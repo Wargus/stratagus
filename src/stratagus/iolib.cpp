@@ -465,6 +465,41 @@ local int flqcmp(const void *v1, const void *v2)
 	return c2->type - c1->type;
 }
 
+#ifdef USE_ZZIPLIB
+/**
+ * will attach a .zip extension and tries to open it
+ * the with => open(2). This is a helper function for
+ * => zzip_dir_open, => zzip_opendir and => zzip_open.
+ *
+ * copied from zzip_dir.c, as it is a private function
+ * and won't be exported in shared lib / dll version!
+ */
+local int
+__my_zzip_open_zip(const char* filename, int filemode)
+{
+    auto char file[PATH_MAX];
+    int fd;
+    int len = strlen (filename);
+    static const char* my_zzip_default_fileext[] =
+    {
+	".zip", ".ZIP", /* common extension */
+	0
+    };
+    const char** ext = my_zzip_default_fileext;
+    
+    if (len+4 >= PATH_MAX) return -1;
+    memcpy(file, filename, len+1);
+
+    for ( ; *ext ; ++ext)
+    {
+	strcpy (file+len, *ext);
+	fd = open(file, filemode);
+	if (fd != -1) return fd;
+    }
+    return -1;
+}    
+#endif
+
 /**
 **	Generate a list of files within a specified directory
 **
@@ -513,7 +548,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	zzip_error_t e;
 
 	*cp = '\0'; /* cut at path separator == possible zipfile basename */
-	fd = __zzip_open_zip(zzbasepath, O_RDONLY|O_BINARY);
+	fd = __my_zzip_open_zip(zzbasepath, O_RDONLY|O_BINARY);
 	if (fd == -1) {
 	    continue;
 	}
@@ -535,7 +570,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	// and we want it vice versa in this special case. Otherwise it would not
 	// match the path separtor backtrace above, which relies on recursive
 	// __zip_open_dir(). __zip_open_dir() only detects zipfiles, not real dirs!
-	fd = __zzip_open_zip(dirname, O_RDONLY|O_BINARY);
+	fd = __my_zzip_open_zip(dirname, O_RDONLY|O_BINARY);
 	if (fd == -1) {
 	    dirp = zzip_opendir(dirname);
 	    zzbasepath[0] = 0;
@@ -574,7 +609,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 			    cp = strrchr(buffer, '.');
 			    if (cp) {
 				*cp = 0;
-				isdir = __zzip_open_zip(buffer, O_RDONLY|O_BINARY);
+				isdir = __my_zzip_open_zip(buffer, O_RDONLY|O_BINARY);
 				if (isdir != -1) {
 				    close(isdir);
 				    isdir = 1;
