@@ -371,7 +371,7 @@ local Menuitem EndScenarioMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*3, 0, LargeFont, NULL, NULL,
 	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'} } },
     { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!Previous", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
+	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
     { 0 }
 #endif
