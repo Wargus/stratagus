@@ -122,9 +122,10 @@ global int* VisionLookup;
 local unsigned char* VisibleTable;
 
 #ifdef USE_SDL_SURFACE
+local SDL_Surface* OnlyFogSurface;
 local void (*VideoDrawUnexplored)(const int, int, int);
 local void (*VideoDrawFog)(const int, int, int);
-local void (*VideoDrawOnlyFog)(int x, int y);
+local void (*VideoDrawOnlyFog)(int, int);
 #else
 /**
 **		Draw unexplored area function pointer. (display and video mode independ)
@@ -507,7 +508,7 @@ global void VideoDrawFogSDL(const int tile, int x, int y)
 	drect.x = x;
 	drect.y = y;
 
-	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
 	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_RLEACCEL, 0);
 }
@@ -533,7 +534,13 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 
 global void VideoDrawOnlyFogSDL(int x, int y)
 {
-	VideoFillTransRectangleClip(ColorBlack, x, y, TileSizeX, TileSizeY, 128);
+	SDL_Rect drect;
+
+	drect.x = x;
+	drect.y = y;
+
+	SDL_BlitSurface(OnlyFogSurface, NULL, TheScreen, &drect);
+	//VideoFillTransRectangleClip(ColorBlack, x, y, TileSizeX, TileSizeY, FogOfWarOpacity);
 }
 
 #else
@@ -1938,6 +1945,24 @@ global void InitMapFogOfWar(void)
 	VideoDrawUnexplored = VideoDrawUnexploredSolidOpenGL;
 #else
 #ifdef USE_SDL_SURFACE
+	//
+	//	Generate Only Fog surface.
+	//	
+	{
+		unsigned char r;
+		unsigned char g;
+		unsigned char b;
+		Uint32 color;
+
+		// FIXME: optimize
+		OnlyFogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, TileSizeX, TileSizeY,
+			32, RMASK, GMASK, BMASK, AMASK);
+
+		SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
+		color = SDL_MapRGBA(OnlyFogSurface->format, r, g, b, FogOfWarOpacity);
+
+		SDL_FillRect(OnlyFogSurface, NULL, color);
+	}
 	VideoDrawUnexplored = VideoDrawUnexploredSDL;
 	VideoDrawFog = VideoDrawFogSDL;
 	VideoDrawOnlyFog = VideoDrawOnlyFogSDL;
@@ -2023,6 +2048,7 @@ global void CleanMapFogOfWar(void)
 		free(VisibleTable);
 		VisibleTable = NULL;
 	}
+	SDL_FreeSurface(OnlyFogSurface);
 }
 
 /**
