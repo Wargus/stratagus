@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ccl_map.c	-	The map ccl functions. */
 //
 //	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "ccl.h"
 #include "map.h"
 #include "minimap.h"
@@ -45,11 +45,11 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Parse a freecraft map.
+**	Parse a stratagus map.
 **
 **	@param list	list of tuples keyword data
 */
-local SCM CclFreeCraftMap(SCM list)
+local SCM CclStratagusMap(SCM list)
 {
     SCM value;
     SCM data;
@@ -74,8 +74,8 @@ local SCM CclFreeCraftMap(SCM list)
 	    data=gh_car(list);
 	    list=gh_cdr(list);
 	    str=gh_scm2newstr(data,NULL);
-	    sprintf(buf,FreeCraftFormatString,
-		    FreeCraftFormatArgs(FreeCraftVersion));
+	    sprintf(buf,StratagusFormatString,
+		    StratagusFormatArgs(StratagusVersion));
 	    if( strcmp(buf,str) ) {
 		fprintf(stderr,"Warning not saved with this version.\n");
 	    }
@@ -532,7 +532,7 @@ local SCM CclSetBurnBuildings(SCM percent,SCM rate)
 */
 global void MapCclRegister(void)
 {
-    gh_new_procedureN("freecraft-map",CclFreeCraftMap);
+    gh_new_procedureN("stratagus-map",CclStratagusMap);
     gh_new_procedure0_0("reveal-map",CclRevealMap);
     gh_new_procedure2_0("center-map",CclCenterMap);
     gh_new_procedure4_0("show-map-location",CclShowMapLocation);

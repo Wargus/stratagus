@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name menus.c	-	The menu function code. */
 //
 //	(c) Copyright 1999-2003 by Andreas Arens and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -39,7 +39,7 @@
 #include <fcntl.h>
 #endif
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "iocompat.h"
 
@@ -2356,7 +2356,7 @@ local void SaveReplayOk(void)
     strcat(TempPathBuf, "/logs/");
 #endif
     ptr = TempPathBuf + strlen(TempPathBuf);
-    sprintf(ptr, "log_of_freecraft_%d.log", ThisPlayer->Player);
+    sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Player);
 
     stat(TempPathBuf, &s);
     buf = (char*)malloc(s.st_size);
@@ -4040,7 +4040,7 @@ local void ScenSelectCancel(void)
     //  Use last selected map.
     //
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -4091,7 +4091,7 @@ local void CustomGameStart(void)
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
 	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
-	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
     } else {
 	strcpy(CurrentMapPath, ScenSelectFileName);
@@ -4129,7 +4129,7 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     }
 
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -5035,7 +5035,7 @@ local void StartEditor(void)
     //
     //	Use the last path.
     //
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -5237,7 +5237,7 @@ local void EditorMainLoadMap(void)
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
 	strcpy(s+1, ScenSelectFileName);	// Final map name with path
-	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
     } else {
@@ -5489,7 +5489,7 @@ local void EditorMainLoadCancel(void)
     //  Use last selected map.
     //
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -5693,7 +5693,7 @@ global void EditorLoadMenu(void)
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
 	strcpy(s+1, ScenSelectFileName);	// Final map name with path
-	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
     } else {
@@ -5758,7 +5758,7 @@ local void EditorLoadCancel(void)
     //  Use last selected map.
     //
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -5853,7 +5853,7 @@ local void EditorMapPropertiesOk(void)
 	LoadTileset();
 	ChangeTilesetPud(old,&TheMap);
 	LoadRGB(GlobalPalette,
-		s=strdcat3(FreeCraftLibPath,"/graphics/",
+		s=strdcat3(StratagusLibPath,"/graphics/",
 		    TheMap.Tileset->PaletteFile));
 	free(s);
 	VideoCreatePalette(GlobalPalette);
@@ -6174,7 +6174,7 @@ global int EditorSaveMenu(void)
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
 	strcpy(s+1, ScenSelectFileName);	// Final map name with path
-	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
     }
@@ -7004,7 +7004,7 @@ local void ReplayGameCancel(void)
     //  Use last selected map.
     //
     DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
-    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectPath, StratagusLibPath);
     if (*ScenSelectPath) {
 	strcat(ScenSelectPath, "/");
     }
@@ -7087,7 +7087,7 @@ global void InitMenuFunctions(void)
     //
     //	Autodetect the swamp tileset
     //
-    strcpy(MenuMapFullPath, FreeCraftLibPath);
+    strcpy(MenuMapFullPath, StratagusLibPath);
     if (MenuMapFullPath[0]) {
 	strcat(MenuMapFullPath, "/graphics/tilesets/");
     }

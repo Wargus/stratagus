@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________			     ______________________
 //			  T H E	  W A R	  B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name video.c	-	The universal video functions. */
 //
 //	(c) Copyright 1999-2002 by Lutz Sammer
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -50,7 +50,7 @@
 **
 **      @section Deco Decorations
 **
-**		A mechanism beteen the Freecraft engine and draw routines
+**		A mechanism beteen the Stratagus engine and draw routines
 **		to make a screen refresh/update faster and accurate.
 **		It will 'know' about overlapping screen decorations and draw
 **		them all (partly) when one is to be updated.
@@ -102,7 +102,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "video.h"
 #include "map.h"
 #include "ui.h"

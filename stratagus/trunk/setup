@@ -7,18 +7,18 @@
 ##	  \/		    \/	   \/	     \/		   \/
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
-##	   FreeCraft - A free fantasy real time strategy game engine
+##	   Stratagus - A free fantasy real time strategy game engine
 ##
 ##	setup		-	Configure Rules.make (GNU MAKE rules).
 ##
 ##	(c) Copyright 2000-2003 by Dan Hensley, Nehal Mistry.
 ##	Optimization section by Patrick McFarland.
 ##
-##	FreeCraft is free software; you can redistribute it and/or modify
+##	Stratagus is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
 ##	by the Free Software Foundation; only version 2 of the License.
 ##
-##	FreeCraft is distributed in the hope that it will be useful,
+##	Stratagus is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##	GNU General Public License for more details.
@@ -60,7 +60,7 @@ EXTRA_LDFLAGS="$LDFLAGS"
 ##-----------------------------------------------------------------------------
 
 # if your system/distribution lacks libpng, you may install the source
-# in the freecraft directory and name that directory here!
+# in the stratagus directory and name that directory here!
 # Default (tested) version is 1.0.12, anything above should also be ok.
 # Adjust as required - ignored if the directory does not exist.
 LOCAL_PNG="libpng-1.0.12"
@@ -69,15 +69,15 @@ LOCAL_PNG="libpng-1.0.12"
 # you might additionally need to install the following:
 
 # if your system/distribution lacks libz, you may install the source
-# in the freecraft directory and name that directory here!
+# in the stratagus directory and name that directory here!
 # Default (tested) version is 1.1.4, anything above should also be ok.
 # Adjust as required - ONLY USED IF SYSTEM HAS NO ZLIB INSTALLED BY DEFAULT!
 LOCAL_ZLIB="zlib-1.1.4"
 
-BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
+BEOS_CONFIGFILE=/boot/home/config/settings/Stratagus/Stratagus.cfg
 
 ##-----------------------------------------------------------------------------
-## Everything below this line should only be changed by FreeCraft developers.
+## Everything below this line should only be changed by Stratagus developers.
 
 if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
   RULESFILE=Rules.make
@@ -101,7 +101,7 @@ cat << .. > $RULESFILE
 ##	  \/		    \/	   \/	     \/		   \/
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
-##	   FreeCraft - A free fantasy real time strategy game engine
+##	   Stratagus - A free fantasy real time strategy game engine
 ##
 ..
 
@@ -169,9 +169,9 @@ while test $# != 0 ; do
       echo "usage: setup [--static] [--unix] [--beos] [--win32] [--darwin] [--debug] [--profile]"
       echo
       echo "Setup will create a Rules.make file (or Rules.make.WIN32"
-      echo "if --win32 forced) that Freecraft needs to compile."
+      echo "if --win32 forced) that Stratagus needs to compile."
       echo "Supported command-line arguments (you may use more than one at a time):"
-      echo "  static  : Compile Freecraft using static libraries (default dynamic)"
+      echo "  static  : Compile Stratagus using static libraries (default dynamic)"
       echo "  unix    : Force Unix/Linux compile options (default auto check)"
       echo "  beos    : Force BeOS compile options (default auto check)"
       echo "  win32   : Force WIN32 compile options (default auto check)"
@@ -355,9 +355,9 @@ else
     echo
     echo "...You do not appear to have a working PNG library installed!"
     echo
-    echo "libpng is required for freecraft to compile. Please "
+    echo "libpng is required for stratagus to compile. Please "
     echo "refer to the LOCAL_PNG section in the setup script to "
-    echo "find out how to install a local copy to compile freecraft."
+    echo "find out how to install a local copy to compile stratagus."
     echo
     echo "Please also note that the PNG library most likely also"
     echo "requires the GZIP compression library. If you are sure"
@@ -469,7 +469,7 @@ else
 if [ "$HAVESDL" = 1 ] ; then
   VIDSEL="S"
 else
-  echo "FreeCraft on BeOS currently only supports SDL for video"
+  echo "Stratagus on BeOS currently only supports SDL for video"
   echo "Please install SDL and try again."
   exit -1
 fi
@@ -811,8 +811,8 @@ echo "" >> $RULESFILE
 
 if [ "$DEBUG" != 1 ] ; then
     echo
-    echo "Debug Support allows you to debug Freecraft more easily, but disables a lot of"
-    echo "optimization support, which may cause Freecraft to run much slower."
+    echo "Debug Support allows you to debug Stratagus more easily, but disables a lot of"
+    echo "optimization support, which may cause Stratagus to run much slower."
     echo
     echo -n "Would you like debug support? (n): "
     read $N DEBUGASK
@@ -844,9 +844,9 @@ if [ "$DEBUG" != 1 ] && [ "$WIN32" != 1 ]; then
     echo Compiler is $CC $CCMAJOR.$CCMINOR.$CCREALLYMINOR
     echo
     echo "This autoconfiguring program allows you to tell GCC to use different"
-    echo "optimizations, based on how stable you want Freecraft. The higher the"
-    echo "optimization, the more unstable Freecraft is. High Optimization also"
-    echo "may cause Freecraft to fail to compile, but usually doesnt. High"
+    echo "optimizations, based on how stable you want Stratagus. The higher the"
+    echo "optimization, the more unstable Stratagus is. High Optimization also"
+    echo "may cause Stratagus to fail to compile, but usually doesnt. High"
     echo "Optimization will also increase compile times."
     echo
     echo "Which Optimization Mode do you wish to use?"
@@ -872,7 +872,7 @@ if [ "$DEBUG" != 1 ] && [ "$WIN32" != 1 ]; then
 	    echo
 	    echo "Specific Processor Optimization:"
 	    echo
-	    echo "You can additionally optimize Freecraft, depending on what architecture" 
+	    echo "You can additionally optimize Stratagus, depending on what architecture" 
 	    echo "(target machine) you run. If you dont know, or your target"
 	    echo "machine isnt listed, simply press enter."
 	    echo
@@ -1037,7 +1037,7 @@ if [ "$BEOS" != 1 ] ; then
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
-    # Libraries needed to build freecraft
+    # Libraries needed to build stratagus
     echo "STRATAGUS_LIBS=$STRATAGUS_LIBS \$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS) \\" >> $RULESFILE
     echo "	\$(ARTSCLIB) \$(FLACLIB) \$(OGGLIB) \$(MP3LIB) \\" >> $RULESFILE
@@ -1046,7 +1046,7 @@ if [ "$BEOS" != 1 ] ; then
     # Libraries needed to build tools
     echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
 
-    # Libraries needed to build freecraft
+    # Libraries needed to build stratagus
     echo "STRATAGUS_LIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
     echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
   fi
@@ -1054,7 +1054,7 @@ else
   # Libraries needed to build tools
   echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
 
-  # Libraries needed to build freecraft
+  # Libraries needed to build stratagus
   echo "STRATAGUS_LIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
   echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
 fi
@@ -1068,7 +1068,7 @@ echo >> $RULESFILE
 if test "$WIN32" = 1 ; then
   echo "# Win32" >> $RULESFILE
   echo "EXE=.exe" >> $RULESFILE
-  echo "OUTFILE=\$(TOPDIR)/freecraft\$(EXE)" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/stratagus\$(EXE)" >> $RULESFILE
   echo "ARCH=win32" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
   echo "OBJDIR=winobj" >> $RULESFILE
@@ -1076,7 +1076,7 @@ else
 # LINUX
   echo "# Linux" >> $RULESFILE
   echo "EXE=" >> $RULESFILE
-  echo "OUTFILE=\$(TOPDIR)/freecraft" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/stratagus" >> $RULESFILE
   echo "ARCH=linux" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
   echo "OBJDIR=obj" >> $RULESFILE
@@ -1154,7 +1154,7 @@ echo
 case $ANSWER in
  [nN])
  	echo
- 	echo "Done generating $RULESFILE. Type '$MAKE $DEPEND && $MAKE$CROSS' to compile freecraft."
+ 	echo "Done generating $RULESFILE. Type '$MAKE $DEPEND && $MAKE$CROSS' to compile stratagus."
 	echo
 	;;
  *)

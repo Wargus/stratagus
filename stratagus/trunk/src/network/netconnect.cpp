@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name netconnect.c	-	The network high level connection code. */
 //
 //	(c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens.
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -35,7 +35,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "net_lowlevel.h"
 #include "player.h"
@@ -104,11 +104,11 @@ local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 **	@param msg	The message to send
 **
 **	@todo	FIXME: we don't need to put the header into all messages.
-**		(header = msg->FreeCraft ... )
+**		(header = msg->Stratagus ... )
 */
 local int NetworkSendICMessage(unsigned long host, int port, InitMessage *msg)
 {
-    msg->FreeCraft = htonl(FreeCraftVersion);
+    msg->Stratagus = htonl(StratagusVersion);
     msg->Version = htonl(NetworkProtocolVersion);
     msg->Lag = htonl(NetworkLag);
     msg->Updates = htonl(NetworkUpdates);
@@ -142,7 +142,7 @@ local const char *icmsgsubtypenames[] = {
     "Hello",			// Client Request
     "Config",			// Setup message configure clients
 
-    "EngineMismatch",		// FreeCraft engine version doesn't match
+    "EngineMismatch",		// Stratagus engine version doesn't match
     "ProtocolMismatch",		// Network protocol version doesn't match
     "EngineConfMismatch",	// Engine configuration isn't identical
     "MapUidMismatch",		// MAP UID doesn't match
@@ -859,13 +859,13 @@ local void ClientParseConnecting(const InitMessage* msg)
 
     switch(msg->SubType) {
 
-	case ICMEngineMismatch: // FreeCraft engine version doesn't match
-	    fprintf(stderr, "Incompatible FreeCraft version "
-			FreeCraftFormatString " <-> "
-			FreeCraftFormatString "\n"
+	case ICMEngineMismatch: // Stratagus engine version doesn't match
+	    fprintf(stderr, "Incompatible Stratagus version "
+			StratagusFormatString " <-> "
+			StratagusFormatString "\n"
 			"from %d.%d.%d.%d:%d\n",
-		    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
-		    FreeCraftFormatArgs(FreeCraftVersion),
+		    StratagusFormatArgs((int)ntohl(msg->Stratagus)),
+		    StratagusFormatArgs(StratagusVersion),
 		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 	    NetLocalState = ccs_incompatibleengine;
 	    NetConnectRunning = 0;	// End the menu..
@@ -934,7 +934,7 @@ local void ClientParseConnected(const InitMessage* msg)
     switch(msg->SubType) {
 
 	case ICMMap:		// Server has sent us new map info
-	    pathlen = sprintf(MenuMapFullPath, "%s/", FreeCraftLibPath);
+	    pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
 	    memcpy(MenuMapFullPath+pathlen, msg->u.MapPath, 256);
 	    MenuMapFullPath[pathlen+255] = 0;
 	    if (NetClientSelectScenario()) {
@@ -944,7 +944,7 @@ local void ClientParseConnected(const InitMessage* msg)
 	    if (ntohl(msg->MapUID) != MenuMapInfo->MapUID) {
 		NetLocalState = ccs_badmap;
 		fprintf(stderr,
-		    "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+		    "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 			    (unsigned int)MenuMapInfo->MapUID,
 			    (unsigned int)ntohl(msg->MapUID));
 		break;
@@ -1321,7 +1321,7 @@ local void ServerParseWaiting(const int h)
 	    // this code path happens until client acknoledges the map
 	    message.Type = MessageInitReply;
 	    message.SubType = ICMMap;			// Send Map info to the client
-	    pathlen = strlen(FreeCraftLibPath) + 1;
+	    pathlen = strlen(StratagusLibPath) + 1;
 	    memcpy(message.u.MapPath, MenuMapFullPath+pathlen, 256);
 	    message.MapUID = htonl(MenuMapInfo->MapUID);
 	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1538,7 +1538,7 @@ local void ServerParseIAmHere(const int h)
 }
 
 /**
-**	Check if the FreeCraft version and Network Protocol match
+**	Check if the Stratagus version and Network Protocol match
 **
 **	@param msg	message received
 **
@@ -1549,17 +1549,17 @@ local int CheckVersions(const InitMessage* msg)
     int n;
     InitMessage message;
 
-    if (ntohl(msg->FreeCraft) != FreeCraftVersion) {
-	fprintf(stderr, "Incompatible FreeCraft version "
-		    FreeCraftFormatString " <-> "
-		    FreeCraftFormatString "\n"
+    if (ntohl(msg->Stratagus) != StratagusVersion) {
+	fprintf(stderr, "Incompatible Stratagus version "
+		    StratagusFormatString " <-> "
+		    StratagusFormatString "\n"
 		    "from %d.%d.%d.%d:%d\n",
-		FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
-		FreeCraftFormatArgs(FreeCraftVersion),
+		StratagusFormatArgs((int)ntohl(msg->Stratagus)),
+		StratagusFormatArgs(StratagusVersion),
 		NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 
 	message.Type = MessageInitReply;
-	message.SubType = ICMEngineMismatch; // FreeCraft engine version doesn't match
+	message.SubType = ICMEngineMismatch; // Stratagus engine version doesn't match
 	message.MapUID = 0L;
 	n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 	DebugLevel0Fn("Sending InitReply Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_

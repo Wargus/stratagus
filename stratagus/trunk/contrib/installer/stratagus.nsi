@@ -1,14 +1,14 @@
 ; The name of the installer
-Name "FreeCraft"
+Name "Stratagus"
 
-OutFile "freecraft-030311-win32.exe"
-Icon "freecraft.ico"
+OutFile "stratagus-030311-win32.exe"
+Icon "stratagus.ico"
 
-InstallDir $PROGRAMFILES\FreeCraft
+InstallDir $PROGRAMFILES\Stratagus
 
-DirText "FreeCraft will be installed to the specified location"
+DirText "Stratagus will be installed to the specified location"
 
-ComponentText "This will install FreeCraft. Select what you want installed."
+ComponentText "This will install Stratagus. Select what you want installed."
 EnabledBitmap bitmap1.bmp
 DisabledBitmap bitmap2.bmp
 InstType "WC2"
@@ -18,7 +18,7 @@ InstType "Base Only"
 Section "Base (required)"
   SectionIn RO
   SetOutPath $INSTDIR
-  File /r "C:\projects\freecraft-030311\*.*"
+  File /r "C:\projects\stratagus-030311\*.*"
   WriteUninstaller $INSTDIR\uninst.exe
 SectionEnd
 
@@ -35,19 +35,19 @@ SectionEnd
 Section "Start Menu Shortcuts"
   SectionIn 1
   SectionIn 2
-  CreateDirectory "$SMPROGRAMS\FreeCraft"
+  CreateDirectory "$SMPROGRAMS\Stratagus"
   StrCmp $1 "1" 0 NoWC2Shortcut
-  CreateShortCut "$SMPROGRAMS\FreeCraft\FreeCraft (WC2).lnk" "$INSTDIR\freecraft.exe" ""
-  CreateShortCut "$SMPROGRAMS\FreeCraft\Edit build.bat.lnk" "notepad.exe" "$INSTDIR\build.bat" ""
-  CreateShortCut "$SMPROGRAMS\FreeCraft\Run build.bat.lnk" "$INSTDIR\build.bat" ""
+  CreateShortCut "$SMPROGRAMS\Stratagus\Stratagus (WC2).lnk" "$INSTDIR\stratagus.exe" ""
+  CreateShortCut "$SMPROGRAMS\Stratagus\Edit build.bat.lnk" "notepad.exe" "$INSTDIR\build.bat" ""
+  CreateShortCut "$SMPROGRAMS\Stratagus\Run build.bat.lnk" "$INSTDIR\build.bat" ""
 NoWC2Shortcut:
-  CreateShortCut "$SMPROGRAMS\FreeCraft\Uninstall FreeCraft.lnk" "$INSTDIR\uninst.exe" ""
+  CreateShortCut "$SMPROGRAMS\Stratagus\Uninstall Stratagus.lnk" "$INSTDIR\uninst.exe" ""
 SectionEnd
 
-Uninstalltext "This will uninstall FreeCraft."
+Uninstalltext "This will uninstall Stratagus."
 
 Section "Uninstall"
-	RMDir /r $SMPROGRAMS\FreeCraft
+	RMDir /r $SMPROGRAMS\Stratagus
 	RMDir /r $INSTDIR
 SectionEnd
 

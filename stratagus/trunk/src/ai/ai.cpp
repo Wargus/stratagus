@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name new_ai.c	-	The new computer player AI main file. */
 //
 //      (c) Copyright 2000-2002 by Lutz Sammer
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -38,7 +38,7 @@
 **
 **      @section aibasics What is it?
 **
-**	FreeCraft uses a very simple scripted AI. There are no optimizations
+**	Stratagus uses a very simple scripted AI. There are no optimizations
 **	yet. The complete AI was written on one weekend.
 **	Until no AI specialist joins, I keep this AI.
 **
@@ -133,7 +133,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #include "player.h"
 #include "unit.h"
