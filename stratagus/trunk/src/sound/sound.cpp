@@ -210,7 +210,7 @@ void PlayMissileSound(const Missile* missile, SoundId sound)
 {
 	int stereo;
 
-	stereo = ((missile->X + missile->Type->Width / 2 -
+	stereo = ((missile->X + missile->Type->G->Width / 2 -
 		TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
 		((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
 	if (stereo < -128) {
