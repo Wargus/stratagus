@@ -105,7 +105,7 @@ local void SetRes1280(Menuitem *mi);
 local void SetRes1600(Menuitem *mi);
 local void SetFullscreen(Menuitem *mi);
 local void SetShadowFogAlpha(Menuitem *mi);
-local void SetShadowFogGrayFog(Menuitem *mi);
+local void SetShadowFogGray(Menuitem *mi);
 
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
@@ -2182,7 +2182,18 @@ global void InitMenuFuncHash(void) {
     HASHADD(StartEditor,"game-start-editor");
     HASHADD(GameShowCredits,"game-show-credits");
     HASHADD(GameMenuExit,"game-menu-exit");
+
+// Global Options
     HASHADD(GlobalOptions,"game-global-options");
+    HASHADD(InitGlobalOptions,"init-global options");
+    HASHADD(SetRes640,"set-res-640");
+    HASHADD(SetRes800,"set-res-800");
+    HASHADD(SetRes1024,"set-res-1024");
+    HASHADD(SetRes1280,"set-res-1280");
+    HASHADD(SetRes1600,"set-res-1600");
+    HASHADD(SetFullscreen,"set-fullscreen");
+    HASHADD(SetShadowFogAlpha,"set-shadow-fog-alpha");
+    HASHADD(SetShadowFogGray,"set-shadow-fog-gray");
 
 // Tips
     HASHADD(InitTips,"init-tips");
@@ -3288,7 +3299,7 @@ local void SetShadowFogAlpha(Menuitem *mi)
 {
 }
 
-local void SetShadowFogGrayFog(Menuitem *mi)
+local void SetShadowFogGray(Menuitem *mi)
 {
 }
 
