@@ -1226,14 +1226,17 @@ global int InitSoundServer(void)
       //prepare for the sound thread
       if( sem_init(&SoundThreadChannelSemaphore,0,0) ) {
 	//FIXME: better error handling
-	perror(__FUNCTION__);
+	PrintFunction();
+	// FIXME: ARI: strerror_r() is better here, but not compatible
+	fprintf(stdout, "%s\n", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;
       }
       if( pthread_create(&SoundThread,NULL,(void *)&WriteSoundThreaded,NULL) ) {
 	//FIXME: better error handling
-	perror(__FUNCTION__);
+	PrintFunction();
+	fprintf(stdout, "%s\n", strerror(errno));
 	close(SoundFildes);
 	SoundFildes=-1;
 	return 1;

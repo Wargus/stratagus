@@ -284,9 +284,9 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
     // FIXME: not the fastest, remove UnitTypeByWcNum from loops!
     IfDebug(
 	if( length!=5694 && length!=5948 ) {
-	    DebugLevel0("\n"__FUNCTION__": ***\n"__FUNCTION__": %d\n"
-		    _C_ length);
-	    DebugLevel0Fn("***\n\n");
+	    DebugLevel0("\n***\n");
+	    DebugLevel0Fn("%d\n" _C_ length);
+	    DebugLevel0("***\n\n");
 	}
     )
     start=udta;
@@ -1256,8 +1256,8 @@ global void LoadUnitTypes(void)
 
 	    unittype=UnitTypeByIdent(type->SameSprite);
 	    if( !unittype ) {
-		fprintf(stderr,__FUNCTION__": unit-type %s not found\n"
-			,type->SameSprite);
+		PrintFunction();
+		fprintf(stdout,"Unit-type %s not found\n" ,type->SameSprite);
 		ExitFatal(-1);
 	    }
 	    type->Sprite=unittype->Sprite;

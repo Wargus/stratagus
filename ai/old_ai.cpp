@@ -1096,14 +1096,14 @@ local void AiAssignWorker(void)
 --      GOAL
 ----------------------------------------------------------------------------*/
 
+IfDebug(
 /**
 **	Show Goal
 */
-local void AiShowGoal(const char *function, const AiGoal * goal)
+local void AiShowGoal(const AiGoal * goal)
 {
-    IfDebug(
 
-    printf("\t%s:%d ", function, AiPlayer - Ais);
+    fprintf(stdout, "%d ", AiPlayer - Ais);
     switch (goal->Action) {
 	case AiCmdBuild:			/// unit must be built
 	    printf("build %d*%s\n", goal->Number,
@@ -1116,8 +1116,9 @@ local void AiShowGoal(const char *function, const AiGoal * goal)
 	case AiCmdArmy:				/// attack the opponent
 	    printf("army %d*%d\n", goal->Number, goal->Unit);
 	    break;
-    } );
+    }
 }
+);
 
 /**
 **      Insert a new goal into the Ai player goal list.
@@ -1143,7 +1144,10 @@ local void AiNewGoal(int action, int number, int type)
     goal->Unit = type;
     AiPlayer->GoalHead = goal;
 
-    AiShowGoal(__FUNCTION__, goal);
+IfDebug(
+    PrintFunction();
+    AiShowGoal(goal);
+);
 }
 
 /**
@@ -1151,7 +1155,10 @@ local void AiNewGoal(int action, int number, int type)
 */
 local void AiDelGoal(AiGoal * goal)
 {
-    AiShowGoal(__FUNCTION__, goal);
+IfDebug(
+    PrintFunction();
+    AiShowGoal(goal);
+);
     goal->Next->Prev = goal->Prev;
     goal->Prev->Next = goal->Next;
     free(goal);
