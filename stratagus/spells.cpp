@@ -683,7 +683,8 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	break;
 
     case SpellActionInvisibility:
-	if (target && target->Type->Organic && target->Invisible < spell->TTL) {
+	if (target && !target->Type->Building
+		    && target->Invisible < spell->TTL) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    target->Invisible = spell->TTL;	// about 50 sec
