@@ -544,7 +544,7 @@ local SCM CclUnit(SCM list)
 	    unit->Reset=0;		// JOHNS ????
 	    DebugCheck( unit->Slot!=slot );
 	} else if( gh_eq_p(value,gh_symbol2scm("next")) ) {
-	    value=gh_car(list);
+	    unit->Next=UnitSlots[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
 	    DebugLevel0Fn("FIXME: 'next of unit %d\n" _C_ slot);
 #if 0
@@ -564,9 +564,7 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("currentsightrange")) ) {
 	    unit->CurrentSightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("host")) ) {
-            unit->Host=UnitSlots[gh_scm2int(gh_car(list))];
-	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("hosttile")) ) {          
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    MapMarkSight(player,gh_scm2int(gh_car(value)),

@@ -487,13 +487,12 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if( unit->Host && !unit->Host->Data.Builded.Cancel ) {
-	    MapUnmarkSight(unit->Player,unit->Host->X+unit->Host->Type->TileWidth/2
-				,unit->Host->Y+unit->Host->Type->TileHeight/2
+	if( unit->Next && !unit->Next->Data.Builded.Cancel && unit->Removed ) {
+	    MapUnmarkSight(unit->Player,unit->Next->X+unit->Next->Type->TileWidth/2
+				,unit->Next->Y+unit->Next->Type->TileHeight/2
 				,unit->CurrentSightRange);
-
-	    unit->Host = NULL;
 	}
+	unit->Next = NULL;
 	unit->CurrentSightRange=unit->Type->Stats->SightRange;
 	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
 #else
@@ -593,7 +592,9 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	}
     }
     if( host ) {
-	unit->Host=host;
+	unit->Next=host;
+    } else {
+	unit->Next=NULL;
     }
 #endif
 
@@ -690,7 +691,9 @@ global void RemoveUnit(Unit* unit, Unit* host)
 
     DebugLevel3Fn("%d %p %p\n" _C_ UnitNumber(unit) _C_ unit _C_ unit->Next);
     UnitCacheRemove(unit);
-
+    // UnitCache uses Next, need to set next again
+    unit->Next=host;
+     
     MustRedraw|=RedrawMinimap;
     CheckUnitToBeDrawn(unit);
 }
@@ -3821,8 +3824,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
 
     if( unit->Next ) {
-	fprintf(file,"'next '%s ",ref=UnitReference(unit->Next));
-	free(ref);
+	fprintf(file,"'next '%d ",UnitNumber(unit->Next));
     }
 
     fprintf(file,"'tile '(%d %d) ",unit->X,unit->Y);
@@ -3869,10 +3871,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file," 'selected");
     }
 #ifdef NEW_FOW
-    if( unit->Host ) {
-	fprintf(file," 'host %d '(%d %d)",UnitNumber(unit->Host),
-		unit->Host->X+unit->Host->Type->TileWidth/2,
-		unit->Host->Y+unit->Host->Type->TileHeight/2);
+    if( unit->Next && unit->Removed ) {
+	fprintf(file," 'hosttile '(%d %d) ",
+		unit->Next->X+unit->Next->Type->TileWidth/2,
+		unit->Next->Y+unit->Next->Type->TileHeight/2);
     }
 #endif
     fprintf(file," 'visible \"");
