@@ -1293,6 +1293,9 @@ global void InitNetwork(void)
 	if( NetworkUpdates<=0 ) {
 	    NetworkUpdates=1;
 	}
+	// Lag must be multiple of Updates?
+	NetworkLag/=NetworkUpdates;
+	NetworkLag*=NetworkUpdates;
 
 	port=NetworkPort;
 	if( NetworkArg ) {
@@ -1410,6 +1413,7 @@ global void NetworkEvent(void)
 	    // Destination frame (time to execute).
 	    n=((FrameCounter+128)&~0xFF)|nc->Frame;
 	    if( n>FrameCounter+128 ) {
+		DebugLevel3(__FUNCTION__": +128 needed!\n");
 		n-=0x100;
 	    }
 
@@ -1417,18 +1421,35 @@ global void NetworkEvent(void)
 	    //
 	    //	Find the commands to resend
 	    //
-	    ncq=(NetworkCommandQueue*)(CommandsOut->first);
-	    while( ncq->List->next ) {
+#if 0
+	    ncq=(NetworkCommandQueue*)(CommandsOut->last);
+	    while( ncq->List->prev ) {
+		DebugLevel2(__FUNCTION__": resend %d? %d\n",ncq->Time,n); 
 		if( ncq->Time==n ) {
 		    NetworkSendPacket(ncq);
 		    break;
 		}
+
+		ncq=(NetworkCommandQueue*)(ncq->List->prev);
+	    }
+	    if( !ncq->List->prev ) {
+		DebugLevel0(__FUNCTION__": no packets for resend\n");
+	    }
+#else
+	    ncq=(NetworkCommandQueue*)(CommandsOut->first);
+	    while( ncq->List->next ) {
+		DebugLevel2(__FUNCTION__": resend %d? %d\n",ncq->Time,n); 
+		if( ncq->Time==n ) {
+		    NetworkSendPacket(ncq);
+		    break;
+		}
+
 		ncq=(NetworkCommandQueue*)(ncq->List->next);
 	    }
 	    if( !ncq->List->next ) {
 		DebugLevel0(__FUNCTION__": no packets for resend\n");
 	    }
-
+#endif
 	    continue;
 	}
 
@@ -1445,6 +1466,7 @@ global void NetworkEvent(void)
 	// Destination frame (time to execute).
 	n=((FrameCounter+128)&~0xFF)|nc->Frame;
 	if( n>FrameCounter+128 ) {
+	    DebugLevel3(__FUNCTION__": +128 needed!\n");
 	    n-=0x100;
 	}
 
@@ -1462,7 +1484,7 @@ global void NetworkEvent(void)
     if( !NetworkInSync ) {
 	NetworkInSync=1;
 	n=((FrameCounter)/NetworkUpdates)*NetworkUpdates+NetworkUpdates;
-	DebugLevel0(__FUNCTION__": wait for %d -",n);
+	DebugLevel0(__FUNCTION__": wait for %d - ",n);
 	for( player=0; player<HostsCount; ++player ) {
 	    if( NetworkIn[n&0xFF][NetPlyNr[player]].Time!=n ) {
 		NetworkInSync=0;
@@ -1694,7 +1716,7 @@ local void NetworkSendPacket(NetworkCommandQueue* ncq)
 	}
     }
 
-    if( 1 || !(rand()&1) )
+    //if( 0 || !(rand()&3) )
 	NetworkBroadcast(&packet,sizeof(packet));
 }
 
@@ -1725,7 +1747,7 @@ local void NetworkResendCommands(void)
 	}
     }
 
-    if( 1 || !(rand()&1) )
+    //if( 0 || !(rand()&3) )
 	NetworkBroadcast(&packet,sizeof(packet));
 }
 
