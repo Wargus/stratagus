@@ -618,12 +618,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     SDL_Event event[1];
     Uint32 ticks;
 
-#ifdef USE_OPENGL
-    SDL_GL_SwapBuffers();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    MustRedraw = RedrawEverything;
-#endif
-
 #if defined(WITH_SOUND) && !defined(USE_SDLA)
     // FIXME: ugly hack, move into sound part!!!
     if( SoundFildes==-1 ) {
@@ -878,6 +872,11 @@ global void CheckVideoInterrupts(void)
 */
 global void RealizeVideoMemory(void)
 {
+#ifdef USE_OPENGL
+    SDL_GL_SwapBuffers();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    MustRedraw=RedrawEverything;
+#endif
 }
 
 /**
