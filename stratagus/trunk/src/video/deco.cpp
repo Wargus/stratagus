@@ -290,6 +290,9 @@
 #include <string.h>
 
 #include "freecraft.h"
+
+#ifdef NEW_DECODRAW
+
 #include "video.h"
 #include "sweepline.h"
 #include "deco.h"
@@ -1044,5 +1047,7 @@ void DecorationUpdateDisplay(void)
 
   InvalidateDirtyscreen();
 }
+
+#endif
 
 //@}
