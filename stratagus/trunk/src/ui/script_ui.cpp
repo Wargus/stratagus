@@ -55,7 +55,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-
 char* ClickMissile;              ///< FIXME:docu
 char* DamageMissile;             ///< FIXME:docu
 
@@ -454,7 +453,7 @@ static int CclDefineCursor(lua_State* l)
 	ct = NULL;
 	i = 0;
 	if (Cursors) {
-		for (; Cursors[i].OType; ++i) {
+		for (; i < CursorMax; ++i) {
 			//
 			//  Race not same, not found.
 			//
@@ -475,12 +474,9 @@ static int CclDefineCursor(lua_State* l)
 	//  Not found, make a new slot.
 	//
 	if (!ct) {
-		ct = calloc(i + 2, sizeof(CursorType));
-		memcpy(ct, Cursors, sizeof(CursorType) * i);
-		free(Cursors);
-		Cursors = ct;
+		CursorMax++;
+		Cursors = realloc(Cursors, CursorMax * sizeof (*Cursors));
 		ct = &Cursors[i];
-		ct->OType = CursorTypeType;
 		ct->Ident = strdup(name);
 		ct->Race = race ? strdup(race) : NULL;
 	}

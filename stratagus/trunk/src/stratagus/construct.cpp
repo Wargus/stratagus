@@ -50,11 +50,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Construction type definition
-*/
-const char ConstructionType[] = "construction";
-
-/**
 **  Constructions.
 */
 static Construction** Constructions;
@@ -295,7 +290,6 @@ static int CclDefineConstruction(lua_State* l)
 		Constructions[i + 1] = NULL;
 		construction = Constructions[i];
 	}
-	construction->OType = ConstructionType;
 	construction->Ident = str;
 
 	//

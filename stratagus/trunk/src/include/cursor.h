@@ -52,10 +52,6 @@
 **
 **  The cursor-type structure members:
 **
-**  CursorType::OType
-**
-**    Object type (future extensions).
-**
 **  CursorType::Ident
 **
 **    Unique identifier of the cursor, used to reference it in config
@@ -137,7 +133,6 @@ typedef struct _cursor_type_ CursorType;
 
 	/// Private type which specifies the cursor-type
 struct _cursor_type_ {
-	const void* OType;  ///< Object type (future extensions)
 	char*       Ident;  ///< Identifier to reference it
 	char*       Race;   ///< Race name
 
@@ -170,8 +165,8 @@ typedef enum _cursor_states_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern const char CursorTypeType[];  ///< cursor-type type
 extern CursorType* Cursors;          ///< cursor-types description
+extern int CursorMax;                ///< Number of cursor.
 
 extern CursorStates CursorState;  ///< current cursor state (point,...)
 extern int CursorAction;          ///< action for selection

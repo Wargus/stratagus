@@ -51,10 +51,6 @@
 **
 **  The construction structure members:
 **
-**  Construction::OType
-**
-**    Object type (future extensions).
-**
 **  Construction::Ident
 **
 **    Unique identifier of the construction, used to reference it in
@@ -125,7 +121,6 @@ typedef struct _construction_frame_ {
 
 	/// Construction shown during construction of a building
 typedef struct _construction_ {
-	const void* OType;  ///< Object type (future extensions)
 	char*       Ident;  ///< construction identifier
 	struct {
 		char* File;    ///< sprite file
@@ -152,7 +147,7 @@ typedef struct _construction_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern const char ConstructionType[];  ///< Construction type
+//extern const char ConstructionType[];  ///< Construction type
 
 /*----------------------------------------------------------------------------
 --  Functions
