@@ -108,8 +108,7 @@ global void CleanModules(void)
 */
 global void InitModules(void)
 {
-    SyncRandSeed=0x87654321;
-
+    InitSyncRand();
     InitIcons();
     InitVideoCursors();
     InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
@@ -195,7 +194,7 @@ global void LoadAll(void)
     LoadGame("save_file_of_freecraft0.ccl");
     SaveGame("save_file_of_freecraft1.ccl");
 #endif
-	LoadGame ("save_file_of_freecraft.ccl");
+    LoadGame ("save_file_of_freecraft.ccl");
 }
 
 //@}
