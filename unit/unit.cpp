@@ -3761,6 +3761,10 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	if (unit->Boarded) {
 		CLprintf(file, " \"boarded\",");
 	}
+	if (unit->AutoRepair) {
+		CLprintf(file, " \"auto-repair\",");
+	}
+
 	CLprintf(file, " \"rs\", %d,", unit->Rs);
 	CLprintf(file, " \"units-boarded-count\", %d,", unit->BoardCount);
 

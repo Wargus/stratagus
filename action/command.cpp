@@ -402,6 +402,23 @@ void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 }
 
 /**
+**  Auto repair.
+**
+**  @param unit     pointer to unit.
+**  @param spellid  Spell id.
+**  @param on       1 for auto repair on, 0 for off.
+*/
+void CommandAutoRepair(Unit* unit, int on)
+{
+	//
+	// Check if unit is still valid? (NETWORK!)
+	//
+	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
+		unit->AutoRepair = on;
+	}
+}
+
+/**
 **  Attack with unit at new position
 **
 **  @param unit    pointer to unit.

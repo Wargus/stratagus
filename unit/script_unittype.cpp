@@ -1938,7 +1938,7 @@ void InitDefinedVariables()
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
-		"PosX", "PosY", "RadarRange", "RadarJammerRange", "Slot"
+		"PosX", "PosY", "RadarRange", "RadarJammerRange", "AutoRepairRange", "Slot"
 		}; // names of the variable.
 	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","

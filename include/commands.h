@@ -99,6 +99,8 @@ extern void SendCommandMove(struct _unit_* unit, int x, int y, int flush);
 	/// Send repair command
 extern void SendCommandRepair(struct _unit_* unit, int x, int y,
 	struct _unit_* dest, int flush);
+	/// Send auto repair command
+extern void SendCommandAutoRepair(struct _unit_* unit, int on);
 	/// Send attack command
 extern void SendCommandAttack(struct _unit_* unit, int x, int y,
 	struct _unit_* dest, int flush);
