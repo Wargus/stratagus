@@ -511,12 +511,14 @@ global void PlaceUnit(Unit* unit,int x,int y)
     if( type->GivesOil ) {
 	Unit* temp;
 
-        DebugLevel0Fn("Remove oil-patch\n");
-	temp=OilPatchOnMap(x,y);
-	DebugCheck( !temp );
-	unit->Value=temp->Value;
-	// oil patch should NOT make sound, handled by let unit die
-	LetUnitDie(temp);		// Destroy oil patch
+	if( (temp=OilPatchOnMap(x,y)) ) {
+	    DebugCheck( !temp );
+	    unit->Value=temp->Value;
+	    // oil patch should NOT make sound, handled by let unit die
+	    LetUnitDie(temp);		// Destroy oil patch
+	} else {
+	    DebugLevel0Fn("No oil-patch to remove.\n");
+	}
     }
 }
 
