@@ -102,7 +102,7 @@ NumberDesc* Damage;                   ///< Damage calculation for missile.
 /// Usefull for getComponent.
 typedef union {const char *s; int i;} UStrInt;
 /// Get component for unit variable.
-extern UStrInt GetComponent(const Unit* unit, int index, EnumVariable e);
+extern UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t);
 
 /**
 **  FIXME: docu
@@ -529,6 +529,11 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 					}
 				} else if (!strcmp(key, "Component")) {
 					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+				} else if (!strcmp(key, "Loc")) {
+					res->D.UnitStat.Loc = LuaToNumber(l, -1);
+					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
+						LuaError(l, "Bad Loc number :'%d'" _C_ (int) LuaToNumber(l, -1));
+					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
 				}
@@ -762,7 +767,8 @@ int EvalNumber(const NumberDesc* number)
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != NULL) {
-				return GetComponent(unit, number->D.UnitStat.Index, number->D.UnitStat.Component).i;
+				return GetComponent(unit, number->D.UnitStat.Index,
+									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
@@ -1012,13 +1018,14 @@ void FreeStringDesc(StringDesc* s)
 **  @param l  lua State.
 **  @param s
 **
-**  @return the lua table {"UnitVar", {Unit = s, Variable = arg1, Component = "Value" or arg2}
+**  @return the lua table {"UnitVar", {Unit = s, Variable = arg1,
+**                                 Component = "Value" or arg2, Loc = [012]}
 */
 static int AliasUnitVar(lua_State* l, const char* s)
 {
 	int nargs; // number of args in lua.
 
-	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
+	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 3);
 	nargs = lua_gettop(l);
 	lua_newtable (l);
 	lua_pushnumber(l, 1);
@@ -1034,10 +1041,32 @@ static int AliasUnitVar(lua_State* l, const char* s)
 	lua_pushvalue(l, 1);
 	lua_rawset(l, -3);
 	lua_pushstring(l, "Component");
-	if (nargs == 2) {
+	if (nargs >= 2) {
 		lua_pushvalue(l, 2);
 	} else {
 		lua_pushstring(l, "Value");
+	}
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Loc");
+	if (nargs >= 3) {
+		//  Warning: type is for unit->Stats->Var...
+		//           and Initial is for unit->Type->Var... (no upgrade modification)
+		char* sloc[] = {"Unit", "Initial", "Type", NULL};
+		int i;
+		const char *key;
+
+		key = LuaToString(l, 3);
+		for (i = 0; sloc[i] != NULL; i++) {
+			if (!strcmp(key, sloc[i])) {
+				lua_pushnumber(l, i);
+				break ;
+			}
+		}
+		if (sloc[i] == NULL) {
+			LuaError(l, "Bad loc :'%s'" _C_ key);
+		}
+	} else {
+		lua_pushnumber(l, 0);
 	}
 	lua_rawset(l, -3);
 
@@ -1055,7 +1084,7 @@ static int AliasUnitVar(lua_State* l, const char* s)
 */
 static int CclUnitAttackerVar(lua_State* l)
 {
-	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for AttackerVar()\n");
 	}
 	return AliasUnitVar(l, "Attacker");
@@ -1071,7 +1100,7 @@ static int CclUnitAttackerVar(lua_State* l)
 */
 static int CclUnitDefenderVar(lua_State* l)
 {
-	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for DefenderVar()\n");
 	}
 	return AliasUnitVar(l, "Defender");
@@ -1087,7 +1116,7 @@ static int CclUnitDefenderVar(lua_State* l)
 */
 static int CclActiveUnitVar(lua_State* l)
 {
-	if (lua_gettop(l) == 0 || lua_gettop(l) > 2) {
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
 		LuaError(l, "Bad number of arg for ActiveUnitVar()\n");
 	}
 	return AliasUnitVar(l, "Active");

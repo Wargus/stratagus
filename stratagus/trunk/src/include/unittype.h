@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -737,14 +737,12 @@ typedef struct _variable_type_ {
 #define ATTACKRANGE_INDEX    16
 #define PIERCINGDAMAGE_INDEX 17
 #define BASICDAMAGE_INDEX    18
-#define DAMAGE_INDEX         19
-#define EXTRADAMAGE_INDEX    20
-#define POSX_INDEX           21
-#define POSY_INDEX           22
-#define RADAR_INDEX          23
-#define RADARJAMMER_INDEX    24
-#define AUTOREPAIRRANGE_INDEX 25
-#define SLOT_INDEX           26
+#define POSX_INDEX           19
+#define POSY_INDEX           20
+#define RADAR_INDEX          21
+#define RADARJAMMER_INDEX    22
+#define AUTOREPAIRRANGE_INDEX 23
+#define SLOT_INDEX           24
 
 #define NVARALREADYDEFINED SLOT_INDEX + 1 // Hardcoded variables
 
