@@ -395,7 +395,7 @@ local void SaveAiHelperTable(FILE* file,const char* name,int upgrade,int n,
 		    if( table[i]->Table[j]->Type==t ) {
 			if( !f ) {
 			    fprintf(file,"\n  (list '%s '%s\n    ",name,
-				    UnitTypes[t].Ident);
+				    UnitTypes[t]->Ident);
 			    f=4;
 			}
 			if( upgrade ) {
@@ -404,10 +404,10 @@ local void SaveAiHelperTable(FILE* file,const char* name,int upgrade,int n,
 			    }
 			    f+=fprintf(file,"'%s ",Upgrades[i].Ident);
 			} else {
-			    if( f+strlen(UnitTypes[i].Ident)>78 ) {
+			    if( f+strlen(UnitTypes[i]->Ident)>78 ) {
 				f=fprintf(file,"\n    ");
 			    }
-			    f+=fprintf(file,"'%s ",UnitTypes[i].Ident);
+			    f+=fprintf(file,"'%s ",UnitTypes[i]->Ident);
 			}
 		    }
 		}
@@ -437,7 +437,7 @@ local void SaveAiEquivTable(FILE* file,const char* name,int n,
     for( i=0; i<n; ++i ) {
 	if( table[i] ) {
 	    fprintf(file,"\n  (list '%s '%s\n    ",name,
-		    UnitTypes[i].Ident);
+		    UnitTypes[i]->Ident);
 	    f=4;
 	    for( j=0; j<table[i]->Count; ++j ) {
 		if( f+strlen(table[i]->Table[j]->Ident)>78 ) {
@@ -474,7 +474,7 @@ local void SaveAiCostTable(FILE* file,const char* name,int n,
 		    if( table[i]->Table[j]->Type==t ) {
 			if( !f ) {
 			    fprintf(file,"\n  (list '%s '%s\n    ",name,
-				    UnitTypes[t].Ident);
+				    UnitTypes[t]->Ident);
 			    f=4;
 			}
 			if( f+strlen(DefaultResourceNames[i])>78 ) {
@@ -515,7 +515,7 @@ local void SaveAiUnitLimitTable(FILE* file,const char* name,int n,
 		    if( table[i]->Table[j]->Type==t ) {
 			if( !f ) {
 			    fprintf(file,"\n  (list '%s '%s\n    ",name,
-				    UnitTypes[t].Ident);
+				    UnitTypes[t]->Ident);
 			    f=4;
 			}
 			if( f+strlen("food")>78 ) {

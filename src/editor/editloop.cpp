@@ -288,10 +288,10 @@ local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 
     //FXIME: vladi: should check place when mirror editing is enabled...?
     unit = MakeUnitAndPlace(x, y, type, player);
-    if (type->OilPatch || type->GivesOil) {
+    if (type->GivesResource==OilCost) {
 	unit->Value = 50000;
     }
-    if (unit->Type->GoldMine) {
+    if (type->GivesResource==GoldCost) {
 	unit->Value = 100000;
     }
 }
@@ -879,8 +879,7 @@ local void ShowUnitInfo(const Unit* unit)
     i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
 	unit->Type->Name, unit->Player->Player,
 	unit->Active ? "active" : "passive");
-    if (unit->Type->OilPatch || unit->Type->GivesOil
-	    || unit->Type->GoldMine) {
+    if (unit->Type->GivesResource) {
 	sprintf(buf+i," Amount %d",unit->Value);
     }
     SetStatusLine(buf);
@@ -1208,9 +1207,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //
     if (EditorState == EditorSelecting) {
 	if ((MouseButtons&RightButton && UnitUnderCursor)) {
-	    if (UnitUnderCursor->Type->GoldMine ||
-		UnitUnderCursor->Type->OilPatch ||
-		UnitUnderCursor->Type->GivesOil) {
+	    if (UnitUnderCursor->Type->GivesResource) {
 		EditorEditResource();
 		return;
 	    }

@@ -244,10 +244,10 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Show for all players.
     //
-    if( type->GoldMine ) {
+    if( type->GivesResource==GoldCost ) {
 	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
 	if ( !unit->Value ) {
-	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+	    VideoDrawText(x+108,y+8+78,GameFont,"(none)");
 	} else {
 	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	}
@@ -256,7 +256,7 @@ global void DrawUnitInfo(const Unit* unit)
     // Not our building and not under construction
     if( unit->Player!=ThisPlayer
 	    || unit->Orders[0].Action!=UnitActionBuilded ) {
-	if( type->GivesOil || type->OilPatch ) {
+	if( type->GivesResource==OilCost ) {
 	    VideoDrawText(x+47,y+8+78,GameFont,"Oil Left:");
 	    if ( !unit->Value ) {
 		VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");

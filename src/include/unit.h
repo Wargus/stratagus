@@ -993,6 +993,8 @@ extern Unit* TargetOnScreenMapPosition (const Unit* unit,int , int );
     /// Return transporter unit on that screen map position
 extern Unit* TransporterOnScreenMapPosition (int , int );
 
+    /// Return unit of a fixed type on a map tile.
+extern Unit* UnitTypeOnMap(int tx,int ty,UnitType* type);
     /// Return gold mine, if on map tile
 extern Unit* GoldMineOnMap(int tx,int ty);
     /// Return oil patch, if on map tile
