@@ -2053,8 +2053,10 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					if (mi->d.listbox.startline > 0) {
 						mi->d.listbox.startline--;
 					}
-					mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
-						(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
+						mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
+							(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					}
 					if (mi[1].d.vslider.action) {
 						(*mi[1].d.vslider.action)(mi);
 					}
@@ -2106,8 +2108,10 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.listbox.noptions) {
 						mi->d.listbox.startline++;
 					}
-					mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
-						(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
+						mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
+							(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
