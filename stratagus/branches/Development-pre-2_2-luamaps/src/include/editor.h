@@ -77,8 +77,8 @@ extern void EditorMainLoop(void);
 	/// Update editor display
 extern void EditorUpdateDisplay(void);
 
-	/// Save a pud from editor
-extern int EditorSavePud(const char* file);
+	/// Save a map from editor
+extern int EditorSaveMap(const char* file);
 
 	/// Register ccl features
 extern void EditorCclRegister(void);

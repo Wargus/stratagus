@@ -4723,9 +4723,9 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 		np = pathbuf;
 	}
 	fl->type = -1;
-	suf[0] = ".pud";
+	suf[0] = ".smp";
 	suf[1] = ".scm";
-	suf[2] = ".chk";
+	suf[2] = ".pud";
 	suf[3] = NULL;
 	u = 0;
 	lcp = 0;
@@ -5445,7 +5445,7 @@ int EditorSaveMenu(void)
 
 	if (!EditorCancelled) {
 		sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
-		if (EditorSavePud(path) == -1) {
+		if (EditorSaveMap(path) == -1) {
 			ret = -1;
 		}
 		s = ScenSelectPath + strlen(ScenSelectPath);
@@ -5510,7 +5510,7 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 	char *cp;
 	char *lcp;
 
-	suf = ".pud";
+	suf = ".smp";
 	np = strrchr(pathbuf, '/');
 	if (np) {
 		np++;
@@ -5537,7 +5537,7 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 		}
 #endif
 		if (*cp == 0) {
-			if (strcasestr(pathbuf, ".pud")) {
+			if (strcasestr(pathbuf, ".smp")) {
 				fl->type = 1;
 				fl->name = strdup(np);
 				return 1;
@@ -5613,8 +5613,8 @@ static void EditorSaveOk(void)
 		} else {
 			strcpy(ScenSelectFileName, menu->Items[3].D.Input.buffer); // Final map name
 			ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
-			if (!strcasestr(ScenSelectFileName, ".pud\0")) {
-				strcat(ScenSelectFileName, ".pud");
+			if (!strcasestr(ScenSelectFileName, ".smp\0")) {
+				strcat(ScenSelectFileName, ".smp");
 			}
 			sprintf(TempPathBuf, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
 			if (!access(TempPathBuf, F_OK)) {

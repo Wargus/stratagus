@@ -1929,17 +1929,17 @@ static void CreateEditor(void)
 }
 
 /**
-**  Save a pud from editor.
+**  Save a map from editor.
 **
 **  @param file  Save the level to this file.
 **
 **  @return      0 for success, -1 for error
 **
-**  @todo  FIXME: Check if the pud is valid, contains no failures.
+**  @todo  FIXME: Check if the map is valid, contains no failures.
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-int EditorSavePud(const char* file)
+int EditorSaveMap(const char* file)
 {
 	int i;
 
@@ -1954,7 +1954,7 @@ int EditorSavePud(const char* file)
 				~MapFieldLandUnit;
 		}
 	}
-	if (SavePud(file, &TheMap) == -1) {
+	if (SaveStratagusMap(file, &TheMap) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();
