@@ -128,6 +128,7 @@ enum _ic_message_subtype_ {
     ICMWaiting,				/// Client has received Welcome and is waiting for Map/State
     ICMMap,				/// MapInfo (and Mapinfo Ack)
     ICMState,				/// StateInfo
+    ICMResync,				/// Ack StateInfo change
 
     ICMServerQuit,			/// Server has quit game
 };
@@ -142,16 +143,8 @@ enum _net_client_con_state_ {
     ccs_mapinfo,		/* has received matching map-info */
     ccs_badmap,			/* has received non-matching map-info */
     ccs_synced,
+    ccs_async,			/* server user has changed selection */
     ccs_unreachable,
-};
-
-/**
-**	Network Server connect states
-*/
-enum _net_server_con_state_ {
-    scs_waiting = 0,
-    scs_sending,
-    scs_synced,
 };
 
 /*----------------------------------------------------------------------------
@@ -188,6 +181,7 @@ extern void NetworkExitServerConnect(void); /// terminate network connect state 
 extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a network connect event
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
 extern int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf); /// Menu: Setup the server IP
+extern void NetworkServerResyncClients(void); /// Menu Loop: Server: Mark clients state to send stateinfo message
 
 //@}
 

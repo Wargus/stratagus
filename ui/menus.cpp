@@ -259,11 +259,11 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
 	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0} } },
+	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0, 0} } },
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
 	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0} } },
+	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
 	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
 };
@@ -349,23 +349,23 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Opponents:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0} } },
+	{ pulldown:{ cgopsoptions, 152, 20, MBUTTON_PULLDOWN, CustomGameOPSAction, 8, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
 };
 
 /**
@@ -414,7 +414,7 @@ local Menuitem NetCreateJoinMenuItems[] = {
 */
 local Menuitem NetMultiButtonStorage[] = {
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
 	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
 };
@@ -432,42 +432,42 @@ local Menuitem NetMultiSetupMenuItems[] = {
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
 
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Fog of War:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0} } },
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
 
     { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
@@ -503,42 +503,42 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },	/// FIXME: Cancelfunc
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
 
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, MenuButtonDisabled, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Fog of War:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 40, 10+300, MenuButtonDisabled, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
-    { MI_TYPE_PULLDOWN, 220, 10+300, MenuButtonDisabled, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
 
     { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
@@ -827,10 +827,16 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 	}
 
 	PushClipping();
-	SetClipping(0,0,x+w-20,VideoHeight-1);
+	if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+	    SetClipping(0,0,x+w-20,VideoHeight-1);
+	} else {
+	    SetClipping(0,0,x+w-1,VideoHeight-1);
+	}
 	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
 	PopClipping();
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
+	if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
+	}
 	text = mi->d.pulldown.options[mi->d.pulldown.curopt];
 	if (text) {
 	    DrawText(x+2,y+2,mi->font,text);
@@ -1799,7 +1805,8 @@ local void GameRCSAction(Menuitem *mi __attribute__((unused)), int i)
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     GameSettings.Presets[0].Race = v[i];
-    ServerSetupState.Race[0] = i;		/// FIXME : mark: send update to clients
+    ServerSetupState.Race[0] = i;
+    NetworkServerResyncClients();
     						/// FIXME : Do similar for clients
 }
 
@@ -1809,13 +1816,15 @@ local void GameRESAction(Menuitem *mi __attribute__((unused)), int i)
 		SettingsResourcesMedium, SettingsResourcesHigh };
 
     GameSettings.Resources = v[i];
-    ServerSetupState.ResOpt = i;		/// FIXME : mark: send update to clients
+    ServerSetupState.ResOpt = i;
+    NetworkServerResyncClients();
 }
 
 local void GameUNSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
-    ServerSetupState.UnsOpt = i;		/// FIXME : mark: send update to clients
+    ServerSetupState.UnsOpt = i;
+    NetworkServerResyncClients();
 }
 
 local void GameTSSAction(Menuitem *mi __attribute__((unused)), int i)
@@ -1823,7 +1832,8 @@ local void GameTSSAction(Menuitem *mi __attribute__((unused)), int i)
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
     GameSettings.Terrain = v[i];
-    ServerSetupState.TssOpt = i;		/// FIXME : mark: send update to clients
+    ServerSetupState.TssOpt = i;
+    NetworkServerResyncClients();
 }
 
 local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
@@ -1834,7 +1844,8 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 local void MultiGameFWSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     FlagRevealMap = i;
-    ServerSetupState.FwsOpt = i;		/// FIXME : mark: send update to clients
+    ServerSetupState.FwsOpt = i;
+    NetworkServerResyncClients();
 }
 
 local void MultiGameDrawFunc(Menuitem *mi)
@@ -1882,6 +1893,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[1];
 	    } else {
 		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+		NetMultiSetupMenuItems[5 + i].d.pulldown.state = 0;
 	    }
 	}
 	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
@@ -1894,6 +1906,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 		ServerSetupState.CompOpt[i] = 1;
 	    }
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+	    NetMultiSetupMenuItems[5 + i].d.pulldown.state = MI_PSTATE_PASSIVE;
 
 	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
 	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
@@ -2247,8 +2260,12 @@ normkey:
 		for (i = 0; i < n; ++i) {
 		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
 		    switch (mi->mitype) {
-			case MI_TYPE_BUTTON:
 			case MI_TYPE_PULLDOWN:
+			    if ((mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+				continue;
+			    }
+			    /* FALL THROUGH */
+			case MI_TYPE_BUTTON:
 			case MI_TYPE_LISTBOX:
 			case MI_TYPE_VSLIDER:
 			case MI_TYPE_INPUT:
@@ -2385,6 +2402,9 @@ global void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    case MI_TYPE_PULLDOWN:
+			if ((mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+			    continue;
+			}
 			// Clicked-state already checked above - there can only be one!
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
