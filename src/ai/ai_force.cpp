@@ -295,6 +295,8 @@ global void AiForceManager(void)
 	    }
 	}
     }
+
+    // AiAssignFreeUnitsToForce();
 }
 
 //@}

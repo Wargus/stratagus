@@ -94,6 +94,15 @@ local void AiCheckUnits(void)
 	DebugLevel3Fn("Already in build queue: %s %d/%d\n" _C_
 		queue->Type->Ident _C_ queue->Made _C_ queue->Want);
     }
+    //
+    //	Remove non active units.
+    //
+    n=AiPlayer->Player->TotalNumUnits;
+    for( i=0; i<n; ++i ) {
+	if( !AiPlayer->Player->Units[i]->Active ) {
+	    counter[AiPlayer->Player->Units[i]->Type->Type]--;
+	}
+    }
     unit_types_count=AiPlayer->Player->UnitTypesCount;
 
     //
@@ -136,7 +145,7 @@ local void AiCheckUnits(void)
 	    t=aiut->Type->Type;
 	    x=aiut->Want;
 	    if( x>unit_types_count[t]+counter[t] ) {	// Request it.
-		DebugLevel3Fn("Force %d need %s * %d\n" _C_ i _C_
+		DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_
 			aiut->Type->Ident,x);
 		AiAddUnitTypeRequest(aiut->Type,
 			x-unit_types_count[t]-counter[t]);
