@@ -20,6 +20,78 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _cursor_type_ cursor.h
+**
+**	\#include "cursor.h"
+**
+**	typedef struct _cursor_type_ CursorType;
+**
+**	This structure contains all informations about a cursor.
+**
+**	In the future it is planned to support animated cursors.
+**
+**	The cursor-type structure members:
+**
+**	CursorType::OType
+**
+**		Object type (future extensions). 
+**
+**	CursorType::Ident
+**
+**	 	Unique identifier of the cursor, used to reference it in config
+**		files and during startup. Don't use this in game, use instead
+**		the pointer to this structure.
+**
+**	CursorType::Race
+**
+**		Owning Race of this cursor ("human", "orc", "alliance",
+**		"mythical", ...). If NULL, this cursor could be used by any
+**		race.
+**
+**	CursorType::File
+**
+**		File containing the image graphics of the cursor.
+**
+**	CursorType::HotX CursorType::HotY
+**
+**		Hot spot of the cursor in pixels. Relative to the sprite origin
+**		(0,0). The hot spot of a cursor is the point to which FreeCraft
+**		refers in tracking the cursor's position. 
+**
+**	CursorType::Width CursorType::Height
+**
+**		Size of the cursor in pixels.
+**
+**	CursorType::Graphic
+**
+**		Contains the sprite of the cursor, loaded from CursorType::File.
+*/
+
+/**
+**	@struct _cursor_config_ cursor.h
+**
+**	\#include "cursor.h"
+**
+**	typedef struct _cursor_config_ CursorConfig;
+**
+**	This structure contains all informations to reference/use a cursor.
+**	It is normally used in other config structures.
+**
+**	CursorConfig::Name
+**
+**		Name to reference this cursor-type. Used while initialization.
+**		(See CursorType::Ident)
+**
+**	CursorConfig::Cursor
+**
+**		Pointer to this cursor-type. Used while runtime.
+*/
+
+/*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
@@ -30,21 +102,17 @@
 --	Definitions
 ----------------------------------------------------------------------------*/
 
-/**
-**	Cursor type typedef
-*/
+    ///	Cursor-type typedef
 typedef struct _cursor_type_ CursorType;
 
-/**
-**	Private type which specifies current cursor type
-*/
+    ///	Private type which specifies the cursor-type
 struct _cursor_type_ {
-    const void*	Type;			/// Object type (future extensions)
+    const void*	OType;			/// Object type (future extensions)
 
-    char*	Ident;			/// Identifier to reference it.
-    char*	Race;			/// Race name.
+    char*	Ident;			/// Identifier to reference it
+    char*	Race;			/// Race name
 
-    char*	File;			/// graphic file of the cursor.
+    char*	File;			/// graphic file of the cursor
 
     int		HotX;			/// hot point x
     int		HotY;			/// hot point y
@@ -56,27 +124,25 @@ struct _cursor_type_ {
     Graphic*	Sprite;			/// cursor sprite image
 };
 
-/**
-**	Cursor definition
-*/
+    /// Cursor config reference
 typedef struct _cursor_config_ {
     char*	Name;			/// config cursor-type name
-    CursorType*	Cursor;			/// cursor-type 
+    CursorType*	Cursor;			/// cursor-type pointer
 } CursorConfig;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern const char CursorTypeType[];	/// unit type type
-extern CursorType* Cursors;		/// cursor types description
+extern const char CursorTypeType[];	/// cursor-type type
+extern CursorType* Cursors;		/// cursor-types description
 
 extern enum CursorState_e CursorState;	/// cursor state
 extern int CursorAction;		/// action for selection
 extern int CursorValue;			/// value for CursorAction (spell type f.e.)
 extern UnitType* CursorBuilding;	/// building cursor
 
-extern CursorType* GameCursor;		/// cursor type
+extern CursorType* GameCursor;		/// cursor-type
 extern int CursorX;			/// cursor position on screen X
 extern int CursorY;			/// cursor position on screen Y
 extern int CursorStartX;		/// rectangle started on screen X
@@ -93,18 +159,13 @@ extern void* OldCursorImage;		/// background saved behind cursor
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    /// initialize all cursor
+    /// Load all cursors
 extern void LoadCursors(unsigned int race);
 
     /// cursor-type by identifier
 extern CursorType* CursorTypeByIdent(const char* ident);
 
-    /** Draw cursor on screen in position x,y..
-    **	@param type	cursor type pointer
-    **	@param x	x coordinate on the screen
-    **	@param y	y coordinate on the screen
-    **	@param frame	sprite animation frame
-    */
+    /// Draw cursor on screen in position x,y
 extern void DrawCursor(const CursorType* type,int x,int y,int frame);
 
     /// destroy the cursor background (for menu use!)
