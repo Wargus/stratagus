@@ -391,7 +391,6 @@
 
 typedef struct _unit_ Unit;				/// unit itself
 typedef enum _unit_action_ UnitAction;		/// all possible unit actions
-
 struct _spell_type_;						/// base structure of a spell type
 
 /**
@@ -490,6 +489,15 @@ enum _directions_ {
 	LookingNW		=7*32,						/// Unit looking north west
 };
 
+
+	/// A linked list element.
+typedef struct _unit_list_item_ UnitListItem;
+struct _unit_list_item_ {
+	Unit*			Unit;						/// Points to the unit it links
+	UnitListItem*	Prev;						/// Previous item.
+	UnitListItem*	Next;						/// Next item.
+};
+
 #define NextDirection		32				/// Next direction N->NE->E...
 #define UnitNotSeen		0x7fffffff		/// Unit not seen, used by Unit::SeenFrame
 
@@ -498,16 +506,20 @@ struct _unit_ {
 	// NOTE: int is faster than shorts
 	int				Refs;						/// Reference counter
 	int				Slot;						/// Assigned slot number
-	Unit**		UnitSlot;				/// Slot pointer of Units
-	Unit**		PlayerSlot;				/// Slot pointer of Player->Units
+	Unit**	    	UnitSlot;				    /// Slot pointer of Units
+	Unit**	    	PlayerSlot;				    /// Slot pointer of Player->Units
 
-	Unit*		Next;						/// Generic link pointer (on map)
+	Unit*		    Next;						/// Generic link pointer (on map)
+#ifdef NEW_UNIT_CACHE
+	UnitListItem*   CacheLinks;					/// Link nodes for unit cache
+	unsigned		CacheLock : 1;				/// Used to lock unit out of the cache.
+#endif
 
 	int				InsideCount;				/// Number of units inside.
-	Unit*		UnitInside;				/// Pointer to one of the units inside.
-	Unit*		Container;				/// Pointer to the unit containing it (or 0)
-	Unit*		NextContained;				/// Next unit in the container.
-	Unit*		PrevContained;				/// Previous unit in the container.
+	Unit*		    UnitInside;				/// Pointer to one of the units inside.
+	Unit*		    Container;				/// Pointer to the unit containing it (or 0)
+	Unit*		    NextContained;				/// Next unit in the container.
+	Unit*		    PrevContained;				/// Previous unit in the container.
 
 	int				X;						/// Map position X
 	int				Y;						/// Map position Y
