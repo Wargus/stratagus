@@ -600,6 +600,7 @@ global int main(int argc,char** argv)
 #ifdef USE_BEOS
     beos_init( argc, argv );
 #endif
+
     //
     //	Setup some defaults.
     //
@@ -623,7 +624,7 @@ global int main(int argc,char** argv)
     //
     for( ;; ) {
 	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:N:FL:S:U:W?") ) {
-#if defined(USE_CCL)
+#ifdef USE_CCL
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
@@ -721,15 +722,11 @@ global int main(int argc,char** argv)
 	--argc;
     }
 
-#if defined(USE_CCL)
-    if (CclStartFile[0] != '/' && CclStartFile[0] != '.') {
-        CclStartFile = strdcat3(FreeCraftLibPath, "/", CclStartFile);
-    }
-
-    CclInit();				// load configurations!
+#ifdef USE_CCL
+    CclInit();				// init CCL and load configurations!
 #endif
 
-    main1(argc,argv);			// CclInit may not return!
+    main1(argc,argv);
 
     return 0;
 }
