@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name stratagus.h	-	The main header file. */
+/**@name stratagus.h - The main header file. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __STRATAGUS_H__
 #define __STRATAGUS_H__
@@ -37,33 +37,8 @@
 ==		Config definitions
 ============================================================================*/
 
-#define noDEBUG								/// Define to include debug code
-#define noFLAG_DEBUG						/// Define to include map flag debug
-
-#define noUSE_THREAD						/// Remove no for version with thread
-
-#define noUSE_SDL						/// Remove no for sdl support
-#define noUSE_SDLA						/// Remove no for sdl audio support
-#define noNEW_DECODRAW						/// Remove no for advanced decoration support.
-
-	/**
-	**		Define this to support load of compressed (gzip) pud files
-	**		and other data files. (If defined you need libz)
-	**		Comment if you have problems with gzseek, ... and other gz functions.
-	*/
-#define noUSE_ZLIB
-
-	/**
-	**		Define this to support load of compressed (libbz2) pud files
-	**		and other data files. (If defined you need libbz2)
-	*/
-#define noUSE_BZ2LIB
-
-	/**
-	**		Define this to support data files stored in a single zip archive or
-	**		multiple archives. (If defined you need libzziplib)
-	*/
-#define noUSE_ZZIPLIB
+// Temporary define, remove
+#define USE_SDL_SURFACE
 
 	//
 	//		Default speed for many things, set it higher for faster actions.
