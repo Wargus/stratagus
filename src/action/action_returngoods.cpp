@@ -52,7 +52,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNITS
+#ifdef NEW_UNIT
 	++destu->Refs;
 #endif
 	unit->Command.Data.Move.Range=1;
@@ -78,7 +78,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNITS
+#ifdef NEW_UNIT
 	++destu->Refs;
 #endif
 	unit->Command.Data.Move.Range=1;
@@ -108,7 +108,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	}
 	unit->Command.Data.Move.Fast=1;
 	unit->Command.Data.Move.Goal=destu;
-#ifdef NEW_UNITS
+#ifdef NEW_UNIT
 	++destu->Refs;
 #endif
 	unit->Command.Data.Move.Range=1;
