@@ -1343,6 +1343,7 @@ global void UIHandleButtonDown(unsigned button)
 	    DoSelectionButtons(ButtonUnderCursor-1,button);
 	} else if( (MouseButtons&LeftButton) ) {
 	    if( ButtonUnderCursor==0 && GameMenuButtonClicked==0 ) {
+		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		GameMenuButtonClicked = 1;
 		MustRedraw|=RedrawMenuButton;
 	    } else if( ButtonUnderCursor==1 && NumSelected==1 ) {
