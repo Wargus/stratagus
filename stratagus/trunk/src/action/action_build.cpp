@@ -221,10 +221,6 @@ void HandleActionBuild(Unit* unit)
 	build = MakeUnit(type, unit->Player);
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
-	PlaceUnit(build, x, y);
-	if (!type->BuilderOutside) {
-		build->CurrentSightRange = 1;
-	}
 
 	// Building on top of something, may remove what is beneath it
 	if (ontop != unit) {
@@ -237,6 +233,12 @@ void HandleActionBuild(Unit* unit)
 			UnitClearOrders(ontop);
 			ReleaseUnit(ontop);
 		}
+	}
+
+	// Must place after previous for map flags
+	PlaceUnit(build, x, y);
+	if (!type->BuilderOutside) {
+		build->CurrentSightRange = 1;
 	}
 
 	// HACK: the building is not ready yet
