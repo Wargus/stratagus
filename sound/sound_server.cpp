@@ -59,6 +59,7 @@
 #error "not USE_SDLA and USE_THREAD"
 #endif
 #include "SDL_audio.h"
+#include "SDL_mutex.h"
 #else
 #ifdef __linux__
 #   include <sys/ioctl.h>
@@ -132,11 +133,49 @@ global int WithSoundThread;		/// FIXME: docu
 
 global int SoundThreadRunning;		/// FIXME: docu
 
+local int MusicTerminated;
+
+#ifdef USE_SDLA
+SDL_mutex * MusicTerminatedMutex;
+#endif
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG) || defined(USE_CDDA)
+
+
+/**
+**	Check if the playlist need to be advanced,
+**	and invoque music-stopped if necessary
+*/
+global void PlayListAdvance(void)
+{
+    int proceed;
+    SCM cb;
+    SCM value;
+    
+#ifdef USE_SDLA
+    SDL_LockMutex(MusicTerminatedMutex);
+#endif
+    proceed = MusicTerminated;
+    MusicTerminated = 0;
+#ifdef USE_SDLA
+    SDL_UnlockMutex(MusicTerminatedMutex);
+#endif
+    
+    if (proceed) {
+	cb = gh_symbol2scm("music-stopped");
+	if (symbol_boundp(cb, NIL)) {	    
+
+	    value = symbol_value(cb, NIL);
+	    if (!gh_null_p(value)) {
+		gh_apply(value, NIL);
+	    }
+	}
+    }
+}
 
 /**
 **	Mix music to stereo 32 bit.
@@ -180,23 +219,19 @@ local void MixMusicToStereo32(int* buffer, int size)
 	}
 
 	if (n != len) {			// End reached
-	    SCM cb;
-
 	    PlayingMusic = 0;
 	    SoundFree(MusicSample);
 	    MusicSample = NULL;
 
-	    // FIXME: we are inside the SDL callback!
+	    // we are inside the SDL callback!
 	    if (CallbackMusic) {
-		cb = gh_symbol2scm("music-stopped");
-		if (symbol_boundp(cb, NIL)) {
-		    SCM value;
-
-		    value = symbol_value(cb, NIL);
-		    if (!gh_null_p(value)) {
-			gh_apply(value, NIL);
-		    }
-		}
+#ifdef USE_SDLA
+		SDL_LockMutex(MusicTerminatedMutex);
+#endif
+		MusicTerminated = 1;
+#ifdef USE_SDLA
+		SDL_UnlockMutex(MusicTerminatedMutex);
+#endif
 	    }
 	}
     }
@@ -1141,6 +1176,11 @@ global int InitSound(void)
 {
     int dummy;
 
+    MusicTerminated = 0;
+#ifdef USE_SDLA
+    MusicTerminatedMutex = SDL_CreateMutex();
+#endif
+
 #ifdef USE_SDLA
     //
     //	Open sound device, 8bit samples, stereo.
@@ -1225,6 +1265,8 @@ global int InitSoundServer(void)
       SoundThreadRunning = 1;
     }
 #endif
+
+    
 
     return 0;
 }
