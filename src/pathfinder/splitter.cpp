@@ -39,7 +39,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "stratagus.h"
 #include "player.h"
 #include "unit.h"
@@ -1217,8 +1216,8 @@ global void MapSplitterEachCycle(void)
 
 				// ConnectionsCount == ~ 3 * n°of tile connected
 				if ((Regions[i].TileCount > 256 && Regions[j].TileCount> 256) &&
-					Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[i].TileCount) / 2 &&
-					Regions[i].ConnectionsCount[j] / 3 < sqrt(Regions[j].TileCount) / 2) {
+					Regions[i].ConnectionsCount[j] / 3 < isqrt(Regions[i].TileCount) / 2 &&
+					Regions[i].ConnectionsCount[j] / 3 < isqrt(Regions[j].TileCount) / 2) {
 					continue;
 				}
 
