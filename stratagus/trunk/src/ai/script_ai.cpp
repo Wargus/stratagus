@@ -123,6 +123,8 @@ local void PrintAiHelperTable(void)
 **	Define helper for Ai.
 **
 **	@param list	List of all helpers.
+**
+**	@todo	FIXME: the first unit could be a list see ../doc/ccl/ai.html
 */
 local SCM CclDefineAiHelper(SCM list)
 {
@@ -173,6 +175,8 @@ local SCM CclDefineAiHelper(SCM list)
 	//
 	value=gh_car(sub_list);
 	sub_list=gh_cdr(sub_list);
+
+	// FIXME: support value as list!
 	str=gh_scm2newstr(value,NULL);
 	base=UnitTypeByIdent(str);
 	if( !base ) {
@@ -508,6 +512,8 @@ local SCM CclAiNeed(SCM value)
 **
 **	@param value	Unit-type as string/symbol/object.
 **	@param count	Number of unit-types requested.
+**
+**	@todo FIXME:	count==0 should remove the request.
 */
 local SCM CclAiSet(SCM value,SCM count)
 {
