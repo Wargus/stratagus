@@ -254,7 +254,6 @@ global void CreateGame(char* filename, WorldMap* map)
     LoadCursors(ThisPlayer->Race);
 
     LoadMissileSprites();
-    InitSpells();
     LoadUnitSprites();
     LoadConstructions();
     LoadDecorations();
@@ -310,6 +309,11 @@ global void CreateGame(char* filename, WorldMap* map)
 	NetworkInSync=1;
     }
 #endif
+
+    //
+    //	Spells
+    //
+    InitSpells();
 
     //
     //  Init units' groups

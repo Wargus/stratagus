@@ -382,7 +382,6 @@ global void InitSpells(void)
 
     for( z=0; SpellTypeTable[z].Ident; ++z ) {
 #ifdef WITH_SOUND			// FIXME: no ifdef orgie
-    //FIXME: vladi: this won't work 'cos sound init is called after InitSpells()
 	SpellTypeTable[z].Casted.Sound =
 		SoundIdForName(SpellTypeTable[z].Casted.Name);
 #else
@@ -557,7 +556,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		unit->Mana -= spell->ManaCost;	// get mana cost
 		target->HP++;
 	    }
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeHealing,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -579,7 +578,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		unit->Player->Score+=target->Type->Points;
 		DestroyUnit(target);
 	    }
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeHealing,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -609,7 +608,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
 	unit->Mana -= spell->ManaCost;
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 	missile = MakeMissile(MissileTypeFireball, sx, sy, x, y);
 
 	missile->State = spell->TTL - (dist - 1) * 2;
@@ -627,7 +626,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    target->Haste = 0;
 	    CheckUnitToBeDrawn(target);
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -646,7 +645,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    x+=target->IX;
 	    y+=target->IY;
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    mis=MakeMissile(spell->Missile.Missile,
 		    x*TileSizeX+TileSizeX/2-TileSizeX*0/3,
 		    y*TileSizeY+TileSizeY/2-TileSizeY*3/3,
@@ -718,7 +717,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		CheckUnitToBeDrawn(target);
 	    }
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -741,7 +740,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
 	    unit->Mana -= spell->ManaCost;
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -789,7 +788,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    }
 	}
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 	unit->Mana -= spell->ManaCost;
 	if (unit->Mana > spell->ManaCost) {
 	    repeat = 1;
@@ -811,7 +810,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	target->TTL=FrameCounter+target->Type->DecayRate*6*FRAMES_PER_SECOND;
 	CheckUnitToBeDrawn(target);
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	MakeMissile(MissileTypeSpell,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -825,7 +824,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    target->Bloodlust = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
 	    CheckUnitToBeDrawn(target);
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -840,7 +839,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	Missile *mis;
 
 	unit->Mana -= spell->ManaCost;
-	PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 
 	mis = MakeMissile(MissileTypeCustom,
 		x * TileSizeX + TileSizeX / 2 - TileSizeX,
@@ -893,7 +892,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
 	    unit->Mana -= spell->ManaCost;
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 	    mis = MakeMissile(MissileTypeDeathCoil,
 		sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
 		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -919,7 +918,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    target->Haste = spell->TTL/FRAMES_PER_SECOND;	// about 25 sec
 	    CheckUnitToBeDrawn(target);
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -958,7 +957,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    }
 	}
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -971,7 +970,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 
 	unit->Mana -= spell->ManaCost;
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 	mis = MakeMissile(MissileTypeWhirlwind,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
@@ -999,7 +998,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		CheckUnitToBeDrawn(target);
 	    }
 
-	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
+	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
@@ -1041,7 +1040,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	    }
 	}
 
-	PlayGameSound(SoundIdForName(spell->Casted.Name), MaxSampleVolume);
+	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 
 	unit->Mana -= spell->ManaCost;
 	if (unit->Mana > spell->ManaCost) {

@@ -829,27 +829,30 @@ local void SendUnload(int x,int y)
 **
 **	@see Selected, @see NumSelected
 */
-local void SendSpellCast(int x,int y)
+local void SendSpellCast(int x, int y)
 {
     int i;
-    Unit* unit;
-    Unit* dest;
+    Unit *unit;
+    Unit *dest;
 
-    dest=UnitOnMapTile(x,y);
+    dest = UnitOnMapTile(x, y);
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
-    /*	NOTE: Vladi:
-        This is a high-level function, it sends target spot and unit
-	(if exists). All checks are performed at spell cast handle
-	function which will cancel function if cannot be executed
-    */
-    for( i=0; i<NumSelected; i++ ) {
-        unit=Selected[i];
-	if( !unit->Type->CanCastSpell )
-	  continue; // this unit cannot cast spell
-	if( dest && unit == dest )
-	  continue; // no unit can cast spell on himself
+    /*  NOTE: Vladi:
+       This is a high-level function, it sends target spot and unit
+       (if exists). All checks are performed at spell cast handle
+       function which will cancel function if cannot be executed
+     */
+    for (i = 0; i < NumSelected; i++) {
+	unit = Selected[i];
+	if (!unit->Type->CanCastSpell) {
+	    continue;			// this unit cannot cast spell
+	}
+	if (dest && unit == dest) {
+	    continue;			// no unit can cast spell on himself
+	}
 	// CursorValue here holds the spell type id
-	SendCommandSpellCast(unit,x,y,dest,CursorValue,!(KeyModifiers&ModifierShift));
+	SendCommandSpellCast(unit, x, y, dest, CursorValue,
+		!(KeyModifiers & ModifierShift));
     }
 }
 
