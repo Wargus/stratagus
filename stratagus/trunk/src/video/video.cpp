@@ -157,8 +157,46 @@ global volatile int VideoInterrupts;	/// be happy, were are quicker
     /// Loaded system palette. 256-entries long, active system palette.
 global Palette GlobalPalette[256];
 
+    /**
+    **  As a video 8bpp pixel color doesn't have RGB encoded, but denote some
+    **  index (a value from contents Pixels) in a system pallete, the
+    **  following precalculated arrays deliver a shortcut.
+    **  NOTE: all array pointers are NULL in a non 8bpp mode
+    **
+    **  commonpalette:
+    **  The single main color palette denoting all possible colors on which all
+    **  other palettes (including above GlobalPalette) are based.
+    **  Note:this means other palettes probably doesn't contains unique colors.
+    **  
+    **  commonpalette_defined:
+    **  Denotes the defined entries (as bit index) in above palette.
+    **  Needed as for X11 it is possible we can't get all 256 colors.
+    **  
+    **  colorcube8:
+    **  Array of 32*32*32 system colors, to get from an unsigned int RGB
+    **  (5x5x5 bit) to a system color.
+    **  
+    **  lookup25trans8:
+    **  Array to get from two system colors as unsigned int (color1<<8)|color2
+    **  to a new system color which is aproximately 75% color1 and 25% color2.
+    **  lookup50trans8:
+    **  The same for 50% color1 and 50% color2.
+    **  
+    **  VideoAllocPalette8:
+    **  Funcytion to let hardware independent palette be converted (when set).
+    */
+global Palette   *commonpalette    = NULL;
+global unsigned long commonpalette_defined[8];
+global VMemType8 *colorcube8       = NULL;
+global VMemType8 *lookup25trans8   = NULL;
+global VMemType8 *lookup50trans8   = NULL;
+global void (*VideoAllocPalette8)( Palette *palette,
+                                   Palette *syspalette,
+                                   unsigned long syspalette_defined[8] )=NULL;
+
     /// Does ColorCycling..
 global void (*ColorCycle)(void);
+
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -287,16 +325,21 @@ global void LoadRGB(Palette *pal, const char *name)
 {
     FILE *fp;
     int i;
+    unsigned char *p;
+    unsigned char buffer[256*3];
 
-    if((fp=fopen(name,"rb")) == NULL) {
+    if( (fp=fopen(name,"rb")) == NULL ||
+        fread(buffer,sizeof(unsigned char),256*3,fp)<256*3 )
+    {
 	fprintf(stderr,"Can't load palette %s\n",name);
 	exit(-1);
     }
 
+    p=buffer;
     for(i=0;i<256;i++){
-	pal[i].r=fgetc(fp)<<2;
-	pal[i].g=fgetc(fp)<<2;
-	pal[i].b=fgetc(fp)<<2;
+	pal[i].r=(*p++)<<2;
+	pal[i].g=(*p++)<<2;
+	pal[i].b=(*p++)<<2;
     }
 
     fclose(fp);
@@ -570,6 +613,335 @@ local void ColorCycle32(void)
     MustRedraw |= RedrawMap | RedrawInfoPanel;
 }
 
+/*===========================================================================
+Following functions support a single common palette for 8bpp
+===========================================================================*/
+/**
+**      Fills a hardware independend palette with most common colors.
+**      (Only really needed in 8bpp, to get a good representation of all color
+**       possibilities.)
+**      NOTE: define BPP8_WINSAFE or BPP8_IRGB for a different version.
+**            X11 supports BPP8_NORMAL to prevent using a common palette
+**            (this will deliver "color allocation error" though!)
+**
+**      @param palette  256 color palette, to be filled with most common RGB.
+**
+**      FIXME: Use TheUI settings (brightness, contrast and saturation) and
+**      visual color range knowledge to reduce the ammount of colors needed.
+*/
+local void VideoFillCommonPalette8( Palette *palette )
+{
+#ifdef BPP8_WINSAFE /*---------------------------------------------------------
+  This pallete generator is consider safe for Windows(tm), as static colors used
+  by the system are kept and at the original locations.
+  ---------------------------------------------------------------------------*/
+  const unsigned char win_top[] = {
+      0,   0,   0,
+    128,   0,   0,
+      0, 128,   0,
+    128, 128,   0,
+      0,   0, 128,
+    128,   0, 128,
+      0, 128, 128,
+    192, 192, 192,
+    192, 220, 192,
+    166, 202, 240 };
+  const unsigned char win_bottom[] = {
+    255, 251, 240,
+    160, 160, 164,
+    128, 128, 128,
+    255,   0,   0,
+      0, 255,   0,
+    255, 255,   0,
+      0,   0, 255,
+    255,   0, 255,
+      0, 255, 255,
+    255, 255, 255 };
+  const unsigned char colorlevel[] = { 0, 87, 138, 181, 220, 255 };
+  const unsigned char graylevel[]  = {
+    47,  67,  82,  95, 106, 116, 125, 134, 142, 150, 157, 164, 171, 177,
+   183, 189, 195, 201, 206, 212, 217, 222, 227, 232, 237, 241, 246, 251 };
+
+  int i, r, g, b;
+
+  /* Fill top of palette with static system colors */
+  for ( i = 0; i <= 3*9; i += 3, palette++ )
+  {
+    palette->r = win_top[ i ];
+    palette->g = win_top[ i + 1 ];
+    palette->b = win_top[ i + 2 ];
+  }
+
+  /* Fill 6*6*6 colorcube (without values already present in static parts) */
+  for ( r = 0; r <= 5; r++ )
+    for ( g = 0; g <= 5; g++ )
+      for ( b = 0; b <= 5; b++ )
+        if ( (r && r != 5) || (g && g != 5) || (b && b != 5) )
+        {
+          palette->r = colorlevel[ r ];
+          palette->g = colorlevel[ g ];
+          palette->b = colorlevel[ b ];
+          palette++;
+        }
+
+  /* Fill up remaining non-static part with grayshades */
+  for ( i = 0; i <= 27; i++, palette++ )
+    palette->r = palette->g = palette->b = graylevel[ i ];
+
+  /* Fill bottom of palette with static system colors */
+  for ( i = 0; i <= 3*9; i += 3, palette++ )
+  {
+    palette->r = win_bottom[ i ];
+    palette->g = win_bottom[ i + 1 ];
+    palette->b = win_bottom[ i + 2 ];
+  }
+
+#else
+#ifdef BPP8_IRGB /*------------------------------------------------------------
+  Palette generator using 8bit encoded as [IIRRGGBB], where I denotes the
+  intensity of the RGB values along a grayshade axis. Which delivers a better
+  spread out RGB range, but can not handle extreme values like 255:0:255
+  ---------------------------------------------------------------------------*/
+  int i, r, g, b;
+
+  for ( i = 0; i <= 3*68; i+=68 )
+    for ( r = 0; r <= 3*17; r+=17 )
+      for ( g = 0; g <= 3*17; g+=17 )
+        for ( b = 0; b <= 3*17; b+=17, palette++ )
+        {
+          palette->r = i+r;
+          palette->g = i+g;
+          palette->b = i+b;
+        }
+
+#else /* default ------------------------------------------------------------
+  Experimental palette, defining a colorcube in a hshorter (most common) range
+  and defining remaining as 40 grayshades over total range.
+  This delivered best quality in 8bpp gameplay:
+  - the large range for grayshades is valuable as many items need them
+  - the shortened colorcube seems just to fit any colors needed.
+  ---------------------------------------------------------------------------*/
+  int i, r, g, b;
+
+  /* Fill 6*6*6 colorcube (shortend and in lower RGB range) */
+  for ( r = 0; r <= 5; r++ )
+    for ( g = 0; g <= 5; g++ )
+      for ( b = 0; b <= 5; b++, palette++ )
+      {
+        palette->r = 15+(127*r)/5;
+        palette->g = 15+(127*g)/5;
+        palette->b = 15+(127*b)/5;
+      }
+
+  /* Fill up remaining part with grayshades */
+  for ( i = 0; i <= 39; i++, palette++ )
+    palette->r = palette->g = palette->b = ((i-216)*255)/39;
+#endif
+#endif
+}
+
+
+/**
+**      Fill a colorcube to get from a RGB (5x5x5 bit) to a system 8bpp color
+**
+**      @param palette  Array of 256 bytes with hardware dependent color as
+**                      index, delivers RGB value (each in range 0..255).
+**
+**      @param pal_def  Denotes which entries (as bit index) in above palette
+**                      are defined (and so may be used in colorcube).
+**                      NOTE: atleast one defined entry should be available
+**
+**      @param cube     Array of 32768 (32*32*32) bytes with RGB value (each in
+**                      range 0..31) as index, delivers color index.
+*/
+local void VideoFillColorcube8( const Palette *palette,
+                                 const unsigned long pal_def[8],
+                                       VMemType8 *cube )
+{
+  int r, g, b, i;
+
+  for ( r = 0; r <= 255; r+=8 )
+    for ( g = 0; g <= 255; g+=8 )
+      for ( b = 0; b <= 255; b+=8 )
+      {
+        const Palette *pal;
+        long int mindistance = 255*255*3+1;
+        int colorfound = 0;
+
+      // seek closest color in given palette
+        for ( pal = palette, i = 0; i <= 255; pal++, i++ )
+        {
+          unsigned long bit;
+
+          bit = 1 << (i&0x1F);
+          if ( pal_def[ i>>5 ] & bit )
+          {
+            long int distance, xr, xg, xb;
+
+            xr = (long int)pal->r - r;
+            xb = (long int)pal->b - b;
+            xg = (long int)pal->g - g;
+            distance = xr*xr + xb*xb + xg*xg;
+            if ( distance < mindistance )
+            {
+              mindistance=distance;
+              colorfound=i;
+            }
+          }
+        }
+
+      // refer RGB to the system color (palette index) found
+        *cube++ = colorfound;
+      //  fprintf( stderr, "%d %d %d = %d %d %d\n",
+      //           r, g, b, palette[colorfound].r, palette[colorfound].g,
+      //           palette[colorfound].b );
+      }
+}
+
+/**
+**      Find a new hardware dependend palette, re-using the colors as set in
+**      the colorcube.
+**
+**      @param cube     A 5x5x5 bit colorcube to get from RGB to system color.
+**
+**      @param palette  Hardware independend palette of 256 colors.
+**
+**      @return         A hardware dependend 8bpp pixel table.
+**
+*/
+global VMemType8* VideoFindNewPalette8( const VMemType8 *cube,
+                                        const Palette *palette )
+{
+  VMemType8 *newpixels, *p;
+  int i;
+
+  newpixels=p=malloc(256*sizeof(VMemType8));
+
+  i=256;
+  do
+  {
+    int r, g, b;
+
+    //FIXME: find a faster way, with rounding..
+    //r = palette->r>>3;
+    //g = palette->g>>3;
+    //b = palette->b>>3;
+    r = (palette->r*31+15)/255;
+    g = (palette->g*31+15)/255;
+    b = (palette->b*31+15)/255;
+
+    palette++;
+    *p++ = cube[ (r<<10) | (g<<5) | b ];
+  } while ( --i > 0 );
+
+  return newpixels;
+}
+
+/**
+**      Fill a lookup table to get from two system colors 8bpp as unsigned int
+**      (color1<<8)|color2 to a new system color which is alpha% color2 and
+**      (100-alpha)% color1.
+**
+**      @param palette	Already filled 256 color palette, to get from system
+**                      color to RGB.
+**
+**      @param cube	Already filled 32*32*32 array of system colors, to get
+**                      from RGB (as 5x5x5 bit) back to system color.
+**
+**      @param lookup	Allocated 256*256 array of system colors, to be filled
+**                      as a lookup table for transparency alpha.
+**
+**      @param alpha	value in 0..255 denoting 0..100% transparency
+*/
+local void FillTransLookup8( const Palette *palette,
+                              const VMemType8 *cube,
+                                    VMemType8 *lookup,
+                                    unsigned char alpha )
+
+{
+  const Palette *p1, *p2;
+  unsigned int i, j;
+  unsigned int alpha1,alpha2,r1, g1, b1, r2, g2, b2;
+
+  alpha1=255-alpha;
+  alpha2=alpha;
+  for ( p1=palette, i = 256; i > 0; i-- )
+  {
+    r1 = alpha1*(unsigned int)p1->r;
+    g1 = alpha1*(unsigned int)p1->g;
+    b1 = alpha1*(unsigned int)p1->b;
+    p1++;
+    for ( p2=palette, j = 256; j > 0; j-- )
+    {
+      r2 = (r1 + alpha2*(unsigned int)p2->r + 255*4)/(255*8);
+      g2 = (g1 + alpha2*(unsigned int)p2->g + 255*4)/(255*8);
+      b2 = (b1 + alpha2*(unsigned int)p2->b + 255*4)/(255*8);
+      p2++;
+
+      *lookup++ = cube[ (r2<<10) | (g2<<5) | b2 ];
+    }
+  }
+}
+
+/**
+**      Initialize globals based on a single common palette of 256 colors.
+**      Only needed for 8bpp, which hasn't RGB encoded in its system color.
+**      FIXME: should be called again when it gets dependent of TheUI settings
+**             then call VideoFreePalette first to prevent "can not allocate"
+*/
+local void InitSingleCommonPalette8( void )
+{
+  Palette *tmp;
+  int i;
+
+  if ( (tmp=malloc(256*sizeof(Palette))) &&
+       (!VideoAllocPalette8 || (commonpalette=malloc(256*sizeof(Palette)))) &&
+       (colorcube8=malloc(32*32*32*sizeof(VMemType8))) &&
+       (lookup25trans8=malloc(256*256*sizeof(VMemType8))) &&
+       (lookup50trans8=malloc(256*256*sizeof(VMemType8))) )
+  {
+  // Create one allocated pallette of 256 colors to be used by all
+  // palettes created later.
+  // This prevents "can not allocate color" errors, but the downside is
+  // that a fullscreen graphic can not use its own pallette to the fullest
+  // (not all colors might be present in the system pallete).
+  VideoFillCommonPalette8(tmp);
+  //for ( i=0; i<=255; i++ )
+  //  fprintf( stderr, "%d %d %d\n", tmp[i].r, tmp[i].g, tmp[i].b );
+
+  if ( VideoAllocPalette8 )
+  { // Palette needs to be converted to hardware dependent palette
+    VideoAllocPalette8(tmp,commonpalette,commonpalette_defined);
+    free( tmp );
+  }
+  else
+  { // Use palette AS-IS FIXME: unused at the moment..
+    commonpalette = tmp;
+    for ( i=0; i<=7; i++ )
+      commonpalette_defined[i]=0xFFFFFFFF;
+  }
+
+  // Create a colorcube to easily get from RGB back to system color
+  VideoFillColorcube8(commonpalette,commonpalette_defined,colorcube8);
+
+  // Create lookup tables to get from one system color to another.
+  //FIXME: With max 256 unique colors in above colorcube, each RGB axis can
+  //       contain 3root(256)=6.3496.. variations. Currently only 5
+  //       supported (0,25,50,75,100% with/without use of lookup tables).
+  //       So extra levels 12.5% and 37.5% needed for better representation.
+  FillTransLookup8(commonpalette,colorcube8,lookup25trans8,(255+2)/4);
+  FillTransLookup8(commonpalette,colorcube8,lookup50trans8,(255+1)/2);
+  }
+  else
+  {
+    fprintf( stderr, "Out of memory for special 8bpp display mode\n"
+                     "Try another mode if you're low on memory\n" );
+    exit( -1 );
+  }
+}
+
+/*===========================================================================*/
+
 /**
 **	Initializes system palette. Also calls SetPlayersPalette to set
 **	palette for all players.
@@ -582,7 +954,7 @@ global void VideoSetPalette(const VMemType* palette)
 {
 #if 0	// ARI: FIXME: This ruins menu palettes, when loaded via default.cm (introduce refcnt?)
     if( Pixels ) {
-	free(Pixels);
+	free(Pixels);//FIXME: free unsufficient, XFreeColors needed for X11
     }
 #endif
     Pixels=(VMemType*)palette;
@@ -671,6 +1043,15 @@ global void InitVideo(void)
 	#endif
     #endif
 #endif
+
+    //
+    //	Use single common palette to be used for all palettes in 8bpp
+    //
+    #ifndef BPP8_NORMAL
+    if ( UseX11 && VideoBpp == 8 ) // FIXME: to be extended for all video..
+      InitSingleCommonPalette8();
+    #endif
+
 
     //
     //	Init video sub modules

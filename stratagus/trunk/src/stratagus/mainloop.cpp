@@ -175,6 +175,197 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 }
 
 /**
+**	FOR DEBUG PURPOSE ONLY, BUT DON'T REMOVE PLEASE !!!
+**
+**      Will try all kinds of possible linedraw routines (only one time) upon
+**      current display, making the job of debugging them more eassier..
+*/
+global void DebugTestDisplay(void)
+{
+  static int a=0;
+
+  int x,y,i;
+
+  if ( a ) return;
+  a=1;
+
+/*Should not show anything (segmentation fault when not properly clipped) */
+  VideoDrawPixelClip(ColorRed,-1,0);
+  VideoDrawPixelClip(ColorRed,0,-1);
+  VideoDrawPixelClip(ColorRed,VideoWidth,0);
+  VideoDrawPixelClip(ColorRed,0,VideoHeight);
+  VideoDraw25TransPixelClip(ColorRed,-1,0);
+  VideoDraw25TransPixelClip(ColorRed,0,-1);
+  VideoDraw25TransPixelClip(ColorRed,VideoWidth,0);
+  VideoDraw25TransPixelClip(ColorRed,0,VideoHeight);
+  VideoDraw50TransPixelClip(ColorRed,-1,0);
+  VideoDraw50TransPixelClip(ColorRed,0,-1);
+  VideoDraw50TransPixelClip(ColorRed,VideoWidth,0);
+  VideoDraw50TransPixelClip(ColorRed,0,VideoHeight);
+  VideoDraw75TransPixelClip(ColorRed,-1,0);
+  VideoDraw75TransPixelClip(ColorRed,0,-1);
+  VideoDraw75TransPixelClip(ColorRed,VideoWidth,0);
+  VideoDraw75TransPixelClip(ColorRed,0,VideoHeight);
+  VideoDrawTransPixelClip(ColorRed,-1,0,0);
+  VideoDrawTransPixelClip(ColorRed,0,-1,0);
+  VideoDrawTransPixelClip(ColorRed,VideoWidth,0,0);
+  VideoDrawTransPixelClip(ColorRed,0,VideoHeight,0);
+
+/*Should show blue area getting transparent from left-to-right */
+   for (y=0;y<50;y++)
+    for (x=0;x<50;x++)
+      VideoDrawPixel(ColorBlue,x,y);
+   for (y=0;y<50;y++)
+    for (x=50;x<100;x++)
+      VideoDraw25TransPixel(ColorBlue,x,y);
+   for (y=0;y<50;y++)
+    for (x=100;x<150;x++)
+      VideoDraw50TransPixel(ColorBlue,x,y);
+   for (y=0;y<50;y++)
+    for (x=150;x<200;x++)
+      VideoDraw75TransPixel(ColorBlue,x,y);
+   for (y=50;y<100;y++)
+    for (x=0;x<256;x++)
+      VideoDrawTransPixel(ColorBlue,x,y,x);
+
+/* Should show blue+red horizontal bars just below above drawpixel tests
+   getting transparent from top-to-bottom. Clipping should prevent segm.fault
+*/
+  for (y=0;y<10;y++)
+  {
+    VideoDrawHLine(ColorBlue,0,y+100,VideoWidth-1);
+    VideoDrawHLineClip(ColorRed,-100,-1,VideoWidth+200);
+    VideoDrawHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+    VideoDrawHLineClip(ColorRed,-100,y+110,VideoWidth+200);
+    VideoDraw25TransHLine(ColorBlue,0,y+120,VideoWidth-1);
+    VideoDraw25TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+    VideoDraw25TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+    VideoDraw25TransHLineClip(ColorRed,-100,y+130,VideoWidth+200);
+    VideoDraw50TransHLine(ColorBlue,0,y+140,VideoWidth-1);
+    VideoDraw50TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+    VideoDraw50TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+    VideoDraw50TransHLineClip(ColorRed,-100,y+150,VideoWidth+200);
+    VideoDraw75TransHLine(ColorBlue,0,y+160,VideoWidth-1);
+    VideoDraw75TransHLineClip(ColorRed,-100,-1,VideoWidth+200);
+    VideoDraw75TransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200);
+    VideoDraw75TransHLineClip(ColorRed,-100,y+170,VideoWidth+200);
+  }
+  for (y=0;y<64;y++)
+  {
+    VideoDrawTransHLine(ColorBlue,0,y+180,VideoWidth-1,y*4);
+    VideoDrawTransHLineClip(ColorRed,-100,-1,VideoWidth+200,y*4);
+    VideoDrawTransHLineClip(ColorRed,-100,VideoHeight,VideoWidth+200,y*4);
+    VideoDrawTransHLineClip(ColorRed,-100,y+180+64+6+6,VideoWidth+200,(63-y)*4);
+  }
+  
+/* Should show blue+red vertical bars at the right of the screen
+   getting transparent from left-to-right. Clipping should prevent segm.fault
+*/
+  i = ((VideoWidth-70-70-50)/10)*10; // starting grid pos for two colums 
+  for (x=0;x<64;x++)
+  {
+    VideoDrawTransVLine(ColorBlue,i+x,0,VideoHeight-1,x*4);
+    VideoDrawTransVLineClip(ColorRed,-1,-100,VideoHeight+200,x*4);
+    VideoDrawTransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200,x*4);
+    VideoDrawTransVLineClip(ColorRed,i+76+x,-100,VideoHeight+200,(63-x)*4);
+  }
+  i -= 4*2*10;
+  for (x=0;x<10;x++)
+  {
+    VideoDrawVLine(ColorBlue,i+x,0,VideoHeight-1);
+    VideoDrawVLineClip(ColorRed,-1,-100,VideoHeight+200);
+    VideoDrawVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+    VideoDrawVLineClip(ColorRed,i+x+10,-100,VideoHeight+200);
+    VideoDraw25TransVLine(ColorBlue,i+x+20,0,VideoHeight-1);
+    VideoDraw25TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+    VideoDraw25TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+    VideoDraw25TransVLineClip(ColorRed,i+x+30,-100,VideoHeight+200);
+    VideoDraw50TransVLine(ColorBlue,i+x+40,0,VideoHeight-1);
+    VideoDraw50TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+    VideoDraw50TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+    VideoDraw50TransVLineClip(ColorRed,i+x+50,-100,VideoHeight+200);
+    VideoDraw75TransVLine(ColorBlue,i+x+60,0,VideoHeight-1);
+    VideoDraw75TransVLineClip(ColorRed,-1,-100,VideoHeight+200);
+    VideoDraw75TransVLineClip(ColorRed,VideoWidth,-100,VideoHeight+200);
+    VideoDraw75TransVLineClip(ColorRed,i+x+70,-100,VideoHeight+200);
+  }
+
+/*Should show filled rectangles in screen's top-right corners */
+  VideoFillRectangleClip(ColorGray,VideoWidth-30,-20,60,40);
+  VideoFill25TransRectangleClip(ColorBlue,VideoWidth-29,-19,58,38);
+  VideoFill50TransRectangleClip(ColorRed,VideoWidth-28,-18,56,36);
+  VideoFill75TransRectangleClip(ColorGreen,VideoWidth-27,-17,54,34);
+  VideoFillTransRectangleClip(ColorBlue,VideoWidth-26,-16,52,32,64);
+
+/*Should show red area in lower-left getting transparent from left-to-right */
+  i = ((VideoHeight-20)/10)*10; // starting grid pos for two colums 
+  VideoFillRectangle(ColorRed,0,i,50,20);
+  VideoFill25TransRectangle(ColorRed,50,i,50,20);
+  VideoFill50TransRectangle(ColorRed,100,i,50,20);
+  VideoFill75TransRectangle(ColorRed,150,i,50,20);
+  i -= 20;
+  for (x=0;x<256;x++)
+    VideoFillTransRectangle(ColorRed,x,i,1,20,x);
+
+/*Should show red/green/blue rectangles in lower-left transparent from
+  left-to-right */
+  i -= 20;
+  for (x=0;x<10;x++)
+  {
+    VideoDrawRectangle(ColorBlue,x,i+x,50-2*x,20-2*x);
+    VideoDraw25TransRectangle(ColorBlue,50+x,i+x,50-2*x,20-2*x);
+    VideoDraw50TransRectangle(ColorBlue,100+x,i+x,50-2*x,20-2*x);
+    VideoDraw75TransRectangle(ColorBlue,150+x,i+x,50-2*x,20-2*x);
+  }
+  i -= 20;
+  for (x=0;x<256;x++)
+    VideoDrawTransRectangle(ColorGreen,x,i,1,20,x);
+  i -= 20;
+  for (x=0;x<128;x++)
+    VideoDrawTransRectangle(ColorRed,2*x,i,2,20,x*2);
+
+/*Should show rectangles in screen's bottom-right corners */
+  VideoDrawRectangleClip(ColorGray,VideoWidth-30,VideoHeight-20,60,40);
+  VideoDraw25TransRectangleClip(ColorBlue,VideoWidth-29,VideoHeight-19,58,38);
+  VideoDraw50TransRectangleClip(ColorRed,VideoWidth-28,VideoHeight-18,56,36);
+  VideoDraw75TransRectangleClip(ColorGreen,VideoWidth-27,VideoHeight-17,54,34);
+  VideoDrawTransRectangleClip(ColorBlue,VideoWidth-26,VideoHeight-16,52,32,64);
+
+/* Display grid of 10x10 (to detect errors more easier) */
+  for (y=0;y<VideoHeight;y+=10)
+   for (x=0;x<VideoWidth;x+=10)
+     VideoDrawPixel(ColorWhite,x,y);
+
+/*Should show white pixel in lower-right corner (not prevented by clippingi) */
+  VideoDrawPixelClip(ColorWhite,VideoWidth-1,VideoHeight-1);
+
+/* Draw colorcube (only for 8bpp!) and common+current palette
+  for (i=0;i<32;i++)
+    for (y=0;y<32;y++)
+     for (x=0;x<32;x++)
+     {
+        int a,b;
+        a=(x+(i%10)*32)*2;
+        b=(y+(i/10)*32)*2;
+        VideoMemory8[a+b*VideoWidth] =
+        VideoMemory8[a+1+b*VideoWidth] =
+        VideoMemory8[a+(b+1)*VideoWidth] =
+        VideoMemory8[a+1+(b+1)*VideoWidth] =
+          colorcube8[ (i<<10)|(y<<5)|x ];
+     }
+  for (i=0;i<256;i++)
+        VideoMemory8[i+400*VideoWidth] = 
+        VideoMemory8[i+401*VideoWidth] = i;
+  for (i=0;i<256;i++)
+        VideoMemory8[i+403*VideoWidth] = 
+        VideoMemory8[i+404*VideoWidth] = Pixels8[ i ];
+*/
+
+/* put it all on screen (when it is not already there ;) */
+  InvalidateArea(0,0,VideoWidth,VideoHeight);
+}
+
+/**
 **	Display update.
 */
 global void UpdateDisplay(void)
@@ -466,6 +657,10 @@ global void GameMainLoop(void)
 
 	if( MustRedraw /* && !VideoInterrupts */ ) {
 	    UpdateDisplay();
+
+            //Enable when debugging linedraw routines..
+	    //DebugTestDisplay();
+
 	    //
 	    // If double-buffered mode, we will display the contains of
 	    // VideoMemory. If direct mode this does nothing. In X11 it does
