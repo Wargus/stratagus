@@ -192,7 +192,7 @@ void DoRightButton(int sx, int sy)
 		//
 		//  Control + right click on unit is follow anything.
 		//
-		if ((KeyModifiers & ModifierControl) && dest && dest != unit) {
+		if ((KeyModifiers & ModifierControl) && dest) {
 			dest->Blink = 4;
 			SendCommandFollow(unit, dest, flush);
 			continue;
