@@ -734,6 +734,13 @@ global int NetInit(void)
 */
 global void NetExit(void)
 {
+    // Clean up windows networking
+    if ( WSACleanup() == SOCKET_ERROR ) {
+	if ( WSAGetLastError() == WSAEINPROGRESS ) {
+	    WSACancelBlockingCall();
+	    WSACleanup();
+	}
+    }
 }
 
 /**
@@ -814,6 +821,7 @@ global int NetOpenUDP(int port)
 
     // open the socket
     sockfd=socket(AF_INET, SOCK_DGRAM, 0);
+    DebugLevel0(__FUNCTION__": socket %d\n",sockfd);
     if( sockfd==INVALID_SOCKET ) {
 	return -1;
     }
@@ -831,6 +839,7 @@ global int NetOpenUDP(int port)
 	    // FIXME: close the socket
 	    return -1;
 	}
+	DebugLevel0(__FUNCTION__": bind ok\n");
 	NetLastHost=sock_addr.sin_addr.s_addr;
 	NetLastPort=sock_addr.sin_port;
     }
@@ -960,15 +969,30 @@ global void InitNetwork(void)
     NetworkInSync=1;
 
     if( NetPlayers>1 || NetworkArg ) {	// with network
+	char* cp;
+	int port;
+
 	DebugLevel0(__FUNCTION__": %d players\n",NetPlayers);
 	DebugLevel0(__FUNCTION__": %s arg\n",NetworkArg);
 
+	NetInit();			// machine dependend setup
+
+	port=NetworkPort;
+	if( NetworkArg ) {
+	    i=strtol(NetworkArg,&cp,0);
+	    if( cp!=NetworkArg && (*cp==':' || *cp=='\0') ) {
+		NetworkArg=cp;
+		port=i;
+	    }
+	}
+
 	// Our communication port
-	NetworkFildes=NetOpenUDP(NetworkPort);
+	NetworkFildes=NetOpenUDP(port);
 	if( NetworkFildes==-1 ) {
-	    NetworkFildes=NetOpenUDP(NetworkPort+1);
+	    NetworkFildes=NetOpenUDP(port+1);
 	    if( NetworkFildes==-1 ) {
-		fprintf(stderr,"No free port available, aborting\n");
+		fprintf(stderr,"No free ports %d-%d available, aborting\n"
+			,port,port+1);
 		exit(-1);
 	    }
 	}
@@ -1108,8 +1132,6 @@ global void InitNetwork(void)
 	} else {
 	    InitMessage message;
 	    unsigned long host;
-	    int port;
-	    char* cp;
 
 	    // Parse server address.
 	    cp=strchr(NetworkArg,':');
