@@ -1587,7 +1587,7 @@ global void AiInit(Player * player)
     //
     //  Adjust costs for AI Player
     //
-    for (i = 0; i < UnitTypeInternalMax; ++i) {
+    for (i = 0; UnitTypes[i].OType; ++i) {
 	for (j = 0; j < MaxCosts; ++j) {
 	    UnitTypes[i].Stats[player->Player].Costs[j] *=
 		    j == TimeCost ? AiTimeFactor : AiCostFactor;
