@@ -38,48 +38,19 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Each 2D decoration on screen has a depth-level (z-position) which determines
-** the order in which is needs to be drawn together with the other listed
-** decorations. For this to work properly, everything that needs to be drawn
-** should be added as decoration to this mechanism.
-** FIXME: proepr levels should be defined here..
-*/
-typedef enum {
-  LevUnderground,
-  LevMole,
-  LevGround,
-  LevWaterLow,
-  LevCarLow,
-  LevPersonLow,
-  LevPersonHigh,
-  LevCarHigh,
-  LevWater,
-  LevBuilding,
-  LevMountain,
-  LevSkylow,
-  LevProjectile,
-  LevSkyMid,
-  LevArplaneLow,
-  LevSkyHigh,
-  LevAirplaneHigh,
-  LevSkyHighest,
-  LevCount 
-} DecorationLevel;
-
-/**
 **	
 **/
 typedef struct DecorationSingle {
-// next single-tile decoration belonging to the same decoration
+  // next single-tile decoration belonging to the same decoration
   struct DecorationSingle *nxt;
-// exact 2x2 tile area
+  // exact 2x2 tile area
   char *tiles;
-// 16bit bitmask which denote the area in above tiles overlapped by this deco
+  // 16bit bitmask which denote the area in above tiles overlapped by this deco
   unsigned int lefttopmask, righttopmask, leftbottommask, rightbottommask;
-// the bit index (bity4+bitx) of the left-top in the first tile
-// @note  bity4 is a multiple of 4 tiles (so no multiple needed)
+  // the bit index (bity4+bitx) of the left-top in the first tile
+  // @note  bity4 is a multiple of 4 tiles (so no multiple needed)
   int bitx, bity4;
-// left-top pixel position
+  // left-top pixel position
   int topleftx, toplefty;
 } DecorationSingle;
 
@@ -107,7 +78,7 @@ typedef struct Deco {
   struct DecorationSingle *singles;
   struct Deco *prv, *nxt;
   int x, y, w, h;
-  DecorationLevel l;
+  int level;
 } Deco;
 
 /**
@@ -122,15 +93,13 @@ typedef struct Deco {
 
 extern void DecorationInit(void);
 
-extern Deco *DecorationAdd( void *data,
-				   void (*drawclip)(void *data),
-				   DecorationLevel l, 
-				   int x, int y,
-				   int w, int h );
-extern void DecorationRemove( Deco *d );
-extern void DecorationRemoveLevels( DecorationLevel min, DecorationLevel max );
+extern Deco* DecorationAdd(void *data,void (*drawclip)(void *data),
+	int level, int x, int y, int w, int h );
+extern Deco* DecorationMove(Deco *d, int x, int y, int w, int h);
+extern void DecorationRemove(Deco *d);
+extern void DecorationRemoveLevels(int min, int max);
 
-extern void DecorationMark( Deco *d );
+extern void DecorationMark(Deco *d);
 
 extern void DecorationRefreshDisplay(void);
 extern void DecorationUpdateDisplay(void);
