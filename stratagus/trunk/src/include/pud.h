@@ -63,8 +63,31 @@
 #define MapActionForest		0xFFFE	/// forest on map
 
 /*----------------------------------------------------------------------------
+--	Declarations
+----------------------------------------------------------------------------*/
+
+/**
+**	Get info for a pud.
+*/
+typedef struct _pud_info_ {
+    char*	Description;		/// Map description
+    int		MapTerrain;		/// Map terrain
+    int		MapWidth;		/// Map width
+    int		MapHeight;		/// Map height
+    int		PlayerType[16];		/// Same player->Type
+    int		PlayerSide[16];		/// Same player->Side
+    int		PlayerGold[16];		/// Same player->Gold
+    int		PlayerWood[16];		/// Same player->Wood
+    int		PlayerOil[16];		/// Same player->Oil
+    int		PlayerAi[16];		/// Same player->Ai
+} PudInfo;
+
+/*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+    /// Return info for pud.
+extern PudInfo* GetPudInfo(const char*);
 
     /// Load a pud file.
 extern void LoadPud(const char* pud,WorldMap* map);
