@@ -3,6 +3,8 @@
 /**
 **	@author	Copyright by Edgar Toernig.
 **	@name	dllist.h		-	Double linked lists.
+**
+*	$Id$
 */
 
 struct dl_node
