@@ -244,10 +244,11 @@ int PlayMovie(const char* name)
 				break;
 			}
 			need_data = 0;
-			data->tstate.internal_encode = NULL;
+			data->tstate.internal_encode = NULL;	// needed, maybe a bug in libtheora?
 		}
 		
-		if (SDL_GetTicks() - start_ticks > theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000) {
+		if (SDL_GetTicks() - start_ticks > theora_granule_time(&data->tstate,
+		  data->tstate.granulepos) * 1000) {
 			OutputTheora(data, yuv_overlay, &rect);
 			need_data = 1;
 		}
