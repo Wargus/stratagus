@@ -415,54 +415,62 @@ local void SpellRunesController(Missile * missile)
 **
 **	@todo	Move this code into the missile code
 */
-local void SpellFlameShieldController(Missile *missile)
+local void SpellFlameShieldController(Missile * missile)
 {
-  static int fs_dc[] = {
-  0, 32, 5, 31, 10, 30, 16, 27, 20, 24, 24, 20, 27, 15, 30, 10, 31, 5, 32, 0,
-  31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10, -30, 5, -31, 0, -32,
-  -5, -31, -10, -30, -16, -27, -20, -24, -24, -20, -27, -15, -30, -10, -31, -5,
-  -32, 0, -31, 5, -30, 10, -27, 16, -24, 20, -20, 24, -15, 27, -10, 30, -5, 31,
-  0, 32 };
+    static int fs_dc[] = {
+	0, 32, 5, 31, 10, 30, 16, 27, 20, 24, 24, 20, 27, 15, 30, 10, 31,
+	5, 32, 0, 31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10,
+	-30, 5, -31, 0, -32, -5, -31, -10, -30, -16, -27, -20, -24, -24, -20,
+	-27, -15, -30, -10, -31, -5, -32, 0, -31, 5, -30, 10, -27, 16, -24,
+	20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32
+    };
+    Unit *table[UnitMax];
+    int n;
+    int i;
+    int dx;
+    int dy;
+    int ux;
+    int uy;
+    int ix;
+    int iy;
+    int uw;
+    int uh;
 
-  Unit *table[UnitMax];
-  int n;
+    i = missile->TTL % 36;		// 36 positions on the circle
+    dx = fs_dc[i * 2];
+    dy = fs_dc[i * 2 + 1];
 
-  int i = missile->TTL % 36;
-  int dx = fs_dc[ i*2 ];
-  int dy = fs_dc[ i*2 + 1 ];
+    ux = missile->TargetUnit->X;
+    uy = missile->TargetUnit->Y;
 
-  int ux = missile->TargetUnit->X;
-  int uy = missile->TargetUnit->Y;
+    ix = missile->TargetUnit->IX;
+    iy = missile->TargetUnit->IY;
 
-  int ix = missile->TargetUnit->IX;
-  int iy = missile->TargetUnit->IY;
+    uw = missile->TargetUnit->Type->Width;
+    uh = missile->TargetUnit->Type->Height;
 
-  int uw = missile->TargetUnit->Type->Width;
-  int uh = missile->TargetUnit->Type->Height;
+    missile->X = ux * TileSizeX + ix + uw / 2 + dx - 32;
+    missile->Y = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
 
-  int mx = ux * TileSizeX + ix + uw / 2 + dx - 32;
-  int my = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
-
-  missile->X = mx;
-  missile->Y = my;
-
-  if ( missile->TTL == 0 )
-    {
-    missile->TargetUnit->FlameShield = 0;
+    if (missile->TTL == 0) {
+	missile->TargetUnit->FlameShield = 0;
     }
+    //vladi: still no have clear idea what is this about :)
+    CheckMissileToBeDrawn(missile);
 
-  //vladi: still no have clear idea what is this about :)
-  CheckMissileToBeDrawn( missile );
-
-  // FIXME: vladi: uhm... perhaps is a bit powerfull?
-  if ( missile->TTL % 10 == 0 ) return;
-  n = SelectUnits( ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table );
-  for (i = 0; i < n; ++i) {
-    if (table[i] == missile->TargetUnit) continue; // cannot hit target unit
-	if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
+    // FIXME: vladi: uhm... perhaps is a bit powerfull?
+    if (missile->TTL % 10 == 0) {
+	return;
+    }
+    n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
+    for (i = 0; i < n; ++i) {
+	if (table[i] == missile->TargetUnit) {	// cannot hit target unit
+	    continue;
+	}
+	if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP) {
 	    HitUnit(missile->SourceUnit, table[i], 1);
-      }
-  }
+	}
+    }
 }
 
 /*----------------------------------------------------------------------------
