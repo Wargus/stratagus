@@ -286,8 +286,8 @@ extern void DrawButtonPanel(void);
 extern void UpdateButtonPanel(void);
     /// FIXME: more docu
 extern void DoButtonButtonClicked(int button);
-    /// FIXME: more docu
-extern void DoButtonPanelKey(int key);
+    /// Lookup key for bottom panel buttons.
+extern int DoButtonPanelKey(int key);
 
 //@}
 

@@ -847,26 +847,29 @@ global void DoButtonButtonClicked(int button)
 **	Lookup key for bottom panel buttons.
 **
 **	@param key	Internal key symbol for pressed key.
+**
+**	@returns	True, if button is handled (consumed).
 */
-global void DoButtonPanelKey(int key)
+global int DoButtonPanelKey(int key)
 {
     int i;
 
-    if( !CurrentButtons ) {		// no buttons
-	return;
-    }
+    if( CurrentButtons ) {		// buttons
 
-    // cade: this is required for action queues SHIFT+M should be `m'
-    if ( key >= 'A' && key <= 'Z' ) {
-	key = tolower(key);
-    }
+	// cade: this is required for action queues SHIFT+M should be `m'
+	if ( key >= 'A' && key <= 'Z' ) {
+	    key = tolower(key);
+	}
 
-    for( i=0; i<9; ++i ) {
-	if( CurrentButtons[i].Pos!=-1 && key==CurrentButtons[i].Key ) {
-	    DoButtonButtonClicked(i);
-	    return;
+	for( i=0; i<9; ++i ) {
+	    if( CurrentButtons[i].Pos!=-1 && key==CurrentButtons[i].Key ) {
+		DoButtonButtonClicked(i);
+		return 1;
+	    }
 	}
     }
+
+    return 0;
 }
 
 //@}

@@ -549,8 +549,6 @@ local void X11HandleKey(KeySym code)
     if( HandleKeyDown(icode) ) {
 	return;
     }
-    // FIXME: Should come first
-    DoButtonPanelKey(icode);
 }
 
 /**
