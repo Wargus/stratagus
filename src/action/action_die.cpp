@@ -64,7 +64,7 @@ global void HandleActionDie(Unit* unit)
     //	Die sequence terminated, generate corpse.
     //
     if( unit->Reset ) {
-	DebugLevel3("Die complete %d\n",UnitNumber(unit));
+	DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 	if( !unit->Type->CorpseType ) {
 	    ReleaseUnit(unit);
 	    return;

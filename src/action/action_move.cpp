@@ -179,13 +179,13 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 #endif
     }
 
-    DebugLevel3Fn(": %d,%d State %2d ",xd,yd,unit->State);
+    DebugLevel3Fn(": %d,%d State %2d " _C_ xd _C_ yd _C_ unit->State);
     DebugLevel3("Walk %d Frame %2d Wait %3d Heading %d %d,%d\n"
-	    ,anim[state].Pixel
-	    ,anim[state].Frame
-	    ,anim[state].Sleep
-	    ,unit->Direction
-	    ,unit->IX,unit->IY);
+	    _C_ anim[state].Pixel
+	    _C_ anim[state].Frame
+	    _C_ anim[state].Sleep
+	    _C_ unit->Direction
+	    _C_ unit->IX _C_ unit->IY);
 
     //
     //	Next animation.
@@ -234,7 +234,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 global int DoActionMove(Unit* unit)
 {
     if( unit->Type->Animations ) {
-	DebugLevel3("%s: %p\n",unit->Type->Ident,unit->Type->Animations );
+	DebugLevel3("%s: %p\n" _C_ unit->Type->Ident _C_ unit->Type->Animations );
 	return ActionMoveGeneric(unit,unit->Type->Animations->Move);
     }
 
@@ -255,9 +255,9 @@ global void HandleActionMove(Unit* unit)
 {
     Unit* goal;
 
-    DebugLevel3Fn("%d: %d %d,%d \n",UnitNumber(unit),
-	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1,
-	    unit->Orders[0].X,unit->Orders[0].Y);
+    DebugLevel3Fn("%d: %d %d,%d \n" _C_ UnitNumber(unit) _C_
+	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1 _C_
+	    unit->Orders[0].X _C_ unit->Orders[0].Y);
 
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;

@@ -79,7 +79,7 @@ local int WaitForTransporter(Unit* unit)
 
     if( !trans || !trans->Type->Transporter ) {
 	// FIXME: destination destroyed??
-	DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
+	DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
 	return 0;
     }
 
@@ -110,7 +110,7 @@ local int WaitForTransporter(Unit* unit)
     //	FIXME: any enemies in range attack them, while waiting.
     //
 
-    DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
+    DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
 
     return 0;
 }
@@ -187,7 +187,7 @@ global void HandleActionBoard(Unit* unit)
     Unit* goal;
 
     DebugLevel3Fn("%p(%d) SubAction %d\n"
-	    ,unit,UnitNumber(unit),unit->SubAction);
+	    _C_ unit _C_ UnitNumber(unit) _C_ unit->SubAction);
 
     switch( unit->SubAction ) {
 	//

@@ -101,7 +101,7 @@ local int MoveToGoldMine(Unit* unit)
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another mine, or retry later.
 	DebugLevel3Fn("GOLD-MINE NOT REACHED %d=%d,%d ? %d\n"
-	      ,UnitNumber(destu),destu->X,destu->Y,
+	      _C_ UnitNumber(destu) _C_ destu->X _C_ destu->Y _C_
 	      MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
@@ -214,7 +214,7 @@ local int MineInGoldmine(Unit* unit)
 	//	End of gold: destroy gold-mine.
 	//
 	if( !OptionUseDepletedMines && mine->Value<DEFAULT_INCOMES[GoldCost] ) {
-	    DebugLevel0Fn("Mine destroyed %d,%d\n",mine->X,mine->Y);
+	    DebugLevel0Fn("Mine destroyed %d,%d\n" _C_ mine->X _C_ mine->Y);
 	    DropOutAll(mine);
 	    LetUnitDie(mine);
 	    mine=NULL;
@@ -248,7 +248,7 @@ local int MineInGoldmine(Unit* unit)
 	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=UnitActionMineGold;
 	    unit->SubAction=64;
-	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
+	    DebugLevel3Fn("Mine with deposit %d,%d\n" _C_ destu->X _C_ destu->Y);
 	}
 
 	//
@@ -262,7 +262,7 @@ local int MineInGoldmine(Unit* unit)
 	} else {
 	    // FIXME: support workers for more races.
 	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
-		,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
+		_C_ unit->X _C_ unit->Y _C_ unit->Type->Type _C_ unit->Type->Name);
 	}
 	unit->Player->UnitTypesCount[unit->Type->Type]++;
         CheckUnitToBeDrawn(unit);
@@ -349,8 +349,8 @@ local int MoveToGoldDeposit(Unit* unit)
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another depot, or retry later.
 	DebugLevel3Fn("GOLD-DEPOT NOT REACHED %d=%d,%d ? %d\n"
-	      ,UnitNumber(destu),destu->X,destu->Y
-	      ,MapDistanceToUnit(unit->X,unit->Y,destu));
+	      _C_ UnitNumber(destu) _C_ destu->X _C_ destu->Y
+	      _C_ MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
     }
 
@@ -389,7 +389,7 @@ local int MoveToGoldDeposit(Unit* unit)
     } else {
 	// FIXME: support workers for more races.
 	DebugLevel0Fn("Wrong unit (%d,%d) for returning gold %d (%s)\n"
-	    ,unit->X,unit->Y,unit->Type->Type,unit->Type->Name);
+	    _C_ unit->X _C_ unit->Y _C_ unit->Type->Type _C_ unit->Type->Name);
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 

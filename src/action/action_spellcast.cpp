@@ -155,9 +155,9 @@ global void HandleActionSpellCast(Unit * unit)
     int flags;
     const SpellType *spell;
 
-    DebugLevel3Fn("%d %d,%d+%d+%d\n",
-	UnitNumber(unit),unit->Orders[0].X,unit->Orders[0].Y,
-	unit->Orders[0].RangeX,unit->Orders[0].RangeY);
+    DebugLevel3Fn("%d %d,%d+%d+%d\n" _C_
+	UnitNumber(unit) _C_ unit->Orders[0].X _C_ unit->Orders[0].Y _C_
+	unit->Orders[0].RangeX _C_ unit->Orders[0].RangeY);
 
     switch (unit->SubAction) {
 
