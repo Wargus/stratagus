@@ -248,6 +248,7 @@ local SCM CclMissile(SCM list)
 	    list = gh_cdr (list);
 	    str = gh_scm2newstr (value, NULL);
 	    missile->SourceUnit = UnitSlots[strtol (str+1, 0, 16)];
+	    free(str);
 	    ++missile->SourceUnit->Refs;
 	} else if (gh_eq_p (value, gh_symbol2scm ("damage"))) {
 	    DebugCheck (!missile);
