@@ -1499,6 +1499,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
     }
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
+	menu->items[8].flags = MenuButtonDisabled;
 	menu->items[11].flags = MenuButtonDisabled;
     }
 #endif
@@ -1516,14 +1517,15 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     menu->items[17].flags = 0;			// cd power
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
-#ifdef USE_LIBCDA
+#if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
 	int i = 0;
-
+#ifdef USE_LIBCDA
 	cd_get_volume(&i, &i);
-#ifndef USE_WIN32
+#else
+	i = MusicVolume;
+#endif
 	menu->items[14].flags = 0;
 	menu->items[14].d.hslider.percent = (i * 100) / 255;
-#endif
 #endif
 	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
 	menu->items[19].flags = 0;
@@ -1737,6 +1739,15 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
     } else {
     // Stop Playing CD
         cd_pause();
+	CDMode = ":stopped";
+    }
+#elif defined(USE_CDDA)
+    // Start Playing CD
+    if (!PlayingMusic) {
+	PlayMusic(":random");
+    } else {
+    // Stop Playing CD
+	PlayingMusic = 0;
 	CDMode = ":stopped";
     }
 #endif
@@ -3549,7 +3560,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
     }
 }
 
-#ifdef USE_LIBCDA
+#if defined(USE_LIBCDA) || defined(USE_CDDA)
 /**
 **	CD volume horizontal slider action callback
 */
@@ -3574,7 +3585,11 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+#ifdef USE_LIBCDA
 	    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
+#else
+	    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
+#endif
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
@@ -3584,7 +3599,11 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
 		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+#ifdef USE_LIBCDA
 		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
+#else
+		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
+#endif
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
