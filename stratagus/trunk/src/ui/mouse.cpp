@@ -634,6 +634,8 @@ global void UIHandleMouseMove(int x,int y)
     }
 }
 
+//.............................................................................
+
 /**
 **	Send selected units to repair
 **
@@ -911,6 +913,8 @@ local void SendCommand(int x,int y)
 	break;
     }
 }
+
+//.............................................................................
 
 /**
 **	Handle mouse button pressed in select state.
