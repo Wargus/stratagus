@@ -1254,6 +1254,7 @@ global void ShowStats(void)
 
 	VideoClearScreen();
 
+	background = NULL;
 	if (GameResult == GameVictory) {
 		if (TheUI.VictoryBackground.File) {
 			background = LoadGraphic(TheUI.VictoryBackground.File);
@@ -1275,18 +1276,22 @@ global void ShowStats(void)
 	IntroNoEvent = 1;
 	IntroButtonPressed = 0;
 #ifndef USE_OPENGL
-	VideoDrawSubClip(background, 0, 0,
-		background->Width, background->Height,
-		(VideoWidth - background->Width) / 2,
-		(VideoHeight - background->Height) / 2);
-#endif
-	while (1) {
-		HideAnyCursor();
-#ifdef USE_OPENGL
+	if (background) {
 		VideoDrawSubClip(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
+	}
+#endif
+	while (1) {
+		HideAnyCursor();
+#ifdef USE_OPENGL
+		if (background) {
+			VideoDrawSubClip(background, 0, 0,
+				background->Width, background->Height,
+				(VideoWidth - background->Width) / 2,
+				(VideoHeight - background->Height) / 2);
+		}
 		GameStatsDrawFunc(frame);
 #else
 		if (!done) {
