@@ -68,6 +68,7 @@
 **		98:	Marks map border, for faster limits checks.
 */
 global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];	/// Path matrix
+local unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
 
 IfDebug(
 global unsigned PfCounterFail;
@@ -106,15 +107,20 @@ local void InitMatrix(unsigned char* matrix)
     h=TheMap.Height;
 
     i=w+w+1;
-    memset(matrix,98,i);		// +1 for ships!
-    memset(matrix+i,0,w*h);		// initialize matrix
+    memset(matrix,98,i);                // +1 for ships!
+    memset(matrix+i,0,w*h);             // initialize matrix
 
-    for( e=i+w*h; i<e; ) {		// mark left and right border
+    for( e=i+w*h; i<e; ) {              // mark left and right border
 	matrix[i]=98;
 	i+=w;
 	matrix[i-1]=98;
     }
-    memset(matrix+i,98,w+1);		// +1 for ships!
+    memset(matrix+i,98,w+1);            // +1 for ships!
+}
+									
+local void InitLocalMatrix(void)
+{
+    memset(LocalMatrix,0,TheMap.Width*TheMap.Height*sizeof(int));		// initialize matrix
 }
 
 /**
@@ -147,21 +153,31 @@ global unsigned char* MakeMatrix(void)
 **	@param w	Width of target area
 **	@param h	Height of target area
 **	@param matrix	Target area marked in matrix
+**
+**	@returns	depth, -1 unreachable
 */
-local void MarkPlaceInMatrix(int x1,int y1,int x2,int y2,unsigned char* matrix)
+local int CheckPlaceInMatrix(int x1,int y1,int x2,int y2,unsigned int* matrix)
 {
     int x;
     int y;
-    int mw;
 
-    mw=TheMap.Width+2;
-    matrix+=mw+mw+2;
     for( y=y1; y<=y2; y++) {
-	for( x=x1; x<=x2; ++x ) {
-	    matrix[x+y*mw]=88;
+	if( matrix[y*TheMap.Width+x1] ) {
+	    return matrix[y*TheMap.Width+x1];
 	}
-	++y;
+	if( matrix[y*TheMap.Width+x2] ) {
+	    return matrix[y*TheMap.Width+x2];
+	}
     }
+    for( x=x1; x<=x2; ++x ) {
+	if( matrix[y1*TheMap.Width+x] ) {
+	    return matrix[y1*TheMap.Width+x];
+	}
+	if( matrix[y2*TheMap.Width+x] ) {
+	    return matrix[y2*TheMap.Width+x];
+	}
+    }
+    return -1;
 }
 
 /**
@@ -177,7 +193,7 @@ local void MarkPlaceInMatrix(int x1,int y1,int x2,int y2,unsigned char* matrix)
 **	@param range	How near we must come.
 **	@param matrix	Target goal and area around is marked in matrix
 */
-local void MarkGoalInMatrix(const Unit* unit,int range,unsigned char* matrix)
+local int CheckGoalInMatrix(const Unit* unit,int range,unsigned int* matrix)
 {
     int x;
     int y;
@@ -191,11 +207,11 @@ local void MarkGoalInMatrix(const Unit* unit,int range,unsigned char* matrix)
     w=type->TileWidth+range*2;
     h=type->TileHeight+range*2;
 
-    MarkPlaceInMatrix(x,y,w,h,matrix);
+    return CheckPlaceInMatrix(x,y,w,h,matrix);
 }
 
 /**
-**	Mark path to goal.
+**	Flood fill an area for a matrix.
 **
 **	This use the flood-fill algorithms.
 **	@todo can be done faster, if starting from both sides.
@@ -203,17 +219,13 @@ local void MarkGoalInMatrix(const Unit* unit,int range,unsigned char* matrix)
 **	@param unit	Path for this unit.
 **	@param matrix	Matrix for calculation.
 **
-**	@return		1 reachable, -1 unreachable
 */
-local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
+local void FillMatrix(Unit* unit,unsigned int* matrix)
 {
-    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1,
-	     0,-2,+2, 0, -2,+2,-2,+2 };
-    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1,
-	    -2, 0, 0,+2, -2,-2,+2,+2 };
     struct {
 	unsigned short X;
 	unsigned short Y;
+	int depth;
     } *points;
     int x;
     int y;
@@ -225,36 +237,23 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     int ep;
     int n;
     int j;
-    int w;
-    int add;
     int depth;
     int size;
-    unsigned char* m;
+    unsigned int* m;
 
-    size=TheMap.Width*TheMap.Height;
+    size=4*(TheMap.Width+TheMap.Height)*sizeof(*points);
     points=malloc(size);
-    size/=sizeof(*points);
+    size=4*(TheMap.Width+TheMap.Height);
 
-    w=TheMap.Width+2;
     mask=UnitMovementMask(unit);
     // Ignore all possible mobile units.
     // FIXME: bad? mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 
-#ifdef NEW_SHIPS
-    if( unit->Type->UnitType==UnitTypeLand ) {
-	add=0;
-    } else {
-	add=8;
-    }
-#else
-    add=0;
-#endif
-
     points[0].X=x=unit->X;
     points[0].Y=y=unit->Y;
-    matrix+=w+w+2;
+    points[0].depth=1;
     rp=0;
-    matrix[x+y*w]=depth=1;			// mark start point
+    matrix[x+y*TheMap.Width]=depth=1;			// mark start point
     ep=wp=1;					// start with one point
     n=2;
 
@@ -265,30 +264,32 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 	while( rp!=ep ) {
 	    rx=points[rp].X;
 	    ry=points[rp].Y;
+	    depth=points[rp].depth;
 	    for( j=0; j<8; ++j ) {		// mark all neighbors
-		x=rx+xoffset[j+add];
-		y=ry+yoffset[j+add];
-		m=matrix+x+y*w;
-		if( *m ) {			// already checked
-		    // Check if goal reached.
-		    if( *m==88 && CanMoveToMask(x,y,mask) ) {
-			free(points);
-			return depth;
-		    }
+		x=rx+Heading2X[j];
+		y=ry+Heading2Y[j];
+		if( x < 0 || y<0 || x >= TheMap.Width || y >= TheMap.Height) {	// already checked
+		    // We Have been here before
+		    continue;
+		}
+		m=matrix+x+y*TheMap.Width;
+		if( *m ) {
 		    continue;
 		}
 		if( CanMoveToMask(x,y,mask) ) {	// reachable
-		    *m=n;
+		    *m=depth+1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
+		    points[wp].depth=depth+1;
 		    if( ++wp>=size ) {		// round about
 			wp=0;
 		    }
 		} else {			// unreachable
-		    *m=99;
+		    *m=0;
 		}
 	    }
 
+	    // Loop for 
 	    if( ++rp>=size ) {			// round about
 		rp=0;
 	    }
@@ -301,12 +302,10 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 	    break;
 	}
 	ep=wp;
-	++depth;
-	n=(depth&0x07)+1;
     }
 
     free(points);
-    return -1;
+    return;
 }
 
 /*----------------------------------------------------------------------------
@@ -331,7 +330,8 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     int y1;
     int y2;
     int reachable;
-    unsigned char* matrix;
+    static int LastGameCycle;
+    static int mask;
 
     DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
@@ -370,22 +370,26 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     }
 
     if( !reachable ) {
-	DebugLevel3("Can't move to destination\n");
+	DebugLevel1("Can't move to destination, goal unreachable\n");
 	return 0;
     }
 
     //
     //  Setup movement.
     //
-    range++; // Mark Place doesn't like 0 range.
-    matrix=CreateMatrix();
-    MarkPlaceInMatrix(x1,y1,x2,y2,matrix);
+    if( src->Type->MovementMask != mask || LastGameCycle != GameCycle 
+	|| LocalMatrix[src->X+src->Y*TheMap.Width] == 0 ) {
+	InitLocalMatrix();
+	FillMatrix(src,LocalMatrix);
+	LastGameCycle = GameCycle;
+	mask = src->Type->MovementMask;
+    }
 
     //
     //  Find a path to the place.
     //
-    if( (depth=MarkPathInMatrix(src,matrix)) < 0 ) {
-	DebugLevel3("Can't move to destination\n");
+    if( (depth=CheckPlaceInMatrix(x1,y1,x2,y2,LocalMatrix)) < 0 ) {
+	DebugLevel1("Can't move to destination, not route to goal\n");
 	return 0;
     }
 
