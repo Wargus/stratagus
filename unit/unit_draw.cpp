@@ -1877,6 +1877,7 @@ global void DrawUnits(const void* v)
 {
     Unit* unit;
     Unit* table[UnitMax];
+    Unit** corpses;
     int n;
     int i;
     const Viewport* vp;
@@ -1892,14 +1893,12 @@ global void DrawUnits(const void* v)
     //
     //  2a) corpse aren't in the cache.
     //
-    for (i = 0; i < NumUnits; ++i) {
-	unit = Units[i];
-	// FIXME: this tries to draw all corps, ohje
-	if ((unit->Type->Vanishes && (int)unit->State==unit->Type->CorpseScript) ||
-	    (UnitVisibleInViewport(vp,unit) &&
-		unit->Orders[0].Action == UnitActionDie) ) {
-	    DrawUnit(unit);
+    corpses = &CorpseList;
+    while( *corpses ) {
+	if( UnitVisibleInViewport(vp,*corpses) ) {
+	    DrawUnit(*corpses);
 	}
+	corpses=&(*corpses)->Next;
     }
 
     //
