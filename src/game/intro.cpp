@@ -823,8 +823,9 @@ local int GameStatsDrawFunc(int frame)
 	if( (int)max==0 )
 	    max=1.0;
 
+	sprintf(buf,"%s - You",ThisPlayer->Name);
 	VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26,
-	                      NamesFont,"You");
+	                      NamesFont,buf);
 	VideoDrawTextCentered(x+50,y+BottomOffset,LargeFont,"Units");
 	sprintf(buf,"%u",ThisPlayer->TotalUnits);
 	percent=ThisPlayer->TotalUnits/max;
@@ -836,12 +837,7 @@ local int GameStatsDrawFunc(int frame)
 		(p->Type!=PlayerPerson && p->Type!=PlayerComputer) ) {
 		continue;
 	    }
-	    if( p->Type==PlayerPerson ) {
-		strcpy(buf,"Person");
-	    }
-	    else {
-		strcpy(buf,"Computer");
-	    }
+	    sprintf(buf,"%s - Enemy",p->Name);
 	    VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26+LineSpacing*c,
 	                          NamesFont,buf);
 	    sprintf(buf,"%u",p->TotalUnits);
