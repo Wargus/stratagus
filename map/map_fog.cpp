@@ -524,7 +524,6 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 
 	drect.x = x;
 	drect.y = y;
-
 	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
@@ -568,10 +567,7 @@ global void VideoDrawFogAlphaOpenGL(
 }
 
 /**
-**		Fast draw 100% fog of war 32x32 tile for 32 bpp video modes.
-**
-**		100% fog of war -- i.e. raster		10101.
-**										01010 etc...
+**		Fast draw 100% fog of war Opengl.
 **
 **		@param data		pointer to tile graphic data.
 **		@param x		X position into video memory
@@ -965,7 +961,9 @@ global void CleanMapFogOfWar(void)
 		free(VisibleTable);
 		VisibleTable = NULL;
 	}
+#ifndef OPENGL
 	SDL_FreeSurface(OnlyFogSurface);
+#endif
 }
 
 /**
