@@ -6717,10 +6717,9 @@ local void ReplayGameOk(void)
 	    menu->items[5].d.button.text = NULL;
 
 	    if (menu->items[6].d.gem.state == MI_GSTATE_CHECKED) {
-		TheMap.NoFogOfWar = 1;
-		FlagRevealMap = 1;
-		GameSettings.NoFogOfWar = 1;
-		GameSettings.RevealMap = 1;
+		ReplayRevealMap = 1;
+	    } else {
+		ReplayRevealMap = 0;
 	    }
 	}
     }

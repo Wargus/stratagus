@@ -261,7 +261,8 @@ global void DrawMinimap(int vx __attribute__((unused)),
 		if( IsMapFieldVisible(ThisPlayer,Minimap2MapX[mx],(Minimap2MapY[my]/TheMap.Width))
 			|| (IsMapFieldExplored(ThisPlayer,Minimap2MapX[mx],
 					(Minimap2MapY[my]/TheMap.Width)) &&
-					((mx&1)==(my&1)))) {
+					((mx&1)==(my&1)))
+			|| ReplayRevealMap ) {
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
@@ -269,7 +270,8 @@ global void DrawMinimap(int vx __attribute__((unused)),
 		flags=Minimap2MapX[mx]+Minimap2MapY[my];
 		if( TheMap.Fields[flags].Flags&MapFieldExplored &&
 			( (TheMap.Visible[0][flags/32]&(1<<(flags%32)))
-			    || ((mx&1)==(my&1)) ) ) {
+			    || ((mx&1)==(my&1)) )
+			    || ReplayRevealMap ) {
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
 			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
@@ -299,7 +301,7 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	    continue;			// Submarine not visible
 	}
 
-	if( !UnitKnownOnMap(unit) ) {
+	if( !UnitKnownOnMap(unit) && !ReplayRevealMap ) {
 	    continue;
 	}
 

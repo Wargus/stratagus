@@ -800,6 +800,7 @@ global void GameMainLoop(void)
     }
 
     FlagRevealMap=0;
+    ReplayRevealMap=0;
     GamePaused=0;
     GodMode=0;
 }

@@ -368,10 +368,7 @@ global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
 		    case 255:
 			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
 			    LookupSight(player,i,y);
-			if (FlagRevealMap == 1 &&
-			    TheMap.Fields[i+y*TheMap.Width].Visible[p] < 255) {
-				++TheMap.Fields[i+y*TheMap.Width].Visible[p];
-			}
+			++TheMap.Fields[i+y*TheMap.Width].Visible[p];
 		    case 0:		// Unexplored
 		    case 1:
 			//We are at minimum, don't do anything.
@@ -1852,7 +1849,12 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
     tile=FogTable[tile];
     tile2=FogTable[tile2];
 
-    if( tile2) {
+    if( ReplayRevealMap ) {
+	tile2 = 0;
+	tile = 0;
+    }
+
+    if( tile2 ) {
 	VideoDrawUnexplored(TheMap.Tiles[tile2],dx,dy);
 	if( tile2==tile ) {		// no same fog over unexplored
 //	    if( tile != 0xf ) {
@@ -1861,7 +1863,7 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 	    tile=0;
 	}
     }
-    if( IsMapFieldVisible(ThisPlayer,x,y) ) {
+    if( IsMapFieldVisible(ThisPlayer,x,y) || ReplayRevealMap ) {
 	if( tile ) {
 	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
 //	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
@@ -1937,7 +1939,7 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 #ifdef NEW_FOW
 		    mx=(dx-vp->X)/TileSizeX + vp->MapX;
 		    my=(dy-vp->Y)/TileSizeY + vp->MapY;
-		    if( IsTileVisible(ThisPlayer,mx,my) ) {
+		    if( IsTileVisible(ThisPlayer,mx,my) || ReplayRevealMap ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
 #ifdef USE_OPENGL
@@ -1947,7 +1949,7 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 #endif
 		    }
 #else
-		    if( TheMap.Fields[sx].Flags&MapFieldExplored ) {
+		    if( TheMap.Fields[sx].Flags&MapFieldExplored || ReplayRevealMap ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
 #ifdef USE_OPENGL
