@@ -219,6 +219,8 @@ global void PlayMusic(const char* name)
 		return;
 	    }
 	    cd_get_tracks(&CDTrack, &NumCDTracks);
+	    if (NumCDTracks == 0)
+		return;
 	    --CDTrack;
 	}
     }
@@ -1531,9 +1533,11 @@ global void QuitSound(void)
 #endif
 
 #ifdef USE_LIBCDA
-    cd_stop();
-    cd_close();
-    cd_exit();
+    if (strcmp(CDMode,":off")) {
+        cd_stop();
+        cd_close();
+        cd_exit();
+    }
 #endif
 
 }
