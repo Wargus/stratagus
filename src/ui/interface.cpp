@@ -412,6 +412,11 @@ local void UiEnterPreferencesOptionsMenu(void)
 */
 local void UiEnterSaveGameMenu(void)
 {
+    // Disable save menu in multiplayer and replays
+    if (NetworkFildes != -1 || ReplayGameType != ReplayNone) {
+	return;
+    }
+
     GamePaused=1;
     SetStatusLine("Game Paused");
     SaveGameMenu();
@@ -427,6 +432,11 @@ local void UiEnterSaveGameMenu(void)
 */
 local void UiEnterLoadGameMenu(void)
 {
+    // Disable load menu in multiplayer
+    if (NetworkFildes != -1) {
+	return;
+    }
+
     GamePaused=1;
     SetStatusLine("Game Paused");
     LoadGameMenu();
