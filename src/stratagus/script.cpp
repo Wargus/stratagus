@@ -311,8 +311,10 @@ local SCM CclShowOrders(void)
     return SCM_UNSPECIFIED;
 }
 
-/*
+/**
 **	For debug increase mining speed.
+**
+**	@param speed	Speed factor of gold mining.
 */
 local SCM CclSpeedMine(SCM speed)
 {
@@ -711,6 +713,7 @@ global void CclInit(void)
     init_subr_0("library-path",CclFreeCraftLibraryPath);
     init_subr_1("title-screen",CclTitleScreen);
 
+// FIXME: Should move into own C file.
     init_subr_5("mana-sprite",CclManaSprite);
     init_subr_5("health-sprite",CclHealthSprite);
     init_subr_0("color-cycle-all",CclColorCycleAll);
@@ -750,6 +753,7 @@ global void CclInit(void)
 
     IconCclRegister();
     MissileCclRegister();
+    PlayerCclRegister();
     TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();

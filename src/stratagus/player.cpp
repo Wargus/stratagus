@@ -90,28 +90,17 @@ global void CreatePlayer(int type)
     player->Player=NumPlayers;
 
     //  Allocate memory for the "list" of this player's units.
-    //  FIXME: brutal way, as we won't need MAX_UNITS for this player...
+    //  FIXME: brutal way, as we won't need UnitMax for this player...
     //	FIXME: ARI: is this needed for 'PlayerNobody' ??
-    if( !(player->Units=(Unit**)calloc(MAX_UNITS,sizeof(Unit*))) ) {
+    if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
 	DebugLevel0("Not enough memory to create player %d.\n",NumPlayers);
 	return;
     }
-    player->TotalNumUnits=0;
 
     //
     //	Take first slot for human on this computer,
     //	fill other with computer players.
     //
-#if 0
-    if( type==PlayerHuman ) {
-	if( !ThisPlayer ) {
-	    ThisPlayer=player;
-	} else if( !NetPlayers && !NetworkArg ) {
-	    // FIXME: only for single players
-	    type=PlayerComputer;
-	}
-    }
-#else
     if( type==PlayerHuman && !NetPlayers && !NetworkArg ) {
 	if( !ThisPlayer ) {
 	    ThisPlayer=player;
@@ -119,7 +108,6 @@ global void CreatePlayer(int type)
 	    type=PlayerComputer;
 	}
     }
-#endif
 
     //
     //	Make simple teams:
@@ -239,7 +227,15 @@ global void CreatePlayer(int type)
     player->Food=0;
     player->NumFoodUnits=0;
     player->NumBuildings=0;
+    player->TotalNumUnits=0;
     player->Score=0;
+
+#ifndef USE_CCL
+    // FIXME: done by ccl
+    player->FoodUnitLimit=200;
+    player->BuildingLimit=200;
+    player->TotalUnitLimit=400;
+#endif
 
     player->Color=PlayerColors[NumPlayers];
 
@@ -316,6 +312,31 @@ global void PlayerSetResource(Player* player,int resource,int value)
     if( player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }
+}
+
+/**
+**	Check if the unit-type didn't break any unit limits.
+**
+**	@param player	Pointer to player.
+**	@param type	Type of unit.
+**	@return		True if enought, false otherwise.
+*/
+global int PlayerCheckLimits(const Player* player,const UnitType* type)
+{
+    // FIXME: currently all units costs 1 unit slot.
+
+    if( player->NumFoodUnits<player->FoodUnitLimit
+	    && player->NumBuildings<player->BuildingLimit
+	    && player->TotalNumUnits<player->TotalUnitLimit ) {
+	return 1;
+    }
+    // FIXME: need a general notify function
+    if( player==ThisPlayer ) {
+	SetMessage("Cannot create more units.");
+    } else {
+	// AiNoMoreUnits(player,type);
+    }
+    return 0;
 }
 
 /**
