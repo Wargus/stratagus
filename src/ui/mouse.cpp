@@ -92,7 +92,10 @@ local void DrawMouseCoordsOnMap(int x,int y)
         DebugLevel0(__FUNCTION__": coords outside map %d,%d\n",x,y);
 	return;
     }
-    DrawImage(ImageMenuButton,0,0,0,0);
+    VideoDrawSub(TheUI.MenuButton.Graphic,0,0
+	    ,TheUI.MenuButton.Graphic->Width
+	    ,TheUI.MenuButton.Graphic->Height
+	    ,TheUI.MenuButtonX,TheUI.MenuButtonY);
     flags=TheMap.Fields[x+y*TheMap.Width].Flags;
     sprintf(buf,"%3d,%3d=%02X|%04X|%c%c%c%c%c%c%c%c%c",x,y
 	    ,TheMap.Fields[x+y*TheMap.Width].Value
@@ -107,8 +110,10 @@ local void DrawMouseCoordsOnMap(int x,int y)
 	    ,flags&MapFieldExplored	?'e':'-'
 	    ,flags&MapFieldVisible	?'v':'-'
 	);
-    DrawText(3,3,GameFont,buf);
-    InvalidateArea(0,0,176,24);
+    DrawText(TheUI.MenuButtonX+3,TheUI.MenuButtonY+3,GameFont,buf);
+    InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY
+	    ,TheUI.MenuButton.Graphic->Width
+	    ,TheUI.MenuButton.Graphic->Height);
 }
 #endif	// } FLAG_DEBUG
 
