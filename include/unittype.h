@@ -569,6 +569,9 @@ typedef enum _new_animation_type_ {
 	NewAnimationRandomRotate,
 	NewAnimationMove,
 	NewAnimationUnbreakable,
+	NewAnimationLabel,
+	NewAnimationGoto,
+	NewAnimationRandomGoto,
 } NewAnimationType;
 
 typedef struct _new_animation_ {
@@ -602,6 +605,13 @@ typedef struct _new_animation_ {
 		struct {
 			int Begin;
 		} Unbreakable;
+		struct {
+			struct _new_animation_* Goto;
+		} Goto;
+		struct {
+			int Random;
+			struct _new_animation_* Goto;
+		} RandomGoto;
 	} D;
 	struct _new_animation_* Next;
 } NewAnimation;

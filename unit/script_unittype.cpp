@@ -62,6 +62,21 @@ _NewAnimationsHash NewAnimationsHash;///< NewAnimations hash table
 
 struct _UnitTypeVar_ UnitTypeVar;    ///< Variables for UnitType and unit.
 
+#define MAX_LABELS 20
+#define MAX_LABEL_LENGTH 256
+
+static struct {
+	NewAnimation* Anim;
+	char Name[MAX_LABEL_LENGTH];
+} Labels[MAX_LABELS];
+static int NumLabels;
+
+static struct {
+	NewAnimation** Anim;
+	char Name[MAX_LABEL_LENGTH];
+} LabelsLater[MAX_LABELS];
+static int NumLabelsLater;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1393,6 +1408,60 @@ static int CclDefineAnimations(lua_State* l)
 }
 
 /**
+**  Add a label
+*/
+static void AddLabel(lua_State* l, NewAnimation* anim, char* label)
+{
+	if (NumLabels == MAX_LABELS) {
+		LuaError(l, "Too many labels: %s" _C_ label);
+	}
+	Labels[NumLabels].Anim = anim;
+	strcpy(Labels[NumLabels].Name, label);
+	++NumLabels;
+}
+
+/**
+**  Find a label
+*/
+static NewAnimation* FindLabel(lua_State* l, char* label)
+{
+	int i;
+
+	for (i = 0; i < NumLabels; ++i) {
+		if (!strcmp(Labels[i].Name, label)) {
+			return Labels[i].Anim;
+		}
+	}
+	LuaError(l, "Label not found: %s" _C_ label);
+	return NULL;
+}
+
+/**
+**  Find a label later
+*/
+static void FindLabelLater(lua_State* l, NewAnimation** anim, char* label)
+{
+	if (NumLabelsLater == MAX_LABELS) {
+		LuaError(l, "Too many gotos: %s" _C_ label);
+	}
+	LabelsLater[NumLabelsLater].Anim = anim;
+	strcpy(LabelsLater[NumLabelsLater].Name, label);
+	++NumLabelsLater;
+}
+
+/**
+**  Fix labels
+*/
+static void FixLabels(lua_State* l)
+{
+	int i;
+
+	for (i = 0; i < NumLabelsLater; ++i) {
+		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
+	}
+}
+
+/**
 **  Parse an animation frame
 */
 static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
@@ -1470,6 +1539,26 @@ static NewAnimation* ParseAnimationFrame(lua_State* l, const char* str)
 		} else {
 			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 		}
+	} else if (!strcmp(op1, "label")) {
+		anim->Type = NewAnimationLabel;
+		AddLabel(l, anim, op2);
+	} else if (!strcmp(op1, "goto")) {
+		anim->Type = NewAnimationGoto;
+		FindLabelLater(l, &anim->D.Goto.Goto, op2);
+	} else if (!strcmp(op1, "random-goto")) {
+		char* label;
+
+		anim->Type = NewAnimationRandomGoto;
+		label = strchr(op2, ' ');
+		if (!label) {
+			LuaError(l, "Missing random-goto label");
+		} else {
+			while (*label == ' ') {
+				*label++ = '\0';
+			}
+		}
+		anim->D.RandomGoto.Random = atoi(op2);
+		FindLabelLater(l, &anim->D.RandomGoto.Goto, label);
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1);
 	}
@@ -1495,6 +1584,7 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 	}
 	args = luaL_getn(l, idx);
 	anim = tail = NULL;
+	NumLabels = NumLabelsLater = 0;
 
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, idx, j + 1);
@@ -1508,6 +1598,7 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 			tail = newanim;
 		}
 	}
+	FixLabels(l);
 
 	return anim;
 }
