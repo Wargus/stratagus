@@ -208,7 +208,7 @@ int PlayMovie(const char* name)
 
 	data->File = f;
 
-	if (data->tinfo.frame_width * 3 / 4 > data->tinfo.frame_height) {
+	if (data->tinfo.frame_width * 300 / 4 > data->tinfo.frame_height * 100) {
 		rect.w = VideoWidth;
 		rect.h = VideoWidth * data->tinfo.frame_height / data->tinfo.frame_width;
 		rect.x = 0;
