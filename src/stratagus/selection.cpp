@@ -632,7 +632,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     for( i=0; i<r; ++i ) {
 	unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleOnScreen(unit) ) {
+	if( !UnitVisibleInViewport(TheUI.LastClickedVP,unit) ) {
 	    continue;
 	}
 	type=unit->Type;
@@ -653,7 +653,7 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     for( i=0; i<r; ++i ) {
 	unit=table[i];
 	// Unit visible FIXME: write function UnitSelectable
-	if( !UnitVisibleOnScreen(unit) ) {
+	if( !UnitVisibleInViewport(TheUI.LastClickedVP,unit) ) {
 	    continue;
 	}
 	// Buildings are visible but not selectable
