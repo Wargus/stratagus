@@ -64,8 +64,6 @@ typedef struct _game_sound_ {
 //FIXME: (Fabrice) I don't think it's the correct place to put this
     SoundConfig WorkComplete[MAX_RACES];/// building ready
 
-    SoundConfig Repair;			/// repair sound
-
     SoundConfig Rescue[MAX_RACES];	/// rescue units
 } GameSound;
 

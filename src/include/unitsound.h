@@ -10,7 +10,8 @@
 //
 /**@name unitsound.h	-	The unit sounds headerfile. */
 //
-//	(c) Copyright 1999,2001 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1999,2001-2003 by Lutz Sammer, Fabrice Rossi,
+//	                             and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -60,6 +61,7 @@ typedef struct _unit_sound_ {
     SoundConfig	Selected;		/// selected by user
     SoundConfig	Acknowledgement;	/// acknowledge of use command
     SoundConfig	Ready;			/// unit training... ready
+    SoundConfig	Repair;			/// unit repairing
     SoundConfig	Help;			/// unit is attacked
     SoundConfig	Dead;			/// unit is killed
 } UnitSound;

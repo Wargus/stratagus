@@ -84,7 +84,6 @@ global GameSound GameSounds
     {	{ "basic human voices work complete", NULL },
 	{ "basic orc voices work complete", NULL },
     },
-    { "repair", NULL },
     {	{ "rescue (human) UNUSED", NULL },
 	{ "rescue (orc) UNUSED", NULL },
     },
@@ -185,8 +184,8 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 	    return GameSounds.BuildingConstruction.Sound;
 	case VoiceDocking:
 	    return GameSounds.Docking.Sound;
-	case VoiceRepair:
-	    return GameSounds.Repair.Sound;
+	case VoiceRepairing:
+	    return unit->Type->Sound.Repair.Sound;
     }
     return NULL;
 }
@@ -333,10 +332,6 @@ global void InitSoundClient(void)
 	    GameSounds.WorkComplete[i].Sound =
 		SoundIdForName(GameSounds.WorkComplete[i].Name);
 	}
-    }
-    if (!GameSounds.Repair.Sound) {
-	GameSounds.Repair.Sound =
-	    SoundIdForName(GameSounds.Repair.Name);
     }
     for (i = 0; i < PlayerRaces.Count; ++i) {
 	if (!GameSounds.Rescue[i].Sound && GameSounds.Rescue[i].Name) {

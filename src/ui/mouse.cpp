@@ -199,9 +199,9 @@ global void DoRightButton(int sx, int sy)
 	    if (unit->Type->Harvester) {
 		if (dest) {
 		    //  Return a loaded harvester to deposit
-		    if ((unit->Value > 0) &&
-			    (dest->Type->CanStore[unit->CurrentResource]) &&
-			    (dest->Player == unit->Player)) {
+		    if (unit->Value > 0 &&
+			    dest->Type->CanStore[unit->CurrentResource] &&
+			    dest->Player == unit->Player) {
 			dest->Blink = 4;
 			DebugLevel3Fn("Return to deposit.\n");
 			SendCommandReturnGoods(unit, dest, flush);
@@ -209,9 +209,9 @@ global void DoRightButton(int sx, int sy)
 		    } 
 		    //  Go and harvest from a building
 		    if ((res = dest->Type->GivesResource) &&
-			    (unit->Type->ResInfo[res]) &&
-			    (unit->Value < unit->Type->ResInfo[res]->ResourceCapacity) &&
-			    (dest->Type->CanHarvest) &&
+			    unit->Type->ResInfo[res] &&
+			    unit->Value < unit->Type->ResInfo[res]->ResourceCapacity &&
+			    dest->Type->CanHarvest &&
 			    (dest->Player == unit->Player ||
 			        (dest->Player->Player == PlayerMax - 1))) {
 			dest->Blink = 4;
@@ -221,12 +221,12 @@ global void DoRightButton(int sx, int sy)
 		} else {
 		    // FIXME: support harvesting more types of terrain.
 		    for (res = 0; res < MaxCosts; ++res) {
-			if ((unit->Type->ResInfo[res]) &&
-				(unit->Type->ResInfo[res]->TerrainHarvester) && 
-				(IsMapFieldExplored(unit->Player, x, y)) &&
-				(ForestOnMap(x, y)) &&
+			if (unit->Type->ResInfo[res] &&
+				unit->Type->ResInfo[res]->TerrainHarvester && 
+				IsMapFieldExplored(unit->Player, x, y) &&
+				ForestOnMap(x, y) &&
 				((unit->CurrentResource != res) ||
-				(unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
+				    (unit->Value < unit->Type->ResInfo[res]->ResourceCapacity))) {
 			    DebugLevel3("Sent worker to cut wood.\n");
 			    SendCommandResourceLoc(unit, x, y,flush);
 			    break;
@@ -238,8 +238,8 @@ global void DoRightButton(int sx, int sy)
 		}
 	    }
 	    //  Go and repair
-	    if ((unit->Type->RepairRange) && dest &&
-		    (dest->Type->RepairHP) &&
+	    if (unit->Type->RepairRange && dest &&
+		    dest->Type->RepairHP &&
 		    dest->HP < dest->Stats->HitPoints &&
 		    (dest->Player == unit->Player || IsAllied(dest->Player, dest))) {
 		dest->Blink = 4;

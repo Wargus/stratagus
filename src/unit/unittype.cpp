@@ -1067,6 +1067,9 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
     if (type->Sound.Ready.Name) {
 	CLprintf(file, "\n    ready \"%s\"", type->Sound.Ready.Name);
     }
+    if (type->Sound.Repair.Name) {
+	CLprintf(file, "\n    repair \"%s\"", type->Sound.Repair.Name);
+    }
     if (type->Sound.Help.Name) {
 	CLprintf(file, "\n    help \"%s\"", type->Sound.Help.Name);
     }
@@ -1562,6 +1565,9 @@ global void CleanUnitTypes(void)
 	}
 	if (type->Sound.Ready.Name) {
 	    free(type->Sound.Ready.Name);
+	}
+	if (type->Sound.Repair.Name) {
+	    free(type->Sound.Repair.Name);
 	}
 	if (type->Sound.Help.Name) {
 	    free(type->Sound.Help.Name);
