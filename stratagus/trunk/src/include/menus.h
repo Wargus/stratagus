@@ -107,6 +107,7 @@ typedef struct _menuitem_ {
 	    int nlines;
 	    int startline;
 	    void *(*retrieveopt)(struct _menuitem_ *, int);
+	    void (*handler)(void);	/* for return key */
 	} listbox;
 	struct {
 	    unsigned cflags;
@@ -117,6 +118,7 @@ typedef struct _menuitem_ {
 	    int percent;
 	    int curper;		/* used in mouse-move state */
 	    int cursel;		/* used in mouse-over state */
+	    void (*handler)(void);	/* for return key */
 	} vslider;
 	/// ... add here ...
 

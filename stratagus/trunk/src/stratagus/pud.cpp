@@ -320,7 +320,10 @@ global PudInfo* GetPudInfo(const char* pud)
 	exit(-1);
     }
 
-    info=malloc(sizeof(PudInfo));
+    info=calloc(1, sizeof(PudInfo));
+    if (!info) {
+	return NULL;
+    }
 
     //
     //	Parse all sections.
@@ -336,7 +339,7 @@ global PudInfo* GetPudInfo(const char* pud)
 		int v;
 
 		v=PudReadWord(input);
-		DebugLevel1("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
+		DebugLevel3("\tVER: %d.%d\n",(v&0xF0)>>4,v&0xF);
 		continue;
 	    }
 	    DebugLevel1("Wrong version length\n");
@@ -385,6 +388,7 @@ global PudInfo* GetPudInfo(const char* pud)
 			DebugLevel3("\tTerrain: SUMMER\n");
 			break;
 		    case TilesetWinter:
+			DebugLevel3("\tTerrain: WINTER\n");
 			break;
 		    case TilesetWasteland:
 			DebugLevel3("\tTerrain: WASTELAND\n");
@@ -681,6 +685,21 @@ global PudInfo* GetPudInfo(const char* pud)
 }
 
 /**
+**	Release info for a pud.
+**
+**	@param pi	PudInfo pointer.
+*/
+global void FreePudInfo(PudInfo* info)
+{
+    if (info) {
+	if (info->Description) {
+	    free(info->Description);
+	}
+	free(info);
+    }
+}
+
+/**
 **	Load pud.
 **
 **	@param pud	File name.
@@ -785,6 +804,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			DebugLevel3("\tTerrain: SUMMER\n");
 			break;
 		    case TilesetWinter:
+			DebugLevel3("\tTerrain: WINTER\n");
 			break;
 		    case TilesetWasteland:
 			DebugLevel3("\tTerrain: WASTELAND\n");
