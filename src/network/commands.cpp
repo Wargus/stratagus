@@ -65,7 +65,10 @@ global int CommandLogDisabled;		/// True if command log is off
 global ReplayType ReplayGameType;	/// Replay game type
 local int DisabledLog;			/// Disabled log for replay
 local int DisabledShowTips;		/// Disabled show tips
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM ReplayLog;			/// Replay log
+#elif defined(USE_LUA)
+#endif
 local FILE* LogFile;			/// Replay log file
 local unsigned long NextLogCycle;	/// Next log cycle number
 local int InitReplay;			/// Initialize replay
@@ -232,6 +235,7 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 /**
 **	Parse log
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclLog(SCM list)
 {
     SCM var;
@@ -250,10 +254,13 @@ local SCM CclLog(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Parse replay-log
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclReplayLog(SCM list)
 {
     SCM value;
@@ -389,6 +396,8 @@ local SCM CclReplayLog(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Load a log file to replay a game
@@ -407,12 +416,22 @@ global int LoadReplay(char* name)
     }
     ReplayGameType = ReplaySinglePlayer;
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("log", CclLog);
     gh_new_procedureN("replay-log", CclReplayLog);
     gh_define("*replay_log*", NIL);
+#elif defined(USE_LUA)
+#endif
+#if defined(USE_GUILE) || defined(USE_SIOD)
     vload(name, 0, 1);
+#elif defined(USE_LUA)
+    LuaLoadFile(name);
+#endif
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     CclGcProtectedAssign(&ReplayLog, symbol_value(gh_symbol2scm("*replay_log*"), NIL));
+#elif defined(USE_LUA)
+#endif
     NextLogCycle = ~0UL;
     if (!CommandLogDisabled) {
 	CommandLogDisabled = 1;
@@ -439,7 +458,10 @@ global void EndReplayLog(void)
 	fclose(LogFile);
 	LogFile = NULL;
     }
+#if defined(USE_GUILE) || defined(USE_SIOD)
     CclGcProtectedAssign(&ReplayLog,SCM_UNSPECIFIED);
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -447,7 +469,10 @@ global void EndReplayLog(void)
 */
 global void CleanReplayLog(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     CclGcProtectedAssign(&ReplayLog, NIL);
+#elif defined(USE_LUA)
+#endif
     // FIXME: LoadGame disables the log since replays aren't saved in the
     // FIXME: saved games yet.  Always enable the log again for now even
     // FIXME: though it ignores the -l command line option.
@@ -469,6 +494,7 @@ global void CleanReplayLog(void)
 */
 local void DoNextReplay(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM value;
     SCM list;
     int unit;
@@ -620,6 +646,8 @@ local void DoNextReplay(void)
     }
 
     CclGcProtectedAssign(&ReplayLog, gh_cdr(ReplayLog));
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -627,6 +655,7 @@ local void DoNextReplay(void)
 */
 local void ReplayEachCycle(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     if (InitReplay) {
 	int i;
 	for (i = 0; i < PlayerMax; ++i) {
@@ -654,6 +683,8 @@ local void ReplayEachCycle(void)
 	SetMessage("End of replay");
 	GameObserve = 0;
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**
@@ -1158,8 +1189,11 @@ global void SendCommandSharedVision(int player, int state, int opponent)
 
 global void NetworkCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     ReplayLog = SCM_UNSPECIFIED;
     CclGcProtect(&ReplayLog);
+#elif defined(USE_LUA)
+#endif
 }
 
 //@}

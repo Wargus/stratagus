@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+/       _________ __                 __                               
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -62,6 +62,7 @@ extern int NoWarningMissileType;		/// quiet ident lookup.
 **
 **	@param list	List describing missile-type.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMissileType(SCM list)
 {
     SCM value;
@@ -156,12 +157,15 @@ local SCM CclDefineMissileType(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define missile type mapping from original number to internal symbol
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineMissileTypeWcNames(SCM list)
 {
     int i;
@@ -187,12 +191,49 @@ local SCM CclDefineMissileTypeWcNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineMissileTypeWcNames(lua_State* l)
+{
+    int i;
+    int j;
+    char** cp;
+
+    if ((cp = MissileTypeWcNames)) {	// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(MissileTypeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i = lua_gettop(l);
+    MissileTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
+    if (!cp) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+
+    for (j = 0; j < i; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
+#endif
 
 /**
 **	Create a missile.
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMissile(SCM list)
 {
     SCM value;
@@ -327,12 +368,15 @@ local SCM CclMissile(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define burning building missiles.
 **
 **	@param list	.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineBurningBuilding(SCM list)
 {
     SCM value;
@@ -377,17 +421,27 @@ local SCM CclDefineBurningBuilding(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for missile-type.
 */
 global void MissileCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-missiletype-wc-names",
-	    CclDefineMissileTypeWcNames);
+	CclDefineMissileTypeWcNames);
     gh_new_procedureN("define-missile-type", CclDefineMissileType);
     gh_new_procedureN("missile", CclMissile);
     gh_new_procedureN("define-burning-building", CclDefineBurningBuilding);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineMissileTypeWcNames",
+	CclDefineMissileTypeWcNames);
+//    lua_register("DefineMissileType", CclDefineMissileType);
+//    lua_register("Missile", CclMissile);
+//    lua_register("DefineBurningBuilding", CclDefineBurningBuilding);
+#endif
 }
 
 //@}

@@ -152,6 +152,7 @@ SDL_mutex * MusicTerminatedMutex;
 */
 global void PlayListAdvance(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int proceed;
     SCM cb;
     SCM value;
@@ -175,6 +176,8 @@ global void PlayListAdvance(void)
 	    }
 	}
     }
+#elif defined(USE_LUA)
+#endif
 }
 
 /**

@@ -65,7 +65,10 @@ struct _ai_type_{
     //unsigned char     AllExplored : 1;/// Ai sees unexplored area
     //unsigned char     AllVisbile : 1;/// Ai sees invisibile area
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM			Script;		/// Main script (gc-protected!)
+#elif defined(USE_LUA)
+#endif
 };
 
 /**
@@ -177,7 +180,10 @@ struct _ai_build_queue_ {
 **	AI running script ( with state, ... )
 */
 typedef struct _ai_running_script_ {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM			Script;		/// Script executed
+#elif defined(USE_LUA)
+#endif
     unsigned long	SleepCycles;	/// Cycles to sleep
     char		ident[10];	/// Debugging !
     int			HotSpot_X;	/// Hot spot ( for defense, attack, ... )
@@ -203,8 +209,11 @@ typedef struct _ai_running_script_ {
 **	Linked list.
 */
 typedef struct _ai_script_action_ {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     SCM			Action;		/// Scheme description, in the form : 
     					/// '((name evaluate-lambda run-script) ... )
+#elif defined(USE_LUA)
+#endif
 
     int			Defensive;	/// Is this action usable for defense
     int			Offensive;	/// Is this action usable for attack
@@ -465,7 +474,10 @@ extern void AiSendExplorers(void);
 //      Scripts
 //
 	/// Run a script ( for the current AiPlayer )
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int hotSpotRay);
+#elif defined(USE_LUA)
+#endif
 	/// Find a script for defense.
 extern void AiFindDefendScript(int attackX, int attackY);
 	/// Check if attack is possible
@@ -481,7 +493,10 @@ extern void AiDebugGauges(void);
     /// Give the value of a specific gauge, for the current RunningScript
 extern int AiGetGaugeValue(int gauge);
     /// Find a gauge given its identifier. 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern int AiFindGaugeId(SCM id);
+#elif defined(USE_LUA)
+#endif
     /// return the force of the unittype.
 extern int AiUnittypeForce(UnitType * unitType);
 
@@ -496,7 +511,10 @@ extern void AiCheckMagic(void);
 //
 
     /// Save/Load a PlayerAi structure ( see ccl_helpers.h for details )
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern void IOPlayerAiFullPtr(SCM form, void *binaryform, void *para);
+#elif defined(USE_LUA)
+#endif
 
 //@}
 

@@ -60,7 +60,10 @@ extern int NoWarningUnitType;		/// quiet ident lookup.
 
 global _AnimationsHash AnimationsHash;	/// Animations hash table
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
+#elif defined(USE_LUA)
+#endif
 
 global char **BoolFlagName = NULL;	/// Name of user defined flag
 global int NumberBoolFlag = 0;		/// Number of defined flags.
@@ -75,6 +78,7 @@ global int NumberBoolFlag = 0;		/// Number of defined flags.
 ** 	@param value	SCM thingie
 **	@return 	the resource id
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global unsigned CclGetResourceByName(SCM value)
 {
     int i;
@@ -964,12 +968,15 @@ local SCM CclSetUnitTypeProperty(SCM ptr, SCM property)
 
     return property;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define tileset mapping from original number to internal symbol
 **
 **	@param list	List of all names.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineUnitTypeWcNames(SCM list)
 {
     int i;
@@ -995,6 +1002,42 @@ local SCM CclDefineUnitTypeWcNames(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineUnitTypeWcNames(lua_State* l)
+{
+    int i;
+    int j;
+    char** cp;
+
+    if ((cp = UnitTypeWcNames)) {	// Free all old names
+	while (*cp) {
+	    free(*cp++);
+	}
+	free(UnitTypeWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i = lua_gettop(l);
+    UnitTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
+    if (!cp) {
+	fprintf(stderr, "out of memory.\n");
+	ExitFatal(-1);
+    }
+
+    for (j = 0; j < i; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	*cp++ = strdup(lua_tostring(l, j + 1));
+    }
+    *cp = NULL;
+
+    return 0;
+}
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -1003,6 +1046,7 @@ local SCM CclDefineUnitTypeWcNames(SCM list)
 **
 **	@param list	Animations list.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAnimations(SCM list)
 {
     char* str;
@@ -1131,6 +1175,8 @@ local SCM CclDefineBoolFlags(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -1139,6 +1185,7 @@ local SCM CclDefineBoolFlags(SCM list)
 */
 global void UnitTypeCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-unit-type", CclDefineUnitType);
     gh_new_procedureN("define-unit-stats", CclDefineUnitStats);
     gh_new_procedureN("define-bool-flags", CclDefineBoolFlags);
@@ -1164,6 +1211,30 @@ global void UnitTypeCclRegister(void)
     gh_new_procedureN("define-unittype-wc-names", CclDefineUnitTypeWcNames);
 
     gh_new_procedureN("define-animations", CclDefineAnimations);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "DefineUnitType", CclDefineUnitType);
+//    lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
+//    lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
+
+//    SiodUnitTypeTag = CclMakeSmobType("UnitType");
+
+//    lua_register(Lua, "UnitType", CclUnitType);
+//    lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
+    // unit type structure access
+//    lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
+//    lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
+//    lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
+
+    // FIXME: write the missing access functions
+
+//    lua_register(Lua, "GetUnitTypeProperty", CclGetUnitTypeProperty);
+//    lua_register(Lua, "SetUnitTypeProperty", CclSetUnitTypeProperty);
+
+    lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
+
+//    lua_register(Lua, "DefineAnimations", CclDefineAnimations);
+
+#endif
 }
 
 //@}

@@ -57,17 +57,21 @@
 ----------------------------------------------------------------------------*/
 
     /// Get unit-type.
+#if defined(USE_GUILE) || defined(USE_SIOD)
 extern UnitType* CclGetUnitType(SCM ptr);
     /// Get resource by name
 extern unsigned CclGetResourceByName(SCM ptr);
+#elif defined(USE_LUA)
+#endif
 
 /**
-**  Set xp damage
+**	Set xp damage
 **
-**  @param flag Flag enabling or disabling it.
+**	@param flag Flag enabling or disabling it.
 **
-**  @return     The old state of the xp damage
+**	@return     The old state of the xp damage
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetXpDamage(SCM flag)
 {
     int old;
@@ -77,6 +81,22 @@ local SCM CclSetXpDamage(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetXpDamage(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = XpDamage;
+    XpDamage = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set training queue
@@ -85,6 +105,7 @@ local SCM CclSetXpDamage(SCM flag)
 **
 **	@return		The old state of the training queue
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetTrainingQueue(SCM flag)
 {
     int old;
@@ -94,6 +115,22 @@ local SCM CclSetTrainingQueue(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetTrainingQueue(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = EnableTrainingQueue;
+    EnableTrainingQueue = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set capture buildings
@@ -102,6 +139,7 @@ local SCM CclSetTrainingQueue(SCM flag)
 **
 **	@return		The old state of the flag
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetBuildingCapture(SCM flag)
 {
     int old;
@@ -111,6 +149,22 @@ local SCM CclSetBuildingCapture(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetBuildingCapture(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = EnableBuildingCapture;
+    EnableBuildingCapture = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Set reveal attacker
@@ -119,6 +173,7 @@ local SCM CclSetBuildingCapture(SCM flag)
 **
 **	@return		The old state of the flag
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetRevealAttacker(SCM flag)
 {
     int old;
@@ -128,6 +183,22 @@ local SCM CclSetRevealAttacker(SCM flag)
 
     return gh_bool2scm(old);
 }
+#elif defined(USE_LUA)
+local int CclSetRevealAttacker(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = RevealAttacker;
+    RevealAttacker = lua_toboolean(l, 1);
+
+    lua_pushboolean(l, old);
+    return 1;
+}
+#endif
 
 /**
 **	Get a unit pointer
@@ -136,6 +207,7 @@ local SCM CclSetRevealAttacker(SCM flag)
 **
 **	@return		The unit pointer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local Unit* CclGetUnit(SCM value)
 {
     return UnitSlots[gh_scm2int(value)];
@@ -1175,6 +1247,8 @@ local SCM CclSlotUsage(SCM list)
     return SCM_UNSPECIFIED;
 #undef SLOT_LEN
 }
+#elif defined(USE_LUA)
+#endif
 
 // FIXME: write the missing access functions
 
@@ -1183,6 +1257,7 @@ local SCM CclSlotUsage(SCM list)
 */
 global void UnitCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("set-xp-damage!", CclSetXpDamage);
     gh_new_procedure1_0("set-training-queue!", CclSetTrainingQueue);
     gh_new_procedure1_0("set-building-capture!", CclSetBuildingCapture);
@@ -1202,6 +1277,27 @@ global void UnitCclRegister(void)
     gh_new_procedure2_0("set-unit-unholy-armor!", CclSetUnitUnholyArmor);
 
     gh_new_procedure1_0 ("slot-usage", CclSlotUsage);
+#elif defined(USE_LUA)
+    lua_register(Lua, "SetXPDamage", CclSetXpDamage);
+    lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);
+    lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);
+    lua_register(Lua, "SetRevealAttacker", CclSetRevealAttacker);
+
+//    lua_register(Lua, "Unit", CclUnit);
+
+//    lua_register(Lua, "MakeUnit", CclMakeUnit);
+//    lua_register(Lua, "PlaceUnit", CclPlaceUnit);
+//    lua_register(Lua, "CreateUnit", CclCreateUnit);
+//    lua_register(Lua, "OrderUnit", CclOrderUnit);
+//    lua_register(Lua, "KillUnit", CclKillUnit);
+//    lua_register(Lua, "KillUnitAt", CclKillUnitAt);
+
+    // unit member access functions
+//    lua_register(Lua, "GetUnitUnholyArmor", CclGetUnitUnholyArmor);
+//    lua_register(Lua, "SetUnitUnholyArmor", CclSetUnitUnholyArmor);
+
+//    lua_register(Lua, "SlotUsage", CclSlotUsage);
+#endif
 }
 
 //@}
