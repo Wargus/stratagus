@@ -108,6 +108,8 @@ global void CleanModules(void)
 */
 global void InitModules(void)
 {
+    GameCycle=0;
+
     InitSyncRand();
     InitIcons();
     InitVideoCursors();
