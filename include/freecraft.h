@@ -76,6 +76,7 @@
 
 #define _C_	,			/// Debug , for non GNU-C compiler
 
+
 #ifdef DEBUG	// {
 
 /**
@@ -89,6 +90,42 @@
 #define DebugCheck(cond)	do{ if( cond ) { \
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
+
+#ifdef _MSVC_	// {
+/**
+**	Print debug information of level 0.
+*/
+static inline void DebugLevel0(const char* fmt,...) {};
+/**
+**	Print debug information of level 1
+*/
+static inline void DebugLevel1(const char* fmt,...) {};
+/**
+**	Print debug information of level 2
+*/
+static inline void DebugLevel2(const char* fmt,...) {};
+/**
+**	Print debug information of level 3
+*/
+static inline void DebugLevel3(const char* fmt,...) {};
+/**
+**	Print debug information of level 0 with function name.
+*/
+static inline void DebugLevel0Fn(const char* fmt,...) {};
+/**
+**	Print debug information of level 1 with function name.
+*/
+static inline void DebugLevel1Fn(const char* fmt,...) {};
+/**
+**	Print debug information of level 2 with function name.
+*/
+static inline void DebugLevel2Fn(const char* fmt,...) {};
+/**
+**	Print debug information of level 3 with function name.
+*/
+static inline void DebugLevel3Fn(const char* fmt,...) {};
+
+#else	// }{ _MSVC_
 
 /**
 **	Print debug information of level 0.
@@ -130,10 +167,26 @@
 */
 #define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
 
+#endif	// !_MSVC_
+
 #else	// }{ DEBUG
 
 #define IfDebug(code)
 #define DebugCheck(cond)
+
+#ifdef _MSVC_	// {
+
+static inline void DebugLevel0(const char* fmt,...) {};
+static inline void DebugLevel1(const char* fmt,...) {};
+static inline void DebugLevel2(const char* fmt,...) {};
+static inline void DebugLevel3(const char* fmt,...) {};
+static inline void DebugLevel0Fn(const char* fmt,...) {};
+static inline void DebugLevel1Fn(const char* fmt,...) {};
+static inline void DebugLevel2Fn(const char* fmt,...) {};
+static inline void DebugLevel3Fn(const char* fmt,...) {};
+
+#else	// }{ _MSVC_
+
 #define DebugLevel0(fmt...)
 #define DebugLevel1(fmt...)
 #define DebugLevel2(fmt...)
@@ -142,6 +195,8 @@
 #define DebugLevel1Fn(fmt...)
 #define DebugLevel2Fn(fmt...)
 #define DebugLevel3Fn(fmt...)
+
+#endif	// !_MSVC_
 
 #endif	// } !DEBUG
 

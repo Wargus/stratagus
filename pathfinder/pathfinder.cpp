@@ -609,8 +609,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 
     DebugLevel3Fn("%s(%d) to %d=%d,%d+%d+%d\n"
 	    ,unit->Type->Ident,UnitNumber(unit)
-	    ,unit->Command.Data.Move.Goal
-		? UnitNumber(unit->Command.Data.Move.Goal) : 0
+	    ,unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : 0
 	    ,gx,gy,ox,oy);
 
     w=TheMap.Width+2;
@@ -868,7 +867,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
     ry=unit->Orders[0].RangeY;
 
     DebugLevel3Fn("%d: -> %s %p | %dx%d+%d+%d\n"
-	,UnitNumber(unit),unit->Command.Data.Move.Fast ? "F" : "C"
+	,UnitNumber(unit),unit->Data.Move.Fast ? "F" : "C"
 	,goal,gx,gy,rx,ry);
 
 #ifdef DEBUG
