@@ -47,7 +47,7 @@
 **	Defines the animation for different actions.
 */
 typedef struct _animation_ {
-    char	Flags;			/// Flags for actions.
+    char	Flags;			/// Flags for actions
     char	Pixel;			/// Change the position in pixels
     char	Sleep;			/// Wait for next animation
     char	Frame;			/// Sprite-frame to display
@@ -170,21 +170,21 @@ struct _unit_type_ {
     unsigned Tanker : 1;		/// FIXME: used? Can transport oil
     unsigned Transporter : 1;		/// can transport units
     unsigned GivesOil : 1;		/// We get here oil
-    unsigned StoresGold : 1;		/// We can store gold/wood here
-    unsigned Vanishes : 1;		/// Corpes & destroyed places.
+    unsigned StoresGold : 1;		/// We can store oil/gold/wood here
+    unsigned Vanishes : 1;		/// Corpes & destroyed places
     unsigned GroundAttack : 1;		/// Can do command ground attack
-    unsigned IsUndead : 1;		///
-    unsigned ShoreBuilding : 1;		///
-    unsigned CanCastSpell : 1;		///
-    unsigned StoresWood : 1;		///
-    unsigned CanAttack : 1;		///
-    unsigned Tower : 1;			///
-    unsigned OilPatch : 1;		///
-    unsigned GoldMine : 1;		///
-    unsigned Hero : 1;			///
-    unsigned StoresOil : 1;		///
+    unsigned IsUndead : 1;		/// FIXME: docu
+    unsigned ShoreBuilding : 1;		/// FIXME: docu
+    unsigned CanCastSpell : 1;		/// FIXME: docu
+    unsigned StoresWood : 1;		/// We can store wood here
+    unsigned CanAttack : 1;		/// FIXME: docu
+    unsigned Tower : 1;			/// FIXME: docu
+    unsigned OilPatch : 1;		/// FIXME: docu
+    unsigned GoldMine : 1;		/// FIXME: docu
+    unsigned Hero : 1;			/// FIXME: docu
+    unsigned StoresOil : 1;		/// We can store oil here
     unsigned Volatile : 1;		/// invisiblity/unholy armor kills unit
-    unsigned CowerMage : 1;		///
+    unsigned CowerMage : 1;		/// FIXME: docu
     unsigned Organic : 1;		/// organic
 
     unsigned SelectableByRectangle : 1;	/// selectable with mouse rectangle
@@ -207,7 +207,7 @@ struct _unit_type_ {
 };
 
     // FIXME: ARI: should be dynamic (ccl..)
-    /// How many unit-types are currently supported.
+    /// How many unit-types are currently supported
 #define UnitTypeMax	0xFF
 
 /*----------------------------------------------------------------------------
@@ -216,19 +216,19 @@ struct _unit_type_ {
 
 extern const char UnitTypeType[];	/// unit-type type
 extern UnitType* UnitTypes;		/// all unit-types
-extern int NumUnitTypes;		/// number of unit-types made.
+extern int NumUnitTypes;		/// number of unit-types made
 
-extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer.
-extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit-type pointer.
-extern UnitType*UnitTypeOrcTanker;	/// human tanker unit-type pointer.
-extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit-type pointer.
-extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit-type pointer.
-extern UnitType*UnitTypeHumanWorker;	/// Human worker.
-extern UnitType*UnitTypeOrcWorker;	/// Orc worker.
-extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
-extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
-extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
-extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
+extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit-type pointer
+extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit-type pointer
+extern UnitType*UnitTypeOrcTanker;	/// human tanker unit-type pointer
+extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit-type pointer
+extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit-type pointer
+extern UnitType*UnitTypeHumanWorker;	/// Human worker
+extern UnitType*UnitTypeOrcWorker;	/// Orc worker
+extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
+extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold
+extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood
+extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood
 extern UnitType*UnitTypeHumanFarm;	/// Human farm
 extern UnitType*UnitTypeOrcFarm;	/// Orc farm
 extern UnitType*UnitTypeHumanWall;	/// Human wall
