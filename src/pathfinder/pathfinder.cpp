@@ -375,7 +375,7 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     }
 
     if( !reachable ) {
-	DebugLevel1("Can't move to destination, goal unreachable\n");
+	DebugLevel3("Can't move to destination, goal unreachable\n");
 	return 0;
     }
 
@@ -394,7 +394,7 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     //  Find a path to the place.
     //
     if( (depth=CheckPlaceInMatrix(x1,y1,x2,y2,LocalMatrix)) < 0 ) {
-	DebugLevel1("Can't move to destination, not route to goal\n");
+	DebugLevel3("Can't move to destination, not route to goal\n");
 	return 0;
     }
 

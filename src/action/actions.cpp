@@ -90,7 +90,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     DebugLevel3("Heading %d +%d,%d\n" _C_ unit->Direction _C_ unit->IX _C_ unit->IY);
     
     if( unit->Frame<0 ) {
-	unit->Frame+=-animation[state].Frame;
+	unit->Frame-=animation[state].Frame;
     } else {
 	unit->Frame+=animation[state].Frame;
     }

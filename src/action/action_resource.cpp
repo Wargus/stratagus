@@ -120,6 +120,7 @@ local int StartGathering(Unit* unit)
 	    RefsDebugCheck( !goal->Refs );
 	}
 	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	// FIXME: Choose an alternative
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
@@ -168,6 +169,8 @@ local int StartGathering(Unit* unit)
 	unit->Wait=1;
     }
 
+    unit->Reset=1;
+
     return 1;
 }
 
@@ -181,6 +184,9 @@ local int StartGathering(Unit* unit)
 local int GatherResource(Unit* unit)
 {
     Unit* source;
+    Unit* depot;
+    Unit* uins;
+    int i;
 
     source=unit->Container;
 
@@ -204,7 +210,7 @@ local int GatherResource(Unit* unit)
     }
     
     //	Change unit to full state.
-    if( unit->Type->TransformWhenLoaded ) {
+    if( unit->Type->TransformWhenLoaded&&unit->Value ) {
 	unit->Player->UnitTypesCount[unit->Type->Type]--;
 	unit->Type=unit->Type->TransformWhenLoaded;
     	unit->Player->UnitTypesCount[unit->Type->Type]++;
@@ -214,8 +220,34 @@ local int GatherResource(Unit* unit)
     //	End of resource: destroy the resource.
     //
     if( source->Value==0 ) {
-	DebugLevel0Fn("Resource is destroyed\n");
-	DropOutAll(source);
+	DebugLevel0Fn("%lu: Resource is destroyed\n" _C_ GameCycle);
+	uins=source->UnitInside;
+	// Improved version of DropOutAll
+        for( i=source->InsideCount; i; --i,uins=uins->NextContained ) {
+	    if (uins->Value && (depot=FindDeposit(uins->Player,uins->X,uins->Y,source->Type->GivesResource))) {
+		DropOutNearest(uins,depot->X+depot->Type->TileWidth/2
+			,depot->Y+depot->Type->TileHeight/2
+			,source->Type->TileWidth,source->Type->TileHeight);
+		uins->Orders[0].Action=UnitActionReturnGoods;
+		uins->SubAction=0;
+	    	uins->Wait=unit->Reset=1;
+		uins->Orders[0].Goal=depot;
+		
+		RefsDebugCheck( !depot->Refs );
+		++depot->Refs;
+		DebugLevel0Fn("Sent unit %d to depot\n" _C_ uins->Slot);
+		continue;
+	    }
+	    DebugLevel0Fn("Unit %d just sits around confused.\n" _C_ uins->Slot);
+	    DropOutOnSide(uins,LookingW
+		    ,source->Type->TileWidth,source->Type->TileHeight);
+	    uins->Orders[0].Goal=0;
+	    uins->Orders[0].X=uins->Orders[0].Y=-1;
+	    uins->Orders[0].Action=UnitActionStill;
+	    uins->Wait=unit->Reset=1;
+	    uins->SubAction=0;
+	}
+
 	LetUnitDie(source);
 	// FIXME: make the workers inside look for a new resource.
 	source=NULL;
@@ -232,7 +264,7 @@ local int GatherResource(Unit* unit)
 }
 
 /**
-**	Stop gathering from the resource.
+**	Stop gathering from the resource, go home.
 **
 **	@param unit	Poiner to unit.
 **
@@ -243,37 +275,41 @@ local int StopGathering(Unit* unit)
     Unit* depot;
     Unit* source;
 
-    source=unit->Container;
-    //  Deactivate the resource. Wicked.
-    source->Data.Resource.Active--;
-    DebugCheck(source->Data.Resource.Active<0);
- 
+    if ((source=unit->Container)) {
+	//  Deactivate the resource. Wicked.
+	source->Data.Resource.Active--;
+	DebugCheck(source->Data.Resource.Active<0);
+    }
+     
     //	Store resource position.
     //	FIXME: is this the best way?
     unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
-    
-    //	Find and send to resource deposit.
-    if( !(depot=FindDeposit(unit->Player,unit->X,unit->Y,unit->Type->ResourceHarvested)) ) {
-	DropOutOnSide(unit,LookingW
-		,source->Type->TileWidth,source->Type->TileHeight);
+   
+    // Find and send to resource deposit.
+    if( (!(depot=FindDeposit(unit->Player,unit->X,unit->Y,unit->Type->ResourceHarvested)))
+	    || (!unit->Value)) {
+	if (source) {
+	    DropOutOnSide(unit,LookingW,source->Type->TileWidth,source->Type->TileHeight);
+	}
 	DebugLevel0Fn("Can't find a resource deposit.\n");
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	// should return 0, done below!
     } else {
-	DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
-		,depot->Y+depot->Type->TileHeight/2
-		,source->Type->TileWidth,source->Type->TileHeight);
+	if (source) {
+	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+		    ,depot->Y+depot->Type->TileHeight/2
+		    ,source->Type->TileWidth,source->Type->TileHeight);
+	}
 	unit->Orders[0].Goal=depot;
 	RefsDebugCheck( !depot->Refs );
 	++depot->Refs;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	unit->Orders[0].X=unit->Orders[0].Y=-1;
-	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	unit->SubAction=SUB_MOVE_TO_DEPOT;
 	NewResetPath(unit);
     }
-    
+
     CheckUnitToBeDrawn(unit);
     if( IsOnlySelected(unit) ) {
 	SelectedUnitChanged();
@@ -337,8 +373,6 @@ local int MoveToDepot(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
-
-    DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
 
     DebugCheck( unit->Wait!=1 );
 
