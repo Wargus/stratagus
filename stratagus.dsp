@@ -723,10 +723,6 @@ SOURCE=.\src\ui\button_checks.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\console.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\ui\icons.c
 # End Source File
 # Begin Source File

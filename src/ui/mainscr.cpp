@@ -642,8 +642,6 @@ global void DrawResources(void)
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-// FIXME: move messages to console code.
-
 #define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5)/// Message timeout 5 seconds
 
 local unsigned long MessagesFrameTimeout;       /// Frame to expire message
