@@ -2,10 +2,10 @@
 ----	$Id$
 -->
 <HTML><HEAD>
-    <TITLE>FAQ for ALE Clone Version 1.16.1</TITLE>
+    <TITLE>FAQ for FreeCraft (fka ALE Clone) Version 1.17</TITLE>
 </HEAD>
 <BODY>
-    <H1>FAQ for ALE Clone Version 1.16.1</H1>
+    <H1>FAQ for FreeCraft (fka ALE Clone) Version 1.17</H1>
 <HR><PRE WIDTH=80>
      ___________		     _________		      _____  __
      \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
@@ -44,7 +44,7 @@ libpng1.0.X. You get it here:
 <DT>Q: The software cursor is too slow
 
 <DD>A: I will improve the speed later, but me was told:<BR>
-Using Accelerated X on a Pentium 75 ALE Clone is now playable.
+Using Accelerated X on a Pentium 75 FreeCraft is now playable.
 <P>
 <DT>Q: Why did Guile 1.3 not work?
 
@@ -56,9 +56,9 @@ into<P>
     GUILELIB=       `guile-config link` -lreadline -lncurses<P>
 With this I got guile 1.3 working.
 <P>
-<DT>Q: Did ALE Clone work with ALSA?
+<DT>Q: Did FreeCraft work with ALSA?
 
-<DD>A: Yes, ALE Clone works with the Advanced Linux Sound Architecture (ALSA) - Driver.
+<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) - Driver.
 I have tested it with version 0.3.2 - 0.4.1.<P>
 More informations <A HREF="http://www.alsa-project.org">
 http://www.alsa-project.org</A><P>
@@ -76,7 +76,7 @@ Now create a file bigmap.cm containing:
 	(load-pud "bigmap3.pud")
 	(load-pud "bigmap4.pud")
 </PRE><P>
-If you now load this file as map (clone bigmap.cm), you see this big map.
+If you now load this file as map (freecraft bigmap.cm), you see this big map.
 bigmap1.pud is in the upper left corner.
 bigmap2.pud is in the upper right corner.
 bigmap3.pud is in the lower left corner.
@@ -89,19 +89,19 @@ Me was told, it works without problems with the german version. Just try it.
 With the new versions this should work without problems.
 
 <P>
-<DT>Q: I get the error message "gcc: No input files", when I build clone.
+<DT>Q: I get the error message "gcc: No input files", when I build freecraft.
     (Reported with pgcc version 1.1.1.) What should I do?
 
-<DD>A: Try changing the line in the clone toplevel Makefile <BR>
-        $(CC) -Lsrc -lclone $(CLONELIBS) -o clone -I. $(CFLAGS) <BR>
+<DD>A: Try changing the line in the freecraft toplevel Makefile <BR>
+        $(CC) -Lsrc -lclone $(CLONELIBS) -o freecraft -I. $(CFLAGS) <BR>
     to <BR>
-        $(CC) -Lsrc -lclone $(CLONELIBS) -o clone -I. $(CFLAGS) dummy.c <P>
-    and execute the command "<I>touch dummy.c</I>" in the clone toplevel
+        $(CC) -Lsrc -lclone $(CLONELIBS) -o freecraft -I. $(CFLAGS) dummy.c <P>
+    and execute the command "<I>touch dummy.c</I>" in the freecraft toplevel
     directory. <P>
     Or install a better gcc version without this bug.
 <P>
 <DT>Q: I have tried to start a level with
-    './clone data/puds/internal/internal01.pud.gz' and I only get this error
+    './freecraft data/puds/internal/internal01.pud.gz' and I only get this error
     message
     'pud: fopen,gzopen,bzopen(): No such file or directory'.
 <DD>A: We have changed the loading syntax:
@@ -110,14 +110,14 @@ With the new versions this should work without problems.
     <LI>./file.pud loads relative from the current directory.
     <LI>/file.pud loads absolute from the root directory.
     </UL>
-    This means you must type './clone ./data/puds/internal/internal01.pud.gz'!
+    This means you must type './freecraft ./data/puds/internal/internal01.pud.gz'!
 <P>
-<DT>Q: I got following error messages if I start clone from the binary release.
+<DT>Q: I got following error messages if I start freecraft from the binary release.
 <BR>ERROR: In procedure primitive-load-path:
 <BR>ERROR: Unable to find file "ice-9/boot-9.scm" in load path 
 <DD>A: Install the runtime system for guile/libguile.
 <BR>If you have it already installed or the installation didn't fix this error,
-try to use: "GUILE_LOAD_PATH=where_you_have_the_ice-9_directory ./clone"
+try to use: "GUILE_LOAD_PATH=where_you_have_the_ice-9_directory ./freecraft"
 to start.
 <P>This sections should be outdated, currently SIOD is used.
 <P>
