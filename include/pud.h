@@ -89,6 +89,9 @@ typedef struct _pud_info_ {
     /// Return info for pud.
 extern PudInfo* GetPudInfo(const char*);
 
+    /// Release info for pud.
+extern void FreePudInfo(PudInfo*);
+
     /// Load a pud file.
 extern void LoadPud(const char* pud,WorldMap* map);
 
