@@ -166,24 +166,24 @@ global void UpdateStats(int reset)
     for (type = UnitTypes; type->OType; ++type) {
         if (reset){
 	    // LUDO : FIXME : reset loading of player stats !
-	for (player = 0; player < PlayerMax; ++player) {
-	    stats = &type->Stats[player];
-	    stats->AttackRange = type->_AttackRange;
-	    stats->SightRange = type->_SightRange;
-	    stats->Armor = type->_Armor;
-	    stats->BasicDamage = type->_BasicDamage;
-	    stats->PiercingDamage = type->_PiercingDamage;
-	    stats->Speed = type->_Speed;
-	    stats->HitPoints = type->_HitPoints;
-	    for (i = 0; i < MaxCosts; ++i) {
-		stats->Costs[i] = type->_Costs[i];
+	    for (player = 0; player < PlayerMax; ++player) {
+		stats = &type->Stats[player];
+		stats->AttackRange = type->_AttackRange;
+		stats->SightRange = type->_SightRange;
+		stats->Armor = type->_Armor;
+		stats->BasicDamage = type->_BasicDamage;
+		stats->PiercingDamage = type->_PiercingDamage;
+		stats->Speed = type->_Speed;
+		stats->HitPoints = type->_HitPoints;
+		for (i = 0; i < MaxCosts; ++i) {
+		    stats->Costs[i] = type->_Costs[i];
+		}
+		if (type->Building) {
+		    stats->Level = 0;	// Disables level display
+		} else {
+		    stats->Level = 1;
+		}
 	    }
-	    if (type->Building) {
-		stats->Level = 0;	// Disables level display
-	    } else {
-		stats->Level = 1;
-	    }
-	}
 	}
 
 	//
@@ -222,7 +222,7 @@ global void UpdateStats(int reset)
 		}
 		break;
 	    default:
-		DebugLevel1Fn("Were moves this unit?\n");
+		DebugLevel1Fn("Where moves this unit?\n");
 		type->MovementMask = 0;
 		break;
 	}
@@ -258,7 +258,7 @@ global void UpdateStats(int reset)
 		type->FieldFlags = MapFieldSeaUnit;
 		break;
 	    default:
-		DebugLevel1Fn("Were moves this unit?\n");
+		DebugLevel1Fn("Where moves this unit?\n");
 		type->FieldFlags = 0;
 		break;
 	}

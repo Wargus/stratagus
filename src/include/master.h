@@ -1,3 +1,28 @@
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
+/**@name minimap.h	-	The minimap headerfile. */
+//
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer and Jimmy Salmon
+//
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; only version 2 of the License.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
+//	$Id$
+
 #ifndef __MASTER_H__
 #define __MASTER_H__
 
@@ -18,22 +43,30 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+    /// FIXME: docu
 extern char MasterTempString[50];
+    /// FIXME: docu
 extern int PublicMasterAnnounce;
+    /// FIXME: docu
 extern unsigned long LastTimeAnnounced;
-extern int master_port;
-extern char *master_host;
+    /// FIXME: docu
+extern int MasterPort;
+    /// FIXME: docu
+extern unsigned long MasterHost;
+    /// FIXME: docu
+extern char *MasterHostString;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
+    /// FIXME: docu
 extern int MasterInit(void);
-extern int MasterSend(const void *buf, int len);
+    /// FIXME: docu
 extern void MasterLoop(unsigned long ticks);
-extern void MasterSendInfo(void);
-extern void MasterStopAnnounced(void);
+    /// FIXME: docu
 extern void MasterSendAnnounce(void);
+    /// FIXME: docu
 extern void MasterProcessGetServerData(const char* msg, size_t length, unsigned long host, int port);
 
 //@}
