@@ -318,8 +318,6 @@ local int CclPlayer(lua_State* l)
 				player->TotalResources[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "total-units")) {
-			player->TotalUnits = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "color")) {
 			int r;
 			int g;

@@ -3523,13 +3523,9 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 #endif
 	CLprintf(file, "\"pixel\", {%d, %d}, ", unit->IX, unit->IY);
 	CLprintf(file, "\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
-	CLprintf(file, "\"%sframe\", %d, ",
-		unit->Frame < 0 ? "flipped-" : "",
-		unit->Frame < 0 ? -unit->Frame - 1 : unit->Frame);
+	CLprintf(file, "\"frame\", %d, ", unit->Frame);
 	if (unit->Seen.Frame != UnitNotSeen) {
-		CLprintf(file, "\"%sseen\", %d, ",
-			unit->Seen.Frame < 0 ? "flipped-" : "",
-			unit->Seen.Frame < 0 ? -unit->Seen.Frame - 1 : unit->Seen.Frame);
+		CLprintf(file, "\"%sseen\", %d, ", unit->Seen.Frame);
 	} else {
 		CLprintf(file, "\"not-seen\", ");
 	}
@@ -3618,16 +3614,19 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	}
 	CLprintf(file, " \"rs\", %d,", unit->Rs);
 	CLprintf(file, " \"units-boarded-count\", %d,", unit->BoardCount);
-	CLprintf(file, "\n  \"units-contained\", {");
-	uins = unit->UnitInside;
-	for (i = unit->InsideCount; i; --i, uins = uins->NextContained) {
-		CLprintf(file, "\"%s\",", ref = UnitReference(uins));
-		free(ref);
-		if (i > 1) {
-			CLprintf(file, " ");
+
+	if (unit->UnitInside) {
+		CLprintf(file, "\n  \"units-contained\", {");
+		uins = unit->UnitInside->PrevContained;
+		for (i = unit->InsideCount; i; --i, uins = uins->PrevContained) {
+			CLprintf(file, "\"%s\"", ref = UnitReference(uins));
+			free(ref);
+			if (i > 1) {
+				CLprintf(file, ", ");
+			}
 		}
+		CLprintf(file, "},\n  ");
 	}
-	CLprintf(file, "},\n  ");
 	CLprintf(file, "\"order-count\", %d,\n  ", unit->OrderCount);
 	CLprintf(file, "\"order-flush\", %d,\n  ", unit->OrderFlush);
 	CLprintf(file, "\"orders\", {");
