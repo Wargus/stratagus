@@ -271,7 +271,11 @@ local void DelProtectedCell(int id)
 local void CheckProtectedCell(SCM* obj,int id)
 {
 #ifdef CHECK_GC_VALUES
+    int i;
     DebugCheck(ProtectedCellValues[id] != *obj);
+    for (i = 0; i < ProtectedCellCount; i++) {
+	DebugCheck(ProtectedCellValues[i] != (*ProtectedCells[i]));
+    }
 #endif
 }
 
@@ -419,6 +423,7 @@ global void CclFlushOutput(void)
 */
 global void CclGarbageCollect(int fast)
 {
+    
 #ifdef USE_GUILE
     if (!fast) {
 	// GUILE handle gc nicely by itself
@@ -428,13 +433,24 @@ global void CclGarbageCollect(int fast)
 #ifdef SIOD_HEAP_GC
     static int cpt=0;
     
-    // Very slow, so differ...
+    // Very slow, so differ as much as possible...
     if (!(++cpt & 15)) {
     	user_gc(SCM_BOOL_F);
     }
 #else
+    static int default_used_cells=0;
+    int new_used_cells;
+    int cur_used_cells=0;
+
     // stop and copy iterates only the allocated SCM
-    gc_stop_and_copy();
+    if (!fast || (cur_used_cells=siod_used_cells()) > default_used_cells + 10000) {
+    	gc_stop_and_copy();
+	new_used_cells = siod_used_cells();
+	if (fast) {
+	    DebugLevel2Fn("GC reduced %d cells to %d\n" _C_ cur_used_cells _C_ new_used_cells);
+	}
+	default_used_cells = new_used_cells;
+    }
 #endif
 #endif
 }
@@ -1034,7 +1050,8 @@ global void InitCcl(void)
 #else
     // Stop & copy GC : scan only allocated cells
     sargv[2] = "-g1";
-    sargv[3] = "-h4000000";
+    // Cells are allocated in chunck of 40000 cells ( => 160Ko ) 
+    sargv[3] = "-h40000";
 #endif
     buf = malloc(strlen(StratagusLibPath) + 4);
     sprintf(buf, "-l%s", StratagusLibPath);
