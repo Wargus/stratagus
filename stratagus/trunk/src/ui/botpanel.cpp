@@ -20,7 +20,7 @@
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
-/
+//
 //	$Id$
 
 //@{
@@ -38,8 +38,11 @@
 
 #include "video.h"
 #include "unit.h"
+#include "commands.h"
+#include "depend.h"
 #include "interface.h"
 #include "ui.h"
+#include "map.h"
 #include "font.h"
 #include "spells.h"
 
