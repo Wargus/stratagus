@@ -331,8 +331,7 @@ void InitUnit(Unit* unit, UnitType* type)
 
 	// On Load, Some units don't have Still animation, eg Deadbody
 	if (unit->Type->Animations->Still) {
-		unit->Frame = unit->Type->Animations->Still[0].Frame +
-			(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
+		unit->Frame = unit->Type->Animations->Still[0].Frame + (type->NumDirections / 2 + 1 - 1);
 	}
 
 	if (UnitTypeVar.NumberVariable) {
@@ -341,7 +340,7 @@ void InitUnit(Unit* unit, UnitType* type)
 			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 	}
 
-	if (!type->Building && type->Sprite &&
+	if (type->NumDirections > 1 && type->Sprite &&
 			VideoGraphicFrames(type->Sprite) > 5) {
 		unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(unit);
