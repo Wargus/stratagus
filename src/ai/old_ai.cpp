@@ -898,7 +898,7 @@ local int AiHarvest(Unit * unit)
 	}
 	++addy;
     }
-    DebugLevel0Fn("no wood on map\n");
+    DebugLevel0Fn("no wood reachable\n");
     return 0;
 }
 
@@ -916,6 +916,7 @@ local void AiAssignWorker(void)
 
     //  Count workers
     num_worker = AiFindFreeWorkers(workers);
+    DebugLevel3Fn("Player %Zd: %d\n", AiPlayer->Player - Players, num_worker);
     if (num_worker) {
 	num_still = num_gold = num_wood = num_repair = 0;
 	for (w = 0; w < num_worker; ++w) {
@@ -951,7 +952,7 @@ local void AiAssignWorker(void)
 		for (w = 0; w < num_worker; ++w) {
 		    type = workers[w]->Type;
 		    action = workers[w]->Orders[0].Action;
-		    if (action == UnitActionStill) {
+		    if (action == UnitActionStill && !workers[w]->Removed ) {
 			if (type ==
 				UnitTypeByWcNum(
 				    AiChooseRace(UnitPeasantWithGold))
@@ -1017,12 +1018,13 @@ local void AiAssignWorker(void)
 	    }
 	    return;
 	}
+
 	//  Unassigned workers: let them do something.
 	//          FIXME: if there is no gold/no wood forget this!
 	if (num_still) {		// assign the non working
 	    for (w = 0; w < num_worker; ++w) {
 		action = workers[w]->Orders[0].Action;
-		if (action == UnitActionStill) {
+		if (action == UnitActionStill && !workers[w]->Removed) {
 		    type = workers[w]->Type;
 		    if (type ==
 			    UnitTypeByWcNum(AiChooseRace(UnitPeasantWithGold))
@@ -1050,28 +1052,28 @@ local void AiAssignWorker(void)
     //  Send standing workers home.
     //
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	    UnitTypeByWcNum( AiChooseRace(UnitTypeHumanWorkerWithGold-> Type)),
+	    UnitTypeByWcNum(AiChooseRace(UnitPeasantWithGold)),
 	    workers);
     DebugLevel3("Gold %d\n", num_worker);
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
 		action = workers[w]->Orders[0].Action;
-		if (action == UnitActionStill) {
+		if (action == UnitActionStill && !workers[w]->Removed ) {
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
 	    }
 	}
     }
     num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	    UnitTypeByWcNum( AiChooseRace(UnitTypeHumanWorkerWithWood-> Type)),
+	    UnitTypeByWcNum(AiChooseRace(UnitPeasantWithWood)),
 	    workers);
     DebugLevel3("Wood %d\n", num_worker);
     if (num_worker) {			// assign the non working
 	if (AiPlayer->MainHall) {
 	    for (w = 0; w < num_worker; ++w) {
 		action = workers[w]->Orders[0].Action;
-		if (action == UnitActionStill) {
+		if (action == UnitActionStill && !workers[w]->Removed ) {
 		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
 	    }
@@ -1114,12 +1116,13 @@ local void AiNewGoal(int action, int number, int type)
 {
     AiGoal *goal;
 
-    if (AiPlayer->GoalHead != 0)
+    if (AiPlayer->GoalHead != 0) {
 	if (AiPlayer->GoalHead->Action == action
 	    && AiPlayer->GoalHead->Number == number
 	    && AiPlayer->GoalHead->Unit == type) {
 	    return;
 	}
+    }
 
     goal = malloc(sizeof(AiGoal));
     goal->Next = AiPlayer->GoalHead;
@@ -1391,7 +1394,8 @@ global void AiWorkComplete(Unit * unit, Unit * what)
     }
     AiPlayer = &Ais[unit->Player->Player];
     AiClearBuildUnitType(what->Type);
-    if (!AiPlayer->MainHall && what->Type->Type == AiChooseRace(UnitTownHall)) {
+    if (!AiPlayer->MainHall
+	    && what->Type == UnitTypeByWcNum(AiChooseRace(UnitTownHall))) {
 	AiPlayer->MainHall = what;
     }
     AiAssignWorker();
@@ -1405,6 +1409,8 @@ global void AiWorkComplete(Unit * unit, Unit * what)
 */
 global void AiCanNotBuild(Unit * unit, const UnitType * what)
 {
+    int i;
+
     DebugLevel1("Ai: Player %Zd: %Zd Can't build %d at %d,%d\n",
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
@@ -1414,7 +1420,16 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
     }
     AiPlayer = &Ais[unit->Player->Player];
     AiClearBuildUnitType(what);
-    AiNewGoal(AiCmdBuild, 1, what->Type);
+
+    //
+    //	FIXME: Convert back.
+    //
+    for( i=0; UnitTypeWcNames[i]; ++i ) {
+	if( !strcmp(UnitTypeWcNames[i],what->Ident) ) {
+	    AiNewGoal(AiCmdBuild, 1, i);
+	    break;
+	}
+    }
 }
 
 /**
@@ -1425,6 +1440,8 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
 */
 global void AiCanNotReach(Unit * unit, const UnitType * what)
 {
+    int i;
+
     DebugLevel3("Ai: Player %Zd: %Zd Can't reach %d at %d,%d\n",
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
@@ -1434,7 +1451,17 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
     }
     AiPlayer = &Ais[unit->Player->Player];
     AiClearBuildUnitType(what);
-    AiNewGoal(AiCmdBuild, 1, what->Type);
+
+    //
+    //	FIXME: Convert back.
+    //
+    for( i=0; UnitTypeWcNames[i]; ++i ) {
+	if( !strcmp(UnitTypeWcNames[i],what->Ident) ) {
+	    AiNewGoal(AiCmdBuild, 1, i);
+	    break;
+	}
+    }
+
     //CommandBuildBuilding(unit,unit->X,unit->Y,UnitTypeByWcNum(UnitWallHuman),1);
     //FIXME: should be a better way than above line.
 }
@@ -1500,7 +1527,7 @@ global void AiEachFrame(Player * player)
 */
 global void AiEachSecond(Player * player)
 {
-    DebugLevel3Fn("Player %d\n", player->Player);
+    DebugLevel3Fn("Player %d\n" _C_ player->Player);
     if (AiSleep) {			// wait some time. FIXME: see above
 	return;
     }
