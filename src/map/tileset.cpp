@@ -412,6 +412,7 @@ local void SaveTilesetMixed(FILE* file,const unsigned short* table
 **	Save the tileset.
 **
 **	@param file	Output file.
+**	@param tileset	Save the content of this tileset.
 */
 local void SaveTileset(FILE* file,const Tileset* tileset)
 {
@@ -481,7 +482,7 @@ local void SaveTileset(FILE* file,const Tileset* tileset)
 }
 
 /**
-**	Save the current tileset.
+**	Save the current tileset module.
 **
 **	@param file	Output file.
 */
