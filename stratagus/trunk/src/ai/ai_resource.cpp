@@ -744,180 +744,12 @@ local void AiCheckingWork(void)
 **
 **	@return		Pointer to the nearest reachable gold mine.
 **
-**	@see FindGoldMine but this version doesn't check for explored tiles.
+**	@see FindGoldMine
 */
 local Unit* AiFindGoldMine(const Unit* unit)
 {
-    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
-    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
-    struct {
-	unsigned short X;
-	unsigned short Y;
-    } * points;
-    int size;
-    int x;
-    int y;
-    int rx;
-    int ry;
-    int mask;
-    int wp;
-    int rp;
-    int ep;
-    int i;
-    int w;
-    int n;
-    unsigned char* m;
-    unsigned char* matrix;
-    const Unit* destu;
-    Unit* mine;
-    Unit* bestmine;
-    int destx;
-    int desty;
-    int bestx;
-    int besty;
-    int bestd;
-
-    destx=x=unit->X;
-    desty=y=unit->Y;
-    size=TheMap.Width*TheMap.Height/4;
-    points=malloc(size*sizeof(*points));
-
-    //
-    //	Find the nearest gold depot
-    //
-    if( (destu=FindDeposit(unit->Player,x,y,GoldCost)) ) {
-	NearestOfUnit(destu,x,y,&destx,&desty);
-    }
-    bestd=99999;
-    IfDebug( bestx=besty=0; );		// keep the compiler happy
-
-    //
-    //	Make movement matrix. FIXME: can create smaller matrix.
-    //
-    matrix=CreateMatrix();
-    w=TheMap.Width+2;
-    matrix+=w+w+2;
-
-    //
-    //	Mark sight range as border. FIXME: matrix didn't need to be bigger.
-    //
-    n=unit->Stats->SightRange;
-    rx=x-n;
-    if( rx<0 ) {
-	rx=0;
-    }
-    ep=x+n;
-    if( ep>TheMap.Width ) {
-	ep=TheMap.Width;
-    }
-    ry=y-n;
-    if( ry<0 ) {
-	ry=0;
-    }
-    wp=y+n;
-    if( wp>TheMap.Height ) {
-	wp=TheMap.Height;
-    }
-    for( i=rx; i<ep; ++i ) {		// top bottom line
-	matrix[i+ry*w]=matrix[i+wp*w]=66;
-    }
-    for( i=ry+1; i<wp-1; ++i ) {
-	matrix[rx+i*w]=matrix[ep+i*w]=66;
-    }
-
-#if 0
-    matrix[x+n+(y+n)*w]=matrix[x-n+(y+n)*w]=
-	matrix[x+n+(y-n)*w]=matrix[x-n+(y-n)*w]=66;
-    for( i=n; i--; ) {
-	// FIXME: marks out of map area
-	DebugCheck( x-i+(y-n)*w<0 || x+i+(y+n)*w>w*TheMap.Hight );
-	matrix[x+n+(y+i)*w]=matrix[x-n+(y+i)*w]=
-	    matrix[x+n+(y-i)*w]=matrix[x-n+(y-i)*w]=
-	    matrix[x-i+(y+n)*w]=matrix[x+i+(y+n)*w]=
-	    matrix[x-i+(y-n)*w]=matrix[x+i+(y-n)*w]=66;
-    }
-#endif
-
-    mask=UnitMovementMask(unit);
-
-    points[0].X=x;
-    points[0].Y=y;
-    rp=0;
-    matrix[x+y*w]=1;			// mark start point
-    ep=wp=1;				// start with one point
-    bestmine=NoUnitP;
-
-    //
-    //	Pop a point from stack, push all neighbors which could be entered.
-    //
-    for( ;; ) {
-	while( rp!=ep ) {
-	    rx=points[rp].X;
-	    ry=points[rp].Y;
-	    for( i=0; i<8; ++i ) {		// mark all neighbors
-		x=rx+xoffset[i];
-		y=ry+yoffset[i];
-		m=matrix+x+y*w;
-		if( *m ) {			// already checked
-		    continue;
-		}
-
-		//
-		//	Look if there is a mine
-		//
-		if ( (mine=ResourceOnMap(x,y,GoldCost)) ) {
-		    if( destu ) {
-			n=max(abs(destx-x),abs(desty-y));
-			if( n<bestd ) {
-			    bestd=n;
-			    bestx=x;
-			    besty=y;
-			    bestmine=mine;
-			}
-			*m=22;
-		    } else {			// no goal take the first
-			free(points);
-			return mine;
-		    }
-		}
-
-		if( CanMoveToMask(x,y,mask) ) {	// reachable
-		    *m=1;
-		    points[wp].X=x;		// push the point
-		    points[wp].Y=y;
-		    if( ++wp>=size ) {		// round about
-			wp=0;
-		    }
-		} else {			// unreachable
-		    *m=99;
-		}
-	    }
-	    if( ++rp>=size ) {			// round about
-		rp=0;
-	    }
-	}
-
-	//
-	//	Take best of this frame, if any.
-	//
-	if( bestd!=99999 ) {
-	    free(points);
-	    return bestmine;
-	}
-
-	//
-	//	Continue with next frame.
-	//
-	if( rp==wp ) {			// unreachable, no more points available
-	    break;
-	}
-	ep=wp;
-    }
-
-    DebugLevel3Fn("no mine in sight-range\n");
-
-    free(points);
-    return NoUnitP;
+    // FIXME: explored tiles?
+    return FindResource(unit,unit->X,unit->Y,100);
 }
 
 /**
@@ -939,112 +771,11 @@ local int AiMineGold(Unit* unit)
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 	return 0;
     }
-    DebugCheck(unit->Type != UnitTypeHumanWorker
-	    && unit->Type != UnitTypeOrcWorker);
 
     CommandResource(unit, dest, FlushCommands);
 
     return 1;
 }
-
-#if 0
-
-/**
-**      Assign worker to harvest.
-**
-**	@param unit	Find wood for this worker.
-*/
-local int AiHarvest(Unit * unit)
-{
-    int x, y, addx, addy, i, n, r, wx, wy, bestx, besty, cost;
-    Unit *dest;
-
-    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    x = unit->X;
-    y = unit->Y;
-    addx = unit->Type->TileWidth;
-    addy = unit->Type->TileHeight;
-    r = TheMap.Width;
-    if (r < TheMap.Height) {
-	r = TheMap.Height;
-    }
-
-    //  This is correct, but can this be written faster???
-    if ((dest = FindWoodDeposit(unit->Player, x, y))) {
-	NearestOfUnit(dest, x, y, &wx, &wy);
-	DebugLevel3("To %d,%d\n" _C_ wx _C_ wy);
-    } else {
-	wx = unit->X;
-	wy = unit->Y;
-    }
-    cost = 99999;
-    IfDebug(bestx = besty = 0; );	// keep the compiler happy
-
-    // FIXME: if we reach the map borders we can go fast up, left, ...
-    --x;
-    while (addx <= r && addy <= r) {
-	for (i = addy; i--; y++) {	// go down
-	    if (CheckedForestOnMap(x, y)) {
-		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
-		    cost = n;
-		    bestx = x;
-		    besty = y;
-		}
-	    }
-	}
-	++addx;
-	for (i = addx; i--; x++) {	// go right
-	    if (CheckedForestOnMap(x, y)) {
-		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
-		    cost = n;
-		    bestx = x;
-		    besty = y;
-		}
-	    }
-	}
-	++addy;
-	for (i = addy; i--; y--) {	// go up
-	    if (CheckedForestOnMap(x, y)) {
-		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
-		    cost = n;
-		    bestx = x;
-		    besty = y;
-		}
-	    }
-	}
-	++addx;
-	for (i = addx; i--; x--) {	// go left
-	    if (CheckedForestOnMap(x, y)) {
-		n = max(abs(wx - x), abs(wy - y));
-		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
-		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
-		    cost = n;
-		    bestx = x;
-		    besty = y;
-		}
-	    }
-	}
-	if (cost != 99999) {
-	    DebugLevel3Fn("wood on %d,%d\n" _C_ x _C_ y);
-	    DebugCheck(unit->Type!=UnitTypeHumanWorker && unit->Type!=UnitTypeOrcWorker);
-	    CommandHarvest(unit, bestx, besty,FlushCommands);
-	    return 1;
-	}
-	++addy;
-    }
-
-    DebugLevel0Fn("no wood reachable by %s(%d,%d)\n");
-	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
-    return 0;
-}
-
-#else
 
 /**
 **      Assign worker to harvest.
@@ -1090,7 +821,7 @@ local int AiHarvest(Unit * unit)
     //
     //	Find the nearest wood depot
     //
-    if( (destu=FindDeposit(unit->Player,x,y,WoodCost)) ) {
+    if( (destu=FindDeposit(unit,x,y,100)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
@@ -1139,9 +870,7 @@ local int AiHarvest(Unit * unit)
 			}
 			*m=22;
 		    } else {			// no goal take the first
-			DebugCheck(unit->Type!=UnitTypeHumanWorker
-				&& unit->Type!=UnitTypeOrcWorker);
-			CommandHarvest(unit,x,y,FlushCommands);
+			CommandResourceLoc(unit,x,y,FlushCommands);
 			free(points);
 			return 1;
 		    }
@@ -1167,9 +896,7 @@ local int AiHarvest(Unit * unit)
 	//	Take best of this frame, if any.
 	//
 	if( bestd!=99999 ) {
-	    DebugCheck(unit->Type!=UnitTypeHumanWorker
-		    && unit->Type!=UnitTypeOrcWorker);
-	    CommandHarvest(unit, bestx, besty,FlushCommands);
+	    CommandResourceLoc(unit, bestx, besty,FlushCommands);
 	    free(points);
 	    return 1;
 	}
@@ -1190,8 +917,6 @@ local int AiHarvest(Unit * unit)
     return 0;
 }
 
-#endif
-
 /**
 **      Assign worker to haul oil.
 */
@@ -1200,7 +925,8 @@ local int AiHaulOil(Unit * unit)
     Unit *dest;
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    dest = FindResource(unit->Player, unit->X, unit->Y ,unit->Type->ResourceHarvested);
+    //  Range hardcoded. search the whole map!!!
+    dest = FindResource(unit, unit->X, unit->Y,1000);
     if (!dest) {
 	DebugLevel3Fn("oil platform not reachable by %s(%d,%d)\n"
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
@@ -1261,27 +987,19 @@ local void AiCollectResources(void)
 	if( !unit->Type->Harvester ) {
 	    continue;
 	}
-	c=unit->Type->ResourceHarvested;
 
 	//
 	//	See if it's assigned already
 	//
-	switch( unit->Orders[0].Action ) {
-	    case UnitActionHarvest:
-		units_assigned[num_units_assigned[WoodCost]++][WoodCost]=unit;
-		continue;
-	    case UnitActionResource:
-		units_assigned[num_units_assigned[c]++][c]=unit;
-		continue;
-	    default:
-		break;
+	if (unit->Orders[0].Action==UnitActionResource) {
+	    c=unit->CurrentResource;
+	    units_assigned[num_units_assigned[c]++][c]=unit;
 	}
 
 	//
 	//  Send workers with resources back home.
 	//
-	if (unit->Value||unit->Type==UnitTypeHumanWorkerWithWood
-		||unit->Type==UnitTypeOrcWorkerWithWood) {
+	if (unit->Value) {
 	    units_with_resource[num_units_with_resource[c]++][c]=unit;
 	    if (unit->Orders[0].Action == UnitActionStill
 		    && unit->OrderCount==1 ) {
@@ -1293,7 +1011,10 @@ local void AiCollectResources(void)
 	//	Look what the unit can do
 	//
 	for( c=0; c<MaxCosts; ++c ) {
-	    int tn;
+	    if (unit->Type->ResInfo[c]) {
+		units_unassigned[num_units_unassigned[c]++][c]=unit;
+	    }
+#if 0
 	    UnitType** types;
 
 	    //
@@ -1329,6 +1050,7 @@ local void AiCollectResources(void)
 	    if( j<tn ) {
 		break;
 	    }
+#endif
 	}
     }
 
@@ -1418,7 +1140,7 @@ local void AiCollectResources(void)
 			    int n1;
 			    int n2;
 			    case GoldCost:
-				if( (unit->Orders[0].Action==UnitActionResource&&unit->Type->ResourceHarvested==GoldCost) || AiMineGold(unit) ) {
+				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==GoldCost) || AiMineGold(unit) ) {
 				    DebugLevel3Fn("Assigned to gold\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
@@ -1434,7 +1156,7 @@ local void AiCollectResources(void)
 				}
 				break;
 			    case WoodCost:
-				if( unit->Orders[0].Action==UnitActionHarvest || AiHarvest(unit) ) {
+				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==WoodCost) || AiHarvest(unit) ) {
 				    DebugLevel3Fn("Assigned to harvest\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
@@ -1450,7 +1172,7 @@ local void AiCollectResources(void)
 				}
 				break;
 			    case OilCost:
-				if( (unit->Orders[0].Action==UnitActionResource&&unit->Type->ResourceHarvested==OilCost) || AiHaulOil(unit) ) {
+				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==OilCost) || AiHaulOil(unit) ) {
 				    DebugLevel3Fn("Assigned to oil\n");
 				    units_assigned[num_units_assigned[c]++][c]=unit;
     				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];

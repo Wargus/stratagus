@@ -420,7 +420,6 @@ enum _unit_action_ {
     UnitActionBuild,			/// unit builds building
 
     UnitActionRepair,			/// unit repairing
-    UnitActionHarvest,			/// unit harvest lumber
     UnitActionResource,			/// unit harvesting resources
     UnitActionReturnGoods,		/// unit returning any resource
 
@@ -568,6 +567,7 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
+    unsigned	CurrentResource;
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
@@ -595,6 +595,7 @@ struct _unit_ {
     }		Resource;		/// Resource still
     struct _order_resource_worker_ {
 	int	TimeToHarvest;		/// how much time until we harvest some more.
+	unsigned DoneHarvesting:1;	/// Harvesting done, wait for action to break.
     }		ResWorker;		/// Worker harvesting
     struct _order_research_ {
 	Upgrade* Upgrade;		/// Upgrade researched
@@ -819,12 +820,15 @@ extern int CanBuildOn(int x,int y,int mask);
 extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
 
     /// Find resource
-extern Unit* FindResource(const Player* player,int x,int y,int resource);
+extern Unit* FindResource(const Unit* unit,int x,int y,int range);
     /// Find nearest deposit
-extern Unit* FindDeposit(const Player*,int x,int y,int resource);
+extern Unit* FindDeposit(const Unit* unit,int x,int y,int range);
     /// Find the next idle worker
 extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
+    /// Find the neareast piece of terrain with specific flags.	
+extern int FindTerrainType(int movemask,int resmask,int rvresult,int range,
+	const Player *player,int x,int y,int* px,int* py);
     /// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const Unit* unit,int* x,int* y);
 

@@ -47,6 +47,7 @@
 #include <bzlib.h>
 #undef DrawIcon
 #undef EndMenu
+#undef FindResource
 #endif
 
 #ifdef USE_ZZIPLIB

@@ -181,9 +181,7 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 	return GameSounds.TreeChopping.Sound;
     case VoiceWorkCompleted:
 	// FIXME: make this more configurable
-	if (unit->Type==UnitTypeHumanWorker) {
-	    return GameSounds.PeasantWorkComplete.Sound;
-	} else if( ThisPlayer->Race==PlayerRaceHuman ) {
+	if( ThisPlayer->Race==PlayerRaceHuman ) {
 	    return GameSounds.HumanWorkComplete.Sound;
 	} else {
 	    return GameSounds.OrcWorkComplete.Sound;

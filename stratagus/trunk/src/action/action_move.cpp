@@ -78,6 +78,8 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     // FIXME: state 0?, should be wrong, should be Reset.
     // FIXME: Reset flag is cleared by HandleUnitAction.
     if( !(state=unit->State) ) {
+	//  FIXME: So units flying up and down are not affected.
+	unit->IX=unit->IY=0;
 
 #ifdef HIERARCHIC_PATHFINDER
 	d = PfHierComputePath (unit, &xd, &yd);

@@ -301,7 +301,7 @@ global void UpdateMinimap(void)
 	    if( (*table)->Player->Player==PlayerNumNeutral ) {
 		if( type->Critter ) {
 		    color=ColorNPC;
-		} else if( type->OilPatch ) {
+		} else if( type->GivesResource==OilCost ) {
 		    color=ColorBlack;
 		} else {
 		    color=ColorYellow;

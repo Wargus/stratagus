@@ -989,11 +989,7 @@ global void ShowLoadProgress(const char* fmt,...)
     char* s;
 
     va_start(va,fmt);
-#ifdef USE_WIN32
-    vsprintf(temp,fmt,va);
-#else
     vsnprintf(temp,sizeof(temp),fmt,va);
-#endif
     va_end(va);
 
     if( VideoDepth && IsFontLoaded(GameFont) ) {

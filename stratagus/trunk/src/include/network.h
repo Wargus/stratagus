@@ -83,9 +83,8 @@ enum _message_type_ {
     MessageCommandUnload,		/// Unit command unload
     MessageCommandBuild,		/// Unit command build building
     MessageCommandCancelBuild,		/// Unit command cancel building
-    MessageCommandHarvest,		/// Unit command harvest
-    MessageCommandMine,			/// Unit command mine gold
-    MessageCommandResource,		/// Unit command haul oil
+    MessageCommandResourceLoc,		/// Unit command resource location
+    MessageCommandResource,		/// Unit command resource
     MessageCommandReturn,		/// Unit command return goods
     MessageCommandTrain,		/// Unit command train
     MessageCommandCancelTrain,		/// Unit command cancel training

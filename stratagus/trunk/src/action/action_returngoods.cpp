@@ -54,9 +54,9 @@
 /**
 **	Return goods to gold/wood deposit.
 **
-**	FIXME: must support to move to a specified deposit.
-**
 **	@param unit	pointer to unit.
+**
+**	FIXME: move this into action_resource?
 */
 global void HandleActionReturnGoods(Unit* unit)
 {
@@ -65,56 +65,30 @@ global void HandleActionReturnGoods(Unit* unit)
 
     type=unit->Type;
     //
-    //	Select target to return goods. FIXME: more races support
+    //	Select target to return goods. 
     // 
-    if( type->Harvester ) {
-	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,type->ResourceHarvested)) ) {
-		DebugLevel3Fn("No deposit -> can't return\n");
-		unit->Orders[0].Action=UnitActionStill;
-		return;
-	    }
-	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
-	    ++destu->Refs;
+    DebugCheck(!type->Harvester );
+    if( !unit->Orders[0].Goal ) {
+	if( !(destu=FindDeposit(unit,unit->X,unit->Y,1000)) ) {
+	    DebugLevel3Fn("No deposit -> can't return\n");
+	    unit->Orders[0].Action=UnitActionStill;
+	    return;
 	}
-	DebugLevel3("Return to %d=%d,%d\n"
-		_C_ UnitNumber(unit->Orders[0].Goal)
-		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-	unit->Orders[0].Action=UnitActionResource;
-	// Somewhere on the way the loaded worker changed Arg1.
-	// Bummer, go get the closest resource to the depot
-	unit->Orders[0].Arg1=(void*)-1;
-	NewResetPath(unit);
-	unit->SubAction=70;
-	unit->Wait=1;
-	return;
+	unit->Orders[0].Goal=destu;
+	RefsDebugCheck( !destu->Refs );
+	++destu->Refs;
     }
-    
-    if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
-	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,WoodCost)) ) {
-		// No deposit -> can't return
-		unit->Orders[0].Action=UnitActionStill;
-		return;
-	    }
-	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
-	    ++destu->Refs;
-	}
-	unit->Orders[0].X=unit->X;
-	unit->Orders[0].Y=unit->Y;	// Return point to continue.
-	DebugLevel3("Return to %d=%d,%d\n"
-		_C_ UnitNumber(unit->Orders[0].Goal)
-		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-	unit->Orders[0].Action=UnitActionHarvest;
-	unit->Orders[0].Arg1=(void*)-1;
-	NewResetPath(unit);
-	unit->SubAction=128;		// FIXME: Hardcoded
-	DebugLevel3("Wait: %d\n" _C_ unit->Wait);
-	unit->Wait=1;
-	return;
-    }
+    DebugLevel3("Return to %d=%d,%d\n"
+	    _C_ UnitNumber(unit->Orders[0].Goal)
+	    _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+    unit->Orders[0].Action=UnitActionResource;
+    // Somewhere on the way the loaded worker could have change Arg1
+    // Bummer, go get the closest resource to the depot
+    unit->Orders[0].Arg1=(void*)-1;
+    NewResetPath(unit);
+    unit->SubAction=70;
+    unit->Wait=1;
+    return;
 }
 
 //@}
