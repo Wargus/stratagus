@@ -195,7 +195,7 @@ extern int NetworkInSync;         /// Network is in sync
 extern int NetworkUpdates;        /// Network update each # game cycles
 extern int NetworkLag;            /// Network lag (# game cycles)
 extern unsigned long NetworkStatus[PlayerMax];  /// Network status
-
+extern int NoRandomPlacementMultiplayer;// Removes randomization of player placements
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

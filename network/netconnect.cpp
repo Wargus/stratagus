@@ -434,42 +434,52 @@ global void NetworkServerStartGame(void)
 	}
 
 	// Randomize the position.
-	// ARI: FIXME: should be possible to disable! Top vs Bottom et al.
+	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
+    // Players slots are then mapped to players numbers(and colors).
+    
 	j = h;
-	for (i = 0; i < NetPlayers; ++i) {
-		if (j > 0) {
-			int k;
-			int o;
-			int chosen;
+   if (NoRandomPlacementMultiplayer == 1) {
+        for (i = 0; i < PlayerMax; ++i) {
+            if (MenuMapInfo->PlayerType[i] != PlayerComputer) {
+                org[i] = Hosts[i].PlyNr;
+            }
+        }
+   } else { 
+	    for (i = 0; i < NetPlayers; ++i) {
+		    if (j > 0) {
+			    int k;
+			    int o;
+			    int chosen;
 
-			chosen = MyRand() % j;
+			    chosen = MyRand() % j;
 
-			n = num[chosen];
-			Hosts[i].PlyNr = n;
-			k = org[i];
-			if (k != n) {
-				for (o = 0; o < PlayerMax; ++o) {
-					if (org[o] == n) {
-						org[o] = k;
-						break;
-					}
-				}
-				org[i] = n;
-			}
-			DebugLevel0Fn("Assigning player %d to slot %d (%d)\n" _C_
+			    n = num[chosen];
+			    Hosts[i].PlyNr = n; 
+			    k = org[i];
+			    if (k != n) {
+				    for (o = 0; o < PlayerMax; ++o) {
+					    if (org[o] == n) {
+						    org[o] = k;
+						    break;
+					    }
+				    }
+				    org[i] = n;
+			    }
+			    DebugLevel0Fn("Assigning player %d to slot %d (%d)\n" _C_
 				i _C_ n _C_ org[i]);
 
-			num[chosen] = num[--j];
-		} else {
-			DebugCheck(1 == 1);
+			    num[chosen] = num[--j];
+		    } else {
+			    DebugCheck(1 == 1);
 #if 0
 			// ARI: is this code path really executed? (initially h >= NetPlayers..)
 			// Above Debugcheck will catch it..
-			Hosts[i].PlyNr = num[0];
-			DebugLevel0Fn("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
+			    Hosts[i].PlyNr = num[0];
+			    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
 #endif
-		}
-	}
+		    }
+	    }
+    }
 
 	// Complete all setup states for the assigned slots.
 	for (i = 0; i < PlayerMax; ++i) {
