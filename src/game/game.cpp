@@ -160,6 +160,9 @@ local void LoadMap(const char* filename,WorldMap* map)
 
 /**
 **	Free for all
+**
+**	@todo FIXME: It is not necessary to use send command, the setup is
+**		executed on all machines.
 */
 local void GameTypeFreeForAll(void)
 {
@@ -177,6 +180,9 @@ local void GameTypeFreeForAll(void)
 
 /**
 **	Top vs Bottom
+**
+**	@todo FIXME: It is not necessary to use send command, the setup is
+**		executed on all machines.
 */
 local void GameTypeTopVsBottom(void)
 {
@@ -203,6 +209,9 @@ local void GameTypeTopVsBottom(void)
 
 /**
 **	Left vs Right
+**
+**	@todo FIXME: It is not necessary to use send command, the setup is
+**		executed on all machines.
 */
 local void GameTypeLeftVsRight(void)
 {
@@ -316,6 +325,9 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
     }
 
+    //
+    //	Setup game types
+    //
     // FIXME: implement more game types
     if (GameSettings.GameType != SettingsGameTypeMapDefault) {
 	switch (GameSettings.GameType) {
@@ -459,27 +471,20 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 #endif
 
-    // FIXME: make this configurable over GUI config.
-    if( ThisPlayer->Race==PlayerRaceHuman ) {
-	SetDefaultTextColors(FontWhite,FontYellow);
-	// FIXME: Add this again:
-	//	PlaySound(SoundBasicHumanVoicesSelected1);
-    } else if( ThisPlayer->Race==PlayerRaceOrc ) {
-	SetDefaultTextColors(FontYellow,FontWhite);
-	// FIXME: Add this again:
-	//	PlaySound(SoundBasicOrcVoicesSelected1);
-    }
-    // FIXME: support more races
+    SetDefaultTextColors(TheUI.NormalFontColor,TheUI.ReverseFontColor);
 
-    MapCenterViewport (0, ThisPlayer->StartX,ThisPlayer->StartY);
+    MapCenterViewport(0, ThisPlayer->StartX, ThisPlayer->StartY);
 
+    //
+    //	Various hacks wich must be done after the map is loaded.
+    //
     //FIXME: must be done after map is loaded
     if(AStarOn) {
 	InitAStar();
     }
 #ifdef HIERARCHIC_PATHFINDER
-    PfHierInitialize ();
-#endif /* HIERARCHIC_PATHFINDER */
+    PfHierInitialize();
+#endif // HIERARCHIC_PATHFINDER
 
     //
     //	FIXME: The palette is loaded after the units are created.
@@ -494,6 +499,8 @@ global void CreateGame(char* filename, WorldMap* map)
 
 /**
 **	Init Game Setting to default values
+**
+**	@todo FIXME: this should not be executed for restart levels!
 */
 global void InitSettings(void)
 {
