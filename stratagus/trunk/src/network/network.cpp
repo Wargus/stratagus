@@ -908,6 +908,10 @@ global void NetworkEvent(void)
 				allowed = 1;
 				break;
 			case MessageQuit:
+			case MessageQuitAck:
+			case MessageResend:
+			case MessageChat:
+			case MessageChatTerm:
 				// FIXME: ensure it's from the right player
 				allowed = 1;
 				break;
