@@ -2500,9 +2500,11 @@ global void InitMenus(int race)
 	InitMenuData();
 	InitMenuFunctions();
 
+#ifndef USE_OPENGL
 	if (race == last_race) {		// same race? already loaded!
 		return;
 	}
+#endif
 
 	if (last_race == -1) {
 		MenuCallbacks.ButtonPressed = &MenuHandleButtonDown;
