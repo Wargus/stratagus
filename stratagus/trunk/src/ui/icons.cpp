@@ -142,7 +142,9 @@ static void AddIcon(const char* ident, const char* tileset,
 		icon->Height = height;
 
 		icon->Sprite = NULL;
+#ifdef USE_OPENGL
 		icon->PlayerColorSprite = NULL;
+#endif
 
 		*(Icon**)hash_add(IconHash, str) = icon;
 		free(str);
