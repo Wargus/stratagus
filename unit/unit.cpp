@@ -649,6 +649,7 @@ global void RemoveUnit(Unit* unit, Unit* host)
 
     if( unit->Removed ) {		// could happen!
 	// If unit is removed (inside) and building is destroyed.
+	unit->Next=NULL;
 	return;
     }
     unit->Removed=1;
