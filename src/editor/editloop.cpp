@@ -1704,6 +1704,7 @@ local void CreateEditor(void)
 
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
+
     if (!*CurrentMapPath) {		// new map!
 	InitUnitTypes(1);
 	//
@@ -1753,6 +1754,21 @@ local void CreateEditor(void)
 	    scm = 1;
 	}
     }
+
+#ifdef NEW_FOW    
+    // Must change visible for ALL Players
+    for (i=0; i < TheMap.Width*TheMap.Height; i++) {
+	//Player 0 is selected and will be done by RevealMap
+        for(n=1;n<PlayerMax;n++) {
+	    if (TheMap.Fields[i].Visible[n] == 0) {
+		TheMap.Fields[i].Visible[n]=2;
+	    } else {
+		TheMap.Fields[i].Visible[n]++;
+	    }
+	}
+    }
+#endif
+
     FlagRevealMap = 0;
 
     //
