@@ -1622,11 +1622,31 @@ global UnitType* CclGetUnitType(SCM ptr)
     } else if (CclGetSmobType(ptr) == SiodUnitTypeTag)  {
 	return CclGetSmobData(ptr);
     } else {
-	errl("CclGetUnitType: not an unit-type", ptr);
+	errl("CclGetUnitType: not a unit-type", ptr);
 	return 0;
     }
 }
 #elif defined(USE_LUA)
+global UnitType* CclGetUnitType(lua_State* l)
+{
+    const char* str;
+
+    // Be kind allow also strings or symbols
+    if (lua_isstring(l, -1)) {
+	str = LuaToString(l, -1);
+	DebugLevel3("CclGetUnitType: %s\n"_C_ str);
+	return UnitTypeByIdent(str);
+    } else if (lua_isuserdata(l, -1)) {
+	LuaUserData* data;
+	data = lua_touserdata(l, -1);
+	if (data->Type == LuaUnitType) {
+	    return data->Data;
+	}
+    }
+    lua_pushfstring(l, "CclGetUnitType: not a unit-type");
+    lua_error(l);
+    return NULL;
+}
 #endif
 
 /**
@@ -1657,7 +1677,6 @@ local void CclUnitTypePrin1(SCM ptr, struct gen_printio* f)
     gput_st(f,buf);
 #endif
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -1676,7 +1695,7 @@ local SCM CclUnitType(SCM ident)
     str = CclConvertToString(ident);
     if (str) {
 	type = UnitTypeByIdent(str);
-	printf("CclUnitType: '%s' -> '%ld'\n", str, (long)type);
+	DebugLevel3Fn("CclUnitType: '%s' -> '%ld'\n" _C_ str _C_ (long)type);
 	free(str);
 	return CclMakeSmobObj(SiodUnitTypeTag, type);
     } else {
@@ -1685,6 +1704,25 @@ local SCM CclUnitType(SCM ident)
     }
 }
 #elif defined(USE_LUA)
+local int CclUnitType(lua_State* l)
+{
+    const char* str;
+    UnitType* type;
+    LuaUserData* data;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    str = LuaToString(l, 1);
+    type = UnitTypeByIdent(str);
+    DebugLevel3Fn("CclUnitType: '%s' -> '%ld'\n" _C_ str _C_ (long)type);
+    data = lua_newuserdata(l, sizeof(LuaUserData));
+    data->Type = LuaUnitType;
+    data->Data = type;
+    return 1;
+}
 #endif
 
 /**
@@ -1699,15 +1737,35 @@ local SCM CclUnitTypeArray(void)
     SCM value;
     int i;
 
-    array = cons_array(gh_int2scm(UnitTypeMax), NIL);
+    array = cons_array(gh_int2scm(NumUnitTypes), NIL);
 
-    for (i = 0; i < UnitTypeMax; ++i) {
+    for (i = 0; i < NumUnitTypes; ++i) {
 	value = CclMakeSmobObj(SiodUnitTypeTag, &UnitTypes[i]);
 	gh_vector_set_x(array, gh_int2scm(i), value);
     }
     return array;
 }
 #elif defined(USE_LUA)
+local int CclUnitTypeArray(lua_State* l)
+{
+    int i;
+    LuaUserData* data;
+
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_newtable(l);
+
+    for (i = 0; i < NumUnitTypes; ++i) {
+	data = lua_newuserdata(l, sizeof(LuaUserData));
+	data->Type = LuaUnitType;
+	data->Data = UnitTypes[i];
+	lua_rawseti(l, 1, i + 1);
+    }
+    return 1;
+}
 #endif
 
 /**
@@ -1728,6 +1786,19 @@ local SCM CclGetUnitTypeIdent(SCM ptr)
     return value;
 }
 #elif defined(USE_LUA)
+local int CclGetUnitTypeIdent(lua_State* l)
+{
+    const UnitType* type;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    type = CclGetUnitType(l);
+    lua_pushstring(l, type->Ident);
+    return 1;
+}
 #endif
 
 /**
@@ -1748,6 +1819,19 @@ local SCM CclGetUnitTypeName(SCM ptr)
     return value;
 }
 #elif defined(USE_LUA)
+local int CclGetUnitTypeName(lua_State* l)
+{
+    const UnitType* type;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    type = CclGetUnitType(l);
+    lua_pushstring(l, type->Name);
+    return 1;
+}
 #endif
 
 /**
@@ -1770,6 +1854,24 @@ local SCM CclSetUnitTypeName(SCM ptr, SCM name)
     return name;
 }
 #elif defined(USE_LUA)
+local int CclSetUnitTypeName(lua_State* l)
+{
+    UnitType* type;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    lua_pushvalue(l, 1);
+    type = CclGetUnitType(l);
+    lua_pop(l, 1);
+    free(type->Name);
+    type->Name = strdup(LuaToString(l, 2));
+
+    lua_pushvalue(l, 2);
+    return 1;
+}
 #endif
 
 /**
@@ -2154,14 +2256,12 @@ global void UnitTypeCclRegister(void)
     lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
     lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 
-//    SiodUnitTypeTag = CclMakeSmobType("UnitType");
-
-//    lua_register(Lua, "UnitType", CclUnitType);
-//    lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
+    lua_register(Lua, "UnitType", CclUnitType);
+    lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
     // unit type structure access
-//    lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
-//    lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
-//    lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
+    lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
+    lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
+    lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 
     lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
