@@ -853,7 +853,7 @@ global void LoadFonts(void)
     fcm=FontColorMappings;
     while( fcm ) {
 	pixels=fcm->Pixels;
-	for( i=0; i<7; ++i ) {
+	for( i=0; i<NumFontColors; ++i ) {
 	    switch( VideoBpp ) {
 		case 8:
 		    ((VMemType8*)pixels)[i]=VideoMapRGB(fcm->RGB[i].R,fcm->RGB[i].G,fcm->RGB[i].B);
