@@ -3117,7 +3117,7 @@ global void GameMenuLoad(void)
     }
 }
 
-local void InitGameMenu(Menuitem *mi)
+local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 {
 }
 
