@@ -582,7 +582,7 @@ local int MissileVisible(const Missile* missile)
     int tileMaxY;
 
     GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
-    if ( !AnyAreaVisibleInMap(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
+    if ( !AnyMapAreaVisibleOnScreen(tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
     }
     DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
