@@ -3495,6 +3495,7 @@ global void LetUnitDie(Unit* unit)
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
 #if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	    unit->Visible = 0xffff;
 	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
 #else
 	    CorpseCacheInsert(unit);
