@@ -970,16 +970,16 @@ local int GameStatsDrawFunc(int frame)
 	char** ranks;
 	int* scores;
 
-	ranks = NULL;	/* .. -Wuninitialized .. */
+	ranks = NULL;
 	scores = NULL;
-	for( i=0; RaceWcNames[i]; ++i ) {
-	    if( !strcmp(RaceWcNames[i],ThisPlayer->RaceName) ) {
+	for( i=0; i<PlayerRaces.Count; ++i ) {
+	    if( !strcmp(PlayerRaces.Name[i],ThisPlayer->RaceName) ) {
 		ranks=Ranks[i].Ranks;
 		scores=Ranks[i].Scores;
 		break;
 	    }
 	}
-	DebugCheck( !RaceWcNames[i] );
+	DebugCheck( i==PlayerRaces.Count );
 
 	rank=ranks[0];
 	i=0;
@@ -1488,13 +1488,13 @@ local SCM CclDefineRanks(SCM list)
 
     rank=NULL;
     race=get_c_string(gh_car(list));
-    for( i=0; RaceWcNames[i]; ++i ) {
-	if( !strcmp(RaceWcNames[i], race) ) {
+    for( i=0; i<PlayerRaces.Count; ++i ) {
+	if( !strcmp(PlayerRaces.Name[i], race) ) {
 	    rank=&Ranks[i];
 	    break;
 	}
     }
-    if( !RaceWcNames[i] ) {
+    if( i==PlayerRaces.Count ) {
 	fprintf(stderr,"define-ranks: Invalid race name: %s\n",race);
 	ExitFatal(-1);
     }

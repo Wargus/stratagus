@@ -289,9 +289,9 @@ typedef struct _menus_ {
 **	Struct which specifies the buttons gfx
 */
 typedef struct _menu_graphics_ {
-    char* File[PlayerMaxRaces];		/// resource filename one for each race
-    int	Width[PlayerMaxRaces];		/// Width of button
-    int	Height[PlayerMaxRaces];		/// Height of button
+    char* File[MAX_RACES];		/// resource filename one for each race
+    int	Width[MAX_RACES];		/// Width of button
+    int	Height[MAX_RACES];		/// Height of button
     Graphic* Sprite;			/// sprite : FILLED
 } MenuGraphics;
 

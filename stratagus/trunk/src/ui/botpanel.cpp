@@ -565,7 +565,7 @@ global void DrawButtonPanel(void)
 */
 local void UpdateButtonPanelMultipleUnits(void)
 {
-    const char* unit_ident;
+    char unit_ident[128];
     int z;
     int i;
 
@@ -574,23 +574,11 @@ local void UpdateButtonPanelMultipleUnits(void)
 	_current_buttons[z].Pos = -1;
     }
 
-    IfDebug( unit_ident=""; );		// keep the compiler happy
-
-    // when we have more races this should become a function
-    switch( ThisPlayer->Race ) {
-	case PlayerRaceHuman:
-	    unit_ident=",human-group,";
-	    break;
-	case PlayerRaceOrc:
-	    unit_ident=",orc-group,";
-	    break;
-	case PlayerRaceNeutral:
-	    unit_ident=",neutral-group,";
-	    break;
-	default:
-	    DebugLevel0("what %d "_C_ ThisPlayer->Race);
-	    abort();
+    i=PlayerRacesIndex(ThisPlayer->Race);
+    if( i==-1 ) {
+	i=PlayerRaces.Race[PlayerRaces.Count-1];
     }
+    sprintf(unit_ident,",%s-group,",PlayerRaces.Name[i]);
 
     for( z = 0; z < NumUnitButtons; z++ ) {
 	if ( UnitButtonTable[z]->Level != CurrentButtonLevel ) {
