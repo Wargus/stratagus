@@ -2169,13 +2169,18 @@ global int CanBuildHere(const UnitType* type,unsigned x,unsigned y)
     if( y+type->TileHeight>TheMap.Height ) {
 	return 0;
     }
-    //
-    //	Flyers and naval units can only placed on odd tiles in editor
-    //
-    if( EditorRunning &&
-	    (type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval) ) {
-	if( x&1 || y&1 ) {
-	    return 0;
+
+    if( EditorRunning ) {
+	if( type->OilPatch || type->GivesOil ) {
+	    // Oil patches and platforms can only be placed on even tiles
+	    if( !(x&1 && y&1) ) {
+		return 0;
+	    }
+	} else if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
+	    // Flyers and naval units can only be placed on odd tiles
+	    if( x&1 || y&1 ) {
+		return 0;
+	    }
 	}
     }
 
