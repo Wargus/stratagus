@@ -754,6 +754,7 @@ global void GameMainLoop(void)
 #else
     int showtip;
 #endif
+    int player;
     int RealVideoSyncSpeed;
     
     GameCallbacks.ButtonPressed = HandleButtonDown;
@@ -813,26 +814,37 @@ global void GameMainLoop(void)
 	    //		Check rescue of units.
 	    //
 	    switch (GameCycle % CYCLES_PER_SECOND) {
-		case 0:
+		case 0:				
+		    // At cycle 0 , start all ai players...
+		    if (GameCycle == 0){
+		    	for (player = 0; player<NumPlayers; ++player){
+			    PlayersEachSecond(player);
+			}
+		    }
+		    // Clear scheme heap each second
+		    user_gc(SCM_BOOL_F);
+		    break;		    
+		case 1:
 		    HandleCloak();
 		    break;
-		case 1:
+		case 2:
 		    break;
-		case 2:				// minimap update
+		case 3:				// minimap update
 		    UpdateMinimap();
 		    MustRedraw |= RedrawMinimap;
-		    break;
-		case 3:				// computer players
-		    PlayersEachSecond();
-		    break;
-		case 4:				// forest grow
+		    break;		
+		case 5:				// forest grow
 		    RegenerateForest();
 		    break;
-		case 5:				// overtaking units
+		case 6:				// overtaking units
 		    RescueUnits();
 		    break;
-		case 6:
-		    break;
+		default:
+		    // FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7) 
+		    player = ( GameCycle % CYCLES_PER_SECOND ) - 7;
+		    if (player < NumPlayers){
+		    	PlayersEachSecond(player);
+		    }		    		    
 	    }
 
 	    //

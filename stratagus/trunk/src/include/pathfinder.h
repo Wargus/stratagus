@@ -100,6 +100,8 @@ extern int NewPath(Unit* unit);
     /// Return distance to unit.
 extern int UnitReachable(Unit* unit,Unit* dst,int range);
 
+extern int PlaceReachable(Unit* src,int x,int y,int w,int h,int range);
+
 //
 //	in astar.c
 //

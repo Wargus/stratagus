@@ -74,7 +74,7 @@
 */
 global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];	/// Path matrix
 local unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
-local int PlaceReachable(Unit* src,int x,int y,int w,int h,int range);
+global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range);
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -380,7 +380,7 @@ local void FillMatrix(Unit* unit,unsigned int* matrix)
 **
 **	@return		Distance to place.
 */
-local int PlaceReachable(Unit* src,int x,int y,int w,int h,int range)
+global int PlaceReachable(Unit* src,int x,int y,int w,int h,int range)
 {
     int depth;
     static unsigned long LastGameCycle;

@@ -593,7 +593,7 @@ struct _unit_ {
     struct _order_resource_ {
 	int	Active;			/// how many units are harvesting from the resource.
     }		Resource;		/// Resource still
-    struct _order_resource_worker_ {
+    struct _order_resource_worker_ {	
 	int	TimeToHarvest;		/// how much time until we harvest some more.
 	unsigned DoneHarvesting:1;	/// Harvesting done, wait for action to break.
     }		ResWorker;		/// Worker harvesting
@@ -647,6 +647,11 @@ struct _unit_ {
 **	Returns unit number (unique to this unit)
 */
 #define UnitNumber(unit)	((unit)->Slot)
+
+/**
+**	Check if a unit is idle.
+*/
+#define UnitIdle(unit)		((unit->Orders[0].Action==UnitActionStill)&&(unit->OrderCount==1))
 
 /**
 **      Return the unit type movement mask.
