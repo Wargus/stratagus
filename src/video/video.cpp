@@ -1149,7 +1149,7 @@ local void InitSingleCommonPalette8( void )
 */
 global void VideoSetPalette(const VMemType* palette)
 {
-    DebugLevel3Fn("Palette %x used\n" _C_ (unsigned)palette);
+    DebugLevel2Fn("Palette %x used\n" _C_ (unsigned)palette);
 
     Pixels=(VMemType*)palette;
     SetPlayersPalette();
