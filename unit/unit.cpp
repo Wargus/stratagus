@@ -1548,14 +1548,12 @@ startn:
     }
 
 found:
-    if( unit->Wait!=1 ) {
-	unit->Wait=1;
-	DebugLevel2Fn("Check this\n");
-    }
-
-    // FIXME: Should I use PlaceUnit here?
     unit->X=x;
     unit->Y=y;
+
+    unit->Wait=1;		// should be correct unit has still action
+
+    // FIXME: Should I use PlaceUnit here?
     UnitCacheInsert(unit);
     // FIXME: This only works with 1x1 big units
     DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
@@ -1668,11 +1666,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    unit->X=bestx;
 	    unit->Y=besty;
 
-	    if( unit->Wait!=1 ) {
-		unit->Wait=1;
-		DebugLevel2Fn("Check this\n");
-	    }
-
+	    unit->Wait=1;		// unit should have action still
 	    // FIXME: Should I use PlaceUnit here?
 
 	    // FIXME: This only works with 1x1 big units
@@ -3178,8 +3172,16 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	case UnitActionStill:
 	    break;
 	case UnitActionBuilded:
-	    DebugLevel0Fn("FIXME: not written\n");
-	    fprintf(file,"\n  'data-builded 'FIXME");
+	    fprintf(file,"\n  'data-builded '(worker %s",
+		    ref=UnitReference(unit->Data.Builded.Worker));
+	    free(ref);
+	    fprintf(file," sum %d add %d val %d sub %d",
+		    unit->Data.Builded.Sum,unit->Data.Builded.Add,
+		    unit->Data.Builded.Val,unit->Data.Builded.Sub);
+	    if( unit->Data.Builded.Cancel ) {
+		fprintf(file,"cancel");
+	    }
+	    fprintf(file,")");
 	    break;
 	case UnitActionResearch:
 	    DebugLevel0Fn("FIXME: not written\n");
