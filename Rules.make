@@ -166,7 +166,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #------------------------------------------------------------------------------
  
 # Uncomment next to profile
-PROFILE=	-pg
+#PROFILE=	-pg
 
 # Version
 VERSION=	'-DVERSION="1.17pre1-build7"'
@@ -204,7 +204,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
 DEBUG=	-DDEBUG #-DNEW_AI # -DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DNEW_NETWORK -DUNIT_ON_MAP # -DNEW_NAMES
+	$(DEBUG) -DUNIT_ON_MAP # -DNEW_NAMES
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
@@ -215,7 +215,7 @@ CFLAGS=-g -O3 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-g -O6 -pipe -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
 #-- Production
 #CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
-#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
+CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
 
 CC=gcc
 RM=rm -f

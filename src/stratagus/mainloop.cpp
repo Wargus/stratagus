@@ -538,9 +538,6 @@ global void GameMainLoop(void)
 
 	WaitEventsAndKeepSync();
 
-#ifndef NEW_NETWORK
-	NetworkSync();			// FIXME: wrong position
-#endif
 	VideoInterrupts=0;
     }
 }

@@ -462,15 +462,12 @@ local void DoEvent(SDL_Event* event)
 */
 global void WaitEventsAndKeepSync(void)
 {
-#if !defined( USE_WIN32 ) || defined ( NEW_NETWORK )
     struct timeval tv;
     fd_set rfds;
     fd_set wfds;
     int maxfd;
     int i;
-#endif
-#ifndef USE_SDLA
-#endif
+
     SDL_Event event[1];
 
     for(;;) {
@@ -480,7 +477,7 @@ global void WaitEventsAndKeepSync(void)
 	    // Handle SDL event
 	    DoEvent(event);
 	}
-#if !defined( USE_WIN32 ) || defined ( NEW_NETWORK )
+
 	//
 	//	Prepare select
 	//
@@ -518,12 +515,6 @@ global void WaitEventsAndKeepSync(void)
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(i=SDL_PollEvent(event)) ? &tv : NULL);
 
-#if 0
-	if( NetworkFildes!=-1 ) {
-	    DebugLevel0("%d net %d\n",maxfd,FD_ISSET(NetworkFildes,&rfds));
-	}
-#endif
-
 	if ( i ) {
 	    // Handle SDL event
 	    DoEvent(event);
@@ -554,7 +545,6 @@ global void WaitEventsAndKeepSync(void)
 		NetworkEvent();
 	    }
 	}
-#endif
 
 	//
 	//	Network in sync and time for frame over: return
