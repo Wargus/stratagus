@@ -79,14 +79,14 @@ etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
 clone:	src etlib/hash.o src/libclone.a 
-	$(CC) -o clone src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
+	$(CC) -o clone src/libclone.a  -lefence $(CLONELIBS)  -lefence -I. $(CFLAGS)
 
 # WIN32-TARGET
 clone.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o src/libclone.a 
 	$(CC) -o clone$(EXE) main.c src/libclone.a -lSDLmain $(CLONELIBS) -I. \
 	$(CFLAGS)
 
-# -L. -lefence 
+# -L.
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl 
 
 tools::
@@ -137,7 +137,7 @@ PICS    = contrib/ale-title.png
 
 CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
-	  data/ccl/ui.ccl data/ccl/fonts.ccl \
+	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/anim.ccl data/ccl/upgrade.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
