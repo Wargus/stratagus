@@ -407,7 +407,9 @@ local void UiEnterPreferencesOptionsMenu(void)
     GamePaused=0;
 }
 
-//	Enter Save Game Menu
+/**
+**	Enter Save Game Menu
+*/
 local void UiEnterSaveGameMenu(void)
 {
     GamePaused=1;
@@ -420,7 +422,9 @@ local void UiEnterSaveGameMenu(void)
     GamePaused=0;
 }
 
-//	Enter Load Game Menu
+/**
+**	Enter Load Game Menu
+*/
 local void UiEnterLoadGameMenu(void)
 {
     GamePaused=1;
@@ -1085,10 +1089,11 @@ local int InputKey(int key)
 local void Screenshot(void)
 {
     CLFile *fd;
-    char filename[1024];
+    char filename[30];
     int i;
 
     for( i=1; i<99; ++i ) {
+	// FIXME: what if we can't write to this directory?
 	sprintf(filename, "screen%02d.png", i);
 	if( !(fd = CLopen(filename)) ) {
 	    break;
@@ -1384,9 +1389,9 @@ local enum {
     ClickedMouseState,			/// button is clicked
 }	MouseState;			/// Current state of mouse
 
-local int LastMouseButton;		/// last mouse button handled
-local int StartMouseTicks;		/// Ticks of first click
-local int LastMouseTicks;		/// Ticks of last mouse event
+local unsigned LastMouseButton;		/// last mouse button handled
+local unsigned StartMouseTicks;		/// Ticks of first click
+local unsigned LastMouseTicks;		/// Ticks of last mouse event
 
 /**
 **	Called if any mouse button is pressed down
@@ -1528,7 +1533,7 @@ global int HoldKeyAdditionalDelay=50;	/// Time to detect additional hold key
 
 local unsigned LastIKey;		/// last key handled
 local unsigned LastIKeyChar;		/// last keychar handled
-local int LastKeyTicks;			/// Ticks of last key
+local unsigned LastKeyTicks;		/// Ticks of last key
 
 /**
 **	Handle keyboard key press.
