@@ -179,6 +179,8 @@ global void CreateMinimap(void)
     //
     //	Calculate minimap fast lookup tables.
     //
+    // FIXME: this needs to be recalculated during map load - the map size
+    // might have changed!
     for( n=MinimapX; n<MINIMAP_W-MinimapX; ++n ) {
 	Minimap2MapX[n]=((n-MinimapX)*MINIMAP_FAC)/MinimapScale;
     }
@@ -399,6 +401,11 @@ global void DrawMinimapCursor(int vx,int vy)
     int w;
     int h;
     int i;
+#ifdef SPLIT_SCREEN_SUPPORT
+    int v = TheUI.LastClickedVP;
+    unsigned MapWidth = TheUI.VP[v].MapWidth;
+    unsigned MapHeight = TheUI.VP[v].MapHeight;
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     // Determine and save region below minimap cursor
     OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
