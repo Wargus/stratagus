@@ -419,7 +419,7 @@ global void (*VideoFillTransRectangle)(SysColors color,int x,int y
 **
 **	@param bits	bits to display
 */
-static void DebugBits( unsigned long bits )
+local void DebugBits( unsigned long bits )
 {
   unsigned long i;
 
@@ -442,7 +442,7 @@ static void DebugBits( unsigned long bits )
 **	@param g	Color Green-value.
 **	@param b	Color Blue-value.
 */
-static unsigned char RGBtoBrightness( unsigned char r,
+local unsigned char RGBtoBrightness( unsigned char r,
                                       unsigned char g,
                                       unsigned char b )
 {
@@ -463,7 +463,7 @@ static unsigned char RGBtoBrightness( unsigned char r,
 **	@param g	Color Green-value.
 **	@param b	Color Blue-value.
 */
-static void ScaleRGB( unsigned char alpha,
+local void ScaleRGB( unsigned char alpha,
                                unsigned char *r,
                                unsigned char *g,
                                unsigned char *b )
@@ -491,7 +491,7 @@ static void ScaleRGB( unsigned char alpha,
 **	@param g	Color Green-value in 0..15
 **	@param b	Color Blue-value  in 0..15
 */
-static unsigned char rgb2intensity( unsigned char r,
+local unsigned char rgb2intensity( unsigned char r,
                                     unsigned char g,
                                     unsigned char b )
 {
@@ -508,7 +508,7 @@ static unsigned char rgb2intensity( unsigned char r,
 **
 **	|IIRR|GGBB| --> |0000|0000|RRRR|0000|00GG|GG00|0000|BBBB|
 */
-static unsigned long irgb2rgb( unsigned char irgb )
+local unsigned long irgb2rgb( unsigned char irgb )
 {
   unsigned long f;
 
@@ -524,7 +524,7 @@ static unsigned long irgb2rgb( unsigned char irgb )
 **
 **	|0000|0000|RRRR|0000|00GG|GG00|0000|BBBB| --> |IIRR|GGBB|
 */
-static unsigned char rgb2irgb( unsigned long rgb )
+local unsigned char rgb2irgb( unsigned long rgb )
 {
   unsigned char i, r, g, b;
 
