@@ -60,12 +60,18 @@ extern int NoWarningUnitType;               /// quiet ident lookup.
 
 global _AnimationsHash AnimationsHash;      /// Animations hash table
 
-global char** BoolFlagName;                 /// Name of user defined flag
-global int NumberBoolFlag;                  /// Number of defined flags.
+global struct _UnitTypeVar_ UnitTypeVar;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void DefineVariableField(lua_State *l, int var_index, int lua_index);
+
+DrawDecoFunc DrawBar;
+DrawDecoFunc PrintValue;
+DrawDecoFunc DrawSpriteBar;
+DrawDecoFunc DrawStaticSprite;
 
 /**
 **  Get the resource ID from a SCM object.
@@ -126,8 +132,11 @@ local int CclDefineUnitType(lua_State* l)
 		redefine = 1;
 	} else {
 		type = NewUnitTypeSlot(str);
-		type->BoolFlag = calloc(NumberBoolFlag, sizeof(*type->BoolFlag));
-		type->CanTargetFlag = calloc(NumberBoolFlag, sizeof(*type->CanTargetFlag));
+		type->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
+		type->CanTargetFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
+		type->Variable = calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
+		memcpy(type->Variable, UnitTypeVar.Variable,
+			UnitTypeVar.NumberVariable * sizeof(*type->Variable));
 		redefine = 0;
 	}
 
@@ -670,8 +679,8 @@ local int CclDefineUnitType(lua_State* l)
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
-				for (i = 0; i < NumberBoolFlag; ++i) {
-					if (!strcmp(value, BoolFlagName[i])) {
+				for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+					if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
 						lua_rawgeti(l, -1, k + 1);
 						value = LuaToString(l, -1);
 						lua_pop(l, 1);
@@ -679,7 +688,7 @@ local int CclDefineUnitType(lua_State* l)
 						break;
 					}
 				}
-				if (i != NumberBoolFlag) {
+				if (i != UnitTypeVar.NumberBoolFlag) {
 					continue;
 				}
 				printf("\n%s\n", type->Name);
@@ -776,13 +785,30 @@ local int CclDefineUnitType(lua_State* l)
 				}
 			}
 		} else {
-			for (i = 0; i < NumberBoolFlag; ++i) { // User defined bool flags
-				if (!strcmp(value, BoolFlagName[i])) {
+			i = GetVariableIndex(value);
+			if (i != -1) { // valid index
+				if (lua_isboolean(l, -1)) {
+					type->Variable[i].Enable = LuaToBoolean(l, -1);
+				} else if (lua_istable(l, -1)) {
+					DefineVariableField(l, i, -1);
+				} else if (lua_isnumber(l, -1)) {
+					type->Variable[i].Enable = 1;
+					type->Variable[i].Value = LuaToNumber(l, -1);
+					type->Variable[i].Max = LuaToNumber(l, -1);
+				} else { // Error
+					lua_pushstring(l, "incorrect argument for the variable in unittype");
+					lua_error(l);
+				}
+				lua_pop(l, 1);
+				continue;
+			}
+			for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) { // User defined bool flags
+				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
 					type->BoolFlag[i] = LuaToBoolean(l, -1);
 					break;
 				}
 			}
-			if (i == NumberBoolFlag) {
+			if (i == UnitTypeVar.NumberBoolFlag) {
 				printf("\n%s\n",type->Name);
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
@@ -1188,6 +1214,102 @@ local int CclDefineAnimations(lua_State* l)
 }
 
 /**
+**    Define the field of the UserDefined variables
+**
+**    @param l lua_state.
+**    @param var_index index of variable to set.
+**    @param var_index index of the table where are the infos
+**
+**    @internal Use to not duplicate code.
+*/
+global void DefineVariableField(lua_State *l, int var_index, int lua_index)
+{
+	if (lua_index < 0) { // relative index
+		lua_index--;
+	}
+	lua_pushnil(l);
+	while(lua_next(l, lua_index)) {
+		const char *key;
+
+		key = LuaToString(l, -2);
+		if (!strcmp(key, "Value")) {
+			UnitTypeVar.Variable[var_index].Value = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Max")) {
+			UnitTypeVar.Variable[var_index].Max = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Increase")) {
+			UnitTypeVar.Variable[var_index].Increase = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Enable")) {
+			UnitTypeVar.Variable[var_index].Enable = LuaToBoolean(l, -1);
+		} else { // Error.
+				lua_pushfstring(l, "incorrect field '%s' for the variable '%s'",
+					key, UnitTypeVar.VariableName[var_index]);
+				lua_error(l);
+		}
+		lua_pop(l, 1); // pop the value;
+	}
+}
+
+/**
+**    return the index of the variable named VarName.
+**
+**    @param VarName name of the variable
+**
+**    @return index of the variable.
+*/
+global int GetVariableIndex(const char *VarName)
+{
+	int i;
+
+	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+		if (!strcmp(VarName, UnitTypeVar.VariableName[i])) {
+			return i;
+		}
+	}
+	DebugPrint("Unknow variable \"%s\", use DefineVariables() before." _C_ VarName);
+	return -1;
+}
+
+/**
+**    Define user variables.
+**
+**    @param l : 
+**    @return 0.
+*/
+local int CclDefineVariables(lua_State* l)
+{
+	const char *str;
+	int i;
+	int args;
+	int j;
+
+	args = lua_gettop(l);
+	for (j = 0; j < args; ++j) {
+		str = LuaToString(l, j + 1);
+		for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+			if (!strcmp(str, UnitTypeVar.VariableName[i])) {
+				DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
+				break;
+			}
+		}
+		if (i == UnitTypeVar.NumberVariable) { // new variable.
+			UnitTypeVar.VariableName = realloc(UnitTypeVar.VariableName,
+				(i + 1) * sizeof(*UnitTypeVar.VariableName));
+			UnitTypeVar.VariableName[i] = strdup(str);
+			UnitTypeVar.Variable = realloc(UnitTypeVar.Variable,
+				(i + 1) * sizeof(*UnitTypeVar.Variable));
+			memset(UnitTypeVar.Variable + i, 0, sizeof (*UnitTypeVar.Variable));
+			UnitTypeVar.NumberVariable++;
+		}
+		if (!lua_istable(l, j + 2)) { // No change => default value.
+			continue;
+		}
+		j++;
+		DefineVariableField(l, i, j + 1);
+	}
+	return 0;
+}
+
+/**
 **  Define boolean flag.
 **
 **  @param l  Lua state.
@@ -1200,39 +1322,204 @@ local int CclDefineBoolFlags(lua_State* l)
 	int j;
 	int old;
 
-	old = NumberBoolFlag;
+	old = UnitTypeVar.NumberBoolFlag;
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
-		for (i = 0; i < NumberBoolFlag; ++i) {
-			if (!strcmp(str, BoolFlagName[i])) {
+		for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+			if (!strcmp(str, UnitTypeVar.BoolFlagName[i])) {
 				DebugPrint("Warning, Bool flags already defined\n");
 				break;
 			}
 		}
-		if (i != NumberBoolFlag) {
-			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ BoolFlagName[i]);
+		if (i != UnitTypeVar.NumberBoolFlag) {
+			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
 			continue;
 		}
-		BoolFlagName = realloc(BoolFlagName, (NumberBoolFlag + 1) * sizeof(*BoolFlagName));
-		BoolFlagName[NumberBoolFlag++] = strdup(str);
+		UnitTypeVar.BoolFlagName = realloc(UnitTypeVar.BoolFlagName,
+			(UnitTypeVar.NumberBoolFlag + 1) * sizeof(*UnitTypeVar.BoolFlagName));
+		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
 	}
-	if (0 < old && old != NumberBoolFlag) {
+	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
 		for (i = 0; i < NumUnitTypes; i++) { // adjust array for unit already defined
 			UnitTypes[i]->BoolFlag = realloc(UnitTypes[i]->BoolFlag,
-				NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
+				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
 			UnitTypes[i]->CanTargetFlag = realloc(UnitTypes[i]->CanTargetFlag,
-				NumberBoolFlag * sizeof((*UnitTypes)->CanTargetFlag));
+				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->CanTargetFlag));
 			memset(UnitTypes[i]->BoolFlag + old, 0,
-				(NumberBoolFlag - old) * sizeof((*UnitTypes)->BoolFlag));
+				(UnitTypeVar.NumberBoolFlag - old) * sizeof((*UnitTypes)->BoolFlag));
 			memset(UnitTypes[i]->CanTargetFlag + old, 0,
-				(NumberBoolFlag - old) * sizeof((*UnitTypes)->CanTargetFlag));
+				(UnitTypeVar.NumberBoolFlag - old) * sizeof((*UnitTypes)->CanTargetFlag));
 		}
 	}
 	return 0;
 }
 
+/**
+**    Define Decorations for user variables
+**
+**    @param list : lua_state.
+**    @return 0;
+**    @todo modify Assert with luastate with User Error.
+**    @todo continue to add configuration.
+*/
+local int CclDefineDecorations(lua_State* l)
+{
+	int i;
+	int nargs;
+	int j;
+	const char *key;
+	DecoVarType DecoVar;
+
+	nargs = lua_gettop(l);
+	for (i = 0; i < nargs; i++) {
+		Assert(lua_istable(l, i + 1));
+		memset(&DecoVar, 0, sizeof(DecoVar));
+		lua_pushnil(l);
+		while (lua_next(l, i + 1)) {
+			key = LuaToString(l, -2);
+			if (!strcmp(key, "Index")) {
+				DecoVar.Index = GetVariableIndex(LuaToString(l, -1));
+			} else if (!strcmp(key, "Offset")) {
+				Assert(lua_istable(l, -1));
+				lua_rawgeti(l, -1, 1); // X
+				lua_rawgeti(l, -2, 2); // Y
+				DecoVar.OffsetX = LuaToNumber(l, -2);
+				DecoVar.OffsetY = LuaToNumber(l, -1);
+				lua_pop(l, 2); // Pop X and Y
+			} else if (!strcmp(key, "OffsetPercent")) {
+				Assert(lua_istable(l, -1));
+				lua_rawgeti(l, -1, 1); // X
+				lua_rawgeti(l, -2, 2); // Y
+				DecoVar.OffsetXPercent = LuaToNumber(l, -2);
+				DecoVar.OffsetYPercent = LuaToNumber(l, -1);
+				lua_pop(l, 2); // Pop X and Y
+			} else if (!strcmp(key, "CenterX")) {
+				DecoVar.IsCenteredInX = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "CenterY")) {
+				DecoVar.IsCenteredInY = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowIfNotEnable")) {
+				DecoVar.ShowIfNotEnable = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowWhenNull")) {
+				DecoVar.ShowWhenNull = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "HideHalf")) {
+				DecoVar.HideHalf = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowWhenMax")) {
+				DecoVar.ShowWhenMax = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowOnlySelected")) {
+				DecoVar.ShowOnlySelected = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "HideNeutral")) {
+				DecoVar.HideNeutral = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "HideAllied")) {
+				DecoVar.HideAllied = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "ShowOpponent")) {
+				DecoVar.ShowOpponent = LuaToBoolean(l, -1);
+			} else if (!strcmp(key, "Method")) {
+				Assert(lua_istable(l, -1));
+				lua_rawgeti(l, -1, 1); // MethodName
+				lua_rawgeti(l, -2, 2); // Data
+				Assert(lua_istable(l, -1));
+				key = LuaToString(l, -2);
+				if (!strcmp(key, "bar")) {
+					DecoVar.f = DrawBar;
+					lua_pushnil(l);
+					while (lua_next(l, -2)) {
+						key = LuaToString(l, -2);
+						if (!strcmp(key, "Height")) {
+							DecoVar.Data.Bar.Height = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Width")) {
+							DecoVar.Data.Bar.Width = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Orientation")) {
+							key = LuaToString(l, -1);;
+							if (!strcmp(key, "horizontal")) {
+								DecoVar.Data.Bar.IsVertical = 0;
+							} else if (!strcmp(key, "vertical")) {
+								DecoVar.Data.Bar.IsVertical = 1;
+							} else { // Error
+								lua_pushfstring(l, "invalid Orientation '%s' for bar in DefineDecorations", key);
+								lua_error(l);
+							}
+						} else if (!strcmp(key, "SEToNW")) {
+							DecoVar.Data.Bar.SEToNW = LuaToBoolean(l, -1);
+						} else if (!strcmp(key, "BorderSize")) {
+							DecoVar.Data.Bar.BorderSize = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "ShowFullBackground")) {
+							DecoVar.Data.Bar.ShowFullBackground = LuaToBoolean(l, -1);
+#if 0	// FIXME Color configuration
+						} else if (!strcmp(key, "Color")) {
+							DecoVar.Data.Bar.Color = // FIXME
+						} else if (!strcmp(key, "BColor")) {
+							DecoVar.Data.Bar.BColor = // FIXME
+#endif
+						} else {
+							lua_pushfstring(l, "'%s' invalid for Method bar", key);
+							lua_error(l);
+						}
+						lua_pop(l, 1); // Pop value
+					}
+
+				} else if (!strcmp(key, "text")) {
+					DecoVar.f = PrintValue;
+// FIXME : More arguments ? Font, color...
+				} else if (!strcmp(key, "sprite")) {
+					DecoVar.f = DrawSpriteBar;
+					lua_rawgeti(l, -1, 1);
+					DecoVar.Data.SpriteBar.NSprite = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+// FIXME : More arguments ?
+				} else if (!strcmp(key, "static-sprite")) {
+					DecoVar.f = DrawStaticSprite;
+					lua_rawgeti(l, -1, 1);
+					DecoVar.Data.StaticSprite.n = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+				} else { // Error
+					lua_pushfstring(l, "invalid method '%s' for Method in DefineDecorations", key);
+					lua_error(l);
+				}
+				lua_pop(l, 2); // MethodName and data
+			} else { // Error
+				lua_pushfstring(l, "invalid key '%s' for DefineDecorations", key);
+				lua_error(l);
+			}
+			lua_pop(l, 1); // Pop the value
+		}
+		for (j = 0; j < UnitTypeVar.NumberDeco; j++) {
+			if (DecoVar.Index == UnitTypeVar.DecoVar[j].Index) {
+				break;
+			}
+		}
+		if (j == UnitTypeVar.NumberDeco) {
+			UnitTypeVar.NumberDeco++;
+			UnitTypeVar.DecoVar = realloc(UnitTypeVar.DecoVar,
+				UnitTypeVar.NumberDeco * sizeof (*UnitTypeVar.DecoVar));
+		}
+		UnitTypeVar.DecoVar[j] = DecoVar;
+	}
+	Assert(lua_gettop(l));
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
+
+
+/**
+**  Define already variables, usefull for drawing now.
+*/
+global void InitDefinedVariables()
+{
+#define NVARALREADYDEFINED 7
+	const char	*var[NVARALREADYDEFINED] = {"HitPoints", "Mana", "Transport",
+		"Research", "Training", "UpgradeTo", "Ressource"};
+	int i;
+
+	UnitTypeVar.VariableName = calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
+	for (i = 0; i < NVARALREADYDEFINED; i++) {
+		UnitTypeVar.VariableName[i] = strdup(var[i]);
+	}
+	UnitTypeVar.Variable = calloc(i, sizeof(*UnitTypeVar.Variable));
+	UnitTypeVar.NumberVariable = i;
+#undef NVARALREADYDEFINED
+}
 
 /**
 **  Register CCL features for unit-type.
@@ -1242,6 +1529,10 @@ global void UnitTypeCclRegister(void)
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
 	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
 	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
+	lua_register(Lua, "DefineVariables", CclDefineVariables);
+	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
+
+	InitDefinedVariables();
 
 	lua_register(Lua, "UnitType", CclUnitType);
 	lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
