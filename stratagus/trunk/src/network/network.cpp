@@ -409,7 +409,7 @@ global void InitNetwork1(void)
 	port = NetworkPort;
 	for (i = 0; i < 10; ++i) {
 		NetworkFildes = NetOpenUDP(port + i);
-		if (NetworkFildes != (Socket)-1) {
+		if (IsNetworkGame()) {
 			break;
 		}
 		if (i == 9) {
@@ -998,7 +998,7 @@ global void NetworkChatMessage(const char* msg)
 	const char* cp;
 	int n;
 
-	if (NetworkFildes != (Socket)-1) {
+	if (IsNetworkGame()) {
 		cp = msg;
 		n = strlen(msg);
 		while (n >= (int)sizeof(ncm->Text)) {
@@ -1251,7 +1251,7 @@ local void NetworkSyncCommands(void)
 */
 global void NetworkCommands(void)
 {
-	if (NetworkFildes != (Socket)-1) {
+	if (IsNetworkGame()) {
 		//
 		//		Send messages to all clients (other players)
 		//

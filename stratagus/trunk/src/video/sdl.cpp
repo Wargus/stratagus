@@ -663,7 +663,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		//
 		//		Network
 		//
-		if (NetworkFildes != (Socket)-1) {
+		if (IsNetworkGame()) {
 			if (NetworkFildes > maxfd) {
 				maxfd = NetworkFildes;
 			}
@@ -715,7 +715,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 			//
 			//		Network
 			//
-			if (NetworkFildes != (Socket)-1 && FD_ISSET(NetworkFildes, &rfds) ) {
+			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds) ) {
 				callbacks->NetworkEvent();
 			}
 		}

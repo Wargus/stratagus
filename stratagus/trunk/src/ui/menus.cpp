@@ -1557,14 +1557,14 @@ global void LoadGameMenu(void)
 local void GameMenuInit(Menuitem *mi __attribute__((unused)))
 {
 	// Disable save menu in multiplayer and replays
-	if (NetworkFildes != (Socket)-1 || ReplayGameType != ReplayNone) {
+	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
 		mi->menu->Items[1].flags |= MenuButtonDisabled;
 	} else {
 		mi->menu->Items[1].flags &= ~MenuButtonDisabled;
 	}
 
 	// Disable load menu in multiplayer
-	if (NetworkFildes != (Socket)-1) {
+	if (IsNetworkGame()) {
 		mi->menu->Items[2].flags |= MenuButtonDisabled;
 	} else {
 		mi->menu->Items[2].flags &= ~MenuButtonDisabled;

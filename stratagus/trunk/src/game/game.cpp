@@ -342,7 +342,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	SyncHash = 0;
 	InitSyncRand();
 
-	if (NetworkFildes != (Socket)-1) { // Prepare network play
+	if (IsNetworkGame()) { // Prepare network play
 		DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
