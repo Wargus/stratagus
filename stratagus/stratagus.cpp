@@ -1089,9 +1089,11 @@ global void MenuLoop(char* filename, WorldMap* map)
 		StopMusic();
 	    }
 	    PlaySectionMusic(PlaySectionMainMenu);
+#ifdef WITH_SOUND
 	    if (!PlayingMusic && MenuMusic) {
 		PlayMusic(MenuMusic);
 	    }
+#endif
 
 	    EnableRedraw = RedrawMenu;
 
