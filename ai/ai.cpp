@@ -197,13 +197,13 @@ local void debugForces(void)
     DebugLevel2Fn(" AI MEMORY (%d)\n" _C_ AiPlayer->EvaluationCount);
     aiaction = AiPlayer->FirstEvaluation;
     while (aiaction) {
-	str = gh_scm2newstr(gh_car(gh_car(aiaction->aiScriptAction->Action)),NULL);
+	str = gh_scm2newstr(gh_car(gh_car(aiaction->AiScriptAction->Action)),NULL);
 	DebugLevel2(" %8d: (%3d,%3d) => points:%9d, needs: %9d ( %s )\n" _C_
-	    aiaction->gamecycle _C_
-	    aiaction->hotSpotX _C_
-	    aiaction->hotSpotY _C_
-	    aiaction->hotSpotValue _C_
-	    aiaction->value _C_
+	    aiaction->GameCycle _C_
+	    aiaction->HotSpotX _C_
+	    aiaction->HotSpotY _C_
+	    aiaction->HotSpotValue _C_
+	    aiaction->Value _C_
 	    str);
 	free(str);
 	aiaction = aiaction->Next;
@@ -263,7 +263,7 @@ local void AiExecuteScripts(void)
 	AiScript = pai->Scripts + i;
 	if (!gh_null_p(AiScript->Script)) {
 	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
-		pai->Player->Player _C_ i _C_ AiScript->ident _C_
+		pai->Player->Player _C_ i _C_ AiScript->Ident _C_
 		AiScript->HotSpotX _C_ AiScript->HotSpotY);
 	    gh_display(AiScript->Script);
 	    gh_newline();*/
@@ -273,8 +273,8 @@ local void AiExecuteScripts(void)
 		CclGcProtectedAssign(&AiScript->Script, gh_cdr(AiScript->Script));
 	    }
 
-	    if (gh_null_p(AiScript->Script) && AiScript->ownForce) {
-		AiEraseForce(AiScript->ownForce);
+	    if (gh_null_p(AiScript->Script) && AiScript->OwnForce) {
+		AiEraseForce(AiScript->OwnForce);
 	    }
 	}
     }
@@ -293,7 +293,7 @@ local void AiExecuteScripts(void)
 	AiScript = pai->Scripts + i;
 	if (AiScript->Script) {
 	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
-		pai->Player->Player _C_ i _C_ AiScript->ident _C_
+		pai->Player->Player _C_ i _C_ AiScript->Ident _C_
 		AiScript->HotSpotX _C_ AiScript->HotSpotY);
 	    gh_display(AiScript->Script);
 	    gh_newline();*/
@@ -304,8 +304,8 @@ local void AiExecuteScripts(void)
 	    lua_rawget(Lua, 1);
 	    LuaCall(0, 1);
 
-	    if (/*gh_null_p(AiScript->Script)*/0 && AiScript->ownForce) {
-		AiEraseForce(AiScript->ownForce);
+	    if (/*gh_null_p(AiScript->Script)*/0 && AiScript->OwnForce) {
+		AiEraseForce(AiScript->OwnForce);
 	    }
 	}
     }
@@ -851,11 +851,11 @@ global void AiInit(Player* player)
     ait = AiTypes;
 
     for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-	pai->Scripts[i].ownForce = AI_GENERIC_FORCES + i;
+	pai->Scripts[i].OwnForce = AI_GENERIC_FORCES + i;
 	pai->Scripts[i].HotSpotX = -1;
 	pai->Scripts[i].HotSpotY = -1;
 	pai->Scripts[i].HotSpotRay = -1;
-	pai->Scripts[i].gauges = 0;
+	pai->Scripts[i].Gauges = 0;
 	pai->Scripts[i].SleepCycles = 0;
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	pai->Scripts[i].Script = NIL;
@@ -863,7 +863,7 @@ global void AiInit(Player* player)
 #elif defined(USE_LUA)
 	pai->Scripts[i].Script = NULL;
 #endif
-	snprintf(pai->Scripts[i].ident, 10, "Empty");
+	snprintf(pai->Scripts[i].Ident, 10, "Empty");
     }
 
     // Set autoattack to 1 as default
@@ -988,8 +988,8 @@ global void CleanAi(void)
 	    }
 
 	    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-		if (pai->Scripts[i].gauges) {
-		    free(pai->Scripts[i].gauges);
+		if (pai->Scripts[i].Gauges) {
+		    free(pai->Scripts[i].Gauges);
 		}
 #if defined(USE_GUILE) || defined(USE_SIOD)
 		CclGcUnprotect(&pai->Scripts[i].Script);

@@ -71,12 +71,12 @@ static IOStructDef AiActionEvaluationStructDef = {
 	-1,
 	{
 		{"`next", NULL, &((AiActionEvaluation*)0)->Next, NULL},
-		{"ai-script-action", &IOAiScriptActionPtr, &((AiActionEvaluation*)0)->aiScriptAction, NULL},
-		{"gamecycle", &IOInt, &((AiActionEvaluation*)0)->gamecycle, NULL},
-		{"hotspot-x", &IOInt, &((AiActionEvaluation*)0)->hotSpotX, NULL},
-		{"hotspot-y", &IOInt, &((AiActionEvaluation*)0)->hotSpotY, NULL},
-		{"hotspot-value", &IOInt, &((AiActionEvaluation*)0)->hotSpotValue, NULL},
-		{"value", &IOInt, &((AiActionEvaluation*)0)->value, NULL},
+		{"ai-script-action", &IOAiScriptActionPtr, &((AiActionEvaluation*)0)->AiScriptAction, NULL},
+		{"gamecycle", &IOInt, &((AiActionEvaluation*)0)->GameCycle, NULL},
+		{"hotspot-x", &IOInt, &((AiActionEvaluation*)0)->HotSpotX, NULL},
+		{"hotspot-y", &IOInt, &((AiActionEvaluation*)0)->HotSpotY, NULL},
+		{"hotspot-value", &IOInt, &((AiActionEvaluation*)0)->HotSpotValue, NULL},
+		{"value", &IOInt, &((AiActionEvaluation*)0)->Value, NULL},
 		{0, 0, 0, 0}
 	}
 };
@@ -102,12 +102,12 @@ static IOStructDef AiRunningScriptStructDef = {
 	{
 		{"script", &IOCcl, &((AiRunningScript*)0)->Script, NULL},
 		{"sleep-cycles", &IOInt, &((AiRunningScript*)0)->SleepCycles, NULL},
-		{"ident", &IOStrBuffer, &((AiRunningScript*)0)->ident, (void*) 10},
+		{"ident", &IOStrBuffer, &((AiRunningScript*)0)->Ident, (void*) 10},
 		{"hotspot-x", &IOInt, &((AiRunningScript*)0)->HotSpotX, NULL},
 		{"hotspot-y", &IOInt, &((AiRunningScript*)0)->HotSpotY, NULL},
 		{"hotspot-ray", &IOInt, &((AiRunningScript*)0)->HotSpotRay, NULL},
-		{"own-force", &IOInt, &((AiRunningScript*)0)->ownForce, NULL},
-		{"gauges", &IOIntArrayPtr, &((AiRunningScript*)0)->gauges, (void*) GAUGE_NB},
+		{"own-force", &IOInt, &((AiRunningScript*)0)->OwnForce, NULL},
+		{"gauges", &IOIntArrayPtr, &((AiRunningScript*)0)->Gauges, (void*) GAUGE_NB},
 		{0, 0, 0, 0}
 	}
 };
@@ -366,7 +366,7 @@ local void IOAiScriptActionPtr(SCM scmfrom, void* binaryform, void* para)
 	}
 }
 
-/*
+/**
 ** Handle loading an array of int for each ressource ( int[MAX_COSTS] )
 **
 **  @param scmfrom     FIXME: docu
@@ -435,7 +435,7 @@ global void IOPlayerAiFullPtr(SCM form, void* binaryform, void* para)
 		}
 	}
 }
-/*
+/**
 **  FIXME: docu
 **
 **  @param scmform     When loading, the scm data to load
@@ -453,7 +453,7 @@ global void IOAiTypeFullPtr(SCM form, void* binaryform, void* para)
 	}
 }
 
-/*
+/**
 **  FIXME: docu
 **
 **  @param scmform     When loading, the scm data to load
@@ -471,7 +471,7 @@ global void IOAiScriptActionFull(SCM form, void* binaryform, void* para)
 
 #ifdef INCOMPLETE_SIOD
 
-/*
+/**
 **  FIXME: docu
 **
 **  @param a  FIXME: docu
@@ -490,7 +490,7 @@ local SCM CclQuotient(SCM a, SCM b)
 	return gh_int2scm(va / vb);
 }
 
-/*
+/**
 **  FIXME: docu
 **
 **  @param x  FIXME: docu
@@ -745,7 +745,7 @@ local SCM CclDefineAiHelper(SCM list)
 	return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
-/*
+/**
 **  FIXME: docu
 **
 **  @param l  FIXME: docu
@@ -899,7 +899,7 @@ local int CclDefineAiHelper(lua_State* l)
 #endif
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-/*
+/**
 **  FIXME: docu
 **
 **  @param type        FIXME: docu
@@ -933,7 +933,7 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
 	return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
-/*
+/**
 **  FIXME: docu
 **
 **  @param l  FIXME: docu
@@ -956,10 +956,11 @@ local int CclDefineAiAction(lua_State* l)
 
 	memset(aiScriptAction, 0, sizeof(AiScriptAction));
 
-#if 0
-	aiScriptAction->Action = definition;
-	CclGcProtect(&aiScriptAction->Action);
-#endif
+	aiScriptAction->Action = malloc(20);
+	sprintf(aiScriptAction->Action, "_ai_action_%d_", AiScriptActionNum - 1);
+	lua_pushstring(l, aiScriptAction->Action);
+	lua_pushvalue(l, 2);
+	lua_settable(l, LUA_GLOBALSINDEX);
 
 	args = luaL_getn(l, 1);
 	for (j = 0; j < args; ++j) {
@@ -1683,7 +1684,7 @@ local int CclAiWait(lua_State* l)
 */
 local SCM CclAiOwnForce(void)
 {
-	return gh_int2scm(AiScript->ownForce);
+	return gh_int2scm(AiScript->OwnForce);
 }
 #elif defined(USE_LUA)
 /**
@@ -1699,7 +1700,7 @@ local int CclAiOwnForce(lua_State* l)
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	}
-	lua_pushnumber(l, AiScript->ownForce);
+	lua_pushnumber(l, AiScript->OwnForce);
 	return 1;
 }
 #endif
@@ -2372,7 +2373,7 @@ local SCM CclAiCanReachHotSpot(SCM way)
 	ZoneSetAddSet(&transportable, &sources);
 
 
-	aiunit = AiPlayer->Force[AiScript->ownForce].Units;
+	aiunit = AiPlayer->Force[AiScript->OwnForce].Units;
 
 	while (aiunit) {
 		switch(aiunit->Unit->Type->UnitType) {
@@ -2464,7 +2465,7 @@ local int CclAiCanReachHotSpot(lua_State* l)
 	ZoneSetAddSet(&transportable, &sources);
 
 
-	aiunit = AiPlayer->Force[AiScript->ownForce].Units;
+	aiunit = AiPlayer->Force[AiScript->OwnForce].Units;
 
 	while (aiunit) {
 		switch(aiunit->Unit->Type->UnitType) {
@@ -3045,7 +3046,7 @@ local SCM CclAiGetUnitTypeForce(SCM value)
 
 	unitType = CclGetUnitType(value);
 
-	return gh_int2scm(AiUnittypeForce(unitType));
+	return gh_int2scm(AiUnitTypeForce(unitType));
 }
 #elif defined(USE_LUA)
 local int CclAiGetUnitTypeForce(lua_State* l)
@@ -3058,7 +3059,7 @@ local int CclAiGetUnitTypeForce(lua_State* l)
 	}
 	unitType = CclGetUnitType(l);
 
-	lua_pushnumber(l, AiUnittypeForce(unitType));
+	lua_pushnumber(l, AiUnitTypeForce(unitType));
 	return 1;
 }
 #endif
@@ -3073,11 +3074,11 @@ local SCM CclAiRestart(void)
 
 	CclGcProtectedAssign(&AiPlayer->Scripts[0].Script, AiPlayer->AiType->Script);
 	AiPlayer->Scripts[0].SleepCycles = 0;
-	snprintf(AiPlayer->Scripts[0].ident, 10, "Main AI");
+	snprintf(AiPlayer->Scripts[0].Ident, 10, "Main AI");
 	for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 		CclGcProtectedAssign(&AiPlayer->Scripts[i].Script, NIL);
 		AiPlayer->Scripts[i].SleepCycles = 0;
-		snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
+		snprintf(AiPlayer->Scripts[i].Ident, 10, "Empty");
 	}
 	return SCM_BOOL_T;
 }
@@ -3098,7 +3099,7 @@ global void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int ho
 {
 	CclGcProtectedAssign(&AiPlayer->Scripts[script].Script, list);
 	AiPlayer->Scripts[script].SleepCycles = 0;
-	snprintf(AiPlayer->Scripts[script].ident, 10, "AiRunScript");
+	snprintf(AiPlayer->Scripts[script].Ident, 10, "AiRunScript");
 	AiPlayer->Scripts[script].HotSpotX = hotSpotX;
 	AiPlayer->Scripts[script].HotSpotY = hotSpotY;
 	AiPlayer->Scripts[script].HotSpotRay = hotSpotRay;
@@ -3128,7 +3129,7 @@ local SCM CclAiScript(SCM value)
 {
 	CclGcProtectedAssign(&AiPlayer->Scripts[0].Script, value);
 	AiPlayer->Scripts[0].SleepCycles = 0;
-	snprintf(AiPlayer->Scripts[0].ident, 10, "MainScript");
+	snprintf(AiPlayer->Scripts[0].Ident, 10, "MainScript");
 	return SCM_BOOL_T;
 }
 #elif defined(USE_LUA)

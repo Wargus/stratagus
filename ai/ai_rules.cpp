@@ -218,13 +218,13 @@ local const char* str_forces[FORCE_COUNT] = {
 ----------------------------------------------------------------------------*/
 
 /**
-**  Force Guagges value
+**  Force Gauges value
 **
-**  @param force     Force Number
+**  @param force     Force number
 **  @param location  FIXME: DOCU
 **  @param camp      FIXME: DOCU
 **
-**  @return          Guage Number
+**  @return          Gauge number
 */
 local int ForceGauge(int force, int location, int camp)
 {
@@ -234,7 +234,7 @@ local int ForceGauge(int force, int location, int camp)
 /**
 **  FIXME: docu
 **
-**  @param guage      FIXME: DOCU
+**  @param gauge      FIXME: DOCU
 **  @param buffer     FIXME: DOCU
 **  @param bufferSize FIXME: DOCU
 */
@@ -328,7 +328,7 @@ local int AiGetPlayerCamp(Player* p)
 **
 **  @return          FIXME: DOCU
 */
-global int AiUnittypeForce(UnitType* unitType)
+global int AiUnitTypeForce(UnitType* unitType)
 {
 	int influence;
 
@@ -378,7 +378,7 @@ local void AiDeclareUnitImpact(int x, int y, Unit* unit)
 
 	// Updates unit counts...
 #if 0
-	unittype_slot=unitType->Type;
+	unittype_slot = unitType->Type;
 #endif
 
 	onhotspot = AiCheckOnHotSpot(x, y);
@@ -455,7 +455,7 @@ global void AiDebugGauges(void)
 	int* values;
 	char buffer[256];
 
-	values = AiScript->gauges;
+	values = AiScript->Gauges;
 	if (!values) {
 		return;
 	}
@@ -518,11 +518,11 @@ global void AiComputeCurrentScriptGauges(void)
 	// debugGauge(GaugeValues);
 
 	// If necessary, allocate space for values
-	if (!AiScript->gauges) {
-		AiScript->gauges = (int*)malloc(sizeof(int) * BasicGaugeNb);
+	if (!AiScript->Gauges) {
+		AiScript->Gauges = (int*)malloc(sizeof(int) * BasicGaugeNb);
 	}
 	// Copy gauges
-	memcpy(AiScript->gauges, GaugeValues, sizeof(int) * BasicGaugeNb);
+	memcpy(AiScript->Gauges, GaugeValues, sizeof(int) * BasicGaugeNb);
 }
 
 /**
@@ -534,10 +534,10 @@ global void AiComputeCurrentScriptGauges(void)
 */
 global int AiGetGaugeValue(int gauge)
 {
-	if (!AiScript->gauges) {
+	if (!AiScript->Gauges) {
 		return 0;
 	}
-	return AiScript->gauges[gauge];
+	return AiScript->Gauges[gauge];
 }
 
 /**
@@ -861,7 +861,7 @@ local int AiFindBestScript(int defend, AiScriptAction** foundBestScriptAction)
 				bestValue = curValue;
 			}
 			// TODO : move to force 1 if attacking!!!!
-			AiEraseForce(AiScript->ownForce);
+			AiEraseForce(AiScript->OwnForce);
 		}
 	}
 
@@ -870,7 +870,6 @@ local int AiFindBestScript(int defend, AiScriptAction** foundBestScriptAction)
 }
 
 /**
-**
 **  Prepare a script execution, by filling fields & computing gauges
 **
 **  @param hotspotx    X position of the hotspot
@@ -900,13 +899,13 @@ local int AiPrepareScript(int hotspotx, int hotspoty, int hotspotray, int defend
 	AiScript->HotSpotY = hotspoty;
 
 	AiScript->HotSpotRay = hotspotray;
-	AiEraseForce(AiScript->ownForce);
-	AiPlayer->Force[AiScript->ownForce].Role =
+	AiEraseForce(AiScript->OwnForce);
+	AiPlayer->Force[AiScript->OwnForce].Role =
 		(defend ? AiForceRoleDefend : AiForceRoleAttack);
-	AiPlayer->Force[AiScript->ownForce].PopulateMode =
+	AiPlayer->Force[AiScript->OwnForce].PopulateMode =
 		(defend ? AiForcePopulateAny : AiForcePopulateFromAttack);
-	AiPlayer->Force[AiScript->ownForce].UnitsReusable = 0;
-	AiPlayer->Force[AiScript->ownForce].HelpMode = AiForceHelpForce;
+	AiPlayer->Force[AiScript->OwnForce].UnitsReusable = 0;
+	AiPlayer->Force[AiScript->OwnForce].HelpMode = AiForceHelpForce;
 
 	AiComputeCurrentScriptGauges();
 
@@ -933,9 +932,9 @@ local void AiStartScript(AiScriptAction* script, char* ident)
 	AiScript->SleepCycles = 0;
 
 	// Don't add anymore units to this force.
-	AiPlayer->Force[AiScript->ownForce].PopulateMode = AiForceDontPopulate;
+	AiPlayer->Force[AiScript->OwnForce].PopulateMode = AiForceDontPopulate;
 
-	snprintf(AiScript->ident, 10, "%s", ident);
+	snprintf(AiScript->Ident, 10, "%s", ident);
 #elif defined(USE_LUA)
 #endif
 }
@@ -961,8 +960,8 @@ global void AiFindDefendScript(int attackX, int attackY)
 
 	if (!bestScriptAction) {
 		// Nothing available, ouch !
-		AiUpdateForce(0, AiScript->ownForce);
-		AiEraseForce(AiScript->ownForce);
+		AiUpdateForce(0, AiScript->OwnForce);
+		AiEraseForce(AiScript->OwnForce);
 		DebugLevel3Fn("no correct defense action script available...\n");
 		return;
 	}
@@ -972,8 +971,8 @@ global void AiFindDefendScript(int attackX, int attackY)
 #elif defined(USE_LUA)
 #endif
 
-	leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
-	totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
+	leftCost = AiEvaluateForceCost(AiScript->OwnForce, 0);
+	totalCost = AiEvaluateForceCost(AiScript->OwnForce, 1);
 	if (leftCost <= (7 * totalCost) / 10) {
 			DebugLevel3Fn("launch defense script\n");
 			AiStartScript(bestScriptAction, "defend");
@@ -1013,8 +1012,8 @@ local Unit* RandomPlayerUnit(Player* player)
 		// Don't take unit near past evaluations
 		action = AiPlayer->FirstEvaluation;
 		while (action) {
-			if ((abs(action->hotSpotX - unit->X) < 8) &&
-					(abs(action->hotSpotY - unit->Y) < 8)) {
+			if ((abs(action->HotSpotX - unit->X) < 8) &&
+					(abs(action->HotSpotY - unit->Y) < 8)) {
 					unit = NoUnitP;
 				break;
 			}
@@ -1092,7 +1091,7 @@ local void AiRemoveFirstAiPlayerEvaluation(void)
 */
 local void AiCleanAiPlayerEvaluations(void)
 {
-	int memorylimit;
+	unsigned long memorylimit;
 
 	// Don't keep more than AI_MEMORY_SIZE ( remove old ones )
 	while (AiPlayer->EvaluationCount >= AI_MEMORY_SIZE) {
@@ -1103,7 +1102,7 @@ local void AiCleanAiPlayerEvaluations(void)
 	memorylimit = GameCycle - 30 * 60;
 
 	while (AiPlayer->FirstEvaluation &&
-			AiPlayer->FirstEvaluation->gamecycle < memorylimit){
+			AiPlayer->FirstEvaluation->GameCycle < memorylimit){
 		AiRemoveFirstAiPlayerEvaluation();
 	}
 }
@@ -1150,18 +1149,18 @@ global void AiPeriodicAttack(void)
 
 	// Add a new ActionEvaluation at the end of the queue
 	actionEvaluation = (AiActionEvaluation*)malloc(sizeof(AiActionEvaluation));
-	actionEvaluation->aiScriptAction = bestScriptAction;
-	actionEvaluation->gamecycle = GameCycle;
-	actionEvaluation->hotSpotX = enemy->X;
-	actionEvaluation->hotSpotY = enemy->Y;
-	actionEvaluation->value = bestScriptValue;
-	actionEvaluation->hotSpotValue =
+	actionEvaluation->AiScriptAction = bestScriptAction;
+	actionEvaluation->GameCycle = GameCycle;
+	actionEvaluation->HotSpotX = enemy->X;
+	actionEvaluation->HotSpotY = enemy->Y;
+	actionEvaluation->Value = bestScriptValue;
+	actionEvaluation->HotSpotValue =
 		AiGetGaugeValue(ForceGauge(WATER_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY)) +
 			AiGetGaugeValue(ForceGauge(GROUND_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY)) +
 			AiGetGaugeValue(ForceGauge(AIR_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY));
 	DebugLevel2Fn("new action at %d %d, hotspotValue=%d, cost=%d\n" _C_
 		enemy->X _C_ enemy->Y _C_
-		actionEvaluation->hotSpotValue _C_ actionEvaluation->value);
+		actionEvaluation->HotSpotValue _C_ actionEvaluation->Value);
 
 	// Insert the evaluation result at the end...
 	AiPlayer->EvaluationCount++;
@@ -1180,16 +1179,16 @@ global void AiPeriodicAttack(void)
 
 	actionEvaluation = AiPlayer->FirstEvaluation;
 	while (actionEvaluation) {
-		if ((bestValue == -1 || actionEvaluation->value <= bestValue) &&
-				actionEvaluation->hotSpotValue >= bestHotSpot) {
+		if ((bestValue == -1 || actionEvaluation->Value <= bestValue) &&
+				actionEvaluation->HotSpotValue >= bestHotSpot) {
 			bestActionEvaluation = actionEvaluation;
 		}
 
-		if (bestValue == -1 || actionEvaluation->value <= bestValue) {
-			bestValue = actionEvaluation->value;
+		if (bestValue == -1 || actionEvaluation->Value <= bestValue) {
+			bestValue = actionEvaluation->Value;
 		}
-		if (actionEvaluation->hotSpotValue >= bestHotSpot) {
-			bestHotSpot = actionEvaluation->hotSpotValue;
+		if (actionEvaluation->HotSpotValue >= bestHotSpot) {
+			bestHotSpot = actionEvaluation->HotSpotValue;
 		}
 		actionEvaluation = actionEvaluation->Next;
 	}
@@ -1198,8 +1197,8 @@ global void AiPeriodicAttack(void)
 		// If nothing available, try the best compromise ( value - hotspot )
 		actionEvaluation = AiPlayer->FirstEvaluation;
 		bestDelta = 0;
-			while (actionEvaluation) {
-			delta = (20 * actionEvaluation->hotSpotValue) / (actionEvaluation->value + 1);
+		while (actionEvaluation) {
+			delta = (20 * actionEvaluation->HotSpotValue) / (actionEvaluation->Value + 1);
 			if (bestDelta == -1 || delta <= bestDelta) {
 				bestActionEvaluation = actionEvaluation;
 			}
@@ -1210,16 +1209,16 @@ global void AiPeriodicAttack(void)
 		DebugLevel3Fn("has a best script, value=%d, hotspot=%d\n" _C_ bestValue _C_
 			bestHotSpot);
 		// => lance si la force est à 80-90%...
-		AiPrepareScript(bestActionEvaluation->hotSpotX, bestActionEvaluation->hotSpotY,
+		AiPrepareScript(bestActionEvaluation->HotSpotX, bestActionEvaluation->HotSpotY,
 			16, 0);
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-		AiEvaluateScript(bestActionEvaluation->aiScriptAction->Action);
+		AiEvaluateScript(bestActionEvaluation->AiScriptAction->Action);
 #elif defined(USE_LUA)
 #endif
 
-		leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
-		totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
+		leftCost = AiEvaluateForceCost(AiScript->OwnForce, 0);
+		totalCost = AiEvaluateForceCost(AiScript->OwnForce, 1);
 		if (leftCost > totalCost) {
 			DebugLevel0Fn("Left cost superior to totalcost ( %d > %d )\n" _C_
 				leftCost _C_ totalCost);
@@ -1227,18 +1226,18 @@ global void AiPeriodicAttack(void)
 
 		if (leftCost <= ((2 * totalCost) / 10)) {
 			DebugLevel3Fn("Attack script !...\n");
-			AiStartScript(bestActionEvaluation->aiScriptAction, "attack");
-		} else if (leftCost <= ((9 * totalCost) /10)) {
+			AiStartScript(bestActionEvaluation->AiScriptAction, "attack");
+		} else if (leftCost <= ((9 * totalCost) / 10)) {
 			DebugLevel3Fn("Not ready for attack script, wait...\n");
 
-			AiUpdateForce(1, AiScript->ownForce);
-			AiEraseForce(AiScript->ownForce);
+			AiUpdateForce(1, AiScript->OwnForce);
+			AiEraseForce(AiScript->OwnForce);
 		} else {
 			DebugLevel3Fn("Attacking crisis ! reseting.\n");
 			AiEraseForce(1);
 			// FIXME : should update with lower values
-			AiUpdateForce(1, AiScript->ownForce);
-			AiEraseForce(AiScript->ownForce);
+			AiUpdateForce(1, AiScript->OwnForce);
+			AiEraseForce(AiScript->OwnForce);
 		}
 	}
 }
