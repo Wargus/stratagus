@@ -1567,7 +1567,7 @@ global void MarkDrawEntireMap(void)
 /**
 **	Draw the map backgrounds.
 **
-**	@param v	Viewport number (FIXME: use pointer).
+**	@param vp	Viewport pointer.
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
 **
