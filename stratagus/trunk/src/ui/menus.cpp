@@ -34,6 +34,11 @@
 #include <string.h>
 #ifndef _MSC_VER
 #include <unistd.h>
+#else
+#ifndef _WIN32_WCE
+#include <io.h>
+#define F_OK 4
+#endif
 #endif
 
 #include "freecraft.h"
