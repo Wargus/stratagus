@@ -314,8 +314,12 @@ global void MapUpdateFogOfWar(int x,int y)
 	    vis=TheMap.Fields[sx].Flags&MapFieldVisible;
 #endif
 	    if( vis && (!last || last&MapFieldPartiallyVisible) ) {
+#ifdef NEW_MAPDRAW
 		*redraw_row=NEW_MAPDRAW;
 		*redraw_tile=NEW_MAPDRAW;
+#else
+		*redraw_row=*redraw_tile=1;
+#endif
 	    }
 
 	    ++redraw_tile;
