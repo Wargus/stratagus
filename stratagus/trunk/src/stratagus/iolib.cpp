@@ -10,7 +10,7 @@
 //
 /**@name iolib.c	-	Compression-IO helper functions. */
 //
-//	(c) Copyright 2000-2002 by Andreas Arens
+//	(c) Copyright 2000-2002 by Andreas Arens, Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -53,6 +53,7 @@
 
 #include "freecraft.h"
 #include "iolib.h"
+#include "campaign.h"			// for CurrentMapPath
 
 #ifndef O_BINARY
 #define O_BINARY	0
@@ -355,6 +356,11 @@ global int CLseek(CLFile *file, long offset, int whence)
 */
 global char* LibraryFileName(const char* file,char* buffer)
 {
+#ifdef USE_ZZIPLIB
+    ZZIP_FILE* zp;
+#endif
+    char* s;
+
     //
     //	Absolute path or in current directory.
     //
@@ -375,16 +381,60 @@ global char* LibraryFileName(const char* file,char* buffer)
     }
 #endif
 #ifdef USE_ZZIPLIB
-    {
-	ZZIP_FILE* zp;
+    strcpy(buffer,file);
+    if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	zzip_close(zp);
+	return buffer;
+    }
+#endif	// USE_ZZIPLIB
 
-	strcpy(buffer,file);
+    //
+    //	Try in map directory
+    //
+    if( *CurrentMapPath ) {
+	DebugLevel3Fn("Map   path: %s\n", CurrentMapPath);
+	if( *CurrentMapPath=='.' || *CurrentMapPath=='/' ) {
+	    strcpy(buffer,CurrentMapPath);
+	    if( (s=strrchr(buffer,'/')) ) {
+		s[1]='\0';
+	    }
+	    strcat(buffer,file);
+	} else {
+	    strcpy(buffer,FreeCraftLibPath);
+	    if( *buffer ) {
+		strcat(buffer,"/");
+	    }
+	    strcat(buffer,CurrentMapPath);
+	    if( (s=strrchr(buffer,'/')) ) {
+		s[1]='\0';
+	    }
+	    strcat(buffer,file);
+	}
+	if( !access(buffer,R_OK) ) {
+	    return buffer;
+	}
+
+#ifdef USE_ZLIB		// gzip or bzip2 in map directory directory
+	strcat(buffer,".gz");
+	if( !access(buffer,R_OK) ) {
+	    return buffer;
+	}
+	*strrchr(buffer,'.')='\0';
+#endif
+#ifdef USE_BZ2LIB
+	strcat(buffer,".bz2");
+	if( !access(buffer,R_OK) ) {
+	    return buffer;
+	}
+	*strrchr(buffer,'.')='\0';
+#endif
+#ifdef USE_ZZIPLIB
 	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
 	    zzip_close(zp);
 	    return buffer;
 	}
-    }
 #endif	// USE_ZZIPLIB
+    }
 
     //
     //	In user home directory
@@ -406,14 +456,10 @@ global char* LibraryFileName(const char* file,char* buffer)
     }
 #endif
 #ifdef USE_ZZIPLIB
-    {
-	ZZIP_FILE* zp;
-
-	sprintf(buffer,"%s/%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH,file);
-	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
-	    zzip_close(zp);
-	    return buffer;
-	}
+    sprintf(buffer,"%s/%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH,file);
+    if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	zzip_close(zp);
+	return buffer;
     }
 #endif	// USE_ZZIPLIB
 
@@ -437,14 +483,10 @@ global char* LibraryFileName(const char* file,char* buffer)
     }
 #endif
 #ifdef USE_ZZIPLIB
-    {
-	ZZIP_FILE* zp;
-
-	sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
-	if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
-	    zzip_close(zp);
-	    return buffer;
-	}
+    sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
+    if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
+	zzip_close(zp);
+	return buffer;
     }
 #endif	// USE_ZZIPLIB
     DebugLevel0Fn("File `%s' not found\n",file);
@@ -492,7 +534,7 @@ __my_zzip_open_zip(const char* filename, int filemode)
 	0
     };
     const char** ext = my_zzip_default_fileext;
-    
+
     if (len+4 >= PATH_MAX) return -1;
     memcpy(file, filename, len+1);
 
@@ -503,7 +545,7 @@ __my_zzip_open_zip(const char* filename, int filemode)
 	if (fd != -1) return fd;
     }
     return -1;
-}    
+}
 #endif
 
 /**
@@ -550,7 +592,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 #ifdef USE_ZZIPLIB
     strcpy (zzbasepath, dirname);
     /* per each slash in filename, check if it there is a zzip around */
-    while ((cp = strrchr(zzbasepath, '/'))) 
+    while ((cp = strrchr(zzbasepath, '/')))
     {
 	int fd;
 	zzip_error_t e;
