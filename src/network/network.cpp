@@ -244,6 +244,7 @@
 #include "netconnect.h"
 #include "commands.h"
 #include "interface.h"
+#include "campaign.h"
 
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
@@ -667,8 +668,10 @@ global void NetworkEvent(void)
 	//
 	if (nc->Type == MessageQuit) {
 	    DebugLevel0("Got quit from network.\n");
-	    DebugLevel0Fn("FIXME: No longer need to quit here!\n");
-	    Exit(0);
+	    // FIXME: should only remove the player who have send the quit
+	    GameResult=GameVictory;
+	    GameRunning=0;
+	    continue;
 	}
 
 	if (nc->Type == MessageResend) {
