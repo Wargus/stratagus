@@ -54,12 +54,12 @@
 /*
 **	Configuration of the small (unit) AI.
 */
-#define PRIORITY_FACTOR		(0x00010000*100)
-#define HEALTH_FACTOR		(0x00000001*100)
-#define DISTANCE_FACTOR		(0x00100000*100)
-#define INRANGE_FACTOR		(0x00010000*100)
-#define INRANGE_BONUS		(0x00100000*100)
-#define CANATTACK_BONUS		(0x01000000*100)
+#define PRIORITY_FACTOR		0x00010000
+#define HEALTH_FACTOR		0x00000001
+#define DISTANCE_FACTOR		0x00100000
+#define INRANGE_FACTOR		0x00010000
+#define INRANGE_BONUS		0x00100000
+#define CANATTACK_BONUS		0x01000000
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -732,17 +732,17 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	    //
 	    //  Priority 0-255
 	    //
-	    cost -= dtype->Priority * PRIORITY_FACTOR / 100;
+	    cost -= dtype->Priority * PRIORITY_FACTOR;
 	    //
 	    //  Remaining HP (Health) 0-65535
 	    //
-	    cost += dest->HP * HEALTH_FACTOR / 100;
+	    cost += dest->HP * HEALTH_FACTOR;
 
 	    //
 	    //  Unit can attack back.
 	    //
 	    if (CanTarget(dtype, type)) {
-		cost -= CANATTACK_BONUS / 100;
+		cost -= CANATTACK_BONUS;
 	    }
 
 	    if (cost < 1) {
@@ -911,11 +911,11 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 	//
 	//	Priority 0-255
 	//
-	cost-=dtype->Priority*PRIORITY_FACTOR/100;
+	cost-=dtype->Priority*PRIORITY_FACTOR;
 	//
 	//	Remaining HP (Health) 0-65535
 	//
-	cost+=dest->HP*HEALTH_FACTOR/100;
+	cost+=dest->HP*HEALTH_FACTOR;
 	//
 	//	Unit in attack range?
 	//
@@ -924,16 +924,16 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 	    continue;
 	}
 	if( d<attackrange && d>type->MinAttackRange ) {
-	    cost+=d*INRANGE_FACTOR/100;
-	    cost-=INRANGE_BONUS/100;
+	    cost+=d*INRANGE_FACTOR;
+	    cost-=INRANGE_BONUS;
 	} else {
-	    cost+=d*DISTANCE_FACTOR/100;
+	    cost+=d*DISTANCE_FACTOR;
 	}
 	//
 	//	Unit can attack back.
 	//
 	if( CanTarget(dtype,type) ) {
-	    cost-=CANATTACK_BONUS/100;
+	    cost-=CANATTACK_BONUS;
 	}
 
 	DebugLevel3Fn("%s -> %s\t%08x\n" _C_ type->Ident _C_ dtype->Ident _C_ cost);
