@@ -283,25 +283,26 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
 **
 **	@param title	SCM title. (nil reports only)
 **
-**	@return		Old title screen.
+**	@return		None
 */
-local SCM CclSetTitleScreen(SCM title)
+local SCM CclSetTitleScreen(SCM list)
 {
-    SCM old;
+    int i;
 
-    old = NIL;
     if (TitleScreen) {
-	old = gh_str02scm(TitleScreen);
-    }
-    if (!gh_null_p(title)) {
-	if (TitleScreen) {
-	    free(TitleScreen);
-	    TitleScreen = NULL;
+	for (i = 0; TitleScreen[i]; ++i) {
+	    free(TitleScreen[i]);
 	}
-
-	TitleScreen = gh_scm2newstr(title, NULL);
     }
-    return old;
+    if (!gh_null_p(list)) {
+	i = 0;
+	TitleScreen = calloc(gh_length(list) + 1, sizeof(*TitleScreen));
+	while (!gh_null_p(list)) {
+	    TitleScreen[i++] = gh_scm2newstr(gh_car(list), NULL);
+	    list = gh_cdr(list);
+	}
+    }
+    return SCM_UNSPECIFIED;
 }
 
 /**
@@ -3240,7 +3241,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure2_0("set-video-resolution!", CclSetVideoResolution);
     gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullscreen);
 
-    gh_new_procedure1_0("set-title-screen!", CclSetTitleScreen);
+    gh_new_procedureN("set-title-screen!", CclSetTitleScreen);
     gh_new_procedure1_0("set-menu-background!", CclSetMenuBackground);
     gh_new_procedure1_0("set-menu-background-with-title!",
 	CclSetMenuBackgroundWithTitle);
