@@ -473,7 +473,7 @@ global int main1(int argc __attribute__ ((unused)),
     "SOUND "
 #endif
     "\n\nFreeCraft may be copied only under the terms of the Artistic License\
-\nwhich may be found in the FreeCradt source kit."
+\nwhich may be found in the FreeCraft source kit."
     "\n\nDISCLAIMER:\n\
 This software is provided as-is.  The author(s) can not be held liable for any\
 \ndamage that might arise from the use of this software.\n\
