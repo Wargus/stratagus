@@ -623,8 +623,8 @@ local void ColorCycle8(void)
 	Pixels8[244] = x;
     }
 
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw |= RedrawMap | RedrawInfoPanel | RedrawButtonPanel;
+    MapColorCycle();		// FIXME: could be little more informative
+    MustRedraw |= RedrawColorCycle;
 }
 
 /**
@@ -684,8 +684,8 @@ local void ColorCycle16(void)
 	Pixels16[244] = x;
     }
 
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw |= RedrawMap | RedrawInfoPanel | RedrawButtonPanel;
+    MapColorCycle();		// FIXME: could be little more informative
+    MustRedraw |= RedrawColorCycle;
 }
 
 /**
@@ -745,8 +745,8 @@ local void ColorCycle24(void)
 	Pixels24[244] = x;
     }
 
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw |= RedrawMap | RedrawInfoPanel | RedrawButtonPanel;
+    MapColorCycle();		// FIXME: could be little more informative
+    MustRedraw |= RedrawColorCycle;
 }
 
 /**
@@ -806,8 +806,8 @@ local void ColorCycle32(void)
 	Pixels32[244] = x;
     }
 
-    MapColorCycle();		// FIXME: could be little more informativer
-    MustRedraw |= RedrawMap | RedrawInfoPanel | RedrawButtonPanel;
+    MapColorCycle();		// FIXME: could be little more informative
+    MustRedraw |= RedrawColorCycle;
 }
 
 /*===========================================================================
