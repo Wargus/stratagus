@@ -870,7 +870,7 @@ global int main(int argc,char** argv)
 			continue;
 		    default:
 			Usage();
-			exit(-1);
+			FatalExit(-1);
 		}
 		continue;
 
@@ -883,7 +883,7 @@ global int main(int argc,char** argv)
 		if( !NetworkLag ) {
 		    fprintf(stderr,"FIXME: zero lag not supported\n");
 		    Usage();
-		    exit(-1);
+		    FatalExit(-1);
 		}
 		continue;
 	    case 'U':
@@ -909,7 +909,7 @@ global int main(int argc,char** argv)
 	    case 'h':
 	    default:
 		Usage();
-		exit(-1);
+		FatalExit(-1);
 	}
 	break;
     }
@@ -917,7 +917,7 @@ global int main(int argc,char** argv)
     if( argc-optind>1 ) {
 	fprintf(stderr,"too many files\n");
 	Usage();
-	exit(-1);
+	FatalExit(-1);
     }
 
     if( argc-optind ) {
