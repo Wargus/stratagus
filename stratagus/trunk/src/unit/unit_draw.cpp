@@ -37,6 +37,11 @@
 #include "interface.h"
 #include "ccl.h"
 
+#ifdef REFS_DEBUG
+    #include "font.h"
+    #include "ui.h"
+#endif
+
 #include "etlib/generic.h"
 
 /*----------------------------------------------------------------------------
@@ -359,11 +364,6 @@ global void LoadDecorations(void)
 #endif
 }
 
-#ifdef REFS_DEBUG
-    #include "font.h"
-    #include "ui.h"
-#endif
-
 /**
 **	Draw decoration (invis, for the unit.)
 **
@@ -372,11 +372,11 @@ global void LoadDecorations(void)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
+local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 {
     int f;
     int color;
-    UnitStats* stats;
+    const UnitStats* stats;
 
 #ifdef REFS_DEBUG
     //
@@ -386,7 +386,6 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	DrawNumber(x+1,y+1,GameFont,unit->Refs);
     }
 #endif
-
 
     //
     //	Only for selected units?
@@ -615,7 +614,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
+local void DrawShadow(const Unit* unit,const UnitType* type,int x,int y)
 {
     int i;
 
@@ -644,7 +643,7 @@ local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
 **	FIXME: of the current selected unit.
 **	FIXME: should be extend to show waypoints, which order (repair...)
 */
-global void DrawPath(Unit* unit)
+global void DrawPath(const Unit* unit)
 {
     int x1;
     int y1;
@@ -936,15 +935,21 @@ local void DrawBuilding(Unit* unit)
 {
     int x;
     int y;
-    UnitType* type;
+    const UnitType* type;
     int frame;
+    int visible;
+
+    visible=UnitVisibleOnMap(unit);
+    // FIXME: is this the correct place? No, but now correct working.
+    if( visible ) {
+	frame = unit->SeenFrame = unit->Frame;
+    } else {
+	frame = unit->SeenFrame;
+	DebugCheck( frame==-1 || frame==255 );
+    }
 
     type=unit->Type;
-
-    // FIXME: is this the correct place?
-    frame = unit->SeenFrame = unit->Frame;
-
-    GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
+    GraphicPlayerPixels(unit->Player,type->Sprite);
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
@@ -983,7 +988,7 @@ local void DrawBuilding(Unit* unit)
     }
 #else
     // FIXME: johns: ugly check here, should be removed!
-    if( unit->Orders[0].Action!=UnitActionDie ) {
+    if( visible && unit->Orders[0].Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
     }
 #endif
@@ -994,23 +999,23 @@ local void DrawBuilding(Unit* unit)
 **
 **	@param unit	Pointer to the unit.
 */
-local void DrawUnit(Unit* unit)
+local void DrawUnit(const Unit* unit)
 {
     int x;
     int y;
     int r;
-    UnitType* type;
-    UnitStats* stats;
+    const UnitType* type;
+    const UnitStats* stats;
 
     if ( unit->Revealer ) {		// Revealers are not drawn
+	DebugLevel0Fn("Drawing revealer\n");
 	return;
     }
-
-    type=unit->Type;
 
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
+    type=unit->Type;
     if( type->UnitType==UnitTypeFly ) {
 	DrawShadow(unit,type,x,y);
     }
@@ -1102,7 +1107,7 @@ global void DrawUnits(void)
     //
     for( i=0; i<n; ++i ) {
 	unit=table[i];
-	if( !unit->Removed && UnitVisible(unit) ) {
+	if( !unit->Removed && UnitVisibleOnScreen(unit) ) {
 	    if( unit->Type->Building ) {
 		DrawBuilding(unit);
 		table[i]=NoUnitP;
