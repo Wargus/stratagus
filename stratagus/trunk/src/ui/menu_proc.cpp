@@ -440,42 +440,75 @@ local void DrawVSlider(Menuitem *mi, int mx, int my)
     x = mx+mi->xofs;
     y = my+mi->yofs;
 
-    if (flags&MenuButtonDisabled) {
-	PushClipping();
-	SetClipping(0,0,VideoWidth-1,y + h - 20);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h/2);
-	PopClipping();
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
-    } else {
-	PushClipping();
-	SetClipping(0,0,VideoWidth-1,y + h - 20);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h/2);
-	PopClipping();
-	if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
-	} else {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW, x, y - 2);
-	}
-	if (mi->d.vslider.cflags&MI_CFLAGS_DOWN) {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
-	} else {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW, x, y + h - 20);
-	}
-	p = (mi->d.vslider.percent * (h - 54)) / 100;
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 1, y + 18 + p);
-    }
+    if (mi->d.vslider.style == MI_STYLE_SC_VSLIDER) {
+	int upb;
+	int downb;
 
-    if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x,y-2,w,h+2);
+	    upb = MBUTTON_SC_UP_ARROW - 1;
+	    downb = MBUTTON_SC_DOWN_ARROW - 1;
+	} else if (flags&MenuButtonClicked) {
+	    if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
+		upb = MBUTTON_SC_UP_ARROW + 1;
+		downb = MBUTTON_SC_DOWN_ARROW;
+	    } else if (mi->d.vslider.cflags&MI_CFLAGS_DOWN) {
+		upb = MBUTTON_SC_UP_ARROW;
+		downb = MBUTTON_SC_DOWN_ARROW + 1;
+	    } else {
+		upb = MBUTTON_SC_UP_ARROW;
+		downb = MBUTTON_SC_DOWN_ARROW;
+	    }
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x,y-2,w,h+2);
+	    upb = MBUTTON_SC_UP_ARROW;
+	    downb = MBUTTON_SC_DOWN_ARROW;
+	}
+	VideoDraw(MenuButtonGfx.Sprite, upb, x, y);
+	VideoDraw(MenuButtonGfx.Sprite, downb, x, y + h-1 - 16);
+
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_VCONT - 1, x, y + 16 + 2);
+	for (p = y+16+2+8+1; p < y+h-1-16-2-8; p += 8) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_VCONT, x, p);
+	}
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_VCONT + 1, x, y + h-1 - 16 - 2 - 8);
+	p = (mi->d.vslider.percent * (h - 54)) / 100;
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_KNOB, x, y + 16 + 2 + p);
+    } else {
+	if (flags&MenuButtonDisabled) {
+	    PushClipping();
+	    SetClipping(0,0,VideoWidth-1,y + h - 20);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h/2);
+	    PopClipping();
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
+	} else {
+	    PushClipping();
+	    SetClipping(0,0,VideoWidth-1,y + h - 20);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h/2);
+	    PopClipping();
+	    if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
+	    } else {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW, x, y - 2);
+	    }
+	    if (mi->d.vslider.cflags&MI_CFLAGS_DOWN) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
+	    } else {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW, x, y + h - 20);
+	    }
+	    p = (mi->d.vslider.percent * (h - 54)) / 100;
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 1, y + 18 + p);
+	}
+
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x,y-2,w,h+2);
+	    } else {
+		VideoDrawRectangleClip(ColorYellow,x,y-2,w,h+2);
+	    }
 	}
     }
-
 }
 
 /**
@@ -500,42 +533,75 @@ local void DrawHSlider(Menuitem *mi, int mx, int my)
     x = mx+mi->xofs;
     y = my+mi->yofs;
 
-    if (flags&MenuButtonDisabled) {
-	PushClipping();
-	SetClipping(0,0,x + w - 20,VideoHeight-1);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w/2, y);
-	PopClipping();
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
-    } else {
-	PushClipping();
-	SetClipping(0,0,x + w - 20,VideoHeight-1);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
-	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w/2, y);
-	PopClipping();
-	if (mi->d.hslider.cflags&MI_CFLAGS_LEFT) {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
-	} else {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
-	}
-	if (mi->d.hslider.cflags&MI_CFLAGS_RIGHT) {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
-	} else {
-	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + w - 20, y);
-	}
-	p = (mi->d.hslider.percent * (w - 54)) / 100;
-	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + p, y + 1);
-    }
+    if (mi->d.hslider.style == MI_STYLE_SC_HSLIDER) {
+	int leftb;
+	int rightb;
 
-    if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x-2,y,w+2,h);
+	    leftb = MBUTTON_SC_LEFT_ARROW - 1;
+	    rightb = MBUTTON_SC_RIGHT_ARROW - 1;
+	} else if (flags&MenuButtonClicked) {
+	    if (mi->d.vslider.cflags&MI_CFLAGS_LEFT) {
+		leftb = MBUTTON_SC_LEFT_ARROW + 1;
+		rightb = MBUTTON_SC_RIGHT_ARROW;
+	    } else if (mi->d.vslider.cflags&MI_CFLAGS_RIGHT) {
+		leftb = MBUTTON_SC_LEFT_ARROW;
+		rightb = MBUTTON_SC_RIGHT_ARROW + 1;
+	    } else {
+		leftb = MBUTTON_SC_LEFT_ARROW;
+		rightb = MBUTTON_SC_RIGHT_ARROW;
+	    }
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x-2,y,w+2,h);
+	    leftb = MBUTTON_SC_LEFT_ARROW;
+	    rightb = MBUTTON_SC_RIGHT_ARROW;
+	}
+	VideoDraw(MenuButtonGfx.Sprite, leftb, x, y);
+	VideoDraw(MenuButtonGfx.Sprite, rightb, x + w-1 - 16, y);
+
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_HCONT - 1, x + 16 + 2, y);
+	for (p = x+16+2+8+1; p < x+w-1-16-2-8; p += 8) {
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_HCONT, p, y);
+	}
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_HCONT + 1, x + w-1 - 16 - 2 - 8, y);
+	p = (mi->d.vslider.percent * (w - 54)) / 100;
+	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_KNOB, x + 16 + 2 + p, y);
+    } else {
+	if (flags&MenuButtonDisabled) {
+	    PushClipping();
+	    SetClipping(0,0,x + w - 20,VideoHeight-1);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w/2, y);
+	    PopClipping();
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
+	} else {
+	    PushClipping();
+	    SetClipping(0,0,x + w - 20,VideoHeight-1);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w/2, y);
+	    PopClipping();
+	    if (mi->d.hslider.cflags&MI_CFLAGS_LEFT) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
+	    } else {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
+	    }
+	    if (mi->d.hslider.cflags&MI_CFLAGS_RIGHT) {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
+	    } else {
+		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + w - 20, y);
+	    }
+	    p = (mi->d.hslider.percent * (w - 54)) / 100;
+	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + p, y + 1);
+	}
+
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x-2,y,w+2,h);
+	    } else {
+		VideoDrawRectangleClip(ColorYellow,x-2,y,w+2,h);
+	    }
 	}
     }
-
 }
 
 /**
@@ -1213,6 +1279,9 @@ local void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    case MI_TYPE_VSLIDER:
+		    {
+			int arrowsize;
+
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
 			if (x < xs || x > xs + mi->d.vslider.xsize || y < ys || y > ys + mi->d.vslider.ysize) {
@@ -1228,14 +1297,20 @@ local void MenuHandleMouseMove(int x,int y)
 			j = y - ys;
 			mi->d.vslider.cursel = 0;
 
-			if (j < 20) {
+			if (mi->d.vslider.style == MI_STYLE_SC_VSLIDER) {
+			    arrowsize = 16;
+			} else {
+			    arrowsize = 20;
+			}
+
+			if (j < arrowsize) {
 			    mi->d.vslider.cursel |= MI_CFLAGS_UP;
-			} else if (j > mi->d.vslider.ysize - 20) {
+			} else if (j >= mi->d.vslider.ysize - arrowsize-1) {
 			    mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
 			} else {
 			    mi->d.vslider.cursel &= ~(MI_CFLAGS_UP|MI_CFLAGS_DOWN);
 			    h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
-			    if (j > h && j < h + 18) {
+			    if (j > h && j < h + 16) {
 				mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
 			    } else {
 				mi->d.vslider.cursel |= MI_CFLAGS_CONT;
@@ -1246,9 +1321,11 @@ local void MenuHandleMouseMove(int x,int y)
 				}
 			    }
 			    j -= 8;
-			    if (j < 20) j=20;
+			    if (j < arrowsize) {
+				j = arrowsize;
+			    }
 
-			    mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
+			    mi->d.vslider.curper = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
 			    if (mi->d.vslider.curper > 100) {
 				mi->d.vslider.curper = 100;
 			    }
@@ -1257,7 +1334,11 @@ local void MenuHandleMouseMove(int x,int y)
 			    (*mi->d.vslider.action)(mi, 1);		// 1 indicates move
 			}
 			break;
+		    }
 		    case MI_TYPE_HSLIDER:
+		    {
+			int arrowsize;
+
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
 			if (x < xs || x > xs + mi->d.hslider.xsize || y < ys || y > ys + mi->d.hslider.ysize) {
@@ -1271,19 +1352,22 @@ local void MenuHandleMouseMove(int x,int y)
 			    continue;
 			}
 			j = x - xs;
-			j -= 6;
-			if (j < 20) {
+			mi->d.hslider.cursel = 0;
+
+			if (mi->d.hslider.style == MI_STYLE_SC_HSLIDER) {
+			    arrowsize = 16;
+			} else {
+			    arrowsize = 20;
+			}
+
+			if (j < arrowsize) {
 			    mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
-			} else if (j > mi->d.hslider.xsize - 20) {
+			} else if (j >= mi->d.hslider.xsize - arrowsize-1) {
 			    mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
 			} else {
 			    mi->d.hslider.cursel &= ~(MI_CFLAGS_LEFT|MI_CFLAGS_RIGHT);
 			    w = (mi->d.hslider.percent * (mi->d.hslider.xsize - 54)) / 100 + 18;
-			    mi->d.hslider.curper = ((j - 20) * 100) / (mi->d.hslider.xsize - 54);
-			    if (mi->d.hslider.curper > 100) {
-				mi->d.hslider.curper = 100;
-			    }
-			    if (j > w && j < w + 18) {
+			    if (j > w && j < w + 16) {
 				mi->d.hslider.cursel |= MI_CFLAGS_KNOB;
 			    } else {
 				mi->d.hslider.cursel |= MI_CFLAGS_CONT;
@@ -1293,11 +1377,21 @@ local void MenuHandleMouseMove(int x,int y)
 				    mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
 				}
 			    }
+			    j -= 8;
+			    if (j < arrowsize) {
+				j = arrowsize;
+			    }
+
+			    mi->d.hslider.curper = ((j - arrowsize) * 100) / (mi->d.hslider.xsize - 54);
+			    if (mi->d.hslider.curper > 100) {
+				mi->d.hslider.curper = 100;
+			    }
 			}
 			if (mi->d.hslider.action) {
 			    (*mi->d.hslider.action)(mi, 1);		// 1 indicates move
 			}
 			break;
+		    }
 		    default:
 			continue;
 			// break;

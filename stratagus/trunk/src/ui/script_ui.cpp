@@ -2373,6 +2373,20 @@ local MenuButtonId scm2buttonid(SCM value)
         id=MBUTTON_SC_GEM_ROUND;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-gem-square")) ) {
         id=MBUTTON_SC_GEM_SQUARE;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-up-arrow")) ) {
+        id=MBUTTON_SC_UP_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-down-arrow")) ) {
+        id=MBUTTON_SC_DOWN_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-left-arrow")) ) {
+        id=MBUTTON_SC_LEFT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-right-arrow")) ) {
+        id=MBUTTON_SC_RIGHT_ARROW;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-knob")) ) {
+        id=MBUTTON_SC_S_KNOB;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-vcont")) ) {
+        id=MBUTTON_SC_S_VCONT;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-s-hcont")) ) {
+        id=MBUTTON_SC_S_HCONT;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button-left")) ) {
         id=MBUTTON_SC_BUTTON_LEFT;
     } else if ( gh_eq_p(value, gh_symbol2scm("sc-button")) ) {
@@ -2414,6 +2428,18 @@ local int scm2hotkey(SCM value)
     }
     free(s);
     return key;
+}
+
+local int scm2style(SCM value)
+{
+    int id;
+
+    if ( gh_eq_p(value, gh_symbol2scm("sc-vslider")) ) {
+        id=MI_STYLE_SC_VSLIDER;
+    } else if ( gh_eq_p(value, gh_symbol2scm("sc-hslider")) ) {
+        id=MI_STYLE_SC_HSLIDER;
+    }
+    return id;
 }
 
 local SCM CclDefineMenuItem(SCM list)
@@ -2768,6 +2794,9 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
 			item->d.vslider.percent=gh_scm2int(gh_car(sublist));
 			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.vslider.style=scm2style(value);
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
@@ -2939,6 +2968,9 @@ local SCM CclDefineMenuItem(SCM list)
 		    } else if ( gh_eq_p(value, gh_symbol2scm("current")) ) {
 			item->d.hslider.percent=gh_scm2int(gh_car(sublist));
 			sublist=gh_cdr(sublist);
+		    } else if ( gh_eq_p(value, gh_symbol2scm("style")) ) {
+			value=gh_car(sublist);
+			item->d.hslider.style=scm2style(value);
 		    } else {
 			//s1=gh_scm2newstr(value, NULL);
 			//fprintf(stderr, "Unsupported property %s\n", s1);
