@@ -294,6 +294,10 @@
 **		missile lives for ever and the lifetime is handled by
 **		Missile::Type:MissileType::Class
 **
+**	Missile::Hidden
+**
+**		When you set this to 1 the unit becomes hidden for a while.
+**
 **	Missile::CurrentStep
 **
 **		Movement step. Used for the different trajectories.
@@ -450,6 +454,7 @@ struct _missile_ {
     int		Damage;			/// direct damage that missile applies
 
     int		TTL;			/// time to live (ticks) used for spells
+    int 	Hidden;			/// If this is 1 then the missile is invisible
 
 // Internal use:
     int		CurrentStep;		/// Current step (0 <= x < TotalStep).

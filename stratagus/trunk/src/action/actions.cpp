@@ -270,14 +270,6 @@ local void IncrementUnitHealth(Unit* unit)
 {
     // Unit may not have stats assigned to it
     if (unit->Stats) {
-	if (HitPointRegeneration && unit->HP<unit->Stats->HitPoints) {
-	    ++unit->HP;
-
-	    if (unit->Selected) {
-		MustRedraw |= RedrawInfoPanel;
-	    }
-	}
-	
 	if (unit->Stats->RegenerationRate && unit->HP<unit->Stats->HitPoints) {
 	    unit->HP += unit->Stats->RegenerationRate;
 	    if (unit->HP > unit->Stats->HitPoints) {

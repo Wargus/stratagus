@@ -311,6 +311,10 @@ local SCM CclMissile(SCM list)
 	    DebugCheck(!missile);
 	    missile->TTL = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("hidden"))) {
+	    DebugCheck(!missile);
+	    missile->Hidden = 1;
+	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("step"))) {
 	    SCM sublist;
 
