@@ -842,30 +842,85 @@ global void NetworkServerResyncClients(void)
 global void NetworkServerStartGame(void)
 {
     int h, i, j, n;
-    unsigned long u;
-    int num[PlayerMax];
+    int num[PlayerMax], org[PlayerMax], rev[PlayerMax];
     char buf[1024];
     InitMessage *msg;
     InitMessage message, statemsg;
 
     DebugCheck(ServerSetupState.CompOpt[0] != 0);
 
+    // save it first..
+    LocalSetupState = ServerSetupState;
+
     // Make a list of the available player slots.
     for (h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    rev[i] = h;
 	    num[h++] = i;
-	    DebugLevel3Fn("Slot %d is available for an interactive player\n", i);
+	    DebugLevel0Fn("Slot %d is available for an interactive player (%d)\n", i, rev[i]);
+	}
+    }
+    // Make a list of the available computer slots.
+    n = h;
+    for (i = 0; i < PlayerMax; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	    rev[i] = n++;
+	    DebugLevel0Fn("Slot %d is available for an ai computer player (%d)\n", i, rev[i]);
+	}
+    }
+    // Make a list of the remaining slots.
+    for (i = 0; i < PlayerMax; i++) {
+	if (ScenSelectPudInfo->PlayerType[i] != PlayerPerson &&
+				ScenSelectPudInfo->PlayerType[i] != PlayerComputer) {
+	    rev[i] = n++;
+	    // PlayerNobody - not available to anything..
 	}
     }
 
+#if 0
+    printf("INITIAL ServerSetupState:\n");
+    for (i = 0; i < PlayerMax-1; i++) {
+	printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
+	if (ServerSetupState.CompOpt[i] == 0) {
+	    printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[i].Host)),
+			 ntohs(Hosts[i].Port), Hosts[i].PlyName);
+	}
+	printf("\n");
+    }
+#endif
+
+    // Reverse to assign slots to menu setup state positions.
+    for (i = 0; i < PlayerMax; i++) {
+	org[i] = -1;
+	for (j = 0; j < PlayerMax; j++) {
+	    if (rev[j] == i) {
+		org[i] = j;
+		break;
+	    }
+	}
+    }
+
+#if 0
+    printf("\n"); for (i=0;i<PlayerMax;i++) printf("% 2d: %d\n", i, org[i]); printf("\n");
+#endif
+
     // Compact host list.. (account for computer/closed slots in the middle..)
-    for (i = 1; i < PlayerMax; i++) {
+    for (i = 1; i < h; i++) {
 	if (Hosts[i].PlyNr == 0) {
 	    for (j = i + 1; j < PlayerMax - 1; j++) {
 		if (Hosts[j].PlyNr) {
+		    DebugLevel0Fn("Compact: Hosts %d -> Hosts %d\n", j, i);
 		    Hosts[i] = Hosts[j];
-		    DebugLevel3Fn("Compact: Hosts %d -> Hosts %d\n", j, i);
-		    Hosts[j].PlyNr = 0;
+		    Hosts[j].PlyNr = Hosts[j].Host = Hosts[j].Port = 0;
+		    n = LocalSetupState.CompOpt[i];
+		    LocalSetupState.CompOpt[i] = LocalSetupState.CompOpt[j];
+		    LocalSetupState.CompOpt[j] = n;
+		    n = LocalSetupState.Race[i];
+		    LocalSetupState.Race[i] = LocalSetupState.Race[j];
+		    LocalSetupState.Race[j] = n;
+		    n = LocalSetupState.LastFrame[i];
+		    LocalSetupState.LastFrame[i] = LocalSetupState.LastFrame[j];
+		    LocalSetupState.LastFrame[j] = n;
 		    break;
 		}
 	    }
@@ -874,66 +929,50 @@ global void NetworkServerStartGame(void)
 	    }
 	}
     }
-    // Randomize the position.
-    for (i = 0; i < NetPlayers; i++) {
-	if (h > 0) {
-	    int chosen = MyRand() % h;
 
-	    DebugLevel3Fn("Assigning player %d to slot %i\n", i, num[chosen]);
-	    Hosts[i].PlyNr = num[chosen];
-	    num[chosen] = num[--h];
+    // Randomize the position.
+    j = h;
+    for (i = 0; i < NetPlayers; i++) {
+	if (j > 0) {
+	    int k, o, chosen = MyRand() % j;
+
+	    n = num[chosen];
+	    Hosts[i].PlyNr = n;
+	    k = org[i];
+	    if (k != n) {
+		for (o = 0; o < PlayerMax; o++) {
+		    if (org[o] == n) {
+			org[o] = k;
+			break;
+		    }
+		}
+		org[i] = n;
+	    }
+	    DebugLevel0Fn("Assigning player %d to slot %d (%d)\n", i, n, org[i]);
+
+	    num[chosen] = num[--j];
 	} else {
 	    DebugCheck(1 == 1);
 #if 0
-	    // ARI: is this code path realy executed? (initially h >= NetPlayers..)
+	    // ARI: is this code path really executed? (initially h >= NetPlayers..)
 	    Hosts[i].PlyNr = num[0];
 	    DebugLevel0Fn("Hosts[%d].PlyNr = %i\n", i, num[0]);
 #endif
 	}
     }
 
-    // Shuffle setup states to match the assigned Host slots.
-    for (i = 0; i < PlayerMax; i++) {
-	num[i] = 0;
-    }
-    for (i = 0; i < NetPlayers; i++) {
-	num[Hosts[i].PlyNr] = 1;
-    }
-    for (i = 0; i < NetPlayers; i++) {
-	h = Hosts[i].PlyNr;
-	if (ServerSetupState.CompOpt[h]) {
-	    for (j = 0; j < PlayerMax; j++) {
-		if (num[j] == 0 && ServerSetupState.CompOpt[j] == 0) {
-		    u = ServerSetupState.CompOpt[h];
-		    ServerSetupState.CompOpt[h] = ServerSetupState.CompOpt[j];
-		    ServerSetupState.CompOpt[j] = u;
-		    u = ServerSetupState.Race[h];
-		    ServerSetupState.Race[h] = ServerSetupState.Race[j];
-		    ServerSetupState.Race[j] = u;
-		    u = ServerSetupState.LastFrame[h];
-		    ServerSetupState.LastFrame[h] = ServerSetupState.LastFrame[j];
-		    ServerSetupState.LastFrame[j] = u;
-		    break;
-		}
-	    }
-	}
-    }
-
-#ifdef DEBUG
-    for (i = 0; i < PlayerMax-1; i++) {
-	printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-	if (ServerSetupState.CompOpt[i] == 0) {
-	    for (j = 0; j < NetPlayers; j++) {
-		if (Hosts[j].PlyNr == i) {
-		    printf(" %d.%d.%d.%d:%d %s", NIPQUAD(ntohl(Hosts[j].Host)),
-				 ntohs(Hosts[j].Port), Hosts[j].PlyName);
-		    
-		}
-	    }
-	}
-	printf("\n");
-    }
+#if 0
+    printf("\n"); for (i=0;i<PlayerMax;i++) printf("% 2d: %d\n", i, org[i]); printf("\n");
 #endif
+
+    // Complete all setup states for the assigned slots.
+    for (i = 0; i < PlayerMax; i++) {
+	num[i] = 1;
+	n = org[i];
+	ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
+	ServerSetupState.Race[n] = LocalSetupState.Race[i];
+	ServerSetupState.LastFrame[n] = LocalSetupState.LastFrame[i];
+    }
 
     /* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
 
@@ -962,7 +1001,6 @@ global void NetworkServerStartGame(void)
 	message.u.Hosts[i].Port = Hosts[i].Port;
 	memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
 	message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-// 	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
     }
 
     // Prepare the final state message:
@@ -1207,7 +1245,7 @@ changed:
 		message.SubType = ICMGo;
 		NetworkSendRateLimitedClientMessage(&message, 250);
 	    } else {
-		DebugLevel3Fn("ccs_started: Final State Enough ICMGo sent - starting\n");
+		DebugLevel3Fn("ccs_started: Final state enough ICMGo sent - starting\n");
 		NetConnectRunning = 0;	// End the menu..
 	    }
 	    break;
@@ -1409,7 +1447,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				    Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
 				    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
 				    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
-				    // PlayerSetName(&Players[Hosts[HostsCount].PlyNr], Hosts[HostsCount].PlyName);
 				    HostsCount++;
 				    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d [%s]\n",
 					    ntohs(ntohs(msg->u.Hosts[i].PlyNr)), NIPQUAD(ntohl(msg->u.Hosts[i].Host)),
@@ -1425,12 +1462,17 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    Hosts[HostsCount].Port = NetLastPort;
 			    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
 			    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
-			    // PlayerSetName(&Players[Hosts[HostsCount].PlyNr], Hosts[HostsCount].PlyName);
 			    HostsCount++;
 			    NetPlayers = HostsCount + 1;
 			    DebugLevel0Fn("Server %d = %d.%d.%d.%d:%d [%s]\n",
 				    ntohs(msg->u.Hosts[i].PlyNr), NIPQUAD(ntohl(NetLastHost)),
 				    ntohs(NetLastPort), msg->u.Hosts[i].PlyName);
+
+			    // put ourselves to the end, like on the server..
+			    Hosts[HostsCount].Host = 0;
+			    Hosts[HostsCount].Port = 0;
+			    Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
+			    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
 
 			    NetLocalState = ccs_goahead;
 			    NetStateMsgCnt = 0;
