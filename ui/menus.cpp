@@ -4231,6 +4231,8 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 	    menu->Items[12].d.pulldown.curopt = 0;
 	}
     }
+    // Initials to Number of Tilesets + 1 for default option.
+    menu->Items[14].d.pulldown.noptions = NumTilesets + 1;
 }
 
 /**
@@ -4337,13 +4339,9 @@ local void GameUNSAction(Menuitem *mi, int i)
 */
 local void GameTSSAction(Menuitem *mi, int i)
 {
-    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
-    int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
-
-    DebugLevel0Fn("FIXME: The enums TilesetSummer, TilesetWinter, ... will be removed in version 1.19\n");
-
     if (!mi || mi->d.pulldown.curopt == i) {
-	GameSettings.Terrain = v[i];
+	// Subtract 1 for default option.
+	GameSettings.Terrain = i - 1;
 	ServerSetupState.TssOpt = i;
 	if (mi) {
 	    NetworkServerResyncClients();
@@ -5188,8 +5186,6 @@ local void EditorNewMap(void)
     char width[10];
     char height[10];
     char description[36];
-    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
-    int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
     VideoLockScreen();
     MenusSetBackground();
@@ -5211,7 +5207,7 @@ local void EditorNewMap(void)
     strcpy(height, "128~!_");
     menu->Items[5].d.input.nch = strlen(width) - 3;
     menu->Items[5].d.input.maxch = 4;
-
+    menu->Items[7].d.pulldown.noptions = NumTilesets;
     ProcessMenu("menu-editor-new", 1);
 
     if (EditorCancelled) {
@@ -5224,7 +5220,7 @@ local void EditorNewMap(void)
     TheMap.Info = calloc(1, sizeof(MapInfo));
     description[strlen(description) - 3] = '\0';
     TheMap.Info->Description = strdup(description);
-    TheMap.Info->MapTerrain = v[menu->Items[7].d.pulldown.curopt];
+    TheMap.Info->MapTerrain = menu->Items[7].d.pulldown.curopt;
     TheMap.Info->MapWidth = atoi(width);
     TheMap.Info->MapHeight = atoi(height);
 
@@ -5944,8 +5940,6 @@ local void EditorMapPropertiesOk(void)
 {
     Menu *menu;
     char *description;
-    // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
-    int v[] = { TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
     int old;
     char *s;
 
@@ -5958,8 +5952,8 @@ local void EditorMapPropertiesOk(void)
 
     // Change the terrain
     old=TheMap.Info->MapTerrain;
-    if (old != v[menu->Items[6].d.pulldown.curopt]) {
-	TheMap.Info->MapTerrain = v[menu->Items[6].d.pulldown.curopt];
+    if (old != menu->Items[6].d.pulldown.curopt) {
+	TheMap.Info->MapTerrain = menu->Items[6].d.pulldown.curopt;
 	free(TheMap.Info->MapTerrainName);
 	TheMap.Info->MapTerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
 	TheMap.Terrain = TheMap.Info->MapTerrain;
