@@ -790,7 +790,7 @@ local int MissileVisible(const Missile* missile)
 **      @param missile  Missile to be checked.
 **      @return         True if map marked to be drawn, false otherwise.
 */
-local int CheckMissileToBeDrawn(const Missile* missile)
+global int CheckMissileToBeDrawn(const Missile* missile)
 {
     int sx,sy,ex,ey;
 
