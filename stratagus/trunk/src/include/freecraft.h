@@ -26,7 +26,6 @@
 
 #define noDEBUG				/// Define to include debug code
 #define noFLAG_DEBUG		/// ARI: Define to include map flag debug
-#define USE_HICOLOR			/// Define to use 16-bit color
 #define noUSE_CCL			/// Remove no for version with guile
 #define noUSE_THREAD			/// Remove no for version with thread
 #define noUSE_SDL			/// Remove no for sdl support
@@ -309,6 +308,9 @@ extern char* strdcat3(const char* l, const char *m, const char* r);
 #define GOLDMINE_DISTANCE	3
     /// How near could a oil-depot be build to a oil-patch.
 #define OILPATCH_DISTANCE	3
+
+    /// How near we could repair an unit.
+#define REPAIR_RANGE		1
 
 //@}
 
