@@ -55,6 +55,7 @@
 #if defined(USE_GUILE) || defined(USE_SIOD)
 extern UnitType* CclGetUnitType(SCM ptr);
 #elif defined(USE_LUA)
+extern UnitType* CclGetUnitType(lua_State* l);
 #endif
 
 #define MAX_SWITCH	256		/// Maximum number of switches
@@ -108,6 +109,32 @@ global int TriggerGetPlayer(SCM player)
 
     return 0;
 }
+#elif defined(USE_LUA)
+global int TriggerGetPlayer(lua_State* l)
+{
+    const char* player;
+    int ret;
+
+    if (lua_isnumber(l, -1)) {
+	ret = LuaToNumber(l, -1);
+	if (ret < 0 || ret > PlayerMax) {
+	    lua_pushfstring(l, "bad player: %d", ret);
+	    lua_error(l);
+	}
+	return ret;
+    }
+    player = LuaToString(l, -1);
+    if (!strcmp(player, "any")) {
+	return -1;
+    } else if (!strcmp(player, "this")) {
+	return ThisPlayer->Player;
+    }
+    lua_pushfstring(l, "bad player: %s", player);
+    lua_error(l);
+
+    return 0;
+}
+#endif
 
 /**
 **	Get the unit-type.
@@ -116,6 +143,7 @@ global int TriggerGetPlayer(SCM player)
 **
 **	@return		The unit-type pointer.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global const UnitType* TriggerGetUnitType(SCM unit)
 {
     if (gh_eq_p(unit, gh_symbol2scm("any"))) {
@@ -131,6 +159,23 @@ global const UnitType* TriggerGetUnitType(SCM unit)
     return CclGetUnitType(unit);
 }
 #elif defined(USE_LUA)
+global const UnitType* TriggerGetUnitType(lua_State* l)
+{
+    const char* unit;
+
+    unit = LuaToString(l, -1);
+    if (!strcmp(unit, "any")) {
+	return ANY_UNIT;
+    } else if (!strcmp(unit, "all")) {
+	return ALL_UNITS;
+    } else if (!strcmp(unit, "units")) {
+	return ALL_FOODUNITS;
+    } else if (!strcmp(unit, "buildings")) {
+	return ALL_BUILDINGS;
+    }
+
+    return CclGetUnitType(l);
+}
 #endif
 
 // --------------------------------------------------------------------------
@@ -170,6 +215,7 @@ typedef int (*CompareFunction)(int, int);
 **
 **	@return		Function pointer to the compare function
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local CompareFunction GetCompareFunction(const char* op)
 {
     if (op[0] == '=') {
@@ -193,6 +239,8 @@ local CompareFunction GetCompareFunction(const char* op)
     }
     return NULL;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has the quantity of unit-type.
@@ -263,12 +311,15 @@ local SCM CclIfUnit(SCM player, SCM operation, SCM quantity, SCM unit)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has the quantity of unit-type at a location.
 **
 **	(if-unit-at {player} {op} {quantity} {unit} {location} {location})
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfUnitAt(SCM list)
 {
     int plynr;
@@ -340,10 +391,13 @@ local SCM CclIfUnitAt(SCM list)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has the quantity of unit-type near to unit-type.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
     SCM nearunit)
 {
@@ -432,10 +486,13 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has the quantity of rescued unit-type near to unit-type.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
     SCM nearunit)
 {
@@ -526,10 +583,13 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has n opponents left.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfOpponents(SCM player, SCM operation, SCM quantity)
 {
     int plynr;
@@ -577,10 +637,13 @@ local SCM CclIfOpponents(SCM player, SCM operation, SCM quantity)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has the quantity of resource.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfResource(SCM player, SCM operation, SCM quantity, SCM resource)
 {
     int plynr;
@@ -645,10 +708,13 @@ local SCM CclIfResource(SCM player, SCM operation, SCM quantity, SCM resource)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has quantity kills
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfKills(SCM player, SCM operation, SCM quantity)
 {
     int plynr;
@@ -682,10 +748,13 @@ local SCM CclIfKills(SCM player, SCM operation, SCM quantity)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Player has a certain score
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfScore(SCM player, SCM operation, SCM quantity)
 {
     int plynr;
@@ -719,10 +788,13 @@ local SCM CclIfScore(SCM player, SCM operation, SCM quantity)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Number of game cycles elapsed
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfElapsed(SCM operation, SCM quantity)
 {
     int q;
@@ -743,10 +815,13 @@ local SCM CclIfElapsed(SCM operation, SCM quantity)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Check the timer value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfTimer(SCM operation, SCM quantity)
 {
     int q;
@@ -771,10 +846,13 @@ local SCM CclIfTimer(SCM operation, SCM quantity)
 
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Check the switch value
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclIfSwitch(SCM number, SCM set)
 {
     int i;
@@ -799,6 +877,8 @@ local SCM CclIfSwitch(SCM number, SCM set)
     }
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+#endif
 
 // --------------------------------------------------------------------------
 //	Actions
@@ -806,6 +886,7 @@ local SCM CclIfSwitch(SCM number, SCM set)
 /**
 **	Action condition player wins.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionVictory(void)
 {
     GameResult = GameVictory;
@@ -813,10 +894,25 @@ local SCM CclActionVictory(void)
     GameRunning = 0;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionVictory(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameResult = GameVictory;
+    GamePaused = 1;
+    GameRunning = 0;
+    return 0;
+}
+#endif
 
 /**
 **	Action condition player lose.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionDefeat(void)
 {
     GameResult = GameDefeat;
@@ -824,10 +920,25 @@ local SCM CclActionDefeat(void)
     GameRunning = 0;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionDefeat(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameResult = GameDefeat;
+    GamePaused = 1;
+    GameRunning = 0;
+    return 0;
+}
+#endif
 
 /**
 **	Action condition player draw.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionDraw(void)
 {
     GameResult = GameDraw;
@@ -835,10 +946,25 @@ local SCM CclActionDraw(void)
     GameRunning = 0;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionDraw(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameResult = GameDraw;
+    GamePaused = 1;
+    GameRunning = 0;
+    return 0;
+}
+#endif
 
 /**
 **	Action set timer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionSetTimer(SCM cycles, SCM increasing)
 {
     GameTimer.Cycles = gh_scm2int(cycles);
@@ -848,39 +974,97 @@ local SCM CclActionSetTimer(SCM cycles, SCM increasing)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionSetTimer(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameTimer.Cycles = LuaToNumber(l, 1);
+    GameTimer.Increasing = LuaToNumber(l, 2);
+    GameTimer.Init = 1;
+    GameTimer.LastUpdate = GameCycle;
+
+    return 0;
+}
+#endif
 
 /**
 **	Action start timer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionStartTimer(void)
 {
     GameTimer.Running = 1;
     GameTimer.Init = 1;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionStartTimer(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameTimer.Running = 1;
+    GameTimer.Init = 1;
+    return 0;
+}
+#endif
 
 /**
 **	Action stop timer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionStopTimer(void)
 {
     GameTimer.Running = 0;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionStopTimer(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    GameTimer.Running = 0;
+    return 0;
+}
+#endif
 
 /**
 **	Action wait
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionWait(SCM ms)
 {
     WaitFrame = FrameCounter +
 	(FRAMES_PER_SECOND * VideoSyncSpeed / 100 * gh_scm2int(ms) + 999) / 1000;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclActionWait(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    WaitFrame = FrameCounter +
+	(FRAMES_PER_SECOND * VideoSyncSpeed / 100 * (int)LuaToNumber(l, 1) + 999) / 1000;
+    return 0;
+}
+#endif
 
 /**
 **	Action stop timer
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclActionSetSwitch(SCM number, SCM set)
 {
     int i;
@@ -903,10 +1087,42 @@ local SCM CclActionSetSwitch(SCM number, SCM set)
     Switch[i] = s;
     return set;
 }
+#elif defined(USE_LUA)
+local int CclActionSetSwitch(lua_State* l)
+{
+    int i;
+    unsigned char s;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    i = LuaToNumber(l, 1);
+    if (i < 0 || i >= MAX_SWITCH) {
+	lua_pushfstring(l, "Invalid switch number: %d", i);
+	lua_error(l);
+    }
+
+    if (lua_isboolean(l, 2)) {
+	s = LuaToBoolean(l, 2);
+    } else {
+	s = LuaToNumber(l, 2);
+	if (s) {
+	    s = 1;
+	}
+    }
+
+    Switch[i] = s;
+    lua_pushvalue(l, 2);
+    return 1;
+}
+#endif
 
 /**
 **	Add a trigger.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddTrigger(SCM condition, SCM action)
 {
     SCM var;
@@ -931,12 +1147,15 @@ local SCM CclAddTrigger(SCM condition, SCM action)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the current trigger number
 **
 **	@param number	    Trigger number
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetTriggerNumber(SCM number)
 {
     int num;
@@ -963,6 +1182,8 @@ local SCM CclSetTriggerNumber(SCM number)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Execute a trigger action
@@ -971,6 +1192,7 @@ local SCM CclSetTriggerNumber(SCM number)
 **
 **	@return		1 if the trigger should be removed
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local int TriggerExecuteAction(SCM script)
 {
     SCM value;
@@ -992,12 +1214,15 @@ local int TriggerExecuteAction(SCM script)
     }
     return 0;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Remove a trigger
 **
 **	@param trig	Current trigger
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void TriggerRemoveTrigger(SCM trig)
 {
     if (!gh_null_p(Trigger)) {
@@ -1106,6 +1331,30 @@ global void TriggerCclRegister(void)
     gh_new_procedure2_0("action-set-switch", CclActionSetSwitch);
 
     gh_define("*triggers*", NIL);
+#elif defined(USE_LUA)
+//    lua_register(Lua, "AddTrigger", CclAddTrigger);
+//    lua_register(Lua, "SetTriggerNumber!", CclSetTriggerNumber);
+    // Conditions
+//    lua_register(Lua, "IfUnit", CclIfUnit);
+//    lua_register(Lua, "IfUnitAt", CclIfUnitAt);
+//    lua_register(Lua, "IfNearUnit", CclIfNearUnit);
+//    lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
+//    lua_register(Lua, "IfOpponents", CclIfOpponents);
+//    lua_register(Lua, "IfResource", CclIfResource);
+//    lua_register(Lua, "IfKills", CclIfKills);
+//    lua_register(Lua, "IfScore", CclIfScore);
+//    lua_register(Lua, "IfElapsed", CclIfElapsed);
+//    lua_register(Lua, "IfTimer", CclIfTimer);
+//    lua_register(Lua, "IfSwitch", CclIfSwitch);
+    // Actions
+    lua_register(Lua, "ActionVictory", CclActionVictory);
+    lua_register(Lua, "ActionDefeat", CclActionDefeat);
+    lua_register(Lua, "ActionDraw", CclActionDraw);
+    lua_register(Lua, "ActionSetTimer", CclActionSetTimer);
+    lua_register(Lua, "ActionStartTimer", CclActionStartTimer);
+    lua_register(Lua, "ActionStopTimer", CclActionStopTimer);
+    lua_register(Lua, "ActionWait", CclActionWait);
+    lua_register(Lua, "ActionSetSwitch", CclActionSetSwitch);
 #endif
 }
 

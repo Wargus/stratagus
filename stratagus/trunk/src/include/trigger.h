@@ -69,12 +69,17 @@ extern Timer GameTimer;			/// the game timer
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(SCM);    /// get player number.
-extern const UnitType* TriggerGetUnitType(SCM);	/// get the unit-type
+#if defined(USE_GUILE) || defined(USE_SIOD)
+extern int TriggerGetPlayer(SCM player);/// get player number.
+extern const UnitType* TriggerGetUnitType(SCM unit);	/// get the unit-type
+#elif defined(USE_LUA)
+extern int TriggerGetPlayer(lua_State* l);/// get player number.
+extern const UnitType* TriggerGetUnitType(lua_State* l);	/// get the unit-type
+#endif
 extern void TriggersEachCycle(void);	/// test triggers
 
 extern void TriggerCclRegister(void);	/// Register ccl features
-extern void SaveTriggers(CLFile*);	/// Save the trigger module
+extern void SaveTriggers(CLFile* file);	/// Save the trigger module
 extern void InitTriggers(void);		/// Setup triggers
 extern void CleanTriggers(void);	/// Cleanup the trigger module
 
