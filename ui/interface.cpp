@@ -927,7 +927,7 @@ global int HandleCheats(const char* input)
 			ThisPlayer->AiEnabled = 1;
 			ThisPlayer->Type = PlayerComputer;
 			if (!ThisPlayer->Ai) {
-					AiInit(ThisPlayer);
+				AiInit(ThisPlayer);
 			}
 			SetMessage("I'm the BORG, resistance is futile!");
 		}
@@ -987,9 +987,7 @@ local int InputKey(int key)
 #endif
 			if (!IsNetworkGame()) {
 				if (!GameObserve && !GamePaused) {
-					int ret;
-					ret = HandleCheats(Input);
-					if (ret) {
+					if (HandleCheats(Input)) {
 						CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 					}
 				}
@@ -1092,7 +1090,7 @@ local void Screenshot(void)
 	char filename[30];
 	int i;
 
-	for (i = 1; i < 99; ++i) {
+	for (i = 1; i <= 99; ++i) {
 		// FIXME: what if we can't write to this directory?
 		sprintf(filename, "screen%02d.png", i);
 		if (!(fd = CLopen(filename, CL_OPEN_READ))) {
@@ -1268,55 +1266,46 @@ global void HandleKeyRepeat(unsigned key __attribute__((unused)),
 */
 global int HandleMouseScrollArea(int x, int y)
 {
-	// FIXME: perhaps I should change the complete scroll handling.
-	// FIXME: show scrolling cursor only, if scrolling is possible
-	// FIXME: scrolling with edge resistance
 	if (x < SCROLL_LEFT) {
-		CursorOn = CursorOnScrollLeft;
-		MouseScrollState = ScrollLeft;
-		GameCursor = TheUI.ArrowW.Cursor;
 		if (y < SCROLL_UP) {
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = TheUI.ArrowNW.Cursor;
-		}
-		if (y > SCROLL_DOWN) {
+		} else if (y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = TheUI.ArrowSW.Cursor;
+		} else {
+			CursorOn = CursorOnScrollLeft;
+			MouseScrollState = ScrollLeft;
+			GameCursor = TheUI.ArrowW.Cursor;
 		}
-		return 1;
-	}
-	if (x > SCROLL_RIGHT) {
-		CursorOn = CursorOnScrollRight;
-		MouseScrollState = ScrollRight;
-		GameCursor = TheUI.ArrowE.Cursor;
+	} else if (x > SCROLL_RIGHT) {
 		if (y < SCROLL_UP) {
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = TheUI.ArrowNE.Cursor;
-		}
-		if (y > SCROLL_DOWN) {
+		} else if (y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = TheUI.ArrowSE.Cursor;
+		} else {
+			CursorOn = CursorOnScrollRight;
+			MouseScrollState = ScrollRight;
+			GameCursor = TheUI.ArrowE.Cursor;
 		}
-		return 1;
-	}
-	if (y < SCROLL_UP) {
+	} else if (y < SCROLL_UP) {
 		CursorOn = CursorOnScrollUp;
 		MouseScrollState = ScrollUp;
 		GameCursor = TheUI.ArrowN.Cursor;
-		return 1;
-	}
-	if (y > SCROLL_DOWN) {
+	} else if (y > SCROLL_DOWN) {
 		CursorOn = CursorOnScrollDown;
 		MouseScrollState = ScrollDown;
 		GameCursor = TheUI.ArrowS.Cursor;
-		return 1;
+	} else {
+		return 0;
 	}
-
-	return 0;
+	return 1;
 }
 
 /**
