@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name missile.c	-	The missiles. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -477,7 +476,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 	return *type;
     }
 
-    DebugLevel0(__FUNCTION__": Missile %s not found\n",ident);
+    DebugLevel0Fn("Missile %s not found\n",ident);
     return NULL;
 }
 
@@ -496,7 +495,7 @@ global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
 {
     Missile* missile;
 
-    DebugLevel3(__FUNCTION__": type %Zd(%s) at %d,%d to %d,%d\n"
+    DebugLevel3Fn("type %Zd(%s) at %d,%d to %d,%d\n"
 	    ,type-MissileTypes,type->Name,sx,sy,dx,dy);
 
     //
@@ -566,7 +565,7 @@ local int CalculateDamageStats(const UnitStats* attacker_stats
     damage+=attacker_stats->PiercingDamage+1;	// round up
     damage/=2;
     damage*=((SyncRand()>>15)&1)+1;
-    DebugLevel3("Damage done %d\n",damage);
+    DebugLevel3Fn("Damage done %d\n",damage);
 
     return damage;
 }
@@ -597,7 +596,7 @@ global void FireMissile(Unit* unit)
     Unit* goal;
     Missile* missile;
 
-    DebugLevel3(__FUNCTION__":\n");
+    DebugLevel3Fn("\n");
 
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
 	// Hit immediately
@@ -617,7 +616,7 @@ global void FireMissile(Unit* unit)
 		return;
 	    }
 
-	    DebugLevel1("Missile-none hits no unit, shouldn't happen!\n");
+	    DebugLevel1Fn("Missile-none hits no unit, shouldn't happen!\n");
 	    return;
 	}
 
@@ -625,7 +624,7 @@ global void FireMissile(Unit* unit)
 #ifdef NEW_UNIT
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
-	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    DebugLevel0Fn("destroyed unit\n");
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -635,7 +634,7 @@ global void FireMissile(Unit* unit)
 	}
 #endif
 	if( goal->Removed ) {
-	    DebugLevel3("Missile-none hits removed unit!\n");
+	    DebugLevel3Fn("Missile-none hits removed unit!\n");
 #ifdef NEW_UNIT
 	    --goal->Refs;
 #endif
@@ -643,7 +642,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
-	    DebugLevel3("Missile-none hits dead unit!\n");
+	    DebugLevel3Fn("Missile-none hits dead unit!\n");
 #ifdef NEW_UNIT
 	    --goal->Refs;
 #endif
@@ -664,7 +663,7 @@ global void FireMissile(Unit* unit)
 #ifdef NEW_UNIT
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
-	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    DebugLevel0Fn("destroyed unit\n");
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -676,7 +675,7 @@ global void FireMissile(Unit* unit)
 	DebugCheck( !goal->Type );	// Target invalid?
 	// Fire to nearest point of unit!
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
-	DebugLevel3("Fire to unit at %d,%d\n",dx,dy);
+	DebugLevel3Fn("Fire to unit at %d,%d\n",dx,dy);
 	dx=dx*TileSizeX+TileSizeX/2;
 	dy=dy*TileSizeY+TileSizeY/2;
     } else {
@@ -719,7 +718,7 @@ local int MissileVisible(const Missile* missile)
 	    || (tileMinY>MapY+MapHeight) || (tileMaxY<MapY)) {
 	return 0;
     }
-    DebugLevel3("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
+    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
 		tileMinX,tileMaxX,tileMinY,tileMaxY,
 		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
     return 1;
@@ -758,6 +757,11 @@ global void DrawMissiles(void)
 	if (MissileVisible(missile)) {
 	    x=missile->X-MapX*TileSizeX+TheUI.MapX;
 	    y=missile->Y-MapY*TileSizeY+TheUI.MapY;
+	    // FIXME: I should copy SourcePlayer for second level missiles.
+	    if( missile->SourcePlayer ) {
+		GraphicPlayerPixels(missile->SourcePlayer
+			,missile->Type->Sprite);
+	    }
 	    DrawMissile(missile->Type,missile->Frame,x,y);
 	}
     }
@@ -839,7 +843,7 @@ local int PointToPointMissile(Missile* missile)
 	missile->Xstep=xstep;
 	missile->Ystep=ystep;
 	++missile->State;
-	DebugLevel3("Init: %d,%d, %d,%d, =%d\n"
+	DebugLevel3Fn("Init: %d,%d, %d,%d, =%d\n"
 		,dx,dy,xstep,ystep,missile->D);
 	return 0;
     } else {
@@ -945,7 +949,7 @@ global void MissileHit(const Missile* missile)
     goal=UnitOnMapTile(x,y);
     if( !goal || !goal->HP ) {
 	if( WallOnMap(x,y) ) {
-	    DebugLevel3("Missile on wall?\n");
+	    DebugLevel3Fn("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
 	    if( HumanWallOnMap(x,y) ) {
 		HitWall(x,y,CalculateDamageStats(missile->SourceStats,
@@ -956,7 +960,7 @@ global void MissileHit(const Missile* missile)
 	    }
 	    return;
 	}
-	DebugLevel0(__FUNCTION__": Oops nothing to hit (%d,%d)?\n",x,y);
+	DebugLevel0Fn("Oops nothing to hit (%d,%d)?\n",x,y);
 	return;
     }
 
@@ -1004,7 +1008,7 @@ global void MissileActions(void)
 			missile->Frame-=
 				VideoGraphicFrames(missile->Type->Sprite);
 		    }
-		    DebugLevel3("Frame %d of %d\n"
+		    DebugLevel3Fn("Frame %d of %d\n"
 			    ,missile->Frame
 			    ,VideoGraphicFrames(missile->Type->Sprite));
 		}
@@ -1054,7 +1058,7 @@ global void MissileActions(void)
 			missile->Frame-=
 				VideoGraphicFrames(missile->Type->Sprite);
 		    }
-		    DebugLevel3("Frame %d of %d\n"
+		    DebugLevel3Fn("Frame %d of %d\n"
 			    ,missile->Frame
 			    ,VideoGraphicFrames(missile->Type->Sprite));
 		}
@@ -1172,7 +1176,7 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     x=(missile->X+missile->Type->Width/2)/TileSizeX;
     y=(missile->Y+missile->Type->Height/2)/TileSizeY;	// pixel -> tile
 
-    DebugLevel3(__FUNCTION__": Missile %p at %d %d\n",missile,x,y);
+    DebugLevel3Fn("Missile %p at %d %d\n",missile,x,y);
 
     return ViewPointDistance(x,y);
 }
