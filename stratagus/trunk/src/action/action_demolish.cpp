@@ -78,14 +78,14 @@ global void HandleActionDemolish(Unit* unit)
 	    //	Already at target? FIXME: duplicate code.
 	    //
 	    if( (goal=unit->Orders[0].Goal) ) {
-		if( MapDistanceToUnit(unit->X,unit->Y,goal)<=1 ) {
+		if( MapDistanceBetweenUnits(unit,goal)<=1 ) {
 		    unit->State=0;
 		    unit->SubAction=2;
 		    HandleActionDemolish(unit);
 		    return;
 		}
-	    } else if( MapDistance(unit->X,unit->Y
-		    ,unit->Orders[0].X,unit->Orders[0].Y)<=1 ) {
+	    } else if( MapDistanceToUnit(unit->Orders[0].X,
+			unit->Orders[0].Y,unit)<=1 ) {
 		unit->State=0;
 		unit->SubAction=2;
 		HandleActionDemolish(unit);
@@ -130,12 +130,12 @@ global void HandleActionDemolish(Unit* unit)
 		//	Have reached target? FIXME: could use pathfinder result?
 		//
 		if( goal ) {
-		    if( MapDistanceToUnit(unit->X,unit->Y,goal)<=1 ) {
+		    if( MapDistanceBetweenUnits(unit,goal)<=1 ) {
 			unit->State=0;
 			unit->SubAction=2;
 		    }
-		} else if( MapDistance(unit->X,unit->Y
-			,unit->Orders[0].X,unit->Orders[0].Y)<=1 ) {
+		} else if( MapDistanceToUnit(unit->Orders[0].X,unit->Orders[0].Y
+			,unit )<=1 ) {
 		    unit->State=0;
 		    unit->SubAction=2;
 		} else if( err==PF_UNREACHABLE ) {

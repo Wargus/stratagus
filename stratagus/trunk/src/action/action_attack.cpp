@@ -297,7 +297,7 @@ local void MoveToTarget(Unit* unit)
 	    //
 	    //	Have reached target? FIXME: could use the new return code?
 	    //
-	    if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
+	    if( goal && MapDistanceBetweenUnits(unit,goal)
 		    <=unit->Stats->AttackRange ) {
 		DebugLevel3Fn("Reached another unit, now attacking it.\n");
 		unit->State=0;
@@ -316,8 +316,7 @@ local void MoveToTarget(Unit* unit)
 	    //
 	    if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
 			|| unit->Orders[0].Action==UnitActionAttackGround)
-		    && MapDistance(unit->X,unit->Y
-			,unit->Orders[0].X,unit->Orders[0].Y)
+		    && MapDistanceToUnit(unit->Orders[0].X,unit->Orders[0].Y,unit)
 			    <=unit->Stats->AttackRange ) {
 		DebugLevel3Fn("Reached wall or ground, now attacking it.\n");
 		unit->State=0;
@@ -519,7 +518,7 @@ local void AttackTarget(Unit* unit)
 	//
 	//	Still near to target, if not goto target.
 	//
-	if( MapDistanceToUnit(unit->X,unit->Y,goal)
+	if( MapDistanceBetweenUnits(unit,goal)
 		>unit->Stats->AttackRange ) {
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		// Save current order to come back or to continue it.
