@@ -106,8 +106,8 @@ global unsigned AllocatedSoundMemory;	/// memory used by sound
 global unsigned CompressedSoundMemory;	/// compressed memory used by sound
 #endif
 
-global int GlobalVolume;		/// global sound volume
-global int MusicVolume;			/// music volume
+global int GlobalVolume=128;		/// global sound volume
+global int MusicVolume=128;		/// music volume
 
 global int DistanceSilent;		/// silent distance
 
@@ -1282,10 +1282,6 @@ global int InitSound(void)
     for(dummy=0;dummy<MaxChannels; ++dummy) {
 	Channels[dummy].Point=dummy+1;
     }
-
-    // initialize volume (neutral point)
-    GlobalVolume=128;
-    MusicVolume=256;
 
     // initialize unit to channel hash table
     // WARNING: creation is only valid for a hash table using pointers as key
