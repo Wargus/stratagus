@@ -100,6 +100,11 @@
 
 #endif
 
+#ifdef WIN32
+#include <stdlib.h>
+#define free(x) do { if( (x) ) free(x); } while(0)
+#endif
+
 #endif	// } __GNUC__
 
 #ifndef __GNUC__	// { disable GNU C Compiler features

@@ -126,7 +126,7 @@ _hash_get(u8 *id, void *tab, int size, int usize)
     s->left = 0;
     s->right = 0;
     memset(s->misc, 0, usize);
-    s->misc[usize] = h;
+    s->misc[usize] = (u8)h;
     strcpy(s->misc + usize + 1, id);
 
     return s->misc;

@@ -754,8 +754,9 @@ local SCM CclSlotUsage (SCM list)
 		gh_scm2int (gh_vector_ref (vector, gh_int2scm (i)));
     }
 #else
-    int len = MAX_UNIT_SLOTS/8 + 1;
-    unsigned char SlotUsage[len];
+#define SLOT_LEN MAX_UNIT_SLOTS/8 + 1
+    const int len = SLOT_LEN;
+    unsigned char SlotUsage[SLOT_LEN];
     int i, prev;
     SCM value;
 
