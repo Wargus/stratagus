@@ -72,6 +72,7 @@ local int InputIndex;		/// current index into input
 local char InputStatusLine[80];	/// Last input status line
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
+global char OrdersDuringPause;	/// Allow giving orders in pause mode.
 global char SkipGameCycle;	/// Skip the next game cycle
 global char BigMapMode;		/// Show only the map
 global enum _iface_state_ InterfaceState; /// Current interface state
