@@ -60,6 +60,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "netconnect.h"
+#include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
 --	Variables

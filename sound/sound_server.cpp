@@ -73,18 +73,11 @@
 
 #include "sound_server.h"
 #include "sound.h"
+#include "cdaudio.h"
 #include "ccl.h"
 
 #ifdef USE_LIBMODPLUG
 #include "../libmodplug/modplug.h"
-#endif
-
-#if defined(USE_SDLCD)
-#include "SDL.h"
-#elif defined(USE_LIBCDA)
-#include "libcda.h"
-#elif defined(USE_CDDA)
-
 #endif
 
 #ifdef USE_GLIB
@@ -221,35 +214,6 @@ global void StopMusic(void)
 #define MixMusicToStereo32(buffer,size)
 
 #endif
-
-/**
-**	Check cdrom.
-**
-**	Perodic called from the main loop.
-*/
-global int CDRomCheck(void *unused __attribute__ ((unused)))
-{
-#if defined(USE_SDLCD)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped
-	    && SDL_CDStatus(CDRom) == 1) {
-	DebugLevel0Fn("Playing new track\n");
-	PlayCDRom(CDMode);
-    }
-#elif defined(USE_LIBCDA)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped
-	    && !cd_current_track() && CDMode != CDModeDefined) {
-	DebugLevel0Fn("Playing new track\n");
-	PlayCDRom(CDMode);
-    }
-#elif defined(USE_CDDA)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped
-	    && !PlayingMusic) {
-	DebugLevel0Fn("Playing new track\n");
-        PlayCDRom(CDMode);
-    }
-#endif
-    return 0;
-}
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -1231,35 +1195,6 @@ global void QuitSound(void)
     }
 #endif // WITH_ARTSC
 #endif // USE_SDLA
-}
-
-/**
-**	FIXME: docu
-*/
-global void QuitCD(void)
-{
-#if defined(USE_SDLCD)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-	SDL_CDStop(CDRom);
-	CDMode = CDModeStopped;
-    }
-    if (CDMode != CDModeStopped) {
-        SDL_CDClose(CDRom);
-	CDMode = CDModeOff;
-    }
-#elif defined(USE_LIBCDA)
-    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-        cd_stop();
-	CDMode = CDModeStopped;
-    }
-    if (CDMode == CDModeStopped) {
-        cd_close();
-        cd_exit();
-	CDMode = CDModeOff;
-    }
-#elif defined(USE_CDDA)
-    close(CDDrive);
-#endif
 }
 
 #endif	// } WITH_SOUND

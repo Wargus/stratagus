@@ -65,6 +65,7 @@
 #include "editor.h"
 #include "commands.h"
 #include "actions.h"
+#include "cdaudio.h"
 
 #ifdef USE_SDLA
 #include "SDL.h"
@@ -1589,11 +1590,8 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
     if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 #if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
 	int i = 0;
-#ifdef USE_LIBCDA
-	cd_get_volume(&i, &i);
-#else
-	i = MusicVolume;
-#endif
+	i = GetCDVolume();
+
 	menu->items[12].flags = 0;
 	menu->items[12].d.hslider.percent = (i * 100) / 255;
 #endif
@@ -1818,41 +1816,14 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
-#ifdef WITH_SOUND
-#ifdef USE_SDLCD
+#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     // Start Playing CD
     if (CDMode == CDModeOff || CDMode == CDModeStopped) {
-#ifdef USE_WIN32
-	SDL_CDResume(CDRom);
-#endif
-	PlayCDRom(CDModeRandom);
+	ResumeCD();
     } else {
     // Stop Playing CD
-        SDL_CDPause(CDRom);
-	CDMode = CDModeStopped;
+	PauseCD();
     }
-    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-	StopMusic();
-    }
-#elif defined(USE_LIBCDA)
-    // Start Playing CD
-    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
-	PlayCDRom(CDModeRandom);
-    } else {
-    // Stop Playing CD
-        cd_pause();
-	CDMode = CDModeStopped;
-    }
-#elif defined(USE_CDDA)
-    // Start Playing CD
-    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
-	PlayCDRom(CDModeRandom);
-    } else {
-    // Stop Playing CD
-	StopMusic();
-	CDMode = CDModeStopped;
-    }
-#endif
 #endif
     SoundOptionsInit(NULL);
 }
@@ -1893,7 +1864,7 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 {
-#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
+#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     CDMode = CDModeDefined;
 #endif
     SoundOptionsInit(NULL);
@@ -1904,7 +1875,7 @@ local void SetCdModeDefined(Menuitem *mi __attribute__((unused)))
 */
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
-#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
+#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     CDMode = CDModeRandom;
 #endif
     SoundOptionsInit(NULL);
@@ -3901,7 +3872,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
     }
 }
 
-#if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_CDDA))
+#if defined(USE_LIBCDA) || defined(USE_CDDA) || defined(USE_SDLCD)
 /**
 **	CD volume horizontal slider action callback
 */
@@ -3926,11 +3897,7 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
-#ifdef USE_LIBCDA
-	    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
-#else
-	    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
-#endif
+	    SetCDVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
@@ -3940,11 +3907,7 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
 		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-#ifdef USE_LIBCDA
-		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
-#else
-		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
-#endif
+		SetCDVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
