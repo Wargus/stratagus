@@ -1666,22 +1666,22 @@ local void HandleTransportRequests(AiTransportRequest * aitr)
 	    return;
 	}
 	
-	gw=aitr->Unit->Orders[0].Goal->Type->TileWidth;
-	gh=aitr->Unit->Orders[0].Goal->Type->TileHeight;
-	gx=aitr->Unit->Orders[0].Goal->X;
-	gy=aitr->Unit->Orders[0].Goal->Y;
-	maxrange=aitr->Unit->Orders[0].Range;
-	minrange=aitr->Unit->Orders[0].MinRange;
+	gw=aitr->Order.Goal->Type->TileWidth;
+	gh=aitr->Order.Goal->Type->TileHeight;
+	gx=aitr->Order.Goal->X;
+	gy=aitr->Order.Goal->Y;
+	maxrange=aitr->Order.Range;
+	minrange=aitr->Order.MinRange;
     } else {
 	// Take care of non square goals :)
 	// If goal is non square, range states a non-existant goal rather
 	// than a tile.
-	gw = aitr->Unit->Orders[0].Width;
-	gh = aitr->Unit->Orders[0].Height;
-	maxrange=aitr->Unit->Orders[0].Range;
-	minrange=aitr->Unit->Orders[0].MinRange;
-	gx=aitr->Unit->Orders[0].X;
-	gy=aitr->Unit->Orders[0].Y;
+	gw = aitr->Order.Width;
+	gh = aitr->Order.Height;
+	maxrange=aitr->Order.Range;
+	minrange=aitr->Order.MinRange;
+	gx=aitr->Order.X;
+	gy=aitr->Order.Y;
     }
 	
     // Check if we have an idle air transporter.
