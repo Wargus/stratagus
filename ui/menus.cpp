@@ -80,43 +80,48 @@ local int MenuButtonCurSel = -1;
 **	Items for the Game Menu
 */
 local Menuitem GameMenuItems[] = {
-    { MI_TYPE_TEXT, { text:{ 128, 11, MI_FLAGS_CENTERED, LargeFont, "Game Menu"} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 40, MenuButtonDisabled, LargeFont,
-	 "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
-    { MI_TYPE_BUTTON, { button:{ 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont,
-	 "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, NULL, KeyCodeF12} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36, MenuButtonDisabled, LargeFont,
-	 "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont,
-	 "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont,
-	 "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, NULL, 'o'} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont,
-	 "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'e'} } },
-    { MI_TYPE_BUTTON, { button:{ 16, 288-40, MenuButtonSelected, LargeFont,
-	 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Game Menu", MI_FLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, NULL, KeyCodeF12} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF5} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, NULL, 'o'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!End Scenario", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'e'} } },
+    { MI_TYPE_BUTTON, 16, 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, GameMenuReturn, '\033'} } },
 };
 
 /**
 **	Items for the Victory Menu
 */
 local Menuitem VictoryMenuItems[] = {
-    { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "Congratulations!"} } },
-    { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "You are victorious!"} } },
-    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
-    { MI_TYPE_BUTTON, { button:{ 32, 56, MenuButtonDisabled, LargeFont,
-	 "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Congratulations!", MI_FLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
+	{ text:{ "You are victorious!", MI_FLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!Victory", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'v'} } },
+    { MI_TYPE_BUTTON, 32, 56, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF11} } },
 };
 
 /**
 **	Items for the Lost Menu
 */
 local Menuitem LostMenuItems[] = {
-    { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "You failed to"} } },
-    { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "achieve victory!"} } },
-    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
+    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "You failed to", MI_FLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
+	{ text:{ "achieve victory!", MI_FLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'o'} } },
 };
 
 /**
@@ -135,18 +140,31 @@ local unsigned char *ssmsoptions[] = {
     "128 x 128",
 };
 
+local unsigned char *sslboptions[] = {	// (WIP) - test only will be read from directory later!!
+    "alamo.pud",
+    "channel.pud"
+};
+
 local Menuitem SelectScenMenuItems[] = {
-    { MI_TYPE_TEXT, { text:{ 176, 8, MI_FLAGS_CENTERED, LargeFont, "Select scenario"} } },
-    { MI_TYPE_TEXT, { text:{ 132, 40, MI_FLAGS_RALIGN, LargeFont, "Type:"} } },
-    { MI_TYPE_PULLDOWN, { pulldown:{ 140, 40, 0, GameFont, ssmtoptions,
-	      192, 20, MBUTTON_PULLDOWN, NULL, 2, 1, 1, 0} } },
-    { MI_TYPE_TEXT, { text:{ 132, 80, MI_FLAGS_RALIGN, LargeFont, "Map size:"} } },
-    { MI_TYPE_PULLDOWN, { pulldown:{ 140, 80, 0, GameFont, ssmsoptions,
-	      192, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
-    { MI_TYPE_BUTTON, { button:{ 48, 318, MenuButtonSelected, LargeFont,
-	 "OK", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
-    { MI_TYPE_BUTTON, { button:{ 198, 318, 0, LargeFont,
-	 "Cancel", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
+    { MI_TYPE_TEXT, 176, 8, 0, LargeFont, NULL, NULL,
+	{ text:{ "Select scenario", MI_FLAGS_CENTERED} } },
+
+    { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, NULL, NULL,
+	{ listbox:{ sslboptions, 288, 6*18, MBUTTON_PULLDOWN, NULL, 2, 0, 0, 0, 6, 0} } },
+
+    { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "OK", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
+    { MI_TYPE_BUTTON, 198, 318, 0, LargeFont, NULL, NULL,
+	{ button:{ "Cancel", 106, 27, MBUTTON_GM_HALF, NULL, 0} } },
+
+    { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
+	{ text:{ "Type:", MI_FLAGS_RALIGN} } },
+    { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
+	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, NULL, 2, 1, 1, 0} } },
+    { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
+	{ text:{ "Map size:", MI_FLAGS_RALIGN} } },
+    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
+	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
 };
 
 /**
@@ -186,7 +204,7 @@ global Menu Menus[] = {
 	(480-352)/2,
 	352, 352,
 	ImagePanel5,
-	5, 7,
+	7, 8,
 	SelectScenMenuItems
     },
 };
@@ -251,12 +269,12 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 {
     int i, nc, rc;
     char *text;
+    unsigned flags = mi->flags;
     MenuButtonId rb = mi->d.pulldown.button;
-    unsigned flags = mi->d.pulldown.flags;
     unsigned w, h, x, y, oh;
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
     w = mi->d.pulldown.xsize;
-    x = mx+mi->d.pulldown.xofs;
-    y = my+mi->d.pulldown.yofs;
     oh = h = mi->d.pulldown.ysize - 2;
 
     GetDefaultTextColors(&nc, &rc);
@@ -275,13 +293,13 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 		    SetDefaultTextColors(rc,rc);
 		else
 		    SetDefaultTextColors(nc,rc);
-		DrawText(x+2,y+2 + oh*i ,mi->d.pulldown.font,text);
+		DrawText(x+2,y+2 + oh*i ,mi->font,text);
 	    }
 	}
 	w += 2;
     } else {
 	h = mi->d.pulldown.ysize;
-	y = my+mi->d.pulldown.yofs;
+	y = my+mi->yofs;
 	if (flags&MenuButtonDisabled) {
 	    rb--;
 	    SetDefaultTextColors(FontGrey,FontGrey);
@@ -298,7 +316,7 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
 	text = mi->d.pulldown.options[mi->d.pulldown.curopt];
 	if (text) {
-	    DrawText(x+2,y+2,mi->d.pulldown.font,text);
+	    DrawText(x+2,y+2,mi->font,text);
 	}
     }
     if (flags&MenuButtonSelected) {
@@ -307,6 +325,59 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
     }
     SetDefaultTextColors(nc,rc);
 }
+
+/**
+**	Draw listbox 'button' on menu mx, my
+**
+**	@param mi	menuitem pointer
+**	@param mx	menu X display position (offset)
+**	@param my	menu Y display position (offset)
+*/
+local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
+{
+    int i, s, nc, rc;
+    char *text;
+    MenuButtonId rb = mi->d.listbox.button;
+    unsigned flags = mi->flags;
+    unsigned w, h, x, y;
+    w = mi->d.listbox.xsize;
+    h = mi->d.listbox.ysize;
+    x = mx+mi->xofs;
+    y = my+mi->yofs;
+
+    GetDefaultTextColors(&nc, &rc);
+
+    if (flags&MenuButtonDisabled) {
+	rb--;
+    } 
+    i = mi->d.listbox.nlines;
+    s = mi->d.listbox.startline;
+    while (i--) {
+	PushClipping();
+	SetClipping(0,0,x+w,VideoHeight);
+	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + 18*i);
+	PopClipping();
+	if (!(flags&MenuButtonDisabled)) {
+	    if (i < mi->d.listbox.noptions) {
+		text = mi->d.listbox.options[i + s];
+		if (text) {
+		    if (i == mi->d.listbox.curopt)
+			SetDefaultTextColors(rc,rc);
+		    else
+			SetDefaultTextColors(nc,rc);
+		    DrawText(x+2,y+2 + 18*i ,mi->font,text);
+		}
+	    }
+	}
+    }
+
+    if (flags&MenuButtonSelected) {
+	VideoDrawRectangle(ColorYellow,x-2,y-2,w+2,h+2);
+	/// FIXME: use ColorGrey if selected button is disabled!
+    }
+    SetDefaultTextColors(nc,rc);
+}
+
 
 /**
 **	Draw menu  'menu'
@@ -331,25 +402,28 @@ global void DrawMenu(int MenuId)
     for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
-		if (mi->d.text.flags&MI_FLAGS_CENTERED)
-		    DrawTextCentered(menu->x+mi->d.text.xofs,menu->y+mi->d.text.yofs,
-			    mi->d.text.font,mi->d.text.text);
-		else if (mi->d.text.flags&MI_FLAGS_RALIGN) {
-		    l = TextLength(mi->d.text.font,mi->d.text.text);
-		    DrawText(menu->x+mi->d.text.xofs-l,menu->y+mi->d.text.yofs,
-			    mi->d.text.font,mi->d.text.text);
+		if (mi->d.text.tflags&MI_FLAGS_CENTERED)
+		    DrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
+			    mi->font,mi->d.text.text);
+		else if (mi->d.text.tflags&MI_FLAGS_RALIGN) {
+		    l = TextLength(mi->font,mi->d.text.text);
+		    DrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
+			    mi->font,mi->d.text.text);
 		} else
-		    DrawText(menu->x+mi->d.text.xofs,menu->y+mi->d.text.yofs,
-			    mi->d.text.font,mi->d.text.text);
+		    DrawText(menu->x+mi->xofs,menu->y+mi->yofs,
+			    mi->font,mi->d.text.text);
 		break;
 	    case MI_TYPE_BUTTON:
-		    DrawMenuButton(mi->d.button.button,mi->d.button.flags,
+		    DrawMenuButton(mi->d.button.button,mi->flags,
 			    mi->d.button.xsize,mi->d.button.ysize,
-			    menu->x+mi->d.button.xofs,menu->y+mi->d.button.yofs,
-			    mi->d.button.font,mi->d.button.text);
+			    menu->x+mi->xofs,menu->y+mi->yofs,
+			    mi->font,mi->d.button.text);
 		break;
 	    case MI_TYPE_PULLDOWN:
 		    DrawPulldown(mi,menu->x,menu->y);
+		break;
+	    case MI_TYPE_LISTBOX:
+		    DrawListbox(mi,menu->x,menu->y);
 		break;
 	    default:
 		break;
@@ -431,7 +505,7 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 	case KeyCodeUp: case KeyCodeDown:
 	    if (MenuButtonCurSel != -1) {
 		mi = menu->items + MenuButtonCurSel;
-		if (mi->mitype == MI_TYPE_PULLDOWN && !(mi->d.pulldown.flags&MenuButtonClicked)) {
+		if (mi->mitype == MI_TYPE_PULLDOWN && !(mi->flags&MenuButtonClicked)) {
 		    if (key == KeyCodeDown) {
 			if (mi->d.pulldown.curopt + 1 < mi->d.pulldown.noptions)
 			    mi->d.pulldown.curopt++;
@@ -449,29 +523,21 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 	    }
 	    break;
 	case 9: 				/// TAB			// FIXME: Add Shift-TAB
-	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].d.button.flags&MenuButtonClicked)) {
+	    if (MenuButtonCurSel != -1 && !(menu->items[MenuButtonCurSel].flags&MenuButtonClicked)) {
 		n = menu->nitems;
 		for (i = 0; i < n; ++i) {
 		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
 		    switch (mi->mitype) {
 			case MI_TYPE_TEXT:
 			    break;
-			case MI_TYPE_BUTTON:
-			    if (mi->d.button.flags & MenuButtonDisabled) {
-				break;
-			    }
-			    mi->d.button.flags |= MenuButtonSelected;
-			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
-			    MenuButtonCurSel = mi - menu->items;
-			    MustRedraw |= RedrawMenu;
-			    return 1;
+			case MI_TYPE_LISTBOX:
 			case MI_TYPE_PULLDOWN:
-			    if (mi->d.pulldown.flags & MenuButtonDisabled) {
+			case MI_TYPE_BUTTON:
+			    if (mi->flags & MenuButtonDisabled) {
 				break;
 			    }
-			    mi->d.pulldown.flags |= MenuButtonSelected;
-			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
-			    // FIXME: maybe different union member, not button!
+			    mi->flags |= MenuButtonSelected;
+			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
 			    MenuButtonCurSel = mi - menu->items;
 			    MustRedraw |= RedrawMenu;
 			    return 1;
@@ -510,31 +576,31 @@ global void MenuHandleMouseMove(int x,int y)
 	mi = menu->items + i;
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
-		if (!(mi->d.button.flags&MenuButtonDisabled)) {
-		    xs = menu->x + mi->d.button.xofs;
-		    ys = menu->y + mi->d.button.yofs;
+		if (!(mi->flags&MenuButtonDisabled)) {
+		    xs = menu->x + mi->xofs;
+		    ys = menu->y + mi->yofs;
 		    if (x < xs || x > xs + mi->d.button.xsize || y < ys || y > ys + mi->d.button.ysize) {
-			if (!(mi->d.button.flags&MenuButtonClicked)) {
-			    if (mi->d.button.flags&MenuButtonActive) {
+			if (!(mi->flags&MenuButtonClicked)) {
+			    if (mi->flags&MenuButtonActive) {
 				RedrawFlag = 1;
-				mi->d.button.flags &= ~MenuButtonActive;
+				mi->flags &= ~MenuButtonActive;
 			    }
 			}
 			continue;
 		    }
-		    if (!(mi->d.button.flags&MenuButtonActive)) {
+		    if (!(mi->flags&MenuButtonActive)) {
 			RedrawFlag = 1;
-			mi->d.button.flags |= MenuButtonActive;
+			mi->flags |= MenuButtonActive;
 		    }
 		    DebugLevel3("On menu button %d\n", i);
 		    MenuButtonUnderCursor = i;
 		}
 		break;
 	    case MI_TYPE_PULLDOWN:
-		if (!(mi->d.pulldown.flags&MenuButtonDisabled)) {
-		    xs = menu->x + mi->d.pulldown.xofs;
-		    if (mi->d.pulldown.flags&MenuButtonClicked) {
-			ys = menu->y + mi->d.pulldown.yofs;
+		if (!(mi->flags&MenuButtonDisabled)) {
+		    xs = menu->x + mi->xofs;
+		    if (mi->flags&MenuButtonClicked) {
+			ys = menu->y + mi->yofs;
 			h = mi->d.pulldown.ysize - 2;
 			ys -= mi->d.pulldown.curopt * h;
 			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + h*mi->d.pulldown.noptions) {
@@ -547,23 +613,27 @@ global void MenuHandleMouseMove(int x,int y)
 			    // FIXME: DISPLAY-ACTION HERE .....
 			}
 		    } else {
-			ys = menu->y + mi->d.pulldown.yofs;
+			ys = menu->y + mi->yofs;
 			if (x<xs || x>xs + mi->d.pulldown.xsize || y<ys || y>ys + mi->d.pulldown.ysize) {
-			    if (!(mi->d.pulldown.flags&MenuButtonClicked)) {
-				if (mi->d.pulldown.flags&MenuButtonActive) {
+			    if (!(mi->flags&MenuButtonClicked)) {
+				if (mi->flags&MenuButtonActive) {
 				    RedrawFlag = 1;
-				    mi->d.pulldown.flags &= ~MenuButtonActive;
+				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
 			    continue;
 			}
 		    }
-		    if (!(mi->d.pulldown.flags&MenuButtonActive)) {
+		    if (!(mi->flags&MenuButtonActive)) {
 			RedrawFlag = 1;
-			mi->d.pulldown.flags |= MenuButtonActive;
+			mi->flags |= MenuButtonActive;
 		    }
 		    DebugLevel3("On menu pulldown %d\n", i);
 		    MenuButtonUnderCursor = i;
+		}
+		break;
+	    case MI_TYPE_LISTBOX:
+		if (!(mi->flags&MenuButtonDisabled)) {
 		}
 		break;
 	    default:
@@ -588,29 +658,25 @@ global void MenuHandleButtonDown(int b)
     if (MouseButtons&LeftButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->items + MenuButtonUnderCursor;
+	    if (!(mi->flags&MenuButtonClicked)) {
+		switch (mi->mitype) {
+		    case MI_TYPE_BUTTON:
+		    case MI_TYPE_PULLDOWN:
+		    case MI_TYPE_LISTBOX:
+			if (MenuButtonCurSel != -1) {
+			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+			}
+			MenuButtonCurSel = MenuButtonUnderCursor;
+			mi->flags |= MenuButtonClicked|MenuButtonSelected;
+			MustRedraw |= RedrawMenu;
+		    default:
+			break;
+		}
+	    }
 	    switch (mi->mitype) {
-		case MI_TYPE_BUTTON:
-		    if (!(mi->d.button.flags&MenuButtonClicked)) {
-			if (MenuButtonCurSel != -1) {
-			    // FIXME: maybe different union member, not button!
-			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
-			}
-			MenuButtonCurSel = MenuButtonUnderCursor;
-			mi->d.button.flags |= MenuButtonClicked|MenuButtonSelected;
-			MustRedraw |= RedrawMenu;
-		    }
-		    break;
 		case MI_TYPE_PULLDOWN:
-		    if (!(mi->d.pulldown.flags&MenuButtonClicked)) {
-			if (MenuButtonCurSel != -1) {
-			    // FIXME: maybe different union member, not button!
-			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
-			}
-			MenuButtonCurSel = MenuButtonUnderCursor;
-			mi->d.pulldown.flags |= MenuButtonClicked|MenuButtonSelected;
-			mi->d.pulldown.cursel = mi->d.pulldown.curopt;
-			MustRedraw |= RedrawMenu;
-		    }
+		    mi->d.pulldown.cursel = mi->d.pulldown.curopt;
+		    break;
 		default:
 		    break;
 	    }
@@ -636,9 +702,9 @@ global void MenuHandleButtonUp(int b)
 	    mi = menu->items + i;
 	    switch (mi->mitype) {
 		case MI_TYPE_BUTTON:
-		    if (mi->d.button.flags&MenuButtonClicked) {
+		    if (mi->flags&MenuButtonClicked) {
 			RedrawFlag = 1;
-			mi->d.button.flags &= ~MenuButtonClicked;
+			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
 			    if (mi->d.button.handler) {
@@ -648,9 +714,9 @@ global void MenuHandleButtonUp(int b)
 		    }
 		    break;
 		case MI_TYPE_PULLDOWN:
-		    if (mi->d.pulldown.flags&MenuButtonClicked) {
+		    if (mi->flags&MenuButtonClicked) {
 			RedrawFlag = 1;
-			mi->d.pulldown.flags &= ~MenuButtonClicked;
+			mi->flags &= ~MenuButtonClicked;
 			if (MenuButtonUnderCursor == i) {
 			    MenuButtonUnderCursor = -1;
 			    if (mi->d.pulldown.cursel != mi->d.pulldown.curopt) {
@@ -696,28 +762,41 @@ global void ProcessMenu(int MenuId, int Loop)
     MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
+	// FIXME: Maybe activate if mouse-pointer is over it right now?
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
-		mi->d.button.flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		if (i == menu->defsel) {
-		    mi->d.button.flags |= MenuButtonSelected;
+		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
 		}
-		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		break;
 	    case MI_TYPE_PULLDOWN:
-		mi->d.pulldown.flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
 		mi->d.pulldown.cursel = 0;
 		if (mi->d.pulldown.defopt != -1)
 		    mi->d.pulldown.curopt = mi->d.pulldown.defopt;
 		if (i == menu->defsel) {
-		    mi->d.pulldown.flags |= MenuButtonSelected;
+		    mi->flags |= MenuButtonSelected;
 		    MenuButtonCurSel = i;
 		}
-		// FIXME: Maybe activate if mouse-pointer is over it right now?
+		break;
+	    case MI_TYPE_LISTBOX:
+		mi->flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		mi->d.listbox.cursel = 0;
+		mi->d.listbox.startline = 0;
+		if (mi->d.listbox.defopt != -1)
+		    mi->d.listbox.curopt = mi->d.listbox.defopt;
+		if (i == menu->defsel) {
+		    mi->flags |= MenuButtonSelected;
+		    MenuButtonCurSel = i;
+		}
 		break;
 	    default:
 		break;
+	}
+	if (mi->initfunc) {
+	    (*mi->initfunc)(mi);
 	}
     }
     MenuButtonUnderCursor = -1;
@@ -736,6 +815,14 @@ global void ProcessMenu(int MenuId, int Loop)
 	    WaitEventsAndKeepSync();
 	}
     }
+
+    for (i = 0; i < menu->nitems; ++i) {
+	mi = menu->items + i;
+	if (mi->exitfunc) {
+	    (*mi->exitfunc)(mi);	// action/destructor
+	}
+    }
+
 }
 
 
