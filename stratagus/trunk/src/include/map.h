@@ -253,6 +253,7 @@ typedef struct _map_field_ {
 typedef struct _map_info_ {
 	char*  Description;     /// Map description
 	char*  MapTerrainName;  /// Map terrain name
+	char*  Filename;        /// Map filename
 	// FIXME: Map Terrain Nr. should be removed.
 	int MapTerrain;  /// Map terrain
 	int MapWidth;    /// Map width
