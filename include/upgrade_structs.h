@@ -136,7 +136,7 @@ static const char* DEFAULT_NAMES[7] __attribute__((unused)) = {
     "time","gold","wood","oil","ore","stone","coal"
 };
 
-#endif	// } __GNUC__
+#endif	// } !__GNUC__
 
 /**
 **	Indices into costs/resource/income array. (A litte future here :)
