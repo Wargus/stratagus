@@ -528,7 +528,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	case SDL_ACTIVEEVENT:
 	    DebugLevel3("\tFocus changed\n");
 	    if (!event->active.state) {
-		CursorOn = -1;
+                InputMouseExit(callbacks,SDL_GetTicks());
 	    }
 	    break;
 
@@ -708,6 +708,8 @@ global void WaitEventsAndKeepSync(void)
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
     callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.MouseExit=(void*)HandleMouseExit;
+
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
 

@@ -344,6 +344,7 @@ local void WaitForInput(int timeout)
     callbacks.ButtonPressed=WaitCallbackKey;
     callbacks.ButtonReleased=WaitCallbackKey;
     callbacks.MouseMoved=WaitCallbackMouse;
+    callbacks.MouseExit=WaitCallbackMouse;
     callbacks.KeyPressed=WaitCallbackKey2;
     callbacks.KeyReleased=WaitCallbackKey2;
 

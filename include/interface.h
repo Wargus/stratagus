@@ -260,7 +260,7 @@ extern int AddButton(int pos,int level,const char* IconIdent,
 extern void SaveButtons(FILE* file);
 
 //
-//	in interface.c
+//	in mouse.c
 //
     /// Called if any mouse button is pressed down
 extern void HandleButtonDown(unsigned button);
@@ -268,17 +268,45 @@ extern void HandleButtonDown(unsigned button);
 extern void HandleButtonUp(unsigned button);
     /// Called if the mouse is moved
 extern void HandleMouseMove(int x,int y);
+    /// Called if the mouse exits the game window (only for some videomodes)
+extern void HandleMouseExit(void);
+
     /// Called if a key is pressed
 extern void HandleKeyDown(unsigned keycode,unsigned keychar);
     /// Called when a key is released
 extern void HandleKeyUp(unsigned keycode,unsigned keychar);
 
+//
+//	in interface.c (for link between video and mouse.c)
+//
     /// Called if any mouse button is pressed down
 extern void InputMouseButtonPress(const EventCallback*,unsigned,unsigned);
     /// Called if any mouse button is released up
 extern void InputMouseButtonRelease(const EventCallback*,unsigned,unsigned);
     /// Called if the mouse is moved
 extern void InputMouseMove(const EventCallback*,unsigned,int,int);
+    /// Called if the mouse exits the game window (when supported by videomode)
+extern void InputMouseExit(const EventCallback*,unsigned);
+    /// Called to look for mouse timeout's
+extern void InputMouseTimeout(const EventCallback*,unsigned);
+
+//
+//	Chaos pur.
+//
+    /// Called if right mouse button is pressed
+extern void DoRightButton(int tx,int ty);
+    /// Cancel the building input mode
+extern void CancelBuildingMode(void);
+
+    /// Draw messages as overlay over of the map
+extern void DrawMessage(void);
+    /// Draw the player resource in resource line
+extern void DrawResources(void);
+    /// Set message to display
+extern void SetMessage( const char* fmt, ... );
+    /// Set message to display with event point
+extern void SetMessageEvent( int x, int y, const char* fmt, ... );
+    /// Center view-point on last event message
     /// Called to look for mouse timeout's
 extern void InputMouseTimeout(const EventCallback*,unsigned);
 
