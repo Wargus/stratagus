@@ -2386,8 +2386,6 @@ local void TipsInit(Menuitem *mi __attribute__((unused)))
     }
 
     free(str);
-
-    MustRedraw = RedrawEverything;
 }
 
 /**
