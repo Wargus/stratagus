@@ -46,6 +46,7 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineGameSounds">DefineGameSounds</a>
+<a href="#DefinePlaySections">DefinePlaySections</a>
 <a href="#MakeSound">MakeSound</a>
 <a href="#MakeSoundGroup">MakeSoundGroup</a>
 <a href="#MapSound">MapSound</a>
@@ -107,6 +108,41 @@ DefineGameSounds(
 
   "rescue", {"human", MakeSound("human rescue", "human/rescue.wav")},
   "rescue", {"orc", MakeSound("orc rescue", "orc/rescue.wav")} )
+</pre>
+
+<a name="DefinePlaySections"></a>
+<h3>DefinePlaySections(["race", racename,] "type", section, media, {"order", ordertype, tracktype, {"track1", "track2", ...}})</h3>
+
+Defines the music to be played at a specific section in the game.
+
+<dl>
+<dt>racename</dt>
+<dd>If specified, play music only for this race.
+</dd>
+<dt>section</dt>
+<dd>Section in the game to play this.
+</dd>
+<dt>media</dt>
+<dd>Can be either 'no-cd' or 'cd'.
+</dd>
+<dt>ordertype</dt>
+<dd>Can be 'all' or 'random'.
+</dd>
+<dt>tracktype</dt>
+<dd>If media is 'cd', then set to 'tracks', otherwise use 'files'.
+</dd>
+<dt>track1, track2, ...</dt>
+<dd>List of tracks/files to be played in this section.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+DefinePlaySections("type", "main-menu",
+    "no-cd", {"order", "all", "files", {"x.ogg", "y.ogg"}})
+DefinePlaySections("race", "mythical", "type", "briefing",
+    "cd", {"order", "all", "tracks", {3, 4, 5, 8}})
 </pre>
 
 <a name="MakeSound"></a>
