@@ -1639,7 +1639,6 @@ global void UIHandleButtonUp(unsigned button)
 		} else if( KeyModifiers & ModifierControl ) {
 		    num=SelectAirUnitsInRectangle (x0, y0, x1, y1);
 		} else {
-		    DebugLevel0Fn("%d;%d, %d;%d\n",x0,y0,x1,y1);
 		    num=SelectUnitsInRectangle (x0, y0, x1, y1);
 		}
 	    }
