@@ -1275,6 +1275,16 @@ global void VideoDrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 {
 	GLubyte r, g, b, a;
 
+	if (x1 < x2) {
+		++x2;
+	} else if (x1 > x2) {
+		--x2;
+	}
+	if (y1 < y2) {
+		++y2;
+	} else if (y1 > y2) {
+		--y2;
+	}
 	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
@@ -1561,7 +1571,7 @@ global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
     int w, int h, unsigned char alpha)
 {
     CLIP_RECTANGLE(x, y, w, h);
-    VideoFillTransRectangle(color, x, y, w, h,alpha);
+    VideoFillTransRectangle(color, x, y, w, h, alpha);
 }
 
 /**
