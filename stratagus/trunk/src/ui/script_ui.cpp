@@ -2962,6 +2962,45 @@ local SCM CclDefineMenuItem(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+/**
+**	Define menu graphics
+**
+**	@param list	List describing the menu.
+*/
+local SCM CclDefineMenuGraphics(SCM list)
+{
+    SCM sublist;
+    SCM value;
+    int i;
+
+    i = 0;
+    while( !gh_null_p(list) ) {
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if( MenuButtonGfx.File[i] ) {
+		    free(MenuButtonGfx.File[i]);
+		}
+		MenuButtonGfx.File[i]=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		SCM sublist2;
+
+		sublist2=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		MenuButtonGfx.Width[i]=gh_scm2int(gh_car(sublist2));
+		sublist2=gh_cdr(sublist2);
+		MenuButtonGfx.Height[i]=gh_scm2int(gh_car(sublist2));
+	    }
+	}
+	++i;
+    }
+    return SCM_UNSPECIFIED;
+}
 
 /**
 **	Define a button.
@@ -3451,6 +3490,7 @@ global void UserInterfaceCclRegister(void)
 
     gh_new_procedureN("define-menu-item",CclDefineMenuItem);
     gh_new_procedureN("define-menu",CclDefineMenu);
+    gh_new_procedureN("define-menu-graphics",CclDefineMenuGraphics);
 
     //
     //	Correct named functions

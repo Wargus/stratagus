@@ -47,6 +47,7 @@
 <A HREF="#define-font">define-font</A>
 <A HREF="#define-font-colors">define-font-colors</A>
 <A HREF="#define-menu">define-menu</A>
+<A HREF="#define-menu-graphics">define-menu-graphics</A>
 <A HREF="#define-menu-item">define-menu-item</A>
 <A HREF="#define-new-ui">define-new-ui</A>
 <A HREF="#define-ui">define-ui</A>
@@ -271,6 +272,40 @@ and 'large-title.
 </PRE>
 
 <P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
+
+<A NAME="define-menu-graphics"></A>
+<H3>define-menu-graphics</H3>
+
+<H4>Description</H4>
+
+Define the menu graphics for each of the races.
+
+<H4>Syntax</H4>
+
+<CODE>(define-menu-graphics '(file filename size (w h)) ...)</CODE>
+
+<DL>
+<DT>filename</DT>
+<DD>Path to the file containing the menu graphics.
+</DD>
+<DT>w,h</DT>
+<DD>Width and height of an image in the menu graphic.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-menu-graphics
+      '(file "ui/buttons 1.png" size (300 144))
+      '(file "ui/buttons 2.png" size (300 144)))
+</PRE>
+
+<P>Defines the menu graphics for all races.
 
 <H4>Used</H4>
 
