@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________			     ______________________
 //			  T H E	  W A R	  B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name deco.c	-	Mechanism for all 2D decorations on screen. */
 //
 //	(c) Copyright 2002 by Lutz Sammer and Stephan Rasenberg
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -30,7 +30,7 @@
 **	page Decorations Decorations - a mechanism for all what is on screen
 **	
 **	This pages describes the intend to use a special mechanism that
-**	functions as an intermediate between the freecraft engine and the
+**	functions as an intermediate between the stratagus engine and the
 **	video routines.
 **	
 **	@note It won't take away the possibility to directly draw something on
@@ -288,7 +288,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 #ifdef NEW_DECODRAW
 

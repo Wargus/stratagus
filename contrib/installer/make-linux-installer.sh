@@ -1,9 +1,9 @@
 #!/bin/bash
-BINFILE=./freecraft-030311-linux.tar.gz
-INSTALLERNAME=./freecraft-$(date +%y%m%d)-linux-installer.sh
+BINFILE=./stratagus-030311-linux.tar.gz
+INSTALLERNAME=./stratagus-$(date +%y%m%d)-linux-installer.sh
 
 FCMPVER=030311
-FCMPONLINE=http://telia.dl.sf.net/freecraft/fcmp-$FCMPVER.tar.gz
+FCMPONLINE=http://telia.dl.sf.net/stratagus/fcmp-$FCMPVER.tar.gz
 FCMPLOCAL=fcmp-$FCDATE.tar.gz
 FCMPFILE=./fcmp-$FCDATE.tar.gz
 
@@ -24,20 +24,20 @@ if [ "\`id -u\`" != "0" ]; then
 fi
 echo;
 echo "=================================="
-echo "Welcome to the FreeCraft installer"
+echo "Welcome to the Stratagus installer"
 echo "=================================="
 echo
-echo -n "Would you like to [i]nstall or [u]ninstall FreeCraft? (i) "
+echo -n "Would you like to [i]nstall or [u]ninstall Stratagus? (i) "
 read -n1 -s OPTION
 echo
 echo
 if [ "\$OPTION" = "u" ] || [ "\$OPTION" = "U" ]; then
-    if [ ! -f ~/.freecraft/freecraft.inst ] || [ "\`cat ~/.freecraft/freecraft.inst | grep -iv REMOVE\`" = "" ]; then
-        echo "Cannot uninstall: FreeCraft does not appear to be installed."
+    if [ ! -f ~/.stratagus/stratagus.inst ] || [ "\`cat ~/.stratagus/stratagus.inst | grep -iv REMOVE\`" = "" ]; then
+        echo "Cannot uninstall: Stratagus does not appear to be installed."
 	echo
         exit
     fi
-    FILES=\`cat ~/.freecraft/freecraft.inst | grep -iv REMOVE\`
+    FILES=\`cat ~/.stratagus/stratagus.inst | grep -iv REMOVE\`
     echo "The following files/directories will be removed:"
     echo
     echo "\$FILES"
@@ -49,13 +49,13 @@ if [ "\$OPTION" = "u" ] || [ "\$OPTION" = "U" ]; then
 	echo
 	echo -n "Removing..."
 	rm -rf \$FILES
-	rm ~/.freecraft/freecraft.inst
+	rm ~/.stratagus/stratagus.inst
 	echo "Done"
 	echo
     fi
     exit
 fi
-echo "Where would you like to install the 'freecraft' directory? "
+echo "Where would you like to install the 'stratagus' directory? "
 echo -n "( \$DEFAULTDIR ) "
 read DIR
 if [ "\$DIR" = "" ]; then 
@@ -87,14 +87,14 @@ if [ "\$DATA" = "o" ] || [ "\$DATA" = "O" ]; then
     echo
     echo "Error: data not found, make sure your cdrom is mounted."
     echo "Installation NOT complete."
-    rm -rf \$DIR/freecraft
+    rm -rf \$DIR/stratagus
     echo
     exit
   fi
   echo -n "Please wait while data is being extracted, this will take several minutes..."
   echo
-  mv \$DIR/freecraft/data \$DIR/freecraft/data.wc2
-  sh \$DIR/freecraft/tools/build.sh -o \$DIR/freecraft/data.wc2 -C \$DIR/freecraft/contrib -p \$CDROM/data -T \$DIR/freecraft/tools
+  mv \$DIR/stratagus/data \$DIR/stratagus/data.wc2
+  sh \$DIR/stratagus/tools/build.sh -o \$DIR/stratagus/data.wc2 -C \$DIR/stratagus/contrib -p \$CDROM/data -T \$DIR/stratagus/tools
 else
   DATADIR=data
   echo
@@ -111,26 +111,26 @@ else
 	echo
 	echo "Error: file not found."
 	echo "Installation NOT complete."
-	rm -rf \$DIR/freecraft
+	rm -rf \$DIR/stratagus
 	echo
 	exit
     fi
     echo -n "PLEASE WAIT"
-    tar -zxvf \$FCMPLOCATION -C \$DIR/freecraft >/dev/null
+    tar -zxvf \$FCMPLOCATION -C \$DIR/stratagus >/dev/null
     echo
   else
     echo
     echo -n "PLEASE WAIT - DOWNLOADING"
     if [ "\`whereis curl | cut -f2 -d:\`" = "" ]; then
-	wget -nv -O - $FCMPONLINE | tar -zxv -C \$DIR/freecraft
+	wget -nv -O - $FCMPONLINE | tar -zxv -C \$DIR/stratagus
     else
-	curl -s $FCMPONLINE | tar -zxv -C \$DIR/freecraft
+	curl -s $FCMPONLINE | tar -zxv -C \$DIR/stratagus
     fi
   fi
   echo
 fi;
 echo
-echo "Where would you like to put the 'freecraft' startup script?"
+echo "Where would you like to put the 'stratagus' startup script?"
 echo -n "( \$DEFAULTSTARTDIR ) "
 read STARTDIR
 if [ "\$STARTDIR" = "" ]; then
@@ -141,32 +141,32 @@ STARTDIR=\`pwd\`
 cd \$CURDIR
 mkdir -p \$STARTDIR
 if [ "\`dirname \$STARTDIR/x\`" = "\`dirname \$DIR/x\`" ]; then
-    STARTDIR=\$STARTDIR/freecraft
+    STARTDIR=\$STARTDIR/stratagus
 fi
 if [ "\`dirname \$STARTDIR\`" != "\`dirname \$DIR/x\`" ]; then
-    echo "\$DIR/freecraft/freecraft -d \$DIR/freecraft/\$DATADIR" > \$STARTDIR/freecraft
-    chmod +x \$STARTDIR/freecraft
+    echo "\$DIR/stratagus/stratagus -d \$DIR/stratagus/\$DATADIR" > \$STARTDIR/stratagus
+    chmod +x \$STARTDIR/stratagus
 else
     echo
-    echo "*** NOTE: you will need to 'cd \$DIR/freecraft' before running ./freecraft ***"
+    echo "*** NOTE: you will need to 'cd \$DIR/stratagus' before running ./stratagus ***"
 fi
-mkdir -p ~/.freecraft
-echo "THIS FILE REQUIRED FOR STRATAGUS UNINSTALLATION, DO NOT REMOVE" > ~/.freecraft/freecraft.inst
-echo "\$DIR/freecraft \$STARTDIR/freecraft" >> ~/.freecraft/freecraft.inst
+mkdir -p ~/.stratagus
+echo "THIS FILE REQUIRED FOR STRATAGUS UNINSTALLATION, DO NOT REMOVE" > ~/.stratagus/stratagus.inst
+echo "\$DIR/stratagus \$STARTDIR/stratagus" >> ~/.stratagus/stratagus.inst
 if [ -d /tmp/cdrom.tmp ]; then umount /tmp/cdrom.tmp; rm -rf /tmp/cdrom.tmp; fi
 echo
-echo "Congratulations! Installation of FreeCraft is complete."
+echo "Congratulations! Installation of Stratagus is complete."
 echo
 echo "To start the game, type the following command:"
 echo
-echo "\$STARTDIR/freecraft"
+echo "\$STARTDIR/stratagus"
 echo
 echo -n "Would you like to start the game now? (n) "
 read -n1 -s START
 echo
 if [ "\$START" = "y" ] || [ "\$START" = "Y" ]; then
   cd \$STARTDIR
-  \$STARTDIR/freecraft
+  \$STARTDIR/stratagus
 fi;
 exit;
 EOF
@@ -182,7 +182,7 @@ fi
 mkdir .installer
 
 tar -zxf $BINFILE -C .installer
-mv .installer/`ls .installer | grep freecraft` .installer/freecraft
+mv .installer/`ls .installer | grep stratagus` .installer/stratagus
 
 cd .installer
 tar -hcO * | gzip -c >> ../$INSTALLERNAME

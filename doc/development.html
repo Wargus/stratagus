@@ -6,38 +6,38 @@
 
 ----	(c) Copyright 2001-2003 by Lutz Sammer and Nehal Mistry
 
-----    FreeCraft is free software; you can redistribute it and/or modify
+----    Stratagus is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
 ----    the Free Software Foundation; only version 2 of the License.
 
-----    FreeCraft is distributed in the hope that it will be useful,
+----    Stratagus is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <title>Development for FreeCraft Version 1.18</title>
+    <title>Development for Stratagus Version 1.18</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
 
-<h1>Development for FreeCraft Version 1.18</h1>
+<h1>Development for Stratagus Version 1.18</h1>
 <hr>
 
-This file should give you some information to help with development of FreeCraft.<p>
+This file should give you some information to help with development of Stratagus.<p>
 
 <h2>Mailing list</h2>
 
-If you want to help with development for FreeCraft you should 
-<a href="http://lists.sourceforge.net/mailman/listinfo/freecraft-hackers">join</a> 
-the freecraft-hackers mailing list.<br> You may also want to look at the 
+If you want to help with development for Stratagus you should 
+<a href="http://lists.sourceforge.net/mailman/listinfo/stratagus-hackers">join</a> 
+the stratagus-hackers mailing list.<br> You may also want to look at the 
 <a href="http://sourceforge.net/mailarchive/forum.php?forum_id=6268">archives.</a>
 
 <h2>IRC - Internet Relay Chat</h2>
 
-You can try to meet other FreeCraft developers and users on the 
+You can try to meet other Stratagus developers and users on the 
 <a href="http://www.freenode.net/">FreeNode</a> IRC Network, in channel
-<a href="irc://irc.freenode.net/freecraft">#FreeCraft</a>.
+<a href="irc://irc.freenode.net/stratagus">#Stratagus</a>.
 
 <h2>Bugs and tasks</h2>
 
@@ -49,7 +49,7 @@ and <a href="http://sourceforge.net/pm/?group_id=1965">planned tasks</a> on the
 Before starting on a bug or task, please ask on the mailing list or in the 
 IRC channel whether anybody else is already working on it.
 
-<h2>Building FreeCraft</h2>
+<h2>Building Stratagus</h2>
 
 <h3>Installing CVS client</h3>
 
@@ -58,22 +58,22 @@ you need CVS for your system. Sourceforge has a guide that will
 help you get started, you can go to section '<b>F</b>' of their 
 <a href="http://sourceforge.net/docman/?group_id=1">documentation page</a>.<p>
 
-<h3>Getting FreeCraft from CVS</h3>
+<h3>Getting Stratagus from CVS</h3>
 
 <h4>There are 3 modules in the CVS repository.</h4>
 
 <ul>
-    <li>freecraft - The FreeCraft engine source<p>
-	The source to the FreeCraft engine. The source is licenced
+    <li>stratagus - The Stratagus engine source<p>
+	The source to the Stratagus engine. The source is licenced
 	under the GNU General Public License.
 	<b>This module is needed for development.</b>
 
-    <li>fcmp - The FreeCraft Media Project<p>
+    <li>fcmp - The Stratagus Media Project<p>
 	A collection of free media (free sounds, music, videos, graphics,
 	animations and models), licensed under the GNU General Public License.
 
-    <li>crafted - The FreeCraft Map Editor<p>
-	A map editor for FreeCraft. This is obsolete now as FreeCraft 
+    <li>crafted - The Stratagus Map Editor<p>
+	A map editor for Stratagus. This is obsolete now as Stratagus 
 	has an internal editor.
 </ul>
 
@@ -86,9 +86,9 @@ the data and therefore speeds the transfer up.<p>
 
 For example:<p>
 
-cvs -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft login<br>
+cvs -d:pserver:anonymous@cvs.stratagus.sourceforge.net:/cvsroot/stratagus login<br>
 <i>"When prompted for a password for anonymous, simply press the Enter key."</i><br>
-cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<p>
+cvs -z3 -d:pserver:anonymous@cvs.stratagus.sourceforge.net:/cvsroot/stratagus co stratagus<p>
 
 This is done only once. To update your CVS directory, go into 
 the module directory and type 'cvs -z3 -q update -dP'.<p>
@@ -96,16 +96,16 @@ the module directory and type 'cvs -z3 -q update -dP'.<p>
 You may put these flags in your ~/.cvsrc file so that you only 
 need to type 'cvs update', the cvs (1) man page will show you how.
 
-<h3>Getting FreeCraft without CVS</h3>
+<h3>Getting Stratagus without CVS</h3>
 
 Please note CVS is always the latest and it is easier for you to keep
 up to date. But if for some reason you cannot get the source via CVS, 
-you find can regular snapshots of FreeCraft 
-<a href="http://freecraft.sourceforge.net/snapshots">here</a>.
+you find can regular snapshots of Stratagus 
+<a href="http://stratagus.sourceforge.net/snapshots">here</a>.
 
-<h3>Compiling FreeCraft</h3>
+<h3>Compiling Stratagus</h3>
 
-You can find instructions for compiling FreeCraft at 
+You can find instructions for compiling Stratagus at 
 <a href="install.html">install.html</a>.<br>
 Since you already have a copy of the source, you may skip 
 ahead to step 2.
@@ -113,7 +113,7 @@ ahead to step 2.
 <h2>Source code documentation</h2>
 
 Valery Shchedrin has introduced tagged source 
-documentation for FreeCraft.<p>
+documentation for Stratagus.<p>
 
 You need either 
 <a href="http://www.doxygen.org">DoxyGen</a> or 
@@ -166,17 +166,17 @@ Please read the doxygen/doc++ documentation.
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name {filename}.c	-	{One line description of this file} */
 //
 //      (c) Copyright 2003 by {insert your name here}
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -191,7 +191,7 @@ Please read the doxygen/doc++ documentation.
 
 #include &lt;stdio.h&gt;
 
-#include "freecraft.h"
+#include "stratagus.h"
 
 // More game includes.
 
@@ -233,7 +233,7 @@ and always update the copyright year if required.<p>
 <h2>Sending a patch</h2>
 
 Once you have completed some work, you will probably want it to be 
-included in the main FreeCraft source.<p>
+included in the main Stratagus source.<p>
 
 Follow these steps:<p>
 
@@ -250,10 +250,10 @@ Once you have the fcmp module, go into the 'fcmp' directory, and edit
 the location variables if necessary in 'buildfcmp.sh'. Then run 
 the 'buildfcmp.sh' script and it will create a working data.fcmp directory.<p>
 
-Please read the <a href="datadir.html">FreeCraft data directory description.</a>
+Please read the <a href="datadir.html">Stratagus data directory description.</a>
 
 <hr>
-(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project 
+(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name loadgame.c	-	Load game. */
 //
 //	(c) Copyright 2001-2003 by Lutz Sammer, Andreas Arens
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "icons.h"
 #include "cursor.h"
 #include "construct.h"
@@ -189,7 +189,7 @@ global void LoadModules(void)
 #endif
 
     LoadRGB(GlobalPalette,
-	    s=strdcat3(FreeCraftLibPath,"/graphics/",
+	    s=strdcat3(StratagusLibPath,"/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
     VideoCreatePalette(GlobalPalette);
@@ -244,14 +244,14 @@ global void LoadGame(char* filename)
 global void LoadAll(void)
 {
 #if 1
-    SaveGame("save_file_of_freecraft0.ccl");
-    LoadGame("save_file_of_freecraft0.ccl");
-    SaveGame("save_file_of_freecraft1.ccl");
-    LoadGame("save_file_of_freecraft1.ccl");
-    SaveGame("save_file_of_freecraft2.ccl");
-    LoadGame("save_file_of_freecraft2.ccl");
+    SaveGame("save_file_of_stratagus0.ccl");
+    LoadGame("save_file_of_stratagus0.ccl");
+    SaveGame("save_file_of_stratagus1.ccl");
+    LoadGame("save_file_of_stratagus1.ccl");
+    SaveGame("save_file_of_stratagus2.ccl");
+    LoadGame("save_file_of_stratagus2.ccl");
 #endif
-    //LoadGame ("save_file_of_freecraft.ccl");
+    //LoadGame ("save_file_of_stratagus.ccl");
 }
 
 //@}

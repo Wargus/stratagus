@@ -6,17 +6,17 @@
 ##	  \/		    \/	   \/	     \/		   \/
 ##  ______________________                           ______________________
 ##			  T H E   W A R   B E G I N S
-##	   FreeCraft - A free fantasy real time strategy game engine
+##	   Stratagus - A free fantasy real time strategy game engine
 ##
 ##	Makefile	-	The make file.
 ##
 ##	(c) Copyright 1998-2003 by Lutz Sammer and Nehal Mistry
 ##
-##	FreeCraft is free software; you can redistribute it and/or modify
+##	Stratagus is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
 ##	by the Free Software Foundation; only version 2 of the License.
 ##
-##	FreeCraft is distributed in the hope that it will be useful,
+##	Stratagus is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##	GNU General Public License for more details.
@@ -37,7 +37,7 @@ CROSSDIR = /usr/local/cross
 
 INCLUDE_DIRS = src/include src/movie/vp31/include etlib
 
-MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
+MODULES = src/action src/ai src/beos src/clone src/editor src/stratagus src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
           src/video etlib
 
@@ -67,7 +67,7 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 
 .PHONY:	make-objdir all-src
 
-all:	all-src freecraft$(EXE) tools
+all:	all-src stratagus$(EXE) tools
 
 make-objdir:
 	@for i in $(MODULES); do \
@@ -87,7 +87,7 @@ help:
 	@-echo "make doc			make source documention with doxygen"
 	@-echo "make doc++			make source documention with doc++"
 	@-echo "make lockver NAME="version"	label current version with symbolic name"
-	@-echo "make strip			strip freecraft and/or freecraft.exe"
+	@-echo "make strip			strip stratagus and/or stratagus.exe"
 	@-echo "make tags			create ctags"
 	@-echo "make depend			create dependencies"
 	@-echo "make dist			create distribution"
@@ -105,15 +105,15 @@ cycle::
 	@$(MAKE) all
 
 run::
-	@$(MAKE) && ./freecraft
+	@$(MAKE) && ./stratagus
 
 runp::
-	@$(MAKE) && ./freecraft && if [ -e gmon.sum ]; then \
-		gprof -s freecraft gmon.out gmon.sum; \
+	@$(MAKE) && ./stratagus && if [ -e gmon.sum ]; then \
+		gprof -s stratagus gmon.out gmon.sum; \
 	    else mv gmon.out gmon.sum; fi
 
 doc::
-	doxygen contrib/doxygen-freecraft.cfg
+	doxygen contrib/doxygen-stratagus.cfg
 
 doc++::
 	@$(MAKE) -C src RULESFILE=$(RULESFILE) doc
@@ -123,21 +123,21 @@ doc++::
 all-src: make-objdir $(OBJ)
 
 # UNIX-TARGET
-freecraft: $(OBJ) 
-	$(CCLD) -o freecraft $^ $(STRATAGUS_LIBS) -I. $(CFLAGS)
+stratagus: $(OBJ) 
+	$(CCLD) -o stratagus $^ $(STRATAGUS_LIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
-	    src/$(OBJDIR)/freecraftrc.$(OE)
-	$(CCLD) -o freecraft$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS) -I. $(CFLAGS)
+stratagus.exe:	$(OBJ) etlib/$(OBJDIR)/getopt.$(OE) \
+	    src/$(OBJDIR)/stratagusrc.$(OE)
+	$(CCLD) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS) -I. $(CFLAGS)
 
 strip:
-	@if [ -f freecraft ]; then strip freecraft; fi
-	@if [ -f freecraft.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip freecraft.exe; fi
+	@if [ -f stratagus ]; then strip stratagus; fi
+	@if [ -f stratagus.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip stratagus.exe; fi
 
-src/$(OBJDIR)/freecraftrc.$(OE): src/freecraft.rc
+src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
-	windres --include-dir contrib -o src/$(OBJDIR)/freecraftrc.$(OE) src/freecraft.rc
+	windres --include-dir contrib -o src/$(OBJDIR)/stratagusrc.$(OE) src/stratagus.rc
 
 echo::
 	@-echo CFLAGS: $(CFLAGS)
@@ -153,13 +153,13 @@ distclean:	clean
 	for i in $(MODULES_ALL); do \
 	[ $(OBJDIR) == "." ] || $(RM) -rf $$i/$(OBJDIR); \
 	$(RM) $$i/.#* $$i/*~; done
-	$(RM) freecraft$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt
+	$(RM) stratagus$(EXE) gmon.sum .depend .#* *~ stderr.txt stdout.txt
 	$(RM) -r srcdoc/*
 	@echo
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
-	contrib/doxygen-freecraft.cfg \
+	contrib/doxygen-stratagus.cfg \
 	$(CCLS) $(DOCS) $(SRC_ALL) src/beos/beos.cpp $(HDRS) Makefile
 	for i in $(MODULES_ALL); do $(LOCKVER) Module.make; done
 
@@ -220,11 +220,11 @@ DOCS    = README doc/index.html doc/install.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
 	  doc/ccl/research.html doc/graphic/* \
 	  doc/trigger.txt doc/vp32_opensource_license_9-6-01.txt \
-	  debian/freecraft.6 doc/ccl/ccl-index.html doc/ccl/game.html \
+	  debian/stratagus.6 doc/ccl/ccl-index.html doc/ccl/game.html \
 	  doc/ccl/icon.html doc/ccl/sound.html doc/ccl/triggers.html \
 	  doc/ccl/ui.html
 
-PICS    = contrib/freecraft.png contrib/freecraft.ico
+PICS    = contrib/stratagus.png contrib/stratagus.ico
 
 PUDS	= contrib/puds/single/*.txt contrib/puds/single/*.pud.gz \
 	  contrib/puds/multi/*.txt contrib/puds/multi/*.pud.gz
@@ -233,7 +233,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
 	  data/ccl/orc/constructions.ccl \
 	  data/ccl/missiles.ccl data/ccl/icons.ccl \
-	  data/ccl/sound.ccl data/ccl/freecraft.ccl \
+	  data/ccl/sound.ccl data/ccl/stratagus.ccl \
 	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
 	  data/ccl/upgrade.ccl data/ccl/human/upgrade.ccl \
 	  data/ccl/orc/upgrade.ccl \
@@ -255,19 +255,19 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
-	  contrib/FreeCraft-beos.proj.gz \
+	  contrib/Stratagus-beos.proj.gz \
 	  contrib/msvc.zip contrib/macosx.tgz contrib/stdint.h \
 	  contrib/campaigns/*/*.cm
 
 MISC    += Makefile Rules.make.orig setup \
-	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
+	  contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  .indent.pro Rules.make.in configure.in configure \
 	  $(CONTRIB) \
 	  \
-	  src/freecraft.rc data/default.cm
+	  src/stratagus.rc data/default.cm
 
 mydate	= $(shell date +%y%m%d)
-distdir	= freecraft-$(mydate)
+distdir	= stratagus-$(mydate)
 
 distlist:
 	@echo $(SRC_ALL) $(HDRS) src/beos/beos.cpp > $(DISTLIST)
@@ -288,7 +288,7 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
-	echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -301,7 +301,7 @@ bin-dist: all
 	echo $(CONTRIB) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
-	echo freecraft$(EXE) >>$(DISTLIST)
+	echo stratagus$(EXE) >>$(DISTLIST)
 	echo tools/wartool$(EXE) >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
@@ -309,9 +309,9 @@ bin-dist: all
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	cp tools/build.sh $(distdir)
 	chmod -R a+rX $(distdir)
-	strip -s -R .comment $(distdir)/freecraft$(EXE)
+	strip -s -R .comment $(distdir)/stratagus$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	tar czhf freecraft-$(mydate)-linux.tar.gz $(distdir)
+	tar czhf stratagus-$(mydate)-linux.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
@@ -325,7 +325,7 @@ win32-bin-dist2: win32
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
 	@echo doc/README-SDL.txt >>$(DISTLIST)
-	@echo freecraft$(EXE) >>$(DISTLIST)
+	@echo stratagus$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
@@ -333,13 +333,13 @@ win32-bin-dist2: win32
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	@cp tools/build.bat $(distdir)
 	@chmod -R a+rX $(distdir)
-	@strip -s -R .comment $(distdir)/freecraft$(EXE)
+	@strip -s -R .comment $(distdir)/stratagus$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@echo "(c) 2003 by the FreeCraft Project http://FreeCraft.Org" | \
-	zip -zq9r freecraft-$(mydate)-win32bin.zip $(distdir)
+	@echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
+	zip -zq9r stratagus-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
-	du -h freecraft-$(mydate)-win32bin.zip
+	du -h stratagus-$(mydate)-win32bin.zip
 
 win32-bin-dist: win32
 	@export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
@@ -347,7 +347,7 @@ win32-bin-dist: win32
 
 #----------------------------------------------------------------------------
 
-difffile=	freecraft-`date +%y%m%d`.diff
+difffile=	stratagus-`date +%y%m%d`.diff
 diff:
 	@$(RM) $(difffile)
 	@$(RM) $(DISTLIST)
@@ -364,7 +364,7 @@ buildit:	tools
 buildclean:
 	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
 	data/interface data/campaigns data/text data/health.png data/mana.png \
-	data/default.pud.gz data/freecraft.png
+	data/default.pud.gz data/stratagus.png
 	rm -rf data/graphics data/sounds data/texts data/music data/videos
 
 release:
@@ -404,30 +404,30 @@ win32distclean:
 #	INSTALL/UNINSTALL
 ##############################################################################
 
-install:	all install-freecraft install-tools
+install:	all install-stratagus install-tools
 
-install-freecraft:
-	@echo installing freecraft
-	mkdir -p $(PREFIX)/lib/games/freecraft
+install-stratagus:
+	@echo installing stratagus
+	mkdir -p $(PREFIX)/lib/games/stratagus
 	mkdir -p /var/lib/games
-	install -m 755 freecraft $(PREFIX)/lib/games/freecraft
-	cp -R data $(PREFIX)/lib/games/freecraft
-	echo "$(PREFIX)/lib/games/freecraft/freecraft \
-	-d $(PREFIX)/lib/games/freecraft/data  "\$$\@" | tee /var/lib/games/freecraft.log" \
-	>$(PREFIX)/bin/freecraft
-	chmod +x $(PREFIX)/bin/freecraft
-	@echo installation of freecraft complete
+	install -m 755 stratagus $(PREFIX)/lib/games/stratagus
+	cp -R data $(PREFIX)/lib/games/stratagus
+	echo "$(PREFIX)/lib/games/stratagus/stratagus \
+	-d $(PREFIX)/lib/games/stratagus/data  "\$$\@" | tee /var/lib/games/stratagus.log" \
+	>$(PREFIX)/bin/stratagus
+	chmod +x $(PREFIX)/bin/stratagus
+	@echo installation of stratagus complete
 
 install-tools:	all
-	@echo installing freecraft tools
-	mkdir -p $(PREFIX)/lib/games/freecraft/tools
-	install -m 755 tools/wartool  $(PREFIX)/lib/games/freecraft/tools
-	install -m 755 tools/build.sh $(PREFIX)/lib/games/freecraft/tools
-	@echo installation of freecraft tools complete
+	@echo installing stratagus tools
+	mkdir -p $(PREFIX)/lib/games/stratagus/tools
+	install -m 755 tools/wartool  $(PREFIX)/lib/games/stratagus/tools
+	install -m 755 tools/build.sh $(PREFIX)/lib/games/stratagus/tools
+	@echo installation of stratagus tools complete
 
 uninstall:
-	@echo uninstalling freecraft and freecraft tools
-	rm -rf $(PREFIX)/lib/games/freecraft
-	rm $(PREFIX)/bin/freecraft
+	@echo uninstalling stratagus and stratagus tools
+	rm -rf $(PREFIX)/lib/games/stratagus
+	rm $(PREFIX)/bin/stratagus
 	@echo uninstallation complete
 

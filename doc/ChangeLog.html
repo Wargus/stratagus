@@ -6,23 +6,23 @@
 
 ----	(c) Copyright 1998-2003 by Lutz Sammer
 
-----    FreeCraft is free software; you can redistribute it and/or modify
+----    Stratagus is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
 ----    the Free Software Foundation; only version 2 of the License.
 
-----    FreeCraft is distributed in the hope that it will be useful,
+----    Stratagus is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
 
-    <title>ChangeLog: FreeCraft Version 1.18</title>
+    <title>ChangeLog: Stratagus Version 1.18</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
     
-<h1>ChangeLog: FreeCraft Version 1.18</h1>
+<h1>ChangeLog: Stratagus Version 1.18</h1>
 <hr>
 
 <a href="#current">Current</a><p>
@@ -197,7 +197,7 @@
     <li>Implemented feature request #632356: Stretching Background Images (from Jimmy Salmon).
     <li>Added Man vs Machine game type (from Jimmy Salmon).
     <li>Fixed bug #634359: Click while in comment makes invisible (from Jimmy Salmon).
-    <li>Fixed bug #638383: Freecraft memfill on some puds (from Jimmy Salmon).
+    <li>Fixed bug #638383: Stratagus memfill on some puds (from Jimmy Salmon).
     <li>Fixed bug #636395: Double-click does not work in window (from Jimmy Salmon).
     <li>Implemented feature request #635863: Clicking on Score Screen Displays All (from Jimmy Salmon).
     <li>Correct paths and filenames for expansion voice extraction (from Russell Smith).
@@ -243,7 +243,7 @@
     <li>Added new feature (set-xp-damage! #t) which adds extra damage from units as they gain XP (from David Slimp).
     <li>Magic parameter in units.ccl file to be used as MaxMana; MAGIC_FOR_NEW_UNITS now means number of percent instead of absolute value (from Martin Hajduch).
     <li>Middle click on unit portrait tracks the unit in the current viewport.
-    <li>Fixed bug: FreeCraft segfaults when you try to abort a unit being trained and you click on a wrong (empty) slot (from Martin Renold).
+    <li>Fixed bug: Stratagus segfaults when you try to abort a unit being trained and you click on a wrong (empty) slot (from Martin Renold).
     <li>Added burning buildings (from Jimmy Salmon).
     <li>Movement/Placement mask and field flags added to unit-type structure.
     <li>Fixed bug: Editor can't place units on mud/dirt.
@@ -297,7 +297,7 @@
     <li>Old command line network setup api is gone.
     <li>Added support for repeating keys in input fields (from Jimmy Salmon).
     <li>Fixed bug #562548: Number of opponents doesn't matter (from Jimmy Salmon).
-    <li>Added ALT+CTRL+S to save the current level as pud "freecraft.pud.gz".
+    <li>Added ALT+CTRL+S to save the current level as pud "stratagus.pud.gz".
     <li>Fixed bug in server menu where the Start Game button was deactivated (from Jimmy Salmon).
     <li>Fixed bug #528207: Fog of war is not correct (from Jimmy Salmon).
     <li>Implemented task #38320: Making screen shots (from Jimmy Salmon).
@@ -404,7 +404,7 @@
     <li>CD player support with SDL. (from Nehal)
     <li>Many documentation fixes. (from Ender)
     <li>First version of campaigns.
-    <li>For a new level you don't have to leave freecraft. (Attention: looses memory)
+    <li>For a new level you don't have to leave stratagus. (Attention: looses memory)
     <li>First version of level briefing.
     <li>Fixed bug: AI could hang waiting on a force.
     <li>Player (struct _player_) source documentation written.
@@ -522,8 +522,8 @@
     <li>Fixed bug: Building buildings with 0 build time, dumps core. (/0)
     <li>Fixed bug: Attacking walls broken with new orders.
     <li>Removed old command code, only the new order code is now present.
-    <li>Made buttons configurable (with CCL FreeCraft configuration language).
-    <li>Made icons configurable (with CCL FreeCraft configuration language).
+    <li>Made buttons configurable (with CCL Stratagus configuration language).
+    <li>Made icons configurable (with CCL Stratagus configuration language).
     <li>Let the AI workers only harvest reachable trees. (very great performance increase.)
     <li>Some more menu code for network menus - unfinished yet.
     <li>Updated to use doxygen 1.2.5.
@@ -616,12 +616,12 @@
     <li>Not ready: New directory structure and filenames in data.
     <li>Wrote new corpse handling.
     <li>Removed old animation scripts handling.
-    <li>Executable renamed to "freecraft".
-    <li>Distribution archive renamed to "freecraft".
+    <li>Executable renamed to "stratagus".
+    <li>Distribution archive renamed to "stratagus".
     </ul>
 <p><li>1.16.1 released<p>
     <ul>
-    <li>The main CCL file "freecraft.ccl" first looked up in $HOME/.freecraft.
+    <li>The main CCL file "stratagus.ccl" first looked up in $HOME/.stratagus.
     <li>Fixed build.bat (from Ari)
     <li>Mythical and alliance user interface removed from main distribution.
     <li>Fixed bug: If Transporter killed, skeletts of passengers appears.
@@ -672,7 +672,7 @@
     <li>Fixed bug: wrong library path for SIOD under win32.
     <li>Fixed bug: Wrong damage displayed, if basic damage is zero.
     <li>Added icon for score contributed from Guardian.
-    <li>CCL2 load now uses FreeCraftLibPath.
+    <li>CCL2 load now uses StratagusLibPath.
     <li>Upgrade/Unit dependency code rewritten.
     <li>Split upgrade.[ch] into depend.[ch] and upgrade.[ch].
     <ul>
@@ -684,7 +684,7 @@
     <li>Fixed bug: Network sync clears too many bits. (from Michael O'Reilly)
     <li>Added MissileByIdent.
     <li>More configuration of mana and health display.
-    <li>Renamed all scheme functions from "clone-" to "freecraft-".
+    <li>Renamed all scheme functions from "clone-" to "stratagus-".
     <li>Fixed bug: correct include file path for SDL_audio.h (from Cade)
     <li>Include print unit type table code only, if DEBUG is defined.
     <li>Added support for bz2 compressed png. (from Ari)
@@ -999,7 +999,7 @@
 </ul>
 
 <hr>
-(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project 
+(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

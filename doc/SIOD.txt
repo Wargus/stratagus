@@ -1,4 +1,4 @@
-The FreeCraft Project includes the sources of SIOD.
+The Stratagus Project includes the sources of SIOD.
 
 SIOD is a small-footprint implementation of the Scheme programming language
 that is provided with some database, unix programming and cgi scripting

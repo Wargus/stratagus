@@ -6,22 +6,22 @@
 
 ----	(c) Copyright 2002-2003 by Nehal Mistry.
 
-----    FreeCraft is free software; you can redistribute it and/or modify
+----    Stratagus is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
 ----    the Free Software Foundation; only version 2 of the License.
 
-----    FreeCraft is distributed in the hope that it will be useful,
+----    Stratagus is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-    <title>FreeCraft Installation</title>
+    <title>Stratagus Installation</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
 
-<h1>Installation instructions for FreeCraft 1.18</h1><p>
+<h1>Installation instructions for Stratagus 1.18</h1><p>
 <hr>
 
     <h2>Software Requirements</h2>
@@ -53,7 +53,7 @@
     <h2>Hardware Requirements</h2>
     <ul>
 	<li><b>Processor:</b> A 133 MHz CPU (faster recommended).<br>
-	<font color="red">NOTE: FreeCraft is believed to be endian and word size safe, so other
+	<font color="red">NOTE: Stratagus is believed to be endian and word size safe, so other
 	architectures like (big endian) PPC or (64bit) Alpha should also
 	work at least with Linux.</font><p>
 
@@ -78,12 +78,12 @@
 
 	<ul>
 	    <li>Download the source from 
-	    <a href="http://freecraft.sourceforge.net/download.html">here</a>.<br>
+	    <a href="http://stratagus.sourceforge.net/download.html">here</a>.<br>
 	    <font color="red">NOTE: both the tar.gz and zip files are the same, 
 	    we provide both formats for convenience.</font><p>
 
-	    <li>Unpack the source freecraft-DATE.tar.gz with 
-	    <pre>	tar -zxvf freecraft-DATE.tar.gz</pre>
+	    <li>Unpack the source stratagus-DATE.tar.gz with 
+	    <pre>	tar -zxvf stratagus-DATE.tar.gz</pre>
 	</ul>
 
 	<li><b>Step 2, Compile:</b><p>
@@ -92,21 +92,21 @@
 	    <li><b>GCC/Mingw users:</b> run the 'setup' script and answer 
 	    the questions instructions to create the Makefile. 
 	    When complete, type 'make depend && make' to compile, and it 
-	    should compile a working 'freecraft' (or 'freecraft.exe' for win32) 
+	    should compile a working 'stratagus' (or 'stratagus.exe' for win32) 
 	    binary. To see all options of setup, type 'setup --help'.<p>
 
 	    <li><b>MSVC users:</b>
 	    <ul>
-		<li>Extract the VC++ project and workspace files from freecraft\contrib\msvc.zip 
-		into the root freecraft directory.</li>
+		<li>Extract the VC++ project and workspace files from stratagus\contrib\msvc.zip 
+		into the root stratagus directory.</li>
 
-		<li><a href="http://freecraft.sourceforge.net/snapshots/msvc-libs.zip">
+		<li><a href="http://stratagus.sourceforge.net/snapshots/msvc-libs.zip">
     		Download</a> the VC++ libraries and extract them into the root
-    		freecraft directory.
+    		stratagus directory.
 
-		<li>Copy freecraft\contrib\freecraft.ico to freecraft\src.
-		<li>You should now be able to compile freecraft by opening 
-		the freecraft.dsw file.<p>
+		<li>Copy stratagus\contrib\stratagus.ico to stratagus\src.
+		<li>You should now be able to compile stratagus by opening 
+		the stratagus.dsw file.<p>
 	    </ul>
 
 	    <li><b>Windows CE(tm) / PocketPc(tm)</b>
@@ -116,8 +116,8 @@
 		CE support for Visual C++ or Visual Studio isn't supported yet. 
 		If you know how to compile with this, please inform us.
 		<li>You also need the 
-		<a href="http://freecraft.sourceforge.net/snapshots/win-ce/FreeCraft%20CE.vcp.gz">emVC++ project</a> and
-		<a href="http://freecraft.sourceforge.net/snapshots/win-ce/FreeCraft%20CE.vcw.gz">emVC++ workbench</a> for FreeCraft.<p>
+		<a href="http://stratagus.sourceforge.net/snapshots/win-ce/Stratagus%20CE.vcp.gz">emVC++ project</a> and
+		<a href="http://stratagus.sourceforge.net/snapshots/win-ce/Stratagus%20CE.vcw.gz">emVC++ workbench</a> for Stratagus.<p>
 	    </ul>
 	</ul>
 
@@ -138,36 +138,36 @@
 	    where DIR is the directory to your mounted CD or your 
 	    installation, (eg, '/cdrom/' or '/mnt/win/war2').<p>
 	    <font color="red">NOTE: You will need to execute this 
-	    script from within your root freecraft directory or 
+	    script from within your root stratagus directory or 
 	    you will run into problems. It will take some 
 	    time to extract everything.</font><p>
 
 	    <li><b>Using FcMP data:</b><p>
 	    Download FcMP from the download page and extract it to 
-	    the freecraft root directory (where the freecraft 
+	    the stratagus root directory (where the stratagus 
 	    binary exists).<br>
 	    <font color="red">NOTE if you extract to a different directory, 
 	    you will need to specify the directory by passing '-d DIR' flag 
-	    when you run the freecraft binary, by default the binary 
+	    when you run the stratagus binary, by default the binary 
 	    looks for 'data' in the current directory.</font><p> 
 
 	    If you are using the CVS engine, you may need to checkout 
 	    the 'fcmp' module from CVS. Then edit the locations at the top 
 	    of 'buildfcmp.sh' and run it, this will create a working 
 	    FcMP dir called: 'data.fcmp' , you may then rename this to 
-	    '$FCDIR/data' where $FCDIR is the directory where the freecraft 
-	    binary exists, or run freecraft with the '-d' option.<p>
+	    '$FCDIR/data' where $FCDIR is the directory where the stratagus 
+	    binary exists, or run stratagus with the '-d' option.<p>
 	</ul>
 
 	<li><b>Step 4, Run:</b><p>
 
-	You may now go into the toplevel freecraft dir and run the binary. Remember, 
-	if the data dir is not './data', you will need to run freecraft with 
+	You may now go into the toplevel stratagus dir and run the binary. Remember, 
+	if the data dir is not './data', you will need to run stratagus with 
 	the '-d' option.<p>
     </ul>
 
 <hr>
-(C) Copyright 1998-2003 by The <a href="http://freecraft.sf.net">FreeCraft</a> Project 
+(C) Copyright 1998-2003 by The <a href="http://stratagus.sf.net">Stratagus</a> Project 
 under the <a href="gpl.html">GNU General Public License</a>.<br>
 All trademarks and copyrights on this page are owned by their respective owners.<br>
 </body>

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name map.c		-	The map. */
 //
 //	(c) Copyright 1998-2003 by Lutz Sammer and Vladi Shabanski
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>              
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
@@ -548,7 +548,7 @@ global void PreprocessMap(void)
 **
 **	@param vp	Viewport pointer.
 **	@param x	X coordinate into this viewport (in pixels, relative
-**			to origin of FreeCraft's window - not the viewport
+**			to origin of Stratagus's window - not the viewport
 **			itself!).
 **
 **	@return		X map tile coordinate.
@@ -566,7 +566,7 @@ global int Viewport2MapX(const Viewport* vp, int x)
 **
 **	@param vp	Viewport pointer.
 **	@param y	Y coordinate into this viewport (in pixels, relative
-**			to origin of FreeCraft's window - not the viewport
+**			to origin of Stratagus's window - not the viewport
 **			itself!).
 **
 **	@return		Y map tile coordinate.
@@ -586,7 +586,7 @@ global int Viewport2MapY(const Viewport* vp, int y)
 **	@param x	The map tile's X coordinate.
 **
 **	@return		X screen coordinate in pixels (relative
-**                      to origin of FreeCraft's window).
+**                      to origin of Stratagus's window).
 */
 global int Map2ViewportX(const Viewport* vp, int x)
 {
@@ -600,7 +600,7 @@ global int Map2ViewportX(const Viewport* vp, int x)
 **	@param y	The map tile's Y coordinate.
 **
 **	@return		Y screen coordinate in pixels (relative
-**                      to origin of FreeCraft's window).
+**                      to origin of Stratagus's window).
 */
 global int Map2ViewportY(const Viewport* vp, int y)
 {

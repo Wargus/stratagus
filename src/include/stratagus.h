@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
-/**@name freecraft.h	-	The main header file. */
+/**@name stratagus.h	-	The main header file. */
 //
 //	(c) Copyright 1998-2003 by Lutz Sammer
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -296,22 +296,22 @@
 #define VERSION	"1.18"		/// Engine version shown
 #endif
 
-#ifndef FreeCraftMajorVerion
-    /// FreeCraft major version
-#define FreeCraftMajorVersion	1
-    /// FreeCraft minor version (maximal 99)
-#define FreeCraftMinorVersion	18
-    /// FreeCraft patch level (maximal 99)
-#define FreeCraftPatchLevel	0
-    /// FreeCraft version (1,2,3) -> 10203
-#define FreeCraftVersion \
-	(FreeCraftMajorVersion*10000+FreeCraftMinorVersion*100 \
-	+FreeCraftPatchLevel)
+#ifndef StratagusMajorVerion
+    /// Stratagus major version
+#define StratagusMajorVersion	1
+    /// Stratagus minor version (maximal 99)
+#define StratagusMinorVersion	18
+    /// Stratagus patch level (maximal 99)
+#define StratagusPatchLevel	0
+    /// Stratagus version (1,2,3) -> 10203
+#define StratagusVersion \
+	(StratagusMajorVersion*10000+StratagusMinorVersion*100 \
+	+StratagusPatchLevel)
 
-    /// FreeCraft printf format string
-#define FreeCraftFormatString	"%d.%d.%d"
-    /// FreeCraft printf format arguments
-#define FreeCraftFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
+    /// Stratagus printf format string
+#define StratagusFormatString	"%d.%d.%d"
+    /// Stratagus printf format arguments
+#define StratagusFormatArgs(v)	(v)/10000,((v)/100)%100,(v)%100
 #endif
 
     /// Text string: Name, Version, Copyright
@@ -321,7 +321,7 @@ extern char NameLine[];
 #define STRATAGUS_LIB_PATH "data"	/// Where to find the data files
 #endif
 #ifndef STRATAGUS_HOME_PATH
-#define STRATAGUS_HOME_PATH ".freecraft"/// Data files in user home dir
+#define STRATAGUS_HOME_PATH ".stratagus"/// Data files in user home dir
 #endif
 
 #define MAGIC_FOR_NEW_UNITS	33	/// How many percent of max mana for new units
@@ -459,7 +459,7 @@ extern char* MenuBackground;		/// File for menu background
 extern char* MenuBackgroundWithTitle;	/// File for menu with title
 extern char* TitleMusic;		/// File for title music
 extern char* MenuMusic;			/// File for menu music
-extern char* FreeCraftLibPath;		/// Location of freecraft data
+extern char* StratagusLibPath;		/// Location of stratagus data
 
 extern int SpeedBuild;			/// Speed factor for building
 extern int SpeedTrain;			/// Speed factor for training
@@ -482,9 +482,9 @@ extern void LoadAll(void);		/// Load all data back
 extern void InitSyncRand(void);		/// Initialize the syncron rand
 extern int SyncRand(void);		/// Syncron rand
 
-extern int main1(int argc,char* argv[]);/// Init freecraft
-extern volatile void Exit(int err);	/// Exit freecraft
-extern volatile void ExitFatal(int err);/// Exit freecraft with fatal error
+extern int main1(int argc,char* argv[]);/// Init stratagus
+extern volatile void Exit(int err);	/// Exit stratagus
+extern volatile void ExitFatal(int err);/// Exit stratagus with fatal error
 
 extern void UpdateDisplay(void);	/// Game display update
 extern void InitModules(void);		/// Initinalize all modules

@@ -6,17 +6,17 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name iolib.c	-	Compression-IO helper functions. */
 //
 //	(c) Copyright 2000-2003 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -36,7 +36,7 @@
 #include <fcntl.h>
 #endif
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "iocompat.h"
 
 #include "campaign.h"			// for CurrentMapPath
@@ -394,7 +394,7 @@ global char* LibraryFileName(const char* file,char* buffer)
 	    }
 	    strcat(buffer,file);
 	} else {
-	    strcpy(buffer,FreeCraftLibPath);
+	    strcpy(buffer,StratagusLibPath);
 	    if( *buffer ) {
 		strcat(buffer,"/");
 	    }
@@ -462,24 +462,24 @@ global char* LibraryFileName(const char* file,char* buffer)
     //
     //	In global shared directory
     //
-    sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
+    sprintf(buffer,"%s/%s",StratagusLibPath,file);
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #ifdef USE_ZLIB		// gzip or bzip2 in global shared directory
-    sprintf(buffer,"%s/%s.gz",FreeCraftLibPath,file);
+    sprintf(buffer,"%s/%s.gz",StratagusLibPath,file);
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
 #ifdef USE_BZ2LIB
-    sprintf(buffer,"%s/%s.bz2",FreeCraftLibPath,file);
+    sprintf(buffer,"%s/%s.bz2",StratagusLibPath,file);
     if( !access(buffer,R_OK) ) {
 	return buffer;
     }
 #endif
 #ifdef USE_ZZIPLIB
-    sprintf(buffer,"%s/%s",FreeCraftLibPath,file);
+    sprintf(buffer,"%s/%s",StratagusLibPath,file);
     if( (zp=zzip_open(buffer,O_RDONLY|O_BINARY)) ) {
 	zzip_close(zp);
 	return buffer;

@@ -6,18 +6,18 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ui.c		-	The user interface globals. */
 //
 //	(c) Copyright 1999-2003 by Lutz Sammer, Andreas Arens, and
 //	                           Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "video.h"
 #include "font.h"
 #include "interface.h"
@@ -661,7 +661,7 @@ global void CleanUserInterface(void)
 }
 
 /**
-**	Takes coordinates of a pixel in freecraft's window and computes
+**	Takes coordinates of a pixel in stratagus's window and computes
 **	the map viewport which contains this pixel.
 **
 **	@param x	x pixel coordinate with origin at UL corner of screen
@@ -823,7 +823,7 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 **	Compute viewport parameters for single viewport mode.
 **
 **	The parameters 	include viewport's width and height expressed
-**	in pixels, its position with respect to FreeCraft's window
+**	in pixels, its position with respect to Stratagus's window
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
@@ -846,7 +846,7 @@ local void SetViewportModeSingle (void)
 **	2 (approximately) equal parts.
 **
 **	The parameters 	include viewport's width and height expressed
-**	in pixels, its position with respect to FreeCraft's window
+**	in pixels, its position with respect to Stratagus's window
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
@@ -875,7 +875,7 @@ local void SetViewportModeSplitHoriz (void)
 **	to another 2 parts.
 **
 **	The parameters 	include viewport's width and height expressed
-**	in pixels, its position with respect to FreeCraft's window
+**	in pixels, its position with respect to Stratagus's window
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
@@ -909,7 +909,7 @@ local void SetViewportModeSplitHoriz3 (void)
 **	2 (approximately) equal parts.
 **
 **	The parameters 	include viewport's width and height expressed
-**	in pixels, its position with respect to FreeCraft's window
+**	in pixels, its position with respect to Stratagus's window
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */
@@ -938,7 +938,7 @@ local void SetViewportModeSplitVert (void)
 **	to 4 (approximately) equal parts.
 **
 **	The parameters 	include viewport's width and height expressed
-**	in pixels, its position with respect to FreeCraft's window
+**	in pixels, its position with respect to Stratagus's window
 **	origin, and the corresponding map parameters expressed in map
 **	tiles with origin at map origin (map tile (0,0)).
 */

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 //#define PRINT_TREE
 #include "avl_tree.h"
 #ifdef PRINT_TREE

@@ -6,18 +6,18 @@
 //	  \/		    \/	   \/	     \/		   \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name mainscr.c	-	The main screen. */
 //
 //	(c) Copyright 1998,2000-2003 by Lutz Sammer, Valery Shchedrin,
 //	                             and Jimmy Salmon
 //
-//	FreeCraft is free software; you can redistribute it and/or modify
+//	Stratagus is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
 //
-//	FreeCraft is distributed in the hope that it will be useful,
+//	Stratagus is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
 //	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //	GNU General Public License for more details.
@@ -36,7 +36,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "freecraft.h"
+#include "stratagus.h"
 #include "video.h"
 #include "font.h"
 #include "sound_id.h"
@@ -1209,7 +1209,7 @@ global void DrawInfoPanel(void)
 	x=TheUI.InfoPanelX+16;
 	y=TheUI.InfoPanelY+8;
 
-	VideoDrawText(x,y,GameFont,"FreeCraft");
+	VideoDrawText(x,y,GameFont,"Stratagus");
 	y+=16;
 	VideoDrawText(x,y,GameFont,"Cycle:");
 	VideoDrawNumber(x+48,y,GameFont,GameCycle);
