@@ -695,9 +695,9 @@ global void InitCcl(void)
 
     EditorCclRegister();
 
-    init_subr_1("load-pud",CclLoadPud);
-    init_subr_1("load-map",CclLoadMap);
-    init_subr_2("define-map",CclDefineMap);
+    gh_new_procedure1_0("load-pud",CclLoadPud);
+    gh_new_procedure1_0("load-map",CclLoadMap);
+    gh_new_procedure2_0("define-map",CclDefineMap);
 
     gh_new_procedure0_0("units",CclUnits);
 
