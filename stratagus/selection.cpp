@@ -195,15 +195,9 @@ global int SelectUnitsByType(Unit* base)
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.
-#ifdef NEW_ORDERS
     if( base->Removed || base->Orders[0].Action==UnitActionDie ) {
         return 0;
     }
-#else
-    if( base->Removed || base->Command.Action==UnitActionDie ) {
-        return 0;
-    }
-#endif
 
     UnSelectAll();
     Selected[0]=base;
@@ -401,17 +395,10 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	    continue;
 	}
 	// FIXME: Can we get this?
-#ifdef NEW_ORDERS
 	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
-#else
-	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) {
-	    SelectSingleUnit(unit);
-	    return 1;
-	}
-#endif
     }
 
     //
@@ -450,17 +437,10 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	    // FIXME: isn't it enough to see a field of the building?
 	    continue;
 	}
-#ifdef NEW_ORDERS
 	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
-#else
-	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) {
-	    SelectSingleUnit(unit);
-	    return 1;
-	}
-#endif
     }
 
     return 0;

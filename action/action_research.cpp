@@ -50,7 +50,6 @@ global void HandleActionResearch(Unit* unit)
 
     DebugLevel3("Research %Zd\n",UnitNumber(unit));
 
-#ifdef NEW_ORDERS
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
 	unit->Data.Research.Ticks=0;
@@ -60,12 +59,6 @@ global void HandleActionResearch(Unit* unit)
     unit->Data.Research.Ticks+=SpeedResearch;
 
     if( unit->Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
-#else
-    upgrade=unit->Command.Data.Research.What;
-    unit->Command.Data.Research.Ticks+=SpeedResearch;
-
-    if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
-#endif
 
 	// FIXME: should als speak and tell ai. generic notify/message.
 	if( unit->Player==ThisPlayer ) {
@@ -77,11 +70,7 @@ global void HandleActionResearch(Unit* unit)
         UpgradeAcquire(unit->Player,upgrade);
 
 	unit->Reset=unit->Wait=1;
-#ifdef NEW_ORDERS
 	unit->Orders[0].Action=UnitActionStill;
-#else
-	unit->Command.Action=UnitActionStill;
-#endif
 	unit->SubAction=0;
 
 	// Upgrade can change all

@@ -308,9 +308,6 @@ global int main1(int argc __attribute__ ((unused)),
 #ifdef UNIT_ON_MAP
     "UNIT-ON-MAP "
 #endif
-#ifdef NEW_ORDERS
-    "NEW-ORDERS "
-#endif
 #ifdef NEW_MAPDRAW
     "NEW-MAPDRAW "
 #endif
@@ -325,6 +322,9 @@ global int main1(int argc __attribute__ ((unused)),
 #endif
 #ifdef NEW_SHIPS
     "NEW-SHIPS "
+#endif
+#ifdef NEW_NETMENUS
+    "NEW-NETMENUS "
 #endif
 #ifdef SLOW_INPUT
     "SLOW-INPUT "
@@ -477,9 +477,6 @@ local void Usage(void)
 #ifdef UNIT_ON_MAP
     "UNIT-ON-MAP "
 #endif
-#ifdef NEW_ORDERS
-    "NEW-ORDERS "
-#endif
 #ifdef NEW_MAPDRAW
     "NEW-MAPDRAW "
 #endif
@@ -494,6 +491,9 @@ local void Usage(void)
 #endif
 #ifdef NEW_SHIPS
     "NEW-SHIPS "
+#endif
+#ifdef NEW_NETMENUS
+    "NEW-NETMENUS "
 #endif
 #ifdef SLOW_INPUT
     "SLOW-INPUT "
