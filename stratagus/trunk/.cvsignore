@@ -42,3 +42,6 @@ preferences*
 data.wc2
 screen*
 *.pud.gz
+autom4te.cache
+config.status
+
