@@ -844,6 +844,7 @@ static void DrawMapCursor(void)
 */
 static void DrawEditorInfo(void)
 {
+#if 0
 	int tile;
 	int i;
 	int x;
@@ -901,6 +902,7 @@ static void DrawEditorInfo(void)
 			: "");
 
 	VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
+#endif
 }
 
 /**
@@ -986,14 +988,6 @@ void EditorUpdateDisplay(void)
 	}
 	DrawEditorPanel();
 
-	//
-	// Resource
-	//
-	if (TheUI.Resource.Graphic) {
-		VideoDrawSub(TheUI.Resource.Graphic, 0, 0,
-			TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
-			TheUI.ResourceX, TheUI.ResourceY);
-	}
 	if (CursorOn == CursorOnMap) {
 		DrawEditorInfo();
 	}

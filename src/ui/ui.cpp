@@ -89,7 +89,6 @@ static void CleanUIGraphics(UI* ui)
 	for (i = 0; i < ui->NumFillers; ++i) {
 		VideoSafeFree(ui->Filler[i].Graphic);
 	}
-	VideoSafeFree(ui->Resource.Graphic);
 
 	for (i = 0; i < MaxCosts + 2; ++i) {
 		VideoSafeFree(ui->Resources[i].Icon.Graphic);
@@ -212,9 +211,6 @@ void LoadUserInterface(void)
 			TheUI.Filler[i].Graphic = LoadGraphic(TheUI.Filler[i].File);
 		}
 	}
-	if (TheUI.Resource.File && *TheUI.Resource.File) {
-		TheUI.Resource.Graphic = LoadGraphic(TheUI.Resource.File);
-	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
 		// FIXME: reuse same graphics?
@@ -327,10 +323,6 @@ void CleanUI(UI* ui)
 	free(ui->FillerX);
 	free(ui->FillerY);
 	free(ui->Filler);
-
-	// Resource
-	free(ui->Resource.File);
-	free(ui->Resource.Graphic);
 
 	// Resource Icons
 	for (i = 0; i < MaxCosts + 2; ++i) {

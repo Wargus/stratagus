@@ -1148,10 +1148,6 @@ static int CclDefineUI(lua_State* l)
 	ui->MouseWarpX = -1;
 	ui->MouseWarpY = -1;
 
-	ui->Resource.File = NULL;
-	ui->ResourceX = -1;
-	ui->ResourceY = -1;
-
 	ui->InfoPanel.File = NULL;
 	ui->InfoPanelX = -1;
 	ui->InfoPanelY = -1;
@@ -1220,19 +1216,6 @@ static int CclDefineUI(lua_State* l)
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 			}
-		} else if (!strcmp(value, "resource-line")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, j + 1, 1);
-			ui->Resource.File = strdup(LuaToString(l, -1));
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
-			ui->ResourceX = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 3);
-			ui->ResourceY = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
