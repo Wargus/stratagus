@@ -124,7 +124,7 @@ global void DoRightButton(int sx, int sy)
 	// Unit selected isn't owned by the player.
 	// You can't select your own units + foreign unit(s).
 	//
-	if (!CanSelectMultipleUnits(Selected[0]->Player) && 0) {
+	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
 		return;
 	}
 
