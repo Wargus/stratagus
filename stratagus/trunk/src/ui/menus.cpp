@@ -2759,10 +2759,8 @@ local void SaveOk(void)
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
     char *suf, *cp, *fsuffix, *np;
-    int p, sz;
-    static int szl[] = { -1, 32, 64, 96, 128, 256, 512, 1024 };
-    np = strrchr(pathbuf, '/');
 
+    np = strrchr(pathbuf, '/');
     if (np) {
 	np++;
     } else {
