@@ -63,9 +63,9 @@ extern UnitType* CclGetUnitType(lua_State* l);
 global Timer GameTimer; /// The game timer
 local unsigned long WaitFrame; /// Frame to wait for
 local int Trigger;
-local int WaitScript;
 local int WaitTrigger;
 local unsigned char Switch[MAX_SWITCH]; /// Switches
+local int* ActiveTriggers;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -1065,9 +1065,6 @@ local int CclActionSetSwitch(lua_State* l)
 local int CclAddTrigger(lua_State* l)
 {
 	int i;
-	const char* str;
-	int args;
-	int j;
 
 	if (lua_gettop(l) != 2 || !lua_isfunction(l, 1) ||
 			(!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
@@ -1093,62 +1090,56 @@ local int CclAddTrigger(lua_State* l)
 	}
 
 	i = luaL_getn(l, -1);
-	lua_pushvalue(l, 1);
-	lua_rawseti(l, -2, i + 1);
-	lua_newtable(l);
-	if (lua_isfunction(l, 2)) {
+	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
+		lua_pushnil(l);
+		lua_rawseti(l, -2, i + 1);
+		lua_pushnil(l);
+		lua_rawseti(l, -2, i + 2);
+	} else {
+		lua_pushvalue(l, 1);
+		lua_rawseti(l, -2, i + 1);
+		lua_newtable(l);
 		lua_pushvalue(l, 2);
 		lua_rawseti(l, -2, 1);
-	} else {
-		args = luaL_getn(l, 2);
-		for (j = 0; j < args; ++j) {
-			lua_rawgeti(l, 2, j + 1);
-			str = LuaToString(l, -1);
-			lua_pop(l, 1);
-			luaL_loadbuffer(l, str, strlen(str), str);
-			lua_rawseti(l, -2, j + 1);
-		}
+		lua_rawseti(l, -2, i + 2);
 	}
-	lua_rawseti(l, -2, i + 2);
 	lua_pop(l, 1);
 
 	return 0;
 }
 
 /**
-**  Set the current trigger number
-**
-**  @param number  Trigger number
+**  Set the trigger values
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetTriggerNumber(SCM number)
+local int CclSetTriggers(lua_State* l)
 {
-	int num;
-	int i;
+	if (lua_gettop(l) != 3) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	Trigger = LuaToNumber(l, 1);
+	WaitTrigger = LuaToNumber(l, 2);
+	WaitFrame = LuaToNumber(l, 3);
 
-	num = gh_scm2int(number);
-	if (num == -1) {
-		CclGcProtectedAssign(&Trigger, NULL);
-	} else {
-		CclGcProtectedAssign(&Trigger, symbol_value(gh_symbol2scm("*triggers*"), NIL));
-		if (gh_null_p(Trigger)) {
-			DebugLevel0Fn("Invalid trigger number: %d out of -1\n" _C_ num);
-		} else {
-			for (i = 0; i < num; ++i) {
-				if (gh_null_p(Trigger)) {
-					DebugLevel0Fn("Invalid trigger number: %d out of %d\n" _C_
-						num _C_ i - 1);
-					break;
-				}
-				CclGcProtectedAssign(&Trigger, gh_cdr(Trigger));
-			}
-		}
+	return 0;
+}
+
+/**
+**  Set the active triggers
+*/
+local int CclSetActiveTriggers(lua_State* l)
+{
+	int args;
+	int j;
+
+	args = lua_gettop(l);
+	ActiveTriggers = malloc(args * sizeof(*ActiveTriggers));
+	for (j = 0; j < args; ++j) {
+		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
 
-	return SCM_UNSPECIFIED;
+	return 0;
 }
-#elif defined(USE_LUA)
-#endif
 
 /**
 **  Execute a trigger action
@@ -1177,7 +1168,6 @@ local int TriggerExecuteAction(int script)
 		}
 		lua_settop(Lua, 2);
 		if (WaitFrame > FrameCounter) {
-			WaitScript = script;
 			lua_pop(Lua, 1);
 			return 0;
 		}
@@ -1222,7 +1212,7 @@ global void TriggersEachCycle(void)
 	}
 	if (WaitFrame && WaitFrame <= FrameCounter) {
 		WaitFrame = 0;
-		if (TriggerExecuteAction(WaitScript)) {
+		if (TriggerExecuteAction(WaitTrigger + 1)) {
 			TriggerRemoveTrigger(WaitTrigger);
 		}
 		lua_pop(Lua, 1);
@@ -1240,17 +1230,14 @@ global void TriggersEachCycle(void)
 		if (!lua_isnil(Lua, -1)) {
 			break;
 		}
+		lua_pop(Lua, 1);
 		Trigger += 2;
 	}
 	if (Trigger < triggers) {
-		int top;
-
 		WaitTrigger = Trigger;
 		Trigger += 2;
-		top = lua_gettop(Lua);
 		LuaCall(0, 0);
 		// If condition is true execute action
-		top = lua_gettop(Lua);
 		if (lua_gettop(Lua) > 1 && lua_toboolean(Lua, -1)) {
 			lua_settop(Lua, 1);
 			if (TriggerExecuteAction(WaitTrigger + 1)) {
@@ -1268,7 +1255,8 @@ global void TriggersEachCycle(void)
 global void TriggerCclRegister(void)
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
-//	lua_register(Lua, "SetTriggerNumber!", CclSetTriggerNumber);
+	lua_register(Lua, "SetTriggers", CclSetTriggers);
+	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
 	// Conditions
 	lua_register(Lua, "IfUnit", CclIfUnit);
 	lua_register(Lua, "IfUnitAt", CclIfUnitAt);
@@ -1299,31 +1287,29 @@ global void TriggerCclRegister(void)
 */
 global void SaveTriggers(CLFile* file)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM list;
 	int i;
-	int trigger;
+	int triggers;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: trigger $Id$\n\n");
+	lua_pushstring(Lua, "_triggers_");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	triggers = luaL_getn(Lua, -1);
 
-	i = 0;
-	trigger = -1;
-	list = symbol_value(gh_symbol2scm("*triggers*"), NIL);
-	while (!gh_null_p(list)) {
-		if (gh_eq_p(Trigger, list)) {
-			trigger = i;
+	CLprintf(file, "SetActiveTriggers(");
+	for (i = 0; i < triggers; i += 2) {
+		lua_rawgeti(Lua, -1, i + 1);
+		if (i) {
+			CLprintf(file, ", ");
 		}
-		CLprintf(file, "(add-trigger '");
-		PrintTrigger(gh_car(gh_car(list)), file);
-		CLprintf(file, " '");
-		PrintTrigger(gh_cdr(gh_car(list)), file);
-		CLprintf(file, ")\n");
-		list = gh_cdr(list);
-		++i;
+		if (!lua_isnil(Lua, -1)) {
+			CLprintf(file, "true");
+		} else {
+			CLprintf(file, "false");
+		}
+		lua_pop(Lua, 1);
 	}
-#endif
-//	CLprintf(file, "(set-trigger-number! %d)\n", trigger);
+	CLprintf(file, ")\n");
+
+	CLprintf(file, "SetTriggers(%d, %d, %d)\n", Trigger, WaitTrigger, WaitFrame);
 
 	if (GameTimer.Init) {
 		CLprintf(file, "ActionSetTimer(%ld, %d)\n",
@@ -1368,6 +1354,9 @@ global void CleanTriggers(void)
 	lua_settable(Lua, LUA_GLOBALSINDEX);
 
 	Trigger = 0;
+
+	free(ActiveTriggers);
+	ActiveTriggers = NULL;
 
 	memset(&GameTimer, 0, sizeof(GameTimer));
 }
