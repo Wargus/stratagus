@@ -248,13 +248,13 @@ local void VideoDrawSubOpenGL(
 	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
+    int sx,ex,sy,ey;
     GLfloat stx,etx,sty,ety;
 
-    sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)w/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)h/VideoHeight;
+    sx=x;
+    ex=sx+w;
+    ey=VideoHeight-y;
+    sy=ey-h;
 
     stx=(GLfloat)gx/graphic->Width*graphic->TextureWidth;
     etx=(GLfloat)(gx+w)/graphic->Width*graphic->TextureWidth;
@@ -264,13 +264,13 @@ local void VideoDrawSubOpenGL(
     glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(stx, 1.0f-ety);
-    glVertex3f(sx, sy, 0.0f);
+    glVertex2i(sx, sy);
     glTexCoord2f(stx, 1.0f-sty);
-    glVertex3f(sx, ey, 0.0f);
+    glVertex2i(sx, ey);
     glTexCoord2f(etx, 1.0f-sty);
-    glVertex3f(ex, ey, 0.0f);
+    glVertex2i(ex, ey);
     glTexCoord2f(etx, 1.0f-ety);
-    glVertex3f(ex, sy, 0.0f);
+    glVertex2i(ex, sy);
     glEnd();
 }
 #endif

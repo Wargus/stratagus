@@ -1306,16 +1306,16 @@ local void MapDraw32Tile32(int tile,int x,int y)
 #ifdef USE_OPENGL
 local void MapDrawTileOpenGL(int tile,int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
+    GLint sx,ex,sy,ey;
     GLfloat stx,etx,sty,ety;
     Graphic *g;
     int t;
 
     g=TheMap.TileData;
-    sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)TileSizeX/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)TileSizeY/VideoHeight;
+    sx=x;
+    ex=sx+TileSizeX;
+    ey=VideoHeight-y;
+    sy=ey-TileSizeY;
 
     t=tile%(g->Width/TileSizeX);
     stx=(GLfloat)t*TileSizeX/g->Width*g->TextureWidth;
@@ -1327,13 +1327,13 @@ local void MapDrawTileOpenGL(int tile,int x,int y)
     glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(stx, 1.0f-ety);
-    glVertex3f(sx, sy, 0.0f);
+    glVertex2i(sx, sy);
     glTexCoord2f(stx, 1.0f-sty);
-    glVertex3f(sx, ey, 0.0f);
+    glVertex2i(sx, ey);
     glTexCoord2f(etx, 1.0f-sty);
-    glVertex3f(ex, ey, 0.0f);
+    glVertex2i(ex, ey);
     glTexCoord2f(etx, 1.0f-ety);
-    glVertex3f(ex, sy, 0.0f);
+    glVertex2i(ex, sy);
     glEnd();
 }
 #endif
