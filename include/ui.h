@@ -92,28 +92,19 @@ typedef struct _ui_ {
     int		MouseScale;		/// Mouse speed scale
 
     //	Fillers
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		Filler1;		/// filler 1 graphic
+    GraphicConfig Filler1;		/// filler 1 graphic
     int		Filler1X;		/// filler 1 X position
     int		Filler1Y;		/// filler 1 Y position
 
     //	Resource line
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		Resource;		/// Resource background
+    GraphicConfig Resource;		/// Resource background
     int		ResourceX;		/// Resource X position
     int		ResourceY;		/// Resource Y position
 
     int		OriginalResources;	/// original resource mode
 
     struct {
-	struct {
-	    char*	File;		/// Filename
-	    Graphic*	Graphic;	/// Graphic
-	}	Icon;			/// icon image
+	GraphicConfig Icon;		/// icon image
 	int	IconRow;		/// icon image row (frame)
 	int	IconX;			/// icon X position
 	int	IconY;			/// icon Y position
@@ -123,10 +114,7 @@ typedef struct _ui_ {
 	int	TextY;			/// text Y position
     }		Resources[MaxCosts];
 
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		FoodIcon;		/// units icon image
+    GraphicConfig FoodIcon;		/// units icon image
     int		FoodIconRow;		/// units icon image row (frame)
     int		FoodIconX;		/// units icon X position
     int		FoodIconY;		/// units icon Y position
@@ -135,10 +123,7 @@ typedef struct _ui_ {
     int		FoodTextX;		/// units text X position
     int		FoodTextY;		/// units text Y position
 
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		ScoreIcon;		/// score icon image
+    GraphicConfig ScoreIcon;		/// score icon image
     int		ScoreIconRow;		/// score icon image row (frame)
     int		ScoreIconX;		/// score icon X position
     int		ScoreIconY;		/// score icon Y position
@@ -148,10 +133,7 @@ typedef struct _ui_ {
     int		ScoreTextY;		/// score text Y position
 
     // Info panel
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		InfoPanel;		/// Info panel background
+    GraphicConfig InfoPanel;		/// Info panel background
     int		InfoPanelX;		/// Info panel screen X position
     int		InfoPanelY;		/// Info panel screen Y position
     int		InfoPanelW;		/// Info panel width
@@ -165,10 +147,7 @@ typedef struct _ui_ {
     int		CompleteTextY;		/// complete text Y position
 
     // Button panel
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		ButtonPanel;		/// Button panel background
+    GraphicConfig ButtonPanel;		/// Button panel background
     int		ButtonPanelX;		/// Button panel screen X position
     int		ButtonPanelY;		/// Button panel screen Y position
 
@@ -181,26 +160,17 @@ typedef struct _ui_ {
     unsigned	MapEndY;
 
     // The menu button
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		MenuButton;		/// menu button background
+    GraphicConfig MenuButton;		/// menu button background
     int		MenuButtonX;		/// menu button screen X position
     int		MenuButtonY;		/// menu button screen Y position
 
     // The minimap
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		Minimap;		/// minimap panel background
+    GraphicConfig Minimap;		/// minimap panel background
     int		MinimapX;		/// minimap screen X position
     int		MinimapY;		/// minimap screen Y position
 
     // The status line
-    struct {
-	char*	File;			/// Filename
-	Graphic*Graphic;		/// Graphic
-    }		StatusLine;		/// Status line background
+    GraphicConfig StatusLine;		/// Status line background
     int		StatusLineX;		/// status line screeen X position
     int		StatusLineY;		/// status line screeen Y position
 
