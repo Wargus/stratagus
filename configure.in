@@ -141,16 +141,13 @@ dnl ----------------------------
 
 dnl --- CHECK FOR ZZIPLIB ------
 AC_ARG_WITH(zziplib,
-    [  --with-zziplib	  [Use zziplib (default: autodetect)]],, with_zziplib="yes")
-if test "$ZZIPLIB" != "no"; then
-    AC_CHECK_LIB(zziplib, main,
-        [ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
-         ZZIPLIB_LIBS="-lzzip"],
-        [ZZIPLIB_CFLAGS=""
-         ZZIPLIB_LIBS=""])
-else
+    [  --with-zziplib	  [Use zziplib (default: no)]],, with_zziplib="yes")
+if test "$ZZIPLIB" != "yes"; then
     ZZIPLIB_CFLAGS=""
     ZZIPLIB_LIBS=""
+else
+    ZZIPLIB_CFLAGS="-DUSE_ZZIPLIB"
+    ZZIPLIB_LIBS="-lzzip"
 fi
 AC_SUBST(ZZIPLIB_CFLAGS)
 AC_SUBST(ZZIPLIB_LIBS)
@@ -177,15 +174,15 @@ dnl ----------------------------
 
 dnl --- CHECK FOR MAD LIB ------
 AC_ARG_WITH(mad,
-    [  --with-mad		  [Use mad mp3 (default: autodetect)]], MAD="$with_mad")
+    [  --with-mad		  [Use mad mp3 (default: no)]], MAD="$with_mad")
 MAD_CFLAGS=
 MAD_LIBS=
-if test "$MAD" != "no"; then
-    AC_CHECK_HEADERS(mad.h, MAD=yes, MAD=no)
-    if test "$MAD" != "no"; then
-	MAD_CFLAGS="-DUSE_MAD"
-	MAD_LIBS="-lmad"
-    fi
+if test "$MAD" != "yes"; then
+    MAD_CFLAGS=""
+    MAD_LIBS=""
+else
+    MAD_CFLAGS="-DUSE_MAD"
+    MAD_LIBS="-lmad"
 fi
 AC_SUBST(MAD_CFLAGS)
 AC_SUBST(MAD_LIBS)
@@ -193,15 +190,13 @@ dnl ----------------------------
 
 dnl --- CHECK FOR FLAC LIB -----
 AC_ARG_WITH(flac,
-    [  --with-flac		  [Use FLAC (default: autodetect)]], FLAC="$with_flac")
-FLAC_CFLAGS=
-FLAC_LIBS=
-if test "$FLAC" != "no"; then
-    AC_CHECK_HEADERS(FLAC/all.h, FLAC=yes, FLAC=no)
-    if test "$FLAC" != "no"; then
-	FLAC_CFLAGS="-DUSE_FLAC"
-	FLAC_LIBS="-lFLAC"
-    fi
+    [  --with-flac		  [Use FLAC (default: no)]], FLAC="$with_flac")
+if test "$FLAC" != "yes"; then
+    FLAC_CFLAGS=
+    FLAC_LIBS=
+else
+    FLAC_CFLAGS="-DUSE_FLAC"
+    FLAC_LIBS="-lFLAC"
 fi
 AC_SUBST(FLAC_CFLAGS)
 AC_SUBST(FLAC_LIBS)
@@ -210,18 +205,18 @@ dnl ----------------------------
 dnl --- CHECK FOR CDAUDIO ------
 AC_ARG_WITH(cdaudio,
     [  --with-cdaudio=libcda,sdlcd,cdda,no
-			  [Enable CD Audio support (default: platform-dependant)]], CDAUDIO="$with_cdaudio")
+			  [Enable CD Audio support (default: no)]], CDAUDIO="$with_cdaudio")
 if test "$CDAUDIO" = "sdl"; then
     CDAUDIO_CFLAGS="`sdl-config --cflags`"
-    CDAUDIO_LIBS=""
-elif test "$CDAUDIO" = "no" -o "$PLATFORM" = "-DBSD"; then
-    CDAUDIO_CFLAGS=""
     CDAUDIO_LIBS=""
 elif test "$CDAUDIO" = "cdda"; then
     CDAUDIO_CFLAGS="-DUSE_CDDA"
     CDAUDIO_LIBS=""
-else
+elif test "$CDAUDIO" = "libcda"; then
     CDAUDIO_CFLAGS="-DUSE_LIBCDA"
+    CDAUDIO_LIBS=""
+else
+    CDAUDIO_CFLAGS=""
     CDAUDIO_LIBS=""
 fi
 AC_SUBST(CDAUDIO_CFLAGS)
