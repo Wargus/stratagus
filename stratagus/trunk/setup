@@ -426,11 +426,13 @@ case $VIDSEL in
 
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
+if [ "$WIN32" != "1" ] ; then
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
-if [ "$BEOS" != "1" ] ; then
-	echo "VIDEOLIB	= \$(SDLLIB) -ldl" >> $RULESFILE
-else
-        echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+    if [ "$BEOS" != "1" ] ; then
+	    echo "VIDEOLIB	= \$(SDLLIB) -ldl" >> $RULESFILE
+    else
+	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+    fi
 fi
 
 	echo
@@ -475,9 +477,9 @@ echo "" >> $RULESFILE
 if test "$WIN32" = "1" ; then
 	echo "VIDEO		= -DUSE_WIN32 \$(SDL)" >> $RULESFILE
 	if test "`gcc -v 2>&1 | grep -is mingw32` x" = " x" ; then
-	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32" >> $RULESFILE
+	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
 	else
-	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32" >> $RULESFILE
+	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -lws2_32" >> $RULESFILE
 	fi
 fi
 

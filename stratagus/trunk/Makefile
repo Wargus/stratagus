@@ -27,7 +27,10 @@
 
 TOPDIR=		.
 
-include $(TOPDIR)/Rules.make
+RULESFILE ?= Rules.make
+WINRULESFILE = Rules.make.WIN32
+
+include $(TOPDIR)/$(RULESFILE)
 
 MAKE=	make TOPDIR=`pwd`
 MODULES= src tools
@@ -76,12 +79,12 @@ doc::
 	doxygen contrib/doxygen-freecraft.cfg
 
 doc++::
-	@$(MAKE) -C src doc
+	@$(MAKE) -C src RULESFILE=$(RULESFILE) doc
 	@if [ ! -d srcdoc ]; then mkdir srcdoc; fi
 	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
 src::
-	@$(MAKE) -C src all
+	@$(MAKE) -C src RULESFILE=$(RULESFILE) all
 
 etlib/$(OBJDIR)hash.$(OE): etlib/hash.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
@@ -94,6 +97,12 @@ etlib/$(OBJDIR)getopt.$(OE): etlib/getopt.c
 etlib/$(OBJDIR)prgname.$(OE): etlib/prgname.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
+
+src/$(OBJDIR)main.$(OE): src/main.c
+	@if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
+	$(CC) -c $(CFLAGS) $< -o $@
+
+src/$(OBJDIR)/libclone.a: ;
 
 # UNIX-TARGET
 freecraft:	src etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)libclone.a
@@ -117,38 +126,38 @@ echo::
 	@-echo LIBS: $(CLONELIBS)
 
 tools::
-	@$(MAKE) -C tools all
+	@$(MAKE) -C tools RULESFILE=$(RULESFILE) all
 
 clean::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clean ; done
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clean ; done
 	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)*.$(OE) .#*
 
 clobber:	clean
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clobber ; done
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clobber ; done
 	$(RM) freecraft$(EXE) gmon.sum *~
 	$(RM) -r srcdoc/*
-	@$(MAKE) -C tools clobber
+	@$(MAKE) -C tools RULESFILE=$(RULESFILE) clobber
 
 distclean:	clobber
 	@echo
 
 ci::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i ci ; done
-	ci -l Makefile Common.mk Rules.make .indent.pro \
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) ci ; done
+	ci -l Makefile Common.mk $(RULESFILE) .indent.pro \
 	contrib/doxygen-freecraft.cfg \
 	$(CCLS) $(DOCS)
 
 lockver::
-	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i lockver ; done
-	$(LOCKVER) Makefile Common.mk Rules.make .indent.pro \
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) lockver ; done
+	$(LOCKVER) Makefile Common.mk $(RULESFILE) .indent.pro \
 	contrib/doxygen-freecraft.cfg \
 	$(CCLS) $(DOCS)
 
 tags::
-	@$(MAKE) -C src tags
+	@$(MAKE) -C src RULESFILE=$(RULESFILE) tags
 
 depend::
-	@$(MAKE) -C src depend
+	@$(MAKE) -C src RULESFILE=$(RULESFILE) depend
 
 ##############################################################################
 #	Distributions
@@ -196,7 +205,7 @@ distdir	= freecraft-$(mydate)
 
 dist::
 	$(RM) $(DISTLIST)
-	@set -e; for i in $(MODULES); do $(MAKE) -C $$i distlist ; done
+	@set -e; for i in $(MODULES); do $(MAKE) -C $$i RULESFILE=$(RULESFILE) distlist ; done
 	echo >>$(DISTLIST)
 	echo $(PICS) >>$(DISTLIST)
 	echo $(MISC) >>$(DISTLIST)
@@ -218,8 +227,8 @@ dist::
 
 small-dist::
 	@$(RM) $(DISTLIST)
-	$(MAKE) -C src distlist
-	$(MAKE) -C tools distlist
+	$(MAKE) -C src RULESFILE=$(RULESFILE) distlist
+	$(MAKE) -C tools RULESFILE=$(RULESFILE) distlist
 	echo $(MISC) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
@@ -288,7 +297,7 @@ win32-bin-dist2:: win32
 
 win32-bin-dist: win32
 	@export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
-	$(MAKE) $(WIN32) win32-bin-dist2
+	$(MAKE) RULESFILE=$(WINRULESFILE) $(WIN32) win32-bin-dist2
 
 win32-exe-dist:	win32-bin-dist
 	cat tools/SFXWiz32-gcc.exe freecraft-$(mydate)-win32bin.zip \
@@ -354,8 +363,8 @@ difffile=	freecraft-`date +%y%m%d`.diff
 diff:
 	@$(RM) $(difffile)
 	@$(RM) $(DISTLIST)
-	$(MAKE) -C src distlist
-	$(MAKE) -C tools distlist
+	$(MAKE) -C src RULESFILE=$(RULESFILE) distlist
+	$(MAKE) -C tools RULESFILE=$(RULESFILE) distlist
 	echo $(MISC) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
@@ -389,8 +398,7 @@ WIN32=	\
     EXE='.exe' \
     XLDFLAGS='' \
     XIFLAGS='' \
-    VIDEO='-DUSE_WIN32 $(SDL)'	\
-    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32'
+    RULESFILE=$(WINRULESFILE)
 
 win32new:
 	@$(MAKE) distclean
