@@ -99,6 +99,103 @@ unsigned CclGetResourceByName(lua_State* l)
 }
 
 /**
+**  Parse BuildingRules
+**
+**  @param l  Lua state.
+**  @param b  BuildingRestriction to fill in
+*/
+static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
+{
+	const char* value;
+	int args;
+	int i;
+
+	args = luaL_getn(l, -1);
+	Assert(!(args & 1)); // must be even
+
+	for (i = 0; i < args; ++i) {
+		*b = calloc(1, sizeof(BuildRestriction));
+		lua_rawgeti(l, -1, i + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++i;
+		lua_rawgeti(l, -1, i + 1);
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "incorrect argument");
+		}
+		if (!strcmp(value, "distance")) {
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Distance")) {
+					(*b)->Data.Distance.Distance = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "DistanceType")) {
+					value = LuaToString(l, -1);
+					if (value[0] == '=') {
+						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
+							(*b)->Data.Distance.DistanceType = Equal;
+						}
+					} else if (value[0] == '>') {
+						if (value[1] == '=' && value[2] == '\0') {
+							(*b)->Data.Distance.DistanceType = GreaterThanEqual;
+						} else if (value[1] == '\0') {
+							(*b)->Data.Distance.DistanceType = GreaterThan;
+						}
+					} else if (value[0] == '<') {
+						if (value[1] == '=' && value[2] == '\0') {
+							(*b)->Data.Distance.DistanceType = LessThanEqual;
+						} else if (value[1] == '\0') {
+							(*b)->Data.Distance.DistanceType = LessThan;
+						}
+					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
+						(*b)->Data.Distance.DistanceType = NotEqual;
+					}
+				} else if (!strcmp(value, "Type")) {
+					(*b)->Data.Distance.RestrictTypeName = strdup(LuaToString(l, -1));
+				} else if (!strcmp(value, "Except")) {
+					(*b)->Data.Distance.Except = LuaToBoolean(l, -1);
+				} else {
+					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "tile")) {
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "NumberOnMask")) {
+					(*b)->Data.Tiles.Number = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "Mask")) {
+					(*b)->Data.Tiles.Mask = LuaToNumber(l, -1);
+				} else {
+					LuaError(l, "Unsupported BuildingRules tile tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "addon")) {
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "OffsetX")) {
+					(*b)->Data.AddOn.OffsetX = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "OffsetY")) {
+					(*b)->Data.AddOn.OffsetY = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "Type")) {
+					(*b)->Data.AddOn.ParentName = strdup(LuaToString(l, -1));
+				} else {
+					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else {
+			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
+		}
+		lua_pop(l, 1);
+		b = &((*b)->Next);
+	}
+}
+
+/**
 **  Parse unit-type.
 **
 **  @param l  Lua state.
@@ -487,6 +584,21 @@ static int CclDefineUnitType(lua_State* l)
 			type->Building = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "BuildingRules")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			subargs = luaL_getn(l, -1);
+			type->BuildingRules = malloc((subargs + 1) * sizeof(BuildRestriction*));
+			type->BuildingRules[subargs] = NULL;
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				ParseBuildingRules(l, &type->BuildingRules[k]);
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "BuilderOutside")) {
 			type->BuilderOutside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuilderLost")) {

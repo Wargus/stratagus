@@ -653,7 +653,7 @@ typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit, const struct 
 **    It is used to show variables graphicly.
 **  @todo add more stuff in this struct.
 */
-typedef struct _decovartype_{
+typedef struct _decovartype_ {
 	int Index;                  ///< Index of the variable. @see DefineVariables
 
 	int OffsetX;                ///< Offset in X coord.
@@ -712,6 +712,57 @@ typedef struct _decovartype_{
 **  Typedef of base structure of unit-type
 */
 typedef struct _unit_type_ UnitType;
+
+typedef struct _building_restrictions_ BuildRestriction;
+
+struct _building_restrictions_ {
+	enum {
+		RestrictAddOn,          ///< We are refereing to the following restriction
+		RestrictOnTop,
+		RestrictDistance,
+		RestrictAttach,
+		RestrictTiles,
+	} RestrictType;
+
+	union {
+		struct {
+			int OffsetX;         ///< offset from the main building to place this
+			int OffsetY;         ///< offset from the main building to place this
+			char* ParentName;    ///< building that is unit is an addon too.
+			UnitType* Parent;    ///< building that is unit is an addon too.
+		} AddOn;
+
+		struct {
+			UnitType* Parent;
+			int ReplaceOnDie;    ///< recreate the parent on destruction
+			int ReplaceOnBuild;  ///< remove the parent, or just build over it.
+		} OnTop;
+		
+		struct {
+			int Distance;        ///< distance to build (circle)
+			enum {
+				Equal,
+				NotEqual,
+				LessThan,
+				LessThanEqual,
+				GreaterThan,
+				GreaterThanEqual,
+			} DistanceType;
+			int Except;          ///< all except this building type.
+			char* RestrictTypeName; 
+			UnitType* RestrictType; 
+		} Distance;
+
+		int Direction;           ///< Direction mask up,down,left,right,up-left...
+
+		struct {
+			int Number;          ///< All tiles, or just 1-n,  0 is all as you don't have a rule otherwise
+			int Mask;            ///< Tile mask required
+		} Tiles;
+	} Data;
+	BuildRestriction* Next;
+};
+	
 
 /**
 ** Base structure of unit-type
@@ -834,6 +885,7 @@ struct _unit_type_ {
 	int GivesResource;                  ///< The resource this unit gives.
 	ResourceInfo* ResInfo[MaxCosts];    ///< Resource information.
 	UnitType* MustBuildOnTop;           ///< Must be built on top of something.
+	BuildRestriction** BuildingRules;   ///< Rules list for building a building.
 	SDL_Color NeutralMinimapColorRGB;   ///< Minimap Color for Neutral Units.
 
 	UnitSound Sound;                ///< Sounds for events
