@@ -408,6 +408,7 @@ global void InitSettings(void)
     for (i = 0; i < PlayerMax; i++) {
 	GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 	GameSettings.Presets[i].Team = SettingsPresetMapDefault;
+	GameSettings.Presets[i].Type = SettingsPresetMapDefault;
     }
     GameSettings.Resources = SettingsResourcesMapDefault;
     GameSettings.NumUnits = SettingsNumUnitsMapDefault;
