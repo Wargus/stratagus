@@ -70,6 +70,7 @@ local int SavedMapPositionY[4];	/// Saved map position Y
 local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[99];	/// Last input status line
+local int SpeedCheat;		/// Speed up cheat
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char GameObserve;	/// Observe mode
@@ -1016,22 +1017,36 @@ global int HandleCheats(const char* Input)
 	SpeedResearch = 1;	// speed factor for researching
 	SetMessage("NORMAL DEBUG SPEED");
     } else if (strcmp(Input, "make it so") == 0) {
-	for (i=1; i<MaxCosts; ++i) {
-	    SpeedResourcesHarvest[i] = 10;
-	    SpeedResourcesReturn[i] = 10;
+	if (SpeedCheat) {
+	    SpeedCheat = 0;
+	    for (i=1; i<MaxCosts; ++i) {
+		SpeedResourcesHarvest[i] = 1;
+		SpeedResourcesReturn[i] = 1;
+	    }
+	    SpeedBuild = 1;	// speed factor for building
+	    SpeedTrain = 1;	// speed factor for training
+	    SpeedUpgrade = 1;	// speed factor for upgrading
+	    SpeedResearch = 1;	// speed factor for researching
+	    SetMessage("NO SO!");
+	} else {
+	    SpeedCheat = 1;
+	    for (i=1; i<MaxCosts; ++i) {
+		SpeedResourcesHarvest[i] = 10;
+		SpeedResourcesReturn[i] = 10;
+	    }
+	    SpeedBuild = 10;	// speed factor for building
+	    SpeedTrain = 10;	// speed factor for training
+	    SpeedUpgrade = 10;	// speed factor for upgrading
+	    SpeedResearch = 10;	// speed factor for researching
+	    ThisPlayer->Resources[GoldCost] += 32000;
+	    ThisPlayer->Resources[WoodCost] += 32000;
+	    ThisPlayer->Resources[OilCost] += 32000;
+	    ThisPlayer->Resources[OreCost] += 32000;
+	    ThisPlayer->Resources[StoneCost] += 32000;
+	    ThisPlayer->Resources[CoalCost] += 32000;
+	    MustRedraw |= RedrawResources;
+	    SetMessage("SO!");
 	}
-	SpeedBuild = 10;	// speed factor for building
-	SpeedTrain = 10;	// speed factor for training
-	SpeedUpgrade = 10;	// speed factor for upgrading
-	SpeedResearch = 10;	// speed factor for researching
-	ThisPlayer->Resources[GoldCost] += 32000;
-	ThisPlayer->Resources[WoodCost] += 32000;
-	ThisPlayer->Resources[OilCost] += 32000;
-	ThisPlayer->Resources[OreCost] += 32000;
-	ThisPlayer->Resources[StoneCost] += 32000;
-	ThisPlayer->Resources[CoalCost] += 32000;
-	MustRedraw |= RedrawResources;
-	SetMessage("SO!");
     } else if (!strcmp(Input, "unite the clans") ) {
 	GameRunning = 0;
 	GameResult = GameVictory;
