@@ -221,6 +221,15 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
 
     //
+    //	Game unit limit reached.
+    //
+    if( NumUnits>=UnitMax ) {
+	DebugLevel0Fn("Over all unit limit (%d) reached.\n" _C_ UnitMax);
+	// FIXME: Hoping this is checked everywhere.
+	return NoUnitP;
+    }
+
+    //
     //	Can use released unit?
     //
     if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
