@@ -726,9 +726,9 @@ local int AiBuildHall(int type)
         }
     // Did use the first if no could be moved.
     DebugLevel3("\tWorker %Zd %d,%d -> Goldmine %Zd %d,%d\n"
-	,UnitNumber(workers[best_w]),
+	,UnitNumber(workers[best_w])
 	,workers[best_w]->X,workers[best_w]->Y
-	,UnitNumber(goldmines[best_g]),
+	,UnitNumber(goldmines[best_g])
 	,goldmines[best_g]->X,goldmines[best_g]->Y);
 
     //  Find the nearest buildable place near the gold-mine.
@@ -1005,7 +1005,8 @@ local void AiAssignWorker(void)
 
     if(AiPlayer->NeedGold && AiPlayer->NeedWood)
         {
-	DebugLevel3("Ai: Player %d need gold and wood\n",AiPlayer->Player);
+	DebugLevel3("Ai: Player %Zd need gold and wood\n"
+	    ,AiPlayer->Player-Players);
 	//      Assign half to wood and gold.
 	if(num_still)
             {               // assign the non-working
@@ -1033,7 +1034,8 @@ local void AiAssignWorker(void)
 
     if(AiPlayer->NeedGold)
         {
-	DebugLevel3("Ai: Player %d need gold\n",AiPlayer->Player);
+	DebugLevel3("Ai: Player %Zd need gold\n"
+	    ,AiPlayer->Player-Players);
 	//      Assign all to mine gold.
 	for(w=0; w<num_worker; ++w)
             {
@@ -1057,7 +1059,8 @@ local void AiAssignWorker(void)
 
     if(AiPlayer->NeedWood)
         {
-	DebugLevel3("Ai: Player %d need wood\n",AiPlayer->Player);
+	DebugLevel3("Ai: Player %Zd need wood\n"
+	    ,AiPlayer->Player-Players);
 	//      Assign all to harvest wood.
 	for(w=0; w<num_worker; ++w)
             {
@@ -1412,8 +1415,8 @@ global void AiHelpMe(Unit * unit)
 */
 global void AiWorkComplete(Unit* unit,Unit* what)
     {
-    DebugLevel3("Ai: Player %d: %d Work %d complete\n"
-	,unit->Player,UnitNumber(unit),what-Units);
+    DebugLevel3("Ai: Player %Zd: %Zd Work %Zd complete\n"
+	,unit->Player-Players,UnitNumber(unit),UnitNumber(what));
     // FIXME: correct position
     if(unit->Player->Type==PlayerHuman) {return;}
     AiPlayer=&Ais[unit->Player->Player];
@@ -1467,8 +1470,8 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 */
 global void AiTrainingComplete(Unit* unit,Unit* what)
     {
-    DebugLevel3("Ai: Player %d: %d Training %d complete\n"
-	,unit->Player,UnitNumber(unit),what-Units);
+    DebugLevel3("Ai: Player %Zd: %Zd Training %Zd complete\n"
+	,unit->Player-Players,UnitNumber(unit),UnitNumber(what));
     // FIXME: correct position
     if(unit->Player->Type==PlayerHuman) {
 	return;
@@ -1552,7 +1555,7 @@ global void AiInit(Player* player)
     PlayerAi* aip;
     Unit* units[MAX_UNITS];
 
-    DebugLevel2Fn("Player %d\n",player->Player);
+    DebugLevel2Fn("Player %d\n" _C_ player->Player);
     player->Ai=aip=&Ais[player->Player];
     aip->Player=player;
 
