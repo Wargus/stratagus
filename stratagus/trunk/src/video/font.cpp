@@ -323,7 +323,6 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
 	int gx,int gy,int w,int h,int x,int y)
 {
     GLfloat sx,sy;
-    GLfloat r,g,b;
     Palette c;
     int i;
 
@@ -334,10 +333,7 @@ local void VideoDrawCharOpenGL(const Graphic* sprite,
 
     for( i=0; i<NumFontColors; ++i ) {
 	c=GlobalPalette[TextColor[i]];
-	r=c.r/255.0f;
-	g=c.g/255.0f;
-	b=c.b/255.0f;
-	glColor3f(r,g,b);
+	glColor3ub(c.r,c.g,c.b);
 	glRasterPos2f(sx,sy);
 	glBitmap(FontBitmapWidths[CurrentFont]*8,h,
 	    0.0f,0.0f,0.0f,0.0f,
