@@ -188,6 +188,8 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
     MustRedraw|=RedrawMinimap|RedrawCursors;
 }
 
+#ifdef DEBUG	// {
+
 /**
 **	FOR DEBUG PURPOSE ONLY, BUT DON'T REMOVE PLEASE !!!
 **
@@ -212,14 +214,18 @@ global void DebugTestDisplay(void)
   InvalidateArea(0,0,VideoWidth,VideoHeight);
 }
 
+#endif	// } DEBUG
+
 /**
 **	Display update.
 */
 global void UpdateDisplay(void)
 {
+#if 0
     if (!MustRedraw) {
 	return;
     }
+#endif
 
     VideoLockScreen();			// prepare video write
 
@@ -294,6 +300,22 @@ global void UpdateDisplay(void)
 		128, 19,
 		TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
 		GameFont,"Menu (~<F10~>)");
+
+#ifdef DEBUG
+	//
+	//	Draw line for frame speed.
+	//
+	{ int f;
+
+	f=(168*(NextFrameTicks-GetTicks()))
+	    /((100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
+	if( f<0 || f>168 ) {
+	    f=168;
+	}
+	VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
+	VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
+	}
+#endif
     }
     if( MustRedraw&RedrawMinimapBorder ) {
 	VideoDrawSub(TheUI.Minimap.Graphic,0,0
@@ -517,6 +539,10 @@ global void GameMainLoop(void)
 	    ColorCycle();
 	}
 
+#ifdef DEBUG
+	MustRedraw|=RedrawMenuButton;
+#endif
+
 	if( MustRedraw /* && !VideoInterrupts */ ) {
             //For debuggin only: replace UpdateDisplay by DebugTestDisplay when
             //                   debugging linedraw routines..
@@ -540,6 +566,9 @@ global void GameMainLoop(void)
 	WaitEventsAndKeepSync();
     }
 
+    //
+    //	Game over
+    //
     NetworkQuit();
     if( GameResult==GameDefeat ) {
 	fprintf(stderr,"You have lost!\n");
