@@ -227,7 +227,7 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 */
 global void PlaySectionMusic(PlaySectionType section)
 {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     int track;
     int newtrack;
 #endif
@@ -260,9 +260,12 @@ global void PlaySectionMusic(PlaySectionType section)
     }
     CurrentPlaySection = PlaySections[i].Type;
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     if (CDMode == CDModeDefined) {
 	track = CDTrack;
+	if (track == Disco) {
+	    return;
+	}
 	newtrack = 0;
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
