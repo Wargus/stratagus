@@ -434,8 +434,7 @@ global void ShowIntro(const Intro *intro)
 
     CallbackMusicOff();
     StopMusic();
-    CurrentPlaySection = PlaySectionBriefing;
-    CDRomCheck(NULL);
+    PlaySectionMusic(PlaySectionBriefing);
     if( intro->VoiceFile[0] ) {
 	PlayFile(intro->VoiceFile[0]);
     }
