@@ -934,7 +934,7 @@ local int CclSoundForName(lua_State* l)
 **		Glue between c and scheme. Allows to specify some global game sounds
 **		in a ccl file.
 */
-local SCM CclDefineGameSounds(lua_State* l)
+local int CclDefineGameSounds(lua_State* l)
 {
 	return 0;
 }
