@@ -109,18 +109,31 @@ local void HandleUnitAction(Unit* unit)
 		&& !unit->Removed ) {
 	    int z;
 
+#if 0
+	    // FIXME: memory loose, can't fix now.
+	    //
+	    //	Release pending references.
+	    //
+	    if( unit->Command.Data.Move.Goal ) {
+		DebugCheck( !unit->Command.Data.Move.Goal->Refs-- );
+		if !--unit->Command.Data.Move.Goal->Refs ) {
+		    ReleaseUnit(unit->Command.Data.Move.Goal);
+		}
+	    }
+#endif
+
 	    //	Structure assign
 	    unit->Command=unit->NextCommand[0];
 	    // Next line shouldn't affect human players,
 	    //	but needed for AI player
-	    unit->NextCommand[0].Action = UnitActionStill;
+	    unit->NextCommand[0].Action=UnitActionStill;
 	    // cade: shift queue
 	    unit->NextCount--;
 	    for ( z = 0; z < unit->NextCount; z++ ) {
 		unit->NextCommand[z] = unit->NextCommand[z+1];
 	    }
 
-	    unit->NextFlush = 0;
+	    unit->NextFlush=0;
 	    unit->SubAction=0;
 	    unit->State=0;
 

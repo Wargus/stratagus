@@ -137,17 +137,19 @@ global void ReleaseUnit(Unit* unit)
 	Units[NumUnits]=NULL;
 	temp->UnitSlot=unit->UnitSlot;
 	*unit->UnitSlot=temp;
+	//
+	//	Are more references remaining?
+	//
+	if( --unit->Refs>0 ) {
+	    unit->Destroyed=1;		// mark as destroyed
+
+	    DebugLevel3Fn("more references\n");
+	    return;
+	}
     }
 
-    //
-    //	Are more references remaining?
-    //
-    if( unit->Refs-->1 ) {
-	unit->Destroyed=1;		// mark as destroyed
+    DebugCheck( unit->Refs );
 
-	DebugLevel3Fn("more references\n");
-	return;
-    }
 #ifdef UNIT_ON_MAP
     if( 0 ) {		// debug check
 	Unit* list;
@@ -1917,6 +1919,21 @@ global void DestroyUnit(Unit* unit)
 
     MustRedraw|=RedrawResources; // for food usage indicator
 
+#if 0
+    // FIXME: unit has still references, can't be reseted here.
+
+    //
+    //	Release all references
+    //
+    if( unit->Command.Data.Move.Goal ) {
+	DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+	if( !--unit->Command.Data.Move.Goal->Refs ) {
+	    ReleaseUnit(unit->Command.Data.Move.Goal);
+	}
+	unit->Command.Data.Move.Goal=NoUnitP;
+    }
+#endif
+
     type=unit->Type;
 
     //
@@ -2139,7 +2156,7 @@ global void HitUnit(Unit* unit,int damage)
 	if( f>75) {
 	    ; // No fire for this
 	} else if( f>50 ) {
-	    missile=MakeMissile(MissileTypeByIdent("missile-small-fire")
+	    missile=MakeMissile(MissileTypeSmallFire
 		    ,unit->X*TileSizeX
 			    +(type->TileWidth*TileSizeX)/2
 		    ,unit->Y*TileSizeY
@@ -2150,7 +2167,7 @@ global void HitUnit(Unit* unit,int damage)
 	    unit->Burning=1;
 	    ++unit->Refs;
 	} else {
-	    missile=MakeMissile(MissileTypeByIdent("missile-big-fire")
+	    missile=MakeMissile(MissileTypeBigFire
 		    ,unit->X*TileSizeX
 			    +(type->TileWidth*TileSizeX)/2
 		    ,unit->Y*TileSizeY

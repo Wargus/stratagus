@@ -59,9 +59,11 @@ local int MoveToGoldMine(Unit* unit)
     destu=unit->Command.Data.Move.Goal;
     if( destu && (destu->Destroyed || !destu->HP) ) {
 	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
+	DebugCheck( !destu->Refs );
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
+	unit->Command.Data.Move.Goal=NoUnitP;
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
@@ -76,7 +78,12 @@ local int MoveToGoldMine(Unit* unit)
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
+    DebugCheck( !destu->Refs );
     --destu->Refs;
+    DebugLevel0Fn("Refs remaining %d\n",destu->Refs);
+    DebugCheck( !destu->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
+
     destu->Command.Data.GoldMine.Active++;
     destu->Frame=1;			// FIXME: should be configurable
 
@@ -227,8 +234,8 @@ local int MoveToGoldDeposit(Unit* unit)
     unit->Command.Action=UnitActionMineGold;
 
     destu=unit->Command.Data.Move.Goal;
-
     if( destu && (destu->Destroyed || !destu->HP) ) {
+	DebugCheck( !destu->Refs );
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
@@ -248,7 +255,9 @@ local int MoveToGoldDeposit(Unit* unit)
 	return -1;
     }
 
+    DebugCheck( !destu->Refs );
     --destu->Refs;
+    DebugCheck( !destu->Refs );
 
     RemoveUnit(unit);
     unit->X=destu->X;
@@ -283,7 +292,6 @@ local int MoveToGoldDeposit(Unit* unit)
 }
 
 /**
-**	Store gold in deposit.
 **
 **	@param unit	Pointer to worker unit.
 **
@@ -368,7 +376,10 @@ global void HandleActionMineGold(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }
 		} else {
@@ -399,7 +410,10 @@ global void HandleActionMineGold(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }
 		} else {

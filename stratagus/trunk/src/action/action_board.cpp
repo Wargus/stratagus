@@ -72,6 +72,7 @@ local int WaitForTransporter(Unit* unit)
     }
     if( trans->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
+	DebugCheck( !trans->Refs );
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
@@ -79,7 +80,9 @@ local int WaitForTransporter(Unit* unit)
 	return 0;
     } else if( trans->Removed ||
 	    !trans->HP || trans->Command.Action==UnitActionDie ) {
+	DebugCheck( !trans->Refs );
 	--trans->Refs;
+	DebugCheck( !trans->Refs );
 	unit->Command.Data.Move.Goal=trans=NoUnitP;
 	return 0;
     }
@@ -111,16 +114,24 @@ local void EnterTransporter(Unit* unit)
     transporter=unit->Command.Data.Move.Goal;
     if( transporter->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
+	DebugCheck( !transporter->Refs );
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
+	unit->Command.Data.Move.Goal=NoUnitP;
 	return;
     } else if( transporter->Removed ||
 	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
+	DebugCheck( !transporter->Refs );
 	--transporter->Refs;
+	DebugCheck( !transporter->Refs );
+	unit->Command.Data.Move.Goal=NoUnitP;
 	return;
     }
+    DebugCheck( !transporter->Refs );
     --transporter->Refs;
+    DebugCheck( !transporter->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
 
     //
     //	Find free slot in transporter.
@@ -182,7 +193,11 @@ global void HandleActionBoard(Unit* unit)
 			if( ++unit->SubAction==200 ) {
 			    unit->Command.Action=UnitActionStill;
 			    if( unit->Command.Data.Move.Goal ) {
+
+				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
 				--unit->Command.Data.Move.Goal->Refs;
+				DebugCheck(!unit->Command.Data.Move.Goal->Refs);
+				unit->Command.Data.Move.Goal=NoUnitP;
 			    }
 			    unit->SubAction=0;
 			}

@@ -122,6 +122,15 @@ global void HandleActionTrain(Unit* unit)
 	}
 
 	nunit->Command=unit->PendCommand;
+	//
+	// FIXME: Pending command uses any references?
+	//
+	if( nunit->Command.Data.Move.Goal ) {
+	    if( nunit->Command.Data.Move.Goal->Destroyed ) {
+		DebugLevel0Fn("FIXME: you have found a bug, please fix it.\n");
+	    }
+	    nunit->Command.Data.Move.Goal->Refs++;
+	}
 
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
