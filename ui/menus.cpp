@@ -2470,6 +2470,12 @@ local void TerminateNetConnect(void)
 
 	    NetConnectingCancel();
 	    return;
+	case ccs_badmap:
+	    menu->items[1].d.text.text = "Map not available.";
+	    ProcessMenu("menu-net-error", 1);
+
+	    NetConnectingCancel();
+	    return;
 	case ccs_incompatiblenetwork:
 	    menu->items[1].d.text.text = "Incompatible network version.";
 	    ProcessMenu("menu-net-error", 1);

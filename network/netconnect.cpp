@@ -1111,6 +1111,26 @@ local void ClientParseAreYouThere(
 **
 **	@param msg	message received
 */
+local void ClientParseBadMap(
+	const InitMessage* msg __attribute__((unused)))
+{
+    int i;
+    InitMessage message;
+
+    message.Type = MessageInitHello;
+    message.SubType = ICMSeeYou;
+    // Spew out 5 and trust in God that they arrive
+    for (i = 0; i < 5; i++) {
+	NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
+    }
+    NetConnectRunning = 0;	// End the menu..
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
 local void ServerParseHello(const InitMessage* msg)
 {
     int h, k, i, n;
@@ -1642,6 +1662,10 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    ClientParseGoAhead(msg);
 		    break;
 
+		case ccs_badmap:
+		    ClientParseBadMap(msg);
+		    break;
+
 		default:
 		    DebugLevel0Fn("Client: Unhandled state %d\n" _C_ NetLocalState);
 		    break;
@@ -1675,6 +1699,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		ServerParseState(msg);
 		break;
 
+	    case ICMMapUidMismatch:
 	    case ICMGoodBye:
 		ServerParseGoodBye();
 		break;
