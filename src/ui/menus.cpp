@@ -249,6 +249,8 @@ local void EditorLoadCancel(void);
 local void EditorLoadVSAction(Menuitem *mi, int i);
 local void EditorMapProperties(void);
 local void EditorPlayerProperties(void);
+local void EditorPlayerPropertiesDrawFunc(Menuitem *mi);
+local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key);
 local void EditorEnterMapDescriptionAction(Menuitem *mi, int key);
 local void EditorMapPropertiesOk(void);
 local void EditorQuitMenu(void);
@@ -2358,6 +2360,10 @@ global void InitMenuFuncHash(void) {
     HASHADD(EditorEnterMapDescriptionAction,"editor-map-description-action");
     HASHADD(EditorMapPropertiesOk,"editor-map-properties-ok");
     HASHADD(EditorEndMenu,"editor-end-menu");
+
+// Editor player properties
+    HASHADD(EditorPlayerPropertiesDrawFunc,"editor-player-properties-draw-func");
+    HASHADD(EditorPlayerPropertiesEnterAction,"editor-player-properties-enter-action");
 }
 
 /*----------------------------------------------------------------------------
@@ -6416,12 +6422,112 @@ local void EditorMapPropertiesCancel(void)
     EditorEndMenu();
 }
 
+local void EditorPlayerPropertiesDrawFunc(Menuitem *mi)
+{
+    StartMenusSetBackground(NULL);
+}
+
+local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+    }
+}
+
+local int player_types_fc_to_menu[] = {
+    0,
+    0,
+    4,
+    5,
+    1,
+    0,
+    2,
+    3,
+};
+local int player_types_menu_to_fc[] = {
+    PlayerPerson,
+    PlayerComputer,
+    PlayerRescuePassive,
+    PlayerRescueActive,
+    PlayerNeutral,
+    PlayerNobody,
+};
+
+local int player_ai_fc_to_menu(int num)
+{
+    if (num == PlayerAiLand) {
+	return 0;
+    } else if (num == PlayerAiPassive) {
+	return 1;
+    } else if (num == PlayerAiSea) {
+	return 2;
+    } else if (num == PlayerAiAir) {
+	return 3;
+    }
+    DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
+    return -1;
+}
+local int player_ai_menu_to_fc(int num)
+{
+    if (num == 0) {
+	return PlayerAiLand;
+    } else if (num == 1) {
+	return PlayerAiPassive;
+    } else if (num == 2) {
+	return PlayerAiSea;
+    } else if (num == 3) {
+	return PlayerAiAir;
+    }
+    DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
+    return -1;
+}
+
 local void EditorPlayerProperties(void)
 {
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoUnlockScreen();
+    Menu *menu;
+    char gold[16][15];
+    char lumber[16][15];
+    char oil[16][15];
+    int i;
+
+    menu = FindMenu("menu-editor-player-properties");
+
+#define RACE_POSITION 21
+#define TYPE_POSITION 38
+#define AI_POSITION 55
+#define GOLD_POSITION 72
+#define LUMBER_POSITION 89
+#define OIL_POSITION 106
+
+    for (i=0; i<16; ++i) {
+	menu->items[RACE_POSITION+i].d.pulldown.defopt = Players[i].Race;
+	menu->items[TYPE_POSITION+i].d.pulldown.defopt = player_types_fc_to_menu[Players[i].Type];
+	menu->items[AI_POSITION+i].d.pulldown.defopt = player_ai_fc_to_menu(Players[i].AiNum);
+	sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
+	sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
+	sprintf(oil[i], "%d~!_", Players[i].Resources[OilCost]);
+	menu->items[GOLD_POSITION+i].d.input.buffer = gold[i];
+	menu->items[GOLD_POSITION+i].d.input.nch = strlen(gold[i]) - 3;
+	menu->items[GOLD_POSITION+i].d.input.maxch = 7;
+	menu->items[LUMBER_POSITION+i].d.input.buffer = lumber[i];
+	menu->items[LUMBER_POSITION+i].d.input.nch = strlen(lumber[i]) - 3;
+	menu->items[LUMBER_POSITION+i].d.input.maxch = 7;
+	menu->items[OIL_POSITION+i].d.input.buffer = oil[i];
+	menu->items[OIL_POSITION+i].d.input.nch = strlen(oil[i]) - 3;
+	menu->items[OIL_POSITION+i].d.input.maxch = 7;
+    }
+
     ProcessMenu("menu-editor-player-properties", 1);
+
+    for (i=0; i<16; ++i) {
+	Players[i].Race = menu->items[RACE_POSITION+i].d.pulldown.curopt;
+	Players[i].Type = player_types_menu_to_fc[menu->items[TYPE_POSITION+i].d.pulldown.curopt];
+	Players[i].AiNum = player_ai_menu_to_fc(menu->items[AI_POSITION+i].d.pulldown.curopt);
+	Players[i].Resources[GoldCost] = atoi(gold[i]);
+	Players[i].Resources[WoodCost] = atoi(lumber[i]);
+	Players[i].Resources[OilCost] = atoi(oil[i]);
+    }
+
     VideoCreatePalette(GlobalPalette);
 }
 
