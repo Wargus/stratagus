@@ -488,6 +488,7 @@ global void RLEPlayerPixels(const Player* player, const RleSprite * sprite)
     *((struct __4pixel16__*)(((VMemType16*)sprite->Pixels)+208))
 	    =player->UnitColors.Depth16;
     break;
+  case 24:
   case 32:
     //((VMemType32*)sprite->Pixels)[208]=player->UnitColor1;
     //((VMemType32*)sprite->Pixels)[209]=player->UnitColor2;
@@ -645,6 +646,7 @@ global void SetPlayersPalette(void)
 	Players[i+8].UnitColors.Depth16.Pixels[3]=Pixels16[15];
 
 	break;
+    case 24:
     case 32:
 #if 0
 	for( i=0; i<7; ++i ) {
