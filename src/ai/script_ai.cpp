@@ -679,6 +679,30 @@ local SCM CclAiForce(SCM list)
 }
 
 /**
+**	Define the role of a force.
+**
+**	@param value	Force number.
+*/
+local SCM CclAiForceRole(SCM value,SCM flag)
+{
+    int force;
+
+    force=gh_scm2int(value);
+    if( force<0 || force>=AI_MAX_FORCES ) {
+	errl("Force out of range",value);
+    }
+    if( gh_eq_p(flag,gh_symbol2scm("attack")) ) {
+	AiPlayer->Force[force].Role=AiForceRoleAttack;
+    } else if( gh_eq_p(flag,gh_symbol2scm("defend")) ) {
+	AiPlayer->Force[force].Role=AiForceRoleDefend;
+    } else {
+	errl("Unknown force role",flag);
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
 **	Check if a force ready.
 **
 **	@param value	Force number.
@@ -1016,6 +1040,7 @@ global void AiCclRegister(void)
     gh_new_procedure2_0("ai:set",CclAiSet);
     gh_new_procedure1_0("ai:wait",CclAiWait);
     gh_new_procedureN("ai:force",CclAiForce);
+    gh_new_procedure2_0("ai:force-role",CclAiForceRole);
     gh_new_procedure1_0("ai:check-force",CclAiCheckForce);
     gh_new_procedure1_0("ai:wait-force",CclAiWaitForce);
     gh_new_procedure1_0("ai:attack-with-force",CclAiAttackWithForce);
