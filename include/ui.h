@@ -342,9 +342,6 @@ typedef struct _ui_ {
 	Uint32        ViewportCursorColor;  ///< minimap cursor color
 
 	// The status line
-	GraphicConfig StatusLine;           ///< Status line background
-	int           StatusLineX;          ///< status line screen X position
-	int           StatusLineY;          ///< status line screen Y position
 	int           StatusLineW;          ///< status line screen width
 	int           StatusLineTextX;      ///< status line screen text X position
 	int           StatusLineTextY;      ///< status line screen text Y position
