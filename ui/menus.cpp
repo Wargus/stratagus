@@ -140,6 +140,8 @@ local void ConfirmSaveMenu(void);
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)));
 local void ConfirmSaveFile(void);
 
+local void LoadAction(void);
+
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
 
@@ -276,7 +278,7 @@ local Graphic* Menusbgnd;
 local Menuitem GameMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1461,30 +1463,24 @@ local void InitSaveGameMenuItems() {
 }
 
 local Menuitem LoadGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
-    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveSelectLBInit, SaveSelectLBExit, {{NULL,0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, {{NULL, 0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
 local void InitLoadGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
-    MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
-    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
+    MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
 			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
-    MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
-    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteMenu, 'd'};
-    MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
-    SaveGameMenuItems[0].d.text    = i0;
-    SaveGameMenuItems[1].d.input   = i1;
-    SaveGameMenuItems[2].d.listbox = i2;
-    SaveGameMenuItems[3].d.vslider = i3;
-    SaveGameMenuItems[4].d.button  = i4;
-    SaveGameMenuItems[5].d.button  = i5;
-    SaveGameMenuItems[6].d.button  = i6;
+    MenuitemVslider i2 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemButton  i3 = { "~!Load", 108, 27, MBUTTON_GM_HALF, LoadAction, 'l'};
+    MenuitemButton  i4 = { "~!Cancel", 108, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    LoadGameMenuItems[0].d.text    = i0;
+    LoadGameMenuItems[1].d.listbox = i1;
+    LoadGameMenuItems[2].d.vslider = i2;
+    LoadGameMenuItems[3].d.button  = i3;
+    LoadGameMenuItems[4].d.button  = i4;
 }
 
 local Menuitem ConfirmSaveMenuItems[] = {
@@ -1799,7 +1795,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-256)/2,
 	384, 256,
 	ImagePanel3,
-	6, 7,
+	4, 5,
 	LoadGameMenuItems,
 	NULL,
     },
@@ -2442,8 +2438,6 @@ local void SaveAction(void)
 	ProcessMenu(MENU_CONFIRM_SAVE, 1);
     }
 
-
-
     EndMenu();
 }
 
@@ -2714,9 +2708,32 @@ local void DeleteFile(void)
     ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
+local void LoadAction(void)
+{
+    char filename[256];
+    FileList *fl;
+    char *name="x"; 
+    size_t nameLength;
+
+//    fl = LoadGameMenuItems[1].d.listbox.options;
+    
+//    name = fl[LoadGameMenuItems[1].d.listbox.curopt].name;
+    nameLength = strlen(name);
+//    if (TypedFileName)
+//	nameLength -= 3;
+
+    strcpy(filename, SaveDir);
+    strcat(filename, "/");
+    strncat(filename, name, nameLength);
+
+    LoadGame(filename);
+    SetMessage("Loaded game: %s", filename);
+}
+
 global void GameMenuLoad(void)
 {
-    LoadAll();	// FIXME: Sample code
+    LoadGameMenuItems[4].flags = MenuButtonDisabled;	/* Save button! */
+    ProcessMenu(MENU_LOAD_GAME, 1);
 }
 
 global void SoundOptions(void)
