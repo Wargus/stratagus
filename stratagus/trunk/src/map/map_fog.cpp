@@ -201,11 +201,14 @@ global int IsTileVisible(const Player* player, int x, int y)
     visible = TheMap.Fields[y * TheMap.Width + x].Visible;
     visiontype = visible[player->Player];
 
-    if (visiontype != 1) {
+    if (visiontype > 1) {
 	return visiontype;
     }
     if (!player->SharedVision) {
-	return visiontype + TheMap.NoFogOfWar;
+	if (visiontype) {
+	    return visiontype + TheMap.NoFogOfWar;
+	}
+	return 0;
     }
 
     for (i = 0; i < PlayerMax ; ++i) {
@@ -214,9 +217,13 @@ global int IsTileVisible(const Player* player, int x, int y)
 	    if (visible[i] > 1) {
 		return 2;
 	    }
+	    visiontype |= visible[i];
 	}
     }
-    return visiontype + TheMap.NoFogOfWar;
+    if (visiontype) {
+	return visiontype + TheMap.NoFogOfWar;
+    }
+    return 0;
 }
 
 /**
