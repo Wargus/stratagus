@@ -168,7 +168,7 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 	int j;
 	int n;
 
-	DebugLevel0Fn("base %X goal %X\n" _C_ base _C_ goal);
+	DebugLevel3Fn("base %X goal %X\n" _C_ base _C_ goal);
 
 	//
 	// Find any mixed tile
