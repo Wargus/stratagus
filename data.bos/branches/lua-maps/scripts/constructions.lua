@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: constructions.lua,v 1.2 2004/02/10 01:55:23 n0body Exp $
+--	$Id$
 
 Load("scripts/elites/constructions.lua")
 
@@ -49,11 +49,8 @@ DefineConstruction("construction-none", {
 
 DefineConstruction("construction-land", {
 	Files= {{
-		Tileset = "desert",
+		Tileset = "default",
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}},{
-		Tileset = "winter",
-		File = "tilesets/winter/neutral/buildings/land_construction_site.png",
 		Size = {64, 64}}},
 	Constructions = {{
 		Percent = 0,
@@ -69,11 +66,8 @@ DefineConstruction("construction-land", {
 
 DefineConstruction("construction-land2", {
 	Files = {{
-		Tileset = "desert",
+		Tileset = "default",
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}}, {
-		Tileset = "winter",
-		File = "tilesets/winter/neutral/buildings/land_construction_site.png",
 		Size = {64, 64}}},
 	Constructions = {{
 		Percent = 0,
@@ -86,11 +80,8 @@ DefineConstruction("construction-land2", {
 
 DefineConstruction("construction-wall", {
 	Files = {{
-		Tileset = "desert",
+		Tileset = "default",
 		File = "tilesets/desert/neutral/buildings/wall_construction_site.png",
-		Size = {32, 32}}, {
-		Tileset = "winter",
-		File = "tilesets/winter/neutral/buildings/wall_construction_site.png",
 		Size = {32, 32}}},
 	Constructions = {{
 		Percent = 0,

@@ -131,7 +131,7 @@ DefineUnitType("unit-revealer", {
 -- Needed for stratagus otherwise it crashes
 DefineUnitType("unit-human-wall", {
 	Name = "Wall",
-	Files = {"tileset-desert", "tilesets/desert/neutral/buildings/wall.png"},
+	Files = {"default", "tilesets/desert/neutral/buildings/wall.png"},
 	Size = {32, 32}, Costs = {"time", 30},
 	Animations = "animations-building", Icon = "icon-cancel",
 	Construction = "construction-wall",
@@ -146,7 +146,7 @@ DefineUnitType("unit-human-wall", {
 -- Needed to avoid a stratagus crash
 DefineUnitType("unit-orc-wall", {
 	Name = "Wall", 
-	Files = {"tileset-desert", "tilesets/desert/neutral/buildings/wall.png"},
+	Files = {"default", "tilesets/desert/neutral/buildings/wall.png"},
 	Size = {32, 32}, Costs = {"time", 30},
 	Animations = "animations-building", Icon = "icon-cancel",
 	Construction = "construction-wall",

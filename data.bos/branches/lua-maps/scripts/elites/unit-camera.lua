@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-camera.lua,v 1.2 2004/11/23 08:58:23 gorm Exp $
+--	$Id$
 
 DefineAnimations("animations-cam",
    "still", {
@@ -64,7 +64,7 @@ DefineConstruction("construction-cam", {
 
 DefineUnitType("unit-cam", {
         Name = "Camera",
-        Files = {"tileset-desert", "elites/build/camera.png"}, Size = {32, 64},
+        Files = {"default", "elites/build/camera.png"}, Size = {32, 64},
         Offset = {0, -16},
         Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
         Animations = "animations-cam", Icon = "icon-cam",
@@ -82,7 +82,7 @@ DefineUnitType("unit-cam", {
 
 DefineUnitType("camera_destroyed", {
         Name = "CameraCrater",
-        Files = {"tileset-desert", "elites/build/camera_c.png"}, Size = {32, 64},
+        Files = {"default", "elites/build/camera_c.png"}, Size = {32, 64},
         Animations = "animations-cam", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,

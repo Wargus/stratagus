@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-radar.lua,v 1.2 2004/12/12 16:07:28 feb Exp $
+--	$Id$
 
 DefineAnimations("animations-gturret",
         "still", {{3, 0, 1, 4}},
@@ -58,7 +58,7 @@ DefineConstruction("construction-gturret", {
 
 DefineUnitType("unit-gturret", {
         Name = "Gun Turret",
-        Files = {"tileset-desert", "elites/build/gturret.png"}, Size = {64, 64},
+        Files = {"default", "elites/build/gturret.png"}, Size = {64, 64},
         Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
         Animations = "animations-gturret", Icon = "icon-gturret",
         Costs = {"time", 130, "titanium", 250, "crystal", 50},
