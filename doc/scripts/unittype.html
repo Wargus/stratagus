@@ -94,8 +94,9 @@ Define animations.
 	<li>Sleep is the number of game cycles to wait unit the next animation frame.
 	this is the way unit speed is controlled, unit-speed in unit type is
 	only used for showing. This should be fixed sometime in the future.
-	<li>Frame is the tile position on the image. Usually 5*tilerows.
-	  The engine will add something between 0 and 4 for the heading.
+	<li>Frame is the tile position on the image. Usually 5*tilerows
+	  (also if the unit actually has more than five possible headings).
+	  The engine will calculate the appropriate sprite number for the heading.
     </ul>
 </dd>
 </dl>
