@@ -536,6 +536,13 @@ struct _unit_ {
     int		GoalY;			/// Destination Y of pathfinder
 #endif
 
+#ifdef HIERARCHIC_PATHFINDER
+
+#define UNIT_CLEAN		0
+#define UNIT_RETREATING		1
+#define UNIT_WINNING		2
+	unsigned	Retreating:2;
+#endif /* HIERARCHIC_PATHFINDER */
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
@@ -644,6 +651,9 @@ extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu
 extern void GetUnitMapArea( const Unit* unit,
                             int *sx, int *sy, int *ex, int *ey );
+#ifdef HIERARCHIC_PATHFINDER
+extern int UnitGetNextPathSegment (Unit * , int * , int * );
+#endif
     /// Increment mana of all magic units each second
 extern void UnitIncrementMana(void);
     /// Increment health of all regenerating units each second

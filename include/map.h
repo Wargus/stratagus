@@ -194,31 +194,6 @@
 #define MaxMapHeight	1024		/// maximal map height supported
 
 /*----------------------------------------------------------------------------
---	Map - region
-----------------------------------------------------------------------------*/
-
-#ifdef NEW_REGIONS
-
-/**
-**	Map region typedef
-*/
-typedef struct _map_region_  MapRegion;
-
-/**
-**	A region of the map
-*/
-struct _map_region_ {
-    unsigned short	X;		/// X tile map center of region
-    unsigned short	Y;		/// Y tile map center of region
-    char	Forest;			/// Region contains forest
-    int		NumNeighbors;		/// How many neighbors
-    MapRegion** Neightbors;		/// Neightbors of this region
-    int		MoveCosts;		/// Costs to move to this field
-};
-
-#endif
-
-/*----------------------------------------------------------------------------
 --	Map - field
 ----------------------------------------------------------------------------*/
 
@@ -257,8 +232,19 @@ typedef struct _map_field_ {
     UnitRef		LandUnit;	/// Land unit
     UnitRef		SeaUnit;	/// Sea unit
 #endif
-#ifdef NEW_REGIONS
-    MapRegion*		Region;		/// Region to which the field belongs
+#ifdef HIERARCHIC_PATHFINDER
+    unsigned short	RegId;	/// Region to which the field belongs
+    unsigned short	f, g;		/// A* parameters (no need to store h)
+    unsigned short	h;		///stored only for BestSoFar computation
+#define HIER_LOW_OPEN	0
+#define HIER_LOW_CLOSED	1
+    unsigned int	Set:1;		/// Open/Closed
+    unsigned int	Goal:1;
+    /* FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
+     * g? There's potentially a *lot* of MapFields in this game and every byte
+     * saved here could translate into 1 MB saved overall for max sized map. */
+    char		Traceback;	/// The field through which we arrived
+					/// to this one
 #endif
 } MapField;
 
@@ -326,10 +312,6 @@ typedef struct _world_map_ {
     MapField*		Fields;		/// fields on map
 #ifdef NEW_FOW2
     unsigned*		Visible[PlayerMax]; /// visible bit-field
-#endif
-
-#ifdef NEW_REGIONS
-    MapRegion**		Regions;	/// Regions of this map
 #endif
 
     unsigned char	NoFogOfWar;	/// fog of war disabled
@@ -533,6 +515,12 @@ extern int ForestOnMap(int x,int y);
 
     /// Returns true, if rock on the map tile field
 extern int RockOnMap(int x,int y);
+
+#ifdef HIERARCHIC_PATHFINDER
+extern inline unsigned short MapFieldGetRegId (int , int );
+extern inline void MapFieldSetRegId (int , int , unsigned short );
+extern inline int MapFieldPassable (int , int , int );
+#endif
 
     /// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x,int y,int mask);
