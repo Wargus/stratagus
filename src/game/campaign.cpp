@@ -566,46 +566,49 @@ global void SaveCampaign(CLFile* file)
 		return;
 	}
 
-	CLprintf(file, "(define-campaign 'current");
+	CLprintf(file, "DefineCampaign(\"current\", ");
 	if (CurrentCampaign->Name) {
-		CLprintf(file, " 'name \"%s\"", CurrentCampaign->Name);
+		CLprintf(file, " \"name\", \"%s\",", CurrentCampaign->Name);
 	}
-	CLprintf(file, " 'players %d", CurrentCampaign->Players);
+	CLprintf(file, " \"players\", %d,", CurrentCampaign->Players);
 	CLprintf(file, "\n");
 
-	CLprintf(file, "  'campaign (list\n");
+	CLprintf(file, "  \"campaign\", {\n");
 	for (ch = CurrentCampaign->Chapters; ch; ch = ch->Next) {
 		if (ch->Type == ChapterShowPicture) {
-			CLprintf(file, "    'show-picture (list\n");
-			CLprintf(file, "      'image \"%s\"\n", ch->Data.Picture.Image);
-			CLprintf(file, "      'fade-in %d\n", ch->Data.Picture.FadeIn);
-			CLprintf(file, "      'fade-out %d\n", ch->Data.Picture.FadeOut);
-			CLprintf(file, "      'display-time %d\n",
+			CLprintf(file, "      \"show-picture\", {\n");
+			CLprintf(file, "      \"image\", \"%s\",\n", ch->Data.Picture.Image);
+			CLprintf(file, "      \"fade-in\", %d,\n", ch->Data.Picture.FadeIn);
+			CLprintf(file, "      \"fade-out\", %d,\n", ch->Data.Picture.FadeOut);
+			CLprintf(file, "      \"display-time\", %d,\n",
 				ch->Data.Picture.DisplayTime);
 			for (text = ch->Data.Picture.Text; text; text = text->Next) {
-				CLprintf(file, "      'text (list\n");
-				CLprintf(file, "        'font '%s\n", FontNames[text->Font]);
-				CLprintf(file, "        'x %d\n", text->X);
-				CLprintf(file, "        'y %d\n", text->Y);
-				CLprintf(file, "        'width %d\n", text->Width);
-				CLprintf(file, "        'height %d\n", text->Height);
+				CLprintf(file, "      \"text\", {\n");
+				CLprintf(file, "        \"font\", \"%s\",\n", FontNames[text->Font]);
+				CLprintf(file, "        \"x\", %d,\n", text->X);
+				CLprintf(file, "        \"y\", %d,\n", text->Y);
+				CLprintf(file, "        \"width\", %d,\n", text->Width);
+				CLprintf(file, "        \"height\", %d,\n", text->Height);
 				if (text->Align == PictureTextAlignLeft) {
-					CLprintf(file,"     'align 'left\n");
+					CLprintf(file,"     \"align\", \",left\",\n");
 				} else {
-					CLprintf(file,"     'align 'center\n");
+					CLprintf(file,"     \"align\", \"center\",\n");
 				}
-				CLprintf(file, "        'text \"%s\"\n", text->Text);
-				CLprintf(file, ")\n");
+				CLprintf(file, "        \"text\", \"%s\"", text->Text);
+				CLprintf(file, "}");
+				if (text->Next) {
+					CLprintf(file, ",");
+				}
 			}
-			CLprintf(file," )\n");
+			CLprintf(file,"}, \n");
 		} else if (ch->Type == ChapterPlayLevel) {
-			CLprintf(file, "    'play-level \"%s\"\n", ch->Data.Level.Name);
+			CLprintf(file, "    \"play-level\", \"%s\",\n", ch->Data.Level.Name);
 		} else if (ch->Type == ChapterPlayVideo) {
-			CLprintf(file, "    'play-movie \"%s\" %d\n",
+			CLprintf(file, "    \"play-movie\", \"%s\", %d\n",
 				ch->Data.Movie.PathName, ch->Data.Movie.Flags);
 		}
 	}
-	CLprintf(file, "  )\n");
+	CLprintf(file, "  }\n");
 	CLprintf(file, ")\n");
 
 	ch = CurrentCampaign->Chapters;
@@ -620,7 +623,7 @@ global void SaveCampaign(CLFile* file)
 	if (!ch) {
 		i = 0;
 	}
-	CLprintf(file, "(set-current-chapter! %d)\n", i);
+	CLprintf(file, "SetCurrentChapter(%d)\n", i);
 }
 
 /**
