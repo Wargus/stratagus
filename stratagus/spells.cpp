@@ -91,8 +91,8 @@ global SpellType SpellTypeTable[]
 	= {
 
 //TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
-  
-// ident,		 	name,			range,mana,ttl, spell action,		  sound config
+
+// ident,			name,			range,mana,ttl, spell action,		  sound config
 //	---human paladins---
 { "spell-holy-vision",		"holy vison",		0x7F,  70,  -1, SpellActionHolyVision	, { "holy vision", NULL }    , { NULL, NULL} },
 { "spell-healing",		"healing",		   6,	6,  -1, SpellActionHealing	, { "healing", NULL }	     , { NULL, NULL} },
@@ -416,7 +416,7 @@ local void SpellRunesController(Missile * missile)
 */
 local void SpellFlameShieldController(Missile *missile)
 {
-  static int fs_dc[] = { 
+  static int fs_dc[] = {
   0, 32, 5, 31, 10, 30, 16, 27, 20, 24, 24, 20, 27, 15, 30, 10, 31, 5, 32, 0,
   31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10, -30, 5, -31, 0, -32,
   -5, -31, -10, -30, -16, -27, -20, -24, -24, -20, -27, -15, -30, -10, -31, -5,
@@ -425,20 +425,20 @@ local void SpellFlameShieldController(Missile *missile)
 
   Unit *table[UnitMax];
   int n;
-  
+
   int i = missile->TTL % 36;
   int dx = fs_dc[ i*2 ];
   int dy = fs_dc[ i*2 + 1 ];
-  
+
   int ux = missile->TargetUnit->X;
   int uy = missile->TargetUnit->Y;
 
   int ix = missile->TargetUnit->IX;
   int iy = missile->TargetUnit->IY;
-  
+
   int uw = missile->TargetUnit->Type->Width;
   int uh = missile->TargetUnit->Type->Height;
-  
+
   int mx = ux * TileSizeX + ix + uw / 2 + dx - 32;
   int my = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
 
@@ -449,19 +449,19 @@ local void SpellFlameShieldController(Missile *missile)
     {
     missile->TargetUnit->FlameShield = 0;
     }
-  
+
   //vladi: still no have clear idea what is this about :)
   CheckMissileToBeDrawn( missile );
-  
+
   // FIXME: vladi: uhm... perhaps is a bit powerfull?
   if ( missile->TTL % 10 == 0 ) return;
   n = SelectUnits( ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table );
   for (i = 0; i < n; ++i) {
     if (table[i] == missile->TargetUnit) continue; // cannot hit target unit
-  	if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
+	if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
 	    HitUnit(missile->SourceUnit, table[i], 1);
       }
-	  }
+  }
 }
 
 /*----------------------------------------------------------------------------
@@ -514,23 +514,23 @@ global void InitSpells(void)
 */
 global void DoneSpells()
 {
-  // nothing yet
+    // nothing yet
 }
 
 /**
-**	Get spell id by ident
+**	Get the numeric spell id by string identifer.
 **
-**	@param Id  Spell ident
+**	@param ident	Spell identifier
 **
-**	@return spell id (index in spell-type table)
+**	@return		Spell id (index in spell-type table)
 */
-global int SpellIdByIdent(const char *Ident)
+global int SpellIdByIdent(const char *ident)
 {
     int z;
 
     // FIXME: support hash
     for (z = 0; SpellTypeTable[z].Ident; ++z) {
-	if (strcmp(SpellTypeTable[z].Ident, Ident) == 0) {
+	if (strcmp(SpellTypeTable[z].Ident, ident) == 0) {
 	    return z;
 	}
     }
@@ -538,18 +538,18 @@ global int SpellIdByIdent(const char *Ident)
 }
 
 /**
-**	Get spell-type struct ptr by ident
+**	Get spell-type struct pointer by string identifier.
 **
-**	@param Id  Spell ident
+**	@param ident	Spell identifier.
 **
-**	@return spell-type struct ptr
+**	@return		spell-type struct pointer.
 */
-global SpellType *SpellTypeByIdent(const char *Ident)
+global SpellType *SpellTypeByIdent(const char *ident)
 {
     int z;
 
     for (z = 0; SpellTypeTable[z].Ident; ++z) {
-	if (strcmp(SpellTypeTable[z].Ident, Ident) == 0) {
+	if (!strcmp(SpellTypeTable[z].Ident, ident)) {
 	    return &SpellTypeTable[z];
 	}
     }
@@ -576,8 +576,8 @@ global SpellType *SpellTypeById(int id)
 **	@param unit	Unit that casts the spell
 **	@param spell	Spell-type pointer
 **	@param target	Target unit that spell is addressed to
-**	@param X	X coord of target spot when/if target does not exist
-**	@param Y	Y coord of target spot when/if target does not exist
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
 **
 **	@return		=!0 if spell should/can casted, 0 if not
 */
@@ -700,7 +700,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 
 	case SpellActionDeathAndDecay:
 	    return 1;
-	    
+
 	case SpellActionCircleOfPower:
 	    return 1;
 
@@ -718,8 +718,8 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 **	@param unit	Unit that casts the spell
 **	@param spell	Spell-type pointer
 **	@param target	Target unit that spell is addressed to
-**	@param X	X coord of target spot when/if target does not exist
-**	@param Y	Y coord of target spot when/if target does not exist
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
 **
 **	@return		0 if spell should/can continue or =! 0 to stop
 */
@@ -867,43 +867,43 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
 	    target->FlameShield = spell->TTL;	// about 15 sec
-      
+
 	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
 	    mis->TTL = spell->TTL + 0*7;
 	    mis->TargetUnit = target;
-      mis->Controller = SpellFlameShieldController;
+	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
 
 	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
 	    mis->TTL = spell->TTL + 1*7;
 	    mis->TargetUnit = target;
-      mis->Controller = SpellFlameShieldController;
+	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
-      
+
 	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
 	    mis->TTL = spell->TTL + 2*7;
 	    mis->TargetUnit = target;
-      mis->Controller = SpellFlameShieldController;
+	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
-      
+
 	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
 	    mis->TTL = spell->TTL + 3*7;
 	    mis->TargetUnit = target;
-      mis->Controller = SpellFlameShieldController;
+	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
-      
+
 	    mis=MakeMissile(spell->Missile.Missile, 0, 0, 0, 0 );
 	    mis->TTL = spell->TTL + 4*7;
 	    mis->TargetUnit = target;
-      mis->Controller = SpellFlameShieldController;
+	    mis->Controller = SpellFlameShieldController;
 	    RefsDebugCheck(!target->Refs || target->Destroyed);
 	    target->Refs++;
-      
+
 /*
 	    x+=target->IX;
 	    y+=target->IY;
@@ -1163,7 +1163,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    mis->Controller = SpellRunesController;
 	    unit->Mana -= spell->ManaCost/5;
 	}
-    
+
     }
 	break;
 
@@ -1346,14 +1346,14 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
       PlaceUnit( cop, x, y );
       }
     else
-      {  
+      {
       cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
 	         unit->Player);
-      }	 
+      }
     MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-    
+
     // Goal is used to link destination circle of power and back:
     // the circle of power owner (source DP)
     unit->Goal = cop;
@@ -1361,17 +1361,17 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     unit->Refs++;
     cop->Refs++;
     //FIXME: setting destination circle of power should use mana
-    
+
     /*
     Unit *cop;
     DebugLevel0Fn( ">>> cop %d,%d\n" _C_ x _C_ y );
     MakeMissile(MissileTypeHealing,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-    */		
+    */
     };
     break;
-    
+
     default:
 	DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
 	break;
