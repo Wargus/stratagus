@@ -96,7 +96,7 @@ global void HandleActionResearch(Unit* unit)
 
 	NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
 	    "%s: complete", unit->Type->Name);
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiResearchComplete(unit, upgrade);
 	}
         UpgradeAcquire(unit->Player, upgrade);

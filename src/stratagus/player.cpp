@@ -643,7 +643,7 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 	return 1;
     } else {
 	NotifyPlayer(player, NotifyYellow, 0, 0, "Cannot create more units.");
-	if (player->Ai) {
+	if (player->AiEnabled) {
 	    // AiNoMoreUnits(player, type);
 	}
 	return -5;
@@ -670,7 +670,7 @@ global int PlayerCheckCosts(const Player* player, const int* costs)
 	    NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough %s...%s more %s.",
 		DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
 
-	    if (player->Ai) {
+	    if (player->AiEnabled) {
 		DebugLevel3("Ai: Not enough %s...%s more %s." _C_
 		    DefaultResourceNames[i] _C_ DefaultActions[i] _C_ DefaultResourceNames[i]);
 	    }

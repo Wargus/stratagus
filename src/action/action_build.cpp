@@ -115,7 +115,7 @@ global void HandleActionBuild(Unit* unit)
 
 	    NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 		"You cannot reach building place");
-	    if (unit->Player->Ai) {
+	    if (unit->Player->AiEnabled) {
 		AiCanNotReach(unit,type);
 	    }
 
@@ -153,7 +153,7 @@ global void HandleActionBuild(Unit* unit)
 
 	NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 	    "You cannot build %s here",type->Name);
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiCanNotBuild(unit, type);
 	}
 
@@ -182,7 +182,7 @@ global void HandleActionBuild(Unit* unit)
 	// FIXME: Better tell what is missing?
 	NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 	    "Not enough resources to build %s", type->Name);
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiCanNotBuild(unit, type);
 	}
 
@@ -200,7 +200,7 @@ global void HandleActionBuild(Unit* unit)
     if (PlayerCheckLimits(unit->Player, type) < 0) {
 	NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 	    "Can't build more units %s", type->Name);
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiCanNotBuild(unit, type);
 	}
 
@@ -392,7 +392,7 @@ global void HandleActionBuilded(Unit* unit)
 		PlayUnitSound(unit, VoiceBuilding);
 	    }
 	}
-	if (unit->Player->Ai) {
+	if (unit->Player->AiEnabled) {
 	    AiWorkComplete(worker, unit);
 	}
 

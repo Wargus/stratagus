@@ -103,7 +103,7 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		snprintf(buf, 100, "We need more %s for repair!",
 		    DefaultResourceNames[i]);
 		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y, buf);
-		if (player->Ai) {
+		if (player->AiEnabled) {
 		    // FIXME: call back to AI?
 		    RefsDecrease(goal);
 		    unit->Orders[0].Goal = NULL;
