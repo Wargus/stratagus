@@ -268,8 +268,10 @@
 **		for some time, this unit cannot be used in usual manner.
 **		JOHNS: Should be moved into unit-type!
 **
-**	Unit::OnBoard
+**	Unit::OnBoard[::MAX_UNITS_ONBOARD]
 **
+**		A table of units on board. This can be units in a transporter
+**		or units in a tower.
 **
 **	Unit::OrderCount
 **
