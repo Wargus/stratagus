@@ -431,6 +431,7 @@ global void DoRightButton (int sx,int sy)
 	SendCommandMove(unit,x,y,flush);
 //	    }
     }
+    ShowOrdersCount=2;
 }
 
 /**
