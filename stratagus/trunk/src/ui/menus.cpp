@@ -1013,12 +1013,16 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Keystroke Help Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 16, 40, 0, SmallFont, NULL, NULL,
-	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_VSLIDER, 256 - 18 - 16, 40, 0, 0, NULL, NULL,
 	{ vslider:{ 0, 18, 10*18, ScenSelectVSKeystrokeHelpAction, -1, 0, 0, 0, NULL} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
+    { MI_TYPE_TEXT, 16, 40, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_TEXT, 16, 40+20*1, 0, LargeFont, NULL, NULL,
+	{ text:{ "TEST2", MI_TFLAGS_LALIGN} } },
+
+
 #else
     { 0 }
 #endif
@@ -1277,7 +1281,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	4, 4,
+	5, 5,
 	KeystrokeHelpMenuItems,
 	NULL,
     },
@@ -2963,29 +2967,21 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int op, d1, d2;
+    int j = 3;
+    
 
     mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-		    mi->d.listbox.curopt++;
-		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-			mi->d.listbox.curopt--;
-			mi->d.listbox.startline++;
-		    }
+		    for (j=3; j < Menus[MENU_KEYSTROKE_HELP].nitems ;++j)
+			KeystrokeHelpMenuItems[j].yofs -= 10;
 		    MustRedraw |= RedrawMenu;
-		}
 	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-		    mi->d.listbox.curopt--;
-		    if (mi->d.listbox.curopt < 0) {
-			mi->d.listbox.curopt++;
-			mi->d.listbox.startline--;
-		    }
+		    for (j=3; j < Menus[MENU_KEYSTROKE_HELP].nitems ;++j)
+			KeystrokeHelpMenuItems[j].yofs += 10;
 		    MustRedraw |= RedrawMenu;
-		}
 	    }
 	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
