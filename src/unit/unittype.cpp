@@ -725,6 +725,9 @@ void CleanUnitTypes(void)
 				free(type->File[j]);
 			}
 		}
+		if (type->ShadowFile) {
+			free(type->ShadowFile);
+		}
 		if (type->Icon.Name) {
 			free(type->Icon.Name);
 		}
