@@ -805,6 +805,7 @@ changed:
 		// Server is ignoring us - break out!
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_detaching: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	case ccs_connecting:
@@ -817,6 +818,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_connecting: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	case ccs_connected:
@@ -827,6 +829,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_connected: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	case ccs_synced:
@@ -850,6 +853,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_changed: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	case ccs_async:
@@ -860,6 +864,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_async: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	case ccs_mapinfo:
@@ -871,6 +876,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_mapinfo: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	case ccs_badmap:
 	    if (NetStateMsgCnt < 20) {	/// 20 retries 
@@ -885,6 +891,7 @@ changed:
 	    } else {
 		NetLocalState = ccs_unreachable;			
 		NetConnectRunning = 0;	/// End the menu..
+		DebugLevel0Fn("ccs_badmap: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
 	default:
@@ -930,6 +937,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			case ICMGoodBye:	/// Server has let us go
 			    DebugLevel3Fn("ccs_detaching: Server GoodBye subtype %d received - byebye\n",msg->SubType);
 			    NetLocalState = ccs_disconnected;
+			    NetStateMsgCnt = 0;
 			    break;
 
 			default:
@@ -977,6 +985,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 			case ICMWelcome:	/// Server has accepted us
 			    NetLocalState = ccs_connected;
+			    NetStateMsgCnt = 0;
 			    NetLocalHostsSlot = msg->u.Hosts[0].PlyNr;
 			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16);	/// Name of server player
 			    Hosts[0].Host = NetworkServerIP;
@@ -1021,6 +1030,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				break;
 			    }
 			    NetLocalState = ccs_mapinfo;
+			    NetStateMsgCnt = 0;
 			    NetConnectRunning = 0;	/// Kick the menu..
 			    break;
 
@@ -1042,6 +1052,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    ServerSetupState = msg->u.State;
 			    NetClientUpdateState();
 			    NetLocalState = ccs_synced;
+			    NetStateMsgCnt = 0;
 			    break;
 
 			default:
@@ -1059,6 +1070,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    ServerSetupState = msg->u.State;
 			    NetClientUpdateState();
 			    NetLocalState = ccs_async;
+			    NetStateMsgCnt = 0;
 			    break;
 
 			default:
@@ -1072,6 +1084,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 			case ICMResync:		/// Server has resynced with us
 			    NetLocalState = ccs_synced;
+			    NetStateMsgCnt = 0;
 			    break;
 
 			default:
