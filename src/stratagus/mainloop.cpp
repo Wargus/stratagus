@@ -578,6 +578,9 @@ global void UpdateDisplay(void)
     if( MustRedraw&RedrawCosts ) {
 	DrawCosts();
     }
+    if( MustRedraw&RedrawTimer ) {
+	DrawTimer();
+    }
 
     if( MustRedraw&RedrawMenu ) {
 	DrawMenu(CurrentMenu);
@@ -651,6 +654,9 @@ global void UpdateDisplay(void)
                      TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width
 		    ,TheUI.StatusLine.Graphic->Height);
+	}
+	if( MustRedraw&RedrawTimer ) {
+	    // FIXME: Invalidate timer area
 	}
 	if( MustRedraw&RedrawMenu ) {
 	    InvalidateMenuAreas();
@@ -735,6 +741,7 @@ global void GameMainLoop(void)
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
 	    TriggersEachCycle();	// handle triggers
+	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!

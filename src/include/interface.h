@@ -356,6 +356,10 @@ extern void ClearCosts(void);
 
     /// Draw the unit info panel
 extern void DrawInfoPanel(void);
+    /// Draw the timer
+extern void DrawTimer(void);
+    /// Update the timer
+extern void UpdateTimer(void);
     /// Draw the unit button panel
 extern void DrawButtonPanel(void);
     /// Update the content of the unit button panel
