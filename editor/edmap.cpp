@@ -633,6 +633,7 @@ global void EditorCreateRandomMap()
   EditorRandomizeTile( COAST_TILE, 10, 16 );
   EditorRandomizeTile( GRASS_TILE, 20, 16 );
   EditorRandomizeTile( WOOD_TILE,  60,  4 );
+  EditorRandomizeTile( ROCK_TILE,  30,  2 );
 }
 
 //@}
