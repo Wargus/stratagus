@@ -68,7 +68,7 @@ typedef struct _init_message_ {
     int		   Lag;			/// Lag time
     int		   Updates;		/// Update frequency
     char	   HostsCount;		/// Number of hosts.
-    
+
     NetworkHost	   Hosts[PlayerMax];	/// Participant information.
 } InitMessage;
 

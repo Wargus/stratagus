@@ -71,7 +71,7 @@ typedef struct _weapon_sound_ {
 
 /**
 ** Loads sounds defined in unitsound.c. Should be replaced by ccl loading of
-** sounds. 
+** sounds.
 */
 extern void LoadUnitSounds(void);
 

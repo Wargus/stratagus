@@ -73,7 +73,7 @@ typedef struct _two_groups_ {
  */
 #define INFINITE_SOUND_RANGE 255
 /**
- ** the maximum range value 
+ ** the maximum range value
  */
 #define MAX_SOUND_RANGE 254
 /**
@@ -114,7 +114,7 @@ typedef struct _sound_request {
     unsigned Fight : 1;			/// is it a fight sound?
     unsigned Selection : 1;		/// is it a selection sound?
     unsigned IsVolume : 1;		/// how to interpret power (as a
-                                        ///volume or as a distance?) 
+                                        ///volume or as a distance?)
 } SoundRequest;
 
 #define MAX_SOUND_REQUESTS 32		/// maximal number of sound requests

@@ -204,7 +204,7 @@ typedef struct _ui_ {
     //
     CursorConfig	Point;		/// General pointing cursor
     CursorConfig	Glass;		/// HourGlass, system is waiting
-    CursorConfig	Cross;		/// Multi-select cursor. 
+    CursorConfig	Cross;		/// Multi-select cursor.
     CursorConfig	YellowHair;	/// Yellow action,attack cursor.
     CursorConfig	GreenHair;	/// Green action,attack cursor.
     CursorConfig	RedHair;	/// Red action,attack cursor.
