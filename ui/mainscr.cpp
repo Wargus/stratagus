@@ -147,9 +147,7 @@ local void UiDrawCompleted(int full, int ready)
 	f = (f * TheUI.CompletedBarW) / 100;
 	VideoFillRectangleClip(TheUI.CompletedBarColor,
 		TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
-#ifdef USE_MAGNANT
-    VideoDraw50TransRectangle(ColorBlack, TheUI.CompletedBarX, TheUI.CompletedBarY, f, TheUI.CompletedBarH);
-#endif
+
 	if (TheUI.CompletedBarText) {
 		VideoDrawText(TheUI.CompletedBarTextX, TheUI.CompletedBarTextY,
 			TheUI.CompletedBarFont, TheUI.CompletedBarText);
