@@ -10,7 +10,7 @@
 //
 /**@name ui.h		-	The user interface header file. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -169,16 +169,17 @@ typedef struct _ui_ {
     char*	ReverseFontColor;	/// Color for reverse text displayed
 
     //	Fillers
-    GraphicConfig Filler1;		/// filler 1 graphic
-    int		Filler1X;		/// filler 1 X position
-    int		Filler1Y;		/// filler 1 Y position
+    GraphicConfig* Filler;		/// Filler graphics
+    int*	FillerX;		/// Filler X positions
+    int*	FillerY;		/// Filler Y positions
+    int		NumFillers;		/// Number of fillers
 
     //	Resource line
     GraphicConfig Resource;		/// Resource background
     int		ResourceX;		/// Resource X position
     int		ResourceY;		/// Resource Y position
 
-    int		OriginalResources;	/// original resource mode
+    int		OriginalResources;	/// Original resource mode
 
     struct {
 #if 0

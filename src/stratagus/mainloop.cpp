@@ -456,10 +456,15 @@ global void UpdateDisplay(void)
 	DrawMessages();
     }
 
-    if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
-	VideoDrawSub(TheUI.Filler1.Graphic,0,0
-		,TheUI.Filler1.Graphic->Width,TheUI.Filler1.Graphic->Height
-		,TheUI.Filler1X,TheUI.Filler1Y);
+    if( MustRedraw&RedrawFillers ) {
+	int i;
+
+	for( i=0; i<TheUI.NumFillers; ++i ) {
+	    VideoDrawSub(TheUI.Filler[i].Graphic,0,0
+		    ,TheUI.Filler[i].Graphic->Width
+		    ,TheUI.Filler[i].Graphic->Height
+		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
+	}
     }
 
     if( MustRedraw&RedrawMenuButton ) {
@@ -529,11 +534,15 @@ global void UpdateDisplay(void)
 		    ,TheUI.MapArea.EndX-TheUI.MapArea.X+1
 		    ,TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
 	}
-	if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.Filler1X,TheUI.Filler1Y
-		    ,TheUI.Filler1.Graphic->Width
-		    ,TheUI.Filler1.Graphic->Height);
+	if( MustRedraw&RedrawFillers ) {
+	    int i;
+
+	    for( i=0; i<TheUI.NumFillers; ++i ) {
+		InvalidateAreaAndCheckCursor(
+			 TheUI.FillerX[i],TheUI.FillerY[i]
+			,TheUI.Filler[i].Graphic->Width
+			,TheUI.Filler[i].Graphic->Height);
+	    }
 	}
 	if(MustRedraw&RedrawMenuButton ) {
 	    InvalidateAreaAndCheckCursor(
