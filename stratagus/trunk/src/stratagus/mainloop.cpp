@@ -183,6 +183,7 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 global void DebugTestDisplay(void)
 {
   static int a=0;
+  extern void DebugTestDisplayLines(void);
 
   if ( a )
     return;
