@@ -600,8 +600,8 @@ case $ANSWER in
 		;;
 	    *)
 		HAVEARTS=1
-		echo "ARTSC		:= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
-		echo "ARTSCLIB	:= \$(shell artsc-config --libs)" >> $RULESFILE
+		echo "ARTSC		= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
+		echo "ARTSCLIB	= \$(shell artsc-config --libs)" >> $RULESFILE
 		echo "Using ARTS Daemon Support..."
 		echo
 		echo -n "Checking for various sound libraries..."
