@@ -639,6 +639,7 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
+    CDPlaySection = "game";
     CDRomCheck(NULL);
 
     while( GameRunning ) {
