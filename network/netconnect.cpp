@@ -72,8 +72,10 @@ global int NetLocalPlayerNumber;	/// Network menu: Player number of local client
 global char NetworkName[16];		/// Network menu: Name of local player
 global int NetConnectRunning;		/// Network menu: Setup mode active
 global unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
+global char NetTriesText[32];		/// Network menu: Client tries count text
+global char NetServerText[64];		/// Network menu: Text describing the Network Server IP
 
-global int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
+local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
 local unsigned long NetLastPacketSent;	/// Tick the last network packet was sent
 local unsigned long NetworkServerIP;	/// Network Client: IP of server to join
@@ -189,11 +191,10 @@ local void NetworkSendRateLimitedClientMessage(InitMessage *msg, long msecs)
 **	Setup the IP-Address of the network server to connect to
 **
 **	@param serveraddr	the serveraddress the user has entered
-**	@param ipbuf		buffer to store the text representation of the IP-address
 **
 **	@return			True, if error; otherwise false.
 */
-global int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf)
+global int NetworkSetupServerAddress(const char *serveraddr)
 {
     unsigned long addr;
 
@@ -206,7 +207,7 @@ global int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf)
     DebugLevel1Fn("SELECTED SERVER: %s (%d.%d.%d.%d)\n" _C_ serveraddr _C_
 		    NIPQUAD(ntohl(addr)));
 
-    sprintf(ipbuf, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
+    sprintf(NetServerText, "%d.%d.%d.%d", NIPQUAD(ntohl(addr)));
     return 0;
 }
 
@@ -593,6 +594,7 @@ global void NetworkProcessClientRequest(void)
     int i;
 
 changed:
+    sprintf(NetTriesText, "Connected try %d of 20", NetStateMsgCnt);
     switch (NetLocalState) {
 	case ccs_disconnected:
 	    message.Type = MessageInitHello;
@@ -623,6 +625,7 @@ changed:
 		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
 		message.MapUID = 0L;
 		NetworkSendRateLimitedClientMessage(&message, 500);
+		sprintf(NetTriesText, "Connecting try %d of 60", NetStateMsgCnt);
 	    } else {
 		NetLocalState = ccs_unreachable;
 		NetConnectRunning = 0;	// End the menu..

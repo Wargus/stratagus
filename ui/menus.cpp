@@ -212,7 +212,6 @@ local void TerminateNetConnect(void);
 
     /// Name, Version, Copyright
 extern char NameLine[];
-extern int NetStateMsgCnt;	/// Number of consecutive msgs of same type sent
 
 local EventCallback callbacks;
 
@@ -242,29 +241,19 @@ local struct {
 */
 global int CurrentMenu = -1;
 
-/**
-**	Other client and server selection state for Multiplayer clients
-*/
-global ServerSetup ServerSetupState, LocalSetupState;
-
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
-
-/**
-**	Text describing the Network Server IP
-*/
-local char NetworkServerText[64];
-
-/**
-**	Text tries
-*/
-local char NetworkTriesText[32];
 
 /**
 **	Offsets from top and left, used for different resolutions
 */
 local int OffsetX = 0;
 local int OffsetY = 0;
+
+/**
+**	Other client and server selection state for Multiplayer clients
+*/
+global ServerSetup ServerSetupState, LocalSetupState;
 
 /**
 **	The background picture used by start menues
@@ -1129,8 +1118,8 @@ local Menuitem ConnectingMenuItems[] = {
 };
 local void InitConnectingMenuItems() {
     MenuitemText   i0 = { "Connecting to server", MI_TFLAGS_CENTERED};
-    MenuitemText   i1 = { NetworkServerText, MI_TFLAGS_CENTERED};
-    MenuitemText   i2 = { NetworkTriesText , MI_TFLAGS_CENTERED};
+    MenuitemText   i1 = { NetServerText, MI_TFLAGS_CENTERED};
+    MenuitemText   i2 = { NetTriesText , MI_TFLAGS_CENTERED};
     MenuitemButton i3 = { "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'};
     ConnectingMenuItems[0].d.text   = i0;
     ConnectingMenuItems[1].d.text   = i1;
@@ -3333,7 +3322,7 @@ local void JoinNetGameMenu(void)
     }
     // Now finally here is the address
     server_host_buffer[EnterServerIPMenuItems[1].d.input.nch] = 0;
-    if (NetworkSetupServerAddress(server_host_buffer, NetworkServerText)) {
+    if (NetworkSetupServerAddress(server_host_buffer)) {
 	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu(MENU_NET_ERROR, 1);
 	VideoLockScreen();
@@ -5773,14 +5762,6 @@ global void ProcessMenu(int menu_id, int loop)
 	    WaitEventsOneFrame(&callbacks);
 	    if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
-		// ARI: FIXME: THIS DOES NOT BELONG HERE!
-		if (NetLocalState == ccs_connecting) {
-		    sprintf(NetworkTriesText,"Connecting try %d of 60",
-			NetStateMsgCnt);
-		} else {
-		    sprintf(NetworkTriesText,"Connected try %d of 20",
-			NetStateMsgCnt);
-		}
 		MustRedraw |= RedrawMenu;
 	    }
 	    // stopped by network activity?
@@ -5837,10 +5818,17 @@ local void MoveButtons()
 global void InitMenus(unsigned int race)
 {
     static int last_race = -1;
-    const char* file;
+    const char *file;
     char *buf;
 
+    if (race == last_race) {	// same race? already loaded!
+	return;
+    }
+
     if (last_race == -1) {
+	// There go all my Gnuish compile time inits -
+	// Why is ANSI C so dumb that it cannot
+	// even initialize unions sanely?
 	InitGameMenuItems();
 	InitVictoryMenuItems();
 	InitLostMenuItems();
@@ -5866,27 +5854,23 @@ global void InitMenus(unsigned int race)
 	InitHelpMenuItems();
 	InitKeystrokeHelpMenuItems();
 	InitSaveGameMenuItems();
-    }
 
-    if (last_race == -1 && VideoWidth != 640) {
-	MoveButtons();
-    }
-    if (last_race == -1) {
-	callbacks.ButtonPressed=&MenuHandleButtonDown;
-	callbacks.ButtonReleased=&MenuHandleButtonUp;
-	callbacks.MouseMoved=&MenuHandleMouseMove;
-	callbacks.MouseExit=&HandleMouseExit;
-	callbacks.KeyPressed=&MenuHandleKeyDown;
-	callbacks.KeyReleased=&MenuHandleKeyUp;
-	callbacks.KeyRepeated=&MenuHandleKeyRepeat;
-	callbacks.NetworkEvent=NetworkEvent;
-	callbacks.SoundReady=WriteSound;
-    }
+	if (VideoWidth != 640) {
+	    MoveButtons();
+	}
 
-    if (race == last_race) {	// same race? already loaded!
-	return;
-    }
-    if (last_race != -1) {	// free previous sprites for different race
+	callbacks.ButtonPressed = &MenuHandleButtonDown;
+	callbacks.ButtonReleased = &MenuHandleButtonUp;
+	callbacks.MouseMoved = &MenuHandleMouseMove;
+	callbacks.MouseExit = &HandleMouseExit;
+	callbacks.KeyPressed = &MenuHandleKeyDown;
+	callbacks.KeyReleased = &MenuHandleKeyUp;
+	callbacks.KeyRepeated = &MenuHandleKeyRepeat;
+	callbacks.NetworkEvent = NetworkEvent;
+	callbacks.SoundReady = WriteSound;
+
+    } else {
+    	// free previous sprites for different race
 	VideoFree(MenuButtonGfx.Sprite);
     }
     last_race = race;

@@ -185,6 +185,8 @@ extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local 
 extern char NetworkName[16];		/// Network menu: Name of local player
 extern int NetConnectRunning;		/// Network menu: Setup mode active
 extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state
+extern char NetTriesText[32];		/// Network menu: Client tries count text
+extern char NetServerText[64];		/// Network menu: Text describing the Network Server IP
 
 extern ServerSetup ServerSetupState;	/// Network menu: Multiplayer Server Menu selections state
 extern ServerSetup LocalSetupState;	/// Network menu: Multiplayer Client Menu selections local state
@@ -201,8 +203,8 @@ extern void NetworkExitClientConnect(void); /// Terminate network connect state 
 extern void NetworkInitServerConnect(void); /// Setup network connect state machine for the server
 extern void NetworkExitServerConnect(void); /// Terminate network connect state machine for the server
 extern void NetworkParseSetupEvent(const char *buf, int size); /// Parse a network connect event
+extern int NetworkSetupServerAddress(const char *serveraddr); /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
-extern int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf); /// Menu: Setup the server IP
 extern void NetworkServerResyncClients(void); /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer(void); /// Menu Loop: Client: Send GoodBye to the server and detach
 
