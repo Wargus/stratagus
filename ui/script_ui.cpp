@@ -1895,71 +1895,71 @@ static int CclDefinePanelContents(lua_State* l)
 										}
 									}
 								}
-							} else if (!strcmp(key, "FormatedText")) {
-								content->DrawData = DrawFormatedText;
+							} else if (!strcmp(key, "FormattedText")) {
+								content->DrawData = DrawFormattedText;
 								Assert(lua_istable(l, -1));
 								// Invalid value by default.
-								content->Data.FormatedText.Index = -1;
-								content->Data.FormatedText.Font = -1;
+								content->Data.FormattedText.Index = -1;
+								content->Data.FormattedText.Font = -1;
 								for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 									key = LuaToString(l, -2);
 									if (!strcmp(key, "Format")) {
-										content->Data.FormatedText.Format = strdup(LuaToString(l, -1));
+										content->Data.FormattedText.Format = strdup(LuaToString(l, -1));
 									} else if (!strcmp(key, "Font")) {
-										content->Data.FormatedText.Font = FontByIdent(LuaToString(l, -1));
+										content->Data.FormattedText.Font = FontByIdent(LuaToString(l, -1));
 									} else if (!strcmp(key, "Variable")) {
-										content->Data.FormatedText.Index = GetVariableIndex(LuaToString(l, -1));
-										if (content->Data.FormatedText.Index == -1) {
+										content->Data.FormattedText.Index = GetVariableIndex(LuaToString(l, -1));
+										if (content->Data.FormattedText.Index == -1) {
 											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component")) {
-										content->Data.FormatedText.Component = Str2EnumVariable(l, LuaToString(l, -1));
+										content->Data.FormattedText.Component = Str2EnumVariable(l, LuaToString(l, -1));
 									} else if (!strcmp(key, "Centered")) {
-										content->Data.FormatedText.Centered = LuaToBoolean(l, -1);
+										content->Data.FormattedText.Centered = LuaToBoolean(l, -1);
 									} else {
-										LuaError(l, "'%s' invalid for method 'FormatedText' in DefinePanels" _C_ key);
+										LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanels" _C_ key);
 									}
 								}
-							} else if (!strcmp(key, "FormatedText2")) {
-								content->DrawData = DrawFormatedText2;
+							} else if (!strcmp(key, "FormattedText2")) {
+								content->DrawData = DrawFormattedText2;
 								Assert(lua_istable(l, -1));
 								// Invalid value by default.
-								content->Data.FormatedText2.Index1 = -1;
-								content->Data.FormatedText2.Index2 = -1;
-								content->Data.FormatedText2.Font = -1;
+								content->Data.FormattedText2.Index1 = -1;
+								content->Data.FormattedText2.Index2 = -1;
+								content->Data.FormattedText2.Font = -1;
 								for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 									key = LuaToString(l, -2);
 										if (!strcmp(key, "Format")) {
-											content->Data.FormatedText2.Format = strdup(LuaToString(l, -1));
+											content->Data.FormattedText2.Format = strdup(LuaToString(l, -1));
 										} else if (!strcmp(key, "Font")) {
-											content->Data.FormatedText2.Font = FontByIdent(LuaToString(l, -1));
+											content->Data.FormattedText2.Font = FontByIdent(LuaToString(l, -1));
 										} else if (!strcmp(key, "Variable")) {
-										content->Data.FormatedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
-										content->Data.FormatedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
-										if (content->Data.FormatedText2.Index1 == -1) {
+										content->Data.FormattedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
+										content->Data.FormattedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
+										if (content->Data.FormattedText2.Index1 == -1) {
 											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component")) {
-										content->Data.FormatedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
-										content->Data.FormatedText2.Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+										content->Data.FormattedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
+										content->Data.FormattedText2.Component2 = Str2EnumVariable(l, LuaToString(l, -1));
 									} else if (!strcmp(key, "Variable1")) {
-										content->Data.FormatedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
-										if (content->Data.FormatedText2.Index1 == -1) {
+										content->Data.FormattedText2.Index1 = GetVariableIndex(LuaToString(l, -1));
+										if (content->Data.FormattedText2.Index1 == -1) {
 											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component1")) {
-										content->Data.FormatedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
+										content->Data.FormattedText2.Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 									} else if (!strcmp(key, "Variable2")) {
-										content->Data.FormatedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
-										if (content->Data.FormatedText2.Index2 == -1) {
+										content->Data.FormattedText2.Index2 = GetVariableIndex(LuaToString(l, -1));
+										if (content->Data.FormattedText2.Index2 == -1) {
 											LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 										}
 									} else if (!strcmp(key, "Component2")) {
-										content->Data.FormatedText2.Component2 = Str2EnumVariable(l, LuaToString(l, -1));
+										content->Data.FormattedText2.Component2 = Str2EnumVariable(l, LuaToString(l, -1));
 									} else if (!strcmp(key, "Centered")) {
-										content->Data.FormatedText2.Centered = LuaToBoolean(l, -1);
+										content->Data.FormattedText2.Centered = LuaToBoolean(l, -1);
 									} else {
-										LuaError(l, "'%s' invalid for method 'FormatedText2' in DefinePanels" _C_ key);
+										LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanels" _C_ key);
 									}
 								}
 

@@ -365,7 +365,7 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 }
 
 /**
-**  Draw formated text with variable value.
+**  Draw formatted text with variable value.
 **
 **  @param unit         unit with variable to show.
 **  @param content      extra data.
@@ -375,7 +375,7 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-void DrawFormatedText(const Unit* unit, ContentType* content, int defaultfont)
+void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 {
 	const char* text;  // Format of the Text to display.
 	int font;          // Font to use.
@@ -384,16 +384,16 @@ void DrawFormatedText(const Unit* unit, ContentType* content, int defaultfont)
 
 	Assert(content);
 	Assert(unit);
-	text = content->Data.FormatedText.Format;
-	font = content->Data.FormatedText.Font;
+	text = content->Data.FormattedText.Format;
+	font = content->Data.FormattedText.Font;
 	if (font == -1) {
 		font = defaultfont;
 	}
 	Assert(font != -1);
-	index = content->Data.FormatedText.Index;
+	index = content->Data.FormattedText.Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	sprintf(buf, text, GetComponent(unit, index, content->Data.FormatedText.Component));
-	if (content->Data.FormatedText.Centered) {
+	sprintf(buf, text, GetComponent(unit, index, content->Data.FormattedText.Component));
+	if (content->Data.FormattedText.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
 		VideoDrawText(content->PosX, content->PosY, font, buf);
@@ -401,7 +401,7 @@ void DrawFormatedText(const Unit* unit, ContentType* content, int defaultfont)
 }
 
 /**
-**  Draw formated text with variable value.
+**  Draw formatted text with variable value.
 **
 **  @param unit         unit with variable to show.
 **  @param content      extra data.
@@ -412,7 +412,7 @@ void DrawFormatedText(const Unit* unit, ContentType* content, int defaultfont)
 **  @bug if text format is incorrect.
 **  @bug if sizeof(int) != sizeof(char*) for sprintf.
 */
-void DrawFormatedText2(const Unit* unit, ContentType* content, int defaultfont)
+void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
 {
 	const char* text;  // Format of the Text to display.
 	int font;          // Font to use.
@@ -422,17 +422,17 @@ void DrawFormatedText2(const Unit* unit, ContentType* content, int defaultfont)
 
 	Assert(content);
 	Assert(unit);
-	text = content->Data.FormatedText2.Format;
-	font = content->Data.FormatedText2.Font;
+	text = content->Data.FormattedText2.Format;
+	font = content->Data.FormattedText2.Font;
 	if (font == -1) {
 		font = defaultfont;
 	}
 	Assert(font != -1);
-	index1 = content->Data.FormatedText2.Index1;
-	index2 = content->Data.FormatedText2.Index2;
-	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormatedText2.Component1),
-		GetComponent(unit, index2, content->Data.FormatedText2.Component2));
-	if (content->Data.FormatedText2.Centered) {
+	index1 = content->Data.FormattedText2.Index1;
+	index2 = content->Data.FormattedText2.Index2;
+	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormattedText2.Component1),
+		GetComponent(unit, index2, content->Data.FormattedText2.Component2));
+	if (content->Data.FormattedText2.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
 		VideoDrawText(content->PosX, content->PosY, font, buf);

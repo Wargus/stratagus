@@ -276,10 +276,10 @@ static void CleanContent(ContentType* content)
 	CleanConditionPanel(content->Condition);
 	if (content->DrawData == DrawSimpleText) {
 		free(content->Data.SimpleText.Text);
-	} else if (content->DrawData == DrawFormatedText) {
-		free(content->Data.FormatedText.Format);
-	} else if (content->DrawData == DrawFormatedText2) {
-		free(content->Data.FormatedText2.Format);
+	} else if (content->DrawData == DrawFormattedText) {
+		free(content->Data.FormattedText.Format);
+	} else if (content->DrawData == DrawFormattedText2) {
+		free(content->Data.FormattedText2.Format);
 	}
 }
 
