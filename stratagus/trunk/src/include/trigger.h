@@ -10,7 +10,7 @@
 //
 /**@name trigger.h	-	The game trigger headerfile. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -43,6 +43,11 @@ typedef struct _timer_ {
     unsigned long LastUpdate;		/// GameCycle of last update
 } Timer;
 
+#define ANY_UNIT	((const UnitType*)0)
+#define ALL_UNITS	((const UnitType*)-1)
+#define ALL_FOODUNITS	((const UnitType*)-2)
+#define ALL_BUILDINGS	((const UnitType*)-3)
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -53,6 +58,8 @@ extern Timer GameTimer;			/// the game timer
 --	Functions
 ----------------------------------------------------------------------------*/
 
+extern int TriggerGetPlayer(SCM);    /// get player number.
+extern const UnitType* TriggerGetUnitType(SCM);	/// get the unit-type
 extern void TriggersEachCycle(void);	/// test triggers
 
 extern void TriggerCclRegister(void);	/// Register ccl features

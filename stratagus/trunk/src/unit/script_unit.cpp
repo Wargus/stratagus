@@ -39,6 +39,7 @@
 #include "ccl.h"
 #include "spells.h"
 #include "pathfinder.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -894,6 +895,97 @@ local SCM CclCreateUnit(SCM type,SCM player,SCM x,SCM y)
 }
 
 /**
+**	Kill a unit
+**
+**	@param type	Unit-type of the unit,
+**	@param player	Owning player number of the unit.
+**
+**	@return		Returns true if a unit was killed.
+*/
+local SCM CclKillUnit(SCM type,SCM player)
+{
+    int j;
+    int plynr;
+    const UnitType* unittype;
+    Unit* unit;
+    Unit** table;
+
+    unittype=TriggerGetUnitType(type);
+    plynr=TriggerGetPlayer(player);
+    if( plynr==-1 ) {
+	table=Units;
+	j=NumUnits-1;
+    } else {
+	table=Players[plynr].Units;
+	j=Players[plynr].TotalNumUnits-1;
+    }
+
+    for( ; j>=0; --j ) {
+	unit=table[j];
+	if( unittype==ANY_UNIT
+		|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
+		|| (unittype==ALL_BUILDINGS && unit->Type->Building)
+		|| unittype==unit->Type ) {
+	    LetUnitDie(unit);
+	    return SCM_BOOL_T;
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Kill a unit at a location
+**
+**	@param type	Unit-type of the unit,
+**	@param player	Owning player number of the unit.
+**	@param quantity	Number of units to kill.
+**	@param loc1	Top left corner location.
+**	@param loc2	Bottom right corner location.
+**
+**	@return		Returns the number of units killed.
+*/
+local SCM CclKillUnitAt(SCM type,SCM player,SCM quantity,SCM loc1,SCM loc2)
+{
+    int plynr;
+    int q;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    const UnitType* unittype;
+    Unit* table[UnitMax];
+    Unit* unit;
+    int an;
+    int j;
+    int s;
+
+    plynr=TriggerGetPlayer(player);
+    q=gh_scm2int(quantity);
+    unittype=TriggerGetUnitType(type);
+    x1=gh_scm2int(gh_car(loc1));
+    y1=gh_scm2int(gh_car(gh_cdr(loc1)));
+    x2=gh_scm2int(gh_car(loc2));
+    y2=gh_scm2int(gh_car(gh_cdr(loc2)));
+
+    an=SelectUnits(x1,y1,x2+1,y2+1,table);
+    for( j=s=0; j<an && s<q; ++j ) {
+	unit=table[j];
+	if( unittype==ANY_UNIT
+		|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
+		|| (unittype==ALL_BUILDINGS && unit->Type->Building)
+		|| unittype==unit->Type ) {
+	    if( plynr==-1 || plynr==unit->Player->Player ) {
+		LetUnitDie(unit);
+		++s;
+	    }
+	}
+    }
+
+    return gh_int2scm(s);
+}
+
+/**
 **	Get the unholy-armor of the unit structure.
 **
 **	@param ptr	Unit object.
@@ -991,6 +1083,8 @@ global void UnitCclRegister(void)
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
     gh_new_procedure4_0("create-unit",CclCreateUnit);
+    gh_new_procedure2_0("kill-unit",CclKillUnit);
+    gh_new_procedure5_0("kill-unit-at",CclKillUnitAt);
 
     // unit member access functions
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);

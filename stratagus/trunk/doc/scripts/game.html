@@ -69,6 +69,8 @@
 <a href="#get-this-player">get-this-player</a>
 <a href="#get-unit-unholy-armor">get-unit-unholy-armor</a>
 <a href="#group">group</a>
+<a href="#kill-unit">kill-unit</a>
+<a href="#kill-unit-at">kill-unit-at</a>
 <a href="#library-path">library-path</a>
 <a href="#load-map">load-map</a>
 <a href="#load-pud">load-pud</a>
@@ -1004,6 +1006,96 @@ Get the amount of a resource for a certain player.
 <h4>Used</h4>
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
+
+<a name="kill-unit"></a>
+<h3>kill-unit</h3>
+
+<h4>Description</h4>
+
+Kill a unit.
+
+<h4>Syntax</h4>
+
+<code>(kill-unit unit player)</code>
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 16     Player number
+'any        Matches any player
+'all        All players (Not used)
+'this       Player on the local computer, Human player in the campaign.
+</pre></dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (kill-unit 'unit-peasant 'this)
+</pre>
+
+<p>Kills a peasant of the player on the local computer.
+
+<h4>Not Used</h4>
+
+<a name="kill-unit-at"></a>
+<h3>kill-unit-at</h3>
+
+<h4>Description</h4>
+
+Kills units at a specific location.
+
+<h4>Syntax</h4>
+
+<code>(kill-unit-at unit player quantity location1 location2)</code>
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+'unit-name  Unit type of this name
+'any        Matches any unit type
+'all        All units (sum of units and buildings)
+'units      All non building units
+'building   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 16     Player number
+'any        Matches any player
+'all        All players (Not used)
+'this       Player on the local computer, Human player in the campaign.
+</pre></dd>
+<dt>quantity</dt>
+<dd><pre>
+0 ... oo    Number for the quantity
+</pre></dd>
+<dt>location1</dt>
+<dd><pre>
+'(x1 y1)    Upper left corner
+</pre></dd>
+<dt>location2</dt>
+<dd><pre>
+'(x2 y2)    Lower right corner
+</pre></dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    (kill-unit-at 'any 'any 9 '(5 12) '(9 15))
+</pre>
+
+<p>Kills any units in the rectangle (5,12) to (9,15).
+
+<h4>Not Used</h4>
 
 <a name="library-path"></a>
 <h3>library-path</h3>
