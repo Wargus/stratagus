@@ -419,23 +419,26 @@ Enable or disable building capture.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-burn-buildings!"></a>
-<h3>(set-burn-buildings! percent rate)</h3>
+<h3>(set-burn-buildings! percent rate wait)</h3>
 
 .
 
 
 <dl>
 <dt>percent</dt>
-<dd>.
+<dd>percentage to start burning at.
 <dt>rate</dt>
-<dd>.
+<dd>HP per wait period to lose
+</dd>
+<dt>wait</dt>
+<dd>Number of cycles to wait before running each burn
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    (set-burn-buildings! 25 2)
+    (set-burn-buildings! 25 2 6)
 </pre>
 
 <h4>Used</h4>

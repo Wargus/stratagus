@@ -824,11 +824,9 @@ global void GameMainLoop(void)
 	    //
 	    switch( GameCycle%CYCLES_PER_SECOND ) {
 		case 0:
-		    UnitIncrementMana();	// magic units
-		    DoRunestones();		// runestones
+		    HandleCloak();
 		    break;
 		case 1:
-		    UnitIncrementHealth();	// berserker healing
 		    break;
 		case 2:				// minimap update
 		    UpdateMinimap();
@@ -844,7 +842,6 @@ global void GameMainLoop(void)
 		    RescueUnits();
 		    break;
 		case 6:
-		    BurnBuildings();		// burn buildings
 		    break;
 	    }
 

@@ -1889,6 +1889,7 @@ local void CreateEditor(void)
 	    if (SelectedPlayer == 15) {
 		SelectedPlayer = i;
 	    }
+#if 0
 	    // FIXME: must support more races
 	    switch (TheMap.Info->PlayerSide[i]) {
 		case PlayerRaceHuman:
@@ -1902,6 +1903,7 @@ local void CreateEditor(void)
 			Players + i);
 		    break;
 	    }
+#endif
 	} else if (Players[i].StartX | Players[i].StartY) {
 	    DebugLevel0Fn("Player nobody has a start position\n");
 	}

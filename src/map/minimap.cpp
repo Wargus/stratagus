@@ -290,7 +290,6 @@ global void UpdateMinimap(void)
     //	FIXME: and other changes
     //
 
-#ifdef BUILDING_DESTROYED
     //	Draw Destroyed Buildings On Map
     table = &DestroyedBuildings;
     while( *table ) {
@@ -332,7 +331,7 @@ global void UpdateMinimap(void)
 	}
 	table=&(*table)->Next;
     }
-#endif
+
     for( table=Units; table<Units+NumUnits; ++table ) {
 	SysColors color;
 

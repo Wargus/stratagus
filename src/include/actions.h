@@ -60,6 +60,7 @@ enum _diplomacy_ {
 extern unsigned	SyncHash;	    /// Hash calculated to find sync failures
 extern int BurnBuildingPercent;	    /// Max percent to burn buildings
 extern int BurnBuildingDamageRate;  /// HP per second to damage buildings
+extern int BurnBuildingWait;	    /// Number of cycles to wait for burning
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -191,9 +192,8 @@ extern void HandleActionSpellCast(Unit* unit);
 extern int UnitShowAnimation(Unit* unit,const Animation* animation);
     /// Handle the actions of all units each game cycle
 extern void UnitActions(void);
-    /// Handle burning buildings
-extern void BurnBuildings(void);
-
+    /// Handle Cloaked Unit's Visible
+extern void HandleCloak(void);
 //@}
 
 #endif // !__ACTIONS_H__
