@@ -114,12 +114,6 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
-	/// Graphic reference used during config/setup
-typedef struct _graphic_config_ {
-	char*    File;      ///< config graphic name or file
-	Graphic* Graphic;   ///< graphic pointer to use to run time
-} GraphicConfig;
-
 	/// Creates a shared hardware palette from an independent Palette struct.
 extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
 

@@ -1459,7 +1459,7 @@ static int CclDefineUI(lua_State* l)
 				++k;
 				if (!strcmp(value, "file")) {
 					lua_rawgeti(l, j + 1, k + 1);
-					ui->PieMenuBackground.File = strdup(LuaToString(l, -1));
+					ui->PieMenuBackgroundG = NewGraphic(LuaToString(l, -1), 0, 0);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "radius")) {
 					// Position of the pies in a piemenu
@@ -1713,9 +1713,9 @@ static int CclDefineUI(lua_State* l)
 			}
 		} else if (!strcmp(value, "victory-background")) {
 			// Backgrounds
-			ui->VictoryBackground.File = strdup(LuaToString(l, j + 1));
+			ui->VictoryBackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
 		} else if (!strcmp(value, "defeat-background")) {
-			ui->DefeatBackground.File = strdup(LuaToString(l, j + 1));
+			ui->DefeatBackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

@@ -79,14 +79,6 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 
 
 /**
-**  Clean the user interface graphics
-*/
-static void CleanUIGraphics(UI* ui)
-{
-	FreeGraphic(ui->PieMenuBackground.Graphic);
-}
-
-/**
 **  Initialize the user interface.
 **
 **  The function looks through ::UI_Table, to find a matching user
@@ -133,7 +125,6 @@ void InitUserInterface(const char* race_name)
 		vps[i].MapY = TheUI.Viewports[i].MapY;
 	}
 
-	CleanUIGraphics(&TheUI);
 	TheUI = *UI_Table[best];
 
 	TheUI.Offset640X = (VideoWidth - 640) / 2;
@@ -196,10 +187,8 @@ void LoadUserInterface(void)
 	if (TheUI.ButtonPanelG) {
 		LoadGraphic(TheUI.ButtonPanelG);
 	}
-	if (TheUI.PieMenuBackground.File) {
-		TheUI.PieMenuBackground.Graphic =
-			NewGraphic(TheUI.PieMenuBackground.File, 0, 0);
-		LoadGraphic(TheUI.PieMenuBackground.Graphic);
+	if (TheUI.PieMenuBackgroundG) {
+		LoadGraphic(TheUI.PieMenuBackgroundG);
 	}
 
 	//
@@ -307,7 +296,7 @@ void CleanUI(UI* ui)
 	FreeGraphic(ui->ButtonPanelG);
 
 	// Pie Menu
-	free(ui->PieMenuBackground.File);
+	FreeGraphic(ui->PieMenuBackgroundG);
 
 	// Buttons
 	free(ui->MenuButton.Text);
@@ -343,8 +332,8 @@ void CleanUI(UI* ui)
 	}
 
 	// Backgrounds
-	free(ui->VictoryBackground.File);
-	free(ui->DefeatBackground.File);
+	FreeGraphic(ui->VictoryBackgroundG);
+	FreeGraphic(ui->DefeatBackgroundG);
 
 	free(ui);
 }
@@ -356,8 +345,6 @@ void CleanUserInterface(void)
 {
 	int i;
 	int j;
-
-	CleanUIGraphics(&TheUI);
 
 	//
 	// Free the available user interfaces.

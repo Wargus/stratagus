@@ -1926,10 +1926,10 @@ void DrawPieMenu(void)
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	// Draw background
-	if (TheUI.PieMenuBackground.Graphic) {
-		VideoDrawClip(TheUI.PieMenuBackground.Graphic, 0,
-			CursorStartX - TheUI.PieMenuBackground.Graphic->Width / 2,
-			CursorStartY - TheUI.PieMenuBackground.Graphic->Height / 2);
+	if (TheUI.PieMenuBackgroundG) {
+		VideoDrawClip(TheUI.PieMenuBackgroundG, 0,
+			CursorStartX - TheUI.PieMenuBackgroundG->Width / 2,
+			CursorStartY - TheUI.PieMenuBackgroundG->Height / 2);
 	}
 	player = Selected[0]->Player;
 
