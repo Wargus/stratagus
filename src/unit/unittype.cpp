@@ -1242,6 +1242,10 @@ global UnitType* NewUnitTypeSlot(char* ident)
 
     // +2 for slot and an empty slot at end.
     type=calloc(NumUnitTypes+2,sizeof(UnitType));
+    if( !type ) {
+	fprintf(stderr,"Out of memory\n");
+	exit(-1);
+    }
     memcpy(type,UnitTypes,sizeof(UnitType)*NumUnitTypes);
     if( UnitTypes ) {
 	free(UnitTypes);
@@ -1254,7 +1258,7 @@ global UnitType* NewUnitTypeSlot(char* ident)
     //
     //	Rehash.
     //
-    for( i=0; i<NumUnitTypes; ++ i ) {
+    for( i=0; i<NumUnitTypes; ++i ) {
 	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[i].Ident)=&UnitTypes[i];
     }
 
