@@ -423,7 +423,7 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 */
 local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 {
-    int i, p;
+    int p;
     unsigned flags = mi->flags;
     unsigned w, h, x, y;
     w = mi->d.vslider.xsize;
