@@ -696,6 +696,8 @@ local int CclReplayLog(lua_State* l)
 	// Apply CurrentReplay settings.
 	if (!SaveGameLoading) {
 		ApplyReplaySettings();
+	} else {
+		CommandLogDisabled = 0;
 	}
 
 	return 0;
