@@ -117,10 +117,12 @@
 **		for each player. This f.e. the upgradeable abilities of an
 **		unit.  (Unit::Stats::SightRange, Unit::Stats::Armor,
 **		Unit::Stats::HitPoints, ...)
+**
 **	Unit::Host
 **
-**		The Unit that the current unit is on board.  Used to obtain information from
-**		Parent Unit.  The New Fog of War uses the hosts sight range.
+**		The unit that the current unit is on board. Used to obtain
+**		information from parent unit. The new fog of war uses the
+**		host's sight range.
 **
 **	Unit::CurrentSightRange
 **
