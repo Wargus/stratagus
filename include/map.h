@@ -506,6 +506,10 @@ extern int RockOnMap(int x,int y);
 extern int CheckedCanMoveToMask(int x,int y,int mask);
     /// Returns true, if the unit-type(mask) can enter the field
 extern int CanMoveToMask(int x,int y,int mask);
+    /// Returns true, if the unit-type can enter the field
+extern int UnitTypeCanMoveTo(int x,int y,const UnitType* type);
+    /// Returns true, if the unit can enter the field
+extern int UnitCanMoveTo(int x,int y,const Unit* unit);
 
     /// Preprocess map, for internal use.
 extern void PreprocessMap(void);
