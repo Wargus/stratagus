@@ -173,9 +173,12 @@
 **
 **	Unit::HP
 **
+**
 **	Unit::XP
 **
+**
 **	Unit::Kills
+**
 **
 **	Unit::Bloodlust
 **
@@ -275,12 +278,15 @@
 **
 **	Unit::Goal
 **
+**		Unit pointer of the goal of the current command, only used for
+**		debugging the new orders, will be removed in release 1.18.
+**		The pathfinder must be trigger, if the goal changes.
 **
-**	Unit::GoalX
+**	Unit::GoalX Unit::GoalY
 **
-**
-**	Unit::GoalY
-**
+**		Map tile position of the goal of the current command. only used
+**		for debugging the new orders, will be removed in release 1.18.
+**		The pathfinder must be trigger, if the goal changes.
 **
 */
 
@@ -536,9 +542,6 @@ struct _unit_ {
 #define InfiniteDistance INT_MAX	/// the distance is unreachable
 
 #define FlushCommands	1		/// Flush commands in queue
-
-// FIXME: will be removed, we will get player limits
-#define MAX_UNITS	UnitMax		/// maximal number of units supported
 
 #define MAX_UNIT_SLOTS	65535		/// Maximal number of used slots
 

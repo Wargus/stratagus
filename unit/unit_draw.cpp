@@ -1277,7 +1277,7 @@ local void DrawUnit(const Unit* unit)
 global void DrawUnits(void)
 {
     Unit* unit;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int n;
     int i;
 

@@ -159,7 +159,7 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type
 */
 global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int n;
     int i;
 
@@ -186,7 +186,7 @@ global Unit* UnitOnMapTile(unsigned tx,unsigned ty)
 */
 global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int n;
     int i;
 
@@ -214,7 +214,7 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
 */
 global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     Unit* unit;
     Unit* best;
     UnitType* type;
@@ -263,7 +263,7 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 */
 global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int n;
     int i;
 
@@ -290,7 +290,7 @@ global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
 */
 global Unit* GoldMineOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -316,7 +316,7 @@ global Unit* GoldMineOnMap(int tx,int ty)
 */
 global Unit* GoldDepositOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -342,7 +342,7 @@ global Unit* GoldDepositOnMap(int tx,int ty)
 */
 global Unit* OilPatchOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -365,7 +365,7 @@ global Unit* OilPatchOnMap(int tx,int ty)
 */
 global Unit* PlatformOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -391,7 +391,7 @@ global Unit* PlatformOnMap(int tx,int ty)
 */
 global Unit* OilDepositOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -417,7 +417,7 @@ global Unit* OilDepositOnMap(int tx,int ty)
 */
 global Unit* WoodDepositOnMap(int tx,int ty)
 {
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     int i;
     int n;
 
@@ -455,7 +455,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
     const Unit* dest;
     const UnitType* type;
     const UnitType* dtype;
-    Unit* table[MAX_UNITS];
+    Unit* table[UnitMax];
     unsigned x;
     unsigned y;
     unsigned n;
