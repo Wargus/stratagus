@@ -95,6 +95,8 @@ local void ObjectivesExit(Menuitem *mi);
 
 // Victory, lost
 local void GameMenuEnd(void);
+local void VictoryInit(Menuitem *mi);
+local void DefeatedInit(Menuitem *mi);
 local void SaveReplay(void);
 local void SaveReplayEnterAction(Menuitem *mi, int key);
 local void SaveReplayOk(void);
@@ -465,6 +467,8 @@ global void InitMenuFuncHash(void) {
 
 // Victory, lost
     HASHADD(GameMenuEnd,"game-menu-end");
+    HASHADD(VictoryInit,"victory-init");
+    HASHADD(DefeatedInit,"defeated-init");
     HASHADD(SaveReplay,"save-replay");
     HASHADD(SaveReplayEnterAction,"save-replay-enter-action");
     HASHADD(SaveReplayOk,"save-replay-ok");
@@ -2258,6 +2262,32 @@ local void GameMenuEnd(void)
     GameRunning = 0;
     CursorOn = CursorOnUnknown;
     CurrentMenu = NULL;
+}
+
+/**
+**	Victory menu init callback
+*/
+local void VictoryInit(Menuitem *mi __attribute__((unused)))
+{
+    Menu *menu;
+
+    menu = CurrentMenu;
+    if (CommandLogDisabled) {
+	menu->items[3].flags = MI_DISABLED;
+    }
+}
+
+/**
+**	Defeated menu init callback
+*/
+local void DefeatedInit(Menuitem *mi __attribute__((unused)))
+{
+    Menu *menu;
+
+    menu = CurrentMenu;
+    if (CommandLogDisabled) {
+	menu->items[3].flags = MI_DISABLED;
+    }
 }
 
 /**
