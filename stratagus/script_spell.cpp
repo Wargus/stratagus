@@ -87,8 +87,8 @@
 ;;			Summon "UnitType",
 ;;			Whirlwind (ttl #n)
 ;;				} )
-;;		'SoundWhenCasted "SoundConfig"
-;;		'MissileWhenCasted "MissileType"
+;;		'sound-when-casted "SoundConfig"
+;;		'missile-when-casted "MissileType"
 ;;		'condition '( {
 ;;			Enemypresence	(#t range #n),			// enemy in range
 ;;			DurationEffect	(#t flag #f_flag value #n),	// "f_flag" < #n
@@ -123,124 +123,6 @@ typedef void	f_ccl_spell(const char *id, SCM list, SpellType	*spell);
 // **************************************************************************
 
 /**
-**	Parse the New Showname for spell.
-**	list = "ShowName"
-*/
-local void ccl_spell_showname(const char *id, SCM list, SpellType *spelltype)
-{
-    char *str = NULL;
-
-    assert (id != NULL);
-    assert (spelltype != NULL);
-
-    str = gh_scm2newstr(list, NULL);
-    if (spelltype->Name != NULL && strcmp(spelltype->Name, str)) {
-	// warn user
-    	DebugLevel3Fn("Redefinition in spell-type '%s' : %s : '%s' -> '%s'\n"
-		_C_ spelltype->IdentName _C_ id _C_ spelltype->Name _C_ str);
-    }
-    free(spelltype->Name);
-    spelltype->Name = str;
-}
-
-/**
-**	Parse the New Manacost for spell.
-**	list = #n
-*/
-local void ccl_spell_manacost(const char *id, SCM list, SpellType *spelltype)
-{
-    int manacost;
-
-    assert (id != NULL);
-    assert (spelltype != NULL);
-
-    manacost = gh_scm2int(list);
-    if (spelltype->ManaCost != -1 && spelltype->ManaCost != manacost)
-    {// warning user
-    	DebugLevel3Fn("Redefinition in spell-type '%s' : %s : '%d' -> '%d'\n"
-    				_C_ spelltype->IdentName _C_ id _C_ spelltype->ManaCost _C_ manacost);
-    }
-    spelltype->ManaCost = manacost;
-}
-
-/**
-**	Parse the New range for spell.
-**	list = #n
-*/
-local void ccl_spell_range(const char *id, SCM list, SpellType *spelltype)
-{
-    int range;
-
-    assert (id != NULL);
-    assert (spelltype != NULL);
-
-    range = gh_scm2int(list);
-    if (spelltype->Range != 0 && spelltype->Range != range) {
-    	DebugLevel3Fn("Redefinition in spell-type '%s' : %s : '%d' -> '%d'\n"
-		_C_ spelltype->IdentName _C_ id _C_ spelltype->Range _C_ range);
-    }
-    spelltype->Range = range;
-}
-
-/**
-**	Parse the target for spell.
-**	list = #target
-**	@note	FIXME : Usefull ? depend of Spell Action, yes for self...
-*/
-local void ccl_spell_target(const char *id, SCM list, SpellType *spelltype)
-{
-    struct {
-	const char *ident;
-	TargetType	e;
-    }	correspondance[] = {
-	{"none", TargetNone},
-	{"self", TargetSelf},
-	{"unit", TargetUnit},
-	{"position", TargetPosition},
-	{ NULL, 0}};
-    TargetType which_sort_of_target;
-    int	i;
-
-    assert (id != NULL);
-    assert (spelltype != NULL);
-
-    which_sort_of_target = spelltype->which_sort_of_target;
-    for (i = 0; correspondance[i].ident != NULL; i++) {
-	if (gh_eq_p(list, gh_symbol2scm((char *) correspondance[i].ident))) {
-	    spelltype->which_sort_of_target = correspondance[i].e;
-	    break;
-	}
-    }
-
-    if (correspondance[i].ident == NULL) {
-	errl("Unsupported tag", list);
-	spelltype->which_sort_of_target = -1;
-	return ;
-    }
-//	Redefinition.
-    if (which_sort_of_target != spelltype->which_sort_of_target
-	    && which_sort_of_target != TargetNone) {
-	const char *s1 = NULL;
-	const char *s2 = NULL;
-
-    	for (i = 0; correspondance[i].ident != NULL; i++) {
-	    if (which_sort_of_target == correspondance[i].e) {
-		s1 = correspondance[i].ident;
-		continue;
-	    }
-	    if (spelltype->which_sort_of_target == correspondance[i].e) {
-		s2 = correspondance[i].ident;
-		continue;
-	    }
-	}
-	if (s1 != NULL) {
-	    DebugLevel3Fn("Redefinition in spell-type '%s' : %s : '%s' -> '%s'\n"
-		    _C_ spelltype->IdentName _C_ id _C_ s1 _C_ s2);
-	}
-    }
-}
-
-/**
 **	Parse the sound for spell.
 **	list = "soundname"
 */
@@ -253,7 +135,7 @@ local void ccl_spell_soundwhencast(const char *id, SCM list, SpellType *spell)
     assert (spell != NULL);
 
     NewSoundName = gh_scm2newstr(list,NULL);
-    OldSoundName = spell->SoundWhenCasted.Name;
+    OldSoundName = spell->SoundWhenCast.Name;
 
     if (OldSoundName && strcmp(NewSoundName,OldSoundName)) {
 	DebugLevel3Fn("Redefinition of sound when casted for '%s' : %s : '%s' -> '%s'\n"
@@ -261,17 +143,17 @@ local void ccl_spell_soundwhencast(const char *id, SCM list, SpellType *spell)
     }
 
     //Free the old stuff.
-    free(spell->SoundWhenCasted.Sound);
+    free(spell->SoundWhenCast.Sound);
     free(OldSoundName);
 
-    spell->SoundWhenCasted.Sound = SoundIdForName(NewSoundName);
-    if (spell->SoundWhenCasted.Sound == NULL) {
+    spell->SoundWhenCast.Sound = SoundIdForName(NewSoundName);
+    if (spell->SoundWhenCast.Sound == NULL) {
 	DebugLevel3Fn("in spell-type '%s' : %s : sound '%s' does not exist\n"
 		_C_ spell->IdentName _C_ id _C_  NewSoundName);
 	free(NewSoundName);
 	NewSoundName=NULL;
     }
-    spell->SoundWhenCasted.Name=NewSoundName;
+    spell->SoundWhenCast.Name=NewSoundName;
 }
 
 /*
@@ -308,7 +190,7 @@ local void ccl_spell_missilewhencast(const char *id, SCM list, SpellType *spell)
 **	For blizzard and DeathAndDecay.
 **	list = fields #n shards #n damage #n
 */
-local char ccl_spell_action_blizzard(const char *SpellName, SCM list, t_SpellAction *spellaction)
+local char ccl_spell_action_blizzard(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     int fields;
     int	shards;
@@ -350,9 +232,9 @@ local char ccl_spell_action_blizzard(const char *SpellName, SCM list, t_SpellAct
 		"fields <= 0 or shards <= 0 have no sense");
 	return 0;
     }
-    spellaction->blizzard.fields = fields;
-    spellaction->blizzard.shards = shards;
-    spellaction->blizzard.damage = damage;
+    spellaction->Blizzard.Fields = fields;
+    spellaction->Blizzard.Shards = shards;
+    spellaction->Blizzard.Damage = damage;
     return 1;
 }
 
@@ -360,7 +242,7 @@ local char ccl_spell_action_blizzard(const char *SpellName, SCM list, t_SpellAct
 **	For fireball and Runes.
 **	list = 'ttl #n 'damage #n
 */
-local char ccl_spell_action_fireball(const char *SpellName, SCM list, t_SpellAction *spellaction)
+local char ccl_spell_action_fireball(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     int	ttl;
     int	damage;
@@ -397,8 +279,8 @@ local char ccl_spell_action_fireball(const char *SpellName, SCM list, t_SpellAct
 		"TTL <= 0 have no sense");
 	return 0;
     }
-    spellaction->fireball.TTL = ttl;
-    spellaction->fireball.damage = damage;
+    spellaction->Fireball.TTL = ttl;
+    spellaction->Fireball.Damage = damage;
     return 1;
 }
 
@@ -406,7 +288,7 @@ local char ccl_spell_action_fireball(const char *SpellName, SCM list, t_SpellAct
 **	For flameshield and whirlwind.
 **	list = 'ttl #n
 */
-local char ccl_spell_action_flameshield(const char *SpellName, SCM list, t_SpellAction *spellaction)
+local char ccl_spell_action_flameshield(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     int ttl;
     SCM	value;
@@ -432,7 +314,7 @@ local char ccl_spell_action_flameshield(const char *SpellName, SCM list, t_Spell
 		"ttl <= 0 have no sense");//  ttl must be positive.
 	return 0;
     }
-    spellaction->flameshield.TTL = ttl;
+    spellaction->FlameShield.TTL = ttl;
     return 1;
 }
 
@@ -442,7 +324,7 @@ local char ccl_spell_action_flameshield(const char *SpellName, SCM list, t_Spell
 **	One or more.
 **	@todo Free when an error occurs. Do a function to do this.
 */
-local char ccl_spell_action_haste(const char *SpellName, SCM list, t_SpellAction	*spellaction)
+local char ccl_spell_action_haste(const char *SpellName, SCM list, SpellActionType	*spellaction)
 {
     struct {
 	const char *id;
@@ -509,7 +391,7 @@ local char ccl_spell_action_haste(const char *SpellName, SCM list, t_SpellAction
 **	HP positive for healing, negative for dealing damage.
 **	list = (HP #n)
 */
-local char ccl_spell_action_healing(const char *SpellName, SCM list, t_SpellAction *spellaction)
+local char ccl_spell_action_healing(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     assert(SpellName);
     assert(spellaction != NULL);
@@ -546,7 +428,7 @@ local char ccl_spell_action_healing(const char *SpellName, SCM list, t_SpellActi
 **	For invisibility and unholyarmor.
 **	list = flag #f_inv value #n missile "missile-name"
 */
-local char ccl_spell_action_invisibility(const char *SpellName, SCM list, t_SpellAction	*spellaction)
+local char ccl_spell_action_invisibility(const char *SpellName, SCM list, SpellActionType	*spellaction)
 {
     const struct {
 	const char *id;
@@ -630,7 +512,7 @@ local char ccl_spell_action_invisibility(const char *SpellName, SCM list, t_Spel
 **	list = ("unittypename")
 **	@note	WARNING, use for other functions than summon, see ccl_spell_action.
 */
-local char ccl_spell_action_summon(const char *SpellName, SCM list, t_SpellAction *spellaction)
+local char ccl_spell_action_summon(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
     assert(SpellName);
     assert(spellaction != NULL);
@@ -661,7 +543,7 @@ local char ccl_spell_action_summon(const char *SpellName, SCM list, t_SpellActio
 **	@param	list	: argument for spell.
 **	@param	spellaction : What we want modify.
 */
-typedef char	f_ccl_action(const char *spellname, SCM list, t_SpellAction	*spellaction);
+typedef char	f_ccl_action(const char *spellname, SCM list, SpellActionType	*spellaction);
 
 /*
 **		Parse the action for spell.
@@ -706,7 +588,7 @@ local void ccl_spell_action(const char *id, SCM list, SpellType *spell)
 		DebugLevel3Fn("%s %d\n" _C_ parser[i].id _C_ sizeof(*spell->SpellAction));
 		list = gh_cdr(list);
 		free(spell->SpellAction);// FIXME : Use a destructor : free pointer, list..
-		spell->SpellAction = (t_SpellAction *) malloc(sizeof (*spell->SpellAction));
+		spell->SpellAction = (SpellActionType *) malloc(sizeof (*spell->SpellAction));
 		memset(spell->SpellAction, 0, sizeof(*spell->SpellAction));
 		if (parser[i].f(spell->IdentName, gh_car(list), spell->SpellAction) == 0) {
 		    // Error in function : it is to the function to warn..
@@ -1067,32 +949,6 @@ local void ccl_spell_autocast(const char *id, SCM list, SpellType *spell)
 	    &spell->AutoCast->Condition_generic,&spell->AutoCast->Condition_specific);
 }
 
-/*
-**	Constructor of SpellType.
-*/
-local SpellType * NewSpellType(char *identname)
-{
-    assert(identname != NULL);
-
-    SpellType *spell = (SpellType *) malloc(sizeof(*spell));
-
-    spell->Ident = SpellTypeCount++;
-    spell->IdentName = strdup(identname);
-    spell->Name = NULL;
-    spell->which_sort_of_target = -1;
-    spell->f = NULL;
-    spell->SpellAction = NULL;
-    spell->Range = 0;
-    spell->ManaCost = (unsigned int) -1;
-    spell->Condition_generic = NULL;
-    spell->Condition_specific = NULL;
-    spell->AutoCast = NULL;
-    spell->SoundWhenCasted.Name = NULL;
-    spell->SoundWhenCasted.Sound = NULL;
-    spell->Missile = NULL;
-    return spell;
-}
-
 /**
 **	Parse Spell.
 **
@@ -1101,53 +957,70 @@ local SpellType * NewSpellType(char *identname)
 local SCM CclDefineSpell(SCM list)
 {
     char *identname;
-    SpellType *spelltype;
+    SpellType *spell;
     SCM	value;
-    int	i;
-    static struct {
-	const char *ident;
-	f_ccl_spell	*f;
-    } parser[] = {
-	{"showname", ccl_spell_showname},
-	{"manacost", ccl_spell_manacost},
-	{"range", ccl_spell_range},
-	{"target", ccl_spell_target},
-	{"action", ccl_spell_action},
-	{"condition", ccl_spell_condition},
-	{"autocast", ccl_spell_autocast},
-	{"SoundWhenCasted", ccl_spell_soundwhencast},
-	{"MissileWhenCasted", ccl_spell_missilewhencast},
-	{NULL, NULL}
-    };
 
     identname = gh_scm2newstr(gh_car(list), NULL);
     list = gh_cdr(list);
-    spelltype = SpellTypeByIdent(identname);
-    if (spelltype != NULL) {
+    spell = SpellTypeByIdent(identname);
+    if (spell != NULL) {
     	DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
 	free(identname);
     } else {
-	spelltype = NewSpellType(identname);
-	free(identname);
-	SpellTypeTable = realloc(SpellTypeTable,(1+SpellTypeCount)*sizeof(SpellType)); // FIXME
-	SpellTypeTable[spelltype->Ident] = *spelltype;
-	spelltype = &SpellTypeTable[spelltype->Ident];
+	SpellTypeTable = realloc(SpellTypeTable,(1+SpellTypeCount)*sizeof(SpellType));
+	spell = &SpellTypeTable[SpellTypeCount++];
+	memset(spell,0,sizeof(SpellType));
+	spell->Ident=SpellTypeCount-1;
+	spell->IdentName=identname;
     }
     while (!gh_null_p(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
-	for (i = 0; parser[i].ident != NULL; i++) {
-	    if (gh_eq_p(value, gh_symbol2scm((char *) parser[i].ident))) {
-		parser[i].f(parser[i].ident, gh_car(list), spelltype);
-		list = gh_cdr(list);
-		break;
+	if (gh_eq_p(value,gh_symbol2scm("showname"))) {
+	    if (spell->Name) { 
+	    	free(spell->Name);
 	    }
-	}
-	if (parser[i].ident == NULL) {
+	    spell->Name=gh_scm2newstr(gh_car(list), NULL);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("manacost"))) {
+	    spell->ManaCost=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("range"))) {
+	    spell->Range=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("target"))) {
+	    value=gh_car(list);
+	    if (gh_eq_p(value,gh_symbol2scm("none"))) {
+		spell->Target=TargetNone;
+	    } else if (gh_eq_p(value,gh_symbol2scm("self"))) {
+		spell->Target=TargetSelf;
+	    } else if (gh_eq_p(value,gh_symbol2scm("unit"))) {
+		spell->Target=TargetSelf;
+	    } else if (gh_eq_p(value,gh_symbol2scm("position"))) {
+		spell->Target=TargetPosition;
+	    } else {
+		errl("Unsupported spell target type tag",value);
+	    }
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("action"))) {
+	    ccl_spell_action("action",gh_car(list),spell);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
+	    ccl_spell_condition("condition",gh_car(list),spell);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("autocast"))) {
+	    ccl_spell_autocast("autocast",gh_car(list),spell);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("sound-when-cast"))) {
+	    ccl_spell_soundwhencast("sound-when-cast",gh_car(list),spell);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("missile-when-cast"))) {
+	    ccl_spell_missilewhencast("missile-when-cast",gh_car(list),spell);
+	    list=gh_cdr(list);
+	} else {
 	    errl("Unsupported tag", value);
 	}
     }
-// FIXME : Verify spell is completed.
     return SCM_UNSPECIFIED;
 }
 
@@ -1180,17 +1053,17 @@ global void SaveSpells(CLFile* file)
 	CLprintf(file,"    'showname \"%s\"\n",spell->Name);
 	CLprintf(file,"    'manacost %d\n",spell->ManaCost);
 	CLprintf(file,"    'range %d\n",spell->Range);
-	if (spell->SoundWhenCasted.Name) { 
-	    CLprintf(file,"    'SoundWhenCasted \"%s\"\n",spell->SoundWhenCasted.Name);
+	if (spell->SoundWhenCast.Name) { 
+	    CLprintf(file,"    'sound-when-cast \"%s\"\n",spell->SoundWhenCast.Name);
 	}
 	if (spell->Missile) {
-	    CLprintf(file,"    'MissileWhenCasted \"%s\"\n",spell->Missile->Ident);
+	    CLprintf(file,"    'missile-when-casted \"%s\"\n",spell->Missile->Ident);
 	}
 	//
 	//  Target type.
 	//
 	CLprintf(file,"    'target '");
-	switch (spell->which_sort_of_target) {
+	switch (spell->Target) {
 	    case TargetSelf:
 		CLprintf(file,"self\n");
 		break;
@@ -1213,13 +1086,13 @@ global void SaveSpells(CLFile* file)
 	CLprintf(file,"    'action");
 	if (spell->f==CastBlizzard) {
 	    CLprintf(file," '(Blizzard (fields %d shards %d damage %d) )\n",
-		    spell->SpellAction->blizzard.fields,
-		    spell->SpellAction->blizzard.shards,
-		    spell->SpellAction->blizzard.damage);
+		    spell->SpellAction->Blizzard.Fields,
+		    spell->SpellAction->Blizzard.Shards,
+		    spell->SpellAction->Blizzard.Damage);
 	} else if (spell->f==CastFireball) {
 	    CLprintf(file," '(FireBall (ttl %d damage %d) )\n",
-		    spell->SpellAction->fireball.TTL,
-		    spell->SpellAction->fireball.damage);
+		    spell->SpellAction->Fireball.TTL,
+		    spell->SpellAction->Fireball.Damage);
 	} else if (spell->f==CastHolyVision) {
 	    CLprintf(file," '(HolyVision \"%s\" )\n",spell->SpellAction->holyvision.revealer->Ident);
 	} else if (spell->f==CastHealing) {
@@ -1281,14 +1154,14 @@ global void SaveSpells(CLFile* file)
 		    spell->SpellAction->raisedead.skeleton->Ident);
 	} else if (spell->f==CastFlameShield) {
 	    CLprintf(file," '(FlameShield (ttl %d) )\n",
-		    spell->SpellAction->flameshield.TTL);
+		    spell->SpellAction->FlameShield.TTL);
 	} else if (spell->f==CastRunes) {
 	    CLprintf(file," '(Runes (ttl %d damage %d) )\n",
 		    spell->SpellAction->runes.TTL,
 		    spell->SpellAction->runes.damage);
 	} else if (spell->f==CastCircleOfPower) {
 	    CLprintf(file," '(CircleOfPower \"%s\")\n",
-		    spell->SpellAction->circleofpower.goal->Ident);
+		    spell->SpellAction->SpawnPortal.PortalType->Ident);
 	} else if (spell->f==CastDeathCoil) {
 	    CLprintf(file," '(DeathCoil)\n");
 	    // FIXME: more?
@@ -1300,6 +1173,7 @@ global void SaveSpells(CLFile* file)
 	//
 	//  FIXME: Save conditions
 	//
+	
 	//
 	//  FIXME: Save autocast and AI info
 	//
