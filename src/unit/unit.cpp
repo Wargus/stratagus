@@ -836,7 +836,6 @@ global void UnitLost(Unit* unit)
 	temp = MakeUnitAndPlace(unit->X, unit->Y, type->MustBuildOnTop, &Players[15]);
 	temp->Value = unit->Value;
     }
-    DebugCheck(player->NumFoodUnits > UnitMax);
     DebugCheck(player->NumBuildings > UnitMax);
     DebugCheck(player->TotalNumUnits > UnitMax);
     DebugCheck(player->UnitTypesCount[type->Type] > UnitMax);
