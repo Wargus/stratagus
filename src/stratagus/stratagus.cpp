@@ -615,6 +615,10 @@ local void PrintHeader(void)
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
+#ifndef DEBUG
+    srand(time(NULL));
+#endif
+
     PrintHeader();
     printf(
     "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
