@@ -66,6 +66,8 @@
 ==	Debug definitions
 ============================================================================*/
 
+#define _C_	,			/// Debug , for non GNU-C compiler
+
 #ifdef DEBUG	// {
 
 /**
