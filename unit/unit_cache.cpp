@@ -46,6 +46,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "map.h"
+#include "editor.h"
 
 /**
 **  Insert new unit into cache.
@@ -101,9 +102,13 @@ void UnitCacheRemove(Unit* unit)
 			} else {
 				// item is head of the list.
 				mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
-				Assert(mf->UnitCache == listitem);
-				mf->UnitCache = listitem->Next;
-				Assert(!mf->UnitCache || !mf->UnitCache->Prev);
+				// FIXME: this check shouldn't be necessary but the editor
+				// FIXME: removes a unit from the cache twice
+				Assert(EditorRunning || mf->UnitCache == listitem);
+				if (mf->UnitCache == listitem) {
+					mf->UnitCache = listitem->Next;
+					Assert(!mf->UnitCache || !mf->UnitCache->Prev);
+				}
 			}
 
 			listitem->Next = listitem->Prev = NULL;
