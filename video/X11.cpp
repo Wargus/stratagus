@@ -166,7 +166,7 @@ global void SetVideoSync(void)
 
     FrameTicks = ms / 10;
     FrameRemainder = ms % 10;
-    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
+    DebugLevel0Fn("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
 }
 
 #endif
@@ -178,7 +178,7 @@ global void SetVideoSync(void)
 local void MyConnectionWatch
 	(Display* display,XPointer client,int fd,Bool flag,XPointer* data)
 {
-    DebugLevel0Fn(": fildes %d flag %d\n",fd,flag);
+    DebugLevel0Fn(": fildes %d flag %d\n" _C_ fd _C_ flag);
     if( flag ) {			// file handle opened
     } else {				// file handle closed
     }
@@ -356,7 +356,7 @@ foundvisual:
 
     xpfv=XListPixmapFormats(TheDisplay, &i);
     for( i--; i>=0; i-- )  {
-	DebugLevel3("pixmap %d\n", xpfv[i].depth);
+	DebugLevel3("pixmap %d\n" _C_ xpfv[i].depth);
 	if( xpfv[i].depth==xvi.depth ) {
 	    break;
 	}
@@ -555,7 +555,7 @@ global void InvalidateArea(int x,int y,int w,int h)
 	y=0;
     }
     if( !w<=0 && !h<=0 ) {
-	DebugLevel3("X %d,%d -> %d,%d\n",x,y,w,h);
+	DebugLevel3("X %d,%d -> %d,%d\n" _C_ x _C_ y _C_ w _C_ h);
 	XClearArea(TheDisplay,TheMainWindow,x,y,w,h,False);
     }
 }
@@ -795,13 +795,13 @@ local void X11DoEvent(const EventCallback* callbacks)
 
     switch( event.type ) {
 	case ButtonPress:
-	    DebugLevel3("\tbutton press %d\n",event.xbutton.button);
+	    DebugLevel3("\tbutton press %d\n" _C_ event.xbutton.button);
 	    InputMouseButtonPress(callbacks, X11GetTicks(),
 		    event.xbutton.button);
 	    break;
 
 	case ButtonRelease:
-	    DebugLevel3("\tbutton release %d\n",event.xbutton.button);
+	    DebugLevel3("\tbutton release %d\n" _C_ event.xbutton.button);
 	    InputMouseButtonRelease(callbacks, X11GetTicks(),
 		    event.xbutton.button);
 	    break;
@@ -813,7 +813,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 
 	case MotionNotify:
 	    DebugLevel3("\tmotion notify %d,%d\n"
-		,event.xbutton.x,event.xbutton.y);
+		 _C_ event.xbutton.x _C_ event.xbutton.y);
 	    InputMouseMove(callbacks, X11GetTicks(),
 		    event.xbutton.x,event.xbutton.y);
 	    if ( (TheUI.WarpX != -1 || TheUI.WarpY != -1)
@@ -860,7 +860,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    X11HandleModifiers((XKeyEvent*)&event);
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    key=XLookupKeysym((XKeyEvent*)&event,0);
-	    DebugLevel3("\tKeyv %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
+	    DebugLevel3("\tKeyv %lx %lx `%*.*s'\n" _C_ key _C_ keysym _C_ num _C_ num _C_ buf);
 	    if( num==1 ) {
 		X11HandleKeyPress(callbacks,key,*buf);
 	    } else {
@@ -880,7 +880,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    X11HandleModifiers((XKeyEvent*)&event);
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    key=XLookupKeysym((XKeyEvent*)&event,0);
-	    DebugLevel3("\tKey^ %lx %lx `%*.*s'\n",key,keysym,num,num,buf);
+	    DebugLevel3("\tKey^ %lx %lx `%*.*s'\n" _C_ key _C_ keysym _C_ num _C_ num _C_ buf);
 	    if( num==1 ) {
 		X11HandleKeyRelease(callbacks,key,*buf);
 	    } else {
@@ -894,7 +894,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    break;
 
 	default:
-	    DebugLevel0("\tX11: Unknown event type: %d\n", event.type);
+	    DebugLevel0("\tX11: Unknown event type: %d\n" _C_  event.type);
 	    break;
 
     }
@@ -1060,7 +1060,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
 #endif
 
-	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
+	DebugLevel3Fn("%d, %d\n" _C_ morex|VideoInterrupts _C_ maxfd);
 
 	//
 	//	X11
