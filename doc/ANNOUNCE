@@ -9,11 +9,7 @@
 	   FreeCraft - A free fantasy real time strategy game engine
 
 What is FreeCraft?
----- -- --- ------
-
-FreeCraft was formerly known as ALE Clone or Clone.
-
-It is a clone of a famous top one sold game for the PC and console.
+---- -- ----------
 
 A realtime, fantasy strategy game for UNIX with X or Console or any Win32.
 
@@ -21,8 +17,8 @@ It comes without graphics, sounds and documentation.
 You need the original game CD or the expansion CD to use FreeCraft.
 (With over 1 million sold copies this shouldn't be a big problem)
 
-What does FreeCraft?
----- ---- --- ------
+What does FreeCraft do?
+---- ---- --------- ---
 
 All graphics and sounds are supported, you can walk, build and collect
 resources and attack.
@@ -35,7 +31,7 @@ Many bug fixes. (like always)
 Can I help?
 --- - -----
 
-YES! I still need help!  (No artists out there?)
+YES! We still need help!  (No artists out there?)
 
 There are many open projects:
 
@@ -44,10 +40,10 @@ There are many open projects:
     Make own graphics, music and sounds.
     Debugging the existing code.
 
-If you want to help, download it and contact me. 
+If you want to help, download it and contact us.
 
-What did FreeCraft need?
----- --- --- ----- -----
+What does FreeCraft need?
+---- ---- --- ----- -----
 
 Linux X11 with 16bit server or Win32 with 16bit videomode, libpng, libz and
 the original game CD or expansion CD.
@@ -62,26 +58,17 @@ GNU General Public License.
 Is there a home page?
 -- ----- - ---- -----
 
-	http://FreeCraft.Org
-	http://FreeCraft.Com
-	http://FreeCraft.Net
+	http://FreeCraft.org
+	http://FreeCraft.com
+	http://FreeCraft.net
 
-Where download FreeCraft?
------ -------- --- ------
+Where can I download FreeCraft?
+----- --- - -------- ----------
 
-ATTENTION: sunsite is renamed to metalab!
+	http://FreeCraft.org
+	http://FreeCraft.com
+	http://FreeCraft.net
 
-I have uploaded the sources to ftp://metalab.unc.edu/pub/Linux/Incoming.
-It should go to ftp://metalab.unc.edu/pub/Linux/games/strategy.
 
-	The name is freecraft-"DATE".tar.gz.
-		(This version freecraft-000402.tar.gz)
-
-or from my home page:
-
-	http://www.fourtytwo.de
-
-	You find there also pre-releases of the next stable version.
-
-Much fun,
-The FreeCraft Project (aleclone@FreeCraft.org) and Johns (johns98@gmx.net)
+Have fun,
+The FreeCraft Project
