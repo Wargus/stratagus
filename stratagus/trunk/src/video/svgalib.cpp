@@ -68,7 +68,7 @@ global VMemType8 Pixels8[256];
 global VMemType16 Pixels16[256];
 global VMemType32 Pixels32[256];
 
-global struct Palette GlobalPalette[256];
+global Palette GlobalPalette[256];
 
 local int old_button;
 local int mouse_x;
@@ -953,7 +953,7 @@ global void WaitEventsAndKeepSync(void)
 /**
 **	Create palette.
 */
-global void VideoCreatePalette(const struct Palette* palette)
+global void VideoCreatePalette(const Palette* palette)
 {
     int i;
 
