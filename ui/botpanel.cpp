@@ -588,7 +588,7 @@ local void UpdateButtonPanelMultipleUnits(void)
 		    }
 		} else if ( UnitButtonTable[z]->Action == ButtonDemolish ) {
 		    for( i=NumSelected; --i; ) {
-			if( Selected[i]->Type->Explodes ) {
+			if( Selected[i]->Type->Volatile ) {
 			    allow = 1;
 			    break;
 			}
@@ -719,7 +719,7 @@ global void UpdateButtonPanel(void)
 		}
 		break;
 	    case ButtonDemolish:
-		if( Selected[0]->Type->Explodes ) {
+		if( Selected[0]->Type->Volatile ) {
 		    allow = 1;
 		}
 		break;

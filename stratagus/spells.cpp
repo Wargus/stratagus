@@ -701,13 +701,23 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		    && target->Invisible < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->Invisible = spell->TTL/FRAMES_PER_SECOND;	// about 50 sec
-	    CheckUnitToBeDrawn(target);
+	    if( target->Type->Volatile ) {
+		RemoveUnit(target);
+		UnitLost(target);
+		ReleaseUnit(target);
+		MakeMissile(MissileTypeExplosion,
+			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	    } else {
+		// about 50 sec
+		target->Invisible = spell->TTL/FRAMES_PER_SECOND;
+		CheckUnitToBeDrawn(target);
+	    }
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+		    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
 	}
 	break;
 
@@ -972,8 +982,18 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		&& target->UnholyArmor < spell->TTL/FRAMES_PER_SECOND) {
 	    // get mana cost
 	    unit->Mana -= spell->ManaCost;
-	    target->UnholyArmor = spell->TTL/FRAMES_PER_SECOND;	// about 13 sec
-	    CheckUnitToBeDrawn(target);
+	    if( target->Type->Volatile ) {
+		RemoveUnit(target);
+		UnitLost(target);
+		ReleaseUnit(target);
+		MakeMissile(MissileTypeExplosion,
+			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+			x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	    } else {
+		// about 13 sec
+		target->UnholyArmor = spell->TTL/FRAMES_PER_SECOND;
+		CheckUnitToBeDrawn(target);
+	    }
 
 	    PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume);
 	    MakeMissile(MissileTypeSpell,
