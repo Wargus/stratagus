@@ -788,22 +788,6 @@ local Menuitem CampaignContMenuItems[] = {
 #endif
 };
 
-local Menuitem CDRomDisabledMenuItems[] = {
-#ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 15, 0, LargeFont, NULL, NULL,
-	{ text:{ "Sorry, this version of", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 15 + 20*1, 0, LargeFont, NULL, NULL,
-	{ text:{ "freecraft was not compiled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 15 + 20*2, 0, LargeFont, NULL, NULL,
-	{ text:{ "with CD Audio support", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 144 - (106 / 2), 128 - 15 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
-#else
-    { 0 }
-#endif
-};
-
-
 local Menuitem SoundOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL,
@@ -837,14 +821,24 @@ local Menuitem SoundOptionsMenuItems[] = {
 
     { MI_TYPE_TEXT, 64, 36*5, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Volume", MI_TFLAGS_CENTERED} } },
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
+#else
+    { MI_TYPE_HSLIDER, 32, 36*5.5, -1, 0, NULL, NULL,
+        { hslider:{ 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk} } },
+#endif
     { MI_TYPE_TEXT, 44, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "min", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "max", MI_TFLAGS_CENTERED} } },
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
+#else
+    { MI_TYPE_GEM, 240, 36*5.5, -1, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
+#endif
     { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, LargeFont, NULL, NULL,
 	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
 
@@ -1103,16 +1097,6 @@ global Menu Menus[] = {
 	ImagePanel1,
 	5, 6,
 	EndScenarioMenuItems,
-	NULL,
-    },
-    {
-    	// CDRom Disabled Message
-	176+(14*TileSizeX-288)/2,
-	16+(14*TileSizeY-128)/2,
-	288, 128,
-	ImagePanel4,
-	0, 4,
-	CDRomDisabledMenuItems,
 	NULL,
     },
     {
@@ -1860,9 +1844,6 @@ local void SetCdPower(Menuitem *mi)
         cd_stop();
 	CDMode = ":stopped";
     }
-#else
-    ProcessMenu(MENU_CDROM_DISABLED, 1);
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
 }
 
