@@ -89,7 +89,7 @@
 
 #define noUSE_TILECACHE			/// defined use tile cache
 #define USE_SMART_TILECACHE		/// defined use a smart tile cache
-#define noGRID		1		/// Map is shown with a grid, if 1
+#define GRID		0		/// Map is shown with a grid, if 1
 
 
 #ifdef DEBUG
@@ -687,8 +687,17 @@ global void VideoDraw32Tile32(const unsigned char* data, int x, int y)
 */
 local void VideoDrawXXTileClip(const unsigned char* data, int x, int y)
 {
+#if GRID==1
+    VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
+	data, x, y, TileSizeX, TileSizeY-1);
+    VideoDrawLine(ColorBlack, x + TileSizeX-1, y,
+	    x + TileSizeX-1, y + TileSizeY);
+    VideoDrawLine(ColorBlack, x, y + TileSizeY-1,
+	    x + TileSizeX, y + TileSizeY - 1);
+#else
     VideoDrawRawClip((VMemType*)TheMap.TileData->Pixels,
 	data, x, y, TileSizeX, TileSizeY);
+#endif
 }
 
 /**
@@ -2604,6 +2613,10 @@ global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 */
 global void MarkDrawEntireMap(void)
 {
+#ifdef NEW_DECODRAW
+    Unit** unit;
+#endif
+    DebugLevel3Fn("\n");
 #ifdef NEW_MAPDRAW
     int i;
 
@@ -2616,9 +2629,13 @@ global void MarkDrawEntireMap(void)
 #endif
 
 #ifdef NEW_DECODRAW
-// Hmm.. remove levels directly might not be a good idea, but it is faster ;)
-//  DecorationRemoveLevels(LevCarLow, LevSkyHighest);
-//  DecorationMark(mapdeco);
+    //
+    //	FIXME: This is soo slow.
+    //
+    DecorationMark(MapDecoration);
+    for (unit = Units; unit < Units + NumUnits; ++unit) {
+	CheckUnitToBeDrawn(*unit);
+    }
 #endif
 
     MustRedraw |= RedrawMap;
@@ -2770,8 +2787,9 @@ local void mapdeco_draw(void* dummy_data)
     extern int ClipX2;
     extern int ClipY2;
 
-   VideoDrawRectangle(ColorWhite, ClipX1, ClipY1,
-	ClipX2-ClipX1+1, ClipY2-ClipY1+1);
+/*    VideoFillRectangle((VMemType)(VMemType32)(rand()),
+		ClipX1, ClipY1, ClipX2 - ClipX1 + 1, ClipY2 - ClipY1 + 1);
+    return;*/
     w = (ClipX2 - ClipX1) / TileSizeX + 1;
     h = (ClipY2 - ClipY1) / TileSizeY + 1;
     x = (ClipX1 - TheUI.SelectedViewport->X) / TileSizeX;
@@ -2783,7 +2801,7 @@ local void mapdeco_draw(void* dummy_data)
     /*x = x * TileSizeX;
     y = y * TileSizeY;*/
     DebugLevel3Fn("%d %d %d %d->%d %d\n" _C_ ClipX1 _C_ ClipY1 _C_ ClipX2 _C_ ClipY2 _C_ x _C_ y);
-    nextline = TheMap.Width - w;
+    nextline = TheMap.Width - w - 1;
     do {
 	x2 = x;
 	w2 = w;
@@ -2827,7 +2845,7 @@ global void InitMap(void)
 	(TheUI.SelectedViewport->EndY - 1)* TileSizeX _C_
 	(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
     MapDecoration = DecorationAdd(NULL /* no data to pass to */,
-	mapdeco_draw, LevGround, TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
+	mapdeco_draw, 0, TheUI.SelectedViewport->X, TheUI.SelectedViewport->Y,
 	(TheUI.SelectedViewport->EndY - 1) * TileSizeX,
 	(TheUI.SelectedViewport->EndX - 1) * TileSizeY);
 //	TheUI.SelectedViewport->EndX - TheUI.SelectedViewport->X + 1,

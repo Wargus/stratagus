@@ -1229,6 +1229,7 @@ global int UnitVisibleOnScreen(const Unit* unit)
 
     for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
 	if (UnitVisibleInViewport(vp, unit)) {
+	    DebugLevel3Fn("unit %d(%s) is visibile\n" _C_ unit->Slot _C_ unit->Type->Ident);
 	    return 1;
 	}
     }
@@ -1300,6 +1301,7 @@ local void DecoBuildingDraw(void* data)
 */
 local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
 {
+#if 0//SEVERE_BRAINDAMAGE
     if (u->Type->Building) {
 	u->deco = DecorationAdd(u, DecoBuildingDraw, LevBuilding, x, y, w, h);
     } else if (u->Type->UnitType == UnitTypeFly) {
@@ -1307,6 +1309,13 @@ local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
     } else {
 	u->deco = DecorationAdd(u, DecoUnitDraw, LevCarLow, x, y, w, h);
     }
+#else
+    if (u->Type->Building) {
+	u->Decoration = DecorationAdd(u, DecoBuildingDraw, 1, x, y, w, h);
+    } else {
+	u->Decoration = DecorationAdd(u, DecoUnitDraw, 2, x, y, w, h);
+    }
+#endif
 }
 #endif
 
@@ -1316,7 +1325,7 @@ local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
 **      @param unit     Unit to be checked.
 **      @return         True if map marked to be drawn, false otherwise.
 */
-global int CheckUnitToBeDrawn(const Unit* unit)
+global int CheckUnitToBeDrawn(Unit* unit)
 {
 #ifdef NEW_MAPDRAW
     int sx;
@@ -1355,35 +1364,26 @@ global int CheckUnitToBeDrawn(const Unit* unit)
 
 	// FIXME: Inaccurate dimension to take unit's extras into account..
 	//        Should be solved by adding each unit extra as separate decoration
-	x = Map2ViewportX(TheUI.SelectedViewport, unit->X) + unit->IX - 10;
-	y = Map2ViewportY(TheUI.SelectedViewport, unit->Y) + unit->IY - 10;
+	x = Map2ViewportX(TheUI.SelectedViewport, unit->X) + unit->IX
+		+ unit->Type->TileWidth * TileSizeX / 2 - unit->Type->Width / 2 - 10;
+	y = Map2ViewportY(TheUI.SelectedViewport, unit->Y) + unit->IY
+	        + unit->Type->TileHeight * TileSizeY / 2 - unit->Type->Height / 2 - 10;
 	w = unit->Type->Width + 20;
 	h = unit->Type->Height + 20;
 
-	if (unit->deco) {
-	    // FIXME: its very expensive to remove+add a decoration to satify a
-	    //        new location, a decoration update function should be added
-	    Deco* d;
-	    d = unit->deco;
-	    if (d->x != x || d->y != y || d->w != w || d->h != h) {
-		DecorationRemove(unit->deco);
-		AddUnitDeco((Unit*)unit, x, y, w, h);
-	    }
-	    else {
-		DecorationMark(unit->deco);
-	    }
-	}
-	else {
+	if (unit->Decoration) {
+	    unit->Decoration = DecorationMove(unit->Decoration, x, y, w, h);
+	} else {
+	    DebugLevel3Fn("Adding Decoration for %d(%s)\n" _C_ unit->Slot _C_ unit->Type->Name);
 	    AddUnitDeco((Unit*)unit, x, y, w, h);
 	}
 
 	return 1;
-    } else if (unit->deco) {
-	// not longer visible: so remove from auto decoration redraw
-	Unit* u;
-	u = (Unit*)unit;
-	DecorationRemove(unit->deco);
-	u->deco = NULL;
+    } else if (unit->Decoration) {
+	// not longer visible: so remove from auto Decorationration redraw
+	DebugLevel3Fn("Removing Decoration for %d(%s)\n" _C_ unit->Slot _C_ unit->Type->Name);
+	DecorationRemove(unit->Decoration);
+	unit->Decoration = NULL;
     }
 #else
     if (UnitVisibleOnScreen(unit)) {

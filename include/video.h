@@ -837,6 +837,8 @@ extern void VideoFillTransCircleClip(VMemType color, int x, int y, int r,
     ///	Set clipping for nearly all vector primitives. Functions which support
     ///	clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
+    /// Set the clipping inside the current clipping rectangle.
+extern void SetClipToClip(int left, int top, int right, int bottom);
 
     ///	Push current clipping.
 extern void PushClipping(void);
