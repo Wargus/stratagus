@@ -1805,7 +1805,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 }
 
 /**
-**	Toggle the map of war handling.
+**	Toggle the fog of war handling.
 **	Used in the preference menu.
 **
 **	@param mi	Menu item (not used).
@@ -1813,13 +1813,15 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
 {
     if (!TheMap.NoFogOfWar) {
-        TheMap.NoFogOfWar = 1;
-        UpdateFogOfWarChange();
-        MapUpdateVisible();
+	TheMap.NoFogOfWar = 1;
+	UpdateFogOfWarChange();
+	MapUpdateVisible();
+	CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
     } else {
-        TheMap.NoFogOfWar = 0;
-        UpdateFogOfWarChange();
-        MapUpdateVisible();
+	TheMap.NoFogOfWar = 0;
+	UpdateFogOfWarChange();
+	MapUpdateVisible();
+	CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow on", -1);
     }
     MustRedraw &= ~RedrawMinimap;
 }
