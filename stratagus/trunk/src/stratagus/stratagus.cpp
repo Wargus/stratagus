@@ -455,7 +455,7 @@ Use it at your own risk.\n\n");
     // All pre-start menues are orcish - may need to be switched later..
     SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(1);
-    LoadCursors("orc");
+    LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
     InitSettings();
 
     WaitForInput(15);
