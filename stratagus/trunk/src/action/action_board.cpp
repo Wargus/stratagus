@@ -59,19 +59,21 @@
 */
 local int MoveToTransporter(Unit* unit)
 {
-    int i,x,y;
+    int i;
+    int x;
+    int y;
 
-    x=unit->X;
-    y=unit->Y;
-    i=DoActionMove(unit);
+    x = unit->X;
+    y = unit->Y;
+    i = DoActionMove(unit);
     // We have to reset a lot, or else they will circle each other and stuff.
-    if (x!=unit->X||y!=unit->Y) {
-	unit->Orders[0].RangeX=1;
-	unit->Orders[0].RangeY=1;
+    if (x != unit->X || y != unit->Y) {
+	unit->Orders[0].RangeX = 1;
+	unit->Orders[0].RangeY = 1;
         NewResetPath(unit);
     }
     // New code has this as default.
-    DebugCheck( unit->Orders[0].Action!=UnitActionBoard );
+    DebugCheck(unit->Orders[0].Action != UnitActionBoard);
     return i;
 }
 
@@ -85,36 +87,36 @@ local int WaitForTransporter(Unit* unit)
 {
     Unit* trans;
 
-    unit->Wait=6;
-    unit->Reset=1;
+    unit->Wait = 6;
+    unit->Reset = 1;
 
-    trans=unit->Orders[0].Goal;
+    trans = unit->Orders[0].Goal;
 
-    if( !trans || !trans->Type->Transporter ) {
+    if (!trans || !trans->Type->Transporter) {
 	// FIXME: destination destroyed??
         DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n" _C_ unit->X _C_ unit->Y);
         return 0;
     }
 
-    if( trans->Destroyed ) {
+    if (trans->Destroyed) {
 	DebugLevel0Fn("Destroyed transporter\n");
-	RefsDebugCheck( !trans->Refs );
-	if( !--trans->Refs ) {
+	RefsDebugCheck(!trans->Refs);
+	if (!--trans->Refs) {
 	    ReleaseUnit(trans);
 	}
-	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].Goal = NoUnitP;
 	return 0;
-    } else if( trans->Removed ||
-	    !trans->HP || trans->Orders[0].Action==UnitActionDie ) {
+    } else if (trans->Removed ||
+	    !trans->HP || trans->Orders[0].Action == UnitActionDie) {
 	DebugLevel0Fn("Unusable transporter\n");
-	RefsDebugCheck( !trans->Refs );
+	RefsDebugCheck(!trans->Refs);
 	--trans->Refs;
-	RefsDebugCheck( !trans->Refs );
-	unit->Orders[0].Goal=NoUnitP;
+	RefsDebugCheck(!trans->Refs);
+	unit->Orders[0].Goal = NoUnitP;
 	return 0;
     }
 
-    if( MapDistanceBetweenUnits(unit,trans)==1 ) {
+    if (MapDistanceBetweenUnits(unit,trans) == 1) {
 	DebugLevel3Fn("Enter transporter\n");
 	return 1;
     }
@@ -129,11 +131,11 @@ local int WaitForTransporter(Unit* unit)
     //  is not there. The unit searches with a big range, so it thinks
     //  it's there. This is why we reset the search. The transporter
     //  should be a lot closer now, so it's not as bad as it seems.
-    unit->SubAction=0;
-    unit->Orders[0].RangeX=1;
-    unit->Orders[0].RangeY=1;
+    unit->SubAction = 0;
+    unit->Orders[0].RangeX = 1;
+    unit->Orders[0].RangeY = 1;
     //Uhh wait a bit.
-    unit->Wait=10;
+    unit->Wait = 10;
 
     return 0;
 }
@@ -147,47 +149,47 @@ local void EnterTransporter(Unit* unit)
 {
     Unit* transporter;
 
-    unit->Wait=1;
-    unit->Orders[0].Action=UnitActionStill;
-    unit->SubAction=0;
+    unit->Wait = 1;
+    unit->Orders[0].Action = UnitActionStill;
+    unit->SubAction = 0;
 
-    transporter=unit->Orders[0].Goal;
-    if( transporter->Destroyed ) {
+    transporter = unit->Orders[0].Goal;
+    if (transporter->Destroyed) {
 	DebugLevel0Fn("Destroyed transporter\n");
 	RefsDebugCheck( !transporter->Refs );
-	if( !--transporter->Refs ) {
+	if (!--transporter->Refs) {
 	    ReleaseUnit(transporter);
 	}
-	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].Goal = NoUnitP;
 	return;
-    } else if( transporter->Removed ||
-	    !transporter->HP || transporter->Orders[0].Action==UnitActionDie ) {
+    } else if (transporter->Removed ||
+	    !transporter->HP || transporter->Orders[0].Action == UnitActionDie) {
 	DebugLevel0Fn("Unuseable transporter\n");
-	RefsDebugCheck( !transporter->Refs );
+	RefsDebugCheck(!transporter->Refs);
 	--transporter->Refs;
-	RefsDebugCheck( !transporter->Refs );
-	unit->Orders[0].Goal=NoUnitP;
+	RefsDebugCheck(!transporter->Refs);
+	unit->Orders[0].Goal = NoUnitP;
 	return;
     }
 
-    RefsDebugCheck( !transporter->Refs );
+    RefsDebugCheck(!transporter->Refs);
     --transporter->Refs;
-    RefsDebugCheck( !transporter->Refs );
-    unit->Orders[0].Goal=NoUnitP;
+    RefsDebugCheck(!transporter->Refs);
+    unit->Orders[0].Goal = NoUnitP;
 
     //
     //		Place the unit inside the transporter.
     //
    
-    if (transporter->InsideCount<transporter->Type->MaxOnBoard) {
-    	RemoveUnit(unit,transporter);
+    if (transporter->InsideCount < transporter->Type->MaxOnBoard) {
+    	RemoveUnit(unit, transporter);
     	//Don't make anything funny after going out of the transporter.
     	// FIXME: This is probably wrong, but it works for me (n0b0dy)
-    	unit->OrderCount=1;
-    	unit->Orders[0].Action=UnitActionStill;
-    	if( IsOnlySelected(transporter) ) {
+    	unit->OrderCount = 1;
+    	unit->Orders[0].Action = UnitActionStill;
+    	if (IsOnlySelected(transporter)) {
 	    SelectedUnitChanged();
-	    MustRedraw|=RedrawInfoPanel;
+	    MustRedraw |= RedrawInfoPanel;
 	}
 	return;
     }
@@ -207,18 +209,18 @@ global void HandleActionBoard(Unit* unit)
     int i;
     Unit* goal;
 
-    DebugLevel3Fn("%p(%d) SubAction %d\n"
-	    _C_ unit _C_ UnitNumber(unit) _C_ unit->SubAction);
+    DebugLevel3Fn("%p(%d) SubAction %d\n" _C_
+	unit _C_ UnitNumber(unit) _C_ unit->SubAction);
 
-    switch( unit->SubAction ) {
+    switch (unit->SubAction) {
 	//
 	//	Wait for transporter
 	//
 	case 201:
 	    // FIXME: show still animations
 	    DebugLevel3Fn("Waiting\n");
-	    if( WaitForTransporter(unit) ) {
-		unit->SubAction=202;
+	    if (WaitForTransporter(unit)) {
+		unit->SubAction = 202;
 	    }
 	    break;
 	//
@@ -231,40 +233,40 @@ global void HandleActionBoard(Unit* unit)
 	//	Move to transporter
 	//
 	case 0:
-		NewResetPath(unit);
-		unit->SubAction=1;
-		// FALL THROUGH
+	    NewResetPath(unit);
+	    unit->SubAction = 1;
+	    // FALL THROUGH
         default:
-	    if( unit->SubAction<=200 ) {
+	    if (unit->SubAction <= 200) {
 		// FIXME: if near transporter wait for enter
-		if( (i=MoveToTransporter(unit)) ) {
-		    if( i==PF_UNREACHABLE ) {
-			if( ++unit->SubAction==200 ) {
-			    unit->Orders[0].Action=UnitActionStill;
-			    if( (goal=unit->Orders[0].Goal) ) {
+		if ((i = MoveToTransporter(unit))) {
+		    if (i == PF_UNREACHABLE) {
+			if (++unit->SubAction == 200) {
+			    unit->Orders[0].Action = UnitActionStill;
+			    if ((goal = unit->Orders[0].Goal)) {
 				RefsDebugCheck(!goal->Refs);
-				if( !--goal->Refs ) {
+				if (!--goal->Refs) {
 				    RefsDebugCheck(!goal->Destroyed);
-				    if( goal->Destroyed ) {
+				    if (goal->Destroyed) {
 					ReleaseUnit(goal);
 				    }
 				}
-				unit->Orders[0].Goal=NoUnitP;
+				unit->Orders[0].Goal = NoUnitP;
 			    }
-			    unit->SubAction=0;
+			    unit->SubAction = 0;
 			} else {
                             //
                             // Try with a bigger range.
                             //
-                            if( unit->Orders[0].RangeX <= TheMap.Width
-                 	        || unit->Orders[0].RangeX <= TheMap.Height) {
+                            if (unit->Orders[0].RangeX <= TheMap.Width ||
+				    unit->Orders[0].RangeX <= TheMap.Height) {
 		                unit->Orders[0].RangeX++;
 		                unit->Orders[0].RangeY++;
                                 unit->SubAction--;
                             }
 			}
-		    } else if( i==PF_REACHED ) {
-			unit->SubAction=201;
+		    } else if (i == PF_REACHED) {
+			unit->SubAction = 201;
 		    }
 		}
 	    }

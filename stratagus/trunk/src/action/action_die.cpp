@@ -58,20 +58,20 @@ global void HandleActionDie(Unit* unit)
     //
     //	Show death animation
     //
-    if( unit->Type->Animations && unit->Type->Animations->Die ) {
-	UnitShowAnimation(unit,unit->Type->Animations->Die);
+    if (unit->Type->Animations && unit->Type->Animations->Die) {
+	UnitShowAnimation(unit, unit->Type->Animations->Die);
     } else {
 	// some units has no death animation
-	unit->Reset=unit->Wait=1;
+	unit->Reset = unit->Wait = 1;
     }
 
     //
     //	Die sequence terminated, generate corpse.
     //
-    if( unit->Reset ) {
+    if (unit->Reset) {
 	DebugLevel3("Die complete %d\n" _C_ UnitNumber(unit));
 
-	if( !unit->Type->CorpseType ) {
+	if (!unit->Type->CorpseType) {
 	    UnitMarkSeen(unit);
 	    ReleaseUnit(unit);
 	    return;
@@ -81,24 +81,24 @@ global void HandleActionDie(Unit* unit)
 	MapUnmarkUnitSight(unit);
 	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
 
-	unit->State=unit->Type->CorpseScript;
-	unit->Type=unit->Type->CorpseType;
+	unit->State = unit->Type->CorpseScript;
+	unit->Type = unit->Type->CorpseType;
         
 	CommandStopUnit(unit);		// This clears all order queues
-	IfDebug(
-	    if( unit->Orders[0].Action!=UnitActionDie ) {
-		DebugLevel0Fn("Reset to die is really needed\n");
-	    }
-	);
-	unit->Orders[0].Action=UnitActionDie;
+#ifdef DEBUG
+	if (unit->Orders[0].Action != UnitActionDie) {
+	    DebugLevel0Fn("Reset to die is really needed\n");
+	}
+#endif
+	unit->Orders[0].Action = UnitActionDie;
 	--unit->OrderCount;		// remove the stop command
-	unit->SubAction=0;
-	unit->Frame=0;
+	unit->SubAction = 0;
+	unit->Frame = 0;
 	UnitUpdateHeading(unit);
-	UnitShowAnimation(unit,unit->Type->Animations->Die);
+	UnitShowAnimation(unit, unit->Type->Animations->Die);
 
 	// FIXME: perhaps later or never is better
-	//ChangeUnitOwner(unit,&Players[PlayerNumNeutral]);
+	//ChangeUnitOwner(unit, &Players[PlayerNumNeutral]);
     }
     UnitMarkSeen(unit);
 }
