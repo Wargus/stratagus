@@ -980,6 +980,99 @@ global void DrawMenu(Menu *menu)
 }
 
 /**
+**	Paste text from the clipboard
+*/
+local void PasteFromClipboard(Menuitem *mi)
+{
+#if defined(USE_WIN32) || defined(_XLIB_H_)
+    int i;
+    char *clipboard;
+#ifdef USE_WIN32
+    HGLOBAL handle;
+#elif defined(_XLIB_H_)
+    Display *display;
+    Window window;
+    Atom rettype;
+    unsigned long nitem;
+    unsigned long dummy;
+    int retform;
+    XEvent event;
+#endif
+
+#ifdef USE_WIN32
+    if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
+	return;
+    }
+    handle = GetClipboardData(CF_TEXT);
+    if (!handle) {
+	CloseClipboard();
+	return;
+    }
+    clipboard = GlobalLock(handle);
+    if (!clipboard) {
+	CloseClipboard();
+	return;
+    }
+#elif defined(_XLIB_H_)
+    if (!(display = XOpenDisplay(NULL))) {
+	return;
+    }
+
+    // Creates a non maped temporary X window to hold the selection
+    if (!(window = XCreateSimpleWindow(display, 
+	    DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
+	XCloseDisplay(display);
+	return;
+    }
+
+    XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
+	window, CurrentTime);
+
+    XNextEvent(display, &event);
+
+    if (event.type != SelectionNotify || 
+	    event.xselection.property != XA_STRING) {
+	return;
+    }
+
+    XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
+	XA_STRING, &rettype, &retform, &nitem, &dummy, 
+	(unsigned char **)&clipboard);
+
+    XDestroyWindow(display, window);
+    XCloseDisplay(display);
+
+    if (rettype != XA_STRING || retform != 8) {
+	if (clipboard != NULL) {
+	    XFree(clipboard);
+	}
+	clipboard = NULL;
+    }
+
+    if (clipboard == NULL) {
+	return;
+    }
+#endif
+    for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
+	if (clipboard[i] >= 32 && clipboard[i] < 0x100 && clipboard[i] != '~') {
+	    mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
+	    ++mi->d.input.nch;
+	}
+    }
+    strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+#ifdef USE_WIN32
+    GlobalUnlock(handle);
+    CloseClipboard();
+#elif defined(_XLIB_H_)
+    if (clipboard != NULL) {
+	XFree(clipboard);
+    }
+#endif
+    MustRedraw |= RedrawMenu;
+#endif
+}
+
+/**
 **	Handle keys in menu mode.
 **
 **	@param key	Key scancode.
@@ -1029,17 +1122,23 @@ inkey:
 		    return;		// Just ignore them
 		case KeyCodeDelete:
 		    mi->d.input.nch = 0;
-		    mi->d.input.buffer[0] = '\0';
+		    strcpy(mi->d.input.buffer, "~!_");
 		    MustRedraw |= RedrawMenu;
 		    break;
-		case 'x':
-		case 'X':
-		    if( (KeyModifiers&ModifierAlt) ) {
-			goto normkey;
-		    }
-		    /* FALL THROUGH */
 		default:
-		    if (key >= 32 && key < 0x100) {
+		    if (KeyModifiers&ModifierAlt) {
+			if (key == 'x' || key == 'X') {
+			    goto normkey;
+			}
+		    } else if (KeyModifiers&ModifierControl) {
+			if (key == 'v' || key == 'V') {
+			    PasteFromClipboard(mi);
+			} else if (key == 'u' || key == 'U') {
+			    mi->d.input.nch = 0;
+			    strcpy(mi->d.input.buffer, "~!_");
+			    MustRedraw |= RedrawMenu;
+			}
+		    } else if (key >= 32 && key < 0x100) {
 			if (mi->d.input.nch < mi->d.input.maxch) {
 			    mi->d.input.buffer[mi->d.input.nch++] = keychar;
 			    strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
@@ -1636,21 +1735,6 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu;
-#if defined(USE_WIN32) || defined(_XLIB_H_)
-    int i;
-    char *clipboard;
-#ifdef USE_WIN32
-    HGLOBAL handle;
-#elif defined(_XLIB_H_)
-    Display *display;
-    Window window;
-    Atom rettype;
-    unsigned long nitem;
-    unsigned long dummy;
-    int retform;
-    XEvent event;
-#endif
-#endif
 
     if (CurrentMenu == NULL) {
 	return;
@@ -1727,78 +1811,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_INPUT:
-#if defined(USE_WIN32) || defined(_XLIB_H_)
-#ifdef USE_WIN32
-			if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
-			    break;
-			}
-			handle = GetClipboardData(CF_TEXT);
-			if (!handle) {
-			    CloseClipboard();
-			    break;
-			}
-			clipboard = GlobalLock(handle);
-			if (!clipboard) {
-			    CloseClipboard();
-			    break;
-			}
-#elif defined(_XLIB_H_)
-			if (!(display = XOpenDisplay(NULL))) {
-			    break;
-			}
-
-			// Creates a non maped temporary X window to hold the selection
-			if (!(window = XCreateSimpleWindow(display, 
-				DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
-			    XCloseDisplay(display);
-			    break;
-			}
-
-			XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
-			    window, CurrentTime);
-
-			XNextEvent(display, &event);
-
-			if (event.type != SelectionNotify || 
-				event.xselection.property != XA_STRING) {
-			    break;
-			}
-
-			XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
-			    XA_STRING, &rettype, &retform, &nitem, &dummy, 
-			    (unsigned char **)&clipboard);
-
-			XDestroyWindow(display, window);
-			XCloseDisplay(display);
-
-			if (rettype != XA_STRING || retform != 8) {
-			    if (clipboard != NULL) {
-				XFree(clipboard);
-			    }
-			    clipboard = NULL;
-			}
-
-			if (clipboard == NULL) {
-			    break;
-			}
-#endif
-			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
-			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
-				mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
-				++mi->d.input.nch;
-			    }
-			}
-			strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
-#ifdef USE_WIN32
-			GlobalUnlock(handle);
-			CloseClipboard();
-#elif defined(_XLIB_H_)
-			if (clipboard != NULL) {
-			    XFree(clipboard);
-			}
-#endif
-			MustRedraw |= RedrawMenu;
-#endif
+			PasteFromClipboard(mi);
 			break;
 		    default:
 			break;
