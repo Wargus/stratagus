@@ -150,6 +150,9 @@ global void LoadMissileSprites(void)
     int i;
     const char* file;
 
+    if (!MissileTypes) {
+	return;
+    }
     for (i = 0; MissileTypes[i].OType; ++i) {
 	if ((file = MissileTypes[i].File)) {
 	    char* buf;
@@ -1450,6 +1453,9 @@ global void InitMissileTypes(void)
 {
     MissileType* mtype;
 
+    if (!MissileTypes) {
+	return;
+    }
     for (mtype = MissileTypes; mtype->OType; ++mtype) {
 	//
 	//	Add missile names to hash table
