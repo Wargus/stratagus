@@ -196,62 +196,75 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
 
     GetDefaultTextColors(&nc, &rc);
     if (button == MBUTTON_SC_BUTTON) {
+	SysColors color;
+
+	// FIXME: colors have to be configurable
+
+	color = 123;
 	// Outer circle
-	VideoDrawHLineClip(ColorBlue,x+3,y,w-6);
-	VideoDrawHLineClip(ColorBlue,x+3,y+h-1,w-6);
-	VideoDrawVLineClip(ColorBlue,x,y+3,h-6);
-	VideoDrawVLineClip(ColorBlue,x+w-1,y+3,h-6);
+	VideoDrawHLineClip(color,x+3,y,w-6);
+	VideoDrawHLineClip(color,x+3,y+h-1,w-6);
+	VideoDrawVLineClip(color,x,y+3,h-6);
+	VideoDrawVLineClip(color,x+w-1,y+3,h-6);
 	// top left
-	VideoDrawPixelClip(ColorBlue,x+1,y+1);
-	VideoDrawPixelClip(ColorBlue,x+2,y+1);
-	VideoDrawPixelClip(ColorBlue,x+1,y+2);
+	VideoDrawPixelClip(color,x+1,y+1);
+	VideoDrawPixelClip(color,x+2,y+1);
+	VideoDrawPixelClip(color,x+1,y+2);
 	// top right
-	VideoDrawPixelClip(ColorBlue,x+w-3,y+1);
-	VideoDrawPixelClip(ColorBlue,x+w-2,y+1);
-	VideoDrawPixelClip(ColorBlue,x+w-2,y+2);
+	VideoDrawPixelClip(color,x+w-3,y+1);
+	VideoDrawPixelClip(color,x+w-2,y+1);
+	VideoDrawPixelClip(color,x+w-2,y+2);
 	// bottom left
-	VideoDrawPixelClip(ColorBlue,x+1,y+h-3);
-	VideoDrawPixelClip(ColorBlue,x+1,y+h-2);
-	VideoDrawPixelClip(ColorBlue,x+2,y+h-2);
+	VideoDrawPixelClip(color,x+1,y+h-3);
+	VideoDrawPixelClip(color,x+1,y+h-2);
+	VideoDrawPixelClip(color,x+2,y+h-2);
 	// bottom right
-	VideoDrawPixelClip(ColorBlue,x+w-3,y+h-2);
-	VideoDrawPixelClip(ColorBlue,x+w-2,y+h-2);
-	VideoDrawPixelClip(ColorBlue,x+w-2,y+h-3);
+	VideoDrawPixelClip(color,x+w-3,y+h-2);
+	VideoDrawPixelClip(color,x+w-2,y+h-2);
+	VideoDrawPixelClip(color,x+w-2,y+h-3);
 
 	// Inner circle
-	VideoDrawHLineClip(ColorBlue,x+8,y+3,w-16);
-	VideoDrawHLineClip(ColorBlue,x+8,y+h-4,w-16);
-	VideoDrawVLineClip(ColorBlue,x+4,y+7,h-14);
-	VideoDrawVLineClip(ColorBlue,x+w-5,y+7,h-14);
+	if (flags&MenuButtonClicked) {
+	    color = 199;
+	} else {
+	    color = 123;
+	}
+	VideoDrawHLineClip(color,x+8,y+3,w-16);
+	VideoDrawHLineClip(color,x+8,y+h-4,w-16);
+	VideoDrawVLineClip(color,x+4,y+7,h-14);
+	VideoDrawVLineClip(color,x+w-5,y+7,h-14);
 	// top left
-	VideoDrawPixelClip(ColorBlue,x+6,y+4);
-	VideoDrawPixelClip(ColorBlue,x+7,y+4);
-	VideoDrawPixelClip(ColorBlue,x+5,y+5);
-	VideoDrawPixelClip(ColorBlue,x+5,y+6);
+	VideoDrawPixelClip(color,x+6,y+4);
+	VideoDrawPixelClip(color,x+7,y+4);
+	VideoDrawPixelClip(color,x+5,y+5);
+	VideoDrawPixelClip(color,x+5,y+6);
 	// top right
-	VideoDrawPixelClip(ColorBlue,x+w-8,y+4);
-	VideoDrawPixelClip(ColorBlue,x+w-7,y+4);
-	VideoDrawPixelClip(ColorBlue,x+w-6,y+5);
-	VideoDrawPixelClip(ColorBlue,x+w-6,y+6);
+	VideoDrawPixelClip(color,x+w-8,y+4);
+	VideoDrawPixelClip(color,x+w-7,y+4);
+	VideoDrawPixelClip(color,x+w-6,y+5);
+	VideoDrawPixelClip(color,x+w-6,y+6);
 	// bottom left
-	VideoDrawPixelClip(ColorBlue,x+5,y+h-7);
-	VideoDrawPixelClip(ColorBlue,x+5,y+h-6);
-	VideoDrawPixelClip(ColorBlue,x+6,y+h-5);
-	VideoDrawPixelClip(ColorBlue,x+7,y+h-5);
+	VideoDrawPixelClip(color,x+5,y+h-7);
+	VideoDrawPixelClip(color,x+5,y+h-6);
+	VideoDrawPixelClip(color,x+6,y+h-5);
+	VideoDrawPixelClip(color,x+7,y+h-5);
 	// bottom right
-	VideoDrawPixelClip(ColorBlue,x+w-6,y+h-7);
-	VideoDrawPixelClip(ColorBlue,x+w-6,y+h-6);
-	VideoDrawPixelClip(ColorBlue,x+w-8,y+h-5);
-	VideoDrawPixelClip(ColorBlue,x+w-7,y+h-5);
+	VideoDrawPixelClip(color,x+w-6,y+h-7);
+	VideoDrawPixelClip(color,x+w-6,y+h-6);
+	VideoDrawPixelClip(color,x+w-8,y+h-5);
+	VideoDrawPixelClip(color,x+w-7,y+h-5);
 
 	if (text) {
+	    if (flags&MenuButtonActive) {
+		SetDefaultTextColors(rc,rc);
+	    }
 	    VideoDrawTextCentered(x+w/2,y+(h-VideoTextHeight(font))/2,font,text);
 	}
 	if (flags&MenuButtonSelected) {
 	    if (flags&MenuButtonDisabled) {
 		VideoDrawRectangleClip(ColorGray,x,y,w-1,h);
 	    } else {
-		VideoDrawRectangleClip(ColorBlue,x,y,w-1,h);
+		VideoDrawRectangleClip(165,x,y,w-1,h);
 	    }
 	}
     } else {
