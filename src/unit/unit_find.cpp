@@ -10,7 +10,7 @@
 //
 /**@name unit_find.c	-	The find/select for units. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -646,7 +646,7 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 **      @note   Limited to attack range smaller than 16.
 **	@note	Will be moved to unit_ai.c soon.
 */
-local Unit* FindRangeAttack(const Unit* u, int range)
+local Unit* FindRangeAttack(Unit* u, int range)
 {
     int x, y, n, cost,d,effective_hp,enemy_count;
     int missile_range,attackrange,hp_damage_evaluate;
@@ -898,7 +898,7 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 **
 **	@note	This could be improved, for better performance.
 */
-global Unit* AttackUnitsInDistance(const Unit* unit,int range)
+global Unit* AttackUnitsInDistance(Unit* unit,int range)
 {
     const Unit* dest;
     const UnitType* type;
@@ -1022,7 +1022,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,int range)
 **
 **	@return		Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInRange(const Unit* unit)
+global Unit* AttackUnitsInRange(Unit* unit)
 {
     //
     //	Only units which can attack.
@@ -1046,7 +1046,7 @@ global Unit* AttackUnitsInRange(const Unit* unit)
 **
 **	@return		Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInReactRange(const Unit* unit)
+global Unit* AttackUnitsInReactRange(Unit* unit)
 {
     int range;
     const UnitType* type;
