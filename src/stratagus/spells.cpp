@@ -706,7 +706,7 @@ global int CastAdjustBuffs(Unit *caster, const SpellType *spell, Unit *target,
     // get mana cost
     caster->Mana -= spell->ManaCost;
 
-    if (spell->Action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+    if (spell->Action->Data.AdjustBuffs.HasteTicks!=BUFF_NOT_AFFECTED) {
 	target->Haste=spell->Action->Data.AdjustBuffs.HasteTicks;
     }
     if (spell->Action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
@@ -790,7 +790,7 @@ global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(castcount<0);
 
-    DebugLevel0Fn("Used to have %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
+    DebugLevel3Fn("Used to have %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
 
     caster->Mana-=castcount*manacost;
     if (hp < 0) {
@@ -809,7 +809,7 @@ global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
 	target->Mana=target->Type->_MaxMana;
     }
 
-    DebugLevel0Fn("Unit now has %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
+    DebugLevel3Fn("Unit now has %d hp and %d mana.\n" _C_ target->HP _C_ target->Mana);
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
@@ -1185,7 +1185,7 @@ local int PassCondition(const Unit* caster,const SpellType* spell,const Unit* ta
 	    }
 	}
 	if (condition->Alliance!=CONDITION_TRUE) {
-	    if ((condition->Alliance==CONDITION_ONLY)^(IsAllied(caster->Player,target))) {
+	    if ((condition->Alliance==CONDITION_ONLY)^(IsAllied(caster->Player,target)||target->Player==caster->Player)) {
 		return 0;
 	    }
 	}
@@ -1197,19 +1197,39 @@ local int PassCondition(const Unit* caster,const SpellType* spell,const Unit* ta
 	//
 	//	Check vitals now.
 	//
-	if (condition->MinHpPercent*target->Stats->HitPoints>target->HP) {
+	if (condition->MinHpPercent*target->Stats->HitPoints/100>target->HP) {
 	    return 0;
 	}
-	if (condition->MaxHpPercent*target->Stats->HitPoints<target->HP) {
+	if (condition->MaxHpPercent*target->Stats->HitPoints/100<=target->HP) {
 	    return 0;
 	}
 	if (target->Type->CanCastSpell) {
-	    if (condition->MinManaPercent*target->Type->_MaxMana>target->Mana) {
+	    if (condition->MinManaPercent*target->Type->_MaxMana/100>target->Mana) {
 		return 0;
 	    }
-	    if (condition->MaxManaPercent*target->Type->_MaxMana<target->Mana) {
+	    if (condition->MaxManaPercent*target->Type->_MaxMana/100<target->Mana) {
 		return 0;
 	    }
+	}
+	//
+	//	Check for slow/haste stuff
+	//	This should be used mostly for ai, if you want to keep casting
+	//	slow to no effect I can't see why should we stop you.
+	//
+	if (condition->MaxSlowTicks<target->Slow) {
+	    return 0;
+	}
+	if (condition->MaxHasteTicks<target->Haste) {
+	    return 0;
+	}
+	if (condition->MaxBloodlustTicks<target->Bloodlust) {
+	    return 0;
+	}
+	if (condition->MaxInvisibilityTicks<target->Invisible) {
+	    return 0;
+	}
+	if (condition->MaxInvincibilityTicks<target->UnholyArmor) {
+	    return 0;
 	}
     }
     return 1;
@@ -1231,59 +1251,98 @@ local Target *SelectTargetUnitsOfAutoCast(const Unit *caster, const SpellType *s
     int x;
     int y;
     int range;
-    int nb_units;
+    int nunits;
     int i;
     int j;
+    int combat;
 
     DebugCheck(!spell);
     DebugCheck(!spell->AutoCast);
     DebugCheck(!caster);
 
+    x=caster->X;
+    y=caster->Y;
+    range=spell->AutoCast->Range;
+
+    //
+    //	Select all units aroung the caster
+    //
+    nunits = SelectUnits(caster->X - range, caster->Y - range,
+	    caster->X + range + caster->Type->TileWidth, caster->Y + range + caster->Type->TileHeight, table);
+    //
+    //  Check every unit if it is hostile
+    // 
+    combat=0;
+    for (i = 0; i < nunits; i++) {
+	if (IsEnemy(caster->Player,table[i]) && !table[i]->Type->Coward) {
+	    combat=1;
+	}
+    }
+
+    //
+    //	Check generic conditions. FIXME: a better way to do this?
+    //
+    if (spell->AutoCast->Combat!=CONDITION_TRUE) {
+	if ((spell->AutoCast->Combat==CONDITION_ONLY)^(combat)) {
+	    return 0;
+	}
+    }
+
     switch (spell->Target) {
-	case TargetSelf :
-	    return NewTargetUnit(caster);
 	case TargetNone :
+	    // TargetNone?
 	    return NewTargetNone();
+	case TargetSelf :
+	    if (PassCondition(caster, spell, caster, x, y, spell->Conditions) &&
+		    PassCondition(caster, spell, caster, x, y, spell->AutoCast->Condition)) {
+    	        return NewTargetUnit(caster);
+    	    }
+	    return 0;
 	case TargetPosition:
-	    range = spell->AutoCast->Range;
-	    do {
-		x = caster->X + SyncRand() % (2 * range) - range;
-		y = caster->Y + SyncRand() % (2 * range) - range;
-	    } while (x < 0 && x <= TheMap.Width
-			    && y < 0 && y <= TheMap.Height);
-	    
-	    // FIXME : CHOOSE a better POSITION (add info in structure ???)
-	    // Just good enough for holyvision...
-	    return NewTargetPosition(x, y);
+	    return 0;
+	    //  Autocast with a position? That's hard
+	    //  Possibilities: cast reveal-map on a dark region
+	    //  Cast raise dead on a bunch of corpses. That would rule.
+	    //  Cast summon until out of mana in the heat of battle. Trivial?
+	    //  Find a tight group of units and cast area-damage spells. HARD,
+	    //  but it is a must-have for AI. What about area-heal?
 	case TargetUnit:
-	    x=caster->X;
-	    y=caster->Y;
-	    range=spell->AutoCast->Range;
-	    // ( + 1) would be ( + caster->size) ??
-	    nb_units = SelectUnits(caster->X - range, caster->Y - range,
-		caster->X + range + 1, caster->Y + range + 1,table);
-	    // For all Unit, check if it is a possible target
-	    for (i = 0, j = 0; i < nb_units; i++) {
-		if (PassCondition(caster,spell,table[i],x,y,spell->Conditions)) {
-			table[j++] = table[i];
+	    //
+	    //	The units are already selected.
+	    //  Check every unit if it is a possible target
+	    // 
+	    for (i = 0, j = 0; i < nunits; i++) {
+		//  FIXME: autocast conditions should include normal conditions.
+		//  FIXME: no, really, they should.
+		if (PassCondition(caster, spell, table[i], x, y, spell->Conditions) &&
+			PassCondition(caster, spell, table[i], x, y, spell->AutoCast->Condition)) {
+		    table[j++] = table[i];
 		}
 	    }
-	    nb_units = j;
-	    if (nb_units != 0) {
+	    nunits = j;
+	    //	
+	    //	Now select the best unit to target.
+	    //	FIXME: Some really smart way to do this. 
+	    //	FIXME: Heal the unit with the lowest hit-points
+	    //	FIXME: Bloodlust the unit with the highest hit-point
+	    //	FIMXE: it will survive more
+	    //
+	    if (nunits != 0) {
 #if 0
-// For the best target
+		// For the best target???
 		sort(table, nb_units, spell->autocast->f_order);
 		return NewTargetUnit(table[0]);
 #else
-// For a random valid target
-		i = SyncRand() % nb_units;
+		//	Best unit, random unit, oh well, same stuff.
+		i = SyncRand() % nunits;
 		return NewTargetUnit(table[i]);
 #endif
 	    }
 	    break;
 	default:
-	    // Error : add the new cases
-	    // FIXME : Warn developpers
+	    // Something is wrong
+	    DebugLevel0Fn("Spell is screwed up, unknown target type\n");
+	    DebugCheck(1);
 	    return NULL;
 	    break;
 	}
@@ -1473,9 +1532,10 @@ global int AutoCastSpell(Unit *caster, const SpellType *spell)
 
     target = NULL;
 
-/*    if (PassCondition(caster,spell,target,x,y,spell->Conditions))
+    //  Check for mana, trivial optimization.
+    if (caster->Mana<spell->ManaCost) {
 	return 0;
-    }*/
+    }
     target = SelectTargetUnitsOfAutoCast(caster, spell);
     if (target == NULL) {
 	return 0;
