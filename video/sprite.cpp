@@ -451,7 +451,7 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 /**
 **  Make shadow sprite
 **
-**  @param graphic  pointer to object
+**  @param g  pointer to object
 **
 **  @todo FIXME: 32bpp
 */
