@@ -411,7 +411,7 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     unsigned char* matrix;
     int depth;
 
-    DebugLevel2Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
+    DebugLevel3Fn("%Zd(%d,%d,%s)->%Zd(%d,%d,%s) "
 	,UnitNumber(src),src->X,src->Y,src->Type->Ident
 	,UnitNumber(dst),dst->X,dst->Y,dst->Type->Ident);
 
@@ -425,10 +425,10 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
     //	Find a path to the goal.
     //
     if( (depth=MarkPathInMatrix(src,matrix))<0 ) {
-	DebugLevel2("NO WAY\n");
+	DebugLevel3("NO WAY\n");
 	return 0;
     }
-    DebugLevel2("OK\n");
+    DebugLevel3("OK\n");
 
     return depth;
 }
