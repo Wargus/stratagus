@@ -499,6 +499,7 @@ global volatile void Exit(int err)
 	extern unsigned PfCounterNotReachable;
     );
 
+    QuitSound();
     NetworkQuit();
     DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
 	,FrameCounter,SlowFrameCounter
