@@ -78,7 +78,7 @@ local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* locatio
 	    } else if (gh_eq_p(gh_car(list), gh_symbol2scm("target"))) {
 		location->Base = LocBaseTarget;
 	    } else {
-		errl("Unsupported missile location base flag.\n",gh_car(list));
+		errl("Unsupported missile location base flag", gh_car(list));
 	    }
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("add-x"))) {
@@ -94,11 +94,67 @@ local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* locatio
 	    location->AddRandY = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else {
-	    errl("Unsupported missile location description flag.\n",value);
+	    errl("Unsupported missile location description flag", value);
 	}
     }
 }
 #elif defined(USE_LUA)
+local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* location)
+{
+    const char* value;
+    int args;
+    int j;
+
+    DebugCheck(location == NULL);
+    memset(location, 0, sizeof(*location));
+    //list = gh_cdr(list);
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    j = 0;
+
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	value = LuaToString(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "base")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    if (!strcmp(value, "caster")) {
+		location->Base = LocBaseCaster;
+	    } else if (!strcmp(value, "target")) {
+		location->Base = LocBaseTarget;
+	    } else {
+		lua_pushfstring(l, "Unsupported missile location base flag: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "add-x")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    location->AddX = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "add-y")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    location->AddY = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "add-rand-x")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    location->AddRandX = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "add-rand-y")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    location->AddRandY = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported missile location description flag: %s",value);
+	    lua_error(l);
+	}
+    }
+}
 #endif
 
 /**
@@ -136,13 +192,13 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		spellaction->Data.SpawnMissile.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("start-point"))) {
-		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.StartPoint);
+		CclSpellMissileLocation(gh_car(list), &spellaction->Data.SpawnMissile.StartPoint);
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("end-point"))) {
-		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.EndPoint);
+		CclSpellMissileLocation(gh_car(list), &spellaction->Data.SpawnMissile.EndPoint);
 		list = gh_cdr(list);
 	    } else {
-		errl("Unsupported area-bombardment tag", value);
+		errl("Unsupported spawn-missile tag", value);
 	    }
 	}
     } else if (gh_eq_p(value, gh_symbol2scm("area-adjust-vitals"))) {
@@ -213,16 +269,16 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		spellaction->Data.AdjustBuffs.HasteTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("slow-ticks"))) {
-		spellaction->Data.AdjustBuffs.SlowTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.SlowTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("bloodlust-ticks"))) {
-		spellaction->Data.AdjustBuffs.BloodlustTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.BloodlustTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("invisibility-ticks"))) {
-		spellaction->Data.AdjustBuffs.InvisibilityTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.InvisibilityTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("invincibility-ticks"))) {
-		spellaction->Data.AdjustBuffs.InvincibilityTicks  = gh_scm2int(gh_car(list));
+		spellaction->Data.AdjustBuffs.InvincibilityTicks = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported adjust-buffs tag", value);
@@ -283,7 +339,7 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		}
 		free(str);
 		list = gh_cdr(list);
-		//FIXME : temp polymorphs? hard to do.
+		// FIXME: temp polymorphs? hard to do.
 	    } else {
 		errl("Unsupported polymorph tag", value);
 	    }
@@ -313,53 +369,72 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 #elif defined(USE_LUA)
 local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 {
-    char* str;
     const char* value;
     int args;
     int j;
 
-#if 0
-    value = gh_car(list);
-    list = gh_cdr(list);
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    j = 0;
+
+    lua_rawgeti(l, -1, j + 1);
+    value = LuaToString(l, -1);
+    lua_pop(l, 1);
+    ++j;
 
     if (!strcmp(value, "spawn-missile")) {
 	spellaction->CastFunction = CastSpawnMissile;
 	spellaction->Data.SpawnMissile.StartPoint.Base = LocBaseCaster;
 	spellaction->Data.SpawnMissile.EndPoint.Base = LocBaseTarget;
 	spellaction->Data.SpawnMissile.TTL = -1;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "damage")) {
-		spellaction->Data.SpawnMissile.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.SpawnMissile.Damage = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "delay")) {
-		spellaction->Data.SpawnMissile.Delay = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.SpawnMissile.Delay = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "ttl")) {
-		spellaction->Data.SpawnMissile.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.SpawnMissile.TTL = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "start-point")) {
-		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.StartPoint);
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		CclSpellMissileLocation(l, &spellaction->Data.SpawnMissile.StartPoint);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "end-point")) {
-		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.EndPoint);
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		CclSpellMissileLocation(l, &spellaction->Data.SpawnMissile.EndPoint);
+		lua_pop(l, 1);
 	    } else {
-		errl("Unsupported area-bombardment tag", value);
+		lua_pushfstring(l, "Unsupported spawn-missile tag: %s", value);
+		lua_error(l);
 	    }
 	}
     } else if (!strcmp(value, "area-adjust-vitals")) {
 	spellaction->CastFunction = CastAreaAdjustVitals;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "hit-points")) {
-		spellaction->Data.AreaAdjustVitals.HP = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaAdjustVitals.HP = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "mana-points")) {
-		spellaction->Data.AreaAdjustVitals.Mana = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaAdjustVitals.Mana = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else {
 		lua_pushfstring(l, "Unsupported area-adjust-vitals tag: %s", value);
 		lua_error(l);
@@ -367,39 +442,51 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	}
     } else if (!strcmp(value, "area-bombardment")) {
 	spellaction->CastFunction = CastAreaBombardment;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "fields")) {
-		spellaction->Data.AreaBombardment.Fields = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaBombardment.Fields = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "shards")) {
-		spellaction->Data.AreaBombardment.Shards = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaBombardment.Shards = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "damage")) {
-		spellaction->Data.AreaBombardment.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaBombardment.Damage = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "start-offset-x")) {
-		spellaction->Data.AreaBombardment.StartOffsetX = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaBombardment.StartOffsetX = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "start-offset-y")) {
-		spellaction->Data.AreaBombardment.StartOffsetY = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AreaBombardment.StartOffsetY = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else {
-		errl("Unsupported area-bombardment tag", value);
+		lua_pushfstring(l, "Unsupported area-bombardment tag: %s", value);
+		lua_error(l);
 	    }
 	}
     } else if (!strcmp(value, "demolish")) {
 	spellaction->CastFunction = CastDemolish;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (!strcmp(value, gh_symbol2scm("range"))) {
-		spellaction->Data.Demolish.Range = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else if (!strcmp(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Demolish.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
+	    if (!strcmp(value, "range")) {
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.Demolish.Range = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else if (!strcmp(value, "damage")) {
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.Demolish.Damage = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else {
 		lua_pushfstring(l, "Unsupported demolish tag: %s", value);
 		lua_error(l);
@@ -412,24 +499,31 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	spellaction->Data.AdjustBuffs.BloodlustTicks = BUFF_NOT_AFFECTED;
 	spellaction->Data.AdjustBuffs.InvisibilityTicks = BUFF_NOT_AFFECTED;
 	spellaction->Data.AdjustBuffs.InvincibilityTicks = BUFF_NOT_AFFECTED;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "haste-ticks")) {
-		spellaction->Data.AdjustBuffs.HasteTicks = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustBuffs.HasteTicks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "slow-ticks")) {
-		spellaction->Data.AdjustBuffs.SlowTicks  = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustBuffs.SlowTicks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "bloodlust-ticks")) {
-		spellaction->Data.AdjustBuffs.BloodlustTicks  = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustBuffs.BloodlustTicks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "invisibility-ticks")) {
-		spellaction->Data.AdjustBuffs.InvisibilityTicks  = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustBuffs.InvisibilityTicks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "invincibility-ticks")) {
-		spellaction->Data.AdjustBuffs.InvincibilityTicks  = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustBuffs.InvincibilityTicks = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else {
 		lua_pushfstring(l, "Unsupported adjust-buffs tag: %s", value);
 		lua_error(l);
@@ -437,23 +531,27 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	}
     } else if (!strcmp(value, "summon")) {
 	spellaction->CastFunction = CastSummon;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "unit-type")) {
-		str = gh_scm2newstr(gh_car(list), 0);
-		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(value);
 		if (!spellaction->Data.Summon.UnitType) {
 		    spellaction->Data.Summon.UnitType = 0;
-		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
+		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ value);
 		}
-		free(str);
-		list = gh_cdr(list);
 	    } else if (!strcmp(value, "time-to-live")) {
-		spellaction->Data.Summon.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.Summon.TTL = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "require-corpse")) {
 		spellaction->Data.Summon.RequireCorpse = 1;
+		--j;
 	    } else {
 		lua_pushfstring(l, "Unsupported summon tag: %s", value);
 		lua_error(l);
@@ -461,18 +559,20 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	}
     } else if (!strcmp(value, "spawn-portal")) {
 	spellaction->CastFunction = CastSpawnPortal;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "portal-type")) {
-		str = gh_scm2newstr(gh_car(list), 0);
-		spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(str);
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(value);
 		if (!spellaction->Data.SpawnPortal.PortalType) {
 		    spellaction->Data.SpawnPortal.PortalType = 0;
-		    DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ str);
+		    DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 		}
-		free(str);
-		list = gh_cdr(list);
 	    } else {
 		lua_pushfstring(l, "Unsupported spawn-portal tag: %s", value);
 		lua_error(l);
@@ -480,19 +580,21 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	}
     } else if (!strcmp(value, "polymorph")) {
 	spellaction->CastFunction = CastPolymorph;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "new-form")) {
-		str = gh_scm2newstr(gh_car(list),0);
-		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		lua_rawgeti(l, -1, j + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(value);
 		if (!spellaction->Data.Summon.UnitType) {
 		    spellaction->Data.Summon.UnitType = 0;
-		    DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ str);
+		    DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 		}
-		free(str);
-		list = gh_cdr(list);
-		//FIXME : temp polymorphs? hard to do.
+		// FIXME: temp polymorphs? hard to do.
 	    } else {
 		lua_pushfstring(l, "Unsupported polymorph tag: %s", value);
 		lua_error(l);
@@ -500,18 +602,23 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	}
     } else if (!strcmp(value, "adjust-vitals")) {
 	spellaction->CastFunction = CastAdjustVitals;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
+	for (; j < args; ++j) {
+	    lua_rawgeti(l, -1, j + 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    ++j;
 	    if (!strcmp(value, "hit-points")) {
-		spellaction->Data.AdjustVitals.HP = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustVitals.HP = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "mana-points")) {
-		spellaction->Data.AdjustVitals.Mana = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustVitals.Mana = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else if (!strcmp(value, "max-multi-cast")) {
-		spellaction->Data.AdjustVitals.MaxMultiCast = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
+		lua_rawgeti(l, -1, j + 1);
+		spellaction->Data.AdjustVitals.MaxMultiCast = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 	    } else {
 		lua_pushfstring(l, "Unsupported adjust-vitals tag: %s", value);
 		lua_error(l);
@@ -521,7 +628,6 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	lua_pushfstring(l, "Unsupported action type: %s", value);
 	lua_error(l);
     }
-#endif
 }
 #endif
 
@@ -1039,22 +1145,30 @@ local int CclDefineSpell(lua_State* l)
 		lua_error(l);
 	    }
 	} else if (!strcmp(value, "action")) {
+	    int subargs;
+	    int k;
+
 	    spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
 	    act = spell->Action;
 	    memset(act, 0, sizeof(SpellActionType));
-#if 0
-	    sublist = gh_car(list);
-	    CclSpellAction(gh_car(sublist), act);
-	    sublist = gh_cdr(sublist);
-	    while (!gh_null_p(sublist)) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    k = 0;
+	    lua_rawgeti(l, j + 1, k + 1);
+	    CclSpellAction(l, act);
+	    lua_pop(l, 1);
+	    ++k;
+	    for (; k < subargs; ++k) {
 		act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
 		act = act->Next;
 		memset(act, 0, sizeof(SpellActionType));
-		CclSpellAction(gh_car(sublist), act);
-		sublist=gh_cdr(sublist);
+		lua_rawgeti(l, j + 1, k + 1);
+		CclSpellAction(l, act);
+		lua_pop(l, 1);
 	    }
-	    list = gh_cdr(list);
-#endif
 	} else if (!strcmp(value, "condition")) {
 	    if (!spell->Condition) {
 		spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
