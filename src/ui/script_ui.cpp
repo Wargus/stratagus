@@ -2105,6 +2105,7 @@ local SCM CclDefineMenuItem(SCM list)
 	} else {
 	    menu->items=(Menuitem*)malloc(sizeof(Menuitem));
 	}
+	item->menu = menu;
 	memcpy(menu->items+menu->nitems,item,sizeof(Menuitem));
 	menu->nitems++;
     }
