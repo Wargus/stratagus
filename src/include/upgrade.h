@@ -79,11 +79,11 @@ extern void UpgradesCclRegister(void);
 		  // allows BerserkerRange1 upgrade
 	  "A:UpgradeBerserkerRange1",
 		  // there are no allow/frobid actions
-	  "", 
+	  "",
 		  // apply to Berserker units
 	  "UnitBerserker"
   );
-		
+
   UpgradesDone(); // this should be called at the end of the game
 
   // end
