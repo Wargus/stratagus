@@ -774,6 +774,73 @@ global void CclInit(void)
     gh_new_procedure0_0("get-freecraft-library-path"
 	    ,CclGetFreeCraftLibraryPath);
 
+    //
+    //	Make some sombols for the compile options/features.
+    //
+#ifdef USE_CCL
+    gh_symbol2scm("freecraft-feature-use-ccl");
+#endif
+#ifdef USE_SDL
+    gh_symbol2scm("freecraft-feature-use-sdl");
+#endif
+#ifdef USE_CCL
+    gh_symbol2scm("freecraft-feature-use-ccl");
+#endif
+#ifdef USE_ONLYCCL
+    gh_symbol2scm("freecraft-feature-only-ccl");
+#endif
+#ifdef USE_THREAD
+    gh_symbol2scm("freecraft-feature-thread");
+#endif
+#ifdef DEBUG
+    gh_symbol2scm("freecraft-feature-debug");
+#endif
+#ifdef USE_ZLIB
+    gh_symbol2scm("freecraft-feature-zlib");
+#endif
+#ifdef USE_BZ2LIB
+    gh_symbol2scm("freecraft-feature-bz2lib");
+#endif
+#ifdef USE_SDL
+    gh_symbol2scm("freecraft-feature-sdl");
+#endif
+#ifdef USE_SDLA
+    gh_symbol2scm("freecraft-feature-sdla");
+#endif
+#ifdef USE_X11
+    gh_symbol2scm("freecraft-feature-x11");
+#endif
+#ifdef WITH_SOUND
+    gh_symbol2scm("freecraft-feature-with-sound");
+#endif
+#ifdef UNIT_ON_MAP
+    gh_symbol2scm("freecraft-feature-unit-on-map");
+#endif
+#ifdef NEW_ORDERS
+    gh_symbol2scm("freecraft-feature-new-orders");
+#endif
+#ifdef NEW_MAPDRAW
+    gh_symbol2scm("freecraft-feature-new-mapdraw");
+#endif
+#ifdef NEW_NAMES
+    gh_symbol2scm("freecraft-feature-new-names");
+#endif
+#ifdef NEW_FOW
+    gh_symbol2scm("freecraft-feature-new-fow");
+#endif
+#ifdef NEW_AI
+    gh_symbol2scm("freecraft-feature-new-ai");
+#endif
+#ifdef NEW_SHIPS
+    gh_symbol2scm("freecraft-feature-new-ships");
+#endif
+#ifdef SLOW_INPUT
+    gh_symbol2scm("freecraft-feature-slow-input");
+#endif
+#ifdef HAVE_EXPANSION
+    gh_symbol2scm("freecraft-feature-have-expansion");
+#endif
+
     print_welcome();
 
     //
