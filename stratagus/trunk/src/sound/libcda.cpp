@@ -333,6 +333,7 @@ void cd_close()
 #include <string.h>
 #include <windows.h>
 #include <mmsystem.h>
+#include "freecraft.h"
 #include "libcda.h"
 
 
