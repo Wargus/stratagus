@@ -374,7 +374,7 @@ global void InitMenuFuncHash(void) {
 
 // Global Options
     HASHADD(GlobalOptions,"menu-global-options");
-    HASHADD(InitGlobalOptions,"init-global options");
+    HASHADD(InitGlobalOptions,"init-global-options");
     HASHADD(SetRes640,"set-res-640");
     HASHADD(SetRes800,"set-res-800");
     HASHADD(SetRes1024,"set-res-1024");
@@ -1455,6 +1455,22 @@ local void GlobalOptions(void)
 
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
+    Menu *menu;
+
+    menu = FindMenu("menu-global-options");
+
+    fprintf(stderr, "XXXX\n");
+    
+    if (VideoWidth == 640)
+	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
+    if (VideoWidth == 800)
+    	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
+    if (VideoWidth == 1024)
+    	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
+    if (VideoWidth == 1280)
+    	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
+    if (VideoWidth == 1600)
+    	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
 }
 
 local void SetRes640(Menuitem *mi __attribute__((unused)))
