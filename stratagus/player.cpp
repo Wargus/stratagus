@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -639,6 +639,10 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 	if (player->TotalNumUnits >= player->TotalUnitLimit) {
 	    NotifyPlayer(player, NotifyYellow, 0, 0, "Unit Limit Reached");
 	    return -4;
+	}
+	if (player->UnitTypesCount[type->Type] >=  player->Allow.Units[type->Type]) {
+	    NotifyPlayer(player, NotifyYellow, 0, 0, "Limit Reached for this unit type");
+	    return -6;
 	}
 	return 1;
     } else {

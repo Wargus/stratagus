@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -51,9 +51,9 @@
 #include "etlib/hash.h"
 
 local int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
-    int*, const char*, const char*, const char*, UnitType*);
+    int*, const int[UnitTypeMax], const char*, const char*, UnitType*);
 local int AddUpgradeModifier(int, int, int, int, int, int, int, int,
-    int*, const char*, const char*, const char*);
+    int*, const int[UnitTypeMax], const char*, const char*);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -361,17 +361,17 @@ global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 		    if (v & (1 << b)) {
 			AllowUnitId(player,
 			    UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
-				'A');
+				UnitMax);
 			AllowUnitId(player,
 			    UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
-				'A');
+				UnitMax);
 		    } else {
 			AllowUnitId(player,
 			    UnitTypeByWcNum(unit_for_bit[i * 16 + 0 + b * 2])->Type,
-				'F');
+				0);
 			AllowUnitId(player,
 			    UnitTypeByWcNum(unit_for_bit[i * 16 + 1 + b * 2])->Type,
-				'F');
+				0);
 		    }
 		}
 	    }
@@ -625,8 +625,8 @@ global void SaveUpgrades(CLFile* file)
 	}
 
 	for (j = 0; j < UnitTypeMax; ++j) {	// allow/forbid units
-	    if (UpgradeModifiers[i]->ChangeUnits[j] != '?') {
-		CLprintf(file, "\n  '(allow %s %d)",
+	    if (UpgradeModifiers[i]->ChangeUnits[j] != 0) {
+		CLprintf(file, "\n  '(allow-unit %s %d)",
 		    UnitTypes[j]->Ident,
 		    UpgradeModifiers[i]->ChangeUnits[j]);
 	    }
@@ -657,20 +657,20 @@ global void SaveUpgrades(CLFile* file)
     //	Save the allow
     //
     for (i = 0; i < NumUnitTypes; ++i) {
-	CLprintf(file, "(define-allow '%s\t", UnitTypes[i]->Ident);
+	CLprintf(file, "(define-unit-allow '%s\t", UnitTypes[i]->Ident);
 	if (strlen(UnitTypes[i]->Ident) < 9) {
-	    CLprintf(file, "\t\t\t\"");
+	    CLprintf(file, "\t\t\t");
 	} else if (strlen(UnitTypes[i]->Ident) < 17) {
-	    CLprintf(file, "\t\t\"");
+	    CLprintf(file, "\t\t");
 	} else if (strlen(UnitTypes[i]->Ident) < 25) {
-	    CLprintf(file, "\t\"");
+	    CLprintf(file, "\t");
 	} else {
-	    CLprintf(file, "\"");
+	    CLprintf(file, "");
 	}
 	for (p = 0; p < PlayerMax; ++p) {
-	    CLprintf(file, "%c", Players[p].Allow.Units[i]);
+	    CLprintf(file, "%d ", Players[p].Allow.Units[i]);
 	}
-	CLprintf(file, "\")\n");
+	CLprintf(file, ")\n");
     }
     CLprintf(file, "\n");
 
@@ -723,7 +723,7 @@ local SCM CclDefineModifier(SCM list)
     int regeneration_rate;
     int hit_points;
     int costs[MaxCosts];
-    char units[UnitTypeMax];
+    int units[UnitTypeMax];
     char upgrades[UpgradeMax];
     char apply_to[UnitTypeMax];
     UnitType* convert_to;
@@ -737,7 +737,7 @@ local SCM CclDefineModifier(SCM list)
     hit_points = 0;
     regeneration_rate = 0;
     memset(costs, 0, sizeof(costs));
-    memset(units, '?', sizeof(units));
+    memset(units, 0, sizeof(units));
     memset(upgrades, '?', sizeof(upgrades));
     memset(apply_to, '?', sizeof(apply_to));
     convert_to = NULL;
@@ -790,6 +790,18 @@ local SCM CclDefineModifier(SCM list)
 	    free(name);
 	    value = gh_cdr(value);
 	    costs[i] = gh_scm2int(gh_car(value));
+	} else if (gh_eq_p(temp, gh_symbol2scm("allow-unit"))) {
+	    value = gh_cdr(value);
+	    str = gh_scm2newstr(gh_car(value), NULL);
+	    value = gh_cdr(value);
+	    DebugLevel3Fn("%s\n" _C_ str);
+	    if (!strncmp(str, "unit-", 5)) {
+		units[UnitTypeIdByIdent(str)] = gh_scm2int(gh_car(value));
+	    } else {
+		free(str);
+		errl("unit expected", NIL);
+	    }
+	    free(str);
 	} else if (gh_eq_p(temp, gh_symbol2scm("allow"))) {
 	    value = gh_cdr(value);
 	    str = gh_scm2newstr(gh_car(value), NULL);
@@ -797,11 +809,9 @@ local SCM CclDefineModifier(SCM list)
 	    DebugLevel3Fn("%s\n" _C_ str);
 	    if (!strncmp(str, "upgrade-", 8)) {
 		upgrades[UpgradeIdByIdent(str)] = gh_scm2int(gh_car(value));
-	    } else if (!strncmp(str, "unit-", 5)) {
-		units[UnitTypeIdByIdent(str)] = gh_scm2int(gh_car(value));
-	    } else {
+	    }else {
 		free(str);
-		errl("upgrade or unit expected", NIL);
+		errl("upgrade expected", NIL);
 	    }
 	    free(str);
 	} else if (gh_eq_p(temp, gh_symbol2scm("apply-to"))) {
@@ -1099,13 +1109,48 @@ local int CclDefineUpgrade(lua_State* l)
 #endif
 
 /**
+**	Define which units are allowed and how much.
+*/
+local SCM CclDefineUnitAllow(SCM list)
+{
+    SCM value;
+    char* ident;
+    int i;
+
+    if (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	ident = gh_scm2newstr(value, NULL);
+
+	if (strncmp(ident, "unit-", 5)) {
+	     DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+	     free(ident);
+	     return SCM_UNSPECIFIED;
+	}
+
+	i=0;
+	while (!gh_null_p(list) && i<16) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    AllowUnitByIdent(&Players[i], ident, gh_scm2int(value));
+	    ++i;
+	}
+
+	free(ident);
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+
+/**
 **	Define which units/upgrades are allowed.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAllow(SCM list)
 {
     SCM value;
-    char* str;
+    char* ident;
     char* ids;
     int i;
     int n;
@@ -1113,22 +1158,31 @@ local SCM CclDefineAllow(SCM list)
     while (!gh_null_p(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
-	str = gh_scm2newstr(value, NULL);
+	ident = gh_scm2newstr(value, NULL);
 	value = gh_car(list);
 	list = gh_cdr(list);
 	ids = gh_scm2newstr(value, NULL);
 
 	n = strlen(ids);
 	if (n > 16) {
-	    fprintf(stderr, "%s: Allow string too long %d\n", str, n);
+	    fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
 	    n = 16;
 	}
 
-	for (i = 0; i < n; ++i) {
-	    AllowByIdent(&Players[i], str, ids[i]);
+	if (!strncmp(ident, "unit-", 5)) {
+	    for (i = 0; i < n; ++i) {
+	    	if(ids[i]=='A') AllowUnitByIdent(&Players[i], ident, UnitMax);
+		if(ids[i]=='F') AllowUnitByIdent(&Players[i], ident, 0);
+	    }
+	} else if (!strncmp(ident, "upgrade-", 8)) {
+	    for (i = 0; i < n; ++i) {
+		AllowUpgradeByIdent(&Players[i], ident, ids[i]);
+	    }
+	} else {
+		DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
 	}
 
-	free(str);
+	free(ident);
 	free(ids);
     }
 
@@ -1238,6 +1292,7 @@ global void UpgradesCclRegister(void)
     gh_new_procedureN("define-modifier", CclDefineModifier);
     gh_new_procedureN("define-upgrade", CclDefineUpgrade);
     gh_new_procedureN("define-allow", CclDefineAllow);
+    gh_new_procedureN("define-unit-allow", CclDefineUnitAllow);
 
     gh_new_procedureN("define-upgrade-wc-names", CclDefineUpgradeWcNames);
 #elif defined(USE_LUA)
@@ -1270,7 +1325,7 @@ global void UpgradesCclRegister(void)
 **	@param speed		Speed modification (Currently not possible).
 **	@param hit_points	Hitpoint modification.
 **	@param costs		Costs modification.
-**	@param af_units		Changes in allow units.
+**	@param units[UnitTypeMax]	Changes in allowed units.
 **	@param af_upgrades	Changes in allow upgrades.
 **	@param apply_to		Applies to this units.
 **	@param convert_to	Converts units to this unit-type.
@@ -1280,7 +1335,8 @@ global void UpgradesCclRegister(void)
 */
 local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
     int basic_damage, int piercing_damage, int armor, int speed,
-    int hit_points, int regeneration_rate, int* costs,const char* af_units,
+    int hit_points, int regeneration_rate, int* costs,
+    const int units[UnitTypeMax],
     const char* af_upgrades, const char* apply_to, UnitType* convert_to)
 {
     int i;
@@ -1307,7 +1363,7 @@ local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	um->Modifier.Costs[i]	= costs[i];
     }
 
-    memcpy(um->ChangeUnits, af_units, sizeof(um->ChangeUnits));
+    memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
     memcpy(um->ChangeUpgrades, af_upgrades, sizeof(um->ChangeUpgrades));
     memcpy(um->ApplyTo, apply_to, sizeof(um->ApplyTo));
 
@@ -1325,9 +1381,9 @@ local int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
     int basic_damage, int piercing_damage, int armor, int speed,
     int hit_points, int* costs,
+    const int units[UnitTypeMax],
     // following are comma separated list of required string id's
-    const char* af_units,    // "A:unit-mage,F:unit-grunt" -- allow mages, forbid grunts
-    const char* af_upgrades, // "F:upgrade-Shield1,R:upgrade-ShieldTotal" -- :)
+    const char* af_upgrades,
     const char* apply_to	    // "unit-peon,unit-peasant"
     )
 {
@@ -1360,26 +1416,9 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
     // FIXME: it will be good if things are checked for errors better!
     // FIXME: perhaps the function `strtok()' should be replaced with local one?
 
-    memset(um->ChangeUnits,    '?', sizeof(um->ChangeUnits));
+    memcpy(um->ChangeUnits, units, sizeof(um->ChangeUnits));
     memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
     memset(um->ApplyTo,        '?', sizeof(um->ApplyTo));
-
-    //
-    // get allow/forbid's for units
-    //
-    s1 = strdup(af_units);
-    DebugCheck(!s1);
-    for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
-	int id;
-	DebugCheck(!(s2[0] == 'A' || s2[0] == 'F'));
-	DebugCheck(!(s2[1] == ':'));
-	id = UnitTypeIdByIdent(s2 + 2);
-	if (id == -1) {
-	    continue;		// should we cancel all and return error?!
-	}
-	um->ChangeUnits[id] = s2[0];
-    }
-    free(s1);
 
     //
     // get allow/forbid's for upgrades
@@ -1436,6 +1475,9 @@ global void AddSimpleUpgrade(const char* ident, const char* icon,
     )
 {
     Upgrade* up;
+    int units[UnitTypeMax];
+
+    memset(units,0,sizeof(UnitTypeMax));
 
     up = AddUpgrade(ident, icon, costs);
     if (!up)  {
@@ -1444,7 +1486,7 @@ global void AddSimpleUpgrade(const char* ident, const char* icon,
     AddUpgradeModifier(up-Upgrades, attack_range, sight_range, basic_damage,
 	piercing_damage, armor, speed, hit_points,
 	mcosts,
-	"", "", // no allow/forbid maps
+	units, "", // no allow/forbid maps
 	apply_to);
 }
 
@@ -1620,16 +1662,11 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
     }
 
     for (z = 0; z < UnitTypeMax; ++z) {
-	// allow/forbid unit types for player
+	// add/remove allowed units
 
 	// FIXME: check if modify is allowed
 
-	if (um->ChangeUnits[z] == 'A') {
-	    player->Allow.Units[z] = 'A';
-	}
-	if (um->ChangeUnits[z] == 'F') {
-	    player->Allow.Units[z] = 'F';
-	}
+	player->Allow.Units[z] += um->ChangeUnits[z];
 
 	DebugCheck(!(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X'));
 
@@ -1738,12 +1775,11 @@ global void UpgradeLost(Player* player, int id)
 **
 **	@param player	Player to change
 **	@param id	unit type id
-**	@param af	`A'llow/`F'orbid/`R'eseached
+**	@param units	maximum amount of units allowed
 */
-global void AllowUnitId(Player* player, int id, char af)
+global void AllowUnitId(Player* player, int id, int units)
 {
-    DebugCheck(!(af == 'A' || af == 'F' || af == 'R'));
-    player->Allow.Units[id] = af;
+    player->Allow.Units[id] = units;
 }
 
 /**
@@ -1762,12 +1798,12 @@ global void AllowUpgradeId(Player* player, int id, char af)
 /**
 **	FIXME: docu
 */
-global char UnitIdAllowed(const Player* player, int id)
+global int UnitIdAllowed(const Player* player, int id)
 {
     // JOHNS: Don't be kind, the people should code correct!
-    DebugCheck(id < 0 || id >= UpgradeMax);
-    if (id < 0 || id >= UpgradeMax) {
-	return 'F';
+    DebugCheck(id < 0 || id >= UnitTypeMax);
+    if (id < 0 || id >= UnitTypeMax) {
+	return 0;
     }
     return player->Allow.Units[id];
 }
@@ -1804,9 +1840,9 @@ global void UpgradeLost2(Player* player, char* ident)	// by ident string
 /**
 **	FIXME: docu
 */
-global void AllowUnitByIdent(Player* player, const char* ident, char af)
+global void AllowUnitByIdent(Player* player, const char* ident, int units)
 {
-    AllowUnitId(player, UnitTypeIdByIdent(ident), af);
+    AllowUnitId(player, UnitTypeIdByIdent(ident), units);
 }
 
 /**
@@ -1815,20 +1851,6 @@ global void AllowUnitByIdent(Player* player, const char* ident, char af)
 global void AllowUpgradeByIdent(Player* player, const char* ident, char af)
 {
     AllowUpgradeId(player, UpgradeIdByIdent(ident), af);
-}
-
-/**
-**	FIXME: docu
-*/
-global void AllowByIdent(Player* player,  const char* ident, char af)
-{
-    if (!strncmp(ident, "unit-", 5)) {
-	AllowUnitByIdent(player, ident, af);
-    } else if (!strncmp(ident, "upgrade-", 8)) {
-	AllowUpgradeByIdent(player, ident, af);
-    } else {
-	DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
-    }
 }
 
 /**
@@ -1842,7 +1864,7 @@ global void AllowByIdent(Player* player,  const char* ident, char af)
 **
 **	@see Allow
 */
-global char UnitIdentAllowed(const Player* player, const char* ident)
+global int UnitIdentAllowed(const Player* player, const char* ident)
 {
     return UnitIdAllowed(player, UnitTypeIdByIdent(ident));
 }
