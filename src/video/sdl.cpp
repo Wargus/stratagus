@@ -91,7 +91,6 @@ global SDL_Surface* TheScreen;				/// Internal screen
 local int FrameTicks;						/// Frame length in ms
 local int FrameRemainder;				/// Frame remainder 0.1 ms
 local int FrameFraction;				/// Frame fractional term
-local int SkipFrames;						/// Skip this frames
 
 /*----------------------------------------------------------------------------
 --		Functions
