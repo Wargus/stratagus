@@ -168,6 +168,7 @@ global void SaveMap(FILE* file)
 global void CreateGame(char* filename, WorldMap* map)
 {
     char* PalettePath;
+    int i, j;
 
     if (filename == NULL) {
 	ProcessMenu(MENU_PRG_START, 1);
@@ -183,6 +184,29 @@ global void CreateGame(char* filename, WorldMap* map)
 
     if( FlagRevealMap ) {
 	RevealMap();
+    }
+
+    if (GameSettings.Resources != SettingsResourcesMapDefault) {
+	for (j = 0; j < PlayerMax; ++j) {
+	    if (Players[j].Type == PlayerNobody) {
+		continue;
+	    }
+	    for (i = 1; i < MaxCosts; ++i) {
+		switch (GameSettings.Resources) {
+		    case SettingsResourcesLow:
+			Players[j].Resources[i]=DEFAULT_RESOURCES_LOW[i];
+			break;
+		    case SettingsResourcesMedium:
+			Players[j].Resources[i]=DEFAULT_RESOURCES_MEDIUM[i];
+			break;
+		    case SettingsResourcesHigh:
+			Players[j].Resources[i]=DEFAULT_RESOURCES_HIGH[i];
+			break;
+		    default:
+			break;
+		}
+	    }
+	}
     }
 
     DebugLevel3("Terrain %d\n",TheMap.Terrain);

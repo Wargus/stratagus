@@ -61,7 +61,7 @@ struct _settings_ {
 #define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied
 
 /*
-**	Resource-Preset factor -- NOT USED YET
+**	Resource-Preset factor
 */
 #define SettingsResourcesMapDefault	SettingsPresetMapDefault
 #define SettingsResourcesLow		0

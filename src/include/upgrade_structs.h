@@ -41,7 +41,13 @@
 **	Default resources for a new player.
 */
 #define DEFAULT_RESOURCES \
-	((int[]){ 0,  3000, 1000, 1000,  1000, 1000, 1000 })
+	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
+#define DEFAULT_RESOURCES_LOW \
+	((int[]){ 0,  2000, 1000, 1000,  1000, 1000, 1000 })
+#define DEFAULT_RESOURCES_MEDIUM \
+	((int[]){ 0,  5000, 2000, 2000,  2000, 2000, 2000 })
+#define DEFAULT_RESOURCES_HIGH \
+	((int[]){ 0,  10000, 5000, 5000,  5000, 5000, 5000 })
 
 /**
 **	Default incomes for a new player.
