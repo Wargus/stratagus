@@ -149,9 +149,9 @@ global int GetTileNumber(int basic, int random, int filler)
 	n = MyRand() % n;
 	i = -1;
 	do {
-	    while( ++i < 16 && !TheMap.Tileset->Table[tile + i]) {
+	    while (++i < 16 && !TheMap.Tileset->Table[tile + i]) {
 	    }
-	} while( i < 16 && n-- );
+	} while (i < 16 && n--);
 	DebugCheck( i == 16 );
 	return tile + i;
     }
@@ -194,6 +194,7 @@ global void EditTile(int x, int y, int tile)
 
     UpdateMinimapSeenXY(x, y);
     UpdateMinimapXY(x, y);
+    MustRedraw |= RedrawMinimap;
 
     EditorTileChanged(x, y);
 }
@@ -242,19 +243,26 @@ global void EditTilesInternal(int x, int y, int tile, int size)
 */
 global void EditTiles(int x, int y, int tile, int size)
 {
-    int mx = TheMap.Width;
-    int my = TheMap.Height;
-    
-    EditTilesInternal( x, y, tile, size );
-    
-    if ( !MirrorEdit ) return;
-    
-    EditTilesInternal( mx - x - size, y, tile, size );
-    
-    if ( MirrorEdit == 1 ) return;
-    
-    EditTilesInternal( x, my - y - size, tile, size );
-    EditTilesInternal( mx - x - size, my - y - size, tile, size );
+    int mx;
+    int my;
+
+    mx = TheMap.Width;
+    my = TheMap.Height;
+
+    EditTilesInternal(x, y, tile, size);
+
+    if (!MirrorEdit) {
+	return;
+    }
+
+    EditTilesInternal(mx - x - size, y, tile, size);
+
+    if (MirrorEdit == 1) {
+	return;
+    }
+
+    EditTilesInternal(x, my - y - size, tile, size);
+    EditTilesInternal(mx - x - size, my - y - size, tile, size);
 }
 
 /**
@@ -272,6 +280,7 @@ global void EditTiles(int x, int y, int tile, int size)
 local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 {
     Unit *unit;
+
     //FXIME: vladi: should check place when mirror editing is enabled...?
     unit = MakeUnitAndPlace(x, y, type, player);
     if (type->OilPatch || type->GivesOil) {
@@ -294,19 +303,26 @@ local void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 */
 local void EditUnit(int x, int y, UnitType* type, Player* player)
 {
-    int mx = TheMap.Width;
-    int my = TheMap.Height;
+    int mx;
+    int my;
+
+    mx = TheMap.Width;
+    my = TheMap.Height;
+
+    EditUnitInternal(x, y, type, player);
     
-    EditUnitInternal( x, y, type, player );
-    
-    if ( !MirrorEdit ) return;
-    
-    EditUnitInternal( mx - x - 1, y, type, player );
-    
-    if ( MirrorEdit == 1 ) return;
-    
-    EditUnitInternal( x, my - y - 1, type, player );
-    EditUnitInternal( mx - x - 1, my - y - 1, type, player );
+    if (!MirrorEdit) {
+	return;
+    }
+
+    EditUnitInternal(mx - x - 1, y, type, player);
+
+    if (MirrorEdit == 1) {
+	return;
+    }
+
+    EditUnitInternal(x, my - y - 1, type, player);
+    EditUnitInternal(mx - x - 1, my - y - 1, type, player);
 }
 
 /**
@@ -329,7 +345,7 @@ local int CalculateUnitIcons(void)
 	x += IconHeight + 2;
     }
     x = TheUI.ButtonPanelX + 10;
-    while( x < TheUI.ButtonPanelX + 146 ) {
+    while (x < TheUI.ButtonPanelX + 146) {
 	count += i;
 	x += IconWidth + 8;
     }
@@ -375,8 +391,9 @@ local void RecalculateShownUnits(void)
     }
     MaxShownUnits = n;
 
-    if( UnitIndex >= MaxShownUnits ) {
+    if (UnitIndex >= MaxShownUnits) {
 	int count;
+
 	count = CalculateUnitIcons();
 	UnitIndex = MaxShownUnits / count * count;
     }
@@ -406,8 +423,8 @@ local void DrawTileIcons(void)
     x = TheUI.InfoPanelX + 46;
     y = TheUI.InfoPanelY + 4 + IconHeight + 11;
 
-    if( CursorOn == CursorOnButton &&
-	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306 ) {
+    if (CursorOn == CursorOnButton &&
+	    ButtonUnderCursor >= 300 && ButtonUnderCursor < 306) {
 	VideoDrawRectangle(ColorGray, x - 42,
 		y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
     }
@@ -489,46 +506,46 @@ local void DrawUnitIcons(void)
 	if (i == PlayerMax / 2) {
 	    y += 20;
 	}
-	if( i==CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody ) {
+	if (i == CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody) {
 	    VideoDrawRectangle(ColorWhite,x + i % 8 * 20, y, 20, 20);
 	}
 	VideoDrawRectangle(
 	    i==CursorPlayer && TheMap.Info->PlayerType[i] != PlayerNobody
 		? ColorWhite : ColorGray,
 	    x + i % 8 * 20, y, 19, 19);
-	if( TheMap.Info->PlayerType[i] != PlayerNobody ) {
+	if (TheMap.Info->PlayerType[i] != PlayerNobody) {
 	    VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
 		17, 17);
 	}
-	if( i==SelectedPlayer ) {
+	if (i == SelectedPlayer) {
 	    VideoDrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
 	}
-	sprintf(buf,"%d",i);
+	sprintf(buf, "%d", i);
 	VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
     }
 
     x = TheUI.InfoPanelX + 4;
     y += 18 * 1 + 4;
-    if( SelectedPlayer != -1 ) {
-	i=sprintf(buf,"Plyr %d %s ",SelectedPlayer,
-		PlayerRaces.Name[TheMap.Info->PlayerSide[SelectedPlayer]]);
+    if (SelectedPlayer != -1) {
+	i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
+		PlayerRaces.Name[TheMap. Info->PlayerSide[SelectedPlayer]]);
 	// Players[SelectedPlayer].RaceName);
 
-	switch( TheMap.Info->PlayerType[SelectedPlayer] ) {
+	switch (TheMap.Info->PlayerType[SelectedPlayer]) {
 	    case PlayerNeutral:
-		strcat(buf,"Neutral");
+		strcat(buf, "Neutral");
 		break;
 	    case PlayerNobody:
 	    default:
-		strcat(buf,"Nobody");
+		strcat(buf, "Nobody");
 		break;
 	    case PlayerPerson:
-		strcat(buf,"Person");
+		strcat(buf, "Person");
 		break;
 	    case PlayerComputer:
 	    case PlayerRescuePassive:
 	    case PlayerRescueActive:
-		strcat(buf,"Computer");
+		strcat(buf, "Computer");
 		break;
 	}
 
@@ -569,7 +586,7 @@ local void DrawUnitIcons(void)
     j = 176-8;
 
     PushClipping();
-    SetClipping(0,0,x + j - 20,VideoHeight-1);
+    SetClipping(0, 0, x + j - 20, VideoHeight - 1);
     VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
     PopClipping();
     if (TheUI.ButtonPanelX + 4 < CursorX
@@ -602,25 +619,25 @@ local void DrawUnitIcons(void)
     y = TheUI.ButtonPanelY + 24;
 
     i = UnitIndex;
-    while( y < TheUI.ButtonPanelY
-	    + TheUI.ButtonPanel.Graphic->Height - IconHeight ) {
-	if( i >= MaxShownUnits ) {
+    while (y < TheUI.ButtonPanelY
+	    + TheUI.ButtonPanel.Graphic->Height - IconHeight) {
+	if (i >= MaxShownUnits) {
 	    break;
 	}
 	x = TheUI.ButtonPanelX + 10;
-	while( x < TheUI.ButtonPanelX + 146 ) {
-	    if( i >= MaxShownUnits ) {
+	while (x < TheUI.ButtonPanelX + 146) {
+	    if (i >= MaxShownUnits) {
 		break;
 	    }
 	    icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 	    DrawIcon(Players + SelectedPlayer, icon, x, y);
 
 	    VideoDrawRectangle(ColorGray, x, y, icon->Width, icon->Height);
-	    if( i==SelectedUnitIndex ) {
+	    if (i == SelectedUnitIndex) {
 		VideoDrawRectangle(ColorGreen, x + 1, y + 1,
 			icon->Width - 2, icon->Height - 2);
 	    }
-	    if( i==CursorUnitIndex ) {
+	    if (i == CursorUnitIndex) {
 		VideoDrawRectangle(ColorWhite,x - 1, y - 1,
 			icon->Width + 2, icon->Height + 2);
 	    }
@@ -644,7 +661,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
     int color;
 
-    color= (flags&IconActive) ? ColorGray : ColorBlack;
+    color = (flags&IconActive) ? ColorGray : ColorBlack;
 
     VideoDrawRectangleClip(color,x,y,TileSizeX+7,TileSizeY+7);
     VideoDrawRectangleClip(ColorBlack,x+1,y+1,TileSizeX+5,TileSizeY+5);
@@ -654,26 +671,27 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
     VideoDrawHLine(ColorGray,x+5,y+TileSizeY+4,TileSizeX+1);
     VideoDrawHLine(ColorGray,x+5,y+TileSizeY+5,TileSizeX+1);
 
-    color= (flags&IconClicked) ? ColorGray : ColorWhite;
+    color = (flags&IconClicked) ? ColorGray : ColorWhite;
     VideoDrawHLine(color,x+5,y+3,TileSizeX+1);
     VideoDrawHLine(color,x+5,y+4,TileSizeX+1);
     VideoDrawVLine(color,x+3,y+3,TileSizeY+3);
     VideoDrawVLine(color,x+4,y+3,TileSizeY+3);
 
-    if( flags&IconClicked ) {
-	++x; ++y;
+    if (flags&IconClicked) {
+	++x;
+	++y;
     }
 
-    x+=4;
-    y+=4;
+    x += 4;
+    y += 4;
 #ifdef USE_OPENGL
     MapDrawTile(TheMap.Tileset->Table[tilenum], x, y);
 #else
     VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]], x, y);
 #endif
 
-    if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x,y,TileSizeX,TileSizeY);
+    if (flags&IconSelected) {
+	VideoDrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
     }
 }
 
@@ -853,11 +871,11 @@ local void ShowUnitInfo(const Unit* unit)
     char buf[256];
     int i;
 
-    i=sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
+    i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
 	unit->Type->Name, unit->Player->Player,
 	unit->Active ? "active" : "passive");
-    if( unit->Type->OilPatch || unit->Type->GivesOil
-	    || unit->Type->GoldMine ) {
+    if (unit->Type->OilPatch || unit->Type->GivesOil
+	    || unit->Type->GoldMine) {
 	sprintf(buf+i," Amount %d",unit->Value);
     }
     SetStatusLine(buf);
@@ -876,7 +894,7 @@ global void EditorUpdateDisplay(void)
 
     DrawMapArea();			// draw the map area
 
-    if (CursorOn==CursorOnMap) {
+    if (CursorOn == CursorOnMap) {
 	DrawMapCursor();			// cursor on map
     }
 
@@ -979,19 +997,19 @@ local void EditorCallbackButtonUp(unsigned button)
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
 
-    if( GameCursor==TheUI.Scroll.Cursor ) {
+    if (GameCursor == TheUI.Scroll.Cursor) {
 	// Move map.
-	GameCursor=TheUI.Point.Cursor;		// Reset
+	GameCursor = TheUI.Point.Cursor;		// Reset
 	return;
     }
 
-    if( (1<<button) == LeftButton && GameMenuButtonClicked==1 ) {
-	GameMenuButtonClicked=0;
-	if( ButtonUnderCursor==0 ) {
-	    ProcessMenu("menu-editor",1);
+    if ((1<<button) == LeftButton && GameMenuButtonClicked == 1) {
+	GameMenuButtonClicked = 0;
+	if (ButtonUnderCursor == 0) {
+	    ProcessMenu("menu-editor", 1);
 	}
     }
-    if( (1<<button) == LeftButton ) {
+    if ((1<<button) == LeftButton) {
 	UnitPlacedThisPress = 0;
     }
 }
@@ -1182,14 +1200,14 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
     //	Right click on a resource
     //
     if (EditorState == EditorSelecting) {
-	if( (MouseButtons&RightButton && UnitUnderCursor) ) {
-	    if( UnitUnderCursor->Type->GoldMine ||
+	if ((MouseButtons&RightButton && UnitUnderCursor)) {
+	    if (UnitUnderCursor->Type->GoldMine ||
 		UnitUnderCursor->Type->OilPatch ||
-		UnitUnderCursor->Type->GivesOil ) {
+		UnitUnderCursor->Type->GivesOil) {
 		EditorEditResource();
 		return;
 	    }
-	    if( !UnitUnderCursor->Type->Building && UnitUnderCursor->HP > 0 ) {
+	    if (!UnitUnderCursor->Type->Building && UnitUnderCursor->HP > 0) {
 		EditorEditAiProperties();
 	    }
 	}
@@ -1236,11 +1254,11 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	    }
 	} else if (MouseButtons&MiddleButton) {
 	    // enter move map mode
-	    CursorStartX=CursorX;
-	    CursorStartY=CursorY;
-	    GameCursor=TheUI.Scroll.Cursor;
+	    CursorStartX = CursorX;
+	    CursorStartY = CursorY;
+	    GameCursor = TheUI.Scroll.Cursor;
 	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
-	    MustRedraw|=RedrawCursor;
+	    MustRedraw |= RedrawCursor;
 	}
     }
 }
@@ -1261,7 +1279,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 'f'&0x1F:
 	case 'f':
 	case 'F':			// ALT+F, CTRL+F toggle fullscreen
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers&(ModifierAlt|ModifierControl))) {
 		break;
 	    }
 	    ToggleFullScreen();
@@ -1291,8 +1309,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 	case 'r':
 	case 'R':			// CTRL+R Randomize map
-	    if( KeyModifiers & ModifierControl ) 
-            {
+	    if (KeyModifiers & ModifierControl) {
                 DebugLevel3Fn("Randomizing map...\n");
   	        EditorCreateRandomMap();
 	    }
@@ -1300,18 +1317,21 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 	case 'm':
 	case 'M':			// CTRL+M Mirror edit
-	    if( KeyModifiers & ModifierControl ) 
-            {
-  	        MirrorEdit++;
-		if ( MirrorEdit == 3 ) MirrorEdit = 0;
-                switch( MirrorEdit )
-		  {
-		  case 1:
-		      SetStatusLine( "Mirror editing enabled: 2-side" ); break;
-		  case 2:
-		      SetStatusLine( "Mirror editing enabled: 4-side" ); break;
-		  default:
-		      SetStatusLine( "Mirror editing disabled" ); break;
+	    if (KeyModifiers & ModifierControl)  {
+  	        ++MirrorEdit;
+		if (MirrorEdit == 3) {
+		    MirrorEdit = 0;
+		}
+                switch (MirrorEdit) {
+		    case 1:
+			SetStatusLine( "Mirror editing enabled: 2-side" );
+			break;
+		    case 2:
+			SetStatusLine( "Mirror editing enabled: 4-side" );
+			break;
+		    default:
+			SetStatusLine( "Mirror editing disabled" );
+			break;
 		  }
 	    }
 	    break;
@@ -1319,16 +1339,16 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	case 'x'&0x1F:
 	case 'x':
 	case 'X':			// ALT+X, CTRL+X: Exit editor
-	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+	    if (!(KeyModifiers&(ModifierAlt|ModifierControl))) {
 		break;
 	    }
 	    Exit(0);
 
 	case KeyCodeDelete:	// Delete
-	    if( UnitUnderCursor ) {
+	    if (UnitUnderCursor) {
 		Unit* unit;
 
-		RemoveUnit(unit = UnitUnderCursor,NULL);
+		RemoveUnit(unit = UnitUnderCursor, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		ReleaseUnit(unit);
@@ -1337,7 +1357,7 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	    break;
 
 	case KeyCodeF10:
-	    ProcessMenu("menu-editor",1);
+	    ProcessMenu("menu-editor", 1);
 	    break;
 
 	case KeyCodeUp:		// Keyboard scrolling
@@ -1477,13 +1497,13 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Drawing tiles on map.
     //
-    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
-	(EditorState == EditorEditTile || EditorState == EditorEditUnit) ) {
+    if (CursorOn == CursorOnMap && (MouseButtons&LeftButton) &&
+	(EditorState == EditorEditTile || EditorState == EditorEditUnit)) {
 
 	//
 	//	Scroll the map
 	//
-	if( !(FrameCounter % SpeedMouseScroll) ) {
+	if (!(FrameCounter % SpeedMouseScroll)) {
 	    if (CursorX <= TheUI.SelectedViewport->X) {
 		ViewportSetViewpoint(TheUI.SelectedViewport,
 		    TheUI.SelectedViewport->MapX - 1,
@@ -1534,7 +1554,7 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Minimap move viewpoint
     //
-    if( CursorOn==CursorOnMinimap && (MouseButtons&LeftButton) ) {
+    if (CursorOn==CursorOnMinimap && (MouseButtons&LeftButton)) {
 	RestrictCursorToMinimap();
 	ViewportSetViewpoint(TheUI.SelectedViewport,
 	    ScreenMinimap2MapX(CursorX)
@@ -1556,10 +1576,9 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Minimap
     //
-    if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
-	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
-	CursorOn=CursorOnMinimap;
-
+    if (x >= TheUI.MinimapX+24 && x < TheUI.MinimapX+24+MINIMAP_W
+	    && y >= TheUI.MinimapY+2 && y < TheUI.MinimapY+2+MINIMAP_H) {
+	CursorOn = CursorOnMinimap;
     }
 
     //
@@ -1568,8 +1587,8 @@ local void EditorCallbackMouse(int x, int y)
     if (EditorState == EditorEditUnit) {
 	bx = TheUI.InfoPanelX + 8;
 	by = TheUI.InfoPanelY + 4 + IconHeight + 10;
-	for( i = 0; i< PlayerMax; ++i ) {
-	    if( i == PlayerMax / 2 ) {
+	for (i = 0; i < PlayerMax; ++i) {
+	    if (i == PlayerMax / 2) {
 		bx = TheUI.InfoPanelX + 8;
 		by += 20;
 	    }
@@ -1592,12 +1611,12 @@ local void EditorCallbackMouse(int x, int y)
 	by = TheUI.ButtonPanelY + 24;
 	while (by < TheUI.ButtonPanelY
 		+ TheUI.ButtonPanel.Graphic->Height - IconHeight) {
-	    if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
+	    if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 		break;
 	    }
 	    bx = TheUI.ButtonPanelX + 10;
 	    while (bx < TheUI.ButtonPanelX + 146) {
-		if( i >= MaxShownUnits || !ShownUnitTypes[i] ) {
+		if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 		    break;
 		}
 		if (bx < x && x < bx + IconWidth
@@ -1626,7 +1645,7 @@ local void EditorCallbackMouse(int x, int y)
 	bx = TheUI.InfoPanelX + 4;
 	by = TheUI.InfoPanelY + 4 + IconHeight + 10;
 
-	while( i < 6 ) {
+	while (i < 6) {
 	    if (bx < x && x < bx + 100 && by < y && y < by + 18) {
 		ButtonUnderCursor = i + 300;
 		CursorOn = CursorOnButton;
@@ -1744,7 +1763,7 @@ local void EditorCallbackMouse(int x, int y)
 		+ TheUI.MouseViewport->MapX * TileSizeX,
 	    CursorY - TheUI.MouseViewport->Y
 		+ TheUI.MouseViewport->MapY * TileSizeY);
-	if( UnitUnderCursor ) {
+	if (UnitUnderCursor) {
 	    ShowUnitInfo(UnitUnderCursor);
 	    return;
 	}
@@ -1910,6 +1929,7 @@ local void CreateEditor(void)
     ShowWaterToSelect = 1;
 
     RecalculateShownUnits();
+    UpdateMinimap();
 
     if (1) {
 	DestroyCursorBackground();
@@ -2008,24 +2028,31 @@ global void EditorMainLoop(void)
 	TileCursorSize = 1;
 
 	while (EditorRunning) {
-	    EditorUpdateDisplay();
+	    if (MustRedraw & RedrawMinimap) {
+		UpdateMinimap();
+	    }
+
+	    if (MustRedraw) {
+		EditorUpdateDisplay();
+		MustRedraw = 0;
+	    }
 
 	    //
 	    //	Map scrolling
 	    //
-	    if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
+	    if (TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll)) {
 		DoScrollArea(MouseScrollState, 0);
 	    }
-	    if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
+	    if (TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll)) {
 		DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
-		if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
+		if (CursorOn == CursorOnMap && (MouseButtons&LeftButton)
 			&& (EditorState == EditorEditTile
-			    || EditorState == EditorEditUnit) ) {
+			    || EditorState == EditorEditUnit)) {
 		    EditorCallbackButtonDown(0);
 		}
 	    }
 
-	    if( ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED) ) {
+	    if (ColorCycleAll>=0 && !(FrameCounter%COLOR_CYCLE_SPEED)) {
 		ColorCycle();
 	    }
 
