@@ -652,7 +652,7 @@ static void ClipMixToStereo16(const int* mix, int size, short* output)
 static Sample* LoadSample(const char* name)
 {
 	Sample* sample;
-	char buf[PATH_MAX];
+	char buf[MAX_PATH];
 
 	LibraryFileName(name, buf);
 
