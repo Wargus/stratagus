@@ -764,7 +764,7 @@ local UnitType* CclGetUnitType(SCM ptr)
 	return UnitTypeByIdent(str);
     }
     if( NTYPEP(ptr,SiodUnitTypeTag) ) {
-	err("not an unit type",ptr);
+	errl("not an unit type",ptr);
     }
     return (UnitType*)CAR(ptr);
 }
