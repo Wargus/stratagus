@@ -235,6 +235,8 @@ typedef struct ConditionInfo {
 typedef struct {
     ConditionInfo *Condition;		/// Conditions to cast the spell.
     int Range;				/// Max range of the target.
+    /// Combat mode is when there are hostile non-coward units around
+    int Combat;				/// If it should be casted in combat
     /// FIXME: Add stuff here for target preference.
     /// FIXME: Heal units with the lowest hit points first.
 } AutoCastInfo;
