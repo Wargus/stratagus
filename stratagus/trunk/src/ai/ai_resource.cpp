@@ -1226,8 +1226,6 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 **
 **	@param unit	Unit that must be repaired.
 **	@return		True if made, false if can't be made.
-**
-**	@note	Can be improved take the unit nearest to unit.
 */
 local int AiRepairUnit(Unit* unit)
 {
@@ -1297,18 +1295,30 @@ local void AiCheckRepair(void)
 		&& unit->Orders[0].Action!=UnitActionBuilded
 		&& unit->Orders[0].Action!=UnitActionUpgradeTo
 		&& unit->HP<unit->Stats->HitPoints ) {
+
 	    DebugLevel0Fn("Have building to repair %d(%s)\n" _C_
 		    UnitNumber(unit) _C_ unit->Type->Ident);
+
 	    //
-	    //	Find a free worker, who can build this building can repair it?
+	    //	FIXME: Repair only buildings under control
 	    //
-	    // FIXME: must check, if there are enough resources
+	    if( AttackUnitsInDistance(unit,unit->Stats->SightRange) ) {
+		continue;
+	    }
+
+	    //
+	    //	Must check, if there are enough resources
+	    //
 	    for( j=1; j<MaxCosts; ++j ) {
 		if( unit->Stats->Costs[j]
 			&& AiPlayer->Player->Resources[j]<99 ) {
 		    repair_flag=0;
 		}
 	    }
+
+	    //
+	    //	Find a free worker, who can build this building can repair it?
+	    //
 	    if ( repair_flag ) {
 		AiRepairUnit(unit);
 		AiPlayer->LastRepairBuilding=UnitNumber(unit);
