@@ -69,7 +69,6 @@ global int ZoneNeedRefresh;
 --	Functions
 ----------------------------------------------------------------------------*/
 
-local void ClearZoneNeedRefresh(void);
 
 /**
 **	Unassign a tile to a region.
@@ -966,7 +965,7 @@ global void InitaliseMapping(void)
 **	@param rsltx	Will hold result X
 **	@param rsltx	Will hold result Y
 */
-local void ZoneFindConnexion(int a, int b,int refx,int refy,int* rsltx,int* rslty)
+global void ZoneFindConnexion(int a, int b,int refx,int refy,int* rsltx,int* rslty)
 {
     int oppzone;
     RegionId oppregion;
@@ -1234,7 +1233,7 @@ global int PlaceReachable(Unit * src, int goal_x,int goal_y,int w,int h,int minr
 /**
 **	Check if zone connections need a refresh & do it
 */
-local void ClearZoneNeedRefresh(void)
+global void ClearZoneNeedRefresh(void)
 {
     if (ZoneNeedRefresh) {
 	RefreshZones();
