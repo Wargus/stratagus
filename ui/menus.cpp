@@ -3355,7 +3355,7 @@ usezzf:
 		    }
 		}
 	    } else {
-		if (strcasestr(pathbuf, ".scm")) {
+		if (strcasestr(np, ".scm")) {
 		    info = GetScmInfo(pathbuf);
 		    if (info) {
 			DebugLevel3Fn("GetScmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
@@ -5324,7 +5324,7 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 #ifdef USE_ZZIPLIB
 usezzf:
 #endif
-	    if (strcasestr(pathbuf, ".pud")) {
+	    if (strcasestr(np, ".pud")) {
 		info = GetPudInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
@@ -5332,7 +5332,7 @@ usezzf:
 		    fl->xdata = info;
 		    return 1;
 		}
-	    } else if (strcasestr(pathbuf, ".scm")) {
+	    } else if (strcasestr(np, ".scm")) {
 		info = GetScmInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
@@ -5340,7 +5340,7 @@ usezzf:
 		    fl->xdata = info;
 		    return 1;
 		}
-	    } else if (strcasestr(pathbuf, ".chk")) {
+	    } else {
 		info = GetChkInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
