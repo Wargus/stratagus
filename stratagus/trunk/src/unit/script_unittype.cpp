@@ -508,8 +508,6 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("vanishes")) ) {
 	    type->Vanishes=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("tower")) ) {
-	    type->Tower=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("hero")) ) {
 	    type->Hero=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("volatile")) ) {

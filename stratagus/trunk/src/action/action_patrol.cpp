@@ -88,7 +88,7 @@ global void HandleActionPatrol(Unit* unit)
 	//		If don't set the goal, the unit can than choose a
 	//		better goal if moving nearer to enemy.
 	//
-	if( unit->Type->CanAttack && !unit->Type->Tower ) {
+	if( unit->Type->CanAttack && unit->Stats->Speed ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 		DebugLevel0Fn("Patrol attack %d\n" _C_ UnitNumber(goal));

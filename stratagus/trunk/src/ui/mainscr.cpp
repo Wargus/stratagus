@@ -460,7 +460,7 @@ global void DrawUnitInfo(const Unit* unit)
 	return;
     }
 
-    if( type->Building && !type->Tower ) {
+    if( type->Building && !type->CanAttack ) {
 	if( type->Supply ) {		// Supply unit
 	    VideoDrawText(x+16,y+8+63,GameFont,"Food Usage");
 	    VideoDrawText(x+58,y+8+78,GameFont,"Grown:");
