@@ -143,6 +143,7 @@ local unsigned long MyHost;		/// My host number.
 local int MyPort;			/// My port number.
 );
 local int NetworkDelay;			/// Delay counter for recover.
+local int NetworkSyncSeeds[256];	/// Network sync seeds.
 local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network packet input queue
 local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
@@ -175,7 +176,7 @@ local int NetworkSendResend;		/// Packets send to resend
 global void NetworkBroadcast(const void *buf, int len)
 {
     int i;
-#if 0
+#if 1
     //
     //	Can be enabled to simulate network delays.
     //
@@ -235,6 +236,10 @@ local void NetworkSendPacket(const NetworkCommandQueue *ncq)
 
     // if (0 || !(rand() & 15))
 	 NetworkBroadcast(&packet, sizeof(packet));
+
+    if( HostsCount<3 ) {		// enough bandwidth to send twice :)
+	 NetworkBroadcast(&packet, sizeof(packet));
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -256,7 +261,7 @@ local void NetworkServerSetup(void)
     //
     //	Wait for all clients to connect.
     //
-    DebugLevel1Fn("Waiting for %d clients\n",NetPlayers);
+    DebugLevel1Fn("Waiting for %d clients\n",NetPlayers-1);
     acknowledge.Type=MessageInitReply;
     msg=(InitMessage*)buf;
     for (i = 1; i < NetPlayers;) {
@@ -1014,6 +1019,11 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 
     switch (ncq->Data.Type) {
 	case MessageSync:
+	    ply=ntohs(ncq->Data.X)<<16;
+	    ply|=ntohs(ncq->Data.Y);
+	    if( ply!=NetworkSyncSeeds[FrameCounter&0xFF] ) {
+		DebugLevel0Fn("\nNetwork out of sync!\n\n");
+	    }
 	    return;
 	case MessageChat:
 	case MessageChatTerm:
@@ -1087,6 +1097,7 @@ local void NetworkResendCommands(void)
 local void NetworkSendCommands(void)
 {
     NetworkCommandQueue *ncq;
+    extern unsigned SyncRandSeed;
 
     //
     //	No command available, send sync.
@@ -1094,6 +1105,8 @@ local void NetworkSendCommands(void)
     if (dl_empty(CommandsIn)) {
 	ncq = malloc(sizeof(NetworkCommandQueue));
 	ncq->Data.Type = MessageSync;
+	ncq->Data.X = htons(SyncRandSeed>>16);
+	ncq->Data.Y = htons(SyncRandSeed&0xFFFF);
 	// FIXME: can compress sync-messages.
     } else {
 	DebugLevel3Fn("command in remove\n");
@@ -1112,6 +1125,8 @@ local void NetworkSendCommands(void)
     DebugLevel3Fn("sending for %d\n", ncq->Time);
 
     NetworkSendPacket(ncq);
+
+    NetworkSyncSeeds[ncq->Time&0xFF]=SyncRandSeed;
 }
 
 /**
