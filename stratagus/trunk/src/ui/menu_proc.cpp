@@ -1640,7 +1640,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 **
 **	@param race	The Race to set-up for
 */
-global void InitMenus(unsigned int race)
+global void InitMenus(int race)
 {
     static int last_race = -1;
     const char *file;
