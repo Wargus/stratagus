@@ -67,6 +67,7 @@ enum _button_cmd_ {
 
     /// typedef for action of button
 typedef struct _button_action_ ButtonAction;
+typedef int (*ButtonCheckFunc)(const Unit*,const ButtonAction*);
 
     /// Action of button
 struct _button_action_ {
@@ -77,7 +78,7 @@ struct _button_action_ {
     int		Value;			/// extra value for command
     char*	ValueStr;		/// keep original value string
 	/// Check if this button is allowed
-    int		(*Allowed)(const Unit* unit,const ButtonAction* button);
+    ButtonCheckFunc	Allowed;
     char*	AllowStr;		/// argument for allowed
     int		Key;			/// alternative on keyboard
     char*	Hint;			/// tip text
@@ -256,7 +257,7 @@ extern void CleanButtons(void);
     /// Make a new button
 extern int AddButton(int pos,int level,const char* IconIdent,
 	enum _button_cmd_ action,const char* value,
-	const void* func,const void* arg,
+	const ButtonCheckFunc func,const void* arg,
 	int key,const char* hint,const char* umask);
 
     /// Save all buttons
