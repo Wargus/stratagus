@@ -835,7 +835,7 @@ extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
 extern void DropOutAll(const Unit* unit);
 
 	/// @todo more docu
-extern int CanBuildHere(const UnitType* type, int x, int y);
+extern int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y);
 	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu

@@ -482,6 +482,7 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 */
 local void DrawBuildingCursor(void)
 {
+	int i;
 	int x;
 	int y;
 	int mx;
@@ -521,10 +522,17 @@ local void DrawBuildingCursor(void)
 	//
 	//  Draw the allow overlay
 	//
-	f = CanBuildHere(CursorBuilding, mx, my);
+	if (NumSelected) {
+		f = 1;
+		for (i = 0; f && i < NumSelected; ++i) {
+			f = CanBuildHere(Selected[i], CursorBuilding, mx, my);
+		}
+	} else {
+		f = CanBuildHere(NoUnitP, CursorBuilding, mx, my);
+	}
 
 	mask = CursorBuilding->MovementMask;
-	h=CursorBuilding->TileHeight;
+	h = CursorBuilding->TileHeight;
 	BuildingCursorEY = my + h - 1;
 	// reduce to view limits
 	if (my + h > vp->MapY + vp->MapHeight) {
