@@ -10,7 +10,7 @@
 //
 /**@name action_demolish.c	-	The demolish action. */
 //
-//	(c) Copyright 1999,2000 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
 //
 //	$Id$
 
