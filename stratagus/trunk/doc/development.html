@@ -2,7 +2,7 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2001,2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
@@ -197,13 +197,13 @@ To build the freecraft with linux you need the following packets.
 
 <H3>Windows(tm)</H3>
 
-You need a C compiler for windows.
+You need a C compiler for windows. Get <B>one</B> of the following.
 <UL>
 <LI>VC or VC++<P>
-    This isn't supported yet. If you have created a project please send me 
-    the url. FreeCraft now compiles without errors, but now many functions
-    are missing.<P>
+    This isn't supported by the FreeCraft team (nobody owns a VC++ kit).
+    FreeCraft should compile without errors, if you follow this instructions:
     <UL>
+    <LI>Ofcause you must buy or own a VC/VC++ 6 development kit.
     <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++ (
     <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.3-VC6.zip">
     SDL-devel-1.2.3-VC6.zip</A>.
@@ -223,7 +223,8 @@ You need a C compiler for windows.
     <LI>C:\ZLIB
     <LI>C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\INCLUDE
     </UL>
-    and the libs like following:
+    If you have other versions or pathes, please correct this in the project
+    settings and the libs like following:
     <UL>
     <LI>C:\LPNG120\PROJECTS\MSVC\WIN32\LIBPNG\LIB_DBG
     <LI>C:\Program Files\Microsoft Visual Studio\VC98\LIB
@@ -234,8 +235,8 @@ You need a C compiler for windows.
     <LI>SDL.lib
     <LI>WS2_32.lib
     </UL>
-    FreeCraft should now compile with VC++ and work correct.<P>
-    <B>Please send me correction and improvements for this, I can't test this.
+    FreeCraft should now compile with VC++ and work correct (untested!).<P>
+    <B>Please send me correction and improvements for this, we can't test this.
     </B>
 
 <P><LI><A HREF="http://sources.redhat.com/cygwin/">cygwin</A><P>
@@ -248,7 +249,7 @@ You need a C compiler for windows.
     3rd-party DLLs.<P>
 
     <UL>
-    <LI><A HREF="http://www.libsdl.org/Xmingw32/">
+    <LI><B>CROSSCOMPILE ONLY</B>: <A HREF="http://www.libsdl.org/Xmingw32/">
 	http://www.libsdl.org/Xmingw32/</A><P>
 	Informations how to use MingGW and libSDL for cross development and
 	native development.<P>
@@ -262,11 +263,13 @@ You need a C compiler for windows.
 	Based on above this is my build. Contains SDL 1.2.1, libpng, zlib.
 	libbz2 and libzzip.  Install this and download the newest FreeCraft
 	source and start FreeCraft development under windows.<P>
+	<B>If unclear, please download only this.</B>
     </UL><P>
     You can get the missing headerfile stdint.h from <A
     HREF="http://freecraft.net/snapshots/stdint.h"
-    >http://freecraft.net/snapshots/stdint.h</A> and you should copy 
-    \bin\sh.exe to \bin\bash.exe before running setup.
+    >http://freecraft.net/snapshots/stdint.h</A>, than change the line
+    "RULESFILE ?= Rules.make" in src/Makefile to "RULESFILE = Rules.make" 
+    and you should copy \bin\sh.exe to \bin\bash.exe before running setup.
 </UL>
 
 <H3>Window CE(tm) / PocketPc(tm)</H3>
@@ -400,7 +403,7 @@ Please read the documentation of the programs.
 //
 /**@name {filename}.c	-	{One line description of this file} */
 //
-//      (c) Copyright 2001 by {insert your name here}
+//      (c) Copyright 2002 by {insert your name here}
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -501,7 +504,7 @@ You need FcGP, without this FcSP can't be used. Follow the above instructions.
 
 CraftED uses autoconf and configure. To build from CVS use.<P>
 
-./autogen.sh<BR>
+./autogen.sh --enable-new-names<BR>
 make<BR>
 ./src/crafted<P>
 
@@ -509,7 +512,7 @@ make<BR>
 
 CraftED uses autoconf and configure. To build from tarball distribution use.<P>
 
-./configure<BR>
+./configure --enable-new-names<BR>
 make<BR>
 ./src/crafted<P>
 
