@@ -909,7 +909,7 @@ local Menuitem PreferencesMenuItems[] = {
 	{ text:{ "Preferences", MI_TFLAGS_CENTERED} } },
 
     { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar} } },	
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar} } },
     { MI_TYPE_TEXT, 46, 36*1 + 2, 0, GameFont, NULL, NULL,
 	{ text:{ "Fog of War Enabled", MI_TFLAGS_LALIGN} } },
 
@@ -1213,7 +1213,7 @@ global Menu Menus[] = {
 	NULL,
     },
     {
-    	// Sound Options Menu
+	// Sound Options Menu
 	176+(14*TileSizeX-352)/2,
 	16+(14*TileSizeY-352)/2,
 	352, 352,
@@ -1292,7 +1292,7 @@ global Menu Menus[] = {
 	KeystrokeHelpMenuItems,
 	NULL,
     },
-    
+
 };
 
 /*----------------------------------------------------------------------------
@@ -1909,13 +1909,13 @@ global void SoundOptions(void)
 	SoundOptionsMenuItems[8].flags = -1;
     }
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
-    
+
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	SoundOptionsMenuItems[17].d.gem.state = MI_GSTATE_UNCHECKED;
 	SoundOptionsMenuItems[14].flags = -1;
 	SoundOptionsMenuItems[19].flags = -1;
-	
+
 	SoundOptionsMenuItems[21].flags = -1;
     } else {
 #ifdef USE_LIBCDA
@@ -1957,7 +1957,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 	InitSoundClient();
 	SoundOff=0;
     }
-#else 
+#else
     if (SoundFildes != -1) {
         close(SoundFildes);
         SoundFildes=-1;
@@ -1968,7 +1968,7 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 	InitSoundClient();
 	SoundOff=0;
     }
-#endif 				
+#endif
 #endif // with sound
     CurrentMenu=-1;
     SoundOptions();
@@ -1978,21 +1978,21 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
     SCM cb;
-    
+
     if (PlayingMusic == 1) {
 	StopMusic();
     } else {
-            if (CallbackMusic) { 
-                cb = gh_symbol2scm("music-stopped"); 
-                if (!gh_null_p(symbol_boundp(cb, NIL))) { 
-                    SCM value; 
+            if (CallbackMusic) {
+                cb = gh_symbol2scm("music-stopped");
+                if (!gh_null_p(symbol_boundp(cb, NIL))) {
+                    SCM value;
 
-                    value = symbol_value(cb, NIL); 
-                    if (!gh_null_p(value)) { 
-                        gh_apply(value, NIL); 
-                    } 
-                } 
-            } 
+                    value = symbol_value(cb, NIL);
+                    if (!gh_null_p(value)) {
+                        gh_apply(value, NIL);
+                    }
+                }
+            }
     }
 #endif // with sound
     CurrentMenu=-1;
@@ -2035,7 +2035,7 @@ local void SetFogOfWar(Menuitem *mi __attribute__((unused)))
         UpdateFogOfWarChange();
         MapUpdateVisible();
     }
-}											
+}
 
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
@@ -2056,7 +2056,7 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
     SoundOptions();
 
 }
-											
+
 global void SpeedSettings(void)
 {
     int i = 2;
@@ -3065,7 +3065,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3094,7 +3094,7 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-    		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
+		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 		SetVideoSync();
 		MustRedraw |= RedrawMenu;
 	    }
@@ -3107,7 +3107,7 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3153,7 +3153,7 @@ local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
 local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3199,7 +3199,7 @@ local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
 local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3239,7 +3239,7 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3280,7 +3280,7 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 {
     mi--;
-    
+
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
@@ -3927,9 +3927,12 @@ local void MenuHandleKeyDown(unsigned key,unsigned keychar)
 	mi = menu->items + MenuButtonCurSel;
 	if (!(mi->flags & MenuButtonDisabled)) {
 inkey:
+#if 0
+	    // Key is unsigned
 	    if (key < 0) {
 		key &= 0xFF;
 	    }
+#endif
 	    if (key >= 0x80 && key < 0x100) {
 		// FIXME ARI: ISO->WC2 Translation here!
 		key = 0;
