@@ -136,11 +136,12 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
 	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
 	  doc/artistic-license.html doc/ccl/ccl.html doc/ccl/tileset.html \
-	  doc/ccl/unittype.html doc/graphic/*.html doc/graphic/*.png
+	  doc/ccl/icon.html doc/ccl/unittype.html doc/graphic/*.html \
+	  doc/graphic/*.png
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
-CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl \
+CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl data/ccl/icons.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
 	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
