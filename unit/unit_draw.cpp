@@ -943,7 +943,9 @@ local void DrawBuilding(Unit* unit)
 	} else {
 	    DrawUnitType(type,frame,x,y);
 	}
-    // Draw the future unit type, if upgrading to it.
+    //
+    //	Draw the future unit type, if upgrading to it.
+    //
     } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
 	DrawUnitType(unit->Orders[0].Type,(frame&128)+1,x,y);
     } else {
