@@ -1129,7 +1129,6 @@ global void MenuLoop(char* filename, WorldMap* map)
 	PlaySectionMusic(PlaySectionMainMenu);
 #endif
 
-	SavePreferences();
 	LoadCcl();			// Reload the main config file
 
 	PreMenuSetup();
