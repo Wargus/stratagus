@@ -79,7 +79,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global int SoundFildes;			/// audio file descriptor
+global int SoundFildes = -1;		/// audio file descriptor
 
 #ifdef DEBUG
 global unsigned AllocatedSoundMemory;	/// memory used by sound
@@ -846,6 +846,10 @@ global void WriteSound(void)
 #endif
     int free_channels,dummy1,dummy2;
 
+    // ARI: If DSP open had failed: No soundcard, other user, etc..
+    if (SoundFildes == -1)
+	return;
+
     DebugLevel3Fn("\n");
 
     if( 0 ) {
@@ -1025,18 +1029,21 @@ global int InitSound(void)
     if( ioctl(SoundFildes,SNDCTL_DSP_SAMPLESIZE,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
     }
     dummy=1;
     if( ioctl(SoundFildes,SNDCTL_DSP_STEREO,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
     }
     dummy=SoundFrequency;
     if( ioctl(SoundFildes,SNDCTL_DSP_SPEED,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
     }
 #if SoundSampleSize==8
@@ -1049,6 +1056,7 @@ global int InitSound(void)
     if( ioctl(SoundFildes,SNDCTL_DSP_SETFRAGMENT,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
     }
 #if 0
@@ -1056,12 +1064,14 @@ global int InitSound(void)
     if( ioctl(SoundFildes,SNDCTL_DSP_SUBDIVIDE,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return;
     }
 #endif
     if( ioctl(SoundFildes,SNDCTL_DSP_GETBLKSIZE,&dummy)==-1 ) {
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
     }
 
@@ -1104,12 +1114,14 @@ global int InitSoundServer()
 	//FIXME: better error handling
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
       }
       if( pthread_create(&SoundThread,NULL,(void *)&WriteSoundThreaded,NULL) ) {
 	//FIXME: better error handling
 	perror(__FUNCTION__);
 	close(SoundFildes);
+	SoundFildes=-1;
 	return 1;
       }
       SoundThreadRunning=1;
@@ -1127,7 +1139,10 @@ global void QuitSound(void)
 #ifdef USE_SDLA
     SDL_CloseAudio();
 #else
-    // FIXME: cleanup code
+    if (SoundFildes != -1) {
+	close(SoundFildes);
+	SoundFildes=-1;
+    }
 #endif
 }
 
