@@ -235,11 +235,9 @@ typedef struct _ui_ {
                                         ///< +2 for food and score
 
 	// Info panel
-	GraphicConfig InfoPanel;            ///< Info panel background
+	Graphic* InfoPanelG;                 ///< Info panel background
 	int InfoPanelX;                     ///< Info panel screen X position
 	int InfoPanelY;                     ///< Info panel screen Y position
-	int InfoPanelW;                     ///< Info panel width
-	int InfoPanelH;                     ///< Info panel height
 
 	Button* SingleSelectedButton;       ///< FIXME: docu
 	char*   SingleSelectedText;         ///< FIXME: docu

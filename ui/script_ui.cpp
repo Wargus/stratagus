@@ -1085,7 +1085,6 @@ static int CclDefineUI(lua_State* l)
 	ui->MouseWarpX = -1;
 	ui->MouseWarpY = -1;
 
-	ui->InfoPanel.File = NULL;
 	ui->InfoPanelX = -1;
 	ui->InfoPanelY = -1;
 
@@ -1235,7 +1234,12 @@ static int CclDefineUI(lua_State* l)
 				if (!strcmp(value, "panel")) {
 					int subk;
 					int subsubargs;
+					int w;
+					int h;
+					char* file;
 
+					w = h = 0;
+					file = NULL;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -1248,7 +1252,7 @@ static int CclDefineUI(lua_State* l)
 						++subk;
 						if (!strcmp(value, "file")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->InfoPanel.File = strdup(LuaToString(l, -1));
+							file = strdup(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "pos")) {
 							lua_rawgeti(l, -1, subk + 1);
@@ -1268,15 +1272,19 @@ static int CclDefineUI(lua_State* l)
 								LuaError(l, "incorrect argument");
 							}
 							lua_rawgeti(l, -1, 1);
-							ui->InfoPanelW = LuaToNumber(l, -1);
+							w = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_rawgeti(l, -1, 2);
-							ui->InfoPanelH = LuaToNumber(l, -1);
+							h = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
 						}
+					}
+					if (file) {
+						ui->InfoPanelG = NewGraphic(file, w, h);
+						free(file);
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "selected")) {
