@@ -98,6 +98,7 @@ global void InitButtons(void)
 */
 global void SaveButtons(CLFile* file)
 {
+#if 0
 	int i;
 	int n;
 	char* cp;
@@ -239,6 +240,7 @@ global void SaveButtons(CLFile* file)
 
 	CLprintf(file, "(set-show-command-key! %s)\n\n",
 		ShowCommandKey ? "#t" : "#f");
+#endif
 }
 
 

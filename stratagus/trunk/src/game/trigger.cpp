@@ -1335,10 +1335,10 @@ global void SaveTriggers(CLFile* file)
 //	CLprintf(file, "(set-trigger-number! %d)\n", trigger);
 
 	if (GameTimer.Init) {
-		CLprintf(file, "(action-set-timer %ld %d)\n",
+		CLprintf(file, "ActionSetTimer(%ld, %d)\n",
 			GameTimer.Cycles, GameTimer.Increasing);
 		if (GameTimer.Running) {
-			CLprintf(file, "(action-start-timer)\n");
+			CLprintf(file, "ActionStartTimer()\n");
 		}
 	}
 }

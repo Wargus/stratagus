@@ -968,26 +968,26 @@ global void InitSelections(void)
 }
 
 /**
-**		Save current selection state.
+**  Save current selection state.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveSelections(CLFile* file)
 {
 	int i;
 	char* ref;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: selection $Id$\n\n");
+	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "--- MODULE: selection $Id$\n\n");
 
-	CLprintf(file, "(set-group-id! %d)\n", GroupId);
-	CLprintf(file, "(selection %d '(", NumSelected);
+	CLprintf(file, "SetGroupId(%d)\n", GroupId);
+	CLprintf(file, "Selection(%d, {", NumSelected);
 	for (i = 0; i < NumSelected; ++i) {
 		ref = UnitReference(Selected[i]);
-		CLprintf(file, "%s ", ref);
+		CLprintf(file, "\"%s\", ", ref);
 		free(ref);
 	}
-	CLprintf(file, "))\n");
+	CLprintf(file, "})\n");
 }
 
 /**

@@ -292,9 +292,9 @@ local void DeleteReplay(FullReplay* replay)
 }
 
 /**
-**		Output the FullReplay list to dest file
+**  Output the FullReplay list to dest file
 **
-**		@param dest		The file to output to
+**  @param dest  The file to output to
 */
 local void SaveFullLog(CLFile* dest)
 {
@@ -345,9 +345,9 @@ local void SaveFullLog(CLFile* dest)
 }
 
 /**
-**		Append the LogEntry structure at the end of currentLog, and to LogFile
+**  Append the LogEntry structure at the end of currentLog, and to LogFile
 **
-**		@param dest		The file to output to
+**  @param dest  The file to output to
 */
 local void AppendLog(LogEntry* log, CLFile* dest)
 {
@@ -699,9 +699,9 @@ local int CclReplayLog(lua_State* l)
 }
 
 /**
-**		Save generated replay
+**  Save generated replay
 **
-**		@param file		file to save to.
+**  @param file  file to save to.
 */
 global void SaveReplayList(CLFile* file)
 {
@@ -709,9 +709,9 @@ global void SaveReplayList(CLFile* file)
 }
 
 /**
-**		Load a log file to replay a game
+**  Load a log file to replay a game
 **
-**		@param name		name of file to load.
+**  @param name  name of file to load.
 */
 global int LoadReplay(char* name)
 {

@@ -281,6 +281,7 @@ global void InitDependencies(void)
 */
 global void SaveDependencies(CLFile* file)
 {
+#if 0
 	unsigned u;
 	const DependRule* node;
 	const DependRule* rule;
@@ -335,6 +336,7 @@ global void SaveDependencies(CLFile* file)
 			node = node->Next;
 		}
 	}
+#endif
 }
 
 /**

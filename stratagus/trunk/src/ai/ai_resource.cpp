@@ -320,7 +320,7 @@ local void AiRequestSupply(void)
 	//
 	// Count the already made build requests.
 	//
-	memset(counter, 0, sizeof (counter));
+	memset(counter, 0, sizeof(counter));
 	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
 		counter[queue->Type->Type] += queue->Want;
 	}
@@ -410,7 +410,7 @@ local int AiTrainUnit(const UnitType* type, UnitType* what)
 **
 **  @param type  The unittype we wan't to build
 */
-global int AiCountUnitBuilders(UnitType * type)
+global int AiCountUnitBuilders(UnitType* type)
 {
 	int result;
 	int i;
@@ -464,7 +464,7 @@ global int AiCountUnitBuilders(UnitType * type)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-local int AiMakeUnit(UnitType * type)
+local int AiMakeUnit(UnitType* type)
 {
 	int i;
 	int n;
@@ -472,7 +472,7 @@ local int AiMakeUnit(UnitType * type)
 	AiUnitTypeTable* const* tablep;
 	const AiUnitTypeTable* table;
 
-	int usableTypes[UnitTypeMax+1];
+	int usableTypes[UnitTypeMax + 1];
 	int usableTypesCount;
 	int currentType;
 
@@ -482,7 +482,7 @@ local int AiMakeUnit(UnitType * type)
 	usableTypesCount = AiFindAvailableUnitTypeEquiv(type, usableTypes);
 
 	// Iterate them
-	for (currentType = 0; currentType < usableTypesCount; currentType++) {
+	for (currentType = 0; currentType < usableTypesCount; ++currentType) {
 
 		type = UnitTypes[usableTypes[currentType]];
 
@@ -845,7 +845,7 @@ local int AiAssignHarvester(Unit* unit, int resource)
 			return 1;
 		}
 		exploremask = 0;
-		for (i = 0; i <= UnitTypeMax; i++) {
+		for (i = 0; i < UnitTypeMax; ++i) {
 			if (UnitTypes[i] && UnitTypes[i]->GivesResource == resource) {
 				switch (UnitTypes[i]->UnitType) {
 				case UnitTypeLand:

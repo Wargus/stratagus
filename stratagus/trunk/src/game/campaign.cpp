@@ -560,8 +560,8 @@ global void SaveCampaign(CLFile* file)
 	ChapterPictureText* text;
 	int i;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: campaign $Id$\n\n");
+	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "--- MODULE: campaign $Id$\n\n");
 	if (!CurrentCampaign) {
 		return;
 	}
