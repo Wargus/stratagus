@@ -53,14 +53,14 @@
 /**
 **		hash table used to store the mapping between sound name and sound id
 */
-local int SoundIdHash[61];
+static int SoundIdHash[61];
 
 #else
 
 /**
 **		hash table used to store the mapping between sound name and sound id
 */
-local hashtable(int, 61) SoundIdHash;
+static hashtable(int, 61) SoundIdHash;
 
 #endif
 
@@ -71,7 +71,7 @@ local hashtable(int, 61) SoundIdHash;
 /**
 **		Display the sound name hash table.
 */
-global void DisplaySoundHashTable(void)
+void DisplaySoundHashTable(void)
 {
 	struct hash_st st;
 
@@ -95,7 +95,7 @@ global void DisplaySoundHashTable(void)
 **		@param name		Name of the sound (now freed by caller!).
 **		@param id		Sound identifier.
 */
-global void MapSound(const char* name, const SoundId id)
+void MapSound(const char* name, const SoundId id)
 {
 	*((SoundId*)hash_add(SoundIdHash, (char*)name)) = id;
 }
@@ -107,7 +107,7 @@ global void MapSound(const char* name, const SoundId id)
 **
 **		@return				Sound idenfier for this name.
 */
-global SoundId SoundIdForName(const char* name)
+SoundId SoundIdForName(const char* name)
 {
 	const SoundId* result;
 
@@ -132,7 +132,7 @@ global SoundId SoundIdForName(const char* name)
 **
 **		@return the sound id of the created group
 */
-global SoundId MakeSound(const char* name, const char* file[], int nb)
+SoundId MakeSound(const char* name, const char* file[], int nb)
 {
 	SoundId id;
 	const SoundId* result;
@@ -164,7 +164,7 @@ global SoundId MakeSound(const char* name, const char* file[], int nb)
 **
 **		@return				Registered sound identifier.
 */
-global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
+SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 {
 	SoundId sound;
 	const SoundId* result;

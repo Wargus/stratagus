@@ -228,7 +228,7 @@ static int FlacStreamRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void FlacStreamFree(Sample *sample)
+static void FlacStreamFree(Sample *sample)
 {
 	FlacData *data;
 
@@ -245,7 +245,7 @@ local void FlacStreamFree(Sample *sample)
 /**
 **  Flac stream type structure.
 */
-local const SampleType FlacStreamSampleType = {
+static const SampleType FlacStreamSampleType = {
 	FlacStreamRead,
 	FlacStreamFree,
 };
@@ -259,7 +259,7 @@ local const SampleType FlacStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-local int FlacRead(Sample *sample, void *buf, int len)
+static int FlacRead(Sample *sample, void *buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -279,7 +279,7 @@ local int FlacRead(Sample *sample, void *buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void FlacFree(Sample *sample)
+static void FlacFree(Sample *sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -289,7 +289,7 @@ local void FlacFree(Sample *sample)
 /**
 **  Flac object type structure.
 */
-local const SampleType FlacSampleType = {
+static const SampleType FlacSampleType = {
 	FlacRead,
 	FlacFree,
 };
@@ -302,7 +302,7 @@ local const SampleType FlacSampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-global Sample* LoadFlac(const char *name, int flags)
+Sample* LoadFlac(const char *name, int flags)
 {
 	Sample *sample;
 	FlacData *data;

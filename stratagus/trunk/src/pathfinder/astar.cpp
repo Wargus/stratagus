@@ -73,24 +73,24 @@ typedef struct _open_ {
 
 //  Convert heading into direction.
 //							//  N NE  E SE  S SW  W NW
-global const int Heading2X[9] = {  0,+1,+1,+1, 0,-1,-1,-1, 0 };
-global const int Heading2Y[9] = { -1,-1, 0,+1,+1,+1, 0,-1, 0 };
-global const int XY2Heading[3][3] = { {7,6,5},{0,0,4},{1,2,3}};
+const int Heading2X[9] = {  0,+1,+1,+1, 0,-1,-1,-1, 0 };
+const int Heading2Y[9] = { -1,-1, 0,+1,+1,+1, 0,-1, 0 };
+const int XY2Heading[3][3] = { {7,6,5},{0,0,4},{1,2,3}};
 /// cost matrix
-local Node* AStarMatrix;
+static Node* AStarMatrix;
 /// a list of close nodes, helps to speed up the matrix cleaning
-local int* CloseSet;
-local int Threshold;
-local int OpenSetMaxSize;
-local int AStarMatrixSize;
+static int* CloseSet;
+static int Threshold;
+static int OpenSetMaxSize;
+static int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4
 #define MAX_OPEN_SET_RATIO 8		// 10,16 to small
 
 /// see pathfinder.h
-global int AStarFixedUnitCrossingCost = MaxMapWidth * MaxMapHeight;
-global int AStarMovingUnitCrossingCost = 5;
-global int AStarKnowUnknown = 0;
-global int AStarUnknownTerrainCost = 2;
+int AStarFixedUnitCrossingCost = MaxMapWidth * MaxMapHeight;
+int AStarMovingUnitCrossingCost = 5;
+int AStarKnowUnknown = 0;
+int AStarUnknownTerrainCost = 2;
 
 /**
 **		The Open set is handled by a Heap stored in a table
@@ -99,14 +99,14 @@ global int AStarUnknownTerrainCost = 2;
 */
 
 /// The set of Open nodes
-local Open* OpenSet;
+static Open* OpenSet;
 /// The size of the open node set
-local int OpenSetSize;
+static int OpenSetSize;
 
 /**
 **		Init A* data structures
 */
-global void InitAStar(void)
+void InitAStar(void)
 {
 	if (!AStarMatrix) {
 		AStarMatrixSize = sizeof(Node) * TheMap.Width * TheMap.Height;
@@ -121,7 +121,7 @@ global void InitAStar(void)
 /**
 **		Free A* data structure
 */
-global void FreeAStar(void)
+void FreeAStar(void)
 {
 	if (AStarMatrix) {
 		free(AStarMatrix);
@@ -134,7 +134,7 @@ global void FreeAStar(void)
 /**
 **		Prepare path finder.
 */
-local void AStarPrepare(void)
+static void AStarPrepare(void)
 {
 	memset(AStarMatrix, 0, AStarMatrixSize);
 }
@@ -142,7 +142,7 @@ local void AStarPrepare(void)
 /**
 **		Clean up the AStarMatrix
 */
-local void AStarCleanUp(int num_in_close)
+static void AStarCleanUp(int num_in_close)
 {
 	int i;
 
@@ -163,7 +163,7 @@ local void AStarCleanUp(int num_in_close)
 */
 #define AStarFindMinimum() 0
 #if 0
-local int AStarFindMinimum()
+static int AStarFindMinimum()
 {
 	return 0;
 }
@@ -173,7 +173,7 @@ local int AStarFindMinimum()
 **		Remove the minimum from the open node set (and update the heap)
 **		pos is the position of the minimum (0 in the heap based implementation)
 */
-local void AStarRemoveMinimum(int pos)
+static void AStarRemoveMinimum(int pos)
 {
 	int i;
 	int j;
@@ -207,7 +207,7 @@ local void AStarRemoveMinimum(int pos)
 **		Add a new node to the open set (and update the heap structure)
 **		Returns Pathfinder failed
 */
-local int AStarAddNode(int x, int y, int o, int costs)
+static int AStarAddNode(int x, int y, int o, int costs)
 {
 	int i;
 	int j;
@@ -243,7 +243,7 @@ local int AStarAddNode(int x, int y, int o, int costs)
 **		Change the cost associated to an open node. The new cost MUST BE LOWER
 **		than the old one in the current heap based implementation.
 */
-local void AStarReplaceNode(int pos, int costs)
+static void AStarReplaceNode(int pos, int costs)
 {
 	int i;
 	int j;
@@ -270,7 +270,7 @@ local void AStarReplaceNode(int pos, int costs)
 **		Check if a node is already in the open set.
 **		Return -1 if not found and the position of the node in the table if found.
 */
-local int AStarFindNode(int eo)
+static int AStarFindNode(int eo)
 {
 	int i;
 
@@ -288,7 +288,7 @@ local int AStarFindNode(int eo)
 **		 0 -> no induced cost, except move
 **		>0 -> costly tile
 */
-local int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
+static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 	int j;
 	int cost;
 	Unit* goal;
@@ -334,7 +334,7 @@ local int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 /**
 **		MarkAStarGoal
 */
-local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
+static int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
 				int mask, int* num_in_close)
 {
 	int cx[4];
@@ -508,7 +508,7 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange
 /**
 **		Find path.
 */
-global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
+int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
 {
 	int i;
 	int j;
@@ -742,7 +742,7 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 **		@return				>0 remaining path length, 0 wait for path, -1
 **						reached goal, -2 can't reach the goal.
 */
-global int NextPathElement(Unit* unit,int* pxd,int *pyd)
+int NextPathElement(Unit* unit,int* pxd,int *pyd)
 {
 	int result;
 

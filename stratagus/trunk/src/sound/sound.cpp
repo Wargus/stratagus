@@ -60,15 +60,15 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global int SoundOff;						/// True quiet, sound turned off
-global int MusicOff;						/// Music turned off
+int SoundOff;						/// True quiet, sound turned off
+int MusicOff;						/// Music turned off
 
 /**
 **		Various sounds used in game.
 **
 **		FIXME: @todo support more races. Must remove static config.
 */
-global GameSound GameSounds
+GameSound GameSounds
 #ifndef laterUSE_CCL
 // FIXME: Removing this crashes?
 ={
@@ -103,7 +103,7 @@ global GameSound GameSounds
 **		@param volume		FIXME: docu
 **		@param stereo		FIXME: docu
 */
-local void InsertSoundRequest(const Unit* unit, unsigned id,
+static void InsertSoundRequest(const Unit* unit, unsigned id,
 	unsigned short power, SoundId sound, unsigned char fight,
 	unsigned char selection, unsigned char volume, char stereo)
 {
@@ -144,7 +144,7 @@ local void InsertSoundRequest(const Unit* unit, unsigned id,
 **
 **		@todo FIXME: The work completed sounds only supports two races.
 */
-local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
+static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 {
 	switch (voice) {
 		case VoiceAcknowledging:
@@ -181,7 +181,7 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 **		@param unit		Sound initiator, unit speaking
 **		@param voice		Type of sound wanted (Ready,Die,Yes,...)
 */
-global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
+void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
 	int stereo;
 
@@ -205,7 +205,7 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 **		@param missile		Sound initiator, missile exploding
 **		@param sound		Sound to be generated
 */
-global void PlayMissileSound(const Missile* missile, SoundId sound)
+void PlayMissileSound(const Missile* missile, SoundId sound)
 {
 	int stereo;
 
@@ -225,7 +225,7 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 /**
 **		FIXME: docu
 */
-global void PlayGameSound(SoundId sound, unsigned char volume)
+void PlayGameSound(SoundId sound, unsigned char volume)
 {
 	InsertSoundRequest(NULL, 0, volume, sound, 0, 0, 1, 0);
 }
@@ -237,7 +237,7 @@ global void PlayGameSound(SoundId sound, unsigned char volume)
 **
 **		@see MaxVolume
 */
-global void SetGlobalVolume(int volume)
+void SetGlobalVolume(int volume)
 {
 	//FIXME: we use here the fact that we are in a shared memory context. This
 	// should send a message to the sound server
@@ -258,7 +258,7 @@ global void SetGlobalVolume(int volume)
 **
 **		@see MaxVolume
 */
-global void SetMusicVolume(int volume)
+void SetMusicVolume(int volume)
 {
 	//FIXME: we use here the fact that we are in a shared memory context. This
 	// should send a message to the sound server
@@ -276,7 +276,7 @@ global void SetMusicVolume(int volume)
 /**
 **		Lookup the sound id's for the game sounds.
 */
-global void InitSoundClient(void)
+void InitSoundClient(void)
 {
 	int i;
 

@@ -59,7 +59,7 @@
 **
 **  @param order  Pointer to order.
 */
-local void ReleaseOrder(Order* order)
+static void ReleaseOrder(Order* order)
 {
 	if (order->Goal) {
 		RefsDecrease(order->Goal);
@@ -72,7 +72,7 @@ local void ReleaseOrder(Order* order)
 **
 **  @param unit  Pointer to unit.
 */
-local void ReleaseOrders(Unit* unit)
+static void ReleaseOrders(Unit* unit)
 {
 	int n;
 
@@ -94,7 +94,7 @@ local void ReleaseOrders(Unit* unit)
 **
 **  @return       Pointer to next free order slot.
 */
-local Order* GetNextOrder(Unit* unit, int flush)
+static Order* GetNextOrder(Unit* unit, int flush)
 {
 	if (flush) {			// empty command queue
 		ReleaseOrders(unit);
@@ -118,7 +118,7 @@ local Order* GetNextOrder(Unit* unit, int flush)
 **  @note        If we make an new order, we must clear any saved actions.
 **  @note        Internal functions, must protect it, if needed.
 */
-local void ClearSavedAction(Unit* unit)
+static void ClearSavedAction(Unit* unit)
 {
 	ReleaseOrder(&unit->SavedOrder);
 
@@ -137,7 +137,7 @@ local void ClearSavedAction(Unit* unit)
 **
 **  @param unit  pointer to unit.
 */
-global void CommandStopUnit(Unit* unit)
+void CommandStopUnit(Unit* unit)
 {
 	Order* order;
 
@@ -161,7 +161,7 @@ global void CommandStopUnit(Unit* unit)
 **  @param cpyorder  pointer to valid order
 **  @param flush     if true, flush command queue.
 */
-global void CommandAnyOrder(Unit* unit, Order* cpyorder, int flush)
+void CommandAnyOrder(Unit* unit, Order* cpyorder, int flush)
 {
 	Order* order;
 	if (!(order = GetNextOrder(unit, flush))) {
@@ -183,7 +183,7 @@ global void CommandAnyOrder(Unit* unit, Order* cpyorder, int flush)
 **  @param src   the order to move
 **  @param dst   the new position of the order
 */
-global void CommandMoveOrder(Unit* unit, int src, int dst)
+void CommandMoveOrder(Unit* unit, int src, int dst)
 {
 	Order tmp;
 	int i;
@@ -215,7 +215,7 @@ global void CommandMoveOrder(Unit* unit, int src, int dst)
 **  @param unit   pointer to unit.
 **  @param flush  if true, flush command queue.
 */
-global void CommandStandGround(Unit* unit, int flush)
+void CommandStandGround(Unit* unit, int flush)
 {
 	Order* order;
 
@@ -243,7 +243,7 @@ global void CommandStandGround(Unit* unit, int flush)
 **  @param dest   unit to be followed
 **  @param flush  if true, flush command queue.
 */
-global void CommandFollow(Unit* unit, Unit* dest, int flush)
+void CommandFollow(Unit* unit, Unit* dest, int flush)
 {
 	Order* order;
 
@@ -290,7 +290,7 @@ global void CommandFollow(Unit* unit, Unit* dest, int flush)
 **  @param y      Y map position to move to.
 **  @param flush  if true, flush command queue.
 */
-global void CommandMove(Unit* unit, int x, int y, int flush)
+void CommandMove(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
@@ -333,7 +333,7 @@ global void CommandMove(Unit* unit, int x, int y, int flush)
 **  @param dest   or unit to be repaired. FIXME: not supported
 **  @param flush  if true, flush command queue.
 */
-global void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
+void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 {
 	Order* order;
 
@@ -390,7 +390,7 @@ global void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 **  @param attack  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-global void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
+void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 {
 	Order* order;
 
@@ -461,7 +461,7 @@ global void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 **  @param y      Y map position to fire on.
 **  @param flush  if true, flush command queue.
 */
-global void CommandAttackGround(Unit* unit, int x, int y, int flush)
+void CommandAttackGround(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
@@ -508,7 +508,7 @@ global void CommandAttackGround(Unit* unit, int x, int y, int flush)
 **  @param y      Y map position to patrol between.
 **  @param flush  if true, flush command queue.
 */
-global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
+void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
@@ -551,7 +551,7 @@ global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 **  @param dest   unit to be boarded.
 **  @param flush  if true, flush command queue.
 */
-global void CommandBoard(Unit* unit, Unit* dest, int flush)
+void CommandBoard(Unit* unit, Unit* dest, int flush)
 {
 	Order* order;
 
@@ -596,7 +596,7 @@ global void CommandBoard(Unit* unit, Unit* dest, int flush)
 **  @param what   unit to be unloaded, NoUnitP all.
 **  @param flush  if true, flush command queue.
 */
-global void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
+void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 {
 	Order* order;
 
@@ -658,7 +658,7 @@ global void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-global void CommandBuildBuilding(Unit* unit, int x, int y,
+void CommandBuildBuilding(Unit* unit, int x, int y,
 	UnitType* what, int flush)
 {
 	Order* order;
@@ -708,7 +708,7 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 **
 **  @param unit    pointer to unit.
 */
-global void CommandDismiss(Unit* unit)
+void CommandDismiss(Unit* unit)
 {
 	//
 	// Check if building is still under construction? (NETWORK!)
@@ -730,7 +730,7 @@ global void CommandDismiss(Unit* unit)
 **  @param y      Y map position for harvest.
 **  @param flush  if true, flush command queue.
 */
-global void CommandResourceLoc(Unit* unit, int x, int y, int flush)
+void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 	int nx;
@@ -785,7 +785,7 @@ global void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 **  @param dest   destination unit.
 **  @param flush  if true, flush command queue.
 */
-global void CommandResource(Unit* unit, Unit* dest, int flush)
+void CommandResource(Unit* unit, Unit* dest, int flush)
 {
 	Order* order;
 
@@ -828,7 +828,7 @@ global void CommandResource(Unit* unit, Unit* dest, int flush)
 **  @param goal   bring goods to this depot.
 **  @param flush  if true, flush command queue.
 */
-global void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
+void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 {
 	Order* order;
 
@@ -874,7 +874,7 @@ global void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-global void CommandTrainUnit(Unit* unit, UnitType* type,
+void CommandTrainUnit(Unit* unit, UnitType* type,
 	int flush __attribute__((unused)))
 {
 	//
@@ -932,7 +932,7 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 **  @param slot  slot number to cancel.
 **  @param type  Unit-type to cancel.
 */
-global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
+void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 {
 	int i;
 	int n;
@@ -998,7 +998,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-global void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
+void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 {
 	Order* order;
 
@@ -1037,7 +1037,7 @@ global void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 **
 **  @param unit  pointer to unit.
 */
-global void CommandCancelUpgradeTo(Unit* unit)
+void CommandCancelUpgradeTo(Unit* unit)
 {
 	ReleaseOrders(unit);				// empty command queue
 
@@ -1077,7 +1077,7 @@ global void CommandCancelUpgradeTo(Unit* unit)
 **  @param what   what to research.
 **  @param flush  if true, flush command queue.
 */
-global void CommandResearch(Unit* unit, Upgrade* what, int flush)
+void CommandResearch(Unit* unit, Upgrade* what, int flush)
 {
 	Order* order;
 
@@ -1129,7 +1129,7 @@ global void CommandResearch(Unit* unit, Upgrade* what, int flush)
 **
 **  @param unit  Pointer to unit.
 */
-global void CommandCancelResearch(Unit* unit)
+void CommandCancelResearch(Unit* unit)
 {
 	ReleaseOrders(unit);				// empty command queue
 
@@ -1175,7 +1175,7 @@ global void CommandCancelResearch(Unit* unit)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
+void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 	SpellType* spell, int flush)
 {
 	Order* order;
@@ -1240,7 +1240,7 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 **  @param spellid  Spell id.
 **  @param on       1 for auto cast on, 0 for off.
 */
-global void CommandAutoSpellCast(Unit* unit, int spellid, int on)
+void CommandAutoSpellCast(Unit* unit, int spellid, int on)
 {
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -1257,7 +1257,7 @@ global void CommandAutoSpellCast(Unit* unit, int spellid, int on)
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-global void CommandDiplomacy(int player, int state, int opponent)
+void CommandDiplomacy(int player, int state, int opponent)
 {
 	switch (state) {
 		case DiplomacyNeutral:
@@ -1287,7 +1287,7 @@ global void CommandDiplomacy(int player, int state, int opponent)
 **  @param state     New shared vision state.
 **  @param opponent  Opponent.
 */
-global void CommandSharedVision(int player, int state, int opponent)
+void CommandSharedVision(int player, int state, int opponent)
 {
 	int before;
 	int after;
@@ -1353,7 +1353,7 @@ global void CommandSharedVision(int player, int state, int opponent)
 **
 **  @param player  Player number that quit.
 */
-global void CommandQuit(int player)
+void CommandQuit(int player)
 {
 	int i;
 

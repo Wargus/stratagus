@@ -101,7 +101,7 @@ static MREADER MReader = { Seek, Tell, Read, Get, Eof };
 **
 **  @return        Number of bytes read
 */
-local int MikModStreamRead(Sample* sample, void* buf, int len)
+static int MikModStreamRead(Sample* sample, void* buf, int len)
 {
 	MikModData* data;
 	int read;
@@ -136,7 +136,7 @@ local int MikModStreamRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void MikModStreamFree(Sample* sample)
+static void MikModStreamFree(Sample* sample)
 {
 	MikModData *data;
 	data = (MikModData*)sample->User;
@@ -155,7 +155,7 @@ local void MikModStreamFree(Sample* sample)
 /**
 **  MikMod object type structure.
 */
-local const SampleType MikModStreamSampleType = {
+static const SampleType MikModStreamSampleType = {
 	MikModStreamRead,
 	MikModStreamFree,
 };
@@ -169,7 +169,7 @@ local const SampleType MikModStreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-local int MikModRead(Sample* sample, void* buf, int len)
+static int MikModRead(Sample* sample, void* buf, int len)
 {
 	if (sample->Len < len) {
 		len = sample->Len;
@@ -187,7 +187,7 @@ local int MikModRead(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void MikModFree(Sample* sample)
+static void MikModFree(Sample* sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -197,7 +197,7 @@ local void MikModFree(Sample* sample)
 /**
 **  MikMod object type structure.
 */
-local const SampleType MikModSampleType = {
+static const SampleType MikModSampleType = {
 	MikModRead,
 	MikModFree,
 };
@@ -211,7 +211,7 @@ local const SampleType MikModSampleType = {
 **  @return       Returns the loaded sample.
 **
 */
-global Sample* LoadMikMod(const char* name, int flags)
+Sample* LoadMikMod(const char* name, int flags)
 {
 	Sample* sample;
 	MikModData* data;

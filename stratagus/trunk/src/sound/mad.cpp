@@ -75,7 +75,7 @@ typedef struct _mp3_data_ {
 **
 **  @return        MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
 */
-local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
+static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 {
 	Sample *sample;
 	MadData *data;
@@ -109,7 +109,7 @@ local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 **  @param header  MAD header.
 **  @param pcm     MAD pcm data struture.
 */
-local enum mad_flow MAD_write(void* user,
+static enum mad_flow MAD_write(void* user,
 	struct mad_header const* header,
 	struct mad_pcm* pcm)
 {
@@ -163,7 +163,7 @@ local enum mad_flow MAD_write(void* user,
 **  possible MAD_ERROR_* errors can be found in the mad.h (or
 **  libmad/stream.h) header file.
 */
-local enum mad_flow MAD_error(void* user __attribute__((unused)),
+static enum mad_flow MAD_error(void* user __attribute__((unused)),
 	struct mad_stream* stream,
 	struct mad_frame* frame __attribute__((unused)))
 {
@@ -184,7 +184,7 @@ local enum mad_flow MAD_error(void* user __attribute__((unused)),
 **
 **  @return        Number of bytes read
 */
-local int MadRead(Sample *sample, unsigned char* buf, int len)
+static int MadRead(Sample *sample, unsigned char* buf, int len)
 {
 	struct mad_decoder *decoder;
 	struct mad_stream* stream;
@@ -276,7 +276,7 @@ local int MadRead(Sample *sample, unsigned char* buf, int len)
 **
 **  @return        Number of bytes read
 */
-local int Mp3ReadStream(Sample* sample, void* buf, int len)
+static int Mp3ReadStream(Sample* sample, void* buf, int len)
 {
 	MadData* data;
 	int i;
@@ -324,7 +324,7 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void Mp3FreeStream(Sample* sample)
+static void Mp3FreeStream(Sample* sample)
 {
 	MadData* data;
 
@@ -348,7 +348,7 @@ local void Mp3FreeStream(Sample* sample)
 /**
 **  Mp3 object type structure.
 */
-local const SampleType Mp3StreamSampleType = {
+static const SampleType Mp3StreamSampleType = {
 	Mp3ReadStream,
 	Mp3FreeStream,
 };
@@ -362,7 +362,7 @@ local const SampleType Mp3StreamSampleType = {
 **
 **  @return        Number of bytes read
 */
-local int Mp3Read(Sample* sample, void* buf, int len)
+static int Mp3Read(Sample* sample, void* buf, int len)
 {
 	if (len > sample->Len) {
 		len = sample->Len;
@@ -380,7 +380,7 @@ local int Mp3Read(Sample* sample, void* buf, int len)
 **
 **  @param sample  Sample to free
 */
-local void Mp3Free(Sample* sample)
+static void Mp3Free(Sample* sample)
 {
 	free(sample->User);
 	free(sample->Buffer);
@@ -390,7 +390,7 @@ local void Mp3Free(Sample* sample)
 /**
 **  Mp3 object type structure.
 */
-local const SampleType Mp3SampleType = {
+static const SampleType Mp3SampleType = {
 	Mp3Read,
 	Mp3Free,
 };
@@ -403,7 +403,7 @@ local const SampleType Mp3SampleType = {
 **
 **  @return       Returns the loaded sample.
 */
-global Sample* LoadMp3(const char* name, int flags)
+Sample* LoadMp3(const char* name, int flags)
 {
 	CLFile* f;
 	unsigned char magic[2];

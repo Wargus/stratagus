@@ -79,20 +79,20 @@
 /**
 **		Menu button graphics
 */
-global MenuGraphics MenuButtonGfx;
+MenuGraphics MenuButtonGfx;
 
 /**
 **		The currently processed menu
 */
-global Menu* CurrentMenu;
+Menu* CurrentMenu;
 
 /**
 **		The background picture used by menus
 */
-local Graphic* Menusbgnd;
+static Graphic* Menusbgnd;
 
-local int MenuButtonUnderCursor = -1;
-local int MenuButtonCurSel = -1;
+static int MenuButtonUnderCursor = -1;
+static int MenuButtonCurSel = -1;
 
 /*----------------------------------------------------------------------------
 --		Menu operation functions
@@ -101,7 +101,7 @@ local int MenuButtonCurSel = -1;
 /**
 **	  Convert menu button style to a string for saving.
 */
-global char* MenuButtonStyle(int style)
+char* MenuButtonStyle(int style)
 {
    switch (style) {
 	   case MBUTTON_MAIN:
@@ -150,7 +150,7 @@ global char* MenuButtonStyle(int style)
 **
 **		@return				Pointer to the menu, NULL if menu is not found.
 */
-global Menu* FindMenu(const char* menu_id)
+Menu* FindMenu(const char* menu_id)
 {
 	Menu** menu;
 
@@ -176,7 +176,7 @@ global Menu* FindMenu(const char* menu_id)
 **		@param normalcolor
 **		@param reversecolor
 */
-global void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
+void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
 	int x, int y, const int font, const unsigned char* text,
 	char* normalcolor, char* reversecolor)
 {
@@ -287,7 +287,7 @@ global void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent,
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawPulldown(Menuitem* mi, int mx, int my)
+static void DrawPulldown(Menuitem* mi, int mx, int my)
 {
 	int i;
 	char* nc;
@@ -538,7 +538,7 @@ local void DrawPulldown(Menuitem* mi, int mx, int my)
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawListbox(Menuitem* mi, int mx, int my)
+static void DrawListbox(Menuitem* mi, int mx, int my)
 {
 	int i;
 	int s;
@@ -618,7 +618,7 @@ local void DrawListbox(Menuitem* mi, int mx, int my)
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawVSlider(Menuitem* mi, int mx, int my)
+static void DrawVSlider(Menuitem* mi, int mx, int my)
 {
 	int p;
 	unsigned flags;
@@ -721,7 +721,7 @@ local void DrawVSlider(Menuitem* mi, int mx, int my)
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawHSlider(Menuitem* mi, int mx, int my)
+static void DrawHSlider(Menuitem* mi, int mx, int my)
 {
 	int p;
 	unsigned flags;
@@ -824,7 +824,7 @@ local void DrawHSlider(Menuitem* mi, int mx, int my)
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawGem(Menuitem* mi, int mx, int my)
+static void DrawGem(Menuitem* mi, int mx, int my)
 {
 	unsigned flags;
 	MenuButtonId rb;
@@ -882,7 +882,7 @@ local void DrawGem(Menuitem* mi, int mx, int my)
 **		@param mx		menu X display position (offset)
 **		@param my		menu Y display position (offset)
 */
-local void DrawInput(Menuitem* mi, int mx, int my)
+static void DrawInput(Menuitem* mi, int mx, int my)
 {
 	char* nc;
 	char* rc;
@@ -963,7 +963,7 @@ local void DrawInput(Menuitem* mi, int mx, int my)
 **
 **  @param menu  The menu number to display (NULL allowed)
 */
-global void DrawMenu(Menu* menu)
+void DrawMenu(Menu* menu)
 {
 	int i;
 	int n;
@@ -1113,7 +1113,7 @@ global void DrawMenu(Menu* menu)
 /**
 **		Paste text from the clipboard
 */
-local void PasteFromClipboard(Menuitem* mi)
+static void PasteFromClipboard(Menuitem* mi)
 {
 #if defined(USE_WIN32) || defined(_XLIB_H_)
 	int i;
@@ -1211,7 +1211,7 @@ local void PasteFromClipboard(Menuitem* mi)
 **		@todo FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
 **	  to implement button animation (depress before action)
 */
-local void MenuHandleKeyDown(unsigned key, unsigned keychar)
+static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
 	int i;
 	int n;
@@ -1491,7 +1491,7 @@ normkey:
 **		@param key		Key scancode.
 **		@param keychar		ASCII character code of key.
 */
-local void MenuHandleKeyUp(unsigned key, unsigned keychar)
+static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
 	HandleKeyModifiersUp(key, keychar);
 }
@@ -1502,7 +1502,7 @@ local void MenuHandleKeyUp(unsigned key, unsigned keychar)
 **		@param key		Key scancode.
 **		@param keychar		ASCII character code of key.
 */
-local void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
+static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	HandleKeyModifiersDown(key, keychar);
 
@@ -1521,7 +1521,7 @@ local void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 **		@param x		Screen X position.
 **		@param y		Screen Y position.
 */
-local void MenuHandleMouseMove(int x, int y)
+static void MenuHandleMouseMove(int x, int y)
 {
 	int h;
 	int w;
@@ -1899,7 +1899,7 @@ local void MenuHandleMouseMove(int x, int y)
 **
 **		@param b		button code
 */
-local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
+static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
 	Menuitem* mi;
 	Menu* menu;
@@ -2113,7 +2113,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 **
 **		@param b		button code
 */
-local void MenuHandleButtonUp(unsigned b)
+static void MenuHandleButtonUp(unsigned b)
 {
 	int i;
 	int n;
@@ -2246,7 +2246,7 @@ MenuStack* Menus;
 /**
 **		Push the current menu onto the stack.
 */
-local void PushMenu(void)
+static void PushMenu(void)
 {
 	MenuStack* menu;
 
@@ -2260,7 +2260,7 @@ local void PushMenu(void)
 /**
 **		Pop the stack and set the current menu
 */
-local void PopMenu(void)
+static void PopMenu(void)
 {
 	MenuStack* menu;
 	Menuitem* mi;
@@ -2293,7 +2293,7 @@ local void PopMenu(void)
 /**
 **  End process menu
 */
-global void EndMenu(void)
+void EndMenu(void)
 {
 	CursorOn = CursorOnUnknown;
 	PopMenu();
@@ -2315,7 +2315,7 @@ global void EndMenu(void)
 **
 **		@todo FIXME: This function is called from the event handler!!
 */
-global void ProcessMenu(const char* menu_id, int loop)
+void ProcessMenu(const char* menu_id, int loop)
 {
 	int i;
 	int oldncr;
@@ -2463,7 +2463,7 @@ global void ProcessMenu(const char* menu_id, int loop)
 **
 **  @param race  The Race to set-up for
 */
-global void InitMenus(int race)
+void InitMenus(int race)
 {
 	static int last_race = -1;
 	const char* file;
@@ -2506,7 +2506,7 @@ global void InitMenus(int race)
 /**
 **		Exit Menus code (freeing data)
 */
-global void ExitMenus(void)
+void ExitMenus(void)
 {
 	if (Menusbgnd) {
 		VideoFree(Menusbgnd);

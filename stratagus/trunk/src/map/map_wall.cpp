@@ -77,7 +77,7 @@
 **		@param y		Map Y tile-position.
 **		@param walltype		Walltype to check. (-1 any kind)
 */
-global int MapIsSeenTileWall(int x, int y, int walltype)
+int MapIsSeenTileWall(int x, int y, int walltype)
 {
 	int t;
 
@@ -95,7 +95,7 @@ global int MapIsSeenTileWall(int x, int y, int walltype)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenWallTile(int x, int y)
+void MapFixSeenWallTile(int x, int y)
 {
 	int t;
 	int tile;
@@ -176,7 +176,7 @@ global void MapFixSeenWallTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixSeenWallNeighbors(int x, int y)
+void MapFixSeenWallNeighbors(int x, int y)
 {
 	MapFixSeenWallTile(x + 1, y);				// side neighbors
 	MapFixSeenWallTile(x - 1, y);
@@ -190,7 +190,7 @@ global void MapFixSeenWallNeighbors(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-global void MapFixWallTile(int x, int y)
+void MapFixWallTile(int x, int y)
 {
 	int tile;
 	MapField* mf;
@@ -276,7 +276,7 @@ global void MapFixWallTile(int x, int y)
 **		@param x		Map X tile-position.
 **		@param y		Map Y tile-position.
 */
-local void MapFixWallNeighbors(int x, int y)
+static void MapFixWallNeighbors(int x, int y)
 {
 	MapFixWallTile(x + 1, y);				// side neighbors
 	MapFixWallTile(x - 1, y);
@@ -290,7 +290,7 @@ local void MapFixWallNeighbors(int x, int y)
 **		@param x		Map X position.
 **		@param y		Map Y position.
 */
-global void MapRemoveWall(unsigned x, unsigned y)
+void MapRemoveWall(unsigned x, unsigned y)
 {
 	MapField* mf;
 
@@ -321,7 +321,7 @@ global void MapRemoveWall(unsigned x, unsigned y)
 **
 **		@todo		FIXME: support for more races.
 */
-global void MapSetWall(unsigned x, unsigned y, int humanwall)
+void MapSetWall(unsigned x, unsigned y, int humanwall)
 {
 	MapField* mf;
 
@@ -361,7 +361,7 @@ global void MapSetWall(unsigned x, unsigned y, int humanwall)
 **		@param y		Map Y tile-position of wall.
 **		@param damage		Damage done to wall.
 */
-global void HitWall(unsigned x, unsigned y, unsigned damage)
+void HitWall(unsigned x, unsigned y, unsigned damage)
 {
 	unsigned v;
 

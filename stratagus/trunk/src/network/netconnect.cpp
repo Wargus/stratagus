@@ -63,35 +63,35 @@
 //		Variables
 //----------------------------------------------------------------------------
 
-global char* NetworkArg;				/// Network command line argument
-global int NetPlayers;						/// How many network players
-global int NetworkPort = NetworkDefaultPort;		/// Local network port to use
+char* NetworkArg;				/// Network command line argument
+int NetPlayers;						/// How many network players
+int NetworkPort = NetworkDefaultPort;		/// Local network port to use
 
 #ifdef DEBUG
 extern unsigned long MyHost;				/// My host number.
 extern int MyPort;						/// My port number.
 #endif
 
-global int HostsCount;						/// Number of hosts.
-global NetworkHost Hosts[PlayerMax];		/// Host and ports of all players.
+int HostsCount;						/// Number of hosts.
+NetworkHost Hosts[PlayerMax];		/// Host and ports of all players.
 
-global int NetConnectRunning;				/// Network menu: Setup mode active
-global NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
-global unsigned char NetLocalState;		/// Network menu: Local Server/Client connect state;
-global int NetLocalHostsSlot;				/// Network menu: Slot # in Hosts array of local client
-global char NetTriesText[32];				/// Network menu: Client tries count text
-global char NetServerText[64];				/// Network menu: Text describing the Network Server IP
-global int NetLocalPlayerNumber;		/// Player number of local client
+int NetConnectRunning;				/// Network menu: Setup mode active
+NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
+unsigned char NetLocalState;		/// Network menu: Local Server/Client connect state;
+int NetLocalHostsSlot;				/// Network menu: Slot # in Hosts array of local client
+char NetTriesText[32];				/// Network menu: Client tries count text
+char NetServerText[64];				/// Network menu: Text describing the Network Server IP
+int NetLocalPlayerNumber;		/// Player number of local client
 
-local int NetStateMsgCnt;				/// Number of consecutive msgs of same type sent
-local unsigned char LastStateMsgType;		/// Subtype of last InitConfig message sent
-local unsigned long NetLastPacketSent;		/// Tick the last network packet was sent
-local unsigned long NetworkServerIP;		/// Network Client: IP of server to join
+static int NetStateMsgCnt;				/// Number of consecutive msgs of same type sent
+static unsigned char LastStateMsgType;		/// Subtype of last InitConfig message sent
+static unsigned long NetLastPacketSent;		/// Tick the last network packet was sent
+static unsigned long NetworkServerIP;		/// Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
 /// For now just specify with the -P port command line arg...
-local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
+static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
 //----------------------------------------------------------------------------
 //		Functions
@@ -107,7 +107,7 @@ local int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 **		@todo		FIXME: we don't need to put the header into all messages.
 **				(header = msg->Stratagus ... )
 */
-local int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
+static int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
 {
 	msg->Stratagus = htonl(StratagusVersion);
 	msg->Version = htonl(NetworkProtocolVersion);
@@ -118,7 +118,7 @@ local int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
 }
 
 #ifdef DEBUG
-local const char* ncconstatenames[] = {
+static const char* ncconstatenames[] = {
 	"ccs_unused",
 	"ccs_connecting",				// new client
 	"ccs_connected",				// has received slot info
@@ -139,7 +139,7 @@ local const char* ncconstatenames[] = {
 	"ccs_incompatiblenetwork",		// incompatible network version
 };
 
-local const char* icmsgsubtypenames[] = {
+static const char* icmsgsubtypenames[] = {
 	"Hello",						// Client Request
 	"Config",						// Setup message configure clients
 
@@ -173,7 +173,7 @@ local const char* icmsgsubtypenames[] = {
 **		@param msg		The message to send
 **		@param msecs		microseconds to delay
 */
-local void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long msecs)
+static void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long msecs)
 {
 	unsigned long now;
 	int n;
@@ -206,7 +206,7 @@ local void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long m
 **
 **		@return						True, if error; otherwise false.
 */
-global int NetworkSetupServerAddress(const char* serveraddr)
+int NetworkSetupServerAddress(const char* serveraddr)
 {
 	unsigned long addr;
 
@@ -226,7 +226,7 @@ global int NetworkSetupServerAddress(const char* serveraddr)
 /**
 **		Setup Network connect state machine for clients
 */
-global void NetworkInitClientConnect(void)
+void NetworkInitClientConnect(void)
 {
 	int i;
 
@@ -247,7 +247,7 @@ global void NetworkInitClientConnect(void)
 /**
 **		Terminate Network connect state machine for clients
 */
-global void NetworkExitClientConnect(void)
+void NetworkExitClientConnect(void)
 {
 	NetConnectRunning = 0;
 	NetPlayers = 0;				// Make single player menus work again!
@@ -256,7 +256,7 @@ global void NetworkExitClientConnect(void)
 /**
 **		Terminate and detach Network connect state machine for the client
 */
-global void NetworkDetachFromServer(void)
+void NetworkDetachFromServer(void)
 {
 	NetLocalState = ccs_detaching;
 	NetStateMsgCnt = 0;
@@ -265,7 +265,7 @@ global void NetworkDetachFromServer(void)
 /**
 **		Setup Network connect state machine for the server
 */
-global void NetworkInitServerConnect(void)
+void NetworkInitServerConnect(void)
 {
 	int i;
 
@@ -287,7 +287,7 @@ global void NetworkInitServerConnect(void)
 /**
 **		Terminate Network connect state machine for the server
 */
-global void NetworkExitServerConnect(void)
+void NetworkExitServerConnect(void)
 {
 	int h;
 	int i;
@@ -316,7 +316,7 @@ global void NetworkExitServerConnect(void)
 /**
 **		Notify state change by menu user to connected clients
 */
-global void NetworkServerResyncClients(void)
+void NetworkServerResyncClients(void)
 {
 	int i;
 
@@ -332,7 +332,7 @@ global void NetworkServerResyncClients(void)
 /**
 **		Server user has finally hit the start game button
 */
-global void NetworkServerStartGame(void)
+void NetworkServerStartGame(void)
 {
 	int h;
 	int i;
@@ -622,7 +622,7 @@ breakout:
 /**
 **		Assign player slots and names in a network game..
 */
-global void NetworkConnectSetupGame(void)
+void NetworkConnectSetupGame(void)
 {
 	int i;
 
@@ -635,7 +635,7 @@ global void NetworkConnectSetupGame(void)
 /**
 **		Client Menu Loop: Send out client request messages
 */
-global void NetworkProcessClientRequest(void)
+void NetworkProcessClientRequest(void)
 {
 	InitMessage message;
 	int i;
@@ -780,7 +780,7 @@ changed:
 **
 **		@param c		The client (host slot) to kick
 */
-local void KickDeadClient(int c)
+static void KickDeadClient(int c)
 {
 	int n;
 
@@ -806,7 +806,7 @@ local void KickDeadClient(int c)
 /**
 **		Server Menu Loop: Send out server request messages
 */
-global void NetworkProcessServerRequest(void)
+void NetworkProcessServerRequest(void)
 {
 	int i;
 	int n;
@@ -844,7 +844,7 @@ global void NetworkProcessServerRequest(void)
 **
 **		@param msg		message received
 */
-local void ClientParseDisconnected(
+static void ClientParseDisconnected(
 	const InitMessage* msg __attribute__((unused)))
 {
 	DebugPrint("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
@@ -857,7 +857,7 @@ local void ClientParseDisconnected(
 **
 **		@param msg		message received
 */
-local void ClientParseDetaching(const InitMessage* msg)
+static void ClientParseDetaching(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
@@ -877,7 +877,7 @@ local void ClientParseDetaching(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseConnecting(const InitMessage* msg)
+static void ClientParseConnecting(const InitMessage* msg)
 {
 	int i;
 
@@ -951,7 +951,7 @@ local void ClientParseConnecting(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseConnected(const InitMessage* msg)
+static void ClientParseConnected(const InitMessage* msg)
 {
 	int pathlen;
 
@@ -991,7 +991,7 @@ local void ClientParseConnected(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseMapInfo(const InitMessage* msg)
+static void ClientParseMapInfo(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
@@ -1013,7 +1013,7 @@ local void ClientParseMapInfo(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseSynced(const InitMessage* msg)
+static void ClientParseSynced(const InitMessage* msg)
 {
 	int i;
 
@@ -1077,7 +1077,7 @@ local void ClientParseSynced(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseAsync(const InitMessage* msg)
+static void ClientParseAsync(const InitMessage* msg)
 {
 	int i;
 
@@ -1113,7 +1113,7 @@ local void ClientParseAsync(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseGoAhead(const InitMessage* msg)
+static void ClientParseGoAhead(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
@@ -1138,7 +1138,7 @@ local void ClientParseGoAhead(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseStarted(const InitMessage* msg)
+static void ClientParseStarted(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
@@ -1157,7 +1157,7 @@ local void ClientParseStarted(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)))
+static void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)))
 {
 	InitMessage message;
 
@@ -1171,7 +1171,7 @@ local void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused))
 **
 **		@param msg		message received
 */
-local void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
+static void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
 {
 	int i;
 	InitMessage message;
@@ -1192,7 +1192,7 @@ local void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
 **		@param h		slot number of host msg originates from
 **		@param msg		message received
 */
-local void ServerParseHello(int h, const InitMessage* msg)
+static void ServerParseHello(int h, const InitMessage* msg)
 {
 	int i, n;
 	InitMessage message;
@@ -1265,7 +1265,7 @@ local void ServerParseHello(int h, const InitMessage* msg)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseResync(const int h)
+static void ServerParseResync(const int h)
 {
 	int i;
 	int n;
@@ -1321,7 +1321,7 @@ local void ServerParseResync(const int h)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseWaiting(const int h)
+static void ServerParseWaiting(const int h)
 {
 	int i;
 	int n;
@@ -1400,7 +1400,7 @@ local void ServerParseWaiting(const int h)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseMap(const int h)
+static void ServerParseMap(const int h)
 {
 	int n;
 	InitMessage message;
@@ -1441,7 +1441,7 @@ local void ServerParseMap(const int h)
 **		@param h		slot number of host msg originates from
 **		@param msg		message received
 */
-local void ServerParseState(const int h, const InitMessage* msg)
+static void ServerParseState(const int h, const InitMessage* msg)
 {
 	int i;
 	int n;
@@ -1497,7 +1497,7 @@ local void ServerParseState(const int h, const InitMessage* msg)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseGoodBye(const int h)
+static void ServerParseGoodBye(const int h)
 {
 	int n;
 	InitMessage message;
@@ -1531,7 +1531,7 @@ local void ServerParseGoodBye(const int h)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseSeeYou(const int h)
+static void ServerParseSeeYou(const int h)
 {
 	switch (NetStates[h].State) {
 		case ccs_detaching:
@@ -1550,7 +1550,7 @@ local void ServerParseSeeYou(const int h)
 **
 **		@param h		slot number of host msg originates from
 */
-local void ServerParseIAmHere(const int h)
+static void ServerParseIAmHere(const int h)
 {
 	// client found us again - update timestamp
 	ServerSetupState.LastFrame[h] = FrameCounter;
@@ -1563,7 +1563,7 @@ local void ServerParseIAmHere(const int h)
 **
 **		@return				0 if the versions match, -1 otherwise
 */
-local int CheckVersions(const InitMessage* msg)
+static int CheckVersions(const InitMessage* msg)
 {
 	int n;
 	InitMessage message;
@@ -1612,7 +1612,7 @@ local int CheckVersions(const InitMessage* msg)
 **
 **		@param msg		message received
 */
-local void NetworkParseMenuPacket(const InitMessage* msg)
+static void NetworkParseMenuPacket(const InitMessage* msg)
 {
 	DebugPrint("Received %s Init Message %d:%d from %d.%d.%d.%d:%d (%ld)\n" _C_
 		icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
@@ -1746,7 +1746,7 @@ local void NetworkParseMenuPacket(const InitMessage* msg)
 **
 **		@return				1 if packet is an InitConfig message, 0 otherwise
 */
-global int NetworkParseSetupEvent(const char* buf, int size)
+int NetworkParseSetupEvent(const char* buf, int size)
 {
 	const InitMessage* msg = (const InitMessage*)buf;
 

@@ -84,7 +84,7 @@
 **
 **		@return				Unit, if an unit of correct type is on the field.
 */
-global Unit* UnitCacheOnXY(int x, int y, unsigned type)
+Unit* UnitCacheOnXY(int x, int y, unsigned type)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -110,7 +110,7 @@ global Unit* UnitCacheOnXY(int x, int y, unsigned type)
 **
 **		@return				Returns the number of units found.
 */
-global int FindUnitsByType(const UnitType* type, Unit** table)
+int FindUnitsByType(const UnitType* type, Unit** table)
 {
 	Unit* unit;
 	int i;
@@ -134,7 +134,7 @@ global int FindUnitsByType(const UnitType* type, Unit** table)
 **
 **		@return				Returns the number of units found.
 */
-global int FindPlayerUnitsByType(const Player* player,const UnitType* type,
+int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 	Unit** table)
 {
 	Unit* unit;
@@ -167,7 +167,7 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type,
 **
 **		@return				Returns first found unit on tile.
 */
-global Unit* UnitOnMapTile(int tx, int ty)
+Unit* UnitOnMapTile(int tx, int ty)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -194,7 +194,7 @@ global Unit* UnitOnMapTile(int tx, int ty)
 **
 **		@return				Returns repairable unit found on tile.
 */
-global Unit* RepairableOnMapTile(int tx, int ty)
+Unit* RepairableOnMapTile(int tx, int ty)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -219,7 +219,7 @@ global Unit* RepairableOnMapTile(int tx, int ty)
 **
 **		@return				Returns ideal target on map tile.
 */
-global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
+Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -266,7 +266,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 **
 **		@return				Returns ideal target on map tile.
 */
-global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
+Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 {
 	Unit* table[UnitMax];
 	Unit* unit;
@@ -309,7 +309,7 @@ global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 **
 **		@return				Returns transporter unit found on tile.
 */
-global Unit* TransporterOnMapTile(int tx, int ty)
+Unit* TransporterOnMapTile(int tx, int ty)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -324,6 +324,7 @@ global Unit* TransporterOnMapTile(int tx, int ty)
 	return NoUnitP;
 }
 
+#if 0
 /**
 **		Returns true if screen map position (x,y) is inside of
 **		the rectangle where the unit's sprite is drawn.
@@ -334,7 +335,7 @@ global Unit* TransporterOnMapTile(int tx, int ty)
 **
 **		@return				true if (x,y) is inside the unit's sprite
 */
-local int InsideUnitSprite(const Unit* unit, int x, int y)
+static int InsideUnitSprite(const Unit* unit, int x, int y)
 {
 	int ux;
 	int uy;				// position at which unit's sprite is currently drawn
@@ -353,6 +354,7 @@ local int InsideUnitSprite(const Unit* unit, int x, int y)
 		return 1;
 	}
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --		Finding special units
@@ -367,7 +369,7 @@ local int InsideUnitSprite(const Unit* unit, int x, int y)
 **
 **		@return				Returns the unit if found, or NoUnitP.
 */
-global Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
+Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
 {
 	Unit* table[UnitMax];
 	int i;
@@ -391,7 +393,7 @@ global Unit* UnitTypeOnMap(int tx, int ty, UnitType* type)
 **
 **		@return				Returns the deposit if found, or NoUnitP.
 */
-global Unit* ResourceOnMap(int tx, int ty, int resource)
+Unit* ResourceOnMap(int tx, int ty, int resource)
 {
 	Unit* table[UnitMax];
 	int i;
@@ -419,7 +421,7 @@ global Unit* ResourceOnMap(int tx, int ty, int resource)
 **
 **		@return				Returns the deposit if found, or NoUnitP.
 */
-global Unit* ResourceDepositOnMap(int tx, int ty, int resource)
+Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 {
 	Unit* table[UnitMax];
 	int i;
@@ -456,7 +458,7 @@ global Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 **	  @note   Limited to attack range smaller than 16.
 **		@note		Will be moved to unit_ai.c soon.
 */
-local Unit* FindRangeAttack(Unit* u, int range)
+static Unit* FindRangeAttack(Unit* u, int range)
 {
 	int x;
 	int y;
@@ -734,7 +736,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 **		@return				Unit to be attacked.
 **
 */
-global Unit* AttackUnitsInDistance(Unit* unit, int range)
+Unit* AttackUnitsInDistance(Unit* unit, int range)
 {
 	Unit* dest;
 	const UnitType* type;
@@ -847,7 +849,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 **
 **		@return				Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInRange(Unit* unit)
+Unit* AttackUnitsInRange(Unit* unit)
 {
 	//
 	//		Only units which can attack.
@@ -870,7 +872,7 @@ global Unit* AttackUnitsInRange(Unit* unit)
 **
 **		@return				Pointer to unit which should be attacked.
 */
-global Unit* AttackUnitsInReactRange(Unit* unit)
+Unit* AttackUnitsInReactRange(Unit* unit)
 {
 	int range;
 	const UnitType* type;

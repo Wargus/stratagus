@@ -56,7 +56,7 @@
 **  @param unit    Unit pointer for action.
 **  @param ground  Flag: true if unit is standing ground.
 */
-global void ActionStillGeneric(Unit* unit, int ground)
+void ActionStillGeneric(Unit* unit, int ground)
 {
 	const UnitType* type;
 	Unit* temp;
@@ -267,7 +267,7 @@ global void ActionStillGeneric(Unit* unit, int ground)
 **
 **  @param unit  Unit pointer for still action.
 */
-global void HandleActionStill(Unit* unit)
+void HandleActionStill(Unit* unit)
 {
 	ActionStillGeneric(unit, 0);
 }

@@ -56,7 +56,7 @@
 **  @param table  Pointer to table with elements.
 **  @param n      Index to insert new into table
 */
-local void AiHelperSetupTable(int* count, AiUnitTypeTable*** table, int n)
+static void AiHelperSetupTable(int* count, AiUnitTypeTable*** table, int n)
 {
 	int i;
 
@@ -79,7 +79,7 @@ local void AiHelperSetupTable(int* count, AiUnitTypeTable*** table, int n)
 **  @param tablep  Pointer to table with elements.
 **  @param base    Base type to insert into table.
 */
-local void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
+static void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
 {
 	int i;
 	int n;
@@ -112,11 +112,11 @@ local void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
 	table->Table[n] = base;
 }
 
-#ifdef DEBUG
+#if 0
 /**
 **  Print AI helper table.
 */
-local void PrintAiHelperTable(void)
+static void PrintAiHelperTable(void)
 {
 }
 #endif
@@ -128,7 +128,7 @@ local void PrintAiHelperTable(void)
 **
 **  @todo  FIXME: the first unit could be a list see ../doc/ccl/ai.html
 */
-local int CclDefineAiHelper(lua_State* l)
+static int CclDefineAiHelper(lua_State* l)
 {
 	const char* value;
 	int what;
@@ -271,7 +271,7 @@ local int CclDefineAiHelper(lua_State* l)
 **
 **  @return   FIXME: docu
 */
-local int CclDefineAi(lua_State* l)
+static int CclDefineAi(lua_State* l)
 {
 	const char* value;
 	AiType* aitype;
@@ -366,7 +366,7 @@ local int CclDefineAi(lua_State* l)
 **  @param type   Unit-type to be appended.
 **  @param count  How many unit-types to build.
 */
-local void InsertUnitTypeRequests(UnitType* type, int count)
+static void InsertUnitTypeRequests(UnitType* type, int count)
 {
 	int n;
 
@@ -388,7 +388,7 @@ local void InsertUnitTypeRequests(UnitType* type, int count)
 **
 **  @param type  Unit-type to be found.
 */
-local AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
+static AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
 {
 	int i;
 	int n;
@@ -407,7 +407,7 @@ local AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
 **
 **  @param type  Unit-type to be found.
 */
-local int FindInUpgradeToRequests(const UnitType* type)
+static int FindInUpgradeToRequests(const UnitType* type)
 {
 	int i;
 	int n;
@@ -426,7 +426,7 @@ local int FindInUpgradeToRequests(const UnitType* type)
 **
 **  @param type  Unit-type to be appended.
 */
-local void InsertUpgradeToRequests(UnitType* type)
+static void InsertUpgradeToRequests(UnitType* type)
 {
 	int n;
 
@@ -447,7 +447,7 @@ local void InsertUpgradeToRequests(UnitType* type)
 **
 **  @param upgrade  Upgrade to be appended.
 */
-local void InsertResearchRequests(Upgrade* upgrade)
+static void InsertResearchRequests(Upgrade* upgrade)
 {
 	int n;
 
@@ -470,7 +470,7 @@ local void InsertResearchRequests(Upgrade* upgrade)
 **
 **  @param l  Lua state.
 */
-local int CclAiGetRace(lua_State* l)
+static int CclAiGetRace(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -486,7 +486,7 @@ local int CclAiGetRace(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiGetSleepCycles(lua_State* l)
+static int CclAiGetSleepCycles(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -504,7 +504,7 @@ local int CclAiGetSleepCycles(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiDebug(lua_State* l)
+static int CclAiDebug(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -528,7 +528,7 @@ local int CclAiDebug(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiDebugPlayer(lua_State* l)
+static int CclAiDebugPlayer(lua_State* l)
 {
 	const char* item;
 	int playerid;
@@ -576,7 +576,7 @@ local int CclAiDebugPlayer(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiNeed(lua_State* l)
+static int CclAiNeed(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -594,7 +594,7 @@ local int CclAiNeed(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiSet(lua_State* l)
+static int CclAiSet(lua_State* l)
 {
 	AiUnitTypeTable* autt;
 	UnitType* type;
@@ -623,7 +623,7 @@ local int CclAiSet(lua_State* l)
 **
 **  @return   Number of return values
 */
-local int CclAiWait(lua_State* l)
+static int CclAiWait(lua_State* l)
 {
 	const AiUnitTypeTable* autt;
 	const UnitType* type;
@@ -692,7 +692,7 @@ local int CclAiWait(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiForce(lua_State* l)
+static int CclAiForce(lua_State* l)
 {
 	AiUnitType** prev;
 	AiUnitType* aiut;
@@ -765,7 +765,7 @@ local int CclAiForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiForceRole(lua_State* l)
+static int CclAiForceRole(lua_State* l)
 {
 	int force;
 	const char* flag;
@@ -795,7 +795,7 @@ local int CclAiForceRole(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiCheckForce(lua_State* l)
+static int CclAiCheckForce(lua_State* l)
 {
 	int force;
 
@@ -819,7 +819,7 @@ local int CclAiCheckForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiWaitForce(lua_State* l)
+static int CclAiWaitForce(lua_State* l)
 {
 	int force;
 
@@ -850,7 +850,7 @@ local int CclAiWaitForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiAttackWithForce(lua_State* l)
+static int CclAiAttackWithForce(lua_State* l)
 {
 	int force;
 
@@ -873,7 +873,7 @@ local int CclAiAttackWithForce(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiSleep(lua_State* l)
+static int CclAiSleep(lua_State* l)
 {
 	int i;
 
@@ -901,7 +901,7 @@ local int CclAiSleep(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiResearch(lua_State* l)
+static int CclAiResearch(lua_State* l)
 {
 	const char* str;
 	Upgrade* upgrade;
@@ -927,7 +927,7 @@ local int CclAiResearch(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiUpgradeTo(lua_State* l)
+static int CclAiUpgradeTo(lua_State* l)
 {
 	UnitType* type;
 
@@ -948,7 +948,7 @@ local int CclAiUpgradeTo(lua_State* l)
 **
 **  @return  Player number of the AI.
 */
-local int CclAiPlayer(lua_State* l)
+static int CclAiPlayer(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -964,7 +964,7 @@ local int CclAiPlayer(lua_State* l)
 **
 **  @return     Old resource vector
 */
-local int CclAiSetReserve(lua_State* l)
+static int CclAiSetReserve(lua_State* l)
 {
 	int i;
 
@@ -991,7 +991,7 @@ local int CclAiSetReserve(lua_State* l)
 **
 **  @return     Old resource vector
 */
-local int CclAiSetCollect(lua_State* l)
+static int CclAiSetCollect(lua_State* l)
 {
 	int i;
 
@@ -1017,7 +1017,7 @@ local int CclAiSetCollect(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAiDump(lua_State* l)
+static int CclAiDump(lua_State* l)
 {
 	int i;
 	int n;
@@ -1092,7 +1092,7 @@ local int CclAiDump(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineAiWcNames(lua_State* l)
+static int CclDefineAiWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -1130,7 +1130,7 @@ local int CclDefineAiWcNames(lua_State* l)
 **
 **  @return   The number of the resource in DefaultResourceNames
 */
-local int DefaultResourceNumber(const char* name)
+static int DefaultResourceNumber(const char* name)
 {
 	int i;
 
@@ -1149,7 +1149,7 @@ local int DefaultResourceNumber(const char* name)
 **
 **  @param l  Lua state.
 */
-local int CclDefineAiPlayer(lua_State* l)
+static int CclDefineAiPlayer(lua_State* l)
 {
 	const char* value;
 	int i;
@@ -1576,7 +1576,7 @@ local int CclDefineAiPlayer(lua_State* l)
 /**
 **  Register CCL features for unit-type.
 */
-global void AiCclRegister(void)
+void AiCclRegister(void)
 {
 	// FIXME: Need to save memory here.
 	// Loading all into memory isn't necessary.

@@ -105,22 +105,22 @@ typedef struct _selection_group_ {
 /**
 **		Simple sounds currently available.
 */
-local SimpleSound* SimpleSounds;
+static SimpleSound* SimpleSounds;
 
 /**
 **		Sound remaping currently available.
 */
-local SoundRemap* SoundRemaps;
+static SoundRemap* SoundRemaps;
 
 /**
 **		Sound-groups currently available
 */
-local SoundGroup* SoundGroups;
+static SoundGroup* SoundGroups;
 
 /**
 **		Selection-groups currently available
 */
-local SelectionGroup* SelectionGroups;
+static SelectionGroup* SelectionGroups;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -133,7 +133,7 @@ local SelectionGroup* SelectionGroups;
 **
 **		@return				number of sounds in group
 */
-local int NbSoundsInGroup(char* const* const group)
+static int NbSoundsInGroup(char* const* const group)
 {
 	int i;
 
@@ -149,7 +149,7 @@ local int NbSoundsInGroup(char* const* const group)
 /**
 **		Loads all simple sounds (listed in the SimpleSounds array).
 */
-local void LoadSimpleSounds(void)
+static void LoadSimpleSounds(void)
 {
 	int i;
 
@@ -164,7 +164,7 @@ local void LoadSimpleSounds(void)
 **		Loads all sound groups.
 **		Special groups are created.
 */
-local void LoadSoundGroups(void)
+static void LoadSoundGroups(void)
 {
 	int i;
 
@@ -188,7 +188,7 @@ local void LoadSoundGroups(void)
 **		Performs remaping listed in the Remaps array. Maps also critter
 **		sounds to their correct values.
 */
-local void RemapSounds(void)
+static void RemapSounds(void)
 {
 	int i;
 
@@ -237,7 +237,7 @@ local void RemapSounds(void)
 /**
 **		Load all sounds for units.
 */
-global void LoadUnitSounds(void)
+void LoadUnitSounds(void)
 {
 	if (SoundFildes != -1) {
 		LoadSimpleSounds();
@@ -251,7 +251,7 @@ global void LoadUnitSounds(void)
 **		And overwrite the sound ranges. @todo the sound ranges should be
 **		configurable by user with CCL.
 */
-global void MapUnitSounds(void)
+void MapUnitSounds(void)
 {
 	UnitType* type;
 	int i;

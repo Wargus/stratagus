@@ -51,36 +51,36 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global char RightButtonAttacks; /// right button 0 move, 1 attack
-global char FancyBuildings;     /// Mirror buildings 1 yes, 0 now.
+char RightButtonAttacks; /// right button 0 move, 1 attack
+char FancyBuildings;     /// Mirror buildings 1 yes, 0 now.
 
 /// keyboard scroll speed
-global int SpeedKeyScroll = KEY_SCROLL_SPEED;
+int SpeedKeyScroll = KEY_SCROLL_SPEED;
 /// mouse scroll speed
-global int SpeedMouseScroll = MOUSE_SCROLL_SPEED;
+int SpeedMouseScroll = MOUSE_SCROLL_SPEED;
 
 /**
 **  The user interface configuration
 */
-global UI TheUI;
+UI TheUI;
 
 /**
 **  The available user interfaces.
 */
-global UI** UI_Table;
+UI** UI_Table;
 
 /*----------------------------------------------------------------------------
 --		Functions
 ----------------------------------------------------------------------------*/
 
-local void ClipViewport(Viewport* vp, int ClipX, int ClipY);
-local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
+static void ClipViewport(Viewport* vp, int ClipX, int ClipY);
+static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 
 
 /**
 **  Clean the user interface graphics
 */
-local void CleanUIGraphics(UI* ui)
+static void CleanUIGraphics(UI* ui)
 {
 	MenuPanel* menupanel;
 	int i;
@@ -117,7 +117,7 @@ local void CleanUIGraphics(UI* ui)
 **
 **  @param race_name  The race identifier, to select the interface.
 */
-global void InitUserInterface(const char* race_name)
+void InitUserInterface(const char* race_name)
 {
 	int i;
 	int best;
@@ -198,7 +198,7 @@ global void InitUserInterface(const char* race_name)
 **  multiple into memory. Use the IconFile code and perhaps build
 **  a new layer, which supports image sharing.
 */
-global void LoadUserInterface(void)
+void LoadUserInterface(void)
 {
 	int i;
 	MenuPanel* menupanel;
@@ -279,7 +279,7 @@ global void LoadUserInterface(void)
 **  @param file  Save file handle
 **  @param ui    User interface to save
 */
-local void SaveViewports(CLFile* file, const UI* ui)
+static void SaveViewports(CLFile* file, const UI* ui)
 {
 	int i;
 	const Viewport* vp;
@@ -298,7 +298,7 @@ local void SaveViewports(CLFile* file, const UI* ui)
 **
 **  @param file  Save file handle
 */
-global void SaveUserInterface(CLFile* file)
+void SaveUserInterface(CLFile* file)
 {
 	SaveViewports(file, &TheUI);
 }
@@ -306,7 +306,7 @@ global void SaveUserInterface(CLFile* file)
 /**
 **  Clean up a user interface.
 */
-global void CleanUI(UI* ui)
+void CleanUI(UI* ui)
 {
 	int i;
 	MenuPanel* menupanel;
@@ -410,7 +410,7 @@ global void CleanUI(UI* ui)
 /**
 **  Clean up the user interface module.
 */
-global void CleanUserInterface(void)
+void CleanUserInterface(void)
 {
 	int i;
 	int j;
@@ -462,7 +462,7 @@ global void CleanUserInterface(void)
 **  @note This functions only works with rectangular viewports, when
 **  we support shaped map window, this must be rewritten.
 */
-global Viewport* GetViewport(int x, int y)
+Viewport* GetViewport(int x, int y)
 {
 	Viewport* vp;
 
@@ -489,7 +489,7 @@ global Viewport* GetViewport(int x, int y)
 **  than one viewports (may well happen) this function
 **  returns the first one it finds.
 */
-global Viewport* MapTileGetViewport(int tx, int ty)
+Viewport* MapTileGetViewport(int tx, int ty)
 {
 	Viewport* vp;
 
@@ -513,7 +513,7 @@ global Viewport* MapTileGetViewport(int tx, int ty)
 **  @param new_vps  The array of the new viewports
 **  @param num_vps  The number of elements in the new_vps[] array.
 */
-local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
+static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
 	int i;
 
@@ -580,7 +580,7 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 **  However, they can be smaller according to the place
 **  the viewport vp takes in context of current ViewportMode.
 */
-local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
+static void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
 	vp->EndX = vp->X + TheMap.Width * TileSizeX - 1;
@@ -608,7 +608,7 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSingle(void)
+static void SetViewportModeSingle(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -631,7 +631,7 @@ local void SetViewportModeSingle(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitHoriz(void)
+static void SetViewportModeSplitHoriz(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -660,7 +660,7 @@ local void SetViewportModeSplitHoriz(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitHoriz3(void)
+static void SetViewportModeSplitHoriz3(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -694,7 +694,7 @@ local void SetViewportModeSplitHoriz3(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeSplitVert(void)
+static void SetViewportModeSplitVert(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -723,7 +723,7 @@ local void SetViewportModeSplitVert(void)
 **  origin, and the corresponding map parameters expressed in map
 **  tiles with origin at map origin (map tile (0,0)).
 */
-local void SetViewportModeQuad(void)
+static void SetViewportModeQuad(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
@@ -759,7 +759,7 @@ local void SetViewportModeQuad(void)
 **
 **  @param new_mode  New mode's number.
 */
-global void SetViewportMode(ViewportMode new_mode)
+void SetViewportMode(ViewportMode new_mode)
 {
 	switch (TheUI.ViewportMode = new_mode) {
 		case VIEWPORT_SINGLE:
@@ -791,7 +791,7 @@ global void SetViewportMode(ViewportMode new_mode)
 **               make sense are mostly 1 (next viewport mode) and
 **               -1 (previous viewport mode).
 */
-global void CycleViewportMode(int step)
+void CycleViewportMode(int step)
 {
 	int new_mode;
 

@@ -71,7 +71,7 @@
 **  @param unit    Unit, for that the attack animation is played.
 **  @param attack  Attack animation.
 */
-local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
+static void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 {
 	int flags;
 
@@ -92,7 +92,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 **
 **  @param unit  Unit, for that the attack animation is played.
 */
-global void AnimateActionAttack(Unit* unit)
+void AnimateActionAttack(Unit* unit)
 {
 	if (unit->Type->Animations) {
 		Assert(unit->Type->Animations->Attack);
@@ -112,7 +112,7 @@ global void AnimateActionAttack(Unit* unit)
 **
 **  @return      A valid goal, if available.
 */
-local Unit* CheckForDeadGoal(Unit* unit)
+static Unit* CheckForDeadGoal(Unit* unit)
 {
 	Unit* goal;
 
@@ -159,7 +159,7 @@ local Unit* CheckForDeadGoal(Unit* unit)
 **
 **  @return      True if command is over.
 */
-local int CheckForTargetInRange(Unit* unit)
+static int CheckForTargetInRange(Unit* unit)
 {
 	Unit* goal;
 	Unit* temp;
@@ -235,7 +235,7 @@ local int CheckForTargetInRange(Unit* unit)
 **
 **  @param unit  Unit that is attacking and moving
 */
-local void MoveToTarget(Unit* unit)
+static void MoveToTarget(Unit* unit)
 {
 	Unit* goal;
 	int err;
@@ -340,7 +340,7 @@ local void MoveToTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-local void AttackTarget(Unit* unit)
+static void AttackTarget(Unit* unit)
 {
 	Unit* goal;
 	Unit* temp;
@@ -506,7 +506,7 @@ local void AttackTarget(Unit* unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-global void HandleActionAttack(Unit* unit)
+void HandleActionAttack(Unit* unit)
 {
 	switch (unit->SubAction) {
 		//

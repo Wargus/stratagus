@@ -53,8 +53,8 @@
 ----------------------------------------------------------------------------*/
 
 
-global char* ClickMissile;
-global char* DamageMissile;
+char* ClickMissile;
+char* DamageMissile;
 
 typedef struct _info_text_ {
 	char* Text;
@@ -75,7 +75,7 @@ typedef struct _info_text_ {
 **
 **  @return   The old state of color cylce all.
 */
-local int CclSetColorCycleAll(lua_State* l)
+static int CclSetColorCycleAll(lua_State* l)
 {
 	lua_Number old;
 
@@ -100,7 +100,7 @@ local int CclSetColorCycleAll(lua_State* l)
 **
 **  @return   The old value.
 */
-local int CclSetMouseScrollSpeedDefault(lua_State* l)
+static int CclSetMouseScrollSpeedDefault(lua_State* l)
 {
 	lua_Number old;
 
@@ -121,7 +121,7 @@ local int CclSetMouseScrollSpeedDefault(lua_State* l)
 **
 **  @return   The old value.
 */
-local int CclSetMouseScrollSpeedControl(lua_State* l)
+static int CclSetMouseScrollSpeedControl(lua_State* l)
 {
 	lua_Number old;
 
@@ -142,7 +142,7 @@ local int CclSetMouseScrollSpeedControl(lua_State* l)
 **
 **  @return   old value
 */
-local int CclSetClickMissile(lua_State* l)
+static int CclSetClickMissile(lua_State* l)
 {
 	char* old;
 	int args;
@@ -173,7 +173,7 @@ local int CclSetClickMissile(lua_State* l)
 **
 **  @return   old value
 */
-local int CclSetDamageMissile(lua_State* l)
+static int CclSetDamageMissile(lua_State* l)
 {
 	char* old;
 	int args;
@@ -202,7 +202,7 @@ local int CclSetDamageMissile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetVideoResolution(lua_State* l)
+static int CclSetVideoResolution(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
 		LuaError(l, "incorrect argument");
@@ -224,7 +224,7 @@ local int CclSetVideoResolution(lua_State* l)
 **
 **  @return   Old fullscreen mode
 */
-local int CclSetVideoFullScreen(lua_State* l)
+static int CclSetVideoFullScreen(lua_State* l)
 {
 	int old;
 
@@ -250,7 +250,7 @@ local int CclSetVideoFullScreen(lua_State* l)
 **
 **  @return   None
 */
-local int CclSetTitleScreens(lua_State* l)
+static int CclSetTitleScreens(lua_State* l)
 {
 	const char* value;
 	int i;
@@ -365,7 +365,7 @@ local int CclSetTitleScreens(lua_State* l)
 **
 **  @return   Old menu music.
 */
-local int CclSetMenuMusic(lua_State* l)
+static int CclSetMenuMusic(lua_State* l)
 {
 	char* old;
 
@@ -392,7 +392,7 @@ local int CclSetMenuMusic(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDisplayPicture(lua_State* l)
+static int CclDisplayPicture(lua_State* l)
 {
 	char* name;
 
@@ -413,7 +413,7 @@ local int CclDisplayPicture(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclProcessMenu(lua_State* l)
+static int CclProcessMenu(lua_State* l)
 {
 	char* mid;
 
@@ -434,7 +434,7 @@ local int CclProcessMenu(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineCursor(lua_State* l)
+static int CclDefineCursor(lua_State* l)
 {
 	const char* value;
 	const char* name;
@@ -550,7 +550,7 @@ local int CclDefineCursor(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetGameCursor(lua_State* l)
+static int CclSetGameCursor(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -565,7 +565,7 @@ local int CclSetGameCursor(lua_State* l)
 **  @param l      Lua state.
 **  @param value  Button type.
 */
-local MenuButtonId scm2buttonid(lua_State* l, const char* value)
+static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 {
 	MenuButtonId id;
 
@@ -642,7 +642,7 @@ local MenuButtonId scm2buttonid(lua_State* l, const char* value)
 **  @param l     Lua state.
 **  @param text  FIXME: docu.
 */
-local void CclParseInfoText(lua_State* l, InfoText* text)
+static void CclParseInfoText(lua_State* l, InfoText* text)
 {
 	const char* value;
 	int args;
@@ -691,7 +691,7 @@ local void CclParseInfoText(lua_State* l, InfoText* text)
 **  @param l     Lua state.
 **  @param icon  FIXME: docu.
 */
-local void CclParseIcon(lua_State* l, Button* icon)
+static void CclParseIcon(lua_State* l, Button* icon)
 {
 	const char* value;
 	int args;
@@ -742,7 +742,7 @@ local void CclParseIcon(lua_State* l, Button* icon)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseSelected(lua_State* l, UI* ui)
+static void CclParseSelected(lua_State* l, UI* ui)
 {
 	const char* value;
 	InfoText text;
@@ -848,7 +848,7 @@ local void CclParseSelected(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseTraining(lua_State* l, UI* ui)
+static void CclParseTraining(lua_State* l, UI* ui)
 {
 	const char* value;
 	InfoText text;
@@ -947,7 +947,7 @@ local void CclParseTraining(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseUpgrading(lua_State* l, UI* ui)
+static void CclParseUpgrading(lua_State* l, UI* ui)
 {
 	const char* value;
 	InfoText text;
@@ -988,7 +988,7 @@ local void CclParseUpgrading(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseResearching(lua_State* l, UI* ui)
+static void CclParseResearching(lua_State* l, UI* ui)
 {
 	const char* value;
 	InfoText text;
@@ -1029,7 +1029,7 @@ local void CclParseResearching(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseTransporting(lua_State* l, UI* ui)
+static void CclParseTransporting(lua_State* l, UI* ui)
 {
 	const char* value;
 	InfoText text;
@@ -1081,7 +1081,7 @@ local void CclParseTransporting(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  FIXME: docu.
 */
-local void CclParseButtonIcons(lua_State* l, UI* ui)
+static void CclParseButtonIcons(lua_State* l, UI* ui)
 {
 	int i;
 
@@ -1099,7 +1099,7 @@ local void CclParseButtonIcons(lua_State* l, UI* ui)
 **
 **  @param l  Lua state.
 */
-local int CclDefineUI(lua_State* l)
+static int CclDefineUI(lua_State* l)
 {
 	const char* value;
 	char* str;
@@ -2058,7 +2058,7 @@ local int CclDefineUI(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineViewports(lua_State* l)
+static int CclDefineViewports(lua_State* l)
 {
 	const char* value;
 	UI* ui;
@@ -2101,7 +2101,7 @@ local int CclDefineViewports(lua_State* l)
 **
 **  @return   The old state of scrolling.
 */
-local int CclSetMouseScroll(lua_State* l)
+static int CclSetMouseScroll(lua_State* l)
 {
 	int old;
 
@@ -2122,7 +2122,7 @@ local int CclSetMouseScroll(lua_State* l)
 **
 **  @return   old scroll speed.
 */
-local int CclSetMouseScrollSpeed(lua_State* l)
+static int CclSetMouseScrollSpeed(lua_State* l)
 {
 	int speed;
 	lua_Number old;
@@ -2149,7 +2149,7 @@ local int CclSetMouseScrollSpeed(lua_State* l)
 **
 **  @return   FIXME: not supported: The old state of grabbing.
 */
-local int CclSetGrabMouse(lua_State* l)
+static int CclSetGrabMouse(lua_State* l)
 {
 	if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -2170,7 +2170,7 @@ local int CclSetGrabMouse(lua_State* l)
 **
 **  @return   The old state of stopping.
 */
-local int CclSetLeaveStops(lua_State* l)
+static int CclSetLeaveStops(lua_State* l)
 {
 	int old;
 
@@ -2191,7 +2191,7 @@ local int CclSetLeaveStops(lua_State* l)
 **
 **  @return   The old state of scrolling.
 */
-local int CclSetKeyScroll(lua_State* l)
+static int CclSetKeyScroll(lua_State* l)
 {
 	int old;
 
@@ -2212,7 +2212,7 @@ local int CclSetKeyScroll(lua_State* l)
 **
 **  @return   old scroll speed.
 */
-local int CclSetKeyScrollSpeed(lua_State* l)
+static int CclSetKeyScrollSpeed(lua_State* l)
 {
 	int speed;
 	lua_Number old;
@@ -2239,7 +2239,7 @@ local int CclSetKeyScrollSpeed(lua_State* l)
 **
 **  @return   The old state of scrolling.
 */
-local int CclSetShowCommandKey(lua_State* l)
+static int CclSetShowCommandKey(lua_State* l)
 {
 	int old;
 
@@ -2259,7 +2259,7 @@ local int CclSetShowCommandKey(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclRightButtonAttacks(lua_State* l)
+static int CclRightButtonAttacks(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -2274,7 +2274,7 @@ local int CclRightButtonAttacks(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclRightButtonMoves(lua_State* l)
+static int CclRightButtonMoves(lua_State* l)
 {
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
@@ -2291,7 +2291,7 @@ local int CclRightButtonMoves(lua_State* l)
 **
 **  @return   The old state of fancy buildings flag.
 */
-local int CclSetFancyBuildings(lua_State* l)
+static int CclSetFancyBuildings(lua_State* l)
 {
 	int old;
 
@@ -2310,7 +2310,7 @@ local int CclSetFancyBuildings(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineMenu(lua_State* l)
+static int CclDefineMenu(lua_State* l)
 {
 	const char* value;
 	Menu* menu;
@@ -2479,7 +2479,7 @@ local int CclDefineMenu(lua_State* l)
 /**
 **  FIXME: docu
 */
-local int scm2hotkey(lua_State* l, const char* value)
+static int scm2hotkey(lua_State* l, const char* value)
 {
 	int len;
 	int key;
@@ -2510,7 +2510,7 @@ local int scm2hotkey(lua_State* l, const char* value)
 /**
 **  FIXME: docu
 */
-local int scm2style(lua_State* l, const char* value)
+static int scm2style(lua_State* l, const char* value)
 {
 	int id;
 
@@ -2528,7 +2528,7 @@ local int scm2style(lua_State* l, const char* value)
 /**
 **  FIXME: docu
 */
-local int CclDefineMenuItem(lua_State* l)
+static int CclDefineMenuItem(lua_State* l)
 {
 	const char* value;
 	char* s1;
@@ -3430,7 +3430,7 @@ local int CclDefineMenuItem(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineMenuGraphics(lua_State* l)
+static int CclDefineMenuGraphics(lua_State* l)
 {
 	int i;
 	int j;
@@ -3493,7 +3493,7 @@ local int CclDefineMenuGraphics(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineButton(lua_State* l)
+static int CclDefineButton(lua_State* l)
 {
 	char buf[64];
 	const char* value;
@@ -3678,7 +3678,7 @@ local int CclDefineButton(lua_State* l)
 /**
 **  Run the set-selection-changed-hook.
 */
-global void SelectionChanged(void)
+void SelectionChanged(void)
 {
 	UpdateButtonPanel();
 }
@@ -3686,7 +3686,7 @@ global void SelectionChanged(void)
 /**
 **  The selected unit has been altered.
 */
-global void SelectedUnitChanged(void)
+void SelectedUnitChanged(void)
 {
 	UpdateButtonPanel();
 }
@@ -3696,7 +3696,7 @@ global void SelectedUnitChanged(void)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorWaterCycleStart(lua_State* l)
+static int CclSetColorWaterCycleStart(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3712,7 +3712,7 @@ local int CclSetColorWaterCycleStart(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorWaterCycleEnd(lua_State* l)
+static int CclSetColorWaterCycleEnd(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3728,7 +3728,7 @@ local int CclSetColorWaterCycleEnd(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorIconCycleStart(lua_State* l)
+static int CclSetColorIconCycleStart(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3744,7 +3744,7 @@ local int CclSetColorIconCycleStart(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorIconCycleEnd(lua_State* l)
+static int CclSetColorIconCycleEnd(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3760,7 +3760,7 @@ local int CclSetColorIconCycleEnd(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorBuildingCycleStart(lua_State* l)
+static int CclSetColorBuildingCycleStart(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3776,7 +3776,7 @@ local int CclSetColorBuildingCycleStart(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetColorBuildingCycleEnd(lua_State* l)
+static int CclSetColorBuildingCycleEnd(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -3793,7 +3793,7 @@ local int CclSetColorBuildingCycleEnd(lua_State* l)
 **  @param l  Lua state.
 **  @return   Old delay
 */
-local int CclSetDoubleClickDelay(lua_State* l)
+static int CclSetDoubleClickDelay(lua_State* l)
 {
 	lua_Number i;
 
@@ -3814,7 +3814,7 @@ local int CclSetDoubleClickDelay(lua_State* l)
 **
 **  @return   Old delay
 */
-local int CclSetHoldClickDelay(lua_State* l)
+static int CclSetHoldClickDelay(lua_State* l)
 {
 	lua_Number i;
 
@@ -3835,7 +3835,7 @@ local int CclSetHoldClickDelay(lua_State* l)
 **
 **  @return   Old style
 */
-local int CclSetSelectionStyle(lua_State* l)
+static int CclSetSelectionStyle(lua_State* l)
 {
 	char* old;
 	const char* style;
@@ -3872,7 +3872,7 @@ local int CclSetSelectionStyle(lua_State* l)
 **
 **  @return   The old state of display of sight.
 */
-local int CclSetShowSightRange(lua_State* l)
+static int CclSetShowSightRange(lua_State* l)
 {
 	lua_Number old;
 	int args;
@@ -3921,7 +3921,7 @@ local int CclSetShowSightRange(lua_State* l)
 **
 **  @return   The old state of display of reaction.
 */
-local int CclSetShowReactionRange(lua_State* l)
+static int CclSetShowReactionRange(lua_State* l)
 {
 	lua_Number old;
 
@@ -3963,7 +3963,7 @@ local int CclSetShowReactionRange(lua_State* l)
 **
 **  @return   The old state of display of attack.
 */
-local int CclSetShowAttackRange(lua_State* l)
+static int CclSetShowAttackRange(lua_State* l)
 {
 	int old;
 
@@ -3984,7 +3984,7 @@ local int CclSetShowAttackRange(lua_State* l)
 **
 **  @return   The old state of display of orders.
 */
-local int CclSetShowOrders(lua_State* l)
+static int CclSetShowOrders(lua_State* l)
 {
 	int old;
 
@@ -4010,7 +4010,7 @@ local int CclSetShowOrders(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAddMessage(lua_State* l)
+static int CclAddMessage(lua_State* l)
 {
 	const char* str;
 
@@ -4028,7 +4028,7 @@ local int CclAddMessage(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclResetKeystrokeHelp(lua_State* l)
+static int CclResetKeystrokeHelp(lua_State* l)
 {
 	int n;
 
@@ -4054,7 +4054,7 @@ local int CclResetKeystrokeHelp(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclSetGroupKeys(lua_State* l)
+static int CclSetGroupKeys(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
@@ -4068,7 +4068,7 @@ local int CclSetGroupKeys(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclAddKeystrokeHelp(lua_State* l)
+static int CclAddKeystrokeHelp(lua_State* l)
 {
 	char* s1;
 	char* s2;
@@ -4102,7 +4102,7 @@ local int CclAddKeystrokeHelp(lua_State* l)
 /**
 **  Register CCL features for UI.
 */
-global void UserInterfaceCclRegister(void)
+void UserInterfaceCclRegister(void)
 {
 	lua_register(Lua, "AddMessage", CclAddMessage);
 

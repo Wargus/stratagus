@@ -62,20 +62,20 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int CDTrack;						/// Current cd track
+int CDTrack;						/// Current cd track
 
-global int NumCDTracks;						/// Number of tracks on the cd
+int NumCDTracks;						/// Number of tracks on the cd
 
 #if defined(USE_SDLCD)
-local SDL_CD* CDRom;						/// SDL cdrom device
+static SDL_CD* CDRom;						/// SDL cdrom device
 #elif defined(USE_CDDA)
-global int CDDrive;						/// CDRom device
-global struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
-local struct cdrom_tochdr CDchdr;				/// TOC header struct
-local struct cdrom_read_audio CDdata;				/// struct for reading data
+int CDDrive;						/// CDRom device
+struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
+static struct cdrom_tochdr CDchdr;				/// TOC header struct
+static struct cdrom_read_audio CDdata;				/// struct for reading data
 #endif
 
-global CDModes CDMode;						/// CD mode
+CDModes CDMode;						/// CD mode
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -85,7 +85,7 @@ global CDModes CDMode;						/// CD mode
 /**
 **		FIXME: docu
 */
-local int InitCD(void)
+static int InitCD(void)
 {
 	if (SDL_Init(SDL_INIT_CDROM)) {
 		return 1;
@@ -102,7 +102,7 @@ local int InitCD(void)
 /**
 **		FIXME: docu
 */
-global int PlayCDTrack(int track)
+int PlayCDTrack(int track)
 {
 	CDTrack = track;
 	return SDL_CDPlayTracks(CDRom, track - 1, 0, 0, 0);
@@ -111,7 +111,7 @@ global int PlayCDTrack(int track)
 /**
 **		FIXME: docu
 */
-global void ResumeCD(void)
+void ResumeCD(void)
 {
 #ifdef USE_WIN32
 	SDL_CDResume(CDRom);
@@ -122,7 +122,7 @@ global void ResumeCD(void)
 /**
 **		FIXME: docu
 */
-global void PauseCD(void)
+void PauseCD(void)
 {
 	SDL_CDPause(CDRom);
 	CDTrack = 0;
@@ -132,7 +132,7 @@ global void PauseCD(void)
 /**
 **		FIXME: docu
 */
-global int IsAudioTrack(int track)
+int IsAudioTrack(int track)
 {
 	// FIXME: what is proper way?
 	return 1;
@@ -141,7 +141,7 @@ global int IsAudioTrack(int track)
 /**
 **		FIXME: docu
 */
-global int IsCDPlaying(void)
+int IsCDPlaying(void)
 {
 	if (SDL_CDStatus(CDRom) == CD_PLAYING) {
 		return 1;
@@ -153,7 +153,7 @@ global int IsCDPlaying(void)
 /**
 **		FIXME: docu
 */
-global int GetCDVolume(void)
+int GetCDVolume(void)
 {
 	return 0;
 }
@@ -161,7 +161,7 @@ global int GetCDVolume(void)
 /**
 **		FIXME: docu
 */
-global void SetCDVolume(int vol)
+void SetCDVolume(int vol)
 {
 	return;
 }
@@ -169,7 +169,7 @@ global void SetCDVolume(int vol)
 /**
 **		FIXME: docu
 */
-global void QuitCD(void)
+void QuitCD(void)
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped) {
 		SDL_CDStop(CDRom);
@@ -184,7 +184,7 @@ global void QuitCD(void)
 /**
 **		FIXME: docu
 */
-local int InitCD(void)
+static int InitCD(void)
 {
 	if (cd_init()) {
 		return -1;
@@ -199,7 +199,7 @@ local int InitCD(void)
 /**
 **		FIXME: docu
 */
-global int PlayCDTrack(int track)
+int PlayCDTrack(int track)
 {
 	CDTrack = track;
 	return cd_play(track);
@@ -208,7 +208,7 @@ global int PlayCDTrack(int track)
 /**
 **		FIXME: docu
 */
-global void ResumeCD(void)
+void ResumeCD(void)
 {
 	PlayCDRom(CDModeDefined);
 }
@@ -216,7 +216,7 @@ global void ResumeCD(void)
 /**
 **		FIXME: docu
 */
-global void PauseCD(void)
+void PauseCD(void)
 {
 	cd_pause();
 	CDTrack = 0;
@@ -226,7 +226,7 @@ global void PauseCD(void)
 /**
 **		FIXME: docu
 */
-global int IsAudioTrack(int track)
+int IsAudioTrack(int track)
 {
 	return cd_is_audio(track);
 }
@@ -234,7 +234,7 @@ global int IsAudioTrack(int track)
 /**
 **		FIXME: docu
 */
-global int IsCDPlaying(void)
+int IsCDPlaying(void)
 {
 	if (cd_current_track()) {
 		return 1;
@@ -246,7 +246,7 @@ global int IsCDPlaying(void)
 /**
 **		FIXME: docu
 */
-global int GetCDVolume(void)
+int GetCDVolume(void)
 {
 	int vol;
 
@@ -257,7 +257,7 @@ global int GetCDVolume(void)
 /**
 **		FIXME: docu
 */
-global void SetCDVolume(int vol)
+void SetCDVolume(int vol)
 {
 	cd_set_volume(vol, vol);
 }
@@ -265,7 +265,7 @@ global void SetCDVolume(int vol)
 /**
 **		FIXME: docu
 */
-global void QuitCD(void)
+void QuitCD(void)
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped) {
 		cd_stop();
@@ -281,7 +281,7 @@ global void QuitCD(void)
 /**
 **		FIXME: docu
 */
-local int InitCD(void)
+static int InitCD(void)
 {
 	int i;
 
@@ -305,7 +305,7 @@ local int InitCD(void)
 /**
 **		FIXME: docu
 */
-global int PlayCDTrack(int track)
+int PlayCDTrack(int track)
 {
 	Sample* sample;
 
@@ -319,7 +319,7 @@ global int PlayCDTrack(int track)
 /**
 **		FIXME: docu
 */
-global void ResumeCD(void)
+void ResumeCD(void)
 {
 	PlayCDRom(CDModeDefined);
 }
@@ -327,7 +327,7 @@ global void ResumeCD(void)
 /**
 **		FIXME: docu
 */
-global void PauseCD(void)
+void PauseCD(void)
 {
 	StopMusic();
 	CDTrack = 0;
@@ -337,7 +337,7 @@ global void PauseCD(void)
 /**
 **		FIXME: docu
 */
-global int IsAudioTrack(track)
+int IsAudioTrack(track)
 {
 	return !(CDtocentry[track].cdte_ctrl & CDROM_DATA_TRACK);
 }
@@ -345,7 +345,7 @@ global int IsAudioTrack(track)
 /**
 **		FIXME: docu
 */
-global int IsCDPlaying(void)
+int IsCDPlaying(void)
 {
 	return PlayingMusic;
 }
@@ -353,7 +353,7 @@ global int IsCDPlaying(void)
 /**
 **		FIXME: docu
 */
-global int GetCDVolume(void)
+int GetCDVolume(void)
 {
 	return MusicVolume;
 }
@@ -361,7 +361,7 @@ global int GetCDVolume(void)
 /**
 **		FIXME: docu
 */
-global void SetCDVolume(int vol)
+void SetCDVolume(int vol)
 {
 	MusicVolume = vol;
 }
@@ -369,7 +369,7 @@ global void SetCDVolume(int vol)
 /**
 **		FIXME: docu
 */
-global void QuitCD(void)
+void QuitCD(void)
 {
 	close(CDDrive);
 }
@@ -380,7 +380,7 @@ global void QuitCD(void)
 **
 **	  Perodic called from the main loop.
 */
-global int CDRomCheck(void* unused __attribute__ ((unused)))
+int CDRomCheck(void* unused __attribute__ ((unused)))
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped &&
 			!IsCDPlaying() && CDMode != CDModeDefined) {
@@ -395,7 +395,7 @@ global int CDRomCheck(void* unused __attribute__ ((unused)))
 **
 **		@param name		name of play mode, CDModeAll, CDModeRandom, CDModeDefined
 */
-global int PlayCDRom(int name)
+int PlayCDRom(int name)
 {
 	int i;
 	int datacd;

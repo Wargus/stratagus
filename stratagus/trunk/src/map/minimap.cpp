@@ -54,46 +54,38 @@
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_OPENGL
-local GLuint MinimapTexture;
-local unsigned char* MinimapSurface;
-local unsigned char* MinimapTerrainSurface;
-local int MinimapTextureWidth;
-local int MinimapTextureHeight;
+static GLuint MinimapTexture;
+static unsigned char* MinimapSurface;
+static unsigned char* MinimapTerrainSurface;
+static int MinimapTextureWidth;
+static int MinimapTextureHeight;
 #else
-local SDL_Surface* MinimapSurface;		/// generated minimap
-local SDL_Surface* MinimapTerrainSurface;		/// generated minimap terrain
+static SDL_Surface* MinimapSurface;		/// generated minimap
+static SDL_Surface* MinimapTerrainSurface;		/// generated minimap terrain
 #endif
-local int* Minimap2MapX;				/// fast conversion table
-local int* Minimap2MapY;				/// fast conversion table
-local int Map2MinimapX[MaxMapWidth];		/// fast conversion table
-local int Map2MinimapY[MaxMapHeight];		/// fast conversion table
+static int* Minimap2MapX;				/// fast conversion table
+static int* Minimap2MapY;				/// fast conversion table
+static int Map2MinimapX[MaxMapWidth];		/// fast conversion table
+static int Map2MinimapY[MaxMapHeight];		/// fast conversion table
 
 //		MinimapScale:
 //		32x32 64x64 96x96 128x128 256x256 512x512 ...
 //		  *4	*2	*4/3   *1			 *1/2	*1/4
-local int MinimapScaleX;				/// Minimap scale to fit into window
-local int MinimapScaleY;				/// Minimap scale to fit into window
-global int MinimapX;						/// Minimap drawing position x offset
-global int MinimapY;						/// Minimap drawing position y offset
+static int MinimapScaleX;				/// Minimap scale to fit into window
+static int MinimapScaleY;				/// Minimap scale to fit into window
+int MinimapX;						/// Minimap drawing position x offset
+int MinimapY;						/// Minimap drawing position y offset
 
-global int MinimapWithTerrain = 1;		/// display minimap with terrain
-global int MinimapFriendly = 1;				/// switch colors of friendly units
-global int MinimapShowSelected = 1;		/// highlight selected units
-
-local int OldMinimapCursorX;				/// Save MinimapCursorX
-local int OldMinimapCursorY;				/// Save MinimapCursorY
-local int OldMinimapCursorW;				/// Save MinimapCursorW
-local int OldMinimapCursorH;				/// Save MinimapCursorH
-local int OldMinimapCursorSize;				/// Saved image size
-
-local SDL_Surface* OldMinimapCursorImage;		/// Saved image behind cursor
+int MinimapWithTerrain = 1;		/// display minimap with terrain
+int MinimapFriendly = 1;				/// switch colors of friendly units
+int MinimapShowSelected = 1;		/// highlight selected units
 
 /**
 **  Create a mini-map from the tiles of the map.
 **
 **  @todo Scaling and scrolling the minmap is currently not supported.
 */
-global void CreateMinimap(void)
+void CreateMinimap(void)
 {
 	int n;
 #ifndef USE_OPENGL
@@ -234,7 +226,7 @@ global void CreateMinimap(void)
 **
 **  FIXME: this can surely be sped up??
 */
-global void UpdateMinimapTerrain(void)
+void UpdateMinimapTerrain(void)
 {
 	int mx;
 	int my;
@@ -330,7 +322,7 @@ global void UpdateMinimapTerrain(void)
 /**
 **  FIXME: docu
 */
-global void UpdateMinimapXY(int tx, int ty)
+void UpdateMinimapXY(int tx, int ty)
 {
 	int mx;
 	int my;
@@ -446,7 +438,7 @@ global void UpdateMinimapXY(int tx, int ty)
 /**
 **  Draw an unit on the minimap. 
 */
-local void DrawUnitOnMinimap(Unit* unit, int red_phase)
+static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 {
 	UnitType* type;
 	int mx;
@@ -524,7 +516,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 /**
 **  FIXME: docu
 */
-global void UpdateMinimap(void)
+void UpdateMinimap(void)
 {
 	static int red_phase;
 	int red_phase_changed;
@@ -608,7 +600,7 @@ global void UpdateMinimap(void)
 /**
 **  FIXME: docu
 */
-global void DrawMinimap(int vx __attribute__((unused)),
+void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
 #ifndef USE_OPENGL
@@ -644,7 +636,7 @@ global void DrawMinimap(int vx __attribute__((unused)),
 **
 **  @return   Tile X coordinate.
 */
-global int ScreenMinimap2MapX(int x)
+int ScreenMinimap2MapX(int x)
 {
 	int tx;
 
@@ -662,7 +654,7 @@ global int ScreenMinimap2MapX(int x)
 **
 **  @return   Tile Y coordinate.
 */
-global int ScreenMinimap2MapY(int y)
+int ScreenMinimap2MapY(int y)
 {
 	int ty;
 
@@ -676,7 +668,7 @@ global int ScreenMinimap2MapY(int y)
 /**
 **  Destroy mini-map.
 */
-global void DestroyMinimap(void)
+void DestroyMinimap(void)
 {
 #ifndef USE_OPENGL
 	SDL_FreeSurface(MinimapTerrainSurface);
@@ -705,7 +697,7 @@ global void DestroyMinimap(void)
 **  @param vx  View point X position.
 **  @param vy  View point Y position.
 */
-global void DrawMinimapCursor(int vx, int vy)
+void DrawMinimapCursor(int vx, int vy)
 {
 	int x;
 	int y;

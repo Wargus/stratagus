@@ -58,7 +58,7 @@
 **  @param data     byte address to read to.
 **  @param length   number of bytes to read.
 */
-local void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	png_size_t check;
 
@@ -77,7 +77,7 @@ local void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t leng
 **
 **  @return      graphic object with loaded graphic, or NULL if failure.
 */
-global Graphic* LoadGraphicPNG(const char* name)
+Graphic* LoadGraphicPNG(const char* name)
 {
 	Graphic* graphic;
 	CLFile* fp;
@@ -297,7 +297,7 @@ done:   /* Clean up and return */
 **
 **  @param name  PNG filename to save.
 */
-global void SaveScreenshotPNG(const char* name)
+void SaveScreenshotPNG(const char* name)
 {
 	FILE* fp;
 	png_structp png_ptr;

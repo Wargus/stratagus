@@ -74,7 +74,7 @@
 **		@param offset		Seek position
 **		@param whence		How to seek
 */
-local int gzseek(CLFile* file, unsigned offset, int whence)
+static int gzseek(CLFile* file, unsigned offset, int whence)
 {
 	char buf[32];
 
@@ -106,7 +106,7 @@ local int gzseek(CLFile* file, unsigned offset, int whence)
 **		@param offset		Seek position
 **		@param whence		How to seek
 */
-local void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unused)))
+static void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unused)))
 {
 	char buf[32];
 
@@ -129,7 +129,7 @@ local void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unuse
 **
 **		@return						File Pointer
 */
-global CLFile* CLopen(const char* fn, long openflags)
+CLFile* CLopen(const char* fn, long openflags)
 {
 	CLFile clf;
 	CLFile* result;
@@ -233,7 +233,7 @@ global CLFile* CLopen(const char* fn, long openflags)
 **
 **		@param file		CLFile pointer.
 */
-global int CLclose(CLFile* file)
+int CLclose(CLFile* file)
 {
 	int tp;
 	int ret;
@@ -269,7 +269,7 @@ global int CLclose(CLFile* file)
 **		@param buf		Pointer to read the data to.
 **		@param len		number of bytes to read.
 */
-global int CLread(CLFile* file, void* buf, size_t len)
+int CLread(CLFile* file, void* buf, size_t len)
 {
 	int tp;
 	int ret;
@@ -296,7 +296,7 @@ global int CLread(CLFile* file, void* buf, size_t len)
 	return ret;
 }
 
-global void CLflush(CLFile * file)
+void CLflush(CLFile * file)
 {
 	int tp;
 	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID && tp == CLF_TYPE_PLAIN) {
@@ -312,7 +312,7 @@ global void CLflush(CLFile * file)
 **		@param format		String Format.
 **		@param ...		Parameter List.
 */
-global int CLprintf(CLFile* file, char* format, ...)
+int CLprintf(CLFile* file, char* format, ...)
 {
 	int n;
 	int size;
@@ -378,7 +378,7 @@ global int CLprintf(CLFile* file, char* format, ...)
 **		@param offset		Seek position
 **		@param whence		How to seek
 */
-global int CLseek(CLFile* file, long offset, int whence)
+int CLseek(CLFile* file, long offset, int whence)
 {
 	int tp;
 	int ret;
@@ -411,7 +411,7 @@ global int CLseek(CLFile* file, long offset, int whence)
 **
 **		@param file		CLFile pointer.
 */
-global long CLtell(CLFile* file)
+long CLtell(CLFile* file)
 {
 	int tp;
 	int ret;
@@ -452,7 +452,7 @@ global long CLtell(CLFile* file)
 **
 **		@return				Pointer to buffer.
 */
-global char* LibraryFileName(const char* file, char* buffer)
+char* LibraryFileName(const char* file, char* buffer)
 {
 	char* s;
 
@@ -594,7 +594,7 @@ global char* LibraryFileName(const char* file, char* buffer)
 **
 **		@return				v1-v2
 */
-local int flqcmp(const void* v1, const void* v2)
+static int flqcmp(const void* v1, const void* v2)
 {
 	const FileList* c1;
 	const FileList* c2;
@@ -618,7 +618,7 @@ local int flqcmp(const void* v1, const void* v2)
 **
 **		@return				Pointer to FileList struct describing Files found.
 */
-global int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
+int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
 {
 #ifndef _MSC_VER
 	DIR* dirp;

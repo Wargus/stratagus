@@ -59,7 +59,7 @@
 **
 **  @param unit  Pointer of researching unit.
 */
-global void HandleActionResearch(Unit* unit)
+void HandleActionResearch(Unit* unit)
 {
 	const Upgrade* upgrade;
 

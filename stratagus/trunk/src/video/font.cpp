@@ -58,10 +58,10 @@ typedef struct _font_color_mapping_ {
 	struct _font_color_mapping_* Next;      /// Next pointer
 } FontColorMapping;
 
-local FontColorMapping* FontColor;
+static FontColorMapping* FontColor;
 
 	/// Font color mappings
-local FontColorMapping* FontColorMappings;
+static FontColorMapping* FontColorMappings;
 
 	/// Font mapping
 typedef struct _font_mapping_ {
@@ -70,36 +70,36 @@ typedef struct _font_mapping_ {
 	struct _font_mapping_* Next;            /// Next pointer
 } FontMapping;
 
-local FontMapping* FontMappings;
+static FontMapping* FontMappings;
 
 /**
 **  Fonts table
 **
 **  Define the font files, sizes.
 */
-local ColorFont Fonts[MaxFonts];
+static ColorFont Fonts[MaxFonts];
 
 	/// Last text color
-local FontColorMapping* LastTextColor;
+static FontColorMapping* LastTextColor;
 	/// Default text color
-local FontColorMapping* DefaultTextColor;
+static FontColorMapping* DefaultTextColor;
 	/// Reverse text color
-local FontColorMapping* ReverseTextColor;
+static FontColorMapping* ReverseTextColor;
 	/// Default normal color index
-local char* DefaultNormalColorIndex;
+static char* DefaultNormalColorIndex;
 	/// Default reverse color index
-local char* DefaultReverseColorIndex;
+static char* DefaultReverseColorIndex;
 
 	/// Draw character with current video depth.
-local void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
+static void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
 	/// Font bitmaps
-local GLubyte* FontBitmaps[MaxFonts][NumFontColors];
+static GLubyte* FontBitmaps[MaxFonts][NumFontColors];
 	/// Font bitmap widths
-local int FontBitmapWidths[MaxFonts];
+static int FontBitmapWidths[MaxFonts];
 	/// Current font
-local int CurrentFont;
+static int CurrentFont;
 #endif
 
 /*----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ local int CurrentFont;
 **  @param y       Y screen position
 */
 #ifndef USE_OPENGL
-local void VideoDrawChar(const Graphic* sprite,
+static void VideoDrawChar(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	SDL_Rect srect;
@@ -137,7 +137,7 @@ local void VideoDrawChar(const Graphic* sprite,
 	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
 }
 #else
-local void VideoDrawChar(const Graphic* sprite,
+static void VideoDrawChar(const Graphic* sprite,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	SDL_Color* c;
@@ -168,7 +168,7 @@ local void VideoDrawChar(const Graphic* sprite,
 /**
 **  FIXME: docu
 */
-local FontColorMapping* GetFontColorMapping(char* color)
+static FontColorMapping* GetFontColorMapping(char* color)
 {
 	FontColorMapping *fcm;
 
@@ -190,7 +190,7 @@ local FontColorMapping* GetFontColorMapping(char* color)
 **  @param normal   Normal text color.
 **  @param reverse  Reverse text color.
 */
-global void SetDefaultTextColors(char* normal, char* reverse)
+void SetDefaultTextColors(char* normal, char* reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
@@ -204,7 +204,7 @@ global void SetDefaultTextColors(char* normal, char* reverse)
 **  @param normalp   Normal text color pointer.
 **  @param reversep  Reverse text color pointer.
 */
-global void GetDefaultTextColors(char** normalp, char** reversep)
+void GetDefaultTextColors(char** normalp, char** reversep)
 {
 	*normalp = DefaultNormalColorIndex;
 	*reversep = DefaultReverseColorIndex;
@@ -218,7 +218,7 @@ global void GetDefaultTextColors(char** normalp, char** reversep)
 **
 **  @return      The length in pixels of the text.
 */
-global int VideoTextLength(unsigned font, const unsigned char* text)
+int VideoTextLength(unsigned font, const unsigned char* text)
 {
 	int width;
 	const unsigned char* s;
@@ -254,7 +254,7 @@ global int VideoTextLength(unsigned font, const unsigned char* text)
 **
 **  @return      The height of the font.
 */
-global int VideoTextHeight(unsigned font)
+int VideoTextHeight(unsigned font)
 {
 	return Fonts[font].Height;
 }
@@ -270,7 +270,7 @@ global int VideoTextHeight(unsigned font)
 **  @param x        X screen position
 **  @param y        Y screen position
 */
-local void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int h,
+static void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int h,
 	int x, int y)
 {
 	int ox;
@@ -297,7 +297,7 @@ local void VideoDrawCharClip(const Graphic* graphic, int gx, int gy, int w, int 
 **
 **  @return      The length of the printed text.
 */
-local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
+static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	int clip)
 {
 	int w;
@@ -401,7 +401,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 **
 **  @return      The length of the printed text.
 */
-global int VideoDrawText(int x, int y, unsigned font,
+int VideoDrawText(int x, int y, unsigned font,
 	const unsigned char* text)
 {
 	return DoDrawText(x, y, font, text, 0);
@@ -419,7 +419,7 @@ global int VideoDrawText(int x, int y, unsigned font,
 **
 **  @return      The length of the printed text.
 */
-global int VideoDrawTextClip(int x, int y, unsigned font,
+int VideoDrawTextClip(int x, int y, unsigned font,
 	const unsigned char* text)
 {
 	return DoDrawText(x, y, font, text, 1);
@@ -437,7 +437,7 @@ global int VideoDrawTextClip(int x, int y, unsigned font,
 **
 **  @return      The length of the printed text.
 */
-global int VideoDrawReverseText(int x, int y, unsigned font,
+int VideoDrawReverseText(int x, int y, unsigned font,
 	const unsigned char* text)
 {
 	int w;
@@ -461,7 +461,7 @@ global int VideoDrawReverseText(int x, int y, unsigned font,
 **
 **  @return      The length of the printed text.
 */
-global int VideoDrawReverseTextClip(int x, int y, unsigned font,
+int VideoDrawReverseTextClip(int x, int y, unsigned font,
 	const unsigned char* text)
 {
 	int w;
@@ -485,7 +485,7 @@ global int VideoDrawReverseTextClip(int x, int y, unsigned font,
 **
 **  @return      The length of the printed text.
 */
-global int VideoDrawTextCentered(int x, int y, unsigned font,
+int VideoDrawTextCentered(int x, int y, unsigned font,
 	const unsigned char* text)
 {
 	int dx;
@@ -502,7 +502,7 @@ global int VideoDrawTextCentered(int x, int y, unsigned font,
 **  @param number  Number to be formatted
 **  @param buf     Buffer to save the formatted number to
 */
-local void FormatNumber(int number, char* buf)
+static void FormatNumber(int number, char* buf)
 {
 	char bufs[sizeof(int) * 10 + 2];
 	int sl;
@@ -530,7 +530,7 @@ local void FormatNumber(int number, char* buf)
 **
 **  @return        The length of the printed text.
 */
-global int VideoDrawNumber(int x, int y, unsigned font, int number)
+int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -548,7 +548,7 @@ global int VideoDrawNumber(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
+int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -566,7 +566,7 @@ global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
+int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -584,7 +584,7 @@ global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 **
 **  @return        The length of the printed text.
 */
-global int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
+int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
 {
 	char buf[sizeof(int) * 10 + 2];
 
@@ -595,7 +595,7 @@ global int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number)
 /**
 **  FIXME: docu
 */
-local void FontMeasureWidths(ColorFont* fp)
+static void FontMeasureWidths(ColorFont* fp)
 {
 	// FIXME: todo.. can this be optimized?
 	int y;
@@ -638,7 +638,7 @@ local void FontMeasureWidths(ColorFont* fp)
 **  Make font bitmap.
 */
 #ifdef USE_OPENGL
-local void MakeFontBitmap(Graphic* g, int font)
+static void MakeFontBitmap(Graphic* g, int font)
 {
 	int i;
 	int j;
@@ -694,7 +694,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 /**
 **  Load all fonts.
 */
-global void LoadFonts(void)
+void LoadFonts(void)
 {
 	unsigned i;
 
@@ -717,7 +717,7 @@ global void LoadFonts(void)
 **
 **  @return       Integer as font identifier.
 */
-global int FontByIdent(const char* ident)
+int FontByIdent(const char* ident)
 {
 	FontMapping* fm;
 
@@ -740,7 +740,7 @@ global int FontByIdent(const char* ident)
 **
 **  @return      Name of the font.
 */
-global const char* FontName(int font)
+const char* FontName(int font)
 {
 	FontMapping* fm;
 
@@ -765,7 +765,7 @@ global const char* FontName(int font)
 **
 **  @todo  make the font name functions more general, support more fonts.
 */
-local int CclDefineFont(lua_State* l)
+static int CclDefineFont(lua_State* l)
 {
 	const char* value;
 	int i;
@@ -834,7 +834,7 @@ local int CclDefineFont(lua_State* l)
 /**
 **  Define a font color.
 */
-local int CclDefineFontColor(lua_State* l)
+static int CclDefineFontColor(lua_State* l)
 {
 	char* color;
 	int i;
@@ -889,7 +889,7 @@ local int CclDefineFontColor(lua_State* l)
 **
 **  @todo FIXME: Make the remaining functions accessable from CCL.
 */
-global void FontsCclRegister(void)
+void FontsCclRegister(void)
 {
 	lua_register(Lua, "DefineFont", CclDefineFont);
 	lua_register(Lua, "DefineFontColor", CclDefineFontColor);
@@ -907,7 +907,7 @@ global void FontsCclRegister(void)
 /**
 **  Cleanup the font module.
 */
-global void CleanFonts(void)
+void CleanFonts(void)
 {
 	unsigned i;
 	FontColorMapping *fcmp, *fcmpn;
@@ -935,7 +935,7 @@ global void CleanFonts(void)
 **
 **  @return      True if loaded, false otherwise.
 */
-global int IsFontLoaded(unsigned font)
+int IsFontLoaded(unsigned font)
 {
 	return Fonts[font].Graphic != 0;
 }

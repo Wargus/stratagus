@@ -62,7 +62,7 @@ typedef struct _wav_data_ {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-local int WavStreamRead(Sample* sample, void* buf, int len)
+static int WavStreamRead(Sample* sample, void* buf, int len)
 {
 	WavData* data;
 	WavChunk chunk;
@@ -133,7 +133,7 @@ local int WavStreamRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-local void WavStreamFree(Sample* sample)
+static void WavStreamFree(Sample* sample)
 {
 	WavData* data;
 
@@ -147,12 +147,12 @@ local void WavStreamFree(Sample* sample)
 /**
 **  wav stream type structure.
 */
-local const SampleType WavStreamSampleType = {
+static const SampleType WavStreamSampleType = {
 	WavStreamRead,
 	WavStreamFree,
 };
 
-local int WavRead(Sample* sample, void* buf, int len)
+static int WavRead(Sample* sample, void* buf, int len)
 {
         if (len > sample->Len) {
                 len = sample->Len;
@@ -165,7 +165,7 @@ local int WavRead(Sample* sample, void* buf, int len)
         return len;
 }
 
-local void WavFree(Sample* sample)
+static void WavFree(Sample* sample)
 {
         free(sample->User);
         free(sample->Buffer);
@@ -175,7 +175,7 @@ local void WavFree(Sample* sample)
 /**
 **	  wav stream type structure.
 */
-local const SampleType WavSampleType = {
+static const SampleType WavSampleType = {
 	WavRead,
 	WavFree,
 };
@@ -191,7 +191,7 @@ local const SampleType WavSampleType = {
 **
 **  @todo         Add ADPCM loading support!
 */
-global Sample* LoadWav(const char* name, int flags)
+Sample* LoadWav(const char* name, int flags)
 {
 	Sample* sample;
 	WavData* data;

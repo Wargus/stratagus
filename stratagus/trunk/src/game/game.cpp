@@ -71,8 +71,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global Settings GameSettings;  /// Game Settings
-local int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
+Settings GameSettings;  /// Game Settings
+static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -88,7 +88,7 @@ local int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 **  @param mapname   map filename
 **  @param map       map loaded
 */
-local void LoadStratagusMap(const char* mapname,
+static void LoadStratagusMap(const char* mapname,
 	WorldMap* map __attribute__((unused)))
 {
 	char mapfull[PATH_MAX];
@@ -127,7 +127,7 @@ local void LoadStratagusMap(const char* mapname,
 **  @param filename  map filename
 **  @param map       map loaded
 */
-local void LoadMap(const char* filename, WorldMap* map)
+static void LoadMap(const char* filename, WorldMap* map)
 {
 	const char* tmp;
 
@@ -171,7 +171,7 @@ local void LoadMap(const char* filename, WorldMap* map)
 /**
 **  Free for all
 */
-local void GameTypeFreeForAll(void)
+static void GameTypeFreeForAll(void)
 {
 	int i;
 	int j;
@@ -188,7 +188,7 @@ local void GameTypeFreeForAll(void)
 /**
 **  Top vs Bottom
 */
-local void GameTypeTopVsBottom(void)
+static void GameTypeTopVsBottom(void)
 {
 	int i;
 	int j;
@@ -215,7 +215,7 @@ local void GameTypeTopVsBottom(void)
 /**
 **  Left vs Right
 */
-local void GameTypeLeftVsRight(void)
+static void GameTypeLeftVsRight(void)
 {
 	int i;
 	int j;
@@ -242,7 +242,7 @@ local void GameTypeLeftVsRight(void)
 /**
 **  Man vs Machine
 */
-local void GameTypeManVsMachine(void)
+static void GameTypeManVsMachine(void)
 {
 	int i;
 	int j;
@@ -267,7 +267,7 @@ local void GameTypeManVsMachine(void)
 /**
 **  Man vs Machine whith Humans on a Team
 */
-local void GameTypeManTeamVsMachine(void)
+static void GameTypeManTeamVsMachine(void)
 {
 	int i;
 	int j;
@@ -304,7 +304,7 @@ local void GameTypeManTeamVsMachine(void)
 **
 **  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
-global void CreateGame(char* filename, WorldMap* map)
+void CreateGame(char* filename, WorldMap* map)
 {
 	int i;
 	int j;
@@ -555,7 +555,7 @@ global void CreateGame(char* filename, WorldMap* map)
 **
 **  @todo  FIXME: this should not be executed for restart levels!
 */
-global void InitSettings(void)
+void InitSettings(void)
 {
 	int i;
 

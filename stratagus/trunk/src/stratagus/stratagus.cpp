@@ -230,50 +230,50 @@ extern int CclUnits(lua_State* l);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global TitleScreen** TitleScreens;          /// Title screens to show at startup
-global char* MenuMusic;                     /// File for menu music
-global char* StratagusLibPath;              /// Path for data directory
-global char LocalPlayerName[16];            /// Name of local player
+TitleScreen** TitleScreens;          /// Title screens to show at startup
+char* MenuMusic;                     /// File for menu music
+char* StratagusLibPath;              /// Path for data directory
+char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
-global char NameLine[] =
+char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
 
-local char* MapName;                        /// Filename of the map to load
-global char* CompileOptions;                /// Compile options.
+static char* MapName;                        /// Filename of the map to load
+char* CompileOptions;                /// Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
-global int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-global int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-global int SpeedBuild = 1;                  /// speed factor for building
-global int SpeedTrain = 1;                  /// speed factor for training
-global int SpeedUpgrade = 1;                /// speed factor for upgrading
-global int SpeedResearch = 1;               /// speed factor for researching
+int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
+int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
+int SpeedBuild = 1;                  /// speed factor for building
+int SpeedTrain = 1;                  /// speed factor for training
+int SpeedUpgrade = 1;                /// speed factor for upgrading
+int SpeedResearch = 1;               /// speed factor for researching
 
 /*============================================================================
 ==  DISPLAY
 ============================================================================*/
 
 // FIXME: not the correct place
-global int MustRedraw = RedrawEverything;   /// Redraw flags
-global int EnableRedraw = RedrawEverything; /// Enable flags
+int MustRedraw = RedrawEverything;   /// Redraw flags
+int EnableRedraw = RedrawEverything; /// Enable flags
 
-global unsigned long GameCycle;             /// Game simulation cycle counter
-global unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
+unsigned long GameCycle;             /// Game simulation cycle counter
+unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
 
-global unsigned SyncRandSeed;               /// sync random seed value.
+unsigned SyncRandSeed;               /// sync random seed value.
 
 /**
 **  Inititalize sync rand seed.
 */
-global void InitSyncRand(void)
+void InitSyncRand(void)
 {
 	SyncRandSeed = 0x87654321;
 }
@@ -284,7 +284,7 @@ global void InitSyncRand(void)
 **  @note This random value must be same on all machines in network game.
 **  Very simple random generations, enough for us.
 */
-global int SyncRand(void)
+int SyncRand(void)
 {
 	int val;
 
@@ -307,7 +307,7 @@ global int SyncRand(void)
 **
 **  @return   Allocated combined string (must be freed).
 */
-global char* strdcat(const char* l, const char* r)
+char* strdcat(const char* l, const char* r)
 {
 	char* res;
 
@@ -328,7 +328,7 @@ global char* strdcat(const char* l, const char* r)
 **
 **  @return   Allocated combined string (must be freeded).
 */
-global char* strdcat3(const char* l, const char* m, const char* r)
+char* strdcat3(const char* l, const char* m, const char* r)
 {
 	char* res;
 
@@ -350,7 +350,7 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 **
 **  @return   Pointer to first occurence of b or NULL if not found.
 */
-global char* strcasestr(const char* a, const char* b)
+char* strcasestr(const char* a, const char* b)
 {
 	int x;
 
@@ -384,7 +384,7 @@ global char* strcasestr(const char* a, const char* b)
 **
 **  @return     The integer square root.
 */
-global long isqrt(long num)
+long isqrt(long num)
 {
 	long squaredbit;
 	long remainder;
@@ -426,14 +426,14 @@ global long isqrt(long num)
 ==  MAIN
 ============================================================================*/
 
-local int WaitNoEvent;                      /// Flag got an event
-local int WaitMouseX;                       /// Mouse X position
-local int WaitMouseY;                       /// Mouse Y position
+static int WaitNoEvent;                      /// Flag got an event
+static int WaitMouseX;                       /// Mouse X position
+static int WaitMouseY;                       /// Mouse Y position
 
 /**
 **  Callback for input.
 */
-local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
+static void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
 	WaitNoEvent = 0;
 }
@@ -441,14 +441,14 @@ local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 /**
 **  Callback for input.
 */
-local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
+static void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
 {
 }
 
 /**
 **  Callback for input.
 */
-local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
+static void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 	WaitNoEvent = 0;
@@ -457,7 +457,7 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
+static void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 }
@@ -465,7 +465,7 @@ local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
+static void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
 }
@@ -473,7 +473,7 @@ local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-local void WaitCallbackMouse(int x, int y)
+static void WaitCallbackMouse(int x, int y)
 {
 	WaitMouseX = x;
 	WaitMouseY = y;
@@ -482,14 +482,14 @@ local void WaitCallbackMouse(int x, int y)
 /**
 **  Callback for exit.
 */
-local void WaitCallbackExit(void)
+static void WaitCallbackExit(void)
 {
 }
 
 /**
 **  Show the title screens
 */
-local void ShowTitleScreens(void)
+static void ShowTitleScreens(void)
 {
 	EventCallback callbacks;
 	int timeout;
@@ -562,7 +562,7 @@ local void ShowTitleScreens(void)
 **
 **  @param fmt  printf format string.
 */
-global void ShowLoadProgress(const char* fmt, ...)
+void ShowLoadProgress(const char* fmt, ...)
 {
 	va_list va;
 	char temp[4096];
@@ -593,7 +593,7 @@ global void ShowLoadProgress(const char* fmt, ...)
 /**
 **  Pre menu setup.
 */
-global void PreMenuSetup(void)
+void PreMenuSetup(void)
 {
 	//
 	//  Initial menus require some gfx.
@@ -621,7 +621,7 @@ global void PreMenuSetup(void)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-global void MenuLoop(char* filename, WorldMap* map)
+void MenuLoop(char* filename, WorldMap* map)
 {
 	for (;;) {
 		//
@@ -737,7 +737,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 /**
 **  Print headerline, copyright, ...
 */
-local void PrintHeader(void)
+static void PrintHeader(void)
 {
 	// vvv---- looks weird, but is needed for GNU brain damage
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
@@ -755,7 +755,7 @@ local void PrintHeader(void)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-local int main1(int argc __attribute__ ((unused)),
+static int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
 	PrintHeader();
@@ -806,7 +806,7 @@ Use it at your own risk.\n\n");
 **
 **  @param err  Error code to parse to shell.
 */
-global void Exit(int err)
+void Exit(int err)
 {
 	StopMusic();
 	QuitSound();
@@ -835,7 +835,7 @@ global void Exit(int err)
 **
 **  @param err  Error code to parse to shell.
 */
-global void ExitFatal(int err)
+void ExitFatal(int err)
 {
 	QuitCD();
 	exit(err);
@@ -844,7 +844,7 @@ global void ExitFatal(int err)
 /**
 **  Display the usage.
 */
-local void Usage(void)
+static void Usage(void)
 {
 	PrintHeader();
 	printf(
@@ -879,7 +879,7 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-global int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	char* p;
 

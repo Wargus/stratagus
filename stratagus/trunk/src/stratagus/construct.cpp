@@ -52,18 +52,18 @@
 /**
 **  Construction type definition
 */
-global const char ConstructionType[] = "construction";
+const char ConstructionType[] = "construction";
 
 /**
 **  Constructions.
 */
-local Construction** Constructions;
+static Construction** Constructions;
 
 /**
 **  Table mapping the original construction numbers in puds to
 **  our internal string.
 */
-global char** ConstructionWcNames;
+char** ConstructionWcNames;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -72,7 +72,7 @@ global char** ConstructionWcNames;
 /**
 **  Initialize  the constructions.
 */
-global void InitConstructions(void)
+void InitConstructions(void)
 {
 }
 
@@ -82,7 +82,7 @@ global void InitConstructions(void)
 **  HELPME: who make this better terrain depended and extendable
 **  HELPME: filename constuction.
 */
-global void LoadConstructions(void)
+void LoadConstructions(void)
 {
 	const char* file;
 	Construction** cop;
@@ -139,7 +139,7 @@ global void LoadConstructions(void)
 /**
 **  Cleanup the constructions.
 */
-global void CleanConstructions(void)
+void CleanConstructions(void)
 {
 	char** cp;
 	int j;
@@ -199,7 +199,7 @@ global void CleanConstructions(void)
 **
 **  @return       Construction structure pointer
 */
-global Construction* ConstructionByIdent(const char* ident)
+Construction* ConstructionByIdent(const char* ident)
 {
 	Construction** cop;
 
@@ -220,7 +220,7 @@ global Construction* ConstructionByIdent(const char* ident)
 **
 **  @param num  Original number used in puds.
 */
-global Construction* ConstructionByWcNum(int num)
+Construction* ConstructionByWcNum(int num)
 {
 	return ConstructionByIdent(ConstructionWcNames[num]);
 }
@@ -232,7 +232,7 @@ global Construction* ConstructionByWcNum(int num)
 **
 **  @param l  Lua state.
 */
-local int CclDefineConstructionWcNames(lua_State* l)
+static int CclDefineConstructionWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -270,7 +270,7 @@ local int CclDefineConstructionWcNames(lua_State* l)
 **
 **  @note make this more flexible
 */
-local int CclDefineConstruction(lua_State* l)
+static int CclDefineConstruction(lua_State* l)
 {
 	const char* value;
 	char* str;
@@ -448,7 +448,7 @@ local int CclDefineConstruction(lua_State* l)
 /**
 **  Register CCL features for construction.
 */
-global void ConstructionCclRegister(void)
+void ConstructionCclRegister(void)
 {
 	lua_register(Lua, "DefineConstructionWcNames",
 		CclDefineConstructionWcNames);

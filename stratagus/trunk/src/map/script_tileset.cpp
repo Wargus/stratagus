@@ -52,7 +52,7 @@
 **
 **  @param l  Lua state.
 */
-local int CclDefineTilesetWcNames(lua_State* l)
+static int CclDefineTilesetWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -90,7 +90,7 @@ local int CclDefineTilesetWcNames(lua_State* l)
 **  @param tileset  Tileset to be extended.
 **  @param tiles    Number of tiles.
 */
-local void ExtendTilesetTables(Tileset* tileset, int tiles)
+static void ExtendTilesetTables(Tileset* tileset, int tiles)
 {
 	tileset->Table = realloc(tileset->Table, tiles * sizeof(*tileset->Table));
 	if (!tileset->Table) {
@@ -117,7 +117,7 @@ local void ExtendTilesetTables(Tileset* tileset, int tiles)
 **  @param l        Lua state.
 **  @param tileset  Tileset currently parsed.
 */
-local int TilesetParseName(lua_State* l, Tileset* tileset)
+static int TilesetParseName(lua_State* l, Tileset* tileset)
 {
 	char* ident;
 	int i;
@@ -147,7 +147,7 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 **
 **  @return      remaining list
 */
-local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
+static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 {
 	int flags;
 	const char* value;
@@ -208,7 +208,7 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 **  @param l        Lua state.
 **  @param tileset  Tileset to be filled.
 */
-local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
+static void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 {
 	const char* value;
 	int i;
@@ -312,7 +312,7 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
 */
-local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
+static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 {
 	int i;
 	int f;
@@ -380,7 +380,7 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 **  @param tileset  Tileset to be filled.
 **  @param index    Current table index.
 */
-local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
+static int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 {
 	int i;
 	int len;
@@ -457,7 +457,7 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 **  @param tileset  Tileset to be filled.
 **  @param t        FIXME: docu
 */
-local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
+static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 {
 	const char* value;
 	int index;
@@ -534,7 +534,7 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 **  @param tileset  Tileset to be filled.
 **  @param t        FIXME: docu
 */
-local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
+static void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 {
 	int num;
 	char* unit;
@@ -565,7 +565,7 @@ local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 **
 **  @param l  Lua state.
 */
-local int CclDefineTileset(lua_State* l)
+static int CclDefineTileset(lua_State* l)
 {
 	const char* value;
 	int type;
@@ -666,7 +666,7 @@ local int CclDefineTileset(lua_State* l)
 /**
 **  Register CCL features for tileset.
 */
-global void TilesetCclRegister(void)
+void TilesetCclRegister(void)
 {
 	lua_register(Lua, "DefineTilesetWcNames", CclDefineTilesetWcNames);
 	lua_register(Lua, "DefineTileset", CclDefineTileset);

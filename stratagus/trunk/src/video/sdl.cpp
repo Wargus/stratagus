@@ -86,14 +86,14 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global SDL_Surface* TheScreen;				/// Internal screen
+SDL_Surface* TheScreen;				/// Internal screen
 
-local SDL_Rect Rects[100];
-local int NumRects;
+static SDL_Rect Rects[100];
+static int NumRects;
 
-local int FrameTicks;						/// Frame length in ms
-local int FrameRemainder;				/// Frame remainder 0.1 ms
-local int FrameFraction;				/// Frame fractional term
+static int FrameTicks;						/// Frame length in ms
+static int FrameRemainder;				/// Frame remainder 0.1 ms
+static int FrameFraction;				/// Frame fractional term
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -109,7 +109,7 @@ local int FrameFraction;				/// Frame fractional term
 **
 **  @see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
 */
-global void SetVideoSync(void)
+void SetVideoSync(void)
 {
 	int ms;
 
@@ -137,7 +137,7 @@ global void SetVideoSync(void)
 /**
 **  Initialize open gl for doing 2d with 3d.
 */
-local void InitOpenGL(void)
+static void InitOpenGL(void)
 {
 	glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
 	glMatrixMode(GL_PROJECTION);
@@ -158,8 +158,8 @@ local void InitOpenGL(void)
 }
 #endif
 
-#ifdef DEBUG
-local void CleanExit(int signum)
+#if 0
+static void CleanExit(int signum)
 {
 	// Clean SDL
 	SDL_Quit();
@@ -174,7 +174,7 @@ local void CleanExit(int signum)
 /**
 **  Initialize the video part for SDL.
 */
-global void InitVideoSdl(void)
+void InitVideoSdl(void)
 {
 	Uint32 flags;
 
@@ -266,7 +266,7 @@ global void InitVideoSdl(void)
 **  @param w  width of rectangle in pixels.
 **  @param h  height of rectangle in pixels.
 */
-global void InvalidateArea(int x, int y, int w, int h)
+void InvalidateArea(int x, int y, int w, int h)
 {
 #ifndef USE_OPENGL
 	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
@@ -282,7 +282,7 @@ global void InvalidateArea(int x, int y, int w, int h)
 /**
 **  Invalidate whole window
 */
-global void Invalidate(void)
+void Invalidate(void)
 {
 #ifndef USE_OPENGL
 	Rects[0].x = 0;
@@ -301,7 +301,7 @@ global void Invalidate(void)
 **
 **  @return         ASCII code or internal keycode.
 */
-local int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
+static int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 {
 	int icode;
 
@@ -461,7 +461,7 @@ local int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 **  @param callbacks  Callback funktion for key down.
 **  @param code       SDL keysym structure pointer.
 */
-local void SdlHandleKeyPress(const EventCallback* callbacks,
+static void SdlHandleKeyPress(const EventCallback* callbacks,
 	const SDL_keysym* code)
 {
 	int icode;
@@ -477,7 +477,7 @@ local void SdlHandleKeyPress(const EventCallback* callbacks,
 **  @param callbacks  Callback funktion for key up.
 **  @param code       SDL keysym structure pointer.
 */
-local void SdlHandleKeyRelease(const EventCallback* callbacks,
+static void SdlHandleKeyRelease(const EventCallback* callbacks,
 	const SDL_keysym* code)
 {
 	int icode;
@@ -493,7 +493,7 @@ local void SdlHandleKeyRelease(const EventCallback* callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
+static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 {
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
@@ -581,7 +581,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 **
 **		FIXME:		the initialition could be moved out of the loop
 */
-global void WaitEventsOneFrame(const EventCallback* callbacks)
+void WaitEventsOneFrame(const EventCallback* callbacks)
 {
 	struct timeval tv;
 	fd_set rfds;
@@ -703,7 +703,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 /**
 **  Realize video memory.
 */
-global void RealizeVideoMemory(void)
+void RealizeVideoMemory(void)
 {
 #ifdef USE_OPENGL
 	SDL_GL_SwapBuffers();
@@ -719,7 +719,7 @@ global void RealizeVideoMemory(void)
 /**
 **  Lock the screen for write access.
 */
-global void SdlLockScreen(void)
+void SdlLockScreen(void)
 {
 #ifndef USE_OPENGL
 	if (SDL_MUSTLOCK(TheScreen)) {
@@ -731,7 +731,7 @@ global void SdlLockScreen(void)
 /**
 **  Unlock the screen for write access.
 */
-global void SdlUnlockScreen(void)
+void SdlUnlockScreen(void)
 {
 #ifndef USE_OPENGL
 	if (SDL_MUSTLOCK(TheScreen)) {
@@ -745,7 +745,7 @@ global void SdlUnlockScreen(void)
 **
 **  @param mode  Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
-global void ToggleGrabMouse(int mode)
+void ToggleGrabMouse(int mode)
 {
 	static int grabbed;
 
@@ -762,7 +762,7 @@ global void ToggleGrabMouse(int mode)
 /**
 **  Toggle full screen mode.
 */
-global void ToggleFullScreen(void)
+void ToggleFullScreen(void)
 {
 #ifdef USE_WIN32
 	long framesize;

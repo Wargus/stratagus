@@ -62,53 +62,53 @@ typedef struct _zone_set_ {
 ----------------------------------------------------------------------------*/
 
 /// Initialise the region system
-global void MapSplitterInit(void);
+void MapSplitterInit(void);
 
 /// Free the region system
-global void MapSplitterClean(void);
+void MapSplitterClean(void);
 
 /// Maintain the region system up2date
-global void MapSplitterEachCycle(void);
+void MapSplitterEachCycle(void);
 
 /// Call this when some tiles become available ( no wood / rock / building )
-global void MapSplitterTilesCleared(int x0,int y0,int x1,int y1);
+void MapSplitterTilesCleared(int x0,int y0,int x1,int y1);
 
 /// Call this when some tiles become unavailable ( wood / rock / building appeared )
-global void MapSplitterTilesOccuped(int x0,int y0,int x1,int y1);
+void MapSplitterTilesOccuped(int x0,int y0,int x1,int y1);
 
 /// Clear a ZoneSet object ( must be a global object )
-global void ZoneSetClear(ZoneSet* m);
+void ZoneSetClear(ZoneSet* m);
 
-global void ZoneSetAddCell(ZoneSet * m,int x,int y);
+void ZoneSetAddCell(ZoneSet * m,int x,int y);
 
 /// Add a zone to a ZoneSet
-global int ZoneSetAddZone(ZoneSet* m, int zone);
+int ZoneSetAddZone(ZoneSet* m, int zone);
 
 /// Add a zoneset into a ZoneSet
-global void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src);
+void ZoneSetAddSet(ZoneSet* dst, ZoneSet* src);
 
 /// Check if a zone is in a ZoneSet
-global void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src);
+void ZoneSetIntersect(ZoneSet* dst, ZoneSet* src);
 
-global int ZoneSetHasIntersect(ZoneSet* a, ZoneSet* b);
+int ZoneSetHasIntersect(ZoneSet* a, ZoneSet* b);
 
-global int ZoneSetContains(ZoneSet* a,int zone);
+int ZoneSetContains(ZoneSet* a,int zone);
 
-global void ZoneSetDebug(ZoneSet * set);
+void ZoneSetDebug(ZoneSet * set);
 
-global void ZoneSetAddUnitZones(ZoneSet * set,Unit * unit);
+void ZoneSetAddUnitZones(ZoneSet * set,Unit * unit);
 
-global void ZoneSetAddGoalZones(ZoneSet* set,Unit* unit, int gx, int gy,int gw,int gh,int minrange,int maxrange);
+void ZoneSetAddGoalZones(ZoneSet* set,Unit* unit, int gx, int gy,int gw,int gh,int minrange,int maxrange);
 
 /**
 ** Add zones connected to src to dst
 **
 */
-global void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src);
+void ZoneSetAddConnected(ZoneSet* dst, ZoneSet * src);
 
-global int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen);
+int ZoneSetFindPath(ZoneSet* src,ZoneSet* dst,int * path,int * pathlen);
 
 // Return a point in destzone connected to srczone
-global void ZoneFindConnexion(int destzone,int srczone,int refX,int refY,int* x,int* y);
+void ZoneFindConnexion(int destzone,int srczone,int refX,int refY,int* x,int* y);
 
 #endif // __MAP_REGIONS_H__

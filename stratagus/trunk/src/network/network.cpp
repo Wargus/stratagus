@@ -252,40 +252,40 @@ typedef struct _network_command_queue_ {
 //		Variables
 //----------------------------------------------------------------------------
 
-global int NetworkNumInterfaces;		/// Network number of interfaces
-global Socket NetworkFildes = -1;				/// Network file descriptor
-global int NetworkInSync = 1;				/// Network is in sync
-global int NetworkUpdates = 5;				/// Network update each # game cycles
-global int NetworkLag = 10;				/// Network lag in # game cycles
-global unsigned long NetworkStatus[PlayerMax];		/// Network status
-global unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
-global int NetworkTimeout = 45;				/// Number of seconds until player times out
+int NetworkNumInterfaces;		/// Network number of interfaces
+Socket NetworkFildes = -1;				/// Network file descriptor
+int NetworkInSync = 1;				/// Network is in sync
+int NetworkUpdates = 5;				/// Network update each # game cycles
+int NetworkLag = 10;				/// Network lag in # game cycles
+unsigned long NetworkStatus[PlayerMax];		/// Network status
+unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
+int NetworkTimeout = 45;				/// Number of seconds until player times out
 
-local char NetMsgBuf[PlayerMax][128];		/// Chat message buffers
-local int NetMsgBufLen[PlayerMax];		/// Stored chat message length
+static char NetMsgBuf[PlayerMax][128];		/// Chat message buffers
+static int NetMsgBufLen[PlayerMax];		/// Stored chat message length
 #ifdef DEBUG
-global unsigned long MyHost;				/// My host number.
-global int MyPort;						/// My port number.
+unsigned long MyHost;				/// My host number.
+int MyPort;						/// My port number.
 #endif
-local unsigned long NetworkDelay;		/// Delay counter for recover.
-local int NetworkSyncSeeds[256];		/// Network sync seeds.
-local int NetworkSyncHashs[256];		/// Network sync hashs.
-local NetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
-local DL_LIST(CommandsIn);				/// Network command input queue
-local DL_LIST(MsgCommandsIn);				/// Network message input queue
+static unsigned long NetworkDelay;		/// Delay counter for recover.
+static int NetworkSyncSeeds[256];		/// Network sync seeds.
+static int NetworkSyncHashs[256];		/// Network sync hashs.
+static NetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
+static DL_LIST(CommandsIn);				/// Network command input queue
+static DL_LIST(MsgCommandsIn);				/// Network message input queue
 
 #ifdef DEBUG
-local int NetworkReceivedPackets;		/// Packets received packets
-local int NetworkReceivedEarly;				/// Packets received too early
-local int NetworkReceivedLate;				/// Packets received too late
-local int NetworkReceivedDups;				/// Packets received as duplicates
-local int NetworkReceivedLost;				/// Packets received packet lost
+static int NetworkReceivedPackets;		/// Packets received packets
+static int NetworkReceivedEarly;				/// Packets received too early
+static int NetworkReceivedLate;				/// Packets received too late
+static int NetworkReceivedDups;				/// Packets received as duplicates
+static int NetworkReceivedLost;				/// Packets received packet lost
 
-local int NetworkSendPackets;				/// Packets send packets
-local int NetworkSendResend;				/// Packets send to resend
+static int NetworkSendPackets;				/// Packets send packets
+static int NetworkSendResend;				/// Packets send to resend
 #endif
 
-local int PlayerQuit[PlayerMax];		/// Player quit
+static int PlayerQuit[PlayerMax];		/// Player quit
 
 //----------------------------------------------------------------------------
 //		Mid-Level api functions
@@ -298,7 +298,7 @@ local int PlayerQuit[PlayerMax];		/// Player quit
 **		@param len		Buffer length.
 **
 */
-global void NetworkBroadcast(const void* buf, int len)
+void NetworkBroadcast(const void* buf, int len)
 {
 	int i;
 
@@ -323,7 +323,7 @@ global void NetworkBroadcast(const void* buf, int len)
 **
 **		@param ncq		Outgoing network queue start.
 */
-local void NetworkSendPacket(const NetworkCommandQueue* ncq)
+static void NetworkSendPacket(const NetworkCommandQueue* ncq)
 {
 	NetworkPacket packet;
 	int i;
@@ -367,7 +367,7 @@ local void NetworkSendPacket(const NetworkCommandQueue* ncq)
 /**
 **		Initialize network part 1.
 */
-global void InitNetwork1(void)
+void InitNetwork1(void)
 {
 	int i;
 	int port;
@@ -443,7 +443,7 @@ global void InitNetwork1(void)
 /**
 **		Cleanup network part 1. (to be called _AFTER_ part 2 :)
 */
-global void ExitNetwork1(void)
+void ExitNetwork1(void)
 {
 	if (!IsNetworkGame()) {		// No network running
 		return;
@@ -467,7 +467,7 @@ global void ExitNetwork1(void)
 /**
 **		Initialize network part 2.
 */
-global void InitNetwork2(void)
+void InitNetwork2(void)
 {
 	int i;
 	int n;
@@ -518,7 +518,7 @@ global void InitNetwork2(void)
 **		@warning
 **				Destination and unit-type shares the same network slot.
 */
-global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
+void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 	const Unit* dest, const UnitType* type, int status)
 {
 	NetworkCommandQueue* ncq;
@@ -576,7 +576,7 @@ global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 **		@param arg4		optional argument #4
 **		@param status		Append command or flush old commands.
 */
-global void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
+void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	int arg4, int status)
 {
 	NetworkCommandQueue* ncq;
@@ -606,7 +606,7 @@ global void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3
 **  @param count  Number of units to send
 **
 */
-global void NetworkSendSelection(Unit** units, int count)
+void NetworkSendSelection(Unit** units, int count)
 {
 	static NetworkPacket packet;
 	NetworkSelectionHeader* header;
@@ -656,7 +656,7 @@ global void NetworkSendSelection(Unit** units, int count)
 **  @param packet  Network Packet to Process
 **  @param player  Player number
 */
-local void NetworkProcessSelection(NetworkPacket* packet, int player)
+static void NetworkProcessSelection(NetworkPacket* packet, int player)
 {
 	int i;
 	int j;
@@ -691,7 +691,7 @@ local void NetworkProcessSelection(NetworkPacket* packet, int player)
 **
 **  @param player  Player number
 */
-local void NetworkRemovePlayer(int player)
+static void NetworkRemovePlayer(int player)
 {
 	int i;
 	int c;
@@ -719,7 +719,7 @@ local void NetworkRemovePlayer(int player)
 **				NetworkReceivedEarly NetworkReceivedLate NetworkReceivedDups
 **				Must be calculated.
 */
-global void NetworkEvent(void)
+void NetworkEvent(void)
 {
 	char buf[1024];
 	NetworkPacket* packet;
@@ -929,7 +929,7 @@ global void NetworkEvent(void)
 /**
 **		Quit the game.
 */
-global void NetworkQuit(void)
+void NetworkQuit(void)
 {
 	int n;
 	int i;
@@ -955,7 +955,7 @@ global void NetworkQuit(void)
 **
 **		@param msg		Text message to send.
 */
-global void NetworkChatMessage(const char* msg)
+void NetworkChatMessage(const char* msg)
 {
 	NetworkCommandQueue* ncq;
 	NetworkChat* ncm;
@@ -989,7 +989,7 @@ global void NetworkChatMessage(const char* msg)
 **
 **		@param ncq		Network command from queue
 */
-local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
+static void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 {
 	int ply;
 
@@ -1057,7 +1057,7 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
 **				packet. I'm not sure that the extra packets I send with this
 **				packet are useful.
 */
-local void NetworkResendCommands(void)
+static void NetworkResendCommands(void)
 {
 	NetworkPacket packet;
 
@@ -1080,7 +1080,7 @@ local void NetworkResendCommands(void)
 /**
 **		Network send commands.
 */
-local void NetworkSendCommands(void)
+static void NetworkSendCommands(void)
 {
 	NetworkCommandQueue* incommand;
 	NetworkCommandQueue* ncq;
@@ -1138,7 +1138,7 @@ local void NetworkSendCommands(void)
 /**
 **		Network excecute commands.
 */
-local void NetworkExecCommands(void)
+static void NetworkExecCommands(void)
 {
 	NetworkCommandQueue* ncq;
 	int i;
@@ -1173,7 +1173,7 @@ local void NetworkExecCommands(void)
 /**
 **		Network synchronize commands.
 */
-local void NetworkSyncCommands(void)
+static void NetworkSyncCommands(void)
 {
 	const NetworkCommandQueue* ncq;
 	int i;
@@ -1198,7 +1198,7 @@ local void NetworkSyncCommands(void)
 /**
 **		Handle network commands.
 */
-global void NetworkCommands(void)
+void NetworkCommands(void)
 {
 	if (IsNetworkGame()) {
 		//
@@ -1216,7 +1216,7 @@ global void NetworkCommands(void)
 /**
 **		Recover network.
 */
-global void NetworkRecover(void)
+void NetworkRecover(void)
 {
 	int i;
 

@@ -68,7 +68,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-global const char* EditorStartFile;  /// Editor CCL start file
+const char* EditorStartFile;  /// Editor CCL start file
 
 /*----------------------------------------------------------------------------
 --  Functions

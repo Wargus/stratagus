@@ -72,8 +72,8 @@
 **				88:		Marks the possible goal fields.
 **				98:		Marks map border, for faster limits checks.
 */
-global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];		/// Path matrix
-local unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
+unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];		/// Path matrix
+// static unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -94,7 +94,7 @@ local unsigned int LocalMatrix[MaxMapWidth*MaxMapHeight];
 **				98			98
 **				98 98 98 98 98
 */
-local void InitMatrix(unsigned char* matrix)
+static void InitMatrix(unsigned char* matrix)
 {
 	unsigned i;
 	unsigned w;
@@ -116,15 +116,17 @@ local void InitMatrix(unsigned char* matrix)
 	memset(matrix + i, 98, w + 1);			// +1 for ships!
 }
 
-local void InitLocalMatrix(void)
+#if 0
+static void InitLocalMatrix(void)
 {
 	memset(LocalMatrix, 0, TheMap.Width * TheMap.Height * sizeof(int));				// initialize matrix
 }
+#endif
 
 /**
 **		Create empty movement matrix.
 */
-global unsigned char* CreateMatrix(void)
+unsigned char* CreateMatrix(void)
 {
 	InitMatrix(Matrix);
 	return Matrix;
@@ -133,7 +135,7 @@ global unsigned char* CreateMatrix(void)
 /**
 **		Allocate a new matrix and initialize
 */
-global unsigned char* MakeMatrix(void)
+unsigned char* MakeMatrix(void)
 {
 	unsigned char* matrix;
 
@@ -143,6 +145,7 @@ global unsigned char* MakeMatrix(void)
 	return matrix;
 }
 
+#if 0
 /**
 **		Mark place in matrix.
 **
@@ -155,7 +158,7 @@ global unsigned char* MakeMatrix(void)
 **
 **		@returns		depth, -1 unreachable
 */
-local int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int* matrix)
+static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned int* matrix)
 {
 	int cx[4];
 	int cy[4];
@@ -264,7 +267,9 @@ local int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned
 	}
 	return 0;
 }
+#endif
 
+#if 0
 /**
 **		Flood fill an area for a matrix.
 **
@@ -275,7 +280,7 @@ local int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigned
 **		@param matrix		Matrix for calculation.
 **
 */
-local void FillMatrix(Unit* unit, unsigned int* matrix)
+static void FillMatrix(Unit* unit, unsigned int* matrix)
 {
 	struct {
 		unsigned short X;
@@ -362,6 +367,7 @@ local void FillMatrix(Unit* unit, unsigned int* matrix)
 	free(points);
 	return;
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --		PATH-FINDER USE
@@ -381,7 +387,7 @@ local void FillMatrix(Unit* unit, unsigned int* matrix)
 **
 **		@return				Distance to place.
 */
-global int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
+int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
 {
 	int depth;
 	static unsigned long LastGameCycle;
@@ -420,7 +426,7 @@ global int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __
 **
 **		@return				Distance to place.
 */
-global int UnitReachable(Unit* src, Unit* dst, int range)
+int UnitReachable(Unit* src, Unit* dst, int range)
 {
 	int depth;
 
@@ -452,7 +458,7 @@ global int UnitReachable(Unit* src, Unit* dst, int range)
 **	  @return				>0 remaining path length, 0 wait for path, -1
 **						reached goal, -2 can't reach the goal.
 */
-global int NewPath(Unit* unit)
+int NewPath(Unit* unit)
 {
 	int i;
 	int gw;

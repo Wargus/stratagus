@@ -63,7 +63,7 @@ extern int NoWarningMissileType; /// quiet ident lookup.
 **
 **  @param l  Lua state.
 */
-local int CclDefineMissileType(lua_State* l)
+static int CclDefineMissileType(lua_State* l)
 {
 	const char* value;
 	char* str;
@@ -179,7 +179,7 @@ local int CclDefineMissileType(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineMissileTypeWcNames(lua_State* l)
+static int CclDefineMissileTypeWcNames(lua_State* l)
 {
 	int i;
 	int j;
@@ -215,7 +215,7 @@ local int CclDefineMissileTypeWcNames(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclMissile(lua_State* l)
+static int CclMissile(lua_State* l)
 {
 	const char* value;
 	MissileType* type;
@@ -354,7 +354,7 @@ local int CclMissile(lua_State* l)
 **
 **  @param l  Lua state.
 */
-local int CclDefineBurningBuilding(lua_State* l)
+static int CclDefineBurningBuilding(lua_State* l)
 {
 	const char* value;
 	BurningBuildingFrame** frame;
@@ -407,7 +407,7 @@ local int CclDefineBurningBuilding(lua_State* l)
 /**
 **  Register CCL features for missile-type.
 */
-global void MissileCclRegister(void)
+void MissileCclRegister(void)
 {
 	lua_register(Lua, "DefineMissileTypeWcNames",
 		CclDefineMissileTypeWcNames);
