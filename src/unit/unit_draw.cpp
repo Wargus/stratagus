@@ -1740,9 +1740,16 @@ local void DrawBuilding(Unit* unit)
     int state;
     int constructed;
 
+
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+    visible=BuildingVisibleOnMap(unit);
+#else
     visible=UnitVisibleOnMap(unit);
+#endif
     // FIXME: is this the correct place? No, but now correct working.
     if( visible ) {
+	y=unit->IY;
+	x=unit->IX;
 	frame = unit->SeenFrame = unit->Frame;
 	type = unit->SeenType = unit->Type;
 	state = unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
@@ -1750,6 +1757,8 @@ local void DrawBuilding(Unit* unit)
 	constructed = unit->SeenConstructed = unit->Constructed;
 	
     } else {
+	x=0;
+	y=0;
 	frame = unit->SeenFrame;
 	type = unit->SeenType;
 	constructed = unit->SeenConstructed;
@@ -1767,8 +1776,8 @@ local void DrawBuilding(Unit* unit)
 	constructed = unit->Constructed;
     }
     
-    x=Map2ViewportX(CurrentViewport,unit->X)+unit->IX;
-    y=Map2ViewportY(CurrentViewport,unit->Y)+unit->IY;
+    x+=Map2ViewportX(CurrentViewport,unit->X);
+    y+=Map2ViewportY(CurrentViewport,unit->Y);
 
     DrawShadow(unit,x,y);
 
@@ -1891,7 +1900,7 @@ global void DrawUnits(const void* v)
 	vp->MapY + vp->MapHeight + 1, table);
 
     //
-    //  2a) corpse aren't in the cache.
+    //  2a) corpse in their own cache.
     //
     corpses = &CorpseList;
     while( *corpses ) {
@@ -1901,6 +1910,19 @@ global void DrawUnits(const void* v)
 	corpses=&(*corpses)->Next;
     }
 
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+    //
+    //  2a1) Destroyed Buildings
+    //
+    corpses = &DestroyedBuildings;
+    while( *corpses ) {
+	if( UnitVisibleInViewport(vp,*corpses) ) {
+	    printf("Drawing Destroyed: ",(*corpses)->SeenType);
+	    DrawBuilding(*corpses);
+	}
+	corpses=&(*corpses)->Next;
+    }
+#endif
     //
     //  2b) buildings
     //
