@@ -71,7 +71,7 @@ local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
 ** 	@param value	SCM thingie
 **	@return 	the resource id
 */
-local unsigned CclGetResourceByName(SCM value)
+global unsigned CclGetResourceByName(SCM value)
 {
     int i;
     for( i=0; i<MaxCosts; ++i ) {
@@ -96,6 +96,7 @@ local SCM CclDefineUnitType(SCM list)
     SCM sublist;
     UnitType* type;
     UnitType* auxtype;
+    ResourceInfo* res;
     char* str;
     int i;
     int redefine;
@@ -271,7 +272,7 @@ local SCM CclDefineUnitType(SCM list)
 	    auxtype=UnitTypeByIdent(str);
 	    if (!auxtype) {
 		DebugLevel0("Build on top of undefined unit \"%s\".\n" _C_ str);
-		exit(0);
+		DebugCheck(1);
 	    }
 	    type->MustBuildOnTop=auxtype;
 	    free(str);
@@ -428,43 +429,55 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Coward=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("harvester")) ) {
 	    type->Harvester=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("harvest-from-outside")) ) {
-	    type->HarvestFromOutside=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("resource-step")) ) {
-	    type->ResourceStep=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("can-gather-resource")) ) {
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("resource-harvested")) ) {
-	    type->ResourceHarvested=CclGetResourceByName(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("wait-at-resource")) ) {
-	    type->WaitAtResource=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("wait-at-depot")) ) {
-	    type->WaitAtDepot=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("resource-capacity")) ) {
-	    type->ResourceCapacity=gh_scm2int(gh_car(list));
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("transform-when-empty")) ) {
-	    str=gh_scm2newstr(gh_car(list),NULL);
-	    auxtype=UnitTypeByIdent(str);
-	    if (!auxtype) {
-		DebugLevel0("Undefined unit \"%s\".\n" _C_ str);
-		exit(0);
+	    res=(ResourceInfo*)malloc(sizeof(ResourceInfo));
+	    memset(res,0,sizeof(ResourceInfo));
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		if (gh_eq_p(value,gh_symbol2scm("resource-id")) ) {
+		    res->ResourceId=CclGetResourceByName(gh_car(sublist));
+		    type->ResInfo[res->ResourceId]=res;
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("resource-step")) ) {
+		    res->ResourceStep=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("final-resource")) ) {
+		    res->FinalResource=CclGetResourceByName(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("wait-at-resource")) ) {
+		    res->WaitAtResource=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("wait-at-depot")) ) {
+		    res->WaitAtDepot=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("resource-capacity")) ) {
+		    res->ResourceCapacity=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("terrain-harvester")) ) {
+		    res->TerrainHarvester=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("lose-resources")) ) {
+		    res->LoseResources=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("harvest-from-outside")) ) {
+		    res->HarvestFromOutside=1;
+		} else if( gh_eq_p(value,gh_symbol2scm("file-when-empty")) ) {
+		    res->FileWhenLoaded=gh_scm2newstr(gh_car(sublist),0);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("file-when-loaded")) ) {
+		    res->FileWhenLoaded=gh_scm2newstr(gh_car(sublist),0);
+		    sublist=gh_cdr(sublist);
+		} else {
+		   printf("\n%s\n",type->Name);
+		   errl("Unsupported tag",value);
+		   DebugCheck( 1 );
+		}
 	    }
-	    type->TransformWhenEmpty=auxtype;
-	    free(str);
-	    list=gh_cdr(list);
-	} else if( gh_eq_p(value,gh_symbol2scm("transform-when-loaded")) ) {
-	    str=gh_scm2newstr(gh_car(list),NULL);
-	    auxtype=UnitTypeByIdent(str);
-	    if (!auxtype) {
-		DebugLevel0("Undefined unit \"%s\".\n" _C_ str);
-		exit(0);
+	    if (!res->FinalResource) {
+		res->FinalResource=res->ResourceId;
 	    }
-	    type->TransformWhenLoaded=auxtype;
-	    free(str);
-	    list=gh_cdr(list);
+	    DebugCheck(!res->ResourceId);
 	} else if( gh_eq_p(value,gh_symbol2scm("gives-resource")) ) {
 	    type->GivesResource=CclGetResourceByName(gh_car(list));
 	    list=gh_cdr(list);
@@ -562,8 +575,8 @@ local SCM CclDefineUnitType(SCM list)
 	} else {
 	   // FIXME: this leaves a half initialized unit-type
 	   printf("\n%s\n",type->Name);
-	   DebugCheck( 1 );
 	   errl("Unsupported tag",value);
+	   DebugCheck( 1 );
 	}
     }
 

@@ -521,17 +521,22 @@ global void DrawUnitInfo(const Unit* unit)
 	VideoDrawText(x+63,y+8+125,GameFont,"Speed:");
 	DrawStats(x+108,y+8+125,stats->Speed,type->_Speed);
 
-        // Show how much wood is harvested already in percents! :) //vladi
-	// FIXME: Make this optional
-        if( unit->Orders[0].Action==UnitActionHarvest && unit->SubAction==64 ) {
-	    sprintf(buf,"Wood: %d%%"
-		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
-	    VideoDrawText(x+63,y+8+141,GameFont,buf);
-        }
 	// FIXME: Ugly hack.
-	if( unit->Type->Harvester&&unit->Value&&unit->Orders[0].Action!=UnitActionHarvest ) {
+	if( unit->Type->Harvester&&unit->Value) {
 	    sprintf(buf,"Carry: %d %s",unit->Value,
-		    DefaultResourceNames[unit->Type->ResourceHarvested]);
+		    DefaultResourceNames[unit->CurrentResource]);
+	    VideoDrawText(x+61,y+8+141,GameFont,buf);	    
+	}
+	if ((unit->Type->Harvester)&&
+		(unit->Orders->Action==UnitActionResource)&&
+		(unit->CurrentResource)&&
+		(unit->Type->ResInfo[unit->CurrentResource]) &&
+		(unit->SubAction==60) &&
+		(!unit->Type->ResInfo[unit->CurrentResource]->ResourceStep)) {
+	    sprintf(buf,"%s: %d%%",DefaultResourceNames[unit->CurrentResource],
+		    100*(unit->Type->ResInfo[unit->CurrentResource]->WaitAtResource-
+			unit->Data.ResWorker.TimeToHarvest)/
+			unit->Type->ResInfo[unit->CurrentResource]->WaitAtResource);
 	    VideoDrawText(x+61,y+8+141,GameFont,buf);	    
 	}
 

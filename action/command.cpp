@@ -702,29 +702,23 @@ global void CommandCancelBuilding(Unit* unit,
 }
 
 /**
-**	Send unit harvest
+**	Send unit harvest a location
 **
 **	@param unit	pointer to unit.
 **	@param x	X map position for harvest.
 **	@param y	Y map position for harvest.
 **	@param flush	if true, flush command queue.
 */
-global void CommandHarvest(Unit* unit,int x,int y,int flush)
+global void CommandResourceLoc(Unit* unit,int x,int y,int flush)
 {
     Order* order;
+    int nx;
+    int ny;
 
     //
     //	Check if unit is still valid? (NETWORK!)
     //
     if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
-	// FIXME: more races, could happen with many orders in queue.
-	if( !unit->Type->Building
-		&& unit->Type!=UnitTypeHumanWorker
-		&& unit->Type!=UnitTypeOrcWorker ) {
-	    DebugLevel0Fn("None worker gets order\n");
-	    ClearSavedAction(unit);
-	    return;
-	}
 	if( unit->Type->Building ) {
 	    // FIXME: should find a better way for pending orders.
 	    order=&unit->NewOrder;
@@ -733,9 +727,27 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 	    return;
 	}
 
-	order->Action=UnitActionHarvest;
-	order->X=x;
-	order->Y=y;
+	order->Action=UnitActionResource;
+	
+	//  Find the closest piece of wood next to a tile where the unit can move
+	DebugLevel3("Want to harvest from %d,%d.\n" _C_ x _C_ y);
+	if (!FindTerrainType(0,(unit->Type->MovementMask),1,20,unit->Player,x,y,&nx,&ny)) {
+	    DebugLevel0Fn("FIXME: Give up???\n");
+	}
+	if (max(abs(nx-x),abs(ny-y))>1) {
+	    DebugLevel3("Closest tile reachable is at %d,%d.\n" _C_ x _C_ y);
+	    if (!FindTerrainType(0,MapFieldForest,0,20,unit->Player,nx,ny,&nx,&ny)) {
+		DebugLevel0Fn("FIXME: Give up???\n");
+	    }
+	} else {
+	    // The destination is next to a reacahble tile.
+	    nx=x;
+	    ny=y;
+	}
+	DebugLevel3("So the final destination is %d,%d.\n" _C_ nx _C_ ny);
+	order->X=nx;
+	order->Y=ny;
+
 	order->RangeX=order->RangeY=1;
 	order->Goal=NoUnitP;
 	order->Type=NULL;
@@ -806,8 +818,7 @@ global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 	// FIXME: more races, could happen with many orders in queue.
 	if( !unit->Type->Building
 		&& !unit->Type->Harvester
-		&& unit->Type!=UnitTypeHumanWorkerWithWood
-		&& unit->Type!=UnitTypeOrcWorkerWithWood) {
+		&& !unit->Value ) { 
 	    ClearSavedAction(unit);
 	    return;
 	}

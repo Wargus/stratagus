@@ -58,6 +58,8 @@
 
     /// Get unit-type.
 extern UnitType* CclGetUnitType(SCM ptr);
+    /// Get resource by name
+extern unsigned CclGetResourceByName(SCM ptr);
 
 /**
 **	Set hit-point regeneration
@@ -209,8 +211,6 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Action=UnitActionBuild;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-repair")) ) {
 	    order->Action=UnitActionRepair;
-	} else if( gh_eq_p(value,gh_symbol2scm("action-harvest")) ) {
-	    order->Action=UnitActionHarvest;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-resource")) ) {
 	    order->Action=UnitActionResource;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-return-goods")) ) {
@@ -361,6 +361,29 @@ local void CclParseBuilded(Unit* unit, SCM list)
 	    }
 	    unit->Data.Builded.Frame = cframe;
 	    value = gh_car(list);
+	    list = gh_cdr(list);
+	}
+    }
+}
+
+/**
+**	Parse res worker data
+**
+**	@param unit	Unit pointer which should be filled with the data.
+**	@param list	All options of the resource worker data.
+*/
+local void CclParseResWorker(Unit* unit, SCM list)
+{
+    SCM value;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("time-to-harvest"))) {
+	    unit->Data.ResWorker.TimeToHarvest = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("done-harvesting"))) {
+	    unit->Data.ResWorker.DoneHarvesting = 1;
 	    list = gh_cdr(list);
 	}
     }
@@ -681,6 +704,9 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("value")) ) {
 	    unit->Value=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("current-resource")) ) {
+	    unit->CurrentResource=CclGetResourceByName(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("sub-action")) ) {
 	    unit->SubAction=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -761,6 +787,10 @@ local SCM CclUnit(SCM list)
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    CclParseBuilded(unit,sublist);
+	} else if( gh_eq_p(value,gh_symbol2scm("data-res-worker")) ) {
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+	    CclParseResWorker(unit,sublist);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-research")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);

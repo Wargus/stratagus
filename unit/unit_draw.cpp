@@ -965,13 +965,12 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 			,unit->Data.UpgradeTo.Ticks);
 
 	    //
-	    //	Chopping wood.
+	    //	Carry resource.
+	    //	Don't display if empty.
 	    //
-	    } else if( unit->Orders[0].Action==UnitActionHarvest
-		    && unit->SubAction==64 ) {
-		DrawManaBar(x,y,type,CHOP_FOR_WOOD,
-			unit->Value>CHOP_FOR_WOOD?
-			    0:CHOP_FOR_WOOD-unit->Value);
+	    } else if( unit->Type->Harvester&&unit->CurrentResource&&unit->Value>0 ) {
+		DrawManaBar(x,y,type,unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity,
+			unit->Value);
 
 	    //
 	    //	Building research new technologie.
@@ -1031,15 +1030,13 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		DrawManaSprite(x,y,type,unit->Orders[0].Type
 			    ->Stats[unit->Player->Player].Costs[TimeCost]
 			,unit->Data.UpgradeTo.Ticks);
-
+		
 	    //
-	    //	Chopping wood.
+	    //	Carry resource.
 	    //
-	    } else if( unit->Orders[0].Action==UnitActionHarvest
-		    && unit->SubAction==64 ) {
-		DrawManaSprite(x,y,type,CHOP_FOR_WOOD,
-			unit->Value>CHOP_FOR_WOOD?
-			    0:CHOP_FOR_WOOD-unit->Value);
+	    } else if( unit->Type->Harvester&&unit->CurrentResource&&unit->Value>0 ) {
+		DrawManaSprite(x,y,type,unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity,
+			unit->Value);
 
 	    //
 	    //	Building research new technologie.
@@ -1492,11 +1489,6 @@ local void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order)
 	    e_color = color = ColorGray;
 	    break;
 
-	case UnitActionHarvest:
-	    e_color = color = ColorYellow;
-	    dest = 1;
-	    break;
-
 	case UnitActionResource:
 	    e_color = color = ColorYellow;
 	    dest = 1;
@@ -1839,6 +1831,8 @@ global void DrawUnit(const Unit* unit)
 {
     int x;
     int y;
+    Graphic* Sprite;
+    ResourceInfo* resinfo;
     const UnitType* type;
 
     if ( unit->Type->Revealer ) {		// Revealers are not drawn
@@ -1859,13 +1853,35 @@ global void DrawUnit(const Unit* unit)
     DrawUnitSelection(unit);
 
     GraphicUnitPixels(unit,type->Sprite);
-    DrawUnitType(type,unit->Frame,x,y);
+
+    Sprite=type->Sprite;
+    if (type->Harvester && unit->CurrentResource) {
+	resinfo=type->ResInfo[unit->CurrentResource];
+	if (unit->Value) {
+	    if (resinfo->SpriteWhenLoaded) {
+		Sprite=resinfo->SpriteWhenLoaded;
+	    }
+	} else {
+	    if (resinfo->SpriteWhenEmpty) {
+		Sprite=resinfo->SpriteWhenEmpty;
+	    }
+	}
+    }
+    if( unit->Frame<0 ) {
+	VideoDrawClipX(Sprite,-unit->Frame,
+		x-(type->Width-type->TileWidth*TileSizeX)/2,
+		y-(type->Height-type->TileHeight*TileSizeY)/2);
+    } else {
+	VideoDrawClip(Sprite,unit->Frame,
+		x-(type->Width-type->TileWidth*TileSizeX)/2,
+		y-(type->Height-type->TileHeight*TileSizeY)/2);
+    }
 #ifdef USE_OPENGL
     DrawUnitPlayerColor(type,unit->Player->Player,unit->Frame,x,y);
 #endif
 
 #ifndef NEW_DECODRAW
-// Unit's extras not fully supported.. need to be deocrations themselves.
+// Unit's extras not fully supported.. need to be decorations themselves.
     DrawInformations(unit,type,x,y);
 #endif
 }

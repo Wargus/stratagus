@@ -100,8 +100,8 @@ extern void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush);
 extern void CommandBuildBuilding(Unit*,int,int,UnitType*,int);
     /// Prepare command cancel build
 extern void CommandCancelBuilding(Unit* unit,Unit* worker);
-    /// Prepare command harvest
-extern void CommandHarvest(Unit* unit,int x,int y,int flush);
+    /// Prepare command resource location
+extern void CommandResourceLoc(Unit* unit,int x,int y,int flush);
     /// Prepare command resource
 extern void CommandResource(Unit* unit,Unit* dest,int flush);
     /// Prepare command return
@@ -160,9 +160,7 @@ extern void HandleActionAttack(Unit* unit);
 extern void HandleActionBoard(Unit* unit);
     /// Handle command unload
 extern void HandleActionUnload(Unit* unit);
-    /// Handle command harvest
-extern void HandleActionHarvest(Unit* unit);
-    /// Handle command haul
+    /// Handle command resource
 extern void HandleActionResource(Unit* unit);
     /// Handle command return
 extern void HandleActionReturnGoods(Unit* unit);

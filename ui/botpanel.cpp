@@ -594,9 +594,7 @@ global void DrawButtonPanel(void)
 		    case ButtonHarvest:
 		    case ButtonReturn:
 			for( j=0; j<NumSelected; ++j ) {
-			    if( Selected[j]->Orders[0].Action!=UnitActionResource
-				    && Selected[j]->Orders[0].Action
-					!=UnitActionHarvest ) {
+			    if( Selected[j]->Orders[0].Action!=UnitActionResource ) {
 				break;
 			    }
 			}

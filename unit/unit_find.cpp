@@ -417,7 +417,7 @@ global Unit* ResourceOnMap(int tx,int ty,int resource)
 
     n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) || !table[i]->Type->CanHarvest ){
+	if( UnitUnusable(table[i]) || !table[i]->Type->CanHarvest || table[i]->Value==0) {
 	    continue;
 	}
 	if( table[i]->Type->GivesResource==resource ) {

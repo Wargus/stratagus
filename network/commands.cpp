@@ -561,8 +561,8 @@ local void DoNextReplay(void)
 	SendCommandBuildBuilding(UnitSlots[unit],posx,posy,UnitTypeByIdent(val),flags);
     } else if( !strcmp(name,"cancel-build") ) {
 	SendCommandCancelBuilding(UnitSlots[unit],dunit);
-    } else if( !strcmp(name,"harvest") ) {
-	SendCommandHarvest(UnitSlots[unit],posx,posy,flags);
+    } else if( !strcmp(name,"resource-loc") ) {
+	SendCommandResourceLoc(UnitSlots[unit],posx,posy,flags);
     } else if( !strcmp(name,"resource") ) {
 	SendCommandResource(UnitSlots[unit],dunit,flags);
     } else if( !strcmp(name,"return") ) {
@@ -902,20 +902,20 @@ global void SendCommandCancelBuilding(Unit* unit,Unit* worker)
 }
 
 /**
-**	Send command: Unit harvest wood.
+** 	Send command: Unit harvests a location (wood for now).
 **
 **	@param unit	pointer to unit.
 **	@param x	X map tile position where to harvest.
 **	@param y	Y map tile position where to harvest.
 **	@param flush	Flag flush all pending commands.
 */
-global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
+global void SendCommandResourceLoc(Unit* unit,int x,int y,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("harvest",unit,flush,x,y,NoUnitP,NULL,-1);
-	CommandHarvest(unit,x,y,flush);
+	CommandLog("resource-loc",unit,flush,x,y,NoUnitP,NULL,-1);
+	CommandResourceLoc(unit,x,y,flush);
     } else {
-	NetworkSendCommand(MessageCommandHarvest,unit,x,y,NoUnitP,0,flush);
+	NetworkSendCommand(MessageCommandResourceLoc,unit,x,y,NoUnitP,0,flush);
     }
 }
 
@@ -923,7 +923,7 @@ global void SendCommandHarvest(Unit* unit,int x,int y,int flush)
 **	Send command: Unit harvest resources
 **
 **	@param unit	pointer to unit.
-**	@param dest	pointer to destination (oil-platform).
+**	@param dest	pointer to destination (oil-platform,gold mine).
 **	@param flush	Flag flush all pending commands.
 */
 global void SendCommandResource(Unit* unit,Unit* dest,int flush)
@@ -1308,9 +1308,9 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 	    CommandLog("cancel-build",unit,FlushCommands,-1,-1,dest,NULL,-1);
 	    CommandCancelBuilding(unit,dest);
 	    break;
-	case MessageCommandHarvest:
-	    CommandLog("harvest",unit,status,x,y,NoUnitP,NULL,-1);
-	    CommandHarvest(unit,x,y,status);
+	case MessageCommandResourceLoc:
+	    CommandLog("resource-loc",unit,status,x,y,NoUnitP,NULL,-1);
+	    CommandResourceLoc(unit,x,y,status);
 	    break;
 	case MessageCommandResource:
 	    dest=NoUnitP;

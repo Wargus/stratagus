@@ -174,10 +174,10 @@ local void (*HandleActionTable[256])(Unit*) = {
     HandleActionPatrol,
     HandleActionBuild,
     HandleActionRepair,
-    HandleActionHarvest,
     HandleActionResource,
     HandleActionReturnGoods,
     HandleActionDemolish,
+    HandleActionNotWritten,
 
     // Enough for the future ?
     HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
@@ -268,7 +268,7 @@ local void (*HandleActionTable[256])(Unit*) = {
 local void HandleUnitAction(Unit* unit)
 {
     int z;
-
+	
     //
     //	If current action is breakable proceed with next one.
     //
@@ -304,6 +304,11 @@ local void HandleUnitAction(Unit* unit)
 		RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 		if( !--unit->Orders[0].Goal->Refs ) {
 		    ReleaseUnit(unit->Orders[0].Goal);
+		}
+	    }
+	    if (unit->CurrentResource) {
+		if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources) {
+		    unit->Value=0;
 		}
 	    }
 

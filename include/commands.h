@@ -98,9 +98,9 @@ extern void SendCommandUnload(Unit* unit,int x,int y,Unit* what,int flush);
 extern void SendCommandBuildBuilding(Unit*,int,int,UnitType*,int);
     /// Send cancel building command
 extern void SendCommandCancelBuilding(Unit* unit,Unit* peon);
+    /// Send harvest location command
+extern void SendCommandResourceLoc(Unit* unit,int x,int y,int flush);
     /// Send harvest command
-extern void SendCommandHarvest(Unit* unit,int x,int y,int flush);
-    /// Send haul oil command
 extern void SendCommandResource(Unit* unit,Unit* dest,int flush);
     /// Send return goods command
 extern void SendCommandReturnGoods(Unit* unit,Unit* dest,int flush);

@@ -40,12 +40,10 @@
 
 #include "stratagus.h"
 
-#if defined(USE_OPENGL) && defined(_MSC_VER)
+#if defined(_MSC_VER)
 #undef NOUSER
-#include "video.h"
-#else
-#include "video.h"
 #endif
+#include "video.h"
 #include "font.h"
 #include "interface.h"
 #include "menus.h"

@@ -155,9 +155,6 @@ global void HandleActionTrain(Unit* unit)
 	        && !nunit->Type->Harvester)
     	    || (unit->NewOrder.Action==UnitActionAttack
 	        && !nunit->Type->CanAttack)
-            || ((unit->NewOrder.Action==UnitActionHarvest)
-		&& nunit->Type!=UnitTypeOrcWorker 
-		&& nunit->Type!=UnitTypeHumanWorker )
 	    || (unit->NewOrder.Action==UnitActionBoard
 	        && nunit->Type->UnitType!=UnitTypeLand) ) {
 	    DebugLevel0Fn("Wrong order for unit\n");
