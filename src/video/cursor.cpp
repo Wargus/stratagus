@@ -59,7 +59,7 @@
 /**
 **  Cursor-type type definition
 */
-const char CursorTypeType[] = "cursor-type";
+int CursorMax = 0; ///< Number of cursor.
 
 /**
 **  Define cursor-types.
@@ -122,7 +122,7 @@ void LoadCursors(const char* race)
 	//
 	//  Load the graphics
 	//
-	for (i = 0; Cursors[i].OType; ++i) {
+	for (i = 0; i < CursorMax; ++i) {
 		//
 		//  Only load cursors of this race or universal cursors.
 		//
@@ -148,14 +148,14 @@ void LoadCursors(const char* race)
 */
 CursorType* CursorTypeByIdent(const char* ident)
 {
-	CursorType* cursortype;
+	int i;  // iterator.
 
-	for (cursortype = Cursors; cursortype->OType; ++cursortype) {
-		if (strcmp(cursortype->Ident, ident)) {
+	for (i = 0; i < CursorMax; i++) {
+		if (strcmp(Cursors[i].Ident, ident)) {
 			continue;
 		}
-		if (!cursortype->Race || cursortype->G) {
-			return cursortype;
+		if (!Cursors[i].Race || Cursors[i].G) {
+			return Cursors + i;
 		}
 	}
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident);
@@ -406,13 +406,14 @@ void CleanCursors(void)
 {
 	int i;
 
-	for (i = 0; Cursors[i].OType; ++i) {
+	for (i = 0; i < CursorMax; ++i) {
 		FreeGraphic(Cursors[i].G);
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);
 	}
 	free(Cursors);
 	Cursors = NULL;
+	CursorMax = 0;
 
 	CursorBuilding = 0;
 	GameCursor = 0;

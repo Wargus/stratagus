@@ -52,10 +52,6 @@
 **
 **  The missile-type structure members:
 **
-**  MissileType::OType
-**
-**  Object type (future extensions).
-**
 **  MissileType::Ident
 **
 **    Unique identifier of the missile-type, used to reference it in
