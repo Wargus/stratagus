@@ -36,6 +36,7 @@
 #include "menus.h"
 #include "cursor.h"
 #include "map.h"
+#include "pud.h"
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
@@ -157,9 +158,9 @@ local Menuitem ScenSelectMenuItems[] = {
 
     { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
 	{ listbox:{ NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
-		    (void *)ScenSelectLBRetrieve} } },
+		    (void *)ScenSelectLBRetrieve, NULL} } },
     { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0} } },
+	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, NULL} } },
 
     { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "OK", 106, 27, MBUTTON_GM_HALF, ScenSelectOk, 0} } },
@@ -392,6 +393,7 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 	PopClipping();
 	if (!(flags&MenuButtonDisabled)) {
 	    if (i < mi->d.listbox.noptions) {
+		SetDefaultTextColors(nc,rc);
 		text = (*mi->d.listbox.retrieveopt)(mi, i + s);
 		if (text) {
 		    if (i == mi->d.listbox.curopt)
@@ -551,6 +553,36 @@ local void GameMenuEnd(void)
     Exit(0);
 }
 
+local void ReadPudInfos(FileList *fl, int n)
+{
+    char buffer[1024], *cp;
+    int i;
+
+    strcpy(buffer, ScenSelectPath);
+    if (buffer[0]) {
+	strcat(buffer, "/");
+    }
+    cp = buffer + strlen(buffer);
+    for (i = 0; i < n; i++) {
+	if (fl[i].type) {
+	    strcpy(cp, fl[i].name);
+	    fl[i].xdata = GetPudInfo(buffer);
+	}
+    }
+}
+
+local void FreePudInfos(FileList *fl, int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++) {
+	if (fl[i].type && fl[i].xdata) {
+	    FreePudInfo(fl[i].xdata);
+	    fl[i].xdata = NULL;
+	}
+    }
+}
+
 local void ScenSelectInit(Menuitem *mi __attribute__((unused)) )
 {
     strcpy(ScenSelectPath, FreeCraftLibPath);
@@ -578,8 +610,12 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 
 local void ScenSelectLBExit(Menuitem *mi)
 {
+    FileList *fl;
+
     if (mi->d.listbox.noptions) {
-	free(mi->d.listbox.options);
+	fl = mi->d.listbox.options;
+	FreePudInfos(fl, mi->d.listbox.noptions);
+	free(fl);
 	mi->d.listbox.options = NULL;
 	mi->d.listbox.noptions = 0;
 	mi[1].flags |= MenuButtonDisabled;
@@ -589,21 +625,28 @@ local void ScenSelectLBExit(Menuitem *mi)
 local void ScenSelectLBInit(Menuitem *mi)
 {
     char *suf;
+    int i, f;
 
     ScenSelectLBExit(mi);
-    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0)
+    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
 	suf = ".cm";
-    else
+	f = 0;
+    } else {
 	suf = ".pud";
-    mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, suf, (FileList **)&(mi->d.listbox.options));
+	f = 1;
+    }
+    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, suf, (FileList **)&(mi->d.listbox.options));
+    if (f == 1 && i > 0) {
+	ReadPudInfos(mi->d.listbox.options, i);
+    }
     // FIXME: Fill xdata here
-    if (mi->d.listbox.noptions == 0) {
+    if (i == 0) {
 	ScenSelectMenuItems[3].d.button.text = "OK";
 	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
     } else {
 	ScenSelectLBAction(mi, 0);
 	ScenSelectMenuItems[3].flags &= ~MenuButtonDisabled;
-	if (mi->d.listbox.noptions > 5) {
+	if (i > 5) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
     }
@@ -612,11 +655,35 @@ local void ScenSelectLBInit(Menuitem *mi)
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
+    Menu *menu;
+    PudInfo *info;
     static char buffer[1024];
+    int j, n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
+	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+		if ((info = fl[i].xdata)) {
+		    menu = Menus + MENU_SCEN_SELECT;
+		    if (info->Description) {
+			DrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+		    }
+		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
+		    DrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    for (n = j = 0; j < 16; j++) {
+			if (info->PlayerType[j] == PlayerHuman) {
+			    n++;
+			}
+		    }
+		    if (n == 1) {
+			DrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+		    } else {
+			sprintf(buffer, "%d players", n);
+			DrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+		    }
+		}
+	    }
 	    strcpy(buffer, "   ");
 	} else {
 	    strcpy(buffer, "\260 ");
