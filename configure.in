@@ -85,7 +85,7 @@ AC_ARG_ENABLE(debug,
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
     DEBUG_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-    DEBUG_CFLAGS="-g -O1 -fsigned-char -Wsign-compare -Werror -Wall -DDEBUG"
+    DEBUG_CFLAGS="-g -O0 -fsigned-char -Wsign-compare -Werror -Wall -DDEBUG"
 fi
 AC_SUBST(DEBUG_CFLAGS)
 
