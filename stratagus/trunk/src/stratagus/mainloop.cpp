@@ -156,10 +156,11 @@ local void MoveMapViewPointDown(int step)
 		++vp->MapY;
 	}
 	// If bottom is > Last map top, make it equal
-	if (vp->MapY * TileSizeY + vp->OffsetY + (vp->EndY - vp->Y + 1) > TheMap.Height * TileSizeY) {
-		vp->MapY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y + 1)) / TileSizeY;
-		vp->OffsetY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y + 1)) % TileSizeY;
+	if (vp->MapY + vp->MapHeight - 1 >= TheMap.Height) {
+		vp->MapY = TheMap.Height - vp->MapHeight + 1;
+		vp->OffsetY = 0;
 	}
+		vp->OffsetY = 0;
 }
 
 /**
@@ -177,11 +178,10 @@ local void MoveMapViewPointRight(int step)
 		vp->OffsetX -= TileSizeX;
 		++vp->MapX;
 	}
-
 	// If right is > Last map top, make it equal
-	if (vp->MapX * TileSizeX + vp->OffsetX + (vp->EndX - vp->X + 1) > TheMap.Width * TileSizeX) {
-		vp->MapX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X + 1)) / TileSizeX;
-		vp->OffsetX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X + 1)) % TileSizeX;
+	if (vp->MapX + vp->MapWidth - 1> TheMap.Width) {
+		vp->MapX = TheMap.Width - vp->MapWidth + 1;
+		vp->OffsetX = 0;
 	}
 }
 
