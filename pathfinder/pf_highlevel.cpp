@@ -390,7 +390,7 @@ local unsigned short GetAdditionalPathRegion (Region *reg)
 	unsigned int regid;
 
 	/* should have been checked by the caller */
-	DebugCheck (reg->Parent);
+	DebugCheck (!reg->Parent);
 
 	if (reg->Area.Y < reg->Parent->Area.Y) {
 		a0 = &reg->Area;
