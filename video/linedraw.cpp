@@ -470,12 +470,34 @@ global void VideoDrawPixel(SDL_Color color, int x, int y)
 
 global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha)
 {
-    DebugCheck(1);
+    int bpp;
+    int ofs;
+    unsigned int c;
+
+    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
+    bpp = TheScreen->format->BytesPerPixel;
+    ofs = TheScreen->pitch * y + x * bpp;
+
+    SDL_LockSurface(TheScreen);
+    memcpy(TheScreen->pixels + ofs, &c, bpp);
+    SDL_UnlockSurface(TheScreen);
 }
+
 global void VideoDrawPixelClip(SDL_Color color, int x, int y)
 {
-    DebugCheck(1);
+    int bpp;
+    int ofs;
+    unsigned int c;
+
+    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
+    bpp = TheScreen->format->BytesPerPixel;
+    ofs = TheScreen->pitch * y + x * bpp;
+
+    SDL_LockSurface(TheScreen);
+    memcpy(TheScreen->pixels + ofs, &c, bpp);
+    SDL_UnlockSurface(TheScreen);
 }
+
 global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
 {
     int i;
@@ -484,14 +506,24 @@ global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
 	VideoDrawPixel(color, x, y + i);
     }
 }
+
 global void VideoDrawTransVLine(SDL_Color color, int x, int y,
     int height, unsigned char alpha)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < height; ++i) {
+	VideoDrawPixel(color, x, y + i);
+    }
 }
-global void VideoDrawVLineClip(SDL_Color color, int x, int y, int width)
+
+global void VideoDrawVLineClip(SDL_Color color, int x, int y, int height)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < height; ++i) {
+	VideoDrawPixel(color, x, y + i);
+    }
 }
 
 global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
@@ -502,30 +534,40 @@ global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
 	VideoDrawPixel(color, x + i, y);
     }
 }
+
 global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < width; ++i) {
+	VideoDrawPixel(color, x + i, y);
+    }
 }
 
 global void VideoDrawTransHLine(SDL_Color color, int x, int y,
     int width, unsigned char alpha)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < width; ++i) {
+	VideoDrawPixel(color, x + i, y);
+    }
 }
+
 global void VideoDrawLine(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoDrawLineClip(SDL_Color color, int sx, int sy, int dx, int dy)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
     int dx, int dy, unsigned char alpha)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoDrawRectangle(SDL_Color color, int x, int y,
@@ -601,6 +643,7 @@ global void VideoFillRectangle(SDL_Color color, int x, int y,
 global void VideoFillTransRectangle(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
+    // FIXME: alpha
     // FIXME: do clipping
 
     SDL_Rect drect;
@@ -617,42 +660,52 @@ global void VideoFillTransRectangle(SDL_Color color, int x, int y,
 global void VideoFillRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-    DebugCheck(1);
+    // FIXME: do clipping
+
+    SDL_Rect drect;
+    Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
+
+    drect.x = x;
+    drect.y = y;
+    drect.w = w;
+    drect.h = h;
+
+    SDL_FillRect(TheScreen, &drect, c);
 }
 
 global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoDrawCircleClip(SDL_Color color, int x, int y,
     int w)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
     int w, unsigned char alpha)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoFillCircleClip(SDL_Color color, int x, int y,
     int w)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
     int w, unsigned char alpha)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 
 global void DebugTestDisplayLines(void)
 {
-    DebugCheck(1);
+//    DebugCheck(1);
 }
 #else
 /**
