@@ -307,11 +307,50 @@ local void UiEnterMenu(void)
 */
 local void UiToggleBigMap(void)
 {
+    static int mapx;
+    static int mapy;
+    static int mapex;
+    static int mapey;
+
     BigMapMode^=1;
     if(BigMapMode) {
+	mapx=TheUI.MapX;
+	mapy=TheUI.MapY;
+	mapex=TheUI.MapEndX;
+	mapey=TheUI.MapEndY;
+
+	TheUI.MapX=0;
+	TheUI.MapY=0;
+	TheUI.MapEndX=((VideoWidth/TileSizeX)*TileSizeX)-1;
+	TheUI.MapEndY=((VideoHeight/TileSizeY)*TileSizeY)-1;
+
+	MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
+	MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
+	MapSetViewpoint(MapX,MapY);
+
+	EnableRedraw^=RedrawEverything;
+	EnableRedraw|=RedrawMap|RedrawAll;
+	MustRedraw|=RedrawEverything;
 	SetStatusLine("Big map enabled");
+	VideoLockScreen();
+	VideoClearScreen();
+	VideoUnlockScreen();
     } else {
+	TheUI.MapX=mapx;
+	TheUI.MapY=mapy;
+	TheUI.MapEndX=mapex;
+	TheUI.MapEndY=mapey;
+
+	MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
+	MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
+	MapSetViewpoint(MapX,MapY);
+
+	EnableRedraw=RedrawEverything;
+	MustRedraw=RedrawEverything;
 	SetStatusLine("Returning to old map");
+	VideoLockScreen();
+	VideoClearScreen();
+	VideoUnlockScreen();
     }
 }
 
