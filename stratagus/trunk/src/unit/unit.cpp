@@ -561,6 +561,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 
     MustRedraw|=RedrawMinimap;
     CheckUnitToBeDrawn(unit);
+    UnitMarkSeen(unit);
 
     //
     //	Building oil-platform, must remove oil-patch.
@@ -1097,6 +1098,62 @@ global int BuildingVisibleOnMap(Unit* unit)
     return 0;
 }
 #endif
+
+/**
+**	@param x	x location to check if building is on, and mark as seen
+**	@param y	y location to check if building is on, and mark as seen
+**
+**/
+global void UnitsMarkSeen(int x,int y)
+{
+    int n;
+    Unit* units[4];
+
+    n = UnitCacheOnTile(x,y,units);
+    // FIXME: need to handle Dead buldings
+    while( n ) {
+	units[n-1]->SeenIY=units[n-1]->IY;
+	units[n-1]->SeenIX=units[n-1]->IX;
+	units[n-1]->SeenFrame = units[n-1]->Frame;
+	units[n-1]->SeenType = units[n-1]->Type;
+	units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
+		((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
+	units[n-1]->SeenConstructed = units[n-1]->Constructed;
+	--n;
+    }
+}
+
+/**
+**	@param unit	pointer to the unit to check if seen
+**
+**/
+global void UnitMarkSeen(Unit* unit)
+{
+    int x;
+    int y;
+
+    // Update Building Seen
+    if( !unit->Type ) {
+	DebugLevel0Fn("UnitMarkSeen: Type is NULL\n" );
+	return;
+    }
+    for (x=0; x<unit->Type->TileWidth; x++) {
+	for (y=0; y<unit->Type->TileHeight; y++) {
+	    if( IsMapFieldVisible(ThisPlayer,unit->X+x,unit->Y+y) ) {
+		unit->SeenIY=unit->IY;
+		unit->SeenIX=unit->IX;
+		unit->SeenFrame = unit->Frame;
+		unit->SeenType = unit->Type;
+		unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
+			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
+		unit->SeenConstructed = unit->Constructed;
+		x=unit->Type->TileWidth;
+		y=unit->Type->TileHeight;
+	    }
+	}
+    }
+}
+
 /**
 **	Returns true, if unit is known on the map. Special case for buildings.
 **
@@ -3372,10 +3429,12 @@ global void LetUnitDie(Unit* unit)
 #else
 	    CorpseCacheInsert(unit);
 #endif
+	    UnitMarkSeen(unit);
 	    return;
 	}
 
 	// no corpse available
+	UnitMarkSeen(unit);
 	ReleaseUnit(unit);
 	return;
     }
@@ -3411,9 +3470,7 @@ global void LetUnitDie(Unit* unit)
     unit->Reset=0;
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionDie;
-//    if( unit->Type->CorpseType || unit->Type->Vanishes ) {
-	CorpseCacheInsert(unit);	//Insert into corpse list
-//    }
+    CorpseCacheInsert(unit);	//Insert into corpse list
 
 #ifdef NEW_FOW
     if( unit->Type->CorpseType ) {
