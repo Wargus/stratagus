@@ -30,6 +30,9 @@ TOPDIR	= ../..
 include $(TOPDIR)/Rules.make
 
 MODULE	= video
+
+HDRS	= _clip_rectangle
+
 OBJS	= video.$(OE) cursor.$(OE) sprite.$(OE) \
 	  graphic.$(OE) linedraw.$(OE) font.$(OE) png.$(OE) \
 	  sdl.$(OE) new_X11.$(OE) X11.$(OE) svgalib.$(OE) wince.$(OE)
