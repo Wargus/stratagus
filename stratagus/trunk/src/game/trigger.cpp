@@ -178,6 +178,73 @@ local SCM CclIfUnit(SCM player,SCM quantity,SCM unit)
     return SCM_BOOL_F;
 }
 
+/**
+**	Player has the quantity of unit-type near to unit-type.
+*/
+local SCM CclIfNearUnit(SCM player,SCM quantity,SCM unit,SCM near)
+{
+    int plynr;
+    int q;
+    const UnitType* unittype;
+    const UnitType* ut2;
+
+    plynr=TriggerGetPlayer(player);
+    q=gh_scm2int(quantity);
+    unittype=TriggerGetUnitType(unit);
+    ut2=CclGetUnitType(unit);
+
+    // ANY, ALL, BUILDINGS, FOODUNITS.
+
+    // Player type
+
+    DebugLevel0Fn("FIXME: not written\n");
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Player has n opponents left.
+*/
+local SCM CclIfOpponents(SCM player,SCM quantity)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+
+    plynr=TriggerGetPlayer(player);
+    q=gh_scm2int(quantity);
+
+    if( plynr==-1 ) {
+	plynr=0;
+	pn=PlayerMax;
+    } else {
+	pn=plynr+1;
+    }
+
+    //
+    //	Check the player opponents
+    //
+    for( n=0; plynr<pn; ++plynr ) {
+	int i;
+
+	for( i=0; i<PlayerMax; ++i ) {
+	    //
+	    //	This player is our enemy and has units left.
+	    //
+	    if( (Players[i].Enemy&(1<<plynr)) && Players[i].TotalNumUnits ) {
+		++n;
+	    }
+	}
+	DebugLevel3Fn("Opponents of %d = %d\n",plynr,n);
+	if( n==q ) {
+	    return SCM_BOOL_T;
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
 // --------------------------------------------------------------------------
 //	Actions
 
@@ -262,6 +329,8 @@ global void TriggerCclRegister(void)
     gh_new_procedure2_0("add-trigger",CclAddTrigger);
     // Conditions
     gh_new_procedure3_0("if-unit",CclIfUnit);
+    gh_new_procedure4_0("if-near-unit",CclIfNearUnit);
+    gh_new_procedure2_0("if-opponents",CclIfOpponents);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
@@ -278,6 +347,20 @@ global void SaveTriggers(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: trigger $Id$\n\n");
     fprintf(file,";;; FIXME: Save not written\n\n");
+}
+
+/**
+**	Initialize the trigger module.
+*/
+global void InitTriggers(void)
+{
+    //
+    //	Setup default triggers
+    //
+    if( gh_null_p(symbol_value(gh_symbol2scm("*triggers*"),NIL)) ) {
+	DebugLevel0Fn("Default triggers\n");
+	gh_apply(symbol_value(gh_symbol2scm("single-player-triggers"),NIL),NIL);
+    }
 }
 
 /**

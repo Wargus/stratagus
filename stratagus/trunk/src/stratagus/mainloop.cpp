@@ -48,7 +48,6 @@
 #include "interface.h"
 #include "menus.h"
 #include "network.h"
-#include "goal.h"
 #include "ui.h"
 #include "deco.h"
 #include "trigger.h"
@@ -483,13 +482,10 @@ global void GameMainLoop(void)
 		case 4:				// computer players
 		    PlayersEachSecond();
 		    break;
-		case 5:				// game goals
-		    CheckGoals();
-		    break;
-		case 6:				// forest grow
+		case 5:				// forest grow
 		    RegenerateForest();
 		    break;
-		case 7:				// overtaking units
+		case 6:				// overtaking units
 		    RescueUnits();
 		    break;
 	    }

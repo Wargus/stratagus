@@ -10,12 +10,11 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998-2001 by Lutz Sammer
+##	(c) Copyright 1998-2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +30,7 @@ include $(TOPDIR)/$(RULESFILE)
 
 MODULE  = clone
 
-SRCS	= clone.c mainloop.c goal.c selection.c groups.c \
+SRCS	= clone.c mainloop.c selection.c groups.c \
 	  unit.c unit_draw.c unitcache.c unit_find.c \
 	  construct.c player.c pud.c ccl.c iolib.c \
 	  spells.c ccl_player.c
