@@ -10,7 +10,7 @@
 //
 /**@name unit.h		-	The unit headerfile. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -233,12 +233,12 @@ struct _unit_ {
     UnitType*	Type;			/// pointer to unit type (peon,...)
     Player*     Player;			/// owner of this unit
     UnitStats*	Stats;			/// current unit stats
- 
+
 //	DISPLAY:
     char	IX;			/// X image displacement to map position
     char	IY;			/// Y image displacement to map position
     unsigned	Frame : 8;		/// Image frame: high bit used for flip
-    unsigned   	SeenFrame : 8;		/// last seen frame/stage of buildings
+    unsigned	SeenFrame : 8;		/// last seen frame/stage of buildings
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
@@ -268,7 +268,7 @@ struct _unit_ {
     unsigned	SubAction : 8;		/// sub-action of unit
     unsigned	Wait : 8;		/// action counter
 #define MAX_UNIT_WAIT	255		/// biggest number in action counter
-    unsigned	State : 8; 		/// action state
+    unsigned	State : 8;		/// action state
 #define MAX_UNIT_STATE	255		/// biggest state for action
     unsigned	Reset : 1;		/// can process new command
     unsigned	Blink : 3;		/// Let selection rectangle blink
@@ -276,7 +276,7 @@ struct _unit_ {
 					/** set to random 1..100 when MakeUnit()
 					** ,used for fancy buildings
 					*/
-    unsigned 	Rs : 8;
+    unsigned	Rs : 8;
     unsigned	Revealer;               // hack -- `revealer' is unit that
                                         // has to keep FOW revealed for some
 					// time, this unit cannot be used in
@@ -310,6 +310,9 @@ struct _unit_ {
 	int	Sub;
 	int	Cancel;			/// Cancel construction
     }		Builded;		/// ActionBuilded,...
+    struct _order_resource_ {
+	int	Active;			/// how much units are in the resource
+    }		Resource;		/// Resource still
     }		Data;			/// Storage room for different commands
 
 #else			//---------------------------------------------
@@ -381,7 +384,7 @@ struct _unit_ {
 ----------------------------------------------------------------------------*/
 
 extern Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
-extern Unit** UnitSlotFree; 		/// First free unit slot
+extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
@@ -524,7 +527,7 @@ extern void UnitCacheStatistic(void);
     /// Initialize unit-cache.
 extern void InitUnitCache(void);
 
-// 	in map.c 	belongs to map or unit??
+//	in map.c	belongs to map or unit??
     /// FIXME: more docu
 extern int UnitMovement(const Unit* unit);
     /// FIXME: more docu
