@@ -109,7 +109,7 @@ typedef struct _world_map_ {
 
     MapField*		Fields;		/// fields on map
 
-    unsigned		NoFogOfWar;	/// fog of war disabled
+    unsigned char	NoFogOfWar;	/// fog of war disabled
 
     unsigned		Terrain;	/// terrain type (summer,winter,...)
     Tileset*		Tileset;	/// tileset data
