@@ -2107,13 +2107,13 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 /**
 **	Find oil deposit.
 **
-**	@param player	A deposit of this player
+**	@param source	A deposit for this unit.
 **	@param x	Nearest to X position.
 **	@param y	Nearest to Y position.
 **
 **	@return		NoUnitP or oil deposit unit
 */
-global Unit* FindOilDeposit(const Player* player,int x,int y)
+global Unit* FindOilDeposit(const Unit* source,int x,int y)
 {
     Unit* unit;
     Unit* best;
@@ -2121,15 +2121,17 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
     int nunits;
     int best_d;
     int d,i;
+    const Player* player;
 
     //	FIXME:	this is not the best one
     //		We need the deposit with the shortest way!
     //		At least it must be reachable!
     //	FIXME:	Could we use unit-cache to find it faster?
     //
+    player=source->Player;
 
     best=NoUnitP;
-    best_d=99999;
+    best_d=INT_MAX;
     nunits=player->TotalNumUnits;
     units=player->Units;
     for( i=0; i<nunits; i++ ) {
@@ -2140,7 +2142,8 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 	// Want oil-deposit
 	if( unit->Type->StoresOil ) {
 	    d=MapDistanceToUnit(x,y,unit);
-	    if( d<best_d ) {
+	    if( d<best_d
+		    /*&& (d=UnitReachable(source,unit,1)) && d<best_d*/ ) {
 		best_d=d;
 		best=unit;
 	    }

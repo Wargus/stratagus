@@ -656,7 +656,7 @@ extern Unit* FindGoldDeposit(const Unit*,int,int);
     /// Find nearest wood deposit
 extern Unit* FindWoodDeposit(const Player* player,int x,int y);
     /// Find nearest oil deposit
-extern Unit* FindOilDeposit(const Player* player,int x,int y);
+extern Unit* FindOilDeposit(const Unit*,int x,int y);
 
     /// FIXME: more docu
 extern int FindWoodInSight(Unit* unit,int* x,int* y);
