@@ -261,11 +261,9 @@ global int PlayMovie(const char* name, int flags)
 
 	StartDecoder(&pbi, avi->Width, avi->Height);
 
-#if defined(WITH_SOUND) && defined(USE_OGG)
 	if (avi->AudioStream != -1) {  // Only if audio available
 		PlayAviOgg(avi);
 	}
-#endif
 
 	callbacks.ButtonPressed = MovieCallbackKey;
 	callbacks.ButtonReleased = MovieCallbackKey1;
@@ -275,7 +273,6 @@ global int PlayMovie(const char* name, int flags)
 	callbacks.KeyReleased = MovieCallbackKey3;
 	callbacks.KeyRepeated = MovieCallbackKey4;
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	if (flags & PlayMovieZoomScreen) {
 		if (flags & PlayMovieKeepAspect) {

@@ -391,11 +391,9 @@ global void ShowIntro(const Intro* intro)
 	TextLines* scrolling_text;
 	TextLines* objectives_text[MAX_OBJECTIVES];
 	int old_video_sync;
-#ifdef WITH_SOUND
 	int soundfree;
 	int soundout;
 	int soundcount;
-#endif
 
 	UseContinueButton = 1;
 	InitContinueButton(455 * VideoWidth / 640, 440 * VideoHeight / 480);
@@ -415,9 +413,7 @@ global void ShowIntro(const Intro* intro)
 	callbacks.KeyPressed = IntroCallbackKey1;
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
-
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	background = LoadGraphic(intro->Background);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
@@ -440,7 +436,7 @@ global void ShowIntro(const Intro* intro)
 
 	CallbackMusicOff();
 	PlaySectionMusic(PlaySectionBriefing);
-#ifdef WITH_SOUND
+
 	soundfree = -1;
 	soundout = -1;
 	soundcount = 0;
@@ -449,7 +445,6 @@ global void ShowIntro(const Intro* intro)
 		soundout = NextSoundRequestOut;
 		PlaySoundFile(intro->VoiceFile[0]);
 	}
-#endif
 
 	SplitTextIntoLines(text, 320, &scrolling_text);
 	for (i = 0; i < MAX_OBJECTIVES; ++i) {
@@ -466,7 +461,6 @@ global void ShowIntro(const Intro* intro)
 	IntroNoEvent = 1;
 	c = 0;
 	while (1) {
-#ifdef WITH_SOUND
 		// FIXME: move sound specific code to the sound files
 		if (soundfree != -1 && (!Channels[soundfree].Command) &&
 				stage < MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut &&
@@ -482,7 +476,7 @@ global void ShowIntro(const Intro* intro)
 				++soundcount;
 			}
 		}
-#endif
+
 		HideAnyCursor();
 		//
 		// Draw background
@@ -562,11 +556,10 @@ global void ShowIntro(const Intro* intro)
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
 
-#ifdef WITH_SOUND
 	if (Channels[soundfree].Command) {
 		FreeOneChannel(soundfree);
 	}
-#endif
+
 	CallbackMusicOn();
 }
 
@@ -599,9 +592,7 @@ global void ShowCredits(Credits* credits)
 	callbacks.KeyPressed = IntroCallbackKey1;
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
-
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	background = NULL;
 	if (credits->Background) {
@@ -751,9 +742,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	callbacks.KeyPressed = IntroCallbackKey1;
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
-
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	background = LoadGraphic(chapter->Data.Picture.Image);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
@@ -1250,7 +1239,6 @@ global void ShowStats(void)
 	callbacks.KeyReleased = IntroCallbackKey2;
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
-	callbacks.SoundReady = WriteSound;
 
 	VideoClearScreen();
 

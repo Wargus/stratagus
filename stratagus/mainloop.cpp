@@ -604,7 +604,6 @@ global void GameMainLoop(void)
 	GameCallbacks.KeyReleased = HandleKeyUp;
 	GameCallbacks.KeyRepeated = HandleKeyRepeat;
 	GameCallbacks.NetworkEvent = NetworkEvent;
-	GameCallbacks.SoundReady = WriteSound;
 
 	Callbacks = &GameCallbacks;
 

@@ -2060,9 +2060,7 @@ global void EditorMainLoop(void)
 		callbacks.KeyPressed = EditorCallbackKeyDown;
 		callbacks.KeyReleased = EditorCallbackKeyUp;
 		callbacks.KeyRepeated = EditorCallbackKey3;
-
 		callbacks.NetworkEvent = NetworkEvent;
-		callbacks.SoundReady = WriteSound;
 
 		GameCursor = TheUI.Point.Cursor;
 		InterfaceState = IfaceStateNormal;

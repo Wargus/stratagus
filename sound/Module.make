@@ -26,8 +26,8 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/sound
-MSRC =   arts_audio.c script_sound.c cdaudio.c flac.c libcda.c mad.c music.c \
-         ogg.c oss_audio.c sdl_audio.c sound.c sound_id.c sound_server.c \
+MSRC =   script_sound.c cdaudio.c flac.c libcda.c mad.c music.c \
+         ogg.c sdl_audio.c sound.c sound_id.c sound_server.c \
          unitsound.c wav.c cdda.c
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

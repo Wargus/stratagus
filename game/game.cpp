@@ -464,16 +464,15 @@ global void CreateGame(char* filename, WorldMap* map)
 	//
 	// Sound part
 	//
-	// FIXME: check if everything is really loaded
 	LoadUnitSounds();
 	MapUnitSounds();
-
-#ifdef WITH_SOUND
-	DebugLevel0("Sounds uses %d bytes (%d KB, %d MB)\n" _C_
-		AllocatedSoundMemory _C_
-		AllocatedSoundMemory / 1024 _C_
-		AllocatedSoundMemory / 1024 / 1024);
-#endif
+	if (SoundFildes != -1) {
+		if (InitSoundServer()) {
+			SoundOff = 1;
+		} else {
+			InitSoundClient();
+		}
+	}
 
 	//
 	// Spells
@@ -510,19 +509,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	// Triggers
 	//
 	InitTriggers();
-
-#ifdef WITH_SOUND
-	if (SoundFildes != -1) {
-		// FIXME: must be done after map is loaded
-		if (InitSoundServer()) {
-			SoundOff = 1;
-			SoundFildes = -1;
-		} else {
-			// must be done after sounds are loaded
-			InitSoundClient();
-		}
-	}
-#endif
 
 	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 

@@ -37,9 +37,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef WITH_SOUND		// {
-#ifdef USE_SDLA
-
 #include "SDL.h"
 #include "sound_server.h"
 
@@ -90,8 +87,5 @@ global int InitSdlSound(const char* dev __attribute__((unused)), int freq,
 
 	return 0;
 }
-
-#endif
-#endif		// } WITH_SOUND
 
 //@}

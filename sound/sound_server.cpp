@@ -38,8 +38,6 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef WITH_SOUND		// {
-
 #if !defined(USE_LIBMODPLUG) && !defined(noUSE_LIBMODPLUG)
 #define USE_LIBMODPLUG						/// Include lib modplug support
 #endif
@@ -54,21 +52,7 @@
 #endif
 #include <limits.h>
 
-#ifdef USE_SDLA
-#ifdef USE_THREAD
-#error "not USE_SDLA and USE_THREAD"
-#endif
-#include "SDL_audio.h"
-#include "SDL_mutex.h"
-#else
-#ifdef __linux__
-#   include <sys/ioctl.h>
-#   include <linux/soundcard.h>
-#else
-#   include <sys/ioctl.h>
-#   include <machine/soundcard.h>
-#endif
-#endif
+#include "SDL.h"
 
 #include "video.h"
 #include "sound_id.h"
@@ -110,6 +94,7 @@
 global int SoundFildes = -1;				/// audio file descriptor
 global int PlayingMusic;				/// flag true if playing music
 global int CallbackMusic;				/// flag true callback ccl if stops
+global int WaitForSoundDevice;				/// Block until sound device available
 
 #ifdef DEBUG
 global unsigned AllocatedSoundMemory;		/// memory used by sound
@@ -125,19 +110,11 @@ global SoundRequest SoundRequests[MAX_SOUND_REQUESTS];
 global int NextSoundRequestIn;
 global int NextSoundRequestOut;
 
-#ifdef USE_THREAD
-global sem_t SoundThreadChannelSemaphore;/// FIXME: docu
-local pthread_t SoundThread;				/// FIXME: docu
-global int WithSoundThread;				/// FIXME: docu
-#endif
-
 global int SoundThreadRunning;				/// FIXME: docu
 
 local int MusicTerminated;
 
-#ifdef USE_SDLA
 SDL_mutex * MusicTerminatedMutex;
-#endif
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -154,14 +131,10 @@ global void PlayListAdvance(void)
 {
 	int proceed;
 
-#ifdef USE_SDLA
 	SDL_LockMutex(MusicTerminatedMutex);
-#endif
 	proceed = MusicTerminated;
 	MusicTerminated = 0;
-#ifdef USE_SDLA
 	SDL_UnlockMutex(MusicTerminatedMutex);
-#endif
 
 	if (proceed) {
 		lua_pushstring(Lua, "MusicStopped");
@@ -218,13 +191,9 @@ local void MixMusicToStereo32(int* buffer, int size)
 
 			// we are inside the SDL callback!
 			if (CallbackMusic) {
-#ifdef USE_SDLA
 				SDL_LockMutex(MusicTerminatedMutex);
-#endif
 				MusicTerminated = 1;
-#ifdef USE_SDLA
 				SDL_UnlockMutex(MusicTerminatedMutex);
-#endif
 			}
 		}
 	}
@@ -993,60 +962,6 @@ global void MixIntoBuffer(void* buffer, int samples)
 #endif
 }
 
-#ifndef USE_SDLA
-/**
-**		Write buffer to sound card.
-*/
-global void WriteSound(void)
-{
-#if SoundSampleSize == 8
-	char buffer[1024];
-#endif
-#if SoundSampleSize == 16
-	short buffer[1024];
-#endif
-
-	// ARI: If DSP open had failed: No soundcard, other user, etc..
-	if (SoundFildes == -1) {
-		DebugLevel0Fn("Shouldn't be reached\n");
-		return;
-	}
-
-	DebugLevel3Fn("\n");
-
-	if (0) {
-		audio_buf_info info;
-
-		ioctl(SoundFildes, SNDCTL_DSP_GETOSPACE, &info);
-		DebugLevel0("%lu Free bytes %d\n" _C_ GameCycle _C_ info.bytes);
-		if (info.bytes < (int)sizeof(buffer)) {
-			return;
-		}
-	}
-
-	MixIntoBuffer(buffer, sizeof(buffer) / sizeof(*buffer));
-
-#ifdef WITH_ARTSC
-	if (WriteArtsSound(buffer, sizeof(buffer)) < 0) {
-		DebugLevel0Fn("ARTSD: Write error - Shouldn't happen!\n");
-
-	}
-#else
-	while (write(SoundFildes, buffer, sizeof(buffer)) == -1) {
-		switch (errno) {
-			case EAGAIN:
-			case EINTR:
-				continue;
-		}
-		perror("write");
-		break;
-	}
-#endif
-}
-#endif
-
-#ifdef USE_SDLA		// {
-
 global void WriteSound(void)
 {
 }
@@ -1069,98 +984,6 @@ global void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int le
 
 	MixIntoBuffer(stream, len);
 }
-#endif		// } USE_SDLA
-
-#ifdef USE_THREAD		// {
-
-/**
-**		FIXME: docu
-*/
-global void WriteSoundThreaded(void)
-{
-	int mixer_buffer[1024];
-#if SoundSampleSize == 8
-	char buffer[1024];
-#endif
-#if SoundSampleSize == 16
-	short buffer[1024];
-#endif
-	int new_free_channels;
-	int free_channels;
-	int how_many_playing;
-	int discarded_request;
-	int started_request;
-
-	DebugLevel3Fn("\n");
-
-	free_channels = MaxChannels;
-	how_many_playing = 0;
-	// wait for the first sound to come
-	sem_wait(&SoundThreadChannelSemaphore);
-	for (;;) {
-		if (0) {
-			audio_buf_info info;
-
-			ioctl(SoundFildes, SNDCTL_DSP_GETOSPACE, &info);
-			DebugLevel0("Free bytes %d\n" _C_ info.bytes);
-		}
-		FillChannels(free_channels, &discarded_request, &started_request);
-		how_many_playing += started_request;
-		new_free_channels = 0;
-		if (how_many_playing || PlayingMusic) {
-
-			memset(mixer_buffer, 0, sizeof(mixer_buffer));
-
-			if (how_many_playing) {
-				new_free_channels = MixChannelsToStereo32(mixer_buffer,
-					sizeof(mixer_buffer) / sizeof(int));
-			}
-			MixMusicToStereo32(mixer_buffer,
-				sizeof(mixer_buffer) / sizeof(int));
-
-#if SoundSampleSize == 8
-			ClipMixToStereo8(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
-				buffer);
-#endif
-#if SoundSampleSize == 16
-			ClipMixToStereo16(mixer_buffer, sizeof(mixer_buffer) / sizeof(int),
-				buffer);
-#endif
-
-#ifdef WITH_ARTSC
-			if (WriteArtsSound(buffer, sizeof(buffer)) < 0) {
-				DebugLevel0Fn("ARTSD: Write error - Shouldn't happen!\n");
-
-			}
-#else
-			while (write(SoundFildes, buffer, sizeof(buffer)) == -1) {
-				switch (errno) {
-					case EAGAIN:
-					case EINTR:
-						continue;
-				}
-				perror("write");
-				break;
-			}
-#endif
-			how_many_playing -= new_free_channels;
-		}
-		free_channels = MaxChannels - how_many_playing;
-		DebugLevel3("Channels: %d %d %d\n" _C_ free_channels _C_ how_many_playing _C_
-			new_free_channels);
-		new_free_channels += discarded_request;
-		// decrement semaphore by the number of stopped channels
-		for (; new_free_channels > 0; --new_free_channels) {
-			//		sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-			//		DebugLevel3("SoundSemaphore: %d\n" _C_ tmp);
-			sem_wait(&SoundThreadChannelSemaphore);
-			//		sem_getvalue(&SoundThreadChannelSemaphore,&tmp);
-			//		DebugLevel3("SoundSemaphore: %d\n" _C_ tmp);
-		}
-	}
-}
-
-#endif		// } USE_THREAD
 
 /**
 **		Initialize sound card.
@@ -1170,11 +993,8 @@ global int InitSound(void)
 	int dummy;
 
 	MusicTerminated = 0;
-#ifdef USE_SDLA
 	MusicTerminatedMutex = SDL_CreateMutex();
-#endif
 
-#ifdef USE_SDLA
 	//
 	//		Open sound device, 8bit samples, stereo.
 	//
@@ -1182,24 +1002,6 @@ global int InitSound(void)
 			WaitForSoundDevice)) {
 		return 1;
 	}
-#else
-#ifdef WITH_ARTSC
-	//
-	//		Connect to artsd, 8bit samples, stereo.
-	//
-	if (InitArtsSound(SoundFrequency, SoundSampleSize)) {
-		return 1;
-	}
-#else
-	//
-	//		Open dsp device, 8bit samples, stereo.
-	//
-	if (InitOssSound(SoundDeviceName, SoundFrequency, SoundSampleSize,
-			WaitForSoundDevice)) {
-		return 1;
-	}
-#endif		// WITH_ARTSC
-#endif		// USE_SDLA
 
 	//		ARI:		The following must be done here to allow sound to work in
 	//				pre-start menus!
@@ -1235,32 +1037,6 @@ global int InitSoundServer(void)
 	ViewPointOffset = max(MapWidth / 2, MapHeight / 2);
 	DebugLevel2("ViewPointOffset: %d\n" _C_ ViewPointOffset);
 
-#ifdef USE_THREAD
-	if (WithSoundThread) {
-	  //prepare for the sound thread
-	  if (sem_init(&SoundThreadChannelSemaphore, 0, 0)) {
-		//FIXME: better error handling
-		PrintFunction();
-		// FIXME: ARI: strerror_r() is better here, but not compatible
-		fprintf(stdout, "%s\n", strerror(errno));
-		close(SoundFildes);
-		SoundFildes = -1;
-		return 1;
-	  }
-	  if (pthread_create(&SoundThread, NULL, (void*)&WriteSoundThreaded, NULL)) {
-		//FIXME: better error handling
-		PrintFunction();
-		fprintf(stdout, "%s\n", strerror(errno));
-		close(SoundFildes);
-		SoundFildes = -1;
-		return 1;
-	  }
-	  SoundThreadRunning = 1;
-	}
-#endif
-
-
-
 	return 0;
 }
 
@@ -1269,23 +1045,8 @@ global int InitSoundServer(void)
 */
 global void QuitSound(void)
 {
-#ifdef USE_SDLA
 	SDL_CloseAudio();
 	SoundFildes = -1;
-#else
-#ifdef WITH_ARTSC
-	ExitArtsSound();
-#else // ! WITH_ARTSC
-	if (SoundFildes != -1) {
-		close(SoundFildes);
-		SoundFildes = -1;
-	}
-#endif // WITH_ARTSC
-#endif // USE_SDLA
 }
-
-#endif		// } WITH_SOUND
-
-global int WaitForSoundDevice;				/// Block until sound device available
 
 //@}

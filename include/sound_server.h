@@ -33,17 +33,9 @@
 
 //@{
 
-#ifdef WITH_SOUND  // {
-
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
-#if defined(USE_THREAD) && !defined(USE_SDLA)
-#include <pthread.h>
-#include <semaphore.h>
-extern sem_t SoundThreadChannelSemaphore;
-#endif
 
 #include "sound_id.h"
 
@@ -214,6 +206,9 @@ enum _play_audio_flags_ {
 	/// sound file descriptor, if -1 no sound available
 extern int SoundFildes;
 
+	/// Block until sound device available
+extern int WaitForSoundDevice;
+
 	/// sound volume (from 0 to MaxVolume, acts as a multiplier)
 extern int GlobalVolume;
 	/// music volume (from 0 to MaxVolume, acts as a multiplier)
@@ -236,11 +231,6 @@ extern int NextSoundRequestOut;
 extern SoundChannel Channels[MaxChannels];
 	/// Next free channel
 extern int NextFreeChannel;
-
-#ifdef USE_THREAD
-	/// are we using a sound thread? (default is zero -> no thread)
-extern int WithSoundThread;
-#endif
 
 	/// @todo docu
 extern int SoundThreadRunning;
@@ -285,18 +275,8 @@ extern void FreeOneChannel(int channel);
 
 	/// Initialize the sound card.
 extern int InitSound(void);
-	/// Initialize the oss compatible sound card.
-extern int InitOssSound(const char* dev,int freq,int size,int wait);
 	/// Initialize the sound card with SDL support.
 extern int InitSdlSound(const char* dev,int freq,int size,int wait);
-	/// Initialize connection to arts sound daemon.
-extern int InitArtsSound(int freq,int size);
-	/// Close the arts sound daemon connection.
-extern void ExitArtsSound(void);
-	/// Write out sound data to arts daemon.
-extern int WriteArtsSound(void* data,int len);
-	/// Query available sample buffer space from arts daemon.
-extern int ArtsGetSpace(void);
 
 	/// Initialize the sound server.
 extern int InitSoundServer(void);
@@ -310,23 +290,6 @@ extern void WriteSound(void);
 
 	///  Cleanup sound.
 extern void QuitSound(void);
-
-#else  // }{ WITH_SOUND
-
-/*----------------------------------------------------------------------------
---  Definitons
-----------------------------------------------------------------------------*/
-
-#define SoundFildes -1          ///< Dummy macro for without sound
-#define SoundThreadRunning 0    ///< Dummy macro for without sound
-
-#define InitSound() 0        ///< Dummy macro for without sound
-#define WriteSound NULL      ///< Dummy macro for without sound
-#define QuitSound()          ///< Dummy macro for without sound
-#define PlayListAdvance()    ///< Dummy macro for without sound
-#endif // } WITH_SOUND
-
-extern int WaitForSoundDevice;  ///< Block until sound device available
 
 //@}
 

@@ -41,11 +41,7 @@
 
 #include "stratagus.h"
 
-#ifdef WITH_SOUND		// {
-
-#ifdef USE_SDLA
-#include "SDL_audio.h"
-#endif
+#include "SDL.h"
 
 #include "video.h"
 #include "sound_id.h"
@@ -111,9 +107,8 @@ local void InsertSoundRequest(const Unit* unit, unsigned id,
 	unsigned short power, SoundId sound, unsigned char fight,
 	unsigned char selection, unsigned char volume, char stereo)
 {
-#ifdef USE_SDLA
 	SDL_LockAudio();
-#endif
+
 	//FIXME: valid only in a shared memory context...
 	if (!SoundOff && sound != NO_SOUND) {
 		if (SoundRequests[NextSoundRequestIn].Used) {
@@ -131,24 +126,15 @@ local void InsertSoundRequest(const Unit* unit, unsigned id,
 			DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n" _C_
 				unit _C_ unit ? unit->Type->Ident : "" _C_
 				sound _C_ NextSoundRequestIn _C_ power);
-#ifdef USE_THREAD
-			// increment semaphore
-			if (SoundThreadRunning) {
-				if (sem_post(&SoundThreadChannelSemaphore)) {
-					DebugLevel0("Cannot increment semaphore!\n");
-					//FIXME: need to quit?
-				}
-			}
-#endif
+
 			++NextSoundRequestIn;
 			if (NextSoundRequestIn >= MAX_SOUND_REQUESTS) {
 				NextSoundRequestIn = 0;
 			}
 		}
 	}
-#ifdef USE_SDLA
+
 	SDL_UnlockAudio();
-#endif
 }
 
 /**
@@ -336,7 +322,5 @@ global void InitSoundClient(void)
 		}
 	}
 }
-
-#endif		// } WITH_SOUND
 
 //@}
