@@ -54,6 +54,7 @@
 #include "campaign.h"
 #include "sound_server.h"
 #include "sound.h"
+#include "ccl.h"
 
 #ifdef USE_SDLCD
 #include "SDL.h"
@@ -1720,69 +1721,38 @@ global void SoundOptions(void)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
 #endif
-    ProcessMenu(MENU_SOUND_OPTIONS, 1);
+    SoundOptionsMenuItems[2].d.hslider.percent = (GlobalVolume * 100) / 255;
+
+    if (PlayingMusic == 1);
+        SoundOptionsMenuItems[11].d.gem.state = MI_GSTATE_CHECKED;
+    SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
+
+    ProcessMenu(MENU_SOUND_OPTIONS, 1);    
 }
 
 local void SetMasterPower(Menuitem *mi)
 {
-    int i = 17;
-#ifdef USE_SDLCD
-    /// Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
-	if (SDL_CDStatus(CDRom) <= 1)
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-    } else {
-    /// Stop Playing CD
-        SDL_CDStop(CDRom);
-	CDMode = ":stopped";
-    }
-#elif defined(USE_LIBCDA)
-    /// Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
-	if (!cd_current_track())
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-    } else {
-    /// Stop Playing CD
-        cd_stop();
-	CDMode = ":stopped";
-    }
-#else
-    ProcessMenu(MENU_CDROM_DISABLED, 1);
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-#endif
 }
 
 local void SetMusicPower(Menuitem *mi)
 {
-    int i = 17;
-#ifdef USE_SDLCD
-    /// Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
-	if (SDL_CDStatus(CDRom) <= 1)
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
+    SCM cb;
+    
+    if (PlayingMusic == 1) {
+	StopMusic();
     } else {
-    /// Stop Playing CD
-        SDL_CDStop(CDRom);
-	CDMode = ":stopped";
+            if (CallbackMusic) { 
+                cb = gh_symbol2scm("music-stopped"); 
+                if (!gh_null_p(symbol_boundp(cb, NIL))) { 
+                    SCM value; 
+
+                    value = symbol_value(cb, NIL); 
+                    if (!gh_null_p(value)) { 
+                        gh_apply(value, NIL); 
+                    } 
+                } 
+            } 
     }
-#elif defined(USE_LIBCDA)
-    /// Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
-	if (!cd_current_track())
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-    } else {
-    /// Stop Playing CD
-        cd_stop();
-	CDMode = ":stopped";
-    }
-#else
-    ProcessMenu(MENU_CDROM_DISABLED, 1);
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-#endif
 }
 
 local void SetCdPower(Menuitem *mi)
