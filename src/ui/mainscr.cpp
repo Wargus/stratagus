@@ -56,6 +56,7 @@
 // FIXME: should become global configurable
 #define OriginalTraining	0	/// 1 for the original training display
 #define OriginalBuilding	0	/// 1 for the original building display
+#define OriginalLevel		0	/// 1 for the original level display
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -79,8 +80,8 @@ local void DrawLifeBar(const Unit* unit,int x,int y)
     int f;
     int color;
 
-    y+=ICON_HEIGHT+8;
-    VideoFillRectangleClip(ColorBlack,x,y,ICON_WIDTH+8,7);
+    y+=ICON_HEIGHT+7;
+    VideoFillRectangleClip(ColorBlack,x,y,ICON_WIDTH+7,7);
     if( unit->HP ) {
 	f=(100*unit->HP)/unit->Stats->HitPoints;
 	if( f>75) {
@@ -90,8 +91,8 @@ local void DrawLifeBar(const Unit* unit,int x,int y)
 	} else {
 	    color=ColorRed;
 	}
-	f=(f*(ICON_WIDTH+4))/100;
-	VideoFillRectangleClip(color,x+2,y,f,5);
+	f=(f*(ICON_WIDTH+5))/100;
+	VideoFillRectangleClip(color,x+1,y+1,f,5);
     }
 }
 
@@ -220,6 +221,14 @@ global void DrawUnitInfo(const Unit* unit)
     //
     if( unit->Player!=ThisPlayer ) {
 	return;
+    }
+
+    //
+    //	Draw unit kills and experience.
+    //
+    if( !OriginalLevel && stats->Level ) {
+        sprintf(buf,"XP:~<%d~> Kills:~<%d~>",unit->XP,unit->Kills);
+	DrawTextCentered(x+114,y+8+15+33,GameFont,buf);
     }
 
     //
@@ -805,9 +814,9 @@ global void DrawCosts(void)
 		,0,3*TheUI.Resources[GoldCost].IconH
 		,TheUI.Resources[GoldCost].IconW
 		,TheUI.Resources[GoldCost].IconH
-		,x,TheUI.StatusLineY+2);
+		,x,TheUI.StatusLineY+1);
 
-	DrawNumber(x+15,TheUI.StatusLineY+2+2,GameFont,CostsMana);
+	DrawNumber(x+15,TheUI.StatusLineY+2,GameFont,CostsMana);
 	x+=45;
     }
 
@@ -817,9 +826,9 @@ global void DrawCosts(void)
 		VideoDrawSub(TheUI.Resources[i].Icon.Graphic
 			,0,TheUI.Resources[i].IconRow*TheUI.Resources[i].IconH
 			,TheUI.Resources[i].IconW,TheUI.Resources[i].IconH
-			,x,TheUI.StatusLineY+2);
+			,x,TheUI.StatusLineY+1);
 	    }
-	    DrawNumber(x+15,TheUI.StatusLineY+2+2,GameFont,Costs[i]);
+	    DrawNumber(x+15,TheUI.StatusLineY+2,GameFont,Costs[i]);
 	    x+=45;
 	    if( x>VideoWidth-45 ) {
 		break;
