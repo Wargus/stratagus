@@ -580,17 +580,17 @@ global void SaveDecorations(CLFile* file)
     CLprintf(file, ";;; MODULE: decorations $Id$\n\n");
 
     CLprintf(file, "(mana-sprite \"%s\"  %d %d  %d %d)\n",
-	ManaSprite.File,ManaSprite.HotX,ManaSprite.HotY,
-	ManaSprite.Width,ManaSprite.Height);
+	ManaSprite.File, ManaSprite.HotX, ManaSprite.HotY,
+	ManaSprite.Width, ManaSprite.Height);
     CLprintf(file, "(health-sprite \"%s\"  %d %d  %d %d)\n",
-	HealthSprite.File,HealthSprite.HotX,HealthSprite.HotY,
-	HealthSprite.Width,HealthSprite.Height);
+	HealthSprite.File, HealthSprite.HotX, HealthSprite.HotY,
+	HealthSprite.Width, HealthSprite.Height);
     CLprintf(file, "(shadow-sprite \"%s\"  %d %d  %d %d)\n",
-	ShadowSprite.File,ShadowSprite.HotX,ShadowSprite.HotY,
-	ShadowSprite.Width,ShadowSprite.Height);
+	ShadowSprite.File, ShadowSprite.HotX, ShadowSprite.HotY,
+	ShadowSprite.Width, ShadowSprite.Height);
     CLprintf(file, "(spell-sprite \"%s\"  %d %d  %d %d)\n",
-	SpellSprite.File,SpellSprite.HotX,SpellSprite.HotY,
-	SpellSprite.Width,SpellSprite.Height);
+	SpellSprite.File, SpellSprite.HotX, SpellSprite.HotY,
+	SpellSprite.Width, SpellSprite.Height);
 
     // This belongs to the config and not save file
     if (ShowHealthBar) {
@@ -924,7 +924,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	//
 	//	Show working of units.
 	//
-	if (unit->Player==ThisPlayer) {
+	if (unit->Player == ThisPlayer) {
 
 	    //
 	    //	Building under constuction.
@@ -1052,7 +1052,7 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
     if (SpellSprite.HotX < 0) {
 	x1 += SpellSprite.HotX +
 	    (type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
-    } else if (SpellSprite.HotX>0) {
+    } else if (SpellSprite.HotX > 0) {
 	x1 += 1 - SpellSprite.HotX +
 	    (type->TileWidth * TileSizeX - type->BoxWidth) / 2;
     } else {
@@ -1554,7 +1554,7 @@ global void ShowOrder(const Unit* unit)
 **
 **	@todo FIXME: The different styles should become a function call.
 */
-local void DrawInformations(const Unit* unit,const UnitType* type, int x, int y)
+local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y)
 {
     const UnitStats* stats;
     int r;
@@ -1587,7 +1587,7 @@ local void DrawInformations(const Unit* unit,const UnitType* type, int x, int y)
 	}
 	if (type->CanAttack) {
 	    if (ShowReactionRange) {
-		r = (unit->Player->Type==PlayerPerson) ?
+		r = (unit->Player->Type == PlayerPerson) ?
 		    type->ReactRangePerson : type->ReactRangeComputer;
 		if (r) {
 		    VideoDrawCircleClip(ColorBlue,
@@ -1619,7 +1619,7 @@ local void DrawInformations(const Unit* unit,const UnitType* type, int x, int y)
 **	@param unit	Pointer to unit.
 **	@param sprite	Change the palette entries 208-210 in this sprite.
 */
-local void GraphicUnitPixels(const Unit* unit,const Graphic* sprite)
+local void GraphicUnitPixels(const Unit* unit, const Graphic* sprite)
 {
     switch (VideoBpp) {
 	case 8:
@@ -1841,7 +1841,7 @@ global void DrawUnit(const Unit* unit)
     //
     DrawUnitSelection(unit);
 
-    GraphicUnitPixels(unit,type->Sprite);
+    GraphicUnitPixels(unit, type->Sprite);
 
     sprite = type->Sprite;
     if (type->Harvester && unit->CurrentResource) {
