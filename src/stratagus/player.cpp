@@ -1057,7 +1057,7 @@ global void DebugPlayers(void)
 	if( k==-1 ) {
 	    k=PlayerRaces.Race[PlayerRaces.Count-1];
 	}
-	DebugLevel0("%09s" _C_ PlayerRaces.Name[k]);
+	DebugLevel0("%9s" _C_ PlayerRaces.Name[k]);
 	DebugLevel0("%2d " _C_ Players[i].AiNum);
 	switch( Players[i].AiNum ) {
 	    case PlayerAiLand:	  DebugLevel0("(land)");	break;
