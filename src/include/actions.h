@@ -195,6 +195,8 @@ extern void HandleActionSpellCast(struct _unit_* unit);
 ----------------------------------------------------------------------------*/
 
 	/// Handle the animation of a unit
+extern int UnitShowNewAnimation(struct _unit_* unit, const struct _new_animation_* anim);
+	/// Handle the animation of a unit
 extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* animation);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);

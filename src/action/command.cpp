@@ -132,7 +132,7 @@ static void RemoveOrder(Unit* unit, int order)
 	
 	Assert(0 <= order && order < unit->OrderCount);
 	i = order;
-	while(i < unit->OrderCount - 1) {
+	while (i < unit->OrderCount - 1) {
 		unit->Orders[i] = unit->Orders[i + 1];
 		++i;
 	}
@@ -241,7 +241,7 @@ void CommandMoveOrder(Unit* unit, int src, int dst)
 	} else {
 		// dst < src
 		tmp = unit->Orders[src];
-		for (i = src - 1 ; i >= dst; --i){
+		for (i = src - 1 ; i >= dst; --i) {
 			unit->Orders[i + 1] = unit->Orders[i];
 		}
 		unit->Orders[dst] = tmp;
@@ -912,7 +912,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 
 	if (slot == -1) {
 		// Cancel All training
-		while(unit->Orders[0].Action == UnitActionTrain) {
+		while (unit->Orders[0].Action == UnitActionTrain) {
 			PlayerAddCostsFactor(unit->Player,
 				unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
 				CancelTrainingCostsFactor);

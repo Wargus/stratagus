@@ -71,13 +71,13 @@ static Unit* UnitToRepairInRange(Unit* unit, int range)
 	int i;                // iterator on unit.
 
 	n = UnitCacheSelect(unit->X - range, unit->Y - range,
-						unit->X + unit->Type->TileWidth + range,
-						unit->Y + unit->Type->TileHeight + range,
-						table);
+		unit->X + unit->Type->TileWidth + range,
+		unit->Y + unit->Type->TileHeight + range,
+		table);
 	for (i = 0; i < n; ++i) {
-		if (PlayersTeamed(table[i]->Player->Player, unit->Player->Player)
-			&& table[i]->Type->RepairHP && table[i]->HP < table[i]->Stats->HitPoints
-			&& UnitVisibleAsGoal(table[i], unit->Player)) {
+		if (PlayersTeamed(table[i]->Player->Player, unit->Player->Player) &&
+				table[i]->Type->RepairHP && table[i]->HP < table[i]->Stats->HitPoints &&
+				UnitVisibleAsGoal(table[i], unit->Player)) {
 			return table[i];
 		}
 	}
@@ -107,7 +107,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 			!unit->Container->Type->AttackFromTransporter ||
 			unit->Type->Missile.Missile->Class == MissileClassNone)) {
 		// If peon is in building or unit is in transporter it is removed.
-		unit->Wait = CYCLES_PER_SECOND / 6;
+//		unit->Wait = CYCLES_PER_SECOND / 6;
 		return;
 	}
 
@@ -126,39 +126,43 @@ void ActionStillGeneric(Unit* unit, int ground)
 		//
 		// Still animation
 		//
-		Assert(type->Animations && type->Animations->Still);
+		if (type->NewAnimations) {
+			UnitShowNewAnimation(unit, type->NewAnimations->Still);
+		} else {
+			Assert(type->Animations && type->Animations->Still);
+			UnitShowAnimation(unit, type->Animations->Still);
 
-		UnitShowAnimation(unit, type->Animations->Still);
-
-		//
-		// FIXME: this a workaround for some bad code.
-		// UnitShowAnimation resets frame.
-		// FIXME: the frames are hardcoded they should be configurable
-		//
-		if (unit->State == 1 && type->GivesResource == GoldCost) {
-			if (unit->Frame < 0) {
-				unit->Frame = unit->Data.Resource.Active ? -1 - 1 : -1;
-			} else {
-				unit->Frame = unit->Data.Resource.Active ? 1 : 0;
+			//
+			// FIXME: this a workaround for some bad code.
+			// UnitShowAnimation resets frame.
+			// FIXME: the frames are hardcoded they should be configurable
+			//
+			if (unit->State == 1 && type->GivesResource == GoldCost) {
+				if (unit->Frame < 0) {
+					unit->Frame = unit->Data.Resource.Active ? -1 - 1 : -1;
+				} else {
+					unit->Frame = unit->Data.Resource.Active ? 1 : 0;
+				}
 			}
-		}
-		if (unit->State == 1 && type->GivesResource == OilCost) {
-			if (unit->Frame < 0) {
-				unit->Frame = unit->Data.Resource.Active ? -2 - 1 : -1;
-			} else {
-				unit->Frame = unit->Data.Resource.Active ? 2 : 0;
+			if (unit->State == 1 && type->GivesResource == OilCost) {
+				if (unit->Frame < 0) {
+					unit->Frame = unit->Data.Resource.Active ? -2 - 1 : -1;
+				} else {
+					unit->Frame = unit->Data.Resource.Active ? 2 : 0;
+				}
 			}
 		}
 	}
 
-	if (!unit->Reset) { // animation can't be aborted here
+	if ((unit->Type->NewAnimations && unit->Anim.Unbreakable) || 
+			(!unit->Type->NewAnimations && !unit->Reset)) { // animation can't be aborted here
 		return;
 	}
 
 	//
 	// Some units, like critter are moving random around randomly
 	//
-	if (type->RandomMovementProbability &&
+	if (!unit->Type->NewAnimations && type->RandomMovementProbability &&
 			((SyncRand() % 100) <= type->RandomMovementProbability)) {
 		int x;
 		int y;
