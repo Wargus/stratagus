@@ -42,6 +42,7 @@
 #include "interface.h"
 #include "ui.h"
 #include "video.h"
+#include "map.h"
 #include "menus.h"
 
 /*----------------------------------------------------------------------------

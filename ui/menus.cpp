@@ -41,10 +41,10 @@
 #include "image.h"
 #include "font.h"
 #include "tileset.h"
+#include "map.h"
 #include "interface.h"
 #include "menus.h"
 #include "cursor.h"
-#include "map.h"
 #include "pud.h"
 #include "iolib.h"
 #include "network.h"
@@ -229,11 +229,12 @@ local unsigned char *ssmsoptions[] = {
     "128 x 128",
 };
 
-local char ScenSelectPath[1024];
 local char ScenSelectDisplayPath[1024];
 local char ScenSelectFileName[128];
 local int CustomGameStarted = 0;
-local MapInfo *ScenSelectPudInfo = NULL;
+local char ScenSelectPath[1024];
+global char ScenSelectFullPath[1024];
+global MapInfo *ScenSelectPudInfo = NULL;
 
 local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
@@ -1178,6 +1179,7 @@ local void ScenSelectMenu(void)
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
     if (strstr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -1708,6 +1710,7 @@ local void GameSetupInit(Menuitem *mi __attribute__((unused)))
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
     if (strstr(ScenSelectFileName, ".pud")) {
 	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -1817,18 +1820,26 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     /// Tell connect state machines how many human player we can have
     NetPlayers = h;
 
-    NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
-    NetMultiSetupMenuItems[5].yofs = 32;
+    if (initial) {
+	NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
+	NetMultiSetupMenuItems[5].yofs = 32;
+    }
     for (i = 1; i < 8; i++) {
-	NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+	if (initial) {
+	    NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+	} else {
+	    if (Hosts[i].PlyNr) {
+		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[1];
+	    } else {
+		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+	    }
+	}
 	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
 
-	// FIXME: Only here for debug - belongs into NetMultiPlayerDrawFunc
-	NetMultiSetupMenuItems[22 + i].flags = 0;
-	NetMultiSetupMenuItems[22 + i].d.gem.state = 0;	// FIXME: check player ready checkmark state
+	/* FIXME: don't forget to throw out additional players without available slots here! */
 
 	if (i >= h) {
-	    /* FIXME: This is wrong - avoid slots of net-connected player! */
+	    /* FIXME: This can be wrong - avoid slots of net-connected player! */
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 1;
 
 	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
@@ -1839,7 +1850,6 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 		NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 2;
 	    NetMultiSetupMenuItems[5 + i].flags = MenuButtonDisabled;
 	}
-	/* FIXME: don't forget to throw out additional players without available slots here! */
     }
 }
 
@@ -1911,7 +1921,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     int i, nc, rc;
 
     i = mi - NetMultiSetupMenuItems - 5;
-    if (i > 0 && i < 8) {
+    if (i >= 0 && i < 8) {
 	if (i > 0) {
 	    NetMultiSetupMenuItems[22 + i].flags &= ~MenuButtonDisabled;
 	    // FIXME: check player ready checkmark state
@@ -1924,12 +1934,13 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
 	}
     }
-
-    GetDefaultTextColors(&nc, &rc);
-    SetDefaultTextColors(rc, rc);
     /* FIXME: 
 	 further changes to implement client menu...
     */
+
+    GetDefaultTextColors(&nc, &rc);
+    SetDefaultTextColors(rc, rc);
+    DebugLevel3Fn("Hosts[%d].PlyName = %s\n", i, Hosts[i].PlyName);
     DrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
     
     SetDefaultTextColors(nc, rc);
@@ -1938,8 +1949,40 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 
 local void MultiGameClientInit(Menuitem *mi)
 {
-    GameSetupInit(mi);
+    // GameSetupInit(mi);
     MultiGameClientUpdate(1);
+}
+
+global int NetClientSelectScenario(void)
+{
+    char *cp;
+
+    FreeMapInfo(ScenSelectPudInfo);
+    ScenSelectPudInfo = NULL;
+
+    cp = strrchr(ScenSelectFullPath, '/');
+    if (cp) {
+	strcpy(ScenSelectFileName, cp + 1);
+	*cp = 0;
+	strcpy(ScenSelectPath, ScenSelectFullPath);
+	*cp = '/';
+    } else {
+	strcpy(ScenSelectFileName, ScenSelectFullPath);
+	ScenSelectPath[0] = 0;
+    }
+
+    if (strstr(ScenSelectFileName, ".pud")) {
+	ScenSelectPudInfo = GetPudInfo(ScenSelectFullPath);
+    } else {
+	// FIXME: GetCmInfo();
+    }
+    return ScenSelectPudInfo == NULL;
+}
+
+global void NetConnectForceDisplayUpdate(void)
+{
+    MultiGamePlayerSelectorsUpdate(0);
+    MustRedraw |= RedrawMenu;
 }
 
 /*----------------------------------------------------------------------------
@@ -2595,7 +2638,7 @@ global void ProcessMenu(int MenuId, int Loop)
     DrawMenu(CurrentMenu);
 
     if (Loop) {
-	for( ; CurrentMenu != -1 ; ) {
+	while (CurrentMenu != -1) {
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
 	    UpdateDisplay();
 	    RealizeVideoMemory();

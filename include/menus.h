@@ -219,7 +219,9 @@ typedef struct _menus_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern  int CurrentMenu;		/// Currently processed menu
+extern int CurrentMenu;			/// Currently processed menu
+extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
+extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -242,6 +244,12 @@ extern void MenuHandleMouseMove(int x,int y);
 extern void MenuHandleButtonDown(int b);
     /// Called if any mouse button is released up
 extern void MenuHandleButtonUp(int b);
+
+    /// The scenario path received from server
+    /// Prepare the client menu.
+extern int NetClientSelectScenario(void);
+    /// Notify menu display code to update info
+extern void NetConnectForceDisplayUpdate(void);
 
 //@}
 
