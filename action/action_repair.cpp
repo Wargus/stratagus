@@ -65,11 +65,9 @@ local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 
     flags = UnitShowAnimation(unit, repair);
 
-#ifdef WITH_SOUND
     if ((flags & AnimationSound)) {
 	PlayUnitSound(unit, VoiceRepairing);
     }
-#endif
 }
 
 /**
