@@ -1602,6 +1602,12 @@ static int CclDefineNewAnimations(lua_State* l)
 			anims->Train = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "EndTrain")) {
 			anims->EndTrain = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "StartResearch")) {
+			anims->StartResearch = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Research")) {
+			anims->Research = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "EndResearch")) {
+			anims->EndResearch = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "StartBuild")) {
 			anims->StartBuild = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Build")) {
