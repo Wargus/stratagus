@@ -168,6 +168,19 @@ global void LoadMissileSprite(MissileType* mtype)
 }
 
 /**
+**  Load the graphics for all missiles types
+*/
+global void LoadMissileSprites(void)
+{
+#ifndef DYNAMIC_LOAD
+	int i;
+
+	for (i = 0; MissileTypes[i].OType; ++i) {
+		LoadMissileSprite(&MissileTypes[i]);
+	}
+#endif
+}
+/**
 **  Get Missile type by identifier.
 **
 **  @param ident  Identifier.

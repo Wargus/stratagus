@@ -1901,9 +1901,11 @@ global void DrawUnit(const Unit* unit)
 		cframe = unit->Seen.CFrame;
 	}
 
+#ifdef DYNAMIC_LOAD
 	if (!type->Sprite) {
 		LoadUnitTypeSprite(type);
 	}
+#endif
 
 	if ((!UnitVisible(unit, ThisPlayer)) && frame == UnitNotSeen) {
 		DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
