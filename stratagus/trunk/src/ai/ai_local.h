@@ -186,18 +186,18 @@ typedef struct _ai_running_script_ {
 #endif
     unsigned long	SleepCycles;	/// Cycles to sleep
     char		ident[10];	/// Debugging !
-    int			HotSpot_X;	/// Hot spot ( for defense, attack, ... )
-    int			HotSpot_Y;
-    int			HotSpot_Ray;
+    int			HotSpotX;	/// Hot spot ( for defense, attack, ... )
+    int			HotSpotY;
+    int			HotSpotRay;
 
     int			ownForce;	/// A force ID ( the n° of the script... )
 
-    // Total number of ressource gauges
-#define RESSOURCE_COUNT 3
+    // Total number of resource gauges
+#define RESOURCE_COUNT 3
     // Total number of forces gauges
 #define FORCE_COUNT	11
 
-#define GAUGE_NB (3+(RESSOURCE_COUNT*2)+(FORCE_COUNT*6))
+#define GAUGE_NB (3 + (RESOURCE_COUNT * 2) + (FORCE_COUNT * 6))
     int*		gauges;		/// Gauges values ( initially 0 )               
 } AiRunningScript;
 
@@ -243,7 +243,7 @@ struct _ai_action_evaluation_ {
 
     int			hotSpotValue;	/// Value of the hotspot ( total points to get... )
 
-    int			value;		/// Result of the evaluation ( ressources needed... )
+    int			value;		/// Result of the evaluation ( resources needed... )
 
     AiActionEvaluation*	Next;		/// Next in linked list
 };
@@ -456,7 +456,7 @@ extern void AiAttackWithForceAt(int force, int x, int y);
 extern void AiAttackWithForce(int force);
     /// Send force home
 extern void AiSendForceHome(int force);
-    /// Evaluate the cost to build a force (time to build + ressources)
+    /// Evaluate the cost to build a force (time to build + resources)
 extern int AiEvaluateForceCost(int force, int total);
     /// Complete a force from existing units.
 extern void AiForceComplete(int force);

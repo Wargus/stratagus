@@ -262,7 +262,9 @@ local void AiExecuteScripts(void)
     for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 	AiScript = pai->Scripts + i;
 	if (!gh_null_p(AiScript->Script)) {
-	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_ pai->Player->Player _C_ i _C_ AiScript->ident _C_ AiScript->HotSpot_X _C_ AiScript->HotSpot_Y);
+	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
+		pai->Player->Player _C_ i _C_ AiScript->ident _C_
+		AiScript->HotSpotX _C_ AiScript->HotSpotY);
 	    gh_display(AiScript->Script);
 	    gh_newline();*/
 
@@ -820,9 +822,9 @@ global void AiInit(Player* player)
 
     for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 	pai->Scripts[i].ownForce = AI_GENERIC_FORCES + i;
-	pai->Scripts[i].HotSpot_X = -1;
-	pai->Scripts[i].HotSpot_Y = -1;
-	pai->Scripts[i].HotSpot_Ray = -1;
+	pai->Scripts[i].HotSpotX = -1;
+	pai->Scripts[i].HotSpotY = -1;
+	pai->Scripts[i].HotSpotRay = -1;
 	pai->Scripts[i].gauges = 0;
 	pai->Scripts[i].SleepCycles = 0;
 #if defined(USE_GUILE) || defined(USE_SIOD)

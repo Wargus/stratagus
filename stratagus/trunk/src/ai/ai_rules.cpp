@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name rules.c	-	computer player AI helpers */
+/**@name ai_rules.c	-	computer player AI helpers */
 //
-//      (c) Copyright 2003 by Ludovic Pollet
+//      (c) Copyright 2003 by Ludovic Pollet and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 /**
 **	Ai runs one or more scripts simultaneously :
-**	* the first (0) launch building, upgrades, ressources, create attack & defense reserve
+**	* the first (0) launch building, upgrades, resources, create attack & defense reserve
 **	* the next ones are launched for attack or defense.
 **
 **	The scripts for attacking and defending are executed with a "hotspot" defined.
@@ -66,7 +66,7 @@
 **		* return a int value indicating : 
 **			-1 the script can't be executed
 **			0  the script is ready to be executed
-**			>0 more time/ressources are required to correctly fill the force
+**			>0 more time/resources are required to correctly fill the force
 **
 **	It receive the defined action as a parameter, and can make use of the unused part of it.
 **
@@ -101,8 +101,8 @@
 ** 		+1	enemy score
 ** 		+2	own score
 **
-**	 RessourcesBase:
-**	 	(Ressources availables on the map... Gold, Wood, ... )
+**	 ResourcesBase:
+**	 	(Resources availables on the map... Gold, Wood, ... )
 **	   	+0	On the hotspot
 **	   	+1	On the map
 **	
@@ -155,9 +155,9 @@
 #define HOTSPOT_AREA	0
 #define GLOBAL_AREA	3
 
-#define RESSOURCE_GOLD	0
-#define RESSOURCE_WOOD	1
-#define RESSOURCE_OIL	2
+#define RESOURCE_GOLD	0
+#define RESOURCE_WOOD	1
+#define RESOURCE_OIL	2
 
 // Can attack on water
 #define WATER_FORCE	0
@@ -188,23 +188,25 @@
 
 
 // These are indead constant...  
-static int ScoreBase = 0;
-static int RessourceBase = 3;
-static int ForceBase = 3 + (RESSOURCE_COUNT * 2);
+local int ScoreBase = 0;
+local int ResourceBase = 3;
+local int ForceBase = 3 + (RESOURCE_COUNT * 2);
 // Global number of (non computed) game state gauge...
-static int BasicGaugeNb = 3 + (RESSOURCE_COUNT * 2) + (FORCE_COUNT * 6);
+local int BasicGaugeNb = 3 + (RESOURCE_COUNT * 2) + (FORCE_COUNT * 6);
 
-static int GaugeValues[3 + (RESSOURCE_COUNT * 2) + (FORCE_COUNT * 6)];
+local int GaugeValues[3 + (RESOURCE_COUNT * 2) + (FORCE_COUNT * 6)];
 
-static Player *currentPlayer;
+local Player* currentPlayer;
 
 /// HotSpot description
-static int HotSpotX, HotSpotY, HotSpotRay;
+local int HotSpotX;
+local int HotSpotY;
+local int HotSpotRay;
 
-static const char *str_camp[3] = { "allied", "enemy", "self" };
-static const char *str_location[2] = { "hotspot", "map" };
-static const char *str_ressources[RESSOURCE_COUNT] = { "gold", "wood", "oil" };
-static const char *str_forces[FORCE_COUNT] = {
+local const char* str_camp[3] = { "allied", "enemy", "self" };
+local const char* str_location[2] = { "hotspot", "map" };
+local const char* str_resources[RESOURCE_COUNT] = { "gold", "wood", "oil" };
+local const char* str_forces[FORCE_COUNT] = {
     // Fire to  ( water / ground / air )
     "sea-fire", "ground-fire", "air-fire", "detectors",
     // Force of units on water, groud, air
@@ -218,29 +220,35 @@ static const char *str_forces[FORCE_COUNT] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-local int ForceGauge(int Force, int location, int camp)
+/**
+**	FIXME: docu
+*/
+local int ForceGauge(int force, int location, int camp)
 {
-    return ForceBase + Force * 6 + location * 3 + camp;
+    return ForceBase + force * 6 + location * 3 + camp;
 }
 
-local void AiGetGaugeName(int gauge, char *buffer, int bufferSize)
+/**
+**	FIXME: docu
+*/
+local void AiGetGaugeName(int gauge, char* buffer, int bufferSize)
 {
     int camp;
-    int ressource;
+    int resource;
     int location;
     int force;
 
-    if (gauge < RessourceBase) {
+    if (gauge < ResourceBase) {
 	gauge -= ScoreBase;
 	camp = gauge;
 	snprintf(buffer, bufferSize, "%s-score", str_camp[camp]);
 	return;
     }
     if (gauge < ForceBase) {
-	gauge -= RessourceBase;
-	ressource = gauge / 2;
+	gauge -= ResourceBase;
+	resource = gauge / 2;
 	location = gauge % 2;
-	snprintf(buffer, bufferSize, "%s-%s", str_ressources[ressource],
+	snprintf(buffer, bufferSize, "%s-%s", str_resources[resource],
 	    str_location[location]);
 	return;
     }
@@ -263,17 +271,17 @@ local void AiGetGaugeName(int gauge, char *buffer, int bufferSize)
 **	@param x	X map position of unit
 **	@param y	Y map position of unit
 **	@return 	1 if it is in the hotspot, 0 otherwisee
-**/
+*/
 local int AiCheckOnHotSpot(int x, int y)
 {
     int dst;
-    if ((AiScript->HotSpot_X < 0) || (AiScript->HotSpot_Y < 0)
-	|| (AiScript->HotSpot_Ray <= 0)) {
+
+    if (AiScript->HotSpotX < 0 || AiScript->HotSpotY < 0 ||
+	    AiScript->HotSpotRay <= 0) {
 	return 0;
     }
-    dst = abs(x - AiScript->HotSpot_X) + abs(y - AiScript->HotSpot_Y);
-    return dst < AiScript->HotSpot_Ray;
-
+    dst = abs(x - AiScript->HotSpotX) + abs(y - AiScript->HotSpotY);
+    return dst < AiScript->HotSpotRay;
 }
 
 /**
@@ -281,10 +289,11 @@ local int AiCheckOnHotSpot(int x, int y)
 **
 ** 	@param p 	the player
 **	@return		FOR_SELF,FOR_ALLIED,FOR_ENEMY,FOR_NEUTRAL  
-**/
-local int AiGetPlayerCamp(Player * p)
+*/
+local int AiGetPlayerCamp(Player* p)
 {
     int id;
+
     if (!p) {
 	return FOR_NEUTRAL;
     }
@@ -303,10 +312,14 @@ local int AiGetPlayerCamp(Player * p)
     return FOR_NEUTRAL;
 }
 
-global int AiUnittypeForce(UnitType * unitType)
+/**
+**	FIXME: docu
+*/
+global int AiUnittypeForce(UnitType* unitType)
 {
     int influence;
-    // Fixme : Ratio between stats are fixed
+
+    // FIXME: Ratio between stats are fixed
     influence = unitType->Stats[AiPlayer->Player->Player].AttackRange +
 	unitType->Stats[AiPlayer->Player->Player].Armor +
 	unitType->Stats[AiPlayer->Player->Player].BasicDamage +
@@ -317,18 +330,17 @@ global int AiUnittypeForce(UnitType * unitType)
     if (influence == 0) {
 	return 1;
     }
-
     return influence;
 }
 
 /**
-**	Add an unit to the current gauges
-**	
+**	Add a unit to the current gauges
+**
 **	@param x	X map position of unit
 **	@param y	Y map position of unit
 **	@param unit 	actual unit ( used for gold mine amount, ... )
 **/
-local void AiDeclareUnitImpact(int x, int y, Unit * unit)
+local void AiDeclareUnitImpact(int x, int y, Unit* unit)
 {
     // Unit camp
     int camp;
@@ -353,7 +365,7 @@ local void AiDeclareUnitImpact(int x, int y, Unit * unit)
     //unittype_slot=unitType->Type;
 
     onhotspot = AiCheckOnHotSpot(x, y);
-    //unittype_base=UnitTypeBase+6*unittype_slot;
+    //unittype_base = UnitTypeBase + 6 * unittype_slot;
 
     if (camp != FOR_NEUTRAL) {
 
@@ -401,7 +413,7 @@ local void AiDeclareUnitImpact(int x, int y, Unit * unit)
 	influences[INVISIBLE_UNITS_VALUE] = (unitType->PermanentCloak ? 1 : 0);
 
 	// Check if the unit has influence on force gauges
-	for (force = 0; force < FORCE_COUNT; force++) {
+	for (force = 0; force < FORCE_COUNT; ++force) {
 	    if ((influence = influences[force])) {
 		if (onhotspot) {
 		    GaugeValues[ForceBase + force * 6 + HOTSPOT_AREA + camp] +=
@@ -411,22 +423,25 @@ local void AiDeclareUnitImpact(int x, int y, Unit * unit)
 	    }
 	}
     }
-    // Update ressources counts
-    // TODO : ressource not correctly computed ( but still unused... )
+    // Update resources counts
+    // TODO : resource not correctly computed ( but still unused... )
 }
 
+/**
+**	FIXME: docu
+*/
 global void AiDebugGauges(void)
 {
     int gauge;
-    int *values;
+    int* values;
     char buffer[256];
-    values = AiScript->gauges;
 
+    values = AiScript->gauges;
     if (!values) {
 	return;
     }
 
-    for (gauge = 0; gauge < GAUGE_NB; gauge++) {
+    for (gauge = 0; gauge < GAUGE_NB; ++gauge) {
 	AiGetGaugeName(gauge, buffer, 256);
 	DebugLevel3Fn("%32s:%4d" _C_ buffer _C_ values[gauge]);
     }
@@ -441,24 +456,24 @@ global void AiDebugGauges(void)
 **		- the landpath needed to go there by air
 **		- the landpath needed to go there on ground
 **		- ...
-**/
+*/
 global void AiComputeCurrentScriptGauges(void)
 {
     int unit_id;
     int camp;
     int player_id;
-    Unit *unit;
+    Unit* unit;
 
     currentPlayer = AiPlayer->Player;
 
-    HotSpotX = AiScript->HotSpot_X;
-    HotSpotY = AiScript->HotSpot_Y;
-    HotSpotRay = AiScript->HotSpot_Ray;
+    HotSpotX = AiScript->HotSpotX;
+    HotSpotY = AiScript->HotSpotY;
+    HotSpotRay = AiScript->HotSpotRay;
 
     // Clear gauges
-    memset(GaugeValues, 0, sizeof (int) * GAUGE_NB);
+    memset(GaugeValues, 0, sizeof(int) * GAUGE_NB);
 
-    for (player_id = 0; player_id < NumPlayers; player_id++) {
+    for (player_id = 0; player_id < NumPlayers; ++player_id) {
 	camp = AiGetPlayerCamp(Players + player_id);
 	if (camp != FOR_NEUTRAL) {
 	    GaugeValues[camp] += Players[player_id].Score;
@@ -466,13 +481,13 @@ global void AiComputeCurrentScriptGauges(void)
     }
 
     // Iterates Units...
-    for (unit_id = 0; unit_id < NumUnits; unit_id++) {
+    for (unit_id = 0; unit_id < NumUnits; ++unit_id) {
 	unit = Units[unit_id];
 
 	if ((unit)->Orders[0].Action == UnitActionDie) {
 	    continue;
 	}
-	if ((unit->X == -1) || (unit->Y == -1)) {
+	if (unit->X == -1 || unit->Y == -1) {
 	    continue;
 	}
 
@@ -485,10 +500,10 @@ global void AiComputeCurrentScriptGauges(void)
 
     // If necessary, allocate space for values
     if (!AiScript->gauges) {
-	AiScript->gauges = (int *) malloc(sizeof (int) * BasicGaugeNb);
+	AiScript->gauges = (int*)malloc(sizeof(int) * BasicGaugeNb);
     }
-    // Copy gauges 
-    memcpy(AiScript->gauges, GaugeValues, sizeof (int) * BasicGaugeNb);
+    // Copy gauges
+    memcpy(AiScript->gauges, GaugeValues, sizeof(int) * BasicGaugeNb);
 }
 
 /**
@@ -553,10 +568,14 @@ global int AiFindGaugeId(lua_State* l)
 }
 #endif
 
+/**
+**	FIXME: docu
+*/
 local int AiFindUnusedScript(void)
 {
     int i;
-    for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
+
+    for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	if (gh_null_p(AiPlayer->Scripts[i].Script)) {
 	    return i;
@@ -586,17 +605,21 @@ local int AiEvaluateScript(SCM script)
     get_need_lambda = gh_cadr(gh_car(script));
     willeval =
 	cons(get_need_lambda,
-	cons(cons(gh_symbol2scm("quote"), cons(script, NIL)), NIL));
+	    cons(cons(gh_symbol2scm("quote"), cons(script, NIL)), NIL));
 
     rslt = gh_eval(willeval, NIL);
 
     return gh_scm2int(rslt);
 }
 #elif defined(USE_LUA)
+local int AiEvaluateScript()
+{
+    return 0;
+}
 #endif
 
 /**
-**	Evaluate the cost to build a force (time to build + ressources)
+**	Evaluate the cost to build a force (time to build + resources)
 **
 **	@param force	the force
 **	@param total	want cost to build the entire force (1), or only for missing units ?
@@ -604,27 +627,25 @@ local int AiEvaluateScript(SCM script)
 */
 global int AiEvaluateForceCost(int force, int total)
 {
-    int want, i, j;
-
+    int want;
+    int i;
+    int j;
     int count[UnitTypeMax + 1];
     int builders;
-
     int equivtypesnb;
     int equivtypes[UnitTypeMax + 1];
-    
     int globalCosts[MaxCosts];
     int globalTime;
-    int cost, own;
-    
+    int cost;
+    int own;
     int forcesize;
     int missing;
-    
-    AiUnitType *unittype;
-    UnitType * usedtype;
+    AiUnitType* unittype;
+    UnitType* usedtype;
 
     if (total) {
-	for (i = 0; i <= UnitTypeMax; i++) {
-	    count[i]=0;
+	for (i = 0; i <= UnitTypeMax; ++i) {
+	    count[i] = 0;
 	}
     } else {
 	AiForceCountUnits(force, count);
@@ -644,7 +665,7 @@ global int AiEvaluateForceCost(int force, int total)
 	return 0;
     }
 
-    for (i = 0; i < MaxCosts; i++) {
+    for (i = 0; i < MaxCosts; ++i) {
 	globalCosts[i] = 0;
     }
     globalTime = 0;
@@ -652,12 +673,12 @@ global int AiEvaluateForceCost(int force, int total)
     // For each "want" unittype, evaluate a cost, based on the number of units.
     unittype = AiPlayer->Force[force].UnitTypes;
 
-    forcesize=0;
+    forcesize = 0;
 
     while (unittype) {
 	forcesize += unittype->Want;
 
-	want = (-count[UnitTypeEquivs[unittype->Type->Type]]);
+	want = -count[UnitTypeEquivs[unittype->Type->Type]];
 
 	// Don't count full unittypes...
 	if (want > 0) {
@@ -670,7 +691,7 @@ global int AiEvaluateForceCost(int force, int total)
 	    // Find number of units which can build them
 	    builders = 0;
 	    usedtype = 0;
-	    for (i = 0;i < equivtypesnb; i++) {
+	    for (i = 0; i < equivtypesnb; ++i) {
 		j = AiCountUnitBuilders(UnitTypes[equivtypes[i]]);
 		if (j > builders) {
 		    usedtype = UnitTypes[equivtypes[i]];
@@ -685,7 +706,7 @@ global int AiEvaluateForceCost(int force, int total)
 
 	    // FIXME : all costs count the same there
 	    // ( sum all costs ... )
-	    for (i = 0; i < MaxCosts; i++) {
+	    for (i = 0; i < MaxCosts; ++i) {
 		globalCosts[i] += want * usedtype->_Costs[i];
 	    }
 
@@ -699,11 +720,11 @@ global int AiEvaluateForceCost(int force, int total)
 	unittype = unittype->Next;
     }
 
-    // Count the ressource proportionnaly to player ressource 
+    // Count the resource proportionnaly to player resource 
     cost = 0;
 
-    // Each ressource count as percentage of available...
-    for (i = 0; i < MaxCosts; i++) {
+    // Each resource count as percentage of available...
+    for (i = 0; i < MaxCosts; ++i) {
 	if (globalCosts[i]) {
 	    own = AiPlayer->Player->Resources[i];
 	    // FIXME : minimum 400 is hardcoded ...
@@ -721,7 +742,7 @@ global int AiEvaluateForceCost(int force, int total)
     cost += globalTime / 20;
 
     // Apply a multiplier on big forces :
-    // 100+(n-5)*10 % :  5 unit = 100 %, 15 units = 200 %, 25 units = 300 %, ...  
+    // 100 + (n - 5) * 10 % :  5 unit = 100 %, 15 units = 200 %, 25 units = 300 %, ...  
     if (forcesize > 5) {
 	cost = (cost * (100 + (forcesize - 5) * 10)) / 100;
     }
@@ -731,25 +752,23 @@ global int AiEvaluateForceCost(int force, int total)
 	cost = (cost * (100 + (forcesize - 50) * 10)) / 100;
     }
 
-
     return cost;
 }
 
 
 /**
 **	Update the dst_force, so that it requires at least what "force" requires 
-**
 */
 local void AiUpdateForce(int dst_force, int force)
 {
     int i;
     int unitcount[UnitTypeMax + 1];
-    AiUnitType *aitype;
+    AiUnitType* aitype;
 
-    memset(unitcount, 0, (UnitTypeMax + 1) * sizeof (int));
+    memset(unitcount, 0, (UnitTypeMax + 1) * sizeof(int));
     AiForceSubstractWant(force, unitcount);
-    for (i = 0; i <= UnitTypeMax; i++) {
-	unitcount[i] = (-unitcount[i]);
+    for (i = 0; i <= UnitTypeMax; ++i) {
+	unitcount[i] = -unitcount[i];
     }
 
     aitype = AiPlayer->Force[dst_force].UnitTypes;
@@ -763,9 +782,9 @@ local void AiUpdateForce(int dst_force, int force)
 	aitype = aitype->Next;
     }
 
-    for (i = 0; i <= UnitTypeMax; i++) {
+    for (i = 0; i <= UnitTypeMax; ++i) {
 	if (unitcount[i] > 0) {
-	    aitype = (AiUnitType *) malloc(sizeof (AiUnitType));
+	    aitype = (AiUnitType*)malloc(sizeof (AiUnitType));
 	    aitype->Want = unitcount[i];
 	    aitype->Type = UnitTypes[i];
 
@@ -777,58 +796,62 @@ local void AiUpdateForce(int dst_force, int force)
 }
 
 /**
-** Find the best script for a target.
-** 
-** Return the best value. 
+**	Find the best script for a target.
+**
+**	@param defend			FIXME: docu
+**	@param foundBestScriptAction	FIXME: docu
+**	@return				the best value
 */
-local int AiFindBestScript(int defend, AiScriptAction * *foundBestScriptAction)
+local int AiFindBestScript(int defend, AiScriptAction** foundBestScriptAction)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    AiScriptAction *aiScriptAction, *bestScriptAction;
-    int bestValue, curValue;
+    AiScriptAction* aiScriptAction;
+    AiScriptAction* bestScriptAction;
+    int bestValue;
+    int curValue;
     int i;
 
-    // Find the best to do !
+    // Find the best to do!
     bestScriptAction = 0;
     bestValue = -1;
 
-    for (i = 0; i < AiScriptActionNum; i++) {
+    for (i = 0; i < AiScriptActionNum; ++i) {
 	aiScriptAction = AiScriptActions + i;
 
-	if ((defend && (aiScriptAction->Defensive))
-		|| ((!defend) && (aiScriptAction->Offensive))) {
+	if ((defend && aiScriptAction->Defensive) ||
+		(!defend && aiScriptAction->Offensive)) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
 	    curValue = AiEvaluateScript(aiScriptAction->Action);
+#elif defined(USE_LUA)
+	    curValue = -1;
+#endif
 	    DebugLevel3Fn("evaluate script ");
 #if 0
 	    gh_display(gh_car(gh_car(aiScriptAction->Action)));
 #endif
 	    DebugLevel3Fn(" => %d\n" _C_ curValue);
-	    if ((curValue != -1) && ((!bestScriptAction) || (curValue <= bestValue))) {
+	    if (curValue != -1 && (!bestScriptAction || (curValue <= bestValue))) {
 		bestScriptAction = aiScriptAction;
 		bestValue = curValue;
 	    }
-	    // TODO : move to force 1 if attacking !!!!
+	    // TODO : move to force 1 if attacking!!!!
 	    AiEraseForce(AiScript->ownForce);
 	}
     }
 
-    (*foundBestScriptAction) = bestScriptAction;
+    *foundBestScriptAction = bestScriptAction;
     return bestValue;
-#elif defined(USE_LUA)
-    return 0;
-#endif
 }
 
 /**
 ** 	
 **	Prepare a script execution, by filling fields & computing gauges 
 **
-**	@param HotSpot_X	X position of the hotspot
-**	@param HotSpot_Y	Y position of the hotspot
-**	@param HotSpot_Ray	Size of the hotspot
+**	@param hotspotx		X position of the hotspot
+**	@param hotspoty		Y position of the hotspot
+**	@param hotspotray	Size of the hotspot
 **	@param defend		Is this a defense script ?	
 */
-local int AiPrepareScript(int HotSpot_X, int HotSpot_Y, int HotSpot_Ray, int defend)
+local int AiPrepareScript(int hotspotx, int hotspoty, int hotspotray, int defend)
 {
     int scriptid;
 
@@ -844,10 +867,10 @@ local int AiPrepareScript(int HotSpot_X, int HotSpot_Y, int HotSpot_Ray, int def
     }
     // Need to set AiScript, to make AiEvaluateScript work
     AiScript = AiPlayer->Scripts + scriptid;
-    AiScript->HotSpot_X = HotSpot_X;
-    AiScript->HotSpot_Y = HotSpot_Y;
+    AiScript->HotSpotX = hotspotx;
+    AiScript->HotSpotY = hotspoty;
 
-    AiScript->HotSpot_Ray = HotSpot_Ray;
+    AiScript->HotSpotRay = hotspotray;
     AiEraseForce(AiScript->ownForce);
     AiPlayer->Force[AiScript->ownForce].Role =
 	(defend ? AiForceRoleDefend : AiForceRoleAttack);
@@ -861,7 +884,10 @@ local int AiPrepareScript(int HotSpot_X, int HotSpot_Y, int HotSpot_Ray, int def
     return scriptid;
 }
 
-local void AiStartScript(AiScriptAction * script, char *ident)
+/**
+**	FIXME: docu
+*/
+local void AiStartScript(AiScriptAction* script, char* ident)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     SCM code;
@@ -882,12 +908,15 @@ local void AiStartScript(AiScriptAction * script, char *ident)
 #endif
 }
 
-
+/**
+**	FIXME: docu
+*/
 global void AiFindDefendScript(int attackX, int attackY)
 {
     int bestValue;
-    int totalCost, leftCost;
-    AiScriptAction *bestScriptAction;
+    int totalCost;
+    int leftCost;
+    AiScriptAction* bestScriptAction;
 
     if (!AiPrepareScript(attackX, attackY, 12, 1)) {
 	return;
@@ -910,7 +939,7 @@ global void AiFindDefendScript(int attackX, int attackY)
 
     leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
     totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
-    if (leftCost <= ((7 * totalCost) / 10)) {
+    if (leftCost <= (7 * totalCost) / 10) {
     	DebugLevel3Fn("launch defense script\n");
     	AiStartScript(bestScriptAction, "defend");
     } else {
@@ -919,31 +948,34 @@ global void AiFindDefendScript(int attackX, int attackY)
     }
 }
 
-local Unit *RandomPlayerUnit(Player * player)
+/**
+**	FIXME: docu
+*/
+local Unit* RandomPlayerUnit(Player* player)
 {
-    int try;
+    int i;
     int unitId;
-    Unit *unit;
-    AiActionEvaluation * action;
+    Unit* unit;
+    AiActionEvaluation* action;
 
     if (!player->TotalNumUnits) {
 	return NoUnitP;
     }
 
-    for (try = 0; try < 20; try++) {
+    for (i = 0; i < 20; ++i) {
 	unitId = SyncRand() % player->TotalNumUnits;
 	unit = player->Units[unitId];
 
-	// FIXME : is this unit targettable ?
-	if ((unit->Removed) || ((unit)->Orders[0].Action == UnitActionDie)) {
+	// FIXME: is this unit targettable ?
+	if (unit->Removed || (unit)->Orders[0].Action == UnitActionDie) {
 	    continue;
 	}
 
 	// Don't take unit near past evaluations
 	action = AiPlayer->FirstEvaluation;
 	while (action) {
-	    if ((abs(action->hotSpotX - unit->X) < 8)
-	    	&& (abs(action->hotSpotY - unit->Y) < 8)) {
+	    if ((abs(action->hotSpotX - unit->X) < 8) &&
+		    (abs(action->hotSpotY - unit->Y) < 8)) {
 	    	unit = NoUnitP;
 		break;
 	    }
@@ -957,9 +989,12 @@ local Unit *RandomPlayerUnit(Player * player)
 
 }
 
-local Unit *RandomEnemyUnit(void)
+/**
+**	FIXME: docu
+*/
+local Unit* RandomEnemyUnit(void)
 {
-    int try;
+    int i;
     int player;
     int enemyPlayers[PlayerMax];
     int enemyPlayerCount;
@@ -968,10 +1003,10 @@ local Unit *RandomEnemyUnit(void)
     // find enemies
     enemyPlayerCount = 0;
     for (player = 0; player < NumPlayers; player++) {
-	if ((AiPlayer->Player->Enemy & (1 << player))
-	    && (AiPlayer->Player->TotalNumUnits)) {
+	if ((AiPlayer->Player->Enemy & (1 << player)) &&
+		AiPlayer->Player->TotalNumUnits) {
 	    enemyPlayers[enemyPlayerCount] = player;
-	    enemyPlayerCount++;
+	    ++enemyPlayerCount;
 	}
     }
 
@@ -979,7 +1014,7 @@ local Unit *RandomEnemyUnit(void)
 	return NoUnitP;
     }
 
-    for (try = 0; try < 10; try++) {
+    for (i = 0; i < 10; ++i) {
 	// find one enemy
 	player = enemyPlayers[SyncRand() % enemyPlayerCount];
 
@@ -998,7 +1033,9 @@ local Unit *RandomEnemyUnit(void)
 */
 local void AiRemoveFirstAiPlayerEvaluation(void)
 {
-    AiActionEvaluation *actionEvaluation = AiPlayer->FirstEvaluation;
+    AiActionEvaluation* actionEvaluation;
+    
+    actionEvaluation = AiPlayer->FirstEvaluation;
 
     AiPlayer->FirstEvaluation = actionEvaluation->Next;
     if (!AiPlayer->FirstEvaluation) {
@@ -1022,23 +1059,30 @@ local void AiCleanAiPlayerEvaluations(void)
     }
 
     // Keep no more than 1 minutes.
-    memorylimit=GameCycle-30*60;
+    memorylimit = GameCycle - 30 * 60;
 
-    while (AiPlayer->FirstEvaluation && AiPlayer->FirstEvaluation->gamecycle < memorylimit){
+    while (AiPlayer->FirstEvaluation &&
+	    AiPlayer->FirstEvaluation->gamecycle < memorylimit){
 	AiRemoveFirstAiPlayerEvaluation();
     }
 }
 
+/**
+**
+*/
 global void AiPeriodicAttack(void)
 {
-    AiScriptAction *bestScriptAction;
-    AiActionEvaluation *actionEvaluation;
-    Unit *enemy;
+    AiScriptAction* bestScriptAction;
+    AiActionEvaluation* actionEvaluation;
+    Unit* enemy;
     int bestScriptValue;
-    AiActionEvaluation *bestActionEvaluation;
-    int bestValue, bestHotSpot;
-    int leftCost, totalCost;
-    int delta, bestDelta;
+    AiActionEvaluation* bestActionEvaluation;
+    int bestValue;
+    int bestHotSpot;
+    int leftCost;
+    int totalCost;
+    int delta;
+    int bestDelta;
 
     AiCleanAiPlayerEvaluations();
 
@@ -1050,7 +1094,7 @@ global void AiPeriodicAttack(void)
     }
 
     // Find a unit as start point.
-    // own=RandomPlayerUnit(AiPlayer->Player);
+    // own = RandomPlayerUnit(AiPlayer->Player);
     // Need to set AiScript, to make AiEvaluateScript work
     if (!AiPrepareScript(enemy->X, enemy->Y, 16, 0)) {
 	return;
@@ -1064,16 +1108,16 @@ global void AiPeriodicAttack(void)
     }
 
     // Add a new ActionEvaluation at the end of the queue
-    actionEvaluation = (AiActionEvaluation *) malloc(sizeof (AiActionEvaluation));
+    actionEvaluation = (AiActionEvaluation*)malloc(sizeof(AiActionEvaluation));
     actionEvaluation->aiScriptAction = bestScriptAction;
     actionEvaluation->gamecycle = GameCycle;
     actionEvaluation->hotSpotX = enemy->X;
     actionEvaluation->hotSpotY = enemy->Y;
     actionEvaluation->value = bestScriptValue;
     actionEvaluation->hotSpotValue =
-	AiGetGaugeValue(ForceGauge(WATER_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY))
-	+ AiGetGaugeValue(ForceGauge(GROUND_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY))
-	+ AiGetGaugeValue(ForceGauge(AIR_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY));
+	AiGetGaugeValue(ForceGauge(WATER_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY)) +
+	    AiGetGaugeValue(ForceGauge(GROUND_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY)) +
+	    AiGetGaugeValue(ForceGauge(AIR_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY));
     DebugLevel2Fn("new action at %d %d, hotspotValue=%d, cost=%d\n" _C_
 	enemy->X _C_ enemy->Y _C_
 	actionEvaluation->hotSpotValue _C_ actionEvaluation->value);
@@ -1095,12 +1139,12 @@ global void AiPeriodicAttack(void)
 
     actionEvaluation = AiPlayer->FirstEvaluation;
     while (actionEvaluation) {
-	if (((bestValue == -1) || (actionEvaluation->value <= bestValue))
-	    && (actionEvaluation->hotSpotValue >= bestHotSpot)) {
+	if ((bestValue == -1 || actionEvaluation->value <= bestValue) &&
+		actionEvaluation->hotSpotValue >= bestHotSpot) {
 	    bestActionEvaluation = actionEvaluation;
 	}
 
-	if ((bestValue == -1) || (actionEvaluation->value <= bestValue)) {
+	if (bestValue == -1 || actionEvaluation->value <= bestValue) {
 	    bestValue = actionEvaluation->value;
 	}
 	if (actionEvaluation->hotSpotValue >= bestHotSpot) {
@@ -1109,10 +1153,10 @@ global void AiPeriodicAttack(void)
 	actionEvaluation = actionEvaluation->Next;
     }
 
-    if ((!bestActionEvaluation) && bestValue != -1 ){
-	// If nothing available, try the best compromis ( value - hotspot )
+    if (!bestActionEvaluation && bestValue != -1) {
+	// If nothing available, try the best compromise ( value - hotspot )
 	actionEvaluation = AiPlayer->FirstEvaluation;
-	bestDelta=0;
+	bestDelta = 0;
     	while (actionEvaluation) {
 	    delta = (20 * actionEvaluation->hotSpotValue) / (actionEvaluation->value + 1);
 	    if (bestDelta == -1 || delta <= bestDelta) {
@@ -1121,7 +1165,7 @@ global void AiPeriodicAttack(void)
 	}
     }
 
-    if ((bestActionEvaluation)) {
+    if (bestActionEvaluation) {
 	DebugLevel3Fn("has a best script, value=%d, hotspot=%d\n" _C_ bestValue _C_
 	    bestHotSpot);
 	// => lance si la force est à 80-90%... 
@@ -1136,7 +1180,8 @@ global void AiPeriodicAttack(void)
 	leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
 	totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
 	if (leftCost > totalCost) {
-	    DebugLevel0Fn("Left cost superior to totalcost ( %d > %d )\n" _C_ leftCost _C_ totalCost);
+	    DebugLevel0Fn("Left cost superior to totalcost ( %d > %d )\n" _C_
+		leftCost _C_ totalCost);
 	}
 
 	if (leftCost <= ((2 * totalCost) / 10)) {
