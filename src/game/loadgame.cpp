@@ -152,6 +152,9 @@ global void InitModules(void)
     InitDependencies();
 
     InitButtons();
+
+    InitAiModule();
+
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize();
 #endif

@@ -585,19 +585,25 @@ local int AiEvaluateScript(SCM script)
 */
 global int AiEvaluateForceCost(int force, int total)
 {
-    int want, i;
+    int want, i, j;
 
     int count[UnitTypeMax + 1];
     int builders;
 
+    int equivtypesnb;
+    int equivtypes[UnitTypeMax + 1];
+    
     int globalCosts[MaxCosts];
     int globalTime;
     int cost, own;
-
+    
+    int forcesize;
+    
     AiUnitType *unittype;
-
+    UnitType * usedtype;
 
     AiForceCountUnits(force, count);
+
     // We have everything ready
     if (!total) {
 	if (!AiForceSubstractWant(force, count)) {
@@ -613,37 +619,54 @@ global int AiEvaluateForceCost(int force, int total)
 
     // For each "want" unittype, evaluate a cost, based on the number of units.
     unittype = AiPlayer->Force[force].UnitTypes;
+
+    forcesize=0;
+
     while (unittype) {
-	want = (-count[unittype->Type->Type]);
+	forcesize += unittype->Want;
 
-	// Don't count full unittypes...        
+	want = (-count[UnitTypeEquivs[unittype->Type->Type]]);
+
+	// Don't count full unittypes...
 	if (want > 0) {
-	    if (!CheckDependByIdent(AiPlayer->Player, unittype->Type->Ident)) {
-		return -1;
-	    }
-	    // Find number of units which can build this            
-	    builders = AiCountUnitBuilders(unittype->Type);
+	    // Never count it twice...
+	    count[UnitTypeEquivs[unittype->Type->Type]] = 0;
 
+	    // Find usable types for building
+	    equivtypesnb = AiFindAvailableUnitTypeEquiv(unittype->Type, equivtypes);
+
+	    // Find number of units which can build them
+	    builders = 0;
+	    usedtype = 0;
+	    for (i = 0;i < equivtypesnb; i++) {
+		j = AiCountUnitBuilders(UnitTypes[equivtypes[i]]);
+		if (j > builders) {
+		    usedtype = UnitTypes[equivtypes[i]];
+		    builders = j;
+		}
+	    }
+	    
 	    // No way to build this, return -1
 	    if (!builders) {
 		return -1;
 	    }
+
 	    // FIXME : all costs count the same there
 	    // ( sum all costs ... )
-
 	    for (i = 0; i < MaxCosts; i++) {
-		globalCosts[i] += want * unittype->Type->_Costs[i];
+		globalCosts[i] += want * usedtype->_Costs[i];
 	    }
 
 	    // FIXME : buildtime is assumed to be proportionnal to hitpoints 
 
 	    // Time to build the first
-	    globalTime += unittype->Type->_HitPoints;
+	    globalTime += usedtype->_HitPoints;
 	    // Time to build the nexts
-	    globalTime += (unittype->Type->_HitPoints * want) / builders;
+	    globalTime += (usedtype->_HitPoints * want) / builders;
 	}
 	unittype = unittype->Next;
     }
+
     // Count the ressource proportionnaly to player ressource 
     cost = 0;
 
@@ -661,9 +684,15 @@ global int AiEvaluateForceCost(int force, int total)
     }
 
 
-    // FIXME : 20 / 1 ratio between buildtime and cost is hardcoded         
+    // FIXME : 20 / 1 ratio between buildtime and cost is hardcoded
     // Here globalTime is ~ the sum of all HitPoints...
     cost += globalTime / 20;
+
+    // Apply a multiplier on big forces :
+    // 100+(n-5)*10 % :  5 unit = 100 %, 15 units = 200 %, 25 units = 300 %, ...  
+    if (forcesize > 5) {
+	cost = (cost * (100 + (forcesize - 5) * 10)) / 100;
+    }
 
     return cost;
 }
@@ -780,8 +809,8 @@ local int AiPrepareScript(int HotSpot_X, int HotSpot_Y, int HotSpot_Ray, int def
     AiEraseForce(AiScript->ownForce);
     AiPlayer->Force[AiScript->ownForce].Role =
 	(defend ? AiForceRoleDefend : AiForceRoleAttack);
-    AiPlayer->Force[AiScript->ownForce].PopulateMode =
-	(defend ? AiForcePopulateAny : AiForcePopulateFromAttack);
+    AiPlayer->Force[AiScript->ownForce].PopulateMode = 
+    	(defend ? AiForcePopulateAny : AiForcePopulateFromAttack);
     AiPlayer->Force[AiScript->ownForce].UnitsReusable = 0;
     AiPlayer->Force[AiScript->ownForce].HelpMode = AiForceHelpForce;
 
@@ -796,6 +825,7 @@ local void AiStartScript(AiScriptAction * script, char *ident)
 
     // Compute force requirements.
     AiEvaluateScript(script->Action);
+
     // TODO : move from force 0 to force script->ownForce    
     // TODO : give some feedback on force 0 !
 
@@ -810,6 +840,7 @@ local void AiStartScript(AiScriptAction * script, char *ident)
 global void AiFindDefendScript(int attackX, int attackY)
 {
     int bestValue;
+    int totalCost, leftCost;
     AiScriptAction *bestScriptAction;
 
     if (!AiPrepareScript(attackX, attackY, 12, 1)) {
@@ -825,8 +856,18 @@ global void AiFindDefendScript(int attackX, int attackY)
 	DebugLevel3Fn("no correct defense action script available...\n");
 	return;
     }
-    DebugLevel3Fn("launch script with value %d\n" _C_ bestValue);
-    AiStartScript(bestScriptAction, "defend");
+
+    AiEvaluateScript(bestScriptAction->Action);
+
+    leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
+    totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
+    if (leftCost <= ((7 * totalCost) / 10)) {
+    	DebugLevel3Fn("launch defense script\n");
+    	AiStartScript(bestScriptAction, "defend");
+    }else{
+	DebugLevel3Fn("not ready for defense\n");
+    	AiStartScript(bestScriptAction, "defend");
+    }
 }
 
 local Unit *RandomPlayerUnit(Player * player)
@@ -834,15 +875,31 @@ local Unit *RandomPlayerUnit(Player * player)
     int try;
     int unitId;
     Unit *unit;
+    AiActionEvaluation * action;
     if (!player->TotalNumUnits) {
 	return NoUnitP;
     }
 
-    for (try = 0; try < 10; try++) {
+    for (try = 0; try < 20; try++) {
 	unitId = SyncRand() % player->TotalNumUnits;
 	unit = player->Units[unitId];
-	// FIXME : is this unit targettable ?   
-	if ((!unit->Removed) && (!((unit)->Orders[0].Action == UnitActionDie))) {
+
+	// FIXME : is this unit targettable ?
+	if ((unit->Removed) || ((unit)->Orders[0].Action == UnitActionDie)) {
+	    continue;
+	}
+
+	// Don't take unit near past evaluations
+	action = AiPlayer->FirstEvaluation;
+	while (action) {
+	    if ((abs(action->hotSpotX - unit->X) < 8)
+	    	&& (abs(action->hotSpotY - unit->Y) < 8)) {
+	    	unit = NoUnitP;
+		break;
+	    }
+	    action = action->Next;
+	}
+	if (unit != NoUnitP) {
 	    return unit;
 	}
     }
@@ -886,13 +943,40 @@ local Unit *RandomEnemyUnit(void)
     return NoUnitP;
 }
 
+/**
+**	Remove the oldest action evaluation
+*/
 local void AiRemoveFirstAiPlayerEvaluation(void)
 {
     AiActionEvaluation *actionEvaluation = AiPlayer->FirstEvaluation;
 
     AiPlayer->FirstEvaluation = actionEvaluation->Next;
+    if (! AiPlayer->FirstEvaluation) {
+	AiPlayer->LastEvaluation = 0;
+    }
+
     free(actionEvaluation);
     AiPlayer->EvaluationCount--;
+}
+
+/**
+**	Remove outdated evaluations
+*/
+local void AiCleanAiPlayerEvaluations(void)
+{
+    int memorylimit;
+
+    // Don't keep more than AI_MEMORY_SIZE ( remove old ones )  
+    while (AiPlayer->EvaluationCount >= AI_MEMORY_SIZE) {
+	AiRemoveFirstAiPlayerEvaluation();
+    }
+
+    // Keep no more than 1 minutes.
+    memorylimit=GameCycle-30*60;
+
+    while (AiPlayer->FirstEvaluation && AiPlayer->FirstEvaluation->gamecycle < memorylimit){
+	AiRemoveFirstAiPlayerEvaluation();
+    }
 }
 
 global void AiPeriodicAttack(void)
@@ -904,6 +988,9 @@ global void AiPeriodicAttack(void)
     AiActionEvaluation *bestActionEvaluation;
     int bestValue, bestHotSpot;
     int leftCost, totalCost;
+    int delta, bestDelta;
+
+    AiCleanAiPlayerEvaluations();
 
     // Find a random enemy unit.
     enemy = RandomEnemyUnit();
@@ -911,6 +998,7 @@ global void AiPeriodicAttack(void)
 	DebugLevel3Fn("No enemy unit found for attack, giving up !\n");
 	return;
     }
+
     // Find a unit as start point.
     // own=RandomPlayerUnit(AiPlayer->Player);
     // Need to set AiScript, to make AiEvaluateScript work
@@ -924,9 +1012,11 @@ global void AiPeriodicAttack(void)
 	DebugLevel3Fn("No usable attack script, giving up !\n");
 	return;
     }
+
     // Add a new ActionEvaluation at the end of the queue
     actionEvaluation = (AiActionEvaluation *) malloc(sizeof (AiActionEvaluation));
     actionEvaluation->aiScriptAction = bestScriptAction;
+    actionEvaluation->gamecycle = GameCycle;
     actionEvaluation->hotSpotX = enemy->X;
     actionEvaluation->hotSpotY = enemy->Y;
     actionEvaluation->value = bestScriptValue;
@@ -934,7 +1024,7 @@ global void AiPeriodicAttack(void)
 	AiGetGaugeValue(ForceGauge(WATER_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY))
 	+ AiGetGaugeValue(ForceGauge(GROUND_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY))
 	+ AiGetGaugeValue(ForceGauge(AIR_UNITS_VALUE, HOTSPOT_AREA, FOR_ENEMY));
-    DebugLevel3Fn("new action at %d %d, hotspotValue=%d, cost=%d\n" _C_
+    DebugLevel2Fn("new action at %d %d, hotspotValue=%d, cost=%d\n" _C_
 	enemy->X _C_ enemy->Y _C_
 	actionEvaluation->hotSpotValue _C_ actionEvaluation->value);
 
@@ -947,11 +1037,6 @@ global void AiPeriodicAttack(void)
 	AiPlayer->FirstEvaluation = actionEvaluation;
     }
     AiPlayer->LastEvaluation = actionEvaluation;
-
-    // Don't keep more than AI_MEMORY_SIZE ( remove old ones )  
-    while (AiPlayer->EvaluationCount > AI_MEMORY_SIZE) {
-	AiRemoveFirstAiPlayerEvaluation();
-    }
 
     // Iterate all actionEvalution. If one of them is better than all others, go !
     bestActionEvaluation = 0;
@@ -974,6 +1059,18 @@ global void AiPeriodicAttack(void)
 	actionEvaluation = actionEvaluation->Next;
     }
 
+    if ((! bestActionEvaluation) && bestValue != -1 ){
+	// If nothing available, try the best compromis ( value - hotspot )
+	actionEvaluation = AiPlayer->FirstEvaluation;
+	bestDelta=0;
+    	while (actionEvaluation) {
+	    delta = (20 * actionEvaluation->hotSpotValue) / (actionEvaluation->value + 1);
+	    if (bestDelta == -1 || delta <= bestDelta) {
+		bestActionEvaluation = actionEvaluation;
+	    }
+	}
+    }
+
     if ((bestActionEvaluation)) {
 	DebugLevel3Fn("has a best script, value=%d, hotspot=%d\n" _C_ bestValue _C_
 	    bestHotSpot);
@@ -985,15 +1082,20 @@ global void AiPeriodicAttack(void)
 
 	leftCost = AiEvaluateForceCost(AiScript->ownForce, 0);
 	totalCost = AiEvaluateForceCost(AiScript->ownForce, 1);
+	if (leftCost > totalCost) {
+	    DebugLevel3Fn("Left cost superior to totalcost ( %d > %d )\n" _C_ leftCost _C_ totalCost);
+	}
 
-	if (leftCost <= ((8 * totalCost) / 10)) {
+	if (leftCost <= ((2 * totalCost) / 10)) {
 	    DebugLevel3Fn("Attack script !...\n");
 	    AiStartScript(bestActionEvaluation->aiScriptAction, "attack");
-	} else {
+	} else if (leftCost <= ((8 * totalCost) /10)) {
 	    DebugLevel3Fn("Not ready for attack script, wait...\n");
 
-	    //AiForceTransfert(AiScript->ownForce,0);
 	    AiUpdateForce(1, AiScript->ownForce);
+	    AiEraseForce(AiScript->ownForce);
+	} else {
+	    DebugLevel3Fn("Attacking crisis ! reseting.\n");
 	    AiEraseForce(AiScript->ownForce);
 	}
     }

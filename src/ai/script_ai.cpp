@@ -73,6 +73,7 @@ static IOStructDef AiActionEvaluationStructDef = {
     {
 	{"`next", 		NULL, 		&((AiActionEvaluation *) 0)->Next, 	NULL},
 	{"ai-script-action",	&IOAiScriptActionPtr,&((AiActionEvaluation *) 0)->aiScriptAction,NULL},
+	{"gamecycle",		&IOInt,		&((AiActionEvaluation *) 0)->gamecycle,	NULL},
 	{"hotspot-x", 		&IOInt,		&((AiActionEvaluation *) 0)->hotSpotX, 	NULL},
 	{"hotspot-y", 		&IOInt,		&((AiActionEvaluation *) 0)->hotSpotY,	NULL},
 	{"hotspot-value", 	&IOInt,		&((AiActionEvaluation *) 0)->hotSpotValue,NULL},
@@ -693,6 +694,8 @@ local SCM CclDefineAiHelper(SCM list)
 		    AiHelperSetupTable(&AiHelpers.EquivCount, &AiHelpers.Equiv,
 			base->Type);
 		    AiHelperInsert(AiHelpers.Equiv + base->Type, type);
+
+		    AiNewUnitTypeEquiv(base,type);
 		    break;
 		case 6:		// repair
 		    AiHelperSetupTable(&AiHelpers.RepairCount, &AiHelpers.Repair,
@@ -817,7 +820,7 @@ extern UnitType *CclGetUnitType(SCM ptr);
 local void InsertUnitTypeRequests(UnitType * type, int count)
 {
     int n;
-
+    
     if (AiPlayer->UnitTypeRequests) {
 	n = AiPlayer->UnitTypeRequestsCount;
 	AiPlayer->UnitTypeRequests = realloc(AiPlayer->UnitTypeRequests,
@@ -1232,12 +1235,16 @@ local SCM CclAiForce(SCM list)
 	if (!count) {			// Don't care
 	    continue;
 	}
+
+    	// Use the equivalent unittype.
+    	type = UnitTypes[UnitTypeEquivs[type->Type]];
+
 	//
 	//      Look if already in force.
 	//
 	for (prev = &AiPlayer->Force[force].UnitTypes; (aiut = *prev);
 	    prev = &aiut->Next) {
-	    if (aiut->Type == type) {	// found
+	    if (UnitTypeEquivs[aiut->Type->Type] == type->Type) {	// found
 		if (aiut->Want < count) {
 		    aiut->Want = count;
 		}
