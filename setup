@@ -87,7 +87,7 @@ else
 fi
 
 if [ "`read -n 1 -t 0 2>&1 | grep e`x" = "x" ]; then
-    N="-n1"
+    N="-n1 -s"
 fi
 
 cat << .. > $RULESFILE
