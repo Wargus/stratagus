@@ -681,6 +681,8 @@ local void DoNextReplay(void)
     dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
     val = ReplayStep->Value;
     num = ReplayStep->Num;
+
+    DebugCheck(strcmp(ReplayStep->UnitIdent,UnitSlots[unit]->Type->Ident));
     
     if (((signed)SyncRandSeed) != ReplayStep->SyncRandSeed) {
 #ifdef DEBUG	

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -160,8 +160,8 @@ extern void UpgradeLost2( Player* player, char* sid ); // by ident string
 
 // all the following functions are just map handlers, no specific notes
 // id -- unit type id, af -- `A'llow/`F'orbid
-extern void AllowUnitId( Player* player, int id, char af );
-extern void AllowUnitByIdent( Player* player, const char* sid, char af );
+extern void AllowUnitId( Player* player, int id, int units );
+extern void AllowUnitByIdent( Player* player, const char* sid, int units );
 
 extern void AllowActionId( Player* player,  int id, char af );
 extern void AllowActionByIdent( Player* player, const char* sid, char af );
@@ -169,10 +169,10 @@ extern void AllowActionByIdent( Player* player, const char* sid, char af );
 extern void AllowUpgradeId( Player* player,  int id, char af );
 extern void AllowUpgradeByIdent( Player* player, const char* sid, char af );
 
-extern void AllowByIdent( Player* player, const char* sid, char af );
+extern void AllowByIdent( Player* player, const char* sid, int units );
 
-extern char UnitIdAllowed(const Player* player,  int id );
-extern char UnitIdentAllowed(const Player* player,const char* sid );
+extern int UnitIdAllowed(const Player* player,  int id );
+extern int UnitIdentAllowed(const Player* player,const char* sid );
 
 extern char ActionIdAllowed(const Player* player,  int id );
 extern char ActionIdentAllowed(const Player* player,const char* sid );

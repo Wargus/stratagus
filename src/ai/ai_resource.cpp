@@ -417,7 +417,7 @@ global int AiCountUnitBuilders(UnitType * type)
     AiUnitTypeTable *const *tablep;
     const AiUnitTypeTable *table;
 
-    if (!UnitIdAllowed(AiPlayer->Player, type->Type)) {
+    if (UnitIdAllowed(AiPlayer->Player, type->Type) == 0) {
 	DebugLevel0Fn("Can't build `%s' now\n" _C_ type->Ident);
 	return 0;
     }
