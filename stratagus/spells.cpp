@@ -107,7 +107,7 @@ global SpellType SpellTypeTable[]
 { "spell-polymorph",		"polymorph",		  10, 200,  -1, SpellActionPolymorph	, { "polymorph", NULL }      , { NULL, NULL} },
 { "spell-blizzard",		"blizzard",		  12,  25,  -1, SpellActionBlizzard	, { "blizzard", NULL }       , { NULL, NULL} },
 //	---orc ogres---							 ---orc ogres---
-{ "spell-eye-of-vision",	"eye of vision",	   6,  70,  -1, SpellActionEyeOfKilrogg , { "eye of vision", NULL } , { NULL, NULL} },
+{ "spell-eye-of-vision",	"eye of vision",	   6,  70,  -1, SpellActionEyeOfVision	, { "eye of vision", NULL }  , { NULL, NULL} },
 { "spell-bloodlust",		"bloodlust",		   6,  50,1000, SpellActionBloodlust	, { "bloodlust", NULL }      , { NULL, NULL} },
 { "spell-runes",		"runes",		  10, 200,2000, SpellActionRunes	, { "runes", NULL }	     , { NULL, NULL} },
 //	---orc death knights---						 ---orc death knights-
@@ -819,7 +819,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 1;
 
 //  ---orc ogres---
-	case SpellActionEyeOfKilrogg:
+	case SpellActionEyeOfVision:
 	    return 1;
 
 	case SpellActionBloodlust:
@@ -859,6 +859,25 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 }
 
 /**
+**	Auto cast holy vision if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastHolyVision(Unit* unit, SpellType* spell)
+{
+    int x;
+    int y;
+
+    x = SyncRand() % TheMap.Width;
+    y = SyncRand() % TheMap.Height;
+    CommandSpellCast(unit, x, y, NoUnitP, spell, FlushCommands);
+    return 1;
+}
+
+/**
 **	Auto cast healing if possible.
 **
 **	@param unit	Unit that casts the spell
@@ -874,7 +893,11 @@ local int AutoCastHealing(Unit* unit, SpellType* spell)
     int j;
     int n;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
@@ -919,7 +942,11 @@ local int AutoCastSlow(Unit* unit, SpellType* spell)
     int j;
     int n;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
@@ -968,15 +995,25 @@ local int AutoCastInvisibility(Unit* unit, SpellType* spell)
     int i;
     int j;
     int n;
+    int enemy;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
     n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
 	unit->Y + r + 1, table);
+    enemy = 0;
 
     for (i = 0, j = 0; i < n; ++i) {
+	if (!enemy && IsEnemy(unit->Player, table[i])) {
+	    enemy = 1;
+	}
+
 	// Only cast on ourselves or an ally
 	if (table[i] == unit || (unit->Player != table[i]->Player
 		&& !IsAllied(unit->Player, table[i]))) {
@@ -996,12 +1033,26 @@ local int AutoCastInvisibility(Unit* unit, SpellType* spell)
 	table[j++] = table[i];
     }
 
-    if (j) {
+    if (enemy && j) {
 	j = SyncRand() % j;
 	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
 	return 1;
     }
     return 0;
+}
+
+/**
+**	Auto cast eye of vision if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastEyeOfVision(Unit* unit, SpellType* spell)
+{
+    CommandSpellCast(unit, unit->X, unit->Y, NoUnitP, spell, FlushCommands);
+    return 1;
 }
 
 /**
@@ -1019,15 +1070,25 @@ local int AutoCastBloodlust(Unit* unit, SpellType* spell)
     int i;
     int j;
     int n;
+    int enemy;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
     n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
 	unit->Y + r + 1, table);
+    enemy = 0;
 
     for (i = 0, j = 0; i < n; ++i) {
+	if (!enemy && IsEnemy(unit->Player, table[i])) {
+	    enemy = 1;
+	}
+
 	// Only cast on ourselves or an ally
 	if (table[i] == unit || (unit->Player != table[i]->Player
 		&& !IsAllied(unit->Player, table[i]))) {
@@ -1047,7 +1108,7 @@ local int AutoCastBloodlust(Unit* unit, SpellType* spell)
 	table[j++] = table[i];
     }
 
-    if (j) {
+    if (enemy && j) {
 	j = SyncRand() % j;
 	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
 	return 1;
@@ -1071,7 +1132,11 @@ local int AutoCastHaste(Unit* unit, SpellType* spell)
     int j;
     int n;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
@@ -1121,15 +1186,25 @@ local int AutoCastUnholyArmor(Unit* unit, SpellType* spell)
     int i;
     int j;
     int n;
+    int enemy;
 
-    r = unit->Type->ReactRangePerson;
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
     if (spell->Range < r) {
 	r = spell->Range;
     }
     n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
 	unit->Y + r + 1, table);
+    enemy = 0;
 
     for (i = 0, j = 0; i < n; ++i) {
+	if (!enemy && IsEnemy(unit->Player, table[i])) {
+	    enemy = 1;
+	}
+
 	// Only cast on ourselves or an ally
 	if (table[i] == unit || (unit->Player != table[i]->Player
 		&& !IsAllied(unit->Player, table[i]))) {
@@ -1149,7 +1224,7 @@ local int AutoCastUnholyArmor(Unit* unit, SpellType* spell)
 	table[j++] = table[i];
     }
 
-    if (j) {
+    if (enemy && j) {
 	j = SyncRand() % j;
 	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
 	return 1;
@@ -1181,7 +1256,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 
 //  ---human paladins---
 	case SpellActionHolyVision:
-	    return 0;
+	    return AutoCastHolyVision(unit, spell);
 
 	case SpellActionHealing:
 	    return AutoCastHealing(unit, spell);
@@ -1209,8 +1284,8 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 	    return 0;
 
 //  ---orc ogres---
-	case SpellActionEyeOfKilrogg:
-	    return 0;
+	case SpellActionEyeOfVision:
+	    return AutoCastEyeOfVision(unit, spell);
 
 	case SpellActionBloodlust:
 	    return AutoCastBloodlust(unit, spell);
@@ -1557,7 +1632,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	break;
 
 //  ---orc ogres---
-    case SpellActionEyeOfKilrogg:
+    case SpellActionEyeOfVision:
 	unit->Mana -= spell->ManaCost;
 
 	// FIXME: johns: the unit is placed on the wrong position
