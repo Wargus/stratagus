@@ -876,20 +876,23 @@ global void DoButtonButtonClicked(int button)
 	    if( CurrentButtons[button].Action==ButtonSpellCast
 		    && (KeyModifiers&ModifierControl) ) {
 		int autocast;
+		SpellType *spell;
 
+		spell=SpellTypeById(CurrentButtons[button].Value);
 		autocast=0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
 		for( i=0; i<NumSelected; ++i ) {
-		    if( Selected[i]->AutoCastSpell!=
-			    SpellTypeById(CurrentButtons[button].Value)) {
+		    if( Selected[i]->AutoCastSpell!=spell) {
 			autocast=1;
 			break;
 		    }
 		}
 		for( i=0; i<NumSelected; ++i ) {
-		    SendCommandAutoSpellCast(Selected[i]
-			    ,CurrentButtons[button].Value,autocast);
+		    if( !autocast || Selected[i]->AutoCastSpell!=spell ) {
+			SendCommandAutoSpellCast(Selected[i]
+				,CurrentButtons[button].Value,autocast);
+		    }
 		}
 	    } else {
 		CursorState=CursorStateSelect;
