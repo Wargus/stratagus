@@ -252,6 +252,9 @@ extern char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 ----------------------------------------------------------------------------*/
 
 extern void InitUserInterface(void);		/// initialize the ui
+extern void LoadUserInterface(void);		/// load ui graphics
+extern void SaveUserInterface(FILE*);		/// save the ui state
+extern void CleanUserInterface(void);		/// clean up the ui
 extern void UserInterfaceCclRegister(void);	/// register ccl features
 
     /// Called if the mouse is moved in Normal interface state
