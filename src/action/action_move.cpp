@@ -279,10 +279,9 @@ global void HandleActionMove(Unit* unit)
 	    //
 	    //	Some tries to reach the goal
 	    //
-	    if (unit->Orders[0].RangeX <= TheMap.Width ||
-		    unit->Orders[0].RangeX <= TheMap.Height) {
-		unit->Orders[0].RangeX++;
-		unit->Orders[0].RangeY++;
+	    if (unit->Orders[0].Range <= TheMap.Width ||
+		    unit->Orders[0].Range <= TheMap.Height) {
+		unit->Orders[0].Range++;
 		break;
 	    }
 	    // FALL THROUGH

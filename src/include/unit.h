@@ -432,10 +432,10 @@ enum _unit_action_ {
 typedef struct _order_ {
     unsigned char	Action;		/// global action
     unsigned char	Flags;		/// Order flags (unused)
-    int			RangeX;		/// How near in X direction
-    int			RangeY;		/// How near in Y direction
+    int			Range;		/// How far away
     unsigned int	MinRange;	/// How far away minimum
-    unsigned char	IsRect:1;	/// For goal as a square, not circle
+    unsigned char	Width;		/// Goal Width (used when Goal is not)
+    unsigned char	Height;		/// Goal Height (used when Goal is not)
 
     Unit*		Goal;		/// goal of the order (if any)
     int			X;		/// or X tile coordinate of destination
