@@ -54,11 +54,10 @@ extern void EditorUpdateDisplay(void);
     /// Register ccl features
 extern void EditorCclRegister(void);
 
-    /// Update surroundings for tile changes.
-extern void EditorTileChanged(int x, int y);
-
-    /// Change tile.
+    /// Change the view of a tile
 extern void ChangeTile(int x, int y, int tile);
+    /// Update surroundings for tile changes
+extern void EditorTileChanged(int x, int y);
 
 //@}
 
