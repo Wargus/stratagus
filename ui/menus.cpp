@@ -1646,7 +1646,8 @@ local void MultiPlayerGameMenu(void)
     StartMenusSetBackground(NULL);
     Invalidate();
     EnterNameMenuItems[1].d.input.buffer = NameBuf;
-    strcpy(NameBuf, "Anonymous~!_");
+    strcpy(NameBuf, NetworkName);
+    strcat(NameBuf, "~!_");
     EnterNameMenuItems[1].d.input.nch = strlen(NameBuf) - 3;
     EnterNameMenuItems[1].d.input.maxch = 15;
     EnterNameMenuItems[2].flags &= ~MenuButtonDisabled;
@@ -2520,7 +2521,7 @@ global void NetClientUpdateState(void)
 **	@param key	Key scancode.
 **	@return		True, if key is handled; otherwise false.
 */
-global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
+global int MenuHandleKeyboard(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
 {					//        to implement button animation (depress before action)
     int i, n;
     Menuitem *mi;
