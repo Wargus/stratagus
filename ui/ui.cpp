@@ -350,7 +350,7 @@ global void CleanUserInterface(void)
     int i;
 
     //
-    //	Free the graphics. FIXME: if shared this will crash.
+    //	Free the graphics. FIXME: if they are shared this will crash.
     //
     VideoSaveFree(TheUI.Filler1.Graphic);
     VideoSaveFree(TheUI.Resource.Graphic);
@@ -416,6 +416,9 @@ global int GetViewport (int x, int y)
     return -1;
 }
 
+/**
+**	FIXME: DOCU
+*/
 local void SetViewportModeSingle (void)
 {
     DebugLevel0 ("Single viewport set\n");
@@ -423,9 +426,15 @@ local void SetViewportModeSingle (void)
     TheUI.NumViewports = 1;
 
     TheUI.VP[0].X = TheUI.MapArea.X;
-    TheUI.VP[0].EndX = TheUI.MapArea.EndX;
+    TheUI.VP[0].EndX = TheUI.MapArea.X + TheMap.Width * TileSizeX;
+    if( TheUI.VP[0].EndX > TheUI.MapArea.EndX ) {	// Map fits
+	TheUI.VP[0].EndX = TheUI.MapArea.EndX;
+    }
     TheUI.VP[0].Y = TheUI.MapArea.Y;
-    TheUI.VP[0].EndY = TheUI.MapArea.EndY;
+    TheUI.VP[0].EndY = TheUI.MapArea.Y + TheMap.Height * TileSizeY;
+    if( TheUI.VP[0].EndY > TheUI.MapArea.EndY ) {	// Map fits
+	TheUI.VP[0].EndY = TheUI.MapArea.EndY;
+    }
 
     //TheUI.VP[0].MapX = 0;
     //TheUI.VP[0].MapY = 0;
@@ -437,6 +446,9 @@ local void SetViewportModeSingle (void)
     TheUI.ActiveViewport = 0;
 }
 
+/**
+**	FIXME: DOCU
+*/
 local void SetViewportModeSplitHoriz (void)
 {
     int i, active;
@@ -448,11 +460,13 @@ local void SetViewportModeSplitHoriz (void)
     new_vps[0].EndX = TheUI.MapArea.EndX;
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2 +1;
     new_vps[1].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     if (TheUI.NumViewports < 2) {
 	for (i=0; i < 2; i++) {
@@ -486,6 +500,9 @@ local void SetViewportModeSplitHoriz (void)
 	TheUI.ActiveViewport = active;
 }
 
+/**
+**	FIXME: DOCU
+*/
 local void SetViewportModeSplitHoriz3 (void)
 {
     int i, active;
@@ -493,16 +510,19 @@ local void SetViewportModeSplitHoriz3 (void)
 
     DebugLevel0 ("Horizontal 3-way viewport division set\n");
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].EndX = TheUI.MapArea.EndX;
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].EndX = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2;
     new_vps[1].Y = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2 +1;
     new_vps[1].EndY = TheUI.MapArea.EndY;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[2].X = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2 +1;
     new_vps[2].EndX = TheUI.MapArea.EndX;
     new_vps[2].Y = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2 +1;
@@ -540,6 +560,9 @@ local void SetViewportModeSplitHoriz3 (void)
 	TheUI.ActiveViewport = active;
 }
 
+/**
+**	FIXME: DOCU
+*/
 local void SetViewportModeSplitVert (void)
 {
     int i, active;
@@ -547,11 +570,13 @@ local void SetViewportModeSplitVert (void)
 
     DebugLevel0 ("Two vertical viewports set\n");
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].EndX = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2;
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.EndY;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[1].X = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2 +1;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
@@ -599,6 +624,9 @@ local void SetViewportModeSplitVert (void)
 	TheUI.ActiveViewport = active;
 }
 
+/**
+**	FIXME: DOCU
+*/
 local void SetViewportModeQuad (void)
 {
     int i, active;
@@ -606,21 +634,25 @@ local void SetViewportModeQuad (void)
 
     DebugLevel0 ("Four viewports set\n");
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[0].X = TheUI.MapArea.X;
     new_vps[0].EndX = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2;
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[1].X = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2 +1;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
     new_vps[1].EndY = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[2].X = TheUI.MapArea.X;
     new_vps[2].EndX = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2;
     new_vps[2].Y = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2 +1;
     new_vps[2].EndY = TheUI.MapArea.EndY;
 
+    // FIXME: Use SetViewportModeSingle map size check
     new_vps[3].X = TheUI.MapArea.X + (TheUI.MapArea.EndX-TheUI.MapArea.X)/2 +1;
     new_vps[3].EndX = TheUI.MapArea.EndX;
     new_vps[3].Y = TheUI.MapArea.Y + (TheUI.MapArea.EndY-TheUI.MapArea.Y)/2 +1;
@@ -659,6 +691,9 @@ local void SetViewportModeQuad (void)
 	TheUI.ActiveViewport = active;
 }
 
+/**
+**	FIXME: DOCU
+*/
 global void SetViewportMode (void)
 {
     switch (TheUI.ViewportMode) {
@@ -683,6 +718,9 @@ global void SetViewportMode (void)
     }
 }
 
+/**
+**	FIXME: DOCU
+*/
 global void CycleViewportMode (int direction)
 {
     TheUI.ViewportMode = (TheUI.ViewportMode + direction) % NUM_VIEWPORT_MODES;

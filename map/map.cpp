@@ -637,24 +637,42 @@ global int Map2ScreenY(int y)
 
 #ifdef SPLIT_SCREEN_SUPPORT
 
+/**
+**	FIXME: docu
+*/
 global int Viewport2MapX (int v, int x)
 {
-    return (((x)-TheUI.VP[v].X)/TileSizeX+TheUI.VP[v].MapX);
+    int r;
+
+    r=((x)-TheUI.VP[v].X)/TileSizeX+TheUI.VP[v].MapX;
+    return r<TheMap.Width ? r : TheMap.Width-1;
 }
 
+/**
+**	FIXME: docu
+*/
 global int Viewport2MapY (int v, int y)
 {
-    return (((y)-TheUI.VP[v].Y)/TileSizeY+TheUI.VP[v].MapY);
+    int r;
+
+    r=((y)-TheUI.VP[v].Y)/TileSizeY+TheUI.VP[v].MapY;
+    return r<TheMap.Height ? r : TheMap.Height-1;
 }
 
+/**
+**	FIXME: docu
+*/
 global int Map2ViewportX (int v, int x)
 {
-    return (TheUI.VP[v].X+((x)-TheUI.VP[v].MapX)*TileSizeX);
+    return TheUI.VP[v].X+((x)-TheUI.VP[v].MapX)*TileSizeX;
 }
 
+/**
+**	FIXME: docu
+*/
 global int Map2ViewportY (int v, int y)
 {
-    return (TheUI.VP[v].Y+((y)-TheUI.VP[v].MapY)*TileSizeY);
+    return TheUI.VP[v].Y+((y)-TheUI.VP[v].MapY)*TileSizeY;
 }
 
 #endif /* SPLIT_SCREEN_SUPPORT */
