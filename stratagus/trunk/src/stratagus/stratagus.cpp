@@ -83,7 +83,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(DEBUG) && (defined(CCL) || defined(CCL2))
+#if defined(DEBUG) && (defined(USE_CCL) || defined(USE_CCL2))
 extern SCM CclUnits(void);
 #endif
 
@@ -385,7 +385,7 @@ global volatile void Exit(int err)
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
     );
-#if defined(DEBUG) && (defined(CCL) || defined(CCL2))
+#if defined(DEBUG) && (defined(USE_CCL) || defined(USE_CCL2))
 	CclUnits();
 #endif
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
