@@ -40,7 +40,6 @@ SetEditorUnitsIcon("icon-assault")
 --
 DefineEditorUnitTypes(
    "unit-vault",
-   "unit-plate1",
 
    "unit-apcs",
    "unit-medic",
