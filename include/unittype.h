@@ -995,7 +995,6 @@ extern UnitType* CclGetUnitType(struct lua_State* l);  ///< Access unit-type obj
 extern void UnitTypeCclRegister(void);          ///< Register ccl features
 
 extern void UpdateStats(int reset_to_default);  ///< Update unit stats
-extern void ParsePudUDTA(const char*,int);      ///< Parse pud udta table
 extern UnitType* UnitTypeByIdent(const char*);  ///< Get unit-type by ident
 extern UnitType* UnitTypeByWcNum(unsigned);     ///< Get unit-type by wc number
 extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
