@@ -305,9 +305,9 @@ local SCM CclOriginalFogOfWar(void)
 }
 
 /**
-**	Gray style fog of war.
+**	Alpha style fog of war.
 */
-local SCM CclGrayFogOfWar(void)
+local SCM CclAlphaFogOfWar(void)
 {
     OriginalFogOfWar=0;
 
@@ -479,7 +479,7 @@ global void MapCclRegister(void)
     gh_new_procedure1_0("set-minimap-terrain!",CclSetMinimapTerrain);
 
     gh_new_procedure0_0("original-fog-of-war",CclOriginalFogOfWar);
-    gh_new_procedure0_0("gray-fog-of-war",CclGrayFogOfWar);
+    gh_new_procedure0_0("alpha-fog-of-war",CclAlphaFogOfWar);
 
     gh_new_procedure1_0("set-fog-of-war-contrast!",CclSetFogOfWarContrast);
     gh_new_procedure1_0("set-fog-of-war-brightness!",CclSetFogOfWarBrightness);
