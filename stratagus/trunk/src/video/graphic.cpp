@@ -314,6 +314,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	int useckey;
 	int bpp;
 	int size;
+	unsigned char alpha;
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
 	if (width > size || height > size) {
@@ -341,6 +342,11 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 	graphic->TextureWidth = (float)width / w;
 	graphic->TextureHeight = (float)height / h;
 	tex = (unsigned char*)malloc(w * h * 4);
+	if (graphic->Surface->flags & SDL_SRCALPHA) {
+		alpha = graphic->Surface->format->alpha;
+	} else {
+		alpha = 0xff;
+	}
 
 	for (x = 0; x < n; ++x) {
 		glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
@@ -365,7 +371,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 						tex[c + 0] = p.r;
 						tex[c + 1] = p.g;
 						tex[c + 2] = p.b;
-						tex[c + 3] = 0xff;
+						tex[c + 3] = alpha;
 					}
 					++sp;
 				} else {
@@ -375,7 +381,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 					if (bpp == 4) {
 						tex[c + 3] = *sp++;
 					} else {
-						tex[c + 3] = 0xff;
+						tex[c + 3] = alpha;
 					}
 				}
 			}
