@@ -79,7 +79,7 @@ global void HandleActionBuild(Unit* unit)
 
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
-	    if( IsSelected(unit) ) {	// update display for new action
+	    if( unit->Selected ) {	// update display for new action
 		UpdateButtonPanel();
 	    }
 
@@ -125,7 +125,7 @@ global void HandleActionBuild(Unit* unit)
 
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
-	if( IsSelected(unit) ) {	// update display for new action
+	if( unit->Selected ) {	// update display for new action
 	    UpdateButtonPanel();
 	}
 
@@ -292,7 +292,7 @@ global void HandleActionBuilded(Unit* unit)
 
 	UpdateForNewUnit(unit,0);
 
-	if( IsSelected(unit) ) {
+	if( IsOnlySelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
 	} else if( unit->Player==ThisPlayer ) {
@@ -319,7 +319,7 @@ global void HandleActionBuilded(Unit* unit)
     }
 
     unit->Wait=5;
-    if( IsSelected(unit) ) {
+    if( IsOnlySelected(unit) ) {
         MustRedraw|=RedrawInfoPanel;
     }
 }

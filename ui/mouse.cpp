@@ -511,23 +511,27 @@ global void UIHandleMouseMove(int x,int y)
 	int xo = MapX, yo = MapY;
 
 	if ( TheUI.ReverseMouseMove ) {
-	    if (x < CursorStartX)
+	    if (x < CursorStartX) {
 		xo++;
-	    else if (x > CursorStartX)
+	    } else if (x > CursorStartX) {
 		xo--;
-	    if (y < CursorStartY)
+	    }
+	    if (y < CursorStartY) {
 		yo++;
-	    else if (y > CursorStartY)
+	    } else if (y > CursorStartY) {
 		yo--;
+	    }
 	} else {
-	    if (x < CursorStartX)
+	    if (x < CursorStartX) {
 		xo--;
-	    else if (x > CursorStartX)
+	    } else if (x > CursorStartX) {
 		xo++;
-	    if (y < CursorStartY)
+	    }
+	    if (y < CursorStartY) {
 		yo--;
-	    else if (y > CursorStartY)
+	    } else if (y > CursorStartY) {
 		yo++;
+	    }
 	}
 	TheUI.WarpX = CursorStartX;
 	TheUI.WarpY = CursorStartY;

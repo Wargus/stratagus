@@ -113,20 +113,29 @@ global void HandleActionTrain(Unit* unit)
 	    unit->SubAction=0;
 	}
 
+	if( unit->NewOrder.Goal ) {
+	    if( unit->NewOrder.Goal->Destroyed ) {
+		DebugLevel0Fn("Destroyed unit in train unit\n");
+		RefsDebugCheck( !unit->NewOrder.Goal->Refs );
+		if( !--unit->NewOrder.Goal->Refs ) {
+		    ReleaseUnit(unit->NewOrder.Goal);
+		}
+		unit->NewOrder.Goal=NoUnitP;
+		unit->NewOrder.Action=UnitActionStill;
+	    }
+	}
+
 	nunit->Orders[0]=unit->NewOrder;
 
 	//
 	// FIXME: Pending command uses any references?
 	//
 	if( nunit->Orders[0].Goal ) {
-	    if( nunit->Orders[0].Goal->Destroyed ) {
-		DebugLevel0Fn("FIXME: you have found a bug, please fix it.\n");
-	    }
 	    RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
 	    nunit->Orders[0].Goal->Refs++;
 	}
 
-	if( IsSelected(unit) ) {
+	if( IsOnlySelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
 	}
@@ -134,7 +143,7 @@ global void HandleActionTrain(Unit* unit)
 	return;
     }
 
-    if( IsSelected(unit) ) {
+    if( IsOnlySelected(unit) ) {
 	MustRedraw|=RedrawInfoPanel;
     }
 

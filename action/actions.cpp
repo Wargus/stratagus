@@ -297,7 +297,7 @@ local void HandleUnitAction(Unit* unit)
 	    unit->SubAction=unit->State=0;
 	    unit->Wait=1;
 
-	    if( IsSelected(unit) ) {	// update display for new action
+	    if( IsOnlySelected(unit) ) {// update display for new action
 		UpdateButtonPanel();
 		MustRedraw|=RedrawInfoPanel;
 	    }

@@ -83,7 +83,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 	//
 	//	Update possible changed buttons.
 	//
-	if( IsSelected(unit) ) {
+	if( IsOnlySelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawPanels;
 	} else if( player==ThisPlayer ) {
@@ -94,7 +94,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 	return;
     }
 
-    if( IsSelected(unit) ) {
+    if( IsOnlySelected(unit) ) {
 	MustRedraw|=RedrawInfoPanel;
     }
 
