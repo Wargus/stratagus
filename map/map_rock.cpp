@@ -46,6 +46,9 @@
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
+#if defined(MAP_REGIONS)
+#include "pathfinder.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --		Declarations
