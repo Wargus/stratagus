@@ -127,8 +127,7 @@ global void CleanPlayers(void)
     //
     if( (ptr=RaceWcNames) ) {	// Free all old names
 	while( *ptr ) {
-	    free(*ptr);
-	    ptr++;
+	    free(*ptr++);
 	}
 	free(RaceWcNames);
 	RaceWcNames=NULL;
