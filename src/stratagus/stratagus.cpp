@@ -527,7 +527,7 @@ local void Usage(void)
 \t-h\t\tHelp shows this page\n\
 \t-l\t\tEnable command log to \"command.log\"\n\
 \t-p players\tNumber of players\n\
-\t-n host[:port]\tNetwork argument (port default 6660)\n\
+\t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames\n\
 \t-U update\tNetwork update frequence in # frames\n\
 \t-s sleep\tNumber of frames for the AI to sleep before they starts\n\
