@@ -213,7 +213,7 @@ local int StartGathering(Unit* unit)
 	    2 * (goal->X - unit->X) + goal->Type->TileWidth,
 	    2 * (goal->Y - unit->Y) + goal->Type->TileHeight);
     }
-    
+
     //
     //	If resource is still under construction, wait!
     //
@@ -296,7 +296,7 @@ local void LoseResource(Unit* unit,const Unit* source)
 
     //
     //  If we are loaded first search for a depot.
-    // 
+    //
     if (unit->Value && (depot = FindDeposit(unit, unit->X, unit->Y,
 	    1000, unit->CurrentResource))) {
 	if (unit->Container) {
@@ -306,7 +306,7 @@ local void LoseResource(Unit* unit,const Unit* source)
 	}
 	//
 	//  Remember were it mined, so it can look around for another resource.
-	//  
+	//
 	unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
 	unit->Orders[0].Goal = depot;
 	RefsDebugCheck(!depot->Refs);
@@ -359,10 +359,10 @@ local int GatherResource(Unit* unit)
     ResourceInfo* resinfo;
     int i;
     int addload;
-    
+
     resinfo = unit->Type->ResInfo[unit->CurrentResource];
     source = 0;
-    
+
     if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 	AnimateActionHarvest(unit);
 	unit->Data.ResWorker.TimeToHarvest -= unit->Wait;
@@ -375,7 +375,7 @@ local int GatherResource(Unit* unit)
 	DebugCheck(!(resinfo->HarvestFromOutside || resinfo->TerrainHarvester));
 	return unit->Reset;
     }
-    
+
     //  Target gone?
     if (resinfo->TerrainHarvester && !ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
 	DebugLevel3Fn("Wood gone for unit %d.\n" _C_ unit->Slot);
@@ -438,13 +438,13 @@ local int GatherResource(Unit* unit)
 		DebugLevel3Fn("Harvested another %d resources.\n" _C_ addload);
 		unit->Value += addload;
 		source->Value -= addload;
-	       
+
 		UnitMarkSeen(source);
 		if (IsOnlySelected(source)) {
 		    MustRedraw |= RedrawInfoPanel;
 		}
 	    }
-	    
+
 	    //
 	    //	End of resource: destroy the resource.
 	    //	FIXME: implement depleted resources.
@@ -455,7 +455,7 @@ local int GatherResource(Unit* unit)
 		uins = source->UnitInside;
 		//
 		// Improved version of DropOutAll that makes workers go to the depot.
-		// 
+		//
 		LoseResource(unit,source);
 		for (i = source->InsideCount; i; --i, uins = uins->NextContained) {
 		    LoseResource(uins,source);
@@ -479,7 +479,7 @@ local int GatherResource(Unit* unit)
 	    }
 	    return 0;
 	}
-	
+
 	if (resinfo->HarvestFromOutside && !resinfo->TerrainHarvester) {
 	    if ((unit->Value == resinfo->ResourceCapacity) || (source == NULL)) {
 		// Mark as complete.
@@ -488,7 +488,7 @@ local int GatherResource(Unit* unit)
 	    }
 	    return 0;
 	}
-	
+
 	if ((!resinfo->HarvestFromOutside) && (!resinfo->TerrainHarvester)) {
 	    return unit->Value == resinfo->ResourceCapacity && source;
 	}
@@ -522,12 +522,12 @@ local int StopGathering(Unit* unit)
 	source->Data.Resource.Active--;
 	DebugCheck(source->Data.Resource.Active < 0);
     }
-     
+
 
     //	Store resource position.
     //	FIXME: is this the best way?
     unit->Orders[0].Arg1 = (void*)((unit->X << 16) | unit->Y);
- 
+
     if (!unit->Value) {
 	DebugLevel0Fn("Unit %d is empty???\n" _C_ unit->Slot);
     } else {
@@ -664,6 +664,9 @@ local int MoveToDepot(Unit* unit)
     }
 
     unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId];
+    if (!unit->Wait) {
+	unit->Wait = 1;
+    }
 
     return 1;
 }
@@ -773,7 +776,7 @@ global void HandleActionResource(Unit* unit)
 	unit->Data.ResWorker.TimeToHarvest _C_
 	DefaultResourceNames[unit->CurrentResource] _C_
 	(unsigned int)unit->Orders->Goal);
-    
+
     //	Let's start mining.
     if (unit->SubAction == SUB_START_RESOURCE) {
 	if (unit->Orders->Goal) {
@@ -790,7 +793,7 @@ global void HandleActionResource(Unit* unit)
 	DebugLevel3Fn("Started mining. reset path.\n");
 	unit->SubAction = SUB_MOVE_TO_RESOURCE;
     }
-   
+
     //  Move to the resource location.
     if (unit->SubAction >= SUB_MOVE_TO_RESOURCE &&
 	    unit->SubAction < SUB_UNREACHABLE_RESOURCE) {
@@ -825,7 +828,7 @@ global void HandleActionResource(Unit* unit)
 	    return;
 	}
     }
-    
+
     //  Gather the resource.
     if (unit->SubAction == SUB_GATHER_RESOURCE) {
 	if (GatherResource(unit)) {
@@ -834,7 +837,7 @@ global void HandleActionResource(Unit* unit)
 	    return;
 	}
     }
-    
+
     //  Stop gathering the resource.
     if (unit->SubAction == SUB_STOP_GATHERING) {
 	if (StopGathering(unit)) {
