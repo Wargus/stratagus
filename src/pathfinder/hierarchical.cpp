@@ -14,7 +14,9 @@
 #include "pf_highlevel.h"
 #include "pf_lowlevel.h"
 
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
 
 struct rect {
 	int Width, Height;
