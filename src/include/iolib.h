@@ -9,18 +9,18 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name iolib.h	-	The iolib functions header file. */
-/*
-**	(c) Copyright 2000 by Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 2000,2001 by Andreas Arens
+//
+//	$Id$
 
 #ifndef __IOLIB_H__
 #define __IOLIB_H__
 
 //@{
 
-/* FIXME: Add archive-style file support here (.DAT, .WAD, .AR, etc) */
+// FIXME: ari: Add archive-style file support here (.DAT, .WAD, .AR, etc)
+// FIXME: johns: I want zip support, tar didn't supports compressed files.
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -42,15 +42,15 @@
 **	FileList struct used by directory access routine
 */
 typedef struct _filelist_ {
-    char *name;
-    int type;
-    void *xdata;
+    char *name;				/// Name of the file
+    int type;				/// Type of the file
+    void *xdata;			/// Extra data attached by high level
 } FileList;
 
 
-#if !defined(USE_ZLIB) && !defined(USE_BZ2LIB) 
+#if !defined(USE_ZLIB) && !defined(USE_BZ2LIB)
 
-/// use plain file routines directly
+// use plain file routines directly
 
 #define CLFile				FILE
 #define CLopen(file)			fopen(file,"rb")
@@ -62,6 +62,8 @@ typedef struct _filelist_ {
 
 /**
 **	Defines a library file
+**
+**	@todo	zip archive support
 */
 typedef struct _CL_File_ {
     int		cl_type;		/// type of CLFile
@@ -74,19 +76,23 @@ typedef struct _CL_File_ {
 #endif	// !USE_BZ2LIB
 } CLFile;
 
-#define CLF_TYPE_INVALID	0
-#define CLF_TYPE_PLAIN		1
-#define CLF_TYPE_GZIP		2
-#define CLF_TYPE_BZIP2		3
+#define CLF_TYPE_INVALID	0	/// invalid file handle
+#define CLF_TYPE_PLAIN		1	/// plain text file handle
+#define CLF_TYPE_GZIP		2	/// gzip file handle
+#define CLF_TYPE_BZIP2		3	/// bzip2 file handle
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern CLFile *CLopen(const char *fn);			  ///  Library file open
-extern int CLclose(CLFile *file);			  ///  Library file close
-extern int CLread(CLFile *file, void *buf, size_t len);	  ///  Library file read
-extern int CLseek(CLFile *file, long offset, int whence); ///  Library file seek
+    ///  Library file open
+extern CLFile *CLopen(const char *fn);
+    ///  Library file close
+extern int CLclose(CLFile *file);
+    ///  Library file read
+extern int CLread(CLFile *file, void *buf, size_t len);
+    ///  Library file seek
+extern int CLseek(CLFile *file, long offset, int whence);
 
 
 #endif	// USE_ZLIB || USE_BZ2LIB
