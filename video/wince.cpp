@@ -500,4 +500,39 @@ global void ToggleGrabMouse(void)
 
 #endif // } USE_WINCE
 
+#ifdef _WIN32_WCE   // {
+
+/*----------------------------------------------------------------------------
+--	General Win32 CE support functions
+----------------------------------------------------------------------------*/
+
+/**
+**	abort	not available
+*/
+global volatile void abort(void)
+{
+    exit(-1);
+}
+
+/**
+**	strdup	other name
+*/
+global char* strdup(const char* strSource)
+{
+    return _strdup(strSource);
+}
+
+/**
+**	perror	not supported
+*/
+global void perror(const char* msg)
+{
+    printf("%s",msg);
+    // FIXME: more is missing
+}
+
+
+
+#endif	// } _WIN32_WCE
+
 //@}
