@@ -142,17 +142,17 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	//
 	//	Normal units react in reaction range.
 	//
-	if( !type->Tower ) {
+	if( !type->Tower && !ground ) {
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
 		// FIXME: should rewrite command handling
 		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
 		unit->SavedCommand=unit->NextCommand[0];
+		unit->SavedCommand.Action=UnitActionAttack;
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
 		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
 		unit->SubAction|=2;
-		unit->SavedCommand.Action=UnitActionAttack;
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
 	    DebugLevel3Fn(" %Zd #%d\n",UnitNumber(goal),goal->Refs);
@@ -167,11 +167,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		if( !--temp->Refs ) {
 		    ReleaseUnit(temp);
 		}
-		unit->Command.Data.Move.Goal=NoUnitP;
+		unit->Command.Data.Move.Goal=temp=NoUnitP;
 	    }
-	    if( !unit->SubAction || unit->Command.Data.Move.Goal!=goal ) {
+	    if( !unit->SubAction || temp!=goal ) {
 		// New target.
-		if( (temp=unit->Command.Data.Move.Goal) ) {
+		if( temp ) {
 		    DebugLevel3Fn(" old unit %Zd #%d\n"
 			    ,UnitNumber(temp),temp->Refs);
 		    DebugCheck( !temp->Refs );
@@ -182,6 +182,11 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		goal->Refs++;
 		unit->State=0;
 		unit->SubAction=1;
+		if( !type->Tower ) {
+		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X
+			    ,goal->Y-unit->Y);
+		    AnimateActionAttack(unit);
+		}
 	    }
 	    return;
 	}
@@ -247,7 +252,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 */
 global void HandleActionStill(Unit* unit)
 {
-    ActionStillGeneric(unit,1);
+    ActionStillGeneric(unit,0);
 }
 
 //@}
