@@ -1218,6 +1218,8 @@ local SCM CclDefineButton(SCM list)
 		ba.Allowed=ButtonCheckUpgradeTo;
 	    } else if( gh_eq_p(value,gh_symbol2scm("check-research")) ) {
 		ba.Allowed=ButtonCheckResearch;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-single-research")) ) {
+		ba.Allowed=ButtonCheckSingleResearch;
 	    } else {
 		s1=gh_scm2newstr(value,NULL);
 		fprintf(stderr,"Unsupported action %s\n",s1);

@@ -680,6 +680,8 @@ global void SaveUpgrades(FILE* file)
 
 /**
 **	Define a new upgrade modifier.
+**
+**	@param list	List of modifiers.
 */
 local SCM CclDefineModifier(SCM list)
 {
@@ -1509,4 +1511,5 @@ global char UpgradeIdentAllowed(const Player * player, const char *sid)
 {
     return UpgradeIdAllowed(player, UpgradeIdByIdent(sid));
 }
+
 //@}

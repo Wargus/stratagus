@@ -1078,9 +1078,12 @@ global void CommandCancelResearch(Unit* unit)
     //	Check if unit is still researching? (NETWORK!)
     //
     if( unit->Orders[0].Action == UnitActionResearch ) {
+	const Upgrade* upgrade;
 
-	PlayerAddCostsFactor(unit->Player,
-		unit->Data.Research.Upgrade->Costs,
+	upgrade=unit->Data.Research.Upgrade;
+	unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]=0;
+
+	PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 		CancelResearchCostsFactor);
 
 	unit->Orders[0].Action=UnitActionStill;

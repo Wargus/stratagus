@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998,2000 by Lutz Sammer
+##	(c) Copyright 1998,2000,2001 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -36,7 +36,7 @@ include $(TOPDIR)/Rules.make
 ##
 
 MODULE	= ui
-OBJS	= mouse.$(OE) button_table.$(OE) botpanel.$(OE) mainscr.$(OE) \
+OBJS	= mouse.$(OE) button_checks.$(OE) botpanel.$(OE) mainscr.$(OE) \
 	  icons.$(OE) ui.$(OE) ccl_ui.$(OE) menus.$(OE) console.$(OE) \
 	  interface.$(OE)
 
