@@ -63,9 +63,6 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 #define TILE_ICON_X (IconWidth * 2 + 16)	/// Tile mode icon
 #define TILE_ICON_Y (2)				/// Tile mode icon
 
-#define TILE_WIDTH 32				/// Tile mode icon
-#define TILE_HEIGHT 32				/// Tile mode icon
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -452,13 +449,13 @@ local void DrawTileIcons(void)
 #else
 	    VideoDrawTile(tiles[TheMap.Tileset->Table[0x10 + i * 16]], x, y);
 #endif
-	    VideoDrawRectangle(ColorGray, x, y, 32, 32);
+	    VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 	    if (TileCursor == i) {
-		VideoDrawRectangle(ColorGreen, x + 1, y + 1, 30, 30);
+		VideoDrawRectangle(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
 
 	    }
 	    if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
-		VideoDrawRectangle(ColorWhite, x - 1, y - 1, 34, 34);
+		VideoDrawRectangle(ColorWhite, x - 1, y - 1, TileSizeX+2, TileSizeY+2);
 	    }
 	    x += 34;
 	    i++;
@@ -644,19 +641,19 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
     color= (flags&IconActive) ? ColorGray : ColorBlack;
 
-    VideoDrawRectangleClip(color,x,y,TILE_WIDTH+7,TILE_HEIGHT+7);
-    VideoDrawRectangleClip(ColorBlack,x+1,y+1,TILE_WIDTH+5,TILE_HEIGHT+5);
+    VideoDrawRectangleClip(color,x,y,TileSizeX+7,TileSizeY+7);
+    VideoDrawRectangleClip(ColorBlack,x+1,y+1,TileSizeX+5,TileSizeY+5);
 
-    VideoDrawVLine(ColorGray,x+TILE_WIDTH+4,y+5,TILE_HEIGHT-1);	// _|
-    VideoDrawVLine(ColorGray,x+TILE_WIDTH+5,y+5,TILE_HEIGHT-1);
-    VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+4,TILE_WIDTH+1);
-    VideoDrawHLine(ColorGray,x+5,y+TILE_HEIGHT+5,TILE_WIDTH+1);
+    VideoDrawVLine(ColorGray,x+TileSizeX+4,y+5,TileSizeY-1);	// _|
+    VideoDrawVLine(ColorGray,x+TileSizeX+5,y+5,TileSizeY-1);
+    VideoDrawHLine(ColorGray,x+5,y+TileSizeY+4,TileSizeX+1);
+    VideoDrawHLine(ColorGray,x+5,y+TileSizeY+5,TileSizeX+1);
 
     color= (flags&IconClicked) ? ColorGray : ColorWhite;
-    VideoDrawHLine(color,x+5,y+3,TILE_WIDTH+1);
-    VideoDrawHLine(color,x+5,y+4,TILE_WIDTH+1);
-    VideoDrawVLine(color,x+3,y+3,TILE_HEIGHT+3);
-    VideoDrawVLine(color,x+4,y+3,TILE_HEIGHT+3);
+    VideoDrawHLine(color,x+5,y+3,TileSizeX+1);
+    VideoDrawHLine(color,x+5,y+4,TileSizeX+1);
+    VideoDrawVLine(color,x+3,y+3,TileSizeY+3);
+    VideoDrawVLine(color,x+4,y+3,TileSizeY+3);
 
     if( flags&IconClicked ) {
 	++x; ++y;
@@ -671,7 +668,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 #endif
 
     if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x,y,TILE_WIDTH,TILE_HEIGHT);
+	VideoDrawRectangleClip(ColorGreen,x,y,TileSizeX,TileSizeY);
     }
 }
 
@@ -1633,7 +1630,8 @@ local void EditorCallbackMouse(int x, int y)
 	while (by < TheUI.ButtonPanelY + 100) {
 	    bx = TheUI.ButtonPanelX + 4;
 	    while (bx < TheUI.ButtonPanelX + 144) {
-		if (bx < x && x < bx + 32 && by < y && y < by + 32) {
+		if (bx < x && x < bx + TileSizeX
+			&& by < y && y < by + TileSizeY) {
 		    int j;
 
 		    // FIXME: i is wrong, must find the solid type
@@ -1673,9 +1671,9 @@ local void EditorCallbackMouse(int x, int y)
 	return;
     }
     if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX
-	    && CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + TILE_WIDTH+7
+	    && CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + TileSizeX+7
 	    && TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY
-	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TILE_HEIGHT+7) {
+	    && CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TileSizeY+7) {
 	ButtonUnderCursor = TileButton;
 	CursorOn = CursorOnButton;
 	SetStatusLine("Tile mode");
