@@ -76,7 +76,11 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	//
 	//	Target killed?
 	//
+#ifdef NEW_ORDERS
+	goal=unit->Orders[0].Goal;
+#else
 	goal=unit->Command.Data.Move.Goal;
+#endif
 	if( goal ) {
 	    // FIXME: should this be handled here?
 	    // FIXME: Can't choose a better target here!
@@ -88,9 +92,17 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=goal=NoUnitP;
+#else
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
+#endif
 	    } else if( goal->Removed ||
+#ifdef NEW_ORDERS
+		    !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+#else
 		    !goal->HP || goal->Command.Action==UnitActionDie ) {
+#endif
 		DebugLevel0Fn("killed unit\n");
 #ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
@@ -99,7 +111,11 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 #ifdef REFS_DEBUG
 		DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=goal=NoUnitP;
+#else
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
+#endif
 	    }
 	}
 
@@ -107,12 +123,20 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	    case PF_UNREACHABLE:	// Can't reach, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
+#ifdef NEW_ORDERS
+		unit->Orders[0].Action=UnitActionStill;
+#else
 		unit->Command.Action=UnitActionStill;
+#endif
 		return d;
 	    case PF_REACHED:		// Reached goal, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
+#ifdef NEW_ORDERS
+		unit->Orders[0].Action=UnitActionStill;
+#else
 		unit->Command.Action=UnitActionStill;
+#endif
 		return d;
 	    case PF_WAIT:		// No path, wait
 		unit->Reset=unit->Wait=1;
