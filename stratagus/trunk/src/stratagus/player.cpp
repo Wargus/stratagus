@@ -296,29 +296,6 @@ global void CreatePlayer(int type)
 	}
     }
 
-    //
-    //	Make simple teams:
-    //		All person players are enemies.
-    //
-    switch( type ) {
-	case PlayerNeutral:
-	case PlayerNobody:
-	default:
-	    team=0;
-	    break;
-	case PlayerComputer:
-	    team=1;
-	    break;
-	case PlayerPerson:
-	    team=2+NumPlayers;
-	    break;
-	case PlayerRescuePassive:
-	case PlayerRescueActive:
-	    // FIXME: correct for multiplayer games?
-	    team=2+NumPlayers;
-	    break;
-    }
-
     if( NumPlayers==PlayerMax ) {
 	static int already_warned;
 
@@ -329,7 +306,33 @@ global void CreatePlayer(int type)
 	return;
     }
 
-    player->Name=strdup("Computer");
+    //
+    //	Make simple teams:
+    //		All person players are enemies.
+    //
+    switch( type ) {
+	case PlayerNeutral:
+	case PlayerNobody:
+	default:
+	    team=0;
+	    player->Name=strdup("Neutral");
+	    break;
+	case PlayerComputer:
+	    team=1;
+	    player->Name=strdup("Computer");
+	    break;
+	case PlayerPerson:
+	    team=2+NumPlayers;
+	    player->Name=strdup("Person");
+	    break;
+	case PlayerRescuePassive:
+	case PlayerRescueActive:
+	    // FIXME: correct for multiplayer games?
+	    player->Name=strdup("Computer");
+	    team=2+NumPlayers;
+	    break;
+    }
+
     player->Type=type;
     player->Race=PlayerRaceHuman;
     player->RaceName=RaceWcNames[0];
