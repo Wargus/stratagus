@@ -225,8 +225,8 @@ int PlayMusic(const char* name)
 		return 1;
 	}
 
-#ifdef USE_OGG
-	if ((sample = LoadOgg(name, PlayAudioStream))) {
+#ifdef USE_VORBIS
+	if ((sample = LoadVorbis(name, PlayAudioStream))) {
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
 			DebugPrint("Not supported music format\n");

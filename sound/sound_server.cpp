@@ -150,8 +150,8 @@ static void MixMusicToStereo32(int* buffer, int size)
 		Assert(MusicSample && MusicSample->Type);
 
 		len = size * sizeof(*buf);
-		tmp = alloca(len);
-		buf = alloca(len);
+		tmp = malloc(len);
+		buf = malloc(len);
 
 		div = 176400 / (MusicSample->Frequency * (MusicSample->SampleSize / 8)
 				* MusicSample->Channels);
@@ -665,8 +665,8 @@ static Sample* LoadSample(const char* name)
 	if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
 		return sample;
 	}
-#ifdef USE_OGG
-	if ((sample = LoadOgg(buf, PlayAudioLoadInMemory))) {
+#ifdef USE_VORBIS
+	if ((sample = LoadVorbis(buf, PlayAudioLoadInMemory))) {
 		return sample;
 	}
 #endif

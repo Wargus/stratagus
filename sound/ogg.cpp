@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//        Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ogg.c - ogg support */
 //
-//      (c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -30,112 +30,258 @@
 
 //@{
 
+//	This file contains code for both the ogg file format, and ogg vorbis.
+
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 
-#ifdef USE_OGG // {
+#ifdef USE_VORBIS // {
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#ifdef BSD
-#include <inttypes.h>
-#else
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-#include <stdint.h>
-#endif // BSD
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
+#ifdef USE_THEORA
+#include <theora/theora.h>
+#endif
 
 #include "myendian.h"
 #include "iolib.h"
-#include "sound.h"
+#include "movie.h"
 #include "sound_server.h"
-#include "video.h"
-#include "avi.h"
 
 /*----------------------------------------------------------------------------
 --  Declaration
 ----------------------------------------------------------------------------*/
 
-/**
-**  Private ogg data structure to handle ogg streaming.
-*/
-typedef struct _ogg_data_ {
-	OggVorbis_File VorbisFile;  ///< Vorbis file handle
-} OggData;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/**
-**  OGG vorbis read callback.
-**
-**  @param ptr    Pointer to memory to fill.
-**  @param size   Size of the element.
-**  @param nmemb  Number of elements to fill.
-**  @param user   User argument.
-**
-**  @return       The number of elements loaded.
-*/
-static size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
+int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f)
 {
-	return CLread(user, ptr, size * nmemb) / size;
+	char *buf;
+	int bytes;
+
+	while (ogg_sync_pageout(sync, page) != 1) {
+		// need more bytes
+		buf = ogg_sync_buffer(sync, 4096);
+		bytes = CLread(f, buf, 4096);
+		if (!bytes || ogg_sync_wrote(sync, bytes)) {
+			return -1;
+		}
+	}
+
+	return 0;
 }
 
-/**
-**  OGG vorbis seek callback.
-**
-**  @param user    User argument.
-**  @param offset  Seek offset.
-**  @param whence  How to seek.
-**
-**  @return        Seek position, -1 if non-seeking.
-*/
-static int OGG_seek(void* user, int64_t offset, int whence)
+int VorbisProcessData(OggData *data, char *buffer)
 {
-	return CLseek(user, offset, whence);
+	int num_samples;
+	float **pcm;
+	float *chan;
+	int i, j;
+	int val;
+	ogg_packet packet;
+	int len;
+
+	len = 0;
+	num_samples = 0;
+
+	while (!len) {
+		if (ogg_stream_packetout(&data->astream, &packet) != 1) {
+			if (OggGetNextPage(&data->page, &data->sync, data->File)) {
+				// EOF
+				return -1;
+			}
+
+			ogg_stream_pagein(&data->astream, &data->page);
+		} else {
+			if (vorbis_synthesis(&data->vblock, &packet) == 0) {
+				vorbis_synthesis_blockin(&data->vdsp, &data->vblock);
+			}
+
+			while ((num_samples = vorbis_synthesis_pcmout(&data->vdsp, &pcm)) > 0) {
+				j = 0;
+				for (i = 0; i < data->vinfo.channels; ++i) {
+					chan = pcm[i];
+					for (j = 0; j < num_samples; ++j) {
+						val = chan[j] * 32767.f;
+						if (val > 32767) {
+							val = 32767;
+						} else if (val < -32768) {
+							val = -32768;
+						}
+
+						*(int16_t*)(buffer + len
+						  + (j * 2 * data->vinfo.channels) + i * 2) = (int16_t)val;
+					}
+				}
+				len += j * 2 * data->vinfo.channels;
+
+				// we consumed num_samples
+				vorbis_synthesis_read(&data->vdsp, num_samples);
+			}
+		}
+	}
+
+	return len;
 }
 
-/**
-**  OGG vorbis close callback.
-**
-**  @param user  User argument.
-**
-**  @return      Success status.
-*/
-static int OGG_close(void* user)
+int OggInit(CLFile *f, OggData *data)
 {
-	return CLclose(user);
+	ogg_packet packet;
+	int num_vorbis;
+#ifdef USE_THEORA
+	int num_theora;
+#endif
+	int stream_start;
+	int ret;
+
+	int magic[1];
+	CLread(f, magic, sizeof(magic));
+	if (AccessLE32(magic) != 0x5367674F) { // "OggS" in ASCII
+		return -1;
+	}
+	CLseek(f, 0, SEEK_SET);
+
+	ogg_sync_init(&data->sync);
+
+	vorbis_info_init(&data->vinfo);
+	vorbis_comment_init(&data->vcomment);
+
+#ifdef USE_THEORA
+	theora_info_init(&data->tinfo);
+	theora_comment_init(&data->tcomment);
+#endif
+
+#ifdef USE_THEORA
+	num_theora = 0;
+#endif
+	num_vorbis = 0;
+	stream_start = 0;
+	while (!stream_start) {
+		ogg_stream_state test;
+
+		if (OggGetNextPage(&data->page, &data->sync, f)) {
+			return -1;
+		}
+
+		if (!ogg_page_bos(&data->page)) {
+			if (num_vorbis) {
+				ogg_stream_pagein(&data->astream, &data->page);
+			}
+#ifdef USE_THEORA
+			if (num_theora) {
+				ogg_stream_pagein(&data->vstream, &data->page);
+			}
+#endif
+			stream_start = 1;
+			break;
+		}
+
+		ogg_stream_init(&test, ogg_page_serialno(&data->page));
+		if (ogg_stream_pagein(&test, &data->page))
+			exit(-1);
+
+		// initial codec headers
+		while (ogg_stream_packetout(&test, &packet) == 1) {
+#ifdef USE_THEORA
+			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet) >= 0) {
+				memcpy(&data->vstream, &test, sizeof(test));
+				++num_theora;
+			} else
+#endif
+			if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
+				memcpy(&data->astream, &test, sizeof(test));
+				++num_vorbis;
+			} else {
+				ogg_stream_clear(&test);
+			}
+		}
+	}
+
+	data->audio = num_vorbis;
+#ifdef USE_THEORA
+	data->video = num_theora;
+#endif
+
+	// remainint codec headers
+	while ((num_vorbis && num_vorbis < 3)
+#ifdef USE_THEORA
+	  || (num_theora && num_theora < 3) ) {
+		// are we in the theora page ?
+		while (num_theora && num_theora < 3 &&
+		  (ret = ogg_stream_packetout(&data->vstream, &packet))) {
+			if (ret < 0) {
+				return -1;
+			}
+			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet)) {
+				return -1;
+			}
+			++num_theora;
+		}
+#else
+	  ) {
+#endif
+
+		// are we in the vorbis page ?
+		while (num_vorbis && num_vorbis < 3 && 
+		  (ret = ogg_stream_packetout(&data->astream, &packet))) {
+			if (ret < 0) {
+				return -1;
+			}
+			if (vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
+				return -1;
+				
+			}
+			++num_vorbis;
+		}
+
+		if (OggGetNextPage(&data->page, &data->sync, f)) {
+				break;
+		}
+
+		if (num_vorbis) {
+			ogg_stream_pagein(&data->astream, &data->page);
+		}
+#ifdef USE_THEORA
+		if (num_theora) {
+			ogg_stream_pagein(&data->vstream, &data->page);
+		}
+#endif
+	}
+
+	if (num_vorbis) {
+		vorbis_synthesis_init(&data->vdsp, &data->vinfo);
+		vorbis_block_init(&data->vdsp, &data->vblock);
+	} else {
+    	vorbis_info_clear(&data->vinfo);
+    	vorbis_comment_clear(&data->vcomment);
+	}
+
+#ifdef USE_THEORA
+	if (num_theora) {
+		theora_decode_init(&data->tstate, &data->tinfo);
+	} else {
+    	theora_info_clear(&data->tinfo);
+    	theora_comment_clear(&data->tcomment);
+	}
+
+	return !(num_vorbis || num_theora);
+#else
+	return !num_vorbis;
+#endif
 }
 
-static long OGG_tell(void* user)
-{
-	return CLtell(user);
-}
-
-/**
-**  Type member function to read from the ogg file
-**
-**  @param sample  Sample reading from
-**  @param buf     Buffer to write data to
-**  @param len     Length of the buffer
-**
-**  @return        Number of bytes read
-*/
-static int OggStreamRead(Sample* sample, void* buf, int len)
+static int VorbisStreamRead(Sample* sample, void* buf, int len)
 {
 	OggData* data;
-	int i;
-	int n;
-	int bitstream;
+	int bytes;
 
 	data = sample->User;
 
@@ -145,24 +291,12 @@ static int OggStreamRead(Sample* sample, void* buf, int len)
 	}
 
 	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
-		// read more data
-		n = SOUND_BUFFER_SIZE - sample->Len;
-
-#ifdef STRATAGUS_BIG_ENDIAN
-		i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos +
-			sample->Len, n, 1, 2, 1, &bitstream);
-#else
-		i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos +
-			sample->Len, n, 0, 2, 1, &bitstream);
-#endif
-		Assert(i >= 0);
-
-		if (!i) {
-			// EOF
+		bytes = VorbisProcessData(data, sample->Buffer + sample->Pos + sample->Len);
+		if (bytes > 0) {
+			sample->Len += bytes;
+		} else {
 			break;
 		}
-
-		sample->Len += i;
 	}
 
 	if (sample->Len < len) {
@@ -176,18 +310,28 @@ static int OggStreamRead(Sample* sample, void* buf, int len)
 	return len;
 }
 
-/**
-**  Type member function to free an ogg file
-**
-**  @param sample  Sample to free
-*/
-static void OggStreamFree(Sample* sample)
+static void VorbisStreamFree(Sample* sample)
 {
-	OggData* data;
-
+	OggData *data;
 	data = sample->User;
 
-	ov_clear(&data->VorbisFile);
+	CLclose(data->File);
+
+	if (data->audio) {
+		ogg_stream_clear(&data->astream);
+		vorbis_block_clear(&data->vblock);
+		vorbis_dsp_clear(&data->vdsp);
+		vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
+	}
+#ifdef USE_THEORA
+	if (data->video) {
+		ogg_stream_clear(&data->vstream);
+		theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+	}
+#endif
+
 	free(data);
 	free(sample->Buffer);
 	free(sample);
@@ -196,247 +340,65 @@ static void OggStreamFree(Sample* sample)
 /**
 ** Ogg stream type structure.
 */
-static const SampleType OggStreamSampleType = {
-	OggStreamRead,
-	OggStreamFree,
+static const SampleType VorbisStreamSampleType = {
+	VorbisStreamRead,
+	VorbisStreamFree,
 };
 
-/**
-**  Type member function to read from the ogg file
-**
-**  @param sample  Sample reading from
-**  @param buf     Buffer to write data to
-**  @param len     Length of the buffer
-**
-**  @return        Number of bytes read
-*/
-static int OggRead(Sample* sample, void* buf, int len)
-{
-	if (len > sample->Len) {
-		len = sample->Len;
-	}
 
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-	sample->Pos += len;
-	sample->Len -= len;
-
-	return len;
-}
 
 /**
-**  Type member function to free an ogg file
-**
-**  @param sample  Sample to free
-*/
-static void OggFree(Sample* sample)
-{
-	free(sample->User);
-	free(sample->Buffer);
-	free(sample);
-}
-
-/**
-**  Ogg object type structure.
-*/
-static const SampleType OggSampleType = {
-	OggRead,
-	OggFree,
-};
-
-/**
-**  Load ogg.
+**  Load vorbis.
 **
 **  @param name   File name.
 **  @param flags  Load flags.
 **
 **  @return       Returns the loaded sample.
 */
-Sample* LoadOgg(const char* name,int flags)
+Sample* LoadVorbis(const char* name,int flags)
 {
 	Sample* sample;
 	OggData *data;
 	CLFile* f;
-	unsigned int magic[1];
 	vorbis_info* info;
-	static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
 
 	if (!(f = CLopen(name, CL_OPEN_READ))) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		return NULL;
 	}
 
-	CLread(f, magic, sizeof(magic));
-	if (AccessLE32(magic) != 0x5367674F) { // "OggS" in ASCII
-		CLclose(f);
-		return NULL;
-	}
-
 	data = malloc(sizeof(OggData));
 
-	CLseek(f, 0, SEEK_SET);
-	if (ov_open_callbacks(f, &data->VorbisFile, NULL, 0, vc)) {
-		fprintf(stderr, "Can't initialize ogg decoder\n");
+	if (OggInit(f, data) || !data->audio) {
 		free(data);
 		CLclose(f);
 		return NULL;
 	}
 
-	info = ov_info(&data->VorbisFile, -1);
-	if (!info) {
-		fprintf(stderr, "no ogg stream\n");
-		free(data);
-		ov_clear(&data->VorbisFile);
-		return NULL;
-	}
+	info = &data->vinfo;
 
 	sample = malloc(sizeof(Sample));
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;
+
 	sample->Len = 0;
 	sample->Pos = 0;
+//	sample->Buffer = malloc(sizeof(SOUND_BUFFER_SIZE));
 	sample->User = data;
+	data->File = f;
 
 	if (flags & PlayAudioStream) {
 		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
-		sample->Type = &OggStreamSampleType;
+		sample->Type = &VorbisStreamSampleType;
 	} else {
-		int total;
-		int i;
-		int n;
-		int bitstream;
-
-		total = ov_pcm_total(&data->VorbisFile, -1) * 2;
-
-		sample->Buffer = malloc(total);
-		sample->Type = &OggSampleType;
-
-		while (sample->Len < total) {
-			n = total - sample->Len > SOUND_BUFFER_SIZE ? SOUND_BUFFER_SIZE : total - sample->Len;
-
-#ifdef STRATAGUS_BIG_ENDIAN
-			i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos + sample->Len, n, 1, 2, 1,
-				&bitstream);
-#else
-			i = ov_read(&data->VorbisFile, sample->Buffer + sample->Pos + sample->Len, n, 0, 2, 1,
-				&bitstream);
-#endif
-			Assert(i >= 0);
-
-			if (!i) {
-				// EOF
-				break;
-			}
-
-			sample->Len += i;
-		}
-
-		Assert(sample->Len == total);
+		exit(-1);
+		// todo
 	}
 
 	return sample;
 }
 
-/*----------------------------------------------------------------------------
---  Avi support
-----------------------------------------------------------------------------*/
-
-/**
-**  OGG vorbis read callback.
-**
-**  @param ptr    Pointer to memory to fill.
-**  @param size   Size of the element.
-**  @param nmemb  Number of elements to fill.
-**  @param user   User argument.
-**
-**  @return       The number of elements loaded.
-*/
-static size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
-{
-	AviFile* avi;
-	size_t length;
-	unsigned char* frame;
-
-	avi = user;
-	if (avi->AudioRemain) { // Bytes remaining
-		length = avi->AudioRemain;
-		if (length > nmemb * size) {
-			length = nmemb * size;
-		}
-		memcpy(ptr,
-			avi->AudioBuffer->Data + avi->AudioBuffer->Length -
-				avi->AudioRemain, length);
-		avi->AudioRemain -= length;
-		return length / size;
-	}
-
-	length = AviReadNextAudioFrame(avi, &frame);
-	if ((int)length < 0) {
-		return 0;
-	}
-	if (length > nmemb * size) {
-		avi->AudioRemain = length - nmemb * size;
-		length = nmemb * size;
-	}
-	memcpy(ptr, frame, length);
-
-	return length / size;
-}
-
-/**
-** OGG vorbis close callback.
-**
-** @param user User argument.
-**
-** @return Success status.
-*/
-static int AVI_OGG_close(void* user __attribute__((unused)))
-{
-	return 0;
-}
-
-/**
-** Play the ogg stream of an avi movie.
-**
-** @param avi Avi file handle
-*/
-void PlayAviOgg(AviFile* avi)
-{
-	Sample* sample;
-	OggData* data;
-	vorbis_info* info;
-	static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close, NULL };
-
-	data = malloc(sizeof(OggData));
-
-	if (ov_open_callbacks(avi, &data->VorbisFile, 0, 0, vc)) {
-		fprintf(stderr, "Can't initialize ogg decoder\n");
-		free(data);
-		return;
-	}
-
-	info = ov_info(&data->VorbisFile, -1);
-	if (!info) {
-		fprintf(stderr, "no ogg stream\n");
-		ov_clear(&data->VorbisFile);
-		free(data);
-		return;
-	}
-
-	sample = malloc(sizeof(Sample));
-	sample->Channels = info->channels;
-	sample->SampleSize = 16;
-	sample->Frequency = info->rate;
-	sample->Buffer = malloc(sizeof(SOUND_BUFFER_SIZE));
-	sample->Len = 0;
-	sample->Pos = 0;
-	sample->Type = &OggStreamSampleType;
-	sample->User = data;
-
-	MusicSample = sample;
-	PlayingMusic = 1;
-}
-
-#endif // USE_OGG
+#endif // USE_VORBIS
 
 //@}
