@@ -114,7 +114,7 @@ int InitServer(int port)
 		return -1;
 	}
 
-	if ((MasterSocket = NetOpenTCP(port)) == -1) {
+	if ((MasterSocket = NetOpenTCP(port)) == (Socket)-1) {
    		fprintf(stderr, "NetOpenTCP failed\n");
    		return -2;
 	}
@@ -211,7 +211,7 @@ static void AcceptConnections(void)
 	Session* new_session;
 	Socket new_socket;
 
-	while ((new_socket = NetAcceptTCP(MasterSocket)) != -1) {
+	while ((new_socket = NetAcceptTCP(MasterSocket)) != (Socket)-1) {
 		// Check if we're at MaxConnections
 		if (Pool->Count == Server.MaxConnections) {
 			NetSendTCP(new_socket, "Server Full\n", 12);
