@@ -436,11 +436,7 @@ global void InitCcl(void)
     sargv[2] = "-g0";
     sargv[3] = "-h200000:20";
     buf=malloc(strlen(FreeCraftLibPath)+4);
-#ifdef __MINGW32__
-    sprintf(buf,"-l%s\\",FreeCraftLibPath);
-#else
     sprintf(buf,"-l%s",FreeCraftLibPath);
-#endif
     sargv[4] = buf;			// never freed
     siod_init(5,sargv);
 
