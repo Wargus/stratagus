@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -42,32 +42,27 @@
 #include "video.h"
 #include "iolib.h"
 #include "intern_video.h"
-#include "map.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global PaletteLink* PaletteList;		/// List of all used palettes.
+global PaletteLink* PaletteList;        /// List of all used palettes.
 
 /*----------------------------------------------------------------------------
---		Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---		Local functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Video draw part of graphic.
+**  Video draw part of graphic.
 **
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param graphic  Pointer to object
+**  @param gx       X offset into object
+**  @param gy       Y offset into object
+**  @param w        width to display
+**  @param h        height to display
+**  @param x        X screen position
+**  @param y        Y screen position
 */
 #ifndef USE_OPENGL
 global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
@@ -124,54 +119,67 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 #endif
 
 /**
-**		Video draw part of graphic clipped.
+**  Video draw part of graphic clipped.
 **
-**		@param graphic		Pointer to object
-**		@param gx		X offset into object
-**		@param gy		Y offset into object
-**		@param w		width to display
-**		@param h		height to display
-**		@param x		X screen position
-**		@param y		Y screen position
+**  @param graphic  Pointer to object
+**  @param gx       X offset into object
+**  @param gy       Y offset into object
+**  @param w        width to display
+**  @param h        height to display
+**  @param x        X screen position
+**  @param y        Y screen position
 */
-#ifndef USE_OPENGL
 global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	CLIP_RECTANGLE(x, y, w, h);
 	VideoDrawSub(graphic, gx, gy, w, h, x, y);
 }
-#else
-global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y)
+
+/**
+**  Video draw part of graphic faded.
+**
+**  @param graphic  Pointer to object
+**  @param gx       X offset into object
+**  @param gy       Y offset into object
+**  @param w        width to display
+**  @param h        height to display
+**  @param x        X screen position
+**  @param y        Y screen position
+**  @param fade     Amount to fade
+*/
+#ifndef USE_OPENGL
+global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
+	int w, int h, int x, int y, unsigned char fade)
 {
-	CLIP_RECTANGLE(x, y, w, h);
+	int alpha;
+
+	alpha = graphic->Surface->format->alpha;
+	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, fade);
+	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
+}
+#else
+global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
+	int w, int h, int x, int y, unsigned char fade)
+{
+	// FIXME: not done
 	VideoDrawSub(graphic, gx, gy, w, h, x, y);
 }
 #endif
 
-
-global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char fade)
-{
-	SDL_Rect srect;
-	SDL_Rect drect;
-	int alpha;
-
-	srect.x = gx;
-	srect.y = gy;
-	srect.w = w;
-	srect.h = h;
-
-	drect.x = x;
-	drect.y = y;
-
-	alpha = graphic->Surface->format->alpha;
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, fade);
-	SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
-}
-
+/**
+**  Video draw part of graphic faded and clipped.
+**
+**  @param graphic  Pointer to object
+**  @param gx       X offset into object
+**  @param gy       Y offset into object
+**  @param w        width to display
+**  @param h        height to display
+**  @param x        X screen position
+**  @param y        Y screen position
+**  @param fade     Amount to fade
+*/
 global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
 {
@@ -180,7 +188,7 @@ global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 }
 
 /**
-**		Free graphic object.
+**  Free graphic object.
 */
 global void VideoFree(Graphic* graphic)
 {
@@ -216,19 +224,19 @@ global void VideoFree(Graphic* graphic)
 }
 
 /*----------------------------------------------------------------------------
---		Global functions
+--  Global functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Make a graphic object.
+**  Make a graphic object.
 **
-**		@param depth		Pixel depth of the object (8,16,32)
-**		@param width		Pixel width.
-**		@param height		Pixel height.
-**		@param data		Object data (malloced by caller, freed from object).
-**		@param size		Size in bytes of the object data.
+**  @param depth   Pixel depth of the object (8,16,32)
+**  @param width   Pixel width.
+**  @param height  Pixel height.
+**  @param data    Object data (malloced by caller, freed from object).
+**  @param size    Size in bytes of the object data.
 **
-**		@return				New graphic object (malloced).
+**  @return        New graphic object (malloced).
 */
 global Graphic* MakeGraphic(unsigned depth, int width, int height,
 	void* data, unsigned size)
@@ -298,11 +306,11 @@ global void FlipGraphic(Graphic* graphic)
 }
 
 /**
-**		Make a new graphic object.
+**  Make a new graphic object.
 **
-**		@param depth		Pixel depth of the object (8,16,32)
-**		@param width		Pixel width.
-**		@param height		Pixel height.
+**  @param depth   Pixel depth of the object (8,16,32)
+**  @param width   Pixel width.
+**  @param height  Pixel height.
 */
 global Graphic* NewGraphic(unsigned depth, int width, int height)
 {
@@ -319,11 +327,11 @@ global Graphic* NewGraphic(unsigned depth, int width, int height)
 }
 
 /**
-**		Make an OpenGL texture or textures out of a graphic object.
+**  Make an OpenGL texture or textures out of a graphic object.
 **
-**		@param graphic		The graphic object.
-**		@param width		Graphic width.
-**		@param height		Graphic height.
+**  @param graphic  The graphic object.
+**  @param width    Graphic width.
+**  @param height   Graphic height.
 */
 #ifdef USE_OPENGL
 global void MakeTexture(Graphic* graphic, int width, int height)
@@ -394,9 +402,9 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 }
 
 /**
-**		Make an OpenGL texture of the player color pixels only.
+**  Make an OpenGL texture of the player color pixels only.
 **
-**		FIXME: Docu
+**  FIXME: docu
 */
 global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 		unsigned char* map, int maplen)
@@ -483,14 +491,14 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 #endif
 
 /**
-**		Resize a graphic
+**  Resize a graphic
 **
-**		@param g		Graphic object.
-**		@param w		New width of graphic.
-**		@param h		New height of graphic.
+**  @param g  Graphic object.
+**  @param w  New width of graphic.
+**  @param h  New height of graphic.
 **
-**		@todo		FIXME: Higher quality resizing.
-**				FIXME: Works only with 8bit indexed graphic objects.
+**  @todo FIXME: Higher quality resizing.
+**        FIXME: Works only with 8bit indexed graphic objects.
 */
 global void ResizeGraphic(Graphic *g, int w, int h)
 {
@@ -537,21 +545,18 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 }
 
 /**
-**		Load graphic from file.
+**  Load graphic from file.
 **
-**		@param name		File name.
+**  @param name  File name.
 **
-**		@return				Graphic object.
-**
-**		@todo				FIXME: I want also support JPG file format!
-**						FIXME: I want to support our own binary format!
-**						FIXME: Add support for 16bit indexed format!
+**  @return      Graphic object.
 */
 global Graphic* LoadGraphic(const char* name)
 {
 	Graphic* graphic;
-	char buf[1024];
+	char buf[PATH_MAX];
 
+	// TODO: More formats?
 	if (!(graphic = LoadGraphicPNG(LibraryFileName(name, buf)))) {
 		fprintf(stderr, "Can't load the graphic `%s'\n", name);
 		ExitFatal(-1);
