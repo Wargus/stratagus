@@ -862,28 +862,28 @@ local void DebugDrawFonts(void)
 
     VideoFillRectangle(ColorWhite,0,0,40,VideoHeight-1);
     VideoDrawTextClip(8,   0+ 10,SmallFont,"FreeCraft");
-    VideoDrawTextClip(8,   0+ 20,SmallFont,
-	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+//    VideoDrawTextClip(8,   0+ 20,SmallFont,
+//	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawTextClip(8,   0+ 30,SmallFont,"abdefgABCDEFQ");
 
     VideoDrawTextClip(8,  40+ 10,GameFont,"FreeCraft");
-    VideoDrawTextClip(8,  40+ 25,GameFont,
-	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+//    VideoDrawTextClip(8,  40+ 25,GameFont,
+//	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawTextClip(8,  40+ 40,GameFont,"abdefgABCDEFQ");
 
     VideoDrawTextClip(8, 100+ 10,LargeFont,"FreeCraft");
-    VideoDrawTextClip(8, 100+ 25,LargeFont,
-	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+//    VideoDrawTextClip(8, 100+ 25,LargeFont,
+//	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawTextClip(8, 100+ 40,LargeFont,"abdefgABCDEFQ");
 
     VideoDrawTextClip(8, 160+ 10,SmallTitleFont,"FreeCraft");
-    VideoDrawTextClip(8, 160+ 35,SmallTitleFont,
-	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+//    VideoDrawTextClip(8, 160+ 35,SmallTitleFont,
+//	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawTextClip(8, 160+ 60,SmallTitleFont,"abdefgABCDEFQ");
 
     VideoDrawTextClip(8, 260+ 10,LargeTitleFont,"FreeCraft");
-    VideoDrawTextClip(8, 260+ 55,LargeTitleFont,
-	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
+//    VideoDrawTextClip(8, 260+ 55,LargeTitleFont,
+//	"~00~11~22~33~44~55~66~77~88~99~aa~bb~cc~dd~ee~ff");
     VideoDrawTextClip(8, 260+ 100,LargeTitleFont,"abdefgABCDEFQ");
 
     PopClipping();

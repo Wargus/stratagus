@@ -10,7 +10,7 @@
 //
 /**@name wince.c	-	WinCE video support. */
 //
-//	(c) Copyright 2001,2002 by
+//	(c) Copyright 2001-2003 by Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -242,11 +242,27 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 }
 
 /**
-**	Create a new hardware dependend palette palette.
+**	Maps RGB to a hardware dependent pixel.
 **
-**	@param palette	Hardware independend palette.
+**	@param r	Red color.
+**	@param g	Green color.
+**	@param b	Blue color.
 **
-**	@return		A hardware dependend pixel table.
+**	@return		A hardware dependent pixel.
+*/
+global unsigned long VideoMapRGB(int r, int g, int b)
+{
+    DebugCheck(!Screen);
+
+    return SDL_MapRGB(Screen->format, r, g, b);
+}
+
+/**
+**	Create a new hardware dependent palette palette.
+**
+**	@param palette	Hardware independent palette.
+**
+**	@return		A hardware dependent pixel table.
 */
 global VMemType *VideoCreateNewPalette(const Palette * palette)
 {
