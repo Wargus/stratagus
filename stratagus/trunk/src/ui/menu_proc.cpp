@@ -151,20 +151,20 @@ global void MenusSetBackground(void)
     DestroyCursorBackground();
     if (!Menusbgnd) {
 	Menusbgnd = LoadGraphic(MenuBackground);
+	ResizeGraphic(Menusbgnd,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
 	MakeTexture(Menusbgnd,Menusbgnd->Width,Menusbgnd->Height);
 #endif
-	// JOHNS: NO VideoSetPalette(Menusbgnd->Pixels);
     }
 
-    // VideoLockScreen();
-
-    // FIXME: bigger window ?
     VideoDrawSubClip(Menusbgnd,0,0,
 	Menusbgnd->Width,Menusbgnd->Height,
 	(VideoWidth-Menusbgnd->Width)/2,(VideoHeight-Menusbgnd->Height)/2);
 
-    // VideoUnlockScreen();
+    MenuRedrawX = 0;
+    MenuRedrawY = 0;
+    MenuRedrawW = VideoWidth;
+    MenuRedrawH = VideoHeight;
 }
 
 /**
@@ -617,6 +617,11 @@ global void DrawMenu(Menu *menu)
 	return;
     }
 
+    MenuRedrawX = menu->x;
+    MenuRedrawY = menu->y;
+    MenuRedrawW = menu->xsize;
+    MenuRedrawH = menu->ysize;
+
     switch (menu->image) {
 	case ImagePanel1:
 	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
@@ -710,11 +715,6 @@ global void DrawMenu(Menu *menu)
     if (mip) {
 	DrawPulldown(mip,menu->x,menu->y);
     }
-
-    MenuRedrawX = menu->x;
-    MenuRedrawY = menu->y;
-    MenuRedrawW = menu->xsize;
-    MenuRedrawH = menu->ysize;
 }
 
 /**

@@ -651,6 +651,41 @@ global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsign
 #endif
 
 /**
+**	Resize a graphic
+**
+**	@param g	Graphic object.
+**	@param w	New width of graphic.
+**	@param h	New height of graphic.
+*/
+global void ResizeGraphic(Graphic *g,int w,int h)
+{
+    int i;
+    int j;
+    unsigned char *data;
+    int x;
+
+    if( g->Width==w && g->Height==h ) {
+	return;
+    }
+
+    data = (unsigned char*)malloc(w*h);
+    x=0;
+
+    for( i=0; i<h; ++i ) {
+	for( j=0; j<w; ++j ) {
+	    data[x] = ((unsigned char*)g->Frames)[
+		(i*g->Height+h/2)/h*g->Width + (j*g->Width+w/2)/w];
+	    ++x;
+	}
+    }
+
+    free(g->Frames);
+    g->Frames = data;
+    g->Width = w;
+    g->Height = h;
+}
+
+/**
 **	Load graphic from file.
 **
 **	@param name	File name.
