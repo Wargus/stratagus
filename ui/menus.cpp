@@ -782,28 +782,26 @@ global void InitMenuFuncHash(void)
 }
 
 /*----------------------------------------------------------------------------
---		Button action handler and Init/Exit functions
+--  Button action handler and Init/Exit functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Draw the version and copyright at bottom of the screen.
-**		Also include now the license.
+**  Draw the version, copyright, and license at bottom of the screen.
 */
-local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
+local void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 {
 	char* nc;
 	char* rc;
 
 	GetDefaultTextColors(&nc, &rc);
-	MenusSetBackground();
 	SetDefaultTextColors(rc, rc);
 
 	if (SoundFildes == -1 && !SoundOff) {
 		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
 	}
 
-	VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 440, GameFont, NameLine);
-	VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 456, GameFont,
+	VideoDrawTextCentered(VideoWidth / 2, TheUI.Offset480Y + 440, GameFont, NameLine);
+	VideoDrawTextCentered(VideoWidth / 2, TheUI.Offset480Y + 456, GameFont,
 		"Engine distributed under the terms of the GNU General Public License.");
 	SetDefaultTextColors(nc, rc);
 }
@@ -1735,8 +1733,6 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 		InitVideo();
 		// Force Update Background Size
 		SetClipping(0,0,VideoWidth - 1,VideoHeight - 1);
-		MenusSetBackground();
-		Invalidate();
 		CleanModules();
 		LoadCcl();
 		PreMenuSetup();
@@ -2754,17 +2750,14 @@ local void SinglePlayerGameMenu(void)
 }
 
 /**
-**		Show the campaign select menu.
+**  Show the campaign select menu.
 **
-**		Look which campaigns are available and how they are called.
+**  Look which campaigns are available and how they are called.
 */
 local void CampaignGameMenu(void)
 {
 	int i;
 	Menu* menu;
-
-	MenusSetBackground();
-	Invalidate();
 
 	menu = FindMenu("menu-campaign-select");
 	DebugPrint("%d campaigns available\n" _C_ NumCampaigns);
@@ -2777,7 +2770,7 @@ local void CampaignGameMenu(void)
 #endif
 
 	//
-	//		Setup campaign name.
+	//  Setup campaign name.
 	//
 	for (i = 0; i < NumCampaigns && i < 4; ++i) {
 		char* s;
@@ -2812,9 +2805,6 @@ local void CampaignGameMenu(void)
 */
 local void StartCampaignFromMenu(int number)
 {
-	MenusSetBackground();
-	Invalidate();
-
 #if 0
 	// JOHNS: this is currently not needed:
 
@@ -2827,10 +2817,6 @@ local void StartCampaignFromMenu(int number)
 
 	PlayCampaign(Campaigns[number].Ident);
 	GuiGameStarted = 1;
-
-	MenusSetBackground();
-	VideoClearScreen();
-	Invalidate();
 
 	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
 	EndMenu();
@@ -2944,9 +2930,6 @@ local void JoinNetGameMenu(void)
 	char *port;
 	Menu *menu;
 
-	MenusSetBackground();
-	Invalidate();
-
 	//
 	//  Prepare enter ip/hostname menu
 	//
@@ -2976,8 +2959,6 @@ local void JoinNetGameMenu(void)
 
 	ProcessMenu("menu-enter-server", 1);
 
-	MenusSetBackground();
-
 	if (menu->Items[1].d.input.nch == 0) {
 		return;
 	}
@@ -2991,7 +2972,6 @@ local void JoinNetGameMenu(void)
 	server_host_buffer[menu->Items[1].d.input.nch] = 0;
 	if (NetworkSetupServerAddress(server_host_buffer)) {
 		NetErrorMenu("Unable to lookup host.");
-		MenusSetBackground();
 		return;
 	}
 	NetworkInitClientConnect();
@@ -3009,8 +2989,6 @@ local void JoinNetGameMenu(void)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		MenusSetBackground();
-		Invalidate();
 		EndMenu();
 	}
 }
@@ -3038,7 +3016,6 @@ local void NetConnectingExit(Menuitem *mi)
 */
 local void NetConnectingCancel(void)
 {
-	MenusSetBackground();
 	NetworkExitClientConnect();
 	// Trigger TerminateNetConnect() to call us again and end the menu
 	NetLocalState = ccs_usercanceled;
@@ -3129,11 +3106,8 @@ local void CreateInternetGameMenu(void)
 */
 local void MultiGameStart(void)
 {
-	MenusSetBackground();
-	Invalidate();
-
 	if (MetaServerInUse) {
-		SendMetaCommand("StartGame","");
+		SendMetaCommand("StartGame", "");
 	}
 
 	GameSettings.Presets[0].Race = SettingsPresetMapDefault;
@@ -3150,10 +3124,7 @@ local void MultiGameStart(void)
 local void MultiPlayerGameMenu(void)
 {
 	char NameBuf[32];
-	Menu *menu;
-
-	MenusSetBackground();
-	Invalidate();
+	Menu* menu;
 
 	menu = FindMenu("menu-enter-name");
 	menu->Items[1].d.input.buffer = NameBuf;
@@ -3164,8 +3135,6 @@ local void MultiPlayerGameMenu(void)
 	menu->Items[2].flags &= ~MenuButtonDisabled;
 
 	ProcessMenu("menu-enter-name", 1);
-
-	MenusSetBackground();
 
 	if (menu->Items[1].d.input.nch == 0) {
 		return;
@@ -3785,7 +3754,6 @@ local void ScenSelectCancel(void)
 */
 local void GameCancel(void)
 {
-	MenusSetBackground();
 	FreeMapInfo(MenuMapInfo);
 	MenuMapInfo = NULL;
 	EndMenu();
@@ -3892,7 +3860,6 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 	char buffer[32];
 
 	GetDefaultTextColors(&nc, &rc);
-	MenusSetBackground();
 	SetDefaultTextColors(rc, rc);
 	l = VideoTextLength(GameFont, "Scenario:");
 	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
@@ -4750,9 +4717,6 @@ global void NetClientUpdateState(void)
 */
 local void StartEditor(void)
 {
-	MenusSetBackground();
-	Invalidate();
-
 	SetupEditor();
 
 	EditorRunning = 1;
@@ -4814,9 +4778,6 @@ local void EditorNewMap(void)
 	char height[10];
 	char description[36];
 
-	MenusSetBackground();
-	Invalidate();
-
 	EditorCancelled = 0;
 
 	menu = FindMenu("menu-editor-new");
@@ -4836,7 +4797,6 @@ local void EditorNewMap(void)
 	ProcessMenu("menu-editor-new", 1);
 
 	if (EditorCancelled) {
-		MenusSetBackground();
 		return;
 	}
 
@@ -4860,7 +4820,6 @@ local void EditorNewMap(void)
 */
 local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 {
-	MenusSetBackground();
 }
 
 /**
@@ -4954,7 +4913,6 @@ local void EditorMainLoadMap(void)
 	GetInfoFromSelectPath();
 
 	if (EditorCancelled) {
-		MenusSetBackground();
 		return;
 	}
 
@@ -5557,7 +5515,6 @@ local void EditorMapPropertiesOk(void)
 */
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 {
-	MenusSetBackground();
 }
 
 /**
@@ -6279,10 +6236,6 @@ local void ReplayGameMenu(void)
 #endif
 	*ScenSelectDisplayPath = '\0';
 
-	VideoClearScreen();
-	MenusSetBackground();
-	Invalidate();
-
 	GuiGameStarted = 0;
 	ProcessMenu("menu-replay-game", 1);
 	if (GuiGameStarted) {
@@ -6792,8 +6745,6 @@ global void InitMenuData(void)
 local void MultiGameMasterReport(void)
 {
 //	EndMenu();
-	MenusSetBackground();
-	Invalidate();
 
 	ProcessMenu("metaserver-list", 1);
 	if (GuiGameStarted) {
@@ -6808,8 +6759,6 @@ local void MultiGameMasterReport(void)
 local void ShowMetaServerList(void)
 {
 	EndMenu();
-	Invalidate();
-	MenusSetBackground();
 
 	GuiGameStarted = 0;
 	ProcessMenu("metaserver-list", 1);
@@ -6922,8 +6871,6 @@ local void MultiMetaServerGameSetupExit(Menuitem *mi)
 {
 	// TODO: how to free stuff?
 //	EndMenu();
-	MenusSetBackground();
-	Invalidate();
 //	EndMenu();
 }
 
@@ -6938,8 +6885,6 @@ local void SelectGameServer(Menuitem *mi)
 
 	j = mi - mi->menu->Items;
 	mi->menu->Items[j].d.gem.state = MI_GSTATE_UNCHECKED;
-	MenusSetBackground();
-	Invalidate();
 	EndMenu();
 
 	strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
@@ -6954,7 +6899,6 @@ local void SelectGameServer(Menuitem *mi)
 //	server_host_buffer[menu->Items[1].d.input.nch] = 0;
 	if (NetworkSetupServerAddress(server_host_buffer)) {
 		NetErrorMenu("Unable to lookup host.");
-		MenusSetBackground();
 		ProcessMenu("metaserver-list", 1);
 		return;
 	}
@@ -6973,8 +6917,6 @@ local void SelectGameServer(Menuitem *mi)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		MenusSetBackground();
-		Invalidate();
 		EndMenu();
 	}
 }
@@ -7028,7 +6970,6 @@ local int MetaServerConnectError(void)
 {
 	Invalidate();
 	NetErrorMenu("Cannot Connect to Meta-Server");
-	MenusSetBackground();
 	return 0;
 }
 
