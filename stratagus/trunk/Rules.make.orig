@@ -125,8 +125,8 @@ MP3LIB		= -lmad
 #ZDEFS		=
 #ZLIBS		=
 # GZ compression
-ZDEFS		= -DUSE_ZLIB
-ZLIBS		= -lz
+#ZDEFS		= -DUSE_ZLIB
+#ZLIBS		= -lz
 # BZ2 compression
 #ZDEFS		= -DUSE_BZ2LIB
 #ZLIBS		= -lbz2
@@ -134,8 +134,8 @@ ZLIBS		= -lz
 #ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
 #ZLIBS		= -lz -lbz2
 # GZ + BZ2 + ZZIP compression
-#ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB -DUSE_ZZIPLIB
-#ZLIBS		= -lzzip -lz -lbz2
+ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB -DUSE_ZZIPLIB
+ZLIBS		= -lzzip -lz -lbz2
 
 #------------------------------------------------------------------------------
 
@@ -232,7 +232,8 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## USE_LUA:		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
 	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
-	# -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
+	-DUSE_HP_FOR_XP -DNEW_NETMENUS # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
+
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
