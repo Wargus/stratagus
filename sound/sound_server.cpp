@@ -145,8 +145,6 @@ global int SoundThreadRunning;		/// FIXME: docu
 
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 
-extern Sample* MusicSample;		/// Music samples
-
 /**
 **	Mix music to stereo 32 bit.
 **
@@ -160,21 +158,35 @@ local void MixMusicToStereo32(int* buffer, int size)
 {
     int i;
     int n;
+    int len;
     short* buf;
 
     if (PlayingMusic) {
 	DebugCheck(!MusicSample && !MusicSample->Type);
 
 	// FIXME: if samples are shared this fails
-	buf = alloca(size * sizeof(*buf));
-	n = MusicSample->Type->Read(MusicSample, buf, size * sizeof(*buf));
+	if (MusicSample->Channels == 2) {
+	    len = size * sizeof(*buf);
+	    buf = alloca(len);
+	    n = MusicSample->Type->Read(MusicSample, buf, len);
 
-	for (i = 0; i < n / sizeof(*buf); ++i) {
-	    // Add to our samples
-	    buffer[i] += (buf[i] * MusicVolume) / 256;
+	    for (i = 0; i < n / sizeof(*buf); ++i) {
+		// Add to our samples
+		buffer[i] += (buf[i] * MusicVolume) / 256;
+	    }
+	} else {
+	    len = size * sizeof(*buf) / 2;
+	    buf = alloca(len);
+	    n = MusicSample->Type->Read(MusicSample, buf, len);
+
+	    for (i = 0; i < n / sizeof(*buf); ++i) {
+		// Add to our samples
+		buffer[i * 2 + 0] += (buf[i] * MusicVolume) / 256;
+		buffer[i * 2 + 1] += (buf[i] * MusicVolume) / 256;
+	    }
 	}
 
-	if (n != size * sizeof(*buf)) {	// End reached
+	if (n != len) {			// End reached
 	    SCM cb;
 
 	    PlayingMusic = 0;

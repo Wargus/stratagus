@@ -36,6 +36,22 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Avi frame buffer typedef
+*/
+typedef struct _avi_frame_buffer_ AviFrameBuffer;
+
+/**
+**	Avi frame buffer structure
+**
+**	Used to stored read and used frames.
+*/
+struct _avi_frame_buffer_ {
+    AviFrameBuffer* Next;		/// Next buffer
+    int		    Length;		/// Buffer length
+    unsigned char   Data[1];		/// Buffer data
+};
+
+/**
 **	Avi file handle structure
 */
 typedef struct _avi_file_ {
@@ -48,10 +64,17 @@ typedef struct _avi_file_ {
     long	NumFrames;		/// Number of video frames
     int		VideoStream;		/// Video stream number
     unsigned long VideoTag;		/// Video stream tag
+    AviFrameBuffer* VideoFrames;	/// Video frames
+    AviFrameBuffer** VideoFramesTail;	/// Video frames tail pointer
+    AviFrameBuffer* VideoBuffer;	/// Current video frame buffer
     // Audio streams
     int		AudioStream;		/// Audio stream number
+    unsigned long AudioTag;		/// Audio stream tag
+    AviFrameBuffer* AudioFrames;	/// Audio frames
+    AviFrameBuffer** AudioFramesTail;	/// Audio frames tail pointer
+    AviFrameBuffer* AudioBuffer;	/// Current audio frame buffer
+    int	AudioRemain;			/// Remaining bytes in buffer
 } AviFile;
-
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -59,11 +82,15 @@ typedef struct _avi_file_ {
 
     /// Open an avi file
 extern AviFile* AviOpen(const char* name);
-
     /// Close an avi file
 extern void AviClose(AviFile* avi);
 
     /// Read next video frame
-extern int AviReadNextFrame(AviFile* avi,unsigned char** frame);
+extern int AviReadNextVideoFrame(AviFile* avi,unsigned char** frame);
+    /// Read next audio frame
+extern int AviReadNextAudioFrame(AviFile* avi,unsigned char** frame);
+
+    /// Play the sound of an avi movie
+extern void PlayAviOgg(AviFile* avi);
 
 //@}
