@@ -199,6 +199,7 @@ global Graphic* LoadGraphicPNG(const char* name)
 		return NULL;
 	}
 #ifdef DEBUG
+	DebugLevel3Fn("%10d: %s: %d * %d\n" _C_ w * h _C_ name _C_ w _C_ h);
 	AllocatedGraphicMemory += h * w;
 #endif
 
