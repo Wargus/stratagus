@@ -123,7 +123,7 @@
 
 #ifndef __FUNCTION__
     // I don't know, but eVC didn't has it, even it is documented
-#define __FUNCTION__ __FILE__ ":" /* __LINE__ */
+#define __FUNCTION__ __FILE__  /* ":" __LINE__ */
 #endif
 
 #ifndef _WIN32_WCE
@@ -139,7 +139,13 @@
 ==	Debug definitions
 ============================================================================*/
 
-#define _C_	,			/// Debug , for non GNU-C compiler
+    /**
+    **	This simulates vararg macros.
+    **	@example
+    **		DebugLevel0("Test %d\n" _C_ 1);
+    **		DebugLevel0("Test %d %d\n" _C_ 1 _C_ 2);
+    */
+#define _C_	,			/// Debug , to simulate vararg macros
 
 #ifdef DEBUG	// {
 
@@ -155,99 +161,74 @@
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
-#ifdef __GNUC__	// { GNUC supports vararg macros
-
     /**
     **	Print debug information of level 0.
     */
-#define DebugLevel0(fmt,args...)	printf(fmt,##args)
+#define DebugLevel0(args) \
+	do { fprintf(stdout,args); } while(0)
 
     /**
     **	Print debug information of level 1.
     */
-#define DebugLevel1(fmt,args...)	printf(fmt,##args)
+#define DebugLevel1(args)\
+	do { fprintf(stdout,args); } while(0)
 
     /**
     **	Print debug information of level 2.
     */
-#define DebugLevel2(fmt,args...)	printf(fmt,##args)
+#define DebugLevel2(args)\
+	do { fprintf(stdout,args); } while(0)
 
     /**
-    **	Print debug information of level 3.
+    **	Print debug information of level 3. (normal = disable)
     */
-#define DebugLevel3(fmt,args...)	/* TURNED OFF: printf(fmt,##args) */
+#define DebugLevel3(args) \
+	/* TURNED OFF: do { fprintf(stdout,args); } while(0) */
 
     /**
     **	Print debug information of level 0 with function name.
     */
-#define DebugLevel0Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+#define DebugLevel0Fn(args) \
+	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
 
     /**
     **	Print debug information of level 1 with function name.
     */
-#define DebugLevel1Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+#define DebugLevel1Fn(args) \
+	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
 
     /**
     **	Print debug information of level 2 with function name.
     */
-#define DebugLevel2Fn(fmt,args...)	printf(__FUNCTION__": "fmt,##args)
+#define DebugLevel2Fn(args) \
+	do { fprintf(stdout,__FUNCTION__": " args); } while(0)
 
     /**
     **	Print debug information of level 3 with function name.
     */
-#define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
-
-#else	// }{ !__GNUC__
-
-#define DebugLevel0(args) do { fprintf(stdout,args); } while(0)
-#define DebugLevel1(args) do { fprintf(stdout,args); } while(0)
-#define DebugLevel2(args) do { fprintf(stdout,args); } while(0)
-#define DebugLevel3(args) /* TURNED OFF: do { fprintf(stdout,args); } while(0) */
-#define DebugLevel0Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
-#define DebugLevel1Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
-#define DebugLevel2Fn(args) do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0)
-#define DebugLevel3Fn(args) /* TURNED OFF: do { fprintf(stdout, "%s:%d: ", __FILE__, __LINE__); fprintf(stdout,args); } while(0) */
-
-#endif	// } !__GNUC__
+#define DebugLevel3Fn(args) \
+	/* TURNED OFF: do { fprintf(stdout,__FUNCTION__": " args); } while(0) */
 
 #else	// }{ DEBUG
 
 #define IfDebug(code)		/* disabled */
 #define DebugCheck(cond)	/* disabled */
 
-#ifdef __GNUC__	// { GNUC auto detection
-
-#define DebugLevel0(fmt...)	/* disabled */
-#define DebugLevel1(fmt...)	/* disabled */
-#define DebugLevel2(fmt...)	/* disabled */
-#define DebugLevel3(fmt...)	/* disabled */
-#define DebugLevel0Fn(fmt...)	/* disabled */
-#define DebugLevel1Fn(fmt...)	/* disabled */
-#define DebugLevel2Fn(fmt...)	/* disabled */
-#define DebugLevel3Fn(fmt...)	/* disabled */
-
-#else	// }{ __GNUC__
-
-#undef _C_
-#define _C_
-
-#define DebugLevel0(fmt)	/* disabled */
-#define DebugLevel1(fmt)	/* disabled */
-#define DebugLevel2(fmt)	/* disabled */
-#define DebugLevel3(fmt)	/* disabled */
-#define DebugLevel0Fn(fmt)	/* disabled */
-#define DebugLevel1Fn(fmt)	/* disabled */
-#define DebugLevel2Fn(fmt)	/* disabled */
-#define DebugLevel3Fn(fmt)	/* disabled */
-
-#endif	// } !__GNUC__
+#define DebugLevel0(args)	/* disabled */
+#define DebugLevel1(args)	/* disabled */
+#define DebugLevel2(args)	/* disabled */
+#define DebugLevel3(args)	/* disabled */
+#define DebugLevel0Fn(args)	/* disabled */
+#define DebugLevel1Fn(args)	/* disabled */
+#define DebugLevel2Fn(args)	/* disabled */
+#define DebugLevel3Fn(args)	/* disabled */
 
 #endif	// } !DEBUG
 
 #ifdef REFS_DEBUG	// {
 
     /**
-    **	Debug check condition for refrences
+    **	Debug check condition for references
     */
 #define RefsDebugCheck(cond)	do{ if( cond ) { \
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \

@@ -619,10 +619,11 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	    } else {
 		strcpy (zzbasepath, dirname);
 	    }
-	    DebugLevel3Fn("zzbasepath `%s', dirname `%s'\n", zzbasepath, dirname);
+	    DebugLevel3Fn("zzbasepath `%s', dirname `%s'\n"
+		_C_ zzbasepath _C_ dirname);
 	}
     }
-    IfDebug( if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n", dirname); } );
+    IfDebug(if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n" _C_ dirname); });
 #else
 #ifndef _MSC_VER
     dirp = opendir(dirname);
@@ -688,7 +689,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		    }
 		} else {
 zzentry:
-		    DebugLevel3Fn("zzip-entry `%s', `%s'\n", buffer, np);
+		    DebugLevel3Fn("zzip-entry `%s', `%s'\n" _C_ buffer _C_ np);
 		    entvalid = 1;
 		    cp = strchr(np, '/');
 		    if (cp) {
