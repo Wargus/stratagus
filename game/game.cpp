@@ -381,7 +381,9 @@ global void CreateGame(char* filename, WorldMap* map)
     if(AStarOn) {
 	InitAStar();
     }
-
+#ifdef HIERARCHIC_PATHFINDER
+    PfHierInitialize ();
+#endif /* HIERARCHIC_PATHFINDER */
 }
 
 /**
