@@ -10,7 +10,7 @@
 //
 /**@name ccl_pathfinder.c	-	pathfinder ccl functions. */
 //
-//	(c) Copyright 2000-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 2000-2002 by Lutz Sammer, Fabrice Rossi, Latimerius.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -112,21 +112,29 @@ local SCM CclAStarSetMovingUCC(SCM cost)
     return SCM_UNSPECIFIED;
 }
 
+#ifdef HIERARCHIC_PATHFINDER
 local SCM CclPfHierShowRegIds (SCM flag)
 {
-#ifdef HIERARCHIC_PATHFINDER
     PfHierShowRegIds = gh_scm2bool (flag);
-#endif
     return SCM_UNSPECIFIED;
 }
 
 local SCM CclPfHierShowGroupIds (SCM flag)
 {
-#ifdef HIERARCHIC_PATHFINDER
     PfHierShowGroupIds = gh_scm2bool (flag);
-#endif
     return SCM_UNSPECIFIED;
 }
+#else
+local SCM CclPfHierShowRegIds (SCM flag __attribute__((unused)))
+{
+    return SCM_UNSPECIFIED;
+}
+
+local SCM CclPfHierShowGroupIds (SCM flag __attribute__((unused)))
+{
+    return SCM_UNSPECIFIED;
+}
+#endif
 
 
 /**
