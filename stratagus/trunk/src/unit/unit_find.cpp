@@ -781,7 +781,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
 
-		if (!UnitVisibleAsGoal(dest, unit->Player)) {
+		if (!UnitVisibleAsGoal(dest, unit->Player) && unit->Player->Type == PlayerPerson) {
 			continue;
 		}
 
