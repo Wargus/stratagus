@@ -112,9 +112,6 @@ static void AddIcon(const char* ident, const char* tileset,
 		iconfile = malloc(sizeof(IconFile));
 		iconfile->FileName = strdup(file);
 		iconfile->Sprite = NULL;
-#ifdef USE_OPENGL
-		memset(iconfile->PlayerColorSprite, 0, sizeof(iconfile->PlayerColorSprite));
-#endif
 		*(IconFile**)hash_add(IconFileHash, iconfile->FileName) = iconfile;
 	}
 
@@ -144,9 +141,6 @@ static void AddIcon(const char* ident, const char* tileset,
 		icon->Height = height;
 
 		icon->Sprite = NULL;
-#ifdef USE_OPENGL
-		icon->PlayerColorSprite = NULL;
-#endif
 
 		*(Icon**)hash_add(IconHash, str) = icon;
 		free(str);
@@ -216,9 +210,6 @@ void LoadIcons(void)
 				icon->File->Sprite = LoadSprite(file, icon->Width, icon->Height);
 			}
 			icon->Sprite = icon->File->Sprite;
-#ifdef USE_OPENGL
-			icon->PlayerColorSprite = icon->File->PlayerColorSprite;
-#endif
 			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
 				DebugPrint("Invalid icon index: %s - %d\n" _C_
 					icon->Ident _C_ icon->Index);
@@ -289,18 +280,9 @@ void CleanIcons(void)
 		//  Handle the icon files.
 		//
 		for (i = 0; i < n; ++i) {
-#ifdef USE_OPENGL
-			int j;
-#endif
-
 			hash_del(IconFileHash, table[i]->FileName);
 			free(table[i]->FileName);
 			VideoSafeFree(table[i]->Sprite);
-#ifdef USE_OPENGL
-			for (j = 0; j < PlayerMax; ++j) {
-				VideoSafeFree(table[i]->PlayerColorSprite[j]);
-			}
-#endif
 
 			free(table[i]);
 		}

@@ -697,7 +697,7 @@ void LoadFonts(void)
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		if (Fonts[i].File && !Fonts[i].Graphic) {
 			ShowLoadProgress("Fonts %s", Fonts[i].File);
-			Fonts[i].Graphic = LoadGraphic(Fonts[i].File);
+			Fonts[i].Graphic = LoadSprite(Fonts[i].File, 0, 0);
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
 			MakeFontBitmap(Fonts[i].Graphic, i);

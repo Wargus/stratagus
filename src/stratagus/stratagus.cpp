@@ -532,7 +532,7 @@ static void ShowTitleScreens(void)
 			g = NULL;
 			if (!mng) {
 #endif
-				g = LoadGraphic(TitleScreens[i]->File);
+				g = LoadSprite(TitleScreens[i]->File, 0, 0);
 				ResizeGraphic(g, VideoWidth, VideoHeight);
 #ifdef USE_MNG
 			}

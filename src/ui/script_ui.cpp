@@ -1958,30 +1958,31 @@ CheckboxStyle* FindCheckboxStyle(const char* style)
 static void ParseButtonStyleProperties(lua_State* l, ButtonStyleProperties* p)
 {
 	const char* value;
+	char* file;
+	int w;
+	int h;
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 
+	file = NULL;
+	w = h = 0;
+
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "File")) {
-			value = LuaToString(l, -1);
-			if (!p->File || strcmp(p->File, value)) {
-				free(p->File);
-				VideoSafeFree(p->Sprite);
-				p->File = strdup(LuaToString(l, -1));
-			}
+			file = strdup(LuaToString(l, -1));
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			p->Width = LuaToNumber(l, -1);
+			w = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			p->Height = LuaToNumber(l, -1);
+			h = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Frame")) {
 			p->Frame = LuaToNumber(l, -1);
@@ -2043,6 +2044,10 @@ static void ParseButtonStyleProperties(lua_State* l, ButtonStyleProperties* p)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 		lua_pop(l, 1);
+	}
+
+	if (file) {
+		p->Sprite = NewGraphic(file, w, h);
 	}
 }
 

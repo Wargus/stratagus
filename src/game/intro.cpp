@@ -412,7 +412,7 @@ void ShowIntro(const Intro* intro)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = LoadGraphic(intro->Background);
+	background = LoadSprite(intro->Background, 0, 0);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
 
 	LibraryFileName(intro->TextFile, buf);
@@ -584,7 +584,7 @@ void ShowCredits(Credits* credits)
 
 	background = NULL;
 	if (credits->Background) {
-		background = LoadGraphic(credits->Background);
+		background = LoadSprite(credits->Background, 0, 0);
 		ResizeGraphic(background, VideoWidth, VideoHeight);
 	}
 
@@ -725,7 +725,7 @@ void ShowPicture(CampaignChapter* chapter)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	background = LoadGraphic(chapter->Data.Picture.Image);
+	background = LoadSprite(chapter->Data.Picture.Image, 0, 0);
 	ResizeGraphic(background, VideoWidth, VideoHeight);
 	IntroNoEvent = 1;
 
@@ -1208,11 +1208,11 @@ void ShowStats(void)
 	background = NULL;
 	if (GameResult == GameVictory) {
 		if (TheUI.VictoryBackground.File) {
-			background = LoadGraphic(TheUI.VictoryBackground.File);
+			background = LoadSprite(TheUI.VictoryBackground.File, 0, 0);
 		}
 	} else {
 		if (TheUI.DefeatBackground.File) {
-			background = LoadGraphic(TheUI.DefeatBackground.File);
+			background = LoadSprite(TheUI.DefeatBackground.File, 0, 0);
 		}
 	}
 	ResizeGraphic(background, VideoWidth, VideoHeight);
