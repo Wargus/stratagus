@@ -284,7 +284,6 @@ typedef struct _menu_ {
 	int       Width;      ///< menu area width
 	int       Height;     ///< menu area height
 	char*     Panel;      ///< optional background panel
-	char*     Background; ///< optional background image behind the menu panel
 	struct _graphic_*  BackgroundG;///< optional background image behind the menu panel
 	int       DefSel;     ///< initial selected item number (or -1)
 	int       NumItems;   ///< number of items to follow

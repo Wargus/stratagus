@@ -2400,7 +2400,7 @@ static int CclDefineMenu(lua_State* l)
 				item.Panel = strdup(LuaToString(l, j + 1));
 			}
 		} else if (!strcmp(value, "background")) {
-			item.Background = strdup(LuaToString(l, j + 1));
+			item.BackgroundG = NewGraphic(LuaToString(l, j + 1), 0, 0);
 		} else if (!strcmp(value, "default")) {
 			item.DefSel = LuaToNumber(l, j + 1);
 /*
@@ -2430,7 +2430,6 @@ static int CclDefineMenu(lua_State* l)
 			int mitype;
 
 			free(menu->Panel);
-			free(menu->Background);
 			FreeGraphic(menu->BackgroundG);
 			for (i = 0; i < menu->NumItems; ++i) {
 				mitype = menu->Items[i].MiType;
@@ -3491,7 +3490,6 @@ static int CclDefineMenuItem(lua_State* l)
 	}
 	free(name);
 	free(item);
-
 
 	return 0;
 }

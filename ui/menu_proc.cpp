@@ -1005,9 +1005,8 @@ void DrawMenu(Menu* menu)
 		return;
 	}
 
-	if (menu->Background) {
-		if (!menu->BackgroundG) {
-			menu->BackgroundG = NewGraphic(menu->Background, 0, 0);
+	if (menu->BackgroundG) {
+		if (!GraphicLoaded(menu->BackgroundG)) {
 			LoadGraphic(menu->BackgroundG);
 			ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
 		}
@@ -2580,8 +2579,6 @@ void ProcessMenu(const char* menu_id, int loop)
 void InitMenus(int race)
 {
 	static int last_race = -1;
-	int width;
-	int height;
 
 	InitMenuData();
 
@@ -2605,9 +2602,8 @@ void InitMenus(int race)
 		FreeGraphic(MenuButtonGfx.Sprite);
 	}
 	last_race = race;
-	width = MenuButtonGfx.Width[race];
-	height = MenuButtonGfx.Height[race];
-	MenuButtonGfx.Sprite = NewGraphic(MenuButtonGfx.File[race], width, height);
+	MenuButtonGfx.Sprite = NewGraphic(MenuButtonGfx.File[race],
+		MenuButtonGfx.Width[race], MenuButtonGfx.Height[race]);
 	LoadGraphic(MenuButtonGfx.Sprite);
 
 	CurrentMenu = NULL;
