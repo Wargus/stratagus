@@ -20,8 +20,12 @@ CCL		= -DUSE_CCL
 CCLLIB		= -lm
 
 # Video support
-VIDEO		= -DUSE_X11
-VIDEOLIB	= -lXext -lX11 -ldl
+SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
+SDL_CFLAGS	= $(shell sdl-config --cflags)
+SDLLIB		= $(shell sdl-config --libs)
+
+VIDEO		= $(SDL)
+VIDEOLIB	= $(SDLLIB) -ldl
 
 # Sound support
 DSOUND		= -DWITH_SOUND
@@ -54,11 +58,10 @@ OBJDIR=obj/
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
-DEBUG=	-DDEBUG #-DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) -DHAVE_EXPANSION
-CFLAGS=-g -O1 -Wall -Werror $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
+CFLAGS=-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
 CTAGSFLAGS=-i defptvS -a -f 
 
 # Locks versions with a symbolic name

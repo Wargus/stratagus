@@ -487,9 +487,9 @@ global void DrawUnitInfo(const Unit* unit)
         // Show how much wood is harvested already in percents! :) //vladi
 	// FIXME: Make this optional
         if( unit->Orders[0].Action==UnitActionHarvest && unit->SubAction==64 ) {
-	    sprintf(buf,"W%%:%d"
+	    sprintf(buf,"Wood: %d%%"
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
-	    VideoDrawText(x+120,y+8+140,GameFont,buf);
+	    VideoDrawText(x+63,y+8+141,GameFont,buf);
         }
 
     }
