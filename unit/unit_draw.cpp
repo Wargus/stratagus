@@ -1967,9 +1967,11 @@ local int DrawLevelCompare(const void* v1, const void* v2) {
 		drawlevel2 = c2->Type->DrawLevel;
 	}
 	if (drawlevel1 == drawlevel2) {
-        // diffpos compares unit's Y positions (botton of sprite) on the map and uses X position in case Y positions are equal.
+        // diffpos compares unit's Y positions (bottom of sprite) on the map and uses 
+        // X position in case Y positions are equal.
         // FIXME: Use BoxHeight?
-        diffpos = c1->Y * TileSizeY + c1->Type->Height + c1->IY - c2->Y * TileSizeY - c2->Type->Height - c2->IY; 
+        diffpos = c1->Y * TileSizeY + c1->Type->Height + c1->IY - c2->Y * TileSizeY - 
+            c2->Type->Height - c2->IY; 
         return diffpos ? diffpos : c1->X - c2->X ? c1->X - c2->X : c1->Slot - c2->Slot; 
 	} else {
 		return drawlevel1 <= drawlevel2 ? -1 : 1;
