@@ -12,6 +12,16 @@
 //
 //	(c) Copyright 1998-2001 by Lutz Sammer
 //
+//	FreeCraft is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published
+//	by the Free Software Foundation; either version 2 of the License,
+//	or (at your option) any later version.
+//
+//	FreeCraft is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//
 //	$Id$
 
 //@{
@@ -493,6 +503,9 @@ local void HandleMouseOn(int x,int y)
 */
 global void UIHandleMouseMove(int x,int y)
 {
+    int mx;
+    int my;
+
     //
     //	Selecting units.
     //
@@ -561,8 +574,10 @@ global void UIHandleMouseMove(int x,int y)
 		    ,y-TheUI.MapY+MapY*TileSizeY);
 	}
     } else if( CursorOn==CursorOnMinimap ) {
-	if( IsMapFieldVisible(Minimap2MapX(x),Minimap2MapY(y)) ) {
-	    UnitUnderCursor=UnitOnMapTile(Minimap2MapX(x),Minimap2MapY(y));
+	mx=ScreenMinimap2MapX(x);
+	my=ScreenMinimap2MapY(y);
+	if( IsMapFieldVisible(mx,my) ) {
+	    UnitUnderCursor=UnitOnMapTile(mx,my);
 	}
     }
 
@@ -591,8 +606,8 @@ global void UIHandleMouseMove(int x,int y)
 		//
 		//	Minimap move viewpoint
 		//
-		MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
-			,Minimap2MapY(CursorY)-MapHeight/2);
+		MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
+			,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 	    }
 	}
 	// FIXME: must move minimap if right button is down !
@@ -624,8 +639,8 @@ global void UIHandleMouseMove(int x,int y)
 	//
 	//	Minimap move viewpoint
 	//
-	MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
-		,Minimap2MapY(CursorY)-MapHeight/2);
+	MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
+		,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 	return;
     }
 }
@@ -950,6 +965,9 @@ local void DoSelectionButtons(unsigned num,unsigned button)
 */
 local void UISelectStateButtonDown(unsigned button)
 {
+    int mx;
+    int my;
+
     //
     //	Clicking on the map.
     //
@@ -961,11 +979,13 @@ local void UISelectStateButtonDown(unsigned button)
 	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 	MustRedraw|=RedrawButtonPanel|RedrawCursor;
+	mx=Screen2MapX(CursorX);
+	my=Screen2MapY(CursorY);
 	if( MouseButtons&LeftButton ) {
 	    MakeMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
-	    SendCommand(Screen2MapX(CursorX),Screen2MapY(CursorY));
+	    SendCommand(mx,my);
 	}
 	return;
     }
@@ -974,6 +994,8 @@ local void UISelectStateButtonDown(unsigned button)
     //	Clicking on the minimap.
     //
     if( CursorOn==CursorOnMinimap ) {
+	mx=ScreenMinimap2MapX(CursorX);
+	my=ScreenMinimap2MapY(CursorY);
 	if( MouseButtons&LeftButton ) {
 	    ClearStatusLine();
 	    ClearCosts();
@@ -983,12 +1005,10 @@ local void UISelectStateButtonDown(unsigned button)
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
 	    MakeMissile(MissileTypeGreenCross
-		    ,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
-		    ,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-	    SendCommand(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
+		    ,mx*TileSizeX+TileSizeX/2,my*TileSizeY+TileSizeY/2,0,0);
+	    SendCommand(mx,my);
 	} else {
-	    MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
-		    ,Minimap2MapY(CursorY)-MapHeight/2);
+	    MapSetViewpoint(mx-MapWidth/2,my-MapHeight/2);
 	}
 	return;
     }
@@ -1089,13 +1109,13 @@ global void UIHandleButtonDown(unsigned button)
 	}
     } else if( CursorOn==CursorOnMinimap ) {
 	if( MouseButtons&LeftButton ) {	// enter move mini-mode
-	    MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
-		    ,Minimap2MapY(CursorY)-MapHeight/2);
+	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
+		    ,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 	} else if( MouseButtons&RightButton ) {
 	    MakeMissile(MissileTypeGreenCross
-		    ,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
-		    ,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-	    DoRightButton(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
+		    ,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
+		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+	    DoRightButton(ScreenMinimap2MapX(CursorX),ScreenMinimap2MapY(CursorY));
 	}
     } else if( CursorOn==CursorOnButton ) {
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
