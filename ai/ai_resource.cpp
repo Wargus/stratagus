@@ -737,207 +737,45 @@ local void AiCheckingWork(void)
 --      WORKERS/RESOURCES
 ----------------------------------------------------------------------------*/
 
-/**
-**	Find the nearest gold mine for unit.
+/*
+**	Assign worker to gather a certain resource.
 **
-**	@param unit	Pointer for source unit.
+**	@param	unit		pointer to the unit.
+**	@param 	resource	resource identification.
 **
-**	@return		Pointer to the nearest reachable gold mine.
-**
-**	@see FindGoldMine
+**	@return	1 if the worker was assigned, 0 otherwise.
 */
-local Unit* AiFindGoldMine(const Unit* unit)
+local int AiAssignHarvester(Unit * unit,int resource)
 {
-    // FIXME: explored tiles?
-    return FindResource(unit,unit->X,unit->Y,100);
-}
-
-/**
-**      Assign worker to mine gold.
-**
-**	@todo FIXME: JOHNS: docu What does used_mine do, for what is it good?
-**
-**      IDEA: If no way to goldmine, we must dig the way.
-**      IDEA: If goldmine is on an other island, we must transport the workers.
-*/
-local int AiMineGold(Unit* unit)
-{
+    ResourceInfo * resinfo;
+    //  These will hold the coordinates of the forest.
+    int forestx;
+    int foresty;
+    //  This will hold the resulting gather destination.
     Unit* dest;
-
-    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    dest = AiFindGoldMine(unit);
-    if (!dest) {
-	DebugLevel3Fn("goldmine not reachable by %s(%d,%d)\n"
-		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
-	return 0;
-    }
-
-    CommandResource(unit, dest, FlushCommands);
-
-    return 1;
-}
-
-/**
-**      Assign worker to harvest.
-**
-**	@param unit	Find wood for this worker.
-**
-**	@return		True if the work is going harvest.
-*/
-local int AiHarvest(Unit * unit)
-{
-    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
-    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
-    struct {
-	unsigned short X;
-	unsigned short Y;
-    } * points;
-    int size;
-    int x;
-    int y;
-    int rx;
-    int ry;
-    int mask;
-    int wp;
-    int rp;
-    int ep;
-    int i;
-    int w;
-    int n;
-    unsigned char* m;
-    unsigned char* matrix;
-    const Unit* destu;
-    int destx;
-    int desty;
-    int bestx;
-    int besty;
-    int bestd;
-
-    x=unit->X;
-    y=unit->Y;
-    size=TheMap.Width*TheMap.Height/4;
-    points=malloc(size*sizeof(*points));
-	
-    //
-    //	Find the nearest wood depot
-    //
-    if( (destu=FindDeposit(unit,x,y,100)) ) {
-	NearestOfUnit(destu,x,y,&destx,&desty);
-    }
-    bestd=99999;
-    bestx=besty=0;		// keep the compiler happy
-
-    //
-    //	Make movement matrix.
-    //
-    matrix=CreateMatrix();
-    w=TheMap.Width+2;
-    matrix+=w+w+2;
-
-    points[0].X=x;
-    points[0].Y=y;
-    rp=0;
-    matrix[x+y*w]=1;			// mark start point
-    ep=wp=1;				// start with one point
-
-    mask=UnitMovementMask(unit);
-
-    //
-    //	Pop a point from stack, push all neightbors which could be entered.
-    //
-    for( ;; ) {
-	while( rp!=ep ) {
-	    rx=points[rp].X;
-	    ry=points[rp].Y;
-	    for( i=0; i<8; ++i ) {		// mark all neighbors
-		x=rx+xoffset[i];
-		y=ry+yoffset[i];
-		m=matrix+x+y*w;
-		if( *m ) {			// already checked
-		    continue;
-		}
-
-		//
-		//	Look if there is wood
-		//
-		if ( CheckedForestOnMap(x,y) ) {
-		    if( destu ) {
-			n=max(abs(destx-x),abs(desty-y));
-			if( n<bestd ) {
-			    bestd=n;
-			    bestx=x;
-			    besty=y;
-			}
-			*m=22;
-		    } else {			// no goal take the first
-			CommandResourceLoc(unit,x,y,FlushCommands);
-			free(points);
-			return 1;
-		    }
-		}
-
-		if( CanMoveToMask(x,y,mask) ) {	// reachable
-		    *m=1;
-		    points[wp].X=x;		// push the point
-		    points[wp].Y=y;
-		    if( ++wp>=size ) {		// round about
-			wp=0;
-		    }
-		} else {			// unreachable
-		    *m=99;
-		}
-	    }
-	    if( ++rp>=size ) {			// round about
-		rp=0;
-	    }
-	}
-
+    
+    resinfo=unit->Type->ResInfo[resource];
+    DebugCheck(!resinfo);
+    if (resinfo->TerrainHarvester) {
 	//
-	//	Take best of this frame, if any.
+	//	Code for terrain harvesters. Search for piece of terrain to mine.
 	//
-	if( bestd!=99999 ) {
-	    CommandResourceLoc(unit, bestx, besty,FlushCommands);
-	    free(points);
+	if (FindTerrainType(UnitMovementMask(unit),MapFieldForest,0,1000,
+		unit->Player,unit->X,unit->Y,&forestx,&foresty)) {
+	    CommandResourceLoc(unit, forestx, foresty,FlushCommands);
 	    return 1;
 	}
-
+    } else {
 	//
-	//	Continue with next frame.
+	//	Find a resource to ravest from.
 	//
-	if( rp==wp ) {			// unreachable, no more points available
-	    break;
+	if ((dest=FindResource(unit,unit->X,unit->Y,1000,resource))) {
+	    CommandResource(unit,dest,FlushCommands);
+	    return 1;
 	}
-	ep=wp;
     }
-
-    DebugLevel3Fn("no wood in range by %s(%d,%d)\n"
-	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
-
-    free(points);
+    //  Failed.
     return 0;
-}
-
-/**
-**      Assign worker to haul oil.
-*/
-local int AiHaulOil(Unit * unit)
-{
-    Unit *dest;
-
-    DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    //  Range hardcoded. search the whole map!!!
-    dest = FindResource(unit, unit->X, unit->Y,1000);
-    if (!dest) {
-	DebugLevel3Fn("oil platform not reachable by %s(%d,%d)\n"
-		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
-	return 0;
-    }
-
-    DebugCheck( !unit->Type->Harvester );
-
-    CommandResource(unit, dest,FlushCommands);
-
-    return 1;
 }
 
 /**
@@ -957,9 +795,8 @@ local void AiCollectResources(void)
     int total;					    // Total of workers
     int c;
     int i;
-    int j;
-    int o;
     int n;
+    int o;
     Unit** units;
     Unit* unit;
     int percent[MaxCosts];
@@ -984,27 +821,33 @@ local void AiCollectResources(void)
     units=AiPlayer->Player->Units;
     for( i=0; i<n; i++ ) {
 	unit=units[i];
-	if( !unit->Type->Harvester ) {
+	if( (!unit->Type->Harvester) || (unit->Removed )) {
+	    continue;
+	}
+
+	c=unit->CurrentResource;
+	//
+	//	See if it's assigned already
+	//
+	if (unit->Orders[0].Action==UnitActionResource&&c) {
+	    units_assigned[num_units_assigned[c]++][c]=unit;
 	    continue;
 	}
 
 	//
-	//	See if it's assigned already
-	//
-	if (unit->Orders[0].Action==UnitActionResource) {
-	    c=unit->CurrentResource;
-	    units_assigned[num_units_assigned[c]++][c]=unit;
+	//	Ignore busy units.
+	//	
+	if (unit->Orders->Action != UnitActionStill || unit->OrderCount!=1 ) {
+	    continue;
 	}
 
 	//
-	//  Send workers with resources back home.
+	//  	Send workers with resources back home.
 	//
-	if (unit->Value) {
+	if (unit->Value&&c) {
 	    units_with_resource[num_units_with_resource[c]++][c]=unit;
-	    if (unit->Orders[0].Action == UnitActionStill
-		    && unit->OrderCount==1 ) {
-		CommandReturnGoods(unit,0,FlushCommands);
-	    }
+	    CommandReturnGoods(unit,0,FlushCommands);
+	    continue;
 	}
 	
 	//
@@ -1014,56 +857,31 @@ local void AiCollectResources(void)
 	    if (unit->Type->ResInfo[c]) {
 		units_unassigned[num_units_unassigned[c]++][c]=unit;
 	    }
-#if 0
-	    UnitType** types;
-
-	    //
-	    //	Look if it is a worker
-	    //
-	    if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
-		continue;		// Nothing known about the resource
-	    }
-	    types=AiHelpers.Collect[c]->Table;
-	    tn=AiHelpers.Collect[c]->Count;
-	    for( j=0; j<tn; ++j ) {
-		if( unit->Type==types[j] ) {
-		    if (unit->Orders[0].Action == UnitActionStill
-			    && unit->OrderCount==1 && !unit->Removed ) {
-			for( c=0; c<MaxCosts; ++c ) {
-			    int tn;
-			    UnitType** types;
-			    if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
-				continue;
-			    }
-			    types=AiHelpers.Collect[c]->Table;
-			    tn=AiHelpers.Collect[c]->Count;
-			    for( j=0; j<tn; ++j ) {
-				if( unit->Type==types[j] ) {
-				    units_unassigned[num_units_unassigned[c]++][c]=unit;
-				}
-			    }
-			}
-			break;
-		    }
-		}
-	    }
-	    if( j<tn ) {
-		break;
-	    }
-#endif
 	}
     }
 
+#ifdef DEBUG
     total=0;
     for( c=0; c<MaxCosts; ++c ) {
 	total+=num_units_assigned[c]+num_units_with_resource[c];
 	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ num_units_assigned[c]);
 	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ num_units_with_resource[c]);
-	DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned[c] _C_ total);
     }
+    DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned[c] _C_ total);
+    if (AiPlayer->Player==ThisPlayer) {
+	DebugLevel3Fn("Percent Assignment:");
+	for( c=0; c<MaxCosts; ++c ) {
+	    if (percent[c]) {
+		DebugLevel3(" %s:%d%%" _C_ DefaultResourceNames[c] _C_ percent[c]);
+	    }
+	}
+	DebugLevel3("\n");
+    }
+ 
+#endif
 
     //
-    //	Reassign workers
+    //	Reassign free workers
     //
     for( c=0; c<MaxCosts; ++c ) {
 	if( num_units_unassigned[c]==0 ) {
@@ -1074,14 +892,16 @@ local void AiCollectResources(void)
 		if( i==c ) {
 		    continue;
 		}
+		//  FIXME: Shouldn't this turn into a while? currently max one worker is transfered.
 		if( (percent[i] < percent[c] &&
 		    ((num_units_assigned[c]+num_units_with_resource[c]-1)*percent_total > total*percent[c] || 
 		      num_units_assigned[c]+num_units_with_resource[c]==0)) ||
 		    (num_units_assigned[i]+num_units_with_resource[i]-1)*percent_total > total*percent[i] ) {
+		    //  We take workers from resource i and move them to resource c
 		    int j;
 		    for( j=num_units_assigned[i]-1; j>=0; --j ) {
 			unit=units_assigned[j][i];
-			if( unit && unit->SubAction < 64 ) {
+			if( unit && unit->SubAction < 50 ) {
 			    units_assigned[j][i] = units_assigned[--num_units_assigned[i]][i];
 			    --total;
 			    units_unassigned[num_units_unassigned[c]++][c]=unit;
@@ -1092,7 +912,7 @@ local void AiCollectResources(void)
 	    }
 	}
     }
-
+    
     //
     //	Now assign the free workers.
     //
@@ -1101,8 +921,14 @@ local void AiCollectResources(void)
 	    int t;
 	    int max;
 
+	    //
+	    //	Loop through all of the workers.
+	    //
 	    unit=units_unassigned[i][n];
 
+	    //
+	    //	Here we determine what to assign the worker to first. 
+	    //
 	    for( max=o=c=0; c<MaxCosts; ++c ) {
 		DebugLevel3Fn("%d, %d, %d\n" _C_
 		    (num_units_assigned[c]+num_units_with_resource[c])*percent_total _C_
@@ -1121,76 +947,32 @@ local void AiCollectResources(void)
 	    //	Look what the unit can do
 	    //
 	    for( t=0; t<MaxCosts; ++t ) {
-		int tn;
-		UnitType** types;
-
+		//
+		//  Now we have to assign it to resource c
+		//  
 		c=(t+o)%MaxCosts;
-
-		//
-		//	Look if it is a worker for this resource
-		//
-		if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
-		    continue;		// Nothing known about the resource
+		if (!unit->Type->ResInfo[c]) {
+		    continue; //	Alas, we can't mine c
 		}
-		types=AiHelpers.Collect[c]->Table;
-		tn=AiHelpers.Collect[c]->Count;
-		for( j=0; j<tn; ++j ) {
-		    if( unit->Type==types[j] && unit->OrderCount==1 ) {
-			switch( c ) {
-			    int n1;
-			    int n2;
-			    case GoldCost:
-				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==GoldCost) || AiMineGold(unit) ) {
-				    DebugLevel3Fn("Assigned to gold\n");
-				    units_assigned[num_units_assigned[c]++][c]=unit;
-    				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
-				    for( n1=0; n1<MaxCosts; ++n1 ) {
-					for( n2=0; n2<num_units_unassigned[n1]; ++n2 ) {
-					    if( units_unassigned[n2][n1]==unit ) {
-						units_unassigned[n2][n1]=units_unassigned[--num_units_unassigned[n1]][n1];
-						break;
-					    }
-					}
-				    }
-				    ++total;
-				}
+		//
+		//  Look if it is a worker for this resource
+		//
+		if( AiAssignHarvester(unit,c) ) {
+		    int n1,n2;
+		    DebugLevel0Fn("Assigned %d to %s\n" _C_ unit->Slot _C_ DefaultResourceNames[c]);
+		    units_assigned[num_units_assigned[c]++][c]=unit;
+		    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
+		    for( n1=0; n1<MaxCosts; ++n1 ) {
+			for( n2=0; n2<num_units_unassigned[n1]; ++n2 ) {
+			    if( units_unassigned[n2][n1]==unit ) {
+				units_unassigned[n2][n1]=units_unassigned[--num_units_unassigned[n1]][n1];
 				break;
-			    case WoodCost:
-				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==WoodCost) || AiHarvest(unit) ) {
-				    DebugLevel3Fn("Assigned to harvest\n");
-				    units_assigned[num_units_assigned[c]++][c]=unit;
-    				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
-				    for( n1=0; n1<MaxCosts; ++n1 ) {
-					for( n2=0; n2<num_units_unassigned[n1]; ++n2 ) {
-					    if( units_unassigned[n2][n1]==unit ) {
-						units_unassigned[n2][n1]=units_unassigned[--num_units_unassigned[n1]][n1];
-						break;
-					    }
-					}
-				    }
-				    ++total;
-				}
-				break;
-			    case OilCost:
-				if( (unit->Orders[0].Action==UnitActionResource&&unit->CurrentResource==OilCost) || AiHaulOil(unit) ) {
-				    DebugLevel3Fn("Assigned to oil\n");
-				    units_assigned[num_units_assigned[c]++][c]=unit;
-    				    units_unassigned[i][c] = units_unassigned[--num_units_unassigned[c]][c];
-				    for( n1=0; n1<MaxCosts; ++n1 ) {
-					for( n2=0; n2<num_units_unassigned[n1]; ++n2 ) {
-					    if( units_unassigned[n2][n1]==unit ) {
-						units_unassigned[n2][n1]=units_unassigned[--num_units_unassigned[n1]][n1];
-						break;
-					    }
-					}
-				    }
-				    ++total;
-				}
-				break;
-			    default:
-				break;
+			    }
 			}
 		    }
+		    ++total;
+		    //	We assigned this worker to something already.
+		    break;
 		}
 	    }
 	}

@@ -539,6 +539,12 @@
 **		Maximum amount of resources a harvester can carry. The
 **		actual amount can be modified while unloading.
 **
+**	ResourceInfo::LoseResources
+**
+**		Special lossy behaviour for loaded harvesters. Harvesters
+**		with loads other than 0 and ResourceCapacity will lose their
+**		cargo on any new order.
+**
 **	ResourceInfo::WaitAtDepot
 **
 **		Cycles the unit waits while inside the depot to unload.
