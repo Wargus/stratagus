@@ -1123,7 +1123,7 @@ static int CclDefineUI(lua_State* l)
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
 				if (!strcmp(value, "File")) {
-					ui->Filler[ui->NumFillers - 1].File = strdup(LuaToString(l, -1));
+					ui->Filler[ui->NumFillers - 1] = NewGraphic(LuaToString(l, -1), 0, 0);
 				} else if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
