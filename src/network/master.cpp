@@ -142,7 +142,7 @@ global int MetaClose(void)
 */
 global int MetaServerOK(char **reply)
 {
-    return !strcmp("OK",*reply);
+    return !strcmp("OK\r\n",*reply) || !strcmp("OK\n",*reply);
 }
 
 /**
@@ -173,26 +173,20 @@ global int SendMetaCommand(char* command, char* format, ...)
     }
 
     // Message Structure
+    // <Stratagus> if for Magnant Compatibility, it may be removed
     // Player Name, Game Name, VERSION, Command, **Paramaters**
-    strcpy(s, LocalPlayerName);
-    strcat(s, "\n");
-    strcat(s, GameName);
-    strcat(s, "\n");
-    strcat(s, VERSION);
-    strcat(s, "\n");
-    strcat(s, command);
-    strcat(s, "\n");
+    sprintf(s,"<Stratagus>\n%s\n%s\n%s\n%s\n", LocalPlayerName, GameName, VERSION, command);
 
     // Commands
-    // Login - 1, password
+    // Login - password
     // Logout - 0
-    // AddGame - ,Name,Map,Players,FreeSpots
-    // JoinGame - Nick of Host
-    // ChangeGame - ,Name,Map,Players,FreeSpots
+    // AddGame - IP,Port,Description,Map,Players,FreeSpots
+    // JoinGame - Nick of Hoster
+    // ChangeGame - Description,Map,Players,FreeSpots
     // GameList - 0
     // NextGameInList - 0
     // StartGame - 0
-    // PlayerScore - Score,Win (Add razings...)
+    // PlayerScore - Player,Score,Win (Add razings...)
     // EndGame - Called after PlayerScore.
     // AbandonGame - 0
     while (1) {
