@@ -334,7 +334,7 @@ static int GatherResource(Unit* unit)
 
 	if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 		AnimateActionHarvest(unit);
-		unit->Data.ResWorker.TimeToHarvest -= unit->Wait;
+		unit->Data.ResWorker.TimeToHarvest--;
 	} else {
 		unit->Anim.CurrAnim = NULL;
 		unit->Data.ResWorker.TimeToHarvest--;
@@ -595,10 +595,7 @@ static int MoveToDepot(Unit* unit)
 		(unit->ResourcesHeld * unit->Player->Incomes[resinfo->FinalResource]) / 100;
 	unit->ResourcesHeld = 0;
 
-	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId];
-	if (!unit->Wait) {
-		unit->Wait = 1;
-	}
+	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId] - 1;
 
 	return 1;
 }
@@ -697,6 +694,12 @@ void HandleActionResource(Unit* unit)
 {
 	int ret;
 	int newres;
+
+	if (unit->Wait) {
+		// FIXME: show idle animation while we wait?
+		unit->Wait--;
+		return;
+	}
 
 	// Let's start mining.
 	if (unit->SubAction == SUB_START_RESOURCE) {
