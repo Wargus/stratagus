@@ -70,13 +70,13 @@ local int NumIconAliases;		/// Number of icons aliases in Aliases.
 
 #ifdef DOXYGEN				// no real code, only for document
 
-local IconFile* IconFileHash[31];	/// lookup table for icon file names
+local IconFile* IconFileHash[61];	/// lookup table for icon file names
 
 local Icon* IconHash[61];		/// lookup table for icon names
 
 #else
 
-local hashtable(IconFile*, 31) IconFileHash;/// lookup table for icon file names
+local hashtable(IconFile*, 61) IconFileHash;/// lookup table for icon file names
 
 local hashtable(Icon*, 61) IconHash;	/// lookup table for icon names
 
@@ -211,7 +211,7 @@ global void LoadIcons(void)
 		buf = alloca(strlen(file) + 9 + 1);
 		file = strcat(strcpy(buf, "graphics/"), file);
 		ShowLoadProgress("Icons %s", file);
-		icon->File->Sprite = LoadSprite(file,IconWidth,IconHeight);
+		icon->File->Sprite = LoadSprite(file, IconWidth, IconHeight);
 #ifdef USE_OPENGL
 		MakeTexture(icon->File->Sprite, icon->File->Sprite->Width,
 		    icon->File->Sprite->Height);
@@ -252,7 +252,7 @@ global void CleanIcons(void)
     //  Icons
     //
     if (Icons) {
-	table = alloca(NumIcons);
+	table = alloca(NumIcons * sizeof(IconFile*));
 	n = 0;
 	for (i = 0; i < NumIcons; ++i) {
 	    char* str;
