@@ -137,9 +137,9 @@ static IOStructDef AiUnitTypeStructDef = {
     sizeof (AiUnitType),
     -1,
     {
-	{"'next", 		0, 		&((AiUnitType *) 0)->Next,		0},
-	{"type", 		&IOUnitTypePtr,	&((AiUnitType *) 0)->Type, 		0},
-	{"want", 		&IOInt,		&((AiUnitType *) 0)->Want,		0},
+	{"'next", 		0, 		&((AiUnitType*) 0)->Next,		0},
+	{"type", 		&IOUnitTypePtr,	&((AiUnitType*) 0)->Type, 		0},
+	{"want", 		&IOInt,		&((AiUnitType*) 0)->Want,		0},
 	{0, 0, 0, 0}
     }
 };
@@ -221,7 +221,7 @@ static IOStructDef UnitTypeRequestsTableDef = {
 /// Description of the UpgradeToRequests table in PlayerAi
 static IOStructDef UpgradeToRequestsTableDef = {
     "UpgradeToRequests",
-    sizeof (UnitType *),
+    sizeof (UnitType*),
     -1,
     {
 	{"`ptr", 		0,		&((PlayerAi *) 0)->UpgradeToRequests,	0},
@@ -307,7 +307,7 @@ static IOStructDef AiScriptActionStructDef = {
 ----------------------------------------------------------------------------*/
 
 /**
-**	Handle saving/loading a reference to an AiType ( AiType * ).
+**	Handle saving/loading a reference to an AiType ( AiType* ).
 **	The null case is handled.
 **
 **	@param	scmform		When loading, the scm data to load
@@ -520,7 +520,7 @@ local void AiHelperSetupTable(int *count, AiUnitTypeTable *** table, int n)
 **	@param tablep	Pointer to table with elements.
 **	@param base	Base type to insert into table.
 */
-local void AiHelperInsert(AiUnitTypeTable ** tablep, UnitType * base)
+local void AiHelperInsert(AiUnitTypeTable ** tablep, UnitType* base)
 {
     int i;
     int n;
@@ -548,7 +548,7 @@ local void AiHelperInsert(AiUnitTypeTable ** tablep, UnitType * base)
     //
     //  Append new base unit-type to units.
     //
-    table = *tablep = realloc(table, sizeof (AiUnitTypeTable) + sizeof (UnitType *) * n);
+    table = *tablep = realloc(table, sizeof (AiUnitTypeTable) + sizeof (UnitType*) * n);
     table->Count = n + 1;
     table->Table[n] = base;
 }
@@ -575,8 +575,8 @@ local SCM CclDefineAiHelper(SCM list)
     SCM value;
     int what;
     char *str;
-    UnitType *base;
-    UnitType *type;
+    UnitType* base;
+    UnitType* type;
     Upgrade *upgrade;
     int cost;
 
@@ -734,10 +734,13 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Define an AI engine.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineAi(SCM list)
 {
     SCM value;
@@ -747,7 +750,7 @@ local SCM CclDefineAi(SCM list)
     const AiType *ait;
 #endif
 
-    aitype = malloc(sizeof (AiType));
+    aitype = malloc(sizeof(AiType));
     aitype->Next = AiTypes;
     AiTypes = aitype;
 
@@ -804,13 +807,75 @@ local SCM CclDefineAi(SCM list)
 
     return list;
 }
+#elif defined(USE_LUA)
+local int CclDefineAi(lua_State* l)
+{
+    const char* value;
+    AiType *aitype;
+#ifdef DEBUG
+    const AiType *ait;
+#endif
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    aitype = malloc(sizeof(AiType));
+    aitype->Next = AiTypes;
+    AiTypes = aitype;
+
+    //
+    //  AI Name
+    //
+    aitype->Name = strdup(LuaToString(l, j + 1));
+    ++j;
+    DebugLevel3Fn("%s\n" _C_ aitype->Name);
+
+#ifdef DEBUG
+    for (ait = AiTypes->Next; ait; ait = ait->Next) {
+	if (!strcmp(aitype->Name, ait->Name)) {
+	    DebugLevel0Fn("Warning two or more AI's with the same name '%s'\n" _C_ ait->
+		Name);
+	}
+    }
+#endif
+
+    //
+    //  AI Race
+    //
+    value = LuaToString(l, j + 1);
+    ++j;
+    DebugLevel3Fn("%s\n" _C_ value);
+    if (*value != '*') {
+	aitype->Race = strdup(value);
+    } else {
+	aitype->Race = NULL;
+    }
+
+    //
+    //  AI Class
+    //
+    aitype->Class = strdup(LuaToString(l, j + 1));
+    ++j;
+    DebugLevel3Fn("%s\n" _C_ aitype->Class);
+
+    //
+    //  AI Script
+    //
+//    aitype->Script = value;
+
+    return 0;
+}
+#endif
 
 /*----------------------------------------------------------------------------
 --	AI script functions
 ----------------------------------------------------------------------------*/
 
+#if defined(USE_GUILE) || defined(USE_SIOD)
     /// Get unit-type.
-extern UnitType *CclGetUnitType(SCM ptr);
+extern UnitType* CclGetUnitType(SCM ptr);
 
 /**
 **	Append unit-type to request table.
@@ -818,7 +883,7 @@ extern UnitType *CclGetUnitType(SCM ptr);
 **	@param type	Unit-type to be appended.
 **	@param count	How many unit-types to build.
 */
-local void InsertUnitTypeRequests(UnitType * type, int count)
+local void InsertUnitTypeRequests(UnitType* type, int count)
 {
     int n;
 
@@ -840,7 +905,7 @@ local void InsertUnitTypeRequests(UnitType * type, int count)
 **
 **	@param type	Unit-type to be found.
 */
-local AiUnitTypeTable *FindInUnitTypeRequests(const UnitType * type)
+local AiUnitTypeTable *FindInUnitTypeRequests(const UnitType* type)
 {
     int i;
     int n;
@@ -859,7 +924,7 @@ local AiUnitTypeTable *FindInUnitTypeRequests(const UnitType * type)
 **
 **	@param type	Unit-type to be found.
 */
-local int FindInUpgradeToRequests(const UnitType * type)
+local int FindInUpgradeToRequests(const UnitType* type)
 {
     int i;
     int n;
@@ -878,7 +943,7 @@ local int FindInUpgradeToRequests(const UnitType * type)
 **
 **	@param type	Unit-type to be appended.
 */
-local void InsertUpgradeToRequests(UnitType * type)
+local void InsertUpgradeToRequests(UnitType* type)
 {
     int n;
 
@@ -899,7 +964,7 @@ local void InsertUpgradeToRequests(UnitType * type)
 **
 **	@param upgrade	Upgrade to be appended.
 */
-local void InsertResearchRequests(Upgrade * upgrade)
+local void InsertResearchRequests(Upgrade* upgrade)
 {
     int n;
 
@@ -1014,7 +1079,7 @@ local SCM CclAiNeed(SCM value)
 local SCM CclAiSet(SCM value, SCM count)
 {
     AiUnitTypeTable *autt;
-    UnitType *type;
+    UnitType* type;
 
     type = CclGetUnitType(value);
     if ((autt = FindInUnitTypeRequests(type))) {
@@ -1035,7 +1100,7 @@ local SCM CclAiSet(SCM value, SCM count)
 local SCM CclAiWait(SCM value)
 {
     const AiUnitTypeTable *autt;
-    const UnitType *type;
+    const UnitType* type;
     const int *unit_types_count;
     int j;
     int n;
@@ -1121,7 +1186,7 @@ local SCM CclAiGetForce(SCM list)
 {
     int force;
     SCM rslt;
-    AiUnitType *aiut;
+    AiUnitType* aiut;
 
     force = gh_scm2int(list);
     if (force < 0 || force >= AI_MAX_FORCES) {
@@ -1164,7 +1229,7 @@ local SCM CclAiAdHocForce(SCM requirement, SCM scm_unittypes)
     int want[3];
     int *unittypes;
     int unittypecount;
-    UnitType *unittype;
+    UnitType* unittype;
     char *str;
     int i;
     int rslt;
@@ -1240,9 +1305,9 @@ local SCM CclAiForceActive(SCM list)
 */
 local SCM CclAiForce(SCM list)
 {
-    AiUnitType **prev;
-    AiUnitType *aiut;
-    UnitType *type;
+    AiUnitType* *prev;
+    AiUnitType* aiut;
+    UnitType* type;
     int count;
     int force;
 
@@ -1391,7 +1456,7 @@ local SCM CclAiCanReachHotSpot(SCM way)
     int i;
     Unit *unit;
     int transporterplace;
-    UnitType * transporter;
+    UnitType* transporter;
     AiUnit * aiunit;
 
     if ((AiScript->HotSpot_X == -1) || (AiScript->HotSpot_Y == -1)
@@ -1661,7 +1726,7 @@ local SCM CclAiResearch(SCM value)
 */
 local SCM CclAiUpgradeTo(SCM value)
 {
-    UnitType *type;
+    UnitType* type;
 
     type = CclGetUnitType(value);
     InsertUpgradeToRequests(type);
@@ -1702,7 +1767,7 @@ local SCM CclAiGetGauge(SCM value)
 
 local SCM CclGetUnitTypeForce(SCM value)
 {
-    UnitType *unitType;
+    UnitType* unitType;
 
     unitType = CclGetUnitType(value);
 
@@ -1838,7 +1903,7 @@ local SCM CclAiDump(void)
 {
     int i;
     int n;
-    const AiUnitType *aut;
+    const AiUnitType* aut;
     const AiBuildQueue *queue;
 
     //
@@ -2105,6 +2170,9 @@ global void AiCclRegister(void)
 
     gh_new_procedureN("define-ai-player", CclDefineAiPlayer);
 #elif defined(USE_LUA)
+//    lua_register(Lua, "DefineAiHelper", CclDefineAiHelper);
+    lua_register(Lua, "DefineAi", CclDefineAi);
+
     lua_register(Lua, "DefineAiWcNames", CclDefineAiWcNames);
 #endif
 }
