@@ -1,0 +1,150 @@
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>ALE Clone unit graphics</TITLE>
+</HEAD>
+<BODY>
+    <H1>ALE Clone unit graphics</H1>
+<HR>
+
+<H2>The units/buildings of a race</H2>
+
+<H3>Units</H3>
+<UL>
+<LI>Worker<BR>
+    The heart of the army, collects resources, repairs buildings and
+    builds buildings.
+<LI>Worker with resource GOLD<BR>
+    The worker carring a resource.
+<LI>Worker with resource WOOD<BR>
+    The worker carring a resource.
+<LI>Soldier with close combat weapon<BR>
+    Small close combat unit.
+<LI>Soldier with far combat weapon<BR>
+    Small far combat unit.
+<LI>Improved soldier with far combat weapon<BR>
+    Small far combat unit with better features. 
+<LI>Big/fast soldier with close combat weapon<BR>
+    Bigger and faster close combat unit.
+<LI>Improved big/fast soldier with close combat weapon<BR>
+    Bigger and faster close combat unit with special magic features.
+<LI>Kamikaze<BR>
+    Self destroying fast unit.
+<LI>Siege weapon<BR>
+    Heavy slow engine.
+<LI>Magic unit<BR>
+    Unit with many magic features.
+<LI>Flying fighter<BR>
+    Heavy flying far combat unit.
+<LI>Flying scout<BR>
+    Fast flying none combat unit.
+<LI>Tanker<BR>
+    Collects resources on water, can build buildings on water.
+<LI>Tanker with resources<BR>
+    Tanker carring resources.
+<LI>Transporter<BR>
+    Transports units over the water.
+<LI>Small ship<BR>
+    Small water far combat unit.
+<LI>Big ship<BR>
+    Big/slow water far combat unit.
+<LI>Undersea ship<BR>
+    Under water fighting unit.
+<P>
+<LI>Heros<BR>
+    There are also many heros which only have an own icon.
+</UL>
+
+<H3>Buildings</H3>
+<UL>
+<LI>Farm<BR>
+    Supplies 4 units.
+<LI>Barracks<BR>
+    Trains fighters.
+<LI>Home house<BR>
+    Trains workers, store for resources.
+<LI>Improved home house<BR>
+    Gives more resources and new buildings.
+<LI>Very improved home house<BR>
+    Gives even more resources and new buildings.
+<LI>Land resource store<BR>
+    Extra store for land resource.
+<LI>Armory<BR>
+    Research for better weapons.
+<LI>Scout tower<BR>
+    Base for the defence towers.
+<LI>Defence tower<BR>
+    Light weapons with air defence.
+<LI>Better defence tower<BR>
+    Heavy weapons without air defence.
+<LI>Wall<BR>
+    Only used for building phase.
+<LI>Training/building place for bigger land units.
+<LI>Training/building place for improved bigger land units.
+<LI>Training/building place for magic units.
+<LI>Training/building place for air units.
+<LI>Training/building place for sea units.
+<LI>Training/building place for undersea units.
+<LI>Building to produce water resource.
+<LI>Store for water resource.
+</UL>
+
+<H2>General units/buildings</H2>
+
+<UL>
+<LI>Animals as decoration on maps.
+<LI>Building for land resource. (mine)
+<LI>Shows water resource.
+<LI>Stones
+<LI>Gate
+</UL>
+
+<H2>Needed graphics for the units</H2>
+
+To an unit/building/object belongs an icon and some animations.<P>
+Each unit/building/object has its portrait, which could be different for
+each tileset.<P>
+And following animations:
+<UL>
+<LI>Standing
+<LI>Moving
+<LI>Attacking
+<LI>Dieing
+<LI>Under construction
+<LI>In use
+</UL>
+
+<H2>The icon format</H2>
+
+An icon has the size of 46x38 pixels. Currently all icons are stored in a
+single file (I will change this, if required).<P>
+
+<H2>Unit file format</H2>
+
+All images for all animations and headings are stored in an single file.
+Currently the loader supports only <I>PNG</I> format.
+The biggest needed size is taken for all images.
+<P>
+
+[1-1][1-2][1-3][1-4][1-5]<BR>
+[2-1][2-2][2-3][2-4][2-5]<BR>
+....<BR>
+[n-1][n-2][n-3][n-4][n-5]<BR>
+
+<P>X-1 ... X-5 are the different headings for the same animations.
+<UL>
+<LI>X-1 looking north
+<LI>X-2 looking north-west
+<LI>X-3 looking west
+<LI>X-4 looking south-west
+<LI>X-5 looking south
+<LI>The missing directions are made with mirroring
+</UL>
+
+2-Y is the second frame of the animation.
+
+<HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>

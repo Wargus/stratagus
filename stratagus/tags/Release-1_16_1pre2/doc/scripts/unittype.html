@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <TITLE>FreeCraft Configuration Language Description: UnitType</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,unittype">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: UnitType</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+<A HREF="../clone.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<HR>
+<H2>Functions</H2>
+<A NAME="define-unit-type"></A>
+<H3>define-unit-type</H3>
+
+<H4>Description</H4>
+
+    Define the unit types in game it is based on the UDTA.<P>
+
+    The default unit types are defined in <A HREF="../../data/ccl/units.ccl">
+    $FREECRAFT_LIBRARY/data/units.ccl</A>.  This could also be defined in own
+    levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-unit-type ident name graphics pixel_size animations icon
+    speed overlay sight_range hitpoints magic costs tile_size box_size
+    attack_range computer_reaction_range human_reaction_range armor
+    priorty damage piercing_damge weapon_upgradable armor_upgradeable
+    decay annoy_factor points missle corpse type right_mouse can_target
+    flags sounds attack_sound)</CODE>
+
+<DL>
+<DT>ident</DT>
+<DD>The unit-type unique identifier.  It is used to reference unit-types in
+game. F.E: "unit-knight", "unit-gold-mine".
+</DD>
+<DT>name</DT>
+<DD>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
+If the name is too long, it is split at space.
+</DD>
+<DD></DD>
+<DT>graphics</DT>
+<DD>Defines the graphics used to display the unit-type in game. This could
+be an array "#( summer winter wasteland swamp) with different files for the
+tilesets. Or an indentifier "unit-xyz" if the graphics from an other unit-type
+should be reused.<P>
+
+Examples:
+    <DL>
+    <DT>#( "knight.png" () () () )</DT>
+    <DD>For all tilesets are the same graphics "knight.png" used. </DD>
+    <DT>#( "gold mine (summer).png" "gold mine (winter).png"
+	"gold mine (wasteland).png" "gold mine (swamp).png")</DT>
+    <DD>"gold mine (summer).png" is used for the summer tileset.<BR>
+	"gold mine (winter).png" is used for the winter tileset.<BR>
+	"gold mine (wasteland).png" is used for the wasteland tileset.<BR>
+	"gold mine (swamp).png" is used for the swamp tileset. </DD>
+    <DT>"unit-knight"</DT>
+    <DD>The graphics from the unit-type "unit-knight" is also used for the
+	this unit-type (here paladin).</DD>
+    </DL>
+</DD>
+<DT>pixel_size</DT>
+<DD>Size of the unit-type graphic in pixeln. A list of X (width) and Y (height)
+sizes.  F.E. '( 72 72 ), '( 96 96 ).</DD>
+<DT>animations</DT>
+<DD>Identifier to reference the animation sequences (scripts) for the
+unit-type. F.E. "animations-knight", "animations-gold-mine".</DD>
+<DT>icon</DT>
+<DD>Identifier to reference the icon shown in game for this unit-type.
+F.E. "icon-knight", "icon-gold-mine".</DD>
+<DT>speed</DT>
+<DD>The speed shown for this unit-type in game. (NOTE: this is
+only shown and *not* used). F.E. 10, 13.</DD>
+<DT>overlay</DT>
+<DD>Define the overlay shown if this unit is constructed (build).
+Currently are available:
+<UL>
+<LI> 6 land construction site
+<LI> 7 human shipyard construction site
+<LI> 8 orc shipyard construction site
+<LI> 9 human oil well construction site
+<LI>10 orc oil well construction site
+<LI>11 human refinery construction site
+<LI>12 orc refinery construction site
+<LI>13 human foundry construction site
+<LI>14 orc foundry construction site
+<LI>15 wall construction site
+</UL>
+NOTE: this will be changed to identifiers sometime.
+</DD>
+<DT>sight_range</DT>
+<DD>Sight range (in tiles) of this unit. F.E. 6, 14.</DD>
+<DT>hitpoints</DT>
+<DD>Hitpoints for this Unit. F.E. 90, 1000</DD>
+<DT>magic</DT>
+<DD>Flag to determine whether this unit is a spell user. 0 = false (not a magic
+user), 1 = true (magic user).  F.E. 1, 0</DD>
+<DT>costs</DT>
+<DD>Define the costs to build (or aquire) this unit. It is an array of #(
+time gold wood oil) or #(time gold wood oil ore stone coal). Time is in frames
+to build this unit.
+Gold is the amount required to build this unit. Wood is the amount required
+to build this unit.  Oil is the amount required to build this unit.
+F.E.: #( 200 2000 1000 200 ).<P>
+NOTE: This is extendable more costs could be added. (using 6 resources insteed
+of 3. Or redefining the gold resource into a crytal resource)
+</DD>
+<DT>tile_size</DT>
+<DD>Define the unit-type size in tiles. NOTE: currently only buildings could
+be bigger than one tile. A list of X (width) and Y (height) sizes. 
+F.E. '( 1 1 ), '( 2 2 ).
+</DD>
+<DT>box_size</DT>
+<DD></DD>
+<DT>attack_range</DT>
+<DD></DD>
+<DT>computer_reaction_range</DT>
+<DD></DD>
+<DT>human_reaction_range</DT>
+<DD></DD>
+<DT>armor</DT>
+<DD></DD>
+<DT>priorty</DT>
+<DD></DD>
+<DT>damage</DT>
+<DD></DD>
+<DT>piercing_damge</DT>
+<DD></DD>
+<DT>weapon_upgradable</DT>
+<DD></DD>
+<DT>armor_upgradeable</DT>
+<DD></DD>
+<DT>decay</DT>
+<DD></DD>
+<DT>annoy_factor</DT>
+<DD></DD>
+<DT>points</DT>
+<DD></DD>
+<DT>missle</DT>
+<DD></DD>
+<DT>corpse</DT>
+<DD></DD>
+<DT>type</DT>
+<DD></DD>
+<DT>right_mouse</DT>
+<DD></DD>
+<DT>can_target</DT>
+<DD></DD>
+<DT>flags</DT>
+<DD></DD>
+<DT>sounds</DT>
+<DD></DD>
+<DT>attack_sound</DT>
+<DD></DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-unit-type "unit-footman"		"Footman"
+      ;; graphic data
+      #("footman.png"
+	()
+	()
+	() )
+      '(  72  72 )			;; graphic size
+      "animations-footman"	;; animations
+      "icon-footman"
+      ;;Speed OvFrame SightR Hitpnt Magic  BTime	Gold	Wood	Oil
+	  10       0      4     60      0 #(   60    600       0      0 )
+      ;;Tile    Box Size    Attack	ReactC	ReactH
+      '( 1 1 ) '(  31  31 )     1       6       4
+      ;;Armor Prior	Damage	Pierc	WUpgr	AUpgr
+	   2    60      6      3       1       1
+      ;;Decay Annoy	Points
+	  0      0      50
+      "missile-none"
+      'corpse-human
+      'type-land
+      'right-attack
+      'can-target-land 
+      ;; flags
+      'land-unit
+      'can-attack
+      'organic
+      'selectable-by-rectangle
+      ;; sounds
+      #("footman-selected"
+	"footman-acknowledge"
+	"footman-ready"
+	"footman-help"
+	"footman-dead" )
+      "footman-attack" )
+</PRE>
+	Define the unit-type "unit-footman" as footman.<P>
+
+<A NAME="print-unit-type-table"></A>
+<H3>print-unit-type-table</H3>
+
+<H4>Description</H4>
+
+    Print the current unit type table for the C code. (
+    <A HREF="../../src/unit/ut_table.c"> $FREECRAFT/src/unit/ut_table.c</A>
+    contains the result) Use "Save" to generate the scheme (FreeCraft
+    configuration language) tables. <P>
+
+<H4>Syntax</H4>
+
+    (print-unit-type-table)
+
+
+<!--
+
+<LI><VAR>unit-type</VAR><BR>
+    Get the pointer to the unit type structure.<P>
+    (unit-type ident)
+    <DL>
+    <DT>ident</DT>
+    <DD>The unit-type unique identifier.</DD>
+    </DL>
+    <P>
+    <H4>Example:</H4>
+    (unit-type "unit-peon")<P>
+    Get the unit type structure of the peon. #<UnitType 0x80ac350 unit-peon><P>
+
+<LI><VAR>unit-type-array</VAR><BR>
+    Get an array of all currently defined unit type structures.<P>
+    (unit-type-array)
+    <P>
+
+<LI><VAR>get-unit-type-ident</VAR><BR>
+    Get the unique identfier of the unit type structure.<P>
+    (get-unit-type-ident type)
+    <DL>
+    <DT>type</DT>
+    <DD>Unit type pointer</DD>
+    </DL>
+    <P>
+    <H4>Example:</H4>
+    (get-unit-type-ident (unit-type "unit-peon"))<P>
+    Get the identifier of the unit type peon.<P>
+-->
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2000 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
