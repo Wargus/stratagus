@@ -333,9 +333,10 @@ extern int ShowHealthBar;		/// Flag: show health bar
 extern int ShowHealthDot;		/// Flag: show health dot
 extern int ShowManaBar;			/// Flag: show mana bar
 extern int ShowManaDot;			/// Flag: show mana dot
-extern int ShowHealthHorizontal;       /// Flag: show health bar horizontal
-extern int ShowManaHorizontal;         /// Flag: show mana bar horizontal
+extern int ShowHealthHorizontal;	/// Flag: show health bar horizontal
+extern int ShowManaHorizontal;		/// Flag: show mana bar horizontal
 extern int ShowNoFull;			/// Flag: show no full health or mana
+extern int ShowEnergySelectedOnly;	/// Flag: show energy only for selected
 extern int DecorationOnTop;		/// Flag: show health and mana on top
 extern int ShowSightRange;		/// Flag: show right range
 extern int ShowReactRange;		/// Flag: show react range
