@@ -1125,7 +1125,7 @@ echo "# Locks versions with a symbolic name" >> $RULESFILE
 echo "LOCKVER=	rcs -q -n\$(NAME)" >> $RULESFILE
 echo >> $RULESFILE
 
-rm .depend
+if [ -f .depend ]; then rm .depend; fi
 
 #------------------------------------------------------------------------------
 
