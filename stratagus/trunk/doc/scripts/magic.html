@@ -20,7 +20,7 @@
     <title>Stratagus Configuration Language Description: Magic</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
     <meta name="Author" content="cleonard@go.ro">
-    <meta name="Keyword" content="ccl,magic,spells">
+    <meta name="Keyword" content="script,magic,spells">
     <meta name="Description" content="">
 </head>
 <body>
@@ -42,7 +42,7 @@
 <a href="../stratagus.html">Stratagus</a> 
 <a href="../readme.html">Readme</a> 
 <a href="../faq.html">FAQ</a> 
-<a href="ccl.html">CCL</a> 
+<a href="ccl.html">Script</a> 
 <a href="icon.html">PREV</a> 
 <a href="pud.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
@@ -50,7 +50,7 @@
 <a href="#define-missile-type">define-missile-type</a>
 <a href="#define-spell">define-spell</a>
 <a href="pud.html#define-missiletype-wc-names">define-missiletype-wc-names</a>
-<a href="#missile">missile</a>
+<!-- <a href="#missile">missile</a> -->
 <hr>
 <h2>Intro - Introduction to spells and missiles.</h2>
 This containts everything around spells and missiles. Though it might not be
@@ -60,7 +60,7 @@ obvious at start missiles are also suited for complex behaviour and included her
 <a name="define-missile-type"></a>
 
 
-<h3>(define-missile-type 'missile-name 'tag 'value ....)</h3>
+<h3>DefineMissileType( "missile-name", { tag = value, ...} )</h3>
 
 This is the function to define a missile type.
 <dl>
@@ -70,108 +70,108 @@ This is the function to define a missile type.
 </dl>
 Possible tags:
 <dl>
-<dt>file</dt>
+<dt>File = "file-path"</dt>
 <dd>This is followed by the path of the file with the missile graphics.
 </dd>
-<dt>size</dt>
+<dt>Size = {x, y}</dt>
 <dd>This if followed by a list of X and Y sizes of the missile sprite.
 F.E. 'size '(32 32)
 </dd>
 <a name="frames-define-missile-type"></a>
-<dt>frames</dt>
+<dt>Frames = number</dt>
 <dd>This is the number of frames in the file. Missiles lack complicated
 animation scripts and just have a bunch of frames with equal duration.
 </dd>
-<dt>num-directions</dt>
-<dd>The number of directions in the file for the missile. Should be 8.
+<dt>NumDirections = number</dt>
+<dd>The number of directions in the file for the missile. Should be 8 (or 5 for flipped missiles).
 </dd>
-<dt>draw-level</dt>
+<dt>DrawLevel = Number</dt>
 <dd>The draw level of the missile. Missiles and units are sorted by this
 value to determine the draw order.
 </dd>
-<dt>fired-sound</dt>
+<dt>FiredSound = "Sound-file"</dt>
 <dd>Name of the sound played when the missile is fired.
 </dd>
-<dt>impact-sound</dt>
+<dt>ImpactSound = "Sound-file"</dt>
 <dd>Name of the sound played when the missile hits it's target.
 </dd>
-<dt>class</dt>
+<dt>Class = "class-type"</dt>
 <dd>Various missiles can have wierd behaviours. This tag is followed by an 
 identifier that specifies some of that behaviour. Here is a list of currently
 supported missile classes:<p>
 <dl>
-    <dt>missile-class-none</dt>
+    <dt>"missile-class-none"</dt>
     <dd>Missile does nothing. Shouldn't really be used.
     </dd>
-    <dt>missile-class-point-to-point </dt>
+    <dt>"missile-class-point-to-point" </dt>
     <dd>Missile flies straight to destination animating on the way
     </dd>
-    <dt>missile-class-point-to-point-with-hit </dt>
+    <dt>"missile-class-point-to-point-with-hit" </dt>
     <dd>Missile flies straight to destination keeping the first frame and
     the finishes the animation when hitting
     </dd>
-    <dt>missile-class-point-to-point-cycle-once </dt>
+    <dt>"missile-class-point-to-point-cycle-once" </dt>
     <dd>Missile flies straight to destination and animates ONCE from first
     to last and back again. To be used for catapult and the like to make a
     projectile bigger mid-way to the target
     </dd>
-    <dt>missile-class-point-to-point-bounce</dt>
+    <dt>"missile-class-point-to-point-bounce"</dt>
     <dl>Missile flies straight to destination, and the "bounces" by hitting
 	every other tile on the path onward. This will also add one aditional flag:
 	<dt>num-bounces</dt>
 	<dd>This if folowed by an integer, representing the number of bounces(hits)</dd>
     </dl>
-    <dt>missile-class-stay</dt>
+    <dt>"missile-class-stay"</dt>
     <dd>Missile will just go through it's animation once and vanish. booooring.
     </dd>
-    <dt>missile-class-cycle-once </dt>
+    <dt>"missile-class-cycle-once" </dt>
     <dd>Missile will just go through it's animation from start to and and back
     again, then vanish.
     </dd>
-    <dt>missile-class-fire </dt>
+    <dt>"missile-class-fire" </dt>
     <dd>Missile is used for fire. More documentation?
     </dd>
-    <dt>missile-class-parabolic</dt>
+    <dt>"missile-class-parabolic"</dt>
     <dd>Missile flies to destination with a parabolic path. It used the same
     animation as cycle-once
     </dd>
-    <dt>missile-class-land-mine</dt>
+    <dt>"missile-class-land-mine"</dt>
     <dd>Missile is a landmine, it will sit quietly and wait for someone to step
     on it. You can use time-to-live as a timeout.<b>FIXME more configurable</b>
     </dd>
-    <dt>missile-class-whirlwind </dt>
+    <dt>"missile-class-whirlwind" </dt>
     <dd>Missile for the whirlwind effect <b>FIXME more configurable</b>
     </dd>
-    <dt>missile-class-flame-shield </dt>
+    <dt>"missile-class-flame-shield" </dt>
     <dd>Missile rotates around target unit and damages everything it touches
     <b>FIXME more configurable</b>
     </dd>
-    <dt>missile-class-death-coil</dt>
+    <dt>"missile-class-death-coil"</dt>
     <dd>Missile is death coil, will drain health from target or enemy units
     in the area and feed it to the caster.<b>FIXME more configurable</b>
     </dd>
 </dl>
 </dd>
 <a name="delay-define-missile-type"></a>
-<dt>delay</dt>
+<dt>Delay = number</dt>
 <dd>Delay in game cycles after the missile generation, until the missile
 animation and effects starts. Delay denotes the number of display cycles to
 skip before drawing the first sprite frame and only happens once at start.
 </dd>
-<dt>sleep</dt>
+<dt>Sleep = number</dt>
 <dd>This are the number of game cycles to wait for the next animation or the
 sleeping between the animation steps. All animations steps use the same delay.
 0 is the fastest and 255 the slowest animation. Perhaps we should later we
 will use animation scripts for more complex animations.
 </dd>
-<dt>speed</dt>
+<dt>Speed = number</dt>
 <dd>The speed how fast the missile moves. 0 the missile didn't move, 1 is the
 slowest speed and 32 s the fastest supported speed. This is how many pixels
 the missiles moves with each animation step.  The real use of this member
 depends on the missile class. This is currently only used by the point-to-point
 missiles.
 </dd>
-<dt>range</dt>
+<dt>Range = number</dt>
 <dd>Determines the range in which a projectile will deal its damage. A range of
 0 will mean that the damage will be limited to the targetted unit only.  So if
 you shot a missile at a unit, it would only damage that unit.  A value of 1 only
@@ -180,21 +180,20 @@ damage for that particular missile would be dealt for a range of 1 around the
 impact spot. All fields that aren't the center get only 1/SpashFactor of the damage.
 Fields 2 away get 1/(SplashFactor*2), and following...
 </dd>
-<dt>splash-factor</dt>
+<dt>SplashFactor = number</dt>
 <dd>The Splash divisor for damage done with range
 </dd>
-<dt>impact-missile</dt>
-<dd>You can use this to spawn another missile on impact. F.E. 'impact-missile 'missile-explosion
+<dt>ImpactMissile = "missile-type"</dt>
+<dd>You can use this to spawn another missile on impact. F.E. ImpactMissile = "missile-explosion"
 </dd>
-<dt>smoke-missile</dt>
+<dt>SmokeMissile = "missile-type"</dt>
 <dd>The name of the next (other) missile to generate a trailing smoke.  So it
 can be used to generate a chain of missiles.
 </dd>
-<dt>can-hit-owner</dt>
-<dd>Determines if the missile will affect
-the caster or not.
+<dt>CanHitOwner = boolean</dt>
+<dd>Determines if the missile will affect the caster or not.
 </dd>
-<dt>firendly-fire</dt>
+<dt>FriendlyFire = boolean</dt>
 <dd>Determines if the missile will damage
 units belonging to the same player of the caster or to an ally.
 </dd>
@@ -203,60 +202,60 @@ units belonging to the same player of the caster or to an ally.
 <h4>Example</h4>
 
 <pre>
-    (define-missile-type 'missile-fireball
-      'file "missiles/fireball.png" 'size '(32 32) 'frames 5
-      'num-directions 8
-      'impact-sound "fireball hit"
-      'class 'missile-class-point-to-point 'draw-level 50  'sleep 1 'speed 16 'range 1
-      'can-hit-owner)
+DefineMissileType("missile-fireball",
+  { File = "missiles/fireball.png", Size = {32, 32}, Frames = 5, NumDirections = 5,
+  ImpactSound = "fireball hit",
+  DrawLevel = 50, Class = "missile-class-point-to-point-bounce", NumBounces = 5,
+  Sleep = 1, Speed = 16, Range = 1,
+  ImpactMissile = "missile-explosion" } )
 </pre>
 <h4>Used</h4>
-<a href="../../data/ccl/missiles.ccl"> $LIBARYPATH/ccl/missiles.ccl </a>
+<a href="../../data/scripts/missiles.lua"> $LIBARYPATH/scripts/missiles.lua </a>
 
 <a name="define-spell"></a>
-<h3>(define-spell spell-ident tag value ... )</h3>
-This is the function to define a spell, icluding it's effects and targetting
+<h3>DefineSpell( "spell-ident", tag, value, ... )</h3>
+This is the function to define a spell, including it's effects and targetting
 conditions. Be very carefull, defining random flags will probably make the game crash.
 
 <dl>
-<dt>showname</dt>
+<dt>"showname", "name"</dt>
 <dd>A neatly formatted string to be shown by the engine on the screen.
 </dd>
-<dt>manacost</dt>
+<dt>"manacost", number</dt>
 <dd>The mana cost of the spell. Maybe this should be set on a per-caster basis?
 </dd>
-<dt>repeat-cast</dt>
+<dt>"repeat-cast" </dt>
 <dd>If specified, the caster will cast it again. To be used with spells like
 area-bombardment to cast it again (area-bombardment is stackable)
 </dd>
-<dt>range</dt>
+<dt>"range", number or "infinite"</dt>
 <dd>The casting range of the spell, do not confuse this with area effect range.
-It's normally an integer value, but you can specify a special value 'infinite to
+It's normally an integer value, but you can specify a special value "infinite" to
 let the spell be casted on the entire map.
 </dd>
-<dt>target</dt>
+<dt>"target", "self" or "position" or "unit"</dt>
 <dd>Target type information. The following values are acceptable:
 <ul>
-    <li>self: The spell will only affect the caster or the area around him, no targetting at all.
-    <li>position: The unit will target a position.
-    <li>unit: The unit will target an unit. The spell will be aborted if the target dies. 
+    <li>"self": The spell will only affect the caster or the area around him, no targetting at all.
+    <li>"position": The unit will target a position.
+    <li>"unit": The unit will target an unit. The spell will be aborted if the target dies. 
 </ul>
 You can still use position spells on units, it will target the unit's position.
 If the unit dies however the caster will stop. (Some spells get casted until
 there is no more mana left).
 </dd>
-<dt>conditions</dt>
+<dt>"conditions", {flag, value, ...}</dt>
 <dd>This is the condition for being able to cast the spell. Think of it as a 
 function that takes an unit as a parameter and return either yes or no depending
 on the unit properties. Here is how a condition looks like:
-<pre>'condition '(
-  building false
-  max-slow-ticks 10)</pre>
+<pre>"condition", {
+  "building", "false"
+  "max-slow-ticks", 10}</pre>
 Here are the supported parameters:<p>
 <dl>
-    <dt>building</dt>
+    <dt>"building", "true" or "false" or "only"</dt>
     <dd>This is one of the bool parameters (can't think of a better name). It is
-    followed by true, false or only. Imagine this as a question, is the target a
+    followed by "true", "false" or "only". Imagine this as a question, is the target a
     building? The answer is yes/no. A "true" parameter makes it always pass(and
     it's the default.), "false" parameter passes when the answer is NO, and "only"
     passes only when the answer is yes.<br>
@@ -265,160 +264,154 @@ Here are the supported parameters:<p>
     only" will make a spell that works only on buildings (can't think of any though).
     This syntax is used for more that "building"
     </dd>
-    <dt>coward</dt>
+    <dt>"coward", "true" or "false" or "only"</dt>
     <dd>This is a bool parameter too, just like building. I specifies the behaviour
     for cowards, unit's that don't attack by themselves. For example you should not
     cast an offensive buff (like bloodlust) on non-combat units.
     </dd>
-    <dt>alliance</dt>
+    <dt>"alliance", "true" or "false" or "only"</dt>
     <dd>This is a bool parameter too, just like building. I specifies the behaviour
     for allied units. Your own units are considered allied too. For instance you
     should only cast healing on your own units. 
     </dd>
-    <dt>self</dt>
+    <dt>"self", "true" or "false" or "only"</dt>
     <dd>This is a bool parameter too, just like building. I it a bit more special,
     since it specifies the behaviour for casting on yourself. <b>A LOT</b> of
     spells specify "self false", to disallow casting on yourself.
     </dd>
-    <dt>bool-flags</dt>
+    <dt>bool-flags, "true" or "false" or "only"</dt>
     <dd>There is no parameter called bool-flags. You can however use flags defined
-    by <a href="unittype.html#define-bool-flags">define-bool-flags</a> just like a
-    bool parameter. For instance "organic only" will make a spell work only on
-    units marked with the organic flag.
+    by <a href="unittype.html#define-bool-flags">DefineBoolFlags()</a> just like a
+    bool parameter. For instance "organic", "only" will make a spell work only on
+    units marked with the "organic" flag.
     </dd>
-    <dt>min-hp-percent</dt>
+    <dt>"min-hp-percent", number</dt>
     <dd>Minimum hp percent of the target. If not specified the minimum is around -10
     You can use this to avoid casting damage spells on enemies that are dying anyway.
     </dd>
-    <dt>max-hp-percent</dt>
+    <dt>"max-hp-percent", number</dt>
     <dd>Maximum hp percent of the target. If not specified the maximum is around 1000.
     For instance you can use this to avoid healing units that are not injured.
     </dd>
-    <dt>min-mana-percent</dt>
+    <dt>"min-mana-percent", number</dt>
     <dd>Minimum mana percent of the target. If not specified the minimum is around -10
     You can use this to avoid spells like mana drain on units that are empty. 
     </dd>
-    <dt>max-mana-percent</dt>
+    <dt>"max-mana-percent", number</dt>
     <dd>Maximum mana percent of the target. If not specified the maximum is around 1000
     For instance you can use this to avoid restoring mana to units that are full.
     </dd>
-    <dt>max-slow-ticks</dt>
+    <dt>"max-slow-ticks", number</dt>
     <dd>Followed by a number, to avoid casting slow on an unit that is already slowed down.
     </dd>
-    <dt>max-haste-ticks</dt>
+    <dt>"max-haste-ticks", number</dt>
     <dd>Followed by a number, to avoid casting haste on an unit that is already hasted.
     </dd>
-    <dt>max-bloodlust-ticks</dt>
+    <dt>"max-bloodlust-ticks", number</dt>
     <dd>Followed by a number, to avoid casting bloodlust on an unit that already has it.
     </dd>
-    <dt>max-invisibility-ticks</dt>
+    <dt>"max-invisibility-ticks", number</dt>
     <dd>Followed by a number, to avoid casting invisibility on an unit that already has it.
     </dd>
-    <dt>max-invincibility-ticks</dt>
+    <dt>"max-invincibility-ticks", number</dt>
     <dd>Followed by a number, to avoid casting invincibility on an unit that already has it.
     </dd>
 </dl>
 </dd><p>
-<dt>autocast</dt>
-<dd>Autocast works very closely with conditions. Here is the syntax:
-<pre>'autocast (range x condition(whatever) )</pre>
+<dt>"autocast", {flag, value}</dt>
+<dd>Autocast works very closely with conditions.
 It functions by selecting every unit in range and trying to check of they fit the
 condition. If they do, the spell is casted. Of course, this is a very primitive
 mechanism, but it works for simple spells like heal. As you might have noticed, some
 of the finer restrictions in conditions are designed for autocast (like not casting
 buffs on cowards). Autocasting position target spells is not supported, sorry.
-Here is a formal list of parameters:
+Here is a formal list of parameters:</dd>
 <dl>
-    <dt>range</dt>
+    <dt>"range", number</dt>
     <dd>The range in which autocast runs. I think it's square?
     </dd>
-    <dt>combat</dt>
+    <dt>"combat", "only" or "true" or "false"</dt>
     <dd>This is a bool parameter, like in condition. It's autocast-specific and NOT
     part of conditions due to technical considerations. Combat is not unit-specific,
     it only depends on caster location. combat mode is when there are non-coward
     enemy units in range. most offensive spells obviousely only should be used in
     combat. (can you say offensive buffs?)
     </dd>
-    <dt>condition</dt>
-    <dd>This is followed by a list exactly like in 'condition. As it was said
+    <dt>"condition", {flag, value}</dt>
+    <dd>This is followed by a list exactly like in "condition". As it was said
     before, this is evaluated for each and every unit in range, and if a unit
     passes, the spell gets casted.
     </dd>
 </dl>
 </dd>
-<dt>ai-cast</dt>
+<dt>"ai-cast", {flag, value}</dt>
 <dd>This is identical to autocast in syntax. It's used by the AI (computer controller
 player) rather then by a human players units. In general this should be a little better
 than autocast (and make human players think some more). There no reason to repeat the
 syntax of autocast here.
 </dd><p>
-<dt>action</dt>
-<dd>The effect of the spells. You can add multiple actions, here is the syntax:
-<pre>'action '((operation-name-1 parameters ... )
-          (operation-name-2 parameters ... )
-             ...
-	  (operation-name-n parameters ... ))
-</pre>
-Here are the supported operations, their paramenters, and what they do.<p>
+<dt>"action", {{"operation-name", flag, value, ...} , ...}</dt>
+<dd>The effect of the spells. You can add multiple actions.
+Here are the supported operations, their paramenters, and what they do.</dd><p>
 <dl>
-    <dt>area-bombardment</dt>
+    <dt>"area-bombardment"</dt>
     <dl>This will a number of missiles to be thrown in a square area. Here are
     the available tags:
-	<dt>fields</dt>
+	<dt>"fields", number</dt>
 	<dd>The size of the affected square. This will get centered on the target
 	It should really be an odd number, or it will look wierd (not centered.)
 	</dd>
-	<dt>shards</dt>
+	<dt>"shards", number</dt>
 	<dd>The amount of missiles to throw at random in the square.
 	</dd>
-	<dt>damage</dt>
+	<dt>"damage", number</dt>
 	<dd>The damage of each individual missile.
 	</dd>
-	</dt>start-offset-x<dt>
-	</dt>start-offset-y<dt>
-	<dd>A missile hitting x,y will start at x+start-offset-x, y+start-offset-y.
+	<dt>"start-offset-x", number</dt>
+	<dt>"start-offset-y", number</dt>
+	<dd>A missile hitting x,y will start at x + start-offset-x, y + start-offset-y.
 	This value is in pixels, for better precision.
 	</dd>
     </dl>
-    <dt>adjust-buffs</dt>
+    <dt>"adjust-buffs", "buff-name", number</dt>
     <dl>This spell with set the time left for every buff. Buffs are temporary
 	bonuses or penalties for units, like better damage or reduced speed(on enemies)
 	when setting buff-1-ticks 567 the unit will have 567 ticks of buff-1 left. 0 is
 	also a value, in fact acting like some sort of dispel magic. Unfortunately
 	this is quite limited at the moment, here are the buffs provided and what they do.
-    	<dt>haste-ticks</dt>
+    	<dt>"haste-ticks"</dt>
 	<dd>The number of haste ticks. Haste gives the unit almost double speed
 	for any activity.
 	</dd>
-    	<dt>haste-ticks</dt>
+    	<dt>"haste-ticks"</dt>
 	<dd>The number of slow ticks. Slow gives the unit double speed for all
 	activities.
 	</dd>
-    	<dt>bloodlust-ticks</dt>
+    	<dt>"bloodlust-ticks"</dt>
 	<dd>The number of bloodlust ticks. Bloodlust gives the unit double damage
 	(both piercing and basic)
 	</dd>
-    	<dt>invisibility-ticks</dt>
+    	<dt>"invisibility-ticks"</dt>
 	<dd>The number of Invisibility ticks. Invisibility makes the unit completely
 	dissapear for other players. It can still be affected by area effect spells
 	though. The unit will appear when the time is gone or when it will try to do
 	anything except move. This has nothing to do with cloaking.
 	</dd>
-	<dt>invincibility-ticks</dt>
+	<dt>"invincibility-ticks"</dt>
 	<dd>The number of invincibility ticks. This makes the unit completely imune
 	to all forms of damage. Try using very low values for this :).
 	</dd>
     </dl>
-    <dt>adjust-vitals</dt>
+    <dt>"adjust-vitals", tag, ...</dt>
     <dl>This will adjust vitals of the unit. Vitals are health, mana, and on a sunny
 	day maybe even shield. Possible tags:
-	<dt>hit-points</dt>
+	<dt>"hit-points", number</dt>
 	<dd>Unit hit-point gain, or loss if negative.
 	</dd>
-	<dt>mana</dt>
+	<dt>"mana", number</dt>
 	<dd>Unit mana gain, or loss if negative.
 	</dd>
-	<dt>max-multi-cast</dt>
+	<dt>"max-multi-cast", number</dt>
 	<dd>This spell usually has some very small limits (like heal 2 hit-points
 	for 1 caster mana), and will get casted multiple times at once, until the
 	hp/mana limit for the unit is reached. You can set this to a reasonable
@@ -426,102 +419,110 @@ Here are the supported operations, their paramenters, and what they do.<p>
 	2 hit-points for 1 caster mana up to 20 hit-points/10 mana per cast
 	</dd>
     </dl>
-    <dt>demolish</dt>
+    <dt>"demolish", tag, ...</dt>
     <dl>This will remove any trees/rocks/walls in and inflict a fixed damage
     to a fixed area. Possible tags:
-    	<dt>damage</dt>
+    	<dt>"damage", number</dt>
 	<dd>Each and every unit in range will receive that damage. FIXME: no
 	support for dampening damage.
 	</dd>
-	<dt>range</dt>
+	<dt>"range", number</dt>
 	<dd>The range of the terrain and unit damage.
 	</dd>
     </dl>
-    <dt>summon</dt>
+    <dt>"summon", tag, ...</dt>
     <dl>This will summon a new unit. Possible tags:
-	<dt>unit-type</dt>
+	<dt>"unit-type", "unit-type-name"</dt>
 	<dd>Type of the unit to summon. Must be already defined.
 	</dd>
-	<dt>ttl</dt>
+	<dt>"ttl", number</dt>
 	<dd>Time to live. The unit will only survive for that time, afterward it
 	will receive 1 damage every game cycle, ending it's life. If this is 0
 	or ommited then the summoned unit is permanent
 	</dd>
-	<dt>require-corpse</dt>
+	<dt>"require-corpse"</dt>
 	<dd>This flag does not take a value. When specified, the caster will
 	summon an unit from a corpse, and consume the corpse in the process.
 	You should make sure the summoned unit dies without a corpse.
 	</dd>
 	How to do a reveal-map spell: define a special unit, give it the 
-	'revealer flag, and set the spell's range to 'infinite. Please see
-	<a href="unittype.html#define-unit-type">(define-unit-type)</a>
+	revealer flag, and set the spell's range to "infinite". Please see
+	<a href="unittype.html#define-unit-type">DefineUnitType()</a>
 	</dd>
     </dl>
-    <dt>polymorph</dt>
+    <dt>"polymorph", tag, ...</dt>
     <dl>This will tranform the unit, giving it a new unit type. Before you
 	ask, temporary polymorphing is not supported, but it would be a nice
 	feature to add in the future. There is only one tag:
-	<dt>unit-type</dt>
+	<dt>"new-form", unit-type-name"</dt>
 	<dd>Type of the unit to transform to. Must be already defined. This spell
 	can be used as an instant-kill spell by polymorphing into a harmless unit,
 	like a chicken.
 	</dd>
     </dl>
-    <dt>spawn-missile</dt>
+    <dt>"spawn-missile", tag, ...</dt>
     <dl>This will spawn a missile in the game. It's one of the most versatile
     spell variants. Here are the paramenters:
-    	<dt>ttl</dt>
+    	<dt>"ttl", number</dt>
 	<dd>Time to live for the missile. Usually means that the missile is
 	gone after this time, but for some missile classes it means something else.
 	</dd>
-    	<dt>damage</dt>
+    	<dt>"damage", number</dt>
 	<dd>This is the damage for this missile, overriding the standard damage
 	defined for the missile.
 	</dd>
-    	<dt>delay</dt>
+    	<dt>"delay", number</dt>
 	<dd>This is the delay for the missile. it means the missile will only
 	appear after this many ticks.
 	</dd>
-	<dt>start-point/end-point</dt>
+	<dt>"start-point", {flag, value, ...}</dt>
+	<dt>"end-point", {flag, value, ...}</dt>
 	<dl>Point to point-ish missiles need a start and an end point for the
-	    trajectory. it is defined like this:
-	    <pre>start-point (base caster/target add-x add-y add-rand-x add-rand-y)</pre>
-	    The individual tags should be self-explanatory, but here goes:
-	    <dt>base</dt>
+	    trajectory.
+	    <dt>"base", "caster" or "target"</dt>
 	    <dd>The base for the location calculation. Can be either caster or target.
 	    </dd>
-	    <dt>add-x</dt>
-	    <dd>How much to add to the x coordinate, in pixels
+	    <dt>"add-x", number</dt>
+	    <dt>"add-y", number</dt>
+	    <dd>How much to add to the x or y coordinate, in pixels
 	    </dd>
-	    <dt>add-y</dt>
-	    <dd>How much to add to the y coordinate, in pixels
-	    </dd>
-	    <dt>add-rand-x</dt>
-	    <dd>Add a random from 0 to value-1 to the x coordinate, in pixels
-	    </dd>
-	    <dt>add-rand-y</dt>
-	    <dd>Add a random from 0 to value-1 to the y coordinate, in pixels
+	    <dt>"add-rand-x", number</dt>
+	    <dt>"add-rand-y", number</dt>
+	    <dd>Add a random from 0 to number to the x or y coordinate, in pixels
 	    </dd>
 	</dl>
     </dl>
 </dl>
 </dd>
+<dt>"depend-upgrade", "upgrade-name"</dt>
+<dd>The dependency of the spell. Spell is available only once the upgrade is searched.
+Upgrade must be already declare.</dd><p>
+<dl>
 </dl>
 
 <h4>Example</h4>
 <pre>
-    (define-spell "spell-holy-vision"
-      'showname "Holy Vision"
-      'manacost 70
-      'range 'infinit
-      'target 'position
-      'action '(summon unit-type unit-revealer time-to-live 10)
-      'sound-when-cast "holy vision"
-      'missile-when-cast "missile-normal-spell"
-    )
+DefineSpell("spell-healing",
+	"showname", "Healing",
+	"manacost", 6,
+	"range", 6,
+	"target", "unit",
+	"action", {{"adjust-vitals", "hit-points", 1}},
+	"condition", {
+	    "organic", "only",  -- it is a defined-flag
+	    "building", "false",
+	    "max-hp-percent", 100
+	},
+	"depend-upgrade", "upgrade-healing",
+	"sound-when-cast", "healing",
+	"missile-when-cast", "missile-heal-effect",
+	"autocast", {"range", 6, "condition", {"alliance", "only", "max-hp-percent", 100}}
+)
 </pre>
 <h4>Used</h4>
-<a href="../../data/ccl/spells.ccl"> $LIBARYPATH/ccl/spells.ccl </a>
+<a href="../../data/scripts/spells.lua"> $LIBARYPATH/scripts/spells.lua </a>
+
+<!-- Useful to explain save format ?
 
 <a name="missile"></a>
 <h3>(missile tag 'value ... )</h3>
@@ -602,7 +603,7 @@ controlling function. No parameters.
 
 <a href="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </a>
 
-
+-->
 
 <hr>
 Last changed: $Id$<br>
