@@ -218,7 +218,7 @@ local void EditTile(int x, int y, int tile)
 	if( y ) {
 	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
 		TileToolDecoration));
-	    mf[-TheMap.Width].Flags |=
+	    (mf-TheMap.Width)->Flags |=
 		TheMap.Tileset->FlagsTable[16 + tile * 16];
 	} else {
 	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
@@ -235,7 +235,7 @@ local void EditTile(int x, int y, int tile)
 	if( y ) {
 	    ChangeTile(x, y - 1, GetTileNumber(tile, TileToolRandom,
 		TileToolDecoration));
-	    mf[-TheMap.Width].Flags |=
+	    (mf-TheMap.Width)->Flags |=
 		TheMap.Tileset->FlagsTable[16 + tile * 16];
 	} else {
 	    ChangeTile(x, y + 1, GetTileNumber(tile, TileToolRandom,
