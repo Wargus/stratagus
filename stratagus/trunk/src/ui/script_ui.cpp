@@ -3064,7 +3064,7 @@ local int CclDefineUI(lua_State* l)
 			    lua_rawgeti(l, -1, 1);
 			    ui->CompletedBarX = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
-			    lua_rawgeti(l, -1, 1);
+			    lua_rawgeti(l, -1, 2);
 			    ui->CompletedBarY = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
@@ -3077,7 +3077,7 @@ local int CclDefineUI(lua_State* l)
 			    lua_rawgeti(l, -1, 1);
 			    ui->CompletedBarW = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
-			    lua_rawgeti(l, -1, 1);
+			    lua_rawgeti(l, -1, 2);
 			    ui->CompletedBarH = LuaToNumber(l, -1);
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
