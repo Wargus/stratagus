@@ -550,6 +550,8 @@ extern FDrawData DrawPanelIcon;
 extern FDrawData DrawLifeBar;
 extern FDrawData DrawCompleteBar;
 
+extern int AddHandler(struct lua_State* l);
+extern void CallHandler(unsigned int handle);
 
 
 //@}
