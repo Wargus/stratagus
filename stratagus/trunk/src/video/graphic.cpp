@@ -45,15 +45,6 @@
 global PaletteLink *PaletteList;	/// List of all used palettes.
 
 /*----------------------------------------------------------------------------
---	Externals
-----------------------------------------------------------------------------*/
-
-extern int ClipX1;			/// current clipping top left
-extern int ClipY1;			/// current clipping top left
-extern int ClipX2;			/// current clipping bottom right
-extern int ClipY2;			/// current clipping bottom right
-
-/*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
