@@ -108,7 +108,7 @@ global GameSound GameSounds
 **		@param stereo		FIXME: docu
 */
 local void InsertSoundRequest(const Unit* unit, unsigned id,
-	unsigned char power, SoundId sound, unsigned char fight,
+	unsigned short power, SoundId sound, unsigned char fight,
 	unsigned char selection, unsigned char volume, char stereo)
 {
 #ifdef USE_SDLA
@@ -201,7 +201,6 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
 	int stereo;
-	int volume;
 
 	stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
 		unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
@@ -212,12 +211,7 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 		stereo = 127;
 	}
 
-	volume = ViewPointDistanceToUnit(unit);
-	if (volume > 255) {
-		volume = 255;
-	}
-
-	InsertSoundRequest(unit, unit->Slot, volume,
+	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
 		ChooseUnitVoiceSoundId(unit, voice), voice == VoiceAttacking,
 		(voice == VoiceSelected || voice == VoiceBuilding), 0, stereo);
 }
@@ -231,7 +225,6 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 global void PlayMissileSound(const Missile* missile, SoundId sound)
 {
 	int stereo;
-	int volume;
 
 	stereo = ((missile->X + missile->Type->Width / 2 -
 		TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
@@ -242,12 +235,8 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 		stereo = 127;
 	}
 
-	volume = ViewPointDistanceToMissile(missile);
-	if (volume > 255) {
-		volume = 255;
-	}
-
-	InsertSoundRequest(NULL, 0, volume, sound, 1, 0, 0, stereo);
+	InsertSoundRequest(NULL, 0, ViewPointDistanceToMissile(missile), sound,
+		1, 0, 0, stereo);
 }
 
 /**
