@@ -764,7 +764,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
     destx=x=unit->X;
     desty=y=unit->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 
     //
     //	Find the nearest gold depot
@@ -860,6 +860,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
 			}
 			*m=22;
 		    } else {			// no goal take the first
+			free(points);
 			return mine;
 		    }
 		}
@@ -884,6 +885,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
 	//	Take best of this frame, if any.
 	//
 	if( bestd!=99999 ) {
+	    free(points);
 	    return bestmine;
 	}
 
@@ -898,6 +900,7 @@ local Unit* AiFindGoldMine(const Unit* unit)
 
     DebugLevel3Fn("no mine in sight-range\n");
 
+    free(points);
     return NoUnitP;
 }
 
@@ -1066,7 +1069,7 @@ local int AiHarvest(Unit * unit)
     x=unit->X;
     y=unit->Y;
     size=TheMap.Width*TheMap.Height/4;
-    points=alloca(size*sizeof(*points));
+    points=malloc(size*sizeof(*points));
 	
     //
     //	Find the nearest wood depot
@@ -1123,6 +1126,7 @@ local int AiHarvest(Unit * unit)
 			DebugCheck(unit->Type!=UnitTypeHumanWorker
 				&& unit->Type!=UnitTypeOrcWorker);
 			CommandHarvest(unit,x,y,FlushCommands);
+			free(points);
 			return 1;
 		    }
 		}
@@ -1150,6 +1154,7 @@ local int AiHarvest(Unit * unit)
 	    DebugCheck(unit->Type!=UnitTypeHumanWorker
 		    && unit->Type!=UnitTypeOrcWorker);
 	    CommandHarvest(unit, bestx, besty,FlushCommands);
+	    free(points);
 	    return 1;
 	}
 
@@ -1165,6 +1170,7 @@ local int AiHarvest(Unit * unit)
     DebugLevel0Fn("no wood in range by %s(%d,%d)\n"
 	    _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 
+    free(points);
     return 0;
 }
 
