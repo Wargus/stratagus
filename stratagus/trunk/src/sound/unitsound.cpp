@@ -1033,6 +1033,8 @@ SimpleSound SimpleSounds[]={
 	"axe throw.wav" },
     { "fist",
 	"fist.wav" },
+    { "peasant attack",
+	"peasant attack.wav" },
     { "lightning",
 	"lightning.wav" },
     { "touch of darkness",
