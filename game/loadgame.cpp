@@ -227,6 +227,8 @@ global void LoadGame(char* filename)
     unsigned long game_cycle;
 
     CleanModules();
+    // log will be enabled if found in the save game
+    CommandLogDisabled = 1;
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
     old_siod_verbose_level = siod_verbose_level;
@@ -242,8 +244,6 @@ global void LoadGame(char* filename)
 #endif
 
     game_cycle = GameCycle;
-    // FIXME: log should be loaded from the save game
-    CommandLogDisabled = 1;
 
     InitModules();
     LoadModules();

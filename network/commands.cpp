@@ -48,6 +48,7 @@
 #include "netconnect.h"
 #include "campaign.h"			// for CurrentMapPath
 #include "ccl.h"
+#include "ccl_helpers.h"
 #include "commands.h"
 #include "interface.h"
 #include "iocompat.h"
@@ -58,6 +59,139 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
+//	Structures
+//----------------------------------------------------------------------------
+
+/**
+**	LogEntry typedef
+*/
+typedef struct _log_entry_ LogEntry;
+
+/**
+**	LogEntry structure.
+*/
+struct _log_entry_ {
+    int		GameCycle;
+    int		UnitNumber;
+    char*	UnitIdent;
+    char*	Name;
+    int		Flag;
+    int		PosX;
+    int		PosY;
+    int		DestUnitNumber;
+    char*	Value;
+    int		Num;
+    LogEntry*	Next;
+};
+
+/**
+**	Multiplayer Player definition
+*/
+typedef struct _multiplayer_player_ {
+    char *	Name;
+    int		Race;
+    int		Team;
+    int 	Type;
+} MPPlayer;
+
+/**
+**	Full replay structure (definition + logs)
+*/
+typedef struct _full_replay_ {
+    char * 	Comment1;
+    char * 	Comment2;
+    char * 	Comment3;
+    char *	Date;
+    char *	Map;
+    char *	MapPath;
+    int		MapId;
+
+    int		Type;
+    int		Race;
+    int		LocalPlayer;
+    MPPlayer	Players[PlayerMax];
+
+    int 	Resource;
+    int		NumUnits;
+    int		TileSet;
+    int		NoFow;
+    int		RevealMap;
+    int		GameType;
+    int		Opponents;
+    int		Engine[3];
+    int		Network[3];
+    LogEntry*	Commands;
+} FullReplay;
+
+//----------------------------------------------------------------------------
+//	Constants
+//----------------------------------------------------------------------------
+
+/// Description of the LogEntry structure 
+static IOStructDef LogEntryStructDef = {
+    "LogEntry",
+    sizeof (LogEntry),
+    -1,
+    {
+	{"`next", 		NULL, 		&((LogEntry *) 0)->Next, 	NULL},
+	{"game-cycle",		&IOInt,		&((LogEntry *) 0)->GameCycle,	NULL},
+	{"unit-number",		&IOInt,		&((LogEntry *) 0)->UnitNumber,	NULL},
+	{"unit-ident",		&IOString,	&((LogEntry *) 0)->UnitIdent,	NULL},
+	{"name",		&IOString,	&((LogEntry *) 0)->Name,	NULL},
+	{"flag",		&IOInt,		&((LogEntry *) 0)->Flag,	NULL},
+	{"posx",		&IOInt,		&((LogEntry *) 0)->PosX,	NULL},
+	{"posy",		&IOInt,		&((LogEntry *) 0)->PosY,	NULL},	
+	{"dest-unit-number",	&IOInt,		&((LogEntry *) 0)->DestUnitNumber,NULL},
+	{"value",		&IOString,	&((LogEntry *) 0)->Value,	NULL},
+	{"Num",			&IOInt,		&((LogEntry *) 0)->Num,		NULL},
+	{0, 0, 0, 0}
+    }
+};
+
+static IOStructDef MPPlayerStructDef = {
+    "MPPlayer",
+    sizeof (MPPlayer),
+    PlayerMax,
+    {
+	{"name",		&IOString,	&((MPPlayer *) 0)->Name,	NULL},
+	{"race",		&IOInt,		&((MPPlayer *) 0)->Race,	NULL},
+	{"team",		&IOInt,		&((MPPlayer *) 0)->Team,	NULL},
+	{"type",		&IOInt,		&((MPPlayer *) 0)->Type,	NULL},	
+	{0, 0, 0, 0}
+    }
+};
+
+static IOStructDef FullReplayStructDef = {
+    "FullReplay",
+    sizeof(FullReplay),
+    -1,
+    {
+	{"comment-1",		&IOString,	&((FullReplay *) 0)->Comment1,	NULL},
+	{"comment-2",		&IOString,	&((FullReplay *) 0)->Comment2,	NULL},
+	{"comment-3",		&IOString,	&((FullReplay *) 0)->Comment3,	NULL},
+	{"date",		&IOString,	&((FullReplay *) 0)->Date,	NULL},
+	{"map",			&IOString,	&((FullReplay *) 0)->Map,	NULL},
+	{"mappath",		&IOString,	&((FullReplay *) 0)->MapPath,	NULL},
+	{"mapid",		&IOInt,		&((FullReplay *) 0)->MapId,	NULL},
+	{"type",		&IOInt,		&((FullReplay *) 0)->Type,	NULL},
+	{"race",		&IOInt,		&((FullReplay *) 0)->Race,	NULL},
+	{"local-player",	&IOInt,		&((FullReplay *) 0)->LocalPlayer,NULL},
+	{"players",		&IOStructArray,	&((FullReplay *) 0)->Players,	(void*)&MPPlayerStructDef},
+	{"resource",		&IOInt,		&((FullReplay *) 0)->Resource,	NULL},
+	{"num-units",		&IOInt,		&((FullReplay *) 0)->NumUnits,	NULL},
+	{"tileset",		&IOInt,		&((FullReplay *) 0)->TileSet,	NULL},
+	{"no-fow",		&IOInt,		&((FullReplay *) 0)->NoFow,	NULL},
+	{"reveal-map",		&IOInt,		&((FullReplay *) 0)->RevealMap,	NULL},
+	{"game-type",		&IOInt,		&((FullReplay *) 0)->GameType,	NULL},
+	{"Opponents",		&IOInt,		&((FullReplay *) 0)->Opponents,	NULL},
+	{"engine",		&IOIntArray,	&((FullReplay *) 0)->Engine,	(void*)3},
+	{"network",		&IOIntArray,	&((FullReplay *) 0)->Network,	(void*)3},
+	{"commands",		&IOLinkedList,	&((FullReplay *) 0)->Commands,	(void*)&LogEntryStructDef},		
+	{0, 0, 0, 0}
+    }
+};
+
+//----------------------------------------------------------------------------
 //	Variables
 //----------------------------------------------------------------------------
 
@@ -65,14 +199,11 @@ global int CommandLogDisabled;		/// True if command log is off
 global ReplayType ReplayGameType;	/// Replay game type
 local int DisabledLog;			/// Disabled log for replay
 local int DisabledShowTips;		/// Disabled show tips
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM ReplayLog;			/// Replay log
-#elif defined(USE_LUA)
-#endif
-local FILE* LogFile;			/// Replay log file
+local CLFile* LogFile;			/// Replay log file
 local unsigned long NextLogCycle;	/// Next log cycle number
 local int InitReplay;			/// Initialize replay
-local char* ReplayPlayers[PlayerMax];	/// Player names
+local FullReplay * CurrentReplay;
+local LogEntry * ReplayStep;
 
 
 //----------------------------------------------------------------------------
@@ -81,6 +212,201 @@ local char* ReplayPlayers[PlayerMax];	/// Player names
 
 /**@name log */
 //@{
+
+/**
+**	Allocate & fill a new FullReplay structure, from GameSettings.
+**
+**	@return	A new FullReplay structure
+*/
+local FullReplay* StartReplay(void)
+{
+    FullReplay* replay;
+    char * s;
+    time_t now;
+    char* s1;
+
+    replay = (FullReplay*) malloc(sizeof(FullReplay));
+    memset(replay, 0, sizeof(FullReplay));
+
+    time(&now);
+    s = ctime(&now);
+    if ((s1 = strchr(s, '\n'))) {
+	*s1 = '\0';
+    }
+
+    replay->Comment1 = strdup("Generated by Stratagus Version " VERSION "\"\n");
+    replay->Comment2 = strdup("Visit http://Stratagus.Org for more information\"\n");
+    replay->Comment3 = strdup("$Id$");
+    
+    if (GameSettings.NetGameType == SettingsSinglePlayerGame) {
+	replay->Type = ReplaySinglePlayer;
+	replay->Race = GameSettings.Presets[0].Race;
+    } else {
+	int i;
+	
+	replay->Type = ReplayMultiPlayer;
+	
+	for (i = 0; i < PlayerMax; ++i) {
+	    replay->Players[i].Name = strdup(Players[i].Name);
+	    replay->Players[i].Race = GameSettings.Presets[i].Race;
+	    replay->Players[i].Team = GameSettings.Presets[i].Team;
+	    replay->Players[i].Type = GameSettings.Presets[i].Type;
+	}
+	
+	replay->LocalPlayer = ThisPlayer->Player;
+    }
+    
+    replay->Date = strdup(s);
+    replay->Map = strdup(TheMap.Description);
+    replay->MapId = (signed int)TheMap.Info->MapUID;
+    replay->MapPath = strdup(CurrentMapPath);
+    replay->Resource = GameSettings.Resources;
+    replay->NumUnits = GameSettings.NumUnits;
+    replay->TileSet = GameSettings.Terrain;
+    replay->NoFow = GameSettings.NoFogOfWar;
+    replay->GameType = GameSettings.GameType;
+    replay->Opponents = GameSettings.Opponents;
+    
+    replay->Engine[0] = StratagusMajorVersion;
+    replay->Engine[1] = StratagusMinorVersion;
+    replay->Engine[2] = StratagusPatchLevel;
+    
+    replay->Network[0] = NetworkProtocolMajorVersion;
+    replay->Network[1] = NetworkProtocolMinorVersion;
+    replay->Network[2] = NetworkProtocolPatchLevel;
+    return replay;
+}
+
+local void ApplyReplaySettings(void)
+{
+    int i;
+    if (CurrentReplay->Type == ReplayMultiPlayer) {
+	ExitNetwork1();
+	NetPlayers = 2;
+	GameSettings.NetGameType = SettingsMultiPlayerGame;
+	
+	ReplayGameType = ReplayMultiPlayer;
+	for (i = 0; i < PlayerMax; i++) {
+	    GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
+	    GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
+	    GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
+	}
+
+	NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
+    } else {
+	GameSettings.NetGameType = SettingsSinglePlayerGame;
+	GameSettings.Presets[0].Race = CurrentReplay->Race;
+	ReplayGameType = ReplaySinglePlayer;
+    }
+
+    strcpy(CurrentMapPath, CurrentReplay->MapPath);
+    GameSettings.Resources = CurrentReplay->Resource;
+    GameSettings.NumUnits = CurrentReplay->NumUnits;
+    GameSettings.Terrain = CurrentReplay->TileSet;
+    TheMap.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+    FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
+    GameSettings.Opponents = CurrentReplay->Opponents;
+    
+    // FIXME : check engine version
+    // FIXME : FIXME: check network version
+    // FIXME : check mapid
+}
+
+local void DeleteReplay(FullReplay * replay)
+{
+    LogEntry* log;
+    LogEntry* next;
+    int i;
+
+#define cond_free(x) { if (x) { free(x); } }
+
+    cond_free(replay->Comment1);
+    cond_free(replay->Comment2);
+    cond_free(replay->Comment3);
+    cond_free(replay->Date);
+    cond_free(replay->Map);
+    cond_free(replay->MapPath);
+
+    for (i = 0; i < PlayerMax; i++) {
+	cond_free(replay->Players[i].Name);
+    }
+
+    log = replay->Commands;
+    while (log) {
+	cond_free(log->UnitIdent);
+	cond_free(log->Name);
+	cond_free(log->Value);
+	next = log->Next;
+	free(log);
+	log = next;
+    }
+
+    free(replay);
+}
+
+/**
+**	Output the FullReplay list to dest file
+**
+**	@param dest	The file to output to
+*/
+global void SaveFullLog(CLFile* dest)
+{
+    // FIXME : IOStartSaving(dest);
+    IOLoadingMode = 0;
+    IOOutFile = dest;
+    IOTabLevel = 2;
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
+    CLprintf(dest, "(replay-log (quote\n");
+#endif
+
+    IOStructPtr(SCM_UNSPECIFIED, (void*)&CurrentReplay, (void*)&FullReplayStructDef);
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
+    CLprintf(dest, "))\n");
+#endif
+    // FIXME : IODone();
+}
+
+/**
+**	Append the LogEntry structure at the end of currentLog, and to LogFile
+**
+**	@param dest	The file to output to
+*/
+global void AppendLog(LogEntry* log)
+{
+    LogEntry** last;
+    
+    // Append to linked list
+    last = &CurrentReplay->Commands;
+    while (*last) {
+	last = &(*last)->Next;
+    }
+
+    *last = log;
+    log->Next = 0;
+
+    // Append to file
+    if (!LogFile) {
+	return;
+    }
+    
+    // FIXME : IOStartSaving(dest);
+    
+    IOLoadingMode = 0;
+    IOOutFile = LogFile;
+    IOTabLevel = 2;
+#if defined(USE_GUILE) || defined(USE_SIOD)
+    CLprintf(LogFile, "(log (quote ");
+#endif
+    IOLinkedList(SCM_UNSPECIFIED, (void*)&log, (void*)&LogEntryStructDef);
+#if defined(USE_GUILE) || defined(USE_SIOD)
+    CLprintf(LogFile,"))\n");
+#endif
+    CLflush(LogFile);
+    
+    // FIXME : IODone();
+}
 
 /**
 **	Log commands into file.
@@ -99,6 +425,8 @@ local char* ReplayPlayers[PlayerMax];	/// Player names
 global void CommandLog(const char* name, const Unit* unit, int flag,
     int x, int y, const Unit* dest, const char* value, int num)
 {
+    LogEntry * log;
+    
     if (CommandLogDisabled) {		// No log wanted
 	return;
     }
@@ -108,11 +436,8 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
     //  to the save file name, to test more than one player on one computer.
     //
     if (!LogFile) {
-	time_t now;
 	char buf[PATH_MAX];
-	char* s;
-	char* s1;
-
+	
 #ifdef USE_WIN32
 	strcpy(buf, GameName);
 	mkdir(buf);
@@ -129,107 +454,64 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 #endif
 
 	sprintf(buf, "%s/log_of_stratagus_%d.log", buf, ThisPlayer->Player);
-	LogFile = fopen(buf, "wb");
+	LogFile = CLopen(buf, CL_OPEN_WRITE);
 	if (!LogFile) {
+	    // don't retry for each command
+	    CommandLogDisabled = 0;
 	    return;
 	}
 
-	time(&now);
-	s = ctime(&now);
-	if ((s1 = strchr(s, '\n'))) {
-	    *s1 = '\0';
+	if (CurrentReplay) {
+	    SaveFullLog(LogFile);
 	}
+    }
 
-	//
-	//	Parseable header
-	//
-	fprintf(LogFile, "(replay-log\n");
-	fprintf(LogFile, "  'comment\t\"Generated by Stratagus Version " VERSION "\"\n");
-	fprintf(LogFile, "  'comment\t\"Visit http://Stratagus.Org for more information\"\n");
-	fprintf(LogFile, "  'comment\t\"$Id$\"\n");
-	if (GameSettings.NetGameType == SettingsSinglePlayerGame) {
-	    fprintf(LogFile, "  'type\t\"%s\"\n", "single-player");
-	    fprintf(LogFile, "  'race\t%d\n", GameSettings.Presets[0].Race);
-	} else {
-	    int i;
-	    fprintf(LogFile, "  'type\t\"%s\"\n", "multi-player");
-	    for (i = 0; i < PlayerMax; ++i) {
-		fprintf(LogFile, "  'player\t(list 'number %d 'name \"%s\" 'race %d 'team %d 'type %d)\n",
-		    i, Players[i].Name, GameSettings.Presets[i].Race,
-		    GameSettings.Presets[i].Team, GameSettings.Presets[i].Type);
-	    }
-	    fprintf(LogFile, "  'local-player\t%d\n", ThisPlayer->Player);
-	}
-	fprintf(LogFile, "  'date\t\"%s\"\n", s);
-	fprintf(LogFile, "  'map\t\"%s\"\n", TheMap.Description);
-	// FIXME : does this work on 64bit arch ?
-	fprintf(LogFile, "  'map-id\t%d\n", (signed int)TheMap.Info->MapUID);
-	fprintf(LogFile, "  'map-path\t\"%s\"\n", CurrentMapPath);
-	fprintf(LogFile, "  'resources\t%d\n", GameSettings.Resources);
-	fprintf(LogFile, "  'num-units\t%d\n", GameSettings.NumUnits);
-	fprintf(LogFile, "  'tileset\t%d\n", GameSettings.Terrain);
-	fprintf(LogFile, "  'no-fow\t%d\n", TheMap.NoFogOfWar);
-	fprintf(LogFile, "  'reveal-map\t%d\n", GameSettings.RevealMap);
-	fprintf(LogFile, "  'game-type\t%d\n", GameSettings.GameType);
-	fprintf(LogFile, "  'opponents\t%d\n", GameSettings.Opponents);
-	fprintf(LogFile, "  'engine\t'(%d %d %d)\n",
-	    StratagusMajorVersion, StratagusMinorVersion, StratagusPatchLevel);
-	fprintf(LogFile, "  'network\t'(%d %d %d)\n",
-	    NetworkProtocolMajorVersion,
-	    NetworkProtocolMinorVersion,
-	    NetworkProtocolPatchLevel);
-	fprintf(LogFile, "  )\n");
+    if (!CurrentReplay) {
+	CurrentReplay = StartReplay();
+
+	SaveFullLog(LogFile);
     }
 
     if (!name) {
 	return;
     }
+    
+    log = (LogEntry*) malloc(sizeof(LogEntry));
 
     //
     //	Frame, unit, (type-ident only to be better readable).
     //
-    if (unit) {
-	fprintf(LogFile, "(log %lu 'unit %d 'ident '%s 'name '%s 'flag '%s",
-	    GameCycle, UnitNumber(unit), unit->Type->Ident, name,
-	    flag ? "flush" : "append");
-    } else {
-	fprintf(LogFile, "(log %lu 'name '%s 'flag '%s",
-	    GameCycle,name, flag ? "flush" : "append");
-    }
+    log->GameCycle = GameCycle;
 
+    log->UnitNumber = (unit ? UnitNumber(unit) : -1);
+    log->UnitIdent = (unit ? strdup(unit->Type->Ident) : NULL);
+        
+    log->Name = strdup(name);
+    log->Flag = flag;
+    
     //
     //	Coordinates given.
     //
-    if (x != -1 || y != -1) {
-	fprintf(LogFile, " 'pos '(%d %d)", x, y);
-    }
+    log->PosX = x;
+    log->PosY = y;
+    
     //
     //	Destination given.
     //
-    if (dest) {
-	fprintf(LogFile, " 'dest '%d", UnitNumber(dest));
-    }
+    log->DestUnitNumber = (dest ? UnitNumber(dest) : -1);
+	
     //
     //	Value given.
     //
-    if (value) {
-	fprintf(LogFile, " 'value \"%s\"", value);
-    }
+    log->Value = (value ? strdup(value) : NULL);
+
     //
     //	Number given.
     //
-    if (num != -1) {
-	fprintf(LogFile, " 'num %d", num);
-    }
-    if (unit) {
-	fprintf(LogFile, ") ;%d:%d %X", unit->Player->Player, unit->Refs,
-	    SyncRandSeed);
-    } else {
-	fprintf(LogFile, ") ;-:- %X",SyncRandSeed);
-    }
+    log->Num = num;
 
-    fprintf(LogFile, "\n");
-    fflush(LogFile);
+    // Append it to ReplayLog list
+    AppendLog(log);
 }
 
 /**
@@ -238,19 +520,23 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclLog(SCM list)
 {
-    SCM var;
+    LogEntry* log;
+    LogEntry** last;
 
-    var = gh_symbol2scm("*replay_log*");
-    if (gh_null_p(symbol_value(var, NIL))) {
-	setvar(var, cons(list, NIL), NIL);
-    } else {
-	SCM tmp;
-	tmp = symbol_value(var, NIL);
-	while (!gh_null_p(gh_cdr(tmp))) {
-	    tmp = gh_cdr(tmp);
-	}
-	gh_set_cdr_x(tmp, cons(list, NIL));
+    DebugCheck(!CurrentReplay);
+
+    IOLoadingMode = 1;
+
+    log = 0;
+    IOLinkedList(list, (void*)&log, (void*)&LogEntryStructDef);
+    
+    // Append to linked list
+    last = &CurrentReplay->Commands;
+    while (*last) {
+	last = &(*last)->Next;
     }
+
+    *last = log;
 
     return SCM_UNSPECIFIED;
 }
@@ -263,144 +549,34 @@ local SCM CclLog(SCM list)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclReplayLog(SCM list)
 {
-    SCM value;
-    SCM sublist;
-    const char* comment;
-    const char* logtype;
-    const char* logdate;
-    const char* map;
-    unsigned int mapid;
-    const char* mappath;
-    int ever1;
-    int ever2;
-    int ever3;
-    int nver1;
-    int nver2;
-    int nver3;
+    FullReplay * replay;
 
-    while (!gh_null_p(list)) {
-	value = gh_car(list);
-	list = gh_cdr(list);
+    DebugCheck(CurrentReplay != NULL);
 
-	if (gh_eq_p(value, gh_symbol2scm("comment"))) {
-	    comment = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("type"))) {
-	    logtype = get_c_string(gh_car(list));
-	    if (!strcmp(logtype, "multi-player")) {
-		ExitNetwork1();
-		NetPlayers = 2;
-		GameSettings.NetGameType = SettingsMultiPlayerGame;
-	    } else {
-		GameSettings.NetGameType = SettingsSinglePlayerGame;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("date"))) {
-	    logdate = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("map"))) {
-	    map = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("map-id"))) {
-	    // FIXME : does this works on 64bits archs
-	    mapid = (unsigned int)gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("map-path"))) {
-	    mappath = get_c_string(gh_car(list));
-	    strcpy(CurrentMapPath, mappath);
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("race"))) {
-	    GameSettings.Presets[0].Race = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("resources"))) {
-	    GameSettings.Resources = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("num-units"))) {
-	    GameSettings.NumUnits = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
-	    GameSettings.Terrain = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("no-fow"))) {
-	    TheMap.NoFogOfWar = GameSettings.NoFogOfWar = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("reveal-map"))) {
-	    FlagRevealMap = GameSettings.RevealMap = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("game-type"))) {
-	    GameSettings.GameType = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("opponents"))) {
-	    GameSettings.Opponents = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("engine"))) {
-	    sublist = gh_car(list);
-	    ever1 = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    ever2 = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    ever3 = gh_scm2int(gh_car(sublist));
-	    // FIXME: check engine version
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("network"))) {
-	    sublist = gh_car(list);
-	    nver1 = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    nver2 = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    nver3 = gh_scm2int(gh_car(sublist));
-	    // FIXME: check network version
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("player"))) {
-	    int num;
-	    int race;
-	    int team;
-	    int type;
-	    char *name;
+    IOLoadingMode = 1;
+    replay = 0;
+    IOStructPtr(list, (void*)&replay, (void*)&FullReplayStructDef);
 
-	    ReplayGameType = ReplayMultiPlayer;
-	    num = -1;
-	    race = team = type = SettingsPresetMapDefault;
-	    name = NULL;
-	    sublist = gh_car(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("number"))) {
-		    num = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("name"))) {
-		    name = gh_scm2newstr(gh_car(sublist), 0);
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("race"))) {
-		    race = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("team"))) {
-		    team = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
-		} else if (gh_eq_p(value, gh_symbol2scm("type"))) {
-		    type = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
-		}
-	    }
-	    if (num != -1) {
-		GameSettings.Presets[num].Race = race;
-		GameSettings.Presets[num].Team = team;
-		GameSettings.Presets[num].Type = type;
-		ReplayPlayers[num] = name;
-	    }
-
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("local-player"))) {
-	    NetLocalPlayerNumber = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	}
-    }
-
+    CurrentReplay = replay;
+    
+    // Apply CurrentReplay settings.
+    ApplyReplaySettings();
+    
     return SCM_UNSPECIFIED;
 }
+
 #elif defined(USE_LUA)
 #endif
+
+/**
+**	Save generated replay
+**
+**	@param file	file to save to.
+*/
+global void SaveReplayList(CLFile* file)
+{
+    SaveFullLog(file);
+}
 
 /**
 **	Load a log file to replay a game
@@ -409,32 +585,15 @@ local SCM CclReplayLog(SCM list)
 */
 global int LoadReplay(char* name)
 {
-    int i;
-
-    for (i = 0; i < PlayerMax; ++i) {
-	if (ReplayPlayers[i]) {
-	    free(ReplayPlayers[i]);
-	    ReplayPlayers[i] = NULL;
-	}
-    }
+    CleanReplayLog();
     ReplayGameType = ReplaySinglePlayer;
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    gh_new_procedureN("log", CclLog);
-    gh_new_procedureN("replay-log", CclReplayLog);
-    gh_define("*replay_log*", NIL);
-#elif defined(USE_LUA)
-#endif
 #if defined(USE_GUILE) || defined(USE_SIOD)
     vload(name, 0, 1);
 #elif defined(USE_LUA)
     LuaLoadFile(name);
 #endif
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    CclGcProtectedAssign(&ReplayLog, symbol_value(gh_symbol2scm("*replay_log*"), NIL));
-#elif defined(USE_LUA)
-#endif
     NextLogCycle = ~0UL;
     if (!CommandLogDisabled) {
 	CommandLogDisabled = 1;
@@ -458,13 +617,14 @@ global int LoadReplay(char* name)
 global void EndReplayLog(void)
 {
     if (LogFile) {
-	fclose(LogFile);
+	CLclose(LogFile);
 	LogFile = NULL;
     }
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    CclGcProtectedAssign(&ReplayLog,SCM_UNSPECIFIED);
-#elif defined(USE_LUA)
-#endif
+    if (CurrentReplay) {
+	DeleteReplay(CurrentReplay);
+	CurrentReplay = NULL;
+    }
+    ReplayStep = NULL;
 }
 
 /**
@@ -472,13 +632,12 @@ global void EndReplayLog(void)
 */
 global void CleanReplayLog(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    CclGcProtectedAssign(&ReplayLog, NIL);
-#elif defined(USE_LUA)
-#endif
-    // FIXME: LoadGame disables the log since replays aren't saved in the
-    // FIXME: saved games yet.  Always enable the log again for now even
-    // FIXME: though it ignores the -l command line option.
+    if (CurrentReplay) {
+	DeleteReplay(CurrentReplay);
+	CurrentReplay = 0;
+    }
+    ReplayStep = NULL;
+    
 //    if (DisabledLog) {
 	CommandLogDisabled = 0;
 	DisabledLog = 0;
@@ -497,13 +656,8 @@ global void CleanReplayLog(void)
 */
 local void DoNextReplay(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-    SCM value;
-    SCM list;
     int unit;
-    const char* ident;
     const char* name;
-    const char* flag;
     int flags;
     int posx;
     int posy;
@@ -511,62 +665,23 @@ local void DoNextReplay(void)
     int num;
     Unit* dunit;
 
-    list = gh_car(ReplayLog);
-
-    NextLogCycle = gh_scm2int(gh_car(list));
-    list = gh_cdr(list);
-
+    DebugCheck(ReplayStep == 0);
+    
+    NextLogCycle = ReplayStep->GameCycle;
+    
     if (NextLogCycle != GameCycle) {
 	return;
     }
 
-    NextLogCycle = ~0UL;
-    unit = -1;
-    name = NULL;
-    flags = 0;
-    posx = -1;
-    posy = -1;
-    dunit = NoUnitP;
-    val = NULL;
-    num = -1;
-    while (!gh_null_p(list)) {
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	if (gh_eq_p(value, gh_symbol2scm("unit"))) {
-	    unit = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("ident"))) {
-	    ident = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("name"))) {
-	    name = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("flag"))) {
-	    flag = get_c_string(gh_car(list));
-	    if (!strcmp(flag, "flush")) {
-		flags = 1;
-	    }
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-	    SCM sublist;
-	    sublist = gh_car(list);
-	    posx = gh_scm2int(gh_car(sublist));
-	    sublist = gh_cdr(sublist);
-	    posy = gh_scm2int(gh_car(sublist));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("dest"))) {
-	    dunit = UnitSlots[gh_scm2int(gh_car(list))];
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("value"))) {
-	    val = get_c_string(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("num"))) {
-	    num = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	}
-    }
-
+    unit = ReplayStep->UnitNumber;
+    name = ReplayStep->Name;
+    flags = ReplayStep->Flag;
+    posx = ReplayStep->PosX;
+    posy = ReplayStep->PosY;
+    dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
+    val = ReplayStep->Value;
+    num = ReplayStep->Num;
+    
     if (!strcmp(name, "stop")) {
 	SendCommandStopUnit(UnitSlots[unit]);
     } else if (!strcmp(name, "stand-ground")) {
@@ -648,9 +763,8 @@ local void DoNextReplay(void)
 	DebugLevel0Fn("Invalid name: %s" _C_ name);
     }
 
-    CclGcProtectedAssign(&ReplayLog, gh_cdr(ReplayLog));
-#elif defined(USE_LUA)
-#endif
+    ReplayStep = ReplayStep->Next;
+    NextLogCycle = ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL;
 }
 
 /**
@@ -658,18 +772,22 @@ local void DoNextReplay(void)
 */
 local void ReplayEachCycle(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
+    if (!CurrentReplay) {
+	return;
+    }
     if (InitReplay) {
 	int i;
 	for (i = 0; i < PlayerMax; ++i) {
-	    if (ReplayPlayers[i]) {
-		PlayerSetName(&Players[i], ReplayPlayers[i]);
+	    if (CurrentReplay->Players[i].Name) {
+		PlayerSetName(&Players[i], CurrentReplay->Players[i].Name);
 	    }
 	}
+	ReplayStep = CurrentReplay->Commands;
+	NextLogCycle = (ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL);
 	InitReplay = 0;
     }
 
-    if (gh_null_p(ReplayLog)) {
+    if (!ReplayStep) {
 	return;
     }
 
@@ -679,15 +797,13 @@ local void ReplayEachCycle(void)
 
     do {
 	DoNextReplay();
-    } while (!gh_null_p(ReplayLog) &&
+    } while (ReplayStep &&
 	    (NextLogCycle == ~0UL || NextLogCycle == GameCycle));
 
-    if (gh_null_p(ReplayLog)) {
+    if (!ReplayStep) {
 	SetMessage("End of replay");
 	GameObserve = 0;
     }
-#elif defined(USE_LUA)
-#endif
 }
 
 /**
@@ -1193,8 +1309,8 @@ global void SendCommandSharedVision(int player, int state, int opponent)
 global void NetworkCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    ReplayLog = SCM_UNSPECIFIED;
-    CclGcProtect(&ReplayLog);
+    gh_new_procedure1_0("log", CclLog);
+    gh_new_procedure1_0("replay-log", CclReplayLog);
 #elif defined(USE_LUA)
 #endif
 }

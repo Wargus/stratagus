@@ -58,6 +58,7 @@
 #include "settings.h"
 #include "iolib.h"
 #include "spells.h"
+#include "commands.h"
 
 #include "ccl.h"
 
@@ -157,6 +158,7 @@ global void SaveGame(const char* filename)
     SaveTriggers(file);
     SaveCampaign(file);
     SaveObjectives(file);
+    SaveReplayList(file);
     // FIXME: find all state information which must be saved.
 
     CLclose(file);

@@ -78,6 +78,7 @@ typedef struct _filelist_ {
 #define CLopen(file,whatever)		fopen(file,"rwb")
 #define CLread(file,buf,len)		fread(buf,1,len,file)
 #define CLseek(file,offset,whence)	fseek(file,offset,whence)
+#define CLflush(file)			fflush(file)
 #define CLclose(file)			fclose(file)
 
 #else	// !USE_ZLIB && !USE_BZ2LIB && !defined(USE_ZZIPLIB)
@@ -122,6 +123,8 @@ enum {
 extern CLFile *CLopen(const char *fn,long flags);
     ///  Library file close
 extern int CLclose(CLFile *file);
+    ///  Library file flush
+extern void CLflush(CLFile *file);
     ///  Library file read
 extern int CLread(CLFile *file, void *buf, size_t len);
     ///  Library file seek
