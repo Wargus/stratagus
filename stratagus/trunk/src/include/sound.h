@@ -50,6 +50,9 @@ typedef struct _game_sound_ {
     SoundConfig HumanWorkComplete;	/// building ready
     SoundConfig PeasantWorkComplete;	/// building ready
     SoundConfig OrcWorkComplete;	/// building ready
+
+    SoundConfig HumanRescue;		/// rescue units
+    SoundConfig OrcRescue;		/// rescue units
 } GameSound;
 
 /*----------------------------------------------------------------------------

@@ -328,7 +328,9 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     if( !type->Building ) {
         unit->Heading=(MyRand()>>13)&7;	// random heading
         player->NumFoodUnits++;		// food needed
-	MustRedraw|=RedrawResources;	// update food
+	if( player==ThisPlayer ) {
+	    MustRedraw|=RedrawResources;// update food
+	}
     } else {
 	player->NumBuildings++;
     }
@@ -529,6 +531,7 @@ global void UnitLost(const Unit* unit)
     if( unit->Type->Building ) {
 	// FIXME: This should be complete rewritten
 	// FIXME: Slow and new members are available
+	// FIXME: most redraws only needed for player==ThisPlayer
 
 	// Still under construction
 	if( unit->Command.Action!=UnitActionBuilded ) {
@@ -800,7 +803,56 @@ global void UnitIncrementMana(void)
 }
 
 /**
+**	Increment health of all regenerating units. Called each second.
+*/
+global void UnitIncrementHealth(void)
+{
+#ifdef NEW_UNIT
+    Unit** table;
+    Unit* unit;
+    static UnitType* berserker;
+    static int regeneration;
+
+    if( !berserker ) {			// FIXME: can move to init code!
+	berserker=UnitTypeByIdent("unit-berserker");
+	regeneration=UpgradeIdByIdent("upgrade-berserker-regeneration");
+    }
+
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	if( unit->Type==berserker
+		&& unit->HP<unit->Stats->HitPoints
+		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
+	    ++unit->HP;			// FIXME: how fast do we regenerate
+	}
+    }
+#else
+    Unit* unit;
+    int i;
+    static UnitType* berserker;
+    static int regeneration;
+
+    if( !berserker ) {
+	berserker=UnitTypeByIdent("unit-berserker");
+	regeneration=UpgradeIdByIdent("upgrade-berserker-regeneration");
+    }
+
+    for( i=0; i< NumUnits; i++) {
+	unit=Units[i];
+	if( unit->Type==berserker
+		&& unit->HP<unit->Stats->HP
+		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
+	    ++unit->HP;			// FIXME: how fast do we regenerate
+	}
+    }
+#endif
+}
+
+/**
 **	Change the unit's owner
+**
+**	@param oldplayer	Old owning player.
+**	@param newplayer	New owning player.
 */
 global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 {
@@ -820,6 +872,11 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 	    }
 	}
     }
+
+    //
+    //	Must change food/gold and other.
+    //
+    UnitLost(unit);
 
 #ifdef NEW_UNIT
     //	Remove from old player table
@@ -845,6 +902,110 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 #endif
 
     unit->Player=newplayer;
+
+    //
+    //	Must change food/gold and other.
+    //
+    if( unit->Type->GivesOil ) {
+	DebugLevel0(__FUNCTION__":FIXME: oil platform transfer unsupported\n");
+    }
+    if( !unit->Type->Building ) {
+        newplayer->NumFoodUnits++;	// food needed
+	if( newplayer==ThisPlayer ) {
+	    MustRedraw|=RedrawResources;// update food
+	}
+    } else {
+	newplayer->NumBuildings++;
+    }
+    newplayer->UnitTypesCount[unit->Type->Type]++;
+    UpdateForNewUnit(unit,0);
+}
+
+/**
+**	Change the owner of all units of a player.
+**
+**	@param oldplayer	Old owning player.
+**	@param newplayer	New owning player.
+*/
+local void ChangePlayerOwner(Player* oldplayer,Player* newplayer)
+{
+    Unit* table[MAX_UNITS];
+    Unit* unit;
+    int i;
+    int n;
+
+    // NOTE: table is changed.
+    n=oldplayer->TotalNumUnits;
+    memcpy(table,oldplayer->Units,n*sizeof(Unit*));
+    for( i=0; i<n; i++ ) {
+	unit=table[i];
+	ChangeUnitOwner(unit,oldplayer,newplayer);
+    }
+}
+
+/**
+**	Rescue units.
+*/
+global void RescueUnits(void)
+{
+    Player* p;
+    Unit* unit;
+    Unit* table[MAX_UNITS];
+    Unit* near[MAX_UNITS];
+    int n;
+    int i;
+    int j;
+    int l;
+    static int norescue;
+
+    if( norescue ) {
+	return;
+    }
+    norescue=1;
+    for( p=Players; p<Players+NumPlayers; ++p ) {
+	if( p->Type!=PlayerRescuePassive && p->Type!=PlayerRescueActive ) {
+	    continue;
+	}
+	if( p->TotalNumUnits ) {
+	    norescue=0;
+	    // NOTE: table is changed.
+	    l=p->TotalNumUnits;
+	    memcpy(table,p->Units,l*sizeof(Unit*));
+	    for( j=0; j<l; j++ ) {
+		unit=table[j];
+		DebugLevel3("Checking %Zd\n",UnitNumber(unit));
+		// NOTE: I hope SelectUnits checks bounds?
+		n=SelectUnits(
+			unit->X-1,unit->Y-1,
+			unit->X+unit->Type->TileWidth+1,
+			unit->Y+unit->Type->TileHeight+1,near);
+		//
+		//	Look if human near the unit.
+		//
+		for( i=0; i<n; ++i ) {
+		    if( near[i]->Player->Type==PlayerHuman ) {
+			ChangeUnitOwner(unit,unit->Player,near[i]->Player);
+			// FIXME: more races?
+			if( unit->Player->Race==PlayerRaceHuman ) {
+			    PlayGameSound(GameSounds.HumanRescue.Sound
+				    ,MaxSampleVolume);
+			} else {
+			    PlayGameSound(GameSounds.OrcRescue.Sound
+				    ,MaxSampleVolume);
+			}
+			//
+			//	City center converts complete race
+			//	NOTE: I use a trick here, centers could
+			//		store gold.
+			if( unit->Type->StoresGold ) {
+			    ChangePlayerOwner(p,unit->Player);
+			}
+			break;
+		    }
+		}
+	    }
+	} 
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -2366,6 +2527,7 @@ global int ViewPointDistanceToUnit(Unit* dest) {
     return MapDistanceToUnit(x_v,y_v,dest);
 }
 
+#if 0
 /**
 **	Check if unit is an enemy.
 **
@@ -2387,6 +2549,33 @@ global int IsEnemy(const Player* player,const Unit* dest)
     }
     return 1;
 }
+#else
+/**
+**	Check if unit is an enemy.
+**
+**	@param player	The source player.
+**	@param dest	The destination unit.
+**
+**	@return		Returns true, if the destination unit is an enemy.
+*/
+global int IsEnemy(const Player* player,const Unit* dest)
+{
+    return player->Enemy&(1<<dest->Player->Player);
+}
+
+/**
+**	Check if unit is allied.
+**
+**	@param player	The source player.
+**	@param dest	The destination unit.
+**
+**	@return		Returns true, if the destination unit is allied.
+*/
+global int IsAllied(const Player* player,const Unit* dest)
+{
+    return player->Allied&(1<<dest->Player->Player);
+}
+#endif
 
 /**
 **	Can the source unit attack the destionation unit.

@@ -270,6 +270,10 @@ local SCM CclDefineGameSounds(SCM list) {
 	} else if ( gh_eq_p(name,gh_symbol2scm("placement-success")) ) {
 	    GameSounds.PlacementSuccess.Sound=CCL_SOUND_ID(data);
 	    DebugLevel3("SoundPlacementSuccess %d\n",SoundPlacementSuccess);
+	} else if ( gh_eq_p(name,gh_symbol2scm("human-rescue")) ) {
+	    GameSounds.HumanRescue.Sound=CCL_SOUND_ID(data);
+	} else if ( gh_eq_p(name,gh_symbol2scm("orc-rescue")) ) {
+	    GameSounds.OrcRescue.Sound=CCL_SOUND_ID(data);
 	} else {
    	    fprintf(stderr,"Incorrect symbol\n");
 	    return list;

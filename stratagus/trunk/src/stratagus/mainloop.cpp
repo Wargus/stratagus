@@ -9,13 +9,16 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name mainloop.c	-	The main game loop. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
+
+//----------------------------------------------------------------------------
+//	Includes
+//----------------------------------------------------------------------------
 
 #include <stdio.h>
 
@@ -44,18 +47,30 @@
 #include <SDL/SDL.h>
 #endif
 
-/* variable set when we are scrolling via keyboard */
+//----------------------------------------------------------------------------
+//	Variables
+//----------------------------------------------------------------------------
+
+    /// variable set when we are scrolling via keyboard
 global enum _scroll_state_ KeyScrollState=ScrollNone;
 
-/* variable set when we are scrolling via mouse */
+    /// variable set when we are scrolling via mouse
 global enum _scroll_state_ MouseScrollState=ScrollNone;
+
+//----------------------------------------------------------------------------
+//	Functions
+//----------------------------------------------------------------------------
 
 /**
 **	Handle scrolling area.
+**
+**	@param TempScrollState	Scroll direction/state.
+**	@param FastScroll	Flag scroll faster.
+**
+**	FIXME: Support dynamic acceleration of scroll speed.
 */
 local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 {
-
     switch( TempScrollState ) {
 	case ScrollUp:
 	    if( MapY ) {
@@ -257,7 +272,9 @@ global void UpdateDisplay(void)
 	    DrawMissiles();
 	    SetClipping(0,0,VideoWidth,VideoHeight);
 	}
+
 	// FIXME: trick17! must find a better solution
+	// Resources over map!
 	if( TheUI.MapX<TheUI.ResourceX && TheUI.MapWidth>TheUI.ResourceX ) {
 	    MustRedraw|=RedrawResources;
 	}
@@ -278,7 +295,7 @@ global void UpdateDisplay(void)
 		,TheUI.MenuButton.Graphic->Width
 		,TheUI.MenuButton.Graphic->Height
 		,TheUI.MenuButtonX,TheUI.MenuButtonY);
-	// FIXME: Button position is configured
+
 	DrawMenuButton(MBUTTON_MAIN, (ButtonUnderCursor == 0
 		? MenuButtonActive : 0)|
 		(GameMenuButtonClicked ? MenuButtonClicked : 0),
@@ -437,20 +454,22 @@ global void GameMainLoop(void)
 
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
 
-	    /*
-	    **	Called each second. Split into different frames.
-	    **		Increment mana of magic units.
-	    **		Update mini-map.
-	    **		Update map fog of war.
-	    **		Call AI.
-	    **		Check game goals.
-	    */
+	    //
+	    //	Work todo each second.
+	    //		Split into different frames, to reduce cpu time.
+	    //		Increment mana of magic units.
+	    //		Update mini-map.
+	    //		Update map fog of war.
+	    //		Call AI.
+	    //		Check game goals.
+	    //		Check rescue of units.
+	    //
 	    switch( FrameCounter%FRAMES_PER_SECOND ) {
 		case 0:
 		    UnitIncrementMana();	// magic units
 		    break;
 		case 1:
-		    //UnitIncrementHealth();// berserker healing
+		    UnitIncrementHealth();	// berserker healing
 		    break;
 		case 2:
 		    MapUpdateVisible();
@@ -467,8 +486,14 @@ global void GameMainLoop(void)
 		case 6:
 		    RegenerateForest();
 		    break;
+		case 7:
+		    RescueUnits();
+		    break;
 	    }
 	}
+	//
+	//	Map scrolling
+	//
 	if( TheUI.MouseScroll && !(FrameCounter%SpeedMouseScroll) ) {
 	    DoScrollArea(MouseScrollState, 0);
 	}
@@ -502,16 +527,9 @@ global void GameMainLoop(void)
 
 	WaitEventsAndKeepSync();
 
+#ifndef NEW_NETWORK
 	NetworkSync();			// FIXME: wrong position
-#if 0
-	//
-	//	Sync:	not needed done by DoEvent
-	//
-	while( VideoSyncSpeed && VideoInterrupts<1 ) {
-	    sigpause(0);
-	}
 #endif
-
 	VideoInterrupts=0;
     }
 }

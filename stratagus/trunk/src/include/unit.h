@@ -355,7 +355,13 @@ extern void UpdateForNewUnit(const Unit* unit,int upgrade);
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
 extern int UnitVisible(const Unit* unit);
 extern void RemoveUnit(Unit* unit);
+    /// Increment mana of all magic units each second.
 extern void UnitIncrementMana(void);
+    /// Increment health of all regenerating units each second.
+extern void UnitIncrementHealth(void);
+    /// Check for rescue each second.
+extern void RescueUnits(void);
+    /// Change owner of unit.
 extern void ChangeUnitOwner(Unit* unit,Player* old,Player* new);
 
 extern void UnitNewHeading(Unit* unit);
@@ -397,6 +403,8 @@ extern int ViewPointDistanceToUnit(Unit* dest);
 
     /// Return true, if unit is an enemy of the player
 extern int IsEnemy(const Player* player,const Unit* dest);
+    /// Return true, if unit is allied with the player
+extern int IsAllied(const Player* player,const Unit* dest);
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
