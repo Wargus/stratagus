@@ -84,7 +84,7 @@ local void ShowInput(void)
 **	Handle keys in command mode.
 **
 **	@param key	Key scancode.
-**	@return		True, if key is handles; otherwise false.
+**	@return		True, if key is handled; otherwise false.
 */
 local int CommandKey(int key)
 {
