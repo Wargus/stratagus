@@ -116,6 +116,7 @@ local void MoveToTarget(Unit* unit)
 	//
 #ifdef NEW_UNIT
 	if( (goal=unit->Command.Data.Move.Goal) ) {
+	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
 		DebugLevel0(__FUNCTION__": destroyed unit\n");
 		if( !--goal->Refs ) {
@@ -202,6 +203,7 @@ local void MoveToTarget(Unit* unit)
 	    }
 	    unit->SubAction=1;
 	} else if( err ) {
+	    unit->State=0;
 	    unit->SubAction=0;
 	    // Return to old task!
 	    if( unit->Command.Action==UnitActionStill ) {
@@ -249,6 +251,7 @@ local void AttackTarget(Unit* unit)
 		}
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+		// FIXME: goal->Removed???
 		--goal->Refs;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
@@ -280,12 +283,10 @@ local void AttackTarget(Unit* unit)
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
 	    unit->SubAction|=2;
-	    if( !unit->Type->Tower ) {
-		UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
-	    }
 	} else
 #else
 	if( !goal || !goal->HP || goal->Command.Action==UnitActionDie ) {
+	    // FIXME: goal->Removed???
 	    unit->State=0;
 	    goal=AttackUnitsInReactRange(unit);
 	    unit->Command.Data.Move.Goal=goal;
@@ -298,10 +299,6 @@ local void AttackTarget(Unit* unit)
 	    DebugLevel3("Unit in react range %Zd\n",UnitNumber(goal));
 	    unit->Command.Data.Move.DX=goal->X;
 	    unit->Command.Data.Move.DY=goal->Y;
-	    if( !unit->Type->Tower ) {
-		UnitHeadingFromDeltaXY(unit
-		    ,goal->X-unit->X,goal->Y-unit->Y);
-	    }
 	} else
 #endif
 
@@ -324,9 +321,6 @@ local void AttackTarget(Unit* unit)
 		unit->Command.Data.Move.Goal=goal=temp;
 		unit->Command.Data.Move.DX=goal->X;
 		unit->Command.Data.Move.DY=goal->Y;
-		if( !unit->Type->Tower ) {
-		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
-		}
 	    }
 	}
 
@@ -345,6 +339,13 @@ local void AttackTarget(Unit* unit)
 	    unit->Frame=0;
 	    unit->State=0;
 	    unit->SubAction--;
+	}
+
+	//
+	//	Turn always to target
+	//
+	if( !unit->Type->Tower && goal ) {
+	    UnitHeadingFromDeltaXY(unit,goal->X-unit->X,goal->Y-unit->Y);
 	}
     }
 }
