@@ -618,7 +618,7 @@ static int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 **  @param x      Screen pixel X position
 **  @param y      Screen pixel Y position
 */
-void DrawMissile(MissileType* mtype, int frame, int x, int y)
+static void DrawMissileType(MissileType* mtype, int frame, int x, int y)
 {
 #ifdef DYNAMIC_LOAD
 	if (!GraphicLoaded(mtype->G)) {
@@ -654,6 +654,44 @@ void DrawMissile(MissileType* mtype, int frame, int x, int y)
 		} else {
 			VideoDrawClip(mtype->G, frame, x, y);
 		}
+	}
+}
+
+/**
+**  Draw missile.
+**
+**  @param missile  Missile to draw.
+*/
+void DrawMissile(const Missile* missile)
+{
+	int x;
+	int y;
+	const Viewport* vp;
+
+	Assert(missile);
+	Assert(missile->Type);
+	Assert(CurrentViewport);
+
+	// FIXME: I should copy SourcePlayer for second level missiles.
+	if (missile->SourceUnit && missile->SourceUnit->Player) {
+#ifdef DYNAMIC_LOAD
+		if (!missile->Type->Sprite) {
+			LoadMissileSprite(missile->Type);
+		}
+#endif
+		GraphicPlayerPixels(missile->SourceUnit->Player,
+			missile->Type->G);
+	}
+	vp = CurrentViewport;
+	x = missile->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
+	y = missile->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
+	switch (missile->Type->Class) {
+		case MissileClassHit:
+			VideoDrawNumberClip(x, y, GameFont, missile->Damage);
+			break;
+		default:
+			DrawMissileType(missile->Type, missile->SpriteFrame, x, y);
+			break;
 	}
 }
 

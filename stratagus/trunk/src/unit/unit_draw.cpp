@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.c - The draw routines for units. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1968,6 +1968,7 @@ static int DrawLevelCompare(const void* v1, const void* v2) {
 */
 int FindAndSortUnits(const Viewport* vp, Unit** table)
 {
+	int i;
 	int n;
 
 	//
@@ -1975,6 +1976,12 @@ int FindAndSortUnits(const Viewport* vp, Unit** table)
 	//
 	n = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
+
+	for (i = 0; i < n; i++) {
+		if (!UnitVisibleInViewport(table[i], vp)) {
+			table[i--] = table[--n];
+		}
+	}
 
 	if (n) {
 		qsort((void*)table, n, sizeof(Unit*), DrawLevelCompare);
