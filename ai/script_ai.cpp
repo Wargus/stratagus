@@ -10,7 +10,8 @@
 //
 /**@name ccl_ai.c - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2002 by Lutz Sammer and Ludovic Pollet
+//      (c) Copyright 2000-2004 by Lutz Sammer, Ludovic Pollet,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -962,6 +963,28 @@ local int CclDefineAiAction(lua_State* l)
 	lua_pushstring(l, aiScriptAction->Action);
 	lua_pushvalue(l, 2);
 	lua_settable(l, LUA_GLOBALSINDEX);
+
+	lua_pushstring(l, "_ai_scripts_");
+	lua_gettable(l, LUA_GLOBALSINDEX);
+	if (lua_isnil(l, -1)) {
+		lua_pop(l, 1);
+		lua_pushstring(l, "_ai_scripts_");
+		lua_newtable(l);
+		lua_settable(l, LUA_GLOBALSINDEX);
+		lua_pushstring(l, "_ai_scripts_");
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	lua_pushstring(l, "Script");
+	lua_rawget(l, 2);
+	if (!lua_istable(l, -1)) {
+		lua_error(l);
+	}
+	aiScriptAction->Script = malloc(20);
+	sprintf(aiScriptAction->Script, "_ai_script_%d_", AiScriptActionNum - 1);
+	lua_pushstring(l, aiScriptAction->Script);
+	lua_rawgeti(l, -2, 3);
+	lua_rawset(l, -4);
+	lua_pop(l, 2);
 
 	args = luaL_getn(l, 1);
 	for (j = 0; j < args; ++j) {
@@ -2094,21 +2117,25 @@ local int CclAiForce(lua_State* l)
 	int args;
 	int j;
 
-	args = lua_gettop(l);
-	j = 0;
-	force = LuaToNumber(l, j + 1);
-	++j;
+	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		lua_pushfstring(l, "Force out of range: %d", force);
 		lua_error(l);
 	}
 
-	for (; j < args; ++j) {
-		lua_pushvalue(l, j + 1);
+	args = luaL_getn(l, 2);
+	for (j = 0; j < args; ++j) {
+		lua_rawgeti(l, 2, j + 1);
 		type = CclGetUnitType(l);
 		lua_pop(l, 1);
 		++j;
-		count = LuaToNumber(l, j + 1);
+		lua_rawgeti(l, 2, j + 1);
+		count = LuaToNumber(l, -1);
+		lua_pop(l, 1);
 
 		if (!type) { // bulletproof
 			continue;
