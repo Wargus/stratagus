@@ -314,12 +314,6 @@
 **		Pointer to the original owner of an unit. It will be NULL if
 **		the unit was not rescued.
 **
-**	Unit::Revealer
-**
-**		`revealer' is unit that has to keep the fog of war  revealed
-**		for some time, this unit cannot be used in usual manner.
-**		JOHNS: Should be moved into unit-type!
-**
 **	Unit::OnBoard[::MAX_UNITS_ONBOARD]
 **
 **		A table of units on board. This can be units in a transporter
@@ -583,8 +577,6 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
-    unsigned	Revealer : 1;		/// reveal the fog of war
-
 #if 0
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
     // FIXME: use the new next pointer

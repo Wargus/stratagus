@@ -289,7 +289,6 @@ local SCM CclShowMapLocation(SCM x, SCM y, SCM radius, SCM cycle)
     //time to cycle, and radius to mark.
     // FIXME: Don't use UnitTypeByIdent during runtime.
     target = MakeUnit(UnitTypeByIdent("unit-revealer"), ThisPlayer);
-    target->Revealer = 1;
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
     target->X = gh_scm2int(x);

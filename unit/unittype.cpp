@@ -861,6 +861,9 @@ local void SaveUnitType(FILE* file,const UnitType* type,int all)
     if( type->Critter ) {
 	fprintf(file,"  'critter\n");
     }
+    if( type->Revealer ) {
+	fprintf(file,"  'revealer\n");
+    }
     if( type->Submarine ) {
 	fprintf(file,"  'submarine\n");
     }

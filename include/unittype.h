@@ -254,6 +254,10 @@
 **
 **		Which units can it attack
 **
+**	Unit::Revealer
+**
+**		A special unit used to reveal the map for a time.
+**
 **	UnitType::LandUnit
 **
 **		Land animated
@@ -302,9 +306,15 @@
 **
 **		Maximum units on board (for transporters)
 **
-**	UnitType::GivesOil
+**	UnitType::GivesResource
 **
-**		We get here oil
+**		This equals to the resource Id of the resource given
+**		or 0 (TimeCost) for other buildings.
+**
+**	UnitType::MustBuildOnTop
+**
+**		Points to the type of building it must be build on or
+**		NoUnitP otherwise. Buggy, works for oil platforms.
 **
 **	UnitType::CanStore[::MaxCosts]
 **
@@ -335,14 +345,6 @@
 **		FIXME: docu
 **
 **	UnitType::Tower
-**
-**		FIXME: docu
-**
-**	UnitType::OilPatch
-**
-**		FIXME: docu
-**
-**	UnitType::GoldMine
 **
 **		FIXME: docu
 **
@@ -568,6 +570,7 @@ struct _unit_type_ {
 #define CanTargetSea	2			/// Can attack sea units
 #define CanTargetAir	4			/// Can attack air units
 
+    unsigned Revealer : 1;		/// reveal the fog of war
     unsigned LandUnit : 1;		/// Land animated
     unsigned AirUnit : 1;		/// Air animated
     unsigned SeaUnit : 1;		/// Sea animated

@@ -1791,7 +1791,6 @@ global void DrawBuilding(const Unit* unit)
     int state;
     int constructed;
 
-
     visible=BuildingVisibleOnMap(unit);
     
     if( ReplayRevealMap ) {
@@ -1867,7 +1866,7 @@ global void DrawUnit(const Unit* unit)
     int y;
     const UnitType* type;
 
-    if ( unit->Revealer ) {		// Revealers are not drawn
+    if ( unit->Type->Revealer ) {		// Revealers are not drawn
 	DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
 	return;
     }

@@ -263,6 +263,8 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("num-directions")) ) {
 	    type->NumDirections=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("revealer")) ) {
+	    type->Revealer=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("sight-range")) ) {
 	    type->_SightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -482,6 +484,7 @@ local SCM CclDefineUnitType(SCM list)
 	    }
 	} else {
 	   // FIXME: this leaves a half initialized unit-type
+	   printf("\n%s\n",type->Name);
 	   errl("Unsupported tag",value);
 	}
     }
