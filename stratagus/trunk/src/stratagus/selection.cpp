@@ -425,9 +425,7 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	}
 	type=unit->Type;
 	// Buildings are visible but not selectable
-	if( type->Building
-		&& !(TheMap.Fields[
-		    unit->Y*TheMap.Width+unit->X].Flags&MapFieldVisible) ) {
+	if( type->Building && !IsMapFieldVisible(unit->Y,unit->X) ) {
 	    // FIXME: isn't it enough to see a field of the building?
 	    continue;
 	}
@@ -448,9 +446,7 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	    continue;
 	}
 	// Buildings are visible but not selectable
-	if( unit->Type->Building
-		&& !(TheMap.Fields[
-		    unit->Y*TheMap.Width+unit->X].Flags&MapFieldVisible) ) {
+	if( unit->Type->Building && !IsMapFieldVisible(unit->Y,unit->X) ) {
 	    // FIXME: isn't it enough to see a field of the building?
 	    continue;
 	}
