@@ -201,58 +201,51 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 **	@param unit	Sound initiator, unit speaking
 **	@param voice	Type of sound wanted (Ready,Die,Yes,...)
 */
-global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
+global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
     int stereo;
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    const Viewport* v;
 
-    stereo = ((unit->X*TileSizeX + unit->IX - (int)v->MapX*TileSizeX) * 256 /
-              (((int)v->MapWidth - 1) * TileSizeX)) - 128;
-#else /* SPLIT_SCREEN_SUPPORT */
-    stereo = ((unit->X*TileSizeX + unit->IX - MapX*TileSizeX) * 256 / 
-              ((MapWidth - 1) * TileSizeX)) - 128;
-#endif /* SPLIT_SCREEN_SUPPORT */
-    if (stereo < -128) stereo=-128;
-    else if (stereo > 127) stereo=127;
+    v = &TheUI.VP[TheUI.LastClickedVP];
 
-    InsertSoundRequest(unit,
-		       unit->Slot,
-		       ViewPointDistanceToUnit(unit),
-		       ChooseUnitVoiceSoundId(unit,voice),
-		       voice==VoiceAttacking,
-		       (voice==VoiceSelected ||voice==VoiceBuilding),
-		       0,
-		       stereo);
+    stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2
+	    + unit->IX - (int)v->MapX * TileSizeX) * 256
+		/ (((int)v->MapWidth - 1) * TileSizeX)) - 128;
+    if (stereo < -128) {
+	stereo = -128;
+    } else if (stereo > 127) {
+	stereo = 127;
+    }
+
+    InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
+	ChooseUnitVoiceSoundId(unit, voice), voice == VoiceAttacking,
+	(voice == VoiceSelected || voice == VoiceBuilding), 0, stereo);
 }
 
 /**
-**	FIXME: docu
+**	Ask the sound server to play a sound for a missile.
+**
+**	@param missile	Sound initiator, missile exploding
+**	@param sound	Sound to be generated
 */
-global void PlayMissileSound(const Missile* missile,SoundId sound)
+global void PlayMissileSound(const Missile* missile, SoundId sound)
 {
     int stereo;
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    const Viewport *v;
 
-    stereo = ((missile->X - (int)v->MapX*TileSizeX) * 256 /
-              (((int)v->MapWidth - 1) * TileSizeX)) - 128;
-#else /* SPLIT_SCREEN_SUPPORT */
-    stereo = ((missile->X - MapX*TileSizeX) * 256 /
-              ((MapWidth - 1) * TileSizeX)) - 128;
-#endif /* SPLIT_SCREEN_SUPPORT */
-    if (stereo < -128) stereo=-128;
-    else if (stereo > 127) stereo=127;
+    v = &TheUI.VP[TheUI.LastClickedVP];
 
-    DebugLevel3("Playing %p\n" _C_ sound);
-    InsertSoundRequest(NULL,
-		       0,
-		       ViewPointDistanceToMissile(missile),
-		       sound,
-		       1,
-		       0,
-		       0,
-		       stereo);
+    stereo = ((missile->X + missile->Type->Width / 2
+	    - (int)v->MapX * TileSizeX) * 256
+		/ (((int)v->MapWidth - 1) * TileSizeX)) - 128;
+    if (stereo < -128) {
+	stereo = -128;
+    } else if (stereo > 127) {
+	stereo = 127;
+    }
+
+    InsertSoundRequest(NULL, 0, ViewPointDistanceToMissile(missile), sound, 1,
+	0, 0, stereo);
 }
 
 /**
