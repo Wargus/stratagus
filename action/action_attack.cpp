@@ -575,9 +575,10 @@ global void HandleActionAttack(Unit* unit)
 	    //
 	    DebugCheck( unit->State!=0 );
 	    //
-	    //	Look for target, if already in range.
+	    //	Look for target, if already in range. Attack if So
 	    //
 	    if( CheckForTargetInRange(unit) ) {
+		unit->SubAction=ATTACK_TARGET;
 		return;
 	    }
 
