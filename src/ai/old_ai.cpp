@@ -83,7 +83,7 @@
 --      Ai tables
 ----------------------------------------------------------------------------*/
 
-global int AiSleep = 0;			/// Ai sleeps # frames
+global int AiSleepCycles;		/// Ai sleeps # cycles
 global int AiTimeFactor = 100;		/// Adjust the AI build times
 global int AiCostFactor = 100;		/// Adjust the AI costs
 
