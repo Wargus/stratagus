@@ -2677,14 +2677,41 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     //	Mark sight range as border. FIXME: matrix didn't need to be bigger.
     //
     n=unit->Stats->SightRange;
+    rx=x-n;
+    if( rx<0 ) {
+	rx=0;
+    }
+    ep=x+n;
+    if( ep>TheMap.Width ) {
+	ep=TheMap.Width;
+    }
+    ry=y-n;
+    if( ry<0 ) {
+	ry=0;
+    }
+    wp=y+n;
+    if( wp>TheMap.Height ) {
+	wp=TheMap.Height;
+    }
+    for( i=rx; i<ep; ++i ) {		// top bottom line
+	matrix[i+ry*w]=matrix[i+wp*w]=66;
+    }
+    for( i=ry+1; i<wp-1; ++i ) {
+	matrix[rx+i*w]=matrix[ep+i*w]=66;
+    }
+
+#if 0
     matrix[x+n+(y+n)*w]=matrix[x-n+(y+n)*w]=
 	matrix[x+n+(y-n)*w]=matrix[x-n+(y-n)*w]=66;
     for( i=n; i--; ) {
+	// FIXME: marks out of map area
+	DebugCheck( x-i+(y-n)*w<0 || x+i+(y+n)*w>w*TheMap.Hight );
 	matrix[x+n+(y+i)*w]=matrix[x-n+(y+i)*w]=
 	    matrix[x+n+(y-i)*w]=matrix[x-n+(y-i)*w]=
 	    matrix[x-i+(y+n)*w]=matrix[x+i+(y+n)*w]=
 	    matrix[x-i+(y-n)*w]=matrix[x+i+(y-n)*w]=66;
     }
+#endif
 
     mask=UnitMovementMask(unit);
 
