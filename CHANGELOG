@@ -2,7 +2,8 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 CVS version:
-- Added tree unit (TimberDragon, François Beerten)
+- Replaced assault attack sound with a bearable one. (micahf)
+- Added tree unit. (TimberDragon, François Beerten)
 - Playlist created dynamically with music files found in 
   the music subdirectory. (François Beerten)
 - Added radar unit. (François Beerten)
@@ -13,7 +14,7 @@ CVS version:
 - Fixed maximum width for chat on the status line. (François Beerten)
 - Made the sound of the attacking assault unit weaker. 
   The sound is bearable now. (François Beerten)
-- Fixed bug #8880 where an APC could load another APC (François Beerten).
+- Fixed bug #8880 where an APC could load another APC. (François Beerten)
 
 For changes up to version 1.1 see the CVS repository 
 at https://savannah.nongnu.org/cvs/?group=stratagus-bos.
