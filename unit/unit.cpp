@@ -335,6 +335,8 @@ global void InitUnit(Unit* unit, UnitType* type)
 	}
     }
 
+    unit->Frame = unit->Type->Animations->Still[0].Frame +
+	(type->Building ? 0 : type->NumDirections / 2 + 1 - 1);
     if (!type->Building && type->Sprite &&
 	    VideoGraphicFrames(type->Sprite) > 5) {
 	unit->Direction = (MyRand() >> 8) & 0xFF;	// random heading
@@ -535,6 +537,7 @@ global Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 	//	fancy buildings: mirror buildings (but shadows not correct)
 	//
 	if (FancyBuildings && unit->Rs > 50) {
+	    // FIXME: doesn't work if Frame is 0
 	    unit->Frame = -unit->Frame;
 	}
     }
