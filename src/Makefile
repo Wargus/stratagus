@@ -23,37 +23,39 @@ OBJS=
 MODULES= clone map unit action ai ui sound video network pathfinder siod game
 
 all::
-	@set -e; for i in $(MODULES) ; do make -C $$i all ; done
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i all ; done
 
 doc::	
-	@set -e; for i in $(MODULES) include ; do make -C $$i doc ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i doc ; done
 
 clean::
-	@set -e; for i in $(MODULES) include ; do make -C $$i clean ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clean ; done
 	$(RM) $(OBJS) libclone.a
 
 clobber::	clean
-	@set -e; for i in $(MODULES) include ; do make -C $$i clobber ; done
+	@set -e; for i in $(MODULES) include ; do $(MAKE) -C $$i clobber ; done
 	$(RM) .depend tags
 
 depend::
 	@echo -n >.depend
-	@set -e; for i in $(MODULES) ; do make -C $$i depend ; done
+	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i depend ; done
 
 tags::
-	@set -e; for i in $(MODULES) ; do cd $$i ; make tags ; cd .. ; done
+	@set -e; for i in $(MODULES) ; do cd $$i ; $(MAKE) tags ; cd .. ; done
 
 distlist::
 	echo >>$(DISTLIST)
+	echo src/main.c  >>$(DISTLIST)
+	echo src/freecraft.rc >>$(DISTLIST)
 	echo src/Makefile >>$(DISTLIST)
-	@for i in include $(MODULES) ; do make -C $$i distlist ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i distlist ; done
 
 ci::
-	@for i in include $(MODULES) ; do make -C $$i ci ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i ci ; done
 	ci -l Makefile
 
 lockver::
-	@for i in include $(MODULES) ; do make -C $$i lockver ; done
+	@for i in include $(MODULES) ; do $(MAKE) -C $$i lockver ; done
 	$(LOCKVER) Makefile
 
 ifeq (.depend,$(wildcard .depend))
