@@ -820,7 +820,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 
 	buf[0]=unit->GroupId+'0';
 	buf[1]='\0';
-	f=TextLength(GameFont,buf);
+	f=VideoTextLength(GameFont,buf);
 	x+=(type->TileWidth*TileSizeX+type->BoxWidth)/2-f;
 	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-14;
 	// FIXME: should use FontHeight(GameFont);

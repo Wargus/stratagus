@@ -1170,7 +1170,7 @@ global void DrawMenu(int MenuId)
 		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		else if (mi->d.text.tflags&MI_TFLAGS_RALIGN) {
-		    l = TextLength(mi->font,mi->d.text.text);
+		    l = VideoTextLength(mi->font,mi->d.text.text);
 		    VideoDrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		} else
@@ -1876,7 +1876,7 @@ local void GameDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
-    l = TextLength(GameFont, "Scenario:");
+    l = VideoTextLength(GameFont, "Scenario:");
     VideoDrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
     VideoDrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
     if (ScenSelectPudInfo) {
@@ -1884,7 +1884,7 @@ local void GameDrawFunc(Menuitem *mi)
 	    VideoDrawText(OffsetX + 16 + l + 8, OffsetY + 360, GameFont, ScenSelectPudInfo->Description);
 	}
 	sprintf(buffer, " (%d x %d)", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-	VideoDrawText(OffsetX + 16+l+8+TextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
+	VideoDrawText(OffsetX + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < 16; j++) {

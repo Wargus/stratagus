@@ -86,7 +86,7 @@ local void ShowInput(void)
     sprintf(InputStatusLine,"MESSAGE:%s~!_",Input);
     input=InputStatusLine;
     // FIXME: That is slow!
-    while( TextLength(GameFont,input)>448 ) {
+    while( VideoTextLength(GameFont,input)>448 ) {
 	++input;
     }
     ClearStatusLine();

@@ -329,7 +329,7 @@ global void GetDefaultTextColors(int *normalp,int *reversep)
 **
 **	@return		The length in pixels of the text.
 */
-global int TextLength(unsigned font,const unsigned char* text)
+global int VideoTextLength(unsigned font,const unsigned char* text)
 {
     int width;
     const unsigned char* s;
@@ -475,7 +475,7 @@ global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 {
     int dx;
 
-    dx=TextLength(font,text);
+    dx=VideoTextLength(font,text);
     VideoDrawText(x-dx/2,y,font,text);
 
     return dx/2;
