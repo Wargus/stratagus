@@ -69,6 +69,7 @@
 
 //###### For Magnant META SERVER
 local int sockfd;  // This is a TCP socket. 
+global int MetaServerInUse;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -167,17 +168,20 @@ global int SendMetaCommand(char* command, char* format, ...)
     if ((p = malloc(size)) == NULL) {
 	return -1;
     }
+    if ((s = malloc(size)) == NULL) {
+	return -1;
+    }
 
     // Message Structure
     // Player Name, Game Name, VERSION, Command, **Paramaters**
-    strcpy(p, LocalPlayerName);
-    strcat(p, "\n");
-    strcat(p, GameName);
-    strcat(p, "\n");
-    strcat(p, VERSION);
-    strcat(p, "\n");
-    strcat(p, command);
-    strcat(p, "\n");
+    strcpy(s, LocalPlayerName);
+    strcat(s, "\n");
+    strcat(s, GameName);
+    strcat(s, "\n");
+    strcat(s, VERSION);
+    strcat(s, "\n");
+    strcat(s, command);
+    strcat(s, "\n");
 
     // Commands
     // Login - 1, password
@@ -194,7 +198,6 @@ global int SendMetaCommand(char* command, char* format, ...)
     while (1) {
 	/* Try to print in the allocated space. */
 	va_start(ap, format);
-	s = va_arg(ap, char *);
 	n = vsnprintf(p, size, format, ap);
 	va_end(ap);
 	/* If that worked, string was processed. */
@@ -212,9 +215,15 @@ global int SendMetaCommand(char* command, char* format, ...)
 	}
     }
     // Allocate the correct size
-    size = strlen(p);
-    ret = NetSendTCP(sockfd, p, size);
+    if ((s = realloc(s, size + strlen(s))) == NULL ) {
+	    free(p);
+	    return -1;
+    }
+    strcat(s, p);
+    size = strlen(s);
+    ret = NetSendTCP(sockfd, s, size);
     free(p);
+    free(s);
     return ret;
 }
 

@@ -52,6 +52,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+extern int MetaServerInUse;
+
 extern int MetaInit(void);
 extern int MetaClose(void);
 extern int MetaServerOK(char **reply);
