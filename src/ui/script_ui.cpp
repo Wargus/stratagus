@@ -469,7 +469,7 @@ local SCM CclDefineCursor(SCM list)
 **
 **	@param ident	Cursor identifier.
 */
-local SCM CclGameCursor(SCM ident)
+local SCM CclSetGameCursor(SCM ident)
 {
     char* str;
 
@@ -1217,6 +1217,40 @@ local SCM CclSetMouseScrollSpeed(SCM num)
 }
 
 /**
+**	Enable/disable grabbing the mouse.
+**
+**	@param flag	True = grab on, false = grab off.
+**	@return		FIXME: not supported: The old state of grabbing.
+*/
+local SCM CclSetGrabMouse(SCM flag)
+{
+    if( gh_scm2bool(flag) ) {
+	ToggleGrabMouse(1);
+    } else {
+	ToggleGrabMouse(-1);
+    }
+
+    //return gh_bool2scm(old);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Enable/disable leaving the window stops scrolling.
+**
+**	@param flag	True = stop on, false = stop off.
+**	@return		The old state of stopping.
+*/
+local SCM CclSetLeaveStops(SCM flag)
+{
+    int old;
+
+    old=LeaveStops;
+    LeaveStops=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
 **	Enable/disable scrolling with the keyboard.
 **
 **	@param flag	True = turn on, false = off.
@@ -1696,9 +1730,11 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-original-resources!",CclSetOriginalResources);
 
     gh_new_procedureN("define-cursor",CclDefineCursor);
-    gh_new_procedure1_0("game-cursor",CclGameCursor);
+    gh_new_procedure1_0("set-game-cursor!",CclSetGameCursor);
     gh_new_procedureN("define-ui",CclDefineUI);
 
+    gh_new_procedure1_0("set-grab-mouse!", CclSetGrabMouse);
+    gh_new_procedure1_0("set-leave-stops!", CclSetLeaveStops);
     gh_new_procedure1_0("set-key-scroll!", CclSetKeyScroll);
     gh_new_procedure1_0("set-key-scroll-speed!", CclSetKeyScrollSpeed);
     gh_new_procedure1_0("set-mouse-scroll!", CclSetMouseScroll);

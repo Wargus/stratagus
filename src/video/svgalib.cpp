@@ -1319,8 +1319,10 @@ global void RealizeVideoMemory(void)
 
 /**
 **	Toggle grab mouse.
+**
+**	@param mode	Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
-global void ToggleGrabMouse(void)
+global void ToggleGrabMouse(int mode __attribute__((unused)))
 {
 }
 

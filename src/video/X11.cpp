@@ -1359,21 +1359,22 @@ global void RealizeVideoMemory(void)
 
 /**
 **	Toggle grab mouse.
+**
+**	@param mode	Wanted mode, 1 grab, -1 not grab, 0 toggle.
 */
-global void ToggleGrabMouse(void)
+global void ToggleGrabMouse(int mode)
 {
     static int grabbed;
 
-    if( grabbed ) {
+    if( mode<=0 && grabbed ) {
 	XUngrabPointer(TheDisplay,CurrentTime);
 	grabbed=0;
-    } else {
+    } else if( mode>=0 && !grabbed ) {
 	if( XGrabPointer(TheDisplay,TheMainWindow,True,0
 		,GrabModeAsync,GrabModeAsync
 		,TheMainWindow, None, CurrentTime)==GrabSuccess ) {
 	    grabbed=1;
 	}
-
     }
 }
 

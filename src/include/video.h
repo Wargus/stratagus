@@ -1366,7 +1366,7 @@ extern void SetVideoSync(void);
 extern void CheckVideoInterrupts(void);
 
     /// Toggle mouse grab mode
-extern void ToggleGrabMouse(void);
+extern void ToggleGrabMouse(int mode);
 
     /// Toggle full screen mode
 extern void ToggleFullScreen(void);

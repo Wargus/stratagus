@@ -218,7 +218,9 @@ extern Unit* UnitUnderCursor;
     /// button number under the cursor
 extern int ButtonUnderCursor;
     /// button 0 (Game Menu) was clicked down
-extern int GameMenuButtonClicked;
+extern char GameMenuButtonClicked;
+    /// Mouse leaves windows stops scroll
+extern char LeaveStops;
     /// current CursorOn field
 extern enum _cursor_on_ CursorOn;
 
