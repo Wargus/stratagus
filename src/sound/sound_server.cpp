@@ -1119,6 +1119,17 @@ global int InitSoundServer()
     return 0;
 }
 
+/**
+**	Cleanup sound server.
+*/
+global void QuitSound(void)
+{
+#ifdef USE_SDLA
+    SDL_CloseAudio();
+#else
+    // FIXME: cleanup code
+#endif
+}
 
 #endif	// } WITH_SOUND
 
