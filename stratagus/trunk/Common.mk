@@ -32,7 +32,7 @@ clean::
 	$(RM) $(OBJS) core *.doc
 
 clobber: clean
-	$(RM) -rf $(OBJDIR)
+	[ $(OBJDIR) == "." ] || $(RM) -rf $(OBJDIR)
 	$(RM) .depend .#* *~ *.$(OE)
 
 depend::
