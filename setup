@@ -446,6 +446,7 @@ case $VIDSEL in
 
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
+	echo "VIDEO             = \$(SDL)" >> $RULESFILE
     if [ "$BEOS" != "1" ] ; then
 	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
     else
@@ -492,7 +493,6 @@ case $VIDSEL in
 	  fi
 	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	  echo >> $RULESFILE
-          echo "VIDEO             = \$(SDL)" >> $RULESFILE
 	else  
 	  echo "Using X11"
 	  echo "VIDEO		= -DUSE_X11" >> $RULESFILE
