@@ -497,9 +497,11 @@ void CreatePlayer(int type)
 	//
 	//  Initial default resources.
 	//
+	#ifndef LUA_MAP_API
 	for (i = 0; i < MaxCosts; ++i) {
 		player->Resources[i] = DefaultResources[i];
 	}
+	#endif
 
 	//
 	//  Initial default incomes.

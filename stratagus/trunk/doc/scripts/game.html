@@ -91,6 +91,7 @@
 <a href="#SetLocalPlayerName">SetLocalPlayerName</a>
 <a href="#SetObjectives">SetObjectives</a>
 <a href="#SetPlayerData">SetPlayerData</a>
+<a href="#SetResourcesHeld">SetResourcesHeld</a>
 <a href="#SetSharedVision">SetSharedVision</a>
 <a href="#SetThisPlayer">SetThisPlayer</a>
 <a href="#SetUnitMana">SetUnitMana</a>
@@ -1281,6 +1282,9 @@ Possible values for <i>property</i>:
 <dt>Name</dt>
 <dd>Name of the player. This name may be exposed in multiplayer games.
 </dd>
+<dt>RaceName</dt>
+<dd>Name of the race of the player. Don't change this value during the game.
+</dd>
 <dt>Ressources</dt>
 <dd>The amount of resources available of the <i>resource</i> kind.
 </dd>
@@ -1319,6 +1323,27 @@ Possible values for <i>property</i>:
     SetPlayerData(player, "Name", "playername")
 </pre>
 
+<a name="SetResourcesHeld"></a>
+<h3>SetResourcesHeld(unit, resources)</h3>
+
+Set the amount of resources available in a unit. Mostly used for harvestable resources.
+
+
+<dl>
+<dt>unit</dt>
+<dd>unit identifier obtained via for example CreateUnit.
+</dd>
+<dt>resources</dt>
+<dd>amount of resources held by the unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    unit = CreateUnit("unit-crystal", {10,45})
+    SetResourcesHeld(unit, 2500)
+</pre>
 
 <a name="SetThisPlayer"></a>
 <h3>SetThisPlayer(playernum)</h3>

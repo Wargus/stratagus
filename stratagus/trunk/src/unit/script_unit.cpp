@@ -1031,6 +1031,30 @@ static int CclCreateUnit(lua_State* l)
 }
 
 /**
+**  Set resources held by a unit
+**
+**  @param l  Lua state.
+*/
+static int CclSetResourcesHeld(lua_State* l)
+{
+	Unit* unit;
+	int value;
+
+	if (lua_gettop(l) != 2) {
+	    printf("%d\n", lua_gettop(l));
+		LuaError(l, "incorrect argument");
+	}
+
+	lua_pushvalue(l, 1);
+	unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	value = LuaToNumber(l, 2);
+	unit->ResourcesHeld = value;
+
+	return 0;
+}
+
+/**
 **  Order a unit
 **
 **  @param l  Lua state.
@@ -1489,6 +1513,7 @@ void UnitCclRegister(void)
 
 	lua_register(Lua, "MoveUnit", CclMoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
+	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
