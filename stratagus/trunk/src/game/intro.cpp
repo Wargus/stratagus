@@ -45,6 +45,7 @@
 #include "cursor.h"
 #include "menus.h"
 #include "interface.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -130,7 +131,8 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
 local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
     if( UseContinueButton ) {
-	if( keychar=='c' || keychar=='\r' ) {
+	if( (keychar=='c' || keychar=='\r') &&
+	    (ContinueButtonFlags&MenuButtonClicked) ) {
 	    IntroNoEvent=0;
 	    ContinueButtonFlags&=~MenuButtonClicked;
 	}
@@ -505,6 +507,7 @@ global void ShowCredits(Credits *credits)
 
     UseContinueButton=1;
     InitContinueButton(455,480-40);
+    GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
     x=(VideoWidth-640)/2;
@@ -922,6 +925,7 @@ global void ShowStats()
 
     UseContinueButton=1;
     InitContinueButton(455,480-40);
+    GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
     done=0;
