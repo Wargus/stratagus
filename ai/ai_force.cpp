@@ -106,11 +106,31 @@ local void AiCleanForce(int force)
     while( aitype ) {
 	if( aitype->Want>counter[aitype->Type->Type] ) {
 	    AiPlayer->Force[force].Completed=0;
-	    break;
 	}
 	counter[aitype->Type->Type]-=aitype->Want;
 	aitype=aitype->Next;
     }
+
+    //
+    //	Release units to much in force.
+    //
+    prev=&AiPlayer->Force[force].Units;
+    while( (aiunit=*prev) ) {
+	if( counter[aiunit->Unit->Type->Type]>0 ) {
+	    DebugLevel0Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
+	    counter[aiunit->Unit->Type->Type]--;
+	    RefsDebugCheck( !aiunit->Unit->Refs );
+	    --aiunit->Unit->Refs;
+	    RefsDebugCheck( !aiunit->Unit->Refs );
+	    *prev=aiunit->Next;
+	    free(aiunit);
+	    continue;
+	}
+	prev=&aiunit->Next;
+    }
+
+    DebugLevel3Fn("%d complete %d\n" _C_ force
+	    _C_ AiPlayer->Force[force].Completed);
 }
 
 /**
@@ -215,10 +235,10 @@ global void AiAssignFreeUnitsToForce(void)
     Unit* unit;
     const AiUnit* aiunit;
 
+    AiCleanForces();
+
     n=AiPlayer->Player->TotalNumUnits;
     memcpy(table,AiPlayer->Player->Units,sizeof(*AiPlayer->Player->Units)*n);
-
-    AiCleanForces();
 
     //
     //	Remove all units already in forces.
@@ -302,6 +322,7 @@ global void AiAttackWithForce(int force)
 	}
 
 	if (!enemy) {
+	    DebugLevel0Fn("Need to plan an attack with transporter\n");
 	    return;
 	}
 	x = enemy->X;
