@@ -422,6 +422,15 @@ global void GameMainLoop(void)
     for( ;; ) {
 	if(!GamePaused) {
 	    ++FrameCounter;
+	    if( !FrameCounter ) {
+		// FIXME: tests with frame counters now fails :(
+		// FIXME: Should happen in 68 years :)
+		fprintf(stderr,"FIXME: *** round robin ***\n");
+		fprintf(stderr,"FIXME: *** round robin ***\n");
+		fprintf(stderr,"FIXME: *** round robin ***\n");
+		fprintf(stderr,"FIXME: *** round robin ***\n");
+	    }
+	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
 	    PlayersEachFrame();		// handle players

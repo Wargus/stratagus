@@ -270,13 +270,16 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
     err=0;
     for( i=1; i<MaxCosts; ++i ) {
 	if( player->Resources[i]<costs[i] ) {
-	    sprintf(buf,"Not enough %s...%s more %s."
-		    ,DEFAULT_NAMES[i],DEFAULT_ACTIONS[i],DEFAULT_NAMES[i]);
-	    //	FIXME: use the general notify function vor this
-	    if( player==ThisPlayer ) {
-		SetMessageDup(buf);
-	    } else {
-		DebugLevel3("Ai: %s.\n",buf);
+	    // FIXME: noticed all or only one?
+	    if( !err ) {
+		sprintf(buf,"Not enough %s...%s more %s."
+			,DEFAULT_NAMES[i],DEFAULT_ACTIONS[i],DEFAULT_NAMES[i]);
+		//	FIXME: use the general notify function vor this
+		if( player==ThisPlayer ) {
+		    SetMessageDup(buf);
+		} else {
+		    DebugLevel3("Ai: %s.\n",buf);
+		}
 	    }
 	    err|=1<<i;
 	}

@@ -152,17 +152,17 @@ struct _unit_type_ {
     unsigned AirUnit : 1;		/// Air animated
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
-    unsigned Critter : 1;		///
-    unsigned Building : 1;		///
-    unsigned Submarine : 1;		///
-    unsigned CanSeeSubmarine : 1;	///
-    unsigned CowerPeon : 1;		///
-    unsigned Tanker : 1;		///
-    unsigned Transporter : 1;		///
-    unsigned GivesOil : 1;		///
-    unsigned StoresGold : 1;		///
+    unsigned Critter : 1;		/// Unit is controlled by nobody
+    unsigned Building : 1;		/// Building
+    unsigned Submarine : 1;		/// Is only visible by CanSeeSubmarine
+    unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
+    unsigned CowerWorker : 1;		/// Is a worker, runs away if attcked
+    unsigned Tanker : 1;		/// FIXME: used? Can transport oil
+    unsigned Transporter : 1;		/// can transport units
+    unsigned GivesOil : 1;		/// We get here oil
+    unsigned StoresGold : 1;		/// We can store gold/wood here
     unsigned Vanishes : 1;		/// Corpes & destroyed places.
-    unsigned GroundAttack : 1;		///
+    unsigned GroundAttack : 1;		/// Can do command ground attack
     unsigned IsUndead : 1;		///
     unsigned ShoreBuilding : 1;		///
     unsigned CanCastSpell : 1;		///
@@ -230,8 +230,8 @@ struct _unit_type_ {
 #define UnitDentarg		0x17
 #define UnitKhadgar		0x18
 #define UnitGromHellscream	0x19
-#define UnitTankerHuman		0x1A
-#define UnitTankerOrc		0x1B
+//#define UnitTankerHuman	0x1A
+//#define UnitTankerOrc		0x1B
 #define UnitTransportHuman	0x1C
 #define UnitTransportOrc	0x1D
 #define UnitElvenDestroyer	0x1E
@@ -319,12 +319,12 @@ struct _unit_type_ {
 
 //	This are internal used unit-types:
 
-#define UnitPeasantWithGold	0x6E
-#define UnitPeonWithGold	0x6F
-#define UnitPeasantWithWood	0x70
-#define UnitPeonWithWood	0x71
-#define UnitTankerHumanFull	0x72
-#define UnitTankerOrcFull	0x73
+//#define UnitPeasantWithGold	0x6E
+//#define UnitPeonWithGold	0x6F
+//#define UnitPeasantWithWood	0x70
+//#define UnitPeonWithWood	0x71
+//#define UnitTankerHumanFull	0x72
+//#define UnitTankerOrcFull	0x73
 
 #endif
 
@@ -342,6 +342,16 @@ extern char	UnitTypeType[];			/// unit type type
 extern UnitType	UnitTypes[UnitTypeInternalMax];	/// all unit types
 
 extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit type pointer.
+extern UnitType*UnitTypeHumanTanker;	/// orc tanker unit type pointer.
+extern UnitType*UnitTypeOrcTanker;	/// human tanker unit type pointer.
+extern UnitType*UnitTypeHumanTankerFull;/// orc tanker full unit type pointer.
+extern UnitType*UnitTypeOrcTankerFull;	/// human tanker full unit type pointer.
+extern UnitType*UnitTypeHumanWorker;	/// Human worker.
+extern UnitType*UnitTypeOrcWorker;	/// Orc worker.
+extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold.
+extern UnitType*UnitTypeOrcWorkerWithGold;	/// Orc worker with gold.
+extern UnitType*UnitTypeHumanWorkerWithWood;	/// Human worker with wood.
+extern UnitType*UnitTypeOrcWorkerWithWood;	/// Orc worker with wood.
 
 /*----------------------------------------------------------------------------
 --	Functions

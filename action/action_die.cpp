@@ -49,10 +49,10 @@ global int HandleActionDie(Unit* unit)
     //
     //	Show death animation
     //
-    if( unit->Type->Animations ) {
+    if( unit->Type->Animations && unit->Type->Animations->Die ) {
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
     } else {
-	DebugLevel0("FIXME: die animation missing\n");
+	// some units has no death animation
 	unit->Reset=1;
 	unit->Wait=1;
     }
@@ -63,7 +63,7 @@ global int HandleActionDie(Unit* unit)
     if( unit->Reset ) {
 	DebugLevel3("Die complete %Zd\n",UnitNumber(unit));
 	if( !unit->Type->CorpseType ) {
-	    FreeUnitMemory(unit);
+	    ReleaseUnit(unit);
 	    return 1;
 	}
 

@@ -34,6 +34,7 @@
 #include "actions.h"
 #include "tileset.h"
 #include "map.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -55,7 +56,7 @@ local Command* GetNextCommand(Unit* unit,int flush)
     } else if( unit->NextCount==MAX_COMMANDS ) {
 	// FIXME: johns: wrong place for an error message.
 	// FIXME: johns: should be checked by AI or the user interface
-	if(unit->Player==ThisPlayer) {
+	if( unit->Player==ThisPlayer ) {
             SetMessage( "Unit action list is full" );
 	}
 	return NULL;
@@ -68,15 +69,12 @@ local Command* GetNextCommand(Unit* unit,int flush)
 --	Commands
 ----------------------------------------------------------------------------*/
 
-//	FIXME:	here we must add network support! JOHNS: moved to network.
-
 /**
 **	Stop unit.
 **
 **	@param unit	pointer to unit.
-**	@param flush	if true, flush command queue.
 */
-global void CommandStopUnit(Unit* unit,int flush)
+global void CommandStopUnit(Unit* unit)
 {
     unit->NextFlush=1;
     unit->NextCount=1;
@@ -103,6 +101,30 @@ global void CommandStandGround(Unit* unit,int flush)
 }
 
 /**
+**	Follow unit to new position
+**
+**	@param unit	pointer to unit.
+**	@param dest	unit to be followed
+**	@param flush	if true, flush command queue.
+*/
+global void CommandFollow(Unit* unit,Unit* dest,int flush)
+{
+    Command* command;
+
+    if( !(command=GetNextCommand(unit,flush)) ) {
+	return;
+    }
+
+    command->Action=UnitActionFollow;
+    command->Data.Move.Fast=1;
+    command->Data.Move.Goal=dest;
+    dest->Refs++;
+    command->Data.Move.Range=1;
+    command->Data.Move.SX=unit->X;
+    command->Data.Move.SY=unit->Y;
+}
+
+/**
 **	Move unit to new position
 **
 **	@param unit	pointer to unit.
@@ -110,7 +132,7 @@ global void CommandStandGround(Unit* unit,int flush)
 **	@param y	Y map position to move to.
 **	@param flush	if true, flush command queue.
 */
-global void CommandMoveUnit(Unit* unit,int x,int y,int flush)
+global void CommandMove(Unit* unit,int x,int y,int flush)
 {
     Command* command;
 
@@ -121,7 +143,10 @@ global void CommandMoveUnit(Unit* unit,int x,int y,int flush)
 	}
     );
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -133,8 +158,6 @@ global void CommandMoveUnit(Unit* unit,int x,int y,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
-
-    unit->PendCommand=*command;
 }
 
 /**
@@ -143,9 +166,10 @@ global void CommandMoveUnit(Unit* unit,int x,int y,int flush)
 **	@param unit	pointer to unit.
 **	@param x	X map position to repair.
 **	@param y	Y map position to repair.
+**	@param dest	or unit to be repaired. FIXME: not supported
 **	@param flush	if true, flush command queue.
 */
-global void CommandRepair(Unit* unit,int x,int y,int flush)
+global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
     Command* command;
 
@@ -154,22 +178,29 @@ global void CommandRepair(Unit* unit,int x,int y,int flush)
 	    DebugLevel0("Internal movement error\n");
 	    return;
 	}
+	// FIXME: dest until now not supported
+	if( dest ) {
+	    DebugLevel0(__FUNCTION__": not used %p\n",dest);
+	}
     );
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
     command->Action=UnitActionRepair;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=RepairableOnMapTile(x,y);
+    command->Data.Move.Goal->Refs++;
     command->Data.Move.Range=REPAIR_RANGE;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
-
-    unit->PendCommand=*command;
 }
 
 /**
@@ -199,7 +230,10 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     DebugLevel3(__FUNCTION__": %Zd attacks %Zd\n"
 	,UnitNumber(unit),attack ? UnitNumber(attack) : 0);
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -221,8 +255,6 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
-
-    unit->PendCommand=*command;
 }
 
 /**
@@ -323,7 +355,7 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
 **	@param unit	pointer to unit.
 **	@param x	X map position to unload.
 **	@param y	Y map position to unload.
-**	@param what	unit to be unload.
+**	@param what	unit to be unloaded, NoUnitP all.
 **	@param flush	if true, flush command queue.
 */
 global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
@@ -360,7 +392,8 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 **	@param what	Unit type to build.
 **	@param flush	if true, flush command queue.
 */
-global void CommandBuildBuilding(Unit* unit,int x,int y,UnitType* what,int flush)
+global void CommandBuildBuilding(Unit* unit,int x,int y
+	,UnitType* what,int flush)
 {
     Command* command;
 
@@ -394,16 +427,16 @@ global void CommandBuildBuilding(Unit* unit,int x,int y,UnitType* what,int flush
 **	Cancel the building construction.
 **
 **	@param unit	pointer to unit.
-**	@param peon	pointer to unit.
+**	@param worker	pointer to unit.
 */
-global void CommandCancelBuilding(Unit* unit,Unit* peon)
+global void CommandCancelBuilding(Unit* unit,Unit* worker)
 {
     unit->NextCount=1;
     unit->NextFlush=1;
 
     unit->NextCommand[0].Action=UnitActionBuilded;
     unit->NextCommand[0].Data.Builded.Cancel=1;
-    unit->NextCommand[0].Data.Builded.Peon=peon;
+    unit->NextCommand[0].Data.Builded.Worker=worker;
 
     unit->Wait=1;
     unit->Reset=1;
@@ -447,7 +480,6 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     // FIXME: this hack didn't work correct on map border
     command->Data.Move.DX=x ? x-1 : x;
     command->Data.Move.DY=y ? y-1 : y;
-
 }
 
 /**
@@ -496,7 +528,10 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
     Command* command;
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -515,8 +550,6 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
 #endif
-
-    unit->PendCommand=*command;
 }
 
 /**
@@ -527,6 +560,7 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 */
 global void CommandReturnGoods(Unit* unit,int flush)
 {
+    // FIXME: flush, and command que not supported!
     unit->NextCount=1;
     unit->NextFlush=1;
 
@@ -596,9 +630,11 @@ global void CommandTrainUnit(Unit* unit,UnitType* what,int flush)
 **
 **	@param unit	pointer to unit.
 */
-global void CommandCancelTraining(Unit* unit)
+global void CommandCancelTraining(Unit* unit,int slot)
 {
     int i;
+
+    DebugCheck( slot );
 
     if ( --unit->Command.Data.Train.Count ) {
 	for( i = 0; i < MAX_UNIT_TRAIN-1; i++ ) {
@@ -640,7 +676,7 @@ global void CommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 **	@param unit	pointer to unit.
 **	@param flush	if true, flush command queue.
 */
-global void CommandCancelUpgradeTo(Unit* unit,int flush)
+global void CommandCancelUpgradeTo(Unit* unit)
 {
     unit->Command.Action=UnitActionStill;
 
@@ -655,11 +691,12 @@ global void CommandCancelUpgradeTo(Unit* unit,int flush)
 **	@param what	what to research.
 **	@param flush	if true, flush command queue.
 */
-global void CommandResearch(Unit* unit,int what,int flush)
+global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 {
     unit->NextCount=1;
     unit->NextFlush=1;
 
+    DebugLevel0(__FUNCTION__": FIXME: must support command queing!!");
     unit->NextCommand[0].Action=UnitActionResearch;
     unit->NextCommand[0].Data.Research.Ticks=0;
     unit->NextCommand[0].Data.Research.What=what;
@@ -674,7 +711,7 @@ global void CommandResearch(Unit* unit,int what,int flush)
 **	@param unit	pointer to unit.
 **	@param flush	if true, flush command queue.
 */
-global void CommandCancelResearch(Unit* unit,int flush)
+global void CommandCancelResearch(Unit* unit)
 {
     unit->Command.Action=UnitActionStill;
 
@@ -702,7 +739,10 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 	}
     );
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending commands.
+	command=&unit->PendCommand;
+    } else if( !(command=GetNextCommand(unit,flush)) ) {
 	return;
     }
 
@@ -724,8 +764,6 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
-
-    unit->PendCommand=*command;
 }
 
 //@}

@@ -27,6 +27,7 @@
 #include <limits.h>
 
 #include "freecraft.h"
+
 #include "video.h"
 #include "sound_id.h"
 #include "unitsound.h"
@@ -42,6 +43,7 @@
 #include "sound.h"
 #include "ai.h"
 #include "pathfinder.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -50,9 +52,12 @@
 #ifdef NEW_UNIT
 global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 global Unit** UnitSlotFree; 		/// First free unit slot
+local Unit* ReleasedHead;		/// List of released units.
+local Unit** ReleasedTail;		/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
+
 #else
 // The pool is currently hardcoded to MAX_UNITS
 global Unit* UnitsPool;			/// All units in play
@@ -60,8 +65,8 @@ global Unit* UnitsPool;			/// All units in play
 global int NumUnits;			/// Number of slots used
 global Unit** Units;			/// Array of used slots
 
-static Unit** FreeUnits;		/// Array of free slots
-static int NumFreeUnits;		/// Number of free slots
+local Unit** FreeUnits;			/// Array of free slots
+local int NumFreeUnits;			/// Number of free slots
 #endif
 
 /*----------------------------------------------------------------------------
@@ -79,11 +84,14 @@ global void InitUnitsMemory(void)
     // Initiallize the "list" of free unit slots
 
     slot=UnitSlots+MAX_UNIT_SLOTS;
+    *--slot=NULL;			// leave the last slot free as no marker
     *--slot=NULL;
     do {
 	slot[-1]=(void*)slot;
     } while( --slot>UnitSlots );
     UnitSlotFree=slot;
+
+    ReleasedTail=&ReleasedHead;
 #else
     int i;
 
@@ -118,40 +126,18 @@ global void InitUnitsMemory(void)
 
 /**
 **	Free the memory for an unit slot. Update all units tables.
+**	Memory is only freed, if all references are dropped.
 **
 **	@param unit	Pointer to unit.
 */
 global void FreeUnitMemory(Unit* unit)
 {
 #ifdef NEW_UNIT
-    Player* player;
     Unit** slot;
-    Unit* temp;
 
-    if( unit->Refs>1 ) {
-	DebugLevel0(__FUNCTION__": too much references\n");
-    }
-
-    //	Remove the unit from the player's units table.
-
-    if( (player=unit->Player) ) {
-	DebugCheck( *unit->PlayerSlot!=unit );
-	temp=player->Units[--player->TotalNumUnits];
-	player->Units[player->TotalNumUnits]=NULL;
-	temp->PlayerSlot=unit->PlayerSlot;
-	*unit->PlayerSlot=temp;
-    }
-
-    //	Remove the unit from the global units table.
-
-    DebugCheck( *unit->UnitSlot!=unit );
-    temp=Units[--NumUnits];
-    Units[NumUnits]=NULL;
-    temp->UnitSlot=unit->UnitSlot;
-    *unit->UnitSlot=temp;
-
+    //
     //	Remove from slot table
-
+    //
     slot=UnitSlots+unit->Slot;
     DebugCheck( *slot!=unit );
 
@@ -193,6 +179,65 @@ global void FreeUnitMemory(Unit* unit)
 }
 
 /**
+**	Release an unit.
+**
+**	The unit is only released if all references are dropped.
+**
+**	@param unit	Pointer to unit.
+*/
+global void ReleaseUnit(Unit* unit)
+{
+#ifdef NEW_UNIT
+    DebugCheck( !unit->Type );		// already free.
+
+    //
+    //	First release, remove from lists/tables.
+    //
+    if( !unit->Destroyed ) {
+	Player* player;
+	Unit* temp;
+	//
+	//	Remove the unit from the player's units table.
+	//
+	if( (player=unit->Player) ) {
+	    DebugCheck( *unit->PlayerSlot!=unit );
+	    temp=player->Units[--player->TotalNumUnits];
+	    player->Units[player->TotalNumUnits]=NULL;
+	    temp->PlayerSlot=unit->PlayerSlot;
+	    *unit->PlayerSlot=temp;
+	}
+	//
+	//	Remove the unit from the global units table.
+	//
+	DebugCheck( *unit->UnitSlot!=unit );
+	temp=Units[--NumUnits];
+	Units[NumUnits]=NULL;
+	temp->UnitSlot=unit->UnitSlot;
+	*unit->UnitSlot=temp;
+    }
+    //
+    //	Are more references remaining?
+    //
+    if( unit->Refs-->1 ) {
+	unit->Destroyed=1;		// mark as destroyed
+
+	DebugLevel0(__FUNCTION__": more references\n");
+	return;
+    }
+    //
+    //	No more references remaining, but the network could have an order
+    //	on the way.
+    //
+    *ReleasedTail=unit;
+    ReleasedTail=&unit->Next;
+    unit->Refs=FrameCounter+NetworkLag;	// could reuse after this.
+    unit->Type=NULL;			// for debugging.
+#else
+    FreeUnitMemory(unit);
+#endif
+}
+
+/**
 **	Create a new unit.
 **
 **	@param type	Pointer to unit-type.
@@ -219,16 +264,27 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 
 #ifdef NEW_UNIT
     //
-    //	Allocate structure
+    //	Can use released unit?
     //
-    if( !(slot=UnitSlotFree) ) {	// should not happen!
-	DebugLevel0(__FUNCTION__": Maximum of units reached\n");
-	return NoUnitP;
+    if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
+	unit=ReleasedHead;
+	ReleasedHead=unit->Next;
+	memset(unit,0,sizeof(*unit));
+	DebugLevel0(__FUNCTION__": release %p\n",unit);
+	// FIXME: can release here more slots.
+    } else {
+	//
+	//	Allocate structure
+	//
+	if( !(slot=UnitSlotFree) ) {	// should not happen!
+	    DebugLevel0(__FUNCTION__": Maximum of units reached\n");
+	    return NoUnitP;
+	}
+	UnitSlotFree=(void*)*slot;
+	*slot=unit=calloc(1,sizeof(Unit));
+	unit->Refs=1;
+	unit->Slot=slot-UnitSlots;		// back index
     }
-    UnitSlotFree=(void*)*slot;
-    *slot=unit=calloc(1,sizeof(Unit));
-    unit->Refs=1;
-    unit->Slot=slot-UnitSlots;		// back index
 
     //
     //	Build all unit table
@@ -279,7 +335,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
 
-    if( type->CowerPeon ) {
+    if( type->CowerWorker ) {
 	unit->WoodToHarvest=CHOP_FOR_WOOD;
     }
     if( type->CanCastSpell ) {
@@ -1966,7 +2022,7 @@ global void DestroyUnit(Unit* unit)
     if( type->OilPatch || unit->Removed ) {
 	RemoveUnit(unit);
 	UnitLost(unit);
-	FreeUnitMemory(unit);
+	ReleaseUnit(unit);
 	return;
     }
 
@@ -1981,7 +2037,7 @@ global void DestroyUnit(Unit* unit)
 	    ,0,0);
 	RemoveUnit(unit);
 	UnitLost(unit);
-	FreeUnitMemory(unit);
+	ReleaseUnit(unit);
 	return;
     }
 
@@ -2034,7 +2090,7 @@ global void DestroyUnit(Unit* unit)
 	}
 
 	// no corpse available
-	FreeUnitMemory(unit);
+	ReleaseUnit(unit);
 	return;
     }
 
@@ -2054,6 +2110,10 @@ global void DestroyUnit(Unit* unit)
 	    || type==UnitTypeByIdent("unit-peasant-with-wood") ) {
 	unit->Type=UnitTypeByIdent("unit-peasant");
     }
+
+    //
+    //	Unit has no death animation.
+    //
 
     // Not good: UnitNewHeading(unit);
     unit->SubAction=0;
@@ -2083,7 +2143,7 @@ global void DestroyAllInside(Unit* source)
 	        // DestroyUnit(unit);
 		RemoveUnit(unit);
 		UnitLost(unit);
-		FreeUnitMemory(unit);
+		ReleaseUnit(unit);
 	    }
 	}
 	return;
@@ -2094,8 +2154,8 @@ global void DestroyAllInside(Unit* source)
     //
     if( source->Type->Building
 	    && source->Command.Action==UnitActionBuilded
-	    && source->Command.Data.Builded.Peon ) {
-	DestroyUnit(source->Command.Data.Builded.Peon);
+	    && source->Command.Data.Builded.Worker ) {
+	DestroyUnit(source->Command.Data.Builded.Worker);
 	return;
     }
 
@@ -2189,7 +2249,7 @@ global void HitUnit(Unit* unit,int damage)
     //
     //	Attack units in range (which or the attacker?)
     //
-    if( !type->CowerPeon && !type->CowerMage ) {
+    if( !type->CowerWorker && !type->CowerMage ) {
 	if( type->CanAttack && !type->Tower ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
@@ -2392,6 +2452,13 @@ local void SaveCommand(const Command* command,FILE* file)
 		free(ref);
 	    }
 	    break;
+	case UnitActionFollow:
+	    fprintf(file,"'follow");
+	    ref=UnitReference(command->Data.Move.Goal);
+	    fprintf(file," %s",ref);
+	    fprintf(file," %d",command->Data.Move.Range);
+	    free(ref);
+	    break;
 	case UnitActionMove:
 	    fprintf(file,"'move");
 	    fprintf(file," (%d %d)"
@@ -2404,13 +2471,19 @@ local void SaveCommand(const Command* command,FILE* file)
 		free(ref);
 	    }
 	    fprintf(file," %d",command->Data.Move.Range);
-	    if( command->Data.Move.Fast ) {
-		fprintf(file," 'fast");
-	    }
 	    break;
 	case UnitActionAttack:
 	    fprintf(file,"'attack");
-	    fprintf(file," \"FIXME:\"");
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.SX,command->Data.Move.SY);
+	    fprintf(file," (%d %d)"
+		,command->Data.Move.DX,command->Data.Move.DY);
+	    if( command->Data.Move.Goal ) {
+		ref=UnitReference(command->Data.Move.Goal);
+		fprintf(file," %s",ref);
+		free(ref);
+	    }
+	    fprintf(file," %d",command->Data.Move.Range);
 	    break;
 	case UnitActionDie:
 	    fprintf(file,"'die");

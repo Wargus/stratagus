@@ -119,7 +119,7 @@ global void HandleActionStill(Unit* unit)
     //
     if( type->Vanishes ) {
 	//UnitCacheRemove(unit);
-	FreeUnitMemory(unit);
+	ReleaseUnit(unit);
 	return;
     }
 #endif
@@ -183,7 +183,7 @@ global void HandleActionStill(Unit* unit)
     //
     //	Workers and mage didn't attack automatic
     //
-    if( type->CanAttack && !type->CowerPeon && !type->CowerMage ) {
+    if( type->CanAttack && !type->CowerWorker && !type->CowerMage ) {
 	//
 	// JOHNS: removed Human controlled units attacks in attacking range.
 	// JOHNS: use stand ground for old behavior.

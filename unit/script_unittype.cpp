@@ -398,7 +398,7 @@ local SCM CclDefineUnitType(SCM list)
     type->Building=0;
     type->Submarine=0;
     type->CanSeeSubmarine=0;
-    type->CowerPeon=0;
+    type->CowerWorker=0;
     type->Tanker=0;
     type->Transporter=0;
     type->GivesOil=0;
@@ -473,8 +473,8 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Submarine=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-see-submarine")) ) {
 	    type->CanSeeSubmarine=0;
-	} else if( gh_eq_p(value,gh_symbol2scm("cower-peon")) ) {
-	    type->CowerPeon=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("cower-worker")) ) {
+	    type->CowerWorker=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("tanker")) ) {
 	    type->Tanker=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("transporter")) ) {

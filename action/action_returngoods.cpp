@@ -32,18 +32,20 @@
 /**
 **	Return goods to gold/wood deposit.
 **
+**	FIXME: must support to move to a specified deposit.
+**
 **	@param unit	pointer to unit.
 */
 global void HandleActionReturnGoods(Unit* unit)
 {
-    int type;
+    UnitType* type;
     Unit* destu;
 
     //
     //	Select target to return goods.
     //
-    type=unit->Type->Type;
-    if( type==UnitPeonWithGold || type==UnitPeasantWithGold ) {
+    type=unit->Type;
+    if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
 	if( !(destu=FindGoldDeposit(unit,unit->X,unit->Y)) ) {
 	    unit->Command.Action=UnitActionStill;
 	    return;
@@ -66,7 +68,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	return;
     }
 
-    if( type==UnitPeonWithWood || type==UnitPeasantWithWood ) {
+    if( type==UnitTypeHumanWorkerWithWood || type==UnitTypeOrcWorkerWithWood ) {
 	if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    unit->Command.Action=UnitActionStill;
 	    return;
@@ -93,7 +95,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	return;
     }
 
-    if( type==UnitTankerHumanFull || type==UnitTankerOrcFull ) {
+    if( type==UnitTypeHumanTankerFull || type==UnitTypeOrcTankerFull ) {
 	if( !(destu=FindOilDeposit(unit->Player,unit->X,unit->Y)) ) {
 	    unit->Command.Action=UnitActionStill;
 	    return;

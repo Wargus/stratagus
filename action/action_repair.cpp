@@ -15,14 +15,6 @@
 **	$Id$
 */
 
-
-/*
-
-  This is a quick hack: repair action, done with attack action reversing
-  :)
-  
-*/
-
 //@{
 
 /*----------------------------------------------------------------------------
@@ -57,51 +49,72 @@
 */
 local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
 {
-    Unit* goal;
     int flags;
-    Player* player;
 
     flags=UnitShowAnimation(unit,repair);
 
     if( (flags&AnimationSound) ) {	
 	PlayUnitSound(unit,VoiceAttacking); //FIXME: should be something else...
     }
+}
 
-    goal=unit->Command.Data.Move.Goal;
-    if (!goal) {
-	// FIXME: Should abort the repair
-	return;
-    }
-
-    // FIXME: Should substract the correct values for repair
-
-    //	Check if enough resources are available
+/**
+**	Repair an unit.
+*/
+local void RepairUnit(Unit* unit,Unit* goal)
+{
+    Player* player;
+    int costs[MaxCosts];
+    int i;
+#define GIVES_HP	16
+#define DIVISOR		2
 
     player=unit->Player;
-    if( !player->Resources[GoldCost] || !player->Resources[WoodCost] ) {
-	// FIXME: perhaps we should not animate if no resources are available.
-	return;
+
+    //	FIXME: Should substract the correct values for repair
+
+    //
+    //	Calculate the costs.
+    //
+    DebugCheck( !goal->Stats->HitPoints );
+    
+    for( i=1; i<MaxCosts; ++i ) {
+	costs[i]=((goal->Stats->Costs[i]*GIVES_HP)
+		/goal->Stats->HitPoints)/DIVISOR;
+
+	// FIXME: unit costs something but to less costs calculated
+	IfDebug(
+	    if( !costs[i] && goal->Stats->Costs[i] ) {
+		DebugLevel0("Costs %d-%d\n",i,costs[i]);
+	    }
+	);
     }
-
+    //
+    //	Check if enough resources are available
+    //
+    for( i=1; i<MaxCosts; ++i ) {
+	if( player->Resources[i]<costs[i] ) {
+    // FIXME: we should show a message, we need resources!
+    // FIXME: perhaps we should not animate if no resources are available.
+	    return;
+	}
+    }
+    //
     //	Repair the unit
-
-    goal->HP++;
+    //
+    goal->HP+=GIVES_HP;
     if ( goal->HP > goal->Stats->HitPoints ) {
 	goal->HP = goal->Stats->HitPoints;
     }
-
+    //
     //	Subtract the resources
+    //
+    PlayerSubCosts(player,costs);
 
-    player->Resources[GoldCost]--;		// FIXME: correct sources?
-    player->Resources[WoodCost]--;
+    // FIXME: if visibile on map must redraw map area.
 
-    //	Must update panel if unit is selected
-    if( IsSelected(goal) ) {
+    if( IsSelected(goal) ) {		// Update panel if unit is selected
 	MustRedraw|=RedrawInfoPanel;
-    }
-
-    if( player==ThisPlayer ) {
-	MustRedraw|=RedrawResources;
     }
 }
 
@@ -151,16 +164,25 @@ global int HandleActionRepair(Unit* unit)
 		//
 #ifdef NEW_UNIT
 		// Check if goal is correct unit.
-		if( goal && goal->Destroyed ) {
-		    DebugLevel0(__FUNCTION__": destroyed unit\n");
-		    if( !--goal->Refs ) {
-			FreeUnitMemory(goal);
+		// FIXME: should I do a function for this?
+		if( goal ) {
+		    if( goal->Destroyed ) {
+			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			if( !--goal->Refs ) {
+			    ReleaseUnit(goal);
+			}
+			// FIXME: should I clear this here?
+			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Command.Data.Move.DX=goal->X;
+			unit->Command.Data.Move.DY=goal->Y;
+		    } else if( goal->Command.Action==UnitActionDie ) {
+			// FIXME: should I clear this here?
+			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Command.Data.Move.DX=goal->X;
+			unit->Command.Data.Move.DY=goal->Y;
 		    }
-		    // FIXME: should I clear this here?
-		    unit->Command.Data.Move.Goal=goal=NULL;
 		}
 #endif
-
 		//
 		//	Have reached target?
 		//
@@ -173,6 +195,10 @@ global int HandleActionRepair(Unit* unit)
 		    }
 		    unit->SubAction=1;
 		} else if( err ) {
+		    DebugCheck( unit->Command.Action!=UnitActionStill );
+		    if( goal ) {
+			goal->Refs--;
+		    }
 		    return 1;
 		}
 		unit->Command.Action=UnitActionRepair;
@@ -188,33 +214,50 @@ global int HandleActionRepair(Unit* unit)
 		goal=unit->Command.Data.Move.Goal;
 
 		//
+		//	Target is dead, choose new one.
+		//
+#ifdef NEW_UNIT
+		// Check if goal is correct unit.
+		// FIXME: should I do a function for this?
+		if( goal ) {
+		    if( goal->Destroyed ) {
+			DebugLevel0(__FUNCTION__": destroyed unit\n");
+			if( !--goal->Refs ) {
+			    ReleaseUnit(goal);
+			}
+			// FIXME: should I clear this here?
+			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Command.Data.Move.DX=goal->X;
+			unit->Command.Data.Move.DY=goal->Y;
+		    } else if( goal->Command.Action==UnitActionDie ) {
+			// FIXME: should I clear this here?
+			unit->Command.Data.Move.Goal=goal=NULL;
+			unit->Command.Data.Move.DX=goal->X;
+			unit->Command.Data.Move.DY=goal->Y;
+		    }
+		}
+#endif
+		if( goal ) {
+		    RepairUnit(unit,goal);
+		}
+
+		//
 		//	Target is fine, choose new one.
 		//
-                if ( !goal || goal->HP >= goal->Stats->HitPoints ) {
+		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
+		    if( goal ) {
+			goal->Refs--;
+		    }
                     unit->Command.Action=UnitActionStill;
 		    unit->SubAction=0;
 		    unit->State=0;
                     return 1;
 		}
-#if 0
-		//
-		//	Still near to target, if not goto target.
-		//
-		if( MapDistanceToUnit(unit->X,unit->Y,goal)
-			>unit->Type->AttackRange ) {
-		    unit->Command.Data.Move.Fast=1;
-		    unit->Command.Data.Move.DX=goal->X;
-		    unit->Command.Data.Move.DY=goal->Y;
-		    unit->Frame=0;
-		    unit->State=0;
-		    unit->SubAction=0;
-		    break;
-		}
-#endif
+
+		// FIXME: automatic repair
 	    }
 	    break;
     }
-
     return 0;
 }
 
