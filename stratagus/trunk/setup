@@ -436,7 +436,6 @@ if [ "$BEOS" != "1" ] ; then
 if test "$WIN32" = 0 ; then
   echo
   echo "VIDEO DRIVER OPTIONS"
-  echo "  X - X11 Support"
 
   if test "$HAVESDL" = 1 ; then
     echo "  S - SDL Support"
@@ -463,12 +462,6 @@ fi
 
 echo "# Video support" >> $RULESFILE
 case $VIDSEL in
-  [xX])
-	echo "-> Using X11"
-	echo "VIDEO           = -DUSE_X11" >> $RULESFILE
-	echo "VIDEOLIB        = -lXext -lX11 $DL" >> $RULESFILE
-	;;
-
   *)
 	echo -n "-> Using SDL"
   	USESDL=1

@@ -56,12 +56,6 @@ SDLLIB		= $(shell sdl-config --static-libs)
 SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
 
 #------------------------------------------------------------------------------
-# Uncomment the next for the normal X11 support.
-
-VIDEO		= -DUSE_X11
-VIDEOLIB	= -lXext -lX11 -ldl
-
-#------------------------------------------------------------------------------
 # Uncomment one of the next for the SDL support.
 
 # Uncomment the next for the generic SDL support.

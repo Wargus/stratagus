@@ -916,9 +916,6 @@ global void InitCcl(void)
 #ifdef USE_SDLCD
     gh_define("stratagus-feature-sdl-cd", SCM_BOOL_T);
 #endif
-#ifdef USE_X11
-    gh_define("stratagus-feature-x11", SCM_BOOL_T);
-#endif
 #ifdef WITH_SOUND
     gh_define("stratagus-feature-with-sound", SCM_BOOL_T);
 #endif
