@@ -73,6 +73,7 @@ global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
 
 global int HitPointRegeneration;	/// Hit point regeneration for all units
+global int XpDamage;				/// Hit point regeneration for all units
 global char EnableTrainingQueue;	/// Config: training queues enabled
 global char EnableBuildingCapture;	/// Config: capture buildings enabled
 global char RevealAttacker;		/// Config: reveal attacker enabled
@@ -4018,6 +4019,8 @@ global void SaveUnits(FILE* file)
     //
     fprintf(file,"(set-hitpoint-regeneration! #%s)\n",
 	    HitPointRegeneration ? "t" : "f");
+    fprintf(file,"(set-xp-damage! #%s)\n",
+	    XpDamage ? "t" : "f");
     fprintf(file,"(set-fancy-buildings! #%s)\n",
 	    FancyBuildings ? "t" : "f");
     fprintf(file,"(set-training-queue! #%s)\n",
@@ -4106,6 +4109,7 @@ global void CleanUnits(void)
     InitUnitsMemory();
 
     HitPointRegeneration=0;
+    XpDamage=0;
     FancyBuildings=0;
 }
 
