@@ -401,7 +401,6 @@ global void DrawButtonPanel(void)
 	    //	with the buttons.
 	    //
 	    if( NumSelected==1 ) {
-#ifdef NEW_ORDERS
 		switch( buttons[i].Action ) {
 		    case ButtonStop:
 			if( Selected[0]->Orders[0].Action==UnitActionStill ) {
@@ -437,7 +436,8 @@ global void DrawButtonPanel(void)
 			}
 			break;
 		    case ButtonDemolish:
-			if( Selected[0]->Orders[0].Action==UnitActionDemolish ) {
+			if( Selected[0]->Orders[0].Action
+				==UnitActionDemolish ) {
 			    v=IconSelected;
 			}
 			break;
@@ -453,47 +453,6 @@ global void DrawButtonPanel(void)
 		    default:
 			break;
 		}
-#else
-		switch( buttons[i].Action ) {
-		    case ButtonStop:
-			if( Selected[0]->Command.Action==UnitActionStill ) {
-			    v=IconSelected;
-			}
-			break;
-		    case ButtonStandGround:
-			if( Selected[0]->Command.Action
-				==UnitActionStandGround ) {
-			    v=IconSelected;
-			}
-			break;
-		    case ButtonMove:
-			if( Selected[0]->Command.Action==UnitActionMove ) {
-			    v=IconSelected;
-			}
-			break;
-		    case ButtonAttack:
-			if( Selected[0]->Command.Action==UnitActionAttack ) {
-			    v=IconSelected;
-			}
-			break;
-		    case ButtonDemolish:
-			if( Selected[0]->Command.Action==UnitActionDemolish ) {
-			    v=IconSelected;
-			}
-			break;
-		    case ButtonAttackGround:
-			if( Selected[0]->Command.Action
-				==UnitActionAttackGround ) {
-			    v=IconSelected;
-			}
-			break;
-
-		    // FIXME: must handle more actions
-
-		    default:
-			break;
-		}
-#endif
 	    }
 
 	    DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon
@@ -694,7 +653,6 @@ global void UpdateButtonPanel(void)
     //
     //	FIXME: johns: some hacks for cancel buttons
     //
-#ifdef NEW_ORDERS
     if( unit->Orders[0].Action==UnitActionBuilded ) {
 	// Trick 17 to get the cancel-build button
 	strcpy(unit_ident,",cancel-build,");
@@ -707,25 +665,11 @@ global void UpdateButtonPanel(void)
     } else {
 	sprintf(unit_ident, ",%s,", unit->Type->Ident);
     }
-#else
-    if( unit->Command.Action==UnitActionBuilded ) {
-	// Trick 17 to get the cancel-build button
-	strcpy(unit_ident,",cancel-build,");
-    } else if( unit->Command.Action==UnitActionUpgradeTo ) {
-	// Trick 17 to get the cancel-upgrade button
-	strcpy(unit_ident,",cancel-upgrade,");
-    } else if( unit->Command.Action==UnitActionResearch ) {
-	// Trick 17 to get the cancel-upgrade button
-	strcpy(unit_ident,",cancel-upgrade,");
-    } else {
-	sprintf(unit_ident, ",%s,", unit->Type->Ident);
-    }
-#endif
 
     for( z = 0; z < UnitButtonCount; z++ ) {
 	//FIXME: we have to check and if these unit buttons are available
-	//       i.e. if button action is ButtonTrain for example check if required
-	//       unit is not restricted etc...
+	//       i.e. if button action is ButtonTrain for example check if
+	//        required unit is not restricted etc...
 
 	buttonaction=UnitButtonTable[z];
 
@@ -901,19 +845,11 @@ global void DoButtonButtonClicked(int button)
 	case ButtonCancel:
 	case ButtonCancelUpgrade:
 	    if ( NumSelected==1 && Selected[0]->Type->Building ) {
-#ifdef NEW_ORDERS
 		if( Selected[0]->Orders[0].Action==UnitActionUpgradeTo ) {
 		    SendCommandCancelUpgradeTo(Selected[0]);
 		} else if( Selected[0]->Orders[0].Action==UnitActionResearch ) {
 		    SendCommandCancelResearch(Selected[0]);
 		}
-#else
-		if( Selected[0]->Command.Action == UnitActionUpgradeTo ) {
-		    SendCommandCancelUpgradeTo(Selected[0]);
-		} else if( Selected[0]->Command.Action == UnitActionResearch ) {
-		    SendCommandCancelResearch(Selected[0]);
-		}
-#endif
 	    }
 	    ClearStatusLine();
 	    ClearCosts();
@@ -926,13 +862,8 @@ global void DoButtonButtonClicked(int button)
 	    break;
 
 	case ButtonCancelTrain:
-#ifdef NEW_ORDERS
 	    DebugCheck( Selected[0]->Orders[0].Action!=UnitActionTrain
 		    || !Selected[0]->Data.Train.Count );
-#else
-	    DebugCheck( Selected[0]->Command.Action!=UnitActionTrain
-		    || !Selected[0]->Command.Data.Train.Count );
-#endif
 	    SendCommandCancelTraining(Selected[0],0);
 	    ClearStatusLine();
 	    ClearCosts();
@@ -942,11 +873,7 @@ global void DoButtonButtonClicked(int button)
 	    // FIXME: johns is this not sure, only building should have this?
 	    if( NumSelected==1 && Selected[0]->Type->Building ) {
 		SendCommandCancelBuilding(Selected[0],
-#ifdef NEW_ORDERS
 		        Selected[0]->Data.Builded.Worker);
-#else
-		        Selected[0]->Command.Data.Builded.Worker);
-#endif
 	    }
 	    ClearStatusLine();
 	    ClearCosts();
@@ -972,13 +899,8 @@ global void DoButtonButtonClicked(int button)
 	    // FIXME: Johns: I want to place commands in queue, even if not
 	    // FIXME:	enough resources are available.
 	    // FIXME: training queue full check is not correct for network.
-#ifdef NEW_ORDERS
 	    if( Selected[0]->Orders[0].Action==UnitActionTrain
 		    && Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN ) {
-#else
-	    if( Selected[0]->Command.Action==UnitActionTrain
-		    && Selected[0]->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
-#endif
 		SetMessage( "Unit training queue is full" );
 	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {

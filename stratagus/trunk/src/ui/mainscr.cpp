@@ -44,10 +44,6 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_ORDERS
-#define Command Orders[0]
-#endif
-
 // FIXME: should become global configurable
 #define OriginalTraining	0	/// 1 for the original training display
 
@@ -209,7 +205,6 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Show progress for buildings only, if they are selected.
     //
-#ifdef NEW_ORDERS
     if( type->Building && NumSelected==1 && Selected[0]==unit ) {
 	//
 	//	Building under constuction.
@@ -282,67 +277,6 @@ global void DrawUnitInfo(const Unit* unit)
 	    return;
 	}
     }
-#else
-    if( type->Building && NumSelected==1 && Selected[0]==unit ) {
-	if( unit->Command.Action==UnitActionBuilded ) {
-	    // FIXME: not correct must use build time!!
-	    DrawCompleted(stats->HitPoints,unit->HP);
-	    return;
-	}
-	if( unit->Command.Action==UnitActionTrain ) {
-	    if( OriginalTraining || unit->Command.Data.Train.Count==1 ) {
-		DrawText(x+37,y+8+78,GameFont,"Training:");
-		DrawUnitIcon(unit->Player
-			,unit->Command.Data.Train.What[0]->Icon.Icon
-			,0,x+107,y+8+70);
-
-		DrawCompleted(
-			unit->Command.Data.Train.What[0]
-			    ->Stats[unit->Player->Player].Costs[TimeCost]
-			,unit->Command.Data.Train.Ticks);
-	    } else {
-		DrawTextCentered(x+114,y+8+29,GameFont,"Training...");
-
-		for( i = 0; i < unit->Command.Data.Train.Count; i++ ) {
-		    DrawUnitIcon(unit->Player
-			    ,unit->Command.Data.Train.What[i]->Icon.Icon
-			    ,(ButtonUnderCursor==i+4)
-				? (IconActive|(MouseButtons&LeftButton)) : 0
-			    ,TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y);
-		}
-
-		DrawCompleted(
-			unit->Command.Data.Train.What[0]
-			    ->Stats[unit->Player->Player].Costs[TimeCost]
-			,unit->Command.Data.Train.Ticks);
-	    }
-	    return;
-	}
-	if( unit->Command.Action==UnitActionUpgradeTo ) {
-	    DrawText(x+29,y+8+78,GameFont,"Upgrading:");
-	    DrawUnitIcon(unit->Player
-		    ,unit->Command.Data.UpgradeTo.What->Icon.Icon
-		    ,0,x+107,y+8+70);
-
-	    DrawCompleted(
-		    unit->Command.Data.UpgradeTo.What
-			->Stats[unit->Player->Player].Costs[TimeCost]
-		    ,unit->Command.Data.UpgradeTo.Ticks);
-	    return;
-	}
-	if( unit->Command.Action==UnitActionResearch ) {
-	    DrawText(16,y+8+78,GameFont,"Researching:");
-	    DrawUnitIcon(unit->Player
-		    ,unit->Command.Data.Research.What->Icon
-		    ,0,x+107,y+8+70);
-
-	    DrawCompleted(
-		    unit->Command.Data.Research.What->Costs[TimeCost]
-		    ,unit->Command.Data.Research.Ticks);
-	    return;
-	}
-    }
-#endif
 
     if( type->StoresWood ) {
 	DrawText(x+20,y+8+78,GameFont,"Production");
@@ -463,7 +397,7 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawStats(x+108,y+8+125,stats->Speed,type->_Speed);
 
         // Show how much wood is harvested already in percents! :) //vladi
-        if( unit->Command.Action==UnitActionHarvest && unit->SubAction==64 ) {
+        if( unit->Orders[0].Action==UnitActionHarvest && unit->SubAction==64 ) {
 	    sprintf(buf,"W%%:%d"
 		    ,(100*(CHOP_FOR_WOOD-unit->Value))/CHOP_FOR_WOOD);
 	    DrawText(x+120,y+8+140,GameFont,buf);
@@ -966,19 +900,10 @@ global void DrawInfoPanel(void)
 	} else {
 	    // FIXME: not correct for enemies units
 	    if( Selected[0]->Type->Building
-#ifdef NEW_ORDERS
 		    && (Selected[0]->Orders[0].Action==UnitActionBuilded
 			|| Selected[0]->Orders[0].Action==UnitActionResearch
 			|| Selected[0]->Orders[0].Action==UnitActionUpgradeTo
-		    /* || Selected[0]->Orders[0].Action==UnitActionUpgrade */
 			|| Selected[0]->Orders[0].Action==UnitActionTrain) ) {
-#else
-		    && (Selected[0]->Command.Action==UnitActionBuilded
-			|| Selected[0]->Command.Action==UnitActionResearch
-			|| Selected[0]->Command.Action==UnitActionUpgradeTo
-		    /* || Selected[0]->Command.Action==UnitActionUpgrade */
-			|| Selected[0]->Command.Action==UnitActionTrain) ) {
-#endif
 		i=3;
 	    } else if( Selected[0]->Type->Magic ) {
 		i=2;
