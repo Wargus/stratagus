@@ -281,6 +281,7 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 **	@return		the number of bytes used to fill buffer
 **
 **	@todo		Can mix faster if signed 8 bit buffers are used.
+**	@todo		Can combine stereo and volume for faster operation.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 			      char stereo,int* buffer,int size)
