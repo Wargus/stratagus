@@ -242,6 +242,7 @@ local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
 local void StartEditor(void);
+local void CancelEditorSelect(void);
 local void EditorNewMap(void);
 local void EditorNewDrawFunc(Menuitem *mi);
 local void EditorNewMapDescriptionEnterAction(Menuitem *mi, int key);
@@ -565,6 +566,7 @@ global void InitMenuFuncHash(void) {
     HASHADD(FcDeleteCancel,"fc-delete-cancel");
 
 // Editor select
+    HASHADD(CancelEditorSelect,"cancel-editor-select");
     HASHADD(EditorNewMap,"editor-new-map");
     HASHADD(EditorMainLoadMap,"editor-main-load-map");
 
@@ -4654,7 +4656,14 @@ local void StartEditor(void)
 	*ScenSelectDisplayPath = '\0';
     }
 
-    ProcessMenu("menu-editor-select", 1);
+    EditorRunning = 1;
+    MenuLoop(NULL, &TheMap);
+}
+
+local void CancelEditorSelect(void)
+{
+    QuitToMenu = 1;
+    EndMenu();
 }
 
 /**
@@ -4712,8 +4721,6 @@ local void EditorNewMap(void)
 
     *CurrentMapPath = '\0';
 
-    // FIXME: Use EditorRunning and main-loop.
-    EditorMainLoop();
     EndMenu();
 }
 
@@ -6149,8 +6156,9 @@ local void EditorSaveConfirmCancel(void)
 */
 local void EditorQuitMenu(void)
 {
-    EditorRunning = 0;
-    GameMenuReturn();
+    QuitToMenu = 1;
+    EditorRunning = 0;    
+    EndMenu();
 }
 
 /**

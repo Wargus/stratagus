@@ -345,6 +345,9 @@ extern int EditorSave(void);
     /// Error menu
 extern void ErrorMenu(char *);
 
+    /// Menu Loop
+extern void MenuLoop(char *filename, WorldMap *map);
+
 //@}
 
 #endif	// !__MENUS_H__

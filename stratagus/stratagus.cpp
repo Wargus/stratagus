@@ -1023,7 +1023,10 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    }
 	    EnableRedraw=RedrawMenu;
 	    if( EditorRunning ) {
+		QuitToMenu = 0;
 		ProcessMenu("menu-editor-select", 1);
+		if (QuitToMenu)
+		    return;
 	    } else {
 		ProcessMenu("menu-program-start", 1);
 	    }
@@ -1040,7 +1043,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//
 	if( EditorRunning ) {
 	    EditorMainLoop();
-	} else {
+	} else if (GameRunning) {
 	    //
 	    //	Create the game.
 	    //
