@@ -101,7 +101,11 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	    }
 	    //
 	    //	Check if under fog of war.
+	    //	Don't bother for goals visible under fog.
 	    //
+	    if (goal->Type->VisibleUnderFog) {
+		return 0;
+	    }
 	    for (x = goal->X; x < goal->X + goal->Type->TileWidth; x++) {
 		for (y = goal->Y; y < goal->Y + goal->Type->TileHeight; y++) {
 		    if (IsMapFieldVisible(unit->Player, x, y)) {
