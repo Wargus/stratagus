@@ -511,7 +511,7 @@ local void CclParseUpgradeTo(lua_State* l, Unit* unit)
 		++j;
 		if (!strcmp(value, "ticks")) {
 			lua_rawgeti(l, -1, j + 1);
-			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, 1);
+			unit->Data.UpgradeTo.Ticks = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		}
 	}
