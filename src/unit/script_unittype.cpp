@@ -162,13 +162,13 @@ local SCM CclDefineUnitType(SCM list)
 		str = gh_scm2newstr(value, NULL);
 		i = 0;
 		if (strcmp(str, "default")) {
-		    for (; i < TilesetMax; ++i) {
+		    for (; i < NumTilesets; ++i) {
 			if (!strcmp(str,Tilesets[i]->Ident) ||
 				!strcmp(str,Tilesets[i]->Class)) {
 			    break;
 			}
 		    }
-		    if (i == TilesetMax) {
+		    if (i == NumTilesets) {
 		       // FIXME: this leaves half initialized unit-type
 		       errl("Unsupported tileset tag", value);
 		    }
