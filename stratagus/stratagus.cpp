@@ -240,15 +240,16 @@ global int SpeedResearch=SPEED_RESEARCH;/// speed factor for researching
 ============================================================================*/
 
 // FIXME: move to video header file
-global int VideoWidth;			/// window width in pixels
-global int VideoHeight;			/// window height in pixels
+global int VideoWidth;			/// Window width in pixels
+global int VideoHeight;			/// Window height in pixels
 
 global unsigned long NextFrameTicks;	/// Ticks of begin of the next frame
-global int FrameCounter;		/// current frame number
-global int SlowFrameCounter;		/// profile, frames out of sync
+global unsigned long FrameCounter;	/// Current frame number
+global int SlowFrameCounter;		/// Profile, frames out of sync
 
 // FIXME: not the correct place
-global enum MustRedraw_e MustRedraw=RedrawEverything;	/// redraw flags
+global int MustRedraw=RedrawEverything;	/// Redraw flags
+global int EnableRedraw=RedrawEverything;/// Enable flags
 
 global unsigned long GameCycle;		/// Game simulation cycle counter
 
@@ -488,7 +489,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	//	Clear screen
 	//
 	VideoLockScreen();
-	VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+	VideoClearScreen();
 	VideoUnlockScreen();
 	Invalidate();
 	RealizeVideoMemory();
@@ -712,7 +713,7 @@ global volatile void Exit(int err)
 
     ExitNetwork1();
     IfDebug(
-	DebugLevel0( "Frames %d, Slow frames %d = %d%%\n"
+	DebugLevel0( "Frames %lu, Slow frames %d = %ld%%\n"
 	    _C_ FrameCounter _C_ SlowFrameCounter
 	    _C_ (SlowFrameCounter*100)/(FrameCounter ? FrameCounter : 1) );
 	UnitCacheStatistic();
