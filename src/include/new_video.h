@@ -20,7 +20,7 @@
 
 //@{
 
-// Little note: this should become the new video headerfile
+// Little NOTE: this should become the new video headerfile
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -37,9 +37,10 @@ Note:	This new graphic object should generalize all the different objects
 	(8bit,16bit,...)
 #endif
 
+// FIXME: not quite correct for new multiple palette version
     /// System-Wide used colors.
 enum _sys_colors_ {
-    ColorBlack = 0,			/// usr for black
+    ColorBlack = 0,			/// use for black
     ColorDarkGreen = 149,
     ColorBlue = 206,
     ColorWhite = 246,
@@ -51,37 +52,35 @@ enum _sys_colors_ {
     ColorBlinkRed = 252,
     ColorViolett = 253,
 
-    ColorWaterCycleStart = 38,
-    ColorWaterCycleEnd = 47,
-    ColorIconCycleStart = 240,
-    ColorIconCycleEnd = 244
+// FIXME: this should some where made configurable
+    ColorWaterCycleStart = 38,		/// color # start for color cycling
+    ColorWaterCycleEnd = 47,		/// color # end   for color cycling
+    ColorIconCycleStart = 240,		/// color # start for color cycling
+    ColorIconCycleEnd = 244		/// color # end   for color cycling
+};
+
+typedef enum _sys_colors_ SysColors;	/// System-Wide used colors.
+
+typedef struct _palette_ Palette;	/// palette typedef
+
+/// Palette structure.
+struct _palette_ {
+    unsigned char r;			/// RED COMPONENT
+    unsigned char g;			/// GREEN COMPONENT
+    unsigned char b;			/// BLUE COMPONENT
 };
 
 typedef unsigned char GraphicData;	/// generic graphic data type
 
-/// Palette structure.
-struct Palette {
-    /// RED COMPONENT
-    unsigned char r;
-    /// GREEN COMPONENT
-    unsigned char g;
-    /// BLUE COMPONENT
-    unsigned char b;
-};
-
-typedef struct Palette Palette;
-
-typedef enum _sys_colors_ SysColors;		/// System-Wide used colors.
-
 /**
 **	General graphic object typedef. (forward)
 */
-typedef struct __graphic__ Graphic;
+typedef struct _graphic_ Graphic;
 
 /**
 **	General graphic object type.
 */
-typedef struct __graphic_type__ {
+typedef struct _graphic_type_ {
 	/**
 	**	Draw the object unclipped.
 	**
@@ -148,10 +147,10 @@ typedef struct __graphic_type__ {
 /**
 **	General graphic object
 */
-struct __graphic__ {
+struct _graphic_ {
   GraphicType*	        Type;		/// Object type dependend
   Palette*              Palette;        /// Loaded Palette
-  GraphicData*          Pixels;
+  GraphicData*          Pixels;		/// Pointer to local or global palette
   unsigned		Width;		/// Width of the object
   unsigned		Height;		/// Height of the object
   unsigned	        NumFrames;	/// Number of frames
@@ -257,7 +256,7 @@ extern void (*VideoDrawHLineClip)(SysColors color,int x,int y
 
     /// 	Free a graphic object.
 #define VideoFree(o)		((o)->Type->Free)((o))
-    /// 	Save free a graphic object.
+    /// 	Save (NULL) free a graphic object.
 #define VideoSaveFree(o) \
 	do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
 
