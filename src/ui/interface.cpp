@@ -639,8 +639,7 @@ local int CommandKey(int key)
 
 	case KeyCodeF9:			// Preferences menu
 	    if( KeyState!=KeyStateInput ) {
-		// FIXME: Enable when this works
-//		UiEnterPreferencesOptionsMenu();
+		UiEnterPreferencesOptionsMenu();
 	    }
 	    break;
 
