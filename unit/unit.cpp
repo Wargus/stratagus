@@ -3641,12 +3641,13 @@ global void SaveUnit(const Unit* unit,FILE* file)
 
     fprintf(file,"\n(unit '%s ",ref=UnitReference(unit));
     free(ref);
-    // Needed to create the unit slot
+    // 'type and 'player must be first, needed to create the unit slot
+    fprintf(file,"'type '%s ",unit->Type->Ident);
+    fprintf(file,"'player %d\n  ",unit->Player->Player);
+
     if( unit->Name ) {
 	fprintf(file,"'name \"%s\" ",unit->Name);
     }
-    fprintf(file,"'type '%s ",unit->Type->Ident);
-    fprintf(file,"'player %d\n  ",unit->Player->Player);
 
     if( unit->Next ) {
 	fprintf(file,"'next '%s ",ref=UnitReference(unit->Next));
