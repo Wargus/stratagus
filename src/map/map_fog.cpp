@@ -190,33 +190,33 @@ local int LookupSight(const Player* player, int tx, int ty)
 **	@param x	X tile to check.
 **	@param y	Y tile to check.
 **
-**	@return		0 unexplored, 1 explored, >1 visible.
+**	@return		0 unexplored, 1 explored, > 1 visible.
 */
 global int IsTileVisible(const Player* player, int x, int y)
 {
-    int visiontype;
     int i;
+    unsigned char visiontype;
+    unsigned char* visible;
 
-    visiontype = TheMap.Fields[y * TheMap.Width + x].Visible[player->Player];
+    visible = TheMap.Fields[y * TheMap.Width + x].Visible;
+    visiontype = visible[player->Player];
 
-    if (visiontype > 1 || !player->SharedVision) {
+    if (visiontype != 1) {
 	return visiontype;
     }
-    if (visiontype == 0) {
-	return 0;
+    if (!player->SharedVision) {
+	return visiontype + TheMap.NoFogOfWar;
     }
+
     for (i = 0; i < PlayerMax ; ++i) {
 	if (player->SharedVision & (1 << i) &&
 		(Players[i].SharedVision & (1 << player->Player))) {
-            if (visiontype < TheMap.Fields[y * TheMap.Width + x].Visible[i]) {
-		visiontype = TheMap.Fields[y * TheMap.Width + x].Visible[i];
+	    if (visible[i] > 1) {
+		return 2;
 	    }
 	}
-	if (visiontype > 1 || TheMap.NoFogOfWar) {
-	    return 2;
-	}
     }
-    return visiontype;
+    return visiontype + TheMap.NoFogOfWar;
 }
 
 /**
