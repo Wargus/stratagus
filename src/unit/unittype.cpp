@@ -482,7 +482,7 @@ void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 			unittype->ResInfo[OilCost]->ResourceCapacity = 100;
 		}
 		unittype->CanTransport = BIT(10, v) ?
-			calloc(NumberBoolFlag, sizeof(*unittype->CanTransport)) : NULL;
+			calloc(UnitTypeVar.NumberBoolFlag, sizeof(*unittype->CanTransport)) : NULL;
 		unittype->CanStore[GoldCost] = BIT(12, v);
 		unittype->Vanishes = BIT(13, v);
 		unittype->GroundAttack = BIT(14, v);
@@ -930,6 +930,7 @@ void CleanUnitTypes(void)
 		Assert(type->Name);
 		free(type->Name);
 
+		free(type->Variable);
 		free(type->BoolFlag);
 		free(type->CanTargetFlag);
 		free(type->CanTransport);
@@ -1020,12 +1021,17 @@ void CleanUnitTypes(void)
 	}
 	NumUnitTypes = 0;
 
-	for (i = 0; i < NumberBoolFlag; ++i) { // User defined flags
-		free(BoolFlagName[i]);
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
+		free(UnitTypeVar.BoolFlagName[i]);
 	}
-	free(BoolFlagName);
-	BoolFlagName = NULL;
-	NumberBoolFlag = 0;
+	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // User defined variables
+		free(UnitTypeVar.VariableName[i]);
+	}
+	free(UnitTypeVar.BoolFlagName);
+	free(UnitTypeVar.VariableName);
+	free(UnitTypeVar.Variable);
+	free(UnitTypeVar.DecoVar);
+	memset(&UnitTypeVar, 0, sizeof (UnitTypeVar));
 
 	//
 	// Clean hardcoded unit types.
