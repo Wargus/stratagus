@@ -250,7 +250,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     unsigned char* m;
 
     size=TheMap.Width*TheMap.Height;
-    points=alloca(size);
+    points=malloc(size);
     size/=sizeof(*points);
 
     w=TheMap.Width+2;
@@ -290,6 +290,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 		if( *m ) {			// already checked
 		    // Check if goal reached.
 		    if( *m==88 && CanMoveToMask(x,y,mask) ) {
+			free(points);
 			return depth;
 		    }
 		    continue;
@@ -322,6 +323,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 	n=(depth&0x07)+1;
     }
 
+    free(points);
     return -1;
 }
 
@@ -636,7 +638,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	    _C_ gx _C_ gy _C_ ox _C_ oy);
 
     size=TheMap.Width*TheMap.Height;
-    points=alloca(size);
+    points=malloc(size);
     size/=sizeof(*points)*2;
 
     w=TheMap.Width+2;
@@ -724,6 +726,7 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 			    PfCounterDepth+=depth;
 			    PfCounterDepth/=2;
 			);
+			free(points);
 			return depth;
 		    }
 		    continue;
@@ -843,10 +846,12 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	}
 #endif
 	PathTraceBack(matrix,(add>>3)+1,bestx,besty,bestn,path);
+	free(points);
 	return INT_MAX;
     }
 #endif
-
+	
+    free(points);
     return PF_UNREACHABLE;
 }
 
