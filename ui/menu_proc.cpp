@@ -1988,6 +1988,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	}
     }
 
+    // mousewheel up
     if (MouseButtons&UpButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->Items + MenuButtonUnderCursor;
@@ -2028,6 +2029,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		case MI_TYPE_PULLDOWN:
 		    if (mi->d.pulldown.curopt) {
 			--mi->d.pulldown.curopt;
+			if (mi->d.pulldown.action) {
+			    (*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+			}
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
@@ -2037,6 +2041,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	}
     }
 
+    // mousewheel down
     if (MouseButtons&DownButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->Items + MenuButtonUnderCursor;
@@ -2077,6 +2082,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		case MI_TYPE_PULLDOWN:
 		    if (mi->d.pulldown.curopt < mi->d.pulldown.noptions - 1) {
 			++mi->d.pulldown.curopt;
+			if (mi->d.pulldown.action) {
+			    (*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+			}
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
