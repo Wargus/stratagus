@@ -997,7 +997,7 @@ global UnitType* UnitTypeByIdent(const char* ident)
 {
     UnitType* const* type;
 
-    type=hash_find(UnitTypeHash,(char*)ident);
+    type=(UnitType* const*)hash_find(UnitTypeHash,ident);
     if( type ) {
 	return *type;
     }
