@@ -99,7 +99,7 @@ global int CclInConfigFile;		/// True while config file parsing
 ----------------------------------------------------------------------------*/
 
 /***
-**	Free pointer if it lays in the heap.
+**	Free pointer, if it lays in the heap.
 **
 **	@param ptr	Pointer into heap.
 */
@@ -400,6 +400,44 @@ local SCM CclMouseScrollOff(void)
     TheUI.MouseScroll=0;
 
     return SCM_UNSPECIFIED;
+}
+
+/**
+**	Debug unit slots.
+*/
+local SCM CclUnits(void)
+{
+#ifdef NEW_UNIT
+    Unit** slot;
+    int i;
+    int r;
+    static char buf[80];
+
+    i=r=0;
+    slot=UnitSlotFree;
+    while( slot ) {
+	++i;
+	slot=(void*)*slot;
+    }
+    for( slot=UnitSlots; slot<UnitSlots+MAX_UNIT_SLOTS; ++slot ) {
+	if( *slot
+		&& (*slot<(Unit*)UnitSlots
+			|| *slot>(Unit*)(UnitSlots+MAX_UNIT_SLOTS)) ) {
+	    if( (*slot)->Destroyed ) {
+		++r;
+	    }
+	}
+    }
+    sprintf(buf,"%d free %d used %d destroyed slots"
+	    ,i,MAX_UNIT_SLOTS-2-i,r);
+    fprintf(stderr,"%d free %d used %d destroyed slots\n"
+	    ,i,MAX_UNIT_SLOTS-2-i,r);
+    SetStatusLine(buf);
+
+    return gh_int2scm(i);
+#else
+    return SCM_UNSPECIFIED;
+#endif
 }
 
 /*............................................................................
@@ -831,6 +869,7 @@ global void CclInit(void)
     init_lsubr("freecraft-map",CclFreeCraftMap);
 
     gh_new_procedure0_0("mouse-scroll-off",CclMouseScrollOff);
+    gh_new_procedure0_0("units",CclUnits);
 
     print_welcome();
 
