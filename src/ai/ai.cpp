@@ -835,6 +835,10 @@ global void AiEachSecond(Player* player)
     //	Handle the force manager.
     //
     AiForceManager();
+    //
+    //	Check for magic actions.
+    //
+    AiCheckMagic();
 
 #ifdef TIMEIT
     ev=rdtsc();
