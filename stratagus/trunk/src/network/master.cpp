@@ -80,33 +80,30 @@ global int MetaInit(void)
 {
     int i; 
     char* reply;
-
+    int Port_Range_Min, Port_Range_Max;
+    Port_Range_Min=1234; 
+    Port_Range_Max=1244;
     reply = NULL;
     MetaServerFildes = NetworkFildes;
-    for (i = 1234; i < 1244; ++i) {
+    for (i = Port_Range_Min; i < Port_Range_Max; ++i) {
 	MetaServerFildes = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 	if (MetaServerFildes != (Socket)-1) {
 	    if (NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT) != -1) {
 		break;
 	    }
+	    else {
+		if (i == Port_Range_Max) {
+		    return -1;
+		}
+	    }
 	}
     }
-    //TODO: clean up and check for full i>1244.
-
-    // FIXME: Configurable Meta Server
-    //i = NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT);
-    //if (i == -1) {
-	//TODO: Notify player that connection was aborted...
-    //	return -1; 
-    //}
-	
+    	
     if (SendMetaCommand("Login", "") == -1) {
-	//TODO: Notify player that connection was aborted...
 	return -1;
     }
 
     if (RecvMetaReply(&reply) == -1) {
-	//TODO: Notify player that connection was aborted...
 	return -1;
     } else {
 	if (MetaServerOK(reply)) {
