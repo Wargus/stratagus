@@ -29,7 +29,6 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "icons.h"
-#include "button.h"
 #include "unittype.h"
 
 #define DEFAULT	NULL
