@@ -224,6 +224,8 @@ enum MustRedraw_e {
 
     /// Must redraw all maps
 #define RedrawMaps		(RedrawMinimap|RedrawMap)
+    /// Must redraw all cursors
+#define RedrawCursors		(RedrawMinimapCursor|RedrawCursor)
     /// Must redraw all panels
 #define RedrawPanels		(RedrawInfoPanel|RedrawButtonPanel)
 
