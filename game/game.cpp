@@ -99,7 +99,7 @@ local void LoadStratagusMap(const char* filename,
     InitPlayers();
     LcmPreventRecurse = 1;
     gh_load((char*)filename);
-    lcm_prevent_recurse = 0;
+    LcmPreventRecurse = 0;
 
 #if 0
     // Not true if multiplayer levels!
