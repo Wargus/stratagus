@@ -245,7 +245,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	CLclose(f);
 	ExitFatal(-1);
     }
-    DebugCheck(wavfmt.Frequency != 44100 || wavfmt.Frequency != 22050 ||
+    DebugCheck(wavfmt.Frequency != 44100 && wavfmt.Frequency != 22050 &&
 	wavfmt.Frequency != 11025);
 
     //
