@@ -299,7 +299,7 @@ typedef struct _ui_ {
 	int       CompletedBarTextY;        ///< completed bar text Y position
 
 	// Button panel
-	GraphicConfig ButtonPanel;          ///< Button panel background
+	Graphic*      ButtonPanelG;          ///< Button panel background
 	int           ButtonPanelX;         ///< Button panel screen X position
 	int           ButtonPanelY;         ///< Button panel screen Y position
 	Button*       ButtonButtons;        ///< Button panel buttons
