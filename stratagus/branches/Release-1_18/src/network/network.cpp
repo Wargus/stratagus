@@ -379,10 +379,11 @@ local void NetworkSendPacket(const NetworkCommandQueue *ncq)
 
     // if (0 || !(rand() & 15))
 	 NetworkBroadcast(&packet, sizeof(packet));
-
+#if 0 
     if (HostsCount < 3) {		// enough bandwidth to send twice :)
 	 NetworkBroadcast(&packet, sizeof(packet));
     }
+#endif
 }
 
 //----------------------------------------------------------------------------

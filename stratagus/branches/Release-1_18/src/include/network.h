@@ -42,7 +42,7 @@
 
 #define NetworkMaxLag	250		/// Debuging network lag (# game cycles)
 
-#define NetworkDups	4		/// Repeat old commands
+#define NetworkDups	1		/// Repeat old commands
 
 /*----------------------------------------------------------------------------
 --	Declarations
