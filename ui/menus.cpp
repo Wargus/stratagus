@@ -283,12 +283,6 @@ local int GuiGameStarted;
 local int EditorLoadCancelled;
 
 /**
-**	Offsets from top and left, used for different resolutions
-*/
-local int OffsetX;
-local int OffsetY;
-
-/**
 **	Other client and server selection state for Multiplayer clients
 */
 global ServerSetup ServerSetupState, LocalSetupState;
@@ -570,8 +564,8 @@ local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
     }
 #endif
 
-    VideoDrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
-    VideoDrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
+    VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 440, GameFont, NameLine);
+    VideoDrawTextCentered(VideoWidth/2, TheUI.Offset480Y + 456, GameFont,
 	"Engine distributed under the terms of the GNU General Public License.");
     SetDefaultTextColors(nc, rc);
 }
@@ -1464,12 +1458,7 @@ local void GlobalOptions(void)
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
     Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
 
-    flags = Screen->flags;
-#endif
     menu = FindMenu("menu-global-options");
     
     menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
@@ -1480,182 +1469,110 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     menu->items[15].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
 
-    if (VideoWidth == 640)
+    if (VideoWidth == 640) {
 	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
-    if (VideoWidth == 800)
+    } else if (VideoWidth == 800) {
     	menu->items[4].d.gem.state = MI_GSTATE_CHECKED;
-    if (VideoWidth == 1024)
+    } else if (VideoWidth == 1024) {
     	menu->items[6].d.gem.state = MI_GSTATE_CHECKED;
-    if (VideoWidth == 1280)
+    } else if (VideoWidth == 1280) {
     	menu->items[8].d.gem.state = MI_GSTATE_CHECKED;
-    if (VideoWidth == 1600)
+    } else if (VideoWidth == 1600) {
     	menu->items[10].d.gem.state = MI_GSTATE_CHECKED;
+    }
 
-#ifdef USE_SDL	
-    if (flags & SDL_FULLSCREEN)
+    if (VideoFullScreen) {
 	menu->items[12].d.gem.state = MI_GSTATE_CHECKED;
-#endif
+    }
 
-    if (OriginalFogOfWar)
+    if (OriginalFogOfWar) {
 	menu->items[15].d.gem.state = MI_GSTATE_CHECKED;
-    else
+    } else {
 	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
+    }
 }
 
 local void SetRes640(Menuitem *mi __attribute__((unused)))
 {
-    Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
-
-    flags = Screen->flags;
-#endif
-    menu = FindMenu("menu-global-options");
-    HideAnyCursor();
-
     if (VideoWidth != 640) {
 	VideoWidth=640;
 	VideoHeight=480;
 	InitVideo();
-#ifdef USE_SDL
-	if (flags & SDL_FULLSCREEN)
-	    ToggleFullScreen();
-#endif
-        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-        LoadCcl();
-        EndMenu();
-        GlobalOptions();
+	DestroyCursorBackground();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	LoadCcl();
     }
+    InitGlobalOptions(NULL);
 }
 
 local void SetRes800(Menuitem *mi __attribute__((unused)))
 {
-    Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
-
-    flags = Screen->flags;
-#endif
-    menu = FindMenu("menu-global-options");
-    HideAnyCursor();
-    
     if (VideoWidth != 800) {
 	VideoWidth=800;
 	VideoHeight=600;
 	InitVideo();
-#ifdef USE_SDL
-        if (flags & SDL_FULLSCREEN)
-	    ToggleFullScreen();
-#endif
-        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	DestroyCursorBackground();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	LoadCcl();
-        EndMenu();
-        GlobalOptions();
     }
+    InitGlobalOptions(NULL);
 }
 
 local void SetRes1024(Menuitem *mi __attribute__((unused)))
 {
-    Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
-
-    flags = Screen->flags;
-#endif
-    menu = FindMenu("menu-global-options");
-    HideAnyCursor();
-
     if (VideoWidth != 1024) {
 	VideoWidth=1024;
 	VideoHeight=768;
 	InitVideo();
-#ifdef USE_SDL
-        if (flags & SDL_FULLSCREEN)
-	    ToggleFullScreen();
-#endif
-        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	DestroyCursorBackground();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
 	LoadCcl();
-        EndMenu();
-        GlobalOptions();
     }
+    InitGlobalOptions(NULL);
 }
 
 local void SetRes1280(Menuitem *mi __attribute__((unused)))
 {
-    Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
-
-    flags = Screen->flags;
-#endif
-    menu = FindMenu("menu-global-options");    
-    HideAnyCursor();
-
     if (VideoWidth != 1280) {
 	VideoWidth=1280;
 	VideoHeight=960;
 	InitVideo();
-#ifdef USE_SDL
-        if (flags & SDL_FULLSCREEN)
-	    ToggleFullScreen();
-#endif
-        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-        LoadCcl();
-        EndMenu();
-        GlobalOptions();
+	DestroyCursorBackground();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	LoadCcl();
     }
+    InitGlobalOptions(NULL);
 }
 
 local void SetRes1600(Menuitem *mi __attribute__((unused)))
 {
-    Menu *menu;
-#ifdef USE_SDL
-    Uint32 flags;
-    extern SDL_Surface *Screen;
-
-    flags = Screen->flags;
-#endif
-    menu = FindMenu("menu-global-options");
-    HideAnyCursor();
-
     if (VideoWidth != 1600) {
 	VideoWidth=1600;
 	VideoHeight=1200;
 	InitVideo();
-#ifdef USE_SDL
-        if (flags & SDL_FULLSCREEN)
-	    ToggleFullScreen();
-#endif
-        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-        LoadCcl();
-        EndMenu();
-        GlobalOptions();
+	DestroyCursorBackground();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	LoadCcl();
     }
+    InitGlobalOptions(NULL);
 }
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
     ToggleFullScreen();
-    EndMenu();
-    GlobalOptions();
+    InitGlobalOptions(NULL);
 }
 
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=1;
-    EndMenu();
-    GlobalOptions();
+    InitGlobalOptions(NULL);
 }
 
 local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=0;
-    EndMenu();
-    GlobalOptions();
+    InitGlobalOptions(NULL);
 }
 
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
@@ -3521,14 +3438,14 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
     MenusSetBackground();
     SetDefaultTextColors(rc, rc);
     l = VideoTextLength(GameFont, "Scenario:");
-    VideoDrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
-    VideoDrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
+    VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
+    VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360+24 , GameFont, ScenSelectFileName);
     if (ScenSelectPudInfo) {
 	if (ScenSelectPudInfo->Description) {
-	    VideoDrawText(OffsetX + 16 + l + 8, OffsetY + 360, GameFont, ScenSelectPudInfo->Description);
+	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, ScenSelectPudInfo->Description);
 	}
 	sprintf(buffer, " (%d x %d)", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-	VideoDrawText(OffsetX + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
+	VideoDrawText(TheUI.Offset640X + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360+24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < PlayerMax; j++) {
@@ -4087,7 +4004,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
     DebugLevel3Fn("Hosts[%d].PlyName = %s\n" _C_ i _C_ Hosts[i].PlyName);
-    VideoDrawText(OffsetX+mi->xofs, OffsetY+mi->yofs, GameFont, Hosts[i].PlyName);
+    VideoDrawText(TheUI.Offset640X+mi->xofs, TheUI.Offset480Y+mi->yofs, GameFont, Hosts[i].PlyName);
 
     SetDefaultTextColors(nc, rc);
 }
@@ -5011,24 +4928,27 @@ local void EditorEndMenu(void)
 **	Move buttons so they're centered on different resolutions
 */
 #ifdef OLD_MENU
-local void MoveButtons(void)
+local void CenterMenus(void)
 {
-    int menus = sizeof(Menus) / sizeof(Menu);
+    int menus;
     int i;
+    int oldOffsetX;
+    int oldOffsetY;
 
-    OffsetX = (VideoWidth - 640) / 2;
-    OffsetY = (VideoHeight - 480) / 2;
+    oldOffsetX = TheUI.Offset640X;
+    oldOffsetY = TheUI.Offset480Y;
+    TheUI.Offset640X = (VideoWidth - 640) / 2;
+    TheUI.Offset480Y = (VideoHeight - 480) / 2;
 
-    for (i=0; i<menus; i++) {
-	Menus[i].x += OffsetX;
-	Menus[i].y += OffsetY;
+    if (TheUI.Offset640X == 0 && oldOffsetX == 0) {
+	return;
     }
-}
-#else
-local void MoveButtons(void)
-{
-    OffsetX = (VideoWidth - 640) / 2;
-    OffsetY = (VideoHeight - 480) / 2;
+
+    menus = sizeof(Menus) / sizeof(Menu);
+    for (i=0; i<menus; i++) {
+	Menus[i].x += TheUI.Offset640X - oldOffsetX;
+	Menus[i].y += TheUI.Offset480Y - oldOffsetY;
+    }
 }
 #endif
 
@@ -5049,9 +4969,9 @@ global void InitMenuData(void)
     menu->items[2].d.text.text = NetTriesText;
     InitNetMultiButtonStorage();
 
-    if (VideoWidth != 640) {
-	MoveButtons();
-    }
+#ifdef OLD_MENU
+    CenterMenus();
+#endif
 }
 
 /**
