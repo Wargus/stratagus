@@ -441,7 +441,7 @@ Use it at your own risk.\n\n");
     //
 #ifdef NEW_NAMES
     LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath,
-	    "/graphics/tilesets/summer/summer.rgb"));
+		  strdcat("/",Tilesets[TilesetSummer].PaletteFile)));
 #else
     LoadRGB(GlobalPalette, s=strdcat(FreeCraftLibPath, "/summer.rgb"));
 #endif
