@@ -770,6 +770,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 #endif
 	//target->TTL=GameCycle+target->Type->DecayRate*6*CYCLES_PER_SECOND;
 	CheckUnitToBeDrawn(target);
+	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
 	break;
 
     case SpellActionHealing:
