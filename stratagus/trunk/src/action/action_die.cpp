@@ -45,12 +45,11 @@
 */
 global int HandleActionDie(Unit* unit)
 {
-    if ( unit->Revealer )
-    {
-    unit->HP--;
-    if( unit->HP == 0 )
-      ReleaseUnit(unit);
-    return 0;
+    if ( unit->Revealer ) {
+	if( !--unit->HP ) {
+	    ReleaseUnit(unit);
+	}
+	return 0;
     }
 
     //
@@ -84,7 +83,7 @@ global int HandleActionDie(Unit* unit)
 	    }
 	);
 	unit->Orders[0].Action=UnitActionDie;
-	--unit->OrderCount;
+	--unit->OrderCount;		// remove the stop command
 #else
 	unit->Command.Action=UnitActionDie;
 	if( unit->NextCount ) {
