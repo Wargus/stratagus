@@ -48,7 +48,7 @@
 /**
 **	My user data for mad callbacks.
 */
-typedef struct _my_user_ {
+typedef struct _mad_user_ {
     CLFile* File;			// File handle
     Sample* Sample;			// Sample buffer
     unsigned char Buffer[4096];		// Decoded buffer
@@ -102,6 +102,8 @@ local enum mad_flow MAD_read(void *user, struct mad_stream *stream)
 **	callback is to output the decoded PCM audio.
 **
 **	@param user	User argument.
+**	@param header	MAD header.
+**	@param pcm	MAD pcm data struture.
 */
 local enum mad_flow MAD_write(void *user,
     struct mad_header const *header __attribute__((unused)),
