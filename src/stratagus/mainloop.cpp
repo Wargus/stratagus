@@ -199,84 +199,154 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
 */
 global void DebugTestDisplay(void)
 {
-  static int a=0;
-  extern void DebugTestDisplayLines(void);
+    static int a = 0;
+    extern void DebugTestDisplayLines(void);
 
-  if ( a )
-    return;
-  a=1;
+    if (a) {
+	return;
+    }
+    a = 1;
 
-  //Enable one function-call as type of test to show one time
-  DebugTestDisplayLines();
-  //DebugTestDisplayVarious();
-  //DebugTestDisplayColorCube();
+    //Enable one function-call as type of test to show one time
+    DebugTestDisplayLines();
+    //DebugTestDisplayVarious();
+    //DebugTestDisplayColorCube();
 
-  // put it all on screen (when it is not already there ;)
-  InvalidateArea(0,0,VideoWidth,VideoHeight);
+    // put it all on screen (when it is not already there ;)
+    InvalidateArea(0, 0, VideoWidth, VideoHeight);
 }
 
 #endif	// } DEBUG
+
+/**
+**	Draw menu button area.
+*/
+local void DrawMenuButtonArea(void)
+{
+    VideoDrawSub(TheUI.MenuButton.Graphic,0,0
+	    ,TheUI.MenuButton.Graphic->Width
+	    ,TheUI.MenuButton.Graphic->Height
+	    ,TheUI.MenuButtonX,TheUI.MenuButtonY);
+
+    DrawMenuButton(MBUTTON_MAIN,
+	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
+	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+	    128, 19,
+	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
+	    GameFont,"Menu (~<F10~>)");
+
+#ifdef DEBUG
+    //
+    //	Draw line for frame speed.
+    //
+    { int f;
+
+    f=168*(NextFrameTicks-GetTicks());
+    if( VideoSyncSpeed ) {
+	f/=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
+    }
+    if( f<0 || f>168 ) {
+	f=168;
+    }
+    if( f ) {
+	VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
+    }
+    if( 168-f ) {
+	VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
+    }
+    }
+    //
+    //	Draw line for network speed.
+    //
+    {
+    int i;
+    int f;
+
+    if( NetworkLag ) {
+	for( i=0; i<PlayerMax; ++i ) {
+	    f=16-(16*(NetworkStatus[i]-GameCycle))/(NetworkLag*2);
+	    if( f<0 || f>16 ) {
+		f=16;
+	    }
+	    if( f ) {
+		VideoDrawHLine(ColorRed,
+		    TheUI.MenuButtonX,TheUI.MenuButtonY+1+i,f);
+	    }
+	    if( 16-f ) {
+		VideoDrawHLine(ColorGreen,
+			TheUI.MenuButtonX+f,TheUI.MenuButtonY+1+i,16-f);
+	    }
+	}
+    }
+    }
+#endif
+}
+
+/**
+**	Draw map area
+*/
+local void DrawMapArea(void)
+{
+#ifdef NEW_DECODRAW
+    // Experimental new drawing mechanism, which can keep track of what is
+    // overlapping and draw only that what has changed..
+    // Every to-be-drawn item added to this mechanism, can be handed by this
+    // call.
+    if (InterfaceState == IfaceStateNormal) {
+      // DecorationRefreshDisplay();
+      DecorationUpdateDisplay();
+    }
+
+#else
+    if (InterfaceState == IfaceStateNormal) {
+#ifdef NEW_MAPDRAW
+	MapUpdateFogOfWar(MapX,MapY);
+#else
+	unsigned u;
+
+	// FIXME: only needed until flags are correct set
+	for( u=0; u<MapHeight; ++u ) {
+	    MustRedrawRow[u]=1;
+	}
+	for( u=0; u<MapHeight*MapWidth; ++u ) {
+	    MustRedrawTile[u]=1;
+	}
+#endif
+
+	SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
+
+	DrawMapBackground(MapX,MapY);
+	DrawUnits();
+	DrawMapFogOfWar(MapX,MapY);
+	DrawMissiles();
+	DrawConsole();
+	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+    }
+
+    // Resources over map!
+    // FIXME: trick17! must find a better solution
+    // FIXME: must take resource end into account
+    if( TheUI.MapX<=TheUI.ResourceX && TheUI.MapEndX>=TheUI.ResourceX
+	    && TheUI.MapY<=TheUI.ResourceY && TheUI.MapEndY>=TheUI.ResourceY ) {
+	MustRedraw|=RedrawResources;
+    }
+#endif
+}
 
 /**
 **	Display update.
 */
 global void UpdateDisplay(void)
 {
-#if 0
-    if (!MustRedraw) {
-	return;
-    }
-#endif
+    MustRedraw&=EnableRedraw;		// Don't redraw disabled parts
 
     VideoLockScreen();			// prepare video write
 
     HideAnyCursor();			// remove cursor (when available)
 
-#ifdef NEW_DECODRAW
-// Experimental new drawing mechanism, which can keep track of what is
-// overlapping and draw only that what has changed..
-// Every to-be-drawn item added to this mechanism, can be handed by this call.
     if( MustRedraw&RedrawMap ) {
-	if (InterfaceState == IfaceStateNormal) {
-          // DecorationRefreshDisplay();
-          DecorationUpdateDisplay();
-	}
+	DrawMapArea();
     }
-
-#else
-    if( MustRedraw&RedrawMap ) {
-	if (InterfaceState == IfaceStateNormal) {
-#ifdef NEW_MAPDRAW
-	    MapUpdateFogOfWar(MapX,MapY);
-#else
-	    unsigned u;
-
-	    // FIXME: only needed until flags are correct set
-	    for( u=0; u<MapHeight; ++u ) {
-		MustRedrawRow[u]=1;
-	    }
-	    for( u=0; u<MapHeight*MapWidth; ++u ) {
-		MustRedrawTile[u]=1;
-	    }
-#endif
-
-	    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
-
-	    DrawMapBackground(MapX,MapY);
-	    DrawUnits();
-	    DrawMapFogOfWar(MapX,MapY);
-	    DrawMissiles();
-	    DrawConsole();
-	    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-	}
-
-	// FIXME: trick17! must find a better solution
-	// Resources over map!
-	if( TheUI.MapX<=TheUI.ResourceX && TheUI.MapEndX>=TheUI.ResourceX ) {
-	    MustRedraw|=RedrawResources;
-	}
-    }
-#endif
 
     if( MustRedraw&(RedrawMessage|RedrawMap) ) {
 	DrawMessage();
@@ -289,63 +359,7 @@ global void UpdateDisplay(void)
     }
 
     if( MustRedraw&RedrawMenuButton ) {
-	VideoDrawSub(TheUI.MenuButton.Graphic,0,0
-		,TheUI.MenuButton.Graphic->Width
-		,TheUI.MenuButton.Graphic->Height
-		,TheUI.MenuButtonX,TheUI.MenuButtonY);
-
-	DrawMenuButton(MBUTTON_MAIN, (ButtonUnderCursor == 0
-		? MenuButtonActive : 0)|
-		(GameMenuButtonClicked ? MenuButtonClicked : 0),
-		128, 19,
-		TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-		GameFont,"Menu (~<F10~>)");
-
-#ifdef DEBUG
-	//
-	//	Draw line for frame speed.
-	//
-	{ int f;
-
-	f=168*(NextFrameTicks-GetTicks());
-	if( VideoSyncSpeed ) {
-	    f/=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
-	}
-	if( f<0 || f>168 ) {
-	    f=168;
-	}
-	if( f ) {
-	    VideoDrawHLine(ColorGreen,TheUI.MenuButtonX,TheUI.MenuButtonY,f);
-	}
-	if( 168-f ) {
-	    VideoDrawHLine(ColorRed,TheUI.MenuButtonX+f,TheUI.MenuButtonY,168-f);
-	}
-	}
-	//
-	//	Draw line for network speed.
-	//
-	{
-	int i;
-	int f;
-
-	if( NetworkLag ) {
-	    for( i=0; i<PlayerMax; ++i ) {
-		f=16-(16*(NetworkStatus[i]-GameCycle))/(NetworkLag*2);
-		if( f<0 || f>16 ) {
-		    f=16;
-		}
-		if( f ) {
-		    VideoDrawHLine(ColorRed,
-			TheUI.MenuButtonX,TheUI.MenuButtonY+1+i,f);
-		}
-		if( 16-f ) {
-		    VideoDrawHLine(ColorGreen,
-			    TheUI.MenuButtonX+f,TheUI.MenuButtonY+1+i,16-f);
-		}
-	    }
-	}
-	}
-#endif
+	DrawMenuButtonArea();
     }
     if( MustRedraw&RedrawMinimapBorder ) {
 	VideoDrawSub(TheUI.Minimap.Graphic,0,0
@@ -355,7 +369,6 @@ global void UpdateDisplay(void)
 
     PlayerPixels(Players);		// Reset to default colors
 
-#if 1
     if( MustRedraw&RedrawMinimap ) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
@@ -365,7 +378,6 @@ global void UpdateDisplay(void)
 	HideMinimapCursor();
 	DrawMinimapCursor(MapX,MapY);
     }
-#endif
 
     if( MustRedraw&RedrawInfoPanel ) {
 	DrawInfoPanel();
@@ -397,7 +409,7 @@ global void UpdateDisplay(void)
     //
     //	Update changes to X11.
     //
-    if( MustRedraw==-1 ) {
+    if( MustRedraw&RedrawAll ) {
 	// refresh entire screen, so no further invalidate needed
 	InvalidateAreaAndCheckCursor(0,0,VideoWidth,VideoHeight);
     } else {
@@ -462,7 +474,6 @@ global void UpdateDisplay(void)
 /**
 **      Enable everything to be drawn for next display update.
 **      Used at start of mainloop (and possible refresh as user option)
-**
 */
 local void EnableDrawRefresh(void)
 {
@@ -579,7 +590,7 @@ global void GameMainLoop(void)
 	    ColorCycle();
 	}
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(FLAG_DEBUG)
 	MustRedraw|=RedrawMenuButton;
 #endif
 
