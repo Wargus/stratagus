@@ -491,7 +491,7 @@ static void UpdateButtonPanelMultipleUnits(void)
 			}
 
 			// is button allowed after all?
-			if (allow) {
+			if (allow && _current_buttons[UnitButtonTable[z]->Pos - 1].Pos == -1) {
 				_current_buttons[UnitButtonTable[z]->Pos - 1] =
 					*UnitButtonTable[z];
 			}
@@ -609,12 +609,24 @@ void UpdateButtonPanel(void)
 				case ButtonMove:
 				case ButtonStop:
 				case ButtonRepair:
-				case ButtonHarvest:
 				case ButtonButton:
 				case ButtonPatrol:
 				case ButtonStandGround:
-				case ButtonReturn:
 					allow = 1;
+					break;
+				case ButtonHarvest:
+					if (!unit->CurrentResource ||
+							(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
+								unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
+						allow = 1;
+					}
+					break;
+				case ButtonReturn:
+					if (!(!unit->CurrentResource ||
+							(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
+								unit->Type->ResInfo[unit->CurrentResource]->LoseResources))) {
+						allow = 1;
+					}
 					break;
 				case ButtonAttack:
 					allow = ButtonCheckAttack(unit, buttonaction);
@@ -670,7 +682,7 @@ void UpdateButtonPanel(void)
 		}
 
 		// is button allowed after all?
-		if (allow) {
+		if (allow && _current_buttons[pos - 1].Pos == -1) {
 			_current_buttons[pos - 1] = (*buttonaction);
 		}
 	}
