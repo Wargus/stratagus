@@ -801,9 +801,9 @@ global unsigned long NetResolveHost(const char* host)
 		addr=0;
 		DebugCheck( he->h_length!=4 );
 		memcpy(&addr,he->h_addr,he->h_length);
-		return addr;
 	    }
 	}
+	return addr;
     }
     return INADDR_NONE;
 }
@@ -1146,6 +1146,7 @@ global void InitNetwork(void)
 	    }
 	    if( host==INADDR_NONE ) {
 		fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
+		exit(-1);
 	    }
 	    DebugLevel0(__FUNCTION__": Server %ld:%d\n",host,ntohs(port));
 
