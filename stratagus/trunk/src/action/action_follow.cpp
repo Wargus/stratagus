@@ -68,11 +68,11 @@ global void HandleActionFollow(Unit* unit)
 	if( goal->Destroyed || !goal->HP
 		|| goal->Orders[0].Action==UnitActionDie ) {
 	    DebugLevel0Fn("Goal dead\n");
-	    unit->Orders[0].Goal=NoUnitP;
 	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs && goal->Destroyed ) {
 		ReleaseUnit(goal);
 	    }
+	    unit->Orders[0].Goal=NoUnitP;
 	    unit->Wait=1;
 	    unit->SubAction=0;
 	    unit->Orders[0].Action=UnitActionStill;
@@ -147,7 +147,8 @@ global void HandleActionFollow(Unit* unit)
 	//		better goal if moving nearer to enemy.
 	//
 	if( unit->Type->CanAttack && !unit->Type->Tower
-		&& goal->Orders[0].Action==UnitActionAttack ) {
+		&& (goal->Orders[0].Action==UnitActionAttack
+		    || goal->Orders[0].Action==UnitActionStill) ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
 		Order order;
@@ -164,6 +165,14 @@ global void HandleActionFollow(Unit* unit)
 		unit->Orders[0].Action=UnitActionStill;
 		unit->SubAction=0;
 		unit->Wait=1;
+		if( unit->Orders[0].Goal ) {
+		    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
+		    if( !--unit->Orders[0].Goal->Refs ) {
+			DebugCheck( !unit->Orders[0].Goal->Destroyed );
+			ReleaseUnit(unit->Orders[0].Goal);
+		    }
+		    unit->Orders[0].Goal=NoUnitP;
+		}
 	    }
 	}
     }
