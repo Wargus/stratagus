@@ -1354,6 +1354,10 @@ global void UIHandleButtonDown(unsigned button)
 				,!(KeyModifiers&ModifierShift));
 		    }
 		}
+		else if( NumSelected==1 && Selected[0]->Type->Building &&
+		         Selected[0]->Orders[0].Action==UnitActionTrain ) {
+		    SendCommandCancelTraining(Selected[0],ButtonUnderCursor-4);
+		}
 	    } else if( ButtonUnderCursor>9 ) {
 		DoButtonButtonClicked(ButtonUnderCursor-10);
 	    }
