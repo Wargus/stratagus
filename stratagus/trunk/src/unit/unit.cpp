@@ -389,31 +389,35 @@ void InitUnit(Unit* unit, UnitType* type)
 }
 
 /**
-** FIXME: Docu
+**  FIXME: Docu
+**
+**  @param unit    unit assigned to player.
+**  @param player  player which have the unit.
+**
+**  @todo FIXME DOCU.
 */
 void AssignUnitToPlayer(Unit* unit, Player* player)
 {
-	UnitType* type;
+	UnitType* type;  // type of unit.
 
+	Assert(player);
 	type = unit->Type;
 
 	//
 	// Build player unit table
 	//
-	if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
+	if (!type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 		unit->PlayerSlot = player->Units + player->TotalNumUnits++;
 		if (!SaveGameLoading) {
-			if (type->_HitPoints != 0) {
-				// If unit is dieing, it's already been lost by all players
-				// don't count again
-				if (type->Building && unit->Orders[0].Action != UnitActionDie) {
-					// FIXME: support more races
-					if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
-						player->TotalBuildings++;
-					}
-				} else if (unit->Orders[0].Action != UnitActionDie) {
-					player->TotalUnits++;
+			// If unit is dieing, it's already been lost by all players
+			// don't count again
+			if (type->Building) {
+				// FIXME: support more races
+				if (type != UnitTypeOrcWall && type != UnitTypeHumanWall) {
+					player->TotalBuildings++;
 				}
+			} else {
+				player->TotalUnits++;
 			}
 		}
 		*unit->PlayerSlot = unit;
@@ -431,7 +435,6 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 			player->NumBuildings++;
 		}
 	}
-
 	unit->Player = player;
 	unit->Stats = &type->Stats[unit->Player->Player];
 	unit->Colors = &player->UnitColors;
@@ -627,7 +630,7 @@ static void MarkUnitFieldFlags(const Unit* unit)
 	}
 #ifdef MAP_REGIONS
 	// Update map splitting.
-	if (type->Building && (flags &
+	if (!CanMove(unit) && (flags &
 		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
 		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))) {
 		MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
@@ -661,7 +664,7 @@ static void UnmarkUnitFieldFlags(const Unit* unit)
 	}
 #ifdef MAP_REGIONS
 	// Update map splitting.
-	if (type->Building && (flags &
+	if (!CanMove(unit) && (flags &
 		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
 		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
 		MapSplitterTilesCleared(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
@@ -1219,10 +1222,6 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 	n = UnitCacheOnTile(x, y, units);
 	while (n) {
 		unit = units[--n];
-		if ((unit->X > x || unit->X + unit->Type->TileWidth - 1 < x ||
-				unit->Y > y || unit->Y + unit->Type->TileHeight - 1 < y)) {
-			DebugPrint("Wrong cache %d %d -> %d %d\n" _C_ x _C_ y _C_ unit->X _C_ unit->Y);
-		}
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
 			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
 		if (cloak != (int)unit->Type->PermanentCloak) {
@@ -3153,7 +3152,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	// Attack units in range (which or the attacker?)
 	//
 	if (attacker && !type->Coward) {
-		if (type->CanAttack && !target->Type->Building) {
+		if (type->CanAttack) {
 			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
 				// Reveal Unit that is attacking
 				goal = attacker;
@@ -3176,7 +3175,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	//
 	// FIXME: Can't attack run away.
 	//
-	if (!type->Building) {
+	if (CanMove(target)) {
 		int x;
 		int y;
 		int d;
@@ -3411,7 +3410,7 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 {
 	int i;
 
-	if (!transporter->Type->CanTransport || unit->Type->Building) {
+	if (!transporter->Type->CanTransport) {
 		return 0;
 	}
 	if (transporter->BoardCount >= transporter->Type->MaxOnBoard) { // full

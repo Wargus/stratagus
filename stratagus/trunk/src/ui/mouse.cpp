@@ -104,35 +104,26 @@ void CancelBuildingMode(void)
 */
 void DoRightButton(int sx, int sy)
 {
-	int i;
-	int x;
-	int y;
-	Unit* dest;
-	Unit* unit;
-	Unit* desttransporter;
-	UnitType* type;
-	int action;
-	int acknowledged;
-	int flush;
-	int res;
-	int spellnum;
+	int i;                  // iterator for selected units.
+	int x;                  // coordonate in tile.
+	int y;                  // coordonate in tile.
+	Unit* dest;             // unit under the cursor if any.
+	Unit* unit;             // one of the selected unit.
+	Unit* desttransporter;  // dest if it could transport any unit.
+	UnitType* type;         // type of unit.
+	int action;             // default action for unit.
+	int acknowledged;       // to play sound
+	int flush;              // append command to old command.
+	int res;                // resource id for harvester.
+	int spellnum;           // spell id for spell cast
 
 	// No unit selected
 	if (!NumSelected) {
 		return;
 	}
 
-	//
-	//  Unit selected isn't owned by the player.
-	//  You can't select your own units + foreign unit(s).
-	//
-	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
-		return;
-	}
-
 	x = sx / TileSizeX;
 	y = sy / TileSizeY;
-	desttransporter = NoUnitP;
 
 	//
 	//  Right mouse with SHIFT appends command to old commands.
@@ -145,6 +136,30 @@ void DoRightButton(int sx, int sy)
 		dest = NULL;
 	}
 
+	//
+	//  Unit selected isn't owned by the player.
+	//  You can't select your own units + foreign unit(s)
+	//  except if it is neutral and it is a resource.
+	//
+	if (!CanSelectMultipleUnits(Selected[0]->Player)) {
+		unit = Selected[0];
+		if (unit->Player->Player != PlayerNumNeutral || dest == NULL) {
+			return ;
+		}
+		// tell to go and harvest from a unit
+		if (dest->Type->Harvester &&
+				(res = unit->Type->GivesResource) &&
+				dest->Type->ResInfo[res] &&
+				dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity &&
+				unit->Type->CanHarvest) {
+			unit->Blink = 4;
+			SendCommandResource(dest, unit, flush);
+			return;
+		}
+		return;
+	}
+
+	desttransporter = NoUnitP;
 	if (dest && dest->Type->CanTransport) {
 		for (i = 0; i < NumSelected; i++) {
 			if (CanTransport(dest, Selected[i])) {
@@ -184,7 +199,7 @@ void DoRightButton(int sx, int sy)
 		//
 		//  Control + right click on unit is follow anything.
 		//
-		if ((KeyModifiers & ModifierControl) && dest && dest!=unit) {
+		if ((KeyModifiers & ModifierControl) && dest && dest != unit) {
 			dest->Blink = 4;
 			SendCommandFollow(unit, dest, flush);
 			continue;
@@ -197,9 +212,8 @@ void DoRightButton(int sx, int sy)
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			// Let the transporter move to the unit. And QUEUE!!!
-			// Don't do it for buildings.
-			if (!dest->Type->Building) {
-				DebugPrint("Send command follow");
+			if (CanMove(dest)) {
+				DebugPrint("Send command follow\n");
 				SendCommandFollow(dest, unit, 0);
 			}
 			SendCommandBoard(unit, -1, -1, dest, flush);
@@ -210,7 +224,7 @@ void DoRightButton(int sx, int sy)
 		//  Handle resource workers.
 		//
 		if (action == MouseActionHarvest) {
-			if (unit->Type->Harvester) {
+			if (type->Harvester) {
 				if (dest) {
 					// Return a loaded harvester to deposit
 					if (unit->ResourcesHeld > 0 &&
@@ -220,10 +234,10 @@ void DoRightButton(int sx, int sy)
 						SendCommandReturnGoods(unit, dest, flush);
 						continue;
 					}
-					// Go and harvest from a building
+					// Go and harvest from a unit
 					if ((res = dest->Type->GivesResource) &&
-							unit->Type->ResInfo[res] &&
-							unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity &&
+							type->ResInfo[res] &&
+							unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity &&
 							dest->Type->CanHarvest &&
 							(dest->Player == unit->Player ||
 								(dest->Player->Player == PlayerNumNeutral))) {
@@ -234,12 +248,12 @@ void DoRightButton(int sx, int sy)
 				} else {
 					// FIXME: support harvesting more types of terrain.
 					for (res = 0; res < MaxCosts; ++res) {
-						if (unit->Type->ResInfo[res] &&
-								unit->Type->ResInfo[res]->TerrainHarvester &&
+						if (type->ResInfo[res] &&
+								type->ResInfo[res]->TerrainHarvester &&
 								IsMapFieldExplored(unit->Player, x, y) &&
 								ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
-									(unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity))) {
+									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
 							SendCommandResourceLoc(unit, x, y,flush);
 							break;
 						}
@@ -250,7 +264,7 @@ void DoRightButton(int sx, int sy)
 				}
 			}
 			// Go and repair
-			if (unit->Type->RepairRange && dest &&
+			if (type->RepairRange && dest &&
 					dest->Type->RepairHP &&
 					dest->HP < dest->Stats->HitPoints &&
 					(dest->Player == unit->Player || IsAllied(dest->Player, dest))) {
@@ -280,12 +294,12 @@ void DoRightButton(int sx, int sy)
 					if (action == MouseActionSpellCast) {
 						// This is for demolition squads and such
 						Assert(unit->Type->CanCastSpell);
-						for (spellnum = 0; !unit->Type->CanCastSpell[spellnum] &&
+						for (spellnum = 0; !type->CanCastSpell[spellnum] &&
 								spellnum < SpellTypeCount ; spellnum++) ;
 						Assert(spellnum != SpellTypeCount);
 						SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
 					} else {
-						if (CanTarget(unit->Type, dest->Type)) {
+						if (CanTarget(type, dest->Type)) {
 							SendCommandAttack(unit, x, y, dest, flush);
 						} else { // No valid target
 							SendCommandAttack(unit, x, y, NoUnitP, flush);
@@ -344,22 +358,44 @@ void DoRightButton(int sx, int sy)
 			continue;
 		}
 
-		//
-		//  Buildings
-		//
-		if (type->Building) {
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
+		// Manage harvester from the destination side.
+		if (dest && dest->Type->Harvester) {
+			// tell to return a loaded harvester to deposit
+			if (dest->ResourcesHeld > 0 &&
+					type->CanStore[dest->CurrentResource] &&
+					dest->Player == unit->Player) {
+				dest->Blink = 4;
+				SendCommandReturnGoods(dest, unit, flush);
+				continue;
+			}
+			// tell to go and harvest from a building
+			if ((res = type->GivesResource) &&
+					dest->Type->ResInfo[res] &&
+					dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity &&
+					type->CanHarvest &&
+					dest->Player == unit->Player) {
+				unit->Blink = 4;
+				SendCommandResource(dest, unit, flush);
+				continue;
+			}
+		}
+
+		// Manaage new order.
+		if (!CanMove(unit)) {
+			// Go and harvest from a unit
+			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest &&
+					(dest->Player == unit->Player || dest->Player->Player == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				continue;
 			}
+			// FIXME: support harvesting more types of terrain.
 			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
-				SendCommandResourceLoc(unit, x, y, flush);
-				continue;
+				SendCommandResourceLoc(unit, x, y,flush);
+				break;
 			}
-			SendCommandMove(unit, x, y, flush);
-			continue;
 		}
+
 		SendCommandMove(unit, x, y, flush);
 	}
 	ShowOrdersCount = GameCycle + ShowOrders * CYCLES_PER_SECOND;
@@ -465,7 +501,7 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->Building && !BigMapMode) {
+	if (NumSelected == 1 && !BigMapMode) {
 		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
 			if (Selected[0]->OrderCount == 1) {
 				if (OnButton(x, y, TheUI.SingleTrainingButton)) {
@@ -943,7 +979,7 @@ static int SendAttack(int sx, int sy)
 	y = sy / TileSizeY;
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
-		if (unit->Type->CanAttack || unit->Type->Building) {
+		if (unit->Type->CanAttack) {
 			if ((dest = UnitUnderCursor) && CanTarget(unit->Type, dest->Type)) {
 				dest->Blink = 4;
 			} else {
@@ -955,8 +991,10 @@ static int SendAttack(int sx, int sy)
 				ret = 1;
 			}
 		} else {
-			SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
-			ret = 1;
+			if (CanMove(unit)) {
+				SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
+				ret = 1;
+			}
 		}
 	}
 	return ret;
@@ -1069,7 +1107,7 @@ static int SendResource(int sx, int sy)
 				}
 			}
 		}
-		if (unit->Type->Building) {
+		if (!CanMove(unit)) {
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, !(KeyModifiers & ModifierShift));

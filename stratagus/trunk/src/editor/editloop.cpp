@@ -1200,11 +1200,10 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		if ((MouseButtons & RightButton && UnitUnderCursor)) {
 			if (UnitUnderCursor->Type->GivesResource) {
 				EditorEditResource();
-				return;
-			}
-			if (!UnitUnderCursor->Type->Building && UnitUnderCursor->HP > 0) {
+			} else {
 				EditorEditAiProperties();
 			}
+			return;
 		}
 	}
 

@@ -606,9 +606,9 @@ static void DrawUnitInfo(const Unit* unit)
 	x = TheUI.InfoPanelX;
 	y = TheUI.InfoPanelY;
 	//
-	//  Show progress for buildings only, if they are selected.
+	//  Show progress if they are selected.
 	//
-	if (type->Building && NumSelected == 1 && Selected[0] == unit) {
+	if (NumSelected == 1 && Selected[0] == unit) {
 		//
 		//  Building training units.
 		//
@@ -1283,11 +1283,10 @@ void DrawInfoPanel(void)
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
 					PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
 					ReplayRevealMap) {
-				if (Selected[0]->Type->Building &&
-						(Selected[0]->Orders[0].Action == UnitActionBuilded ||
-							Selected[0]->Orders[0].Action == UnitActionResearch ||
-							Selected[0]->Orders[0].Action == UnitActionUpgradeTo ||
-							Selected[0]->Orders[0].Action == UnitActionTrain)) {
+				if (Selected[0]->Orders[0].Action == UnitActionBuilded ||
+					Selected[0]->Orders[0].Action == UnitActionResearch ||
+					Selected[0]->Orders[0].Action == UnitActionUpgradeTo ||
+					Selected[0]->Orders[0].Action == UnitActionTrain) {
 					i = 3;
 				} else if (Selected[0]->Type->_MaxMana) {
 					i = 2;

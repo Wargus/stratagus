@@ -195,7 +195,7 @@ void DrawUnitSelection(const Unit* unit)
 				color = Players[i].Color;
 			}
 		}
-	} else if (CursorBuilding && unit->Type->Building && 
+	} else if (CursorBuilding && unit->Type->Building &&
 			unit->Orders[0].Action != UnitActionDie &&
 			(unit->Player == ThisPlayer ||
 				PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
@@ -1170,43 +1170,10 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 		Assert(unit);
 		type = unit->Type;
 	}
-	Assert(!unit || !type || unit->Type == type);
+	Assert(type);
+	Assert(!unit || unit->Type == type);
 
-	//
-	//  A building can be under construction and is drawn with construction
-	//  frames.
-	//
-	if (type->Building) {
-		// Draw normal shadow
-		if (type->ShadowSprite) {
-			// FIXME: this can be combined with the unit else part.
-			x -= (type->ShadowWidth -
-				type->TileWidth * TileSizeX) / 2;
-			y -= (type->ShadowHeight -
-				type->TileHeight * TileSizeY) / 2;
-			x += type->ShadowOffsetX;
-			y += type->ShadowOffsetY;
-			if (type->Flip) {
-				if (frame < 0) {
-					VideoDrawClipX(type->ShadowSprite, -frame - 1, x, y);
-				} else {
-					VideoDrawClip(type->ShadowSprite, frame, x, y);
-				}
-			} else {
-				int row;
-
-				row = type->NumDirections / 2 + 1;
-				if (frame < 0) {
-					frame = ((-frame - 1) / row) * type->NumDirections + type->NumDirections - (-frame - 1) % row;
-				} else {
-					frame = (frame / row) * type->NumDirections + frame % row;
-				}
-				VideoDrawClip(type->ShadowSprite, frame, x, y);
-			}
-		}
-		return;
-	}
-
+	// unit == NULL for the editor
 	if (unit && unit->Orders[0].Action == UnitActionDie) {
 		return;
 	}
@@ -1590,7 +1557,7 @@ void ShowOrder(const Unit* unit)
 		ShowSingleOrder(unit, x1, y1, unit->Orders + i);
 	}
 #endif
-	if (unit->Type->Building) {
+	if (!CanMove(unit)) {
 		ShowSingleOrder(unit, x1, y1, &unit->NewOrder);
 	}
 }

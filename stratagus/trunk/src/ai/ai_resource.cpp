@@ -153,10 +153,8 @@ static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 	// Count what we train.
 	//
 	for (queue = pai->UnitTypeBuilded; queue; queue = queue->Next) {
-		if (!queue->Type->Building) {
-			if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
-				return 0;
-			}
+		if ((remaining -= queue->Made * queue->Type->Demand) < 0) {
+			return 0;
 		}
 	}
 	return 1;
