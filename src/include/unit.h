@@ -667,7 +667,7 @@ extern int ViewPointDistanceToUnit(Unit* dest);
 extern int IsEnemy(const Player* player,const Unit* dest);
     /// Return true, if unit is allied with the player
 extern int IsAllied(const Player* player,const Unit* dest);
-    /// FIXME: more docu
+    /// Can this unit-type attack the other (destination).
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
