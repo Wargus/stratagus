@@ -48,32 +48,14 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-    /// FIXME: docu
-extern char MasterTempString[50];
-    /// FIXME: docu
-extern int PublicMasterAnnounce;
-    /// FIXME: docu
-extern unsigned long LastTimeAnnounced;
-    /// FIXME: docu
-extern int MasterPort;
-    /// FIXME: docu
-extern unsigned long MasterHost;
-    /// FIXME: docu
-extern char *MasterHostString;
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-    /// FIXME: docu
-extern int MasterInit(void);
-    /// FIXME: docu
-extern void MasterLoop(unsigned long ticks);
-    /// FIXME: docu
-extern void MasterSendAnnounce(void);
-    /// FIXME: docu
-extern void MasterProcessGetServerData(const char* msg, size_t length, unsigned long host, int port);
-
-//@}
+extern int MetaInit(void);
+extern int MetaClose(void);
+extern int MetaServerOK(char **reply);
+extern int SendMetaCommand(char* command, char* format, ...);
+extern int RecvMetaReply(char **reply);
 
 #endif	// !__MASTER_H__

@@ -769,8 +769,6 @@ global void InitMenuFuncHash(void) {
     HASHADD(ReplayGameCancel,"replay-game-cancel");
 
 // Metaserver
-    HASHADD(EnterMasterAction,"enter-master-action");
-    HASHADD(MultiGameMasterReport,"menu-multi-master-gem");
 }
 
 /*----------------------------------------------------------------------------
@@ -2764,10 +2762,6 @@ local void MultiScenSelectMenu(void)
     ScenSelectMenu();
     MultiGamePlayerSelectorsUpdate(1);
 
-    if (PublicMasterAnnounce) {
-	MasterSendAnnounce();
-    }
-
     menu->Items[6].flags = MI_DISABLED;
 }
 
@@ -3153,18 +3147,10 @@ local void CreateNetGameMenu(void)
     Menu *menu;
 
     menu = FindMenu("menu-multi-setup");
-    menu->Items[61].d.input.buffer = MasterTempString;
-    sprintf(MasterTempString, "%s:%d", MasterHostString, ntohs(MasterPort));
-    strcat(MasterTempString, "~!_");
-    menu->Items[61].d.input.nch = strlen(MasterTempString) - 3;
-    menu->Items[61].d.input.maxch = 49;
-    PublicMasterAnnounce = 0;
-    menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
 
     DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu("menu-multi-setup", 1);
-    PublicMasterAnnounce = 2;
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -7196,73 +7182,6 @@ global void InitMenuFunctions(void)
 	fclose(fd);
     }
 #endif
-}
-
-/**
-**	FIXME: docu
-*/
-local void MultiGameMasterReport(void)
-{
-    Menu *menu;
-    char *port;
-    char ch;
-
-    menu = FindMenu("menu-multi-setup");
-    if (menu->Items[61].d.input.nch == 0) {
-	PublicMasterAnnounce = 0;
-	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
-	return;
-    }
-
-    ch = MasterTempString[menu->Items[61].d.input.nch];
-    MasterTempString[menu->Items[61].d.input.nch] = '\0';
-    port = strchr(MasterTempString, ':');
-    if (port) {
-	*port = '\0';
-	++port;
-	if (MasterHostString) {
-	    free(MasterHostString);
-	}
-	MasterHostString = strdup(MasterTempString);
-	MasterHost = NetResolveHost(MasterHostString);
-	MasterPort = htons(atoi(port));
-	--port;
-	*port = ':';
-    } else {
-	if (MasterHostString) {
-	    free(MasterHostString);
-	}
-	MasterHostString = strdup(MasterTempString);
-	MasterHost = NetResolveHost(MasterHostString);
-	MasterPort = htons(MASTER_PORT);
-    }
-
-    if (PublicMasterAnnounce) {
-	PublicMasterAnnounce = 0;
-	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
-	// change behaviour here?
-	MasterSendAnnounce();
-    } else {
-	PublicMasterAnnounce = 1;
-	menu->Items[60].d.gem.state = MI_GSTATE_CHECKED;
-	MasterSendAnnounce();
-    }
-
-    MasterTempString[menu->Items[61].d.input.nch] = ch;
-}
-
-/**
-**	FIXME: docu
-*/
-local void EnterMasterAction(Menuitem *mi, int key)
-{
-    Menu *menu;
-
-    if (key == '\b' || (key >= ' ' && key <= 256)) {
-	menu = FindMenu("menu-multi-setup");
-	PublicMasterAnnounce = 0;
-	menu->Items[60].d.gem.state = MI_GSTATE_UNCHECKED;
-    }
 }
 
 //@}
