@@ -1372,7 +1372,6 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Unit* unit;
 
 				RemoveUnit(unit = UnitUnderCursor, NULL);
-				UnitCacheRemove(unit);
 				UnitLost(unit);
 				UnitClearOrders(unit);
 				ReleaseUnit(unit);
