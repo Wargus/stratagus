@@ -10,7 +10,7 @@
 //
 /**@name map.c		-	The map. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Vladi Shabanski
+//	(c) Copyright 1998-2003 by Lutz Sammer and Vladi Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -130,21 +130,25 @@ global void RevealMap(void)
     int ix;
     int iy;
 
-    for ( ix = 0; ix < TheMap.Width; ix++ ) {
-	for ( iy = 0; iy < TheMap.Height; iy++ ) {
+    for (ix = 0; ix < TheMap.Width; ++ix) {
+	for (iy = 0; iy < TheMap.Height; ++iy) {
 #ifdef NEW_FOW
-	    if (!TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]) {
-		TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]=1;
+	    int i;
+	    for (i = 0; i < PlayerMax; ++i) {
+		if (Players[i].Type != PlayerNobody
+			&& !TheMap.Fields[ix+iy*TheMap.Width].Visible[i]) {
+		    TheMap.Fields[ix+iy*TheMap.Width].Visible[i]=1;
+		}
 	    }
 #else
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags |= MapFieldExplored;
 
-	    if( TheMap.NoFogOfWar ) {
+	    if (TheMap.NoFogOfWar) {
 		TheMap.Visible[0][((iy)*TheMap.Width+(ix))/32] |= 
 			(1<<(((iy)*TheMap.Width+(ix))%32));
 	    }
 #endif
-	    MapMarkSeenTile(ix,iy);
+	    MapMarkSeenTile(ix, iy);
 	}
     }
 }
