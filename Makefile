@@ -233,7 +233,6 @@ tags:
 	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
 depend:
-	@$(MAKE) -C src RULESFILE=$(RULESFILE) depend
 
 ##############################################################################
 #	Distributions
