@@ -48,6 +48,7 @@
 #include "ui.h"
 #include "menus.h"
 #include "iolib.h"
+#include "unit.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -233,7 +234,8 @@ static void SaveViewports(CLFile* file, const UI* ui)
 	CLprintf(file, "DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
-		CLprintf(file, ",\n  \"viewport\", {%d, %d}", vp->MapX, vp->MapY);
+		CLprintf(file, ",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY, 
+			vp->Unit ? UnitNumber(vp->Unit) : -1);
 	}
 	CLprintf(file, ")\n\n");
 }

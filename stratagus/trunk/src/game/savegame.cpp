@@ -265,12 +265,12 @@ void SaveGame(const char* filename)
 	CLprintf(file, "SetGameCycle(%lu)\n", GameCycle);
 
 	SaveCcl(file);
-	SaveUserInterface(file);
 	SaveUnitTypes(file);
 	SaveUpgrades(file);
 	SavePlayers(file);
-	SaveMap(file);
 	SaveUnits(file);
+	SaveUserInterface(file);
+	SaveMap(file);
 	SaveAi(file);
 	SaveSelections(file);
 	SaveGroups(file);
