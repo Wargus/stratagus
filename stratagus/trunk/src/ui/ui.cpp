@@ -595,9 +595,9 @@ local void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 		TheUI.Viewports[i].Y = new_vps[i].Y;
 		TheUI.Viewports[i].EndY = new_vps[i].EndY;
 		TheUI.Viewports[i].MapWidth =
-			(new_vps[i].EndX - new_vps[i].X + TileSizeX) / TileSizeX;
+			(new_vps[i].EndX - new_vps[i].X + TileSizeX) / TileSizeX + 1;
 		TheUI.Viewports[i].MapHeight =
-			(new_vps[i].EndY - new_vps[i].Y + TileSizeY) / TileSizeY;
+			(new_vps[i].EndY - new_vps[i].Y + TileSizeY) / TileSizeY + 1;
 
 		if (TheUI.Viewports[i].MapWidth + TheUI.Viewports[i].MapX >
 			TheMap.Width) {
@@ -649,14 +649,12 @@ local void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 	if (vp->EndX > ClipX) {
 		vp->EndX = ClipX;
 	}
-	// then clip it to the nearest lower TileSize boundary if necessary
-	vp->EndX -= (vp->EndX - vp->X + 1) % TileSizeX;
 
 	// the same for y
 	if (vp->EndY > ClipY) {
 		vp->EndY = ClipY;
 	}
-	vp->EndY -= (vp->EndY - vp->Y + 1) % TileSizeY;
+
 }
 
 /**

@@ -723,7 +723,7 @@ global void UIHandleMouseMove(int x, int y)
 
 		TheUI.MouseWarpX = CursorStartX;
 		TheUI.MouseWarpY = CursorStartY;
-		ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
+		ViewportSetViewpoint(TheUI.MouseViewport, xo, yo, 0, 0);
 		return;
 	}
 
@@ -737,7 +737,7 @@ global void UIHandleMouseMove(int x, int y)
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
+			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
 
@@ -756,8 +756,8 @@ global void UIHandleMouseMove(int x, int y)
 		vp = TheUI.MouseViewport;
 		if (IsMapFieldExplored(ThisPlayer, Viewport2MapX(vp, x),
 				Viewport2MapY(vp, y)) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX,
-				y - vp->Y + vp->MapY * TileSizeY);
+			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
+				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
 		mx = ScreenMinimap2MapX(x);
@@ -794,7 +794,7 @@ global void UIHandleMouseMove(int x, int y)
 				//
 				ViewportCenterViewpoint(TheUI.SelectedViewport,
 					ScreenMinimap2MapX(CursorX),
-					ScreenMinimap2MapY(CursorY));
+					ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -824,7 +824,7 @@ global void UIHandleMouseMove(int x, int y)
 		//		Minimap move viewpoint
 		//
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
+			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
 		return;
@@ -1300,15 +1300,15 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 		UpdateButtonPanel();
 		MustRedraw |= RedrawButtonPanel | RedrawCursor;
 
-		sx = CursorX - vp->X + TileSizeX * vp->MapX;
-		sy = CursorY - vp->Y + TileSizeY * vp->MapY;
+		sx = CursorX - vp->X + TileSizeX * vp->MapX + vp->OffsetX;
+		sy = CursorY - vp->Y + TileSizeY * vp->MapY + vp->OffsetY;
 		if (MouseButtons & LeftButton) {
 			if (ClickMissile) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-					vp->MapX * TileSizeX+CursorX - vp->X,
-					vp->MapY * TileSizeY+CursorY - vp->Y,
-					vp->MapX * TileSizeX+CursorX - vp->X,
-					vp->MapY * TileSizeY+CursorY - vp->Y);
+					vp->MapX * TileSizeX+CursorX - vp->X + vp->OffsetX,
+					vp->MapY * TileSizeY+CursorY - vp->Y + vp->OffsetY,
+					vp->MapX * TileSizeX+CursorX - vp->X + vp->OffsetX,
+					vp->MapY * TileSizeY+CursorY - vp->Y + vp->OffsetY);
 			}
 			SendCommand(sx, sy);
 		}
@@ -1340,7 +1340,7 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 			}
 			SendCommand(sx, sy);
 		} else {
-			ViewportCenterViewpoint(TheUI.SelectedViewport, mx, my);
+			ViewportCenterViewpoint(TheUI.SelectedViewport, mx, my, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
 	}
@@ -1501,30 +1501,22 @@ global void UIHandleButtonDown(unsigned button)
 				int x;
 				int y;
 
-				x = CursorX - TheUI.MouseViewport->X +
-					TheUI.MouseViewport->MapX * TileSizeX;
-				y = CursorY - TheUI.MouseViewport->Y +
-					TheUI.MouseViewport->MapY * TileSizeY;
-				if (x >= TheMap.Width * TileSizeX) {		// Reduce to map limits
-					x = (TheMap.Width - 1) * TileSizeX;
-				}
-				if (y >= TheMap.Height * TileSizeY) {		// Reduce to map limits
-					y = (TheMap.Height - 1) * TileSizeY;
-				}
+				x = Viewport2MapX(TheUI.MouseViewport, CursorX);
+				y = Viewport2MapY(TheUI.MouseViewport, CursorY);
 
-				if (UnitUnderCursor && (unit = UnitOnMapTile(x / TileSizeX, y / TileSizeY)) &&
+				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
 					!UnitUnderCursor->Type->Decoration) {
 					unit->Blink = 4;		// if right click on building -- blink
 				} else {		// if not not click on building -- green cross
 					if (ClickMissile) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 							TheUI.MouseViewport->MapX * TileSizeX +
-								CursorX - TheUI.MouseViewport->X,
+								CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->OffsetX,
 							TheUI.MouseViewport->MapY * TileSizeY +
-								CursorY - TheUI.MouseViewport->Y, 0, 0);
+								CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->OffsetY, 0, 0);
 					}
 				}
-				DoRightButton(x, y);
+				DoRightButton(x * TileSizeX, y * TileSizeY);
 			}
 		}
 	//
@@ -1533,7 +1525,7 @@ global void UIHandleButtonDown(unsigned button)
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportCenterViewpoint(TheUI.SelectedViewport,
-				ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
+				ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				if (ClickMissile) {
@@ -1584,7 +1576,8 @@ global void UIHandleButtonDown(unsigned button)
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
-						Selected[0]->Y);
+						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2, 
+						Selected[0]->IY + TileSizeY / 2);
 				}
 			//
 			//		clicked on training button
@@ -1790,8 +1783,8 @@ global void UIHandleButtonUp(unsigned button)
 					Viewport2MapX(TheUI.MouseViewport, CursorX),
 					Viewport2MapY(TheUI.MouseViewport, CursorY)) || ReplayRevealMap) {
 				unit = UnitOnScreen(unit,
-					CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->MapX * TileSizeX,
-					CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->MapY * TileSizeY);
+					CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->MapX * TileSizeX + TheUI.MouseViewport->OffsetX,
+					CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->MapY * TileSizeY + TheUI.MouseViewport->OffsetY);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!

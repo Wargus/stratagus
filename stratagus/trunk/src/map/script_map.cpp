@@ -291,7 +291,7 @@ local int CclCenterMap(lua_State* l)
 		lua_error(l);
 	}
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
-		LuaToNumber(l, 1), LuaToNumber(l, 2));
+		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
 
 	return 0;
 }

@@ -929,7 +929,8 @@ global void CenterOnMessage(void)
 		return;
 	}
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
-		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex]);
+		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex],
+		TileSizeX / 2, TileSizeY / 2);
 	SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
 }
