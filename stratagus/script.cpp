@@ -907,13 +907,13 @@ global void SavePreferences(void)
     buf[0] = '\0';
     switch (CDMode) {
 	case CDModeAll:
-	    strcpy(buf, "all");
+	    strcpy(buf, "'all");
 	    break;
 	case CDModeRandom:
-	    strcpy(buf, "random");
+	    strcpy(buf, "'random");
 	    break;
 	case CDModeDefined:
-	    strcpy(buf, "defined");
+	    strcpy(buf, "'defined");
 	    break;
 	default:
 	    break;

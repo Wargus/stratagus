@@ -482,6 +482,14 @@ global void PlaySectionMusic(PlaySectionType section)
     j = 0;
     track = cd_current_track();
 
+    if (section == PlaySectionStats) {
+	if (GameResult == GameVictory) {
+	    section = PlaySectionStatsVictory;
+	} else {
+	    section = PlaySectionStatsDefeat;
+	}
+    }
+
     for (i = 0; i < NumPlaySections; ++i) {
 	if (PlaySections[i].Type == section && (!PlaySections[i].Race || 
 		!(strcmp(PlaySections[i].Race, ThisPlayer->RaceName)))) {
@@ -503,8 +511,9 @@ global void PlaySectionMusic(PlaySectionType section)
 	    } else if (PlaySections[i].CDOrder == PlaySectionOrderRandom) {
     		do {
 		    newtrack = MyRand() % NumCDTracks;
-		} while ( ((newtrack << j) & PlaySections[i].CDTracks) && 
-		    (cd_is_audio(CDTrack) < 1) );
+		    printf("%d\n", newtrack);
+		} while ( !((1 << newtrack) & PlaySections[i].CDTracks) || 
+		    (cd_is_audio(newtrack) < 1) );
 	    }
 	}
 	if (newtrack) {
