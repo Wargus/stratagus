@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include "FLAC/stream_decoder.h"
 
+#include "myendian.h"
 #include "iolib.h"
 #include "sound_server.h"
 
@@ -201,15 +202,15 @@ global Sample* LoadFlac(const char* name)
     MyUser user;
     CLFile* f;
     Sample* sample;
-    unsigned long magic;
+    unsigned long magic[1];
     FLAC__StreamDecoder* stream;
 
     if( !(f=CLopen(name)) ) {
 	fprintf(stderr,"Can't open file `%s'\n",name);
 	return NULL;
     }
-    CLread(f,&magic,sizeof(magic));
-    if( magic!=0x43614C66 ) {		// "fLaC" in ASCII
+    CLread(f,magic,sizeof(magic));
+    if( AccessLE32(magic)!=0x43614C66 ) {	// "fLaC" in ASCII
 	CLclose(f);
 	return NULL;
     }
