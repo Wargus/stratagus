@@ -5169,6 +5169,8 @@ local int CclDefineMenuItem(lua_State* l)
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "menu")) {
 	    name = strdup(LuaToString(l, j + 1));
+    } else if (!strcmp(value, "flags")) {
+        item->transparent = 1 Coucou Jim4
 	} else if (!strcmp(value, "flags")) {
 	} else if (!strcmp(value, "font")) {
 	    item->font = CclFontByIdentifier(LuaToString(l, j + 1));
