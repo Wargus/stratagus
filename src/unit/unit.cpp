@@ -295,6 +295,9 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Wait=1;
     unit->Reset=1;
     unit->Removed=1;
+#ifdef NEW_DECODRAW
+    unit->deco=NULL;
+#endif
 
     if( type->Submarine ) {
 	unit->Visible=0;		// Invisible as default
@@ -439,6 +442,11 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     }
 
     PlaceUnit(unit,x,y);
+
+#ifdef NEW_DECODRAW
+// FIXME: needed?
+//    CheckUnitToBeDrawn(unit);
+#endif
 
     return unit;
 }
@@ -1049,6 +1057,63 @@ global void GetUnitMapArea( const Unit* unit,
     *ey = *sy + unit->Type->TileHeight - !unit->IY;
 }
 
+
+#ifdef NEW_DECODRAW
+/**
+**	Decoration redraw function that will redraw an unit (no building) for
+**	set clip rectangle by decoration mechanism.
+**
+**	@param data  Unit* to be drawn
+*/
+local void unitdeco_draw( void *data )
+{
+  Unit *unit = (Unit *)data;
+
+  DebugCheck( unit->Removed );
+  DebugCheck( !UnitVisibleOnScreen(unit) );
+
+  DrawUnit( unit );
+}
+
+/**
+**	Decoration redraw function that will redraw a building for
+**	set clip rectangle by decoration mechanism.
+**
+**	@param data  Unit* to be drawn
+*/
+local void buildingdeco_draw( void *data )
+{
+  Unit *unit = (Unit *)data;
+
+  DebugCheck( unit->Removed );
+  DebugCheck( !UnitVisibleOnScreen(unit) );
+
+  DrawBuilding( unit );
+}
+
+/**
+**	Create decoration for any unit-type
+**
+**	@param u = an unit which is visible on screen
+**      @param x = x pixel position on screen of left-top
+**      @param y = y pixel position on screen of left-top
+**      @param w = width in pixels of area to be drawn from (x,y)
+**      @param h = height in pixels of area to be drawn from (x,y)
+*/
+local void AddUnitDeco( Unit *u, int x, int y, int w, int h )
+{
+  if ( u->Type->Building )
+    u->deco = DecorationAdd( u, buildingdeco_draw, LevBuilding, x, y, w, h );
+  else
+  {
+    if ( u->Type->UnitType==UnitTypeFly )
+      u->deco = DecorationAdd( u, unitdeco_draw, LevSkylow, x, y, w, h );
+    else
+      u->deco = DecorationAdd( u, unitdeco_draw, LevCarLow, x, y, w, h );
+  }
+}
+#endif
+
 /**
 **      Check and sets if unit must be drawn on screen-map
 **
@@ -1082,10 +1147,42 @@ global int CheckUnitToBeDrawn(const Unit * unit)
 	return 1;
     }
 #else
+#ifdef NEW_DECODRAW
+    if ( !unit->Removed && UnitVisibleOnScreen(unit) ) {
+        int x = Map2ScreenX(unit->X)+unit->IX;
+        int y = Map2ScreenY(unit->Y)+unit->IY;
+        int w = unit->Type->BoxWidth;
+        int h = unit->Type->BoxHeight;
+
+        if ( unit->deco )
+        {
+        // FIXME: its very expensive to remove+add a decoration to satify a
+        //        new location, a decoration update function should be added
+          Deco *d = unit->deco;
+          if ( d->x != x || d->y != y || d->w != w || d->h != h )
+          {
+            DecorationRemove( unit->deco );
+            AddUnitDeco( (Unit *)unit, x, y, w, h );
+          }
+          else DecorationMark( unit->deco );
+        }
+        else AddUnitDeco( (Unit *)unit, x, y, w, h );
+
+	return 1;
+    }
+    else if ( unit->deco )
+    {
+    // not longer visible: so remove from auto decoration redraw
+      Unit *u = (Unit *)unit;
+      DecorationRemove( unit->deco );
+      u->deco = NULL;
+    }
+#else
     if (UnitVisibleOnScreen(unit)) {
 	MustRedraw |= RedrawMap;
 	return 1;
     }
+#endif
 #endif
     return 0;
 }

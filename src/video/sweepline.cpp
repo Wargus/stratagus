@@ -349,10 +349,10 @@ void SweeplineInvalidate( int y )
   while ( sweepline_bottom_head &&
           sweepline_bottom_head->bottomyshadow <= y )
   {
-    InvalidateRectangle( sweepline_bottom_head->leftx,
-                         sweepline_bottom_head->topy,
-                         sweepline_bottom_head->rightx,
-                         sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
+    InvalidateArea( sweepline_bottom_head->leftx,
+                    sweepline_bottom_head->topy,
+                    sweepline_bottom_head->rightx,
+                    sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
     DeleteSRectangle( sweepline_bottom_head );
   }
 }
@@ -364,10 +364,10 @@ void SweeplineInvalidateAll( void )
 {
   while ( sweepline_bottom_head )
   {
-    InvalidateRectangle( sweepline_bottom_head->leftx,
-                         sweepline_bottom_head->topy,
-                         sweepline_bottom_head->rightx, 
-                         sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
+    InvalidateArea( sweepline_bottom_head->leftx,
+                    sweepline_bottom_head->topy,
+                    sweepline_bottom_head->rightx, 
+                    sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
     DeleteSRectangle( sweepline_bottom_head );
   }
 }

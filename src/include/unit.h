@@ -323,6 +323,10 @@ typedef struct _player_ Player;		// recursive includes :(
 #include "upgrade_structs.h"
 #include "upgrade.h"
 
+#ifdef NEW_DECODRAW
+#include "deco.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -549,12 +553,15 @@ struct _unit_ {
     int		GoalY;			/// Destination Y of pathfinder
 
 #ifdef HIERARCHIC_PATHFINDER
-
 #define UNIT_CLEAN		0	/// FIXME: comment missing
 #define UNIT_RETREATING		1	/// FIXME: comment missing
 #define UNIT_WINNING		2	/// FIXME: comment missing
     unsigned	Retreating:2;		/// FIXME: comment what is this?
 #endif	// HIERARCHIC_PATHFINDER
+
+#ifdef NEW_DECODRAW
+    Deco*  deco;           /// Decoration when visible on screen
+#endif
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
