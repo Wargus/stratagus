@@ -83,7 +83,6 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 */
 static void CleanUIGraphics(UI* ui)
 {
-	FreeGraphic(ui->InfoPanel.Graphic);
 	FreeGraphic(ui->ButtonPanel.Graphic);
 	FreeGraphic(ui->PieMenuBackground.Graphic);
 }
@@ -192,9 +191,8 @@ void LoadUserInterface(void)
 		}
 	}
 
-	if (TheUI.InfoPanel.File) {
-		TheUI.InfoPanel.Graphic = NewGraphic(TheUI.InfoPanel.File, 0, 0);
-		LoadGraphic(TheUI.InfoPanel.Graphic);
+	if (TheUI.InfoPanelG) {
+		LoadGraphic(TheUI.InfoPanelG);
 	}
 	if (TheUI.ButtonPanel.File) {
 		TheUI.ButtonPanel.Graphic = NewGraphic(TheUI.ButtonPanel.File, 0, 0);
@@ -290,7 +288,7 @@ void CleanUI(UI* ui)
 	}
 
 	// Info Panel
-	free(ui->InfoPanel.File);
+	FreeGraphic(ui->InfoPanelG);
 	free(ui->SingleSelectedButton);
 	free(ui->SingleSelectedText);
 	free(ui->SelectedButtons);
