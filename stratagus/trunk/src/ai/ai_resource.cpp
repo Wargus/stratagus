@@ -501,12 +501,10 @@ local void AiCheckingWork(void)
     UnitType* type;
     AiBuildQueue* queue;
 
-    DebugLevel3Fn("%d %d %d\n" _C_
+    DebugLevel2Fn("%d:%d %d %d\n" _C_ AiPlayer->Player->Player _C_
 	    AiPlayer->Player->Resources[1] _C_
 	    AiPlayer->Player->Resources[2] _C_
 	    AiPlayer->Player->Resources[3]);
-
-    AiPlayer->NeededMask=0;
 
     if( AiPlayer->NeedFood ) {		// Food has the highest priority
 	AiPlayer->NeedFood=0;
@@ -554,17 +552,55 @@ local void AiCheckingWork(void)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Find the nearest gold mine for unit from x,y.
+**
+**	@param unit	Pointer for source unit.
+**	@param x	X tile position to start.
+**	@param y	Y tile position to start.
+**
+**	@return		Pointer to the nearest reachable gold mine.
+**
+**	@see FindGoldMine but this version uses a reachable gold-mine.
+*/
+global Unit* AiFindGoldMine(const Unit* source,int x,int y)
+{
+    Unit** table;
+    Unit* unit;
+    Unit* best;
+    int best_d;
+    int d;
+
+    best=NoUnitP;
+    best_d=99999;
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	// Want gold-mine and not dieing.
+	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
+	    continue;
+	}
+	if( (d=UnitReachable(source,unit,1)) && d<best_d ) {
+	    best_d=d;
+	    best=unit;
+	}
+    }
+    DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+    return best;
+}
+
+/**
 **      Assign worker to mine gold.
 **
 **      IDEA: If no way to goldmine, we must dig the way.
 **      IDEA: If goldmine is on an other island, we must transport the workers.
+**
+**	@note	I can cache the gold-mine.
 */
 local int AiMineGold(Unit * unit)
 {
     Unit *dest;
 
     DebugLevel3Fn("%d\n", UnitNumber(unit));
-    dest = FindGoldMine(unit, unit->X, unit->Y);
+    dest = AiFindGoldMine(unit, unit->X, unit->Y);
     if (!dest) {
 	DebugLevel0Fn("goldmine not reachable\n");
 	return 0;
@@ -867,6 +903,8 @@ global void AiResourceManager(void)
     //	Collect resources.
     //
     AiCollectResources();
+
+    AiPlayer->NeededMask=0;
 }
 
 //@}
