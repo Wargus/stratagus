@@ -86,54 +86,59 @@ global int MapWallChk(int x,int y,int walltype) // used by FixWall, walltype==-1
     return t == walltype;
 }
 
-global int FixWall(int x,int y) // used by MapRemoveWall and PreprocessMap
+global int FixWall(int x, int y)	// used by MapRemoveWall and PreprocessMap
 {
-  int tile;
-  int walltype;
-  MapField* mf;
+    int tile;
+    int walltype;
+    MapField *mf;
 
-  //
-  //	Outside the map
-  //
-  if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-      return 0;
-  }
-  mf=TheMap.Fields+(x)+(y)*TheMap.Width;
-  walltype = TheMap.Tileset->TileTypeTable[mf->SeenTile];
-  if ( walltype != TileTypeHumanWall && walltype != TileTypeOrcWall ) {
-      return 0;
-  }
+    //
+    //    Outside the map
+    //
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	return 0;
+    }
+    mf = TheMap.Fields + (x) + (y) * TheMap.Width;
+    walltype = TheMap.Tileset->TileTypeTable[mf->SeenTile];
+    if (walltype != TileTypeHumanWall && walltype != TileTypeOrcWall) {
+	return 0;
+    }
+#define WALL(xx,yy) (MapWallChk(xx,yy,walltype) != 0)
+    tile = 0;
+    if (WALL(x, y - 1)) {
+	tile |= 1 << 0;
+    }
+    if (WALL(x + 1, y)) {
+	tile |= 1 << 1;
+    }
+    if (WALL(x, y + 1)) {
+	tile |= 1 << 2;
+    }
+    if (WALL(x - 1, y)) {
+	tile |= 1 << 3;
+    }
 
-  #define WALL(xx,yy) (MapWallChk(xx,yy,walltype) != 0)
-  tile = 0;
-  if (WALL(x  ,y-1)) tile |= 1<<0;
-  if (WALL(x+1,y  )) tile |= 1<<1;
-  if (WALL(x  ,y+1)) tile |= 1<<2;
-  if (WALL(x-1,y  )) tile |= 1<<3;
+    tile = WallTable[tile];
 
-  tile = WallTable[tile];
-
-  if (walltype == TileTypeHumanWall)
-     {
-     if (mf->Value < WALL_50HP)
-        tile += TheMap.Tileset->HumanWall50Tile;
-      else
-        tile += TheMap.Tileset->HumanWall100Tile;
-     }
-   else
-     {
-     if (mf->Value < WALL_50HP)
-        tile += TheMap.Tileset->OrcWall50Tile;
-      else
-        tile += TheMap.Tileset->OrcWall100Tile;
-     }
+    if (walltype == TileTypeHumanWall) {
+	if (mf->Value < WALL_50HP)
+	    tile += TheMap.Tileset->HumanWall50Tile;
+	else
+	    tile += TheMap.Tileset->HumanWall100Tile;
+    } else {
+	if (mf->Value < WALL_50HP)
+	    tile += TheMap.Tileset->OrcWall50Tile;
+	else
+	    tile += TheMap.Tileset->OrcWall100Tile;
+    }
 
 // FIXME: Johns, Is this correct? Could this function be called under fog of war
-    if (mf->SeenTile == tile)
+    if (mf->SeenTile == tile) {
 	return 0;
+    }
     mf->SeenTile = tile;
 
-    UpdateMinimapXY(x,y);
+    UpdateMinimapXY(x, y);
     return 1;
 }
 

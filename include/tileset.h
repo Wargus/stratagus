@@ -10,7 +10,7 @@
 //
 /**@name tileset.h	-	The tileset headerfile. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -28,15 +28,6 @@
 
 //#define MaxTilesInTileset	1024	/// Current limit of tiles in tileset
 #define MaxTilesInTileset	3072	/// Current limit of tiles in tileset
-
-#if 0
-
-#define TILE_PER_ROW	16		/// tiles stored in an image row
-#define TILE_ROWS	24		/// tiles rows in the image
-#define TILE_COUNT	(TILE_PER_ROW*TILE_ROWS)
-
-#endif
-
 
 /**
 **   These are used for lookup tiles types
@@ -63,6 +54,7 @@ typedef struct _tileset_ {
     char*	Ident;			/// tileset identifier
     char*	Name;			/// name for future extensions
     char*	File;			/// file containing image data
+    char*	PaletteFile;		/// file containing the global palette
 
     const unsigned short* Table;	/// pud to internal conversion table
     unsigned char* TileTypeTable;	/// for fast lookup of tile type
