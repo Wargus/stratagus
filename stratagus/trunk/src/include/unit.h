@@ -133,9 +133,11 @@
 **		all informations that all units of the same type shares.
 **		(Animations, Name, Stats, ...)
 **
-**	Unit::SeenType
-**		Pointer to the unit-type that this unit was, when last seen.
-**		Currently only used by buildings.
+**	Unit::Seen
+**
+**		Type
+**		    Pointer to the unit-type that this unit was, when last seen.
+**		    Currently only used by buildings.
 **
 **	Unit::Player
 **
@@ -525,15 +527,17 @@ struct _unit_ {
     signed char	IX;			/// X image displacement to map position
     signed char	IY;			/// Y image displacement to map position
     int		Frame;			/// Image frame: <0 is mirrored
-    
-    int		SeenFrame;		/// last seen frame/stage of buildings
-    UnitType*	SeenType;		/// Pointer to last seen unit-type
-    signed char	SeenIX;			/// Unit seen X image displacement to map position
-    signed char	SeenIY;			/// Unit seen Y image displacement to map position
-    unsigned	SeenConstructed : 1;	/// Unit seen construction
-    unsigned	SeenState : 3;		/// Unit seen build/upgrade state
-    unsigned	SeenDestroyed : 1;	/// Unit seen destroyed or not
-    ConstructionFrame* SeenCFrame;	/// Unit seen construction frame
+   
+    struct _seen_ {
+	int	    Frame;		/// last seen frame/stage of buildings
+	UnitType*   Type;		/// Pointer to last seen unit-type
+	signed char IX;			/// Unit seen X image displacement to map position
+	signed char IY;			/// Unit seen Y image displacement to map position
+	unsigned    Constructed : 1;	/// Unit seen construction
+	unsigned    State : 3;		/// Unit seen build/upgrade state
+	unsigned    Destroyed : 1;	/// Unit seen destroyed or not
+	ConstructionFrame* CFrame;	/// Unit seen construction frame
+    } Seen;
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 

@@ -142,6 +142,7 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 	UnitCacheRemove(unit);
 
+	MapMarkUnitDeltaSight(unit, xd, yd);
 	MapUnmarkUnitSight(unit);
 	//  ummark sight for units inside too.
 	uninside = unit->UnitInside;
@@ -157,7 +158,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 
 	MustRedraw |= RedrawMinimap;
 
-	MapMarkUnitSight(unit);
 	//  Remove unit from the current selection
 	if (unit->Selected && !IsMapFieldVisible(ThisPlayer, unit->X, unit->Y)) {
 	    if (NumSelected == 1) {          //  Remove building cursor
