@@ -754,6 +754,7 @@ global void LoadCcl(void)
     //
     CclInConfigFile=1;
     file=LibraryFileName(CclStartFile,buf);
+    ShowLoadProgress("Script %s\n",file);
     if( (s=strrchr(file,'.')) && s[1]=='C' ) {
 	fast_load(gh_str02scm(file),NIL);
     } else {
