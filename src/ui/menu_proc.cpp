@@ -1648,6 +1648,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     unsigned long nitem;
     unsigned long dummy;
     int retform;
+    XEvent event;
 #endif
 #endif
 
@@ -1746,11 +1747,6 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			    break;
 			}
 
-			if (XGetSelectionOwner(display, XA_PRIMARY) == None) {
-			    XCloseDisplay(display);
-			    break;
-			}
-
 			// Creates a non maped temporary X window to hold the selection
 			if (!(window = XCreateSimpleWindow(display, 
 				DefaultRootWindow(display), 0, 0, 1, 1, 0, 0, 0))) {
@@ -1761,18 +1757,26 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 			XConvertSelection(display, XA_PRIMARY, XA_STRING, XA_STRING,
 			    window, CurrentTime);
 
-			XFlush(display);
+			XNextEvent(display, &event);
 
-			// FIXME: loops 4 times or until we get selection, need to use proper way
-			clipboard = NULL;
-			for ( i = 0; i < 5 && !clipboard; ++i) {
-			    XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
-				AnyPropertyType, &rettype, &retform, &nitem, 
-				&dummy, (unsigned char **)&clipboard);
+			if (event.type != SelectionNotify || 
+				event.xselection.property != XA_STRING) {
+			    break;
 			}
+
+			XGetWindowProperty(display, window, XA_STRING, 0, 1024, False, 
+			    XA_STRING, &rettype, &retform, &nitem, &dummy, 
+			    (unsigned char **)&clipboard);
 
 			XDestroyWindow(display, window);
 			XCloseDisplay(display);
+
+			if (rettype != XA_STRING || retform != 8) {
+			    if (clipboard != NULL) {
+				XFree(clipboard);
+			    }
+			    clipboard = NULL;
+			}
 
 			if (clipboard == NULL) {
 			    break;
