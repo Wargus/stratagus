@@ -743,14 +743,19 @@ global void SetPlayersPalette(void)
 global void DebugPlayers(void)
 {
     int i;
+    const char* colors[16] = {
+	"red", "blue", "green", "violett", "orange", "black", "white", "yellow",
+	"yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow",
+	"yellow"
+    };
 
-    DebugLevel0("Nr  I Name     Type         Race     Ai\n");
-    DebugLevel0("--  - -------- ------------ -------- --\n");
+    DebugLevel0("Nr   Color   I Name     Type         Race    Ai\n");
+    DebugLevel0("--  -------- - -------- ------------ ------- -- ---\n");
     for( i=0; i<PlayerMax; ++i ) {
 	if( Players[i].Type==PlayerNobody ) {
 	    continue;
 	}
-	DebugLevel0("%2d: %c %-8.8s ",i
+	DebugLevel0("%2d: %8.8s %c %-8.8s ",i,colors[i]
 		,ThisPlayer==&Players[i] ? '*'
 			: Players[i].AiEnabled ? '+' : ' '
 		,Players[i].Name);
