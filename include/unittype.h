@@ -942,7 +942,7 @@ struct _unit_type_ {
 	char* CanTransport;             /// Can transport units with this flag.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources;          /// Amount of Resources on build
-	/// @note original only visual effect, we do more with this!
+	/// originally only visual effect, we do more with this!
 	enum {
 		UnitTypeLand,               /// Unit lives on land
 		UnitTypeFly,                /// Unit lives in air
