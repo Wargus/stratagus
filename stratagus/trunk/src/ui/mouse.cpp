@@ -1447,7 +1447,8 @@ global void UIHandleButtonDown(unsigned button)
 						}
 					}
 				}
-				if (CanBuildUnitType(Selected[0], CursorBuilding, x, y) &&
+				if (CanBuildUnitTypeMask(Selected[0], CursorBuilding, x, y,
+					Selected[0]->Type->MovementMask & ~(MapFieldBuilding | MapFieldLandUnit | MapFieldSeaUnit)) &&
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess.Sound,
 						MaxSampleVolume);
