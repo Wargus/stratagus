@@ -320,14 +320,14 @@ FCSP3=	../fcsp-alliance-20010819.tar.bz2
 linux-complete:
 	mkdir freecraft-complete
 	tar xjf $(FCGP1)
-	tar xjCf freecraft-complete $(FCSP1)
-	tar xjCf freecraft-complete $(FCSP2)
-	tar xjCf freecraft-complete $(FCSP3)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
 	cp -a fcgp-*/* freecraft-complete
+	tar xjCf freecraft-complete $(FCSP1)
+	tar xjCf freecraft-complete $(FCSP2)
+	tar xjCf freecraft-complete $(FCSP3)
 	cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcgp-*
@@ -341,14 +341,14 @@ linux-complete:
 win32-complete:
 	mkdir freecraft-complete
 	tar xjf $(FCGP1)
-	tar xjCf freecraft-complete $(FCSP1)
-	tar xjCf freecraft-complete $(FCSP2)
-	tar xjCf freecraft-complete $(FCSP3)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
 	cp -a fcgp-*/* freecraft-complete
+	tar xjCf freecraft-complete $(FCSP1)
+	tar xjCf freecraft-complete $(FCSP2)
+	tar xjCf freecraft-complete $(FCSP3)
 	cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcgp-*
