@@ -30,7 +30,7 @@ else
     ARCH=linux
 fi
 
-if test "$ARCH" = "macosx ; then
+if test "$ARCH" = "macosx" ; then
     EXTRA_CFLAGS=-I/sw/include
     EXTRA_LIBS=-L/sw/lib
     CPPFLAGS+=-I/sw/include
