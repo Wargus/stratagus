@@ -323,7 +323,11 @@ local int CclSetContrast(lua_State* l)
 	lua_error(l);
     }
     TheUI.Contrast = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -377,7 +381,11 @@ local int CclSetBrightness(lua_State* l)
 	lua_error(l);
     }
     TheUI.Brightness = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME:
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -431,7 +439,11 @@ local int CclSetSaturation(lua_State* l)
 	lua_error(l);
     }
     TheUI.Saturation = i;
+#ifdef USE_SDL_SURFACE
+    // FIXME:
+#else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
+#endif
     MustRedraw = RedrawEverything;
 
     lua_pushnumber(l, old);
@@ -3022,13 +3034,25 @@ local int CclDefineUI(lua_State* l)
 				lua_error(l);
 			    }
 			    lua_rawgeti(l, -1, 1);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.r = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.a = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_rawgeti(l, -1, 2);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.g = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.b = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_rawgeti(l, -1, 3);
+#ifdef USE_SDL_SURFACE
+			    ui->CompletedBarColorRGB.b = LuaToNumber(l, -1);
+#else
 			    ui->CompletedBarColorRGB.D24.c = LuaToNumber(l, -1);
+#endif
 			    lua_pop(l, 1);
 			    lua_pop(l, 1);
 			} else if (!strcmp(value, "pos")) {
