@@ -15,9 +15,6 @@
 **	$Id$
 */
 
-//FIXME: I don't fully understand the range parameter in the Unit
-// structure. Something might be broken because of this misunderstanding
-
 //@{
 
 #include <stdio.h>
@@ -480,7 +477,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    // we go to the best node
 	    ex=best_x;
 	    ey=best_y;
-	    if(ex==x && ey==y) {
+	    if(ex==unit->X && ey==unit->Y) {
 		DebugLevel3(__FUNCTION__": %Zd unreachable\n",UnitNumber(unit));
 		AStarCleanUp(num_in_close);
 		return -2;
@@ -500,12 +497,11 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     path_length=0;
     x=unit->X;
     y=unit->Y;
-    for(;;) {
+    i=0;
+    while(ex!=x||ey!=y) {
 	DebugLevel3("%d %d %d %d\n",x,y,ex,ey);
 	eo=ex*TheMap.Width+ey;
 	i=AStarMatrix[eo].Direction;
-	if (ex == x && ey == y)
-	    break;
 	ex-=xoffset[i];
 	ey-=yoffset[i];
 	path_length++;
