@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"Update the command index in ccl-index.html."
+"Update the command index in index.html."
 
 import os
 
@@ -15,9 +15,9 @@ for infile in os.listdir('.'):
 
 commands.sort()
 
-head, trash, tail = open('ccl-index.html').read().split('SCRIPT')
+head, trash, tail = open('index.html').read().split('SCRIPT')
 
-f = open('ccl-index.html', 'w')
+f = open('index.html', 'w')
 f.write(head + 'SCRIPT -->\n')
 for command in commands:
     f.write('<dt><a href="' + reffiles[command] + '#' + command + '">' + command + '</a></dt>\n')
