@@ -373,7 +373,7 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
     type = unit->Type;
 
     //
-    //	Build player unit table    
+    //	Build player unit table
     //
     if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 	unit->PlayerSlot = player->Units + player->TotalNumUnits++;
@@ -479,9 +479,9 @@ global void PlaceUnit(Unit* unit, int x, int y)
 #endif
 
 #ifdef MAP_REGIONS
-    if (type->Building && 
-    	(type->FieldFlags & 
-	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding | 
+    if (type->Building &&
+    	(type->FieldFlags &
+	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
 	  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
 	MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
     }
@@ -676,9 +676,9 @@ global void RemoveUnit(Unit* unit, Unit* host)
     //
     //	Update map splitting.
     //
-    if (type->Building && 
-    	(type->FieldFlags & 
-	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding | 
+    if (type->Building &&
+    	(type->FieldFlags &
+	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
 	  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
 	MapSplitterTilesCleared(unit->X, unit->Y,
 	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
@@ -973,7 +973,7 @@ global int UnitDrawableOnMap(const Unit* unit)
 	if (unit->Type->PermanentCloak) {
 	    return 0;
 	}
-	
+
 	// Unit is visible under fog and was already discovered once.
 	if (unit->Type->VisibleUnderFog && unit->SeenFrame!=UnitNotSeen) {
 	    return 1;
@@ -985,7 +985,7 @@ global int UnitDrawableOnMap(const Unit* unit)
 /**
 ** 	This function fills in the Seen fields of an unit from current fields.
 **	To be called when unit goes out of view, or when the map is revealed.
-** 
+**
 ** 	@param unit	The unit to work on
 */
 local void UnitFillSeenValues(Unit* unit)
@@ -1059,7 +1059,7 @@ global void UnitGoesUnderFog(Unit* unit, int p)
 **	@param player	The player to mark for.
 **	@param x	x location to check if building is on, and mark as seen
 **	@param y	y location to check if building is on, and mark as seen
-**	@param cloak	If this is for cloaked units. 
+**	@param cloak	If this is for cloaked units.
 */
 global void UnitsMarkSeen(const Player* player, int x, int y, int cloak)
 {
@@ -1072,7 +1072,7 @@ global void UnitsMarkSeen(const Player* player, int x, int y, int cloak)
     DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
     while (n) {
 	unit = units[--n];
-	if (cloak != unit->Type->PermanentCloak) {
+	if (cloak != (int)unit->Type->PermanentCloak) {
 	    continue;
 	}
 	for (p = 0; p < PlayerMax ; ++p) {
@@ -1105,7 +1105,7 @@ global void UnitsUnmarkSeen(const Player* player, int x, int y, int cloak)
     DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
     while (n) {
 	unit = units[--n];
-	if (cloak != unit->Type->PermanentCloak) {
+	if (cloak != (int)unit->Type->PermanentCloak) {
 	    continue;
 	}
 	for (p = 0; p < PlayerMax ; ++p) {
@@ -1417,15 +1417,15 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
     //  FIXME: an unit is moving (the unit stops when between map cells.)
 
     /*for (i = 0; i < MAX_ORDERS; ++i) {
-      if (unit->Orders[i].Action == UnitActionAttack ||
-      unit->Orders[i].Action == UnitActionAttackGround) {
-    //Now see if it's an enemy..
-    //FIXME:Just Stops attacking at the moment
-    printf("Stopped attack for a/an %s,\n", unit->Type->Name);
-    unit->Orders[i].Action = UnitActionStill;
-    unit->SubAction = unit->State = 0;
-    break;
-    }
+	if (unit->Orders[i].Action == UnitActionAttack ||
+		unit->Orders[i].Action == UnitActionAttackGround) {
+	    // Now see if it's an enemy..
+	    // FIXME:Just Stops attacking at the moment
+	    printf("Stopped attack for a/an %s,\n", unit->Type->Name);
+	    unit->Orders[i].Action = UnitActionStill;
+	    unit->SubAction = unit->State = 0;
+	    break;
+	}
     }*/
 
     //
@@ -1975,7 +1975,7 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 	    return 0;
 	}
     }
-    
+
     //	resource deposit can't be build too near to resource
     // FIXME: use unit-cache here.
     for (i = 0; i < NumUnits; ++i) {
@@ -2152,7 +2152,7 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
     if (unit && unit->Player->Type == PlayerPerson) {
 	player = unit->Player;
     }
-	
+
     for (h = type->TileHeight; h--;) {
 	for (w = type->TileWidth; w--;) {
 	    if (!CanBuildOn(x + w, y + h, mask)) {
@@ -2196,9 +2196,9 @@ global int FindWoodInSight(const Unit* unit, int* x, int* y)
 /**
 **	Find the closest piece of terrain with the given flags.
 **
-**	@param movemask	The movement mask to reach that location. 
+**	@param movemask	The movement mask to reach that location.
 **	@param resmask	Result tile mask.
-**	@param rvresult Return a tile that doesn't match. 
+**	@param rvresult Return a tile that doesn't match.
 **	@param range	Maximum distance for the search.
 **	@param player	Only search fields explored by player
 **	@param x	Map X start position for the search.
@@ -2268,7 +2268,7 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		y = ry + yoffset[i];
 		//  Make sure we don't leave the map.
 		if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		    continue; 
+		    continue;
 		}
 		m = matrix + x + y * w;
 		//  Check if visited or unexplored
@@ -2460,7 +2460,7 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 }
 
 /**
-**	Find deposit. This will find a deposit for a resource 
+**	Find deposit. This will find a deposit for a resource
 **
 **	@param unit	The unit that wants to find a resource.
 **	@param x	Closest to x
@@ -3284,11 +3284,11 @@ global int CanTarget(const UnitType* source, const UnitType* dest)
     int i;
 
     for (i = 0; i < NumberBoolFlag; i++) {
-        if (source->CanTargetFlag[i] != CONDITION_TRUE) {
-            if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
-                return 0;
-            }
-        }
+	if (source->CanTargetFlag[i] != CONDITION_TRUE) {
+	    if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
+		return 0;
+	    }
+	}
     }
     if (dest->UnitType == UnitTypeLand) {
 	if (dest->ShoreBuilding) {
@@ -3646,7 +3646,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 		    ++frame;
 		}
 		CLprintf(file, "\n  'data-builded '(");
-		
+
 		if (unit->Data.Builded.Worker) {
 		    CLprintf(file, "worker %s ",
 		    ref = UnitReference(unit->Data.Builded.Worker));
