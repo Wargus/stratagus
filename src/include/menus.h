@@ -33,8 +33,9 @@
 
 /**
 **	Menu button referencing
-**	Each button is 300 x 144  =>	53 buttons
+**	Each button is 300 x 144  =>	50 buttons (53 for Expansion GFX)
 **	For multi-version buttons: button - 1 == disabled, + 1 == depressed
+**	For gems: -1 == disabled, +1 == depressed, +2 checked, +3 checked+depressed
 */
 typedef unsigned MenuButtonId;
 
@@ -44,6 +45,8 @@ typedef unsigned MenuButtonId;
 #define MBUTTON_GM_HALF		10
 #define MBUTTON_132		13
 #define MBUTTON_GM_FULL		16
+#define MBUTTON_GEM_ROUND	19
+#define MBUTTON_GEM_SQUARE	24
 #define MBUTTON_UP_ARROW	29
 #define MBUTTON_DOWN_ARROW	32
 #define MBUTTON_LEFT_ARROW	35
@@ -53,7 +56,7 @@ typedef unsigned MenuButtonId;
 #define MBUTTON_S_HCONT		44
 #define MBUTTON_PULLDOWN	46
 #define MBUTTON_VTHIN		48
-#define MBUTTON_FOLDER		51
+#define MBUTTON_FOLDER		51	/* expansion gfx only */
 
 /*----------------------------------------------------------------------------
 --	Menus
@@ -132,6 +135,13 @@ typedef struct _menuitem_ {
 	    int nch;
 	    int maxch;
 	} input;
+	struct {
+	    unsigned state;
+	    unsigned xsize;
+	    unsigned ysize;
+	    MenuButtonId button;
+	    void (*action)(struct _menuitem_ *);
+	} gem;
 	/// ... add here ...
 
     } d;
@@ -144,6 +154,7 @@ typedef struct _menuitem_ {
 #define MI_TYPE_VSLIDER 5
 #define MI_TYPE_DRAWFUNC 6
 #define MI_TYPE_INPUT 7
+#define MI_TYPE_GEM 8
 
     /// for MI_TYPE_TEXT
 #define MI_TFLAGS_CENTERED 1
@@ -155,7 +166,12 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_LEFT MI_CURC_UP
 #define MI_CFLAGS_RIGHT MI_CURC_DOWN
 #define MI_CFLAGS_KNOB 4
-#define MI_CFLAGS_CONT 8		/// unused right now - to be implemented!
+#define MI_CFLAGS_CONT 8
+
+    /// for MI_TYPE_GEM
+#define MI_GSTATE_CHECKED 1
+#define MI_GSTATE_INVISIBLE 2
+#define MI_GSTATE_PASSIVE 3
 
 /**
 **	Menu definition.
@@ -189,7 +205,7 @@ typedef struct _menus_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern  int CurrentMenu;		/// Current handled menu
+extern  int CurrentMenu;		/// Currently processed menu
 
 /*----------------------------------------------------------------------------
 --	Functions
