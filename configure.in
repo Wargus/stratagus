@@ -279,7 +279,9 @@ fi
 AC_SUBST(PREFIX)
 
 if test "$WIN32" = "1"; then
-    touch Rules.make
+    if ! test -f Rules.make; then
+	echo "include Rules.make.WIN32" >Rules.make
+    fi
     AC_CONFIG_FILES(Rules.make.WIN32:Rules.make.in)
 else
     AC_CONFIG_FILES(Rules.make)
