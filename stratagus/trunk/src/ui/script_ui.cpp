@@ -2544,7 +2544,7 @@ static int scm2style(lua_State* l, const char* value)
 /**
 **  Parse menu item text
 */
-void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 {
 	const char* value;
 	int subargs;
@@ -2629,7 +2629,7 @@ void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item button
 */
-void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -2707,7 +2707,7 @@ void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item pulldown
 */
-void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -2817,7 +2817,7 @@ void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item listbox
 */
-void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -2937,7 +2937,7 @@ void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item vslider
 */
-void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -3061,7 +3061,7 @@ void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item hslider
 */
-void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -3185,7 +3185,7 @@ void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item drawfunc
 */
-void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 {
 	const char* value;
 	void** func;
@@ -3211,7 +3211,7 @@ void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item input
 */
-void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
@@ -3290,7 +3290,7 @@ void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 /**
 **  Parse menu item checkbox
 */
-void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
+static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 {
 	int subargs;
 	int k;
