@@ -35,6 +35,7 @@
 #include "freecraft.h"
 #include "player.h"
 #include "ccl.h"
+#include "ai.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -74,6 +75,7 @@ local SCM CclPlayer(SCM list)
     if( NumPlayers<=i ) {
 	NumPlayers=i+1;
     }
+    player->Player = i;
     if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
 	DebugLevel0("Not enough memory to create player %d.\n",i);
 
@@ -253,6 +255,8 @@ local SCM CclPlayer(SCM list)
 	   errl("Unsupported tag",value);
 	}
     }
+    if (player->AiEnabled)
+	AiInit (player);
 
     return SCM_UNSPECIFIED;
 }
