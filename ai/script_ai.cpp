@@ -81,6 +81,19 @@ static IOStructDef AiActionEvaluationStructDef = {
     }
 };
 
+static IOStructDef AiExplorationRequestStructDef = {
+    "AiExplorationRequest",
+    sizeof (AiExplorationRequest),
+    -1,
+    {
+	{"`next", 		NULL, 		&((AiExplorationRequest *) 0)->Next, 	NULL},	
+	{"gamecycle",		&IOInt,		&((AiExplorationRequest *) 0)->Mask,	NULL},
+	{"map-x", 		&IOInt,		&((AiExplorationRequest *) 0)->X, 	NULL},
+	{"map-y", 		&IOInt,		&((AiExplorationRequest *) 0)->Y,	NULL},
+	{0, 0, 0, 0}
+    }
+};
+
 /// Description of the AiRunningScript structure
 static IOStructDef AiRunningScriptStructDef = {
     "AiRunningScript",
@@ -248,6 +261,8 @@ static IOStructDef PlayerAiStructDef = {
 	{"collect", 		&IORessourceArray,&((PlayerAi *) 0)->Collect,		0},
 	{"neededmask",		&IORessourceMask,&((PlayerAi *) 0)->Reserve,		0},
 	{"need-food",		&IOBool,	&((PlayerAi *) 0)->NeedFood,		0},
+	{"exploration-requests",&IOLinkedList,	&((PlayerAi *) 0)->FirstExplorationRequest,&AiExplorationRequestStructDef},
+	{"last-exploration",	&IOInt,		&((PlayerAi *) 0)->LastExplorationGameCycle,0},
 	{"unit-type-requests",	&IOTable,	0,					&UnitTypeRequestsTableDef},
 	{"upgrade-to-requests",	&IOTable,	0,					&UpgradeToRequestsTableDef},
 	{"research-requests",	&IOTable,	0,					&ResearchRequestsTableDef},
@@ -1748,7 +1763,8 @@ local SCM CclAiScript(SCM value)
     for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
 	AiPlayer->Scripts[i].Script = NIL;
 	AiPlayer->Scripts[i].SleepCycles = 0;
-	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
+	AiEraseForce(AiPlayer->Scripts[i].ownForce);
+	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");	
     }
     return SCM_BOOL_T;
 }
