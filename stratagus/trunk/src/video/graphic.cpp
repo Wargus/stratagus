@@ -391,6 +391,10 @@ void FlipGraphic(Graphic* g)
 	int j;
 	SDL_Surface* s;
 
+	if (g->SurfaceFlip) {
+		return;
+	}
+
 	s = g->SurfaceFlip = SDL_ConvertSurface(g->Surface,
 		g->Surface->format, SDL_SWSURFACE);
 	if (g->Surface->flags & SDL_SRCCOLORKEY) {
@@ -577,6 +581,10 @@ static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
 */
 void MakeTexture(Graphic* graphic)
 {
+	if (graphic->Textures) {
+		return;
+	}
+
 	graphic->Textures = (GLuint*)malloc(graphic->NumFrames * sizeof(GLuint));
 	glGenTextures(graphic->NumFrames, graphic->Textures);
 	MakeTextures(graphic, graphic->Textures, NULL);
