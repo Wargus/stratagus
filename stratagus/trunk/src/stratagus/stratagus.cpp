@@ -333,7 +333,7 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 **
 **	@return		Pointer to first occurence of b or NULL if not found.
 */
-#ifndef __FreeBSD__
+#ifndef BSD
 global char* strcasestr(char* a, const char* b)
 {
     int x;
@@ -356,7 +356,7 @@ global char* strcasestr(char* a, const char* b)
 
     return NULL;
 }
-#endif
+#endif // BSD
 
 /*============================================================================
 ==	MAIN

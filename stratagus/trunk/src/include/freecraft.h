@@ -527,9 +527,9 @@ extern char* strdcat(const char* l, const char* r);
      /// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
      /// case insensitive strstr
-#ifndef __FreeBSD__
+#ifndef BSD
 extern char* strcasestr(char* str, const char* substr);
-#endif
+#endif // BSD
 
 /*============================================================================
 ==	Misc
