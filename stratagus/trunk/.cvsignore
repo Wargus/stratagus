@@ -1,5 +1,6 @@
 Rules.make
 freecraft
+freecraft.exe
 gmon.out
 save_file_of_freecraft.ccl
 .cvsignore
@@ -32,3 +33,5 @@ wartool.dsp
 wartool.plg
 wartool___Win32_Debug
 wartool___Win32_Release
+*.log
+preferences*
