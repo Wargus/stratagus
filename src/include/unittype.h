@@ -10,7 +10,7 @@
 //
 /**@name unittype.h	-	The unit-types headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -439,6 +439,7 @@
 #include "unitsound.h"
 #include "upgrade_structs.h"
 #include "construct.h"
+#include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -470,6 +471,12 @@ typedef struct __animations__ {
     Animation*	Die;			/// Unit dieing
     Animation**	Extend;			/// For future extensions
 } Animations;
+
+#define ANIMATIONS_MAXANIM 1024
+
+    /// Hash table of all the animations
+typedef hashtable(Animations*,ANIMATIONS_MAXANIM) _AnimationsHash;
+extern _AnimationsHash AnimationsHash;
 
 /**
 **      Missile type definition (used in config tables)

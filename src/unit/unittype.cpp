@@ -10,7 +10,7 @@
 //
 /**@name unittype.c	-	The unit types. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -508,11 +508,11 @@ global void ParsePudUDTA(const char* udta,int length __attribute__((unused)))
 */
 global Animations* AnimationsByIdent(const char* ident)
 {
-    SCM sym;
+    Animations** tmp;
 
-    sym=gh_symbol2scm((char*)ident);
-    if( symbol_boundp(sym,NIL)==SCM_BOOL_T ) {
-	return (Animations*)gh_scm2int(symbol_value(sym,NIL));
+    tmp=(Animations**)hash_find(AnimationsHash,ident);
+    if( tmp ) {
+	return *tmp;
     }
     DebugLevel0Fn("Warning animation `%s' not found\n" _C_ ident);
     return NULL;
