@@ -131,6 +131,7 @@ global int SoundThreadRunning;		/// FIXME: docu
 
 #ifdef USE_LIBMODPLUG
 local int PlayingMusic;			/// Flag true if playing music
+local ModPlugFile* ModFile;		/// Mod file loaded into memory
 
 /**
 **	Play a music file. Currently supported are .mod, .it, .s3m, .wav, .xm.
@@ -161,7 +162,10 @@ global void PlayMusic(const char* name)
     buffer=malloc(8192);
 
     if( PlayingMusic ) {
-	ModPlug_Unload();
+	if( ModFile ) {
+	    ModPlug_Unload(ModFile);
+	    ModFile=0;
+	}
 	PlayingMusic=0;
     }
 
@@ -181,7 +185,7 @@ global void PlayMusic(const char* name)
     buffer=realloc(buffer,size);
     DebugLevel0Fn("%d\n",size);
 
-    ModPlug_Load(buffer,size);
+    ModFile=ModPlug_Load(buffer,size);
 
     free(buffer);
 
@@ -205,9 +209,11 @@ local void MixMusicToStereo32(int* buffer,int size)
     int n;
 
     if( PlayingMusic ) {
+	DebugCheck( !ModFile );
+
 	buf=alloca(size*sizeof(*buf));
 
-	n=ModPlug_Read(buf,size*sizeof(*buf));
+	n=ModPlug_Read(ModFile,buf,size*sizeof(*buf));
 
 	for( i=0; i<n/sizeof(*buf); ++i ) {	// Add to our samples
 #ifdef USE_LIBMODPLUG32
@@ -222,7 +228,9 @@ local void MixMusicToStereo32(int* buffer,int size)
 
 	    DebugLevel2Fn("End of music %d\n",i);
 	    PlayingMusic=0;
-	    ModPlug_Unload();
+	    if( ModFile ) {
+		ModPlug_Unload(ModFile);
+	    }
 
 	    cb=gh_symbol2scm("music-stopped");
 	    if( !gh_null_p(symbol_boundp(cb,NIL)) ) {
