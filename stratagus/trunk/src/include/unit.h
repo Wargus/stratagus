@@ -673,7 +673,9 @@ extern void InitUnitsMemory(void);
 //extern void FreeUnitMemory(Unit* unit);
     /// Release an unit
 extern void ReleaseUnit(Unit* unit);
-extern void InitUnit (Unit * , UnitType * , Player * );
+//extern void InitUnit (Unit * , UnitType * , Player * );
+extern void InitUnit (Unit * , UnitType * );
+extern void AssignUnitToPlayer (Unit * , Player * );
     ///	Create a new unit
 extern Unit* MakeUnit(UnitType* type,Player* player);
     /// Place an unit on map
@@ -694,8 +696,14 @@ extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
 extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
+ 
+#ifdef SPLIT_SCREEN_SUPPORT
+extern int UnitVisibleInViewport (int v, const Unit * );
+#endif /* SPLIT_SCREEN_SUPPORT */
+
     /// Returns true, if unit is visible on current map view
 extern int UnitVisibleOnScreen(const Unit* unit);
+
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu
@@ -853,8 +861,14 @@ extern void LoadDecorations(void);
 extern void SaveDecorations(FILE* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
+
+#ifdef SPLIT_SCREEN_SUPPORT
+    /// Draw all units visible on map
+extern void DrawUnits (int );
+#else /* SPLIT_SCREEN_SUPPORT */
     /// Draw all units visible on map
 extern void DrawUnits(void);
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 //	in unit_find.c
     /// Select units in rectangle range
