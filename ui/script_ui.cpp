@@ -243,7 +243,7 @@ local SCM CclDefineCursor(SCM list)
     ct=NULL;
     i=0;
     if( Cursors ) {
-	for( ; Cursors[i].Type; ++i ) {
+	for( ; Cursors[i].OType; ++i ) {
 	    //
 	    //	Race not same, not found.
 	    //
@@ -272,7 +272,7 @@ local SCM CclDefineCursor(SCM list)
 	CclFree(Cursors);
 	Cursors=ct;
 	ct=&Cursors[i];
-	ct->Type=CursorTypeType;
+	ct->OType=CursorTypeType;
 	ct->Ident=s1;
 	ct->Race=s2;
     }
