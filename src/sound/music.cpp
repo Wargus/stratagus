@@ -341,7 +341,7 @@ global void PlayMusic(const char* name)
 #endif
 
 #ifdef USE_OGG
-    if ((sample = LoadOgg(name))) {
+    if ((sample = LoadOggStreaming(name))) {
 	if( sample->Channels!=2
 		|| sample->SampleSize!=16
 		|| sample->Frequency!=SoundFrequency ) {
@@ -403,7 +403,7 @@ global void PlayFile(const char* name)
 #endif
     name = LibraryFileName(name, buffer);
 #ifdef USE_OGG
-    if ((sample = LoadOggStreaming(name))) {
+    if ((sample = LoadOgg(name))) {
 	if( sample->Channels!=2
 		|| sample->SampleSize!=16
 		|| sample->Frequency!=SoundFrequency ) {
