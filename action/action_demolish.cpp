@@ -145,7 +145,7 @@ global void HandleActionDemolish(Unit* unit)
 	    //
             n=SelectUnits(x-2,y-2, x+2, y+2,table);
             for( i=0; i<n; ++i ) {
-		if ( table[i]->Type->UnitType!=UnitTypeFly ) {
+		if (table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP) {
 		    // Don't hit flying units!
 		    HitUnit(table[i],DEMOLISH_DAMAGE);
 		}
