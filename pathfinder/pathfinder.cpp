@@ -663,8 +663,8 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 	if( unreachable ) {
 	    PfCounterNotReachable++;
 	    MakeMissile(MissileTypeGreenCross,
-		unit->X*TileSizeX+TileSizeX/2,
-		unit->Y*TileSizeY+TileSizeY/2,0,0);
+		unit->X*TileSizeX+TileSizeX/2,unit->Y*TileSizeY+TileSizeY/2,
+		unit->X*TileSizeX+TileSizeX/2,unit->Y*TileSizeY+TileSizeY/2);
 	}
     );
 
