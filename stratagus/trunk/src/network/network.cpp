@@ -1379,6 +1379,14 @@ global void NetworkCommands(void)
     // FIXME: NetworkEvent should place the commands in a loop
 }
 
+/**
+**	Recover network.
+*/
+global void NetworkRecover(void)
+{
+    // FIXME: noop now
+}
+
 #endif	// } !NEW_NETWORK
 
 //@}
