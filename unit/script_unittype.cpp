@@ -176,7 +176,7 @@ local int CclDefineUnitType(lua_State* l)
 					}
 					if (i == NumTilesets) {
 					   // This leaves half initialized unit-type
-					   LuaError(l, "Unsupported tileset tag" _C_ value);
+					   LuaError(l, "Unsupported tileset tag '%s'" _C_ value);
 					}
 				}
 				if (redefine) {
