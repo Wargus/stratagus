@@ -864,7 +864,9 @@ local void DrawEditorInfo(void)
 	    break;
 	}
     }
-    DebugCheck(i == TheMap.Tileset->NumTiles);
+    
+    if (CursorOn == CursorOnMap)
+	DebugCheck(i == TheMap.Tileset->NumTiles);
 
     sprintf(buf, "%d %s %s", tile,
 	TheMap.Tileset->TileNames[TheMap.Tileset->BasicNameTable[i]],
