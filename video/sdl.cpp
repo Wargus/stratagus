@@ -288,6 +288,7 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 	    *keychar = icode = '\033';
 	    break;
 	case SDLK_RETURN:
+	case SDLK_KP_ENTER:
 	    *keychar = icode = '\r';
 	    break;
 	case SDLK_BACKSPACE:
@@ -382,6 +383,9 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 	    break;
 	case SDLK_KP_MINUS:
 	    icode = KeyCodeKPMinus;
+	    break;
+	case SDLK_KP_PERIOD:
+	    icode = KeyCodeKPPeriod;
 	    break;
 	case SDLK_SYSREQ:
 	case SDLK_PRINT:
