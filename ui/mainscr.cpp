@@ -447,16 +447,16 @@ global void DrawUnitInfo(const Unit* unit)
 
     if (type->Building && !type->CanAttack) {
 	if (type->Supply) {		// Supply unit
-	    VideoDrawText(x + 16, y + 8 + 63, GameFont, "Food Usage");
-	    VideoDrawText(x + 58, y + 8 + 78, GameFont, "Grown:");
-	    VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Player->Food);
-	    VideoDrawText(x + 71, y + 8 + 94, GameFont, "Used:");
-	    if (unit->Player->Food < unit->Player->NumFoodUnits) {
+	    VideoDrawText(x + 16, y + 8 + 63, GameFont, "Usage");
+	    VideoDrawText(x + 58, y + 8 + 78, GameFont, "Supply:");
+	    VideoDrawNumber(x + 108, y + 8 + 78, GameFont, unit->Player->Supply);
+	    VideoDrawText(x + 51, y + 8 + 94, GameFont, "Demand:");
+	    if (unit->Player->Supply < unit->Player->Demand) {
 		VideoDrawReverseNumber(x + 108, y + 8 + 94, GameFont,
-		    unit->Player->NumFoodUnits);
+		    unit->Player->Demand);
 	    } else {
 		VideoDrawNumber(x + 108, y + 8 + 94, GameFont,
-		    unit->Player->NumFoodUnits);
+		    unit->Player->Demand);
 	    }
 	}
     } else {
@@ -597,8 +597,8 @@ global void DrawResources(void)
 	    TheUI.Resources[FoodCost].IconX, TheUI.Resources[FoodCost].IconY);
     }
     if (TheUI.Resources[FoodCost].TextX != -1) {
-	sprintf(tmp, "%d/%d", ThisPlayer->NumFoodUnits, ThisPlayer->Food);
-	if (ThisPlayer->Food < ThisPlayer->NumFoodUnits) {
+	sprintf(tmp, "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
+	if (ThisPlayer->Supply < ThisPlayer->Demand) {
 	    VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
 		TheUI.Resources[FoodCost].TextY, GameFont, tmp);
 	} else {

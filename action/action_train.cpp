@@ -92,11 +92,11 @@ global void HandleActionTrain(Unit* unit)
 	}
 
 	//
-	//	Check if enough food available.
+	//	Check if enough supply available.
 	//
-	if ((food = !PlayerCheckFood(player, unit->Data.Train.What[0])) ||
-		!PlayerCheckLimits(player, unit->Data.Train.What[0])) {
-	    if (food && unit->Player->Ai) {
+	food = PlayerCheckLimits(player, unit->Data.Train.What[0]);
+	if (food < 0) {
+	    if (food == -3 && unit->Player->Ai) {
 		AiNeedMoreFarms(unit, unit->Orders[0].Type);
 	    }
 

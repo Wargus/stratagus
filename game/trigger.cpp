@@ -242,7 +242,7 @@ local SCM CclIfUnit(SCM player, SCM operation, SCM quantity, SCM unit)
 	}
     } else if (unittype == ALL_FOODUNITS) {
 	for (; plynr < pn; ++plynr) {
-	    if (compare(Players[plynr].NumFoodUnits, q)) {
+	    if (compare(Players[plynr].TotalNumUnits - Players[plynr].NumBuildings, q)) {
 		return SCM_BOOL_T;
 	    }
 	}

@@ -292,7 +292,7 @@ typedef struct _player_ai_ {
     int			Collect[MaxCosts];/// Collect % of resources
     int			NeededMask;	/// Mask for needed resources
 
-    int			NeedFood;	/// Flag need food
+    int			NeedSupply;	/// Flag need food
 
     AiExplorationRequest*FirstExplorationRequest;/// Requests for exploration
     unsigned int	LastExplorationGameCycle;/// When did the last explore occur ?

@@ -1481,7 +1481,7 @@ global void AiNeedMoreFarms(Unit * unit, const UnitType * what __attribute__ ((u
 
     DebugCheck(unit->Player->Type == PlayerPerson);
 
-    ((PlayerAi *) unit->Player->Ai)->NeedFood = 1;
+    ((PlayerAi *) unit->Player->Ai)->NeedSupply = 1;
 }
 
 /**

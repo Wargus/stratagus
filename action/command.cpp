@@ -864,8 +864,7 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 	//	Check if enough resources remains? (NETWORK!)
 	//	FIXME: wrong if append to message queue!!!
 	//
-	if (!PlayerCheckFood(unit->Player, type) ||
-		!PlayerCheckLimits(unit->Player, type) ||
+	if (PlayerCheckLimits(unit->Player, type) < 0 ||
 		PlayerCheckUnitType(unit->Player, type)) {
 	    return;
 	}

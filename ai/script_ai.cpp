@@ -262,7 +262,7 @@ static IOStructDef PlayerAiStructDef = {
 	{"needed",		&IORessourceArray,&((PlayerAi *) 0)->Needed,		0},
 	{"collect", 		&IORessourceArray,&((PlayerAi *) 0)->Collect,		0},
 	{"neededmask",		&IORessourceMask,&((PlayerAi *) 0)->Reserve,		0},
-	{"need-food",		&IOBool,	&((PlayerAi *) 0)->NeedFood,		0},
+	{"need-supply",		&IOBool,	&((PlayerAi *) 0)->NeedSupply,		0},
 	{"exploration-requests",&IOLinkedList,	&((PlayerAi *) 0)->FirstExplorationRequest,&AiExplorationRequestStructDef},
 	{"last-exploration",	&IOInt,		&((PlayerAi *) 0)->LastExplorationGameCycle,0},
 	{"unit-type-requests",	&IOTable,	0,					&UnitTypeRequestsTableDef},

@@ -435,7 +435,7 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
     }
 
     if (type->Demand) {
-	player->NumFoodUnits += type->Demand;	// food needed
+	player->Demand += type->Demand;	// food needed
 	if (player == ThisPlayer) {
 	    MustRedraw |= RedrawResources;	// update food
 	}
@@ -779,7 +779,7 @@ global void UnitLost(Unit* unit)
     //	Handle unit demand. (Currently only food supported.)
     //
     if (type->Demand) {
-	player->NumFoodUnits -= type->Demand;
+	player->Demand -= type->Demand;
 	if (player == ThisPlayer) {
 	    MustRedraw |= RedrawResources;	// update food
 	    // FIXME: MustRedraw |= RedrawFood;
@@ -791,7 +791,7 @@ global void UnitLost(Unit* unit)
     //
     if (unit->Orders[0].Action != UnitActionBuilded) {
 	if (type->Supply) {			// supply
-	    player->Food -= type->Supply;
+	    player->Supply -= type->Supply;
 	    if (player == ThisPlayer) {
 		MustRedraw |= RedrawResources;
 		// FIXME: MustRedraw |= RedrawFood;
@@ -890,7 +890,7 @@ global void UpdateForNewUnit(const Unit* unit, int upgrade)
     //		Note an upgraded unit can't give more supply.
     //
     if (type->Supply && !upgrade) {
-	player->Food += type->Supply;
+	player->Supply += type->Supply;
 	if (player == ThisPlayer) {
 	    MustRedraw |= RedrawResources;	// update food
 	}
@@ -1582,12 +1582,12 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
     if (unit->Type->GivesResource) {
 	DebugLevel0Fn("Resource transfer not supported\n");
     }
-    if (!unit->Type->Building) {
-	newplayer->NumFoodUnits += unit->Type->Demand;
-	if (newplayer == ThisPlayer) {
-	    MustRedraw |= RedrawResources;// update food
-	}
-    } else {
+    newplayer->Demand += unit->Type->Demand;
+    newplayer->Supply += unit->Type->Supply;
+    if (newplayer == ThisPlayer) {
+	MustRedraw |= RedrawResources;// update food
+    }
+    if (unit->Type->Building) {
 	newplayer->NumBuildings++;
     }
     newplayer->UnitTypesCount[unit->Type->Type]++;

@@ -197,7 +197,7 @@ global void HandleActionBuild(Unit* unit)
     //
     //	Check if hiting any limits for the building.
     //
-    if (!PlayerCheckLimits(unit->Player, type)) {
+    if (PlayerCheckLimits(unit->Player, type) < 0) {
 	NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 	    "Can't build more units %s", type->Name);
 	if (unit->Player->Ai) {
