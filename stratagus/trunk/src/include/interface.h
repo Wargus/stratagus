@@ -217,6 +217,8 @@ extern char OrdersDuringPause;
 extern char SkipGameCycle;
     /// Invincibility cheat
 extern int GodMode;
+    /// Disco cheat
+extern int Disco;
 
     /// pressed mouse buttons (normal,double,dragged,long)
 extern enum _mouse_buttons_ MouseButtons;

@@ -31,14 +31,15 @@
 
 #include <stdio.h>
 #include "freecraft.h"
+#include "cdaudio.h"
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
 
 #include <stdlib.h>
 
 #include "sound.h"
 //#include "sound_server.h"
-#include "cdaudio.h"
+
 
 #if defined(USE_SDLCD) 
 #include "SDL.h" 
@@ -460,6 +461,6 @@ global int PlayCDRom(int name)
 }
 
 
-#endif	// } defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#endif	// } USE_CDAUDIO
 
 //@}

@@ -55,6 +55,7 @@
 #include "iolib.h"
 #include "pud.h"
 #include "commands.h"
+#include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -78,6 +79,7 @@ global char SkipGameCycle;	/// Skip the next game cycle
 global char BigMapMode;		/// Show only the map
 global enum _iface_state_ InterfaceState; /// Current interface state
 global int GodMode;		/// Invincibility cheat
+global int Disco;		/// Disco cheat
 global enum _key_state_ KeyState; /// current key state
 
 /*----------------------------------------------------------------------------
@@ -1043,6 +1045,15 @@ global int HandleCheats(const char* Input)
 	    SetMessage("God Mode ON");
 	} else {
 	    SetMessage("God Mode OFF");
+	}
+    } else if (!strcmp(Input, "disco") ) {
+	if (Disco) {
+	    Disco = 0;
+	} else {
+#ifdef USE_CDAUDIO
+	    PlayCDTrack(18);
+#endif
+	    Disco = 18;
 	}
     } else {
 	ret = 0;

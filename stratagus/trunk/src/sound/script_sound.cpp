@@ -389,7 +389,7 @@ local SCM CclSetMusicVolume(SCM volume)
 */
 local SCM CclSetCdMode(SCM mode)
 {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
+#ifdef USE_CDAUDIO
     CDModes cdmode;
 
     if( gh_eq_p(mode,gh_symbol2scm("all")) ) {
