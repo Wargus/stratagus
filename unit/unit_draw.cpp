@@ -2192,13 +2192,13 @@ global void DrawUnit(const Unit* unit)
 	//  use it if it's building.
 	cframe = unit->Data.Builded.Frame;
     } else {
-	type = unit->SeenType;
-	frame = unit->SeenFrame;
-	x = unit->SeenIX;
-	y = unit->SeenIY;
-	state = unit->SeenState;
-	constructed = unit->SeenConstructed;
-	cframe = unit->SeenCFrame;
+	type = unit->Seen.Type;
+	frame = unit->Seen.Frame;
+	x = unit->Seen.IX;
+	y = unit->Seen.IY;
+	state = unit->Seen.State;
+	constructed = unit->Seen.Constructed;
+	cframe = unit->Seen.CFrame;
     }
 
     DebugCheck(!type);

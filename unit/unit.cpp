@@ -313,7 +313,7 @@ global void InitUnit(Unit* unit, UnitType* type)
     //  Initialise unit structure (must be zero filled!)
     //
     unit->Type = type;
-    unit->SeenFrame = UnitNotSeen;		// Unit isn't yet seen
+    unit->Seen.Frame = UnitNotSeen;		// Unit isn't yet seen
 
     // FIXME: this is not needed for load+save, must move to other place
     if (1) {				// Call CCL for name generation
@@ -932,8 +932,13 @@ global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 */
 global int UnitVisibleOnMap(const Unit* unit)
 {
+    int p;
+    Player* player;
+
     DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
 
+    player = unit->Player;
+    p = 0;
     // Removed unit
     if (unit->Removed) {
 	return 0;
@@ -944,8 +949,17 @@ global int UnitVisibleOnMap(const Unit* unit)
     if (unit->Invisible) {
 	return 0;
     }
+
     // If units are watching it... what do you think?
-    return (unit->VisCount[ThisPlayer->Player] != 0);
+    for (p = 0; p < PlayerMax ; ++p) {
+	if ((p == player->Player) || (player->SharedVision & (1 << p) && 
+	    Players[p].SharedVision & (1 << player->Player))) {
+	    if (unit->VisCount[p]) {
+		return 1;
+	    }
+	}
+    }
+    return 0;
 }
 
 /**
@@ -981,7 +995,7 @@ global int UnitDrawableOnMap(const Unit* unit)
 	}
 
 	// Unit is visible under fog and was already discovered once.
-	if (unit->Type->VisibleUnderFog && unit->SeenFrame!=UnitNotSeen) {
+	if (unit->Type->VisibleUnderFog && unit->Seen.Frame != UnitNotSeen) {
 	    return 1;
 	}
 	return 0;
@@ -997,18 +1011,18 @@ global int UnitDrawableOnMap(const Unit* unit)
 local void UnitFillSeenValues(Unit* unit)
 {
     //	Seen values are undefined for visible units.
-    unit->SeenIY = unit->IY;
-    unit->SeenIX = unit->IX;
-    unit->SeenFrame = unit->Frame;
-    unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
+    unit->Seen.IY = unit->IY;
+    unit->Seen.IX = unit->IX;
+    unit->Seen.Frame = unit->Frame;
+    unit->Seen.State = (unit->Orders[0].Action == UnitActionBuilded) |
 	((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
     if (unit->Orders[0].Action == UnitActionDie) {
-	unit->SeenState = 3;
+	unit->Seen.State = 3;
     }
-    unit->SeenType = unit->Type;
-    unit->SeenConstructed = unit->Constructed;
-    unit->SeenDestroyed = unit->Destroyed;
-    unit->SeenCFrame = unit->Data.Builded.Frame;
+    unit->Seen.Type = unit->Type;
+    unit->Seen.Constructed = unit->Constructed;
+    unit->Seen.Destroyed = unit->Destroyed;
+    unit->Seen.CFrame = unit->Data.Builded.Frame;
 }
 
 /**
@@ -1027,14 +1041,14 @@ local void UnitFillSeenValues(Unit* unit)
 local void UnitGoesOutOfFog(Unit* unit, int p)
 {
     if (unit->Type->VisibleUnderFog) {
-	if (unit->SeenByPlayer & (1<<p)) {
+	if (unit->SeenByPlayer & (1 << p)) {
 	    DebugLevel3Fn("unit %d(%s): cleaned a ref from player %d\n" _C_
 		    unit->Slot _C_ unit->Type->Name _C_ p);
 	    if (Players[p].Type == PlayerPerson) {
 		RefsDecrease(unit);
 	    }
 	} else {
-	    unit->SeenByPlayer |= (1<<p);
+	    unit->SeenByPlayer |= (1 << p);
 	}
     }
 }
@@ -1074,19 +1088,23 @@ global void UnitsMarkSeen(const Player* player, int x, int y, int cloak)
     Unit* units[UnitMax];
     Unit* unit;
 
-    n = SelectUnitsOnTile(x, y,units);
+    n = SelectUnitsOnTile(x, y, units);
+    p = 0;
     DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
     while (n) {
 	unit = units[--n];
 	if (cloak != (int)unit->Type->PermanentCloak) {
 	    continue;
 	}
+	unit->VisCount[player->Player]++;
+	DebugCheck(unit->VisCount[player->Player] >
+	    unit->Type->TileWidth * unit->Type->TileHeight);
 	for (p = 0; p < PlayerMax ; ++p) {
-	    if ((player->SharedVision & (1 << p)) || (p == player->Player)) {
+	    if ((p == player->Player) || (player->SharedVision & (1 << p) && 
+		Players[p].SharedVision & (1 << player->Player))) {
 		if (!unit->VisCount[p]) {
-		    UnitGoesOutOfFog(unit,p);
+		    UnitGoesOutOfFog(unit, p);
 		}
-		unit->VisCount[p]++;
 	    }
 	}
     }
@@ -1107,17 +1125,19 @@ global void UnitsUnmarkSeen(const Player* player, int x, int y, int cloak)
     Unit* units[UnitMax];
     Unit* unit;
 
-    n = SelectUnitsOnTile(x, y,units);
+    n = SelectUnitsOnTile(x, y, units);
+    p = 0;
     DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
     while (n) {
 	unit = units[--n];
 	if (cloak != (int)unit->Type->PermanentCloak) {
 	    continue;
 	}
+	DebugCheck(!unit->VisCount[player->Player]);
+	unit->VisCount[player->Player]--;
 	for (p = 0; p < PlayerMax ; ++p) {
-	    if (player->SharedVision & (1 << p) || (p == player->Player)) {
-		DebugCheck(!unit->VisCount[p]);
-		unit->VisCount[p]--;
+	    if ((p == player->Player) || (player->SharedVision & (1 << p) && 
+		Players[p].SharedVision & (1 << player->Player))) {
 		if (!unit->VisCount[p]) {
 		    UnitGoesUnderFog(unit,p);
 		}
@@ -1156,21 +1176,23 @@ global void UnitCountSeen(Unit* unit)
 	for (x = 0; x < unit->Type->TileWidth; ++x) {
 	    for (y = 0; y < unit->Type->TileHeight; ++y) {
 		if (unit->Type->PermanentCloak) {
-		    if (TileDetectCloak(&Players[p], unit->X + x, unit->Y + y)) {
+		    if (TheMap.Fields[(unit->Y + y) * TheMap.Width + x + unit->X].VisCloak[p]) {
 			newv++;
 		    }
 	        } else {
-		    if (IsMapFieldVisible(&Players[p], unit->X + x, unit->Y + y)) {
+		    if (TheMap.Fields[(unit->Y + y) * TheMap.Width + x + unit->X].Visible[p]) {
 			newv++;
 		    }
 		}
 	    }
 	}
+	// Shared Vision Calculation here.
+	// Do I share vision, and if so, so I see/hide unit now.
 	if ((oldv == 0) && (newv)) {
-	    UnitGoesOutOfFog(unit,p);
+	    UnitGoesOutOfFog(unit, p);
 	}
 	if ((oldv) && (newv == 0)) {
-	    UnitGoesUnderFog(unit,p);
+	    UnitGoesUnderFog(unit, p);
 	}
 	//  Now set the new visibility count
 	unit->VisCount[p] = newv;
@@ -3542,28 +3564,28 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     }
     CLprintf(file, ")\n  ");
     if (unit->VisCount[ThisPlayer->Player]==0 && unit->Type->VisibleUnderFog) {
-	CLprintf(file, "'seen-pixel '(%d %d) ", unit->SeenIX, unit->SeenIY);
-	if (unit->SeenType) {
-	    CLprintf(file, "'seen-type '%s ", unit->SeenType->Ident);
+	CLprintf(file, "'seen-pixel '(%d %d) ", unit->Seen.IX, unit->Seen.IY);
+	if (unit->Seen.Type) {
+	    CLprintf(file, "'seen-type '%s ", unit->Seen.Type->Ident);
 	}
-	if (unit->SeenFrame != UnitNotSeen) {
+	if (unit->Seen.Frame != UnitNotSeen) {
 	    CLprintf(file, "'%sseen %d ",
-		unit->SeenFrame < 0 ? "flipped-" : "",
-		unit->SeenFrame < 0 ? -unit->SeenFrame : unit->SeenFrame);
+		unit->Seen.Frame < 0 ? "flipped-" : "",
+		unit->Seen.Frame < 0 ? -unit->Seen.Frame : unit->Seen.Frame);
 	} else {
 	    CLprintf(file, "'not-seen ");
 	}
-	if (unit->SeenConstructed) {
+	if (unit->Seen.Constructed) {
 	    CLprintf(file, " 'seen-constructed");
 	}
-	if (unit->SeenDestroyed) {
+	if (unit->Seen.Destroyed) {
 	    CLprintf(file, " 'seen-destroyed");
 	}
-	CLprintf(file, " 'seen-state %d ", unit->SeenState);
+	CLprintf(file, " 'seen-state %d ", unit->Seen.State);
 	if (unit->Orders->Action == UnitActionBuilded) {
 	    cframe = unit->Type->Construction->Frames;
 	    frame = 0;
-	    while (cframe != unit->SeenCFrame) {
+	    while (cframe != unit->Seen.CFrame) {
 		cframe = cframe->Next;
 		++frame;
 	    }
