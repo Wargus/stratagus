@@ -7124,6 +7124,7 @@ local void MultiGameMasterReport(void)
 {
     Menu *menu;
     char *port;
+    char ch;
 
     menu = FindMenu("menu-multi-setup");
     if (menu->Items[61].d.input.nch == 0) {
@@ -7132,7 +7133,8 @@ local void MultiGameMasterReport(void)
 	return;
     }
 
-    MasterTempString[menu->Items[61].d.input.nch] = 0;
+    ch = MasterTempString[menu->Items[61].d.input.nch];
+    MasterTempString[menu->Items[61].d.input.nch] = '\0';
     port = strchr(MasterTempString, ':');
     if (port) {
 	*port = '\0';
@@ -7164,6 +7166,8 @@ local void MultiGameMasterReport(void)
 	menu->Items[60].d.gem.state = MI_GSTATE_CHECKED;
 	MasterSendAnnounce();
     }
+
+    MasterTempString[menu->Items[61].d.input.nch] = ch;
 }
 
 /**
