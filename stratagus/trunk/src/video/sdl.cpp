@@ -310,6 +310,7 @@ global void Invalidate(void)
 **	Convert SDL keysym into internal keycode.
 **
 **	@param code	SDL keysym structure pointer.
+**	@param keychar	Internal keycode.
 **
 **	@return		ASCII code or internal keycode.
 */
@@ -470,8 +471,8 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 /**
 **	Handle keyboard key press!
 **
-**	@param callback	Callback funktion for key down.
-**	@param code	SDL keysym structure pointer.
+**	@param callbacks	Callback funktion for key down.
+**	@param code		SDL keysym structure pointer.
 */
 local void SdlHandleKeyPress(const EventCallback* callbacks,
     const SDL_keysym* code)
@@ -486,8 +487,8 @@ local void SdlHandleKeyPress(const EventCallback* callbacks,
 /**
 **	Handle keyboard key release!
 **
-**	@param callback	Callback funktion for key up.
-**	@param code	SDL keysym structure pointer.
+**	@param callbacks	Callback funktion for key up.
+**	@param code		SDL keysym structure pointer.
 */
 local void SdlHandleKeyRelease(const EventCallback* callbacks,
     const SDL_keysym* code)
@@ -502,8 +503,8 @@ local void SdlHandleKeyRelease(const EventCallback* callbacks,
 /**
 **	Handle interactive input event.
 **
-**	@param callback	Callback structure for events.
-**	@param event	SDL event structure pointer.
+**	@param callbacks	Callback structure for events.
+**	@param event		SDL event structure pointer.
 */
 local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 {
