@@ -67,7 +67,7 @@ global int CDTrack;			/// Current cd track
 global int NumCDTracks;			/// Number of tracks on the cd
 
 #if defined(USE_SDLCD) 
-local SDL_CD *CDRom;			/// SDL cdrom device
+local SDL_CD* CDRom;			/// SDL cdrom device
 #elif defined(USE_CDDA) 
 global int CDDrive;			/// CDRom device
 global struct cdrom_tocentry CDtocentry[64];	/// TOC track header struct
@@ -105,7 +105,7 @@ local int InitCD(void)
 global int PlayCDTrack(int track)
 {
     CDTrack = track;
-    return SDL_CDPlayTracks(CDRom, track-1, 0, 0, 0);
+    return SDL_CDPlayTracks(CDRom, track - 1, 0, 0, 0);
 }
 
 /**
@@ -249,6 +249,7 @@ global int IsCDPlaying(void)
 global int GetCDVolume(void)
 {
     int vol;
+
     cd_get_volume(&vol, &vol);
     return vol;
 }
@@ -258,7 +259,6 @@ global int GetCDVolume(void)
 */
 global void SetCDVolume(int vol)
 {
-    vol = vol;
     cd_set_volume(vol, vol);
 }
 
@@ -307,7 +307,7 @@ local int InitCD(void)
 */
 global int PlayCDTrack(int track)
 {
-    Sample *sample;
+    Sample* sample;
 
     sample = LoadCD(NULL, track);
     CDTrack = track;
@@ -339,7 +339,7 @@ global void PauseCD(void)
 */
 global int IsAudioTrack(track)
 {
-    return !(CDtocentry[track].cdte_ctrl&CDROM_DATA_TRACK);
+    return !(CDtocentry[track].cdte_ctrl & CDROM_DATA_TRACK);
 }
 
 /**
@@ -380,10 +380,10 @@ global void QuitCD(void)
 ** 
 **      Perodic called from the main loop. 
 */
-global int CDRomCheck(void *unused __attribute__ ((unused)))
+global int CDRomCheck(void* unused __attribute__ ((unused)))
 {
-    if (CDMode != CDModeOff && CDMode != CDModeStopped
-	    && !IsCDPlaying() && CDMode != CDModeDefined) {
+    if (CDMode != CDModeOff && CDMode != CDModeStopped &&
+	    !IsCDPlaying() && CDMode != CDModeDefined) {
         DebugLevel0Fn("Playing new track\n");
         PlayCDRom(CDMode);
     }

@@ -92,16 +92,16 @@ global int InitArtsSound(int freq, int size)
 
     switch (freq) {
 	case 11025:
-	    frags = ((8<<16) |  8);   // 8 Buffers of  256 Bytes
+	    frags = ((8 << 16) |  8);   // 8 Buffers of  256 Bytes
 	    break;
 	case 22050:
-	    frags = ((8<<16) |  9);   // 8 Buffers of  512 Bytes
+	    frags = ((8 << 16) |  9);   // 8 Buffers of  512 Bytes
 	    break;
 	default:
 	    DebugLevel0Fn("Unexpected sample frequency %d\n" _C_ freq);
 	    // FALL THROUGH
 	case 44100:
-	    frags = ((8<<16) | 10);   // 8 Buffers of 1024 Bytes
+	    frags = ((8 << 16) | 10);   // 8 Buffers of 1024 Bytes
 	    break;
     }
     if (size == 16) {			//  8 bit
@@ -139,7 +139,7 @@ global void ExitArtsSound(void)
 */
 global int WriteArtsSound(void* data,int len)
 {
-	return arts_write(stream, data, len);
+    return arts_write(stream, data, len);
 }
 
 /**
@@ -149,7 +149,7 @@ global int WriteArtsSound(void* data,int len)
 */
 global int ArtsGetSpace(void)
 {
-	return arts_stream_get(stream, ARTS_P_BUFFER_SPACE);
+    return arts_stream_get(stream, ARTS_P_BUFFER_SPACE);
 }
 
 #endif	// } WITH_ARTSC
