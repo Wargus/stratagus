@@ -1464,6 +1464,11 @@ local void PudWriteSQM(gzFile f,const WorldMap* map)
 	if( f&MapFieldUnpassable ) {
 	    v|=MapMoveUnpassable;
 	}
+#if 0
+	// These fields shouldn't be saved.  The engine sets them when loading
+	// a pud and placing units.  Saving these creates problems with games
+	// that don't use all of the units, for example using fewer players
+	// or one peasant only.
 	if( f&MapFieldLandUnit ) {
 	    v|=MapMoveLandUnit;
 	}
@@ -1476,6 +1481,7 @@ local void PudWriteSQM(gzFile f,const WorldMap* map)
 	if( f&MapFieldBuilding ) {
 	    v|=MapMoveBuildingUnit;
 	}
+#endif
 	sqm[i*2+0]=v >> 0;
 	sqm[i*2+1]=v >> 8;
     }
