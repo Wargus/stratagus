@@ -89,8 +89,10 @@
 <a href="#SetDefaultMap">SetDefaultMap</a>
 <a href="#SetDiplomacy">SetDiplomacy</a>
 <a href="#SetGameCycle">SetGameCycle</a>
+<a href="#SetGameName">SetGameName</a>
 <a href="#SetGamePaused">SetGamePaused</a>
 <a href="#SetGroupId">SetGroupId</a>
+<a href="#SetLocalPlayerName">SetLocalPlayerName</a>
 <a href="#SetObjectives">SetObjectives</a>
 <a href="#SetSharedVision">SetSharedVision</a>
 <a href="#SetThisPlayer">SetThisPlayer</a>
@@ -99,6 +101,7 @@
 <a href="#ShowMapLocation">ShowMapLocation</a>
 <a href="#SharedVision">SharedVision</a>
 <a href="#SlotUsage">SlotUsage</a>
+<a href="#SyncRand">SyncRand</a>
 <a href="#Unit">Unit</a>
 <a href="#Units">Units</a>
 <hr>
@@ -1036,6 +1039,24 @@ Set the current game cycle number.
     SetGameCycle(100)
 </pre>
 
+<a name="SetGameName"></a>
+<h3>SetGameName("name")</h3>
+
+Sets the name of the game so savegames, maps, settings and logs can be set
+differently for different games used.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name the game has for loading and saving files</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Name to bos, ~/.stratagus/bos is location of files
+	SetGameName("bos")
+</pre>
+
 <a name="SetGamePaused"></a>
 <h3>SetGamePaused(paused)</h3>
 
@@ -1071,6 +1092,24 @@ Pause or unpause the game.
 
 <pre>
     SetGroupId()
+</pre>
+
+<a name="SetLocalPlayerName"</a>
+<h3>SetLocalPlayerName("name")</h3>
+
+Sets the name of the player playing on this computer. Also saved in
+preferences, and a default used when the game is started.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name of the player, limited to 16 characters"</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    -- Set Player Name to mr-russ
+	SetLocalPlayerName("mr-russ")
 </pre>
 
 <a name="SetObjectives"></a>
@@ -1237,6 +1276,28 @@ Show an area on the map for the given player.
 
 <pre>
     SlotUsage()
+</pre>
+
+<a name="SyncRand"></a>
+<h3>SyncRand(number)</h3>
+
+Get a value from the Stratagus syncronized random number generator.
+Used to allow the AI to make syncronized choices with multiplayer, and 
+during replays.
+
+<dl>
+<dt>number<dt>
+<dd>Number to create random from, eg 10 will return a number from 0-9</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    if(SyncRand(10) &lt; 5) then
+		-- Do this
+	else
+		-- Do that
+	end
 </pre>
 
 <a name="Unit"></a>
