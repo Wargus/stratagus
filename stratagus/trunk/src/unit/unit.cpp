@@ -959,6 +959,11 @@ global int UnitDrawableOnMap(const Unit* unit)
 {
     DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
 
+    //  All units are always visible in the editor.
+    if (EditorRunning) {
+	return 1;
+    }
+
     //  If it's your own unit, of course you can see it, right?
     //  WRONG, it can have a vision range of 0.
     // Invisible by spell
@@ -966,6 +971,7 @@ global int UnitDrawableOnMap(const Unit* unit)
 	return 0;
     }
     // If units are watching it... what do you think?
+    // Units are always visible if the editor is running.
     if (unit->VisCount[ThisPlayer->Player]) {
 	return 1;
     } else { // Not watched by any units.
