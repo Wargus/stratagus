@@ -970,7 +970,6 @@ echo "	@\$(TOPDIR)/tools/aledoc \$< | \$(DOCIFY) > \$*-h.doc 2>/dev/null" >> $RU
 echo
 echo "Done generating $RULESFILE."
 echo
-$MAKE clean > /dev/null
 echo -n "Would you like to compile it now? (y) "
 read $N ANSWER
 echo
