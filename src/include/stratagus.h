@@ -298,15 +298,15 @@ extern int EnableRedraw;
 #define MyRand()  rand()
 
 enum {
-    TitleFlagCenter	= 1 << 0,  ///< Center Text
+	TitleFlagCenter	= 1 << 0,  ///< Center Text
 };
 
 typedef struct _title_screen_label_ {
-    char* Text;
-    int Font;
-    int Xofs;
-    int Yofs;
-    int Flags;
+	char* Text;
+	int Font;
+	int Xofs;
+	int Yofs;
+	int Flags;
 } TitleScreenLabel;
 
 typedef struct _title_screen_ {

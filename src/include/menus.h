@@ -104,12 +104,12 @@ typedef int MenuButtonId;
 #define MBUTTON_SC_BUTTON 116
 #define MBUTTON_SC_BUTTON_RIGHT 125
 
-    /// Offsets into NetMultiSetupMenuItems
+	/// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE	5
 #define SERVER_PLAYER_READY	32
 #define SERVER_PLAYER_LAG	46
 
-    /// Offsets into NetMultiClientMenuItems
+	/// Offsets into NetMultiClientMenuItems
 #define CLIENT_PLAYER_STATE	5
 #define CLIENT_RACE		21
 #define CLIENT_RESOURCE		23

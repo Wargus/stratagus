@@ -135,8 +135,8 @@ static enum mad_flow MAD_write(void* user,
 
 	buf = (short*)(sample->Buffer + sample->Pos + sample->Len);
 
-        for (i = 0; i < n; ++i) {
-                for (j = 0; j < sample->Channels; ++j) {
+	for (i = 0; i < n; ++i) {
+		for (j = 0; j < sample->Channels; ++j) {
 			s = pcm->samples[j][i];
 			// round
 			s += (1L << (MAD_F_FRACBITS - 16));
@@ -148,9 +148,9 @@ static enum mad_flow MAD_write(void* user,
 			}
 			// quantize
 			s >>= (MAD_F_FRACBITS + 1 - 16);
-                        buf[i * sample->Channels + j] = s;
-                }
-        }
+			buf[i * sample->Channels + j] = s;
+		}
+	}
 
 	sample->Len += comp;
 
@@ -288,10 +288,10 @@ static int Mp3ReadStream(Sample* sample, void* buf, int len)
 
 	data = sample->User;
 
-        if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
-                memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-                sample->Pos = 0;
-        }
+	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
+		sample->Pos = 0;
+	}
 
 	divide = 176400 / (sample->Frequency * 2 * sample->Channels);
 
@@ -369,8 +369,8 @@ static int Mp3Read(Sample* sample, void* buf, int len)
 	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
-        sample->Pos += len;
-        sample->Len -= len;
+	sample->Pos += len;
+	sample->Len -= len;
 
 	return len;
 }

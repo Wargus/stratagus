@@ -1122,8 +1122,8 @@ void VideoDrawHLine(Uint32 color, int x, int y, int width)
 */
 void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
-    CLIP_HLINE(x, y, width);
-    VideoDrawHLine(color, x, y, width);
+	CLIP_HLINE(x, y, width);
+	VideoDrawHLine(color, x, y, width);
 }
 
 /**
@@ -1218,8 +1218,8 @@ void VideoDrawVLine(Uint32 color, int x, int y, int height)
 */
 void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
-    CLIP_VLINE(x, y, height);
-    VideoDrawVLine(color, x, y, height);
+	CLIP_VLINE(x, y, height);
+	VideoDrawVLine(color, x, y, height);
 }
 
 /**
@@ -1442,7 +1442,7 @@ void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 **  @param w      width of rectangle (0=don't draw).
 */
 void VideoDrawRectangleClip(Uint32 color, int x, int y,
-    int w, int h)
+	int w, int h)
 {
 	#define _x              x
 	#define _y              y
@@ -1524,10 +1524,10 @@ void VideoFillRectangle(Uint32 color, int x, int y,
 **  @param w      width of rectangle (0=don't draw).
 */
 void VideoFillRectangleClip(Uint32 color, int x, int y,
-    int w, int h)
+	int w, int h)
 {
-    CLIP_RECTANGLE(x, y, w, h);
-    VideoFillRectangle(color, x, y, w, h);
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoFillRectangle(color, x, y, w, h);
 }
 
 /**
@@ -1568,10 +1568,10 @@ void VideoFillTransRectangle(Uint32 color, int x, int y,
 **  @param alpha  alpha value of pixels.
 */
 void VideoFillTransRectangleClip(Uint32 color, int x, int y,
-    int w, int h, unsigned char alpha)
+	int w, int h, unsigned char alpha)
 {
-    CLIP_RECTANGLE(x, y, w, h);
-    VideoFillTransRectangle(color, x, y, w, h, alpha);
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoFillTransRectangle(color, x, y, w, h, alpha);
 }
 
 /**
