@@ -97,6 +97,7 @@ enum _game_types_ {
     SettingsGameTypeFreeForAll,
     SettingsGameTypeTopVsBottom,
     SettingsGameTypeLeftVsRight,
+    SettingsGameTypeManVsMachine,
 
     // Future game type ideas
 #if 0
