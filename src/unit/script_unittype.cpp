@@ -1698,6 +1698,7 @@ static int CclDefineDecorations(lua_State* l)
 void UpdateUnitVariables(const Unit* unit)
 {
 	int i;
+	const UnitType* type; // unit->Type.
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Value = 0;
@@ -1831,6 +1832,29 @@ void UpdateUnitVariables(const Unit* unit)
 		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
 		Assert(unit->Variable[i].Value <= unit->Variable[i].Max);
 	}
+
+	// BoolFlag
+	type = unit->Type;
+	type->BoolFlag[COWARD_INDEX]                = type->Coward;
+	type->BoolFlag[BUILDING_INDEX]              = type->Building;
+	type->BoolFlag[FLIP_INDEX]                  = type->Flip;
+	type->BoolFlag[REVEALER_INDEX]              = type->Revealer;
+	type->BoolFlag[LANDUNIT_INDEX]              = type->LandUnit;
+	type->BoolFlag[AIRUNIT_INDEX]               = type->AirUnit;
+	type->BoolFlag[SEAUNIT_INDEX]               = type->SeaUnit;
+	type->BoolFlag[EXPLODEWHENKILLED_INDEX]     = type->ExplodeWhenKilled;
+	type->BoolFlag[VISIBLEUNDERFOG_INDEX]       = type->VisibleUnderFog;
+	type->BoolFlag[PERMANENTCLOAK_INDEX]        = type->PermanentCloak;
+	type->BoolFlag[DETECTCLOAK_INDEX]           = type->DetectCloak;
+	type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX] = type->AttackFromTransporter;
+	type->BoolFlag[VANISHES_INDEX]              = type->Vanishes;
+	type->BoolFlag[GROUNDATTACK_INDEX]          = type->GroundAttack;
+	type->BoolFlag[SHOREBUILDING_INDEX]         = type->ShoreBuilding;
+	type->BoolFlag[CANATTACK_INDEX]             = type->CanAttack;
+	type->BoolFlag[BUILDEROUTSIDE_INDEX]        = type->BuilderOutside;
+	type->BoolFlag[BUILDERLOST_INDEX]           = type->BuilderLost;
+	type->BoolFlag[CANHARVEST_INDEX]            = type->CanHarvest;
+	type->BoolFlag[HARVESTER_INDEX]             = type->Harvester;
 }
 
 /**
@@ -1844,14 +1868,23 @@ void InitDefinedVariables()
 		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
 		"PosX", "PosY", "Slot"
 		}; // names of the variable.
-	int i;
+	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
+		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
+		"\"VisibleUnderFog\", \"PermanentCloack\", \"AttackFromTransporter\","
+		"\"Vanishes\", \"GroundAttack\", \"ShoreBuilding\", \"CanAttack\","
+		"\"BuilderOutSide\", \"BuilderLost\", \"CanHarvest\", \"Harvester\")";
+	int i; // iterator for var and boolflag.
 
+	// Variables.
 	UnitTypeVar.VariableName = calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
 	for (i = 0; i < NVARALREADYDEFINED; i++) {
 		UnitTypeVar.VariableName[i] = strdup(var[i]);
 	}
 	UnitTypeVar.Variable = calloc(i, sizeof(*UnitTypeVar.Variable));
 	UnitTypeVar.NumberVariable = i;
+
+	// Boolflags.
+	CclCommand(boolflag);
 }
 
 /**

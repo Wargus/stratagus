@@ -214,16 +214,11 @@ typedef struct ConditionInfo {
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-	char Coward;            ///< Target is coward. Don't bloodlust them.
 	char Alliance;          ///< Target is allied. (neutral is neither allied, nor opponent)
 	char Opponent;          ///< Target is opponent. (neutral is neither allied, nor opponent)
-	char Building;          ///< Target is a building.
 	char TargetSelf;        ///< Target is the same as the caster.
 	char* BoolFlag;         ///< User defined boolean flag.
-#if 0
-		// TODO: NOT IMPLEMENTED:
-	char UnitBuffed;        ///< Target is buffed(haste/slow/bloodlust). Dispel magic?
-#endif
+
 	//
 	//  Conditions related to vitals:
 	//
