@@ -58,11 +58,16 @@ You need:
 	<LI>Win32 system win95, win98, winME, winNT or win2000.
 	    <UL>
 	    <LI>For network play WIN95 OSR2 (aka win95b) or higher is required
-		since some features of Winsock2 (WS2_32.DLL) are used. We try
-		to emulate this using WSOCK32.DLL features, but that code is
-		not in yet.
+		since some features of Winsock2 (WS2_32.DLL) are used. We will try
+		to emulate this using WSOCK32.DLL features in future versions, but
+		that code is not in yet.<BR>
+		For now this MS <A HREF="http://www.microsoft.com/windows95/downloads/contents/WUAdminTools/S_WUNetworkingTools/W95Sockets2/Default.asp">download</A> link might help. You must
+		install WS2_32.DLL even if you don't intend to play over a network,
+		otherwise FreeCraft won't start.
 	    <LI>WinNT needs to be WinNT4.0 + service pack 3 or higher for the same
 		reasons.
+	    <LI>Please note that winXP is <I>not</I> supported for various incompatibilities
+		and most likely will never be.
 	    </UL>
 	</UL>
 	<LI>libpng. (I use libpng-2.1.0, aka 1.0.5)
@@ -215,7 +220,7 @@ shell that comes with it you must type '/' instead of '\' in path names.
     <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=46537">this</a>
     page. Unzip it into any directory.
     <LI>Download freecraft-'date'.zip and unzip it into any directory.
-    <LI>Install any required librarys. (If you downloaded mingw32 from the link
+    <LI>Install all required libraries. (If you downloaded mingw32 from the link
     above you should not need to do this)
     <LI>Open a shell. (run mingw32.bat)
     <LI>Change to the top level freecraft directory. (cd /freecraft)
