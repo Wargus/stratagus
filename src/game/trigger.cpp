@@ -499,7 +499,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-unit: %s\n",op);
+	fprintf(stderr,"Illegal comparison operation in if-resource: %s\n",op);
 	Exit(1);
     }
 
@@ -568,6 +568,82 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 		    return SCM_BOOL_T;
 		}
 	    }
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Player has quantity kills
+*/
+local SCM CclIfKills(SCM player,SCM operation,SCM quantity)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+    const char* op;
+    CompareFunction Compare;
+
+    plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
+    q=gh_scm2int(quantity);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-kills: %s\n",op);
+	Exit(1);
+    }
+
+    if( plynr==-1 ) {
+	plynr=0;
+	pn=PlayerMax;
+    } else {
+	pn=plynr+1;
+    }
+
+    for( n=0; plynr<pn; ++plynr ) {
+	if( Compare(Players[plynr].TotalKills,q) ) {
+	    return SCM_BOOL_T;
+	}
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Player has a certain score
+*/
+local SCM CclIfScore(SCM player,SCM operation,SCM quantity)
+{
+    int plynr;
+    int q;
+    int pn;
+    int n;
+    const char* op;
+    CompareFunction Compare;
+
+    plynr=TriggerGetPlayer(player);
+    op=get_c_string(operation);
+    q=gh_scm2int(quantity);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-score: %s\n",op);
+	Exit(1);
+    }
+
+    if( plynr==-1 ) {
+	plynr=0;
+	pn=PlayerMax;
+    } else {
+	pn=plynr+1;
+    }
+
+    for( n=0; plynr<pn; ++plynr ) {
+	if( Compare(Players[plynr].Score,q) ) {
+	    return SCM_BOOL_T;
 	}
     }
 
@@ -668,6 +744,8 @@ global void TriggerCclRegister(void)
     gh_new_procedure5_0("if-rescued-near-unit",CclIfRescuedNearUnit);
     gh_new_procedure3_0("if-opponents",CclIfOpponents);
     gh_new_procedure4_0("if-resource",CclIfResource);
+    gh_new_procedure3_0("if-kills",CclIfKills);
+    gh_new_procedure3_0("if-score",CclIfScore);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
