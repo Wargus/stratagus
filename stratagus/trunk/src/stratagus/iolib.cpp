@@ -522,12 +522,33 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	    errno = zzip_errno(e);
 	    close(fd);
 	    dirp = NULL;
-	    break;
 	}
+	break;
     }
     if (!dirp) {
-	dirp = zzip_opendir(dirname);
-	zzbasepath[0] = 0;
+	int fd;
+	zzip_error_t e;
+
+	// this is tricky - we used to simply zzip_opendir(dirname) here, but
+	// zziplib (correctly) prefers real directories over same named zipfiles
+	// and we want it vice versa in this special case. Otherwise it would not
+	// match the path separtor backtrace above, which relies on recursive
+	// __zip_open_dir(). __zip_open_dir() only detects zipfiles, not real dirs!
+	fd = __zzip_open_zip(dirname, O_RDONLY|O_BINARY);
+	if (fd == -1) {
+	    dirp = zzip_opendir(dirname);
+	    zzbasepath[0] = 0;
+	} else {
+	    dirp = zzip_dir_fdopen(fd, &e);
+	    if (e) {
+		errno = zzip_errno(e);
+		close(fd);
+		dirp = NULL;
+	    } else {
+		strcpy (zzbasepath, dirname);
+	    }
+	    DebugLevel3Fn("zzbasepath `%s', dirname `%s'\n", zzbasepath, dirname);
+	}
     }
     IfDebug( if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n", dirname); } );
 #else
@@ -566,20 +587,25 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		}
 	    } else {
 		if (zzbasepath[0]) {
-		    cp = (char *)dirname + strlen(zzbasepath) + 1;
-		    cp = strchr(cp, '/') + 1;
-		    DebugLevel3Fn("dirprefix `%s', `%s'\n", cp, np);
-		    i = strlen(cp);
-		    if (strlen(dp->d_name) >= i && memcmp(dp->d_name, cp, i) == 0 &&
-				dp->d_name[i] == '/' && dp->d_name[i + 1]) {
-			strcpy(np, dp->d_name + i + 1);
+		    i = strlen(zzbasepath);
+		    isdir = 0;
+		    if (strlen(dirname) > i) {
+			cp = (char *)dirname + i + 1;
+			i = strlen(cp);
+			if (strlen(dp->d_name) >= i && memcmp(dp->d_name, cp, i) == 0 &&
+				    dp->d_name[i] == '/' && dp->d_name[i + 1]) {
+			    strcpy(np, dp->d_name + i + 1);
+			    goto zzentry;
+			}
+		    } else {
+			strcpy(np, dp->d_name);
 			goto zzentry;
 		    }
 		} else {
 zzentry:
 		    DebugLevel3Fn("zzip-entry `%s', `%s'\n", buffer, np);
 		    entvalid = 1;
-		    cp = strrchr(np, '/');
+		    cp = strchr(np, '/');
 		    if (cp) {
 			isdir = 1;
 			*cp = 0;
