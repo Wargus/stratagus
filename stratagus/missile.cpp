@@ -689,11 +689,20 @@ global void DrawMissile(const MissileType* mtype, int frame, int x, int y)
 {
 	DebugCheck(mtype == NULL);
 	// FIXME: This is a hack for mirrored sprites
-	if (frame < 0) {
-		VideoDrawClipX(mtype->Sprite, -frame, x, y);
-	} else {
-		VideoDrawClip(mtype->Sprite, frame, x, y);
-	}
+    if (mtype->Transparency==50) {
+        if (frame < 0) {
+			VideoDrawClipXTrans50(mtype->Sprite, -frame, x, y);
+		} else {
+			VideoDrawClipTrans50(mtype->Sprite, frame, x, y);
+		}
+ 	} else {
+
+		if (frame < 0) {
+			VideoDrawClipX(mtype->Sprite, -frame, x, y);
+		} else {
+			VideoDrawClip(mtype->Sprite, frame, x, y);
+		}
+    }
 }
 
 /**
@@ -1364,6 +1373,9 @@ global void SaveMissileTypes(CLFile* file)
 		}
 		CLprintf(file, "\n  'num-directions %d", mtype->NumDirections);
 		CLprintf(file, "\n ");
+        if (mtype->Transparency) {
+            CLprintf(file, "\n 'transparency %d", mtype->Transparency);
+        }
 		if (mtype->FiredSound.Name) {
 			CLprintf(file, " 'fired-sound \"%s\"", mtype->FiredSound.Name);
 		}

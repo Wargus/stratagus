@@ -111,6 +111,8 @@ local SCM CclDefineMissileType(SCM list)
 			mtype->SpriteFrames = gh_scm2int(gh_car(list));
 		} else if (gh_eq_p(value, gh_symbol2scm("num-directions"))) {
 			mtype->NumDirections = gh_scm2int(gh_car(list));
+        } else if (gh_eq_p(value, gh_symbol2scm("transparency"))) {
+            mtype->Transparency = gh_scm2int(gh_car(list));
 		} else if (gh_eq_p(value, gh_symbol2scm("fired-sound"))) {
 			free(mtype->FiredSound.Name);
 			mtype->FiredSound.Name = gh_scm2newstr(gh_car(list), NULL);
