@@ -129,6 +129,7 @@ global void InitModules(void)
 #ifdef HIERARCHIC_PATHFINDER
     PfHierInitialize ();
 #endif
+    InitMapFogOfWar();			// build tables for fog of war
 }
 
 /**
@@ -193,6 +194,9 @@ global void LoadAll(void)
     SaveGame("save_file_of_freecraft0.ccl");
     LoadGame("save_file_of_freecraft0.ccl");
     SaveGame("save_file_of_freecraft1.ccl");
+    LoadGame("save_file_of_freecraft1.ccl");
+    SaveGame("save_file_of_freecraft2.ccl");
+    LoadGame("save_file_of_freecraft2.ccl");
 #endif
     LoadGame ("save_file_of_freecraft.ccl");
 }
