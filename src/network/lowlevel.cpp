@@ -467,12 +467,14 @@ global int NetConnectTCP(int sockfd,char* host,int port)
 {
     struct sockaddr_in sa;
     unsigned long addr;
+#ifndef __BEOS__
     int opt;
 
     opt = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void*)&opt, sizeof(opt));
     opt = 0;
     setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (void*)&opt, sizeof(opt));
+#endif
 
     addr=NetResolveHost(host);
     if( addr==INADDR_NONE ) {
