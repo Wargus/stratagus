@@ -88,7 +88,7 @@ local unsigned long NextLogCycle;	/// Next log cycle number
 **	@param num	optional number argument
 */
 global void CommandLog(const char* name,const Unit* unit,int flag,
-	unsigned x,unsigned y,const Unit* dest,const char* value,int num)
+	int x,int y,const Unit* dest,const char* value,int num)
 {
     if( CommandLogDisabled ) {		// No log wanted
 	return;
@@ -568,7 +568,7 @@ global void ReplayEachCycle(void)
 	return;
     }
 
-    if( NextLogCycle!=-1 && NextLogCycle!=GameCycle ) {
+    if( NextLogCycle!=(unsigned long)-1 && NextLogCycle!=GameCycle ) {
 	return;
     }
 

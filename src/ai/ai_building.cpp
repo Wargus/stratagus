@@ -365,7 +365,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 	return 0;
     }
 
-    for( i=0; i<sizeof(best_mines)/sizeof(*best_mines); ++i) {
+    for( i=0; i<(int)(sizeof(best_mines)/sizeof(*best_mines)); ++i) {
 	best_mines[i].d=-1;
     }
 
@@ -411,7 +411,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 	//  Sort by distance to mine
 	//
 	d = MapDistanceToUnit(worker->X, worker->Y, goldmines[i]);
-	for( j=0; j<sizeof(best_mines)/sizeof(*best_mines); ++j ) {
+	for( j=0; j<(int)(sizeof(best_mines)/sizeof(*best_mines)); ++j ) {
 	    int k;
 	    if( best_mines[j].d==-1 || d<best_mines[j].d ) {
 		for( k=sizeof(best_mines)/sizeof(*best_mines)-1; k>j; --k ) {
@@ -426,7 +426,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     }
     best_mines[i].d=-1;
 
-    for( i=0; i<sizeof(best_mines)/sizeof(*best_mines) && best_mines[i].d!=-1; ++i) {
+    for( i=0; i<(int)(sizeof(best_mines)/sizeof(*best_mines)) && best_mines[i].d!=-1; ++i) {
 	//
 	//  Find a building place near the mine
 	//
