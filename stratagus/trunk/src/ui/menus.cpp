@@ -235,6 +235,18 @@ local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
 
 local void StartEditor(void);
+local void EditorNewMap(void);
+local void EditorLoadMap(void);
+local void EditorLoadInit(Menuitem *mi);
+local void EditorLoadLBInit(Menuitem *mi);
+local void EditorLoadLBExit(Menuitem *mi);
+local void EditorLoadFolder(void);
+local int EditorLoadRDFilter(char *pathbuf, FileList *fl);
+local void EditorLoadLBAction(Menuitem *mi, int i);
+local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i);
+local void EditorLoadOk(void);
+local void EditorLoadCancel(void);
+local void EditorLoadVSAction(Menuitem *mi, int i);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -283,6 +295,7 @@ local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
 local int GameLoaded;
+local int EditorLoadCancelled;
 
 /**
 **	Offsets from top and left, used for different resolutions
@@ -1585,6 +1598,47 @@ local void InitConfirmDeleteMenuItems() {
     ConfirmDeleteMenuItems[4].d.button = i4;
 }
 
+local Menuitem EditorSelectMenuItems[] = {
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 0, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 1, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 320 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+};
+local void InitEditorSelectMenuItems() {
+    MenuitemButton i0 = { "~!New Map", 224, 27, MBUTTON_GM_FULL, EditorNewMap, 'n'};
+    MenuitemButton i1 = { "~!Load Map", 224, 27, MBUTTON_GM_FULL, EditorLoadMap, 'l'};
+    MenuitemButton i2 = { "~!Cancel", 224, 27, MBUTTON_GM_FULL, EndMenu, 'c'};
+    EditorSelectMenuItems[0].d.button = i0;
+    EditorSelectMenuItems[1].d.button = i1;
+    EditorSelectMenuItems[2].d.button = i2;
+}
+
+local Menuitem EditorLoadMapMenuItems[] = {
+    { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, EditorLoadInit, NULL, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, (352-18-288)/2, 11+98, 0, GameFont, EditorLoadLBInit, EditorLoadLBExit, {{NULL,0}} },
+    { MI_TYPE_VSLIDER, (352-18-288)/2+288, 11+98, 0, 0, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 48, 308, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 198, 308, 0, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, (352-18-288)/2-2, 11+98-28, 0, GameFont, NULL, NULL, {{NULL,0}} },
+
+};
+local void InitEditorLoadMapMenuItems() {
+    MenuitemText    i0 = { "Select map", MI_TFLAGS_CENTERED};
+
+    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, EditorLoadLBAction, 0, 0, 0, 0, 6, 0,
+			    (void *)EditorLoadLBRetrieve, EditorLoadOk};
+    MenuitemVslider  i2 = { 0, 18, 6*18, EditorLoadVSAction, -1, 0, 0, 0, EditorLoadOk};
+
+    MenuitemButton   i3 = { "OK", 106, 27, MBUTTON_GM_HALF, EditorLoadOk, 0};
+    MenuitemButton   i4 = { "Cancel", 106, 27, MBUTTON_GM_HALF, EditorLoadCancel, 0};
+    MenuitemButton   i5 = { NULL, 36, 24, MBUTTON_FOLDER, EditorLoadFolder, 0};
+    EditorLoadMapMenuItems[0].d.text     = i0;
+    EditorLoadMapMenuItems[1].d.listbox  = i1;
+    EditorLoadMapMenuItems[2].d.vslider  = i2;
+    EditorLoadMapMenuItems[3].d.button   = i3;
+    EditorLoadMapMenuItems[4].d.button   = i4;
+    EditorLoadMapMenuItems[5].d.button   = i5;
+}
+
 /**
 **	FIXME: Ari please look, this is now in TheUI.
 */
@@ -1879,6 +1933,26 @@ global Menu Menus[] = {
 	ImagePanel4,
 	1, 5,
 	ConfirmDeleteMenuItems,
+	NULL,
+    },
+    {
+	// Editor Select Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	0, 3,
+	EditorSelectMenuItems,
+	NULL,
+    },
+    {
+	// Editor Load Map Menu
+	(640-352)/2,
+	(480-352)/2,
+	352, 352,
+	ImagePanel5,
+	4, 6,
+	EditorLoadMapMenuItems,
 	NULL,
     },
 };
@@ -5598,7 +5672,424 @@ global void NetClientUpdateState(void)
 */
 local void StartEditor(void)
 {
+    char* s;
+
+    VideoLockScreen();
+    StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
+    Invalidate();
+
+    if (!*CurrentMapPath || *CurrentMapPath == '.' || *CurrentMapPath == '/') {
+	strcpy(CurrentMapPath, "default.pud");
+    }
+
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    if (*ScenSelectPath) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectPath, '/'))) {
+	strcpy(ScenSelectFileName, s + 1);
+	*s = '\0';
+    }
+    strcpy(ScenSelectDisplayPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
+	*s = '\0';
+    } else {
+	*ScenSelectDisplayPath = '\0';
+    }
+
+    GetInfoFromSelectPath();
+
+    ProcessMenu(MENU_EDITOR_SELECT, 1);
+
+}
+
+local void EditorNewMap(void)
+{
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    // FIXME: currently just loads default.pud
+    strcpy(CurrentMapPath, "default.pud");
+
     EditorMainLoop();
+    EndMenu();
+}
+
+local void EditorLoadMap(void)
+{
+    char *p;
+
+    EditorLoadCancelled=0;
+    ProcessMenu(MENU_EDITOR_LOAD_MAP, 1);
+    GetInfoFromSelectPath();
+
+    if (EditorLoadCancelled) {
+	VideoLockScreen();
+	StartMenusSetBackground(NULL);
+	VideoUnlockScreen();
+	return;
+    }
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    if (ScenSelectPath[0]) {
+	strcat(ScenSelectPath, "/");
+	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
+	p = ScenSelectPath + strlen(FreeCraftLibPath) + 1;
+	strcpy(CurrentMapPath, p);
+    } else {
+	strcpy(CurrentMapPath, ScenSelectFileName);
+	strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
+    }
+
+    EditorMainLoop();
+    EndMenu();
+}
+
+local void EditorLoadInit(Menuitem *mi)
+{
+    DebugCheck(!*ScenSelectPath);
+    EditorLoadMapMenuItems[5].flags =
+	*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
+    EditorLoadMapMenuItems[5].d.button.text = ScenSelectDisplayPath;
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+}
+
+local void EditorLoadLBInit(Menuitem *mi)
+{
+    int i;
+
+    EditorLoadLBExit(mi);
+    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorLoadRDFilter,
+	(FileList **)&(mi->d.listbox.options));
+
+    if (i == 0) {
+	EditorLoadMapMenuItems[3].d.button.text = "OK";
+	EditorLoadMapMenuItems[3].flags |= MenuButtonDisabled;
+    } else {
+	EditorLoadLBAction(mi, 0);
+	EditorLoadMapMenuItems[3].flags &= ~MenuButtonDisabled;
+	if (i > 5) {
+	    mi[1].flags &= ~MenuButtonDisabled;
+	}
+    }
+}
+
+local void EditorLoadLBExit(Menuitem *mi)
+{
+    FileList *fl;
+
+    if (mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	FreeMapInfos(fl, mi->d.listbox.noptions);
+	free(fl);
+	mi->d.listbox.options = NULL;
+	mi->d.listbox.noptions = 0;
+	mi[1].flags |= MenuButtonDisabled;
+    }
+}
+
+local int EditorLoadRDFilter(char *pathbuf, FileList *fl)
+{
+    MapInfo *info;
+    char *suf;
+    char *np, *cp, *lcp;
+#ifdef USE_ZZIPLIB
+    ZZIP_FILE *zzf;
+#endif
+
+    suf = ".pud";
+    np = strrchr(pathbuf, '/');
+    if (np) {
+	np++;
+    } else {
+	np = pathbuf;
+    }
+    cp = np;
+    cp--;
+    fl->type = -1;
+#ifdef USE_ZZIPLIB
+    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+	sz = zzip_file_real(zzf);
+	zzip_close(zzf);
+	if (!sz) {
+	    goto usezzf;
+	}
+    }
+#endif
+    do {
+	lcp = cp++;
+	cp = strcasestr(cp, suf);
+    } while (cp != NULL);
+    if (lcp >= np) {
+	cp = lcp + strlen(suf);
+#ifdef USE_ZLIB
+	if (strcmp(cp, ".gz") == 0) {
+	    *cp = 0;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	if (strcmp(cp, ".bz2") == 0) {
+	    *cp = 0;
+	}
+#endif
+	if (*cp == 0) {
+#ifdef USE_ZZIPLIB
+usezzf:
+#endif
+	    if (strcasestr(pathbuf, ".pud")) {
+		info = GetPudInfo(pathbuf);
+		if (info) {
+		    fl->type = 1;
+		    fl->name = strdup(np);
+		    fl->xdata = info;
+		    return 1;
+		}
+	    }
+	}
+    }
+    return 0;
+}
+
+local void EditorLoadFolder(void)
+{
+    char *cp;
+    Menuitem *mi = EditorLoadMapMenuItems + 1;
+
+    if (ScenSelectDisplayPath[0]) {
+	cp = strrchr(ScenSelectDisplayPath, '/');
+	if (cp) {
+	    *cp = 0;
+	} else {
+	    ScenSelectDisplayPath[0] = 0;
+	    EditorLoadMapMenuItems[5].flags |= MenuButtonDisabled;
+	    EditorLoadMapMenuItems[5].d.button.text = NULL;
+	}
+	cp = strrchr(ScenSelectPath, '/');
+	if (cp) {
+	    *cp = 0;
+	    EditorLoadLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	}
+    }
+}
+
+local void EditorLoadOk(void)
+{
+    FileList *fl;
+    Menuitem *mi = EditorLoadMapMenuItems + 1;
+    int i = mi->d.listbox.curopt + mi->d.listbox.startline;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type == 0) {
+	    strcat(ScenSelectPath, "/");
+	    strcat(ScenSelectPath, fl[i].name);
+	    if (EditorLoadMapMenuItems[5].flags&MenuButtonDisabled) {
+		EditorLoadMapMenuItems[5].flags &= ~MenuButtonDisabled;
+		EditorLoadMapMenuItems[5].d.button.text = ScenSelectDisplayPath;
+	    } else {
+		strcat(ScenSelectDisplayPath, "/");
+	    }
+	    strcat(ScenSelectDisplayPath, fl[i].name);
+	    EditorLoadLBInit(mi);
+	    mi->d.listbox.cursel = -1;
+	    mi->d.listbox.startline = 0;
+	    mi->d.listbox.curopt = 0;
+	    mi[1].d.vslider.percent = 0;
+	    mi[1].d.hslider.percent = 0;
+	    MustRedraw |= RedrawMenu;
+	} else {
+	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
+	    EndMenu();
+	}
+    }
+}
+
+local void EditorLoadCancel(void)
+{
+    char* s;
+
+    EditorLoadCancelled=1;
+
+    //
+    //  Use last selected map.
+    //
+    DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    if (*ScenSelectPath) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectPath, '/'))) {
+	strcpy(ScenSelectFileName, s + 1);
+	*s = '\0';
+    }
+    strcpy(ScenSelectDisplayPath, CurrentMapPath);
+    if ((s = strrchr(ScenSelectDisplayPath, '/'))) {
+	*s = '\0';
+    } else {
+	*ScenSelectDisplayPath = '\0';
+    }
+
+    DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+
+    EndMenu();
+}
+
+local unsigned char *EditorLoadLBRetrieve(Menuitem *mi, int i)
+{
+    FileList *fl;
+    Menu *menu;
+    MapInfo *info;
+    static char buffer[1024];
+    int j, n;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+		if ((info = fl[i].xdata)) {
+		    menu = Menus + MENU_EDITOR_LOAD_MAP;
+		    if (info->Description) {
+			VideoDrawText(menu->x+8,menu->y+234,LargeFont,info->Description);
+		    }
+		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
+		    VideoDrawText(menu->x+8,menu->y+234+20,LargeFont,buffer);
+		    for (n = j = 0; j < PlayerMax; j++) {
+			if (info->PlayerType[j] == PlayerPerson) {
+			    n++;
+			}
+		    }
+		    if (n == 1) {
+			VideoDrawText(menu->x+8,menu->y+234+40,LargeFont,"1 player");
+		    } else {
+			sprintf(buffer, "%d players", n);
+			VideoDrawText(menu->x+8,menu->y+234+40,LargeFont,buffer);
+		    }
+		}
+	    }
+	    strcpy(buffer, "   ");
+	} else {
+	    strcpy(buffer, "\260 ");
+	}
+	strcat(buffer, fl[i].name);
+	return buffer;
+    }
+    return NULL;
+}
+
+local void EditorLoadLBAction(Menuitem *mi, int i)
+{
+    FileList *fl;
+
+    DebugCheck(i<0);
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    EditorLoadMapMenuItems[3].d.button.text = "OK";
+	} else {
+	    EditorLoadMapMenuItems[3].d.button.text = "Open";
+	}
+	if (mi->d.listbox.noptions > 5) {
+	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	}
+    }
+}
+
+local void EditorLoadVSAction(Menuitem *mi, int i)
+{
+    int op, d1, d2;
+
+    mi--;
+    switch (i) {
+	case 0:		// click - down
+	case 2:		// key - down
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    mi->d.listbox.curopt++;
+		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+			mi->d.listbox.curopt--;
+			mi->d.listbox.startline++;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    mi->d.listbox.curopt--;
+		    if (mi->d.listbox.curopt < 0) {
+			mi->d.listbox.curopt++;
+			mi->d.listbox.startline--;
+		    }
+		    MustRedraw |= RedrawMenu;
+		}
+	    }
+	    EditorLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+	    if (i == 2) {
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+	    }
+	    break;
+	case 1:		// mouse - move
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
+				 (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
+			    d2 = op - mi[1].d.vslider.curper;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt++;
+			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				mi->d.listbox.curopt--;
+				mi->d.listbox.startline++;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+				break;
+			}
+		    }
+		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
+		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+			for (;;) {
+			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
+				     (mi->d.listbox.noptions - 1);
+			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
+			    d2 = mi[1].d.vslider.curper - op;
+			    if (d2 >= d1)
+				break;
+			    mi->d.listbox.curopt--;
+			    if (mi->d.listbox.curopt < 0) {
+				mi->d.listbox.curopt++;
+				mi->d.listbox.startline--;
+			    }
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+				break;
+			}
+		    }
+		}
+
+		DebugCheck(mi->d.listbox.startline < 0);
+		DebugCheck(mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+
+		EditorLoadLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
+		MustRedraw |= RedrawMenu;
+	    }
+	    break;
+	default:
+	    break;
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -6520,6 +7011,8 @@ global void InitMenus(unsigned int race)
 	InitLoadGameMenuItems();
 	InitConfirmSaveMenuItems();
 	InitConfirmDeleteMenuItems();
+	InitEditorSelectMenuItems();
+	InitEditorLoadMapMenuItems();
 
 	if (VideoWidth != 640) {
 	    MoveButtons();
