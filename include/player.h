@@ -443,10 +443,7 @@ enum PlayerAis {
 	PlayerAiUniversal = 0xFF,  ///< attack best possible
 };
 
-#define PlayerNumNeutral 15  ///< this is the neutral player slot
-#if 0
-#define PlayerMax 16  ///< maximal players supported
-#endif
+#define PlayerNumNeutral (PlayerMax - 1)  ///< this is the neutral player slot
 
 /**
 **  Notify types. Noties are send to the player.
