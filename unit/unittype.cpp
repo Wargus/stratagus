@@ -41,6 +41,7 @@
 #include "map.h"
 #include "sound_id.h"
 #include "unitsound.h"
+#include "construct.h"
 #include "unittype.h"
 #include "player.h"
 #include "missile.h"
@@ -165,7 +166,7 @@ global void ParsePudUDTA(const char* udta,int length)
     for( i=0; i<110; ++i ) {		// overlap frames
 	unittype=UnitTypeByWcNum(i);
 	v=FetchLE16(udta);
-	unittype->OverlapFrame=v;
+	unittype->Construction=ConstructionByWcNum(v);
     }
     for( i=0; i<508; ++i ) {		// skip obselete data
 	v=FetchLE16(udta);
@@ -522,7 +523,7 @@ local void SaveUnitType(const UnitType* type,FILE* file)
     fprintf(file,"  ;;Speed Constr SightR Hitpnt Magic  BTime  Gold  Wood   Oil   Ore Stone  Coal\n");
     fprintf(file,"  %6d %6d %6d %6d %5d #(%4d %5d %5d %5d %5d %5d %5d)\n"
 	,type->_Speed
-	,type->OverlapFrame
+	,type->Construction->Nr
 	,type->_SightRange
 	,type->_HitPoints
 	,type->Magic
