@@ -141,7 +141,9 @@ global void HandleActionTrain(Unit* unit)
 	if( (unit->NewOrder.Action==UnitActionHaulOil
 		    && !nunit->Type->Tanker)
 		|| (unit->NewOrder.Action==UnitActionAttack
-		    && !nunit->Type->CanAttack) ) {
+		    && !nunit->Type->CanAttack)
+		|| (unit->NewOrder.Action==UnitActionBoard
+		    && nunit->Type->UnitType!=UnitTypeLand) ) {
 	    DebugLevel0Fn("Wrong order for unit\n");
 	    nunit->Orders[0].Action=UnitActionStill;
 	} else {
