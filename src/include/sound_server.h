@@ -48,7 +48,7 @@
 	*/
 #define MaxVolume 255
 
-#define SOUND_BUFFER_SIZE 16384
+#define SOUND_BUFFER_SIZE 65536
 
 /**
 **  General sample object typedef. (forward)
@@ -92,9 +92,9 @@ struct _sample_ {
 	unsigned int Frequency;       ///< frequency in hz
 	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
 
-	char *Buffer;                 ///< sample buffer
+	unsigned char *Buffer;                 ///< sample buffer
 	int Pos;                      ///< buffer position
-	unsigned int Len;                      ///< length of filled buffer
+	int Len;                      ///< length of filled buffer
 
 
 	int Length;

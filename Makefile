@@ -177,7 +177,7 @@ depend:
 #	include dependency files, if they exist
 #
 
-$(OBJ):		$(RULESFILE)
+$(OBJ):	
 
 ifeq (.depend,$(wildcard .depend))
 include .depend

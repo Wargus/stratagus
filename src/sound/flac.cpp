@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef USE_FLAC		// {
+#ifdef USE_FLAC  // {
 
 #include <stdlib.h>
 #include <string.h>
@@ -59,13 +59,6 @@ typedef struct _flac_data_ {
 	FLAC__StreamDecoder* Stream;		/// Decoder stream
 } FlacData;
 
-#define FLAC_BUFFER_SIZE  (1200 * 1024)		/// Buffer size to fill
-
-#undef SOUND_BUFFER_SIZE
-#define SOUND_BUFFER_SIZE (1200 * 1024)
-
-local const SampleType FlacSampleType;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -77,8 +70,8 @@ local const SampleType FlacSampleType;
 **  @param status  Error state.
 **  @param user    User data.
 */
-local void FLAC_error_callback(const FLAC__StreamDecoder* stream,
-	FLAC__StreamDecoderErrorStatus status, void* user)
+static void FLAC_error_callback(const FLAC__StreamDecoder *stream,
+	FLAC__StreamDecoderErrorStatus status, void *user)
 {
 	DebugLevel0Fn(" %s\n" _C_ FLAC__StreamDecoderErrorStatusString[status]);
 }
@@ -93,13 +86,13 @@ local void FLAC_error_callback(const FLAC__StreamDecoder* stream,
 **
 **  @return        Error status.
 */
-local FLAC__StreamDecoderReadStatus FLAC_read_callback(
-	const FLAC__StreamDecoder * stream,
-	FLAC__byte buffer[], unsigned int *bytes, void *user)
+static FLAC__StreamDecoderReadStatus FLAC_read_callback(
+	const FLAC__StreamDecoder *stream, FLAC__byte buffer[],
+	unsigned int *bytes, void *user)
 {
 	Sample *sample;
 	FlacData *data;
-	unsigned i;
+	unsigned int i;
 
 	DebugLevel3Fn("Read callback %d\n" _C_ *bytes);
 
@@ -122,10 +115,10 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
 **  @param metadata  metadata block
 **  @param user      User data.
 */
-local void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
-	const FLAC__StreamMetadata* metadata, void *user)
+static void FLAC_metadata_callback(const FLAC__StreamDecoder *stream,
+	const FLAC__StreamMetadata *metadata, void *user)
 {
-	Sample* sample;
+	Sample *sample;
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 		sample = user;
@@ -133,6 +126,12 @@ local void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 		sample->Channels = metadata->data.stream_info.channels;
 		sample->Frequency = metadata->data.stream_info.sample_rate;
 		sample->SampleSize = metadata->data.stream_info.bits_per_sample;
+
+		if (!sample->Buffer) {
+			DebugCheck(!metadata->data.stream_info.total_samples);
+			sample->Buffer = malloc(metadata->data.stream_info.total_samples *
+				sample->Channels * sample->SampleSize / 8);
+		}
 
 		DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n" _C_
 			sample->Channels _C_ sample->Frequency _C_ sample->SampleSize);
@@ -149,14 +148,17 @@ local void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 **
 **  @return        Error status.
 */
-local FLAC__StreamDecoderWriteStatus FLAC_write_callback(
-	const FLAC__StreamDecoder* stream,
-	const FLAC__Frame* frame, const FLAC__int32* const buffer[], void* user)
+static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
+	const FLAC__StreamDecoder *stream, const FLAC__Frame *frame,
+	const FLAC__int32* const buffer[], void *user)
 {
 	Sample *sample;
 	FlacData *data;
-	unsigned i;
-	char* dest;
+	unsigned int i;
+	int j;
+	char *dest;
+	char *buf;
+	int ssize;
 
 	DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n" _C_
 		frame->header.bits_per_sample _C_ frame->header.channels _C_
@@ -165,62 +167,98 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	sample = user;
 	data = sample->User;
 
+	DebugCheck(!sample->Buffer);
 	DebugCheck(frame->header.bits_per_sample != sample->SampleSize);
 
-	i = frame->header.channels * frame->header.blocksize *
-		frame->header.bits_per_sample / 8;
+	ssize = (frame->header.bits_per_sample / 8);
+	buf = malloc(frame->header.blocksize * sample->Channels * ssize);
 
-/*
-	if (sample->Type == &FlacSampleType) {
-		// not streaming
-		sample = realloc(sample, sizeof(*sample) + sample->Len + i * rate);
-		if (!sample) {
-			fprintf(stderr, "Out of memory!\n");
-			CLclose(data->FlacFile);
-			ExitFatal(-1);
+	// FLAC splits it up the channels, we need to sew it back together
+	for (i = 0; i < frame->header.blocksize; ++i) {
+		for (j = 0; j < sample->Channels; ++j) {
+			if (ssize == 1) {
+				buf[i * sample->Channels + j] = ((const char*)buffer[j])[i * sample->Channels];
+			} else {
+				buf[i * 2 * sample->Channels + j * 2] = ((const char*)buffer[j])[i * 2 * sample->Channels];
+				buf[i * 2 * sample->Channels + j * 2 + 1] = ((const char*)buffer[j])[i * 2 * sample->Channels + 1];
+			}
 		}
-		data->Sample = sample;
-		data->PointerInBuffer = sample->Data;
 	}
-*/
-	dest = (char*)sample->Buffer + sample->Pos + sample->Len;
-	printf("pos + len = %d\n", sample->Pos + sample->Len);
 
-	i = ConvertToStereo32((const char* const)buffer, dest, sample->Frequency,
-		sample->SampleSize / 8, sample->Channels, i);
+	dest = sample->Buffer + sample->Pos + sample->Len;
+	i = ConvertToStereo32(buf, dest, sample->Frequency,
+		sample->SampleSize / 8, sample->Channels, frame->header.blocksize * sample->Channels * 2);
 	sample->Len += i;
 
-	printf("sample->Len = %d\n", sample->Len);
-	printf("sample->Pos = %d\n", sample->Pos);
+	free(buf);
 
-/*
-	switch (sample->SampleSize) {
-		case 8:
-			for (i = 0; i < frame->header.blocksize; ++i) {
-				for (y = 0; y < rate; ++y) {
-					for (channel = 0; channel < frame->header.channels; channel++) {
-						*((unsigned char*)p)++ = buffer[channel][i] + 128;
-					}
-				}
-			}
-			break;
-		case 16:
-			for (i = 0; i < frame->header.blocksize; ++i) {
-				for (y = 0; y < rate; ++y) {
-					for (channel = 0; channel < frame->header.channels; channel++) {
-						*((short*)p)++ = buffer[channel][i];
-					}
-				}
-			}
-			break;
-		default:
-			fprintf(stderr, "Unsupported sample depth!\n");
-			CLclose(data->FlacFile);
-			ExitFatal(-1);
-	}
-*/
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
+
+/**
+**  Type member function to read from the flac file
+**
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
+**
+**  @return        Number of bytes read
+*/
+static int FlacStreamRead(Sample* sample, void* buf, int len)
+{
+	FlacData* data;
+
+	data = (FlacData*)sample->User;
+
+	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
+		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
+		sample->Pos = 0;
+	}
+
+	while (sample->Len < SOUND_BUFFER_SIZE / 4 &&
+			FLAC__stream_decoder_get_state(data->Stream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
+		// need to read new data
+		FLAC__stream_decoder_process_single(data->Stream);
+	}
+
+	if (sample->Len < len) {
+		len = sample->Len;
+	}
+
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+
+	sample->Pos += len;
+	sample->Len -= len;
+
+	return len;
+}
+
+/**
+**  Type member function to free an flac file
+**
+**  @param sample  Sample to free
+*/
+local void FlacStreamFree(Sample* sample)
+{
+	FlacData* data;
+
+	data = sample->User;
+
+	CLclose(data->FlacFile);
+	FLAC__stream_decoder_finish(data->Stream);
+	FLAC__stream_decoder_delete(data->Stream);
+	free(data);
+	free(sample->Buffer);
+	free(sample);
+}
+
+/**
+**  Flac stream type structure.
+*/
+local const SampleType FlacStreamSampleType = {
+	FlacStreamRead,
+	FlacStreamFree,
+};
 
 /**
 **  Type member function to read from the flac file
@@ -237,7 +275,7 @@ local int FlacRead(Sample* sample, void* buf, int len)
 
 	data = sample->User;
 
-	if ((unsigned)len > sample->Len) {
+	if (len > sample->Len) {
 		len = sample->Len;
 	}
 
@@ -257,12 +295,9 @@ local int FlacRead(Sample* sample, void* buf, int len)
 */
 local void FlacFree(Sample* sample)
 {
-#ifdef DEBUG
-	AllocatedSoundMemory -= sample->Len;
-#endif
 	free(sample->User);
 	free(sample->Buffer);
-//	free(sample);
+	free(sample);
 }
 
 /**
@@ -271,85 +306,6 @@ local void FlacFree(Sample* sample)
 local const SampleType FlacSampleType = {
 	FlacRead,
 	FlacFree,
-};
-
-/**
-**  Type member function to read from the flac file
-**
-**  @param sample  Sample reading from
-**  @param buf     Buffer to write data to
-**  @param len     Length of the buffer
-**
-**  @return        Number of bytes read
-*/
-local int FlacStreamRead(Sample* sample, void* buf, int len)
-{
-	FlacData* data;
-
-	data = (FlacData*)sample->User;
-
-/*
-	while (FLAC__stream_decoder_get_state(data->Stream) !=
-			FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) {
-		// read metadata
-		FLAC__stream_decoder_process_single(data->Stream);
-	}
-
-*/
-
-	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
-		DebugCheck(sample->Pos + sample->Len > SOUND_BUFFER_SIZE);
-		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
-		sample->Pos = 0;
-	}
-
-	while (sample->Len < SOUND_BUFFER_SIZE / 4 &&
-			FLAC__stream_decoder_get_state(data->Stream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
-		// need to read new data
-		FLAC__stream_decoder_process_single(data->Stream);
-	}
-
-	if (sample->Len < (unsigned)len) {
-		len = sample->Len;
-	}
-
-	memcpy(buf, sample->Buffer + sample->Pos, len);
-
-	sample->Pos += len;
-	sample->Len -= len;
-
-	DebugCheck(sample->Len < 0);
-
-	return len;
-}
-
-/**
-**  Type member function to free an flac file
-**
-**  @param sample  Sample to free
-*/
-local void FlacStreamFree(Sample* sample)
-{
-	FlacData* data;
-
-#ifdef DEBUG
-	AllocatedSoundMemory -= sizeof(*sample) + SOUND_BUFFER_SIZE;
-#endif
-
-	data = sample->User;
-	CLclose(data->FlacFile);
-	FLAC__stream_decoder_finish(data->Stream);
-	FLAC__stream_decoder_delete(data->Stream);
-	free(data);
-//	free(sample);
-}
-
-/**
-**  Flac stream type structure.
-*/
-local const SampleType FlacStreamSampleType = {
-	FlacStreamRead,
-	FlacStreamFree,
 };
 
 /**
@@ -372,6 +328,7 @@ global Sample* LoadFlac(const char* name, int flags)
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		return NULL;
 	}
+
 	CLread(f, magic, sizeof(magic));
 	if (AccessLE32(magic) != 0x43614C66) {		// "fLaC" in ASCII
 		CLclose(f);
@@ -393,8 +350,6 @@ global Sample* LoadFlac(const char* name, int flags)
 	data->Stream = stream;
 
 	sample = malloc(sizeof(Sample));
-	sample->Buffer = malloc(SOUND_BUFFER_SIZE);
-	DebugCheck(!sample->Buffer);
 	sample->Len = 0;
 	sample->Pos = 0;
 	sample->User = data;
@@ -407,11 +362,13 @@ global Sample* LoadFlac(const char* name, int flags)
 	FLAC__stream_decoder_init(stream);
 
 	if (flags & PlayAudioStream) {
+		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &FlacStreamSampleType;
 
 		FLAC__stream_decoder_process_until_end_of_metadata(stream);
 	} else {
-	DebugCheck(1);
+		// Buffer will be malloc'ed from metadata callback
+		sample->Buffer = NULL;
 		sample->Type = &FlacSampleType;
 
 		DebugCheck(FLAC__stream_decoder_get_state(stream) !=
