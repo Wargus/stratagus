@@ -60,6 +60,7 @@ local void AiExecuteScript(void)
     pai=AiPlayer;
     if( !gh_null_p(pai->Script) ) {
 	if( pai->ScriptDebug ) {		// display executed command
+	    printf("%d:",pai->Player->Player);
 	    gh_display(gh_car(pai->Script));
 	    gh_newline();
 	}
@@ -339,6 +340,21 @@ global void AiHelpMe(Unit* unit)
 }
 
 /**
+**	Called if an unit is killed.
+**
+**	@param unit	Pointer to unit.
+*/
+global void AiUnitKilled(Unit* unit)
+{
+    DebugLevel1Fn("%d: %d(%s) killed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    // FIXME: if the unit builds something for us it must restartet!!!!
+}
+
+/**
 **	Called if work complete (Buildings).
 **
 **	@param unit	Pointer to unit what builds the building.
@@ -363,9 +379,9 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 */
 global void AiCanNotBuild(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("%d: %d Can't build %s at %d,%d\n" _C_
-	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
-	    unit->X _C_ unit->Y);
+    DebugLevel1Fn("%d: %d(%s) Can't build %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident
+	    _C_ what->Ident _C_ unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
@@ -390,6 +406,23 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 }
 
 /**
+**	Called if the AI needs more farms.
+**
+**	@param unit	Point to unit.
+**      @param what     Pointer to unit-type.
+*/
+global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
+{
+    DebugLevel1Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    ((PlayerAi*)unit->Player->Ai)->NeedFood=1;
+}
+
+/**
 **	Called if training of an unit is completed.
 **
 **	@param unit	Pointer to unit making.
@@ -410,13 +443,33 @@ global void AiTrainingComplete(Unit* unit,Unit* what)
 }
 
 /**
-**	Called if an unit is killed.
+**	Called if upgrading of an unit is completed.
 **
-**	@param unit	Pointer to unit.
+**	@param unit	Pointer to unit working.
+**	@param what	Pointer to the new unit-type.
 */
-global void AiUnitKilled(Unit* unit)
+global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
 {
-    // FIXME: if the unit builds something for us it must restartet!!!!
+    DebugLevel1Fn("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+}
+
+/**
+**	Called if reseaching of an unit is completed.
+**
+**	@param unit	Pointer to unit working.
+**	@param what	Pointer to the new upgrade.
+*/
+global void AiResearchComplete(Unit* unit,const Upgrade* what)
+{
+    DebugLevel1Fn("%d: %d(%s) research %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
 }
 
 /**

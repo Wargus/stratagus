@@ -501,6 +501,7 @@ local SCM CclAiSet(SCM value,SCM count)
     type=CclGetUnitType(value);
     if( (autt=FindInUnitTypeRequests(type)) ) {
 	autt->Count=gh_scm2int(count);
+	// FIXME: 0 should remove it.
     } else {
 	InsertUnitTypeRequests(type,gh_scm2int(count));
     }

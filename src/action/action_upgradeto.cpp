@@ -73,8 +73,8 @@ global void HandleActionUpgradeTo(Unit* unit)
 	if( player==ThisPlayer ) {
 	    SetMessage2( unit->X, unit->Y, "Upgrade to %s complete",
 		    unit->Type->Name );
-	} else {
-	    // FIXME: AiUpgradeToComplete(unit,type);
+	} else if( unit->Player->Ai ) {
+	    AiUpgradeToComplete(unit,type);
 	}
 	unit->Reset=unit->Wait=1;
 	unit->Orders[0].Action=UnitActionStill;

@@ -278,6 +278,7 @@ global void AiForceManager(void)
 	if( AiPlayer->Force[force].Defending ) {
 	    const AiUnit* aiunit;
 
+	    AiCleanForce(force);
 	    //
 	    //	Look if still enemies in attack range.
 	    //
