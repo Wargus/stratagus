@@ -8,12 +8,11 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name ut_table.c	-	The unit types table. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+/**@name ut_table.c	-	The unit-types table. */
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -36,147 +35,11 @@
 #define DEFAULT	NULL
 
 /**
-**	Unit type type definition
+**	Unit-type type definition
 */
 global const char UnitTypeType[] = "unit-type";
 
-/*----------------------------------------------------------------------------
---	Buttons
-----------------------------------------------------------------------------*/
-
-#if 0
-// This was the start of my (johns) version, the new and active version
-// is from cade and could be found in ui/button_table.c and ui/botpanel.c
-// FIXME: what is better? configure the buttons with the unit or separate it
-
-// Footman, Knight
-local ButtonConfig _FootmanButtons[] = {
-     {"human-move"}
-    ,{"human-shield1"}	,{"human-shield2"}	,{"human-shield3"}
-    ,{"human-sword1"}	,{"human-sword2"}	,{"human-sword3"}
-    ,{"human-patrol"}
-    ,{"human-stand-ground"}
-    ,{ NULL }
-};
-
-#define _FootmanButtons			NULL
-#define _GruntButtons			NULL
-#define _PeasantButtons			NULL
-#define _PeonButtons			NULL
-#define _BallistaButtons		NULL
-#define _CatapultButtons		NULL
-#define _KnightButtons			NULL
-#define _OgreButtons			NULL
-#define _ArcherButtons			NULL
-#define _AxethrowerButtons		NULL
-#define _MageButtons			NULL
-#define _DeathKnightButtons		NULL
-#define _PaladinButtons			NULL
-#define _OgreMageButtons		NULL
-#define _DwarvesButtons			NULL
-#define _GoblinSappersButtons		NULL
-#define _AttackPeasantButtons		NULL
-#define _AttackPeonButtons		NULL
-#define _RangerButtons			NULL
-#define _BerserkerButtons		NULL
-#define _AlleriaButtons			NULL
-#define _TeronGorefiendButtons		NULL
-#define _KurdanAndSky_reeButtons	NULL
-#define _DentargButtons			NULL
-#define _KhadgarButtons			NULL
-#define _GromHellscreamButtons		NULL
-#define _TankerHumanButtons		NULL
-#define _TankerOrcButtons		NULL
-#define _TransportHumanButtons		NULL
-#define _TransportOrcButtons		NULL
-#define _ElvenDestroyerButtons		NULL
-#define _TrollDestroyerButtons		NULL
-#define _BattleshipButtons		NULL
-#define _JuggernaughtButtons		NULL
-#define _NothingButtons			NULL
-#define _DeathwingButtons		NULL
-#define _Nothing1Buttons		NULL
-#define _Nothing2Buttons		NULL
-#define _GnomishSubmarineButtons	NULL
-#define _GiantTurtleButtons		NULL
-#define _GnomishFlyingMachineButtons	NULL
-#define _GoblinZeppelinButtons		NULL
-#define _GryphonRiderButtons		NULL
-#define _DragonButtons			NULL
-#define _TuralyonButtons		NULL
-#define _EyeOfKilroggButtons		NULL
-#define _DanathButtons			NULL
-#define _KorgathBladefistButtons	NULL
-#define _Nothing3Buttons		NULL
-#define _Cho_gallButtons		NULL
-#define _LotharButtons			NULL
-#define _Gul_danButtons			NULL
-#define _UtherLightbringerButtons	NULL
-#define _ZuljinButtons			NULL
-#define _Nothing4Buttons		NULL
-#define _SkeletonButtons		NULL
-#define _DaemonButtons			NULL
-#define _CritterButtons			NULL
-#define _FarmButtons			NULL
-#define _PigFarmButtons			NULL
-#define _BarracksHumanButtons		NULL
-#define _BarracksOrcButtons		NULL
-#define _ChurchButtons			NULL
-#define _AltarOfStormsButtons		NULL
-#define _ScoutTowerHumanButtons		NULL
-#define _ScoutTowerOrcButtons		NULL
-#define _StablesButtons			NULL
-#define _OgreMoundButtons		NULL
-#define _GnomishInventorButtons		NULL
-#define _GoblinAlchemistButtons		NULL
-#define _GryphonAviaryButtons		NULL
-#define _DragonRoostButtons		NULL
-#define _ShipyardHumanButtons		NULL
-#define _ShipyardOrcButtons		NULL
-#define _TownHallButtons		NULL
-#define _GreatHallButtons		NULL
-#define _ElvenLumberMillButtons		NULL
-#define _TrollLumberMillButtons		NULL
-#define _FoundryHumanButtons		NULL
-#define _FoundryOrcButtons		NULL
-#define _MageTowerButtons		NULL
-#define _TempleOfTheDamnedButtons	NULL
-#define _BlacksmithHumanButtons		NULL
-#define _BlacksmithOrcButtons		NULL
-#define _RefineryHumanButtons		NULL
-#define _RefineryOrcButtons		NULL
-#define _OilPlatformHumanButtons	NULL
-#define _OilPlatformOrcButtons		NULL
-#define _KeepButtons			NULL
-#define _StrongholdButtons		NULL
-#define _CastleButtons			NULL
-#define _FortressButtons		NULL
-#define _GoldMineButtons		NULL
-#define _OilPatchButtons		NULL
-#define _StartLocationHumanButtons	NULL
-#define _StartLocationOrcButtons	NULL
-#define _GuardTowerHumanButtons		NULL
-#define _GuardTowerOrcButtons		NULL
-#define _CannonTowerHumanButtons	NULL
-#define _CannonTowerOrcButtons		NULL
-#define _CircleofPowerButtons		NULL
-#define _DarkPortalButtons		NULL
-#define _RunestoneButtons		NULL
-#define _WallHumanButtons		NULL
-#define _WallOrcButtons			NULL
-#define _DeadBodyButtons		NULL
-#define _Destroyed1x1PlaceButtons	NULL
-#define _Destroyed2x2PlaceButtons	NULL
-#define _Destroyed3x3PlaceButtons	NULL
-#define _Destroyed4x4PlaceButtons	NULL
-#define _PeasantWithGoldButtons		NULL
-#define _PeonWithGoldButtons		NULL
-#define _PeasantWithWoodButtons		NULL
-#define _PeonWithWoodButtons		NULL
-#define _TankerHumanFullButtons		NULL
-#define _TankerOrcFullButtons		NULL
-
-#endif
+#ifndef laterUSE_CCL
 
 /*----------------------------------------------------------------------------
 --	Animations
@@ -189,27 +52,27 @@ local ButtonConfig _FootmanButtons[] = {
 //	Default:
 local Animation DefaultStill[] = {
 // FIXME: Reset frame 0, wait 1, than endless wait 5
-    {0, 0, 4, 0}, {3, 0, 1, 0}
+    {0, 0, 4, 0}, {131, 0, 1, 0}
 };
 
 //	Gryphon rider, Kurdan and Sky'ree:
 local Animation GryphonRiderStill[] = {
-    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
+    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {131, 0, 6, 5}
 };
 
 //	Dragon, Deathwing:
 local Animation DragonStill[] = {
-    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {3, 0, 6, 5}
+    {2, 0, 6, 0},  {2, 0, 6, 5},  {2, 0, 6, 5},  {131, 0, 6, 5}
 };
 
 //	GnomishFlyingMachine:
 local Animation GnomishFlyingMachineStill[] = {
-    {2, 0, 1, 0},  {2, 0, 1, 5},  {2, 0, 1, 0},  {3, 0, 1,-5}
+    {2, 0, 1, 0},  {2, 0, 1, 5},  {2, 0, 1, 0},  {131, 0, 1,-5}
 };
 
 //	Daemon:
 local Animation DaemonStill[] = {
-    {2, 0, 4, 0},  {2, 0, 4, 5},  {2, 0, 4, 5},  {3, 0, 4, 5}
+    {2, 0, 4, 0},  {2, 0, 4, 5},  {2, 0, 4, 5},  {131, 0, 4, 5}
 };
 
 /*----------------------------------------------------------------------------
@@ -220,14 +83,14 @@ local Animation DaemonStill[] = {
 local Animation GruntMove[] = {
     {0, 3, 2,  0}, {0, 3, 1,  5}, {0, 3, 2,  0}, {0, 2, 1,  5}, {0, 3, 1,  0},
     {0, 2, 1,-10}, {0, 3, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0}, {0, 2, 1,  5},
-    {0, 3, 1,  0}, {3, 2, 1,-20}
+    {0, 3, 1,  0}, {131, 2, 1,-20}
 };
 
 //	Peon, Peasant, Attacking Peon, Attacking Peasant.
 local Animation PeonMove[] = {
     {0, 3, 2,  0}, {0, 3, 1,  5}, {0, 3, 2,  0}, {0, 2, 1,  5}, {0, 3, 1,  0},
     {0, 2, 1,-10}, {0, 3, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0}, {0, 2, 1,  5},
-    {0, 3, 1,  0}, {3, 2, 1,-20}
+    {0, 3, 1,  0}, {131, 2, 1,-20}
 };
 
 //	Ballista
@@ -235,7 +98,7 @@ local Animation BallistaMove[] = {
     {0, 0, 1,  0}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5},
     {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5},
     {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5},
-    {0, 2, 2,  5}, {3, 2, 1, -5}
+    {0, 2, 2,  5}, {131, 2, 1, -5}
 };
 
 //	Catapult
@@ -243,80 +106,80 @@ local Animation CatapultMove[] = {
     {0, 0, 1,  0}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5},
     {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5},
     {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5}, {0, 2, 2,  5}, {0, 2, 2, -5},
-    {0, 2, 2,  5}, {3, 2, 1, -5}
+    {0, 2, 2,  5}, {131, 2, 1, -5}
 };
 
 //	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
 local Animation KnightMove[] = {
     {0, 3, 1,  0}, {0, 3, 1,  5}, {0, 4, 2,  0}, {0, 3, 1,  5}, {0, 3, 1,  0},
-    {0, 3, 1,  5}, {0, 4, 2,  0}, {0, 3, 1,  5}, {0, 3, 1,  0}, {3, 3, 1,-20}
+    {0, 3, 1,  5}, {0, 4, 2,  0}, {0, 3, 1,  5}, {0, 3, 1,  0}, {131, 3, 1,-20}
 };
 
 //	Ogre, Ogre-mage, Dentarg, Cho'gall
 local Animation OgreMove[] = {
     {0, 3, 1,  0}, {0, 3, 1,  5}, {0, 3, 1,  0}, {0, 2, 1,  5}, {0, 3, 1,  0},
     {0, 2, 1,-10}, {0, 3, 1,  0}, {0, 3, 1, 15}, {0, 3, 1,  0}, {0, 2, 1,  5},
-    {0, 3, 1,  0}, {3, 2, 1,-20}
+    {0, 3, 1,  0}, {131, 2, 1,-20}
 };
 
 //	Archer, Ranger, Alleria
 local Animation ArcherMove[] = {
     {0, 3, 2,  0}, {0, 3, 1,  5}, {0, 3, 2,  0}, {0, 2, 1,  5}, {0, 3, 1,  0},
     {0, 2, 1,-10}, {0, 3, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0}, {0, 2, 1,  5},
-    {0, 3, 1,  0}, {3, 2, 1,-20}
+    {0, 3, 1,  0}, {131, 2, 1,-20}
 };
 
 //	Axethrower, Berserker, Zuljin
 local Animation AxethrowerMove[] = {
     {0, 3, 2,  0}, {0, 3, 1,  5}, {0, 3, 2,  0}, {0, 2, 1,  5}, {0, 3, 1,  0},
     {0, 2, 1,-10}, {0, 3, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0}, {0, 2, 1,  5},
-    {0, 3, 1,  0}, {3, 2, 1,-20}
+    {0, 3, 1,  0}, {131, 2, 1,-20}
 };
 
 //	Mage, Khadar
 local Animation MageMove[] = {
     {0, 3, 2,  0}, {0, 3, 1,  5}, {0, 3, 2,  0}, {0, 2, 1,  5}, {0, 3, 2,  0},
     {0, 2, 1,-10}, {0, 3, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0}, {0, 2, 1,  5},
-    {0, 3, 2,  0}, {3, 2, 1,-20}
+    {0, 3, 2,  0}, {131, 2, 1,-20}
 };
 
 //	Death Knight, Teron Gorefiend, Gul'dan
 local Animation DeathKnightMove[] = {
     {0, 3, 2,  0}, {0, 3, 2,  5}, {0, 4, 2,  0}, {0, 3, 2,  5}, {0, 4, 2,  0},
-    {0, 3, 2,  5}, {0, 4, 2,  0}, {0, 3, 2,  5}, {0, 3, 2,  0}, {3, 3, 1,-20}
+    {0, 3, 2,  5}, {0, 4, 2,  0}, {0, 3, 2,  5}, {0, 3, 2,  0}, {131, 3, 1,-20}
 };
 
 //	Dwarves
 local Animation DwarvesMove[] = {
     {0, 3, 2,  0}, {0, 3, 1, 10}, {0, 4, 2,  0}, {0, 3, 1, 15}, {0, 3, 2,  0},
-    {0, 3, 1, 15}, {0, 4, 2,  0}, {0, 3, 1, 15}, {0, 3, 1,  0}, {3, 3, 1,-55}
+    {0, 3, 1, 15}, {0, 4, 2,  0}, {0, 3, 1, 15}, {0, 3, 1,  0}, {131, 3, 1,-55}
 };
 
 //	Goblin Sappers
 local Animation GoblinSappersMove[] = {
     {0, 3, 1,  0}, {0, 3, 1, 10}, {0, 2, 1,  0}, {0, 3, 2, 15}, {0, 3, 1,  0},
     {0, 2, 1, 15}, {0, 3, 1,  0}, {0, 3, 1, 15}, {0, 2, 1,  0}, {0, 3, 2, 10},
-    {0, 3, 1,  0}, {3, 2, 1,-65}
+    {0, 3, 1,  0}, {131, 2, 1,-65}
 };
 
 //	Gryphon Rider, Kurdan and Sky'ree:
 local Animation GryphonRiderMove[] = {
     {0, 0, 1,  0}, {0, 2, 2,  0}, {0, 3, 2,  0}, {0, 3, 2,  5}, {0, 2, 2,  0},
     {0, 3, 2,  0}, {0, 3, 2,  5}, {0, 2, 2,  0}, {0, 3, 2,  0}, {0, 3, 2,  5},
-    {0, 2, 2,  0}, {0, 3, 2,  0}, {3, 3, 1,-15}
+    {0, 2, 2,  0}, {0, 3, 2,  0}, {131, 3, 1,-15}
 };
 
 //	Dragon, Deathwing
 local Animation DragonMove[] = {
     {0, 0, 1,  0}, {0, 2, 2,  0}, {0, 3, 2,  0}, {0, 3, 2,  5}, {0, 2, 2,  0},
     {0, 3, 2,  0}, {0, 3, 2,  5}, {0, 2, 2,  0}, {0, 3, 2,  0}, {0, 3, 2,  5},
-    {0, 2, 2,  0}, {0, 3, 2,  0}, {3, 3, 1,-15}
+    {0, 2, 2,  0}, {0, 3, 2,  0}, {131, 3, 1,-15}
 };
 
 //	Eye of kilrogg
 local Animation EyeOfKilroggMove[] = {
     {0, 4, 1,  0}, {0, 4, 1,  0}, {0, 4, 1,  0}, {0, 4, 1,  0}, {0, 4, 1,  0},
-    {0, 4, 1,  0}, {0, 4, 1,  0}, {3, 4, 1,  0}
+    {0, 4, 1,  0}, {0, 4, 1,  0}, {131, 4, 1,  0}
 };
 
 //	Human tanker, orc tanker:
@@ -327,7 +190,7 @@ local Animation TankerMove[] = {
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
-    {0, 1, 1,  0}, {3, 1, 1,  0}
+    {0, 1, 1,  0}, {131, 1, 1,  0}
 };
 
 //	Human transporter, orc transporter:
@@ -338,7 +201,7 @@ local Animation TransportMove[] = {
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
-    {0, 1, 1,  0}, {3, 1, 1,  0}
+    {0, 1, 1,  0}, {131, 1, 1,  0}
 };
 
 //	Elven destroyer, Troll destroyer:
@@ -349,7 +212,7 @@ local Animation DestroyerMove[] = {
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
-    {0, 1, 1,  0}, {3, 1, 1,  0}
+    {0, 1, 1,  0}, {131, 1, 1,  0}
 };
 
 //	Battleship, Juggernaught
@@ -360,7 +223,7 @@ local Animation BattleshipMove[] = {
     {0, 1, 2,  0}, {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 2,  0},
     {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 2,  0},
     {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 2,  0}, {0, 1, 1,  0},
-    {0, 1, 2,  0}, {3, 1, 1,  0}
+    {0, 1, 2,  0}, {131, 1, 1,  0}
 };
 
 //	Gnomish submarine, giant turtle
@@ -371,7 +234,7 @@ local Animation SubmarineMove[] = {
     {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 1,  0},
     {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 2,  0},
     {0, 1, 1,  0}, {0, 1, 1,  0}, {0, 1, 2,  0}, {0, 1, 1,  0}, {0, 1, 1,  0},
-    {0, 1, 2,  0}, {3, 1, 1,  0}
+    {0, 1, 2,  0}, {131, 1, 1,  0}
 };
 
 //	Gnomish flying machine
@@ -379,7 +242,7 @@ local Animation GnomishFlyingMachineMove[] = {
     {0, 2, 1,  0}, {0, 1, 1,  5}, {0, 2, 1,  0}, {0, 2, 1, -5}, {0, 1, 1,  0},
     {0, 2, 1,  5}, {0, 1, 1,  0}, {0, 2, 1, -5}, {0, 2, 1,  0}, {0, 1, 1,  5},
     {0, 2, 1,  0}, {0, 1, 1, -5}, {0, 2, 1,  0}, {0, 2, 1,  5}, {0, 1, 1,  0},
-    {0, 2, 1, -5}, {0, 1, 1,  0}, {0, 2, 1,  5}, {0, 2, 1,  0}, {3, 1, 1, -5}
+    {0, 2, 1, -5}, {0, 1, 1,  0}, {0, 2, 1,  5}, {0, 2, 1,  0}, {131, 1, 1, -5}
 };
 
 //	Goblin zeppelin
@@ -387,21 +250,21 @@ local Animation GoblinZeppelinMove[] = {
     {0, 2, 1,  0}, {0, 1, 1,  0}, {0, 2, 1,  0}, {0, 2, 1,  0}, {0, 1, 1,  0},
     {0, 2, 1,  0}, {0, 1, 1,  0}, {0, 2, 1,  0}, {0, 2, 1,  0}, {0, 1, 1,  0},
     {0, 2, 1,  0}, {0, 1, 1,  0}, {0, 2, 1,  0}, {0, 2, 1,  0}, {0, 1, 1,  0},
-    {0, 2, 1,  0}, {0, 1, 1,  0}, {0, 2, 1,  0}, {0, 2, 1,  0}, {3, 1, 1,  0}
+    {0, 2, 1,  0}, {0, 1, 1,  0}, {0, 2, 1,  0}, {0, 2, 1,  0}, {131, 1, 1,  0}
 };
 
 //	Skeleton
 local Animation SkeletonMove[] = {
     {0, 3, 2,  0}, {0, 3, 2, 10}, {0, 3, 1,  0}, {0, 2, 2, 15}, {0, 3, 3,  0},
     {0, 2, 1,-25}, {0, 3, 2,  0}, {0, 3, 2, 40}, {0, 3, 1,  0}, {0, 2, 2, 15},
-    {0, 3, 2,  0}, {3, 2, 1,-55}
+    {0, 3, 2,  0}, {131, 2, 1,-55}
 };
 
 //	Daemon
 local Animation DaemonMove[] = {
     {0, 3, 2,  0}, {0, 2, 1,  0}, {0, 2, 2,  5}, {0, 2, 2,  0}, {0, 2, 1,  0},
     {0, 2, 2,  5}, {0, 2, 1,  0}, {0, 3, 2,  0}, {0, 2, 2,  5}, {0, 2, 1,  0},
-    {0, 2, 2,  0}, {0, 2, 1,  5}, {0, 2, 2,  0}, {0, 2, 2,  0}, {3, 2, 1,-20}
+    {0, 2, 2,  0}, {0, 2, 1,  5}, {0, 2, 2,  0}, {0, 2, 2,  0}, {131, 2, 1,-20}
 };
 
 //	Critter
@@ -409,7 +272,7 @@ local Animation CritterMove[] = {
     {0, 2, 2,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0},
     {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0},
     {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0}, {0, 2, 3,  0},
-    {0, 2, 3,  0}, {3, 0, 1,  0}
+    {0, 2, 3,  0}, {131, 0, 1,  0}
 };
 
 /*----------------------------------------------------------------------------
@@ -419,70 +282,70 @@ local Animation CritterMove[] = {
 ///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
 local Animation GruntAttack[] = {
     { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Peon, Peasant, Attacking Peon, Attacking Peasant.
 global Animation PeonAttack[] = {
     { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0, 3,  5},
-    { 0, 0, 7,-20},{ 3, 0, 1,  0}
+    { 0, 0, 7,-20},{131, 0, 1,  0}
 };
 
 ///	Ballista
 local Animation BallistaAttack[] = {
-    { 0, 0,25, 10},{12, 0,25,  5},{ 0, 0,100, 0},{ 0, 0,49,-15},{ 3, 0, 1,  0}
+    { 0, 0,25, 10},{12, 0,25,  5},{ 0, 0,100, 0},{ 0, 0,49,-15},{131, 0, 1,  0}
 };
 
 ///	Catapult
 local Animation CatapultAttack[] = {
     {12, 0, 4, 15},{ 0, 0, 4,- 5},{ 0, 0, 3,  5},{ 0, 0, 2,- 5},{ 0, 0, 2,  5},
-    { 0, 0,30,- 5},{ 0, 0, 4,  5},{ 0, 0,100, 0},{ 0, 0,50,-15},{ 3, 0, 1,  0}
+    { 0, 0,30,- 5},{ 0, 0, 4,  5},{ 0, 0,100, 0},{ 0, 0,50,-15},{131, 0, 1,  0}
 };
 
 ///	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
 local Animation KnightAttack[] = {
     { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Ogre, Ogre-mage, Dentarg, Cho'gall
 local Animation OgreAttack[] = {
     { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 5,  5},{ 0, 0,10,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Archer, Ranger, Alleria
 local Animation ArcherAttack[] = {
     { 0, 0,10, 25},{12, 0,10,  5},{ 0, 0,44,-30},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Axethrower, Berserker, Zuljin
 local Animation AxethrowerAttack[] = {
     { 0, 0, 3, 25},{ 0, 0, 3,  5},{ 0, 0, 3,  5},{12, 0, 3,  5},{ 0, 0,52,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Mage, Khadar
 local Animation MageAttack[] = {
     { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Death Knight, Teron Gorefiend, Gul'dan
 local Animation DeathKnightAttack[] = {
     { 0, 0, 5, 25},{ 0, 0, 5,  5},{12, 0, 7,  5},{ 0, 0, 5,  5},{ 0, 0,17,-40},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Dwarves
 local Animation DwarvesAttack[] = {
-    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
+    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{131, 0, 1,  0}
 };
 
 ///	Goblin Sappers
 local Animation GoblinSappersAttack[] = {
-    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{ 3, 0, 1,  0}
+    { 0, 0, 3, 15},{12, 0, 5, 15},{ 0, 0, 3, 15},{ 0, 0,13,-45},{131, 0, 1,  0}
 };
 
 ///	Gryphon Rider, Kurdan and Sky'ree:
@@ -509,54 +372,54 @@ local Animation DragonAttack[] = {
 
 ///	Eye of kilrogg
 local Animation EyeOfKilroggAttack[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Human tanker, orc tanker:
 local Animation TankerAttack[] = {
-    {12, 0,30,  0},{ 0, 0,99,  0},{ 3, 0, 1,  0}
+    {12, 0,30,  0},{ 0, 0,99,  0},{131, 0, 1,  0}
 };
 
 ///	Human transporter, orc transporter:
 local Animation TransportAttack[] = {
-    {12, 0,119,  0},{ 3, 0, 1,  0}
+    {12, 0,119,  0},{131, 0, 1,  0}
 };
 
 ///	Elven destroyer, Troll destroyer:
 local Animation DestroyerAttack[] = {
-    {12, 0,119,  0},{ 3, 0, 1,  0}
+    {12, 0,119,  0},{131, 0, 1,  0}
 };
 
 ///	Battleship, Juggernaught
 local Animation BattleshipAttack[] = {
-    {12, 0,127,  0},{ 0, 0,102,  0},{ 3, 0, 1,  0}
+    {12, 0,127,  0},{ 0, 0,102,  0},{131, 0, 1,  0}
 };
 
 ///	Gnomish submarine, giant turtle
 local Animation SubmarineAttack[] = {
     { 0, 0,10,  5},{ 0, 0,25,  5},{12, 0,25,  0},{ 0, 0,25,- 5},{ 0, 0,29,- 5},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Gnomish flying machine
 local Animation GnomishFlyingMachineAttack[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Goblin zeppelin
 local Animation GoblinZeppelinAttack[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Critter
 local Animation CritterAttack[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Skeleton
 local Animation SkeletonAttack[] = {
     { 0, 0, 4, 15},{ 0, 0, 4, 15},{12, 0, 4, 15},{ 0, 0, 4, 15},{ 0, 0,18,-60},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Daemon
@@ -568,12 +431,12 @@ local Animation DaemonAttack[] = {
 
 ///	Guard tower
 local Animation GuardTowerAttack[] = {
-    {12, 0,59,  0},{ 3, 0, 1,  0},
+    {12, 0,59,  0},{131, 0, 1,  0},
 };
 
 ///	Cannon tower
 local Animation CannonTowerAttack[] = {
-    {12, 0,150,  0},{ 3, 0, 1,  0},
+    {12, 0,150,  0},{131, 0, 1,  0},
 };
 
 /*----------------------------------------------------------------------------
@@ -582,137 +445,137 @@ local Animation CannonTowerAttack[] = {
 
 ///	Footman,Grunt,Grom Hellscream,Danath,Korgath Bladefist
 local Animation GruntDie[] = {
-    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{131, 0, 1,  0}
 };
 
 ///	Peon, Peasant, Attacking Peon, Attacking Peasant.
 local Animation PeonDie[] = {
-    { 0, 0, 3, 50},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+    { 0, 0, 3, 50},{ 0, 0, 3,  5},{ 0, 0,100,  5},{131, 0, 1,  0}
 };
 
 ///	Knight, Paladin, Turalyon, Lothar, Uther Lightbringer
 local Animation KnightDie[] = {
     { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100, 5},{ 0, 0,200, 5},
-    { 0, 0,200, 5},{ 3, 0, 1,  0}
+    { 0, 0,200, 5},{131, 0, 1,  0}
 };
 
 ///	Ogre, Ogre-mage, Dentarg, Cho'gall
 local Animation OgreDie[] = {
     { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100, 5},{ 0, 0,200, 5},
-    { 0, 0,200, 5},{ 3, 0, 1,  0}
+    { 0, 0,200, 5},{131, 0, 1,  0}
 };
 
 ///	Archer, Ranger, Alleria
 local Animation ArcherDie[] = {
-    { 0, 0, 3, 35},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+    { 0, 0, 3, 35},{ 0, 0, 3,  5},{ 0, 0,100,  5},{131, 0, 1,  0}
 };
 
 ///	Axethrower, Berserker, Zuljin
 local Animation AxethrowerDie[] = {
-    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{ 3, 0, 1,  0}
+    { 0, 0, 3, 45},{ 0, 0, 3,  5},{ 0, 0,100,  5},{131, 0, 1,  0}
 };
 
 ///	Mage, Khadar
 local Animation MageDie[] = {
     { 0, 0, 5, 45},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
-    { 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 3, 0, 1,  0}
+    { 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{131, 0, 1,  0}
 };
 
 ///	Death Knight, Teron Gorefiend, Gul'dan
 local Animation DeathKnightDie[] = {
     { 0, 0, 5, 45},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Dwarves
 local Animation DwarvesDie[] = {
     { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
-    { 0, 0, 3, 10},{ 3, 0, 1,  0}
+    { 0, 0, 3, 10},{131, 0, 1,  0}
 };
 
 ///	Goblin Sappers
 local Animation GoblinSappersDie[] = {
     { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
-    { 0, 0, 3, 10},{ 0, 0, 3, 10},{ 3, 0, 1,  0}
+    { 0, 0, 3, 10},{ 0, 0, 3, 10},{131, 0, 1,  0}
 };
 
 ///	Gryphon Rider, Kurdan and Sky'ree:
 local Animation GryphonRiderDie[] = {
     { 0, 0, 5, 35},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
-    { 0, 0, 5,  5},{ 0, 0, 5,  5},{ 3, 0, 1,  0}
+    { 0, 0, 5,  5},{ 0, 0, 5,  5},{131, 0, 1,  0}
 };
 
 ///	Dragon, Deathwing
 local Animation DragonDie[] = {
     { 0, 0, 5, 25},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
-    { 0, 0, 5,  5},{ 3, 0, 1,  0}
+    { 0, 0, 5,  5},{131, 0, 1,  0}
 };
 
 ///	Human tanker, orc tanker:
 local Animation TankerDie[] = {
-    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+    { 0, 0,50,  5},{ 0, 0,50,  5},{131, 0, 1,  0}
 };
 
 ///	Human transporter, orc transporter:
 local Animation TransportDie[] = {
-    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+    { 0, 0,50,  5},{ 0, 0,50,  5},{131, 0, 1,  0}
 };
 
 ///	Elven destroyer, Troll destroyer:
 local Animation DestroyerDie[] = {
-    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+    { 0, 0,50,  5},{ 0, 0,50,  5},{131, 0, 1,  0}
 };
 
 ///	Battleship, Juggernaught
 local Animation BattleshipDie[] = {
-    { 0, 0,50,  5},{ 0, 0,50,  5},{ 3, 0, 1,  0}
+    { 0, 0,50,  5},{ 0, 0,50,  5},{131, 0, 1,  0}
 };
 
 ///	Gnomish submarine, giant turtle
 local Animation SubmarineDie[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Gnomish flying machine
 local Animation GnomishFlyingMachineDie[] = {
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Critter
 local Animation CritterDie[] = {
-    { 0, 0,200,  5},{ 3, 0, 1,  0}
+    { 0, 0,200,  5},{131, 0, 1,  0}
 };
 
 ///	Skeleton
 local Animation SkeletonDie[] = {
     { 0, 0, 3,  5},{ 0, 0, 3, 15},{ 0, 0, 3, 15},{ 0, 0, 3, 15},
-    { 0, 0, 3, 15},{ 3, 0, 1,  0}
+    { 0, 0, 3, 15},{131, 0, 1,  0}
 };
 
 ///	Daemon
 local Animation DaemonDie[] = {
     { 0, 0, 5, 50},{ 0, 0, 5,  5},{ 0, 0, 5,  5},{ 0, 0, 5,  5},
-    { 3, 0, 1,  0}
+    {131, 0, 1,  0}
 };
 
 ///	Dead body (contains orcis, human and ships corpse
 local Animation DeadBodyDie[] = {
     //	Corpse:		Orcish
-    {0, 0,200, 5}, {0, 0,200,  5}, {0, 0,200, 5}, {0, 0,200, 5},
+    {0, 0,200, 5}, {16, 0,200,  5}, {0, 0,200, 5}, {0, 0,200, 5},
     {0, 0,200, 5}, {3, 0,  1,-25},
     //	Corpse:		Human
-    {0, 0,200, 0}, {0, 0,200, 10}, {0, 0,200, 5}, {0, 0,200, 5},
+    {0, 0,200, 0}, {16, 0,200, 10}, {0, 0,200, 5}, {0, 0,200, 5},
     {0, 0,200, 5}, {3, 0,  1,-25},
     //	Corpse:		Ships
-    {0, 0,100,30}, {0, 0,100, 0}, {3, 0,  1,  0}
+    {0, 0,100,30}, {16, 0,100, 0}, {131, 0,  1,  0}
 };
 
 ///	Destroyed site:
 local Animation DestroyedPlaceDie[] = {
     //	Destroyed land site:
-    {0, 0,200,0}, {0, 0,200,1}, {3, 0,  1,0},
+    {0, 0,200,0}, {16, 0,200,1}, {3, 0,  1,0},
     //	Destroyed water site:
-    {0, 0,200,2}, {0, 0,200,1}, {3, 0,  1,0}
+    {0, 0,200,2}, {16, 0,200,1}, {131, 0,  1,0}
 };
 
 /*----------------------------------------------------------------------------
@@ -1063,32 +926,13 @@ local Animations DestroyedPlaceAnimations[] = {
 #define TankerOrcFullAnimations		TankerOrcAnimations
 
 /*----------------------------------------------------------------------------
---	Corpse
-----------------------------------------------------------------------------*/
-
-#define CorpseNone		NULL, NULL, 0
-#define CorpseOrc		"unit-dead-body", NULL, 0
-#define CorpseHuman		"unit-dead-body", NULL, 6
-#define CorpseShip		"unit-dead-body", NULL, 12
-
-#define CorpseLandSite1x1	"unit-destroyed-1x1-place", NULL, 0
-#define CorpseLandSite2x2	"unit-destroyed-2x2-place", NULL, 0
-#define CorpseLandSite3x3	"unit-destroyed-3x3-place", NULL, 0
-#define CorpseLandSite4x4	"unit-destroyed-4x4-place", NULL, 0
-
-#define CorpseWaterSite1x1	"unit-destroyed-1x1-place", NULL, 3
-#define CorpseWaterSite2x2	"unit-destroyed-2x2-place", NULL, 3
-#define CorpseWaterSite3x3	"unit-destroyed-3x3-place", NULL, 3
-#define CorpseWaterSite4x4	"unit-destroyed-4x4-place", NULL, 3
-
-/*----------------------------------------------------------------------------
---	Unit types table
+--	Unit-types table
 ----------------------------------------------------------------------------*/
 
 /**
-**	Unit types definition
+**	Default unit-types definition. (used if there is no CCL support)
 */
-global UnitType UnitTypes[] = {
+global UnitType DefaultUnitTypes[] = {
 // * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING *
 // Warning this is generated!!
 {   UnitTypeType, "unit-footman"
@@ -1125,8 +969,8 @@ global UnitType UnitTypes[] = {
 	 { "footman-selected" }
 	,{ "footman-acknowledge" }
 	,{ "footman-ready" }
-	,{ "footman-help" }
-	,{ "footman-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "footman-attack" }
    } },
 
@@ -1164,8 +1008,8 @@ global UnitType UnitTypes[] = {
 	 { "grunt-selected" }
 	,{ "grunt-acknowledge" }
 	,{ "grunt-ready" }
-	,{ "grunt-help" }
-	,{ "grunt-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "grunt-attack" }
    } },
 
@@ -1203,8 +1047,8 @@ global UnitType UnitTypes[] = {
 	 { "peasant-selected" }
 	,{ "peasant-acknowledge" }
 	,{ "peasant-ready" }
-	,{ "peasant-help" }
-	,{ "peasant-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "peasant-attack" }
    } },
 
@@ -1242,8 +1086,8 @@ global UnitType UnitTypes[] = {
 	 { "peon-selected" }
 	,{ "peon-acknowledge" }
 	,{ "peon-ready" }
-	,{ "peon-help" }
-	,{ "peon-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "peon-attack" }
    } },
 
@@ -1281,8 +1125,8 @@ global UnitType UnitTypes[] = {
 	 { "ballista-selected" }
 	,{ "ballista-acknowledge" }
 	,{ "ballista-ready" }
-	,{ "ballista-help" }
-	,{ "ballista-dead" }
+	,{ "basic human voices help 1" }
+	,{ "explosion" }
    },   {	 { "ballista-attack" }
    } },
 
@@ -1320,8 +1164,8 @@ global UnitType UnitTypes[] = {
 	 { "catapult-selected" }
 	,{ "catapult-acknowledge" }
 	,{ "catapult-ready" }
-	,{ "catapult-help" }
-	,{ "catapult-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "explosion" }
    },   {	 { "catapult-attack" }
    } },
 
@@ -1359,8 +1203,8 @@ global UnitType UnitTypes[] = {
 	 { "knight-selected" }
 	,{ "knight-acknowledge" }
 	,{ "knight-ready" }
-	,{ "knight-help" }
-	,{ "knight-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "knight-attack" }
    } },
 
@@ -1398,8 +1242,8 @@ global UnitType UnitTypes[] = {
 	 { "ogre-selected" }
 	,{ "ogre-acknowledge" }
 	,{ "ogre-ready" }
-	,{ "ogre-help" }
-	,{ "ogre-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "ogre-attack" }
    } },
 
@@ -1437,8 +1281,8 @@ global UnitType UnitTypes[] = {
 	 { "archer-selected" }
 	,{ "archer-acknowledge" }
 	,{ "archer-ready" }
-	,{ "archer-help" }
-	,{ "archer-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "archer-attack" }
    } },
 
@@ -1476,8 +1320,8 @@ global UnitType UnitTypes[] = {
 	 { "axethrower-selected" }
 	,{ "axethrower-acknowledge" }
 	,{ "axethrower-ready" }
-	,{ "axethrower-help" }
-	,{ "axethrower-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "axethrower-attack" }
    } },
 
@@ -1515,8 +1359,8 @@ global UnitType UnitTypes[] = {
 	 { "mage-selected" }
 	,{ "mage-acknowledge" }
 	,{ "mage-ready" }
-	,{ "mage-help" }
-	,{ "mage-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "mage-attack" }
    } },
 
@@ -1554,8 +1398,8 @@ global UnitType UnitTypes[] = {
 	 { "death-knight-selected" }
 	,{ "death-knight-acknowledge" }
 	,{ "death-knight-ready" }
-	,{ "death-knight-help" }
-	,{ "death-knight-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "death-knight-attack" }
    } },
 
@@ -1593,8 +1437,8 @@ global UnitType UnitTypes[] = {
 	 { "paladin-selected" }
 	,{ "paladin-acknowledge" }
 	,{ "paladin-ready" }
-	,{ "paladin-help" }
-	,{ "paladin-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "paladin-attack" }
    } },
 
@@ -1632,8 +1476,8 @@ global UnitType UnitTypes[] = {
 	 { "ogre-mage-selected" }
 	,{ "ogre-mage-acknowledge" }
 	,{ "ogre-mage-ready" }
-	,{ "ogre-mage-help" }
-	,{ "ogre-mage-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "ogre-mage-attack" }
    } },
 
@@ -1671,8 +1515,8 @@ global UnitType UnitTypes[] = {
 	 { "dwarves-selected" }
 	,{ "dwarves-acknowledge" }
 	,{ "dwarves-ready" }
-	,{ "dwarves-help" }
-	,{ "dwarves-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "dwarves-attack" }
    } },
 
@@ -1710,8 +1554,8 @@ global UnitType UnitTypes[] = {
 	 { "goblin-sappers-selected" }
 	,{ "goblin-sappers-acknowledge" }
 	,{ "goblin-sappers-ready" }
-	,{ "goblin-sappers-help" }
-	,{ "goblin-sappers-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "goblin-sappers-attack" }
    } },
 
@@ -1749,8 +1593,8 @@ global UnitType UnitTypes[] = {
 	 { "peasant-selected" }
 	,{ "peasant-acknowledge" }
 	,{ "peasant-ready" }
-	,{ "peasant-help" }
-	,{ "peasant-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "peasant-attack" }
    } },
 
@@ -1788,8 +1632,8 @@ global UnitType UnitTypes[] = {
 	 { "peon-selected" }
 	,{ "peon-acknowledge" }
 	,{ "peon-ready" }
-	,{ "peon-help" }
-	,{ "peon-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "peon-attack" }
    } },
 
@@ -1827,8 +1671,8 @@ global UnitType UnitTypes[] = {
 	 { "ranger-selected" }
 	,{ "ranger-acknowledge" }
 	,{ "ranger-ready" }
-	,{ "ranger-help" }
-	,{ "ranger-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "ranger-attack" }
    } },
 
@@ -1866,8 +1710,8 @@ global UnitType UnitTypes[] = {
 	 { "berserker-selected" }
 	,{ "berserker-acknowledge" }
 	,{ "berserker-ready" }
-	,{ "berserker-help" }
-	,{ "berserker-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "berserker-attack" }
    } },
 
@@ -1905,8 +1749,8 @@ global UnitType UnitTypes[] = {
 	 { "alleria-selected" }
 	,{ "alleria-acknowledge" }
 	,{ "alleria-ready" }
-	,{ "alleria-help" }
-	,{ "alleria-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "alleria-attack" }
    } },
 
@@ -1944,8 +1788,8 @@ global UnitType UnitTypes[] = {
 	 { "teron-gorefiend-selected" }
 	,{ "teron-gorefiend-acknowledge" }
 	,{ "teron-gorefiend-ready" }
-	,{ "teron-gorefiend-help" }
-	,{ "teron-gorefiend-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "teron-gorefiend-attack" }
    } },
 
@@ -1983,8 +1827,8 @@ global UnitType UnitTypes[] = {
 	 { "kurdan-and-sky'ree-selected" }
 	,{ "kurdan-and-sky'ree-acknowledge" }
 	,{ "kurdan-and-sky'ree-ready" }
-	,{ "kurdan-and-sky'ree-help" }
-	,{ "kurdan-and-sky'ree-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "kurdan-and-sky'ree-attack" }
    } },
 
@@ -2022,8 +1866,8 @@ global UnitType UnitTypes[] = {
 	 { "dentarg-selected" }
 	,{ "dentarg-acknowledge" }
 	,{ "dentarg-ready" }
-	,{ "dentarg-help" }
-	,{ "dentarg-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "dentarg-attack" }
    } },
 
@@ -2061,8 +1905,8 @@ global UnitType UnitTypes[] = {
 	 { "khadgar-selected" }
 	,{ "khadgar-acknowledge" }
 	,{ "khadgar-ready" }
-	,{ "khadgar-help" }
-	,{ "khadgar-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "khadgar-attack" }
    } },
 
@@ -2100,8 +1944,8 @@ global UnitType UnitTypes[] = {
 	 { "grom-hellscream-selected" }
 	,{ "grom-hellscream-acknowledge" }
 	,{ "grom-hellscream-ready" }
-	,{ "grom-hellscream-help" }
-	,{ "grom-hellscream-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "grom-hellscream-attack" }
    } },
 
@@ -2139,8 +1983,8 @@ global UnitType UnitTypes[] = {
 	 { "human-oil-tanker-selected" }
 	,{ "human-oil-tanker-acknowledge" }
 	,{ "human-oil-tanker-ready" }
-	,{ "human-oil-tanker-help" }
-	,{ "human-oil-tanker-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "human-oil-tanker-attack" }
    } },
 
@@ -2178,8 +2022,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-oil-tanker-selected" }
 	,{ "orc-oil-tanker-acknowledge" }
 	,{ "orc-oil-tanker-ready" }
-	,{ "orc-oil-tanker-help" }
-	,{ "orc-oil-tanker-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "orc-oil-tanker-attack" }
    } },
 
@@ -2217,8 +2061,8 @@ global UnitType UnitTypes[] = {
 	 { "human-transport-selected" }
 	,{ "human-transport-acknowledge" }
 	,{ "human-transport-ready" }
-	,{ "human-transport-help" }
-	,{ "human-transport-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "human-transport-attack" }
    } },
 
@@ -2256,8 +2100,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-transport-selected" }
 	,{ "orc-transport-acknowledge" }
 	,{ "orc-transport-ready" }
-	,{ "orc-transport-help" }
-	,{ "orc-transport-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "orc-transport-attack" }
    } },
 
@@ -2295,8 +2139,8 @@ global UnitType UnitTypes[] = {
 	 { "elven-destroyer-selected" }
 	,{ "elven-destroyer-acknowledge" }
 	,{ "elven-destroyer-ready" }
-	,{ "elven-destroyer-help" }
-	,{ "elven-destroyer-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "elven-destroyer-attack" }
    } },
 
@@ -2334,8 +2178,8 @@ global UnitType UnitTypes[] = {
 	 { "troll-destroyer-selected" }
 	,{ "troll-destroyer-acknowledge" }
 	,{ "troll-destroyer-ready" }
-	,{ "troll-destroyer-help" }
-	,{ "troll-destroyer-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "troll-destroyer-attack" }
    } },
 
@@ -2373,8 +2217,8 @@ global UnitType UnitTypes[] = {
 	 { "battleship-selected" }
 	,{ "battleship-acknowledge" }
 	,{ "battleship-ready" }
-	,{ "battleship-help" }
-	,{ "battleship-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "battleship-attack" }
    } },
 
@@ -2412,8 +2256,8 @@ global UnitType UnitTypes[] = {
 	 { "ogre-juggernaught-selected" }
 	,{ "ogre-juggernaught-acknowledge" }
 	,{ "ogre-juggernaught-ready" }
-	,{ "ogre-juggernaught-help" }
-	,{ "ogre-juggernaught-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "ogre-juggernaught-attack" }
    } },
 
@@ -2448,12 +2292,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "nothing-22-selected" }
-	,{ "nothing-22-acknowledge" }
-	,{ "nothing-22-ready" }
-	,{ "nothing-22-help" }
-	,{ "nothing-22-dead" }
-   },   {	 { "nothing-22-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-deathwing"
@@ -2490,8 +2334,8 @@ global UnitType UnitTypes[] = {
 	 { "deathwing-selected" }
 	,{ "deathwing-acknowledge" }
 	,{ "deathwing-ready" }
-	,{ "deathwing-help" }
-	,{ "deathwing-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "deathwing-attack" }
    } },
 
@@ -2526,12 +2370,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     1
    ,{		// sound
-	 { "nothing-24-selected" }
-	,{ "nothing-24-acknowledge" }
-	,{ "nothing-24-ready" }
-	,{ "nothing-24-help" }
-	,{ "nothing-24-dead" }
-   },   {	 { "nothing-24-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-nothing-25"
@@ -2565,12 +2409,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     1
    ,{		// sound
-	 { "nothing-25-selected" }
-	,{ "nothing-25-acknowledge" }
-	,{ "nothing-25-ready" }
-	,{ "nothing-25-help" }
-	,{ "nothing-25-dead" }
-   },   {	 { "nothing-25-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-gnomish-submarine"
@@ -2607,8 +2451,8 @@ global UnitType UnitTypes[] = {
 	 { "gnomish-submarine-selected" }
 	,{ "gnomish-submarine-acknowledge" }
 	,{ "gnomish-submarine-ready" }
-	,{ "gnomish-submarine-help" }
-	,{ "gnomish-submarine-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "gnomish-submarine-attack" }
    } },
 
@@ -2646,8 +2490,8 @@ global UnitType UnitTypes[] = {
 	 { "giant-turtle-selected" }
 	,{ "giant-turtle-acknowledge" }
 	,{ "giant-turtle-ready" }
-	,{ "giant-turtle-help" }
-	,{ "giant-turtle-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "giant-turtle-attack" }
    } },
 
@@ -2685,8 +2529,8 @@ global UnitType UnitTypes[] = {
 	 { "gnomish-flying-machine-selected" }
 	,{ "gnomish-flying-machine-acknowledge" }
 	,{ "gnomish-flying-machine-ready" }
-	,{ "gnomish-flying-machine-help" }
-	,{ "gnomish-flying-machine-dead" }
+	,{ "basic human voices help 1" }
+	,{ "explosion" }
    },   {	 { "gnomish-flying-machine-attack" }
    } },
 
@@ -2724,8 +2568,8 @@ global UnitType UnitTypes[] = {
 	 { "goblin-zeppelin-selected" }
 	,{ "goblin-zeppelin-acknowledge" }
 	,{ "goblin-zeppelin-ready" }
-	,{ "goblin-zeppelin-help" }
-	,{ "goblin-zeppelin-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "explosion" }
    },   {	 { "goblin-zeppelin-attack" }
    } },
 
@@ -2763,8 +2607,8 @@ global UnitType UnitTypes[] = {
 	 { "gryphon-rider-selected" }
 	,{ "gryphon-rider-acknowledge" }
 	,{ "gryphon-rider-ready" }
-	,{ "gryphon-rider-help" }
-	,{ "gryphon-rider-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "gryphon-rider-attack" }
    } },
 
@@ -2802,8 +2646,8 @@ global UnitType UnitTypes[] = {
 	 { "dragon-selected" }
 	,{ "dragon-acknowledge" }
 	,{ "dragon-ready" }
-	,{ "dragon-help" }
-	,{ "dragon-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "dragon-attack" }
    } },
 
@@ -2841,8 +2685,8 @@ global UnitType UnitTypes[] = {
 	 { "turalyon-selected" }
 	,{ "turalyon-acknowledge" }
 	,{ "turalyon-ready" }
-	,{ "turalyon-help" }
-	,{ "turalyon-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "turalyon-attack" }
    } },
 
@@ -2880,7 +2724,7 @@ global UnitType UnitTypes[] = {
 	 { "eye-of-kilrogg-selected" }
 	,{ "eye-of-kilrogg-acknowledge" }
 	,{ "eye-of-kilrogg-ready" }
-	,{ "eye-of-kilrogg-help" }
+	,{ "basic orc voices help 1" }
 	,{ "eye-of-kilrogg-dead" }
    },   {	 { "eye-of-kilrogg-attack" }
    } },
@@ -2919,8 +2763,8 @@ global UnitType UnitTypes[] = {
 	 { "danath-selected" }
 	,{ "danath-acknowledge" }
 	,{ "danath-ready" }
-	,{ "danath-help" }
-	,{ "danath-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "danath-attack" }
    } },
 
@@ -2958,8 +2802,8 @@ global UnitType UnitTypes[] = {
 	 { "korgath-bladefist-selected" }
 	,{ "korgath-bladefist-acknowledge" }
 	,{ "korgath-bladefist-ready" }
-	,{ "korgath-bladefist-help" }
-	,{ "korgath-bladefist-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "korgath-bladefist-attack" }
    } },
 
@@ -2994,12 +2838,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "nothing-30-selected" }
-	,{ "nothing-30-acknowledge" }
-	,{ "nothing-30-ready" }
-	,{ "nothing-30-help" }
-	,{ "nothing-30-dead" }
-   },   {	 { "nothing-30-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-cho'gall"
@@ -3036,8 +2880,8 @@ global UnitType UnitTypes[] = {
 	 { "cho'gall-selected" }
 	,{ "cho'gall-acknowledge" }
 	,{ "cho'gall-ready" }
-	,{ "cho'gall-help" }
-	,{ "cho'gall-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "cho'gall-attack" }
    } },
 
@@ -3075,8 +2919,8 @@ global UnitType UnitTypes[] = {
 	 { "lothar-selected" }
 	,{ "lothar-acknowledge" }
 	,{ "lothar-ready" }
-	,{ "lothar-help" }
-	,{ "lothar-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "lothar-attack" }
    } },
 
@@ -3114,8 +2958,8 @@ global UnitType UnitTypes[] = {
 	 { "gul'dan-selected" }
 	,{ "gul'dan-acknowledge" }
 	,{ "gul'dan-ready" }
-	,{ "gul'dan-help" }
-	,{ "gul'dan-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "gul'dan-attack" }
    } },
 
@@ -3153,8 +2997,8 @@ global UnitType UnitTypes[] = {
 	 { "uther-lightbringer-selected" }
 	,{ "uther-lightbringer-acknowledge" }
 	,{ "uther-lightbringer-ready" }
-	,{ "uther-lightbringer-help" }
-	,{ "uther-lightbringer-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "uther-lightbringer-attack" }
    } },
 
@@ -3192,8 +3036,8 @@ global UnitType UnitTypes[] = {
 	 { "zuljin-selected" }
 	,{ "zuljin-acknowledge" }
 	,{ "zuljin-ready" }
-	,{ "zuljin-help" }
-	,{ "zuljin-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "zuljin-attack" }
    } },
 
@@ -3228,12 +3072,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "nothing-36-selected" }
-	,{ "nothing-36-acknowledge" }
-	,{ "nothing-36-ready" }
-	,{ "nothing-36-help" }
-	,{ "nothing-36-dead" }
-   },   {	 { "nothing-36-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-skeleton"
@@ -3270,8 +3114,8 @@ global UnitType UnitTypes[] = {
 	 { "skeleton-selected" }
 	,{ "skeleton-acknowledge" }
 	,{ "skeleton-ready" }
-	,{ "skeleton-help" }
-	,{ "skeleton-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "skeleton-attack" }
    } },
 
@@ -3309,8 +3153,8 @@ global UnitType UnitTypes[] = {
 	 { "daemon-selected" }
 	,{ "daemon-acknowledge" }
 	,{ "daemon-ready" }
-	,{ "daemon-help" }
-	,{ "daemon-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "daemon-attack" }
    } },
 
@@ -3387,8 +3231,8 @@ global UnitType UnitTypes[] = {
 	 { "farm-selected" }
 	,{ "farm-acknowledge" }
 	,{ "farm-ready" }
-	,{ "farm-help" }
-	,{ "farm-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "farm-attack" }
    } },
 
@@ -3426,8 +3270,8 @@ global UnitType UnitTypes[] = {
 	 { "pig-farm-selected" }
 	,{ "pig-farm-acknowledge" }
 	,{ "pig-farm-ready" }
-	,{ "pig-farm-help" }
-	,{ "pig-farm-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "pig-farm-attack" }
    } },
 
@@ -3465,8 +3309,8 @@ global UnitType UnitTypes[] = {
 	 { "human-barracks-selected" }
 	,{ "human-barracks-acknowledge" }
 	,{ "human-barracks-ready" }
-	,{ "human-barracks-help" }
-	,{ "human-barracks-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-barracks-attack" }
    } },
 
@@ -3504,8 +3348,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-barracks-selected" }
 	,{ "orc-barracks-acknowledge" }
 	,{ "orc-barracks-ready" }
-	,{ "orc-barracks-help" }
-	,{ "orc-barracks-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-barracks-attack" }
    } },
 
@@ -3543,8 +3387,8 @@ global UnitType UnitTypes[] = {
 	 { "church-selected" }
 	,{ "church-acknowledge" }
 	,{ "church-ready" }
-	,{ "church-help" }
-	,{ "church-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "church-attack" }
    } },
 
@@ -3582,8 +3426,8 @@ global UnitType UnitTypes[] = {
 	 { "altar-of-storms-selected" }
 	,{ "altar-of-storms-acknowledge" }
 	,{ "altar-of-storms-ready" }
-	,{ "altar-of-storms-help" }
-	,{ "altar-of-storms-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "altar-of-storms-attack" }
    } },
 
@@ -3621,8 +3465,8 @@ global UnitType UnitTypes[] = {
 	 { "human-watch-tower-selected" }
 	,{ "human-watch-tower-acknowledge" }
 	,{ "human-watch-tower-ready" }
-	,{ "human-watch-tower-help" }
-	,{ "human-watch-tower-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-watch-tower-attack" }
    } },
 
@@ -3660,8 +3504,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-watch-tower-selected" }
 	,{ "orc-watch-tower-acknowledge" }
 	,{ "orc-watch-tower-ready" }
-	,{ "orc-watch-tower-help" }
-	,{ "orc-watch-tower-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-watch-tower-attack" }
    } },
 
@@ -3699,8 +3543,8 @@ global UnitType UnitTypes[] = {
 	 { "stables-selected" }
 	,{ "stables-acknowledge" }
 	,{ "stables-ready" }
-	,{ "stables-help" }
-	,{ "stables-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "stables-attack" }
    } },
 
@@ -3738,8 +3582,8 @@ global UnitType UnitTypes[] = {
 	 { "ogre-mound-selected" }
 	,{ "ogre-mound-acknowledge" }
 	,{ "ogre-mound-ready" }
-	,{ "ogre-mound-help" }
-	,{ "ogre-mound-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "ogre-mound-attack" }
    } },
 
@@ -3777,8 +3621,8 @@ global UnitType UnitTypes[] = {
 	 { "gnomish-inventor-selected" }
 	,{ "gnomish-inventor-acknowledge" }
 	,{ "gnomish-inventor-ready" }
-	,{ "gnomish-inventor-help" }
-	,{ "gnomish-inventor-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "gnomish-inventor-attack" }
    } },
 
@@ -3816,8 +3660,8 @@ global UnitType UnitTypes[] = {
 	 { "goblin-alchemist-selected" }
 	,{ "goblin-alchemist-acknowledge" }
 	,{ "goblin-alchemist-ready" }
-	,{ "goblin-alchemist-help" }
-	,{ "goblin-alchemist-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "goblin-alchemist-attack" }
    } },
 
@@ -3855,8 +3699,8 @@ global UnitType UnitTypes[] = {
 	 { "gryphon-aviary-selected" }
 	,{ "gryphon-aviary-acknowledge" }
 	,{ "gryphon-aviary-ready" }
-	,{ "gryphon-aviary-help" }
-	,{ "gryphon-aviary-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "gryphon-aviary-attack" }
    } },
 
@@ -3894,8 +3738,8 @@ global UnitType UnitTypes[] = {
 	 { "dragon-roost-selected" }
 	,{ "dragon-roost-acknowledge" }
 	,{ "dragon-roost-ready" }
-	,{ "dragon-roost-help" }
-	,{ "dragon-roost-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "dragon-roost-attack" }
    } },
 
@@ -3933,8 +3777,8 @@ global UnitType UnitTypes[] = {
 	 { "human-shipyard-selected" }
 	,{ "human-shipyard-acknowledge" }
 	,{ "human-shipyard-ready" }
-	,{ "human-shipyard-help" }
-	,{ "human-shipyard-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-shipyard-attack" }
    } },
 
@@ -3972,8 +3816,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-shipyard-selected" }
 	,{ "orc-shipyard-acknowledge" }
 	,{ "orc-shipyard-ready" }
-	,{ "orc-shipyard-help" }
-	,{ "orc-shipyard-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-shipyard-attack" }
    } },
 
@@ -4011,8 +3855,8 @@ global UnitType UnitTypes[] = {
 	 { "town-hall-selected" }
 	,{ "town-hall-acknowledge" }
 	,{ "town-hall-ready" }
-	,{ "town-hall-help" }
-	,{ "town-hall-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "town-hall-attack" }
    } },
 
@@ -4050,8 +3894,8 @@ global UnitType UnitTypes[] = {
 	 { "great-hall-selected" }
 	,{ "great-hall-acknowledge" }
 	,{ "great-hall-ready" }
-	,{ "great-hall-help" }
-	,{ "great-hall-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "great-hall-attack" }
    } },
 
@@ -4089,8 +3933,8 @@ global UnitType UnitTypes[] = {
 	 { "elven-lumber-mill-selected" }
 	,{ "elven-lumber-mill-acknowledge" }
 	,{ "elven-lumber-mill-ready" }
-	,{ "elven-lumber-mill-help" }
-	,{ "elven-lumber-mill-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "elven-lumber-mill-attack" }
    } },
 
@@ -4128,8 +3972,8 @@ global UnitType UnitTypes[] = {
 	 { "troll-lumber-mill-selected" }
 	,{ "troll-lumber-mill-acknowledge" }
 	,{ "troll-lumber-mill-ready" }
-	,{ "troll-lumber-mill-help" }
-	,{ "troll-lumber-mill-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "troll-lumber-mill-attack" }
    } },
 
@@ -4167,8 +4011,8 @@ global UnitType UnitTypes[] = {
 	 { "human-foundry-selected" }
 	,{ "human-foundry-acknowledge" }
 	,{ "human-foundry-ready" }
-	,{ "human-foundry-help" }
-	,{ "human-foundry-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-foundry-attack" }
    } },
 
@@ -4206,8 +4050,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-foundry-selected" }
 	,{ "orc-foundry-acknowledge" }
 	,{ "orc-foundry-ready" }
-	,{ "orc-foundry-help" }
-	,{ "orc-foundry-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-foundry-attack" }
    } },
 
@@ -4245,8 +4089,8 @@ global UnitType UnitTypes[] = {
 	 { "mage-tower-selected" }
 	,{ "mage-tower-acknowledge" }
 	,{ "mage-tower-ready" }
-	,{ "mage-tower-help" }
-	,{ "mage-tower-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "mage-tower-attack" }
    } },
 
@@ -4284,8 +4128,8 @@ global UnitType UnitTypes[] = {
 	 { "temple-of-the-damned-selected" }
 	,{ "temple-of-the-damned-acknowledge" }
 	,{ "temple-of-the-damned-ready" }
-	,{ "temple-of-the-damned-help" }
-	,{ "temple-of-the-damned-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "temple-of-the-damned-attack" }
    } },
 
@@ -4323,8 +4167,8 @@ global UnitType UnitTypes[] = {
 	 { "human-blacksmith-selected" }
 	,{ "human-blacksmith-acknowledge" }
 	,{ "human-blacksmith-ready" }
-	,{ "human-blacksmith-help" }
-	,{ "human-blacksmith-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-blacksmith-attack" }
    } },
 
@@ -4362,8 +4206,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-blacksmith-selected" }
 	,{ "orc-blacksmith-acknowledge" }
 	,{ "orc-blacksmith-ready" }
-	,{ "orc-blacksmith-help" }
-	,{ "orc-blacksmith-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-blacksmith-attack" }
    } },
 
@@ -4401,8 +4245,8 @@ global UnitType UnitTypes[] = {
 	 { "human-refinery-selected" }
 	,{ "human-refinery-acknowledge" }
 	,{ "human-refinery-ready" }
-	,{ "human-refinery-help" }
-	,{ "human-refinery-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-refinery-attack" }
    } },
 
@@ -4440,8 +4284,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-refinery-selected" }
 	,{ "orc-refinery-acknowledge" }
 	,{ "orc-refinery-ready" }
-	,{ "orc-refinery-help" }
-	,{ "orc-refinery-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-refinery-attack" }
    } },
 
@@ -4479,8 +4323,8 @@ global UnitType UnitTypes[] = {
 	 { "human-oil-platform-selected" }
 	,{ "human-oil-platform-acknowledge" }
 	,{ "human-oil-platform-ready" }
-	,{ "human-oil-platform-help" }
-	,{ "human-oil-platform-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-oil-platform-attack" }
    } },
 
@@ -4518,8 +4362,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-oil-platform-selected" }
 	,{ "orc-oil-platform-acknowledge" }
 	,{ "orc-oil-platform-ready" }
-	,{ "orc-oil-platform-help" }
-	,{ "orc-oil-platform-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-oil-platform-attack" }
    } },
 
@@ -4557,8 +4401,8 @@ global UnitType UnitTypes[] = {
 	 { "keep-selected" }
 	,{ "keep-acknowledge" }
 	,{ "keep-ready" }
-	,{ "keep-help" }
-	,{ "keep-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "keep-attack" }
    } },
 
@@ -4596,8 +4440,8 @@ global UnitType UnitTypes[] = {
 	 { "stronghold-selected" }
 	,{ "stronghold-acknowledge" }
 	,{ "stronghold-ready" }
-	,{ "stronghold-help" }
-	,{ "stronghold-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "stronghold-attack" }
    } },
 
@@ -4635,8 +4479,8 @@ global UnitType UnitTypes[] = {
 	 { "castle-selected" }
 	,{ "castle-acknowledge" }
 	,{ "castle-ready" }
-	,{ "castle-help" }
-	,{ "castle-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "castle-attack" }
    } },
 
@@ -4674,8 +4518,8 @@ global UnitType UnitTypes[] = {
 	 { "fortress-selected" }
 	,{ "fortress-acknowledge" }
 	,{ "fortress-ready" }
-	,{ "fortress-help" }
-	,{ "fortress-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "fortress-attack" }
    } },
 
@@ -4714,7 +4558,7 @@ global UnitType UnitTypes[] = {
 	,{ "gold-mine-acknowledge" }
 	,{ "gold-mine-ready" }
 	,{ "gold-mine-help" }
-	,{ "gold-mine-dead" }
+	,{ "building destroyed" }
    },   {	 { "gold-mine-attack" }
    } },
 
@@ -4753,7 +4597,7 @@ global UnitType UnitTypes[] = {
 	,{ "oil-patch-acknowledge" }
 	,{ "oil-patch-ready" }
 	,{ "oil-patch-help" }
-	,{ "oil-patch-dead" }
+	,{ "building destroyed" }
    },   {	 { "oil-patch-attack" }
    } },
 
@@ -4791,8 +4635,8 @@ global UnitType UnitTypes[] = {
 	 { "human-start-location-selected" }
 	,{ "human-start-location-acknowledge" }
 	,{ "human-start-location-ready" }
-	,{ "human-start-location-help" }
-	,{ "human-start-location-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-start-location-attack" }
    } },
 
@@ -4830,8 +4674,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-start-location-selected" }
 	,{ "orc-start-location-acknowledge" }
 	,{ "orc-start-location-ready" }
-	,{ "orc-start-location-help" }
-	,{ "orc-start-location-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-start-location-attack" }
    } },
 
@@ -4869,8 +4713,8 @@ global UnitType UnitTypes[] = {
 	 { "human-guard-tower-selected" }
 	,{ "human-guard-tower-acknowledge" }
 	,{ "human-guard-tower-ready" }
-	,{ "human-guard-tower-help" }
-	,{ "human-guard-tower-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-guard-tower-attack" }
    } },
 
@@ -4908,8 +4752,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-guard-tower-selected" }
 	,{ "orc-guard-tower-acknowledge" }
 	,{ "orc-guard-tower-ready" }
-	,{ "orc-guard-tower-help" }
-	,{ "orc-guard-tower-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-guard-tower-attack" }
    } },
 
@@ -4947,8 +4791,8 @@ global UnitType UnitTypes[] = {
 	 { "human-cannon-tower-selected" }
 	,{ "human-cannon-tower-acknowledge" }
 	,{ "human-cannon-tower-ready" }
-	,{ "human-cannon-tower-help" }
-	,{ "human-cannon-tower-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-cannon-tower-attack" }
    } },
 
@@ -4986,8 +4830,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-cannon-tower-selected" }
 	,{ "orc-cannon-tower-acknowledge" }
 	,{ "orc-cannon-tower-ready" }
-	,{ "orc-cannon-tower-help" }
-	,{ "orc-cannon-tower-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-cannon-tower-attack" }
    } },
 
@@ -5025,8 +4869,8 @@ global UnitType UnitTypes[] = {
 	 { "circle-of-power-selected" }
 	,{ "circle-of-power-acknowledge" }
 	,{ "circle-of-power-ready" }
-	,{ "circle-of-power-help" }
-	,{ "circle-of-power-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "circle-of-power-attack" }
    } },
 
@@ -5064,8 +4908,8 @@ global UnitType UnitTypes[] = {
 	 { "dark-portal-selected" }
 	,{ "dark-portal-acknowledge" }
 	,{ "dark-portal-ready" }
-	,{ "dark-portal-help" }
-	,{ "dark-portal-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "dark-portal-attack" }
    } },
 
@@ -5103,8 +4947,8 @@ global UnitType UnitTypes[] = {
 	 { "runestone-selected" }
 	,{ "runestone-acknowledge" }
 	,{ "runestone-ready" }
-	,{ "runestone-help" }
-	,{ "runestone-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "runestone-attack" }
    } },
 
@@ -5142,8 +4986,8 @@ global UnitType UnitTypes[] = {
 	 { "human-wall-selected" }
 	,{ "human-wall-acknowledge" }
 	,{ "human-wall-ready" }
-	,{ "human-wall-help" }
-	,{ "human-wall-dead" }
+	,{ "basic human voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "human-wall-attack" }
    } },
 
@@ -5181,8 +5025,8 @@ global UnitType UnitTypes[] = {
 	 { "orc-wall-selected" }
 	,{ "orc-wall-acknowledge" }
 	,{ "orc-wall-ready" }
-	,{ "orc-wall-help" }
-	,{ "orc-wall-dead" }
+	,{ "basic orc voices help 2" }
+	,{ "building destroyed" }
    },   {	 { "orc-wall-attack" }
    } },
 
@@ -5217,12 +5061,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "dead-body-selected" }
-	,{ "dead-body-acknowledge" }
-	,{ "dead-body-ready" }
-	,{ "dead-body-help" }
-	,{ "dead-body-dead" }
-   },   {	 { "dead-body-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-destroyed-1x1-place"
@@ -5256,12 +5100,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "destroyed-1x1-place-selected" }
-	,{ "destroyed-1x1-place-acknowledge" }
-	,{ "destroyed-1x1-place-ready" }
-	,{ "destroyed-1x1-place-help" }
-	,{ "destroyed-1x1-place-dead" }
-   },   {	 { "destroyed-1x1-place-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-destroyed-2x2-place"
@@ -5295,12 +5139,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "destroyed-2x2-place-selected" }
-	,{ "destroyed-2x2-place-acknowledge" }
-	,{ "destroyed-2x2-place-ready" }
-	,{ "destroyed-2x2-place-help" }
-	,{ "destroyed-2x2-place-dead" }
-   },   {	 { "destroyed-2x2-place-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-destroyed-3x3-place"
@@ -5334,12 +5178,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "destroyed-3x3-place-selected" }
-	,{ "destroyed-3x3-place-acknowledge" }
-	,{ "destroyed-3x3-place-ready" }
-	,{ "destroyed-3x3-place-help" }
-	,{ "destroyed-3x3-place-dead" }
-   },   {	 { "destroyed-3x3-place-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-destroyed-4x4-place"
@@ -5373,12 +5217,12 @@ global UnitType UnitTypes[] = {
 	//Hero	SOil	Explode	CowerM	Organic	Select
 	,    0,    0,         0,     0,       0,     0
    ,{		// sound
-	 { "destroyed-4x4-place-selected" }
-	,{ "destroyed-4x4-place-acknowledge" }
-	,{ "destroyed-4x4-place-ready" }
-	,{ "destroyed-4x4-place-help" }
-	,{ "destroyed-4x4-place-dead" }
-   },   {	 { "destroyed-4x4-place-attack" }
+	 { }
+	,{ }
+	,{ }
+	,{ }
+	,{ }
+   },   {	 { }
    } },
 
 {   UnitTypeType, "unit-peasant-with-gold"
@@ -5415,8 +5259,8 @@ global UnitType UnitTypes[] = {
 	 { "peasant-with-gold-selected" }
 	,{ "peasant-with-gold-acknowledge" }
 	,{ "peasant-with-gold-ready" }
-	,{ "peasant-with-gold-help" }
-	,{ "peasant-with-gold-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "peasant-with-gold-attack" }
    } },
 
@@ -5454,8 +5298,8 @@ global UnitType UnitTypes[] = {
 	 { "peon-with-gold-selected" }
 	,{ "peon-with-gold-acknowledge" }
 	,{ "peon-with-gold-ready" }
-	,{ "peon-with-gold-help" }
-	,{ "peon-with-gold-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "peon-with-gold-attack" }
    } },
 
@@ -5493,8 +5337,8 @@ global UnitType UnitTypes[] = {
 	 { "peasant-with-wood-selected" }
 	,{ "peasant-with-wood-acknowledge" }
 	,{ "peasant-with-wood-ready" }
-	,{ "peasant-with-wood-help" }
-	,{ "peasant-with-wood-dead" }
+	,{ "basic human voices help 1" }
+	,{ "basic human voices dead" }
    },   {	 { "peasant-with-wood-attack" }
    } },
 
@@ -5532,8 +5376,8 @@ global UnitType UnitTypes[] = {
 	 { "peon-with-wood-selected" }
 	,{ "peon-with-wood-acknowledge" }
 	,{ "peon-with-wood-ready" }
-	,{ "peon-with-wood-help" }
-	,{ "peon-with-wood-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "basic orc voices dead" }
    },   {	 { "peon-with-wood-attack" }
    } },
 
@@ -5571,8 +5415,8 @@ global UnitType UnitTypes[] = {
 	 { "human-oil-tanker-full-selected" }
 	,{ "human-oil-tanker-full-acknowledge" }
 	,{ "human-oil-tanker-full-ready" }
-	,{ "human-oil-tanker-full-help" }
-	,{ "human-oil-tanker-full-dead" }
+	,{ "basic human voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "human-oil-tanker-full-attack" }
    } },
 
@@ -5610,13 +5454,27 @@ global UnitType UnitTypes[] = {
 	 { "orc-oil-tanker-full-selected" }
 	,{ "orc-oil-tanker-full-acknowledge" }
 	,{ "orc-oil-tanker-full-ready" }
-	,{ "orc-oil-tanker-full-help" }
-	,{ "orc-oil-tanker-full-dead" }
+	,{ "basic orc voices help 1" }
+	,{ "ship sinking" }
    },   {	 { "orc-oil-tanker-full-attack" }
    } },
 
 // Warning this is generated!!
 // * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING *
+   { 0 }
 };
+
+#endif
+
+/**
+**	Unit-types definition
+*/
+global UnitType* UnitTypes
+#ifndef laterUSE_CCL
+    = DefaultUnitTypes
+#endif
+    ;
+
+global int NumUnitTypes;		/// number of unit-types made.
 
 //@}

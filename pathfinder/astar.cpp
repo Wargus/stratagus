@@ -335,14 +335,13 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 
     // Let's first mark goal
     if(goal) {
-	j=goal->Type->Type;
 	cx=goal->X;
 	cy=goal->Y;
-	ey=UnitTypes[j].TileHeight+r-1;
-	sx=UnitTypes[j].TileWidth+r-1;
+	ey=goal->Type->TileHeight+r-1;
+	sx=goal->Type->TileWidth+r-1;
 	// approximate goal for A*
-	gx=goal->X+UnitTypes[j].TileHeight/2;
-	gy=goal->Y+UnitTypes[j].TileWidth/2;
+	gx=goal->X+goal->Type->TileHeight/2;
+	gy=goal->Y+goal->Type->TileWidth/2;
     } else {
 #ifdef NEW_ORDERS
 	cx=gx=unit->Orders[0].X;

@@ -965,8 +965,6 @@ global void UIHandleButtonDown(int b)
 
 		x=Screen2MapX(CursorX);
 		y=Screen2MapY(CursorY);
-		DebugLevel3("Build (%d,%d) %d\n"
-			,CursorX,CursorY,CursorBuilding-UnitTypes);
 		// FIXME: error messages
 
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)

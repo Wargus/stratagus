@@ -42,7 +42,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local long SiodUnitTypeTag;		/// siod unit type object
+local long SiodUnitTypeTag;		/// siod unit-type object
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -51,7 +51,11 @@ local long SiodUnitTypeTag;		/// siod unit type object
 /**
 **	Parse unit-type.
 **
-**	@param list	List describing unit type.
+**	@note FIXME: This should be changed to a more readable and useable
+**	format. I thinking of an tagged format 'size and this should be
+**	parsed by a general parser.
+**
+**	@param list	List describing the unit-type.
 */
 local SCM CclDefineUnitType(SCM list)
 {
@@ -62,21 +66,22 @@ local SCM CclDefineUnitType(SCM list)
     int i;
     int j;
     int n;
-    static int hack_index;
 
     //	Slot identifier
 
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel3("UnitType: %s\n",str);
     type=UnitTypeByIdent(str);
-    if( !type ) {
-	// FIXME: must generate a new unit type
-	type=&UnitTypes[hack_index++];
+    if( type ) {
+	CclFree(str);
+    } else {
+	//
+	//	Allocate new memory. (+2 for start end empty last entry.)
+	//
+	type=NewUnitTypeSlot(str);
     }
 
     //	Name
-
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
@@ -165,10 +170,11 @@ local SCM CclDefineUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    DebugLevel3("\tAnimation: %s\n",str);
+    temp=gh_symbol2scm(str);
+    if( symbol_boundp(temp,NIL)==SCM_BOOL_T ) {
+	type->Animations=(void*)gh_scm2int(symbol_value(temp,NIL));
+    }
     free(str);
-
-    // FIXME: animation parsing not written
 
     // Icon
 
@@ -618,6 +624,8 @@ local SCM CclPrintUnitTypeTable(void)
 
 #endif
 
+// ----------------------------------------------------------------------------
+
 /**
 **	Get a single animation sequence.
 */
@@ -667,6 +675,7 @@ local Animation *GetSingleAnimation(SCM list)
 	anim.Frame = Frame;
 	finallist[current_location++] = anim;
     }
+    finallist[current_location-1] . Flags |= AnimationEnd;
     //printf("\n");
 
     return finallist;
@@ -758,8 +767,10 @@ local SCM CclAnimType(SCM list)
   }
 }
 
+// ----------------------------------------------------------------------------
+
 /**
-**	Access unit type object
+**	Access unit-type object
 */
 local UnitType* CclGetUnitType(SCM ptr)
 {
@@ -770,13 +781,13 @@ local UnitType* CclGetUnitType(SCM ptr)
 	return UnitTypeByIdent(str);
     }
     if( NTYPEP(ptr,SiodUnitTypeTag) ) {
-	errl("not an unit type",ptr);
+	errl("not an unit-type",ptr);
     }
     return (UnitType*)CAR(ptr);
 }
 
 /**
-**	Print the unit type object
+**	Print the unit-type object
 **
 **	@param ptr	Scheme object.
 **	@param f	Output structure.
@@ -792,11 +803,11 @@ local void CclUnitTypePrin1(SCM ptr,struct gen_printio* f)
 }
 
 /**
-**	Get unit type structure.
+**	Get unit-type structure.
 **
-**	@param ident	Identifier for unit type.
+**	@param ident	Identifier for unit-type.
 **
-**	@return		Unit type structure.
+**	@return		Unit-type structure.
 */
 local SCM CclUnitType(SCM ident)
 {
@@ -816,9 +827,9 @@ local SCM CclUnitType(SCM ident)
 }
 
 /**
-**	Get all unit type structures.
+**	Get all unit-type structures.
 **
-**	@return		An array of all unit type structures.
+**	@return		An array of all unit-type structures.
 */
 local SCM CclUnitTypeArray(void)
 {
@@ -838,11 +849,11 @@ local SCM CclUnitTypeArray(void)
 }
 
 /**
-**	Get the ident of the unit type structure.
+**	Get the ident of the unit-type structure.
 **
-**	@param ptr	Unit type object.
+**	@param ptr	Unit-type object.
 **
-**	@return		The identifier of the unit type.
+**	@return		The identifier of the unit-type.
 */
 local SCM CclGetUnitTypeIdent(SCM ptr)
 {
@@ -855,11 +866,11 @@ local SCM CclGetUnitTypeIdent(SCM ptr)
 }
 
 /**
-**	Get the name of the unit type structure.
+**	Get the name of the unit-type structure.
 **
-**	@param ptr	Unit type object.
+**	@param ptr	Unit-type object.
 **
-**	@return		The name of the unit type.
+**	@return		The name of the unit-type.
 */
 local SCM CclGetUnitTypeName(SCM ptr)
 {
@@ -872,12 +883,12 @@ local SCM CclGetUnitTypeName(SCM ptr)
 }
 
 /**
-**	Set the name of the unit type structure.
+**	Set the name of the unit-type structure.
 **
-**	@param ptr	Unit type object.
+**	@param ptr	Unit-type object.
 **	@param name	The name to set.
 **
-**	@return		The name of the unit type.
+**	@return		The name of the unit-type.
 */
 local SCM CclSetUnitTypeName(SCM ptr,SCM name)
 {
@@ -893,11 +904,11 @@ local SCM CclSetUnitTypeName(SCM ptr,SCM name)
 // FIXME: write the missing access functions
 
 /**
-**	Get the property of the unit type structure.
+**	Get the property of the unit-type structure.
 **
-**	@param ptr	Unit type object.
+**	@param ptr	Unit-type object.
 **
-**	@return		The property of the unit type.
+**	@return		The property of the unit-type.
 */
 local SCM CclGetUnitTypeProperty(SCM ptr)
 {
@@ -908,12 +919,12 @@ local SCM CclGetUnitTypeProperty(SCM ptr)
 }
 
 /**
-**	Set the property of the unit type structure.
+**	Set the property of the unit-type structure.
 **
-**	@param ptr	Unit type object.
+**	@param ptr	Unit-type object.
 **	@param name	The property to set.
 **
-**	@return		The property of the unit type.
+**	@return		The property of the unit-type.
 */
 local SCM CclSetUnitTypeProperty(SCM ptr,SCM property)
 {
@@ -963,6 +974,85 @@ local SCM CclDefineUnitTypeWcNames(SCM list)
     return SCM_UNSPECIFIED;
 }
 
+// ----------------------------------------------------------------------------
+
+/**
+**	Define an unit-type animations set.
+**
+**	@param list	Animations list.
+*/
+local SCM CclDefineAnimations(SCM list)
+{
+    char* str;
+    SCM id;
+    SCM value;
+    Animations* anims;
+    Animation* anim;
+    Animation* t;
+    int i;
+    int frame;
+
+    str=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+    anims=calloc(1,sizeof(Animations));
+
+    while( !gh_null_p(list) ) {
+	id=gh_car(list);
+	list=gh_cdr(list);
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	t=anim=malloc(gh_length(value)*sizeof(Animation));
+	frame=0;
+	while( !gh_null_p(value) ) {
+	    t->Flags=gh_scm2int(gh_vector_ref(gh_car(value),gh_int2scm(0)));
+	    t->Pixel=gh_scm2int(gh_vector_ref(gh_car(value),gh_int2scm(1)));
+	    t->Sleep=gh_scm2int(gh_vector_ref(gh_car(value),gh_int2scm(2)));
+	    i=gh_scm2int(gh_vector_ref(gh_car(value),gh_int2scm(3)));
+	    t->Frame=i-frame;
+	    frame=i;
+	    if( t->Flags&AnimationRestart ) {
+		frame=0;
+	    }
+	    ++t;
+	    value=gh_cdr(value);
+	}
+	t[-1].Flags|=0x80;		// Marks end of list
+
+	if( gh_eq_p(id,gh_symbol2scm("still")) ) {
+	    if( anims->Still ) {
+		free(anims->Still);
+	    }
+	    anims->Still=anim;
+	} else if( gh_eq_p(id,gh_symbol2scm("move")) ) {
+	    if( anims->Move ) {
+		free(anims->Move);
+	    }
+	    anims->Move=anim;
+	} else if( gh_eq_p(id,gh_symbol2scm("attack")) ) {
+	    if( anims->Attack ) {
+		free(anims->Attack);
+	    }
+	    anims->Attack=anim;
+	} else if( gh_eq_p(id,gh_symbol2scm("die")) ) {
+	    if( anims->Die ) {
+		free(anims->Die);
+	    }
+	    anims->Die=anim;
+	} else {
+	    DebugLevel0Fn("Wrong tag `%s'\n",gh_scm2newstr(id,NULL));
+	    free(id);
+	}
+    }
+
+    // I generate a scheme variable containing the pointer!
+    gh_define(str,gh_int2scm((int)anims));
+
+    return SCM_UNSPECIFIED;
+}
+
+// ----------------------------------------------------------------------------
+
 /**
 **	Register CCL features for unit-type.
 */
@@ -990,7 +1080,10 @@ global void UnitTypeCclRegister(void)
 
     gh_new_procedureN("define-unittype-wc-names",CclDefineUnitTypeWcNames);
 
+    // FIXME: could be removed, if FGP animations are converted.
     gh_new_procedureN("anim-type",CclAnimType);
+
+    gh_new_procedureN("define-animations",CclDefineAnimations);
 
     InitUnitTypes();
 }

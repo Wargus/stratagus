@@ -391,7 +391,7 @@ global volatile void Exit(int err)
 	,(SlowFrameCounter*100)/(FrameCounter ? : 1));
     IfDebug(
 	UnitCacheStatistic();
-	DebugLevel0("Path: Error: %u(%u) OK: %u Depth: %u\n"
+	DebugLevel0("Path: Error: %u Unreachable: %u OK: %u Depth: %u\n"
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
     );

@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unitsound.c	-	The unit sounds. */
@@ -43,808 +43,59 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#define MaxSimpleGroups 7
-//FIXME: should I use separate types?
+/**
+**	Simple sound definition:
+**		There is only one sound/voice that could be used for this
+**		sound identifier.
+*/
+typedef struct _simple_sound_ {
+    char *Name;				/// name of the sound
+    char *File;				/// corresponding sound file
+} SimpleSound;
 
-/// sound group definition
+/**
+**	Structure for remaping a sound to a new name.
+*/
+typedef struct _sound_remap_ {
+    char* NewName;			/// Name in unit-type definition
+    char* BaseName;			/// Name used in sound definition
+} SoundRemap;
+
+#define MaxSimpleGroups 7		/// maximal number of sounds pro group
+
+/**
+**	Sound group definition:
+**		There is a collection of sounds/voices that could be randomly
+**		be used fot this sound identifier.
+*/
 typedef struct _sound_group_ {
-    char* Name;                     /// name of the group
-    char* Sounds[MaxSimpleGroups];  /// list of sound files
+    char* Name;				/// name of the group
+    char* Sounds[MaxSimpleGroups];	/// list of sound files
 } SoundGroup;
 
-/// simple sound definition
-typedef struct _simple_sound_ {
-    char *Name; /// name of the sound
-    char *File; /// corresponding sound file
-} SimpleSound;
+/**
+**	Selection structure:
+**
+**	Special sound structure currently used for the selection of an unit.
+**	For a special number of the uses the first group is used, after this
+**	the second groups is played.
+*/
+typedef struct _selection_group_ {
+    char* Name;				/// name of the selection sound
+    char* First;			/// name of the sound
+    char* Second;			/// name of the annoyed sound
+} SelectionGroup;
 
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-/// table of acknowledgment sounds
-SoundGroup Acknowledgments[]={
-{	"basic human voices acknowledge",
-    {	"basic human voices acknowledgement 1.wav",
-	"basic human voices acknowledgement 2.wav",
-	"basic human voices acknowledgement 3.wav",
-	"basic human voices acknowledgement 4.wav"	},
-},
+#ifndef USE_CCL
 
-{	"basic orc voices acknowledge",
-    {	"basic orc voices acknowledgement 1.wav",
-	"basic orc voices acknowledgement 2.wav",
-	"basic orc voices acknowledgement 3.wav",
-	"basic orc voices acknowledgement 4.wav"	},
-},
-
-{	"peasant-acknowledge",
-    {	"peasant acknowledgement 1.wav",
-	"peasant acknowledgement 2.wav",
-	"peasant acknowledgement 3.wav",
-	"peasant acknowledgement 4.wav"		},
-},
-
-{	"knight-acknowledge",
-    {	"knight acknowledgement 1.wav",
-	"knight acknowledgement 2.wav",
-	"knight acknowledgement 3.wav",
-	"knight acknowledgement 4.wav"		},
-},
-
-{	"ogre-acknowledge",
-    {	"ogre acknowledgement 1.wav",
-	"ogre acknowledgement 2.wav",
-	"ogre acknowledgement 3.wav"		},
-},
-
-{	"elven archer-ranger acknowledge",
-    {	"elven archer-ranger acknowledgement 1.wav",
-	"elven archer-ranger acknowledgement 2.wav",
-	"elven archer-ranger acknowledgement 3.wav",
-	"elven archer-ranger acknowledgement 4.wav"	},
-},
-
-{	"troll axethrower-berserker acknowledge",
-    {	"troll axethrower-berserker acknowledgement 1.wav",
-	"troll axethrower-berserker acknowledgement 2.wav",
-	"troll axethrower-berserker acknowledgement 3.wav"	},
-},
-
-{	"mage-acknowledge",
-    {	"mage acknowledgement 1.wav",
-	"mage acknowledgement 2.wav",
-	"mage acknowledgement 3.wav"		},
-},
-
-{	"death-knight-acknowledge",
-    {	"death knight acknowledgement 1.wav",
-	"death knight acknowledgement 2.wav",
-	"death knight acknowledgement 2.wav"	},
-},
-
-{	"paladin-acknowledge",
-    {	"paladin acknowledgement 1.wav",
-	"paladin acknowledgement 2.wav",
-	"paladin acknowledgement 3.wav",
-	"paladin acknowledgement 4.wav"		},
-},
-
-{	"ogre-mage-acknowledge",
-    {	"ogre-mage acknowledgement 1.wav",
-	"ogre-mage acknowledgement 2.wav",
-	"ogre-mage acknowledgement 3.wav"		},
-},
-
-{	"dwarves-acknowledge",
-    {	"dwarven demolition squad acknowledgement 1.wav",
-	"dwarven demolition squad acknowledgement 2.wav",
-	"dwarven demolition squad acknowledgement 3.wav",
-	"dwarven demolition squad acknowledgement 4.wav",
-	"dwarven demolition squad acknowledgement 5.wav"	},
-},
-
-{	"goblin-sappers-acknowledge",
-    {	"goblin sappers acknowledgement 1.wav",
-	"goblin sappers acknowledgement 2.wav",
-	"goblin sappers acknowledgement 3.wav",
-	"goblin sappers acknowledgement 4.wav"	},
-},
-
-
-{	"alleria-acknowledge",
-    {	"alleria acknowledgement 1.wav",
-	"alleria acknowledgement 2.wav",
-	"alleria acknowledgement 3.wav"		},
-},
-
-{	"teron-gorefiend-acknowledge",
-    {	"teron gorefiend acknowledgement 1.wav",
-	"teron gorefiend acknowledgement 2.wav",
-	"teron gorefiend acknowledgement 3.wav"	},
-},
-
-{	"kurdran-and-sky'ree-acknowledge",
-    {	"kurdran acknowledgement 1.wav",
-	"kurdran acknowledgement 2.wav",
-	"kurdran acknowledgement 3.wav"		},
-},
-
-{	"dentarg-acknowledge",
-    {	"dentarg acknowledgement 1.wav",
-	"dentarg acknowledgement 2.wav",
-	"dentarg acknowledgement 3.wav"		},
-},
-
-{	"khadgar-acknowledge",
-    {	"khadgar acknowledgement 1.wav",
-	"khadgar acknowledgement 2.wav",
-	"khadgar acknowledgement 3.wav"		},
-},
-
-{	"grom-hellscream-acknowledge",
-    {	"grom hellscream acknowledgement 1.wav",
-	"grom hellscream acknowledgement 2.wav",
-	"grom hellscream acknowledgement 3.wav"	},
-},
-
-{	"tanker acknowledge",
-    {	"tanker acknowledgement.wav"	},
-},
-
-{	"ships human acknowledge",
-    {	"ships human acknowledgement 1.wav",
-	"ships human acknowledgement 2.wav",
-	"ships human acknowledgement 3.wav"		},
-},
-
-{	"ships orc acknowledge",
-    {	"ships orc acknowledgement 1.wav",
-	"ships orc acknowledgement 2.wav",
-	"ships orc acknowledgement 3.wav"		},
-},
-
-{	"deathwing-acknowledge",
-    {	"deathwing acknowledgement 1.wav",
-	"deathwing acknowledgement 2.wav",
-	"deathwing acknowledgement 3.wav"		},
-},
-
-{	"gnomish-flying-machine-acknowledge",
-    {	"gnomish flying machine acknowledgement 1.wav"	},
-},
-
-{	"goblin-zeppelin-acknowledge",
-    {	"goblin zeppelin acknowledgement 1.wav"	},
-},
-
-{	"gryphon-rider-acknowledge",
-    {	"gryphon rider griffon1.wav",
-	"gryphon rider griffon2.wav"	},
-},
-
-{	"dragon-acknowledge",
-    {	"dragon acknowledgement 1.wav",
-	"dragon acknowledgement 2.wav"		},
-},
-
-{	"turalyon-acknowledge",
-    {	"turalyon acknowledgement 1.wav",
-	"turalyon acknowledgement 2.wav",
-	"turalyon acknowledgement 3.wav"		},
-},
-
-{	"danath-acknowledge",
-    {	"danath acknowledgement 1.wav",
-	"danath acknowledgement 2.wav",
-	"danath acknowledgement 3.wav"		},
-},
-
-{	"korgath-bladefist-acknowledge",
-    {	"korgath bladefist acknowledgement 1.wav",
-	"korgath bladefist acknowledgement 2.wav",
-	"korgath bladefist acknowledgement 3.wav"	},
-}
-};
-
-/// table of selection sounds
-SoundGroup Selections[]={
-{     "basic human voices selected",
-    {	"basic human voices selected 1.wav",
-	"basic human voices selected 2.wav",
-	"basic human voices selected 3.wav",
-	"basic human voices selected 4.wav",
-	"basic human voices selected 5.wav",
-	"basic human voices selected 6.wav" },
-},
-{     "basic orc voices selected",
-    {	"basic orc voices selected 1.wav",
-	"basic orc voices selected 2.wav",
-	"basic orc voices selected 3.wav",
-	"basic orc voices selected 4.wav",
-	"basic orc voices selected 5.wav",
-	"basic orc voices selected 6.wav" },
-},
-{     "death knight selected",
-    {   "death knight selected 1.wav",
-	"death knight selected 2.wav"},
-},
-{
-      "dwarven demolition squad selected",
-    {   "dwarven demolition squad selected 1.wav",
-	"dwarven demolition squad selected 2.wav" },
-},
-{
-      "elven archer-ranger selected",
-    {   "elven archer-ranger selected 1.wav",
-	"elven archer-ranger selected 2.wav",
-	"elven archer-ranger selected 3.wav",
-        "elven archer-ranger selected 4.wav" },
-},
-{
-      "goblin sappers selected",
-    {   "goblin sappers selected 1.wav",
-	"goblin sappers selected 2.wav",
-        "goblin sappers selected 3.wav",
-        "goblin sappers selected 4.wav"  },
-},
-{
-      "knight selected",
-    {
-	"knight selected 1.wav",
-	"knight selected 2.wav",
-        "knight selected 3.wav",
-        "knight selected 4.wav"},
-},
-{
-      "paladin selected",
-    {   "paladin selected 1.wav",
-        "paladin selected 2.wav",
-        "paladin selected 3.wav",
-        "paladin selected 4.wav" },
-},
-{
-      "ogre selected",
-    {   "ogre selected 1.wav",
-        "ogre selected 2.wav",
-        "ogre selected 3.wav",
-	"ogre selected 4.wav" },
-},
-{     "ogre-mage selected",
-    {   "ogre-mage selected 1.wav",
-        "ogre-mage selected 2.wav",
-        "ogre-mage selected 3.wav",
-        "ogre-mage selected 4.wav"},
-},
-{
-      "ships human selected",
-    {   "ships human selected 1.wav",
-	"ships human selected 2.wav",
-        "ships human selected 3.wav"},
-},
-{
-      "ships orc selected",
-    {   "ships orc selected 1.wav",
-	"ships orc selected 2.wav",
-        "ships orc selected 3.wav"},
-},
-{
-      "troll axethrower-berserker selected",
-    {   "troll axethrower-berserker selected 1.wav",
-        "troll axethrower-berserker selected 2.wav",
-	"troll axethrower-berserker selected 3.wav"  },
-},
-{
-      "mage selected",
-    {   "mage selected 1.wav",
-        "mage selected 2.wav",
-        "mage selected 3.wav" },
-},
-{
-      "peasant selected",
-    {   "peasant selected 1.wav",
-        "peasant selected 2.wav",
-        "peasant selected 3.wav",
-	"peasant selected 4.wav" },
-},
-{
-      "alleria selected",
-    {   "alleria selected 1.wav",
-        "alleria selected 2.wav",
-        "alleria selected 3.wav" },
-},
-{
-      "danath selected",
-    {   "danath selected 1.wav",
-        "danath selected 2.wav",
-        "danath selected 3.wav" },
-},
-{
-      "khadgar selected",
-    {   "khadgar selected 1.wav",
-        "khadgar selected 2.wav",
-        "khadgar selected 3.wav" },
-},
-{
-      "kurdran selected",
-    {   "kurdran selected 1.wav",
-        "kurdran selected 2.wav",
-        "kurdran selected 3.wav" },
-},
-{
-      "turalyon selected",
-    {   "turalyon selected 1.wav",
-        "turalyon selected 2.wav",
-        "turalyon selected 3.wav" },
-},
-{
-      "deathwing selected",
-    {   "deathwing selected 1.wav",
-        "deathwing selected 2.wav",
-        "deathwing selected 3.wav" },
-},
-{
-      "dentarg selected",
-    {   "dentarg selected 1.wav",
-        "dentarg selected 2.wav",
-        "dentarg selected 3.wav" },
-},
-{
-      "grom hellscream selected",
-    {   "grom hellscream selected 1.wav",
-        "grom hellscream selected 2.wav",
-        "grom hellscream selected 3.wav" },
-},
-{
-      "korgath bladefist selected",
-    {   "korgath bladefist selected 1.wav",
-        "korgath bladefist selected 2.wav",
-        "korgath bladefist selected 3.wav" },
-},
-{
-      "teron gorefiend selected",
-    {   "teron gorefiend selected 1.wav",
-        "teron gorefiend selected 2.wav",
-        "teron gorefiend selected 3.wav" },
-}
-};
-
-/// table of annoyed sounds
-SoundGroup Annoyed[]={
-    {
-	"basic human voices annoyed",
-	{
-	    "basic human voices annoyed 1.wav",
-	    "basic human voices annoyed 2.wav",
-	    "basic human voices annoyed 3.wav",
-	    "basic human voices annoyed 4.wav",
-	    "basic human voices annoyed 5.wav",
-	    "basic human voices annoyed 6.wav",
-	    "basic human voices annoyed 7.wav"
-	}
-    },
-    {
-	"basic orc voices annoyed",
-	{
-	    "basic orc voices annoyed 1.wav",
-	    "basic orc voices annoyed 2.wav",
-	    "basic orc voices annoyed 3.wav",
-	    "basic orc voices annoyed 4.wav",
-	    "basic orc voices annoyed 5.wav",
-	    "basic orc voices annoyed 6.wav",
-	    "basic orc voices annoyed 7.wav"
-	}
-    },
-    {
-	"death knight annoyed",
-	{
-	    "death knight annoyed 1.wav",
-	    "death knight annoyed 2.wav",
-	    "death knight annoyed 3.wav",
-	}
-    },
-    {
-	"dwarven demolition squad annoyed",
-	{
-	    "dwarven demolition squad annoyed 1.wav",
-	    "dwarven demolition squad annoyed 2.wav",
-	    "dwarven demolition squad annoyed 3.wav",
-	}
-    },
-    {
-	"elven archer-ranger annoyed",
-	{
-	    "elven archer-ranger annoyed 1.wav",
-	    "elven archer-ranger annoyed 2.wav",
-	    "elven archer-ranger annoyed 3.wav",
-	}
-    },
-    {
-	"gnomish flying machine annoyed",
-	{
-	    "gnomish flying machine annoyed 1.wav",
-	    "gnomish flying machine annoyed 2.wav",
-	    "gnomish flying machine annoyed 3.wav",
-	    "gnomish flying machine annoyed 4.wav",
-	    "gnomish flying machine annoyed 5.wav",
-	}
-    },
-    {
-	"goblin sappers annoyed",
-	{
-	    "goblin sappers annoyed 1.wav",
-	    "goblin sappers annoyed 2.wav",
-	    "goblin sappers annoyed 3.wav",
-	}
-    },
-    {
-	"goblin zeppelin annoyed",
-	{
-	    "goblin zeppelin annoyed 1.wav",
-	    "goblin zeppelin annoyed 2.wav",
-	}
-    },
-    {
-	"knight annoyed",
-	{
-	    "knight annoyed 1.wav",
-	    "knight annoyed 2.wav",
-	    "knight annoyed 3.wav",
-	}
-    },
-    {
-	"paladin annoyed",
-	{
-	    "paladin annoyed 1.wav",
-	    "paladin annoyed 2.wav",
-	    "paladin annoyed 3.wav",
-	}
-    },
-    {
-	"ogre annoyed",
-	{
-	    "ogre annoyed 1.wav",
-	    "ogre annoyed 2.wav",
-	    "ogre annoyed 3.wav",
-	    "ogre annoyed 4.wav",
-	    "ogre annoyed 5.wav",
-	}
-    },
-    {
-	"ogre-mage annoyed",
-	{
-	    "ogre-mage annoyed 1.wav",
-	    "ogre-mage annoyed 2.wav",
-	    "ogre-mage annoyed 3.wav",
-	}
-    },
-    {
-	"ships human annoyed",
-	{
-	    "ships human annoyed 1.wav",
-	    "ships human annoyed 2.wav",
-	    "ships human annoyed 3.wav",
-	}
-    },
-    {
-	"ships orc annoyed",
-	{
-	    "ships orc annoyed 1.wav",
-	    "ships orc annoyed 2.wav",
-	    "ships orc annoyed 3.wav",
-	}
-    },
-    {
-	"ships submarine annoyed",
-	{
-	    "ships submarine annoyed 1.wav",
-	    "ships submarine annoyed 2.wav",
-	    "ships submarine annoyed 3.wav",
-	    "ships submarine annoyed 4.wav",
-	}
-    },
-    {
-	"troll axethrower-berserker annoyed",
-	{
-	    "troll axethrower-berserker annoyed 1.wav",
-	    "troll axethrower-berserker annoyed 2.wav",
-	    "troll axethrower-berserker annoyed 3.wav",
-	}
-    },
-    {
-	"mage annoyed",
-	{
-	    "mage annoyed 1.wav",
-	    "mage annoyed 2.wav",
-	    "mage annoyed 3.wav",
-	}
-    },
-    {
-	"peasant annoyed",
-	{
-	    "peasant annoyed 1.wav",
-	    "peasant annoyed 2.wav",
-	    "peasant annoyed 3.wav",
-	    "peasant annoyed 4.wav",
-	    "peasant annoyed 5.wav",
-	    "peasant annoyed 6.wav",
-	    "peasant annoyed 7.wav"
-	}
-    },
-    {
-	"alleria annoyed",
-	{
-	    "alleria annoyed 1.wav",
-	    "alleria annoyed 2.wav",
-	    "alleria annoyed 3.wav",
-	}
-    },
-    {
-	"danath annoyed",
-	{
-	    "danath annoyed 1.wav",
-	    "danath annoyed 2.wav",
-	    "danath annoyed 3.wav",
-	}
-    },
-    {
-	"khadgar annoyed",
-	{
-	    "khadgar annoyed 1.wav",
-	    "khadgar annoyed 2.wav",
-	    "khadgar annoyed 3.wav",
-	}
-    },
-    {
-	"kurdran annoyed",
-	{
-	    "kurdran annoyed 1.wav",
-	    "kurdran annoyed 2.wav",
-	    "kurdran annoyed 3.wav",
-	}
-    },
-    {
-	"turalyon annoyed",
-	{
-	    "turalyon annoyed 1.wav",
-	    "turalyon annoyed 2.wav",
-	    "turalyon annoyed 3.wav",
-	}
-    },
-    {
-	"deathwing annoyed",
-	{
-	    "deathwing annoyed 1.wav",
-	    "deathwing annoyed 2.wav",
-	    "deathwing annoyed 3.wav",
-	}
-    },
-    {
-	"dentarg annoyed",
-	{
-	    "dentarg annoyed 1.wav",
-	    "dentarg annoyed 2.wav",
-	    "dentarg annoyed 3.wav",
-	}
-    },
-    {
-	"grom hellscream annoyed",
-	{
-	    "grom hellscream annoyed 1.wav",
-	    "grom hellscream annoyed 2.wav",
-	    "grom hellscream annoyed 3.wav",
-	}
-    },
-    {
-	"korgath bladefist annoyed",
-	{
-	    "korgath bladefist annoyed 1.wav",
-	    "korgath bladefist annoyed 2.wav",
-	    "korgath bladefist annoyed 3.wav",
-	}
-    },
-    {
-	"teron gorefiend annoyed",
-	{
-	    "teron gorefiend annoyed 1.wav",
-	    "teron gorefiend annoyed 2.wav",
-	    "teron gorefiend annoyed 3.wav",
-	}
-    }
-};
-
-/// selection structure
-typedef struct _selection_group_ {
-    char* Name;   /// name of the selection sound
-    char* First;  /// name of the sound
-    char* Second; /// name of the annoyed sound
-} SelectionGroup;
-
-
-/// table of selection groups
-SelectionGroup SelectionGroups[]={
-    {
-	"footman-selected",
-	"basic human voices selected",
-	"basic human voices annoyed"
-    },
-    {
-	"grunt-selected",
-	"basic orc voices selected",
-	"basic orc voices annoyed"
-    },
-    {
-	"peasant-selected",
-	"peasant selected",
-	"peasant annoyed"
-    },
-    {
-	"knight-selected",
-	"knight selected",
-	"knight annoyed"
-    },
-    {
-	"ogre-selected",
-	"ogre selected",
-	"ogre annoyed"
-    },
-    {
-	"archer-selected",
-	"elven archer-ranger selected",
-	"elven archer-ranger annoyed"
-    },
-    {
-	"axethrower-selected",
-	"troll axethrower-berserker selected",
-	"troll axethrower-berserker annoyed"
-    },
-    {
-	"mage-selected",
-	"mage selected",
-	"mage annoyed"
-    },
-    {
-	"death-knight-selected",
-	"death knight selected",
-	"death knight annoyed"
-    },
-    {
-	"paladin-selected",
-	"paladin selected",
-	"paladin annoyed"
-    },
-    {
-	"ogre-mage-selected",
-	"ogre-mage selected",
-	"ogre-mage annoyed"
-    },
-    {
-	"dwarves-selected",
-	"dwarven demolition squad selected",
-	"dwarven demolition squad annoyed"
-    },
-    {
-	"goblin-sappers-selected",
-	"goblin sappers selected",
-	"goblin sappers annoyed"
-    },
-    {
-	"alleria-selected",
-	"alleria selected",
-	"alleria annoyed"
-    },
-    {
-	"teron-gorefiend-selected",
-	"teron gorefiend selected",
-	"teron gorefiend annoyed"
-    },
-    {
-	"kurdan-and-sky'ree-selected",
-	"kurdran selected",
-	"kurdran annoyed"
-    },
-    {
-	"dentarg-selected",
-	"dentarg selected",
-	"dentarg annoyed"
-    },
-    {
-	"khadgar-selected",
-	"khadgar selected",
-	"khadgar annoyed"
-    },
-    {
-	"grom-hellscream-selected",
-	"grom hellscream selected",
-	"grom hellscream annoyed"
-    },
-    {
-	"human-oil-tanker-selected",
-	"ships human selected",
-	"ships human annoyed"
-    },
-    {
-	"orc-oil-tanker-selected",
-	"ships orc selected",
-	"ships orc annoyed"
-    },
-    {
-	"deathwing-selected",
-	"deathwing selected",
-	"deathwing annoyed"
-    },
-    {
-	"gnomish-submarine-selected",
-	"ships human selected",
-	"ships submarine annoyed"
-    },
-    {
-	"gnomish-flying-machine-selected",
-	"click",
-	"gnomish flying machine annoyed"
-    },
-    {
-	"goblin-zeppelin-selected",
-	"click",
-	"goblin zeppelin annoyed"
-    },
-    {
-	"turalyon-selected",
-	"turalyon selected",
-	"turalyon annoyed"
-    },
-    {
-	"danath-selected",
-	"danath selected",
-	"danath annoyed"
-    },
-    {
-	"korgath-bladefist-selected",
-	"korgath bladefist selected",
-	"korgath bladefist annoyed"
-    }
-    //    {
-    //	"-selected",
-    //	" selected",
-    //	" annoyed"
-    //    },
-};
-
-/// table of unclassified sound groups
-SoundGroup OtherGroups[]={
-    {
-	"building destroyed",
-	{
-	    "explosion 1.wav",
-	    "explosion 2.wav",
-	    "explosion 3.wav"
-	},
-    },
-    {
-	"sword attack",
-	{
-	    "sword attack 1.wav",
-	    "sword attack 2.wav",
-	    "sword attack 3.wav"
-	}
-    },
-    {
-	"tree chopping",
-	{
-	    "tree chopping 1.wav",
-	    "tree chopping 2.wav",
-	    "tree chopping 3.wav",
-	    "tree chopping 4.wav"
-	}
-    }
-};
-
-/// table of simple sounds
-SimpleSound SimpleSounds[]={
-    { "placement error",
-	"placement error.wav" },
-    { "placement sucess",
-	"placement sucess.wav" },
+/**
+**	Default simple sounds for none CCL support.
+*/
+local SimpleSound DefaultSimpleSounds[] = {
     { "building construction",
 	"building construction.wav" },
     { "explosion",
@@ -952,10 +203,6 @@ SimpleSound SimpleSounds[]={
 	"polymorph.wav" },
     { "slow",
 	"slow.wav" },
-    { "lightning",
-	"lightning.wav" },
-    { "touch of darkness",
-	"touch of darkness.wav" },
     { "unholy armour",
 	"unholy armour.wav" },
     { "whirlwind",
@@ -1037,18 +284,17 @@ SimpleSound SimpleSounds[]={
     { "lightning",
 	"lightning.wav" },
     { "touch of darkness",
-	"touch of darkness.wav" }
+	"touch of darkness.wav" },
+    { "unholy armour",
+	"unholy armour.wav" },
+    { }
 };
 
-/// structure for remaping a sound to a new name
-typedef struct _remap_ {
-    char* NewName;			/// Name in unit type definition
-    char* BaseName;			/// Name used in sound definition
-} Remap;
-
-/// table of sound remapings
-Remap Remaps[]={
-    //acknowledge sounds
+/**
+**	Default sound remaps for none CCL support.
+*/
+local SoundRemap DefaultSoundRemaps[] = {
+    // acknowledge sounds
     { "footman-acknowledge",
       "basic human voices acknowledge"},
     { "grunt-acknowledge",
@@ -1182,7 +428,7 @@ Remap Remaps[]={
     { "uther-lightbringer-selected",
       "paladin-selected"},
     { "zuljin-selected",
-      "troll axethrower-berserker-selected"},
+      "troll axethrower-berserker selected"},
     { "skeleton-selected",
       "click"},
     { "daemon-selected",
@@ -1358,108 +604,794 @@ Remap Remaps[]={
     { "peon-with-wood-attack",
       "peasant attack"},
     { "peasant-with-wood-attack",
-      "peasant attack"}
-    //    { "",
-    //      ""},
+      "peasant attack"},
+    //	  { "",
+    //	    ""},
+    { }
 };
 
-/** Computes the number of sounds in a sound group
- * @param group list of file names
- * @return number of sounds
- */
-local int NbSoundsInGroup(char* group[]) {
+/**
+**	Default sound-groups for none CCL support.
+*/
+local SoundGroup DefaultSoundGroups[] = {
+    //
+    //	Acknowledgment sounds -------------------------------------------------
+    //
+{	"basic human voices acknowledge",
+    {	"basic human voices acknowledgement 1.wav",
+	"basic human voices acknowledgement 2.wav",
+	"basic human voices acknowledgement 3.wav",
+	"basic human voices acknowledgement 4.wav"	},
+},
+
+{	"basic orc voices acknowledge",
+    {	"basic orc voices acknowledgement 1.wav",
+	"basic orc voices acknowledgement 2.wav",
+	"basic orc voices acknowledgement 3.wav",
+	"basic orc voices acknowledgement 4.wav"	},
+},
+
+{	"peasant-acknowledge",
+    {	"peasant acknowledgement 1.wav",
+	"peasant acknowledgement 2.wav",
+	"peasant acknowledgement 3.wav",
+	"peasant acknowledgement 4.wav"		},
+},
+
+{	"knight-acknowledge",
+    {	"knight acknowledgement 1.wav",
+	"knight acknowledgement 2.wav",
+	"knight acknowledgement 3.wav",
+	"knight acknowledgement 4.wav"		},
+},
+
+{	"ogre-acknowledge",
+    {	"ogre acknowledgement 1.wav",
+	"ogre acknowledgement 2.wav",
+	"ogre acknowledgement 3.wav"		},
+},
+
+{	"elven archer-ranger acknowledge",
+    {	"elven archer-ranger acknowledgement 1.wav",
+	"elven archer-ranger acknowledgement 2.wav",
+	"elven archer-ranger acknowledgement 3.wav",
+	"elven archer-ranger acknowledgement 4.wav"	},
+},
+
+{	"troll axethrower-berserker acknowledge",
+    {	"troll axethrower-berserker acknowledgement 1.wav",
+	"troll axethrower-berserker acknowledgement 2.wav",
+	"troll axethrower-berserker acknowledgement 3.wav"	},
+},
+
+{	"mage-acknowledge",
+    {	"mage acknowledgement 1.wav",
+	"mage acknowledgement 2.wav",
+	"mage acknowledgement 3.wav"		},
+},
+
+{	"death-knight-acknowledge",
+    {	"death knight acknowledgement 1.wav",
+	"death knight acknowledgement 2.wav",
+	"death knight acknowledgement 2.wav"	},
+},
+
+{	"paladin-acknowledge",
+    {	"paladin acknowledgement 1.wav",
+	"paladin acknowledgement 2.wav",
+	"paladin acknowledgement 3.wav",
+	"paladin acknowledgement 4.wav"		},
+},
+
+{	"ogre-mage-acknowledge",
+    {	"ogre-mage acknowledgement 1.wav",
+	"ogre-mage acknowledgement 2.wav",
+	"ogre-mage acknowledgement 3.wav"		},
+},
+
+{	"dwarves-acknowledge",
+    {	"dwarven demolition squad acknowledgement 1.wav",
+	"dwarven demolition squad acknowledgement 2.wav",
+	"dwarven demolition squad acknowledgement 3.wav",
+	"dwarven demolition squad acknowledgement 4.wav",
+	"dwarven demolition squad acknowledgement 5.wav"	},
+},
+
+{	"goblin-sappers-acknowledge",
+    {	"goblin sappers acknowledgement 1.wav",
+	"goblin sappers acknowledgement 2.wav",
+	"goblin sappers acknowledgement 3.wav",
+	"goblin sappers acknowledgement 4.wav"	},
+},
+
+
+{	"alleria-acknowledge",
+    {	"alleria acknowledgement 1.wav",
+	"alleria acknowledgement 2.wav",
+	"alleria acknowledgement 3.wav"		},
+},
+
+{	"teron-gorefiend-acknowledge",
+    {	"teron gorefiend acknowledgement 1.wav",
+	"teron gorefiend acknowledgement 2.wav",
+	"teron gorefiend acknowledgement 3.wav" },
+},
+
+{	"kurdran-and-sky'ree-acknowledge",
+    {	"kurdran acknowledgement 1.wav",
+	"kurdran acknowledgement 2.wav",
+	"kurdran acknowledgement 3.wav"		},
+},
+
+{	"dentarg-acknowledge",
+    {	"dentarg acknowledgement 1.wav",
+	"dentarg acknowledgement 2.wav",
+	"dentarg acknowledgement 3.wav"		},
+},
+
+{	"khadgar-acknowledge",
+    {	"khadgar acknowledgement 1.wav",
+	"khadgar acknowledgement 2.wav",
+	"khadgar acknowledgement 3.wav"		},
+},
+
+{	"grom-hellscream-acknowledge",
+    {	"grom hellscream acknowledgement 1.wav",
+	"grom hellscream acknowledgement 2.wav",
+	"grom hellscream acknowledgement 3.wav" },
+},
+
+{	"tanker acknowledge",
+    {	"tanker acknowledgement.wav"	},
+},
+
+{	"ships human acknowledge",
+    {	"ships human acknowledgement 1.wav",
+	"ships human acknowledgement 2.wav",
+	"ships human acknowledgement 3.wav"		},
+},
+
+{	"ships orc acknowledge",
+    {	"ships orc acknowledgement 1.wav",
+	"ships orc acknowledgement 2.wav",
+	"ships orc acknowledgement 3.wav"		},
+},
+
+{	"deathwing-acknowledge",
+    {	"deathwing acknowledgement 1.wav",
+	"deathwing acknowledgement 2.wav",
+	"deathwing acknowledgement 3.wav"		},
+},
+
+{	"gnomish-flying-machine-acknowledge",
+    {	"gnomish flying machine acknowledgement 1.wav"	},
+},
+
+{	"goblin-zeppelin-acknowledge",
+    {	"goblin zeppelin acknowledgement 1.wav" },
+},
+
+{	"gryphon-rider-acknowledge",
+    {	"gryphon rider griffon1.wav",
+	"gryphon rider griffon2.wav"	},
+},
+
+{	"dragon-acknowledge",
+    {	"dragon acknowledgement 1.wav",
+	"dragon acknowledgement 2.wav"		},
+},
+
+{	"turalyon-acknowledge",
+    {	"turalyon acknowledgement 1.wav",
+	"turalyon acknowledgement 2.wav",
+	"turalyon acknowledgement 3.wav"		},
+},
+
+{	"danath-acknowledge",
+    {	"danath acknowledgement 1.wav",
+	"danath acknowledgement 2.wav",
+	"danath acknowledgement 3.wav"		},
+},
+
+{	"korgath-bladefist-acknowledge",
+    {	"korgath bladefist acknowledgement 1.wav",
+	"korgath bladefist acknowledgement 2.wav",
+	"korgath bladefist acknowledgement 3.wav"	},
+},
+
+    //
+    //	Selection sounds -----------------------------------------------------
+    //
+{     "basic human voices selected",
+    {	"basic human voices selected 1.wav",
+	"basic human voices selected 2.wav",
+	"basic human voices selected 3.wav",
+	"basic human voices selected 4.wav",
+	"basic human voices selected 5.wav",
+	"basic human voices selected 6.wav" },
+},
+{     "basic orc voices selected",
+    {	"basic orc voices selected 1.wav",
+	"basic orc voices selected 2.wav",
+	"basic orc voices selected 3.wav",
+	"basic orc voices selected 4.wav",
+	"basic orc voices selected 5.wav",
+	"basic orc voices selected 6.wav" },
+},
+{     "death knight selected",
+    {	"death knight selected 1.wav",
+	"death knight selected 2.wav"},
+},
+{	"dwarven demolition squad selected",
+    {	"dwarven demolition squad selected 1.wav",
+	"dwarven demolition squad selected 2.wav" },
+},
+{	"elven archer-ranger selected",
+    {	"elven archer-ranger selected 1.wav",
+	"elven archer-ranger selected 2.wav",
+	"elven archer-ranger selected 3.wav",
+	"elven archer-ranger selected 4.wav" },
+},
+{	"goblin sappers selected",
+    {	"goblin sappers selected 1.wav",
+	"goblin sappers selected 2.wav",
+	"goblin sappers selected 3.wav",
+	"goblin sappers selected 4.wav"	 },
+},
+{	"knight selected",
+    {	"knight selected 1.wav",
+	"knight selected 2.wav",
+	"knight selected 3.wav",
+	"knight selected 4.wav"},
+},
+{	"paladin selected",
+    {	"paladin selected 1.wav",
+	"paladin selected 2.wav",
+	"paladin selected 3.wav",
+	"paladin selected 4.wav" },
+},
+{	"ogre selected",
+    {	"ogre selected 1.wav",
+	"ogre selected 2.wav",
+	"ogre selected 3.wav",
+	"ogre selected 4.wav" },
+},
+{	"ogre-mage selected",
+    {	"ogre-mage selected 1.wav",
+	"ogre-mage selected 2.wav",
+	"ogre-mage selected 3.wav",
+	"ogre-mage selected 4.wav"},
+},
+{	"ships human selected",
+    {	"ships human selected 1.wav",
+	"ships human selected 2.wav",
+	"ships human selected 3.wav"},
+},
+{	"ships orc selected",
+    {	"ships orc selected 1.wav",
+	"ships orc selected 2.wav",
+	"ships orc selected 3.wav"},
+},
+{	"troll axethrower-berserker selected",
+    {	"troll axethrower-berserker selected 1.wav",
+	"troll axethrower-berserker selected 2.wav",
+	"troll axethrower-berserker selected 3.wav"  },
+},
+{	"mage selected",
+    {	"mage selected 1.wav",
+	"mage selected 2.wav",
+	"mage selected 3.wav" },
+},
+{	"peasant selected",
+    {	"peasant selected 1.wav",
+	"peasant selected 2.wav",
+	"peasant selected 3.wav",
+	"peasant selected 4.wav" },
+},
+{	"alleria selected",
+    {	"alleria selected 1.wav",
+	"alleria selected 2.wav",
+	"alleria selected 3.wav" },
+},
+{	"danath selected",
+    {	"danath selected 1.wav",
+	"danath selected 2.wav",
+	"danath selected 3.wav" },
+},
+{	"khadgar selected",
+    {	"khadgar selected 1.wav",
+	"khadgar selected 2.wav",
+	"khadgar selected 3.wav" },
+},
+{	"kurdran selected",
+    {	"kurdran selected 1.wav",
+	"kurdran selected 2.wav",
+	"kurdran selected 3.wav" },
+},
+{	"turalyon selected",
+    {	"turalyon selected 1.wav",
+	"turalyon selected 2.wav",
+	"turalyon selected 3.wav" },
+},
+{	"deathwing selected",
+    {	"deathwing selected 1.wav",
+	"deathwing selected 2.wav",
+	"deathwing selected 3.wav" },
+},
+{	"dentarg selected",
+    {	"dentarg selected 1.wav",
+	"dentarg selected 2.wav",
+	"dentarg selected 3.wav" },
+},
+{	"grom hellscream selected",
+    {	"grom hellscream selected 1.wav",
+	"grom hellscream selected 2.wav",
+	"grom hellscream selected 3.wav" },
+},
+{	"korgath bladefist selected",
+    {	"korgath bladefist selected 1.wav",
+	"korgath bladefist selected 2.wav",
+	"korgath bladefist selected 3.wav" },
+},
+{	"teron gorefiend selected",
+    {	"teron gorefiend selected 1.wav",
+	"teron gorefiend selected 2.wav",
+	"teron gorefiend selected 3.wav" },
+},
+    //
+    //	Annoyed sounds --------------------------------------------------------
+    //
+{	"basic human voices annoyed",
+    {	"basic human voices annoyed 1.wav",
+	"basic human voices annoyed 2.wav",
+	"basic human voices annoyed 3.wav",
+	"basic human voices annoyed 4.wav",
+	"basic human voices annoyed 5.wav",
+	"basic human voices annoyed 6.wav",
+	"basic human voices annoyed 7.wav"
+    }
+},
+{	"basic orc voices annoyed",
+    {	"basic orc voices annoyed 1.wav",
+	"basic orc voices annoyed 2.wav",
+	"basic orc voices annoyed 3.wav",
+	"basic orc voices annoyed 4.wav",
+	"basic orc voices annoyed 5.wav",
+	"basic orc voices annoyed 6.wav",
+	"basic orc voices annoyed 7.wav"
+    }
+},
+{	"death knight annoyed",
+    {	"death knight annoyed 1.wav",
+	"death knight annoyed 2.wav",
+	"death knight annoyed 3.wav",
+    }
+},
+{	"dwarven demolition squad annoyed",
+    {	"dwarven demolition squad annoyed 1.wav",
+	"dwarven demolition squad annoyed 2.wav",
+	"dwarven demolition squad annoyed 3.wav",
+    }
+},
+{	"elven archer-ranger annoyed",
+    {	"elven archer-ranger annoyed 1.wav",
+	"elven archer-ranger annoyed 2.wav",
+	"elven archer-ranger annoyed 3.wav",
+    }
+},
+{	"gnomish flying machine annoyed",
+    {	"gnomish flying machine annoyed 1.wav",
+	"gnomish flying machine annoyed 2.wav",
+	"gnomish flying machine annoyed 3.wav",
+	"gnomish flying machine annoyed 4.wav",
+	"gnomish flying machine annoyed 5.wav",
+    }
+},
+{	"goblin sappers annoyed",
+    {	"goblin sappers annoyed 1.wav",
+	"goblin sappers annoyed 2.wav",
+	"goblin sappers annoyed 3.wav",
+    }
+},
+{	"goblin zeppelin annoyed",
+    {	"goblin zeppelin annoyed 1.wav",
+	"goblin zeppelin annoyed 2.wav",
+    }
+},
+{	"knight annoyed",
+    {	"knight annoyed 1.wav",
+	"knight annoyed 2.wav",
+	"knight annoyed 3.wav",
+    }
+},
+{	"paladin annoyed",
+    {	"paladin annoyed 1.wav",
+	"paladin annoyed 2.wav",
+	"paladin annoyed 3.wav",
+    }
+},
+{	"ogre annoyed",
+    {	"ogre annoyed 1.wav",
+	"ogre annoyed 2.wav",
+	"ogre annoyed 3.wav",
+	"ogre annoyed 4.wav",
+	"ogre annoyed 5.wav",
+    }
+},
+{	"ogre-mage annoyed",
+    {	"ogre-mage annoyed 1.wav",
+	"ogre-mage annoyed 2.wav",
+	"ogre-mage annoyed 3.wav",
+    }
+},
+{	"ships human annoyed",
+    {	"ships human annoyed 1.wav",
+	"ships human annoyed 2.wav",
+	"ships human annoyed 3.wav",
+    }
+},
+{	"ships orc annoyed",
+    {	"ships orc annoyed 1.wav",
+	"ships orc annoyed 2.wav",
+	"ships orc annoyed 3.wav",
+    }
+},
+{	"ships submarine annoyed",
+    {	"ships submarine annoyed 1.wav",
+	"ships submarine annoyed 2.wav",
+	"ships submarine annoyed 3.wav",
+	"ships submarine annoyed 4.wav",
+    }
+},
+{	"troll axethrower-berserker annoyed",
+    {	"troll axethrower-berserker annoyed 1.wav",
+	"troll axethrower-berserker annoyed 2.wav",
+	"troll axethrower-berserker annoyed 3.wav",
+    }
+},
+{	"mage annoyed",
+    {	"mage annoyed 1.wav",
+	"mage annoyed 2.wav",
+	"mage annoyed 3.wav",
+    }
+},
+{	"peasant annoyed",
+    {	"peasant annoyed 1.wav",
+	"peasant annoyed 2.wav",
+	"peasant annoyed 3.wav",
+	"peasant annoyed 4.wav",
+	"peasant annoyed 5.wav",
+	"peasant annoyed 6.wav",
+	"peasant annoyed 7.wav"
+    }
+},
+{	"alleria annoyed",
+    {	"alleria annoyed 1.wav",
+	"alleria annoyed 2.wav",
+	"alleria annoyed 3.wav",
+    }
+},
+{	"danath annoyed",
+    {	"danath annoyed 1.wav",
+	"danath annoyed 2.wav",
+	"danath annoyed 3.wav",
+    }
+},
+{	"khadgar annoyed",
+    {	"khadgar annoyed 1.wav",
+	"khadgar annoyed 2.wav",
+	"khadgar annoyed 3.wav",
+    }
+},
+{	"kurdran annoyed",
+    {	"kurdran annoyed 1.wav",
+	"kurdran annoyed 2.wav",
+	"kurdran annoyed 3.wav",
+    }
+},
+{	"turalyon annoyed",
+    {	"turalyon annoyed 1.wav",
+	"turalyon annoyed 2.wav",
+	"turalyon annoyed 3.wav",
+    }
+},
+{	"deathwing annoyed",
+    {	"deathwing annoyed 1.wav",
+	"deathwing annoyed 2.wav",
+	"deathwing annoyed 3.wav",
+    }
+},
+{	"dentarg annoyed",
+    {	"dentarg annoyed 1.wav",
+	"dentarg annoyed 2.wav",
+	"dentarg annoyed 3.wav",
+    }
+},
+{	"grom hellscream annoyed",
+    {	"grom hellscream annoyed 1.wav",
+	"grom hellscream annoyed 2.wav",
+	"grom hellscream annoyed 3.wav",
+    }
+},
+{	"korgath bladefist annoyed",
+    {	"korgath bladefist annoyed 1.wav",
+	"korgath bladefist annoyed 2.wav",
+	"korgath bladefist annoyed 3.wav",
+    }
+},
+{	"teron gorefiend annoyed",
+    {	"teron gorefiend annoyed 1.wav",
+	"teron gorefiend annoyed 2.wav",
+	"teron gorefiend annoyed 3.wav",
+    }
+},
+    //
+    //	Other sounds ---------------------------------------------------------
+    //
+{	"building destroyed",
+    {	"explosion 1.wav",
+	"explosion 2.wav",
+	"explosion 3.wav"
+    },
+},
+{	"sword attack",
+    {	"sword attack 1.wav",
+	"sword attack 2.wav",
+	"sword attack 3.wav"
+    }
+},
+{	"tree chopping",
+    {	"tree chopping 1.wav",
+	"tree chopping 2.wav",
+	"tree chopping 3.wav",
+	"tree chopping 4.wav"
+    }
+},
+    { }
+};
+
+/**
+**	Default selection-groups for none CCL support.
+*/
+local SelectionGroup DefaultSelectionGroups[] = {
+    {	"footman-selected",
+	"basic human voices selected",
+	"basic human voices annoyed"
+    },
+    {	"grunt-selected",
+	"basic orc voices selected",
+	"basic orc voices annoyed"
+    },
+    {	"peasant-selected",
+	"peasant selected",
+	"peasant annoyed"
+    },
+    {	"knight-selected",
+	"knight selected",
+	"knight annoyed"
+    },
+    {	"ogre-selected",
+	"ogre selected",
+	"ogre annoyed"
+    },
+    {	"archer-selected",
+	"elven archer-ranger selected",
+	"elven archer-ranger annoyed"
+    },
+    {	"axethrower-selected",
+	"troll axethrower-berserker selected",
+	"troll axethrower-berserker annoyed"
+    },
+    {	"mage-selected",
+	"mage selected",
+	"mage annoyed"
+    },
+    {	"death-knight-selected",
+	"death knight selected",
+	"death knight annoyed"
+    },
+    {	"paladin-selected",
+	"paladin selected",
+	"paladin annoyed"
+    },
+    {	"ogre-mage-selected",
+	"ogre-mage selected",
+	"ogre-mage annoyed"
+    },
+    {	"dwarves-selected",
+	"dwarven demolition squad selected",
+	"dwarven demolition squad annoyed"
+    },
+    {	"goblin-sappers-selected",
+	"goblin sappers selected",
+	"goblin sappers annoyed"
+    },
+    {	"alleria-selected",
+	"alleria selected",
+	"alleria annoyed"
+    },
+    {	"teron-gorefiend-selected",
+	"teron gorefiend selected",
+	"teron gorefiend annoyed"
+    },
+    {	"kurdan-and-sky'ree-selected",
+	"kurdran selected",
+	"kurdran annoyed"
+    },
+    {	"dentarg-selected",
+	"dentarg selected",
+	"dentarg annoyed"
+    },
+    {	"khadgar-selected",
+	"khadgar selected",
+	"khadgar annoyed"
+    },
+    {	"grom-hellscream-selected",
+	"grom hellscream selected",
+	"grom hellscream annoyed"
+    },
+    {	"human-oil-tanker-selected",
+	"ships human selected",
+	"ships human annoyed"
+    },
+    {	"orc-oil-tanker-selected",
+	"ships orc selected",
+	"ships orc annoyed"
+    },
+    {	"deathwing-selected",
+	"deathwing selected",
+	"deathwing annoyed"
+    },
+    {	"gnomish-submarine-selected",
+	"ships human selected",
+	"ships submarine annoyed"
+    },
+    {	"gnomish-flying-machine-selected",
+	"click",
+	"gnomish flying machine annoyed"
+    },
+    {	"goblin-zeppelin-selected",
+	"click",
+	"goblin zeppelin annoyed"
+    },
+    {	"turalyon-selected",
+	"turalyon selected",
+	"turalyon annoyed"
+    },
+    {	"danath-selected",
+	"danath selected",
+	"danath annoyed"
+    },
+    {	"korgath-bladefist-selected",
+	"korgath bladefist selected",
+	"korgath bladefist annoyed"
+    },
+    { }
+};
+
+#endif
+
+/**
+**	Simple sounds currently available.
+*/
+local SimpleSound* SimpleSounds
+#ifndef USE_CCL
+    = DefaultSimpleSounds
+#endif
+    ;
+
+/**
+**	Sound remaping currently available.
+*/
+local SoundRemap* SoundRemaps
+#ifndef USE_CCL
+    = DefaultSoundRemaps
+#endif
+    ;
+
+/**
+**	Sound-groups currently available
+*/
+local SoundGroup* SoundGroups
+#ifndef USE_CCL
+    = DefaultSoundGroups
+#endif
+    ;
+
+/**
+**	Selection-groups currently available
+*/
+local SelectionGroup* SelectionGroups
+#ifndef USE_CCL
+    = DefaultSelectionGroups
+#endif
+    ;
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+/**
+**	Computes the number of sounds in a sound group
+**
+**	@param group	list of file names
+**
+**	@return		number of sounds in group
+*/
+local int NbSoundsInGroup(char* const* const group)
+{
     int i;
 
     for(i=0;i<MaxSimpleGroups;i++) {
-	if (group[i]==NULL) {
+	if ( !group[i] ) {
 	    return i;
 	}
     }
-    return MaxSimpleGroups;
+    return i;
 }
 
-/** Loads all simple sounds (listed in the SimpleSounds array).
- */
-local void LoadSimpleSounds(void) {
+
+/**
+**	Loads all simple sounds (listed in the SimpleSounds array).
+*/
+local void LoadSimpleSounds(void)
+{
     int i;
-    int nb;
 
-    nb=sizeof(SimpleSounds)/sizeof(*SimpleSounds);
-    DebugLevel3("Loading Simple Sounds (%d sounds)\n",nb);
-    for(i=0;i<nb;i++) {
-	DebugLevel3("Loading %s with name %s\n",SimpleSounds[i].File,
-		    SimpleSounds[i].Name);
-	MakeSound(SimpleSounds[i].Name,&(SimpleSounds[i].File),1);
-    }
-}
-
-/** Loads all sound groups.
- ** Special groups are created.
- */
-local void LoadSoundGroups(void) {
-    int i;
-    int nb;
-    int nb_sounds;
-
-    nb=sizeof(Acknowledgments)/sizeof(*Acknowledgments);
-    DebugLevel3("Loading Acknowledgment Sound Groups (%d groups)\n",nb);
-    for(i=0;i<nb;i++) {
-	nb_sounds=NbSoundsInGroup(Acknowledgments[i].Sounds);
-	DebugLevel3("Load group %s (%d sounds)\n",Acknowledgments[i].Name,
-		    nb_sounds);
-	MakeSound(Acknowledgments[i].Name,Acknowledgments[i].Sounds,
-		  nb_sounds);
-    }
-    nb=sizeof(Selections)/sizeof(*Selections);
-    DebugLevel3("Loading Selection Sound Groups (%d groups)\n",nb);
-    for(i=0;i<nb;i++) {
-	nb_sounds=NbSoundsInGroup(Selections[i].Sounds);
-	DebugLevel3("Load group %s (%d sounds)\n",Selections[i].Name,
-		    nb_sounds);
-	MakeSound(Selections[i].Name,Selections[i].Sounds,nb_sounds);
-    }
-    nb=sizeof(Annoyed)/sizeof(*Annoyed);
-    DebugLevel3("Loading Annoyed Sound Groups (%d groups)\n",nb);
-    for(i=0;i<nb;i++) {
-	nb_sounds=NbSoundsInGroup(Annoyed[i].Sounds);
-	DebugLevel3("Load group %s (%d sounds)\n",Annoyed[i].Name,
-		    nb_sounds);
-	MakeSound(Annoyed[i].Name,Annoyed[i].Sounds,nb_sounds);
-    }
-    nb=sizeof(OtherGroups)/sizeof(*OtherGroups);
-    DebugLevel3("Loading Other Sound Groups (%d groups)\n",nb);
-    for(i=0;i<nb;i++) {
-	nb_sounds=NbSoundsInGroup(OtherGroups[i].Sounds);
-	DebugLevel3("Load group %s (%d sounds)\n",OtherGroups[i].Name,
-		    nb_sounds);
-	MakeSound(OtherGroups[i].Name,OtherGroups[i].Sounds,
-		  nb_sounds);
-    }
-    nb=sizeof(SelectionGroups)/sizeof(*SelectionGroups);
-    DebugLevel3("Making Special Sound Groups (%d groups)\n",nb);
-    for(i=0;i<nb;i++) {
-	//FIXME: might be more efficient
-	DebugLevel3("Group %s (%s,%s)\n",SelectionGroups[i].Name,
-		    SelectionGroups[i].First,SelectionGroups[i].Second);
-	MakeSoundGroup(SelectionGroups[i].Name,
-		       SoundIdForName(SelectionGroups[i].First),
-		       SoundIdForName(SelectionGroups[i].Second));
+    if( SimpleSounds ) {
+	for(i=0;SimpleSounds[i].Name;i++) {
+	    MakeSound(SimpleSounds[i].Name,&(SimpleSounds[i].File),1);
+	}
     }
 }
 
-/** Performs remaping listed in the Remaps array. Maps also critter sounds to
- ** their correct values.
- */
-local void RemapSounds(void) {
+/**
+**	Loads all sound groups.
+**	Special groups are created.
+*/
+local void LoadSoundGroups(void)
+{
     int i;
-    int nb;
 
-    nb=sizeof(Remaps)/sizeof(*Remaps);
-    for(i=0;i<nb;i++) {
-	//FIXME: should be more efficient
-	MapSound(Remaps[i].NewName,SoundIdForName(Remaps[i].BaseName));
+    if( SoundGroups ) {
+	for(i=0;SoundGroups[i].Name;i++) {
+	    MakeSound(SoundGroups[i].Name,SoundGroups[i].Sounds,
+		    NbSoundsInGroup(SoundGroups[i].Sounds));
+	}
     }
-    // critter mapping
+    if( SelectionGroups ) {
+	for(i=0;SelectionGroups[i].Name;i++) {
+	    //FIXME: might be more efficient
+	    MakeSoundGroup(SelectionGroups[i].Name,
+		    SoundIdForName(SelectionGroups[i].First),
+		    SoundIdForName(SelectionGroups[i].Second));
+	}
+    }
+}
+
+/**
+**	Performs remaping listed in the Remaps array. Maps also critter
+**	sounds to their correct values.
+*/
+local void RemapSounds(void)
+{
+    int i;
+
+    if( SoundRemaps ) {
+	for(i=0;SoundRemaps[i].NewName;i++) {
+	    //FIXME: should be more efficient
+	    MapSound(SoundRemaps[i].NewName,
+		    SoundIdForName(SoundRemaps[i].BaseName));
+	}
+    }
+
+    //
+    //	Make some general sounds.
+    //
+    MapSound("gold-mine-help",SoundIdForName("basic orc voices help 1"));
+
+    // critter mapping FIXME: must support more terrains.
+
     switch( TheMap.Terrain ) {
     case TilesetSummer:
 	MakeSoundGroup("critter-selected",
@@ -1484,17 +1416,13 @@ local void RemapSounds(void) {
     default:
 	DebugLevel2("Unknown Terrain %d\n",TheMap.Terrain);
     }
-
 }
-
-/*----------------------------------------------------------------------------
---	Functions
-----------------------------------------------------------------------------*/
 
 /**
 **	Load all sounds for units.
 */
-global void LoadUnitSounds(void) {
+global void LoadUnitSounds(void)
+{
     if( SoundFildes!=-1 ) {
 	LoadSimpleSounds();
 	LoadSoundGroups();
@@ -1503,86 +1431,56 @@ global void LoadUnitSounds(void) {
 }
 
 /**
-**	FIXME: docu
+**	Map the sounds of all unit-types to the correct sound id.
+**	And overwrite the sound ranges. @todo the sound ranges should be
+**	configurable by user with CCL.
 */
-global void MapUnitSounds(void) {
-    int i;
-    int nb;
-    SoundId HumanHelp,HumanCityHelp,OrcHelp,OrcCityHelp;
-    SoundId HumanDead,OrcDead,BuildingDestroyed,ShipSinking,NonOrganicDead;
+global void MapUnitSounds(void)
+{
+    UnitType* type;
 
     if( SoundFildes!=-1 ) {
 	SetSoundRange(SoundIdForName("tree chopping"),32);
-	nb=sizeof(UnitTypes)/sizeof(*UnitTypes);
-	// help sounds
-	HumanHelp=SoundIdForName("basic human voices help 1");
-	HumanCityHelp=SoundIdForName("basic human voices help 2");
-	OrcHelp=SoundIdForName("basic orc voices help 1");
-	OrcCityHelp=SoundIdForName("basic orc voices help 2");
-	// Ranges for help sounds
-	SetSoundRange(HumanHelp,INFINITE_SOUND_RANGE);
-	SetSoundRange(HumanCityHelp,INFINITE_SOUND_RANGE);
-	SetSoundRange(OrcHelp,INFINITE_SOUND_RANGE);
-	SetSoundRange(OrcCityHelp,INFINITE_SOUND_RANGE);
-	// death sounds
-	HumanDead=SoundIdForName("basic human voices dead");
-	OrcDead=SoundIdForName("basic orc voices dead");
-	BuildingDestroyed=SoundIdForName("building destroyed");
-	ShipSinking=SoundIdForName("ship sinking");
-	NonOrganicDead=SoundIdForName("explosion");
-	for(i=0;i<nb;i++) {
-	    UnitTypes[i].Sound.Selected.Sound=
-		SoundIdForName(UnitTypes[i].Sound.Selected.Name);
-	    UnitTypes[i].Sound.Acknowledgement.Sound=
-		SoundIdForName(UnitTypes[i].Sound.Acknowledgement.Name);
-	    // Acknowledge sounds have infinite range
-	    SetSoundRange(UnitTypes[i].Sound.Acknowledgement.Sound,
-			  INFINITE_SOUND_RANGE);
-	    UnitTypes[i].Sound.Ready.Sound=
-		SoundIdForName(UnitTypes[i].Sound.Ready.Name);
-	    //FIXME: will be modified
-	    UnitTypes[i].Weapon.Attack.Sound=
-		SoundIdForName(UnitTypes[i].Weapon.Attack.Name);
-	    //FIXME: very dirty trick based on the fact that unit types
-	    // alternate between human and orc, starting with human.
-	    // should be at least defined as remaps
-	    //FIXME: (Fabrice) I don't think it's 100% correct for death
-	    //sounds.
 
-	    if (i%2) {
-		//orc
-		if (UnitTypes[i].Building) {
-		    UnitTypes[i].Sound.Help.Sound=OrcCityHelp;
-		    UnitTypes[i].Sound.Dead.Sound=BuildingDestroyed;
-		} else {
-		    UnitTypes[i].Sound.Help.Sound=OrcHelp;
-		    if (UnitTypes[i].SeaUnit) {
-			UnitTypes[i].Sound.Dead.Sound=ShipSinking;
-		    } else {
-			if (UnitTypes[i].Organic) {
-			    UnitTypes[i].Sound.Dead.Sound=OrcDead;
-			} else {
-			    UnitTypes[i].Sound.Dead.Sound=NonOrganicDead;
-			}
-		    }
-		}
-	    } else {
-		//human
-		if (UnitTypes[i].Building) {
-		    UnitTypes[i].Sound.Help.Sound=HumanCityHelp;
-		    UnitTypes[i].Sound.Dead.Sound=BuildingDestroyed;
-		} else {
-		    UnitTypes[i].Sound.Help.Sound=HumanHelp;
-		    if (UnitTypes[i].SeaUnit) {
-			UnitTypes[i].Sound.Dead.Sound=ShipSinking;
-		    } else {
-			if (UnitTypes[i].Organic) {
-			    UnitTypes[i].Sound.Dead.Sound=HumanDead;
-			} else {
-			    UnitTypes[i].Sound.Dead.Sound=NonOrganicDead;
-			}
-		    }
-		}
+	//
+	//	Parse all units sounds.
+	//
+	for( type=UnitTypes; type->OType; type++) {
+	    if( type->Sound.Selected.Name ) {
+		type->Sound.Selected.Sound=
+			SoundIdForName(type->Sound.Selected.Name);
+	    }
+	    if( type->Sound.Acknowledgement.Name ) {
+		type->Sound.Acknowledgement.Sound=
+			SoundIdForName(type->Sound.Acknowledgement.Name);
+		/*
+		// Acknowledge sounds have infinite range
+		SetSoundRange(type->Sound.Acknowledgement.Sound,
+			INFINITE_SOUND_RANGE);
+		*/
+	    }
+	    if( type->Sound.Ready.Name ) {
+		type->Sound.Ready.Sound=
+		    SoundIdForName(type->Sound.Ready.Name);
+		// Ready sounds have infinite range
+		SetSoundRange(type->Sound.Ready.Sound,
+			INFINITE_SOUND_RANGE);
+	    }
+	    // FIXME: will be modified, attack sound be moved to missile/weapon
+	    if( type->Weapon.Attack.Name ) {
+		type->Weapon.Attack.Sound=
+			SoundIdForName(type->Weapon.Attack.Name);
+	    }
+	    if( type->Sound.Help.Name ) {
+		type->Sound.Help.Sound=
+			SoundIdForName(type->Sound.Help.Name);
+		// Help sounds have infinite range
+		SetSoundRange(type->Sound.Help.Sound,
+			INFINITE_SOUND_RANGE);
+	    }
+	    if( type->Sound.Dead.Name ) {
+		type->Sound.Dead.Sound=
+			SoundIdForName(type->Sound.Dead.Name);
 	    }
 	}
     }
