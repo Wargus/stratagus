@@ -44,7 +44,7 @@
 #include "upgrade.h"
 #include "depend.h"
 #include "player.h"
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables

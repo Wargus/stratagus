@@ -53,7 +53,7 @@
 #include "interface.h"
 #include "font.h"
 #include "ui.h"
-#include "ccl.h"
+#include "script.h"
 
 #include "etlib/generic.h"
 

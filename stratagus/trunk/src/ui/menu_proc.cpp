@@ -53,7 +53,7 @@
 #include "ui.h"
 #include "sound_server.h"
 #include "sound.h"
-#include "ccl.h"
+#include "script.h"
 
 #ifdef USE_WIN32
 #ifdef _MSC_VER

@@ -377,7 +377,7 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "construct.h"
-#include "ccl.h"
+#include "script.h"
 
 #include "SDL.h"
 

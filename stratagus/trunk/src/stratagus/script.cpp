@@ -45,7 +45,7 @@
 #include "iocompat.h"
 
 #include "iolib.h"
-#include "ccl.h"
+#include "script.h"
 #include "missile.h"
 #include "depend.h"
 #include "upgrade.h"
@@ -53,7 +53,7 @@
 #include "unit.h"
 #include "map.h"
 #include "pud.h"
-#include "ccl_sound.h"
+#include "script_sound.h"
 #include "ui.h"
 #include "interface.h"
 #include "font.h"

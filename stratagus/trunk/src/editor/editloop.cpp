@@ -56,7 +56,7 @@
 #include "iocompat.h"
 #include "commands.h"
 
-#include "ccl.h"
+#include "script.h"
 
 extern void DoScrollArea(enum _scroll_state_ state, int fast);
 

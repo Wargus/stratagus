@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_helpers.h - The clone configuration language headerfile. */
+/**@name script_helpers.h - The clone configuration language headerfile. */
 //
 //      (c) Copyright 2003-2004 by Ludovic Pollet
 //
@@ -28,11 +28,11 @@
 //
 //      $Id$
 
-#ifndef __CCL_HELPERS__
-#define __CCL_HELPERS__
+#ifndef __SCRIPT_HELPERS__
+#define __SCRIPT_HELPERS__
 
 
 //@{
 //@}
 
-#endif // !__CCL_H__
+#endif // !__SCRIPT_H__

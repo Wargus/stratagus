@@ -40,7 +40,7 @@
 
 #include "stratagus.h"
 #include "player.h"
-#include "ccl.h"
+#include "script.h"
 #include "ai.h"
 #include "actions.h"
 #include "commands.h"

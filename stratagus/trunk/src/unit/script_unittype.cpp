@@ -46,7 +46,7 @@
 #include "unittype.h"
 #include "icons.h"
 #include "missile.h"
-#include "ccl.h"
+#include "script.h"
 #include "construct.h"
 #include "spells.h"
 

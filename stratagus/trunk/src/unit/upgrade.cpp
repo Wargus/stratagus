@@ -669,7 +669,7 @@ global void SaveUpgrades(CLFile* file)
 --		Ccl part of upgrades
 ----------------------------------------------------------------------------*/
 
-#include "ccl.h"
+#include "script.h"
 
 /**
 **		Define a new upgrade modifier.

@@ -39,7 +39,7 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
-#include "ccl.h"
+#include "script.h"
 #include "map.h"
 #include "minimap.h"
 #include "actions.h"

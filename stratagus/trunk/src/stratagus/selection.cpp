@@ -48,7 +48,7 @@
 #include "commands.h"
 #include "network.h"
 
-#include "ccl.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --		Variables
