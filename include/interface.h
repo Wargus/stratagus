@@ -95,7 +95,7 @@ enum _iface_state_ {
 enum _key_state_ {
     KeyStateCommand = 0,	/// keys -> commands
     KeyStateInput		/// keys -> line editor
-} KeyState;			/// current keyboard state
+};				/// current keyboard state
 
     /// additional keycodes
 enum _key_codes_ {
@@ -228,7 +228,8 @@ extern enum _iface_state_ InterfaceState;
 extern enum _scroll_state_ KeyScrollState;
     /// current scroll state of mouse
 extern enum _scroll_state_ MouseScrollState;
-
+    /// current key state
+extern enum _key_state_ KeyState;
     /// pointer to unit under the cursor
 extern Unit* UnitUnderCursor;
     /// button number under the cursor
