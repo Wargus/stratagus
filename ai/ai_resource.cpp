@@ -127,7 +127,7 @@ local int AiCheckCosts(const int* costs)
 local int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 {
 	int remaining;
-	const AiBuildQueue *queue;
+	const AiBuildQueue* queue;
 
 	DebugLevel3Fn(" for player %d\n" _C_ pai->Player->Player);
 	//
@@ -755,17 +755,14 @@ local void AiCheckingWork(void)
 
 			//
 			// FIXME: must check if requirements are fulfilled.
-			//  Buildings can be destructed.
+			// Buildings can be destroyed.
 
 			//
 			// Check if we have enough food.
 			//
-			if (!type->Building) {
-				// Count future
-				if (!AiCheckSupply(AiPlayer, type)) {
-					AiPlayer->NeedSupply = 1;
-					AiRequestSupply();
-				}
+			if (type->Demand && !AiCheckSupply(AiPlayer, type)) {
+				AiPlayer->NeedSupply = 1;
+				AiRequestSupply();
 			}
 			//
 			// Check limits, AI should be broken if reached.
