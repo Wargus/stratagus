@@ -1235,8 +1235,8 @@ global Menu Menus[] = {
     },
     {
 	// Tips Menu
-	176+(14*TileSizeX-256)/2,
-	16+(14*TileSizeY-288)/2,
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-256)/2,
 	288, 256,
 	ImagePanel2,
 	4, 13,
