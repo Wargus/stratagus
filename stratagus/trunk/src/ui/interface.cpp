@@ -93,9 +93,8 @@ local void ShowInput(void)
 
     sprintf(InputStatusLine,"MESSAGE:%s~!_",Input);
     input=InputStatusLine;
-    // FIXME: That is slow!
-    // FIXME: Must use the real status line length!!
-    while( VideoTextLength(GameFont,input)>448 ) {
+    // FIXME: This is slow!
+    while( VideoTextLength(GameFont,input)>TheUI.StatusLine.Graphic->Width ) {
 	++input;
     }
     KeyState=KeyStateCommand;
@@ -112,6 +111,7 @@ local void UiBeginInput(void)
     KeyState=KeyStateInput;
     Input[0]='\0';
     InputIndex=0;
+    ClearCosts();
     ShowInput();
 }
 
