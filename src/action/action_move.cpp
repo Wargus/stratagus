@@ -58,7 +58,7 @@ local int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 **	@param unit	Unit that moves.
 **	@param move	Animation script for unit.
 **
-**	@returns	>0 remaining path length, 0 wait for path, -1
+**	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
 local int ActionMoveGeneric(Unit* unit,const Animation* move)
@@ -77,11 +77,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	//	Target killed?
 	//
 #ifdef NEW_ORDERS
-	goal=unit->Orders[0].Goal;
-#else
-	goal=unit->Command.Data.Move.Goal;
-#endif
-	if( goal ) {
+	if( (goal=unit->Orders[0].Goal) ) {
 	    // FIXME: should this be handled here?
 	    // FIXME: Can't choose a better target here!
 	    if( goal->Destroyed ) {
@@ -90,28 +86,49 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
-#ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
-#else
-		unit->Command.Data.Move.Goal=goal=NoUnitP;
-#endif
+		ResetPath(unit->Orders[0]);
 	    } else if( goal->Removed ||
-#ifdef NEW_ORDERS
 		    !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-#else
-		    !goal->HP || goal->Command.Action==UnitActionDie ) {
-#endif
 		DebugLevel0Fn("killed unit\n");
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
+		unit->Orders[0].X=goal->X;
+		unit->Orders[0].Y=goal->Y;
 		unit->Orders[0].Goal=goal=NoUnitP;
-#else
-		unit->Command.Data.Move.Goal=goal=NoUnitP;
-#endif
+		ResetPath(unit->Orders[0]);
 	    }
 	}
+#else
+	if( (goal=unit->Command.Data.Move.Goal) ) {
+	    // FIXME: should this be handled here?
+	    // FIXME: Can't choose a better target here!
+	    if( goal->Destroyed ) {
+		DebugLevel0Fn("destroyed unit\n");
+		RefsDebugCheck( !goal->Refs );
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    } else if( goal->Removed ||
+		    !goal->HP || goal->Command.Action==UnitActionDie ) {
+		DebugLevel0Fn("killed unit\n");
+		RefsDebugCheck( !goal->Refs );
+		--goal->Refs;
+		RefsDebugCheck( !goal->Refs );
+		unit->Command.Data.Move.DX=goal->X;
+		unit->Command.Data.Move.DY=goal->Y;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+		ResetPath(unit->Command);
+	    }
+	}
+#endif
 
 	switch( d=NextPathElement(unit,&xd,&yd) ) {
 	    case PF_UNREACHABLE:	// Can't reach, stop
@@ -183,9 +200,20 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	unit->Frame=0;
 	UnitHeadingFromDeltaXY(unit,xd,yd);
     } else {
+#ifdef NEW_SHIPS
+	if( unit->Type->UnitType==UnitTypeLand ) {
+	    xd=Heading2X[unit->Direction/NextDirection];
+	    yd=Heading2Y[unit->Direction/NextDirection];
+	} else {
+	    xd=Heading2X[unit->Direction/NextDirection]*2;
+	    yd=Heading2Y[unit->Direction/NextDirection]*2;
+	}
+	d=0;
+#else
 	xd=Heading2X[unit->Direction/NextDirection];
 	yd=Heading2Y[unit->Direction/NextDirection];
 	d=0;
+#endif
     }
 
     DebugLevel3Fn(": %d,%d State %2d ",xd,yd,unit->State);
@@ -193,7 +221,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	    ,move[state].Pixel
 	    ,move[state].Frame
 	    ,move[state].Sleep
-	    ,unit->Heading
+	    ,unit->Direction
 	    ,unit->IX,unit->IY);
 
     unit->IX+=xd*move[state].Pixel;
@@ -223,7 +251,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 **
 **	@param unit	Pointer to unit.
 **
-**	@returns	>0 remaining path length, 0 wait for path, -1
+**	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
 global int HandleActionMove(Unit* unit)
