@@ -153,40 +153,17 @@ global void CreateGame(char* filename, WorldMap* map)
     int i, j;
     char* s;
 
-    //
-    // Evaluate optional command line parameters
-    //
-    NetworkSetupArgs();
-
-    //
-    // Don't leak when called multiple times 
-    //	- FIXME: not the ideal place for this..
-    //
-    FreeMapInfo(map->Info);
-    map->Info = NULL;
-
-    //
-    //	Network part 1 (port set-up)
-    //
-    InitNetwork1();
-
-    if (filename == NULL) {
-	if( strcmp(TitleMusic,MenuMusic) ) {	// Start new music for menus?
-	    PlayMusic(MenuMusic);
-	}
-	ProcessMenu(MENU_PRG_START, 1);
-	if( NetworkFildes!=-1 && NetPlayers<2 ) {
-	    ExitNetwork1();
-	}
-	
-    } else {
+    if ( filename ) {
 	s = NULL;
+	// FIXME: LibraryFile here?
 	if (filename[0] != '/' && filename[0] != '.') {
 	    s = filename = strdcat3(FreeCraftLibPath, "/", filename);
 	}
 	//
 	//	Load the map.
 	//
+	InitUnitTypes();
+	UpdateStats();
 	LoadMap(filename, map);
 
 	if (s) {
@@ -310,19 +287,6 @@ global void CreateGame(char* filename, WorldMap* map)
 		,CompressedSoundMemory/1024
 		,CompressedSoundMemory/1024/1024);
     );
-#endif
-
-#if 0
-    //
-    //	Network part
-    //
-    if( NetPlayers>1 || NetworkArg ) {	// with network
-	InitNetwork1();
-	InitNetwork2();
-    } else {
-	NetworkFildes=-1;
-	NetworkInSync=1;
-    }
 #endif
 
     //

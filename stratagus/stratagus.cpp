@@ -29,7 +29,7 @@
 **	@mainpage
 **
 **	@section Introduction Introduction
-**	
+**
 **	Welcome to the source code documentation of the FreeCraft engine.
 **	For an open source project it is very important to have a good
 **	source code documentation, I have tried to do this with the help
@@ -147,7 +147,7 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
-#if defined(__CYGWIN__) 
+#if defined(__CYGWIN__)
 #include <getopt.h>
 #endif
 #if defined(_MSC_VER)
@@ -344,7 +344,7 @@ local void WaitCallbackExit(void)
 /**
 **	Wait for any input.
 **
-**	@param time	Time in seconds to wait.	
+**	@param time	Time in seconds to wait.
 */
 local void WaitForInput(int timeout)
 {
@@ -397,6 +397,33 @@ local void WaitForInput(int timeout)
 //----------------------------------------------------------------------------
 
 /**
+**	Pre menu setup.
+*/
+local void PreMenuSetup(void)
+{
+    char* s;
+
+    //
+    //  Inital menues require some gfx.
+    //
+    // FIXME: must search tileset by identifier or use a gui palette?
+    LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
+	    "/graphics/",Tilesets[TilesetSummer]->PaletteFile));
+    free(s);
+    VideoCreatePalette(GlobalPalette);
+    LoadFonts();
+
+    // All pre-start menues are orcish - may need to be switched later..
+    SetDefaultTextColors(FontYellow,FontWhite);
+    InitMenus(PlayerRaceOrc);
+    LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
+    InitSettings();
+
+    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    LoadUserInterface();
+}
+
+/**
 **	Menu loop.
 **
 **	Show the menus, start game, return back.
@@ -408,14 +435,49 @@ global void MenuLoop(char* filename, WorldMap* map)
 {
     for( ;; ) {
 	//
+	//	Network part 1 (port set-up)
+	//	FIXME: JOHNS: -> ARI can this be called multiple?
+	//
+	InitNetwork1();
+	//
+	// Don't leak when called multiple times
+	//	- FIXME: not the ideal place for this..
+	//
+	FreeMapInfo(map->Info);
+	map->Info = NULL;
+	//
+	//	No filename given, choose with the menus
+	//
+	if ( !filename ) {
+	    // Start new music for menus?
+	    // FIXME: If second loop?
+	    if( strcmp(TitleMusic,MenuMusic) ) {
+		PlayMusic(MenuMusic);
+	    }
+	    ProcessMenu(MENU_PRG_START, 1);
+	    if( NetworkFildes!=-1 && NetPlayers<2 ) {
+		ExitNetwork1();
+	    }
+	}
+	//
 	//	Create the game.
 	//
 	CreateGame(filename,map);
 
 	SetStatusLine(NameLine);
 	SetMessage("Do it! Do it now!");
-
+	//
+	//	Play the game.
+	//
 	GameMainLoop();
+
+	CleanModules();
+
+	LoadCcl();			// Reload the main config file
+
+	PreMenuSetup();
+
+	filename=NULL;
     }
 }
 
@@ -512,8 +574,6 @@ local void PrintHeader(void)
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
-    char* s;
-
     PrintHeader();
     printf(
     "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
@@ -523,6 +583,9 @@ This software is provided as-is.  The author(s) can not be held liable for any\
 \ndamage that might arise from the use of this software.\n\
 Use it at your own risk.\n\n");
 
+    //
+    //	Hardware drivers setup
+    //
     InitVideo();			// setup video display
 #ifdef WITH_SOUND
     if( InitSound() ) {			// setup sound card
@@ -540,38 +603,12 @@ Use it at your own risk.\n\n");
     }
     Invalidate();
 
-    //
-    //  Units Memory Management
-    //
-    InitUnitsMemory();
-    UpdateStats();
-    InitUnitTypes();
+    InitUnitsMemory();		// Units memory management
+    PreMenuSetup();		// Load everything needed for menus
+    WaitForInput(15);		// Show game intro
+    NetworkSetupArgs();		// Evaluate optional command line parameters
 
-    //
-    //  Inital menues require some gfx.
-    //
-    // FIXME: must search tileset by identifier or use a gui palette?
-    LoadRGB(GlobalPalette, s=strdcat3(FreeCraftLibPath,
-	    "/graphics/",Tilesets[TilesetSummer]->PaletteFile));
-    free(s);
-    VideoCreatePalette(GlobalPalette);
-    LoadFonts();
-
-    // All pre-start menues are orcish - may need to be switched later..
-    SetDefaultTextColors(FontYellow,FontWhite);
-    InitMenus(1);
-    LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
-    InitSettings();
-
-    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
-    LoadUserInterface();
-
-    //
-    //	Show game intro
-    //
-    WaitForInput(15);
-
-    MenuLoop(MapName,&TheMap);
+    MenuLoop(MapName,&TheMap);	// Enter the menu loop
 
     return 0;
 }
@@ -653,7 +690,11 @@ global int mymain(int argc,char** argv)
 global int main(int argc,char** argv)
 #endif
 {
+
 #ifdef USE_BEOS
+    //
+    //	Parse arguments for BeOS
+    //
     beos_init( argc, argv );
 #endif
 
@@ -661,8 +702,6 @@ global int main(int argc,char** argv)
     //	Setup some defaults.
     //
     FreeCraftLibPath=FREECRAFT_LIB_PATH;
-    // FIXME: Is this needed? JOHNS: I think not.
-    TitleScreen=strdup("graphics/ui/title.png");
     CclStartFile="ccl/freecraft.ccl";
 
     memset(NetworkName, 0, 16);
@@ -774,7 +813,8 @@ global int main(int argc,char** argv)
 	--argc;
     }
 
-    CclInit();				// init CCL and load configurations!
+    InitCcl();				// init CCL and load configurations!
+    LoadCcl();
 
     main1(argc,argv);
 
