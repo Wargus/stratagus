@@ -194,6 +194,18 @@ local int CommandKey(int key)
 	    ToggleGrabMouse();
 	    break;
 
+	case 'F':			// toggle fullscreen
+#ifdef USE_SDL
+	    {
+	    #include <SDL/SDL.h>
+	    // FIXME: move to system api part!
+	    extern SDL_Surface *Screen;	/// internal screen 
+
+	    SDL_WM_ToggleFullScreen(Screen);
+	    }
+#endif
+	    break;
+
         case ' ':
             CenterOnMessage();
             break; 
