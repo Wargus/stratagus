@@ -262,6 +262,7 @@ distdir	= freecraft-$(mydate)
 distlist:
 	@echo $(SRC_ALL) $(HDRS) src/beos/beos.cpp > $(DISTLIST)
 	for i in $(MODULES_ALL); do echo $$i/Module.make >> $(DISTLIST); done
+	for i in $(INCLUDE_DIRS); do echo $$i/Module.make >> $(DISTLIST); done
 #	@echo src/include >> $(DISTLIST)
 
 dist: distlist
