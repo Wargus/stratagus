@@ -154,6 +154,69 @@ local int AiCheckUnitTypeCosts(const UnitType* type)
 }
 
 /**
+**	Enemy units in distance.
+**
+**	@param unit	Find in distance for this unit.
+**	@param range	Distance range to look.
+**
+**	@return		Number of enemy units.
+*/
+global int EnemyUnitsInDistance(const Unit* unit,unsigned range)
+{
+    const Unit* dest;
+    const UnitType* type;
+    Unit* table[UnitMax];
+    unsigned x;
+    unsigned y;
+    unsigned n;
+    unsigned i;
+    int e;
+    const Player* player;
+
+    DebugLevel3Fn("(%d)%s\n" _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+
+    //
+    //	Select all units in range.
+    //
+    x=unit->X;
+    y=unit->Y;
+    n=SelectUnits(x-range,y-range,x+range+1,y+range+1,table);
+
+    player=unit->Player;
+    type=unit->Type;
+
+    //
+    //	Find the enemy units which can attack
+    //
+    for( e=i=0; i<n; ++i ) {
+	dest=table[i];
+	//
+	//	unusable unit
+	//
+	// FIXME: did SelectUnits already filter this.
+	if( dest->Removed || dest->Invisible
+		|| !(dest->Visible&(1<<player->Player))
+		|| dest->Orders[0].Action==UnitActionDie ) {
+	    DebugLevel0Fn("NO\n");
+	    continue;
+	}
+
+	if( !IsEnemy(player,dest) ) {	// a friend or neutral
+	    continue;
+	}
+
+	//
+	//	Unit can attack back?
+	//
+	if( CanTarget(dest->Type,type) ) {
+	    ++e;
+	}
+    }
+
+    return e;
+}
+
+/**
 **	Check if we can build the building.
 **
 **	@param type	Unit that can build the building.
@@ -1302,7 +1365,7 @@ local void AiCheckRepair(void)
 	    //
 	    //	FIXME: Repair only buildings under control
 	    //
-	    if( AttackUnitsInDistance(unit,unit->Stats->SightRange) ) {
+	    if( EnemyUnitsInDistance(unit,unit->Stats->SightRange) ) {
 		continue;
 	    }
 
