@@ -441,7 +441,7 @@ case $VIDSEL in
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
-	  SDLLIB="$SDLLIB -lesd"
+	  SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
 	fi
 
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
