@@ -152,31 +152,31 @@ local void VideoDrawChar8(const Graphic* sprite,
     dp=VideoMemory8+x+y*VideoWidth-1;
     da=VideoWidth-w;
     --w;
+    
+#define UNROLL \
+    ++dp; \
+    p=*++sp; \
+    if (p!=255) { \
+	if( p<NumFontColors ) { \
+	    *dp=FontPixels8[p]; \
+	} else { \
+	    *dp=((VMemType8*)sprite->Pixels)[p]; \
+	} \
+    }
 
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {		// loop with unroll
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels8[p];
-	    }
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels8[p];
-	    }
+	    UNROLL;
+	    UNROLL;
 	}
 	if( sp<=lp ) {
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels8[p];
-	    }
+	    UNROLL;
 	}
 	sp+=sa;
 	dp+=da;
     }
+#undef UNROLL
 }
 
 /**
@@ -208,30 +208,30 @@ local void VideoDrawChar16(const Graphic* sprite,
     da=VideoWidth-w;
     --w;
 
+#define UNROLL \
+    ++dp; \
+    p=*++sp; \
+    if (p!=255) { \
+	if( p<NumFontColors ) { \
+	    *dp=FontPixels16[p]; \
+	} else { \
+	    *dp=((VMemType16*)sprite->Pixels)[p]; \
+	} \
+    }
+
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {		// loop with unroll
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels16[p];
-	    }
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels16[p];
-	    }
+	    UNROLL;
+	    UNROLL;
 	}
 	if( sp<=lp ) {
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels16[p];
-	    }
+	    UNROLL;
 	}
 	sp+=sa;
 	dp+=da;
     }
+#undef UNROLL
 }
 
 /**
@@ -263,30 +263,30 @@ local void VideoDrawChar24(const Graphic* sprite,
     da=VideoWidth-w;
     --w;
 
+#define UNROLL \
+    ++dp; \
+    p=*++sp; \
+    if (p!=255) { \
+	if( p<NumFontColors ) { \
+	    *dp=FontPixels24[p]; \
+	} else { \
+	    *dp=((VMemType24*)sprite->Pixels)[p]; \
+	} \
+    }
+
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {		// loop with unroll
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels24[p];
-	    }
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels24[p];
-	    }
+	    UNROLL;
+	    UNROLL;
 	}
 	if( sp<=lp ) {
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels24[p];
-	    }
+	    UNROLL;
 	}
 	sp+=sa;
 	dp+=da;
     }
+#undef UNROLL
 }
 
 /**
@@ -318,30 +318,30 @@ local void VideoDrawChar32(const Graphic* sprite,
     da=VideoWidth-w;
     --w;
 
+#define UNROLL \
+    ++dp; \
+    p=*++sp; \
+    if (p!=255) { \
+	if( p<NumFontColors ) { \
+	    *dp=FontPixels32[p]; \
+	} else { \
+	    *dp=((VMemType32*)sprite->Pixels)[p]; \
+	} \
+    }
+
     while( sp<gp ) {
 	lp=sp+w;
 	while( sp<lp ) {		// loop with unroll
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels32[p];
-	    }
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels32[p];
-	    }
+	    UNROLL;
+	    UNROLL;
 	}
 	if( sp<=lp ) {
-	    ++dp;
-	    p=*++sp;
-	    if( p!=255 ) {
-		*dp=FontPixels32[p];
-	    }
+	    UNROLL;
 	}
 	sp+=sa;
 	dp+=da;
     }
+#undef UNROLL
 }
 
 #ifdef USE_OPENGL
@@ -834,6 +834,9 @@ global void LoadFonts(void)
     int v;
     char* vp;
 
+    //
+    //	First select the font drawing procedure.
+    //
 #ifdef USE_OPENGL
     VideoDrawChar=VideoDrawCharOpenGL;
 #else

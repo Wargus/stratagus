@@ -653,6 +653,7 @@ local void DrawCursor(const CursorType* type,int x,int y,int frame)
     int spritex;
     int spritey;
 
+    DebugCheck(!type);
     //
     //	Save cursor position and size, for faster cursor redraw.
     //

@@ -431,6 +431,8 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("clicks-to-explode")) ) {
 	    type->ClicksToExplode=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("sniper")) ) {
+	    type->Sniper=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("permanent-cloak")) ) {
 	    type->PermanentCloak=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("detect-cloak")) ) {
