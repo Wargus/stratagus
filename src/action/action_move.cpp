@@ -75,6 +75,8 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     int state;
     int d;
     int i;
+    int x;
+    int y;
 
     // FIXME: state 0?, should be wrong, should be Reset.
     // FIXME: Reset flag is cleared by HandleUnitAction.
@@ -116,27 +118,27 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags&=~i;
 
 	UnitCacheRemove(unit);
-	unit->X+=xd;
-	unit->Y+=yd;
+	x=unit->X+=xd;
+	y=unit->Y+=yd;
 	UnitCacheInsert(unit);
 
-	TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=i;
+	TheMap.Fields[x+y*TheMap.Width].Flags|=i;
 
 	MustRedraw|=RedrawMinimap;
 	//
 	//	Update visible area.
 	//
+	x+=unit->Type->TileWidth/2;
+	y+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
-	MapMarkNewSight(unit->Player
-		,unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
+	MapMarkNewSight(unit->Player,x,y,unit->Stats->SightRange,xd,yd);
 #else
 	if( unit->Player==ThisPlayer ) {
-	    MapMarkNewSight(unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
+	    MapMarkNewSight(x,y,unit->Stats->SightRange,xd,yd);
 	}
 #endif
 	if( unit->Type->CanSeeSubmarine ) {
-	    MarkSubmarineSeen(unit->Player,unit->X,unit->Y,
-		    unit->Stats->SightRange);
+	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
 
 	unit->IX=-xd*TileSizeX;

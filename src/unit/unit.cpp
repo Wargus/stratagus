@@ -391,6 +391,8 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	}
     }
 
+    x+=unit->Type->TileWidth/2;
+    y+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
     //
     //	Update fog of war.
@@ -405,7 +407,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
     }
 #endif
     if( type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
     }
 
     unit->Removed=0;
@@ -1595,6 +1597,8 @@ found:
 
     unit->Removed=0;
 
+    x+=unit->Type->TileWidth/2;
+    y+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
     //
     //	Update fog of war.
@@ -1609,7 +1613,7 @@ found:
     }
 #endif
     if( unit->Type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
     }
 
     MustRedraw|=RedrawMinimap;
@@ -1710,6 +1714,9 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    unit->Removed=0;
 	    UnitCacheInsert(unit);
 
+	    // {FIXME: Should make a general function for this
+	    bestx+=unit->Type->TileWidth/2;
+	    besty+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
 	    //
 	    //	Update fog of war.
@@ -1724,9 +1731,10 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    }
 #endif
 	    if( unit->Type->CanSeeSubmarine ) {
-		MarkSubmarineSeen(unit->Player,unit->X,unit->Y,
+		MarkSubmarineSeen(unit->Player,bestx,besty,
 			unit->Stats->SightRange);
 	    }
+	    // }FIXME: Should make a general function for this
 
 	    MustRedraw|=RedrawMinimap;
             CheckUnitToBeDrawn(unit);

@@ -411,10 +411,11 @@ global void MapUpdateVisible(void)
     units=ThisPlayer->Units;
     for( i=0; i<nunits; i++ ) {
 	unit=units[i];
+	x=unit->X+unit->Type->TileWidth/2;
+	y=unit->Y+unit->Type->TileHeight/2;
 	if( unit->Removed ) {
 	    if( unit->Revealer ) {
-		MapMarkSight(unit->X+unit->Type->TileWidth/2
-		    ,unit->Y+unit->Type->TileHeight/2,10);
+		MapMarkSight(x,y,10);
 		continue;
 	    }
 	    //
@@ -441,18 +442,12 @@ global void MapUpdateVisible(void)
 	    }
 	}
 #ifdef NEW_FOW
-	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
-		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange*(unit->Revealer == 0)
-		                    + 12*(unit->Revealer != 0));
+	MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
 #else
-	MapMarkSight(unit->X+unit->Type->TileWidth/2
-		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange);
+	MapMarkSight(x,y,unit->Stats->SightRange);
 #endif
 	if( unit->Type->CanSeeSubmarine ) {
-	    MarkSubmarineSeen(unit->Player,unit->X,unit->Y,
-		    unit->Stats->SightRange);
+	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
     }
 }
