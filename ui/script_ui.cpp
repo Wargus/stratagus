@@ -495,7 +495,7 @@ local int CclSetVideoResolution(lua_State* l)
 **	@return			Old fullscreen mode
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetVideoFullscreen(SCM fullscreen)
+local SCM CclSetVideoFullScreen(SCM fullscreen)
 {
     SCM old;
 
@@ -506,7 +506,7 @@ local SCM CclSetVideoFullscreen(SCM fullscreen)
     return old;
 }
 #elif defined(USE_LUA)
-local int CclSetVideoFullscreen(lua_State* l)
+local int CclSetVideoFullScreen(lua_State* l)
 {
     int old;
 
@@ -7240,7 +7240,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-saturation!", CclSetSaturation);
 
     gh_new_procedure2_0("set-video-resolution!", CclSetVideoResolution);
-    gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullscreen);
+    gh_new_procedure1_0("set-video-fullscreen!", CclSetVideoFullScreen);
 
     gh_new_procedureN("set-title-screens!", CclSetTitleScreens);
     gh_new_procedure1_0("set-menu-background!", CclSetMenuBackground);
@@ -7320,7 +7320,7 @@ global void UserInterfaceCclRegister(void)
     lua_register(Lua, "SetSaturation", CclSetSaturation);
 
     lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
-    lua_register(Lua, "SetVideoFullscreen", CclSetVideoFullscreen);
+    lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
 
     lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
     lua_register(Lua, "SetMenuBackground", CclSetMenuBackground);
