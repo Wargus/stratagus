@@ -21,33 +21,54 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include "player.h"
+
+/*----------------------------------------------------------------------------
 --	Definitions
 ----------------------------------------------------------------------------*/
 
-    /// cursor type typedef
+/**
+**	Cursor type typedef
+*/
 typedef struct _cursor_type_ CursorType;
 
-    /// private type which specifies current cursor type
+/**
+**	private type which specifies current cursor type
+*/
 struct _cursor_type_ {
-	/// resource filename one for each race
-    const char*	File[PlayerMaxRaces];
+#ifdef NEW_VIDEO
+    const char*	File[PlayerMaxRaces];	/// resource filename one for each race
 
 // FIXME: this must be extra for each file (different sizes for the races)
 // FIXME: or must define that each image has the same size
-	/// hot point x
-    int		HotX;
-	/// hot point y
-    int		HotY;
-	/// width of cursor
-    int		Width;
-	/// height of cursor
-    int		Height;
+    int		HotX;			/// hot point x
+    int		HotY;			/// hot point y
+    int		Width;			/// width of cursor
+    int		Height;			/// height of cursor
 
-	/// sprite image of cursor : FILLED
-    RleSprite*	RleSprite;
+// --- FILLED UP ---
+
+    Graphic*	Sprite;			/// cursor sprite image
+#else
+    const char*	File[PlayerMaxRaces];	/// resource filename one for each race
+
+// FIXME: this must be extra for each file (different sizes for the races)
+// FIXME: or must define that each image has the same size
+    int		HotX;			/// hot point x
+    int		HotY;			/// hot point y
+    int		Width;			/// width of cursor
+    int		Height;			/// height of cursor
+
+// --- FILLED UP ---
+
+    RleSprite*	RleSprite;		/// cursor sprite image
+#endif
 };
 
-    /// cursor type (enumerated)
+    /// cursor type (enumerated) FIXME: should remove the enumeration
 enum CursorType_e {
     CursorTypePoint = 0,
     CursorTypeGlass,
@@ -71,23 +92,24 @@ enum CursorType_e {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-    /// cursor types description
-extern CursorType Cursors[CursorMax];
+extern CursorType Cursors[CursorMax];	/// cursor types description
 
-extern int OldCursorX;			// last cursor data
-extern int OldCursorY;
-extern int OldCursorW;
-extern int OldCursorH;
+extern enum CursorState_e CursorState;	/// cursor state
+extern int CursorAction;		/// action for selection
+extern UnitType* CursorBuilding;	/// building cursor
 
-extern int CursorAction;		// action for selection
-extern UnitType* CursorBuilding;	// building cursor
+extern CursorType* GameCursor;		/// cursor type
+extern int CursorX;			/// cursor position on screen X
+extern int CursorY;			/// cursor position on screen Y
+extern int CursorStartX;		/// rectangle started on screen X
+extern int CursorStartY;		/// rectangle started on screen Y
 
-    /// current cursor type (shape)
-extern CursorType* GameCursor;
-extern int CursorX;			// cursor position
-extern int CursorY;
-extern int CursorStartX;		// rectangle started
-extern int CursorStartY;
+extern int OldCursorX;			/// saved cursor position on screen X
+extern int OldCursorY;			/// saved cursor position on screen Y
+extern int OldCursorW;			/// saved cursor width in pixel
+extern int OldCursorH;			/// saved cursor height in pixel
+extern int OldCursorSize;		/// size of saved cursor image
+extern void* OldCursorImage;		/// background saved behind cursor	
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -112,6 +134,9 @@ extern void DrawAnyCursor(void);
 
     /// hide any cursor 
 extern int HideAnyCursor(void);
+
+    /// initialize the cursor module
+extern void InitCursor(void);
 
 //@}
 

@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name video.h	-	The video headerfile. */
+/**@name new_video.h	-	The video headerfile. */
 //
 //	(c) Copyright 1999,2000 by Lutz Sammer
 //
@@ -30,12 +30,22 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-#if 0
-Note:	This new graphic object should generalize all the different objects
-	currently used in ALE Clone, Graphic Image, Sprite, RLESprite.
-	Also should generalize the handling of different hardwares.
-	(8bit,16bit,...)
-#endif
+typedef unsigned char VMemType8;	///  8 bpp modes pointer
+typedef unsigned short VMemType16;	/// 16 bpp modes pointer
+typedef struct { char a,b,c;} VMemType24;/// 24 bpp modes pointer
+typedef unsigned long VMemType32;	/// 32 bpp modes pointer
+
+/**
+**	General video mode pointer.
+**
+**	@see VMemType8 @see VMemType16 @see VMemType24 @see VMemType32
+*/
+typedef union __vmem_type__ {
+    VMemType8	d8;			///  8 bpp access
+    VMemType16	d16;			/// 16 bpp access
+    VMemType24	d24;			/// 24 bpp access
+    VMemType32	d32;			/// 32 bpp access
+} VMemType;
 
 // FIXME: not quite correct for new multiple palette version
     /// System-Wide used colors.
@@ -65,9 +75,9 @@ typedef struct _palette_ Palette;	/// palette typedef
 
 /// Palette structure.
 struct _palette_ {
-    unsigned char r;			/// RED COMPONENT
-    unsigned char g;			/// GREEN COMPONENT
-    unsigned char b;			/// BLUE COMPONENT
+    unsigned char r;			/// red component
+    unsigned char g;			/// green component
+    unsigned char b;			/// blue component
 };
 
 typedef unsigned char GraphicData;	/// generic graphic data type
@@ -89,7 +99,7 @@ typedef struct _graphic_type_ {
 	**	@param x	x coordinate on the screen
 	**	@param y	y coordinate on the screen
 	*/
-    void (*Draw)	(Graphic* o,unsigned f,int x,int y);
+    void (*Draw)	(const Graphic* o,unsigned f,int x,int y);
 	/**
 	**	Draw the object unclipped and flipped in X direction.
 	**
@@ -98,7 +108,7 @@ typedef struct _graphic_type_ {
 	**	@param x	x coordinate on the screen
 	**	@param y	y coordinate on the screen
 	*/
-    void (*DrawX)	(Graphic* o,unsigned f,int x,int y);
+    void (*DrawX)	(const Graphic* o,unsigned f,int x,int y);
 	/**
 	**	Draw the object clipped to the current clipping.
 	**
@@ -107,7 +117,7 @@ typedef struct _graphic_type_ {
 	**	@param x	x coordinate on the screen
 	**	@param y	y coordinate on the screen
 	*/
-    void (*DrawClip)	(Graphic* o,unsigned f,int x,int y);
+    void (*DrawClip)	(const Graphic* o,unsigned f,int x,int y);
 	/**
 	**	Draw the object clipped and flipped in X direction.
 	**
@@ -116,9 +126,9 @@ typedef struct _graphic_type_ {
 	**	@param x	x coordinate on the screen
 	**	@param y	y coordinate on the screen
 	*/
-    void (*DrawClipX)	(Graphic* o,unsigned f,int x,int y);
+    void (*DrawClipX)	(const Graphic* o,unsigned f,int x,int y);
 	/**
-	**	Draw part of the object.
+	**	Draw part of the object unclipped.
 	**
 	**	@param o	pointer to object
 	**	@param gx	X offset into object
@@ -128,14 +138,61 @@ typedef struct _graphic_type_ {
 	**	@param x	x coordinate on the screen
 	**	@param y	y coordinate on the screen
 	*/
-    void (*DrawSub)	(Graphic* o,int gx,int gy
+    void (*DrawSub)	(const Graphic* o,int gx,int gy
 			,unsigned w,unsigned h,int x,int y);
-    void (*DrawSubX)	(Graphic* o,int gx,int gy
+	/**
+	**	Draw part of the object unclipped and flipped in X direction.
+	**
+	**	@param o	pointer to object
+	**	@param gx	X offset into object
+	**	@param gy	Y offset into object
+	**	@param w	width to display
+	**	@param h	height to display
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	*/
+    void (*DrawSubX)	(const Graphic* o,int gx,int gy
 			,unsigned w,unsigned h,int x,int y);
-    void (*DrawSubClip)	(Graphic* o,int gx,int gy
+	/**
+	**	Draw part of the object clipped to the current clipping.
+	**
+	**	@param o	pointer to object
+	**	@param gx	X offset into object
+	**	@param gy	Y offset into object
+	**	@param w	width to display
+	**	@param h	height to display
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	*/
+    void (*DrawSubClip)	(const Graphic* o,int gx,int gy
 			,unsigned w,unsigned h,int x,int y);
-    void (*DrawSubClipX)(Graphic* o,int gx,int gy
+	/**
+	**	Draw part of the object clipped and flipped in X direction.
+	**
+	**	@param o	pointer to object
+	**	@param gx	X offset into object
+	**	@param gy	Y offset into object
+	**	@param w	width to display
+	**	@param h	height to display
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	*/
+    void (*DrawSubClipX)(const Graphic* o,int gx,int gy
 			,unsigned w,unsigned h,int x,int y);
+
+	/**
+	**	Draw the object unclipped and zoomed.
+	**
+	**	@param o	pointer to object
+	**	@param f	number of frame (object index)
+	**	@param x	x coordinate on the screen
+	**	@param y	y coordinate on the screen
+	**	@param z	Zoom factor X 10 (10 = 1:1).
+	*/
+    void (*DrawZoom)	(const Graphic* o,unsigned f,int x,int y,int z);
+
+    // FIXME: add zooming functions.
+
 	/*
 	**	Free the object.
 	**
@@ -148,13 +205,18 @@ typedef struct _graphic_type_ {
 **	General graphic object
 */
 struct _graphic_ {
-  GraphicType*	        Type;		/// Object type dependend
-  Palette*              Palette;        /// Loaded Palette
-  GraphicData*          Pixels;		/// Pointer to local or global palette
-  unsigned		Width;		/// Width of the object
-  unsigned		Height;		/// Height of the object
-  unsigned	        NumFrames;	/// Number of frames
-  void*		        Frames;		/// Frames of the object
+	// cache line 0
+    GraphicType*	Type;		/// Object type dependend
+    void*		Frames;		/// Frames of the object
+    GraphicData*	Pixels;		/// Pointer to local or global palette
+    unsigned		Width;		/// Width of the object
+	// cache line 1
+    unsigned		Height;		/// Height of the object
+    unsigned		NumFrames;	/// Number of frames
+    unsigned		Size;		/// Size of frames
+    Palette*		Palette;        /// Loaded Palette
+	// cache line 2
+    //void*		Offsets;	/// Offsets into frames
 };
 
 /*----------------------------------------------------------------------------
@@ -164,7 +226,7 @@ struct _graphic_ {
     /**
     **	Wanted videomode, fullscreen or windowed.
     */
-extern int VideoFullScreen;
+extern char VideoFullScreen;
 
     /**
     **	Draw pixel unclipped.
@@ -232,6 +294,13 @@ extern void (*VideoDrawHLineClip)(SysColors color,int x,int y
 --	Macros
 ----------------------------------------------------------------------------*/
 
+    /// Get the width of a single frame of a graphic object
+#define VideoGraphicWidth(o)	((o)->Width)
+    /// Get the height of a single frame of a graphic object
+#define VideoGraphicHeight(o)	((o)->Height)
+    /// Get the number of frames of a graphic object
+#define VideoGraphicFrames(o)	((o)->NumFrames)
+
     ///	Draw a graphic object unclipped.
 #define VideoDraw(o,f,x,y)	((o)->Type->Draw)((o),(f),(x),(y))
     ///	Draw a graphic object unclipped and flipped in X direction.
@@ -254,9 +323,35 @@ extern void (*VideoDrawHLineClip)(SysColors color,int x,int y
 #define VideoDrawSubClipX(o,ix,iy,w,h,x,y) \
 	((o)->Type->DrawSubClipX)((o),(ix),(iy),(w),(h),(x),(y))
 
-    /// 	Free a graphic object.
+    ///	Draw a graphic object zoomed unclipped.
+#define VideoDrawZoom(o,f,x,y,z) \
+	((o)->Type->DrawZoom)((o),(f),(x),(y),(z))
+    ///	Draw a graphic object zoomed unclipped flipped in X direction.
+#define VideoDrawZoomX(o,f,x,y,z) \
+	((o)->Type->DrawZoomX)((o),(f),(x),(y),(z))
+    ///	Draw a graphic object zoomed clipped to the current clipping.
+#define VideoDrawZoomClip(o,f,x,y,z) \
+	((o)->Type->DrawZoomClip)((o),(f),(x),(y),(z))
+    ///	Draw a graphic object zoomed clipped and flipped in X direction.
+#define VideoDrawZoomClipX(o,f,x,y,z) \
+	((o)->Type->DrawZoomClipX)((o),(f),(x),(y),(z))
+
+    ///	Draw a part of graphic object zoomed unclipped.
+#define VideoDrawZoomSub(o,ix,iy,w,h,x,y,z) \
+	((o)->Type->DrawZoomSub)((o),(ix),(iy),(w),(h),(x),(y),(z))
+    ///	Draw a part of graphic object zoomed unclipped flipped in X direction.
+#define VideoDrawZoomSubX(o,ix,iy,w,h,x,y,z) \
+	((o)->Type->DrawZoomSubX)((o),(ix),(iy),(w),(h),(x),(y),(z))
+    ///	Draw a part of graphic object zoomed clipped to the current clipping.
+#define VideoDrawZoomSubClip(o,ix,iy,w,h,x,y,z) \
+	((o)->Type->DrawZoomSubClip)((o),(ix),(iy),(w),(h),(x),(y),(z))
+    ///	Draw a part of graphic object zoomed clipped flipped in X direction.
+#define VideoDrawZoomSubClipX(o,ix,iy,w,h,x,y,z) \
+	((o)->Type->DrawZoomSubClipX)((o),(ix),(iy),(w),(h),(x),(y),(z))
+
+    ///	Free a graphic object.
 #define VideoFree(o)		((o)->Type->Free)((o))
-    /// 	Save (NULL) free a graphic object.
+    ///	Save (NULL) free a graphic object.
 #define VideoSaveFree(o) \
 	do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
 
@@ -264,7 +359,8 @@ extern void (*VideoDrawHLineClip)(SysColors color,int x,int y
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitVideo(void);		/// initialize the video part
+    /// initialize the video part
+extern void InitVideo(void);
 
     ///	Load graphic from PNG file.
 extern Graphic* LoadGraphicPNG(const char* name);
@@ -273,13 +369,19 @@ extern Graphic* LoadGraphicPNG(const char* name);
 extern Graphic* NewGraphic(unsigned d,unsigned w,unsigned h);
 
     /// Make graphic
-extern Graphic* MakeGraphic(unsigned d,unsigned w,unsigned h,void* p);
+extern Graphic* MakeGraphic(unsigned,unsigned,unsigned,void*,unsigned);
 
     /// Load graphic
 extern Graphic* LoadGraphic(const char* file);
 
+    /// Load sprite
+extern Graphic* LoadSprite(const char* file,unsigned w,unsigned h);
+
     /// Init graphic
 extern void InitGraphic(void);
+
+    /// Init sprite
+extern void InitSprite(void);
 
     /// Init line draw
 extern void InitLineDraw(void);
@@ -291,6 +393,17 @@ extern void VideoDrawRectangle(SysColors color,int x,int y
     ///	Fill rectangle.
 extern void VideoFillRectangle(SysColors color,int x,int y
 	,unsigned w,unsigned h);
+
+    /**
+    **	Set clipping for nearly all vector primitives. Functions which support
+    **	clipping will be marked Clip. Set the system-wide clipping rectangle.
+    **
+    **	@param left	Left x coordinate
+    **	@param top	Top y coordinate
+    **	@param right	Right x coordinate
+    **	@param bottom	Bottom y coordinate
+    */
+extern void SetClipping(int left,int top,int right,int bottom);
 
     /**
     **	Load a picture and display it on the screen (full screen),
