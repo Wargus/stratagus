@@ -1239,6 +1239,7 @@ void CleanSpells(void)
 
 		if (spell->Condition) {
 			free(spell->Condition->BoolFlag);
+			free(spell->Condition->Variable);
 			free(spell->Condition);
 		}
 		//
@@ -1247,6 +1248,7 @@ void CleanSpells(void)
 		if (spell->AutoCast) {
 			if (spell->AutoCast->Condition) {
 				free(spell->AutoCast->Condition->BoolFlag);
+				free(spell->AutoCast->Condition->Variable);
 				free(spell->AutoCast->Condition);
 			}
 			free(spell->AutoCast);
@@ -1254,6 +1256,7 @@ void CleanSpells(void)
 		if (spell->AICast) {
 			if (spell->AICast->Condition) {
 				free(spell->AICast->Condition->BoolFlag);
+				free(spell->AICast->Condition->Variable);
 				free(spell->AICast->Condition);
 			}
 			free(spell->AICast);

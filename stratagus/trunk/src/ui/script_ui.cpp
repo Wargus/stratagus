@@ -2048,6 +2048,7 @@ static void ParseButtonStyleProperties(lua_State* l, ButtonStyleProperties* p)
 
 	if (file) {
 		p->Sprite = NewGraphic(file, w, h);
+		free(file);
 	}
 }
 
@@ -3948,6 +3949,9 @@ static int CclSetGroupKeys(lua_State* l)
 {
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
+	}
+	if (UiGroupKeys) {
+		free(UiGroupKeys);
 	}
 	UiGroupKeys = strdup(LuaToString(l, 1));
 	return 0;

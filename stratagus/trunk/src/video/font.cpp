@@ -919,6 +919,7 @@ void CleanFonts(void)
 	fcmp = FontColorMappings;
 	while (fcmp) {
 		fcmpn = fcmp->Next;
+		free(fcmp->ColorName);
 		free(fcmp);
 		fcmp = fcmpn;
 	}

@@ -855,9 +855,12 @@ void CleanDecorations(void)
 
 	for (i = 0; i < DecoSprite.SpriteNumber; i++) {
 		deco = &DecoSprite.SpriteArray[i];
+		free(DecoSprite.Name[i]);
 		free(deco->File);
 		VideoSafeFree(deco->Sprite);
 	}
+
+	free(DecoSprite.SpriteArray);
 	free(DecoSprite.Name);
 	memset(&DecoSprite, 0, sizeof(DecoSprite));
 
