@@ -37,7 +37,7 @@ include $(TOPDIR)/Rules.make
 
 MODULE	= ui
 OBJS	= mouse.$(OE) button_table.$(OE) botpanel.$(OE) mainscr.$(OE) \
-	  icons.$(OE) ui.$(OE) ccl_ui.$(OE) image.$(OE) menus.$(OE) \
-	  console.$(OE) interface.$(OE)
+	  icons.$(OE) ui.$(OE) ccl_ui.$(OE) menus.$(OE) console.$(OE) \
+	  interface.$(OE)
 
 include $(TOPDIR)/Common.mk
