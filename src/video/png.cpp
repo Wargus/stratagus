@@ -74,11 +74,11 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 **  Load a png graphic file.
 **  Modified function from SDL_Image
 **
-**  @param name  png filename to load.
+**  @param g  graphic to load.
 **
-**  @return      0 for success, -1 for error.
+**  @return   0 for success, -1 for error.
 */
-int LoadGraphicPNG(Graphic* graphic)
+int LoadGraphicPNG(Graphic* g)
 {
 	CLFile* fp;
 	SDL_Surface* volatile surface;
@@ -103,11 +103,11 @@ int LoadGraphicPNG(Graphic* graphic)
 
 	ckey = -1;
 
-	if (!graphic->File) {
+	if (!g->File) {
 		return -1;
 	}
 
-	LibraryFileName(graphic->File, name);
+	LibraryFileName(g->File, name);
 	if (!name) {
 		return -1;
 	}
@@ -286,9 +286,9 @@ int LoadGraphicPNG(Graphic* graphic)
 		}
 	}
 
-	graphic->Surface = surface;
-	graphic->GraphicWidth = surface->w;
-	graphic->GraphicHeight = surface->h;
+	g->Surface = surface;
+	g->GraphicWidth = surface->w;
+	g->GraphicHeight = surface->h;
 
 done:   /* Clean up and return */
 	png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : (png_infopp)0,
