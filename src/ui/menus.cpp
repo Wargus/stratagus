@@ -1015,7 +1015,7 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_TEXT, 16, 40, 0, SmallFont, NULL, NULL,
 	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_VSLIDER, 256 - 18 - 16, 40, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 11*18, NULL, -1, 0, 0, 0, NULL} } },
+	{ vslider:{ 0, 18, 10*18, NULL, -1, 0, 0, 0, NULL} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
@@ -1505,6 +1505,7 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 	PushClipping();
 	SetClipping(0,0,VideoWidth-1,y + h - 20);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h/2);
 	PopClipping();
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
@@ -1512,6 +1513,7 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 	PushClipping();
 	SetClipping(0,0,VideoWidth-1,y + h - 20);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h/2);
 	PopClipping();
 	if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
@@ -1558,6 +1560,7 @@ local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
 	PushClipping();
 	SetClipping(0,0,x + w - 20,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w/2, y);
 	PopClipping();
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
@@ -1565,6 +1568,7 @@ local void DrawHSlider(Menuitem *mi, unsigned mx, unsigned my)
 	PushClipping();
 	SetClipping(0,0,x + w - 20,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w/2, y);
 	PopClipping();
 	if (mi->d.hslider.cflags&MI_CFLAGS_LEFT) {
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
