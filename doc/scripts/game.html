@@ -1,0 +1,1375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Icon</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Game</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="config.html">PREV</A> 
+<A HREF="research.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#add-keystroke-help">add-keystroke-help</A>
+<A HREF="#add-message">add-message</A>
+<A HREF="#add-tip">add-tip</A>
+<A HREF="#briefing">briefing</A>
+<A HREF="#create-unit">create-unit</A>
+<A HREF="#credits">credits</A>
+<A HREF="#define-campaign">define-campaign</A>
+<A HREF="#define-construction">define-construction</A>
+<A HREF="#define-construction-wc-names">define-construction-wc-names</A>
+<A HREF="#define-editor-unittypes">define-editor-unittypes</A>
+<A HREF="#define-map">define-map</A>
+<A HREF="#define-missile-type">define-missile-type</A>
+<A HREF="#define-missiletype-wc-names">define-missiletype-wc-names</A>
+<A HREF="#define-race-wc-names">define-race-wc-names</A>
+<A HREF="#diplomacy">diplomacy</A>
+<A HREF="#freecraft-map">freecraft-map</A>
+<A HREF="#game-cycle">game-cycle</A>
+<A HREF="#get-freecraft-home-path">get-freecraft-home-path</A>
+<A HREF="#get-freecraft-library-path">get-freecraft-library-path</A>
+<A HREF="#get-player-resources">get-player-resources</A>
+<A HREF="#get-this-player">get-this-player</A>
+<A HREF="#get-unit-unholy-armor">get-unit-unholy-armor</A>
+<A HREF="#group">group</A>
+<A HREF="#library-path">library-path</A>
+<A HREF="#load-pud">load-pud</A>
+<A HREF="#log">log</A>
+<A HREF="#make-unit">make-unit</A>
+<A HREF="#missile">missile</A>
+<A HREF="#new-colors">new-colors</A>
+<A HREF="#pf-show-groupids!">pf-show-groupids!</A>
+<A HREF="#pf-show-regids!">pf-show-regids!</A>
+<A HREF="#place-unit">place-unit</A>
+<A HREF="#player">player</A>
+<A HREF="#replay-log">replay-log</A>
+<A HREF="#reset-keystroke-help">reset-keystroke-help</A>
+<A HREF="#selection">selection</A>
+<A HREF="#set-diplomacy!">set-diplomacy!</A>
+<A HREF="#set-group-id!">set-group-id!</A>
+<A HREF="#set-player-resources!">set-player-resources!</A>
+<A HREF="#set-this-player!">set-this-player!</A>
+<A HREF="#set-unit-unholy-armor!">set-unit-unholy-armor!</A>
+<A HREF="#slot-usage">slot-usage</A>
+<A HREF="#unit">unit</A>
+<A HREF="#units">units</A>
+<HR>
+<H2>Intro - Introduction to game functions and variables</H2>
+
+Everything around the game.
+<H2>Functions</H2>
+<A NAME="add-keystroke-help"></A>
+<H3>add-keystroke-help</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(add-keystroke-help)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-keystroke-help)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="add-message"></A>
+<H3>add-message</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>()</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-message)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="add-tip"></A>
+<H3>add-tip</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(add-tip)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-tip)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="briefing"></A>
+<H3>briefing</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(briefing)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (briefing)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="create-unit"></A>
+<H3>create-unit</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(create-unit)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (create-unit)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="credits"></A>
+<H3>credits</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(credits)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (credits)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-campaign"></A>
+<H3>define-campaign</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-campaign)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-campaign)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-construction"></A>
+<H3>define-construction</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-construction)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-construction)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-construction-wc-names"></A>
+<H3>define-construction-wc-names</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-construction-wc-names)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-construction-wc-names)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-editor-unittypes"></A>
+<H3>define-editor-unittypes</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-editor-unittypes)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-editor-unittypes)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-map"></A>
+<H3>define-map</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-map)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-map)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-missile-type"></A>
+<H3>define-missile-type</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-missile-type)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-missile-type)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-missiletype-wc-names"></A>
+<H3>define-missiletype-wc-names</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-missiletype-wc-names)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-missiletype-wc-names)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-race-wc-names"></A>
+<H3>define-race-wc-names</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-race-wc-names)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-race-wc-names)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="diplomacy"></A>
+<H3>diplomacy</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(diplomacy)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (diplomacy)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="freecraft-map"></A>
+<H3>freecraft-map</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(freecraft-map)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (freecraft-map)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="game-cycle"></A>
+<H3>game-cycle</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(game-cycle)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (game-cycle)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-freecraft-home-path"></A>
+<H3>get-freecraft-home-path</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(get-freecraft-home-path)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-freecraft-home-path)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-freecraft-library-path"></A>
+<H3>get-freecraft-library-path</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(get-freecraft-library-path)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-freecraft-library-path)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-player-resources"></A>
+<H3>get-player-resources</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(get-player-resources)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-player-resources)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-this-player"></A>
+<H3>get-this-player</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(get-this-player)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-this-player)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="get-unit-unholy-armor"></A>
+<H3>get-unit-unholy-armor</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(get-unit-unholy-armor)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (get-unit-unholy-armor)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="group"></A>
+<H3>group</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(group)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (group)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="library-path"></A>
+<H3>library-path</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(library-path)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (library-path)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="load-pud"></A>
+<H3>load-pud</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(load-pud)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (load-pud)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="log"></A>
+<H3>log</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(log)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (log)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="make-unit"></A>
+<H3>make-unit</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(make-unit)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (make-unit)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="missile"></A>
+<H3>missile</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(missile)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (missile)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="new-colors"></A>
+<H3>new-colors</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(new-colors)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (new-colors)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="pf-show-groupids!"></A>
+<H3>pf-show-groupids!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(pf-show-groupids!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (pf-show-groupids!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="pf-show-regids!"></A>
+<H3>pf-show-regids!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(pf-show-regids!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (pf-show-regids!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="place-unit"></A>
+<H3>place-unit</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(place-unit)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (place-unit)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="player"></A>
+<H3>player</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(player)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (player)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="replay-log"></A>
+<H3>replay-log</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(replay-log)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (replay-log)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="reset-keystroke-help"></A>
+<H3>reset-keystroke-help</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(reset-keystroke-help)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (reset-keystroke-help)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="selection"></A>
+<H3>selection</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(selection)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (selection)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-diplomacy!"></A>
+<H3>set-diplomacy!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-diplomacy!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-diplomacy!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-group-id!"></A>
+<H3>set-group-id!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-group-id!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-group-id!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-player-resources!"></A>
+<H3>set-player-resources!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-player-resources!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-player-resources!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-this-player!"></A>
+<H3>set-this-player!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-this-player!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-this-player!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-unit-unholy-armor!"></A>
+<H3>set-unit-unholy-armor!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-unit-unholy-armor!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-unit-unholy-armor!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="slot-usage"></A>
+<H3>slot-usage</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(slot-usage)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (slot-usage)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="unit"></A>
+<H3>unit</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(unit)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (unit)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="units"></A>
+<H3>units</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(units)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (units)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>

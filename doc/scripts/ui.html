@@ -1,0 +1,386 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; either version 2 of the License, or
+----    (at your option) any later version.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: User Interface (UI)</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: User Interface (UI)</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 2002 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="triggers.html">PREV</A> 
+<A HREF="unittype.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#define-button">define-button</A>
+<A HREF="#define-cursor">define-cursor</A>
+<A HREF="#define-font">define-font</A>
+<A HREF="#define-font-colors">define-font-colors</A>
+<A HREF="#define-menu">define-menu</A>
+<A HREF="#define-menu-item">define-menu-item</A>
+<A HREF="#define-new-ui">define-new-ui</A>
+<A HREF="#define-ui">define-ui</A>
+<A HREF="#display-picture">display-picture</A>
+<A HREF="#process-menu">process-menu</A>
+<A HREF="#set-game-cursor!">set-game-cursor!</A>
+<HR>
+<H2>Intro - Introduction to UI functions and variables</H2>
+
+Everything around the UI.
+<H2>Functions</H2>
+<A NAME="define-button"></A>
+<H3>define-button</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-button)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-button)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-cursor"></A>
+<H3>define-cursor</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-cursor)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-cursor)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-font"></A>
+<H3>define-font</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-font)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-font)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-font-colors"></A>
+<H3>define-font-colors</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-font-colors)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-font-colors)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-menu"></A>
+<H3>define-menu</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-menu)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-menu)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-menu-item"></A>
+<H3>define-menu-item</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-menu-item)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-menu-item)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-new-ui"></A>
+<H3>define-new-ui</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-new-ui)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-new-ui)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="define-ui"></A>
+<H3>define-ui</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(define-ui)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-ui)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="display-picture"></A>
+<H3>display-picture</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(display-picture)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (display-picture)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="process-menu"></A>
+<H3>process-menu</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(process-menu)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (process-menu)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-game-cursor!"></A>
+<H3>set-game-cursor!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-game-cursor!)</CODE>
+
+<DL>
+<DT></DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-game-cursor!)
+</PRE>
+
+<P>.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002 by <A HREF="mailto:aleclone@FreeCraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>
+
