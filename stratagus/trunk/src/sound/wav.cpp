@@ -221,7 +221,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	CLclose(f);
 	ExitFatal(-1);
     }
-    if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2) {
+    if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.Sample != 4) {
 	printf("Unsupported sample size %d\n", wavfmt.SampleSize);
 	CLclose(f);
 	ExitFatal(-1);
@@ -236,7 +236,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     //
     //  Read sample
     //
-    sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE);
+    sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE*wavfmt.Channels);
     sample->Channels = wavfmt.Channels;
     sample->SampleSize = wavfmt.SampleSize * 8;
     sample->Frequency = wavfmt.Frequency;
