@@ -723,12 +723,8 @@ global Graphic* LoadGraphic(const char* name)
     char buf[1024];
 
     if (!(graphic = LoadGraphicPNG(LibraryFileName(name, buf)))) {
-	/*
 	fprintf(stderr, "Can't load the graphic `%s'\n", name);
 	ExitFatal(-1);
-	*/
-	name = NULL; // force crash
-	fprintf(stderr, "Can't load the graphic `%s'\n", name);
     }
 
     graphic->Pixels = VideoCreateSharedPalette(graphic->Palette);
