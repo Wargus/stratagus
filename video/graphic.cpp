@@ -512,7 +512,7 @@ global void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
 **  @todo FIXME: Higher quality resizing.
 **        FIXME: Works only with 8bit indexed graphic objects.
 */
-global void ResizeGraphic(Graphic *g, int w, int h)
+global void ResizeGraphic(Graphic* g, int w, int h)
 {
 	int i;
 	int j;
@@ -553,6 +553,7 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 
 	g->Width = w;
 	g->Height = h;
+	free(g->Data);
 	g->Data = data;
 }
 

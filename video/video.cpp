@@ -153,7 +153,6 @@ local Clip* ClipsGarbage;				/// garbage-list of available clips
 
 #ifdef DEBUG
 global unsigned AllocatedGraphicMemory; /// Allocated memory for objects
-global unsigned CompressedGraphicMemory;/// memory for compressed objects
 #endif
 
 	/**
