@@ -1102,7 +1102,9 @@ local SCM CclDefineUpgrade(SCM list)
 	if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
 	    //	Icon
 
-	    free(icon);
+	    if( icon ) {
+		free(icon);
+	    }
 	    icon=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
