@@ -407,7 +407,11 @@ static int CclGetThisPlayer(lua_State* l)
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_pushnumber(l, ThisPlayer - Players);
+	if (ThisPlayer) {
+		lua_pushnumber(l, ThisPlayer - Players);
+	} else {
+		lua_pushnumber(l, 0);
+	}
 	return 1;
 }
 
