@@ -2904,7 +2904,7 @@ global void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	MapMarkUnitSight(unit);
+	MapMarkUnitSight(unit);;
 }
 
 /**
