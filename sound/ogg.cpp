@@ -137,7 +137,7 @@ local int OGG_close(void* user)
 **
 **	@return		    Number of bytes read
 */
-local int OggReadStream(Sample* sample, void* buf, int len)
+local int OggReadStream(Sample* sample, void* buf, unsigned int len)
 {
     OggData* data;
     int i;
@@ -212,7 +212,7 @@ local const SampleType OggStreamSampleType = {
 **
 **	@return		    Number of bytes read
 */
-local int OggRead(Sample* sample, void* buf, int len)
+local int OggRead(Sample* sample, void* buf, unsigned int len)
 {
     int pos;
 
