@@ -671,7 +671,7 @@ void LoadFonts(void)
 			LoadGraphic(Fonts[i].G);
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
-			MakeFontColorTextures(Fonts[i].Graphic, i);
+			MakeFontColorTextures(Fonts[i].G, i);
 #endif
 		}
 	}
