@@ -401,7 +401,7 @@ local Menuitem EndScenarioMenuItems[] = {
 **	Items for the SelectScen Menu
 */
 local unsigned char *ssmtoptions[] = {
-    "All scenarios (cm+pud)",
+    // "All scenarios (cm+pud)",
     "Freecraft scenario (cm)",
     "Foreign scenario (pud)"
     // FIXME: what is about levels in zips?
@@ -452,7 +452,7 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
 	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 3, 0, 0, 0, 0} } },
+	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0, 0} } },
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
 	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
@@ -2867,7 +2867,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 */
 local void JoinNetGameMenu(void)
 {
-    char ServerHostBuf[32];
+    char server_host_buffer[32];
 
     VideoLockScreen();
     StartMenusSetBackground(NULL);
@@ -2875,18 +2875,18 @@ local void JoinNetGameMenu(void)
     Invalidate();
 
     //
-    //	Prepare enter ip/hostname menu
+    //  Prepare enter ip/hostname menu
     //
-    EnterServerIPMenuItems[1].d.input.buffer = ServerHostBuf;
-    if( NetworkArg ) {
-	strcpy(ServerHostBuf,NetworkArg);
+    if (NetworkArg) {
+	strcpy(server_host_buffer, NetworkArg);
     } else {
-	ServerHostBuf[0]='\0';
+	server_host_buffer[0] = '\0';
     }
-    strcat(ServerHostBuf, "~!_");
-    EnterServerIPMenuItems[1].d.input.nch = strlen(ServerHostBuf) - 3;
+    strcat(server_host_buffer, "~!_");
+    EnterServerIPMenuItems[1].d.input.buffer = server_host_buffer;
+    EnterServerIPMenuItems[1].d.input.nch = strlen(server_host_buffer) - 3;
     EnterServerIPMenuItems[1].d.input.maxch = 24;
-    if( EnterServerIPMenuItems[1].d.input.nch ) {
+    if (EnterServerIPMenuItems[1].d.input.nch) {
 	EnterServerIPMenuItems[2].flags &= ~MenuButtonDisabled;
     } else {
 	EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
@@ -2901,10 +2901,9 @@ local void JoinNetGameMenu(void)
     if (EnterServerIPMenuItems[1].d.input.nch == 0) {
 	return;
     }
-
     // Now finally here is the address
-    ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;
-    if (NetworkSetupServerAddress(ServerHostBuf, NetworkServerText) != 0) {
+    server_host_buffer[EnterServerIPMenuItems[1].d.input.nch] = 0;
+    if (NetworkSetupServerAddress(server_host_buffer, NetworkServerText)) {
 	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu(MENU_NET_ERROR, 1);
 	VideoLockScreen();
@@ -2913,6 +2912,10 @@ local void JoinNetGameMenu(void)
 	return;
     }
     NetworkInitClientConnect();
+    if (NetworkArg) {
+	free(NetworkArg);
+    }
+    NetworkArg = strdup(server_host_buffer);
 
     // Here we really go...
     ProcessMenu(MENU_NET_CONNECTING, 1);
@@ -2928,7 +2931,7 @@ local void NetConnectingCancel(void)
     VideoUnlockScreen();
     NetworkExitClientConnect();
     // Trigger TerminateNetConnect() to call us again and end the menu
-    NetLocalState = ccs_unreachable;
+    NetLocalState = ccs_usercanceled;
     EndMenu();
 }
 
@@ -2937,11 +2940,40 @@ local void NetConnectingCancel(void)
 */
 local void TerminateNetConnect(void)
 {
-    if (NetLocalState == ccs_unreachable) {
-	// FIXME: Should show a menu with error code if can't reach server
-	NetConnectingCancel();
-	return;
+    switch (NetLocalState) {
+	case ccs_unreachable:
+	    NetErrorMenuItems[1].d.text.text = "Can't reach server.";
+	    ProcessMenu(MENU_NET_ERROR, 1);
+
+	    NetConnectingCancel();
+	    return;
+	case ccs_nofreeslots:
+	    NetErrorMenuItems[1].d.text.text = "Too much players.";
+	    ProcessMenu(MENU_NET_ERROR, 1);
+
+	    NetConnectingCancel();
+	    return;
+	case ccs_serverquits:
+	    NetErrorMenuItems[1].d.text.text = "Server gone.";
+	    ProcessMenu(MENU_NET_ERROR, 1);
+
+	    NetConnectingCancel();
+	    return;
+	case ccs_incompatibleengine:
+	    NetErrorMenuItems[1].d.text.text = "Incompatible engine version.";
+	    ProcessMenu(MENU_NET_ERROR, 1);
+
+	    NetConnectingCancel();
+	    return;
+	case ccs_incompatiblenetwork:
+	    NetErrorMenuItems[1].d.text.text = "Incompatible network version.";
+	    ProcessMenu(MENU_NET_ERROR, 1);
+
+	case ccs_usercanceled:
+	    NetConnectingCancel();
+	    return;
     }
+
     DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
     NetConnectRunning = 2;
     DestroyCursorBackground();
@@ -3092,10 +3124,13 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     ZZIP_FILE *zzf;
 #endif
 
+#if 0
     if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
 	suf = NULL;
 	p = -1;
-    } else if (ScenSelectMenuItems[6].d.pulldown.curopt == 1) {
+    } else
+#endif
+    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
 	suf = ".cm";
 	p = 0;
     } else {
@@ -3122,21 +3157,19 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
     do {
 	lcp = cp++;
+	cp = strcasestr(cp, suf);
+#if 0
 	if( suf ) {
-	    printf("suf %s\n",pathbuf);
-	    cp = strcasestr(cp, suf);
 	} else if( !suf && (cp = strcasestr(cp, ".cm")) ) {
-	    printf("cm %s\n",pathbuf);
 	    suf = ".cm";
 	    p = 0;
 	} else if( !suf && (cp = strcasestr(cp, ".pud")) ) {
-	    printf("pud %s\n",pathbuf);
 	    suf = ".pud";
 	    p = 1;
 	} else {
-	    printf("none %s\n",pathbuf);
 	    cp=NULL;
 	}
+#endif
     } while (cp != NULL);
     if (lcp >= np) {
 	cp = lcp + strlen(suf);
@@ -3154,6 +3187,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #ifdef USE_ZZIPLIB
 usezzf:
 #endif
+#if 0
 	    if( p==-1 ) {
 		printf("What now ?\n");
 		if (strcasestr(pathbuf, ".pud")) {
@@ -3162,6 +3196,7 @@ usezzf:
 		    p=0;
 		}
 	    }
+#endif
 	    if (p) {
 		if (strcasestr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
@@ -4188,6 +4223,9 @@ local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
     NetworkExitServerConnect();
 }
 
+/**
+**	Cancel button of server multi player menu pressed.
+*/
 local void MultiGameCancel(void)
 {
     MultiGameSetupExit(NULL);
@@ -4257,6 +4295,9 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
+/**
+**	Cancel button of multiplayer client menu pressed.
+*/
 local void MultiClientCancel(void)
 {
     NetworkDetachFromServer();

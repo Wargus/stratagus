@@ -111,7 +111,7 @@ typedef struct _init_message_ {
     union {
 	NetworkHost	Hosts[PlayerMax];	/// Participant information
 	char		MapPath[256];
-	ServerSetup	State;			/// Server Setup State information 
+	ServerSetup	State;			/// Server Setup State information
     } u;
 } InitMessage;
 
@@ -119,25 +119,25 @@ typedef struct _init_message_ {
 **	Network init config message subtypes (menu state machine).
 */
 enum _ic_message_subtype_ {
-    ICMHello,				/// Client Request
-    ICMConfig,				/// Setup message configure clients
+    ICMHello,			/// Client Request
+    ICMConfig,			/// Setup message configure clients
 
-    ICMEngineMismatch,			/// FreeCraft engine version doesn't match
-    ICMProtocolMismatch,		/// Network protocol version doesn't match
-    ICMEngineConfMismatch,		/// Engine configuration isn't identical
-    ICMMapUidMismatch,			/// MAP UID doesn't match
+    ICMEngineMismatch,		/// FreeCraft engine version doesn't match
+    ICMProtocolMismatch,	/// Network protocol version doesn't match
+    ICMEngineConfMismatch,	/// Engine configuration isn't identical
+    ICMMapUidMismatch,		/// MAP UID doesn't match
 
-    ICMGameFull,			/// No player slots available
-    ICMWelcome,				/// Acknowledge for new client connections
+    ICMGameFull,		/// No player slots available
+    ICMWelcome,			/// Acknowledge for new client connections
 
-    ICMWaiting,				/// Client has received Welcome and is waiting for Map/State
-    ICMMap,				/// MapInfo (and Mapinfo Ack)
-    ICMState,				/// StateInfo
-    ICMResync,				/// Ack StateInfo change
+    ICMWaiting,			/// Client has received Welcome and is waiting for Map/State
+    ICMMap,			/// MapInfo (and Mapinfo Ack)
+    ICMState,			/// StateInfo
+    ICMResync,			/// Ack StateInfo change
 
-    ICMServerQuit,			/// Server has quit game
-    ICMGoodBye,				/// Client wants to leave game
-    ICMSeeYou,				/// Client has left game
+    ICMServerQuit,		/// Server has quit game
+    ICMGoodBye,			/// Client wants to leave game
+    ICMSeeYou,			/// Client has left game
 };
 
 /**
@@ -145,16 +145,21 @@ enum _ic_message_subtype_ {
 */
 enum _net_client_con_state_ {
     ccs_unused = 0,
-    ccs_connecting,		/* new client */
-    ccs_connected,		/* has received slot info */
-    ccs_mapinfo,		/* has received matching map-info */
-    ccs_badmap,			/* has received non-matching map-info */
-    ccs_synced,
-    ccs_async,			/* server user has changed selection */
-    ccs_changed,		/* client user has made menu selection */
-    ccs_detaching,		/* client user wants to detach */
-    ccs_disconnected,		/* client has detached */
-    ccs_unreachable,
+    ccs_connecting,		/// New client
+    ccs_connected,		/// Has received slot info
+    ccs_mapinfo,		/// Has received matching map-info
+    ccs_badmap,			/// Has received non-matching map-info
+    ccs_synced,			/// FIXME: what is this?
+    ccs_async,			/// Server user has changed selection
+    ccs_changed,		/// Client user has made menu selection
+    ccs_detaching,		/// Client user wants to detach
+    ccs_disconnected,		/// Client has detached
+    ccs_unreachable,		/// Server is unreachable
+    ccs_usercanceled,		/// Connection canceled by user
+    ccs_nofreeslots,		/// Server has no more free slots
+    ccs_serverquits,		/// Server quits
+    ccs_incompatibleengine,	/// Incompatible engine version
+    ccs_incompatiblenetwork,	/// Incompatible netowrk version
 };
 
 /*----------------------------------------------------------------------------
@@ -181,15 +186,15 @@ extern ServerSetup LocalSetupState;	/// Network menu: Multiplayer Client Menu se
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void NetworkServerSetup(WorldMap *map);	/// connection server setup
-extern void NetworkClientSetup(WorldMap *map);	/// connection client setup
-extern void NetworkSetupArgs(void);		/// setup command line connection parameters
+extern void NetworkServerSetup(WorldMap *map);	/// Connection server setup
+extern void NetworkClientSetup(WorldMap *map);	/// Connection client setup
+extern void NetworkSetupArgs(void);		/// Setup command line connection parameters
 
-extern void NetworkInitClientConnect(void); /// setup network connect state machine for clients
-extern void NetworkExitClientConnect(void); /// terminate network connect state machine for clients
-extern void NetworkInitServerConnect(void); /// setup network connect state machine for the server
-extern void NetworkExitServerConnect(void); /// terminate network connect state machine for the server
-extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a network connect event
+extern void NetworkInitClientConnect(void); /// Setup network connect state machine for clients
+extern void NetworkExitClientConnect(void); /// Terminate network connect state machine for clients
+extern void NetworkInitServerConnect(void); /// Setup network connect state machine for the server
+extern void NetworkExitServerConnect(void); /// Terminate network connect state machine for the server
+extern void NetworkParseSetupEvent(const char *buf, int size); /// Parse a network connect event
 extern void NetworkProcessClientRequest(void); /// Menu Loop: Send out client request messages
 extern int NetworkSetupServerAddress(const char *serveraddr, char *ipbuf); /// Menu: Setup the server IP
 extern void NetworkServerResyncClients(void); /// Menu Loop: Server: Mark clients state to send stateinfo message
