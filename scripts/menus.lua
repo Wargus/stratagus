@@ -2654,313 +2654,54 @@ DefineMenuItem("pos", { 455, 440}, "font", "large",
     "style", "gm-half"},
   "menu", "menu-editor-player-properties")
 -- 3
+
 DefineMenuItem("pos", { 12, 40 + (22 * 0)}, "font", "game",
   "text", {"caption", "#", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 1)}, "font", "game",
-  "text", {"caption", "0", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 2)}, "font", "game",
-  "text", {"caption", "1", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 3)}, "font", "game",
-  "text", {"caption", "2", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 4)}, "font", "game",
-  "text", {"caption", "3", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 5)}, "font", "game",
-  "text", {"caption", "4", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 6)}, "font", "game",
-  "text", {"caption", "5", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 7)}, "font", "game",
-  "text", {"caption", "6", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 8)}, "font", "game",
-  "text", {"caption", "7", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 9)}, "font", "game",
-  "text", {"caption", "8", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 10)}, "font", "game",
-  "text", {"caption", "9", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 11)}, "font", "game",
-  "text", {"caption", "10", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 12)}, "font", "game",
-  "text", {"caption", "11", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 13)}, "font", "game",
-  "text", {"caption", "12", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 14)}, "font", "game",
-  "text", {"caption", "13", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 15)}, "font", "game",
-  "text", {"caption", "14", "align", "left"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 12, 40 + (22 * 16)}, "font", "game",
-  "text", {"caption", "15", "align", "left"},
-  "menu", "menu-editor-player-properties")
+
+for i=0,15 do
+  DefineMenuItem("pos", { 12, 40 + (22 * (i+1))}, "font", "game",
+    "text", {"caption", i, "align", "left"},
+    "menu", "menu-editor-player-properties")
+end
+
 -- 20
 DefineMenuItem("pos", { 40, 40 + (22 * 0)}, "font", "game",
   "text", {"caption", "Race", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 1)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 2)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 3)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 4)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 5)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 6)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 7)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 8)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 9)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 10)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 11)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 12)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 13)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 14)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 40, 40 + (22 * 15)}, "font", "game",
-  "pulldown",  {"size", {80, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Human", "Orc" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 40, 40 + (22 * (i+1))}, "font", "game",
+    "pulldown",  {"size", {80, 20},
+      "style", "pulldown",
+      "func", nil,
+      "options", {"Elite", "Neutral" },
+      "default", 0,
+      "current", 0},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 40, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "pulldown",  {"size", {80, 20},
     "style", "pulldown",
     "func", nil,
-    "options", {"Human", "Orc", "Neutral" },
+    "options", {"Elite", "Neutral" },
     "default", 0,
     "current", 0},
   "menu", "menu-editor-player-properties")
+
 -- 37
 DefineMenuItem("pos", { 130, 40 + (22 * 0)}, "font", "game",
   "text", {"caption", "Type", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 1)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 2)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 3)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 4)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 5)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 6)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 7)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 8)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 9)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 10)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 11)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 12)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 13)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 14)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 130, 40 + (22 * 15)}, "font", "game",
-  "pulldown",  {"size", {150, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 130, 40 + (22 * (i+1))}, "font", "game",
+    "pulldown",  {"size", {150, 20},
+      "style", "pulldown",
+      "func", nil,
+      "options", {"Person", "Computer", "Rescue (Passive)", "Rescue (Active)", "Neutral", "Nobody "},
+      "default", 0,
+      "current", 0},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 130, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "pulldown",  {"size", {150, 20},
     "style", "pulldown",
@@ -2969,130 +2710,21 @@ DefineMenuItem("pos", { 130, 40 + (22 * 16)}, "font", "game", "flags", {"disable
     "default", 0,
     "current", 0},
   "menu", "menu-editor-player-properties")
+
 -- 54
 DefineMenuItem("pos", { 290, 40 + (22 * 0)}, "font", "game",
   "text", {"caption", "AI", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 1)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 2)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 3)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 4)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 5)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 6)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 7)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 8)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 9)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 10)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 11)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 12)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 13)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 14)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 290, 40 + (22 * 15)}, "font", "game",
-  "pulldown",  {"size", {120, 20},
-    "style", "pulldown",
-    "func", nil,
-    "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
-    "default", 0,
-    "current", 0},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 290, 40 + (22 * (i+1))}, "font", "game",
+    "pulldown",  {"size", {120, 20},
+      "style", "pulldown",
+      "func", nil,
+      "options", {"Land Attack", "Passive", "Sea Attack", "Air Attack" },
+      "default", 0,
+      "current", 0},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 290, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "pulldown",  {"size", {120, 20},
     "style", "pulldown",
@@ -3101,259 +2733,57 @@ DefineMenuItem("pos", { 290, 40 + (22 * 16)}, "font", "game", "flags", {"disable
     "default", 0,
     "current", 0},
   "menu", "menu-editor-player-properties")
+
 -- 71
 DefineMenuItem("pos", { 420, 40 + (22 * 0)}, "font", "game",
-  "text", {"caption", "Gold", "align", "left"},
+  "text", {"caption", "Titanium", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 1)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 2)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 3)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 4)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 5)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 6)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 7)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 8)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 9)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 10)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 11)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 12)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 13)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 14)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 420, 40 + (22 * 15)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 420, 40 + (22 * (i+1))}, "font", "game",
+    "input", {"size", {60, 20},
+      "func", "editor-player-properties-enter-action",
+      "style", "pulldown"},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 420, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "input", {"size", {60, 20},
     "func", "editor-player-properties-enter-action",
     "style", "pulldown"},
   "menu", "menu-editor-player-properties")
+
 -- 88
 DefineMenuItem("pos", { 490, 40 + (22 * 0)}, "font", "game",
-  "text", {"caption", "Lumber", "align", "left"},
+  "text", {"caption", "Crystal", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 1)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 2)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 3)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 4)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 5)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 6)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 7)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 8)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 9)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 10)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 11)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 12)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 13)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 14)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 490, 40 + (22 * 15)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 490, 40 + (22 * (i+1))}, "font", "game",
+    "input", {"size", {60, 20},
+      "func", "editor-player-properties-enter-action",
+      "style", "pulldown"},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 490, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "input", {"size", {60, 20},
     "func", "editor-player-properties-enter-action",
     "style", "pulldown"},
   "menu", "menu-editor-player-properties")
+
 -- 105
 DefineMenuItem("pos", { 560, 40 + (22 * 0)}, "font", "game",
-  "text", {"caption", "Oil", "align", "left"},
+  "text", {"caption", "Quality", "align", "left"},
   "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 1)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 2)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 3)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 4)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 5)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 6)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 7)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 8)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 9)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 10)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 11)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 12)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 13)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 14)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
-DefineMenuItem("pos", { 560, 40 + (22 * 15)}, "font", "game",
-  "input", {"size", {60, 20},
-    "func", "editor-player-properties-enter-action",
-    "style", "pulldown"},
-  "menu", "menu-editor-player-properties")
+for i=0,14 do
+  DefineMenuItem("pos", { 560, 40 + (22 * (i+1))}, "font", "game",
+    "input", {"size", {60, 20},
+      "func", "editor-player-properties-enter-action",
+      "style", "pulldown"},
+    "menu", "menu-editor-player-properties")
+end
 DefineMenuItem("pos", { 560, 40 + (22 * 16)}, "font", "game", "flags", {"disabled"},
   "input", {"size", {60, 20},
     "func", "editor-player-properties-enter-action",
     "style", "pulldown"},
   "menu", "menu-editor-player-properties")
-
 
 --
 -- menu-editor-tips
