@@ -332,11 +332,6 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
-#define __STRUCT_PLAYER__
-typedef struct _player_ Player;		// recursive includes :(
-#endif
-
 #include "video.h"
 #include "unittype.h"
 #include "upgrade_structs.h"
@@ -727,9 +722,6 @@ extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
-    /// Returns true, if unit is visible on current map view
-extern int UnitVisibleInViewport(int v, const Unit*);
-
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
     /// FIXME: more docu
@@ -848,16 +840,6 @@ extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
 extern void InitUnitCache(void);
 
-#if 0
-//	in map.c	belongs to map or unit??
-    /// FIXME: more docu
-extern unsigned UnitFieldFlags(const Unit* unit);
-    /// FIXME: more docu
-extern int TypeMovementMask(const UnitType* type);
-    /// FIXME: more docu
-extern int UnitMovementMask(const Unit* unit);
-#endif
-
 //	in unit_draw.c
 //--------------------
     /// Draw nothing around unit
@@ -889,7 +871,7 @@ extern void SaveDecorations(FILE* file);
 extern void CleanDecorations(void);
 
     /// Draw all units visible on map in viewport
-extern void DrawUnits(int v);
+extern void DrawUnits(const void* vp);
 
 //	in unit_find.c
     /// Select units in rectangle range

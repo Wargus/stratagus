@@ -395,7 +395,7 @@ global void HideMinimapCursor(void)
 **	@param vx	View point X position.
 **	@param vy	View point Y position.
 */
-global void DrawMinimapCursor(int vx,int vy)
+global void DrawMinimapCursor(int vx, int vy)
 {
     int x;
     int y;
@@ -404,30 +404,28 @@ global void DrawMinimapCursor(int vx,int vy)
     int i;
 
     // Determine and save region below minimap cursor
-    OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
-	    (vx*MinimapScale)/MINIMAP_FAC;
-    OldMinimapCursorY=y=TheUI.MinimapY+2+MinimapY+
-	    (vy*MinimapScale)/MINIMAP_FAC;
-    i = TheUI.VP[TheUI.LastClickedVP].MapWidth;
-    OldMinimapCursorW=w=(i*MinimapScale)/MINIMAP_FAC;
-    i = TheUI.VP[TheUI.LastClickedVP].MapHeight;
-    OldMinimapCursorH=h=(i*MinimapScale)/MINIMAP_FAC;
-    i=(w+1+h)*2*VideoTypeSize;
-    if( OldMinimapCursorSize<i ) {
-	if( OldMinimapCursorImage ) {
-	    OldMinimapCursorImage=realloc(OldMinimapCursorImage,i);
+    OldMinimapCursorX = x =
+	TheUI.MinimapX + 24 + MinimapX + (vx * MinimapScale) / MINIMAP_FAC;
+    OldMinimapCursorY = y =
+	TheUI.MinimapY + 2 + MinimapY + (vy * MinimapScale) / MINIMAP_FAC;
+    OldMinimapCursorW = w =
+	(TheUI.SelectedViewport->MapWidth * MinimapScale) / MINIMAP_FAC;
+    OldMinimapCursorH = h =
+	(TheUI.SelectedViewport->MapHeight * MinimapScale) / MINIMAP_FAC;
+    i = (w + 1 + h) * 2 * VideoTypeSize;
+    if (OldMinimapCursorSize < i) {
+	if (OldMinimapCursorImage) {
+	    OldMinimapCursorImage = realloc(OldMinimapCursorImage, i);
 	} else {
-	    OldMinimapCursorImage=malloc(i);
+	    OldMinimapCursorImage = malloc(i);
 	}
 	DebugLevel3("Cursor memory %d\n" _C_ i);
-	OldMinimapCursorSize=i;
+	OldMinimapCursorSize = i;
     }
-    SaveCursorRectangle(OldMinimapCursorImage,x,y,w,h);
+    SaveCursorRectangle(OldMinimapCursorImage, x, y, w, h);
 
     // Draw cursor as rectangle (Note: unclipped, as it is always visible)
-    // FIXME: The viewpoint color should be configurable
-    //VideoDraw50TransRectangle(ThisPlayer->Color,x,y,w,h);
-    VideoDraw50TransRectangle(ColorWhite,x,y,w,h);
+    VideoDraw50TransRectangle(TheUI.ViewportCursorColor, x, y, w, h);
 }
 
 /**

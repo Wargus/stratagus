@@ -1455,7 +1455,7 @@ global void MapColorCycle(void)
 */
 global int MarkDrawPosMap(int x, int y)
 {
-    if (GetViewport(x, y) != -1) {
+    if (MapTileGetViewport(x, y)) {
 	MustRedraw |= RedrawMap;
 	return 1;
     }
@@ -1465,6 +1465,7 @@ global int MarkDrawPosMap(int x, int y)
 /**
 **	Denote wether area in map is overlapping with the viewport.
 **
+**	@param vp	Viewport pointer.
 **	@param sx	X map tile position of area in map to be checked.
 **	@param sy	Y map tile position of area in map to be checked.
 **	@param ex	X map tile position of area in map to be checked.
@@ -1472,20 +1473,17 @@ global int MarkDrawPosMap(int x, int y)
 **
 **	@return		True if overlapping, false otherwise.
 */
-global int MapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
+global int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+	int ex, int ey)
 {
-    const Viewport* view;
-
-    view = &TheUI.VP[v];
-    return sx >= view->MapX && sy >= view->MapY
-	&& ex < view->MapX + view->MapWidth
-	&& ey < view->MapY + view->MapHeight;
+    return sx >= vp->MapX && sy >= vp->MapY
+	&& ex < vp->MapX + vp->MapWidth && ey < vp->MapY + vp->MapHeight;
 }
 
 /**
 **	Check if a point is visible (inside) a viewport.
 **
-**	@param v	Viewport.
+**	@param vp	Viewport pointer.
 **	@param x	X map tile position of point in map to be checked.
 **	@param y	Y map tile position of point in map to be checked.
 **
@@ -1500,6 +1498,7 @@ local inline int PointInViewport(const Viewport* vp, int x, int y)
 /**
 **	Check if any part of an area is visible in a viewport.
 **
+**	@param vp	Viewport pointer.
 **	@param sx	X map tile position of area in map to be checked.
 **	@param sy	Y map tile position of area in map to be checked.
 **	@param ex	X map tile position of area in map to be checked.
@@ -1510,12 +1509,10 @@ local inline int PointInViewport(const Viewport* vp, int x, int y)
 **	@todo	Didn't works if all points lay outside and the area covers
 **		the complete viewport.
 */
-global int AnyMapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
+global int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+	int ex, int ey)
 {
-    const Viewport* vp;
-
     // FIXME: Can be faster written
-    vp = &TheUI.VP[v];
     return PointInViewport(vp, sx, sy) || PointInViewport(vp, sx, ey)
 	|| PointInViewport(vp, ex, sy) || PointInViewport(vp, ex, ey);
 }
@@ -1534,7 +1531,8 @@ global int AnyMapAreaVisibleInViewport(int v, int sx, int sy, int ex, int ey)
 */
 global int MarkDrawAreaMap(int sx, int sy, int ex, int ey)
 {
-    if (MapTileGetViewport(sx, sy) != -1 || MapTileGetViewport(ex, ey) != -1) {
+    if (MapTileGetViewport(sx, sy) || MapTileGetViewport(ex, ey)
+	    || MapTileGetViewport(sx, ey) || MapTileGetViewport(ex, sy) ) {
 	MustRedraw |= RedrawMap;
 	return 1;
     }
@@ -1595,7 +1593,7 @@ global void MarkDrawEntireMap(void)
 ** (in pixels)
 ** </PRE>
 */
-global void DrawMapBackgroundInViewport(int v, int x, int y)
+global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 {
     int sx;
     int sy;
@@ -1617,15 +1615,15 @@ global void DrawMapBackgroundInViewport(int v, int x, int y)
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 
-    ex=TheUI.VP[v].EndX;
+    ex=vp->EndX;
     sy=y*TheMap.Width;
-    dy=TheUI.VP[v].Y;
-    ey=TheUI.VP[v].EndY;
+    dy=vp->Y;
+    ey=vp->EndY;
 
     while( dy<ey ) {
 	if( *redraw_row++ ) {		// row must be redrawn
 	    sx=x+sy;
-	    dx=TheUI.VP[v].X;
+	    dx=vp->X;
 	    while( dx<ex ) {
 		//
 		//	draw only tiles which must be drawn
@@ -1646,7 +1644,7 @@ global void DrawMapBackgroundInViewport(int v, int x, int y)
 		dx+=TileSizeX;
 	    }
 	} else {
-	    redraw_tile += TheUI.VP[v].MapWidth;
+	    redraw_tile += vp->MapWidth;
 	}
 	sy+=TheMap.Width;
 	dy+=TileSizeY;
@@ -1654,22 +1652,22 @@ global void DrawMapBackgroundInViewport(int v, int x, int y)
 
 #if defined(HIERARCHIC_PATHFINDER) && defined(GRID)
     {
-    int xmax = x + (TheUI.VP[v].EndX-TheUI.VP[v].X)/TileSizeX;
+    int xmax = x + (vp->EndX-vp->X)/TileSizeX;
     int xmin = x;
-    int ymax = y + (TheUI.VP[v].EndY-TheUI.VP[v].Y)/TileSizeY;
+    int ymax = y + (vp->EndY-vp->Y)/TileSizeY;
     int ymin = y;
     int AreaWidth = AreaGetWidth ();
     int AreaHeight = AreaGetHeight ();
     for ( ; x <= xmax; x++)  {
 	if (x%AreaWidth == 0) {
-	    int	xx = TheUI.VP[v].X + TileSizeX * (x - xmin) - 1;
-	    VideoDrawLineClip (ColorRed, xx, TheUI.VP[v].Y, xx, TheUI.VP[v].EndY);
+	    int	xx = vp->X + TileSizeX * (x - xmin) - 1;
+	    VideoDrawLineClip (ColorRed, xx, vp->Y, xx, vp->EndY);
 	}
     }
     for ( ; y <= ymax; y++)  {
 	if (y%AreaHeight == 0) {
-	    int	yy = TheUI.VP[v].Y + TileSizeY * (y - ymin) - 1;
-	    VideoDrawLineClip (ColorRed, TheUI.VP[v].X, yy, TheUI.VP[v].EndX, yy);
+	    int	yy = vp->Y + TileSizeY * (y - ymin) - 1;
+	    VideoDrawLineClip (ColorRed, vp->X, yy, vp->EndX, yy);
 	}
     }
 

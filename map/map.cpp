@@ -153,36 +153,37 @@ global void RevealMap(void)
 /**
 **	Change viewpoint of map viewport v to x,y.
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapViewportSetViewpoint(int v, int x, int y)
+global void ViewportSetViewpoint(Viewport* vp, int x, int y)
 {
     int map_width;
     int map_height;
 
-    if (x == TheUI.VP[v].MapX && y == TheUI.VP[v].MapY) {
+    if (x == vp->MapX && y == vp->MapY) {
 	return;				// Already using this view.
     }
 
-    map_width = TheUI.VP[v].MapWidth;
+    map_width = vp->MapWidth;
     if (x < 0) {
-	TheUI.VP[v].MapX = 0;
+	vp->MapX = 0;
     } else if (x > TheMap.Width - map_width) {
-	TheUI.VP[v].MapX = TheMap.Width - map_width;
+	vp->MapX = TheMap.Width - map_width;
     } else {
-	TheUI.VP[v].MapX = x;
+	vp->MapX = x;
     }
 
-    map_height = TheUI.VP[v].MapHeight;
+    map_height = vp->MapHeight;
     if (y < 0) {
-	TheUI.VP[v].MapY = 0;
+	vp->MapY = 0;
     } else if (y > TheMap.Height - map_height) {
-	TheUI.VP[v].MapY = TheMap.Height - map_height;
+	vp->MapY = TheMap.Height - map_height;
     } else {
-	TheUI.VP[v].MapY = y;
+	vp->MapY = y;
     }
+
     MarkDrawEntireMap();
     MustRedraw |= RedrawMinimap | RedrawMinimapCursor;
 }
@@ -190,14 +191,13 @@ global void MapViewportSetViewpoint(int v, int x, int y)
 /**
 **	Center map viewport v on map tile (x,y).
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
 */
-global void MapViewportCenter(int v, int x, int y)
+global void ViewportCenterViewpoint(Viewport* vp, int x, int y)
 {
-    MapViewportSetViewpoint(v, x - (TheUI.VP[v].MapWidth / 2),
-	y - (TheUI.VP[v].MapHeight / 2));
+    ViewportSetViewpoint(vp, x - (vp->MapWidth / 2), y - (vp->MapHeight / 2));
 }
 
 /*----------------------------------------------------------------------------
@@ -558,65 +558,65 @@ global void PreprocessMap(void)
 /**
 **	Convert viewport x coordinate to map tile x coordinate.
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param x	X coordinate into this viewport (in pixels, relative
 **			to origin of FreeCraft's window - not the viewport
 **			itself!).
 **
 **	@return		X map tile coordinate.
 */
-global int Viewport2MapX(int v, int x)
+global int Viewport2MapX(const Viewport* vp, int x)
 {
     int r;
 
-    r = ((x) - TheUI.VP[v].X) / TileSizeX + TheUI.VP[v].MapX;
+    r = (x - vp->X) / TileSizeX + vp->MapX;
     return r < TheMap.Width ? r : TheMap.Width - 1;
 }
 
 /**
 **	Convert viewport y coordinate to map tile y coordinate.
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param y	Y coordinate into this viewport (in pixels, relative
 **			to origin of FreeCraft's window - not the viewport
 **			itself!).
 **
 **	@return		Y map tile coordinate.
 */
-global int Viewport2MapY(int v, int y)
+global int Viewport2MapY(const Viewport* vp, int y)
 {
     int r;
 
-    r = ((y) - TheUI.VP[v].Y) / TileSizeY + TheUI.VP[v].MapY;
+    r = (y - vp->Y) / TileSizeY + vp->MapY;
     return r < TheMap.Height ? r : TheMap.Height - 1;
 }
 
 /**
 **	Convert a map tile X coordinate into a viewport x pixel coordinate.
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param x	The map tile's X coordinate.
 **
 **	@return		X screen coordinate in pixels (relative
 **                      to origin of FreeCraft's window).
 */
-global int Map2ViewportX(int v, int x)
+global int Map2ViewportX(const Viewport* vp, int x)
 {
-    return TheUI.VP[v].X + ((x) - TheUI.VP[v].MapX) * TileSizeX;
+    return vp->X + (x - vp->MapX) * TileSizeX;
 }
 
 /**
 **	Convert a map tile Y coordinate into a viewport y pixel coordinate.
 **
-**	@param v	The viewport.
+**	@param vp	Viewport pointer.
 **	@param y	The map tile's Y coordinate.
 **
 **	@return		Y screen coordinate in pixels (relative
 **                      to origin of FreeCraft's window).
 */
-global int Map2ViewportY(int v, int y)
+global int Map2ViewportY(const Viewport* vp, int y)
 {
-    return TheUI.VP[v].Y + ((y) - TheUI.VP[v].MapY) * TileSizeY;
+    return vp->Y + (y - vp->MapY) * TileSizeY;
 }
 
 /**

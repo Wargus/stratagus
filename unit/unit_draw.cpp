@@ -97,7 +97,7 @@ global void (*DrawSelection)(const Unit* unit,const UnitType* type,int x,int y)
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
 
-local int CurrentViewport;		/// FIXME: quick hack for split screen
+local const Viewport* CurrentViewport;	/// FIXME: quick hack for split screen
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1852,67 +1852,66 @@ local void DrawUnit(const Unit* unit)
 **	@param v	Viewport to be drawn.
 **
 **	@todo FIXME: Must use the redraw tile flags in this function
+**		FIXME: Use const Viewport*
 */
-global void DrawUnits(int v)
+global void DrawUnits(const void* v)
 {
     Unit* unit;
     Unit* table[UnitMax];
     int n;
     int i;
-    const Viewport* viewport;
+    const Viewport* vp;
 
-    CurrentViewport = v;
-    viewport = &TheUI.VP[v];
-
-    //
-    //	Select all units touching the viewpoint.
-    //
-    n = SelectUnits(viewport->MapX-1, viewport->MapY-1,
-		viewport->MapX+viewport->MapWidth+1,
-		viewport->MapY+viewport->MapHeight+1,table);
+    CurrentViewport = vp = v;
 
     //
-    //	2a) corpse aren't in the cache.
+    //  Select all units touching the viewpoint.
     //
-    for( i=0; i<NumUnits; ++i ) {
-	unit=Units[i];
+    n = SelectUnits(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
+	vp->MapY + vp->MapHeight + 1, table);
+
+    //
+    //  2a) corpse aren't in the cache.
+    //
+    for (i = 0; i < NumUnits; ++i) {
+	unit = Units[i];
 	// FIXME: this tries to draw all corps, ohje
-	if( unit->Type->Vanishes || unit->Orders[0].Action==UnitActionDie ) {
+	if (unit->Type->Vanishes || unit->Orders[0].Action == UnitActionDie) {
 	    DrawUnit(unit);
 	}
     }
 
     //
-    //	2b) buildings
+    //  2b) buildings
     //
-    for( i=0; i<n; ++i ) {
-	unit=table[i];
-	if( !unit->Removed && UnitVisibleInViewport(v, unit) ) {
-	    if( unit->Type->Building ) {
+    for (i = 0; i < n; ++i) {
+	unit = table[i];
+	if (!unit->Removed && UnitVisibleInViewport(vp, unit)) {
+	    if (unit->Type->Building) {
 		DrawBuilding(unit);
-		table[i]=NoUnitP;
+		table[i] = NoUnitP;
 	    }
 	} else {
-	    table[i]=NoUnitP;
+	    table[i] = NoUnitP;
 	}
     }
     //
-    //	3) land/sea units
+    //  3) land/sea units
     //
-    for( i=0; i<n; ++i ) {
-	if( !(unit=table[i]) ) {
+    for (i = 0; i < n; ++i) {
+	if (!(unit = table[i])) {
 	    continue;
 	}
-	if( unit->Type->UnitType!=UnitTypeFly ) {
+	if (unit->Type->UnitType != UnitTypeFly) {
 	    DrawUnit(unit);
-	    table[i]=NoUnitP;
+	    table[i] = NoUnitP;
 	}
     }
     //
-    //	5) flying units
+    //  5) flying units
     //
-    for( i=0; i<n; ++i ) {
-	if( !(unit=table[i]) ) {
+    for (i = 0; i < n; ++i) {
+	if (!(unit = table[i])) {
 	    continue;
 	}
 	DrawUnit(unit);

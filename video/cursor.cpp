@@ -398,7 +398,7 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
     //	Clip to map window.
     //	FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
     //
-    vp = &TheUI.VP[TheUI.ActiveViewport];
+    vp = TheUI.SelectedViewport;
     if( x1<vp->X ) {
 	x1=vp->X;
     } else if( x1>vp->EndX ) {
@@ -692,12 +692,11 @@ local void DrawBuildingCursor(void)
     const Viewport* vp;
 
     // Align to grid
-    vp = &TheUI.VP[TheUI.ActiveViewport];
-
+    vp = TheUI.MouseViewport;
     x=CursorX-(CursorX - vp->X)%TileSizeX;
     y=CursorY-(CursorY - vp->Y)%TileSizeY;
-    BuildingCursorSX = mx = Viewport2MapX(TheUI.ActiveViewport, x);
-    BuildingCursorSY = my = Viewport2MapY(TheUI.ActiveViewport, y);
+    BuildingCursorSX = mx = Viewport2MapX(vp, x);
+    BuildingCursorSY = my = Viewport2MapY(vp, y);
 
     //
     //	Draw building
@@ -716,58 +715,8 @@ local void DrawBuildingCursor(void)
     //	Draw the allow overlay
     //
     f=CanBuildHere(CursorBuilding,mx,my);
-#if 0
-    // FIXME: Should be moved into unittype structure, and allow more types.
-    if( CursorBuilding->ShoreBuilding ) {
-	mask=MapFieldLandUnit
-		| MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldLandAllowed	// can't build on this
-		//| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
-    } else {
-	switch( CursorBuilding->UnitType ) {
-	case UnitTypeLand:
-	    mask=MapFieldLandUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldWall
-		| MapFieldRocks
-		| MapFieldForest	// wall,rock,forest not 100% clear?
-		| MapFieldCoastAllowed
-		| MapFieldWaterAllowed	// can't build on this
-		| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
-	    break;
-	case UnitTypeNaval:
-	    mask=MapFieldSeaUnit
-		| MapFieldBuilding	// already occuppied
-		| MapFieldCoastAllowed
-		| MapFieldLandAllowed	// can't build on this
-		| MapFieldUnpassable	// FIXME: I think shouldn't be used
-		| MapFieldNoBuilding;
-	    break;
-	case UnitTypeFly:
-	    mask=MapFieldAirUnit;	// already occuppied
-	    break;
-
-	default:
-	    DebugLevel1Fn("Were moves this unit?\n");
-	    return;
-	}
-	if( !CursorBuilding->Building ) {
-	    mask &= ~MapFieldNoBuilding;
-	}
-    }
-
-#else
 
     mask = CursorBuilding->MovementMask;
-
-#endif
-
     h=CursorBuilding->TileHeight;
     BuildingCursorEY=my+h-1;
     if (my+h > vp->MapY + vp->MapHeight) {	// reduce to view limits

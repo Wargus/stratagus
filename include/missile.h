@@ -307,7 +307,7 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __STRUCT_MISSILETYPE__
-#define __STRUCT_MISSILETYPE__
+#define __STRUCT_MISSILETYPE__		/// protect duplicate missile typedef
 
 /**
 **	Missile-type typedef
@@ -436,7 +436,7 @@ extern void FireMissile(Unit*);
 extern int CheckMissileToBeDrawn(const Missile* missile);
 
     /// Draw all missiles
-extern void DrawMissiles(int v);
+extern void DrawMissiles(const Viewport* vp);
 
     /// handle all missiles
 extern void MissileActions(void);
