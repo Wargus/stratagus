@@ -203,7 +203,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-lightning",
     "lightning.png",
-    32,32,
+    32,32, 30,
     { NULL },
     { NULL },
     MissileClassPointToPointWithHit,
@@ -215,18 +215,20 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-griffon-hammer",
     "gryphon hammer.png",
-    32,32,
+    32,32, 15,
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
     0,
+    1,
+    16,
     1,
     "missile-explosion",	NULL,
     },
 { MissileTypeType,
     "missile-dragon-breath",
     "dragon breath.png",
-    32,32,
+    32,32, 5,
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
@@ -239,7 +241,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-fireball",
     "fireball.png",
-    32,32,
+    32,32, 5,
     { NULL },
     { "fireball hit" },
     MissileClassPointToPoint,
@@ -251,7 +253,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-flame-shield",
     "flame shield.png",
-    32,48,
+    32,48, 6,
     { NULL },
     { NULL },
     MissileClassFlameShield,
@@ -263,7 +265,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-blizzard",
     "blizzard.png",
-    32,32,
+    32,32, 4,
     { NULL },
     { NULL },
     MissileClassBlizzard,
@@ -276,7 +278,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-death-and-decay",
     "death and decay.png",
-    32,32,
+    32,32, 8,
     { NULL },
     { NULL },
     MissileClassDeathDecay,
@@ -288,7 +290,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-big-cannon",
     "big cannon.png",
-    16,16,
+    16,16, 20,
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
@@ -301,7 +303,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-exorcism",
     "exorcism.png",
-    48,48,
+    48,48, 10,
     { NULL },
     { NULL },
     MissileClassPointToPoint,
@@ -313,7 +315,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-heal-effect",
     "heal effect.png",
-    48,48,
+    48,48, 10,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -325,7 +327,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-touch-of-death",
     "touch of death.png",
-    32,32,
+    32,32, 30,
     { NULL },
     { NULL },
     MissileClassPointToPointWithHit,
@@ -337,7 +339,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-rune",
     "rune.png",
-    16,16,
+    16,16, 4,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -349,7 +351,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-whirlwind",
     "tornado.png",
-    56,56,
+    56,56, 4,
     { NULL },
     { NULL },
     MissileClassWhirlwind,
@@ -361,7 +363,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-catapult-rock",
     "catapult rock.png",
-    32,32,
+    32,32, 15,
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
@@ -374,7 +376,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-ballista-bolt",
     "ballista bolt.png",
-    64,64,
+    64,64, 5,
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
@@ -387,7 +389,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-arrow",
     "arrow.png",
-    40,40,
+    40,40, 5,
     { NULL },
     { "bow hit" },
     MissileClassPointToPoint,
@@ -399,7 +401,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-axe",
     "axe.png",
-    32,32,
+    32,32, 15,
     { NULL },
     { "bow hit" },
     MissileClassPointToPoint,
@@ -411,7 +413,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-submarine-missile",
     "submarine missile.png",
-    40,40,
+    40,40, 5,
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
@@ -424,7 +426,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-turtle-missile",
     "turtle missile.png",
-    40,40,
+    40,40, 5,
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
@@ -437,7 +439,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-small-fire",
     "small fire.png",
-    32,48,
+    32,48, 6,
     { NULL },
     { NULL },
     MissileClassFire,
@@ -449,7 +451,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-big-fire",
     "big fire.png",
-    48,48,
+    48,48, 10,
     { NULL },
     { NULL },
     MissileClassFire,
@@ -461,7 +463,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-impact",
     "ballista-catapult impact.png",
-    48,48,
+    48,48, 10,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -473,7 +475,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-normal-spell",
     "normal spell.png",
-    32,32,
+    32,32, 6,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -485,7 +487,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-explosion",
     "explosion.png",
-    64,64,
+    64,64, 20,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -497,7 +499,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-small-cannon",
     "cannon.png",
-    32,32,
+    32,32, 15,
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
@@ -510,7 +512,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-cannon-explosion",
     "cannon explosion.png",
-    32,32,
+    32,32, 4,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -522,7 +524,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-cannon-tower-explosion",
     "cannon-tower explosion.png",
-    32,32,
+    32,32, 4,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -534,7 +536,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-daemon-fire",
     "daemon fire.png",
-    32,32,
+    32,32, 15,
     { NULL },
     { NULL },
     MissileClassPointToPoint,
@@ -546,7 +548,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-green-cross",
     "green cross.png",
-    32,32,
+    32,32, 4,
     { NULL },
     { NULL },
     MissileClassCycleOnce,
@@ -558,7 +560,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-none",
     NULL,
-    32,32,
+    32,32, 0,
     { NULL },
     { NULL },
     MissileClassNone,
@@ -570,7 +572,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-blizzard-hit",
     "blizzard.png",
-    32,32,
+    32,32, 4,
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
@@ -582,7 +584,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-death-coil",
     "touch of death.png",
-    32,32,
+    32,32, 30,
     { NULL },
     { NULL },
     MissileClassPointToPoint,
@@ -594,7 +596,7 @@ global MissileType DefaultMissileTypes[] = {
 { MissileTypeType,
     "missile-custom",
     NULL,
-    32,32,
+    32,32, 0,
     { NULL },
     { NULL },
     MissileClassCustom,
@@ -634,6 +636,8 @@ global int NumMissileTypes;		/// number of missile-types made.
 global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 global MissileType* MissileTypeBigFire;		/// Big fire missile-type
 global MissileType* MissileTypeGreenCross;	/// Green cross missile-type
+    /// missile-type for the explosion missile
+global MissileType* MissileTypeExplosion;
 
 IfDebug(
 global int NoWarningMissileType;		/// quiet ident lookup.
@@ -674,6 +678,11 @@ global void LoadMissileSprites(void)
 	    ShowLoadProgress("\tMissile %s\n",file);
 	    MissileTypes[i].Sprite=LoadSprite(
 		    file,MissileTypes[i].Width,MissileTypes[i].Height);
+
+	    // Correct the number of frames in graphic
+	    DebugCheck( MissileTypes[i].Sprite->NumFrames
+			<MissileTypes[i].Frames );
+	    MissileTypes[i].Sprite->NumFrames=MissileTypes[i].Frames;
 	}
     }
     NumMissileTypes=i;
@@ -707,11 +716,19 @@ global void LoadMissileSprites(void)
     MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
     MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
+    MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
 
     // FIXME: FIXME: FIXME: very dirty hacks
+    DebugCheck( MissileTypeSmallFire->Sprite->NumFrames!=6 );
     MissileTypeSmallFire->Sprite->NumFrames=6;
+    DebugCheck( MissileTypeByIdent("missile-death-and-decay")
+		->Sprite->NumFrames!=8 );
     MissileTypeByIdent("missile-death-and-decay")->Sprite->NumFrames=8;
+    DebugCheck( MissileTypeByIdent("missile-normal-spell")
+		->Sprite->NumFrames!=6 );
     MissileTypeByIdent("missile-normal-spell")->Sprite->NumFrames=6;
+    DebugCheck( MissileTypeByIdent("missile-flame-shield")
+		->Sprite->NumFrames!=6 );
     MissileTypeByIdent("missile-flame-shield")->Sprite->NumFrames=6;
 }
 
@@ -724,7 +741,7 @@ global void LoadMissileSprites(void)
 */
 global MissileType* MissileTypeByIdent(const char* ident)
 {
-    MissileType** type;
+    MissileType* const* type;
 
     type=(MissileType**)hash_find(MissileTypeHash,(char*)ident);
 
@@ -732,7 +749,7 @@ global MissileType* MissileTypeByIdent(const char* ident)
 	return *type;
     }
 
-    IfDebug( 
+    IfDebug(
 	if( !NoWarningMissileType ) {
 	    DebugLevel0Fn("Missile %s not found\n",ident);
 	}
@@ -828,7 +845,7 @@ found:
     missile->Type=type;
     missile->Frame=0;
     missile->State=0;
-    missile->Wait=type->Sleep;		// initial wait = sleep 
+    missile->Wait=type->Sleep;		// initial wait = sleep
     missile->Delay=type->Delay;		// initial delay
 
     missile->SourceUnit=NULL;
@@ -1457,7 +1474,7 @@ global void MissileHit(Missile* missile)
 	//	Can the unit attack the this unit-type?
 	//	NOTE: perhaps this should be come a property of the missile.
 	//
-	if( CanTarget(missile->SourceUnit->Type,goal->Type) ) { 
+	if( CanTarget(missile->SourceUnit->Type,goal->Type) ) {
 	    if( goal->X==x && goal->Y==y ) {
 		MissileHitsGoal(missile,goal,1);
 	    } else {
@@ -1804,7 +1821,7 @@ global void SaveMissileTypes(FILE* file)
 	}
 	fprintf(file," 'size '(%d %d)",mt->Width,mt->Height);
 	if( mt->Sprite ) {
-	    fprintf(file," 'frames %d",VideoGraphicFrames(mt->Sprite));
+	    fprintf(file," 'frames %d",mt->Frames);
 	}
 	fprintf(file,"\n ");
 	if( mt->FiredSound.Name ) {
@@ -1836,7 +1853,6 @@ global void SaveMissileTypes(FILE* file)
 local void SaveMissile(const Missile* missile,FILE* file)
 {
     char* s1;
-    extern char* UnitReference(const Unit*);
 
     fprintf(file,"(missile 'type '%s",missile->Type->Ident);
     fprintf(file," 'pos '(%d %d) 'goal '(%d %d)",
@@ -1885,6 +1901,11 @@ global void SaveMissiles(FILE* file)
 global void CleanMissileTypes(void)
 {
     DebugLevel0Fn("FIXME: not written\n");
+
+    MissileTypeSmallFire=NULL;
+    MissileTypeBigFire=NULL;
+    MissileTypeGreenCross=NULL;
+    MissileTypeExplosion=NULL;
 }
 
 
