@@ -1466,21 +1466,30 @@ global void UIHandleButtonDown(unsigned button)
     //	Cursor is on the buttons: group or command
     //
     } else if( CursorOn==CursorOnButton ) {
+	//
+	//	clicked on info panel - selection shown
+	//
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
 	    DoSelectionButtons(ButtonUnderCursor-1,button);
 	} else if( (MouseButtons&LeftButton) ) {
-	    if( ButtonUnderCursor==0 && GameMenuButtonClicked==0 ) {
+	    //
+	    //	clicked on menu button
+	    //
+	    if( ButtonUnderCursor==0 && !GameMenuButtonClicked ) {
 		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		GameMenuButtonClicked = 1;
 		MustRedraw|=RedrawMenuButton;
+	    //
+	    //	clicked on info panel - single unit shown
+	    //
 	    } else if( ButtonUnderCursor==1 && NumSelected==1 ) {
 		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
-#ifdef SPLIT_SCREEN_SUPPORT
-		MapCenterViewport (TheUI.LastClickedVP, Selected[0]->X,
+		MapCenterViewport(TheUI.LastClickedVP, Selected[0]->X,
 				Selected[0]->Y);
-#else /* SPLIT_SCREEN_SUPPORT */
-		MapCenter(Selected[0]->X,Selected[0]->Y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+	    //
+	    //	clicked on info panel - single unit shown
+	    //		for transporter - training queues
+	    //
 	    } else if( ButtonUnderCursor>3 && ButtonUnderCursor<10 ) {
 		if( NumSelected==1 && Selected[0]->Type->Transporter ) {
 		    if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
@@ -1510,9 +1519,25 @@ global void UIHandleButtonDown(unsigned button)
 			    Selected[0]->Data.Train.What[slotid]);
 		    }
 		}
+	    //
+	    //	clicked on button panel
+	    //
 	    } else if( ButtonUnderCursor>9 ) {
 		DoButtonButtonClicked(ButtonUnderCursor-10);
 	    }
+	} else if( (MouseButtons&MiddleButton) ) {
+	    //
+	    //	clicked on info panel - single unit shown
+	    //
+	    if( ButtonUnderCursor==1 && NumSelected==1 ) {
+		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+		if( TheUI.VP[TheUI.LastClickedVP].Unit == Selected[0] ) {
+		    TheUI.VP[TheUI.LastClickedVP].Unit = NULL;
+		} else {
+		    TheUI.VP[TheUI.LastClickedVP].Unit = Selected[0];
+		}
+	    }
+	} else if( (MouseButtons&RightButton) ) {
 	}
     }
 }
