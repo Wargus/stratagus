@@ -1114,6 +1114,11 @@ local void NetworkSendCommands(void)
 	// ncq = BASE_OF(NetworkCommandQueue,List[0], CommandsIn->first);
 
 	dl_remove_first(CommandsIn);
+	// FIXME: we can send destoyed units over network :(
+	if( UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed ) {
+	    DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
+		    ntohs(ncq->Data.Unit));
+	}
     }
 
     //	Insert in output queue.
