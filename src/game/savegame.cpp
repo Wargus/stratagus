@@ -84,6 +84,7 @@ global void SaveGame(const char* filename)
     fprintf(file,";;; -----------------------------------------\n\n");
 
     SaveIcons(file);
+    SaveCursors(file);
     // SaveUI(file);
     SaveUnitTypes(file);
     SaveUpgrades(file);
@@ -94,6 +95,8 @@ global void SaveGame(const char* filename)
     SavePlayers(file);
     SaveMap(file);
     SaveUnits(file);
+    SaveSelections(file);
+    SaveGroups(file);
     SaveMissiles(file);
 
     // FIXME: find all state information which must be saved.
