@@ -515,10 +515,16 @@ global void DrawButtonPanel(void)
 	    //	Tutorial show command key in icons
 	    //
 	    if( ShowCommandKey ) {
-		// FIXME: real DrawChar would be usefull
-		sprintf(buf,"%c",toupper(CurrentButtons[i].Key));
-		VideoDrawText(TheUI.Buttons[i+10].X+39,TheUI.Buttons[i+10].Y+30
-			,GameFont,buf);
+		if( CurrentButtons[i].Key==27 ) {
+		    strcpy(buf,"ESC");
+		    VideoDrawText(TheUI.Buttons[i+10].X+TheUI.Buttons[i+10].Width-VideoTextLength(GameFont,buf),
+			TheUI.Buttons[i+10].Y+30,GameFont,buf);
+		} else {
+		    // FIXME: real DrawChar would be useful
+		    sprintf(buf,"%c",toupper(CurrentButtons[i].Key));
+		    VideoDrawText(TheUI.Buttons[i+10].X+39,
+			TheUI.Buttons[i+10].Y+30,GameFont,buf);
+		}
 	    }
 	}
     }
