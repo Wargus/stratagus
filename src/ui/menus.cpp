@@ -2437,11 +2437,12 @@ local void SaveAction(void)
 
     if (access(filename,F_OK)) {
         SaveGame(filename);
+	SetMessage("Saved game to: %s", filename);
     } else {
 	ProcessMenu(MENU_CONFIRM_SAVE, 1);
     }
 
-    SetMessage("Saved game to: %s", filename);
+
 
     EndMenu();
 }
@@ -2682,6 +2683,7 @@ local void ConfirmSaveFile(void)
     strcat(name, "/");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     SaveGame(name);
+    SetMessage("Saved game to: %s", name);
     EndMenu();
 }
 
