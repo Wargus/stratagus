@@ -95,6 +95,7 @@ local void ObjectivesExit(Menuitem *mi);
 
 // Victory, lost
 local void GameMenuEnd(void);
+local void SaveReplayInit(void);
 local void SaveReplay(void);
 
 // Scenario select
@@ -458,6 +459,7 @@ global void InitMenuFuncHash(void) {
 
 // Victory, lost
     HASHADD(GameMenuEnd,"game-menu-end");
+    HASHADD(SaveReplayInit,"save-replay-init");
     HASHADD(SaveReplay,"save-replay");
 
 // Scenario select
@@ -2195,12 +2197,61 @@ local void GameMenuEnd(void)
     CurrentMenu = NULL;
 }
 
+local void SaveReplayInit(void)
+{
+    char filename[32];
+    Menu *menu;
+
+    menu = FindMenu("menu-save-replay");
+    menu->items[1].d.input.buffer = filename;
+    strcpy(filename, "~!_");
+    menu->items[1].d.input.nch = 0;
+    menu->items[1].d.input.maxch = 28;
+
+    EndMenu();
+    ProcessMenu("menu-save-replay", 1);
+}
+
 /**
 **	TODO
 */
 local void SaveReplay(void)
 {
+    char filename[128];
+    char tmpname[128];
+    FILE *tmpfile;
+    FILE *newfile; 
+    Menu *menu;
+    char *buf;
+    struct stat s;
 
+    menu = FindMenu("menu-save-replay");
+
+#ifdef WIN32
+    sprintf(tmpname,"logs");
+#else
+    sprintf(tmpname,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    strcat(tmpname,"/logs");
+#endif
+    strcpy(filename, tmpname);
+    strcat(filename,"/");
+    strncat(filename, menu->items[1].d.input.buffer,
+	    menu->items[1].d.input.nch);
+    sprintf(tmpname,"%s/log_of_freecraft_%d.log",tmpname,ThisPlayer->Player);
+
+    stat(tmpname, &s);
+    buf = (char*)malloc(s.st_size);
+
+    tmpfile = fopen(tmpname,"rb");
+    newfile = fopen(filename,"wb");
+
+    fread(buf, s.st_size, 1, tmpfile);
+    fwrite(buf, s.st_size, 1, newfile);
+    
+    fclose(tmpfile);
+    fclose(newfile);
+
+    EndMenu();
 }
 
 /**
