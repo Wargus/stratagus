@@ -3223,7 +3223,7 @@ static ClipCode ClipCodeLine( int x, int y )
 **	@param code1	ClipCode of one point of line
 **	@param code2	ClipCode of second point of line
 */
-static ClipCode LineIsUnclippedOnSameSide( code1, code2 )
+static ClipCode LineIsUnclippedOnSameSide( int code1, int code2 )
 {
    int newmask = code1 & code2;
    return newmask;
@@ -3236,7 +3236,7 @@ static ClipCode LineIsUnclippedOnSameSide( code1, code2 )
 **	@param code1	ClipCode of one point of line
 **	@param code2	ClipCode of second point of line
 */
-static ClipCode LineIsUnclipped( code1, code2 )
+static ClipCode LineIsUnclipped( int code1, int code2 )
 {
    int newmask = code1 | code2;
    return newmask;
@@ -6057,6 +6057,7 @@ global void DebugTestDisplayVarious(void)
 {
   int x,y,i,j;
 
+  x=y=i=j=0;
  //Should not show anything (segmentation fault when not properly clipped)
   VideoDrawPixelClip(ColorRed,-1,0);
   VideoDrawPixelClip(ColorRed,0,-1);
