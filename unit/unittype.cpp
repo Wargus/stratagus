@@ -843,6 +843,12 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->RepairRange ) {
 	CLprintf(file,"  'repair-range %d\n",type->RepairRange);
     }
+    if( type->DemolishRange ) {
+	CLprintf(file,"  'demolish-range %d\n",type->DemolishRange);
+    }
+    if( type->DemolishRange ) {
+	CLprintf(file,"  'demolish-damage %d\n",type->DemolishDamage);
+    }
     if( type->CanTarget ) {
 	CLprintf(file,"  ");
 	if( type->CanTarget&CanTargetLand ) {
@@ -888,6 +894,12 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->Critter ) {
 	CLprintf(file,"  'critter\n");
     }
+    if( type->RandomMovementProbability ) {
+	CLprintf(file,"  'random-movement-probability %d\n",type->RandomMovementProbability);
+    }
+    if( type->ClicksToExplode ) {
+	CLprintf(file,"  'clicks-to-explode %d\n",type->ClicksToExplode);
+    }
     if( type->Revealer ) {
 	CLprintf(file,"  'revealer\n");
     }
@@ -909,7 +921,6 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
     
     if( type->Harvester ) {
-	CLprintf(file,"  'harvester\n");
 	for (i=0;i<MaxCosts;i++) {
 	    if (type->ResInfo[i]) {
 		res=type->ResInfo[i];

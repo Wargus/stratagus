@@ -253,7 +253,18 @@
 **
 **	UnitType::Points
 **
-**		How many points you get for unit
+**		How many points you get for unit. Used in the final score table.
+**
+**	UnitType::DemolishRange
+**
+**		If non-zero This is the range for units that can demolish.
+**		The demolished area is a square, sorry.
+**
+**	UnitType::DemolishDamage
+**
+**		Damage dealt to unit affected by demolition. This can be 0,
+**		in this case only terrain will be affected. Units have to be in
+**		DemolishRange to be affected.
 **
 **	UnitType::CanTarget
 **
@@ -285,6 +296,16 @@
 **
 **		Unit is marked as critter. The effect of this is that when
 **		idle the unit will move around randomly.
+**
+**	UnitType::RandomMovementProbability
+**
+**		When the unit is idle this is the probability that it will
+**		take a step in a random direction, in percents.
+**
+**	UnitType::ClickToExplode
+**
+**		If this is non-zero, then after that many clicks the unit will
+**		commit suicide. Doesn't work with resource workers/resources.
 **
 **	UnitType::Wall
 **
@@ -724,6 +745,8 @@ struct _unit_type_ {
     unsigned SeaUnit : 1;		/// Sea animated
     unsigned ExplodeWhenKilled : 1;	/// Death explosion animated
     unsigned Critter : 1;		/// Unit is controlled by nobody
+    unsigned int RandomMovementProbability;/// Probability to move randomly.
+    unsigned int ClicksToExplode;	/// Number of consecutive clicks until unit suicides.
     unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
     unsigned PermanentCloak : 1;	/// Is only visible by CloakDetectors.
@@ -737,6 +760,8 @@ struct _unit_type_ {
     unsigned ShoreBuilding : 1;		/// Building must be build on coast.
     unsigned CanCastSpell : 1;		/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
+    unsigned int DemolishRange;		/// Unit will Demolish around when dead.
+    unsigned int DemolishDamage;	/// Damage dealt to unit affected by demolition.
     unsigned int RepairRange;		/// Units repair range.
     unsigned BuilderOutside : 1;	/// The builder stays outside during the build.
     unsigned BuilderLost : 1;		/// The builder is lost after the build.

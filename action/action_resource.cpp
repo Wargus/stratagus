@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "player.h"
@@ -150,7 +151,7 @@ local int StartGathering(Unit* unit)
 	DebugCheck(!ForestOnMap(unit->Orders->X,unit->Orders->Y));
 	UnitHeadingFromDeltaXY(unit,unit->Orders->X-unit->X,unit->Orders->Y-unit->Y);
 	if (resinfo->WaitAtResource) {
-	    unit->Data.ResWorker.TimeToHarvest=resinfo->WaitAtResource;
+	    unit->Data.ResWorker.TimeToHarvest=resinfo->WaitAtResource/SpeedResourcesHarvest[resinfo->ResourceId];
 	} else {
 	    unit->Data.ResWorker.TimeToHarvest=1;
 	}
@@ -238,7 +239,7 @@ local int StartGathering(Unit* unit)
 	unit->Y=goal->Y;
     }
 
-    unit->Data.ResWorker.TimeToHarvest=resinfo->WaitAtResource;
+    unit->Data.ResWorker.TimeToHarvest=resinfo->WaitAtResource/SpeedResourcesHarvest[resinfo->ResourceId];
 
     unit->Data.ResWorker.DoneHarvesting=0;
 
@@ -306,8 +307,8 @@ local int GatherResource(Unit* unit)
 	// No wood? Freeze!!!
     }
 
-    if (!unit->Data.ResWorker.DoneHarvesting&&unit->Data.ResWorker.TimeToHarvest<0) {
-	unit->Data.ResWorker.TimeToHarvest+=resinfo->WaitAtResource;
+    while ((!unit->Data.ResWorker.DoneHarvesting)&&unit->Data.ResWorker.TimeToHarvest<0) {
+	unit->Data.ResWorker.TimeToHarvest+=resinfo->WaitAtResource/SpeedResourcesHarvest[resinfo->ResourceId];
 	
 	//
 	//  Calculate how much we can load.
@@ -605,7 +606,7 @@ local int MoveToDepot(Unit* unit)
 	MustRedraw|=RedrawResources;
     }
 
-    unit->Wait=resinfo->WaitAtDepot;
+    unit->Wait=resinfo->WaitAtDepot/SpeedResourcesReturn[resinfo->ResourceId];
 
     return 1;
 }
@@ -709,8 +710,10 @@ global void HandleActionResource(Unit* unit)
 {
     int ret,newres;
 
-    DebugLevel3Fn("%s(%d) SubAction %d\n"
-	_C_ unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction);
+    DebugLevel3Fn("%s(%d) SubAction %d TTH %d res %s goal %ul\n"
+	_C_ unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction
+	_C_ unit->Data.ResWorker.TimeToHarvest _C_ DefaultResourceNames[unit->CurrentResource]
+	_C_ (unsigned int)unit->Orders->Goal);
     
     //	Let's start mining.
     if ( unit->SubAction==SUB_START_RESOURCE ) {
@@ -804,6 +807,15 @@ global void HandleActionResource(Unit* unit)
     if (unit->SubAction==SUB_RETURN_RESOURCE) {
 	if( WaitInDepot(unit) ) {
 	    unit->SubAction=SUB_START_RESOURCE;
+	    //
+	    //	It's posible, though very rare that the unit's goal blows up
+	    //	this cycle, but after this unit. Thus, next frame the unit
+	    //	will start mining a destroyed site. If, on the otherhand we
+	    //	are already in SUB_MOVE_TO_RESOURCE then we can handle it.
+	    //	So, we pass through SUB_START_RESOURCE the very instant it
+	    //	goes out of the depot.
+	    //
+	    HandleActionResource(unit);
 	}
 	return;
     }

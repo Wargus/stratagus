@@ -376,6 +376,12 @@ local SCM CclDefineUnitType(SCM list)
 	    type->GroundAttack=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-attack")) ) {
 	    type->CanAttack=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("demolish-range"))){
+	    type->DemolishRange=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("demolish-damage"))){
+	    type->DemolishDamage=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("repair-range")) ) {
 	    type->RepairRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -419,6 +425,12 @@ local SCM CclDefineUnitType(SCM list)
 	    type->SeaUnit=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("critter")) ) {
 	    type->Critter=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("random-movement-probability")) ) {
+	    type->RandomMovementProbability=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("clicks-to-explode")) ) {
+	    type->ClicksToExplode=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("permanent-cloak")) ) {
 	    type->PermanentCloak=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("detect-cloak")) ) {
@@ -427,8 +439,6 @@ local SCM CclDefineUnitType(SCM list)
 	    type->Transporter=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("coward")) ) {
 	    type->Coward=1;
-	} else if( gh_eq_p(value,gh_symbol2scm("harvester")) ) {
-	    type->Harvester=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-gather-resource")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
@@ -474,6 +484,7 @@ local SCM CclDefineUnitType(SCM list)
 		   DebugCheck( 1 );
 		}
 	    }
+	    type->Harvester=1;
 	    if (!res->FinalResource) {
 		res->FinalResource=res->ResourceId;
 	    }
