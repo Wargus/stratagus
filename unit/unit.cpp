@@ -69,7 +69,7 @@ global void InitUnitsMemory(void)
 {
     Unit** slot;
 
-    // Initiallize the "list" of free unit slots
+    // Initialize the "list" of free unit slots
 
     slot=UnitSlots+MAX_UNIT_SLOTS;
     *--slot=NULL;			// leave the last slot free as no marker
@@ -80,8 +80,10 @@ global void InitUnitsMemory(void)
     UnitSlotFree=slot;
 
     ReleasedTail=&ReleasedHead;		// list of unfreed units.
+    NumUnits=0;
 }
 
+#if 0
 /**
 **	Free the memory for an unit slot. Update the global slot table.
 **	The memory should only be freed, if all references are dropped.
@@ -101,6 +103,7 @@ global void FreeUnitMemory(Unit* unit)
     *slot=(void*)UnitSlotFree;
     free(unit);
 }
+#endif
 
 /**
 **	Release an unit.
@@ -1141,15 +1144,15 @@ global void UnitIncrementHealth(void)
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if (HitPointRegeneration &&  unit->HP<unit->Stats->HitPoints)
-	{
-		++unit->HP;
+	if (HitPointRegeneration &&  unit->HP<unit->Stats->HitPoints) {
+	    ++unit->HP;
 
-		// some frames delayed done my color cycling
-	    if( 0 )
-			CheckUnitToBeDrawn(unit);
-	    if( unit->Selected )
-			MustRedraw|=RedrawInfoPanel;
+	    if( 0 ) {		// some frames delayed done my color cycling
+		CheckUnitToBeDrawn(unit);
+	    }
+	    if( unit->Selected ) {
+		MustRedraw|=RedrawInfoPanel;
+	    }
 	}
 	if( unit->Type==berserker
 		&& unit->HP<unit->Stats->HitPoints
@@ -2867,16 +2870,273 @@ global char* UnitReference(const Unit* unit)
     char* ref;
 
     ref=malloc(10);
-    sprintf(ref,"U%08ZX",UnitNumber(unit));
+    sprintf(ref,"U%04X",UnitNumber(unit));
     return ref;
 }
 
 /**
+**	Save an order.
+**
+**	@param order	Order who should be saved.
+**	@param file	Output file.
+*/
+local void SaveOrder(const Order* order,FILE* file)
+{
+    char* ref;
+
+    fprintf(file,"'(");
+    switch( order->Action ) {
+	case UnitActionNone:
+	    fprintf(file,"action-none");
+	    break;
+
+	case UnitActionStill:
+	    fprintf(file,"action-still");
+	    break;
+	case UnitActionStandGround:
+	    fprintf(file,"action-stand-ground");
+	    break;
+	case UnitActionFollow:
+	    fprintf(file,"action-follow");
+	    break;
+	case UnitActionMove:
+	    fprintf(file,"action-move");
+	    break;
+	case UnitActionAttack:
+	    fprintf(file,"action-attack");
+	    break;
+	case UnitActionAttackGround:
+	    fprintf(file,"action-attack-ground");
+	    break;
+	case UnitActionDie:
+	    fprintf(file,"action-die");
+	    break;
+
+	case UnitActionSpellCast:
+	    fprintf(file,"action-spell-cast");
+	    break;
+
+	case UnitActionTrain:
+	    fprintf(file,"action-train");
+	    break;
+	case UnitActionUpgradeTo:
+	    fprintf(file,"action-upgrade-to");
+	    break;
+	case UnitActionResearch:
+	    fprintf(file,"action-research");
+	    break;
+	case UnitActionBuilded:
+	    fprintf(file,"action-builded");
+	    break;
+
+	case UnitActionBoard:
+	    fprintf(file,"action-board");
+	    break;
+	case UnitActionUnload:
+	    fprintf(file,"action-unload");
+	    break;
+	case UnitActionPatrol:
+	    fprintf(file,"action-patrol");
+	    break;
+	case UnitActionBuild:
+	    fprintf(file,"action-build");
+	    break;
+
+	case UnitActionRepair:
+	    fprintf(file,"action-repair");
+	    break;
+	case UnitActionHarvest:
+	    fprintf(file,"action-harvest");
+	    break;
+	case UnitActionMineGold:
+	    fprintf(file,"action-mine-gold");
+	    break;
+	case UnitActionMineOre:
+	    fprintf(file,"action-mine-ore");
+	    break;
+	case UnitActionMineCoal:
+	    fprintf(file,"action-mine-coal");
+	    break;
+	case UnitActionQuarryStone:
+	    fprintf(file,"action-quarry-stone");
+	    break;
+	case UnitActionHaulOil:
+	    fprintf(file,"action-haul-oil");
+	    break;
+	case UnitActionReturnGoods:
+	    fprintf(file,"action-return-goods");
+	    break;
+
+	case UnitActionDemolish:
+	    fprintf(file,"action-demolish");
+	    break;
+    }
+    fprintf(file," flags %d",order->Flags);
+    fprintf(file," range (%d %d)",order->RangeX,order->RangeY);
+    if( order->Goal ) {
+	fprintf(file," goal %s",ref=UnitReference(order->Goal));
+	free(ref);
+    }
+    fprintf(file," tile (%d %d)",order->X,order->Y);
+    if( order->Type ) {
+	fprintf(file," type %s",order->Type->Ident);
+    }
+    if( order->Arg1 ) {
+	// patrol=pos, research=upgrade, spell=spell
+	switch( order->Action ) {
+	    case UnitActionPatrol:
+		fprintf(file," patrol (%d %d)",
+			(int)order->Arg1>>16,(int)order->Arg1&0xFFFF);
+		break;
+	    case UnitActionSpellCast:
+		fprintf(file," spell %s",((SpellType*)order->Arg1)->Ident);
+		break;
+	    case UnitActionResearch:
+		fprintf(file," upgrade %s",((Upgrade*)order->Arg1)->Ident);
+		break;
+	    default:
+		fprintf(file," arg1 %08X",(int)order->Arg1);
+		break;
+	}
+    }
+    fprintf(file,")");
+}
+
+/**
 **	Save the state of an unit to file.
+**
+**	@param unit	Unit pointer to be saved.
+**	@param file	Output file.
 */
 global void SaveUnit(const Unit* unit,FILE* file)
 {
-    DebugLevel0Fn("FIXME: not written\n");
+    char* ref;
+    int i;
+
+    fprintf(file,"\n(unit '%s\n  ",ref=UnitReference(unit));
+    free(ref);
+
+    if( unit->Next ) {
+	fprintf(file,"'next '%s ",ref=UnitReference(unit->Next));
+	free(ref);
+    }
+
+    fprintf(file,"'tile '(%d %d)",unit->X,unit->Y);
+
+    fprintf(file," 'type '%s\n  ",unit->Type->Ident);
+    fprintf(file,"'player %d ",unit->Player->Player);
+    fprintf(file,"'stats 'S%08X\n  ",(int)unit->Stats);
+    fprintf(file,"'pixel '(%d %d) ",unit->IX,unit->IY);
+    fprintf(file,"'%sframe %d ",
+	    unit->Frame&128 ? "flipped-" : "" ,unit->Frame&127);
+    if( unit->SeenFrame!=0xFF ) {
+	fprintf(file,"'%sseen %d ",
+		unit->SeenFrame&128 ? "flipped-" : "" ,unit->SeenFrame&127);
+    } else {
+	fprintf(file,"'not-seen ");
+    }
+    fprintf(file,"'direction %d\n  ",(unit->Direction*360)/256);
+    fprintf(file,"'attacked %d\n ",unit->Attacked);
+    if( unit->Burning ) {
+	fprintf(file," 'burning");
+    }
+    if( unit->Destroyed ) {
+	fprintf(file," 'destroyed");
+    }
+    if( unit->Removed ) {
+	fprintf(file," 'removed");
+    }
+    if( unit->Selected ) {
+	fprintf(file," 'selected");
+    }
+    fprintf(file," 'visible \"");
+    for( i=0; i<PlayerMax; ++i ) {
+	fputc((unit->Visible&(1<<i)) ? 'X' : '_',file);
+    }
+    fprintf(file,"\"\n ");
+    if( unit->Constructed ) {
+	fprintf(file," 'constructed");
+    }
+    if( unit->Active ) {
+	fprintf(file," 'active");
+    }
+    fprintf(file," 'mana %d",unit->Mana);
+    fprintf(file," 'hp %d\n  ",unit->HP);
+
+    fprintf(file,"'ttl %d ",unit->TTL);
+    fprintf(file,"'bloodlust %d ",unit->Bloodlust);
+    fprintf(file,"'haste %d ",unit->Haste);
+    fprintf(file,"'slow %d\n  ",unit->Slow);
+    fprintf(file,"'invisible %d ",unit->Invisible);
+    fprintf(file,"'flame-shield %d ",unit->FlameShield);
+    fprintf(file,"'unholy-armor %d\n  ",unit->UnholyArmor);
+
+    fprintf(file,"'group-id %d\n  ",unit->GroupId);
+    fprintf(file,"'last-group %d\n  ",unit->LastGroup);
+
+    fprintf(file,"'sub-action %d ",unit->SubAction);
+    fprintf(file,"'wait %d ",unit->Wait);
+    fprintf(file,"'state %d",unit->State);
+    if( unit->Reset ) {
+	fprintf(file," 'reset");
+    }
+    fprintf(file,"\n  'blink %d",unit->Blink);
+    if( unit->Moving ) {
+	fprintf(file," 'moving");
+    }
+    fprintf(file," 'rs %d",unit->Rs);
+    if( unit->Revealer ) {
+	fprintf(file," 'revealer");
+    }
+    fprintf(file,"\n  'on-board #(");
+    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
+	if( unit->OnBoard[i] ) {
+	    fprintf(file,"'%s",ref=UnitReference(unit->OnBoard[i]));
+	    free(ref);
+	} else {
+	    fprintf(file,"()");
+	}
+	if( i<MAX_UNITS_ONBOARD-1 ) {
+	    fputc(' ',file);
+	}
+    }
+    fprintf(file,")\n  ");
+    fprintf(file,"'order-count %d\n  ",unit->OrderCount);
+    fprintf(file,"'order-flush %d\n  ",unit->OrderFlush);
+    fprintf(file,"'orders #(");
+    for( i=0; i<MAX_ORDERS; ++i ) {
+	fprintf(file,"\n    ");
+	SaveOrder(&unit->Orders[i],file);
+    }
+    fprintf(file,")\n  'saved-order ");
+    SaveOrder(&unit->SavedOrder,file);
+    fprintf(file,"\n  'new-order ");
+    SaveOrder(&unit->NewOrder,file);
+
+    //
+    //	Order data part
+    //
+    switch( unit->Orders[0].Action ) {
+	case UnitActionStill:
+	    break;
+	case UnitActionBuilded:
+	    fprintf(file,"\n  'data-builded 'FIXME");
+	    break;
+	case UnitActionResearch:
+	    fprintf(file,"\n  'data-reseach 'FIXME");
+	    break;
+	case UnitActionUpgradeTo:
+	    fprintf(file,"\n  'data-upgrade-to 'FIXME");
+	    break;
+	case UnitActionTrain:
+	    fprintf(file,"\n  'data-train 'FIXME");
+	    break;
+	default:
+	    fprintf(file,"\n  'data-move 'FIXME");
+	    break;
+    }
+
+    fprintf(file,")\n");
 }
 
 /**
@@ -2886,12 +3146,56 @@ global void SaveUnit(const Unit* unit,FILE* file)
 */
 global void SaveUnits(FILE* file)
 {
-    Unit** unit;
+    Unit** table;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: units $Id$\n");
-    for( unit=Units; unit<&Units[NumUnits]; ++unit ) {
-	SaveUnit(*unit,file);
+    fprintf(file,";;; MODULE: units $Id$\n\n");
+
+    //
+    //	Local variables
+    //
+    fprintf(file,"(set-hitpoint-regeneration! #%s)\n",
+	    HitPointRegeneration ? "t" : "f");
+
+    for( table=Units; table<&Units[NumUnits]; ++table ) {
+	SaveUnit(*table,file);
+    }
+}
+
+/*----------------------------------------------------------------------------
+--	Initialize/Cleanup
+----------------------------------------------------------------------------*/
+
+/**
+**	Initialize unit module.
+*/
+global void InitUnits(void)
+{
+    InitUnitsMemory();
+}
+
+/**
+**	Cleanup unit module.
+*/
+global void CleanUnits(void)
+{
+    Unit** table;
+    Unit* unit;
+
+    //
+    //	Free memory for all units in unit table.
+    //
+    for( table=Units; table<&Units[NumUnits]; ++table ) {
+	free(*table);
+	*table=NULL;
+    }
+
+    //
+    //	Release memory of units in release queue.
+    //
+    while( (unit=ReleasedHead) ) {
+	ReleasedHead=unit->Next;
+	free(unit);
     }
 }
 
