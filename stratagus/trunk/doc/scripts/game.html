@@ -45,6 +45,7 @@
 <HR>
 <A HREF="#add-keystroke-help">add-keystroke-help</A>
 <A HREF="#add-message">add-message</A>
+<A HREF="#add-objective">add-objective</A>
 <A HREF="#add-tip">add-tip</A>
 <A HREF="#briefing">briefing</A>
 <A HREF="#create-unit">create-unit</A>
@@ -76,6 +77,7 @@
 <A HREF="#pf-show-regids!">pf-show-regids!</A>
 <A HREF="#place-unit">place-unit</A>
 <A HREF="#player">player</A>
+<A HREF="#remove-objective">remove-objective</A>
 <A HREF="#replay-log">replay-log</A>
 <A HREF="#reset-keystroke-help">reset-keystroke-help</A>
 <A HREF="#selection">selection</A>
@@ -151,34 +153,65 @@ Everything around the game.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
+<A NAME="add-objective"></A>
+<H3>add-objective</H3>
+
+<H4>Description</H4>
+
+Add an objective to the scenario objectives text list.
+
+<H4>Syntax</H4>
+
+<CODE>(add-objective objective position)</CODE>
+
+<DL>
+<DT>objective</DT>
+<DD>Objective text.
+</DD>
+<DT>position</DT>
+<DD>Optional position (0 offset) to add the objective, default is at the end.
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-objective "-Build a barracks")
+    (add-objective "-Destroy all enemies" 0)
+</PRE>
+
+<P>Adds the objective text "-Build a barracks" to the end of the objectives
+list and adds the objective "-Destroy all enemies" to the first position.
+
+<H4>Not Used</H4>
+
 <A NAME="add-tip"></A>
 <H3>add-tip</H3>
 
 <H4>Description</H4>
 
-.
+Adds a tip.  Tips are shown at the start of a level.
 
 <H4>Syntax</H4>
 
-<CODE>(add-tip)</CODE>
+<CODE>(add-tip tip)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>tip</DT>
+<DD>Text of the tip.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (add-tip)
+    (add-tip "You can demolish trees and rocks.")
 </PRE>
 
-<P>.
+<P>Adds the tip.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/tips.ccl"> $LIBARYPATH/ccl/tips.ccl </A>
 
 <A NAME="briefing"></A>
 <H3>briefing</H3>
@@ -1047,6 +1080,32 @@ Returns the current game cycle.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="remove-objective"></A>
+<H3>remove-objective</H3>
+
+<H4>Description</H4>
+
+Remove an objective from the scenario objectives text list.
+
+<H4>Syntax</H4>
+
+<CODE>(remove-objective position)</CODE>
+
+<DL>
+<DT>position</DT>
+<DD>Position (0 offset) to remove from the objectives list.
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (remove-objective 0)
+</PRE>
+
+<P>Remove the first objective from the objectives list.
+
+<H4>Not Used</H4>
 
 <A NAME="replay-log"></A>
 <H3>replay-log</H3>
