@@ -1896,7 +1896,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 	PlayMusic(":random");
     } else {
     // Stop Playing CD
-        SDL_CDStop(CDRom);
+        SDL_CDPause(CDRom);
 	CDMode = ":stopped";
     }
 #elif defined(USE_LIBCDA)
