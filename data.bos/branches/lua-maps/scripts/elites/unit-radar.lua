@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: unit-radar.lua,v 1.2 2004/12/12 16:07:28 feb Exp $
+--	$Id$
 
 DefineAnimations("animations-radar",
    "still", {
@@ -56,7 +56,7 @@ DefineConstruction("construction-radar", {
 
 DefineUnitType("unit-radar", {
         Name = "Radar",
-        Files = {"tileset-desert", "elites/build/radar.png"}, Size = {64, 64},
+        Files = {"default", "elites/build/radar.png"}, Size = {64, 64},
 	Offset = {12, -16},
         Shadow = {"file", "elites/build/radar_s.png", "size", {64, 64}},
         Animations = "animations-radar", Icon = "icon-radar",
@@ -76,7 +76,7 @@ DefineUnitType("unit-radar", {
 
 DefineUnitType("radar_destroyed", {
         Name = "RadarWreck",
-        Files = {"tileset-desert", "elites/build/radar.png"}, Size = {64, 64},
+        Files = {"default", "elites/build/radar.png"}, Size = {64, 64},
         Animations = "animations-radar", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
