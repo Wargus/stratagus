@@ -3132,6 +3132,9 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 		x = target->X - attacker->X;
 		y = target->Y - attacker->Y;
 		d = isqrt(x * x + y * y);
+		if (!d) {
+			d = 1;
+		}
 		x = target->X + (x * 5) / d;
 		y = target->Y + (y * 5) / d;
 		CommandStopUnit(target);
