@@ -1446,7 +1446,7 @@ local void InitKeystrokeHelpMenuItems() {
 
 local Menuitem SaveGameMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
-    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveLBInit, SaveLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
