@@ -735,20 +735,27 @@ global void TriggersEachCycle(void)
 {
     SCM pair;
     SCM trig;
+    static SCM trigger_start=NIL;
 
     if( !Trigger ) {
 	Trigger=symbol_value(gh_symbol2scm("*triggers*"),NIL);
+	trigger_start=Trigger;
     }
 
     if( !gh_null_p(trig=Trigger) ) {		// Next trigger
 	pair=gh_car(trig);
 	Trigger=gh_cdr(trig);
 	// Pair is condition action
-	if( !gh_null_p(gh_apply(car(pair),NIL)) ) {
+	if( !gh_null_p(pair) && !gh_null_p(gh_apply(car(pair),NIL)) ) {
 	    if( gh_null_p(gh_apply(cdr(pair),NIL)) ) {
-		DebugLevel0Fn("FIXME: should remove trigger\n");
-		//CAR(trig)=CAR(Trigger);
-		//CDR(trig)=CDR(Trigger);
+		if( !gh_null_p(Trigger) ) {
+		    setcar(trig,gh_car(Trigger));
+		    setcdr(trig,gh_cdr(Trigger));
+		} else {
+		    setcar(trig,NIL);
+		    setcdr(trig,NIL);
+		}
+		setvar(gh_symbol2scm("*triggers*"),trigger_start,NIL);
 	    }
 	    fflush(stdout);
 	}
