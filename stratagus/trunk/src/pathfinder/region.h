@@ -23,7 +23,10 @@ struct _region_neighbor_ {
 **  A region of the map
 */
 struct _region_ {
-    unsigned short RegId;			// this Region's id number
+#if DEBUG
+	unsigned int Magic;			// to detect memory corruption
+#endif
+    unsigned short RegId;		// this Region's id number
     unsigned short GroupId;		// id of the RegGroup to which Region belongs
 	struct _region_ *Next;
 	struct _region_ *NextInGroup;
