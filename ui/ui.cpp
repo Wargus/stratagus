@@ -338,11 +338,15 @@ local void SaveUi(FILE* file,const UI* ui)
 	    ui->InfoPanelX,ui->InfoPanelY,
 	    ui->InfoPanelW,ui->InfoPanelH);
 
-    fprintf(file,"  ; Complete bar\n");
-    fprintf(file,"  (list %d %d %d %d %d)\n",
-	    ui->CompleteBarColor,
-	    ui->CompleteBarX,ui->CompleteBarY,
+    fprintf(file,"\n  'completed-bar '(");
+    fprintf(file,"\n    color %d",ui->CompleteBarColor);
+    fprintf(file,"\n    pos (%3d %3d)",ui->CompleteBarX,ui->CompleteBarY);
+    fprintf(file,"\n    size (%d %d)",ui->CompleteBarW,ui->CompleteBarH);
+    fprintf(file,"\n    text \"%s\"",ui->CompleteBarText);
+    fprintf(file,"\n    font %s",FontNames[ui->CompleteBarFont]);
+    fprintf(file,"\n    text-pos (%3d %3d)",
 	    ui->CompleteTextX,ui->CompleteTextY);
+    fprintf(file,")\n\n");
 
     fprintf(file,"  ; Button panel\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",

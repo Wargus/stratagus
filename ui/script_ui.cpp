@@ -867,35 +867,46 @@ local SCM CclDefineUI(SCM list)
     ui->InfoPanelH=y;
 
     // Completed bar
-    temp=gh_car(list);
+    value=gh_car(list);
     list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+    if( gh_eq_p(value,gh_symbol2scm("completed-bar")) ) {
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("color")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteBarColor=gh_scm2int(value);
+	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteBarX=gh_scm2int(gh_car(value));
+		ui->CompleteBarY=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteBarW=gh_scm2int(gh_car(value));
+		ui->CompleteBarH=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteBarText=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteBarFont=CclFontByIdentifier(value);
+	    } else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->CompleteTextX=gh_scm2int(gh_car(value));
+		ui->CompleteTextY=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else {
+		errl("Unsupported tag",value);
+	    }
+	}
     }
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    i=gh_scm2int(value);
-    ui->CompleteBarColor=i;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->CompleteBarX=x;
-    ui->CompleteBarY=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->CompleteTextX=x;
-    ui->CompleteTextY=y;
 
     //	ButtonPanel
     temp=gh_car(list);
