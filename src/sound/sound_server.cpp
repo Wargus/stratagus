@@ -1342,8 +1342,7 @@ global int InitSound(void)
     DebugLevel0Fn("FIXME: must write non GLIB hash functions\n");
 #endif
 
-    // FIXME: should make it configurable
-    PlayMusic("music/default.mod");
+    PlayMusic(TitleMusic);
 
     return 0;
 }

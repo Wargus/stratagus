@@ -196,7 +196,10 @@ local SCM CclSetTitleScreen(SCM title)
 {
     SCM old;
 
-    old=gh_str02scm(TitleScreen);
+    old=NIL;
+    if( TitleScreen ) {
+	old=gh_str02scm(TitleScreen);
+    }
     if( !gh_null_p(title) ) {
 	if( TitleScreen ) {
 	    CclFree(TitleScreen);
@@ -204,6 +207,110 @@ local SCM CclSetTitleScreen(SCM title)
 	}
 
 	TitleScreen=gh_scm2newstr(title,NULL);
+    }
+    return old;
+}
+
+/**
+**	Default title music.
+**
+**	@param music	title music. (nil reports only)
+**
+**	@return		Old title music.
+*/
+local SCM CclSetTitleMusic(SCM music)
+{
+    SCM old;
+
+    old=NIL;
+    if( TitleMusic ) {
+	old=gh_str02scm(TitleMusic);
+    }
+    if( !gh_null_p(music) ) {
+	if( TitleMusic ) {
+	    CclFree(TitleMusic);
+	    TitleMusic=NULL;
+	}
+
+	TitleMusic=gh_scm2newstr(music,NULL);
+    }
+    return old;
+}
+
+/**
+**	Default menu background.
+**
+**	@param background	background. (nil reports only)
+**
+**	@return		Old menu background.
+*/
+local SCM CclSetMenuBackground(SCM background)
+{
+    SCM old;
+
+    old=NIL;
+    if( MenuBackground ) {
+	old=gh_str02scm(MenuBackground);
+    }
+    if( !gh_null_p(background) ) {
+	if( MenuBackground ) {
+	    CclFree(MenuBackground);
+	    MenuBackground=NULL;
+	}
+
+	MenuBackground=gh_scm2newstr(background,NULL);
+    }
+    return old;
+}
+
+/**
+**	Default menu background with title.
+**
+**	@param background	background. (nil reports only)
+**
+**	@return		Old menu background.
+*/
+local SCM CclSetMenuBackgroundWithTitle(SCM background)
+{
+    SCM old;
+
+    old=NIL;
+    if( MenuBackgroundWithTitle ) {
+	old=gh_str02scm(MenuBackgroundWithTitle);
+    }
+    if( !gh_null_p(background) ) {
+	if( MenuBackgroundWithTitle ) {
+	    CclFree(MenuBackgroundWithTitle);
+	    MenuBackgroundWithTitle=NULL;
+	}
+
+	MenuBackgroundWithTitle=gh_scm2newstr(background,NULL);
+    }
+    return old;
+}
+
+/**
+**	Default menu music.
+**
+**	@param music	menu music. (nil reports only)
+**
+**	@return		Old menu music.
+*/
+local SCM CclSetMenuMusic(SCM music)
+{
+    SCM old;
+
+    old=NIL;
+    if( MenuMusic ) {
+	old=gh_str02scm(MenuMusic);
+    }
+    if( !gh_null_p(music) ) {
+	if( MenuMusic ) {
+	    CclFree(MenuMusic);
+	    MenuMusic=NULL;
+	}
+
+	MenuMusic=gh_scm2newstr(music,NULL);
     }
     return old;
 }
@@ -1566,6 +1673,11 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-saturation!",CclSetSaturation);
 
     gh_new_procedure1_0("set-title-screen!",CclSetTitleScreen);
+    gh_new_procedure1_0("set-menu-background!",CclSetMenuBackground);
+    gh_new_procedure1_0("set-menu-background-with-title!",
+	    CclSetMenuBackgroundWithTitle);
+    gh_new_procedure1_0("set-title-music!",CclSetTitleMusic);
+    gh_new_procedure1_0("set-menu-music!",CclSetMenuMusic);
 
     gh_new_procedure1_0("display-picture",CclDisplayPicture);
     gh_new_procedure1_0("process-menu",CclProcessMenu);

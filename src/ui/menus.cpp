@@ -1223,14 +1223,13 @@ global void DrawMenu(int MenuId)
 ----------------------------------------------------------------------------*/
 
 /**
-**	FIXME: docu.
+**	Set start menu backgound and draw it.
 */
 local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 {
     DestroyCursorBackground();
-    // FIXME: make this configurable from CCL.
     if (!Menusbgnd) {
-	Menusbgnd = LoadGraphic("graphics/ui/Menu background without title.png");
+	Menusbgnd = LoadGraphic(MenuBackground);
 	VideoSetPalette(Menusbgnd->Pixels);
     }
 
@@ -1242,7 +1241,6 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 	(VideoWidth-Menusbgnd->Width)/2,(VideoHeight-Menusbgnd->Height)/2);
 
     VideoUnlockScreen();
-
 }
 
 /**

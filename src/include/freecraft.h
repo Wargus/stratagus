@@ -438,6 +438,10 @@ extern int Map2ScreenY(int y);		/// Convert map tile to screen pixel
 #define MyRand()	rand()
 
 extern char* TitleScreen;		/// file for title screen
+extern char* MenuBackground;		/// file for menu background
+extern char* MenuBackgroundWithTitle;	/// file for menu with title
+extern char* TitleMusic;		/// file for title music
+extern char* MenuMusic;			/// file for menu music
 extern char* FreeCraftLibPath;		/// location of freecraft data
 
 extern int SpeedMine;			/// speed factor for mine gold
