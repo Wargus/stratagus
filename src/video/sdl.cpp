@@ -727,13 +727,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 #endif
 
 	    //
-	    //	Not more input and network in sync and time for frame over
-	    //
-	    if( !i && NetworkInSync && VideoInterrupts ) {
-		break;
-	    }
-
-	    //
 	    //	Network
 	    //
 	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
@@ -742,9 +735,9 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	}
 
 	//
-	//	Not more input and time for frame over: return
+	//	No more input and time for frame over: return
 	//
-	if( !i && VideoInterrupts ) {
+	if( !i && maxfd<=0 && VideoInterrupts ) {
 	    break;
 	}
     }
