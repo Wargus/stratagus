@@ -266,7 +266,8 @@ extern int main1(int argc,char* argv[]);/// init freecraft.
 extern volatile void Exit(int err);	/// exit freecraft.
 
 extern void SetMessage(char* message);
-extern void SetMessageDup(char* message);
+extern void SetMessageDup(const char* message);
+extern void SetMessageDupCat(const char* message);
 extern void ClearMessage(void);
 extern void SetStatusLine(char* status);
 extern void ClearStatusLine(void);

@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "unit.h"
@@ -57,6 +58,8 @@
 #endif	// !WIN32
 #endif // !USE_SDL_NET
 
+#define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
+
 //----------------------------------------------------------------------------
 //	Declaration
 //----------------------------------------------------------------------------
@@ -83,6 +86,7 @@ enum _message_type_ {
     MessageSync,			/// heart beat
     MessageQuit,			/// quit game
     MessageChat,			/// chat message
+    MessageChatCont,			/// chat message continue
 
     MessageCommandStop,			/// unit command stop
     MessageCommandStand,		/// unit command stand ground
@@ -120,6 +124,16 @@ typedef struct _network_command_ {
     unsigned short	Y;		/// Map position Y.
     UnitRef 		Dest;		/// Destination unit.
 } NetworkCommand;
+
+/**
+**	Network chat message.
+*/
+typedef struct _network_chat_ {
+    unsigned char	Frame;		/// Destination frame
+    unsigned char	Type;		/// Network command type
+    unsigned char	Player;		/// Sending player
+    char		Text[7];	/// Message bytes
+} NetworkChat;
 
 /**
 **	Network init message
@@ -939,6 +953,7 @@ global void InitNetwork(void)
     //	Server mode: clients connects to this computer.
     //
     DebugLevel0(__FUNCTION__": Packet %d\n",sizeof(NetworkCommand));
+    DebugLevel0(__FUNCTION__": Packet %d\n",sizeof(NetworkChat));
 
 
     NetworkFildes=-1;
@@ -1234,6 +1249,9 @@ global void NetworkEvent(void)
 	IfDebug( UnitCacheStatistic(); );
 	DebugLevel0("Got quit from network.\n");
 	exit(0);
+    }
+    if( ncq.Data.Type==MessageChat || ncq.Data.Type==MessageChatCont ) {
+	player=((NetworkChat*)&ncq.Data)->Player;
     } else if( ncq.Data.Type==MessageSync ) {
 	player=ntohs(ncq.Data.X);
     } else {
@@ -1272,10 +1290,38 @@ global void NetworkQuit(void)
 }
 
 /**
-**	Send chat message.
+**	Send chat message. (Message is send with low priority)
+**
+**	@param msg	Text message to send.
 */
 global void NetworkChatMessage(const char* msg)
 {
+    NetworkCommandQueue* ncq;
+    NetworkChat* ncm;
+    const char* cp;
+    int n;
+    int t;
+
+    t=MessageChat;
+    cp=msg;
+    n=strlen(msg);
+    while( n>=sizeof(ncm->Text) ) {
+	ncq=malloc(sizeof(NetworkCommandQueue));
+	dl_insert_last(CommandsIn,ncq->List);
+	ncq->Data.Type=t;
+	t=MessageChatCont;
+	ncm=(NetworkChat*)(&ncq->Data);
+	ncm->Player=ThisPlayer->Player;
+	memcpy(ncm->Text,cp,sizeof(ncm->Text));
+	cp+=sizeof(ncm->Text);
+	n-=sizeof(ncm->Text);
+    }
+    ncq=malloc(sizeof(NetworkCommandQueue));
+    dl_insert_last(CommandsIn,ncq->List);
+    ncq->Data.Type=t;
+    ncm=(NetworkChat*)(&ncq->Data);
+    ncm->Player=ThisPlayer->Player;
+    memcpy(ncm->Text,cp,n+1);		// see >= above :)
 }
 
 /**
@@ -1292,6 +1338,21 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
     int y;
 
     if( ncq->Data.Type==MessageSync ) {
+	return;
+    }
+    if( ncq->Data.Type==MessageChat || ncq->Data.Type==MessageChatCont ) {
+	NetworkChat* ncm;
+	char buf[256];
+
+	ncm=(NetworkChat*)(&ncq->Data);
+	memcpy(buf,ncm->Text,sizeof(ncm->Text));
+	buf[sizeof(ncm->Text)]='\0';
+
+	if( ncq->Data.Type==MessageChatCont ) {
+	    SetMessageDupCat(buf);
+	} else {
+	    SetMessageDup(buf);
+	}
 	return;
     }
     DebugLevel0(__FUNCTION__": %d frame %d\n",ncq->Data.Type,FrameCounter);
@@ -1434,6 +1495,8 @@ local void NetworkSendCommands(void)
     } else {
 	DebugLevel0(__FUNCTION__": command in remove\n");
 	ncq=(NetworkCommandQueue*)CommandsIn->first;
+	//ncq=BASE_OF(NetworkCommandQueue,List[0],CommandsIn->first);
+
 	dl_remove_first(CommandsIn);
     }
 
@@ -1453,7 +1516,7 @@ local void NetworkSendCommands(void)
     for( i=0; i<NetworkDups; ++i ) {
 	table[i]=ncq->Data;
 	ncq=(NetworkCommandQueue*)(ncq->List->next);
-	if( ncq->List==CommandsOut->null ) {
+	if( !ncq->List->next ) {
 	    break;
 	}
     }
