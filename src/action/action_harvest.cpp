@@ -17,22 +17,29 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
-#include "missile.h"
 #include "actions.h"
 #include "sound.h"
 #include "tileset.h"
 #include "map.h"
 #include "interface.h"
+#include "pathfinder.h"
+
+// FIXME: Should combine all the resource functions
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Move to forest.
@@ -48,13 +55,13 @@ local int MoveToWood(Unit* unit)
     int dx;
     int dy;
 
-    if( !HandleActionMove(unit) ) {	// reached end-point
+    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
-    // FIXME: reached nearly must be returned by HandleActionMove!
 
     //
     //	reached nearly? and is there wood?
+    //		FIXME: use return value of pathfinder.
     //
     if( unit->Command.Data.Move.Range ) {
 	// FIXME: not correct on map border :(
@@ -65,14 +72,14 @@ local int MoveToWood(Unit* unit)
     y=unit->Command.Data.Move.DY;
     dx=x-unit->X;
     dy=y-unit->Y;
-    DebugLevel3("Why %d,%d = %d\n",dx,dy,ForestOnMap(x,y));
+    DebugLevel3Fn("Why %d,%d = %d\n",dx,dy,ForestOnMap(x,y));
     if( dx<-1 || dx>1 || dy<-1 || dy>1 || !ForestOnMap(x,y) ) {
 	if( FindWoodInSight(unit
 		,&unit->Command.Data.Move.DX
 		,&unit->Command.Data.Move.DY) ) {
 
 	    // Move to new wood position
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	    unit->Command.Data.Move.Range=2;
 	    unit->Command.Action=UnitActionHarvest;
@@ -146,7 +153,7 @@ local int ChopWood(Unit* unit)
 	    if( FindWoodInSight(unit
 		    ,&unit->Command.Data.Move.DX
 		    ,&unit->Command.Data.Move.DY) ) {
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.Goal=NoUnitP;
 		unit->Command.Data.Move.Range=0;
 		// FIXME: shouldn't it be range=1 ??
@@ -155,7 +162,7 @@ local int ChopWood(Unit* unit)
 	    } else {
 		unit->Command.Action=UnitActionStill;
 		unit->SubAction=0;
-		DebugLevel3("NO-WOOD in sight range\n");
+		DebugLevel3Fn("NO-WOOD in sight range\n");
 	    }
 	    return 0;
 	}
@@ -171,7 +178,7 @@ local int ChopWood(Unit* unit)
 	    } else if( unit->Type==UnitTypeHumanWorker ) {
 		unit->Type=UnitTypeHumanWorkerWithWood;
 	    } else {
-		DebugLevel0("Wrong unit for chopping wood %d\n"
+		DebugLevel0Fn("Wrong unit for chopping wood %d\n"
 			,unit->Type->Type);
 	    }
 
@@ -201,7 +208,7 @@ local int ChopWood(Unit* unit)
 		unit->Command.Action=UnitActionStill;
 		unit->SubAction=0;
 	    } else {
-		unit->Command.Data.Move.Fast=1;
+		ResetPath(unit->Command);
 		unit->Command.Data.Move.Range=1;
 		unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
@@ -216,7 +223,7 @@ local int ChopWood(Unit* unit)
 		unit->Command.Data.Move.DX=destu->X;
 		unit->Command.Data.Move.DY=destu->Y;
 #endif
-		DebugLevel3("Return to %Zd=%d,%d\n"
+		DebugLevel3Fn("Return to %Zd=%d,%d\n"
 			    ,UnitNumber(destu)
 			    ,unit->Command.Data.Move.DX
 			    ,unit->Command.Data.Move.DY);
@@ -239,7 +246,7 @@ local int ReturnWithWood(Unit* unit)
     int y;
     Unit* destu;
 
-    if( !HandleActionMove(unit) ) {	// reached end-point
+    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
 
@@ -252,7 +259,7 @@ local int ReturnWithWood(Unit* unit)
     if( destu ) {
 #ifdef NEW_UNIT
 	if( destu->Destroyed ) {
-	    DebugLevel0(__FUNCTION__": destroyed unit\n");
+	    DebugLevel0Fn("Destroyed unit\n");
 	    if( !--destu->Refs ) {
 		ReleaseUnit(destu);
 	    }
@@ -281,8 +288,9 @@ local int ReturnWithWood(Unit* unit)
     y=unit->Command.Data.Move.DY;
     destu=WoodDepositOnMap(x,y);
 
+    // FIXME: could use the return value of the pathfinder
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-      DebugLevel2("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+      DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 		  ,UnitNumber(destu),x,y
 		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	unit->Command.Action=UnitActionStill;
@@ -309,7 +317,7 @@ local int ReturnWithWood(Unit* unit)
     } else if( unit->Type==UnitTypeHumanWorkerWithWood ) {
 	unit->Type=UnitTypeHumanWorker;
     } else {
-	DebugLevel0("Wrong unit for returning wood %d\n"
+	DebugLevel0Fn("Wrong unit for returning wood %d\n"
 	    ,unit->Type->Type);
     }
 
@@ -330,7 +338,7 @@ local int WaitInWoodDeposit(Unit* unit)
 {
     Unit* destu;
 
-    DebugLevel3("Waiting\n");
+    DebugLevel3Fn("Waiting\n");
 
     if( !unit->Value ) {
 	//
@@ -347,7 +355,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	//	Return to chop point.
 	//
 	unit->Command.Action=UnitActionHarvest;
-	unit->Command.Data.Move.Fast=1;
+	ResetPath(unit->Command);
 	unit->Command.Data.Move.Goal=NoUnitP;
 	unit->Command.Data.Move.Range=0;
 	unit->Command.Data.Move.DX=unit->Command.Data.Move.SX;

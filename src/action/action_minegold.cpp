@@ -32,6 +32,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "interface.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -48,18 +49,18 @@ local int MoveToGoldMine(Unit* unit)
 {
     Unit* destu;
 
-    if( !HandleActionMove(unit) ) {	// reached end-point
+    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
-    // FIXME: support new return values of the pathfinder
-    // FIXME: HandleActionMove must return this: reached nearly?
+    
+    // FIXME: HandleActionMove return this: reached nearly, use it!
 
     unit->Command.Action=UnitActionMineGold;
 
     destu=unit->Command.Data.Move.Goal;
 #ifdef NEW_UNIT
     if( destu && (destu->Destroyed || !destu->HP) ) {
-	DebugLevel1("WAIT after goldmine destroyed %d\n",unit->Wait);
+	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
 	if( !--destu->Refs ) {
 	    ReleaseUnit(destu);
 	}
@@ -69,7 +70,7 @@ local int MoveToGoldMine(Unit* unit)
     }
 #endif
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3("GOLD-MINE NOT REACHED %d,%d\n",dx,dy);
+	DebugLevel3Fn("GOLD-MINE NOT REACHED %d,%d\n",dx,dy);
 	return -1;
     }
 
@@ -82,7 +83,7 @@ local int MoveToGoldMine(Unit* unit)
     --destu->Refs;
 #else
     if( !destu->Type->GoldMine ) {  // Goldmine destroyed.
-	DebugLevel1("WAIT after goldmine destroyed %d\n",unit->Wait);
+	DebugLevel1Fn("WAIT after goldmine destroyed %d\n",unit->Wait);
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
@@ -117,16 +118,16 @@ local int MineInGoldmine(Unit* unit)
     Unit* mine;
     Unit* destu;
 
-    DebugLevel3("Waiting\n");
+    DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
 	//
 	// Have gold
 	//
 	mine=GoldMineOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel3("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(mine));
+	    DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(mine));
 	    if( !mine ) {
-		DebugLevel0("No unit? (%d,%d)\n",unit->X,unit->Y);
+		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
 		abort();
 	    } );
 
@@ -151,7 +152,7 @@ local int MineInGoldmine(Unit* unit)
 	    DestroyUnit(mine);
 	    if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
 		// FIXME: should return 0 here?
-		DebugLevel0(__FUNCTION__": Too less gold\n");
+		DebugLevel0Fn("Too less gold\n");
 	    }
 	}
 	// FIXME: I use goldmine after destory!!!
@@ -161,12 +162,12 @@ local int MineInGoldmine(Unit* unit)
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
-	    DebugLevel2("Mine without deposit\n");
+	    DebugLevel2Fn("Mine without deposit\n");
 	} else {
 	    DropOutNearest(unit
 		    ,destu->X,destu->Y
 		    ,mine->Type->TileWidth,mine->Type->TileHeight);
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
 	    ++destu->Refs;
@@ -183,7 +184,7 @@ local int MineInGoldmine(Unit* unit)
 	    unit->Command.Data.Move.DY=destu->Y;
 #endif
 	    unit->Command.Action=UnitActionMineGold;
-	    DebugLevel3("Mine with deposit %d,%d\n",destu->X,destu->Y);
+	    DebugLevel3Fn("Mine with deposit %d,%d\n",destu->X,destu->Y);
 	}
 
 	if( unit->Type==UnitTypeOrcWorker ) {
@@ -191,7 +192,7 @@ local int MineInGoldmine(Unit* unit)
 	} else if( unit->Type==UnitTypeHumanWorker ) {
 	    unit->Type=UnitTypeHumanWorkerWithGold;
 	} else {
-	    DebugLevel0("Wrong unit (%d,%d) for mining gold %d (%s)\n"
+	    DebugLevel0Fn("Wrong unit (%d,%d) for mining gold %d (%s)\n"
 		,unit->X,unit->Y
 		,unit->Type->Type,unit->Type->Name);
 	}
@@ -231,11 +232,11 @@ local int MoveToGoldDeposit(Unit* unit)
     int y;
     Unit* destu;
 
-    if( !HandleActionMove(unit) ) {	// reached end-point
+    if( HandleActionMove(unit)>=0 ) {	// reached end-point?
 	return 0;
     }
-    // FIXME: support new return values of the pathfinder
-    // FIXME: HandleActionMove must return this: reached nearly?
+    
+    // FIXME: HandleActionMove return this: reached nearly, use it!
 
     unit->Command.Action=UnitActionMineGold;
 
@@ -256,7 +257,7 @@ local int MoveToGoldDeposit(Unit* unit)
     DebugCheck( destu!=GoldDepositOnMap(x,y) );
 
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel3Fn("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 	    ,UnitNumber(destu),x,y
 	    ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
@@ -268,7 +269,7 @@ local int MoveToGoldDeposit(Unit* unit)
     y=unit->Command.Data.Move.DY;
     destu=GoldDepositOnMap(x,y);
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-	DebugLevel3("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+	DebugLevel3Fn("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 	    ,UnitNumber(destu),x,y
 	    ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	return -1;
@@ -292,7 +293,7 @@ local int MoveToGoldDeposit(Unit* unit)
     } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
 	unit->Type=UnitTypeHumanWorker;
     } else {
-	DebugLevel0("Wrong unit (%d,%d) for returning gold %d (%s)\n"
+	DebugLevel0Fn("Wrong unit (%d,%d) for returning gold %d (%s)\n"
 	    ,unit->X,unit->Y
 	    ,unit->Type->Type,unit->Type->Name);
     }
@@ -319,7 +320,7 @@ local int StoreGoldInDeposit(Unit* unit)
     Unit* destu;
     Unit* depot;
 
-    DebugLevel3("Waiting\n");
+    DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
 	depot=unit->Command.Data.Move.Goal;
 	// Could be destroyed, but than we couldn't be in?
@@ -334,7 +335,7 @@ local int StoreGoldInDeposit(Unit* unit)
 	} else {
 	    DropOutNearest(unit,destu->X,destu->Y
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
-	    unit->Command.Data.Move.Fast=1;
+	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=destu;
 #ifdef NEW_UNIT
 	    ++destu->Refs;

@@ -198,6 +198,8 @@ extern void MapMarkNewSight(const Player*,int,int,int,int,int);
 #else
     /// Mark the sight in range
 extern void MapMarkSight(int tx,int ty,int range);
+    /// Mark the new sight in range
+extern void MapMarkNewSight(int,int,int,int,int);
 #endif
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);

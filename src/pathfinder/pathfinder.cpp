@@ -804,7 +804,7 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	    DebugCheck( *xdp==0 && *ydp==0 );
 	    return 0;
 	}
-	unit->Command.Data.Move.Fast=0;
+	ResetPath(unit->Command);
 	DebugLevel3(__FUNCTION__": Fallback to slow method\n");
     }
 

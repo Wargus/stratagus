@@ -17,45 +17,51 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
 #include "unit.h"
 #include "actions.h"
+#include "pathfinder.h"
 
-/*
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+/**
 **	Unit Patrol:
 **		The unit patrols between two points.
 **		Any enemy unit in reaction range is attacked.
 **	FIXME:
-**		If the attack is completed, resume patrol!
 **  		Should do some tries to reach the end-points.
 **		Should support patrol between more points!
+**		Patrol between units.
+**
+**	@param unit	Patroling unit pointer.
 */
 global void HandleActionPatrol(Unit* unit)
 {
-    int t;
     const Unit* goal;
 
-    if( HandleActionMove(unit) ) {	// reached end-point
-
-	//	Swap the points:
+    if( HandleActionMove(unit)<0 ) {	// reached end-point or stop
 
 	unit->Command.Action=UnitActionPatrol;
-	unit->Command.Data.Move.Fast=1;
-	t=unit->Command.Data.Move.SX;
-	unit->Command.Data.Move.SX=unit->Command.Data.Move.DX;
-	unit->Command.Data.Move.DX=t;
 
-	t=unit->Command.Data.Move.SY;
-	unit->Command.Data.Move.SY=unit->Command.Data.Move.DY;
-	unit->Command.Data.Move.DY=t;
+	//	Swap the points:
+	unit->Command.Data.Move.SX^=unit->Command.Data.Move.DX;
+	unit->Command.Data.Move.DX^=unit->Command.Data.Move.SX;
+	unit->Command.Data.Move.SX^=unit->Command.Data.Move.DX;
+
+	unit->Command.Data.Move.SY^=unit->Command.Data.Move.DY;
+	unit->Command.Data.Move.DY^=unit->Command.Data.Move.SY;
+	unit->Command.Data.Move.SY^=unit->Command.Data.Move.DY;
+
+	ResetPath(unit->Command);
     }
 
     if( unit->Reset ) {
@@ -69,6 +75,9 @@ global void HandleActionPatrol(Unit* unit)
 	    if( goal ) {
 		DebugLevel0("Patrol attack %Zd\n",UnitNumber(goal));
 		CommandAttack(unit,goal->X,goal->Y,NULL,1);
+		// Save current command to come back.
+		unit->SavedCommand=unit->Command;
+		unit->SavedCommand.Action=UnitActionPatrol;
 	    }
 	}
     }

@@ -25,9 +25,6 @@
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -35,6 +32,7 @@
 #include "tileset.h"
 #include "map.h"
 #include "upgrade.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -120,7 +118,7 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     }
 
     command->Action=UnitActionFollow;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
     dest->Refs++;
@@ -159,7 +157,7 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
     }
 
     command->Action=UnitActionMove;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=0;
     command->Data.Move.SX=unit->X;
@@ -209,7 +207,7 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     }
 
     command->Action=UnitActionRepair;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
     if( dest ) {
@@ -260,7 +258,7 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     }
 
     command->Action=UnitActionAttack;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     // choose goal and good attack range
     if( attack ) {
 	command->Data.Move.Goal=attack;
@@ -309,7 +307,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     }
 
     command->Action=UnitActionAttackGround;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=unit->Stats->AttackRange;
     command->Data.Move.SX=unit->X;
@@ -345,7 +343,7 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
     }
 
     command->Action=UnitActionPatrol;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=0;
     command->Data.Move.SX=unit->X;
@@ -372,7 +370,7 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     }
 
     command->Action=UnitActionBoard;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
     dest->Refs++;
@@ -411,7 +409,7 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     }
 
     command->Action=UnitActionUnload;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=what;
 #ifdef NEW_UNIT
     if( what ) {
@@ -446,7 +444,7 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
     }
 
     command->Action=UnitActionBuild;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     // FIXME: only quadratic buildings supported!!!
     if( what->ShoreBuilding ) {
@@ -511,7 +509,7 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 
 #if 0
     command->Action=UnitActionHarvest;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
@@ -520,7 +518,7 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     command->Data.Move.DY=y;
 #endif
     command->Action=UnitActionHarvest;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=NoUnitP;
     command->Data.Move.Range=2;
     command->Data.Move.SX=unit->X;
@@ -551,7 +549,7 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     }
 
     command->Action=UnitActionMineGold;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
     dest->Refs++;
@@ -591,7 +589,7 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     }
 
     command->Action=UnitActionHaulOil;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     command->Data.Move.Goal=dest;
 #ifdef NEW_UNIT
     dest->Refs++;
@@ -621,11 +619,12 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 global void CommandReturnGoods(Unit* unit,int flush)
 {
     // FIXME: flush, and command que not supported!
+
     unit->NextCount=1;
     unit->NextFlush=1;
 
     unit->NextCommand[0].Action=UnitActionReturnGoods;
-    unit->NextCommand[0].Data.Move.Fast=1;
+    ResetPath(unit->NextCommand[0]);
     unit->NextCommand[0].Data.Move.Goal=NoUnitP;
     unit->NextCommand[0].Data.Move.Range=1;
     unit->NextCommand[0].Data.Move.SX=unit->X;
@@ -821,7 +820,7 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     }
 
     command->Action=UnitActionDemolish;
-    command->Data.Move.Fast=1;
+    ResetPath(*command);
     // choose goal and good attack range
     if( dest ) {
 	command->Data.Move.Goal=dest;

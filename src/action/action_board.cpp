@@ -17,34 +17,39 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
 #include "interface.h"
+#include "pathfinder.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Move to transporter.
 **
-**	@param unit	Pointer to unit.
-**	@return		-1 if unreachable, True if reached, False otherwise.
+**	@param unit	Pointer to unit, moving to transporter.
+**	@returns	>0 remaining path length, 0 wait for path, -1
+**			reached goal, -2 can't reach the goal.
 */
 local int MoveToTransporter(Unit* unit)
 {
     int i;
 
-    if( !(i=HandleActionMove(unit)) ) {	// reached end-point
-	return 0;
-    }
+    i=HandleActionMove(unit);
     unit->Command.Action=UnitActionBoard;
-    return 1;
+    return i;
 }
 
 /**
@@ -63,12 +68,12 @@ local int WaitForTransporter(Unit* unit)
     trans=unit->Command.Data.Move.Goal;
     // FIXME: destination destroyed??
     if( !trans || !trans->Type->Transporter ) {
-	DebugLevel3("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
+	DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 	return 0;
     }
 #ifdef NEW_UNIT
     if( trans->Destroyed ) {
-	DebugLevel0(__FUNCTION__": destroyed unit\n");
+	DebugLevel0Fn("Destroyed unit\n");
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
@@ -83,11 +88,11 @@ local int WaitForTransporter(Unit* unit)
 #endif
 
     if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
-	DebugLevel3("Enter transporter\n");
+	DebugLevel3Fn("Enter transporter\n");
 	return 1;
     }
 
-    DebugLevel2("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
+    DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 
     return 0;
 }
@@ -109,7 +114,7 @@ local void EnterTransporter(Unit* unit)
     transporter=unit->Command.Data.Move.Goal;
 #ifdef NEW_UNIT
     if( transporter->Destroyed ) {
-	DebugLevel0(__FUNCTION__": destroyed unit\n");
+	DebugLevel0Fn("Destroyed unit\n");
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
@@ -137,7 +142,7 @@ local void EnterTransporter(Unit* unit)
 	    return;
 	}
     }
-    DebugLevel0("No free slot in transporter\n");
+    DebugLevel0Fn("No free slot in transporter\n");
 }
 
 /**
@@ -151,8 +156,8 @@ global void HandleActionBoard(Unit* unit)
 {
     int i;
 
-    DebugLevel3(__FUNCTION__": %p(%Zd) SubAction %d\n"
-		,unit,UnitNumber(unit),unit->SubAction);
+    DebugLevel3Fn("%p(%Zd) SubAction %d\n"
+	    ,unit,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {
 	//
@@ -160,7 +165,7 @@ global void HandleActionBoard(Unit* unit)
 	//
 	case 201:
 	    // FIXME: show still animations
-	    DebugLevel3("Waiting\n");
+	    DebugLevel3Fn("Waiting\n");
 	    if( WaitForTransporter(unit) ) {
 		unit->SubAction=202;
 	    }
@@ -178,7 +183,7 @@ global void HandleActionBoard(Unit* unit)
 	    if( unit->SubAction<=200 ) {
 		// FIXME: if near transporter wait for enter
 		if( (i=MoveToTransporter(unit)) ) {
-		    if( i==-1 ) {
+		    if( i==PF_UNREACHABLE ) {
 			if( ++unit->SubAction==200 ) {
 			    unit->Command.Action=UnitActionStill;
 #ifdef NEW_UNIT
@@ -188,13 +193,10 @@ global void HandleActionBoard(Unit* unit)
 #endif
 			    unit->SubAction=0;
 			}
-		    } else {
+		    } else if( i==PF_REACHED ) {
 			unit->SubAction=201;
 		    }
 		}
-	    }
-	    if( unit->Command.Action!=UnitActionBoard ) {
-		DebugLevel0(__FUNCTION__": %d\n",unit->SubAction);
 	    }
 	    break;
     }

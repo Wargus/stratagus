@@ -47,16 +47,19 @@ local int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 **	@param unit	Unit that moves.
 **	@param move	Animation script for unit.
 **
-**	@returns	True if still moving, False if stopping.
+**	@returns	>0 remaining path length, 0 wait for path, -1
+**			reached goal, -2 can't reach the goal.
 */
-local int DoActionMoveGeneric(Unit* unit,Animation* move)
+local int ActionMoveGeneric(Unit* unit,const Animation* move)
 {
     int xd;
     int yd;
     int state;
     Unit* goal;
+    int d;
     int i;
 
+    // FIXME: state 0?, should be wrong, should be Reset.
     if( !(state=unit->State) ) {
 
 	//
@@ -65,6 +68,8 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	goal=unit->Command.Data.Move.Goal;
 #ifdef NEW_UNIT
 	if( goal ) {
+	    // FIXME: should this be handled here?
+	    // FIXME: Can't choose a better target here!
 	    if( goal->Destroyed ) {
 		DebugLevel0(__FUNCTION__": destroyed unit\n");
 		if( !--goal->Refs ) {
@@ -73,6 +78,7 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( goal->Removed ||
 		    !goal->HP || goal->Command.Action==UnitActionDie ) {
+		DebugLevel0(__FUNCTION__": killed unit\n");
 		--goal->Refs;
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
@@ -86,22 +92,21 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	}
 #endif
 
-	// FIXME: should I give same error codes to caller
-	switch( NextPathElement(unit,&xd,&yd) ) {
+	switch( d=NextPathElement(unit,&xd,&yd) ) {
 	    case PF_UNREACHABLE:	// Can't reach, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
 		unit->Command.Action=UnitActionStill;
-		return -1;
+		return d;
 	    case PF_REACHED:		// Reached goal, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
 		unit->Command.Action=UnitActionStill;
-		return 1;
+		return d;
 	    case PF_WAIT:		// No path, wait
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
-		return 0;
+		return d;
 	    default:			// On the way moving
 		unit->Moving=1;
 		break;
@@ -111,7 +116,7 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	//	Transporter (un)docking?
 	//
 	if( unit->Type->Transporter
-	    && ( (WaterOnMap(unit->X,unit->Y)
+		&& ( (WaterOnMap(unit->X,unit->Y)
 		    && CoastOnMap(unit->X+xd,unit->Y+yd))
 		|| (CoastOnMap(unit->X,unit->Y)
 			&& WaterOnMap(unit->X+xd,unit->Y+yd)) ) ) {
@@ -140,8 +145,7 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 		,unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
 #else
 	if( unit->Player==ThisPlayer ) {
-	    // FIXME: need only mark to new direction!!
-	    MapMarkSight(unit->X,unit->Y,unit->Stats->SightRange);
+	    MapMarkNewSight(unit->X,unit->Y,unit->Stats->SightRange,xd,yd);
 	}
 #endif
 
@@ -152,9 +156,10 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
     } else {
 	xd=Heading2X[unit->Direction/NextDirection];
 	yd=Heading2Y[unit->Direction/NextDirection];
+	d=0;
     }
 
-    DebugLevel3("Move: %d,%d State %2d ",xd,yd,unit->State);
+    DebugLevel3Fn(": %d,%d State %2d ",xd,yd,unit->State);
     DebugLevel3("Walk %d Frame %2d Wait %3d Heading %d %d,%d\n"
 	    ,move[state].Pixel
 	    ,move[state].Frame
@@ -181,7 +186,7 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	++unit->State;
     }
 
-    return 0;
+    return d;
 }
 
 /**
@@ -189,16 +194,17 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 **
 **	@param unit	Pointer to unit.
 **
-**	@returns	0=moving,1=stopped reached,-1=stopped unreached
+**	@returns	>0 remaining path length, 0 wait for path, -1
+**			reached goal, -2 can't reach the goal.
 */
 global int HandleActionMove(Unit* unit)
 {
     if( unit->Type->Animations ) {
 	DebugLevel3("%s: %p\n",unit->Type->Ident,unit->Type->Animations );
-	return DoActionMoveGeneric(unit,unit->Type->Animations->Move);
+	return ActionMoveGeneric(unit,unit->Type->Animations->Move);
     }
 
-    return -1;
+    return PF_UNREACHABLE;
 }
 
 //@}
