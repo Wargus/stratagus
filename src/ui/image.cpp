@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name image.c	-	The standard images. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -130,7 +129,7 @@ global void LoadImages(unsigned int race)
 **
 **	@param image	Image number (=index).
 **
-**	@returns	The image width.
+**	@return		The image width.
 */
 global int ImageWidth(int image)
 {
@@ -142,7 +141,7 @@ global int ImageWidth(int image)
 **
 **	@param image	Image number (=index).
 **
-**	@returns	The image height.
+**	@return		The image height.
 */
 global int ImageHeight(int image)
 {
