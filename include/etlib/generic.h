@@ -14,6 +14,12 @@
 #define Default break; default
 #define streq(a, b) (strcmp((a), (b)) == 0)
 
+#ifdef _MSC_VER
+#ifndef inline
+#define inline _inline
+#endif
+#endif
+
 #ifndef min
 #ifdef _MSC_VER
 #define min min
