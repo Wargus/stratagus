@@ -64,8 +64,7 @@ DefineUnitType("unit-gold-mine", {
 		"acknowledge", "gold-mine-acknowledge",
 		"ready", "gold-mine-ready",
 		"help", "gold-mine-help",
-		"dead", "building destroyed",
-		"attack", "gold-mine-attack"}})
+		"dead", "building destroyed"}})
 
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
