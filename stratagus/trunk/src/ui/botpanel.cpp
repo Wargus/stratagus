@@ -110,7 +110,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 	ButtonAction* ba;
 
 	ba = (ButtonAction*)malloc(sizeof(ButtonAction));
-	DebugCheck(!ba);						//FIXME: perhaps should return error?
+	Assert(ba);						//FIXME: perhaps should return error?
 
 	ba->Pos = pos;
 	ba->Level = level;
@@ -126,7 +126,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 #ifdef DEBUG
 				if (ba->Value < 0) {
 					DebugLevel0("Spell %s does not exist?\n" _C_ value);
-					DebugCheck(ba->Value < 0);
+					Assert(ba->Value >= 0);
 				}
 #endif
 				break;
@@ -169,7 +169,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 	ba->UnitMask = strdup(buf);
 	UnitButtonTable[NumUnitButtons++] = ba;
 	// FIXME: check if already initited
-	//DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
+	//Assert(ba->Icon.Icon != NoIcon);// just checks, that's why at the end
 	return 1;
 }
 
@@ -185,7 +185,7 @@ global void CleanButtons(void)
 	//  Free the allocated buttons.
 	//
 	for (z = 0; z < NumUnitButtons; ++z) {
-		DebugCheck(!UnitButtonTable[z]);
+		Assert(UnitButtonTable[z]);
 		if (UnitButtonTable[z]->Icon.Name) {
 			free(UnitButtonTable[z]->Icon.Name);
 		}
@@ -322,7 +322,7 @@ global void DrawButtonPanel(void)
 						break;
 					case ButtonSpellCast:
 						for (j = 0; j < NumSelected; ++j) {
-							DebugCheck(!Selected[j]->AutoCastSpell);
+							Assert(Selected[j]->AutoCastSpell);
 							if (Selected[j]->AutoCastSpell[buttons[i].Value] != 1) {
 								break;
 							}
@@ -539,7 +539,7 @@ global void UpdateButtonPanel(void)
 
 	unit = Selected[0];
 	player = unit->Player;
-	DebugCheck(unit == NoUnitP);
+	Assert(unit != NoUnitP);
 
 	if (unit->Player != ThisPlayer &&
 		!PlayersTeamed(ThisPlayer->Player, player->Player)) {		// foreign unit
@@ -803,8 +803,8 @@ global void DoButtonButtonClicked(int button)
 			break;
 
 		case ButtonCancelTrain:
-			DebugCheck(Selected[0]->Orders[0].Action != UnitActionTrain ||
-				!Selected[0]->Data.Train.Count);
+			Assert(Selected[0]->Orders[0].Action == UnitActionTrain &&
+				Selected[0]->Data.Train.Count);
 			SendCommandCancelTraining(Selected[0], -1, NULL);
 			ClearStatusLine();
 			ClearCosts();
