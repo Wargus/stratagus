@@ -468,6 +468,8 @@ extern void MapCenter(int x,int y);
     /// Set the current map view to x,y (upper,left corner)
 extern void MapSetViewpoint(int x,int y);
 
+    /// Returns true, if the tile field is empty
+extern int IsMapFieldEmpty(int x,int y);
     /// Returns true, if water on the map tile field
 extern int WaterOnMap(int x,int y);
     /// Returns true, if coast on the map tile field

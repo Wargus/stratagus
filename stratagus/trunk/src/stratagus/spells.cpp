@@ -42,12 +42,12 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-#define FIREBALL_DAMAGE		20
-#define WHIRLWIND_DAMAGE1	 4 // the center of the whirlwind
-#define WHIRLWIND_DAMAGE2	 1 // the periphery of the whirlwind
-#define BLIZZARD_DAMAGE		10
-#define DEATHANDDECAY_DAMAGE	10
-#define RUNE_DAMAGE		50
+#define FIREBALL_DAMAGE		20	/// Damage of center fireball
+#define WHIRLWIND_DAMAGE1	 4	/// the center of the whirlwind
+#define WHIRLWIND_DAMAGE2	 1	/// the periphery of the whirlwind
+#define BLIZZARD_DAMAGE		10	/// Damage of blizzard
+#define DEATHANDDECAY_DAMAGE	10	/// Damage of death & decay
+#define RUNE_DAMAGE		50	/// Rune damage
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -952,51 +952,64 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionRunes:
     {
-	//FIXME: vladi: runes should be set on empty tile (ground or water)
 	Missile *mis;
 
-	unit->Mana -= spell->ManaCost;
 	PlayGameSound(spell->Casted.Sound, MaxSampleVolume);
 
-	mis = MakeMissile(MissileTypeCustom,
-		x * TileSizeX + TileSizeX / 2 - TileSizeX,
-		y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2 - TileSizeX,
-		y * TileSizeY + TileSizeY / 2);
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellRunesController;
+	if( IsMapFieldEmpty(x-1,y+0) ) {
+	    mis = MakeMissile(MissileTypeCustom,
+		    x * TileSizeX + TileSizeX / 2 - TileSizeX,
+		    y * TileSizeY + TileSizeY / 2,
+		    x * TileSizeX + TileSizeX / 2 - TileSizeX,
+		    y * TileSizeY + TileSizeY / 2);
+	    mis->TTL = spell->TTL;
+	    mis->Controller = SpellRunesController;
+	    unit->Mana -= spell->ManaCost/5;
+	}
 
-	mis = MakeMissile(MissileTypeCustom,
-		x * TileSizeX + TileSizeX / 2 + TileSizeX,
-		y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2 + TileSizeX,
-		y * TileSizeY + TileSizeY / 2);
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellRunesController;
+	if( IsMapFieldEmpty(x+1,y+0) ) {
+	    mis = MakeMissile(MissileTypeCustom,
+		    x * TileSizeX + TileSizeX / 2 + TileSizeX,
+		    y * TileSizeY + TileSizeY / 2,
+		    x * TileSizeX + TileSizeX / 2 + TileSizeX,
+		    y * TileSizeY + TileSizeY / 2);
+	    mis->TTL = spell->TTL;
+	    mis->Controller = SpellRunesController;
+	    unit->Mana -= spell->ManaCost/5;
+	}
 
-	mis = MakeMissile(MissileTypeCustom,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2);
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellRunesController;
+	if( IsMapFieldEmpty(x+0,y+0) ) {
+	    mis = MakeMissile(MissileTypeCustom,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2);
+	    mis->TTL = spell->TTL;
+	    mis->Controller = SpellRunesController;
+	    unit->Mana -= spell->ManaCost/5;
+	}
 
-	mis = MakeMissile(MissileTypeCustom,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2 - TileSizeY,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2 - TileSizeY);
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellRunesController;
+	if( IsMapFieldEmpty(x+0,y-1) ) {
+	    mis = MakeMissile(MissileTypeCustom,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2 - TileSizeY,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2 - TileSizeY);
+	    mis->TTL = spell->TTL;
+	    mis->Controller = SpellRunesController;
+	    unit->Mana -= spell->ManaCost/5;
+	}
 
-	mis = MakeMissile(MissileTypeCustom,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2 + TileSizeY,
-		x * TileSizeX + TileSizeX / 2,
-		y * TileSizeY + TileSizeY / 2 + TileSizeY);
-	mis->TTL = spell->TTL;
-	mis->Controller = SpellRunesController;
+	if( IsMapFieldEmpty(x+0,y+1) ) {
+	    mis = MakeMissile(MissileTypeCustom,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2 + TileSizeY,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2 + TileSizeY);
+	    mis->TTL = spell->TTL;
+	    mis->Controller = SpellRunesController;
+	    unit->Mana -= spell->ManaCost/5;
+	}
     }
 	break;
 
