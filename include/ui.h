@@ -227,11 +227,6 @@ typedef struct _ui_ {
 	int* FillerY;                       ///< Filler Y positions
 	int  NumFillers;                    ///< Number of fillers
 
-	// Resource line
-	GraphicConfig Resource;             ///< Resource background
-	int ResourceX;                      ///< Resource X position
-	int ResourceY;                      ///< Resource Y position
-
 	struct {
 		GraphicConfig Icon;             ///< icon image
 		int IconFrame;                  ///< icon frame

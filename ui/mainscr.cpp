@@ -650,13 +650,6 @@ void DrawResources(void)
 	int i;
 	int v;
 
-	if (TheUI.Resource.Graphic) {
-		VideoDrawSubClip(TheUI.Resource.Graphic, 0, 0,
-			TheUI.Resource.Graphic->Width,
-			TheUI.Resource.Graphic->Height,
-			TheUI.ResourceX,TheUI.ResourceY);
-	}
-
 	for (i = 0; i < MaxCosts; ++i) {
 		if (TheUI.Resources[i].Icon.Graphic) {
 			VideoDrawClip(TheUI.Resources[i].Icon.Graphic,
