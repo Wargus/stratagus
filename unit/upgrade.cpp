@@ -10,7 +10,7 @@
 //
 /**@name upgrade.c	-	The upgrade/allow functions. */
 //
-//	(c) Copyright 1999-2000 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
 //
 //	$Id$
 
@@ -175,19 +175,19 @@ local struct _wc_upgrades_ {
   "unit-axethrower,unit-berserker" },
 { "upgrade-ogre-mage",			NULL,
   {  250, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-ogre-mage" },
 { "upgrade-paladin",			NULL,
   {  250, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-paladin" },
 { "upgrade-holy-vision",		NULL,
   {  0,    0,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-paladin" },
 { "upgrade-healing",			"icon-heal",
   {  200, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-paladin" },
 { "upgrade-exorcism",			NULL,
   {  200, 2000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-paladin" },
 { "upgrade-flame-shield",		NULL,
   {  100, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
@@ -208,10 +208,10 @@ local struct _wc_upgrades_ {
   "" },
 { "upgrade-eye-of-kilrogg",		NULL,
   {  0,    0,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-ogre-mage" },
 { "upgrade-bloodlust",			NULL,
   {  100, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-ogre-mage" },
 { "upgrade-raise-dead",			NULL,
   {  100, 1500,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
@@ -229,7 +229,7 @@ local struct _wc_upgrades_ {
   "" },
 { "upgrade-runes",			NULL,
   {  150, 1000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
-  "" },
+  "unit-ogre-mage" },
 { "upgrade-death-and-decay",		NULL,
   {  200, 2000,   0,   0 },	 0, 0, 0, 0, 0, 0, 0, {   0,   0,   0,   0 },
   "" },
@@ -302,7 +302,7 @@ local const char* UpgradeWcNames[] = {
 **
 **	@param ident	upgrade identifier.
 **	@param icon	icon displayed for this upgrade,
-**			NULL for generated name (icon-<ident>). 
+**			NULL for generated name (icon-<ident>).
 **	@param costs	costs to upgrade.
 **
 **	@returns upgrade id or -1 for error
@@ -384,7 +384,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 
     upgrade=(Upgrade**)hash_find(UpgradeHash,(char*)ident);
 
-    if( upgrade ) { 
+    if( upgrade ) {
 	return *upgrade;
     }
 
@@ -566,7 +566,7 @@ global void ParsePudALOW(const char* alow,int length)
 		    if( units[i*16+0+b*2] ) {
 			DebugLevel3Fn(" %s +\n",
 				units[i*16+0+b*2]);
-				
+
 			AllowUnitByIdent(player,units[i*16+0+b*2],'A');
 			AllowUnitByIdent(player,units[i*16+1+b*2],'A');
 		    }
@@ -596,7 +596,7 @@ global void ParsePudALOW(const char* alow,int length)
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
 			DebugLevel0Fn(" %s +R\n",spells[i*8+b]);
-				
+
 			AllowUpgradeByIdent(player,spells[i*8+b],'R');
 		    }
 		} else {
@@ -623,7 +623,7 @@ global void ParsePudALOW(const char* alow,int length)
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
 			DebugLevel0Fn(" %s +A\n",spells[i*8+b]);
-				
+
 			AllowUpgradeByIdent(player,spells[i*8+b],'A');
 		    }
 		}
@@ -644,7 +644,7 @@ global void ParsePudALOW(const char* alow,int length)
 		if( v&(1<<b) ) {
 		    if( spells[i*8+b] ) {
 			DebugLevel0Fn(" %s +U\n",spells[i*8+b]);
-				
+
 			AllowUpgradeByIdent(player,spells[i*8+b],'U');
 		    }
 		}
@@ -665,7 +665,7 @@ global void ParsePudALOW(const char* alow,int length)
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
 			DebugLevel0Fn(" %s +A\n",upgrades[i*16+b*2]);
-				
+
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'A');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'A');
 		    }
@@ -687,7 +687,7 @@ global void ParsePudALOW(const char* alow,int length)
 		if( v&(1<<b) ) {
 		    if( upgrades[i*16+b*2+0] ) {
 			DebugLevel0Fn(" %s +U\n",upgrades[i*16+b*2]);
-				
+
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+0],'U');
 			AllowUpgradeByIdent(player,upgrades[i*16+b*2+1],'U');
 		    }
@@ -729,7 +729,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
 	group=AccessLE16(	ugrd+52+(i+52+52+52+52)*2);
 	flags=AccessLE16(	ugrd+52+(i+52+52+52+52+52)*2);
 	DebugLevel3Fn(" %s %d,%d,%d,%d %d %d %08X\n"
-		,UpgradeWcNames[i] 
+		,UpgradeWcNames[i]
 		,time,gold,lumber,oil
 		,icon,group,flags);
 	if( UpgradesCount ) {
@@ -838,7 +838,7 @@ global void SaveUpgrades(FILE* file)
 
     fprintf(file,"\n");
 
-    // Save the allow 
+    // Save the allow
     fprintf(file,"(define-allow\n");
     for( i=0; i<sizeof(UnitTypes)/sizeof(*UnitTypes); ++i ) {
 	fprintf(file,"  \"%s\"\t",UnitTypes[i].Ident);
@@ -860,7 +860,7 @@ global void SaveUpgrades(FILE* file)
     fprintf(file,"\n");
 
 #if 0
-    // Save the actions 
+    // Save the actions
     for( i=0; i<20; ++i ) {
 	for( p=0; p<PlayerMax; ++p ) {
 	    fprintf(file,"(allow-action %d \"%s\" \"%c\")\n"
@@ -871,7 +871,7 @@ global void SaveUpgrades(FILE* file)
     fprintf(file,"\n");
 #endif
 
-    // Save the upgrades 
+    // Save the upgrades
     for( i=0; i<UpgradesCount; ++i ) {
 	fprintf(file,"  \"%s\"\t",Upgrades[i].Ident);
 	if( strlen(Upgrades[i].Ident)<12 ) {
@@ -951,7 +951,7 @@ local SCM CclDefineAllow(SCM list)
     SCM value;
     char* str;
     char* ids;
-    int i; 
+    int i;
     int n;
 
     while( !gh_null_p(list) ) {
@@ -1315,7 +1315,7 @@ void ApplyUpgradeModifier( Player* player, UpgradeModifier* um )
 	    UnitTypes[z].Stats[pn].Armor	+= um->mods.Armor;
 	    UnitTypes[z].Stats[pn].Speed	+= um->mods.Speed;
 	    UnitTypes[z].Stats[pn].HitPoints	+= um->mods.HitPoints;
-		
+
 
 	    // upgrade costs :)
 	    for( j=0; j<MaxCosts; ++j ) {
