@@ -585,7 +585,8 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
 /**
 **	Called if a Unit is Attacked
 **
-**	@param unit	Pointer to unit that is being attacked.
+**	@param attacker	Pointer to attacker unit.
+**	@param defender	Pointer to unit that is being attacked.
 */
 global void AiHelpMe(const Unit* attacker,Unit* defender)
 {

@@ -794,8 +794,8 @@ local void SendMove(int x,int y)
 **	To unit:
 **		Move to unit attacking and tracing the unit until dead.
 **
-**	@param x	X screen map position.
-**	@param y	Y screen map position.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 **
 **	@see Selected, @see NumSelected
 */
@@ -892,7 +892,9 @@ local void SendDemolish (int sx,int sy)
 /**
 **	Let units harvest wood/mine gold/haul oil
 **
-**	@param x,y	Map coordinate of the destination
+**	@param x	X map coordinate of the destination
+**	@param y	Y map coordinate of the destination
+**
 **	@see Selected
 */
 local void SendHarvest(int x,int y)

@@ -78,6 +78,7 @@ local SCM CclDefineTilesetWcNames(SCM list)
 /**
 **	Parse the special slot part of a tileset definition
 **
+**	@param tileset	Tileset to be filled.
 **	@param list	Tagged list defining a special slot.
 */
 local void DefineTilesetParseSpecial(Tileset* tileset,SCM list)
@@ -166,6 +167,8 @@ local void DefineTilesetParseSpecial(Tileset* tileset,SCM list)
 /**
 **	Parse the solid slot part of a tileset definition
 **
+**	@param tileset	Tileset to be filled.
+**	@param index	Current table index.
 **	@param list	Tagged list defining a solid slot.
 */
 local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
@@ -226,6 +229,8 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
 /**
 **	Parse the mixed slot part of a tileset definition
 **
+**	@param tileset	Tileset to be filled.
+**	@param index	Current table index.
 **	@param list	Tagged list defining a mixed slot.
 */
 local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
@@ -299,6 +304,7 @@ local int DefineTilesetParseMixed(Tileset* tileset,int index,SCM list)
 /**
 **	Parse the slot part of a tileset definition
 **
+**	@param tileset	Tileset to be filled.
 **	@param list	Tagged list defining a slot.
 */
 local void DefineTilesetParseSlot(Tileset* tileset,SCM list)

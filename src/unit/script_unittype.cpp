@@ -873,7 +873,7 @@ local SCM CclGetUnitTypeProperty(SCM ptr)
 **	Set the property of the unit-type structure.
 **
 **	@param ptr	Unit-type object.
-**	@param name	The property to set.
+**	@param property	The property to set.
 **
 **	@return		The property of the unit-type.
 */

@@ -732,6 +732,7 @@ local int InputKey(int key)
 **	Handle key down.
 **
 **	@param key	Key scancode.
+**	@param keychar	Character code.
 */
 global void HandleKeyDown(unsigned key,unsigned keychar)
 {
@@ -784,6 +785,7 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 **	Handle key up.
 **
 **	@param key	Key scancode.
+**	@param keychar	Character code.
 */
 global void HandleKeyUp(unsigned key,unsigned keychar __attribute__((unused)))
 {
@@ -994,7 +996,8 @@ global void InputMouseButtonRelease(const EventCallback* callbacks,
 **
 **	@param callbacks	Callback structure for events.
 **	@param ticks		Denotes time-stamp of video-system
-**
+**	@param x		X movement
+**	@param y		Y movement
 */
 global void InputMouseMove(const EventCallback* callbacks,
 	unsigned ticks,int x,int y)

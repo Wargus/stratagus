@@ -405,10 +405,12 @@ local SCM CclSoundThread(void)
     return SCM_UNSPECIFIED;
 }
 
-/** Set the range of a given sound.
-    @param sound the sound id or name of the sound
-    @range the new range for this sound
- */
+/**
+**	Set the range of a given sound.
+**
+**	@param sound	the sound id or name of the sound
+**	@param		range the new range for this sound
+*/
 local SCM CclSetSoundRange(SCM sound,SCM range) {
     //FIXME check for errors
     unsigned char TheRange;

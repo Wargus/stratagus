@@ -346,10 +346,11 @@ global void MapMarkSight(int tx,int ty,int range)
 /**
 **	Mark the new sight of unit. (Explore and make visible.)
 **
-**	@param player	Player to mark sight.
-**	@param tx	X center position.
-**	@param ty	Y center position.
+**	@param tx	X map tile position of center.
+**	@param ty	Y map tile position of center.
 **	@param range	Radius to mark.
+**	@param dx	Unused: Delta in tiles in X direction.
+**	@param dy	Unused: Delta in tiles in Y direction.
 */
 global void MapMarkNewSight(int tx,int ty,int range
 	,int dx __attribute__((unused)),int dy __attribute__((unused)))
@@ -677,6 +678,7 @@ global void VideoDraw8OnlyFog32Solid(const GraphicData* data __attribute__((unus
 /**
 **	Fast draw solid unexplored 32x32 tile for 8 bpp video modes.
 **
+**	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
@@ -800,6 +802,7 @@ global void VideoDraw16OnlyFog32Solid(const GraphicData* data __attribute__((unu
 /**
 **	Fast draw solid unexplored 32x32 tile for 16 bpp video modes.
 **
+**	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
@@ -922,6 +925,7 @@ global void VideoDraw24OnlyFog32Solid(const GraphicData* data __attribute__((unu
 /**
 **	Fast draw solid unexplored 32x32 tile for 24 bpp video modes.
 **
+**	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */
@@ -1044,6 +1048,7 @@ global void VideoDraw32OnlyFog32Solid(const GraphicData* data __attribute__((unu
 /**
 **	Fast draw solid unexplored 32x32 tile for 32 bpp video modes.
 **
+**	@param data	pointer to tile graphic data
 **	@param x	X position into video memory
 **	@param y	Y position into video memory
 */

@@ -12,12 +12,11 @@
 //
 //	I use breadth-first.
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -88,7 +87,7 @@ global unsigned PfCounterNotReachable;
 /**
 **	Create empty movement matrix.
 **
-**	NOTE: double border for ships/flyers.
+**	@NOTE	Double border for ships/flyers.
 **
 **		98 98 98 98 98
 **		98 98 98 98 98
@@ -397,7 +396,7 @@ global int UnitReachable(const Unit* src,const Unit* dst,int range)
 **	@param oy	Offset in Y.
 **
 **	@param xdp	OUT: Pointer for x direction.
-**	@param xdp	OUT: Pointer for y direction.
+**	@param ydp	OUT: Pointer for y direction.
 **
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
@@ -839,11 +838,11 @@ local int ComplexNewPath(Unit* unit,int gx,int gy,int ox,int oy,char* path)
 **	The destination could be an unit or a field.
 **	Range gives how far we must reach the goal.
 **
-**	NOTE: the destination could become negative coordinates!
+**	@NOTE	The destination could become negative coordinates!
 **
 **	@param unit	Path for this unit.
 **	@param xdp	Pointer for x direction return.
-**	@param xdp	Pointer for y direction return.
+**	@param ydp	Pointer for y direction return.
 **
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
