@@ -121,6 +121,8 @@ extern void CLflush(CLFile *file);
 extern int CLread(CLFile *file, void *buf, size_t len);
 	///  Library file seek
 extern int CLseek(CLFile *file, long offset, int whence);
+	///  Library file tell
+extern long CLtell(CLFile *file);
 	///  Library file write
 extern int CLprintf(CLFile *file, char *format, ...);
 
