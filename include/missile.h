@@ -557,11 +557,6 @@ FuncController MissileActionWhirlwind;
 FuncController MissileActionFlameShield;
 FuncController MissileActionDeathCoil;
 
-#ifdef META_LUA
-	/// Initialize Spell scripting.
-extern void ScriptMissileTypesInit(void);
-#endif
-
 //@}
 
 #endif // !__MISSILE_H__

@@ -544,13 +544,6 @@ extern void PlayerCclRegister(void);
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) ((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Player, (player)->Player))
 
-#ifdef META_LUA
-
-	/// Initialize scripting
-extern void ScriptPlayerInit(void);
-
-#endif
-
 //@}
 
 #endif // !__PLAYER_H__
