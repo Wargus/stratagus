@@ -298,8 +298,8 @@ local void WaitForInput(int timeout)
     ddfile=popen("`which ddate`","r");
     fgets(ddate,72,ddfile);
     pclose(ddfile);
-#endif
     DrawTextCentered(VideoWidth/2,20,LargeFont,ddate);
+#endif
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
