@@ -4813,7 +4813,7 @@ global UnitType DefaultUnitTypes[] = {
 	// BTime  Gold  Wood   Oil   Ore Stone  Coal
 	,{  190, 1000,  300,    0,    0,    0,    0 }
 	//TileW	TileH	BoxW	BoxH	>Attack	<Attack	ReactC	ReactHuman
-	,     2,    2,    63,     63,        0,      7,     7,      7
+	,     2,    2,    63,     63,        1,      7,     7,      7
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
 	,    20,   40,      50,     0,      0,      0
 	//Type	Decay	Annoy	Mouse	Points
