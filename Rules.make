@@ -87,8 +87,8 @@ CCLLIB	= -lm
 
 # Uncomment the next for the normal X11 support.
 
-#VIDEO		= -DUSE_X11
-#VIDEOLIB	= -lXext -lX11 -ldl 
+VIDEO		= -DUSE_X11
+VIDEOLIB	= -lXext -lX11 -ldl 
 
 # Uncomment the next to get the support for SDL.
 
@@ -166,10 +166,10 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #------------------------------------------------------------------------------
  
 # Uncomment next to profile
-#PROFILE=	-pg
+PROFILE=	-pg
 
 # Version
-VERSION=	'-DVERSION="1.16.1"'
+VERSION=	'-DVERSION="1.17pre1-build1"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -177,7 +177,7 @@ VERSION=	'-DVERSION="1.16.1"'
 # Libraries needed to build tools
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
 
-# Libraries needed to build clone
+# Libraries needed to build freecraft
 CLONELIBS=$(XLDFLAGS) -lpng -lz -lm \
 	$(THREADLIB) $(CCLLIB) $(GLIBLIB) $(VIDEOLIB) $(ZLIBS)
 
@@ -185,13 +185,13 @@ DISTLIST=$(TOPDIR)/distlist
 TAGS=$(TOPDIR)/src/tags
 
 # LINUX
-OUTFILE=$(TOPDIR)/clone
+OUTFILE=$(TOPDIR)/freecraft
 ARCH=linux
 OE=o
 EXE=
 
 # WIN32
-#OUTFILE=$(TOPDIR)/clone$(EXE)
+#OUTFILE=$(TOPDIR)/freecraft$(EXE)
 #ARCH=win32
 #OE=o
 #EXE=.exe
@@ -202,20 +202,20 @@ EXE=
 ## include flags
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
-DEBUG=	-DDEBUG # -DFLAG_DEBUG
+DEBUG=	-DDEBUG #-DNEW_AI # -DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DNEW_VIDEO
+	$(DEBUG) -DNEW_VIDEO # -DNEW_NAMES
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
 #CFLAGS=-g -O1 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)
 #CFLAGS=-g -O2 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
-#CFLAGS=-g -O3 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
+CFLAGS=-g -O3 $(PROFILE) -pipe -Wall -Werror $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-g -O3 $(PROFILE) -pipe -Wall $(IFLAGS)  $(DFLAGS)
 #CFLAGS=-g -O6 -pipe -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
 #-- Production
 #CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)
-CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
+#CFLAGS=-O6 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS) -static
 
 CC=gcc
 RM=rm -f
