@@ -74,14 +74,12 @@
 */
 static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 {
-	int xd;
-	int yd;
+	int xd;     // X movement in tile.
+	int yd;     // Y movement in tile.
 	int state;
 	int d;
-	int i;
-	int x;
-	int y;
-	Unit* uninside;
+	int x;      // Unit->X
+	int y;      // Unit->Y
 
 	// FIXME: state 0?, should be wrong, should be Reset.
 	// FIXME: Reset flag is cleared by HandleUnitAction.
@@ -111,60 +109,26 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 				unit->Moving = 1;
 				break;
 		}
-
+		x = unit->X;
+		y = unit->Y;
 		//
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
 		if (unit->Type->CanTransport &&
-				((WaterOnMap(unit->X, unit->Y) &&
-					CoastOnMap(unit->X + xd, unit->Y + yd)) ||
-				(CoastOnMap(unit->X, unit->Y) &&
-					WaterOnMap(unit->X + xd, unit->Y + yd)))) {
+				((WaterOnMap(x, y) && CoastOnMap(x + xd, y + yd)) ||
+				(CoastOnMap(x, y) && WaterOnMap(x + xd, y + yd)))) {
 			PlayUnitSound(unit, VoiceDocking);
 		}
 
-		//
-		// Update movement map.
-		//
-		i = unit->Type->FieldFlags;
-		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags &= ~i;
-
-		UnitCacheRemove(unit);
-
-		//
-		// Trick for fog of war speed. first mark the new location then unmark the first.
-		//
-			x = unit->X += xd;
-			y = unit->Y += yd;
-			// Mark sight.
-			MapMarkUnitSight(unit);
-			uninside = unit->UnitInside;
-			for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
-				MapMarkUnitOnBoardSight(uninside, unit);
-			}
-			x = unit->X -= xd;
-			y = unit->Y -= yd;
-			// Unmark sight.
-			MapUnmarkUnitSight(unit);
-			uninside = unit->UnitInside;
-			for (i = unit->InsideCount; i; uninside = uninside->NextContained, --i) {
-				MapUnmarkUnitOnBoardSight(uninside, unit);
-			}
-		//
-		// End fog of war trick
-		//
-
-		x = unit->X += xd;
-		y = unit->Y += yd;
-		UnitCacheInsert(unit);
-
-		TheMap.Fields[x + y * TheMap.Width].Flags |= unit->Type->FieldFlags;
+		x = unit->X + xd;
+		y = unit->Y + yd;
+		MoveUnitToXY(unit, x, y);
 
 		MustRedraw |= RedrawMinimap;
 
 		// Remove unit from the current selection
-		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, unit->X, unit->Y)) {
+		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
 			if (NumSelected == 1) { //  Remove building cursor
 				CancelBuildingMode();
 			}
