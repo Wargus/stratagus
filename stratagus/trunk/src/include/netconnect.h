@@ -43,7 +43,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	4
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	0
+#define NetworkProtocolPatchLevel	1
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -149,7 +149,7 @@ enum _net_client_con_state_ {
     ccs_connected,		/// Has received slot info
     ccs_mapinfo,		/// Has received matching map-info
     ccs_badmap,			/// Has received non-matching map-info
-    ccs_synced,			/// FIXME: what is this?
+    ccs_synced,			/// Client is in sync with server
     ccs_async,			/// Server user has changed selection
     ccs_changed,		/// Client user has made menu selection
     ccs_detaching,		/// Client user wants to detach
@@ -158,6 +158,8 @@ enum _net_client_con_state_ {
     ccs_usercanceled,		/// Connection canceled by user
     ccs_nofreeslots,		/// Server has no more free slots
     ccs_serverquits,		/// Server quits
+    ccs_goahead,		/// Server wants to start game
+    ccs_started,		/// Server has started game
     ccs_incompatibleengine,	/// Incompatible engine version
     ccs_incompatiblenetwork,	/// Incompatible netowrk version
 };

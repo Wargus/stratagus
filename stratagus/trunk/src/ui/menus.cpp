@@ -3028,6 +3028,14 @@ local void TerminateNetConnect(void)
 	case ccs_usercanceled:
 	    NetConnectingCancel();
 	    return;
+
+	case ccs_started:
+	    DebugLevel1Fn("TerminateNetConnect: started\n");
+	    CustomGameStart();
+	    return;
+
+	default:
+	    break;
     }
 
     DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
