@@ -291,7 +291,7 @@ global void InitUnit(Unit* unit, UnitType* type)
     }
 
     if (type->CanCastSpell) {
-	unit->Mana = (type->Magic * MAGIC_FOR_NEW_UNITS) / 100;
+	unit->Mana = (type->_MaxMana * MAGIC_FOR_NEW_UNITS) / 100;
     }
     unit->Active = 1;
 
@@ -1425,7 +1425,7 @@ global void UnitIncrementMana(void)
 	    --unit->Blink;
 	}
 
-	if( unit->Type->CanCastSpell && unit->Mana!=unit->Type->Magic ) {
+	if( unit->Type->CanCastSpell && unit->Mana!=unit->Type->_MaxMana ) {
 	    unit->Mana++;
 
 	    // some frames delayed done my color cycling
