@@ -279,14 +279,6 @@ extern void DrawMenu(int MenuId);
 extern void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigned h,unsigned x,unsigned y,const int font,const unsigned char *text);
     /// Draw and process a menu
 extern void ProcessMenu(int MenuId, int Loop);
-    /// Keyboard handler for menus
-extern int MenuHandleKeyboard(int key, int keychar);
-    /// Called if the mouse is moved in Menu interface state
-extern void MenuHandleMouseMove(int x,int y);
-    /// Called if any mouse button is pressed down
-extern void MenuHandleButtonDown(int b);
-    /// Called if any mouse button is released up
-extern void MenuHandleButtonUp(int b);
 
     /// The scenario path received from server
     /// Update the client menu.

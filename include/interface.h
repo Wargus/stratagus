@@ -272,10 +272,17 @@ extern void SaveButtons(FILE* file);
 extern void HandleButtonDown(unsigned button);
     /// Called if any mouse button is released up
 extern void HandleButtonUp(unsigned button);
+    /// Keep coordinates in window and update cursor position
+extern void HandleCursorMove(int* x,int* y);
     /// Called if the mouse is moved
 extern void HandleMouseMove(int x,int y);
     /// Called if the mouse exits the game window (only for some videomodes)
 extern void HandleMouseExit(void);
+
+    /// Update KeyModifiers if a key is pressed
+extern int HandleKeyModifiersDown(unsigned keycode,unsigned keychar);
+    /// Update KeyModifiers if a key is released
+extern int HandleKeyModifiersUp(unsigned keycode,unsigned keychar);
 
     /// Called if a key is pressed
 extern void HandleKeyDown(unsigned keycode,unsigned keychar);
