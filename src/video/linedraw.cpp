@@ -1012,17 +1012,11 @@ global void InitLineDraw(void)
 */
 global void VideoDrawPixel(Uint32 color, int x, int y)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
 	glEnd();
@@ -1040,15 +1034,9 @@ global void VideoDrawPixel(Uint32 color, int x, int y)
 global void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, 255 - alpha);
 	glBegin(GL_POINTS);
@@ -1066,22 +1054,16 @@ global void VideoDrawTransPixel(Uint32 color, int x, int y,
 */
 global void VideoDrawPixelClip(Uint32 color, int x, int y)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
 	// Clipping:
 	if (x < ClipX1 || x > ClipX2 || y < ClipY1 || y > ClipY2) {
 		return;
 	}
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_POINTS);
 	glVertex2i(x, y);
 	glEnd();
@@ -1098,17 +1080,11 @@ global void VideoDrawPixelClip(Uint32 color, int x, int y)
 */
 global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + width, y);
@@ -1162,15 +1138,9 @@ global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 global void VideoDrawTransHLine(Uint32 color, int x, int y, int width,
 	unsigned char alpha)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, 255 - alpha);
 	glBegin(GL_LINES);
@@ -1206,17 +1176,11 @@ global void VideoDrawTransHLineClip(Uint32 color, int x, int y, int width,
 */
 global void VideoDrawVLine(Uint32 color, int x, int y, int height)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x, y + height);
@@ -1270,15 +1234,9 @@ global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 global void VideoDrawTransVLine(Uint32 color, int x, int y, int height,
 	unsigned char alpha)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, 255 - alpha);
 	glBegin(GL_LINES);
@@ -1315,17 +1273,11 @@ global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 */
 global void VideoDrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
 	glVertex2i(x1, y1);
 	glVertex2i(x2, y2);
@@ -1456,17 +1408,11 @@ global void VideoDrawLineClip(Uint32 color, int x1, int y1, int x2, int y2)
 */
 global void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_LINE_LOOP);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
@@ -1518,15 +1464,9 @@ global void VideoDrawRectangleClip(Uint32 color, int x, int y,
 global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, 255 - alpha);
 	glBegin(GL_LINE_LOOP);
@@ -1550,17 +1490,11 @@ global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 global void VideoFillRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b, a;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, a);
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
@@ -1599,15 +1533,9 @@ global void VideoFillRectangleClip(Uint32 color, int x, int y,
 global void VideoFillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	Uint32 c;
-	GLubyte r;
-	GLubyte g;
-	GLubyte b;
+	GLubyte r, g, b;
 
-	c = color;
-	r = (c >> 16) & 0xff;
-	g = (c >> 8) & 0xff;
-	b = (c >> 0) & 0xff;
+	VideoGetRGB(color, &r, &g, &b);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, 255 - alpha);
 	glBegin(GL_TRIANGLE_STRIP);

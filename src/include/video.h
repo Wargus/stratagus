@@ -299,7 +299,17 @@ extern int ColorBuildingCycleEnd;   ///< color # end   for color cycling
 #ifndef USE_OPENGL
 #define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))
 #else
-#define VideoMapRGB(f, r, g, b) (((r) << 16) | ((g) << 8) | (b))
+#define VideoMapRGB(f, r, g, b) VideoMapRGBA((f), (r), (g), (b), 0xff)
+#define VideoMapRGBA(f, r, g, b, a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
+#define VideoGetRGB(c, r, g, b) { \
+	*(r) = ((c) >> 0) & 0xff; \
+	*(g) = ((c) >> 8) & 0xff; \
+	*(b) = ((c) >> 16) & 0xff; }
+#define VideoGetRGBA(c, r, g, b, a) { \
+	*(r) = ((c) >> 0) & 0xff; \
+	*(g) = ((c) >> 8) & 0xff; \
+	*(b) = ((c) >> 16) & 0xff; \
+	*(a) = ((c) >> 24) & 0xff; }
 #endif
 
 #ifndef USE_OPENGL
