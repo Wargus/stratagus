@@ -584,7 +584,7 @@ local SCM CclFreeCraftMap(SCM list)
 	    name=gh_car(value);
 	    data=gh_cdr(value);
 	    if( !gh_symbol_p(name) ) {
-		fprintf(stderr,"symbol expected\n");
+		fprintf(stderr,__FUNCTION__": symbol expected\n");
 		return list;
 	    }
 	    if( gh_eq_p(name,gh_symbol2scm("version")) ) {
