@@ -1448,7 +1448,7 @@ global void UnitIncrementMana(void)
 	//	Look if the time to live is over.
 	//
 	if( unit->TTL && unit->TTL<GameCycle ) {
-	    DebugLevel0Fn("Unit must die %d %lu!\n" _C_ unit->TTL _C_ GameCycle);
+	    DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
 		LetUnitDie(unit);
 	    //}
@@ -3905,7 +3905,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file," 'xp %d",unit->XP);
     fprintf(file," 'kills %d\n  ",unit->Kills);
 
-    fprintf(file,"'ttl %d ",unit->TTL);
+    fprintf(file,"'ttl %lu ",unit->TTL);
     fprintf(file,"'bloodlust %d ",unit->Bloodlust);
     fprintf(file,"'haste %d ",unit->Haste);
     fprintf(file,"'slow %d\n  ",unit->Slow);

@@ -691,7 +691,7 @@ global void NetworkEvent(void)
 	    // FIXME: not neccessary to send this packet multiple!!!!
 	    //	other side send re-send until its gets an answer.
 
-	    DebugLevel2Fn("Resend for %d got\n" _C_ n);
+	    DebugLevel2Fn("Resend for %lu got\n" _C_ n);
 	    //
 	    //	Find the commands to resend
 	    //
@@ -919,13 +919,13 @@ local void NetworkResendCommands(void)
     ncq = (NetworkCommandQueue *)(CommandsOut->last);
 
     for (i = 1; i < NetworkDups; ++i) {
-	DebugLevel2("%d %d," _C_ ncq->Data.Type _C_ ncq->Time);
+	DebugLevel2("%d %lu," _C_ ncq->Data.Type _C_ ncq->Time);
 	packet.Commands[i] = ncq->Data;
 	if (ncq->List->prev->prev) {
 	    ncq = (NetworkCommandQueue *)(ncq->List->prev);
 	}
     }
-    DebugLevel2("<%d %d\n" _C_ ncq->Data.Type _C_ ncq->Time);
+    DebugLevel2("<%d %lu\n" _C_ ncq->Data.Type _C_ ncq->Time);
 
     // if(0 || !(rand() & 15))
 	NetworkBroadcast(&packet, sizeof(packet));
@@ -1030,7 +1030,7 @@ local void NetworkExecCommands(void)
 		DebugLevel3Fn("execute net %lu,%d(%lx),%d\n" _C_
 			GameCycle _C_ i _C_ GameCycle & 0xFF _C_ ncq->Time);
 		if (ncq->Time != GameCycle) {
-		    DebugLevel2Fn("cycle %lu idx %lu time %d\n" _C_
+		    DebugLevel2Fn("cycle %lu idx %lu time %lu\n" _C_
 			    GameCycle _C_ GameCycle & 0xFF _C_ ncq->Time);
 		    DebugCheck(ncq->Time != GameCycle);
 		}
