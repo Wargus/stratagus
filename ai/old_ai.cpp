@@ -141,6 +141,7 @@ local AiCommand AiTable1[] = {
     {AiCmdArmy, Wave(2), Wave(3),},
     {AiCmdArmy, Wave(3), Wave(4),},
     {AiCmdBuild, UnitScoutTowerHuman, 2,},
+    {AiCmdArmy, Wave(3), Wave(4),},
     {0, 0, 0}
 };
 
@@ -1471,9 +1472,9 @@ global void AiEachFrame(Player * player)
     command = AiPlayer->Commands[AiPlayer->CmdIndex];
     if (AiPlayer->GoalHead->Next == 0) {
 	if (command.Number == 0 && command.Command == 0) {
-	    DebugLevel3("Ai Starting Over\n");
-	    //AiPlayer->CmdIndex = 0;
-	    AiPlayer->DoCommands = 0;
+	    DebugLevel2Fn("Ai Starting Over\n");
+	    AiPlayer->CmdIndex = 0;
+	    AiPlayer->DoCommands = 1;
 	}
 	if (AiPlayer->DoCommands) {
 	    AiNewGoal(command.Command, command.Number, command.Unit);
