@@ -3002,10 +3002,9 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 
 local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
-    int op, d1, d2;
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
-
+    int increments = 100 / (nitems - 3 - 9);
 
     mi--;
     switch (i) {
@@ -3030,44 +3029,26 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 	    }
-	    ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
+	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 200 / (nitems - 9);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.pulldown.noptions) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
-				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
-			d2 = op - mi[1].d.vslider.curper;
-			if (d2 < d1) {
-			    mi->d.listbox.curopt++;
-			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-				mi->d.listbox.curopt--;
-				mi->d.listbox.startline++;
-			    }
-			}
-		    }
+		    mi[1].d.vslider.percent = mi[1].d.vslider.curper;
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
-			op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
-				 (mi->d.listbox.noptions - 1);
-			d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
-			d2 = mi[1].d.vslider.curper - op;
-			if (d2 < d1) {
-			    mi->d.listbox.curopt--;
-			    if (mi->d.listbox.curopt < 0) {
-				mi->d.listbox.curopt++;
-				mi->d.listbox.startline--;
-			    }
-			}
-		    }
+		    mi[1].d.vslider.percent = mi[1].d.vslider.curper;
 		}
-		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-		mi[1].d.vslider.percent = mi[1].d.vslider.curper;
+		mi[1].d.vslider.percent = mi[1].d.vslider.curper / increments * increments;
+		for (j=3; j < nitems; ++j) {
+		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 9) / 200 * (-20) ) + 40 + (j-3)*20;
+		    if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
+			KeystrokeHelpMenuItems[j].xofs = 400;
+		    else
+			KeystrokeHelpMenuItems[j].xofs = 16;
+		}
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
