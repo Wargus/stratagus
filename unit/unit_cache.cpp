@@ -82,9 +82,8 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
-
 	Unit* prev;
+
 	prev = TheMap.Fields[unit->Y * TheMap.Width + unit->X].UnitCache;
 	if (prev == unit) {
 		TheMap.Fields[unit->Y * TheMap.Width + unit->X].UnitCache = unit->Next;
