@@ -59,6 +59,7 @@
 
 #ifdef USE_X11
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #elif defined(USE_SDL)
 #include <SDL.h>
 #include <SDL_syswm.h>
@@ -1427,9 +1428,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					   &rettype, &retform, &nitem, &bytes,
 					   (unsigned char **)&clipboard);
 
-#ifndef USE_X11
 			XCloseDisplay(display);
-#endif
 #endif
 			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
 			    if (clipboard[i] != '\r' && clipboard[i] != '\n') {
