@@ -133,7 +133,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include
 #	Support for SIOD (scheme interpreter)
 #	C C L	-	Craft Configuration Language
 
-CCL	= -DUSE_CCL
+CCL	= -DUSE_SIOD
 CCLLIB	= -lm
 
 #------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ MAKE=make
 PREFIX=@PREFIX@
 
 # Use SIOD support
-CCL		= -DUSE_CCL
+CCL		= -DUSE_SIOD
 CCLLIB		= -lm
 
 # Video support
