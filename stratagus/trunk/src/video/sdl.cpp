@@ -73,6 +73,7 @@ local int FrameTicks;			/// Frame length in ms
 local int FrameRemainder;		/// Frame remainder 0.1 ms
 local int FrameFraction;		/// Frame fractional term
 local int SkipFrames;			/// Skip this frames
+global int InMainWindow = 1;		/// cursor inside freecraft window
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -492,6 +493,7 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 
 	case SDL_ACTIVEEVENT:
 	    DebugLevel3("\tFocus changed\n");
+	    InMainWindow = !InMainWindow;
 	    if (!event->active.state) {
                 InputMouseExit(callbacks,SDL_GetTicks());
 	    }
