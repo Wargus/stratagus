@@ -357,10 +357,10 @@ local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
     }
 
     if( icon ) {
-	upgrade->Icon = IconByIdent(icon);
+	upgrade->Icon.Name = strdup(icon);
     } else {				// automatic generated icon-name
 	sprintf(buf,"icon-%s",ident+8);
-	upgrade->Icon = IconByIdent(buf);
+	upgrade->Icon.Name = strdup(buf);
     }
 
     for( i=0; i<MaxCosts; ++i ) {
@@ -432,37 +432,43 @@ global Upgrade* UpgradeByIdent(const char* ident)
 */
 global void InitUpgrades(void)
 {
-#ifndef USE_CCL
-    int z;
+    int i;
 
+#ifndef USE_CCL
     if( !UpgradesCount ) {
-	InitIcons();			// wired, but I need them here
 
 	// Setup the default upgrades
-	for( z = 0; z <sizeof(WcUpgrades)/sizeof(*WcUpgrades); z++ ) {
+	for( i = 0; i <sizeof(WcUpgrades)/sizeof(*WcUpgrades); i++ ) {
 	    // FIXME: perhaps we should parse some structures.
 	    AddSimpleUpgrade(
-		WcUpgrades[z].Ident,
-		WcUpgrades[z].Icon,
+		WcUpgrades[i].Ident,
+		WcUpgrades[i].Icon,
 
-		WcUpgrades[z].Costs,
+		WcUpgrades[i].Costs,
 
-		WcUpgrades[z].AttackRange,
-		WcUpgrades[z].SightRange,
-		WcUpgrades[z].BasicDamage,
-		WcUpgrades[z].PiercingDamage,
-		WcUpgrades[z].Armor,
-		WcUpgrades[z].Speed,
-		WcUpgrades[z].HitPoints,
+		WcUpgrades[i].AttackRange,
+		WcUpgrades[i].SightRange,
+		WcUpgrades[i].BasicDamage,
+		WcUpgrades[i].PiercingDamage,
+		WcUpgrades[i].Armor,
+		WcUpgrades[i].Speed,
+		WcUpgrades[i].HitPoints,
 
-		WcUpgrades[z].CostsModifier,
+		WcUpgrades[i].CostsModifier,
 
-		WcUpgrades[z].Units);
+		WcUpgrades[i].Units);
 	}
     }
 
     SetupAllow();
 #endif
+
+    //
+    //	Resolve the icons.
+    //
+    for( i=0; i<UpgradesCount; ++i ) {
+	Upgrades[i].Icon.Icon=IconByIdent(Upgrades[i].Icon.Name);
+    }
 }
 
 /**
@@ -774,7 +780,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
 	costs[GoldCost]=gold;
 	costs[WoodCost]=lumber;
 	costs[OilCost]=oil;
-	AddUpgrade(UpgradeWcNames[i],IdentOfIcon(icon),costs);
+	AddUpgrade(UpgradeWcNames[i],IconWcNames[icon],costs);
 #else
 	if( UpgradesCount ) {
 	    DebugLevel0Fn("// FIXME: no bock to write this better\n");
@@ -788,7 +794,7 @@ global void ParsePudUGRD(const char* ugrd,int length)
 	for( j=OilCost+1; j<MaxCosts; ++j ) {
 	    WcUpgrades[i].Costs[j]=0;
 	}}
-	WcUpgrades[i].Icon=IdentOfIcon(icon);
+	WcUpgrades[i].Icon=IconWcNames[icon];
 #endif
 
 	// group+flags are to mystic to be implemented
@@ -814,7 +820,7 @@ global void SaveUpgrades(FILE* file)
     //
     for( i=0; i<UpgradesCount; ++i ) {
 	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
-		,Upgrades[i].Ident,IdentOfIcon(Upgrades[i].Icon));
+		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
 	fprintf(file,"  'costs #(");
 	for( j=0; j<MaxCosts; ++j ) {
 	    fprintf(file," %5d",Upgrades[i].Costs[j]);
@@ -1071,8 +1077,6 @@ local SCM CclDefineUpgrade(SCM list)
     int n;
     int j;
 
-    InitIcons();
-
     //	Identifier
 
     ident=gh_scm2newstr(gh_car(list),NULL);
@@ -1245,13 +1249,13 @@ global void UpgradesCclRegister(void)
 #if 0
 void UpgradesDone(void) // free upgrade/allow structures
 {
-  int z;
+  int i;
 
   memset( &Upgrades, 0, sizeof(Upgrades) );
   UpgradesCount = 0;
 
-  for ( z = 0; z < UpgradeModifiersCount; z++ )
-    free( UpgradeModifiers[z] );
+  for ( i = 0; i < UpgradeModifiersCount; i++ )
+    free( UpgradeModifiers[i] );
   UpgradeModifiersCount = 0;
 }
 #endif
