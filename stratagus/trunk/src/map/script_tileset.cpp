@@ -72,6 +72,7 @@ local SCM CclTileset(SCM slot,SCM name,SCM file,SCM palette,SCM table)
 	fprintf(stderr,"Wrong tileset slot name\n");
 	return SCM_UNSPECIFIED;
     }
+    //Tilesets[type].Ident=gh_scm2newstr(slot,NULL);
     Tilesets[type].Name=gh_scm2newstr(name,NULL);
     Tilesets[type].File=gh_scm2newstr(file,NULL);
     Tilesets[type].PaletteFile=gh_scm2newstr(palette,NULL);
