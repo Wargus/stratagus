@@ -164,11 +164,38 @@ global void ReleaseUnit(Unit* unit)
 	//
 	unit->Destroyed=1;		// mark as destroyed
 
-	//Update Corpse Cache
-	if( unit->Type->Vanishes && unit->Orders[0].Action == UnitActionDie ) {
-	    CorpseCacheRemove(unit);
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	// Mark building as can't be destroyed, since it's still seen
+        if( unit->Type->Building ) {
+	    int i;
+	    int x;
+	    int y;
+	    int w;
+	    int w0;
+	    int h;
+
+	    // Mark the Destroyed building, with who has seen it destroyed.
+	    x = unit->X;
+	    y = unit->Y;
+	    unit->Visible = 0x0000;
+	    for( i=0; i < PlayerMax; i++ ) {
+		w = w0 = unit->Type->TileWidth;
+		h = unit->Type->TileHeight;
+		for( ; h-->0; ) {
+		    for( w=w0; w-->0; ) {
+			if( IsMapFieldVisible(&Players[i],x+w,y+h)
+			    || Players[i].Type != PlayerPerson ) {
+			    unit->Visible |= (1 << i);
+			}
+		    }
+		}
+	    }
 	}
 
+    if( unit->Type->Building && unit->Visible != 0xFFFF ) {
+	return;
+    }
+#endif
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
 	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle
@@ -177,6 +204,19 @@ global void ReleaseUnit(Unit* unit)
 	}
 #ifdef HIERARCHIC_PATHFINDER
 	PfHierReleaseData(unit);
+#endif
+    }
+
+    // Update Corpse Cache
+    if( unit->Orders[0].Action == UnitActionDie ) {
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	if( unit->Type->Building ) {
+	    DeadBuildingCacheRemove(unit);
+	} else {
+	    CorpseCacheRemove(unit);
+	}
+#else
+	CorpseCacheRemove(unit);
 #endif
     }
 
@@ -1011,6 +1051,46 @@ global int UnitVisibleOnMap(const Unit* unit)
     return 0;
 }
 
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+/**
+**	Returns true, if unit is visible for this player on the map.
+**	An unit is visible, if any field could be seen.
+**
+**	@warning	This is only true for ::ThisPlayer.
+**
+**	@param unit	Unit to be checked.
+**	@return		True if visible, false otherwise.
+*/
+global int BuildingVisibleOnMap(Unit* unit)
+{
+    int x;
+    int y;
+    int w;
+    int w0;
+    int h;
+
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
+
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+
+    //
+    //	Check if visible, not under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
+	    if( IsMapFieldVisible(ThisPlayer,x+w,y+h) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
+}
+#endif
 /**
 **	Returns true, if unit is known on the map. Special case for buildings.
 **
@@ -1090,6 +1170,8 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 	return 0;
     }
 
+    // FIXME: Need to be able to see enemy submarines seen by my shared vision
+    //		partners
     if( ThisPlayer != unit->Player &&
 	!(unit->Player->SharedVision&(1<<ThisPlayer->Player) &&
 	ThisPlayer->SharedVision&(1<<unit->Player->Player)) ) {
@@ -1098,7 +1180,11 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
 	    return 0;
 	}
 	// Visible submarine
-	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) && !unit->Type->Building ) {
+#else
+        if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+#endif
 	    return 0;
 	}
     }
@@ -3275,7 +3361,11 @@ global void LetUnitDie(Unit* unit)
 		    || !unit->Type->Animations->Die );
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
-	    CorpseCacheInsert(unit);	//Insert into corpse list
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
+#else
+	    CorpseCacheInsert(unit);
+#endif
 	    return;
 	}
 
@@ -3315,9 +3405,9 @@ global void LetUnitDie(Unit* unit)
     unit->Reset=0;
     unit->Wait=1;
     unit->Orders[0].Action=UnitActionDie;
-    if( unit->Type->CorpseType ) {
+//    if( unit->Type->CorpseType || unit->Type->Vanishes ) {
 	CorpseCacheInsert(unit);	//Insert into corpse list
-    }
+//    }
 
 #ifdef NEW_FOW
     if( unit->Type->CorpseType ) {

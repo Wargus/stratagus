@@ -796,14 +796,15 @@ global void InitUnitCache(void)
 //****************************************************************************/
 
 /**
-**	Inserts a corpse into the current corpse list
+**	Inserts a dieing unit into the current dead list
+**	it may be into the building or corpse list
 **
 **	@param unit	Unit pointer to insert into list
 **/
-global void CorpseCacheInsert(Unit* unit)
+global void DeadCacheInsert(Unit* unit,Unit** List)
 {
-    unit->Next=CorpseList;
-    CorpseList=unit;
+    unit->Next=*List;
+    *List=unit;
 }
 
 /**
@@ -811,11 +812,11 @@ global void CorpseCacheInsert(Unit* unit)
 **
 **	@param unit	Unit pointer to remove from list
 **/
-global void CorpseCacheRemove(Unit* unit)
+global void DeadCacheRemove(Unit* unit, Unit** List )
 {
     Unit** prev;
 
-    prev=&CorpseList;
+    prev=List;
     DebugCheck( !*prev );
     while( *prev ) {			// find the unit, be bug friendly
 	if( *prev==unit ) {

@@ -683,7 +683,9 @@ extern Unit** UnitSlotFree;		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
 extern Unit* DestroyedBuildings;	/// List of DestroyedBuildings
+#endif
 extern Unit* CorpseList;		/// List of Corpses On Map
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
@@ -747,6 +749,10 @@ extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
 extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
+#if defined(NEW_FOW) && defined(BUILDING_DESTROYED)
+    /// Returns true, if building is known on the map
+extern int BuildingVisibleOnMap(Unit* unit);
+#endif
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
@@ -868,9 +874,21 @@ extern void UnitCacheStatistic(void);
     /// Initialize unit-cache
 extern void InitUnitCache(void);
     /// Inserts a corpse into the corpse list cache
-extern void CorpseCacheInsert(Unit* unit);
+extern void DeadCacheInsert(Unit* unit,Unit** List );
     /// Removes a corpse from the corpse cache
-extern void CorpseCacheRemove(Unit* unit);
+extern void DeadCacheRemove(Unit* unit,Unit** List );
+
+#define CorpseCacheInsert(unit) \
+	(DeadCacheInsert((unit),&CorpseList))
+
+#define DeadBuildingCacheInsert(unit) \
+	(DeadCacheInsert((unit),&DestroyedBuildings))
+
+#define CorpseCacheRemove(unit) \
+	(DeadCacheRemove((unit),&CorpseList))
+
+#define DeadBuildingCacheRemove(unit) \
+	(DeadCacheRemove((unit),&DestroyedBuildings))
 
 //	in unit_draw.c
 //--------------------
