@@ -96,6 +96,7 @@ struct _sample_ {
     unsigned char	Channels;	/// mono or stereo
     unsigned char	SampleSize;	/// sample size in bits
     unsigned int	Frequency;	/// frequency in hz
+    unsigned short	BitsPerSample;	/// bits in a sample 8/16/32
     int			Length;		/// sample length
     char		Data[1];	/// sample bytes
 };
