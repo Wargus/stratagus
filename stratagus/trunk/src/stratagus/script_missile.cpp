@@ -427,17 +427,17 @@ global void MissileCclRegister(void)
 
 #ifdef META_LUA
 
-	/// Get func for SpellType 
-local int ScriptMissileTypeGet(MissileType* missiletype, const char* key, lua_State* l);
-	/// Set func for SpellType 
-local int ScriptMissileTypeSet(MissileType* missiletype, const char* key, lua_State* l);
+	/// Proxy type for MissileType
+local ScriptProxyType ScriptProxyMissileType;
+	/// Proxy type for the SpellType array
+local ScriptProxyType ScriptProxyMissileTypes;
 
 /**
 **  Create a new missile Type
 **
 **	@param l    Lua state
 */
-local int ScriptMissileTypesCreate(lua_State* l)
+local int ScriptMissileTypeCreate(lua_State* l)
 {
 	const char* name;
 	MissileType* mtype;
@@ -458,8 +458,7 @@ local int ScriptMissileTypesCreate(lua_State* l)
 		mtype->Flip = 1;
 		mtype->SplashFactor = 100;
 
-		ScriptCreateUserdata(l, mtype,
-				ScriptMissileTypeGet, ScriptMissileTypeSet);
+		ScriptCreateUserdata(l, mtype, &ScriptProxyMissileType);
 		return 1;
 	}
 }
@@ -549,32 +548,28 @@ local int ScriptMissileTypeSet(MissileType* mtype, const char* key, lua_State* l
 }
 
 /**
-**	Get function for the big spell namespace.
+**	Get function for the big missile types namespace, with int index
 */
-local int ScriptMissileTypesNamespaceGet(lua_State* l)
+local int ScriptMissileTypesGetInt(void* object, int index, lua_State* l)
 {
-	int i;
-	const char* key;
+	if (index < 0 || index >= NumMissileTypes) {
+		LuaError(l, "Missile type index out of range");
+	}
+	ScriptCreateUserdata(l, MissileTypes[index], &ScriptProxyMissileType);
+	return 1;
+}
+
+/**
+**	Get function for the big missile types namespace, with string key
+*/
+local int ScriptMissileTypesGetStr(void* object, const char* key, lua_State* l)
+{
 	MissileType* mtype;
 
-	//  Index with number
-	if (lua_isnumber(l, 2)) {
-		i = LuaToNumber(l, 2);
-		DebugLevel3Fn("(%d)\n" _C_ i);
-		if (i < 0 || i >= NumMissileTypes) {
-			LuaError(l, "Missile type index out of range");
-		}
-		ScriptCreateUserdata(l, MissileTypes[i], ScriptMissileTypeGet, ScriptMissileTypeSet);
-		return 1;
-	}
-
-	//  Index with string.
-	key = LuaToString(l, 2);
-
 	META_GET_INT("n", NumMissileTypes);
-
+	META_GET_FUNC("Create", ScriptMissileTypeCreate);
 	if ((mtype = MissileTypeByIdent(key))) {
-		ScriptCreateUserdata(l, mtype, ScriptMissileTypeGet, ScriptMissileTypeSet);
+		ScriptCreateUserdata(l, mtype, &ScriptProxyMissileType);
 		return 1;
 	}
 
@@ -588,26 +583,21 @@ local int ScriptMissileTypesNamespaceGet(lua_State* l)
 */
 global void ScriptMissileTypesInit(void)
 {
-	// Create Stratagus.Missiles namespace.
-	// No userdata, there's no data. And no finalizer
+	ScriptProxyMissileType.GetStr = (ScriptGetSetStrFunction *)ScriptMissileTypeGet;
+	ScriptProxyMissileType.SetStr = (ScriptGetSetStrFunction *)ScriptMissileTypeSet;
+	ScriptProxyMissileType.GetInt = ScriptGetSetIntBlock;
+	ScriptProxyMissileType.SetInt = ScriptGetSetIntBlock;
+	ScriptProxyMissileType.Collect = 0;
+
+	ScriptProxyMissileTypes.GetStr = (ScriptGetSetStrFunction *)ScriptMissileTypesGetStr;
+	ScriptProxyMissileTypes.SetStr = ScriptGetSetStrBlock;
+	ScriptProxyMissileTypes.GetInt = (ScriptGetSetIntFunction *)ScriptMissileTypesGetInt;
+	ScriptProxyMissileTypes.SetInt = ScriptGetSetIntBlock;
+	ScriptProxyMissileTypes.Collect = 0;
+
+	// Create Stratagus.MissileTypes namespace.
 	lua_pushstring(Lua, "MissileTypes");
-	lua_newtable(Lua);
-
-	// Generate the metatable
-	lua_newtable(Lua);
-	lua_pushstring(Lua, "__index");
-	lua_pushcfunction(Lua, ScriptMissileTypesNamespaceGet);
-	lua_settable(Lua, -3);
-	lua_pushstring(Lua, "__newindex");
-	lua_pushcfunction(Lua, ScriptSetValueBlock); // Read-Only
-	lua_settable(Lua, -3);
-	lua_setmetatable(Lua, -2);
-
-	// Add functions.
-	lua_pushstring(Lua, "Create");
-	lua_pushcfunction(Lua, ScriptMissileTypesCreate);
-	lua_rawset(Lua, -3);
-
+	ScriptCreateUserdata(Lua, 0, &ScriptProxyMissileTypes);
 	lua_rawset(Lua, -3);
 }
 

@@ -90,29 +90,38 @@ extern void CleanCclCredits();            /// Free Ccl Credits Memory
 --  Functions and data structures.
 ----------------------------------------------------------------------------*/
 
-	/// Script get/set function prototype. The values is on the lua stack.
-typedef int ScriptGetSetFunction(void* object, const char* key, lua_State* l);
+	/// Script get/set function prototype with string key. The value is on the lua stack.
+typedef int ScriptGetSetStrFunction(void* object, const char* key, lua_State* l);
+	/// Script get/set function prototype with int index. The value is on the lua stack.
+typedef int ScriptGetSetIntFunction(void* object, int index, lua_State* l);
+	/// Script garbage collector function prototype.
+typedef int ScriptCollectFunction(void* object);
+
+	/// Structure for a script proxy type. Make one of those for every scriptable struct.
+typedef struct {
+	ScriptGetSetStrFunction* GetStr;        /// Get function with strings.
+	ScriptGetSetStrFunction* SetStr;        /// Set function with strings.
+	ScriptGetSetIntFunction* GetInt;        /// Get function with int index.
+	ScriptGetSetIntFunction* SetInt;        /// Set function with int index.
+	ScriptCollectFunction* Collect;         /// Garbage collection function.
+} ScriptProxyType;
 
 	/// Structure for a script proxy. Don't mess with this outside of scripting
 typedef struct {
-	void* Object;                          /// The actual Object
-	ScriptGetSetFunction* GetFunction;        /// Get function
-	ScriptGetSetFunction* SetFunction;        /// Set function
+	void* Object;                                   /// The actual Object
+	ScriptProxyType* Type;                          /// Type information
 } ScriptProxy;
 
-	/// Userdata Constructor.
-extern void ScriptDoCreateUserdata(lua_State* l, void* Object,
-		ScriptGetSetFunction* GetFunction, ScriptGetSetFunction* SetFunction);
-	/// Really dumb set function that always goes into an error.
-extern int ScriptSetValueBlock(lua_State* l);
+	/// Userdata Constructor. Push userdata on the stack.
+extern void ScriptCreateUserdata(lua_State* l, void* object, ScriptProxyType* type);
+	/// Really dumb set function that always goes into an error, with string key
+extern int ScriptGetSetStrBlock(void* object, const char* key, lua_State* l);
+	/// Really dumb set function that always goes into an error, with int index
+extern int ScriptGetSetIntBlock(void* object, int index, lua_State* l);
 
 /*----------------------------------------------------------------------------
 --  Quick macros for meta lua. Use them in well-formed get/set functions.
 ----------------------------------------------------------------------------*/
-
-	/// Macro to call ScriptDoCreateUserdata w/o casts.
-#define ScriptCreateUserdata(l, o, g, s) (ScriptDoCreateUserdata(l, o, \
-		(ScriptGetSetFunction*)(g), (ScriptGetSetFunction*)(s)))
 
     /// Quick way to fail in a function. You can use _C_ like in DebugLevelx
 #ifdef DEBUG
@@ -181,6 +190,24 @@ extern int ScriptSetValueBlock(lua_State* l);
 		return 0; \
 	} \
 }
+
+#define META_GET_FUNC(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushcfunction(l, v); \
+		return 1; \
+	} \
+}
+
+/*
+#define META_SET_FUNC(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		luaL_checktype(l, -1, LUA_TBOOLEAN); \
+		v = lua_toboolean(l, -1); \
+		return 0; \
+	} \
+}*/
 
 #endif // META_LUA
 
