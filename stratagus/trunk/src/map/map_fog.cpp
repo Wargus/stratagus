@@ -2896,9 +2896,9 @@ build_table:
 			    |((b>>bloss)<<bshft);
 		}
 		if( TileSizeX==16 && TileSizeY==16 ) {
-		    VideoDrawFog=VideoDraw16Fog32Alpha;
-		    VideoDrawOnlyFog=VideoDraw16OnlyFog32Alpha;
-		    VideoDrawUnexplored=VideoDraw16Unexplored32Solid;
+		    VideoDrawFog=VideoDraw16Fog16Alpha;
+		    VideoDrawOnlyFog=VideoDraw16OnlyFog16Alpha;
+		    VideoDrawUnexplored=VideoDraw16Unexplored16Solid;
 		} else if( TileSizeX==32 && TileSizeY==32 ) {
 		    VideoDrawFog=VideoDraw16Fog32Alpha;
 		    VideoDrawOnlyFog=VideoDraw16OnlyFog32Alpha;
