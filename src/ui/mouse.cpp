@@ -1106,8 +1106,8 @@ static int SendUnload(int sx, int sy)
 static int SendSpellCast(int sx, int sy)
 {
 	int i;
-	Unit *unit;
-	Unit *dest;
+	Unit* unit;
+	Unit* dest;
 	int x;
 	int y;
 	int ret;

@@ -360,7 +360,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 					int miny;
 					int maxy;
 					int nunits;
-					Unit *units[UnitMax];
+					Unit* units[UnitMax];
 
 					buildings = 0;
 
