@@ -861,11 +861,11 @@ local int GameStatsDrawFunc(int frame)
 	    "General", "Master", "Marshall", "Chieftain", "Overlord",
 	    "War Chief", "Demigod", "God", "Designer"
 	};
-	unsigned RankScores[] = {
+	int RankScores[] = {
 	    2000, 5000, 8000, 18000, 28000,
 	    40000, 55000, 70000, 85000, 105000,
 	    125000, 145000, 165000, 185000, 205000,
-	    230000, 255000, 280000, -1
+	    230000, 255000, 280000
 	};
 
 	if( ThisPlayer->Race==PlayerRaceHuman ) {
@@ -874,15 +874,12 @@ local int GameStatsDrawFunc(int frame)
 	    Ranks=OrcRanks;
 	}
 
-	Rank = NULL;
+	Rank=Ranks[sizeof(RankScores)];
 	for( i=0; i<sizeof(RankScores); i++ ) {
 	    if( ThisPlayer->Score<RankScores[i] ) {
 		Rank=Ranks[i];
 		break;
 	    }
-	}
-	if( !Rank ) {
-	    Rank="No Rank";
 	}
 
 	VideoDrawTextCentered(x+324,y+TopOffset,LargeFont,"Rank");
