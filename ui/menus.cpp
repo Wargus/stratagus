@@ -780,7 +780,7 @@ global void GameMenuSave(void)
     menu = FindMenu("menu-save-game");
     strcpy(savegame_buffer, "~!_");
     menu->items[1].d.input.buffer = savegame_buffer;
-    menu->items[1].d.input.nch = 0; /* strlen(savegame_buffer) - 3; */
+    menu->items[1].d.input.nch = strlen(savegame_buffer) - 3;
     menu->items[1].d.input.maxch = 24;
     menu->items[4].flags = MenuButtonDisabled;	/* Save button! */
     ProcessMenu("menu-save-game", 1);
@@ -815,7 +815,7 @@ local void SaveLBInit(Menuitem *mi)
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir,
 	    NULL, (FileList **) & (mi->d.listbox.options));
     if (i != 0) {
-	if (i > 7) {
+	if (i > mi->d.listbox.nlines) {
 	    mi->menu->items[3].flags = MI_ENABLED;
 	} else {
 	    mi->menu->items[3].flags = MI_DISABLED;
@@ -827,38 +827,14 @@ local void SaveLBInit(Menuitem *mi)
 /**
 **	Save game listbox retrieve callback
 */
-// FIXME: modify function
 local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    MapInfo *info;
     static char buffer[1024];
-    int j;
-    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
-		if ((info = fl[i].xdata)) {
-		    if (info->Description) {
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254,LargeFont,info->Description);
-		    }
-		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(mi->menu->x+8,mi->menu->y+254+20,LargeFont,buffer);
-		    for (n = j = 0; j < PlayerMax; j++) {
-			if (info->PlayerType[j] == PlayerPerson) {
-			    n++;
-			}
-		    }
-		    if (n == 1) {
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,"1 player");
-		    } else {
-			sprintf(buffer, "%d players", n);
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,buffer);
-		    }
-		}
-	    }
 	    strcpy(buffer, "   ");
 	} else {
 	    strcpy(buffer, "\260 ");
@@ -879,13 +855,13 @@ local void SaveLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	if (mi->d.listbox.noptions > 7) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
 	if (fl[i].type) {
-	    strcpy(mi->menu->items[1].d.input.buffer, fl[i].name);
-	    mi->menu->items[1].d.input.nch = strlen(fl[i].name);
+	    sprintf(mi->menu->items[1].d.input.buffer, "%s~!_", fl[i].name);
+	    mi->menu->items[1].d.input.nch = strlen(mi->menu->items[1].d.input.buffer) - 3;
 	    mi->menu->items[4].flags = MI_ENABLED;
 	    mi->menu->items[5].flags = MI_ENABLED;
 	} else {
@@ -1119,7 +1095,7 @@ local void LoadLBInit(Menuitem *mi)
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, SaveRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
-	if (i > 7) {
+	if (i > mi->d.listbox.nlines) {
 	    mi->menu->items[2].flags = MenuButtonSelected;
 	} else {
 	    mi->menu->items[2].flags = MenuButtonDisabled;
@@ -1131,38 +1107,14 @@ local void LoadLBInit(Menuitem *mi)
 /**
 **	Load game listbox retrieve callback
 */
-// FIXME: modify function
 local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
-    MapInfo *info;
     static char buffer[1024];
-    int j;
-    int n;
 
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
 	if (fl[i].type) {
-	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
-		if ((info = fl[i].xdata)) {
-		    if (info->Description) {
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254,LargeFont,info->Description);
-		    }
-		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(mi->menu->x+8,mi->menu->y+254+20,LargeFont,buffer);
-		    for (n = j = 0; j < PlayerMax; j++) {
-			if (info->PlayerType[j] == PlayerPerson) {
-			    n++;
-			}
-		    }
-		    if (n == 1) {
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,"1 player");
-		    } else {
-			sprintf(buffer, "%d players", n);
-			VideoDrawText(mi->menu->x+8,mi->menu->y+254+40,LargeFont,buffer);
-		    }
-		}
-	    }
 	    strcpy(buffer, "   ");
 	} else {
 	    strcpy(buffer, "\260 ");
@@ -1183,7 +1135,7 @@ local void LoadLBAction(Menuitem *mi, int i)
     DebugCheck(i<0);
     if (i < mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	if (mi->d.listbox.noptions > 7) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
@@ -1192,6 +1144,8 @@ local void LoadLBAction(Menuitem *mi, int i)
 	} else {
 	    mi->menu->items[3].flags = MI_DISABLED;
 	}
+    } else {
+	mi->menu->items[3].flags = MI_DISABLED;
     }
 }
 
@@ -2820,7 +2774,7 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
 	} else {
 	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
-	if (mi->d.listbox.noptions > 5) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
@@ -2982,7 +2936,7 @@ local void ScenSelectLBInit(Menuitem *mi)
     } else {
 	ScenSelectLBAction(mi, 0);
 	mi->menu->items[3].flags &= ~MenuButtonDisabled;
-	if (i > 5) {
+	if (i > mi->d.listbox.nlines) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
     }
@@ -4773,7 +4727,7 @@ local void EditorMainLoadLBInit(Menuitem *mi)
     } else {
 	EditorMainLoadLBAction(mi, 0);
 	mi->menu->items[3].flags &= ~MenuButtonDisabled;
-	if (i > 5) {
+	if (i > mi->d.listbox.nlines) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
     }
@@ -5057,7 +5011,7 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
 	} else {
 	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
-	if (mi->d.listbox.noptions > 5) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
@@ -5539,7 +5493,7 @@ local void EditorSaveLBInit(Menuitem *mi)
 	sprintf(mi->menu->items[3].d.input.buffer, "%s~!_", ScenSelectFileName);
 	mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
 	mi->menu->items[4].flags &= ~MenuButtonDisabled;
-	if (i > 5) {
+	if (i > mi->d.listbox.nlines) {
 	    mi[1].flags &= ~MenuButtonDisabled;
 	}
     }
@@ -5765,7 +5719,7 @@ local void EditorSaveLBAction(Menuitem *mi, int i)
 	    mi->menu->items[3].d.input.nch = strlen(mi->menu->items[3].d.input.buffer) - 3;
 	    mi->menu->items[4].d.button.text = strdup("Open");
 	}
-	if (mi->d.listbox.noptions > 5) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
     }
@@ -5997,8 +5951,10 @@ local void ReplayGameLBInit(Menuitem *mi)
     } else {
 	ReplayGameLBAction(mi, 0);
 	mi->menu->items[3].flags &= ~MenuButtonDisabled;
-	if (i > 5) {
+	if (i > mi->d.listbox.nlines) {
 	    mi[1].flags &= ~MenuButtonDisabled;
+	} else {
+	    mi[1].flags |= MenuButtonDisabled;
 	}
     }
 }
@@ -6098,7 +6054,7 @@ local void ReplayGameLBAction(Menuitem *mi, int i)
 	} else {
 	    mi->menu->items[3].d.button.text = strdup("Open");
 	}
-	if (mi->d.listbox.noptions > 5) {
+	if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
