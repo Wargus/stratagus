@@ -186,9 +186,9 @@
     /**
     **	Debug check condition. If cond is true abort with file,line.
     */
-#define DebugCheck(cond)	do{ if( cond ) { \
-	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
-	abort(); } }while( 0 )
+#define DebugCheck(cond)	do { if (cond) { \
+	fprintf(stderr, "DebugCheck at %s:%d: %s\n", __FILE__, __LINE__, #cond); \
+	abort(); }} while (0)
 
     /**
     **	Print debug information of level 0.
