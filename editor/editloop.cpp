@@ -1927,6 +1927,11 @@ global void EditorMainLoop(void)
 	}
 	if( TheUI.KeyScroll && !(FrameCounter%SpeedKeyScroll) ) {
 	    DoScrollArea(KeyScrollState, KeyModifiers&ModifierControl);
+	    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
+		    && (EditorState == EditorEditTile
+			|| EditorState == EditorEditUnit) ) {
+		EditorCallbackButtonDown(0);
+	    }
 	}
 
 	if( !(FrameCounter%COLOR_CYCLE_SPEED) ) {
