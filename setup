@@ -824,9 +824,7 @@ echo "#####################################################################" >> 
 echo "# Don't change anything below here unless you know what you're doing!" >> $RULESFILE
 echo >> $RULESFILE
 
-if [ "$WIN32" = "0" ] ; then
-  echo "VERSION=	'$VERSION'" >> $RULESFILE
-fi
+echo "VERSION=	'$VERSION'" >> $RULESFILE
 echo "PROFILE=$PROFILE" >> $RULESFILE
 echo >> $RULESFILE
 
