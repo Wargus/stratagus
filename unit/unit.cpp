@@ -801,22 +801,27 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 }
 
 /**
-**	Mark submarine seen by an submarine detector.
+**	Mark submarine seen by a submarine detector.
 **
 **	@param player	Player pointer that can see the submarine
 **	@param x	X map tile center position
 **	@param y	Y map tile center position
 **	@param r	Range arround center
+**
+**	@note
+**		All units are marked as visible, not only submarines.
 */
 global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 {
     Unit* table[UnitMax];
     int n;
     int i;
+    int pm;
 
     n=SelectUnits(x-r,y-r,x+r,y+r,table);
+    pm=(1<<player->Player);
     for( i=0; i<n; ++i ) {
-	table[i]->Visible|=(1<<player->Player);
+	table[i]->Visible|=pm;
     }
 }
 
@@ -1087,9 +1092,9 @@ global int CheckUnitToBeDrawn(const Unit * unit)
 
 /**
 **	Increment mana of all magic units. Called each second.
-**	Also clears the blink flag.
+**	Also clears the blink flag and handles submarines.
 **
-**	NOTE: we could build a table of all magic units reducing cpu use.
+**	@NOTE: we could build a table of all magic units reducing cpu use.
 */
 //FIXME: vladi: the doc says incrementing mana is done by 1 per second
 //       the spells effect can be decremented at the same time and this
@@ -1177,14 +1182,27 @@ global void UnitIncrementMana(void)
 	    unit->Visible=0;
 	}
     }
+
+    //
+    //	Step 2) Mark all submarines that could be seen.
+    //		Take units that can see sub marines, aren't under construction
+    //		and are on the map.
+    //
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	if( unit->Type->CanSeeSubmarine && !unit->Removed &&
+		unit->Orders[0].Action!=UnitActionBuilded ) {
+	    MarkSubmarineSeen(unit->Player,unit->X+unit->Type->TileWidth/2,
+		unit->Y+unit->Type->TileHeight/2,unit->Stats->SightRange);
+	}
+    }
 }
 
 /**
 **	Increment health of all regenerating units. Called each second.
 **
 **	@note:	We could build a table of all regenerating units reducing cpu
-**		use. Also the berserker unit-type and upgrade regeneration
-**		should be initialized in some init function.
+**		use. 
 **		Any idea how to handle this more general? It whould be nice
 **		to have more units that could regenerate.
 */
@@ -1192,13 +1210,10 @@ global void UnitIncrementHealth(void)
 {
     Unit** table;
     Unit* unit;
-    static UnitType* berserker;
-    static int regeneration;
+    int regeneration;
 
-    if( !berserker ) {			// FIXME: can move to init code!
-	berserker=UnitTypeByIdent("unit-berserker");
-	regeneration=UpgradeIdByIdent("upgrade-berserker-regeneration");
-    }
+    // FIXME: move to init code! (Can't be done here, load/save!)
+    regeneration=UpgradeIdByIdent("upgrade-berserker-regeneration");
 
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
@@ -1212,7 +1227,7 @@ global void UnitIncrementHealth(void)
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
-	if( unit->Type==berserker
+	if( unit->Type==UnitTypeBerserker
 		&& unit->HP<unit->Stats->HitPoints
 		&& UpgradeIdAllowed(unit->Player,regeneration)=='R' ) {
 	    ++unit->HP;			// FIXME: how fast do we regenerate
