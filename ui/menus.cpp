@@ -2184,7 +2184,7 @@ local void KeystrokeHelpMenu(void)
     int j;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
 
-    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 200 / (nitems - 9);
+    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 100 / (nitems - 9 - 3);
 
     for (j=3; j < nitems ;++j) {
 	if ((KeystrokeHelpMenuItems[j].yofs < 40) || (KeystrokeHelpMenuItems[j].yofs > 40*5))
@@ -3032,7 +3032,7 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 	    if (i == 2) {
 		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
-	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 200 / (nitems - 9);
+	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - 40) / -20 ) * 100 / (nitems - 9 - 3);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
