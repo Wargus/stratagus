@@ -575,6 +575,9 @@ local void DrawShadow(Unit* unit,UnitType* type,int x,int y)
 */
 global void DrawPath(Unit* unit)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: later\n");
+#else
     int x1;
     int y1;
     int x2;
@@ -684,6 +687,7 @@ global void DrawPath(Unit* unit)
 	    ,Map2ScreenX(x1)+TileSizeX/2-3,Map2ScreenY(y1)+TileSizeY/2-3
 	    ,6,6);
     }
+#endif
 }
 
 /**
@@ -694,6 +698,9 @@ global void DrawPath(Unit* unit)
 */
 local void ShowOrder(const Unit* unit)
 {
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("FIXME: later\n");
+#else
     int x1;
     int y1;
     int x2;
@@ -707,7 +714,7 @@ local void ShowOrder(const Unit* unit)
     x1=Map2ScreenX(unit->X)+unit->IX+unit->Type->TileWidth*TileSizeX/2;
     y1=Map2ScreenY(unit->Y)+unit->IY+unit->Type->TileHeight*TileSizeY/2;
 
-    if( (goal=unit->Command.Data.Move.Goal) ) {
+    if( (goal=unit->Command.Data.Move.Goal) && goal->Type ) {
 	x2=Map2ScreenX(goal->X)+goal->IX+goal->Type->TileWidth*TileSizeX/2;
 	y2=Map2ScreenY(goal->Y)+goal->IY+goal->Type->TileHeight*TileSizeY/2;
     } else {
@@ -814,6 +821,7 @@ local void ShowOrder(const Unit* unit)
     VideoFillCircleClip(color,x2,y2,2);
 
     //DrawPath(unit);
+#endif
 }
 
 /*
