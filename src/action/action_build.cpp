@@ -399,9 +399,7 @@ global void HandleActionBuilded(Unit* unit)
 	}
 	
 	if( type->GivesResource ) {
-	    // FIXME: nobody: shouldn't this be already 0?
-	    // FIXME: wierd condition.
-	    // FIXME: It holds the number of units inside a resource.
+	    // Set to Zero as it's part of a union
 	    unit->Data.Resource.Active=0;
 	}
 
