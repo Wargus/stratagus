@@ -896,57 +896,61 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,
 	int flush __attribute__((unused)))
 {
     //
-    //	Check if enough resources remains? (NETWORK!)
-    //	FIXME: wrong if append to message queue!!!
+    //	Check if unit is still valid? (NETWORK!)
     //
-    if( !PlayerCheckFood(unit->Player,type)
-	    || !PlayerCheckLimits(unit->Player,type)
-	    || PlayerCheckUnitType(unit->Player,type) ) {
-	return;
-    }
-
-    //
-    //	Not already training?
-    //
-    if( unit->Orders[0].Action!=UnitActionTrain ) {
-
-	DebugCheck( unit->Wait>6 );
-
-	if( unit->OrderCount==2 && unit->Orders[1].Action==UnitActionTrain ) {
-	    DebugLevel0Fn("FIXME: not supported. Unit queue full!\n");
+    if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
+	//
+	//	Check if enough resources remains? (NETWORK!)
+	//	FIXME: wrong if append to message queue!!!
+	//
+	if( !PlayerCheckFood(unit->Player,type)
+		|| !PlayerCheckLimits(unit->Player,type)
+		|| PlayerCheckUnitType(unit->Player,type) ) {
 	    return;
+	}
+
+	//
+	//	Not already training?
+	//
+	if( unit->Orders[0].Action!=UnitActionTrain ) {
+
+	    DebugCheck( unit->Wait>6 );
+
+	    if( unit->OrderCount==2 && unit->Orders[1].Action==UnitActionTrain ) {
+		DebugLevel0Fn("FIXME: not supported. Unit queue full!\n");
+		return;
+	    } else {
+		ReleaseOrders(unit);
+		unit->Orders[1].Action=UnitActionTrain;
+	    }
+	    DebugCheck( unit->OrderCount!=1 || unit->OrderFlush!=1 );
+
+	    unit->OrderCount=2;
+	    unit->Orders[1].Type=type;
+	    unit->Orders[1].X=unit->Orders[1].Y=-1;
+	    unit->Orders[1].Goal=NoUnitP;
+	    unit->Orders[1].Arg1=NULL;
 	} else {
-	    ReleaseOrders(unit);
-	    unit->Orders[1].Action=UnitActionTrain;
-	}
-	DebugCheck( unit->OrderCount!=1 || unit->OrderFlush!=1 );
+	    //
+	    //	Update interface.
+	    //
+	    if( unit->Player==ThisPlayer && unit->Selected ) {
+		MustRedraw|=RedrawInfoPanel;
+	    }
 
-	unit->OrderCount=2;
-	unit->Orders[1].Type=type;
-	unit->Orders[1].X=unit->Orders[1].Y=-1;
-	unit->Orders[1].Goal=NoUnitP;
-	unit->Orders[1].Arg1=NULL;
-    } else {
-	//
-	//	Update interface.
-	//
-	if( unit->Player==ThisPlayer && unit->Selected ) {
-	    MustRedraw|=RedrawInfoPanel;
-	}
+	    //
+	    //	Training slots are all already full. (NETWORK!)
+	    //
+	    if( !EnableTrainingQueue || unit->Data.Train.Count>=MAX_UNIT_TRAIN ) {
+		DebugLevel0Fn("Unit queue full!\n");
+		return;
+	    }
 
-	//
-	//	Training slots are all already full. (NETWORK!)
-	//
-	if( !EnableTrainingQueue || unit->Data.Train.Count>=MAX_UNIT_TRAIN ) {
-	    DebugLevel0Fn("Unit queue full!\n");
-	    return;
+	    unit->Data.Train.What[unit->Data.Train.Count++]=type;
 	}
-
-	unit->Data.Train.What[unit->Data.Train.Count++]=type;
+	// FIXME: if you give quick an other order, the resources are lost!
+	PlayerSubUnitType(unit->Player,type);
     }
-    // FIXME: if you give quick an other order, the resources are lost!
-    PlayerSubUnitType(unit->Player,type);
-
     ClearSavedAction(unit);
 }
 
