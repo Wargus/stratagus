@@ -705,11 +705,14 @@ global void DoButtonButtonClicked(int button)
 		MustRedraw|=RedrawCursor;
 	    }
 	    break;
+
 	case B_Train:
 	    type=&UnitTypes[CurrentButtons[button].Value];
-	    // FIXME: Johns: I want to place commands in que, even if not
+	    // FIXME: Johns: I want to place commands in queue, even if not
 	    // FIXME: enought resources are available
-	    if( PlayerCheckFood(ThisPlayer,type)
+	    if( Selected[0]->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
+		SetMessage( "Unit training queue is full" );
+	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {
 		PlayerSubUnitType(ThisPlayer,type);
 		SendCommandTrainUnit(Selected[0],type
@@ -720,6 +723,7 @@ global void DoButtonButtonClicked(int button)
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	    break;
+
 	case B_UpgradeTo:
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    if( !PlayerCheckUnitType(ThisPlayer,type) ) {
