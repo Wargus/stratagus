@@ -50,6 +50,7 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "interface.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -69,6 +70,7 @@ global Sample* MusicSample;		/// Music samples
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":wc2"
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
+global char *CDPlaySection = "menu";
 #endif
 
 #if defined(USE_SDLCD)
@@ -360,7 +362,21 @@ global int PlayCDRom(const char* name)
 	if (!strcmp(name, ":wc2")) {
 	    CDMode = ":wc2";
 	    track = cd_current_track();
-	    if (!GameRunning && track != 15) {
+	    if (!strcmp(CDPlaySection, "showstats")) {
+		if (GameResult == GameVictory) {
+		    if (!ThisPlayer->Race && track != 8) {
+			cd_play(8);
+		    } else if (ThisPlayer->Race && track != 16) {
+			cd_play(16);
+		    }
+		} else {
+		    if (!ThisPlayer->Race && track != 9) {
+			cd_play(9);
+		    } else if (ThisPlayer->Race && track != 17) {
+			cd_play(17);
+		    }
+		}
+	    } else if (!GameRunning && track != 15) {
 		cd_play(15);
 	    } else if (GameRunning && !ThisPlayer->Race && (track < 3 || track > 7)) {
 		do CDTrack = (MyRand() % NumCDTracks) + 3;
