@@ -43,19 +43,18 @@
 <a href="../faq.html">FAQ</a> 
 <a href="ui.html">PREV</a> 
 <a href="ai.html">NEXT</a> 
-<a href="index.html">CCL Index</a> 
+<a href="index.html">LUA Index</a>
 <hr>
 <a href="#DefineAnimations">DefineAnimations</a>
 <a href="#DefineBoolFlags">DefineBoolFlags</a>
 <a href="#DefineVariables">DefineVariables</a>
-<a href="#DefineUnitStats">DefineUnitStats</a> -->
+<a href="#DefineUnitStats">DefineUnitStats</a>
 <a href="#DefineUnitType">DefineUnitType</a>
-<a href="pud.html#DefineUnitTypeWcNames">DefineUnittypeWcNames</a>
 <a href="#GetUnitTypeIdent">GetUnitTypeIdent</a>
 <a href="#GetUnitTypeName">GetUnitTypeName</a>
 <a href="#SetUnitTypeName">SetUnitTypeName</a>
 <a href="#UnitType">UnitType</a>
-<a href="#UnitTpeArray">UnitTypeArray</a>
+<a href="#UnitTypeArray">UnitTypeArray</a>
 <hr>
 <h2>Intro - Introduction to unit-type functions and variables</h2>
 
@@ -157,11 +156,10 @@ For example, Mana is active only for caster, but HP is available for every unit.
 </pre>
 
 
-<!--
 <a name="DefineUnitStats"></a>
-<h3>(DefineUnitStats ident player 'tag1 value1 'tag2 value2 ...)</h3>
+<h3>DefineUnitStats(ident, player, tag1, value1, tag2, value2 ...)</h3>
 
-Define unit stats. This is mostly only used in savegames, but included
+Define unit stats. This is almost only used in savegames, but included
 here for completeness. In the game every unit of the same type of one
 player have the same stats, affected by upgrades.
 
@@ -214,12 +212,14 @@ A special 'resource' is time, the time to train the unit in cycles.
 <h4>Example</h4>
 
 <pre>
-    (DefineUnitStats 'unit-archer 14
-      'level 1 'speed 10 'attack-range 4 'sight-range 5
-      'armor 0 'basic-damage 3 'piercing-damage 6 'hit-points 40
-      'costs '(time 70 gold 500 wood 50 oil 0 ore 0 stone 0 coal 0) )
+    DefineUnitStats("unit-archer", 14,
+      "level", 1, "speed", 10, "attack-range", 4, "sight-range", 5,
+      "armor", 0, "basic-damage", 3, "piercing-damage", 6, "hit-points", 40,
+      "costs", {"time", 0, "titanium", 0, "crystal", 0, "gas", 0, "ore", 0, 
+                "stone", 0, "coal", 0})
 </pre>
--->
+
+
 <a name="DefineUnitType"></a>
 <h3>DefineUnitType( "ident", { tag1 = value1, tag2  = value2, ...})</h3>
 
