@@ -70,13 +70,14 @@ VIDEOLIB	= -lXext -lX11 -ldl
 
 # Uncomment the next for the generic SDL support.
 
-VIDEO		= $(SDL)
-VIDEOLIB	= $(SDLLIB)
+#VIDEO		= $(SDL)
+#VIDEOLIB	= $(SDLLIB)
 
 # Uncomment the next for the SDL X11/SVGALIB support.
+#	(sdl-config --static-libs didn't work correct.)
 
-#VIDEO		= $(SDL)
-#VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
+VIDEO		= $(SDL)
+VIDEOLIB	= $(SDLLIB) -lXext -lX11 -lXxf86dga -lXxf86vm -lvga -lvgagl -ldl -lesd -lm -lslang -lgpm
 
 # Uncomment the next for the win32/cygwin support. (not working?)
 
@@ -140,7 +141,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \
 #PROFILE=	-pg
 
 # Compile Version
-VERSION=	'-DVERSION="1.17pre1-build12"'
+VERSION=	'-DVERSION="1.17pre1-build13"'
 
 ############################################################################
 # below this, nothing should be changed!
@@ -185,7 +186,7 @@ DEBUG=	-DDEBUG -DREFS_DEBUG # -DFLAG_DEBUG
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Include new network menues.
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_NAMES # -DNEW_NETMENUS -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_AI -DNEW_SHIPS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -D_NEW_NAMES -DNEW_NETMENUS # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_AI -DNEW_SHIPS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
@@ -202,7 +203,6 @@ CC=cc
 RM=rm -f
 MAKE=make
 
-## JOHNS: my ctags didn't support
 CTAGSFLAGS=-i defmpstuvFS -a -f
 #CTAGSFLAGS=-i defptvS -a -f
 

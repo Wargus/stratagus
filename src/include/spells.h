@@ -30,6 +30,7 @@
 #include "sound.h"
 #include "unittype.h"
 #include "unit.h"
+#include "missile.h"
 
 /*----------------------------------------------------------------------------
 --	Definitons
@@ -66,6 +67,8 @@ typedef enum _spell_action_type_ {
 
 /**
 **	Base structure of a spell type
+**
+**	@todo	Move more parameters into this structure.
 */
 typedef struct _spell_type_ {
 
@@ -79,6 +82,7 @@ typedef struct _spell_type_ {
     SpellActionType  Action;	/// SpellAction*
 
     SoundConfig Casted;		/// sound played if casted
+    MissileConfig Missile;	/// missile fired on cast
 } SpellType;
 
 /*----------------------------------------------------------------------------

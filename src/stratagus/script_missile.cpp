@@ -169,6 +169,8 @@ local SCM CclDefineMissileType(SCM list)
 		// FIXME: this leaves a half initialized missile-type
 		errl("Unsupported class",value);
 	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("delay")) ) {
+	    type->Delay=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("sleep")) ) {
 	    type->Sleep=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {

@@ -990,18 +990,35 @@ global void UnitIncrementMana(void)
 	}
 
 	//
+	//	Look if the time to live is over.
+	//
+	if( unit->TTL && unit->TTL<FrameCounter ) {
+	    DebugLevel0Fn("Unit must die %d %d!\n",unit->TTL,FrameCounter);
+	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
+		DestroyUnit(unit);
+	    //}
+	    // FIXME: this can modify my table, some units are than skipped!
+	    continue;
+	}
+
+	//
 	// decrease spells effects time
 	//
-	if ( unit->Bloodlust > 0 )
-	  unit->Bloodlust--;
-	if ( unit->Haste > 0 )
-	  unit->Haste--;
-	if ( unit->Slow > 0 )
-	  unit->Slow--;
-	if ( unit->Invisible > 0 )
-	  unit->Invisible--;
-	if ( unit->UnholyArmor > 0 )
-	  unit->UnholyArmor--;
+	if ( unit->Bloodlust > 0 ) {
+	    unit->Bloodlust--;
+	}
+	if ( unit->Haste > 0 ) {
+	    unit->Haste--;
+	}
+	if ( unit->Slow > 0 ) {
+	    unit->Slow--;
+	}
+	if ( unit->Invisible > 0 ) {
+	    unit->Invisible--;
+	}
+	if ( unit->UnholyArmor > 0 ) {
+	    unit->UnholyArmor--;
+	}
     }
 }
 
