@@ -222,7 +222,9 @@ typedef struct _menus_ {
 #define MENU_NET_CONNECTING 11
 #define MENU_CAMPAIN_SELECT 12
 #define MENU_CAMPAIN_CONT 13
-#define MENU_MAX 13			/// highest available menu id (for ccl)
+#define MENU_OBJECTIVES 14
+#define MENU_MAX 14			/// highest available menu id (for ccl)
+
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
