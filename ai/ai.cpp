@@ -587,7 +587,7 @@ local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
 **
 **	@param unit	Pointer to unit that is being attacked.
 */
-global void AiHelpMe(const Unit* attacker,Unit * defender)
+global void AiHelpMe(const Unit* attacker,Unit* defender)
 {
     PlayerAi* pai;
     AiUnit* aiunit;
@@ -596,6 +596,13 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
     DebugLevel0Fn("%d: %d(%s) attacked at %d,%d\n" _C_
 	    defender->Player->Player _C_ UnitNumber(defender) _C_
 	    defender->Type->Ident _C_ defender->X _C_ defender->Y);
+
+    //
+    //	Don't send help to scouts (zeppelin,eye of vision).
+    //
+    if( !defender->Type->CanAttack && defender->Type->UnitType==UnitTypeFly ) {
+	return;
+    }
 
     AiPlayer=pai=defender->Player->Ai;
     if( pai->Force[0].Attacking ) {		// Force 0 busy
@@ -608,6 +615,7 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
     for( force=0; force<AI_MAX_FORCES; ++force ) {
 	aiunit=pai->Force[force].Units;
 	if( !pai->Force[force].Attacking ) {	// none attacking
+	    // FIXME, send the force for help
 	    continue;
 	}
 	while( aiunit ) {
