@@ -56,9 +56,9 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local int CDTrack = 0;			/// Current cd track
+global int CDTrack;			/// Current cd track
 
-local int NumCDTracks;			/// Number of tracks on the cd
+global int NumCDTracks;			/// Number of tracks on the cd
 
 #if defined(USE_SDLCD) 
 local SDL_CD *CDRom;			/// SDL cdrom device
@@ -76,7 +76,7 @@ global CDModes CDMode;			/// CD mode
 ----------------------------------------------------------------------------*/
 
 #if defined (USE_SDLCD)
-local int InitCD()
+local int InitCD(void)
 {
     if (SDL_Init(SDL_INIT_CDROM)) {
 	return 1;
@@ -96,7 +96,7 @@ global int PlayCDTrack(int track)
     return SDL_CDPlayTracks(CDRom, track-1, 0, 0, 0);
 }
 
-global void ResumeCD()
+global void ResumeCD(void)
 {
 #ifdef USE_WIN32
     SDL_CDResume(CDRom);
@@ -116,7 +116,7 @@ global int IsAudioTrack(int track)
     return 1;
 }
 
-global int IsCDPlaying()
+global int IsCDPlaying(void)
 {
     if (SDL_CDStatus(CDRom) == CD_PLAYING) {
 	return 1;
@@ -125,7 +125,7 @@ global int IsCDPlaying()
     }
 }
 
-global int GetCDVolume()
+global int GetCDVolume(void)
 {
     return 0;
 }
@@ -147,7 +147,7 @@ global void QuitCD(void)
     }
 }
 #elif defined(USE_LIBCDA)
-local int InitCD()
+local int InitCD(void)
 {
     if (cd_init()) {
 	return -1;
@@ -165,12 +165,12 @@ global int PlayCDTrack(int track)
     return cd_play(track);
 }
 
-global void ResumeCD()
+global void ResumeCD(void)
 {
     PlayCDRom(CDModeRandom);
 }
 
-global void PauseCD()
+global void PauseCD(void)
 {
     cd_pause();
     CDMode = CDModeStopped;
@@ -182,7 +182,7 @@ global int IsAudioTrack(int track)
     return cd_is_audio(track);
 }
 
-global int IsCDPlaying()
+global int IsCDPlaying(void)
 {
     if (cd_current_track()) {
 	return 1;
@@ -191,7 +191,7 @@ global int IsCDPlaying()
     }
 }
 
-global int GetCDVolume()
+global int GetCDVolume(void)
 {
     int vol;
     cd_get_volume(&vol, &vol);
