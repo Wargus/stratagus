@@ -2614,7 +2614,7 @@ void InitMenus(int race)
 }
 
 /**
-** Exit Menus code (freeing data)
+**  Exit Menus code (freeing data)
 */
 void ExitMenus(void)
 {
