@@ -129,15 +129,10 @@ local SCM CclDefineNewUnitType(SCM list)
 	    type->Width=gh_scm2int(gh_car(sublist));
 	    type->Height=gh_scm2int(gh_cadr(sublist));
 	} else if( gh_eq_p(value,gh_symbol2scm("animations")) ) {
-	    SCM temp;
-
-	    // FIXME: type->Animations=
-	    // FIXME:	AnimationsByIdent(str=gh_scm2newstr(gh_car(list),NULL));
-	    temp=gh_car(list);
+	    type->Animations=
+		AnimationsByIdent(str=gh_scm2newstr(gh_car(list),NULL));
+	    free(str);
 	    list=gh_cdr(list);
-	    if( symbol_boundp(temp,NIL)==SCM_BOOL_T ) {
-		type->Animations=(void*)gh_scm2int(symbol_value(temp,NIL));
-	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
 	    type->Icon.Name=gh_scm2newstr(gh_car(list),NULL);
 	    type->Icon.Icon=NULL;
@@ -506,10 +501,7 @@ local SCM CclDefineOldUnitType(SCM list)
     list=gh_cdr(list);
     value=gh_car(list);
     str=gh_scm2newstr(value,NULL);
-    temp=gh_symbol2scm(str);
-    if( symbol_boundp(temp,NIL)==SCM_BOOL_T ) {
-	type->Animations=(void*)gh_scm2int(symbol_value(temp,NIL));
-    }
+    type->Animations=AnimationsByIdent(str);
     free(str);
 
     // Icon
@@ -1322,8 +1314,7 @@ local SCM CclDefineAnimations(SCM list)
 	    }
 	    anims->Die=anim;
 	} else {
-	    DebugLevel0Fn("Wrong tag `%s'\n",gh_scm2newstr(id,NULL));
-	    free(id);
+	    errl("Unsupported tag",id);
 	}
     }
 
