@@ -201,8 +201,13 @@ local void DoScrollArea(enum _scroll_state_ TempScrollState, int FastScroll)
     int stepy;
 
     if (FastScroll) {
+#ifdef SPLIT_SCREEN_SUPPORT
+	stepx = TheUI.VP[TheUI.LastClickedVP].MapWidth / 2;
+	stepy = TheUI.VP[TheUI.LastClickedVP].MapHeight / 2;
+#else /* SPLIT_SCREEN_SUPPORT */
 	stepx = MapWidth / 2;
 	stepy = MapHeight / 2;
+#endif /* SPLIT_SCREEN_SUPPORT */
     } else {	// dynamic: let these variables increase upto FastScroll..
 	stepx = stepy = 1;
     }

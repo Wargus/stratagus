@@ -1774,7 +1774,11 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 		dx+=TileSizeX;
 	    }
 	} else {
+#ifdef SPLIT_SCREEN_SUPPORT
+	    redraw_tile += vp->MapWidth;
+#else /* SPLIT_SCREEN_SUPPORT */
 	    redraw_tile+=MapWidth;
+#endif /* SPLIT_SCREEN_SUPPORT */
 	}
         ++redraw_row;
 	sy+=TheMap.Width;

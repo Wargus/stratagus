@@ -881,6 +881,28 @@ local SCM CclDefineUI(SCM list)
     value=gh_car(temp);
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
+#ifdef SPLIT_SCREEN_SUPPORT
+    ui->MapArea.X=x;
+    ui->MapArea.Y=y;
+    if ( ui->MapArea.X < 0 || ui->MapArea.Y < 0 ) {
+	fprintf(stderr,"map top-left point expected\n");
+	return SCM_UNSPECIFIED;
+    }
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    x=gh_scm2int(value);
+    value=gh_car(temp);
+    temp=gh_cdr(temp);
+    y=gh_scm2int(value);
+    //StephanR: note that the bottom-right point is one pixel off
+    ui->MapArea.EndX = x-1;
+    ui->MapArea.EndY = y-1;
+    if ( x < 1 || y < 1 || ui->MapArea.EndX < ui->MapArea.X ||
+				ui->MapArea.EndY < ui->MapArea.Y ) {
+	fprintf(stderr,"map bottom-right point expected\n");
+	return SCM_UNSPECIFIED;
+    }
+#else /* SPLIT_SCREEN_SUPPORT */
     ui->MapX=x;
     ui->MapY=y;
     if ( ui->MapX < 0 || ui->MapY < 0 ) {
@@ -901,6 +923,7 @@ local SCM CclDefineUI(SCM list)
 	fprintf(stderr,"map bottom-right point expected\n");
 	return SCM_UNSPECIFIED;
     }
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     //	MenuButton
     temp=gh_car(list);
