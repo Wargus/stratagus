@@ -174,7 +174,7 @@ global void ShowIntro(const Intro *intro)
     int stage;
 
     VideoLockScreen();
-    VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+    VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();
