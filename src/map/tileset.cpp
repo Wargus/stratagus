@@ -131,7 +131,7 @@ global void LoadTileset(void)
 	TheMap.TileData = LoadGraphic(buf);
 #endif
 #ifdef USE_OPENGL
-	MakeTexture(TheMap.TileData, TheMap.TileData->Width, TheMap.TileData->Height);
+	MakeTexture(TheMap.TileGraphic, TheMap.TileGraphic->Width, TheMap.TileGraphic->Height);
 #endif
 
 	TileSizeX = Tilesets[i]->TileSizeX;
