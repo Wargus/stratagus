@@ -1330,6 +1330,20 @@ global void ShowStats(void)
     SetVideoSync();
 }
 
+/**
+**	Free Ccl Credits Memory
+*/
+global void CleanCclCredits()
+{
+    if( GameCredits.Background ) {
+	free(GameCredits.Background);
+	GameCredits.Background=NULL;
+    }
+    if( GameCredits.Names ) {
+	free(GameCredits.Names);
+	GameCredits.Names=NULL;
+    }
+}
 
 /**
 **	Parse the credits configuration.
