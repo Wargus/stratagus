@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name video.c	-	The universal video functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -162,14 +161,13 @@ global void SetClipping(int left,int top,int right,int bottom)
     if( top>bottom ) { top^=bottom; bottom^=top; top^=bottom; }
     
     if( left<0 )    left=0;
+    else if( left>=VideoWidth )		left=VideoWidth-1;
     if( top<0 )	    top=0;
+    else if( top>=VideoHeight )		top=VideoHeight-1;
     if( right<0 )   right=0;
+    else if( right>=VideoWidth )	right=VideoWidth-1;
     if( bottom<0 )  bottom=0;
-
-    if( left>=VideoWidth )	left=VideoWidth-1;
-    if( right>=VideoWidth )	right=VideoWidth-1;
-    if( bottom>=VideoHeight )	bottom=VideoHeight-1;
-    if( top>=VideoHeight )	top=VideoHeight-1;
+    else if( bottom>=VideoHeight )	bottom=VideoHeight-1;
     
     ClipX1=left;
     ClipY1=top;
