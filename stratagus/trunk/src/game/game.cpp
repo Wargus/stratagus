@@ -250,6 +250,7 @@ global void CreateGame(char* filename, WorldMap* map)
     GameCycle = 0;
     SyncHash = 0;
     InitSyncRand();
+    GameTimer.Init=0;
 
     if( NetworkFildes!=-1 ) {		// Prepare network play
 	DebugLevel0Fn("Client setup: Calling InitNetwork2\n");

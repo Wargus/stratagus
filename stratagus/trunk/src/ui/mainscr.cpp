@@ -47,6 +47,7 @@
 #include "interface.h"
 #include "ui.h"
 #include "map.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -1125,6 +1126,63 @@ global void DrawInfoPanel(void)
 		y+=14;
 	    }
 	}
+    }
+}
+
+/*----------------------------------------------------------------------------
+--	TIMER
+----------------------------------------------------------------------------*/
+
+/**
+**	Draw the timer
+*/
+global void DrawTimer(void)
+{
+    char buf[30];
+    int hour;
+    int min;
+    int sec;
+    const Viewport* v;
+
+    if( !GameTimer.Init ) {
+	return;
+    }
+
+    sec=GameTimer.Cycles/CYCLES_PER_SECOND % 60;
+    min=(GameTimer.Cycles/CYCLES_PER_SECOND / 60) % 60;
+    hour=(GameTimer.Cycles/CYCLES_PER_SECOND / 3600);
+
+    if( hour ) {
+	sprintf(buf,"%d:%02d:%02d",hour,min,sec);
+    } else {
+	sprintf(buf,"%d:%02d",min,sec);
+    }
+
+    v=&TheUI.VP[TheUI.LastClickedVP];
+
+    // FIXME: make this configurable
+    VideoDrawText(v->EndX-70,v->MapY+15,GameFont,buf);
+}
+
+/**
+**	Update the timer
+*/
+global void UpdateTimer(void)
+{
+    static unsigned long last_update = 0;
+
+    if( GameTimer.Running ) {
+	if( GameTimer.Increasing ) {
+	    GameTimer.Cycles += GameCycle-last_update;
+	} else {
+	    GameTimer.Cycles -= GameCycle-last_update;
+	    if( GameTimer.Cycles < 0 ) {
+		GameTimer.Cycles = 0;
+	    }
+	}
+	last_update = GameCycle;
+	// FIXME: only redraw when the displayed time changes
+	MustRedraw |= RedrawTimer;
     }
 }
 

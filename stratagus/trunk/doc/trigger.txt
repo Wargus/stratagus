@@ -159,14 +159,16 @@ The only actions I support for the start are.
 	The condition player is set to defeat.
 (action-draw)
 	The condition player is set to draw.
-(action-set-timer N)
-	Set the countdown timer to N.
+(action-set-timer <# seconds> <increasing>)
+	Set the timer to a number of seconds and 1 for increasing,
+	0 for decreasing.
 (action-start-timer)
-	Start the countdown timer.
+	Start the timer.
 (action-stop-timer)
-	Stop the countdown timer.
+	Stop the timer.
 (add-message "Bla bla bla")
-	Show message in message area, is not automatic split at screen end!
+	Show message in message area, it is not automatically split at the
+	edge of the screen!
 (play-file "voice.ogg")
 	Play a story voice file.
 

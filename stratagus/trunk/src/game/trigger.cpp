@@ -59,6 +59,7 @@ extern UnitType* CclGetUnitType(SCM ptr);
 ----------------------------------------------------------------------------*/
 
 local SCM Trigger;			/// Current trigger
+global Timer GameTimer;			/// The game timer
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -664,11 +665,40 @@ local SCM CclIfElapsed(SCM operation,SCM quantity)
 
     Compare=GetCompareFunction(op);
     if( !Compare ) {
-	fprintf(stderr,"Illegal comparison operation in if-score: %s\n",op);
+	fprintf(stderr,"Illegal comparison operation in if-elapsed: %s\n",op);
 	Exit(1);
     }
 
     if( Compare(GameCycle,q) ) {
+	return SCM_BOOL_T;
+    }
+
+    return SCM_BOOL_F;
+}
+
+/**
+**	Check the timer value
+*/
+local SCM CclIfTimer(SCM operation,SCM quantity)
+{
+    int q;
+    const char* op;
+    CompareFunction Compare;
+
+    if( !GameTimer.Init ) {
+	return SCM_BOOL_F;
+    }
+
+    op=get_c_string(operation);
+    q=gh_scm2int(quantity);
+
+    Compare=GetCompareFunction(op);
+    if( !Compare ) {
+	fprintf(stderr,"Illegal comparison operation in if-timer: %s\n",op);
+	Exit(1);
+    }
+
+    if( Compare(GameTimer.Cycles/CYCLES_PER_SECOND,q) ) {
 	return SCM_BOOL_T;
     }
 
@@ -708,6 +738,43 @@ local SCM CclActionDraw(void)
     GameResult=GameDraw;
     GamePaused=1;
     GameRunning=0;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Action set timer
+*/
+local SCM CclActionSetTimer(SCM seconds, SCM increasing)
+{
+    int secs;
+    int i;
+
+    secs=gh_scm2int(seconds);
+    i=gh_scm2int(increasing);
+
+    GameTimer.Cycles=secs*CYCLES_PER_SECOND;
+    GameTimer.Increasing=i;
+    GameTimer.Init=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Action start timer
+*/
+local SCM CclActionStartTimer(void)
+{
+    GameTimer.Running=1;
+    GameTimer.Init=1;
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Action stop timer
+*/
+local SCM CclActionStopTimer(void)
+{
+    GameTimer.Running=0;
     return SCM_UNSPECIFIED;
 }
 
@@ -775,10 +842,14 @@ global void TriggerCclRegister(void)
     gh_new_procedure3_0("if-kills",CclIfKills);
     gh_new_procedure3_0("if-score",CclIfScore);
     gh_new_procedure2_0("if-elapsed",CclIfElapsed);
+    gh_new_procedure2_0("if-timer",CclIfTimer);
     // Actions
     gh_new_procedure0_0("action-victory",CclActionVictory);
     gh_new_procedure0_0("action-defeat",CclActionDefeat);
     gh_new_procedure0_0("action-draw",CclActionDraw);
+    gh_new_procedure2_0("action-set-timer",CclActionSetTimer);
+    gh_new_procedure0_0("action-start-timer",CclActionStartTimer);
+    gh_new_procedure0_0("action-stop-timer",CclActionStopTimer);
 
     gh_define("*triggers*",NIL);
 }

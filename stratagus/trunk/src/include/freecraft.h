@@ -381,6 +381,7 @@ enum _must_redraw_flags_ {
     RedrawMenuButton	= 1<<20,	/// Area above minimap
     RedrawMinimapCursor	= 1<<21,	/// Minimap cursor changed
     RedrawMenu		= 1<<22,	/// Menu
+    RedrawTimer		= 1<<23,	/// Timer
 
     // Bits 23-29 are unused.
 

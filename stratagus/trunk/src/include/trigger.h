@@ -32,9 +32,21 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+/**
+**	Timer structure
+*/
+typedef struct _timer_ {
+    char Init;				/// timer is initialized
+    char Running;			/// timer is running
+    char Increasing;			/// increasing or decreasing
+    long Cycles;			/// current value in game cycles
+} Timer;
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
+
+extern Timer GameTimer;			/// the game timer
 
 /*----------------------------------------------------------------------------
 --	Functions
