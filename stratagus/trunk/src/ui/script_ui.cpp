@@ -1473,6 +1473,84 @@ local SCM CclSetSelectionStyle(SCM style)
 }
 
 /**
+**	Set display of sight range.
+**
+**	@param flag	True = turning display of sight on, false = off.
+**
+**	@return		The old state of display of sight.
+*/
+local SCM CclSetShowSightRange(SCM flag)
+{
+    int old;
+
+    old=!ShowSightRange;
+    if( !gh_null_p(flag) ) {
+	if( gh_eq_p(flag,gh_symbol2scm("rectangle")) ) {
+	    ShowSightRange=1;
+	} else if( gh_eq_p(flag,gh_symbol2scm("circle")) ) {
+	    ShowSightRange=2;
+	} else {
+	    ShowSightRange=3;
+	}
+    } else {
+	ShowSightRange=0;
+    }
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set display of reaction range.
+**
+**	@param flag	True = turning display of reaction on, false = off.
+**
+**	@return		The old state of display of reaction.
+*/
+local SCM CclSetShowReactionRange(SCM flag)
+{
+    int old;
+
+    old=!ShowReactionRange;
+    ShowReactionRange=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set display of attack range.
+**
+**	@param flag	True = turning display of attack on, false = off.
+**
+**	@return		The old state of display of attack.
+*/
+local SCM CclSetShowAttackRange(SCM flag)
+{
+    int old;
+
+    old=!ShowAttackRange;
+    ShowAttackRange=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
+**	Set display of orders.
+**
+**	@param flag	True = turning display of orders on, false = off.
+**
+**	@return		The old state of display of orders.
+*/
+local SCM CclSetShowOrders(SCM flag)
+{
+    int old;
+
+    old=!ShowOrders;
+    ShowOrders=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -1520,6 +1598,10 @@ global void UserInterfaceCclRegister(void)
     //	Look and feel of units
     //
     gh_new_procedure1_0("set-selection-style!",CclSetSelectionStyle);
+    gh_new_procedure1_0("set-show-sight-range!",CclSetShowSightRange);
+    gh_new_procedure1_0("set-show-reaction-range!",CclSetShowReactionRange);
+    gh_new_procedure1_0("set-show-attack-range!",CclSetShowAttackRange);
+    gh_new_procedure1_0("set-show-orders!",CclSetShowOrders);
 }
 
 //@}

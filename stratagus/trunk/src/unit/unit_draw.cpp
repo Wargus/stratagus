@@ -61,7 +61,7 @@ global int ShowManaDot=1;		/// Flag: show mana dot
 global int ShowNoFull=1;		/// Flag: show no full health or mana
 global int DecorationOnTop=1;		/// Flag: show health and mana on top
 global int ShowSightRange;		/// Flag: show right range
-global int ShowReactRange;		/// Flag: show react range
+global int ShowReactionRange;		/// Flag: show reaction range
 global int ShowAttackRange;		/// Flag: show attack range
 global int ShowOrders;			/// Flag: show orders of unit on map
     /// Flag: health horizontal instead of vertical
@@ -1179,14 +1179,28 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
     //
     if( NumSelected==1 && unit->Selected ) {
 	if( ShowSightRange ) {
-	    VideoDrawRectangleClip(ColorGreen
-		,x+type->TileWidth*TileSizeX/2-stats->SightRange*TileSizeX
-		,y+type->TileHeight*TileSizeY/2-stats->SightRange*TileSizeY
-		,stats->SightRange*TileSizeX*2
-		,stats->SightRange*TileSizeY*2);
+	    if( ShowSightRange == 1 ) {
+		VideoFill75TransRectangleClip(ColorGreen
+		    ,x+type->TileWidth*TileSizeX/2-stats->SightRange*TileSizeX
+		    ,y+type->TileHeight*TileSizeY/2-stats->SightRange*TileSizeY
+		    ,stats->SightRange*TileSizeX*2
+		    ,stats->SightRange*TileSizeY*2);
+	    } else if( ShowSightRange == 2 ) {
+		VideoFill75TransCircleClip(ColorGreen
+			,x+type->TileWidth*TileSizeX/2
+			,y+type->TileHeight*TileSizeY/2
+			,min(stats->SightRange*TileSizeX
+			    ,stats->SightRange*TileSizeY));
+	    } else {
+		VideoDrawRectangleClip(ColorGreen
+		    ,x+type->TileWidth*TileSizeX/2-stats->SightRange*TileSizeX
+		    ,y+type->TileHeight*TileSizeY/2-stats->SightRange*TileSizeY
+		    ,stats->SightRange*TileSizeX*2
+		    ,stats->SightRange*TileSizeY*2);
+	    }
 	}
 	if( type->CanAttack || type->Tower ) {
-	    if( ShowReactRange ) {
+	    if( ShowReactionRange ) {
 		r= (unit->Player->Type==PlayerHuman)
 			? type->ReactRangeHuman
 			: type->ReactRangeComputer;

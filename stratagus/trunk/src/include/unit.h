@@ -615,7 +615,7 @@ extern int ShowNoFull;			/// Flag: show no full health or mana
 extern int ShowEnergySelectedOnly;	/// Flag: show energy only for selected
 extern int DecorationOnTop;		/// Flag: show health and mana on top
 extern int ShowSightRange;		/// Flag: show right range
-extern int ShowReactRange;		/// Flag: show react range
+extern int ShowReactionRange;		/// Flag: show reaction range
 extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
