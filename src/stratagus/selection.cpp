@@ -205,6 +205,7 @@ global int ToggleSelectUnit(Unit* unit)
  **	@param base	Select all units of same type.
  **	@return		Number of units found, 0 means selection unchanged
  **
+ **	@todo
  **	FIXME: 0 can't happen. Maybe when scripting will use it?
  **
  **	FIXME: should always select the nearest 9 units to the base!
