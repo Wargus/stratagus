@@ -10,12 +10,11 @@
 ##
 ##	Common.mk        -       Common make (GNU Make)
 ##
-##	(c) Copyright 1998,2000 by Lutz Sammer
+##	(c) Copyright 1998,2000,2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,10 +40,8 @@ depend::
 	$(CC) -MM $(IFLAGS) $(DFLAGS) $(CFLAGS) $$i >>.depend ; done
 
 tags::
-	@for i in $(SRCS) $(CPPSRCS) ; do\
-	cd .. ;\
-	ctags $(CTAGSFLAGS) $(TAGS) $(MODULE)/$$i ;\
-	cd $(MODULE) ;\
+	for i in $(SRCS) $(CPPSRCS) ; do\
+	ctags $(CTAGSFLAGS) $(TAGS) `pwd`/$$i ;\
 	done
 
 ci::
