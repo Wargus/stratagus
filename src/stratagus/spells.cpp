@@ -591,9 +591,11 @@ global int CastPolymorph(Unit* caster, const SpellType* spell,
     if (UnitTypeCanMoveTo(x, y, type)) {
 	MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
     }
-    MakeMissile(spell->Missile,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    if (spell->Missile) {
+	MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    }
     return 0;
 }
 
