@@ -150,7 +150,7 @@ PREFIX=/usr/local
 #PROFILE=	-pg -a
 
 # Compile Version
-VERSION=	'-DVERSION="1.18pre1"'
+VERSION=	'-DVERSION="2.0"'
 
 ############################################################################
 # below this, nothing should be changed!
