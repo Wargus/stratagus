@@ -154,7 +154,7 @@ CursorType* CursorTypeByIdent(const char* ident)
 		if (strcmp(Cursors[i].Ident, ident)) {
 			continue;
 		}
-		if (!Cursors[i].Race || Cursors[i].G) {
+		if (!Cursors[i].Race || GraphicLoaded(Cursors[i].G)) {
 			return Cursors + i;
 		}
 	}
