@@ -396,7 +396,7 @@ global void UnitActions(void)
 	HandleUnitAction(unit);
 	DebugCheck( *tpos!=unit );	// Removed is evil.
 
-#ifdef no_DEBUG
+#ifdef DEBUG
 	//
 	//	Dump the unit to find the network unsyncron bug.
 	//
