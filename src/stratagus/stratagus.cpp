@@ -494,7 +494,6 @@ static void ShowTitleScreens(void)
 	int x;
 	int y;
 
-
 	if (!TitleScreens) {
 		return;
 	}
@@ -512,6 +511,9 @@ static void ShowTitleScreens(void)
 	for (i = 0; TitleScreens[i]; ++i) {
 		WaitNoEvent = 1;
 		timeout = TitleScreens[i]->Timeout * CYCLES_PER_SECOND;
+		if (!timeout) {
+			timeout = -1;
+		}
 
 		if (TitleScreens[i]->Music) {
 			if (!strcmp(TitleScreens[i]->Music, "none") ||
@@ -523,12 +525,34 @@ static void ShowTitleScreens(void)
 				PlayMovieZoomScreen | PlayMovieKeepAspect)) {
 			TitleScreenLabel** labels;
 			Graphic* g;
+#ifdef USE_MNG
+			Mng* mng;
 
-			g = LoadGraphic(TitleScreens[i]->File);
-			ResizeGraphic(g, VideoWidth, VideoHeight);
+			mng = LoadMNG(TitleScreens[i]->File);
+			g = NULL;
+			if (!mng) {
+#endif
+				g = LoadGraphic(TitleScreens[i]->File);
+				ResizeGraphic(g, VideoWidth, VideoHeight);
+#ifdef USE_MNG
+			}
+#endif
+
 			while (timeout-- && WaitNoEvent) {
-				VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
-					(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
+#ifdef USE_MNG
+				if (mng) {
+					DisplayMNG(mng, (VideoWidth - mng->Surface->w) / 2,
+						(VideoHeight - mng->Surface->h) / 2);
+					if (mng->Iteration == TitleScreens[i]->Iterations) {
+						WaitNoEvent = 0;
+					}
+				} else {
+#endif
+					VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
+						(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
+#ifdef USE_MNG
+				}
+#endif
 				labels = TitleScreens[i]->Labels;
 				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
 					for (j = 0; labels[j]; ++j) {
@@ -540,17 +564,22 @@ static void ShowTitleScreens(void)
 						VideoDrawText(x, y, labels[j]->Font, labels[j]->Text);
 					}
 				}
+
 				Invalidate();
 				RealizeVideoMemory();
 				WaitEventsOneFrame(&callbacks);
 			}
-			VideoFree(g);
+#ifdef USE_MNG
+			if (mng) {
+				FreeMNG(mng);
+			}
+#endif
+			VideoSafeFree(g);
 		}
 
 		VideoClearScreen();
-		Invalidate();
-		RealizeVideoMemory();
 	}
+	Invalidate();
 }
 
 /**
@@ -625,7 +654,6 @@ void MenuLoop(char* filename, WorldMap* map)
 		//
 		VideoClearScreen();
 		Invalidate();
-		RealizeVideoMemory();
 
 		//
 		//  Network part 1 (port set-up)
