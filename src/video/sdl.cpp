@@ -119,13 +119,15 @@ global void InitVideoSdl(void)
 {
     //	Initialize the SDL library
 
+    if ( SDL_Init(
 #ifdef USE_SDLA
-    // FIXME: didn't work with SDL SVGAlib
-    if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
-#else
-    if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
+	    // FIXME: didn't work with SDL SVGAlib
+	    SDL_INIT_AUDIO |
 #endif
-    {
+#ifdef DEBUG
+	    SDL_INIT_NOPARACHUTE|
+#endif
+	    SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 ) {
 	fprintf(stderr,"Couldn't initialize SDL: %s\n", SDL_GetError());
 	exit(1);
     }
@@ -171,7 +173,7 @@ global void InitVideoSdl(void)
     //
     //	I need the used bits per pixel.
     //	You see it's better making all self, than using wired libaries :)
-    //  And with the win32 version this also didn't works 
+    //  And with the win32 version this also didn't works
     //
     if( !VideoDepth ) {
 	int i;
@@ -401,7 +403,6 @@ local void SdlHandleKeyUp(const SDL_keysym* code)
     }
 
     HandleKeyUp(icode);
-    
 }
 
 /**
@@ -695,13 +696,13 @@ global void ColorCycle(void)
       ((VMemType8*)TheMap.TileData->Pixels)[47] = x;
 
       x=Pixels8[38];
-      for( i=38; i<47; ++i ) {	
-	  	    Pixels8[i]=Pixels8[i+1];
+      for( i=38; i<47; ++i ) {
+		    Pixels8[i]=Pixels8[i+1];
       }
       Pixels8[47]=x;
-      
+
       x=Pixels8[240];
-      for( i=240; i<244; ++i ) {	
+      for( i=240; i<244; ++i ) {
 	Pixels8[i]=Pixels8[i+1];
       }
       Pixels8[244]=x;
