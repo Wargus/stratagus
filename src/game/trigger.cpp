@@ -184,59 +184,46 @@ static CompareFunction GetCompareFunction(const char* op)
 }
 
 /**
-**  Player has the quantity of unit-type at a location.
-**
-**  (if-unit-at {player} {op} {quantity} {unit} {location} {location})
+**  Return the number of units of a giver unit-type and player at a location.
 */
-static int CclIfUnitAt(lua_State* l)
+static int CclGetNumUnitsAt(lua_State* l)
 {
 	int plynr;
-	int q;
 	int x1;
 	int y1;
 	int x2;
 	int y2;
 	const UnitType* unittype;
-	const char* op;
-	CompareFunction compare;
 	Unit* table[UnitMax];
 	Unit* unit;
 	int an;
 	int j;
 	int s;
 
-	if (lua_gettop(l) != 6) {
+	if (lua_gettop(l) != 4) {
 		LuaError(l, "incorrect argument");
 	}
 
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operator in if-unit-at: %s" _C_ op);
-	}
-	q = LuaToNumber(l, 3);
-	lua_pushvalue(l, 4);
+	plynr = LuaToNumber(l, 1);
+	lua_pushvalue(l, 2);
 	unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 5) || luaL_getn(l, 5) != 2) {
+	if (!lua_istable(l, 3) || luaL_getn(l, 3) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_rawgeti(l, 5, 1);
+	lua_rawgeti(l, 3, 1);
 	x1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	lua_rawgeti(l, 5, 2);
+	lua_rawgeti(l, 3, 2);
 	y1 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	if (!lua_istable(l, 6) || luaL_getn(l, 6) != 2) {
+	if (!lua_istable(l, 4) || luaL_getn(l, 4) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	lua_rawgeti(l, 6, 1);
+	lua_rawgeti(l, 4, 1);
 	x2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
-	lua_rawgeti(l, 6, 2);
+	lua_rawgeti(l, 4, 2);
 	y2 = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 
@@ -268,12 +255,7 @@ static int CclIfUnitAt(lua_State* l)
 			}
 		}
 	}
-	if (compare(s, q)) {
-		lua_pushboolean(l, 1);
-		return 1;
-	}
-
-	lua_pushboolean(l, 0);
+	lua_pushnumber(l, s);
 	return 1;
 }
 
@@ -504,10 +486,6 @@ static int CclGetNumOpponents(lua_State* l)
 */
 static int CclGetTimer(lua_State* l)
 {
-	int q;
-	const char* op;
-	CompareFunction compare;
-
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
@@ -824,7 +802,7 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "SetTriggers", CclSetTriggers);
 	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
 	// Conditions
-	lua_register(Lua, "IfUnitAt", CclIfUnitAt);
+	lua_register(Lua, "GetNumUnitsAt", CclGetNumUnitsAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
 	lua_register(Lua, "GetNumOpponents", CclGetNumOpponents);
