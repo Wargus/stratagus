@@ -521,7 +521,10 @@ global void PlaceUnit(Unit* unit, int x, int y)
 #endif
 
 #ifdef MAP_REGIONS
-    if (type->Building) {
+    if (type->Building && 
+    	(type->FieldFlags & 
+	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding | 
+	  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
 	MapSplitterTilesOccuped(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
     }
 #endif
@@ -719,7 +722,10 @@ global void RemoveUnit(Unit* unit, Unit* host)
     //
     //	Update map splitting.
     //
-    if (type->Building) {
+    if (type->Building && 
+    	(type->FieldFlags & 
+	 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding | 
+	  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
 	MapSplitterTilesCleared(unit->X, unit->Y,
 	    unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
     }
