@@ -376,14 +376,15 @@ global void MapUpdateVisible(void)
     //
     w=TheMap.Width;
     if ( TheMap.NoFogOfWar ) {
+	// FIXME: is this needed????
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
-#ifdef NEW_FOW
-		TheMap.Fields[x+y*w].Visible=-1;
-#else
-		TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
-#endif
 		if ( IsMapFieldExplored(x,y) ) {
+#ifdef NEW_FOW
+		    TheMap.Fields[x+y*w].Visible=-1;
+#else
+		    TheMap.Fields[x+y*w].Flags|=MapFieldVisible;
+#endif
 		    MapMarkSeenTile( x,y );
 		}
 	    }
