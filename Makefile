@@ -63,7 +63,7 @@ runp::
 	    else mv gmon.out gmon.sum; fi
 
 doc::
-	doxygen doxygen-clone.cfg
+	doxygen contrib/doxygen-freecraft.cfg
 
 doc++::
 	@$(MAKE) -C src doc
@@ -78,20 +78,20 @@ etlib/getopt.o: etlib/getopt.c
 etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
-freecraft:	src etlib/hash.o src/libclone.a 
+freecraft:	src etlib/hash.o src/libclone.a
 	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
-		src/freecraftrc.o src/libclone.a 
+		src/freecraftrc.o src/libclone.a
 	$(CC) -o freecraft$(EXE) src/main.c src/libclone.a src/freecraftrc.o \
 	-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 src/freecraftrc.o: src/freecraft.rc
 	windres --include-dir contrib -osrc/freecraftrc.o src/freecraft.rc
 
-# -L. -lefence 
-# -Lccmalloc-0.2.3/src -lccmalloc -ldl 
+# -L. -lefence
+# -Lccmalloc-0.2.3/src -lccmalloc -ldl
 
 tools::
 	@$(MAKE) -C tools all
@@ -112,13 +112,13 @@ distclean:	clobber
 ci::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i ci ; done
 	ci -l Makefile Common.mk Rules.make .indent.pro \
-	doxygen-clone.cfg doxygen-0.4.diff \
+	contrib/doxygen-freecraft.cfg \
 	$(CCLS) $(DOCS)
 
 lockver::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i lockver ; done
 	$(LOCKVER) Makefile Common.mk Rules.make .indent.pro \
-	doxygen-clone.cfg doxygen-0.4.diff \
+	contrib/doxygen-freecraft.cfg \
 	$(CCLS) $(DOCS)
 
 tags::
@@ -150,8 +150,8 @@ CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl \
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
 
-MISC    = Makefile Common.mk Rules.make.orig doxygen-clone.cfg \
-	  doxygen-0.4.diff FreeCraft-beos.proj setup \
+MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
+	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c contrib/req.cm $(CONTRIB) \
 	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h
@@ -170,7 +170,7 @@ dist::
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
+	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir).tar.gz $(distdir)
 	tar cjhf $(distdir).tar.bz2 $(distdir)
@@ -190,7 +190,7 @@ small-dist::
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
+	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+r $(distdir)
 	tar chzf $(distdir)-small.tar.gz $(distdir)
 	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
@@ -212,7 +212,7 @@ bin-dist:: all
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
+	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+r $(distdir)
 	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
@@ -237,7 +237,7 @@ win32-bin-dist2:: win32
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
-	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
+	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	@cp tools/build.bat $(distdir)
 	@chmod -R a+r $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
@@ -308,7 +308,7 @@ complete:	linux-complete win32-complete
 
 #----------------------------------------------------------------------------
 difffile=	freecraft-`date +%y%m%d`.diff
-diff:	
+diff:
 	@$(RM) $(difffile)
 	@$(RM) $(DISTLIST)
 	$(MAKE) -C src distlist
@@ -363,7 +363,7 @@ win32distclean:
 	$(MAKE) $(WIN32) distclean
 
 ##############################################################################
-#	INSTALL/UNINSTALL	
+#	INSTALL/UNINSTALL
 ##############################################################################
 
 install:	all
