@@ -246,32 +246,23 @@ on the unit properties. Here is how a condition looks like:
   "max-slow-ticks", 10}</pre>
 Here are the supported parameters:<p>
 <dl>
-    <dt>"building", "true" or "false" or "only"</dt>
+    <dt>"alliance", "true" or "false" or "only"</dt>
     <dd>This is one of the bool parameters (can't think of a better name). It is
-    followed by "true", "false" or "only". Imagine this as a question, is the target a
-    building? The answer is yes/no. A "true" parameter makes it always pass(and
+    followed by "true", "false" or "only". Imagine this as a question, is the target in
+    alliance? The answer is yes/no. A "true" parameter makes it always pass(and
     it's the default.), "false" parameter passes when the answer is NO, and "only"
     passes only when the answer is yes.<br>
     It doesn't really makes sense to ever say true, since you might just as well
-    ommit it. "building false" means the spell won't work on buildings. "building 
-    only" will make a spell that works only on buildings (can't think of any though).
-    This syntax is used for more that "building"
-    </dd>
-    <dt>"coward", "true" or "false" or "only"</dt>
-    <dd>This is a bool parameter too, just like building. I specifies the behaviour
-    for cowards, unit's that don't attack by themselves. For example you should not
-    cast an offensive buff (like bloodlust) on non-combat units.
-    </dd>
-    <dt>"alliance", "true" or "false" or "only"</dt>
-    <dd>This is a bool parameter too, just like building. I specifies the behaviour
-    for allied units. Your own units are considered allied too.
+    ommit it. "alliance false" means the spell won't work on allied units. "alliance 
+    only" will make a spell that works only on allied units (can't think of any though).
+	Your own units are considered allied too.
     </dd>
     <dt>"opponent", "true" or "false" or "only"</dt>
-    <dd>This is a bool parameter too, just like building. I specifies the behaviour
+    <dd>This is a bool parameter too, just like alliance. I specifies the behaviour
     for opponent units. Neutral units are neither allied unit nor opponent units.
     </dd>
     <dt>"self", "true" or "false" or "only"</dt>
-    <dd>This is a bool parameter too, just like building. I it a bit more special,
+    <dd>This is a bool parameter too, just like alliance. I it a bit more special,
     since it specifies the behaviour for casting on yourself. <b>A LOT</b> of
     spells specify "self false", to disallow casting on yourself.
     </dd>

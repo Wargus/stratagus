@@ -122,8 +122,15 @@ DefineAnimations("animations-footman",
 
 Define boolean unit flags. Examples are organic, mechanical, undead, etc.
 Spells use these to determine who to hit, and units can be restricted too.
-Try to avoid using names with other meanings (nothing from unit definitions
-or spell condition definition.)
+Try to avoid using names with other meanings (nothing from spell condition definition.)
+Some Flags are already defined in the engine : the UnitType flags.
+So following flags are the value of the unitType :
+"Building", "BuilderOutSide", "BuilderLost", "ShoreBuilding",
+"Coward", "Harvester", "Revealer",
+"LandUnit", "AirUnit", "SeaUnit",
+"ExplodeWhenKilled", "VisibleUnderFog", "PermanentCloack", "AttackFromTransporter",
+"GroundAttack", "CanAttack", "CanHarvest",
+"Vanishes", "Flip"
 
 <h4>Example</h4>
 

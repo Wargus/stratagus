@@ -631,6 +631,30 @@ typedef struct _variable_type_ {
 	char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
 } VariableType;
 
+// Index for boolflag aready defined
+#define COWARD_INDEX                  0
+#define BUILDING_INDEX                1
+#define FLIP_INDEX                    2
+#define REVEALER_INDEX                3
+#define LANDUNIT_INDEX                4
+#define AIRUNIT_INDEX                 5
+#define SEAUNIT_INDEX                 6
+#define EXPLODEWHENKILLED_INDEX       7
+#define VISIBLEUNDERFOG_INDEX         8
+#define PERMANENTCLOAK_INDEX          9
+#define DETECTCLOAK_INDEX            10
+#define ATTACKFROMTRANSPORTER_INDEX  11
+#define VANISHES_INDEX               12
+#define GROUNDATTACK_INDEX           13
+#define SHOREBUILDING_INDEX          14
+#define CANATTACK_INDEX              15
+#define BUILDEROUTSIDE_INDEX         16
+#define BUILDERLOST_INDEX            17
+#define CANHARVEST_INDEX             18
+#define HARVESTER_INDEX              19
+
+#define NBOOLALREADYDEFINED HARVESTER_INDEX + 1 // Hardcoded boolflag
+
 // Index for variable already defined.
 #define HP_INDEX              0
 #define BUILD_INDEX           1
@@ -781,7 +805,7 @@ struct _building_restrictions_ {
 	} Data;
 	BuildRestriction* Next;
 };
-	
+
 
 /**
 ** Base structure of unit-type
