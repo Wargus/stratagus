@@ -259,10 +259,12 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 	ptr=&((*ptr)->next);
 
 	l+=strlen(s);
+	if( s1 ) {
+	    ++l;
+	}
 	if( !text[l] ) {
 	    break;
 	}
-	++l;
 	s=str+l;
 	if( !*s ) {
 	    ++s;
