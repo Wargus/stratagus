@@ -812,7 +812,9 @@ local Menuitem PreferencesMenuItems[] = {
 local Menuitem SpeedSettingsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_VSLIDER, 128, 40, 0, 0, NULL, NULL,
+            { vslider:{ 0, 6, 6*18, ScenSelectVSAction, 1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -835,7 +837,7 @@ local Menuitem GameOptionsMenuItems[] = {
     { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
+	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
     { 0 }
 #endif
