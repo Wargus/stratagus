@@ -41,9 +41,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "freecraft.h"
+
 #include "etlib/dllist.h"
 #include "net_lowlevel.h"
-#include "freecraft.h"
 #include "unit.h"
 #include "map.h"
 #include "actions.h"
