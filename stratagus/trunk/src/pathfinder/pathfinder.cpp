@@ -225,7 +225,7 @@ local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
     w=TheMap.Width+2;
     mask=UnitMovementMask(unit);
     // Ignore all possible mobile units.
-    mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
+    // FIXME: bad? mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
 
 #ifdef NEW_SHIPS
     if( unit->Type->UnitType==UnitTypeLand ) {
