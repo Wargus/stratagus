@@ -708,6 +708,7 @@ global void UnitLost(Unit* unit)
 	unit->SavedOrder.Goal=NoUnitP;
     }
     unit->Orders[0].Action=UnitActionStill;
+    unit->SubAction=unit->State=0;
 
     DebugCheck( player->NumFoodUnits > UnitMax);
     DebugCheck( player->NumBuildings > UnitMax);
@@ -1397,15 +1398,6 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     //	Must change food/gold and other.
     //
     UnitLost(unit);
-
-#if 0
-    //	Remove from old player table
-
-    temp=oldplayer->Units[--oldplayer->TotalNumUnits];
-    temp->PlayerSlot=unit->PlayerSlot;
-    *unit->PlayerSlot=temp;
-    oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
-#endif
 
     //
     //	Now the new side!
