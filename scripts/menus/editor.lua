@@ -340,7 +340,7 @@ DefineMenuItem("pos", { 12, 40 + (22 * 0)}, "font", "game",
 
 for i=0,15 do
   DefineMenuItem("pos", { 12, 40 + (22 * (i+1))}, "font", "game",
-    "text", {"caption", i, "align", "left"},
+    "text", {"caption", ""..i, "align", "left"},
     "menu", "menu-editor-player-properties")
 end
 
