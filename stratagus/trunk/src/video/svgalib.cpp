@@ -1298,6 +1298,7 @@ global void CheckVideoInterrupts(void)
         ++SlowFrameCounter;
     }
 #endif
+    // FIXME: Need to support this with gettimeofday code.
 }
 
 /**
