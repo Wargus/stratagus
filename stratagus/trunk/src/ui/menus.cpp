@@ -78,6 +78,7 @@ local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void GameOptions(void);
 local void SetCdMode(Menuitem *mi);
+local void CDRomDisabled(void);
 
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
@@ -320,6 +321,20 @@ local Menuitem EndScenarioMenuItems[] = {
 #endif
 };
 
+local Menuitem CDRomDisabledMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 144, 10, 0, LargeFont, NULL, NULL,
+	{ text:{ "Sorry, this version of", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 30, 0, LargeFont, NULL, NULL,
+	{ text:{ "freecraft was not compiled", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 50, 0, LargeFont, NULL, NULL,
+	{ text:{ "with CD Audio support", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
+#else
+    { 0 }
+#endif
+};
 
 /**
 **	Items for the SelectScen Menu
@@ -959,6 +974,16 @@ global Menu Menus[] = {
 	GameOptionsMenuItems,
 	NULL,
     },
+    {
+    	// CDRom Disabled Message
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-128)/2,
+	288, 128,
+	ImagePanel4,
+	0, 4,
+	CDRomDisabledMenuItems,
+	NULL,
+    },
 };
 
 /*----------------------------------------------------------------------------
@@ -1488,7 +1513,7 @@ local void GameOptions(void)
 {
     // TODO
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
-    GameOptionsMenuItems[1].d.gem.state = 1;
+    GameOptionsMenuItems[1].d.gem.state = 0;
 #else
     if (strcmp(":off", CDMode))
 	GameOptionsMenuItems[1].d.gem.state = 4;
@@ -1515,6 +1540,9 @@ local void SetCdMode(Menuitem *mi)
 
 	CDMode = ":off";
     }
+#else
+    ProcessMenu(MENU_CDROM_DISABLED, 1);
+    GameOptionsMenuItems[1].d.gem.state = 0;
 #endif
 }
 
