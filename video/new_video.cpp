@@ -210,6 +210,7 @@ global void PopClipping(void)
 	ClipY1=clip->Y1;
 	ClipX2=clip->X2;
 	ClipY2=clip->Y2;
+	free(clip);
     } else {
 	ClipX1=0;
 	ClipY1=0;
