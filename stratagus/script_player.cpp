@@ -36,6 +36,8 @@
 #include "player.h"
 #include "ccl.h"
 #include "ai.h"
+#include "actions.h"
+#include "commands.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -340,11 +342,13 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 **
 **	@return		FIXME: should return old state.
 **
-**	@todo diplomacy must send of the network
+**	@todo FIXME: should return old state.
 */
 local SCM CclSetDiplomacy(SCM player,SCM state,SCM opponent)
 {
     int plynr;
+
+#if 0
     Player* base;
 
     base=CclGetPlayer(player);
@@ -364,7 +368,25 @@ local SCM CclSetDiplomacy(SCM player,SCM state,SCM opponent)
 	base->Allied&=~(1<<plynr);
     }
 
+#else
+    int base;
+
+    base=gh_scm2int(player);
+    plynr=gh_scm2int(opponent);
+
     // FIXME: must send over network!!
+
+    if( gh_eq_p(state,gh_symbol2scm("allied")) ) {
+	SendCommandDiplomacy(base,DiplomacyAllied,plynr);
+    } else if( gh_eq_p(state,gh_symbol2scm("neutral")) ) {
+	SendCommandDiplomacy(base,DiplomacyNeutral,plynr);
+    } else if( gh_eq_p(state,gh_symbol2scm("crazy")) ) {
+	SendCommandDiplomacy(base,DiplomacyCrazy,plynr);
+    } else if( gh_eq_p(state,gh_symbol2scm("enemy")) ) {
+	SendCommandDiplomacy(base,DiplomacyEnemy,plynr);
+    }
+
+#endif
 
     // FIXME: we can return the old state
     return SCM_UNSPECIFIED;
@@ -373,35 +395,12 @@ local SCM CclSetDiplomacy(SCM player,SCM state,SCM opponent)
 /**
 **	Change the diplomacy from ThisPlayer to another player.
 **
-**	@param player	Player number to change.
 **	@param state	To which state this should be changed.
-**
-**	@todo diplomacy must send of the network
+**	@param player	Player number to change.
 */
-local SCM CclDiplomacy(SCM player,SCM state)
+local SCM CclDiplomacy(SCM state,SCM player)
 {
-    int plynr;
-
-    plynr=gh_scm2int(player);
-
-    if( gh_eq_p(state,gh_symbol2scm("allied")) ) {
-	ThisPlayer->Enemy&=~(1<<plynr);
-	ThisPlayer->Allied|=1<<plynr;
-    } else if( gh_eq_p(state,gh_symbol2scm("neutral")) ) {
-	ThisPlayer->Enemy&=~(1<<plynr);
-	ThisPlayer->Allied&=~(1<<plynr);
-    } else if( gh_eq_p(state,gh_symbol2scm("crazy")) ) {
-	ThisPlayer->Enemy|=1<<plynr;
-	ThisPlayer->Allied|=1<<plynr;
-    } else if( gh_eq_p(state,gh_symbol2scm("enemy")) ) {
-	ThisPlayer->Enemy|=1<<plynr;
-	ThisPlayer->Allied&=~(1<<plynr);
-    }
-
-    // FIXME: must send over network!!
-
-    // FIXME: we can return the old state
-    return SCM_UNSPECIFIED;
+    return CclSetDiplomacy(gh_int2scm(ThisPlayer->Player),state,player);
 }
 
 /**
