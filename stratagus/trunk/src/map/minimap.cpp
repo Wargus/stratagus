@@ -279,7 +279,10 @@ void UpdateMinimapTerrain(void)
 }
 
 /**
-**  FIXME: docu
+**  Update a single minimap tile after a change
+**
+**  @param tx  The X map position to update in the minimap
+**  @param ty  The Y map position to update in the minimap
 */
 void UpdateMinimapXY(int tx, int ty)
 {
@@ -493,7 +496,7 @@ static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 }
 
 /**
-**  FIXME: docu
+**  Update the minimap with the current game information
 */
 void UpdateMinimap(void)
 {
@@ -602,7 +605,7 @@ void UpdateMinimap(void)
 }
 
 /**
-**  FIXME: docu
+**  Draw the minimap on the screen
 */
 void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))

@@ -1037,9 +1037,9 @@ void UnitLost(Unit* unit)
 }
 
 /**
-**  FIXME: Docu
+**  Removes all orders from a unit.
 **
-**  @param unit  FIXME: docu
+**  @param unit  The unit that will have all its orders cleared
 */
 void UnitClearOrders(Unit* unit)
 {
