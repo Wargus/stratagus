@@ -1427,7 +1427,7 @@ global void LoadUnitTypes(void)
 	UnitType* type;
 	int i;
 
-	for (i = 0; i<NumUnitTypes; ++i) {
+	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
 
 		//
@@ -1451,7 +1451,16 @@ global void LoadUnitTypes(void)
 		if (type->CorpseName) {
 			type->CorpseType = UnitTypeByIdent(type->CorpseName);
 		}
-
+		
+		//
+		// Load Sprite
+		//
+#ifndef DYNAMIC_LOAD
+		if (!type->Sprite) {
+			ShowLoadProgress("Unit \"%s\"", type->Name);
+			LoadUnitTypeSprite(type);
+		}
+#endif
 		// FIXME: should i copy the animations of same graphics?
 	}
 }
