@@ -319,22 +319,22 @@ local void HandleUnitAction(Unit* unit)
 */
 global void UnitActions(void)
 {
-    Unit** table;
+    Unit* table[UnitMax];
+    Unit** tpos;
     Unit** tend;
     Unit* unit;
 
     //
     //	Must copy table, units could be removed.
     //
-    table=alloca(sizeof(Unit)*NumUnits);
     tend=table+NumUnits;
-    memcpy(table,Units,sizeof(Unit)*NumUnits);
+    memcpy(table,Units,sizeof(Unit*)*NumUnits);
 
     //
     //	Do all actions
     //
-    for( ; table<tend; table++ ) {
-	unit=*table;
+    for( tpos=table; tpos<tend; tpos++ ) {
+	unit=*tpos;
 
 #if defined(UNIT_ON_MAP) && 0		// debug unit store
 	 { const Unit* list;
@@ -372,7 +372,7 @@ global void UnitActions(void)
 	    continue;
 	}
 	HandleUnitAction(unit);
-	DebugCheck( *table!=unit );	// Removed is evil.
+	DebugCheck( *tpos!=unit );	// Removed is evil.
 
 #ifdef no_DEBUG
 	//
