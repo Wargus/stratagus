@@ -254,7 +254,7 @@ local void AnimateActionHarvest(Unit* unit)
 	DebugCheck(!unit->Type->Animations->Harvest[unit->CurrentResource]);
 	flags = UnitShowAnimation(unit,
 	    unit->Type->Animations->Harvest[unit->CurrentResource]);
-	if ((flags & AnimationSound) && (UnitVisibleOnMap(unit) || ReplayRevealMap)) {
+	if (flags & AnimationSound) {
 	    PlayUnitSound(unit, VoiceHarvesting);
 	}
     }

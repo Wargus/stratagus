@@ -417,6 +417,9 @@ local void DrawMapViewport(Viewport* vp)
 	//
 	nunits = FindAndSortUnits(vp, table);
 	nmissiles = FindAndSortMissiles(vp, missiletable);
+/*	if (Units[170]) {
+	    DebugLevel0Fn("Unit 170: %s ref %d\n" _C_ Units[170]->Type->Name _C_ Units[170]->Refs);
+	}*/
 
 	i = 0;
 	j = 0;
@@ -830,10 +833,7 @@ global void GameMainLoop(void)
 		    // Clear scheme heap each second
 		    // FIXME: this is too slow to call during the game
 		    CclGarbageCollect(1);
-		    break;
-		case 1:
-		    HandleCloak();
-		    break;
+		    break;		    
 		case 2:
 		    break;
 		case 3:				// minimap update

@@ -1921,9 +1921,9 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
     const UnitStats* stats;
     int r;
 
-#if 0 // This is for showing vis counts.
+#if 0 // This is for showing vis counts and refs.
     char buf[10];
-    sprintf(buf, "%d", unit->VisCount[ThisPlayer->Player]);
+    sprintf(buf, "%d/%d", unit->VisCount[ThisPlayer->Player], unit->Refs);
     VideoDrawTextClip(x + 10, y + 10, 1, buf);
 #endif
 
@@ -2172,14 +2172,14 @@ global void DrawUnit(const Unit* unit)
     //
     //	This should be obviousely false.
     //
-/*    DebugCheck(unit->VisCount[ThisPlayer->Player] >
+    DebugCheck(unit->VisCount[ThisPlayer->Player] >
 	    unit->Type->TileWidth * unit->Type->TileHeight);
-*/
 
     //
     //	If we are in replay reveal map or the unit is visible(not under fog).
     //
     if (ReplayRevealMap || TheMap.NoFogOfWar ||
+//	    !unit->SeenType || // UGLY STUPID HACK
 	    unit->VisCount[ThisPlayer->Player]) {
 	type = unit->Type;
 	frame = unit->Frame;
@@ -2341,22 +2341,11 @@ global int FindAndSortUnits(const Viewport* vp, Unit** table)
     while (*corpses) {
 	if (UnitVisibleInViewport(vp,*corpses) && !(*corpses)->Destroyed) {
 	    table[n++] = *corpses;
+	    DebugLevel3Fn("Yay we have a corpse\n");
 	}
 	corpses = &(*corpses)->Next;
     }
 
-    //
-    //  Add Destroyed Buildings
-    //
-    corpses = &DestroyedBuildings;
-    while (*corpses) {
-	if (UnitVisibleInViewport(vp, *corpses) && !(*corpses)->SeenDestroyed &&
-		(((*corpses)->Visible & 1 << ThisPlayer->Player) ||
-		    !(*corpses)->Destroyed)) {
-	    table[n++] = *corpses;
-	}
-	corpses = &(*corpses)->Next;
-    }
     // Only draw if there are units to draw :)
     if (n) {
 	qsort((void *)table, n, sizeof(Unit*), DrawLevelCompare);
