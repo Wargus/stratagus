@@ -109,6 +109,7 @@ global void CleanPlayers(void)
     }
     ThisPlayer=NULL;
     memset(Players,0,sizeof(Players));
+    SetPlayersPalette();
     NumPlayers=0;
 }
 
@@ -773,8 +774,9 @@ global void PlayerPixels(const Player* player)
 /**
 **	Setup the player colors for the current palette.
 **
-**	FIXME: need better colors for the player 8-16.
-**	FIXME: could be called before PixelsXX is setup.
+**	@todo
+**		FIXME: need better colors for the player 8-16.
+**		FIXME: could be called before PixelsXX is setup.
 */
 global void SetPlayersPalette(void)
 {
