@@ -1194,6 +1194,7 @@ global void InputMouseExit(const EventCallback* callbacks,
 	unsigned ticks __attribute__((unused)))
 {
 //FIXME: should we do anything here with ticks? don't know, but conform others
+    HandleMouseExit();
     callbacks->MouseExit();
 }
 
