@@ -2901,7 +2901,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 **		@param x		Map viewpoint x position.
 **		@param y		Map viewpoint y position.
 */
-global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
+global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 {
 	int sx;
 	int sy;
@@ -2921,8 +2921,8 @@ global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
 	static long mv = 9999999;
 #endif
 
-	redraw_row = MustRedrawRow;				// flags must redraw or not
-	redraw_tile = MustRedrawTile;
+	redraw_row = vp->MustRedrawRow;				// flags must redraw or not
+	redraw_tile = vp->MustRedrawTile;
 
 	p = ThisPlayer->Player;
 

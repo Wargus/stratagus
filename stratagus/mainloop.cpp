@@ -386,17 +386,19 @@ local void DrawMapViewport(Viewport* vp)
 
 	if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
+#if 0
 		MapUpdateFogOfWar(vp->MapX, vp->MapY);
+#endif
 #else
 		int u;
 
 		// FIXME: Johns: this didn't work correct with viewports!
 		// FIXME: only needed until flags are correct set
 		for (u = 0; u < vp->MapHeight; ++u) {
-			MustRedrawRow[u] = 1;
+			vp->MustRedrawRow[u] = 1;
 		}
 		for (u = 0; u < vp->MapHeight * vp->MapWidth; ++u) {
-			MustRedrawTile[u] = 1;
+			vp->MustRedrawTile[u] = 1;
 		}
 #endif
 		//
