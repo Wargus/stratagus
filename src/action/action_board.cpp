@@ -39,6 +39,7 @@
 **	Move to transporter.
 **
 **	@param unit	Pointer to unit, moving to transporter.
+**
 **	@returns	>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
@@ -47,7 +48,11 @@ local int MoveToTransporter(Unit* unit)
     int i;
 
     i=HandleActionMove(unit);
+#ifdef NEW_ORDERS
+    unit->Orders[0].Action=UnitActionBoard;
+#else
     unit->Command.Action=UnitActionBoard;
+#endif
     return i;
 }
 
@@ -64,7 +69,11 @@ local int WaitForTransporter(Unit* unit)
     unit->Wait=6;
     unit->Reset=1;
 
+#ifdef NEW_ORDERS
+    trans=unit->Orders[0].Goal;
+#else
     trans=unit->Command.Data.Move.Goal;
+#endif
     // FIXME: destination destroyed??
     if( !trans || !trans->Type->Transporter ) {
 	DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
@@ -78,10 +87,18 @@ local int WaitForTransporter(Unit* unit)
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
+#ifdef NEW_ORDERS
+	unit->Orders[0].Goal=trans=NoUnitP;
+#else
 	unit->Command.Data.Move.Goal=trans=NoUnitP;
+#endif
 	return 0;
     } else if( trans->Removed ||
+#ifdef NEW_ORDERS
+	    !trans->HP || trans->Orders[0].Action==UnitActionDie ) {
+#else
 	    !trans->HP || trans->Command.Action==UnitActionDie ) {
+#endif
 #ifdef REFS_DEBUG
 	DebugCheck( !trans->Refs );
 #endif
@@ -89,7 +106,11 @@ local int WaitForTransporter(Unit* unit)
 #ifdef REFS_DEBUG
 	DebugCheck( !trans->Refs );
 #endif
+#ifdef NEW_ORDERS
+	unit->Orders[0].Goal=trans=NoUnitP;
+#else
 	unit->Command.Data.Move.Goal=trans=NoUnitP;
+#endif
 	return 0;
     }
 
@@ -114,10 +135,18 @@ local void EnterTransporter(Unit* unit)
     int i;
 
     unit->Wait=1;
+#ifdef NEW_ORDERS
+    unit->Orders[0].Action=UnitActionStill;
+#else
     unit->Command.Action=UnitActionStill;
+#endif
     unit->SubAction=0;
 
+#ifdef NEW_ORDERS
+    transporter=unit->Orders[0].Goal;
+#else
     transporter=unit->Command.Data.Move.Goal;
+#endif
     if( transporter->Destroyed ) {
 	DebugLevel0Fn("Destroyed unit\n");
 #ifdef REFS_DEBUG
@@ -126,10 +155,18 @@ local void EnterTransporter(Unit* unit)
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
+#ifdef NEW_ORDERS
+	unit->Orders[0].Goal=NoUnitP;
+#else
 	unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 	return;
     } else if( transporter->Removed ||
+#ifdef NEW_ORDERS
+	    !transporter->HP || transporter->Orders[0].Action==UnitActionDie ) {
+#else
 	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
+#endif
 #ifdef REFS_DEBUG
 	DebugCheck( !transporter->Refs );
 #endif
@@ -137,7 +174,11 @@ local void EnterTransporter(Unit* unit)
 #ifdef REFS_DEBUG
 	DebugCheck( !transporter->Refs );
 #endif
+#ifdef NEW_ORDERS
+	unit->Orders[0].Goal=NoUnitP;
+#else
 	unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 	return;
     }
 #ifdef REFS_DEBUG
@@ -147,7 +188,11 @@ local void EnterTransporter(Unit* unit)
 #ifdef REFS_DEBUG
     DebugCheck( !transporter->Refs );
 #endif
+#ifdef NEW_ORDERS
+    unit->Orders[0].Goal=NoUnitP;
+#else
     unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 
     //
     //	Find free slot in transporter.
@@ -207,6 +252,20 @@ global void HandleActionBoard(Unit* unit)
 		if( (i=MoveToTransporter(unit)) ) {
 		    if( i==PF_UNREACHABLE ) {
 			if( ++unit->SubAction==200 ) {
+#ifdef NEW_ORDERS
+			    unit->Orders[0].Action=UnitActionStill;
+			    if( unit->Orders[0].Goal ) {
+
+#ifdef REFS_DEBUG
+				DebugCheck(!unit->Orders[0].Goal->Refs);
+#endif
+				--unit->Orders[0].Goal->Refs;
+#ifdef REFS_DEBUG
+				DebugCheck(!unit->Orders[0].Goal->Refs);
+#endif
+				unit->Orders[0].Goal=NoUnitP;
+			    }
+#else
 			    unit->Command.Action=UnitActionStill;
 			    if( unit->Command.Data.Move.Goal ) {
 
@@ -219,6 +278,7 @@ global void HandleActionBoard(Unit* unit)
 #endif
 				unit->Command.Data.Move.Goal=NoUnitP;
 			    }
+#endif
 			    unit->SubAction=0;
 			}
 		    } else if( i==PF_REACHED ) {
