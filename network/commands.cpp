@@ -589,7 +589,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
     DebugLevel3Fn(" %d frame %d\n", msgnr, FrameCounter);
 
     unit=UnitSlots[unum];
-    DebugCheck( !unit || !unit->Type );
+    DebugCheck( !unit );
     //
     //	Check if unit is already killed?
     //
@@ -597,6 +597,8 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	DebugLevel0Fn(" destroyed unit skipping %Zd\n",UnitNumber(unit));
 	return;
     }
+
+    DebugCheck( !unit->Type );
 
     status=(msgnr&0x80)>>7;
 
