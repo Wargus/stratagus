@@ -92,6 +92,9 @@
 **		The tile map coordinates of the unit. 0,0 is the upper left on
 **		the map. To convert the map coordinates into pixels, they
 **		must be multiplicated with the #TileSizeX and #TileSizeY.
+**		To get the pixel coordinates of an unit, calculate 
+**		Unit::X*#TileSize+Unit::IX , Unit::Y*#TileSizeY+Unit::IY.
+**		
 **
 **	Unit::Type
 **
