@@ -547,10 +547,14 @@ static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 
 				if (IsVisible && !event->active.gain) {
 					IsVisible = 0;
-					UiTogglePause();
+					if (!GamePaused) {
+						UiTogglePause();
+					}
 				} else if (!IsVisible && event->active.gain) {
 					IsVisible = 1;
-					UiTogglePause();
+					if (GamePaused) {
+						UiTogglePause();
+					}
 				}
 			}
 			break;
