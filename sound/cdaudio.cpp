@@ -384,7 +384,7 @@ global int CDRomCheck(void* unused __attribute__ ((unused)))
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped &&
 			!IsCDPlaying() && CDMode != CDModeDefined) {
-		DebugLevel0Fn("Playing new track\n");
+		DebugPrint("Playing new track\n");
 		PlayCDRom(CDMode);
 	}
 	return 0;
