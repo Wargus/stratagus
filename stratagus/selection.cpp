@@ -44,6 +44,7 @@
 #include "unit.h"
 #include "interface.h"
 #include "map.h"
+#include "tileset.h"
 #include "ui.h"
 #include "commands.h"
 #include "network.h"

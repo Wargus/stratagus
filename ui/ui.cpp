@@ -44,6 +44,7 @@
 #include "font.h"
 #include "interface.h"
 #include "map.h"
+#include "tileset.h"
 #include "ui.h"
 #include "menus.h"
 

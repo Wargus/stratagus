@@ -180,12 +180,22 @@
 */
 
 /*----------------------------------------------------------------------------
---  Includes
+--  Declarations
 ----------------------------------------------------------------------------*/
 
-#include "unit.h"
-#include "video.h"
-#include "tileset.h"
+#include "upgrade_structs.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _tileset_;
+struct _graphic_;
+struct _player_;
+struct _CL_File_;
+struct _unit_;
+struct _unit_type_;
+struct _unit_list_item_;
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -214,7 +224,7 @@ typedef struct _map_field_ {
 	unsigned char Value;               ///< HP for walls/ Wood Regeneration
 	unsigned char Visible[PlayerMax];  ///< Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax]; ///< Visiblity for cloaking.
-	UnitListItem* UnitCache;           ///< A unit on the map field
+	struct _unit_list_item_* UnitCache;///< A unit on the map field
 } MapField;
 
 // Not used until now:
@@ -275,13 +285,13 @@ typedef struct _world_map_ {
 
 	unsigned char NoFogOfWar;  ///< fog of war disabled
 
-	char* TerrainName;  ///< terrain as name
+	char* TerrainName;         ///< terrain as name
 	// TODO: terrain nr. should be removed?
-	int      Terrain; ///< terrain type (summer,winter,...)
-	Tileset* Tileset; ///< tileset data
+	int      Terrain;          ///< terrain type (summer,winter,...)
+	struct _tileset_* Tileset; ///< tileset data
 
 	unsigned TileCount; ///< how many tiles, (== TileGraphic->NFrames)
-	Graphic* TileGraphic; ///< graphic for all the tiles
+	struct _graphic_* TileGraphic; ///< graphic for all the tiles
 
 	char Description[32];///< map description short
 
@@ -296,13 +306,13 @@ typedef struct _world_map_ {
 extern WorldMap TheMap;  ///< The current map
 
 	/// Fast draw tile, display and video mode independ
-extern void VideoDrawTile(const int, int, int);
+extern void VideoDrawTile(const int tile, int x, int y);
 	/// Draws tiles display and video mode independ
-extern void MapDrawTile(int, int, int);
+extern void MapDrawTile(int tile, int x, int y);
 	/// Vision Table to see where to locate goals and vision
 extern unsigned char* VisionTable[3];
 	/// Companion table for fast lookups
-extern int *VisionLookup;
+extern int* VisionLookup;
 
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
@@ -320,36 +330,29 @@ extern int ReplayRevealMap;
 //
 // in map_draw.c
 //
-#if 0
-	/// Fast draw 32x32 tile for 32 bpp video modes
-extern void VideoDraw32Tile32(const unsigned char* data,int x,int y);
-	/// Fast draw 32x32 tile for 16 bpp video modes
-extern void VideoDraw16Tile32(const unsigned char* data,int x,int y);
-	/// Fast draw 32x32 tile for  8 bpp video modes
-extern void VideoDraw8Tile32(const unsigned char* data,int x,int y);
-#endif
-
 	/// Called when the color cycles
 extern void MapColorCycle(void);
 
 	/// Draw the map background
-extern void DrawMapBackgroundInViewport(const Viewport*, int x, int y);
+extern void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y);
 	/// Build tables for map
 extern void InitMap(void);
 
 	/// Denote wether area in map is overlapping with viewport on screen
-extern int MapAreaVisibleInViewport(const Viewport*, int , int , int , int);
+extern int MapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+	int ex, int ey);
 	/// Check if any part of an area is visible in viewport
-extern int AnyMapAreaVisibleInViewport(const Viewport*, int , int , int , int);
+extern int AnyMapAreaVisibleInViewport(const Viewport* vp, int sx, int sy,
+	int ex, int ey);
 
 //
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
-typedef void MapMarkerFunc(const Player*, int x, int y);
+typedef void MapMarkerFunc(const struct _player_* player, int x, int y);
 
 	/// Filter map flags through fog
-extern int MapFogFilterFlags(Player* player, int x, int y, int mask);
+extern int MapFogFilterFlags(struct _player_* player, int x, int y, int mask);
 	/// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
@@ -360,9 +363,11 @@ extern MapMarkerFunc MapMarkTileDetectCloak;
 extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
-extern void MapSight(const Player* player, int x, int y, int w, int h, int range, MapMarkerFunc *marker);
+extern void MapSight(const struct _player_* player, int x, int y, int w,
+	int h, int range, MapMarkerFunc* marker);
 	/// Find if a tile is visible (With shared vision)
-extern unsigned char IsTileVisible(const Player* player, int x, int y);
+extern unsigned char IsTileVisible(const struct _player_* player, int x,
+	int y);
 	/// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x, int y);
 	/// Update fog of war
@@ -383,7 +388,7 @@ extern void FreeVisionTable(void);
 // in map_wall.c
 //
 	/// Check if the seen tile-type is wall
-extern int MapIsSeenTileWall(int x, int y,int walltype);
+extern int MapIsSeenTileWall(int x, int y, int walltype);
 	/// Correct the seen wall field, depending on the surrounding
 extern void MapFixSeenWallTile(int x, int y);
 	/// Correct the surrounding seen wall fields
@@ -391,9 +396,9 @@ extern void MapFixSeenWallNeighbors(int x, int y);
 	/// Correct the real wall field, depending on the surrounding
 extern void MapFixWallTile(int x, int y);
 	/// Remove wall on tile
-extern void MapRemoveWall(unsigned x,unsigned y);
+extern void MapRemoveWall(unsigned x, unsigned y);
 	/// Wall is hit
-extern void HitWall(unsigned x,unsigned y,unsigned damage);
+extern void HitWall(unsigned x, unsigned y, unsigned damage);
 
 //
 // in map_wood.c
@@ -423,7 +428,7 @@ extern void MapFixSeenRockNeighbors(int x, int y);
 	/// Correct the real rock field, depending on the surrounding
 extern void MapFixRockTile(int x, int y);
 	/// Remove rock from the map
-extern void MapRemoveRock(unsigned x,unsigned y);
+extern void MapRemoveRock(unsigned x, unsigned y);
 
 //
 // in ccl_map.c
@@ -434,12 +439,8 @@ extern void MapCclRegister(void);
 //
 // mixed sources
 //
-	/// Load a map
-#if 0
-extern void LoadMap(const char* file, WorldMap* map);
-#endif
 	/// Save the map
-extern void SaveMap(CLFile* file);
+extern void SaveMap(struct _CL_File_* file);
 	/// Clean the map
 extern void CleanMap(void);
 
@@ -476,9 +477,9 @@ extern int RockOnMap(int x, int y);
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);
 	/// Returns true, if the unit-type can enter the field
-extern int UnitTypeCanMoveTo(int x, int y, const UnitType* type);
+extern int UnitTypeCanMoveTo(int x, int y, const struct _unit_type_* type);
 	/// Returns true, if the unit can enter the field
-extern int UnitCanMoveTo(int x, int y, const Unit* unit);
+extern int UnitCanMoveTo(int x, int y, const struct _unit_* unit);
 
 	/// Preprocess map, for internal use.
 extern void PreprocessMap(void);
@@ -489,9 +490,9 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 // in unit.c
 
 /// Mark on vision table the Sight of the unit.
-void MapMarkUnitSight(Unit* unit);
+void MapMarkUnitSight(struct _unit_* unit);
 /// Unmark on vision table the Sight of the unit.
-void MapUnmarkUnitSight(Unit* unit);
+void MapUnmarkUnitSight(struct _unit_* unit);
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -501,16 +502,18 @@ void MapUnmarkUnitSight(Unit* unit);
 #define CanMoveToMask(x, y, mask) \
 	!(TheMap.Fields[(x) + (y) * TheMap.Width].Flags & (mask))
 
-#define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
-#define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
+#define MapMarkSight(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapMarkTileSight)
+#define MapUnmarkSight(player, x, y, w, h, range) \
+	MapSight((player), (x), (y), (w), (h), (range), MapUnmarkTileSight)
 
 	/// Check if a field for the user is explored
-#define IsMapFieldExplored(player,x,y) \
-	(IsTileVisible((player),(x),(y)))
+#define IsMapFieldExplored(player, x, y) \
+	(IsTileVisible((player), (x), (y)))
 
 	/// Check if a field for the user is visibile
-#define IsMapFieldVisible(player,x,y) \
-	(IsTileVisible((player),(x),(y))>1)
+#define IsMapFieldVisible(player, x, y) \
+	(IsTileVisible((player), (x), (y)) > 1)
 
 //@}
 

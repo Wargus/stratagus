@@ -147,8 +147,8 @@ extern int NetSetNonBlocking(Socket sockfd);
 	/// Open a TCP connection.
 extern int NetConnectTCP(Socket sockfd, unsigned long addr, int port);
 	/// Send through a UPD socket to a host:port.
-extern int NetSendUDP(Socket sockfd, unsigned long host, int port
-	, const void* buf, int len);
+extern int NetSendUDP(Socket sockfd, unsigned long host, int port,
+	const void* buf, int len);
 	/// Send through a TCP socket
 extern int NetSendTCP(Socket sockfd, const void* buf, int len);
 	/// Wait for socket ready.

@@ -71,7 +71,7 @@ typedef struct _sample_type_ {
 		**
 		**  @return      Number of bytes filled.
 		*/
-	int (*Read) (Sample* o, void* buf, int len);
+	int (*Read)(Sample* o, void* buf, int len);
 		/**
 		** Free the sample object.
 		**
@@ -101,7 +101,7 @@ struct _sample_ {
 #define SoundFree(o) ((o)->Type->Free)((o))
 	/// Save (NULL) free a sample object.
 #define SoundSaveFree(o) \
-	do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
+	do { if ((o)) ((o)->Type->Free)((o)); } while (0)
 
 /**
 **  Sound double group: a sound that groups two sounds, used to implement
@@ -135,12 +135,12 @@ typedef struct _two_groups_ {
 **  Sound definition.
 */
 typedef struct _sound_ {
-		/**
-		**  Range is a multiplier for ::DistanceSilent.
-		**  255 means infinite range of the sound.
-		*/
-	unsigned char Range;       ///< Range is a multiplier for DistanceSilent
-	unsigned char Number;      ///< single, group, or table of sounds.
+	/**
+	**  Range is a multiplier for ::DistanceSilent.
+	**  255 means infinite range of the sound.
+	*/
+	unsigned char Range;        ///< Range is a multiplier for DistanceSilent
+	unsigned char Number;       ///< single, group, or table of sounds.
 	union {
 		Sample* OneSound;       ///< if it's only a simple sound
 		Sample** OneGroup;      ///< when it's a simple group
@@ -194,7 +194,7 @@ typedef struct _sound_channel_
 } SoundChannel;
 
 /**
-** Play audio flags.
+**  Play audio flags.
 */
 enum _play_audio_flags_ {
 	PlayAudioStream = 1,        ///< Stream the file from medium
@@ -204,7 +204,7 @@ enum _play_audio_flags_ {
 };
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 	/// sound file descriptor, if -1 no sound available
@@ -250,17 +250,17 @@ extern Sample* MusicSample;  ///< Music samples
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern Sample* LoadFlac(const char* name,int flags); ///< Load a flac file
-extern Sample* LoadWav(const char* name,int flags);  ///< Load a wav file
-extern Sample* LoadOgg(const char* name,int flags);  ///< Load an ogg file
-extern Sample* LoadMp3(const char* name,int flags);  ///< Load a mp3 file
-extern Sample* LoadMikMod(const char* name,int flags);  ///< Load a module file
+extern Sample* LoadFlac(const char* name, int flags);   ///< Load a flac file
+extern Sample* LoadWav(const char* name, int flags);    ///< Load a wav file
+extern Sample* LoadOgg(const char* name, int flags);    ///< Load an ogg file
+extern Sample* LoadMp3(const char* name, int flags);    ///< Load a mp3 file
+extern Sample* LoadMikMod(const char* name, int flags); ///< Load a module file
 
 extern int ConvertToStereo32(const char* in, char* out, int frequency,
 	int bitrate, int channels, int bytes);
 
 	/// Register a sound (can be a simple sound or a group)
-extern SoundId RegisterSound(const char* file[],unsigned number);
+extern SoundId RegisterSound(const char* file[], unsigned number);
 
 	/**
 	**  @brief Create a special sound group with two sounds
@@ -270,10 +270,10 @@ extern SoundId RegisterSound(const char* file[],unsigned number);
 	**  @param second   second part of the group
 	**  @return         the special sound unique identifier
 	*/
-extern SoundId RegisterTwoGroups(const SoundId first,const SoundId second);
+extern SoundId RegisterTwoGroups(const SoundId first, const SoundId second);
 
 	/// Modify the range of a given sound.
-extern void SetSoundRange(SoundId sound,unsigned char range);
+extern void SetSoundRange(SoundId sound, unsigned char range);
 
 	/// Free a channel and unregister its source
 extern void FreeOneChannel(int channel);
@@ -281,7 +281,7 @@ extern void FreeOneChannel(int channel);
 	/// Initialize the sound card.
 extern int InitSound(void);
 	/// Initialize the sound card with SDL support.
-extern int InitSdlSound(const char* dev,int freq,int size,int wait);
+extern int InitSdlSound(const char* dev, int freq, int size, int wait);
 
 	/// Initialize the sound server.
 extern int InitSoundServer(void);

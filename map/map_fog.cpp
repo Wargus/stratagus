@@ -44,6 +44,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "map.h"
+#include "tileset.h"
 #include "minimap.h"
 #include "font.h"
 #include "ui.h"

@@ -37,9 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "unittype.h"
 #include "unit.h"
-#include "upgrade.h"
 #include "net_lowlevel.h"
 
 /*----------------------------------------------------------------------------
@@ -55,6 +53,9 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _unit_;
+struct _unit_type_;
 
 /**
 **  Network message types.
@@ -209,15 +210,16 @@ extern void NetworkSync(void);   ///< Hold in sync
 extern void NetworkQuit(void);   ///< Quit game
 extern void NetworkRecover(void);   ///< Recover network
 extern void NetworkCommands(void);  ///< Get all network commands
-extern void NetworkChatMessage(const char*msg);  ///< Send chat message
+extern void NetworkChatMessage(const char* msg);  ///< Send chat message
 	/// Send network command.
-extern void NetworkSendCommand(int command, const Unit* unit, int x, int y,
-	const Unit* dest, const UnitType* type, int status);
+extern void NetworkSendCommand(int command, const struct _unit_* unit, int x,
+	int y, const struct _unit_* dest, const struct _unit_type_* type,
+	int status);
 	/// Send extended network command.
-extern void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
-	int arg4, int status);
+extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
+	int arg3, int arg4, int status);
 	/// Send Selections to Team
-extern void NetworkSendSelection(Unit** units, int count);
+extern void NetworkSendSelection(struct _unit_** units, int count);
 	/// Register ccl functions related to network
 extern void NetworkCclRegister(void);
 //@}
@@ -249,8 +251,7 @@ struct dl_head
 	struct dl_node* last;
 };
 
-static inline struct dl_head*
-dl_init(struct dl_head* h)
+static inline struct dl_head* dl_init(struct dl_head* h)
 {
 	h->first = (struct dl_node*)&h->null;
 	h->null = 0;
@@ -258,8 +259,7 @@ dl_init(struct dl_head* h)
 	return h;
 }
 
-static inline struct dl_node*
-dl_remove(struct dl_node* n)
+static inline struct dl_node* dl_remove(struct dl_node* n)
 {
 	n->prev->next = n->next;
 	n->next->prev = n->prev;

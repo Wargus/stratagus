@@ -38,14 +38,13 @@
 #include <string.h>
 
 #include "stratagus.h"
-/*
-#include "video.h"
-#include "tileset.h"
-#include "unittype.h"
-*/
 #include "spells.h"
 #include "script_sound.h"
 #include "script.h"
+#include "missile.h"
+#include "unittype.h"
+#include "upgrade.h"
+
 
 // **************************************************************************
 // Action parsers for spellAction

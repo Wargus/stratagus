@@ -34,12 +34,6 @@
 //@{
 
 /*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
-#include "map.h"
-
-/*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
 
@@ -51,13 +45,13 @@
 #define NetworkProtocolPatchLevel   2
 	/// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
-	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 \
-	+ NetworkProtocolPatchLevel)
+	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
+		NetworkProtocolPatchLevel)
 
 	/// Network protocol printf format string
 #define NetworkProtocolFormatString "%d.%d.%d"
 	/// Network protocol printf format arguments
-#define NetworkProtocolFormatArgs(v) (v) / 10000,((v) / 100) % 100,(v) % 100
+#define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
 
 #define NetworkDefaultPort 6660  ///< Default communication port
 

@@ -55,7 +55,7 @@
 /**
 **  Convert a 32 bit value in little endian and return it in native format.
 */
-#define  ConvertLE32(v) SDL_SwapLE32((v))
+#define ConvertLE32(v) SDL_SwapLE32((v))
 
 /**
 **  Access a 16 bit value in little endian and return it in native format.

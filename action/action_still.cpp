@@ -46,6 +46,7 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "spells.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 -- Functions

@@ -37,12 +37,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "unit.h"
 #include "map.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _unit_;
 
 /**
 **  Result codes of the pathfinder.
@@ -52,18 +53,18 @@
 **    stop others how far to goal.
 */
 enum _move_return_ {
-	PF_FAILED=-3,       ///< This Pathfinder failed, try another
-	PF_UNREACHABLE=-2,  ///< Unreachable stop
-	PF_REACHED=-1,      ///< Reached goal stop
-	PF_WAIT=0,          ///< Wait, no time or blocked
-	PF_MOVE=1,          ///< On the way moving
+	PF_FAILED = -3,       ///< This Pathfinder failed, try another
+	PF_UNREACHABLE = -2,  ///< Unreachable stop
+	PF_REACHED = -1,      ///< Reached goal stop
+	PF_WAIT = 0,          ///< Wait, no time or blocked
+	PF_MOVE = 1,          ///< On the way moving
 };
 
 /**
 **  To remove pathfinder internals. Called if path destination changed.
 */
 #define NewResetPath(unit) \
-	do { unit->Data.Move.Fast=1; unit->Data.Move.Length=0; }while( 0 )
+	do { unit->Data.Move.Fast = 1; unit->Data.Move.Length = 0; } while (0)
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -96,17 +97,18 @@ extern unsigned char* CreateMatrix(void);
 	/// Allocate a new matrix and initialize
 extern unsigned char* MakeMatrix(void);
 	/// Get next element of the way to goal.
-extern int NewPath(Unit* unit);
+extern int NewPath(struct _unit_* unit);
 	/// Return distance to unit.
-extern int UnitReachable(Unit* unit, Unit* dst, int range);
-
-extern int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange, int maxrange);
+extern int UnitReachable(struct _unit_* unit, struct _unit_* dst, int range);
+	/// Can the unit 'src' reach the place x,y
+extern int PlaceReachable(struct _unit_* src, int x, int y, int w, int h,
+	int minrange, int maxrange);
 
 //
 // in astar.c
 //
 	/// Returns the next element of the path
-extern int NextPathElement(Unit*, int* xdp, int* ydp);
+extern int NextPathElement(struct _unit_*unit, int* xdp, int* ydp);
 
 	/// Init the a* data structures
 extern void InitAStar(void);
@@ -115,7 +117,8 @@ extern void InitAStar(void);
 extern void FreeAStar(void);
 
 	/// Find and a* path for a unit
-extern int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path);
+extern int AStarFindPath(struct _unit_* unit, int gx, int gy, int gw, int gh,
+	int minrange, int maxrange, char* path);
 //
 // in ccl_pathfinder.c
 //

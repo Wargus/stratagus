@@ -44,6 +44,7 @@
 #include "actions.h"
 #include "map.h"
 #include "ai_local.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --  Functions

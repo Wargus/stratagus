@@ -37,8 +37,17 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "unit.h"
+#include "unitsound.h"
 #include "sound_id.h"
-#include "missile.h"
+#include "player.h"
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+
+struct _unit_;
+struct _missile_;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -122,7 +131,8 @@ extern char* CurrentMusicFile;
 **  @param unit              the unit speaking
 **  @param unit_voice_group  the sound to play
 */
-extern void PlayUnitSound(const Unit* unit,UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSound(const struct _unit_* unit,
+	UnitVoiceGroup unit_voice_group);
 
 /**
 **  Ask to the sound server to play a sound associated to a missile.
@@ -130,7 +140,7 @@ extern void PlayUnitSound(const Unit* unit,UnitVoiceGroup unit_voice_group);
 **  @param missile  the missile (origin of the sound)
 **  @param sound    the sound to play
 */
-extern void PlayMissileSound(const Missile* missile,SoundId sound);
+extern void PlayMissileSound(const struct _missile_* missile, SoundId sound);
 
 /**
 **  Ask to the sound server to play a sound: low level call.
@@ -138,7 +148,7 @@ extern void PlayMissileSound(const Missile* missile,SoundId sound);
 **  @param sound   the sound to play.
 **  @param volume  volume of the sound
 */
-extern void PlayGameSound(SoundId sound,unsigned char volume);
+extern void PlayGameSound(SoundId sound, unsigned char volume);
 
 	/// Set global volume
 extern void SetGlobalVolume(int volume);
@@ -161,10 +171,10 @@ extern void StopMusic(void);
 
 	/// Turn music stopped callback on
 #define CallbackMusicOn() \
-  CallbackMusic=1;
+	CallbackMusic = 1;
 	/// Turn music stopped callback off
 #define CallbackMusicOff() \
-  CallbackMusic=0;
+	CallbackMusic = 0;
 
 //@}
 

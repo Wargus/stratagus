@@ -52,6 +52,7 @@
 #include "font.h"
 #include "spells.h"
 #include "menus.h"
+#include "sound.h"
 
 /*----------------------------------------------------------------------------
 --  Defines

@@ -329,14 +329,15 @@
 ----------------------------------------------------------------------------*/
 
 #include "unitsound.h"
-#include "unittype.h"
-#include "upgrade_structs.h"
-#include "player.h"
-#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _graphic_;
+struct _unit_;
+struct _viewport_;
+struct _CL_File_;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -365,34 +366,34 @@ typedef int MissileClass;
 **
 */
 enum _missile_class_ {
-		/// Missile does nothing
-		MissileClassNone,
-		/// Missile flies from x,y to x1,y1
-		MissileClassPointToPoint,
-		/// Missile flies from x,y to x1,y1 than shows hit animation.
-		MissileClassPointToPointWithHit,
-		/// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
-		MissileClassPointToPointCycleOnce,
-		/// Missile flies from x,y to x1,y1 than bounces three times.
-		MissileClassPointToPointBounce,
-		/// Missile appears at x,y, does it's anim and vanishes.
-		MissileClassStay,
-		/// Missile appears at x,y, then cycle through the frames once.
-		MissileClassCycleOnce,
-		/// Missile doesn't move, than checks the source unit for HP.
-		MissileClassFire,
-		/// Missile shows the hit points.
-		MissileClassHit,
-		/// Missile flies from x,y to x1,y1 using a parabolic path
-		MissileClassParabolic,
-		/// Missile wait on x,y until a non-air unit comes by, the explodes.
-		MissileClassLandMine,
-		/// Missile appears at x,y, is whirlwind
-		MissileClassWhirlwind,
-		/// Missile surround x,y
-		MissileClassFlameShield,
-		/// Missile is death coil.
-		MissileClassDeathCoil
+	/// Missile does nothing
+	MissileClassNone,
+	/// Missile flies from x,y to x1,y1
+	MissileClassPointToPoint,
+	/// Missile flies from x,y to x1,y1 than shows hit animation.
+	MissileClassPointToPointWithHit,
+	/// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
+	MissileClassPointToPointCycleOnce,
+	/// Missile flies from x,y to x1,y1 than bounces three times.
+	MissileClassPointToPointBounce,
+	/// Missile appears at x,y, does it's anim and vanishes.
+	MissileClassStay,
+	/// Missile appears at x,y, then cycle through the frames once.
+	MissileClassCycleOnce,
+	/// Missile doesn't move, than checks the source unit for HP.
+	MissileClassFire,
+	/// Missile shows the hit points.
+	MissileClassHit,
+	/// Missile flies from x,y to x1,y1 using a parabolic path
+	MissileClassParabolic,
+	/// Missile wait on x,y until a non-air unit comes by, the explodes.
+	MissileClassLandMine,
+	/// Missile appears at x,y, is whirlwind
+	MissileClassWhirlwind,
+	/// Missile surround x,y
+	MissileClassFlameShield,
+	/// Missile is death coil.
+	MissileClassDeathCoil
 };
 
 	/// Base structure of missile-types
@@ -428,7 +429,7 @@ struct _missile_type_ {
 	MissileType* SmokeMissile;   ///< Trailling missile
 
 // --- FILLED UP ---
-	Graphic* Sprite;  ///< missile sprite image
+	struct _graphic_* Sprite;    ///< missile sprite image
 };
 
 /*----------------------------------------------------------------------------
@@ -439,7 +440,7 @@ struct _missile_type_ {
 **  Missile typedef.
 */
 typedef struct _missile_ Missile;
-typedef void FuncController(Missile *);
+typedef void FuncController(Missile*);
 
 	/// Missile on the map
 struct _missile_ {
@@ -456,8 +457,8 @@ struct _missile_ {
 	int Wait;         ///< delay between frames
 	int Delay;        ///< delay to showup
 
-	Unit* SourceUnit;  ///< unit that fires (could be killed)
-	Unit* TargetUnit;  ///< target unit, used for spells
+	struct _unit_* SourceUnit;  ///< unit that fires (could be killed)
+	struct _unit_* TargetUnit;  ///< target unit, used for spells
 
 	int Damage;  ///< direct damage that missile applies
 
@@ -506,30 +507,32 @@ extern void LoadMissileSprite(MissileType* mtype);
 	/// load all missile sprites
 extern void LoadMissileSprites();
 	/// allocate an empty missile-type slot
-extern MissileType* NewMissileTypeSlot(char*);
+extern MissileType* NewMissileTypeSlot(char* ident);
 	/// Get missile-type by ident
-extern MissileType* MissileTypeByIdent(const char*);
+extern MissileType* MissileTypeByIdent(const char* ident);
 	/// create a missile
-extern Missile* MakeMissile(MissileType*, int, int, int, int);
+extern Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx,
+	int dy);
 	/// create a local missile
-extern Missile* MakeLocalMissile(MissileType*, int, int, int, int);
+extern Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx,
+	int dy);
 	/// fire a missile
-extern void FireMissile(Unit*);
+extern void FireMissile(struct _unit_* unit);
 
 	/// Draw all missiles
 extern void DrawMissile(MissileType* mtype, int frame, int x, int y);
-extern int FindAndSortMissiles(const Viewport* vp, Missile** table);
+extern int FindAndSortMissiles(const struct _viewport_* vp, Missile** table);
 
 	/// handle all missiles
 extern void MissileActions(void);
 	/// distance from view point to missile
-extern int ViewPointDistanceToMissile(const Missile*);
+extern int ViewPointDistanceToMissile(const Missile* missile);
 
 	/// Get the burning building missile based on hp percent
 extern MissileType* MissileBurningBuilding(int percent);
 
 	/// Save missiles
-extern void SaveMissiles(CLFile*);
+extern void SaveMissiles(struct _CL_File_* file);
 
 	/// Initialize missile-types
 extern void InitMissileTypes(void);

@@ -52,6 +52,7 @@
 #include "sound_server.h"
 #include "missile.h"
 #include "map.h"
+#include "tileset.h"
 #include "ui.h"
 
 #include "sound.h"
