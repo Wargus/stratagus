@@ -449,8 +449,6 @@ global void PlaySectionMusic(PlaySectionType section)
     int found;
     int numfiles;
 
-    printf("in playsecmu\n");
-
     if (NumPlaySections == 0) {
 	return;
     }
