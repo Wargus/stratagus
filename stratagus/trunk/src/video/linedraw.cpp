@@ -32,7 +32,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,23 +46,23 @@
 
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Bitmask, denoting a postion left/right/above/below clip rectangle
-**		(mainly used by VideoDrawLineClip)
+** Bitmask, denoting a postion left/right/above/below clip rectangle
+** (mainly used by VideoDrawLineClip)
 */
 typedef enum {
-   ClipCodeInside = 0,						/// Clipping inside rectangle
-   ClipCodeAbove  = 1,						/// Clipping above rectangle
-   ClipCodeBelow  = 2,						/// Clipping below rectangle
-   ClipCodeLeft   = 4,						/// Clipping left rectangle
-   ClipCodeRight  = 8						/// Clipping right rectangle
+   ClipCodeInside = 0, /// Clipping inside rectangle
+   ClipCodeAbove  = 1, /// Clipping above rectangle
+   ClipCodeBelow  = 2, /// Clipping below rectangle
+   ClipCodeLeft   = 4, /// Clipping left rectangle
+   ClipCodeRight  = 8 /// Clipping right rectangle
 } ClipCode;
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 #ifndef USE_OPENGL
@@ -73,7 +73,7 @@ static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char a
 #endif
 
 // ===========================================================================
-//		Pixel
+// Pixel
 // ===========================================================================
 
 #ifndef USE_OPENGL
@@ -258,7 +258,7 @@ void VideoDrawTransVLine(Uint32 color, int x, int y,
 void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
 	int w;
-	
+
 	w = 1;
 	CLIP_RECTANGLE(x, y, w, height);
 	VideoDrawVLine(color, x, y, height);
@@ -299,7 +299,7 @@ void VideoDrawHLine(Uint32 color, int x, int y, int width)
 void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
 	int h;
-	
+
 	h = 1;
 	CLIP_RECTANGLE(x, y, width, h);
 	VideoDrawHLine(color, x, y, width);
@@ -1678,7 +1678,7 @@ void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 	} while (cx <= cy);
 }
 
-void VideoFillTransCircle(Uint32 color, int x, int y, 
+void VideoFillTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
 	int p;

@@ -31,12 +31,12 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
 
-#ifdef USE_SDL		// {
+#ifdef USE_SDL // {
 
 #ifdef DEBUG
 #include <signal.h>
@@ -86,16 +86,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-SDL_Surface* TheScreen;				/// Internal screen
+SDL_Surface* TheScreen; /// Internal screen
 
 #ifndef USE_OPENGL
 static SDL_Rect Rects[100];
 static int NumRects;
 #endif
 
-static int FrameTicks;						/// Frame length in ms
-static int FrameRemainder;				/// Frame remainder 0.1 ms
-static int FrameFraction;				/// Frame fractional term
+static int FrameTicks; /// Frame length in ms
+static int FrameRemainder; /// Frame remainder 0.1 ms
+static int FrameFraction; /// Frame fractional term
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -569,18 +569,18 @@ static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 }
 
 /**
-**		Wait for interactive input event for one frame.
+** Wait for interactive input event for one frame.
 **
-**		Handles system events, joystick, keyboard, mouse.
-**		Handles the network messages.
-**		Handles the sound queue.
+** Handles system events, joystick, keyboard, mouse.
+** Handles the network messages.
+** Handles the sound queue.
 **
-**		All events available are fetched. Sound and network only if available.
-**		Returns if the time for one frame is over.
+** All events available are fetched. Sound and network only if available.
+** Returns if the time for one frame is over.
 **
-**		@param callbacks		Call backs that handle the events.
+** @param callbacks Call backs that handle the events.
 **
-**		FIXME:		the initialition could be moved out of the loop
+** FIXME: the initialition could be moved out of the loop
 */
 void WaitEventsOneFrame(const EventCallback* callbacks)
 {
@@ -604,7 +604,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 	}
 
 	ticks = SDL_GetTicks();
-	if (ticks > NextFrameTicks) {		// We are too slow :(
+	if (ticks > NextFrameTicks) { // We are too slow :(
 #ifdef DEBUG
 		// FIXME: need locking!
 		// if (InterfaceState == IfaceStateNormal) {
@@ -622,7 +622,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 
 	for (;;) {
 		//
-		//		Time of frame over? This makes the CPU happy. :(
+		// Time of frame over? This makes the CPU happy. :(
 		//
 		ticks = SDL_GetTicks();
 		if (!interrupts && ticks + 11 < NextFrameTicks) {
@@ -639,7 +639,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 		}
 
 		//
-		//		Prepare select
+		// Prepare select
 		//
 		maxfd = 0;
 		tv.tv_sec = tv.tv_usec = 0;
@@ -647,7 +647,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 		FD_ZERO(&wfds);
 
 		//
-		//		Network
+		// Network
 		//
 		if (IsNetworkGame()) {
 			if (NetworkFildes > maxfd) {
@@ -661,8 +661,8 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 			(i = SDL_PollEvent(event)) ? &tv : NULL);
 #else
 		// QUICK HACK to fix the event/timer problem
-		//		The timer code didn't interrupt the select call.
-		//		Perhaps I could send a signal to the process
+		// The timer code didn't interrupt the select call.
+		// Perhaps I could send a signal to the process
 		// Not very nice, but this is the problem if you use other libraries
 		// The event handling of SDL is wrong designed = polling only.
 		// There is hope on SDL 1.3 which will have this fixed.
@@ -671,13 +671,13 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 		i = SDL_PollEvent(event);
 #endif
 
-		if (i) {						// Handle SDL event
+		if (i) { // Handle SDL event
 			SdlDoEvent(callbacks, event);
 		}
 
 		if (s > 0) {
 			//
-			//		Network
+			// Network
 			//
 			if (IsNetworkGame() && FD_ISSET(NetworkFildes, &rfds) ) {
 				callbacks->NetworkEvent();
@@ -685,7 +685,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 		}
 
 		//
-		//		No more input and time for frame over: return
+		// No more input and time for frame over: return
 		//
 		if (!i && s <= 0 && interrupts) {
 			break;
@@ -778,7 +778,7 @@ void ToggleFullScreen(void)
 	int ncolors;
 #endif
 
-	if (!TheScreen) {						// don't bother if there's no surface.
+	if (!TheScreen) { // don't bother if there's no surface.
 		return;
 	}
 
@@ -793,7 +793,7 @@ void ToggleFullScreen(void)
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
 #ifndef USE_OPENGL
-	if (!(pixels = malloc(framesize))) {		// out of memory
+	if (!(pixels = malloc(framesize))) { // out of memory
 		return;
 	}
 	SDL_LockSurface(TheScreen);
@@ -819,7 +819,7 @@ void ToggleFullScreen(void)
 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
-		if (!TheScreen) {				// completely screwed.
+		if (!TheScreen) { // completely screwed.
 #ifndef USE_OPENGL
 			free(pixels);
 			if (TheScreen->format->palette) {
@@ -853,8 +853,8 @@ void ToggleFullScreen(void)
 
 	SDL_SetClipRect(TheScreen, &clip);
 
-	Invalidate();						// Update display
-#else		// !USE_WIN32
+	Invalidate(); // Update display
+#else // !USE_WIN32
 	SDL_WM_ToggleFullScreen(TheScreen);
 #endif
 
