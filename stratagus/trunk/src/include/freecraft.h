@@ -492,6 +492,8 @@ extern void GameMainLoop(void);		/// game main loop
 extern char* strdcat(const char* l, const char* r);
      /// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char *m, const char* r);
+     /// case insensitive strstr
+extern char* strcasestr(char* str, const char* substr);
 
 /*============================================================================
 ==	Misc

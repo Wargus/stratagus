@@ -148,6 +148,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -315,6 +316,35 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 	strcat(res, r);
     }
     return res;
+}
+
+/**
+**	Case insensitive version of strstr
+**
+**	@param a 	String to search in
+**	@param b 	Substring to search for
+**
+**	@return		Pointer to first occurence of b or NULL if not found.
+*/
+global char* strcasestr(char* a, const char* b)
+{
+    int x=0;
+
+    if( !a || !*a || !b || !*b || strlen(a) < strlen(b) )
+	return NULL;
+
+    while( *a ) {
+	if( a[x] && (tolower(a[x]) == tolower(b[x])) )
+	    x++;
+	else if( b[x] ) {
+	    a++;
+	    x=0;
+	}
+	else
+	    return a;
+    }
+
+    return NULL;
 }
 
 /*============================================================================
