@@ -303,6 +303,7 @@ local char* DefaultUpgradeWcNames[] = {
     "upgrade-unholy-armor",
     "upgrade-runes",
     "upgrade-death-and-decay",
+    NULL
 };
 #endif
 
@@ -770,10 +771,10 @@ global void ParsePudUGRD(const char* ugrd,int length)
 	icon=AccessLE16(	ugrd+52+(i+52+52+52)*2);
 	group=AccessLE16(	ugrd+52+(i+52+52+52+52)*2);
 	flags=AccessLE16(	ugrd+52+(i+52+52+52+52+52)*2);
-	DebugLevel3Fn(" %s %d,%d,%d,%d %d %d %08X\n"
-		,UpgradeWcNames[i]
+	DebugLevel3Fn(" (%d)%s %d,%d,%d,%d (%d)%s %d %08X\n"
+		,i,UpgradeWcNames[i]
 		,time,gold,lumber,oil
-		,icon,group,flags);
+		,icon,IconWcNames[icon],group,flags);
 #ifdef USE_CCL
 	memset(costs,0,sizeof(costs));
 	costs[TimeCost]=time;
