@@ -3688,6 +3688,8 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"'group-id %d\n  ",unit->GroupId);
     fprintf(file,"'last-group %d\n  ",unit->LastGroup);
 
+    fprintf(file,"'value %d\n  ",unit->Value);
+
     fprintf(file,"'sub-action %d ",unit->SubAction);
     fprintf(file,"'wait %d ",unit->Wait);
     fprintf(file,"'state %d",unit->State);
