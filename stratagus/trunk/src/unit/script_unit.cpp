@@ -169,6 +169,8 @@ local void CclParseOrder(SCM list,Order* order)
 	    order->Action=UnitActionRepair;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-harvest")) ) {
 	    order->Action=UnitActionHarvest;
+	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-gold")) ) {
+	    order->Action=UnitActionMineGold;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-ore")) ) {
 	    order->Action=UnitActionMineOre;
 	} else if( gh_eq_p(value,gh_symbol2scm("action-mine-coal")) ) {
@@ -324,6 +326,9 @@ local SCM CclUnit(SCM list)
 	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
 	    type=UnitTypeByIdent(str=gh_scm2newstr(gh_car(list),NULL));
 	    free(str);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
+	    unit->Name=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("player")) ) {
 	    player=&Players[gh_scm2int(gh_car(list))];

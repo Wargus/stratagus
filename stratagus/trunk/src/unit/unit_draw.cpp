@@ -410,15 +410,32 @@ global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
 */
 global void LoadDecorations(void)
 {
-    HealthSprite.Sprite=LoadSprite(HealthSprite.File
+    if( HealthSprite.File ) {
+	HealthSprite.Sprite=LoadSprite(HealthSprite.File
 		,HealthSprite.Width,HealthSprite.Height);
-    ManaSprite.Sprite=LoadSprite(ManaSprite.File
+    }
+    if( ManaSprite.File ) {
+	ManaSprite.Sprite=LoadSprite(ManaSprite.File
 		,ManaSprite.Width,ManaSprite.Height);
-    ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
+    }
+    if( ShadowSprite.File ) {
+	ShadowSprite.Sprite=LoadSprite(ShadowSprite.File
 		,ShadowSprite.Width,ShadowSprite.Height);
+    }
     // FIXME: make this configurable
-    SpellSprites=LoadSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png"
-	,16,16);
+    SpellSprites=LoadSprite(
+	    "graphics/ui/bloodlust,haste,slow,invisible,shield.png",16,16);
+}
+
+/**
+**	Save decorations.
+*/
+global void SaveDecorations(FILE* file)
+{
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: decorations $Id$\n\n");
+
+    DebugLevel0Fn("FIXME: not written.\n");
 }
 
 /**

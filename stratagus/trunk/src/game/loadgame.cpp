@@ -103,6 +103,7 @@ global void CleanModules(void)
 global void InitModules(void)
 {
     SyncRandSeed=0x87654321;
+
     InitIcons();
     InitVideoCursors();
     InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
@@ -110,6 +111,7 @@ global void InitModules(void)
     InitMissileTypes();
     InitMissiles();
     InitConstructions();
+    // InitDecorations();
     InitUnitTypes();
     UpdateStats();
     InitUnits();
@@ -134,8 +136,8 @@ global void LoadModules(void)
     // LoadPlayers();
     LoadMissileSprites();
     LoadConstructions();
-    LoadUnitTypes();
     LoadDecorations();
+    LoadUnitTypes();
 
     LoadTileset();
 
