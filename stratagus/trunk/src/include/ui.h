@@ -45,14 +45,14 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Defines the SVGALIB mouse speed adjust (must be > 0)
+**	Defines the default SVGALIB mouse speed adjust (must be > 0)
 */
-#define MOUSEADJUST 15
+#define MOUSEADJUST	15
 
 /**
-**	Defines the SVGALIB mouse speed scale
+**	Defines the default SVGALIB mouse speed scale
 */
-#define MOUSESCALE 1
+#define MOUSESCALE	1
 
     /// MACRO - HARDCODED NUMBER OF BUTTONS on screen
 #define MaxButtons	19
@@ -82,8 +82,9 @@ typedef struct _ui_ {
     int		Saturation;		/// General Saturation
 
     int		MouseScroll;		/// Enable mouse scrolling
+    int		KeyScroll;		/// Enable keyboard scrolling
 	/// Middle mouse button map move with reversed directions
-    unsigned	ReverseMouseMove;
+    char	ReverseMouseMove;
 
     int		WarpX;			/// Cursor warp X position
     int		WarpY;			/// Cursor warp Y position
@@ -222,6 +223,9 @@ extern UI** UI_Table;			/// All available user interfaces
 
 extern char RightButtonAttacks;		/// right button 0 move, 1 attack.
 extern char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
+
+extern int SpeedKeyScroll;		/// Keyboard Scrolling Speed, in Frames
+extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
 
 /*----------------------------------------------------------------------------
 --	Functions
