@@ -281,6 +281,7 @@ global int CDRomCheck(void *unused)
 	    CDTrack = 1;
     }
 #endif
+    return 0;
 }
 
 /*----------------------------------------------------------------------------
