@@ -3029,8 +3029,13 @@ global Graphic* LoadSprite(const char* name,int width,int height)
     int depth;
 
     graphic=LoadGraphic(name);
+    if( !width ) {
+	width=graphic->Width;
+    }
+    if( !height ) {
+	height=graphic->Height;
+    }
 
-    DebugCheck( !width || !height );
     DebugCheck( width>graphic->Width || height>graphic->Height );
 
     depth=8;
