@@ -519,9 +519,12 @@ local SCM CclWithSound(void)
 */
 local SCM CclGetFreeCraftHomePath(void)
 {
-    char buf[PATH_MAX];
+    const char* cp;
+    char* buf;
 
-    strcpy(buf,getenv("HOME"));
+    cp=getenv("HOME");
+    buf=alloca(strlen(cp)+sizeof(FREECRAFT_HOME_PATH)+2);
+    strcpy(buf,cp);
     strcat(buf,"/");
     strcat(buf,FREECRAFT_HOME_PATH);
 
