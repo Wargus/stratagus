@@ -76,7 +76,7 @@
 **	@param offset	Seek position
 **	@param whence	How to seek
 */
-local void gzseek(CLFile* file,unsigned offset,int whence)
+local int gzseek(CLFile* file,unsigned offset,int whence)
 {
     char buf[32];
 
@@ -84,7 +84,7 @@ local void gzseek(CLFile* file,unsigned offset,int whence)
 	gzread(file,buf,sizeof(buf));
 	offset-=sizeof(buf);
     }
-    gzread(file,buf,offset);
+    return gzread(file,buf,offset);
 }
 
 #endif	// } ZLIB_VERSION<="1.0.4"
