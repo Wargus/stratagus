@@ -6996,27 +6996,6 @@ global void InitMenuData(void)
 */
 global void InitMenuFunctions(void)
 {
-    // FIXME: This must be removed!
-    // FIXME: Use wartool and fix the ccls instead!
-    if (!strcmp(GameName, "wc2")) {
-	Menu *menu;
-
-	//
-	//  FIXME: Hack to disable Expansion Gfx..
-	//
-	strcpy(MenuMapFullPath, StratagusLibPath);
-	if (MenuMapFullPath[0]) {
-	    strcat(MenuMapFullPath, "/graphics/tilesets/");
-	}
-	strcat(MenuMapFullPath, "swamp");
-	if (access(MenuMapFullPath, F_OK) != 0) {
-	    menu = FindMenu("menu-custom-game");
-	    menu->Items[14].d.pulldown.noptions = 4;
-	    menu = FindMenu("menu-multi-setup");
-	    menu->Items[29].d.pulldown.noptions = 4;
-	}
-    }
-
 #ifdef SAVE_MENU_CCL
     {
 	FILE* fd;
