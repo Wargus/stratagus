@@ -282,6 +282,8 @@ linux-complete:
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
+	chmod 777 freecraft-complete
+	chmod -R a+rX freecraft-complete
 	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
 	-tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
 	rm -rf freecraft-complete
@@ -299,6 +301,8 @@ win32-complete:
 	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
+	chmod 777 freecraft-complete
+	chmod -R a+rX freecraft-complete
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
 	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
