@@ -99,6 +99,7 @@ local int AiCheckSurrounding(const UnitType * type,int x, int y)
     return 1;
 }
 
+#if 0
 /**
 **      Find free building place.
 **
@@ -169,6 +170,111 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	    return 1;
 	}
     }
+    return 0;
+}
+
+#endif
+
+/**
+**      Find free building place. (flood fill version)
+**
+**	@param worker	Worker to build building.
+**	@param type	Type of building.
+**	@param dx	Pointer for X position returned.
+**	@param dy	Pointer for Y position returned.
+**	@param flag	Flag if surrounding must be free.
+**	@return		True if place found, false if no found.
+*/
+local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
+	int *dx, int *dy,int flag)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } points[TheMap.Width*TheMap.Height];
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* matrix;
+
+    //
+    //	Make movement matrix.
+    //
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+
+    mask=UnitMovementMask(worker);
+    // Ignore all possible mobile units.
+    mask&=~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
+
+    points[0].X=x=worker->X;
+    points[0].Y=y=worker->Y;
+    matrix+=w+w+2;
+    rp=0;
+    matrix[x+y*w]=1;				// mark start point
+    ep=wp=1;					// start with one point
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		//
+		//	Look if we can build here.
+		//
+		if (CanBuildUnitType(worker, type, x, y)
+			&& (!flag || AiCheckSurrounding(type, x, y)) ) {
+		    *dx=x;
+		    *dy=y;
+		    return 1;
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=sizeof(points) ) {// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+
+	    if( ++rp>=sizeof(points) ) {	// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
     return 0;
 }
 

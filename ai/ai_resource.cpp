@@ -561,6 +561,12 @@ local void AiCheckingWork(void)
 **	@return		Pointer to the nearest reachable gold mine.
 **
 **	@see FindGoldMine but this version uses a reachable gold-mine.
+**
+**	@note	This function is very expensive, reduce the calls to it.
+**		Also we could sort the gold mines by the map distance and
+**		try the nearest first.
+**		Or we could do a flood fill search starting from x.y. The
+**		first found gold mine is it.
 */
 global Unit* AiFindGoldMine(const Unit* source,int x,int y)
 {
@@ -578,12 +584,19 @@ global Unit* AiFindGoldMine(const Unit* source,int x,int y)
 	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
 	    continue;
 	}
-	if( (d=UnitReachable(source,unit,1)) && d<best_d ) {
+	
+	//
+	//	If we have already a shorter way, than the distance to the
+	//	unit, we didn't need to check, if reachable.
+	//
+	if( MapDistanceBetweenUnits(source,unit)<best_d
+		&& (d=UnitReachable(source,unit,1)) && d<best_d ) {
 	    best_d=d;
 	    best=unit;
 	}
     }
     DebugLevel3Fn("%d %d,%d\n",UnitNumber(best),best->X,best->Y);
+
     return best;
 }
 
@@ -647,7 +660,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost && PlaceReachable(unit, x, y, 1)) {
+		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -659,7 +672,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost && PlaceReachable(unit, x, y, 1)) {
+		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -671,7 +684,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost && PlaceReachable(unit, x, y, 1)) {
+		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
@@ -683,7 +696,7 @@ local int AiHarvest(Unit * unit)
 	    if (CheckedForestOnMap(x, y)) {
 		n = max(abs(wx - x), abs(wy - y));
 		DebugLevel3("Distance %d,%d %d\n", x, y, n);
-		if (n < cost && PlaceReachable(unit, x, y, 1)) {
+		if (n < cost && PlaceReachable(unit, x-1, y-1, 3)) {
 		    cost = n;
 		    bestx = x;
 		    besty = y;
