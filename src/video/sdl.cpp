@@ -516,12 +516,12 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 	    break;
 
 	case SDL_KEYDOWN:
-	    DebugLevel2("\tKey press\n");
+	    DebugLevel3("\tKey press\n");
 	    SdlHandleKeyPress(callbacks->KeyPressed, &event->key.keysym);
 	    break;
 
 	case SDL_KEYUP:
-	    DebugLevel2("\tKey release\n");
+	    DebugLevel3("\tKey release\n");
 	    SdlHandleKeyRelease(callbacks->KeyReleased, &event->key.keysym);
 	    break;
 
