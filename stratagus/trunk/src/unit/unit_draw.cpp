@@ -81,44 +81,43 @@ static inline max(int a, int b) { return a > b ? a : b; }
 --		Variables
 ----------------------------------------------------------------------------*/
 
-global int ShowHealthBar;				/// Flag: show health bar
-global int ShowHealthDot;				/// Flag: show health dot
-global int ShowManaBar;						/// Flag: show mana bar
-global int ShowManaDot;						/// Flag: show mana dot
-global int ShowNoFull;						/// Flag: show no full health or mana
-global int DecorationOnTop;				/// Flag: show health and mana on top
-global int ShowSightRange;				/// Flag: show right range
-global int ShowReactionRange;				/// Flag: show reaction range
-global int ShowAttackRange;				/// Flag: show attack range
-global int ShowOrders;						/// Flag: show orders of unit on map
-global unsigned long ShowOrdersCount;		/// Show orders for some time
-	/// Flag: health horizontal instead of vertical
-global int ShowHealthHorizontal;
-	/// Flag: health horizontal instead of vertical
-global int ShowManaHorizontal;
-	/// Flag: show bars and dot energy only for selected
-global int ShowEnergySelectedOnly;
-	/// Flag: show the health background long
-global int ShowHealthBackgroundLong;
-	/// Flag: show the mana background long
-global int ShowManaBackgroundLong;
+global int ShowSightRange;              ///< Flag: show right range
+global int ShowReactionRange;           ///< Flag: show reaction range
+global int ShowAttackRange;             ///< Flag: show attack range
+global int ShowOrders;                  ///< Flag: show orders of unit on map
+global unsigned long ShowOrdersCount;   ///< Show orders for some time
+
+// See InitVar in script_unittype.c
+#define HP_INDEX          0
+#define MANA_INDEX        1
+#define TRANSPORT_INDEX   2
+#define RESEARCH_INDEX    3
+#define TRAINING_INDEX    4
+#define UPGRADINGTO_INDEX 5
+#define RESSOURCE_INDEX   6
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two or three parts?
 
 /**
-**		Show that units are selected.
+**  Show that units are selected.
 **
-**		@param color
-**		@param x1,y1		Coordinates of the top left corner.
-**		@param x2,y2		Coordinates of the bottom right corner.
+**  @param color
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
 */
 global void (*DrawSelection)(Uint32 color, int x1, int y1,
 	int x2, int y2) = DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
+
+DrawDecoFunc DrawBar;
+DrawDecoFunc PrintValue;
+DrawDecoFunc DrawSpriteBar;
+DrawDecoFunc DrawStaticSprite;
+
 
 // FIXME: clean split screen support
 // FIXME: integrate this with global versions of these functions in map.c
@@ -128,9 +127,9 @@ global const Viewport* CurrentViewport;		/// FIXME: quick hack for split screen
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /**
-**		Show selection marker around an unit.
+**  Show selection marker around an unit.
 **
-**		@param unit		Pointer to unit.
+**  @param unit  Pointer to unit.
 */
 global void DrawUnitSelection(const Unit* unit)
 {
@@ -285,17 +284,17 @@ global void DrawSelectionCorners(Uint32 color, int x1, int y1,
 }
 
 /**
-**		Decoration: health, mana.
+**  Decoration: health, mana.
 */
 typedef struct _decoration_ {
-	char*		File;						/// File containing the graphics data
-	int				HotX;						/// X drawing position (relative)
-	int				HotY;						/// Y drawing position (relative)
-	int				Width;						/// width of the decoration
-	int				Height;						/// height of the decoration
+	char*		File;           ///< File containing the graphics data
+	int				HotX;       ///< X drawing position (relative)
+	int				HotY;       ///< Y drawing position (relative)
+	int				Width;      ///< width of the decoration
+	int				Height;     ///< height of the decoration
 
 // --- FILLED UP ---
-	Graphic*		Sprite;						/// loaded sprite images
+	Graphic*		Sprite;     ///< loaded sprite images
 } Decoration;
 
 /**
@@ -404,102 +403,240 @@ local int CclSpellSprite(lua_State* l)
 	return 0;
 }
 
-/**
-**  Enable display health as health-bar.
-**
-**  @param l  Lua state
-*/
-local int CclShowHealthBar(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	ShowHealthBar = 1;
-	ShowHealthDot = 0;
+#if 1 // To be deleted ? DefineDecoration do that.
 
-	return 0;
+/**
+**  return the index of deco relative to index var.
+**  create if didn't exist before.
+**
+**  @param index index of the var
+**
+**  @return index for Deco[]
+**  @internal use only to not duplicate code..
+*/
+local int GetIndexDeco(int index)
+{
+	int i;
+
+	Assert(index < UnitTypeVar.NumberVariable);
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		if (UnitTypeVar.DecoVar[i].Index == index) {
+			return i;
+		}
+	}
+	UnitTypeVar.DecoVar = realloc(UnitTypeVar.DecoVar,
+		(i + 1) * sizeof(*UnitTypeVar.DecoVar));
+	memset(UnitTypeVar.DecoVar + i, 0, sizeof(*UnitTypeVar.DecoVar));
+	UnitTypeVar.NumberDeco++;
+	UnitTypeVar.DecoVar[i].Index = index;
+	return i;
 }
 
+
 /**
-**  Enable display health as health-dot.
+**  Enable display health as health-sprite.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
+**    OffsetPercent = {50, 100}, Offset = {0, -7},
+**    Method = {"sprite", {1}}})
 **
 **  @param l  Lua state
 */
 local int CclShowHealthDot(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowHealthBar = 0;
-	ShowHealthDot = 1;
-
+	i = GetIndexDeco(HP_INDEX);
+	UnitTypeVar.DecoVar[i].HideNeutral = 1;
+	UnitTypeVar.DecoVar[i].IsCenteredInX = 1;
+	UnitTypeVar.DecoVar[i].OffsetXPercent = 50;
+	UnitTypeVar.DecoVar[i].OffsetYPercent = 100;
+	UnitTypeVar.DecoVar[i].OffsetX = 0;
+	UnitTypeVar.DecoVar[i].OffsetY = -7;
+	UnitTypeVar.DecoVar[i].f = DrawSpriteBar;
+	UnitTypeVar.DecoVar[i].Data.SpriteBar.NSprite = 1;
 	return 0;
 }
 
 /**
-**  Enable display health as horizontal bar.
+**  Enable display health as health-bar.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
+**    OffsetPercent = {50, 100}, Offset = {0, -7},
+**    Method = {"bar", {Width = 3, BorderSize = 1}}})
 **
 **  @param l  Lua state
 */
 local int CclShowHealthHorizontal(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowHealthBar = 1;
-	ShowHealthDot = 0;
-	ShowHealthHorizontal = 1;
-
+	i = GetIndexDeco(HP_INDEX);
+	UnitTypeVar.DecoVar[i].HideNeutral = 1;
+	UnitTypeVar.DecoVar[i].IsCenteredInX = 1;
+	UnitTypeVar.DecoVar[i].OffsetXPercent = 50;
+	UnitTypeVar.DecoVar[i].OffsetYPercent = 100;
+	UnitTypeVar.DecoVar[i].OffsetX = 0;
+	UnitTypeVar.DecoVar[i].OffsetY = -7;
+	UnitTypeVar.DecoVar[i].f = DrawBar;
+	UnitTypeVar.DecoVar[i].Data.Bar.Height = 3;
+	UnitTypeVar.DecoVar[i].Data.Bar.BorderSize = 1;
 	return 0;
 }
 
 /**
-**  Enable display health as vertical bar.
+**  Enable display health as health-bar.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "HitPoints", HideNeutral = true,
+**    Offset = {-7, 0},
+**    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
 **
 **  @param l  Lua state
 */
 local int CclShowHealthVertical(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowHealthBar = 1;
-	ShowHealthDot = 0;
-	ShowHealthHorizontal = 0;
+	i = GetIndexDeco(HP_INDEX);
+	UnitTypeVar.DecoVar[i].HideNeutral = 1;
+	UnitTypeVar.DecoVar[i].OffsetX = -7;
+	UnitTypeVar.DecoVar[i].OffsetY = 0;
+	UnitTypeVar.DecoVar[i].f = DrawBar;
+	UnitTypeVar.DecoVar[i].Data.Bar.Width = 3;
+	UnitTypeVar.DecoVar[i].Data.Bar.BorderSize = 1;
+	UnitTypeVar.DecoVar[i].Data.Bar.IsVertical = 1;
+	return 0;
+}
 
+/**
+**  Enable display health as health-bar.
+**
+**  Equivalent of ShowHealthVertical()
+**
+**  @param l  Lua state
+*/
+local int CclShowHealthBar(lua_State* l)
+{
+	return CclShowHealthVertical(l);
+}
+
+/**
+**  Enable display mana as mana-sprite.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
+**    OffsetPercent = {50, 100},
+**    Method = {"sprite", {0}}})
+**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**
+**  @param l  Lua state
+*/
+local int CclShowManaDot(lua_State* l)
+{
+	int i;
+	int j;
+
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	for (i = 1; i <= 6; i++) {
+		j = GetIndexDeco(i);
+		UnitTypeVar.DecoVar[j].HideNeutral = 1;
+		UnitTypeVar.DecoVar[j].IsCenteredInX = 1;
+		UnitTypeVar.DecoVar[j].OffsetXPercent = 50;
+		UnitTypeVar.DecoVar[j].OffsetYPercent = 100;
+		UnitTypeVar.DecoVar[j].OffsetX = 0;
+		UnitTypeVar.DecoVar[j].OffsetY = -7;
+		UnitTypeVar.DecoVar[j].f = DrawSpriteBar;
+		UnitTypeVar.DecoVar[j].Data.SpriteBar.NSprite = 0;
+	}
+	UnitTypeVar.DecoVar[j].HideNeutral = 0; // Don't hide ressource
+	return 0;
+}
+
+/**
+**  Enable display mana as horizontal bar.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "Mana", HideNeutral = true, CenterX = true,
+**    OffsetPercent = {50, 100},
+**    Method = {"bar", {Width = 3, BorderSize = 1}}})
+**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**
+**  @param l  Lua state
+*/
+local int CclShowManaHorizontal(lua_State* l)
+{
+	int i;
+	int j;
+
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	for (i = 1; i <= 6; i ++) { // For all index used Manabar
+		j = GetIndexDeco(i);
+		UnitTypeVar.DecoVar[j].HideNeutral = 1;
+		UnitTypeVar.DecoVar[j].IsCenteredInX = 1;
+		UnitTypeVar.DecoVar[j].OffsetXPercent = 50;
+		UnitTypeVar.DecoVar[j].OffsetYPercent = 100;
+		UnitTypeVar.DecoVar[j].f = DrawBar;
+		UnitTypeVar.DecoVar[j].Data.Bar.Height = 3;
+		UnitTypeVar.DecoVar[j].Data.Bar.BorderSize = 1;
+	}
+	return 0;
+}
+
+/**
+**  Enable display mana as vertical bar.
+**
+**  Equivalent of
+**  DefineDecorations({Index = "Mana", HideNeutral = true,
+**    Method = {"bar", {Width = 3, BorderSize = 1, Orientation = "vertical"}}})
+**  For index Mana, Transport, Research, Training, UpgradeTo, Ressource.
+**
+**  @param l  Lua state
+*/
+local int CclShowManaVertical(lua_State* l)
+{
+	int i;
+	int j;
+
+	if (lua_gettop(l) != 0) {
+		LuaError(l, "incorrect argument");
+	}
+	for (i = 1; i <= 6; i ++) { // For all index used Manabar
+		j = GetIndexDeco(i);
+		UnitTypeVar.DecoVar[j].HideNeutral = 1;
+		UnitTypeVar.DecoVar[j].f = DrawBar;
+		UnitTypeVar.DecoVar[j].Data.Bar.Width = 3;
+		UnitTypeVar.DecoVar[j].Data.Bar.BorderSize = 1;
+		UnitTypeVar.DecoVar[j].Data.Bar.IsVertical = 1;
+	}
 	return 0;
 }
 
 /**
 **  Enable display mana as mana-bar.
 **
+**  Equivalent of ShowManaVertical()
+**
 **  @param l  Lua state
 */
 local int CclShowManaBar(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	ShowManaBar = 1;
-	ShowManaDot = 0;
-
-	return 0;
-}
-
-/**
-**  Enable display mana as mana-dot.
-**
-**  @param l  Lua state
-*/
-local int CclShowManaDot(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	ShowManaBar = 0;
-	ShowManaDot = 1;
-
-	return 0;
+	return CclShowManaVertical(l);
 }
 
 /**
@@ -509,11 +646,14 @@ local int CclShowManaDot(lua_State* l)
 */
 local int CclShowEnergySelected(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowEnergySelectedOnly = 1;
-
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		UnitTypeVar.DecoVar[i].ShowOnlySelected = 1;
+	}
 	return 0;
 }
 
@@ -524,47 +664,17 @@ local int CclShowEnergySelected(lua_State* l)
 */
 local int CclShowFull(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowNoFull = 0;
-
-	return 0;
-}
-
-/**
-**  Enable display mana as horizontal bar.
-**
-**  @param l  Lua state
-*/
-local int CclShowManaHorizontal(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		UnitTypeVar.DecoVar[i].ShowWhenMax = 1;
 	}
-	ShowManaBar = 1;
-	ShowManaDot = 0;
-	ShowManaHorizontal = 1;
-
 	return 0;
 }
 
-/**
-**  Enable display mana as vertical bar.
-**
-**  @param l  Lua state
-*/
-local int CclShowManaVertical(lua_State* l)
-{
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-	ShowManaBar = 1;
-	ShowManaDot = 0;
-	ShowManaHorizontal = 0;
-
-	return 0;
-}
 
 /**
 **  Disable display of full bars/dots.
@@ -573,11 +683,14 @@ local int CclShowManaVertical(lua_State* l)
 */
 local int CclShowNoFull(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	ShowNoFull = 1;
-
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		UnitTypeVar.DecoVar[i].ShowWhenMax = 0;
+	}
 	return 0;
 }
 
@@ -588,13 +701,18 @@ local int CclShowNoFull(lua_State* l)
 */
 local int CclDecorationOnTop(lua_State* l)
 {
+	int i;
+
 	if (lua_gettop(l) != 0) {
 		LuaError(l, "incorrect argument");
 	}
-	DecorationOnTop = 1;
-
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		UnitTypeVar.DecoVar[i].OffsetY = 0;
+	}
 	return 0;
 }
+
+#endif
 
 /**
 **  Register CCL features for decorations.
@@ -606,6 +724,8 @@ global void DecorationCclRegister(void)
 	lua_register(Lua, "ShadowSprite", CclShadowSprite);
 	lua_register(Lua, "SpellSprite", CclSpellSprite);
 
+#if 1 // To be deleted ? alredy Replaced by DefineDecoration
+	// These fonctions ara aliases to DefineDecorations
 	lua_register(Lua, "ShowHealthBar", CclShowHealthBar);
 	lua_register(Lua, "ShowHealthDot", CclShowHealthDot);
 // adicionado por protoman
@@ -621,6 +741,7 @@ global void DecorationCclRegister(void)
 	lua_register(Lua, "ShowFull", CclShowFull);
 	lua_register(Lua, "ShowNoFull", CclShowNoFull);
 	lua_register(Lua, "DecorationOnTop", CclDecorationOnTop);
+#endif
 }
 
 /**
@@ -635,8 +756,8 @@ global void LoadDecorations(void)
 	}
 	if (ManaSprite.File) {
 		ShowLoadProgress("Decorations `%s'", ManaSprite.File);
-		ManaSprite.Sprite = LoadSprite(ManaSprite.File
-				,ManaSprite.Width,ManaSprite.Height);
+		ManaSprite.Sprite = LoadSprite(ManaSprite.File,
+			ManaSprite.Width,ManaSprite.Height);
 	}
 	if (ShadowSprite.File) {
 		ShowLoadProgress("Decorations `%s'", ShadowSprite.File);
@@ -656,126 +777,185 @@ global void LoadDecorations(void)
 */
 global void CleanDecorations(void)
 {
-	if (HealthSprite.File) {
-		free(HealthSprite.File);
-	}
+	free(HealthSprite.File);
 	VideoSafeFree(HealthSprite.Sprite);
 	HealthSprite.File = NULL;
 	HealthSprite.Sprite = NULL;
 
-	if (ManaSprite.File) {
-		free(ManaSprite.File);
-	}
+	free(ManaSprite.File);
 	VideoSafeFree(ManaSprite.Sprite);
 	ManaSprite.File = NULL;
 	ManaSprite.Sprite = NULL;
 
-	if (ShadowSprite.File) {
-		free(ShadowSprite.File);
-	}
+	free(ShadowSprite.File);
 	VideoSafeFree(ShadowSprite.Sprite);
 	ShadowSprite.File = NULL;
 	ShadowSprite.Sprite = NULL;
 
-	if (SpellSprite.File) {
-		free(SpellSprite.File);
-	}
+	free(SpellSprite.File);
 	VideoSafeFree(SpellSprite.Sprite);
 	SpellSprite.File = NULL;
 	SpellSprite.Sprite = NULL;
 }
 
 /**
-**  Draw mana/working sprite.
+**    Draw bar for variables.
 **
-**  @param x      X screen pixel position
-**  @param y      Y screen pixel position
-**  @param type   Unit type pointer
-**  @param full   Full value
-**  @param ready  Ready value
+**    @param x     X screen pixel position
+**    @param y     Y screen pixel position
+**    @param unit  Unit pointer
+**    @param Deco  More data arguments
+**    @todo fix color configuration.
 */
-local void DrawManaSprite(int x, int y, const UnitType* type, int full, int ready)
+global void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
-	int n;
+	int height;
+	int width;
+	int h;
+	int w;
+	char b;        // BorderSize.
+	Uint32 bcolor; // Border color.
+	Uint32 color;  // inseide color.
+	int f;         // 100 * value / max.
 
-	if (!full) {
-		return;
+	Assert(unit);
+	Assert(Deco);
+	Assert(unit->Type);
+	Assert(unit->Variable[Deco->Index].Max);
+	height = Deco->Data.Bar.Height;
+	if (height == 0) { // Default value
+		height = unit->Type->BoxHeight; // Better size ? {,Box, Tile}
 	}
-	n = VideoGraphicFrames(ManaSprite.Sprite) - 1;
-	n -= (n * ready) / full;
+	width = Deco->Data.Bar.Width;
+	if (width == 0) { // Default value
+		width = unit->Type->BoxWidth; // Better size ? {,Box, Tile}
+	}
+	if (Deco->Data.Bar.IsVertical)  { // Vertical
+		w = width;
+		h = unit->Variable[Deco->Index].Value * height / unit->Variable[Deco->Index].Max;
+	} else {
+		w = unit->Variable[Deco->Index].Value * width / unit->Variable[Deco->Index].Max;
+		h = height;
+	}
 
-	Assert(n >= 0 && n < VideoGraphicFrames(ManaSprite.Sprite));
-	if (ManaSprite.HotX < 0) {
-		x += ManaSprite.HotX +
-			(type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
-	} else if (ManaSprite.HotX>0) {
-		x += 1 - ManaSprite.HotX +
-			(type->TileWidth * TileSizeX - type->BoxWidth) / 2;
-	} else {
-		x += (type->TileWidth * TileSizeX - ManaSprite.Width + 1) / 2;
+	if (Deco->IsCenteredInX) {
+		x -= w / 2;
 	}
-	if (ManaSprite.HotY < 0) {
-		y += ManaSprite.HotY +
-			(type->TileHeight * TileSizeY + type->BoxHeight + 1) / 2;
-	} else if (ManaSprite.HotY > 0) {
-		y += 1 - ManaSprite.HotY +
-			(type->TileHeight * TileSizeY - type->BoxHeight) / 2;
-	} else {
-		y += (type->TileHeight * TileSizeY - ManaSprite.Height + 1) / 2;
+	if (Deco->IsCenteredInY) {
+		y -= h / 2;
 	}
-	VideoDrawClip(ManaSprite.Sprite, n, x, y);
+
+	b = Deco->Data.Bar.BorderSize;
+	// Could depend of (value / max)
+	f = unit->Variable[Deco->Index].Value * 100 / unit->Variable[Deco->Index].Max;
+	bcolor = ColorBlack; // Deco->Data.Bar.BColor
+	color = f > 50 ? (f > 75 ? ColorGreen : ColorYellow) : (f > 25 ? ColorOrange : ColorRed);
+	// Deco->Data.Bar.Color
+	if (b) {
+		if (Deco->Data.Bar.ShowFullBackground) {
+			VideoFillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
+		} else {
+			if (Deco->Data.Bar.SEToNW) {
+				VideoFillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
+					2 * b + w, 2 * b + h);
+			} else {
+				VideoFillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
+			}
+		}
+	}
+	if (Deco->Data.Bar.SEToNW) {
+		VideoFillRectangleClip(color, x - w + width, y - h + height, w, h);
+	} else {
+		VideoFillRectangleClip(color, x, y, w, h);
+	}
 }
 
 /**
-**  Draw mana/working bar.
+**    Print variable values (and max....).
 **
-**  @param x      X screen pixel position
-**  @param y      Y screen pixel position
-**  @param type   Unit type pointer
-**  @param full   Full value
-**  @param ready  Ready value
+**    @param x     X screen pixel position
+**    @param y     Y screen pixel position
+**    @param unit  Unit pointer
+**    @param Deco  More data arguments
+**    @todo fix font/color configuration.
 */
-local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
+global void PrintValue(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
-	int f;
-	int w;
+	if (Deco->IsCenteredInX) {
+		x -= 2; // VideoTextLength(GameFont, buf) / 2, with buf = str(Value)
+	}
+	if (Deco->IsCenteredInY) {
+		y -= VideoTextHeight(GameFont) / 2;
+	}
+	VideoDrawNumberClip(x, y, GameFont, unit->Variable[Deco->Index].Value);
+}
 
-	if (!full) {
+/**
+**    Draw a sprite with is like a bar (several stages)
+**
+**    @param x     X screen pixel position
+**    @param y     Y screen pixel position
+**    @param unit  Unit pointer
+**    @param Deco  More data arguments
+**    @todo fix sprite configuration.
+*/
+global void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
+{
+	int n;
+	Graphic *sprite;
+
+	Assert(unit);
+	Assert(Deco);
+	Assert(unit->Variable[Deco->Index].Max);
+
+	if (Deco->Data.SpriteBar.NSprite == 0) {
+		sprite = ManaSprite.Sprite;
+		x += ManaSprite.HotX; // in addition of OffsetX... Usefull ?
+		y += ManaSprite.HotY; // in addition of OffsetY... Usefull ?
+
+	} else if (Deco->Data.SpriteBar.NSprite == 1) {
+		sprite = HealthSprite.Sprite;
+		x += HealthSprite.HotX; // in addition of OffsetX... Usefull ?
+		y += HealthSprite.HotY; // in addition of OffsetY... Usefull ?
+	} else {
+		DebugPrint("Not yet implemented, other sprite support ?");
 		return;
 	}
-	f = (100 * ready) / full;
-	if (ShowManaHorizontal == 0)  {
-		VideoFillRectangleClip(ColorBlue,
-			x + (type->TileWidth * TileSizeX + type->BoxWidth) / 2,
-			y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2,
-			2, (f * type->BoxHeight) / 100);
-	}  else  {
-		//
-		//		Draw the black rectangle in full size?
-		//
-		if (ShowManaBackgroundLong) {
-			VideoFillRectangleClip(ColorBlack,
-				x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-				(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-					type->BoxHeight + 5,
-				type->BoxHeight + 1, 5);
-		} else {
-			VideoDrawRectangleClip(ColorBlack,
-				x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-				(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-					type->BoxHeight + 5,
-				(f * type->BoxHeight) / 100, 4);
-		}
 
-		w = (f * type->BoxHeight) / 100 - 1;
-		if (w > 0) { // Prevents -1 turning into unsigned int
-			VideoFillRectangleClip(ColorBlue,
-				x + (type->TileWidth * TileSizeX - type->BoxWidth) / 2 + 1,
-				(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-					type->BoxHeight + 6,
-				w, 3);
-		}
+	n = VideoGraphicFrames(sprite) - 1;
+	n -= (n * unit->Variable[Deco->Index].Value) / unit->Variable[Deco->Index].Max;
+
+	if (Deco->IsCenteredInX) {
+		x -= sprite->Width / 2;
 	}
+	if (Deco->IsCenteredInY) {
+		y -= sprite->Height / 2;
+	}
+
+	VideoDrawClip(sprite, n, x, y);
+}
+
+/**
+**    Draw a static sprite.
+**
+**    @param x     X screen pixel position
+**    @param y     Y screen pixel position
+**    @param unit  Unit pointer
+**    @param Deco  More data arguments
+**    @todo fix sprite configuration configuration.
+*/
+global void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
+{
+	Graphic *sprite;
+
+	sprite = SpellSprite.Sprite;
+	if (Deco->IsCenteredInX) {
+		x -= sprite->Width / 2;
+	}
+	if (Deco->IsCenteredInY) {
+		y -= sprite->Height / 2;
+	}
+	VideoDrawClip(sprite, Deco->Data.StaticSprite.n, x, y);
 }
 
 /**
@@ -789,11 +969,9 @@ local void DrawManaBar(int x, int y, const UnitType* type, int full, int ready)
 local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
 	int f;
-	Uint32 color;
-	int w;
 	int x1;
 	int y1;
-	const UnitStats* stats;
+	int i;
 
 #ifdef REFS_DEBUG
 	//
@@ -802,268 +980,82 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	VideoDrawNumberClip(x + 1, y + 1, GameFont, unit->Refs);
 #endif
 
-	//
-	//		Only for selected units?
-	//
-	if (ShowEnergySelectedOnly && !unit->Selected) {
-		return;
+	for (i = 0; i <= RESSOURCE_INDEX; i++) { // default values
+		unit->Variable[i].Value = 0;
+		unit->Variable[i].Max = 0;
+		unit->Variable[i].Enable = 1;
 	}
 
-	//
-	//		Health bar on left side of unit.
-	//
-	stats = unit->Stats;
-	//  Why remove the neutral race?
-	if ((unit->Player->Type != PlayerNeutral) && ShowHealthBar) {
-		if (stats->HitPoints && !(ShowNoFull && unit->HP == stats->HitPoints)) {
-			f = (100 * unit->HP) / stats->HitPoints;
-			if (f > 75) {
-				color = ColorDarkGreen;
-			} else if (f > 50) {
-				color = ColorYellow;
-			} else if (f > 25) {
-				color = ColorOrange;
-			} else {
-				color = ColorRed;
-			}
-			if (ShowHealthHorizontal)  {
-				//
-				//		Draw the black rectangle in full size?
-				//
-				if (ShowHealthBackgroundLong) {
-#ifdef DEBUG
-					// Johns: I want to see fast moving.
-					// VideoFillRectangleClip(unit->Data.Move.Fast
-					// Johns: I want to see the AI active flag
-					VideoFillRectangleClip(unit->Active? ColorBlack : ColorWhite,
-						x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-						(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-							type->BoxHeight + 1,
-						type->BoxHeight + 1, 5);
-#else
-					VideoFillRectangleClip(ColorBlack,
-						x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-						(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-							type->BoxHeight + 1,
-						type->BoxHeight + 1, 5);
-#endif
-				} else {
-#ifdef DEBUG
-					// Johns: I want to see fast moving.
-					VideoFillRectangleClip(unit->Data.Move.Fast ? ColorBlack : ColorWhite,
-						x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-						(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-							type->BoxHeight + 1,
-						((f * type->BoxHeight) / 100) + 1, 5);
+	// HP (do also building under construction :) ).
+	unit->Variable[HP_INDEX].Value = unit->HP;
+	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
 
-#else
-					VideoFillRectangleClip(ColorBlack,
-						x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2),
-						(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-							type->BoxHeight + 1,
-						((f * type->BoxHeight) / 100) + 1, 5);
-#endif
-				}
-				w = (f * type->BoxHeight) / 100 - 1;
-				if (w > 0) { // Prevents -1 turning into unsigned int
-					VideoFillRectangleClip(color,
-						x + ((type->TileWidth * TileSizeX - type->BoxWidth) / 2) + 1,
-						(y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2) +
-							type->BoxHeight + 2,
-						w, 3);
-				}
-			}  else  {
-				VideoFillRectangleClip(color,
-					x + (type->TileWidth * TileSizeX - type->BoxWidth) / 2,
-					y + (type->TileHeight * TileSizeY - type->BoxHeight) / 2,
-					2, (f * type->BoxHeight) / 100);
-			}
+	// Mana.
+	unit->Variable[MANA_INDEX].Value = unit->Mana;
+	unit->Variable[MANA_INDEX].Max = unit->Type->_MaxMana;
+	unit->Variable[MANA_INDEX].Enable = type->CanCastSpell ? 1 : 0;
+
+	// Transport
+	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;
+	unit->Variable[TRANSPORT_INDEX].Max = unit->Type->MaxOnBoard;
+
+	// Research.
+	if (unit->Orders[0].Action == UnitActionResearch) {
+		unit->Variable[RESEARCH_INDEX].Value =
+			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades];
+		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
+	}
+
+	//	Training
+	if (unit->Orders[0].Action == UnitActionTrain) {
+		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
+		unit->Variable[TRAINING_INDEX].Max =
+			unit->Data.Train.What[0]->Stats[unit->Player->Player].Costs[TimeCost];
+	}
+
+	// UpgradeTo
+	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
+		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
+		unit->Variable[UPGRADINGTO_INDEX].Max =
+			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
+	}
+
+	// Ressources.
+	if (type->GivesResource) {
+		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESSOURCE_INDEX].Max = 655350; // FIXME use better value ?
+	} else if (type->Harvester && unit->CurrentResource) {
+		unit->Variable[RESSOURCE_INDEX].Value = unit->Value;
+		unit->Variable[RESSOURCE_INDEX].Max = type->ResInfo[unit->CurrentResource]->ResourceCapacity;
+	}
+
+	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
+		int value;
+		int max;
+		const DecoVarType *Deco;
+
+		Deco = &UnitTypeVar.DecoVar[i];
+		Assert(Deco->f);
+		value = unit->Variable[Deco->Index].Value;
+		max = unit->Variable[Deco->Index].Max;
+		Assert(value <= max);
+
+		if (!((value == 0 && !Deco->ShowWhenNull) || (value == max && !Deco->ShowWhenMax)
+			|| (Deco->HideHalf && value != 0 && value != max)
+			|| (!Deco->ShowIfNotEnable && !unit->Variable[i].Enable)
+			|| (Deco->ShowOnlySelected && !unit->Selected)
+			|| (unit->Player->Type == PlayerNeutral && Deco->HideNeutral)
+			|| (IsEnemy(ThisPlayer, unit) && !Deco->ShowOpponent)
+			|| (IsAllied(ThisPlayer, unit) && (unit->Player != ThisPlayer) && Deco->HideAllied)
+			|| max == 0)) {
+			Deco->f(
+				x + Deco->OffsetX + Deco->OffsetXPercent * unit->Type->TileWidth * TileSizeX / 100,
+				y + Deco->OffsetY + Deco->OffsetYPercent * unit->Type->TileHeight * TileSizeY / 100,
+				unit, Deco);
 		}
 	}
 
-	//
-	//		Health dot on left side of unit.
-	//  Why skip the neutral units?
-	//
-	if ((unit->Player->Type != PlayerNeutral) && ShowHealthDot) {
-		if (stats->HitPoints &&
-				!(ShowNoFull && unit->HP == stats->HitPoints)) {
-			int n;
-
-			n = VideoGraphicFrames(HealthSprite.Sprite) - 1;
-			n -= (n * unit->HP) / stats->HitPoints;
-#if 0
-			f = (100 * unit->HP) / stats->HitPoints;
-			if (f > 75) {
-				n = 3 - ((f - 75) / (25 / 3)) + 0;
-			} else if (f > 50) {
-				n = 3 - ((f - 50) / (25 / 3)) + 4;
-			} else {
-				n = 3 - (f / (50 / 3)) + 8;
-			}
-#endif
-			Assert(n >= 0);
-			if (HealthSprite.HotX < 0) {
-				x1 = x + HealthSprite.HotX +
-					(type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
-			} else if (HealthSprite.HotX > 0) {
-				x1 = x + 1 - HealthSprite.HotX +
-					(type->TileWidth * TileSizeX - type->BoxWidth) / 2;
-			} else {
-				x1 = x + (type->TileWidth * TileSizeX - HealthSprite.Width + 1) / 2;
-			}
-			if (HealthSprite.HotY < 0) {
-				y1 = y + HealthSprite.HotY +
-					(type->TileHeight * TileSizeY + type->BoxHeight + 1) / 2;
-			} else if (HealthSprite.HotY > 0) {
-				y1 = y + 1 - HealthSprite.HotY +
-					(type->TileHeight * TileSizeY - type->BoxHeight) / 2;
-			} else {
-				y1 = y + (type->TileHeight * TileSizeY - HealthSprite.Height + 1) / 2;
-			}
-			VideoDrawClip(HealthSprite.Sprite, n, x1, y1);
-		}
-	}
-
-	//
-	//		Mana bar on right side of unit. FIXME: combine bar and sprite
-	//
-	if (ShowManaBar) {
-		if (type->CanCastSpell &&
-				!(ShowNoFull && unit->Mana == unit->Type->_MaxMana)) {
-			// s0m3body: mana bar should display mana proportionally
-			//				to unit's max mana (unit->Type->_MaxMana)
-			DrawManaBar(x, y, type, unit->Type->_MaxMana, unit->Mana);
-		} else if (type->GivesResource) {
-			DrawManaBar(x, y, type, 655350, unit->Value);
-		}
-		//
-		//		Show working of units.
-		//
-		if (unit->Player == ThisPlayer) {
-
-			//
-			//		Building under constuction.
-			//
-			/*
-			if (unit->Orders[0].Action == UnitActionBuilded) {
-				DrawManaBar(x, y, type, stats->HitPoints, unit->HP);
-			} else
-			*/
-
-			//
-			//		Building training units.
-			//
-			if (unit->Orders[0].Action == UnitActionTrain) {
-				DrawManaBar(x, y, type, unit->Data.Train.What[0]->Stats[
-						unit->Player->Player].Costs[TimeCost],
-					unit->Data.Train.Ticks);
-
-			//
-			//		Building upgrading to better type.
-			//
-			} else if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-				DrawManaBar(x, y, type, unit->Orders[0].Type->Stats[
-						unit->Player->Player].Costs[TimeCost],
-					unit->Data.UpgradeTo.Ticks);
-
-			//
-			//		Carry resource.
-			//		Don't display if empty.
-			//
-			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
-				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
-				DrawManaBar(x, y, type, unit->Type->ResInfo[
-						unit->CurrentResource]->ResourceCapacity,
-					unit->Value);
-
-			//
-			//		Building research new technologie.
-			//
-			} else if (unit->Orders[0].Action == UnitActionResearch) {
-				DrawManaBar(x, y, type,
-					unit->Data.Research.Upgrade->Costs[TimeCost],
-					unit->Player->UpgradeTimers.Upgrades[
-						unit->Data.Research.Upgrade - Upgrades]);
-			//
-			//		Transporter with units on board.
-			//
-			} else if (unit->Type->Transporter) {
-				DrawManaBar(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
-			}
-		}
-	}
-
-	//
-	//		Mana dot on right side of unit.
-	//
-	if (ShowManaDot) {
-		// s0m3body: MaxMana can vary for each unit,
-		// 				it is stored in unit->Type->_MaxMana
-		if (type->CanCastSpell &&
-				!(ShowNoFull && unit->Mana == unit->Type->_MaxMana)) {
-			DrawManaSprite(x, y, type,unit->Type->_MaxMana, unit->Mana);
-		} else if (type->GivesResource) {
-			DrawManaSprite(x, y, type, 655350, unit->Value);
-		}
-		//
-		//		Show working of units.
-		//
-		if (unit->Player == ThisPlayer) {
-
-			//
-			//		Building under constuction.
-			//
-			/*
-			if (unit->Orders[0].Action == UnitActionBuilded) {
-				DrawManaSprite(x, y, type, stats->HitPoints, unit->HP);
-			} else
-			*/
-
-			//
-			//		Building training units.
-			//
-			if (unit->Orders[0].Action == UnitActionTrain) {
-				DrawManaSprite(x, y, type, unit->Data.Train.What[0]->Stats[
-						unit->Player->Player].Costs[TimeCost],
-					unit->Data.Train.Ticks);
-
-			//
-			//		Building upgrading to better type.
-			//
-			} else if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-				DrawManaSprite(x,y,type,unit->Orders[0].Type->Stats[
-						unit->Player->Player].Costs[TimeCost],
-					unit->Data.UpgradeTo.Ticks);
-
-			//
-			//		Carry resource.
-			//
-			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
-				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
-				DrawManaSprite(x, y, type,
-					unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity,
-					unit->Value);
-
-			//
-			//		Building research new technologie.
-			//
-			} else if (unit->Orders[0].Action == UnitActionResearch) {
-				DrawManaSprite(x, y, type,
-					unit->Data.Research.Upgrade->Costs[TimeCost],
-					unit->Player->UpgradeTimers.Upgrades[
-						unit->Data.Research.Upgrade-Upgrades]);
-			//
-			//		Transporter with units on board.
-			//
-			} else if (unit->Type->Transporter) {
-				DrawManaSprite(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
-			}
-		}
-	}
-
-	// FIXME: Johns there is 100% a way to remove this calculation from
-	//				runtime.
+	// FIXME: Johns there is 100% a way to remove this calculation from runtime.
 	x1 = x;
 	y1 = y;
 	if (SpellSprite.HotX < 0) {
