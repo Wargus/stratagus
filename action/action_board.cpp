@@ -156,8 +156,10 @@ local void EnterTransporter(Unit* unit)
 	// Place the unit inside the transporter.
 	//
 
-	if (transporter->InsideCount < transporter->Type->MaxOnBoard) {
-			RemoveUnit(unit, transporter);
+	if (transporter->BoardCount < transporter->Type->MaxOnBoard) {
+		RemoveUnit(unit, transporter);
+		transporter->BoardCount++;
+		unit->Boarded = 1;
 		if (!unit->Player->AiEnabled) {
 			// Don't make anything funny after going out of the transporter.
 			// FIXME: This is probably wrong, but it works for me (n0b0dy)
@@ -165,7 +167,7 @@ local void EnterTransporter(Unit* unit)
 			unit->Orders[0].Action = UnitActionStill;
 		}
 
-			if (IsOnlySelected(transporter)) {
+		if (IsOnlySelected(transporter)) {
 			SelectedUnitChanged();
 			MustRedraw |= RedrawInfoPanel;
 		}

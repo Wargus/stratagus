@@ -294,7 +294,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//
 	//		Draw unit kills and experience.
 	//
-	if (stats->Level && !(type->Transporter && unit->InsideCount)) {
+	if (stats->Level && !(type->Transporter && unit->BoardCount)) {
 		sprintf(buf, "XP:~<%d~> Kills:~<%d~>", unit->XP, unit->Kills);
 		VideoDrawTextCentered(x + 114, y + 8 + 15 + 33, GameFont, buf);
 	}
@@ -406,6 +406,33 @@ global void DrawUnitInfo(const Unit* unit)
 		}
 	}
 
+	if (type->Transporter && unit->BoardCount) {
+		int j;
+
+		if (TheUI.TransportingText) {
+			VideoDrawText(TheUI.TransportingTextX, TheUI.TransportingTextY,
+				TheUI.TransportingFont, TheUI.TransportingText);
+		}
+		uins = unit->UnitInside;
+		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
+			if (uins->Boarded) {
+				DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
+					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
+						(IconActive | (MouseButtons & LeftButton)) : 0,
+					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+				UiDrawLifeBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+				if (uins->Type->CanCastSpell && unit->Type->_MaxMana) {
+					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+				}
+				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
+					SetStatusLine(uins->Type->Name);
+				}
+				++j;
+			}
+		}
+		return;
+	}
+
 	vpos = 77; // Start of resource drawing
 	for (i = 1; i < MaxCosts; ++i) {
 		if (type->CanStore[i]) {
@@ -429,28 +456,6 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 	if (vpos != 77) {
 		// We displayed at least one resource
-		return;
-	}
-
-	if (type->Transporter && unit->InsideCount) {
-		if (TheUI.TransportingText) {
-			VideoDrawText(TheUI.TransportingTextX, TheUI.TransportingTextY,
-				TheUI.TransportingFont, TheUI.TransportingText);
-		}
-		uins = unit->UnitInside;
-		for (i = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
-			DrawUnitIcon(unit->Player,uins->Type->Icon.Icon,
-				(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) ?
-					(IconActive | (MouseButtons & LeftButton)) : 0,
-				TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
-			UiDrawLifeBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
-			if (uins->Type->CanCastSpell && unit->Type->_MaxMana) {
-				UiDrawManaBar(uins, TheUI.TransportingButtons[i].X, TheUI.TransportingButtons[i].Y);
-			}
-			if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == i) {
-				SetStatusLine(uins->Type->Name);
-			}
-		}
 		return;
 	}
 

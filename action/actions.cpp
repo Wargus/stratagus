@@ -53,6 +53,7 @@
 ----------------------------------------------------------------------------*/
 
 global unsigned SyncHash;			/// Hash calculated to find sync failures
+#define DEBUG_ACTIONS
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -494,25 +495,11 @@ global void UnitActions(void)
 	int i;
 	int tabsize;
 
-	buffsthiscycle = regenthiscycle =
-		blinkthiscycle = !(GameCycle % CYCLES_PER_SECOND);
+	buffsthiscycle = regenthiscycle = blinkthiscycle =
+			!(GameCycle % CYCLES_PER_SECOND);
 
-	//
-	// Must copy table, units could be removed.
-	//
-	memcpy(table, Units, sizeof(Unit*) * NumUnits);
-
-	//
-	// Check for dead/destroyed units in table...
-	// Filter them out
-	//
-	for (i = tabsize = 0; i < NumUnits; ++i) {
-		if (!table[i]->Destroyed) {		// Ignore destroyed units
-			table[tabsize++] = table[i];
-		} else {
-			DebugLevel3Fn("Destroyed unit %d in table, should be ok\n" _C_ table[i]->Slot);
-		}
-	}
+	memcpy(table, Units, NumUnits * sizeof(Unit*));
+	tabsize = NumUnits;
 
 	//
 	// Check for things that only happen every few cycles
@@ -522,6 +509,9 @@ global void UnitActions(void)
 	// 1) Blink flag.
 	if (blinkthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
+			while(table[i]->Destroyed) {
+				table[i] = table[--tabsize];
+			}
 			if (table[i]->Blink) {
 				--table[i]->Blink;
 			}
@@ -531,22 +521,20 @@ global void UnitActions(void)
 	// 2) Buffs...
 	if (buffsthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
-			HandleBuffs(table[i], CYCLES_PER_SECOND);
-			if (table[i]->Destroyed) {
+			while(table[i]->Destroyed) {
 				table[i] = table[--tabsize];
-				--i;
 			}
+			HandleBuffs(table[i], CYCLES_PER_SECOND);
 		}
 	}
 
 	// 3) Increase health mana, burn and stuff
 	if (regenthiscycle) {
 		for (i = 0; i < tabsize; ++i) {
-			HandleRegenerations(table[i]);
-			if (table[i]->Destroyed) {
+			while(table[i]->Destroyed) {
 				table[i] = table[--tabsize];
-				--i;
 			}
+			HandleRegenerations(table[i]);
 		}
 	}
 
@@ -554,6 +542,9 @@ global void UnitActions(void)
 	// Do all actions
 	//
 	for (i = 0; i < tabsize; ++i) {
+		while(table[i]->Destroyed) {
+			table[i] = table[--tabsize];
+		}
 		unit = table[i];
 
 		if (--unit->Wait) {			// Wait until counter reached

@@ -431,8 +431,8 @@ local void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->InsideCount) {
-		for (i = Selected[0]->InsideCount - 1; i >= 0; --i) {
+	if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->BoardCount) {
+		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (x >= TheUI.TransportingButtons[i].X &&
 					x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Width + 7 &&
 					y >= TheUI.TransportingButtons[i].Y &&
@@ -460,7 +460,7 @@ local void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				for (i = 0; i < TheUI.NumTrainingButtons; ++i) {
+				for (i = TheUI.NumTrainingButtons; i >= 0; --i) {
 					if (x >= TheUI.TrainingButtons[i].X &&
 							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
 							y >= TheUI.TrainingButtons[i].Y &&
@@ -1618,13 +1618,14 @@ global void UIHandleButtonDown(unsigned button)
 				//
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
-					if (Selected[0]->InsideCount >= ButtonUnderCursor) {
-						// FIXME: should check if valid here.
-						// n0b0dy: check WHAT?
+					if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 						uins = Selected[0]->UnitInside;
-						for (i = 0; i < ButtonUnderCursor; ++i) {
-							uins = uins->NextContained;
+						for (i = ButtonUnderCursor; i; uins = uins->NextContained) {
+							if (uins->Boarded) {
+								--i;
+							}
 						}
+						DebugCheck(!uins->Boarded);
 						SendCommandUnload(Selected[0],
 							Selected[0]->X, Selected[0]->Y, uins,
 							!(KeyModifiers & ModifierShift));

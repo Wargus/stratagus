@@ -742,7 +742,7 @@ local int CclGetPlayerResource(lua_State* l)
 	}
 	if (i == MaxCosts) {
 		// FIXME: this leaves a half initialized player
-		lua_pushfstring(l, "Invalid resource", res);
+		lua_pushfstring(l, "Invalid resource \"%s\"", res);
 		lua_error(l);
 	}
 	lua_pushnumber(l, plyr->Resources[i]);
