@@ -135,7 +135,9 @@ global int FindPlayerUnitsByType(const Player* player,const UnitType* type
 {
     Unit* unit;
     Unit** units;
-    int num,nunits,i;
+    int num;
+    int nunits;
+    int i;
 
     nunits=player->TotalNumUnits;
     units=player->Units;
@@ -212,12 +214,12 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
 **
 **	@return		Returns ideal target on map tile.
 */
-global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
+global Unit* TargetOnMapTile(const Unit* source,unsigned tx,unsigned ty)
 {
     Unit* table[UnitMax];
     Unit* unit;
     Unit* best;
-    UnitType* type;
+    const UnitType* type;
     int n;
     int i;
 
@@ -289,8 +291,9 @@ global Unit* TransporterOnMapTile(unsigned tx,unsigned ty)
 local int InsideUnitSprite (Unit *unit, unsigned x, unsigned y)
 {
     int ux, uy;      /* position at which unit's sprite is currently drawn */
-    UnitType *type=unit->Type;
+    const UnitType *type;
 
+    type=unit->Type;
     ux = TileSizeX*unit->X + unit->IX;
     ux -= (type->BoxWidth - TileSizeX*type->TileWidth)/2;
     uy = TileSizeY*unit->Y + unit->IY;
@@ -381,12 +384,11 @@ global Unit* RepairableOnScreenMapPosition (unsigned x,unsigned y)
 **
 **	@return		Returns ideal target
 */
-global Unit *TargetOnScreenMapPosition (Unit* source, unsigned x, unsigned y)
+global Unit *TargetOnScreenMapPosition (const Unit* source, unsigned x, unsigned y)
 {
     Unit* table[UnitMax];
     Unit* unit;
     Unit* best;
-    UnitType* type;
     int tx, ty;
     int n;
     int i;
