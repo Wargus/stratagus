@@ -736,8 +736,8 @@ extern Unit* FindGoldDeposit(const Unit*,int,int);
 extern Unit* FindWoodDeposit(const Player* player,int x,int y);
     /// Find nearest oil deposit
 extern Unit* FindOilDeposit(const Unit*,int x,int y);
-    /// Find an idle worker and center on it.
-extern void FindIdleWorker();
+    /// Find the next idle worker
+extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
     /// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const Unit* unit,int* x,int* y);

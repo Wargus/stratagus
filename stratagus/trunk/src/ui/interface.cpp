@@ -386,6 +386,27 @@ local void UiToggleTerrain(void)
 }
 
 /**
+**	Find the next idle worker, select it, and center on it
+*/
+local void UiFindIdleWorker(void)
+{
+    Unit* unit;
+    static Unit* LastIdleWorker=NoUnitP;
+
+    unit=FindIdleWorker(ThisPlayer,LastIdleWorker);
+    if( unit!=NoUnitP ) {
+	LastIdleWorker=unit;
+	SelectSingleUnit(unit);
+	ClearStatusLine();
+	ClearCosts();
+	CurrentButtonLevel=0;
+	UpdateButtonPanel();
+	PlayUnitSound(Selected[0],VoiceSelected);
+	MapCenter(unit->X,unit->Y);
+    }
+}
+
+/**
 **	Toggle grab mouse on/off.
 */
 local void UiToggleGrabMouse(void)
@@ -580,7 +601,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    FindIdleWorker();
+	    UiFindIdleWorker();
 	    break;
 
 	case KeyCodeUp:
