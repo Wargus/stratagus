@@ -75,14 +75,14 @@ global void AiCheckMagic(void)
 			for (j = 0; j < SpellTypeCount; ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
-					(SpellTypeById(j)->AutoCast || SpellTypeById(j)->AICast)) {
+					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {
 #ifdef DEBUG
 					success =  // Follow on next line (AutoCastSpell).
 #endif
-						AutoCastSpell(unit, SpellTypeById(j));
+						AutoCastSpell(unit, SpellTypeTable[j]);
 					DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
 						unit->Type->Ident _C_
-						SpellTypeById(j)->Ident _C_ success ? "success" : "fail");
+						SpellTypeTable[j]->Ident _C_ success ? "success" : "fail");
 				}
 			}
 		}

@@ -201,7 +201,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
 	if (!strncmp(target, "unit-", 5)) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
-		if (UnitIdAllowed(player, rule.Kind.UnitType->Type) == 0) {
+		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return 0;
 		}
 		rule.Type = DependRuleUnitType;

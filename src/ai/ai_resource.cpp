@@ -319,7 +319,7 @@ local void AiRequestSupply(void)
 	//
 	memset(counter, 0, sizeof(counter));
 	for (queue = AiPlayer->UnitTypeBuilded; queue; queue = queue->Next) {
-		counter[queue->Type->Type] += queue->Want;
+		counter[queue->Type->Slot] += queue->Want;
 	}
 
 	//
@@ -328,7 +328,7 @@ local void AiRequestSupply(void)
 	n = AiHelpers.UnitLimit[0]->Count;
 	for (i = 0; i < n; ++i) {
 		type = AiHelpers.UnitLimit[0]->Table[i];
-		if (counter[type->Type]) { // Already ordered.
+		if (counter[type->Slot]) { // Already ordered.
 			return;
 		}
 
@@ -416,7 +416,7 @@ global int AiCountUnitBuilders(UnitType* type)
 	AiUnitTypeTable* const* tablep;
 	const AiUnitTypeTable* table;
 
-	if (UnitIdAllowed(AiPlayer->Player, type->Type) == 0) {
+	if (UnitIdAllowed(AiPlayer->Player, type->Slot) == 0) {
 		DebugLevel0Fn("Can't build `%s' now\n" _C_ type->Ident);
 		return 0;
 	}
@@ -430,11 +430,11 @@ global int AiCountUnitBuilders(UnitType* type)
 		n = AiHelpers.TrainCount;
 		tablep = AiHelpers.Train;
 	}
-	if (type->Type > n) { // Oops not known.
+	if (type->Slot > n) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
-	table = tablep[type->Type];
+	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
@@ -447,7 +447,7 @@ global int AiCountUnitBuilders(UnitType* type)
 		//
 		// The type for builder/trainer is available
 		//
-		result += unit_count[table->Table[i]->Type];
+		result += unit_count[table->Table[i]->Slot];
 	}
 	return result;
 }
@@ -493,11 +493,11 @@ local int AiMakeUnit(UnitType* type)
 			n = AiHelpers.TrainCount;
 			tablep = AiHelpers.Train;
 		}
-		if (type->Type > n) { // Oops not known.
+		if (type->Slot > n) { // Oops not known.
 			DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
 		}
-		table = tablep[type->Type];
+		table = tablep[type->Slot];
 		if (!table) { // Oops not known.
 			DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 			continue;
@@ -509,7 +509,7 @@ local int AiMakeUnit(UnitType* type)
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[table->Table[i]->Type]) {
+			if (unit_count[table->Table[i]->Slot]) {
 				DebugLevel3("Found a builder for a %s.\n" _C_ type->ident);
 				if (type->Building) {
 					if (AiBuildBuilding(table->Table[i], type)) {
@@ -614,7 +614,7 @@ global void AiAddResearchRequest(Upgrade* upgrade)
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Type]) {
+		if (unit_count[table->Table[i]->Slot]) {
 			if (AiResearchUpgrade(table->Table[i], upgrade)) {
 				return;
 			}
@@ -696,11 +696,11 @@ global void AiAddUpgradeToRequest(UnitType* type)
 	n = AiHelpers.UpgradeCount;
 	tablep = AiHelpers.Upgrade;
 
-	if (type->Type > n) { // Oops not known.
+	if (type->Slot > n) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
 	}
-	table = tablep[type->Type];
+	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return;
@@ -712,7 +712,7 @@ global void AiAddUpgradeToRequest(UnitType* type)
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Type]) {
+		if (unit_count[table->Table[i]->Slot]) {
 			if (AiUpgradeTo(table->Table[i], type)) {
 				return;
 			}
@@ -1240,11 +1240,11 @@ local int AiRepairUnit(Unit* unit)
 	n = AiHelpers.RepairCount;
 	tablep = AiHelpers.Repair;
 	type = unit->Type;
-	if (type->Type > n) { // Oops not known.
+	if (type->Slot > n) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
 	}
-	table = tablep[type->Type];
+	table = tablep[type->Slot];
 	if (!table) { // Oops not known.
 		DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
 		return 0;
@@ -1256,7 +1256,7 @@ local int AiRepairUnit(Unit* unit)
 		//
 		// The type is available
 		//
-		if (unit_count[table->Table[i]->Type]) {
+		if (unit_count[table->Table[i]->Slot]) {
 			if (AiRepairBuilding(table->Table[i], unit)) {
 				return 1;
 			}

@@ -660,8 +660,9 @@ global int PlayerCheckLimits(const Player* player, const UnitType* type)
 			NotifyPlayer(player, NotifyYellow, 0, 0, "Total Unit Limit Reached");
 			return -4;
 		}
-		if (player->UnitTypesCount[type->Type] >=  player->Allow.Units[type->Type]) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Limit of %d Reached for this unit type", player->Allow.Units[type->Type]);
+		if (player->UnitTypesCount[type->Slot] >=  player->Allow.Units[type->Slot]) {
+			NotifyPlayer(player, NotifyYellow, 0, 0, "Limit of %d Reached for this unit type",
+					player->Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
@@ -824,7 +825,7 @@ global void PlayerSubCostsFactor(Player* player, const int* costs, int factor)
 */
 global int HaveUnitTypeByType(const Player* player, const UnitType* type)
 {
-	return player->UnitTypesCount[type->Type];
+	return player->UnitTypesCount[type->Slot];
 }
 
 /**
@@ -838,7 +839,7 @@ global int HaveUnitTypeByType(const Player* player, const UnitType* type)
 */
 global int HaveUnitTypeByIdent(const Player* player, const char* ident)
 {
-	return player->UnitTypesCount[UnitTypeByIdent(ident)->Type];
+	return player->UnitTypesCount[UnitTypeByIdent(ident)->Slot];
 }
 
 /**

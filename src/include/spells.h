@@ -241,20 +241,19 @@ struct _spell_type_;
 **		Base structure of a spell type.
 */
 typedef struct _spell_type_ {
-	//  Identification stuff
-	void* ScriptData;       				/// Script Data for this object.
-	int Ident;								/// Spell numeric identifier
-	char *IdentName;						/// Spell unique identifier (spell-holy-vision)
+	// Identification stuff
+	char *Ident;						    /// Spell unique identifier (spell-holy-vision)
 	char *Name;								/// Spell name shown by the engine
+	int Slot;								/// Spell numeric identifier
 
-	//		Spell Specifications
-	TargetType		Target;						/// Targetting information. See TargetType.
+	// Spell Specifications
+	TargetType Target;					    /// Targetting information. See TargetType.
 	SpellActionType *Action;				/// More arguments for spell (damage, delay, additional sounds...).
 
 	int Range;								/// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost;						/// Required mana for each cast.
-	int RepeatCast;						/// If the spell will be cast again until out of targets.
+	int ManaCost;						    /// Required mana for each cast.
+	int RepeatCast;						    /// If the spell will be cast again until out of targets.
 
 	int DependencyId;						/// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition;				/// Conditions to cast the spell. (generic (no test for each target))

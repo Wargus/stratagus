@@ -596,8 +596,8 @@ local int CclDefineSpell(lua_State* l)
 		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
 		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
-		spell->Ident = SpellTypeCount - 1;
-		spell->IdentName = identname;
+		spell->Slot = SpellTypeCount - 1;
+		spell->Ident = identname;
 		spell->DependencyId = -1;
 	}
 	for (; j < args; ++j) {
@@ -1042,8 +1042,8 @@ local int ScriptSpellCreate(lua_State* l)
 		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
 		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
-		spell->Ident = SpellTypeCount - 1;
-		spell->IdentName = strdup(name);
+		spell->Slot = SpellTypeCount - 1;
+		spell->Ident = strdup(name);
 		spell->DependencyId = -1;
 		ScriptCreateUserdata(l, spell, ScriptSpellGet, ScriptSpellSet);
 		return 1;
@@ -1058,8 +1058,9 @@ local int ScriptSpellCreate(lua_State* l)
 */
 local int ScriptSpellGet(SpellType* spell, const char* key, lua_State* l)
 {
-	META_GET_STRING("DisplayName", spell->Name);
-	META_GET_STRING("Ident", spell->IdentName);
+	META_GET_STRING("Name", spell->Name);
+	META_GET_STRING("Ident", spell->Ident);
+	META_GET_INT("Slot", spell->Slot);
 	META_GET_INT("ManaCost", spell->ManaCost);
 	META_GET_INT("Range", spell->Range);
 	META_GET_BOOL("RepeatCast", spell->RepeatCast);
@@ -1094,7 +1095,7 @@ local int ScriptSpellSet(SpellType* spell, const char* key, lua_State* l)
 {
 	const char* val;
 
-	META_SET_STRING("DisplayName", spell->Name);
+	META_SET_STRING("Name", spell->Name);
 	META_SET_INT("ManaCost", spell->ManaCost);
 	META_SET_INT("Range", spell->Range);
 	META_SET_BOOL("RepeatCast", spell->RepeatCast);

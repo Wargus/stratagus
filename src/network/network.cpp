@@ -552,7 +552,7 @@ global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 			if (dest && check->Data.Dest == htons(dest->Slot)) {
 				DebugLevel3Fn("Removed Repeat Command\n");
 				return;
-			} else if (type && check->Data.Dest == htons(type->Type)) {
+			} else if (type && check->Data.Dest == htons(type->Slot)) {
 				DebugLevel3Fn("Removed Repeat Command\n");
 				return;
 			} else if (check->Data.Dest == 0xFFFF) {
@@ -578,7 +578,7 @@ global void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 	if (dest) {
 		ncq->Data.Dest = htons(dest->Slot);
 	} else if (type) {
-		ncq->Data.Dest = htons(type->Type);
+		ncq->Data.Dest = htons(type->Slot);
 	} else {
 		ncq->Data.Dest = htons(-1);
 	}
