@@ -103,6 +103,7 @@ local void MoveToTarget(Unit* unit)
     int wall;
     int err;
 
+    // FIXME: is this a a-star problem ?
     if( unit->Command.Action==UnitActionAttackGround
 	|| WallOnMap(unit->Command.Data.Move.DX,unit->Command.Data.Move.DY) ) { 
 	// FIXME: workaround for pathfinder problem
