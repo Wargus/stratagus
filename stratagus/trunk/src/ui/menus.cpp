@@ -4559,6 +4559,7 @@ local void EndMenu(void)
     InterfaceState = IfaceStateNormal;
     UpdateDisplay();
     InterfaceState = IfaceStateMenu;
+    MustRedraw = RedrawMenu;
 }
 
 /**
