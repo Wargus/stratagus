@@ -382,6 +382,34 @@ global int CanMoveToMask(int x,int y,int mask)
 #endif
 
 /**
+**	Can an unit of unit-type move to this point.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**	@param type	unit-type to be checked.
+**
+**	@return		True if could be entered, false otherwise.
+*/
+global int UnitTypeCanMoveTo(int x,int y,const UnitType* type)
+{
+    return CanMoveToMask(x,y,TypeMovementMask(type));
+}
+
+/**
+**	Can an unit move to this point.
+**
+**	@param x	X map tile position.
+**	@param y	Y map tile position.
+**	@param unit	unit to be checked.
+**
+**	@return		True if could be entered, false otherwise.
+*/
+global int UnitCanMoveTo(int x,int y,const Unit* unit)
+{
+    return CanMoveToMask(x,y,TypeMovementMask(unit->Type));
+}
+
+/**
 **	Return the units field flags.
 **	This flags are used to mark the field for this unit.
 **
