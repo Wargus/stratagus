@@ -53,18 +53,6 @@
 **				@see video.h @see video.c
 **
 **
-**	  @section Deco Decorations
-**
-**				A mechanism beteen the Stratagus engine and draw routines
-**				to make a screen refresh/update faster and accurate.
-**				It will 'know' about overlapping screen decorations and draw
-**				them all (partly) when one is to be updated.
-**
-**				See page @ref Deco for a detailed description.
-**
-**			  @see deco.h @see deco.c
-**
-**
 **	  @section VideoModuleHigh High Level - video dependent functions
 **
 **				These are the video platforms that are supported, any platform
