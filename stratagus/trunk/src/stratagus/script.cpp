@@ -699,7 +699,7 @@ global void CclInit(void)
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
-    sargv[3] = "-h100000:10";
+    sargv[3] = "-h200000:10";
 #ifdef __MINGW32__
     sprintf(buf,"-l%s\\",FreeCraftLibPath);
 #else
