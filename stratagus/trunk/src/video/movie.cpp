@@ -59,7 +59,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern SDL_Surface *TheScreen;
+extern SDL_Surface* TheScreen;
 static int MovieStop;
 
 /*----------------------------------------------------------------------------
@@ -101,7 +101,10 @@ static void MovieCallbackMouseExit(void)
 {
 }
 
-int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
+/**
+**  FIXME: docu
+*/
+static int OutputTheora(OggData* data, SDL_Overlay* yuv_overlay, SDL_Rect* rect)
 {
 	int i;
 	yuv_buffer yuv;
@@ -120,18 +123,18 @@ int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 	}
 
 	crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
-	for(i=0; i < yuv_overlay->h; ++i) {
+	for (i = 0; i < yuv_overlay->h; ++i) {
 		memcpy(yuv_overlay->pixels[0] + yuv_overlay->pitches[0] * i,
-		  yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
+			yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
 	}
 
 	crop_offset = (data->tinfo.offset_x / 2) + (yuv.uv_stride) *
-	  (data->tinfo.offset_y / 2);
-	for (i=0; i < yuv_overlay->h / 2; ++i) {
+		(data->tinfo.offset_y / 2);
+	for (i = 0; i < yuv_overlay->h / 2; ++i) {
 		memcpy(yuv_overlay->pixels[1] + yuv_overlay->pitches[1] * i,
-		  yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
+			yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
 		memcpy(yuv_overlay->pixels[2] + yuv_overlay->pitches[2] * i,
-		  yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
+			yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
 	}
 
 	if (SDL_MUSTLOCK(TheScreen)) {
@@ -144,7 +147,10 @@ int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 	return 0;
 }
 
-int TheoraProcessData(OggData *data)
+/**
+**  FIXME: docu
+*/
+static int TheoraProcessData(OggData* data)
 {
 	ogg_packet packet;
 
@@ -158,7 +164,7 @@ int TheoraProcessData(OggData *data)
 			ogg_stream_pagein(&data->vstream, &data->page);
 		} else {
 			theora_decode_packetin(&data->tstate, &packet);
-			data->tstate.internal_encode = NULL;	// needed, maybe a bug in libtheora?
+			data->tstate.internal_encode = NULL;  // needed, maybe a bug in libtheora?
 			return 0;
 		}
 	}
@@ -171,15 +177,14 @@ int TheoraProcessData(OggData *data)
 **  @param name   Filename of movie file.
 **
 **  @return       Non-zero if file isn't a supported movie.
-**
 */
 int PlayMovie(const char* name)
 {
-	OggData *data;
-	CLFile *f;
+	OggData* data;
+	CLFile* f;
 	SDL_Rect rect;
-	SDL_Overlay *yuv_overlay;
-	Sample *sample;
+	SDL_Overlay* yuv_overlay;
+	Sample* sample;
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;
@@ -209,7 +214,7 @@ int PlayMovie(const char* name)
 	rect.h = VideoHeight;
 
 	yuv_overlay = SDL_CreateYUVOverlay(data->tinfo.frame_width,
-	  data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
+		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
 		return -1;
@@ -248,7 +253,7 @@ int PlayMovie(const char* name)
 		}
 
 		diff = SDL_GetTicks() - start_ticks - theora_granule_time(&data->tstate,
-		  data->tstate.granulepos) * 1000;
+			data->tstate.granulepos) * 1000;
 
 		if (diff > 100) {
 			// too far behind, skip some frames
@@ -285,6 +290,9 @@ int PlayMovie(const char* name)
 
 #else
 
+/**
+**  FIXME: docu
+*/
 int PlayMovie(const char* name)
 {
 	return -1;
