@@ -225,10 +225,10 @@ echo "# Use SIOD support" >> $RULESFILE
 if [ "$BEOS" != "1" ] ; then
   if [ "$DARWIN" != "1" ] ; then
     echo "CCL		= -DUSE_CCL2" >> $RULESFILE
-    echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+    echo "CCLLIB		= -lm" >> $RULESFILE
   else
     echo "CCL             = -DUSE_CCL2" >> $RULESFILE
-    echo "CCLLIB		= -dl" >> $RULESFILE
+    echo "CCLLIB		= -ldl" >> $RULESFILE
   fi
 else
   echo "CCL             = -DUSE_CCL2 -DUSE_BEOS" >> $RULESFILE
