@@ -648,17 +648,32 @@ global void UIHandleMouseMove(int x,int y)
 	if( KeyModifiers&ModifierControl ) {
 	    scroll=2;
 	} else {
-	    scroll=4;
+	    scroll=1;
 	}
+
+#ifdef WIN32
+	scroll*=2;
+#endif
 
 	xo = TheUI.MouseViewport->MapX;
 	yo = TheUI.MouseViewport->MapY;
 	if( TheUI.ReverseMouseMove ) {
-	    xo+=(CursorStartX-x)/scroll;
-	    yo+=(CursorStartY-y)/scroll;
+	    if (x < CursorStartX) {
+    		xo+=scroll;
+	    } else if (x > CursorStartX) {
+		xo-=scroll;
+	    }
 	} else {
-	    xo+=(x-CursorStartX)/scroll;
-	    yo+=(y-CursorStartY)/scroll;
+	    if (x < CursorStartX) {
+    		xo-=scroll;
+	    } else if (x > CursorStartX) {
+        	xo+=scroll;
+	    }
+	    if (y < CursorStartY) {
+		yo-=scroll;
+	    } else if (y > CursorStartY) {
+    		yo+=scroll;
+	    }
 	}
 	TheUI.WarpX=CursorStartX;
 	TheUI.WarpY=CursorStartY;
