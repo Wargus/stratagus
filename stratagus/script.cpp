@@ -47,6 +47,7 @@
 #include "ccl_sound.h"
 #include "ccl.h"
 #include "font.h"
+#include "pathfinder.h" 
 
 #include <guile/gh.h>			// I use guile for a quick hack
 
@@ -79,6 +80,7 @@ extern void sgtk_init_gtk_gdk_glue();
 #include "ccl_sound.h"
 #include "ui.h"
 #include "font.h"
+#include "pathfinder.h" 
 #include "ai.h"
 
 #endif // USE_CCL2
@@ -702,6 +704,7 @@ local void gh_main_prog(int argc,char* argv[])
     gh_new_procedureN("missile-type",CclMissileType);
 
     MapCclRegister();
+    PathfinderCclRegister(); 
     UnitButtonCclRegister();
     UnitTypeCclRegister();
     SoundCclRegister();
@@ -812,6 +815,7 @@ global void CclInit(void)
     init_lsubr("missile-type",CclMissileType);
 
     MapCclRegister();
+    PathfinderCclRegister(); 
     UnitButtonCclRegister();
     UnitTypeCclRegister();
     UpgradesCclRegister();
