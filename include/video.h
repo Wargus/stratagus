@@ -600,6 +600,126 @@ extern void (*VideoDrawTransHLineClip)(SysColors color,int x,int y
 	,unsigned width,int alpha);
 
     /**
+    **	Draw line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDrawLine)(SysColors color,int sx,int sy,int dx,int dy);
+
+    /**
+    **	Draw 25% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw25TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 50% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw50TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 75% translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw75TransLine)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw translucent line unclipped.
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransLine)(SysColors color,int sx,int sy,int dx,int dy
+	,int alpha);
+
+    /**
+    **	Draw line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDrawLineClip)(SysColors color,int sx,int sy,int dx,int dy);
+
+    /**
+    **	Draw 25% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw25TransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw 50% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw50TransLineClip)(SysColors color,int sx,int sy,
+	int dx,int dy);
+
+    /**
+    **	Draw 75% translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    */
+extern void (*VideoDraw75TransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy);
+
+    /**
+    **	Draw translucent line clipped to current clip setting
+    **
+    **	@param color	Color index.
+    **	@param sx	Source x coordinate on the screen
+    **	@param sy	Source y coordinate on the screen
+    **	@param dx	Destination x coordinate on the screen
+    **	@param dy	Destination y coordinate on the screen
+    **	@param alpha	alpha value of pixel.
+    */
+extern void (*VideoDrawTransLineClip)(SysColors color,int sx,int sy
+	,int dx,int dy,int alpha);
+
+    /**
     **	Draw rectangle.
     **
     **	@param color	Color index.
