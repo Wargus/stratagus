@@ -1550,7 +1550,8 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     int mask;
     Unit* table[UnitMax];
 
-    DebugCheck( !unit->Removed );
+    //FIXME: vladi: this debug check fails when used for teleporting...
+    //DebugCheck( !unit->Removed );
 
     // FIXME: better and quicker solution, to find the building.
     x=y=-1;

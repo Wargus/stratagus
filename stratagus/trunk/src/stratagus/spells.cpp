@@ -1336,9 +1336,22 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionCircleOfPower:
     {
+    // FIXME: vladi: cop should be placed only on explored land
     // FIXME: Don't use UnitTypeByIdent during runtime.
-    Unit *cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
+    Unit *cop = (Unit*)(unit->Goal);
+    if ( cop )
+      {
+      // FIXME: if cop is already defined --> move it, but it doesn't work?
+      cop->X = x;
+      cop->Y = y;
+      RemoveUnit( cop );
+      PlaceUnit( cop, x, y );
+      }
+    else
+      {  
+      cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
 	         unit->Player);
+      }	 
     MakeMissile(MissileTypeSpell,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
