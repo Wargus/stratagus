@@ -60,10 +60,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef DEBUG
-int NoWarningUnitType;  ///< quiet ident lookup
-#endif
-
 UnitType* UnitTypes[UnitTypeMax];   ///< unit-types definition
 int NumUnitTypes;                   ///< number of unit-types made
 
@@ -431,6 +427,12 @@ UnitType* NewUnitTypeSlot(char* ident)
 	}
 	type->Slot = NumUnitTypes;
 	type->Ident = ident;
+	type->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
+	type->CanTargetFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
+	type->Variable = calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
+	memcpy(type->Variable, UnitTypeVar.Variable,
+		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
+
 	UnitTypes[NumUnitTypes++] = type;
 	*(UnitType**)hash_add(UnitTypeHash, type->Ident) = type;
 	return type;
