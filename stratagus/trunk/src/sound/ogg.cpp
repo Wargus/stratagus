@@ -180,7 +180,6 @@ global Sample *LoadOgg(const char* name)
 		free(sample);
 		fprintf(stderr, "out of memory\n");
 		ov_clear(vf);
-		CLclose(f);
 		return NULL;
 	    }
 	    sample = s;
@@ -199,9 +198,8 @@ global Sample *LoadOgg(const char* name)
     sample = realloc(sample, sizeof(*sample) + sample->Length);
 
     ov_clear(vf);
-    CLclose(f);
 
-    printf(" %d\n" _C_ sample->Length);
+    DebugLevel0Fn(" %d\n" _C_ sample->Length);
     IfDebug( AllocatedSoundMemory += sample->Length; );
 
     return sample;
