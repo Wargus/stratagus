@@ -327,6 +327,14 @@ local void WaitCallbackMouse(int dummy_x __attribute__((unused)),
 }
 
 /**
+**	Callback for exit.
+*/
+local void WaitCallbackExit(void)
+{
+    DebugLevel3Fn("Exit\n");
+}
+
+/**
 **	Wait for any input.
 **
 **	@param time	Time in seconds to wait.	
@@ -344,7 +352,7 @@ local void WaitForInput(int timeout)
     callbacks.ButtonPressed=WaitCallbackKey;
     callbacks.ButtonReleased=WaitCallbackKey;
     callbacks.MouseMoved=WaitCallbackMouse;
-    callbacks.MouseExit=WaitCallbackMouse;
+    callbacks.MouseExit=WaitCallbackExit;
     callbacks.KeyPressed=WaitCallbackKey2;
     callbacks.KeyReleased=WaitCallbackKey2;
 
