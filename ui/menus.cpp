@@ -4032,6 +4032,8 @@ local void ScenSelectOk(void)
 */
 local void ScenSelectCancel(void)
 {
+    // FIXME: why is all this below needed?
+/*
     char *s;
 
     //
@@ -4055,6 +4057,7 @@ local void ScenSelectCancel(void)
     }
 
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+*/
 
     CurrentMenu->Items[9].d.button.text = NULL;
 
