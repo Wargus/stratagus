@@ -546,7 +546,7 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "count")) {
 			lua_rawgeti(l, -1, j + 1);
-			unit->Data.Train.Count = LuaToNumber(l, 1);
+			unit->Data.Train.Count = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "queue")) {
 			int subargs;
@@ -561,6 +561,7 @@ local void CclParseTrain(lua_State* l, Unit* unit)
 			for (i = 0, k = 0; i < MAX_UNIT_TRAIN && k < subargs; ++i, ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				value = LuaToString(l, -1);
+				lua_pop(l, 1);
 				if (!strcmp(value, "unit-none")) {
 					unit->Data.Train.What[i] = NULL;
 				} else {
