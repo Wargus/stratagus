@@ -68,6 +68,48 @@ global int CurrentMenu = -1;
 
 local int MenuButtonUnderCursor = -1;
 
+/**
+**	Items for the Game Menu
+*/
+local Menuitem GameMenuItems[] = {
+    { MI_TYPE_TEXT, { text:{ 128, 11, MI_FLAGS_CENTERED, LargeFont, "Game Menu"} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 40, MenuButtonDisabled, LargeFont,
+	 "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF11, GameMenuSave} } },
+    { MI_TYPE_BUTTON, { button:{ 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont,
+	 "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF12, NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36, MenuButtonDisabled, LargeFont,
+	 "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF5, NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont,
+	 "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF1, NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont,
+	 "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, 'o', NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont,
+	 "~!End Scenario", 224, 27, MBUTTON_GM_FULL, 'e', GameMenuEnd} } },
+    { MI_TYPE_BUTTON, { button:{ 16, 288-40, MenuButtonSelected, LargeFont,
+	 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, '\033', GameMenuReturn} } },
+};
+/**
+**	Items for the Victory Menu
+*/
+local Menuitem VictoryMenuItems[] = {
+    { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "Congratulations!"} } },
+    { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "You are victorious!"} } },
+    { MI_TYPE_BUTTON, { button:{ 32, 56, MenuButtonDisabled, LargeFont,
+	 "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF11, NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
+	 "~!Victory", 224, 27, MBUTTON_GM_FULL, 'v', GameMenuEnd} } },
+};
+
+/**
+**	Items for the Lost Menu
+*/
+local Menuitem LostMenuItems[] = {
+    { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "You failed to"} } },
+    { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "achieve victory!"} } },
+    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
+	 "~!OK", 224, 27, MBUTTON_GM_FULL, 'o', GameMenuEnd} } },
+};
+
 global Menu Menus[] = {
     {
 	/// Game Menu
@@ -76,23 +118,25 @@ global Menu Menus[] = {
 	ImagePanel1,
 	RedrawMapOverlay,
 	8,
-	{
-	    { MI_TYPE_TEXT, { text:{ 128, 11, MI_FLAGS_CENTERED, LargeFont, "Game Menu"} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 40, MenuButtonDisabled, LargeFont,
-		 "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF11, GameMenuSave} } },
-	    { MI_TYPE_BUTTON, { button:{ 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont,
-		 "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, KeyCodeF12, NULL} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36, MenuButtonDisabled, LargeFont,
-		 "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF5, NULL} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont,
-		 "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF1, NULL} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36, MenuButtonDisabled, LargeFont,
-		 "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, 'o', NULL} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont,
-		 "~!End Scenario", 224, 27, MBUTTON_GM_FULL, 'e', GameMenuEnd} } },
-	    { MI_TYPE_BUTTON, { button:{ 16, 288-40, MenuButtonSelected, LargeFont,
-		 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, '\033', GameMenuReturn} } },
-	},
+	GameMenuItems
+    },
+    {
+	/// Victory Menu
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-128)/2,
+	ImagePanel4,
+	RedrawMapOverlay,
+	4,
+	VictoryMenuItems
+    },
+    {
+	/// Lost Menu
+	176+(14*TileSizeX-288)/2,
+	16+(14*TileSizeY-128)/2,
+	ImagePanel4,
+	RedrawMapOverlay,
+	3,
+	LostMenuItems
     },
 };
 
