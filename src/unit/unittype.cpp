@@ -695,16 +695,33 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( flag ) {
 	CLprintf(file,")\n");
     }
-
+    
     for( i=flag=0; i<MaxCosts; ++i ) {
-	if( all || type->_Costs[i] ) {
+	if( type->ImproveIncomes[i] > DefaultIncomes[i] ) {
 	    if( !flag ) {
-		CLprintf(file,"  'repair-costs '(");
+		CLprintf(file,"   'improve-production '(");
 		flag=1;
 	    } else {
 		CLprintf(file," ");
 	    }
-	    CLprintf(file,"%s %d",DefaultResourceNames[i],type->_RepairCosts[i]);
+	    CLprintf(file,"%s %d ",DefaultResourceNames[i],type->ImproveIncomes[i]-DefaultIncomes[i]);
+	}
+    }
+    if( flag ) {
+	CLprintf(file,")\n");
+    }
+
+    if( type->RepairHP ) {
+	for( i=flag=0; i<MaxCosts; ++i ) {
+	    if( all || type->_Costs[i] ) {
+		if( !flag ) {
+		    CLprintf(file,"  'repair-costs '(");
+		    flag=1;
+		} else {
+		    CLprintf(file," ");
+		}
+		CLprintf(file,"%s %d",DefaultResourceNames[i],type->_RepairCosts[i]);
+	    }
 	}
     }
     if( flag ) {
