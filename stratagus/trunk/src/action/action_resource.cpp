@@ -708,7 +708,8 @@ void ResourceGiveUp(Unit* unit)
 */
 global void HandleActionResource(Unit* unit)
 {
-    int ret,newres;
+    int ret;
+    int newres;
 
     DebugLevel3Fn("%s(%d) SubAction %d TTH %d res %s goal %ul\n"
 	_C_ unit->Type->Ident _C_ UnitNumber(unit) _C_ unit->SubAction

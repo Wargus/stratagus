@@ -98,20 +98,17 @@ typedef union
 // TTL's below are in ticks: approx: 500=13sec, 1000=25sec, 2000=50sec
 // FIXME use TTL, as in TICKS to live
     struct {
-	int Fields;		/// FIXME doc
-	int Shards;		/// FIXME doc
-	int Damage;		/// damage
-    } Blizzard;
+	int Fields;		/// The size of the affected square
+	int Shards;		/// Number of shards thrown.
+	int Damage;		/// Damage for every shard.
+	/// The offset of the missile start point to the hit location.
+	int StartOffsetX;
+	int StartOffsetY;
+    } AreaBombardment;
     
     struct {
 	UnitType *PortalType;	/// The unit type spawned
     } SpawnPortal;
-    
-    struct {
-	int Fields;		/// FIXME doc
-	int Shards;		/// FIXME doc
-	int Damage;		/// damage
-    } DeathAndDecay;
     
     struct {
 	int TTL;		/// time to live (ticks)
@@ -143,24 +140,28 @@ typedef union
     } invisibility;
     
     struct {
-	UnitType *unit;		/// The new form :)
-    } polymorph;
+	UnitType *NewForm;	/// The new form
+	//  TODO: temporary polymorphs would be awesome, but hard to implement
+    } Polymorph;
     
     struct {
-	UnitType *skeleton;		/// The unit to spwan from corpses
-    } raisedead;
+	UnitType *UnitType;	/// Type of unit to be summoned.
+	int TTL;		/// Time to live for summoned unit. 0 means infinite
+    } Summon;
     
     struct {
-	int TTL;			/// time to live (ticks)
-	int damage;			/// Damage.
+	UnitType *Skeleton;	/// The unit to spawn from corpses
+	int TTL;		/// Time to live for summon. 0 means infinite.
+    } RaiseDead;
+    //  What about a resurection spell?
+
+    struct {
+	int TTL;		/// time to live (ticks)
+	int Damage;		/// Damage.
     } runes;
     
     struct {
-	UnitType *unittype;		/// Type of unit to be summoned.
-    } summon;
-    
-    struct {
-	int  TTL;			/// time to live (ticks)
+	int  TTL;		/// time to live (ticks)
 	// FIXME: more configurations
     } whirlwind;
 } SpellActionType;
@@ -246,7 +247,7 @@ struct _spell_type_;
 /*
 **	Pointer on function that cast the spell.
 */
-typedef int f_spell(Unit* caster, const struct _spell_type_* spell, Unit* target,
+typedef int SpellFunc(Unit* caster, const struct _spell_type_* spell, Unit* target,
 	int x, int y);
 
 /**
@@ -260,7 +261,7 @@ typedef struct _spell_type_ {
 
     //	Spell Specifications
     TargetType	Target;			/// Targetting information. See TargetType.
-    f_spell *f;				/// function to cast the spell.
+    SpellFunc *f;				/// function to cast the spell.
     SpellActionType *SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
     int Range;				/// Max range of the target.
     int ManaCost;			/// required mana for each cast
@@ -337,21 +338,20 @@ extern unsigned CclGetSpellByIdent(SCM value);
 **	Spelltype to cast.
 */
 
-f_spell	CastHolyVision;
-f_spell	CastHealing;
-f_spell	CastHaste;
-f_spell	CastFireball;
-f_spell	CastFlameShield;
-f_spell	CastInvisibility;
-f_spell	CastPolymorph;
-f_spell	CastBlizzard;
-f_spell	CastSummon;
-f_spell	CastRunes;
-f_spell	CastDeathCoil;
-f_spell	CastRaiseDead;
-f_spell	CastWhirlwind;
-f_spell	CastDeathAndDecay;
-f_spell	CastCircleOfPower;
+SpellFunc CastHolyVision;
+SpellFunc CastHealing;
+SpellFunc CastHaste;
+SpellFunc CastFireball;
+SpellFunc CastFlameShield;
+SpellFunc CastInvisibility;
+SpellFunc CastPolymorph;
+SpellFunc CastAreaBombardment;
+SpellFunc CastSummon;
+SpellFunc CastRunes;
+SpellFunc CastDeathCoil;
+SpellFunc CastRaiseDead;
+SpellFunc CastWhirlwind;
+SpellFunc CastSpawnPortal;
 
 
 /*
