@@ -10,7 +10,7 @@
 //
 /**@name ccl_player.c	-	The player ccl functions. */
 //
-//	(c) Copyright 2001 by Lutz Sammer
+//	(c) Copyright 2001,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -245,11 +245,21 @@ local SCM CclPlayer(SCM list)
 }
 
 /**
+**	Get ThisPlayer.
+**
+**	@return		This player number.
+*/
+local SCM CclGetThisPlayer(void)
+{
+    return gh_int2scm(ThisPlayer-Players);
+}
+
+/**
 **	Set ThisPlayer.
 **
 **	@param plynr	This player number.
 */
-local SCM CclThisPlayer(SCM plynr)
+local SCM CclSetThisPlayer(SCM plynr)
 {
     ThisPlayer=&Players[gh_scm2int(plynr)];
 
@@ -309,6 +319,8 @@ local SCM CclSetAllPlayersTotalUnitLimit(SCM limit)
 **
 **	@param player	Player number to change.
 **	@param state	To which state this should be changed.
+**
+**	@todo diplomacy must send of the network
 */
 local SCM CclDiplomacy(SCM player,SCM state)
 {
@@ -329,6 +341,8 @@ local SCM CclDiplomacy(SCM player,SCM state)
 	ThisPlayer->Enemy|=1<<plynr;
 	ThisPlayer->Allied&=~(1<<plynr);
     }
+
+    // FIXME: must send over network!!
 
     // FIXME: we can return the old state
     return SCM_UNSPECIFIED;
@@ -383,7 +397,8 @@ local SCM CclNewPlayerColors(void)
 global void PlayerCclRegister(void)
 {
     gh_new_procedureN("player",CclPlayer);
-    gh_new_procedure1_0("this-player",CclThisPlayer);
+    gh_new_procedure0_0("get-this-player",CclGetThisPlayer);
+    gh_new_procedure1_0("set-this-player!",CclSetThisPlayer);
 
     gh_new_procedure1_0("set-all-players-food-unit-limit!",
 		CclSetAllPlayersFoodUnitLimit);
