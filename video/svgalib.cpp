@@ -1120,9 +1120,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Sound
 	//
+#ifndef WITH_ARTSC
 	if( !SoundOff && !SoundThreadRunning ) {
 	    FD_SET(SoundFildes, &wfds);
 	}
+#endif
 
 	//
 	//	Network
@@ -1131,6 +1133,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    FD_SET(NetworkFildes, &rfds);
 	}
 
+#ifdef WITH_ARTSC
+	if (ArtsGetSpace() >= 1024) {
+	    callbacks->SoundReady();
+	}
+#endif
 	ret = vga_waitevent(VGA_MOUSEEVENT | VGA_KEYEVENT, &rfds, &wfds, NULL,
 		&tv);
 
@@ -1138,10 +1145,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Sound
 	    //
+#ifndef WITH_ARTSC
 	    if(!SoundOff && !SoundThreadRunning
 		    && FD_ISSET(SoundFildes, &wfds)) {
 		callbacks->SoundReady();
 	    }
+#endif
 
 #if 0
 	    // ARI: needs network packets!
@@ -1161,6 +1170,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    }
 	}
 
+#ifdef WITH_ARTSC
+	if (ArtsGetSpace() >= 1024) {
+	    callbacks->SoundReady();
+	}
+#endif
 	//
 	//	Network in sync and time for frame over: return
 	//

@@ -1026,12 +1026,14 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Sound
 	//
+#ifndef WITH_ARTSC
 	if( !SoundOff && !SoundThreadRunning ) {
 	    if( SoundFildes>maxfd ) {
 		maxfd=SoundFildes;
 	    }
 	    FD_SET(SoundFildes,&wfds);
 	}
+#endif
 
 	//
 	//	Network
@@ -1043,6 +1045,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    FD_SET(NetworkFildes,&rfds);
 	}
 
+#ifdef WITH_ARTSC
+	if (ArtsGetSpace() >= 1024) {
+	    callbacks->SoundReady();
+	}
+#endif
 #ifdef USE_ITIMER
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(morex|VideoInterrupts) ? &tv : NULL);
@@ -1083,10 +1090,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Sound
 	    //
+#ifndef WITH_ARTSC
 	    if( !SoundOff && !SoundThreadRunning
 		    && FD_ISSET(SoundFildes,&wfds) ) {
 		callbacks->SoundReady();
 	    }
+#endif
 
 	    //
 	    //	Network
@@ -1096,6 +1105,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    }
 
 	}
+#ifdef WITH_ARTSC
+	if (ArtsGetSpace() >= 1024) {
+	    callbacks->SoundReady();
+	}
+#endif
 
 	//
 	//	Not more input and time for frame over: return

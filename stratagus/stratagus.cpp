@@ -445,7 +445,7 @@ local void WaitCallbackExit(void)
 **
 **	@param frame	Current frame.
 */
-local void VideoEffect0(int frame)
+local void VideoEffect0(int frame, const EventCallback* callbacks)
 {
     int i;
     static Graphic* Logo;
@@ -560,9 +560,10 @@ global void EffectDrawCircle(int* ptr,int depth,int x,int y,int r)
 /**
 **	Test some video effects.
 **
-**	@param frame	Current frame.
+**	@param frame		Current frame.
+**	@param callbacks	Call backs that handle events.
 */
-local void VideoEffect0(int frame)
+local void VideoEffect0(int frame, const EventCallback* callbacks)
 {
     static int* buf1;
     static int* buf2;
@@ -656,6 +657,11 @@ local void VideoEffect0(int frame)
     //
     VideoLockScreen();
     for( y=1; y<VideoHeight-1; ++y ) {
+#ifdef WITH_ARTSC
+	if (ArtsGetSpace() >= 1024) {
+	    callbacks->SoundReady();
+	}
+#endif
 	for( x=1; x<VideoWidth-1; ++x ) {
 	    int xo;
 	    int yo;
@@ -868,10 +874,10 @@ local void WaitForInput(int timeout)
     WaitNoEvent=1;
     timeout*=CYCLES_PER_SECOND;
     while( timeout-- && WaitNoEvent ) {
-	VideoEffect0(timeout);
+	VideoEffect0(timeout, &callbacks);
 	WaitEventsOneFrame(&callbacks);
     }
-    VideoEffect0(-1);
+    VideoEffect0(-1, &callbacks);
 #endif
 
     VideoLockScreen();
@@ -1221,6 +1227,7 @@ global volatile void Exit(int err)
 
     StopMusic();
     QuitSound();
+    QuitCD();
     NetworkQuit();
 
     ExitNetwork1();
