@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name icons.c	-	The icons. */
+/**@name icons.c - The icons. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -49,53 +49,53 @@
 #include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
-**		Maps the original icon numbers in puds to our internal strings.
+**  Maps the original icon numbers in puds to our internal strings.
 */
 global char** IconWcNames;
 
 // FIXME: Can be removed:
-global int IconWidth;						/// Icon width in panels
-global int IconHeight;						/// Icon height in panels
+global int IconWidth;                       /// Icon width in panels
+global int IconHeight;                      /// Icon height in panels
 
-local Icon** Icons;						/// Table of all icons.
-local int NumIcons;						/// Number of icons in Icons.
+local Icon** Icons;                         /// Table of all icons.
+local int NumIcons;                         /// Number of icons in Icons.
 
-local char** IconAliases;				/// Table of all aliases for icons.
-local int NumIconAliases;				/// Number of icons aliases in Aliases.
+local char** IconAliases;                   /// Table of all aliases for icons.
+local int NumIconAliases;                   /// Number of icons aliases in Aliases.
 
-#ifdef DOXYGEN								// no real code, only for document
+#ifdef DOXYGEN                              // no real code, only for document
 
-local IconFile* IconFileHash[61];		/// lookup table for icon file names
+local IconFile* IconFileHash[61];           /// lookup table for icon file names
 
-local Icon* IconHash[61];				/// lookup table for icon names
+local Icon* IconHash[61];                   /// lookup table for icon names
 
 #else
 
 local hashtable(IconFile*, 61) IconFileHash;/// lookup table for icon file names
 
-local hashtable(Icon*, 61) IconHash;		/// lookup table for icon names
+local hashtable(Icon*, 61) IconHash;        /// lookup table for icon names
 
 #endif
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		@brief Add an icon definition.
+**  Add an icon definition.
 **
-**		@bug Redefining an icon isn't supported.
+**  @bug Redefining an icon isn't supported.
 **
-**		@param ident		Icon identifier.
-**		@param tileset		Optional tileset identifier.
-**		@param width		Icon width.
-**		@param height		Icon height.
-**		@param index		Index into file.
-**		@param file		Graphic file containing the icons.
+**  @param ident    Icon identifier.
+**  @param tileset  Optional tileset identifier.
+**  @param width    Icon width.
+**  @param height   Icon height.
+**  @param index    Index into file.
+**  @param file     Graphic file containing the icons.
 */
 local void AddIcon(const char* ident, const char* tileset,
 	int index, int width, int height, const char* file)
@@ -111,7 +111,7 @@ local void AddIcon(const char* ident, const char* tileset,
 	ptr = (void **)hash_find(IconFileHash, file);
 	if (ptr && *ptr) {
 		iconfile = *ptr;
-	} else {								// new file
+	} else {  // new file
 		iconfile = malloc(sizeof(IconFile));
 		iconfile->FileName = strdup(file);
 		iconfile->Sprite = NULL;
@@ -153,9 +153,9 @@ local void AddIcon(const char* ident, const char* tileset,
 }
 
 /**
-**		Init the icons.
+**  Init the icons.
 **
-**		Add the short name and icon aliases to hash table.
+**  Add the short name and icon aliases to hash table.
 */
 global void InitIcons(void)
 {
@@ -185,8 +185,8 @@ global void InitIcons(void)
 }
 
 /**
-**		Load the graphics for the icons. Graphic data is only loaded once
-**		and than shared.
+**  Load the graphics for the icons. Graphic data is only loaded once
+**  and than shared.
 */
 global void LoadIcons(void)
 {
@@ -227,7 +227,7 @@ global void LoadIcons(void)
 }
 
 /**
-**		Cleanup memory used by the icons.
+**  Cleanup memory used by the icons.
 */
 global void CleanIcons(void)
 {
@@ -239,7 +239,7 @@ global void CleanIcons(void)
 	//
 	//  Mapping the original icon numbers in puds to our internal strings
 	//
-	if ((ptr = (void**)IconWcNames)) {		// Free all old names
+	if ((ptr = (void**)IconWcNames)) {  // Free all old names
 		while (*ptr) {
 			free(*ptr++);
 		}
@@ -283,7 +283,7 @@ global void CleanIcons(void)
 		NumIcons = 0;
 
 		//
-		//	  Handle the icon files.
+		//  Handle the icon files.
 		//
 		for (i = 0; i < n; ++i) {
 			hash_del(IconFileHash, table[i]->FileName);
@@ -310,11 +310,11 @@ global void CleanIcons(void)
 }
 
 /**
-**		Find the icon by identifier.
+**  Find the icon by identifier.
 **
-**		@param ident		The icon identifier.
+**  @param ident  The icon identifier.
 **
-**		@return				Icon pointer or NoIcon == NULL if not found.
+**  @return       Icon pointer or NoIcon == NULL if not found.
 */
 global Icon* IconByIdent(const char *ident)
 {
@@ -331,11 +331,11 @@ global Icon* IconByIdent(const char *ident)
 }
 
 /**
-**		Get the identifier of an icon.
+**  Get the identifier of an icon.
 **
-**		@param icon		Icon pointer
+**  @param icon  Icon pointer
 **
-**		@return				The identifier for the icon
+**  @return      The identifier for the icon
 */
 global const char* IdentOfIcon(const Icon* icon)
 {
@@ -345,12 +345,12 @@ global const char* IdentOfIcon(const Icon* icon)
 }
 
 /**
-**		Draw icon on x,y.
+**  Draw icon on x,y.
 **
-**		@param player		Player pointer used for icon colors
-**		@param icon		Icon identifier
-**		@param x		X display pixel position
-**		@param y		Y display pixel position
+**  @param player  Player pointer used for icon colors
+**  @param icon    Icon identifier
+**  @param x       X display pixel position
+**  @param y       Y display pixel position
 */
 global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
@@ -359,13 +359,13 @@ global void DrawIcon(const Player* player, Icon* icon, int x, int y)
 }
 
 /**
-**		Draw unit icon 'icon' with border on x,y
+**  Draw unit icon 'icon' with border on x,y
 **
-**		@param player		Player pointer used for icon colors
-**		@param icon		Icon identifier
-**		@param flags		State of icon (clicked, mouse over...)
-**		@param x		X display pixel position
-**		@param y		Y display pixel position
+**  @param player  Player pointer used for icon colors
+**  @param icon    Icon identifier
+**  @param flags   State of icon (clicked, mouse over...)
+**  @param x       X display pixel position
+**  @param y       Y display pixel position
 */
 global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	int x, int y)
@@ -381,7 +381,7 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	DebugCheck(!icon);
 
 	//
-	//		Black border around icon with gray border if active.
+	//  Black border around icon with gray border if active.
 	//
 	color = (flags & (IconActive | IconClicked)) ? ColorGray : ColorBlack;
 
@@ -391,13 +391,13 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 	VideoDrawRectangleClip(ColorBlack, x + 1, y + 1,
 		width + 5, height + 5);
 
-	// _|		Shadow
+	// _|  Shadow
 	VideoDrawVLine(ColorGray, x + width + 3, y + 2, height + 1);
 	VideoDrawVLine(ColorGray, x + width + 4, y + 2, height + 1);
 	VideoDrawHLine(ColorGray, x + 2, y + height + 3, width + 3);
 	VideoDrawHLine(ColorGray, x + 2, y + height + 4, width + 3);
 
-	// |~		Light
+	// |~  Light
 	color = (flags & IconClicked) ? ColorGray : ColorWhite;
 	VideoDrawHLine(color, x + 4, y + 2, width - 1);
 	VideoDrawHLine(color, x + 4, y + 3, width - 1);
@@ -476,9 +476,9 @@ global void SaveIcons(CLFile* file)
 }
 
 /**
-**		@brief Parse icon definition.
+**  Parse icon definition.
 **
-**		@param list		Icon definition list.
+**  @param list  Icon definition list.
 */
 local int CclDefineIcon(lua_State* l)
 {
@@ -489,60 +489,44 @@ local int CclDefineIcon(lua_State* l)
 	int width;
 	int height;
 	int index;
-	int args;
-	int j;
 
-	args = lua_gettop(l);
-	j = 0;
-#ifdef DEBUG
-	index = width = height = 0;
-#endif
-	filename = NULL;
-	tileset = NULL;
+	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	width = height = index = 0;
+	ident = tileset = filename = NULL;
 
-	//  Identifier
-
-	ident = LuaToString(l, j + 1);
-	++j;
-
-	//
-	//  Parse the arguments, tagged format.
-	//
-	for (; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
-
-		if (!strcmp(value, "tileset")) {
-			tileset = LuaToString(l, j + 1);
-		} else if (!strcmp(value, "size")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+	lua_pushnil(l);
+	while (lua_next(l, 1)) {
+		value = LuaToString(l, -2);
+		if (!strcmp(value, "Name")) {
+			ident = LuaToString(l, -1);
+		} else if (!strcmp(value, "Tileset")) {
+			tileset = LuaToString(l, -1);
+		} else if (!strcmp(value, "Size")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-			lua_rawgeti(l, j + 1, 1);
+			lua_rawgeti(l, -1, 1);
 			width = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
+			lua_rawgeti(l, -1, 2);
 			height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "normal")) {
-			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
-				lua_pushstring(l, "incorrect argument");
-				lua_error(l);
-			}
-			lua_rawgeti(l, j + 1, 1);
-			index = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
+		} else if (!strcmp(value, "File")) {
 			filename = LuaToString(l, -1);
-			lua_pop(l, 1);
+		} else if (!strcmp(value, "Index")) {
+			index = LuaToNumber(l, -1);
 		} else {
 			lua_pushfstring(l, "Unsupported tag: %s", value);
 			lua_error(l);
 		}
+		lua_pop(l, 1);
 	}
 
-	DebugCheck(!filename || !width || !height);
+	DebugCheck(!ident || !filename || !width || !height);
 
 	AddIcon(ident, tileset, index, width, height, filename);
 
@@ -550,13 +534,9 @@ local int CclDefineIcon(lua_State* l)
 }
 
 /**
-**		@brief Parse icon alias definition.
+**  Parse icon alias definition.
 **
-**		@todo
-**				Should check if alias is free and icon already defined.
-**
-**		@param alias		Icon alias name.
-**		@param icon		Original icon.
+**  @todo  Should check if alias is free and icon already defined.
 */
 local int CclDefineIconAlias(lua_State* l)
 {
@@ -573,9 +553,7 @@ local int CclDefineIconAlias(lua_State* l)
 }
 
 /**
-**		@brief Define icon mapping from original number to internal symbol
-**
-**		@param list		List of all names.
+**  Define icon mapping from original number to internal symbol
 */
 local int CclDefineIconWcNames(lua_State* l)
 {
@@ -583,7 +561,7 @@ local int CclDefineIconWcNames(lua_State* l)
 	int j;
 	char** cp;
 
-	if ((cp = IconWcNames)) {		// Free all old names
+	if ((cp = IconWcNames)) {  // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -591,7 +569,7 @@ local int CclDefineIconWcNames(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	//  Get new table.
 	//
 	i = lua_gettop(l);
 	IconWcNames = cp = malloc((i + 1) * sizeof(char*));
@@ -609,11 +587,8 @@ local int CclDefineIconWcNames(lua_State* l)
 }
 
 /**
-**		Set icon size
-** FIXME: can be removed:
-**
-**		@param width		Width of icon.
-**		@param height		Height of icon.
+**  Set icon size
+**  FIXME: can be removed:
 */
 local int CclSetIconSize(lua_State* l)
 {
@@ -627,10 +602,9 @@ local int CclSetIconSize(lua_State* l)
 }
 
 /**
-**		Register CCL features for icons.
+**  Register CCL features for icons.
 **
-**		@todo
-**				Add more functions for CCL. (draw-icon)
+**  @todo  Add more functions for CCL. (draw-icon)
 */
 global void IconCclRegister(void)
 {
