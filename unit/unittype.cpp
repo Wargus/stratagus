@@ -900,6 +900,9 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     if( type->ClicksToExplode ) {
 	CLprintf(file,"  'clicks-to-explode %d\n",type->ClicksToExplode);
     }
+    if( type->Sniper ) {
+	CLprintf(file,"  'sniper \n");
+    }
     if( type->Revealer ) {
 	CLprintf(file,"  'revealer\n");
     }
@@ -1342,6 +1345,10 @@ global void LoadUnitTypes(void)
 	//	Lookup icons.
 	//
 	type->Icon.Icon=IconByIdent(type->Icon.Name);
+	if (!type->Icon.Icon) {
+	    printf("Can't find icon %s\n",type->Icon.Name);
+	    ExitFatal(-1);
+	}
 	//
 	//	Lookup missiles.
 	//
