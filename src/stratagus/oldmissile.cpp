@@ -1323,7 +1323,7 @@ global void MissileHit(Missile* missile)
     //
     if( !missile->Type->Range && missile->TargetUnit ) {
 	goal=missile->TargetUnit;
-	if( goal->Destroyed || !goal->HP ) {	// Destroyed or dead.
+	if( goal->Destroyed ) {			// Destroyed
 	    RefsDebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
