@@ -915,6 +915,10 @@ global void SavePreferences(void)
 	case CDModeDefined:
 	    strcpy(buf, "defined");
 	    break;
+	case CDModeStopped:
+	case CDModeOff:
+	    strcpy(buf, "off");
+	    break;
 	default:
 	    break;
     }
