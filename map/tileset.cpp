@@ -292,11 +292,13 @@ global void LoadTileset(void)
     TheMap.Tileset->WoodTable[19] = TheMap.Tileset->MidOneTree;
 
     //Mark which corners of each tile has tree in it.
-    //All corners for solid tiles.
+    //All corners for solid tiles. (Same for rocks)
     //1 Bottom Left
     //2 Bottom Right
     //4 Top Right
     //8 Top Left
+    //16 Bottom Tree Tile
+    //32 Top Tree Tile
     for (i = solid; i < solid + 16; i++ ) {
 	TheMap.Tileset->MixedLookupTable[table[i]] = 15;
     }
@@ -335,6 +337,12 @@ global void LoadTileset(void)
 		break;
 	}
     }
+    //16 Bottom Tree Special
+    //32 Top Tree Special
+    //64 Mid tree special - differentiate with mixed tiles.
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneTree]=12+16;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneTree]=3+32;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneTree]=15+48;
 
     //
     //  Build rock removement table.
@@ -401,6 +409,10 @@ global void LoadTileset(void)
 		break;
 	}
     }
+
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->BotOneRock]=12+16;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->TopOneRock]=3+32;
+    TheMap.Tileset->MixedLookupTable[TheMap.Tileset->MidOneRock]=15+48;
 
     TheMap.Tileset->RockTable[ 0] = -1;
     TheMap.Tileset->RockTable[ 1] = table[mixed + 0x30]; 
