@@ -224,11 +224,11 @@ global void LoadGame(char* filename)
 
     old_siod_verbose_level = siod_verbose_level;
     siod_verbose_level = 4;
-    user_gc(SCM_BOOL_F);
+    CclGarbageCollect(0);
     siod_verbose_level = old_siod_verbose_level;
     InitVisionTable();
     gh_load(filename);
-    user_gc(SCM_BOOL_F);
+    CclGarbageCollect(0);
 
     game_cycle = GameCycle;
     // FIXME: log should be loaded from the save game
