@@ -17,13 +17,14 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "freecraft.h"
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -31,6 +32,10 @@
 #include "tileset.h"
 #include "map.h"
 #include "interface.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Move to goldmine.
@@ -46,11 +51,23 @@ local int MoveToGoldMine(Unit* unit)
     if( !HandleActionMove(unit) ) {	// reached end-point
 	return 0;
     }
+    // FIXME: support new return values of the pathfinder
     // FIXME: HandleActionMove must return this: reached nearly?
 
     unit->Command.Action=UnitActionMineGold;
 
     destu=unit->Command.Data.Move.Goal;
+#ifdef NEW_UNIT
+    if( destu && (destu->Destroyed || !destu->HP) ) {
+	DebugLevel1("WAIT after goldmine destroyed %d\n",unit->Wait);
+	if( !--destu->Refs ) {
+	    ReleaseUnit(destu);
+	}
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+#endif
     if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
 	DebugLevel3("GOLD-MINE NOT REACHED %d,%d\n",dx,dy);
 	return -1;
@@ -61,14 +78,18 @@ local int MoveToGoldMine(Unit* unit)
     //
     // FIXME: hmmm... we're in trouble here.
     // we should check if there's still some gold left in the mine instead.
+#ifdef NEW_UNIT
+    --destu->Refs;
+#else
     if( !destu->Type->GoldMine ) {  // Goldmine destroyed.
 	DebugLevel1("WAIT after goldmine destroyed %d\n",unit->Wait);
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
+#endif
     destu->Command.Data.GoldMine.Active++;
-    destu->Frame=1;			// FIXME: configurable
+    destu->Frame=1;			// FIXME: should be configurable
 
     RemoveUnit(unit);
     unit->X=destu->X;
@@ -148,14 +169,17 @@ local int MineInGoldmine(Unit* unit)
 	    DebugLevel3("Mine without goldmine\n");
 	} else {
 	    DropOutNearest(unit
-		    ,destu->X
-		    ,destu->Y
-		    ,mine->Type->TileWidth
-		    ,mine->Type->TileHeight);
+		    ,destu->X,destu->Y
+		    ,mine->Type->TileWidth,mine->Type->TileHeight);
 	    unit->Command.Data.Move.Fast=1;
 	    unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNIT
+	    ++destu->Refs;
+#endif
 	    unit->Command.Data.Move.Range=1;
 #if 1
+	    // FIXME: old pathfinder didn't found the path to the nearest
+	    // FIXME: point of the unit
 	    NearestOfUnit(destu,unit->X,unit->Y
 		,&unit->Command.Data.Move.DX
 		,&unit->Command.Data.Move.DY);
@@ -173,8 +197,7 @@ local int MineInGoldmine(Unit* unit)
 	} else {
 	    DebugLevel0("Wrong unit (%d,%d) for mining gold %d (%s)\n"
 		,unit->X,unit->Y
-		,unit->Type->Type
-		,unit->Type->Name);
+		,unit->Type->Type,unit->Type->Name);
 	}
 	if( UnitVisible(unit) ) {
 	    MustRedraw|=RedrawMap;
@@ -200,6 +223,161 @@ local int MineInGoldmine(Unit* unit)
 }
 
 /**
+**	Move to gold deposit.
+**
+**	@param unit	Pointer to worker unit.
+**
+**	@return		TRUE if ready, otherwise FALSE.
+*/
+local int MoveToGoldDeposit(Unit* unit)
+{
+    int x;
+    int y;
+    Unit* destu;
+
+    if( !HandleActionMove(unit) ) {	// reached end-point
+	return 0;
+    }
+    // FIXME: support new return values of the pathfinder
+    // FIXME: HandleActionMove must return this: reached nearly?
+
+    unit->Command.Action=UnitActionMineGold;
+
+#ifdef NEW_UNIT
+    destu=unit->Command.Data.Move.Goal;
+
+    if( destu && (destu->Destroyed || !destu->HP) ) {
+	if( !--destu->Refs ) {
+	    ReleaseUnit(destu);
+	}
+	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
+    x=unit->Command.Data.Move.DX;
+    y=unit->Command.Data.Move.DY;
+    DebugCheck( destu!=GoldDepositOnMap(x,y) );
+
+    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
+	DebugLevel3("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+	    ,UnitNumber(destu),x,y
+	    ,MapDistanceToUnit(unit->X,unit->Y,destu));
+	return -1;
+    }
+
+    --destu->Refs;
+#else
+    x=unit->Command.Data.Move.DX;
+    y=unit->Command.Data.Move.DY;
+    destu=GoldDepositOnMap(x,y);
+    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
+	DebugLevel3("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
+	    ,UnitNumber(destu),x,y
+	    ,MapDistanceToUnit(unit->X,unit->Y,destu));
+	return -1;
+    }
+#endif
+
+    RemoveUnit(unit);
+    unit->X=destu->X;
+    unit->Y=destu->Y;
+
+    //
+    //	Update gold.
+    //
+    unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
+    if( unit->Player==ThisPlayer ) {
+	MustRedraw|=RedrawResources;
+    }
+    
+    if( unit->Type==UnitTypeOrcWorkerWithGold ) {
+	unit->Type=UnitTypeOrcWorker;
+    } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
+	unit->Type=UnitTypeHumanWorker;
+    } else {
+	DebugLevel0("Wrong unit (%d,%d) for returning gold %d (%s)\n"
+	    ,unit->X,unit->Y
+	    ,unit->Type->Type,unit->Type->Name);
+    }
+
+    if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
+	unit->Wait=WAIT_FOR_GOLD;
+    } else {
+	unit->Wait=MAX_UNIT_WAIT;
+    }
+    unit->Value=WAIT_FOR_GOLD-unit->Wait;
+
+    return 1;
+}
+
+/**
+**	Store gold in deposit.
+**
+**	@param unit	Pointer to worker unit.
+**
+**	@return		TRUE if ready, otherwise FALSE.
+*/
+local int StoreGoldInDeposit(Unit* unit)
+{
+    Unit* destu;
+    Unit* depot;
+
+    DebugLevel3("Waiting\n");
+    if( !unit->Value ) {
+	depot=unit->Command.Data.Move.Goal;
+	// Could be destroyed, but than we couldn't be in?
+
+	// FIXME: return to last position!
+	// FIXME: Ari says, don't automatic search a new mine.
+	if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
+#ifdef NEW_HEADING
+	    DropOutOnSide(unit,LookingW
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
+#else
+	    DropOutOnSide(unit,HeadingW
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
+#endif
+	    unit->Command.Action=UnitActionStill;
+	    unit->SubAction=0;
+	} else {
+	    DropOutNearest(unit,destu->X,destu->Y
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
+	    unit->Command.Data.Move.Fast=1;
+	    unit->Command.Data.Move.Goal=destu;
+#ifdef NEW_UNIT
+	    ++destu->Refs;
+#endif
+	    unit->Command.Data.Move.Range=1;
+#if 1
+	    // FIXME: old pathfinder didn't found the path to the nearest
+	    // FIXME: point of the unit
+	    NearestOfUnit(destu,unit->X,unit->Y
+		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY);
+#else
+	    unit->Command.Data.Move.DX=destu->X;
+	    unit->Command.Data.Move.DY=destu->Y;
+#endif
+	    unit->Command.Action=UnitActionMineGold;
+	}
+
+	if( UnitVisible(unit) ) {
+	    MustRedraw|=RedrawMap;
+	}
+	unit->Wait=1;
+	unit->SubAction=0;
+	return 1;
+    }
+    if( unit->Value<MAX_UNIT_WAIT ) {
+	unit->Wait=unit->Value;
+    } else {
+	unit->Wait=MAX_UNIT_WAIT;
+    }
+    unit->Value-=unit->Wait;
+    return 0;
+}
+
+/**
 **	Unit mines gold!
 **
 **	FIXME: must move to center of gold-mine.
@@ -209,12 +387,7 @@ local int MineInGoldmine(Unit* unit)
 */
 global void HandleActionMineGold(Unit* unit)
 {
-    int x;
-    int y;
-    int i;
-    Unit* destu;
-
-// FIXME: GoldMine and GreatHall hard coded
+    int ret;
 
     switch( unit->SubAction ) {
 	//
@@ -225,11 +398,16 @@ global void HandleActionMineGold(Unit* unit)
 	case 2:
 	case 3:
 	case 4:					// 4 tries to reach gold-mine
-	    if( (i=MoveToGoldMine(unit)) ) {
-		if( i==-1 ) {
+	    if( (ret=MoveToGoldMine(unit)) ) {
+		if( ret==-1 ) {
 		    if( ++unit->SubAction==5 ) {
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
+#ifdef NEW_UNIT
+			if( unit->Command.Data.Move.Goal ) {
+			    --unit->Command.Data.Move.Goal->Refs;
+			}
+#endif
 		    }
 		} else {
 		    unit->SubAction=64;
@@ -253,110 +431,29 @@ global void HandleActionMineGold(Unit* unit)
 	case 66:
 	case 67:
 	case 68:				// 4 tries to reach depot
-	    if( !HandleActionMove(unit) ) {	// reached end-point
-		return;
-	    }
-
-	    unit->Command.Action=UnitActionMineGold;
-	    x=unit->Command.Data.Move.DX;
-	    y=unit->Command.Data.Move.DY;
-	    destu=GoldDepositOnMap(x,y);
-	    if( !destu || MapDistanceToUnit(unit->X,unit->Y,destu)!=1 ) {
-		if( ++unit->SubAction==69 ) {
-		    DebugLevel2("GOLD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
-			,UnitNumber(destu),x,y
-			,MapDistanceToUnit(unit->X,unit->Y,destu));
-		    unit->Command.Action=UnitActionStill;
-		    unit->SubAction=0;
+	    if( (ret=MoveToGoldDeposit(unit)) ) {
+		if( ret==-1 ) {
+		    if( ++unit->SubAction==69 ) {
+			unit->Command.Action=UnitActionStill;
+			unit->SubAction=0;
+#ifdef NEW_UNIT
+			if( unit->Command.Data.Move.Goal ) {
+			    --unit->Command.Data.Move.Goal->Refs;
+			}
+#endif
+		    }
+		} else {
+		    unit->SubAction=128;
 		}
-		return;
 	    }
-
-	    RemoveUnit(unit);
-	    unit->X=destu->X;
-	    unit->Y=destu->Y;
-
-	    //
-	    //	Update gold.
-	    //
-	    unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
-	    if( unit->Player==ThisPlayer ) {
-	        MustRedraw|=RedrawResources;
-	    }
-	    
-	    if( unit->Type==UnitTypeOrcWorkerWithGold ) {
-		unit->Type=UnitTypeOrcWorker;
-	    } else if( unit->Type==UnitTypeHumanWorkerWithGold ) {
-		unit->Type=UnitTypeHumanWorker;
-	    } else {
-		DebugLevel0("Wrong unit (%d,%d) for returning gold %d (%s)\n"
-		    ,unit->X,unit->Y
-		    ,unit->Type->Type
-		    ,unit->Type->Name);
-	    }
-
-	    if( WAIT_FOR_GOLD<MAX_UNIT_WAIT ) {
-		unit->Wait=WAIT_FOR_GOLD;
-	    } else {
-		unit->Wait=MAX_UNIT_WAIT;
-	    }
-	    unit->Value=WAIT_FOR_GOLD-unit->Wait;
-	    unit->SubAction=128;
 	    break;
 
 	//
 	//	Wait for gold stored.
 	//
 	case 128:
-	    DebugLevel3("Waiting\n");
-	    if( !unit->Value ) {
-		// FIXME: return to last position!
-		// FIXME: Ari says, don't automatic search a new mine.
-		if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
-#ifdef NEW_HEADING
-		    DropOutOnSide(unit,LookingW
-			    ,UnitTypes[UnitGreatHall].TileWidth
-			    ,UnitTypes[UnitGreatHall].TileHeight);
-#else
-		    DropOutOnSide(unit,HeadingW
-			    ,UnitTypes[UnitGreatHall].TileWidth
-			    ,UnitTypes[UnitGreatHall].TileHeight);
-#endif
-		    unit->Command.Action=UnitActionStill;
-		    unit->SubAction=0;
-		} else {
-		    DropOutNearest(unit
-			    ,destu->X
-			    ,destu->Y
-			    ,UnitTypes[UnitGreatHall].TileWidth
-			    ,UnitTypes[UnitGreatHall].TileHeight);
-		    unit->Command.Data.Move.Fast=1;
-		    unit->Command.Data.Move.Goal=destu;
-		    unit->Command.Data.Move.Range=1;
-#if 1
-		    NearestOfUnit(destu,unit->X,unit->Y
-			,&unit->Command.Data.Move.DX
-			,&unit->Command.Data.Move.DY);
-#else
-		    unit->Command.Data.Move.DX=destu->X;
-		    unit->Command.Data.Move.DY=destu->Y;
-#endif
-		    unit->Command.Action=UnitActionMineGold;
-		    // unit->Value=UnitNumber(destu);  // unused...
-		}
-
-		if( UnitVisible(unit) ) {
-		    MustRedraw|=RedrawMap;
-		}
-		unit->Wait=1;
+	    if( StoreGoldInDeposit(unit) ) {
 		unit->SubAction=0;
-	    } else {
-		if( unit->Value<MAX_UNIT_WAIT ) {
-		    unit->Wait=unit->Value;
-		} else {
-		    unit->Wait=MAX_UNIT_WAIT;
-		}
-		unit->Value-=unit->Wait;
 	    }
 	    break;
     }

@@ -35,6 +35,122 @@
 #include "actions.h"
 #include "ai.h"
 
+/*
+**	Names for the unit-type table slots as used in puds.
+**
+**	NOTE: Would be soon global removed.
+*/
+#define	UnitFootman		0x00
+#define	UnitGrunt		0x01
+#define UnitPeasant		0x02
+#define UnitPeon		0x03
+#define UnitBallista		0x04
+#define UnitCatapult		0x05
+#define UnitKnight		0x06
+#define UnitOgre		0x07
+#define UnitArcher		0x08
+#define UnitAxethrower		0x09
+#define UnitMage		0x0A
+#define UnitDeathKnight		0x0B
+#define UnitPaladin		0x0C
+#define UnitOgreMage		0x0D
+#define UnitDwarves		0x0E
+#define UnitGoblinSappers	0x0F
+#define UnitAttackPeasant	0x10
+#define UnitAttackPeon		0x11
+#define UnitRanger		0x12
+#define UnitBerserker		0x13
+#define UnitAlleria		0x14
+#define UnitTeronGorefiend	0x15
+#define UnitKurdanAndSky_ree	0x16
+#define UnitDentarg		0x17
+#define UnitKhadgar		0x18
+#define UnitGromHellscream	0x19
+//#define UnitTankerHuman	0x1A
+//#define UnitTankerOrc		0x1B
+#define UnitTransportHuman	0x1C
+#define UnitTransportOrc	0x1D
+#define UnitElvenDestroyer	0x1E
+#define UnitTrollDestroyer	0x1F
+#define UnitBattleship		0x20
+#define UnitJuggernaught	0x21
+#define UnitNothing		0x22
+#define UnitDeathwing		0x23
+#define UnitNothing1		0x24
+#define UnitNothing2		0x25
+#define UnitGnomishSubmarine	0x26
+#define UnitGiantTurtle		0x27
+#define UnitGnomishFlyingMachine 0x28
+#define UnitGoblinZeppelin	0x29
+#define UnitGryphonRider	0x2A
+#define UnitDragon		0x2B
+#define UnitTuralyon		0x2C
+#define UnitEyeOfKilrogg	0x2D
+#define UnitDanath		0x2E
+#define UnitKorgathBladefist	0x2F
+#define UnitNothing3		0x30
+#define UnitCho_gall		0x31
+#define UnitLothar		0x32
+#define UnitGul_dan		0x33
+#define UnitUtherLightbringer	0x34
+#define UnitZuljin		0x35
+#define UnitNothing4		0x36
+#define UnitSkeleton		0x37
+#define UnitDaemon		0x38
+#define UnitCritter		0x39
+#define UnitFarm		0x3A
+#define UnitPigFarm		0x3B
+#define UnitBarracksHuman	0x3C
+#define UnitBarracksOrc		0x3D
+#define UnitChurch		0x3E
+#define UnitAltarOfStorms	0x3F
+#define UnitScoutTowerHuman	0x40
+#define UnitScoutTowerOrc	0x41
+#define UnitStables		0x42
+#define UnitOgreMound		0x43
+#define UnitGnomishInventor	0x44
+#define UnitGoblinAlchemist	0x45
+#define UnitGryphonAviary	0x46
+#define UnitDragonRoost		0x47
+#define UnitShipyardHuman	0x48
+#define UnitShipyardOrc		0x49
+#define UnitTownHall		0x4A
+#define UnitGreatHall		0x4B
+#define UnitElvenLumberMill	0x4C
+#define UnitTrollLumberMill	0x4D
+#define UnitFoundryHuman	0x4E
+#define UnitFoundryOrc		0x4F
+#define UnitMageTower		0x50
+#define UnitTempleOfTheDamned	0x51
+#define UnitBlacksmithHuman	0x52
+#define UnitBlacksmithOrc	0x53
+#define UnitRefineryHuman	0x54
+#define UnitRefineryOrc		0x55
+#define UnitOilPlatformHuman	0x56
+#define UnitOilPlatformOrc	0x57
+#define UnitKeep		0x58
+#define UnitStronghold		0x59
+#define UnitCastle		0x5A
+#define UnitFortress		0x5B
+//#define UnitGoldMine		0x5C
+#define UnitOilPatch		0x5D
+#define UnitStartLocationHuman	0x5E
+#define UnitStartLocationOrc	0x5F
+#define UnitGuardTowerHuman	0x60
+#define UnitGuardTowerOrc	0x61
+#define UnitCannonTowerHuman	0x62
+#define UnitCannonTowerOrc	0x63
+#define UnitCircleofPower	0x64
+#define UnitDarkPortal		0x65
+#define UnitRunestone		0x66
+#define UnitWallHuman		0x67
+#define UnitWallOrc		0x68
+#define UnitDeadBody		0x69
+#define Unit1x1DestroyedPlace	0x6A
+#define Unit2x2DestroyedPlace	0x6B
+#define Unit3x3DestroyedPlace	0x6C
+#define Unit4x4DestroyedPlace	0x6D
+
 /*----------------------------------------------------------------------------
 --      Ai tables
 ----------------------------------------------------------------------------*/
@@ -1157,19 +1273,19 @@ local int AiNeedBuilding(int type)
     typep=UnitTypes+type;
     if( typep==UnitTypeHumanWorker || typep==UnitTypeOrcWorker ) {
 	if(AiNoBuilding(UnitTownHall)) return 1;
+    } else if( typep==UnitTypeByIdent("unit-ballista")
+	    || typep==UnitTypeByIdent("unit-catapult") ) {
+	if(AiNoBuilding(UnitTownHall)) return 1;
+	if(AiNoBuilding(UnitBlacksmithHuman)) return 1;
+    } else if( typep==UnitTypeByIdent("unit-archer")
+	    || typep==UnitTypeByIdent("unit-axethrower") ) {
+	if(AiNoBuilding(UnitTownHall)) return 1;
+	if(AiNoBuilding(UnitElvenLumberMill)) return 1;
+    } else if( typep==UnitTypeByIdent("unit-footman")
+	    || typep==UnitTypeByIdent("unit-grunt") ) {
+	if(AiNoBuilding(UnitTownHall)) return 1;
+	if(AiNoBuilding(UnitBarracksHuman)) return 1;
     }
-    switch(type)
-        {
-        case UnitBallista: case UnitCatapult:
-          if(AiNoBuilding(UnitTownHall)) return 1;
-          if(AiNoBuilding(UnitBlacksmithHuman)) return 1;
-        case UnitArcher: case UnitAxethrower:
-          if(AiNoBuilding(UnitTownHall)) return 1;
-          if(AiNoBuilding(UnitElvenLumberMill)) return 1;
-        case UnitFootman: case UnitGrunt:
-          if(AiNoBuilding(UnitTownHall)) return 1;
-          if(AiNoBuilding(UnitBarracksHuman)) return 1;
-        }
     return 0;
     }
 
@@ -1439,7 +1555,7 @@ global void AiInit(Player* player)
     player->Ai=aip=&Ais[player->Player];
     aip->Player=player;
 
-    for(i=0; i<UnitTypeMax/(sizeof(int)*8); ++i) {aip->Build[i]=0;}
+    for(i=0; i<UnitTypeInternalMax/(sizeof(int)*8); ++i) {aip->Build[i]=0;}
     aip->GoalHead=(AiGoal*)&aip->GoalNil1;
     aip->GoalNil1=(AiGoal*)0;
     aip->GoalTail=(AiGoal*)&aip->GoalHead;

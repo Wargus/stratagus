@@ -406,7 +406,9 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=what;
 #ifdef NEW_UNIT
-    what->Refs++;
+    if( what ) {
+	what->Refs++;
+    }
 #endif
     command->Data.Move.Range=0;
     command->Data.Move.SX=unit->X;
