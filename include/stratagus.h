@@ -57,8 +57,8 @@
 #define SPEED_OIL		1				/// Speed factor for getting oil
 #define SPEED_BUILD		1				/// Speed factor for building
 #define SPEED_TRAIN		1				/// Speed factor for training
-#define SPEED_UPGRADE		1				/// Speed factor for upgrading
-#define SPEED_RESEARCH		1				/// Speed factor for researching
+#define SPEED_UPGRADE	1				/// Speed factor for upgrading
+#define SPEED_RESEARCH	1				/// Speed factor for researching
 
 /*============================================================================
 ==		Compiler repairs
@@ -519,6 +519,7 @@ extern long isqrt(long num);
 	/// How near could a depot be build to a resource
 #define RESOURCE_DISTANCE		3
 
+extern char* CompileOptions;
 //@}
 
 #endif		// !__STRATAGUS_H__
