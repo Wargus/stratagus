@@ -618,6 +618,8 @@ global void DisplayPicture(const char* name)
 #endif
 
 #ifdef USE_SDL_SURFACE
+    // Unset the alpha color key, not needed
+    SDL_SetColorKey(picture->Surface, 0, 0);
     SDL_BlitSurface(picture->Surface, NULL, TheScreen, NULL);
 #else
     VideoLockScreen();
