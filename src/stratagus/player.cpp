@@ -54,11 +54,7 @@
 global int NumPlayers;			/// How many player slots used
 global Player Players[PlayerMax];	/// All players in play
 global Player* ThisPlayer;		/// Player on this computer
-
-/**
-**	Table mapping the original race numbers in puds to our internal string.
-*/
-global char** RaceWcNames;
+global PlayerRace PlayerRaces;		/// Player races
 
 global int NoRescueCheck;		/// Disable rescue check
 
@@ -110,6 +106,26 @@ global char* PlayerColorNames[PlayerMax] = {
 ----------------------------------------------------------------------------*/
 
 /**
+**	Get race array index by race type
+**
+**	@param race	Race
+**
+**	@return		Index to race in PlayerRaces
+*/
+global int PlayerRacesIndex(int race)
+{
+    int i;
+
+    for( i=0; i<PlayerRaces.Count; ++i ) {
+	if( PlayerRaces.Race[i]==race ) {
+	    return i;
+	}
+    }
+    fprintf(stderr,"Invalid race: %d\n", race);
+    return -1;
+}
+
+/**
 **	Init players.
 */
 global void InitPlayers(void)
@@ -127,7 +143,6 @@ global void InitPlayers(void)
 global void CleanPlayers(void)
 {
     int p;
-    char** ptr;
 
     for( p=0; p<PlayerMax; ++p ) {
 	if( Players[p].Name ) {
@@ -144,13 +159,11 @@ global void CleanPlayers(void)
     //
     //	Mapping the original race numbers in puds to our internal strings
     //
-    if( (ptr=RaceWcNames) ) {	// Free all old names
-	while( *ptr ) {
-	    free(*ptr++);
-	}
-	free(RaceWcNames);
-	RaceWcNames=NULL;
+    for( p=0; p<PlayerRaces.Count; ++p ) {
+	free(PlayerRaces.Name[p]);
+	free(PlayerRaces.Display[p]);
     }
+    PlayerRaces.Count=0;
 
     NoRescueCheck=0;
 }
@@ -166,7 +179,6 @@ global void SavePlayers(FILE* file)
 {
     int i;
     int j;
-    char** cp;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: players $Id$\n\n");
@@ -174,15 +186,17 @@ global void SavePlayers(FILE* file)
     //
     //	Dump table wc2 race numbers -> internal symbol.
     //
-    if( (cp=RaceWcNames) ) {
-	fprintf(file,"(define-race-wc-names");
-
-	i=90;
-	while( *cp ) {
-	    if( i+strlen(*cp)>79 ) {
-		i=fprintf(file,"\n ");
+    if( PlayerRaces.Count ) {
+	fprintf(file,"(define-race-names");
+	for( i=0; i<PlayerRaces.Count; ++i ) {
+	    fprintf(file,"\n  'race '(");
+	    fprintf(file,"\n    race %d",PlayerRaces.Race[i]);
+	    fprintf(file,"\n    name %s",PlayerRaces.Name[i]);
+	    fprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    if( PlayerRaces.Visible[i] ) {
+		fprintf(file,"\n    visible");
 	    }
-	    i+=fprintf(file," '%s",*cp++);
+	    fprintf(file,")");
 	}
 	fprintf(file,")\n\n");
     }
@@ -376,8 +390,8 @@ global void CreatePlayer(int type)
     }
 
     player->Type=type;
-    player->Race=PlayerRaceHuman;
-    player->RaceName=RaceWcNames[0];
+    player->Race=PlayerRaces.Race[0];
+    player->RaceName=PlayerRaces.Name[0];
     player->Team=team;
     player->Enemy=0;
     player->Allied=0;
@@ -482,21 +496,11 @@ global void CreatePlayer(int type)
 */
 global void PlayerSetSide(Player* player,int side)
 {
-    char** cp;
+    DebugCheck(side<0 || side>=PlayerRaces.Count);
+    DebugCheck(!PlayerRaces.Name[side]);
 
     player->Race=side;
-
-    if( (cp=RaceWcNames) ) {
-	while( *cp ) {
-	    if( !side-- ) {
-		player->RaceName=*cp;
-		return;
-	    }
-	    ++cp;
-	}
-    }
-    DebugLevel0Fn("Unsupported side %d\n" _C_ side);
-    player->RaceName="oops";
+    player->RaceName=PlayerRaces.Name[side];
 }
 
 /**
@@ -1022,6 +1026,7 @@ global void DebugPlayers(void)
 {
 #ifdef DEBUG
     int i;
+    int k;
     const char* colors[16] = {
 	"red", "blue", "green", "violett", "orange", "black", "white", "yellow",
 	"yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow",
@@ -1048,12 +1053,11 @@ global void DebugPlayers(void)
 	    case 6: DebugLevel0("rescue pas.  ");	break;
 	    case 7: DebugLevel0("rescue akt.  ");	break;
 	}
-	switch( Players[i].Race ) {
-	    case PlayerRaceHuman:   DebugLevel0("human   ");	break;
-	    case PlayerRaceOrc:     DebugLevel0("orc     ");	break;
-	    case PlayerRaceNeutral: DebugLevel0("neutral ");	break;
-	    default: DebugLevel0("what %d " _C_ Players[i].Race);	break;
+	k=PlayerRacesIndex(Players[i].Race);
+	if( k==-1 ) {
+	    k=PlayerRaces.Race[PlayerRaces.Count-1];
 	}
+	DebugLevel0("%09s" _C_ PlayerRaces.Name[k]);
 	DebugLevel0("%2d " _C_ Players[i].AiNum);
 	switch( Players[i].AiNum ) {
 	    case PlayerAiLand:	  DebugLevel0("(land)");	break;
