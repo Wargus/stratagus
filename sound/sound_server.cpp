@@ -156,7 +156,8 @@ local void MixMusicToStereo32(int* buffer, int size)
 
 		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 			// Add to our samples
-			buffer[i] += (buf[i] * MusicVolume) / 255;
+			// FIXME: why taking out '/ 2' leads to distortion
+			buffer[i] += buf[i] * MusicVolume / MaxVolume / 2;
 		}
 
 		if (n < len) {				// End reached
@@ -227,8 +228,9 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	}
 
 	for (i = 0; i < size; i += 2) {
-		buffer[i] += ((short*)(sample->Buffer))[index + i] * local_volume * left / 128 / 512;
-		buffer[i + 1] += ((short*)(sample->Buffer))[index + i + 1] * local_volume * right / 128 / 512;
+		// FIXME: why taking out '/ 2' leads to distortion
+		buffer[i] += ((short*)(sample->Buffer))[index + i] * local_volume * left / 128 / MaxVolume / 2;
+		buffer[i + 1] += ((short*)(sample->Buffer))[index + i + 1] * local_volume * right / 128 / MaxVolume / 2;
 	}
 
 	return size;
