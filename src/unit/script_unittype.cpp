@@ -364,8 +364,8 @@ local SCM CclDefineUnitType(SCM list)
 	    type->MouseAction = MouseActionMove;
 	} else if (gh_eq_p(value, gh_symbol2scm("right-harvest"))) {
 	    type->MouseAction = MouseActionHarvest;
-	} else if (gh_eq_p(value, gh_symbol2scm("right-demolish"))) {
-	    type->MouseAction = MouseActionDemolish;
+	} else if (gh_eq_p(value, gh_symbol2scm("right-spell-cast"))) {
+	    type->MouseAction = MouseActionSpellCast;
 	} else if (gh_eq_p(value, gh_symbol2scm("right-sail"))) {
 	    type->MouseAction = MouseActionSail;
 
@@ -373,12 +373,6 @@ local SCM CclDefineUnitType(SCM list)
 	    type->GroundAttack = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("can-attack"))) {
 	    type->CanAttack = 1;
-	} else if (gh_eq_p(value, gh_symbol2scm("demolish-range"))){
-	    type->DemolishRange = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("demolish-damage"))){
-	    type->DemolishDamage = gh_scm2int(gh_car(list));
-	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("repair-range"))) {
 	    type->RepairRange = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
@@ -593,14 +587,6 @@ local SCM CclDefineUnitType(SCM list)
 	   errl("Unsupported tag", value);
 	   DebugCheck(1);
 	}
-    }
-
-    //
-    //	Unit type checks.
-    //
-    if (type->CanCastSpell && !type->_MaxMana) {
-	DebugLevel0Fn("%s: Need max mana value\n" _C_ type->Ident);
-	type->_MaxMana = 1;
     }
 
     return SCM_UNSPECIFIED;

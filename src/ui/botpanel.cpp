@@ -135,8 +135,6 @@ global void SaveButtons(CLFile* file)
 		CLprintf(file, "'attack-ground"); break;
 	    case ButtonReturn:
 		CLprintf(file, "'return-goods"); break;
-	    case ButtonDemolish:
-		CLprintf(file, "'demolish"); break;
 	    case ButtonSpellCast:
 		CLprintf(file, "'cast-spell"); break;
 	    case ButtonResearch:
@@ -431,9 +429,6 @@ global void DrawButtonPanel(void)
 		case ButtonAttack:
 		    action = UnitActionAttack;
 		    break;
-		case ButtonDemolish:
-		    action = UnitActionDemolish;
-		    break;
 		case ButtonAttackGround:
 		    action = UnitActionAttackGround;
 		    break;
@@ -616,13 +611,6 @@ local void UpdateButtonPanelMultipleUnits(void)
 			    break;
 			}
 		    }
-		} else if (UnitButtonTable[z]->Action == ButtonDemolish) {
-		    for (i = NumSelected; --i;) {
-			if (Selected[i]->Type->Volatile) {
-			    allow = 1;
-			    break;
-			}
-		    }
 		} else if (UnitButtonTable[z]->Action == ButtonCancel) {
 		    allow = 1;
 		} else if (UnitButtonTable[z]->Action == ButtonCancelUpgrade) {
@@ -784,11 +772,6 @@ global void UpdateButtonPanel(void)
 			allow = 1;
 		    }
 		    break;
-		case ButtonDemolish:
-		    if (Selected[0]->Type->Volatile) {
-			allow = 1;
-		    }
-		    break;
 		case ButtonTrain:
 		    // Check if building queue is enabled
 		    if (!EnableTrainingQueue &&
@@ -890,7 +873,6 @@ global void DoButtonButtonClicked(int button)
 	case ButtonAttack:
 	case ButtonRepair:
 	case ButtonAttackGround:
-	case ButtonDemolish:
         case ButtonSpellCast:
 	    if (CurrentButtons[button].Action == ButtonSpellCast &&
 		    (KeyModifiers & ModifierControl)) {

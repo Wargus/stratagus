@@ -104,7 +104,7 @@ local void HandleSuicideClick(Unit* unit)
 
     // FIXME: make this configurable
     if (unit->Value == unit->Type->ClicksToExplode) {
-	SendCommandDemolish(unit, unit->X, unit->Y, 0, FlushCommands);
+	LetUnitDie(unit);
 	unit->Value = 0;
     }
 }

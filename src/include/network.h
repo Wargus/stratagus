@@ -93,7 +93,6 @@ enum _message_type_ {
     MessageCommandCancelUpgrade,	/// Unit command cancel upgrade
     MessageCommandResearch,		/// Unit command research
     MessageCommandCancelResearch,	/// Unit command cancel research
-    MessageCommandDemolish,		/// Unit command demolish
 
     MessageExtendedCommand,		/// Command is the next byte
 

@@ -326,9 +326,9 @@ F.E. "icon-knight", "icon-gold-mine".
     <dd>This should be used for resource gathering units. It will return goods when
     on a deposit and mine when on a resource.
     </dd>
-    <dt>right-demolish</dt>
-    <dd>This is for demolishing units. It will try to demolish instead of attack (since
-    demolishing units can still have a normal attack, but it really shouldn't be used)
+    <dt>right-spell-cast</dt>
+    <dd>This is an ugly hack for demolishing units. The unit will cast it's first
+    known spell(in order of spell definition) instead of attacking a hostile unit.
     </dd>
 <p></dl>
 <dt>can-gather-resource</dt>
@@ -461,13 +461,6 @@ F.E.: '( gold 2 wood 1 oil 1 ).
 </dd>
 <dt>detect-cloak</dt>
 <dd>Unit can detect cloaked units. If an unit is detected other units can attack it as well\
-</dd>
-<dt>demolish-range</dt>
-<dd>If non-zero this is the range for units that can demolish.The demolished area is a square, sorry.
-</dd>
-<dt>demolish-damage</dt>
-<dd>Damage dealt to unit affected by demolition. This can be 0, in this case
-only terrain will be affected. Units have to be in demolish-range to be affected.
 </dd>
 <dt>random-movement-probablitity</dt>
 <dd>When the unit is idle this is the probability that it will take a
