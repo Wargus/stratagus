@@ -51,9 +51,6 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-	/// Get unit-type.
-extern UnitType* CclGetUnitType(lua_State* l);
-
 #define MAX_SWITCH 256 /// Maximum number of switches
 
 /*----------------------------------------------------------------------------

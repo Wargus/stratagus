@@ -382,9 +382,6 @@ local int CclDefineAi(lua_State* l)
 --  AI script functions
 ----------------------------------------------------------------------------*/
 
-	/// Get unit-type.
-extern UnitType* CclGetUnitType(lua_State* l);
-
 /**
 **  Append unit-type to request table.
 **
