@@ -3699,6 +3699,7 @@ global void SaveUnits(CLFile* file)
 	unsigned char SlotUsage[MAX_UNIT_SLOTS / 8 + 1];
 	int InRun;
 	int RunStart;
+	int j;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: units $Id$\n\n");
@@ -3716,7 +3717,7 @@ global void SaveUnits(CLFile* file)
 #endif
 
 	CLprintf(file, "-- Unit slot usage bitmap\n");
-	CLprintf(file, "SlotUsage({");
+	CLprintf(file, "SlotUsage(");
 
 	memset(SlotUsage, 0, MAX_UNIT_SLOTS / 8 + 1);
 	for (i = 0; i < NumUnits; ++i) {
@@ -3735,6 +3736,7 @@ global void SaveUnits(CLFile* file)
 #else
 #define SlotUsed(slot)		(SlotUsage[(slot) / 8] & (1 << ((slot) % 8)))
 	RunStart = InRun = 0;
+	j = 0;
 	for (i = 0; i < MAX_UNIT_SLOTS; ++i) {
 		if (!InRun && SlotUsed(i)) {
 			InRun = 1;
@@ -3742,16 +3744,21 @@ global void SaveUnits(CLFile* file)
 		}
 		if (!SlotUsed(i) && InRun) {
 			InRun = 0;
-			if (i - 1 == RunStart) {
-				CLprintf(file, "%d, ", i - 1);
+			if (!j) {
+				j = 1;
 			} else {
-				CLprintf(file, "%d, \"-\", %d, ", RunStart, i - 1);
+				CLprintf(file, ", ");
+			}
+			if (i - 1 == RunStart) {
+				CLprintf(file, "%d", i - 1);
+			} else {
+				CLprintf(file, "%d, \"-\", %d", RunStart, i - 1);
 			}
 		}
 	}
 #endif
 
-	CLprintf (file, "})\n");
+	CLprintf (file, ")\n");
 
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);
