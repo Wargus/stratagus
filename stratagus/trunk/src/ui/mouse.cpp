@@ -1,11 +1,11 @@
 //   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
-//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
-//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
-//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//   \_	  _____/______	 ____	____ \_	  ___ \____________ _/ ____\/  |_
+//    |	   __) \_  __ \_/ __ \_/ __ \/	  \  \/\_  __ \__  \\	__\\   __\ 
+//    |	    \	|  | \/\  ___/\	 ___/\	   \____|  | \// __ \|	|   |  |
+//    \___  /	|__|	\___  >\___  >\______  /|__|  (____  /__|   |__|
 //	  \/		    \/	   \/	     \/		   \/
-//  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
+//  ______________________			     ______________________
+//			  T H E	  W A R	  B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name mouse.c	-	The mouse handling. */
@@ -97,7 +97,7 @@ local void DrawMouseCoordsOnMap(int x,int y)
     x=Screen2MapX(x);
     y=Screen2MapY(y);
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-        DebugLevel0Fn("coords outside map %d,%d\n",x,y);
+	DebugLevel0Fn("coords outside map %d,%d\n",x,y);
 	return;
     }
     VideoDrawSub(TheUI.MenuButton.Graphic,0,0
@@ -112,8 +112,8 @@ local void DrawMouseCoordsOnMap(int x,int y)
 	    ,flags&MapFieldUnpassable	?'u':'-'
 	    ,flags&MapFieldNoBuilding	?'n':'-'
 	    ,flags&MapFieldForest	?'f':'-'
-	    ,flags&MapFieldWaterAllowed	?'w':'-'
-	    ,flags&MapFieldCoastAllowed	?'c':'-'
+	    ,flags&MapFieldWaterAllowed ?'w':'-'
+	    ,flags&MapFieldCoastAllowed ?'c':'-'
 	    ,flags&MapFieldLandAllowed	?'l':'-'
 	    ,flags&MapFieldHuman	?'h':'-'
 	    ,flags&MapFieldExplored	?'e':'-'
@@ -170,14 +170,14 @@ global void DoRightButton (int sx,int sy)
     // FIXME: and for a group of units this is slow!
     acknowledged=0;
     for( i=0; i<NumSelected; ++i ) {
-        unit=Selected[i];
-        DebugCheck( !unit );
-        if( !acknowledged ) {
-            PlayUnitSound(unit,VoiceAcknowledging);
-            acknowledged=1;
-        }
-        type=unit->Type;
-        action=type->MouseAction;
+	unit=Selected[i];
+	DebugCheck( !unit );
+	if( !acknowledged ) {
+	    PlayUnitSound(unit,VoiceAcknowledging);
+	    acknowledged=1;
+	}
+	type=unit->Type;
+	action=type->MouseAction;
 	DebugLevel3Fn("Mouse action %d\n",action);
 
 	//
@@ -186,23 +186,23 @@ global void DoRightButton (int sx,int sy)
 	if( KeyModifiers&ModifierControl ) {
 	    // FIXME: what todo if more than one unit on that tile?
 	    dest=UnitOnScreenMapPosition (sx,sy);
-            if( dest ) {
-                if( dest!=unit ) {
-		    dest->Blink=3;
+	    if( dest ) {
+		if( dest!=unit ) {
+		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
-                    continue;
+		    continue;
 		}
-            }
+	    }
 	}
 
-        //
-        //      Enter transporters?
 	//
-        dest=TransporterOnScreenMapPosition (sx,sy);
-        if( dest && dest->Type->Transporter
-                && dest->Player==ThisPlayer
-                && unit->Type->UnitType==UnitTypeLand ) {
-            dest->Blink=3;
+	//	Enter transporters?
+	//
+	dest=TransporterOnScreenMapPosition (sx,sy);
+	if( dest && dest->Type->Transporter
+		&& dest->Player==ThisPlayer
+		&& unit->Type->UnitType==UnitTypeLand ) {
+	    dest->Blink=4;
 	    DebugLevel3Fn("Board transporter\n");
 	    //	Let the transporter move to passenger
 	    //		It should do nothing and not already on coast.
@@ -212,113 +212,113 @@ global void DoRightButton (int sx,int sy)
 		    && !CoastOnMap(dest->X,dest->Y) ) {
 		SendCommandFollow(dest,unit,FlushCommands);
 	    }
-            SendCommandBoard(unit,-1,-1,dest,flush);
-            continue;
-        }
+	    SendCommandBoard(unit,-1,-1,dest,flush);
+	    continue;
+	}
 
-        //
-        //      Worker of human or orcs
-        //
-        if( action==MouseActionHarvest ) {
-            if( type==UnitTypeOrcWorkerWithWood
-                    || type==UnitTypeHumanWorkerWithWood
-                    || type==UnitTypeOrcWorkerWithGold
-                    || type==UnitTypeHumanWorkerWithGold ) {
-                dest=UnitOnMapTile(x,y);
-                if( dest ) {
-                    dest->Blink=3;
-                    if( dest->Type->StoresGold
-                            && (type==UnitTypeOrcWorkerWithGold
-                                || type==UnitTypeHumanWorkerWithGold) ) {
-                        DebugLevel3("GOLD-DEPOSIT\n");
-                        SendCommandReturnGoods(unit,dest,flush);
-                        continue;
-                    }
-                    if( (dest->Type->StoresWood || dest->Type->StoresGold)
-                            && (type==UnitTypeOrcWorkerWithWood
-                                || type==UnitTypeHumanWorkerWithWood) ) {
-                        DebugLevel3("WOOD-DEPOSIT\n");
-                        SendCommandReturnGoods(unit,dest,flush);
-                        continue;
-                    }
-                }
-            } else {
-                if( ForestOnMap(x,y) ) {
-                    SendCommandHarvest(unit,x,y,flush);
-                    continue;
-                }
-                if( (dest=GoldMineOnMap(x,y)) ) {
-                    dest->Blink=3;
-                    DebugLevel3("GOLD-MINE\n");
-                    SendCommandMineGold(unit,dest,flush);
-                    continue;
-                }
-            }
+	//
+	//	Worker of human or orcs
+	//
+	if( action==MouseActionHarvest ) {
+	    if( type==UnitTypeOrcWorkerWithWood
+		    || type==UnitTypeHumanWorkerWithWood
+		    || type==UnitTypeOrcWorkerWithGold
+		    || type==UnitTypeHumanWorkerWithGold ) {
+		dest=UnitOnMapTile(x,y);
+		if( dest ) {
+		    dest->Blink=4;
+		    if( dest->Type->StoresGold
+			    && (type==UnitTypeOrcWorkerWithGold
+				|| type==UnitTypeHumanWorkerWithGold) ) {
+			DebugLevel3("GOLD-DEPOSIT\n");
+			SendCommandReturnGoods(unit,dest,flush);
+			continue;
+		    }
+		    if( (dest->Type->StoresWood || dest->Type->StoresGold)
+			    && (type==UnitTypeOrcWorkerWithWood
+				|| type==UnitTypeHumanWorkerWithWood) ) {
+			DebugLevel3("WOOD-DEPOSIT\n");
+			SendCommandReturnGoods(unit,dest,flush);
+			continue;
+		    }
+		}
+	    } else {
+		if( ForestOnMap(x,y) ) {
+		    SendCommandHarvest(unit,x,y,flush);
+		    continue;
+		}
+		if( (dest=GoldMineOnMap(x,y)) ) {
+		    dest->Blink=4;
+		    DebugLevel3("GOLD-MINE\n");
+		    SendCommandMineGold(unit,dest,flush);
+		    continue;
+		}
+	    }
 
-            dest=TargetOnScreenMapPosition (unit,sx,sy);
-            if( dest ) {
-                if( IsEnemy(ThisPlayer,dest) ) {
-		    dest->Blink=3;
+	    dest=TargetOnScreenMapPosition (unit,sx,sy);
+	    if( dest ) {
+		if( IsEnemy(ThisPlayer,dest) ) {
+		    dest->Blink=4;
 		    SendCommandAttack(unit,x,y,dest,flush);
 		    continue;
 		}
-            }
+	    }
 
 	    // cade: this is default repair action
 	    dest=RepairableOnScreenMapPosition (sx, sy);
 	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
-	        SendCommandRepair(unit,x,y,dest,flush);
+		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 
 	    dest=UnitOnScreenMapPosition (sx,sy);
-            if( dest ) {
+	    if( dest ) {
 		// FIXME: should ally to self
-                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
-		    dest->Blink=3;
+		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
-                    continue;
+		    continue;
 		}
-            }
+	    }
 
 	    SendCommandMove(unit,x,y,flush);
 	    continue;
 	}
 
-        //
-        //      Tanker
-        //
-        if( action==MouseActionHaulOil ) {
+	//
+	//	Tanker
+	//
+	if( action==MouseActionHaulOil ) {
 	    // FIXME: How can I remove here the unit type? More races!
-            if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
-                DebugLevel2("Should return to oil deposit\n");
-                if( (dest=UnitOnMapTile(x,y)) ) {
-                    dest->Blink=3;
-                    if( dest->Type->StoresOil ) {
-                        DebugLevel3("OIL-DEPOSIT\n");
-                        SendCommandReturnGoods(unit,dest,flush);
-                        continue;
-                    }
+	    if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
+		DebugLevel2("Should return to oil deposit\n");
+		if( (dest=UnitOnMapTile(x,y)) ) {
+		    dest->Blink=4;
+		    if( dest->Type->StoresOil ) {
+			DebugLevel3("OIL-DEPOSIT\n");
+			SendCommandReturnGoods(unit,dest,flush);
+			continue;
+		    }
 		}
-            } else {
-                if( (dest=PlatformOnMap(x,y)) ) {
-                    dest->Blink=3;
-                    DebugLevel3("PLATFORM\n");
-                    SendCommandHaulOil(unit,dest,flush);
-                    continue;
-                }
-            }
+	    } else {
+		if( (dest=PlatformOnMap(x,y)) ) {
+		    dest->Blink=4;
+		    DebugLevel3("PLATFORM\n");
+		    SendCommandHaulOil(unit,dest,flush);
+		    continue;
+		}
+	    }
 
 	    dest=UnitOnScreenMapPosition (sx,sy);
-            if( dest ) {
-                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+	    if( dest ) {
+		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
-		    dest->Blink=3;
+		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
-                    continue;
+		    continue;
 		}
-            }
+	    }
 
 #ifdef NEW_SHIPS
 	    if( unit->Type->UnitType!=UnitTypeLand ) {
@@ -326,49 +326,51 @@ global void DoRightButton (int sx,int sy)
 		y&=~1;			// Ships could only even fields
 	    }
 #endif
-            SendCommandMove(unit,x,y,flush);
-            continue;
-        }
+	    SendCommandMove(unit,x,y,flush);
+	    continue;
+	}
 
-        //
-        //      Fighters
-        //
-        if( action==MouseActionAttack ) {
-            // FIXME: more units on same tile
-	    // FIXME: should use enemy first, than other functions!
-
-            dest=TargetOnScreenMapPosition (unit, sx, sy);
-            if( dest ) {
-                if( IsEnemy(ThisPlayer,dest) ) {
-		    dest->Blink=3;
-                    // FIXME: can I attack this unit?
-                    SendCommandAttack(unit,x,y,dest,flush);
-                    continue;
+	//
+	//	Fighters
+	//
+	if( action==MouseActionDemolish || action==MouseActionAttack ) {
+	    // Picks the enemy with highest priority and can be attacked
+	    dest=TargetOnScreenMapPosition(unit, sx, sy);
+	    if( dest ) {
+		if( IsEnemy(ThisPlayer,dest) ) {
+		    dest->Blink=4;
+		    if( action==MouseActionDemolish ) {
+			SendCommandDemolish(unit,x,y,dest,flush);
+		    } else {
+			SendCommandAttack(unit,x,y,dest,flush);
+		    }
+		    continue;
 		}
-            }
-            if( WallOnMap(x,y) ) {
-                DebugLevel3("WALL ON TILE\n");
-                if( ThisPlayer->Race==PlayerRaceHuman
-                        && OrcWallOnMap(x,y) ) {
-                    DebugLevel3("HUMAN ATTACKS ORC\n");
-                    SendCommandAttack(unit,x,y,NoUnitP,flush);
-                }
-                if( ThisPlayer->Race==PlayerRaceOrc
-                        && HumanWallOnMap(x,y) ) {
-                    DebugLevel3("ORC ATTACKS HUMAN\n");
-                    SendCommandAttack(unit,x,y,NoUnitP,flush);
-                }
-            }
+	    }
+
+	    if( WallOnMap(x,y) ) {
+		DebugLevel3("WALL ON TILE\n");
+		if( ThisPlayer->Race==PlayerRaceHuman
+			&& OrcWallOnMap(x,y) ) {
+		    DebugLevel3("HUMAN ATTACKS ORC\n");
+		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		}
+		if( ThisPlayer->Race==PlayerRaceOrc
+			&& HumanWallOnMap(x,y) ) {
+		    DebugLevel3("ORC ATTACKS HUMAN\n");
+		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		}
+	    }
 
 	    dest=UnitOnScreenMapPosition (sx,sy);
-            if( dest ) {
-                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+	    if( dest ) {
+		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
-		    dest->Blink=3;
+		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
-                    continue;
+		    continue;
 		}
-            }
+	    }
 
 #ifdef NEW_SHIPS
 	    if( unit->Type->UnitType!=UnitTypeLand ) {
@@ -393,31 +395,26 @@ global void DoRightButton (int sx,int sy)
 		}
 	    }
 	    // FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
-            continue;
-        }
-
-        if( action==MouseActionDemolish ) {
-	    // FIXME: demolish!!!!!!!
-	    DebugLevel0Fn("FIXME: demolish\n");
+	    continue;
 	}
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
 	    dest=UnitOnScreenMapPosition (sx,sy);
-            if( dest ) {
+	    if( dest ) {
 		// Follow allied units, but not self.
-                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+		if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
-		    dest->Blink=3;
+		    dest->Blink=4;
 		    SendCommandFollow(unit,dest,flush);
-                    continue;
+		    continue;
 		}
-            }
+	    }
 	}
 
-        //
-        //      Ships
-        //
+	//
+	//	Ships
+	//
 #ifdef NEW_SHIPS
 	if( action==MouseActionSail ) {
 	    x&=~1;
@@ -508,7 +505,7 @@ local void HandleMouseOn(int x,int y)
     //
     //	Scrolling Region Handling
     //	FIXME: perhaps I should change the complete scroll handling.
-    //  FIXME: show scrolling cursor only, if scrolling is possible
+    //	FIXME: show scrolling cursor only, if scrolling is possible
     //	FIXME: scrolling with edge resistance
     //
     if( x<SCROLL_LEFT ) {
@@ -559,9 +556,9 @@ local void HandleMouseOn(int x,int y)
 
 /**
 **	Handle cursor exits the game window (only for some videomodes)
-**      FIXME: make it so that the game is partially 'paused'.
-**             Game should run (for network play), but not react on or show
-**             interactive events. 
+**	FIXME: make it so that the game is partially 'paused'.
+**	       Game should run (for network play), but not react on or show
+**	       interactive events.
 */
 global void HandleMouseExit(void)
 {
@@ -756,7 +753,7 @@ local void SendRepair(int sx,int sy)
 	dest=NoUnitP;
     }
     for( i=0; i<NumSelected; ++i ) {
-        unit=Selected[i];
+	unit=Selected[i];
 	if( unit->Type->CowerWorker ) {
 	    SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	} else {
@@ -780,7 +777,7 @@ local void SendMove(int x,int y)
     Unit* unit;
 
     for( i=0; i<NumSelected; ++i ) {
-        unit=Selected[i];
+	unit=Selected[i];
 //		if( !unit->Type->Building ) {
 	SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
 //		}
@@ -810,15 +807,15 @@ local void SendAttack (int sx,int sy)
     int y = sy / TileSizeY;
 
     for( i=0; i<NumSelected; i++ ) {
-        unit=Selected[i];
+	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
 	    dest=TargetOnScreenMapPosition (unit,sx,sy);
 	    DebugLevel3Fn("Attacking %p\n",dest);
 	    if( dest ) {
-		dest->Blink=3;
+		dest->Blink=4;
 	    }
-	    if( dest!=unit ) {  // don't let an unit self destruct
-	        SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
+	    if( dest!=unit ) {	// don't let an unit self destruct
+		SendCommandAttack(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	    }
 	} else {
 	    SendCommandMove(unit,x,y,!(KeyModifiers&ModifierShift));
@@ -838,7 +835,7 @@ local void SendAttackGround(int x,int y)
     Unit* unit;
 
     for( i=0; i<NumSelected; ++i ) {
-        unit=Selected[i];
+	unit=Selected[i];
 	if( unit->Type->CanAttack ) {
 	    SendCommandAttackGround(unit,x,y,!(KeyModifiers&ModifierShift));
 	} else {
@@ -856,7 +853,7 @@ local void SendPatrol(int x,int y)
     Unit* unit;
 
     for( i=0; i<NumSelected; i++ ) {
-        unit=Selected[i];
+	unit=Selected[i];
 	// FIXME: Can the unit patrol ?
 	SendCommandPatrol(unit,x,y,!(KeyModifiers&ModifierShift));
     }
@@ -877,12 +874,12 @@ local void SendDemolish (int sx,int sy)
     int y = sy / TileSizeY;
 
     for( i=0; i<NumSelected; ++i ) {
-        unit=Selected[i];
+	unit=Selected[i];
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
 	    dest=TargetOnScreenMapPosition (unit,sx,sy);
 	    if( dest==unit ) {	// don't let an unit self destruct
-	        dest=NoUnitP;
+		dest=NoUnitP;
 	    }
 	    SendCommandDemolish(unit,x,y,dest,!(KeyModifiers&ModifierShift));
 	} else {
@@ -903,14 +900,14 @@ local void SendHarvest(int x,int y)
     Unit* dest;
 
     for( i=0; i<NumSelected; ++i ) {
-        if( (dest=PlatformOnMap(x,y)) ) {
-	    dest->Blink=3;
+	if( (dest=PlatformOnMap(x,y)) ) {
+	    dest->Blink=4;
 	    DebugLevel3("PLATFORM\n");
 	    SendCommandHaulOil(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
 	}
 	if( (dest=GoldMineOnMap(x,y)) ) {
-	    dest->Blink=3;
+	    dest->Blink=4;
 	    DebugLevel3("GOLD-MINE\n");
 	    SendCommandMineGold(Selected[i],dest,!(KeyModifiers&ModifierShift));
 	    continue;
@@ -931,7 +928,7 @@ local void SendUnload(int x,int y)
 
     for( i=0; i<NumSelected; i++ ) {
 	// FIXME: not only transporter selected?
-        SendCommandUnload(Selected[i],x,y,NoUnitP
+	SendCommandUnload(Selected[i],x,y,NoUnitP
 		,!(KeyModifiers&ModifierShift));
     }
 }
@@ -958,7 +955,7 @@ local void SendSpellCast (int sx, int sy)
 
     dest = UnitOnScreenMapPosition (sx, sy);
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
-    /*  NOTE: Vladi:
+    /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
        (if exists). All checks are performed at spell cast handle
        function which will cancel function if cannot be executed
@@ -1016,7 +1013,7 @@ local void SendCommand (int sx, int sy)
 	case ButtonDemolish:
 	    SendDemolish(sx,sy);
 	    break;
-        case ButtonSpellCast:
+	case ButtonSpellCast:
 	    SendSpellCast(sx,sy);
 	    break;
 	default:
@@ -1028,7 +1025,7 @@ local void SendCommand (int sx, int sy)
     //	Acknowledge the command with first selected unit.
     //
     for( i=0; i<NumSelected; ++i ) {
-        PlayUnitSound(Selected[i],VoiceAcknowledging);
+	PlayUnitSound(Selected[i],VoiceAcknowledging);
 	break;
     }
 }
@@ -1239,7 +1236,7 @@ global void UIHandleButtonDown(unsigned button)
 	    return;
 	}
 
-	if( MouseButtons&LeftButton ) {	// enter select mode
+	if( MouseButtons&LeftButton ) { // enter select mode
 	    CursorStartX=CursorX;
 	    CursorStartY=CursorY;
 	    CursorStartScrMapX = CursorStartX -TheUI.MapX + TileSizeX * MapX;
@@ -1254,15 +1251,15 @@ global void UIHandleButtonDown(unsigned button)
 	    DebugLevel3("Cursor middle down %d,%d\n",CursorX,CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
-            Unit* unit;
+	    Unit* unit;
 	    int x = CursorX - TheUI.MapX + MapX*TileSizeX;
 	    int y = CursorY - TheUI.MapY + MapY*TileSizeY;
 
-            unit = UnitOnScreenMapPosition (x, y);
-            if ( unit ) { // if right click on building -- blink
-              unit->Blink=3;
-	    } else { // if not not click on building -- green cross
-	      MakeLocalMissile(MissileTypeGreenCross
+	    unit = UnitOnScreenMapPosition (x, y);
+	    if ( unit ) {	// if right click on building -- blink
+		unit->Blink=4;
+	    } else {		// if not not click on building -- green cross
+		MakeLocalMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
 	    }
@@ -1272,7 +1269,7 @@ global void UIHandleButtonDown(unsigned button)
     //	Cursor is on the minimap area
     //
     } else if( CursorOn==CursorOnMinimap ) {
-	if( MouseButtons&LeftButton ) {	// enter move mini-mode
+	if( MouseButtons&LeftButton ) { // enter move mini-mode
 	    MapSetViewpoint(ScreenMinimap2MapX(CursorX)-MapWidth/2
 		    ,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 	} else if( MouseButtons&RightButton ) {
@@ -1280,7 +1277,8 @@ global void UIHandleButtonDown(unsigned button)
 		    ,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 	    // DoRightButton() takes screen map coordinates
-	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX, 						ScreenMinimap2MapY(CursorY) * TileSizeY);
+	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
+		    ScreenMinimap2MapY(CursorY) * TileSizeY);
 	}
     //
     //	Cursor is on the buttons: group or command
@@ -1289,7 +1287,7 @@ global void UIHandleButtonDown(unsigned button)
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
 	    DoSelectionButtons(ButtonUnderCursor-1,button);
 	} else if( (MouseButtons&LeftButton) ) {
-	    if(	ButtonUnderCursor==0 && GameMenuButtonClicked==0 ) {
+	    if( ButtonUnderCursor==0 && GameMenuButtonClicked==0 ) {
 		GameMenuButtonClicked = 1;
 		MustRedraw|=RedrawMenuButton;
 	    } else if( ButtonUnderCursor==1 && NumSelected==1 ) {
@@ -1342,7 +1340,7 @@ global void UIHandleButtonUp(unsigned button)
     // FIXME: must selecting!  (lokh: what does this mean? is this done now?)
 
     // SHIFT toggles select/unselect a single unit and
-    //       add the content of the rectangle to the selectection
+    //		add the content of the rectangle to the selectection
     // ALT takes group of unit
     // CTRL takes all units of same type (st*rcr*ft)
     if( CursorState==CursorStateRectangle
@@ -1377,11 +1375,11 @@ global void UIHandleButtonUp(unsigned button)
 	    }
 	    w -= x;
 	    h -= y;
-            if( KeyModifiers&ModifierShift ) {
-                num=AddSelectedUnitsInRectangle(x,y,w,h);
-            } else {
-                num=SelectUnitsInRectangle(x,y,w,h);
-            }
+	    if( KeyModifiers&ModifierShift ) {
+		num=AddSelectedUnitsInRectangle(x,y,w,h);
+	    } else {
+		num=SelectUnitsInRectangle(x,y,w,h);
+	    }
 #endif
 	    int x0 = CursorStartScrMapX;
 	    int y0 = CursorStartScrMapY;
@@ -1398,11 +1396,11 @@ global void UIHandleButtonUp(unsigned button)
 		y0 = y1;
 		y1 = swap;
 	    }
-            if ( KeyModifiers & ModifierShift ) {
-                num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
-            } else {
-                num=SelectUnitsInRectangle (x0, y0, x1, y1);
-            }
+	    if ( KeyModifiers & ModifierShift ) {
+		num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
+	    } else {
+		num=SelectUnitsInRectangle (x0, y0, x1, y1);
+	    }
 	} else {
 	    //
 	    // Select single unit
@@ -1411,9 +1409,9 @@ global void UIHandleButtonUp(unsigned button)
 	    if( NumSelected==1 ) {
 		unit=Selected[0];
 	    }
-            // cade: cannot select unit on invisible space
+	    // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
-            if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
+	    if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
 		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.MapX+MapX*TileSizeX
 		    ,CursorY-TheUI.MapY+MapY*TileSizeY);
@@ -1428,20 +1426,20 @@ global void UIHandleButtonUp(unsigned button)
 			num=SelectUnitsByType(unit);
 		    }
 		} else if( (KeyModifiers&ModifierAlt) && unit->LastGroup ) {
-                    num=SelectGroupFromUnit(unit);
+		    num=SelectGroupFromUnit(unit);
 
 		    // Don't allow to select own and enemy units.
 		    // Don't allow mixing buildings
 		} else if( KeyModifiers&ModifierShift
 			&& unit->Player==ThisPlayer
-			&& !unit->Type->Building 
+			&& !unit->Type->Building
 			&& (NumSelected!=1 || !Selected[0]->Type->Building)
 			&& (NumSelected!=1
 			    || Selected[0]->Player==ThisPlayer)) {
 		    num=ToggleSelectUnit(unit);
 		} else {
 		    SelectSingleUnit(unit);
-                    num=1;
+		    num=1;
 		}
 	    } else {
 		num=0;
@@ -1472,13 +1470,13 @@ global void UIHandleButtonUp(unsigned button)
 		} else {
 		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		}
-	        if ( Selected[0]->Player == ThisPlayer ) {
+		if ( Selected[0]->Player == ThisPlayer ) {
 			char buf[64];
 			sprintf( buf, "You have ~<%d~> %s(s)",
 				 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Type],
 				 Selected[0]->Type->Name);
 			SetStatusLine( buf );
-	        }
+		}
 	    }
 	}
 
