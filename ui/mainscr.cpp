@@ -10,7 +10,7 @@
 //
 /**@name mainscr.c	-	The main screen. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer and Valery Shchedrin
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer and Valery Shchedrin
 //
 //	$Id$
 
@@ -291,7 +291,7 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawNumber(x+108,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
 	if( unit->Player->Incomes[WoodCost]!=DEFAULT_INCOMES[WoodCost] ) {
-		sprintf(buf, "~+<%i~>", unit->Player->Incomes[WoodCost]);
+		sprintf(buf, "~<+%i~>", unit->Player->Incomes[WoodCost]);
 		DrawText(x+126,y+8+93,GameFont,buf);
 	}
 	DrawText(x+84,y+8+109,GameFont,"Oil:");
