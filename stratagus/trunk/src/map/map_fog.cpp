@@ -902,7 +902,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 	}
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
-	for (my = vp->MapY; my < ey; ++my) {
+	for (; my < ey; ++my) {
 		for (mx = sx; mx < ex; ++mx) {
 			VisibleTable[my * TheMap.Width + mx] = IsTileVisible(ThisPlayer, mx, my);
 		}
