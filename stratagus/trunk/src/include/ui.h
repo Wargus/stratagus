@@ -346,32 +346,32 @@ typedef struct _ui_ {
 	char*   PanelIndex;                 ///< Index of the InfoPanel.
 	char    NumberPanel;                ///< Number of Panel.
 
-	Button* SingleSelectedButton;       ///< FIXME: docu
+	Button* SingleSelectedButton;       ///< Button for single selected unit
 
 	Button* SelectedButtons;            ///< Selected buttons
 	int     NumSelectedButtons;         ///< Number of selected buttons
-	int     MaxSelectedFont;            ///< FIXME: docu
+	int     MaxSelectedFont;            ///< Font type to use
 	int     MaxSelectedTextX;           ///< position to place '+#' text
 	int     MaxSelectedTextY;           ///< if > maximum units selected
 
-	Button* SingleTrainingButton;       ///< FIXME: docu
-	char*   SingleTrainingText;         ///< FIXME: docu
-	int     SingleTrainingFont;         ///< FIXME: docu
-	int     SingleTrainingTextX;        ///< FIXME: docu
-	int     SingleTrainingTextY;        ///< FIXME: docu
+	Button* SingleTrainingButton;       ///< Button for single training
+	char*   SingleTrainingText;         ///< Text for single training
+	int     SingleTrainingFont;         ///< Font for single traning
+	int     SingleTrainingTextX;        ///< X text position single training
+	int     SingleTrainingTextY;        ///< Y text position single training
 
 	Button* TrainingButtons;            ///< Training buttons
 	int     NumTrainingButtons;         ///< Number of training buttons
-	char*   TrainingText;               ///< FIXME: docu
-	int     TrainingFont;               ///< FIXME: docu
-	int     TrainingTextX;              ///< FIXME: docu
-	int     TrainingTextY;              ///< FIXME: docu
+	char*   TrainingText;               ///< Multiple Training Text
+	int     TrainingFont;               ///< Multiple Training Font
+	int     TrainingTextX;              ///< Multiple Training X Text position
+	int     TrainingTextY;              ///< Multiple Training Y Text position
 
-	Button* UpgradingButton;            ///< FIXME: docu
+	Button* UpgradingButton;            ///< Button info for upgrade
 
-	Button* ResearchingButton;          ///< FIXME: docu
+	Button* ResearchingButton;          ///< Button info for researching
 
-	Button* TransportingButtons;        ///< FIXME: docu
+	Button* TransportingButtons;        ///< Button info for transporting
 	int     NumTransportingButtons;     ///< Number of transporting buttons
 
 	// Completed bar
@@ -453,8 +453,8 @@ typedef struct _ui_ {
 
 	MenuPanel* MenuPanels;              ///< Menu panels
 
-	Graphic* VictoryBackgroundG;        ///< FIXME: docu
-	Graphic* DefeatBackgroundG;         ///< FIXME: docu
+	Graphic* VictoryBackgroundG;        ///< Victory background graphic
+	Graphic* DefeatBackgroundG;         ///< Defeat background graphic
 } UI;
 
 /*----------------------------------------------------------------------------
