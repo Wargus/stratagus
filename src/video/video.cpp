@@ -256,7 +256,7 @@ global void SetClipping(int left, int top, int right, int bottom)
 			right >= VideoWidth || bottom < 0 || bottom >= VideoHeight) {
 		DebugLevel0Fn("Wrong clipping %d->%d %d->%d, write cleaner code.\n" _C_
 			left _C_ right _C_ top _C_ bottom);
-//		DebugCheck(1);
+//		Assert(0);
 	}
 #endif
 	ClipRectToRect(&left, &top, &right, &bottom, 0, 0, VideoWidth, VideoHeight);
@@ -362,7 +362,7 @@ global void VideoPaletteListRemove(SDL_Surface* surface)
 		}
 		curlink = &((*curlink)->Next);
 	}
-	DebugCheck(!*curlink);
+	Assert(*curlink);
 	if (*curlink == PaletteList) {
 		tmp = PaletteList->Next;
 		free(PaletteList);
