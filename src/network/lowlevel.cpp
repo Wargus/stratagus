@@ -225,7 +225,7 @@ global int NetSocketAddr(const int sock)
 	wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
                       sizeof(localAddr), &bytesReturned, NULL, NULL);
 	if (wsError == SOCKET_ERROR) {
-	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n", GetLastError());
+	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %ld\n", GetLastError());
 	}
 
 	// parse interface information
