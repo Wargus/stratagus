@@ -493,17 +493,24 @@ local SCM CclDefineSpell(SCM list)
 	    CclSpellAction(gh_car(list),spell->Action);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("condition"))) {
-	    if (!spell->Conditions) {
-		spell->Conditions=(ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    if (!spell->Condition) {
+		spell->Condition=(ConditionInfo*)malloc(sizeof(ConditionInfo));
 	    }
-	    CclSpellCondition(gh_car(list),spell->Conditions);
+	    CclSpellCondition(gh_car(list),spell->Condition);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("autocast"))) {
 	    if (!spell->AutoCast) {
 		spell->AutoCast=(AutoCastInfo*)malloc(sizeof(AutoCastInfo));
-		memset(spell->AutoCast,0,sizeof(AutoCastInfo*));
+		memset(spell->AutoCast,0,sizeof(AutoCastInfo));
 	    }
 	    CclSpellAutocast(gh_car(list),spell->AutoCast);
+	    list=gh_cdr(list);
+	} else if (gh_eq_p(value,gh_symbol2scm("ai-cast"))) {
+	    if (!spell->AICast) {
+		spell->AICast=(AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+		memset(spell->AICast,0,sizeof(AutoCastInfo));
+	    }
+	    CclSpellAutocast(gh_car(list),spell->AICast);
 	    list=gh_cdr(list);
 	} else if (gh_eq_p(value,gh_symbol2scm("sound-when-cast"))) {
 	    //  Free the old name, get the new one
@@ -546,70 +553,6 @@ local SCM CclDefineSpell(SCM list)
 global void SpellCclRegister(void)
 {
     gh_new_procedureN("define-spell", CclDefineSpell);
-}
-
-/*
-**	Save a spell action to a file.
-**
-** 	@param file	File pointer to save to
-**	@param action	Pointer to action to save.
-*/
-local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
-{
-    char condstrings [3][10] = {
-	"true",			/// CONDITION_TRUE
-	"false",		/// CONDITION_FALSE
-	"only"			/// CONDITION_ONLY
-    };
-
-    DebugCheck(!file);
-    DebugCheck(!condition);
-
-    CLprintf(file,"( ");
-    //
-    //	First save data related to flags.
-    //	NOTE: (int) is there to keep compilers happy.
-    //
-    if (condition->Undead!=CONDITION_TRUE) {
-	CLprintf(file,"undead %s ",condstrings[(int)condition->Undead]);
-    }
-    if (condition->Organic!=CONDITION_TRUE) {
-	CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
-    }
-    if (condition->Hero!=CONDITION_TRUE) {
-	CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
-    }
-    if (condition->Coward!=CONDITION_TRUE) {
-	CLprintf(file,"coward %s ",condstrings[(int)condition->Coward]);
-    }
-    if (condition->Alliance!=CONDITION_TRUE) {
-	CLprintf(file,"alliance %s ",condstrings[(int)condition->Alliance]);
-    }
-    if (condition->Building!=CONDITION_TRUE) {
-	CLprintf(file,"building %s ",condstrings[(int)condition->Building]);
-    }
-    if (condition->TargetSelf!=CONDITION_TRUE) {
-	CLprintf(file,"self %s ",condstrings[(int)condition->TargetSelf]);
-    }
-    //
-    //	Min/Max vital percents
-    //
-    CLprintf(file,"min-hp-percent %d ",condition->MinHpPercent);
-    CLprintf(file,"max-hp-percent %d ",condition->MaxHpPercent);
-    CLprintf(file,"min-mana-percent %d ",condition->MinManaPercent);
-    CLprintf(file,"max-mana-percent %d ",condition->MaxManaPercent);
-    //
-    //	Max buff ticks stuff
-    //
-    CLprintf(file,"max-slow-ticks %d ",condition->MaxSlowTicks);
-    CLprintf(file,"max-haste-ticks %d ",condition->MaxHasteTicks);
-    CLprintf(file,"max-bloodlust-ticks %d ",condition->MaxBloodlustTicks);
-    CLprintf(file,"max-invisibility-ticks %d ",condition->MaxInvisibilityTicks);
-    CLprintf(file,"max-invincibility-ticks %d ",condition->MaxInvincibilityTicks);
-    //
-    //	The end.
-    //
-    CLprintf(file,")\n");
 }
 
 /*
@@ -692,7 +635,96 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
     } 
 }
 
-/**
+/*
+**	Save a spell action to a file.
+**
+** 	@param file	File pointer to save to
+**	@param action	Pointer to action to save.
+*/
+local void SaveSpellCondition(CLFile *file,ConditionInfo* condition)
+{
+    char condstrings [3][10] = {
+	"true",			/// CONDITION_TRUE
+	"false",		/// CONDITION_FALSE
+	"only"			/// CONDITION_ONLY
+    };
+
+    DebugCheck(!file);
+    DebugCheck(!condition);
+
+    CLprintf(file,"( ");
+    //
+    //	First save data related to flags.
+    //	NOTE: (int) is there to keep compilers happy.
+    //
+    if (condition->Undead!=CONDITION_TRUE) {
+	CLprintf(file,"undead %s ",condstrings[(int)condition->Undead]);
+    }
+    if (condition->Organic!=CONDITION_TRUE) {
+	CLprintf(file,"organic %s ",condstrings[(int)condition->Organic]);
+    }
+    if (condition->Hero!=CONDITION_TRUE) {
+	CLprintf(file,"hero %s ",condstrings[(int)condition->Hero]);
+    }
+    if (condition->Coward!=CONDITION_TRUE) {
+	CLprintf(file,"coward %s ",condstrings[(int)condition->Coward]);
+    }
+    if (condition->Alliance!=CONDITION_TRUE) {
+	CLprintf(file,"alliance %s ",condstrings[(int)condition->Alliance]);
+    }
+    if (condition->Building!=CONDITION_TRUE) {
+	CLprintf(file,"building %s ",condstrings[(int)condition->Building]);
+    }
+    if (condition->TargetSelf!=CONDITION_TRUE) {
+	CLprintf(file,"self %s ",condstrings[(int)condition->TargetSelf]);
+    }
+    //
+    //	Min/Max vital percents
+    //
+    CLprintf(file,"min-hp-percent %d ",condition->MinHpPercent);
+    CLprintf(file,"max-hp-percent %d ",condition->MaxHpPercent);
+    CLprintf(file,"min-mana-percent %d ",condition->MinManaPercent);
+    CLprintf(file,"max-mana-percent %d ",condition->MaxManaPercent);
+    //
+    //	Max buff ticks stuff
+    //
+    CLprintf(file,"max-slow-ticks %d ",condition->MaxSlowTicks);
+    CLprintf(file,"max-haste-ticks %d ",condition->MaxHasteTicks);
+    CLprintf(file,"max-bloodlust-ticks %d ",condition->MaxBloodlustTicks);
+    CLprintf(file,"max-invisibility-ticks %d ",condition->MaxInvisibilityTicks);
+    CLprintf(file,"max-invincibility-ticks %d ",condition->MaxInvincibilityTicks);
+    //
+    //	The end.
+    //
+    CLprintf(file,")\n");
+}
+
+/*
+**	Save autocast info to a CCL file	 
+**
+**	@param file	The file to save to.
+**	@param autocast	Auocastinfo to save.
+*/
+void SaveSpellAutoCast(CLFile *file,AutoCastInfo* autocast)
+{
+    char condstrings [3][10] = {
+	"true",			/// CONDITION_TRUE
+	"false",		/// CONDITION_FALSE
+	"only"			/// CONDITION_ONLY
+    };
+    
+    CLprintf(file,"( range %d",autocast->Range);
+    if (autocast->Combat!=CONDITION_TRUE) {
+	CLprintf(file,"undead %s ",condstrings[(int)autocast->Combat]);
+    }
+    if (autocast->Condition) {
+	CLprintf(file," condition ");
+	SaveSpellCondition(file,autocast->Condition);
+    }
+    CLprintf(file," )\n");
+}
+
+/*
 **	Save spells to a CCL file.
 **	
 **	@param file	The file to save to.
@@ -746,20 +778,28 @@ global void SaveSpells(CLFile *file)
 	SaveSpellAction(file,spell->Action);
 	CLprintf(file,"\n");
 	//
-	//  FIXME: Save conditions
+	//  Save conditions
 	//
-	if (spell->Conditions) {
+	if (spell->Condition) {
 	    CLprintf(file,"    'condition '");
-	    SaveSpellCondition(file,spell->Conditions);
+	    SaveSpellCondition(file,spell->Condition);
 	    CLprintf(file,"\n");
 	}
 	//
-	//  FIXME: Save autocast and AI info
+	//  Save own unit autocast
 	//
 	if (spell->AutoCast) {
-	    CLprintf(file,"    'autocast '(range %d condition ",spell->AutoCast->Range);
-	    SaveSpellCondition(file,spell->Conditions);
-	    CLprintf(file,")\n");
+	    CLprintf(file,"    'autocast '");
+	    SaveSpellAutoCast(file,spell->AutoCast);
+	    CLprintf(file,"\n");
+	}
+	//
+	//  Save AI autocast.
+	//
+	if (spell->AICast) {
+	    CLprintf(file,"    'ai-cast '");
+	    SaveSpellAutoCast(file,spell->AICast);
+	    CLprintf(file,"\n");
 	}
 	CLprintf(file,")\n");
     }
