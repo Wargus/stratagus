@@ -335,11 +335,14 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitPlayers();
 	
 	if (!TheMap.Info.Filename) {
+		char path[PATH_MAX];
+		
 		Assert(filename);
+		LibraryFileName(filename, path);
 		if (strcasestr(filename, ".pud")) {
-			GetPudInfo(filename, &TheMap.Info);
+			GetPudInfo(path, &TheMap.Info);
 		} else if(strcasestr(filename, ".smp")) {
-			LuaLoadFile(filename);
+			LuaLoadFile(path);
 		}
 	}
 
