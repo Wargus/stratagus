@@ -195,10 +195,10 @@ global void UpdateMinimapTerrain(void)
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
 
-			((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
+			((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 				((Uint8*)TheMap.TileGraphic->Surface->pixels)
 					[xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8)
-					* TheMap.TileGraphic->Surface->w];
+					* TheMap.TileGraphic->Surface->pitch];
 		}
 	}
 	SDL_UnlockSurface(MinimapTerrainSurface);
@@ -261,10 +261,10 @@ global void UpdateMinimapXY(int tx, int ty)
 			xofs = TileSizeX * (tile % tilepitch);
 			yofs = TileSizeY * (tile / tilepitch);
 
-			((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW] =
+			((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch] =
 				((Uint8*)TheMap.TileGraphic->Surface->pixels)
 					[xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8)
-					* TheMap.TileGraphic->Surface->w];
+					* TheMap.TileGraphic->Surface->pitch];
 		}
 	}
 	SDL_UnlockSurface(TheMap.TileGraphic->Surface);
@@ -324,7 +324,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 		h = h0;
 		while (h-- >= 0) {
 			SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
-			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * TheUI.MinimapW] =
+			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
 				VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
 		}
 	}
@@ -359,10 +359,10 @@ global void UpdateMinimap(void)
 			}
 
 			if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
-				((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] =
-					((Uint8*)MinimapTerrainSurface->pixels)[mx + my * TheUI.MinimapW];
+				((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
+					((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch];
 			} else if (visiontype > 0) {
-				((Uint8*)MinimapSurface->pixels)[mx + my * TheUI.MinimapW] =
+				((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 					VideoMapRGB(MinimapSurface->format, 0, 0, 0);
 			}
 		}
