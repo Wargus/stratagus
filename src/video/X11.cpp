@@ -1083,7 +1083,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    XFree(xfd);
 	}
 
-	for( i=morex; i--; ) {		// handle new + *OLD* x11 events
+	for( i=morex; i > 0 && i--; ) {		// handle new + *OLD* x11 events
 	   X11DoEvent(callbacks);
 	}
 
