@@ -208,7 +208,7 @@ global char* FreeCraftLibPath;		/// Path for data
 
     /// Name, Version, Copyright
 global char NameLine[] =
-    "FreeCraft V" VERSION ", (c) 1998-2001 by The FreeCraft Project.";
+    "FreeCraft V" VERSION ", (c) 1998-2002 by The FreeCraft Project.";
 
     /// Filename of the map to load
 local char* MapName = NULL;
@@ -447,9 +447,6 @@ local void PrintHeader(void)
 #endif
 #ifdef NEW_FOW
     "NEW-FOW "
-#endif
-#ifdef NEW_FOW2
-    "NEW-FOW2 "
 #endif
 #ifdef NEW_AI
     "NEW-AI "
