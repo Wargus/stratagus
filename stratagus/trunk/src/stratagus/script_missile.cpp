@@ -71,8 +71,6 @@ static int CclDefineMissileType(lua_State* l)
 	MissileType* mtype;
 	unsigned i;
 	char* file;
-	int w;
-	int h;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
@@ -102,7 +100,6 @@ static int CclDefineMissileType(lua_State* l)
 	mtype->SplashFactor = 100;
 
 	file = NULL;
-	w = h = 0;
 
 	//
 	// Parse the arguments
@@ -117,10 +114,10 @@ static int CclDefineMissileType(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			w = LuaToNumber(l, -1);
+			mtype->Width = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			lua_rawgeti(l, -1, 2);
-			h = LuaToNumber(l, -1);
+			mtype->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Frames")) {
 			mtype->SpriteFrames = LuaToNumber(l, -1);
@@ -178,7 +175,7 @@ static int CclDefineMissileType(lua_State* l)
 	}
 
 	if (file) {
-		mtype->G = NewGraphic(file, w, h);
+		mtype->G = NewGraphic(file, mtype->Width, mtype->Height);
 	}
 
 	return 0;
