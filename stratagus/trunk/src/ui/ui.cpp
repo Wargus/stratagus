@@ -66,8 +66,14 @@ global UI** UI_Table;
 
 /**
 **	Initialize the user interface.
+**
+**	The function looks through ::UI_Table, to find a matching user
+**	interface. It uses the race_name and the current video window sizes to
+**	find it.
+**
+**	@param race_name	The race identifier, to select the interface.
 */
-global void InitUserInterface(const char *RaceName)
+global void InitUserInterface(const char *race_name)
 {
     int i;
     int best;
@@ -75,7 +81,7 @@ global void InitUserInterface(const char *RaceName)
     // select the correct slot
     best=0;
     for( i=0; UI_Table[i]; ++i ) {
-	if( !strcmp(RaceName,UI_Table[i]->Name) ) {
+	if( !strcmp(race_name,UI_Table[i]->Name) ) {
 	    // perfect
 	    if( VideoWidth==UI_Table[i]->Width
 		    && VideoHeight==UI_Table[i]->Height  ) {
