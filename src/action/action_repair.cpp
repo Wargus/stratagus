@@ -276,10 +276,16 @@ global void HandleActionRepair(Unit* unit)
 						NewResetPath(unit);
 					}
 				}
-				if (goal) {
+				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange) {
 					RepairUnit(unit, goal);
 					goal = unit->Orders[0].Goal;
+				} else if (goal && MapDistanceBetweenUnits(unit, goal) > unit->Type->RepairRange) {
+					// If goal has move, chase after it
+					unit->State = 0;
+					unit->SubAction = 0;
+					unit->Reset = 1;
 				}
+
 
 				//
 				// Target is fine, choose new one.
