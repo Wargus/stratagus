@@ -33,7 +33,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.16.1\""
+VERSION="-DVERSION=\"1.17pre1-build1\""
 WIN32=-1
 
 # Choose optimization level
@@ -415,14 +415,14 @@ echo >> $RULESFILE
 if test "$WIN32" = 1 ; then
   echo "# Win32" >> $RULESFILE
   echo "EXE=.exe" >> $RULESFILE
-  echo "OUTFILE=\$(TOPDIR)/clone\$(EXE)" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/freecraft\$(EXE)" >> $RULESFILE
   echo "ARCH=win32" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
 else
 # LINUX
   echo "# Linux" >> $RULESFILE
   echo "EXE=" >> $RULESFILE
-  echo "OUTFILE=\$(TOPDIR)/clone" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/freecraft" >> $RULESFILE
   echo "ARCH=linux" >> $RULESFILE
   echo "OE=o" >> $RULESFILE
 fi
@@ -504,4 +504,3 @@ case $ANSWER in
 	;;
 	
 esac
-
