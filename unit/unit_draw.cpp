@@ -93,7 +93,7 @@ local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
 **	@param unit	Pointer to the unit.
 **	@param type	Type of the unit.
 **
-**	@returns	Color for selection, or -1 if not selected.
+**	@return		Color for selection, or -1 if not selected.
 */
 local int SelectionColor(const Unit* unit,const UnitType* type)
 {
@@ -375,26 +375,32 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    } else {
 		color=ColorRed;
 	    }
-	    if ( ShowHealthHorizontal == 0)  {
-		    VideoFillRectangleClip(color
-			,x+(type->TileWidth*TileSizeX
-				-type->BoxWidth)/2
-			,y+(type->TileHeight*TileSizeY
-				-type->BoxHeight)/2
-			,2,(f*type->BoxHeight)/100);
+	    if ( ShowHealthHorizontal )  {
+#ifdef DEBUG
+		// Johns: I want to see fast moving.
+		VideoFillRectangleClip(unit->Command.Data.Move.Fast 
+			? ColorBlack : ColorWhite
+#else
+		VideoFillRectangleClip(ColorBlack
+#endif
+		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+			    +type->BoxHeight+1
+		    ,((f*type->BoxHeight)/100)+1
+		    ,5);
+		VideoFillRectangleClip(color
+		    ,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
+		    ,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+			    +type->BoxHeight+2
+		    ,(f*type->BoxHeight)/100-1
+		    ,3);
 	    }  else  {
-		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+1
-			,((f*type->BoxHeight)/100)+1
-			,5);
-		    VideoFillRectangleClip(color
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+2
-			,(f*type->BoxHeight)/100-1
-			,3);
+		VideoFillRectangleClip(color
+		    ,x+(type->TileWidth*TileSizeX
+			    -type->BoxWidth)/2
+		    ,y+(type->TileHeight*TileSizeY
+			    -type->BoxHeight)/2
+		    ,2,(f*type->BoxHeight)/100);
 	    }
 	}
     }
@@ -449,7 +455,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
 	    if ( ShowManaHorizontal == 0)  {
-	    	f=(100*unit->Mana)/255;
+		f=(100*unit->Mana)/255;
 		    VideoFillRectangleClip(ColorBlue
 			,x+(type->TileWidth*TileSizeX
 				+type->BoxWidth)/2
