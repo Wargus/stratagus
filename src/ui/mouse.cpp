@@ -135,7 +135,7 @@ global void DoRightButton(int sx,int sy)
     //
     flush=!(KeyModifiers&ModifierShift);
     
-    if( UnitUnderCursor && (dest=TransporterOnScreenMapPosition(sx,sy))) {
+    if( UnitUnderCursor && (dest=TransporterOnMapTile(x,y))) {
         // n0b0dy: So we are clicking on a transporter. We have to:
         // 1) Flush the transporters orders.
         // 2) Tell the transporter to follow the units. We have to queue all
@@ -172,7 +172,7 @@ global void DoRightButton(int sx,int sy)
 	//
 	if( KeyModifiers&ModifierControl && UnitUnderCursor ) {
 	    // FIXME: what todo if more than one unit on that tile?
-	    dest=UnitOnScreenMapPosition(sx,sy);
+	    dest=UnitOnMapTile(x,y);
 	    if( dest ) {
 		if( dest!=unit ) {
 		    dest->Blink=4;
@@ -185,7 +185,7 @@ global void DoRightButton(int sx,int sy)
 	//
 	//	Enter transporters?
 	//
-	if( UnitUnderCursor && (dest=TransporterOnScreenMapPosition(sx,sy))) {
+	if( UnitUnderCursor && (dest=TransporterOnMapTile(x,y))) {
 	    if( dest->Player==unit->Player
 		    && unit->Type->UnitType==UnitTypeLand ) {
 		dest->Blink=4;
@@ -241,14 +241,14 @@ global void DoRightButton(int sx,int sy)
 	    //  Go and repair
 	    if ( (unit->Type->CanRepair) &&
 		    (UnitUnderCursor) &&
-		    (dest=RepairableOnScreenMapPosition(sx,sy)) &&
+		    (dest=RepairableOnMapTile(x,y)) &&
 		    ((dest->Player==unit->Player) || (IsAllied(dest->Player,dest)))) {
 		dest->Blink=4;
 		SendCommandRepair(unit,x,y,dest,flush);
 		continue;
 	    }
 	    //  Follow another unit
-	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
+	    if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
 		if( (dest->Player==unit->Player || IsAllied(unit->Player,dest))
 			&& dest!=unit ) {
 		    dest->Blink=4;
@@ -267,7 +267,7 @@ global void DoRightButton(int sx,int sy)
 	if( action==MouseActionDemolish || action==MouseActionAttack ) {
 	    if( UnitUnderCursor ) {
 		// Picks the enemy with highest priority and can be attacked
-		dest=TargetOnScreenMapPosition(unit, sx, sy);
+		dest=TargetOnMapTile(unit, x, y);
 		if( dest ) {
 		    if( IsEnemy(unit->Player,dest) ) {
 			dest->Blink=4;
@@ -296,7 +296,7 @@ global void DoRightButton(int sx,int sy)
 		    }
 		}
 
-		dest=UnitOnScreenMapPosition(sx,sy);
+		dest=UnitOnMapTile(x,y);
 		if( dest ) {
 		    if( (dest->Player==unit->Player
 			    || IsAllied(unit->Player,dest)) && dest!=unit ) {
@@ -335,7 +335,7 @@ global void DoRightButton(int sx,int sy)
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
-	    if( UnitUnderCursor && (dest=UnitOnScreenMapPosition(sx,sy)) ) {
+	    if( UnitUnderCursor && (dest=UnitOnMapTile(x,y)) ) {
 		// Follow allied units, but not self.
 		if( (dest->Player==unit->Player
 			|| IsAllied(unit->Player,dest)) && dest!=unit ) {
@@ -785,17 +785,17 @@ local void SendRepair(int sx,int sy)
     int x;
     int y;
 
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
+
     if( UnitUnderCursor ) {
-	dest=RepairableOnScreenMapPosition(sx,sy);
+	dest=RepairableOnMapTile(x,y);
     } else {
 	dest=NoUnitP;
     }
-
-    x=sx/TileSizeX;
-    y=sy/TileSizeY;
     for( i=0; i<NumSelected; ++i ) {
 	unit=Selected[i];
-	if( unit->Type->CowerWorker ) {
+	if( unit->Type->CanRepair ) {
 	    // FIXME: Should move test in repairable
 	    if( dest && dest->Type && (dest->Player==unit->Player
 		    || IsAllied(unit->Player,dest)) ) {
@@ -826,7 +826,7 @@ local void SendMove(int x,int y)
     Unit* transporter;
 
     if( UnitUnderCursor ) {
-	transporter=TransporterOnScreenMapPosition(x*TileSizeX,y*TileSizeY);
+	transporter=TransporterOnMapTile(x,y);
     } else {
 	transporter=NoUnitP;
     }
@@ -883,7 +883,7 @@ local void SendAttack(int sx,int sy)
 	unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
 	    if( UnitUnderCursor
-		    && (dest=TargetOnScreenMapPosition(unit,sx,sy)) ) {
+		    && (dest=TargetOnMapTile(unit,x,y)) ) {
 		DebugLevel3Fn("Attacking %p\n" _C_ dest);
 		dest->Blink=4;
 	    } else {
@@ -955,7 +955,7 @@ local void SendDemolish(int sx,int sy)
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
 	    if( UnitUnderCursor ) {
-		dest=TargetOnScreenMapPosition(unit,sx,sy);
+		dest=TargetOnMapTile(unit,x,y);
 		if( dest==unit ) {	// don't let a unit self destruct
 		    dest=NoUnitP;
 		}
@@ -1036,13 +1036,13 @@ local void SendSpellCast(int sx, int sy)
     int x;
     int y;
 
+    x=sx/TileSizeX;
+    y=sy/TileSizeY;
     if( UnitUnderCursor ) {
-	dest=UnitOnScreenMapPosition(sx, sy);
+	dest=UnitOnMapTile(x, y);
     } else {
 	dest=NoUnitP;
     }
-    x=sx/TileSizeX;
-    y=sy/TileSizeY;
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n" _C_ dest _C_ x _C_ y);
     /*	NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
@@ -1477,7 +1477,7 @@ global void UIHandleButtonDown(unsigned button)
 		    y=(TheMap.Height-1)*TileSizeY;
 		}
 
-		if( UnitUnderCursor && (unit=UnitOnScreenMapPosition(x,y)) ) {
+		if( UnitUnderCursor && (unit=UnitOnMapTile(x/TileSizeX,y/TileSizeY)) ) {
 		    unit->Blink=4;	// if right click on building -- blink
 		} else {	// if not not click on building -- green cross
 		    MakeLocalMissile(MissileTypeGreenCross
