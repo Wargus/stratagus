@@ -1293,6 +1293,71 @@ local void CclParseInfoText(SCM list, InfoText* text)
     }
 }
 #elif defined(USE_LUA)
+local void CclParseInfoText(lua_State* l, InfoText* text)
+{
+    const char* value;
+    int args;
+    int j;
+
+    memset(text, 0, sizeof(*text));
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "text")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    text->Text = strdup(lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "font")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    text->Font = CclFontByIdentifier(lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "pos")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, -1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    text->X = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, -1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    text->Y = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
 #endif
 
 /**
@@ -1328,6 +1393,10 @@ local void CclParseIcon(lua_State* l, Button* icon)
     int args;
     int j;
 
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
     args = luaL_getn(l, -1);
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, -1, j + 1);
@@ -1469,10 +1538,130 @@ local void CclParseSelected(SCM list, UI* ui)
 	}
     }
 }
+#elif defined(USE_LUA)
+local void CclParseSelected(lua_State* l, UI* ui)
+{
+    const char* value;
+    InfoText text;
+    int args;
+    int j;
+    int k;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "single")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    args = luaL_getn(l, -1);
+	    for (k = 0; k < args; ++k) {
+		lua_rawgeti(l, -1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    CclParseInfoText(l, &text);
+		    lua_pop(l, 1);
+		    ui->SingleSelectedText = text.Text;
+		    ui->SingleSelectedFont = text.Font;
+		    ui->SingleSelectedTextX = text.X;
+		    ui->SingleSelectedTextY = text.Y;
+		} else if (!strcmp(value, "icon")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    ui->SingleSelectedButton = calloc(1, sizeof(Button));
+		    CclParseIcon(l, ui->SingleSelectedButton);
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "multiple")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    args = luaL_getn(l, -1);
+	    for (k = 0; k < args; ++k) {
+		lua_rawgeti(l, -1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    CclParseInfoText(l, &text);
+		    lua_pop(l, 1);
+		    ui->SelectedText = text.Text;
+		    ui->SelectedFont = text.Font;
+		    ui->SelectedTextX = text.X;
+		    ui->SelectedTextY = text.Y;
+		} else if (!strcmp(value, "icons")) {
+		    int i;
+
+		    lua_rawgeti(l, -1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->NumSelectedButtons = luaL_getn(l, -1);
+		    ui->SelectedButtons = calloc(ui->NumSelectedButtons,
+			sizeof(Button));
+		    for (i = 0; i < ui->NumSelectedButtons; ++i) {
+			lua_rawgeti(l, -1, i + 1);
+			CclParseIcon(l, &ui->SelectedButtons[i]);
+			lua_pop(l, 1);
+		    }
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "max-text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    CclParseInfoText(l, &text);
+		    lua_pop(l, 1);
+		    ui->MaxSelectedFont = text.Font;
+		    ui->MaxSelectedTextX = text.X;
+		    ui->MaxSelectedTextY = text.Y;
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
+#endif
 
 /**
 **	Parse info panel training section
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseTraining(SCM list, UI* ui)
 {
     SCM value;
@@ -1543,10 +1732,123 @@ local void CclParseTraining(SCM list, UI* ui)
 	}
     }
 }
+#elif defined(USE_LUA)
+local void CclParseTraining(lua_State* l, UI* ui)
+{
+    const char* value;
+    InfoText text;
+    int args;
+    int j;
+    int k;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "single")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    args = luaL_getn(l, -1);
+	    for (k = 0; k < args; ++k) {
+		lua_rawgeti(l, -1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    CclParseInfoText(l, &text);
+		    lua_pop(l, 1);
+		    ui->SingleTrainingText = text.Text;
+		    ui->SingleTrainingFont = text.Font;
+		    ui->SingleTrainingTextX = text.X;
+		    ui->SingleTrainingTextY = text.Y;
+		} else if (!strcmp(value, "icon")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    ui->SingleTrainingButton = calloc(1, sizeof(Button));
+		    CclParseIcon(l, ui->SingleTrainingButton);
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "multiple")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    args = luaL_getn(l, -1);
+	    for (k = 0; k < args; ++k) {
+		lua_rawgeti(l, -1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "text")) {
+		    lua_rawgeti(l, -1, k + 1);
+		    CclParseInfoText(l, &text);
+		    lua_pop(l, 1);
+		    ui->TrainingText = text.Text;
+		    ui->TrainingFont = text.Font;
+		    ui->TrainingTextX = text.X;
+		    ui->TrainingTextY = text.Y;
+		} else if (!strcmp(value, "icons")) {
+		    int i;
+
+		    lua_rawgeti(l, -1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    ui->NumTrainingButtons = luaL_getn(l, -1);
+		    ui->TrainingButtons = calloc(ui->NumTrainingButtons,
+			sizeof(Button));
+		    for (i = 0; i < ui->NumTrainingButtons; ++i) {
+			lua_rawgeti(l, -1, i + 1);
+			CclParseIcon(l, &ui->TrainingButtons[i]);
+			lua_pop(l, 1);
+		    }
+		    lua_pop(l, 1);
+		} else {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
+#endif
 
 /**
 **	Parse info panel upgrading section
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseUpgrading(SCM list, UI* ui)
 {
     SCM value;
@@ -1573,10 +1875,53 @@ local void CclParseUpgrading(SCM list, UI* ui)
 	}
     }
 }
+#elif defined(USE_LUA)
+local void CclParseUpgrading(lua_State* l, UI* ui)
+{
+    const char* value;
+    InfoText text;
+    int args;
+    int j;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "text")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    CclParseInfoText(l, &text);
+	    lua_pop(l, 1);
+	    ui->UpgradingText = text.Text;
+	    ui->UpgradingFont = text.Font;
+	    ui->UpgradingTextX = text.X;
+	    ui->UpgradingTextY = text.Y;
+	} else if (!strcmp(value, "icon")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    ui->UpgradingButton = calloc(1, sizeof(Button));
+	    CclParseIcon(l, ui->UpgradingButton);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
+#endif
 
 /**
 **	Parse info panel researching section
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseResearching(SCM list, UI* ui)
 {
     SCM value;
@@ -1603,10 +1948,53 @@ local void CclParseResearching(SCM list, UI* ui)
 	}
     }
 }
+#elif defined(USE_LUA)
+local void CclParseResearching(lua_State* l, UI* ui)
+{
+    const char* value;
+    InfoText text;
+    int args;
+    int j;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "text")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    CclParseInfoText(l, &text);
+	    lua_pop(l, 1);
+	    ui->ResearchingText = text.Text;
+	    ui->ResearchingFont = text.Font;
+	    ui->ResearchingTextX = text.X;
+	    ui->ResearchingTextY = text.Y;
+	} else if (!strcmp(value, "icon")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    ui->ResearchingButton = calloc(1, sizeof(Button));
+	    CclParseIcon(l, ui->ResearchingButton);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
+#endif
 
 /**
 **	Parse info panel transporting section
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local void CclParseTransporting(SCM list, UI* ui)
 {
     SCM value;
@@ -1640,6 +2028,59 @@ local void CclParseTransporting(SCM list, UI* ui)
 	    }
 	} else {
 	    errl("Unsupported tag", value);
+	}
+    }
+}
+#elif defined(USE_LUA)
+local void CclParseTransporting(lua_State* l, UI* ui)
+{
+    const char* value;
+    InfoText text;
+    int args;
+    int j;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "text")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    CclParseInfoText(l, &text);
+	    lua_pop(l, 1);
+	    ui->TransportingText = text.Text;
+	    ui->TransportingFont = text.Font;
+	    ui->TransportingTextX = text.X;
+	    ui->TransportingTextY = text.Y;
+	} else if (!strcmp(value, "icons")) {
+	    int i;
+
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_istable(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->NumTransportingButtons = luaL_getn(l, -1);
+	    ui->TransportingButtons = calloc(ui->NumTransportingButtons,
+		sizeof(Button));
+	    for (i = 0; i < ui->NumTransportingButtons; ++i) {
+		lua_rawgeti(l, -1, i + 1);
+		CclParseIcon(l, &ui->TransportingButtons[i]);
+		lua_pop(l, 1);
+	    }
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
 	}
     }
 }
@@ -2676,102 +3117,220 @@ local int CclDefineUI(lua_State* l)
 		}
 		lua_pop(l, 1);
 	    }
-#if 0
-	} else if (gh_eq_p(value, gh_symbol2scm("info-panel"))) {
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		if (gh_eq_p(value, gh_symbol2scm("panel"))) {
-		    SCM slist;
+	} else if (!strcmp(value, "info-panel")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		value = lua_tostring(l, -1);
+		lua_pop(l, 1);
+		++k;
+		if (!strcmp(value, "panel")) {
+		    int subk;
+		    int subsubargs;
 
-		    slist = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    while (!gh_null_p(slist)) {
-			value = gh_car(slist);
-			slist = gh_cdr(slist);
-			if (gh_eq_p(value, gh_symbol2scm("file"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->InfoPanel.File = gh_scm2newstr(value, NULL);
-			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->InfoPanelX = gh_scm2int(gh_car(value));
-			    ui->InfoPanelY = gh_scm2int(gh_car(gh_cdr(value)));
-			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->InfoPanelW = gh_scm2int(gh_car(value));
-			    ui->InfoPanelH = gh_scm2int(gh_car(gh_cdr(value)));
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    subsubargs = luaL_getn(l, -1);
+		    for (subk = 0; subk < subsubargs; ++subk) {
+			lua_rawgeti(l, -1, subk + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			++subk;
+			if (!strcmp(value, "file")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_isstring(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->InfoPanel.File = strdup(lua_tostring(l, -1));
+			    lua_pop(l, 1);
+			} else if (!strcmp(value, "pos")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->InfoPanelX = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 2);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->InfoPanelY = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_pop(l, 1);
+			} else if (!strcmp(value, "size")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->InfoPanelW = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 2);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->InfoPanelH = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_pop(l, 1);
 			} else {
-			    errl("Unsupported tag", value);
+			    lua_pushfstring(l, "Unsupported tag: %s", value);
+			    lua_error(l);
 			}
 		    }
-		} else if (gh_eq_p(value, gh_symbol2scm("selected"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    CclParseSelected(value, ui);
-		} else if (gh_eq_p(value, gh_symbol2scm("training"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    CclParseTraining(value, ui);
-		} else if (gh_eq_p(value, gh_symbol2scm("upgrading"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    CclParseUpgrading(value, ui);
-		} else if (gh_eq_p(value, gh_symbol2scm("researching"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    CclParseResearching(value, ui);
-		} else if (gh_eq_p(value, gh_symbol2scm("transporting"))) {
-		    value = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    CclParseTransporting(value, ui);
-		} else if (gh_eq_p(value, gh_symbol2scm("completed-bar"))) {
-		    SCM slist;
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "selected")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    CclParseSelected(l, ui);
+		} else if (!strcmp(value, "training")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    CclParseTraining(l, ui);
+		} else if (!strcmp(value, "upgrading")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    CclParseUpgrading(l, ui);
+		} else if (!strcmp(value, "researching")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    CclParseResearching(l, ui);
+		} else if (!strcmp(value, "transporting")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    CclParseTransporting(l, ui);
+		} else if (!strcmp(value, "completed-bar")) {
+		    int subsubargs;
+		    int subk;
 
-		    slist = gh_car(sublist);
-		    sublist = gh_cdr(sublist);
-		    while (!gh_null_p(slist)) {
-			value = gh_car(slist);
-			slist = gh_cdr(slist);
-			if (gh_eq_p(value, gh_symbol2scm("color"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->CompletedBarColorRGB.D24.a = gh_scm2int(gh_car(value));
-			    ui->CompletedBarColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(value)));
-			    ui->CompletedBarColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(value))));
-			} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->CompletedBarX = gh_scm2int(gh_car(value));
-			    ui->CompletedBarY = gh_scm2int(gh_car(gh_cdr(value)));
-			} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    ui->CompletedBarW = gh_scm2int(gh_car(value));
-			    ui->CompletedBarH = gh_scm2int(gh_car(gh_cdr(value)));
-			} else if (gh_eq_p(value, gh_symbol2scm("text"))) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    subsubargs = luaL_getn(l, -1);
+		    for (subk = 0; subk < subsubargs; ++subk) {
+			lua_rawgeti(l, -1, subk + 1);
+			if (!lua_isstring(l, -1)) {
+			    lua_pushstring(l, "incorrect argument");
+			    lua_error(l);
+			}
+			value = lua_tostring(l, -1);
+			lua_pop(l, 1);
+			++subk;
+			if (!strcmp(value, "color")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarColorRGB.D24.a = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 2);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarColorRGB.D24.b = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 3);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarColorRGB.D24.c = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_pop(l, 1);
+			} else if (!strcmp(value, "pos")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarX = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarY = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_pop(l, 1);
+			} else if (!strcmp(value, "size")) {
+			    lua_rawgeti(l, -1, subk + 1);
+			    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarW = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_rawgeti(l, -1, 1);
+			    if (!lua_isnumber(l, -1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			    }
+			    ui->CompletedBarH = lua_tonumber(l, -1);
+			    lua_pop(l, 1);
+			    lua_pop(l, 1);
+			} else if (!strcmp(value, "text")) {
 			    InfoText text;
 
-			    value = gh_car(slist);
-			    slist = gh_cdr(slist);
-			    CclParseInfoText(value, &text);
+			    lua_rawgeti(l, -1, subk + 1);
+			    CclParseInfoText(l, &text);
+			    lua_pop(l, 1);
 			    ui->CompletedBarText = text.Text;
 			    ui->CompletedBarFont = text.Font;
 			    ui->CompletedBarTextX = text.X;
 			    ui->CompletedBarTextY = text.Y;
 			} else {
-			    errl("Unsupported tag", value);
+			    lua_pushfstring(l, "Unsupported tag: %s", value);
+			    lua_error(l);
 			}
 		    }
 		} else {
-		    errl("Unsupported tag", value);
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
 		}
 	    }
-#endif
 	} else if (!strcmp(value, "button-panel")) {
 	    if (!lua_istable(l, j + 1)) {
 		lua_pushstring(l, "incorrect argument");
@@ -3590,8 +4149,8 @@ local int CclDefineUI(lua_State* l)
 	    }
 	    ui->DefeatBackground.File = strdup(lua_tostring(l, j + 1));
 	} else {
-//	    lua_pushfstring(l, "Unsupported tag: %s", value);
-//	    lua_error(l);
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
 	}
     }
 
@@ -3636,6 +4195,60 @@ local SCM CclDefineViewports(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineViewports(lua_State* l)
+{
+    const char* value;
+//    SCM sublist;
+    UI* ui;
+    int i;
+    int args;
+    int j;
+
+    i = 0;
+    ui = &TheUI;
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "mode")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->ViewportMode = lua_tonumber(l, j + 1);
+	} else if (!strcmp(value, "viewport")) {
+	    if (!lua_istable(l, j + 1) && luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->Viewports[i].MapX = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ui->Viewports[i].MapY = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    ++i;
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+    ui->NumViewports = i;
+
+    return 0;
+}
 #endif
 
 /**
@@ -6373,7 +6986,7 @@ local SCM CclDefineButton(SCM list)
 
     memset(&ba, 0, sizeof(ba));
     //
-    //	Parse the arguments, already the new tagged format.
+    //	Parse the arguments
     //
     while (!gh_null_p(list)) {
 	value = gh_car(list);
@@ -6547,6 +7160,234 @@ local SCM CclDefineButton(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineButton(lua_State* l)
+{
+    char buf[64];
+    const char* value;
+    char* s1;
+    char* s2;
+    ButtonAction ba;
+    int args;
+    int j;
+
+    DebugLevel3Fn("Define button\n");
+
+    memset(&ba, 0, sizeof(ba));
+    //
+    //	Parse the arguments
+    //
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "pos")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ba.Pos = lua_tonumber(l, j + 1);
+	} else if (!strcmp(value, "level")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ba.Level = lua_tonumber(l, j + 1);
+	} else if (!strcmp(value, "icon")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ba.Icon.Name = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "action")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    if (!strcmp(value, "move")) {
+		ba.Action = ButtonMove;
+	    } else if (!strcmp(value, "stop")) {
+		ba.Action = ButtonStop;
+	    } else if (!strcmp(value, "attack")) {
+		ba.Action = ButtonAttack;
+	    } else if (!strcmp(value, "repair")) {
+		ba.Action = ButtonRepair;
+	    } else if (!strcmp(value, "harvest")) {
+		ba.Action = ButtonHarvest;
+	    } else if (!strcmp(value, "button")) {
+		ba.Action = ButtonButton;
+	    } else if (!strcmp(value, "build")) {
+		ba.Action = ButtonBuild;
+	    } else if (!strcmp(value, "train-unit")) {
+		ba.Action = ButtonTrain;
+	    } else if (!strcmp(value, "patrol")) {
+		ba.Action = ButtonPatrol;
+	    } else if (!strcmp(value, "stand-ground")) {
+		ba.Action = ButtonStandGround;
+	    } else if (!strcmp(value, "attack-ground")) {
+		ba.Action = ButtonAttackGround;
+	    } else if (!strcmp(value, "return-goods")) {
+		ba.Action = ButtonReturn;
+	    } else if (!strcmp(value, "cast-spell")) {
+		ba.Action = ButtonSpellCast;
+	    } else if (!strcmp(value, "research")) {
+		ba.Action = ButtonResearch;
+	    } else if (!strcmp(value, "upgrade-to")) {
+		ba.Action = ButtonUpgradeTo;
+	    } else if (!strcmp(value, "unload")) {
+		ba.Action = ButtonUnload;
+	    } else if (!strcmp(value, "cancel")) {
+		ba.Action = ButtonCancel;
+	    } else if (!strcmp(value, "cancel-upgrade")) {
+		ba.Action = ButtonCancelUpgrade;
+	    } else if (!strcmp(value, "cancel-train-unit")) {
+		ba.Action = ButtonCancelTrain;
+	    } else if (!strcmp(value, "cancel-build")) {
+		ba.Action = ButtonCancelBuild;
+	    } else {
+		lua_pushfstring(l, "Unsupported button action: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "value")) {
+	    if (!lua_isnumber(l, j + 1) && !lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (lua_isnumber(l, j + 1)) {
+		sprintf(buf, "%ld", lua_tonumber(l, j + 1));
+		s1 = strdup(buf);
+	    } else {
+		s1 = strdup(lua_tostring(l, j + 1));
+	    }
+	    ba.ValueStr = s1;
+	} else if (!strcmp(value, "allowed")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    if (!strcmp(value, "check-true")) {
+		ba.Allowed = ButtonCheckTrue;
+	    } else if (!strcmp(value, "check-false")) {
+		ba.Allowed = ButtonCheckFalse;
+	    } else if (!strcmp(value, "check-upgrade")) {
+		ba.Allowed = ButtonCheckUpgrade;
+	    } else if (!strcmp(value, "check-units-or")) {
+		ba.Allowed = ButtonCheckUnitsOr;
+	    } else if (!strcmp(value, "check-units-and")) {
+		ba.Allowed = ButtonCheckUnitsAnd;
+	    } else if (!strcmp(value, "check-network")) {
+		ba.Allowed = ButtonCheckNetwork;
+	    } else if (!strcmp(value, "check-no-network")) {
+		ba.Allowed = ButtonCheckNoNetwork;
+	    } else if (!strcmp(value, "check-no-work")) {
+		ba.Allowed = ButtonCheckNoWork;
+	    } else if (!strcmp(value, "check-no-research")) {
+		ba.Allowed = ButtonCheckNoResearch;
+	    } else if (!strcmp(value, "check-attack")) {
+		ba.Allowed = ButtonCheckAttack;
+	    } else if (!strcmp(value, "check-upgrade-to")) {
+		ba.Allowed = ButtonCheckUpgradeTo;
+	    } else if (!strcmp(value, "check-research")) {
+		ba.Allowed = ButtonCheckResearch;
+	    } else if (!strcmp(value, "check-single-research")) {
+		ba.Allowed = ButtonCheckSingleResearch;
+	    } else {
+		lua_pushfstring(l, "Unsupported action: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "allow-arg")) {
+	    int subargs;
+	    int k;
+
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    s1 = strdup("");
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		s2 = strdup(lua_tostring(l, -1));
+		lua_pop(l, 1);
+		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
+		strcat(s1, s2);
+		free(s2);
+		if (k == subargs) {
+		    strcat(s1, ",");
+		}
+	    }
+	    ba.AllowStr = s1;
+	} else if (!strcmp(value, "key")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ba.Key = *lua_tostring(l, j + 1);
+	} else if (!strcmp(value, "hint")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    ba.Hint = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "for-unit")) {
+	    int subargs;
+	    int k;
+
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    // FIXME: ba.UnitMask shouldn't be a string
+	    s1 = strdup(",");
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		if (!lua_isstring(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		s2 = strdup(lua_tostring(l, -1));
+		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
+		strcat(s1, s2);
+		strcat(s1, ",");
+		free(s2);
+	    }
+	    ba.UnitMask = s1;
+	    if (!strncmp(ba.UnitMask, ",*,", 3)) {
+		free(ba.UnitMask);
+		ba.UnitMask = strdup("*");
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+    AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
+	ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
+    if (ba.ValueStr) {
+	free(ba.ValueStr);
+    }
+    if (ba.AllowStr) {
+	free(ba.AllowStr);
+    }
+    if (ba.Hint) {
+        free(ba.Hint);
+    }
+    if (ba.UnitMask) {
+        free(ba.UnitMask);
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -7314,7 +8155,7 @@ global void UserInterfaceCclRegister(void)
     lua_register(Lua, "DefineCursor", CclDefineCursor);
     lua_register(Lua, "SetGameCursor", CclSetGameCursor);
     lua_register(Lua, "DefineUI", CclDefineUI);
-//    lua_register(Lua, "DefineViewports", CclDefineViewports);
+    lua_register(Lua, "DefineViewports", CclDefineViewports);
 
     lua_register(Lua, "SetGrabMouse", CclSetGrabMouse);
     lua_register(Lua, "SetLeaveStops", CclSetLeaveStops);
@@ -7328,7 +8169,7 @@ global void UserInterfaceCclRegister(void)
     lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
     lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
 
-//    lua_register(Lua, "DefineButton", CclDefineButton);
+    lua_register(Lua, "DefineButton", CclDefineButton);
 
     lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
     lua_register(Lua, "DefineMenu", CclDefineMenu);
