@@ -599,7 +599,7 @@ local void SaveCursorBackground32(int x,int y,int w,int h)
 /**
 **	Destroy image behind cursor.
 */
-local void DestroyCursorBackground(void)
+global void DestroyCursorBackground(void)
 {
     if (OldCursorImage) {
 	free(OldCursorImage);
@@ -820,7 +820,7 @@ global void HideAnyCursor(void)
     //
     //	First, Normal cursor (might restore part of rectangle cursor also).
     //
-    if( OldCursorW ) {
+    if( OldCursorW && OldCursorImage) {
         // restore area of visible cursor
         LoadCursorBackground(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
 
