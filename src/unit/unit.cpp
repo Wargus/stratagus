@@ -3240,7 +3240,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    }
 	}
 	NotifyPlayer(target->Player,NotifyRed,target->X,target->Y,
-		"%s attacked",target->Type->Ident);
+		"%s attacked",target->Type->Name);
 	if( target->Player->AiEnabled ) {
 	    AiHelpMe(attacker,target);
 	}
