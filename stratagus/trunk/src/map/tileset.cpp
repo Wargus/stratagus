@@ -115,11 +115,7 @@ global void LoadTileset(void)
 	if (!Tilesets[i]->Table) {
 		char buf[1024];
 		LibraryFileName(Tilesets[i]->File, buf);
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		vload(buf, 0, 1);
-#elif defined(USE_LUA)
 		LuaLoadFile(buf);
-#endif
 	}
 
 	TheMap.Tileset = Tilesets[i];

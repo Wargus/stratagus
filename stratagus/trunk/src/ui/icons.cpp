@@ -478,61 +478,6 @@ global void SaveIcons(CLFile* file)
 **
 **		@param list		Icon definition list.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineIcon(SCM list)
-{
-	SCM value;
-	char* ident;
-	char* tileset;
-	char* filename;
-	int width;
-	int height;
-	int index;
-
-#ifdef DEBUG
-	index = width = height = 0;
-#endif
-	filename = NULL;
-	tileset = NULL;
-
-	//  Identifier
-
-	ident = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-
-	//
-	//  Parse the arguments, tagged format.
-	//
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
-			tileset = gh_scm2newstr(gh_car(list), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			value = gh_car(list);
-			width = gh_scm2int(gh_car(value));
-			height = gh_scm2int(gh_cadr(value));
-		} else if (gh_eq_p(value, gh_symbol2scm("normal"))) {
-			value = gh_car(list);
-			index = gh_scm2int(gh_car(value));
-			filename = gh_scm2newstr(gh_cadr(value), NULL);
-		} else {
-			errl("Unsupported tag", value);
-		}
-		list = gh_cdr(list);
-	}
-
-	DebugCheck(!filename || !width || !height);
-
-	AddIcon(ident, tileset, index, width, height, filename);
-	free(ident);
-	free(tileset);
-	free(filename);
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineIcon(lua_State* l)
 {
 	const char* value;
@@ -601,7 +546,6 @@ local int CclDefineIcon(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		@brief Parse icon alias definition.
@@ -612,17 +556,6 @@ local int CclDefineIcon(lua_State* l)
 **		@param alias		Icon alias name.
 **		@param icon		Original icon.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineIconAlias(SCM alias, SCM icon)
-{
-	IconAliases = realloc(IconAliases, sizeof(char*) * 2 * (NumIconAliases + 1));
-	IconAliases[NumIconAliases * 2 + 0] = gh_scm2newstr(alias, NULL);
-	IconAliases[NumIconAliases * 2 + 1] = gh_scm2newstr(icon, NULL);
-	++NumIconAliases;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineIconAlias(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
@@ -636,40 +569,12 @@ local int CclDefineIconAlias(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		@brief Define icon mapping from original number to internal symbol
 **
 **		@param list		List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineIconWcNames(SCM list)
-{
-	int i;
-	char** cp;
-
-	if ((cp = IconWcNames)) {				// Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(IconWcNames);
-	}
-
-	//
-	//		Get new table.
-	//
-	i = gh_length(list);
-	IconWcNames = cp = malloc((i + 1) * sizeof(char*));
-	while (i--) {
-		*cp++ = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-	}
-	*cp = NULL;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineIconWcNames(lua_State* l)
 {
 	int i;
@@ -700,7 +605,6 @@ local int CclDefineIconWcNames(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Set icon size
@@ -709,14 +613,6 @@ local int CclDefineIconWcNames(lua_State* l)
 **		@param width		Width of icon.
 **		@param height		Height of icon.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetIconSize(SCM width, SCM height)
-{
-	IconWidth = gh_scm2int(width);
-	IconHeight = gh_scm2int(height);
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclSetIconSize(lua_State* l)
 {
 	if (lua_gettop(l) != 2) {
@@ -727,7 +623,6 @@ local int CclSetIconSize(lua_State* l)
 	IconHeight = LuaToNumber(l, 2);
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for icons.
@@ -737,15 +632,6 @@ local int CclSetIconSize(lua_State* l)
 */
 global void IconCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-icon", CclDefineIcon);
-	gh_new_procedure2_0("define-icon-alias", CclDefineIconAlias);
-
-	gh_new_procedureN("define-icon-wc-names", CclDefineIconWcNames);
-
-	// FIXME: can be removed:
-	gh_new_procedure2_0("set-icon-size!", CclSetIconSize);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineIcon", CclDefineIcon);
 	lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);
 
@@ -753,7 +639,6 @@ global void IconCclRegister(void)
 
 	// FIXME: can be removed:
 	lua_register(Lua, "SetIconSize", CclSetIconSize);
-#endif
 }
 
 //@}

@@ -71,11 +71,7 @@ typedef struct _log_entry_ LogEntry;
 **		LogEntry structure.
 */
 struct _log_entry_ {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	int				GameCycle;
-#elif defined(USE_LUA)
 	unsigned long   GameCycle;
-#endif
 	int				UnitNumber;
 	char*		UnitIdent;
 	char*		Action;
@@ -85,11 +81,7 @@ struct _log_entry_ {
 	int				DestUnitNumber;
 	char*		Value;
 	int				Num;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	int				SyncRandSeed;
-#elif defined(USE_LUA)
 	unsigned		SyncRandSeed;
-#endif
 	LogEntry*		Next;
 };
 
@@ -113,11 +105,7 @@ typedef struct _full_replay_ {
 	char*		Date;
 	char*		Map;
 	char*		MapPath;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	int				MapId;
-#elif defined(USE_LUA)
 	unsigned		MapId;
-#endif
 
 	int				Type;
 	int				Race;
@@ -140,72 +128,6 @@ typedef struct _full_replay_ {
 //		Constants
 //----------------------------------------------------------------------------
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-/// Description of the LogEntry structure
-static IOStructDef LogEntryStructDef = {
-	"LogEntry",
-	sizeof(LogEntry),
-	-1,
-	{
-		{"`next", 				NULL, 				&((LogEntry*)0)->Next, 				NULL},
-		{"game-cycle",				&IOInt,				&((LogEntry*)0)->GameCycle,		NULL},
-		{"unit-number",				&IOInt,				&((LogEntry*)0)->UnitNumber,		NULL},
-		{"unit-ident",				&IOString,		&((LogEntry*)0)->UnitIdent,		NULL},
-		{"action",				&IOString,		&((LogEntry*)0)->Action,		NULL},
-		{"flush",				&IOInt,				&((LogEntry*)0)->Flush,				NULL},
-		{"posx",				&IOInt,				&((LogEntry*)0)->PosX,				NULL},
-		{"posy",				&IOInt,				&((LogEntry*)0)->PosY,				NULL},
-		{"dest-unit-number",		&IOInt,				&((LogEntry*)0)->DestUnitNumber,NULL},
-		{"value",				&IOString,		&((LogEntry*)0)->Value,				NULL},
-		{"Num",						&IOInt,				&((LogEntry*)0)->Num,				NULL},
-		{"SyncRandSeed",		&IOInt,				&((LogEntry*)0)->SyncRandSeed,		NULL},
-		{0, 0, 0, 0}
-	}
-};
-
-static IOStructDef MPPlayerStructDef = {
-	"MPPlayer",
-	sizeof(MPPlayer),
-	PlayerMax,
-	{
-		{"name",				&IOString,		&((MPPlayer*)0)->Name,		NULL},
-		{"race",				&IOInt,				&((MPPlayer*)0)->Race,		NULL},
-		{"team",				&IOInt,				&((MPPlayer*)0)->Team,		NULL},
-		{"type",				&IOInt,				&((MPPlayer*)0)->Type,		NULL},
-		{0, 0, 0, 0}
-	}
-};
-
-static IOStructDef FullReplayStructDef = {
-	"FullReplay",
-	sizeof(FullReplay),
-	-1,
-	{
-		{"comment-1",				&IOString,		&((FullReplay*)0)->Comment1,		NULL},
-		{"comment-2",				&IOString,		&((FullReplay*)0)->Comment2,		NULL},
-		{"comment-3",				&IOString,		&((FullReplay*)0)->Comment3,		NULL},
-		{"date",				&IOString,		&((FullReplay*)0)->Date,		NULL},
-		{"map",						&IOString,		&((FullReplay*)0)->Map,		NULL},
-		{"mappath",				&IOString,		&((FullReplay*)0)->MapPath,		NULL},
-		{"mapid",				&IOInt,				&((FullReplay*)0)->MapId,		NULL},
-		{"type",				&IOInt,				&((FullReplay*)0)->Type,		NULL},
-		{"race",				&IOInt,				&((FullReplay*)0)->Race,		NULL},
-		{"local-player",		&IOInt,				&((FullReplay*)0)->LocalPlayer,		NULL},
-		{"players",				&IOStructArray,		&((FullReplay*)0)->Players,		(void*)&MPPlayerStructDef},
-		{"resource",				&IOInt,				&((FullReplay*)0)->Resource,		NULL},
-		{"num-units",				&IOInt,				&((FullReplay*)0)->NumUnits,		NULL},
-		{"tileset",				&IOInt,				&((FullReplay*)0)->TileSet,		NULL},
-		{"no-fow",				&IOInt,				&((FullReplay*)0)->NoFow,		NULL},
-		{"reveal-map",				&IOInt,				&((FullReplay*)0)->RevealMap,		NULL},
-		{"game-type",				&IOInt,				&((FullReplay*)0)->GameType,		NULL},
-		{"Opponents",				&IOInt,				&((FullReplay*)0)->Opponents,		NULL},
-		{"engine",				&IOIntArray,		&((FullReplay*)0)->Engine,		(void*)3},
-		{"network",				&IOIntArray,		&((FullReplay*)0)->Network,		(void*)3},
-		{"commands",				&IOLinkedList,		&((FullReplay*)0)->Commands,		(void*)&LogEntryStructDef},
-		{0, 0, 0, 0}
-	}
-};
-#endif
 
 //----------------------------------------------------------------------------
 //		Variables
@@ -376,17 +298,6 @@ local void DeleteReplay(FullReplay* replay)
 */
 local void SaveFullLog(CLFile* dest)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	// FIXME : IOStartSaving(dest);
-	IOLoadingMode = 0;
-	IOOutFile = dest;
-	IOTabLevel = 2;
-
-	CLprintf(dest, "(replay-log (quote\n");
-	IOStructPtr(SCM_UNSPECIFIED, (void*)&CurrentReplay, (void*)&FullReplayStructDef);
-	CLprintf(dest, "))\n");
-	// FIXME : IODone();
-#elif defined(USE_LUA)
 	LogEntry* log;
 	int i;
 
@@ -431,7 +342,6 @@ local void SaveFullLog(CLFile* dest)
 		AppendLog(log, dest);
 		log = log->Next;
 	}
-#endif
 }
 
 /**
@@ -457,16 +367,6 @@ local void AppendLog(LogEntry* log, CLFile* dest)
 		return;
 	}
 
-	// FIXME : IOStartSaving(dest);
-
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	IOLoadingMode = 0;
-	IOOutFile = dest;
-	IOTabLevel = 2;
-	CLprintf(dest, "(log (quote ");
-	IOLinkedList(SCM_UNSPECIFIED, (void*)&log, (void*)&LogEntryStructDef);
-	CLprintf(dest,"))\n");
-#elif defined(USE_LUA)
 	CLprintf(dest, "Log( { ");
 	CLprintf(dest, "GameCycle = %lu, ", log->GameCycle);
 	if (log->UnitNumber != -1) {
@@ -490,10 +390,7 @@ local void AppendLog(LogEntry* log, CLFile* dest)
 		CLprintf(dest, "Num = %d, ", log->Num);
 	}
 	CLprintf(dest, "SyncRandSeed = %u } )\n", log->SyncRandSeed);
-#endif
 	CLflush(dest);
-
-	// FIXME : IODone();
 }
 
 /**
@@ -607,30 +504,6 @@ global void CommandLog(const char* action, const Unit* unit, int flush,
 /**
 **		Parse log
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclLog(SCM list)
-{
-	LogEntry* log;
-	LogEntry** last;
-
-	DebugCheck(!CurrentReplay);
-
-	IOLoadingMode = 1;
-
-	log = NULL;
-	IOLinkedList(list, (void*)&log, (void*)&LogEntryStructDef);
-
-	// Append to linked list
-	last = &CurrentReplay->Commands;
-	while (*last) {
-		last = &(*last)->Next;
-	}
-
-	*last = log;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclLog(lua_State* l)
 {
 	LogEntry* log;
@@ -693,30 +566,10 @@ local int CclLog(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Parse replay-log
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclReplayLog(SCM list)
-{
-	FullReplay* replay;
-
-	DebugCheck(CurrentReplay != NULL);
-
-	IOLoadingMode = 1;
-	replay = 0;
-	IOStructPtr(list, (void*)&replay, (void*)&FullReplayStructDef);
-
-	CurrentReplay = replay;
-
-	// Apply CurrentReplay settings.
-	ApplyReplaySettings();
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclReplayLog(lua_State* l)
 {
 	FullReplay* replay;
@@ -844,7 +697,6 @@ local int CclReplayLog(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Save generated replay
@@ -866,11 +718,7 @@ global int LoadReplay(char* name)
 	CleanReplayLog();
 	ReplayGameType = ReplaySinglePlayer;
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	vload(name, 0, 1);
-#elif defined(USE_LUA)
 	LuaLoadFile(name);
-#endif
 
 	NextLogCycle = ~0UL;
 	if (!CommandLogDisabled) {
@@ -1605,15 +1453,13 @@ global void SendCommandSharedVision(int player, int state, int opponent)
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void NetworkCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedure1_0("log", CclLog);
-	gh_new_procedure1_0("replay-log", CclReplayLog);
-#elif defined(USE_LUA)
 	lua_register(Lua, "Log", CclLog);
 	lua_register(Lua, "ReplayLog", CclReplayLog);
-#endif
 }
 
 //@}

@@ -313,33 +313,6 @@ global Construction* ConstructionByWcNum(int num)
 **
 **		@param list		List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineConstructionWcNames(SCM list)
-{
-	int i;
-	char** cp;
-
-	if ((cp = ConstructionWcNames)) {				// Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(ConstructionWcNames);
-	}
-
-	//
-	//		Get new table.
-	//
-	i = gh_length(list);
-	ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
-	while (i--) {
-		*cp++ = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-	}
-	*cp = NULL;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineConstructionWcNames(lua_State* l)
 {
 	int i;
@@ -370,7 +343,6 @@ local int CclDefineConstructionWcNames(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Parse the construction.
@@ -379,168 +351,6 @@ local int CclDefineConstructionWcNames(lua_State* l)
 **
 **		@note make this more flexible
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineConstruction(SCM list)
-{
-	SCM value;
-	SCM sublist;
-	char* str;
-	Construction* construction;
-	Construction** cop;
-	int i;
-
-	//		Slot identifier
-
-	str = gh_scm2newstr(gh_car(list), NULL);
-	list = gh_cdr(list);
-
-	if ((cop = Constructions) == NULL) {
-		Constructions = malloc(2 * sizeof(Construction*));
-		Constructions[0] = calloc(1, sizeof(Construction));
-		Constructions[1] = NULL;
-		construction = Constructions[0];
-	} else {
-		for (i = 0; *cop; ++i, ++cop) {
-		}
-		Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
-		Constructions[i] = calloc(1, sizeof(Construction));
-		Constructions[i + 1] = NULL;
-		construction = Constructions[i];
-	}
-	construction->OType = ConstructionType;
-	construction->Ident = str;
-
-	//
-	//		Parse the arguments, in tagged format.
-	//
-	while (!gh_null_p(list)) {
-		int files;
-
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if ((files = gh_eq_p(value, gh_symbol2scm("file"))) ||
-				gh_eq_p(value, gh_symbol2scm("shadow-file"))) {
-			int tileset;
-			char* file;
-			int w;
-			int h;
-
-			tileset = 0;
-			file = NULL;
-			w = 0;
-			h = 0;
-
-			sublist = gh_car(list);
-			while (!gh_null_p(sublist)) {
-				value = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-
-				if (gh_eq_p(value, gh_symbol2scm("tileset"))) {
-					str = gh_scm2newstr(gh_car(sublist), NULL);
-					sublist = gh_cdr(sublist);
-
-					// FIXME: use a general get tileset function here!
-					i = 0;
-					if (strcmp(str, "default")) {
-						for (; i < NumTilesets; ++i) {
-							if (!strcmp(str, Tilesets[i]->Ident)) {
-								break;
-							}
-							if (!strcmp(str, Tilesets[i]->Class)) {
-								break;
-							}
-						}
-						if (i == NumTilesets) {
-							fprintf(stderr, "Tileset `%s' not available\n", str);
-							errl("tileset not available", gh_car(sublist));
-						}
-					}
-					tileset = i;
-					free(str);
-				} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
-					file = gh_scm2newstr(gh_car(sublist), NULL);
-					sublist = gh_cdr(sublist);
-				} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-					value = gh_car(sublist);
-					sublist = gh_cdr(sublist);
-					w = gh_scm2int(gh_car(value));
-					value = gh_cdr(value);
-					h = gh_scm2int(gh_car(value));
-				} else {
-					errl("Unsupported tag", value);
-				}
-			}
-			if (files) {
-				free(construction->File[tileset].File);
-				construction->File[tileset].File = file;
-				construction->File[tileset].Width = w;
-				construction->File[tileset].Height = h;
-			} else {
-				free(construction->ShadowFile[tileset].File);
-				construction->ShadowFile[tileset].File = file;
-				construction->ShadowFile[tileset].Width = w;
-				construction->ShadowFile[tileset].Height = h;
-			}
-		} else if (gh_eq_p(value, gh_symbol2scm("constructions"))) {
-			sublist = gh_car(list);
-			while (!gh_null_p(sublist)) {
-				SCM slist;
-				int percent;
-				int file;
-				int frame;
-				ConstructionFrame** cframe;
-
-				percent = 0;
-				file = 0;
-				frame = 0;
-
-				slist = gh_car(sublist);
-				sublist = gh_cdr(sublist);
-				while (!gh_null_p(slist)) {
-					value = gh_car(slist);
-					slist = gh_cdr(slist);
-
-					if (gh_eq_p(value, gh_symbol2scm("percent"))) {
-						percent = gh_scm2int(gh_car(slist));
-						slist = gh_cdr(slist);
-					} else if (gh_eq_p(value, gh_symbol2scm("file"))) {
-						value = gh_car(slist);
-						if (gh_eq_p(value, gh_symbol2scm("construction"))) {
-							file = ConstructionFileConstruction;
-						} else if (gh_eq_p(value, gh_symbol2scm("main"))) {
-							file = ConstructionFileMain;
-						} else {
-							errl("Unsupported tag", value);
-						}
-						slist = gh_cdr(slist);
-					} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
-						frame = gh_scm2int(gh_car(slist));
-						slist = gh_cdr(slist);
-					} else {
-						errl("Unsupported tag", value);
-					}
-				}
-				cframe = &construction->Frames;
-				while (*cframe) {
-					cframe = &((*cframe)->Next);
-				}
-				(*cframe) = malloc(sizeof(ConstructionFrame));
-				(*cframe)->Percent = percent;
-				(*cframe)->File = file;
-				(*cframe)->Frame = frame;
-				(*cframe)->Next = NULL;
-			}
-		} else {
-			// FIXME: this leaves a half initialized construction
-			errl("Unsupported tag", value);
-		}
-		list = gh_cdr(list);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineConstruction(lua_State* l)
 {
 	const char* value;
@@ -722,7 +532,6 @@ local int CclDefineConstruction(lua_State* l)
 
 	return 0;
 }
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -731,14 +540,8 @@ local int CclDefineConstruction(lua_State* l)
 */
 global void ConstructionCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-construction-wc-names",
-		CclDefineConstructionWcNames);
-	gh_new_procedureN("define-construction", CclDefineConstruction);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineConstructionWcNames",
 		CclDefineConstructionWcNames);
 	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
-#endif
 }
 //@}

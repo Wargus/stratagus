@@ -52,37 +52,6 @@
 **
 **		@param list		List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineTilesetWcNames(SCM list)
-{
-	int i;
-	char** cp;
-
-	if ((cp = TilesetWcNames)) {		// Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(TilesetWcNames);
-	}
-
-	//
-	//		Get new table.
-	//
-	i = gh_length(list);
-	TilesetWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	while (i--) {
-		*cp++ = gh_scm2newstr(gh_car(list), NULL);
-		list = gh_cdr(list);
-	}
-	*cp = NULL;
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclDefineTilesetWcNames(lua_State* l)
 {
 	int i;
@@ -113,7 +82,6 @@ local int CclDefineTilesetWcNames(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Extend tables of the tileset.
@@ -148,28 +116,6 @@ local void ExtendTilesetTables(Tileset* tileset, int tiles)
 **		@param tileset		Tileset currently parsed.
 **		@param list		List with name.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local int TilesetParseName(Tileset* tileset, SCM list)
-{
-	char* ident;
-	int i;
-
-	ident = gh_scm2newstr(gh_car(list), NULL);
-	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
-		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
-			free(ident);
-			return i;
-		}
-	}
-
-	//  Can't find it, then we add another solid terrain type.
-	tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
-		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
-	tileset->SolidTerrainTypes[i].TerrainName = ident;
-
-	return i;
-}
-#elif defined(USE_LUA)
 local int TilesetParseName(lua_State* l, Tileset* tileset)
 {
 	char* ident;
@@ -190,7 +136,6 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 
 	return i;
 }
-#endif
 
 /**
 **		Parse the flag section of a tile definition.
@@ -200,62 +145,6 @@ local int TilesetParseName(lua_State* l, Tileset* tileset)
 **
 **		@return				remaining list
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM ParseTilesetTileFlags(SCM list, int* back)
-{
-	int flags;
-
-	//
-	//  Parse the list: flags of the slot
-	//
-	flags = 0;
-	while (!gh_null_p(list)) {
-		SCM value;
-
-		value = gh_car(list);
-
-		if (!gh_symbol_p(value)) {
-			break;
-		}
-		list = gh_cdr(list);
-
-		//
-		//	  Flags are only needed for the editor
-		//
-		if (gh_eq_p(value, gh_symbol2scm("water"))) {
-			flags |= MapFieldWaterAllowed;
-		} else if (gh_eq_p(value, gh_symbol2scm("land"))) {
-			flags |= MapFieldLandAllowed;
-		} else if (gh_eq_p(value, gh_symbol2scm("coast"))) {
-			flags |= MapFieldCoastAllowed;
-		} else if (gh_eq_p(value, gh_symbol2scm("no-building"))) {
-			flags |= MapFieldNoBuilding;
-		} else if (gh_eq_p(value, gh_symbol2scm("unpassable"))) {
-			flags |= MapFieldUnpassable;
-		} else if (gh_eq_p(value, gh_symbol2scm("wall"))) {
-			flags |= MapFieldWall;
-		} else if (gh_eq_p(value, gh_symbol2scm("rock"))) {
-			flags |= MapFieldRocks;
-		} else if (gh_eq_p(value, gh_symbol2scm("forest"))) {
-			flags |= MapFieldForest;
-		} else if (gh_eq_p(value, gh_symbol2scm("land-unit"))) {
-			flags |= MapFieldLandUnit;
-		} else if (gh_eq_p(value, gh_symbol2scm("air-unit"))) {
-			flags |= MapFieldAirUnit;
-		} else if (gh_eq_p(value, gh_symbol2scm("sea-unit"))) {
-			flags |= MapFieldSeaUnit;
-		} else if (gh_eq_p(value, gh_symbol2scm("building"))) {
-			flags |= MapFieldBuilding;
-		} else if (gh_eq_p(value, gh_symbol2scm("human"))) {
-			flags |= MapFieldHuman;
-		} else {
-			errl("solid: unsupported tag", value);
-		}
-	}
-	*back = flags;
-	return list;
-}
-#elif defined(USE_LUA)
 local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 {
 	int flags;
@@ -311,7 +200,6 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 	}
 	*back = flags;
 }
-#endif
 
 /**
 **		Parse the special slot part of a tileset definition
@@ -319,68 +207,6 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 **		@param tileset		Tileset to be filled.
 **		@param list		Tagged list defining a special slot.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local void DefineTilesetParseSpecial(Tileset* tileset, SCM list)
-{
-	SCM value;
-	SCM data;
-	int i;
-
-	//
-	//		Parse the list:		(still everything could be changed!)
-	//
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		data = gh_car(list);
-		list = gh_cdr(list);
-
-		//
-		//		top-one-tree, mid-one-tree, bot-one-tree
-		//
-		if (gh_eq_p(value, gh_symbol2scm("top-one-tree"))) {
-			tileset->TopOneTree = gh_scm2int(data);
-		} else if (gh_eq_p(value, gh_symbol2scm("mid-one-tree"))) {
-			tileset->MidOneTree = gh_scm2int(data);
-		} else if (gh_eq_p(value, gh_symbol2scm("bot-one-tree"))) {
-			tileset->BotOneTree = gh_scm2int(data);
-		//
-		//		removed-tree
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("removed-tree"))) {
-			tileset->RemovedTree = gh_scm2int(data);
-		//
-		//		growing-tree
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("growing-tree"))) {
-			if (gh_vector_length(data) != 2) {
-				errl("growing-tree: Wrong vector length", data);
-			}
-			for (i = 0; i < 2; ++i) {
-				value = gh_vector_ref(data, gh_int2scm(i));
-				tileset->GrowingTree[i] = gh_scm2int(value);
-			}
-
-		//
-		//		top-one-rock, mid-one-rock, bot-one-rock
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("top-one-rock"))) {
-			tileset->TopOneRock = gh_scm2int(data);
-		} else if (gh_eq_p(value, gh_symbol2scm("mid-one-rock"))) {
-			tileset->MidOneRock = gh_scm2int(data);
-		} else if (gh_eq_p(value, gh_symbol2scm("bot-one-rock"))) {
-			tileset->BotOneRock = gh_scm2int(data);
-		//
-		//		removed-rock
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("removed-rock"))) {
-			tileset->RemovedRock = gh_scm2int(data);
-		} else {
-			errl("special: unsupported tag", value);
-		}
-	}
-}
-#elif defined(USE_LUA)
 local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 {
 	const char* value;
@@ -481,7 +307,6 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 		}
 	}
 }
-#endif
 
 /**
 **		Parse the solid slot part of a tileset definition
@@ -490,58 +315,6 @@ local void DefineTilesetParseSpecial(lua_State* l, Tileset* tileset)
 **		@param index		Current table index.
 **		@param list		Tagged list defining a solid slot.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local int DefineTilesetParseSolid(Tileset* tileset, int index, SCM list)
-{
-	SCM value;
-	SCM data;
-	int i;
-	int f;
-	int l;
-	int basic_name;
-	SolidTerrainInfo* tt;// short for terrain type.
-
-	ExtendTilesetTables(tileset, index + 16);
-
-	basic_name = TilesetParseName(tileset, list);		// base name
-	tt = tileset->SolidTerrainTypes + basic_name;
-	list = gh_cdr(list);
-
-	list = ParseTilesetTileFlags(list, &f);
-
-	//
-	//		Vector: the tiles.
-	//
-	value = gh_car(list);
-	tt->NumSolidTiles = l = gh_vector_length(value);
-
-	// hack for sc tilesets, remove when fixed
-	if (l > 16) {
-		ExtendTilesetTables(tileset, index + l);
-	}
-
-	for (i = 0; i < l; ++i) {
-		data = gh_vector_ref(value, gh_int2scm(i));
-//		tt->SolidTiles[i] = tileset->Table[index + i] = gh_scm2int(data);
-		tileset->Table[index + i] = gh_scm2int(data);
-		tileset->FlagsTable[index + i] = f;
-		tileset->Tiles[index + i].BaseTerrain = basic_name;
-		tileset->Tiles[index + i].MixTerrain = 0;
-	}
-	while (i < 16) {
-		tileset->Table[index + i] = 0;
-		tileset->FlagsTable[index + i] = 0;
-		tileset->Tiles[index + i].BaseTerrain = 0;
-		tileset->Tiles[index + i].MixTerrain = 0;
-		++i;
-	}
-
-	if (l < 16) {
-		return index + 16;
-	}
-	return index + l;
-}
-#elif defined(USE_LUA)
 local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 {
 	int i;
@@ -604,7 +377,6 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	}
 	return index + len;
 }
-#endif
 
 /**
 **		Parse the mixed slot part of a tileset definition
@@ -613,67 +385,6 @@ local int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 **		@param index		Current table index.
 **		@param list		Tagged list defining a mixed slot.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local int DefineTilesetParseMixed(Tileset* tileset, int index, SCM list)
-{
-	SCM value;
-	SCM data;
-	int i;
-	int l;
-	int f;
-	int basic_name;
-	int mixed_name;
-	int new_index;
-
-	new_index = index + 256;
-	ExtendTilesetTables(tileset, new_index);
-
-	basic_name = TilesetParseName(tileset, list);		// base name
-	list = gh_cdr(list);
-	mixed_name = TilesetParseName(tileset, list);		// mixed name
-	list = gh_cdr(list);
-
-	list = ParseTilesetTileFlags(list, &f);
-
-	//
-	//		Parse the list:		slots FIXME: no error checking number of slots
-	//
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		//
-		//		Vector: the tiles.
-		//
-		l = gh_vector_length(value);
-		for (i = 0; i < l; ++i) {
-			data = gh_vector_ref(value, gh_int2scm(i));
-			tileset->Table[index + i] = gh_scm2int(data);
-			tileset->FlagsTable[index + i] = f;
-			tileset->Tiles[index + i].BaseTerrain = basic_name;
-			tileset->Tiles[index + i].MixTerrain = mixed_name;
-		}
-		while (i < 16) {						// Fill missing slots
-			tileset->Table[index + i] = 0;
-			tileset->FlagsTable[index + i] = 0;
-			tileset->Tiles[index + i].BaseTerrain = 0;
-			tileset->Tiles[index + i].MixTerrain = 0;
-			++i;
-		}
-		index += 16;
-	}
-
-	while (index < new_index) {
-		tileset->Table[index] = 0;
-		tileset->FlagsTable[index] = 0;
-		tileset->Tiles[index].BaseTerrain = 0;
-		tileset->Tiles[index].MixTerrain = 0;
-		++index;
-	}
-
-	return new_index;
-}
-#elif defined(USE_LUA)
 local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 {
 	int i;
@@ -744,7 +455,6 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 
 	return new_index;
 }
-#endif
 
 /**
 **		Parse the slot part of a tileset definition
@@ -752,69 +462,6 @@ local int DefineTilesetParseMixed(lua_State* l, Tileset* tileset, int index)
 **		@param tileset		Tileset to be filled.
 **		@param list		Tagged list defining a slot.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local void DefineTilesetParseSlot(Tileset* tileset, SCM list)
-{
-	SCM value;
-	SCM data;
-	int index;
-
-	index = 0;
-	tileset->Table = malloc(16 * sizeof(*tileset->Table));
-	if (!tileset->Table) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	tileset->FlagsTable =
-		malloc(16 * sizeof(*tileset->FlagsTable));
-	if (!tileset->FlagsTable) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	tileset->Tiles = malloc(16 * sizeof(TileInfo));
-	if (!tileset->Tiles) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	tileset->SolidTerrainTypes = malloc(sizeof(SolidTerrainInfo));
-	if (!tileset->SolidTerrainTypes) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	tileset->SolidTerrainTypes[0].TerrainName = strdup("unused");
-	tileset->NumTerrainTypes = 1;
-
-	//
-	//		Parse the list:		(still everything could be changed!)
-	//
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		data = gh_car(list);
-		list = gh_cdr(list);
-
-		//
-		//		special part
-		//
-		if (gh_eq_p(value, gh_symbol2scm("special"))) {
-			DefineTilesetParseSpecial(tileset, data);
-		//
-		//		solid part
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("solid"))) {
-			index = DefineTilesetParseSolid(tileset, index, data);
-		//
-		//		mixed part
-		//
-		} else if (gh_eq_p(value, gh_symbol2scm("mixed"))) {
-			index = DefineTilesetParseMixed(tileset, index, data);
-		} else {
-			errl("slots: unsupported tag", value);
-		}
-	}
-	tileset->NumTiles = index;
-}
-#elif defined(USE_LUA)
 local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 {
 	const char* value;
@@ -885,7 +532,6 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 	}
 	tileset->NumTiles = index;
 }
-#endif
 
 /**
 **		Parse the item mapping part of a tileset definition
@@ -893,30 +539,6 @@ local void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 **		@param tileset		Tileset to be filled.
 **		@param list		List defining item mapping.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local void DefineTilesetParseItemMapping(Tileset* tileset, SCM list)
-{
-	SCM value;
-	int num;
-	char* unit;
-	char buf[30];
-	char** h;
-
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
-		num = gh_scm2int(value);
-		value = gh_car(list);
-		list = gh_cdr(list);
-		unit = gh_scm2newstr(value, 0);
-		sprintf(buf, "%d", num);
-		if ((h = (char**)hash_find(tileset->ItemsHash, buf)) != NULL) {
-			free(*h);
-		}
-		*(char**)hash_add(tileset->ItemsHash, buf) = unit;
-	}
-}
-#elif defined(USE_LUA)
 local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 {
 	int num;
@@ -942,110 +564,12 @@ local void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 		*(char**)hash_add(tileset->ItemsHash, buf) = unit;
 	}
 }
-#endif
 
 /**
 **		Define tileset
 **
 **		@param list		Tagged list defining a tileset.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineTileset(SCM list)
-{
-	SCM value;
-	SCM data;
-	int type;
-	Tileset* tileset;
-	char* ident;
-
-	value = gh_car(list);
-	list = gh_cdr(list);
-
-	if (!gh_symbol_p(value)) {
-		errl("illegal tileset slot name", value);
-	}
-	ident = gh_scm2newstr(value, NULL);
-
-	//
-	//		Find the tile set.
-	//
-	if (Tilesets) {
-		for (type = 0; type < NumTilesets; ++type) {
-			if(!strcmp(Tilesets[type]->Ident, ident)) {
-				free(Tilesets[type]->Ident);
-				free(Tilesets[type]->File);
-				free(Tilesets[type]->Class);
-				free(Tilesets[type]->Name);
-				free(Tilesets[type]->ImageFile);
-				free(Tilesets[type]->PaletteFile);
-				free(Tilesets[type]->Table);
-				free(Tilesets[type]->Tiles);
-				free(Tilesets[type]->TileTypeTable);
-				free(Tilesets[type]->AnimationTable);
-				free(Tilesets[type]);
-				break;
-			}
-		}
-		if (type == NumTilesets) {
-			Tilesets = realloc(Tilesets, ++NumTilesets * sizeof(*Tilesets));
-		}
-	} else {
-		Tilesets = malloc(sizeof(*Tilesets));
-		type = 0;
-		++NumTilesets;
-	}
-	if (!Tilesets) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	Tilesets[type] = tileset = calloc(sizeof(Tileset), 1);
-	if (!tileset) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	Tilesets[type]->Ident = ident;
-	Tilesets[type]->TileSizeX = 32;
-	Tilesets[type]->TileSizeY = 32;
-
-	//
-	//		Parse the list:		(still everything could be changed!)
-	//
-	while (!gh_null_p(list)) {
-
-		value = gh_car(list);
-		list = gh_cdr(list);
-		data = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("file"))) {
-			tileset->File = gh_scm2newstr(data, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("class"))) {
-			tileset->Class = gh_scm2newstr(data, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("name"))) {
-			tileset->Name = gh_scm2newstr(data, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("image"))) {
-			tileset->ImageFile = gh_scm2newstr(data, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("palette"))) {
-			tileset->PaletteFile = gh_scm2newstr(data, NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-			tileset->TileSizeX = gh_scm2int(gh_car(data));
-			data = gh_cdr(data);
-			tileset->TileSizeY = gh_scm2int(gh_car(data));
-		} else if (gh_eq_p(value, gh_symbol2scm("slots"))) {
-			DefineTilesetParseSlot(tileset, data);
-		} else if (gh_eq_p(value, gh_symbol2scm("animations"))) {
-			DebugLevel0Fn("Animations not supported.\n");
-		} else if (gh_eq_p(value, gh_symbol2scm("objects"))) {
-			DebugLevel0Fn("Objects not supported.\n");
-		} else if (gh_eq_p(value, gh_symbol2scm("item-mapping"))) {
-			DefineTilesetParseItemMapping(tileset, data);
-		} else {
-			errl("Unsupported tag", value);
-		}
-	}
-	return list;
-}
-#elif defined(USE_LUA)
 local int CclDefineTileset(lua_State* l)
 {
 	const char* value;
@@ -1150,20 +674,14 @@ local int CclDefineTileset(lua_State* l)
 	}
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for tileset.
 */
 global void TilesetCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedureN("define-tileset-wc-names", CclDefineTilesetWcNames);
-	gh_new_procedureN("define-tileset", CclDefineTileset);
-#elif defined(USE_LUA)
 	lua_register(Lua, "DefineTilesetWcNames", CclDefineTilesetWcNames);
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
-#endif
 }
 
 //@}

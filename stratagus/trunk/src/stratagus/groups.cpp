@@ -235,30 +235,6 @@ global void RemoveUnitFromGroups(Unit* unit)
 **		@param num		Number of units in group
 **		@param units		Units in group
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclGroup(SCM group, SCM num, SCM units)
-{
-	int i;
-	UnitGroup* grp;
-
-	grp = &Groups[gh_scm2int(group)];
-	grp->NumUnits = gh_scm2int(num);
-	if (!grp->Units) {
-		InitGroups();
-	}
-	i = 0;
-	while (!gh_null_p(units)) {
-		char* str;
-
-		str = gh_scm2newstr(gh_car(units), NULL);
-		grp->Units[i++] = (Unit*)strtol(str + 1, NULL, 16);
-		free(str);
-		units = gh_cdr(units);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
 local int CclGroup(lua_State* l)
 {
 	int i;
@@ -286,18 +262,13 @@ local int CclGroup(lua_State* l)
 
 	return 0;
 }
-#endif
 
 /**
 **		Register CCL features for groups.
 */
 global void GroupCclRegister(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	gh_new_procedure3_0("group", CclGroup);
-#elif defined(USE_LUA)
 	lua_register(Lua, "Group", CclGroup);
-#endif
 }
 
 //@}

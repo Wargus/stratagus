@@ -38,7 +38,7 @@ CROSSDIR = /usr/local/cross
 INCLUDE_DIRS = src/include src/movie/vp31/include etlib
 
 MODULES = src/action src/ai src/beos src/stratagus src/editor src/stratagus src/game src/libmodplug src/map \
-          src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
+          src/missile src/movie src/movie/vp31 src/network src/pathfinder src/sound src/ui src/unit \
           src/video etlib
 
 MODULES_TOOLS = tools
@@ -216,7 +216,7 @@ tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/stratagus/$(OBJDIR)/mpq.o
 DOCS    = README doc/index.html doc/install.html \
 	  doc/media.html doc/datadir.html doc/README-SDL.txt\
 	  doc/faq.html doc/ChangeLog.html doc/todo.html \
-	  doc/development.html doc/gpl.html doc/SIOD.txt \
+	  doc/development.html doc/gpl.html \
 	  doc/ccl/ai.html doc/ccl/ccl.html doc/ccl/config.html \
 	  doc/ccl/icon.html doc/ccl/tileset.html doc/ccl/unittype.html \
 	  doc/ccl/research.html doc/graphic/* \
@@ -249,7 +249,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/ccl/ranks.ccl \
 	  data/ccl/tips.ccl data/ccl/menus.ccl data/ccl/keystrokes.ccl \
-	  data/ccl/siod.ccl data/ccl/spells.ccl \
+	  data/ccl/spells.ccl \
 	  data/ccl/editor.ccl # data/campaigns/*/*.cm
 
 CONTRIB	= contrib/cross.png contrib/red_cross.png \

@@ -67,11 +67,7 @@ struct _ai_type_{
 	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
 #endif
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM Script;   /// Main script (gc-protected!)
-#elif defined(USE_LUA)
 	char* Script; /// Main script
-#endif
 };
 
 /**
@@ -119,36 +115,15 @@ enum _ai_force_role_ {
 
 
 /**
-**  Ways to populate a force
-*/
-enum _ai_force_populate_mode_ {
-	AiForceDontPopulate,        /// Force won't receive any unit
-	AiForcePopulateFromScratch, /// Force unit's will be builded
-	AiForcePopulateFromAttack,  /// Force will receive units from idle attack force only - nothing builded
-	AiForcePopulateAny          /// Force will receive units from any idle force - nothing builded
-};
-
-/**
-**  How to react when an unit is attacked in a force
-*/
-enum _ai_force_help_mode_ {
-	AiForceDontHelp,  /// Don't react to attack on this force
-	AiForceHelpForce, /// Send idle units to defend
-	AiForceHelpFull   /// Create a defend force, send it, ...
-};
-
-/**
 **  Define an AI force.
 **
 **  A force is a group of units belonging together.
 */
 typedef struct _ai_force_ {
 	char Completed;     /// Flag saying force is complete build
-	char Attacking;     /// Is this force attacking ( aka not idle )
+	char Defending;     /// Flag saying force is defending
+	char Attacking;     /// Flag saying force is attacking
 	char Role;          /// Role of the force
-	char PopulateMode;  /// Which forces can be used to fill this force ?
-	char UnitsReusable; /// Indicate moving units of this force into others is allowed.
-	char HelpMode;      /// How to react to treat in this force ?
 
 	AiUnitType* UnitTypes; /// Count and types of unit-type
 	AiUnit*     Units;     /// Units in the force
@@ -179,77 +154,6 @@ struct _ai_build_queue_ {
 	UnitType*     Type; /// unit-type
 };
 
-/**
-**  AI running script ( with state, ... )
-*/
-typedef struct _ai_running_script_ {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM           Script;      /// Script executed
-#elif defined(USE_LUA)
-	char*         Script;      /// Script executed
-#endif
-	unsigned long SleepCycles; /// Cycles to sleep
-	char          Ident[10];   /// Debugging !
-	int           HotSpotX;    /// Hot spot ( for defense, attack, ... )
-	int           HotSpotY;
-	int           HotSpotRay;
-	int           OwnForce;    /// A force ID ( the n° of the script... )
-	int*          Gauges;      /// Gauges values ( initially 0 )
-
-	// Total number of resource gauges
-#define RESOURCE_COUNT  3
-	// Total number of forces gauges
-#define FORCE_COUNT		11
-
-#define GAUGE_NB (3 + (RESOURCE_COUNT * 2) + (FORCE_COUNT * 6))
-} AiRunningScript;
-
-/**
-**  Ai script action
-**
-**  Describe each different attack/defend scheme.
-**
-**  Linked list.
-*/
-typedef struct _ai_script_action_ {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	SCM Action;    /// Scheme description, in the form :
-	               /// '((name evaluate-lambda run-script) ... )
-#elif defined(USE_LUA)
-	char* Action;  /// Name of lua table
-	char* Script;  /// Name of lua script
-#endif
-
-	int Defensive; /// Is this action usable for defense
-	int Offensive; /// Is this action usable for attack
-
-	/// TODO : hotspot_kind : set if the hotspot should contain path from base
-} AiScriptAction;
-
-/**
-**  AiActionEvaluation typedef
-*/
-typedef struct _ai_action_evaluation_ AiActionEvaluation;
-
-/**
-**  Ai action evaluation
-**
-**  Each AiPlayer periodically evaluation an attack action.
-**
-**  If it is ready, the attack is fired. Else, it is keept for a while.
-**  From time to time, the best unfired try is fired.
-**
-*/
-struct _ai_action_evaluation_ {
-	AiScriptAction*     AiScriptAction; /// Action evaluated
-	unsigned long       GameCycle;      /// Gamecycle when this evaluation occured
-	int                 HotSpotX;       /// X position of the hotspot, or -1
-	int                 HotSpotY;       /// Y position of the hotspot, or -1
-	int                 HotSpotValue;   /// Value of the hotspot ( total points to get... )
-	int                 Value;          /// Result of the evaluation ( resources needed... )
-	AiActionEvaluation* Next;           /// Next in linked list
-};
-
 typedef struct _ai_exploration_request_ AiExplorationRequest;
 
 struct _ai_exploration_request_ {
@@ -274,22 +178,14 @@ typedef struct _player_ai_ {
 	Player* Player; /// Engine player structure
 	AiType* AiType; /// AI type of this player AI
 	// controller
-#define AI_MAX_RUNNING_SCRIPTS 5 /// ( generic, attack, defend, ... )
-#define AI_MAIN_SCRIPT 0
-	AiRunningScript Scripts[AI_MAX_RUNNING_SCRIPTS]; /// All running scripts
-
-	// Ai "memory"
-#define AI_MEMORY_SIZE 30 /// Max number of keept evaluation ( => 30 sec )
-	AiActionEvaluation* FirstEvaluation; /// begining of linked list of evaluation
-	AiActionEvaluation* LastEvaluation;  /// end of linked list of evaluation
-	int                 EvaluationCount; /// size of linked list of evaluation
+	char*               Script;          /// Script executed
 	int                 ScriptDebug;     /// Flag script debuging on/off
-	int                 AutoAttack;      /// Are attack started automatically ?
+	unsigned long       SleepCycles;     /// Cycles to sleep
 
 	// forces
-#define AI_MAX_FORCES 10 /// How many forces are supported
-#define AI_GENERIC_FORCES (AI_MAX_FORCES-AI_MAX_RUNNING_SCRIPTS) /// How many forces are useable in the main script
-	AiForce Force[AI_MAX_FORCES]; /// Forces controlled by AI
+#define AI_MAX_FORCES 10                    /// How many forces are supported
+#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces
+	AiForce Force[AI_MAX_ATTACKING_FORCES]; /// Forces controlled by AI
 
 	// resource manager
 	int Reserve[MaxCosts]; /// Resources to keep in reserve
@@ -373,12 +269,8 @@ typedef struct _ai_helper_ {
 extern AiType* AiTypes; /// List of all AI types
 extern AiHelper AiHelpers; /// AI helper variables
 
-#define MaxAiScriptActions 64 /// How many AiScriptActions are supported
-extern int AiScriptActionNum; /// Current number of AiScriptAction
-extern AiScriptAction AiScriptActions[MaxAiScriptActions]; /// All availables AI script actions
 extern int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 extern PlayerAi* AiPlayer; /// Current AI player
-extern AiRunningScript* AiScript; /// Currently running script
 extern char** AiTypeWcNames; /// pud num to internal string mapping
 
 /*----------------------------------------------------------------------------
@@ -398,8 +290,6 @@ extern void AiAddResearchRequest(Upgrade*  upgrade);
 extern void AiResourceManager(void);
 	/// Ask the ai to explore around x,y
 extern void AiExplore(int x, int y, int exploreMask);
-	/// Count the number of builder unit available for the given unittype
-extern int AiCountUnitBuilders(UnitType* type);
 	/// Make two unittypes be considered equals
 extern void AiNewUnitTypeEquiv(UnitType* a, UnitType* b);
 	/// Remove any equivalence between unittypes
@@ -420,40 +310,16 @@ extern int AiFindBuildingPlace(const Unit*, const UnitType*, int*, int*);
 //
 	/// Cleanup units in force
 extern void AiCleanForces(void);
-	/// Cleanup units in the given force
-extern void AiCleanForce(int force);
-	/// Remove everything in the given force
-extern void AiEraseForce(int force);
 	/// Assign a new unit to a force
 extern void AiAssignToForce(Unit* unit);
 	/// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce(void);
-	/// Complete a force with units form another
-extern void AiForceTransfert(int src, int dst);
-	/// Group a force on the nearest unit to target
-extern void AiGroupForceNear(int force, int targetx, int targety);
 	/// Attack with force at position
 extern void AiAttackWithForceAt(int force, int x, int y);
 	/// Attack with force
 extern void AiAttackWithForce(int force);
-	/// Send force home
-extern void AiSendForceHome(int force);
-	/// Evaluate the cost to build a force (time to build + resources)
-extern int AiEvaluateForceCost(int force, int total);
-	/// Complete a force from existing units.
-extern void AiForceComplete(int force);
-	/// Enrole one or more units of a type in a force
-extern int AiEnroleSpecificUnitType(int force, UnitType* ut, int count);
-	/// Create a force from existing units, ready to respond to the powers
-extern int AiCreateSpecificForce(int *power, int *unittypes, int unittypescount);
-	/// Force's unit is attacked.
-extern void AiForceHelpMe(int force, const Unit* attacker, Unit* defender);
 	/// Periodic called force manager handler
 extern void AiForceManager(void);
-	/// Calculate the number of unit produced for each wanted unittype
-extern void AiForceCountUnits(int force, int* unittypeCount);
-	/// Substract the number of unit wanted for each unittype
-extern int AiForceSubstractWant(int force, int* unittypeCount);
 
 //
 // Plans
@@ -466,51 +332,10 @@ extern int AiPlanAttack(AiForce* force);
 extern void AiSendExplorers(void);
 
 //
-// Scripts
-//
-	/// Run a script ( for the current AiPlayer )
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern void AiRunScript(int script, SCM list, int hotSpotX, int hotSpotY, int hotSpotRay);
-#elif defined(USE_LUA)
-#endif
-	/// Find a script for defense.
-extern void AiFindDefendScript(int attackX, int attackY);
-	/// Check if attack is possible
-extern void AiPeriodicAttack(void);
-
-//
-// Gauges
-//
-	/// Compute gauges for the current RunningScript
-extern void AiComputeCurrentScriptGauges(void);
-	/// Output gauges values
-extern void AiDebugGauges(void);
-	/// Give the value of a specific gauge, for the current RunningScript
-extern int AiGetGaugeValue(int gauge);
-	/// Find a gauge given its identifier.
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern int AiFindGaugeId(SCM id);
-#elif defined(USE_LUA)
-extern int AiFindGaugeId(lua_State* l);
-#endif
-	/// return the force of the unittype.
-extern int AiUnitTypeForce(UnitType* unitType);
-
-//
 // Magic
 //
 	/// Check for magic
 extern void AiCheckMagic(void);
-
-//
-// Ccl helpers
-//
-
-	/// Save/Load a PlayerAi structure ( see ccl_helpers.h for details )
-#if defined(USE_GUILE) || defined(USE_SIOD)
-extern void IOPlayerAiFullPtr(SCM form, void* binaryform, void* para);
-#elif defined(USE_LUA)
-#endif
 
 //@}
 

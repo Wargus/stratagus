@@ -170,11 +170,8 @@ global int AiCostFactor = 100;				/// Adjust the AI costs
 
 global AiType* AiTypes;						/// List of all AI types.
 global AiHelper AiHelpers;				/// AI helper variables
-global int AiScriptActionNum = 0;		/// number of action script ( FIXME : initialized only once )
-global AiScriptAction AiScriptActions[MaxAiScriptActions];		/// definitions of action scripts
 
 global PlayerAi* AiPlayer;				/// Current AI player
-global AiRunningScript* AiScript;		/// Current AI script
 /**
 **  W*rCr*ft number to internal ai-type name.
 */
@@ -185,135 +182,21 @@ global char** AiTypeWcNames;
 ----------------------------------------------------------------------------*/
 
 /**
-**  FIXME: docu
-*/
-local void debugForces(void)
-{
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	const AiActionEvaluation* aiaction;
-	int force;
-	int i;
-	int count[UnitTypeMax + 1];
-	int want[UnitTypeMax + 1];
-	char* str;
-
-	DebugLevel2Fn(" AI MEMORY (%d)\n" _C_ AiPlayer->EvaluationCount);
-	aiaction = AiPlayer->FirstEvaluation;
-	while (aiaction) {
-		str = gh_scm2newstr(gh_car(gh_car(aiaction->AiScriptAction->Action)),NULL);
-		DebugLevel2(" %8lu: (%3d,%3d) => points:%9d, needs: %9d ( %s )\n" _C_
-			aiaction->GameCycle _C_
-			aiaction->HotSpotX _C_
-			aiaction->HotSpotY _C_
-			aiaction->HotSpotValue _C_
-			aiaction->Value _C_
-			str);
-		free(str);
-		aiaction = aiaction->Next;
-	}
-	DebugLevel2Fn(" AI FORCES	  ! : completed	A/D : attacking/defending\n");
-	for (force = 0; force < AI_MAX_FORCES; ++force) {
-		DebugLevel2("force %5d %c%c :" _C_
-			force _C_
-			(AiPlayer->Force[force].Role == AiForceRoleAttack ? 'A' : 'D') _C_
-			(AiPlayer->Force[force].Completed ? '!' : ' '));
-
-		AiForceCountUnits(force, count);
-
-		for (i = 0; i <= UnitTypeMax; ++i) {
-			want[i] = 0;
-		}
-		AiForceSubstractWant(force, want);
-
-		for (i = 0; i < UnitTypeMax; ++i) {
-			if (count[i] || want[i]) {
-				DebugLevel2(" %s(%d/%d)" _C_ UnitTypes[i]->Ident _C_ count[i] _C_ (-want[i]));
-			}
-		}
-
-		if (force > AI_GENERIC_FORCES || force == 0) {
-			if (!gh_null_p(AiPlayer->Scripts[force ? force - AI_GENERIC_FORCES : 0].Script)) {
-					DebugLevel2(" => ");
-				fflush(stdout);
-				gh_display(gh_car(AiPlayer->Scripts[force ? force - AI_GENERIC_FORCES : 0].Script));
-				CclFlushOutput();
-			}
-		}
-		DebugLevel2("\n");
-	}
-#elif defined(USE_LUA)
-#endif
-}
-
-/**
 **  Execute the AI Script.
 */
-local void AiExecuteScripts(void)
+local void AiExecuteScript(void)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	int i;
-	PlayerAi* pai;
-	SCM value;
-
-	pai = AiPlayer;
-
-	// Debugging
-	if (pai->ScriptDebug) {
-		debugForces();
-	}
-
-	for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-		AiScript = pai->Scripts + i;
-		if (!gh_null_p(AiScript->Script)) {
-			/*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
-				pai->Player->Player _C_ i _C_ AiScript->Ident _C_
-				AiScript->HotSpotX _C_ AiScript->HotSpotY);
-			gh_display(AiScript->Script);
-			gh_newline();*/
-
-			value = gh_eval(gh_car(AiScript->Script), NIL);
-			if (!gh_eq_p(value, SCM_BOOL_T)) {
-				CclGcProtectedAssign(&AiScript->Script, gh_cdr(AiScript->Script));
-			}
-
-			if (gh_null_p(AiScript->Script) && AiScript->OwnForce) {
-				AiEraseForce(AiScript->OwnForce);
-			}
-		}
-	}
-#elif defined(USE_LUA)
-	int i;
 	PlayerAi* pai;
 
 	pai = AiPlayer;
-
-	// Debugging
-	if (pai->ScriptDebug) {
-		debugForces();
+	if (pai->Script) {
+		lua_pushstring(Lua, "_ai_scripts_");
+		lua_gettable(Lua, LUA_GLOBALSINDEX);
+		lua_pushstring(Lua, pai->Script);
+		lua_rawget(Lua, 1);
+		LuaCall(0, 1);
+		lua_pop(Lua, 1);
 	}
-
-	for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-		AiScript = pai->Scripts + i;
-		if (AiScript->Script) {
-			/*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_
-				pai->Player->Player _C_ i _C_ AiScript->Ident _C_
-				AiScript->HotSpotX _C_ AiScript->HotSpotY);
-			gh_display(AiScript->Script);
-			gh_newline();*/
-
-			lua_pushstring(Lua, "_ai_scripts_");
-			lua_gettable(Lua, LUA_GLOBALSINDEX);
-			lua_pushstring(Lua, AiScript->Script);
-			lua_rawget(Lua, 1);
-			LuaCall(0, 1);
-			lua_pop(Lua, 1);
-
-			if (!AiScript->Script && AiScript->OwnForce) {
-				AiEraseForce(AiScript->OwnForce);
-			}
-		}
-	}
-#endif
 }
 
 /**
@@ -322,6 +205,7 @@ local void AiExecuteScripts(void)
 local void AiCheckUnits(void)
 {
 	int counter[UnitTypeMax];
+	int attacking[UnitTypeMax];
 	const AiBuildQueue* queue;
 	const int* unit_types_count;
 	int i;
@@ -332,6 +216,7 @@ local void AiCheckUnits(void)
 	int e;
 
 	memset(counter, 0, sizeof (counter));
+	memset(attacking,0,sizeof(attacking));
 
 	//
 	//  Count the already made build requests.
@@ -386,14 +271,13 @@ local void AiCheckUnits(void)
 	}
 
 	//
-	// Magically complete all forces
+	// Look through the forces what is missing.
 	//
-	for (i = 0; i < AI_MAX_FORCES; ++i) {
-		if (!AiPlayer->Force[i].Completed &&
-				(AiPlayer->Force[i].PopulateMode == AiForcePopulateFromAttack ||
-					AiPlayer->Force[i].PopulateMode == AiForcePopulateAny)) {
-			// This force should be completed from other forces.
-			AiForceComplete(i);
+	for (i = AI_MAX_FORCES; i < AI_MAX_ATTACKING_FORCES; ++i) {
+		const AiUnit* unit;
+
+		for (unit = AiPlayer->Force[i].Units; unit; unit = unit->Next) {
+			attacking[unit->Unit->Type->Type]++;
 		}
 	}
 
@@ -403,20 +287,22 @@ local void AiCheckUnits(void)
 	for (i = 0; i < AI_MAX_FORCES; ++i) {
 		const AiUnitType* aiut;
 
-		// Create units only for AiForceCreateFromScratch forces
-		if (AiPlayer->Force[i].PopulateMode != AiForcePopulateFromScratch) {
+		// No troops for attacking force
+		if (!AiPlayer->Force[i].Defending &&
+				AiPlayer->Force[i].Attacking) {
 			continue;
 		}
 
 		for (aiut = AiPlayer->Force[i].UnitTypes; aiut; aiut = aiut->Next) {
 			t = aiut->Type->Type;
 			x = aiut->Want;
-			if (x > unit_types_count[t] + counter[t]) {  // Request it.
+			if (x > unit_types_count[t] + counter[t] - attacking[t]) {    // Request it.
 				DebugLevel2Fn("Force %d need %s * %d\n" _C_ i _C_ aiut->Type->
 					Ident _C_ x);
-				AiAddUnitTypeRequest(aiut->Type, x - unit_types_count[t] - counter[t]);
-				counter[t] += x - unit_types_count[t] - counter[t];
-				AiPlayer->Force[i].Completed = 0;
+				AiAddUnitTypeRequest(aiut->Type,
+					x - (unit_types_count[t] + counter[t] - attacking[t]));
+				counter[t] += x - (unit_types_count[t] + counter[t] - attacking[t]);
+				AiPlayer->Force[i].Completed=0;
 			}
 			counter[t] -= x;
 		}
@@ -705,32 +591,6 @@ local void SaveAiHelper(CLFile* file)
 }
 
 /**
-**  Save all the AiScriptAction defined
-**
-**  @param file  Output file
-*/
-local void SaveAiScriptActions(CLFile* file)
-{
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	AiScriptAction* aiScriptAction;
-	int i;
-
-	// FIXME : should import the built-in lambda as well ( really needed ? )
-	for (i = 0; i < AiScriptActionNum; ++i) {
-		aiScriptAction = AiScriptActions + i;
-
-		CLprintf(file, "(define-ai-action '(%s%s)\n  '",
-			(aiScriptAction->Defensive ? " defense " : ""),
-			(aiScriptAction->Offensive ? " attack " : ""));
-
-		lprin1CL(aiScriptAction->Action, file);
-		CLprintf(file, "\n)\n");
-	}
-#elif defined(USE_LUA)
-#endif
-}
-
-/**
 **  Save the AI type. (recursive)
 **
 **  @param file    Output file.
@@ -738,7 +598,7 @@ local void SaveAiScriptActions(CLFile* file)
 */
 local void SaveAiType(CLFile* file, const AiType* aitype)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
+#if 0
 	SCM list;
 
 	if (aitype->Next) {
@@ -753,11 +613,11 @@ local void SaveAiType(CLFile* file, const AiType* aitype)
 	list = aitype->Script;
 	while (!gh_null_p(list)) {
 		CLprintf(file, "\n	");
-		//lprin1CL(gh_car(list),file);
+		lprin1CL(gh_car(list), file);
 		list = gh_cdr(list);
 	}
 	CLprintf(file, " ))\n\n");
-#elif defined(USE_LUA)
+#else
 #endif
 }
 
@@ -783,7 +643,7 @@ local void SaveAiTypes(CLFile* file)
 */
 local void SaveAiPlayer(CLFile* file, unsigned plynr, PlayerAi* ai)
 {
-#if defined(USE_GUILE) || defined(USE_SIOD)
+#if 0
 	IOOutFile = file;
 	IOLoadingMode = 0;
 	IOTabLevel = 1;
@@ -791,7 +651,7 @@ local void SaveAiPlayer(CLFile* file, unsigned plynr, PlayerAi* ai)
 	CLprintf(IOOutFile, "(define-ai-player '");
 	IOPlayerAiFullPtr(SCM_UNSPECIFIED, &ai, 0);
 	CLprintf(IOOutFile, ")\n");
-#elif defined(USE_LUA)
+#else
 #endif
 }
 
@@ -825,7 +685,6 @@ global void SaveAi(CLFile* file)
 	SaveAiTypesWcName(file);
 	SaveAiHelper(file);
 	SaveAiTypes(file);
-	SaveAiScriptActions(file);
 	SaveAiPlayers(file);
 
 	DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
@@ -838,7 +697,6 @@ global void SaveAi(CLFile* file)
 */
 global void AiInit(Player* player)
 {
-	int i;
 	PlayerAi* pai;
 	AiType* ait;
 	char* ainame;
@@ -852,35 +710,6 @@ global void AiInit(Player* player)
 	}
 	pai->Player = player;
 	ait = AiTypes;
-
-	for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-		pai->Scripts[i].OwnForce = AI_GENERIC_FORCES + i;
-		pai->Scripts[i].HotSpotX = -1;
-		pai->Scripts[i].HotSpotY = -1;
-		pai->Scripts[i].HotSpotRay = -1;
-		pai->Scripts[i].Gauges = 0;
-		pai->Scripts[i].SleepCycles = 0;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		pai->Scripts[i].Script = NIL;
-		CclGcProtect(&pai->Scripts[i].Script);
-#elif defined(USE_LUA)
-		pai->Scripts[i].Script = NULL;
-#endif
-		snprintf(pai->Scripts[i].Ident, 10, "Empty");
-	}
-
-	// Set autoattack to 1 as default
-	pai->AutoAttack = 1;
-
-	for (i = 0; i < AI_GENERIC_FORCES; ++i) {
-		// First force defend, others are attacking...
-		pai->Force[i].Role = (i ? AiForceRoleAttack : AiForceRoleDefend);
-
-		// Theses forces should be built from scratch
-		pai->Force[i].PopulateMode = AiForcePopulateFromScratch;
-		pai->Force[i].UnitsReusable = 1;
-		pai->Force[i].HelpMode = AiForceHelpFull;
-	}
 
 	ainame = AiTypeWcNames[player->AiNum];
 	DebugLevel0(" looking for class %s\n" _C_ ainame);
@@ -931,11 +760,7 @@ global void AiInit(Player* player)
 		_C_ ainame _C_ ait->Class);
 
 	pai->AiType = ait;
-#if defined(USE_GUILE) || defined(USE_SIOD)
-	CclGcProtectedAssign(&pai->Scripts[0].Script, ait->Script);
-#elif defined(USE_LUA)
-	pai->Scripts[0].Script = ait->Script;
-#endif
+	pai->Script = ait->Script;
 
 	pai->Collect[TimeCost] = 0;
 	pai->Collect[GoldCost] = 50;
@@ -975,7 +800,7 @@ global void CleanAi(void)
 			//
 			//  Free forces
 			//
-			for (i = 0; i < AI_MAX_FORCES; ++i) {
+			for (i = 0; i < AI_MAX_ATTACKING_FORCES; ++i) {
 				AiUnitType* aut;
 				AiUnit* aiunit;
 
@@ -987,16 +812,6 @@ global void CleanAi(void)
 					temp = aiunit->Next;
 					free(aiunit);
 				}
-			}
-
-			for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
-				if (pai->Scripts[i].Gauges) {
-					free(pai->Scripts[i].Gauges);
-				}
-#if defined(USE_GUILE) || defined(USE_SIOD)
-				CclGcUnprotect(&pai->Scripts[i].Script);
-#elif defined(USE_LUA)
-#endif
 			}
 
 			//
@@ -1041,14 +856,7 @@ global void CleanAi(void)
 		free(aitype->Name);
 		free(aitype->Race);
 		free(aitype->Class);
-
-		// ai-type->Script freed by ccl
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		CclGcUnprotect(&aitype->Script);
-#elif defined(USE_LUA)
 		free(aitype->Script);
-		aitype->Script = NULL;
-#endif
 
 		temp = aitype->Next;
 		free(aitype);
@@ -1106,19 +914,7 @@ global void CleanAi(void)
 		AiTypeWcNames = NULL;
 	}
 
-	// Free script action scm...
-	for (i = 0; i < AiScriptActionNum; ++i) {
-#if defined(USE_GUILE) || defined(USE_SIOD)
-		CclGcUnprotect(&AiScriptActions[i].Action);
-#elif defined(USE_LUA)
-		free(AiScriptActions[i].Action);
-		AiScriptActions[i].Action = NULL;
-#endif
-	}
-
 	AiResetUnitTypeEquiv();
-
-	AiScriptActionNum = 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -1268,24 +1064,45 @@ global void AiHelpMe(const Unit* attacker, Unit* defender)
 	}
 
 	AiPlayer = pai = defender->Player->Ai;
+	if (pai->Force[0].Attacking) {  // Force 0 busy
+		return;
+	}
 
 	//
-	//  If unit belongs to an attack/defend force, don't defend it.
+	//  If unit belongs to an attacking force, don't defend it.
 	//
-	for (force = 1; force < AI_MAX_FORCES; ++force) {
+	for (force = 0; force < AI_MAX_ATTACKING_FORCES; ++force) {
+		if (!pai->Force[force].Attacking) {  // none attacking
+			// FIXME, send the force for help
+			continue;
+		}
 		aiunit = pai->Force[force].Units;
-
 		while (aiunit) {
 			if (defender == aiunit->Unit) {
-				AiForceHelpMe(force, attacker, defender);
 				return;
 			}
 			aiunit = aiunit->Next;
 		}
 	}
 
-	// Unit can't be found in forces, consider it's in force 0
-	AiForceHelpMe(0, attacker, defender);
+	DebugLevel2Fn("Sending force 0 and 1 to defend\n");
+	//
+	//  Send force 0 defending, also send force 1 if this is home.
+	//
+	if (attacker) {
+		AiAttackWithForceAt(0, attacker->X, attacker->Y);
+		if (!pai->Force[1].Attacking) {  // none attacking
+			pai->Force[1].Defending = 1;
+			AiAttackWithForceAt(1, attacker->X, attacker->Y);
+		}
+	} else {
+		AiAttackWithForceAt(0, defender->X, defender->Y);
+		if (!pai->Force[1].Attacking) {  // none attacking
+			pai->Force[1].Defending = 1;
+			AiAttackWithForceAt(1, defender->X, defender->Y);
+		}
+	}
+	pai->Force[0].Defending = 1;
 }
 
 /**
@@ -1915,7 +1732,7 @@ global void AiEachSecond(Player* player)
 	//
 	//  Advance script
 	//
-	AiExecuteScripts();
+	AiExecuteScript();
 
 	//
 	//  Look if everything is fine.
@@ -1933,10 +1750,6 @@ global void AiEachSecond(Player* player)
 	//  Check for magic actions.
 	//
 	AiCheckMagic();
-
-	if (AiPlayer->AutoAttack) {
-		AiPeriodicAttack();
-	}
 
 	// At most 1 explorer each 5 seconds
 	if (GameCycle > AiPlayer->LastExplorationGameCycle + 5 * CYCLES_PER_SECOND) {
