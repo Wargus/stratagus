@@ -1747,8 +1747,8 @@ local void DrawConstruction(const Unit* unit,int frame,int x,int y)
 	GraphicUnitPixels(unit,construction->Sprite);
 	VideoDrawClip(construction->Sprite,frame,x,y);
     } else {
-	x-=unit->Type->Sprite->Width/2;
-	y-=unit->Type->Sprite->Height/2;
+	x-=unit->Type->TileWidth*TileSizeX/2;
+	y-=unit->Type->TileHeight*TileSizeY/2;
 	GraphicUnitPixels(unit,unit->Type->Sprite);
 	DrawUnitType(unit->Type,frame,x,y);
 #ifdef USE_OPENGL
