@@ -10,7 +10,7 @@
 //
 /**@name spells.h	-	The Spells. */
 //
-//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -131,6 +131,9 @@ extern int SpellCast( Unit*, const SpellType* , Unit* , int , int );
 
     /// auto cast the spell if possible
 extern int AutoCastSpell(Unit* unit, SpellType* spell);
+
+    /// returns != 0 if spell can be auto cast
+extern int CanAutoCastSpell(const SpellType* spell);
 
 //@}
 

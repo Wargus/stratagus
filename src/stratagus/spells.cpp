@@ -1438,6 +1438,91 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 }
 
 /**
+**	Check if the spell can be auto cast.
+**
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+global int CanAutoCastSpell(const SpellType* spell)
+{
+    DebugCheck(spell == NULL);
+
+    switch (spell->Action) {
+	case SpellActionNone:
+	    DebugLevel0Fn("No spell action\n");
+	    return 0;
+
+//  ---human paladins---
+	case SpellActionHolyVision:
+	    return 1;
+
+	case SpellActionHealing:
+	    return 1;
+
+	case SpellActionExorcism:
+	    return 1;
+
+//  ---human mages---
+	case SpellActionFireball:
+	    return 0;
+
+	case SpellActionSlow:
+	    return 1;
+
+	case SpellActionFlameShield:
+	    return 0;
+
+	case SpellActionInvisibility:
+	    return 1;
+
+	case SpellActionPolymorph:
+	    return 0;
+
+	case SpellActionBlizzard:
+	    return 0;
+
+//  ---orc ogres---
+	case SpellActionEyeOfVision:
+	    return 1;
+
+	case SpellActionBloodlust:
+	    return 1;
+
+	case SpellActionRunes:
+	    return 0;
+
+//  ---orc death knights---
+	case SpellActionDeathCoil:
+	    return 1;
+
+	case SpellActionHaste:
+	    return 1;
+
+	case SpellActionRaiseDead:
+	    return 0;
+
+	case SpellActionWhirlwind:
+	    return 0;
+
+	case SpellActionUnholyArmor:
+	    return 1;
+
+	case SpellActionDeathAndDecay:
+	    return 0;
+
+	case SpellActionCircleOfPower:
+	    return 0;
+
+	default:
+	    DebugLevel0Fn("Unknown spell action `%d'\n" _C_ spell->Action);
+	    return 0;
+    }
+
+    return 0;
+}
+
+/**
 **	Cast holy vision.
 **
 **	@param unit	Unit that casts the spell
