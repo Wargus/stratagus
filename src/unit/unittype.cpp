@@ -532,7 +532,7 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 	,type->_Costs[OreCost]
 	,type->_Costs[StoneCost]
 	,type->_Costs[CoalCost]);
- 
+
     fprintf(file,"  ;;Tile    Box Size    >Attack	<Attack	ReactC	ReactH\n");
     fprintf(file,"  '( %d %d ) '( %3d %3d ) %6d %7d %6d %7d\n"
 	,type->TileWidth
@@ -827,7 +827,7 @@ global void SaveUnitTypes(FILE* file)
 	fputc('\n',file);
 	SaveUnitType(type,file);
     }
-    
+
     //	Save all stats
 
     for( type=UnitTypes; type->OType; ++type ) {
@@ -916,7 +916,10 @@ global UnitType* NewUnitTypeSlot(char* ident)
 **	@param type	Unit-type pointer.
 **	@param frame	Animation frame of unit-type.
 **	@param x	Screen X pixel postion to draw unit-type.
-**	@param Y	Screen Y pixel postion to draw unit-type.
+**	@param y	Screen Y pixel postion to draw unit-type.
+**
+**	@todo	Do screen position caculation in high level.
+**		Better way to handle in x mirrored sprites.
 */
 global void DrawUnitType(const UnitType* type,unsigned frame,int x,int y)
 {
@@ -1068,7 +1071,7 @@ global void CleanUnitTypes(void)
     for( type=UnitTypes; type->OType; ++type ) {
 	Animations* anims;
 	UnitType* temp;
-	
+
 	if( !(anims=type->Animations) ) {	// Must be handled?
 	    continue;
 	}
