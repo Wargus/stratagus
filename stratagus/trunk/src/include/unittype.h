@@ -403,7 +403,7 @@
 **    remain outside inside the building.
 **
 **  @warning Workers that can build buildings with the
-**  @warnigg BuilderOutside flag must have the CanRepair flag.
+**  @warning BuilderOutside flag must have the CanRepair flag.
 **
 **  UnitType::BuilderLost
 **
@@ -630,7 +630,10 @@ typedef struct _resource_info_ {
 */
 typedef struct _unit_type_ UnitType;
 
-	/// Base structure of unit-type
+/**
+** Base structure of unit-type
+** @todo n0body: AutoBuildRate not implemented.
+*/
 struct _unit_type_ {
 	char* Ident;                    ///< Identifier
 	char* Name;                     ///< Pretty name shown from the engine
@@ -688,7 +691,6 @@ struct _unit_type_ {
 	int RepairRange;                ///< Units repair range.
 	char *CanCastSpell;             ///< Unit is able to use spells.
 	char *AutoCastActive;           ///< Default value for autocast.
-	/// @todo n0body: AutoBuildRate not implemented.
 	int AutoBuildRate;              ///< The rate at which the building builds itself
 	int RandomMovementProbability;  ///< Probability to move randomly.
 	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
