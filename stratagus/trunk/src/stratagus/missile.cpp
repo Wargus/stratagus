@@ -713,9 +713,8 @@ local int MissileVisibleInViewport (int v, const Missile* missile)
     if (!AnyMapAreaVisibleInViewport (v,tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
 	return 0;
     }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d (Map %d %d %d %d)\n",
-		tileMinX,tileMaxX,tileMinY,tileMaxY,
-		MapX,MapX+MapWidth,MapY,MapY+MapHeight);
+    DebugLevel3Fn("Missile bounding box %d %d %d %d\n",
+		tileMinX,tileMaxX,tileMinY,tileMaxY);
     return 1;
 }
 #else /* SPLIT_SCREEN_SUPPORT */

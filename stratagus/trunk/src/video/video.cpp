@@ -1292,7 +1292,9 @@ global void InitVideo(void)
     DecorationInit();
 #endif
 
+#ifndef SPLIT_SCREEN_SUPPORT
     DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
+#endif
 }
 
 //@}
