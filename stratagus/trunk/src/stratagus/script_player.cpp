@@ -257,9 +257,11 @@ local SCM CclPlayer(SCM list)
 	   errl("Unsupported tag",value);
 	}
     }
-//    if (player->AiEnabled) {
-//	AiInit (player);
-//    }
+#ifndef DEBUG
+    if (player->AiEnabled) {
+	AiInit (player);
+    }
+#endif
 
     return SCM_UNSPECIFIED;
 }
