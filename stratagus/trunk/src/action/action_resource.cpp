@@ -89,6 +89,13 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 #ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
 
+    if( !goal ) {			// Move checks for killed units.
+	// FIXME: perhaps we should choose an alternative
+	unit->Orders[0].Action=UnitActionStill;
+	unit->SubAction=0;
+	return 0;
+    }
+
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
@@ -143,6 +150,13 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 #else
 
     goal=unit->Command.Data.Move.Goal;
+
+    if( !goal ) {			// Move checks for killed units.
+	// FIXME: perhaps we should choose an alternative
+	unit->SubAction=0;
+	unit->Command.Action=UnitActionStill;
+	return 0;
+    }
 
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
@@ -399,6 +413,13 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 #ifdef NEW_ORDERS
     goal=unit->Orders[0].Goal;
 
+    if( !goal ) {			// Move checks for killed units.
+	// FIXME: perhaps we should choose an alternative
+	unit->SubAction=0;
+	unit->Orders[0].Action=UnitActionStill;
+	return 0;
+    }
+
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,goal)!=1 );
@@ -439,6 +460,13 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 #else
 
     goal=unit->Command.Data.Move.Goal;
+
+    if( !goal ) {			// Move checks for killed units.
+	// FIXME: perhaps we should choose an alternative
+	unit->SubAction=0;
+	unit->Command.Action=UnitActionStill;
+	return 0;
+    }
 
     DebugCheck( !goal );
     DebugCheck( unit->Wait!=1 );
