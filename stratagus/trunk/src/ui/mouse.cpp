@@ -1344,15 +1344,25 @@ global void UIHandleButtonDown(unsigned button)
 	    if( Selected[0] && (MouseButtons&LeftButton) ) {// enter select mode
 		int x;
 		int y;
+		int i;
+		int j;
+		int explored;
 
-		x = Viewport2MapX(TheUI.MouseViewport, CursorX);
-		y = Viewport2MapY(TheUI.MouseViewport, CursorY);
+		x=Viewport2MapX(TheUI.MouseViewport,CursorX);
+		y=Viewport2MapY(TheUI.MouseViewport,CursorY);
 		// FIXME: error messages
 
+		explored=1;
+		for( j=0; explored && j<Selected[0]->Type->Height; ++j ) {
+		    for( i=0; i<Selected[0]->Type->Width; ++i ) {
+			if( !IsMapFieldExplored(ThisPlayer,x+i,y+j) ) {
+			    explored=0;
+			    break;
+			}
+		    }
+		}
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
-			// FIXME: vladi: should check all building footprint
-			// but not just MAPEXPLORED(x,y)
-			&& (IsMapFieldExplored(ThisPlayer,x,y) || ReplayRevealMap) ) {
+			&& (explored || ReplayRevealMap) ) {
 		    PlayGameSound(GameSounds.PlacementSuccess.Sound
 			    ,MaxSampleVolume);
 		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
