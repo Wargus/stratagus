@@ -442,6 +442,7 @@ global MissileType MissileTypes[MissileTypeMax] = {
 */
 global MissileType* MissileTypeSmallFire;	/// Small fire missile type
 global MissileType* MissileTypeBigFire;		/// Big fire missile type
+global MissileType* MissileTypeGreenCross;	/// Green cross missile type
 
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
@@ -497,6 +498,7 @@ global void LoadMissileSprites(void)
     // FIXME: FIXME: FIXME: very diry hack
     MissileTypeSmallFire->Sprite->NumFrames=6;
     MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
+    MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
 }
 
 /**
