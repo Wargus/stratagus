@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name svgalib.c	-	svgalib support. */
-/*
-**	(c) Copyright 1999-2000 by Jarek Sobieszek
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Jarek Sobieszek
+//
+//	$Id$
 
 //@{
 
@@ -367,6 +366,7 @@ local void KeyboardEvent(int scancode, int press) {
     IfDebug( icode=0; );		// keeps the compiler happy
 
     if(press == KEY_EVENTPRESS) {
+	// FIXME: combine scancode -> internal keycode of press and release
 	switch(scancode) {
 	    case SCANCODE_1:
 		if(KeyModifiers & ModifierShift) {
@@ -546,19 +546,15 @@ local void KeyboardEvent(int scancode, int press) {
 		icode = '\t';
 		break;
 	    case SCANCODE_CURSORBLOCKUP:
-	    case SCANCODE_CURSORUP:
 		icode = KeyCodeUp;
 		break;
 	    case SCANCODE_CURSORBLOCKDOWN:
-	    case SCANCODE_CURSORDOWN:
 		icode = KeyCodeDown;
 		break;
 	    case SCANCODE_CURSORBLOCKLEFT:
-	    case SCANCODE_CURSORLEFT:
 		icode = KeyCodeLeft;
 		break;
 	    case SCANCODE_CURSORBLOCKRIGHT:
-	    case SCANCODE_CURSORRIGHT:
 		icode = KeyCodeRight;
 		break;
 	    case SCANCODE_F1:
@@ -597,7 +593,40 @@ local void KeyboardEvent(int scancode, int press) {
 	    case SCANCODE_F12:
 		icode = KeyCodeF12;
 		break;
+
+	    case SCANCODE_KEYPAD0:
+		icode = KeyCodeKP0;
+		break;
+	    case SCANCODE_KEYPAD1:
+		icode = KeyCodeKP1;
+		break;
+	    case SCANCODE_KEYPAD2:
+		icode = KeyCodeKP2;
+		break;
+	    case SCANCODE_KEYPAD3:
+		icode = KeyCodeKP3;
+		break;
+	    case SCANCODE_KEYPAD4:
+		icode = KeyCodeKP4;
+		break;
+	    case SCANCODE_KEYPAD5:
+		icode = KeyCodeKP5;
+		break;
+	    case SCANCODE_KEYPAD6:
+		icode = KeyCodeKP6;
+		break;
+	    case SCANCODE_KEYPAD7:
+		icode = KeyCodeKP7;
+		break;
+	    case SCANCODE_KEYPAD8:
+		icode = KeyCodeKP8;
+		break;
+	    case SCANCODE_KEYPAD9:
+		icode = KeyCodeKP9;
+		break;
+
 	    // KeyCodePause
+
 	    case SCANCODE_LEFTSHIFT:
 	    case SCANCODE_RIGHTSHIFT:
 		KeyModifiers |= ModifierShift;
@@ -621,6 +650,7 @@ local void KeyboardEvent(int scancode, int press) {
 	// FIXME: Should come first
 	DoButtonPanelKey(icode);
     } else if(press == KEY_EVENTRELEASE) {
+	// FIXME: combine scancode -> internal keycode of press and release
 	switch(scancode) {
 	    case SCANCODE_1:
 		if(KeyModifiers & ModifierShift) {
@@ -800,19 +830,15 @@ local void KeyboardEvent(int scancode, int press) {
 		icode = '\t';
 		break;
 	    case SCANCODE_CURSORBLOCKUP:
-	    case SCANCODE_CURSORUP:
 		icode = KeyCodeUp;
 		break;
 	    case SCANCODE_CURSORBLOCKDOWN:
-	    case SCANCODE_CURSORDOWN:
 		icode = KeyCodeDown;
 		break;
 	    case SCANCODE_CURSORBLOCKLEFT:
-	    case SCANCODE_CURSORLEFT:
 		icode = KeyCodeLeft;
 		break;
 	    case SCANCODE_CURSORBLOCKRIGHT:
-	    case SCANCODE_CURSORRIGHT:
 		icode = KeyCodeRight;
 		break;
 	    case SCANCODE_F1:
@@ -851,6 +877,38 @@ local void KeyboardEvent(int scancode, int press) {
 	    case SCANCODE_F12:
 		icode = KeyCodeF12;
 		break;
+
+	    case SCANCODE_KEYPAD0:
+		icode = KeyCodeKP0;
+		break;
+	    case SCANCODE_KEYPAD1:
+		icode = KeyCodeKP1;
+		break;
+	    case SCANCODE_KEYPAD2:
+		icode = KeyCodeKP2;
+		break;
+	    case SCANCODE_KEYPAD3:
+		icode = KeyCodeKP3;
+		break;
+	    case SCANCODE_KEYPAD4:
+		icode = KeyCodeKP4;
+		break;
+	    case SCANCODE_KEYPAD5:
+		icode = KeyCodeKP5;
+		break;
+	    case SCANCODE_KEYPAD6:
+		icode = KeyCodeKP6;
+		break;
+	    case SCANCODE_KEYPAD7:
+		icode = KeyCodeKP7;
+		break;
+	    case SCANCODE_KEYPAD8:
+		icode = KeyCodeKP8;
+		break;
+	    case SCANCODE_KEYPAD9:
+		icode = KeyCodeKP9;
+		break;
+
 	    case SCANCODE_LEFTSHIFT:
 	    case SCANCODE_RIGHTSHIFT:
 		KeyModifiers &= ~ModifierShift;
