@@ -627,17 +627,18 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 */
 global int NextPathElement(Unit* unit,int* pxd,int *pyd)
 {
-    static int LastFrameCounter;
+    static int LastGameCycle;
     static int UnreachableCounter;
     int result;
 
     //
     //	Reduce the load, stop handling pathes if too many UNREACHABLE results.
     //
-    if( FrameCounter!=LastFrameCounter ) {
-	LastFrameCounter=FrameCounter;
+    if( GameCycle!=LastGameCycle ) {
+	LastGameCycle=GameCycle;
 	UnreachableCounter=3;
     }
+    // FIXME: Can use the time left in frame.
     if( !UnreachableCounter ) {
 	DebugLevel0Fn("Done too much %d.\n",UnitNumber(unit));
 	return PF_WAIT;

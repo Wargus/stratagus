@@ -52,6 +52,7 @@
 #include "deco.h"
 #include "trigger.h"
 #include "campaign.h"
+#include "sound_server.h"
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 #include "sound_server.h"
@@ -308,7 +309,7 @@ global void UpdateDisplay(void)
 	{ int f;
 
 	f=(168*(NextFrameTicks-GetTicks()))
-	    /((100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed);
+	    /((100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
 	if( f<0 || f>168 ) {
 	    f=168;
 	}
@@ -452,9 +453,18 @@ local void EnableDrawRefresh(void)
 */
 global void GameMainLoop(void)
 {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
-    int counter = 30;
-#endif
+    EventCallback callbacks;
+
+    callbacks.ButtonPressed=(void*)HandleButtonDown;
+    callbacks.ButtonReleased=(void*)HandleButtonUp;
+    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.MouseExit=(void*)HandleMouseExit;
+
+    callbacks.KeyPressed=HandleKeyDown;
+    callbacks.KeyReleased=HandleKeyUp;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
 
     SetVideoSync();
     EnableDrawRefresh();
@@ -462,11 +472,12 @@ global void GameMainLoop(void)
     GameRunning=1;
 
     for( ; GameRunning; ) {
-	// FIXME: The mouse and network should continue in pause mode!
-	if(!GamePaused) {
-	    ++FrameCounter;
-	    if( !FrameCounter ) {
-		// FIXME: tests with frame counters now fails :(
+	//
+	//	Game logic part
+	//
+	if (!GamePaused && NetworkInSync) {
+	    if( !++GameCycle ) {
+		// FIXME: tests with game cycle counter now fails :(
 		// FIXME: Should happen in 68 years :)
 		fprintf(stderr,"FIXME: *** round robin ***\n");
 		fprintf(stderr,"FIXME: *** round robin ***\n");
@@ -476,14 +487,8 @@ global void GameMainLoop(void)
 	    NetworkCommands();		// Get network commands
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
-	    PlayersEachFrame();		// handle players
-	    TriggersEachFrame();	// handle triggers
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
-	    if (counter --== 0) {
-		CDRomCheck();
-		counter = 30; // every second
-	    }
-#endif
+	    PlayersEachCycle();		// handle players
+	    TriggersEachCycle();	// handle triggers
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
 
 	    //
@@ -496,7 +501,7 @@ global void GameMainLoop(void)
 	    //		Check game goals.
 	    //		Check rescue of units.
 	    //
-	    switch( FrameCounter%FRAMES_PER_SECOND ) {
+	    switch( GameCycle%CYCLES_PER_SECOND ) {
 		case 0:
 		    UnitIncrementMana();	// magic units
 		    break;
@@ -518,13 +523,19 @@ global void GameMainLoop(void)
 		case 6:				// overtaking units
 		    RescueUnits();
 		    break;
-		case 7:
+		case 7:				// show order some time
 		    if( ShowOrdersCount ) {
 			ShowOrdersCount--;
 		    }
 		    break;
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+		case 8:				// Check cd-rom
+		    CDRomCheck();
+		    break;
+#endif
 	    }
 	}
+
 	//
 	//	Map scrolling
 	//
@@ -563,7 +574,10 @@ global void GameMainLoop(void)
 
 	CheckVideoInterrupts();		// look if already an interrupt
 
-	WaitEventsAndKeepSync();
+	WaitEventsOneFrame(&callbacks);
+	if( !NetworkInSync ) {
+	    NetworkRecover();		// recover network
+	}
     }
 
     //

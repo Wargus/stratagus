@@ -749,15 +749,15 @@ global void PlayersInitAi(void)
 }
 
 /**
-**	Handle AI of all players each frame.
+**	Handle AI of all players each game cycle.
 */
-global void PlayersEachFrame(void)
+global void PlayersEachCycle(void)
 {
     int player;
 
     for( player=0; player<NumPlayers; ++player ) {
 	if( Players[player].AiEnabled ) {
-	    AiEachFrame(&Players[player]);
+	    AiEachCycle(&Players[player]);
 	}
     }
 }
@@ -771,7 +771,7 @@ global void PlayersEachSecond(void)
     int res;
 
     for (player = 0; player < NumPlayers; ++player) {
-	if ((FrameCounter / FRAMES_PER_SECOND) % 10 == 0) {
+	if ((GameCycle / CYCLES_PER_SECOND) % 10 == 0) {
 	    for (res = 0; res < MaxCosts; res++) {
 		Players[player].Revenue[res] =
 		    Players[player].Resources[res] -

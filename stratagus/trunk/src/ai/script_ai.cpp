@@ -776,15 +776,15 @@ local SCM CclAiSleep(SCM value)
 {
     int i;
 
-    DebugLevel3Fn("%d %d\n",FrameCounter,AiPlayer->SleepFrames);
+    DebugLevel3Fn("%lu %d\n",GameCycle,AiPlayer->SleepFrames);
     if( AiPlayer->SleepFrames ) {
-	if( AiPlayer->SleepFrames<FrameCounter ) {
+	if( AiPlayer->SleepFrames<GameCycle ) {
 	    AiPlayer->SleepFrames=0;
 	    return SCM_BOOL_F;
 	}
     } else {
 	i=gh_scm2int(value);
-	AiPlayer->SleepFrames=FrameCounter+i;
+	AiPlayer->SleepFrames=GameCycle+i;
     }
 
     return SCM_BOOL_T;

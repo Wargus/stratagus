@@ -77,7 +77,7 @@ global void HandleActionBuild(Unit* unit)
 	    if( unit->SubAction++<10 ) {
 		//	To keep the load low, retry each 1/4 second.
 		// NOTE: we can already inform the AI about this problem?
-		unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
+		unit->Wait=CYCLES_PER_SECOND/4+unit->SubAction;
 		return;
 	    }
 
@@ -122,7 +122,7 @@ global void HandleActionBuild(Unit* unit)
 	if( unit->SubAction++<10 ) {
 	    //	To keep the load low, retry each 1/4 second.
 	    // NOTE: we can already inform the AI about this problem?
-	    unit->Wait=FRAMES_PER_SECOND/4+unit->SubAction;
+	    unit->Wait=CYCLES_PER_SECOND/4+unit->SubAction;
 	    return;
 	}
 
@@ -201,7 +201,7 @@ global void HandleActionBuild(Unit* unit)
     build->Orders[0].Action=UnitActionBuilded;
     build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
     build->Data.Builded.Val=stats->HitPoints;
-    n=(stats->Costs[TimeCost]*FRAMES_PER_SECOND/6)/(SpeedBuild*5);
+    n=(stats->Costs[TimeCost]*CYCLES_PER_SECOND/6)/(SpeedBuild*5);
     if( n ) {
 	build->Data.Builded.Add=stats->HitPoints/n;
     } else {				// No build time pops-up?
@@ -215,7 +215,7 @@ global void HandleActionBuild(Unit* unit)
     DebugLevel3Fn("Build Sum %d, Add %d, Val %d, Sub %d\n"
 	,build->Data.Builded.Sum,build->Data.Builded.Add
 	,build->Data.Builded.Val,build->Data.Builded.Sub);
-    build->Wait=FRAMES_PER_SECOND/6;
+    build->Wait=CYCLES_PER_SECOND/6;
 
     //
     //	Building oil-platform, must remove oil-patch.

@@ -130,7 +130,7 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
-    DebugLevel2Fn("%d:Unit %p %d `%s'\n",FrameCounter,
+    DebugLevel2Fn("%lu:Unit %p %d `%s'\n",GameCycle,
 	    unit,UnitNumber(unit),unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
@@ -157,7 +157,7 @@ global void ReleaseUnit(Unit* unit)
 	unit->Destroyed=1;		// mark as destroyed
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
-	    DebugLevel2Fn("%d:More references of %d #%d\n",FrameCounter
+	    DebugLevel2Fn("%lu:More references of %d #%d\n",GameCycle
 		    ,UnitNumber(unit),unit->Refs);
 	    return;
 	}
@@ -185,10 +185,10 @@ global void ReleaseUnit(Unit* unit)
     //
     *ReleasedTail=unit;
     ReleasedTail=&unit->Next;
-    unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
+    unit->Refs=GameCycle+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel2Fn("%d:No more references %d\n",
-		FrameCounter,UnitNumber(unit));
+	DebugLevel2Fn("%lu:No more references %d\n",
+		GameCycle,UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
 }
@@ -222,13 +222,13 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     //
     //	Can use released unit?
     //
-    if( ReleasedHead && ReleasedHead->Refs<FrameCounter ) {
+    if( ReleasedHead && ReleasedHead->Refs<GameCycle ) {
 	unit=ReleasedHead;
 	ReleasedHead=unit->Next;
 	if( ReleasedTail==&unit->Next ) {	// last element
 	    ReleasedTail=&ReleasedHead;
 	}
-	DebugLevel2Fn("%d:Release %p %d\n",FrameCounter,unit,UnitNumber(unit));
+	DebugLevel2Fn("%lu:Release %p %d\n",GameCycle,unit,UnitNumber(unit));
 	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
 	// FIXME: can release here more slots, reducing memory needs.
@@ -1263,8 +1263,8 @@ global void UnitIncrementMana(void)
 	//
 	//	Look if the time to live is over.
 	//
-	if( unit->TTL && unit->TTL<FrameCounter ) {
-	    DebugLevel0Fn("Unit must die %d %d!\n",unit->TTL,FrameCounter);
+	if( unit->TTL && unit->TTL<GameCycle ) {
+	    DebugLevel0Fn("Unit must die %d %lu!\n",unit->TTL,GameCycle);
 	    //if( !--unit->HP ) { FIXME: must reduce hp the last seconds of life
 		LetUnitDie(unit);
 	    //}
@@ -3027,7 +3027,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( !target->Attacked ) {
 	// NOTE: perhaps this should also be moved into the notify?
 	if( target->Player==ThisPlayer ) {
-	    static int LastFrame;
+	    static int LastCycle;
 	    static int LastX;
 	    static int LastY;
 
@@ -3035,11 +3035,11 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	    //	One help cry each 2 second is enough
 	    //	If on same area ignore it for 2 minutes.
 	    //
-	    if( LastFrame<FrameCounter ) {
-		if( LastFrame+FRAMES_PER_SECOND*120<FrameCounter ||
+	    if( LastCycle<GameCycle ) {
+		if( LastCycle+CYCLES_PER_SECOND*120<GameCycle ||
 			target->X<LastX-14 || target->X>LastX+14
 			    || target->Y<LastY-14 || target->Y>LastY+14  ) {
-		    LastFrame=FrameCounter+FRAMES_PER_SECOND*2;
+		    LastCycle=GameCycle+CYCLES_PER_SECOND*2;
 		    LastX=target->X;
 		    LastY=target->Y;
 		    PlayUnitSound(target,VoiceHelpMe);

@@ -613,7 +613,7 @@ global void DrawResources(void)
 
 // FIXME: move messages to console code.
 
-#define MESSAGES_TIMEOUT  FRAMES_PER_SECOND*5	/// Message timeout 5 seconds
+#define MESSAGES_TIMEOUT  (FRAMES_PER_SECOND*5)	/// Message timeout 5 seconds
 
 local int   MessageFrameTimeout;		/// frame to expire message
 
@@ -1044,8 +1044,8 @@ global void DrawInfoPanel(void)
 	VideoDrawText(x,y,GameFont,"FreeCraft");
 	y+=16;
 	VideoDrawText(x,y,GameFont,"Cycle:");
-	VideoDrawNumber(x+48,y,GameFont,FrameCounter);
-	VideoDrawNumber(x+110,y,GameFont,FRAMES_PER_SECOND*VideoSyncSpeed/100);
+	VideoDrawNumber(x+48,y,GameFont,GameCycle);
+	VideoDrawNumber(x+110,y,GameFont,CYCLES_PER_SECOND*VideoSyncSpeed/100);
 	y+=20;
 
 	for( i=0; i<PlayerMax; ++i ) {

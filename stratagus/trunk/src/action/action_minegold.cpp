@@ -495,7 +495,7 @@ global void HandleActionMineGold(Unit* unit)
 			}
 		    } else {
 			//	To keep the load low, retry each 1/4 second.
-			unit->Wait=unit->SubAction+FRAMES_PER_SECOND/4;
+			unit->Wait=unit->SubAction+CYCLES_PER_SECOND/4;
 		    }
 		} else {
 		    unit->SubAction=64;
@@ -530,7 +530,7 @@ global void HandleActionMineGold(Unit* unit)
 			}
 		    } else {
 			//	To keep the load low, retry each 1/4 second.
-			unit->Wait=unit->SubAction-64+FRAMES_PER_SECOND/4;
+			unit->Wait=unit->SubAction-64+CYCLES_PER_SECOND/4;
 		    }
 		} else {
 		    unit->SubAction=128;

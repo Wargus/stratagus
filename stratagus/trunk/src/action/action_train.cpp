@@ -82,7 +82,7 @@ global void HandleActionTrain(Unit* unit)
 	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
 		    ->Stats[player->Player].Costs[TimeCost];
 	    unit->Reset=1;
-	    unit->Wait=FRAMES_PER_SECOND/6;
+	    unit->Wait=CYCLES_PER_SECOND/6;
 	    return;
 	}
 
@@ -103,7 +103,7 @@ global void HandleActionTrain(Unit* unit)
 	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
 		    ->Stats[player->Player].Costs[TimeCost];
 	    unit->Reset=1;
-	    unit->Wait=FRAMES_PER_SECOND/6;
+	    unit->Wait=CYCLES_PER_SECOND/6;
 	    return;
 	}
 
@@ -182,7 +182,7 @@ global void HandleActionTrain(Unit* unit)
     }
 
     unit->Reset=1;
-    unit->Wait=FRAMES_PER_SECOND/6;
+    unit->Wait=CYCLES_PER_SECOND/6;
 }
 
 //@}
