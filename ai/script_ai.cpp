@@ -203,17 +203,17 @@ local SCM CclDefineAiHelper(SCM list)
 		}
 		DebugLevel3Fn("> %s\n" _C_ upgrade->Ident);
 	    } else if( what==4 || what==5 ) {
-		if( !strcmp(DEFAULT_NAMES[1],str) ) {
+		if( !strcmp(DefaultResourceNames[1],str) ) {
 		    cost=1;
-		} else if( !strcmp(DEFAULT_NAMES[2],str) ) {
+		} else if( !strcmp(DefaultResourceNames[2],str) ) {
 		    cost=2;
-		} else if( !strcmp(DEFAULT_NAMES[3],str) ) {
+		} else if( !strcmp(DefaultResourceNames[3],str) ) {
 		    cost=3;
-		} else if( !strcmp(DEFAULT_NAMES[4],str) ) {
+		} else if( !strcmp(DefaultResourceNames[4],str) ) {
 		    cost=4;
-		} else if( !strcmp(DEFAULT_NAMES[5],str) ) {
+		} else if( !strcmp(DefaultResourceNames[5],str) ) {
 		    cost=5;
-		} else if( !strcmp(DEFAULT_NAMES[6],str) ) {
+		} else if( !strcmp(DefaultResourceNames[6],str) ) {
 		    cost=6;
 		} else {
 		    fprintf(stderr,"unknown cost %s\n",str);
@@ -912,7 +912,7 @@ local SCM CclAiDump(void)
     //
     printf("------\n");
     for( i=0; i<MaxCosts; ++i ) {
-	printf("%s(%4d) ",DEFAULT_NAMES[i],AiPlayer->Player->Resources[i]);
+	printf("%s(%4d) ",DefaultResourceNames[i],AiPlayer->Player->Resources[i]);
     }
     printf("\n");
     printf("%d:",AiPlayer->Player->Player);
@@ -1009,7 +1009,7 @@ local int DefaultResourceNumber(const char *type)
 {
     int i;
     for( i=0; i<MaxCosts; ++i ) {
-	if( !strcmp(DEFAULT_NAMES[i],type) ) {
+	if( !strcmp(DefaultResourceNames[i],type) ) {
 	    return i;
 	}
     }

@@ -232,7 +232,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	Update the resource.
 	//	Remove what we can carry, FIXME: always this?
 	//
-	source->Value-=DEFAULT_INCOMES[resource->Cost];
+	source->Value-=DefaultIncomes[resource->Cost];
 
 	DebugLevel3Fn("-%d\n" _C_ source->Data.Resource.Active);
 	if( !--source->Data.Resource.Active ) {
@@ -246,7 +246,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	//	End of resource: destroy the resource.
 	//
-	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
+	if( source->Value<DefaultIncomes[resource->Cost] ) {
 	    DebugLevel0Fn("Resource is destroyed\n");
 	    DropOutAll(source);
 	    LetUnitDie(source);
@@ -264,7 +264,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	} else {
 	    // FIXME: should support more races
 	    DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-		_C_ unit->Type->Ident _C_ DEFAULT_NAMES[resource->Cost]);
+		_C_ unit->Type->Ident _C_ DefaultResourceNames[resource->Cost]);
 	}
 	unit->Player->UnitTypesCount[unit->Type->Type]++;
 
@@ -416,7 +416,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 	unit->Type=*resource->Orc;
     } else {
 	DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
-	    _C_ unit->Type->Ident _C_ DEFAULT_NAMES[resource->Cost]);
+	    _C_ unit->Type->Ident _C_ DefaultResourceNames[resource->Cost]);
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 

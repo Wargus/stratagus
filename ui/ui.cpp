@@ -283,7 +283,7 @@ local void OldSaveUi(FILE* file,const UI* ui)
 	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
 
     for( i=1; i<MaxCosts; ++i ) {
-	fprintf(file,"  ; Resource %s\n",DEFAULT_NAMES[i]);
+	fprintf(file,"  ; Resource %s\n",DefaultResourceNames[i]);
 	fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
 		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
 		ui->Resources[i].IconX,ui->Resources[i].IconY,
@@ -402,7 +402,7 @@ local void NewSaveUi(FILE * file, const UI * ui)
     for (i = 1; i < MaxCosts; ++i) {
 	// FIXME: use slot 0 for time displays!
 	fprintf(file, "\n    %s (icon-pos (%d %d) icon-file \"%s\"\n",
-	    DEFAULT_NAMES[i],
+	    DefaultResourceNames[i],
 	    ui->Resources[i].IconX, ui->Resources[i].IconY,
 	    ui->Resources[i].Icon.File);
 	fprintf(file,"      icon-frame %d icon-size (%d %d) text-pos (%d %d))",

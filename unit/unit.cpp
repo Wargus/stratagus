@@ -757,7 +757,7 @@ global void UnitLost(Unit* unit)
 		int m;
 		int j;
 
-		m=DEFAULT_INCOMES[i];
+		m=DefaultIncomes[i];
 		for( j=0; j<player->TotalNumUnits; ++j ) {
 		    if( m<player->Units[j]->Type->ImproveIncomes[i] ) {
 			m=player->Units[j]->Type->ImproveIncomes[i];
