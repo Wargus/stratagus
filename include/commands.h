@@ -107,6 +107,8 @@ extern void SendCommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	,int flush);
     /// Send diplomacy command
 extern void SendCommandDiplomacy(int player,int state,int opponent);
+    /// Send shared vision command
+extern void SendCommandSharedVision(int player,int state,int opponent);
 
     /// Parse a command (from network).
 extern void ParseCommand(unsigned char type,UnitRef unum,unsigned short x,

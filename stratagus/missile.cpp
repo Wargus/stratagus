@@ -599,7 +599,7 @@ global void FireMissile(Unit* unit)
 #ifdef NEW_FOW
 	MapMarkSight(goal->Player,unit->X,unit->Y,1);
 #else
-	if( goal->Player==ThisPlayer ) {
+	if( goal->Player==ThisPlayer || IsSharedVision(ThisPlayer,goal) ) {
 	    MapMarkSight(unit->X,unit->Y,1);
 	}
 #endif

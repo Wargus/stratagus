@@ -308,6 +308,7 @@ struct _player_ {
     int		Team;			/// team of player
     unsigned	Enemy;			/// enemy bit field for this player
     unsigned	Allied;			/// allied bit field for this player
+    unsigned	SharedVision;		/// shared vision bit field
 
     int		StartX;			/// map tile start X position
     int		StartY;			/// map tile start Y position

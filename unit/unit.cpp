@@ -492,7 +492,8 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	//
 	//	Update fog of war, if unit belongs to player on this computer
 	//
-	if( unit->Player==ThisPlayer ) {
+	if( unit->Player==ThisPlayer || 
+	    (ThisPlayer && IsSharedVision(ThisPlayer,unit)) ) {
 	    MapMarkSight(x,y,unit->Stats->SightRange);
 	}
 #endif
@@ -3548,6 +3549,21 @@ global int IsEnemy(const Player* player,const Unit* dest)
 global int IsAllied(const Player* player,const Unit* dest)
 {
     return player->Allied&(1<<dest->Player->Player);
+}
+
+/**
+**	Check if unit is shared vision.
+**
+**	@param player	The source player.
+**	@param dest	The destination unit.
+**
+**	@return		Returns true, if the destination unit is shared
+**			vision.
+*/
+global int IsSharedVision(const Player* player,const Unit* dest)
+{
+    return (player->SharedVision&(1<<dest->Player->Player)) &&
+	   (dest->Player->SharedVision&(1<<player->Player));
 }
 
 /**

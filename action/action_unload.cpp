@@ -146,7 +146,7 @@ found:
     //
     //	Update fog of war, if unit belongs to player on this computer
     //
-    if( unit->Player==ThisPlayer ) {
+    if( unit->Player==ThisPlayer || IsSharedVision(ThisPlayer,unit) ) {
 	MapMarkSight(x,y,unit->Stats->SightRange);
     }
 #endif

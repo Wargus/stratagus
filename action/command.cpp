@@ -1317,4 +1317,20 @@ global void CommandDiplomacy(int player,int state,int opponent)
     // FIXME: Should we display a message?
 }
 
+/**
+**	Shared vision changed.
+**
+**	@param player	Player which changes his state.
+**	@param state	New shared vision state.
+**	@param opponent	Opponent.
+*/
+global void CommandSharedVision(int player,int state,int opponent)
+{
+    if( state==0 ) {
+	Players[player].SharedVision&=~(1<<opponent);
+    } else {
+	Players[player].SharedVision|=(1<<opponent);
+    }
+}
+
 //@}
