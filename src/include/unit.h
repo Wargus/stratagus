@@ -480,7 +480,6 @@ typedef struct _order_ {
 typedef enum _unit_voice_group_ {
 	VoiceSelected,          /// If selected
 	VoiceAcknowledging,     /// Acknowledge command
-	VoiceAttacking,         /// FIXME: Should be removed?
 	VoiceReady,             /// Command completed
 	VoiceHelpMe,            /// If attacked
 	VoiceDying,             /// If killed

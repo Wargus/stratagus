@@ -536,9 +536,11 @@ extern void PlayersEachCycle(void);
 	/// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
+#ifndef USE_OPENGL
 	/// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(const struct _player_* player,
 	const Graphic* sprite);
+#endif
 
 	/// Output debug informations for players
 extern void DebugPlayers(void);

@@ -245,12 +245,6 @@ Icon* IconByIdent(const char* ident)
 */
 void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
-#ifdef USE_OPENGL
-	if (!icon->Sprite->PlayerColorTextures[player->Player]) {
-		MakePlayerColorTexture(icon->Sprite, player->Player);
-	}
-#endif
-	GraphicPlayerPixels(player, icon->Sprite);
 	VideoDrawPlayerColorClip(icon->Sprite, player->Player, icon->Frame, x, y);
 }
 

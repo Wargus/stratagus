@@ -434,17 +434,6 @@ UnitType* NewUnitTypeSlot(char* ident)
 void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 	int x, int y)
 {
-#ifdef USE_OPENGL
-	if (!sprite->PlayerColorTextures[player]) {
-		MakePlayerColorTexture(sprite, player);
-	}
-#else
-	SDL_SetColors(sprite->Surface, Players[player].UnitColors.Colors, 208, 4);
-	if (sprite->SurfaceFlip) {
-		SDL_SetColors(sprite->SurfaceFlip, Players[player].UnitColors.Colors, 208, 4);
-	}
-#endif
-
 	// FIXME: move this calculation to high level.
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
 	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
