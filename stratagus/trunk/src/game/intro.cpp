@@ -229,8 +229,12 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 	char* s1;
 	char* space;
 
-	if( (s1=strchr(s,'\n')) ) {
-	    *s1='\0';
+	if( (s1=strpbrk(s,"\n\r")) ) {
+	    if( (s1[0]=='\n' && s1[1]=='\r') ||
+		(s1[0]=='\r' && s1[1]=='\n')) {
+		s1[1]='\0';
+	    }
+	    s1[0]='\0';
 	}
 	space=NULL;
 	for( ;; ) {
@@ -260,6 +264,13 @@ local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 	}
 	++l;
 	s=str+l;
+	if( !*s ) {
+	    ++s;
+	    ++l;
+	    if( !text[l] ) {
+		break;
+	    }
+	}
     }
 
     free(str);
