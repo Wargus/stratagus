@@ -28,8 +28,6 @@
 //
 //      $Id$
 
-#ifdef NEW_AI	// {
-
 //@{
 
 /*----------------------------------------------------------------------------
@@ -657,5 +655,3 @@ global int AiFindBuildingPlace(const Unit * worker, const UnitType * type,
 }
 
 //@}
-
-#endif // } NEW_AI
