@@ -650,6 +650,9 @@ local void PrgStartInit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameMenuReturn(void)
 {
     EndMenu();
@@ -661,9 +664,12 @@ local void GameMenuReturn(void)
     GamePaused = 0;
 }
 
-local char *SaveDir;
-local int TypedFileName;
+local char *SaveDir;			/// FIXME: docu
+local int TypedFileName;		/// FIXME: docu
 
+/**
+**	FIXME: docu
+*/
 local void InitSaveGameMenu(Menuitem *mi)
 {
     mi->menu->items[4].flags = MenuButtonDisabled;    
@@ -689,6 +695,9 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     mi->menu->items[5].flags = MenuButtonDisabled;
 }
 
+/**
+**	FIXME: docu
+*/
 local void SaveAction(void)
 {
     char filename[PATH_MAX];
@@ -720,6 +729,9 @@ local void SaveAction(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void CreateSaveDir(void)
 {
 #ifdef USE_WIN32
@@ -734,12 +746,16 @@ local void CreateSaveDir(void)
     mkdir(path,0777);
     strcat(path,"/save");
     mkdir(path,0777);
-    if (SaveDir)
+    if (SaveDir) {
 	free(SaveDir);
+    }
     SaveDir = strdup(path);
 #endif
 }
 
+/**
+**	FIXME: docu
+*/
 global void GameMenuSave(void)
 {
     char savegame_buffer[32];
@@ -754,6 +770,9 @@ global void GameMenuSave(void)
     ProcessMenu("menu-save-game", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local void SaveLBExit(Menuitem *mi)
 {
@@ -768,6 +787,9 @@ local void SaveLBExit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void SaveLBInit(Menuitem *mi)
 {
     int i;
@@ -786,6 +808,9 @@ local void SaveLBInit(Menuitem *mi)
     mi->d.listbox.curopt = -1;
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
 {
@@ -828,6 +853,9 @@ local unsigned char *SaveLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 local void SaveLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -852,6 +880,9 @@ local void SaveLBAction(Menuitem *mi, int i)
     TypedFileName = 0;
 }
 
+/**
+**	FIXME: docu
+*/
 local void SaveVSAction(Menuitem *mi, int i)
 {
     int op;
@@ -943,6 +974,9 @@ local void SaveVSAction(Menuitem *mi, int i)
     TypedFileName = 0;
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local void SaveOk(void)
 {
@@ -981,6 +1015,9 @@ local void SaveOk(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local int SaveRDFilter(char *pathbuf, FileList *fl)
 {
     char *suf;
@@ -1027,12 +1064,18 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 local void InitLoadGameMenu(Menuitem *mi)
 {
     mi->menu->items[3].flags = MI_DISABLED;
     CreateSaveDir();
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local void LoadLBExit(Menuitem *mi)
 {
@@ -1047,6 +1090,9 @@ local void LoadLBExit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void LoadLBInit(Menuitem *mi)
 {
     int i;
@@ -1065,6 +1111,9 @@ local void LoadLBInit(Menuitem *mi)
     mi->d.listbox.curopt = -1;
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
 {
@@ -1107,6 +1156,9 @@ local unsigned char *LoadLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 local void LoadLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -1126,6 +1178,9 @@ local void LoadLBAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void LoadVSAction(Menuitem *mi, int i)
 {
     int op;
@@ -1216,6 +1271,9 @@ local void LoadVSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 // FIXME: modify function
 local void LoadOk(void)
 {
@@ -1254,6 +1312,9 @@ local void LoadOk(void)
 }
 
 #if 0
+/**
+**	FIXME: docu
+*/
 local void SaveMenu(void)
 {
     EndMenu();
@@ -1261,6 +1322,9 @@ local void SaveMenu(void)
 }
 #endif
 
+/**
+**	FIXME: docu
+*/
 local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
 {
     static char name[PATH_MAX];		// FIXME: much memory wasted
@@ -1282,6 +1346,9 @@ local void ConfirmSaveInit(Menuitem * mi __attribute__ ((unused)))
     menu->items[2].d.text.text = name;
 }
 
+/**
+**	FIXME: docu
+*/
 local void ConfirmSaveFile(void)
 {
     char name[PATH_MAX];
@@ -1305,12 +1372,18 @@ local void ConfirmSaveFile(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void FcDeleteMenu(void)
 {
     EndMenu();
     ProcessMenu("menu-delete-confirm", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
 {
     static char name[PATH_MAX];		// FIXME: much memory wasted
@@ -1322,6 +1395,9 @@ local void FcDeleteInit(Menuitem *mi __attribute__((unused)))
     menu->items[2].d.text.text = name;
 }
   
+/**
+**	FIXME: docu
+*/
 local void FcDeleteFile(void)
 {
     Menu *menu;
@@ -1338,6 +1414,9 @@ local void FcDeleteFile(void)
     ProcessMenu("menu-save-game", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void LoadAction(void)
 {
     Menu *menu;
@@ -1362,6 +1441,9 @@ local void LoadAction(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 global void GameMenuLoad(void)
 {
     Menu *menu;
@@ -1375,16 +1457,25 @@ global void GameMenuLoad(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void InitGameMenu(Menuitem *mi __attribute__((unused)))
 {
     // FIXME: populate...
 }
 
+/**
+**	FIXME: docu
+*/
 global void SoundOptions(void)
 {
     ProcessMenu("menu-sound-options", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
@@ -1465,11 +1556,17 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 #endif // with sound
 }
 
+/**
+**	FIXME: docu
+*/
 local void GlobalOptions(void)
 {
     ProcessMenu("menu-global-options", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
 {
     Menu *menu;
@@ -1507,6 +1604,9 @@ local void InitGlobalOptions(Menuitem *mi __attribute__((unused)))
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetRes(Menuitem *mi)
 {
     Menu *menu;
@@ -1545,24 +1645,36 @@ local void SetRes(Menuitem *mi)
     InitGlobalOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
     ToggleFullScreen();
     InitGlobalOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=1;
     InitGlobalOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetShadowFogGray(Menuitem *mi __attribute__((unused)))
 {
     OriginalFogOfWar=0;
     InitGlobalOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
@@ -1588,6 +1700,9 @@ local void SetMasterPower(Menuitem *mi __attribute__((unused)))
     InitSoundOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
@@ -1612,6 +1727,9 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
     InitSoundOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetCdPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_SDLCD
@@ -1670,6 +1788,9 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
     ShowCommandKey ^= 1;
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
@@ -1678,6 +1799,9 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
     InitSoundOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
@@ -1686,6 +1810,9 @@ local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
     InitSoundOptions(NULL);
 }
 
+/**
+**	FIXME: docu
+*/
 global void SpeedSettings(void)
 {
     Menu *menu;
@@ -1746,6 +1873,7 @@ local void GameOptions(void)
     ProcessMenu("menu-game-options", 1);
 }
 
+#if 0
 /**
 **	Show the global options.
 */
@@ -1753,6 +1881,7 @@ local void GameGlobalOptionsMenu(void)
 {
     // FIXME: write me
 }
+#endif
 
 /**
 **	Show the game credits.
@@ -1815,6 +1944,9 @@ local void GameMenuEnd(void)
     CurrentMenu = NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 local void KeystrokeHelpMenu(void)
 {
     Menu *menu;
@@ -1824,11 +1956,17 @@ local void KeystrokeHelpMenu(void)
     ProcessMenu("menu-keystroke-help", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void HelpMenu(void)
 {
     ProcessMenu("menu-help", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void ShowTipsMenu(void)
 {
     Menu *menu;
@@ -1846,7 +1984,7 @@ local void ShowTipsMenu(void)
 /**
 **	Free the tips from the menu
 */
-local void FreeTips()
+local void FreeTips(void)
 {
     int i;
     Menu *menu;
@@ -1942,6 +2080,9 @@ local void SetTips(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void NextTip(void)
 {
     CurrentTip++;
@@ -1979,7 +2120,7 @@ local void GameMenuExit(void)
 }
 
 /**
-**
+**	FIXME: docu
 */
 local void SetMenuObjectives(void)
 {
@@ -2039,7 +2180,7 @@ local void SetMenuObjectives(void)
 }
 
 /**
-**
+**	FIXME: docu
 */
 local void FreeMenuObjectives(void)
 {
@@ -2056,7 +2197,7 @@ local void FreeMenuObjectives(void)
 }
 
 /**
-**
+**	FIXME: docu
 */
 local void GameMenuObjectives(void)
 {
@@ -2538,6 +2679,9 @@ local void MultiPlayerGameMenu(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void FreeMapInfos(FileList *fl, int n)
 {
     int i;
@@ -2562,6 +2706,9 @@ local void ScenSelectInit(Menuitem *mi)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -2581,6 +2728,9 @@ local void ScenSelectLBAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectLBExit(Menuitem *mi)
 {
     FileList *fl;
@@ -2595,6 +2745,9 @@ local void ScenSelectLBExit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
@@ -2717,6 +2870,9 @@ usezzf:
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectLBInit(Menuitem *mi)
 {
     int i;
@@ -2741,6 +2897,9 @@ local void ScenSelectLBInit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -2782,6 +2941,9 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
     mi = mi->menu->items + 1;
@@ -2794,6 +2956,9 @@ local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
     MustRedraw |= RedrawMenu;
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectVSAction(Menuitem *mi, int i)
 {
     int op;
@@ -2881,6 +3046,9 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
     int j;
@@ -2931,6 +3099,9 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameSpeedHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -2973,6 +3144,9 @@ local void GameSpeedHSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MouseScrollHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -3019,6 +3193,9 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void KeyboardScrollHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -3065,6 +3242,9 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MasterVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -3105,6 +3285,9 @@ local void MasterVolumeHSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MusicVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -3146,6 +3329,9 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
 }
 
 #ifdef USE_LIBCDA
+/**
+**	FIXME: docu
+*/
 local void CdVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
@@ -3186,12 +3372,18 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
     }
 }
 #else
+/**
+**	FIXME: docu
+*/
 local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 	int i __attribute__((unused)))
 {
 }
 #endif
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectFolder(void)
 {
     char *cp;
@@ -3223,6 +3415,9 @@ local void ScenSelectFolder(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void ScenSelectOk(void)
 {
     FileList *fl;
@@ -3291,6 +3486,9 @@ local void ScenSelectCancel(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameCancel(void)
 {
     VideoLockScreen();
@@ -3373,6 +3571,9 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     GetInfoFromSelectPath();
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     int nc;
@@ -3425,6 +3626,9 @@ local void GameRCSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameRESAction(Menuitem *mi, int i)
 {
     int v[] = { SettingsResourcesMapDefault, SettingsResourcesLow,
@@ -3439,6 +3643,9 @@ local void GameRESAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameUNSAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
@@ -3450,6 +3657,9 @@ local void GameUNSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void GameTSSAction(Menuitem *mi, int i)
 {
     // FIXME: TilesetSummer, ... shouldn't be used, they will be removed.
@@ -3481,6 +3691,9 @@ local void GameGATAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
@@ -3547,11 +3760,17 @@ local void MultiGamePTSAction(Menuitem *mi, int o)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameDrawFunc(Menuitem *mi)
 {
     GameDrawFunc(mi);
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameClientDrawFunc(Menuitem *mi)
 {
     // FIXME: do something better
@@ -3872,6 +4091,9 @@ local void MultiClientUpdate(int initial)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameSetupInit(Menuitem *mi)
 {
     int i;
@@ -3901,6 +4123,9 @@ local void MultiGameSetupInit(Menuitem *mi)
     DebugLevel3Fn("h = %d, NetPlayers = %d\n" _C_ h _C_ NetPlayers);
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameSetupExit(Menuitem *mi __attribute__((unused)))
 {
     NetworkExitServerConnect();
@@ -3987,6 +4212,9 @@ local void MultiClientCancel(void)
     // GameCancel();
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiGameClientInit(Menuitem *mi)
 {
     // GameSetupInit(mi);
@@ -4022,6 +4250,9 @@ local void MultiClientGemAction(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiClientRCSAction(Menuitem *mi, int i)
 {
     if (mi->d.pulldown.curopt == i) {
@@ -4030,6 +4261,9 @@ local void MultiClientRCSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiClientReady(void)
 {
     Menu *menu;
@@ -4041,6 +4275,9 @@ local void MultiClientReady(void)
     MultiClientUpdate(0);
 }
 
+/**
+**	FIXME: docu
+*/
 local void MultiClientNotReady(void)
 {
     Menu *menu;
@@ -4070,6 +4307,9 @@ global void NetClientCheckLocalState(void)
     /* ADD HERE */
 }
 
+/**
+**	FIXME: docu
+*/
 global int NetClientSelectScenario(void)
 {
     char *cp;
@@ -4096,6 +4336,9 @@ global int NetClientSelectScenario(void)
     return ScenSelectPudInfo == NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 global void NetConnectForceDisplayUpdate(void)
 {
     MultiGamePlayerSelectorsUpdate(2);
@@ -4238,11 +4481,17 @@ local void EditorNewMap(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     MenusSetBackground();
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorNewMapDescriptionEnterAction(
 	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
@@ -4260,6 +4509,9 @@ local void EditorNewMapSizeEnterAction(Menuitem * mi,
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorNewOk(void)
 {
     Menu *menu;
@@ -4312,12 +4564,18 @@ local void EditorNewOk(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorNewCancel(void)
 {
     EditorCancelled=1;
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadMap(void)
 {
     char *p;
@@ -4354,6 +4612,9 @@ local void EditorMainLoadMap(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadInit(Menuitem *mi)
 {
     DebugCheck(!*ScenSelectPath);
@@ -4363,6 +4624,9 @@ local void EditorMainLoadInit(Menuitem *mi)
     DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadLBInit(Menuitem *mi)
 {
     int i;
@@ -4383,6 +4647,9 @@ local void EditorMainLoadLBInit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadLBExit(Menuitem *mi)
 {
     FileList *fl;
@@ -4397,6 +4664,9 @@ local void EditorMainLoadLBExit(Menuitem *mi)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
@@ -4462,6 +4732,9 @@ usezzf:
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadFolder(void)
 {
     Menu *menu;
@@ -4494,6 +4767,9 @@ local void EditorMainLoadFolder(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadOk(void)
 {
     Menu *menu;
@@ -4530,6 +4806,9 @@ local void EditorMainLoadOk(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadCancel(void)
 {
     char* s;
@@ -4561,6 +4840,9 @@ local void EditorMainLoadCancel(void)
     EndMenu();
 }
 
+/**
+**	FIXME: docu
+*/
 local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -4602,6 +4884,9 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadLBAction(Menuitem *mi, int i)
 {
     FileList *fl;
@@ -4621,6 +4906,9 @@ local void EditorMainLoadLBAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMainLoadVSAction(Menuitem *mi, int i)
 {
     int op;
@@ -4708,6 +4996,9 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMapProperties(void)
 {
     Menu *menu;
@@ -4734,11 +5025,17 @@ local void EditorMapProperties(void)
     ProcessMenu("menu-editor-map-properties", 1);
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMapPropertiesEnterAction(
 	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorMapPropertiesOk(void)
 {
     Menu *menu;
@@ -4761,16 +5058,27 @@ local void EditorMapPropertiesOk(void)
     EditorEndMenu();
 }
 
+#if 0
+/**
+**	FIXME: docu
+*/
 local void EditorMapPropertiesCancel(void)
 {
     EditorEndMenu();
 }
+#endif
 
+/**
+**	FIXME: docu
+*/
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     MenusSetBackground();
 }
 
+/**
+**	FIXME: docu
+*/
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
 	int key __attribute__((unused)))
 {
@@ -4798,6 +5106,9 @@ local int player_types_menu_to_fc[] = {
     PlayerNobody,
 };
 
+/**
+**	FIXME: docu
+*/
 local int player_ai_fc_to_menu(int num)
 {
     if (num == PlayerAiLand) {
@@ -4812,6 +5123,9 @@ local int player_ai_fc_to_menu(int num)
     DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
     return -1;
 }
+/**
+**	FIXME: docu
+*/
 local int player_ai_menu_to_fc(int num)
 {
     if (num == 0) {
