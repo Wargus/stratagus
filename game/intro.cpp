@@ -725,10 +725,11 @@ global void ShowPicture(const char* act,const char* title,const char* picture)
 /**
 **	Draw a box with the text inside
 */
-local void DrawStatBox(int x,int y,char* text)
+local void DrawStatBox(int x,int y,char* text,unsigned color,float percent)
 {
     VideoFillRectangleClip(ColorBlack,x,y,80,24);
     VideoDrawRectangleClip(ColorYellow,x+1,y+1,78,22);
+    VideoFillRectangleClip(color,x+3,y+3,(int)(percent*74),18);
     VideoDrawTextCentered(x+40,y+5,LargeFont,text);
 }
 
@@ -751,7 +752,10 @@ local int GameStatsDrawFunc(int frame)
     int TopOffset;
     int BottomOffset;
     int DescriptionOffset;
+    float percent;
+    float max;
 
+    percent=1.0;
     done=0;
 
     if( (frame%StatsPause)!=0 )
@@ -778,6 +782,8 @@ local int GameStatsDrawFunc(int frame)
 	DescriptionOffset=20;
     }
     LineSpacing=(432-BottomOffset-DescriptionOffset)/c;
+
+    PlayGameSound(SoundIdForName("fist"),MaxSampleVolume);
 
 
     if( dodraw==1 ) {
@@ -806,11 +812,24 @@ local int GameStatsDrawFunc(int frame)
     }
 
     else if( dodraw==4 ) {
+	max=Players[0].TotalUnits;
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalUnits>max )
+		max=p->TotalUnits;
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26,
 	                      NamesFont,"You");
 	VideoDrawTextCentered(x+50,y+BottomOffset,LargeFont,"Units");
 	sprintf(buf,"%u",ThisPlayer->TotalUnits);
-	DrawStatBox(x+10,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalUnits/max;
+	DrawStatBox(x+10,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer || 
@@ -826,15 +845,30 @@ local int GameStatsDrawFunc(int frame)
 	    VideoDrawTextCentered(x+320,y+BottomOffset+DescriptionOffset+26+LineSpacing*c,
 	                          NamesFont,buf);
 	    sprintf(buf,"%u",p->TotalUnits);
-	    DrawStatBox(x+10,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalUnits/max;
+	    DrawStatBox(x+10,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==5 ) {
+	max=Players[0].TotalBuildings;
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalBuildings>max )
+		max=p->TotalBuildings;
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+140,y+BottomOffset,LargeFont,"Buildings");
 	sprintf(buf,"%u",ThisPlayer->TotalBuildings);
-	DrawStatBox(x+100,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalBuildings/max;
+	DrawStatBox(x+100,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -842,15 +876,30 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalBuildings);
-	    DrawStatBox(x+100,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalBuildings/max;
+	    DrawStatBox(x+100,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==6 ) {
+	max=Players[0].TotalResources[GoldCost];
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalResources[GoldCost]>max )
+		max=p->TotalResources[GoldCost];
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+230,y+BottomOffset,LargeFont,"Gold");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[GoldCost]);
-	DrawStatBox(x+190,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalResources[GoldCost]/max;
+	DrawStatBox(x+190,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -858,15 +907,30 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[GoldCost]);
-	    DrawStatBox(x+190,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalResources[GoldCost]/max;
+	    DrawStatBox(x+190,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==7 ) {
+	max=Players[0].TotalResources[WoodCost];
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalResources[WoodCost]>max )
+		max=p->TotalResources[WoodCost];
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+320,y+BottomOffset,LargeFont,"Lumber");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[WoodCost]);
-	DrawStatBox(x+280,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalResources[WoodCost]/max;
+	DrawStatBox(x+280,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -874,15 +938,30 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
             sprintf(buf,"%u",p->TotalResources[WoodCost]);
-	    DrawStatBox(x+280,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalResources[WoodCost]/max;
+	    DrawStatBox(x+280,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==8 ) {
+	max=Players[0].TotalResources[OilCost];
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalResources[OilCost]>max )
+		max=p->TotalResources[OilCost];
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+410,y+BottomOffset,LargeFont,"Oil");
 	sprintf(buf,"%u",ThisPlayer->TotalResources[OilCost]);
-	DrawStatBox(x+370,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalResources[OilCost]/max;
+	DrawStatBox(x+370,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -890,15 +969,30 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalResources[OilCost]);
-	    DrawStatBox(x+370,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalResources[OilCost]/max;
+	    DrawStatBox(x+370,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==9 ) {
+	max=Players[0].TotalKills;
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalKills>max )
+		max=p->TotalKills;
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+500,y+BottomOffset,LargeFont,"Kills");
+	percent=ThisPlayer->TotalKills/max;
 	sprintf(buf,"%u",ThisPlayer->TotalKills);
-	DrawStatBox(x+460,y+BottomOffset+DescriptionOffset,buf);
+	DrawStatBox(x+460,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -906,15 +1000,30 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalKills);
-	    DrawStatBox(x+460,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalKills/max;
+	    DrawStatBox(x+460,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
     }
 
     else if( dodraw==10 ) {
+	max=Players[0].TotalRazings;
+	for( i=1; i<PlayerMax; i++ ) {
+	    p=&Players[i];
+	    if( p->Type!=PlayerPerson && p->Type!=PlayerComputer )
+		continue;
+	    if( p->TotalRazings>max )
+		max=p->TotalRazings;
+	}
+	if( (int)max==0 )
+	    max=1.0;
+
 	VideoDrawTextCentered(x+590,y+BottomOffset,LargeFont,"Razings");
 	sprintf(buf,"%u",ThisPlayer->TotalRazings);
-	DrawStatBox(x+550,y+BottomOffset+DescriptionOffset,buf);
+	percent=ThisPlayer->TotalRazings/max;
+	DrawStatBox(x+550,y+BottomOffset+DescriptionOffset,buf,
+	            ThisPlayer->Color,percent);
 	for( i=0,c=1; i<PlayerMax; i++ ) {
 	    p=&Players[i];
 	    if( p==ThisPlayer ||
@@ -922,7 +1031,9 @@ local int GameStatsDrawFunc(int frame)
 		continue;
 	    }
 	    sprintf(buf,"%u",p->TotalRazings);
-	    DrawStatBox(x+550,y+BottomOffset+DescriptionOffset+LineSpacing*c,buf);
+	    percent=p->TotalRazings/max;
+	    DrawStatBox(x+550,y+BottomOffset+DescriptionOffset+LineSpacing*c,
+	                buf,p->Color,percent);
 	    c++;
 	}
 	done=1;
