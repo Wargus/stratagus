@@ -177,7 +177,7 @@
 #endif
 
 #ifndef FreeCraftMajorVerion
-    /// FreeCraft protocol major version
+    /// FreeCraft major version
 #define FreeCraftMajorVersion	1
     /// FreeCraft minor version (maximal 99)
 #define FreeCraftMinorVersion	17
