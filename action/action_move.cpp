@@ -63,12 +63,28 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	//	Target killed?
 	//
 	goal=unit->Command.Data.Move.Goal;
+#ifdef NEW_UNIT
+	if( goal ) {
+	    if( goal->Destroyed ) {
+		DebugLevel0(__FUNCTION__": destroyed unit\n");
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    } else if( goal->Removed ||
+		    !goal->HP || goal->Command.Action==UnitActionDie ) {
+		--goal->Refs;
+		unit->Command.Data.Move.Goal=goal=NoUnitP;
+	    }
+	}
+#else
 	DebugLevel3("UNIT %p GOAL %p\n",unit,goal);
 	if( goal && (!goal->Type || goal->Removed
 		|| goal->Command.Action==UnitActionDie) ) {
 	    unit->Command.Data.Move.Goal=NoUnitP;
 	    DebugLevel3("goal killed\n");
 	}
+#endif
 
 	// FIXME: should I give same error codes to caller
 	switch( NextPathElement(unit,&xd,&yd) ) {
@@ -126,6 +142,7 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 
 	unit->IX=-xd*TileSizeX;
 	unit->IY=-yd*TileSizeY;
+	unit->Frame=0;
 	UnitHeadingFromDeltaXY(unit,xd,yd);
     } else {
 #ifdef NEW_HEADING
