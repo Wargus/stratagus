@@ -219,6 +219,9 @@
 **
 **	Unit::Revealer
 **
+**		`revealer' is unit that has to keep the fog of war  revealed
+**		for some time, this unit cannot be used in usual manner.
+**		JOHNS: Should be moved into unit-type!
 **
 **	Unit::OnBoard
 **
@@ -457,10 +460,7 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
-    unsigned	Revealer;               // hack -- `revealer' is unit that
-                                        // has to keep FOW revealed for some
-					// time, this unit cannot be used in
-					// usual manner
+    unsigned	Revealer : 1;		/// reveal the fog of war
 
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
     // FIXME: use the new next pointer
@@ -736,7 +736,7 @@ extern void UpgradeButtons(int upgrade);
 //	in unit_draw.c
     /// FIXME: more docu
 extern void LoadDecorations(void);
-    /// FIXME: more docu
+    /// Draw all units visible on map
 extern void DrawUnits(void);
 
 //	in unit_find.c

@@ -345,6 +345,8 @@ global void MapUpdateFogOfWar(int x,int y)
 
 /**
 **	Update visible of the map.
+**
+**	@todo	This function could be improved in speed and functionality.
 */
 global void MapUpdateVisible(void)
 {
@@ -399,6 +401,11 @@ global void MapUpdateVisible(void)
     for( i=0; i<nunits; i++ ) {
 	unit=units[i];
 	if( unit->Removed ) {
+	    if( unit->Revealer ) {
+		MapMarkSight(unit->X+unit->Type->TileWidth/2
+		    ,unit->Y+unit->Type->TileHeight/2,10);
+		continue;
+	    }
 	    //
 	    //	If peon is in the mine, the mine has a sight range too.
 	    //  This is quite dirty code...
@@ -430,8 +437,7 @@ global void MapUpdateVisible(void)
 #else
 	MapMarkSight(unit->X+unit->Type->TileWidth/2
 		,unit->Y+unit->Type->TileHeight/2
-		,unit->Stats->SightRange*(unit->Revealer == 0)
-		                    + 12*(unit->Revealer != 0));
+		,unit->Stats->SightRange);
 #endif
     }
 }
