@@ -83,7 +83,7 @@ global void ChooseTargetBegin(int action)
     if( ChooseTargetBeginHook == NIL ) {
 	DebugLevel0Fn("Hook is NIL!\n");
     } else {
-	gh_apply(ChooseTargetBeginHook,NIL);
+        gh_eval(ChooseTargetBeginHook,NIL);
     }
     // FIXME: maybe write this from ccl?
     SetStatusLine("Select Target");
@@ -103,7 +103,7 @@ global void ChooseTargetFinish(void)
     if( ChooseTargetFinishHook == NIL ) {
 	DebugLevel0Fn("Hook is NIL!\n");
     } else {
-	gh_apply(ChooseTargetFinishHook,NIL);
+	gh_eval(ChooseTargetFinishHook,NIL);
     }
 }
 
@@ -600,7 +600,7 @@ local SCM CclSelectedDrawButtons(void)
 	    gh_display(Selected[0]->Type->AddButtonsHook);
 	    gh_newline();
 	    */
-	    gh_apply(Selected[0]->Type->AddButtonsHook,NIL);
+	    gh_eval(Selected[0]->Type->AddButtonsHook,NIL);
 	}
     }
     return SCM_UNSPECIFIED;
@@ -3270,7 +3270,7 @@ global void SelectionChanged(void)
 	gh_display(SelectionChangedHook);
 	gh_newline();
 	//}
-	gh_apply(SelectionChangedHook, NIL);
+        gh_eval(SelectionChangedHook,NIL);
     } else {
 	DebugLevel0Fn("Hook empty!\n");
     }
@@ -3296,7 +3296,7 @@ global void SelectedUnitChanged(void)
 	//gh_display(SelectedUnitChangedHook);
 	//gh_newline();
 	//}
-	gh_apply(SelectedUnitChangedHook, NIL);
+        gh_eval(SelectedUnitChangedHook,NIL);
     } else {
 	DebugLevel0Fn("Hook empty!\n");
     }
