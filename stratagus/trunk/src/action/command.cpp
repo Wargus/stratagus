@@ -246,6 +246,9 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     // choose goal and good attack range
     if( attack ) {
 	command->Data.Move.Goal=attack;
+#ifdef NEW_UNIT
+	attack->Refs++;
+#endif
 	command->Data.Move.Range=unit->Stats->AttackRange;
     } else {
 	command->Data.Move.Goal=NoUnitP;
@@ -346,6 +349,9 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionBoard;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=dest;
+#ifdef NEW_UNIT
+    dest->Refs++;
+#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -380,6 +386,9 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     command->Action=UnitActionUnload;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=what;
+#ifdef NEW_UNIT
+    what->Refs++;
+#endif
     command->Data.Move.Range=0;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -507,6 +516,9 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionMineGold;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=dest;
+#ifdef NEW_UNIT
+    dest->Refs++;
+#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -542,6 +554,9 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionHaulOil;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=dest;
+#ifdef NEW_UNIT
+    dest->Refs++;
+#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -755,6 +770,9 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     // choose goal and good attack range
     if( dest ) {
 	command->Data.Move.Goal=dest;
+#ifdef NEW_UNIT
+	dest->Refs++;
+#endif
 	command->Data.Move.Range=1;
     } else {
 	command->Data.Move.Goal=NoUnitP;
