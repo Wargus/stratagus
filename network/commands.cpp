@@ -292,6 +292,33 @@ local void DeleteReplay(FullReplay* replay)
 	free(replay);
 }
 
+local void PrintLogCommand(LogEntry* log, CLFile* dest)
+{
+	CLprintf(dest, "Log( { ");
+	CLprintf(dest, "GameCycle = %lu, ", log->GameCycle);
+	if (log->UnitNumber != -1) {
+		CLprintf(dest, "UnitNumber = %d, ", log->UnitNumber);
+	}
+	if (log->UnitIdent) {
+		CLprintf(dest, "UnitIdent = \"%s\", ", log->UnitIdent);
+	}
+	CLprintf(dest, "Action = \"%s\", ", log->Action);
+	CLprintf(dest, "Flush = %d, ", log->Flush);
+	if (log->PosX != -1 || log->PosY != -1) {
+		CLprintf(dest, "PosX = %d, PosY = %d, ", log->PosX, log->PosY);
+	}
+	if (log->DestUnitNumber != -1) {
+		CLprintf(dest, "DestUnitNumber = %d, ", log->DestUnitNumber);
+	}
+	if (log->Value) {
+		CLprintf(dest, "Value = [[%s]], ", log->Value);
+	}
+	if (log->Num != -1) {
+		CLprintf(dest, "Num = %d, ", log->Num);
+	}
+	CLprintf(dest, "SyncRandSeed = %u } )\n", log->SyncRandSeed);
+}
+
 /**
 **  Output the FullReplay list to dest file
 **
@@ -340,7 +367,7 @@ local void SaveFullLog(CLFile* dest)
 	CLprintf(dest, "} )\n");
 	log = CurrentReplay->Commands;
 	while (log) {
-		AppendLog(log, dest);
+		PrintLogCommand(log, dest);
 		log = log->Next;
 	}
 }
@@ -368,29 +395,7 @@ local void AppendLog(LogEntry* log, CLFile* dest)
 		return;
 	}
 
-	CLprintf(dest, "Log( { ");
-	CLprintf(dest, "GameCycle = %lu, ", log->GameCycle);
-	if (log->UnitNumber != -1) {
-		CLprintf(dest, "UnitNumber = %d, ", log->UnitNumber);
-	}
-	if (log->UnitIdent) {
-		CLprintf(dest, "UnitIdent = \"%s\", ", log->UnitIdent);
-	}
-	CLprintf(dest, "Action = \"%s\", ", log->Action);
-	CLprintf(dest, "Flush = %d, ", log->Flush);
-	if (log->PosX != -1 || log->PosY != -1) {
-		CLprintf(dest, "PosX = %d, PosY = %d, ", log->PosX, log->PosY);
-	}
-	if (log->DestUnitNumber != -1) {
-		CLprintf(dest, "DestUnitNumber = %d, ", log->DestUnitNumber);
-	}
-	if (log->Value) {
-		CLprintf(dest, "Value = [[%s]], ", log->Value);
-	}
-	if (log->Num != -1) {
-		CLprintf(dest, "Num = %d, ", log->Num);
-	}
-	CLprintf(dest, "SyncRandSeed = %u } )\n", log->SyncRandSeed);
+	PrintLogCommand(log, dest);
 	CLflush(dest);
 }
 
