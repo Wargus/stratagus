@@ -1191,6 +1191,43 @@ local void SaveUnitType(const UnitType* type,FILE* file)
 }
 
 /**
+**	Save state of an unit-stats to file.
+**
+**	@param stats	Unit-stats to save.
+**	@param ident	Unit-type ident.
+**	@param plynr	Player number.
+**	@param file	Output file.
+*/
+local void SaveUnitStats(const UnitStats* stats,const char* ident,int plynr,
+	FILE* file)
+{
+    int j;
+
+    fprintf(file,"(define-unit-stats '%s %d\n  ",ident,plynr);
+    fprintf(file,"'level %d ",stats->Level);
+    fprintf(file,"'speed %d ",stats->Speed);
+    fprintf(file,"'attack-range %d ",stats->AttackRange);
+    fprintf(file,"'sight-range %d\n  ",stats->SightRange);
+    fprintf(file,"'armor %d ",stats->Armor);
+    fprintf(file,"'basic-damage %d ",stats->BasicDamage);
+    fprintf(file,"'piercing-damage %d ",stats->PiercingDamage);
+    fprintf(file,"'hit-points %d\n  ",stats->HitPoints);
+    fprintf(file,"'costs '(");
+    for( j=0; j<MaxCosts; ++j ) {
+	if( j ) {
+//	    if( j==MaxCosts/2 ) {
+//		fputs("\n    ",file);
+//	    } else {
+		fputc(' ',file);
+//	    }
+	}
+	fprintf(file,"%s %d",DEFAULT_NAMES[j],stats->Costs[j]);
+    }
+
+    fprintf(file,") )\n");
+}
+
+/**
 **	Save state of the unit-type table to file.
 **
 **	@param file	Output file.
@@ -1204,7 +1241,7 @@ global void SaveUnitTypes(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: unittypes $Id$\n\n");
 
-    //	Original number to internal missile-type name.
+    //	Original number to internal unit-type name.
 
     i=fprintf(file,"(define-unittype-wc-names");
     for( sp=UnitTypeWcNames; *sp; ++sp ) {
@@ -1226,6 +1263,15 @@ global void SaveUnitTypes(FILE* file)
     for( type=UnitTypes; type->OType; ++type ) {
 	fputc('\n',file);
 	SaveUnitType(type,file);
+    }
+    
+    //	Save all stats
+
+    for( type=UnitTypes; type->OType; ++type ) {
+	fputc('\n',file);
+	for( i=0; i<PlayerMax; ++i ) {
+	    SaveUnitStats(&type->Stats[i],type->Ident,i,file);
+	}
     }
 }
 
@@ -1331,6 +1377,7 @@ global void InitUnitTypes(void)
     unsigned type;
 
     if( !UnitTypes ) {
+	// Johns: I think this is needed for the none CCL version
 	DebugLevel0Fn("Called too early\n");
 	return;
     }
