@@ -4984,7 +4984,7 @@ local void EditorPlayerProperties(void)
 	TheMap.Info->PlayerOil[i] = atoi(oil[i]);
     }
 
-    VideoCreatePalette(GlobalPalette);
+    // JOHNS: NO VideoCreatePalette(GlobalPalette);
 }
 
 /**

@@ -492,7 +492,7 @@ global void DisplayPicture(const char *name)
     Graphic* picture;
 
     picture=LoadGraphic(name);
-    VideoSetPalette(picture->Pixels);
+    // JOHNS: NO VideoSetPalette(picture->Pixels);
 
     VideoLockScreen();
 
@@ -503,7 +503,7 @@ global void DisplayPicture(const char *name)
 
     VideoUnlockScreen();
 
-    VideoSetPalette(NULL);
+    // JOHNS: NO VideoSetPalette(NULL);
     VideoFree(picture);
 }
 
