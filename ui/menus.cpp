@@ -1760,14 +1760,15 @@ global void SoundOptions(void)
     SoundOptionsMenuItems[8].d.hslider.percent = (MusicVolume * 100) / 255;
     
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
-    cd_get_volume(&i, &i);
-    SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
+#ifdef USE_LIBCDA
+    cd_get_volume(&i, &i);
+    SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
+#endif
 #else
     SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
-
     ProcessMenu(MENU_SOUND_OPTIONS, 1);    
 }
 
@@ -2855,7 +2856,7 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 
 local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 {
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#ifdef USE_LIBCDA
     mi--;
     
     switch (i) {
