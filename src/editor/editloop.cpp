@@ -806,6 +806,31 @@ local void DrawEditorInfo(void)
     int y;
     unsigned flags;
     char buf[256];
+    int resx;
+    int resy;
+
+    resx = resy = 9999;
+    for (i = 1; i < MaxCosts; ++i) {
+	x = TheUI.Resources[i].IconX;
+	if (TheUI.Resources[i].Icon.Graphic && x < resx) {
+	    resx = x;
+	}
+	x = TheUI.Resources[i].TextX;
+	if (x != -1 && x < resx) {
+	    resx = TheUI.Resources[i].IconX;
+	}
+	y = TheUI.Resources[i].IconY;
+	if (TheUI.Resources[i].Icon.Graphic && y < resy) {
+	    resy = y;
+	}
+	y = TheUI.Resources[i].TextY;
+	if (y != -1 && y < resx) {
+	    resy = TheUI.Resources[i].IconY;
+	}
+    }
+    if (resx == 9999 || resy == 9999) {
+	return;
+    }
 
     x = y = 0;
     if (TheUI.MouseViewport) {
@@ -814,7 +839,7 @@ local void DrawEditorInfo(void)
     }
 
     sprintf(buf, "Editor (%d %d)", x, y);
-    VideoDrawText(TheUI.ResourceX + 2, TheUI.ResourceY + 2, GameFont, buf);
+    VideoDrawText(resx + 2, resy + 2, GameFont, buf);
 
     //
     //	Flags info
@@ -835,7 +860,7 @@ local void DrawEditorInfo(void)
 	flags & MapFieldAirUnit		? 'a' : '-',
 	flags & MapFieldSeaUnit		? 's' : '-',
 	flags & MapFieldBuilding	? 'b' : '-');
-    VideoDrawText(TheUI.ResourceX + 118, TheUI.ResourceY + 2, GameFont, buf);
+    VideoDrawText(resx + 118, resy + 2, GameFont, buf);
 
     //
     //	Tile info
@@ -856,7 +881,7 @@ local void DrawEditorInfo(void)
 	    ? TheMap.Tileset->TileNames[TheMap.Tileset->MixedNameTable[i]]
 	    : "");
 
-    VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
+    VideoDrawText(resx + 252, resy + 2, GameFont, buf);
 }
 
 /**
@@ -891,6 +916,16 @@ global void EditorUpdateDisplay(void)
     HideAnyCursor();			// remove cursor (when available)
 
     DrawMapArea();			// draw the map area
+
+    //
+    //  Panels
+    //
+    for (i = 0; i < TheUI.NumPanels; ++i) {
+	if (TheUI.Panel[i].Graphic) {
+	    VideoDraw(TheUI.Panel[i].Graphic, 0,
+		    TheUI.PanelX[i], TheUI.PanelY[i]);
+	}
+    }
 
     if (CursorOn == CursorOnMap) {
 	DrawMapCursor();			// cursor on map
@@ -936,17 +971,6 @@ global void EditorUpdateDisplay(void)
 	DrawEditorInfo();
     }
 
-    //
-    //  Fillers
-    //
-    for (i = 0; i < TheUI.NumPanels; ++i) {
-	if (TheUI.Panel[i].Graphic) {
-	    VideoDrawSub(TheUI.Panel[i].Graphic, 0, 0,
-		    TheUI.Panel[i].Graphic->Width,
-		    TheUI.Panel[i].Graphic->Height,
-		    TheUI.PanelX[i], TheUI.PanelY[i]);
-	}
-    }
     //
     //  Status line
     //
