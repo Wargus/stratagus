@@ -283,7 +283,7 @@
     /// FreeCraft minor version (maximal 99)
 #define FreeCraftMinorVersion	17
     /// FreeCraft patch level (maximal 99)
-#define FreeCraftPatchLevel	1
+#define FreeCraftPatchLevel	2
     /// FreeCraft version (1,2,3) -> 10203
 #define FreeCraftVersion \
 	(FreeCraftMajorVersion*10000+FreeCraftMinorVersion*100 \
