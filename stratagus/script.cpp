@@ -608,7 +608,7 @@ global void CclCommand(char* command)
 ............................................................................*/
 
 /**
-**	Initialize ccl.
+**	Initialize ccl and load the config file(s).
 */
 global void CclInit(void)
 {
@@ -770,6 +770,6 @@ global void CclInit(void)
     CclInConfigFile=0;
 }
 
-#endif	// } defined(USE_CCL)
+#endif	// } USE_CCL
 
 //@}
