@@ -95,6 +95,9 @@
 
 #define inline __inline			// fix m$ brain damage
 #define __attribute__()			// does nothing
+#ifndef __FUNCTION__
+#define __FUNCTION__			// I don't know, but eVC didn't has it
+#endif
 
 /**
 **	Print debug information of level 0.
