@@ -1735,7 +1735,7 @@ local void GameMenuLoad(void)
 global void SoundOptions(void)
 {
 #ifdef WITH_SOUND
-#ifdef USE_LIBCDA
+#if defined(USE_LIBCDA) || defined(USE_SDLCD)
     int i = 17;
 #endif
     
