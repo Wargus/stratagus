@@ -246,6 +246,7 @@ local void MoveToTarget(Unit* unit)
 	    if( goal ) {
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current command to come back.
+		    DebugCheck( unit->Orders[0].Goal );
 		    unit->SavedOrder=unit->Orders[0];
 		}
 		RefsDebugCheck( goal->Destroyed || !goal->Refs );
@@ -295,6 +296,11 @@ local void MoveToTarget(Unit* unit)
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current command to come back.
 		    unit->SavedOrder=unit->Orders[0];
+		    if( goal ) {
+			DebugLevel0Fn("Have goal to come back %Zd\n",
+				UnitNumber(goal));
+		    }
+		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
 		unit->Orders[0].X=-1;
@@ -498,6 +504,11 @@ local void AttackTarget(Unit* unit)
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		// Save current command to come back.
 		unit->SavedOrder=unit->Orders[0];
+		if( goal ) {
+		    DebugLevel0Fn("Have unit to come back %Zd?\n",
+			    UnitNumber(goal));
+		}
+		unit->SavedOrder.Goal=NoUnitP;
 	    }
 #else
 	    if( !goal ) {
@@ -547,6 +558,11 @@ local void AttackTarget(Unit* unit)
 		if( unit->SavedOrder.Action==UnitActionStill ) {
 		    // Save current order to come back or to continue it.
 		    unit->SavedOrder=unit->Orders[0];
+		    if( goal ) {
+			DebugLevel0Fn("Have unit to come back %Zd?\n",
+				UnitNumber(goal));
+		    }
+		    unit->SavedOrder.Goal=NoUnitP;
 		}
 		unit->Orders[0].Goal=goal=temp;
 		unit->Orders[0].X=-1;
@@ -572,6 +588,7 @@ local void AttackTarget(Unit* unit)
 	    if( unit->SavedOrder.Action==UnitActionStill ) {
 		// Save current order to come back or to continue it.
 		unit->SavedOrder=unit->Orders[0];
+		DebugCheck( unit->SavedOrder.Goal!=NoUnitP );
 	    }
 	    NewResetPath(unit);
 #else
