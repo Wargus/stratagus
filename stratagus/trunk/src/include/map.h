@@ -405,6 +405,8 @@ extern void MapCclRegister(void);
 //
 // mixed sources
 //
+	/// Alocate and initialise map table
+extern void CreateMap(int width, int height);
 	/// Save the map
 extern void SaveMap(struct _CL_File_* file);
 	/// Clean the map
