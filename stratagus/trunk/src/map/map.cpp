@@ -91,15 +91,26 @@ global void LoadMap(const char* filename,WorldMap* map)
 
     tmp=strrchr(filename,'.');
     if( tmp ) {
+#ifdef USE_ZLIB
 	if( !strcmp(tmp,".gz") ) {
 	    while( tmp-1>filename && *--tmp!='.' ) {
 	    }
-	} else if( !strcmp(tmp,".bz2") ) {
+	} else
+#endif
+#ifdef USE_BZ2LIB
+	if( !strcmp(tmp,".bz2") ) {
 	    while( tmp-1>filename && *--tmp!='.' ) {
 	    }
 	}
-	if( !strcmp(tmp,".cm") || !strcmp(tmp,".cm.gz")
-		|| !strcmp(tmp,".cm.bz2") ) {
+#endif
+	if( !strcmp(tmp,".cm")
+#ifdef USE_ZLIB
+		|| !strcmp(tmp,".cm.gz")
+#endif
+#ifdef USE_BZ2LIB
+		|| !strcmp(tmp,".cm.bz2")
+#endif
+	) {
 	    LoadGameMap(filename,map);
 	    return;
 	}

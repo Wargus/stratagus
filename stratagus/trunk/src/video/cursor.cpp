@@ -448,6 +448,18 @@ local void SaveCursor(void)
 }
 
 /**
+**	Destroy image behind cursor.
+*/
+global void DestroyCursorBackground(void)
+{
+    if (OldCursorImage) {
+	free(OldCursorImage);
+	OldCursorImage = NULL;
+    }
+    OldCursorSize = 0;
+}
+
+/**
 **	Restore image behind cursor.
 */
 local void RestoreCursor(void)

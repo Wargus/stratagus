@@ -40,12 +40,24 @@
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
---	Prototypes for action handlers
+--	Prototypes for local functions
+----------------------------------------------------------------------------*/
+
+local void EndMenu(void);
+
+/*----------------------------------------------------------------------------
+--	Prototypes for action handlers and helper functions
 ----------------------------------------------------------------------------*/
 
 local void GameMenuSave(void);
 local void GameMenuEnd(void);
 local void GameMenuReturn(void);
+
+local void StartMenusSetBackground(Menuitem *mi);	
+
+local void SinglePlayerGameMenu(void);
+local void MultiPlayerGameMenu(void);
+local void ScenSelectMenu(void);
 
 local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
@@ -57,6 +69,11 @@ local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
 local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
+
+local void CustomGameSetupInit(Menuitem *mi);	// master init
+local void CustomGameCancel(void);
+local void CustomGameStart(void);
+local void CustomGameDrawFunc(Menuitem *mi);
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -151,6 +168,9 @@ local unsigned char *ssmsoptions[] = {
 
 local char ScenSelectPath[1024];
 local char ScenSelectDisplayPath[1024];
+local char ScenSelectFileName[128];
+local int CustomGameStarted = 0;
+local PudInfo *ScenSelectPudInfo = NULL;
 
 local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
@@ -177,6 +197,34 @@ local Menuitem ScenSelectMenuItems[] = {
 	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
 	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
+};
+
+/**
+**	Items for the Prg Start Menu
+*/
+local Menuitem PrgStartMenuItems[] = {
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
+	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuEnd, 'x'} } },
+};
+
+/**
+**	Items for the Custom Game Setup Menu
+*/
+local Menuitem CustomGameMenuItems[] = {
+    { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, CustomGameSetupInit, NULL,
+	{ drawfunc:{ CustomGameDrawFunc } } },
+    { MI_TYPE_TEXT, 640/2, 216, 0, LargeFont, NULL, NULL,
+	{ text:{ "~<Single Player Game Setup~>", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
+	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, ScenSelectMenu, 'e'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
 };
 
 /**
@@ -218,6 +266,24 @@ global Menu Menus[] = {
 	ImagePanel5,
 	4, 10,
 	ScenSelectMenuItems
+    },
+    {
+	/// PrgStart Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	0, 3,
+	PrgStartMenuItems
+    },
+    {
+	/// CustomGame Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	3, 5,
+	CustomGameMenuItems
     },
 };
 
@@ -281,9 +347,9 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     }
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x,y,w,h);
+	    VideoDrawRectangleClip(ColorGray,x,y,w-1,h);
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x,y,w,h);
+	    VideoDrawRectangleClip(ColorYellow,x,y,w-1,h);
 	}
     }
     SetDefaultTextColors(nc,rc);
@@ -519,6 +585,11 @@ global void DrawMenu(int MenuId)
 	    case MI_TYPE_VSLIDER:
 		DrawVSlider(mi,menu->x,menu->y);
 		break;
+	    case MI_TYPE_DRAWFUNC:
+		if (mi->d.drawfunc.draw) {
+		    (*mi->d.drawfunc.draw)(mi);
+		}
+		break;
 	    default:
 		break;
 	}
@@ -531,16 +602,21 @@ global void DrawMenu(int MenuId)
 --	Button action handler and Init/Exit functions
 ----------------------------------------------------------------------------*/
 
+local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
+{
+    HideCursor();
+    DestroyCursorBackground();
+    DisplayPicture("graphic/interface/Menu background without title.png");
+}
+
 local void GameMenuReturn(void)
 {
+    EndMenu();
+    MustRedraw &= ~RedrawMenu;
+    InterfaceState = IfaceStateNormal;
     ClearStatusLine();
-    InterfaceState=IfaceStateNormal;
-    MustRedraw&=~RedrawMenu;
-    MustRedraw|=RedrawMap;
-    GamePaused=0;
-    CursorOn=CursorOnUnknown;
-    CurrentMenu=-1;
-    /// FIXME: restore mouse pointer to sane state (call fake mouse move?)
+    MustRedraw |= RedrawMap;
+    GamePaused = 0;
 }
 
 local void GameMenuSave(void)
@@ -552,6 +628,42 @@ local void GameMenuEnd(void)
 {
     Exit(0);
 }
+
+local void ScenSelectMenu(void)
+{
+    int i;
+
+    ProcessMenu(MENU_SCEN_SELECT, 1);
+    // StartMenusSetBackground(NULL);
+    FreePudInfo(ScenSelectPudInfo);
+    ScenSelectPudInfo = NULL;
+    if (ScenSelectPath[0]) {
+	i = strlen(ScenSelectPath);
+	strcat(ScenSelectPath, "/");
+    } else {
+	i = 0;
+    }
+    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    ScenSelectPath[i] = 0;
+}
+
+local void SinglePlayerGameMenu(void)
+{
+    DestroyCursorBackground();
+    CustomGameStarted = 0;
+    ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    if (CustomGameStarted) {
+	GameMenuReturn();
+    }
+}
+
+local void MultiPlayerGameMenu(void)
+{
+    // ProcessMenu( ??? , 1);
+    Exit(0);
+}
+
 
 local void FreePudInfos(FileList *fl, int n)
 {
@@ -565,7 +677,7 @@ local void FreePudInfos(FileList *fl, int n)
     }
 }
 
-local void ScenSelectInit(Menuitem *mi __attribute__((unused)) )
+local void ScenSelectInit(Menuitem *mi __attribute__((unused)))
 {
     strcpy(ScenSelectPath, FreeCraftLibPath);
     ScenSelectDisplayPath[0] = 0;
@@ -733,7 +845,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
-local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)) )
+local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)))
 {
     mi = ScenSelectMenuItems + 1;
     ScenSelectLBInit(mi);
@@ -873,23 +985,83 @@ local void ScenSelectOk(void)
 	    mi[1].d.vslider.percent = 0;
 	    MustRedraw |= RedrawMenu;
 	} else {
-	    if (ScenSelectPath[0]) {
-		strcat(ScenSelectPath, "/");
-	    }
-	    strcat(ScenSelectPath, fl[i].name);		// Final map name with path
-	    LoadMap(ScenSelectPath, &TheMap);
-	    ScenSelectCancel();				// Not really, just end menu
+	    strcpy(ScenSelectFileName, fl[i].name);	// Final map name
+	    EndMenu();
 	}
     }
 }
 
 local void ScenSelectCancel(void)
 {
-    InterfaceState=IfaceStateNormal;
-    MustRedraw&=~RedrawMenu;
-    CursorOn=CursorOnUnknown;
-    CurrentMenu=-1;
-    /// FIXME: restore mouse pointer to sane state (call fake mouse move?)
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectFileName, "default.pud");
+    EndMenu();
+}
+
+local void CustomGameCancel(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    FreePudInfo(ScenSelectPudInfo);
+    ScenSelectPudInfo = NULL;
+    EndMenu();
+    
+}
+
+local void CustomGameStart(void)
+{
+    FreePudInfo(ScenSelectPudInfo);
+    ScenSelectPudInfo = NULL;
+    if (ScenSelectPath[0]) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    LoadMap(ScenSelectPath, &TheMap);
+    CustomGameStarted = 1;
+    EndMenu();
+}
+
+local void CustomGameSetupInit(Menuitem *mi __attribute__((unused)))
+{
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+    strcpy(ScenSelectFileName, "default.pud");
+    if (ScenSelectPath[0]) {
+	strcat(ScenSelectPath, "/");
+    }
+    strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
+    ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+    strcpy(ScenSelectPath, FreeCraftLibPath);
+}
+
+local void CustomGameDrawFunc(Menuitem *mi)
+{
+    int nc, rc;
+    char buffer[32];
+
+    GetDefaultTextColors(&nc, &rc);
+    StartMenusSetBackground(mi);
+    SetDefaultTextColors(rc, rc);
+    DrawText(16, 360, GameFont, "Scenario:");
+    DrawText(16, 360+24 , GameFont, ScenSelectFileName);
+    if (ScenSelectPudInfo->Description) {
+	DrawText(16, 360+24+24, GameFont, ScenSelectPudInfo->Description);
+    }
+    sprintf(buffer, "%d x %d", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
+    DrawText(16, 360+24+24+24, GameFont, buffer);
+#if 0
+    for (n = j = 0; j < 16; j++) {
+	if (info->PlayerType[j] == PlayerHuman) {
+	    n++;
+	}
+    }
+    if (n == 1) {
+	DrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+    } else {
+	sprintf(buffer, "%d players", n);
+	DrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+    }
+#endif
+    SetDefaultTextColors(nc, rc);
 }
 
 /*----------------------------------------------------------------------------
@@ -1022,8 +1194,6 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 		for (i = 0; i < n; ++i) {
 		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
 		    switch (mi->mitype) {
-			case MI_TYPE_TEXT:
-			    break;
 			case MI_TYPE_BUTTON:
 			case MI_TYPE_PULLDOWN:
 			case MI_TYPE_LISTBOX:
@@ -1313,6 +1483,18 @@ global void MenuHandleButtonUp(int b)
     }
 }
 
+/**
+**	End process menu
+**
+*/
+local void EndMenu(void)
+{
+    CursorOn = CursorOnUnknown;
+    CurrentMenu = -1;
+    MustRedraw |= RedrawMenu;
+    /// FIXME: restore mouse pointer to sane state (call fake mouse move?)
+}
+
 
 /**
 **	Process menu  'menu'
@@ -1325,10 +1507,19 @@ global void ProcessMenu(int MenuId, int Loop)
     int i;
     Menu *menu;
     Menuitem *mi;
-    // FIXME: Recursion: Save: CurrentMenu, MenuButtonCurSel, MenuButtonUnderCursor
+    int CurrentMenuSave = -1, MenuButtonUnderCursorSave = -1, MenuButtonCurSelSave = -1;
+    
+    // Recursion protection:
+    if (Loop) {
+	CurrentMenuSave = CurrentMenu;
+	MenuButtonUnderCursorSave = MenuButtonUnderCursor;
+	MenuButtonCurSelSave = MenuButtonCurSel;
+    }
 
     InterfaceState = IfaceStateMenu;
     HideCursor();
+    DestroyCursorBackground();
+    MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
     GameCursor = &Cursors[CursorTypePoint];
     CurrentMenu = MenuId;
@@ -1397,6 +1588,11 @@ global void ProcessMenu(int MenuId, int Loop)
 	}
     }
 
+    if (Loop) {
+	CurrentMenu = CurrentMenuSave;
+	MenuButtonUnderCursor = MenuButtonUnderCursorSave;
+	MenuButtonCurSel = MenuButtonCurSelSave;
+    }
 }
 
 
