@@ -497,6 +497,21 @@ local SCM CclSelectedIsBuilding(void)
 }
 
 /**
+**	Whether the selected unit is repairing.
+*/
+local SCM CclSelectedIsRepairing(void)
+{
+    if( NumSelected == 0) {
+	return SCM_UNSPECIFIED;
+    }
+    if( Selected[0]->Orders[0].Action==UnitActionTrain ) {
+	return SCM_BOOL_T;
+    } else {
+	return SCM_BOOL_F;
+    }
+}
+
+/**
 **	FIXME: docu
 */
 local SCM CclSelectedIsTraining(void)
@@ -567,6 +582,33 @@ local SCM CclSelectedOwnedByPlayer(void)
 }
 
 /**
+**	Return the name of the resource type that is loaded.
+*/
+local SCM CclSelectedResourceLoaded(void)
+{
+    int i;
+    int type;
+    Unit * unit;
+    type = -1;
+    for ( i=0; i<NumSelected; i++ ) {
+	unit = Selected[i];
+	if( unit->CurrentResource && unit->Value && 
+	    (!unit->Type->ResInfo[unit->CurrentResource]->LoseResources || 
+	     unit->Value >= unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) ) {
+	    if( type == -1 ) {
+		type = unit->CurrentResource;
+	    } else if( type != unit->CurrentResource ) {
+		return gh_str02scm("mixed");
+	    }
+	}
+    }
+    if( type == -1 ) {
+	return SCM_UNSPECIFIED;
+    }
+    return gh_str02scm(DefaultResourceNames[type]);
+}
+
+/**
 **	FIXME: docu
 */
 local SCM CclSelectedMixedUnits(void)
@@ -584,6 +626,52 @@ local SCM CclSelectedMixedUnits(void)
 	}
     }
     return SCM_BOOL_F;
+}
+
+/**
+**	FIXME: docu
+*/
+local SCM CclSelectedGetAction(void)
+{
+    int j;
+    UnitAction action;
+
+    if( NumSelected == 0 ) {
+	return gh_str02scm("Invalid");
+    }
+    action = Selected[0]->Orders[0].Action;
+    for( j=1; j<NumSelected; ++j ) {
+	if( Selected[j]->Orders[0].Action!=action ) {
+	    return gh_str02scm("Mixed");
+	}
+    }
+
+    switch (action) {
+    case UnitActionNone: return gh_str02scm("None");
+    case UnitActionStill: return gh_str02scm("Still"); break;
+    case UnitActionStandGround: return gh_str02scm("StandGround"); break;
+    case UnitActionFollow: return gh_str02scm("Follow"); break;
+    case UnitActionMove: return gh_str02scm("Move"); break;
+    case UnitActionAttack: return gh_str02scm("Attack"); break;
+    case UnitActionAttackGround: return gh_str02scm("AttackGround"); break;
+    case UnitActionDie: return gh_str02scm("Die"); break;
+    case UnitActionSpellCast: return gh_str02scm("SpellCast"); break;
+    case UnitActionTrain: return gh_str02scm("Train"); break;
+    case UnitActionUpgradeTo: return gh_str02scm("UpgradeTo"); break;
+    case UnitActionResearch: return gh_str02scm("Research"); break;
+    case UnitActionBuilded: return gh_str02scm("Builded"); break;
+    case UnitActionBoard: return gh_str02scm("Board"); break;
+    case UnitActionUnload: return gh_str02scm("Unload"); break;
+    case UnitActionPatrol: return gh_str02scm("Patrol"); break;
+    case UnitActionBuild: return gh_str02scm("Build"); break;
+    case UnitActionRepair: return gh_str02scm("Repair"); break;
+    case UnitActionResource: return gh_str02scm("Resource"); break;
+    case UnitActionReturnGoods: return gh_str02scm("ReturnGoods"); break;
+    case UnitActionDemolish: return gh_str02scm("Demolish"); break;
+    default:
+	DebugLevel0Fn("FIXME: invalid action id %d\n" _C_ action);
+	return gh_str02scm("invalid");
+    }
 }
 
 /**
@@ -3149,6 +3237,10 @@ local SCM CclAddButton(SCM list)
 	    s1=gh_scm2newstr(value,NULL);
 	    ba.Key=*s1;
 	    free(s1);
+	} else if( gh_eq_p(value,gh_symbol2scm("highlight")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Highlight=gh_scm2bool(value);
 	} else if( gh_eq_p(value,gh_symbol2scm("hint")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -3162,7 +3254,7 @@ local SCM CclAddButton(SCM list)
 
 
     // maxy: allocated memory goes into currentButtons[], must not be freed
-    AddButton(pos,ba.Icon.Name,ba.Action,ba.Key,ba.Hint);
+    AddButton(pos,ba.Icon.Name,ba.Action,ba.Key,ba.Hint,ba.Highlight);
 
     return SCM_UNSPECIFIED;
 }
@@ -3721,6 +3813,8 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("selected-get-speed",CclSelectedGetSpeed);
     gh_new_procedure0_0("selected-owned-by-player",CclSelectedOwnedByPlayer);
     gh_new_procedure0_0("selected-mixed-units",CclSelectedMixedUnits);
+    gh_new_procedure0_0("selected-get-action",CclSelectedGetAction);
+    gh_new_procedure0_0("selected-resource-loaded",CclSelectedResourceLoaded);
     gh_new_procedure0_0("selected-draw-buttons",CclSelectedDrawButtons);
 
 #endif

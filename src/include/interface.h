@@ -95,6 +95,7 @@ struct _button_action_ {
     char*	UnitMask;		/// for which units is it available
 #else
     SCM 	Action;			/// script on button press
+    int         Highlight;		/// whether to draw a border
 #endif
     IconConfig	Icon;			/// icon to display
     int		Key;			/// alternative on keyboard
@@ -316,7 +317,7 @@ extern int AddButton(int pos,int level,const char* IconIdent,
 	int key,const char* hint,const char* umask);
 #else
     /// Add a new button to the command panel
-extern void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint);
+extern void AddButton(int pos, char *icon_ident, SCM action, int key, char *hint, int highlight);
     /// Remove a single button from the panel
 global void RemoveButton(int pos);
 #endif
