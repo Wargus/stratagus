@@ -915,6 +915,14 @@ global void NetworkEvent(void)
 				// FIXME: ensure it's from the right player
 				allowed = 1;
 				break;
+			case MessageCommandDismiss:
+				// Allow to explode critters.
+				if ((UnitSlots[ntohs(nc->Unit)]->Player->Player == PlayerMax - 1) &&
+					UnitSlots[ntohs(nc->Unit)]->Type->ClicksToExplode) {
+					allowed = 1;
+					break;
+				}
+				// Fall through!
 			default:
 				if (UnitSlots[ntohs(nc->Unit)]->Player->Player == player ||
 					PlayersTeamed(player, UnitSlots[ntohs(nc->Unit)]->Player->Player)) {
