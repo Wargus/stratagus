@@ -776,7 +776,7 @@ local SCM CclAiSleep(SCM value)
 {
     int i;
 
-    DebugLevel0Fn("%d %d\n",FrameCounter,AiPlayer->SleepFrames);
+    DebugLevel3Fn("%d %d\n",FrameCounter,AiPlayer->SleepFrames);
     if( AiPlayer->SleepFrames ) {
 	if( AiPlayer->SleepFrames<FrameCounter ) {
 	    AiPlayer->SleepFrames=0;

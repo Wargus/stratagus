@@ -288,6 +288,8 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 		    }
 
 		    // Check targets on tile?
+		    // FIXME: the move code didn't likes a shore building as
+		    //		target
 		    if( EnemyOnMapTile(unit,x,y) ) {
 			DebugLevel0Fn("Target found %d,%d-%d\n"
 				_C_ x _C_ y _C_ state);
