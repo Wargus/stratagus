@@ -143,9 +143,6 @@ extern int VideoSyncSpeed;
 
 extern volatile int VideoInterrupts;
 
-	// 1 if mouse cursor is inside main window, else 0
-extern int InMainWindow;
-
 	///		Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
@@ -159,9 +156,6 @@ extern void VideoLockScreen(void);
 	///		Unlock the screen for display
 extern void VideoUnlockScreen(void);
 
-	// 1 if mouse cursor is inside main window, else 0
-extern int InMainWindow;
-
 	///		Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
@@ -172,14 +166,6 @@ extern char VideoFullScreen;
 	**		@see main
 	*/
 extern int VideoDepth;
-
-	/**
-	**		Architecture-dependant video bpp (bits pro pixel).
-	**		Set by InitVideoXXX. (8,16,24,32)
-	**		@see InitVideo @see InitVideoSdl
-	**		@see main
-	*/
-extern int VideoBpp;
 
 	/**
 	**		Architecture-dependant videomemory. Set by InitVideoXXX.
@@ -201,12 +187,8 @@ extern SDL_Surface* TheScreen;
 #define AMASK 0xff000000
 #endif
 
-typedef unsigned char GraphicData;		/// generic graphic data type
-
 	/// initialize the video part
 extern void InitVideo(void);
-
-extern void RealizeScreen(void);
 
 	/// Resize a graphic
 extern void ResizeGraphic(Graphic* g, int w, int h);
