@@ -509,10 +509,11 @@ case $VIDSEL in
   	USESDL=1
 	if [ "$WIN32" = "1" ]; then
 	  SDLLIB="\$(shell $SDL_CONFIG --libs) -lmingwex"
+	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS) -DUSE_WIN32" >> $RULESFILE
 	else
 	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
+	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	fi
-	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
 	if test "$STATIC x" != " x" ; then
@@ -531,7 +532,7 @@ case $VIDSEL in
 	;;
 
 esac
-echo "" >> $RULESFILE
+echo >> $RULESFILE
 
 #
 # Put in Cygwin/win32 stuff if necessary, and test for mingw32
@@ -1026,6 +1027,9 @@ fi
 if [ "$WIN32" = "0" ] ; then
     echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib $LDF_PNG_PATH $LOCAL_LDF" >> $RULESFILE
     echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include $IF_PNG_PATH $LOCAL_IF" >> $RULESFILE
+else
+    echo "XLDFLAGS"	= >> $RULESFILE
+    echo "XIFLAGS"	= >> $RULESFILE
 fi
 
 echo >> $RULESFILE

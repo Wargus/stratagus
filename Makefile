@@ -374,10 +374,6 @@ release:
 
 #-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
-    EXE='.exe' \
-    XLDFLAGS='' \
-    XIFLAGS='' \
-    VIDEO='-DUSE_WIN32 $(SDL)'  \
     VIDEOLIB='-L$(CROSSDIR)/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32' \
     RULESFILE=$(WINRULESFILE)
 
