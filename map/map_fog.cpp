@@ -53,6 +53,11 @@
 #define noTIMEIT			/// defined time function
 #endif
 
+    /// True if this is the fog color
+#define COLOR_FOG_P(x) ((x) == 239)
+    /// Solid fog color number in global palette
+#define COLOR_FOG (0)
+
 /**
 **	Do unroll 8x
 **
