@@ -1885,14 +1885,8 @@ global void RescueUnits(void)
 			ChangeUnitOwner(unit,unit->Player,around[i]->Player);
 			unit->Blink=5;
 			unit->Rescued=1;
-			// FIXME: more races?
-			if( unit->Player->Race==PlayerRaceHuman ) {
-			    PlayGameSound(GameSounds.HumanRescue.Sound
-				    ,MaxSampleVolume);
-			} else {
-			    PlayGameSound(GameSounds.OrcRescue.Sound
-				    ,MaxSampleVolume);
-			}
+			PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound
+				,MaxSampleVolume);
 			//
 			//	City center converts complete race
 			//	NOTE: I use a trick here, centers could
