@@ -724,8 +724,8 @@ global void DrawMessages(void)
     for (z = 0; z < MessagesCount; z++) {
 	if (z == 0) {
 	    PushClipping();
-	    SetClipping(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8, VideoWidth,
-		VideoHeight);
+	    SetClipping(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8, VideoWidth - 1,
+		VideoHeight - 1);
 	}
 	VideoDrawTextClip(TheUI.MapArea.X + 8,
 	    TheUI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
