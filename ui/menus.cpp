@@ -35,6 +35,8 @@
 #include <string.h>
 #include <ctype.h>
 #ifndef _MSC_VER
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #else
 #ifndef _WIN32_WCE
@@ -2353,14 +2355,15 @@ local void SaveAction(void)
 
 
 
-local void CreateSaveDir(Menuitem *mi)
+local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_WIN32
 SaveDir="save";
+mkdir(SaveDir);
 #else
 SaveDir="$HOME/.freecraft/save";
+mkdir(SaveDir,0777);
 #endif
-mkdir(SaveDir);
 }
 
 local void GameMenuSave(void)
