@@ -2168,6 +2168,7 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
     int h;
     int j;
     int mask;
+    Player* player;
 
     // Terrain Flags don't matter.
     if (type->MustBuildOnTop) {
@@ -2264,12 +2265,21 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 
 #endif
 
+    player = NULL;
+
+    if (unit && unit->Player->Type == PlayerPerson) {
+	player = unit->Player;
+    }
+	
     for (h = type->TileHeight; h--;) {
 	for (w = type->TileWidth; w--;) {
 	    if (!CanBuildOn(x + w, y + h, mask)) {
 		if (unit) {
 		    TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
 		}
+		return 0;
+	    }
+	    if (player && !IsMapFieldExplored(player, x + w, y + h)) {
 		return 0;
 	    }
 	}
