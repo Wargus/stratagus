@@ -2577,7 +2577,7 @@ global int CanTarget(const UnitType* source,const UnitType* dest)
 /**
 **	Generate a unit reference, a printable unique string for unit.
 */
-local char* UnitReference(const Unit* unit)
+global char* UnitReference(const Unit* unit)
 {
     char* ref;
 
