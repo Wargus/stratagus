@@ -65,6 +65,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 	Unit* goal;
 	int i;
 
+	Assert(unit->Orders[0].Action == UnitActionStill);
 	//
 	// If unit is not bunkered and removed, wait
 	//
@@ -200,11 +201,12 @@ void ActionStillGeneric(Unit* unit, int ground)
 				unit->SavedOrder.Goal = NoUnitP;
 			}
 		} else if ((goal = AttackUnitsInRange(unit))) {
+			unit->Reset = 0;
 			//
-			// Old goal destroyed.
+			// Old goal unavailable.
 			//
 			temp = unit->Orders[0].Goal;
-			if (temp && temp->Destroyed) {
+			if (temp && temp->Orders[0].Action == UnitActionDie) {
 				RefsDecrease(temp);
 				unit->Orders[0].Goal = temp = NoUnitP;
 			}
@@ -215,13 +217,11 @@ void ActionStillGeneric(Unit* unit, int ground)
 				}
 				unit->Orders[0].Goal = goal;
 				RefsIncrease(goal);
-				unit->Reset = 0;
 				unit->State = 0;
 				unit->SubAction = 1; // Mark attacking.
 				UnitHeadingFromDeltaXY(unit,
 					goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 					goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
-				AnimateActionAttack(unit);
 			}
 			return;
 		}
@@ -234,7 +234,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 		}
 		unit->SubAction = unit->State = 0; // No attacking, restart
 	}
-
+	Assert(!unit->Orders[0].Goal);
 	//
 	// Land units are turning left/right.
 	//
