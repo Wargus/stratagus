@@ -2722,6 +2722,65 @@ global Unit* FindOilDeposit(const Unit* source,int x,int y)
     return best;
 }
 
+
+/**
+**	Find an idle worker and center on it.
+*/
+global void FindIdleWorker()
+{
+    Unit* unit=NULL;
+    Unit** units;
+    Unit* FirstUnitFound;
+    int nunits;
+    int i;
+    int SelectNextUnit;
+    int FoundUnit;
+    const Player* player;
+    static Unit* LastIdleWorker=NULL;
+
+    FoundUnit=0;
+    FirstUnitFound=NULL;
+    if( LastIdleWorker==NULL ) SelectNextUnit=1;
+    else SelectNextUnit=0;
+
+    player=ThisPlayer;
+    nunits=player->TotalNumUnits;
+    units=player->Units;
+
+    for( i=0; i<nunits; i++ ) {
+	unit=units[i];
+	if( unit->Type->CowerWorker && !unit->Removed ) {
+	    if( unit->Orders[0].Action==UnitActionStill ) {
+		if( SelectNextUnit && !IsOnlySelected(unit) ) {
+		    FoundUnit=1;
+		    break;
+		}
+		if( FirstUnitFound==NULL ) {
+		    FirstUnitFound=unit;
+		}
+	    }
+	}
+	if( unit==LastIdleWorker ) {
+	    SelectNextUnit=1;
+	}
+    }
+    if( i==nunits && FirstUnitFound!=NULL && !IsOnlySelected(FirstUnitFound) ) {
+	unit=FirstUnitFound;
+	FoundUnit=1;
+    }
+
+    if( FoundUnit ) {
+	LastIdleWorker=unit;
+	SelectSingleUnit(unit);
+	ClearStatusLine();
+	ClearCosts();
+	CurrentButtonLevel=0;
+	UpdateButtonPanel();
+	PlayUnitSound(Selected[0],VoiceSelected);
+	MapCenter(unit->X,unit->Y);
+    }
+}
+
 /*----------------------------------------------------------------------------
 --	Select units
 ----------------------------------------------------------------------------*/
@@ -3078,7 +3137,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     // david: capture enemy buildings
     // Only worker types can capture.
     // Still possible to destroy building if not careful (too many attackers)
-    if( EnableBuildingCapture && attack
+    if( EnableBuildingCapture && attacker
 	    && type->Building && target->HP<=damage*3 &&
 	    (attacker->Type==UnitTypeOrcWorker
 		|| attacker->Type==UnitTypeHumanWorker) ) {
