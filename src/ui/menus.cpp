@@ -2324,8 +2324,12 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 
 local void SaveAction(void)
 {
-    printf(" %s ", SaveGameMenuItems[1].d.input.buffer);
-    SaveGame(SaveGameMenuItems[1].d.input.buffer);
+    int len;
+    char *filename;
+    len = strlen(SaveGameMenuItems[1].d.input.buffer);
+    strncpy(filename,SaveGameMenuItems[1].d.input.buffer,len - 3);
+    strncat(filename,".ccl",4);
+    SaveGame(filename);
 }
 
 local void GameMenuSave(void)
