@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -265,50 +264,21 @@ local SCM CclSetFogOfWar(SCM flag)
     return gh_bool2scm(old);
 }
 
-#if 1
-
-// FIXME: Should be removed
-
-/**
-**	Enable fog of war.
-*/
-local SCM CclFogOfWar(void)
-{
-    TheMap.NoFogOfWar=0;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
-**	Disable fog of war.
-*/
-local SCM CclNoFogOfWar(void)
-{
-    TheMap.NoFogOfWar=1;
-
-    return SCM_UNSPECIFIED;
-}
-
-#endif
-
 /**
 **	Enable display of terrain in minimap.
+**
+**	@param flag	#t = show minimap with terrain, #f = show no terrain.
+**
+**	@return		The old state of the minimap with terrain.
 */
-local SCM CclMinimapTerrain(void)
+local SCM CclSetMinimapTerrain(SCM flag)
 {
-    MinimapWithTerrain=1;
+    int old;
 
-    return SCM_UNSPECIFIED;
-}
+    old=MinimapWithTerrain;
+    MinimapWithTerrain=gh_scm2bool(flag);
 
-/**
-**	Disable display of terrain in minimap.
-*/
-local SCM CclNoMinimapTerrain(void)
-{
-    MinimapWithTerrain=0;
-
-    return SCM_UNSPECIFIED;
+    return gh_bool2scm(old);
 }
 
 /**
@@ -342,81 +312,93 @@ local SCM CclGrayFogOfWar(void)
 /**
 **	Gray style fog of war contrast.
 */
-local SCM CclFogOfWarContrast(SCM contrast)
+local SCM CclSetFogOfWarContrast(SCM contrast)
 {
     int i;
+    int o;
 
     i=gh_scm2int(contrast);
     if( i<0 || i>400 ) {
 	fprintf(stderr,__FUNCTION__": contrast should be 0-400\n");
 	i=100;
     }
+    o=FogOfWarContrast;
     FogOfWarContrast=i;
 
     if( !CclInConfigFile ) {
 	InitMapFogOfWar();
     }
 
-    return SCM_UNSPECIFIED;
+    return gh_int2scm(o);
 }
 
 /**
 **	Gray style fog of war brightness.
 */
-local SCM CclFogOfWarBrightness(SCM brightness)
+local SCM CclSetFogOfWarBrightness(SCM brightness)
 {
     int i;
+    int o;
 
     i=gh_scm2int(brightness);
     if( i<-100 || i>100 ) {
 	fprintf(stderr,__FUNCTION__": brightness should be -100-100\n");
 	i=0;
     }
+    o=FogOfWarBrightness;
     FogOfWarBrightness=i;
 
     if( !CclInConfigFile ) {
 	InitMapFogOfWar();
     }
 
-    return SCM_UNSPECIFIED;
+    return gh_int2scm(o);
 }
 
 /**
 **	Gray style fog of war saturation.
 */
-local SCM CclFogOfWarSaturation(SCM saturation)
+local SCM CclSetFogOfWarSaturation(SCM saturation)
 {
     int i;
+    int o;
 
     i=gh_scm2int(saturation);
     if( i<-100 || i>200 ) {
 	fprintf(stderr,__FUNCTION__": saturation should be -100-200\n");
 	i=0;
     }
+    o=FogOfWarSaturation;
     FogOfWarSaturation=i;
 
     if( !CclInConfigFile ) {
 	InitMapFogOfWar();
     }
 
-    return SCM_UNSPECIFIED;
+    return gh_int2scm(o);
 }
 
 /**
-**	Forest regeneration speed.
+**	Set forest regeneration speed.
+**
+**	@param speed	New regeneration speed (0 disabled)
+**
+**	@return		Old speed
 */
-local SCM CclForestRegeneration(SCM speed)
+local SCM CclSetForestRegeneration(SCM speed)
 {
     int i;
+    int o;
 
     i=gh_scm2int(speed);
     if( i<0 || i>255 ) {
 	fprintf(stderr,__FUNCTION__": regneration speed should be 0-255\n");
 	i=0;
     }
+    o=ForestRegeneration;
     ForestRegeneration=i;
 
-    return SCM_UNSPECIFIED;
+    return gh_int2scm(o);
 }
 
 /**
@@ -428,25 +410,16 @@ global void MapCclRegister(void)
     gh_new_procedure0_0("reveal-map",CclRevealMap);
 
     gh_new_procedure1_0("set-fog-of-war!",CclSetFogOfWar);
-
-#if 1
-    // FIXME: should be removed
-
-    gh_new_procedure0_0("fog-of-war",CclFogOfWar);
-    gh_new_procedure0_0("no-fog-of-war",CclNoFogOfWar);
-#endif
-
-    gh_new_procedure0_0("minimap-terrain",CclMinimapTerrain);
-    gh_new_procedure0_0("no-minimap-terrain",CclNoMinimapTerrain);
+    gh_new_procedure1_0("set-minimap-terrain!",CclSetMinimapTerrain);
 
     gh_new_procedure0_0("original-fog-of-war",CclOriginalFogOfWar);
     gh_new_procedure0_0("gray-fog-of-war",CclGrayFogOfWar);
 
-    gh_new_procedure1_0("fog-of-war-contrast",CclFogOfWarContrast);
-    gh_new_procedure1_0("fog-of-war-brightness",CclFogOfWarBrightness);
-    gh_new_procedure1_0("fog-of-war-saturation",CclFogOfWarSaturation);
+    gh_new_procedure1_0("set-fog-of-war-contrast!",CclSetFogOfWarContrast);
+    gh_new_procedure1_0("set-fog-of-war-brightness!",CclSetFogOfWarBrightness);
+    gh_new_procedure1_0("set-fog-of-war-saturation!",CclSetFogOfWarSaturation);
 
-    gh_new_procedure1_0("forest-regeneration",CclForestRegeneration);
+    gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
 }
 
 //@}
