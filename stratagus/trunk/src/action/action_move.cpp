@@ -150,13 +150,8 @@ local int DoActionMoveGeneric(Unit* unit,Animation* move)
 	unit->Frame=0;
 	UnitHeadingFromDeltaXY(unit,xd,yd);
     } else {
-#ifdef NEW_HEADING
-	xd=Heading2X[unit->Direction/32];
-	yd=Heading2Y[unit->Direction/32];
-#else
-	xd=Heading2X[unit->Heading];
-	yd=Heading2Y[unit->Heading];
-#endif
+	xd=Heading2X[unit->Direction/NextDirection];
+	yd=Heading2Y[unit->Direction/NextDirection];
     }
 
     DebugLevel3("Move: %d,%d State %2d ",xd,yd,unit->State);

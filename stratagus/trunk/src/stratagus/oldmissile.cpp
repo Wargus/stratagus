@@ -791,51 +791,20 @@ global void DrawMissiles(void)
 */
 local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
 {
-#ifdef NEW_HEADING
-    int heading;
-    int frame;
+    int dir;
 
-    heading=DirectionToHeading(dx,dy);
     // FIXME: depends on the missile directions wc 8, sc 32
-    if( heading<=LookingS ) {	// north->east->south
-	frame=heading/32;
-    } else {
-	frame=128+256/32-heading/32;
-    }
-    missile->Frame=frame;
-#else
-    int heading;
-    int frame;
+    missile->Frame&=127;
+    missile->Frame/=5;
+    missile->Frame*=5;
 
-    // Set new heading:
-    if( dx==0 ) {
-	if( dy<0 ) {
-	    heading=HeadingN;
-	} else {
-	    heading=HeadingS;
-	}
-	frame=heading;
-    } else if( dx>0 ) {
-	if( dy<0 ) {
-	    heading=HeadingNE;
-	} else if( dy==0 ) {
-	    heading=HeadingE;
-	} else {
-	    heading=HeadingSE;
-	}
-	frame=heading;
+    dir=((DirectionToHeading(dx,dy)+NextDirection/2)&0xFF)/NextDirection;
+    if( dir<=LookingS/NextDirection ) {	// north->east->south
+	missile->Frame+=dir;
     } else {
-	if( dy<0 ) {
-	    heading=HeadingNW;
-	} else if( dy==0 ) {
-	    heading=HeadingW;
-	} else {
-	    heading=HeadingSW;
-	}
-	frame=128+1+HeadingNW-heading;
+	// Note: 128 is the flag for flip graphic in X.
+	missile->Frame+=128+256/NextDirection-dir;
     }
-    missile->Frame=frame;
-#endif
 }
 
 #define MISSILE_STEPS	16		// How much did a missile move??

@@ -62,7 +62,7 @@ local Command* GetNextCommand(Unit* unit,int flush)
 	return NULL;
     }
 
-    return &unit->NextCommand[unit->NextCount++];
+    return &unit->NextCommand[(int)unit->NextCount++];
 }
 
 /*----------------------------------------------------------------------------

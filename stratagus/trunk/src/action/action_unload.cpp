@@ -84,13 +84,8 @@ local void LeaveTransporter(Unit* unit)
 	    if( goal==unit->OnBoard[i] ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-#ifdef NEW_HEADING
 		DropOutOnSide(goal,LookingW
 			,unit->Type->TileWidth,unit->Type->TileHeight);
-#else
-		DropOutOnSide(goal,HeadingW
-			,unit->Type->TileWidth,unit->Type->TileHeight);
-#endif
 		unit->OnBoard[i]=NoUnitP;
 		unit->Value--;
 		break;
@@ -101,13 +96,8 @@ local void LeaveTransporter(Unit* unit)
 	    if( (goal=unit->OnBoard[i]) ) {
 		goal->X=unit->X;
 		goal->Y=unit->Y;
-#ifdef NEW_HEADING
 		DropOutOnSide(goal,LookingW
 			,unit->Type->TileWidth,unit->Type->TileHeight);
-#else
-		DropOutOnSide(goal,HeadingW
-			,unit->Type->TileWidth,unit->Type->TileHeight);
-#endif
 		unit->OnBoard[i]=NoUnitP;
 		unit->Value--;
 	    }
