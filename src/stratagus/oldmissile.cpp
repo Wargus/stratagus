@@ -92,6 +92,10 @@
 **	Missile flies from x,y to x1,y1 than shows hit animation.
 */
 #define MissileClassPointToPointWithHit		11
+/**
+**	Missile don't move, than checks the source unit for HP.
+*/
+#define MissileClassFire			12
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -308,16 +312,16 @@ global MissileType MissileTypes[MissileTypeMax] = {
     "small fire.png",
     32,48,
     { NULL },
-    MissileClassStayWithDelay,	
-    1,
+    MissileClassFire,	
+    8,
     },
 { MissileTypeType,
     "missile-big-fire",
     "big fire.png",
     48,48,
     { NULL },
-    MissileClassStayWithDelay,	
-    1,
+    MissileClassFire,	
+    8,
     },
 { MissileTypeType,
     "missile-impact",
@@ -394,6 +398,12 @@ global MissileType MissileTypes[MissileTypeMax] = {
     },
 };
 
+/*
+**	Next missile types are used hardcoded in the source.
+*/
+global MissileType* MissileTypeSmallFire;	/// Small fire missile type
+global MissileType* MissileTypeBigFire;		/// Big fire missile type
+
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
 local int NumMissiles;			/// currently used missiles
@@ -443,6 +453,11 @@ global void LoadMissileSprites(void)
 		    =MissileTypeByIdent(MissileTypes[i].ImpactName);
 	}
     }
+
+    MissileTypeSmallFire=MissileTypeByIdent("missile-small-fire");
+    // FIXME: FIXME: FIXME: very diry hack
+    MissileTypeSmallFire->RleSprite->NumFrames=6;
+    MissileTypeBigFire=MissileTypeByIdent("missile-big-fire");
 }
 
 /**
@@ -503,10 +518,10 @@ global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
     missile=Missiles+NumMissiles++;
 
 found:
-    missile->X=sx;
-    missile->Y=sy;
-    missile->DX=dx;
-    missile->DY=dy;
+    missile->X=sx-type->Width/2;
+    missile->Y=sy-type->Height/2;
+    missile->DX=dx-type->Width/2;
+    missile->DY=dy-type->Height/2;
     missile->Type=type;
     missile->Frame=0;
     missile->State=0;
@@ -643,7 +658,7 @@ global void FireMissile(Unit* unit)
 
     // FIXME: goal is already dead, but missile could hit others?
 
-    x=unit->X*TileSizeX+TileSizeX/2;
+    x=unit->X*TileSizeX+TileSizeX/2;	// missile starts in tile middle
     y=unit->Y*TileSizeY+TileSizeY/2;
     if( (goal=unit->Command.Data.Move.Goal) ) {
 #ifdef NEW_UNIT
@@ -696,10 +711,10 @@ local int MissileVisible(const Missile* missile)
     int tileMinY;
     int tileMaxY;
 
-    tileMinX=(missile->X-missile->Type->Width/2)/TileSizeX;
-    tileMinY=(missile->Y-missile->Type->Height/2)/TileSizeY;
-    tileMaxX=(missile->X+missile->Type->Width/2)/TileSizeX;
-    tileMaxY=(missile->Y+missile->Type->Height/2)/TileSizeY;
+    tileMinX=missile->X/TileSizeX;
+    tileMinY=missile->Y/TileSizeY;
+    tileMaxX=(missile->X+missile->Type->Width)/TileSizeX;
+    tileMaxY=(missile->Y+missile->Type->Height)/TileSizeY;
     if ( (tileMinX>(MapX+MapWidth)) || (tileMaxX<MapX)
 	    || (tileMinY>MapY+MapHeight) || (tileMaxY<MapY)) {
 	return 0;
@@ -715,10 +730,6 @@ local int MissileVisible(const Missile* missile)
 */
 global void DrawMissile(const MissileType* type,int frame,int x,int y)
 {
-    // FIXME: remove this here, move to higher functions
-    x-=type->Width/2;
-    y-=type->Height/2;
-
     // FIXME: This is a hack for mirrored sprites
     if( frame&128 ) {
 	DrawRleSpriteClippedX(type->RleSprite,frame&127,x,y);
@@ -939,14 +950,18 @@ local int PointToPointMissile(Missile* missile)
 global void MissileHit(const Missile* missile)
 {
     Unit* goal;
+    int x;
+    int y;
 
     // FIXME: should I move the PlayMissileSound to here?
 
     if( missile->Type->ImpactSound.Sound ) {
 	PlayMissileSound(missile,missile->Type->ImpactSound.Sound);
     }
+    x=missile->X+missile->Type->Width/2;
+    y=missile->Y+missile->Type->Height/2;
     if( missile->Type->ImpactMissile ) {
-	MakeMissile(missile->Type->ImpactMissile,missile->X,missile->Y,0,0);
+	MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
     }
     if( !missile->SourceType ) {	// no target
 	return;
@@ -955,21 +970,19 @@ global void MissileHit(const Missile* missile)
     // FIXME: must choose better goal!
     // FIXME: what can the missile hit?
     // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have are effect
-    goal=UnitOnMapTile(missile->X/TileSizeX,missile->Y/TileSizeY);
-    if( !goal || !goal->HP ) {
-	int dx;
-	int dy;
 
-	dx=missile->X/TileSizeX;
-	dy=missile->Y/TileSizeY;
-	if( WallOnMap(dx,dy) ) {
+    x/=TileSizeX;
+    y/=TileSizeY;
+    goal=UnitOnMapTile(x,y);
+    if( !goal || !goal->HP ) {
+	if( WallOnMap(x,y) ) {
 	    DebugLevel3("Missile on wall?\n");
 	    // FIXME: don't use UnitTypeByIdent here, this is slow!
-	    if( HumanWallOnMap(dx,dy) ) {
-		HitWall(dx,dy,CalculateDamageStats(missile->SourceStats,
+	    if( HumanWallOnMap(x,y) ) {
+		HitWall(x,y,CalculateDamageStats(missile->SourceStats,
 			UnitTypeByIdent("unit-human-wall")->Stats));
 	    } else {
-		HitWall(dx,dy,CalculateDamageStats(missile->SourceStats,
+		HitWall(x,y,CalculateDamageStats(missile->SourceStats,
 			UnitTypeByIdent("unit-orc-wall")->Stats));
 	    }
 	    return;
@@ -1055,7 +1068,7 @@ global void MissileActions(void)
 			    missile->DY+=missile->Ystep*TileSizeY*2;
 			    MissileHit(missile);
 			    // FIXME: hits to left and right
-			    // FIXME: reduce damage effect
+			    // FIXME: reduce damage effects on later impacts
 			    break;
 			default:
 			    missile->Type=MissileFree;
@@ -1122,11 +1135,54 @@ global void MissileActions(void)
 			break;
 		}
 		break;
+
+	    case MissileClassFire:
+		missile->Wait=missile->Type->Speed;
+		if( ++missile->Frame==missile->Type->RleSprite->NumFrames ) {
+		    int f;
+		    Unit* unit;
+
+		    unit=missile->SourceUnit;
+		    if( unit->Destroyed || !unit->HP ) {
+#ifdef NEW_UNIT
+			if( !--unit->Refs ) {
+			    ReleaseUnit(unit);
+			}
+#endif
+			missile->Type=MissileFree;
+			break;
+		    }
+		    missile->Frame=0;
+		    f=(100*unit->HP)/unit->Stats->HitPoints;
+		    if( f>75) {
+			missile->Type=MissileFree;	// No fire for this
+			unit->Burning=0;
+		    } else if( f>50 ) {
+			if( missile->Type!=MissileTypeSmallFire ) {
+			    missile->X+=missile->Type->Width/2;
+			    missile->Y+=missile->Type->Height/2;
+			    missile->Type=MissileTypeSmallFire;
+			    missile->X-=missile->Type->Width/2;
+			    missile->Y-=missile->Type->Height/2;
+			}
+		    } else {
+			if( missile->Type!=MissileTypeBigFire ) {
+			    missile->X+=missile->Type->Width/2;
+			    missile->Y+=missile->Type->Height/2;
+			    missile->Type=MissileTypeBigFire;
+			    missile->X-=missile->Type->Width/2;
+			    missile->Y-=missile->Type->Height/2;
+			}
+		    }
+		}
+		break;
+
 	}
 
 	if (missile->Type!=MissileFree && MissileVisible(missile)) {
 	    // check after movement
 	    MustRedraw|=RedrawMap;
+	    // FIXME: must mark the exact tile, for more optimazation
 	}
     }
 }
@@ -1141,8 +1197,8 @@ global int ViewPointDistanceToMissile(const Missile* missile)
     int x;
     int y;
 
-    x=missile->X/TileSizeX;
-    y=missile->Y/TileSizeY;		// pixel -> tile
+    x=(missile->X+missile->Type->Width/2)/TileSizeX;
+    y=(missile->Y+missile->Type->Height/2)/TileSizeY;	// pixel -> tile
 
     DebugLevel3(__FUNCTION__": Missile %p at %d %d\n",missile,x,y);
 

@@ -232,6 +232,7 @@ struct _unit_ {
     unsigned	Heading : 8;		/// direction of unit looking
 #endif
 
+    unsigned	Burning : 1;		/// unit is burning
     unsigned	Attacked : 1;		/// unit is attacked
     // FIXME: next not used!
     //unsigned	Visible : 1;		/// unit is visible (submarine)
