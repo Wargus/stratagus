@@ -117,18 +117,20 @@ typedef struct _construction_ {
     const void* OType;			/// Object type (future extensions)
 
     char*	Ident;			/// construction identifier
-    char*	File[TilesetMax];	/// sprite file
-    char*	ShadowFile;		/// shadow sprite file
-
-    int		Width;			/// sprite width
-    int		Height;			/// sprite height
-    int		ShadowWidth;		/// shadow sprite width
-    int		ShadowHeight;		/// shadow sprite height
+    struct {
+	char*	File;			/// sprite file
+	int	Width;			/// sprite width
+	int	Height;			/// sprite height
+    } File[TilesetMax], ShadowFile[TilesetMax];
 
 // --- FILLED UP ---
 
     Graphic*	Sprite;			/// construction sprite image
+    int	Width;				/// sprite width
+    int	Height;				/// sprite height
     Graphic*	ShadowSprite;		/// construction shadow sprite image
+    int	ShadowWidth;			/// shadow sprite width
+    int	ShadowHeight;			/// shadow sprite height
 } Construction;
 
 /*----------------------------------------------------------------------------
