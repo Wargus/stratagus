@@ -119,6 +119,7 @@ local void EnterServerIPAction(Menuitem *mi, int key);
 local void EnterServerIPCancel(void);
 
 local void EnterSaveGameAction(Menuitem *mi, int key);
+local void SaveAction(void);
 
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
@@ -1449,7 +1450,7 @@ local void InitSaveGameMenuItems() {
     MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 7, 0,
 			   (void *)ScenSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
-    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, EndMenu, 's'};
+    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
     MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     SaveGameMenuItems[0].d.text    = i0;
@@ -2321,6 +2322,12 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     }
 }
 
+local void SaveAction(void)
+{
+    printf(" %s ", SaveGameMenuItems[1].d.input.buffer);
+    SaveGame(SaveGameMenuItems[1].d.input.buffer);
+}
+
 local void GameMenuSave(void)
 {
     char savegame_buffer[32];
@@ -2781,6 +2788,7 @@ local void TipsMenuEnd(void)
 
     EndMenu();
 }
+
 
 /**
 **	Exit the game from menu.
