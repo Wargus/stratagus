@@ -504,9 +504,13 @@ local void UiToggleBigMap(void)
 	EnableRedraw |= RedrawMap | RedrawAll;
 	MustRedraw |= RedrawEverything;
 	SetStatusLine("Big map enabled");
+#ifdef USE_SDL_SURFACE
+	VideoClearScreen();
+#else
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
+#endif
     } else {
 	TheUI.MapArea.X = mapx;
 	TheUI.MapArea.Y = mapy;
@@ -518,9 +522,13 @@ local void UiToggleBigMap(void)
 	EnableRedraw = RedrawEverything;
 	MustRedraw = RedrawEverything;
 	SetStatusLine("Returning to old map");
+#ifdef USE_SDL_SURFACE
+	VideoClearScreen();
+#else
 	VideoLockScreen();
 	VideoClearScreen();
 	VideoUnlockScreen();
+#endif
     }
 }
 
