@@ -205,12 +205,11 @@ local hashtable(UnitType*,61) UnitTypeHash;
 
 #ifdef DEBUG	// {
 
+#if !defined(USE_CCL)
 /**
-**	Table unit-type enums -> string.
-**
-**	Used to build C tables.
+**	Default without CCL support.
 */
-local const char* UnitTypeNames[] = {
+local char* DefaultUnitTypeNames[] = {
     "Footman",
     "Grunt",
     "Peasant",
@@ -329,6 +328,18 @@ local const char* UnitTypeNames[] = {
     "TankerOrcFull",
     NULL
 };
+#endif
+
+/**
+**	Table unit-type enums -> string.
+**
+**	Used to build C tables.
+*/
+local char** UnitTypeNames
+#if !defined(USE_CCL)
+    =DefaultUnitTypeNames
+#endif
+    ;
 
 /*----------------------------------------------------------------------------
 --	Functions

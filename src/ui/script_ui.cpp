@@ -161,6 +161,7 @@ local SCM CclDisplayPicture(SCM file)
     char* name;
 
     name=gh_scm2newstr(file,NULL);
+    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
     DisplayPicture(name);
     Invalidate();
     free(name);
