@@ -1,2 +1,38 @@
-HDRS += src/include/actions.h src/include/ai.h src/include/avi.h src/include/campaign.h src/include/script.h src/include/ccl_sound.h src/include/cdaudio.h src/include/commands.h src/include/construct.h src/include/cursor.h src/include/deco.h src/include/depend.h src/include/editor.h src/include/font.h src/include/stratagus.h src/include/icons.h src/include/interface.h src/include/iocompat.h src/include/iolib.h src/include/libcda.h src/include/map.h src/include/master.h src/include/menus.h src/include/minimap.h src/include/missile.h src/include/movie.h src/include/myendian.h src/include/net_lowlevel.h src/include/netconnect.h src/include/network.h src/include/pathfinder.h src/include/player.h src/include/pud.h src/include/rdtsc.h src/include/settings.h src/include/sound.h src/include/sound_id.h src/include/sound_server.h src/include/spells.h src/include/tileset.h src/include/trigger.h src/include/ui.h src/include/unit.h src/include/unitsound.h src/include/unittype.h src/include/upgrade.h src/include/upgrade_structs.h src/include/video.h src/include/wav.h src/include/script_sound.h
-HDRS += src/include/etlib/dllist.h src/include/etlib/generic.h src/include/etlib/hash.h
+##       _________ __                 __
+##      /   _____//  |_____________ _/  |______     ____  __ __  ______
+##      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+##      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
+##     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+##             \/                  \/          \//_____/            \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   Stratagus - A free fantasy real time strategy game engine
+##
+##	Module.make	-	Module Makefile (included from Makefile).
+##
+##	(c) Copyright 2004 by The Stratagus Team
+##
+##      This program is free software; you can redistribute it and/or modify
+##      it under the terms of the GNU General Public License as published by
+##      the Free Software Foundation; version 2 dated June, 1991.
+##
+##      This program is distributed in the hope that it will be useful,
+##      but WITHOUT ANY WARRANTY; without even the implied warranty of
+##      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##      GNU General Public License for more details.
+##
+##      You should have received a copy of the GNU General Public License
+##      along with this program; if not, write to the Free Software
+##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+MODULE = src/include
+MHDRS =  actions.h ai.h avi.h campaign.h script.h ccl_sound.h cdaudio.h \
+         commands.h construct.h cursor.h deco.h depend.h editor.h font.h \
+         stratagus.h icons.h interface.h iocompat.h iolib.h libcda.h map.h \
+         master.h menus.h minimap.h missile.h movie.h myendian.h net_lowlevel.h \
+         netconnect.h network.h pathfinder.h player.h pud.h rdtsc.h settings.h \
+         sound.h sound_id.h sound_server.h spells.h tileset.h trigger.h ui.h \
+         unit.h unitsound.h unittype.h upgrade.h upgrade_structs.h video.h \
+         wav.h script_sound.h etlib/dllist.h etlib/generic.h etlib/hash.h
+
+HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
