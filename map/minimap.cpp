@@ -10,7 +10,7 @@
 //
 /**@name minimap.c	-	The minimap. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -207,6 +207,8 @@ global void DestroyMinimap(void)
 {
     VideoSaveFree(MinimapGraphic);
     MinimapGraphic=NULL;
+    memset(Minimap2MapX,0,MINIMAP_W*sizeof(int));
+    memset(Minimap2MapY,0,MINIMAP_H*sizeof(int));
 }
 
 /**
