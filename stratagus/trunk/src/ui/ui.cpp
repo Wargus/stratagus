@@ -809,11 +809,14 @@ global void CleanUserInterface(void)
     }
 
     //	Free Title screen.
-    if (TitleScreen) {
-	for (i = 0; TitleScreen[i]; ++i) {
-	    free(TitleScreen[i]);
-	    TitleScreen[i]=NULL;
+    if (TitleScreens) {
+	for (i = 0; TitleScreens[i]; ++i) {
+	    free(TitleScreens[i]->File);
+	    free(TitleScreens[i]->Music);
+	    free(TitleScreens[i]);
 	}
+	free(TitleScreens);
+	TitleScreens = NULL;
     }
 
     // FIXME: Johns: Implement this correctly or we will lose memory!

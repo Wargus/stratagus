@@ -444,11 +444,14 @@ extern int SlowFrameCounter;
     */
 #define MyRand()	rand()
 
-extern char** TitleScreen;		/// File for title screen
+typedef struct _title_screen_ {
+    char* File;
+    char* Music;
+} TitleScreen;
+extern TitleScreen** TitleScreens;	/// File for title screen
 extern char* GameName;			/// Name of the game (wc2,wc1)
 extern char* MenuBackground;		/// File for menu background
 extern char* MenuBackgroundWithTitle;	/// File for menu with title
-extern char* TitleMusic;		/// File for title music
 extern char* MenuMusic;			/// File for menu music
 extern char* ClickMissile;		/// Missile to show when you click
 extern char* DamageMissile;		/// Missile to show damage caused
