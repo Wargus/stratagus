@@ -1393,7 +1393,7 @@ local void SaveMissile(const Missile* missile, CLFile* file)
 		CLprintf(file, " \"hidden\", ");
 	}
 
-	CLprintf(file, " \"step\", {%d, %d},",
+	CLprintf(file, " \"step\", {%d, %d}",
 		missile->CurrentStep, missile->TotalStep);
 
 	// MissileSlot filled in during init
