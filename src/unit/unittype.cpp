@@ -1365,6 +1365,11 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 			fprintf(stdout, "Unit-type %s not found\n", type->SameSprite);
 			ExitFatal(-1);
 		}
+		if (!type->Sprite) {
+			LoadUnitTypeSprite(type);
+		}
+		unittype->Sprite = type->Sprite;
+		return;
 	} else {
 		type = unittype;
 	}
