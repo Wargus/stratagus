@@ -3933,6 +3933,7 @@ local void MultiGameSetupInit(Menuitem *mi)
 	*CurrentMapPath='\0';
     }
 
+    FlagRevealMap = 0;
     GameSetupInit(mi);
     NetworkInitServerConnect();
     menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
