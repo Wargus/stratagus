@@ -658,7 +658,9 @@ typedef struct _variable_type_ {
 #define BASICDAMAGE_INDEX    19
 #define DAMAGE_INDEX         20
 #define EXTRADAMAGE_INDEX    21
-#define SLOT_INDEX           22
+#define POSX_INDEX           22
+#define POSY_INDEX           23
+#define SLOT_INDEX           24
 
 #define NVARALREADYDEFINED SLOT_INDEX + 1 // Hardcoded variables
 
