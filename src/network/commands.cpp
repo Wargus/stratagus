@@ -71,17 +71,25 @@ typedef struct _log_entry_ LogEntry;
 **	LogEntry structure.
 */
 struct _log_entry_ {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int		GameCycle;
+#elif defined(USE_LUA)
+    unsigned long   GameCycle;
+#endif
     int		UnitNumber;
     char*	UnitIdent;
-    char*	Name;
-    int		Flag;
+    char*	Action;
+    int		Flush;
     int		PosX;
     int		PosY;
     int		DestUnitNumber;
     char*	Value;
     int		Num;
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int		SyncRandSeed;
+#elif defined(USE_LUA)
+    unsigned	SyncRandSeed;
+#endif
     LogEntry*	Next;
 };
 
@@ -89,7 +97,7 @@ struct _log_entry_ {
 **	Multiplayer Player definition
 */
 typedef struct _multiplayer_player_ {
-    char *	Name;
+    char*	Name;
     int		Race;
     int		Team;
     int 	Type;
@@ -99,13 +107,17 @@ typedef struct _multiplayer_player_ {
 **	Full replay structure (definition + logs)
 */
 typedef struct _full_replay_ {
-    char * 	Comment1;
-    char * 	Comment2;
-    char * 	Comment3;
-    char *	Date;
-    char *	Map;
-    char *	MapPath;
+    char* 	Comment1;
+    char* 	Comment2;
+    char* 	Comment3;
+    char*	Date;
+    char*	Map;
+    char*	MapPath;
+#if defined(USE_GUILE) || defined(USE_SIOD)
     int		MapId;
+#elif defined(USE_LUA)
+    unsigned	MapId;
+#endif
 
     int		Type;
     int		Race;
@@ -129,37 +141,37 @@ typedef struct _full_replay_ {
 //----------------------------------------------------------------------------
 
 #if defined(USE_GUILE) || defined(USE_SIOD)
-/// Description of the LogEntry structure 
+/// Description of the LogEntry structure
 static IOStructDef LogEntryStructDef = {
     "LogEntry",
-    sizeof (LogEntry),
+    sizeof(LogEntry),
     -1,
     {
-	{"`next", 		NULL, 		&((LogEntry *) 0)->Next, 	NULL},
-	{"game-cycle",		&IOInt,		&((LogEntry *) 0)->GameCycle,	NULL},
-	{"unit-number",		&IOInt,		&((LogEntry *) 0)->UnitNumber,	NULL},
-	{"unit-ident",		&IOString,	&((LogEntry *) 0)->UnitIdent,	NULL},
-	{"name",		&IOString,	&((LogEntry *) 0)->Name,	NULL},
-	{"flag",		&IOInt,		&((LogEntry *) 0)->Flag,	NULL},
-	{"posx",		&IOInt,		&((LogEntry *) 0)->PosX,	NULL},
-	{"posy",		&IOInt,		&((LogEntry *) 0)->PosY,	NULL},	
-	{"dest-unit-number",	&IOInt,		&((LogEntry *) 0)->DestUnitNumber,NULL},
-	{"value",		&IOString,	&((LogEntry *) 0)->Value,	NULL},
-	{"Num",			&IOInt,		&((LogEntry *) 0)->Num,		NULL},
-	{"SyncRandSeed",	&IOInt,		&((LogEntry *) 0)->SyncRandSeed,NULL},
+	{"`next", 		NULL, 		&((LogEntry*)0)->Next, 		NULL},
+	{"game-cycle",		&IOInt,		&((LogEntry*)0)->GameCycle,	NULL},
+	{"unit-number",		&IOInt,		&((LogEntry*)0)->UnitNumber,	NULL},
+	{"unit-ident",		&IOString,	&((LogEntry*)0)->UnitIdent,	NULL},
+	{"action",		&IOString,	&((LogEntry*)0)->Action,	NULL},
+	{"flush",		&IOInt,		&((LogEntry*)0)->Flush,		NULL},
+	{"posx",		&IOInt,		&((LogEntry*)0)->PosX,		NULL},
+	{"posy",		&IOInt,		&((LogEntry*)0)->PosY,		NULL},
+	{"dest-unit-number",	&IOInt,		&((LogEntry*)0)->DestUnitNumber,NULL},
+	{"value",		&IOString,	&((LogEntry*)0)->Value,		NULL},
+	{"Num",			&IOInt,		&((LogEntry*)0)->Num,		NULL},
+	{"SyncRandSeed",	&IOInt,		&((LogEntry*)0)->SyncRandSeed,	NULL},
 	{0, 0, 0, 0}
     }
 };
 
 static IOStructDef MPPlayerStructDef = {
     "MPPlayer",
-    sizeof (MPPlayer),
+    sizeof(MPPlayer),
     PlayerMax,
     {
-	{"name",		&IOString,	&((MPPlayer *) 0)->Name,	NULL},
-	{"race",		&IOInt,		&((MPPlayer *) 0)->Race,	NULL},
-	{"team",		&IOInt,		&((MPPlayer *) 0)->Team,	NULL},
-	{"type",		&IOInt,		&((MPPlayer *) 0)->Type,	NULL},	
+	{"name",		&IOString,	&((MPPlayer*)0)->Name,	NULL},
+	{"race",		&IOInt,		&((MPPlayer*)0)->Race,	NULL},
+	{"team",		&IOInt,		&((MPPlayer*)0)->Team,	NULL},
+	{"type",		&IOInt,		&((MPPlayer*)0)->Type,	NULL},
 	{0, 0, 0, 0}
     }
 };
@@ -169,27 +181,27 @@ static IOStructDef FullReplayStructDef = {
     sizeof(FullReplay),
     -1,
     {
-	{"comment-1",		&IOString,	&((FullReplay *) 0)->Comment1,	NULL},
-	{"comment-2",		&IOString,	&((FullReplay *) 0)->Comment2,	NULL},
-	{"comment-3",		&IOString,	&((FullReplay *) 0)->Comment3,	NULL},
-	{"date",		&IOString,	&((FullReplay *) 0)->Date,	NULL},
-	{"map",			&IOString,	&((FullReplay *) 0)->Map,	NULL},
-	{"mappath",		&IOString,	&((FullReplay *) 0)->MapPath,	NULL},
-	{"mapid",		&IOInt,		&((FullReplay *) 0)->MapId,	NULL},
-	{"type",		&IOInt,		&((FullReplay *) 0)->Type,	NULL},
-	{"race",		&IOInt,		&((FullReplay *) 0)->Race,	NULL},
-	{"local-player",	&IOInt,		&((FullReplay *) 0)->LocalPlayer,NULL},
-	{"players",		&IOStructArray,	&((FullReplay *) 0)->Players,	(void*)&MPPlayerStructDef},
-	{"resource",		&IOInt,		&((FullReplay *) 0)->Resource,	NULL},
-	{"num-units",		&IOInt,		&((FullReplay *) 0)->NumUnits,	NULL},
-	{"tileset",		&IOInt,		&((FullReplay *) 0)->TileSet,	NULL},
-	{"no-fow",		&IOInt,		&((FullReplay *) 0)->NoFow,	NULL},
-	{"reveal-map",		&IOInt,		&((FullReplay *) 0)->RevealMap,	NULL},
-	{"game-type",		&IOInt,		&((FullReplay *) 0)->GameType,	NULL},
-	{"Opponents",		&IOInt,		&((FullReplay *) 0)->Opponents,	NULL},
-	{"engine",		&IOIntArray,	&((FullReplay *) 0)->Engine,	(void*)3},
-	{"network",		&IOIntArray,	&((FullReplay *) 0)->Network,	(void*)3},
-	{"commands",		&IOLinkedList,	&((FullReplay *) 0)->Commands,	(void*)&LogEntryStructDef},		
+	{"comment-1",		&IOString,	&((FullReplay*)0)->Comment1,	NULL},
+	{"comment-2",		&IOString,	&((FullReplay*)0)->Comment2,	NULL},
+	{"comment-3",		&IOString,	&((FullReplay*)0)->Comment3,	NULL},
+	{"date",		&IOString,	&((FullReplay*)0)->Date,	NULL},
+	{"map",			&IOString,	&((FullReplay*)0)->Map,	NULL},
+	{"mappath",		&IOString,	&((FullReplay*)0)->MapPath,	NULL},
+	{"mapid",		&IOInt,		&((FullReplay*)0)->MapId,	NULL},
+	{"type",		&IOInt,		&((FullReplay*)0)->Type,	NULL},
+	{"race",		&IOInt,		&((FullReplay*)0)->Race,	NULL},
+	{"local-player",	&IOInt,		&((FullReplay*)0)->LocalPlayer,	NULL},
+	{"players",		&IOStructArray,	&((FullReplay*)0)->Players,	(void*)&MPPlayerStructDef},
+	{"resource",		&IOInt,		&((FullReplay*)0)->Resource,	NULL},
+	{"num-units",		&IOInt,		&((FullReplay*)0)->NumUnits,	NULL},
+	{"tileset",		&IOInt,		&((FullReplay*)0)->TileSet,	NULL},
+	{"no-fow",		&IOInt,		&((FullReplay*)0)->NoFow,	NULL},
+	{"reveal-map",		&IOInt,		&((FullReplay*)0)->RevealMap,	NULL},
+	{"game-type",		&IOInt,		&((FullReplay*)0)->GameType,	NULL},
+	{"Opponents",		&IOInt,		&((FullReplay*)0)->Opponents,	NULL},
+	{"engine",		&IOIntArray,	&((FullReplay*)0)->Engine,	(void*)3},
+	{"network",		&IOIntArray,	&((FullReplay*)0)->Network,	(void*)3},
+	{"commands",		&IOLinkedList,	&((FullReplay*)0)->Commands,	(void*)&LogEntryStructDef},
 	{0, 0, 0, 0}
     }
 };
@@ -206,9 +218,10 @@ local int DisabledShowTips;		/// Disabled show tips
 local CLFile* LogFile;			/// Replay log file
 local unsigned long NextLogCycle;	/// Next log cycle number
 local int InitReplay;			/// Initialize replay
-local FullReplay * CurrentReplay;
-local LogEntry * ReplayStep;
+local FullReplay* CurrentReplay;
+local LogEntry* ReplayStep;
 
+local void AppendLog(LogEntry* log, CLFile* dest);
 
 //----------------------------------------------------------------------------
 //	Log commands
@@ -225,12 +238,11 @@ local LogEntry * ReplayStep;
 local FullReplay* StartReplay(void)
 {
     FullReplay* replay;
-    char * s;
+    char* s;
     time_t now;
     char* s1;
 
-    replay = (FullReplay*) malloc(sizeof(FullReplay));
-    memset(replay, 0, sizeof(FullReplay));
+    replay = calloc(1, sizeof(FullReplay));
 
     time(&now);
     s = ctime(&now);
@@ -238,28 +250,28 @@ local FullReplay* StartReplay(void)
 	*s1 = '\0';
     }
 
-    replay->Comment1 = strdup("Generated by Stratagus Version " VERSION "\"\n");
-    replay->Comment2 = strdup("Visit http://Stratagus.Org for more information\"\n");
+    replay->Comment1 = strdup("Generated by Stratagus Version " VERSION "");
+    replay->Comment2 = strdup("Visit http://Stratagus.Org for more information");
     replay->Comment3 = strdup("$Id$");
-    
+
     if (GameSettings.NetGameType == SettingsSinglePlayerGame) {
 	replay->Type = ReplaySinglePlayer;
 	replay->Race = GameSettings.Presets[0].Race;
     } else {
 	int i;
-	
+
 	replay->Type = ReplayMultiPlayer;
-	
+
 	for (i = 0; i < PlayerMax; ++i) {
 	    replay->Players[i].Name = strdup(Players[i].Name);
 	    replay->Players[i].Race = GameSettings.Presets[i].Race;
 	    replay->Players[i].Team = GameSettings.Presets[i].Team;
 	    replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
-	
+
 	replay->LocalPlayer = ThisPlayer->Player;
     }
-    
+
     replay->Date = strdup(s);
     replay->Map = strdup(TheMap.Description);
     replay->MapId = (signed int)TheMap.Info->MapUID;
@@ -270,27 +282,31 @@ local FullReplay* StartReplay(void)
     replay->NoFow = GameSettings.NoFogOfWar;
     replay->GameType = GameSettings.GameType;
     replay->Opponents = GameSettings.Opponents;
-    
+
     replay->Engine[0] = StratagusMajorVersion;
     replay->Engine[1] = StratagusMinorVersion;
     replay->Engine[2] = StratagusPatchLevel;
-    
+
     replay->Network[0] = NetworkProtocolMajorVersion;
     replay->Network[1] = NetworkProtocolMinorVersion;
     replay->Network[2] = NetworkProtocolPatchLevel;
     return replay;
 }
 
+/**
+**	FIXME: docu
+*/
 local void ApplyReplaySettings(void)
 {
     int i;
+
     if (CurrentReplay->Type == ReplayMultiPlayer) {
 	ExitNetwork1();
 	NetPlayers = 2;
 	GameSettings.NetGameType = SettingsMultiPlayerGame;
-	
+
 	ReplayGameType = ReplayMultiPlayer;
-	for (i = 0; i < PlayerMax; i++) {
+	for (i = 0; i < PlayerMax; ++i) {
 	    GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 	    GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 	    GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
@@ -310,13 +326,16 @@ local void ApplyReplaySettings(void)
     TheMap.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
     FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
     GameSettings.Opponents = CurrentReplay->Opponents;
-    
+
     // FIXME : check engine version
     // FIXME : FIXME: check network version
     // FIXME : check mapid
 }
 
-local void DeleteReplay(FullReplay * replay)
+/**
+**	FIXME: docu
+*/
+local void DeleteReplay(FullReplay* replay)
 {
     LogEntry* log;
     LogEntry* next;
@@ -331,19 +350,21 @@ local void DeleteReplay(FullReplay * replay)
     cond_free(replay->Map);
     cond_free(replay->MapPath);
 
-    for (i = 0; i < PlayerMax; i++) {
+    for (i = 0; i < PlayerMax; ++i) {
 	cond_free(replay->Players[i].Name);
     }
 
     log = replay->Commands;
     while (log) {
 	cond_free(log->UnitIdent);
-	cond_free(log->Name);
+	cond_free(log->Action);
 	cond_free(log->Value);
 	next = log->Next;
 	free(log);
 	log = next;
     }
+
+#undef cond_free
 
     free(replay);
 }
@@ -353,19 +374,64 @@ local void DeleteReplay(FullReplay * replay)
 **
 **	@param dest	The file to output to
 */
-global void SaveFullLog(CLFile* dest)
+local void SaveFullLog(CLFile* dest)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     // FIXME : IOStartSaving(dest);
     IOLoadingMode = 0;
     IOOutFile = dest;
     IOTabLevel = 2;
 
-#if defined(USE_GUILE) || defined(USE_SIOD)
     CLprintf(dest, "(replay-log (quote\n");
     IOStructPtr(SCM_UNSPECIFIED, (void*)&CurrentReplay, (void*)&FullReplayStructDef);
     CLprintf(dest, "))\n");
-#endif
     // FIXME : IODone();
+#elif defined(USE_LUA)
+    LogEntry* log;
+    int i;
+
+    CLprintf(dest, "ReplayLog( {\n");
+    CLprintf(dest, "  Comment1 = \"%s\",\n", CurrentReplay->Comment1);
+    CLprintf(dest, "  Comment2 = \"%s\",\n", CurrentReplay->Comment2);
+    CLprintf(dest, "  Comment3 = \"%s\",\n", CurrentReplay->Comment3);
+    CLprintf(dest, "  Date = \"%s\",\n", CurrentReplay->Date);
+    CLprintf(dest, "  Map = \"%s\",\n", CurrentReplay->Map);
+    CLprintf(dest, "  MapPath = \"%s\",\n", CurrentReplay->MapPath);
+    CLprintf(dest, "  MapId = %u,\n", CurrentReplay->MapId);
+    CLprintf(dest, "  Type = %d,\n", CurrentReplay->Type);
+    CLprintf(dest, "  Race = %d,\n", CurrentReplay->Race);
+    CLprintf(dest, "  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
+    CLprintf(dest, "  Players = {\n");
+    for (i = 0; i < PlayerMax; ++i) {
+	if (CurrentReplay->Players[i].Name) {
+	    CLprintf(dest, "    { Name = \"%s\",\n", CurrentReplay->Players[i].Name);
+	} else {
+	    CLprintf(dest, "    {\n");
+	}
+	CLprintf(dest, "      Race = %d,\n", CurrentReplay->Players[i].Race);
+	CLprintf(dest, "      Team = %d,\n", CurrentReplay->Players[i].Team);
+	CLprintf(dest, "      Type = %d }%s", CurrentReplay->Players[i].Type,
+	    i != PlayerMax - 1 ? ",\n" : "\n");
+    }
+    CLprintf(dest, "  },\n");
+    CLprintf(dest, "  Resource = %d,\n", CurrentReplay->Resource);
+    CLprintf(dest, "  NumUnits = %d,\n", CurrentReplay->NumUnits);
+    CLprintf(dest, "  TileSet = %d,\n", CurrentReplay->TileSet);
+    CLprintf(dest, "  NoFow = %d,\n", CurrentReplay->NoFow);
+    CLprintf(dest, "  RevealMap = %d,\n", CurrentReplay->RevealMap);
+    CLprintf(dest, "  GameType = %d,\n", CurrentReplay->GameType);
+    CLprintf(dest, "  Opponents = %d,\n", CurrentReplay->Opponents);
+    CLprintf(dest, "  Engine = { %d, %d, %d },\n",
+	CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
+    CLprintf(dest, "  Network = { %d, %d, %d }\n",
+	CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
+    CLprintf(dest, "} )\n");
+    log = CurrentReplay->Commands;
+    while (log) {
+	AppendLog(log, dest);
+	log = log->Next;
+    }
+#endif
 }
 
 /**
@@ -373,10 +439,10 @@ global void SaveFullLog(CLFile* dest)
 **
 **	@param dest	The file to output to
 */
-global void AppendLog(LogEntry* log)
+local void AppendLog(LogEntry* log, CLFile* dest)
 {
     LogEntry** last;
-    
+
     // Append to linked list
     last = &CurrentReplay->Commands;
     while (*last) {
@@ -387,22 +453,46 @@ global void AppendLog(LogEntry* log)
     log->Next = 0;
 
     // Append to file
-    if (!LogFile) {
+    if (!dest) {
 	return;
     }
-    
+
     // FIXME : IOStartSaving(dest);
-    
-    IOLoadingMode = 0;
-    IOOutFile = LogFile;
-    IOTabLevel = 2;
+
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    CLprintf(LogFile, "(log (quote ");
+    IOLoadingMode = 0;
+    IOOutFile = dest;
+    IOTabLevel = 2;
+    CLprintf(dest, "(log (quote ");
     IOLinkedList(SCM_UNSPECIFIED, (void*)&log, (void*)&LogEntryStructDef);
-    CLprintf(LogFile,"))\n");
+    CLprintf(dest,"))\n");
+#elif defined(USE_LUA)
+    CLprintf(dest, "Log( { ");
+    CLprintf(dest, "GameCycle = %lu, ", log->GameCycle);
+    if (log->UnitNumber != -1) {
+	CLprintf(dest, "UnitNumber = %d, ", log->UnitNumber);
+    }
+    if (log->UnitIdent) {
+	CLprintf(dest, "UnitIdent = \"%s\", ", log->UnitIdent);
+    }
+    CLprintf(dest, "Action = \"%s\", ", log->Action);
+    CLprintf(dest, "Flush = %d, ", log->Flush);
+    if (log->PosX != -1 || log->PosY != -1) {
+	CLprintf(dest, "PosX = %d, PosY = %d, ", log->PosX, log->PosY);
+    }
+    if (log->DestUnitNumber != -1) {
+	CLprintf(dest, "DestUnitNumber = %d, ", log->DestUnitNumber);
+    }
+    if (log->Value) {
+	CLprintf(dest, "Value = \"%s\", ", log->Value);
+    }
+    if (log->Num != -1) {
+	CLprintf(dest, "Num = %d, ", log->Num);
+    }
+    CLprintf(dest, "SyncRandSeed = %u } )\n", log->SyncRandSeed);
 #endif
-    CLflush(LogFile);
-    
+    CLflush(dest);
+
     // FIXME : IODone();
 }
 
@@ -411,20 +501,20 @@ global void AppendLog(LogEntry* log)
 **
 **	This could later be used to recover, crashed games.
 **
-**	@param name	Command name (move,attack,...).
+**	@param action	Command name (move,attack,...).
 **	@param unit	Unit that receive the command.
-**	@param flag	Append command or flush old commands.
+**	@param flush	Append command or flush old commands.
 **	@param x	optional X map position.
 **	@param y	optional y map position.
 **	@param dest	optional destination unit.
 **	@param value	optional command argument (unit-type,...).
 **	@param num	optional number argument
 */
-global void CommandLog(const char* name, const Unit* unit, int flag,
+global void CommandLog(const char* action, const Unit* unit, int flush,
     int x, int y, const Unit* dest, const char* value, int num)
 {
-    LogEntry * log;
-    
+    LogEntry* log;
+
     if (CommandLogDisabled) {		// No log wanted
 	return;
     }
@@ -435,7 +525,7 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
     //
     if (!LogFile) {
 	char buf[PATH_MAX];
-	
+
 #ifdef USE_WIN32
 	strcpy(buf, GameName);
 	mkdir(buf);
@@ -470,11 +560,11 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 	SaveFullLog(LogFile);
     }
 
-    if (!name) {
+    if (!action) {
 	return;
     }
-    
-    log = (LogEntry*) malloc(sizeof(LogEntry));
+
+    log = (LogEntry*)malloc(sizeof(LogEntry));
 
     //
     //	Frame, unit, (type-ident only to be better readable).
@@ -483,21 +573,21 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
 
     log->UnitNumber = (unit ? UnitNumber(unit) : -1);
     log->UnitIdent = (unit ? strdup(unit->Type->Ident) : NULL);
-        
-    log->Name = strdup(name);
-    log->Flag = flag;
-    
+
+    log->Action = strdup(action);
+    log->Flush = flush;
+
     //
     //	Coordinates given.
     //
     log->PosX = x;
     log->PosY = y;
-    
+
     //
     //	Destination given.
     //
     log->DestUnitNumber = (dest ? UnitNumber(dest) : -1);
-	
+
     //
     //	Value given.
     //
@@ -511,7 +601,7 @@ global void CommandLog(const char* name, const Unit* unit, int flag,
     log->SyncRandSeed = (signed)SyncRandSeed;
 
     // Append it to ReplayLog list
-    AppendLog(log);
+    AppendLog(log, LogFile);
 }
 
 /**
@@ -527,9 +617,9 @@ local SCM CclLog(SCM list)
 
     IOLoadingMode = 1;
 
-    log = 0;
+    log = NULL;
     IOLinkedList(list, (void*)&log, (void*)&LogEntryStructDef);
-    
+
     // Append to linked list
     last = &CurrentReplay->Commands;
     while (*last) {
@@ -541,6 +631,68 @@ local SCM CclLog(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclLog(lua_State* l)
+{
+    LogEntry* log;
+    LogEntry** last;
+    const char* value;
+
+    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    DebugCheck(!CurrentReplay);
+
+    log = calloc(1, sizeof(LogEntry));
+    log->UnitNumber = -1;
+    log->PosX = -1;
+    log->PosY = -1;
+    log->DestUnitNumber = -1;
+    log->Num = -1;
+
+    lua_pushnil(l);
+    while (lua_next(l, 1) != 0) {
+	value = LuaToString(l, -2);
+	if (!strcmp(value, "GameCycle")) {
+	    log->GameCycle = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "UnitNumber")) {
+	    log->UnitNumber = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "UnitIdent")) {
+	    log->UnitIdent = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Action")) {
+	    log->Action = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Flush")) {
+	    log->Flush = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "PosX")) {
+	    log->PosX = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "PosY")) {
+	    log->PosY = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "DestUnitNumber")) {
+	    log->DestUnitNumber = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Value")) {
+	    log->Value = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Num")) {
+	    log->Num = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "SyncRandSeed")) {
+	    log->SyncRandSeed = LuaToNumber(l, -1);
+	} else {
+	    lua_pushfstring(l, "Unsupported key: %s", value);
+	    lua_error(l);
+	}
+	lua_pop(l, 1);
+    }
+
+    // Append to linked list
+    last = &CurrentReplay->Commands;
+    while (*last) {
+	last = &(*last)->Next;
+    }
+
+    *last = log;
+
+    return 0;
+}
 #endif
 
 /**
@@ -549,7 +701,7 @@ local SCM CclLog(SCM list)
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclReplayLog(SCM list)
 {
-    FullReplay * replay;
+    FullReplay* replay;
 
     DebugCheck(CurrentReplay != NULL);
 
@@ -558,14 +710,140 @@ local SCM CclReplayLog(SCM list)
     IOStructPtr(list, (void*)&replay, (void*)&FullReplayStructDef);
 
     CurrentReplay = replay;
-    
+
     // Apply CurrentReplay settings.
     ApplyReplaySettings();
-    
+
     return SCM_UNSPECIFIED;
 }
-
 #elif defined(USE_LUA)
+local int CclReplayLog(lua_State* l)
+{
+    FullReplay* replay;
+    const char* value;
+    int j;
+
+    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    DebugCheck(CurrentReplay != NULL);
+
+    replay = calloc(1, sizeof(FullReplay));
+
+    lua_pushnil(l);
+    while (lua_next(l, 1) != 0) {
+	value = LuaToString(l, -2);
+	if (!strcmp(value, "Comment1")) {
+	    replay->Comment1 = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Comment2")) {
+	    replay->Comment2 = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Comment3")) {
+	    replay->Comment3 = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Date")) {
+	    replay->Date = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Map")) {
+	    replay->Map = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "MapPath")) {
+	    replay->MapPath = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "MapId")) {
+	    replay->MapId = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Type")) {
+	    replay->Type = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Race")) {
+	    replay->Race = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "LocalPlayer")) {
+	    replay->LocalPlayer = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Players")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != PlayerMax) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    for (j = 0; j < PlayerMax; ++j) {
+		int top;
+
+		lua_rawgeti(l, -1, j + 1);
+		if (!lua_istable(l, -1)) {
+		    lua_pushstring(l, "incorrect argument");
+		    lua_error(l);
+		}
+		top = lua_gettop(l);
+		lua_pushnil(l);
+		while (lua_next(l, top) != 0) {
+		    value = LuaToString(l, -2);
+		    if (!strcmp(value, "Name")) {
+			replay->Players[j].Name = strdup(LuaToString(l, -1));
+		    } else if (!strcmp(value, "Race")) {
+			replay->Players[j].Race = LuaToNumber(l, -1);
+		    } else if (!strcmp(value, "Team")) {
+			replay->Players[j].Team = LuaToNumber(l, -1);
+		    } else if (!strcmp(value, "Type")) {
+			replay->Players[j].Type = LuaToNumber(l, -1);
+		    } else {
+			lua_pushfstring(l, "Unsupported key: %s", value);
+			lua_error(l);
+		    }
+		    lua_pop(l, 1);
+		}
+		lua_pop(l, 1);
+	    }
+	} else if (!strcmp(value, "Resource")) {
+	    replay->Resource = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "NumUnits")) {
+	    replay->NumUnits = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "TileSet")) {
+	    replay->TileSet = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "NoFow")) {
+	    replay->NoFow = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "RevealMap")) {
+	    replay->RevealMap = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "GameType")) {
+	    replay->GameType = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Opponents")) {
+	    replay->Opponents = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Engine")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, -1, 1);
+	    replay->Engine[0] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, -1, 2);
+	    replay->Engine[1] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, -1, 3);
+	    replay->Engine[2] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "Network")) {
+	    if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, -1, 1);
+	    replay->Network[0] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, -1, 2);
+	    replay->Network[1] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, -1, 3);
+	    replay->Network[2] = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported key: %s", value);
+	    lua_error(l);
+	}
+	lua_pop(l, 1);
+    }
+
+    CurrentReplay = replay;
+
+    // Apply CurrentReplay settings.
+    ApplyReplaySettings();
+
+    return 0;
+}
 #endif
 
 /**
@@ -637,7 +915,7 @@ global void CleanReplayLog(void)
 	CurrentReplay = 0;
     }
     ReplayStep = NULL;
-    
+
 //    if (DisabledLog) {
 	CommandLogDisabled = 0;
 	DisabledLog = 0;
@@ -657,7 +935,7 @@ global void CleanReplayLog(void)
 local void DoNextReplay(void)
 {
     int unit;
-    const char* name;
+    const char* action;
     int flags;
     int posx;
     int posy;
@@ -666,16 +944,16 @@ local void DoNextReplay(void)
     Unit* dunit;
 
     DebugCheck(ReplayStep == 0);
-    
+
     NextLogCycle = ReplayStep->GameCycle;
-    
+
     if (NextLogCycle != GameCycle) {
 	return;
     }
 
     unit = ReplayStep->UnitNumber;
-    name = ReplayStep->Name;
-    flags = ReplayStep->Flag;
+    action = ReplayStep->Action;
+    flags = ReplayStep->Flush;
     posx = ReplayStep->PosX;
     posy = ReplayStep->PosY;
     dunit = (ReplayStep->DestUnitNumber != -1 ? UnitSlots[ReplayStep->DestUnitNumber] : NoUnitP);
@@ -683,9 +961,9 @@ local void DoNextReplay(void)
     num = ReplayStep->Num;
 
     DebugCheck(unit != -1 && strcmp(ReplayStep->UnitIdent, UnitSlots[unit]->Type->Ident));
-    
+
     if (((signed)SyncRandSeed) != ReplayStep->SyncRandSeed) {
-#ifdef DEBUG	
+#ifdef DEBUG
 	if (!ReplayStep->SyncRandSeed) {
 	    // Replay without the 'sync info
 	    NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "No sync info for this replay !");
@@ -702,54 +980,54 @@ local void DoNextReplay(void)
 	return;
 #endif
     }
-    
-    if (!strcmp(name, "stop")) {
+
+    if (!strcmp(action, "stop")) {
 	SendCommandStopUnit(UnitSlots[unit]);
-    } else if (!strcmp(name, "stand-ground")) {
+    } else if (!strcmp(action, "stand-ground")) {
 	SendCommandStandGround(UnitSlots[unit], flags);
-    } else if (!strcmp(name, "follow")) {
+    } else if (!strcmp(action, "follow")) {
 	SendCommandFollow(UnitSlots[unit], dunit, flags);
-    } else if (!strcmp(name, "move")) {
+    } else if (!strcmp(action, "move")) {
 	SendCommandMove(UnitSlots[unit], posx, posy, flags);
-    } else if (!strcmp(name, "repair")) {
+    } else if (!strcmp(action, "repair")) {
 	SendCommandRepair(UnitSlots[unit], posx, posy, dunit, flags);
-    } else if (!strcmp(name, "attack")) {
+    } else if (!strcmp(action, "attack")) {
 	SendCommandAttack(UnitSlots[unit], posx, posy, dunit, flags);
-    } else if (!strcmp(name, "attack-ground")) {
+    } else if (!strcmp(action, "attack-ground")) {
 	SendCommandAttackGround(UnitSlots[unit], posx, posy, flags);
-    } else if (!strcmp(name, "patrol")) {
+    } else if (!strcmp(action, "patrol")) {
 	SendCommandPatrol(UnitSlots[unit], posx, posy, flags);
-    } else if (!strcmp(name, "board")) {
+    } else if (!strcmp(action, "board")) {
 	SendCommandBoard(UnitSlots[unit], posx, posy, dunit, flags);
-    } else if (!strcmp(name, "unload")) {
+    } else if (!strcmp(action, "unload")) {
 	SendCommandUnload(UnitSlots[unit], posx, posy, dunit, flags);
-    } else if (!strcmp(name, "build")) {
+    } else if (!strcmp(action, "build")) {
 	SendCommandBuildBuilding(UnitSlots[unit], posx, posy, UnitTypeByIdent(val), flags);
-    } else if (!strcmp(name, "dismiss")) {
+    } else if (!strcmp(action, "dismiss")) {
 	SendCommandDismiss(UnitSlots[unit]);
-    } else if (!strcmp(name, "resource-loc")) {
+    } else if (!strcmp(action, "resource-loc")) {
 	SendCommandResourceLoc(UnitSlots[unit], posx, posy, flags);
-    } else if (!strcmp(name, "resource")) {
+    } else if (!strcmp(action, "resource")) {
 	SendCommandResource(UnitSlots[unit], dunit, flags);
-    } else if (!strcmp(name, "return")) {
+    } else if (!strcmp(action, "return")) {
 	SendCommandReturnGoods(UnitSlots[unit], dunit, flags);
-    } else if (!strcmp(name, "train")) {
+    } else if (!strcmp(action, "train")) {
 	SendCommandTrainUnit(UnitSlots[unit], UnitTypeByIdent(val), flags);
-    } else if (!strcmp(name, "cancel-train")) {
+    } else if (!strcmp(action, "cancel-train")) {
 	SendCommandCancelTraining(UnitSlots[unit], num, val ? UnitTypeByIdent(val) : NULL);
-    } else if (!strcmp(name, "upgrade-to")) {
+    } else if (!strcmp(action, "upgrade-to")) {
 	SendCommandUpgradeTo(UnitSlots[unit], UnitTypeByIdent(val), flags);
-    } else if (!strcmp(name, "cancel-upgrade-to")) {
+    } else if (!strcmp(action, "cancel-upgrade-to")) {
 	SendCommandCancelUpgradeTo(UnitSlots[unit]);
-    } else if (!strcmp(name, "research")) {
+    } else if (!strcmp(action, "research")) {
 	SendCommandResearch(UnitSlots[unit],UpgradeByIdent(val), flags);
-    } else if (!strcmp(name, "cancel-research")) {
+    } else if (!strcmp(action, "cancel-research")) {
 	SendCommandCancelResearch(UnitSlots[unit]);
-    } else if (!strcmp(name, "spell-cast")) {
+    } else if (!strcmp(action, "spell-cast")) {
 	SendCommandSpellCast(UnitSlots[unit], posx, posy, dunit, num, flags);
-    } else if (!strcmp(name, "auto-spell-cast")) {
+    } else if (!strcmp(action, "auto-spell-cast")) {
 	SendCommandAutoSpellCast(UnitSlots[unit], num, posx);
-    } else if (!strcmp(name, "diplomacy")) {
+    } else if (!strcmp(action, "diplomacy")) {
 	int state;
 	if (!strcmp(val, "neutral")) {
 	    state = DiplomacyNeutral;
@@ -764,7 +1042,7 @@ local void DoNextReplay(void)
 	    state = -1;
 	}
 	SendCommandDiplomacy(posx, state, posy);
-    } else if (!strcmp(name, "shared-vision")) {
+    } else if (!strcmp(action, "shared-vision")) {
 	int state;
 	state = atoi(val);
 	if (state != 0 && state != 1) {
@@ -772,16 +1050,16 @@ local void DoNextReplay(void)
 	    state = 0;
 	}
 	SendCommandSharedVision(posx, state, posy);
-    } else if (!strcmp(name, "input")) {
+    } else if (!strcmp(action, "input")) {
 	if (val[0] == '(') {
 	    CclCommand(val);
 	} else {
 	    HandleCheats(val);
 	}
-    } else if (!strcmp(name, "quit")) {
+    } else if (!strcmp(action, "quit")) {
 	CommandQuit(posx);
     } else {
-	DebugLevel0Fn("Invalid name: %s" _C_ name);
+	DebugLevel0Fn("Invalid action: %s" _C_ action);
     }
 
     ReplayStep = ReplayStep->Next;
@@ -1313,7 +1591,7 @@ global void SendCommandDiplomacy(int player, int state, int opponent)
 global void SendCommandSharedVision(int player, int state, int opponent)
 {
     if (NetworkFildes == (Socket)-1) {
-	if (state==0) {
+	if (state == 0) {
 	    CommandLog("shared-vision", NoUnitP, 0, player, opponent,
 		NoUnitP, "0", -1);
 	} else {
@@ -1333,6 +1611,8 @@ global void NetworkCclRegister(void)
     gh_new_procedure1_0("log", CclLog);
     gh_new_procedure1_0("replay-log", CclReplayLog);
 #elif defined(USE_LUA)
+    lua_register(Lua, "Log", CclLog);
+    lua_register(Lua, "ReplayLog", CclReplayLog);
 #endif
 }
 
