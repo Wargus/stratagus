@@ -962,7 +962,8 @@ local int CommandKey(int key)
 global int HandleCheats(const char* Input)
 {
     int ret;
-    ret=1;
+
+    ret = 1;
 
     // FIXME: disable cheats
     if (strcmp(Input, "there is no aliens level") == 0) {
@@ -1036,16 +1037,20 @@ global int HandleCheats(const char* Input)
 	MustRedraw |= RedrawResources;
 	SetMessage("SO!");
     } else if (!strcmp(Input, "unite the clans") ) {
-	GameRunning=0;
-	GameResult=GameVictory;
+	GameRunning = 0;
+	GameResult = GameVictory;
     } else if (!strcmp(Input, "you pitiful worm") ) {
-	GameRunning=0;
-	GameResult=GameDefeat;
+	GameRunning = 0;
+	GameResult = GameDefeat;
     } else if (!strcmp(Input, "it is a good day to die") ) {
-	GodMode=1;
-	SetMessage("DIE!");
+	GodMode = !GodMode;
+	if (GodMode) {
+	    SetMessage("God Mode ON");
+	} else {
+	    SetMessage("God Mode OFF");
+	}
     } else {
-	ret=0;
+	ret = 0;
     }
 
     return ret;
