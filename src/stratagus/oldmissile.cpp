@@ -199,7 +199,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPointWithHit,
     1,
     16,
-    1,
+    0,
     },
 { MissileTypeType,
     "missile-griffon-hammer",
@@ -311,7 +311,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPointWithHit,
     1,
     16,
-    1,
+    .,
     },
 { MissileTypeType,
     "missile-rune",
@@ -368,7 +368,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPoint,
     1,
     16,
-    1,
+    0,
     },
 { MissileTypeType,
     "missile-axe",
@@ -379,7 +379,7 @@ global MissileType DefaultMissileTypes[] = {
     MissileClassPointToPoint,
     1,
     16,
-    1,
+    0,
     },
 { MissileTypeType,
     "missile-submarine-missile",
@@ -802,6 +802,18 @@ local void FreeMissile(Missile* missile)
 	}
 	missile->SourceUnit=NoUnitP;
     }
+    if( missile->TargetUnit ) {
+	RefsDebugCheck( !missile->TargetUnit->Refs );
+	if( missile->TargetUnit->Destroyed ) {
+	    if( !--missile->TargetUnit->Refs ) {
+		ReleaseUnit(missile->TargetUnit);
+	    }
+	} else {
+	    --missile->TargetUnit->Refs;
+	    RefsDebugCheck( !missile->TargetUnit->Refs );
+	}
+	missile->TargetUnit=NoUnitP;
+    }
 }
 
 /**
@@ -900,7 +912,7 @@ global void FireMissile(Unit* unit)
 	    return;
 	}
 	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
-	    DebugLevel3Fn("Missile-none hits dead unit!\n");
+	    DebugLevel3Fn("Missile hits dead unit!\n");
 	    return;
 	}
     }
@@ -962,7 +974,6 @@ global void FireMissile(Unit* unit)
 	// FIXME: Can this be too near??
     }
 
-
     // Fire to the tile center of the destination.
     dx=dx*TileSizeX+TileSizeX/2;
     dy=dy*TileSizeY+TileSizeY/2;
@@ -970,6 +981,11 @@ global void FireMissile(Unit* unit)
     //
     //	Damage of missile
     //
+    if( goal ) {
+	missile->TargetUnit=goal;
+	RefsDebugCheck( !goal->Refs || goal->Destroyed );
+	goal->Refs++;
+    }
     missile->SourceUnit=unit;
     RefsDebugCheck( !unit->Refs || unit->Destroyed );
     unit->Refs++;
@@ -1230,6 +1246,8 @@ local int PointToPointMissile(Missile* missile)
 
 /**
 **	Work for missile hit.
+**
+**	@param missile	Missile reaching end-point.
 */
 global void MissileHit(const Missile* missile)
 {
@@ -1255,18 +1273,19 @@ global void MissileHit(const Missile* missile)
 	mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
 	mis->Damage = missile->Damage; // direct damage, spells mostly
 	mis->SourceUnit = missile->SourceUnit;
+	// FIXME: should copy target also?
 	if( mis->SourceUnit ) {
+	    RefsDebugCheck( mis->SourceUnit->Destroyed );
 	    RefsDebugCheck( !mis->SourceUnit->Refs );
 	    mis->SourceUnit->Refs++;
 	}
     }
 
-    if( !missile->SourceUnit ) {	// no owner
-	//FIXME: should be removed?
+    if( !missile->SourceUnit ) {	// no owner - green-cross ...
+	DebugLevel3Fn("Missile has no owner!\n");
 	return;
     }
 
-    // FIXME: must choose better goal!
     // FIXME: what can the missile hit?
     // FIXME: "missile-catapult-rock", "missile-ballista-bolt", have area effect
 
@@ -1274,10 +1293,27 @@ global void MissileHit(const Missile* missile)
     y/=TileSizeY;
 
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	// FIXME: this should handled by caller?
+	DebugLevel0Fn("Missile gone outside of map!\n");
 	return;				// outside the map.
     }
 
-    goal=UnitOnMapTile(x,y);
+    //
+    //	Chooce correct goal.
+    //
+    if( !missile->Type->Range && missile->TargetUnit ) {
+	goal=missile->TargetUnit;
+	if( goal->Destroyed || !goal->HP ) {	// Destroyed or dead.
+	    RefsDebugCheck( !goal->Refs );
+	    if( !--goal->Refs ) {
+		ReleaseUnit(goal);
+	    }
+	    return;
+	}
+    } else {
+	goal=UnitOnMapTile(x,y);
+    }
+
     if( !goal || !goal->HP ) {
 	if( WallOnMap(x,y) ) {
 	    DebugLevel3Fn("Missile on wall?\n");
