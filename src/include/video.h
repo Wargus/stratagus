@@ -61,17 +61,10 @@ typedef struct _graphic_ {
 } Graphic;
 
 #ifdef USE_MNG
-#ifdef USE_WIN32
-#define MNG_USE_DLL
-#else
-#define MNG_USE_SO
-#endif
-#include <libmng.h>
-#undef LOCAL
 typedef struct _mng_ {
 	char* Name;
 	FILE* FD;
-	mng_handle Handle;
+	void* Handle;
 	SDL_Surface* Surface;
 	unsigned char* Buffer;
 	unsigned long Ticks;
