@@ -93,7 +93,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     //
     //	open + prepare
     //
-    if( !(fp=CLopen(name)) ) {
+    if( !(fp=CLopen(name,CL_OPEN_READ)) ) {
 	perror("Can't open file");
 	return NULL;
     }

@@ -422,7 +422,7 @@ global Sample *LoadMp3(const char* name, int flags)
     unsigned char magic[2];
     Sample* sample;
 
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
@@ -435,7 +435,7 @@ global Sample *LoadMp3(const char* name, int flags)
 
     // FIXME: ugly way to rewind.
     CLclose(f);
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }

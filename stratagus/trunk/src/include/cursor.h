@@ -227,7 +227,7 @@ extern void InvalidateCursorAreas(void);
     /// Initialize the cursor module
 extern void InitVideoCursors(void);
     /// Save the cursor definitions
-extern void SaveCursors(FILE*);
+extern void SaveCursors(CLFile*);
     /// Cleanup the cursor module
 extern void CleanCursors(void);
     /// Destroy image behind cursor.

@@ -57,7 +57,7 @@ extern Upgrade* UpgradeByIdent(const char*);
     /// init upgrade/allow structures
 extern void InitUpgrades(void);
     /// save the upgrades
-extern void SaveUpgrades(FILE*);
+extern void SaveUpgrades(CLFile*);
     /// cleanup upgrade module
 extern void CleanUpgrades();
 

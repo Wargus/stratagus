@@ -86,23 +86,23 @@ global void InitGroups(void)
 **
 **	@param file	Output file.
 */
-global void SaveGroups(FILE* file)
+global void SaveGroups(CLFile* file)
 {
     int i;
     int g;
     char* ref;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: groups $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: groups $Id$\n\n");
 
     for( g=0; g<NUM_GROUPS; g++ ) {
-	fprintf(file,"(group %d %d '(",g,Groups[g].NumUnits);
+	CLprintf(file,"(group %d %d '(",g,Groups[g].NumUnits);
 	for( i=0; i<Groups[g].NumUnits; ++i ) {
 	    ref=UnitReference(Groups[g].Units[i]);
-	    fprintf(file,"%s ",ref);
+	    CLprintf(file,"%s ",ref);
 	    free(ref);
 	}
-	fprintf(file,"))\n");
+	CLprintf(file,"))\n");
     }
 }
 

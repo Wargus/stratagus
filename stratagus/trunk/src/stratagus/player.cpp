@@ -183,31 +183,31 @@ global void CleanPlayers(void)
 **
 **	@note FIXME: Not complete saved.
 */
-global void SavePlayers(FILE* file)
+global void SavePlayers(CLFile* file)
 {
     int i;
     int j;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: players $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: players $Id$\n\n");
 
 #ifndef NEW_UI
     //
     //	Dump table wc2 race numbers -> internal symbol.
     //
     if( PlayerRaces.Count ) {
-	fprintf(file,"(define-race-names");
+	CLprintf(file,"(define-race-names");
 	for( i=0; i<PlayerRaces.Count; ++i ) {
-	    fprintf(file,"\n  'race '(");
-	    fprintf(file,"\n    race %d",PlayerRaces.Race[i]);
-	    fprintf(file,"\n    name %s",PlayerRaces.Name[i]);
-	    fprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    CLprintf(file,"\n  'race '(");
+	    CLprintf(file,"\n    race %d",PlayerRaces.Race[i]);
+	    CLprintf(file,"\n    name %s",PlayerRaces.Name[i]);
+	    CLprintf(file,"\n    display %s",PlayerRaces.Display[i]);
 	    if( PlayerRaces.Visible[i] ) {
-		fprintf(file,"\n    visible");
+		CLprintf(file,"\n    visible");
 	    }
-	    fprintf(file,")");
+	    CLprintf(file,")");
 	}
-	fprintf(file,")\n\n");
+	CLprintf(file,")\n\n");
     }
 #endif
 
@@ -215,118 +215,118 @@ global void SavePlayers(FILE* file)
     //	Dump table wc2 race numbers -> internal symbol.
     //
     if( PlayerRaces.Count ) {
-	fprintf(file,"(define-race-names");
+	CLprintf(file,"(define-race-names");
 	for( i=0; i<PlayerRaces.Count; ++i ) {
-	    fprintf(file,"\n  'race '(");
-	    fprintf(file,"\n    race %d",PlayerRaces.Race[i]);
-	    fprintf(file,"\n    name %s",PlayerRaces.Name[i]);
-	    fprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    CLprintf(file,"\n  'race '(");
+	    CLprintf(file,"\n    race %d",PlayerRaces.Race[i]);
+	    CLprintf(file,"\n    name %s",PlayerRaces.Name[i]);
+	    CLprintf(file,"\n    display %s",PlayerRaces.Display[i]);
 	    if( PlayerRaces.Visible[i] ) {
-		fprintf(file,"\n    visible");
+		CLprintf(file,"\n    visible");
 	    }
-	    fprintf(file,")");
+	    CLprintf(file,")");
 	}
-	fprintf(file,")\n\n");
+	CLprintf(file,")\n\n");
     }
 
     //
     //	Dump all players
     //
     for( i=0; i<NumPlayers; ++i ) {
-	fprintf(file,"(player %d\n",i);
-	fprintf(file,"  'name \"%s\"\n",Players[i].Name);
-	fprintf(file,"  'type ");
+	CLprintf(file,"(player %d\n",i);
+	CLprintf(file,"  'name \"%s\"\n",Players[i].Name);
+	CLprintf(file,"  'type ");
 	switch( Players[i].Type ) {
-	    case PlayerNeutral:	      fprintf(file,"'neutral");		break;
-	    case PlayerNobody:	      fprintf(file,"'nobody");		break;
-	    case PlayerComputer:      fprintf(file,"'computer");	break;
-	    case PlayerPerson:	      fprintf(file,"'person");		break;
-	    case PlayerRescuePassive: fprintf(file,"'rescue-passive");	break;
-	    case PlayerRescueActive:  fprintf(file,"'rescue-active");	break;
-	    default:		      fprintf(file,"%d",Players[i].Type); break;
+	    case PlayerNeutral:	      CLprintf(file,"'neutral");		break;
+	    case PlayerNobody:	      CLprintf(file,"'nobody");		break;
+	    case PlayerComputer:      CLprintf(file,"'computer");	break;
+	    case PlayerPerson:	      CLprintf(file,"'person");		break;
+	    case PlayerRescuePassive: CLprintf(file,"'rescue-passive");	break;
+	    case PlayerRescueActive:  CLprintf(file,"'rescue-active");	break;
+	    default:		      CLprintf(file,"%d",Players[i].Type); break;
 	}
-	fprintf(file," 'race \"%s\"",Players[i].RaceName);
-	fprintf(file," 'ai %d\n",Players[i].AiNum);
-	fprintf(file,"  'team %d",Players[i].Team);
+	CLprintf(file," 'race \"%s\"",Players[i].RaceName);
+	CLprintf(file," 'ai %d\n",Players[i].AiNum);
+	CLprintf(file,"  'team %d",Players[i].Team);
 
-	fprintf(file," 'enemy \"");
+	CLprintf(file," 'enemy \"");
 	for( j=0; j<PlayerMax; ++j ) {
-	    fputc((Players[i].Enemy&(1<<j)) ? 'X' : '_',file);
+	    CLprintf(file,"%c",(Players[i].Enemy&(1<<j)) ? 'X' : '_');
 	}
-	fprintf(file,"\" 'allied \"");
+	CLprintf(file,"\" 'allied \"");
 	for( j=0; j<PlayerMax; ++j ) {
-	    fputc((Players[i].Allied&(1<<j)) ? 'X' : '_',file);
+	    CLprintf(file,"%c",(Players[i].Allied&(1<<j)) ? 'X' : '_');
 	}
-	fprintf(file,"\" 'shared-vision \"");
+	CLprintf(file,"\" 'shared-vision \"");
 	for( j=0; j<PlayerMax; ++j ) {
-	    fputc((Players[i].SharedVision&(1<<j)) ? 'X' : '_',file);
+	    CLprintf(file,"%c",(Players[i].SharedVision&(1<<j)) ? 'X' : '_');
 	}
-	fprintf(file,"\"\n  'start '(%d %d)\n",Players[i].StartX,
+	CLprintf(file,"\"\n  'start '(%d %d)\n",Players[i].StartX,
 		Players[i].StartY);
 
 	// Resources
-	fprintf(file,"  'resources '(");
+	CLprintf(file,"  'resources '(");
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( j ) {
 		if( j==MaxCosts/2 ) {
-		    fputs("\n    ",file);
+		    CLprintf(file,"\n    ");
 		} else {
-		    fputc(' ',file);
+		    CLprintf(file," ");
 		}
 	    }
-	    fprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Resources[j]);
+	    CLprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Resources[j]);
 	}
 	// Incomes
-	fprintf(file,")\n  'incomes '(");
+	CLprintf(file,")\n  'incomes '(");
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( j ) {
 		if( j==MaxCosts/2 ) {
-		    fputs("\n    ",file);
+		    CLprintf(file,"\n    ");
 		} else {
-		    fputc(' ',file);
+		    CLprintf(file," ");
 		}
 	    }
-	    fprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Incomes[j]);
+	    CLprintf(file,"%s %d",DefaultResourceNames[j],Players[i].Incomes[j]);
 	}
-	fprintf(file,";;FIXME: new members must be saved\n");
+	CLprintf(file,";;FIXME: new members must be saved\n");
 
 	// UnitTypesCount done by load units.
 
-	fprintf(file,")\n  '%s\n",Players[i].AiEnabled ?
+	CLprintf(file,")\n  '%s\n",Players[i].AiEnabled ?
 		"ai-enabled" : "ai-disabled");
 
 	// Ai done by load ais.
 
-	fprintf (file, "  'food %d", Players[i].Food);
-	fprintf(file," 'food-unit-limit %d",Players[i].FoodUnitLimit);
-	fprintf(file," 'building-limit %d",Players[i].BuildingLimit);
-	fprintf(file," 'total-unit-limit %d",Players[i].TotalUnitLimit);
+	CLprintf (file, "  'food %d", Players[i].Food);
+	CLprintf(file," 'food-unit-limit %d",Players[i].FoodUnitLimit);
+	CLprintf(file," 'building-limit %d",Players[i].BuildingLimit);
+	CLprintf(file," 'total-unit-limit %d",Players[i].TotalUnitLimit);
 
-	fprintf(file,"\n  'score %d",Players[i].Score);
-	fprintf(file,"\n  'total-units %d",Players[i].TotalUnits);
-	fprintf(file,"\n  'total-buildings %d",Players[i].TotalBuildings);
-	fprintf(file,"\n  'total-razings %d",Players[i].TotalRazings);
-	fprintf(file,"\n  'total-kills %d",Players[i].TotalKills);
-	fprintf(file,"\n  'total-resources '(");
+	CLprintf(file,"\n  'score %d",Players[i].Score);
+	CLprintf(file,"\n  'total-units %d",Players[i].TotalUnits);
+	CLprintf(file,"\n  'total-buildings %d",Players[i].TotalBuildings);
+	CLprintf(file,"\n  'total-razings %d",Players[i].TotalRazings);
+	CLprintf(file,"\n  'total-kills %d",Players[i].TotalKills);
+	CLprintf(file,"\n  'total-resources '(");
 	for( j=0; j<MaxCosts; ++j ) {
-	    fprintf(file,"%d ",Players[i].TotalResources[j]);
+	    CLprintf(file,"%d ",Players[i].TotalResources[j]);
 	}
-	fprintf(file,")");
+	CLprintf(file,")");
 
 	// Colors done by init code.
 
 	// Allow saved by allow.
 
-	fprintf(file,"\n  'timers '(");
+	CLprintf(file,"\n  'timers '(");
 	for( j=0; j<UpgradeMax; ++j ) {
 	    if( j ) {
-		fputc(' ',file);
+		CLprintf(file," ");
 	    }
-	    fprintf(file,"%d",Players[i].UpgradeTimers.Upgrades[j]);
+	    CLprintf(file,"%d",Players[i].UpgradeTimers.Upgrades[j]);
 	}
-	fprintf(file,")");
+	CLprintf(file,")");
 
-	fprintf(file,")\n\n");
+	CLprintf(file,")\n\n");
     }
 
     DebugLevel0Fn("FIXME: must unit-stats?\n");
@@ -334,7 +334,7 @@ global void SavePlayers(FILE* file)
     //
     //	Dump local variables
     //
-    fprintf(file,"(set-this-player! %d)\n\n",ThisPlayer->Player);
+    CLprintf(file,"(set-this-player! %d)\n\n",ThisPlayer->Player);
 }
 
 /**

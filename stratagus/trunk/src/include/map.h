@@ -474,7 +474,7 @@ extern void MapCclRegister(void);
     /// Load a map
 //extern void LoadMap(const char* file,WorldMap* map);
     /// Save the map
-extern void SaveMap(FILE* file);
+extern void SaveMap(CLFile* file);
     /// Clean the map
 extern void CleanMap(void);
 

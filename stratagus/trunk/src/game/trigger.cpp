@@ -1100,7 +1100,7 @@ global void TriggerCclRegister(void)
 **	@param exp	Expression
 **	@param f	File to print to
 */
-local void PrintTrigger(SCM exp, FILE *f)
+local void PrintTrigger(SCM exp, CLFile *f)
 {
 #ifdef USE_GUILE
 #else
@@ -1113,20 +1113,20 @@ local void PrintTrigger(SCM exp, FILE *f)
     INTERRUPT_CHECK();
     switch TYPE(exp) {
     case tc_nil:
-	fprintf(f,"()");
+	CLprintf(f,"()");
 	break;
     case tc_cons:
-	fprintf(f,"(");
+	CLprintf(f,"(");
 	PrintTrigger(car(exp),f);
 	for(tmp=cdr(exp);CONSP(tmp);tmp=cdr(tmp)) {
-	    fprintf(f," ");
+	    CLprintf(f," ");
 	    PrintTrigger(car(tmp),f);
 	}
 	if NNULLP(tmp) {
-	    fprintf(f," . ");
+	    CLprintf(f," . ");
 	    PrintTrigger(tmp,f);
 	}
-	fprintf(f,")");
+	CLprintf(f,")");
 	break;
     case tc_flonum:
 	n = (long) FLONM(exp);
@@ -1135,10 +1135,10 @@ local void PrintTrigger(SCM exp, FILE *f)
 	} else {
 	    sprintf(tkbuffer,"%g",FLONM(exp));
 	}
-	fprintf(f,tkbuffer);
+	CLprintf(f,tkbuffer);
 	break;
     case tc_symbol:
-	fprintf(f,PNAME(exp));
+	CLprintf(f,PNAME(exp));
 	break;
     case tc_subr_0:
     case tc_subr_1:
@@ -1151,22 +1151,22 @@ local void PrintTrigger(SCM exp, FILE *f)
     case tc_fsubr:
     case tc_msubr:
 	sprintf(tkbuffer,"#<%s ",subr_kind_str(TYPE(exp)));
-	fprintf(f,tkbuffer);
-	fprintf(f,(*exp).storage_as.subr.name);
-	fprintf(f,">");
+	CLprintf(f,tkbuffer);
+	CLprintf(f,(*exp).storage_as.subr.name);
+	CLprintf(f,">");
 	break;
     case tc_string:
-	fprintf(f,"\"%s\"",(*exp).storage_as.string.data);
+	CLprintf(f,"\"%s\"",(*exp).storage_as.string.data);
 	break;
     case tc_closure:
-	fprintf(f,"(lambda ");
+	CLprintf(f,"(lambda ");
 	if CONSP((*exp).storage_as.closure.code) {
 	    PrintTrigger(car((*exp).storage_as.closure.code),f);
-	    fprintf(f," ");
+	    CLprintf(f," ");
 	    PrintTrigger(cdr((*exp).storage_as.closure.code),f);
 	} else
 	    PrintTrigger((*exp).storage_as.closure.code,f);
-	fprintf(f,")");
+	CLprintf(f,")");
 	break;
     default:
 	break;
@@ -1176,7 +1176,7 @@ local void PrintTrigger(SCM exp, FILE *f)
 	    (*p->prin1)(exp,f);
 	else {
 	    sprintf(tkbuffer,"#<UNKNOWN %d %p>",TYPE(exp),exp);
-	    fprintf(f,tkbuffer);
+	    CLprintf(f,tkbuffer);
 	}
 #endif
     }
@@ -1188,14 +1188,14 @@ local void PrintTrigger(SCM exp, FILE *f)
 **
 **	@param file	Open file to print to
 */
-global void SaveTriggers(FILE* file)
+global void SaveTriggers(CLFile* file)
 {
     SCM list;
     int i;
     int trigger;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: trigger $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: trigger $Id$\n\n");
 
     i=0;
     trigger=-1;
@@ -1204,21 +1204,21 @@ global void SaveTriggers(FILE* file)
 	if( gh_eq_p(Trigger,list) ) {
 	    trigger=i;
 	}
-	fprintf(file,"(add-trigger '");
+	CLprintf(file,"(add-trigger '");
 	PrintTrigger(gh_car(gh_car(list)),file);
-	fprintf(file," '");
+	CLprintf(file," '");
 	PrintTrigger(gh_cdr(gh_car(list)),file);
-	fprintf(file,")\n");
+	CLprintf(file,")\n");
 	list=gh_cdr(list);
 	++i;
     }
-    fprintf(file,"(set-trigger-number! %d)\n",trigger);
+    CLprintf(file,"(set-trigger-number! %d)\n",trigger);
 
     if( GameTimer.Init ) {
-	fprintf(file,"(action-set-timer %ld %d)\n",
+	CLprintf(file,"(action-set-timer %ld %d)\n",
 	    GameTimer.Cycles,GameTimer.Increasing);
 	if( GameTimer.Running ) {
-	    fprintf(file,"(action-start-timer)\n");
+	    CLprintf(file,"(action-start-timer)\n");
 	}
     }
 }

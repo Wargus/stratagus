@@ -427,7 +427,7 @@ global void ShowIntro(const Intro *intro)
 #endif
 
     LibraryFileName(intro->TextFile,buf);
-    if( !(file=CLopen(buf)) ) {
+    if( !(file=CLopen(buf,CL_OPEN_READ)) ) {
 	fprintf(stderr,"Can't open file `%s'\n",intro->TextFile);
 	ExitFatal(-1);
     }
@@ -1582,16 +1582,16 @@ global void ObjectivesCclRegister(void)
 /**
 **	Save the objectives.
 */
-global void SaveObjectives(FILE *file)
+global void SaveObjectives(CLFile *file)
 {
     int i;
 
     if( GameIntro.Objectives[0] ) {
-	fprintf(file,"(set-objectives!");
+	CLprintf(file,"(set-objectives!");
 	for( i=0; i<MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i ) {
-	    fprintf(file,"\n  \"%s\"",GameIntro.Objectives[i]);
+	    CLprintf(file,"\n  \"%s\"",GameIntro.Objectives[i]);
 	}
-	fprintf(file,")\n");
+	CLprintf(file,")\n");
     }
 }
 

@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "etlib/hash.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Documentation
@@ -334,7 +335,7 @@ extern Tileset** Tilesets;		/// Tileset information
 ----------------------------------------------------------------------------*/
 
 extern void LoadTileset(void);		/// Load tileset definition
-extern void SaveTilesets(FILE*);	/// Save the tileset configuration
+extern void SaveTilesets(CLFile*file);	/// Save the tileset configuration
 extern void CleanTilesets(void);	/// Cleanup the tileset module
 
 extern void TilesetCclRegister(void);	/// Register CCL features for tileset

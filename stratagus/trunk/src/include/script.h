@@ -148,6 +148,8 @@ typedef long ccl_smob_type_t;
 
 #endif // !USE_GUILE
 
+#include "iolib.h"
+
 //extern SCM CclEachSecond;		/// Scheme function called each second
 
 /*----------------------------------------------------------------------------
@@ -171,7 +173,7 @@ extern void CclGcProtect(SCM obj);	/// Protect scm object for GC
 extern void CclGcUnprotect(SCM obj);	/// Unprotect scm object for GC
 extern void InitCcl(void);		/// Initialise ccl
 extern void LoadCcl(void);		/// Load ccl config file
-extern void SaveCcl(FILE* file);	/// Save CCL module
+extern void SaveCcl(CLFile* file);	/// Save CCL module
 extern void SavePreferences(void);	/// Save user preferences
 extern void CclCommand(const char*);	/// Execute a ccl command
 extern void CclFree(void*);		/// Save free

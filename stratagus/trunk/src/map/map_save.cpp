@@ -61,98 +61,98 @@
 **
 **	@param file	Output file.
 */
-global void SaveMap(FILE* file)
+global void SaveMap(CLFile* file)
 {
     int w;
     int h;
     int i;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: map $Id$\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: map $Id$\n");
 
-    fprintf(file,"(stratagus-map\n");
+    CLprintf(file,"(stratagus-map\n");
 
-    fprintf(file,"  'version \"" StratagusFormatString "\"\n",
+    CLprintf(file,"  'version \"" StratagusFormatString "\"\n",
 	    StratagusFormatArgs(StratagusVersion));
-    fprintf(file,"  'description \"%s\"\n",TheMap.Description);
+    CLprintf(file,"  'description \"%s\"\n",TheMap.Description);
 
-    fprintf(file,"  'the-map '(\n");
+    CLprintf(file,"  'the-map '(\n");
 
     // FIXME: Why terrain? TheMap->Tileset->Class should be correct
-    fprintf(file,"  terrain (%s \"%s\")\n"
+    CLprintf(file,"  terrain (%s \"%s\")\n"
 	    ,TheMap.TerrainName,Tilesets[TheMap.Terrain]->Class);
 
-    fprintf(file,"  size (%d %d)\n",TheMap.Width,TheMap.Height);
-    fprintf(file,"  %s\n",TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
+    CLprintf(file,"  size (%d %d)\n",TheMap.Width,TheMap.Height);
+    CLprintf(file,"  %s\n",TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 
-    fprintf(file,"  map-fields (\n");
+    CLprintf(file,"  map-fields (\n");
     for( h=0; h<TheMap.Height; ++h ) {
-	fprintf(file,"  ; %d\n",h);
+	CLprintf(file,"  ; %d\n",h);
 	for( w=0; w<TheMap.Width; ++w ) {
 	    MapField* mf;
 
 	    mf=&TheMap.Fields[h*TheMap.Width+w];
-	    fprintf(file,"  (%3d %3d",mf->Tile,mf->SeenTile);
+	    CLprintf(file,"  (%3d %3d",mf->Tile,mf->SeenTile);
 	    if( mf->Value ) {
-		fprintf(file," %d",mf->Value);
+		CLprintf(file," %d",mf->Value);
 	    }
 	    for( i=0; i < PlayerMax; ++i ) {
 		if( mf->Visible[i] == 1) {
-		    fprintf(file," explored %d",i);
+		    CLprintf(file," explored %d",i);
 		}
 	    }
 	    if( mf->Flags&MapFieldHuman ) {
-		fprintf(file," human");
+		CLprintf(file," human");
 	    }
 	    if( mf->Flags&MapFieldLandAllowed ) {
-		fprintf(file," land");
+		CLprintf(file," land");
 	    }
 	    if( mf->Flags&MapFieldCoastAllowed ) {
-		fprintf(file," coast");
+		CLprintf(file," coast");
 	    }
 	    if( mf->Flags&MapFieldWaterAllowed ) {
-		fprintf(file," water");
+		CLprintf(file," water");
 	    }
 	    if( mf->Flags&MapFieldNoBuilding ) {
-		fprintf(file," mud");
+		CLprintf(file," mud");
 	    }
 	    if( mf->Flags&MapFieldUnpassable ) {
-		fprintf(file," block");
+		CLprintf(file," block");
 	    }
 	    if( mf->Flags&MapFieldWall ) {
-		fprintf(file," wall");
+		CLprintf(file," wall");
 	    }
 	    if( mf->Flags&MapFieldRocks ) {
-		fprintf(file," rock");
+		CLprintf(file," rock");
 	    }
 	    if( mf->Flags&MapFieldForest ) {
-		fprintf(file," wood");
+		CLprintf(file," wood");
 	    }
 #if 1
 	    // Not Required for save
 	    // These are required for now, UnitType::FieldFlags is 0 until
 	    // UpdateStats is called which is after the game is loaded
 	    if( mf->Flags&MapFieldLandUnit ) {
-		fprintf(file," ground");
+		CLprintf(file," ground");
 	    }
 	    if( mf->Flags&MapFieldAirUnit ) {
-		fprintf(file," air");
+		CLprintf(file," air");
 	    }
 	    if( mf->Flags&MapFieldSeaUnit ) {
-		fprintf(file," sea");
+		CLprintf(file," sea");
 	    }
 	    if( mf->Flags&MapFieldBuilding ) {
-		fprintf(file," building");
+		CLprintf(file," building");
 	    }
 #endif
 	    if( w&1 ) {
-		fprintf(file,")\n");
+		CLprintf(file,")\n");
 	    } else {
-		fprintf(file,")\t");
+		CLprintf(file,")\t");
 	    }
 	}
     }
-    fprintf(file,")))\n");
+    CLprintf(file,")))\n");
 }
 
 //@}

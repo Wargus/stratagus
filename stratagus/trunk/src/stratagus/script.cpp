@@ -1149,15 +1149,15 @@ global void LoadCcl(void)
 **
 **	@param file	Save file.
 */
-global void SaveCcl(FILE* file)
+global void SaveCcl(CLFile* file)
 {
 #ifdef USE_GUILE
 #else
     SCM list;
     extern SCM oblistvar;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: CCL $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: CCL $Id$\n\n");
 
     for(list = oblistvar; gh_list_p(list); list = gh_cdr(list) ) {
 	SCM sym;
@@ -1166,14 +1166,14 @@ global void SaveCcl(FILE* file)
 	if(symbol_boundp(sym, NIL)) {
 	    SCM value;
 
-	    fprintf(file,";;(define %s\n",get_c_string(sym));
+	    CLprintf(file,";;(define %s\n",get_c_string(sym));
 	    value = symbol_value(sym, NIL);
-	    fprintf(file,";;");
-	    lprin1f(value,file);
-	    fprintf(file,"\n");
+	    CLprintf(file,";;");
+	    lprin1CL(value,file);
+	    CLprintf(file,"\n");
 #ifdef DEBUG
 	} else {
-	    fprintf(file,";;%s unbound\n",get_c_string(sym));
+	    CLprintf(file,";;%s unbound\n",get_c_string(sym));
 #endif
 	}
     }

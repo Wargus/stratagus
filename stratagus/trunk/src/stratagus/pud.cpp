@@ -360,7 +360,7 @@ global MapInfo* GetPudInfo(const char* pud)
     unsigned short temp_short;
     // FIXME: Reuse the temporary alloca buffer...
 
-    if( !(input=CLopen(pud)) ) {
+    if( !(input=CLopen(pud,CL_OPEN_READ)) ) {
 	fprintf(stderr,"Try ./path/name\n");
 	fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 	return NULL;
@@ -813,7 +813,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     if (!map->Info) {
 	map->Info = GetPudInfo(pud);
     }
-    if( !(input=CLopen(pud)) ) {
+    if( !(input=CLopen(pud,CL_OPEN_READ)) ) {
 	fprintf(stderr,"Try ./path/name\n");
 	fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 	ExitFatal(-1);

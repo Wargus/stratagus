@@ -543,92 +543,92 @@ global void ParsePudUGRD(const char* ugrd,int length __attribute__((unused)))
 **
 **	@param file	Output file.
 */
-global void SaveUpgrades(FILE* file)
+global void SaveUpgrades(CLFile* file)
 {
     int i;
     int j;
     int p;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: upgrades $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: upgrades $Id$\n\n");
 
     /* remove?
     //
     //	Save all upgrades
     //
     for( i=0; i<NumUpgrades; ++i ) {
-	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
+	CLprintf(file,"(define-upgrade '%s 'icon '%s\n"
 		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
-	fprintf(file,"  'costs #(");
+	CLprintf(file,"  'costs #(");
 	for( j=0; j<MaxCosts; ++j ) {
-	    fprintf(file," %5d",Upgrades[i].Costs[j]);
+	    CLprintf(file," %5d",Upgrades[i].Costs[j]);
 	}
-	fprintf(file,"))\n");
+	CLprintf(file,"))\n");
     }
-    fprintf(file,"\n");
+    CLprintf(file,"\n");
     */
 
     //
     //	Save all upgrades
     //
     for( i=0; i<NumUpgrades; ++i ) {
-	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
+	CLprintf(file,"(define-upgrade '%s 'icon '%s\n"
 		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
-	fprintf(file,"  'costs #(");
+	CLprintf(file,"  'costs #(");
 	for( j=0; j<MaxCosts; ++j ) {
-	    fprintf(file," %5d",Upgrades[i].Costs[j]);
+	    CLprintf(file," %5d",Upgrades[i].Costs[j]);
 	}
 
-	fprintf(file,"))\n");
+	CLprintf(file,"))\n");
     }
-    fprintf(file,"\n");
+    CLprintf(file,"\n");
 
     //
     //	Save all upgrade modifiers.
     //
     for( i=0; i<NumUpgradeModifiers; ++i ) {
-	fprintf(file,"(define-modifier '%s",
+	CLprintf(file,"(define-modifier '%s",
 		Upgrades[UpgradeModifiers[i]->UpgradeId].Ident);
 
 	if( UpgradeModifiers[i]->Modifier.AttackRange ) {
-	    fprintf(file,"\n  '(attack-range %d)"
+	    CLprintf(file,"\n  '(attack-range %d)"
 		    ,UpgradeModifiers[i]->Modifier.AttackRange );
 	}
 	if( UpgradeModifiers[i]->Modifier.SightRange ) {
-	    fprintf(file,"\n  '(sight-range %d)"
+	    CLprintf(file,"\n  '(sight-range %d)"
 		    ,UpgradeModifiers[i]->Modifier.SightRange );
 	}
 	if( UpgradeModifiers[i]->Modifier.BasicDamage ) {
-	    fprintf(file,"\n  '(basic-damage %d)"
+	    CLprintf(file,"\n  '(basic-damage %d)"
 		    ,UpgradeModifiers[i]->Modifier.BasicDamage );
 	}
 	if( UpgradeModifiers[i]->Modifier.PiercingDamage ) {
-	    fprintf(file,"\n  '(piercing-damage %d)"
+	    CLprintf(file,"\n  '(piercing-damage %d)"
 		    ,UpgradeModifiers[i]->Modifier.PiercingDamage );
 	}
 	if( UpgradeModifiers[i]->Modifier.Armor ) {
-	    fprintf(file,"\n  '(armor %d)"
+	    CLprintf(file,"\n  '(armor %d)"
 		    ,UpgradeModifiers[i]->Modifier.Armor );
 	}
 	if( UpgradeModifiers[i]->Modifier.Speed ) {
-	    fprintf(file,"\n  '(speed %d)"
+	    CLprintf(file,"\n  '(speed %d)"
 		    ,UpgradeModifiers[i]->Modifier.Speed );
 	}
 	if( UpgradeModifiers[i]->Modifier.HitPoints ) {
-	    fprintf(file,"\n  '(hit-points %d)"
+	    CLprintf(file,"\n  '(hit-points %d)"
 		    ,UpgradeModifiers[i]->Modifier.HitPoints );
 	}
 
 	for( j=0; j<MaxCosts; ++j ) {
 	    if( UpgradeModifiers[i]->Modifier.Costs[j] ) {
-		fprintf(file,"\n  '(%s-cost %d)"
+		CLprintf(file,"\n  '(%s-cost %d)"
 		    ,DefaultResourceNames[j],UpgradeModifiers[i]->Modifier.Costs[j]);
 	    }
 	}
 
 	for( j=0; j<UnitTypeMax; ++j ) {	// allow/forbid units
 	    if( UpgradeModifiers[i]->ChangeUnits[j]!='?' ) {
-		fprintf(file,"\n  '(allow %s %d)",
+		CLprintf(file,"\n  '(allow %s %d)",
 			UnitTypes[j]->Ident,
 			UpgradeModifiers[i]->ChangeUnits[j]);
 	    }
@@ -636,65 +636,65 @@ global void SaveUpgrades(FILE* file)
 
 	for( j=0; j<UpgradeMax; ++j ) {		// allow/forbid upgrades
 	    if( UpgradeModifiers[i]->ChangeUpgrades[j]!='?' ) {
-		fprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
+		CLprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
 			UpgradeModifiers[i]->ChangeUpgrades[j]);
 	    }
 	}
 
 	for( j=0; j<UnitTypeMax; ++j ) {	// apply to units
 	    if( UpgradeModifiers[i]->ApplyTo[j]!='?' ) {
-		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j]->Ident);
+		CLprintf(file,"\n  '(apply-to %s)",UnitTypes[j]->Ident);
 	    }
 	}
 
 	if( UpgradeModifiers[i]->ConvertTo ) {
-	    fprintf(file,"\n  '(convert-to %s)",
+	    CLprintf(file,"\n  '(convert-to %s)",
 		    ((UnitType*)UpgradeModifiers[i]->ConvertTo)->Ident);
 	}
 
-	fprintf(file,")\n\n");
+	CLprintf(file,")\n\n");
     }
 
     //
     //	Save the allow
     //
     for( i=0; i<NumUnitTypes; ++i ) {
-	fprintf(file,"(define-allow '%s\t",UnitTypes[i]->Ident);
+	CLprintf(file,"(define-allow '%s\t",UnitTypes[i]->Ident);
 	if( strlen(UnitTypes[i]->Ident)<9 ) {
-	    fprintf(file,"\t\t\t\"");
+	    CLprintf(file,"\t\t\t\"");
 	} else if( strlen(UnitTypes[i]->Ident)<17 ) {
-	    fprintf(file,"\t\t\"");
+	    CLprintf(file,"\t\t\"");
 	} else if( strlen(UnitTypes[i]->Ident)<25 ) {
-	    fprintf(file,"\t\"");
+	    CLprintf(file,"\t\"");
 	} else {
-	    fprintf(file,"\"");
+	    CLprintf(file,"\"");
 	}
 	for( p=0; p<PlayerMax; ++p ) {
-	    fprintf(file,"%c",Players[p].Allow.Units[i]);
+	    CLprintf(file,"%c",Players[p].Allow.Units[i]);
 	}
-	fprintf(file,"\")\n");
+	CLprintf(file,"\")\n");
     }
-    fprintf(file,"\n");
+    CLprintf(file,"\n");
 
     //
     //	Save the upgrades
     //
     for( i=0; i<NumUpgrades; ++i ) {
-	fprintf(file,"(define-allow '%s\t",Upgrades[i].Ident);
+	CLprintf(file,"(define-allow '%s\t",Upgrades[i].Ident);
 	if( strlen(Upgrades[i].Ident)<9 ) {
-	    fprintf(file,"\t\t\t\"");
+	    CLprintf(file,"\t\t\t\"");
 	} else if( strlen(Upgrades[i].Ident)<17 ) {
-	    fprintf(file,"\t\t\"");
+	    CLprintf(file,"\t\t\"");
 	} else if( strlen(Upgrades[i].Ident)<25 ) {
-	    fprintf(file,"\t\"");
+	    CLprintf(file,"\t\"");
 	} else {
-	    fprintf(file,"\"");
+	    CLprintf(file,"\"");
 	}
 	for( p=0; p<PlayerMax; ++p ) {
-	    fprintf(file,"%c",Players[p].Allow.Upgrades[i]);
+	    CLprintf(file,"%c",Players[p].Allow.Upgrades[i]);
 	}
-	fprintf(file,"\"");
-	fprintf(file,")\n");
+	CLprintf(file,"\"");
+	CLprintf(file,")\n");
     }
 }
 
