@@ -171,7 +171,7 @@ global void CommandQuit(int player)
 	    }
 	    Players[i].SharedVision &= ~(1 << player);
 	    Players[player].Allied &= ~(1 << i);
-	    Players[player].Enemy & =~(1 << i);
+	    Players[player].Enemy &= ~(1 << i);
 	    Players[player].SharedVision &= ~(1 << i);
 	}
 	SetMessage("Player \"%s\" has left the game", Players[player].Name);
