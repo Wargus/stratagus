@@ -677,7 +677,7 @@ global void UpdateDisplay(void)
 					 TheUI.Filler[i].Graphic->Height);
 			}
 		}
-		if(MustRedraw & RedrawMenuButton) {
+		if (MustRedraw & RedrawMenuButton) {
 			if (NetworkFildes == (Socket)-1) {
 				if (TheUI.MenuButton.X != -1) {
 					InvalidateAreaAndCheckCursor(
@@ -921,9 +921,6 @@ global void GameMainLoop(void)
 			}
 		}
 
-#if defined(DEBUG) && !defined(FLAG_DEBUG)
-		MustRedraw |= RedrawMenuButton;
-#endif
 		if (FastForwardCycle > GameCycle &&
 				RealVideoSyncSpeed != VideoSyncSpeed) {
 			RealVideoSyncSpeed = VideoSyncSpeed;
