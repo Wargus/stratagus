@@ -88,7 +88,7 @@ local int LcmPreventRecurse;		/// prevent recursion through LoadGameMap
 **	@param map	map loaded
 */
 local void LoadStratagusMap(const char* filename,
-	WorldMap* map __attribute__((unused)))
+    WorldMap* map __attribute__((unused)))
 {
     DebugLevel3Fn("%p \n" _C_ map);
 
@@ -104,7 +104,7 @@ local void LoadStratagusMap(const char* filename,
 #if 0
     // Not true if multiplayer levels!
     if (!ThisPlayer) {		/// ARI: bomb if nothing was loaded!
-	fprintf(stderr,"%s: invalid Stratagus map\n", filename);
+	fprintf(stderr, "%s: invalid Stratagus map\n", filename);
 	ExitFatal(-1);
     }
     // FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
@@ -507,7 +507,7 @@ global void CreateGame(char* filename, WorldMap* map)
     }
 #endif
     ViewportCenterViewpoint(TheUI.SelectedViewport,
-	    ThisPlayer->StartX, ThisPlayer->StartY);
+	ThisPlayer->StartX, ThisPlayer->StartY);
 
     //
     //	Various hacks wich must be done after the map is loaded.

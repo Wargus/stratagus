@@ -165,7 +165,7 @@ local CompareFunction GetCompareFunction(const char* op)
 	    return &CompareEq;
 	}
     } else if (op[0] == '>') {
-	if (op[1] == '=' && op[2] == '\0' ) {
+	if (op[1] == '=' && op[2] == '\0') {
 	    return &CompareGrEq;
 	} else if (op[1] == '\0') {
 	    return &CompareGr;
@@ -176,7 +176,7 @@ local CompareFunction GetCompareFunction(const char* op)
 	} else if (op[1] == '\0') {
 	    return &CompareLe;
 	}
-    } else if (op[0] == '!' && op[1] == '=' && op[2] == '\0' ) {
+    } else if (op[0] == '!' && op[1] == '=' && op[2] == '\0') {
 	return &CompareNEq;
     }
     return NULL;
@@ -376,13 +376,11 @@ local SCM CclIfNearUnit(SCM player, SCM operation, SCM quantity, SCM unit,
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
 	if (unit->Type->UnitType == UnitTypeLand) {
-	    an = SelectUnits(
-		unit->X - 1, unit->Y - 1,
+	    an = SelectUnits(unit->X - 1, unit->Y - 1,
 		unit->X + unit->Type->TileWidth + 1,
 		unit->Y + unit->Type->TileHeight + 1, around);
 	} else {
-	    an = SelectUnits(
-		unit->X - 2, unit->Y - 2,
+	    an = SelectUnits(unit->X - 2, unit->Y - 2,
 		unit->X + unit->Type->TileWidth + 2,
 		unit->Y + unit->Type->TileHeight + 2, around);
 	}
@@ -470,13 +468,11 @@ local SCM CclIfRescuedNearUnit(SCM player, SCM operation, SCM quantity, SCM unit
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
 	if (unit->Type->UnitType == UnitTypeLand) {
-	    an=SelectUnits(
-		unit->X - 1, unit->Y - 1,
+	    an = SelectUnits(unit->X - 1, unit->Y - 1,
 		unit->X + unit->Type->TileWidth + 1,
 		unit->Y + unit->Type->TileHeight + 1, around);
 	} else {
-	    an=SelectUnits(
-		unit->X - 2, unit->Y - 2,
+	    an = SelectUnits(unit->X - 2, unit->Y - 2,
 		unit->X + unit->Type->TileWidth + 2,
 		unit->Y + unit->Type->TileHeight + 2, around);
 	}
@@ -596,7 +592,7 @@ local SCM CclIfResource(SCM player, SCM operation, SCM quantity, SCM resource)
 	plynr = 0;
 	pn = PlayerMax;
     } else {
-	pn = plynr+1;
+	pn = plynr + 1;
     }
 
     for (i = 0; i < MaxCosts; ++i) {

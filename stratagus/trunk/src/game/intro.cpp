@@ -105,10 +105,10 @@ local int ContinueButtonFlags;		/// Flags for continue button
 local void IntroCallbackButton1(unsigned button)
 {
     if (UseContinueButton) {
-	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX
-		&& CursorX <= ContinueButtonX + 106
-		&& ContinueButtonY <= CursorY
-		&& CursorY <= ContinueButtonY + 27) {
+	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX &&
+		CursorX <= ContinueButtonX + 106 &&
+		ContinueButtonY <= CursorY &&
+		CursorY <= ContinueButtonY + 27) {
 	    ContinueButtonFlags |= MenuButtonClicked;
 	}
     } else {
@@ -123,11 +123,11 @@ local void IntroCallbackButton1(unsigned button)
 local void IntroCallbackButton2(unsigned button)
 {
     if (UseContinueButton) {
-	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX
-		&& CursorX <= ContinueButtonX + 106
-		&& ContinueButtonY <= CursorY
-		&& CursorY <= ContinueButtonY + 27
-		&& (ContinueButtonFlags & MenuButtonClicked)) {
+	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX &&
+		CursorX <= ContinueButtonX + 106 &&
+		ContinueButtonY <= CursorY &&
+		CursorY <= ContinueButtonY + 27 &&
+		(ContinueButtonFlags & MenuButtonClicked)) {
 	    IntroNoEvent = 0;
 	}
 	ContinueButtonFlags &= ~MenuButtonClicked;
@@ -171,7 +171,7 @@ local void IntroCallbackKey2(unsigned key, unsigned keychar)
 **	Callback for input.
 */
 local void IntroCallbackKey3(unsigned key __attribute__((unused)),
-			     unsigned keychar __attribute__((unused)))
+    unsigned keychar __attribute__((unused)))
 {
 }
 
@@ -184,8 +184,8 @@ local void IntroCallbackMouse(int x, int y)
     CursorY = y;
 
     if (UseContinueButton) {
-	if( ContinueButtonX <= CursorX && CursorX <= ContinueButtonX + 106 &&
-	    ContinueButtonY <= CursorY && CursorY <= ContinueButtonY + 27 ) {
+	if (ContinueButtonX <= CursorX && CursorX <= ContinueButtonX + 106 &&
+		ContinueButtonY <= CursorY && CursorY <= ContinueButtonY + 27) {
 	    ContinueButtonFlags |= MenuButtonActive;
 	}
 	else {
@@ -493,20 +493,20 @@ global void ShowIntro(const Intro* intro)
 	//	Draw background
 	//
 	VideoDrawSubClip(background, 0, 0,
-		background->Width, background->Height,
-		(VideoWidth - background->Width) / 2,
-		(VideoHeight - background->Height) / 2);
+	    background->Width, background->Height,
+	    (VideoWidth - background->Width) / 2,
+	    (VideoHeight - background->Height) / 2);
 	//
 	//	Draw title
 	//
 	SetDefaultTextColors(FontWhite, FontYellow);
-	VideoDrawTextCentered((70 + 340) / 2 * VideoWidth / 640, 28 * VideoHeight / 480,
-	    LargeFont,intro->Title);
+	VideoDrawTextCentered((70 + 340) / 2 * VideoWidth / 640,
+	    28 * VideoHeight / 480, LargeFont, intro->Title);
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(70 * VideoWidth / 640, 80 * VideoHeight / 480, 70 * VideoWidth / 640 + 320,
-	    170 * VideoHeight / 480, line, scrolling_text);
+	ScrollText(70 * VideoWidth / 640, 80 * VideoHeight / 480,
+	    70 * VideoWidth / 640 + 320, 170 * VideoHeight / 480, line, scrolling_text);
 
 	//
 	//	Draw objectives
@@ -1389,7 +1389,7 @@ local SCM CclCredits(SCM list)
 	GameCredits.Names = (char*)malloc(1);
 	GameCredits.Names[0] = '\0';
     }
-    len=0;
+    len = 0;
 
     while (!gh_null_p(list)) {
 	value = gh_car(list);
@@ -1401,7 +1401,7 @@ local SCM CclCredits(SCM list)
 	}
 	if (gh_eq_p(value, gh_symbol2scm("name")) ||
 		gh_eq_p(value, gh_symbol2scm("title")) ||
-		gh_eq_p(value, gh_symbol2scm("comment")) ) {
+		gh_eq_p(value, gh_symbol2scm("comment"))) {
 	    n = get_c_string(gh_car(list));
 	    nlen = strlen(n);
 	    GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
