@@ -1791,7 +1791,7 @@ local void InitOldMenuData(void)
 #endif	/// OLD_MENU
 
 
-#ifdef SAVE_MENU_CCL
+#ifdef SAVE_MENU_CCL	// {
 
 typedef char char30[30];
 global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
@@ -1803,7 +1803,10 @@ global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
     strcpy((char*)hash_add(MenuFuncHash2,buf), (y)); \
 }
 
-char *menu_names[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
+local char *menu_names[] = {
     "menu-game",
     "menu-victory",
     "menu-defeated",
@@ -1840,7 +1843,10 @@ char *menu_names[] = {
     "menu-editor-player-properties",
 };
 
-char *menu_flags[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
+local char *menu_flags[] = {
     "",
     "'flags '(active)",
     "'flags '(clicked)",
@@ -1852,7 +1858,10 @@ char *menu_flags[] = {
     "'flags '(disabled)",
 };
 
-char *images[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
+local char *images[] = {
     "none",
     "panel1",
     "panel2",
@@ -1861,15 +1870,22 @@ char *images[] = {
     "panel5",
 };
 
-char *font_names[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+**	FIXME: should use the names of the real fonts.
+*/
+local char *font_names[] = {
     "small",
     "game",
     "large",
-    "smallTitle",
-    "largeTitle",
+    "small-title",
+    "large-title",
 };
 
-char *text_flags[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
+local char *text_flags[] = {
     "none",
     "center",
     "right",
@@ -1877,7 +1893,10 @@ char *text_flags[] = {
     "left",
 };
 
-char *gem_state[] = {
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
+local char *gem_state[] = {
     "unchecked",
     "passive",
     "invisible",
@@ -1885,6 +1904,9 @@ char *gem_state[] = {
     "checked",
 };
 
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
 local char *hotkey2str(int key, char *buf)
 {
     if (!key) {
@@ -1908,6 +1930,9 @@ local char *hotkey2str(int key, char *buf)
     return buf;
 }
 
+/**
+**	FIXME: docu wrong names, global variable naming is: MenuNames
+*/
 local char *button_style(int style)
 {
     switch (style) {
@@ -2019,6 +2044,8 @@ global void SaveMenus(FILE* file)
 		    break;
 		case MI_TYPE_BUTTON:
 		    sprintf(func,"%p",menu->items[j].d.button.handler);
+		    // FIXME: Johns "null" is not good, use nil or ()
+		    //		or use no style item.
 		    fprintf(file,"    'button '(size (%d %d)\n"
 			         "            caption \"%s\"\n"
 				 "            hotkey \"%s\"\n"
@@ -2026,7 +2053,9 @@ global void SaveMenus(FILE* file)
 				 "            style %s)\n",
 				 menu->items[j].d.button.xsize,
 				 menu->items[j].d.button.ysize,
-				 menu->items[j].d.button.text ? menu->items[j].d.button.text : "null",
+				 menu->items[j].d.button.text ?
+					menu->items[j].d.button.text
+					: (unsigned char*)"null",
 				 hotkey2str(menu->items[j].d.button.hotkey,hotkey),
 				 (char*)hash_find(MenuFuncHash2,func),
 				 button_style(menu->items[j].d.button.button));
@@ -2129,21 +2158,29 @@ global void SaveMenus(FILE* file)
 	fprintf(file,"\n\n");
     }
 }
-#endif /// SAVE_MENU_CCL
+#endif	// } SAVE_MENU_CCL
 
 
-/// Offsets into NetMultiSetupMenuItems
+    /// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_STATE	5
+    /// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_READY	30
+    /// Offsets into NetMultiSetupMenuItems
 #define SERVER_PLAYER_LAG	44
 
-/// Offsets into NetMultiClientMenuItems
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_PLAYER_STATE	5
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_RACE		21
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_RESOURCE		23
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_UNITS		25
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_FOG_OF_WAR	27
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_TILESET		29
+    /// Offsets into NetMultiClientMenuItems
 #define CLIENT_PLAYER_READY	30
 
 //@}
