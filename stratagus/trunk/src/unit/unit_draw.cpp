@@ -613,8 +613,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	buf[0]=unit->GroupId+'0';
 	buf[1]='\0';
 	f=TextLength(GameFont,buf);
-	x-=f+(type->TileWidth*TileSizeX+type->BoxWidth)/2;
-	y-=14+(type->TileHeight*TileSizeY+type->BoxHeight)/2;
+	x+=(type->TileWidth*TileSizeX+type->BoxWidth)/2-f;
+	y+=(type->TileHeight*TileSizeY+type->BoxHeight)/2-14;
 	// FIXME: should use FontHeight(GameFont);
 	if( x>TheUI.MapX && x+f<TheUI.MapEndX && y>TheUI.MapY
 		&& y+14<TheUI.MapEndY ) {
