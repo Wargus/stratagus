@@ -10,12 +10,11 @@
 //
 /**@name unit_draw.c	-	The draw routines for units. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -79,15 +78,6 @@ global int ShowManaBackgroundLong=1;
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
 
-local void DrawSelectionCircle(const Unit* unit,const UnitType* type
-	,int x,int y);
-local void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
-	,int x,int y);
-local void DrawSelectionRectangle(const Unit* unit,const UnitType* type
-	,int x,int y);
-local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
-	,int x,int y);
-
 /**
 **	Show that units are selected.
 **
@@ -96,8 +86,8 @@ local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
-	=DrawSelectionRectangle;
+global void (*DrawSelection)(const Unit*,const UnitType*,int,int)
+	=DrawSelectionNone;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -135,6 +125,19 @@ local int SelectionColor(const Unit* unit,const UnitType* type)
 }
 
 /**
+**	Don't show selected units.
+**
+**	@param unit	Pointer to the unit.
+**	@param type	Type of the unit.
+**	@param x	Screen X position of the unit.
+**	@param y	Screen Y position of the unit.
+*/
+global void DrawSelectionNone(const Unit* unit,const UnitType* type
+	,int x,int y)
+{
+}
+
+/**
 **	Show selected units with circle.
 **
 **	@param unit	Pointer to the unit.
@@ -142,7 +145,7 @@ local int SelectionColor(const Unit* unit,const UnitType* type)
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawSelectionCircle(const Unit* unit,const UnitType* type
+global void DrawSelectionCircle(const Unit* unit,const UnitType* type
 	,int x,int y)
 {
     int color;
@@ -172,7 +175,7 @@ local void DrawSelectionCircle(const Unit* unit,const UnitType* type
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
+global void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
 	,int x,int y)
 {
     int color;
@@ -202,7 +205,7 @@ local void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawSelectionRectangle(const Unit* unit,const UnitType* type
+global void DrawSelectionRectangle(const Unit* unit,const UnitType* type
 	,int x,int y)
 {
     int color;
@@ -229,8 +232,8 @@ local void DrawSelectionRectangle(const Unit* unit,const UnitType* type
 **	@param x	Screen X position of the unit.
 **	@param y	Screen Y position of the unit.
 */
-local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
-	,int x,int y)
+global void DrawSelectionRectangleWithTrans(const Unit* unit
+	,const UnitType* type,int x,int y)
 {
     int color;
 
@@ -1200,6 +1203,9 @@ local void DrawBuilding(Unit* unit)
     x=Map2ScreenX(unit->X)+unit->IX;
     y=Map2ScreenY(unit->Y)+unit->IY;
 
+    //
+    //	Show that the unit is selected
+    //
     DrawSelection(unit,type,x,y);
 
     //
@@ -1254,6 +1260,9 @@ local void DrawUnit(const Unit* unit)
 	DrawShadow(unit,type,x,y);
     }
 
+    //
+    //	Show that the unit is selected
+    //
     DrawSelection(unit,type,x,y);
 
     GraphicPlayerPixels(unit->Player,type->Sprite);

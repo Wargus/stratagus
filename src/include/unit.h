@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -622,6 +621,8 @@ extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
 extern int EnableTrainingQueue;		/// Config: training queues enabled
 extern int EnableBuildingCapture;	/// Config: building capture enabled
+   /// Draw the selection
+extern void (*DrawSelection)(const Unit*,const UnitType*,int,int);
 
 //	in selection.c
 extern Unit* Selected[MaxSelectable];	/// currently selected units
@@ -783,11 +784,29 @@ extern int TypeMovementMask(const UnitType* type);
 extern int UnitMovementMask(const Unit* unit);
 
 //	in bottom_panel.c
+//--------------------
     /// FIXME: more docu
 extern void UpgradeButtons(int upgrade);
 
 //	in unit_draw.c
-    /// FIXME: more docu
+//--------------------
+    /// Draw nothing around unit
+extern void DrawSelectionNone(const Unit* unit,const UnitType* type
+	,int x,int y);
+    /// Draw circle around unit
+extern void DrawSelectionCircle(const Unit* unit,const UnitType* type
+	,int x,int y);
+    /// Draw circle filled with alpha around unit
+extern void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
+	,int x,int y);
+    /// Draw rectangle around unit
+extern void DrawSelectionRectangle(const Unit* unit,const UnitType* type
+	,int x,int y);
+    /// Draw rectangle filled with alpha around unit
+extern void DrawSelectionRectangleWithTrans(const Unit* unit
+	,const UnitType* type,int x,int y);
+
+    /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
     /// Draw all units visible on map
 extern void DrawUnits(void);
