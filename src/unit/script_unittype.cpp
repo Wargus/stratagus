@@ -171,6 +171,10 @@ local SCM CclDefineNewUnitType(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("magic")) ) {
 	    type->Magic=gh_scm2int(gh_car(list));
+	    if( type->Magic>MaxMana ) {
+		DebugLevel0Fn("Too much mana %d\n" _C_ type->Magic);
+		type->Magic=MaxMana;
+	    }
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("tile-size")) ) {
 	    sublist=gh_car(list);
