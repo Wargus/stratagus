@@ -350,7 +350,7 @@ global void InitUnit(Unit* unit, UnitType* type)
     unit->Removed = 1;
 
     // Invisible as default for submarines
-    if (!type->Submarine) {
+    if (!type->PermanentCloak) {
 	unit->Visible = -1;		// Visible as default
     }
 
@@ -512,7 +512,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkUnitSight(unit);
 
-	if( type->CanSeeSubmarine ) {
+	if( type->DetectCloak ) {
 	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
 	}
     }
@@ -1583,7 +1583,7 @@ global void UnitIncrementMana(void)
 		unit->Bloodlust _C_ unit->Haste _C_ unit->Slow _C_
 		unit->Invisible _C_ unit->UnholyArmor);
 
-	if (  unit->Type->Submarine ) {
+	if (  unit->Type->PermanentCloak ) {
 	    if( !flag && (unit->Visible&(1<<ThisPlayer->Player)) ) {
 		flag=CheckUnitToBeDrawn(unit);
 	    }
@@ -1598,7 +1598,7 @@ global void UnitIncrementMana(void)
     //
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
-	if( unit->Type->CanSeeSubmarine && !unit->Removed &&
+	if( unit->Type->DetectCloak && !unit->Removed &&
 		unit->Orders[0].Action!=UnitActionBuilded ) {
 	    MarkSubmarineSeen(unit->Player,unit->X+unit->Type->TileWidth/2,
 		    unit->Y+unit->Type->TileHeight/2,unit->Stats->SightRange);

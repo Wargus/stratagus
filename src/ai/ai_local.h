@@ -248,18 +248,6 @@ typedef struct _ai_helper_ {
     int			RepairCount;
     AiUnitTypeTable**	Repair;
     /**
-    **	The index is the costs that should be collected, giving a table of all
-    **	units/buildings which could collect this resource.
-    */
-    int			CollectCount;
-    AiUnitTypeTable**	Collect;
-    /**
-    **	The index is the costs that should be collected, giving a table of all
-    **	units/buildings which could carray this resource.
-    */
-    int			WithGoodsCount;
-    AiUnitTypeTable**	WithGoods;
-    /**
     **	The index is the unit-limit that should be solved, giving a table of all
     **	units/buildings which could reduce this unit-limit.
     */

@@ -294,13 +294,13 @@
 **
 **		Unit is a Building
 **
-**	UnitType::Submarine
+**	UnitType::PermanentCloak
 **
-**		Is only visible by CanSeeSubmarine
+**		Unit is permanently cloaked.
 **
-**	UnitType::CanSeeSubmarine
+**	UnitType::DetectCloak
 **
-**		Only this units can see Submarine
+**		These units can detect Cloaked units.
 **
 **	UnitType::Coward
 **
@@ -726,8 +726,8 @@ struct _unit_type_ {
     unsigned Critter : 1;		/// Unit is controlled by nobody
     unsigned Wall : 1;			/// Wall
     unsigned Building : 1;		/// Building
-    unsigned Submarine : 1;		/// Is only visible by CanSeeSubmarine
-    unsigned CanSeeSubmarine : 1;	/// Only this units can see Submarine
+    unsigned PermanentCloak : 1;	/// Is only visible by CloakDetectors.
+    unsigned DetectCloak : 1;		/// Can see Cloaked units.
     unsigned Coward : 1;		/// Unit will only attack if instructed.
     unsigned Transporter : 1;		/// Can transport units
     unsigned MaxOnBoard;		/// Number of Transporter slots.

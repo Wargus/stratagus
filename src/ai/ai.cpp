@@ -570,17 +570,6 @@ local void SaveAiHelper(CLFile* file)
 	    AiHelpers.Repair);
 
     //
-    //	Save collect table
-    //
-    SaveAiCostTable(file,"collect",AiHelpers.CollectCount,AiHelpers.Collect);
-
-    //
-    //	Save resource table
-    //
-    SaveAiCostTable(file,"with-goods",AiHelpers.WithGoodsCount,
-	    AiHelpers.WithGoods);
-
-    //
     //	Save limits table
     //
     SaveAiUnitLimitTable(file,"unit-limit",AiHelpers.UnitLimitCount,
@@ -993,16 +982,6 @@ global void CleanAi(void)
 	free(AiHelpers.Repair[i]);
     }
     free(AiHelpers.Repair);
-
-    for( i=0; i<AiHelpers.CollectCount; ++i ) {
-	free(AiHelpers.Collect[i]);
-    }
-    free(AiHelpers.Collect);
-
-    for( i=0; i<AiHelpers.WithGoodsCount; ++i ) {
-	free(AiHelpers.WithGoods[i]);
-    }
-    free(AiHelpers.WithGoods);
 
     for( i=0; i<AiHelpers.UnitLimitCount; ++i ) {
 	free(AiHelpers.UnitLimit[i]);

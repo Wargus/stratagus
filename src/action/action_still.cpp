@@ -111,8 +111,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
     //
     //	Critters:	are moving random around.
     //
-    // FIXME: critters: skeleton and daemon are also critters??????
-    if( type->Critter && type==UnitTypeCritter ) {
+    if( type->Critter && type==UnitTypeCritter) {
 	int x;
 	int y;
 
@@ -149,6 +148,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
 		unit->Orders[0].X=x;
 		unit->Orders[0].Y=y;
+		unit->State=0;
 	    }
 	}
 	// NOTE: critter couldn't attack automatic through the return
