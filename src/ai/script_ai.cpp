@@ -464,9 +464,11 @@ local SCM CclAiWait(SCM value)
     AiUnitTypeTable* autt;
     UnitType* type;
 
-    printf("Wait: ");
-    gh_display(value);
-    gh_newline();
+    IfDebug(
+	printf("Wait: ");
+	gh_display(value);
+	gh_newline();
+    );
 
     type=CclGetUnitType(value);
     if( !(autt=FindInRequests(type)) ) {
@@ -496,9 +498,11 @@ local SCM CclAiForce(SCM list)
     int count;
     int force;
 
-    printf("Force: ");
-    gh_display(list);
-    gh_newline();
+    IfDebug(
+	printf("Force: ");
+	gh_display(list);
+	gh_newline();
+    );
 
     force=gh_scm2int(gh_car(list));
     if( force<0 || force>=AI_MAX_FORCES ) {
@@ -551,9 +555,11 @@ local SCM CclAiWaitForce(SCM value)
 {
     int force;
 
-    printf("Wait-Force: ");
-    gh_display(value);
-    gh_newline();
+    IfDebug(
+	printf("Wait-Force: ");
+	gh_display(value);
+	gh_newline();
+    );
 
     force=gh_scm2int(value);
     if( force<0 || force>=AI_MAX_FORCES ) {
@@ -573,10 +579,20 @@ local SCM CclAiWaitForce(SCM value)
 */
 local SCM CclAiAttackWithForce(SCM value)
 {
-    printf("Attack: ");
-    gh_display(value);
-    gh_newline();
-    // FIXME: more later!
+    int force;
+
+    IfDebug(
+	printf("Attack: ");
+	gh_display(value);
+	gh_newline();
+    );
+
+    force=gh_scm2int(value);
+    if( force<0 || force>=AI_MAX_FORCES ) {
+	errl("Force out of range",value);
+    }
+
+    AiAttackWithForce(force);
 
     return SCM_BOOL_F;
 }
@@ -591,10 +607,12 @@ local SCM CclAiSleep(SCM value)
     static int fc;
     int i;
 
-    printf("Sleep: ");
-    gh_display(value);
-    printf(" %d %d",fc,FrameCounter);
-    gh_newline();
+    IfDebug(
+	printf("Sleep: ");
+	gh_display(value);
+	printf(" %d %d",fc,FrameCounter);
+	gh_newline();
+    );
 
     i=gh_scm2int(value);
     if( fc ) {
@@ -616,6 +634,14 @@ local SCM CclAiSleep(SCM value)
 */
 local SCM CclAiResearch(SCM value)
 {
+    IfDebug(
+	printf("Research: ");
+	gh_display(value);
+	gh_newline();
+    );
+
+    DebugLevel0Fn("FIXME:\n");
+
     return SCM_BOOL_F;
 }
 
@@ -626,6 +652,14 @@ local SCM CclAiResearch(SCM value)
 */
 local SCM CclAiUpgradeTo(SCM value)
 {
+    IfDebug(
+	printf("Upgrade-to: ");
+	gh_display(value);
+	gh_newline();
+    );
+
+    DebugLevel0Fn("FIXME:\n");
+
     return SCM_BOOL_F;
 }
 
