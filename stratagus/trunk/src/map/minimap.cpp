@@ -302,7 +302,6 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	if( !UnitKnownOnMap(unit) ) {
 	    continue;
 	}
-	unit->SeenFrame = unit->Frame;
 
 	// FIXME: submarine not visible
 
