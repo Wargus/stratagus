@@ -718,6 +718,7 @@ global void LoadMissileSprites(void)
     MissileTypeGreenCross=MissileTypeByIdent("missile-green-cross");
     MissileTypeExplosion = MissileTypeByIdent("missile-explosion");
 
+#if 0
     // FIXME: FIXME: FIXME: very dirty hacks
     DebugCheck( MissileTypeSmallFire->Sprite->NumFrames!=6 );
     MissileTypeSmallFire->Sprite->NumFrames=6;
@@ -730,6 +731,7 @@ global void LoadMissileSprites(void)
     DebugCheck( MissileTypeByIdent("missile-flame-shield")
 		->Sprite->NumFrames!=6 );
     MissileTypeByIdent("missile-flame-shield")->Sprite->NumFrames=6;
+#endif
 }
 
 /**
