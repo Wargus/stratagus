@@ -1772,6 +1772,9 @@ global void SaveMissileTypes(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: missile-types $Id$\n\n");
 
+    //
+    //	Original number to internal missile-type name.
+    //
     i=fprintf(file,"(define-missiletype-wc-names");
     for( sp=MissileTypeWcNames; *sp; ++sp ) {
 	if( i+strlen(*sp)>79 ) {
@@ -1781,7 +1784,9 @@ global void SaveMissileTypes(FILE* file)
     }
     fprintf(file,")\n\n");
 
-
+    //
+    //	Missile types
+    //
     for( mt=MissileTypes; mt<&MissileTypes[NumMissileTypes]; ++mt ) {
 	fprintf(file,"(define-missile-type '%s\n ",mt->Ident);
 	if( mt->File ) {
@@ -1823,12 +1828,11 @@ local void SaveMissile(const Missile* missile,FILE* file)
     char* s1;
     extern char* UnitReference(const Unit*);
 
-    fprintf(file,"(missile 'type '%s",
-	missile->Type->Ident);
-    fprintf(file," 'pos (%d %d) 'goal (%d %d)",
+    fprintf(file,"(missile 'type '%s",missile->Type->Ident);
+    fprintf(file," 'pos '(%d %d) 'goal '(%d %d)",
 	missile->X,missile->Y,missile->DX,missile->DY);
-    fprintf(file,"\n  'frame %d 'state %d 'wait %d\n ",
-	missile->Frame,missile->State,missile->Wait);
+    fprintf(file,"\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
+	missile->Frame,missile->State,missile->Wait,missile->Delay);
     if( missile->SourceUnit ) {
 	fprintf(file," 'source %s",s1=UnitReference(missile->SourceUnit));
 	free(s1);
@@ -1838,11 +1842,11 @@ local void SaveMissile(const Missile* missile,FILE* file)
 	free(s1);
     }
     fprintf(file," 'damage %d",missile->Damage);
-    fprintf(file,"\n  'data (%d %d %d %d %d)",
-	missile->D,missile->Dx,missile->Dy,missile->Xstep,missile->Ystep);
     // FIXME: need symbolic names for controller
     fprintf(file," 'ttl %d 'controller %ld",
 	missile->TTL,(long)missile->Controller);
+    fprintf(file," 'data '(%d %d %d %d %d)",
+	missile->D,missile->Dx,missile->Dy,missile->Xstep,missile->Ystep);
     fprintf(file,")\n");
 }
 
