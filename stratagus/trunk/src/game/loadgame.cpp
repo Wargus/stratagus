@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name savegame.c	-	Save game. */
+/**@name loadgame.c	-	Load game. */
 //
 //	(c) Copyright 2001 by Lutz Sammer, Andreas Arens
 //
@@ -35,11 +35,11 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Cleanup all.
+**	Cleanup modules.
 **
 **	Call each module to clean up.
 */
-global void CleanupAll(void)
+global void CleanModules(void)
 {
     CleanIcons();
 #if 0
@@ -57,15 +57,54 @@ global void CleanupAll(void)
 }
 
 /**
+**	Initialize all modules.
+**
+**	Call each module to initialize.
+*/
+global void InitModules(void)
+{
+    InitIcons();
+}
+
+/**
+**	Load all.
+**
+**	Call each module to load additional files (graphics,sounds).
+*/
+global void LoadModules(void)
+{
+    LoadIcons();
+}
+
+/**
+**	Load a game to file.
+**
+**	@param filename	File name to be loaded.
+**
+**	@note	Later we want to store in a more compact binary format.
+*/
+global void LoadGame(char* filename)
+{
+    CleanModules();
+
+    gh_eval_file(filename);
+
+    InitModules();
+    LoadModules();
+
+    MustRedraw=RedrawEverything;	// redraw everything
+}
+
+/**
 **	Load all game data.
+**
+**	Test function for the later load/save functions.
 */
 global void LoadAll(void)
 {
-    CleanupAll();
-
-    gh_eval_file("save_file_of_freecraft.ccl");
-
-    MustRedraw=RedrawEverything;	// redraw everything
+    SaveGame("save_file_of_freecraft0.ccl");
+    LoadGame("save_file_of_freecraft0.ccl");
+    SaveGame("save_file_of_freecraft1.ccl");
 }
 
 //@}
