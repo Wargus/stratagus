@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.c	-	The draw routines for units. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1725,6 +1725,38 @@ local void DrawUnitPlayerColor(const UnitType* type,int player,int frame,int x,i
 }
 #endif
 
+/**
+**	Draw construction.
+**
+**	@param construction	Construction pointer.
+**	@param frame	Frame number to draw.
+**	@param x	X position.
+**	@param y	Y position.
+*/
+local void DrawConstruction(const Unit* unit,int x,int y)
+{
+    ConstructionFrame* cframe;
+
+    cframe=unit->Data.Builded.Frame;
+    if( cframe->File==ConstructionFileConstruction ) {
+	const Construction* construction;
+
+	construction=unit->Type->Construction;
+	x-=construction->Width/2;
+	y-=construction->Height/2;
+	GraphicUnitPixels(unit,construction->Sprite);
+	VideoDrawClip(construction->Sprite,cframe->Frame,x,y);
+    } else {
+	x-=unit->Type->Sprite->Width/2;
+	y-=unit->Type->Sprite->Height/2;
+	GraphicUnitPixels(unit,unit->Type->Sprite);
+	DrawUnitType(unit->Type,cframe->Frame,x,y);
+#ifdef USE_OPENGL
+	DrawUnitPlayerColor(unit->Type,unit->Player->Player,cframe->Frame,x,y);
+#endif
+    }
+}
+
 /*
 **	Units on map:
 **
@@ -1792,18 +1824,10 @@ local void DrawBuilding(Unit* unit)
     //	Buildings under construction/upgrade/ready.
     //
     if( state == 1 ) {
-	if( constructed || VideoGraphicFrames(type->Sprite)<=1 ) {
-	    GraphicUnitPixels(unit,type->Construction->Sprite);
-	    DrawConstruction(type->Construction
-		,frame&127
+	if( constructed ) {
+	    DrawConstruction(unit
 		,x+(type->TileWidth*TileSizeX)/2
 		,y+(type->TileHeight*TileSizeY)/2);
-	} else {
-	    GraphicUnitPixels(unit,type->Sprite);
-	    DrawUnitType(type,frame,x,y);
-#ifdef USE_OPENGL
-	    DrawUnitPlayerColor(type,unit->Player->Player,frame,x,y);
-#endif
 	}
     //
     //	Draw the future unit type, if upgrading to it.
