@@ -94,6 +94,7 @@
 #ifdef _MSC_VER	// { m$ auto detection
 
 #define inline __inline			// fix m$ brain damage
+#define __attribute__()			// does nothing
 
 /**
 **	Print debug information of level 0.
