@@ -380,7 +380,7 @@ local void UiEnterPreferencesOptionsMenu(void)
 local void UiEnterSaveGameMenu(void)
 {
 	// Disable save menu in multiplayer and replays
-	if (NetworkFildes != (Socket)-1 || ReplayGameType != ReplayNone) {
+	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
 		return;
 	}
 
@@ -397,7 +397,7 @@ local void UiEnterSaveGameMenu(void)
 local void UiEnterLoadGameMenu(void)
 {
 	// Disable load menu in multiplayer
-	if (NetworkFildes != (Socket)-1) {
+	if (IsNetworkGame()) {
 		return;
 	}
 
