@@ -945,7 +945,7 @@ local void Usage(void)
 	PrintHeader();
 	printf(
 "\n\nUsage: stratagus [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
-\t-c file.ccl\tccl start file (default stratagus.ccl)\n\
+\t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\
 \t-f factor\tComputer units cost factor\n\
@@ -990,13 +990,13 @@ global int main(int argc, char** argv)
 #ifndef __APPLE__
 	StratagusLibPath = STRATAGUS_LIB_PATH;
 #endif
-	CclStartFile = "ccl/stratagus.lua";
-	EditorStartFile = "ccl/editor.lua";
+	CclStartFile = "scripts/stratagus.lua";
+	EditorStartFile = "scripts/editor.lua";
 
 	memset(LocalPlayerName, 0, 16);
 	strcpy(LocalPlayerName, "Anonymous");
 
-	// FIXME: Parse options before or after ccl?
+	// FIXME: Parse options before or after scripts?
 
 	//
 	//  Parse commandline
