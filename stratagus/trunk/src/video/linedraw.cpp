@@ -708,11 +708,11 @@ global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
 global void VideoDrawRectangle(SDL_Color color, int x, int y,
     int w, int h)
 {
-    VideoDrawHLine(color, x, y, w + 1);
-    VideoDrawHLine(color, x, y + h, w + 1);
+    VideoDrawHLine(color, x, y, w);
+    VideoDrawHLine(color, x, y + h - 1, w);
 
-    VideoDrawVLine(color, x, y + 1, h - 1);
-    VideoDrawVLine(color, x + w, y + 1, h - 1);
+    VideoDrawVLine(color, x, y + 1, h - 2);
+    VideoDrawVLine(color, x + w - 1, y + 1, h - 2);
 }
 
 global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
@@ -725,11 +725,11 @@ global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
 global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    VideoDrawTransHLine(color, x, y, w + 1, alpha);
-    VideoDrawTransHLine(color, x, y + h, w + 1, alpha);
+    VideoDrawTransHLine(color, x, y, w, alpha);
+    VideoDrawTransHLine(color, x, y + h - 1, w, alpha);
 
-    VideoDrawTransVLine(color, x, y + 1, h - 1, alpha);
-    VideoDrawTransVLine(color, x + w, y + 1, h - 1, alpha);
+    VideoDrawTransVLine(color, x, y + 1, h - 2, alpha);
+    VideoDrawTransVLine(color, x + w - 1, y + 1, h - 2, alpha);
 }
 
 global void VideoFillRectangle(SDL_Color color, int x, int y,
