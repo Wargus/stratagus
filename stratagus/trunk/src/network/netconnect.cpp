@@ -50,6 +50,10 @@
 //	Declaration
 //----------------------------------------------------------------------------
 
+// received nothing from client for xx frames?
+#define CLIENT_LIVE_BEAT 60
+#define CLIENT_IS_DEAD 300
+
 //----------------------------------------------------------------------------
 //	Variables
 //----------------------------------------------------------------------------
@@ -157,6 +161,8 @@ local const char *icmsgsubtypenames[] = {
     "SeeYou",			// Client has left game
 
     "Go",			// Client is ready to run
+    "AreYouThere",		// Server asks are you there
+    "IAmHere",			// Client answers I am here
 };
 #endif
 
@@ -586,9 +592,6 @@ global void NetworkConnectSetupGame(void)
     for (i = 0; i < HostsCount; ++i) {
 	PlayerSetName(&Players[Hosts[i].PlyNr], Hosts[i].PlyName);
     }
-
-    // FIXME: evaluate ServerSetupState .....
-    // FIXME: must be done earlier during player creation!!!
 }
 
 /**
@@ -732,6 +735,52 @@ changed:
 	    break;
 	default:
 	    break;
+    }
+}
+
+/**
+**	Server Menu Loop: Send out server request messages
+*/
+global void NetworkProcessServerRequest(void)
+{
+    int i, n;
+    unsigned long fcd;
+    InitMessage message;
+
+    for (i = 1; i < PlayerMax-1; ++i) {
+	if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
+	    fcd = FrameCounter - ServerSetupState.LastFrame[i];
+	    if (fcd >= CLIENT_LIVE_BEAT) {
+		if (fcd > CLIENT_IS_DEAD) {
+		    // kick client...
+		    NetStates[i].State = ccs_unused;
+		    Hosts[i].Host = 0;
+		    Hosts[i].Port = 0;
+		    Hosts[i].PlyNr = 0;
+		    memset(Hosts[i].PlyName, 0, 16);
+		    ServerSetupState.Ready[i] = 0;
+		    ServerSetupState.Race[i] = 0;
+		    ServerSetupState.LastFrame[i] = 0L;
+
+		    // Resync other clients
+		    for (n = 1; n < PlayerMax-1; n++) {
+			if (n != i && Hosts[n].PlyNr) {
+			    NetStates[n].State = ccs_async;
+			}
+		    }
+		    NetConnectForceDisplayUpdate();
+
+		} else if (fcd % 5 == 0) {
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMAYT;	// Probe for the client
+		    message.MapUID = 0L;
+		    n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
+		    DebugLevel0Fn("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
+			    n _C_ NIPQUAD(ntohl(Hosts[i].Host)) _C_ ntohs(Hosts[i].Port) _C_
+			    FrameCounter _C_ ServerSetupState.LastFrame[i]);
+		}
+	    }
+	}
     }
 }
 
@@ -1040,6 +1089,20 @@ local void ClientParseGoAhead(const InitMessage* msg)
 **
 **	@param msg	message received
 */
+local void ClientParseAreYouThere(const InitMessage* msg)
+{
+    InitMessage message;
+
+    message.Type = MessageInitHello;
+    message.SubType = ICMIAH;
+    NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
 local void ServerParseHello(const InitMessage* msg)
 {
     int h, k, i, n;
@@ -1085,6 +1148,7 @@ local void ServerParseHello(const InitMessage* msg)
 	}
     }
     // this code path happens until client sends waiting (= has received this message)
+    ServerSetupState.LastFrame[k] = FrameCounter;
     message.Type = MessageInitReply;
     message.SubType = ICMWelcome;				// Acknowledge: Client is welcome
     message.u.Hosts[0].PlyNr = htons(k);			// Host array slot number
@@ -1107,8 +1171,8 @@ local void ServerParseHello(const InitMessage* msg)
     n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
     DebugLevel0Fn("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n" _C_
 		n _C_ k _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-    NetStates[h].MsgCnt++;
-    if (NetStates[h].MsgCnt > 50) {
+    NetStates[k].MsgCnt++;
+    if (NetStates[k].MsgCnt > 50) {
 	// FIXME: Client sends hellos, but doesn't receive our welcome acks....
 	;
     }
@@ -1126,6 +1190,7 @@ local void ServerParseResync(void)
     // look up the host
     for (h = 0; h < PlayerMax-1; ++h) {
 	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    ServerSetupState.LastFrame[h] = FrameCounter;
 	    switch (NetStates[h].State) {
 		case ccs_mapinfo:
 		    // a delayed ack - fall through..
@@ -1266,6 +1331,7 @@ local void ServerParseMap(void)
     // look up the host
     for (h = 0; h < PlayerMax-1; ++h) {
 	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    ServerSetupState.LastFrame[h] = FrameCounter;
 	    switch (NetStates[h].State) {
 		// client has recvd map info waiting for state info
 		case ccs_connected:
@@ -1311,6 +1377,7 @@ local void ServerParseState(const InitMessage* msg)
     // look up the host
     for (h = 0; h < PlayerMax-1; ++h) {
 	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    ServerSetupState.LastFrame[h] = FrameCounter;
 	    switch (NetStates[h].State) {
 		case ccs_mapinfo:
 		    // User State Change right after connect - should not happen, but..
@@ -1325,7 +1392,6 @@ local void ServerParseState(const InitMessage* msg)
 		    DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n" _C_
 				     h _C_ ServerSetupState.Ready[h] _C_ ServerSetupState.Race[h]);
 		    // Add additional info usage here!
-		    ServerSetupState.LastFrame[h] = FrameCounter;
 		    NetConnectForceDisplayUpdate();
 		    /* Fall through */
 		case ccs_async:
@@ -1365,6 +1431,7 @@ local void ServerParseGoodBye(void)
     // look up the host
     for (h = 0; h < PlayerMax-1; ++h) {
 	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    ServerSetupState.LastFrame[h] = FrameCounter;
 	    switch (NetStates[h].State) {
 		default:
 		    // We can enter here from _ANY_ state!
@@ -1410,6 +1477,7 @@ local void ServerParseSeeYou(void)
 		    memset(Hosts[h].PlyName, 0, 16);
 		    ServerSetupState.Ready[h] = 0;
 		    ServerSetupState.Race[h] = 0;
+		    ServerSetupState.LastFrame[h] = 0L;
 
 		    // Resync other clients
 		    for (i = 1; i < PlayerMax-1; i++) {
@@ -1427,6 +1495,22 @@ local void ServerParseSeeYou(void)
 	    }
 	    break;
 	 }
+    }
+}
+
+/**
+**	FIXME: docu
+*/
+local void ServerParseIAmHere(void)
+{
+    int h;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    // client found us again
+	    ServerSetupState.LastFrame[h] = FrameCounter;
+	}
     }
 }
 
@@ -1505,6 +1589,10 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		// No ack here - Server will spew out a few Quit msgs, which has to be enough
 		return;
 	    }
+	    if (msg->SubType == ICMAYT) {	// Server is checking for our presence
+		ClientParseAreYouThere(msg);
+		return;
+	    }
 	    switch(NetLocalState) {
 		case ccs_disconnected:
 		    ClientParseDisconnected(msg);
@@ -1578,6 +1666,10 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
 	    case ICMSeeYou:
 		ServerParseSeeYou();
+		break;
+
+	    case ICMIAH:
+		ServerParseIAmHere();
 		break;
 
 	    default:
