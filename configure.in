@@ -192,7 +192,7 @@ dnl ----------------------------
 
 dnl --- CHECK FOR MNG LIB ------
 AC_ARG_WITH(mng,
-    [  --with-mng		  [Use mng (default: no)]], MAD="$with_mng")
+    [  --with-mng		  [Use mng (default: no)]], MNG="$with_mng")
 MNG_CFLAGS=
 MNG_LIBS=
 if test "$MNG" != "yes"; then
