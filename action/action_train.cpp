@@ -151,7 +151,6 @@ void HandleActionTrain(Unit* unit)
 		}
 
 		nunit = MakeUnit(unit->Orders[0].Type, player);
-
 		if (nunit != NoUnitP) {
 			nunit->X = unit->X;
 			nunit->Y = unit->Y;
@@ -198,7 +197,6 @@ void HandleActionTrain(Unit* unit)
 				if (nunit->Orders[0].Goal) {
 					RefsIncrease(nunit->Orders->Goal);
 				}
-
 			} else {
 				if (unit->NewOrder.Goal) {
 					if (unit->NewOrder.Goal->Destroyed) {
@@ -223,12 +221,11 @@ void HandleActionTrain(Unit* unit)
 			if (IsOnlySelected(unit)) {
 				UpdateButtonPanel();
 			}
-
 			return;
-		}
-	} else {
-		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
+		} else {
+			NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
 				"Unable to Train %s", unit->Orders[0].Type->Name);
+		}
 	}
 
 	if (!unit->Type->NewAnimations) {
