@@ -1688,26 +1688,30 @@ local void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 
     cframe = unit->Data.Builded.Frame;
     if (cframe->File == ConstructionFileConstruction) {
-	x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
-	y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
-//	x += type->ShadowOffsetX;
-//	y += type->ShadowOffsetY;
-	if (frame < 0) {
-	    VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
-		-frame, x, y);
-	} else {
-	    VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
-		frame, x, y);
+	if (unit->Type->Construction->ShadowSprite) {
+	    x -= (unit->Type->Construction->Width - unit->Type->TileWidth * TileSizeX) / 2;
+	    y -= (unit->Type->Construction->Height - unit->Type->TileHeight * TileSizeY )/ 2;
+//	    x += type->ShadowOffsetX;
+//	    y += type->ShadowOffsetY;
+	    if (frame < 0) {
+		VideoDrawShadowClipX(unit->Type->Construction->ShadowSprite,
+		    -frame, x, y);
+	    } else {
+		VideoDrawShadowClip(unit->Type->Construction->ShadowSprite,
+		    frame, x, y);
+	    }
 	}
     } else {
-	x -= (unit->Type->ShadowWidth - unit->Type->TileWidth * TileSizeX) / 2;
-	y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
-	x += unit->Type->ShadowOffsetX;
-	y += unit->Type->ShadowOffsetY;
-	if (frame < 0) {
-	    VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
-	} else {
-	    VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+	if (unit->Type->ShadowSprite) {
+	    x -= (unit->Type->ShadowWidth - unit->Type->TileWidth * TileSizeX) / 2;
+	    y -= (unit->Type->ShadowHeight - unit->Type->TileHeight * TileSizeY) / 2;
+	    x += unit->Type->ShadowOffsetX;
+	    y += unit->Type->ShadowOffsetY;
+	    if (frame < 0) {
+		VideoDrawShadowClipX(unit->Type->ShadowSprite, -frame, x, y);
+	    } else {
+		VideoDrawShadowClip(unit->Type->ShadowSprite, frame, x, y);
+	    }
 	}
     }
 }
