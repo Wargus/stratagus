@@ -86,7 +86,7 @@ global int SaveGameLoading;             /// If a Saved Game is Loading
 global char* Tips[MAX_TIPS + 1];        /// Array of tips
 global int ShowTips;                    /// Show tips at start of level
 global int CurrentTip;                  /// Current tip to display
-
+global int NoRandomPlacementMultiplayer = 0;///Disable the random placement of players in muliplayer mode
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -439,6 +439,22 @@ local int CclSetLocalPlayerName(lua_State* l)
 	LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
 	return 0;
 }
+
+
+/**
+**		Removes Randomization of Player position in Multiplayer mode
+*/
+local int CclNoRandomPlacementMultiplayer(lua_State* l)
+{
+	if (lua_gettop(l) != 0) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+	NoRandomPlacementMultiplayer = 1;
+
+	return 0;
+}
+
 
 /**
 **  Set God mode.
@@ -1334,6 +1350,7 @@ global void InitCcl(void)
 	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
 	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
 	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
+    lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
 
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "SaveGame", CclSaveGame);
