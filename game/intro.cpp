@@ -927,7 +927,7 @@ local int GameStatsDrawFunc(int frame)
     line_spacing=(432-bottom_offset-description_offset)/c;
 
     if( !draw_all || (dodraw<=10 && (frame%stats_pause)==0) ) {
-	PlayGameSound(SoundIdForName("fist"),MaxSampleVolume);
+	PlayGameSound(SoundIdForName("statsthump"),MaxSampleVolume);
     }
 
 
