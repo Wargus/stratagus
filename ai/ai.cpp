@@ -334,7 +334,7 @@ global void AiInit(Player* player)
     AiType* ait;
     char* ainame;
 
-    DebugLevel0Fn("%d - %s\n" _C_ player->Player _C_ player->Name);
+    DebugLevel0Fn("%d - %s -" _C_ player->Player _C_ player->Name);
 
     pai=calloc(1,sizeof(PlayerAi));
     if( !pai ) {
@@ -348,6 +348,9 @@ global void AiInit(Player* player)
     if( player->AiNum<sizeof(AiTypeWcNames)/sizeof(*AiTypeWcNames) ) {
 	ainame=AiTypeWcNames[player->AiNum];
     }
+
+    DebugLevel0(" %s\n",ainame);
+
     //
     //	Search correct AI type.
     //
@@ -371,6 +374,9 @@ global void AiInit(Player* player)
 	    continue;
 	}
 	break;
+    }
+    if( !ainame ) {
+	DebugLevel0Fn("AI: not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     }
     DebugLevel0Fn("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ ait->Race
 	    _C_ ainame _C_ ait->Class );
