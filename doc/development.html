@@ -173,7 +173,7 @@ up to date. But you find regular snapshots of the FreeCraft source here:
 
 <H3>Linux(tm)</H3>
 
-To build Freecraft with Linux you will need the following packages. The
+To build FreeCraft with Linux you will need the following packages. The
 following list refers mainly to Debian packages. You'll have to figure out
 the corresponding packages in your particular distribution.
 <UL>
@@ -195,6 +195,35 @@ the corresponding packages in your particular distribution.
     various reasons (such as the fact that their API's have not stabilized, or
     that they are deprecated).  Include files and manual pages are also
     provided.
+<LI>libsdl1.2-dev - Development files for Simple DirectMedia Layer<P>
+    Very simply, SDL is a library that allows you portable low level access to
+    a video framebuffer, audio output, mouse, and keyboard.<P>
+    This package contains the files needed to compile and link programs which
+    use SDL.<P>
+    If not included in your distribution you can get it
+    <A HREF="http://www.libsdl.org">here</A>.
+</UL>
+
+<H3>MacOS(tm)</H3>
+
+To build FreeCraft with MacOS you will need the following packages.
+<UL>
+<UL>
+<LI>gcc - The GNU C compiler<P>
+    gcc-2.95 preferred. Old gcc 2.96 can't compile FreeCraft. gcc 3.0 produce
+    many wrong! warnings.
+<LI>If you have MacOS, can you please write this section. And send it us as
+    patch.
+<LI>You can run ./setup which should work on MacOS/Darwin.
+<LI>Or extract the project builder archive "contrib/macosx.tgz", this should
+    work on MacOS X.
+</UL>
+<LI>libpng2-dev - PNG library - development<P>
+    libpng is a library implementing an interface for reading and writing PNG
+    (Portable Network Graphics) format files.
+<LI>zlib-dev - compression library - development<P>
+    zlib is a library implementing the deflate compression method found in gzip
+    and pkzip.  This package includes the development support files.
 <LI>libsdl1.2-dev - Development files for Simple DirectMedia Layer<P>
     Very simply, SDL is a library that allows you portable low level access to
     a video framebuffer, audio output, mouse, and keyboard.<P>
