@@ -63,7 +63,7 @@ local int DisabledLog;			/// Disabled log for replay
 local int DisabledShowTips;		/// Disabled show tips
 local SCM ReplayLog;			/// Replay log
 local FILE* LogFile;			/// Replay log file
-local int NextLogCycle;			/// Next log cycle number
+local unsigned long NextLogCycle;	/// Next log cycle number
 
 
 //----------------------------------------------------------------------------
