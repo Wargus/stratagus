@@ -270,6 +270,7 @@ local void MoveToTarget(Unit* unit)
 	    || (!unit->Orders[0].Goal &&
 		WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)) ) {
 	// FIXME: workaround for pathfinder problem
+	// FIXME: is this true with the new pathfinding??
 	DebugLevel3Fn("FIXME: Johns remove this for new orders.\n");
 	unit->Orders[0].X-=unit->Orders[0].RangeX;
 	unit->Orders[0].Y-=unit->Orders[0].RangeY;
@@ -342,7 +343,14 @@ local void MoveToTarget(Unit* unit)
 		if( goal ) {
 		    DebugLevel0(", target %d\n" _C_ UnitNumber(goal));
 		} else {
-		    DebugLevel0("\n");
+		    DebugLevel0(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+		}
+		if( unit->Orders[0].RangeX < TheMap.Width 
+		    || unit->Orders[0].RangeY < TheMap.Height ) {
+		    // Try again with more range
+		    unit->Orders[0].RangeX++;
+		    unit->Orders[0].RangeY++;
+		    return;
 		}
 	    }
 	    if( unit->Orders[0].Goal ) {
