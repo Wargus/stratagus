@@ -103,6 +103,23 @@ local SCM CclSetBuildingCapture(SCM flag)
 }
 
 /**
+**	Set reveal attacker
+**
+**	@param flag	Flag enabling or disabling it.
+**
+**	@return		The old state of the flag
+*/
+local SCM CclSetRevealAttacker(SCM flag)
+{
+    int old;
+
+    old = RevealAttacker;
+    RevealAttacker = gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
 **	Get an unit pointer
 **
 **	@param value	Unit slot number.
@@ -634,6 +651,7 @@ global void UnitCclRegister(void)
 	    CclSetHitPointRegeneration);
     gh_new_procedure1_0("set-training-queue!",CclSetTrainingQueue);
     gh_new_procedure1_0("set-building-capture!",CclSetBuildingCapture);
+    gh_new_procedure1_0("set-reveal-attacker!",CclSetRevealAttacker);
 
     gh_new_procedureN("unit",CclUnit);
 
