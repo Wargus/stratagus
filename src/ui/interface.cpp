@@ -438,6 +438,51 @@ local void UiEnterLoadGameMenu(void)
 }
 
 /**
+**	Enter Exit Confirm menu
+*/
+local void UiExitConfirmMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    ExitConfirmMenu();
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
+**	Enter Quit To Menu Confirm menu
+*/
+local void UiQuitToMenuConfirmMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    QuitToMenuConfirmMenu();
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
+**	Enter Restart Confirm menu
+*/
+local void UiRestartConfirmMenu(void)
+{
+    GamePaused=1;
+    SetStatusLine("Game Paused");
+    RestartConfirmMenu();
+    InterfaceState=IfaceStateNormal;
+    ClearStatusLine();
+    MarkDrawEntireMap();
+    MustRedraw=RedrawEverything;
+    GamePaused=0;
+}
+
+/**
 **	Toggle big map mode.
 **
 **	@todo FIXME: We should try to keep the same view, if possible
@@ -868,7 +913,8 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    ExitConfirmMenu();
+	    UiExitConfirmMenu();
+	    break;
 
 	case 'q'&0x1F:
 	case 'q':
@@ -876,7 +922,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    QuitToMenuConfirmMenu();
+	    UiQuitToMenuConfirmMenu();
 	    break;
 
 	case 'r'&0x1F:
@@ -885,7 +931,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    RestartConfirmMenu();
+	    UiRestartConfirmMenu();
 	    break;
 
 	case '.':
