@@ -282,7 +282,7 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 **  @param matrix   Matrix for calculation.
 **
 */
-static void FillMatrix(Unit* unit, unsigned int* matrix)
+static void FillMatrix(const Unit* unit, unsigned int* matrix)
 {
 	struct {
 		unsigned short X;
@@ -389,7 +389,7 @@ static void FillMatrix(Unit* unit, unsigned int* matrix)
 **
 **  @return         Distance to place.
 */
-int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
+int PlaceReachable(const Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
 {
 	int depth;
 	static unsigned long LastGameCycle;
@@ -428,7 +428,7 @@ int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __attribu
 **
 **  @return  Distance to place.
 */
-int UnitReachable(Unit* src, Unit* dst, int range)
+int UnitReachable(const Unit* src, const Unit* dst, int range)
 {
 	int depth;
 
