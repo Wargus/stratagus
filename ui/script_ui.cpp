@@ -47,6 +47,22 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Enable/disable the global color cycling.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of color cylce all.
+*/
+local SCM CclSetColorCycleAll(SCM flag)
+{
+    int old;
+
+    old=ColorCycleAll;
+    ColorCycleAll=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+/**
 **	Enable/disable the reverse map move.
 **
 **	@param flag	True = turn on, false = off.
@@ -61,7 +77,6 @@ local SCM CclSetReverseMapMove(SCM flag)
 
     return gh_bool2scm(old);
 }
-
 /**
 **	Defines the SVGALIB mouse speed adjust (must be > 0)
 **
@@ -168,6 +183,29 @@ local SCM CclSetSaturation(SCM saturation)
     VideoCreatePalette(GlobalPalette);	// rebuild palette
     MustRedraw=RedrawEverything;
 
+    return old;
+}
+
+/**
+**	Default title-screen.
+**
+**	@param title	SCM title. (nil reports only)
+**
+**	@return		Old title screen.
+*/
+local SCM CclSetTitleScreen(SCM title)
+{
+    SCM old;
+
+    old=gh_str02scm(TitleScreen);
+    if( !gh_null_p(title) ) {
+	if( TitleScreen ) {
+	    CclFree(TitleScreen);
+	    TitleScreen=NULL;
+	}
+
+	TitleScreen=gh_scm2newstr(title,NULL);
+    }
     return old;
 }
 
@@ -1164,13 +1202,19 @@ local SCM CclRightButtonMoves(void)
 }
 
 /**
-**	Enable fancy buildings
+**	Enable/disable the fancy buildings.
+**
+**	@param flag	True = turn on, false = off.
+**	@return		The old state of fancy buildings flag.
 */
-local SCM CclFancyBuildings(void)
+local SCM CclSetFancyBuildings(SCM flag)
 {
-    FancyBuildings=1;
+    int old;
 
-    return SCM_UNSPECIFIED;
+    old=FancyBuildings;
+    FancyBuildings=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
 }
 
 /**
@@ -1402,6 +1446,7 @@ local SCM CclSetHoldClickDelay(SCM delay)
 */
 global void UserInterfaceCclRegister(void)
 {
+    gh_new_procedure1_0("set-color-cycle-all!",CclSetColorCycleAll);
     gh_new_procedure1_0("set-reverse-map-move!",CclSetReverseMapMove);
 
     gh_new_procedure1_0("set-mouse-adjust!",CclSetMouseAdjust);
@@ -1410,6 +1455,8 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-contrast!",CclSetContrast);
     gh_new_procedure1_0("set-brightness!",CclSetBrightness);
     gh_new_procedure1_0("set-saturation!",CclSetSaturation);
+
+    gh_new_procedure1_0("set-title-screen!",CclSetTitleScreen);
 
     gh_new_procedure1_0("display-picture",CclDisplayPicture);
     gh_new_procedure1_0("process-menu",CclProcessMenu);
@@ -1428,7 +1475,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("set-show-command-key!",CclSetShowCommandKey);
     gh_new_procedure0_0("right-button-attacks",CclRightButtonAttacks);
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
-    gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
+    gh_new_procedure1_0("set-fancy-buildings!",CclSetFancyBuildings);
 
     gh_new_procedureN("define-button",CclDefineButton);
 
