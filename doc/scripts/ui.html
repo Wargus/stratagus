@@ -134,58 +134,89 @@ check-upgrade-to, check-research, check-single-research.
 
 <H4>Description</H4>
 
-.
+Define a cursor.
 
 <H4>Syntax</H4>
 
-<CODE>(define-cursor)</CODE>
+<CODE>(define-cursor ident race 'image image<BR>
+&nbsp;&nbsp;'hot-spot '(x y) 'size '(width height) ['rate rate])</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>ident</DT>
+<DD>Unique identifier of the cursor, used to reference it in config files and
+during startup.
+</DD>
+<DT>race</DT>
+<DD>Race to use this cursor with or "any" to use with any race.
+</DD>
+<DT>image</DT>
+<DD>Path to the image graphic.
+</DD>
+<DT>hot-spot</DT>
+<DD>Hot spot of the cursor in pixels. Relative to the sprite origin (0,0). The
+hot spot of a cursor is the point to which FreeCraft refers in tracking the
+cursor's position.
+</DD>
+<DT>size</DT>
+<DD>Size of the cursor in pixels.
+</DD>
+<DT>rate</DT>
+<DD>Rate of changing the frames if using an animated cursor. The "rate" tells
+the engine how many milliseconds to hold each frame of the animation.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-cursor)
+    (define-cursor 'cursor-cross 'any
+      'image "ui/cursors/small green cross.png"
+      'hot-spot '(8 8) 'size '(18 18))
 </PRE>
 
-<P>.
+<P>Defines the cross cursor for any race.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/ui.ccl"> $LIBARYPATH/ccl/ui.ccl </A> ,
+<A HREF="../../data/ccl/human/ui.ccl"> $LIBARYPATH/ccl/human/ui.ccl </A> ,
+<A HREF="../../data/ccl/orc/ui.ccl"> $LIBARYPATH/ccl/orc/ui.ccl </A>
 
 <A NAME="define-font"></A>
 <H3>define-font</H3>
 
 <H4>Description</H4>
 
-.
+Define a font.
 
 <H4>Syntax</H4>
 
-<CODE>(define-font)</CODE>
+<CODE>(define-font type file size)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>type</DT>
+<DD>Type of font.  Supported types are: 'game, 'small, 'large, 'small-title,
+and 'large-title.
+</DD>
+<DT>file</DT>
+<DD>File name for font file.  Currently only multicolor bitmap fonts supported.
+</DD>
+<DT>size</DT>
+<DD>Font size width and height.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (define-font)
+    (define-font 'game "graphics/ui/fonts/game.png" 13 14)
 </PRE>
 
-<P>.
+<P>Define the game font.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </A>
 
 <A NAME="define-font-colors"></A>
 <H3>define-font-colors</H3>
@@ -214,7 +245,7 @@ check-upgrade-to, check-research, check-single-research.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/fonts.ccl"> $LIBARYPATH/ccl/fonts.ccl </A>
 
 <A NAME="define-menu"></A>
 <H3>define-menu</H3>
@@ -243,7 +274,7 @@ check-upgrade-to, check-research, check-single-research.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
 
 <A NAME="define-menu-item"></A>
 <H3>define-menu-item</H3>
@@ -272,7 +303,7 @@ check-upgrade-to, check-research, check-single-research.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/menus.ccl"> $LIBARYPATH/ccl/menus.ccl </A>
 
 <A NAME="define-new-ui"></A>
 <H3>define-new-ui</H3>
@@ -374,87 +405,81 @@ viewport having map coordinates 82,31 and the second having coordinates
 
 <H4>Description</H4>
 
-.
+Display a picture.
 
 <H4>Syntax</H4>
 
-<CODE>(display-picture)</CODE>
+<CODE>(display-picture file)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>file</DT>
+<DD>Path to the image graphic.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (display-picture)
+    (display-picture "graphics/ui/freecraft.png")
 </PRE>
 
-<P>.
+<P>Displays the picture.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="process-menu"></A>
 <H3>process-menu</H3>
 
 <H4>Description</H4>
 
-.
+Process a menu.
 
 <H4>Syntax</H4>
 
-<CODE>(process-menu)</CODE>
+<CODE>(process-menu id)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>id</DT>
+<DD>ID of the menu.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (process-menu)
+    (process-menu 'menu-program-start)
 </PRE>
 
-<P>.
+<P>Process the menu 'menu-program-start.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="set-game-cursor!"></A>
 <H3>set-game-cursor!</H3>
 
 <H4>Description</H4>
 
-.
+Set the game cursor.
 
 <H4>Syntax</H4>
 
-<CODE>(set-game-cursor!)</CODE>
+<CODE>(set-game-cursor! ident)</CODE>
 
 <DL>
-<DT></DT>
-<DD>.
+<DT>ident</DT>
+<DD>Unique identifier of the cursor.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
-    (set-game-cursor!)
+    (set-game-cursor! 'cursor-point)
 </PRE>
 
-<P>.
+<P>Set the game cursor to 'cursor-point.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <HR>
 Last changed: $Id$<BR>
