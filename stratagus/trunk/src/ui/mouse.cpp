@@ -631,14 +631,23 @@ local void SendRepair(int x,int y)
 {
     int i;
     Unit* unit;
+    Unit* dest;
 
+    dest=RepairableOnMapTile(x,y);
+    if( !dest || !dest->Type
+	    || !dest->Type->Building
+	    || dest->Player!=ThisPlayer
+	    || dest->HP>=dest->Stats[dest->Player->Player].HitPoints ) {
+	// FIXME: Should move test in repairable
+	dest=NoUnitP;
+    }
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
-// FIXME: only worker could be send repairing
-//		if( !unit->Type->Building ) {
-//		if( unit->Type->CowerWorker ) {
-	SendCommandRepair(unit,x,y,NoUnitP,!(KeyModifiers&ModifierShift));
-//		}
+	if( unit->Type->CowerWorker ) {
+	    SendCommandRepair(unit,x,y,dest,!(KeyModifiers&ModifierShift));
+	} else {
+	    DebugLevel0Fn("No worker repairs\n");
+	}
     }
 }
 
