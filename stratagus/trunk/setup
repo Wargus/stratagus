@@ -50,6 +50,7 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI"
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## NEW_NETMENUS:	Menu driven network set-up.
+## NEW_REGIONS:		Support for new regions code
 
 # Compile commands
 CC=gcc
