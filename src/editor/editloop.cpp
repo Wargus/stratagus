@@ -1863,7 +1863,7 @@ static void CreateEditor(void)
 
 	ReplayRevealMap = 1;
 	FlagRevealMap = 0;
-	SelectedPlayer = 15;
+	SelectedPlayer = PlayerNumNeutral;
 
 	//
 	// Place the start points, which the loader discarded.
@@ -1871,7 +1871,7 @@ static void CreateEditor(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
 			// Set SelectedPlayer to a valid player
-			if (SelectedPlayer == 15) {
+			if (SelectedPlayer == PlayerNumNeutral) {
 				SelectedPlayer = i;
 			}
 #if 0
