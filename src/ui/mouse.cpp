@@ -273,6 +273,7 @@ global void DoRightButton (int sx,int sy)
 
 	    dest=UnitOnScreenMapPosition (sx,sy);
             if( dest ) {
+		// FIXME: should ally to self
                 if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
 			&& dest!=unit ) {
 		    dest->Blink=3;
