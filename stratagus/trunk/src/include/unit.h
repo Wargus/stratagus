@@ -716,7 +716,6 @@ extern void DrawUnitSelection(const Unit*);
 extern void (*DrawSelection)(VMemType, int, int, int, int);
 
 extern int MaxSelectable;		/// How many units could be selected
-extern int NumUnitsPerGroup;		/// How many units could be in a group
 
 extern Unit** Selected;			/// currently selected units
 extern int NumSelected;			/// how many units selected
