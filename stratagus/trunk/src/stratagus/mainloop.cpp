@@ -744,7 +744,6 @@ global void GameMainLoop(void)
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
-	    TriggersEachCycle();	// handle triggers
 	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time
@@ -813,6 +812,7 @@ global void GameMainLoop(void)
 #endif
 	}
 
+	TriggersEachCycle();		// handle triggers
 	UpdateMessages();		// update messages
 
 	//

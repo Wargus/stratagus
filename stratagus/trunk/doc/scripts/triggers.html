@@ -48,6 +48,7 @@
 <A HREF="#action-start-timer">action-start-timer</A>
 <A HREF="#action-stop-timer">action-stop-timer</A>
 <A HREF="#action-victory">action-victory</A>
+<A HREF="#action-wait">action-wait</A>
 <A HREF="#add-trigger">add-trigger</A>
 <A HREF="#if-elapsed">if-elapsed</A>
 <A HREF="#if-kills">if-kills</A>
@@ -80,15 +81,17 @@ The condition player is set to defeat.
 
 <PRE>
     (add-trigger
-      (lambda () (if-unit 'this '== 0 'all))
-      (lambda () (action-defeat)))
+      '(
+        (if-unit 'this '== 0 'all))
+      '(
+        (action-defeat)))
 </PRE>
 
 <P>Adds a trigger.  If the player on the console has 0 units then he loses.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
 <A NAME="action-draw"></A>
 <H3>action-draw</H3>
@@ -109,9 +112,7 @@ The condition player is set to draw. (NOT SUPPORTED)
 
 <P>.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="action-set-timer"></A>
 <H3>action-set-timer</H3>
@@ -141,9 +142,7 @@ Set the timer.
 
 <P>Sets the timer to 9000 cycles (300 seconds or 5 minutes) and decreasing.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="action-start-timer"></A>
 <H3>action-start-timer</H3>
@@ -164,9 +163,7 @@ Start the timer.
 
 <P>Starts the timer.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="action-stop-timer"></A>
 <H3>action-stop-timer</H3>
@@ -187,9 +184,7 @@ Stop the timer.
 
 <P>Stops the timer.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="action-victory"></A>
 <H3>action-victory</H3>
@@ -206,8 +201,10 @@ The condition player is set to victory.
 
 <PRE>
     (add-trigger
-      (lambda () (if-opponents 'this '== 0))
-      (lambda () (action-victory)))
+      '(
+        (if-opponents 'this '== 0))
+      '(
+        (action-victory)))
 </PRE>
 
 <P>Adds a trigger. If the player on the console has killed all his 
@@ -215,7 +212,43 @@ opponents he won.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
+<A NAME="action-wait"></A>
+<H3>action-wait</H3>
+
+<H4>Description</H4>
+
+Causes the trigger to wait a minimum number of milliseconds.
+
+<H4>Syntax</H4>
+
+<CODE>(action-wait ms)</CODE>
+
+<DL>
+<DT>ms</DT>
+<DD>Minimum number of milliseconds to wait.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (add-trigger
+      '(
+        (if-opponents 'this '== 0))
+      '(
+        (add-message "Hello")
+        (action-wait 2000)
+        (add-message "World")
+        #f))
+</PRE>
+
+<P>Adds a trigger. If the player on the console has killed all his 
+opponents the message "Hello" appears then two seconds later the message
+"World" appears.
+
+<H4>Not Used</H4>
 
 <A NAME="add-trigger"></A>
 <H3>add-trigger</H3>
@@ -232,8 +265,10 @@ Creates a new trigger.
 <DT>condition</DT>
 <DD><PRE>
 condition can be
-	(lambda () (or (and condition1 conditon2 ...)
-	   (and condition3 condition4 ...)))
+	'(
+          (or
+            (and condition1 conditon2 ...)
+	    (and condition3 condition4 ...)))
 	...
 	- condition1 and condition2 and ... must be true or condition3
 	  and condition4 and ... must be true to execute the action.
@@ -250,8 +285,10 @@ returns true and is removed if the action returns false.
 
 <PRE>
     (add-trigger
-      (lambda () (if-opponents 'this '== 0))
-      (lambda () (action-victory)))
+      '(
+        (if-opponents 'this '== 0))
+      '(
+        (action-victory)))
 </PRE>
 
 <P>Adds a trigger. If the player on the console has killed all his 
@@ -259,7 +296,7 @@ opponents he won.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
 <A NAME="if-elapsed"></A>
 <H3>if-elapsed</H3>
@@ -295,9 +332,7 @@ Game run for duration.  If the game run for the duration game cycles the action 
 
 <P>If the game has run for 300 cycles.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-kills"></A>
 <H3>if-kills</H3>
@@ -341,9 +376,7 @@ player for the action.
 
 <P>.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-near-unit"></A>
 <H3>if-near-unit</H3>
@@ -396,9 +429,7 @@ the action.
 
 <P>If the player on the console has 6 archers near the circle of power.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-opponents"></A>
 <H3>if-opponents</H3>
@@ -443,7 +474,7 @@ Player has the quantity of opponents.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
 <A NAME="if-rescued-near-unit"></A>
 <H3>if-rescued-near-unit</H3>
@@ -496,9 +527,7 @@ for the action.
 
 <P>The player on the console has 1 rescued archer near the circle of power.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-resource"></A>
 <H3>if-resource</H3>
@@ -594,9 +623,7 @@ quantity of score the action is executed.
 
 <P>If the player on the console has a score of at least 1000.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-timer"></A>
 <H3>if-timer</H3>
@@ -632,9 +659,7 @@ Timer reaches quantity. If the timer reaches quantity the action is executed.
 
 <P>If the timer is at 0 cycles.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="if-unit"></A>
 <H3>if-unit</H3>
@@ -688,7 +713,7 @@ units must control the player for the action.
 
 <H4>Used</H4>
 
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
 <A NAME="set-trigger-number!"></A>
 <H3>set-trigger-number!</H3>
