@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,19 +46,19 @@
 #include "commands.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Get a player pointer
+**  Get a player pointer
 **
-**		@param value		Player slot number.
+**  @param value  Player slot number.
 **
-**		@return				The player pointer
+**  @return       The player pointer
 */
 local Player* CclGetPlayer(lua_State* l)
 {
@@ -66,9 +66,9 @@ local Player* CclGetPlayer(lua_State* l)
 }
 
 /**
-**		Parse the player configuration.
+**  Parse the player configuration.
 **
-**		@param list		Tagged list of all informations.
+**  @param list  Tagged list of all informations.
 */
 local int CclPlayer(lua_State* l)
 {
@@ -96,7 +96,7 @@ local int CclPlayer(lua_State* l)
 	}
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	//  Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -362,12 +362,12 @@ local int CclPlayer(lua_State* l)
 }
 
 /**
-**		Change unit owner
+**  Change unit owner
 **
-**		@param pos1		 top left tile
-**		@param pos2		 bottom right tile
-**		@param oldplayer old player number
-**		@param newplayer new player number
+**  @param pos1       top left tile
+**  @param pos2       bottom right tile
+**  @param oldplayer  old player number
+**  @param newplayer  new player number
 **/
 local int CclChangeUnitsOwner(lua_State* l)
 {
@@ -420,9 +420,9 @@ local int CclChangeUnitsOwner(lua_State* l)
 }
 
 /**
-**		Get ThisPlayer.
+**  Get ThisPlayer.
 **
-**		@return				This player number.
+**  @return  This player number.
 */
 local int CclGetThisPlayer(lua_State* l)
 {
@@ -435,9 +435,9 @@ local int CclGetThisPlayer(lua_State* l)
 }
 
 /**
-**		Set ThisPlayer.
+**  Set ThisPlayer.
 **
-**		@param plynr		This player number.
+**  @param plynr  This player number.
 */
 local int CclSetThisPlayer(lua_State* l)
 {
@@ -455,9 +455,9 @@ local int CclSetThisPlayer(lua_State* l)
 }
 
 /**
-**		Set MaxSelectable
+**  Set MaxSelectable
 **
-**		@param				Max number of selectable units.
+**  @param Max number of selectable units.
 */
 local int CclSetMaxSelectable(lua_State* l)
 {
@@ -472,9 +472,9 @@ local int CclSetMaxSelectable(lua_State* l)
 }
 
 /**
-**		Set player unit limit.
+**  Set player unit limit.
 **
-**		@param limit		Unit limit.
+**  @param limit  Unit limit.
 */
 local int CclSetAllPlayersUnitLimit(lua_State* l)
 {
@@ -493,9 +493,9 @@ local int CclSetAllPlayersUnitLimit(lua_State* l)
 }
 
 /**
-**		Set player unit limit.
+**  Set player unit limit.
 **
-**		@param limit		Unit limit.
+**  @param limit  Unit limit.
 */
 local int CclSetAllPlayersBuildingLimit(lua_State* l)
 {
@@ -514,9 +514,9 @@ local int CclSetAllPlayersBuildingLimit(lua_State* l)
 }
 
 /**
-**		Set player unit limit.
+**  Set player unit limit.
 **
-**		@param limit		Unit limit.
+**  @param limit  Unit limit.
 */
 local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 {
@@ -535,15 +535,15 @@ local int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 }
 
 /**
-**		Change the diplomacy from player to another player.
+**  Change the diplomacy from player to another player.
 **
-**		@param player		Player to change diplomacy.
-**		@param opponent		Player number to change.
-**		@param state		To which state this should be changed.
+**  @param player    Player to change diplomacy.
+**  @param opponent  Player number to change.
+**  @param state     To which state this should be changed.
 **
-**		@return				FIXME: should return old state.
+**  @return          FIXME: should return old state.
 **
-**		@todo FIXME: should return old state.
+**  @todo FIXME: should return old state.
 */
 local int CclSetDiplomacy(lua_State* l)
 {
@@ -573,10 +573,10 @@ local int CclSetDiplomacy(lua_State* l)
 }
 
 /**
-**		Change the diplomacy from ThisPlayer to another player.
+**  Change the diplomacy from ThisPlayer to another player.
 **
-**		@param state		To which state this should be changed.
-**		@param player		Player number to change.
+**  @param state   To which state this should be changed.
+**  @param player  Player number to change.
 */
 local int CclDiplomacy(lua_State* l)
 {
@@ -586,15 +586,15 @@ local int CclDiplomacy(lua_State* l)
 }
 
 /**
-**		Change the shared vision from player to another player.
+**  Change the shared vision from player to another player.
 **
-**		@param player		Player to change shared vision.
-**		@param opponent		Player number to change.
-**		@param state		To which state this should be changed.
+**  @param player    Player to change shared vision.
+**  @param opponent  Player number to change.
+**  @param state     To which state this should be changed.
 **
-**		@return				FIXME: should return old state.
+**  @return          FIXME: should return old state.
 **
-**		@todo FIXME: should return old state.
+**  @todo FIXME: should return old state.
 */
 local int CclSetSharedVision(lua_State* l)
 {
@@ -617,10 +617,10 @@ local int CclSetSharedVision(lua_State* l)
 }
 
 /**
-**		Change the shared vision from ThisPlayer to another player.
+**  Change the shared vision from ThisPlayer to another player.
 **
-**		@param state		To which state this should be changed.
-**		@param player		Player number to change.
+**  @param state   To which state this should be changed.
+**  @param player  Player number to change.
 */
 local int CclSharedVision(lua_State* l)
 {
@@ -630,9 +630,9 @@ local int CclSharedVision(lua_State* l)
 }
 
 /**
-**		Define race names
+**  Define race names
 **
-**		@param list		List of all races.
+**  @param list  List of all races.
 */
 local int CclDefineRaceNames(lua_State* l)
 {
@@ -695,7 +695,7 @@ local int CclDefineRaceNames(lua_State* l)
 }
 
 /**
-**		Make new player colors
+**  Make new player colors
 */
 local int CclNewPlayerColors(lua_State* l)
 {
@@ -711,81 +711,129 @@ local int CclNewPlayerColors(lua_State* l)
 // ----------------------------------------------------------------------------
 
 /**
-**		Get player resources.
-**
-**		@param player		Player
-**		@param resource		Resource name
-**
-**		@return				Player resource
+**  Get player data.
 */
-local int CclGetPlayerResource(lua_State* l)
+local int CclGetPlayerData(lua_State* l)
 {
-	int i;
-	Player* plyr;
-	const char* res;
+	Player* p;
+	const char* data;
 
-	if (lua_gettop(l) != 2) {
+	if (lua_gettop(l) < 2) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	}
 	lua_pushvalue(l, 1);
-	plyr = CclGetPlayer(l);
+	p = CclGetPlayer(l);
 	lua_pop(l, 1);
-	res = LuaToString(l, 2);
+	data = LuaToString(l, 2);
 
-	for (i = 0; i < MaxCosts; ++i) {
-		if (!strcmp(res, DefaultResourceNames[i])) {
-			break;
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, p->Name);
+		return 1;
+	} else if (!strcmp(data, "RaceName")) {
+		lua_pushstring(l, p->RaceName);
+		return 1;
+	} else if (!strcmp(data, "Resources")) {
+		const char* res;
+		int i;
+
+		if (lua_gettop(l) != 3) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
 		}
-	}
-	if (i == MaxCosts) {
-		// FIXME: this leaves a half initialized player
-		lua_pushfstring(l, "Invalid resource \"%s\"", res);
-		lua_error(l);
-	}
-	lua_pushnumber(l, plyr->Resources[i]);
-	return 1;
-}
-
-/**
-**		Set player resource.
-**
-**		@param list		Resource list
-*/
-local int CclSetPlayerResource(lua_State* l)
-{
-	int i;
-	Player* player;
-	const char* value;
-	int args;
-	int j;
-
-	args = lua_gettop(l);
-	lua_pushvalue(l, 1);
-	player = CclGetPlayer(l);
-	lua_pop(l, 1);
-	for (j = 1; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		++j;
+		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
-			if (!strcmp(value, DefaultResourceNames[i])) {
+			if (!strcmp(res, DefaultResourceNames[i])) {
 				break;
 			}
 		}
 		if (i == MaxCosts) {
-		   lua_pushfstring(l, "Unsupported tag: %s", value);
-		   lua_error(l);
+			lua_pushfstring(l, "Invalid resource \"%s\"", res);
+			lua_error(l);
 		}
-		player->Resources[i] = LuaToNumber(l, j + 1);
+		lua_pushnumber(l, p->Resources[i]);
+		return 1;
+	} else if (!strcmp(data, "UnitTypesCount")) {
+		UnitType* type;
+
+		if (lua_gettop(l) != 3) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		}
+		type = CclGetUnitType(l);
+		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
+		return 1;
+	} else if (!strcmp(data, "AiEnabled")) {
+		lua_pushboolean(l, p->AiEnabled);
+		return 1;
+	} else if (!strcmp(data, "TotalNumUnits")) {
+		lua_pushnumber(l, p->TotalNumUnits);
+		return 1;
+	} else if (!strcmp(data, "NumBuildings")) {
+		lua_pushnumber(l, p->NumBuildings);
+		return 1;
+	} else if (!strcmp(data, "Supply")) {
+		lua_pushnumber(l, p->Supply);
+		return 1;
+	} else if (!strcmp(data, "Demand")) {
+		lua_pushnumber(l, p->Demand);
+		return 1;
+	} else if (!strcmp(data, "UnitLimit")) {
+		lua_pushnumber(l, p->UnitLimit);
+		return 1;
+	} else if (!strcmp(data, "BuildingLimit")) {
+		lua_pushnumber(l, p->BuildingLimit);
+		return 1;
+	} else if (!strcmp(data, "TotalUnitLimit")) {
+		lua_pushnumber(l, p->TotalUnitLimit);
+		return 1;
+	} else if (!strcmp(data, "Score")) {
+		lua_pushnumber(l, p->Score);
+		return 1;
+	} else if (!strcmp(data, "TotalUnits")) {
+		lua_pushnumber(l, p->TotalUnits);
+		return 1;
+	} else if (!strcmp(data, "TotalBuildings")) {
+		lua_pushnumber(l, p->TotalBuildings);
+		return 1;
+	} else if (!strcmp(data, "TotalResources")) {
+		const char* res;
+		int i;
+
+		if (lua_gettop(l) != 3) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		}
+		res = LuaToString(l, 3);
+		for (i = 0; i < MaxCosts; ++i) {
+			if (!strcmp(res, DefaultResourceNames[i])) {
+				break;
+			}
+		}
+		if (i == MaxCosts) {
+			lua_pushfstring(l, "Invalid resource \"%s\"", res);
+			lua_error(l);
+		}
+		lua_pushnumber(l, p->TotalResources[i]);
+		return 1;
+	} else if (!strcmp(data, "TotalRazings")) {
+		lua_pushnumber(l, p->TotalRazings);
+		return 1;
+	} else if (!strcmp(data, "TotalKills")) {
+		lua_pushnumber(l, p->TotalKills);
+		return 1;
+	} else {
+		lua_pushfstring(l, "Invalid field: %s", data);
+		lua_error(l);
 	}
-	MustRedraw |= RedrawResources;
-	return 0;
+
+	return 1;
 }
 
 // ----------------------------------------------------------------------------
 
 /**
-**		Register CCL features for players.
+**  Register CCL features for players.
 */
 global void PlayerCclRegister(void)
 {
@@ -813,8 +861,7 @@ global void PlayerCclRegister(void)
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
 	// player member access functions
-	lua_register(Lua, "GetPlayerResource", CclGetPlayerResource);
-	lua_register(Lua, "SetPlayerResource", CclSetPlayerResource);
+	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 }
 
 #ifdef META_LUA
