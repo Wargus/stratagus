@@ -1701,6 +1701,8 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
         SDL_CDPause(CDRom);
 	CDMode = ":stopped";
     }
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
+	StopMusic();
 #elif defined(USE_LIBCDA)
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
