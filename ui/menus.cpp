@@ -3025,7 +3025,7 @@ local void JoinNetGameMenu(void)
     Invalidate();
 #else
     VideoLockScreen();
-
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 #endif
