@@ -30,8 +30,8 @@
 
 //@{
 
-#define ICON_SIZE_X (TheUI.ButtonButtons[0].Width)
-#define ICON_SIZE_Y (TheUI.ButtonButtons[0].Height)
+#define ICON_SIZE_X (TheUI.ButtonButtons[0].Style->Width)
+#define ICON_SIZE_Y (TheUI.ButtonButtons[0].Style->Height)
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -433,9 +433,9 @@ static void HandleMouseOn(int x, int y)
 			!BigMapMode) {
 		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
 			if (x >= TheUI.TransportingButtons[i].X &&
-					x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Width + 7 &&
+					x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Style->Width &&
 					y >= TheUI.TransportingButtons[i].Y &&
-					y < TheUI.TransportingButtons[i].Y + TheUI.TransportingButtons[i].Height + 7) {
+					y < TheUI.TransportingButtons[i].Y + TheUI.TransportingButtons[i].Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
@@ -448,9 +448,9 @@ static void HandleMouseOn(int x, int y)
 			if (Selected[0]->OrderCount == 1) {
 				if (TheUI.SingleTrainingButton &&
 						x >= TheUI.SingleTrainingButton->X &&
-						x < TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Width + 7 &&
+						x < TheUI.SingleTrainingButton->X + TheUI.SingleTrainingButton->Style->Width &&
 						y >= TheUI.SingleTrainingButton->Y &&
-						y < TheUI.SingleTrainingButton->Y + TheUI.SingleTrainingButton->Height + 7) {
+						y < TheUI.SingleTrainingButton->Y + TheUI.SingleTrainingButton->Style->Height) {
 					ButtonAreaUnderCursor = ButtonAreaTraining;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
@@ -461,9 +461,9 @@ static void HandleMouseOn(int x, int y)
 					i < TheUI.NumTrainingButtons; ++i) {
 					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
 							x >= TheUI.TrainingButtons[i].X &&
-							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Width + 7 &&
+							x < TheUI.TrainingButtons[i].X + TheUI.TrainingButtons[i].Style->Width &&
 							y >= TheUI.TrainingButtons[i].Y &&
-							y < TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Height + 7) {
+							y < TheUI.TrainingButtons[i].Y + TheUI.TrainingButtons[i].Style->Height) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = i;
 						CursorOn = CursorOnButton;
@@ -473,9 +473,9 @@ static void HandleMouseOn(int x, int y)
 			}
 		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo && !BigMapMode) {
 			if (x >= TheUI.UpgradingButton->X &&
-					x < TheUI.UpgradingButton->X + TheUI.UpgradingButton->Width + 7 &&
+					x < TheUI.UpgradingButton->X + TheUI.UpgradingButton->Style->Width &&
 					y >= TheUI.UpgradingButton->Y &&
-					y < TheUI.UpgradingButton->Y + TheUI.UpgradingButton->Height + 7) {
+					y < TheUI.UpgradingButton->Y + TheUI.UpgradingButton->Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaUpgrading;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
@@ -483,9 +483,9 @@ static void HandleMouseOn(int x, int y)
 			}
 		} else if (Selected[0]->Orders[0].Action == UnitActionResearch && !BigMapMode) {
 			if (x >= TheUI.ResearchingButton->X &&
-					x < TheUI.ResearchingButton->X + TheUI.ResearchingButton->Width + 7 &&
+					x < TheUI.ResearchingButton->X + TheUI.ResearchingButton->Style->Width &&
 					y >= TheUI.ResearchingButton->Y &&
-					y < TheUI.ResearchingButton->Y + TheUI.ResearchingButton->Height + 7) {
+					y < TheUI.ResearchingButton->Y + TheUI.ResearchingButton->Style->Height) {
 				ButtonAreaUnderCursor = ButtonAreaResearching;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
@@ -496,9 +496,9 @@ static void HandleMouseOn(int x, int y)
 	if (NumSelected == 1) {
 		if (TheUI.SingleSelectedButton && !BigMapMode &&
 				x >= TheUI.SingleSelectedButton->X &&
-				x < TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Width + 7 &&
+				x < TheUI.SingleSelectedButton->X + TheUI.SingleSelectedButton->Style->Width &&
 				y >= TheUI.SingleSelectedButton->Y &&
-				y < TheUI.SingleSelectedButton->Y + TheUI.SingleSelectedButton->Height + 7) {
+				y < TheUI.SingleSelectedButton->Y + TheUI.SingleSelectedButton->Style->Height) {
 			ButtonAreaUnderCursor = ButtonAreaSelected;
 			ButtonUnderCursor = 0;
 			CursorOn = CursorOnButton;
@@ -510,9 +510,9 @@ static void HandleMouseOn(int x, int y)
 				TheUI.NumSelectedButtons - 1 : NumSelected - 1;
 			for (; i >= 0; --i) {
 				if (x >= TheUI.SelectedButtons[i].X &&
-						x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Width + 7 &&
+						x < TheUI.SelectedButtons[i].X + TheUI.SelectedButtons[i].Style->Width &&
 						y >= TheUI.SelectedButtons[i].Y &&
-						y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Height + 7) {
+						y < TheUI.SelectedButtons[i].Y + TheUI.SelectedButtons[i].Style->Height) {
 					ButtonAreaUnderCursor = ButtonAreaSelected;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
@@ -1750,9 +1750,9 @@ void UIHandleButtonUp(unsigned button)
 			x0 = CursorStartScrMapX;
 			y0 = CursorStartScrMapY;
 			x1 = CursorX - TheUI.MouseViewport->X +
-				TheUI.MouseViewport->MapX * TileSizeX;
+				TheUI.MouseViewport->MapX * TileSizeX + TheUI.MouseViewport->OffsetX;
 			y1 = CursorY - TheUI.MouseViewport->Y +
-				TheUI.MouseViewport->MapY * TileSizeY;
+				TheUI.MouseViewport->MapY * TileSizeY + TheUI.MouseViewport->OffsetY;
 
 			if (x0 > x1) {
 				int swap;

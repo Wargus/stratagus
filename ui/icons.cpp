@@ -44,6 +44,8 @@
 #include "icons.h"
 #include "player.h"
 #include "script.h"
+#include "ui.h"
+#include "menus.h"
 
 #include "util.h"
 
@@ -400,63 +402,28 @@ void DrawIcon(const Player* player, Icon* icon, int x, int y)
 **  Draw unit icon 'icon' with border on x,y
 **
 **  @param player  Player pointer used for icon colors
-**  @param icon    Icon identifier
+**  @param style   Button style
 **  @param flags   State of icon (clicked, mouse over...)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
+**  @param text    Optional text to display
 */
-void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
-	int x, int y)
+void DrawUnitIcon(const Player* player, ButtonStyle* style, Icon* icon,
+	unsigned flags, int x, int y, const char* text)
 {
-	Uint32 color;
-	int width;
-	int height;
+	ButtonStyle s;
 
-	Assert(icon);
-
-	width = icon->Width;
-	height = icon->Height;
-
-	//
-	//  Black border around icon with gray border if active.
-	//
-	color = (flags & (IconActive | IconClicked)) ? ColorGray : ColorBlack;
-
-	// FIXME: BAD HACK to not draw border for Magnant
-	if (strcmp(GameName, "Magnant")) {
-		VideoDrawRectangleClip(color, x, y, width + 7, height + 7);
-		VideoDrawRectangleClip(ColorBlack, x + 1, y + 1,
-			width + 5, height + 5);
+	memcpy(&s, style, sizeof(ButtonStyle));
+	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
+		s.Clicked.Sprite = s.Disabled.Sprite = icon->Sprite;
+	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
+		s.Clicked.Frame = s.Disabled.Frame = icon->Index;
+	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
+		s.Default.BorderColorRGB = TheUI.ButtonAutoCastBorderColorRGB;
+		s.Default.BorderColor = 0;
 	}
-
-	// _|  Shadow
-	VideoDrawVLine(ColorGray, x + width + 3, y + 2, height + 1);
-	VideoDrawVLine(ColorGray, x + width + 4, y + 2, height + 1);
-	VideoDrawHLine(ColorGray, x + 2, y + height + 3, width + 3);
-	VideoDrawHLine(ColorGray, x + 2, y + height + 4, width + 3);
-
-	// |~  Light
-	color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	VideoDrawHLine(color, x + 4, y + 2, width - 1);
-	VideoDrawHLine(color, x + 4, y + 3, width - 1);
-	VideoDrawVLine(color, x + 2, y + 2, height + 1);
-	VideoDrawVLine(color, x + 3, y + 2, height + 1);
-
-	if (flags & IconClicked) {
-		x += 4;
-		y += 4;
-	} else {
-		x += 3;
-		y += 3;
-	}
-
-	DrawIcon(player, icon, x, y);
-
-	if (flags & IconSelected) {
-		VideoDrawRectangleClip(ColorGreen, x - 1, y - 1, width + 1, height + 1);
-	} else if (flags & IconAutoCast) {
-		VideoDrawRectangleClip(ColorBlue, x - 1, y - 1, width + 1, height + 1);
-	}
+	// FIXME: player colors
+	DrawMenuButton(&s, flags, x, y, text);
 }
 
 /**
