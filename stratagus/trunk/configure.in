@@ -110,21 +110,18 @@ AC_ARG_WITH(opengl,
     [  --with-opengl		  [Use opengl (default: no)]],, with_opengl="no")
 if test "$with_opengl" != "no"; then
 	VIDEO_CFLAGS="$VIDEO_CFLAGS -DUSE_OPENGL"
-	case "$target" in
-		*-*-cygwin* | *-*-mingw32*)
-			VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
-			;;
-		*)
-			AC_PATH_X
-			AC_PATH_XTRA
-			if test x$have_x = xyes; then
-				VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
-				VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
-			else
-				VIDEO_LIBS="$VIDEO_LIBS -lGL"
-			fi
-			;;
-	esac
+	if test "`uname -a | grep -is cygwin`" -o "`uname -a | grep -is mingw`"; then
+		VIDEO_LIBS="$VIDEO_LIBS -lopengl32"
+	else
+		AC_PATH_X
+		AC_PATH_XTRA
+		if test x$have_x = xyes; then
+			VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
+			VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
+		else
+			VIDEO_LIBS="$VIDEO_LIBS -lGL"
+		fi
+	fi
 fi
 AC_SUBST(VIDEO_CFLAGS)
 AC_SUBST(VIDEO_LIBS)
