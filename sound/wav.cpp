@@ -64,12 +64,16 @@ typedef struct _wav_data_ {
 local int WavReadStream(Sample *sample, void *buf, int len)
 {
     WavData* data;
+    char sndbuf[WAV_BUFFER_SIZE*4];
     int n;
     int i;
+    int x, y;
+    int rate;
 
     data = (WavData*) sample->User;
 
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
+	// need to read new data
 	n = sample->Length - (data->PointerInBuffer - sample->Data);
 	memcpy(sample->Data, data->PointerInBuffer, n);
 	sample->Length = n;
@@ -77,9 +81,21 @@ local int WavReadStream(Sample *sample, void *buf, int len)
 
 	n = WAV_BUFFER_SIZE - n;
 
-	i = CLread(data->WavFile, data->PointerInBuffer + sample->Length, 
-		    WAV_BUFFER_SIZE);
-	sample->Length += i;
+	rate = 22050 / (sample->Frequency / sample->Channels);
+	if (!rate) {
+	    rate = 1;
+	}
+
+	i = CLread(data->WavFile, sndbuf, WAV_BUFFER_SIZE/rate);
+
+	// FIXME: clicking for 22khz sounds
+	for (x = 0; x < i*rate; x += 4) {
+	    for (y = 0; y < 4; ++y) {
+	        data->PointerInBuffer[x + sample->Length + y] = sndbuf[x/rate+y];
+	    }
+	}
+
+	sample->Length += i*rate;
 
         if (sample->Length < len) {
             len = sample->Length;
@@ -241,6 +257,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     sample->SampleSize = wavfmt.SampleSize * 8;
     sample->Frequency = wavfmt.Frequency;
     sample->Length = 0;
+
 
     if (flags & PlayAudioStream) {
 	WavData* data;
