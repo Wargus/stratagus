@@ -41,7 +41,7 @@
 **
 **	Any help to improve this documention is welcome. If you didn't
 **	understand something or you found a failure or a wrong spelling
-**	please write an email.
+**	or wrong grammer please write an email (including a patch :).
 **
 **	@section Informations Informations
 **
@@ -53,17 +53,60 @@
 **	This are the main modules of the FreeCraft engine.
 **
 **	@subsection Map Map
+**
+**		Handles the map. A map is made from tiles.
+**
+**		@see map.h @see map.c @see tileset.h @see tileset.c
+**
 **	@subsection Unit Unit
+**
+**		Handles units. Units are ships, flyers, buildings, creatures,
+**		machines.
+**
+**		@see unit.h @see unit.c
+**
 **	@subsection Missile Missile
+**
+**		Handles missiles. Missiles are all other sprites on map
+**		which are no unit.
+**
+**		@see missile.h @see missile.c
+**
 **	@subsection Player Player
+**
+**		Handles players, all units are owned by a player. A player
+**		could be controlled by a human or a computer.
+**
+**		@see player.h @see player.c
+**
 **	@subsection Sound Sound
+**
+**		@see sound.h @see sound.c
+**
 **	@subsection Video Video
+**
+**		@see video.h @see video.c
+**
 **	@subsection Network Network
+**
+**		@see network.h @see network.c
+**
 **	@subsection Pathfinder Pathfinder
+**
+**		@see pathfinder.h @see pathfinder.c
+**
 **	@subsection AI AI
+**
+**		@see ai.h @see ai.c
+**
 **	@subsection CCL CCL
 **
+**		@see ccl.h @see ccl.c
+**
+**
 **	@subsection Icon Icon
+**
+**		@see icon.h @see icon.c
 **
 */
 
