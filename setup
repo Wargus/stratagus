@@ -1124,14 +1124,6 @@ echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
 echo "	\$(DEBUG) \$(SDLCD) \$(LIBCDA) \\" >> $RULESFILE
 echo -n "	\$(ARTSC) \$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
-echo
-echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
-read $N YESORNO
-echo
-if [ "$YESORNO" = "Y" -o "$YESORNO" = "y" ] ; then
-echo -n " -DHAVE_EXPANSION" >> $RULESFILE
-fi
-
 echo "" >> $RULESFILE
 
 echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS $PROFILE" >> $RULESFILE

@@ -1222,9 +1222,6 @@ local void PrintHeader(void)
 #ifdef SLOW_INPUT
     "SLOW-INPUT "
 #endif
-#ifdef HAVE_EXPANSION
-    "EXPANSION "
-#endif
 	,NameLine);
 }
 
