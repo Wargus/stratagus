@@ -197,9 +197,9 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 	if (x < 0) {
 		vp->MapX = 0;
 		vp->OffsetX = 0;
-	} else if (x > TheMap.Width - map_width) {
-		vp->MapX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) / TileSizeX;
-		vp->OffsetX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) % TileSizeX;
+	} else if (x >= TheMap.Width - map_width + 1) {
+		vp->MapX = TheMap.Width - vp->MapWidth + 1;
+		vp->OffsetX = 0;
 	} else {
 		vp->MapX = x;
 		if (vp->OffsetX < 0) {
@@ -211,14 +211,14 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 			}
 		}
 	}
-
+	DebugCheck(vp->OffsetX < 0 || vp->OffsetX >= TileSizeX);
 	map_height = vp->MapHeight;
 	if (y < 0) {
 		vp->MapY = 0;
 		vp->OffsetY = 0;
-	} else if (y > TheMap.Height - map_height) {
-		vp->MapY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) / TileSizeY;
-		vp->OffsetY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) % TileSizeY;
+	} else if (y >= TheMap.Height - map_height + 1) {
+		vp->MapY = TheMap.Height - vp->MapHeight + 1;
+		vp->OffsetY = 0;
 	} else {
 		vp->MapY = y;
 		if (vp->OffsetY < 0) {
@@ -230,7 +230,7 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 			}
 		}
 	}
-
+	DebugCheck(vp->OffsetY < 0 || vp->OffsetY >= TileSizeY);
 	MarkDrawEntireMap();
 	MustRedraw |= RedrawMinimap | RedrawMinimapCursor;
 }
