@@ -49,7 +49,9 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global unsigned SyncHash;	/// Hash calculated to find sync failures
+global unsigned SyncHash;	    /// Hash calculated to find sync failures
+global int BurnBuildingPercent;	    /// Max percent to burn buildings
+global int BurnBuildingDamageRate;  /// HP per second to damage buildings
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -434,6 +436,36 @@ global void UnitActions(void)
 	SyncHash^=unit->State<<12;
 	SyncHash^=unit->SubAction<<6;
 	SyncHash^=unit->Refs<<3;
+    }
+}
+
+/**
+**	Handle burning buildings
+*/
+global void BurnBuildings(void)
+{
+    Unit* unit;
+    int i;
+    int f;
+
+    if( !BurnBuildingPercent ) {
+	return;
+    }
+
+    for( i=0; i<NumUnits; ++i) {
+	unit = Units[i];
+
+	if( !unit->Type->Building || unit->Removed || unit->Destroyed ) {
+	    continue;
+	}
+
+	// don't burn buildings under construction
+	if( unit->Stats->HitPoints && unit->Orders[0].Action!=UnitActionBuilded ) {
+	    f = (100 * unit->HP) / unit->Stats->HitPoints;
+	    if( f <= BurnBuildingPercent ) {
+		HitUnit(NoUnitP, unit, BurnBuildingDamageRate);
+	    }
+	}
     }
 }
 

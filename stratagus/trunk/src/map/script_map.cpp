@@ -36,6 +36,7 @@
 #include "ccl.h"
 #include "map.h"
 #include "minimap.h"
+#include "actions.h"
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -431,6 +432,33 @@ local SCM CclSetGoldmineDepleted(SCM rate)
 }
 
 /**
+**	Set burning buildings percent and rate.
+**
+**	@param percent	    Max percent needed to burn buildings
+**	@param rate	    HP per second to damage buildings
+*/
+local SCM CclSetBurnBuildings(SCM percent,SCM rate)
+{
+    int p;
+    int r;
+
+    p=gh_scm2int(percent);
+    r=gh_scm2int(rate);
+    if( p<0 || p>100 ) {
+	fprintf(stderr,__FUNCTION__": burn percent should be 0-100\n");
+	p=0;
+    }
+    if( r<=0 ) {
+	fprintf(stderr,__FUNCTION__": burn rate should be greater than 0\n");
+	p=0;
+    }
+    BurnBuildingPercent=p;
+    BurnBuildingDamageRate=r;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for map.
 */
 global void MapCclRegister(void)
@@ -450,6 +478,8 @@ global void MapCclRegister(void)
 
     gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
     gh_new_procedure1_0("set-goldmine-depleted!",CclSetGoldmineDepleted);
+
+    gh_new_procedure2_0("set-burn-buildings!",CclSetBurnBuildings);
 }
 
 //@}
