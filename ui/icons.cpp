@@ -104,7 +104,7 @@ local void AddIcon(const char* ident, const char* tileset,
 	//
 	//  Look up graphic file
 	//
-	ptr = (void **)hash_find(IconFileHash, file);
+	ptr = (void**)hash_find(IconFileHash, file);
 	if (ptr && *ptr) {
 		iconfile = *ptr;
 	} else {  // new file
@@ -182,7 +182,7 @@ global void InitIcons(void)
 
 /**
 **  Load the graphics for the icons. Graphic data is only loaded once
-**  and than shared.
+**  and then shared.
 */
 global void LoadIcons(void)
 {
@@ -308,7 +308,7 @@ global void CleanIcons(void)
 **
 **  @return       Icon pointer or NoIcon == NULL if not found.
 */
-global Icon* IconByIdent(const char *ident)
+global Icon* IconByIdent(const char* ident)
 {
 	Icon* const* icon;
 
@@ -523,8 +523,6 @@ local int CclDefineIconWcNames(lua_State* l)
 
 /**
 **  Register CCL features for icons.
-**
-**  @todo  Add more functions for CCL. (DrawIcon)
 */
 global void IconCclRegister(void)
 {
