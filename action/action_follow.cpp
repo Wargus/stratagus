@@ -65,12 +65,14 @@ global void HandleActionFollow(Unit* unit)
     //
     if( unit->SubAction==128 ) {
 	goal=unit->Orders[0].Goal;
-	if( goal->Destroyed || !goal->HP
+	if( !goal || goal->Destroyed || !goal->HP
 		|| goal->Orders[0].Action==UnitActionDie ) {
 	    DebugLevel0Fn("Goal dead\n");
-	    RefsDebugCheck( !goal->Refs );
-	    if( !--goal->Refs && goal->Destroyed ) {
-		ReleaseUnit(goal);
+	    if( goal ) {
+		RefsDebugCheck( !goal->Refs );
+		if( !--goal->Refs && goal->Destroyed ) {
+		    ReleaseUnit(goal);
+		}
 	    }
 	    unit->Orders[0].Goal=NoUnitP;
 	    unit->Wait=1;
