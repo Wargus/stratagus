@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -1572,14 +1572,10 @@ static int CclDefineUI(lua_State* l)
 			}
 			w = 0;
 			h = 0;
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "pos")) {
-					lua_rawgeti(l, j + 1, k + 1);
+			lua_pushnil(l);
+			while (lua_next(l, j + 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1589,9 +1585,7 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					ui->MapArea.Y = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "size")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1601,10 +1595,10 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					h = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_pop(l, 1);
 			}
 			ui->MapArea.EndX = ui->MapArea.X + w - 1;
 			ui->MapArea.EndY = ui->MapArea.Y + h - 1;
@@ -1746,14 +1740,10 @@ static int CclDefineUI(lua_State* l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "pos")) {
-					lua_rawgeti(l, j + 1, k + 1);
+			lua_pushnil(l);
+			while (lua_next(l, j + 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1763,9 +1753,7 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					ui->MinimapPosY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "size")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1775,13 +1763,12 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					ui->MinimapH = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "transparent")) {
-					ui->MinimapTransparent = 1;
-					--k;
+				} else if (!strcmp(value, "Transparent")) {
+					ui->MinimapTransparent = LuaToBoolean(l, -1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "status-line")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1821,75 +1808,43 @@ static int CclDefineUI(lua_State* l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "point")) {
-					lua_rawgeti(l, j + 1, k + 1);
+			lua_pushnil(l);
+			while (lua_next(l, j + 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Point")) {
 					ui->Point.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "glass")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Glass")) {
 					ui->Glass.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "cross")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Cross")) {
 					ui->Cross.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "yellow")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Yellow")) {
 					ui->YellowHair.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "green")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Green")) {
 					ui->GreenHair.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "red")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Red")) {
 					ui->RedHair.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "scroll")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Scroll")) {
 					ui->Scroll.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-e")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowE")) {
 					ui->ArrowE.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-ne")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowNE")) {
 					ui->ArrowNE.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-n")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowN")) {
 					ui->ArrowN.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-nw")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowNW")) {
 					ui->ArrowNW.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-w")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowW")) {
 					ui->ArrowW.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-sw")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowSW")) {
 					ui->ArrowSW.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-s")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowS")) {
 					ui->ArrowS.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "arrow-se")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "ArrowSE")) {
 					ui->ArrowSE.Name = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "menu-panels")) {
 			if (!lua_istable(l, j + 1)) {
