@@ -91,8 +91,12 @@ dnl    [  --enable-optimization	  [Enable detection of optimization flags (defau
 dnl FIXME: todo
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config)
-if test  x$SDLCONFIG = x; then
+if test "x$SDLCONFIG" = "x"; then
     AC_CHECK_PROGS(SDLCONFIG, sdl11-config)
+fi
+if test "x$SDLCONFIG" = "x"; then
+    echo "*** sdl-config not found";
+    exit 1;
 fi
 VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `$SDLCONFIG --cflags`"
 if test "$enable_static" != "yes"; then
@@ -107,7 +111,7 @@ if test "$WIN32" = "1"; then
 	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
     fi
 fi
-if test $ARCH = bsd; then
+if test "$ARCH" = "bsd"; then
     VIDEO_LIBS="$VIDEO_LIBS -lc"
 fi
 AC_SUBST(VIDEO_CFLAGS)
@@ -124,7 +128,7 @@ if test "$with_opengl" != "no"; then
 	else
 		AC_PATH_X
 		AC_PATH_XTRA
-		if test x$have_x = xyes; then
+		if test "x$have_x" = "xyes"; then
 			VIDEO_CFLAGS="$VIDEO_CFLAGS $X_CFLAGS"
 			VIDEO_LIBS="$VIDEO_LIBS $X_LIBS -lGL"
 		else
@@ -225,19 +229,19 @@ dnl ----------------------------
 dnl ---- CHECK FOR LUA ---------
 AC_ARG_WITH(lua, 
     [	--with-lua=prefix	  [Prefix where Lua is installed]], LUAPFX="$with_lua")
-if test x$LUAPFX != x ; then
+if test "x$LUAPFX" != "x"; then
     LUA_CFLAGS="-I$LUAPFX/include"
     LUA_LIBS="-L$LUAPFX/lib"
 fi
 
 AC_CHECK_PROGS(LUACONFIG, [lua-config lua-config50 luaconfig5.0], "")
-if test x$LUACONFIG != x; then
+if test "x$LUACONFIG" != "x"; then
     LUA_CFLAGS="$LUA_CFLAGS `[$LUACONFIG --include]`"
     LUA_LIBS="$LUA_LIBS `[$LUACONFIG --libs]`"
 else
     LUA_CFLAGS="$CFLAGS"
     LUA_LIBS="$LIBS"
-    if test $ARCH = linux ; then
+    if test "$ARCH" = "linux"; then
 	LUA_LIBS="$LUA_LIBS -ldl"
     fi
     AC_CHECK_LIB(lua, lua_getfenv, LUA_LIBS="$LUA_LIBS -llua",
@@ -256,7 +260,7 @@ AC_SUBST(LUA_LIBS)
 	
 dnl ---- end of lua check ------
 
-if test "$prefix" = "NONE"; then
+if test "x$prefix" = "x"; then
     PREFIX=/usr/local
 else
     PREFIX="$prefix"
