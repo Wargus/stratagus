@@ -312,6 +312,15 @@ global int CLread(CLFile* file, void* buf, size_t len)
     return ret;
 }
 
+global void CLflush(CLFile * file)
+{
+    int tp;
+    if (file && (tp = file->cl_type) != CLF_TYPE_INVALID && tp == CLF_TYPE_PLAIN) {
+	fflush(file->cl_plain);
+    }
+}
+
+
 /**
 **	CLprintf	Library file write
 **
