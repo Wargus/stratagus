@@ -98,6 +98,7 @@ global void CleanModules(void)
     CleanTilesets();
     CleanMap();
     CleanReplayLog();
+    CleanCclCredits();
 #ifdef HIERARCHIC_PATHFINDER
     PfHierClean ();
 #endif
