@@ -64,6 +64,28 @@ typedef enum _chapter_types_ {
 typedef struct _campaign_chapter_ CampaignChapter;
 
 /**
+**	Picture text alignment
+*/
+typedef enum _picture_text_alignment_ {
+    PictureTextAlignLeft,		/// Left align
+    PictureTextAlignCenter,		/// Center align
+} PictureTextAlignment;
+
+/**
+**	Campaign picture text
+*/
+typedef struct _chapter_picture_text_ {
+    int Font;				/// Font
+    int X;				/// X position
+    int Y;				/// Y position
+    int Width;				/// Width
+    int Height;				/// Height
+    PictureTextAlignment Align;		/// Alignment
+    char* Text;				/// Text
+    struct _chapter_picture_text_ * Next; /// Next
+} ChapterPictureText;
+
+/**
 **	Campaign chapter structure.
 */
 struct _campaign_chapter_ {
@@ -74,9 +96,11 @@ struct _campaign_chapter_ {
 	    char* Name;			/// Chapter name
 	} Level;			/// Data for a level
 	struct {
-	    char* Act;			/// Act number
-	    char* Title;		/// Title text
-	    char* Background;		/// Background image
+	    char* Image;		/// File name of image
+	    int FadeIn;			/// Number of cycles to fade in
+	    int FadeOut;		/// Number of cycles to fade out
+	    int DisplayTime;		/// Number of cycles to display image
+	    ChapterPictureText *Text;	/// Linked list of text data
 	} Picture;			/// Data for a picture
 	struct {
 	    char* PathName;		/// File name of video

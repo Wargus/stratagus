@@ -39,6 +39,7 @@ typedef struct _settings_ Settings;
 
 #include "player.h"
 #include "map.h"
+#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --	Settings  __WIP__
@@ -114,7 +115,7 @@ enum _game_types_ {
 
 // ----------------------------------------------------------------------------
 
-#define MAX_BRIEFING_VOICES	2	/// How many intro voices supported
+#define MAX_BRIEFING_VOICES	20	/// How many intro voices supported
 #define MAX_OBJECTIVES		9	/// How many objectives supported
 
 typedef struct _intro_ {
@@ -158,7 +159,7 @@ extern void ShowIntro(const Intro* intro);
     /// Show game credits
 extern void ShowCredits();
     /// Show picture
-extern void ShowPicture(const char* act,const char* title,const char* picture);
+extern void ShowPicture(CampaignChapter* chapter);
     /// Show stats
 extern void ShowStats();
     /// Register CCL functions for credits

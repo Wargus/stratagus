@@ -39,6 +39,7 @@
 #include "campaign.h"
 #include "settings.h"
 #include "iolib.h"
+#include "font.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -105,9 +106,7 @@ global char* NextChapter(void)
 	}
 	while( CurrentChapter) {
 	    if( CurrentChapter->Type==ChapterShowPicture ) {
-		ShowPicture(CurrentChapter->Data.Picture.Act,
-		            CurrentChapter->Data.Picture.Title,
-		            CurrentChapter->Data.Picture.Background);
+		ShowPicture(CurrentChapter);
 	    }
 	    else if( CurrentChapter->Type==ChapterPlayLevel ) {
 		break;
@@ -169,6 +168,87 @@ global void PlayCampaign(const char* name)
     GameResult=GameNoResult;
 
     strcpy(CurrentMapPath, filename);
+}
+
+/**
+**	Parse campaign show-picture.
+**
+**	@param chapter	    Chapter.
+**	@param list	    List describing show-picture.
+*/
+local void ParseShowPicture(CampaignChapter *chapter,SCM list)
+{
+    SCM value;
+    SCM sublist;
+
+    chapter->Type=ChapterShowPicture;
+
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("image")) ) {
+	    chapter->Data.Picture.Image=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("fade-in")) ) {
+	    chapter->Data.Picture.FadeIn=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("fade-out")) ) {
+	    chapter->Data.Picture.FadeOut=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("display-time")) ) {
+	    chapter->Data.Picture.DisplayTime=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
+	    ChapterPictureText **text;
+
+	    sublist=gh_car(list);
+	    list=gh_cdr(list);
+
+	    text = &chapter->Data.Picture.Text;
+	    while( *text ) {
+		text = &((*text)->Next);
+	    }
+	    *text = calloc(sizeof(ChapterPictureText),1);
+
+	    while( !gh_null_p(sublist) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+
+		if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+		    (*text)->Font=CclFontByIdentifier(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("x")) ) {
+		    (*text)->X=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("y")) ) {
+		    (*text)->Y=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("width")) ) {
+		    (*text)->Width=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("height")) ) {
+		    (*text)->Height=gh_scm2int(gh_car(sublist));
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("align")) ) {
+		    char* str;
+		    str=gh_scm2newstr(gh_car(sublist),NIL);
+		    if( !strcmp(str,"left") ) {
+			(*text)->Align=PictureTextAlignLeft;
+		    } else if( !strcmp(str,"center") ) {
+			(*text)->Align=PictureTextAlignCenter;
+		    } else {
+			errl("Invalid chapter picture text align value",gh_car(sublist));
+		    }
+		    free(str);
+		    sublist=gh_cdr(sublist);
+		} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
+		    (*text)->Text=gh_scm2newstr(gh_car(sublist),NIL);
+		    sublist=gh_cdr(sublist);
+		}
+	    }
+	}
+    }
 }
 
 /**
@@ -258,21 +338,8 @@ local SCM CclDefineCampaign(SCM list)
 		tail=&chapter->Next;
 
 		if( gh_eq_p(value,gh_symbol2scm("show-picture")) ) {
-		    value=gh_car(sublist);
+		    ParseShowPicture(chapter,gh_car(sublist));
 		    sublist=gh_cdr(sublist);
-
-		    chapter->Type=ChapterShowPicture;
-		    chapter->Data.Picture.Act=gh_scm2newstr(value,NULL);
-
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-
-		    chapter->Data.Picture.Title=gh_scm2newstr(value,NULL);
-
-		    value=gh_car(sublist);
-		    sublist=gh_cdr(sublist);
-
-		    chapter->Data.Picture.Background=gh_scm2newstr(value,NULL);
 		} else if( gh_eq_p(value,gh_symbol2scm("play-movie")) ) {
 		    DebugLevel0Fn("FIXME: not supported\n");
 		} else if( gh_eq_p(value,gh_symbol2scm("play-level")) ) {
@@ -316,7 +383,8 @@ local SCM CclBriefing(SCM list)
 	list=gh_cdr(list);
 
 	if( gh_eq_p(value,gh_symbol2scm("type")) ) {
-	    if( !gh_eq_p(gh_car(list),gh_symbol2scm("wc2")) ) {
+	    if( !gh_eq_p(gh_car(list),gh_symbol2scm("wc2")) &&
+		!gh_eq_p(gh_car(list),gh_symbol2scm("sc")) ) {
 	       // FIXME: this leaves a half initialized briefing
 	       errl("Unsupported briefing type",value);
 	    }

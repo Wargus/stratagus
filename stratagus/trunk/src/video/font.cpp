@@ -36,6 +36,7 @@
 #include "freecraft.h"
 #include "video.h"
 #include "font.h"
+#include "ccl.h"
 
 #include "intern_video.h"
 
@@ -820,8 +821,6 @@ global void LoadFonts(void)
 /*----------------------------------------------------------------------------
 --	CCL
 ----------------------------------------------------------------------------*/
-
-#include "ccl.h"
 
 /**
 **	Font symbol to id.
