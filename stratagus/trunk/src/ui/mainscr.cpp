@@ -477,10 +477,8 @@ global void DrawUnitInfo(const Unit* unit)
         //sprintf(buf,"Level ~<%d~>",stats->Level);
 	//VideoDrawText(x+91,y+8+33,GameFont,buf);
 
-	if( !type->Tanker && !type->Submarine ) {
-	    VideoDrawText(x+57,y+8+63,GameFont,"Armor:");
-	    DrawStats(x+108,y+8+63,stats->Armor,type->_Armor);
-	}
+	VideoDrawText(x+57,y+8+63,GameFont,"Armor:");
+	DrawStats(x+108,y+8+63,stats->Armor,type->_Armor);
 
 	VideoDrawText(x+47,y+8+78,GameFont,"Damage:");
 	if( (i=type->_BasicDamage+type->_PiercingDamage) ) {

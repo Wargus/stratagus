@@ -430,7 +430,7 @@ enum _unit_action_ {
     UnitActionMineOre,			/// unit mines ore FIXME: not written
     UnitActionMineCoal,			/// unit mines coal FIXME: not written
     UnitActionQuarryStone,		/// unit quarrying stone FIXME: not written
-    UnitActionHaulOil,			/// unit hauling oil
+    UnitActionResource,			/// unit hauling oil
     UnitActionReturnGoods,		/// unit returning any resource
 
     UnitActionDemolish,			/// unit demolish at position/unit
@@ -566,8 +566,7 @@ struct _unit_ {
     int		Value;			/// value used for much
 
     unsigned	SubAction : 8;		/// sub-action of unit
-    unsigned	Wait : 8;		/// action counter
-#define MAX_UNIT_WAIT	255		/// biggest number in action counter
+    unsigned	Wait;			/// action counter
     unsigned	State : 8;		/// action state
 #define MAX_UNIT_STATE	255		/// biggest state for action
     unsigned	Reset : 1;		/// can process new command
@@ -577,11 +576,6 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
-#if 0
-#define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
-    // FIXME: use the new next pointer
-    Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
-#endif
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
@@ -841,8 +835,8 @@ extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 extern int FindWoodInSight(const Unit* unit,int* x,int* y);
     /// Find gold mine
 extern Unit* FindGoldMine(const Unit* unit,int x,int y);
-    /// Find oil platform
-extern Unit* FindOilPlatform(const Player* player,int x,int y);
+    /// Find resource
+extern Unit* FindResource(const Player* player,int x,int y,int resource);
 
     /// FIXME: more docu
 extern Unit* UnitOnScreen(Unit* unit,int x,int y);

@@ -151,8 +151,8 @@ global void HandleActionTrain(Unit* unit)
 	//
 	//	FIXME: we must check if the units supports the new order.
 	//
-	if( (unit->NewOrder.Action==UnitActionHaulOil
-	        && !nunit->Type->Tanker)
+	if( (unit->NewOrder.Action==UnitActionResource
+	        && !nunit->Type->Harvester)
     	    || (unit->NewOrder.Action==UnitActionAttack
 	        && !nunit->Type->CanAttack)
             || ((unit->NewOrder.Action==UnitActionMineGold

@@ -393,12 +393,7 @@ local int ReturnWithWood(Unit* unit)
     }
     unit->Player->UnitTypesCount[unit->Type->Type]++;
 
-    if( WAIT_FOR_WOOD<MAX_UNIT_WAIT ) {
-	unit->Wait=WAIT_FOR_WOOD;
-    } else {
-	unit->Wait=MAX_UNIT_WAIT;
-    }
-    unit->Value=WAIT_FOR_WOOD-unit->Wait;
+    unit->Wait=WAIT_FOR_WOOD;
 
     return 1;
 }
@@ -414,41 +409,30 @@ local int WaitInWoodDeposit(Unit* unit)
 
     DebugLevel3Fn("Waiting\n");
 
-    if( !unit->Value ) {
-	//
-	//	Drop out unit at nearest point to target.
-	//
-	destu=ResourceDepositOnMap(unit->X,unit->Y,WoodCost);
-	DebugCheck( !destu );		// there must be a depot!
+    //
+    //	Drop out unit at nearest point to target.
+    //
+    destu=ResourceDepositOnMap(unit->X,unit->Y,WoodCost);
+    DebugCheck( !destu );		// there must be a depot!
 
-	DropOutNearest(unit
-		,unit->Orders[0].X,unit->Orders[0].Y
-		,destu->Type->TileWidth,destu->Type->TileHeight);
+    DropOutNearest(unit
+	    ,unit->Orders[0].X,unit->Orders[0].Y
+	    ,destu->Type->TileWidth,destu->Type->TileHeight);
 
-	//
-	//	Return to chop point.
-	//
-	DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
-	unit->Orders[0].Goal=NoUnitP;
-	unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
-	// NOTE: unit->Orders[0].X && unit->Orders[0].Y holds return place.
-	NewResetPath(unit);
+    //
+    //	Return to chop point.
+    //
+    DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
+    unit->Orders[0].Goal=NoUnitP;
+    unit->Orders[0].RangeX=unit->Orders[0].RangeY=0;
+    // NOTE: unit->Orders[0].X && unit->Orders[0].Y holds return place.
+    NewResetPath(unit);
 
-        CheckUnitToBeDrawn(unit);
-	unit->Wait=1;
-	//unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
-	unit->Value=CHOP_FOR_WOOD;
-	return 1;
-    }
-
-    if( unit->Value<MAX_UNIT_WAIT ) {
-	unit->Wait=unit->Value;
-    } else {
-	unit->Wait=MAX_UNIT_WAIT;
-    }
-    unit->Value-=unit->Wait;
-
-    return 0;
+    CheckUnitToBeDrawn(unit);
+    unit->Wait=1;
+    //unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
+    unit->Value=CHOP_FOR_WOOD;
+    return 1;
 }
 
 /**
