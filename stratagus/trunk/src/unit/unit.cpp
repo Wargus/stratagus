@@ -110,7 +110,7 @@ global void FreeUnitMemory(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
-    DebugLevel2Fn(" Unit %p %Zd `%s'\n",
+    DebugLevel2Fn("Unit %p %Zd `%s'\n",
 	    unit,UnitNumber(unit),unit->Type->Ident);
 
     DebugCheck( !unit->Type );		// already free.
@@ -143,10 +143,9 @@ global void ReleaseUnit(Unit* unit)
 	//
 	//	Are more references remaining?
 	//
+	unit->Destroyed=1;		// mark as destroyed
 	RefsDebugCheck( !unit->Refs );
 	if( --unit->Refs>0 ) {
-	    unit->Destroyed=1;		// mark as destroyed
-
 	    DebugLevel2Fn("More references of %Zd #%d\n"
 		    ,UnitNumber(unit),unit->Refs);
 	    return;
@@ -177,7 +176,7 @@ global void ReleaseUnit(Unit* unit)
     ReleasedTail=&unit->Next;
     unit->Refs=FrameCounter+NetworkMaxLag;	// could be reuse after this.
     IfDebug(
-	DebugLevel2Fn("%Zd\n",UnitNumber(unit));
+	DebugLevel2Fn("No more references %Zd\n",UnitNumber(unit));
 	unit->Type=NULL;			// for debugging.
     );
 }
@@ -207,10 +206,10 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	if( ReleasedTail==&unit->Next ) {	// last element
 	    ReleasedTail=&ReleasedHead;
 	}
+	DebugLevel2Fn("Release %p %d\n",unit,UnitNumber(unit));
 	slot=UnitSlots+unit->Slot;
 	memset(unit,0,sizeof(*unit));
-	DebugLevel2Fn("release %p\n",unit);
-	// FIXME: can release here more slots.
+	// FIXME: can release here more slots, reducing memory needs.
     } else {
 	//
 	//	Allocate structure
