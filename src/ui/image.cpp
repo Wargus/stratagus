@@ -40,6 +40,8 @@
 
 /**
 **	Constant graphics
+**
+**	FIXME: must support more races, this must be configurable from CCL.
 */
 struct _images_ {
     char*	File[PlayerMaxRaces];	/// one file for each race
@@ -49,6 +51,18 @@ struct _images_ {
 // --- FILLED UP ---
     Graphic*	Image;			/// graphic image (filled)
 } Images[] = {
+#ifdef NEW_NAMES
+    { { "ui/human/panel 1.png" ,"ui/orc/panel 1.png" }
+		, 256, 288 },
+    { { "ui/human/panel 2.png" ,"ui/orc/panel 2.png" }
+		, 288, 256 },
+    { { "ui/human/panel 3.png" ,"ui/orc/panel 3.png" }
+		, 384, 256 },
+    { { "ui/human/panel 4.png" ,"ui/orc/panel 4.png" }
+		, 288, 128 },
+    { { "ui/human/panel 5.png" ,"ui/orc/panel 5.png" }
+		, 352, 352 },
+#else
     { { "interface/panel 1 (humans).png"
 	,"interface/panel 1 (orcs).png" }
 		, 256, 288 },
@@ -64,6 +78,7 @@ struct _images_ {
     { { "interface/panel 5 (humans).png"
 	,"interface/panel 5 (orcs).png" }
 		, 352, 352 },
+#endif
 };
 
 /*----------------------------------------------------------------------------
@@ -81,6 +96,8 @@ struct _images_ {
 */
 global void DrawImage(int image,int row,int frame,int x,int y)
 {
+    DebugCheck( image<0 );
+
     if( image>=0 ) {			// FIXME: trick 17! better solution
 	VideoDrawSub(Images[image].Image
 	    ,frame*Images[image].Width,row*Images[image].Height
@@ -118,7 +135,11 @@ global void LoadImages(unsigned int race)
 	}
 
 	buf=alloca(strlen(file)+9+1);
+#ifdef NEW_NAMES
+	file=strcat(strcpy(buf,"graphics/"),file);
+#else
 	file=strcat(strcpy(buf,"graphic/"),file);
+#endif
 	ShowLoadProgress("\tImage %s\n",file);
 	Images[i].Image=LoadGraphic(file);
     }
