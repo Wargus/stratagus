@@ -172,11 +172,13 @@ global void LoadUserInterface(void)
     //
     //	Load graphics
     //
-    if( TheUI.Filler1.File ) {
-	TheUI.Filler1.Graphic=LoadGraphic(TheUI.Filler1.File);
+    for( i=0; i<TheUI.NumFillers; ++i ) {
+	if( TheUI.Filler[i].File ) {
+	    TheUI.Filler[i].Graphic=LoadGraphic(TheUI.Filler[i].File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.Filler1.Graphic,TheUI.Filler1.Graphic->Width,TheUI.Filler1.Graphic->Height);
+	    MakeTexture(TheUI.Filler[i].Graphic,TheUI.Filler[i].Graphic->Width,TheUI.Filler[i].Graphic->Height);
 #endif
+	}
     }
     if( TheUI.Resource.File ) {
 	TheUI.Resource.Graphic=LoadGraphic(TheUI.Resource.File);
@@ -308,7 +310,7 @@ local void OldSaveUi(FILE* file,const UI* ui)
 	    ui->Name,ui->Width,ui->Height);
     fprintf(file,"  ; Filler 1\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
-	    ui->Filler1.File,ui->Filler1X,ui->Filler1Y);
+	    ui->Filler[0].File,ui->FillerX[0],ui->FillerY[0]);
     fprintf(file,"  ; Resource line\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
@@ -428,8 +430,10 @@ local void NewSaveUi(FILE * file, const UI * ui)
     fprintf(file, "  'normal-font-color %s 'reverse-font-color %s\n",
 	ui->NormalFontColor, ui->ReverseFontColor);
 
-    fprintf(file, "  'filler-1 '(pos (%d %d) image \"%s\")\n",
-	ui->Filler1X, ui->Filler1Y, ui->Filler1.File);
+    for( i=0; i<TheUI.NumFillers; ++i ) {
+	fprintf(file, "  'filler '(pos (%d %d) image \"%s\")\n",
+	    ui->FillerX[i], ui->FillerY[i], ui->Filler[i].File);
+    }
 
     fprintf(file, "  'resources '(pos (%d %d) image \"%s\"",
 	ui->ResourceX, ui->ResourceY, ui->Resource.File);
@@ -589,7 +593,9 @@ global void CleanUserInterface(void)
     //
     //	Free the graphics. FIXME: if they are shared this will crash.
     //
-    VideoSaveFree(TheUI.Filler1.Graphic);
+    for( i=0; i<TheUI.NumFillers; ++i ) {
+	VideoSaveFree(TheUI.Filler[i].Graphic);
+    }
     VideoSaveFree(TheUI.Resource.Graphic);
 
     for( i=0; i<MaxCosts; ++i ) {

@@ -868,6 +868,8 @@ local void ShowUnitInfo(const Unit* unit)
 */
 global void EditorUpdateDisplay(void)
 {
+    int i;
+
     VideoLockScreen();			// { prepare video write
 
     HideAnyCursor();			// remove cursor (when available)
@@ -940,11 +942,15 @@ global void EditorUpdateDisplay(void)
     }
 
     //
-    //  Filler
+    //  Fillers
     //
-    if (TheUI.Filler1.Graphic) {
-	VideoDrawSub(TheUI.Filler1.Graphic, 0, 0, TheUI.Filler1.Graphic->Width,
-	    TheUI.Filler1.Graphic->Height, TheUI.Filler1X, TheUI.Filler1Y);
+    for (i = 0; i < TheUI.NumFillers; ++i) {
+	if (TheUI.Filler[i].Graphic) {
+	    VideoDrawSub(TheUI.Filler[i].Graphic, 0, 0,
+		    TheUI.Filler[i].Graphic->Width,
+		    TheUI.Filler[i].Graphic->Height,
+		    TheUI.FillerX[i], TheUI.FillerY[i]);
+	}
     }
     //
     //  Status line

@@ -397,7 +397,7 @@ enum _must_redraw_flags_ {
     RedrawStatusLine	= 1<<14,	/// Statusline
     RedrawInfoPanel	= 1<<15,	/// Unit description
     RedrawButtonPanel	= 1<<16,	/// Unit buttons
-    RedrawFiller1	= 1<<17,	/// Filler1: Border on right side
+    RedrawFillers	= 1<<17,	/// Fillers
     RedrawMinimapBorder	= 1<<18,	/// Area around minimap
     RedrawCosts		= 1<<19,	/// Costs in status line
     RedrawMenuButton	= 1<<20,	/// Area above minimap
