@@ -139,7 +139,7 @@ AC_ARG_WITH(ogg,
 OGG_CFLAGS=
 OGG_LIBS=
 if test "$OGG" != "no"; then
-    MAD="yes"
+    OGG="yes"
     AC_CHECK_HEADERS(ogg.h,, OGG=no)
     AC_CHECK_HEADERS(vorbis.h,, OGG=no)
     if test "$OGG" != "no"; then
@@ -170,14 +170,14 @@ dnl ----------------------------
 dnl --- CHECK FOR FLAC LIB -----
 AC_ARG_WITH(flac,
     [  --with-flac		  [Use FLAC (default: autodetect)]], FLAC="$with_flac")
-dnl if test -z "$MAD
-
+FLAC_CFLAGS=
+FLAC_LIBS=
 if test "$FLAC" != "no"; then
-    FLAC_CFLAGS="-DUSE_FLAC"
-    FLAC_LIBS="-lFLAC"
-else
-    FLAC_CFLAGS=""
-    FLAC_LIBS=""
+    AC_CHECK_HEADERS(FLAC/all.h, FLAC=yes, FLAC=no)
+    if test "$FLAC" != "no"; then
+	FLAC_CFLAGS="-DUSE_FLAC"
+	FLAC_LIBS="-lFLAC"
+    fi
 fi
 AC_SUBST(FLAC_CFLAGS)
 AC_SUBST(FLAC_LIBS)
