@@ -428,6 +428,20 @@ local void HandleMouseOn(int x, int y)
 	    return;
 	}
     }
+    if (NumSelected == 1 && Selected[0]->Type->Transporter && Selected[0]->InsideCount) {
+	for (i = Selected[0]->InsideCount - 1; i >= 0; --i) {
+	    if (x >= TheUI.TransportingButtons[i].X &&
+		    x < TheUI.TransportingButtons[i].X + TheUI.TransportingButtons[i].Width + 7 &&
+		    y >= TheUI.TransportingButtons[i].Y &&
+		    y < TheUI.TransportingButtons[i].Y + TheUI.TransportingButtons[i].Height + 7) {
+		ButtonAreaUnderCursor = ButtonAreaTransporting;
+		ButtonUnderCursor = i;
+		CursorOn = CursorOnButton;
+		MustRedraw |= RedrawInfoPanel;
+		return;
+	    }
+	}
+    }
     if (NumSelected == 1 && Selected[0]->Type->Building) {
 	if (Selected[0]->Orders[0].Action == UnitActionTrain) {
 	    if (Selected[0]->Data.Train.Count == 1) {
