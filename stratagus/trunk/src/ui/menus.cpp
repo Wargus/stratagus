@@ -3742,32 +3742,25 @@ global void SoundOptions(void)
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
 {
 #ifdef WITH_SOUND
-#ifdef USE_SDLA
     if (SoundFildes != -1) {
+#ifdef USE_SDLA
 	SDL_CloseAudio();
+#else
+        close(SoundFildes);
+#endif
 	SoundFildes=-1;
 	SoundOff=1;
     } else {
-	InitSound();
+	SoundOff=0;
+	if( InitSound() ) {
+	    SoundOff=1;
+	    SoundFildes=-1;
+	}
 	MapUnitSounds();
 	InitSoundServer();
 	InitSoundClient();
-	SoundOff=0;
-    }
-#else
-    if (SoundFildes != -1) {
-        close(SoundFildes);
-        SoundFildes=-1;
-	SoundOff=1;
-    } else {
-	InitSound();
-	MapUnitSounds();
-	InitSoundServer();
-	InitSoundClient();
-	SoundOff=0;
     }
 #endif
-#endif // with sound
     CurrentMenu=NULL;
     SoundOptions();
 }
