@@ -106,7 +106,7 @@ global void SaveGame(const char* filename)
     fprintf(file,";;;  )\n");
 
     // FIXME: probably not the right place for this
-    fprintf(file,"(set-game-cycle! %d)\n",GameCycle);
+    fprintf(file,"(set-game-cycle! %lu)\n",GameCycle);
 
     SaveCcl(file);
     SaveIcons(file);
