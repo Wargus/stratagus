@@ -859,7 +859,8 @@ global void UIHandleButtonDown(int b)
                 CurrentButtonLevel = 0; // reset unit buttons to normal
 		UpdateButtonPanel();
 		MustRedraw|=RedrawButtonPanel|RedrawCursor;
-		MakeMissile(MissileGreenCross
+		// FIXME: slow slow slow slow....
+		MakeMissile(MissileTypeByIdent("missile-green-cross")
 			,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 			,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 		SendCommand(Minimap2MapX(CursorX),Minimap2MapY(CursorY));
@@ -933,7 +934,8 @@ global void UIHandleButtonDown(int b)
               }
             else
               { // if not not click on building -- green cross
-  	      MakeMissile(MissileGreenCross
+	      // FIXME: slow slow slow slow....
+	      MakeMissile(MissileTypeByIdent("missile-green-cross")
 	 	    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
               }
@@ -944,7 +946,8 @@ global void UIHandleButtonDown(int b)
 	    MapSetViewpoint(Minimap2MapX(CursorX)-MapWidth/2
 		    ,Minimap2MapY(CursorY)-MapHeight/2);
 	} else if( MouseButtons&RightButton ) {
-	    MakeMissile(MissileGreenCross
+	    // FIXME: slow slow slow slow....
+	    MakeMissile(MissileTypeByIdent("missile-green-cross")
 		    ,Minimap2MapX(CursorX)*TileSizeX+TileSizeX/2
 		    ,Minimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 	    DoRightButton(Minimap2MapX(CursorX),Minimap2MapY(CursorY));

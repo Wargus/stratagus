@@ -48,6 +48,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     int flags;
 
     if( !(state=unit->State) ) {
+	unit->Frame=0;
 	UnitUpdateHeading(unit);		// FIXME: remove this!!
     }
 

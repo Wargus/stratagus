@@ -39,9 +39,14 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**	Missile type typedef.
+*/
+typedef struct _missile_type_ MissileType;
+
+/**
 **	Base structure of missile types
 */
-typedef struct _missile_type_ {
+struct _missile_type_ {
     void*	OType;			/// Object type (future extensions)
 
     char*	Ident;			/// missile name
@@ -56,52 +61,18 @@ typedef struct _missile_type_ {
     int		Class;			/// missile class 
     int		Speed;			/// missile speed
 
+    char*	ImpactName;		/// Impact missile type name
+    MissileType*ImpactMissile;		/// Missile produces an impact
+
 // --- FILLED UP ---
-    unsigned	Type;			/// missile type as number
-
     RleSprite*	RleSprite;		/// missile sprite image
-} MissileType;
+};
 
-#if 1
-/*
-**	Missile types	(FIXME: should be removed!!)
-*/
-#define MissileLightning		0x00
-#define MissileGriffonHammer		0x01
-#define MissileDragonBreath		0x02
-#define MissileFireball			0x03
-#define MissileFlameShield		0x04
-#define MissileBlizzard			0x05
-#define MissileDeathDecay		0x06
-#define MissileBigCannon		0x07
-#define MissileExorcism			0x08
-#define MissileHealEffect		0x09
-#define MissileTouchOfDeath		0x0A
-#define MissileRune			0x0B
-#define MissileWhirlwind		0x0C
-#define MissileCatapultRock		0x0D
-#define MissileBallistaBolt		0x0E
-#define MissileArrow			0x0F
-#define MissileAxe			0x10
-#define MissileSubmarineMissile		0x11
-#define MissileTurtleMissile		0x12
-#define MissileSmallFire		0x13
-#define MissileBigFire			0x14
-#define MissileImpact			0x15
-#define MissileNormalSpell		0x16
-#define MissileExplosion		0x17
-#define MissileSmallCannon		0x18
-#define MissileCannonExplosion		0x19
-#define MissileCannonTowerExplosion	0x1A
-#define MissileDaemonFire		0x1B
-#define MissileGreenCross		0x1C
-#define MissileNone			0x1D
-
-#endif
-
+    /// how many missile type are maximal supported
 #define MissileTypeMax			0x1E
 
-#define MissileFree			(MissileType*)0	// free missile slot
+    /// mark a free missile slot
+#define MissileFree			(MissileType*)0
 
 /*----------------------------------------------------------------------------
 --	Missile
@@ -147,16 +118,15 @@ extern void LoadMissileSprites(void);
     /// Get missile type by ident.
 extern MissileType* MissileTypeByIdent(const char*);
     /// create a missile
-extern Missile* MakeMissile(int missile_type,int sx,int sy,int dx,int dy);
-			// FIXME: ^ use pointer
+extern Missile* MakeMissile(MissileType*,int,int,int,int);
     /// fire a missile
-extern void FireMissile(Unit* unit);
+extern void FireMissile(Unit*);
     /// draw all missiles
 extern void DrawMissiles(void);
     /// handle all missiles
 extern void MissileActions(void);
     /// distance from view point to missile
-extern int ViewPointDistanceToMissile(const Missile* dest);
+extern int ViewPointDistanceToMissile(const Missile*);
 
 //@}
 
