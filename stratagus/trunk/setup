@@ -1,6 +1,11 @@
 #!/bin/bash
 
-RULESFILE=Rules.make
+if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
+  RULESFILE=Rules.make
+else
+  RULESFILE=Rules.make.WIN32
+fi
+
 BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
 
 cat << .. > $RULESFILE
@@ -839,14 +844,14 @@ echo "	@\$(TOPDIR)/tools/aledoc \$< | \$(DOCIFY) > \$*-h.doc 2>/dev/null" >> $RU
 # Final comments
 
 echo
-echo "Done generating Rules.make."
+echo "Done generating $RULESFILE."
 echo -n "Would you like to compile it now? (y) "
 read ANSWER
 
 case $ANSWER in
  [nN])
  	echo
- 	echo "Done generating Rules.make.  Type '$MAKE' to compile!"
+ 	echo "Done generating $RULESFILE.  Type '$MAKE' to compile!"
 	;;
  *)
 	$MAKE depend
