@@ -275,7 +275,7 @@ global void UpdateMinimap(void)
     int h;
     int h0;
 
-    red_phase_changed = red_phase != ((FrameCounter / FRAMES_PER_SECOND) & 1);
+    red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
     if (red_phase_changed) {
 	red_phase = !red_phase;
     }
