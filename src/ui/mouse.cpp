@@ -138,21 +138,20 @@ local void DrawMouseCoordsOnMap(int x,int y)
 /**
 **	Called when right button is pressed
 **
-**	@param sx	X screen map position.
-**	@param sy	Y screen map position.
+**	@param sx	X map position in pixels.
+**	@param sy	Y map position in pixels.
 */
 global void DoRightButton (int sx,int sy)
 {
-    int i, x, y;
+    int i;
+    int x;
+    int y;
     Unit* dest;
     Unit* unit;
     UnitType* type;
     int action;
     int acknowledged;
     int flush;
-
-    x = sx / TileSizeX;
-    y = sy / TileSizeY;
 
     //
     // No unit selected
@@ -168,6 +167,9 @@ global void DoRightButton (int sx,int sy)
     if( Selected[0]->Player!=ThisPlayer ) {
 	return;
     }
+
+    x = sx / TileSizeX;
+    y = sy / TileSizeY;
 
     //
     //	Right mouse with SHIFT appends command to old commands.
@@ -743,6 +745,7 @@ global void UIHandleMouseMove(int x,int y)
     //cade: this is forbidden for unexplored and not visible space
     // FIXME: This must done new, moving units, scrolling...
     if( CursorOn==CursorOnMap ) {
+	// FIXME: wrong for SPLIT_SCREEN_SUPPORT!
 	if( IsMapFieldVisible(Screen2MapX(x),Screen2MapY(y)) ) {
 	    DebugLevel3Fn("%d,%d\n"
 		    ,x-TheUI.MapX+MapX*TileSizeX
@@ -1422,6 +1425,8 @@ global void UIHandleButtonDown(unsigned button)
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
 	    Unit* unit;
+	    // FIXME: Rethink the complete chaos of coordinates here
+	    // FIXME: Johns: Perhaps we should use a pixel map coordinates
 #ifdef SPLIT_SCREEN_SUPPORT
 	    int v = TheUI.ActiveViewport;
 	    int x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
@@ -1430,6 +1435,13 @@ global void UIHandleButtonDown(unsigned button)
 	    int x = CursorX - TheUI.MapX + MapX*TileSizeX;
 	    int y = CursorY - TheUI.MapY + MapY*TileSizeY;
 #endif /* SPLIT_SCREEN_SUPPORT */
+
+	    if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
+		x = (TheMap.Width-1)*TileSizeX;
+	    }
+	    if( y>=TheMap.Height*TileSizeY ) {	// Reduce to map limits
+		y = (TheMap.Height-1)*TileSizeY;
+	    }
 
 	    unit = UnitOnScreenMapPosition (x, y);
 	    if ( unit ) {	// if right click on building -- blink
