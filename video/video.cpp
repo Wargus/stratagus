@@ -1092,10 +1092,11 @@ global void InitVideo(void)
     //
     //	Use single common palette to be used for all palettes in 8bpp
     //
-    #ifndef BPP8_NORMAL
-    if ( UseX11 && VideoBpp == 8 ) // FIXME: to be extended for all video..
+#ifndef BPP8_NORMAL
+    if ( UseX11 && VideoBpp == 8 ) {	// FIXME: to be extended for all video..
       InitSingleCommonPalette8();
-    #endif
+    }
+#endif
 
     //
     //	Init video sub modules
