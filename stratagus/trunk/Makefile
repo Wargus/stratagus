@@ -51,6 +51,7 @@ help:
 	@-echo "make doc			make source documention with doxygen"
 	@-echo "make doc++			make source documention with doc++"
 	@-echo "make lockver NAME="version"	label current version with symbolic name"
+	@-echo "make strip			strip freecraft and/or freecraft.exe"
 	@-echo "make tags			create ctags"
 	@-echo "make depend			create dependencies"
 	@-echo "make dist			create distribution"
