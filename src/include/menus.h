@@ -278,6 +278,10 @@ typedef struct _menus_ {
 ----------------------------------------------------------------------------*/
 
 extern int CurrentMenu;			/// Currently processed menu
+extern int MenuRedrawX;			/// X coordinate of menu to redraw
+extern int MenuRedrawY;			/// Y coordinate of menu to redraw
+extern int MenuRedrawW;			/// Width of menu to redraw
+extern int MenuRedrawH;			/// Height of menu to redraw
 extern char ScenSelectFullPath[1024];	/// Full path to currently selected map
 extern MapInfo *ScenSelectPudInfo;	/// MapInfo of currently selected map
 

@@ -266,6 +266,14 @@ local struct {
 */
 global int CurrentMenu = -1;
 
+/**
+**	X, Y, Width, and Height of menu are to redraw
+*/
+global int MenuRedrawX;
+global int MenuRedrawY;
+global int MenuRedrawW;
+global int MenuRedrawH;
+
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
@@ -2266,8 +2274,8 @@ global void DrawMenu(int menu_id)
     Menu *menu;
     Menuitem *mi, *mip;
 
-    MustRedraw &= ~RedrawMenu;
     if (menu_id == -1) {
+	MustRedraw &= ~RedrawMenu;
 	return;
     }
 
@@ -2366,7 +2374,10 @@ global void DrawMenu(int menu_id)
 	DrawPulldown(mip,menu->x,menu->y);
     }
 
-    InvalidateArea(menu->x,menu->y,menu->xsize,menu->ysize);
+    MenuRedrawX=menu->x;
+    MenuRedrawY=menu->y;
+    MenuRedrawW=menu->xsize;
+    MenuRedrawH=menu->ysize;
 }
 
 /*----------------------------------------------------------------------------
@@ -6429,6 +6440,8 @@ global void ProcessMenu(int menu_id, int loop)
 
     VideoLockScreen();
     DrawMenu(CurrentMenu);
+    InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
+    MustRedraw&=~RedrawMenu;
     VideoUnlockScreen();
 
     if (loop) {
