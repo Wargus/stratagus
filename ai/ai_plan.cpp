@@ -79,14 +79,14 @@ local Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 		// if( UnitUnusable(unit) ) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
-		if (unit->Removed || unit->Invisible || !unit->HP
-			|| !(unit->Visible & (1 << source->Player->Player))
-			|| unit->Orders[0].Action == UnitActionDie) {
+		if (unit->Removed || unit->Invisible || !unit->HP ||
+				!(unit->Visible & (1 << source->Player->Player)) ||
+				unit->Orders[0].Action == UnitActionDie) {
 			continue;
 		}
 		type = unit->Type;
-		if (tx < unit->X || tx >= unit->X + type->TileWidth
-			|| ty < unit->Y || ty >= unit->Y + type->TileHeight) {
+		if (tx < unit->X || tx >= unit->X + type->TileWidth ||
+				ty < unit->Y || ty >= unit->Y + type->TileHeight) {
 			continue;
 		}
 		if (!CanTarget(source->Type, unit->Type)) {
@@ -144,7 +144,7 @@ local void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
 	}
 
 	points = malloc(TheMap.Width * TheMap.Height);
-	size = TheMap.Width * TheMap.Height / sizeof (*points);
+	size = TheMap.Width * TheMap.Height / sizeof(*points);
 
 	//
 	// Make movement matrix.
@@ -245,7 +245,7 @@ local int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* dy
 	unsigned char* m;
 
 	size = TheMap.Width * TheMap.Height / 2;
-	points = malloc(size * sizeof (*points));
+	points = malloc(size * sizeof(*points));
 
 	x = unit->X;
 	y = unit->Y;
@@ -409,7 +409,7 @@ global int AiFindWall(AiForce* force)
 	x = unit->X;
 	y = unit->Y;
 	size = TheMap.Width * TheMap.Height / 4;
-	points = malloc(size * sizeof (*points));
+	points = malloc(size * sizeof(*points));
 
 	destx = -1;
 	desty = -1;
@@ -514,8 +514,8 @@ global int AiPlanAttack(AiForce* force)
 	int state;
 	Unit* transporter;
 
-	DebugLevel0Fn("Planning for force #%d of player #%d\n"
-		_C_ force - AiPlayer->Force _C_ AiPlayer->Player->Player);
+	DebugLevel0Fn("Planning for force #%d of player #%d\n" _C_
+		force - AiPlayer->Force _C_ AiPlayer->Player->Player);
 
 	watermatrix = CreateMatrix();
 
@@ -628,8 +628,7 @@ void AiSendExplorers(void)
 	requestcount = 0;
 
 	while (request) {
-		requestcount ++;
-
+		++requestcount;
 		request = request->Next;
 	}
 
@@ -641,7 +640,7 @@ void AiSendExplorers(void)
 	outtrycount = 0;
 	do {
 		bestunit = 0;
-		outtrycount++;
+		++outtrycount;
 
 		// Choose a request
 		requestid = SyncRand() % requestcount;
@@ -649,7 +648,7 @@ void AiSendExplorers(void)
 		request = AiPlayer->FirstExplorationRequest;
 		while (requestid) {
 			request = request->Next;
-			requestid--;
+			--requestid;
 		}
 		// Choose a target, "near"
 		centerx = request->X;
@@ -668,7 +667,7 @@ void AiSendExplorers(void)
 			}
 
 			ray = 3 * ray / 2;
-			trycount ++;
+			++trycount;
 		} while (trycount < 8 && !targetok);
 
 		if (!targetok) {
@@ -703,10 +702,10 @@ void AiSendExplorers(void)
 				if (flyeronly) {
 					continue;
 				}
-				if ((request->Mask & MapFieldLandUnit) && (type->UnitType != UnitTypeLand)) {
+				if ((request->Mask & MapFieldLandUnit) && type->UnitType != UnitTypeLand) {
 					continue;
 				}
-				if ((request->Mask & MapFieldSeaUnit) && (type->UnitType != UnitTypeNaval)) {
+				if ((request->Mask & MapFieldSeaUnit) && type->UnitType != UnitTypeNaval) {
 					continue;
 				}
 			} else {
@@ -720,7 +719,7 @@ void AiSendExplorers(void)
 				bestunit = (*unit);
 			}
 		}
-	} while(outtrycount <= 4 && !bestunit);
+	} while (outtrycount <= 4 && !bestunit);
 
 	if (bestunit) {
 		CommandMove(bestunit, x, y, FlushCommands);
