@@ -149,8 +149,9 @@ global void DrawUnitSelection(const Unit* unit)
 	} else if (unit->Selected || unit->TeamSelected || (unit->Blink & 1)) {
 		if (unit->Player->Player == PlayerNumNeutral) {
 			color = ColorYellow;
-		} else if (unit->Selected && (unit->Player == ThisPlayer ||
-			PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
+		} else if ((unit->Selected || (unit->Blink & 1)) &&
+				(unit->Player == ThisPlayer ||
+					PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 			color = ColorGreen;
 		} else if (IsEnemy(ThisPlayer, unit)) {
 			color = ColorRed;
@@ -169,7 +170,8 @@ global void DrawUnitSelection(const Unit* unit)
 			}
 		}
 	} else if (CursorBuilding && unit->Type->Building && 
-		(unit->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
+			(unit->Player == ThisPlayer ||
+				PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
