@@ -775,6 +775,9 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	missile->State = spell->TTL - (dist - 1) * 2;
 	missile->TTL = spell->TTL;
 	missile->Controller = SpellFireballController;
+	missile->SourceUnit = unit;
+	RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	unit->Refs++;
     }
 	break;
 
