@@ -361,19 +361,31 @@ global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, in
 #else
 global void VideoDrawTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
 	VideoDraw(sprite, frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 global void VideoDrawClipTrans(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
 	VideoDrawClip(sprite, frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 global void VideoDrawTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
 	VideoDrawX(sprite, frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 global void VideoDrawClipTransX(const Graphic* sprite, unsigned frame, int x, int y, int alpha)
 {
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
 	VideoDrawClipX(sprite, frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 #endif
 
