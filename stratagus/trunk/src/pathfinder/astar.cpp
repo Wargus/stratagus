@@ -104,7 +104,7 @@ global void FreeAStar(void)
 {
     if(AStarMatrix) {
 	free(AStarMatrix);
-	AStarMatrix=0;
+	AStarMatrix=NULL;
 	free(CloseSet);
 	free(OpenSet);
     }
