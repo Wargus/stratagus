@@ -113,6 +113,9 @@ struct _menuitem_;
 typedef struct _menuitem_text_ {
     unsigned char *text;
     unsigned int tflags;
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
+    int align;
     void (*action)(struct _menuitem_ *);
 } MenuitemText;
 typedef struct _menuitem_button_ {
@@ -120,6 +123,8 @@ typedef struct _menuitem_button_ {
     int xsize;
     int ysize;
     MenuButtonId button;
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
     void (*handler)(void);
     unsigned hotkey;
 } MenuitemButton;
@@ -134,6 +139,8 @@ typedef struct _menuitem_pulldown_ {
     int curopt;
     int cursel;		/* used in popup state */
     unsigned int state;
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
     void *options;
@@ -148,6 +155,8 @@ typedef struct _menuitem_listbox_ {
     int nlines;
     int startline;
     int dohandler;
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
     void *(*retrieveopt)(struct _menuitem_ *, int);
     void (*handler)(void);	/* for return key */
 } MenuitemListbox;
@@ -186,6 +195,8 @@ typedef struct _menuitem_input_ {
     void (*action)(struct _menuitem_ *, int);	/* for key */
     int nch;
     int maxch;
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
 } MenuitemInput;
 typedef struct _menuitem_gem_ {
     unsigned char *text;
@@ -194,6 +205,8 @@ typedef struct _menuitem_gem_ {
     int ysize;
     MenuButtonId button;
     void (*action)(struct _menuitem_ *);
+    unsigned char *normalcolor;
+    unsigned char *reversecolor;
 } MenuitemGem;
 
 struct _menus_;
