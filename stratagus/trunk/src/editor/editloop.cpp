@@ -948,13 +948,6 @@ void EditorUpdateDisplay(void)
 		TheUI.MenuButton.Text);
 
 	//
-	// Minimap border
-	//
-	if (TheUI.MinimapPanel.Graphic) {
-		VideoDrawSub(TheUI.MinimapPanel.Graphic, 0, 0, TheUI.MinimapPanel.Graphic->Width,
-			TheUI.MinimapPanel.Graphic->Height, TheUI.MinimapPanelX, TheUI.MinimapPanelY);
-	}
-	//
 	// Minimap
 	//
 	if (TheUI.SelectedViewport) {

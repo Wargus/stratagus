@@ -89,7 +89,6 @@ void CreateMinimap(void)
 {
 	int n;
 #ifndef USE_OPENGL
-	SDL_Rect srect;
 	SDL_PixelFormat* f;
 #endif
 
@@ -158,57 +157,6 @@ void CreateMinimap(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
 		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		MinimapSurface);
-#endif
-
-#ifndef USE_OPENGL
-	srect.x = TheUI.MinimapPosX - TheUI.MinimapPanelX;
-	srect.y = TheUI.MinimapPosY - TheUI.MinimapPanelY;
-	srect.w = TheUI.MinimapW;
-	srect.h = TheUI.MinimapH;
-	if (TheUI.MinimapPanel.Graphic) {
-		SDL_BlitSurface(TheUI.MinimapPanel.Graphic->Surface, &srect,
-			MinimapSurface, NULL);
-	}
-#else
-	if (TheUI.MinimapPanel.Graphic) {
-		SDL_Surface* s;
-		SDL_Color c;
-		int x;
-		int y;
-		int sx;
-		int sy;
-		Uint32* dp;
-
-		dp = (Uint32*)MinimapSurface;
-		sy = TheUI.MinimapPosY - TheUI.MinimapPanelY;
-		sx = TheUI.MinimapPosX - TheUI.MinimapPanelX;
-		s = TheUI.MinimapPanel.Graphic->Surface;
-		SDL_LockSurface(s);
-		if (s->format->BytesPerPixel == 1) {
-			Uint8* sp;
-
-			for (y = 0; y < TheUI.MinimapH; ++y, ++sy) {
-				sp = (Uint8*)s->pixels + sy * s->pitch + sx;
-				for (x = 0; x < TheUI.MinimapW; ++x) {
-					c = s->format->palette->colors[*sp++];
-					*dp++ = VideoMapRGB(0, c.r, c.g, c.b);
-				}
-				dp += MinimapTextureWidth - TheUI.MinimapW;
-			}
-		} else {
-			Uint32* sp;
-
-			for (y = 0; y < TheUI.MinimapH; ++y, ++sy) {
-				sp = (Uint32*)((Uint8*)s->pixels + sy * s->pitch + sx);
-				for (x = 0; x < TheUI.MinimapW; ++x) {
-					VideoGetRGBA(*sp, &c.r, &c.g, &c.b, &c.unused);
-					*dp++ = VideoMapRGBA(0, c.r, c.g, c.b, c.unused);
-				}
-				dp += MinimapTextureWidth - TheUI.MinimapW;
-			}
-		}
-		SDL_UnlockSurface(s);
-	}
 #endif
 
 #ifndef USE_OPENGL
