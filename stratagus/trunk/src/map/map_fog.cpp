@@ -58,7 +58,7 @@
 #ifdef DEBUG
 
 // Use this to see FOW visibility for every tile
-#define DEBUG_FOG_OF_WAR
+#define noDEBUG_FOG_OF_WAR
 
 #define noTIMEIT			/// defined time function
 #endif
