@@ -67,6 +67,7 @@ local struct {
 global int CurrentMenu = -1;
 
 local int MenuButtonUnderCursor = -1;
+local int MenuButtonCurSel = -1;
 
 /**
 **	Items for the Game Menu
@@ -94,10 +95,10 @@ local Menuitem GameMenuItems[] = {
 local Menuitem VictoryMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "Congratulations!"} } },
     { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "You are victorious!"} } },
+    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
+	 "~!Victory", 106, 27, MBUTTON_GM_FULL, 'v', GameMenuEnd} } },
     { MI_TYPE_BUTTON, { button:{ 32, 56, MenuButtonDisabled, LargeFont,
 	 "Save Game (~<F11~>)", 224, 27, MBUTTON_GM_FULL, KeyCodeF11, NULL} } },
-    { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!Victory", 224, 27, MBUTTON_GM_FULL, 'v', GameMenuEnd} } },
 };
 
 /**
@@ -107,36 +108,59 @@ local Menuitem LostMenuItems[] = {
     { MI_TYPE_TEXT, { text:{ 144, 11, MI_FLAGS_CENTERED, LargeFont, "You failed to"} } },
     { MI_TYPE_TEXT, { text:{ 144, 32, MI_FLAGS_CENTERED, LargeFont, "achieve victory!"} } },
     { MI_TYPE_BUTTON, { button:{ 32, 90, MenuButtonSelected, LargeFont,
-	 "~!OK", 224, 27, MBUTTON_GM_FULL, 'o', GameMenuEnd} } },
+	 "~!OK", 106, 27, MBUTTON_GM_FULL, 'o', GameMenuEnd} } },
 };
 
+/**
+**	Items for the SelectScen Menu - (WIP)
+*/
+local Menuitem SelectScenMenuItems[] = {
+    { MI_TYPE_TEXT, { text:{ 176, 8, MI_FLAGS_CENTERED, LargeFont, "Select scenario"} } },
+    { MI_TYPE_BUTTON, { button:{ 48, 318, MenuButtonSelected, LargeFont,
+	 "OK", 106, 27, MBUTTON_GM_HALF, 0, NULL} } },
+    { MI_TYPE_BUTTON, { button:{ 198, 318, 0, LargeFont,
+	 "Cancel", 106, 27, MBUTTON_GM_HALF, 0, NULL} } },
+};
+
+/**
+**	Menus
+*/
 global Menu Menus[] = {
     {
 	/// Game Menu
 	176+(14*TileSizeX-256)/2,
 	16+(14*TileSizeY-288)/2,
+	256, 288,
 	ImagePanel1,
-	RedrawMapOverlay,
-	8,
+	7, 8,
 	GameMenuItems
     },
     {
 	/// Victory Menu
 	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-128)/2,
+	288, 128,
 	ImagePanel4,
-	RedrawMapOverlay,
-	4,
+	2, 4,
 	VictoryMenuItems
     },
     {
 	/// Lost Menu
 	176+(14*TileSizeX-288)/2,
 	16+(14*TileSizeY-128)/2,
+	288, 128,
 	ImagePanel4,
-	RedrawMapOverlay,
-	3,
+	2, 3,
 	LostMenuItems
+    },
+    {
+	/// SelectScen Menu
+	(640-352)/2,
+	(480-352)/2,
+	352, 352,
+	ImagePanel5,
+	1, 3,
+	SelectScenMenuItems
     },
 };
 
@@ -197,7 +221,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 */
 global void DrawMenu(int MenuId)
 {
-    int i;
+    int i, n;
     Menu *menu;
     Menuitem *mi;
 
@@ -208,8 +232,9 @@ global void DrawMenu(int MenuId)
     if (menu->image != ImageNone) {
 	DrawImage(menu->image,0,0,menu->x,menu->y);
     }
-    for (i = 0; i < menu->nitems; i++) {
-	mi = &menu->items[i];
+    n = menu->nitems;
+    mi = menu->items;
+    for (i = 0; i < n; i++) {
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
 		if (mi->d.text.flags&MI_FLAGS_CENTERED)
@@ -228,8 +253,9 @@ global void DrawMenu(int MenuId)
 	    default:
 		break;
 	}
+	mi++;
     }
-    MustRedraw |= menu->area;	// for Invalidate()
+    InvalidateArea(menu->x,menu->y,menu->xsize,menu->ysize);
 }
 
 /*----------------------------------------------------------------------------
@@ -240,7 +266,7 @@ local void GameMenuReturn(void)
 {
     ClearStatusLine();
     InterfaceState=IfaceStateNormal;
-    MustRedraw&=~RedrawMapOverlay;
+    MustRedraw&=~RedrawMenu;
     MustRedraw|=RedrawMap;
     GamePaused=0;
     CursorOn=CursorOnUnknown;
@@ -264,9 +290,9 @@ local void GameMenuEnd(void)
 **	@param key	Key scancode.
 **	@return		True, if key is handled; otherwise false.
 */
-global int MenuKey(int key)
-{
-    int i;
+global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_ MenuKeyUp() !!!
+{					//        to implement button animation (depress before action)
+    int i, n;
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
 
@@ -286,8 +312,44 @@ global int MenuKey(int key)
 	}
 	mi++;
     }
-    /// FIXME: ADD <RETURN-KEY> HANDLER HERE!
     switch (key) {
+	case 10: case 13:			/// RETURN
+	    if (MenuButtonCurSel != -1) {
+		mi = menu->items + MenuButtonCurSel;
+		switch (mi->mitype) {
+		    case MI_TYPE_BUTTON:
+			if (mi->d.button.handler) {
+			    (*mi->d.button.handler)();
+			}
+			return 1;
+		    default:
+			break;
+		}
+	    }
+	    break;
+	case 9: 				/// TAB			// FIXME: Add Shift-TAB
+	    if (MenuButtonCurSel != -1) {
+		n = menu->nitems;
+		for (i = 0; i < n; ++i) {
+		    mi = menu->items + ((MenuButtonCurSel + i + 1) % n);
+		    switch (mi->mitype) {
+			case MI_TYPE_TEXT:
+			    break;
+			case MI_TYPE_BUTTON:
+			    if (mi->d.button.flags & MenuButtonDisabled) {
+				break;
+			    }
+			    mi->d.button.flags |= MenuButtonSelected;
+			    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
+			    MenuButtonCurSel = mi - menu->items;
+			    MustRedraw |= RedrawMenu;
+			    return 1;
+			default:
+			    break;
+		    }
+		}
+	    }
+	    break;
 	case 'q':
 	    Exit(0);
 	default:
@@ -354,12 +416,16 @@ global void MenuHandleMouseMove(int x,int y)
 global void MenuHandleButtonDown(int b)
 {
     Menuitem *mi;
+    Menu *menu = Menus + CurrentMenu;
 
     if (MouseButtons&LeftButton) {
 	if (MenuButtonUnderCursor != -1) {
-	    mi = Menus[CurrentMenu].items + MenuButtonUnderCursor;
+	    mi = menu->items + MenuButtonUnderCursor;
 	    if (!(mi->d.button.flags&MenuButtonClicked)) {
-		mi->d.button.flags |= MenuButtonClicked; /// FIXME: | MenuButtonSelected (like original!)
+		if (MenuButtonCurSel != -1) {
+		    menu->items[MenuButtonCurSel].d.button.flags &= ~MenuButtonSelected;
+		}
+		mi->d.button.flags |= MenuButtonClicked|MenuButtonSelected;
 		MustRedraw |= RedrawMenu;
 	    }
 	}
@@ -417,6 +483,7 @@ global void ProcessMenu(int MenuId, int Loop)
     int i;
     Menu *menu;
     Menuitem *mi;
+    // FIXME: Recursion: Save: CurrentMenu, MenuButtonCurSel, MenuButtonUnderCursor
 
     InterfaceState = IfaceStateMenu;
     HideCursor();
@@ -424,12 +491,17 @@ global void ProcessMenu(int MenuId, int Loop)
     GameCursor = &Cursors[CursorTypePoint];
     CurrentMenu = MenuId;
     menu = Menus + CurrentMenu;
+    MenuButtonCurSel = -1;
     for (i = 0; i < menu->nitems; ++i) {
 	mi = menu->items + i;
 	switch (mi->mitype) {
 	    case MI_TYPE_BUTTON:
-		mi->d.button.flags &= ~(MenuButtonClicked|MenuButtonActive);
-		// FIXME: Activate if mouse is over it!!!
+		mi->d.button.flags &= ~(MenuButtonClicked|MenuButtonActive|MenuButtonSelected);
+		if (i == menu->defsel) {
+		    mi->d.button.flags |= MenuButtonSelected;
+		    MenuButtonCurSel = i;
+		}
+		// FIXME: Maybe activate if mouse-pointer is over it right now?
 		break;
 	    default:
 		break;
@@ -443,13 +515,9 @@ global void ProcessMenu(int MenuId, int Loop)
     DrawMenu(CurrentMenu);
 
     if (Loop) {
-	Invalidate();
 	for( ; CurrentMenu != -1 ; ) {
 	    DebugLevel3("MustRedraw: 0x%08x\n",MustRedraw);
 	    UpdateDisplay();
-	    if (MustRedraw & Menus[CurrentMenu].area) {    
-		Invalidate();
-	    }
 	    VideoInterrupts=0;
 	    RealizeVideoMemory();
 	    WaitEventsAndKeepSync();
