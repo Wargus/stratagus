@@ -365,6 +365,50 @@ local void CclParseBuilded(Unit* unit, SCM list)
 }
 
 /**
+**	Parse research
+**
+**	@param unit	Unit pointer which should be filled with the data.
+**	@param list	All options of the research data.
+*/
+local void CclParseResearch(Unit* unit, SCM list)
+{
+    SCM value;
+    char* str;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("ident"))) {
+	    value = gh_car(list);
+	    str = gh_scm2newstr(value, NULL);
+	    unit->Data.Research.Upgrade = UpgradeByIdent(str);
+	    free(str);
+	    list = gh_cdr(list);
+	}
+    }
+}
+
+/**
+**	Parse upgrade to
+**
+**	@param unit	Unit pointer which should be filled with the data.
+**	@param list	All options of the upgrade to data.
+*/
+local void CclParseUpgradeTo(Unit* unit, SCM list)
+{
+    SCM value;
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("ticks"))) {
+	    unit->Data.UpgradeTo.Ticks = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	}
+    }
+}
+
+/**
 **	Parse stored data for train order
 **
 **	@param unit	Unit pointer which should be filled with the data.
@@ -643,11 +687,11 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("data-research")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: research\n");
+	    CclParseResearch(unit,value);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-upgrade-to")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME: upgrade-to\n");
+	    CclParseUpgradeTo(unit,value);
 	} else if( gh_eq_p(value,gh_symbol2scm("data-train")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
