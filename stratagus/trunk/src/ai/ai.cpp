@@ -1044,6 +1044,10 @@ local void AiRemoveFromBuilded( PlayerAi * pai, const UnitType * type )
 	}
     }
 
+    if (pai->Player==ThisPlayer) {
+	DebugLevel0Fn("My guess is that you built something under ai me. naughty boy!\n");
+	return;
+    }
     DebugCheck( 1 );
 }
 
