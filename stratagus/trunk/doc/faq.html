@@ -137,12 +137,15 @@ $(DEBUG)
     A: You didn't need to copy, the installation did it for you.
 <DT>Q: The game becomes very slow under X11.
 <DD>A: Give your X11 server a higher priority than the clients.<P>
-    renice <pid-of-your-x11-server><P>
+    renice -5 &lt;pid-of-your-x11-server&gt;<P>
     or start freecraft with<P>
     nice -n 5 ./freecraft
 
-</DL>
+<DT>Q: Can I use FreeCraft to join in an original network game?
+<DD>A: Sorry, FreeCraft use its own network protocol. You can only play
+    with FreeCraft against other FreeCrafts.
 
+</DL>
 
 <HR>
 Last changed: $Id$<BR>
