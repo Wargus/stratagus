@@ -134,6 +134,7 @@ global void RevealMap(void)
 {
     int x;
     int y;
+    int p;
 
     DebugLevel1Fn("\n");
     for (x = 0; x < TheMap.Width; ++x) {
@@ -149,9 +150,18 @@ global void RevealMap(void)
     }
     //
     //	Start a global unit seen recount. It's the best way.
+    //	We also have to copy seen values for every unit, and thus mark those units as
+    //	dicovered.
     //
     for (x = 0; x < NumUnits; ++x) {
-	UnitFillSeenValues(Units[x]);
+	for (p = 0; p < PlayerMax; ++p) {
+	    if (Players[p].Type == PlayerPerson && (!(Units[x]->SeenByPlayer & (1 << p))) &&
+		    Units[x]->Type->VisibleUnderFog && !Units[x]->VisCount[p]) {
+		DebugLevel0Fn("unit %d first seen by %d\n" _C_ Units[x]->Slot _C_ p);
+		UnitGoesUnderFog(Units[x], p);
+		Units[x]->SeenByPlayer |= (1 << p);
+	    }
+	}
     }
 }
 

@@ -583,7 +583,6 @@ local SCM CclUnit(SCM list)
     int i;
     int insidecount;
     char* str;
-    char* s;
 
     insidecount = -1;
     slot = gh_scm2int(gh_car(list));
@@ -727,17 +726,6 @@ local SCM CclUnit(SCM list)
 	} else if (gh_eq_p(value, gh_symbol2scm("rescued-from"))) {
 	    unit->RescuedFrom = &Players[gh_scm2int(gh_car(list))];
 	    list = gh_cdr(list);
-	} else if (gh_eq_p(value, gh_symbol2scm("visible"))) {
-	    str=s = gh_scm2newstr(gh_car(list), NULL);
-	    list = gh_cdr(list);
-	    for (i = 0; i < PlayerMax && *s; ++i, ++s) {
-		if (*s == '-' || *s == '_' || *s == ' ') {
-		    unit->Visible &= ~(1 << i);
-		} else {
-		    unit->Visible |= (1 << i);
-		}
-	    }
-	    free(str);
 	} else if (gh_eq_p(value, gh_symbol2scm("constructed"))) {
 	    unit->Constructed = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("active"))) {
@@ -847,10 +835,7 @@ local SCM CclUnit(SCM list)
 		unit->Player->UnitTypesCount[type->Type]--;
 	    }
 	    // FIXME: (mr-russ) Does not load CorpseList Properly
-	    if (unit->Type->Building &&
-		    (unit->Orders[0].Action == UnitActionDie || unit->Destroyed)) {
-		DeadBuildingCacheInsert(unit);
-	    } else if (unit->Orders[0].Action == UnitActionDie) {
+	    if (unit->Orders[0].Action == UnitActionDie) {
 		CorpseCacheInsert(unit);
 	    }
 #if 0

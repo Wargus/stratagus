@@ -221,7 +221,7 @@ global int EnemyUnitsInDistance(const Unit * unit, unsigned range)
 	//
 	// FIXME: did SelectUnits already filter this.
 	if (dest->Removed || dest->Invisible || !unit->HP
-	    || !(dest->Visible & (1 << player->Player))
+	    || (!dest->VisCount[1 << player->Player])
 	    || dest->Orders[0].Action == UnitActionDie) {
 	    DebugLevel0Fn("NO\n");
 	    continue;
@@ -764,7 +764,7 @@ local void AiCheckingWork(void)
 	    //  Check limits, AI should be broken if reached.
 	    //
 	    if (PlayerCheckLimits(AiPlayer->Player, type) < 0) {
-		DebugLevel2Fn("Unit limits reached, or Need Supply\n");
+		DebugLevel3Fn("Unit limits reached, or Need Supply\n");
 		continue;
 	    }
 	    //

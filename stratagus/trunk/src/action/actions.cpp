@@ -95,10 +95,6 @@ global int GoalGone(const Unit* unit, const Unit* goal)
 	    if (goal->Invisible) {
 		return 1;
 	    }
-	    //  Goal is cloaked for this player
-	    if (!(goal->Visible & (1 << p))) {
-		return 1;
-	    }
 	    //
 	    //	Check if under fog of war.
 	    //	Don't bother for goals visible under fog.
@@ -693,35 +689,6 @@ global void UnitActions(void)
 	SyncHash ^= unit->State << 12;
 	SyncHash ^= unit->SubAction << 6;
 	SyncHash ^= unit->Refs << 3;
-    }
-}
-
-/**
-**	Handle Marking and Unmarking of Cloak
-**
-**	@note Must be handled outside the drawing fucntions and
-**	@note all at once.
-*/
-global void HandleCloak(void)
-{
-    Unit* unit;
-    int i;
-
-    for (i = 0; i < NumUnits; ++i) {
-	unit = Units[i]; 
-	if (unit->Type->PermanentCloak) {
-	    if ((unit->Visible & (1 << ThisPlayer->Player))) {
-		CheckUnitToBeDrawn(unit);
-	    }
-	    unit->Visible = 0;
-	}
-    }
-    for (i = 0; i < NumUnits; ++i) {
-	unit = Units[i];
-	if (unit->Type->DetectCloak && !unit->Removed &&
-		unit->Orders[0].Action != UnitActionBuilded) {
-	    MapDetectCloakedUnits(unit);
-	}
     }
 }
 

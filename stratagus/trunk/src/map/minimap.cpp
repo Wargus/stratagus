@@ -383,17 +383,22 @@ global void UpdateMinimap(void)
     //	FIXME: and other changes
     //
 
-    //	Draw Destroyed Buildings On Map
-    table = &DestroyedBuildings;
+    table = &CorpseList;
 
 #ifdef USE_SDL_SURFACE
     // FIXME: todo
     (int)type = (int)unit = w = h = h0 = 0;
 #else
+
     while (*table) {
 	VMemType color;
 
-	if (!BuildingVisibleOnMap(*table) && (*table)->SeenState != 3
+	// Only for buildings?
+	if (!(*table)->Type->Building) {
+	    table = &(*table)->Next;
+	    continue;
+	}
+	if (!UnitDrawableOnMap(*table) && (*table)->SeenState != 3
 		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
 		color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
@@ -428,21 +433,13 @@ global void UpdateMinimap(void)
 
 	unit = *table;
 
-	if (unit->Removed) {		// Removed, inside another building
+	//
+	//	If the unit is not known on map don't draw it.
+	//	This function should cover shared vision and stuff.
+	//
+	if (!UnitDrawableOnMap(unit) && !ReplayRevealMap) {
 	    continue;
 	}
-	if (unit->Invisible) {		// Can't be seen
-	    continue;
-	}
-	if (!(unit->Visible & (1 << ThisPlayer->Player))) {
-	    continue;			// Cloaked unit not visible
-	}
-
-	if (!UnitKnownOnMap(unit) && !ReplayRevealMap) {
-	    continue;
-	}
-
-	// FIXME: submarine not visible
 
 	type = unit->Type;
 	//

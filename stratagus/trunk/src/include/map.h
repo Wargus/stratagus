@@ -197,8 +197,8 @@
 //	1024x1024:	  8 MB  12 MB
 //	2048*2048:	 32 MB  48 MB
 //	4096*4096:	128 MB 192 MB
-#define MaxMapWidth	1024		/// maximal map width supported
-#define MaxMapHeight	1024		/// maximal map height supported
+#define MaxMapWidth	256		///  maximal map width supported
+#define MaxMapHeight	256		/// maximal map height supported
 
 /*----------------------------------------------------------------------------
 --	Map - field
@@ -227,6 +227,7 @@ typedef struct _map_field_ {
     //	      different.
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
     unsigned char Visible[PlayerMax];	/// Seen counter 0 unexplored
+    unsigned char VisCloak[PlayerMax];	/// Seen counter 0 unexplored
 #ifdef UNIT_ON_MAP
     union {
 	Unit*		Units;		/// An unit on the map field
@@ -420,12 +421,18 @@ extern  void MarkDrawEntireMap(void);
 extern void MapMarkTileSight(const Player* player,int x,int y);
     /// Unmark a tile for normal sight
 extern void MapUnmarkTileSight(const Player* player,int x,int y);
+    /// Mark a tile for cloak detection
+extern void MapMarkTileDetectCloak(const Player* player,int x,int y);
+    /// Unmark a tile for cloak detection
+extern void MapUnmarkTileDetectCloak(const Player* player,int x,int y);
     /// Mark Cloaked units on a tile as detected.
 extern void MapDetectUnitsOnTile(const Player* player,int x,int y);
     /// Mark sight changes
 extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int));
     /// Find if a tile is visible (With shared vision)
 extern int IsTileVisible(const Player* player, int x, int y);
+    /// Find if cloak detection is available on a tile.
+extern int TileDetectCloak(const Player* player, int x, int y);
     /// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x,int y);
     ///	Update fog of war
@@ -569,14 +576,29 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
-#define MapDetectCloakedUnits(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapDetectUnitsOnTile)
 #define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
 #define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
-#define MapMarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
-#define MapUnmarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
-	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
+
+#define MapMarkUnitSight(unit) \
+{ \
+    MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
+	    (unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileSight); \
+    if (unit->Type->DetectCloak) { \
+	MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
+		(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileDetectCloak); \
+    }\
+}
+
+#define MapUnmarkUnitSight(unit) \
+{ \
+    MapSight((unit)->Player,(unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
+	    (unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight); \
+    if (unit->Type->DetectCloak) { \
+	MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
+		(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapUnmarkTileDetectCloak); \
+    }\
+}
+
 #define MapMarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
 	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
 #define MapUnmarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \

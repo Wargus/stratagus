@@ -173,11 +173,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	    MapMarkUnitOnBoardSight(uninside, unit);
 	}
 
-	//  Reveal cloaked units.
-	if (unit->Type->DetectCloak) {
-	    MapDetectCloakedUnits(unit);
-	}
-
 	unit->IX = -xd * TileSizeX;
 	unit->IY = -yd * TileSizeY;
 	unit->Frame = 0;

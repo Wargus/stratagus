@@ -242,7 +242,7 @@ global Unit* TargetOnMapTile(const Unit* source, int tx, int ty)
 	// FIXME: did SelectUnitsOnTile already filter this?
 	// Invisible and not Visible
 	if (unit->Removed || unit->Invisible || !unit->HP ||
-		!(unit->Visible & (1 << source->Player->Player)) ||
+		!(unit->VisCount[source->Player->Player]) ||
 		unit->Orders[0].Action == UnitActionDie) {
 	    continue;
 	}
@@ -295,7 +295,7 @@ global Unit* TargetOnMap(const Unit* source, int x1, int y1, int x2, int y2)
 	// FIXME: did SelectUnitsOnTile already filter this?
 	// Invisible and not Visible
 	if (unit->Removed || unit->Invisible || !unit->HP ||
-		!(unit->Visible & (1 << source->Player->Player)) ||
+		!(unit->VisCount[source->Player->Player]) ||
 		unit->Orders[0].Action == UnitActionDie) {
 	    continue;
 	}
@@ -542,7 +542,7 @@ local Unit* FindRangeAttack(Unit* u, int range)
 	//
 	// FIXME: did SelectUnits already filter this.
 	if (dest->Removed || dest->Invisible || !u->HP ||
-		!(dest->Visible & (1 << player->Player)) ||
+		!(dest->VisCount[player->Player]) ||
 		dest->Orders[0].Action == UnitActionDie) {
 	    table[i] = 0;
 	    continue;
@@ -789,7 +789,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	//
 	// FIXME: did SelectUnits already filter this.
 	if (dest->Removed || dest->Invisible || !unit->HP ||
-		!(dest->Visible & (1 << player->Player)) ||
+		!(dest->VisCount[player->Player]) ||
 		dest->Orders[0].Action == UnitActionDie) {
 	    continue;
 	}
