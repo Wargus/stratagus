@@ -114,7 +114,7 @@ global UnitType* CursorBuilding;	/// building cursor
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 	// Saved area after draw cursor, needed later to hide it again
 	// (OldCursorW!=0 denotes it's defined)
-local int OldCursorInvalidate=0;/// flag (0/1): if cursor need invalidate
+local int OldCursorInvalidate;	/// flag (0/1): if cursor need invalidate
 local int OldCursorX;		/// saved cursor position on screen X
 local int OldCursorY;		/// saved cursor position on screen Y
 local int OldCursorW;		/// saved cursor width in pixel
@@ -142,15 +142,15 @@ local void* OldCursorImage;		/// background saved behind cursor
     **
     **	@note the complete image should be in Screen (no clipping) and
     **	non-empty
-    **     ( x>=0,y>=0,w>0,h>0,(x+w-1)<=VideoWidth,(y+h-1)<=VideoHeight )
+    **     (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
     */
-local void (*SaveCursorBackground)(int x,int y,int w,int h);
+local void (*SaveCursorBackground)(int x, int y, int w, int h);
     /// Function pointer: Load background behind cursor
-local void (*LoadCursorBackground)(int x,int y,int w,int h);
+local void (*LoadCursorBackground)(int x, int y, int w, int h);
 
 /*--- DRAW RECTANGLE CURSOR ------------------------------------------------*/
 	// Saved area after draw rectangle, needed later to hide it again
-	// (OldCursorRectangleW!=0 denotes it's defined)
+	// (OldCursorRectangleW != 0 denotes it's defined)
 local int OldCursorRectangleInvalidate;	/// flag (0/1): ..need invalidate
 local int OldCursorRectangleX;		/// saved cursor position on screen X
 local int OldCursorRectangleY;		/// saved cursor position on screen Y
@@ -159,7 +159,7 @@ local int OldCursorRectangleH;		/// saved cursor height in pixel
 local void* OldCursorRectangle;		/// background saved behind rectangle
 
 	// Area which is already hidden, but needed for invalidate
-	// (HiddenCursorRectangleW!=0 denotes it's defined)
+	// (HiddenCursorRectangleW != 0 denotes it's defined)
 local int HiddenCursorRectangleX;	/// saved cursor position on screen X
 local int HiddenCursorRectangleY;	/// saved cursor position on screen Y
 local int HiddenCursorRectangleW;	/// saved cursor width in pixel
@@ -176,9 +176,9 @@ local int HiddenCursorRectangleH;	/// saved cursor height in pixel
 **
 **	@note the complete rectangle should be in Screen (no clipping) and
 **	non-empty
-**     ( x>=0,y>=0,w>0,h>0,(x+w-1)<=VideoWidth,(y+h-1)<=VideoHeight )
+**     (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 */
-global void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
+global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
 
 /**
 **	Function pointer: Load rectangle behind cursor
@@ -191,7 +191,7 @@ global void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
 **
 **	@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
-global void (*LoadCursorRectangle)(void *buffer,int x,int y,int w,int h);
+global void (*LoadCursorRectangle)(void* buffer, int x, int y, int w, int h);
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -210,7 +210,7 @@ global void LoadCursors(const char* race)
     //
     //	Free old cursor sprites.
     //
-    for( i=0; Cursors[i].OType; ++i ) {
+    for (i = 0; Cursors[i].OType; ++i) {
 	VideoSaveFree(Cursors[i].Sprite);
 	Cursors[i].Sprite = NULL;
     }
@@ -218,23 +218,23 @@ global void LoadCursors(const char* race)
     //
     //	Load the graphics
     //
-    for( i=0; Cursors[i].OType; ++i ) {
+    for (i = 0; Cursors[i].OType; ++i) {
 	//
 	//	Only load cursors of this race or universal cursors.
 	//
-	if( Cursors[i].Race && strcmp(Cursors[i].Race,race) ) {
+	if (Cursors[i].Race && strcmp(Cursors[i].Race, race)) {
 	    continue;
 	}
 
-	file=Cursors[i].File;
-	if( file ) {
+	file = Cursors[i].File;
+	if (file) {
 	    char* buf;
 
-	    buf=alloca(strlen(file)+9+1);
-	    file=strcat(strcpy(buf,"graphics/"),file);
-	    ShowLoadProgress("\tCursor %s\n",file);
-	    Cursors[i].Sprite=LoadSprite(file,
-		    Cursors[i].Width,Cursors[i].Height);
+	    buf = alloca(strlen(file) + 9 + 1);
+	    file = strcat(strcpy(buf,"graphics/"), file);
+	    ShowLoadProgress("\tCursor %s\n", file);
+	    Cursors[i].Sprite = LoadSprite(file,
+		Cursors[i].Width, Cursors[i].Height);
 	}
     }
 }
@@ -252,11 +252,11 @@ global CursorType* CursorTypeByIdent(const char* ident)
 {
     CursorType* cursortype;
 
-    for( cursortype=Cursors; cursortype->OType; ++cursortype ) {
-	if( strcmp(cursortype->Ident,ident) ) {
+    for (cursortype = Cursors; cursortype->OType; ++cursortype) {
+	if (strcmp(cursortype->Ident, ident)) {
 	    continue;
 	}
-	if( !cursortype->Race || cursortype->Sprite ) {
+	if (!cursortype->Race || cursortype->Sprite) {
 	    return cursortype;
 	}
     }
@@ -274,21 +274,21 @@ global CursorType* CursorTypeByIdent(const char* ident)
 **	FIXME: this kind of macros are hard to single step with gdb.
 **	FIXME: inline functions should have the same speed and are debugable.
 */
-#define LOADCURSORRECTANGLE(buffer,video,memtype,x,y,w,h)  { \
+#define LOADCURSORRECTANGLE(buffer, video, memtype, x, y, w, h)  { \
     const memtype* sp; \
     memtype* dp; \
-    sp=(memtype *)buffer; \
-    dp=video+y*VideoWidth+x; \
-    memcpy(dp,sp,w*sizeof(memtype)); \
-    if ( --h ) { \
-      sp+=w; \
-      dp+=VideoWidth; \
-      while( --h ) { \
-	*dp	= *sp++; \
-	dp[w-1] = *sp++; \
-	dp+=VideoWidth; \
-      } \
-      memcpy(dp,sp,w*sizeof(memtype)); \
+    sp = (memtype*)buffer; \
+    dp = video + y * VideoWidth + x; \
+    memcpy(dp, sp, w * sizeof(memtype)); \
+    if (--h) { \
+	sp += w; \
+	dp += VideoWidth; \
+	while (--h) { \
+	    *dp = *sp++; \
+	    dp[w - 1] = *sp++; \
+	    dp += VideoWidth; \
+	} \
+	memcpy(dp, sp, w * sizeof(memtype)); \
     } \
 }
 
@@ -300,94 +300,103 @@ global CursorType* CursorTypeByIdent(const char* ident)
 **	FIXME: this kind of macros are hard to single step with gdb.
 **	FIXME: inline functions should have the same speed and are debugable.
 */
-#define SAVECURSORRECTANGLE(buffer,video,memtype,x,y,w,h)  { \
+#define SAVECURSORRECTANGLE(buffer, video, memtype, x, y, w, h)  { \
     const memtype* sp; \
     memtype* dp; \
-    sp=video+y*VideoWidth+x; \
-    dp=(memtype *)buffer; \
-    memcpy(dp,sp,w*sizeof(memtype)); \
-    if ( --h ) { \
-      dp+=w; \
-      sp+=VideoWidth; \
-      while( --h ) { \
-       *dp++ = *sp; \
-       *dp++ = sp[w-1]; \
-       sp+=VideoWidth; \
-      } \
-      memcpy(dp,sp,w*sizeof(memtype)); \
+    sp = video + y * VideoWidth + x; \
+    dp = (memtype*)buffer; \
+    memcpy(dp, sp, w * sizeof(memtype)); \
+    if (--h) { \
+	dp += w; \
+	sp += VideoWidth; \
+	while (--h) { \
+	    *dp++ = *sp; \
+	    *dp++ = sp[w - 1]; \
+	    sp += VideoWidth; \
+	} \
+	memcpy(dp, sp, w * sizeof(memtype)); \
     } \
 }
 
 
-/**  Restore cursor rectangle for 8bpp frame buffer.
-**   (See description function pointer LoadCursorRectangle)
-*/
-global void LoadCursorRectangle8(void *buffer,int x,int y,int w,int h)
-{
-	LOADCURSORRECTANGLE(buffer,VideoMemory8,VMemType8,x,y,w,h);
-}
-
-/** Restore cursor rectangle for 16bpp frame buffer.
-**   (See description function pointer LoadCursorRectangle)
+/**
+**	Restore cursor rectangle for 8bpp frame buffer.
+**	 (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-global void LoadCursorRectangle16(void *buffer,int x,int y,int w,int h)
+global void LoadCursorRectangle8(void* buffer, int x, int y, int w, int h)
 {
-	LOADCURSORRECTANGLE(buffer,VideoMemory16,VMemType16,x,y,w,h);
+    LOADCURSORRECTANGLE(buffer, VideoMemory8, VMemType8, x, y, w, h);
 }
 
-/** Restore cursor rectangle for 24bpp frame buffer.
-**   (See description function pointer LoadCursorRectangle)
+/**
+**	Restore cursor rectangle for 16bpp frame buffer.
+**	 (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-global void LoadCursorRectangle24(void *buffer,int x,int y,int w,int h)
+global void LoadCursorRectangle16(void* buffer, int x, int y, int w, int h)
 {
-	LOADCURSORRECTANGLE(buffer,VideoMemory24,VMemType24,x,y,w,h);
+    LOADCURSORRECTANGLE(buffer, VideoMemory16, VMemType16, x, y, w, h);
 }
 
-/** Restore cursor rectangle for 32bpp frame buffer.
-**   (See description function pointer LoadCursorRectangle)
+/**
+**	Restore cursor rectangle for 24bpp frame buffer.
+**	 (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-global void LoadCursorRectangle32(void *buffer,int x,int y,int w,int h)
+global void LoadCursorRectangle24(void* buffer, int x, int y, int w, int h)
 {
-	LOADCURSORRECTANGLE(buffer,VideoMemory32,VMemType32,x,y,w,h);
+    LOADCURSORRECTANGLE(buffer,VideoMemory24, VMemType24, x, y, w, h);
 }
 
-/** Save cursor rectangle for 8bpp frame buffer.
-**   (See description function pointer SaveCursorRectangle)
-**	@see SaveCursorRectangle
+/**
+**	Restore cursor rectangle for 32bpp frame buffer.
+**	 (See description function pointer LoadCursorRectangle)
+**	@see LoadCursorRectangle
 */
-global void SaveCursorRectangle8(void *buffer,int x,int y,int w,int h)
+global void LoadCursorRectangle32(void* buffer, int x, int y, int w, int h)
 {
-	SAVECURSORRECTANGLE(buffer,VideoMemory8,VMemType8,x,y,w,h);
+    LOADCURSORRECTANGLE(buffer, VideoMemory32, VMemType32, x, y, w, h);
 }
 
-/** Save cursor rectangle for 16bpp frame buffer.
-**   (See description function pointer SaveCursorRectangle)
+/**
+**	Save cursor rectangle for 8bpp frame buffer.
+**	 (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-global void SaveCursorRectangle16(void *buffer,int x,int y,int w,int h)
+global void SaveCursorRectangle8(void* buffer, int x, int y, int w, int h)
 {
-	SAVECURSORRECTANGLE(buffer,VideoMemory16,VMemType16,x,y,w,h);
+    SAVECURSORRECTANGLE(buffer, VideoMemory8, VMemType8, x, y, w, h);
 }
 
-/** Save cursor rectangle for 24bpp frame buffer.
-**   (See description function pointer SaveCursorRectangle)
+/**
+**	Save cursor rectangle for 16bpp frame buffer.
+**	 (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-global void SaveCursorRectangle24(void *buffer,int x,int y,int w,int h)
+global void SaveCursorRectangle16(void* buffer, int x, int y, int w, int h)
 {
-	SAVECURSORRECTANGLE(buffer,VideoMemory24,VMemType24,x,y,w,h);
+    SAVECURSORRECTANGLE(buffer, VideoMemory16, VMemType16, x, y, w, h);
 }
 
-/** Save cursor rectangle for 32bpp frame buffer.
-**   (See description function pointer SaveCursorRectangle)
+/**
+**	Save cursor rectangle for 24bpp frame buffer.
+**	 (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-global void SaveCursorRectangle32(void *buffer,int x,int y,int w,int h)
+global void SaveCursorRectangle24(void* buffer, int x, int y, int w, int h)
 {
-	SAVECURSORRECTANGLE(buffer,VideoMemory32,VMemType32,x,y,w,h);
+    SAVECURSORRECTANGLE(buffer, VideoMemory24, VMemType24, x, y, w, h);
+}
+
+/**
+**	Save cursor rectangle for 32bpp frame buffer.
+**	 (See description function pointer SaveCursorRectangle)
+**	@see SaveCursorRectangle
+*/
+global void SaveCursorRectangle32(void* buffer, int x, int y, int w, int h)
+{
+    SAVECURSORRECTANGLE(buffer, VideoMemory32, VMemType32, x, y, w, h);
 }
 
 /**
@@ -400,7 +409,7 @@ global void SaveCursorRectangle32(void *buffer,int x,int y,int w,int h)
 **	@param x1	Screen x end position of rectangle
 **	@param y1	Screen y end position of rectangle
 */
-local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
+local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 {
     int w;
     int h;
@@ -411,36 +420,36 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
     //	FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
     //
     vp = TheUI.SelectedViewport;
-    if( x1<vp->X ) {
-	x1=vp->X;
-    } else if( x1>vp->EndX ) {
-	x1=vp->EndX;
+    if (x1 < vp->X) {
+	x1 = vp->X;
+    } else if (x1 > vp->EndX) {
+	x1 = vp->EndX;
     }
-    if( y1<vp->Y ) {
-	y1=vp->Y;
-    } else if( y1>vp->EndY ) {
-	y1=vp->EndY;
-    }
-
-    if( x>x1 ) {
-	x=x1;
-	w=CursorStartX-x+1;
-    } else {
-	w=x1-x+1;
-    }
-    if( y>y1 ) {
-	y=y1;
-	h=CursorStartY-y+1;
-    } else {
-	h=y1-y+1;
+    if (y1 < vp->Y) {
+	y1 = vp->Y;
+    } else if (y1 > vp->EndY) {
+	y1 = vp->EndY;
     }
 
-    if ( w && h ) {
+    if (x > x1) {
+	x = x1;
+	w = CursorStartX - x + 1;
+    } else {
+	w = x1 - x + 1;
+    }
+    if (y > y1) {
+	y = y1;
+	h = CursorStartY - y + 1;
+    } else {
+	h = y1 - y + 1;
+    }
+
+    if (w && h) {
 	SaveCursorRectangle(OldCursorRectangle,
-                          OldCursorRectangleX=x,OldCursorRectangleY=y,
- 			  OldCursorRectangleW=w,OldCursorRectangleH=h);
-	VideoDrawRectangleClip(ColorGreen,x,y,w,h);
-	OldCursorRectangleInvalidate=1;
+	    OldCursorRectangleX = x,OldCursorRectangleY = y,
+	    OldCursorRectangleW = w,OldCursorRectangleH = h);
+	VideoDrawRectangleClip(ColorGreen, x, y, w, h);
+	OldCursorRectangleInvalidate = 1;
     }
 }
 
@@ -455,17 +464,17 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void LoadCursorBackground8(int x,int y,int w,int h)
+local void LoadCursorBackground8(int x, int y, int w, int h)
 {
     const VMemType8* sp;
     VMemType8* dp;
 
-    sp=OldCursorImage;
-    dp=VideoMemory8+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType8));
-	sp+=w;
-	dp+=VideoWidth;
+    sp = OldCursorImage;
+    dp = VideoMemory8 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType8));
+	sp += w;
+	dp += VideoWidth;
     }
 }
 
@@ -477,17 +486,17 @@ local void LoadCursorBackground8(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void LoadCursorBackground16(int x,int y,int w,int h)
+local void LoadCursorBackground16(int x, int y, int w, int h)
 {
     const VMemType16* sp;
     VMemType16* dp;
 
-    sp=OldCursorImage;
-    dp=VideoMemory16+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType16));
-	sp+=w;
-	dp+=VideoWidth;
+    sp = OldCursorImage;
+    dp = VideoMemory16 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType16));
+	sp += w;
+	dp += VideoWidth;
     }
 }
 
@@ -499,17 +508,17 @@ local void LoadCursorBackground16(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void LoadCursorBackground24(int x,int y,int w,int h)
+local void LoadCursorBackground24(int x, int y, int w, int h)
 {
     const VMemType24* sp;
     VMemType24* dp;
 
-    sp=OldCursorImage;
-    dp=VideoMemory24+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType24));
-	sp+=w;
-	dp+=VideoWidth;
+    sp = OldCursorImage;
+    dp = VideoMemory24 + y * VideoWidth+x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType24));
+	sp += w;
+	dp += VideoWidth;
     }
 }
 
@@ -521,17 +530,17 @@ local void LoadCursorBackground24(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void LoadCursorBackground32(int x,int y,int w,int h)
+local void LoadCursorBackground32(int x, int y, int w, int h)
 {
     const VMemType32* sp;
     VMemType32* dp;
 
-    sp=OldCursorImage;
-    dp=VideoMemory32+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType32));
-	sp+=w;
-	dp+=VideoWidth;
+    sp = OldCursorImage;
+    dp = VideoMemory32 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType32));
+	sp += w;
+	dp += VideoWidth;
     }
 }
 
@@ -543,17 +552,17 @@ local void LoadCursorBackground32(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void SaveCursorBackground8(int x,int y,int w,int h)
+local void SaveCursorBackground8(int x, int y, int w, int h)
 {
     VMemType8* dp;
     VMemType8* sp;
 
-    dp=OldCursorImage;
-    sp=VideoMemory8+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType8));
-	dp+=w;
-	sp+=VideoWidth;
+    dp = OldCursorImage;
+    sp = VideoMemory8 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType8));
+	dp += w;
+	sp += VideoWidth;
     }
 }
 
@@ -565,17 +574,17 @@ local void SaveCursorBackground8(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void SaveCursorBackground16(int x,int y,int w,int h)
+local void SaveCursorBackground16(int x, int y, int w, int h)
 {
     VMemType16* dp;
     const VMemType16* sp;
 
-    dp=OldCursorImage;
-    sp=VideoMemory16+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType16));
-	dp+=w;
-	sp+=VideoWidth;
+    dp = OldCursorImage;
+    sp = VideoMemory16 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType16));
+	dp += w;
+	sp += VideoWidth;
     }
 }
 
@@ -587,17 +596,17 @@ local void SaveCursorBackground16(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void SaveCursorBackground24(int x,int y,int w,int h)
+local void SaveCursorBackground24(int x, int y, int w, int h)
 {
     VMemType24* dp;
     const VMemType24* sp;
 
-    dp=OldCursorImage;
-    sp=VideoMemory24+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType24));
-	dp+=w;
-	sp+=VideoWidth;
+    dp = OldCursorImage;
+    sp = VideoMemory24 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType24));
+	dp += w;
+	sp += VideoWidth;
     }
 }
 
@@ -609,17 +618,17 @@ local void SaveCursorBackground24(int x,int y,int w,int h)
 **	@param w	Width in pixels.
 **	@param h	Height in pixels.
 */
-local void SaveCursorBackground32(int x,int y,int w,int h)
+local void SaveCursorBackground32(int x, int y, int w, int h)
 {
     VMemType32* dp;
     const VMemType32* sp;
 
-    dp=OldCursorImage;
-    sp=VideoMemory32+y*VideoWidth+x;
-    while( h-- ) {
-	memcpy(dp,sp,w*sizeof(VMemType32));
-	dp+=w;
-	sp+=VideoWidth;
+    dp = OldCursorImage;
+    sp = VideoMemory32 + y * VideoWidth + x;
+    while (h--) {
+	memcpy(dp, sp, w * sizeof(VMemType32));
+	dp += w;
+	sp += VideoWidth;
     }
 }
 
@@ -645,7 +654,7 @@ global void DestroyCursorBackground(void)
 **	@param y	Screen y pixel position.
 **	@param frame	Animation frame # of the cursor.
 */
-local void DrawCursor(const CursorType* type,int x,int y,int frame)
+local void DrawCursor(const CursorType* type, int x, int y, int frame)
 {
     int size;
     int w;
@@ -657,29 +666,29 @@ local void DrawCursor(const CursorType* type,int x,int y,int frame)
     //
     //	Save cursor position and size, for faster cursor redraw.
     //
-    spritex=(x-=type->HotX);
-    spritey=(y-=type->HotY);
-    w=VideoGraphicWidth(type->Sprite);
-    h=VideoGraphicHeight(type->Sprite);
+    spritex = (x -= type->HotX);
+    spritey = (y -= type->HotY);
+    w = VideoGraphicWidth(type->Sprite);
+    h = VideoGraphicHeight(type->Sprite);
 
     //Reserve enough memory for background of sprite (also for future calls)
-    size=w*h*MemSize;
-    if( OldCursorSize<size ) {
-	if( OldCursorImage ) {
-	    OldCursorImage=realloc(OldCursorImage,size);
+    size = w * h * MemSize;
+    if (OldCursorSize < size) {
+	if (OldCursorImage) {
+	    OldCursorImage = realloc(OldCursorImage, size);
 	} else {
-	    OldCursorImage=malloc(size);
+	    OldCursorImage = malloc(size);
 	}
-	OldCursorSize=size;
+	OldCursorSize = size;
     }
 
     //Save (seen) area behind sprite
-    CLIP_RECTANGLE(x,y,w,h);
-    SaveCursorBackground(OldCursorX=x,OldCursorY=y,OldCursorW=w,OldCursorH=h);
+    CLIP_RECTANGLE(x, y, w, h);
+    SaveCursorBackground(OldCursorX = x, OldCursorY = y, OldCursorW = w, OldCursorH = h);
 
     //Draw sprite (using its own clipping)  FIXME: prevent clipping twice
-    VideoDrawClip(type->Sprite,frame,spritex,spritey);
-    OldCursorInvalidate=1;
+    VideoDrawClip(type->Sprite, frame, spritex, spritey);
+    OldCursorInvalidate = 1;
 }
 
 /*----------------------------------------------------------------------------
@@ -706,8 +715,8 @@ local void DrawBuildingCursor(void)
 
     // Align to grid
     vp = TheUI.MouseViewport;
-    x=CursorX-(CursorX - vp->X)%TileSizeX;
-    y=CursorY-(CursorY - vp->Y)%TileSizeY;
+    x = CursorX - (CursorX - vp->X) % TileSizeX;
+    y = CursorY - (CursorY - vp->Y) % TileSizeY;
     BuildingCursorSX = mx = Viewport2MapX(vp, x);
     BuildingCursorSY = my = Viewport2MapY(vp, y);
 
@@ -716,60 +725,66 @@ local void DrawBuildingCursor(void)
     //
     PushClipping();
     SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-    GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
-    if( VideoGraphicFrames(CursorBuilding->Sprite)>5 ) {
-	DrawUnitType(CursorBuilding,4,x,y);
+    GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
+    if (VideoGraphicFrames(CursorBuilding->Sprite) > 5) {
+	DrawUnitType(CursorBuilding, 4, x, y);
     } else {
-	DrawUnitType(CursorBuilding,0,x,y);
+	DrawUnitType(CursorBuilding, 0, x, y);
     }
     PopClipping();
 
     //
     //	Draw the allow overlay
     //
-    f=CanBuildHere(CursorBuilding,mx,my);
+    f = CanBuildHere(CursorBuilding, mx, my);
 
     mask = CursorBuilding->MovementMask;
     h=CursorBuilding->TileHeight;
-    BuildingCursorEY=my+h-1;
-    if (my+h > vp->MapY + vp->MapHeight) {	// reduce to view limits
+    BuildingCursorEY = my + h - 1;
+    if (my + h > vp->MapY + vp->MapHeight) {	// reduce to view limits
 	h = vp->MapY + vp->MapHeight - my;
     }
     w0 = CursorBuilding->TileWidth;	// reduce to view limits
-    BuildingCursorEX=mx+w0-1;
-    if (mx+w0 > vp->MapX + vp->MapWidth) {
+    BuildingCursorEX = mx + w0 - 1;
+    if (mx + w0 > vp->MapX + vp->MapWidth) {
 	w0 = vp->MapX + vp->MapWidth - mx;
     }
-    while( h-- ) {
-	w=w0;
-	while( w-- ) {
-	    int basex, basey;
+    while (h--) {
+	w = w0;
+	while (w--) {
+	    int basex;
+	    int basey;
+	    int i;
+	    int j;
+
 	    // FIXME: The field is covered by fog of war!
-	    if( f && ( CursorBuilding->MustBuildOnTop || 
-		    CanBuildOn(mx+w,my+h,mask & ((Selected[0] && 
+	    if (f && (CursorBuilding->MustBuildOnTop ||
+		    CanBuildOn(mx + w, my + h, mask & ((Selected[0] && 
 			!CursorBuilding->BuilderOutside &&
-			Selected[0]->X==mx+w && Selected[0]->Y==my+h)
-			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1)))
-		  && IsMapFieldExplored(ThisPlayer,mx+w,my+h) )  {
-		color=ColorGreen;
+			Selected[0]->X == mx + w && Selected[0]->Y == my + h) ?
+			    ~(MapFieldLandUnit | MapFieldSeaUnit) : -1)))
+		  && IsMapFieldExplored(ThisPlayer, mx + w, my + h))  {
+		color = ColorGreen;
 	    } else {
-		color=ColorRed;
+		color = ColorRed;
 	    }
 	    // FIXME: I could do this faster+better
 	    /* latimerius: I'm not sure what you have in mind but I can
 	     * at least move invariants out of the loops. */
-	    basex = x + w*TileSizeX;
-	    basey = y + h*TileSizeY;
-	    for( y1=0; y1<TileSizeY; ++y1 ) {
-		int j = basey+y1;
-		for( x1=y1&1; x1<TileSizeX; x1+=2 ) {
-		    int i = basex+x1;
-		    if (i > vp->EndX)
+	    basex = x + w * TileSizeX;
+	    basey = y + h * TileSizeY;
+	    for (y1 = 0; y1 < TileSizeY; ++y1) {
+		j = basey + y1;
+		for (x1 = y1 & 1; x1 < TileSizeX; x1 += 2) {
+		    i = basex + x1;
+		    if (i > vp->EndX) {
 			break;
-		    VideoDrawPixel (color, i, j);
+		    }
+		    VideoDrawPixel(color, i, j);
 		}
-		if (j > vp->EndY)
+		if (j > vp->EndY) {
 		    break;
+		}
 	    }
 	}
     }
@@ -790,29 +805,27 @@ local void DrawBuildingCursor(void)
 **            here, but this is done by InvalidateCursorAreas.
 **
 **  FIXME: event handler should be temporary stopped while copying
-**         CursorX,CursorY,.. because between two copy commands another
+**         CursorX, CursorY,.. because between two copy commands another
 **         event can occure, which let invalid mouse position be delivered.
 */
 global void DrawAnyCursor(void)
 {
     // Disable any previous drawn cursor
-    OldCursorInvalidate=OldCursorW=
-	OldCursorRectangleInvalidate=OldCursorRectangleW=
-	BuildingCursor=0;
+    OldCursorInvalidate = OldCursorW = OldCursorRectangleInvalidate =
+	OldCursorRectangleW = BuildingCursor = 0;
 
     //
     //	First, Selecting rectangle
     //
-    if( CursorState==CursorStateRectangle
-	     && (CursorStartX!=CursorX || CursorStartY!=CursorY) ) {
-	DrawVisibleRectangleCursor(CursorStartX,CursorStartY,CursorX,CursorY);
-    }
-    //
-    //	Or Selecting position for building
-    //
-    else if( CursorBuilding && CursorOn==CursorOnMap ) {
+    if (CursorState == CursorStateRectangle &&
+	    (CursorStartX != CursorX || CursorStartY != CursorY)) {
+	DrawVisibleRectangleCursor(CursorStartX, CursorStartY, CursorX, CursorY);
+    } else if (CursorBuilding && CursorOn == CursorOnMap) {
+	//
+	//	Or Selecting position for building
+	//
 	DrawBuildingCursor();
-	BuildingCursor=1;
+	BuildingCursor = 1;
     }
 
     //
@@ -821,8 +834,8 @@ global void DrawAnyCursor(void)
     //  Cursor May not Exist if we are loading a game or something. Only
     //	draw it if it exists
     //
-    if( GameCursor ) {
-	DrawCursor(GameCursor,CursorX,CursorY,GameCursor->SpriteFrame);
+    if (GameCursor) {
+	DrawCursor(GameCursor, CursorX, CursorY, GameCursor->SpriteFrame);
     }
 }
 
@@ -839,46 +852,45 @@ global void HideAnyCursor(void)
     //
     //	First, Normal cursor (might restore part of rectangle cursor also).
     //
-    if( OldCursorW && OldCursorImage) {
+    if (OldCursorW && OldCursorImage) {
         // restore area of visible cursor
-        LoadCursorBackground(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
+        LoadCursorBackground(OldCursorX, OldCursorY, OldCursorW, OldCursorH);
 
         // save hidden area to be invalidated
-        HiddenCursorX=OldCursorX;
-        HiddenCursorY=OldCursorY;
-        HiddenCursorW=OldCursorW;
-        HiddenCursorH=OldCursorH;
+        HiddenCursorX = OldCursorX;
+        HiddenCursorY = OldCursorY;
+        HiddenCursorW = OldCursorW;
+        HiddenCursorH = OldCursorH;
 
         // Denote cursor no longer visible
-        OldCursorW=0;
+        OldCursorW = 0;
     }
 
     //
     //	Last, Selecting rectangle
     //
-    if( OldCursorRectangleW ) {
+    if (OldCursorRectangleW) {
         //  restore area of visible cursor
 	LoadCursorRectangle(OldCursorRectangle,
-                            OldCursorRectangleX,OldCursorRectangleY,
-			    OldCursorRectangleW,OldCursorRectangleH);
+	    OldCursorRectangleX, OldCursorRectangleY,
+	    OldCursorRectangleW, OldCursorRectangleH);
 
         // save hidden area to be invalidated
-        HiddenCursorRectangleX=OldCursorRectangleX;
-        HiddenCursorRectangleY=OldCursorRectangleY;
-        HiddenCursorRectangleW=OldCursorRectangleW;
-        HiddenCursorRectangleH=OldCursorRectangleH;
+        HiddenCursorRectangleX = OldCursorRectangleX;
+        HiddenCursorRectangleY = OldCursorRectangleY;
+        HiddenCursorRectangleW = OldCursorRectangleW;
+        HiddenCursorRectangleH = OldCursorRectangleH;
 
         // Denote cursor no longer visible
-        OldCursorRectangleW=0;
-    }
-    //
-    //	Or Selecting position for building
-    //
-    else if( BuildingCursor ) {
-    //NOTE: this will restore tiles themselves later in next video update
-	MarkDrawAreaMap(BuildingCursorSX,BuildingCursorSY,
-		BuildingCursorEX,BuildingCursorEY);
-        BuildingCursor=0;
+        OldCursorRectangleW = 0;
+    } else if (BuildingCursor) {
+	//
+	//	Or Selecting position for building
+	//
+	//NOTE: this will restore tiles themselves later in next video update
+	MarkDrawAreaMap(BuildingCursorSX, BuildingCursorSY,
+	    BuildingCursorEX, BuildingCursorEY);
+        BuildingCursor = 0;
     }
 }
 
@@ -897,8 +909,8 @@ global void CursorAnimate(unsigned ticks)
     if (ticks > last + GameCursor->FrameRate) {
 	last = ticks + GameCursor->FrameRate;
 	GameCursor->SpriteFrame++;
-	if ((GameCursor->SpriteFrame & 127)
-		>= VideoGraphicFrames(GameCursor->Sprite)) {
+	if ((GameCursor->SpriteFrame & 127) >=
+		VideoGraphicFrames(GameCursor->Sprite)) {
 	    GameCursor->SpriteFrame = 0;
 	}
 	MustRedraw |= RedrawCursor;
@@ -915,51 +927,53 @@ global void CursorAnimate(unsigned ticks)
 **	@param w	width of area on screen
 **	@param h	height of area on screen
 */
-global void InvalidateAreaAndCheckCursor( int x, int y, int w, int h )
+global void InvalidateAreaAndCheckCursor(int x, int y, int w, int h)
 {
-  int dx,dy;
+    int dx;
+    int dy;
 
-  //Invalidate area
-  InvalidateArea(x,y,w,h);
+    //Invalidate area
+    InvalidateArea(x, y, w, h);
 
-  //Now check if cursor sprite is inside it, then no need for invalidate
-  if ( OldCursorInvalidate )
-  {
-    dx = OldCursorX-x;
-    dy = OldCursorY-y;
-    if ( dx >= 0 && dy >= 0 && (w-dx) >= OldCursorW && (h-dy) >= OldCursorH )
-      OldCursorInvalidate = 0;
-  }
+    //Now check if cursor sprite is inside it, then no need for invalidate
+    if (OldCursorInvalidate) {
+	dx = OldCursorX - x;
+	dy = OldCursorY - y;
+	if (dx >= 0 && dy >= 0 && (w - dx) >= OldCursorW &&
+		(h - dy) >= OldCursorH) {
+	    OldCursorInvalidate = 0;
+	}
+    }
 
-  //Now check if previously hidden cursor sprite is inside it..
-  if ( HiddenCursorW )
-  {
-    dx = HiddenCursorX-x;
-    dy = HiddenCursorY-y;
-    if ( dx >= 0 && dy >= 0 &&
-         (w-dx) >= HiddenCursorW && (h-dy) >= HiddenCursorH )
-      HiddenCursorW = 0;
-  }
+    //Now check if previously hidden cursor sprite is inside it..
+    if (HiddenCursorW) {
+	dx = HiddenCursorX - x;
+	dy = HiddenCursorY - y;
+	if (dx >= 0 && dy >= 0 && (w - dx) >= HiddenCursorW &&
+	    (h - dy) >= HiddenCursorH) {
+	    HiddenCursorW = 0;
+	}
+    }
 
-  //Now check if cursor rectangle is inside it..
-  if ( OldCursorRectangleInvalidate )
-  {
-    dx = OldCursorRectangleX-x;
-    dy = OldCursorRectangleY-y;
-    if ( dx >= 0 && dy >= 0 &&
-         (w-dx) >= OldCursorRectangleW && (h-dy) >= OldCursorRectangleH )
-      OldCursorRectangleInvalidate = 0;
-  }
+    //Now check if cursor rectangle is inside it..
+    if (OldCursorRectangleInvalidate) {
+	dx = OldCursorRectangleX - x;
+	dy = OldCursorRectangleY - y;
+	if (dx >= 0 && dy >= 0 && (w - dx) >= OldCursorRectangleW &&
+		(h - dy) >= OldCursorRectangleH) {
+	    OldCursorRectangleInvalidate = 0;
+	}
+    }
 
-  //Now check if previously hidden cursor rectangle is inside it..
-  if ( HiddenCursorRectangleW )
-  {
-    dx = HiddenCursorRectangleX-x;
-    dy = HiddenCursorRectangleY-y;
-    if ( dx >= 0 && dy >= 0 &&
-         (w-dx) >= HiddenCursorRectangleW && (h-dy) >= HiddenCursorRectangleH )
-      HiddenCursorRectangleW = 0;
-  }
+    //Now check if previously hidden cursor rectangle is inside it..
+    if (HiddenCursorRectangleW) {
+	dx = HiddenCursorRectangleX - x;
+	dy = HiddenCursorRectangleY - y;
+	if (dx >= 0 && dy >= 0 && (w - dx) >= HiddenCursorRectangleW &&
+		(h - dy) >= HiddenCursorRectangleH) {
+	    HiddenCursorRectangleW = 0;
+	}
+    }
 }
 
 /**
@@ -972,16 +986,15 @@ global void InvalidateAreaAndCheckCursor( int x, int y, int w, int h )
 */
 local void InvalidateRectangle(int x, int y, int w, int h)
 {
-    InvalidateArea(x,y,w,1); // top side
-    if ( --h > 0 )
-    {
-      InvalidateArea(x,y+h,w,1); // bottom side
-      if ( --h > 0 )
-      {
-        InvalidateArea(x,++y,1,h); // left side
-        if ( --w > 0 )
-          InvalidateArea(x+w,y,1,h); // right side
-      }
+    InvalidateArea(x, y, w, 1); // top side
+    if (--h > 0) {
+	InvalidateArea(x, y + h, w, 1); // bottom side
+	if (--h > 0) {
+	    InvalidateArea(x, ++y, 1, h); // left side
+	    if (--w > 0) {
+		InvalidateArea(x + w, y, 1, h); // right side
+	    }
+	}
     }
 }
 
@@ -992,62 +1005,52 @@ local void InvalidateRectangle(int x, int y, int w, int h)
 */
 global void InvalidateCursorAreas(void)
 {
-  //Invalidate cursor sprite
-  if ( OldCursorInvalidate )
-  {
-    InvalidateArea(OldCursorX,OldCursorY,OldCursorW,OldCursorH);
-    OldCursorInvalidate=0;
-  }
+    //Invalidate cursor sprite
+    if (OldCursorInvalidate) {
+	InvalidateArea(OldCursorX, OldCursorY, OldCursorW, OldCursorH);
+	OldCursorInvalidate = 0;
+    }
 
-  //Invalidate hidden cursor sprite
-  if ( HiddenCursorW )
-  {
-    InvalidateArea(HiddenCursorX,HiddenCursorY,HiddenCursorW,HiddenCursorH);
-    HiddenCursorW=0;
-  }
+    //Invalidate hidden cursor sprite
+    if (HiddenCursorW) {
+	InvalidateArea(HiddenCursorX, HiddenCursorY, HiddenCursorW, HiddenCursorH);
+	HiddenCursorW = 0;
+    }
 
-  //Invalidate cursor rectangle
-  if ( OldCursorRectangleInvalidate )
-  {
-    InvalidateRectangle(OldCursorRectangleX,OldCursorRectangleY,
-                        OldCursorRectangleW,OldCursorRectangleH);
-    OldCursorRectangleInvalidate=0;
-  }
+    //Invalidate cursor rectangle
+    if (OldCursorRectangleInvalidate) {
+	InvalidateRectangle(OldCursorRectangleX, OldCursorRectangleY,
+	    OldCursorRectangleW, OldCursorRectangleH);
+	OldCursorRectangleInvalidate = 0;
+    }
 
-  //Invalidate hidden cursor rectangle
-  if ( HiddenCursorRectangleW )
-  {
-    InvalidateRectangle(HiddenCursorRectangleX,HiddenCursorRectangleY,
-                        HiddenCursorRectangleW,HiddenCursorRectangleH);
-    HiddenCursorRectangleW=0;
-  }
+    //Invalidate hidden cursor rectangle
+    if (HiddenCursorRectangleW) {
+	InvalidateRectangle(HiddenCursorRectangleX, HiddenCursorRectangleY,
+	    HiddenCursorRectangleW, HiddenCursorRectangleH);
+	HiddenCursorRectangleW = 0;
+    }
 }
 
 #ifdef USE_OPENGL
-local void LoadCursorRectangleOpenGL(void *buffer __attribute__((unused)),
-				     int x __attribute__((unused)),
-				     int y __attribute__((unused)),
-				     int w __attribute__((unused)),
-				     int h __attribute__((unused)))
+local void LoadCursorRectangleOpenGL(void* buffer __attribute__((unused)),
+    int x __attribute__((unused)), int y __attribute__((unused)),
+    int w __attribute__((unused)), int h __attribute__((unused)))
 {
 }
-local void SaveCursorRectangleOpenGL(void *buffer __attribute__((unused)),
-				     int x __attribute__((unused)),
-				     int y __attribute__((unused)),
-				     int w __attribute__((unused)),
-				     int h __attribute__((unused)))
+local void SaveCursorRectangleOpenGL(void* buffer __attribute__((unused)),
+    int x __attribute__((unused)), int y __attribute__((unused)),
+    int w __attribute__((unused)), int h __attribute__((unused)))
 {
 }
 local void LoadCursorBackgroundOpenGL(int x __attribute__((unused)),
-				      int y __attribute__((unused)),
-				      int w __attribute__((unused)),
-				      int h __attribute__((unused)))
+    int y __attribute__((unused)),
+    int w __attribute__((unused)), int h __attribute__((unused)))
 {
 }
 local void SaveCursorBackgroundOpenGL(int x __attribute__((unused)),
-				      int y __attribute__((unused)),
-				      int w __attribute__((unused)),
-				      int h __attribute__((unused)))
+    int y __attribute__((unused)),
+    int w __attribute__((unused)), int h __attribute__((unused)))
 {
 }
 #endif
@@ -1061,56 +1064,56 @@ local void SaveCursorBackgroundOpenGL(int x __attribute__((unused)),
 global void InitVideoCursors(void)
 {
 #ifdef USE_OPENGL
-    SaveCursorBackground=SaveCursorBackgroundOpenGL;
-    LoadCursorBackground=LoadCursorBackgroundOpenGL;
-    MemSize=1;
-    SaveCursorRectangle=SaveCursorRectangleOpenGL;
-    LoadCursorRectangle=LoadCursorRectangleOpenGL;
+    SaveCursorBackground = SaveCursorBackgroundOpenGL;
+    LoadCursorBackground = LoadCursorBackgroundOpenGL;
+    MemSize = 1;
+    SaveCursorRectangle = SaveCursorRectangleOpenGL;
+    LoadCursorRectangle = LoadCursorRectangleOpenGL;
 #else
-    if( OldCursorRectangle ) {	// memory of possible previous video-setting?
-	free( OldCursorRectangle );
+    if (OldCursorRectangle) {	// memory of possible previous video-setting?
+	free(OldCursorRectangle);
 	OldCursorRectangle = 0;
     }
 
-    switch( VideoBpp ) {
+    switch (VideoBpp) {
 	case 8:
-	    SaveCursorBackground=SaveCursorBackground8;
-	    LoadCursorBackground=LoadCursorBackground8;
-	    MemSize=sizeof(VMemType8);
-	    SaveCursorRectangle=SaveCursorRectangle8;
-	    LoadCursorRectangle=LoadCursorRectangle8;
+	    SaveCursorBackground = SaveCursorBackground8;
+	    LoadCursorBackground = LoadCursorBackground8;
+	    MemSize = sizeof(VMemType8);
+	    SaveCursorRectangle = SaveCursorRectangle8;
+	    LoadCursorRectangle = LoadCursorRectangle8;
 	    break;
 	case 15:
 	case 16:
-	    SaveCursorBackground=SaveCursorBackground16;
-	    LoadCursorBackground=LoadCursorBackground16;
-	    MemSize=sizeof(VMemType16);
-	    SaveCursorRectangle=SaveCursorRectangle16;
-	    LoadCursorRectangle=LoadCursorRectangle16;
+	    SaveCursorBackground = SaveCursorBackground16;
+	    LoadCursorBackground = LoadCursorBackground16;
+	    MemSize = sizeof(VMemType16);
+	    SaveCursorRectangle = SaveCursorRectangle16;
+	    LoadCursorRectangle = LoadCursorRectangle16;
 	    break;
 	case 24:
-	    SaveCursorBackground=SaveCursorBackground24;
-	    LoadCursorBackground=LoadCursorBackground24;
-	    MemSize=sizeof(VMemType24);
-	    SaveCursorRectangle=SaveCursorRectangle24;
-	    LoadCursorRectangle=LoadCursorRectangle24;
+	    SaveCursorBackground = SaveCursorBackground24;
+	    LoadCursorBackground = LoadCursorBackground24;
+	    MemSize = sizeof(VMemType24);
+	    SaveCursorRectangle = SaveCursorRectangle24;
+	    LoadCursorRectangle = LoadCursorRectangle24;
 	    break;
 	case 32:
-	    SaveCursorBackground=SaveCursorBackground32;
-	    LoadCursorBackground=LoadCursorBackground32;
-	    MemSize=sizeof(VMemType32);
-	    SaveCursorRectangle=SaveCursorRectangle32;
-	    LoadCursorRectangle=LoadCursorRectangle32;
+	    SaveCursorBackground = SaveCursorBackground32;
+	    LoadCursorBackground = LoadCursorBackground32;
+	    MemSize = sizeof(VMemType32);
+	    SaveCursorRectangle = SaveCursorRectangle32;
+	    LoadCursorRectangle = LoadCursorRectangle32;
 	    break;
 	default:
 	    DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
 	    abort();
     }
-    OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*MemSize);
+    OldCursorRectangle = malloc((2 * VideoWidth + 2 * (VideoHeight - 2)) * MemSize);
 #endif
 
-    CursorX=VideoWidth/2;
-    CursorY=VideoHeight/2;
+    CursorX = VideoWidth / 2;
+    CursorY = VideoHeight / 2;
 }
 
 /**
@@ -1120,44 +1123,44 @@ global void SaveCursors(CLFile* file)
 {
     int i;
 
-    CLprintf(file,"\n;;; -----------------------------------------\n");
-    CLprintf(file,";;; MODULE: cursors $Id$\n\n");
+    CLprintf(file, "\n;;; -----------------------------------------\n");
+    CLprintf(file, ";;; MODULE: cursors $Id$\n\n");
 
-    for( i=0; Cursors[i].OType; ++i ) {
-	CLprintf(file,"(define-cursor '%s '%s\n",
-		Cursors[i].Ident, Cursors[i].Race ? Cursors[i].Race : "any");
-	CLprintf(file,"  'image \"%s\"\n",Cursors[i].File);
-	CLprintf(file,"  'hot-spot '(%d %d) ",Cursors[i].HotX,Cursors[i].HotY);
-	CLprintf(file,"'size '(%d %d) ",Cursors[i].Width,Cursors[i].Height);
-	CLprintf(file,")\n\n");
+    for (i = 0; Cursors[i].OType; ++i) {
+	CLprintf(file, "(define-cursor '%s '%s\n",
+	    Cursors[i].Ident, Cursors[i].Race ? Cursors[i].Race : "any");
+	CLprintf(file, "  'image \"%s\"\n", Cursors[i].File);
+	CLprintf(file, "  'hot-spot '(%d %d) ", Cursors[i].HotX, Cursors[i].HotY);
+	CLprintf(file, "'size '(%d %d) ", Cursors[i].Width, Cursors[i].Height);
+	CLprintf(file, ")\n\n");
     }
 
     // Not ready:
-    CLprintf(file,";;(set-game-cursor! '%s)\n",GameCursor->Ident);
+    CLprintf(file, ";;(set-game-cursor! '%s)\n", GameCursor->Ident);
     // FIXME: what about the other variables???
-    switch( CursorState ) {
+    switch (CursorState) {
 	case CursorStatePoint:
-	    CLprintf(file,";;(cursor-state 'point)\n");
+	    CLprintf(file, ";;(cursor-state 'point)\n");
 	    break;
 	case CursorStateSelect:
-	    CLprintf(file,";;(cursor-state 'select)\n");
+	    CLprintf(file, ";;(cursor-state 'select)\n");
 	    break;
 	case CursorStateRectangle:
-	    CLprintf(file,";;(cursor-state 'rectangle)\n");
+	    CLprintf(file, ";;(cursor-state 'rectangle)\n");
 	    break;
     }
-    CLprintf(file,";;(cursor-action %d)\n",CursorAction);
+    CLprintf(file, ";;(cursor-action %d)\n", CursorAction);
 #ifndef NEW_UI
-    CLprintf(file,";;(cursor-value %d)\n",CursorValue);
+    CLprintf(file, ";;(cursor-value %d)\n", CursorValue);
 #else
-    CLprintf(file,";;(cursor-spell %d)\n",CursorSpell);
+    CLprintf(file, ";;(cursor-spell %d)\n", CursorSpell);
 #endif
-    CLprintf(file,";;(cursor-building '%s)\n",
-	    CursorBuilding ? CursorBuilding->Ident : "()");
-    CLprintf(file,";;(cursor-position '(%d %d)\n",CursorX,CursorY);
-    CLprintf(file,";;(cursor-start '(%d %d)\n",CursorStartX,CursorStartY);
-    CLprintf(file,";;(unit-under-cursor %s\n",
-	    UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
+    CLprintf(file, ";;(cursor-building '%s)\n",
+	CursorBuilding ? CursorBuilding->Ident : "()");
+    CLprintf(file, ";;(cursor-position '(%d %d)\n", CursorX, CursorY);
+    CLprintf(file, ";;(cursor-start '(%d %d)\n", CursorStartX, CursorStartY);
+    CLprintf(file, ";;(unit-under-cursor %s\n",
+	UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
 }
 
 /**
@@ -1167,23 +1170,23 @@ global void CleanCursors(void)
 {
     int i;
 
-    for( i=0; Cursors[i].OType; ++i ) {
+    for (i = 0; Cursors[i].OType; ++i) {
 	free(Cursors[i].Ident);
 	free(Cursors[i].Race);
 	free(Cursors[i].File);
 	VideoSaveFree(Cursors[i].Sprite);
     }
     free(Cursors);
-    Cursors=NULL;
+    Cursors = NULL;
 
-    free( OldCursorRectangle );
-    OldCursorRectangle=0;
+    free(OldCursorRectangle);
+    OldCursorRectangle = 0;
 
     DestroyCursorBackground();
 
-    CursorBuilding=0;
-    GameCursor=0;
-    UnitUnderCursor=NoUnitP;
+    CursorBuilding = 0;
+    GameCursor = 0;
+    UnitUnderCursor = NoUnitP;
 }
 
 //@}
