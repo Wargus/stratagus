@@ -80,7 +80,7 @@ global SpellType *SpellTypeTable = NULL;
 
 
 /// How many spell-types are available
-global int SpellTypeCount = 0; // Usefull ?
+global int SpellTypeCount = 0;
 
 /*----------------------------------------------------------------------------
 --	Functions (Spells Controllers/Callbacks)
@@ -120,28 +120,25 @@ local void SpellFireballController(Missile *missile)
     // explosions are on each tile on the way
 
     // approx
-    if (missile->TTL <= missile->State && missile->TTL % 2 == 0)
-    {
+    if (missile->TTL <= missile->State && missile->TTL % 2 == 0) {
 	//+TileSize/2 to align gfx to baseline
-		x = missile->X + TileSizeX / 2;
-		y = missile->Y + TileSizeY / 2;
+	x = missile->X + TileSizeX / 2;
+	y = missile->Y + TileSizeY / 2;
 
-		MakeMissile(MissileTypeExplosion, x, y, x, y);
+	MakeMissile(MissileTypeExplosion, x, y, x, y);
 
-		x = x / TileSizeX;
-		y = y / TileSizeY;
+	x = x / TileSizeX;
+	y = y / TileSizeY;
 
 	// Effect of the explosion on units
 	// NOTE: vladi: this is slightly different than original
 	//      now it hits all units in range 1
-		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-		for (i = 0; i < n; ++i)
-		{
-			if (table[i]->HP)
-			{
-				HitUnit(missile->SourceUnit, table[i], FIREBALL_DAMAGE); // Should be missile->damage
-			}
-		}
+	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
+	for (i = 0; i < n; ++i)	{
+	    if (table[i]->HP) {
+		HitUnit(missile->SourceUnit, table[i], FIREBALL_DAMAGE); // Should be missile->damage
+	    }
+	}
     }
 }
 
@@ -154,134 +151,108 @@ local void SpellFireballController(Missile *missile)
 */
 local void SpellDeathCoilController(Missile * missile)
 {
-	Unit	*table[UnitMax];
-	int	i;
-	int	n;
-	Unit	*source;
+    Unit *table[UnitMax];
+    int	i;
+    int	n;
+    Unit *source;
 
     //
     //  missile has not reached target unit/spot
     //
-	if (!(missile->X == missile->DX && missile->Y == missile->DY))
-	{
-		return ;
+    if (!(missile->X == missile->DX && missile->Y == missile->DY)) {
+	return ;
+    }
+    source = missile->SourceUnit;
+    if (source->Destroyed) {
+	return ;
+    }
+    // source unit still exists
+    //
+    //	Target unit still exists and casted on a special target
+    //
+    if (missile->TargetUnit && !missile->TargetUnit->Destroyed
+	    && missile->TargetUnit->HP)  {
+	if (missile->TargetUnit->HP <= 50) {// 50 should be parametrable
+	    source->Player->Score += missile->TargetUnit->Type->Points;
+	    if( missile->TargetUnit->Type->Building) {
+		source->Player->TotalRazings++;
+	    } else {
+		source->Player->TotalKills++;
+	    }
+#ifdef USE_HP_FOR_XP
+	    source->XP += missile->TargetUnit->HP;
+#else
+	    source->XP += missile->TargetUnit->Type->Points;
+#endif
+	    ++source->Kills;
+	    missile->TargetUnit->HP = 0;
+	    LetUnitDie(missile->TargetUnit);
+	} else {
+#ifdef USE_HP_FOR_XP
+	    source->XP += 50;
+#endif
+	    missile->TargetUnit->HP -= 50;
 	}
-	source = missile->SourceUnit;
-	if (source->Destroyed)
-	{
-		return ;
+	if (source->Orders[0].Action != UnitActionDie) {
+	    source->HP += 50;
+	    if (source->HP > source->Stats->HitPoints) {
+		source->HP = source->Stats->HitPoints;
+	    }
 	}
-	// source unit still exists
-	//
-	//	Target unit still exists and casted on a special target
-	//
-	if (missile->TargetUnit && !missile->TargetUnit->Destroyed
-		&& missile->TargetUnit->HP)
-	{
-		if (missile->TargetUnit->HP <= 50)	// 50 should be parametrable
-		{
-			source->Player->Score += missile->TargetUnit->Type->Points;
-			if( missile->TargetUnit->Type->Building)
-			{
-				source->Player->TotalRazings++;
-			}
-			else
-			{
-				source->Player->TotalKills++;
+    } else {
+//
+//	No target unit -- try enemies in range 5x5 // Must be parametrable
+//
+	int ec = 0;		// enemy count
+	int x = missile->DX / TileSizeX;
+	int y = missile->DY / TileSizeY;
+
+	n = SelectUnits(x - 2, y - 2, x + 2, y + 2, table);
+	if (n == 0) {
+	    return ;
+	}
+	// calculate organic enemy count
+	for (i = 0; i < n; ++i) {
+	    ec += (IsEnemy(source->Player, table[i])
+	    && table[i]->Type->Organic != 0);
+	}
+	if (ec > 0)  {
+	    // yes organic enemies found
+	    for (i = 0; i < n; ++i) {
+		if (IsEnemy(source->Player, table[i]) && table[i]->Type->Organic != 0) {
+		    // disperse damage between them
+		    //NOTE: 1 is the minimal damage
+		    if (table[i]->HP <= 50 / ec ) {
+			source->Player->Score += table[i]->Type->Points;
+			if( table[i]->Type->Building ) {
+			    source->Player->TotalRazings++;
+			} else {
+			    source->Player->TotalKills++;
 			}
 #ifdef USE_HP_FOR_XP
-			source->XP += missile->TargetUnit->HP;
+			source->XP += table[i]->HP;
 #else
-			source->XP += missile->TargetUnit->Type->Points;
+			source->XP += table[i]->Type->Points;
 #endif
 			++source->Kills;
-			missile->TargetUnit->HP = 0;
-			LetUnitDie(missile->TargetUnit);
-		}
-		else
-		{
+			table[i]->HP = 0;
+			LetUnitDie(table[i]); // too much damage
+		    } else {
 #ifdef USE_HP_FOR_XP
-			source->XP += 50;
+			source->XP += 50/ec;
 #endif
-			missile->TargetUnit->HP -= 50;
+			table[i]->HP -= 50 / ec;
+		    }
 		}
-		if (source->Orders[0].Action != UnitActionDie)
-		{
-			source->HP += 50;
-			if (source->HP > source->Stats->HitPoints)
-			{
-				source->HP = source->Stats->HitPoints;
-			}
+	    }
+	    if (source->Orders[0].Action!=UnitActionDie) {
+		source->HP += 50;
+		if (source->HP > source->Stats->HitPoints) {
+		    source->HP = source->Stats->HitPoints;
 		}
+	    }
 	}
-	else
-    //
-    //	No target unit -- try enemies in range 5x5 // Must be parametrable
-    //
-	{
-		int ec = 0;		// enemy count
-		int x = missile->DX / TileSizeX;
-		int y = missile->DY / TileSizeY;
-
-		n = SelectUnits(x - 2, y - 2, x + 2, y + 2, table);
-		if (n == 0)
-		{
-			return ;
-		}
-	    // calculate organic enemy count
-    	for (i = 0; i < n; ++i)
-    	{
-			ec += (IsEnemy(source->Player, table[i])
-			&& table[i]->Type->Organic != 0);
-		}
-		if (ec > 0)
-		{	// yes organic enemies found
-			for (i = 0; i < n; ++i)
-			{
-				if (IsEnemy(source->Player, table[i])
-				    && table[i]->Type->Organic != 0)
-				{
-			// disperse damage between them
-			//NOTE: 1 is the minimal damage
-					if (table[i]->HP <= 50 / ec )
-					{
-						source->Player->Score += table[i]->Type->Points;
-		    			if( table[i]->Type->Building )
-		    			{
-							source->Player->TotalRazings++;
-						}
-						else
-						{
-							source->Player->TotalKills++;
-						}
-#ifdef USE_HP_FOR_XP
-						source->XP += table[i]->HP;
-#else
-						source->XP += table[i]->Type->Points;
-#endif
-						++source->Kills;
-						table[i]->HP = 0;
-						LetUnitDie(table[i]); // too much damage
-					}
-					else
-					{
-#ifdef USE_HP_FOR_XP
-						source->XP += 50/ec;
-#endif
-						table[i]->HP -= 50 / ec;
-					}
-			    }
-			}
-			if (source->Orders[0].Action!=UnitActionDie)
-			{
-				source->HP += 50;
-				if (source->HP > source->Stats->HitPoints)
-				{
-					source->HP = source->Stats->HitPoints;
-				}
-			}
-		}
-	}
+    }
 }
 
 /**
@@ -307,32 +278,26 @@ local void SpellWhirlwindController(Missile *missile)
     //
     //	Every 4 cycles 4 points damage in tornado center
     //
-    if (!(missile->TTL % 4))
-    {
-		n = SelectUnitsOnTile(x, y, table);
-		for (i = 0; i < n; ++i)
-		{
-		    if (table[i]->HP)
-		    {
-				HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE1);// should be missile damage ?
-		    }
-		}
+    if (!(missile->TTL % 4)) {
+	n = SelectUnitsOnTile(x, y, table);
+	for (i = 0; i < n; ++i)	{
+	    if (table[i]->HP) {
+		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE1);// should be missile damage ?
+	    }
+	}
     }
     //
     //	Every 1/10s 1 points damage on tornado periphery
     //
-    if (!(missile->TTL % (CYCLES_PER_SECOND/10)))
-    {
+    if (!(missile->TTL % (CYCLES_PER_SECOND/10))) {
     	// we should parameter this
-		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-		DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
-		for (i = 0; i < n; ++i)
-		{
-		    if( (table[i]->X != x || table[i]->Y != y) && table[i]->HP)
-		    {
-				HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2); // should be in missile
-		    }
-		}
+	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
+	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
+	for (i = 0; i < n; ++i) {
+	    if( (table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
+		HitUnit(missile->SourceUnit,table[i], WHIRLWIND_DAMAGE2); // should be in missile
+	    }
+	}
     }
     DebugLevel3Fn( "Whirlwind: %d, %d, TTL: %d\n" _C_
 	    missile->X _C_ missile->Y _C_ missile->TTL );
@@ -340,7 +305,7 @@ local void SpellWhirlwindController(Missile *missile)
     //
     //	Changes direction every 3 seconds (approx.)
     //
-    if (!(missile->TTL % 100)) {	// missile has reached target unit/spot
+    if (!(missile->TTL % 100)) { // missile has reached target unit/spot
 	int nx, ny;
 
 	do {
@@ -375,23 +340,19 @@ local void SpellRunesController(Missile * missile)
     y = missile->Y / TileSizeY;
 
     n = SelectUnitsOnTile(x, y, table);
-    for (i = 0; i < n; ++i)
-    {
-		if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP)
-		{
-		    // FIXME: don't use ident!!!
-		    PlayMissileSound(missile, SoundIdForName("explosion"));
-		    MakeMissile(MissileTypeExplosion, missile->X, missile->Y,
-						missile->X, missile->Y);
-		    HitUnit(missile->SourceUnit, table[i], RUNE_DAMAGE);
-		    missile->TTL=0;		// Rune can only hit once
-		}
+    for (i = 0; i < n; ++i) {
+	if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP) {
+	    // FIXME: don't use ident!!!
+	    PlayMissileSound(missile, SoundIdForName("explosion"));
+	    MakeMissile(MissileTypeExplosion, missile->X, missile->Y,
+					missile->X, missile->Y);
+	    HitUnit(missile->SourceUnit, table[i], RUNE_DAMAGE);
+	    missile->TTL=0;		// Rune can only hit once
+	}
     }
     // show rune every 4 seconds (approx.)
-    if (missile->TTL % 100 == 0)
-    {
-		MakeMissile(MissileTypeRune, missile->X, missile->Y,
-					missile->X, missile->Y);
+    if (missile->TTL % 100 == 0) {
+	MakeMissile(MissileTypeRune, missile->X, missile->Y,missile->X, missile->Y);
     }
 }
 
@@ -409,8 +370,7 @@ local void SpellFlameShieldController(Missile * missile)
 	5, 32, 0, 31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10,
 	-30, 5, -31, 0, -32, -5, -31, -10, -30, -16, -27, -20, -24, -24, -20,
 	-27, -15, -30, -10, -31, -5, -32, 0, -31, 5, -30, 10, -27, 16, -24,
-	20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32
-    };
+	20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32};
     Unit *table[UnitMax];
     int n;
     int i;
@@ -434,33 +394,28 @@ local void SpellFlameShieldController(Missile * missile)
     uh = missile->TargetUnit->Type->Height;
     missile->X = ux * TileSizeX + ix + uw / 2 + dx - 32;
     missile->Y = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
-    if (missile->TargetUnit->Orders[0].Action == UnitActionDie)
-    {
-		missile->TTL = i;
+    if (missile->TargetUnit->Orders[0].Action == UnitActionDie) {
+	missile->TTL = i;
     }
-    if (missile->TTL == 0)
-    {
-		missile->TargetUnit->FlameShield = 0;
+    if (missile->TTL == 0) {
+	missile->TargetUnit->FlameShield = 0;
     }
     //vladi: still no have clear idea what is this about :)
     CheckMissileToBeDrawn(missile);
 
     // Only hit 1 out of 8 frames
-    if (missile->TTL & 7)
-    {
-		return;
+    if (missile->TTL & 7) {
+	return;
     }
     n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
-    for (i = 0; i < n; ++i)
-    {
-		if (table[i] == missile->TargetUnit)
-		{	// cannot hit target unit
-			continue;
-		}
-		if (table[i]->HP)
-		{
-		    HitUnit(missile->SourceUnit, table[i], 1);
-		}
+    for (i = 0; i < n; ++i) {
+	if (table[i] == missile->TargetUnit) {
+	    // cannot hit target unit
+	    continue;
+	}
+	if (table[i]->HP) {
+	    HitUnit(missile->SourceUnit, table[i], 1);
+	}
     }
 }
 
@@ -472,7 +427,51 @@ local void SpellFlameShieldController(Missile * missile)
 // Cast the Spell
 // ****************************************************************************
 
-//	Blizzard
+/**
+**	Cast circle of power.
+**
+**	@param caster	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**	@param target	Target unit that spell is addressed to
+**	@param x	X coord of target spot when/if target does not exist
+**	@param y	Y coord of target spot when/if target does not exist
+**
+**	@return		=!0 if spell should be repeated, 0 if not
+*/
+global int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
+    Unit* target __attribute__((unused)), int x, int y)
+{
+    // FIXME: vladi: cop should be placed only on explored land
+    Unit *portal;
+    UnitType *ptype;
+    
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(spell->SpellAction->SpawnPortal.PortalType);
+
+    ptype = spell->SpellAction->SpawnPortal.PortalType;
+
+    portal = caster->Goal;
+    if (portal) {
+	// FIXME: if cop is already defined --> move it, but it doesn't work?
+	RemoveUnit(portal, NULL);
+	PlaceUnit(portal, x, y);
+    } else {
+	portal = MakeUnitAndPlace(x, y, ptype, &Players[PlayerMax - 1]);
+    }
+    MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    //  Goal is used to link to destination circle of power
+    caster->Goal = portal;
+    RefsDebugCheck(!portal->Refs || portal->Destroyed);
+    portal->Refs++;
+    //FIXME: setting destination circle of power should use mana
+    return 0;
+}
+
+//	AreaBombardment
 //   NOTE: vladi: blizzard differs than original in this way:
 //   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 
@@ -487,15 +486,15 @@ local void SpellFlameShieldController(Missile * missile)
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastBlizzard(Unit* caster, const SpellType* spell,
+global int CastAreaBombardment(Unit* caster, const SpellType* spell,
     Unit* target __attribute__((unused)), int x, int y)
 {
     int fields;
     int shards;
     int damage;
     Missile *mis = NULL;
-    int sx;
-    int sy;
+    int offsetx;
+    int offsety;
     int dx;
     int dy;
     int i;
@@ -505,152 +504,42 @@ global int CastBlizzard(Unit* caster, const SpellType* spell,
     assert(spell->SpellAction);
     //assert(x in range, y in range);
 
-    fields = spell->SpellAction->Blizzard.Fields;
-    shards = spell->SpellAction->Blizzard.Shards;
-    damage = spell->SpellAction->Blizzard.Damage;
-    while (fields--)
-    {
+    fields = spell->SpellAction->AreaBombardment.Fields;
+    shards = spell->SpellAction->AreaBombardment.Shards;
+    damage = spell->SpellAction->AreaBombardment.Damage;
+    offsetx = spell->SpellAction->AreaBombardment.StartOffsetX;
+    offsety = spell->SpellAction->AreaBombardment.StartOffsetY;
+    while (fields--) {
     	// FIXME : radius configurable...
-		do {
-		    // find new destination in the map
-		    dx = x + SyncRand() % 5 - 2;
-		    dy = y + SyncRand() % 5 - 2;
-		} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
-		sx = dx - 4;
-		sy = dy - 4;
-		for (i = 0; i < shards; ++i)
-		{
-		    mis = MakeMissile(spell->Missile,
-							    sx * TileSizeX + TileSizeX / 2,
-							    sy * TileSizeY + TileSizeY / 2,
-							    dx * TileSizeX + TileSizeX / 2,
-							    dy * TileSizeY + TileSizeY / 2);
-			if (mis->Type->Speed)
-			{
-		    	mis->Delay = i * mis->Type->Sleep * 2 * TileSizeX / mis->Type->Speed;
-			}
-			else
-			{
-				DebugLevel0Fn("Missile-type '%s' must have speed non null" _C_ spell->Missile->Ident);
-				// Or assert();
-				// warning : bad conf.
-			}
-		    mis->Damage = damage;
-		    // FIXME: not correct -- blizzard should continue even if mage is
-		    //       destroyed (though it will be quite short time...)
-		    mis->SourceUnit = caster;
-		    RefsDebugCheck(!caster->Refs || caster->Destroyed);
-		    caster->Refs++;
-		}
-    }
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    caster->Mana -= spell->ManaCost;
-	return caster->Mana > spell->ManaCost;
-}
-
-/**
-**	Cast circle of power.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastCircleOfPower(Unit* caster, const SpellType* spell __attribute__((unused)),
-    Unit* target __attribute__((unused)), int x, int y)
-{
-    // FIXME: vladi: cop should be placed only on explored land
-    Unit *cop = NULL;
-    UnitType *ucop = spell->SpellAction->SpawnPortal.PortalType;
-
-    assert(caster);
-    assert(spell);
-    assert(spell->SpellAction);
-    assert(spell->SpellAction->SpawnPortal.PortalType);
-//	assert(x in range, y in range);
-
-    cop = caster->Goal;
-    if (cop)
-    {
-		// FIXME: if cop is already defined --> move it, but it doesn't work?
-		RemoveUnit(cop, NULL);
-		PlaceUnit(cop, x, y);
-    }
-    else
-    {
-		cop = MakeUnitAndPlace(x, y, ucop, &Players[PlayerMax - 1]);
-    }
-	    MakeMissile(spell->Missile,
-	    	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-	    	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    // Next is used to link to destination circle of power
-    caster->Goal = cop;
-    RefsDebugCheck(!cop->Refs || cop->Destroyed);
-    cop->Refs++;
-    //FIXME: setting destination circle of power should use mana
-    return 0;
-}
-
-/**
-**	Cast death and decay.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-**	@todo	unify DeathAndDecay and blizzard function. (if possible)
-*/
-global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
-{
-    int fields;			// blizzard thing, yep :)
-    int shards;
-	int damage;
-    Missile *mis = NULL;
-    int dx;
-    int dy;
-    int i;
-
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
-
-    fields = spell->SpellAction->DeathAndDecay.Fields;
-    shards = spell->SpellAction->DeathAndDecay.Shards;
-    damage = spell->SpellAction->DeathAndDecay.Damage;
-    while (fields--)
-    {
-		do {
-		    // find new destination in the map
-		    dx = x + SyncRand() % 5 - 2;
-		    dy = y + SyncRand() % 5 - 2;
-		} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
-		for (i = 0; i < shards; ++i)
-		{
-		    mis = MakeMissile(spell->Missile,
-			    dx * TileSizeX + TileSizeX / 2, dy * TileSizeY + TileSizeY / 2,
-			    dx * TileSizeX + TileSizeX / 2, dy * TileSizeY + TileSizeY / 2);
-		    mis->Damage = damage;
-		    //FIXME: not correct -- death and decay should continue even if
-		    //       death knight is destroyed (though it will be quite
-		    //       short time...)
-		    mis->Delay = i * mis->Type->Sleep
-			    * VideoGraphicFrames(mis->Type->Sprite);
-		    mis->SourceUnit = caster;
-		    RefsDebugCheck(!caster->Refs || caster->Destroyed);
-		    caster->Refs++;
-		}
+	do {
+	    // find new destination in the map
+	    dx = x + SyncRand() % 5 - 2;
+	    dy = y + SyncRand() % 5 - 2;
+	} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
+	for (i = 0; i < shards; ++i) {
+	    mis = MakeMissile(spell->Missile,
+		    dx * TileSizeX + TileSizeX / 2 + offsetx,
+		    dy * TileSizeY + TileSizeY / 2 + offsety,
+		    dx * TileSizeX + TileSizeX / 2,
+		    dy * TileSizeY + TileSizeY / 2);
+	    //  FIXME: This is just patched up, it works, but I have no idea why.
+	    //  FIXME: What is the reasoning behind all this?
+	    if (mis->Type->Speed) {
+		mis->Delay = i * mis->Type->Sleep * 2 * TileSizeX / mis->Type->Speed;
+	    } else {
+		mis->Delay = i * mis->Type->Sleep * VideoGraphicFrames(mis->Type->Sprite);
+	    }
+	    mis->Damage = damage;
+	    // FIXME: not correct -- blizzard should continue even if mage is
+	    //       destroyed (though it will be quite short time...)
+	    mis->SourceUnit = caster;
+	    RefsDebugCheck(!caster->Refs || caster->Destroyed);
+	    caster->Refs++;
 	}
+    }
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     caster->Mana -= spell->ManaCost;
-    return (caster->Mana > spell->ManaCost);
+    return caster->Mana > spell->ManaCost;
 }
 
 /**
@@ -664,8 +553,7 @@ global int CastDeathAndDecay(Unit* caster, const SpellType* spell,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
     Missile *mis = NULL;
     int sx = caster->X;
@@ -674,20 +562,19 @@ global int CastDeathCoil(Unit* caster, const SpellType* spell, Unit* target,
     assert(caster);
     assert(spell);
     assert(spell->SpellAction);
-//	assert(target);
-//	assert(x in range, y in range);
+// assert(target);
+// assert(x in range, y in range);
 
     caster->Mana -= spell->ManaCost;
 
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     mis = MakeMissile(spell->Missile,
-	sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
-	x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+	    sx * TileSizeX + TileSizeX / 2, sy * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->SourceUnit = caster;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
     caster->Refs++;
-    if (target)
-    {
+    if (target) {
 	mis->TargetUnit = target;
 	RefsDebugCheck(!target->Refs || target->Destroyed);
 	target->Refs++;
@@ -715,18 +602,16 @@ global int CastFireball(Unit* caster, const SpellType* spell,
     int sy;
     int dist;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(target);
-//	assert(x in range, y in range);
-	assert(spell->Missile);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(spell->Missile);
 
     // NOTE: fireball can be casted on spot
     sx = caster->X;
     sy = caster->Y;
     dist = MapDistance(sx, sy, x, y);
-	assert(dist != 0);
+    assert(dist != 0);
     x += ((x - sx) * 10) / dist;
     y += ((y - sy) * 10) / dist;
     sx = sx * TileSizeX + TileSizeX / 2;
@@ -759,29 +644,28 @@ global int CastFireball(Unit* caster, const SpellType* spell,
 global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
     int x __attribute__((unused)), int y __attribute__((unused)))
 {
-	Missile* mis = NULL;
-	int	i;
+    Missile* mis = NULL;
+    int	i;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
-//	assert(x in range, y in range);
-	assert(spell->Missile);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(target);
+//  assert(x in range, y in range);
+    assert(spell->Missile);
 
-	// get mana cost
-	caster->Mana -= spell->ManaCost;
-	target->FlameShield = spell->SpellAction->FlameShield.TTL;
-	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-	for (i = 0; i < 5; i++)
-	{
-		mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
-		mis->TTL = spell->SpellAction->FlameShield.TTL + i * 7;
-		mis->TargetUnit = target;
-		mis->Controller = SpellFlameShieldController;
-		RefsDebugCheck(!target->Refs || target->Destroyed);
-		target->Refs++;
-	}
+    // get mana cost
+    caster->Mana -= spell->ManaCost;
+    target->FlameShield = spell->SpellAction->FlameShield.TTL;
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
+    for (i = 0; i < 5; i++) {
+	mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
+	mis->TTL = spell->SpellAction->FlameShield.TTL + i * 7;
+	mis->TargetUnit = target;
+	mis->Controller = SpellFlameShieldController;
+	RefsDebugCheck(!target->Refs || target->Destroyed);
+	target->Refs++;
+    }
     return 0;
 }
 
@@ -799,93 +683,69 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
-	struct s_haste	*haste;
+    struct s_haste	*haste;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(target);
 
-	// get mana cost
-	caster->Mana -= spell->ManaCost;
+    // get mana cost
+    caster->Mana -= spell->ManaCost;
 
-	for (haste = &spell->SpellAction->haste; haste != NULL; haste = haste->next)
-	{
-		// FIXME modify unit (slow, bloodlust, ..) -> flag[] ?
-		switch (haste->flag)
-		{
-			case flag_slow:
-			{
-				target->Slow = haste->value / CYCLES_PER_SECOND;
-				break;
-			}
-			case flag_haste:
-			{
-				target->Haste = haste->value / CYCLES_PER_SECOND;
-				break;
-			}
-			case flag_bloodlust:
-			{
-				target->Bloodlust = haste->value / CYCLES_PER_SECOND;
-				break;
-			}
-			case flag_HP:
-			{
-				target->HP = haste->value;
-				if (target->HP <= 0)
-				{
-					target->HP = 1; // could be to 0 ??
-				}
-				if (target->Stats->HitPoints < target->HP)
-				{
-					target->HP = target->Stats->HitPoints;
-				}
-				break;
-			}
-			case flag_Mana:
-			{
-				target->Mana = haste->value;
-				if (target->Type->_MaxMana < target->Mana)
-				{
-					target->Mana = target->Type->_MaxMana;
-				}
-				break;
-			}
-			case flag_HP_percent:
-			{
-				target->HP = target->HP * haste->value / 100;
-				if (target->HP < 0)
-				{
-					target->HP = 1; // could be to 0 ??
-				}
-				if (target->Stats->HitPoints < target->HP)
-				{
-					target->HP = target->Stats->HitPoints;
-				}
-				break;
-			}
-			case flag_Mana_percent:
-			{
-				target->Mana = target->Mana * haste->value / 100;
-				if (target->Type->_MaxMana < target->Mana)
-				{
-					target->Mana = target->Type->_MaxMana;
-				}
-				break;
-			}
-			default:
-			{
-				// Warn devellopers
-				assert(0);
-			}
+    for (haste = &spell->SpellAction->haste; haste != NULL; haste = haste->next) {
+	// FIXME modify unit (slow, bloodlust, ..) -> flag[] ?
+	switch (haste->flag) {
+	    case flag_slow:
+		target->Slow = haste->value / CYCLES_PER_SECOND;
+		break;
+	    case flag_haste:
+		target->Haste = haste->value / CYCLES_PER_SECOND;
+		break;
+	    case flag_bloodlust:
+		target->Bloodlust = haste->value / CYCLES_PER_SECOND;
+		break;
+	    case flag_HP:
+		target->HP = haste->value;
+		if (target->HP <= 0) {
+		    target->HP = 1; // could be to 0 ??
 		}
+		if (target->Stats->HitPoints < target->HP) {
+		    target->HP = target->Stats->HitPoints;
+		}
+		break;
+	    case flag_Mana:
+		target->Mana = haste->value;
+		if (target->Type->_MaxMana < target->Mana) {// What is Maxmana per unit.
+		    target->Mana = target->Type->_MaxMana;
+		}
+		break;
+	    case flag_HP_percent:
+		target->HP = target->HP * haste->value / 100;
+		if (target->HP < 0) {
+		    target->HP = 1; // could be to 0 ??
+		}
+		if (target->Stats->HitPoints < target->HP) {
+		    target->HP = target->Stats->HitPoints;
+		}
+		break;
+	    case flag_Mana_percent:
+		target->Mana = target->Mana * haste->value / 100;
+		if (target->Type->_MaxMana < target->Mana) {// What is Maxmana per unit.
+		    target->Mana = target->Type->_MaxMana;
+		}
+		break;
+	    default:
+		// Warn devellopers
+		assert(0);
 	}
-	CheckUnitToBeDrawn(target);
-	PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
-	MakeMissile(spell->Missile,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	return 0;
+    }
+    CheckUnitToBeDrawn(target);
+    PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
+    MakeMissile(spell->Missile,
+	x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
+	x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+    return 0;
 }
 
 /**
@@ -899,54 +759,49 @@ global int CastHaste(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastHealing(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastHealing(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
-	int	i;
-	int	diffHP;
-	int diffMana = caster->Mana;
-	int	HP = spell->SpellAction->healing.HP;
-	int Mana = spell->ManaCost;
+    int i;
+    int diffHP;
+    int diffMana = caster->Mana;
+    int HP = spell->SpellAction->healing.HP;
+    int Mana = spell->ManaCost;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(target);
 
-   	// Healing or exorcism
-   	diffHP = (HP > 0) ? target->Stats->HitPoints - target->HP : target->HP;
-   	i = min(diffHP / HP + (diffHP % HP ? 1 : 0),
-   			diffMana / Mana + (diffMana % Mana ? 1 : 0));
-	// Stop when no mana or full HP
+    // Healing or exorcism
+    diffHP = (HP > 0) ? target->Stats->HitPoints - target->HP : target->HP;
+    i = min(diffHP / HP + (diffHP % HP ? 1 : 0),
+	    diffMana / Mana + (diffMana % Mana ? 1 : 0));
+    // Stop when no mana or full HP
     caster->Mana -= i * Mana;
     target->HP += i * HP;
-	if (HP < 0)
-	{
+
+    if (HP < 0) {
 #ifdef USE_HP_FOR_XP
-		caster->XP += i * HP;
+	caster->XP += i * HP;
 #endif
-		if (!target->HP)
-		{
-		    caster->Player->Score += target->Type->Points;
-		    if (target->Type->Building)
-		    {
-				caster->Player->TotalRazings++;
-		    }
-		    else
-		    {
-				caster->Player->TotalKills++;
-		    }
+	if (!target->HP) {
+	    caster->Player->Score += target->Type->Points;
+	    if (target->Type->Building) {
+		caster->Player->TotalRazings++;
+	    } else {
+		caster->Player->TotalKills++;
+	    }
 #ifndef USE_HP_FOR_XP
-		    caster->XP += target->Type->Points;
+	    caster->XP += target->Type->Points;
 #endif
-		    caster->Kills++;
-		    LetUnitDie(target);
-		}
+	    caster->Kills++;
+	    LetUnitDie(target);
 	}
-	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-	MakeMissile(spell->Missile,
-			    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-			    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    }
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
+    MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     return 0;
 }
 
@@ -961,16 +816,15 @@ global int CastHealing(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastHolyVision(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastHolyVision(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+//  assert(x in range, y in range);
 
     caster->Mana -= spell->ManaCost;	// get mana cost
-    // FIXME Do a fonction to reveal map (use for attack revealer) instead of create unit
+    // FIXME: compact with summon.
     target = MakeUnit(spell->SpellAction->holyvision.revealer, caster->Player);
     target->Orders[0].Action = UnitActionStill;
     target->HP = 0;
@@ -997,53 +851,44 @@ global int CastHolyVision(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastInvisibility(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastInvisibility(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
-	assert(spell->SpellAction->invisibility.missile);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(target);
+    assert(spell->SpellAction->invisibility.missile);
 
-	// get mana cost
-	caster->Mana -= spell->ManaCost;
-	if (target->Type->Volatile)
-	{
-	    RemoveUnit(target,NULL);
-	    UnitLost(target);
-	    UnitClearOrders(target);
-	    ReleaseUnit(target);
-	    MakeMissile(spell->SpellAction->invisibility.missile,
-				    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-				    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    // get mana cost
+    caster->Mana -= spell->ManaCost;
+    if (target->Type->Volatile) {
+	RemoveUnit(target,NULL);
+	UnitLost(target);
+	UnitClearOrders(target);
+	ReleaseUnit(target);
+	MakeMissile(spell->SpellAction->invisibility.missile,
+		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+    } else {
+	switch (spell->SpellAction->invisibility.flag) {
+	    case flag_invisibility:
+		target->Invisible = spell->SpellAction->invisibility.value;
+		target->Invisible /= CYCLES_PER_SECOND;
+		break;
+	    case flag_unholyarmor:
+		target->UnholyArmor = spell->SpellAction->invisibility.value;
+		target->UnholyArmor /= CYCLES_PER_SECOND;
+		break;
+	    default:
+		//  Something is WRONG!!!
+		assert(0);
 	}
-	else
-	{
-		switch (spell->SpellAction->invisibility.flag)
-		{
-			case flag_invisibility:
-			{
-				target->Invisible = spell->SpellAction->invisibility.value;
-				target->Invisible /= CYCLES_PER_SECOND;
-			}
-			case flag_unholyarmor:
-			{
-				target->UnholyArmor = spell->SpellAction->invisibility.value;
-				target->UnholyArmor /= CYCLES_PER_SECOND;
-			}
-			default:
-			{
-				assert(0);
-				// Warn devellopers
-			}
-		}
-		CheckUnitToBeDrawn(target);
-	}
-	PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
-	MakeMissile(spell->Missile,
-				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-				x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2 );
+	CheckUnitToBeDrawn(target);
+    }
+    PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
+    MakeMissile(spell->Missile,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2 );
     return 0;
 }
 
@@ -1058,47 +903,42 @@ global int CastInvisibility(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
-	UnitType* type = spell->SpellAction->polymorph.unit;
+    UnitType* type = spell->SpellAction->Polymorph.NewForm;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(target);
-	assert(spell->SpellAction->polymorph.unit);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(target);
+    assert(type);
 
-	caster->Player->Score += target->Type->Points;
-	if (target->Type->Building)
-	{
-    	caster->Player->TotalRazings++;
-	}
-	else
-	{
-    	caster->Player->TotalKills++;
-	}
+    caster->Player->Score += target->Type->Points;
+    if (target->Type->Building) {
+	caster->Player->TotalRazings++;
+    } else {
+	caster->Player->TotalKills++;
+    }
 #ifdef USE_HP_FOR_XP
-	caster->XP += target->HP;
+    caster->XP += target->HP;
 #else
-	caster->XP += target->Type->Points;
+    caster->XP += target->Type->Points;
 #endif
-	caster->Kills++;
-	// as said somewhere else -- no corpses :)
-	RemoveUnit(target,NULL);
-	UnitLost(target);
-	UnitClearOrders(target);
-	ReleaseUnit(target);
-	if (UnitTypeCanMoveTo(x, y, type))
-	{
-	    MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
-	}
-	caster->Mana -= spell->ManaCost;
-	PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-	MakeMissile(spell->Missile,
+    caster->Kills++;
+    // as said somewhere else -- no corpses :)
+    RemoveUnit(target,NULL);
+    UnitLost(target);
+    UnitClearOrders(target);
+    ReleaseUnit(target);
+    if (UnitTypeCanMoveTo(x, y, type)) {
+	MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
+    }
+    caster->Mana -= spell->ManaCost;
+    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
+    MakeMissile(spell->Missile,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-	return 0;
+    return 0;
 }
 
 /**
@@ -1112,47 +952,49 @@ global int CastPolymorph(Unit* caster, const SpellType* spell, Unit* target,
 **
 **	@return		=!0 if spell should be repeated, 0 if not
 */
-global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,
-    int x, int y)
+global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,int x, int y)
 {
     Unit **corpses;
     Unit *tempcorpse;
     UnitType *skeleton;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(spell->SpellAction->raisedead.skeleton != NULL);
-//	assert(x in range, y in range);
-    skeleton = spell->SpellAction->raisedead.skeleton;
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+//  assert(x in range, y in range);
+    skeleton = spell->SpellAction->RaiseDead.Skeleton;
+    assert(skeleton);
 
     corpses = &CorpseList;
 
-    while (caster->Mana >= spell->ManaCost && *corpses)
-    {
+    while (*corpses) {
 	// FIXME: this tries to raise all corps, ohje
 	// FIXME: I can raise ships?
-		if ((*corpses)->Orders[0].Action == UnitActionDie
-			&& !(*corpses)->Type->Building
-			&& (*corpses)->X >= x - 1 && (*corpses)->X <= x + 1
-			&& (*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1)
-		{
-		    // FIXME: did they count on food?
-		    // Can there be more than 1 skeleton created on the same tile? yes
-		    target = MakeUnit(skeleton, caster->Player);
-		    target->X = (*corpses)->X;
-		    target->Y = (*corpses)->Y;
-		    DropOutOnSide(target,LookingW,0,0);
-		    // set life span
-		    target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
-		    CheckUnitToBeDrawn(target);
-		    tempcorpse = *corpses;
-		    corpses = &(*corpses)->Next;
-		    ReleaseUnit(tempcorpse);
-		    caster->Mana -= spell->ManaCost;
-		    corpses = &(*corpses)->Next;
+	if ((*corpses)->Orders[0].Action == UnitActionDie
+		&& !(*corpses)->Type->Building
+		&& (*corpses)->X >= x - 1 && (*corpses)->X <= x + 1
+		&& (*corpses)->Y >= y - 1 && (*corpses)->Y <= y + 1) {
+	    // FIXME: did they count on food?
+	    // nobody: unlikely.
+	    // Can there be more than 1 skeleton created on the same tile? yes
+	    target = MakeUnit(skeleton, caster->Player);
+	    target->X = (*corpses)->X;
+	    target->Y = (*corpses)->Y;
+	    DropOutOnSide(target,LookingW,0,0);
+	    // set life span
+	    target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
+	    CheckUnitToBeDrawn(target);
+	    tempcorpse = *corpses;
+	    corpses = &(*corpses)->Next;
+	    ReleaseUnit(tempcorpse);
+	    caster->Mana -= spell->ManaCost;
+	    if (caster->Mana<spell->ManaCost) {
+		break;
 	    }
+	} else {
+	    corpses=&(*corpses)->Next;
 	}
+    }
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     MakeMissile(spell->Missile,
 	    x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
@@ -1172,44 +1014,43 @@ global int CastRaiseDead(Unit* caster, const SpellType* spell, Unit* target,
 **	@return		=!0 if spell should be repeated, 0 if not
 */
 global int CastRunes(Unit* caster, const SpellType* spell,
-    Unit* target __attribute__((unused)), int x, int y)
+	Unit* target __attribute__((unused)), int x, int y)
 {
     Missile *mis = NULL;
-	const int	xx[] = {-1, +1, 0, 0, 0};
-	const int	yy[] = {0, 0, 0, -1, +1};
 
-	int	oldx = x;
-	int	oldy = y;
-	int	i;
+    const int xx[] = {-1,+1, 0, 0, 0};
+    const int yy[] = { 0, 0, 0,-1,+1};
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
+    int oldx = x;
+    int oldy = y;
+    int i;
+
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+//  assert(x in range, y in range);
 
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-	for (i = 0; i < 5; i++)
-	{
-		x = oldx + xx[i];
-		y = oldy + yy[i];
-		
-	    if (IsMapFieldEmpty(x - 1, y + 0))
-	    {
-			mis = MakeMissile(spell->Missile,
-								x * TileSizeX + TileSizeX / 2,
-								y * TileSizeY + TileSizeY / 2,
-								x * TileSizeX + TileSizeX / 2,
-								y * TileSizeY + TileSizeY / 2);
-			mis->TTL = spell->SpellAction->runes.TTL;
-			mis->Controller = SpellRunesController;
-			caster->Mana -= spell->ManaCost / 5;
-	    }
+    for (i = 0; i < 5; i++) {
+	x = oldx + xx[i];
+	y = oldy + yy[i];
+	    
+	if (IsMapFieldEmpty(x - 1, y + 0)) {
+	    mis = MakeMissile(spell->Missile,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2,
+		    x * TileSizeX + TileSizeX / 2,
+		    y * TileSizeY + TileSizeY / 2);
+	    mis->TTL = spell->SpellAction->runes.TTL;
+	    mis->Controller = SpellRunesController;
+	    caster->Mana -= spell->ManaCost / 5;
 	}
+    }
     return 0;
 }
 
 /**
-**	Cast eye of vision. (summon)
+**	Cast summon spell.
 **
 **	@param caster	Unit that casts the spell
 **	@param spell	Spell-type pointer
@@ -1222,15 +1063,15 @@ global int CastRunes(Unit* caster, const SpellType* spell,
 global int CastSummon(Unit* caster, const SpellType* spell, Unit* target,
     int x, int y)
 {
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-	assert(spell->SpellAction->summon.unittype != NULL);
-//	assert(x in range, y in range);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+    assert(spell->SpellAction->Summon.UnitType != NULL);
+//  assert(x in range, y in range);
 
     caster->Mana -= spell->ManaCost;
     // FIXME: johns: the unit is placed on the wrong position
-    target = MakeUnit(spell->SpellAction->summon.unittype, caster->Player);
+    target = MakeUnit(spell->SpellAction->Summon.UnitType, caster->Player);
     target->X = x;
     target->Y = y;
     DropOutOnSide(target, LookingW, 0, 0);
@@ -1262,16 +1103,16 @@ global int CastWhirlwind(Unit* caster, const SpellType* spell,
 {
     Missile *mis = NULL;
 
-	assert(caster);
-	assert(spell);
-	assert(spell->SpellAction);
-//	assert(x in range, y in range);
+    assert(caster);
+    assert(spell);
+    assert(spell->SpellAction);
+//  assert(x in range, y in range);
 
     caster->Mana -= spell->ManaCost;
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     mis = MakeMissile(spell->Missile,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
-		x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
+	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
     mis->TTL = spell->SpellAction->whirlwind.TTL;
     mis->Controller = SpellWhirlwindController;
     return 0;
@@ -1281,168 +1122,118 @@ global int CastWhirlwind(Unit* caster, const SpellType* spell,
 //	Specific conditions
 // ****************************************************************************
 
-/* *************************************
-** property of unittype himself
+/*
+**	Check for unittype properties of unittype himself
 */
-global int		CheckUnitTypeFlag(const t_Conditions	*condition,
-									const Unit* caster,
-									const Unit* target, int x, int y)
+global int CheckUnitTypeFlag(const t_Conditions	*condition,
+	const Unit* caster,const Unit* target, int x, int y)
 {
-	assert(caster != NULL);
-	assert(condition != NULL);
+    assert(caster != NULL);
+    assert(condition != NULL);
 
-	if (target == NULL)
-		return !condition->expectvalue;
-	// FIXME Modify unit struture for an array of boolean ?
-	switch (condition->u.flag)
-	{
-		case flag_coward:
-		{
-			return target->Type->Coward;
-		}
-		case flag_organic:
-		{
-			return target->Type->Organic;
-		}
-		case flag_isundead:
-		{
-			return target->Type->IsUndead;
-		}
-		case flag_canattack:
-		{
-			return target->Type->CanAttack;
-		}
-		case flag_building:
-		{
-			return target->Type->Building;
-		}
-		default:
-		{
-			assert(0);
-			// Warn devellopers
-		}
-	}
+    if (target == NULL)
+	    return !condition->expectvalue;
+    // FIXME Modify unit struture for an array of boolean ?
+    switch (condition->u.flag) {
+	case flag_coward:
+	    return target->Type->Coward;
+	case flag_organic:
+	    return target->Type->Organic;
+	case flag_isundead:
+	    return target->Type->IsUndead;
+	case flag_canattack:
+	    return target->Type->CanAttack;
+	case flag_building:
+	    return target->Type->Building;
+	default:
+	    assert(0);
+	    // Warn devellopers
+    }
 }
 
-/* *************************************
-** property of alliance
+/*
+**	Check for alliance status.
 */
-global int		CheckAllied(const t_Conditions	*condition,
-							const Unit* caster,
-							const Unit* target, int x, int y)
+global int CheckAllied(const t_Conditions *condition,const Unit* caster,const Unit* target, int x, int y)
 {
-	assert(caster != NULL);
-
-	return caster->Player == target->Player
-		||IsAllied(caster->Player, target) ? 1 : 0;
+    assert(caster != NULL);
+    return caster->Player == target->Player || IsAllied(caster->Player, target) ? 1 : 0;
 }
 
-/* *************************************
-** property of alliance
+/*
+**	Check if target is self
 */
-global int		Checkhimself(const t_Conditions	*condition,
-							const Unit* caster,
-							const Unit* target, int x, int y)
+global int Checkhimself(const t_Conditions *condition,const Unit* caster,const Unit* target, int x, int y)
 {
-	assert(caster != NULL);
-
-	return caster == target;
+    assert(caster != NULL);
+    return caster == target;
 }
 
-/* *************************************
-** property of target unit itself (no type specific)
+/*
+**	Check duration effects.
 */
-global int		CheckUnitDurationEffect(const t_Conditions	*condition,
-										const Unit* caster,
-										const Unit* target, int x, int y)
+global int CheckUnitDurationEffect(const t_Conditions *condition,const Unit* caster,const Unit* target, int x, int y)
 {
-	int	ttl;
-	assert(condition);
-	ttl = condition->u.durationeffect.ttl;
+    int ttl;
+    assert(condition);
+    ttl = condition->u.durationeffect.ttl;
 
-	if (target == NULL)
-		return !condition->expectvalue;
+    if (target == NULL) {
+	return !condition->expectvalue;
+    }
 
-	switch (condition->u.durationeffect.flag)
-	{
-		case flag_invisibility:
-		{
-			return (target->Invisible >= ttl / CYCLES_PER_SECOND);
-		}
-		case flag_bloodlust:
-		{
-			return (target->Bloodlust >= ttl / CYCLES_PER_SECOND);
-		}
-		case flag_slow:
-		{
-			return (target->Slow >= ttl / CYCLES_PER_SECOND);
-		}
-		case flag_haste:
-		{
-			return (target->Haste >= ttl / CYCLES_PER_SECOND);
-		}
-		case flag_unholyarmor:
-		{
-			return (target->UnholyArmor >= ttl / CYCLES_PER_SECOND);
-		}
-		case flag_flameshield:
-		{
-			return (target->FlameShield >= ttl);
-		}
-		case flag_HP:
-		{
-			return (target->HP >= ttl);
-		}
-		case flag_Mana:
-		{
-			return (target->Mana >= ttl);
-		}
-		case flag_HP_percent:
-		{
-			return (target->HP * 100 >= ttl * target->Stats->HitPoints); // FIXME
-		}
-		case flag_Mana_percent:
-		{
-			return (target->Mana * 100 >= ttl * target->Type->_MaxMana); // FIXME
-		}
-		/// Add here the other cases
-		default:
-		{
-			abort();
-			// Warn devellopers
-		}
-	}
+    switch (condition->u.durationeffect.flag) {
+	case flag_invisibility:
+	    return (target->Invisible >= ttl / CYCLES_PER_SECOND);
+	case flag_bloodlust:
+	    return (target->Bloodlust >= ttl / CYCLES_PER_SECOND);
+	case flag_slow:
+	    return (target->Slow >= ttl / CYCLES_PER_SECOND);
+	case flag_haste:
+	    return (target->Haste >= ttl / CYCLES_PER_SECOND);
+	case flag_unholyarmor:
+	    return (target->UnholyArmor >= ttl / CYCLES_PER_SECOND);
+	case flag_flameshield:
+	    return (target->FlameShield >= ttl);
+	case flag_HP:
+	    return (target->HP >= ttl);
+	case flag_Mana:
+	    return (target->Mana >= ttl);
+	case flag_HP_percent:
+	    return (target->HP * 100 >= ttl * target->Stats->HitPoints); // FIXME
+	case flag_Mana_percent:
+	    return (target->Mana * 100 >= ttl * target->Type->_MaxMana); // FIXME : MaxMana.
+	/// Add here the other cases
+	default:
+	    abort();
+	    // Warn devellopers
+    }
 }
 
 // ****************************************************************************
 //	Specific conditions
 // ****************************************************************************
 
-global int	CheckEnemyPresence(const t_Conditions	*condition,
-							const Unit* caster)
+global int CheckEnemyPresence(const t_Conditions *condition,const Unit* caster)
 {
-	Unit* table[UnitMax];
+    Unit* table[UnitMax];
     int i;
     int n;
-	int range = condition->u.range;
-	int	x = caster->X;
-	int	y = caster->Y;
+    int range = condition->u.range;
+    int	x = caster->X;
+    int	y = caster->Y;
 
-	assert(condition != NULL);
-	assert(caster != NULL);
+    assert(condition != NULL);
+    assert(caster != NULL);
 	
 // +1 should be + Caster_tile_Size ?
-    n = SelectUnits(x - range, y - range,
-    				x + range + 1, y + range + 1,
-    				table);
-    for (i = 0; i < n; ++i)
-    {
-		if (IsEnemy(caster->Player, table[i]))
-		{
-		    return 1;
-		}
+    n = SelectUnits(x - range, y - range,x + range + 1, y + range + 1,table);
+    for (i = 0; i < n; ++i) {
+	if (IsEnemy(caster->Player, table[i])) {
+	    return 1;
 	}
-	return 0;
+    }
+    return 0;
 }
 
 // ****************************************************************************
@@ -1451,7 +1242,7 @@ global int	CheckEnemyPresence(const t_Conditions	*condition,
 
 local Target *NewTarget(TargetType t, const Unit *unit, int x, int y)
 {
-    Target	*target = (Target *) malloc(sizeof(*target));
+    Target *target = (Target *) malloc(sizeof(*target));
 
     assert(!(unit == NULL && t == TargetUnit));
     assert(!(!(0 <= x && x < TheMap.Width) && t == TargetPosition));
@@ -1469,15 +1260,14 @@ local Target *NewTargetNone()
     return NewTarget(TargetNone, NULL, 0, 0);
 }
 
-local Target	*NewTargetUnit(const Unit *unit)
+local Target *NewTargetUnit(const Unit *unit)
 {
     assert(unit != NULL);
-
     return NewTarget(TargetUnit, unit, 0, 0);
 }
 
 
-local Target	*NewTargetPosition(int x, int y)
+local Target *NewTargetPosition(int x, int y)
 {
     assert(0 <= x && x < TheMap.Width);
     assert(0 <= y && y < TheMap.Height);
@@ -1494,30 +1284,27 @@ local Target	*NewTargetPosition(int x, int y)
 */
 local int PassGenericCondition(const Unit* caster,const SpellType* spell,const t_Conditions *condition)
 {
-//	const t_Conditions	*condition = NULL;
-	int	ret;
+    int ret;
 
-	assert(caster != NULL);
-	assert(spell != NULL);
+    assert(caster != NULL);
+    assert(spell != NULL);
 
-	// FIXME : Move it in spell->Condition_generic ???
-	// mana is a must!
-    if (caster->Mana < spell->ManaCost)
-	{
-		return 0;
+    // FIXME : Move it in spell->Condition_generic ???
+    // mana is a must!
+    if (caster->Mana < spell->ManaCost) {
+	return 0;
+    }
+    for (/*condition = spell->Condition_generic*/; condition != NULL; condition = condition->next)
+    {
+	assert(condition->f.generic != NULL);
+	ret = condition->f.generic(condition, caster);
+	assert(ret == 0 || ret == 1);
+	assert(condition->expectvalue == 0 || condition->expectvalue == 1);
+	if (ret != condition->expectvalue) {
+	    return 0;
 	}
-	for (/*condition = spell->Condition_generic*/; condition != NULL; condition = condition->next)
-	{
-		assert(condition->f.generic != NULL);
-		ret = condition->f.generic(condition, caster);
-		assert(ret == 0 || ret == 1);
-		assert(condition->expectvalue == 0 || condition->expectvalue == 1);
-		if (ret != condition->expectvalue)
-		{
-			return 0;
-		}
-	}
-	return 1;
+    }
+    return 1;
 }
 
 /**
@@ -1525,36 +1312,29 @@ local int PassGenericCondition(const Unit* caster,const SpellType* spell,const t
 **	@return 1 if condition is ok.
 **	@return 0 else.
 */
-local int		PassSpecificCondition(const Unit* caster,
-										const SpellType* spell,
-									    const Unit* target,		// FIXME : Use an unique struture t_Target ?
-										int x,
-									    int y,
-										const t_Conditions *condition)
+local int PassSpecificCondition(const Unit* caster,const SpellType* spell,
+	const Unit* target,int x,int y,const t_Conditions *condition)
 {
-//	const t_Conditions	*condition = NULL;
-	int	ret;
+    int ret;
 
-	assert(caster != NULL);
-	assert(spell != NULL);
+    assert(caster != NULL);
+    assert(spell != NULL);
 
-	for (/*condition = spell->Condition_specific*/; condition != NULL; condition = condition->next)
-	{
-		assert(condition->f.specific != NULL);
-		ret = condition->f.specific(condition, caster, target, x, y);
-		assert(ret == 0 || ret == 1);
-		assert(condition->expectvalue == 0 || condition->expectvalue == 1);
-		if (ret != condition->expectvalue)
-		{
-			return 0;
-		}
+    for (/*condition = spell->Condition_specific*/; condition != NULL; condition = condition->next) {
+	assert(condition->f.specific != NULL);
+	ret = condition->f.specific(condition, caster, target, x, y);
+	assert(ret == 0 || ret == 1);
+	assert(condition->expectvalue == 0 || condition->expectvalue == 1);
+	if (ret != condition->expectvalue) {
+	    return 0;
 	}
-	return 1;
+    }
+    return 1;
 }
 
 
 /**
-**	 Select the target for the autocast.
+**	Select the target for the autocast.
 **
 **	@param caster	Unit who would cast the spell.
 **	@param spell	Spell-type pointer.
@@ -1562,88 +1342,71 @@ local int		PassSpecificCondition(const Unit* caster,
 **	@return Target*	choosen target or Null if spell can't be cast.
 **
 */
-// should be global (for IA) ???
-local Target 	*SelectTargetUnitsOfAutoCast(const Unit *caster,
-											const SpellType *spell)
+// should be global (for AI) ???
+local Target *SelectTargetUnitsOfAutoCast(const Unit *caster,const SpellType *spell)
 {
-	assert(spell != NULL);
-	assert(spell->AutoCast != NULL);
-	assert(caster != NULL);
+    Unit* table[UnitMax];
+    int x;
+    int y;
+    int range;
+    int nb_units;
+    int i;
+    int j;
 
-	switch (spell->Target)
-	{
-		case 	TargetSelf :
-		{
-			return NewTargetUnit(caster);
-		}
-		case	TargetNone :
-		{
-			return NewTargetNone();
-		}
-		case	TargetPosition:
-		{
-			int x, y;
-			int range = spell->AutoCast->Range;
+    assert(spell != NULL);
+    assert(spell->AutoCast != NULL);
+    assert(caster != NULL);
 
-			do
-			{
-				x = caster->X + SyncRand() % (2 * range) - range;
-				y = caster->Y + SyncRand() % (2 * range) - range;
-			} while (x < 0 && x <= TheMap.Width
-					&& y < 0 && y <= TheMap.Height);
-			
-			// FIXME : CHOOSE a better POSITION (add info in structure ???)
-			// Just good enought for holyvision...
-			return NewTargetPosition(SyncRand() % TheMap.Width,
-									SyncRand() % TheMap.Height);
+    switch (spell->Target) {
+	case TargetSelf :
+	    return NewTargetUnit(caster);
+	case TargetNone :
+	    return NewTargetNone();
+	case TargetPosition:
+	    range = spell->AutoCast->Range;
+	    do {
+		x = caster->X + SyncRand() % (2 * range) - range;
+		y = caster->Y + SyncRand() % (2 * range) - range;
+	    } while (x < 0 && x <= TheMap.Width
+			    && y < 0 && y <= TheMap.Height);
+	    
+	    // FIXME : CHOOSE a better POSITION (add info in structure ???)
+	    // Just good enought for holyvision...
+	    return NewTargetPosition(x, y);
+	case TargetUnit:
+	    x=caster->X;
+	    y=caster->Y;
+	    range=spell->AutoCast->Range;
+	    // ( + 1) would be ( + caster->size) ??
+	    nb_units = SelectUnits(caster->X - range, caster->Y - range,
+		caster->X + range + 1, caster->Y + range + 1,table);
+	    // For all Unit, check if it is a possible target
+	    for (i = 0, j = 0; i < nb_units; i++) {
+		if (PassSpecificCondition(caster,spell,table[i],x,y,spell->Condition_specific)
+			&& PassSpecificCondition(caster,spell,table[i],x,y,spell->AutoCast->Condition_specific)) {
+			table[j++] = table[i];
 		}
-		case	TargetUnit:
-		{
-		    Unit* table[UnitMax];
-		    int range = spell->AutoCast->Range;
-		    int nb_units;
-			int	x = caster->X;
-			int	y = caster->Y;
-			int i, j;
-			// ( + 1) would be ( + caster->size) ??
-		    nb_units = SelectUnits(caster->X - range, caster->Y - range,
-		    						caster->X + range + 1, caster->Y + range + 1,
-		    						table);
-			// For all Unit, check if it is a possible target
-		    for (i = 0, j = 0; i < nb_units; i++)
-			{
-				if (PassSpecificCondition(caster, spell, table[i], x, y,
-						spell->Condition_specific)
-					&& PassSpecificCondition(caster, spell, table[i], x, y,
-						spell->AutoCast->Condition_specific))
-				{
-					table[j++] = table[i];
-				}
-			}
-			nb_units = j;
-			if (nb_units != 0)
-			{
+	    }
+	    nb_units = j;
+	    if (nb_units != 0) {
 #if 0
 // For the best target
-				sort(table, nb_units, spell->autocast->f_order);
-				return NewTargetUnit(table[0]);
+		sort(table, nb_units, spell->autocast->f_order);
+		return NewTargetUnit(table[0]);
 #else
 // For a random valid target
-				i = SyncRand() % nb_units;
-				return NewTargetUnit(table[i]);
+		i = SyncRand() % nb_units;
+		return NewTargetUnit(table[i]);
 #endif
-			}
-		break;
-		}
-		default:
-		{
-			// Error : add the new cases
-			// FIXME : Warn developpers
-			return NULL;
-			break;
-		}
+	    }
+	    break;
+	default:
+	    // Error : add the new cases
+	    // FIXME : Warn developpers
+	    return NULL;
+	    break;
 	}
-	return NULL;	// Can't spell the auto-cast.
+    return NULL;	// Can't spell the auto-cast.
 }
 
 // ****************************************************************************
@@ -1667,10 +1430,7 @@ global void InitSpells(void)
 global void DoneSpells()
 {
 // FIXME
-#if 0
-
-#endif
-	free(SpellTypeTable);
+    free(SpellTypeTable);
     // nothing yet
 }
 
@@ -1744,6 +1504,22 @@ global SpellType *SpellTypeById(int id)
 // ****************************************************************************
 
 /**
+**	Check if spell is research for player \p player.
+**	@param	player : player for who we want to know if he knows the spell.
+**	@param	id : 
+*/
+global int SpellIsAvailable(const Player* player, int SpellId)
+{
+    assert(player != NULL);
+    assert(0 <= SpellId && SpellId < SpellTypeCount);
+
+    int dependencyId = SpellTypeTable[SpellId].DependencyId;
+
+    return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
+}
+
+
+/**
 **	Check if the spell can be auto cast.
 **
 **	@param spell	Spell-type pointer
@@ -1752,9 +1528,9 @@ global SpellType *SpellTypeById(int id)
 */
 global int CanAutoCastSpell(const SpellType* spell)
 {
-	assert(spell != NULL);
+    assert(spell != NULL);
 
-	return spell->AutoCast ? 1 : 0;
+    return spell->AutoCast ? 1 : 0;
 }
 
 /**
@@ -1796,34 +1572,29 @@ global int CanCastSpell(const Unit* caster,const SpellType* spell,
 **
 **	@return		1 if spell is casted, 0 if not.
 */
-global int	AutoCastSpell(Unit *caster,
-						 const SpellType* spell)
+global int AutoCastSpell(Unit *caster,const SpellType* spell)
 {
-    Target 				*target = NULL;
+    Target *target = NULL;
 
-	assert(caster != NULL);
-	assert(spell != NULL);
-	assert(0 <= spell->Ident && spell->Ident < SpellTypeCount);
+    assert(caster != NULL);
+    assert(spell != NULL);
+    assert(0 <= spell->Ident && spell->Ident < SpellTypeCount);
     assert(caster->Type->CanCastSpell);
     assert(caster->Type->CanCastSpell[spell->Ident]);
 
-	if (!PassGenericCondition(caster, spell, spell->Condition_generic)
-		|| !PassGenericCondition(caster, spell, spell->AutoCast->Condition_generic))
-	{
-		return 0;
-	}
-	target = SelectTargetUnitsOfAutoCast(caster, spell);
-	if (target == NULL)
-	{
-		return 0;
-	}
-	else
-	{
-		//	Must move before ?
-		//	FIXME SpellType* of CommandSpellCast must be const.
-		CommandSpellCast(caster, target->X, target->Y, target->unit, (SpellType*) spell, FlushCommands);
-		free(target);
-	}
+    if (!PassGenericCondition(caster, spell, spell->Condition_generic)
+	    || !PassGenericCondition(caster, spell, spell->AutoCast->Condition_generic)) {
+	return 0;
+    }
+    target = SelectTargetUnitsOfAutoCast(caster, spell);
+    if (target == NULL) {
+	return 0;
+    } else {
+	//	Must move before ?
+	//	FIXME SpellType* of CommandSpellCast must be const.
+	CommandSpellCast(caster, target->X, target->Y, target->unit, (SpellType*) spell, FlushCommands);
+	free(target);
+    }
     return 1;
 }
 
@@ -1838,12 +1609,12 @@ global int	AutoCastSpell(Unit *caster,
 **
 **	@return		!=0 if spell should/can continue or 0 to stop
 */
-global int SpellCast(Unit* caster, const SpellType* spell,
-		Unit* target, int x, int y)
+global int SpellCast(Unit* caster, const SpellType* spell,Unit* target, int x, int y)
 {
     assert(spell != NULL);
     assert(spell->f != NULL);
     assert(caster != NULL);
+    assert(SpellIsAvailable(caster->Player, spell->Ident));
 
     caster->Invisible = 0;// unit is invisible until attacks // FIXME Must be configurable
     if (target) {
