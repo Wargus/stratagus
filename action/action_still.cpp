@@ -92,7 +92,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 #ifdef NEW_ORDERS
 	    unit->Frame=unit->Data.Resource.Active ? 2 : 0;
 #else
-	    unit->Frame=unit->Command.Data.OilWell.Active ? 2 : 0;
+	    unit->Frame=unit->Command.Data.Resource.Active ? 2 : 0;
 #endif
 	}
     }
@@ -170,17 +170,24 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	if( !type->Tower && !ground ) {
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
-		// FIXME: should rewrite command handling
-		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
-#ifdef NEW_ORDERS
-		unit->SavedOrder=unit->Orders[1];
-#else
-		unit->SavedCommand=unit->NextCommand[0];
-		unit->SavedCommand.Action=UnitActionAttack;
-#endif
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
-		DebugLevel3Fn(" %Zd Attacking in range %d\n"
+		DebugLevel2Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
+#ifdef NEW_ORDERS
+		unit->SavedOrder.Action=UnitActionAttack;
+		unit->SavedOrder.RangeX=unit->SavedOrder.RangeY=0;
+		unit->SavedOrder.X=unit->X;
+		unit->SavedOrder.Y=unit->Y;
+		unit->SavedOrder.Goal=NoUnitP;
+		ResetPath(unit->SavedOrder);
+#else
+		unit->SavedCommand.Action=UnitActionAttack;
+		unit->SavedCommand.Data.Move.Range=0;
+		unit->SavedCommand.Data.Move.DX=unit->X;
+		unit->SavedCommand.Data.Move.DY=unit->Y;
+		unit->SavedCommand.Data.Move.Goal=NoUnitP;
+		ResetPath(unit->SavedCommand);
+#endif
 		unit->SubAction|=2;
 	    }
 	} else if( (goal=AttackUnitsInRange(unit)) ) {
