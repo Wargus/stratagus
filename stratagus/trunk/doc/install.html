@@ -54,12 +54,12 @@
 
     <h2>Hardware Requirements</h2>
     <ul>
-	<li><b>Processor:</b> A 133 MHz CPU (faster recommended).<br>
+	<li><b>Processor:</b> A 300 MHz CPU (faster recommended).<br>
 	<font color="red">NOTE: Stratagus is believed to be endian and word size safe, so other
 	architectures like (big endian) PPC or (64bit) Alpha should also
 	work at least with Linux.</font><p>
 
-	<li><b>Memory:</b> 16 MB of RAM (32 MB for mp3/ogg support).<br><p>
+	<li><b>Memory:</b> 32 MB of RAM (64 MB for mp3/ogg support).<br><p>
 
 	<li><b>Video Card:</b> Any graphics card that can handle 16 bpp 
 	and 640x480 is supported. (OpenGL is supported, and requires a 32Meg Card)<p>
@@ -72,8 +72,6 @@
 
     Mac OS X users: Extract the "contrib/macosx.tgz" file to the 
     top-level directory and read "Read Me.rtf".<p>
-
-    Binary users may skip to step 3.<p>
 
     <ul>
 	<li><b>Step 1, Download and Extract:</b><p>
@@ -114,41 +112,12 @@
 
 	</ul>
 
-	<li><b>Step 3, Extract data:</b><p>
-
-	Now that you have a working engine, you need some media data before 
-	you can actually play the game. You can either use the data 
-	from the wc2 CD, or use another data set.<p>
-
-	<ul>
-	    <li><b>Using wc2 data:</b><p>
-	    <a href="http://wargus.sourceforge.net/download.html">Download</a> Wargus and compile it.<p>
-	    For Win32, run:
-	    <pre>	build.bat DIR</pre>
-	    where DIR is the directory to your CD or your 
-	    installation, (eg, 'e:' or 'c:\war2').<p>
-	    For Unix, run:
-	    <pre>	./build.sh -p DIR</pre>
-	    where DIR is the directory to your mounted CD or your 
-	    installation, (eg, '/cdrom/' or '/mnt/win/war2').<p>
-	    <font color="red">NOTE: You will need to execute this 
-	    script from within the root wargus directory or 
-	    you will run into problems. It will take some 
-	    time to extract everything.</font><p>
-
-	    <li><b>Using another data set:</b><p>
-	    You may download another <a href="http://stratagus.sourceforge.net/datasets.shtml">game</a>.<p>
-	    <font color="red">NOTE you will need to specify the data 
-	    directory by passing '-d DIR' flag 
-	    when you run the stratagus binary, by default the binary 
-	    looks for 'data' in the current directory.</font><p> 
-	</ul>
-
-	<li><b>Step 4, Run:</b><p>
+	<li><b>Step 3, Run:</b><p>
 
 	You may now go into the toplevel stratagus dir and run the binary. Remember, 
-	if the data dir is not './data', you will need to run stratagus with 
-	the '-d' option.<p>
+	you have to obtain some gamedata to start the engine. stratagus looks in './data',
+	if your data is in a different location you will need to run stratagus with 
+	the '-d' option. Games can be found <a href="http://stratagus.sourceforge.net/datasets.shtml">here</a><p>
     </ul>
 
 <hr>
