@@ -61,7 +61,7 @@
 #ifdef USE_OPENGL
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
-#include <SDL_opengl.h>
+#include "SDL_opengl.h"
 #undef EndMenu
 #undef DrawIcon
 #endif

@@ -190,7 +190,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #endif
 
 #ifdef __MINGW32__
-#include <SDL.h>
+#include "SDL.h"
 extern int opterr;
 extern int optind;
 extern int optopt;
