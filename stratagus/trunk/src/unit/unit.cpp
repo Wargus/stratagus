@@ -3443,12 +3443,25 @@ global void LetUnitDie(Unit* unit)
 #else
 	    CorpseCacheInsert(unit);
 #endif
+#ifdef NEW_FOW
+	MapMarkSight(unit->Player,unit->X,unit->Y,1);
+#endif
+	UnitMarkSeen(unit);
+#ifdef NEW_FOW
+	MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
+#endif
 	    UnitMarkSeen(unit);
 	    return;
 	}
 
 	// no corpse available
+#ifdef NEW_FOW
+	MapMarkSight(unit->Player,unit->X,unit->Y,1);
+#endif
 	UnitMarkSeen(unit);
+#ifdef NEW_FOW
+	MapUnmarkSight(unit->Player,unit->X,unit->Y,1);
+#endif
 	ReleaseUnit(unit);
 	return;
     }
