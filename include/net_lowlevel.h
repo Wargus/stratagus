@@ -43,12 +43,19 @@
 #include <SDLnet.h>
 #else
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
-#  define USE_WINSOCK
+
+#define USE_WINSOCK
+
 #ifdef NEW_NETMENUS
 #define _WIN32_WINNT 0x0400
 #define WINVER 0x0400
 #endif
+
 #include <windows.h>
+#ifdef _MSC_VER
+#include <winsock.h>
+#endif
+
 #ifdef NEW_NETMENUS
 //#include <ws2tcpip.h>
 #define SIO_GET_INTERFACE_LIST 0x4004747F
