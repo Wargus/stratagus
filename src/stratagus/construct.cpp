@@ -141,6 +141,8 @@ global void LoadConstructions(void)
 global void SaveConstructions(FILE* file)
 {
     int j;
+    int i;
+    char** cp;
     Construction** cop;
     ConstructionFrame* cframe;
 
@@ -149,6 +151,22 @@ global void SaveConstructions(FILE* file)
 
     // FIXME: needed?
     
+    //
+    //	Dump table wc2 construction numbers -> internal symbol.
+    //
+    if( (cp=ConstructionWcNames) ) {
+	fprintf(file,"(define-construction-wc-names");
+
+	i=90;
+	while( *cp ) {
+	    if( i+strlen(*cp)>79 ) {
+		i=fprintf(file,"\n ");
+	    }
+	    i+=fprintf(file," '%s",*cp++);
+	}
+	fprintf(file,")\n\n");
+    }
+
     //
     //	Dump table of all constructions
     //

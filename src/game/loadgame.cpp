@@ -121,7 +121,7 @@ global void CleanModules(void)
 /**
 **	Initialize all modules.
 **
-**	Call each module to initialize (for LoadGame).
+**	Call each module to initialize.
 */
 global void InitModules(void)
 {
@@ -217,57 +217,8 @@ global void LoadGame(char* filename)
     int old_siod_verbose_level;
     unsigned long game_cycle;
 
-    // protect from hooks
-    
-    //LoadCcl();                      // Reload the main config file
-    { // maxy: added instead of CleanModules(); untested
-	// FIXME: those things should be somehow either in InitModules
-	// or be cleaned implicitely when things get overriden from
-	// the savegame
+    CleanModules();
 
-	EndReplayLog();
-	CleanMessages();
-
-	DestroyCursorBackground();
-	CursorBuilding=0;
-	GameCursor=0;
-	UnitUnderCursor=NoUnitP;
-	CleanAi();
-	{ //CleanPlayers(); //?
-	    int p;
-	    
-	    for( p=0; p<PlayerMax; ++p ) {
-		if( Players[p].Name ) {
-		    free(Players[p].Name);
-		}
-		if( Players[p].Units ) {
-		    free(Players[p].Units);
-		}
-	    }
-	    ThisPlayer=NULL;
-	    memset(Players,0,sizeof(Players));
-	    NumPlayers=0;
-	    // ? NoRescueCheck=0;
-	}
-
-	CleanUnits();
-	CleanSelections();
-	CleanGroups();
-	// CleanUpgrades() ?
-	// CleanDependencies() ?
-	// should not be necessary: CleanButtons()
-	CleanMissiles();
-	CleanMap();
-	CleanReplayLog();
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierClean ();
-#endif
-	if (AStarOn) {
-	    FreeAStar();
-	}
-    }
-
-    // collect garbage, then eval the savegame
     old_siod_verbose_level=siod_verbose_level;
     siod_verbose_level=4;
     user_gc(SCM_BOOL_F);
@@ -285,8 +236,8 @@ global void LoadGame(char* filename)
     GameCycle=game_cycle;
     //GameCursor=TheUI.Point.Cursor;	// FIXME: just a default.
     GameCursor=CursorTypeByIdent("cursor-point");	// TheUI not cleaned
-    SelectionChanged();
-    MustRedraw=RedrawEverything;
+    UpdateButtonPanel();
+    MustRedraw=RedrawEverything;	// redraw everything
 }
 
 /**

@@ -74,11 +74,7 @@ global CursorType* Cursors;
 
 global CursorStates CursorState;/// current cursor state (point,...)
 global int CursorAction;	/// action for selection
-#ifndef NEW_UI
 global int CursorValue;		/// value for CursorAction (spell type f.e.)
-#else
-global int CursorSpell;		/// spell type while selecting target
-#endif
 
 	//Event changed mouse position, can alter at any moment
 global int CursorX;		/// cursor position on screen X
@@ -1107,7 +1103,6 @@ global void InitVideoCursors(void)
 /**
 **	Save cursor state.
 */
-/* should not be necessary
 global void SaveCursors(FILE* file)
 {
     int i;
@@ -1147,7 +1142,6 @@ global void SaveCursors(FILE* file)
     fprintf(file,";;(unit-under-cursor %s\n",
 	    UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
 }
-*/
 
 /**
 **	Cleanup cursor module

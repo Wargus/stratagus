@@ -127,11 +127,17 @@ global void SaveGame(const char* filename)
     fprintf(file,"(set-game-cycle! %lu)\n",GameCycle);
 
     SaveCcl(file);
+    SaveIcons(file);
+    SaveCursors(file);
     SaveUserInterface(file);
+    SaveTilesets(file);
     SaveConstructions(file);
+    SaveDecorations(file);
     SaveUnitTypes(file);
     SaveUpgrades(file);
+    SaveDependencies(file);
     SaveButtons(file);
+    SaveMissileTypes(file);
     SavePlayers(file);
     SaveMap(file);
     SaveUnits(file);

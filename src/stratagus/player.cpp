@@ -212,6 +212,24 @@ global void SavePlayers(FILE* file)
 #endif
 
     //
+    //	Dump table wc2 race numbers -> internal symbol.
+    //
+    if( PlayerRaces.Count ) {
+	fprintf(file,"(define-race-names");
+	for( i=0; i<PlayerRaces.Count; ++i ) {
+	    fprintf(file,"\n  'race '(");
+	    fprintf(file,"\n    race %d",PlayerRaces.Race[i]);
+	    fprintf(file,"\n    name %s",PlayerRaces.Name[i]);
+	    fprintf(file,"\n    display %s",PlayerRaces.Display[i]);
+	    if( PlayerRaces.Visible[i] ) {
+		fprintf(file,"\n    visible");
+	    }
+	    fprintf(file,")");
+	}
+	fprintf(file,")\n\n");
+    }
+
+    //
     //	Dump all players
     //
     for( i=0; i<NumPlayers; ++i ) {

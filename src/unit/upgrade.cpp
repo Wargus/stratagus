@@ -568,7 +568,20 @@ global void SaveUpgrades(FILE* file)
     fprintf(file,"\n");
     */
 
-    // FIXME: can at least partially be removed
+    //
+    //	Save all upgrades
+    //
+    for( i=0; i<NumUpgrades; ++i ) {
+	fprintf(file,"(define-upgrade '%s 'icon '%s\n"
+		,Upgrades[i].Ident,Upgrades[i].Icon.Name);
+	fprintf(file,"  'costs #(");
+	for( j=0; j<MaxCosts; ++j ) {
+	    fprintf(file," %5d",Upgrades[i].Costs[j]);
+	}
+
+	fprintf(file,"))\n");
+    }
+    fprintf(file,"\n");
 
     //
     //	Save all upgrade modifiers.
