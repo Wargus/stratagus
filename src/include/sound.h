@@ -117,6 +117,9 @@ extern void SetGlobalVolume(int volume);
 */
 extern void InitSoundClient(void);
 
+    /// Play a music file
+extern void PlayMusic(const char* name);
+
 #else	// }{ WITH_SOUND
 
 /*----------------------------------------------------------------------------
@@ -130,6 +133,8 @@ extern void InitSoundClient(void);
 #define PlayGameSound(s,v)		/// Dummy macro for without sound
 #define SetGlobalVolume(v)		/// Dummy macro for without sound
 #define InitSoundClient()		/// Dummy macro for without sound
+
+#define PlayMusic(v)			/// Dummy macro for without sound
 
 #endif	// } WITH_SOUND
 
