@@ -84,6 +84,9 @@ local void MultiPlayerGameMenu(void);
 local void CampainGameMenu(void);
 local void ScenSelectMenu(void);
 
+local void AllianceCampainMenu(void);
+local void MysticalCampainMenu(void);
+
 local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
@@ -650,6 +653,33 @@ local Menuitem ConnectingMenuItems[] = {
 };
 
 /**
+**	Items for the Campain Select Menu
+*/
+local Menuitem CampainSelectMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Alliance Campain", 224, 27, MBUTTON_GM_FULL, AllianceCampainMenu, 'a'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Mystical Campain", 224, 27, MBUTTON_GM_FULL, MysticalCampainMenu, 'm'} } },
+    { MI_TYPE_BUTTON, 208, 320 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Previous Menu", 224, 27, MBUTTON_GM_FULL, EndMenu, 'p'} } },
+#else
+    { 0 }
+#endif
+};
+
+/**
+**	Items for the Campain Continue Menu
+*/
+local Menuitem CampainContMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_BUTTON, 508, 320 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Continue", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'} } },
+#else
+    { 0 }
+#endif
+};
+/**
 **	FIXME: Ari please look, this is now in TheUI.
 */
 enum {
@@ -784,6 +814,26 @@ global Menu Menus[] = {
 	2, 3,
 	ConnectingMenuItems,
 	TerminateNetConnect,
+    },
+    {
+	// Campain Select Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	0, 3,
+	CampainSelectMenuItems,
+	NULL,
+    },
+    {
+	// Campain Continue Menu
+	0,
+	0,
+	640, 480,
+	ImageNone,
+	0, 1,
+	CampainContMenuItems,
+	NULL,
     },
 };
 
@@ -1358,11 +1408,45 @@ local void SinglePlayerGameMenu(void)
 local void CampainGameMenu(void)
 {
     DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
     GuiGameStarted = 0;
-    // ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
+    ProcessMenu(MENU_CAMPAIN_SELECT, 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
+}
+
+local void AllianceCampainMenu(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    // Any Campain info should be displayed through a DrawFunc() Item
+    // int the CAMPAIN_CONT menu processed below...
+    ProcessMenu(MENU_CAMPAIN_CONT, 1);
+    // Set GuiGameStarted = 1 to acctually run a game here...
+    // But select and load the map first...
+    // See CustomGameStart() for info...
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+}
+
+local void MysticalCampainMenu(void)
+{
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
+    // Any Campain info should be displayed through a DrawFunc() Item
+    // int the CAMPAIN_CONT menu processed below...
+    ProcessMenu(MENU_CAMPAIN_CONT, 1);
+    // Set GuiGameStarted = 1 to acctually run a game here...
+    // But select and load the map first...
+    // See CustomGameStart() for info...
+    DestroyCursorBackground();
+    StartMenusSetBackground(NULL);
+    Invalidate();
 }
 
 local void EnterNameCancel(void)
@@ -1867,8 +1951,12 @@ local void CustomGameStart(void)
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
     // FIXME: Johns is this here needed? Can the map loaded in create game?
+    // ARI: Yes - This switches the menu gfx.. from def. Orc to Human, etc
     InitUnitTypes();
     UpdateStats();
+    // ARI: And this finally loads it.
+    //  For an alternative Method see network games..
+    //  That way it should work finally..
     LoadMap(ScenSelectPath, &TheMap);
     GuiGameStarted = 1;
     EndMenu();
