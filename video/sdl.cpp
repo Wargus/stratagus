@@ -38,7 +38,7 @@
 #ifndef _MSC_VER
 #include <sys/time.h>
 #endif
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #ifdef USE_BEOS
 #include <sys/socket.h>
@@ -46,7 +46,6 @@
 
 #ifdef USE_WIN32
 #include <winsock.h>
-#undef DrawText
 #endif
 
 #include "video.h"
@@ -929,7 +928,7 @@ global void CheckVideoInterrupts(void)
         //DebugLevel1("Slow frame\n");
 	// FIXME: need locking!
 	IfDebug(
-	    //DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    //VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	);
         ++SlowFrameCounter;
     }
