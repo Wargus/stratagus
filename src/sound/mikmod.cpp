@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mikmod.c			-	MikMod support */
+/**@name mikmod.c - MikMod support */
 //
-//	(c) Copyright 2004 by Nehal Mistry
+//      (c) Copyright 2004 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
@@ -49,31 +49,31 @@
 #undef DrawIcon
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 typedef struct _mikmod_data_ {
 	SAMPLE* MikModSample;
 	MODULE* MikModModule;
-	int Pos;				// Position in buffer
-	char* Buffer;				// Buffer start
-	int Len;				// Length of filled buffer
+	int Pos;                    /// Position in buffer
+	char* Buffer;               /// Buffer start
+	int Len;                    /// Length of filled buffer
 } MikModData;
 
 #define MIKMOD_BUFFER_SIZE (1024 * 32)
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Type member function to read from the module
+**  Type member function to read from the module
 **
-**		@param sample			Sample reading from
-**		@param buf			Buffer to write data to
-**		@param len			Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return				Number of bytes read
+**  @return        Number of bytes read
 */
 local int MikModRead(Sample* sample, void* buf, int len)
 {
@@ -105,9 +105,9 @@ local int MikModRead(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free sample
+**  Type member function to free sample
 **
-**		@param sample			Sample to free
+**  @param sample  Sample to free
 */
 local void MikModFree(Sample* sample)
 {
@@ -124,7 +124,7 @@ local void MikModFree(Sample* sample)
 }
 
 /**
-**		MikMod object type structure.
+**  MikMod object type structure.
 */
 local const SampleType MikModStreamSampleType = {
 	MikModRead,
@@ -132,12 +132,12 @@ local const SampleType MikModStreamSampleType = {
 };
 
 /**
-**		Load MikMod.
+**  Load MikMod.
 **
-**		@param name		Filename of the module.
-**		@param flags		Unused.
+**  @param name   Filename of the module.
+**  @param flags  Unused.
 **
-**		@return			Returns the loaded sample.
+**  @return       Returns the loaded sample.
 **
 */
 global Sample* LoadMikMod(const char* name, int flags __attribute__((unused)))
@@ -181,6 +181,6 @@ global Sample* LoadMikMod(const char* name, int flags __attribute__((unused)))
 	return sample;
 }
 
-#endif		// } USE_MIKMOD
+#endif  // } USE_MIKMOD
 
 //@}
