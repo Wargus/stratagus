@@ -571,18 +571,18 @@ case $ANSWER in
 	  echo "-> You do not appear to have the arts client installed"
 	else
 	  echo
-	  echo -n "Do you want use arts daemon sound output? (y) "
+	  echo -n "Do you want use arts daemon sound output? (n) "
 	  read $N ANSWERA
 	  echo
 	  case $ANSWERA in
-	    [nN])
-		echo "-> No arts daemon support"
-		;;
-	    *)
+	    [yY])
 		HAVEARTS=1
 		echo "ARTSC		= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
 		echo "ARTSCLIB	= \$(shell artsc-config --libs)" >> $RULESFILE
 		echo "-> Compiling with arts daemon support"
+		;;
+	    *)
+		echo "-> No arts daemon support"
 		;;
 	  esac
 	fi
