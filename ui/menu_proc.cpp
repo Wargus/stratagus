@@ -2469,24 +2469,28 @@ global void ProcessMenu(const char* menu_id, int loop)
 		switch (mi->mitype) {
 			case MI_TYPE_PULLDOWN:
 				mi->d.pulldown.cursel = 0;
-				if (mi->d.pulldown.defopt != -1)
+				if (mi->d.pulldown.defopt != -1) {
 					mi->d.pulldown.curopt = mi->d.pulldown.defopt;
+				}
 				break;
 			case MI_TYPE_LISTBOX:
 				mi->d.listbox.cursel = -1;
 				mi->d.listbox.startline = 0;
-				if (mi->d.listbox.defopt != -1)
+				if (mi->d.listbox.defopt != -1) {
 					mi->d.listbox.curopt = mi->d.listbox.defopt;
+				}
 				break;
 			case MI_TYPE_VSLIDER:
 				mi->d.vslider.cflags = 0;
-				if (mi->d.vslider.defper != -1)
+				if (mi->d.vslider.defper != -1) {
 					mi->d.vslider.percent = mi->d.vslider.defper;
+				}
 				break;
 			case MI_TYPE_HSLIDER:
 				mi->d.hslider.cflags = 0;
-				if (mi->d.hslider.defper != -1)
+				if (mi->d.hslider.defper != -1) {
 					mi->d.hslider.percent = mi->d.hslider.defper;
+				}
 				break;
 			default:
 				break;
