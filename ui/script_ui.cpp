@@ -2242,6 +2242,7 @@ local SCM CclDefineMenu(SCM list)
 	    }
 	}
 	//printf("Me:%s\n", name);
+	free(name);
     } else {
 	fprintf(stderr,"Name of menu is missed, skip definition\n");
     }
