@@ -330,8 +330,8 @@ global void UpdateMinimap(void)
 	    table = &(*table)->Next;
 	    continue;
 	}
-	if (!UnitDrawableOnMap(*table) && (*table)->SeenState != 3
-		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
+	if (!UnitDrawableOnMap(*table) && (*table)->Seen.State != 3
+		&& !(*table)->Seen.Destroyed && (type = (*table)->Seen.Type) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
 		color = (*table)->Type->NeutralMinimapColorRGB;
 	    } else {
@@ -814,8 +814,8 @@ global void UpdateMinimap(void)
 	    table = &(*table)->Next;
 	    continue;
 	}
-	if (!UnitDrawableOnMap(*table) && (*table)->SeenState != 3
-		&& !(*table)->SeenDestroyed && (type = (*table)->SeenType) ) {
+	if (!UnitDrawableOnMap(*table) && (*table)->Seen.State != 3
+		&& !(*table)->Seen.Destroyed && (type = (*table)->Seen.Type) ) {
 	    if( (*table)->Player->Player == PlayerNumNeutral ) {
 		color = VideoMapRGB((*table)->Type->NeutralMinimapColorRGB.D24.a,
 		        (*table)->Type->NeutralMinimapColorRGB.D24.b,

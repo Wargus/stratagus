@@ -1358,8 +1358,18 @@ global void CommandSharedVision(int player, int state, int opponent)
 	    }
 	}
 	Players[player].SharedVision &= ~(1 << opponent);
+#ifdef DEBUG
+	if (Players[opponent].Type == PlayerComputer) {
+	    Players[opponent].SharedVision &= ~(1 << player);
+	}
+#endif
     } else {
 	Players[player].SharedVision |= (1 << opponent);
+#ifdef DEBUG
+	if (Players[opponent].Type == PlayerComputer) {
+	    Players[opponent].SharedVision |= (1 << player);
+	}
+#endif
 	// Check all tiles and mark SeenTiles for wood
 	if (Players[player].SharedVision & (1 << opponent) &&
 		Players[opponent].SharedVision & (1 << player) &&

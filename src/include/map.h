@@ -589,6 +589,17 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
     }\
 }
 
+#define MapMarkUnitDeltaSight(unit,dx,dy) \
+{ \
+    MapSight((unit)->Player, (unit)->X+dx,(unit)->Y+dy,(unit)->Type->TileWidth,\
+	    (unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileSight); \
+    if (unit->Type->DetectCloak) { \
+	MapSight((unit)->Player, (unit)->X+dx,(unit)->Y+dy,(unit)->Type->TileWidth,\
+		(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileDetectCloak); \
+    }\
+}
+		    
+
 #define MapUnmarkUnitSight(unit) \
 { \
     MapSight((unit)->Player,(unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
