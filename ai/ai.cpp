@@ -483,36 +483,44 @@ local void SaveAiHelper(FILE* file)
 }
 
 /**
+**	Save the AI type. (recursive)
+**
+**	@param file	Output file.
+**	@param aitype	AI type to save.
+*/
+local void SaveAiType(FILE* file,const AiType* aitype)
+{
+    SCM list;
+
+    if( aitype->Next ) {
+	SaveAiType(file,aitype->Next);
+    }
+    DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
+    fprintf(file,"(define-ai \"%s\" '%s '%s\n",
+	    aitype->Name,aitype->Race ? aitype->Race : "*",aitype->Class);
+
+    fprintf(file,"  '(");
+    //	Print the script a little formated
+    list=aitype->Script;
+    while( !gh_null_p(list) ) {
+	fprintf(file,"\n    ");
+	lprin1f(gh_car(list),file);
+	list=gh_cdr(list);
+    }
+    fprintf(file," ))\n\n");
+}
+
+/**
 **	Save the AI types.
 **
 **	@param file	Output file.
 */
-global void SaveAiTypes(FILE* file)
+local void SaveAiTypes(FILE* file)
 {
-    const AiType* aitype;
-    SCM list;
+    SaveAiType(file,AiTypes);
 
-    //
-    //	Save AiTypes.
-    //
-    for( aitype=AiTypes; aitype; aitype=aitype->Next ) {
-	DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
-	fprintf(file,"(define-ai \"%s\" '%s '%s\n",
-		aitype->Name,aitype->Race ? aitype->Race : "*",aitype->Class);
-
-	fprintf(file,"  '(");
-	//	Print the script a little formated
-	list=aitype->Script;
-	while( !gh_null_p(list) ) {
-	    fprintf(file,"\n    ");
-	    lprin1f(gh_car(list),file);
-	    list=gh_cdr(list);
-	}
-	fprintf(file," ))\n\n");
-
-	// FIXME: Must save references to other scripts - scheme functions
-	// Perhaps we should dump the complete scheme state
-    }
+    // FIXME: Must save references to other scripts - scheme functions
+    // Perhaps we should dump the complete scheme state
 }
 
 /**
@@ -605,7 +613,7 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
     fprintf(file,")\n");
 
     if( ai->NeedFood ) {
-	fprintf(file,"  'need-food");
+	fprintf(file,"  'need-food\n");
     }
 
     //
