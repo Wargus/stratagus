@@ -786,7 +786,7 @@ static int CclDefineFont(lua_State* l)
 	if (i == -1 || !w || !h || !file) {
 		LuaError(l, "missing argument");
 	}
-	Fonts[i].G = NewGraphic(file, w, h);
+	Fonts[i].G = NewGraphic(file, 0, 0);
 	Fonts[i].Width = w;
 	Fonts[i].Height = h;
 
