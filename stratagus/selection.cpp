@@ -55,11 +55,8 @@
 ----------------------------------------------------------------------------*/
 
 global int NumSelected;			/// Number of selected units
-global Unit* Selected[MaxSelectable] = {
-    NoUnitP, NoUnitP, NoUnitP,
-    NoUnitP, NoUnitP, NoUnitP,
-    NoUnitP, NoUnitP, NoUnitP
-};					/// All selected units
+global int MaxSelectable;		/// Maximum number of selected units
+global Unit** Selected;			/// All selected units
 
 local unsigned GroupId;			/// Unique group # for automatic groups
 
@@ -967,6 +964,8 @@ global void InitSelections(void)
 {
     int i;
 
+    Selected = malloc(NumUnitsPerGroup * sizeof(Unit*));
+
     if ((i = NumSelected)) {		// Cleanup after load
 	while (i--) {
 	    Selected[i] = UnitSlots[(int)Selected[i]];
@@ -1005,6 +1004,7 @@ global void CleanSelections(void)
     GroupId = 0;
     NumSelected = 0;
     DebugCheck(NoUnitP);		// Code fails if none zero
+    free(Selected);
     memset(Selected, 0, sizeof(Selected));
 }
 
