@@ -182,7 +182,7 @@ global int NoWarningMissileType;		/// quiet ident lookup.
 local Missile* GlobalMissiles[MAX_MISSILES];	/// all global missiles on map
 local int NumGlobalMissiles;			/// currently used missiles
 
-local Missile* LocalMissiles[MAX_MISSILES];	/// all local missiles on map
+local Missile* LocalMissiles[MAX_MISSILES*8];	/// all local missiles on map
 local int NumLocalMissiles;			/// currently used missiles
 
 #ifdef DOXYGEN                          // no real code, only for document
@@ -327,7 +327,7 @@ local Missile* NewLocalMissile(void)
     Missile* missile;
 
     //	Check maximum missiles!
-    if( NumLocalMissiles==MAX_MISSILES ) {
+    if( NumLocalMissiles==MAX_MISSILES*8 ) {
 	fprintf(stderr,"Maximum of local missiles reached\n");
 	abort();
 	return NULL;
