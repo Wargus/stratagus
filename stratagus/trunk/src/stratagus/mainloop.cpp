@@ -820,6 +820,9 @@ global void GameMainLoop(void)
     //
     //	Game over
     //
+    if( FastForwardCycle > GameCycle ) {
+	VideoSyncSpeed = RealVideoSyncSpeed;
+    }
     NetworkQuit();
     if( GameResult==GameDefeat ) {
 	fprintf(stderr,"You have lost!\n");
