@@ -228,10 +228,10 @@ global void DrawUnitInfo(const Unit* unit)
     //
     if( type->GoldMine ) {
 	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
-	if ( unit->Value == 0 ) {
-  	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+	if ( !unit->Value ) {
+ 	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
 	} else {
-  	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+ 	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
 	}
 	return;
     }
@@ -240,7 +240,11 @@ global void DrawUnitInfo(const Unit* unit)
 	    || unit->Orders[0].Action!=UnitActionBuilded ) {
 	if( type->GivesOil || type->OilPatch ) {
 	    VideoDrawText(x+47,y+8+78,GameFont,"Oil Left:");
-	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	    if ( !unit->Value ) {
+		VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+	    } else {
+		VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	    }
 	    return;
 	}
     }
@@ -257,7 +261,7 @@ global void DrawUnitInfo(const Unit* unit)
     //
     //	Draw unit kills and experience.
     //
-    if( !OriginalLevel && stats->Level 
+    if( !OriginalLevel && stats->Level
 	    && !(type->Transporter && unit->Value) ) {
         sprintf(buf,"XP:~<%d~> Kills:~<%d~>",unit->XP,unit->Kills);
 	VideoDrawTextCentered(x+114,y+8+15+33,GameFont,buf);
@@ -388,7 +392,7 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[GoldCost] / 1000.0);
         VideoDrawText(x+120,y+8+77,GameFont,buf);
-	
+
 	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
 	VideoDrawNumber(x+78,y+8+93,GameFont,DEFAULT_INCOMES[WoodCost]);
 	// Lumber mill
@@ -399,7 +403,7 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
         VideoDrawText(x+120,y+8+93,GameFont,buf);
-	
+
 	VideoDrawText(x+54,y+8+109,GameFont,"Oil:");
 	VideoDrawNumber(x+78,y+8+109,GameFont,DEFAULT_INCOMES[OilCost]);
 	if( unit->Player->Incomes[OilCost]!=DEFAULT_INCOMES[OilCost] ) {
@@ -521,16 +525,16 @@ global void DrawUnitInfo(const Unit* unit)
 	    i=(100*unit->Mana)/MaxMana;
 	    i=(i*(61-4))/100;
 	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
-	
+
 	    VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
-	*/    
+	*/
 	    int w = 130;
 	    i=(100*unit->Mana)/MaxMana;
 	    i=(i*w)/100;
 	    VideoDrawRectangleClip(ColorGray, x+16,  y+8+140,  x+16+w,  16  );
 	    VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,x+16+w-2,16-2);
 	    VideoFillRectangleClip(ColorBlue, x+16+2,y+8+140+2,i,       16-4);
-	
+
 	    // VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
 	    VideoDrawNumber(x+16+w/2,y+8+140+1,GameFont,unit->Mana);
 	}
