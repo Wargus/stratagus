@@ -129,7 +129,6 @@
 #define alloca _alloca			/// I hope this works with all VC..
 
 #ifndef _WIN32_WCE
-#pragma warning(disable:4018)		// Signed/unsigned mismatch
 #pragma warning(disable:4244)		// Conversion from double to uchar
 #pragma warning(disable:4761)		// Integral size mismatch
 #define snprintf _snprintf		/// Unix -> dumm
