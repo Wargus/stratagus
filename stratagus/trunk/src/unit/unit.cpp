@@ -332,10 +332,8 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
 	// On Load, Some units don't have Still animation, eg Deadbody
-	if (unit->Type->Animations && unit->Type->Animations->Still) {
-		unit->Frame = unit->Type->Animations->Still[0].Frame + (type->NumDirections / 2 + 1 - 1);
-	} else if (unit->Type->NewAnimations) {
-		// FIXME: this shouldn't be here
+	if (unit->Type->NewAnimations && !unit->Type->NewAnimations->Still) {
+		// FIXME: wrong frame
 		unit->Frame = type->NumDirections / 2 + 1 - 1;
 	}
 
@@ -362,8 +360,6 @@ void InitUnit(Unit* unit, UnitType* type)
 	}
 	unit->Active = 1;
 
-	unit->Wait = 1;
-	unit->Reset = 1;
 	unit->Removed = 1;
 
 	unit->Rs = MyRand() % 100; // used for fancy buildings and others
@@ -1927,8 +1923,6 @@ startn:
 	}
 
 found:
-	unit->Wait = 1; // should be correct unit has still action
-
 	PlaceUnit(unit, x, y);
 }
 
@@ -2018,7 +2012,6 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		if (bestd != 99999) {
-			unit->Wait = 1; // unit should have action still
 			PlaceUnit(unit, bestx, besty);
 			return;
 		}
@@ -2042,7 +2035,6 @@ void DropOutAll(const Unit* source)
 			source->Type->TileWidth, source->Type->TileHeight);
 		Assert(!unit->Orders[0].Goal);
 		unit->Orders[0].Action = UnitActionStill;
-		unit->Wait=unit->Reset = 1;
 		unit->SubAction = 0;
 	}
 	DebugPrint("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
@@ -2979,8 +2971,6 @@ void LetUnitDie(Unit* unit)
 	// Not good: UnitUpdateHeading(unit);
 	unit->SubAction = 0;
 	unit->State = 0;
-	unit->Reset = 0;
-	unit->Wait = 1;
 	unit->Orders[0].Action = UnitActionDie;
 	if (type->CorpseType) {
 #ifdef DYNAMIC_LOAD
@@ -2995,8 +2985,7 @@ void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	if (type->CorpseType || (type->Animations && type->Animations->Die) ||
-			(type->NewAnimations && type->NewAnimations->Death)) {
+	if (type->CorpseType || (type->NewAnimations && type->NewAnimations->Death)) {
 		unit->Removed = 0;
 		UnitCacheInsert(unit);
 	}
@@ -3760,8 +3749,8 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"sub-action\", %d, ", unit->SubAction);
 	CLprintf(file, "\"wait\", %d, ", unit->Wait);
 	CLprintf(file, "\"state\", %d,", unit->State);
-	if (unit->Reset) {
-		CLprintf(file, " \"reset\",");
+	if (unit->Anim.Unbreakable) {
+		CLprintf(file, " \"unbreakable\",");
 	}
 	CLprintf(file, "\n  \"blink\", %d,", unit->Blink);
 	if (unit->Moving) {

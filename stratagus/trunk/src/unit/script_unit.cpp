@@ -10,7 +10,7 @@
 //
 /**@name script_unit.c - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -616,7 +616,6 @@ static int CclUnit(lua_State* l)
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
 			unit->Removed = 0;
-			unit->Reset = 0; // JOHNS ????
 			Assert(unit->Slot == slot);
 		} else if (!strcmp(value, "next")) {
 			unit->Next = UnitSlots[(int)LuaToNumber(l, j + 1)];
@@ -785,8 +784,8 @@ static int CclUnit(lua_State* l)
 			unit->Wait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {
 			unit->State = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "reset")) {
-			unit->Reset = 1;
+		} else if (!strcmp(value, "unbreakable")) {
+			unit->Anim.Unbreakable = 1;
 			--j;
 		} else if (!strcmp(value, "blink")) {
 			unit->Blink = LuaToNumber(l, j + 1);
@@ -955,7 +954,6 @@ static int CclMoveUnit(lua_State* l)
 	heading = SyncRand() % 256;
 	mask = UnitMovementMask(unit);
 	if (CheckedCanMoveToMask(ix, iy, mask)) {
-		unit->Wait = 1;
 		PlaceUnit(unit, ix, iy);
 	} else {
 		unit->X = ix;
@@ -1019,7 +1017,6 @@ static int CclCreateUnit(lua_State* l)
 	} else {
 		mask = UnitMovementMask(unit);
 		if (CheckedCanMoveToMask(ix, iy, mask)) {
-			unit->Wait = 1;
 			PlaceUnit(unit, ix, iy);
 		} else {
 			unit->X = ix;

@@ -10,7 +10,7 @@
 //
 /**@name unitsound.h - The unit sounds headerfile. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Fabrice Rossi,
+//      (c) Copyright 1999-2005 by Lutz Sammer, Fabrice Rossi,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -67,15 +67,6 @@ typedef struct _unit_sound_ {
 	SoundConfig Help;               /// unit is attacked
 	SoundConfig Dead;               /// unit is killed
 } UnitSound;
-
-/// @todo temporary solution should perhaps be a member of a more general weapon structure.
-
-/**
-**  Attack sounds
-*/
-typedef struct _weapon_sound_ {
-	SoundConfig Attack; /// weapon is fired
-} WeaponSound;
 
 /*----------------------------------------------------------------------------
 --  Variables
