@@ -41,6 +41,7 @@
 #include "stratagus.h"
 #include "video.h"
 #include "map.h"
+#include "player.h"
 #include "intern_video.h"
 
 /*----------------------------------------------------------------------------
@@ -104,7 +105,7 @@ void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
 	ety = (GLfloat)(gy + h) / graphic->Height * graphic->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBindTexture(GL_TEXTURE_2D, graphic->Textures[0]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
@@ -203,9 +204,9 @@ void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 void VideoFree(Graphic* graphic)
 {
 #ifdef USE_OPENGL
-	if (graphic->NumTextureNames) {
-		glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
-		free(graphic->TextureNames);
+	if (graphic->Textures) {
+		glDeleteTextures(graphic->NumFrames, graphic->Textures);
+		free(graphic->Textures);
 	}
 #endif
 
@@ -215,12 +216,14 @@ void VideoFree(Graphic* graphic)
 		}
 		SDL_FreeSurface(graphic->Surface);
 	}
+#ifndef USE_OPENGL
 	if (graphic->SurfaceFlip) {
 		if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
 			VideoPaletteListRemove(graphic->SurfaceFlip);
 		}
 		SDL_FreeSurface(graphic->SurfaceFlip);
 	}
+#endif
 	free(graphic);
 }
 
@@ -247,8 +250,8 @@ Graphic* MakeGraphic(SDL_Surface* surface)
 	}
 
 	graphic->Surface = surface;
-	graphic->Width = surface->w;
-	graphic->Height = surface->h;
+	graphic->GraphicWidth = surface->w;
+	graphic->GraphicHeight = surface->h;
 	graphic->NumFrames = 1;
 
 	return graphic;
@@ -319,15 +322,15 @@ void FlipGraphic(Graphic* g)
 **  @param height   Graphic height.
 */
 #ifdef USE_OPENGL
-void MakeTexture(Graphic* graphic, int width, int height)
+static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
 {
 	int i;
 	int j;
 	int h;
 	int w;
 	int x;
-	int n;
 	unsigned char* tex;
+	unsigned char* tp;
 	const unsigned char* sp;
 	int fl;
 	Uint32 ckey;
@@ -335,78 +338,107 @@ void MakeTexture(Graphic* graphic, int width, int height)
 	int bpp;
 	int size;
 	unsigned char alpha;
+	Uint32 b;
+	Uint32 c;
+	Uint32 pc;
+	SDL_PixelFormat* f;
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
-	if (width > size || height > size) {
+	if (g->Width > size || g->Height > size) {
 		DebugPrint("Image too large (%d,%d), max size: %d\n" _C_
-			width _C_ height _C_ size);
+			g->Width _C_ g->Height _C_ size);
 		return;
 	}
 
-	n = (graphic->Width / width) * (graphic->Height / height);
-	fl = graphic->Width / width;
-	bpp = graphic->Surface->format->BytesPerPixel;
-	useckey = graphic->Surface->flags & SDL_SRCCOLORKEY;
-	ckey = graphic->Surface->format->colorkey;
+	fl = g->GraphicWidth / g->Width;
+	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
+	f = g->Surface->format;
+	bpp = f->BytesPerPixel;
+	ckey = f->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	graphic->NumTextureNames = n;
-	graphic->TextureNames = (GLuint*)malloc(n * sizeof(GLuint));
-	glGenTextures(n, graphic->TextureNames);
-	for (i = 1; i < width; i <<= 1) {
+	for (w = 1; w < g->Width; w <<= 1) {
 	}
-	w = i;
-	for (i = 1; i < height; i <<= 1) {
+	for (h = 1; h < g->Height; h <<= 1) {
 	}
-	h = i;
-	graphic->TextureWidth = (float)width / w;
-	graphic->TextureHeight = (float)height / h;
+	g->TextureWidth = (float)g->Width / w;
+	g->TextureHeight = (float)g->Height / h;
 	tex = (unsigned char*)malloc(w * h * 4);
-	if (graphic->Surface->flags & SDL_SRCALPHA) {
-		alpha = graphic->Surface->format->alpha;
+	if (g->Surface->flags & SDL_SRCALPHA) {
+		alpha = f->alpha;
 	} else {
 		alpha = 0xff;
 	}
 
-	for (x = 0; x < n; ++x) {
-		glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
+	SDL_LockSurface(g->Surface);
+	for (x = 0; x < g->NumFrames; ++x) {
+		glBindTexture(GL_TEXTURE_2D, textures[x]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		SDL_LockSurface(graphic->Surface);
-		for (i = 0; i < height; ++i) {
-			sp = (const unsigned char*)graphic->Surface->pixels + (x % fl) * width * bpp +
-				((x / fl) * height + i) * graphic->Surface->pitch;
-			for (j = 0; j < width; ++j) {
-				int c;
+		for (i = 0; i < g->Height; ++i) {
+			sp = (const unsigned char*)g->Surface->pixels + (x % fl) * g->Width * bpp +
+				((x / fl) * g->Height + i) * g->Surface->pitch;
+			tp = tex + i * w * 4;
+			for (j = 0; j < g->Width; ++j) {
+				int z;
 				SDL_Color p;
 
-				c = i * w * 4 + j * 4;
 				if (bpp == 1) {
 					if (useckey && *sp == ckey) {
-						tex[c + 3] = 0;
+						tp[3] = 0;
 					} else {
-						p = graphic->Surface->format->palette->colors[*sp];
-						tex[c + 0] = p.r;
-						tex[c + 1] = p.g;
-						tex[c + 2] = p.b;
-						tex[c + 3] = alpha;
+						p = f->palette->colors[*sp];
+						tp[0] = p.r;
+						tp[1] = p.g;
+						tp[2] = p.b;
+						tp[3] = alpha;
+					}
+					if (colors) {
+						for (z = 0; z < 4; ++z) {
+							if (*sp == 208 + z) {
+								p = colors->Colors[z];
+								tp[0] = p.r;
+								tp[1] = p.g;
+								tp[2] = p.b;
+								tp[3] = 0xff;
+								break;
+							}
+						}
 					}
 					++sp;
 				} else {
-					tex[c + 0] = *sp++;
-					tex[c + 1] = *sp++;
-					tex[c + 2] = *sp++;
 					if (bpp == 4) {
-						tex[c + 3] = *sp++;
+						c = *(Uint32*)sp;
 					} else {
-						tex[c + 3] = alpha;
+						c = (sp[f->Rshift >> 3] << f->Rshift) |
+							(sp[f->Gshift >> 3] << f->Gshift) |
+							(sp[f->Bshift >> 3] << f->Bshift);
+						c |= ((alpha | (alpha << 8) | (alpha << 16) | (alpha << 24)) ^
+							(f->Rmask | f->Gmask | f->Bmask));
 					}
+					*(Uint32*)tp = c;
+					if (colors) {
+						b = (c & f->Bmask) >> f->Bshift;
+						if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
+								((c & f->Gmask) >> f->Gshift) == b) {
+							pc = ((colors->Colors[0].r * b / 255) << f->Rshift) |
+								((colors->Colors[0].g * b / 255) << f->Gshift) |
+								((colors->Colors[0].b * b / 255) << f->Bshift);
+							if (bpp == 4) {
+								pc |= (c & f->Amask);
+							} else {
+								pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
+							}
+							*(Uint32*)tp = pc;
+						}
+					}
+					sp += bpp;
 				}
+				tp += 4;
 			}
 		}
-		SDL_UnlockSurface(graphic->Surface);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 #ifdef DEBUG
 		if ((i = glGetError())) {
@@ -414,131 +446,33 @@ void MakeTexture(Graphic* graphic, int width, int height)
 		}
 #endif
 	}
+	SDL_UnlockSurface(g->Surface);
 	free(tex);
 }
 
 /**
-**  Make an OpenGL texture of the player color pixels only.
+**  Make an OpenGL texture or textures out of a graphic object.
 **
-**  @param g        FIXME: docu
-**  @param graphic  FIXME: docu
-**  @param frame    FIXME: docu
-**  @param map      FIXME: docu
-**  @param maplen   FIXME: docu
+**  @param graphic  The graphic object.
 */
-void MakePlayerColorTexture(Graphic** g, Graphic* graphic, int frame,
-	UnitColors* colors)
+void MakeTexture(Graphic* graphic)
 {
-	int i;
-	int j;
-	int h;
-	int w;
-	int n;
-	unsigned char* tex;
-	const unsigned char* sp;
-	int fl;
-	int bpp;
-	Uint32 b;
-	Uint32 c;
-	Uint32 pc;
-	SDL_PixelFormat* f;
+	graphic->Textures = (GLuint*)malloc(graphic->NumFrames * sizeof(GLuint));
+	glGenTextures(graphic->NumFrames, graphic->Textures);
+	MakeTextures(graphic, graphic->Textures, NULL);
+}
 
-	if (!*g) {
-		*g = calloc(1, sizeof(Graphic));
-
-		n = graphic->NumFrames;
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		(*g)->NumTextureNames = n;
-		(*g)->TextureNames = calloc(n,sizeof(GLuint));
-
-		(*g)->Width = graphic->Width;
-		(*g)->Height = graphic->Height;
-		(*g)->GraphicWidth = graphic->GraphicWidth;
-		(*g)->GraphicHeight = graphic->GraphicHeight;
-		(*g)->TextureWidth = graphic->TextureWidth;
-		(*g)->TextureHeight = graphic->TextureHeight;
-	}
-
-	fl = graphic->GraphicWidth / graphic->Width;
-	bpp = graphic->Surface->format->BytesPerPixel;
-	glGenTextures(1, &(*g)->TextureNames[frame]);
-
-	for (i = 1; i < graphic->Width; i <<= 1) {
-	}
-	w = i;
-	for (i = 1; i < graphic->Height; i <<= 1) {
-	}
-	h = i;
-
-	tex = (unsigned char*)malloc(w * h * 4);
-	f = graphic->Surface->format;
-
-	glBindTexture(GL_TEXTURE_2D, (*g)->TextureNames[frame]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	SDL_LockSurface(graphic->Surface);
-	for (i = 0; i < graphic->Height; ++i) {
-		sp = (const unsigned char*)graphic->Surface->pixels + (frame % fl) * graphic->Width * bpp +
-			((frame / fl) * graphic->Height + i) * graphic->Surface->pitch;
-		for (j = 0; j < graphic->Width; ++j) {
-			int y;
-			int z;
-			SDL_Color p;
-
-			y = i * w * 4 + j * 4;
-			if (bpp == 1) {
-				for (z = 0; z < 4; ++z) {
-					if (*sp == 208 + z) {
-						p = colors->Colors[z];
-						tex[y + 0] = p.r;
-						tex[y + 1] = p.g;
-						tex[y + 2] = p.b;
-						tex[y + 3] = 0xff;
-						break;
-					}
-				}
-				if (z == 4) {
-					tex[y + 3] = 0;
-				}
-				++sp;
-			} else {
-				if (bpp == 4) {
-					c = *(Uint32*)sp;
-				} else {
-					c = (sp[f->Rshift >> 3] << f->Rshift) |
-						(sp[f->Gshift >> 3] << f->Gshift) |
-						(sp[f->Bshift >> 3] << f->Bshift);
-				}
-				b = (c & f->Bmask) >> f->Bshift;
-				if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
-						((c & f->Gmask) >> f->Gshift) == b) {
-					pc = ((colors->Colors[0].r * b / 255) << f->Rshift) |
-						((colors->Colors[0].g * b / 255) << f->Gshift) |
-						((colors->Colors[0].b * b / 255) << f->Bshift);
-					if (bpp == 4) {
-						pc |= (c & f->Amask);
-					} else {
-						pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
-					}
-					*(Uint32*)(tex + y) = pc;
-				} else {
-					*(Uint32*)(tex + y) = 0;
-				}
-				sp += bpp;
-			}
-		}
-	}
-	SDL_UnlockSurface(graphic->Surface);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-#ifdef DEBUG
-	if ((i = glGetError())) {
-		DebugPrint("glTexImage2D(%x)\n" _C_ i);
-	}
-#endif
-	free(tex);
+/**
+**  Make an OpenGL texture with the player colors.
+**
+**  @param graphic  FIXME: docu
+**  @param player   FIXME: docu
+*/
+void MakePlayerColorTexture(Graphic* graphic, int player)
+{
+	graphic->PlayerColorTextures[player] = malloc(graphic->NumFrames * sizeof(GLuint));
+	glGenTextures(graphic->NumFrames, graphic->PlayerColorTextures[player]);
+	MakeTextures(graphic, graphic->PlayerColorTextures[player], &Players[player].UnitColors);
 }
 #endif
 
@@ -567,7 +501,7 @@ void ResizeGraphic(Graphic* g, int w, int h)
 		return;
 	}
 
-	if (g->Width == w && g->Height == h) {
+	if (g->GraphicWidth == w && g->GraphicHeight == h) {
 		return;
 	}
 
@@ -602,13 +536,13 @@ void ResizeGraphic(Graphic* g, int w, int h)
 		SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 	}
 
-	g->Width = w;
-	g->Height = h;
+	g->Width = g->GraphicWidth = w;
+	g->Height = g->GraphicHeight = h;
 
 #ifdef USE_OPENGL
-	glDeleteTextures(g->NumTextureNames, g->TextureNames);
-	free(g->TextureNames);
-	MakeTexture(g, g->Width, g->Height);
+	glDeleteTextures(g->NumFrames, g->Textures);
+	free(g->Textures);
+	MakeTexture(g);
 #endif
 }
 
