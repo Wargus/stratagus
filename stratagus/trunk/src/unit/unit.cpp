@@ -2269,8 +2269,8 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
     int besty;
     int bestd;
 
-    x=unit->X;
-    y=unit->Y;
+    destx=x=unit->X;
+    desty=y=unit->Y;
 
     //
     //	Find the nearest wood depot
@@ -2337,8 +2337,8 @@ global int FindWoodInSight(const Unit* unit,int* px,int* py)
 			}
 			*m=22;
 		    } else {			// no goal take the first
-			*px=bestx;
-			*py=besty;
+			*px=x;
+			*py=y;
 			return 1;
 		    }
 		}
