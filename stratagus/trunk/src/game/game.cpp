@@ -168,6 +168,10 @@ global void CreateGame(char* filename, WorldMap* map)
 	// FIXME: LibraryFile here?
 	if (filename[0] != '/' && filename[0] != '.') {
 	    s = filename = strdcat3(FreeCraftLibPath, "/", filename);
+	    strcpy(CurrentMapPath, strchr(filename,'/')+1);
+	}
+	else {
+	    strcpy(CurrentMapPath, filename);
 	}
 	//
 	//	Load the map.
