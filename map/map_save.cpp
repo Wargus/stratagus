@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name map_save.c	-	Saving the map. */
 //
-//	(c) Copyright 2001-2003 by Lutz Sammer
+//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -80,7 +80,7 @@ global void SaveMap(CLFile* file)
 
 	// FIXME: Why terrain? TheMap->Tileset->Class should be correct
 	CLprintf(file, "  \"terrain\", {\"%s\", \"%s\"},\n",
-		TheMap.TerrainName,Tilesets[TheMap.Terrain]->Class);
+		TheMap.TerrainName, Tilesets[TheMap.Terrain]->Class);
 
 	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Width, TheMap.Height);
 	CLprintf(file, "  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");

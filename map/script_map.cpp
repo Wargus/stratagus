@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name ccl_map.c	-	The map ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -55,12 +55,13 @@
 **
 **		@param list		list of tuples keyword data
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclStratagusMap(SCM list)
+local int CclStratagusMap(lua_State* l)
 {
-	SCM value;
-	SCM data;
-	char* str;
+	const char* value;
+	int args;
+	int j;
+	int subargs;
+	int k;
 
 	//
 	//		Parse the list:		(still everything could be changed!)
@@ -70,65 +71,73 @@ local SCM CclStratagusMap(SCM list)
 		TheMap.Info = calloc(1, sizeof(MapInfo));
 	}
 
-	while (!gh_null_p(list)) {
+	args = lua_gettop(l);
+	for (j = 0; j < args; ++j) {
+		value = LuaToString(l, j + 1);
+		++j;
 
-		value = gh_car(list);
-		list = gh_cdr(list);
-
-		if (gh_eq_p(value, gh_symbol2scm("version"))) {
+		if (!strcmp(value, "version")) {
 			char buf[32];
 
-			data = gh_car(list);
-			list = gh_cdr(list);
-			str = gh_scm2newstr(data, NULL);
+			value = LuaToString(l, j + 1);
 			sprintf(buf, StratagusFormatString, StratagusFormatArgs(StratagusVersion));
-			if (strcmp(buf, str)) {
+			if (strcmp(buf, value)) {
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
-			free(str);
-		} else if (gh_eq_p(value, gh_symbol2scm("uid"))) {
-			TheMap.Info->MapUID = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("description"))) {
-			data = gh_car(list);
-			list = gh_cdr(list);
+		} else if (!strcmp(value, "uid")) {
+			TheMap.Info->MapUID = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "description")) {
+			value = LuaToString(l, j + 1);
+			strncpy(TheMap.Description, value, sizeof(TheMap.Description));
+			TheMap.Info->Description = strdup(value);
+		} else if (!strcmp(value, "the-map")) {
+			if (!lua_istable(l, j + 1)) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			subargs = luaL_getn(l, j + 1);
+			for (k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, j + 1, k + 1);
+				value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				++k;
 
-			str = gh_scm2newstr(data, NULL);
-			strncpy(TheMap.Description, str, sizeof(TheMap.Description));
-			TheMap.Info->Description = strdup(str);
-			free(str);
-		} else if (gh_eq_p(value, gh_symbol2scm("the-map"))) {
-			data = gh_car(list);
-			list = gh_cdr(list);
-
-			while (!gh_null_p(data)) {
-				value = gh_car(data);
-				data = gh_cdr(data);
-
-				if (gh_eq_p(value, gh_symbol2scm("terrain"))) {
+				if (!strcmp(value, "terrain")) {
 					int i;
 
-					value = gh_car(data);
-					data = gh_cdr(data);
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						lua_pushstring(l, "incorrect argument");
+						lua_error(l);
+					}
+					lua_rawgeti(l, -1, 1);
+					value = LuaToString(l, -1);
+					lua_pop(l, 1);
+					// ignore (l, -1, 2)
+					lua_pop(l, 1);
 
 					free(TheMap.TerrainName);
-					TheMap.TerrainName = str = gh_scm2newstr(gh_car(value), NULL);
-					//
-					//		Lookup the index of this tileset.
-					//
+					TheMap.TerrainName = strdup(value);
+
+					// Lookup the index of this tileset.
 					for (i = 0; TilesetWcNames[i] &&
-							strcmp(str, TilesetWcNames[i]); ++i) {
+						strcmp(value, TilesetWcNames[i]); ++i) {
 					}
 					TheMap.Terrain = i;
-					// Ignore: str=gh_scm2newstr(gh_cadr(value),NULL);
 					LoadTileset();
-
-				} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
-					value = gh_car(data);
-					data = gh_cdr(data);
-
-					TheMap.Width = gh_scm2int(gh_car(value));
-					TheMap.Height = gh_scm2int(gh_cadr(value));
+				} else if (!strcmp(value, "size")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						lua_pushstring(l, "incorrect argument");
+						lua_error(l);
+					}
+					lua_rawgeti(l, -1, 1);
+					TheMap.Width = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					TheMap.Height = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_pop(l, 1);
 
 					free(TheMap.Fields);
 					TheMap.Fields = calloc(TheMap.Width * TheMap.Height,
@@ -136,114 +145,122 @@ local SCM CclStratagusMap(SCM list)
 					TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
 					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
-
-				} else if (gh_eq_p(value, gh_symbol2scm("fog-of-war"))) {
+				} else if (!strcmp(value, "fog-of-war")) {
 					TheMap.NoFogOfWar = 0;
-				} else if (gh_eq_p(value, gh_symbol2scm("no-fog-of-war"))) {
+					--k;
+				} else if (!strcmp(value, "no-fog-of-war")) {
 					TheMap.NoFogOfWar = 1;
-				} else if (gh_eq_p(value, gh_symbol2scm("map-fields"))) {
+					--k;
+				} else if (!strcmp(value, "map-fields")) {
 					int i;
+					int subsubargs;
+					int subk;
 
-					value = gh_car(data);
-					data = gh_cdr(data);
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						lua_pushstring(l, "incorrect argument");
+						lua_error(l);
+					}
 
-					i = gh_length(value);
-					if (i != TheMap.Width * TheMap.Height) {
+					subsubargs = luaL_getn(l, -1);
+					if (subsubargs != TheMap.Width * TheMap.Height) {
 						fprintf(stderr, "Wrong tile table length %d\n", i);
 					}
 					i = 0;
-					while (!gh_null_p(value)) {
-						SCM field;
+					for (subk = 0; subk < subsubargs; ++subk) {
+						int args2;
+						int j2;
 
-						field = gh_car(value);
-						value = gh_cdr(value);
+						lua_rawgeti(l, -1, subk + 1);
+						if (!lua_istable(l, -1)) {
+							lua_pushstring(l, "incorrect argument");
+							lua_error(l);
+						}
+						args2 = luaL_getn(l, -1);
+						j2 = 0;
 
-						TheMap.Fields[i].Tile = gh_scm2int(gh_car(field));
-						field = gh_cdr(field);
-						TheMap.Fields[i].SeenTile = gh_scm2int(gh_car(field));
-						field = gh_cdr(field);
+						lua_rawgeti(l, -1, j2 + 1);
+						TheMap.Fields[i].Tile = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						++j2;
+						lua_rawgeti(l, -1, j2 + 1);
+						TheMap.Fields[i].SeenTile = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						++j2;
 #ifdef UNITS_ON_MAP
 						TheMap.Fields[i].Building = 0xffff;
 						TheMap.Fields[i].AirUnit = 0xffff;
 						TheMap.Fields[i].LandUnit = 0xffff;
 						TheMap.Fields[i].SeaUnit = 0xffff;
 #endif /* UNITS_ON_MAP */
-						while (!gh_null_p(field)) {
-							if (gh_exact_p(gh_car(field))) {
-								TheMap.Fields[i].Value = gh_scm2int(gh_car(field));
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("explored"))) {
-								field = gh_cdr(field);
-								TheMap.Fields[i].Visible[gh_scm2int(gh_car(field))] = 1;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("human"))) {
+						for (; j2 < args2; ++j2) {
+							lua_rawgeti(l, -1, j2 + 1);
+							if (lua_isnumber(l, -1)) {
+								TheMap.Fields[i].Value = LuaToNumber(l, -1);
+								lua_pop(l, 1);
+								continue;
+							}
+							value = LuaToString(l, -1);
+							lua_pop(l, 1);
+							if (!strcmp(value, "explored")) {
+								++j2;
+								lua_rawgeti(l, -1, j2 + 1);
+								TheMap.Fields[i].Visible[(int)LuaToNumber(l, -1)] = 1;
+								lua_pop(l, 1);
+							} else if (!strcmp(value, "human")) {
 								TheMap.Fields[i].Flags |= MapFieldHuman;
 
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("land"))) {
+							} else if (!strcmp(value, "land")) {
 								TheMap.Fields[i].Flags |= MapFieldLandAllowed;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("coast"))) {
+							} else if (!strcmp(value, "coast")) {
 								TheMap.Fields[i].Flags |= MapFieldCoastAllowed;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("water"))) {
+							} else if (!strcmp(value, "water")) {
 								TheMap.Fields[i].Flags |= MapFieldWaterAllowed;
 
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("mud"))) {
+							} else if (!strcmp(value, "mud")) {
 								TheMap.Fields[i].Flags |= MapFieldNoBuilding;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("block"))) {
+							} else if (!strcmp(value, "block")) {
 								TheMap.Fields[i].Flags |= MapFieldUnpassable;
 
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("wall"))) {
+							} else if (!strcmp(value, "wall")) {
 								TheMap.Fields[i].Flags |= MapFieldWall;
-							} else if( gh_eq_p(gh_car(field),
-									gh_symbol2scm("rock")) ) {
+							} else if (!strcmp(value, "rock")) {
 								TheMap.Fields[i].Flags |= MapFieldRocks;
-							} else if( gh_eq_p(gh_car(field),
-									gh_symbol2scm("wood")) ) {
+							} else if (!strcmp(value, "wood")) {
 								TheMap.Fields[i].Flags |= MapFieldForest;
 
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("ground"))) {
+							} else if (!strcmp(value, "ground")) {
 								TheMap.Fields[i].Flags |= MapFieldLandUnit;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("air"))) {
+							} else if (!strcmp(value, "air")) {
 								TheMap.Fields[i].Flags |= MapFieldAirUnit;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("sea"))) {
+							} else if (!strcmp(value, "sea")) {
 								TheMap.Fields[i].Flags |= MapFieldSeaUnit;
-							} else if (gh_eq_p(gh_car(field),
-									gh_symbol2scm("building"))) {
+							} else if (!strcmp(value, "building")) {
 								TheMap.Fields[i].Flags |= MapFieldBuilding;
 
 							} else {
-							   // FIXME: this leaves a half initialized map
-							   errl("Unsupported tag", value);
+							   lua_pushfstring(l, "Unsupported tag: %s", value);
+							   lua_error(l);
 							}
-							field = gh_cdr(field);
 						}
+						lua_pop(l, 1);
 						++i;
 					}
-
+					lua_pop(l, 1);
 				} else {
-				   // FIXME: this leaves a half initialized map
-				   errl("Unsupported tag", value);
+				   lua_pushfstring(l, "Unsupported tag: %s", value);
+				   lua_error(l);
 				}
 			}
 
 		} else {
-		   // FIXME: this leaves a half initialized map
-		   errl("Unsupported tag", value);
+		   lua_pushfstring(l, "Unsupported tag: %s", value);
+		   lua_error(l);
 		}
 	}
 
-	return SCM_UNSPECIFIED;
+	return 0;
 }
-#elif defined(USE_LUA)
-#endif
 
 /**
 **		Reveal the complete map.
@@ -544,7 +561,7 @@ local int CclSetForestRegeneration(lua_State* l)
 */
 global void MapCclRegister(void)
 {
-//	lua_register(Lua, "StratagusMap", CclStratagusMap);
+	lua_register(Lua, "StratagusMap", CclStratagusMap);
 	lua_register(Lua, "RevealMap", CclRevealMap);
 	lua_register(Lua, "CenterMap", CclCenterMap);
 	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
