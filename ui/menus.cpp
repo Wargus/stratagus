@@ -323,14 +323,14 @@ local Menuitem EndScenarioMenuItems[] = {
 
 local Menuitem CDRomDisabledMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 10, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 144, 15, 0, LargeFont, NULL, NULL,
 	{ text:{ "Sorry, this version of", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 30, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 144, 15 + 20*1, 0, LargeFont, NULL, NULL,
 	{ text:{ "freecraft was not compiled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 144, 50, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 144, 15 + 20*2, 0, LargeFont, NULL, NULL,
 	{ text:{ "with CD Audio support", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
+    { MI_TYPE_BUTTON, 144 - (106 / 2), 128 - 15 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
@@ -773,14 +773,14 @@ local Menuitem CampaignContMenuItems[] = {
 
 local Menuitem GameOptionsMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_TEXT, 144, 11, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 10, 42, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Audio Enabled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
+    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
@@ -964,10 +964,10 @@ global Menu Menus[] = {
     },
     {
 	// Game Options Menu
-	176+(14*TileSizeX-288)/2,
-	16+(14*TileSizeY-128)/2,
-	288, 128,
-	ImagePanel4,
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
 	2, 4,
 	GameOptionsMenuItems,
 	NULL,
