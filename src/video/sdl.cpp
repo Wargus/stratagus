@@ -1078,9 +1078,9 @@ global void ToggleFullScreen(void)
 
     // save the contents of the screen.
 #ifdef USE_SDL_SURFACE
-    framesize = w * h * Screen->format->BytesPerPixel;
-#else
     framesize = w * h * TheScreen->format->BytesPerPixel;
+#else
+    framesize = w * h * Screen->format->BytesPerPixel;
 #endif
 
 #ifndef USE_OPENGL
