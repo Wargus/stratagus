@@ -51,6 +51,8 @@ local hashtable(UnitType*,61) UnitTypeHash;
 
 /**
 **	W*rCr*ft number to internal unit-type name.
+**
+**	FIXME: must loaded from ccl!!!!
 */
 local const char* UnitTypeWcNames[] = {
     "unit-footman",
@@ -302,10 +304,6 @@ local const char* UnitTypeNames[] = {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#ifndef USE_CCL2
-extern char UnitCorpse[UnitTypeInternalMax];
-#endif
-
 /**
 **	Generate C - table for UnitTypes.
 */
@@ -355,6 +353,7 @@ global void PrintUnitTypeTable(void)
 //		,MissileTypes[type->MissileWeapon].Ident);
 	printf("   ,{ \"%s\" }\t\t// Missile\n",type->Missile.Name);
 
+#if 0
 //	switch( UnitCorpse[type->Type] ) {
 	switch( type->Corpse ) {
 	    case 0:
@@ -376,6 +375,10 @@ global void PrintUnitTypeTable(void)
 		printf("   ,CorpseWaterSite\n");
 		break;
 	}
+#endif
+	printf("   ,\"%s\", NULL, %d\n",type->CorpseName,type->CorpseScript);
+	break;
+
 	printf("\t//Speed\tOvFrame\tSightR\tHitpnt\tMagic\tBTime\tGold\tWood\tOil\n");
 	printf("\t,%6d,%7d,%6d,%7d,%6d, {%5d,%6d,%7d,%6d }\n"
 	    ,type->_Speed
@@ -831,6 +834,7 @@ global void SaveUnitType(const UnitType* type,FILE* file)
     //fprintf(file,"  \"%s\"\n",MissileTypes[type->MissileWeapon].Ident);
     fprintf(file,"  \"%s\"\n",type->Missile.Name);
     fprintf(file,"  ");
+#if 0
     switch( type->Corpse ) {
 	case 0:
 	    fprintf(file,"'corpse-none");
@@ -852,6 +856,8 @@ global void SaveUnitType(const UnitType* type,FILE* file)
 	    break;
     }
     fprintf(file,"\n");
+#endif
+    printf("'%s %d\n",type->CorpseName,type->CorpseScript);
 
     fprintf(file,"  ");
     switch( type->UnitType ) {
@@ -1146,6 +1152,13 @@ global void LoadUnitSprites(void)
 	//
 	UnitTypes[type].Missile.Missile=MissileTypeByIdent(
 		UnitTypes[type].Missile.Name);
+	//
+	//	Lookup corpse.
+	//
+	if( UnitTypes[type].CorpseName ) {
+	    UnitTypes[type].CorpseType
+		    =UnitTypeByIdent(UnitTypes[type].CorpseName);
+	}
     }
 
     // FIXME: must copy unit data from peon/peasant to with gold/wood

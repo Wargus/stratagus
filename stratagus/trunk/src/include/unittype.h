@@ -71,12 +71,14 @@ typedef struct _missile_config_ {
     void*	Missile;		/// identifier to use to run time
 } MissileConfig;
 
+#if 0
 #define CorpseNone	0	/// Unit has no corpse
 #define CorpseHuman	1	/// Unit has a human corpse
 #define CorpseOrc	2	/// Unit has a orc corpse
 #define CorpseShip	3	/// Unit has a ship corpse
 #define CorpseLandSite	4	/// Unit has a land corpse
 #define CorpseWaterSite	5	/// Unit has a water corpse
+#endif
 
 /**
 **	Typedef of base structure of unit-type
@@ -104,7 +106,10 @@ struct _unit_type_ {
 
     IconConfig	Icon;			/// icon to display for this unit
     MissileConfig Missile;		/// missile weapon
-    int		Corpse;			/// corpse type
+
+    char*	CorpseName;		/// corpse type name
+    UnitType*	CorpseType;		/// corpse unit-type 
+    int		CorpseScript;		/// corpse script start
 
     int		_Speed;			/// movement speed
 

@@ -113,12 +113,12 @@ global void HandleActionStill(Unit* unit)
 	}
     }
 
-#if 0  // a unit with type->Vanishes is _dying_.
+#if 1  // a unit with type->Vanishes is _dying_.
     //
     //	Corpse:		vanishes
     //
     if( type->Vanishes ) {
-	UnitCacheRemove(unit);
+	//UnitCacheRemove(unit);
 	FreeUnitMemory(unit);
 	return;
     }

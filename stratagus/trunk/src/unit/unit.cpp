@@ -1697,6 +1697,7 @@ global void DestroyUnit(Unit* unit)
 	//
 	if( type->GoldMine
 		|| type->StoresGold || type->StoresWood
+		|| type->GivesOil || type->StoresOil
 		|| unit->Command.Action==UnitActionBuilded ) {
 	    DestroyAllInside(unit);
 	}
@@ -1704,6 +1705,7 @@ global void DestroyUnit(Unit* unit)
 	RemoveUnit(unit);
 	UnitLost(unit);
 
+#if 0
 	unit->SubAction=unit->Type->Type;
 
 	// Create corpse FIXME: this should be handled by die?
@@ -1723,12 +1725,7 @@ global void DestroyUnit(Unit* unit)
 		break;
 	}
 	unit->Frame=0;
-#if 0
-	//unit->SubAction=0;
-	//if( unit->Type->ShoreBuilding ) {
-	//    unit->SubAction=1;
-	//}
-#endif
+
 	unit->Type=type;
 	unit->IX=(type->Width-type->RleSprite->Width)/2;
 	unit->IY=(type->Height-type->RleSprite->Height)/2;
@@ -1738,6 +1735,32 @@ global void DestroyUnit(Unit* unit)
 	unit->Wait=1;
 	unit->Removed=0;
 	unit->Command.Action=UnitActionDie;
+#endif
+
+	// FIXME: buildings should get a die sequence
+
+	if( (type=type->CorpseType) ) {
+	    unit->State=unit->Type->CorpseScript;
+	    unit->Type=type;
+
+	    unit->IX=(type->Width-type->RleSprite->Width)/2;
+	    unit->IY=(type->Height-type->RleSprite->Height)/2;
+
+	    unit->SubAction=0;
+	    unit->Removed=0;
+	    unit->Command.Action=UnitActionDie;
+
+	    DebugCheck( !unit->Type->Animations
+		    || !unit->Type->Animations->Die );
+	    unit->Frame=0;
+	    UnitShowAnimation(unit,unit->Type->Animations->Die);
+	    DebugLevel0(__FUNCTION__": Frame %d\n",unit->Frame);
+
+	    return;
+	}
+
+	// no corpse available
+	FreeUnitMemory(unit);
 	return;
     }
 
@@ -1749,12 +1772,13 @@ global void DestroyUnit(Unit* unit)
     RemoveUnit(unit);
     UnitLost(unit);
 
-    unit->Frame=0;
+    // Not good: UnitNewHeading(unit);
     unit->State=0;
     unit->Reset=0;
-    unit->Wait=1;
     unit->Removed=0;
+    unit->Wait=1;
     unit->Command.Action=UnitActionDie;
+
 }
 
 /**
@@ -2113,10 +2137,12 @@ local void SaveCommand(const Command* command,FILE* file)
 	    fprintf(file,"'upgrade-to");
 	    fprintf(file," \"FIXME:\"");
 	    break;
+	/*
 	case UnitActionUpgrade:
 	    fprintf(file,"'upgrade");
 	    fprintf(file," \"FIXME:\"");
 	    break;
+	*/
 	case UnitActionResearch:
 	    fprintf(file,"'research");
 	    fprintf(file," \"FIXME:\"");
@@ -2153,17 +2179,29 @@ local void SaveCommand(const Command* command,FILE* file)
 	    fprintf(file,"'mine-gold");
 	    fprintf(file," \"FIXME:\"");
 	    break;
-	case UnitActionReturnGoods:
-	    fprintf(file,"'return-goods");
+	case UnitActionMineOre:
+	    fprintf(file,"'mine-ore");
+	    fprintf(file," \"FIXME:\"");
+	    break;
+	case UnitActionMineCoal:
+	    fprintf(file,"'mine-coal");
+	    fprintf(file," \"FIXME:\"");
+	    break;
+	case UnitActionQuarryStone:
+	    fprintf(file,"'break-stone");
 	    fprintf(file," \"FIXME:\"");
 	    break;
 	case UnitActionHaulOil:
 	    fprintf(file,"'haul-oil");
 	    fprintf(file," \"FIXME:\"");
+	    break;
+	case UnitActionReturnGoods:
+	    fprintf(file,"'return-goods");
+	    fprintf(file," \"FIXME:\"");
+	    break;
 	case UnitActionDemolish:
 	    fprintf(file,"'demolish");
 	    fprintf(file," \"FIXME:\"");
-	    break;
 	    break;
     }
     fprintf(file,")\n");

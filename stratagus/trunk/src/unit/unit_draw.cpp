@@ -579,7 +579,7 @@ local void DrawBuilding(Unit* unit)
 	DrawUnitType(type,frame+n_frame,x,y);
     }
 
-    // FIXME: johns: ugly check here should be removed!
+    // FIXME: johns: ugly check here should be removed! vanish could be used
     if( unit->Command.Action!=UnitActionDie ) {
 	DrawDecoration(unit,type,x,y);
 	DrawSelectionRectangle(unit,type,x,y);
