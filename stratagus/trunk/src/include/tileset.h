@@ -80,6 +80,10 @@
 **		as global sytem palette.
 **		@see GlobalPalette, VideoSetPalette.
 **
+**	Tileset::NumTiles
+**
+**		The number of different tiles in the tables.
+**
 **	Tileset::Table
 **
 **		Table to map the abstract level (PUD) tile numbers, to tile
@@ -203,6 +207,7 @@ typedef struct _tileset_ {
     char*	File;			/// File containing image data
     char*	PaletteFile;		/// File containing the global palette
 
+    int		NumTiles;		/// Number of tiles in the tables
     unsigned short*	Table;		/// Pud to internal conversion table
     // FIXME: currently unsupported
     unsigned char*	TileTypeTable;	/// For fast lookup of tile type

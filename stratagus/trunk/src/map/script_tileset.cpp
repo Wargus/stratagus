@@ -348,6 +348,7 @@ local void DefineTilesetParseSlot(Tileset* tileset,SCM list)
 	    errl("slots: unsupported tag",value);
 	}
     }
+    tileset->NumTiles=index;
 }
 
 /**
