@@ -64,6 +64,10 @@
 **		@note It is planned to change this to support more and
 **		better tilesets.
 **
+**	Construction::File[::TilesetMax]
+**
+**		Path file name of shadow sprite file for the different tilesets.
+**
 **	Construction::Nr
 **
 **		Slot number of the construction, used for saving. This should
@@ -76,9 +80,19 @@
 **		the same size. Also all sprites (tilesets) must have the same
 **		size.
 **
+**	Construction::ShadowWidth Construction::ShadowHeight
+**
+**		Size of a shadow sprite frame in pixels. All frames of a sprite
+**		have the same size. Also all sprites (tilesets) must have the
+**		same size.
+**
 **	Construction::Sprite
 **
 **		Sprite image.
+**
+**	Construction::ShadowSprite
+**
+**		Shadow sprite image.
 **
 **	@todo
 **		Need ::TilesetByName, ...
@@ -104,15 +118,19 @@ typedef struct _construction_ {
 
     char*	Ident;			/// construction identifier
     char*	File[TilesetMax];	/// sprite file
+    char*	ShadowFile;		/// shadow sprite file
 
     int		Nr;			/// FIXME: remove Number for save
 
     int		Width;			/// sprite width
     int		Height;			/// sprite height
+    int		ShadowWidth;		/// shadow sprite width
+    int		ShadowHeight;		/// shadow sprite height
 
 // --- FILLED UP ---
 
     Graphic*	Sprite;			/// construction sprite image
+    Graphic*	ShadowSprite;		/// construction shadow sprite image
 } Construction;
 
 /*----------------------------------------------------------------------------
