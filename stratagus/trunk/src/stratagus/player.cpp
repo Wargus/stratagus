@@ -130,13 +130,13 @@ global void SavePlayers(FILE* file)
 	fprintf(file,"  'name \"%s\"\n",Players[i].Name);
 	fprintf(file,"  'type ");
 	switch( Players[i].Type ) {
-	    case 2: fprintf(file,"'neutral");		break;
-	    case 3: fprintf(file,"'nobody");		break;
-	    case 4: fprintf(file,"'computer");		break;
-	    case 5: fprintf(file,"'human");		break;
-	    case 6: fprintf(file,"'rescue-passive");	break;
-	    case 7: fprintf(file,"'rescue-active");	break;
-	    default:fprintf(file,"%d",Players[i].Type); break;
+	    case PlayerNeutral:	      fprintf(file,"'neutral");		break;
+	    case PlayerNobody:	      fprintf(file,"'nobody");		break;
+	    case PlayerComputer:      fprintf(file,"'computer");	break;
+	    case PlayerHuman:	      fprintf(file,"'human");		break;
+	    case PlayerRescuePassive: fprintf(file,"'rescue-passive");	break;
+	    case PlayerRescueActive:  fprintf(file,"'rescue-active");	break;
+	    default:		      fprintf(file,"%d",Players[i].Type); break;
 	}
 	fprintf(file," 'race \"%s\"",Players[i].RaceName);
 	fprintf(file," 'ai %d\n",Players[i].AiNum);
