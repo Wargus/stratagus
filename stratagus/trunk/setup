@@ -279,7 +279,7 @@ else
   echo "refer to the LOCAL_PNG section in the setup script to "
   echo "find out how to install a local copy to compile freecraft."
   echo
-  echo "Please also note the the PNG library most likely also"
+  echo "Please also note that the PNG library most likely also"
   echo "requires the GZIP compression library. If you are sure"
   echo "to have libpng installed, but this test still fails,"
   echo "check out for libz. You may refer to the LOCAL_ZLIB"
