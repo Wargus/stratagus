@@ -349,6 +349,24 @@ find_solid:
     return base | (table[direction] << 4);
 }
 
+/**
+**	Change tile from abstract tile-type.
+**
+**	@param x	X map tile coordinate.
+**	@param y	Y map tile coordinate.
+**	@param tile	Abstract tile type to edit.
+*/
+global void ChangeTile(int x, int y, int tile)
+{
+    MapField *mf;
+
+    DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
+    DebugCheck(tile < 0 || tile >= TheMap.Tileset->NumTiles);
+
+    mf = &TheMap.Fields[y * TheMap.Width + x];
+    mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
+}
+
 #define D_UP	8		/// Go up allowed
 #define D_DOWN	4		/// Go down allowed
 #define D_LEFT	2		/// Go left allowed
