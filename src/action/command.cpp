@@ -47,9 +47,7 @@
 local void ReleaseOrder(Order* order)
 {
     if( order->Goal ) {
-#ifdef REFS_DEBUG
-	DebugCheck( !order->Goal->Refs );
-#endif
+	RefsDebugCheck( !order->Goal->Refs );
 	if( !--order->Goal->Refs ) {
 	    ReleaseUnit(order->Goal);
 	}

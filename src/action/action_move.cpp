@@ -86,9 +86,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 	    // FIXME: Can't choose a better target here!
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -104,13 +102,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
 		    !goal->HP || goal->Command.Action==UnitActionDie ) {
 #endif
 		DebugLevel0Fn("killed unit\n");
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 #ifdef NEW_ORDERS
 		unit->Orders[0].Goal=goal=NoUnitP;
 #else

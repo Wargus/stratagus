@@ -58,7 +58,7 @@ global void HandleActionDemolish(Unit* unit)
 	//
 	case 0:
 	    // FIXME: reset first!! why? (johns)
-	    err=HandleActionMove(unit); 
+	    err=HandleActionMove(unit);
 	    if( unit->Reset ) {
 		goal=unit->Command.Data.Move.Goal;
 		//
@@ -67,9 +67,7 @@ global void HandleActionDemolish(Unit* unit)
 		if( goal ) {
 		    if( goal->Destroyed ) {
 			DebugLevel0Fn("Destroyed unit\n");
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
@@ -79,13 +77,9 @@ global void HandleActionDemolish(Unit* unit)
 			return;
 		    } else if( goal->Removed || !goal->HP
 				|| goal->Command.Action==UnitActionDie ) {
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
-#ifdef REFS_DEBUG
-			DebugCheck( !goal->Refs );
-#endif
+			RefsDebugCheck( !goal->Refs );
 			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			// FIXME: perhaps I should choose an alternative
 			unit->Command.Action=UnitActionStill;
@@ -119,13 +113,9 @@ global void HandleActionDemolish(Unit* unit)
 	case 1:
 	    goal=unit->Command.Data.Move.Goal;
 	    if( goal ) {
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
-#ifdef REFS_DEBUG
-		DebugCheck( !goal->Refs );
-#endif
+		RefsDebugCheck( !goal->Refs );
 		unit->Command.Data.Move.Goal=NoUnitP;
 	    }
 
@@ -134,7 +124,7 @@ global void HandleActionDemolish(Unit* unit)
             DestroyUnit(unit);
 	    // FIXME: Must play explosion sound
 
-	    // 	FIXME: Currently we take the X fields, the original only the O
+	    //	FIXME: Currently we take the X fields, the original only the O
 	    //		XXXXX ..O..
 	    //		XXXXX .OOO.
 	    //		XX.XX OO.OO
@@ -148,7 +138,7 @@ global void HandleActionDemolish(Unit* unit)
             n=SelectUnits(x-2,y-2, x+2, y+2,table);
 	    // FIXME: Don't hit flying units!
             for( i=0; i<n; ++i ) {
-	    	if ( table[i]->Type->LandUnit )
+	   	if ( table[i]->Type->LandUnit )
                    HitUnit(table[i],DEMOLISH_DAMAGE);
             }
 

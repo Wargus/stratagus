@@ -151,9 +151,7 @@ global void ReleaseUnit(Unit* unit)
 	}
     }
 
-#ifdef REFS_DEBUG
-    DebugCheck( unit->Refs );
-#endif
+    RefsDebugCheck( unit->Refs );
 
 #ifdef UNIT_ON_MAP
     if( 0 ) {		// debug check
@@ -2268,10 +2266,10 @@ global void HitUnit(Unit* unit,int damage)
 
     DebugCheck( damage==0 || unit->HP==0 || unit->Type->Vanishes );
 
-    if ( unit->UnholyArmor > 0 )
-      { //NOTE: vladi: units with active UnholyArmour are invulnerable
-      return;
-      }
+    if ( unit->UnholyArmor > 0 ) {
+	// vladi: units with active UnholyArmour are invulnerable
+	return;
+    }
 
     type=unit->Type;
     if( !unit->Attacked ) {

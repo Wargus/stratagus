@@ -63,9 +63,7 @@ local int MoveToOilWell(Unit* unit)
 
     well=unit->Orders[0].Goal;
     if( well && (well->Destroyed || !well->HP) ) {
-#ifdef REFS_DEBUG
-	DebugCheck( !well->Refs );
-#endif
+	RefsDebugCheck( !well->Refs );
 	if( !--well->Refs ) {
 	    ReleaseUnit(well);
 	}
@@ -87,22 +85,16 @@ local int MoveToOilWell(Unit* unit)
 	return -1;
     }
 
-#ifdef REFS_DEBUG
-    DebugCheck( !well->Refs );
-#endif
+    RefsDebugCheck( !well->Refs );
     --well->Refs;
-#ifdef REFS_DEBUG
-    DebugCheck( !well->Refs );
-#endif
+    RefsDebugCheck( !well->Refs );
     unit->Orders[0].Goal=NoUnitP;
 #else
     unit->Command.Action=UnitActionHaulOil;
 
     well=unit->Command.Data.Move.Goal;
     if( well && (well->Destroyed || !well->HP) ) {
-#ifdef REFS_DEBUG
-	DebugCheck( !well->Refs );
-#endif
+	RefsDebugCheck( !well->Refs );
 	if( !--well->Refs ) {
 	    ReleaseUnit(well);
 	}
@@ -124,13 +116,9 @@ local int MoveToOilWell(Unit* unit)
 	return -1;
     }
 
-#ifdef REFS_DEBUG
-    DebugCheck( !well->Refs );
-#endif
+    RefsDebugCheck( !well->Refs );
     --well->Refs;
-#ifdef REFS_DEBUG
-    DebugCheck( !well->Refs );
-#endif
+    RefsDebugCheck( !well->Refs );
     unit->Command.Data.Move.Goal=NoUnitP;
 #endif
 
@@ -347,9 +335,7 @@ local int MoveToOilDepot(Unit* unit)
 
     depot=unit->Orders[0].Goal;
     if( depot && (depot->Destroyed || !depot->HP) ) {
-#ifdef REFS_DEBUG
-	DebugCheck( !depot->Refs );
-#endif
+	RefsDebugCheck( !depot->Refs );
 	if( !--depot->Refs ) {
 	    ReleaseUnit(depot);
 	}
@@ -370,9 +356,7 @@ local int MoveToOilDepot(Unit* unit)
 
     depot=unit->Command.Data.Move.Goal;
     if( depot && (depot->Destroyed || !depot->HP) ) {
-#ifdef REFS_DEBUG
-	DebugCheck( !depot->Refs );
-#endif
+	RefsDebugCheck( !depot->Refs );
 	if( !--depot->Refs ) {
 	    ReleaseUnit(depot);
 	}
@@ -393,13 +377,9 @@ local int MoveToOilDepot(Unit* unit)
 
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,depot)!=1 );
 
-#ifdef REFS_DEBUG
-    DebugCheck( !depot->Refs );
-#endif
+    RefsDebugCheck( !depot->Refs );
     --depot->Refs;
-#ifdef REFS_DEBUG
-    DebugCheck( !depot->Refs );
-#endif
+    RefsDebugCheck( !depot->Refs );
     // FIXME: don't work unit->Command.Data.Move.Goal=NoUnitP;
 
     RemoveUnit(unit);
@@ -539,25 +519,17 @@ global void HandleActionHaulOil(Unit* unit)
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Orders[0].Goal ) {
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Orders[0].Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    --unit->Orders[0].Goal->Refs;
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Orders[0].Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    unit->Orders[0].Goal=NoUnitP;
 #else
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    unit->Command.Data.Move.Goal=NoUnitP;
 #endif
 			}
@@ -586,25 +558,17 @@ global void HandleActionHaulOil(Unit* unit)
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Orders[0].Goal ) {
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Orders[0].Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    --unit->Orders[0].Goal->Refs;
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Orders[0].Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Orders[0].Goal->Refs );
 			    unit->Orders[0].Goal=NoUnitP;
 #else
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
-#ifdef REFS_DEBUG
-			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-#endif
+			    RefsDebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    unit->Command.Data.Move.Goal=NoUnitP;
 #endif
 			}

@@ -163,21 +163,13 @@ global int SpellDeathCoilController( void* missile )
   int n;
 
   Missile* mis = (Missile*)missile;
-#ifdef REFS_DEBUG
-  DebugCheck( !mis->SourceUnit->Refs );
-#endif
+  RefsDebugCheck( !mis->SourceUnit->Refs );
   mis->SourceUnit->Refs--;
-#ifdef REFS_DEBUG
-  DebugCheck( !mis->SourceUnit->Refs );
-#endif
+  RefsDebugCheck( !mis->SourceUnit->Refs );
   if ( mis->TargetUnit ) {
-#ifdef REFS_DEBUG
-    DebugCheck( !mis->TargetUnit->Refs );
-#endif
+    RefsDebugCheck( !mis->TargetUnit->Refs );
     mis->TargetUnit->Refs--;
-#ifdef REFS_DEBUG
-    DebugCheck( !mis->TargetUnit->Refs );
-#endif
+    RefsDebugCheck( !mis->TargetUnit->Refs );
   }
   if ( mis->X == mis->DX && mis->Y == mis->DY )
     { // missile has reached target unit/spot
@@ -212,7 +204,7 @@ global int SpellDeathCoilController( void* missile )
 	            && table[i]->Type->Organic != 0);
 	  if ( ec > 0 )
 	    { // yes organic enemies found
-  	    for( i=0; i<n; ++i )
+	    for( i=0; i<n; ++i )
 	      if ( IsEnemy(mis->SourceUnit->Player,table[i])
 	            && table[i]->Type->Organic != 0 )
 	        {
@@ -227,7 +219,7 @@ global int SpellDeathCoilController( void* missile )
 		else
 		  table[i]->HP = hp;
 		}
-  	    mis->SourceUnit->HP += 50;
+	    mis->SourceUnit->HP += 50;
 	    if ( mis->SourceUnit->HP > mis->SourceUnit->Stats->HitPoints )
 	      mis->SourceUnit->HP = mis->SourceUnit->Stats->HitPoints;
 	    }
@@ -505,7 +497,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          break;
 //  ---human mages---
     case SpellActionFireball:
-    	   { //NOTE: fireball can be casted on spot
+	   { //NOTE: fireball can be casted on spot
 	   Missile* mis;
 	   int sx = unit->X;
 	   int sy = unit->Y;
@@ -530,7 +522,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-fireball"),
 	                sx, sy, dx, dy );
 
@@ -595,7 +587,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionBlizzard:
-    	 {
+	 {
 	 /*
 	   NOTE: vladi: blizzard differs than original in this way:
 	         original: launches 50 shards at 5 random spots x 10 for 25 mana
@@ -678,7 +670,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          break;
 //  ---orc death knights---
     case SpellActionDeathCoil:
-    	 if( (target && target->Type->Organic) || (!target) )
+	 if( (target && target->Type->Organic) || (!target) )
 	   {
 	   Missile* mis;
 	   int sx = unit->X;
@@ -694,7 +686,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-death-coil"),
 	                sx*TileSizeX+TileSizeX/2,
 	                sy*TileSizeX+TileSizeX/2,
@@ -706,7 +698,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   if (target)
 	     {
 	     mis->TargetUnit = target;
-  	     target->Refs++;
+	     target->Refs++;
 	     }
 	   mis->Controller = SpellDeathCoilController;
 	   }
@@ -739,13 +731,13 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 		    || Units[i]->Command.Action==UnitActionDie)
 		      && Units[i]->X == x && Units[i]->Y == y ) {
 #endif
- 	           //FIXME: URGENT: remove corpse
+	           //FIXME: URGENT: remove corpse
 		   //RemoveUnit( Units[i] );
 	           //UnitLost( Units[i] );
 	           //ReleaseUnit( Units[i] );
 	           MakeUnitAndPlace( x, y, UnitTypeByIdent("unit-skeleton"),
 	                             unit->Player );
-  	           unit->Mana -= spell->ManaCost;
+	           unit->Mana -= spell->ManaCost;
 	           break;
 	        }
 	   }
@@ -759,7 +751,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   Missile* mis;
 	   unit->Mana -= spell->ManaCost;
 
-  	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
+	   PlayGameSound(SoundIdForName(spell->Casted.Name),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent("missile-whirlwind"),
 	                x*TileSizeX+TileSizeX/2,
 	                y*TileSizeX+TileSizeX/2,
@@ -783,7 +775,7 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
          DebugCheck( unit->Mana < 0 );
          break;
     case SpellActionDeathAndDecay:
-    	 {
+	 {
 	 /*
 	   See notes about Blizzard spell above...
 	 */
