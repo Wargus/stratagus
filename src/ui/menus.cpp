@@ -2328,8 +2328,10 @@ local void SaveAction(void)
     char *filename;
     len = strlen(SaveGameMenuItems[1].d.input.buffer);
     strncpy(filename,SaveGameMenuItems[1].d.input.buffer,len - 3);
-    strncat(filename,".ccl",4);
+    strcat(filename,".ccl");
     SaveGame(filename);
+    SetMessage("Saved game to: %s", filename);
+    EndMenu();
 }
 
 local void GameMenuSave(void)
