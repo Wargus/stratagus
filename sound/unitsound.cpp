@@ -1491,6 +1491,9 @@ local void RemapSounds(void) {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Load all sounds for units.
+*/
 global void LoadUnitSounds(void) {
     if( SoundFildes!=-1 ) {
 	LoadSimpleSounds();
@@ -1499,6 +1502,9 @@ global void LoadUnitSounds(void) {
     }
 }
 
+/**
+**	FIXME: docu
+*/
 global void MapUnitSounds(void) {
     int i;
     int nb;

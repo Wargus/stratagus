@@ -53,7 +53,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 
     if( unit->Removed ) {		// Removed units, do nothing?
 	// If peon is in building or unit is in transporter it is removed.
-	unit->Wait=4;
+	unit->Wait=FRAMES_PER_SECOND/6;
 	return;
     }
 
@@ -246,9 +246,16 @@ global void ActionStillGeneric(Unit* unit,int ground)
 #else
 	if( (temp=unit->Command.Data.Move.Goal) ) {
 #endif
-	    RefsDebugCheck( !temp->Refs );
-	    temp->Refs--;
-	    RefsDebugCheck( !temp->Refs );
+	    if( temp->Destroyed ) {
+		RefsDebugCheck( !temp->Refs );
+		if( !--temp->Refs ) {
+		    ReleaseUnit(temp);
+		}
+	    } else {
+		RefsDebugCheck( !temp->Refs );
+		temp->Refs--;
+		RefsDebugCheck( !temp->Refs );
+	    }
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Goal=NoUnitP;
 #else
@@ -295,7 +302,6 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	return;
     }
 }
-
 
 /**
 **	Unit stands still!

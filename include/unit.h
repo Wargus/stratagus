@@ -121,7 +121,7 @@ struct _command_ {
 	    unsigned	SY;		/// Source
 	    unsigned	DX;
 	    unsigned	DY;		/// Destination
-	    int         SpellId;	/// spell type id
+	    void*	Spell;		/// spell type id
 	} Move;				/// move:
 	struct {
 	    unsigned	Fast : 1;	/// Can fast move
@@ -303,9 +303,11 @@ struct _unit_ {
     struct _order_resource_ {
 	int	Active;			/// how much units are in the resource
     }		Resource;		/// Resource still
+/* FIXME: move and harvest.
     struct _order_harvest_ {
 	unsigned WoodToHarvest;		/// Ticks for harvest
     }		Harvest;		/// Harvest action
+*/
     struct _order_research_ {
 	unsigned Ticks;			/// Ticks for research
 	Upgrade* Upgrade;		/// Upgrade researched
@@ -314,7 +316,7 @@ struct _unit_ {
 	unsigned	Ticks;		/// Ticks to complete
 	UnitType*	What;		/// Unit upgraded to
     } UpgradeTo;			/// Upgrade to action
-    struct _order_traub_ {
+    struct _order_train_ {
 	unsigned	Ticks;		/// Ticks to complete
 	unsigned	Count;		/// Units in training queue
 	// FIXME: vladi: later we should train more units or automatic
@@ -507,12 +509,14 @@ extern void DestroyAllInside(Unit* source);
     /// FIXME: more docu
 extern void HitUnit(Unit* unit,int damage);
 
-    /// FIXME: more docu
+    /// Returns the map distance between two points.
 extern int MapDistance(int x1,int y1,int x2,int y2);
-    /// FIXME: more docu
+    ///	Returns the map distance between two points with unit type.
 extern int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2);
-    /// FIXME: more docu
+    ///	Returns the map distance to unit.
 extern int MapDistanceToUnit(int x,int y,const Unit* dest);
+    ///	Returns the map distance between two units.
+extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 
     /// FIXME: more docu
 extern int ViewPointDistance(int x,int y);

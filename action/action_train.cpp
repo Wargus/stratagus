@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name action_train.c -	The building train action. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -54,6 +53,15 @@ global void HandleActionTrain(Unit* unit)
 
     player=unit->Player;
 #ifdef NEW_ORDERS
+    //
+    //	First entry
+    //
+    if( !unit->SubAction ) {
+	unit->Data.Train.Ticks=0;
+	unit->Data.Train.What[0]=unit->Orders[0].Type;
+	unit->Data.Train.Count=1;
+	unit->SubAction=1;
+    }
     unit->Data.Train.Ticks+=SpeedTrain;
     // FIXME: Should count down
     if( unit->Data.Train.Ticks
@@ -109,9 +117,8 @@ global void HandleActionTrain(Unit* unit)
 	    AiTrainingComplete(unit,nunit);
 	}
 
-	unit->Reset=1;
-	unit->Wait=1;
-        
+	unit->Reset=unit->Wait=1;
+
 #ifdef NEW_ORDERS
 	if ( --unit->Data.Train.Count ) {
 	    int z;
@@ -121,6 +128,7 @@ global void HandleActionTrain(Unit* unit)
 	    unit->Data.Train.Ticks=0;
 	} else {
 	    unit->Orders[0].Action=UnitActionStill;
+	    unit->SubAction=0;
 	}
 
 	nunit->Orders[0]=unit->NewOrder;
@@ -145,6 +153,7 @@ global void HandleActionTrain(Unit* unit)
 	    unit->Command.Data.Train.Ticks=0;
 	} else {
 	    unit->Command.Action=UnitActionStill;
+	    unit->SubAction=0;
 	}
 
 	nunit->Command=unit->PendCommand;

@@ -69,8 +69,8 @@ typedef enum _spell_action_type_ {
 */
 typedef struct _spell_type_ {
 
-    int  Id;			/// index in the table (set by InitSpells())
-    char Ident[64];		/// spell name (ident)
+    char* Ident;		/// spell identifier
+    char* Name;			/// spell name shown by the engine
 
     int  Range;			/// spell range
     int  ManaCost;		/// required mana for each cast

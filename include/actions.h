@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name actions.h	-	The actions headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __ACTIONS_H__
 #define __ACTIONS_H__
@@ -27,6 +26,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "upgrade.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -39,6 +39,11 @@
 /*----------------------------------------------------------------------------
 --	Commands:	in command.c
 ----------------------------------------------------------------------------*/
+
+/*
+**	This functions gives an unit a new command. If the command is given
+**	by the user the function with Send prefix should be used.
+*/
 
     /// Prepare command stop
 extern void CommandStopUnit(Unit* unit);
@@ -71,7 +76,7 @@ extern void CommandMineGold(Unit* unit,Unit* dest,int flush);
     /// Prepare command haul
 extern void CommandHaulOil(Unit* unit,Unit* dest,int flush);
     /// Prepare command return
-extern void CommandReturnGoods(Unit* unit,int flush);
+extern void CommandReturnGoods(Unit* unit,Unit* goal,int flush);
     /// Prepare command train
 extern void CommandTrainUnit(Unit* unit,UnitType* what,int flush);
     /// Prepare command cancel training
@@ -90,7 +95,7 @@ extern void CommandCancelResearch(Unit* unit);
 extern void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush);
     /// Prepare command spellcast
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
-	,int spellid, int flush);
+	,SpellType* spell, int flush);
 
 /*----------------------------------------------------------------------------
 --	Actions:	in action_<name>.c
@@ -102,12 +107,16 @@ extern void ActionStillGeneric(Unit* unit,int ground);
 extern void HandleActionStill(Unit* unit);
     /// Handle command stand ground
 extern void HandleActionStandGround(Unit* unit);
+    /// Generic move action
+extern int DoActionMove(Unit* unit);
     /// Handle command move
-extern int HandleActionMove(Unit* unit);
+extern void HandleActionMove(Unit* unit);
     /// Handle command repair
-extern int HandleActionRepair(Unit* unit);
+extern void HandleActionRepair(Unit* unit);
     /// Handle command patrol
 extern void HandleActionPatrol(Unit* unit);
+    /// Show attack animation
+extern void AnimateActionAttack(Unit* unit);
     /// Handle command attack
 extern void HandleActionAttack(Unit* unit);
     /// Handle command board
@@ -123,13 +132,11 @@ extern void HandleActionHaulOil(Unit* unit);
     /// Handle command return
 extern void HandleActionReturnGoods(Unit* unit);
     /// Handle command die
-extern int HandleActionDie(Unit* unit);
+extern void HandleActionDie(Unit* unit);
     /// Handle command build
 extern void HandleActionBuild(Unit* unit);
     /// Handle command builded
 extern void HandleActionBuilded(Unit* unit);
-    /// Handle command attack
-extern int AnimateActionAttack(Unit* unit);
     /// Handle command train
 extern void HandleActionTrain(Unit* unit);
     /// Handle command upgrade to

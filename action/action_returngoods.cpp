@@ -124,7 +124,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    ,unit->Command.Data.Move.DX,unit->Command.Data.Move.DY);
 	unit->Command.Action=UnitActionHarvest;
 #endif
-	unit->SubAction=2;		// FIXME: Hardcoded
+	unit->SubAction=128;		// FIXME: Hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
 	unit->Wait=1;
 	return;

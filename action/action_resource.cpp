@@ -76,7 +76,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 {
     Unit* goal;
 
-    switch( HandleActionMove(unit) ) {	// reached end-point?
+    switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Action=resource->Action;
@@ -250,7 +250,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 */
 local int WaitInResource(Unit* unit,const Resource* resource)
 {
-    Unit* goal;
+    Unit* source;
     Unit* depot;
 
     DebugLevel3Fn("Waiting\n");
@@ -259,10 +259,11 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	//	Have the resource
 	//
-	goal=resource->ResourceOnMap(unit->X,unit->Y);
+	source=resource->ResourceOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y,UnitNumber(goal));
-	    if( !goal ) {
+	    DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y
+		,UnitNumber(source));
+	    if( !source ) {
 		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
 		abort();
 	    } );
@@ -271,32 +272,32 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	Update the resource.
 	//	Remove what we can carry, FIXME: always this?
 	//
-	goal->Value-=DEFAULT_INCOMES[resource->Cost];
+	source->Value-=DEFAULT_INCOMES[resource->Cost];
 #ifdef NEW_ORDERS
-	DebugLevel3Fn("-%d\n",goal->Data.Resource.Active);
-	if( !--goal->Data.Resource.Active ) {
-	    goal->Frame=0;
-	    CheckUnitToBeDrawn(goal);
+	DebugLevel3Fn("-%d\n",source->Data.Resource.Active);
+	if( !--source->Data.Resource.Active ) {
+	    source->Frame=0;
+	    CheckUnitToBeDrawn(source);
 	}
 #else
-	DebugLevel3Fn("-%d\n",goal->Command.Data.Resource.Active);
-	if( !--goal->Command.Data.Resource.Active ) {
-	    goal->Frame=0;
-	    CheckUnitToBeDrawn(goal);
+	DebugLevel3Fn("-%d\n",source->Command.Data.Resource.Active);
+	if( !--source->Command.Data.Resource.Active ) {
+	    source->Frame=0;
+	    CheckUnitToBeDrawn(source);
 	}
 #endif
-	if( IsSelected(goal) ) {
+	if( IsSelected(source) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}
 
 	//
 	//	End of resource: destroy the resource.
 	//
-	if( goal->Value<DEFAULT_INCOMES[resource->Cost] ) {
+	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
 	    unit->Removed=0;		// BUG ALERT: Unit not dropped out!
-	    DropOutAll(goal);
-	    DestroyUnit(goal);
-	    goal=NULL;
+	    DropOutAll(source);
+	    DestroyUnit(source);
+	    source=NULL;
 	}
 
 	//
@@ -307,6 +308,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	} else if( unit->Type==*resource->Orc ) {
 	    unit->Type=*resource->OrcWithResource;
 	} else {
+	    // FIXME: should support more races
 	    DebugLevel0Fn("Wrong unit-type `%s' for resource `%s'\n"
 		,unit->Type->Ident,DEFAULT_NAMES[resource->Cost]);
 	}
@@ -315,9 +317,9 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	Find and send to resource deposit.
 	//
 	if( !(depot=resource->FindDeposit(unit->Player,unit->X,unit->Y)) ) {
-	    if( goal ) {
+	    if( source ) {
 		DropOutOnSide(unit,LookingW
-		    ,goal->Type->TileWidth,goal->Type->TileHeight);
+		    ,source->Type->TileWidth,source->Type->TileHeight);
 	    } else {
 		DropOutOnSide(unit,LookingW,1,1);
 	    }
@@ -326,12 +328,9 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    unit->SubAction=0;
 	    // should return 0, done below!
 	} else {
-	    if( goal ) {
-		DropOutNearest(unit,depot->X,depot->Y
-			,goal->Type->TileWidth,goal->Type->TileHeight);
-	    } else {
-		DropOutNearest(unit,depot->X,depot->Y,1,1);
-	    }
+	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+		    ,depot->Y+depot->Type->TileHeight/2
+		    ,source->Type->TileWidth,source->Type->TileHeight);
 	    ResetPath(unit->Orders[0]);
 	    unit->Orders[0].Goal=depot;
 	    RefsDebugCheck( !depot->Refs );
@@ -354,12 +353,9 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    unit->SubAction=0;
 	    // should return 0, done below!
 	} else {
-	    if( goal ) {
-		DropOutNearest(unit,depot->X,depot->Y
-			,goal->Type->TileWidth,goal->Type->TileHeight);
-	    } else {
-		DropOutNearest(unit,depot->X,depot->Y,1,1);
-	    }
+	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+		    ,depot->Y+depot->Type->TileHeight/2
+		    ,source->Type->TileWidth,source->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=depot;
 	    RefsDebugCheck( !depot->Refs );
@@ -373,7 +369,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
         CheckUnitToBeDrawn(unit);
 	if( IsSelected(unit) ) {
 	    UpdateButtonPanel();
-	    MustRedraw|=RedrawButtonPanel;
 	}
 	unit->Wait=1;
 	return unit->Command.Action==resource->Action;
@@ -404,7 +399,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 {
     Unit* goal;
 
-    switch( HandleActionMove(unit) ) {	// reached end-point?
+    switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 #ifdef NEW_ORDERS
 	    unit->Orders[0].Action=resource->Action;
@@ -590,8 +585,9 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
-	    DropOutNearest(unit,goal->X,goal->Y
-		,depot->Type->TileWidth,depot->Type->TileHeight);
+	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
+		    ,goal->Y+goal->Type->TileHeight/2
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Orders[0].Goal=goal;
 	    RefsDebugCheck( !goal->Refs );
@@ -617,8 +613,9 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	    unit->Command.Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {
-	    DropOutNearest(unit,goal->X,goal->Y
-		,depot->Type->TileWidth,depot->Type->TileHeight);
+	    DropOutNearest(unit,goal->X+goal->Type->TileWidth/2
+		    ,goal->Y+goal->Type->TileHeight/2
+		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    ResetPath(unit->Command);
 	    unit->Command.Data.Move.Goal=goal;
 	    RefsDebugCheck( !goal->Refs );

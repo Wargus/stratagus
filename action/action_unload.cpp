@@ -46,7 +46,7 @@ local int MoveToCoast(Unit* unit)
 {
     DebugLevel3Fn("%p\n",unit->Command.Data.Move.Goal);
 
-    switch( HandleActionMove(unit) ) {	// reached end-point?
+    switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:
 	    DebugLevel2Fn("COAST NOT REACHED\n");
 	    return -1;
@@ -154,9 +154,15 @@ global void HandleActionUnload(Unit* unit)
 
     switch( unit->SubAction ) {
 	//
-	//	Move to transporter
+	//	Move the transporter
 	//
 	case 0:
+#ifdef NEW_ORDERS
+	    NewResetPath(unit);
+#endif
+	    unit->SubAction=1;
+	    // FALL THROUGH
+	case 1:
 #ifdef NEW_ORDERS
 	    if( !unit->Orders[0].Goal ) {
 #else
@@ -174,7 +180,7 @@ global void HandleActionUnload(Unit* unit)
 			    unit->SubAction=0;
 			}
 		    } else {
-			unit->SubAction=1;
+			unit->SubAction=2;
 		    }
 		}
 		break;
@@ -182,7 +188,7 @@ global void HandleActionUnload(Unit* unit)
 	//
 	//	Leave the transporter
 	//
-	case 1:
+	case 2:
 	    // FIXME: show still animations ?
 	    LeaveTransporter(unit);
 	    break;

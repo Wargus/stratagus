@@ -50,10 +50,30 @@ local void ReleaseOrder(Order* order)
     if( order->Goal ) {
 	RefsDebugCheck( !order->Goal->Refs );
 	if( !--order->Goal->Refs ) {
+	    DebugCheck( !order->Goal->Destroyed );
 	    ReleaseUnit(order->Goal);
 	}
 	order->Goal=NoUnitP;
     }
+}
+
+/**
+**	Release all orders of an unit.
+**
+**	@param unit	Pointer to unit.
+*/
+local void ReleaseOrders(Unit* unit)
+{
+    int n;
+
+    if( (n=unit->OrderCount)>1 ) {
+	while( --n ) {
+	    ReleaseOrder(&unit->Orders[n]);
+	}
+	unit->OrderCount=1;
+    }
+    unit->OrderFlush=1;
+    // Order 0 must be stopped in the action loop.
 }
 
 /**
@@ -67,14 +87,11 @@ local void ReleaseOrder(Order* order)
 local Order* GetNextOrder(Unit* unit,int flush)
 {
     if( flush ) {			// empty command queue
-	if( unit->OrderCount>1 ) {
-	    DebugLevel0Fn("FIXME: must free the order queue\n");
-	}
-	unit->OrderCount=unit->OrderFlush=1;
-	// Order 0 must stopped in the action loop.
+	ReleaseOrders(unit);
     } else if( unit->OrderCount==MAX_ORDERS ) {
 	// FIXME: johns: wrong place for an error message.
 	// FIXME: johns: should be checked by AI or the user interface
+	// NOTE: But must still be checked here.
 	if( unit->Player==ThisPlayer ) {
 	    // FIXME: use a general notify call
             SetMessage( "Unit order list is full" );
@@ -95,10 +112,10 @@ local Order* GetNextOrder(Unit* unit,int flush)
 */
 local void ClearSavedAction(Unit* unit)
 {
-    unit->SavedOrder.Action=UnitActionStill;	// clear saved action
-    unit->SavedOrder.X=-1;
-    unit->SavedOrder.Y=-1;
     ReleaseOrder(&unit->SavedOrder);
+
+    unit->SavedOrder.Action=UnitActionStill;	// clear saved action
+    unit->SavedOrder.X=unit->SavedOrder.Y=-1;
     unit->SavedOrder.Type=NULL;
     unit->SavedOrder.Arg1=NULL;
 }
@@ -159,10 +176,11 @@ global void CommandStopUnit(Unit* unit)
 #ifdef NEW_ORDERS
     Order* order;
 
-    order=GetNextOrder(unit,1);		// Flush them.
+    // Ignore that the unit could be removed.
+
+    order=GetNextOrder(unit,FlushCommands);	// Flush them.
     order->Action=UnitActionStill;
-    order->X=-1;
-    order->Y=-1;
+    order->X=order->Y=-1;
     order->Goal=NoUnitP;
     order->Type=NULL;
     order->Arg1=NULL;
@@ -192,14 +210,20 @@ global void CommandStandGround(Unit* unit,int flush)
 #ifdef NEW_ORDERS
     Order* order;
 
-    if( (order=GetNextOrder(unit,flush)) ) {
-	order->Action=UnitActionStandGround;
-	order->X=-1;
-	order->Y=-1;
-	order->Goal=NoUnitP;
-	order->Type=NULL;
-	order->Arg1=NULL;
+    // Ignore that the unit could be removed.
+
+    if( unit->Type->Building ) {
+	// FIXME: should find a better way for pending orders.
+	order=&unit->NewOrder;
+	ReleaseOrder(order);
+    } else if( !(order=GetNextOrder(unit,flush)) ) {
+	return;
     }
+    order->Action=UnitActionStandGround;
+    order->X=order->Y=-1;
+    order->Goal=NoUnitP;
+    order->Type=NULL;
+    order->Arg1=NULL;
 #else
     Command* command;
 
@@ -226,39 +250,69 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
 #ifdef NEW_ORDERS
     Order* order;
 
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending orders.
-	order=&unit->NewOrder;
-    } else if( !(order=GetNextOrder(unit,flush)) ) {
-	return;
-    }
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
 
-    order->Action=UnitActionFollow;
-    ResetPath(*order);
-    order->Goal=dest;
-    RefsDebugCheck( !dest->Refs );
-    dest->Refs++;
-    order->RangeX=order->RangeY=1;
-    order->X=-1;
-    order->Y=-1;
-    order->Type=NULL;
-    order->Arg1=NULL;
+	order->Action=UnitActionFollow;
+	//
+	//	Destination could be killed.
+	//	Should be handled in action, but is not possible!
+	//		Unit::Refs is used as timeout counter.
+	//
+	if( dest->Destroyed ) {
+	    order->X=dest->X+dest->Type->TileWidth/2;
+	    order->Y=dest->Y+dest->Type->TileHeight/2;
+	    order->Goal=NoUnitP;
+	    order->RangeX=order->RangeY=0;
+	} else {
+	    order->X=order->Y=-1;
+	    order->Goal=dest;
+	    RefsDebugCheck( !dest->Refs );
+	    dest->Refs++;
+	    order->RangeX=order->RangeY=1;
+	}
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
-    if( !(command=GetNextCommand(unit,flush)) ) {
-	return;
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( !(command=GetNextCommand(unit,flush)) ) {
+	    return;
+	}
+
+	command->Action=UnitActionFollow;
+	ResetPath(*command);
+	//
+	//	Destination could be killed.
+	//	Should be handled in action, but is not possible!
+	//		Unit::Refs is used as timeout counter.
+	//
+	if( dest->Destroyed ) {
+	    command->Data.Move.Goal=NoUnitP;
+	    command->Data.Move.DX=dest->X+dest->Type->TileWidth/2;
+	    command->Data.Move.DY=dest->Y+dest->Type->TileHeight/2;
+	} else {
+	    command->Data.Move.Goal=dest;
+	    RefsDebugCheck( !dest->Refs );
+	    dest->Refs++;
+	}
+	command->Data.Move.Range=1;
+	command->Data.Move.SX=command->Data.Move.SY=-1;
     }
-
-    command->Action=UnitActionFollow;
-    ResetPath(*command);
-    command->Data.Move.Goal=dest;
-    RefsDebugCheck( !dest->Refs );
-    dest->Refs++;
-    command->Data.Move.Range=1;
-    command->Data.Move.SX=-1;
-    command->Data.Move.SY=-1;
-
 #endif
     ClearSavedAction(unit);
 }
@@ -274,7 +328,35 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
 global void CommandMove(Unit* unit,int x,int y,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0Fn("Internal movement error\n");
+	    return;
+	}
+    );
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionMove;
+	order->Goal=NoUnitP;
+	order->X=x;
+	order->Y=y;
+	order->RangeX=order->RangeY=0;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -322,7 +404,41 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionRepair;
+	//
+	//	Destination could be killed.
+	//	Should be handled in action, but is not possible!
+	//		Unit::Refs is used as timeout counter.
+	//
+	if( dest->Destroyed ) {
+	    order->X=dest->X+dest->Type->TileWidth/2;
+	    order->Y=dest->Y+dest->Type->TileHeight/2;
+	    order->Goal=NoUnitP;
+	    order->RangeX=order->RangeY=0;
+	} else {
+	    order->X=order->Y=-1;
+	    order->Goal=dest;
+	    RefsDebugCheck( !dest->Refs );
+	    dest->Refs++;
+	    order->RangeX=order->RangeY=REPAIR_RANGE;
+	}
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -355,6 +471,7 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     ResetPath(*command);
     command->Data.Move.Goal=dest;
     if( dest ) {
+	RefsDebugCheck( dest->Destroyed || !dest->Refs );
 	dest->Refs++;
     }
     command->Data.Move.Range=REPAIR_RANGE;
@@ -379,7 +496,66 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
 global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0Fn("Internal movement error\n");
+	    return;
+	}
+	if( unit->Type->Vanishes ) {
+	    DebugLevel0Fn("Internal error\n");
+	    abort();
+	}
+    );
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionAttack;
+	if( attack ) {
+	    //
+	    //	Destination could be killed.
+	    //	Should be handled in action, but is not possible!
+	    //		Unit::Refs is used as timeout counter.
+	    //
+	    if( attack->Destroyed ) {
+		order->X=attack->X+attack->Type->TileWidth/2;
+		order->Y=attack->Y+attack->Type->TileHeight/2;
+		order->Goal=NoUnitP;
+		order->RangeX=order->RangeY=0;
+	    } else {
+		order->X=order->Y=-1;
+		order->Goal=attack;
+		RefsDebugCheck( !attack->Refs );
+		attack->Refs++;
+		order->RangeX=order->RangeY=unit->Stats->AttackRange;
+	    }
+	} else if( WallOnMap(x,y) ) {
+	    // FIXME: look into action_attack.c about this ugly problem
+	    order->X=x;
+	    order->Y=y;
+	    order->RangeX=order->RangeY=unit->Stats->AttackRange;
+	    order->Goal=NoUnitP;
+	} else {
+	    order->X=x;
+	    order->Y=y;
+	    order->RangeX=order->RangeY=0;
+	    order->Goal=NoUnitP;
+	}
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
+
 #else
     Command* command;
 
@@ -409,6 +585,7 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
     // choose goal and good attack range
     if( attack ) {
 	command->Data.Move.Goal=attack;
+	RefsDebugCheck( attack->Destroyed || !attack->Refs );
 	attack->Refs++;
 	command->Data.Move.Range=unit->Stats->AttackRange;
     } else {
@@ -439,7 +616,38 @@ global void CommandAttack(Unit* unit,int x,int y,Unit* attack,int flush)
 global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0Fn("Internal movement error\n");
+	    return;
+	}
+    );
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionAttackGround;
+	order->X=x;
+	order->Y=y;
+	order->RangeX=order->RangeY=unit->Stats->AttackRange;
+	order->Goal=NoUnitP;
+	order->Type=NULL;
+	order->Arg1=NULL;
+
+	DebugLevel0("FIXME this next\n");
+    }
+
 #else
     Command* command;
 
@@ -464,7 +672,7 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
     // FIXME: pathfinder didn't support this kind of target
-    DebugLevel0("Fixme this next\n");
+    DebugLevel0("FIXME this next\n");
 
 #endif
     ClearSavedAction(unit);
@@ -472,6 +680,8 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 
 /**
 **	Let an unit patrol from current to new position
+**
+**	FIXME: want to support patroling between units.
 **
 **	@param unit	pointer to unit.
 **	@param x	X map position to patrol between.
@@ -481,7 +691,35 @@ global void CommandAttackGround(Unit* unit,int x,int y,int flush)
 global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    IfDebug(
+	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
+	    DebugLevel0Fn("Internal movement error\n");
+	    return;
+	}
+    );
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionPatrol;
+	order->Goal=NoUnitP;
+	order->X=x;
+	order->Y=y;
+	order->RangeX=order->RangeY=0;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -519,7 +757,38 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 global void CommandBoard(Unit* unit,Unit* dest,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	//
+	//	Destination could be killed.
+	//	Should be handled in action, but is not possible!
+	//		Unit::Refs is used as timeout counter.
+	//
+	if( dest->Destroyed ) {
+	    return;
+	}
+
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionBoard;
+	order->X=order->Y=-1;
+	order->Goal=dest;
+	RefsDebugCheck( !dest->Refs );
+	dest->Refs++;
+	order->RangeX=order->RangeY=1;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -530,13 +799,13 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionBoard;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
+    RefsDebugCheck( dest->Destroyed || !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=dest->X;
     command->Data.Move.DY=dest->Y;
-
 #endif
     ClearSavedAction(unit);
 }
@@ -553,7 +822,38 @@ global void CommandBoard(Unit* unit,Unit* dest,int flush)
 global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionUnload;
+	order->X=x;
+	order->Y=y;
+	//
+	//	Destination could be killed.
+	//	Should be handled in action, but is not possible!
+	//		Unit::Refs is used as timeout counter.
+	//
+	order->Goal=NoUnitP;
+	if( what && !what->Destroyed ) {
+	    order->Goal=what;
+	    RefsDebugCheck( !what->Refs );
+	    what->Refs++;
+	}
+	order->RangeX=order->RangeY=0;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -572,6 +872,7 @@ global void CommandUnload(Unit* unit,int x,int y,Unit* what,int flush)
     ResetPath(*command);
     command->Data.Move.Goal=what;
     if( what ) {
+	RefsDebugCheck( what->Destroyed || !what->Refs );
 	what->Refs++;
     }
     command->Data.Move.Range=0;
@@ -597,7 +898,37 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 	,UnitType* what,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionBuild;
+	order->Goal=NoUnitP;
+	if( what->ShoreBuilding ) {
+	    order->RangeX=what->TileWidth+1;
+	    order->RangeY=what->TileHeight+1;
+	    order->X=x-1;
+	    order->Y=y-1;
+	} else {
+	    // FIXME: -1 read note in pathfinder, some old wired code.
+	    order->RangeX=what->TileWidth-1;
+	    order->RangeY=what->TileHeight-1;
+	    order->X=x;
+	    order->Y=y;
+	}
+	order->Type=what;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -639,7 +970,12 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 global void CommandCancelBuilding(Unit* unit,Unit* worker)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    //
+    //	Check if building is still under construction? (NETWORK!)
+    //
+    if( unit->Orders[0].Action==UnitActionBuilded ) {
+	unit->Data.Builded.Cancel=1;
+    }
 #else
 #if 0
     if( unit->Command.Action==UnitActionBuilded ) {
@@ -675,9 +1011,28 @@ global void CommandCancelBuilding(Unit* unit,Unit* worker)
 global void CommandHarvest(Unit* unit,int x,int y,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
 
-    unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionHarvest;
+	order->X=x-1;
+	order->Y=y-1;
+	order->RangeX=order->RangeY=2;
+	order->Goal=NoUnitP;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -700,8 +1055,8 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
     command->Data.Move.DX=x-1;
     command->Data.Move.DY=y-1;
 
-    ClearSavedAction(unit);
 #endif
+    ClearSavedAction(unit);
 }
 
 /**
@@ -714,7 +1069,31 @@ global void CommandHarvest(Unit* unit,int x,int y,int flush)
 global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid and Goal still alive? (NETWORK!)
+    //
+    if( !unit->Removed && !dest->Destroyed ) {
+	// FIXME: if low-level supports searching, pass NoUnitP down.
+
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionMineGold;
+	order->X=order->Y=-1;
+	order->Goal=dest;
+	RefsDebugCheck( !dest->Refs );
+	dest->Refs++;
+	order->RangeX=order->RangeY=1;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -728,13 +1107,12 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionMineGold;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-    RefsDebugCheck( !dest->Refs );
+    RefsDebugCheck( dest->Destroyed || !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=-1;
-    command->Data.Move.DY=-1;
+    command->Data.Move.DX=command->Data.Move.DY=-1;
 
 #endif
     ClearSavedAction(unit);
@@ -750,7 +1128,31 @@ global void CommandMineGold(Unit* unit,Unit* dest,int flush)
 global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid and Goal still alive? (NETWORK!)
+    //
+    if( !unit->Removed && !dest->Destroyed ) {
+	// FIXME: if low-level supports searching, pass NoUnitP down.
+
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionHaulOil;
+	order->X=order->Y=-1;
+	order->Goal=dest;
+	RefsDebugCheck( !dest->Refs );
+	dest->Refs++;
+	order->RangeX=order->RangeY=1;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     Command* command;
 
@@ -764,13 +1166,12 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionHaulOil;
     ResetPath(*command);
     command->Data.Move.Goal=dest;
-    RefsDebugCheck( !dest->Refs );
+    RefsDebugCheck( dest->Destroyed || !dest->Refs );
     dest->Refs++;
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
-    command->Data.Move.DX=-1;
-    command->Data.Move.DY=-1;
+    command->Data.Move.DX=command->Data.Move.DY=-1;
 
 #endif
     ClearSavedAction(unit);
@@ -780,12 +1181,41 @@ global void CommandHaulOil(Unit* unit,Unit* dest,int flush)
 **	Let unit returning goods.
 **
 **	@param unit	pointer to unit.
+**	@param goal	bring goods to this depot.
 **	@param flush	if true, flush command queue.
 */
-global void CommandReturnGoods(Unit* unit,int flush)
+global void CommandReturnGoods(Unit* unit,Unit* goal,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    Order* order;
+
+    //
+    //	Check if unit is still valid and Goal still alive? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionReturnGoods;
+	order->X=order->Y=-1;
+	order->Goal=NoUnitP;
+	//
+	//	Destination could be killed. NETWORK!
+	//
+	if( goal && !goal->Destroyed ) {
+	    order->Goal=goal;
+	    RefsDebugCheck( !goal->Refs );
+	    goal->Refs++;
+	}
+	order->RangeX=order->RangeY=1;
+	order->Type=NULL;
+	order->Arg1=NULL;
+    }
 #else
     // FIXME: flush, and command que not supported!
 
@@ -813,9 +1243,6 @@ global void CommandReturnGoods(Unit* unit,int flush)
 global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
-
-#else
     //
     //	Check if enough resources remains? (NETWORK!)
     //
@@ -823,6 +1250,59 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 	    || PlayerCheckUnitType(unit->Player,type) ) {
 	return;
     }
+
+    //
+    //	Not already training?
+    //
+    if( unit->Orders[0].Action!=UnitActionTrain ) {
+
+	DebugCheck( unit->Wait>6 );
+
+	if( unit->OrderCount==2 && unit->Orders[1].Action==UnitActionTrain ) {
+	    DebugLevel0Fn("FIXME: not supported. Unit queue full!\n");
+	    return;
+	} else {
+	    ReleaseOrders(unit);
+	    unit->Orders[1].Action=UnitActionTrain;
+	}
+	DebugCheck( unit->OrderCount!=1 || unit->OrderFlush!=1 );
+
+	unit->OrderCount=2;
+	unit->Orders[1].Type=type;
+	unit->Orders[1].X=unit->Orders[1].Y=-1;
+	unit->Orders[1].Goal=NoUnitP;
+	unit->Orders[1].Arg1=NULL;
+    } else {
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    MustRedraw|=RedrawInfoPanel;
+	}
+
+	//
+	//	Training slots are all already full. (NETWORK!)
+	//
+	if( unit->Data.Train.Count>=MAX_UNIT_TRAIN ) {
+	    DebugLevel0Fn("Unit queue full!\n");
+	    return;
+	}
+
+	unit->Data.Train.What[unit->Data.Train.Count++]=type;
+    }
+    // FIXME: if you give quick an other order, the resources are lost!
+    PlayerSubUnitType(unit->Player,type);
+
+#else
+
+    //
+    //	Check if enough resources remains? (NETWORK!)
+    //
+    if( !PlayerCheckFood(unit->Player,type)
+	    || PlayerCheckUnitType(unit->Player,type) ) {
+	return;
+    }
+    // FIXME: if you give quick an other order, the resources are lost!
     PlayerSubUnitType(unit->Player,type);
 
     //
@@ -847,7 +1327,7 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 	//
 	if( command->Data.Train.Count>=MAX_UNIT_TRAIN ) {
 	    DebugLevel0Fn("Unit queue full!\n");
-	    //PlayerAddUnitType(unit->Player,type);
+	    PlayerAddUnitType(unit->Player,type);
 	    return;
 	}
 	command->Data.Train.What[command->Data.Train.Count++]=type;
@@ -884,7 +1364,46 @@ global void CommandTrainUnit(Unit* unit,UnitType* type,int flush)
 global void CommandCancelTraining(Unit* unit,int slot)
 {
 #ifdef NEW_ORDERS
-    DebugLevel0Fn("FIXME: not written\n");
+    int i;
+    int n;
+
+    // FIXME: over network we could cancel the wrong slot.
+
+    //
+    //	Check if unit is still training 'slot'? (NETWORK!)
+    //
+    if( unit->Orders[0].Action==UnitActionTrain
+	    && slot<(n=unit->Data.Train.Count) ) {
+
+	PlayerAddCostsFactor(unit->Player,
+		unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
+		CancelTrainingCostsFactor);
+
+	if ( --n ) {
+	    for( i = slot; i < n; i++ ) {
+		unit->Data.Train.What[i] = unit->Data.Train.What[i+1];
+	    }
+	    if( !slot ) {
+		unit->Data.Train.Ticks=0;
+	    }
+	    unit->Data.Train.Count=n;
+	} else {
+	    DebugLevel0Fn("Last slot\n");
+	    unit->Orders[0].Action=UnitActionStill;
+	    unit->SubAction=0;
+	}
+
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next training
+    }
+
 #else
     int i;
     int n;
@@ -912,6 +1431,7 @@ global void CommandCancelTraining(Unit* unit,int slot)
 	    unit->Command.Data.Train.Count=n;
 	} else {
 	    unit->Command.Action=UnitActionStill;
+	    unit->SubAction=0;
 	}
 
 	//
@@ -926,6 +1446,7 @@ global void CommandCancelTraining(Unit* unit,int slot)
     }
 
 #endif
+
     ClearSavedAction(unit);
 }
 
@@ -941,15 +1462,34 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 #ifdef NEW_ORDERS
     Order* order;
 
-    DebugLevel0Fn("FIXME: must support order queing!!");
-    order=GetNextOrder(unit,1);		// Flush them.
+    //
+    //	Check if unit is still valid and Goal still alive? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	//
+	//	Check if enough resources remains? (NETWORK!)
+	//
+	if( PlayerCheckUnitType(unit->Player,type) ) {
+	    return;
+	}
 
-    order->Action=UnitActionUpgradeTo;
-    order->X=-1;
-    order->Y=-1;
-    order->Goal=NoUnitP;
-    order->Type=NULL;
-    order->Arg1=type;
+	if( !flush ) {
+	    DebugLevel0Fn("FIXME: must support order queing!!");
+	}
+	if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	PlayerSubUnitType(unit->Player,type);
+
+	order->Action=UnitActionUpgradeTo;
+	order->X=order->Y=-1;
+	order->Goal=NoUnitP;
+	order->Type=type;
+	order->Arg1=NULL;
+    }
+
 #else
     //
     //	Check if enough resources remains? (NETWORK!)
@@ -957,6 +1497,7 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
     if( PlayerCheckUnitType(unit->Player,type) ) {
 	return;
     }
+    // FIXME: if you give quick an other order, the resources are lost!
     PlayerSubUnitType(unit->Player,type);
 
     unit->NextCount=1;
@@ -970,6 +1511,7 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
     unit->Reset=1;
 
 #endif
+
     ClearSavedAction(unit);
 }
 
@@ -981,29 +1523,48 @@ global void CommandUpgradeTo(Unit* unit,UnitType* type,int flush)
 global void CommandCancelUpgradeTo(Unit* unit)
 {
 #ifdef NEW_ORDERS
-    Order* order;
+    ReleaseOrders(unit);		// empty command queue
 
-    DebugLevel0Fn("FIXME: must support order queing!!");
-    order=GetNextOrder(unit,1);		// Flush them.
+    //
+    //	Check if unit is still upgrading? (NETWORK!)
+    //
+    if( unit->Orders[0].Action == UnitActionUpgradeTo ) {
 
-    order->Action=UnitActionStill;
-    order->X=-1;
-    order->Y=-1;
-    order->Goal=NoUnitP;
-    order->Type=NULL;
-    order->Arg1=NULL;
-    DebugLevel0Fn("FIXME:\n");
+	PlayerAddCostsFactor(unit->Player,
+		unit->Data.UpgradeTo.What->Stats->Costs,
+		CancelUpgradeCostsFactor);
+
+	unit->Orders[0].Action=UnitActionStill;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].Type=NULL;
+	unit->Orders[0].Arg1=NULL;
+
+	unit->SubAction=0;
+
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next command.
+    }
+
 #else
     //
     //	Check if unit is still upgrading? (NETWORK!)
     //
     if( unit->Command.Action == UnitActionUpgradeTo ) {
-		    
+
 	PlayerAddCostsFactor(unit->Player,
 		unit->Command.Data.UpgradeTo.What->Stats->Costs,
 		CancelUpgradeCostsFactor);
 
 	unit->Command.Action=UnitActionStill;
+	unit->SubAction=0;
 
 	//
 	//	Update interface.
@@ -1032,15 +1593,33 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 #ifdef NEW_ORDERS
     Order* order;
 
-    DebugLevel0Fn("FIXME: must support order queing!!\n");
-    order=GetNextOrder(unit,1);		// Flush them.
+    //
+    //	Check if unit is still valid and Goal still alive? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	//
+	//	Check if enough resources remains? (NETWORK!)
+	//
+	if( PlayerCheckCosts(unit->Player,what->Costs) ) {
+	    return;
+	}
 
-    order->Action=UnitActionResearch;
-    order->X=-1;
-    order->Y=-1;
-    order->Goal=NoUnitP;
-    order->Type=NULL;
-    order->Arg1=what;
+	if( !flush ) {
+	    DebugLevel0Fn("FIXME: must support order queing!!");
+	}
+	if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	// FIXME: if you give quick an other order, the resources are lost!
+	PlayerSubCosts(unit->Player,what->Costs);
+
+	order->Action=UnitActionResearch;
+	order->X=order->Y=-1;
+	order->Goal=NoUnitP;
+	order->Type=NULL;
+	order->Arg1=what;
+    }
 #else
     //
     //	Check if enough resources remains? (NETWORK!)
@@ -1048,6 +1627,7 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     if( PlayerCheckCosts(unit->Player,what->Costs) ) {
 	return;
     }
+    // FIXME: if you give quick an other order, the resources are lost!
     PlayerSubCosts(unit->Player,what->Costs);
 
     unit->NextCount=1;
@@ -1073,25 +1653,43 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 global void CommandCancelResearch(Unit* unit)
 {
 #ifdef NEW_ORDERS
-    Order* order;
+    ReleaseOrders(unit);		// empty command queue
 
-    DebugLevel0Fn("FIXME: must support order queing!!");
-    order=GetNextOrder(unit,1);		// Flush them.
+    //
+    //	Check if unit is still researching? (NETWORK!)
+    //
+    if( unit->Orders[0].Action == UnitActionResearch ) {
 
-    order->Action=UnitActionStill;
-    order->X=-1;
-    order->Y=-1;
-    order->Goal=NoUnitP;
-    order->Type=NULL;
-    order->Arg1=NULL;
-    DebugLevel0Fn("FIXME:\n");
+	PlayerAddCostsFactor(unit->Player,
+		unit->Data.Research.Upgrade->Costs,
+		CancelResearchCostsFactor);
+
+	unit->Orders[0].Action=UnitActionStill;
+	unit->Orders[0].X=unit->Orders[0].Y=-1;
+	unit->Orders[0].Goal=NoUnitP;
+	unit->Orders[0].Type=NULL;
+	unit->Orders[0].Arg1=NULL;
+
+	unit->SubAction=0;
+
+	//
+	//	Update interface.
+	//
+	if( unit->Player==ThisPlayer && unit->Selected ) {
+	    UpdateButtonPanel();
+	    MustRedraw|=RedrawPanels;
+	}
+
+	unit->Wait=unit->Reset=1;	// immediately start next command.
+    }
+
 #else
     //
     //	Check if unit is still researching? (NETWORK!)
     //
     if( unit->Command.Action == UnitActionResearch ) {
 	PlayerAddCostsFactor(unit->Player,
-		unit->Command.Data.UpgradeTo.What->Stats->Costs,
+		unit->Command.Data.Research.What->Costs,
 		CancelResearchCostsFactor);
 
 	unit->Command.Action=UnitActionStill;
@@ -1132,30 +1730,52 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 	}
     );
 
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending orders.
-	order=&unit->NewOrder;
-    } else if( !(order=GetNextOrder(unit,flush)) ) {
-	return;
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionDemolish;
+	if( dest ) {
+	    //
+	    //	Destination could be killed.
+	    //	Should be handled in action, but is not possible!
+	    //		Unit::Refs is used as timeout counter.
+	    //
+	    if( dest->Destroyed ) {
+		order->X=dest->X+dest->Type->TileWidth/2;
+		order->Y=dest->Y+dest->Type->TileHeight/2;
+		order->Goal=NoUnitP;
+		order->RangeX=order->RangeY=0;
+	    } else {
+		order->X=order->Y=-1;
+		order->Goal=dest;
+		RefsDebugCheck( !dest->Refs );
+		dest->Refs++;
+		order->RangeX=order->RangeY=1;
+	    }
+	} else if( WallOnMap(x,y) || ForestOnMap(x,y) || RockOnMap(x,y) ) {
+	    order->X=x;
+	    order->Y=y;
+	    order->RangeX=order->RangeY=1;
+	    order->Goal=NoUnitP;
+	} else {
+	    order->X=x;
+	    order->Y=y;
+	    order->RangeX=order->RangeY=0;
+	    order->Goal=NoUnitP;
+	}
+	order->Type=NULL;
+	order->Arg1=NULL;
     }
 
-    order->Action=UnitActionDemolish;
-    ResetPath(*order);
-    // choose goal and good attack range
-    if( dest ) {
-	order->Goal=dest;
-	dest->Refs++;
-	order->RangeX=order->RangeY=1;
-    } else {
-	order->Goal=NoUnitP;
-	if( WallOnMap(x,y) || ForestOnMap(x,y) || RockOnMap(x,y) ) {
-	    order->RangeX=order->RangeY=1;
-	} else {
-	    order->RangeX=order->RangeY=0;
-	}
-    }
-    order->X=x;
-    order->Y=y;
 #else
     Command* command;
 
@@ -1178,6 +1798,7 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
     // choose goal and good attack range
     if( dest ) {
 	command->Data.Move.Goal=dest;
+	RefsDebugCheck( dest->Destroyed || !dest->Refs );
 	dest->Refs++;
 	command->Data.Move.Range=1;
     } else {
@@ -1204,61 +1825,78 @@ global void CommandDemolish(Unit* unit,int x,int y,Unit* dest,int flush)
 **	@param x	X map position to spell cast on.
 **	@param y	Y map position to spell cast on.
 **	@param dest	Spell cast on unit (if exist).
-**	@param spellid  Spell type id.
+**	@param spell	Spell type pointer.
 **	@param flush	if true, flush command queue.
 */
-global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
-	,int flush)
+global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
+	,SpellType* spell,int flush)
 {
 #ifdef NEW_ORDERS
     Order* order;
-    SpellType* spell;
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0("Internal movement error\n");
 	    return;
-	}
-	if( unit->Type->Vanishes ) {
-	    DebugLevel0("Internal error\n");
-	    abort();
 	}
     );
 
     DebugLevel3Fn(": %Zd spell-casts on %Zd\n"
 	,UnitNumber(unit),dest ? UnitNumber(dest) : 0);
 
-    if( unit->Type->Building ) {
-	// FIXME: should find a better way for pending commands.
-	order=&unit->NewOrder;
-    } else if( !(order=GetNextOrder(unit,flush)) ) {
-	return;
+    //
+    //	Check if unit is still valid? (NETWORK!)
+    //
+    if( !unit->Removed ) {
+	// FIXME: should I check here, if there is still enough mana?
+
+	if( unit->Type->Building ) {
+	    // FIXME: should find a better way for pending orders.
+	    order=&unit->NewOrder;
+	    ReleaseOrder(order);
+	} else if( !(order=GetNextOrder(unit,flush)) ) {
+	    return;
+	}
+
+	order->Action=UnitActionSpellCast;
+	order->RangeX=order->RangeY=spell->Range;
+	if( dest ) {
+	    //
+	    //	Destination could be killed.
+	    //	Should be handled in action, but is not possible!
+	    //		Unit::Refs is used as timeout counter.
+	    //
+	    if( dest->Destroyed ) {
+		// FIXME: where check if spell needs an unit as destination?
+		order->X=dest->X+dest->Type->TileWidth/2-order->RangeX;
+		order->Y=dest->Y+dest->Type->TileHeight/2-order->RangeY;
+		order->Goal=NoUnitP;
+		order->RangeX<<=1;
+		order->RangeY<<=1;
+	    } else {
+		order->X=order->Y=-1;
+		order->Goal=dest;
+		RefsDebugCheck( !dest->Refs );
+		dest->Refs++;
+	    }
+	} else {
+	    order->X=x-order->RangeX;
+	    order->Y=y-order->RangeY;
+	    order->Goal=NoUnitP;
+	    order->RangeX<<=1;
+	    order->RangeY<<=1;
+	}
+	order->Type=NULL;
+	order->Arg1=spell;
     }
 
-    spell=SpellTypeById( spellid );
-
-    order->Action=UnitActionSpellCast;
-    ResetPath(*order);
-    order->RangeX=order->RangeY=spell->Range;
-    order->Goal=dest;
-    if (dest) {
-	dest->Refs++;
-    }
-    order->X=x;
-    order->Y=y;
-    order->Arg1=spell;
 #else
     Command* command;
-    const SpellType* spell;
 
     IfDebug(
 	if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
 	    DebugLevel0("Internal movement error\n");
 	    return;
-	}
-	if( unit->Type->Vanishes ) {
-	    DebugLevel0("Internal error\n");
-	    abort();
 	}
     );
 
@@ -1272,13 +1910,13 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
 	return;
     }
 
-    spell = SpellTypeById( spellid );
-
     command->Action=UnitActionSpellCast;
     ResetPath(*command);
 
-    if (dest)
-      dest->Refs++;
+    if (dest) {
+	RefsDebugCheck( dest->Destroyed || !dest->Refs );
+	dest->Refs++;
+    }
 
     command->Data.Move.Goal=dest;
     command->Data.Move.Range=spell->Range;
@@ -1286,7 +1924,7 @@ global void CommandSpellCast(Unit* unit,int x,int y,Unit* dest,int spellid
     command->Data.Move.SY=unit->Y;
     command->Data.Move.DX=x;
     command->Data.Move.DY=y;
-    command->Data.Move.SpellId = spellid;
+    command->Data.Move.Spell = spell;
 
 #endif
     ClearSavedAction(unit);

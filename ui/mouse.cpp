@@ -197,16 +197,14 @@ global void DoRightButton(int x,int y)
                             && (type==UnitTypeOrcWorkerWithGold
                                 || type==UnitTypeHumanWorkerWithGold) ) {
                         DebugLevel3("GOLD-DEPOSIT\n");
-                        // FIXME: return to this depot??
-                        SendCommandReturnGoods(unit,flush);
+                        SendCommandReturnGoods(unit,dest,flush);
                         continue;
                     }
                     if( (dest->Type->StoresWood || dest->Type->StoresGold)
                             && (type==UnitTypeOrcWorkerWithWood
                                 || type==UnitTypeHumanWorkerWithWood) ) {
                         DebugLevel3("WOOD-DEPOSIT\n");
-                        // FIXME: return to this depot??
-                        SendCommandReturnGoods(unit,flush);
+                        SendCommandReturnGoods(unit,dest,flush);
                         continue;
                     }
                 }
@@ -257,15 +255,14 @@ global void DoRightButton(int x,int y)
         //      Tanker
         //
         if( action==MouseActionHaulOil ) {
-	    // FIXME: How can I remove here the unit type?
+	    // FIXME: How can I remove here the unit type? More races!
             if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
                 DebugLevel2("Should return to oil deposit\n");
                 if( (dest=UnitOnMapTile(x,y)) ) {
                     dest->Blink=3;
                     if( dest->Type->StoresOil ) {
                         DebugLevel3("OIL-DEPOSIT\n");
-                        // FIXME: return to this depot??
-                        SendCommandReturnGoods(unit,flush);
+                        SendCommandReturnGoods(unit,dest,flush);
                         continue;
                     }
 		}

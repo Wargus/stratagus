@@ -346,7 +346,8 @@ local int AiFindFreeWorkers(Unit ** table)
 	unit = table[i];
 #ifdef NEW_ORDERS
 	if (unit->Orders[0].Action != UnitActionBuild
-	    && unit->Orders[1].Action != UnitActionBuild) {
+		&& (unit->OrderCount==1
+		    || unit->Orders[1].Action != UnitActionBuild) ) {
 	    table[num++] = unit;
 	}
 #else
@@ -782,7 +783,7 @@ local int AiBuildHall(int type)
 		       , workers[best_w], type, &best_x, &best_y)) {
 	return -1;
     }
-    CommandBuildBuilding(workers[best_w], best_x, best_y, &UnitTypes[type], 1);
+    CommandBuildBuilding(workers[best_w], best_x, best_y, &UnitTypes[type],FlushCommands);
     AiMarkBuildUnitType(type);
     return 0;
 }
@@ -889,8 +890,8 @@ local int AiTrainCreature(int type)
 	}
 #endif
 	player = AiPlayer->Player;
-	PlayerSubUnitType(player, &UnitTypes[type]);
-	CommandTrainUnit(units[nunits], &UnitTypes[type], 1);
+	CommandTrainUnit(units[nunits], &UnitTypes[type],FlushCommands);
+	// FIXME: and if not possible?
 	AiMarkBuildUnitType(type);
 	return 0;
     }
@@ -919,7 +920,7 @@ local void AiMineGold(Unit * unit)
 	//AiPlayer->NoGold=1;
 	return;
     }
-    CommandMineGold(unit, dest, 1);
+    CommandMineGold(unit, dest,FlushCommands);
 }
 
 /**
@@ -1003,7 +1004,7 @@ local int AiHarvest(Unit * unit)
 	}
 	if (cost != 99999) {
 	    DebugLevel3Fn("wood on %d,%d\n", x, y);
-	    CommandHarvest(unit, bestx, besty, 1);
+	    CommandHarvest(unit, bestx, besty,FlushCommands);
 	    return 1;
 	}
 	++addy;
@@ -1074,7 +1075,7 @@ local void AiAssignWorker(void)
 			    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
 			    || type ==
 			    AiChooseRace(UnitTypeHumanWorkerWithWood->Type)) {
-			    CommandReturnGoods(workers[w], 1);
+			    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 			} else {
 			    if (num_gold <= num_wood) {
 				AiMineGold(workers[w]);
@@ -1099,7 +1100,7 @@ local void AiAssignWorker(void)
 		if (type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type)
 		    || type ==
 		    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)) {
-		    CommandReturnGoods(workers[w], 1);
+		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		} else {
 		    // FIXME: don't interrupt chopping
 #ifdef NEW_ORDERS
@@ -1126,7 +1127,7 @@ local void AiAssignWorker(void)
 		if (type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type)
 		    || type ==
 		    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)) {
-		    CommandReturnGoods(workers[w], 1);
+		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		} else {
 #ifdef NEW_ORDERS
 		    action = workers[w]->Orders[0].Action;
@@ -1156,7 +1157,7 @@ local void AiAssignWorker(void)
 			|| type ==
 			AiChooseRace(UnitTypeHumanWorkerWithWood->Type)) {
 			if (AiPlayer->MainHall) {
-			    CommandReturnGoods(workers[w], 1);
+			    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 			}
 			continue;
 		    }
@@ -1191,7 +1192,7 @@ local void AiAssignWorker(void)
 		action = workers[w]->Command.Action;
 #endif
 		if (action == UnitActionStill) {
-		    CommandReturnGoods(workers[w], 1);
+		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
 	    }
 	}
@@ -1211,7 +1212,7 @@ local void AiAssignWorker(void)
 		action = workers[w]->Command.Action;
 #endif
 		if (action == UnitActionStill) {
-		    CommandReturnGoods(workers[w], 1);
+		    CommandReturnGoods(workers[w],NoUnitP,FlushCommands);
 		}
 	    }
 	}
@@ -1415,7 +1416,7 @@ local int AiCommandAttack(int unittype, int attack, int home)
     for (i = 0; i < attack; i++) {
 	enemy = AttackUnitsInDistance(table[i], 1000);
 	if (enemy) {
-	    CommandAttack(table[i], enemy->X, enemy->Y, NULL, 1);
+	    CommandAttack(table[i], enemy->X, enemy->Y, NULL,FlushCommands);
 	}
     }
     return 1;

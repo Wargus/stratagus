@@ -44,10 +44,15 @@ enum _move_return_ {
 **	To remove pathfinder internals. Called if path destination changed.
 */
 #ifdef NEW_ORDERS
-// FIXME: Must check, if it is always correct called
 #define ResetPath(command) // Hope I didn't need this?
+
+#define NewResetPath(unit) \
+    do { unit->Data.Move.Fast=1; unit->Data.Move.Length=0; }while( 0 )
+
 #else
+
 #define ResetPath(command) ((command).Data.Move.Fast=1)
+
 #endif
 
 /*----------------------------------------------------------------------------
