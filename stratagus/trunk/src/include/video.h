@@ -37,6 +37,8 @@ typedef unsigned char VMemType8;	///  8 bpp modes pointer
     /// MACRO defines speed of colorcycling
 #define COLOR_CYCLE_SPEED	(FRAMES_PER_SECOND/4)
 
+#ifndef NEW_VIDEO	// { Should be removed with new video final version
+
 /**@name RleSprite */
 //@{
 
@@ -52,7 +54,7 @@ typedef unsigned char VMemType8;	///  8 bpp modes pointer
 struct RleSprite {
     unsigned		Width;		/// width of a frame
     unsigned		Height;		/// height of a frame
-    GraphicData*	Pixels;		/// palette FUTURE extension
+    GraphicData*	Pixels;		/// pointer to local or global palette 
     int			NumFrames;	/// number of frames
     IfDebug( int ByteSize; )
     /**
@@ -110,11 +112,8 @@ extern void DrawRleSpriteClippedX(RleSprite* sprite,unsigned frame,int x,int y);
 extern void FreeRleSprite(RleSprite *sprite);
 //@}
 
-/**@name Vector graphics primitives */
+#endif	// } !NEW_VIDEO
 
-// now in linedraw and vectored
-
-//@{
 /** Set clipping for nearly all vector primitives. Functions which support
   clipping will be marked CLIPPED. Set system-wide clipping rectangle.
   @param left left x coordinate
@@ -142,7 +141,7 @@ extern void* VideoMemory;
 */
 extern int VideoDepth;
     /// Sub depth 555, 565
-extern int VideoSubDepth;
+//extern int VideoSubDepth;
 
     /// 32 bpp modes video memory address
 #define VideoMemory32	((VMemType32*)VideoMemory)
@@ -156,8 +155,8 @@ extern int VideoSubDepth;
   VideoCreatePalette.
   @see VideoCreatePalette
  */
-extern VMemType8 * Pixels8;		///  8 bpp
-extern VMemType16 * Pixels16;	/// 16 bpp default	
+extern VMemType8 * Pixels8;	///  8 bpp
+extern VMemType16 * Pixels16;	/// 16 bpp
 extern VMemType32 * Pixels32;	/// 32 bpp
 
 /** Set videomode. Tries to set choosen videomode. Only 640x480, 800x600
@@ -167,14 +166,14 @@ extern VMemType32 * Pixels32;	/// 32 bpp
 extern int SetVideoMode(int width);
 
 /** Loaded system palette. 256-entries long, active system palette. */
-extern struct Palette GlobalPalette[256];
+extern Palette GlobalPalette[256];
 
 /** Load palette from resource. Just loads palette, to set it use
   VideoCreatePalette, which sets system palette.
   @param pal buffer to store palette (256-entries long)
   @param name resource file name
  */
-extern void LoadRGB(struct Palette *pal, const char *name);
+extern void LoadRGB(Palette *pal, const char *name);
 
 /// Initialize Pixels[] for all players (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
@@ -192,14 +191,14 @@ extern void CheckVideoInterrupts(void);
 extern void ColorCycle(void);
 
 /** Creates a palette from a Palette struct */
-extern GraphicData * VideoCreateNewPalette(const struct Palette *palette);
+extern GraphicData * VideoCreateNewPalette(const Palette *palette);
 
 /** Initializes system palette. Also calls SetPlayersPalette to set palette for
   all players.
   @param palette Palette structure
   @see SetPlayersPalette
  */
-extern void VideoCreatePalette(const struct Palette *palette);
+extern void VideoCreatePalette(const Palette *palette);
 
 /// Process all system events. This function also keeps synchronization of game.
 extern void WaitEventsAndKeepSync(void);
