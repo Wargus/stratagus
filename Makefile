@@ -22,7 +22,7 @@ include $(TOPDIR)/Rules.make
 MAKE=	make TOPDIR=`pwd`
 MODULES= src tools
 
-all:	src clone$(EXE) tools
+all:	src freecraft$(EXE) tools
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
@@ -55,11 +55,11 @@ cycle::
 	@$(MAKE) all
 
 run::
-	@$(MAKE) && ./clone
+	@$(MAKE) && ./freecraft
 
 runp::
-	@$(MAKE) && ./clone && if [ -e gmon.sum ]; then \
-		gprof -s clone gmon.out gmon.sum; \
+	@$(MAKE) && ./freecraft && if [ -e gmon.sum ]; then \
+		gprof -s freecraft gmon.out gmon.sum; \
 	    else mv gmon.out gmon.sum; fi
 
 doc::
@@ -78,15 +78,15 @@ etlib/getopt.o: etlib/getopt.c
 etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
-clone:	src etlib/hash.o src/libclone.a 
-	$(CC) -o clone src/libclone.a  -lefence $(CLONELIBS)  -lefence -I. $(CFLAGS)
+freecraft:	src etlib/hash.o src/libclone.a 
+	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-clone.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o src/libclone.a 
-	$(CC) -o clone$(EXE) main.c src/libclone.a -lSDLmain $(CLONELIBS) -I. \
+freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o src/libclone.a 
+	$(CC) -o freecraft$(EXE) main.c src/libclone.a -lSDLmain $(CLONELIBS) -I. \
 	$(CFLAGS)
 
-# -L.
+# -L. -lefence 
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl 
 
 tools::
@@ -98,7 +98,7 @@ clean::
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i clobber ; done
-	$(RM) clone$(EXE) gmon.sum
+	$(RM) freecraft$(EXE) gmon.sum
 	$(RM) -r srcdoc/*
 	@$(MAKE) -C tools clobber
 
@@ -127,10 +127,10 @@ depend::
 #	Distributions
 ##############################################################################
 
-DOCS    = README doc/readme.html doc/install.html doc/clone.html doc/faq.html \
-	  doc/ChangeLog.html doc/todo.html doc/clone.lsm doc/development.html \
-	  doc/LICENSE doc/OPL doc/opl.html doc/artistic-license.html \
-	  doc/ccl/unittype.html \
+DOCS    = README doc/readme.html doc/install.html doc/freecraft.html \
+	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
+	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
+	  doc/artistic-license.html doc/ccl/unittype.html \
 	  doc/graphic/*.html doc/graphic/*.png
 
 PICS    = contrib/ale-title.png
@@ -150,7 +150,7 @@ MISC    = Makefile Common.mk Rules.make.orig doxygen-clone.cfg \
 	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h main.c
 
 mydate	= $(shell date +%y%m%d)
-distdir	= clone-$(mydate)
+distdir	= freecraft-$(mydate)
 
 dist::
 	$(RM) $(DISTLIST)
@@ -197,7 +197,7 @@ bin-dist:: all
 	echo $(CONTRIB) >>$(DISTLIST)
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
-	echo clone$(EXE) >>$(DISTLIST)
+	echo freecraft$(EXE) >>$(DISTLIST)
 	echo tools/wartool$(EXE) >>$(DISTLIST)
 	echo tools/build.sh >>$(DISTLIST)
 	rm -rf $(distdir)
@@ -205,10 +205,10 @@ bin-dist:: all
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
 	chmod -R a+r $(distdir)
-	strip -s -R .comment $(distdir)/clone$(EXE)
+	strip -s -R .comment $(distdir)/freecraft$(EXE)
 	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	tar chzf clone-$(mydate)-bin.tar.gz $(distdir)
-	tar chIf clone-$(mydate)-bin.tar.bz2 $(distdir)
+	tar chzf freecraft-$(mydate)-bin.tar.gz $(distdir)
+	tar chIf freecraft-$(mydate)-bin.tar.bz2 $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
@@ -219,7 +219,7 @@ win32-bin-dist2:: win32
 	@echo $(CCLS) >>$(DISTLIST)
 	@echo $(DOCS) >>$(DISTLIST)
 	@echo SDL.dll >>$(DISTLIST)
-	@echo clone$(EXE) >>$(DISTLIST)
+	@echo freecraft$(EXE) >>$(DISTLIST)
 	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@echo tools/build.bat >>$(DISTLIST)
 	@rm -rf $(distdir)
@@ -227,18 +227,18 @@ win32-bin-dist2:: win32
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir) 
 	@chmod -R a+r $(distdir)
-	@strip -s -R .comment $(distdir)/clone$(EXE)
+	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@zip -q9r clone-$(mydate)-win32bin.zip $(distdir)
+	@zip -q9r freecraft-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
-	du -h clone-$(mydate)-win32bin.zip
+	du -h freecraft-$(mydate)-win32bin.zip
 
 win32-bin-dist:: win32
 	@export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
 	make $(WIN32) win32-bin-dist2
 
-difffile=	clone-`date +%y%m%d`.diff
+difffile=	freecraft-`date +%y%m%d`.diff
 diff:	
 	@$(RM) $(difffile)
 	@$(RM) $(DISTLIST)
@@ -253,14 +253,14 @@ buildit:	tools
 	. tools/build.sh
 
 buildclean:
-	rm -rf data/*.rgb data/puds data/sound data/graphic \
-	data/interface data/campaigns
+	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
+	data/interface data/campaigns data/text data/health.png data/mana.png \
+	data/default.pud.gz data/ale-title.png
 
 release:
-	make ci
 	make distclean
 	make depend
-	make bin-dist
+	make bin-dist "ZDEFS=-DUSE_ZLIB -DUSE_BZ2LIB" "ZLIBS=-lz -lbz2"
 	make win32new
 	make win32-bin-dist
 	make dist
@@ -296,11 +296,11 @@ win32distclean:
 ##############################################################################
 
 install:	all
-	install -m 755 clone $(DESTDIR)/usr/games/ale-clone
+	install -m 755 freecraft $(DESTDIR)/usr/games/freecraft
 
 install-tools:	all
-	install -m 755 tools/wartool  $(DESTDIR)/usr/lib/ale-clone/tools/
-	install -m 755 tools/build.sh $(DESTDIR)/usr/lib/ale-clone/tools/
+	install -m 755 tools/wartool  $(DESTDIR)/usr/lib/freecraft/tools/
+	install -m 755 tools/build.sh $(DESTDIR)/usr/lib/freecraft/tools/
 
 uninstall:
 	@echo "under construction: make it by hand :)"
