@@ -242,13 +242,8 @@ typedef struct _map_field_ {
     unsigned short	SeenTile;	/// last seen tile (FOW)
     unsigned short	Flags;		/// field flags
     unsigned char	Value;		/// HP for walls/ Wood Regeneration
-    // FIXME: this could be removed and encoded into visible/expored
-    unsigned char	VisibleLastFrame;   /// Visible last frame
 #ifdef NEW_FOW
-    unsigned char	VisibleMask:4;	/// Visible mask
-    unsigned char	ExploredMask:4;	/// Explored mask
-    unsigned short	Visible;	/// Visible flags for all players
-    unsigned short	Explored;	/// Explored flags for all players
+    unsigned char Visible[PlayerMax];	/// Seen counter 0 unexplored
 #endif
 #ifdef UNIT_ON_MAP
     union {
@@ -257,7 +252,6 @@ typedef struct _map_field_ {
     }			Here;		/// What is on the field
 #endif
 #ifdef UNITS_ON_MAP
-// FIXME: Unused
     UnitRef		Building;	/// Building or corpse
     UnitRef		AirUnit;	/// Air unit
     UnitRef		LandUnit;	/// Land unit
@@ -268,16 +262,15 @@ typedef struct _map_field_ {
 #endif
 } MapField;
 
-// FIXME: should be removed
-#define MapFieldCompletelyVisible   0x0001  /// Field completely visible
-#define MapFieldPartiallyVisible    0x0002  /// Field partially visible
-
 #ifndef NEW_FOW
 // 0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible
+#ifndef NEW_FOW2
 #define MapFieldVisible		0x0001	/// Field visible
+#endif
 #define MapFieldExplored	0x0002	/// Field explored
 #endif
 
+// Not used until now:
 //#define MapFieldArray		0x0004	/// More than one unit on the field
 
 #define MapFieldHuman		0x0008	/// Human is owner of the field (walls)
@@ -331,6 +324,9 @@ typedef struct _world_map_ {
     unsigned		Height;		/// the map height
 
     MapField*		Fields;		/// fields on map
+#ifdef NEW_FOW2
+    unsigned*		Visible[PlayerMax]; /// visible bit-field
+#endif
 
 #ifdef NEW_REGIONS
     MapRegion**		Regions;	/// Regions of this map
@@ -568,22 +564,47 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(x,y) \
-    (TheMap.Fields[(y)*TheMap.Width+(x)].Explored&(1<<ThisPlayer->Player))
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Visible[ThisPlayer->Player])
 
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(x,y) \
-    (TheMap.Fields[(y)*TheMap.Width+(x)].Visible&(1<<ThisPlayer->Player))
+    (TheMap.Fields[(y)*TheMap.Width+(x)].Visible[ThisPlayer->Player]>1)
+
 #else
 
     /// Check if a field for the user is explored
 #define IsMapFieldExplored(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldExplored)
 
+#ifdef NEW_FOW2
+
+    /// Check if a field for the user is visibile
+#define IsMapFieldVisible(x,y) \
+    (TheMap.Visible[0][((y)*TheMap.Width+(x))/32] \
+	&(1<<(((y)*TheMap.Width+(x))%32)))
+
+#else
+
     /// Check if a field for the user is visibile
 #define IsMapFieldVisible(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
 
 #endif
+
+#endif
+
+#ifdef UNITS_ON_MAP
+#if 0
+#define BuildingOnMapField(mf)	((mf)->Flags & MapFieldBuilding)
+#define LandUnitOnMapField(mf)	((mf)->Flags & MapFieldLandUnit)
+#define SeaUnitOnMapField(mf)	((mf)->Flags & MapFieldSeaUnit)
+#define AirUnitOnMapField(mf)	((mf)->Flags & MapFieldAirUnit)
+#endif
+#define BuildingOnMapField(mf)	((mf)->Building != 0xffff)
+#define LandUnitOnMapField(mf)	((mf)->LandUnit != 0xffff)
+#define SeaUnitOnMapField(mf)	((mf)->SeaUnit != 0xffff)
+#define AirUnitOnMapField(mf)	((mf)->AirUnit != 0xffff)
+#endif /* UNITS_ON_MAP */
 
 //@}
 

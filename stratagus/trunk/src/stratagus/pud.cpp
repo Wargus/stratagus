@@ -910,11 +910,17 @@ global void LoadPud(const char* pud,WorldMap* map)
 		map->Height=height;
 
 		map->Fields=calloc(width*height,sizeof(*map->Fields));
+#ifdef NEW_FOW2
+		TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+#endif
 		if( !map->Fields ) {
 		    perror("calloc()");
 		    exit(-1);
 		}
 		InitUnitCache();
+		// FIXME: this should be CreateMap or InitMap?
+	    } else {			// FIXME: should do some checks here!
+		DebugLevel0Fn("Warning: Fields already allocated\n");
 	    }
 	    continue;
 	}

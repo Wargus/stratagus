@@ -179,9 +179,13 @@ global void MapFixSeenWallTile(int x, int y)
 
 	// FIXME: can this only happen if seen?
 #ifdef NEW_FOW
-	if (mf->Visible & (1 << ThisPlayer->Player)) {
+	if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+	if ( IsMapFieldVisible(x,y) ) {
 #else
 	if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MarkDrawPosMap(x, y);
@@ -274,9 +278,13 @@ global void MapFixWallTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 #ifdef NEW_FOW
-	if (mf->Visible & (1 << ThisPlayer->Player)) {
+	if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+	if ( IsMapFieldVisible(x,y) ) {
 #else
 	if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -326,9 +334,13 @@ global void MapRemoveWall(unsigned x,unsigned y)
     MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if( mf->Flags&MapFieldVisible ) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x,y);
 	MapMarkSeenTile(x,y);
@@ -365,9 +377,13 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
     MapFixWallNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if( mf->Flags&MapFieldVisible ) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x,y);
 	MapMarkSeenTile(x,y);

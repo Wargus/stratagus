@@ -137,18 +137,24 @@ global void RevealMap(void)
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
 #ifdef NEW_FOW
-	    int m;
-
-	    m=(1<<ThisPlayer->Player);
-	    TheMap.Fields[ix+iy*TheMap.Width].Explored|=m;
 	    if( TheMap.NoFogOfWar ) {
-		TheMap.Fields[ix+iy*TheMap.Width].Visible|=m;
+		TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]=2;
+	    } else {
+		TheMap.Fields[ix+iy*TheMap.Width].Visible[ThisPlayer->Player]=1;
 	    }
-	    // FIXME: Set Mask.
+#else
+#ifdef NEW_FOW2
+	    TheMap.Fields[ix+iy*TheMap.Width].Flags |= MapFieldExplored;
+
+	    if( TheMap.NoFogOfWar ) {
+		TheMap.Visible[0][((iy)*TheMap.Width+(ix))/32] |= 
+			(1<<(((iy)*TheMap.Width+(ix))%32));
+	    }
 #else
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags
 		    |= MapFieldExplored
 			| (TheMap.NoFogOfWar ? MapFieldVisible : 0);
+#endif
 #endif
 	    MapMarkSeenTile(ix,iy);
 	}
@@ -588,6 +594,9 @@ global void CleanMap(void)
 {
     free(TheMap.Fields);
     free(TheMap.TerrainName);
+#ifdef NEW_FOW2
+    free(TheMap.Visible[0]);
+#endif
 
     // Tileset freeed by Tileset?
 
