@@ -41,6 +41,7 @@
 #include "pathfinder.h"
 #include "pud.h"
 #include "ui.h"
+#include "editor.h"
 
 #include "ccl.h"
 
@@ -540,14 +541,16 @@ global void PreprocessMap(void)
     }
 
     // it is required for fixing the wood that all tiles are marked as seen!
-    for (ix = 0; ix < TheMap.Width; ix++) {
-	for (iy = 0; iy < TheMap.Height; iy++) {
-	    MapFixWoodTile(ix, iy);
-	    MapFixSeenWoodTile(ix, iy);
-	    MapFixRockTile(ix, iy);
-	    MapFixSeenRockTile(ix, iy);
-	    MapFixWallTile(ix, iy);
-	    MapFixSeenWallTile(ix, iy);
+    if (!EditorRunning) {
+	for (ix = 0; ix < TheMap.Width; ix++) {
+	    for (iy = 0; iy < TheMap.Height; iy++) {
+		MapFixWoodTile(ix, iy);
+		MapFixSeenWoodTile(ix, iy);
+		MapFixRockTile(ix, iy);
+		MapFixSeenRockTile(ix, iy);
+		MapFixWallTile(ix, iy);
+		MapFixSeenWallTile(ix, iy);
+	    }
 	}
     }
 }
