@@ -10,7 +10,7 @@
 //
 /**@name action_harvest.c -	The harvest action. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 

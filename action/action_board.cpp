@@ -10,7 +10,7 @@
 //
 /**@name action_board.c	-	The board action. */
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
 //	$Id$
 
