@@ -510,11 +510,9 @@ struct _unit_ {
 	Unit** UnitSlot;     ///< Slot pointer of Units
 	Unit** PlayerSlot;   ///< Slot pointer of Player->Units
 
-	Unit*    Next;       ///< Generic link pointer (on map)
-#ifdef NEW_UNIT_CACHE
+	Unit*         Next;          ///< Generic link pointer (on map)
 	UnitListItem* CacheLinks;    ///< Link nodes for unit cache
 	unsigned      CacheLock : 1; ///< Used to lock unit out of the cache.
-#endif
 
 	int   InsideCount;   ///< Number of units inside.
 	int   BoardCount;    ///< Number of units transported inside.
@@ -908,8 +906,6 @@ extern int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table);
 extern int UnitCacheOnTile(int x, int y, Unit** table);
 	/// Select unit on X,Y of type naval,fly,land
 extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
-	/// Print unit-cache statistic
-extern void UnitCacheStatistic(void);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
 
