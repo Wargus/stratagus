@@ -4473,9 +4473,13 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     //	Check if all players are ready.
     DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n" _C_ avail _C_ ready);
     if (ready == avail) {
-	NetMultiSetupMenuItems[3].flags = 0;	// enable start game button
+	if (NetMultiSetupMenuItems[3].flags == MenuButtonDisabled) {
+	    // enable start game button
+	    NetMultiSetupMenuItems[3].flags = 0;
+	}
     } else {
-	NetMultiSetupMenuItems[3].flags = MenuButtonDisabled;	// disable start game button
+	// disable start game button
+	NetMultiSetupMenuItems[3].flags = MenuButtonDisabled;
     }
 }
 
