@@ -180,11 +180,11 @@ global void LoadModules(void)
     MapUnitSounds();
     InitAStar();
 #ifdef WITH_SOUND
-    if (SoundFildes!=-1) {
+    if (SoundFildes != -1) {
 	//FIXME: must be done after map is loaded
-	if ( InitSoundServer() ) {
-	    SoundOff=1;
-	    SoundFildes=-1;
+	if (InitSoundServer()) {
+	    SoundOff = 1;
+	    SoundFildes = -1;
 	} else {
 	    // must be done after sounds are loaded
 	    InitSoundClient();
