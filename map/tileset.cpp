@@ -10,7 +10,7 @@
 //
 /**@name tileset.c	-	The tileset. */
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -35,12 +35,28 @@
 extern int WoodTable[16];		/// Table for wood removable.
 extern int RockTable[20];		/// Table for rock removable.
 
+#if !defined(CCL) && !defined(CCL2)
+/**
+**	Default without CCL support.
+*/
+local char* DefaultTilesetWcNames[] = {
+    "tileset-summer",
+    "tileset-winter",
+    "tileset-wasteland",
+    "tileset-swamp"
+};
+#endif
+
 /**
 **	Mapping of wc numbers to our internal symbols.
 **	The numbers are used in puds.
 **	0=summer, 1=winter, 2=wasteland, 3=swamp.
 */
-global char** TilesetWcNames;
+global char** TilesetWcNames
+#if !defined(CCL) && !defined(CCL2)
+    =DefaultTilesetWcNames
+#endif
+    ;
 
 #if 1		//	FIXME: only support ccl version.
 
@@ -1612,7 +1628,7 @@ global void LoadTileset(void)
 	    TheMap.Tileset->TileTypeTable[tile]=TileTypeWood;
 	}
 	if( (((i&0xF0)==0x40 || (i&0xF0)==0x90) && (i&0xF)<5)
-		|| (i&0xF)<3 ) { 
+		|| (i&0xF)<3 ) {
 	    if( (tile=table[0x800+i]) ) {	// mixed human wall
 		TheMap.Tileset->TileTypeTable[tile]=TileTypeHumanWall;
 	    }
