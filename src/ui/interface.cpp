@@ -408,7 +408,7 @@ local void UiToggleBigMap(void)
 	TheUI.MapArea.EndX=((VideoWidth/TileSizeX)*TileSizeX)-1;
 	TheUI.MapArea.EndY=((VideoHeight/TileSizeY)*TileSizeY)-1;
 
-	SetViewportMode ();
+	SetViewportMode (TheUI.ViewportMode);
 #else /* SPLIT_SCREEN_SUPPORT */
 	mapx=TheUI.MapX;
 	mapy=TheUI.MapY;
@@ -439,7 +439,7 @@ local void UiToggleBigMap(void)
 	TheUI.MapArea.EndX=mapex;
 	TheUI.MapArea.EndY=mapey;
 
-	SetViewportMode ();
+	SetViewportMode (TheUI.ViewportMode);
 #else /* SPLIT_SCREEN_SUPPORT */
 	TheUI.MapX=mapx;
 	TheUI.MapY=mapy;
