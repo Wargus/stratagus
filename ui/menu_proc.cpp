@@ -1980,6 +1980,12 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
+		case MI_TYPE_PULLDOWN:
+		    if (mi->d.pulldown.curopt) {
+			--mi->d.pulldown.curopt;
+		    }
+		    MustRedraw |= RedrawMenu;
+		    break;
 		default:
 		    break;
 	    }
@@ -2020,6 +2026,12 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    mi->d.hslider.cflags |= MI_CFLAGS_LEFT;
 		    if (mi->d.hslider.action) {
 			(*mi->d.hslider.action)(mi, 2);
+		    }
+		    MustRedraw |= RedrawMenu;
+		    break;
+		case MI_TYPE_PULLDOWN:
+		    if (mi->d.pulldown.curopt < mi->d.pulldown.noptions - 1) {
+			++mi->d.pulldown.curopt;
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
