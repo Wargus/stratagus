@@ -71,7 +71,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 
     flags=UnitShowAnimation(unit,attack);
 
-    if( (flags&AnimationSound) && UnitVisibleOnMap(unit) ) {
+    if( (flags&AnimationSound) && (UnitVisibleOnMap(unit) || ReplayRevealMap) ) {
 	PlayUnitSound(unit,VoiceAttacking);
     }
 
