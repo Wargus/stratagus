@@ -620,25 +620,6 @@ local void NetworkRemovePlayer(int player)
 {
     int i;
 
-    if (Players[player].TotalNumUnits != 0) {
-	// Set player to neutral, remove allied/enemy/shared vision status
-	Players[player].Type = PlayerNeutral;
-	for (i = 0; i < NumPlayers; ++i) {
-	    if (i == player) {
-		continue;
-	    }
-	    Players[i].Allied &= ~(1 << player);
-	    Players[i].Enemy &= ~(1 << player);
-	    Players[i].SharedVision &= ~(1 << player);
-	    Players[player].Allied &= ~(1 << i);
-	    Players[player].Enemy &= ~(1 << i);
-	    Players[player].SharedVision &= ~(1 << i);
-	}
-	SetMessage("Player \"%s\" has left the game", Players[player].Name);
-    } else {
-	SetMessage("Player \"%s\" has been killed", Players[player].Name);
-    }
-
     // Remove player from Hosts and clear NetworkIn
     for (i = 0; i < HostsCount; ++i) {
 	if (Hosts[i].PlyNr == player) {
@@ -942,6 +923,8 @@ local void ParseNetworkCommand(const NetworkCommandQueue *ncq)
 	    break;
 	case MessageQuit:
 	    NetworkRemovePlayer(ncq->Data.X);
+	    CommandLog("quit",NoUnitP,FlushCommands,ncq->Data.X,-1,NoUnitP,NULL,-1);
+	    CommandQuit(ncq->Data.X);
 	    break;
 	case MessageExtendedCommand: {
 	    const NetworkExtendedCommand *nec;

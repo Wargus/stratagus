@@ -131,6 +131,35 @@ local void ClearSavedAction(Unit* unit)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Player quit.
+**
+**	@param player	Player number that quit.
+*/
+global void CommandQuit(int player)
+{
+    int i;
+
+    if (Players[player].TotalNumUnits != 0) {
+	// Set player to neutral, remove allied/enemy/shared vision status
+	Players[player].Type = PlayerNeutral;
+	for (i = 0; i < NumPlayers; ++i) {
+	    if (i == player) {
+		continue;
+	    }
+	    Players[i].Allied &= ~(1 << player);
+	    Players[i].Enemy &= ~(1 << player);
+	    Players[i].SharedVision &= ~(1 << player);
+	    Players[player].Allied &= ~(1 << i);
+	    Players[player].Enemy &= ~(1 << i);
+	    Players[player].SharedVision &= ~(1 << i);
+	}
+	SetMessage("Player \"%s\" has left the game", Players[player].Name);
+    } else {
+	SetMessage("Player \"%s\" has been killed", Players[player].Name);
+    }
+}
+
+/**
 **	Stop unit.
 **
 **	@param unit	pointer to unit.
