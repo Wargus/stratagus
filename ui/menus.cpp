@@ -3787,7 +3787,9 @@ local void GameRCSAction(Menuitem *mi, int i)
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     if (mi->d.pulldown.curopt == i) {
-	GameSettings.Presets[0].Race = v[i];
+	if (NetworkFildes==-1) {
+	    GameSettings.Presets[0].Race = v[i];
+	}
 	ServerSetupState.Race[0] = 2 - i;
 	NetworkServerResyncClients();
     }
