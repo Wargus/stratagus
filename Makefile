@@ -147,7 +147,8 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/ui.ccl data/ccl/human/ui.ccl data/ccl/orc/ui.ccl \
 	  data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
-	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl \
+	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl 
+	  data/ccl/human/upgrade.ccl data/ccl/orc/upgrade.ccl \
 	  data/ccl/buttons.ccl data/ccl/human/buttons.ccl \
 	  data/ccl/orc/buttons.ccl data/ccl/wc2.ccl data/default.cm
 
@@ -341,10 +342,13 @@ release:
 #	WIN32 Crosscompiler Build
 ##############################################################################
 
+#-lws2_32 -Wl,--stack,63550000  -Wl,--stack,16777216
 WIN32=	\
     EXE='.exe' \
+    ZDEFS='-DUSE_ZLIB' \
+    ZLIBS='-lz' \
     VIDEO='-DUSE_WIN32 $(SDL)'	\
-    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -lws2_32 -Wl,--stack,16777216'
+    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32'
 
 win32new:
 	@$(MAKE) distclean
