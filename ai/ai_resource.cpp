@@ -885,9 +885,10 @@ local int AiHarvest(Unit * unit)
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
     struct {
-	unsigned short X;
-	unsigned short Y;
-    } points[MaxMapWidth*MaxMapHeight/4];
+		unsigned short X;
+		unsigned short Y;
+    } * points;
+    int size;
     int x;
     int y;
     int rx;
@@ -910,7 +911,9 @@ local int AiHarvest(Unit * unit)
 
     x=unit->X;
     y=unit->Y;
-
+    points=alloca(TheMap.Width*TheMap.Height/4);
+    size=TheMap.Width*TheMap.Height/sizeof(*points);
+	
     //
     //	Find the nearest wood depot
     //
@@ -974,17 +977,17 @@ local int AiHarvest(Unit * unit)
 		    *m=1;
 		    points[wp].X=x;		// push the point
 		    points[wp].Y=y;
-		    if( ++wp>=sizeof(points)/sizeof(*points) ) {// round about
-			wp=0;
-		    }
+			if( ++wp>=size ) {			// round about
+				wp=0;
+			}
 		} else {			// unreachable
 		    *m=99;
 		}
 	    }
 
-	    if( ++rp>=sizeof(points)/sizeof(*points) ) {	// round about
-		rp=0;
-	    }
+		if( ++rp>=size ) {			// round about
+			rp=0;
+		}
 	}
 
 	//
