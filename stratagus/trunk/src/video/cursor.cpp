@@ -1050,6 +1050,35 @@ global void InvalidateCursorAreas(void)
   }
 }
 
+#ifdef USE_OPENGL
+local void LoadCursorRectangleOpenGL(void *buffer __attribute__((unused)),
+				     int x __attribute__((unused)),
+				     int y __attribute__((unused)),
+				     int w __attribute__((unused)),
+				     int h __attribute__((unused)))
+{
+}
+local void SaveCursorRectangleOpenGL(void *buffer __attribute__((unused)),
+				     int x __attribute__((unused)),
+				     int y __attribute__((unused)),
+				     int w __attribute__((unused)),
+				     int h __attribute__((unused)))
+{
+}
+local void LoadCursorBackgroundOpenGL(int x __attribute__((unused)),
+				      int y __attribute__((unused)),
+				      int w __attribute__((unused)),
+				      int h __attribute__((unused)))
+{
+}
+local void SaveCursorBackgroundOpenGL(int x __attribute__((unused)),
+				      int y __attribute__((unused)),
+				      int w __attribute__((unused)),
+				      int h __attribute__((unused)))
+{
+}
+#endif
+
 /**
 **	Setup the cursor part.
 **
@@ -1058,6 +1087,13 @@ global void InvalidateCursorAreas(void)
 */
 global void InitVideoCursors(void)
 {
+#ifdef USE_OPENGL
+    SaveCursorBackground=SaveCursorBackgroundOpenGL;
+    LoadCursorBackground=LoadCursorBackgroundOpenGL;
+    MemSize=1;
+    SaveCursorRectangle=SaveCursorRectangleOpenGL;
+    LoadCursorRectangle=LoadCursorRectangleOpenGL;
+#else
     if( OldCursorRectangle ) {	// memory of possible previous video-setting?
 	free( OldCursorRectangle );
 	OldCursorRectangle = 0;
@@ -1098,6 +1134,7 @@ global void InitVideoCursors(void)
 	    abort();
     }
     OldCursorRectangle=malloc((2*VideoWidth+2*(VideoHeight-2))*MemSize);
+#endif
 
     CursorX=VideoWidth/2;
     CursorY=VideoHeight/2;
