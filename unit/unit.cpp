@@ -255,9 +255,11 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
 
+#ifndef NEW_ORDERS
     if( type->CowerWorker ) {
 	unit->WoodToHarvest=CHOP_FOR_WOOD;
     }
+#endif
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
     }
@@ -265,17 +267,23 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 
     unit->GroupId=-1;
 
-    DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
-
     unit->Wait=1;
     unit->Reset=1;
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
     unit->Revealer = 0; // FOW revealer
 
+#ifdef NEW_ORDERS
+    unit->Orders[0].Action=UnitActionStill;
+    unit->NewOrder.Action=UnitActionStill;
+    unit->SavedOrder.Action=UnitActionStill;
+#else
     unit->Command.Action=UnitActionStill;
     unit->PendCommand.Action=UnitActionStill;
     unit->SavedCommand.Action=UnitActionStill;
+#endif
+
+    DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
 
     return unit;
 }
@@ -445,7 +453,8 @@ global void RemoveUnit(Unit* unit)
 
     DebugLevel3Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
     UnitCacheRemove(unit);
-    {	
+#ifdef UNIT_ON_MAP
+    if( 0 ) {	
 	Unit* list;
 
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
@@ -458,6 +467,7 @@ global void RemoveUnit(Unit* unit)
 	    list=list->Next;
 	}
     }
+#endif
 
     MustRedraw|=RedrawMinimap;
     if( UnitVisible(unit) ) {
@@ -486,9 +496,14 @@ global void UnitLost(const Unit* unit)
 	// FIXME: most redraws only needed for player==ThisPlayer
 
 	// Still under construction
-	if( unit->Command.Action!=UnitActionBuilded ) {
-	    if( type==UnitTypeByIdent("unit-farm")
-		    || type==UnitTypeByIdent("unit-pig-farm") ) {
+#ifdef NEW_ORDERS
+	// FIXME: could use unit::Constructed?
+	if( unit->Orders[0].Action!=UnitActionBuilded )
+#else
+	if( unit->Command.Action!=UnitActionBuilded )
+#endif
+	{
+	    if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
 		player->Food-=4;
 		MustRedraw |= RedrawResources;
 	    } else if( type==UnitTypeByIdent("unit-town-hall")
@@ -531,7 +546,9 @@ global void UnitLost(const Unit* unit)
 	player->NumBuildings--;
     } else {
 	player->NumFoodUnits--;
-	MustRedraw|=RedrawResources;	// update food
+	if( player==ThisPlayer ) {
+	    MustRedraw|=RedrawResources;	// update food
+	}
     }
 
     //
@@ -741,6 +758,8 @@ global int UnitVisible(const Unit* unit)
     return 1;
 #endif
 }
+
+// FIXME: perhaps I should write a function UnitSelectable?
 
 /**
 **	Increment mana of all magic units. Called each second.
@@ -1072,7 +1091,7 @@ global void UnitHeadingFromDeltaXY(Unit* unit,int dx,int dy)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Reapear unit on map.
+**	Reappear unit on map.
 */
 global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
 {
@@ -1142,7 +1161,12 @@ found:
     // FIXME: This only works with 1x1 big units
     TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
+#ifdef NEW_ORDERS
+    DebugLevel0Fn("Look here\n");
+    unit->Orders[0].Action=UnitActionStill;
+#else
     unit->Command.Action=UnitActionStill;
+#endif
     if( unit->Wait!=1 ) {
 	unit->Wait=1;
 	DebugLevel3("Check this\n");
@@ -1170,7 +1194,7 @@ found:
 }
 
 /**
-**	Reapear unit on map nearest to x,y.
+**	Reappear unit on map nearest to x,y.
 */
 global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 {
@@ -1248,7 +1272,12 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    // FIXME: This only works with 1x1 big units
 	    TheMap.Fields[bestx+besty*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
+#ifdef NEW_ORDERS
+	    DebugLevel0Fn("Look here\n");
+	    unit->Orders[0].Action=UnitActionStill;
+#else
 	    unit->Command.Action=UnitActionStill;
+#endif
 	    if( unit->Wait!=1 ) {
 		unit->Wait=1;
 		DebugLevel3("Check this\n");
@@ -1887,9 +1916,15 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 	unit=*table;
 	// We don't use UnitUnusable() to be able to select
 	// a building under construction.
+#ifdef NEW_ORDERS
+	if( unit->Removed || unit->Orders[0].Action==UnitActionDie ) {
+	    continue;
+	}
+#else
 	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
 	    continue;
 	}
+#endif
 	type=unit->Type;
 
 	//
@@ -1943,25 +1978,31 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 global void DestroyUnit(Unit* unit)
 {
     UnitType* type;
+#ifdef NEW_ORDERS
+    int i;
+#endif
 
     unit->HP=0;
     unit->Moving=0;
 
     MustRedraw|=RedrawResources; // for food usage indicator
 
-#if 0
-    // FIXME: unit has still references, can't be reseted here.
-
+#ifdef NEW_ORDERS
     //
     //	Release all references
     //
-    if( unit->Command.Data.Move.Goal ) {
-	DebugCheck( !unit->Command.Data.Move.Goal->Refs );
-	if( !--unit->Command.Data.Move.Goal->Refs ) {
-	    ReleaseUnit(unit->Command.Data.Move.Goal);
+    for( i=unit->OrderCount+1; i>=0; --i ) {
+	if( unit->Orders[i].Goal ) {
+	    DebugCheck( !unit->Orders[i].Goal->Refs );
+	    if( !--unit->Orders[i].Goal->Refs ) {
+		ReleaseUnit(unit->Orders[i].Goal);
+	    }
+	    unit->Orders[i].Goal=NoUnitP;
 	}
-	unit->Command.Data.Move.Goal=NoUnitP;
+	unit->OrderCount=0;
     }
+#else
+    // FIXME: unit has still references, can't be reseted here.
 #endif
 
     type=unit->Type;
@@ -2002,6 +2043,17 @@ global void DestroyUnit(Unit* unit)
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
 
+#ifdef NEW_ORDERS
+	//
+	//	Building with units inside?
+	//
+	if( type->GoldMine
+		|| type->StoresGold || type->StoresWood
+		|| type->GivesOil || type->StoresOil
+		|| unit->Orders[0].Action==UnitActionBuilded ) {
+	    DestroyAllInside(unit);
+	}
+#else
 	//
 	//	Building with units inside?
 	//
@@ -2011,6 +2063,7 @@ global void DestroyUnit(Unit* unit)
 		|| unit->Command.Action==UnitActionBuilded ) {
 	    DestroyAllInside(unit);
 	}
+#endif
 
 	RemoveUnit(unit);
 	UnitLost(unit);
@@ -2027,14 +2080,20 @@ global void DestroyUnit(Unit* unit)
 	    unit->SubAction=0;
 	    unit->Removed=0;
 	    unit->Frame=0;
+#ifdef NEW_ORDERS
+	    unit->Orders[0].Action=UnitActionDie;
+#else
 	    unit->Command.Action=UnitActionDie;
+#endif
 
 	    DebugCheck( !unit->Type->Animations
 		    || !unit->Type->Animations->Die );
+#ifndef NEW_ORDERS
 	    if( unit->NextCount ) {
 		DebugLevel0Fn("NextCount = %d\n",unit->NextCount);
 	    }
 	    unit->NextCount=0;
+#endif
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n",unit->Frame);
 
@@ -2066,7 +2125,7 @@ global void DestroyUnit(Unit* unit)
     }
 
     //
-    //	Unit has no death animation.
+    //	Unit has death animation.
     //
 
     // Not good: UnitUpdateHeading(unit);
@@ -2075,7 +2134,11 @@ global void DestroyUnit(Unit* unit)
     unit->State=0;
     unit->Reset=0;
     unit->Wait=1;
+#ifdef NEW_ORDERS
+    unit->Orders[0].Action=UnitActionDie;
+#else
     unit->Command.Action=UnitActionDie;
+#endif
 }
 
 /**
@@ -2103,6 +2166,16 @@ global void DestroyAllInside(Unit* source)
 	return;
     }
 
+#ifdef NEW_ORDERS
+    //
+    // Destroy the peon in building under construction...
+    //
+    if( source->Orders[0].Action==UnitActionBuilded
+	    && source->Data.Builded.Worker ) {
+	DestroyUnit(source->Data.Builded.Worker);
+	return;
+    }
+#else
     //
     // Destroy the peon in building under construction...
     //
@@ -2112,6 +2185,7 @@ global void DestroyAllInside(Unit* source)
 	DestroyUnit(source->Command.Data.Builded.Worker);
 	return;
     }
+#endif
 
     // FIXME: should use a better methode, linking all units in a building
     // FIXME: f.e. with the next pointer.
@@ -2131,6 +2205,9 @@ global void DestroyAllInside(Unit* source)
 
 /**
 **	Unit is hit by missile.
+**
+**	@param unit	Unit that is hit.
+**	@param damage	How many damage to take.
 */
 global void HitUnit(Unit* unit,int damage)
 {
@@ -2217,9 +2294,22 @@ global void HitUnit(Unit* unit,int damage)
 	}
     }
 
+    //
+    //	FIXME: call others for help.
+    //
+
+    //
+    //	Unit is working?
+    //
+#ifdef NEW_ORDERS
+    if( unit->Orders[0].Action!=UnitActionStill ) {
+	return;
+    }
+#else
     if( unit->Command.Action!=UnitActionStill ) {
 	return;
     }
+#endif
 
     //
     //	Attack units in range (which or the attacker?)
@@ -2228,9 +2318,14 @@ global void HitUnit(Unit* unit,int damage)
 	if( type->CanAttack && !type->Tower ) {
 	    goal=AttackUnitsInReactRange(unit);
 	    if( goal ) {
-		CommandAttack(unit,goal->X,goal->Y,goal,0);
-		// FIXME: whow what a chaos (johns)
-		//unit->SubAction|=2; (removed produces error)
+		// FIXME: should rewrite command handling
+		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
+#ifdef NEW_ORDERS
+		unit->SavedOrder=unit->Orders[1];
+#else
+		unit->SavedCommand=unit->NextCommand[0];
+#endif
+		CommandAttack(unit,goal->X,goal->Y,NoUnitP,FlushCommands);
 		return;
 	    }
 	}
@@ -2239,6 +2334,9 @@ global void HitUnit(Unit* unit,int damage)
     //
     //	FIXME: Can't attack run away.
     //
+    if( !type->Building ) {
+	DebugLevel0Fn("FIXME: run away!\n");
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -2421,6 +2519,10 @@ local char* UnitReference(const Unit* unit)
     return ref;
 }
 
+#ifdef NEW_ORDERS
+
+#else
+
 /**
 **	Save the current command of an unit.
 */
@@ -2499,6 +2601,10 @@ local void SaveCommand(const Command* command,FILE* file)
 	    fprintf(file,"'die");
 	    fprintf(file," \"FIXME:\"");
 	    break;
+	case UnitActionSpellCast:
+	    fprintf(file,"'spell-cast");
+	    fprintf(file," \"FIXME:\"");
+	    break;
 	case UnitActionTrain:
 	    fprintf(file,"'train");
 	    fprintf(file," \"FIXME:\"");
@@ -2573,19 +2679,19 @@ local void SaveCommand(const Command* command,FILE* file)
 	    fprintf(file,"'demolish");
 	    fprintf(file," \"FIXME:\"");
 	    break;
-	case UnitActionSpellCast:
-	    fprintf(file,"'spell-cast");
-	    fprintf(file," \"FIXME:\"");
-	    break;
     }
     fprintf(file,")\n");
 }
+
+#endif
 
 /**
 **	Save the state of an unit to file.
 */
 global void SaveUnit(const Unit* unit,FILE* file)
 {
+#ifdef NEW_ORDERS
+#else
     char* ref;
     int i;
 
@@ -2641,6 +2747,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	SaveCommand(unit->NextCommand+i,file);
     }
     fprintf(file,"  ))\n");
+#endif
 }
 
 /**
