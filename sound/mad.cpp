@@ -268,7 +268,7 @@ local const SampleType Mp3StreamSampleType = {
 **
 **	@return		    Number of bytes read
 */
-local int Mp3Read(Sample* sample, void* buf, int len)
+local int Mp3Read(Sample* sample, void* buf, unsigned len)
 {
     unsigned pos;
 

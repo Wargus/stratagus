@@ -103,7 +103,7 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	const FLAC__StreamDecoder * stream __attribute__((unused)),
 	FLAC__byte buffer[], unsigned int *bytes, void *user)
 {
-    int i;
+    unsigned i;
     CLFile *f;
 
     DebugLevel3Fn("Read callback %d\n" _C_ *bytes);
@@ -159,8 +159,8 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
     const FLAC__Frame * frame, const FLAC__int32 * const buffer[], void *user)
 {
     Sample *sample;
-    int i;
-    int channel;
+    unsigned i;
+    unsigned channel;
     void *p;
 
     DebugLevel3Fn("Write callback %d bits, %d channel, %d bytes\n" _C_
@@ -216,7 +216,7 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 **
 **	@return		    Number of bytes read
 */
-local int FlacRead(Sample* sample, void* buf, int len)
+local int FlacRead(Sample* sample, void* buf, unsigned len)
 {
     unsigned pos;
 
