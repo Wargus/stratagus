@@ -1940,7 +1940,6 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	break;
     }
 
-    DebugCheck((char)unit->Mana < 0);
     return repeat;
 }
 
