@@ -434,8 +434,7 @@ local void DrawBuildingCursor(void)
 	while( w-- ) {
 	    if( f && (CanBuildOn(mx+w,my+h,mask) ||
 		    (Selected[0]->X==mx+w && Selected[0]->Y==my+h))
-                  && (TheMap.Fields[mx+w+(my+h)*TheMap.Width].Flags
-			&MapFieldExplored) ) {
+                  && IsMapFieldExplored(mx+w,my+h) ) {
 		color=ColorGreen;
 	    } else {
 		color=ColorRed;
