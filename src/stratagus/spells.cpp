@@ -770,8 +770,11 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 	Unit* temp;
 
 	// FIXME: johns: the unit is placed on the wrong position
-	temp=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-eye-of-kilrogg"),
-	     unit->Player);
+	temp=MakeUnit(UnitTypeByIdent("unit-eye-of-kilrogg"),unit->Player);
+	temp->X=x;
+	temp->Y=y;
+	DropOutOnSide(temp,LookingW,0,0);
+
 	// set life span
 	temp->TTL=FrameCounter+temp->Type->DecayRate*6*FRAMES_PER_SECOND;
 
@@ -903,6 +906,7 @@ global int SpellCast(const SpellType * spell, Unit * unit, Unit * target,
 		Unit* temp;
 
 		// FIXME: did they count on food?
+		// Can there be more than 1 skeleton created on the same tile?
 		temp=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
 			unit->Player);
 		// set life span
