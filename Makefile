@@ -192,7 +192,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/tilesets/wasteland.ccl data/ccl/tilesets/swamp.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm
 
-CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
+CONTRIB	= contrib/cross.png contrib/red\ cross.png contrib/health.png contrib/mana.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz
