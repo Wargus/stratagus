@@ -8,14 +8,13 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name goal.h		-	The game goal headerfile. */
+/**@name trigger.c	-	The trigger handling. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,21 +23,21 @@
 //
 //	$Id$
 
-#ifndef __GOAL_H__
-#define __GOAL_H__
-
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "freecraft.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
-
-/**
-**	All possible game goals.
-*/
-enum _game_goal_ {
-    GoalLastSideWins,			/// the last player with units wins
-};
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -48,9 +47,29 @@ enum _game_goal_ {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void SetGlobalGoal(int goal);	/// set global game goal
-extern void CheckGoals(void);		/// test if goals reached
+/**
+**	Register CCL features for triggers.
+*/
+global void TriggerCclRegister(void)
+{
+}
+
+/**
+**	Save the trigger module.
+*/
+global void SaveTrigger(FILE* file)
+{
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: trigger $Id$\n\n");
+    fprintf(file,";;; FIXME: Save not written\n\n");
+}
+
+/**
+**	Clean up the trigger module.
+*/
+global void CleanTrigger(void)
+{
+    DebugLevel0Fn("FIXME: Cleaning trigger not written\n");
+}
 
 //@}
-
-#endif	// !__GOAL_H__

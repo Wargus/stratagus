@@ -8,14 +8,13 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name goal.h		-	The game goal headerfile. */
+/**@name trigger.h	-	The game trigger headerfile. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,21 +23,14 @@
 //
 //	$Id$
 
-#ifndef __GOAL_H__
-#define __GOAL_H__
+#ifndef __TRIGGER_H__
+#define __TRIGGER_H__
 
 //@{
 
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
-
-/**
-**	All possible game goals.
-*/
-enum _game_goal_ {
-    GoalLastSideWins,			/// the last player with units wins
-};
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -48,9 +40,12 @@ enum _game_goal_ {
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void SetGlobalGoal(int goal);	/// set global game goal
-extern void CheckGoals(void);		/// test if goals reached
+extern void CheckTriggers(void);	/// test all triggers
+
+extern void TriggerCclRegister(void);	/// Register ccl features
+extern void SaveTrigger(FILE*);		/// Save the trigger module
+extern void CleanTrigger(void);		/// Cleanup the trigger module
 
 //@}
 
-#endif	// !__GOAL_H__
+#endif	// !__TRIGGER_H__

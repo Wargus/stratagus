@@ -43,7 +43,7 @@ HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
 	  ccl_sound.h sound.h sound_id.h unitsound.h wav.h sound_server.h \
 	  video.h network.h commands.h goal.h ui.h menus.h spells.h \
 	  siod.h siodp.h iolib.h depend.h settings.h myendian.h net_lowlevel.h \
-	  netconnect.h rdtsc.h campaign.h \
+	  netconnect.h rdtsc.h campaign.h trigger.h \
 	  etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h \
 
 all:
