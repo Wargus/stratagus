@@ -446,7 +446,7 @@ fi
 if test "$WIN32" = 0 ; then
   echo
   echo "VIDEO DRIVER OPTIONS"
-  echo "  X-X11 Support (default)"
+  echo "  X-X11 Support"
 
   if test "$HAVESDL" = 1 ; then
     echo "  S-SDL Support"
@@ -458,7 +458,7 @@ if test "$WIN32" = 0 ; then
     echo "  B-SDL/SVGALIB Support"
   fi
   echo
-  echo -n "Please enter selection: "
+  echo -n "Please enter selection: (s) "
   read $N VIDSEL
   echo
 fi
@@ -479,30 +479,6 @@ fi
 
 echo "# Video support" >> $RULESFILE
 case $VIDSEL in
-  [sS])
-	echo -n "-> Using SDL"
-  	USESDL=1
-	SDLLIB="\$(shell $SDL_CONFIG --libs)"
-	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-
-        if test "$STATIC x" != " x" ; then
-	  SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
-	fi
-
-	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
-	echo >> $RULESFILE
-	echo "VIDEO             = \$(SDL)" >> $RULESFILE
-    if [ "$BEOS" != "1" ] ; then
-	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
-    else
-	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
-    fi
-
-
-	echo
-	;;
-
   [vV])
 	echo "-> Using SVGALIB"
 	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
@@ -515,35 +491,36 @@ case $VIDSEL in
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
 	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-
-        if test "$STATIC x" != " x" ; then
-	  SDLLIB="$SDLLIB -lesd"
-	fi
-
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
 	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl $DL" >> $RULESFILE
 	echo
 	;;
-
   *)
-	if [ "$WIN32" = "1" ] ; then
-	  echo "-> Using SDL"
-  	  USESDL=1
+	echo -n "-> Using SDL"
+  	USESDL=1
+	if [ "$WIN32" = "1" ]; then
 	  SDLLIB="\$(shell $SDL_CONFIG --libs) -lmingwex"
-	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	  echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
-          if test "$STATIC x" != " x" ; then
-	    SDLLIB="$SDLLIB -lesd"
-	  fi
-	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
-	  echo >> $RULESFILE
-	else  
-	  echo "-> Using X11"
-	  echo "VIDEO		= -DUSE_X11" >> $RULESFILE
-	  echo "VIDEOLIB	= -lXext -lX11 $DL" >> $RULESFILE
+	else
+	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	fi
+	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+
+	if test "$STATIC x" != " x" ; then
+	    SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
+	fi
+
+	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
+	echo >> $RULESFILE
+	echo "VIDEO             = \$(SDL)" >> $RULESFILE
+        if [ "$BEOS" != "1" ] ; then
+	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
+	else
+	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+	fi
+	echo
 	;;
 
 esac
