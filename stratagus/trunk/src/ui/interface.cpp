@@ -784,8 +784,16 @@ local int CommandKey(int key)
 	    UiDecrementGameSpeed();
 	    break;
 
+	case 'l'&0x1F:
 	case 'l':			// ALT l F12 load game menu
 	case 'L':
+#ifdef DEBUG
+	    if( KeyModifiers&ModifierControl ) {// Ctrl + L - load - all debug
+		LoadAll();
+		SetMessage("All loaded");
+		break;
+	    }
+#endif
 	    if( !(KeyModifiers&ModifierAlt) ) {
 		break;
 	    }
