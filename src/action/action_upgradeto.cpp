@@ -54,7 +54,7 @@ global void HandleActionUpgradeTo(Unit* unit)
 	unit->Data.UpgradeTo.Ticks=0;
 	unit->SubAction=1;
     }
-    type=unit->Data.UpgradeTo.What;
+    type=unit->Orders[0].Type;
     stats=&type->Stats[player->Player];
 
     // FIXME: Should count down here
