@@ -34,9 +34,9 @@ This file should give you some information to help with development of Stratagus
 <h2>Mailing list</h2>
 
 If you want to help with development for Stratagus you should 
-<a href="http://mail.nongnu.org/mailman/listinfo/stratagus-devel/">join</a> 
+<a href="http://lists.sourceforge.net/mailman/listinfo/stratagus-devel">join</a> 
 the stratagus-devel mailing list.<br> You may also want to look at the 
-<a href="http://mail.nongnu.org/archive/html/stratagus-devel/">archives.</a>
+<a href="http://sourceforge.net/mailarchive/forum.php?forum_id=39600">archives.</a>
 
 <h2>IRC - Internet Relay Chat</h2>
 
@@ -47,11 +47,11 @@ You can try to meet other Stratagus developers and users on the
 <h2>Bugs and tasks</h2>
 
 You can find <a
-href="http://savannah.nongnu.org/bugs/?group=stratagus">known bugs</a>
-and <a href="http://savannah.nongnu.org/pm/?group=stratagus">planned
+href="http://sourceforge.net/tracker/?group_id=84903&atid=574265">known bugs</a>
+and <a href="http://sourceforge.net/pm/?group_id=84903">planned
 tasks</a> on the <a
-href="http://savannah.nongnu.org/projects/stratagus/">Savannah pages
-of Stratagus</a>.<p>
+href="http://sourceforge.net/projects/stratagus/">Sourceforge pages
+for Stratagus</a>.<p>
 
 Before starting on a bug or task, please ask on the mailing list or in the 
 IRC channel whether anybody else is already working on it.
@@ -62,12 +62,12 @@ IRC channel whether anybody else is already working on it.
 
 If you want to help develop, it is the best that you use CVS. To do
 so, first you need CVS for your system. Savannah has a <a
-href="http://savannah.nongnu.org/cvs/?group=stratagus">guide</a> that
+href="http://sourceforge.net/cvs/?group_id=84903">guide</a> that
 will help you get started.
 
 <h3>Getting Stratagus from CVS</h3>
 
-<h4>There are 3 modules in the CVS repository.</h4>
+<h4>There are 2 modules in the CVS repository.</h4>
 
 <ul>
     <li>stratagus - The Stratagus engine source<p>
@@ -75,27 +75,26 @@ will help you get started.
 	under the GNU General Public License.
 	<b>This module is needed for development.</b>
 
-    <li>fcmp - The Stratagus Media Project<p>
-	A collection of free media (free sounds, music, videos, graphics,
-	animations and models), licensed under the GNU General Public License.
-
-    <li>crafted - The Stratagus Map Editor<p>
-	A map editor for Stratagus. This is obsolete now as Stratagus 
-	has an internal editor.
+    <li>htdocs - The Stratagus Website<p>
+	The website is stored in CVS for easy updating and version management
+	by mulitple people.  This module is not needed unless you plan to update
+	the stratagus website 
 </ul>
 
 <h4>How do I access to these modules?</h4>
 
 The instructions for accessing the modules are on the 
-<a href="http://savannah.nongnu.org/cvs/?group=stratagus">project cvs</a> page.<br> 
+<a href="http://sourceforge.net/cvs/?group_id=84903">project cvs</a> page.<br> 
 NOTE: it is highly recommended that you use the -z3 flag, this compresses 
-the data and therefore speeds the transfer up.<p>
+the data and therefore speeds the transfer up. Also be warned that sourceforge
+has its anonymous CVS up to 5 hours behind developer CVS. Changes to developer
+CVS are not immediate for anonymous users.<p>
 
 For example:<p>
 
-cvs -d:pserver:anoncvs@subversions.gnu.org:/cvsroot/stratagus login<br />
+cvs -d:pserver:anoncvs@cvs.sourceforge.net:/cvsroot/stratagus login<br />
 <i>"When prompted for a password for anonymous, simply press the Enter key."</i><br>
-cvs -z3 -d:pserver:anoncvs@subversions.gnu.org:/cvsroot/stratagus co stratagus<br />
+cvs -z3 -d:pserver:anoncvs@cvs.sourceforge.net:/cvsroot/stratagus co stratagus<br />
 
 This is done only once. To update your CVS directory, go into 
 the module directory and type 'cvs -z3 -q update -dP'.<p>
@@ -105,10 +104,13 @@ need to type 'cvs update', the cvs (1) man page will show you how.
 
 <h3>Getting Stratagus without CVS</h3>
 
-Please note CVS is always the latest and it is easier for you to keep
-up to date. But if for some reason you cannot get the source via CVS, 
-you find can regular snapshots of Stratagus 
-<a href="http://savannah.nongnu.org/files/?group=stratagus">here</a>.
+Only releases are made outside of CVS.  If you wish to be involved with
+development, it is best that you obtain CVS, or learn how to use it so
+you can get access to CVS. CVS usually remains quite stable and is easier
+for you to keep up to date. Release versions of stratagus are available 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=84903">here</a>. 
+Many of the games that use the stratagus engine will, and should bundle these 
+files with their release, to ensure compatibility.
 
 <h3>Compiling Stratagus</h3>
 
@@ -232,10 +234,9 @@ If you fix in other modules, please imitate the coding style of the original cod
 found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
 <ul>
     <li>Write ANSI C.
-    <li>Use 8 spaces tabulators.
-    <li>Use 4 spaces indentation levels.
+    <li>Use 4 spaces tabulators.
     <li>No line should be longer than 78 characters.
-    <li>Use C++ comments for to end of line comments.
+	<li>All comments should be on their own line.
     <li>Use { } even for one statement blocks.
 </ul>
 
@@ -253,7 +254,7 @@ Follow these steps:<p>
     <li>cvs -q update -d
     <li>cvs -q diff -u &gt; your-nickname.diff
     <li>upload 'your-nickname.diff' to the
-    <a href=http://savannah.nongnu.org/patch/?group=stratagus">patch tracker</a>.
+    <a href="http://sourceforge.net/tracker/?group_id=84903&atid=574267">patch tracker</a>.
 </ul>
 
 Please also read the <a href="datadir.html">Stratagus data directory description.</a><p>
