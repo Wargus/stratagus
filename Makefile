@@ -248,6 +248,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/ccl/ranks.ccl \
 	  data/ccl/tips.ccl data/ccl/menus.ccl data/ccl/keystrokes.ccl \
+	  data/ccl/siod.ccl \
 	  data/ccl/editor.ccl # data/campaigns/*/*.cm
 
 CONTRIB	= contrib/cross.png contrib/red_cross.png \
@@ -371,9 +372,9 @@ release:
 	$(MAKE) distclean
 	$(MAKE) depend
 	$(MAKE) bin-dist
-#	$(MAKE) win32new
-#	$(MAKE) win32-bin-dist
-#	$(MAKE) win32distclean
+	$(MAKE) win32new
+	$(MAKE) win32-bin-dist
+	$(MAKE) win32distclean
 	$(MAKE) dist
 
 ##############################################################################
