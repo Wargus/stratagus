@@ -41,7 +41,7 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define MASTER_HOST "nobody.gotdns.org"
+#define MASTER_HOST "mohydine.no-ip.com"
 #define MASTER_PORT 7775
 
 /*----------------------------------------------------------------------------
