@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name linedraw.c	-	The general linedraw functions. */
+/**@name linedraw.c - The general linedraw functions. */
 //
-//	(c) Copyright 2000-2003 by Lutz Sammer, Stephan Rasenberg,
-//	Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 2000-2004 by Lutz Sammer, Stephan Rasenberg,
+//                              Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -68,7 +68,9 @@ typedef enum {
 #ifdef USE_SDL_SURFACE
 // FIXME: comments
 global void (*VideoDrawPixel)(Uint32 color, int x, int y);
+local void (*VideoDoDrawPixel)(Uint32 color, int x, int y);
 global void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
+local void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
 global void VideoDrawPixelClip(Uint32 color, int x, int y);
 global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);
 global void VideoDrawVLine(Uint32 color, int x, int y, int width);
@@ -448,30 +450,52 @@ global void (*VideoFillTransRectangle)(VMemType color, int x, int y,
 // ===========================================================================
 
 #ifdef USE_SDL_SURFACE
-	// FIXME: BIG todo
-	// FIXME: optimize all these
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawPixel16(Uint32 color, int x, int y)
+{
+	((Uint16*)TheScreen->pixels)[x + y * VideoWidth] = color;
+}
+
+/**
+**  FIXME: docu
+*/
 global void VideoDrawPixel16(Uint32 color, int x, int y)
 {
 	VideoLockScreen();
-	((Uint16*)TheScreen->pixels)[x + y * VideoWidth] = color;
+	VideoDoDrawPixel16(color, x, y);
 	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawPixel32(Uint32 color, int x, int y)
+{
+	((Uint32*)TheScreen->pixels)[x + y * VideoWidth] = color;
+}
+
+/**
+**  FIXME: docu
+*/
 global void VideoDrawPixel32(Uint32 color, int x, int y)
 {
 	VideoLockScreen();
-	((Uint32*)TheScreen->pixels)[x + y * VideoWidth] = color;
+	VideoDoDrawPixel32(color, x, y);
 	VideoUnlockScreen();
 }
 
-global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
 	Uint16* p;
 	unsigned long dp;
 
+	// Loses precision for speed
 	alpha = (255 - alpha) >> 3;
-
-	VideoLockScreen();
 
 	p = &((Uint16*)TheScreen->pixels)[x + y * VideoWidth];
 	color = (((color << 16) | color) & 0x07E0F81F);
@@ -479,11 +503,22 @@ global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alph
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
 	dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
 	*p = (dp >> 16) | dp;
+}
 
+/**
+**  FIXME: docu
+*/
+global void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
+{
+	VideoLockScreen();
+	VideoDoDrawTransPixel16(color, x, y, alpha);
 	VideoUnlockScreen();
 }
 
-global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
 	unsigned long sp2;
 	unsigned long dp1;
@@ -510,92 +545,171 @@ global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alph
 	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
+global void VideoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
+{
+	VideoLockScreen();
+	VideoDoDrawTransPixel32(color, x, y, alpha);
+	VideoUnlockScreen();
+}
+
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawPixelClip(Uint32 color, int x, int y)
+{
+	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
+		VideoDoDrawPixel(color, x, y);
+	}
+}
+
+/**
+**  FIXME: docu
+*/
 global void VideoDrawPixelClip(Uint32 color, int x, int y)
 {
-	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		VideoDrawPixel(color, x, y);
-	}
+	VideoLockScreen();
+	VideoDoDrawPixelClip(color, x, y);
+	VideoUnlockScreen();
 }
 
-global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+/**
+**  FIXME: docu
+*/
+local void VideoDoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
 {
 	if (x >= ClipX1 && y >= ClipY1 && x <= ClipX2 && y <= ClipY2) {
-		VideoDrawTransPixel(color, x, y, alpha);
+		VideoDoDrawTransPixel(color, x, y, alpha);
 	}
 }
 
+/**
+**  FIXME: docu
+*/
+global void VideoDrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha)
+{
+	VideoLockScreen();
+	VideoDoDrawTransPixelClip(color, x, y, alpha);
+	VideoUnlockScreen();
+}
+
+/**
+**  FIXME: docu
+*/
 global void VideoDrawVLine(Uint32 color, int x, int y, int height)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < height; ++i) {
-		VideoDrawPixel(color, x, y + i);
+		VideoDoDrawPixel(color, x, y + i);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < height; ++i) {
-		VideoDrawTransPixel(color, x, y + i, alpha);
+		VideoDoDrawTransPixel(color, x, y + i, alpha);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
 {
-	int w = 1;
+	int w;
+	
+	w = 1;
 	CLIP_RECTANGLE(x, y, w, height);
 	VideoDrawVLine(color, x, y, height);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < height; ++i) {
-		VideoDrawTransPixelClip(color, x, y + i, alpha);
+		VideoDoDrawTransPixelClip(color, x, y + i, alpha);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < width; ++i) {
-		VideoDrawPixel(color, x + i, y);
+		VideoDoDrawPixel(color, x + i, y);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawHLineClip(Uint32 color, int x, int y, int width)
 {
-	int h = 1;
+	int h;
+	
+	h = 1;
 	CLIP_RECTANGLE(x, y, width, h);
 	VideoDrawHLine(color, x, y, width);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < width; ++i) {
-		VideoDrawTransPixel(color, x + i, y, alpha);
+		VideoDoDrawTransPixel(color, x + i, y, alpha);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha)
 {
 	int i;
 
+	VideoLockScreen();
 	for (i = 0; i < width; ++i) {
-		VideoDrawTransPixelClip(color, x + i, y, alpha);
+		VideoDoDrawTransPixelClip(color, x + i, y, alpha);
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
 	int x;
@@ -658,8 +772,9 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 
 		p = (ylen << 1) - xlen;
 
+		VideoLockScreen();
 		for (x = sx; x < dx; ++x) {
-			VideoDrawPixel(color, x, y);
+			VideoDoDrawPixel(color, x, y);
 			if (p >= 0) {
 				y += incr;
 				p += (ylen - xlen) << 1;
@@ -667,6 +782,7 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (ylen << 1);
 			}
 		}
+		VideoUnlockScreen();
 		return;
 	}
 
@@ -675,8 +791,9 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 
 		p = (xlen << 1) - ylen;
 
+		VideoLockScreen();
 		for (y = sy; y < dy; ++y) {
-			VideoDrawPixel(color, x, y);
+			VideoDoDrawPixel(color, x, y);
 			if (p >= 0) {
 				x += incr;
 				p += (xlen - ylen) << 1;
@@ -684,19 +801,25 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (xlen << 1);
 			}
 		}
+		VideoUnlockScreen();
 		return;
 	}
 
 	// Draw a diagonal line
 	if (ylen == xlen) {
+		VideoLockScreen();
 		while (y != dy) {
-			VideoDrawPixel(color, x, y);
+			VideoDoDrawPixel(color, x, y);
 			x += incr;
 			++y;
 		}
+		VideoUnlockScreen();
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
 	int x;
@@ -759,8 +882,9 @@ global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 
 		p = (ylen << 1) - xlen;
 
+		VideoLockScreen();
 		for (x = sx; x < dx; ++x) {
-			VideoDrawPixelClip(color, x, y);
+			VideoDoDrawPixelClip(color, x, y);
 			if (p >= 0) {
 				y += incr;
 				p += (ylen - xlen) << 1;
@@ -768,6 +892,7 @@ global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (ylen << 1);
 			}
 		}
+		VideoUnlockScreen();
 		return;
 	}
 
@@ -776,8 +901,9 @@ global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 
 		p = (xlen << 1) - ylen;
 
+		VideoLockScreen();
 		for (y = sy; y < dy; ++y) {
-			VideoDrawPixelClip(color, x, y);
+			VideoDoDrawPixelClip(color, x, y);
 			if (p >= 0) {
 				x += incr;
 				p += (xlen - ylen) << 1;
@@ -785,19 +911,25 @@ global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 				p += (xlen << 1);
 			}
 		}
+		VideoUnlockScreen();
 		return;
 	}
 
 	// Draw a diagonal line
 	if (ylen == xlen) {
+		VideoLockScreen();
 		while (y != dy) {
-			VideoDrawPixelClip(color, x, y);
+			VideoDoDrawPixelClip(color, x, y);
 			x += incr;
 			++y;
 		}
+		VideoUnlockScreen();
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransLine(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha)
 {
@@ -805,6 +937,9 @@ global void VideoDrawTransLine(Uint32 color, int sx, int sy,
 	VideoDrawLine(color, sx, sy, dx, dy);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
@@ -815,6 +950,9 @@ global void VideoDrawRectangle(Uint32 color, int x, int y,
 	VideoDrawVLine(color, x + w - 1, y + 1, h - 2);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
@@ -825,6 +963,9 @@ global void VideoDrawRectangleClip(Uint32 color, int x, int y,
 	VideoDrawVLineClip(color, x + w - 1, y + 1, h - 2);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
@@ -835,6 +976,9 @@ global void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	VideoDrawTransVLine(color, x + w - 1, y + 1, h - 2, alpha);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillRectangle(Uint32 color, int x, int y,
 	int w, int h)
 {
@@ -848,6 +992,9 @@ global void VideoFillRectangle(Uint32 color, int x, int y,
 	SDL_FillRect(TheScreen, &drect, color);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
@@ -865,16 +1012,19 @@ global void VideoFillRectangleClip(Uint32 color, int x, int y,
 	SDL_SetClipRect(TheScreen, &oldrect);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
-	// FIXME: optimize
 	SDL_Rect drect;
 	SDL_Surface* s;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 
+	// FIXME: optimize
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
 		32, RMASK, GMASK, BMASK, AMASK);
 
@@ -890,6 +1040,9 @@ global void VideoFillTransRectangle(Uint32 color, int x, int y,
 	SDL_FreeSurface(s);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
@@ -907,6 +1060,9 @@ global void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 	SDL_SetClipRect(TheScreen, &oldrect);
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawCircle(Uint32 color, int x, int y, int r)
 {
 	int p;
@@ -916,16 +1072,17 @@ global void VideoDrawCircle(Uint32 color, int x, int y, int r)
 	p = 1 - r;
 	py = r;
 
+	VideoLockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDrawPixel(color, x + px, y + py);
-		VideoDrawPixel(color, x + px, y - py);
-		VideoDrawPixel(color, x - px, y + py);
-		VideoDrawPixel(color, x - px, y - py);
+		VideoDoDrawPixel(color, x + px, y + py);
+		VideoDoDrawPixel(color, x + px, y - py);
+		VideoDoDrawPixel(color, x - px, y + py);
+		VideoDoDrawPixel(color, x - px, y - py);
 
-		VideoDrawPixel(color, x + py, y + px);
-		VideoDrawPixel(color, x + py, y - px);
-		VideoDrawPixel(color, x - py, y + px);
-		VideoDrawPixel(color, x - py, y - px);
+		VideoDoDrawPixel(color, x + py, y + px);
+		VideoDoDrawPixel(color, x + py, y - px);
+		VideoDoDrawPixel(color, x - py, y + px);
+		VideoDoDrawPixel(color, x - py, y - px);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -934,8 +1091,12 @@ global void VideoDrawCircle(Uint32 color, int x, int y, int r)
 			py -= 1;
 		}
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
@@ -946,16 +1107,17 @@ global void VideoDrawTransCircle(Uint32 color, int x, int y,
 	p = 1 - r;
 	py = r;
 
+	VideoLockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDrawTransPixel(color, x + px, y + py, alpha);
-		VideoDrawTransPixel(color, x + px, y - py, alpha);
-		VideoDrawTransPixel(color, x - px, y + py, alpha);
-		VideoDrawTransPixel(color, x - px, y - py, alpha);
+		VideoDoDrawTransPixel(color, x + px, y + py, alpha);
+		VideoDoDrawTransPixel(color, x + px, y - py, alpha);
+		VideoDoDrawTransPixel(color, x - px, y + py, alpha);
+		VideoDoDrawTransPixel(color, x - px, y - py, alpha);
 
-		VideoDrawTransPixel(color, x + py, y + px, alpha);
-		VideoDrawTransPixel(color, x + py, y - px, alpha);
-		VideoDrawTransPixel(color, x - py, y + px, alpha);
-		VideoDrawTransPixel(color, x - py, y - px, alpha);
+		VideoDoDrawTransPixel(color, x + py, y + px, alpha);
+		VideoDoDrawTransPixel(color, x + py, y - px, alpha);
+		VideoDoDrawTransPixel(color, x - py, y + px, alpha);
+		VideoDoDrawTransPixel(color, x - py, y - px, alpha);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -964,8 +1126,12 @@ global void VideoDrawTransCircle(Uint32 color, int x, int y,
 			py -= 1;
 		}
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 {
 	int p;
@@ -975,16 +1141,17 @@ global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 	p = 1 - r;
 	py = r;
 
+	VideoLockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDrawPixelClip(color, x + px, y + py);
-		VideoDrawPixelClip(color, x + px, y - py);
-		VideoDrawPixelClip(color, x - px, y + py);
-		VideoDrawPixelClip(color, x - px, y - py);
+		VideoDoDrawPixelClip(color, x + px, y + py);
+		VideoDoDrawPixelClip(color, x + px, y - py);
+		VideoDoDrawPixelClip(color, x - px, y + py);
+		VideoDoDrawPixelClip(color, x - px, y - py);
 
-		VideoDrawPixelClip(color, x + py, y + px);
-		VideoDrawPixelClip(color, x + py, y - px);
-		VideoDrawPixelClip(color, x - py, y + px);
-		VideoDrawPixelClip(color, x - py, y - px);
+		VideoDoDrawPixelClip(color, x + py, y + px);
+		VideoDoDrawPixelClip(color, x + py, y - px);
+		VideoDoDrawPixelClip(color, x - py, y + px);
+		VideoDoDrawPixelClip(color, x - py, y - px);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -993,8 +1160,12 @@ global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 			py -= 1;
 		}
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
@@ -1005,16 +1176,17 @@ global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
 	p = 1 - r;
 	py = r;
 
+	VideoLockScreen();
 	for (px = 0; px <= py + 1; ++px) {
-		VideoDrawTransPixelClip(color, x + px, y + py, alpha);
-		VideoDrawTransPixelClip(color, x + px, y - py, alpha);
-		VideoDrawTransPixelClip(color, x - px, y + py, alpha);
-		VideoDrawTransPixelClip(color, x - px, y - py, alpha);
+		VideoDoDrawTransPixelClip(color, x + px, y + py, alpha);
+		VideoDoDrawTransPixelClip(color, x + px, y - py, alpha);
+		VideoDoDrawTransPixelClip(color, x - px, y + py, alpha);
+		VideoDoDrawTransPixelClip(color, x - px, y - py, alpha);
 
-		VideoDrawTransPixelClip(color, x + py, y + px, alpha);
-		VideoDrawTransPixelClip(color, x + py, y - px, alpha);
-		VideoDrawTransPixelClip(color, x - py, y + px, alpha);
-		VideoDrawTransPixelClip(color, x - py, y - px, alpha);
+		VideoDoDrawTransPixelClip(color, x + py, y + px, alpha);
+		VideoDoDrawTransPixelClip(color, x + py, y - px, alpha);
+		VideoDoDrawTransPixelClip(color, x - py, y + px, alpha);
+		VideoDoDrawTransPixelClip(color, x - py, y - px, alpha);
 
 		if (p < 0) {
 			p += 2 * px + 3;
@@ -1023,8 +1195,12 @@ global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
 			py -= 1;
 		}
 	}
+	VideoUnlockScreen();
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillCircle(Uint32 color, int x, int y, int r)
 {
 	int p;
@@ -1061,6 +1237,9 @@ global void VideoFillCircle(Uint32 color, int x, int y, int r)
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillTransCircle(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
@@ -1098,6 +1277,9 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 {
 	int p;
@@ -1134,6 +1316,9 @@ global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 	int r, unsigned char alpha)
 {
@@ -1171,16 +1356,23 @@ global void VideoFillTransCircleClip(Uint32 color, int x, int y,
 	}
 }
 
+/**
+**  FIXME: docu
+*/
 global void InitLineDraw()
 {
 	switch (VideoDepth) {
 		case 16:
 			VideoDrawPixel = VideoDrawPixel16;
+			VideoDoDrawPixel = VideoDoDrawPixel16;
 			VideoDrawTransPixel = VideoDrawTransPixel16;
+			VideoDoDrawTransPixel = VideoDoDrawTransPixel16;
 			break;
 		case 32:
 			VideoDrawPixel = VideoDrawPixel32;
+			VideoDoDrawPixel = VideoDoDrawPixel32;
 			VideoDrawTransPixel = VideoDrawTransPixel32;
+			VideoDoDrawTransPixel = VideoDoDrawTransPixel32;
 	}
 }
 
