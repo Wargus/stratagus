@@ -57,15 +57,15 @@
 **	@param data	byte address to read to.
 **	@param length	number of bytes to read.
 */
-local void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
+local void CL_png_readfn(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_size_t check;
+    png_size_t check;
 
-   check = (png_size_t)CLread((CLFile *)png_get_io_ptr(png_ptr), data,
+    check = (png_size_t)CLread((CLFile*)png_get_io_ptr(png_ptr), data,
 	(size_t)length);
-   if (check != length) {
-      png_error(png_ptr, "Read Error");
-   }
+    if (check != length) {
+	png_error(png_ptr, "Read Error");
+    }
 }
 
 /**
@@ -80,7 +80,7 @@ local void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
 global Graphic* LoadGraphicPNG(const char* name)
 {
     Graphic* graphic;
-    Palette *palette;
+    Palette* palette;
     CLFile* fp;
     png_structp png_ptr;
     png_infop info_ptr;
@@ -93,123 +93,125 @@ global Graphic* LoadGraphicPNG(const char* name)
     //
     //	open + prepare
     //
-    if( !(fp=CLopen(name,CL_OPEN_READ)) ) {
+    if (!(fp = CLopen(name, CL_OPEN_READ))) {
 	perror("Can't open file");
 	return NULL;
     }
 
-    png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
-    if( !png_ptr ) {
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png_ptr) {
 	CLclose(fp);
 	return NULL;
     }
-    info_ptr=png_create_info_struct(png_ptr);
-    if( !info_ptr ) {
-	png_destroy_read_struct(&png_ptr,NULL,NULL);
+    info_ptr = png_create_info_struct(png_ptr);
+    if (!info_ptr) {
+	png_destroy_read_struct(&png_ptr, NULL, NULL);
 	CLclose(fp);
 	return NULL;
     }
-    if( setjmp(png_ptr->jmpbuf) ) {
-	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
+    if (setjmp(png_ptr->jmpbuf)) {
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	CLclose(fp);
 	return NULL;
     }
-    png_set_read_fn(png_ptr,fp,CL_png_readfn);
+    png_set_read_fn(png_ptr, fp, CL_png_readfn);
 
     //
     //	Setup ready, read header info.
     //
-    png_read_info(png_ptr,info_ptr);
+    png_read_info(png_ptr, info_ptr);
 
-    DebugLevel3("%s: width %ld height %ld = %ld bytes\n"
-	    _C_ name _C_ info_ptr->width _C_ info_ptr->height
-	    _C_ info_ptr->width*info_ptr->height);
-    DebugLevel3("%s: %s" _C_ name
-	_C_ png_get_valid(png_ptr,info_ptr,PNG_INFO_PLTE) ? "palette" : "");
-    DebugLevel3(" %s"
-	_C_ png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS) ? "transparent" : "");
+    DebugLevel3("%s: width %ld height %ld = %ld bytes\n" _C_
+	name _C_ info_ptr->width _C_ info_ptr->height _C_
+	info_ptr->width * info_ptr->height);
+    DebugLevel3("%s: %s" _C_ name _C_
+	png_get_valid(png_ptr, info_ptr, PNG_INFO_PLTE) ? "palette" : "");
+    DebugLevel3(" %s" _C_
+	png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ? "transparent" : "");
     DebugLevel3(" depth %d\n" _C_ info_ptr->bit_depth);
 
     //	Setup translators:
 
-    palette= (Palette *)calloc(256,sizeof(Palette));
+    palette = (Palette*)calloc(256, sizeof(Palette));
 
-    if( info_ptr->color_type==PNG_COLOR_TYPE_PALETTE ) {
+    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE) {
 	DebugLevel3("Color palette\n");
-	if( info_ptr->valid&PNG_INFO_PLTE ) {
+	if (info_ptr->valid & PNG_INFO_PLTE) {
 	    DebugLevel3Fn(" palette %d\n" _C_ info_ptr->num_palette);
-	    if( info_ptr->num_palette>256 ) {
+	    if (info_ptr->num_palette > 256) {
 		abort();
 	    }
-	    for( i=0; i<info_ptr->num_palette; ++i ) {
-		palette[i].r=info_ptr->palette[i].red;
-		palette[i].g=info_ptr->palette[i].green;
-		palette[i].b=info_ptr->palette[i].blue;
+	    for (i = 0; i < info_ptr->num_palette; ++i) {
+		palette[i].r = info_ptr->palette[i].red;
+		palette[i].g = info_ptr->palette[i].green;
+		palette[i].b = info_ptr->palette[i].blue;
 	    }
-	    for( ; i<256; ++i ) {
-		palette[i].r=palette[i].g=palette[i].b=0;
+	    for(; i < 256; ++i) {
+		palette[i].r = palette[i].g = palette[i].b = 0;
 	    }
 	}
     }
 
-    if( info_ptr->bit_depth==16 ) {
+    if (info_ptr->bit_depth == 16) {
 	png_set_strip_16(png_ptr);
     }
-    if( info_ptr->bit_depth<8 ) {
+    if (info_ptr->bit_depth < 8) {
 	png_set_packing(png_ptr);
     }
 
 #if 0
     //	Want 8 bit palette with transparent!
-    if( info_ptr->color_type==PNG_COLOR_TYPE_PALETTE &&
-	    info_ptr->bit_depth<8 ) {
+    if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+	    info_ptr->bit_depth < 8) {
 	png_set_expand(png_ptr);
     }
 
-    if( 0 ) {
+    if (0) {
 	extern unsigned char GlobalPalette[];
 
-	png_set_dither(png_ptr,GlobalPalette,256,256,NULL,1);
+	png_set_dither(png_ptr, GlobalPalette, 256, 256, NULL, 1);
     }
 #endif
 
-    png_read_update_info(png_ptr,info_ptr);
+    png_read_update_info(png_ptr, info_ptr);
 
     //	Allocate and reserve memory.
-    w=info_ptr->width;
-    h=info_ptr->height;
-    if( info_ptr->width!=info_ptr->rowbytes ) {
-	DebugLevel0("width(%ld)!=rowbytes(%ld) in file:%s\n"
-	    _C_ info_ptr->width _C_ info_ptr->rowbytes _C_ name);
+    w = info_ptr->width;
+    h = info_ptr->height;
+    if (info_ptr->width != info_ptr->rowbytes) {
+	DebugLevel0("width(%ld) != rowbytes(%ld) in file:%s\n" _C_
+	    info_ptr->width _C_ info_ptr->rowbytes _C_ name);
 	abort();
     }
 
-    lines=alloca(h*sizeof(*lines));
-    if( !lines ) {
-	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
+    lines = alloca(h * sizeof(*lines));
+    if (!lines) {
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	CLclose(fp);
 	return NULL;
     }
-    data=malloc(h*w);
-    if( !data ) {
-	png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
+    data = malloc(h * w);
+    if (!data) {
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	CLclose(fp);
 	return NULL;
     }
-    IfDebug( AllocatedGraphicMemory+=h*w; );
+#ifdef DEBUG
+    AllocatedGraphicMemory += h * w;
+#endif
 
-    for( i=0; i<h; ++i ) {		// start of lines
-	lines[i]=data+i*w;
+    for (i = 0; i < h; ++i) {		// start of lines
+	lines[i] = data + i * w;
     }
 
     //	Final read the image.
 
-    png_read_image(png_ptr,lines);
-    png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
+    png_read_image(png_ptr, lines);
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
     CLclose(fp);
 
-    graphic=MakeGraphic(8,w,h,data,w*h);	// data freed by make graphic
-    graphic->Palette=palette;  //FIXME: should this be part of MakeGraphic
+    graphic = MakeGraphic(8, w, h, data, w * h);	// data freed by make graphic
+    graphic->Palette = palette;  //FIXME: should this be part of MakeGraphic
 
     return graphic;
 }
@@ -221,15 +223,17 @@ global Graphic* LoadGraphicPNG(const char* name)
 */
 global void SaveScreenshotPNG(const char* name)
 {
-    FILE *fp;
+    FILE* fp;
     png_structp png_ptr;
     png_infop info_ptr;
     unsigned char* row;
-    int i, j;
+    int i;
+    int j;
 
     fp = fopen(name, "wb");
-    if (fp == NULL)
+    if (fp == NULL) {
 	return;
+    }
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (png_ptr == NULL) {
@@ -262,43 +266,46 @@ global void SaveScreenshotPNG(const char* name)
 
     VideoLockScreen();
 
-    row = (char*)malloc(VideoWidth*3);
+    row = (char*)malloc(VideoWidth * 3);
 
     png_write_info(png_ptr, info_ptr);
 
-    for (i=0; i<VideoHeight; ++i) {
+    for (i = 0; i < VideoHeight; ++i) {
 	switch (VideoDepth) {
 	case 8:
 	    // FIXME: Finish
 	    break;
 	case 15:
-	    for (j=0; j<VideoWidth; ++j) {
-		VMemType16 c = VideoMemory16[i*VideoWidth+j];
-		row[j*3+0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-		row[j*3+1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
-		row[j*3+2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
+	    for (j = 0; j < VideoWidth; ++j) {
+		VMemType16 c;
+		c = VideoMemory16[i * VideoWidth + j];
+		row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
+		row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
 	    }
 	    break;
 	case 16:
-	    for (j=0; j<VideoWidth; ++j) {
-		VMemType16 c = VideoMemory16[i*VideoWidth+j];
-		row[j*3+0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-		row[j*3+1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
-		row[j*3+2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
+	    for (j = 0; j < VideoWidth; ++j) {
+		VMemType16 c;
+		c = VideoMemory16[i*VideoWidth+j];
+		row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
+		row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
+		row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
 	    }
 	    break;
 	case 24:
-	    if (VideoBpp==24) {
-		memcpy(row, VideoMemory24+i*VideoWidth, VideoWidth*3);
+	    if (VideoBpp == 24) {
+		memcpy(row, VideoMemory24 + i * VideoWidth, VideoWidth * 3);
 		break;
 	    }
 	    // FALL THROUGH
 	case 32:
-	    for (j=0; j<VideoWidth; ++j) {
-		VMemType32 c = VideoMemory32[i*VideoWidth+j];
-		row[j*3+0] = ((c >> 0) & 0xff);
-		row[j*3+1] = ((c >> 8) & 0xff);
-		row[j*3+2] = ((c >> 16) & 0xff);
+	    for (j = 0; j < VideoWidth; ++j) {
+		VMemType32 c;
+		c = VideoMemory32[i * VideoWidth + j];
+		row[j * 3 + 0] = ((c >> 0) & 0xff);
+		row[j * 3 + 1] = ((c >> 8) & 0xff);
+		row[j * 3 + 2] = ((c >> 16) & 0xff);
 	    }
 	    break;
 	}
