@@ -11,7 +11,7 @@
 /**@name sound_server.c		-	The sound server
 **                                      (hardware layer and so on) */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -111,8 +111,6 @@ SDL_mutex * MusicTerminatedMutex;
 --		Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_MIKMOD)
-
 /**
 **		Check if the playlist need to be advanced,
 **		and invoque music-stopped if necessary
@@ -152,29 +150,16 @@ local void MixMusicToStereo32(int* buffer, int size)
 	if (PlayingMusic) {
 		DebugCheck(!MusicSample && !MusicSample->Type);
 
-		// FIXME: if samples are shared this fails
-		if (MusicSample->Channels == 2) {
-			len = size * sizeof(*buf);
-			buf = alloca(len);
-			n = MusicSample->Type->Read(MusicSample, buf, len);
+		len = size * sizeof(*buf);
+		buf = alloca(len);
+		n = MusicSample->Type->Read(MusicSample, buf, len);
 
-			for (i = 0; i < n / (int)sizeof(*buf); ++i) {
-				// Add to our samples
-				buffer[i] += (buf[i] * MusicVolume) / 255;
-			}
-		} else {
-			len = size * sizeof(*buf) / 2;
-			buf = alloca(len);
-			n = MusicSample->Type->Read(MusicSample, buf, len);
-
-			for (i = 0; i < n / (int)sizeof(*buf); ++i) {
-				// Add to our samples
-				buffer[i * 2 + 0] += (buf[i] * MusicVolume) / 255;
-				buffer[i * 2 + 1] += (buf[i] * MusicVolume) / 255;
-			}
+		for (i = 0; i < n / (int)sizeof(*buf); ++i) {
+			// Add to our samples
+			buffer[i] += (buf[i] * MusicVolume) / 255;
 		}
 
-		if (n < len) {					// End reached
+		if (n < len) {				// End reached
 			PlayingMusic = 0;
 			SoundFree(MusicSample);
 			MusicSample = NULL;
@@ -188,24 +173,6 @@ local void MixMusicToStereo32(int* buffer, int size)
 		}
 	}
 }
-
-#else
-
-/// Dummy functions if no music support is enabled
-global int PlayMusic(const char* name __attribute__((unused)))
-{
-	return 0;
-}
-
-/// Dummy functions if no music support is enabled
-global void StopMusic(void)
-{
-}
-
-/// Dummy functions if no music support is enabled
-#define MixMusicToStereo32(buffer, size)
-
-#endif
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -224,83 +191,47 @@ global void StopMusic(void)
 **		@param buffer		Output buffer
 **		@param size		Size of the output buffer to be filled
 **
-**		@return				the number of bytes used to fill buffer
+**		@return			the number of bytes used to fill buffer
 **
-**		@todo				Can mix faster if signed 8 bit buffers are used.
-**		@todo				Can combine stereo and volume for faster operation.
+**		@todo			Can mix faster if signed 8 bit buffers are used.
+**		@todo			Can combine stereo and volume for faster operation.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	char stereo, int* buffer, int size)
 {
-	int ri;								// read index
-	int wi;								// write index
-	unsigned length;
-	int v;
 	int local_volume;
 	unsigned char left;
 	unsigned char right;
+	int i;
 
-	local_volume = ((int)volume + 1) * 2 * GlobalVolume / MaxVolume;
-	length = sample->Length - index;
+	local_volume = (int)volume * GlobalVolume / MaxVolume;
+	if (local_volume < 32) {
+		// minimum volume
+		local_volume = 32;
+	}
+
 	if (stereo < 0) {
 		left = 128;
 		right = 128 + stereo;
-	}
-	else {
+	} else {
 		left = 128 - stereo;
 		right = 128;
 	}
+
 	DebugLevel3("Length %d\n" _C_ length);
 
-	// FIXME: support other formats, stereo or 32 bit ...
+	DebugCheck(index & 1);
 
-	if (sample->SampleSize == 8) {
-		unsigned char* rp;
-
-		rp = sample->Data + index;
-		if ((size * sample->Frequency) / SoundFrequency / 2 > length) {
-			size = (length * SoundFrequency / sample->Frequency) * 2;
-		}
-
-		// mix mono, 8 bit sound to stereo, 32 bit
-		for (ri = wi = 0; wi < size;) {
-			ri = (wi * sample->Frequency) / SoundFrequency;
-			ri /= 2;						// adjust for mono
-
-			// FIXME: must interpolate samples!
-			v = (rp[ri] - 127) * local_volume;
-
-			buffer[wi++] += v * left / 128;
-			buffer[wi++] += v * right / 128;		// left+right channel
-		}
-		ri = (wi * sample->Frequency) / SoundFrequency;
-		ri /= 2;								// adjust for mono
-		DebugLevel3("Mixed %d bytes to %d\n" _C_ ri _C_ wi);
-	} else {
-		short* rp;
-
-		DebugCheck(index & 1);
-
-		rp = (short*)(sample->Data + index);
-		if ((size * sample->Frequency) / SoundFrequency > length) {
-			size = (length * SoundFrequency / sample->Frequency);
-		}
-
-		// mix mono, 16 bit sound to stereo, 32 bit
-		for (ri = wi = 0; wi < size;) {
-			ri = (wi * sample->Frequency) / SoundFrequency;
-			ri /= 2;						// adjust for mono
-
-			// FIXME: must interpolate samples!
-			v = rp[ri] * local_volume / 256;
-
-			buffer[wi++] += v * left / 128;
-			buffer[wi++] += v * right / 128;
-		}
-		ri = (wi * sample->Frequency) / SoundFrequency;
+	if (size >= sample->Len / 2 - index) {
+		size = sample->Len / 2 - index;
 	}
 
-	return ri;
+	for (i = 0; i < size; i += 2) {
+		buffer[i] += ((short*)(sample->Buffer))[index + i] * local_volume * left / 128 / 512;
+		buffer[i + 1] += ((short*)(sample->Buffer))[index + i + 1] * local_volume * right / 128 / 512;
+	}
+
+	return size;
 }
 
 /**
@@ -320,7 +251,7 @@ global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	int chansize, int channels, int bytes)
 {
 	SDL_AudioCVT acvt;
-	int format;
+	Uint16 format;
 
 	if (chansize == 1) {
 		format = AUDIO_U8;
@@ -337,7 +268,6 @@ global int ConvertToStereo32(const char* src, char* dest, int frequency,
 	SDL_ConvertAudio(&acvt);
 
 	return acvt.len_mult * bytes;
-//	return acvt.len_ratio * bytes;
 }
 
 global SoundChannel Channels[MaxChannels];
@@ -702,7 +632,8 @@ local int MixChannelsToStereo32(int* buffer,int size)
 				Channels[channel].Stereo, buffer, size);
 			Channels[channel].Point += i;
 
-			if (Channels[channel].Point >= Channels[channel].Sample->Length) {
+//			if (Channels[channel].Point >= Channels[channel].Sample->Length){
+			if (Channels[channel].Point >= Channels[channel].Sample->Len / 2) {
 				// free channel as soon as possible (before playing)
 				// useful in multithreading
 				DebugLevel3("End playing request from %p\n" _C_
@@ -942,7 +873,7 @@ global void MixIntoBuffer(void* buffer, int samples)
 #if SoundSampleSize == 8
 	ClipMixToStereo8(mixer_buffer, samples, buffer);
 #endif
-#if SoundSampleSize==16
+#if SoundSampleSize == 16
 	ClipMixToStereo16(mixer_buffer, samples, buffer);
 #endif
 }
