@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -1519,7 +1519,7 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
-	if ( unit->Type->CanRepair &&
+	if ( unit->Type->RepairRange &&
 		(unit->Orders[0].Action==UnitActionResource ||
 		unit->Orders[0].Action==UnitActionStill) &&
 		unit->OrderCount==1 ) {
@@ -1569,7 +1569,7 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 	unit=table[i];
 	DebugLevel2Fn("Have an unit to repair %d :)\n" _C_ UnitNumber(unit));
 
-	if( UnitReachable(unit,building,REPAIR_RANGE) ) {
+	if( UnitReachable(unit,building,unit->Type->RepairRange) ) {
 	    CommandRepair(unit, 0, 0, building,FlushCommands);
 	    return 1;
 	}
