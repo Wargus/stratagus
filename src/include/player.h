@@ -177,6 +177,8 @@ extern int NumPlayers;			/// Player in play
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on this computer
 
+extern char** RaceWcNames;		/// pud original -> internal
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/

@@ -106,6 +106,22 @@ local SCM CclPlayer(SCM list)
 	       errl("Unsupported tag",value);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("race")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    if( RaceWcNames ) {
+		for( i=0; RaceWcNames[i]; ++i ) {
+		    if( !strcmp(str,RaceWcNames[i]) ) {
+			player->RaceName=RaceWcNames[i];
+			player->Race=i;
+			break;
+		    }
+		}
+	    }
+	    free(str);
+	    if( !RaceWcNames || !RaceWcNames[i] ) {
+	       // FIXME: this leaves a half initialized player
+	       errl("Unsupported tag",gh_car(list));
+	    }
+#if 0
 	    player->RaceName=str=gh_scm2newstr(gh_car(list),NULL);
 	    if( !strcmp(str,"human") ) {
 		player->Race=PlayerRaceHuman;
@@ -117,6 +133,7 @@ local SCM CclPlayer(SCM list)
 	       // FIXME: this leaves a half initialized player
 	       errl("Unsupported tag",gh_car(list));
 	    }
+#endif
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("ai")) ) {
 	    player->AiNum=gh_scm2int(gh_car(list));
@@ -321,6 +338,37 @@ local SCM CclDiplomacy(SCM player,SCM state)
     return SCM_UNSPECIFIED;
 }
 
+/**
+**	Define race mapping from original number to internal symbol
+**
+**	@param list	List of all names.
+*/
+local SCM CclDefineRaceWcNames(SCM list)
+{
+    int i;
+    char** cp;
+
+    if( (cp=RaceWcNames) ) {		// Free all old names
+	while( *cp ) {
+	    free(*cp++);
+	}
+	free(RaceWcNames);
+    }
+
+    //
+    //	Get new table.
+    //
+    i=gh_length(list);
+    RaceWcNames=cp=malloc((i+1)*sizeof(char*));
+    while( i-- ) {
+	*cp++=gh_scm2newstr(gh_car(list),NULL);
+	list=gh_cdr(list);
+    }
+    *cp=NULL;
+
+    return SCM_UNSPECIFIED;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -339,6 +387,8 @@ global void PlayerCclRegister(void)
 		CclSetAllPlayersTotalUnitLimit);
 
     gh_new_procedure2_0("diplomacy",CclDiplomacy);
+
+    gh_new_procedureN("define-race-wc-names",CclDefineRaceWcNames);
 }
 
 #endif	// } USE_CCL

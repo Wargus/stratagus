@@ -55,6 +55,11 @@ global Player Players[PlayerMax];	/// All players in play
 global Player* ThisPlayer;		/// Player on this computer
 
 /**
+**	Table mapping the original race numbers in puds to our internal string.
+*/
+global char** RaceWcNames;
+
+/**
 **	Colors used for minimap.	FIXME: make this configurable
 */
 local int PlayerColors[PlayerMax] = {
@@ -98,6 +103,7 @@ global void InitPlayers(void)
 global void CleanPlayers(void)
 {
     int p;
+    char** ptr;
 
     for( p=0; p<PlayerMax; ++p ) {
 	if( Players[p].Name ) {
@@ -111,6 +117,17 @@ global void CleanPlayers(void)
     memset(Players,0,sizeof(Players));
     SetPlayersPalette();
     NumPlayers=0;
+
+    //
+    //	Mapping the original race numbers in puds to our internal strings
+    //
+    if( (ptr=RaceWcNames) ) {	// Free all old names
+	while( *ptr ) {
+	    free(*ptr++);
+	}
+	free(RaceWcNames);
+	RaceWcNames=NULL;
+    }
 }
 
 /**
@@ -122,9 +139,23 @@ global void SavePlayers(FILE* file)
 {
     int i;
     int j;
+    char** cp;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: players $Id$\n\n");
+
+    if( (cp=RaceWcNames) ) {
+	fprintf(file,"(define-race-wc-names");
+
+	i=90;
+	while( *cp ) {
+	    if( i+strlen(*cp)>79 ) {
+		i=fprintf(file,"\n ");
+	    }
+	    i+=fprintf(file," '%s",*cp++);
+	}
+	fprintf(file,")\n\n");
+    }
 
     for( i=0; i<NumPlayers; ++i ) {
 	fprintf(file,"(player %d\n",i);
@@ -285,7 +316,7 @@ global void CreatePlayer(int type)
     player->Name=strdup("Computer");
     player->Type=type;
     player->Race=PlayerRaceHuman;
-    player->RaceName="human";
+    player->RaceName=RaceWcNames[0];
     player->Team=team;
     player->Enemy=0;
     player->Allied=0;
@@ -396,22 +427,21 @@ global void CreatePlayer(int type)
 */
 global void PlayerSetSide(Player* player,int side)
 {
+    char** cp;
+
     player->Race=side;
-    switch( side ) {
-	case PlayerRaceHuman:
-	    player->RaceName="human";
-	    break;
-	case PlayerRaceOrc:
-	    player->RaceName="orc";
-	    break;
-	case PlayerRaceNeutral:
-	    player->RaceName="neutral";
-	    break;
-	default:
-	    DebugLevel0Fn("Unsupported side %d\n",side);
-	    player->RaceName="oops";
-	    break;
+
+    if( (cp=RaceWcNames) ) {
+	while( *cp ) {
+	    if( !side-- ) {
+		player->RaceName=*cp;
+		return;
+	    }
+	    ++cp;
+	}
     }
+    DebugLevel0Fn("Unsupported side %d\n",side);
+    player->RaceName="oops";
 }
 
 /**

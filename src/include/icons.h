@@ -199,15 +199,15 @@ typedef struct _icon_config_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern char** IconWcNames;			/// pud original -> internal
+extern char** IconWcNames;		/// pud original -> internal
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitIcons(void);			/// init icons
-extern void LoadIcons(void);			/// load icons
-extern void CleanIcons(void);			/// cleanup icons
+extern void InitIcons(void);		/// init icons
+extern void LoadIcons(void);		/// load icons
+extern void CleanIcons(void);		/// cleanup icons
 
     /// Name -> icon
 extern Icon* IconByIdent(const char* ident);
@@ -216,8 +216,8 @@ extern const char* IdentOfIcon(const Icon* icon);
     /// Draw icon of an unit
 extern void DrawUnitIcon(const Player*,Icon*,unsigned,unsigned,unsigned);
 
-extern void SaveIcons(FILE*);			/// Save icons
-extern void IconCclRegister(void);		/// register CCL features
+extern void SaveIcons(FILE*);		/// Save icons
+extern void IconCclRegister(void);	/// register CCL features
 
 //@}
 
