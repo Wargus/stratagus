@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name menus.c	-	The menu function code. */
 //
-//	(c) Copyright 1999-2003 by Andreas Arens, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1999-2004 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -5141,17 +5141,17 @@ local void EditorMainLoadMap(void)
 	char *p;
 	char *s;
 
-	EditorCancelled=0;
+	EditorCancelled = 0;
 	ProcessMenu("menu-editor-main-load-map", 1);
 	GetInfoFromSelectPath();
 
 	if (EditorCancelled) {
 #ifdef USE_SDL_SURFACE
+		MenusSetBackground();
+#else
 		VideoLockScreen();
 		MenusSetBackground();
 		VideoUnlockScreen();
-#else
-		MenusSetBackground();
 #endif
 		return;
 	}
@@ -6989,13 +6989,13 @@ global void ErrorMenu(char *error)
 }
 
 /*----------------------------------------------------------------------------
---		Init functions
+--  Init functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Initialize player races for a menu item
+**  Initialize player races for a menu item
 */
-local void InitPlayerRaces(Menuitem *mi)
+local void InitPlayerRaces(Menuitem* mi)
 {
 	int i;
 	int n;
@@ -7006,7 +7006,7 @@ local void InitPlayerRaces(Menuitem *mi)
 		}
 	}
 	++n;
-	//  Reallocate pulldown options.
+	// Reallocate pulldown options.
 	if (mi->d.pulldown.options) {
 		free(mi->d.pulldown.options);
 	}
@@ -7022,14 +7022,14 @@ local void InitPlayerRaces(Menuitem *mi)
 }
 
 /**
-**		Initialize tilesets for a menu item
+**  Initialize tilesets for a menu item
 */
-local void InitTilesets(Menuitem *mi, int mapdefault)
+local void InitTilesets(Menuitem* mi, int mapdefault)
 {
 	int i;
 	int n;
 
-	//  Reallocate pulldown options.
+	// Reallocate pulldown options.
 	if (mi->d.pulldown.options) {
 		free(mi->d.pulldown.options);
 	}
@@ -7047,7 +7047,7 @@ local void InitTilesets(Menuitem *mi, int mapdefault)
 }
 
 /**
-**		Initialize the loaded menu data
+**  Initialize the loaded menu data
 */
 global void InitMenuData(void)
 {
@@ -7071,7 +7071,7 @@ global void InitMenuData(void)
 }
 
 /**
-**		Post-Initialize the loaded menu functions
+**  Post-Initialize the loaded menu functions
 */
 global void InitMenuFunctions(void)
 {
@@ -7086,15 +7086,12 @@ global void InitMenuFunctions(void)
 }
 
 
-
-
-
 /**
-**		FIXME: docu
+**  FIXME: docu
 */
 local void MultiGameMasterReport(void)
 {
-//		EndMenu();
+//	EndMenu();
 #ifdef USE_SDL_SURFACE
 	MenusSetBackground();
 	Invalidate();
@@ -7113,7 +7110,7 @@ local void MultiGameMasterReport(void)
 }
 
 /**
-**		Menu for Mater Server Game list.
+**  Menu for Mater Server Game list.
 */
 local void ShowMetaServerList(void)
 {
@@ -7134,14 +7131,14 @@ local void ShowMetaServerList(void)
 	if (GuiGameStarted) {
 		GameMenuReturn();
 	}
-
 }
 
-
 /**
-**		Multiplayer server menu init callback
-** Mohydine: Right now, because I find it simpler, the client is sending n commands, one for each online game.
-** TODO: well, redo this :)
+**  Multiplayer server menu init callback
+**
+**  Mohydine: Right now, because I find it simpler, the client is sending
+**            n commands, one for each online game.
+**  TODO: well, redo this :)
 */
 local void MultiMetaServerGameSetupInit(Menuitem* mi)
 {
@@ -7155,18 +7152,17 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	Menu* menu;
 	char* port;
 
-
 	SendMetaCommand("NumberOfGames", "");
 	menu = FindMenu("metaserver-list");
 
 	reply = NULL;
-	//receive
-	//check okay
+	// receive
+	// check okay
 	if (RecvMetaReply(&reply) == -1) {
 		//TODO: Notify player that connection was aborted...
 		nummenus = 1;
 	} else {
-		for (i = 0; i < 3; i++) {
+		for (i = 0; i < 3; ++i) {
 			GetMetaParameter(reply, 0, &parameter);
 			nummenus = atoi(parameter);
 			if (nummenus == 0) {
@@ -7179,18 +7175,17 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 
 	}
 
-	nummenus--;
+	--nummenus;
 	// Meta server only sends matching version
 	// Only Displays games from Matching version
 
-
 	i = 1;
 	k = 0;
-	numparams = 5; //TODO: To be changed if more params are sent
+	numparams = 5; // TODO: To be changed if more params are sent
 
-	//Retrieve list of online game from the meta server
+	// Retrieve list of online game from the meta server
 	for (j = 4; j <= nummenus * (numparams + 1); j += numparams + 1) { // loop over the number of items in the menu
-		//TODO: hard coded.
+		// TODO: hard coded.
 		// Check if connection to meta server is there.
 
 		SendMetaCommand("GameNumber","%d\n",k + 1);
@@ -7204,10 +7199,10 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 			menu->Items[j + 4].d.text.text = NULL;
 			menu->Items[j + 5].d.gem.state = MI_GSTATE_INVISIBLE;
 		} else {
-			GetMetaParameter(reply, 0, &parameter);  // Player Name
+			GetMetaParameter(reply, 0, &parameter);       // Player Name
 			menu->Items[j].d.text.text = parameter;
-			GetMetaParameter(reply, 3, &parameter);   // IP
-			GetMetaParameter(reply, 4, &port);				  // port
+			GetMetaParameter(reply, 3, &parameter);       // IP
+			GetMetaParameter(reply, 4, &port);            // port
 			sprintf(parameter, "%s:%s", parameter, port); // IP:Port
 			menu->Items[j + 1].d.text.text = parameter;
 			GetMetaParameter(reply, 6, &parameter);
@@ -7222,7 +7217,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 	}
 
 	// Don't display slots not in use
-	//FIXME: HardCoded Number of Items in list
+	// FIXME: HardCoded Number of Items in list
 	// 5 is the hardcoded value
 	for (; j <= numparams * 5; j += numparams + 1) {
 		// fill the menus with the right info.
@@ -7236,12 +7231,12 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
 }
 
 /**
-**		Multiplayer server menu exit callback
+**  Multiplayer server menu exit callback
 */
 local void MultiMetaServerGameSetupExit(Menuitem *mi)
 {
-		//TODO: how to free stuff?
-	//EndMenu();
+	// TODO: how to free stuff?
+//	EndMenu();
 #ifdef USE_SDL_SURFACE
 	MenusSetBackground();
 	Invalidate();
@@ -7251,15 +7246,14 @@ local void MultiMetaServerGameSetupExit(Menuitem *mi)
 	VideoUnlockScreen();
 	Invalidate();
 #endif
-	//EndMenu();
+//	EndMenu();
 }
 
 /**
-**		Action taken when a player select an online game
+**  Action taken when a player select an online game
 */
 local void SelectGameServer(Menuitem *mi)
 {
-
 	char server_host_buffer[64];
 	char *port;
 	int j;
@@ -7279,15 +7273,14 @@ local void SelectGameServer(Menuitem *mi)
 
 	strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
 
-
-	//Launch join directly
-	if ( (port = strchr(server_host_buffer, ':')) != NULL) {
+	// Launch join directly
+	if ((port = strchr(server_host_buffer, ':')) != NULL) {
 		NetworkPort = atoi(port + 1);
 		port[0] = 0;
 	}
 
 	// Now finally here is the address
-	//server_host_buffer[menu->Items[1].d.input.nch] = 0;
+//	server_host_buffer[menu->Items[1].d.input.nch] = 0;
 	if (NetworkSetupServerAddress(server_host_buffer)) {
 		NetErrorMenu("Unable to lookup host.");
 #ifdef USE_SDL_SURFACE
@@ -7326,33 +7319,33 @@ local void SelectGameServer(Menuitem *mi)
 #endif
 		EndMenu();
 	}
-
-
 }
+
 /**
-**		Action to add a game server on the meta-server.
+**  Action to add a game server on the meta-server.
 */
 local void AddGameServer(void)
 {
-	//send message to meta server. meta server will detect IP address.
-	//Meta-server will return "BUSY" if the list of online games is busy.
+	// send message to meta server. meta server will detect IP address.
+	// Meta-server will return "BUSY" if the list of online games is busy.
 
-	SendMetaCommand("AddGame", "%s\n%d\n%s\n%s\n%s\n%s\n", "IP",NetworkPort,"Name","Map","Players","Free");
+	SendMetaCommand("AddGame", "%s\n%d\n%s\n%s\n%s\n%s\n",
+		"IP", NetworkPort, "Name", "Map", "Players", "Free");
 
 	// FIXME: Get Reply from Queue
-
 }
 
 /**
-**		Action to add a game server on the meta-server.
+**  Action to add a game server on the meta-server.
 */
 local void ChangeGameServer(void)
 {
-	//send message to meta server. meta server will detect IP address.
-	//Meta-server will return "ERR" if the list of online games is busy.
 	int i;
 	int freespots;
-	int		players;
+	int	players;
+
+	// send message to meta server. meta server will detect IP address.
+	// Meta-server will return "ERR" if the list of online games is busy.
 
 	freespots = 0;
 	players = 0;
@@ -7364,32 +7357,32 @@ local void ChangeGameServer(void)
 			++freespots;
 		}
 	}
-	SendMetaCommand("ChangeGame", "%s\n%s\n%d\n%d\n", "Name", ScenSelectFileName, players, freespots - 1);
+	SendMetaCommand("ChangeGame", "%s\n%s\n%d\n%d\n",
+		"Name", ScenSelectFileName, players, freespots - 1);
 
 	// FIXME: Get Reply from Queue
-
 }
 
-
+/**
+**  FIXME: docu
+*/
 local int MetaServerConnectError(void)
 {
-#ifdef USE_SDL_SURFACE
 	Invalidate();
 	NetErrorMenu("Cannot Connect to Meta-Server");
+#ifdef USE_SDL_SURFACE
 	MenusSetBackground();
 #else
-	Invalidate();
-	NetErrorMenu("Cannot Connect to Meta-Server");
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
 #endif
 	return 0;
 }
+
 /**
 **  Close MetaServer connection
 */
-
 local void MultiMetaServerClose(void)
 {
 	MetaClose();
