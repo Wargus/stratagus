@@ -91,14 +91,6 @@ global Menu* CurrentMenu;
 */
 local Graphic* Menusbgnd;
 
-/**
-**		X, Y, Width, and Height of menu are to redraw
-*/
-local int MenuRedrawX;
-local int MenuRedrawY;
-local int MenuRedrawW;
-local int MenuRedrawH;
-
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
@@ -182,11 +174,6 @@ global void MenusSetBackground(void)
 	VideoDrawSubClip(Menusbgnd, 0, 0,
 		Menusbgnd->Width, Menusbgnd->Height,
 		(VideoWidth - Menusbgnd->Width) / 2, (VideoHeight - Menusbgnd->Height) / 2);
-
-	MenuRedrawX = 0;
-	MenuRedrawY = 0;
-	MenuRedrawW = VideoWidth;
-	MenuRedrawH = VideoHeight;
 }
 
 /**
@@ -987,9 +974,9 @@ local void DrawInput(Menuitem* mi, int mx, int my)
 
 
 /**
-**		Draw a menu.
+**  Draw a menu.
 **
-**		@param menu		The menu number to display (NULL allowed)
+**  @param menu  The menu number to display (NULL allowed)
 */
 global void DrawMenu(Menu* menu)
 {
@@ -1007,35 +994,38 @@ global void DrawMenu(Menu* menu)
 		return;
 	}
 
-	MenuRedrawX = menu->X;
-	MenuRedrawY = menu->Y;
-	MenuRedrawW = menu->Width;
-	MenuRedrawH = menu->Height;
+	if (menu->Background) {
+		if (!menu->BackgroundG) {
+			menu->BackgroundG = LoadGraphic(menu->Background);
+			ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
+		}
+		VideoDraw(menu->BackgroundG, 0, 0, 0);
+	}
 
 	if (menu->Panel && !strcmp(menu->Panel, ScPanel)) {
 		// Background
-		VideoFillTransRectangle(ColorBlack, MenuRedrawX + 1,
-				MenuRedrawY + 1, MenuRedrawW - 2, MenuRedrawH - 2, 50);
-		VideoDrawHLineClip(ColorBlue, MenuRedrawX + 3, MenuRedrawY, MenuRedrawW - 6);
-		VideoDrawHLineClip(ColorBlue, MenuRedrawX + 3, MenuRedrawY + MenuRedrawH - 1, MenuRedrawW - 6);
-		VideoDrawVLineClip(ColorBlue, MenuRedrawX, MenuRedrawY + 3, MenuRedrawH - 6);
-		VideoDrawVLineClip(ColorBlue, MenuRedrawX + MenuRedrawW - 1, MenuRedrawY + 3, MenuRedrawH - 6);
+		VideoFillTransRectangle(ColorBlack, menu->X + 1,
+				menu->Y + 1, menu->Width - 2, menu->Height - 2, 50);
+		VideoDrawHLineClip(ColorBlue, menu->X + 3, menu->Y, menu->Width - 6);
+		VideoDrawHLineClip(ColorBlue, menu->X + 3, menu->Y + menu->Height - 1, menu->Width - 6);
+		VideoDrawVLineClip(ColorBlue, menu->X, menu->Y + 3, menu->Height - 6);
+		VideoDrawVLineClip(ColorBlue, menu->X + menu->Width - 1, menu->Y + 3, menu->Height - 6);
 		// top left
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 1, MenuRedrawY + 1);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 2, MenuRedrawY + 1);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 1, MenuRedrawY + 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 1);
+		VideoDrawPixelClip(ColorBlue, menu->X + 2, menu->Y + 1);
+		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 2);
 		// top right
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 3, MenuRedrawY + 1);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 2, MenuRedrawY + 1);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 2, MenuRedrawY + 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + 1);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 1);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 2);
 		// bottom left
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 1, MenuRedrawY + MenuRedrawH - 3);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 1, MenuRedrawY + MenuRedrawH - 2);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + 2, MenuRedrawY + MenuRedrawH - 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 3);
+		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + 2, menu->Y + menu->Height - 2);
 		// bottom right
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 3, MenuRedrawY + MenuRedrawH - 2);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 2, MenuRedrawY + MenuRedrawH - 2);
-		VideoDrawPixelClip(ColorBlue, MenuRedrawX + MenuRedrawW - 2, MenuRedrawY + MenuRedrawH - 3);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + menu->Height - 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
+		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
 	} else if (menu->Panel) {
 		MenuPanel* menupanel;
 

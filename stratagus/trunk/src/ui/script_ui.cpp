@@ -2385,6 +2385,8 @@ local int CclDefineMenu(lua_State* l)
 			if (strcmp(LuaToString(l, j + 1), "none")) {
 				item.Panel = strdup(LuaToString(l, j + 1));
 			}
+		} else if (!strcmp(value, "background")) {
+			item.Background = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "default")) {
 			item.DefSel = LuaToNumber(l, j + 1);
 /*
@@ -2414,6 +2416,8 @@ local int CclDefineMenu(lua_State* l)
 			int mitype;
 
 			free(menu->Panel);
+			free(menu->Background);
+			VideoSafeFree(menu->BackgroundG);
 			for (i = 0; i < menu->NumItems; ++i) {
 				mitype = menu->Items[i].mitype;
 				if (mitype == MI_TYPE_TEXT) {
