@@ -437,6 +437,7 @@ local SCM CclDefineCursor(SCM list)
 	ct->OType=CursorTypeType;
 	ct->Ident=s1;
 	ct->Race=s2;
+	ct->FrameRate=200;
     }
 
     //
