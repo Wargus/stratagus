@@ -81,16 +81,16 @@ extern int PlayCDTrack(int track);
 extern int IsAudioTrack(int track);
 
     /// Get cd volume (0-255)
-extern int GetCDVolume();
+extern int GetCDVolume(void);
 
     /// Set cd volume (0-255)
 extern void SetCDVolume(int vol);
 
     /// Resume CD
-extern void ResumeCD();
+extern void ResumeCD(void);
 
     /// Pause CD
-extern void PauseCD();
+extern void PauseCD(void);
 
     /// Close CD
 extern void QuitCD(void);

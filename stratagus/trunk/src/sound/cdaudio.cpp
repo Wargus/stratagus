@@ -76,6 +76,9 @@ global CDModes CDMode;			/// CD mode
 ----------------------------------------------------------------------------*/
 
 #if defined (USE_SDLCD)
+/**
+**	FIXME: docu
+*/
 local int InitCD(void)
 {
     if (SDL_Init(SDL_INIT_CDROM)) {
@@ -90,12 +93,18 @@ local int InitCD(void)
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 global int PlayCDTrack(int track)
 {
     CDTrack = track;
     return SDL_CDPlayTracks(CDRom, track-1, 0, 0, 0);
 }
 
+/**
+**	FIXME: docu
+*/
 global void ResumeCD(void)
 {
 #ifdef USE_WIN32
@@ -104,18 +113,27 @@ global void ResumeCD(void)
     PlayCDRom(CDModeRandom);
 }
 
-global void PauseCD()
+/**
+**	FIXME: docu
+*/
+global void PauseCD(void)
 {
     SDL_CDPause(CDRom);
     CDMode = CDModeStopped;
 }
 
+/**
+**	FIXME: docu
+*/
 global int IsAudioTrack(int track)
 {
     // FIXME: what is proper way?
     return 1;
 }
 
+/**
+**	FIXME: docu
+*/
 global int IsCDPlaying(void)
 {
     if (SDL_CDStatus(CDRom) == CD_PLAYING) {
@@ -125,16 +143,25 @@ global int IsCDPlaying(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 global int GetCDVolume(void)
 {
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 global void SetCDVolume(int vol)
 {
     return;
 }
 
+/**
+**	FIXME: docu
+*/
 global void QuitCD(void)
 {
     if (CDMode != CDModeOff && CDMode != CDModeStopped) {
@@ -147,6 +174,9 @@ global void QuitCD(void)
     }
 }
 #elif defined(USE_LIBCDA)
+/**
+**	FIXME: docu
+*/
 local int InitCD(void)
 {
     if (cd_init()) {
@@ -159,29 +189,43 @@ local int InitCD(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 global int PlayCDTrack(int track)
 {
     CDTrack = track;
     return cd_play(track);
 }
 
+/**
+**	FIXME: docu
+*/
 global void ResumeCD(void)
 {
     PlayCDRom(CDModeRandom);
 }
 
+/**
+**	FIXME: docu
+*/
 global void PauseCD(void)
 {
     cd_pause();
     CDMode = CDModeStopped;
 }
 
-
+/**
+**	FIXME: docu
+*/
 global int IsAudioTrack(int track)
 {
     return cd_is_audio(track);
 }
 
+/**
+**	FIXME: docu
+*/
 global int IsCDPlaying(void)
 {
     if (cd_current_track()) {
@@ -191,6 +235,9 @@ global int IsCDPlaying(void)
     }
 }
 
+/**
+**	FIXME: docu
+*/
 global int GetCDVolume(void)
 {
     int vol;
@@ -198,13 +245,19 @@ global int GetCDVolume(void)
     return vol;
 }
 
+/**
+**	FIXME: docu
+*/
 global void SetCDVolume(int vol)
 {
     vol = vol;
     cd_set_volume(vol, vol);
 }
 
-global void QuitCD()
+/**
+**	FIXME: docu
+*/
+global void QuitCD(void)
 {
     if (CDMode != CDModeOff && CDMode != CDModeStopped) {
         cd_stop();
@@ -217,7 +270,10 @@ global void QuitCD()
     }
 }
 #elif defined(USE_CDDA)
-local int InitCD()
+/**
+**	FIXME: docu
+*/
+local int InitCD(void)
 {
     int i;
 
@@ -238,6 +294,9 @@ local int InitCD()
     return 0;
 }
 
+/**
+**	FIXME: docu
+*/
 global int PlayCDTrack(int track)
 {
     Sample *sample;
@@ -249,38 +308,59 @@ global int PlayCDTrack(int track)
     return 0;
 }
 
-global void ResumeCD()
+/**
+**	FIXME: docu
+*/
+global void ResumeCD(void)
 {
     PlayCDRom(CDModeRandom);
 }
 
-global void PauseCD()
+/**
+**	FIXME: docu
+*/
+global void PauseCD(void)
 {
     StopMusic();
     CDMode = CDModeStopped;
 }
 
+/**
+**	FIXME: docu
+*/
 global int IsAudioTrack(track)
 {
     return !(CDtocentry[track].cdte_ctrl&CDROM_DATA_TRACK);
 }
 
-global int IsCDPlaying()
+/**
+**	FIXME: docu
+*/
+global int IsCDPlaying(void)
 {
     return PlayingMusic;
 }
 
-global int GetCDVolume()
+/**
+**	FIXME: docu
+*/
+global int GetCDVolume(void)
 {
     return MusicVolume;
 }
 
+/**
+**	FIXME: docu
+*/
 global void SetCDVolume(int vol)
 {
     MusicVolume = vol;
 }
 
-global void QuitCD()
+/**
+**	FIXME: docu
+*/
+global void QuitCD(void)
 {
     close(CDDrive);
 }
@@ -294,7 +374,7 @@ global void QuitCD()
 global int CDRomCheck(void *unused __attribute__ ((unused)))
 {
     if (CDMode != CDModeOff && CDMode != CDModeStopped
-                && !IsCDPlaying() && CDMode != CDModeDefined) {
+	    && !IsCDPlaying() && CDMode != CDModeDefined) {
         DebugLevel0Fn("Playing new track\n");
         PlayCDRom(CDMode);
     }
@@ -305,7 +385,6 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 **	Play CDRom
 **
 **	@param name	name of play mode, CDModeAll, CDModeRandom, CDModeDefined
-**
 */
 global int PlayCDRom(int name)
 {
