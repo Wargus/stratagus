@@ -983,9 +983,9 @@ static int CclGetUnitTypeIdent(lua_State* l)
 
 	type = CclGetUnitType(l);
 	if (type) {
-	lua_pushstring(l, type->Ident);
+		lua_pushstring(l, type->Ident);
 	} else {
-	lua_pushstring(l, "unit not defined");
+		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1));
 	}
 	return 1;
 }
