@@ -592,6 +592,10 @@ global MissileType* MissileTypeSmallFire;	/// Small fire missile-type
 global MissileType* MissileTypeBigFire;		/// Big fire missile-type
 global MissileType* MissileTypeGreenCross;	/// Green cross missile-type
 
+IfDebug(
+global int NoWarningMissileType;		/// quiet ident lookup.
+);
+
 #define MAX_MISSILES	1800		/// maximum number of missiles
 
 local int NumMissiles;			/// currently used missiles
@@ -681,7 +685,11 @@ global MissileType* MissileTypeByIdent(const char* ident)
 	return *type;
     }
 
-    DebugLevel0Fn("Missile %s not found\n",ident);
+    IfDebug( 
+	if( !NoWarningMissileType ) {
+	    DebugLevel0Fn("Missile %s not found\n",ident);
+	}
+    );
     return NULL;
 }
 
@@ -1271,14 +1279,20 @@ global void MissileHit(const Missile* missile)
 	Missile* mis;
 
 	mis = MakeMissile(missile->Type->ImpactMissile,x,y,0,0);
+	// Impact missiles didn't generate any damage now.
+#if 0
 	mis->Damage = missile->Damage; // direct damage, spells mostly
 	mis->SourceUnit = missile->SourceUnit;
 	// FIXME: should copy target also?
 	if( mis->SourceUnit ) {
-	    RefsDebugCheck( mis->SourceUnit->Destroyed );
+	    // RefsDebugCheck( mis->SourceUnit->Destroyed );
+	    if( mis->SourceUnit->Destroyed ) {
+		DebugLevel0Fn("Referencing a destroyed unit, I think it is good here\n");
+	    }
 	    RefsDebugCheck( !mis->SourceUnit->Refs );
 	    mis->SourceUnit->Refs++;
 	}
+#endif
     }
 
     if( !missile->SourceUnit ) {	// no owner - green-cross ...
