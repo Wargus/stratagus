@@ -601,6 +601,7 @@ global int PlayerCheckCosts(const Player* player,const int* costs)
 /**
 **	Check if enough resources for new unit is available.
 **
+**	@param player	Pointer to player, which resources are checked.
 **	@param type	Type of unit.
 **	@return		False if all enought, otherwise a bit mask.
 */
@@ -628,8 +629,9 @@ global void PlayerAddCosts(Player* player,const int* costs)
 }
 
 /**
-**	Add the costs of an unit to resources
+**	Add the costs of an unit type to resources
 **
+**	@param player	Pointer of player, to which the resources are added.
 **	@param type	Type of unit.
 */
 global void PlayerAddUnitType(Player* player,const UnitType* type)
@@ -679,6 +681,7 @@ global void PlayerSubCosts(Player* player,const int* costs)
 /**
 **	Substract the costs of new unit from resources
 **
+**	@param player	Pointer of player, from which the resources are removed.
 **	@param type	Type of unit.
 */
 global void PlayerSubUnitType(Player* player,const UnitType* type)
@@ -720,9 +723,11 @@ global int HaveUnitTypeByType(const Player* player,const UnitType* type)
 /**
 **	Have unit of type.
 **
-**	@param player	Pointer to player.
-**	@param type	Type of unit.
+**	@param player	Pointer to owning player.
+**	@param ident	Identifier of unit-type that should be lookuped.
 **	@return		How many exists, false otherwise.
+**
+**	@note	This function should not be used during run time.
 */
 global int HaveUnitTypeByIdent(const Player* player,const char* ident)
 {
@@ -1035,11 +1040,12 @@ global void DebugPlayers(void)
 **
 **	@param player	Player with it
 **	@param type	Problem type
-**	@param X	Map X tile position
-**	@param Y	Map Y tile position
+**	@param x	Map X tile position
+**	@param y	Map Y tile position
 **	@param fmt	Message format
 **	@param ...	Message varargs
 **
+**	@note		The parameter type, isn't yet used.
 **	@todo FIXME:	We must also notfiy allied players.
 */
 global void NotifyPlayer(const Player* player,
