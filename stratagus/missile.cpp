@@ -761,11 +761,11 @@ global int CheckMissileToBeDrawn(const Missile* missile)
 /**
 **	Draw missile.
 */
-global void DrawMissile(const MissileType* mtype,unsigned frame,int x,int y)
+local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 {
     // FIXME: This is a hack for mirrored sprites
-    if( frame&128 ) {
-	VideoDrawClipX(mtype->Sprite,frame&127,x,y);
+    if( frame<0 ) {
+	VideoDrawClipX(mtype->Sprite,-frame,x,y);
     } else {
 	VideoDrawClip(mtype->Sprite,frame,x,y);
     }
@@ -845,18 +845,21 @@ global void DrawMissiles(void)
 local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
 {
     int dir;
+    int nextdir;
 
-    // FIXME: depends on the missile directions wc 8, sc 32
-    missile->SpriteFrame&=127;
-    missile->SpriteFrame/=5;
-    missile->SpriteFrame*=5;
+    if( missile->SpriteFrame<0 ) {
+	missile->SpriteFrame=-missile->SpriteFrame;
+    }
+    missile->SpriteFrame/=missile->Type->NumDirections/2+1;
+    missile->SpriteFrame*=missile->Type->NumDirections/2+1;
 
-    dir=((DirectionToHeading(dx,dy)+NextDirection/2)&0xFF)/NextDirection;
-    if( dir<=LookingS/NextDirection ) {	// north->east->south
+    nextdir=256/missile->Type->NumDirections;
+    dir=((DirectionToHeading(dx,dy)+nextdir/2)&0xFF)/nextdir;
+    if( dir<=LookingS/nextdir ) {	// north->east->south
 	missile->SpriteFrame+=dir;
     } else {
-	// Note: 128 is the flag for flip graphic in X.
-	missile->SpriteFrame+=128+256/NextDirection-dir;
+	missile->SpriteFrame+=256/nextdir-dir;
+	missile->SpriteFrame=-missile->SpriteFrame;
     }
 }
 

@@ -80,6 +80,7 @@ local SCM CclDefineMissileType(SCM list)
 	mtype=NewMissileTypeSlot(str);	// str consumed!
     }
 
+    mtype->NumDirections=8;
     //
     //	Parse the arguments, already the new tagged format.
     //
@@ -96,6 +97,8 @@ local SCM CclDefineMissileType(SCM list)
 	    mtype->Height=gh_scm2int(gh_car(value));
 	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
 	    mtype->SpriteFrames=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("num-directions")) ) {
+	    mtype->NumDirections=gh_scm2int(gh_car(list));
 	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
 	    free(mtype->FiredSound.Name);
 	    mtype->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);

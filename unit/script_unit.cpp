@@ -498,16 +498,16 @@ local SCM CclUnit(SCM list)
 	    unit->Frame=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("flipped-frame")) ) {
-	    unit->Frame=128|gh_scm2int(gh_car(list));
+	    unit->Frame=-gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("seen")) ) {
 	    unit->SeenFrame=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("flipped-seen")) ) {
-	    unit->SeenFrame=128|gh_scm2int(gh_car(list));
+	    unit->SeenFrame=-gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("not-seen")) ) {
-	    unit->SeenFrame=-1;
+	    unit->SeenFrame=UnitNotSeen;
 	} else if( gh_eq_p(value,gh_symbol2scm("direction")) ) {
 	    unit->Direction=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);

@@ -84,6 +84,10 @@
 **		@note There is currently a limit of 127 sprite frames, which
 **		can be lifted if needed.
 **
+**	MissileType::NumDirections
+**
+**		Number of directions missile can face.
+**
 **	MissileType::FiredSound
 **
 **		Sound of the missile, if fired. @note currently not used.
@@ -328,6 +332,7 @@ struct _missile_type_ {
     unsigned	Width;			/// missile width in pixels
     unsigned	Height;			/// missile height in pixels
     unsigned	SpriteFrames;		/// number of sprite frames in graphic
+    int		NumDirections;		/// number of directions missile can face
 
 	// FIXME: FireSound defined but not used!
     SoundConfig FiredSound;		/// fired sound
