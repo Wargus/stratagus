@@ -30,6 +30,38 @@
 //@{
 
 /*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _graphic_config_ video.h
+**
+**	\#include "video.h"
+**
+**	typedef struct _graphic_config_ GraphicConfig;
+**
+**	This structure contains all configuration informations about a graphic.
+**
+**	GraphicConfig::File
+**
+**		Unique identifier of the graphic, used to reference graphics
+**		in config files and during startup.  The file is resolved
+**		during game start and the pointer placed in the next field.
+**		Currently this is the path file name of the graphic file.
+**
+**	GraphicConfig::Graphic
+**
+**		Pointer to the graphic. This pointer is resolved during game
+**		start.
+**
+**	Example how this can be used in C initializers:
+**
+**	@code
+**		{ "peasant.png" },
+**	@endcode
+*/
+
+/*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
 
@@ -85,6 +117,7 @@ struct __lnode__ {
     VMemType*		Palette;	/// Palette in hardware format
     long		Checksum;	/// Checksum for quick lookup
     // FIXME: need reference counts here!
+    int			RefCount;	/// Reference counter
 };
 
 
@@ -262,6 +295,12 @@ struct _graphic_ {
 	// cache line 2
     //void*		Offsets;	/// Offsets into frames
 };
+
+    ///	Graphic reference used during config/setup
+typedef struct _graphic_config_ {
+    char*	File;			/// config graphic name or file
+    Graphic*	Graphic;		/// graphic pointer to use to run time
+} GraphicConfig;
 
 /**
 **	Event call back.
