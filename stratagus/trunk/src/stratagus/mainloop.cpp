@@ -54,7 +54,7 @@
 
 #ifdef USE_SDL
 	// FIXME: move to system api part!
-#include <SDL/SDL.h>
+#include <SDL.h>
 #endif
 
 //----------------------------------------------------------------------------
