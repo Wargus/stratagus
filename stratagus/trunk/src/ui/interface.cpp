@@ -314,8 +314,8 @@ local void UiIncrementGameSpeed(void)
 local void UiDecrementGameSpeed(void)
 {
     VideoSyncSpeed-=10;
-    if( VideoSyncSpeed<=0 ) {
-	VideoSyncSpeed=1;
+    if( VideoSyncSpeed<=10 ) {
+	VideoSyncSpeed=10;
     }
     SetVideoSync();
     SetStatusLine("Slower");
@@ -482,6 +482,7 @@ local int CommandKey(int key)
 	    break;
 
 	case '+':			// + Faster
+        case '=': // plus is shift-equals.
 	case KeyCodeKPPlus:
 	    UiIncrementGameSpeed();
 	    break;
