@@ -51,7 +51,7 @@ local void ScenSelectLBExit(Menuitem *mi);
 local void ScenSelectLBInit(Menuitem *mi);
 local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i);
 local void ScenSelectLBAction(Menuitem *mi, int i);
-local void ScenSelectTPAction(Menuitem *mi, int i);
+local void ScenSelectTPMSAction(Menuitem *mi, int i);
 local void ScenSelectVSAction(Menuitem *mi, int i);
 local void ScenSelectFolder(void);
 local void ScenSelectInit(Menuitem *mi);	// master init
@@ -158,9 +158,9 @@ local Menuitem ScenSelectMenuItems[] = {
 
     { MI_TYPE_LISTBOX, 24, 140, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit,
 	{ listbox:{ NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
-		    (void *)ScenSelectLBRetrieve, NULL} } },
+		    (void *)ScenSelectLBRetrieve, ScenSelectOk} } },
     { MI_TYPE_VSLIDER, 312, 140, 0, 0, NULL, NULL,
-	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, NULL} } },
+	{ vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
 
     { MI_TYPE_BUTTON, 48, 318, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "OK", 106, 27, MBUTTON_GM_HALF, ScenSelectOk, 0} } },
@@ -170,11 +170,11 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
 	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPAction, 2, 1, 1, 0} } },
+	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0} } },
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
 	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
-    { MI_TYPE_PULLDOWN, 140, 80, MenuButtonDisabled, GameFont, NULL, NULL,
-	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, NULL, 5, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
+	{ pulldown:{ ssmsoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 5, 0, 0, 0} } },
     { MI_TYPE_BUTTON, 22, 112, 0, GameFont, NULL, NULL,
 	{ button:{ NULL, 36, 24, MBUTTON_FOLDER, ScenSelectFolder, 0} } },
 };
@@ -553,24 +553,6 @@ local void GameMenuEnd(void)
     Exit(0);
 }
 
-local void ReadPudInfos(FileList *fl, int n)
-{
-    char buffer[1024], *cp;
-    int i;
-
-    strcpy(buffer, ScenSelectPath);
-    if (buffer[0]) {
-	strcat(buffer, "/");
-    }
-    cp = buffer + strlen(buffer);
-    for (i = 0; i < n; i++) {
-	if (fl[i].type) {
-	    strcpy(cp, fl[i].name);
-	    fl[i].xdata = GetPudInfo(buffer);
-	}
-    }
-}
-
 local void FreePudInfos(FileList *fl, int n)
 {
     int i;
@@ -622,24 +604,81 @@ local void ScenSelectLBExit(Menuitem *mi)
     }
 }
 
+local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
+{
+    PudInfo *info;
+    char *suf, *cp, *lcp, *np;
+    static int p, sz, szl[] = { -1, 32, 64, 96, 128 };
+
+    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
+	suf = ".cm";
+	p = 0;
+    } else {
+	suf = ".pud";
+	p = 1;
+    }
+    np = strrchr(pathbuf, '/');
+    if (np) {
+	np++;
+    } else {
+	np = pathbuf;
+    }
+    cp = np;
+    cp--;
+    fl->type = -1;
+    do {
+	lcp = cp++;
+	cp = strstr(cp, suf);
+    } while (cp != NULL);
+    if (lcp >= np) {
+	cp = lcp + strlen(suf);
+#ifdef USE_ZLIB
+	if (strcmp(cp, ".gz") == 0) {
+	    *cp = 0;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	if (strcmp(cp, ".bz2") == 0) {
+	    *cp = 0;
+	}
+#endif
+	if (*cp == 0) {
+	    if (p) {
+		info = GetPudInfo(pathbuf);
+		if (info) {
+		    sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
+		    if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
+			fl->type = 1;
+			fl->name = strdup(np);
+			fl->xdata = info;
+			return 1;
+		    } else {
+			FreePudInfo(info);
+		    }
+		}
+	    } else {
+		fl->type = 1;
+		fl->name = strdup(np);
+		fl->xdata = NULL;
+		return 1;
+	    }
+	}
+    }
+    return 0;
+}
+
 local void ScenSelectLBInit(Menuitem *mi)
 {
-    char *suf;
-    int i, f;
+    int i;
 
     ScenSelectLBExit(mi);
     if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
-	suf = ".cm";
-	f = 0;
+	ScenSelectMenuItems[8].flags |= MenuButtonDisabled;
     } else {
-	suf = ".pud";
-	f = 1;
+	ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
     }
-    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, suf, (FileList **)&(mi->d.listbox.options));
-    if (f == 1 && i > 0) {
-	ReadPudInfos(mi->d.listbox.options, i);
-    }
-    // FIXME: Fill xdata here
+    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
+						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
 	ScenSelectMenuItems[3].d.button.text = "OK";
 	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
@@ -694,7 +733,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
     return NULL;
 }
 
-local void ScenSelectTPAction(Menuitem *mi, int i __attribute__((unused)) )
+local void ScenSelectTPMSAction(Menuitem *mi, int i __attribute__((unused)) )
 {
     mi = ScenSelectMenuItems + 1;
     ScenSelectLBInit(mi);
@@ -894,6 +933,16 @@ global int MenuKey(int key)		// FIXME: Should be MenuKeyDown(), and act on _new_
 		    case MI_TYPE_BUTTON:
 			if (mi->d.button.handler) {
 			    (*mi->d.button.handler)();
+			}
+			return 1;
+		    case MI_TYPE_LISTBOX:
+			if (mi->d.listbox.handler) {
+			    (*mi->d.listbox.handler)();
+			}
+			return 1;
+		    case MI_TYPE_VSLIDER:
+			if (mi->d.vslider.handler) {
+			    (*mi->d.vslider.handler)();
 			}
 			return 1;
 		    default:
