@@ -4913,7 +4913,7 @@ global void EditorEditResource(void)
 
     if (UnitUnderCursor->Type->GoldMine) {
 	menu->items[0].d.text.text = "Amount of gold:";
-    } else if (UnitUnderCursor->Type->OilPatch) {
+    } else if (UnitUnderCursor->Type->OilPatch || UnitUnderCursor->Type->GivesOil) {
 	menu->items[0].d.text.text = "Amount of oil:";
     }
     sprintf(buf, "%d~!_", UnitUnderCursor->Value);
