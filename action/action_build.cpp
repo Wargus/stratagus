@@ -132,6 +132,7 @@ global void HandleActionBuild(Unit* unit)
 	    // Release Temporary Building
             UnitClearOrders(unit->Orders[0].Goal);
             ReleaseUnit(unit->Orders[0].Goal);
+	    unit->Orders[0].Goal = NULL;
 	    unit->SubAction = 0;
 	    if (unit->Selected) {	// update display for new action
 		SelectedUnitChanged();
@@ -173,7 +174,7 @@ global void HandleActionBuild(Unit* unit)
 	// Release Temporary Building
         UnitClearOrders(unit->Orders[0].Goal);
         ReleaseUnit(unit->Orders[0].Goal);
-	unit->Orders[0].Goal = 0;
+	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -206,6 +207,7 @@ global void HandleActionBuild(Unit* unit)
 	// Release Temporary Building
         UnitClearOrders(unit->Orders[0].Goal);
         ReleaseUnit(unit->Orders[0].Goal);
+	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -227,6 +229,7 @@ global void HandleActionBuild(Unit* unit)
 	// Release Temporary Building
         UnitClearOrders(unit->Orders[0].Goal);
         ReleaseUnit(unit->Orders[0].Goal);
+	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
 	if (unit->Selected) {	// update display for new action
 	    SelectedUnitChanged();
@@ -290,6 +293,7 @@ global void HandleActionBuild(Unit* unit)
 	unit->X = x;
 	unit->Y = y;
 	unit->Orders[0].Action = UnitActionStill;
+	unit->Orders[0].Goal = NULL;
 	unit->SubAction = 0;
     } else {
 	//  Make the builder repair the newly spawned building.
