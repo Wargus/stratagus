@@ -167,8 +167,10 @@ local int MineInGoldmine(Unit* unit)
 	} else if( unit->Type->Type==UnitPeasant ) {
 	    unit->Type=&UnitTypes[UnitPeasantWithGold];
 	} else {
-	    DebugLevel0("Wrong unit for mining gold %d\n"
-		,unit->Type->Type);
+	    DebugLevel0("Wrong unit (%d,%d) for mining gold %d (%s)\n"
+		,unit->X,unit->Y
+		,unit->Type->Type
+		,unit->Type->Name);
 	}
 	if( UnitVisible(unit) ) {
 	    MustRedraw|=RedrawMap;
@@ -283,8 +285,10 @@ global void HandleActionMineGold(Unit* unit)
 	    } else if( unit->Type->Type==UnitPeasantWithGold ) {
 		unit->Type=&UnitTypes[UnitPeasant];
 	    } else {
-		DebugLevel0("Wrong unit for returning gold %d\n"
-		    ,unit->Type->Type);
+		DebugLevel0("Wrong unit (%d,%d) for returning gold %d (%s)\n"
+		    ,unit->X,unit->Y
+		    ,unit->Type->Type
+		    ,unit->Type->Name);
 	    }
 
 	    if( WAIT_FOR_GOLD<UNIT_MAX_WAIT ) {

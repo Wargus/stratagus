@@ -650,9 +650,7 @@ local Animation * GetSingleAnimation(SCM list){
 
 }
 
-global Animation ** UnitDie;
 global Animation ** UnitCorpse;
-global Animation ** UnitStillAnimation;
 
 /**
  ** Get animation data
@@ -682,16 +680,17 @@ local SCM CclAnimType(SCM list)
     
     switch( type ){
     case 0:
-      UnitStillAnimation = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
 	    unittype->Animations=calloc(sizeof(*unittype->Animations),1);
 	}
+	// FIXME: animations are shared?
 	CclFree(unittype->Animations->Still);
         unittype->Animations->Still=whole_animation[i];
       }
       DebugLevel2("Loading UnitStillAnimation\n");
+      free(whole_animation);
       break;
     case 1:
       for( i=0; i<UnitTypeInternalMax; ++i ) {
@@ -703,9 +702,9 @@ local SCM CclAnimType(SCM list)
 	unittype->Animations->Move=whole_animation[i];
       }
       DebugLevel2("Loading UnitMoveAnimation\n");
+      free(whole_animation);
       break;
     case 2:
-      UnitDie = whole_animation;
       for( i=0; i<UnitTypeInternalMax; ++i ) {
 	unittype=UnitTypeByWcNum(i);
 	if( !unittype->Animations ) {
@@ -715,6 +714,7 @@ local SCM CclAnimType(SCM list)
 	unittype->Animations->Die=whole_animation[i];
       }
       DebugLevel2("Loading UnitDie\n");
+      free(whole_animation);
       break;
     case 3:
       UnitCorpse = whole_animation;
@@ -737,9 +737,11 @@ local SCM CclAnimType(SCM list)
 	unittype->Animations->Attack=whole_animation[i];
       }
       DebugLevel2("Loading UnitAttack\n");
+      free(whole_animation);
       break;
     default:
       DebugLevel1(__FUNCTION__":Unknown unit-type %d\n",type);
+      free(whole_animation);
       break;
     }
     return list;
