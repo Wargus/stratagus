@@ -309,16 +309,10 @@ local void WaitForInput(int timeout)
 }
 
 /**
-**	Main1, called from main.
-**
-**	@param	argc	Number of arguments.
-**	@param	argv	Vector of arguments.
+**	Print headerline, copyright, ...
 */
-global int main1(int argc __attribute__ ((unused)),
-	char** argv __attribute__ ((unused)))
+local void PrintHeader(void)
 {
-    char* s;
-
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
 #ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
@@ -361,7 +355,7 @@ global int main1(int argc __attribute__ ((unused)),
     "SOUND "
 #endif
     // New features:
-    "\nFeatures "
+    "\nCompile feature "
 #ifdef UNIT_ON_MAP
     "UNIT-ON-MAP "
 #endif
@@ -389,13 +383,28 @@ global int main1(int argc __attribute__ ((unused)),
 #ifdef HAVE_EXPANSION
     "EXPANSION "
 #endif
+	,NameLine);
+}
+
+/**
+**	Main1, called from main.
+**
+**	@param	argc	Number of arguments.
+**	@param	argv	Vector of arguments.
+*/
+global int main1(int argc __attribute__ ((unused)),
+	char** argv __attribute__ ((unused)))
+{
+    char* s;
+
+    PrintHeader();
+    printf(
     "\n\nFreeCraft may be copied only under the terms of the GNU General Public License\
 \nwhich may be found in the FreeCraft source kit."
     "\n\nDISCLAIMER:\n\
 This software is provided as-is.  The author(s) can not be held liable for any\
 \ndamage that might arise from the use of this software.\n\
-Use it at your own risk.\n"
-	,NameLine);
+Use it at your own risk.\n\n");
 
     InitVideo();			// setup video display
 #ifdef WITH_SOUND
@@ -438,7 +447,7 @@ Use it at your own risk.\n"
     SetDefaultTextColors(FontYellow,FontWhite);
     InitMenus(1);
     LoadImages(1);
-    LoadCursors(1);
+    LoadCursors("orc");
     InitSettings();
 
     WaitForInput(15);
@@ -495,73 +504,8 @@ global volatile void Exit(int err)
 */
 local void Usage(void)
 {
-    printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
-#ifdef USE_CCL
-    "\n  SIOD Copyright by George J. Carrette."
-#endif
-#ifdef USE_SDL
-    "\n  SDL Copyright by Sam Lantinga."
-#endif
-    "\nCompile options "
-#ifdef USE_CCL
-    "CCL "
-#endif
-#ifdef USE_ONLYCCL
-    "ONLYCCL "
-#endif
-#ifdef USE_THREAD
-    "THREAD "
-#endif
-#ifdef DEBUG
-    "DEBUG "
-#endif
-#ifdef USE_ZLIB
-    "ZLIB "
-#endif
-#ifdef USE_BZ2LIB
-    "BZ2LIB "
-#endif
-#ifdef USE_SDL
-    "SDL "
-#endif
-#ifdef USE_SDLA
-    "SDL-AUDIO "
-#endif
-#ifdef USE_X11
-    "X11 "
-#endif
-#ifdef WITH_SOUND
-    "SOUND "
-#endif
-    // New features:
-    "\nFeatures "
-#ifdef UNIT_ON_MAP
-    "UNIT-ON-MAP "
-#endif
-#ifdef NEW_MAPDRAW
-    "NEW-MAPDRAW "
-#endif
-#ifdef NEW_NAMES
-    "NEW-NAMES "
-#endif
-#ifdef NEW_FOW
-    "NEW-FOW "
-#endif
-#ifdef NEW_AI
-    "NEW-AI "
-#endif
-#ifdef NEW_SHIPS
-    "NEW-SHIPS "
-#endif
-#ifdef NEW_NETMENUS
-    "NEW-NETMENUS "
-#endif
-#ifdef SLOW_INPUT
-    "SLOW-INPUT "
-#endif
-#ifdef HAVE_EXPANSION
-    "EXPANSION "
-#endif
+    PrintHeader();
+    printf(
 "\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
 \t-d datapath\tpath to freecraft data\n\
 \t-c file.ccl\tccl start file\n\
@@ -572,7 +516,7 @@ local void Usage(void)
 \t-P port\t\tNetwork port to use (menu code only)\n\
 \t-n [localport:]host[:port]\tNetwork argument (port default 6660)\n\
 \t-L lag\t\tNetwork lag in # frames (default 5 = 165ms)\n\
-\t-U update\tNetwork update frequence in # frames (default 5 = 6x pro s)\n\
+\t-U update\tNetwork update rate in # frames (default 5=6x pro s)\n\
 \t-N name\t\tName of the player\n\
 \t-s sleep\tNumber of frames for the AI to sleep before it starts\n\
 \t-t factor\tComputer units built time factor\n\
@@ -583,7 +527,7 @@ local void Usage(void)
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
 \t-W\t\tWindowed video mode (only supported with SDL)\n\
 map is relative to FreeCraftLibPath=datapath, use ./map for relative to cwd\n\
-",NameLine);
+");
 }
 
 /**
