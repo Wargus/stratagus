@@ -3003,10 +3003,15 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 			d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
 			d2 = op - mi[1].d.vslider.curper;
 			if (d2 < d1) {
-			    mi->d.listbox.curopt++;
-			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
-				mi->d.listbox.curopt--;
-				mi->d.listbox.startline++;
+			    int x;
+			    x = (int)(((float)mi[1].d.vslider.curper-op) /
+			             (100/(mi->d.pulldown.noptions-1))+.5f);
+			    for (; x>=0; --x) {
+				mi->d.listbox.curopt++;
+				if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
+				    mi->d.listbox.curopt--;
+				    mi->d.listbox.startline++;
+				}
 			    }
 			}
 		    }
@@ -3017,16 +3022,20 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 			d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
 			d2 = mi[1].d.vslider.curper - op;
 			if (d2 < d1) {
-			    mi->d.listbox.curopt--;
-			    if (mi->d.listbox.curopt < 0) {
-				mi->d.listbox.curopt++;
-				mi->d.listbox.startline--;
+			    int x;
+			    x = (int)(((float)op-mi[1].d.vslider.curper) /
+			             (100/(mi->d.pulldown.noptions-1))+.5f);
+			    for (; x>=0; --x) {
+				mi->d.listbox.curopt--;
+				if (mi->d.listbox.curopt < 0) {
+				    mi->d.listbox.curopt++;
+				    mi->d.listbox.startline--;
+				}
 			    }
 			}
 		    }
 		}
 		ScenSelectLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
-		mi[1].d.vslider.percent = mi[1].d.vslider.curper;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -3039,25 +3048,28 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 {
     int j = 3;
     int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
-    int increments = 100 / (nitems - j - 11);
 
     mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN && KeystrokeHelpMenuItems[nitems-1].yofs > (40+20*11)) {
+	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN &&
+	        KeystrokeHelpMenuItems[nitems-1].yofs > (40+20*11)) {
 		    for (j=3; j < nitems ;++j) {
 			KeystrokeHelpMenuItems[j].yofs -= 20;
-			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
+			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
+			    (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			    KeystrokeHelpMenuItems[j].mitype = 0;
 			else
 			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
 		    }
 		    MustRedraw |= RedrawMenu;
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP && KeystrokeHelpMenuItems[3].yofs < (40+20*1)) {
+	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP &&
+	               KeystrokeHelpMenuItems[3].yofs < (40+20*1)) {
 		    for (j=3; j < nitems ;++j) {
 			KeystrokeHelpMenuItems[j].yofs += 20;
-			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
+			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
+			    (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			    KeystrokeHelpMenuItems[j].mitype = 0;
 			else
 			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
@@ -3070,16 +3082,17 @@ local void ScenSelectVSKeystrokeHelpAction(Menuitem *mi, int i)
 	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
-		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    mi[1].d.vslider.percent = mi[1].d.vslider.curper;
-		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    mi[1].d.vslider.percent = mi[1].d.vslider.curper;
-		}
-		mi[1].d.vslider.percent = (mi[1].d.vslider.curper + 8) / increments * increments;
+	    if ((mi[1].d.vslider.cflags&MI_CFLAGS_KNOB) &&
+	        (mi[1].flags&MenuButtonClicked)) {
+		int ys;
+		float f;
+		f = (int)((float)mi[1].d.vslider.curper/(100/(nitems-11-3))+.5f) * 100 / (float)(nitems-11-3);
+		mi[1].d.vslider.percent = (int)f;
+		ys = ((int)(f * (nitems-11-3) + .5f) / 100) * -20 + (40+20*1);
 		for (j=3; j < nitems; ++j) {
-		    KeystrokeHelpMenuItems[j].yofs = ( mi[1].d.vslider.percent * (nitems - 11 - 3) / 100 * (-20) ) + (40+20*1) + (j-3)*20;
-		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
+		    KeystrokeHelpMenuItems[j].yofs = ys + (j-3)*20;
+		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
+		        (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
 			KeystrokeHelpMenuItems[j].mitype = 0;
 		    else
 			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
@@ -4322,7 +4335,8 @@ local void MenuHandleMouseMove(int x,int y)
 			    continue;
 			}
 			j = y - ys;
-			j -= 8;
+			mi->d.vslider.cursel = 0;
+
 			if (j < 20) {
 			    mi->d.vslider.cursel |= MI_CFLAGS_UP;
 			} else if (j > mi->d.vslider.ysize - 20) {
@@ -4330,10 +4344,6 @@ local void MenuHandleMouseMove(int x,int y)
 			} else {
 			    mi->d.vslider.cursel &= ~(MI_CFLAGS_UP|MI_CFLAGS_DOWN);
 			    h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
-			    mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
-			    if (mi->d.vslider.curper > 100) {
-				mi->d.vslider.curper = 100;
-			    }
 			    if (j > h && j < h + 18) {
 				mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
 			    } else {
@@ -4343,6 +4353,13 @@ local void MenuHandleMouseMove(int x,int y)
 				} else {
 				    mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
 				}
+			    }
+			    j -= 8;
+			    if (j < 20) j=20;
+
+			    mi->d.vslider.curper = ((j - 20) * 100) / (mi->d.vslider.ysize - 54);
+			    if (mi->d.vslider.curper > 100) {
+				mi->d.vslider.curper = 100;
 			    }
 			}
 			if (mi->d.vslider.action) {
@@ -4433,6 +4450,9 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     Menu *menu = Menus + CurrentMenu;
 
     if (CurrentMenu == -1)
+	return;
+
+    if (MouseButtons&(LeftButton<<MouseHoldShift))
 	return;
 
     if (MouseButtons&LeftButton) {
