@@ -493,7 +493,7 @@ extern void MapCclRegister(void);
 //	mixed sources
 //
     /// Load a map
-extern void LoadMap(const char* file,WorldMap* map);
+//extern void LoadMap(const char* file,WorldMap* map);
     /// Save the map
 extern void SaveMap(FILE* file);
     /// Clean the map
