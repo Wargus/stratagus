@@ -66,7 +66,7 @@ local GraphicType GraphicImage16Type;	/// image type 16bit palette
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to8(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     const unsigned char* sp;
@@ -110,7 +110,7 @@ local void VideoDrawSub8to8(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to16(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     const unsigned char* sp;
@@ -156,7 +156,7 @@ local void VideoDrawSub8to16(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to24(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     const unsigned char* sp;
@@ -200,7 +200,7 @@ local void VideoDrawSub8to24(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to32(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     const unsigned char* sp;
@@ -244,7 +244,7 @@ local void VideoDrawSub8to32(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to8Clip(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     CLIP_RECTANGLE(x,y,w,h);
@@ -263,7 +263,7 @@ local void VideoDrawSub8to8Clip(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to16Clip(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     CLIP_RECTANGLE(x,y,w,h);
@@ -282,7 +282,7 @@ local void VideoDrawSub8to16Clip(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to24Clip(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     CLIP_RECTANGLE(x,y,w,h);
@@ -301,7 +301,7 @@ local void VideoDrawSub8to24Clip(
 **	@param y	Y screen position
 */
 local void VideoDrawSub8to32Clip(
-	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	const Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y)
 {
     CLIP_RECTANGLE(x,y,w,h);
@@ -426,7 +426,7 @@ local void* FadePixels(void* pixels,int fade)
 **	@param fade	Amount faded, from 0 (black) to 256 (no fading)
 */
 global void VideoDrawSubClipFaded(
-	Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
+	Graphic* graphic,int gx,int gy,int w,int h,
 	int x,int y,int fade)
 {
     void* oldpixels;
