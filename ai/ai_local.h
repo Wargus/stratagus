@@ -297,6 +297,7 @@ typedef struct _player_ai_ {
     AiExplorationRequest*FirstExplorationRequest;/// Requests for exploration
     unsigned int	LastExplorationGameCycle;/// When did the last explore occur ?
 
+    unsigned int 	LastCanNotMoveGameCycle;
     /// number of elements in UnitTypeRequests
     int			UnitTypeRequestsCount;
     /// unit-types to build/train requested and priority list

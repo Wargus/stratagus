@@ -532,6 +532,18 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 	    UnitNumber(unit) _C_
 	    unit->X _C_ unit->Y _C_ x _C_ y);
 
+    if (abs(gx - unit->X) <= 1 && abs(gy - unit->Y) <= 1 && maxrange == 0) {
+	// Simplest case, move to adj cell
+	if (gx == unit->X && gy == unit->Y) {
+	    return PF_REACHED;
+	}
+
+	if (path) {
+	    path[0] = XY2Heading[gx - unit->X + 1][gy - unit->Y + 1];
+	}
+	return 1;
+    }
+
     OpenSetSize=0;
     num_in_close=0;
     mask=UnitMovementMask(unit);
@@ -748,7 +760,8 @@ global int NextPathElement(Unit* unit,int* pxd,int *pyd)
     if( unit->Data.Move.Length <= 0 || 
 	( unit->Goal && (unit->Goal->X != unit->Orders[0].X
 	    || unit->Goal->Y != unit->Orders[0].Y)) ) {
-        result=NewPath(unit);
+	result=NewPath(unit);
+	
         if( result==PF_UNREACHABLE ) {
 	    unit->Data.Move.Length=0;
 	    return result;
