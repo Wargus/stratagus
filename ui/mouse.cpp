@@ -10,12 +10,11 @@
 //
 /**@name mouse.c	-	The mouse handling. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1052,7 +1051,11 @@ local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused
 
     if( (KeyModifiers&ModifierControl)
 	    || (MouseButtons&(LeftButton<<MouseDoubleShift)) ) {
-	SelectUnitsByType(unit);
+	if( KeyModifiers&ModifierShift ) {
+	    ToggleUnitsByType(unit);
+	} else {
+	    SelectUnitsByType(unit);
+	}
     } else if( KeyModifiers&ModifierAlt ) {
 	SelectGroupFromUnit(unit);
     } else if( KeyModifiers&ModifierShift ) {
@@ -1418,7 +1421,11 @@ global void UIHandleButtonUp(unsigned button)
 		// FIXME: Not nice coded, button number hardcoded!
 		if( (KeyModifiers&ModifierControl)
 			|| (button&(1<<MouseDoubleShift))) {
-		    num=SelectUnitsByType(unit);
+		    if( KeyModifiers&ModifierShift ) {
+			num=ToggleUnitsByType(unit);
+		    } else {
+			num=SelectUnitsByType(unit);
+		    }
 		} else if( (KeyModifiers&ModifierAlt) && unit->LastGroup ) {
                     num=SelectGroupFromUnit(unit);
 
