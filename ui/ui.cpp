@@ -46,13 +46,18 @@
 global char RightButtonAttacks;		/// right button 0 move, 1 attack
 global char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 
+    /// keyboard scroll speed
+global int SpeedKeyScroll=KEY_SCROLL_SPEED;
+    /// mouse scroll speed
+global int SpeedMouseScroll=MOUSE_SCROLL_SPEED;
+
 /**
 **	The user interface configuration
 **
 **	@todo FIXME: check if everything is initialized from ccl.
 */
 global UI TheUI
-#if 1
+#if 0	// FIXME: 0
 = {
     "default", 640, 480,		// interface selector
     100, 0, 100,			// contrast, brightness, saturation
@@ -146,8 +151,9 @@ global UI TheUI
 */
 global UI** UI_Table;
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /**
 **	Initialize the user interface.
@@ -278,6 +284,140 @@ global void LoadUserInterface(void)
 }
 
 /**
+**	Save the user interface module.
+*/
+global void SaveUserInterface(FILE* file)
+{
+    int i;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: ui $Id$\n\n");
+
+    // Contrast, Brightness, Saturation
+    fprintf(file,"(set-contrast! %d)\n",TheUI.Contrast);
+    fprintf(file,"(set-brightness! %d)\n",TheUI.Brightness);
+    fprintf(file,"(set-saturation! %d)\n\n",TheUI.Saturation);
+    // Scrolling
+    fprintf(file,"(set-mouse-scroll! %s)\n",TheUI.MouseScroll ? "#t" : "#f");
+    fprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
+    fprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
+    fprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
+    fprintf(file,"(set-reverse-map-move! %s)\n\n",
+	    TheUI.ReverseMouseMove ? "#t" : "#f");
+
+    fprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
+    fprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);
+
+    fprintf(file,"(set-original-resources! %s)\n\n",
+	    TheUI.OriginalResources ? "#t" : "#f");
+
+    // Save the current UI
+
+    fprintf(file,"(define-ui '%s %d %d\t; Selector\n",
+	    TheUI.Name,TheUI.Width,TheUI.Height);
+    fprintf(file,"  ; Filler 1\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.Filler1.File,TheUI.Filler1X,TheUI.Filler1Y);
+    fprintf(file,"  ; Resource line\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.Resource.File,TheUI.ResourceX,TheUI.ResourceY);
+
+    for( i=1; i<MaxCosts; ++i ) {
+	fprintf(file,"  ; Resource %s\n",DEFAULT_NAMES[i]);
+	fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+		TheUI.Resources[i].Icon.File,TheUI.Resources[i].IconRow,
+		TheUI.Resources[i].IconX,TheUI.Resources[i].IconY,
+		TheUI.Resources[i].IconW,TheUI.Resources[i].IconH,
+		TheUI.Resources[i].TextX,TheUI.Resources[i].TextY);
+    }
+    fprintf(file,"  ; Food\n");
+    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+	    TheUI.FoodIcon.File,TheUI.FoodIconRow,
+	    TheUI.FoodIconX,TheUI.FoodIconY,
+	    TheUI.FoodIconW,TheUI.FoodIconH,
+	    TheUI.FoodTextX,TheUI.FoodTextY);
+    fprintf(file,"  ; Score\n");
+    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+	    TheUI.ScoreIcon.File,TheUI.ScoreIconRow,
+	    TheUI.ScoreIconX,TheUI.ScoreIconY,
+	    TheUI.ScoreIconW,TheUI.ScoreIconH,
+	    TheUI.ScoreTextX,TheUI.ScoreTextY);
+
+    fprintf(file,"  ; Info panel\n");
+    fprintf(file,"  (list \"%s\" %d %d %d %d)\n",
+	    TheUI.InfoPanel.File,
+	    TheUI.InfoPanelX,TheUI.InfoPanelY,
+	    TheUI.InfoPanelW,TheUI.InfoPanelH);
+
+    fprintf(file,"  ; Complete bar\n");
+    fprintf(file,"  (list %d %d %d %d %d)\n",
+	    TheUI.CompleteBarColor,
+	    TheUI.CompleteBarX,TheUI.CompleteBarY,
+	    TheUI.CompleteTextX,TheUI.CompleteTextY);
+
+    fprintf(file,"  ; Button panel\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.ButtonPanel.File,TheUI.ButtonPanelX,TheUI.ButtonPanelY);
+
+    fprintf(file,"  ; The map area\n");
+    fprintf(file,"  (list %d %d %d %d)\n",
+	    TheUI.MapX,TheUI.MapY,TheUI.MapEndX+1,TheUI.MapEndY+1);
+
+    fprintf(file,"  ; Menu button background\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.MenuButton.File,TheUI.MenuButtonX,TheUI.MenuButtonY);
+
+    fprintf(file,"  ; Minimap background\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.Minimap.File,TheUI.MinimapX,TheUI.MinimapY);
+
+    fprintf(file,"  ; Status line\n");
+    fprintf(file,"  (list \"%s\" %d %d)\n",
+	    TheUI.StatusLine.File,TheUI.StatusLineX,TheUI.StatusLineY);
+
+    fprintf(file,"  ; Buttons\n");
+    for( i=0; i<MaxButtons; ++i ) {
+	fprintf(file,"  (list %3d %3d %4d %3d)\n",
+		TheUI.Buttons[i].X,TheUI.Buttons[i].Y,
+		TheUI.Buttons[i].Width,TheUI.Buttons[i].Height);
+    }
+
+    fprintf(file,"  ; Buttons II\n");
+    for( i=0; i<6; ++i ) {
+	fprintf(file,"  (list %3d %3d %4d %3d)\n",
+		TheUI.Buttons2[i].X,TheUI.Buttons2[i].Y,
+		TheUI.Buttons2[i].Width,TheUI.Buttons2[i].Height);
+    }
+
+    fprintf(file,"  ; Cursors\n");
+    fprintf(file,"  (list");
+    fprintf(file," '%s",TheUI.Point.Name);
+    fprintf(file," '%s",TheUI.Glass.Name);
+    fprintf(file," '%s\n",TheUI.Cross.Name);
+    fprintf(file,"    '%s",TheUI.YellowHair.Name);
+    fprintf(file," '%s",TheUI.GreenHair.Name);
+    fprintf(file,"    '%s\n",TheUI.RedHair.Name);
+    fprintf(file,"    '%s\n",TheUI.Scroll.Name);
+
+    fprintf(file,"    '%s",TheUI.ArrowE.Name);
+    fprintf(file," '%s",TheUI.ArrowNE.Name);
+    fprintf(file," '%s",TheUI.ArrowN.Name);
+    fprintf(file," '%s\n",TheUI.ArrowNW.Name);
+    fprintf(file,"    '%s",TheUI.ArrowW.Name);
+    fprintf(file," '%s",TheUI.ArrowSW.Name);
+    fprintf(file," '%s",TheUI.ArrowS.Name);
+    fprintf(file," '%s)\n",TheUI.ArrowSE.Name);
+
+    fprintf(file,"  (list \"%s\")\n",TheUI.GameMenuePanel.File);
+    fprintf(file,"  (list \"%s\")\n",TheUI.Menue1Panel.File);
+    fprintf(file,"  (list \"%s\")\n",TheUI.Menue2Panel.File);
+    fprintf(file,"  (list \"%s\")\n",TheUI.VictoryPanel.File);
+    fprintf(file,"  (list \"%s\")",TheUI.ScenarioPanel.File);
+
+    fprintf(file," )\n\n");
+}
+
+/**
 **	Clean up the user interface module.
 */
 global void CleanUserInterface(void)
@@ -308,11 +448,11 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.VictoryPanel.Graphic);
     VideoSaveFree(TheUI.ScenarioPanel.Graphic);
 
-    memset(&TheUI,0,sizeof(TheUI));
-
     // FIXME: Johns: Implement this correctly or we will lose memory!
 
     DebugLevel0Fn("FIXME: not completely written\n");
+
+    memset(&TheUI,0,sizeof(TheUI));
 }
 
 //@}
