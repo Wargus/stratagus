@@ -58,6 +58,8 @@ global int ShowOrders;			/// Flag: show orders of unit on map
 global int ShowHealthHorizontal=1;
     /// Flag: health horizontal instead of vertical
 global int ShowManaHorizontal=1;
+    /// Flag: show bars and dot energy only for selected
+global int ShowEnergySelectedOnly; 
 
 // FIXME: not all variables of this file are here
 // FIXME: perhaps split this file into two?
@@ -343,6 +345,14 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
     int f;
     int color;
     UnitStats* stats;
+
+
+    //
+    //	Only for selected units?
+    //
+    if( ShowEnergySelectedOnly && !unit->Selected ) {
+	return;
+    }
 
     //
     //	Health bar on left side of unit.

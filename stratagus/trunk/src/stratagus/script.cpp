@@ -230,6 +230,17 @@ local SCM CclShowManaDot(void)
 }
 
 /**
+**	Enable energy bars and dots only for selected units
+*/
+local SCM CclShowEnergySelected(void)
+{
+    ShowEnergySelectedOnly=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+
+/**
 **	Enable display of full bars/dots.
 */
 local SCM CclShowFull(void)
@@ -906,6 +917,7 @@ global void CclInit(void)
 
     init_subr_0("show-mana-bar",CclShowManaBar);
     init_subr_0("show-mana-dot",CclShowManaDot);
+    init_subr_0("show-energy-selected-only",CclShowEnergySelected);
     init_subr_0("show-full",CclShowFull);
     init_subr_0("show-no-full",CclShowNoFull);
     init_subr_0("decoration-on-top",CclDecorationOnTop);
