@@ -821,13 +821,24 @@ local int CclUnits(lua_State* l)
 /**
 **		Compiled with sound.
 */
-local int CclWithSound(lua_State* l)
+local int CclGetCompileFeature(lua_State* l)
 {
-#ifdef WITH_SOUND
-	lua_pushboolean(l, 1);
-#else
-	lua_pushboolean(l, 0);
-#endif
+	const char* str;
+
+	if (lua_gettop(l) != 1) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	}
+
+	str = LuaToString(l, 1);
+	if (strstr(CompileOptions, str)) {
+		DebugLevel0Fn("I have %s\n" _C_ str);
+		lua_pushboolean(l, 1);
+	} else {
+		DebugLevel0Fn("I don't have %s\n" _C_ str);
+		lua_pushboolean(l, 0);
+	}
+
 	return 1;
 }
 
@@ -937,6 +948,99 @@ global int CclCommand(const char* command)
 ..		Setup
 ............................................................................*/
 
+#ifdef META_LUA
+
+#define FAST_GET_STRING(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushstring(l, strdup(v)); \
+		return 1; \
+	} \
+}
+
+#define FAST_GET_INT(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushnumber(l, v); \
+		return 1; \
+	} \
+}
+
+#define FAST_GET_BOOL(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushboolean(l, v); \
+		return 1; \
+	} \
+}
+
+/**
+**  Get a value from the big Stratagus struct.
+*/
+local int ScriptStratagusGetValue(lua_State* l)
+{
+	const char* key;
+
+	DebugCheck(lua_gettop(l) != 2);
+	key = LuaToString(l, -1);
+
+	// Here start the fields.
+	FAST_GET_STRING("LibraryPath", StratagusLibPath);
+	FAST_GET_INT("GameCycle", GameCycle);
+	FAST_GET_STRING("GameName", GameName);
+	FAST_GET_BOOL("GamePaused", GamePaused);
+
+	//  Something went wrong.
+	lua_pushfstring(l, "Unknown field \"%s\". Going DOWN!!!\n", key);
+	lua_error(l);
+	return 0;
+}
+
+/**
+**  Set a value from the big Stratagus struct.
+*/
+local int ScriptStratagusSetValue(lua_State* l)
+{
+	const char* key;
+
+	DebugCheck(lua_gettop(l) != 3);
+	key = LuaToString(l, -2);
+
+	//  Here start the fields.
+	//  Sorry, none yet.
+	
+	//  Something went wrong.
+	lua_pushfstring(l, "Unknown field \"%s\". Going DOWN!!!\n", key);
+	lua_error(l);
+	return 0;
+
+}
+
+/**
+**  Initialize metatables and the main stratagus table.
+*/
+local void InitScript(void)
+{
+	lua_pushstring(Lua, "Stratagus");
+
+	/* First is the main table, and the metatable for Stratagus. */
+	lua_newtable(Lua);
+	lua_newtable(Lua);
+
+	lua_pushstring(Lua, "__index");
+	lua_pushcfunction(Lua, ScriptStratagusGetValue);
+	lua_settable(Lua, -3);
+	lua_pushstring(Lua, "__newindex");
+	lua_pushcfunction(Lua, ScriptStratagusSetValue);
+	lua_settable(Lua, -3);
+
+	lua_setmetatable(Lua, -2);
+		
+	lua_settable(Lua, LUA_GLOBALSINDEX);
+}
+
+#endif
+
 /**
 **		Initialize ccl and load the config file(s).
 */
@@ -950,6 +1054,11 @@ global void InitCcl(void)
 	luaopen_debug(Lua);
 	lua_settop(Lua, 0);			// discard any results
 
+#ifdef META_LUA
+	InitScript();
+#endif
+
+	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "GameCycle", CclGameCycle);
 	lua_register(Lua, "SetGameName", CclSetGameName);
@@ -1014,7 +1123,6 @@ global void InitCcl(void)
 
 	lua_register(Lua, "Units", CclUnits);
 
-	lua_register(Lua, "WithSound", CclWithSound);
 	lua_register(Lua, "GetStratagusHomePath", CclGetStratagusHomePath);
 	lua_register(Lua, "GetStratagusLibraryPath",
 		CclGetStratagusLibraryPath);

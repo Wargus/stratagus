@@ -246,6 +246,7 @@ global char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
 
 local char* MapName;                        /// Filename of the map to load
+global char* CompileOptions;                /// Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
@@ -723,58 +724,7 @@ local void PrintHeader(void)
 #ifdef USE_SDL
 	"\n  SDL Copyright by Sam Lantinga."
 #endif
-	"\nCompile options "
-#ifdef USE_THREAD
-	"THREAD "
-#endif
-#ifdef DEBUG
-	"DEBUG "
-#endif
-#ifdef USE_ZLIB
-	"ZLIB "
-#endif
-#ifdef USE_BZ2LIB
-	"BZ2LIB "
-#endif
-#ifdef USE_SDL
-	"SDL "
-#endif
-#ifdef USE_SDLA
-	"SDL-AUDIO "
-#endif
-#ifdef USE_SDLCD
-	"SDL-CD "
-#endif
-#ifdef WITH_SOUND
-	"SOUND "
-#endif
-#ifdef USE_LIBCDA
-	"LIBCDA "
-#endif
-#ifdef USE_FLAC
-	"FLAC "
-#endif
-#ifdef USE_OGG
-	"OGG "
-#endif
-#ifdef USE_MAD
-	"MP3 "
-#endif
-	// New features:
-	"\nCompile feature "
-#ifdef UNIT_ON_MAP
-	"UNIT-ON-MAP "
-#endif
-#ifdef NEW_MAPDRAW
-	"NEW-MAPDRAW "
-#endif
-#ifdef HIERARCHIC_PATHFINDER
-	"HIERARCHIC-PATHFINDER "
-#endif
-#ifdef MAP_REGIONS
-	"MAP_REGIONS "
-#endif
-		, NameLine);
+	"\nCompile options %s", NameLine, CompileOptions);
 }
 
 /**
@@ -947,6 +897,63 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 */
 global int main(int argc, char** argv)
 {
+	CompileOptions =
+#ifdef USE_THREAD
+		"THREAD "
+#endif
+#ifdef DEBUG
+		"DEBUG "
+#endif
+#ifdef USE_ZLIB
+		"ZLIB "
+#endif
+#ifdef USE_BZ2LIB
+		"BZ2LIB "
+#endif
+#ifdef USE_SDL
+		"SDL "
+#endif
+#ifdef USE_SDLA
+		"SDL-AUDIO "
+#endif
+#ifdef USE_SDLCD
+		"SDL-CD "
+#endif
+#ifdef WITH_SOUND
+		"SOUND "
+#endif
+#ifdef USE_LIBCDA
+		"LIBCDA "
+#endif
+#ifdef USE_FLAC
+		"FLAC "
+#endif
+#ifdef USE_OGG
+		"OGG "
+#endif
+#ifdef USE_MAD
+		"MP3 "
+#endif
+#ifdef UNIT_ON_MAP
+		"UNIT-ON-MAP "
+#endif
+#ifdef NEW_UNIT_CACHE
+		"NEW-UNIT-CACHE "
+#endif
+#ifdef NEW_MAPDRAW
+		"NEW-MAPDRAW "
+#endif
+#ifdef HIERARCHIC_PATHFINDER
+		"HIERARCHIC-PATHFINDER "
+#endif
+#ifdef MAP_REGIONS
+		"MAP-REGIONS "
+#endif
+#ifdef USE_OPENGL
+		"OPENGL "
+#endif
+	;
+
 #ifdef USE_BEOS
 	//
 	//  Parse arguments for BeOS
