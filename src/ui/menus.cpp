@@ -1505,7 +1505,7 @@ local void SetRes(Menuitem *mi)
 
     if (VideoWidth != res) {
 	VideoWidth=res;
-	VideoHeight=res * 2 / 3;
+	VideoHeight=res * 3 / 4;
 	InitVideo();
 	DestroyCursorBackground();
 	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
