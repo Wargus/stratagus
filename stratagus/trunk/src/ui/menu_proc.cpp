@@ -676,6 +676,13 @@ local void MenuHandleKeyDown(unsigned key,unsigned keychar)
     if (CurrentMenu == NULL) {
 	return;
     }
+
+    if( KeyCodeKP0 <= key && key <= KeyCodeKP9 ) {
+	key=keychar = '0' + key-KeyCodeKP0;
+    } else if( key==KeyCodeKPPeriod ) {
+	key=keychar = '.';
+    }
+
     menu = CurrentMenu;
     if (MenuButtonCurSel != -1 && menu->items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
 	mi = menu->items + MenuButtonCurSel;
