@@ -456,6 +456,11 @@ global void DrawButtonPanel(void)
 			    v=IconSelected;
 			}
 			break;
+		    case ButtonRepair:
+			if( Selected[0]->Orders[0].Action==UnitActionRepair ) {
+			    v=IconSelected;
+			}
+			break;
 
 		    // FIXME: must handle more actions
 

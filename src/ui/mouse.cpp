@@ -246,10 +246,7 @@ global void DoRightButton(int x,int y)
 
 	    // cade: this is default repair action
 	    dest=RepairableOnMapTile(x,y);
-	    if( dest && dest->Type
-		    && dest->Player==ThisPlayer
-		    && dest->HP<dest->Stats[dest->Player->Player].HitPoints
-		    && dest->Type->Building ) {
+	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
 	        SendCommandRepair(unit,x,y,dest,flush);
 	    } else {
 	        SendCommandMove(unit,x,y,flush);
@@ -648,10 +645,7 @@ local void SendRepair(int x,int y)
     Unit* dest;
 
     dest=RepairableOnMapTile(x,y);
-    if( !dest || !dest->Type
-	    || !dest->Type->Building
-	    || dest->Player!=ThisPlayer
-	    || dest->HP>=dest->Stats[dest->Player->Player].HitPoints ) {
+    if( !dest || !dest->Type || dest->Player!=ThisPlayer ) {
 	// FIXME: Should move test in repairable
 	dest=NoUnitP;
     }
