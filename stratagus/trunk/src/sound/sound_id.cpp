@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 
-#ifdef WITH_SOUND	// {
+#ifdef WITH_SOUND		// {
 
 #include <stdlib.h>
 #include <string.h>
@@ -47,141 +47,141 @@
 #include "etlib/hash.h"
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef DOXYGEN				// no real code, only for document
+#ifdef DOXYGEN								// no real code, only for document
 
 /**
-**	hash table used to store the mapping between sound name and sound id
+**		hash table used to store the mapping between sound name and sound id
 */
 local int SoundIdHash[61];
 
 #else
 
 /**
-**	hash table used to store the mapping between sound name and sound id
+**		hash table used to store the mapping between sound name and sound id
 */
 local hashtable(int, 61) SoundIdHash;
 
 #endif
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Display the sound name hash table.
+**		Display the sound name hash table.
 */
 global void DisplaySoundHashTable(void)
 {
-    struct hash_st st;
+	struct hash_st st;
 
-    fprintf(stdout,"Sound HashTable Begin\n");
-    PrintFunction();
-    fprintf(stdout,"FIXME: not written\n");
-    fprintf(stdout,"Sound HashTable End\n");
+	fprintf(stdout,"Sound HashTable Begin\n");
+	PrintFunction();
+	fprintf(stdout,"FIXME: not written\n");
+	fprintf(stdout,"Sound HashTable End\n");
 
-    hash_stat(SoundIdHash, &st);
-    printf("nelem   : %d\n", st.nelem);
-    printf("hashsize: %d\n", st.hashsize);
-    printf("maxdepth: %d\n", st.maxdepth);
-    printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
+	hash_stat(SoundIdHash, &st);
+	printf("nelem   : %d\n", st.nelem);
+	printf("hashsize: %d\n", st.hashsize);
+	printf("maxdepth: %d\n", st.maxdepth);
+	printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
 
 }
 
 /**
-**	Add a new mapping (sound name to sound id) in the hash table
-**	Create a new mapping between a name and an already valid sound id.
+**		Add a new mapping (sound name to sound id) in the hash table
+**		Create a new mapping between a name and an already valid sound id.
 **
-**	@param name	Name of the sound (now freed by caller!).
-**	@param id	Sound identifier.
+**		@param name		Name of the sound (now freed by caller!).
+**		@param id		Sound identifier.
 */
 global void MapSound(const char* name, const SoundId id)
 {
-    *((SoundId*)hash_add(SoundIdHash, (char*)name)) = id;
+	*((SoundId*)hash_add(SoundIdHash, (char*)name)) = id;
 }
 
 /**
-**	Maps a sound name to its id
+**		Maps a sound name to its id
 **
-**	@param name	Sound name.
+**		@param name		Sound name.
 **
-**	@return		Sound idenfier for this name.
+**		@return				Sound idenfier for this name.
 */
 global SoundId SoundIdForName(const char* name)
 {
-    const SoundId* result;
+	const SoundId* result;
 
-    DebugCheck(!name);
+	DebugCheck(!name);
 
-    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-	return *result;
-    }
-    DebugLevel0("Can't find sound `%s' in sound table\n" _C_ name);
-    return NULL;
+	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
+		return *result;
+	}
+	DebugLevel0("Can't find sound `%s' in sound table\n" _C_ name);
+	return NULL;
 }
 
 /**
-**	Ask the sound server to register a sound and store the mapping
-**	between its name and its id.
-**	Register a sound group (or an unique sound if nb==1) and get the
-**	corresponding sound id.
+**		Ask the sound server to register a sound and store the mapping
+**		between its name and its id.
+**		Register a sound group (or an unique sound if nb==1) and get the
+**		corresponding sound id.
 **
-**	@param name	name of this sound group (Freed by caller).
-**	@param file	list of sound file names
-**	@param nb	number of sounds
+**		@param name		name of this sound group (Freed by caller).
+**		@param file		list of sound file names
+**		@param nb		number of sounds
 **
-**	@return the sound id of the created group
+**		@return the sound id of the created group
 */
 global SoundId MakeSound(const char* name, const char* file[], int nb)
 {
-    SoundId id;
-    const SoundId* result;
+	SoundId id;
+	const SoundId* result;
 
-    DebugCheck(nb > 255);
+	DebugCheck(nb > 255);
 
-    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
-	return *result;
-    }
+	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
+		DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
+		return *result;
+	}
 
-    // ask the server to register the sound
-    id = RegisterSound(file, nb);
-    // save the mapping from name to id in the hash table.
-    MapSound(name, id);
-    return id;
+	// ask the server to register the sound
+	id = RegisterSound(file, nb);
+	// save the mapping from name to id in the hash table.
+	MapSound(name, id);
+	return id;
 }
 
 /**
-**	Ask the sound server to build a special sound group.
+**		Ask the sound server to build a special sound group.
 **
-**	Register two sound groups together to make a special sound (for
-**	selection). Return the corresponding id after registering it under a
-**	given name.
+**		Register two sound groups together to make a special sound (for
+**		selection). Return the corresponding id after registering it under a
+**		given name.
 **
-**	@param name	the name of the group (handled by caller).
-**	@param first	id of the first group
-**	@param second	id of the second group
+**		@param name		the name of the group (handled by caller).
+**		@param first		id of the first group
+**		@param second		id of the second group
 **
-**	@return		Registered sound identifier.
+**		@return				Registered sound identifier.
 */
 global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 {
-    SoundId sound;
-    const SoundId* result;
+	SoundId sound;
+	const SoundId* result;
 
-    if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
-	return *result;
-    }
+	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
+		DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
+		return *result;
+	}
 
-    sound = RegisterTwoGroups(first, second);
-    MapSound(name, sound);
+	sound = RegisterTwoGroups(first, second);
+	MapSound(name, sound);
 
-    return sound;
+	return sound;
 }
 
-#endif	// } WITH_SOUND
+#endif		// } WITH_SOUND
 
 //@}

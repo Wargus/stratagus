@@ -1,9 +1,9 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
 //	   Stratagus - A free fantasy real time strategy game engine
@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--		Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -46,429 +46,429 @@
 //#include "sound_server.h"
 
 
-#if defined(USE_SDLCD) 
-#include "SDL.h" 
-#elif defined(USE_LIBCDA) 
-#include "libcda.h" 
-#elif defined(USE_CDDA) 
+#if defined(USE_SDLCD)
+#include "SDL.h"
+#elif defined(USE_LIBCDA)
+#include "libcda.h"
+#elif defined(USE_CDDA)
 #include "iocompat.h"
 #endif
 
 /*----------------------------------------------------------------------------
---	Declaration
+--		Declaration
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Variables
+--		Variables
 ----------------------------------------------------------------------------*/
 
-global int CDTrack;			/// Current cd track
+global int CDTrack;						/// Current cd track
 
-global int NumCDTracks;			/// Number of tracks on the cd
+global int NumCDTracks;						/// Number of tracks on the cd
 
-#if defined(USE_SDLCD) 
-local SDL_CD* CDRom;			/// SDL cdrom device
-#elif defined(USE_CDDA) 
-global int CDDrive;			/// CDRom device
-global struct cdrom_tocentry CDtocentry[64];	/// TOC track header struct
-local struct cdrom_tochdr CDchdr;		/// TOC header struct
-local struct cdrom_read_audio CDdata;		/// struct for reading data
+#if defined(USE_SDLCD)
+local SDL_CD* CDRom;						/// SDL cdrom device
+#elif defined(USE_CDDA)
+global int CDDrive;						/// CDRom device
+global struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
+local struct cdrom_tochdr CDchdr;				/// TOC header struct
+local struct cdrom_read_audio CDdata;				/// struct for reading data
 #endif
 
-global CDModes CDMode;			/// CD mode
+global CDModes CDMode;						/// CD mode
 
 /*----------------------------------------------------------------------------
---	Functions
+--		Functions
 ----------------------------------------------------------------------------*/
 
 #if defined (USE_SDLCD)
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 local int InitCD(void)
 {
-    if (SDL_Init(SDL_INIT_CDROM)) {
-	return 1;
-    }
-    CDRom = SDL_CDOpen(0);
-    if (!SDL_CDStatus(CDRom)) {
-	CDMode = CDModeOff;
-	return 1;
-    }
-    NumCDTracks = CDRom->numtracks;
-    return 0;
+	if (SDL_Init(SDL_INIT_CDROM)) {
+		return 1;
+	}
+	CDRom = SDL_CDOpen(0);
+	if (!SDL_CDStatus(CDRom)) {
+		CDMode = CDModeOff;
+		return 1;
+	}
+	NumCDTracks = CDRom->numtracks;
+	return 0;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int PlayCDTrack(int track)
 {
-    CDTrack = track;
-    return SDL_CDPlayTracks(CDRom, track - 1, 0, 0, 0);
+	CDTrack = track;
+	return SDL_CDPlayTracks(CDRom, track - 1, 0, 0, 0);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void ResumeCD(void)
 {
 #ifdef USE_WIN32
-    SDL_CDResume(CDRom);
+	SDL_CDResume(CDRom);
 #endif
-    PlayCDRom(CDModeDefined);
+	PlayCDRom(CDModeDefined);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void PauseCD(void)
 {
-    SDL_CDPause(CDRom);
-    CDTrack = 0;
-    CDMode = CDModeStopped;
+	SDL_CDPause(CDRom);
+	CDTrack = 0;
+	CDMode = CDModeStopped;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsAudioTrack(int track)
 {
-    // FIXME: what is proper way?
-    return 1;
+	// FIXME: what is proper way?
+	return 1;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsCDPlaying(void)
 {
-    if (SDL_CDStatus(CDRom) == CD_PLAYING) {
-	return 1;
-    } else {
-	return 0;
-    }
+	if (SDL_CDStatus(CDRom) == CD_PLAYING) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int GetCDVolume(void)
 {
-    return 0;
+	return 0;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void SetCDVolume(int vol)
 {
-    return;
+	return;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void QuitCD(void)
 {
-    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-        SDL_CDStop(CDRom);
-        CDMode = CDModeStopped;
-    }
-    if (CDMode != CDModeStopped) {
-        SDL_CDClose(CDRom);
-        CDMode = CDModeOff;
-    }
+	if (CDMode != CDModeOff && CDMode != CDModeStopped) {
+		SDL_CDStop(CDRom);
+		CDMode = CDModeStopped;
+	}
+	if (CDMode != CDModeStopped) {
+		SDL_CDClose(CDRom);
+		CDMode = CDModeOff;
+	}
 }
 #elif defined(USE_LIBCDA)
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 local int InitCD(void)
 {
-    if (cd_init()) {
-	return -1;
-    } else {
-	if (cd_get_tracks(NULL, &NumCDTracks)) {
-	    return -1;
+	if (cd_init()) {
+		return -1;
+	} else {
+		if (cd_get_tracks(NULL, &NumCDTracks)) {
+			return -1;
+		}
+		return 0;
 	}
-	return 0;
-    }
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int PlayCDTrack(int track)
 {
-    CDTrack = track;
-    return cd_play(track);
+	CDTrack = track;
+	return cd_play(track);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void ResumeCD(void)
 {
-    PlayCDRom(CDModeDefined);
+	PlayCDRom(CDModeDefined);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void PauseCD(void)
 {
-    cd_pause();
-    CDTrack = 0;
-    CDMode = CDModeStopped;
+	cd_pause();
+	CDTrack = 0;
+	CDMode = CDModeStopped;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsAudioTrack(int track)
 {
-    return cd_is_audio(track);
+	return cd_is_audio(track);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsCDPlaying(void)
 {
-    if (cd_current_track()) {
-	return 1;
-    } else {
-	return 0;
-    }
+	if (cd_current_track()) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int GetCDVolume(void)
 {
-    int vol;
+	int vol;
 
-    cd_get_volume(&vol, &vol);
-    return vol;
+	cd_get_volume(&vol, &vol);
+	return vol;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void SetCDVolume(int vol)
 {
-    cd_set_volume(vol, vol);
+	cd_set_volume(vol, vol);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void QuitCD(void)
 {
-    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
-        cd_stop();
-        CDMode = CDModeStopped;
-    }
-    if (CDMode == CDModeStopped) {
-        cd_close();
-        cd_exit();
-        CDMode = CDModeOff;
-    }
+	if (CDMode != CDModeOff && CDMode != CDModeStopped) {
+		cd_stop();
+		CDMode = CDModeStopped;
+	}
+	if (CDMode == CDModeStopped) {
+		cd_close();
+		cd_exit();
+		CDMode = CDModeOff;
+	}
 }
 #elif defined(USE_CDDA)
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 local int InitCD(void)
 {
-    int i;
+	int i;
 
-    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
-    ioctl(CDDrive, CDROMRESET);
-    ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
-    for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
-        CDtocentry[i].cdte_format = CDROM_LBA;
-        CDtocentry[i].cdte_track = i;
-        ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
-    }
-    NumCDTracks = i - 1;
+	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
+	ioctl(CDDrive, CDROMRESET);
+	ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
+	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
+		CDtocentry[i].cdte_format = CDROM_LBA;
+		CDtocentry[i].cdte_track = i;
+		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
+	}
+	NumCDTracks = i - 1;
 
-    if (NumCDTracks == 0) {
-	CDMode = CDModeOff;
-	return -1;
-    }
-    return 0;
+	if (NumCDTracks == 0) {
+		CDMode = CDModeOff;
+		return -1;
+	}
+	return 0;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int PlayCDTrack(int track)
 {
-    Sample* sample;
+	Sample* sample;
 
-    sample = LoadCD(NULL, track);
-    CDTrack = track;
-    MusicSample = sample;
-    PlayingMusic = 1;
-    return 0;
+	sample = LoadCD(NULL, track);
+	CDTrack = track;
+	MusicSample = sample;
+	PlayingMusic = 1;
+	return 0;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void ResumeCD(void)
 {
-    PlayCDRom(CDModeDefined);
+	PlayCDRom(CDModeDefined);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void PauseCD(void)
 {
-    StopMusic();
-    CDTrack = 0;
-    CDMode = CDModeStopped;
+	StopMusic();
+	CDTrack = 0;
+	CDMode = CDModeStopped;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsAudioTrack(track)
 {
-    return !(CDtocentry[track].cdte_ctrl & CDROM_DATA_TRACK);
+	return !(CDtocentry[track].cdte_ctrl & CDROM_DATA_TRACK);
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int IsCDPlaying(void)
 {
-    return PlayingMusic;
+	return PlayingMusic;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global int GetCDVolume(void)
 {
-    return MusicVolume;
+	return MusicVolume;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void SetCDVolume(int vol)
 {
-    MusicVolume = vol;
+	MusicVolume = vol;
 }
 
 /**
-**	FIXME: docu
+**		FIXME: docu
 */
 global void QuitCD(void)
 {
-    close(CDDrive);
+	close(CDDrive);
 }
 #endif
 
-/** 
-**      Check cdrom. 
-** 
-**      Perodic called from the main loop. 
+/**
+**	  Check cdrom.
+**
+**	  Perodic called from the main loop.
 */
 global int CDRomCheck(void* unused __attribute__ ((unused)))
 {
-    if (CDMode != CDModeOff && CDMode != CDModeStopped &&
-	    !IsCDPlaying() && CDMode != CDModeDefined) {
-        DebugLevel0Fn("Playing new track\n");
-        PlayCDRom(CDMode);
-    }
-    return 0;
+	if (CDMode != CDModeOff && CDMode != CDModeStopped &&
+			!IsCDPlaying() && CDMode != CDModeDefined) {
+		DebugLevel0Fn("Playing new track\n");
+		PlayCDRom(CDMode);
+	}
+	return 0;
 }
 
 /*
-**	Play CDRom
+**		Play CDRom
 **
-**	@param name	name of play mode, CDModeAll, CDModeRandom, CDModeDefined
+**		@param name		name of play mode, CDModeAll, CDModeRandom, CDModeDefined
 */
 global int PlayCDRom(int name)
 {
-    int i;
-    int datacd;
+	int i;
+	int datacd;
 
-    if (name == CDModeOff) {
-	CDMode = CDModeOff;
-	return 1;
-    }
-
-    if (CDMode == CDModeOff) {
-	if (InitCD()) {
-	    fprintf(stderr, "Error initializing cdrom\n");
-	    CDMode = CDModeOff;
-	    return 1;
+	if (name == CDModeOff) {
+		CDMode = CDModeOff;
+		return 1;
 	}
-	datacd = 1;
-	for (i = 1; i <= NumCDTracks; ++i) {
-	    if (IsAudioTrack(i) > 0) {
-		datacd = 0;
-		break;
-	    }
+
+	if (CDMode == CDModeOff) {
+		if (InitCD()) {
+			fprintf(stderr, "Error initializing cdrom\n");
+			CDMode = CDModeOff;
+			return 1;
+		}
+		datacd = 1;
+		for (i = 1; i <= NumCDTracks; ++i) {
+			if (IsAudioTrack(i) > 0) {
+				datacd = 0;
+				break;
+			}
+		}
+		if (datacd || NumCDTracks <= 0) {
+			CDMode = CDModeOff;
+			fprintf(stderr, "Not an audio cd\n");
+			return 1;
+		}
 	}
-	if (datacd || NumCDTracks <= 0) {
-	    CDMode = CDModeOff;
-	    fprintf(stderr, "Not an audio cd\n");
-	    return 1;
+
+	StopMusic();
+
+	// FIXME: when would this happen
+	if (NumCDTracks <= 0) {
+		return 1;
 	}
-    }
 
-    StopMusic();
-
-    // FIXME: when would this happen
-    if (NumCDTracks <= 0) {
-	return 1;
-    }
-
-    // if mode is play all tracks
-    if (name == CDModeAll) {
-	CDMode = CDModeAll;
-	CDTrack = 0;
-	do {
-	    if (CDTrack >= NumCDTracks) {
+	// if mode is play all tracks
+	if (name == CDModeAll) {
+		CDMode = CDModeAll;
 		CDTrack = 0;
-	    }
-	} while (!IsAudioTrack(++CDTrack));
-	if (PlayCDTrack(CDTrack)) {
-	    CDMode = CDModeStopped;
+		do {
+			if (CDTrack >= NumCDTracks) {
+				CDTrack = 0;
+			}
+		} while (!IsAudioTrack(++CDTrack));
+		if (PlayCDTrack(CDTrack)) {
+			CDMode = CDModeStopped;
+		}
+		return 0;
 	}
-	return 0;
-    }
 
-    // if mode is play random tracks
-    if (name == CDModeRandom) {
-	CDMode = CDModeRandom;
-	CDTrack = 0;
-	do {
-	    CDTrack = MyRand() % NumCDTracks;
-	} while (!IsAudioTrack(CDTrack));
-	if (PlayCDTrack(CDTrack)) {
-	    CDMode = CDModeStopped;
+	// if mode is play random tracks
+	if (name == CDModeRandom) {
+		CDMode = CDModeRandom;
+		CDTrack = 0;
+		do {
+			CDTrack = MyRand() % NumCDTracks;
+		} while (!IsAudioTrack(CDTrack));
+		if (PlayCDTrack(CDTrack)) {
+			CDMode = CDModeStopped;
+		}
+		return 0;
 	}
-	return 0;
-    }
 
-    if (name == CDModeDefined) {
-	CDMode = CDModeDefined;
-	return 0;
-    }
+	if (name == CDModeDefined) {
+		CDMode = CDModeDefined;
+		return 0;
+	}
 
-    return 1;
+	return 1;
 }
 
 
-#endif	// } USE_CDAUDIO
+#endif		// } USE_CDAUDIO
 
 //@}
