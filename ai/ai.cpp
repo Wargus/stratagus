@@ -231,7 +231,7 @@ local void AiCheckUnits(void)
 	}
 	
 	if( x>e+counter[t] ) {	// Request it.
-	    DebugLevel3Fn("Need %s *%d\n" _C_
+	    DebugLevel2Fn("Need %s *%d\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
 		    x-e-counter[t]);
@@ -552,7 +552,32 @@ global void AiUnitKilled(Unit* unit)
 
     DebugCheck(unit->Player->Type == PlayerHuman);
 
-    // FIXME: if the unit builds something for us it must restartet!!!!
+    // FIXME: must handle all orders...
+
+    switch( unit->Orders[0].Action ) {
+	case UnitActionStill:
+	case UnitActionAttack:
+	case UnitActionMove:
+	    break;
+	case UnitActionBuilded:
+	    DebugLevel1Fn("%d: %d(%s) killed, under construction!\n" _C_
+		    unit->Player->Player _C_ UnitNumber(unit) _C_
+		    unit->Type->Ident);
+	    AiReduceMadeInBuilded(unit->Player->Ai,unit->Type);
+	    break;
+	case UnitActionBuild:
+	    DebugLevel1Fn("%d: %d(%s) killed, with order %s!\n" _C_
+		    unit->Player->Player _C_ UnitNumber(unit) _C_
+		    unit->Type->Ident _C_
+		    unit->Orders[0].Type->Ident);
+	    AiReduceMadeInBuilded(unit->Player->Ai,unit->Orders[0].Type);
+	    break;
+	default:
+	    DebugLevel1Fn("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
+		    unit->Player->Player _C_ UnitNumber(unit) _C_
+		    unit->Type->Ident _C_ unit->Orders[0].Action);
+	    break;
+    }
 }
 
 /**
