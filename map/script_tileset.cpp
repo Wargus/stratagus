@@ -10,7 +10,7 @@
 //
 /**@name ccl_tileset.c	-	The tileset ccl functions. */
 //
-//	(c) Copyright 2000,2001 by Lutz Sammer
+//	(c) Copyright 2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -426,7 +426,7 @@ local SCM CclDefineTileset(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("animations")) ) {
 	    DebugLevel0Fn("Animations not supported.\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("objects")) ) {
-	    DebugLevel0Fn("objects not supported.\n");
+	    DebugLevel0Fn("Objects not supported.\n");
 	} else {
 	    errl("Unsupported tag",value);
 	}
