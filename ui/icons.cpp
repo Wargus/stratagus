@@ -408,8 +408,8 @@ global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
 
     color= (flags&IconActive) ? ColorGray : ColorBlack;
 
-    VideoDrawRectangle(color,x,y,ICON_WIDTH+7,ICON_HEIGHT+7);
-    VideoDrawRectangle(ColorBlack,x+1,y+1,ICON_WIDTH+5,ICON_HEIGHT+5);
+    VideoDrawRectangleClip(color,x,y,ICON_WIDTH+7,ICON_HEIGHT+7);
+    VideoDrawRectangleClip(ColorBlack,x+1,y+1,ICON_WIDTH+5,ICON_HEIGHT+5);
 
     VideoDrawVLine(ColorGray,x+ICON_WIDTH+4,y+5,ICON_HEIGHT-1);	// _|
     VideoDrawVLine(ColorGray,x+ICON_WIDTH+5,y+5,ICON_HEIGHT-1);
@@ -432,7 +432,7 @@ global void DrawUnitIcon(const void* player,IconId icon,unsigned flags
 	    ,Icons[0].Width,Icons[0].Height,x+4,y+4);
 
     if( flags&IconSelected ) {
-	VideoDrawRectangle(ColorGreen,x+4,y+4,ICON_WIDTH-1,ICON_HEIGHT-1);
+	VideoDrawRectangleClip(ColorGreen,x+4,y+4,ICON_WIDTH-1,ICON_HEIGHT-1);
     }
 }
 

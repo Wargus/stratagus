@@ -266,9 +266,9 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     }
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangle(ColorGray,x,y,w,h);
+	    VideoDrawRectangleClip(ColorGray,x,y,w,h);
 	} else {
-	    VideoDrawRectangle(ColorYellow,x,y,w,h);
+	    VideoDrawRectangleClip(ColorYellow,x,y,w,h);
 	}
     }
     SetDefaultTextColors(nc,rc);
@@ -337,9 +337,9 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
     }
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangle(ColorGray,x-2,y-2,w,h);
+	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w,h);
 	} else {
-	    VideoDrawRectangle(ColorYellow,x-2,y-2,w,h);
+	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w,h);
 	}
     }
     SetDefaultTextColors(nc,rc);
@@ -392,9 +392,9 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangle(ColorGray,x-2,y-2,w+2,h+2);
+	    VideoDrawRectangleClip(ColorGray,x-2,y-2,w+2,h+2);
 	} else {
-	    VideoDrawRectangle(ColorYellow,x-2,y-2,w+2,h+2);
+	    VideoDrawRectangleClip(ColorYellow,x-2,y-2,w+2,h+2);
 	}
     }
     SetDefaultTextColors(nc,rc);
