@@ -105,9 +105,9 @@ static IOStructDef AiRunningScriptStructDef = {
 	{"script", 		&IOCcl,		&((AiRunningScript*)0)->Script, 	NULL},
 	{"sleep-cycles", 	&IOInt,		&((AiRunningScript*)0)->SleepCycles, 	NULL},
 	{"ident", 		&IOStrBuffer,	&((AiRunningScript*)0)->ident,		(void*) 10},
-	{"hotspot-x",		&IOInt,		&((AiRunningScript*)0)->HotSpot_X,	NULL},
-	{"hotspot-y",		&IOInt,		&((AiRunningScript*)0)->HotSpot_Y,	NULL},
-	{"hotspot-ray",		&IOInt,		&((AiRunningScript*)0)->HotSpot_Ray,	NULL},
+	{"hotspot-x",		&IOInt,		&((AiRunningScript*)0)->HotSpotX,	NULL},
+	{"hotspot-y",		&IOInt,		&((AiRunningScript*)0)->HotSpotY,	NULL},
+	{"hotspot-ray",		&IOInt,		&((AiRunningScript*)0)->HotSpotRay,	NULL},
 	{"own-force",		&IOInt,		&((AiRunningScript*)0)->ownForce,	NULL},
 	{"gauges",		&IOIntArrayPtr,	&((AiRunningScript*)0)->gauges,		(void*) GAUGE_NB},
 	{0, 0, 0, 0}
@@ -2177,8 +2177,8 @@ local SCM CclAiCanReachHotSpot(SCM way)
     UnitType* transporter;
     AiUnit* aiunit;
 
-    if ((AiScript->HotSpot_X == -1) || (AiScript->HotSpot_Y == -1) ||
-	    (AiScript->HotSpot_Ray <= 0)) {
+    if ((AiScript->HotSpotX == -1) || (AiScript->HotSpotY == -1) ||
+	    (AiScript->HotSpotRay <= 0)) {
 	return SCM_BOOL_T;
     }
 
@@ -2222,7 +2222,7 @@ local SCM CclAiCanReachHotSpot(SCM way)
 	    case UnitTypeFly:
 	    	break;
 	    case UnitTypeNaval:
-		if (!PlaceReachable(aiunit->Unit, AiScript->HotSpot_X, AiScript->HotSpot_Y,
+		if (!PlaceReachable(aiunit->Unit, AiScript->HotSpotX, AiScript->HotSpotY,
 			1, 1, 0, aiunit->Unit->Type->_AttackRange)) {
 		    return SCM_BOOL_F;
 	    	}
@@ -2233,7 +2233,7 @@ local SCM CclAiCanReachHotSpot(SCM way)
 		ZoneSetAddUnitZones(&sources,aiunit->Unit);
 
 		ZoneSetClear(&targets);
-		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpot_X - 4, AiScript->HotSpot_Y - 4,
+		ZoneSetAddGoalZones(&targets, aiunit->Unit, AiScript->HotSpotX - 4, AiScript->HotSpotY - 4,
 		    9, 9, 0, 0);
 
 		if (!ZoneSetHasIntersect(&targets, &sources) &&
