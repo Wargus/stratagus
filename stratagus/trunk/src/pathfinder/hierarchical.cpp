@@ -72,7 +72,6 @@ int PfHierInitialize (void)
 	AreasInitialize ();
 	RegionSetInitialize ();
 	RegGroupsInitialize ();
-	//AreasFillRegionLists ();
 	HighlevelInit ();
 	LowlevelInit ();
 	/* FIXME should return something useful */
@@ -92,13 +91,13 @@ int PfHierComputePath (Unit *unit, int *dx, int *dy)
 	unsigned int ts0, ts1, ts2, ts3, hightime, lowtime;
 	unsigned int low_reset, low_mark, low_path;
 	HighlevelPath *HighPath;
-	UnitType *type = unit->Type;
 	int retval;
 
-	if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
-		Neighbor = &NeighborEveryOther[0];
-	} else {
-		Neighbor = &NeighborEvery[0];
+	if (unit->Orders[0].Goal && unit->Orders[0].Goal->Moving) {
+		/* We are heading to a moving target.  This means that our precomputed
+		 * path (if any) is likely to be inaccurate and worthless.  Erase
+		 * it and launch the pathfinder. */
+		unit->Data.Move.Length = 0;
 	}
 
 	if (unit->Data.Move.Length) {
@@ -336,9 +335,11 @@ local int PfHierGetPrecomputed (Unit *unit, int *dx, int *dy)
 
 		Unit *obstacle = UnitOnMapTile (unit->X + *dx, unit->Y + *dy);
 
+#if 0
 		/* FIXME this is temporary substitution for a still missing path
 		 * execution code. */
 		return -2;	/* PF_UNREACHABLE */
+#endif
 
 		if (obstacle->Moving || (obstacle->Wait &&
 								obstacle->Orders[0].Action == UnitActionMove)) {
