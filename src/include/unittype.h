@@ -10,7 +10,7 @@
 //
 /**@name unittype.h	-	The unit-types headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -71,13 +71,19 @@ typedef struct __animations__ {
     Animation**	Extend;			/// For future extensions
 } Animations;
 
+#ifndef __STRUCT_MISSILETYPE__
+#define __STRUCT_MISSILETYPE__
+typedef struct _missile_type_ MissileType;         /// missile-type typedef
+#endif
+
 /**
 **      Missile type definition (used in config tables)
+**
+**	@todo Shouldn't I move this into missle.h?
 */
 typedef struct _missile_config_ {
     char*	Name;			/// config missile name
-    // FIXME: void* is needed,because of recursive headers :(
-    void*	Missile;		/// identifier to use to run time
+    MissileType*Missile;		/// identifier to use to run time
 } MissileConfig;
 
 /**

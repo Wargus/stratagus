@@ -263,10 +263,15 @@
 --	Missile-type
 ----------------------------------------------------------------------------*/
 
+#ifndef __STRUCT_MISSILETYPE__
+#define __STRUCT_MISSILETYPE__
+
 /**
 **	Missile-type typedef
 */
 typedef struct _missile_type_ MissileType;
+
+#endif
 
     ///		Base structure of missile-types
 struct _missile_type_ {
