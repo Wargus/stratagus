@@ -192,7 +192,7 @@ CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/tilesets.ccl data/ccl/tilesets/summer.ccl \
 	  data/ccl/tilesets/winter.ccl \
 	  data/ccl/tilesets/wasteland.ccl data/ccl/tilesets/swamp.ccl \
-	  data/ccl/campaigns.ccl \
+	  data/ccl/campaigns.ccl data/ccl/credits.ccl \
 	  data/ccl/human/campaign1.ccl data/ccl/human/campaign2.ccl \
 	  data/ccl/orc/campaign1.ccl data/ccl/orc/campaign2.ccl \
 	  data/ccl/anim.ccl data/ccl/wc2.ccl data/default.cm \

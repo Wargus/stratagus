@@ -577,6 +577,7 @@ global void InitCcl(void)
     AiCclRegister();
     CampaignCclRegister();
     TriggerCclRegister();
+    CreditsCclRegister();
 
     init_subr_1("load-pud",CclLoadPud);
     init_subr_2("define-map",CclDefineMap);

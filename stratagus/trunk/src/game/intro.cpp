@@ -40,6 +40,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "settings.h"
+#include "ccl.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -59,6 +60,7 @@ typedef struct TextLines {
 ----------------------------------------------------------------------------*/
 
 global Intro	GameIntro;		/// Game intro
+global Credits	GameCredits;		/// Game credits
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -196,11 +198,16 @@ local void FreeTextLines(TextLines** lines)
 **	@param h	height of text area
 **	@param i	scroll index.
 **	@param text	Text to display.
+**
+**	@return		1 if there is more to scroll, 0 if it is done
 */
-local void ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
+local int ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 {
     int miny,endy;
     TextLines* ptr;
+    int scrolling;
+
+    scrolling=1;
 
     PushClipping();
     SetClipping(x,y,x+w,y+h);
@@ -222,7 +229,12 @@ local void ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
 	ptr=ptr->next;
     }
 
+    if( y<miny+24 )
+	scrolling=0;
+
     PopClipping();
+
+    return scrolling;
 }
 
 /**
@@ -245,13 +257,14 @@ global void ShowIntro(const Intro *intro)
     int stage;
     TextLines* ScrollingText;
     TextLines* ObjectivesText[MAX_OBJECTIVES];
+    int OldVideoSyncSpeed;
 
     VideoLockScreen();
     VideoClearScreen();
     VideoUnlockScreen();
-    Invalidate();
-    RealizeVideoMemory();
 
+    OldVideoSyncSpeed=VideoSyncSpeed;
+    VideoSyncSpeed=100;
     SetVideoSync();
 
     callbacks.ButtonPressed=IntroCallbackButton1;
@@ -280,6 +293,7 @@ global void ShowIntro(const Intro *intro)
     text[l+i]='\0';
     l+=i+1;
     text=realloc(text,l);
+    CLclose(file);
 
     CallbackMusicOff();
     StopMusic();
@@ -365,15 +379,244 @@ global void ShowIntro(const Intro *intro)
     VideoFree(background);
 
     VideoLockScreen();
-    VideoFillRectangle(ColorBlack,0,0,VideoWidth,VideoHeight);
+    VideoClearScreen();
     VideoUnlockScreen();
-    Invalidate();
-    RealizeVideoMemory();
 
+    VideoSyncSpeed=OldVideoSyncSpeed;
+    SetVideoSync();
 
     CallbackMusicOn();
     // FIXME: should this be GameMusic?
     PlayMusic(MenuMusic);
+}
+
+/**
+**	Show the credits
+**
+**	@param credits	Credits structure
+*/
+global void ShowCredits(Credits *credits)
+{
+    EventCallback callbacks;
+    Graphic* background;
+    int line;
+    int x;
+    int y;
+    int scrolling;
+    TextLines* ScrollingCredits;
+    int OldVideoSyncSpeed;
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    OldVideoSyncSpeed=VideoSyncSpeed;
+    VideoSyncSpeed=100;
+    SetVideoSync();
+
+    callbacks.ButtonPressed=IntroCallbackButton1;
+    callbacks.ButtonReleased=IntroCallbackButton2;
+    callbacks.MouseMoved=IntroCallbackMouse;
+    callbacks.MouseExit=IntroCallbackExit;
+    callbacks.KeyPressed=IntroCallbackKey1;
+    callbacks.KeyReleased=IntroCallbackKey2;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+    background=NULL;
+    if( credits->Background ) {
+	background=LoadGraphic(credits->Background);
+    }
+
+    // play different music?
+
+    ScrollingCredits=NULL;
+    if( credits->Names ) {
+	SplitTextIntoLines(credits->Names,320,&ScrollingCredits);
+    }
+
+    x=(VideoWidth-640)/2;
+    y=(VideoHeight-480)/2;
+    IntroNoEvent=1;
+    line=0;
+    scrolling=1;
+    while( IntroNoEvent ) {
+
+	VideoLockScreen();
+
+	//
+	//	Draw background
+	//
+	if( background ) {
+	    VideoDrawSubClip(background,0,0,
+		background->Width,background->Height,
+		(VideoWidth-background->Width)/2,
+		(VideoHeight-background->Height)/2);
+	}
+
+	//
+	//	Draw scrolling text
+	//
+	if( ScrollingCredits ) {
+	    scrolling=ScrollText(x+140,y+80,320,275,line,ScrollingCredits);
+	}
+
+	// FIXME: draw Continue button
+
+	VideoUnlockScreen();
+
+	// FIXME: update only the changed area!!!!
+
+	Invalidate();
+	RealizeVideoMemory();
+
+	WaitEventsOneFrame(&callbacks);
+
+	++line;
+
+	// Loop if we're done scrolling
+	if( !scrolling )
+	    line=0;
+    }
+
+    if( ScrollingCredits ) {
+	FreeTextLines(&ScrollingCredits);
+    }
+
+    if( background ) {
+	VideoFree(background);
+    }
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    VideoSyncSpeed=OldVideoSyncSpeed;
+    SetVideoSync();
+
+    // CallbackMusicOn();
+    // FIXME: should this be GameMusic?
+    // PlayMusic(MenuMusic);
+}
+
+/**
+**	Show picture.
+**
+**	@param name	Path file name of the picture.
+*/
+global void ShowPicture(const char* name)
+{
+    EventCallback callbacks;
+    Graphic* background;
+    int x;
+    int y;
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+
+    callbacks.ButtonPressed=IntroCallbackButton1;
+    callbacks.ButtonReleased=IntroCallbackButton2;
+    callbacks.MouseMoved=IntroCallbackMouse;
+    callbacks.MouseExit=IntroCallbackExit;
+    callbacks.KeyPressed=IntroCallbackKey1;
+    callbacks.KeyReleased=IntroCallbackKey2;
+
+    callbacks.NetworkEvent=NetworkEvent;
+    callbacks.SoundReady=WriteSound;
+
+    background=LoadGraphic(name);
+
+    x=(VideoWidth-640)/2;
+    IntroNoEvent=1;
+    while( IntroNoEvent ) {
+	y=(VideoHeight-480)/2;
+
+	VideoLockScreen();
+	//
+	//	Draw background
+	//
+	VideoDrawSubClip(background,0,0,
+		background->Width,background->Height,
+		(VideoWidth-background->Width)/2,
+		(VideoHeight-background->Height)/2);
+
+	VideoUnlockScreen();
+
+	Invalidate();
+	RealizeVideoMemory();
+
+	WaitEventsOneFrame(&callbacks);
+    }
+
+    VideoFree(background);
+
+    VideoLockScreen();
+    VideoClearScreen();
+    VideoUnlockScreen();
+}
+
+
+/**
+**	Parse the credits configuration.
+**
+**	@param list	Scheme list containing the credits.
+**
+**	@todo	'comment and 'title are only parsed, but not used.
+*/
+local SCM CclCredits(SCM list)
+{
+    SCM value;
+    const char* n;
+    int nlen;
+    int len;
+
+    if( GameCredits.Background ) {
+	free(GameCredits.Background);
+    }
+    GameCredits.Background=NULL;
+    if( GameCredits.Names ) {
+	free(GameCredits.Names);
+	GameCredits.Names=(char*)malloc(1);
+	GameCredits.Names[0]='\0';
+    }
+    len=0;
+
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("background")) ) {
+	    GameCredits.Background=gh_scm2newstr(gh_car(list),NULL);
+	    list=gh_cdr(list);
+	}
+	if( gh_eq_p(value,gh_symbol2scm("name")) 
+		|| gh_eq_p(value,gh_symbol2scm("title")) 
+		|| gh_eq_p(value,gh_symbol2scm("comment")) ) {
+	    n=get_c_string(gh_car(list));
+	    nlen=strlen(n);
+	    GameCredits.Names=(char*)realloc(GameCredits.Names,len+nlen+2);
+	    if( len!=0 ) {
+		GameCredits.Names[len++]='\n';
+	    }
+	    strcpy(GameCredits.Names+len,n);
+	    len+=nlen;
+	    list=gh_cdr(list);
+	}
+    }
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Register CCL features for credits.
+*/
+global void CreditsCclRegister(void)
+{
+    GameCredits.Background=NULL;
+    GameCredits.Names=NULL;
+    gh_new_procedureN("credits",CclCredits);
 }
 
 //@}
