@@ -124,7 +124,7 @@ global char** MissileTypeWcNames
 /**
 **	Missile type type definition
 */
-global char MissileTypeType[] = "missile-type";
+global const char MissileTypeType[] = "missile-type";
 
 /**
 **	Define missile types.
