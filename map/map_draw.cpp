@@ -166,9 +166,7 @@ local unsigned int PixelsHigh[256];
 **
 **		Draws tiles display and video mode independ
 */
-#ifdef USE_SDL_SURFACE
-global void VideoDrawTile(const int, int, int);
-#else
+#ifndef USE_SDL_SURFACE
 global void (*VideoDrawTile)(const GraphicData*, int, int);
 #endif
 
@@ -177,9 +175,7 @@ global void (*VideoDrawTile)(const GraphicData*, int, int);
 **
 **		Draws tiles display and video mode independ
 */
-#ifdef USE_SDL_SURFACE
-global void MapDrawTile(int, int, int);
-#else
+#ifndef USE_SDL_SURFACE
 global void (*MapDrawTile)(int, int, int);
 #endif
 
@@ -2202,11 +2198,60 @@ local void VideoDraw32Tile32Cached(const VMemType32* graphic, int x, int y)
 
 // ---------------------------------------------------------------------------
 
+/**
+**		Draw tile.
+**
+**		@param tile		Tile number to draw.
+**		@param x		X position into video memory
+**		@param y		Y position into video memory
+*/
 #ifdef USE_SDL_SURFACE
-local void MapDrawTile(int tile, int x, int y)
+#ifndef USE_OPENGL
+global void MapDrawTile(int tile, int x, int y)
 {
 	VideoDrawTile(tile, x, y);
 }
+#else
+global void MapDrawTile(int tile, int x, int y)
+{
+	GLint sx;
+	GLint ex;
+	GLint sy;
+	GLint ey;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
+	Graphic *g;
+	int t;
+
+	g = TheMap.TileGraphic;
+	sx = x;
+	ex = sx + TileSizeX;
+	ey = VideoHeight - y;
+	sy = ey - TileSizeY;
+
+	t = tile % (g->Width / TileSizeX);
+	stx=(GLfloat)t * TileSizeX / g->Width * g->TextureWidth;
+	etx=(GLfloat)(t * TileSizeX + TileSizeX) / g->Width * g->TextureWidth;
+	t = tile / (g->Width / TileSizeX);
+	sty=(GLfloat)t * TileSizeY / g->Height * g->TextureHeight;
+	ety=(GLfloat)(t * TileSizeY + TileSizeY) / g->Height * g->TextureHeight;
+
+	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, 1.0f - ety);
+	glVertex2i(sx, sy);
+	glTexCoord2f(stx, 1.0f - sty);
+	glVertex2i(sx, ey);
+	glTexCoord2f(etx, 1.0f - sty);
+	glVertex2i(ex, ey);
+	glTexCoord2f(etx, 1.0f - ety);
+	glVertex2i(ex, sy);
+	glEnd();
+}
+#endif
+
 #else
 
 /**
@@ -2345,54 +2390,6 @@ local void MapDraw32Tile32(int tile, int x, int y)
 		VideoDraw32Tile32(TheMap.Tiles[tile], x, y);
 		TileCached[tile] = VideoMemory32 + x + y * VideoWidth;
 	}
-}
-#endif
-
-/**
-**		Draw tile.
-**
-**		@param tile		Tile number to draw.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
-*/
-#ifdef USE_OPENGL
-local void MapDrawTileOpenGL(int tile, int x, int y)
-{
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
-	GLfloat stx;
-	GLfloat etx;
-	GLfloat sty;
-	GLfloat ety;
-	Graphic *g;
-	int t;
-
-	g = TheMap.TileData;
-	sx = x;
-	ex = sx + TileSizeX;
-	ey = VideoHeight - y;
-	sy = ey - TileSizeY;
-
-	t = tile % (g->Width / TileSizeX);
-	stx=(GLfloat)t * TileSizeX / g->Width * g->TextureWidth;
-	etx=(GLfloat)(t * TileSizeX + TileSizeX) / g->Width * g->TextureWidth;
-	t = tile / (g->Width / TileSizeX);
-	sty=(GLfloat)t * TileSizeY / g->Height * g->TextureHeight;
-	ety=(GLfloat)(t * TileSizeY + TileSizeY) / g->Height * g->TextureHeight;
-
-	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(stx, 1.0f - ety);
-	glVertex2i(sx, sy);
-	glTexCoord2f(stx, 1.0f - sty);
-	glVertex2i(sx, ey);
-	glTexCoord2f(etx, 1.0f - sty);
-	glVertex2i(ex, ey);
-	glTexCoord2f(etx, 1.0f - ety);
-	glVertex2i(ex, sy);
-	glEnd();
 }
 #endif
 
@@ -2904,10 +2901,6 @@ global void InitMap(void)
 	MapColorCycle();
 #endif
 
-#ifdef USE_OPENGL
-	MapDrawTile = MapDrawTileOpenGL;
-#else
-
 #ifdef NEW_DECODRAW
 	// StephanR: Using the decoration mechanism we need to support drawing tiles
 	// clipped, as by only updating a small part of the tile, we don't have to
@@ -3002,8 +2995,6 @@ global void InitMap(void)
 	}
 #endif // ifdef USE_SDL_SURFACE
 #endif // NEW_DECODRAW
-
-#endif // USE_OPENGL
 }
 
 //@}
