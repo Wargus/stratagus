@@ -716,13 +716,13 @@ local void DrawEditorPanel(void)
     //
     //  Select / Units / Tiles
     //
-    icon = IconByIdent("icon-human-patrol-land");
+    icon = IconByIdent(EditorSelectIcon);
     DebugCheck(!icon);
     DrawUnitIcon(Players, icon,
         (ButtonUnderCursor == SelectButton ? IconActive : 0) |
 	    (EditorState==EditorSelecting ? IconSelected : 0),
 	x, y);
-    icon = IconByIdent("icon-footman");
+    icon = IconByIdent(EditorUnitsIcon);
     DebugCheck(!icon);
     DrawUnitIcon(Players, icon,
         (ButtonUnderCursor == UnitButton ? IconActive : 0) |
@@ -1708,7 +1708,9 @@ local void CreateEditor(void)
     char buf[PATH_MAX];
     CLFile *clf;
     extern LISP fast_load(LISP lfname, LISP noeval);
+    int scm;
 
+    scm = 0;
     //
     //  Load and evaluate the editor configuration file
     //  FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
@@ -1778,6 +1780,9 @@ local void CreateEditor(void)
 	CreateGame(NULL, &TheMap);
     } else {
 	CreateGame(CurrentMapPath, &TheMap);
+	if (strcasestr(CurrentMapPath,".scm")) {
+	    scm = 1;
+	}
     }
     FlagRevealMap = 0;
 
@@ -1790,11 +1795,13 @@ local void CreateEditor(void)
 	    switch (Players[i].Race) {
 		case PlayerRaceHuman:
 		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-			UnitTypeByWcNum(WC_StartLocationHuman), Players + i);
+			UnitTypeByWcNum(scm?SC_StartLocation:WC_StartLocationHuman),
+			Players + i);
 		    break;
 		case PlayerRaceOrc:
 		    MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-			UnitTypeByWcNum(WC_StartLocationOrc), Players + i);
+			UnitTypeByWcNum(scm?SC_StartLocation:WC_StartLocationOrc),
+			Players + i);
 		    break;
 	    }
 	} else if (Players[i].StartX | Players[i].StartY) {
