@@ -84,7 +84,8 @@ local enum _editor_state_ {
     EditorEditUnit,			/// Edit units
 } EditorState;				/// Current editor state
 
-// FIXME: support for bigger tools 2x2, 3x3, 4x4.
+local char TileToolRandom;		/// Tile tool draws random
+local char TileToolDecoration;		/// Tile tool draws with decorations
 local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
@@ -127,6 +128,55 @@ local void ChangeTile(int x, int y, int tile)
 }
 
 /**
+**	Get tile number.
+**
+**	@param basic	Basic tile number
+**	@param random	Return random tile
+**	@param filler	Get a decorated tile.
+**
+**	@return		Tile number used in pud.
+**
+**	@todo	FIXME: Solid tiles are here still hardcoded.
+*/
+local int GetTileNumber(int basic, int random, int filler)
+{
+    int tile;
+    int i;
+    int n;
+
+    tile = 16 + basic * 16;
+    if (random) {
+	for (n = i = 0; i < 16; ++i) {
+	    if (!TheMap.Tileset->Table[tile + i]) {
+		if (!filler) {
+		    break;
+		}
+	    } else {
+		++n;
+	    }
+	}
+	n = MyRand() % n;
+	i = -1;
+	do {
+	    while( ++i < 16 && !TheMap.Tileset->Table[tile + i]) {
+	    }
+	} while( i < 16 && n-- );
+	DebugCheck( i == 16 );
+	return tile + i;
+    }
+    if (filler) {
+	for (i = 0; i < 16 && TheMap.Tileset->Table[tile + i]; ++i) {
+	}
+	for (; i < 16 && !TheMap.Tileset->Table[tile + i]; ++i) {
+	}
+	if (i != 16) {
+	    return tile + i;
+	}
+    }
+    return tile;
+}
+
+/**
 **	Edit tile.
 **
 **	@param x	X map tile coordinate.
@@ -137,7 +187,7 @@ local void EditTile(int x, int y, int tile)
 {
     DebugCheck(x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height);
 
-    ChangeTile(x, y, 16 + tile * 16);
+    ChangeTile(x, y, GetTileNumber(tile, TileToolRandom, TileToolDecoration));
 
     //
     //  Change the flags
@@ -282,10 +332,12 @@ local void DrawTileIcons(void)
 	MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "Random");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE - 1, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
     y += 20;
     VideoDrawTextCentered(x, y, GameFont, "Filler");
-    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_GEM_SQUARE - 1, x + 40, y - 3);
+    VideoDraw(MenuButtonGfx.Sprite,
+	MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
     y += 20;
 
     tiles = TheMap.Tiles;
@@ -647,7 +699,7 @@ local void ShowUnitInfo(const Unit* unit)
     char buf[256];
     int i;
 
-    i=sprintf(buf, "#%d '%s' Player:%d %s", UnitNumber(unit),
+    i=sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
 	unit->Type->Name, unit->Player->Player,
 	unit->Active ? "active" : "passive");
     if( unit->Type->OilPatch || unit->Type->GivesOil
@@ -853,8 +905,11 @@ global void EditorCallbackButtonDown(unsigned button __attribute__((unused)))
 	    case 303:
 		TileCursorSize = 4;
 		return;
-	    case 304:			// FIXME:
-	    case 305:			// FIXME:
+	    case 304:
+		TileToolRandom ^= 1;
+		return;
+	    case 305:
+		TileToolDecoration ^= 1;
 		return;
 	}
 	TileCursor = ButtonUnderCursor - 100;
@@ -952,6 +1007,15 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
     }
 
     switch (key) {
+	case 'f'&0x1F:
+	case 'f':
+	case 'F':			// ALT+F, CTRL+F toggle fullscreen
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    ToggleFullScreen();
+	    break;
+
 	case 's':			// ALT s F11 save pud menu
 	case 'S':
 	case KeyCodeF11:
@@ -967,6 +1031,14 @@ global void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		CycleViewportMode(1);
 	    }
 	    break;
+
+	case 'x'&0x1F:
+	case 'x':
+	case 'X':			// ALT+X, CTRL+X: Exit editor
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    Exit(0);
 
 	case KeyCodeDelete:	// Delete
 	    if( UnitUnderCursor ) {
