@@ -53,152 +53,88 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Check if the surrounding are free.
+**	Check if the surrounding are free. Depending on the value of flag, it will check :
+**	0: the building will not block any way
+**	1: all surrounding is free
 **
 **	@param worker	Worker to build.
 **	@param type	Type of building.
 **	@param x	X map tile position for the building.
 **	@param y	Y map tile position for the building.
+**	@param flag	0: only check that building will not block anything.
 **
 **	@return		True if the surrounding is free, false otherwise.
 **
 **	@note		Can be faster written.
 */
-local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y)
+local int AiCheckSurrounding(const Unit * worker, const UnitType * type, int x, int y, int flag)
 {
+    static int dirs[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
+    int surrounding[1024]; // Max criconference for building
+    int surroundingnb;
+    int x0, y0, x1, y1;
     int i;
-    int h;
-    int w;
-
-    h = type->TileHeight + 2;
-    w = type->TileWidth + 2;
-    --x;
-    --y;
-
-    for (i = 0; i < w; ++i) {		// Top row
-	// FIXME: (pludov) slow, worse,...
-	if (x + i < 0 || x + i > TheMap.Width) {
-	    continue;
+    int lastval;
+    int dir;
+    int obstacle;
+    
+    x0 = x - 1;
+    y0 = y - 1;
+    x1 = x0 + type->TileWidth + 1;
+    y1 = y0 + type->TileWidth + 1;
+    
+    
+    x = x0;
+    y = y0;
+    dir = -1;
+    surroundingnb = 0;
+    while (dir < 4) {
+	if ((unsigned)x < (unsigned)TheMap.Width && (unsigned)y < (unsigned)TheMap.Height) {
+	    if (worker && x == worker->X && y == worker->Y) {
+		surrounding[surroundingnb++] = 1;
+	    } else if (TheMap.Fields[x + y * TheMap.Width].Flags &
+			(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
+			MapFieldForest | MapFieldBuilding)) {
+		surrounding[surroundingnb++] = 0;
+	    } else{
+		// Can pass there
+		surrounding[surroundingnb++] = (TheMap.Fields[x + y * TheMap.Width].Flags & 
+			(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
+	    }
+	} else {
+	    surrounding[surroundingnb++] = 0;
 	}
-	if (!(x + i == worker->X && y == worker->Y) && y >= 0 &&
-	    TheMap.Fields[x + i + y * TheMap.Width].Flags &
-	    (MapFieldUnpassable | MapFieldWall | MapFieldRocks |
-		MapFieldForest | MapFieldBuilding)) {
-	    return 0;
-	}				// Bot row
-	if (!(x + i == worker->X && y + h == worker->Y) && y + h < TheMap.Height &&
-	    TheMap.Fields[x + i + (y + h) * TheMap.Width].Flags &
-	    (MapFieldUnpassable | MapFieldWall | MapFieldRocks |
-		MapFieldForest | MapFieldBuilding)) {
-	    return 0;
+	
+	if ((x == x0 || x == x1) && (y == y0 || y == y1)) {
+	    dir++;
 	}
+	
+	x += dirs[dir][0];
+	y += dirs[dir][1];
     }
-
-    ++y;
-    h -= 2;
-    for (i = 0; i < h; ++i) {		// Left row
-	// FIXME: (pludov) slow, worse,...
-	if (y + i < 0 || y + i > TheMap.Height) {
-	    continue;
+    
+    lastval = surrounding[surroundingnb - 1];
+    obstacle = 0;
+    for (i = 0 ; i < surroundingnb; i++) {
+	if (lastval && !surrounding[i]) {
+	    obstacle++;
 	}
-	if (!(x == worker->X && (y + i) == worker->Y) && x >= 0 &&
-	    TheMap.Fields[x + (y + i) * TheMap.Width].Flags & (MapFieldUnpassable |
-		MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding)) {
-	    return 0;
-	}				// Right row
-	if (!((x + w) == worker->X && (y + i) == worker->Y) && (x + w) < TheMap.Width
-	    && TheMap.Fields[x + w +
-		(y + i) *
-		TheMap.Width].
-	    Flags & (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest |
-		MapFieldBuilding)) {
-	    return 0;
-	}
+	lastval = surrounding[i];
     }
-    return 1;
+    
+    if (obstacle == 0) {
+	obstacle = !surrounding[0];
+    }
+    
+    if (flag) {
+	return obstacle == 0;
+    } else if (!type->ShoreBuilding) {
+	return obstacle < 2;
+    } else {
+	// Shore building haves at least 2 obstacles : sea->ground & ground->sea
+	return obstacle < 3;
+    }
 }
-
-#if 0
-/**
-**      Find free building place.
-**
-**	@param worker	Worker to build building.
-**	@param type	Type of building.
-**	@param dx	Pointer for X position returned.
-**	@param dy	Pointer for Y position returned.
-**	@param flag	Flag if surrounding must be free.
-**	@return		True if place found, false if no found.
-**
-**	@note	This can be done faster, use flood fill.
-*/
-local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
-    int *dx, int *dy, int flag)
-{
-    int wx;
-    int wy;
-    int x;
-    int y;
-    int addx;
-    int addy;
-    int end;
-    int state;
-
-    wx = worker->X;
-    wy = worker->Y;
-    x = wx;
-    y = wy;
-    addx = 1;
-    addy = 1;
-
-    state = 0;
-    end = y + addy - 1;
-    for (;;) {				// test rectangles around the place
-	switch (state) {
-	    case 0:
-		if (y++ == end) {
-		    ++state;
-		    end = x + addx++;
-		}
-		break;
-	    case 1:
-		if (x++ == end) {
-		    ++state;
-		    end = y - addy++;
-		}
-		break;
-	    case 2:
-		if (y-- == end) {
-		    ++state;
-		    end = x - addx++;
-		}
-		break;
-	    case 3:
-		if (x-- == end) {
-		    state = 0;
-		    end = y + addy++;
-		    if (addx >= TheMap.Width && addy >= TheMap.Height) {
-			return 0;
-		    }
-		}
-		break;
-	}
-
-	// FIXME: this check outside the map could be speeded up.
-	if (y < 0 || x < 0 || y >= TheMap.Height || x >= TheMap.Width) {
-	    continue;
-	}
-	if (CanBuildUnitType(worker, type, x, y) &&
-	    (!flag || AiCheckSurrounding(worker, type, x, y)) &&
-	    PlaceReachable(worker, x, y, 1)) {
-	    *dx = x;
-	    *dy = y;
-	    return 1;
-	}
-    }
-    return 0;
-}
-
-#endif
 
 /**
 **      Find free building place. (flood fill version)
@@ -244,7 +180,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     //  Look if we can build at current place.
     //
     if (CanBuildUnitType(worker, type, x, y) &&
-	(!flag || AiCheckSurrounding(worker, type, x, y))) {
+	(/*!flag || */AiCheckSurrounding(worker, type, x, y, flag))) {
 	*dx = x;
 	*dy = y;
 	free(points);
@@ -297,7 +233,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		//      Look if we can build here.
 		//
 		if (CanBuildUnitType(worker, type, x, y) &&
-		    (!flag || AiCheckSurrounding(worker, type, x, y))) {
+		    (/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
 		    *dx = x;
 		    *dy = y;
 		    free(points);
@@ -635,8 +571,7 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type, int 
 **	@todo	Better and faster way to find building place of oil platforms
 **		Special routines for special buildings.
 */
-global int AiFindBuildingPlace(const Unit * worker, const UnitType * type, int *dx,
-    int *dy)
+global int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx, int* dy)
 {
 
     //
