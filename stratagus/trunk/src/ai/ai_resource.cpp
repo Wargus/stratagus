@@ -641,8 +641,12 @@ local int AiMineGold(Unit * unit)
     return 1;
 }
 
+#if 0
+
 /**
 **      Assign worker to harvest.
+**
+**	@param unit	Find wood for this worker.
 */
 local int AiHarvest(Unit * unit)
 {
@@ -732,6 +736,148 @@ local int AiHarvest(Unit * unit)
     DebugLevel0Fn("no wood reachable\n");
     return 0;
 }
+
+#else
+
+/**
+**      Assign worker to harvest.
+**
+**	@param unit	Find wood for this worker.
+**
+**	@return		True if the work is going harvest.
+*/
+local int AiHarvest(Unit * unit)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } points[MaxMapWidth*MaxMapHeight];
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    int n;
+    unsigned char* m;
+    unsigned char* matrix;
+    const Unit* destu;
+    int destx;
+    int desty;
+    int bestx;
+    int besty;
+    int bestd;
+
+    x=unit->X;
+    y=unit->Y;
+
+    //
+    //	Find the nearest wood depot
+    //
+    if( (destu=FindWoodDeposit(unit->Player,x,y)) ) {
+	NearestOfUnit(destu,x,y,&destx,&desty);
+    }
+    bestd=99999;
+    IfDebug( bestx=besty=0; );		// keep the compiler happy
+
+    //
+    //	Make movement matrix.
+    //
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;			// mark start point
+    ep=wp=1;				// start with one point
+
+    mask=UnitMovementMask(unit);
+
+    //
+    //	Pop a point from stack, push all neightbors which could be entered.
+    //
+    for( ;; ) {
+	while( rp!=ep ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {			// already checked
+		    continue;
+		}
+
+		//
+		//	Look if there is wood
+		//
+		if ( ForestOnMap(x,y) ) {
+		    if( destu ) {
+			n=max(abs(destx-x),abs(desty-y));
+			if( n<bestd ) {
+			    bestd=n;
+			    bestx=x;
+			    besty=y;
+			}
+			*m=22;
+		    } else {			// no goal take the first
+			DebugCheck(unit->Type!=UnitTypeHumanWorker
+				&& unit->Type!=UnitTypeOrcWorker);
+			CommandHarvest(unit, bestx, besty,FlushCommands);
+			return 1;
+		    }
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=sizeof(points) ) {// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+
+	    if( ++rp>=sizeof(points) ) {	// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Take best of this frame, if any.
+	//
+	if( bestd!=99999 ) {
+	    DebugCheck(unit->Type!=UnitTypeHumanWorker
+		    && unit->Type!=UnitTypeOrcWorker);
+	    CommandHarvest(unit, bestx, besty,FlushCommands);
+	    return 1;
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
+    DebugLevel0Fn("no wood in range\n");
+
+    return 0;
+}
+
+#endif
 
 /**
 **      Assign worker to haul oil.
