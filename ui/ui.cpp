@@ -328,27 +328,28 @@ local void SaveUi(CLFile* file, const UI* ui)
 
     CLprintf(file, "\n  'resources (list");
     for (i = 1; i < MaxCosts + 2; ++i) {
-	if (!ui->Resources[i].Icon.File) {
-	    continue;
+	if (ui->Resources[i].Icon.File) {
+	    CLprintf(file, "\n    '%s",
+		i < MaxCosts ? DefaultResourceNames[i] :
+		    i == FoodCost ? "food" : "score");
+	    CLprintf(file, " (list 'file \"%s\" 'row %d\n"
+		"      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
+		ui->Resources[i].Icon.File, ui->Resources[i].IconRow,
+		ui->Resources[i].IconX, ui->Resources[i].IconY,
+		ui->Resources[i].IconW, ui->Resources[i].IconH,
+		ui->Resources[i].TextX, ui->Resources[i].TextY);
 	}
-	CLprintf(file, "\n    '%s",
-	    i < MaxCosts ? DefaultResourceNames[i] :
-		i == FoodCost ? "food" : "score");
-	CLprintf(file, " (list 'file \"%s\" 'row %d\n"
-	    "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
-	    ui->Resources[i].Icon.File, ui->Resources[i].IconRow,
-	    ui->Resources[i].IconX, ui->Resources[i].IconY,
-	    ui->Resources[i].IconW, ui->Resources[i].IconH,
-	    ui->Resources[i].TextX, ui->Resources[i].TextY);
     }
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'info-panel (list");
-    CLprintf(file, "\n    'panel (list");
-    CLprintf(file, "\n      'file \"%s\"", ui->InfoPanel.File);
-    CLprintf(file, "\n      'pos '(%d %d)", ui->InfoPanelX, ui->InfoPanelY);
-    CLprintf(file, "\n      'size '(%d %d))", ui->InfoPanelW, ui->InfoPanelH);
-
+    if (ui->InfoPanel.File) {
+	CLprintf(file, "\n    'panel (list");
+	CLprintf(file, "\n      'file \"%s\"", ui->InfoPanel.File);
+	CLprintf(file, "\n      'pos '(%d %d)", ui->InfoPanelX, ui->InfoPanelY);
+	CLprintf(file, "\n      'size '(%d %d)", ui->InfoPanelW, ui->InfoPanelH);
+	CLprintf(file, ")");
+    }
     CLprintf(file, "\n    'selected (list");
     CLprintf(file, "\n      'single (list");
     if (ui->SingleSelectedText) {
@@ -489,10 +490,13 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, ")\n");    // 'info-panel
 
     CLprintf(file, "\n  'button-panel (list\n");
-    CLprintf(file, "\n    'panel (list\n");
-    CLprintf(file, "\n      'file \"%s\"\n", ui->ButtonPanel.File);
-    CLprintf(file, "\n      'pos '(%d %d))",
-	ui->ButtonPanelX, ui->ButtonPanelY);
+    if (ui->ButtonPanel.File) {
+	CLprintf(file, "\n    'panel (list\n");
+	CLprintf(file, "\n      'file \"%s\"\n", ui->ButtonPanel.File);
+	CLprintf(file, "\n      'pos '(%d %d)",
+	    ui->ButtonPanelX, ui->ButtonPanelY);
+	CLprintf(file, ")");
+    }
     CLprintf(file, "\n    'icons (list\n");
     for (i = 0; i < ui->NumButtonButtons; ++i) {
 	CLprintf(file, "\n      (list 'pos '(%d %d) 'size '(%d %d))",
@@ -503,7 +507,7 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'map-area (list");
-    CLprintf(file, "\n    'pos '(%3d %3d)",
+    CLprintf(file, "\n    'pos '(%d %d)",
 	ui->MapArea.X, ui->MapArea.Y);
     CLprintf(file, "\n    'size '(%d %d)",
 	ui->MapArea.EndX - ui->MapArea.X + 1,
@@ -511,11 +515,13 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'menu-panel (list\n");
-    CLprintf(file, "\n    'panel (list");
-    CLprintf(file, "\n      'file \"%s\"", ui->MenuPanel.File);
-    CLprintf(file, "\n      'pos '(%d %d)",
-	ui->MenuPanelX, ui->MenuPanelY);
-    CLprintf(file, ")");
+    if (ui->MenuPanel.File) {
+	CLprintf(file, "\n    'panel (list");
+	CLprintf(file, "\n      'file \"%s\"", ui->MenuPanel.File);
+	CLprintf(file, "\n      'pos '(%d %d)",
+	    ui->MenuPanelX, ui->MenuPanelY);
+	CLprintf(file, ")");
+    }
     CLprintf(file, "\n    'menu-button '(");
     CLprintf(file, "\n      pos (%d %d)",
 	ui->MenuButton.X, ui->MenuButton.Y);
@@ -549,24 +555,28 @@ local void SaveUi(CLFile* file, const UI* ui)
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'minimap (list");
-    CLprintf(file, "\n    'file \"%s\"", ui->MinimapPanel.File);
-    if (ui->MinimapTransparent) {
-	CLprintf(file, "\n    'transparent");
+    if (ui->MinimapPanel.File) {
+	CLprintf(file, "\n    'file \"%s\"", ui->MinimapPanel.File);
+	CLprintf(file, "\n    'panel-pos '(%d %d)",
+	    ui->MinimapPanelX, ui->MinimapPanelY);
     }
-    CLprintf(file, "\n    'panel-pos '(%d %d)",
-	ui->MinimapPanelX, ui->MinimapPanelY);
     CLprintf(file, "\n    'pos '(%d %d)",
 	ui->MinimapPosX, ui->MinimapPosY);
     CLprintf(file, "\n    'size '(%d %d)",
 	ui->MinimapW, ui->MinimapH);
+    if (ui->MinimapTransparent) {
+	CLprintf(file, "\n    'transparent");
+    }
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'status-line '(");
-    CLprintf(file, "\n    file \"%s\"",ui->StatusLine.File);
-    CLprintf(file, "\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
+    if (ui->StatusLine.File) {
+	CLprintf(file, "\n    file \"%s\"", ui->StatusLine.File);
+    }
+    CLprintf(file, "\n    pos (%d %d)", ui->StatusLineX, ui->StatusLineY);
     CLprintf(file, "\n    text-pos (%d %d)",
 	ui->StatusLineTextX, ui->StatusLineTextY);
-    CLprintf(file, "\n    font %s",FontNames[ui->StatusLineFont]);
+    CLprintf(file, "\n    font %s", FontNames[ui->StatusLineFont]);
     CLprintf(file, ")\n");
 
     CLprintf(file, "\n  'cursors '(");
