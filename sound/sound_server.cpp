@@ -317,7 +317,7 @@ local int HowManyFree(void)
 	return nb;
 }
 
-/*
+/**
 ** Check whether to discard or not a sound request
 */
 local int KeepRequest(SoundRequest* sr) {

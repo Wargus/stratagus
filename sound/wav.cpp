@@ -316,7 +316,8 @@ global Sample* LoadWav(const char* name, int flags)
 		int comp;		// number of compressed bytes actually read
 		int divide;
 		int i;
-		int n;
+		int rem;
+		int read;
 		char sndbuf[SOUND_BUFFER_SIZE];
 
 		sample->Type = &WavSampleType;
@@ -324,36 +325,46 @@ global Sample* LoadWav(const char* name, int flags)
 		divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
 
 		sample->Buffer = NULL;
+		read = 0;
+		rem = 0;
 		while (1) {
-			// read more data
-			comp = CLread(f, &chunk, sizeof(chunk));
+			if (!rem) {
+				// read next chunk
+				comp = CLread(f, &chunk, sizeof(chunk));
 
-			if (!comp) {
-				// EOF
-				break;
+				if (!comp) {
+					// EOF
+					break;
+				}
+
+				chunk.Magic = ConvertLE32(chunk.Magic);
+				chunk.Length = ConvertLE32(chunk.Length);
+				if (chunk.Magic != DATA) {
+					CLseek(f, chunk.Length, SEEK_CUR);
+				    continue;
+				}
+				rem = chunk.Length;
 			}
 
-			chunk.Magic = ConvertLE32(chunk.Magic);
-			chunk.Length = ConvertLE32(chunk.Length);
-			if (chunk.Magic != DATA) {
-				CLseek(f, chunk.Length, SEEK_CUR);
-				continue;
+			if (rem > SOUND_BUFFER_SIZE) {
+				read = SOUND_BUFFER_SIZE;
+				rem -= SOUND_BUFFER_SIZE;
+			} else {
+				read = rem;
+				rem = 0;
 			}
-			n = chunk.Length;
 
-			sample->Buffer = realloc(sample->Buffer, sample->Len + n * divide);
+			sample->Buffer = realloc(sample->Buffer, sample->Len + read * divide);
 			DebugCheck(!sample->Buffer);
 
-			comp = CLread(data->WavFile, sndbuf, n);
+			comp = CLread(data->WavFile, sndbuf, read);
 
 			if (!comp) {
 				break;
 			}
 
-			if (sample->BitsPerSample == 16) {
-				for (i = 0; i < n >> 1; ++i) {
-					((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
-				}
+			for (i = 0; i < read >> 1; ++i) {
+				((unsigned short*)sndbuf)[i] = ConvertLE16(((unsigned short*)sndbuf)[i]);
 			}
 
 			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos,
