@@ -909,6 +909,7 @@ local void ClientParseConnected(const InitMessage* msg)
 
 	case ICMMap:		// Server has sent us new map info
 	    sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
+	    // FIXME: pathlen = sprintf should work?
 	    pathlen = strlen(ScenSelectFullPath);
 	    memcpy(ScenSelectFullPath+pathlen, msg->u.MapPath, 256);
 	    ScenSelectFullPath[pathlen+255] = 0;
@@ -1095,7 +1096,8 @@ local void ClientParseGoAhead(const InitMessage* msg)
 **
 **	@param msg	message received
 */
-local void ClientParseAreYouThere(const InitMessage* msg)
+local void ClientParseAreYouThere(
+	const InitMessage* msg __attribute__((unused)))
 {
     InitMessage message;
 
