@@ -425,7 +425,7 @@ extern void MapDetectUnitsOnTile(const Player* player,int x,int y);
     /// Mark sight changes
 extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int));
     /// Find if a tile is visible (With shared vision)
-extern int IsTileVisible(const Player* player, int x, int y);
+extern unsigned char IsTileVisible(const Player* player, int x, int y);
     /// Mark tiles with fog of war to be redrawn
 extern void MapUpdateFogOfWar(int x,int y);
     ///	Update fog of war
