@@ -157,7 +157,7 @@ local void UiCenterOnGroup(unsigned group)
 			x += (units[n]->X - x) / 2;
 			y += (units[n]->Y - y) / 2;
 		}
-		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y);
+		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -535,7 +535,7 @@ local void UiCenterOnSelected(void)
 			x += (Selected[n]->X - x) / 2;
 			y += (Selected[n]->Y - y) / 2;
 		}
-		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y);
+		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -558,7 +558,7 @@ local void UiSaveMapPosition(unsigned position)
 local void UiRecallMapPosition(unsigned position)
 {
 	ViewportSetViewpoint(TheUI.SelectedViewport,
-		SavedMapPositionX[position], SavedMapPositionY[position]);
+		SavedMapPositionX[position], SavedMapPositionY[position], TileSizeX / 2, TileSizeY / 2);
 }
 
 /**
@@ -593,7 +593,7 @@ local void UiFindIdleWorker(void)
 		CurrentButtonLevel = 0;
 		PlayUnitSound(Selected[0], VoiceSelected);
 		SelectionChanged();
-		ViewportCenterViewpoint(TheUI.SelectedViewport, unit->X, unit->Y);
+		ViewportCenterViewpoint(TheUI.SelectedViewport, unit->X, unit->Y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 

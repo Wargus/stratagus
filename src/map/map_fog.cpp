@@ -47,6 +47,7 @@
 #include "minimap.h"
 #include "font.h"
 #include "ui.h"
+#include "../video/intern_video.h"
 
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
@@ -487,6 +488,8 @@ global void UpdateFogOfWarChange(void)
 global void VideoDrawFogSDL(const int tile, int x, int y)
 {
 	int tilepitch;
+	int oldx;
+	int oldy;
 	SDL_Rect srect;
 	SDL_Rect drect;
 
@@ -496,6 +499,12 @@ global void VideoDrawFogSDL(const int tile, int x, int y)
 	srect.y = TileSizeY * (tile / tilepitch);
 	srect.w = TileSizeX;
 	srect.h = TileSizeY;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
 
 	drect.x = x;
 	drect.y = y;
@@ -515,6 +524,8 @@ global void VideoDrawFogSDL(const int tile, int x, int y)
 global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 {
 	int tilepitch;
+	int oldx;
+	int oldy;
 	SDL_Rect srect;
 	SDL_Rect drect;
 
@@ -524,6 +535,12 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 	srect.y = TileSizeY * (tile / tilepitch);
 	srect.w = TileSizeX;
 	srect.h = TileSizeY;
+	
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
 
 	drect.x = x;
 	drect.y = y;
@@ -538,12 +555,26 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 */
 global void VideoDrawOnlyFogSDL(int x, int y)
 {
+	int oldx;
+	int oldy;
+	SDL_Rect srect;
 	SDL_Rect drect;
+
+	srect.x = 0;
+	srect.y = 0;
+	srect.w = OnlyFogSurface->w;
+	srect.h = OnlyFogSurface->h;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
 
 	drect.x = x;
 	drect.y = y;
 
-	SDL_BlitSurface(OnlyFogSurface, NULL, TheScreen, &drect);
+	SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
 }
 
 #else
@@ -873,10 +904,10 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 
 	ex = vp->EndX;
 	sy = y * TheMap.Width;
-	dy = vp->Y;
+	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
-	while (dy < ey) {
+	while (dy <= ey) {
 		// row must be redrawn
 		if (*redraw_row) {
 #if NEW_MAPDRAW > 1
@@ -885,19 +916,19 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 			*redraw_row = 0;
 #endif
 			sx = x + sy;
-			dx = vp->X;
-			while (dx < ex) {
+			dx = vp->X - vp->OffsetX;
+			while (dx <= ex) {
 				if (*redraw_tile) {
 #if NEW_MAPDRAW > 1
 					(*redraw_tile)--;
 #else
 					*redraw_tile = 0;
-					mx = (dx - vp->X) / TileSizeX + vp->MapX;
-					my = (dy - vp->Y) / TileSizeY + vp->MapY;
+					mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
+					my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
 					if (VisibleTable[my * TheMap.Width + mx] || ReplayRevealMap) {
 						DrawFogOfWarTile(sx, sy, dx, dy);
 					} else {
-						VideoFillRectangle(ColorBlack, dx, dy, TileSizeX, TileSizeY);
+						VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 					}
 #endif
 

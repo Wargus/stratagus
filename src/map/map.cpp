@@ -179,36 +179,56 @@ global void RevealMap(void)
 /**
 **  Change viewpoint of map viewport v to x,y.
 **
-**  @param vp  Viewport pointer.
-**  @param x   X map tile position.
-**  @param y   Y map tile position.
+**  @param vp       Viewport pointer.
+**  @param x        X map tile position.
+**  @param y        Y map tile position.
+**  @param offsetx  X offset in tile.
+**	@param offsety  Y offset in tile.
 */
-global void ViewportSetViewpoint(Viewport* vp, int x, int y)
+global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
 	int map_width;
 	int map_height;
 
-	if (x == vp->MapX && y == vp->MapY) {
-		// Already using this view.
-		return;
-	}
+	vp->OffsetX = offsetx;
+	vp->OffsetY = offsety;
 
 	map_width = vp->MapWidth;
 	if (x < 0) {
 		vp->MapX = 0;
+		vp->OffsetX = 0;
 	} else if (x > TheMap.Width - map_width) {
-		vp->MapX = TheMap.Width - map_width;
+		vp->MapX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) / TileSizeX;
+		vp->OffsetX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) % TileSizeX;
 	} else {
 		vp->MapX = x;
+		if (vp->OffsetX < 0) {
+			if (vp->MapX != 0) {
+				vp->MapX--;
+				vp->OffsetX += TileSizeX;
+			} else {
+				vp->OffsetX = 0;
+			}
+		}
 	}
 
 	map_height = vp->MapHeight;
 	if (y < 0) {
 		vp->MapY = 0;
+		vp->OffsetY = 0;
 	} else if (y > TheMap.Height - map_height) {
-		vp->MapY = TheMap.Height - map_height;
+		vp->MapY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) / TileSizeY;
+		vp->OffsetY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) % TileSizeY;
 	} else {
 		vp->MapY = y;
+		if (vp->OffsetY < 0) {
+			if (vp->MapY != 0) {
+				vp->MapY--;
+				vp->OffsetY += TileSizeY;
+			} else {
+				vp->OffsetY = 0;
+			}
+		}
 	}
 
 	MarkDrawEntireMap();
@@ -221,10 +241,14 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y)
 **  @param vp  Viewport pointer.
 **  @param x   X map tile position.
 **  @param y   Y map tile position.
+**  @param offsetx  X offset in tile.
+**	@param offsety  Y offset in tile.
 */
-global void ViewportCenterViewpoint(Viewport* vp, int x, int y)
+global void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 {
-	ViewportSetViewpoint(vp, x - (vp->MapWidth / 2), y - (vp->MapHeight / 2));
+	x = x * TileSizeX + offsetx - (vp->EndX - vp->X) / 2;
+	y = y * TileSizeY + offsety - (vp->EndY - vp->Y) / 2;
+	ViewportSetViewpoint(vp, x / TileSizeX, y / TileSizeY, x % TileSizeX, y % TileSizeY);
 }
 
 /*----------------------------------------------------------------------------
@@ -458,7 +482,7 @@ global int Viewport2MapX(const Viewport* vp, int x)
 {
 	int r;
 
-	r = (x - vp->X) / TileSizeX + vp->MapX;
+	r = (x - vp->X + vp->MapX * TileSizeX + vp->OffsetX) / TileSizeX;
 	return r < TheMap.Width ? r : TheMap.Width - 1;
 }
 
@@ -476,7 +500,7 @@ global int Viewport2MapY(const Viewport* vp, int y)
 {
 	int r;
 
-	r = (y - vp->Y) / TileSizeY + vp->MapY;
+	r = (y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY) / TileSizeY;
 	return r < TheMap.Height ? r : TheMap.Height - 1;
 }
 
@@ -491,7 +515,7 @@ global int Viewport2MapY(const Viewport* vp, int y)
 */
 global int Map2ViewportX(const Viewport* vp, int x)
 {
-	return vp->X + (x - vp->MapX) * TileSizeX;
+	return vp->X + (x - vp->MapX) * TileSizeX - vp->OffsetX;
 }
 
 /**
@@ -505,7 +529,7 @@ global int Map2ViewportX(const Viewport* vp, int x)
 */
 global int Map2ViewportY(const Viewport* vp, int y)
 {
-	return vp->Y + (y - vp->MapY) * TileSizeY;
+	return vp->Y + (y - vp->MapY) * TileSizeY - vp->OffsetY;
 }
 
 /**

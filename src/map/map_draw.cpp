@@ -42,6 +42,7 @@
 #include "tileset.h"
 #include "video.h"
 #include "map.h"
+#include "../video/intern_video.h"
 #include "player.h"
 #include "pathfinder.h"
 #include "ui.h"
@@ -83,9 +84,19 @@ global Deco* MapDecoration = NULL;
 **  @param y     Y position into video memory
 */
 #ifndef USE_OPENGL
+/**
+**  Draw a tile clipped
+**
+**  @param tile  pointer to tile graphic data
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+**
+*/
 global void VideoDrawTile(const int tile, int x, int y)
 {
 	int tilepitch;
+	int oldx;
+	int oldy;
 	SDL_Rect srect;
 	SDL_Rect drect;
 
@@ -95,6 +106,13 @@ global void VideoDrawTile(const int tile, int x, int y)
 	srect.y = TileSizeY * (tile / tilepitch);
 	srect.w = TileSizeX;
 	srect.h = TileSizeY;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+					
 
 	drect.x = x;
 	drect.y = y;
@@ -403,15 +421,15 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 
 	ex = vp->EndX;
 	sy = y * TheMap.Width;
-	dy = vp->Y;
+	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
-	while (dy < ey) {
+	while (dy <= ey) {
 		// row must be redrawn
 		if (*redraw_row++) {
 			sx = x + sy;
-			dx = vp->X;
-			while (dx < ex) {
+			dx = vp->X - vp->OffsetX;
+			while (dx <= ex) {
 				//
 				//  draw only tiles which must be drawn
 				//
@@ -435,8 +453,8 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 		} else {
 #ifdef NEW_MAPDRAW_
 			sx = x + sy;
-			dx = vp->X;
-			while (dx < ex) {
+			dx = vp->X - vp->OffsetX;
+			while (dx <= ex) {
 				VideoDrawRectangle(ColorRed, dx, dy, 32, 32);
 				++sx;
 				dx += TileSizeX;

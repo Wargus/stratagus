@@ -541,7 +541,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
 #endif
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
-		ThisPlayer->StartX, ThisPlayer->StartY);
+		ThisPlayer->StartX, ThisPlayer->StartY, TileSizeX / 2, TileSizeY / 2);
 
 	//
 	// Various hacks wich must be done after the map is loaded.

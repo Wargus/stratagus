@@ -97,88 +97,103 @@ global EventCallback MenuCallbacks;		/// Menu callbacks
 //----------------------------------------------------------------------------
 
 /**
-**		Move map view point up (north).
+**  Move map view point up (north).
 **
-**		@param step		How many tiles.
+**  @param step  How many tiles.
 */
 local void MoveMapViewPointUp(int step)
 {
 	Viewport* vp;
 
 	vp = TheUI.SelectedViewport;
-	if (vp->MapY >= step) {
-		vp->MapY -= step;
-	} else {
+	vp->OffsetY -= step;
+	while (vp->OffsetY < 0) {
+		vp->OffsetY += TileSizeY;
+		--vp->MapY;
+	}
+
+	if (vp->MapY < 0) {
 		vp->MapY = 0;
+		vp->OffsetY = 0;
 	}
 }
 
 /**
-**		Move map view point left (west).
+**  Move map view point left (west).
 **
-**		@param step		How many tiles.
+**  @param step  How many tiles.
 */
 local void MoveMapViewPointLeft(int step)
 {
 	Viewport* vp;
 
 	vp = TheUI.SelectedViewport;
-	if (vp->MapX >= step) {
-		vp->MapX -= step;
-	} else {
+	vp->OffsetX -= step;
+	while (vp->OffsetX < 0) {
+		vp->OffsetX += TileSizeX;
+		--vp->MapX;
+	}
+
+	if (vp->MapX < 0) {
 		vp->MapX = 0;
+		vp->OffsetX = 0;
 	}
 }
 
 /**
-**		Move map view point down (south).
+**  Move map view point down (south).
 **
-**		@param step		How many tiles.
+**  @param step  How many tiles.
 */
 local void MoveMapViewPointDown(int step)
 {
 	Viewport* vp;
 
 	vp = TheUI.SelectedViewport;
-	if (TheMap.Height > vp->MapHeight &&
-			vp->MapY <= TheMap.Height - vp->MapHeight - step) {
-		vp->MapY += step;
-	} else {
-		vp->MapY = TheMap.Height - vp->MapHeight;
+	vp->OffsetY += step;
+	while (vp->OffsetY >= TileSizeY) {
+		vp->OffsetY -= TileSizeY;
+		++vp->MapY;
+	}
+	// If bottom is > Last map top, make it equal
+	if (vp->MapY * TileSizeY + vp->OffsetY + vp->EndY - vp->Y > TheMap.Height * TileSizeY) {
+		vp->MapY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) / TileSizeY;
+		vp->OffsetY = (TheMap.Height * TileSizeY - (vp->EndY - vp->Y)) % TileSizeY;
 	}
 }
 
 /**
-**		Move map view point right (east).
+**  Move map view point right (east).
 **
-**		@param step		How many tiles.
+**  @param step  How many tiles.
 */
 local void MoveMapViewPointRight(int step)
 {
 	Viewport* vp;
 
 	vp = TheUI.SelectedViewport;
-	if (TheMap.Width > vp->MapWidth &&
-			vp->MapX <= TheMap.Width - vp->MapWidth - step) {
-		vp->MapX += step;
-	} else {
-		vp->MapX = TheMap.Width - vp->MapWidth;
+	vp->OffsetX += step;
+	while (vp->OffsetX >= TileSizeX) {
+		vp->OffsetX -= TileSizeX;
+		++vp->MapX;
+	}
+
+	// If right is > Last map top, make it equal
+	if (vp->MapX * TileSizeX + vp->OffsetX + vp->EndX - vp->X > TheMap.Width * TileSizeX) {
+		vp->MapX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) / TileSizeX;
+		vp->OffsetX = (TheMap.Width * TileSizeX - (vp->EndX - vp->X)) % TileSizeX;
 	}
 }
 
 /**
-**		Handle scrolling area.
+**  Handle scrolling area.
 **
-**		@param state		Scroll direction/state.
-**		@param fast		Flag scroll faster.
+**  @param state  Scroll direction/state.
+**  @param fast   Flag scroll faster.
 **
-**		@todo		Support dynamic acceleration of scroll speed.
-**		@todo		If the scroll key is longer pressed the area is scrolled faster.
-**		@todo		Scrolling pixel wise.
+**  @todo  Support dynamic acceleration of scroll speed.
+**  @todo  If the scroll key is longer pressed the area is scrolled faster.
 **
-**		StephanR: above needs one row+column of tiles extra to be
-**				drawn (clipped), which also needs to be supported
-**				by various functions using MustRedrawTile,..
 */
 global void DoScrollArea(enum _scroll_state_ state, int fast)
 {
@@ -186,10 +201,11 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	int stepy;
 
 	if (fast) {
-		stepx = TheUI.SelectedViewport->MapWidth / 2;
-		stepy = TheUI.SelectedViewport->MapHeight / 2;
+		stepx = TheUI.SelectedViewport->MapWidth / 2 * TileSizeX;
+		stepy = TheUI.SelectedViewport->MapHeight / 2 * TileSizeY;
 	} else {				// dynamic: let these variables increase upto fast..
-		stepx = stepy = 1;
+		stepx = TileSizeX;
+		stepy = TileSizeY;
 	}
 
 	switch (state) {
@@ -230,11 +246,11 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 }
 
 /**
-**		Draw menu button area.
+**  Draw menu button area.
 **
-**		With debug it shows the used frame time and arrival of network packets.
+**  With debug it shows the used frame time and arrival of network packets.
 **
-**		@todo		Must be more configurable. Adding diplomacy menu here?
+**  @todo  Must be more configurable. Adding diplomacy menu here?
 */
 local void DrawMenuButtonArea(void)
 {
@@ -280,7 +296,7 @@ local void DrawMenuButtonArea(void)
 
 #ifdef DRAW_DEBUG
 	//
-	//		Draw line for frame speed.
+	// Draw line for frame speed.
 	//
 	{ int f;
 
@@ -299,7 +315,7 @@ local void DrawMenuButtonArea(void)
 	}
 	}
 	//
-	//		Draw line for network speed.
+	// Draw line for network speed.
 	//
 	{
 	int i;
@@ -326,11 +342,11 @@ local void DrawMenuButtonArea(void)
 }
 
 /**
-**		Draw a map viewport.
+**  Draw a map viewport.
 **
-**		@param vp		Viewport pointer.
+**  @param vp  Viewport pointer.
 **
-**		@note		Johns: I think parsing the viewport pointer is faster.
+**  @note  Johns: I think parsing the viewport pointer is faster.
 */
 local void DrawMapViewport(Viewport* vp)
 {
@@ -373,14 +389,15 @@ local void DrawMapViewport(Viewport* vp)
 		}
 #endif
 		//
-		//		An unit is tracked, center viewport on this unit.
+		// An unit is tracked, center viewport on this unit.
 		//
 		if (vp->Unit) {
 			if (vp->Unit->Destroyed ||
 					vp->Unit->Orders[0].Action == UnitActionDie) {
 				vp->Unit = NoUnitP;
 			} else {
-				ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y);
+				ViewportCenterViewpoint(vp, vp->Unit->X, vp->Unit->Y,
+					vp->Unit->IX + TileSizeX / 2, vp->Unit->IY + TileSizeY / 2);
 			}
 		}
 
@@ -404,8 +421,8 @@ local void DrawMapViewport(Viewport* vp)
 				}
 				++i;
 			} else {
-				x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
-				y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
+				x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
+				y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
 				// FIXME: I should copy SourcePlayer for second level missiles.
 				if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
 #ifdef DYNAMIC_LOAD
@@ -434,8 +451,8 @@ local void DrawMapViewport(Viewport* vp)
 			}
 		}
 		for (; j < nmissiles; ++j) {
-			x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X;
-			y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y;
+			x = missiletable[j]->X - vp->MapX * TileSizeX + vp->X - vp->OffsetX;
+			y = missiletable[j]->Y - vp->MapY * TileSizeY + vp->Y - vp->OffsetY;
 			// FIXME: I should copy SourcePlayer for second level missiles.
 			if (missiletable[j]->SourceUnit && missiletable[j]->SourceUnit->Player) {
 #ifdef DYNAMIC_LOAD
@@ -458,8 +475,8 @@ local void DrawMapViewport(Viewport* vp)
 		}
 		DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
 		//
-		//		Draw orders of selected units.
-		//		Drawn here so that they are shown even when the unit is out of the screen.
+		// Draw orders of selected units.
+		// Drawn here so that they are shown even when the unit is out of the screen.
 		//
 		if (ShowOrders == SHOW_ORDERS_ALWAYS ||
 				((ShowOrdersCount >= GameCycle || (KeyModifiers & ModifierShift)))) {
@@ -479,10 +496,10 @@ local void DrawMapViewport(Viewport* vp)
 }
 
 /**
-**		Draw map area
+**  Draw map area
 **
-**		@todo		Fix the FIXME's and we only need to draw a line between the
-**				viewports and show the active viewport.
+**  @todo  Fix the FIXME's and we only need to draw a line between the
+**         viewports and show the active viewport.
 */
 global void DrawMapArea(void)
 {
