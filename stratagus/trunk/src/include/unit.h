@@ -431,6 +431,7 @@ struct _unit_ {
     unsigned	Removed : 1;		/// unit is removed (not on map)
     unsigned	Selected : 1;		/// unit is selected
     unsigned	Constructed : 1;	/// unit is in construction
+    unsigned 	Active : 1;		/// unit is active for AI
 
     unsigned	Mana : 8;		/// mana points
     unsigned	HP;			/// hit points

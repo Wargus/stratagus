@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "freecraft.h"
 
@@ -162,6 +163,49 @@ global void AiAssignToForce(Unit* unit)
 	    ++unit->Refs;
 	    AiPlayer->Force[force].Units=aiunit;
 	    break;
+	}
+    }
+}
+
+/**
+**	Assign free units to force.
+*/
+global void AiAssignFreeUnitsToForce(void)
+{
+    Unit* table[UnitMax];
+    int n;
+    int f;
+    int i;
+    Unit* unit;
+    const AiUnit* aiunit;
+
+    n=AiPlayer->Player->TotalNumUnits;
+    memcpy(table,AiPlayer->Player->Units,sizeof(*AiPlayer->Player->Units)*n);
+
+    AiCleanForces();
+
+    //
+    //	Remove all units already in forces.
+    //
+    for( f=0; f<AI_MAX_FORCES; ++f ) {
+	aiunit=AiPlayer->Force[f].Units;
+	while( aiunit ) {
+	    unit=aiunit->Unit;
+	    for( i=0; i<n; ++i ) {
+		if( table[i]==unit ) {
+		    table[i]=table[--n];
+		}
+	    }
+	    aiunit=aiunit->Next;
+	}
+    }
+
+    //
+    //	Try to assign the remaining units.
+    //
+    for( i=0; i<n; ++i ) {
+	if( table[i]->Active ) {
+	    AiAssignToForce(table[i]);
 	}
     }
 }

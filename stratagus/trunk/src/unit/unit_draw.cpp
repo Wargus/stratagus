@@ -412,7 +412,14 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		//	Draw the black rectangle in full size?
 		//
 		if( ShowHealthBackgroundLong ) {
+#if defined(DEBUG)
+		    // Johns: I want to see fast moving.
+		    //VideoFillRectangleClip(unit->Data.Move.Fast 
+		    VideoFillRectangleClip(unit->Active
+			    ? ColorBlack : ColorWhite
+#else
 		    VideoFillRectangleClip(ColorBlack
+#endif
 			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
 			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 				+type->BoxHeight+1
