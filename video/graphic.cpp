@@ -34,21 +34,7 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**	Typedef of lnode.
-*/
-typedef struct __lnode__ PaletteLink;
-
-/**
-**	sturct __lnode__, links all palettes together to join the same palettes.
-*/
-struct __lnode__ {
-    PaletteLink*	Next;		/// Next palette
-    VMemType*		Palette;	/// Palette in hardware format
-    long		Checksum;	/// Checksum for quick lookup
-};
-
-local PaletteLink *palette_list;	/// List of all used palettes.
+global PaletteLink *palette_list;	/// List of all used palettes.
 
 /*----------------------------------------------------------------------------
 --	Externals

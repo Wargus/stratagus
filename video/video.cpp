@@ -95,12 +95,16 @@ extern void InitVideoWin32(void);
 
 global char VideoFullScreen;		/// true fullscreen wanted
 
+global int ColorCycleAll;               /// Color Cycle with all palettes.
+
 global int ClipX1;			/// current clipping top left
 global int ClipY1;			/// current clipping top left
 global int ClipX2;			/// current clipping bottom right
 global int ClipY2;			/// current clipping bottom right
 
 local Clip* Clips;			/// stack of all clips.
+
+extern PaletteLink *palette_list;
 
 #ifdef DEBUG
 global unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
@@ -316,28 +320,49 @@ global void ColorCycle8(void)
     int x;
     VMemType8* pixels;
 
-    //
-    //	Color cycle tileset palette
-    //
-    pixels=TheMap.TileData->Pixels;
-    x = pixels[38];
-    for(i = 38; i < 47; ++i){
+    if(ColorCycleAll){
+      PaletteLink * current_link = palette_list;
+      while(current_link != NULL){
+	x=((VMemType8*)(current_link->Palette))[38];
+	for( i=38; i<47; ++i ) {	// tileset color cycle
+	  ((VMemType8*)(current_link->Palette))[i]=
+	    ((VMemType8*)(current_link->Palette))[i+1];
+	}
+	((VMemType8*)(current_link->Palette))[47]=x;
+	
+	x=((VMemType8*)(current_link->Palette))[240];
+	for( i=240; i<244; ++i ) {	// units/icons color cycle
+	  ((VMemType8*)(current_link->Palette))[i]=
+	    ((VMemType8*)(current_link->Palette))[i+1];
+	}
+	((VMemType8*)(current_link->Palette))[244]=x;
+	current_link = current_link->Next;
+      }
+    } else { 
+
+      //
+      //	Color cycle tileset palette
+      //
+      pixels=TheMap.TileData->Pixels;
+      x = pixels[38];
+      for(i = 38; i < 47; ++i){
 	pixels[i] = pixels[i+1];
-    }
-    pixels[47] = x;
-
-    x=Pixels8[38];
-    for( i=38; i<47; ++i ) {	// tileset color cycle
+      }
+      pixels[47] = x;
+      
+      x=Pixels8[38];
+      for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels8[i]=Pixels8[i+1];
-    }
-    Pixels8[47]=x;
-
-    x=Pixels8[240];
-    for( i=240; i<244; ++i ) {	// units/icons color cycle
+      }
+      Pixels8[47]=x;
+      
+      x=Pixels8[240];
+      for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels8[i]=Pixels8[i+1];
+      }
+      Pixels8[244]=x;
     }
-    Pixels8[244]=x;
-
+      
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
@@ -355,27 +380,48 @@ global void ColorCycle16(void)
     int x;
     VMemType16* pixels;
 
-    //
-    //	Color cycle tileset palette
-    //
-    pixels=TheMap.TileData->Pixels;
-    x = pixels[38];
-    for(i = 38; i < 47; ++i){
+    if(ColorCycleAll){
+      PaletteLink * current_link = palette_list;
+      while(current_link != NULL){
+	x=((VMemType16*)(current_link->Palette))[38];
+	for( i=38; i<47; ++i ) {	// tileset color cycle
+	  ((VMemType16*)(current_link->Palette))[i]=
+	    ((VMemType16*)(current_link->Palette))[i+1];
+	}
+	((VMemType16*)(current_link->Palette))[47]=x;
+	
+	x=((VMemType16*)(current_link->Palette))[240];
+	for( i=240; i<244; ++i ) {	// units/icons color cycle
+	  ((VMemType16*)(current_link->Palette))[i]=
+	    ((VMemType16*)(current_link->Palette))[i+1];
+	}
+	((VMemType16*)(current_link->Palette))[244]=x;
+	current_link = current_link->Next;
+      }
+    } else { 
+
+      //
+      //	Color cycle tileset palette
+      //
+      pixels=TheMap.TileData->Pixels;
+      x = pixels[38];
+      for(i = 38; i < 47; ++i){
 	pixels[i] = pixels[i+1];
-    }
-    pixels[47] = x;
-
-    x=Pixels16[38];
-    for( i=38; i<47; ++i ) {	// tileset color cycle
+      }
+      pixels[47] = x;
+      
+      x=Pixels16[38];
+      for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels16[i]=Pixels16[i+1];
-    }
-    Pixels16[47]=x;
+      }
+      Pixels16[47]=x;
 
-    x=Pixels16[240];
-    for( i=240; i<244; ++i ) {	// units/icons color cycle
+      x=Pixels16[240];
+      for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels16[i]=Pixels16[i+1];
+      }
+      Pixels16[244]=x;
     }
-    Pixels16[244]=x;
 
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
@@ -394,27 +440,48 @@ global void ColorCycle24(void)
     VMemType24 x;
     VMemType24* pixels;
 
-    //
-    //	Color cycle tileset palette
-    //
-    pixels=TheMap.TileData->Pixels;
-    x = pixels[38];
-    for(i = 38; i < 47; ++i){
+    if(ColorCycleAll){
+      PaletteLink * current_link = palette_list;
+      while(current_link != NULL){
+	x=((VMemType24*)(current_link->Palette))[38];
+	for( i=38; i<47; ++i ) {	// tileset color cycle
+	  ((VMemType24*)(current_link->Palette))[i]=
+	    ((VMemType24*)(current_link->Palette))[i+1];
+	}
+	((VMemType24*)(current_link->Palette))[47]=x;
+	
+	x=((VMemType24*)(current_link->Palette))[240];
+	for( i=240; i<244; ++i ) {	// units/icons color cycle
+	  ((VMemType24*)(current_link->Palette))[i]=
+	    ((VMemType24*)(current_link->Palette))[i+1];
+	}
+	((VMemType24*)(current_link->Palette))[244]=x;
+	current_link = current_link->Next;
+      }
+    } else { 
+
+      //
+      //	Color cycle tileset palette
+      //
+      pixels=TheMap.TileData->Pixels;
+      x = pixels[38];
+      for(i = 38; i < 47; ++i){
 	pixels[i] = pixels[i+1];
-    }
-    pixels[47] = x;
-
-    x=Pixels24[38];
-    for( i=38; i<47; ++i ) {	// tileset color cycle
+      }
+      pixels[47] = x;
+      
+      x=Pixels24[38];
+      for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels24[i]=Pixels24[i+1];
-    }
-    Pixels24[47]=x;
-
-    x=Pixels24[240];
-    for( i=240; i<244; ++i ) {	// units/icons color cycle
+      }
+      Pixels24[47]=x;
+      
+      x=Pixels24[240];
+      for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels24[i]=Pixels24[i+1];
+      }
+      Pixels24[244]=x;
     }
-    Pixels24[244]=x;
 
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
@@ -433,27 +500,48 @@ global void ColorCycle32(void)
     int x;
     VMemType32* pixels;
 
-    //
-    //	Color cycle tileset palette
-    //
-    pixels=TheMap.TileData->Pixels;
-    x = pixels[38];
-    for(i = 38; i < 47; ++i){
+    if(ColorCycleAll){
+      PaletteLink * current_link = palette_list;
+      while(current_link != NULL){
+	x=((VMemType32*)(current_link->Palette))[38];
+	for( i=38; i<47; ++i ) {	// tileset color cycle
+	  ((VMemType32*)(current_link->Palette))[i]=
+	    ((VMemType32*)(current_link->Palette))[i+1];
+	}
+	((VMemType32*)(current_link->Palette))[47]=x;
+	
+	x=((VMemType32*)(current_link->Palette))[240];
+	for( i=240; i<244; ++i ) {	// units/icons color cycle
+	  ((VMemType32*)(current_link->Palette))[i]=
+	    ((VMemType32*)(current_link->Palette))[i+1];
+	}
+	((VMemType32*)(current_link->Palette))[244]=x;
+	current_link = current_link->Next;
+      }
+    } else { 
+
+      //
+      //	Color cycle tileset palette
+      //
+      pixels=TheMap.TileData->Pixels;
+      x = pixels[38];
+      for(i = 38; i < 47; ++i){
 	pixels[i] = pixels[i+1];
-    }
-    pixels[47] = x;
-
-    x=Pixels32[38];
-    for( i=38; i<47; ++i ) {	// tileset color cycle
+      }
+      pixels[47] = x;
+      
+      x=Pixels32[38];
+      for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels32[i]=Pixels32[i+1];
-    }
-    Pixels32[47]=x;
-
-    x=Pixels32[240];
-    for( i=240; i<244; ++i ) {	// units/icons color cycle
+      }
+      Pixels32[47]=x;
+      
+      x=Pixels32[240];
+      for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels32[i]=Pixels32[i+1];
+      }
+      Pixels32[244]=x;
     }
-    Pixels32[244]=x;
 
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
