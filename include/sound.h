@@ -118,6 +118,8 @@ extern PlaySectionType CurrentPlaySection;  /// Current play section type
 
 extern CDModes CDMode;			/// CD mode
 
+extern char* CurrentMusicFile;
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -150,6 +152,8 @@ extern void SetMusicVolume(int volume);
 /** Initialize client side of the sound layer.
 */
 extern void InitSoundClient(void);
+
+extern void PlaySectionMusic(PlaySectionType section);
 
     /// Play a sample file
 extern void PlayFile(const char* name);
