@@ -689,9 +689,9 @@ typedef struct _decovartype_{
 			Uint32 BColor;              ///< Color of background.
 		} Bar; ///< Use for Horizontal and vertical Bar.
 
-		struct {
+//		struct {
 // FIXME : Add Color, font, format
-		} Text;
+//		} Text;
 
 		struct {
 			char NSprite;                ///< 0 for ManaSprite, 1 for HealthSprite.
