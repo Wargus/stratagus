@@ -6368,8 +6368,11 @@ local int CclDefineButton(lua_State* l)
     char* s1;
     const char* s2;
     ButtonAction ba;
-    int args;
-    int j;
+
+    if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
 
     DebugLevel3Fn("Define button\n");
 
@@ -6377,18 +6380,17 @@ local int CclDefineButton(lua_State* l)
     //
     //	Parse the arguments
     //
-    args = lua_gettop(l);
-    for (j = 0; j < args; ++j) {
-	value = LuaToString(l, j + 1);
-	++j;
-	if (!strcmp(value, "pos")) {
-	    ba.Pos = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "level")) {
-	    ba.Level = LuaToNumber(l, j + 1);
-	} else if (!strcmp(value, "icon")) {
-	    ba.Icon.Name = strdup(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "action")) {
-	    value = LuaToString(l, j + 1);
+    lua_pushnil(l);
+    while (lua_next(l, 1)) {
+	value = LuaToString(l, -2);
+	if (!strcmp(value, "Pos")) {
+	    ba.Pos = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Level")) {
+	    ba.Level = LuaToNumber(l, -1);
+	} else if (!strcmp(value, "Icon")) {
+	    ba.Icon.Name = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "Action")) {
+	    value = LuaToString(l, -1);
 	    if (!strcmp(value, "move")) {
 		ba.Action = ButtonMove;
 	    } else if (!strcmp(value, "stop")) {
@@ -6433,20 +6435,20 @@ local int CclDefineButton(lua_State* l)
 		lua_pushfstring(l, "Unsupported button action: %s", value);
 		lua_error(l);
 	    }
-	} else if (!strcmp(value, "value")) {
-	    if (!lua_isnumber(l, j + 1) && !lua_isstring(l, j + 1)) {
+	} else if (!strcmp(value, "Value")) {
+	    if (!lua_isnumber(l, -1) && !lua_isstring(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
-	    if (lua_isnumber(l, j + 1)) {
-		sprintf(buf, "%ld", (long int)lua_tonumber(l, j + 1));
+	    if (lua_isnumber(l, -1)) {
+		sprintf(buf, "%ld", (long int)lua_tonumber(l, -1));
 		s1 = strdup(buf);
 	    } else {
-		s1 = strdup(lua_tostring(l, j + 1));
+		s1 = strdup(lua_tostring(l, -1));
 	    }
 	    ba.ValueStr = s1;
-	} else if (!strcmp(value, "allowed")) {
-	    value = LuaToString(l, j + 1);
+	} else if (!strcmp(value, "Allowed")) {
+	    value = LuaToString(l, -1);
 	    if (!strcmp(value, "check-true")) {
 		ba.Allowed = ButtonCheckTrue;
 	    } else if (!strcmp(value, "check-false")) {
@@ -6477,18 +6479,18 @@ local int CclDefineButton(lua_State* l)
 		lua_pushfstring(l, "Unsupported action: %s", value);
 		lua_error(l);
 	    }
-	} else if (!strcmp(value, "allow-arg")) {
+	} else if (!strcmp(value, "AllowArg")) {
 	    int subargs;
 	    int k;
 
-	    if (!lua_istable(l, j + 1)) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    s1 = strdup("");
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		s2 = LuaToString(l, -1);
 		lua_pop(l, 1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
@@ -6496,24 +6498,25 @@ local int CclDefineButton(lua_State* l)
 		strcat(s1, ",");
 	    }
 	    ba.AllowStr = s1;
-	} else if (!strcmp(value, "key")) {
-	    ba.Key = *LuaToString(l, j + 1);
-	} else if (!strcmp(value, "hint")) {
-	    ba.Hint = strdup(LuaToString(l, j + 1));
-	} else if (!strcmp(value, "for-unit")) {
+	} else if (!strcmp(value, "Key")) {
+	    ba.Key = *LuaToString(l, -1);
+	} else if (!strcmp(value, "Hint")) {
+	    ba.Hint = strdup(LuaToString(l, -1));
+	} else if (!strcmp(value, "ForUnit")) {
 	    int subargs;
 	    int k;
 
-	    if (!lua_istable(l, j + 1)) {
+	    if (!lua_istable(l, -1)) {
 		lua_pushstring(l, "incorrect argument");
 		lua_error(l);
 	    }
 	    // FIXME: ba.UnitMask shouldn't be a string
 	    s1 = strdup(",");
-	    subargs = luaL_getn(l, j + 1);
+	    subargs = luaL_getn(l, -1);
 	    for (k = 0; k < subargs; ++k) {
-		lua_rawgeti(l, j + 1, k + 1);
+		lua_rawgeti(l, -1, k + 1);
 		s2 = LuaToString(l, -1);
+		lua_pop(l, 1);
 		s1 = realloc(s1, strlen(s1) + strlen(s2) + 2);
 		strcat(s1, s2);
 		strcat(s1, ",");
@@ -6527,6 +6530,7 @@ local int CclDefineButton(lua_State* l)
 	    lua_pushfstring(l, "Unsupported tag: %s", value);
 	    lua_error(l);
 	}
+	lua_pop(l, 1);
     }
     AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 	ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
