@@ -1196,7 +1196,7 @@ local void AiCollectResources(void)
 		    switch( c ) {
 			case GoldCost:
 			    if( AiMineGold(unit) ) {
-				DebugLevel0Fn("Assigned\n");
+				DebugLevel3Fn("Assigned\n");
 				assigned[an[c]++][c]=unit;
 				++total;
 			    }
@@ -1210,7 +1210,7 @@ local void AiCollectResources(void)
 			    break;
 			case OilCost:
 			    if( AiHaulOil(unit) ) {
-				DebugLevel0Fn("Assigned\n");
+				DebugLevel3Fn("Assigned\n");
 				assigned[an[c]++][c]=unit;
 				++total;
 			    }
