@@ -448,6 +448,22 @@ local SCM CclPlayMusic(SCM name)
 }
 
 /**
+**	Play a sound file.
+**
+**	@param name	Name of the sound file to play.
+*/
+local SCM CclPlayFile(SCM name)
+{
+    char* filename;
+
+    filename=gh_scm2newstr(name,NULL);
+    PlayFile(filename);
+    free(filename);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Stop playing music.
 */
 local SCM CclStopMusic(void)
@@ -482,6 +498,7 @@ global void SoundCclRegister(void)
     init_subr_1("play-sound",CclPlaySound);
 
     gh_new_procedure1_0("play-music",CclPlayMusic);
+    gh_new_procedure1_0("play-file",CclPlayFile);
     gh_new_procedure0_0("stop-music",CclStopMusic);
 }
 
@@ -614,6 +631,16 @@ local SCM CclPlayMusic(SCM name __attribute__((unused)))
 }
 
 /**
+**	Play a sound file.
+**
+**	@param name	Name of the sound file to play.
+*/
+local SCM CclPlayFile(SCM name __attribute__((unused)))
+{
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for sound. Dummy version.
 */
 global void SoundCclRegister(void)
@@ -632,6 +659,7 @@ global void SoundCclRegister(void)
     gh_new_procedure2_0("set-sound-range!",CclSetSoundRange);
 
     gh_new_procedure1_0("play-music",CclPlayMusic);
+    gh_new_procedure1_0("play-file",CclPlayFile);
 }
 
 #endif	// } !WITH_SOUND
