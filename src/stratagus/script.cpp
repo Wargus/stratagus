@@ -2046,11 +2046,11 @@ global void SavePreferences(void)
 	if (ui_group_keys[i]!='"') {
 	    fprintf(fd, "%c", ui_group_keys[i]);
 	} else {
-	    fprintf(fd, "\"");
+	    fprintf(fd, "\\\"");
 	}
 	i++;
     }
-    fprintf(fd, "\"\n");
+    fprintf(fd, "\")\n");
     
     fclose(fd);
 #elif defined(USE_LUA)
