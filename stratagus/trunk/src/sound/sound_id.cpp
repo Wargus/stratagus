@@ -10,7 +10,7 @@
 //
 /**@name sound_id.c	-	The sound id. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
 //
 //	it under the terms of the GNU General Public License as published
 //	by the Free Software Foundation; only version 2 of the License.
@@ -82,7 +82,7 @@ global void DisplaySoundHashTable(void)
     fprintf(stdout,"FIXME: not written\n");
     fprintf(stdout,"Sound HashTable End\n");
 
-    hash_stat(SoundIdHash, &st); 
+    hash_stat(SoundIdHash, &st);
     printf("nelem   : %d\n", st.nelem);
     printf("hashsize: %d\n", st.hashsize);
     printf("maxdepth: %d\n", st.maxdepth);
@@ -176,7 +176,7 @@ global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 	return *result;
     }
 
-    sound=RegisterTwoGroups(first, second);
+    sound = RegisterTwoGroups(first, second);
     MapSound(name, sound);
 
     return sound;
