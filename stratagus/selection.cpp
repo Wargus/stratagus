@@ -187,7 +187,7 @@ global int SelectUnitsByType(Unit* base)
 
     type=base->Type;
 
-    DebugLevel3Fn(" (%d)\n",base->UnitType->Type);
+    DebugLevel3Fn(" %s\n",base->Type->Ident);
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
