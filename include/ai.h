@@ -38,7 +38,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int AiSleep;			/// Ai sleeps # frames
+extern int AiSleepCycles;		/// Ai sleeps # cycles
 extern int AiTimeFactor;		/// Adjust the AI build times
 extern int AiCostFactor;		/// Adjust the AI costs
 
