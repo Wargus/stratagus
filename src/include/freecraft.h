@@ -128,6 +128,8 @@
 #pragma warning(disable:4244)		// Conversion from double to uchar
 #pragma warning(disable:4761)		// Integral size mismatch
 #define snprintf _snprintf		/// Unix -> dumm
+#include <string.h>
+#define strdup _strdup
 #endif
 
 
