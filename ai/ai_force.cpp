@@ -382,6 +382,13 @@ local void AiLoadForce(AiForce* force)
 	aiunit=aiunit->Next;
     }
 
+    if( !n ) {
+	DebugLevel0Fn("No transporter, lost or error in code?\n");
+	force->MustTransport=0;
+	force->State=0;
+	return;
+    }
+
     //
     //	Load all on transporter.
     //
@@ -412,6 +419,7 @@ local void AiLoadForce(AiForce* force)
 	}
 	aiunit=aiunit->Next;
     }
+
     if( !f ) {
 	DebugLevel0Fn("All are loaded\n");
 	++force->State;
