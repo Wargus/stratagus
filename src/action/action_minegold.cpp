@@ -80,7 +80,6 @@ local int MoveToGoldMine(Unit* unit)
     // we should check if there's still some gold left in the mine instead.
     DebugCheck( !destu->Refs );
     --destu->Refs;
-    DebugLevel0Fn("Refs remaining %d\n",destu->Refs);
     DebugCheck( !destu->Refs );
     unit->Command.Data.Move.Goal=NoUnitP;
 
