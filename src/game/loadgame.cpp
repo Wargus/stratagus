@@ -258,12 +258,12 @@ global void LoadGame(char* filename)
 global void LoadAll(void)
 {
 #if 1
-	SaveGame("save_file_of_stratagus0.ccl");
-	LoadGame("save_file_of_stratagus0.ccl");
-	SaveGame("save_file_of_stratagus1.ccl");
-	LoadGame("save_file_of_stratagus1.ccl");
-	SaveGame("save_file_of_stratagus2.ccl");
-	LoadGame("save_file_of_stratagus2.ccl");
+	SaveGame("save_file_stratagus0.sav");
+	LoadGame("save_file_stratagus0.sav");
+	SaveGame("save_file_stratagus1.sav");
+	LoadGame("save_file_stratagus1.sav");
+	SaveGame("save_file_stratagus2.sav");
+	LoadGame("save_file_stratagus2.sav");
 #endif
 #if 0
 	LoadGame ("save_file_of_stratagus.ccl");

@@ -610,6 +610,7 @@ local void SaveAiHelper(CLFile* file)
 */
 local void SaveAiType(CLFile* file, const AiType* aitype)
 {
+	return;
 	if (aitype->Next) {
 		SaveAiType(file, aitype->Next);
 	}
