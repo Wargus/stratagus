@@ -284,6 +284,7 @@ global void CreatePlayer(int type)
     //  Allocate memory for the "list" of this player's units.
     //  FIXME: brutal way, as we won't need UnitMax for this player...
     //	FIXME: ARI: is this needed for 'PlayerNobody' ??
+    //	FIXME:	A: Johns: currently we need no init for the nobody player.
     if( !(player->Units=(Unit**)calloc(UnitMax,sizeof(Unit*))) ) {
 	DebugLevel0("Not enough memory to create player %d.\n",NumPlayers);
 	return;
