@@ -994,6 +994,13 @@ global int UnitVisibleOnScreen(const Unit* unit)
 
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
+    if (!ThisPlayer) {
+	//FIXME: ARI: Added here for early game setup state by MakeAndPlaceUnit()
+	//            from LoadMap(). ThisPlayer not yet set, so don't show anything
+	//            until first real map-draw.
+	return 0;
+    }
+
     if( unit->Player != ThisPlayer ) {
 	//FIXME: vladi: should handle teams and shared vision
 	// Invisible by spell
