@@ -117,6 +117,7 @@ local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameSetupExit(Menuitem *mi);	// master exit
 local void MultiGameDrawFunc(Menuitem *mi);
 local void MultiGameFWSAction(Menuitem *mi, int i);
+local void MultiGamePTSAction(Menuitem *mi, int o);
 local void NetMultiPlayerDrawFunc(Menuitem *mi);
 local void MultiGamePlayerSelectorsUpdate(int initial);
 local void MultiScenSelectMenu(void);
@@ -425,7 +426,7 @@ local Menuitem NetCreateJoinMenuItems[] = {
 */
 local Menuitem NetMultiButtonStorage[] = {
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, 0, 0, 0, 0} } },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
 	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
 };
@@ -1853,6 +1854,19 @@ local void MultiGameFWSAction(Menuitem *mi __attribute__((unused)), int i)
     NetworkServerResyncClients();
 }
 
+local void MultiGamePTSAction(Menuitem *mi, int o)
+{
+    int i;
+
+    i = mi - NetMultiSetupMenuItems - 5;
+    if (i > 0 && i < 8) {
+	if (mi->d.pulldown.curopt == o) {
+	    ServerSetupState.CompOpt[i] = o;
+	    NetworkServerResyncClients();
+	}
+    }
+}
+
 local void MultiGameDrawFunc(Menuitem *mi)
 {
     GameDrawFunc(mi);
@@ -1952,8 +1966,16 @@ local void MultiClientUpdate(int initial)
     for (i = 1; i < 8; i++) {
 	if (Hosts[i].PlyNr) {
 	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[1];
+	    if (i == NetLocalHostsSlot) {
+		NetMultiClientMenuItems[22 + i].d.gem.state = 0;
+	    } else {
+		NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	    }
 	} else {
 	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[0];
+	    NetMultiClientMenuItems[5 + i].d.pulldown.state = MI_PSTATE_PASSIVE;
+	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+	    NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
 	}
 	NetMultiClientMenuItems[5 + i].yofs = 32 + i * 22;
 
@@ -2137,9 +2159,8 @@ global void NetConnectForceDisplayUpdate(void)
 global void NetClientUpdateState(void)
 {
 #if 0
-    // FIXME: Handle RACES!!!!!
-    GameSettings.Presets[0].Race = v[i];
-    ServerSetupState.Race[0] = i;
+    // FIXME: Handle RACES -> Not visible! Delayed to final InitConfig msg...
+    GameSettings.Presets[0].Race = ServerSetupState.Race[0];
 #endif
 
     GameRESAction(NULL, ServerSetupState.ResOpt);
