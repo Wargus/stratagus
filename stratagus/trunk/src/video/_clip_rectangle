@@ -104,72 +104,76 @@
 **    }
 */
 {
-  int f, left, right, top, bottom;
+	int f;
+	int left;
+	int right;
+	int top;
+	int bottom;
 
-// Ensure non-empty rectangle
-  if ( !(_w && _h ) ) {
-    return;                      // rectangle is `void'
-  }
+	// Ensure non-empty rectangle
+	if (!(_w && _h)) {
+		return;                      // rectangle is `void'
+	}
 
-// Clip rectangle boundary
-  left=right=top=bottom=1;
+	// Clip rectangle boundary
+	left = right = top = bottom = 1;
 
-  if( _x<ClipX1 ) {            // no left side
-    f=ClipX1-_x;
-    if ( _w<=f ) {
-      return;                    // entire rectangle left --> not visible
-    }
-    _w-=f;
-    _x=ClipX1;
-    left=0;
-  }
-  if( (_x+_w)>ClipX2+1 ) {     // no right side
-    if( _x>ClipX2 ) {
-      return;                    // entire rectangle right --> not visible
-    }
-    _w=ClipX2-_x+1;
-    right=0;
-  }
-  if( _y<ClipY1 ) {               // no top
-    f=ClipY1-_y;
-    if( _h<=f ) {
-      return;                    // entire rectangle above --> not visible
-    }
-    _h-=f;
-    _y=ClipY1;
-    top=0;
-  }
-  if( (_y+_h)>ClipY2+1 ) {    // no bottom
-    if( _y>ClipY2 ) {
-        return;                  // entire rectangle below --> not visible
-    }
-    _h=ClipY2-_y+1;
-    bottom=0;
-  }
+	if (_x < ClipX1) {            // no left side
+		f = ClipX1 - _x;
+		if (_w <= f) {
+			return;                    // entire rectangle left --> not visible
+		}
+		_w -= f;
+		_x = ClipX1;
+		left = 0;
+	}
+	if ((_x + _w) > ClipX2 + 1) {     // no right side
+		if (_x > ClipX2) {
+			return;                    // entire rectangle right --> not visible
+		}
+		_w = ClipX2 - _x + 1;
+		right = 0;
+	}
+	if (_y < ClipY1) {               // no top
+		f = ClipY1 - _y;
+		if (_h <= f) {
+			return;                    // entire rectangle above --> not visible
+		}
+		_h -= f;
+		_y = ClipY1;
+		top = 0;
+	}
+	if ((_y + _h) > ClipY2 + 1) {    // no bottom
+		if (_y > ClipY2) {
+			return;                  // entire rectangle below --> not visible
+		}
+		_h = ClipY2 - _y + 1;
+		bottom = 0;
+	}
 
-// Draw (part of) rectangle sides
-// Note: _hline and _vline should be able to handle zero width/height
-  if ( top ) {
-    _hline(_x,_y,_w);
-    if  ( ! --_h ) {
-      return;                    // rectangle as horizontal line
-    }
-    _y++;
-  }
-  if ( bottom ) {
-    _hline(_x,_y+_h-1,_w);
-    _h--;
-  }
-  if ( left ) {
-    _vline(_x,_y,_h);
-    if  ( ! --_w ) {
-      return;                    // rectangle as vertical line
-    }
-    _x++;
-  }
-  if ( right ) {
-    _vline(_x+_w-1,_y,_h);
-  }
+	// Draw (part of) rectangle sides
+	// Note: _hline and _vline should be able to handle zero width/height
+	if (top) {
+		_hline(_x, _y, _w);
+		if (!--_h) {
+			return;                    // rectangle as horizontal line
+		}
+		++_y;
+	}
+	if (bottom) {
+		_hline(_x, _y + _h - 1, _w);
+		--_h;
+	}
+	if (left) {
+		_vline(_x, _y, _h);
+		if (!--_w) {
+			return;                    // rectangle as vertical line
+		}
+		++_x;
+	}
+	if (right) {
+		_vline(_x + _w - 1, _y, _h);
+	}
 }
 
 //@}
