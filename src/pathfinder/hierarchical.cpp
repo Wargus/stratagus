@@ -333,14 +333,20 @@ local int PfHierGetPrecomputed (Unit *unit, int *dx, int *dy)
 //	if (TheMap.Fields[neigho].Flags & MapFieldLandUnit) {
 	if ( !UnitCanMoveTo (unit->X + *dx, unit->Y + *dy, unit)) {
 		/* this means that a unit of the same type blocks the field */
+
 		Unit *obstacle = UnitOnMapTile (unit->X + *dx, unit->Y + *dy);
+
+		/* FIXME this is temporary substitution for a still missing path
+		 * execution code. */
+		return -2;	/* PF_UNREACHABLE */
+
 		if (obstacle->Moving || (obstacle->Wait &&
 								obstacle->Orders[0].Action == UnitActionMove)) {
 			int odx, ody;
 			if (UnitGetNextPathSegment (obstacle, &odx, &ody)) {
 				if ((obstacle->X + odx == unit->X) &&
 						(obstacle->Y + ody == unit->Y)) {
-					printf ("deadlock detected!!!\n");
+					//printf ("deadlock detected!!!\n");
 					if (ResolveDeadlock (unit, obstacle, dx, dy))
 						return 1;	/* PF_MOVE */
 					else
@@ -480,6 +486,7 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 	int x, y;
 	unsigned short *GrpsToRecompute=NULL;
 	int RecomputeGroups = RegGroupRecomputationNeeded (x0, y0, x1, y1);
+	int OldNumRegions = RegionSetGetNumRegions ();
 
 	printf ("MapChanged: (%d,%d)->(%d,%d), groups %s need to be recomputed\n",
 					x0, y0, x1, y1, RecomputeGroups ? "" : "don't");
@@ -530,6 +537,11 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 		RegGroupSetInitialize ();
 	} else {
 		RestoreGroupIds (ax0, ay0, ax1, ay1);
+	}
+	if (OldNumRegions < RegionSetGetNumRegions ()) {
+		/* number of Regions inceased due to this map change, tell the
+		 * highlevel pathfinder. */
+		HighlevelInit ();
 	}
 	ts1 = rdtsc ();
 	printf ("PfHierMapChangedCallback(): %d cycles.\n", ts1-ts0);
