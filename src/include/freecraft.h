@@ -274,16 +274,16 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.17.2"		/// Engine version shown
+#define VERSION	"1.18pre1"		/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion
     /// FreeCraft major version
 #define FreeCraftMajorVersion	1
     /// FreeCraft minor version (maximal 99)
-#define FreeCraftMinorVersion	17
+#define FreeCraftMinorVersion	18
     /// FreeCraft patch level (maximal 99)
-#define FreeCraftPatchLevel	2
+#define FreeCraftPatchLevel	0
     /// FreeCraft version (1,2,3) -> 10203
 #define FreeCraftVersion \
 	(FreeCraftMajorVersion*10000+FreeCraftMinorVersion*100 \
@@ -478,7 +478,6 @@ extern jmp_buf main_loop;
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load
 
-extern void SaveAll(void);		/// Call all modules to save states
 extern void LoadAll(void);		/// Load all data back
 
 extern void InitSyncRand(void);		/// Initialize the syncron rand
