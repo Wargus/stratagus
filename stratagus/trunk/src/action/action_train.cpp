@@ -146,6 +146,9 @@ void HandleActionTrain(Unit* unit)
 		nunit->X = unit->X;
 		nunit->Y = unit->Y;
 
+		// New unit might supply food
+		UpdateForNewUnit(nunit, 0);
+
 		DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
 
 		// Set life span
