@@ -284,15 +284,25 @@ static int AStarFindNode(int eo)
 
 /**
 ** Compute the cost of crossing tile (dx,dy)
-** -1 -> impossible to cross
+**
+**  @param unit  unit which move.
+**  @param ex    X tile where to move.
+**  @param ey    Y tile where to move.
+**  @param mask  mask movement of the unit.
+**  @param current_cost  FIXME : unused.
+**
+**   @return -1 -> impossible to cross.
 **  0 -> no induced cost, except move
 ** >0 -> costly tile
+**
+**  @todo FIXME : use current_cost or remove this attribut.
 */
-static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
-	int j;
-	int cost;
+static int CostMoveTo(const Unit* unit, int ex, int ey, int mask, int current_cost) {
+	int i;     // iterator on tilesize.
+	int j;     // iterator on tilesize.
+	int flag;  // flag of the map.
+	int cost;  // result cost.
 	Unit* goal;
-
 	cost = 0;
 
 	// Doesn't cost anything to move to ourselves :)
@@ -300,33 +310,42 @@ static int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 	if (unit->X == ex && unit->Y == ey) {
 		return 0;
 	}
-	j = TheMap.Fields[ex + ey * TheMap.Info.MapWidth].Flags & mask;
-	if( j && (AStarKnowUnknown
-			|| IsMapFieldExplored(unit->Player, ex, ey)) ) {
-		if( j & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) ) {
-			// we can't cross fixed units and other unpassable things
-			return -1;
-		}
-		goal = UnitCacheOnXY(ex, ey, unit->Type->UnitType);
-		if (!goal) {
-			// Shouldn't happen, mask says there is something on this tile
-			Assert(0);
-			return -1;
-		}
-		if (goal->Moving)  {
-			// moving unit are crossable
-			cost += AStarMovingUnitCrossingCost;
-		} else {
-			// for non moving unit Always Fail
-			// FIXME: Need support for moving a fixed unit to add cost
-			return -1;
-			cost += AStarFixedUnitCrossingCost;
-		}
+	// Out of bound.
+	if (TheMap.Info.MapWidth <= ex + unit->Type->TileWidth
+		|| TheMap.Info.MapHeight <= ey + unit->Type->TileHeight) {
+		return -1;
 	}
-	// Add cost of crossing unknown tiles if required
-	if (!AStarKnowUnknown && !IsMapFieldExplored(unit->Player, ex, ey) ) {
-		// Tend against unknown tiles.
-		cost += AStarUnknownTerrainCost;
+	// verify each tile of the unit.
+	for (i = ex; i < ex + unit->Type->TileWidth; i++) {
+		for (j = ey; j < ey + unit->Type->TileHeight; j++) {
+			flag = TheMap.Fields[i + j * TheMap.Info.MapWidth].Flags & mask;
+			if(flag && (AStarKnowUnknown || IsMapFieldExplored(unit->Player, i, j)) ) {
+				if(flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
+					// we can't cross fixed units and other unpassable things
+					return -1;
+				}
+				goal = UnitCacheOnXY(i, j, unit->Type->UnitType);
+				if (!goal) {
+					// Shouldn't happen, mask says there is something on this tile
+					Assert(0);
+					return -1;
+				}
+				if (goal->Moving)  {
+					// moving unit are crossable
+					cost += AStarMovingUnitCrossingCost;
+				} else {
+					// for non moving unit Always Fail
+					// FIXME: Need support for moving a fixed unit to add cost
+					return -1;
+					cost += AStarFixedUnitCrossingCost;
+				}
+			}
+			// Add cost of crossing unknown tiles if required
+			if (!AStarKnowUnknown && !IsMapFieldExplored(unit->Player, i, j) ) {
+				// Tend against unknown tiles.
+				cost += AStarUnknownTerrainCost;
+			}
+		}
 	}
 	return cost;
 }
@@ -779,12 +798,12 @@ int NextPathElement(Unit* unit,int* pxd,int *pyd)
 	*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
 	result=unit->Data.Move.Length;
 	unit->Data.Move.Length--;
-	if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
+	if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
 		result=NewPath(unit);
 		if( result>0 ) {
 			*pxd=Heading2X[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
 			*pyd=Heading2Y[(int)unit->Data.Move.Path[(int)unit->Data.Move.Length-1]];
-			if( !CheckedCanMoveToMask(*pxd+unit->X,*pyd+unit->Y,UnitMovementMask(unit)) ) {
+			if (!UnitCanBeAt(unit, *pxd + unit->X, *pyd + unit->Y)) {
 				// There may be unit in the way, Astar may allow you to walk onto it.
 				result=PF_UNREACHABLE;
 				*pxd=0;

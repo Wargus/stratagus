@@ -630,7 +630,7 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 	RemoveUnit(target, NULL);
 	for (i = 0; i < type->TileWidth; ++i) {
 		for (j = 0; j < type->TileHeight; ++j) {
-			if (!UnitTypeCanMoveTo(x + i, y + j, type)) {
+			if (!UnitTypeCanBeAt(type, x + i, y + j)) {
 				PlaceUnit(target, target->X, target->Y);
 				return 0;
 			}

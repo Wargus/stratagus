@@ -642,7 +642,7 @@ static void UpdateUnitSightRange(Unit* unit)
 **
 **  @param unit    unit to mark.
 */
-static void MarkUnitFieldFlags(const Unit* unit)
+void MarkUnitFieldFlags(const Unit* unit)
 {
 	UnitType* type; // Type of the unit.
 	unsigned flags; //
@@ -676,7 +676,7 @@ static void MarkUnitFieldFlags(const Unit* unit)
 **
 **  @param unit    unit to mark.
 */
-static void UnmarkUnitFieldFlags(const Unit* unit)
+void UnmarkUnitFieldFlags(const Unit* unit)
 {
 	UnitType* type; // Type of the unit.
 	unsigned flags; //
@@ -790,10 +790,13 @@ static void UnitInXY(Unit* unit, int x, int y)
 */
 void MoveUnitToXY(Unit* unit, int x, int y)
 {
+	Assert(unit);
+
 	MapUnmarkUnitSight(unit);
 	UnitCacheRemove(unit);
 	UnmarkUnitFieldFlags(unit);
 
+	Assert(UnitCanBeAt(unit, x, y));
 	// Move the unit.
 	UnitInXY(unit, x, y);
 
@@ -801,9 +804,6 @@ void MoveUnitToXY(Unit* unit, int x, int y)
 	MarkUnitFieldFlags(unit);
 	MapMarkUnitSight(unit);
 }
-
-
-
 
 /**
 ** Place unit on map.
