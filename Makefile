@@ -39,7 +39,7 @@ INCLUDE_DIRS = src/include src/movie/vp31/include
 
 MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
-          src/video etlib src
+          src/video etlib
 
 MODULES_TOOLS = tools
 
