@@ -767,7 +767,7 @@ local int CclAiForce(lua_State* l)
 		//
 		for (prev = &AiPlayer->Force[force].UnitTypes; (aiut = *prev);
 				prev = &aiut->Next) {
-			if (UnitTypeEquivs[aiut->Type->Slot] == type->Slot) { // found
+			if (aiut->Type->Slot == type->Slot) { // found
 				if (count) {
 					aiut->Want = count;
 				} else {
