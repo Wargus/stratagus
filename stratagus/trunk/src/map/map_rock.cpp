@@ -26,6 +26,7 @@
 #include "freecraft.h"
 #include "map.h"
 #include "minimap.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -139,8 +140,13 @@ global void MapRemoveRock(unsigned x,unsigned y)
     UpdateMinimapXY(x,y);		// FIXME: should be done if visible?
 
     // Must redraw map only if field is visibile
+#ifdef NEW_FOW
+    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+#else
     if( mf->Flags&MapFieldVisible ) {
+#endif
 	MustRedraw|=RedrawMaps;
+	// FIXME: Should we do this? MapMarkSeenTile(x,y);
     }
 }
 

@@ -214,7 +214,6 @@ global void DrawMinimap(int vx,int vy)
     static int RedPhase;
     int mx;
     int my;
-    int flags;
     int x;
     int y;
 #ifdef NEW_UNIT
@@ -232,6 +231,12 @@ global void DrawMinimap(int vx,int vy)
     int h;
     int h0;
 #endif
+#ifdef NEW_FOW
+    int bits;
+    MapField* mf;
+#else
+    int flags;
+#endif
 
     RedPhase^=1;
 
@@ -245,9 +250,22 @@ global void DrawMinimap(int vx,int vy)
     //
     //	Draw the terrain
     //
+#ifdef NEW_FOW
+    bits=(1<<ThisPlayer->Player);
+#endif
     if( MinimapWithTerrain ) {
 	for( my=0; my<MINIMAP_H; ++my ) {
 	    for( mx=0; mx<MINIMAP_W; ++mx ) {
+#ifdef NEW_FOW
+		mf=TheMap.Fields+Minimap2MapX[mx]+Minimap2MapY[my];
+		if( (mf->Explored&bits)
+			&& ( (mf->Visible&bits)
+			    || TheMap.NoFogOfWar
+			    || ((mx&1)==(my&1)) ) ) {
+		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
+			    ,x+mx,y+my);
+		}
+#else
 		flags=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Flags;
 		if( flags&MapFieldExplored &&
 			( (flags&MapFieldVisible)
@@ -255,6 +273,7 @@ global void DrawMinimap(int vx,int vy)
 		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
 			    ,x+mx,y+my);
 		}
+#endif
 	    }
 	}
     }
@@ -271,6 +290,17 @@ global void DrawMinimap(int vx,int vy)
 
 	unit=*table;
 
+#ifdef NEW_FOW
+	mf=TheMap.Fields+unit->X+unit->Y*TheMap.Width;
+	// Draw only units on explored fields
+	if( !(mf->Explored&bits) ) {
+	    continue;
+	}
+	// Draw only units on visible fields
+	if( !TheMap.NoFogOfWar && !(mf->Visible&bits) ) {
+	    continue;
+	}
+#else
 	flags=TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags;
 	// Draw only units on explored fields
 	if( !(flags&MapFieldExplored) ) {
@@ -280,6 +310,7 @@ global void DrawMinimap(int vx,int vy)
 	if( !TheMap.NoFogOfWar && !(flags&MapFieldVisible) ) {
 	    continue;
 	}
+#endif
 	// FIXME: buildings under fog of war.
 	// FIXME: submarine not visible
 

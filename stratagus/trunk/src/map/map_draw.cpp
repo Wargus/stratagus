@@ -1090,6 +1090,8 @@ global void DrawMapBackground(int x,int y)
 		//	draw only tiles which must be drawn
 		//
 		if( *redraw_tile++) {
+		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
+#if 0
 		    if (TheMap.Fields[sx].Flags&MapFieldExplored) {
 			MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
 		    } else {
@@ -1097,6 +1099,7 @@ global void DrawMapBackground(int x,int y)
 			// FIXME: must write better code for this
 			MapDrawTile(TheMap.Fields[sx].Tile,dx,dy);
 		    }
+#endif
 		}
 		++sx;
 		dx+=TileSizeX;
@@ -1123,7 +1126,8 @@ global void DrawMapBackground(int x,int y)
 **	Initialise the fog of war.
 **	Build tables, setup functions.
 */
-void InitMap(void) {
+void InitMap(void)
+{
     switch( VideoDepth ) {
 	case 15:
 	case 16:

@@ -210,9 +210,20 @@ global void RevealMap(void)
 
     for ( ix = 0; ix < TheMap.Width; ix++ ) {
 	for ( iy = 0; iy < TheMap.Height; iy++ ) {
+#ifdef NEW_FOW
+	    int m;
+
+	    m=(1<<ThisPlayer->Player);
+	    TheMap.Fields[ix+iy*TheMap.Width].Explored|=m;
+	    if( TheMap.NoFogOfWar ) {
+		TheMap.Fields[ix+iy*TheMap.Width].Visible|=m;
+	    }
+	    // FIXME: Set Mask.
+#else
 	    TheMap.Fields[ix+iy*TheMap.Width].Flags
 		    |= MapFieldExplored
 			| TheMap.NoFogOfWar ? MapFieldVisible : 0;
+#endif
 	    MapMarkSeenTile(ix,iy);
 	}
     }

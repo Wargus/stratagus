@@ -175,8 +175,15 @@ extern void InitMap(void);
 //
 //	in map_fog.c
 //
+#ifdef NEW_FOW
+    /// Mark the sight in range
+extern void MapMarkSight(const Player*,int,int,int);
+    /// Mark the new sight in range
+extern void MapMarkNewSight(const Player*,int,int,int,int,int);
+#else
     /// Mark the sight in range
 extern void MapMarkSight(int tx,int ty,int range);
+#endif
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
     /// Draw the map fog of war

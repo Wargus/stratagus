@@ -442,7 +442,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
     //
     //	Update fog of war.
     //
-    MapMarkSight(x,y,unit->Stats->SightRange);
+    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
 #else
     //
     //	Update fog of war, if unit belongs to player on this computer
@@ -1349,10 +1349,19 @@ found:
     }
     unit->Removed=0;
 
+#ifdef NEW_FOW
+    //
+    //	Update fog of war.
+    //
+    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+#else
+    //
     //	Update fog of war, if unit belongs to player on this computer
-    if( unit->Player==ThisPlayer ) {
+    //
+    if( player==ThisPlayer ) {
 	MapMarkSight(x,y,unit->Stats->SightRange);
     }
+#endif
 
     MustRedraw|=RedrawMinimap;
     if( UnitVisible(unit) ) {
@@ -1447,9 +1456,19 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    unit->Removed=0;
 	    UnitCacheInsert(unit);
 
-	    if( unit->Player==ThisPlayer ) {
+#ifdef NEW_FOW
+	    //
+	    //	Update fog of war.
+	    //
+	    MapMarkSight(unit->Player,bestx,besty,unit->Stats->SightRange);
+#else
+	    //
+	    //	Update fog of war, if unit belongs to player on this computer
+	    //
+	    if( player==ThisPlayer ) {
 		MapMarkSight(bestx,besty,unit->Stats->SightRange);
 	    }
+#endif
 
 	    MustRedraw|=RedrawMinimap;
 	    if( UnitVisible(unit) ) {
