@@ -56,7 +56,7 @@
 #include "sound.h"
 #include "ccl.h"
 
-#ifdef USE_SDLCD
+#ifdef USE_SDLCD || USE_SDLA
 #include "SDL.h"
 #endif
 
