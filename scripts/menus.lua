@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: menus.lua,v 1.6 2004/08/12 22:25:32 feb Exp $
+--	$Id$
 
 --
 -- load the keystroke helps
@@ -80,7 +80,7 @@ DefineMenuItem("pos", { 16, 40 + (36 * 2)}, "font", "large",
   "menu", "menu-game")
 DefineMenuItem("pos", { 16, 40 + (36 * 3)}, "font", "large",
   "button", {
-    "caption", "Scenario ~!Objectives",
+    "caption", "~!Objectives",
     "hotkey", "o",
     "func", "objectives-menu",
     "style", "gm-full"},
@@ -189,7 +189,7 @@ DefineMenuItem("pos", { 162, 80}, "font", "large",
 DefineMenu("name", "menu-select-scenario", "geometry", {144, 64, 352, 352},
   "panel", "panel5", "background", MenuBackground, "default", 4)
 DefineMenuItem("pos", { 176, 8}, "font", "large", "init", "scen-select-init",
-  "text", {"caption", "Select scenario", "align", "center"},
+  "text", {"caption", "Select map", "align", "center"},
   "menu", "menu-select-scenario")
 DefineMenuItem("pos", { 24, 140}, "font", "game", "init", "scen-select-lb-init", "exit", "scen-select-lb-exit",
   "listbox", {"size", {288, 108},
@@ -225,7 +225,7 @@ DefineMenuItem("pos", { 140, 40}, "font", "game",
   "pulldown",  {"size", {192, 20},
     "style", "pulldown",
     "func", "scen-select-tpms-action",
-    "options", {"Stratagus scenario (cm)", "Foreign scenario (pud)" },
+    "options", {"Stratagus map (smp)", "Foreign map (pud)" },
     "default", 1,
     "current", 1},
   "menu", "menu-select-scenario")
@@ -422,7 +422,7 @@ DefineMenuItem("pos", { (640 / 2) + 12, 192}, "font", "large",
   "menu", "menu-custom-game")
 DefineMenuItem("pos", { 640 - 224 - 16, 360 + (36 * 0)}, "font", "large",
   "button", {
-    "caption", "S~!elect Scenario",
+    "caption", "S~!elect Map",
     "hotkey", "e",
     "func", "scen-select-menu",
     "style", "gm-full"},
@@ -631,7 +631,7 @@ DefineMenuItem("pos", { (640 / 2) + 12, 8}, "font", "large",
   "menu", "menu-multi-setup")
 DefineMenuItem("pos", { 640 - 224 - 16, 360 + (36 * 0)}, "font", "large",
   "button", {
-    "caption", "S~!elect Scenario",
+    "caption", "S~!elect Map",
     "hotkey", "e",
     "func", "multi-scen-select",
     "style", "gm-full"},
