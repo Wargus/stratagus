@@ -251,6 +251,7 @@ global void LoadGame(char* filename)
     gh_load(filename);
     CclGarbageCollect(0);
 #elif defined(USE_LUA)
+    LuaLoadFile(filename);
 #endif
 
     game_cycle = GameCycle;
