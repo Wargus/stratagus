@@ -2299,6 +2299,9 @@ local void GameMenuReturn(void)
     GamePaused = 0;
 }
 
+local char *SaveDir;
+local int TypedFileName;
+
 /**
 **	FIXME: docu.
 */
@@ -2312,9 +2315,8 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 	    EndMenu();
 	}
     }
+    TypedFileName = 1;
 }
-
-local char *SaveDir;
 
 local void SaveAction(void)
 {
@@ -2323,7 +2325,8 @@ local void SaveAction(void)
     size_t nameLength;
 
     nameLength = strlen(name);
-    nameLength -= 3;
+    if (TypedFileName)
+	nameLength -= 3;
     if ( (filename = malloc(256)) == NULL)
     {
         fprintf(stderr,
@@ -2470,7 +2473,7 @@ local void SaveSelectLBAction(Menuitem *mi, int i)
 	    SaveGameMenuItems[4].flags = MenuButtonDisabled;
 	}
     }
-
+    TypedFileName = 0;
 }
 
 local void SaveSelectVSAction(Menuitem *mi, int i)
@@ -2555,6 +2558,7 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 	default:
 	    break;
     }
+    TypedFileName = 0;
 }
 
 local void GameMenuLoad(void)
