@@ -128,9 +128,6 @@ local SCM CclDefineUnitType(SCM list)
 	type->_RegenerationRate = 0;
     }
     type->NumDirections = 8;
-#ifdef NEW_UI
-    type->AddButtonsHook = NIL;
-#endif
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -596,13 +593,6 @@ local SCM CclDefineUnitType(SCM list)
 		    errl("Unsupported sound tag", value);
 		}
 	    }
-#ifdef NEW_UI
-	} else if (gh_eq_p(value, gh_symbol2scm("add-buttons"))) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    CclGcProtect(value);
-	    type->AddButtonsHook = value;
-#endif
 	} else {
 	   // FIXME: this leaves a half initialized unit-type
 	   printf("\n%s\n",type->Name);
