@@ -406,6 +406,39 @@ global int CLseek(CLFile* file, long offset, int whence)
 	return ret;
 }
 
+/**
+**		CLtell			Library file tell
+**
+**		@param file		CLFile pointer.
+*/
+global long CLtell(CLFile* file)
+{
+	int tp;
+	int ret;
+
+	ret = -1;
+
+	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+		if (tp == CLF_TYPE_PLAIN) {
+			ret = ftell(file->cl_plain);
+		}
+#ifdef USE_ZLIB
+		if (tp == CLF_TYPE_GZIP) {
+			ret = gztell(file->cl_gz);
+		}
+#endif		// USE_ZLIB
+#ifdef USE_BZ2LIB
+		if (tp == CLF_TYPE_BZIP2) {
+			// FIXME: need to implement this
+			ret = -1;
+		}
+#endif		// USE_BZ2LIB
+	} else {
+		errno = EBADF;
+	}
+	return ret;
+}
+
 #endif		// USE_ZLIB || USE_BZ2LIB
 
 /**
