@@ -6,11 +6,11 @@
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
 //			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//      Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mad.c			-	mp3 support with libmad */
+/**@name mad.c - mp3 support with libmad */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer
+//      (c) Copyright 2002-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,9 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
-
-//	FIXME: JOHNS: MP3 streaming did not yet work.
+//      $Id$
 
 //@{
 
@@ -53,25 +51,17 @@
 --		Declaration
 ----------------------------------------------------------------------------*/
 
-/**
-**		My user data for mad callbacks.
-*/
-typedef struct _mad_user_ {
-	CLFile* File;						// File handle
-	Sample* Sample;						// Sample buffer
-	unsigned char Buffer[4096];				// Decoded buffer
-} MyUser;
+#define MAD_INBUF_SIZE 32768
 
 /**
 **		Private mp3 data structure to handle mp3 streaming.
 */
 typedef struct _mp3_data_ {
-	char*				PointerInBuffer;		/// Pointer into buffer
-	struct mad_decoder		Decoder[1];				/// Mad decoder handle
-	MyUser				User[1];				/// Decoder user data
-} Mp3Data;
-
-#define MP3_BUFFER_SIZE  (12 * 1024)				/// Buffer size to fill
+	struct mad_decoder MadDecoder;           /// Mad decoder handle
+	CLFile* MadFile;                         /// File handle
+	unsigned char Buffer[MAD_INBUF_SIZE];    /// Input buffer
+	int BufferLen;                           /// Length of filled buffer
+} MadData;
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -83,34 +73,33 @@ typedef struct _mp3_data_ {
 **		@param user		Our user pointer.
 **		@param stream		MP3 stream.
 **
-**		@return				MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
+**		@return			MAP_FLOW_STOP if eof, MAD_FLOW_CONTINUE otherwise.
 */
 local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 {
+	Sample *sample;
+	MadData *data;
 	int i;
-	int l;
-	CLFile* f;
-	MyUser* u;
 
 	DebugLevel3Fn("Read callback\n");
 
-	u = (MyUser*) user;
-	f = u->File;
+	sample = user;
+	data = sample->User;
 
-	l = 0;
-	// Copy remaining bytes over
 	if (stream->next_frame) {
-		memmove(u->Buffer, stream->next_frame,
-			l = &u->Buffer[sizeof(u->Buffer)] - stream->next_frame);
+		memmove(data->Buffer, stream->next_frame, data->BufferLen =
+			&data->Buffer[data->BufferLen] - stream->next_frame);
 	}
 
-	i = CLread(f, u->Buffer + l, sizeof(u->Buffer) - l);
-	//if (!(l + i)) {
+	i = CLread(data->MadFile, data->Buffer + data->BufferLen, MAD_INBUF_SIZE - data->BufferLen);
 	if (!i) {
 		return MAD_FLOW_STOP;
 	}
+
 	DebugLevel3Fn("%d bytes\n" _C_ l + i);
-	mad_stream_buffer(stream, u->Buffer, l + i);
+
+	data->BufferLen += i;
+	mad_stream_buffer(stream, data->Buffer, data->BufferLen);
 
 	return MAD_FLOW_CONTINUE;
 }
@@ -125,29 +114,51 @@ local enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 **		@param pcm		MAD pcm data struture.
 */
 local enum mad_flow MAD_write(void* user,
-	struct mad_header const* header __attribute__((unused)),
+	struct mad_header const* header,
 	struct mad_pcm* pcm)
 {
-	int i;
-	int n;
-	int c;
-	int channels;
 	Sample* sample;
-	short* p;
-
-	n = pcm->length;
-	channels = pcm->channels;
+	int i;
+	int j;
+	int n;
+	void *dest;
+	char *buf;
 
 	DebugLevel3Fn("%d channels %d samples\n" _C_ channels _C_ n);
 
-	sample = ((MyUser*)user)->Sample;
+	sample = user;
+
+	n = pcm->length;
 
 	if (!sample->SampleSize) {
 		sample->Frequency = pcm->samplerate;
-		sample->Channels = channels;
+		sample->Channels = pcm->channels;
 		sample->SampleSize = 16;
 	}
 
+	i = n * pcm->channels * 2;
+
+	buf = malloc(i);
+
+        // we need to sew back channels together
+        for (i = 0; i < n; ++i) {
+                for (j = 0; j < sample->Channels; ++j) {
+                        buf[i * 2 * sample->Channels + j * 2] = ((const char*)pcm->samples[j])[i * 2 * sample->Channels];
+                        buf[i * 2 * sample->Channels + j * 2 + 1] = ((const char*)pcm->samples[j])[i * 2 * sample->Channels + 1];
+                }
+        }
+
+	i = n * pcm->channels * 2;
+
+	dest = sample->Buffer + sample->Pos + sample->Len;
+        i = ConvertToStereo32(buf, dest, sample->Frequency,
+                sample->SampleSize / 8, sample->Channels, i);
+        sample->Len += i;
+
+	free(buf);
+
+	return MAD_FLOW_CONTINUE;
+/*
 	i = n * channels * 2;
 
 	((MyUser*)user)->Sample = sample =
@@ -179,6 +190,7 @@ local enum mad_flow MAD_write(void* user,
 	}
 
 	return MAD_FLOW_CONTINUE;
+*/
 }
 
 /**
@@ -206,7 +218,7 @@ local enum mad_flow MAD_error(void* user __attribute__((unused)),
 **		@param buf		Buffer to write data to
 **		@param len		Length of the buffer
 **
-**		@return				Number of bytes read
+**		@return			Number of bytes read
 */
 local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 {
@@ -286,7 +298,9 @@ local int MadRead(struct mad_decoder* decoder, unsigned char* buf, int len)
 */
 local int Mp3ReadStream(Sample* sample, void* buf, int len)
 {
-	Mp3Data* data;
+return 0;
+/*
+	MadData* data;
 	int i;
 	int n;
 
@@ -323,6 +337,7 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 	memcpy(buf, data->PointerInBuffer, len);
 	data->PointerInBuffer += len;
 	return len;
+*/
 }
 
 /**
@@ -332,25 +347,21 @@ local int Mp3ReadStream(Sample* sample, void* buf, int len)
 */
 local void Mp3FreeStream(Sample* sample)
 {
-	Mp3Data* data;
-
-#ifdef DEBUG
-	AllocatedSoundMemory -= sizeof(*sample) + MP3_BUFFER_SIZE;
-#endif
+	MadData* data;
 
 	data = sample->User;
 
 	// release the decoder
 
-	mad_synth_finish(data->Decoder->sync->synth);
-	mad_frame_finish(&data->Decoder->sync->frame);
-	mad_stream_finish(&data->Decoder->sync->stream);
+	mad_synth_finish(data->MadDecoder.sync->synth);
+	mad_frame_finish(&data->MadDecoder.sync->frame);
+	mad_stream_finish(&data->MadDecoder.sync->stream);
 
-	free(data->Decoder->sync);
-	data->Decoder->sync = NULL;
-	mad_decoder_finish(data->Decoder);
+	free(data->MadDecoder.sync);
+	data->MadDecoder.sync = NULL;
+	mad_decoder_finish(&data->MadDecoder);
 
-	CLclose(data->User->File);
+	CLclose(data->MadFile);
 
 	free(data);
 	free(sample);
@@ -375,15 +386,13 @@ local const SampleType Mp3StreamSampleType = {
 */
 local int Mp3Read(Sample* sample, void* buf, int len)
 {
-	int pos;
-
-	pos = (int)sample->User;
-	if (pos + len > sample->Length) {				// Not enough data?
-		len = sample->Length - pos;
+	if (len > sample->Len) {			// Not enough data
+		len = sample->Len;
 	}
-	memcpy(buf, sample->Data + pos, len);
 
-	sample->User = (void*)(pos + len);
+	memcpy(buf, sample->Buffer + sample->Pos, len);
+        sample->Pos += len;
+        sample->Len -= len;
 
 	return len;
 }
@@ -395,10 +404,8 @@ local int Mp3Read(Sample* sample, void* buf, int len)
 */
 local void Mp3Free(Sample* sample)
 {
-#ifdef DEBUG
-	AllocatedSoundMemory -= sample->Length;
-#endif
-
+	free(sample->User);
+	free(sample->Buffer);
 	free(sample);
 }
 
@@ -425,6 +432,7 @@ global Sample* LoadMp3(const char* name, int flags)
 	CLFile* f;
 	unsigned char magic[2];
 	Sample* sample;
+	MadData *data;
 
 	if (!(f = CLopen(name,CL_OPEN_READ))) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
@@ -437,22 +445,17 @@ global Sample* LoadMp3(const char* name, int flags)
 		return NULL;
 	}
 
-	// FIXME: ugly way to rewind.
-	CLclose(f);
-	if (!(f = CLopen(name,CL_OPEN_READ))) {
-		fprintf(stderr, "Can't open file `%s'\n", name);
-		return NULL;
-	}
+	CLseek(f, 0, SEEK_SET);
 
 	DebugLevel2Fn("Have mp3 file %s\n" _C_ name);
 
-#ifdef MP3_STREAM_WORKS
-	if (flags & PlayAudioStream)
-#else
-	if (0 && (flags & PlayAudioStream))
-#endif
-	{
-		Mp3Data* data;
+	sample = malloc(sizeof(Sample));
+	data = malloc(sizeof(MadData));
+
+	// streaming currently broken
+	if (0 && (flags & PlayAudioStream)) {
+/*
+		MadData* data;
 
 		sample = malloc(sizeof(*sample) + MP3_BUFFER_SIZE);
 		if (!sample) {
@@ -478,11 +481,11 @@ global Sample* LoadMp3(const char* name, int flags)
 		data->User->Sample = sample;
 
 		// configure input, output, and error functions
-
-		mad_decoder_init(data->Decoder, data->User,
-			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
-			MAD_error, NULL /* message */);
-
+*/
+//		mad_decoder_init(data->Decoder, data->User,
+//			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
+//			MAD_error, NULL /* message */);
+/*
 		data->Decoder->sync = malloc(sizeof(*data->Decoder->sync));
 		if (!data->Decoder->sync) {
 			fprintf(stderr, "Out of memory\n");
@@ -504,22 +507,26 @@ global Sample* LoadMp3(const char* name, int flags)
 		sample->Length = MadRead(data->Decoder, sample->Data, MP3_BUFFER_SIZE);
 
 		DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + MP3_BUFFER_SIZE);
-#ifdef DEBUG
-		AllocatedSoundMemory += sizeof(*sample) + MP3_BUFFER_SIZE;
-#endif
 
 		return sample;
+*/
 	} else {
-		MyUser user;
 		struct mad_decoder decoder;
 
-		sample = calloc(1, sizeof(*sample));
-		user.File = f;
-		user.Sample = sample;
+		data->MadFile = f;
+		sample->User = data;
+		sample->Buffer = malloc(55000000);
+		DebugCheck(!sample->Buffer);
+
+		sample->Len = 0;
+		sample->Pos = 0;
+		sample->SampleSize = 0;
+
+		data->BufferLen = 0;
 
 		// configure input, output, and error functions
 
-		mad_decoder_init(&decoder, &user,
+		mad_decoder_init(&decoder, sample,
 			MAD_read, NULL /* header */, NULL /* filter */, MAD_write,
 			MAD_error, NULL /* message */);
 
@@ -529,16 +536,12 @@ global Sample* LoadMp3(const char* name, int flags)
 		mad_decoder_finish(&decoder);
 		CLclose(f);
 
-		user.Sample->Type = &Mp3SampleType;
-		user.Sample->User = 0;
+		sample->Type = &Mp3SampleType;
 
-		DebugLevel0Fn(" %d\n" _C_ user.Sample->Length);
-#ifdef DEBUG
-		AllocatedSoundMemory += user.Sample->Length;
-#endif
-
-		return user.Sample;
+		DebugLevel0Fn(" %d\n" _C_ sample->Len);
 	}
+
+	return sample;
 }
 
 #endif		// USE_MAD
