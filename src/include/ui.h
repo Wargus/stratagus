@@ -193,7 +193,7 @@ typedef enum {
 */
 typedef struct _menu_panel_ {
 	char*                Ident;     ///< Unique identifier
-	GraphicConfig        Panel;     ///< Panel
+	Graphic*             G;         ///< Graphic
 	struct _menu_panel_* Next;      ///< Next pointer
 } MenuPanel;
 
