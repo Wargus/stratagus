@@ -82,6 +82,7 @@
 <A HREF="#replay-log">replay-log</A>
 <A HREF="#reset-keystroke-help">reset-keystroke-help</A>
 <A HREF="#selection">selection</A>
+<A HREF="#set-default-map!">set-default-map!</A>
 <A HREF="#set-diplomacy!">set-diplomacy!</A>
 <A HREF="#set-game-cycle!">set-game-cycle!</A>
 <A HREF="#set-group-id!">set-group-id!</A>
@@ -1262,6 +1263,33 @@ Remove an objective from the scenario objectives text list.
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
 
+<A NAME="set-default-map!"></A>
+<H3>set-default-map!</H3>
+
+<H4>Description</H4>
+
+Set the default map path.
+
+<H4>Syntax</H4>
+
+<CODE>(set-default-map! path)</CODE>
+
+<DL>
+<DT>path</DT>
+<DD>Path to the map.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-default-map! "puds/default.pud")
+</PRE>
+
+<P>Sets the default map to "puds/default.pud".
+
+<H4>Not Used</H4>
+
 <A NAME="set-diplomacy!"></A>
 <H3>set-diplomacy!</H3>
 
@@ -1287,9 +1315,7 @@ Remove an objective from the scenario objectives text list.
 
 <P>.
 
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+<H4>Not Used</H4>
 
 <A NAME="set-game-cycle!"></A>
 <H3>set-game-cycle!</H3>
