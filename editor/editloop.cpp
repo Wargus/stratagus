@@ -1537,10 +1537,10 @@ local void CreateEditor(void)
 {
     int i;
     int n;
-    char* file;
-    char* s;
+    char *file;
+    char *s;
     char buf[PATH_MAX];
-    CLFile* clf;
+    CLFile *clf;
     extern LISP fast_load(LISP lfname, LISP noeval);
 
     //
@@ -1561,44 +1561,62 @@ local void CreateEditor(void)
 
     FlagRevealMap = 1;			// editor without fog and all visible
     TheMap.NoFogOfWar = 1;
-    if( !*CurrentMapPath ) {		// new map!
+    if (!*CurrentMapPath) {		// new map!
 	InitUnitTypes();
 	UpdateStats();
+
 	//
-	//	Inititialize TheMap / Players.
+	//      Inititialize TheMap / Players.
 	//
+	DebugCheck(TheMap.Info);
+
+	TheMap.Info = calloc(1, sizeof(MapInfo));
+	TheMap.Info->Description = strdup("http://FreeCraft.Org");
+	TheMap.Info->MapTerrain = 0;
+	TheMap.Info->MapTerrainName =
+	    strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
+	TheMap.Info->MapWidth = TheMap.Info->MapHeight = 256;
+
 	for (i = 0; i < PlayerMax; ++i) {
-	    if( i==PlayerNumNeutral ) {
+	    if (i == PlayerNumNeutral) {
 		CreatePlayer(PlayerNeutral);
+		TheMap.Info->PlayerType[i] = PlayerNeutral;
 	    } else {
 		CreatePlayer(PlayerNobody);
+		TheMap.Info->PlayerType[i] = PlayerNobody;
 	    }
+	    TheMap.Info->PlayerGold[i] = Players[i].Resources[GoldCost];
+	    TheMap.Info->PlayerWood[i] = Players[i].Resources[WoodCost];
+	    TheMap.Info->PlayerOil[i] = Players[i].Resources[OilCost];
 	}
 
-	DebugCheck( TheMap.Info );
-	TheMap.Info = calloc(1,sizeof(MapInfo));
-
-	TheMap.Width=TheMap.Height=256;
-	TheMap.Fields=calloc(TheMap.Width*TheMap.Height,sizeof(MapField));
-	TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+	strncpy(TheMap.Description, TheMap.Info->Description, 32);
+	TheMap.Width = TheMap.Info->MapWidth;
+	TheMap.Height = TheMap.Info->MapHeight;
+	TheMap.Fields = calloc(TheMap.Width * TheMap.Height, sizeof(MapField));
+	TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
 	InitUnitCache();
 
-	TheMap.TerrainName = strdup(Tilesets[0]->Ident);
+	TheMap.Terrain = TheMap.Info->MapTerrain;
+	TheMap.TerrainName = strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
+	TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
 
-	for (i = 0; i < TheMap.Width * TheMap.Height; ++i ) {
-	    TheMap.Fields[i].Tile=TheMap.Fields[i].SeenTile=0;
-	    if (TheMap.Tileset) {
-		TheMap.Fields[i].Tile=TheMap.Fields[i].SeenTile=
-		    TheMap.Tileset->Table[16];
-		TheMap.Fields[i].Flags=TheMap.Tileset->FlagsTable[16];
-	    }
+	for (i = 0; i < TheMap.Width * TheMap.Height; ++i) {
+	    TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
+	    TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
+		TheMap.Tileset->Table[16];
+	    TheMap.Fields[i].Flags = TheMap.Tileset->FlagsTable[16];
 	}
+	GameSettings.Resources = SettingsResourcesMapDefault;
 	CreateGame(NULL, &TheMap);
     } else {
 	CreateGame(CurrentMapPath, &TheMap);
     }
     FlagRevealMap = 0;
 
+    //
+    //	Place the start points, which the loader discarded.
+    //
     for (i = 0; i < PlayerMax; ++i) {
 	if (Players[i].Type != PlayerNobody) {
 	    // FIXME: must support more races
@@ -1617,7 +1635,7 @@ local void CreateEditor(void)
 	}
     }
 
-    if( !EditorUnitTypes ) {
+    if (!EditorUnitTypes) {
 	//
 	//  Build editor unit-type tables.
 	//
@@ -1626,14 +1644,14 @@ local void CreateEditor(void)
 	    ++i;
 	}
 	n = i + 1;
-	EditorUnitTypes = malloc(sizeof(char*) * n);
+	EditorUnitTypes = malloc(sizeof(char *) * n);
 	for (i = 0; i < n; ++i) {
 	    EditorUnitTypes[i] = UnitTypeWcNames[i];
 	}
-	MaxUnitIndex = n-1;
+	MaxUnitIndex = n - 1;
     }
 
-    if( 1 ) {
+    if (1) {
 	ProcessMenu("menu-editor-tips", 1);
 	InterfaceState = IfaceStateNormal;
     }
