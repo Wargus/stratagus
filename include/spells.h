@@ -37,32 +37,35 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**	Different spell actions.
+**	Different spell actions, defines the behavior of the spells.
 */
 typedef enum _spell_action_type_ {
     SpellActionNone,			/// FIXME: Comments
 //	---human paladins---
-    SpellActionHolyVision,
-    SpellActionHealing,
-    SpellActionExorcism,
+    SpellActionHolyVision,		/// FIXME: Comments
+    SpellActionHealing,			/// FIXME: Comments
+    SpellActionExorcism,		/// FIXME: Comments
 //	---human mages---
-    SpellActionFireball,
-    SpellActionSlow,
-    SpellActionFlameShield,
-    SpellActionInvisibility,
-    SpellActionPolymorph,
-    SpellActionBlizzard,
+    SpellActionFireball,		/// FIXME: Comments
+    SpellActionSlow,			/// FIXME: Comments
+    SpellActionFlameShield,		/// FIXME: Comments
+    SpellActionInvisibility,		/// FIXME: Comments
+    SpellActionPolymorph,		/// FIXME: Comments
+    SpellActionBlizzard,		/// FIXME: Comments
 //	---orc ogres---
-    SpellActionEyeOfKilrogg,
-    SpellActionBloodlust,
-    SpellActionRunes,
+    SpellActionEyeOfKilrogg,		/// FIXME: Comments
+    SpellActionBloodlust,		/// FIXME: Comments
+    SpellActionRunes,			/// FIXME: Comments
 //	---orc death knights---
-    SpellActionDeathCoil,
-    SpellActionHaste,
-    SpellActionRaiseDead,
-    SpellActionWhirlwind,
-    SpellActionUnholyArmor,
-    SpellActionDeathAndDecay
+    SpellActionDeathCoil,		/// FIXME: Comments
+    SpellActionHaste,			/// FIXME: Comments
+    SpellActionRaiseDead,		/// FIXME: Comments
+    SpellActionWhirlwind,		/// FIXME: Comments
+    SpellActionUnholyArmor,		/// FIXME: Comments
+    SpellActionDeathAndDecay,		/// FIXME: Comments
+
+    // Here you can new spell actions
+
 } SpellActionType;
 
 /**
@@ -108,9 +111,9 @@ extern const SpellType* SpellTypeByIdent( const char* Ident );
     /// return spell type by spell id
 extern SpellType* SpellTypeById( int Id );
 
-/*    // returns != 0 if spell can be casted by this unit, enough mana?
-extern int CanCastSpell( const Unit* unit, int SpellId );
-*/
+    /// returns != 0 if spell can be casted by this unit, enough mana?
+extern int CanCastSpell( const Unit*, int, const Unit*, const Unit*,int, int );
+
     /// fire spell on target unit or place at x,y
 extern int SpellCast( const SpellType* SpellId, Unit* unit, Unit* target,
 	int x, int y );
