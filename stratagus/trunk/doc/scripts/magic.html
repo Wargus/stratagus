@@ -238,8 +238,13 @@ If the unit dies however the caster will stop. (Some spells get casted until
 there is no more mana left).
 </dd>
 <dt>action</dt>
-<dd>The effect of the spells. This comes in the form of 'action '(operation-name parameters ... ) <br>
-Here are the supported operations , their paramenters, and what they do.<p>
+<dd>The effect of the spells. This comes in the following form:
+<pre>'action '((operation-name-1 parameters ... )
+          (operation-name-2 parameters ... )
+             ...
+	  (operation-name-n parameters ... ))
+</pre>
+Here are the supported operations, their paramenters, and what they do.<p>
 <dl>
     <dt>area-bombardment</dt>
     <dl>This will a number of missiles to be thrown in a square area. Here are
@@ -335,6 +340,43 @@ Here are the supported operations , their paramenters, and what they do.<p>
 	can be used as an instant-kill spell by polymorphing into a harmless unit,
 	like a chicken.
 	</dd>
+    </dl>
+    <dt>spawn-missile</dt>
+    <dl>This will spawn a missile in the game. It's one of the most versatile
+    spell variants. Here are the paramenters:
+    	<dt>ttl</dt>
+	<dd>Time to live for the missile. Usually means that the missile is
+	gone after this time, but for some missile classes it means something else.
+	</dd>
+    	<dt>damage</dt>
+	<dd>This is the damage for this missile, overriding the standard damage
+	defined for the missile.
+	</dd>
+    	<dt>delay</dt>
+	<dd>This is the delay for the missile. it means the missile will only
+	appear after this many ticks.
+	</dd>
+	<dt>start-point/end-point</dt>
+	<dl>Point to point-ish missiles need a start and an end point for the
+	    trajectory. it is defined like this:
+	    <pre>start-point (base caster/target add-x add-y add-rand-x add-rand-y)</pre>
+	    The individual tags should be self-explanatory, but here goes:
+	    <dt>base</dt>
+	    <dd>The base for the location calculation. Can be either caster or target.
+	    </dd>
+	    <dt>add-x</dt>
+	    <dd>How much to add to the x coordinate, in pixels
+	    </dd>
+	    <dt>add-y</dt>
+	    <dd>How much to add to the y coordinate, in pixels
+	    </dd>
+	    <dt>add-rand-x</dt>
+	    <dd>Add a random from 0 to value-1 to the x coordinate, in pixels
+	    </dd>
+	    <dt>add-rand-y</dt>
+	    <dd>Add a random from 0 to value-1 to the y coordinate, in pixels
+	    </dd>
+	</dl>
     </dl>
 </dl>
 </dd>

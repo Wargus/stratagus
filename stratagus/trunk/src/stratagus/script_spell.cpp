@@ -50,10 +50,57 @@
 //		Action parsers for spellAction
 // **************************************************************************
 
-/*
+/**
+** 	Parse the missile location description for a spell action.
+**
+**	@param list		SCM list object, with the description.
+**	@param location		Pointer to missile location description.
+**
+**	@note	This is only here to avoid code duplication. You don't have
+**	any reason to USE this:)
+*/
+local void CclSpellMissileLocation(SCM list, SpellActionMissileLocation* location)
+{
+    SCM value;
+ 
+    DebugCheck(location == NULL);
+    memset(location, 0, sizeof(*location));
+    //list = gh_cdr(list);
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("base"))) {
+	    if (gh_eq_p(gh_car(list), gh_symbol2scm("caster"))) {
+		location->Base = LocBaseCaster;
+	    } else if (gh_eq_p(gh_car(list), gh_symbol2scm("target"))) {
+		location->Base = LocBaseTarget;
+	    } else {
+		errl("Unsupported missile location base flag.\n",gh_car(list));
+	    }
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("add-x"))) {
+	    location->AddX = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("add-y"))) {
+	    location->AddY = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("add-rand-x"))) {
+	    location->AddRandX = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("add-rand-y"))) {
+	    location->AddRandY = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else {
+	    errl("Unsupported missile location description flag.\n",value);
+	}
+    }
+}
+
+/**
 **	Parse the action for spell.
 **
-**	@param list		SCM list object, with somthing like (action-type params).
+**	@param list		SCM list object, with something like (action-type params).
 **	@param spellaction	Pointer to spellactopm.
 */
 local void CclSpellAction(SCM list, SpellActionType* spellaction)
@@ -66,8 +113,35 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
     value = gh_car(list);
     list = gh_cdr(list);
 
-    memset(spellaction, 0, sizeof(*spellaction));
-    if (gh_eq_p(value, gh_symbol2scm("area-bombardment"))) {
+    if (gh_eq_p(value, gh_symbol2scm("spawn-missile"))) {
+	spellaction->CastFunction = CastSpawnMissile;
+	spellaction->Data.SpawnMissile.StartPoint.Base=LocBaseCaster;
+	spellaction->Data.SpawnMissile.EndPoint.Base=LocBaseTarget;
+	spellaction->Data.SpawnMissile.TTL=-1;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+		spellaction->Data.SpawnMissile.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("delay"))) {
+		spellaction->Data.SpawnMissile.Delay = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
+		spellaction->Data.SpawnMissile.TTL = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("start-point"))) {
+		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.StartPoint);
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("end-point"))) {
+		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.EndPoint);
+		list = gh_cdr(list);
+	    } else {
+		errl("Unsupported area-bombardment tag", value);
+	    }
+	}
+	
+    } else if (gh_eq_p(value, gh_symbol2scm("area-bombardment"))) {
 	spellaction->CastFunction = CastAreaBombardment;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
@@ -89,67 +163,6 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported area-bombardment tag", value);
-	    }
-	}
-    } else if (gh_eq_p(value, gh_symbol2scm("flame-shield"))) {
-	spellaction->CastFunction = CastFlameShield;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("duration"))) {
-		spellaction->Data.FlameShield.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-		/// FIXME:damage, missiles, rotation speed?
-	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.FlameShield.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    }else {
-		errl("Unsupported flame-shield tag", value);
-	    }
-	}
-    } else if (gh_eq_p(value, gh_symbol2scm("fireball"))) {
-	spellaction->CastFunction = CastFireball;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
-		spellaction->Data.Fireball.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported fireball tag", value);
-	    }
-	}
-    } else if (gh_eq_p(value, gh_symbol2scm("runes"))) {
-	spellaction->CastFunction = CastRunes;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Runes.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
-		spellaction->Data.Runes.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported runes tag", value);
-	    }
-	}
-    } else if (gh_eq_p(value, gh_symbol2scm("whirlwind"))) {
-	spellaction->CastFunction = CastWhirlwind;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("duration"))) {
-		spellaction->Data.Whirlwind.TTL = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Whirlwind.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported runes tag", value);
 	    }
 	}
     } else if (gh_eq_p(value, gh_symbol2scm("adjust-buffs"))) {
@@ -426,6 +439,8 @@ local SCM CclDefineSpell(SCM list)
     char* str;
     SpellType* spell;
     SCM value;
+    SCM sublist;
+    SpellActionType* act;
 
     identname = gh_scm2newstr(gh_car(list), NULL);
     list = gh_cdr(list);
@@ -473,10 +488,19 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("action"))) {
-	    if (!spell->Action) {
-		spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
+	    spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
+	    act=spell->Action;
+	    memset(act, 0, sizeof(SpellActionType));
+	    sublist=gh_car(list);
+	    CclSpellAction(gh_car(sublist), act);
+	    sublist=gh_cdr(sublist);
+	    while (!gh_null_p(gh_car(sublist))) {
+		act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
+		act=act->Next;
+		memset(act, 0, sizeof(SpellActionType));
+		CclSpellAction(gh_car(sublist), act);
+		sublist=gh_cdr(sublist);
 	    }
-	    CclSpellAction(gh_car(list), spell->Action);
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("condition"))) {
 	    if (!spell->Condition) {
@@ -549,17 +573,44 @@ global void SpellCclRegister(void)
 */
 local void SaveSpellAction(CLFile *file,SpellActionType* action)
 {
+    SpellActionMissileLocation * loc;
     if (action->CastFunction == CastAreaBombardment) {
 	CLprintf(file, "(area-bombardment fields %d shards %d damage %d start-offset-x %d start-offset-y %d)",
-	    action->Data.AreaBombardment.Fields,
-	    action->Data.AreaBombardment.Shards,
-	    action->Data.AreaBombardment.Damage,
-	    action->Data.AreaBombardment.StartOffsetX,
-	    action->Data.AreaBombardment.StartOffsetY);
-    } else if (action->CastFunction == CastFireball) {
-	CLprintf(file, "(fireball ttl %d damage %d)",
-	    action->Data.Fireball.TTL,
-	    action->Data.Fireball.Damage);
+		action->Data.AreaBombardment.Fields,
+		action->Data.AreaBombardment.Shards,
+		action->Data.AreaBombardment.Damage,
+		action->Data.AreaBombardment.StartOffsetX,
+		action->Data.AreaBombardment.StartOffsetY);
+    } else if (action->CastFunction == CastSpawnMissile) {
+	CLprintf(file, "(spawn-missile delay %d ttl %d damage %d ",
+		action->Data.SpawnMissile.Delay,
+		action->Data.SpawnMissile.TTL,
+		action->Data.SpawnMissile.Damage);
+	//
+	//	Save start-point
+	//
+	loc=&action->Data.SpawnMissile.StartPoint;
+	CLprintf(file, "start-point (base ");
+	if (loc->Base==LocBaseCaster) {
+	    CLprintf(file, "caster");
+	} else {
+	    CLprintf(file, "target");
+	}
+	CLprintf(file, " add-x %d add-y %d add-rand-x %d add-rand-y %d) ",
+		loc->AddX,loc->AddY,loc->AddRandX,loc->AddRandY);
+	//
+	//	Save end-point
+	//
+	loc=&action->Data.SpawnMissile.EndPoint;
+	CLprintf(file, "end-point (base ");
+	if (loc->Base==LocBaseCaster) {
+	    CLprintf(file, "caster");
+	} else {
+	    CLprintf(file, "target");
+	}
+	CLprintf(file, " add-x %d add-y %d add-rand-x %d add-rand-y %d)",
+		loc->AddX,loc->AddY,loc->AddRandX,loc->AddRandY);
+	CLprintf(file, ")");
     } else if (action->CastFunction == CastAdjustVitals) {
 	CLprintf(file, "(adjust-vitals");
 	if (action->Data.AdjustVitals.HP) {
@@ -574,8 +625,8 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 	CLprintf(file, ")\n");
     } else if (action->CastFunction == CastSummon) {
 	CLprintf(file, "(summon unit-type %s time-to-live %d",
-	    action->Data.Summon.UnitType->Ident,
-	    action->Data.Summon.TTL);
+		action->Data.Summon.UnitType->Ident,
+		action->Data.Summon.TTL);
 	if (action->Data.Summon.RequireCorpse) {
 	    CLprintf(file, " require-corpse ");
 	}
@@ -600,20 +651,10 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
 	CLprintf(file, ")");
     } else if (action->CastFunction == CastPolymorph) {
 	CLprintf(file, "(polymorph new-form %s)",
-	    action->Data.Polymorph.NewForm->Ident);
-    } else if (action->CastFunction == CastFlameShield) {
-	CLprintf(file, "(flame-shield duration %d)",
-	    action->Data.FlameShield.TTL);
-    } else if (action->CastFunction == CastRunes) {
-	CLprintf(file, "(runes ttl %d damage %d)",
-	    action->Data.Runes.TTL,
-	    action->Data.Runes.Damage);
+		action->Data.Polymorph.NewForm->Ident);
     } else if (action->CastFunction == CastSpawnPortal) {
 	CLprintf(file, "(spawn-portal portal-type %s)",
-	    action->Data.SpawnPortal.PortalType->Ident);
-    } else if (action->CastFunction == CastWhirlwind) {
-	CLprintf(file, "(whirlwind duration %d damage %d)",
-	    action->Data.Whirlwind.TTL, action->Data.Whirlwind.Damage);
+		action->Data.SpawnPortal.PortalType->Ident);
     } 
 }
 
@@ -717,6 +758,7 @@ void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 global void SaveSpells(CLFile* file)
 {
     SpellType* spell;
+    SpellActionType* act;
 
     DebugCheck(!file);
     
@@ -756,9 +798,15 @@ global void SaveSpells(CLFile* file)
 	//
 	//  Save the action(effect of the spell)
 	//
-	CLprintf(file, "    'action '");
-	SaveSpellAction(file, spell->Action);
-	CLprintf(file, "\n");
+	CLprintf(file, "    'action '(\n");
+	act=spell->Action;
+	while (act) {
+	    CLprintf(file,"        ");
+	    SaveSpellAction(file, act);
+	    CLprintf(file,"\n");
+	    act=act->Next;
+	}
+	CLprintf(file, ")\n");
 	//
 	//  Save conditions
 	//
