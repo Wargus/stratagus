@@ -34,8 +34,9 @@
 #ifdef USE_SDL	// {
 
 #include <stdlib.h>
+#include <limits.h>
 #ifndef _MSC_VER
-#include <sys/time.h>
+//#include <sys/time.h>
 #endif
 #include <SDL.h>
 
@@ -66,6 +67,10 @@
 ----------------------------------------------------------------------------*/
 
 global SDL_Surface *Screen;		/// internal screen
+local int FrameTicks;			/// Frame length in ms
+local int FrameRemainder;		/// Frame remainder 0.1 ms
+local int FrameFraction;		/// Frame fractional term
+local int SkipFrames;			/// Skip this frames
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -77,12 +82,28 @@ global SDL_Surface *Screen;		/// internal screen
 
 /**
 **	Initialise video sync.
+**	Calculate the length of video frame and any simulation skips.
 **
-**	@see VideoSyncSpeed
+**	@see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
 */
 global void SetVideoSync(void)
 {
-    DebugLevel0Fn("%d\n",(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed);
+    int ms;
+
+    if( VideoSyncSpeed ) {
+	ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+    } else {
+	ms = INT_MAX;
+    }
+    SkipFrames = ms / 400;
+    while (SkipFrames && ms / SkipFrames < 200) {
+	--SkipFrames;
+    }
+    ms /= SkipFrames + 1;
+
+    FrameTicks = ms / 10;
+    FrameRemainder = ms % 10;
+    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
 }
 
 /*----------------------------------------------------------------------------
@@ -531,6 +552,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     ticks=SDL_GetTicks();
     if( ticks>NextFrameTicks ) {	// We are too slow :(
+	IfDebug(
+	    // FIXME: need locking!
+	    //VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	);
 	++SlowFrameCounter;
     }
 
@@ -545,7 +570,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	}
 	while( ticks>=NextFrameTicks ) {
 	    ++VideoInterrupts;
-	    NextFrameTicks+=(100*1000/CYCLES_PER_SECOND)/VideoSyncSpeed;
+	    FrameFraction+=FrameRemainder;
+	    if( FrameFraction>10 ) {
+		FrameFraction-=10;
+		++NextFrameTicks;
+	    }
+	    NextFrameTicks+=FrameTicks;
 	}
 
 	//
@@ -635,6 +665,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //	Prepare return, time for one frame is over.
     //
     VideoInterrupts=0;
+
+    
+    if( !SkipGameCycle-- ) {
+	SkipGameCycle=SkipFrames;
+    }
 }
 
 /**
@@ -767,14 +802,6 @@ global VMemType *VideoCreateNewPalette(const Palette * palette)
 */
 global void CheckVideoInterrupts(void)
 {
-    if( VideoInterrupts ) {
-        //DebugLevel1("Slow frame\n");
-	// FIXME: need locking!
-	IfDebug(
-	    //VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-	);
-        ++SlowFrameCounter;
-    }
 }
 
 /**
@@ -799,6 +826,17 @@ global void ToggleGrabMouse(void)
 	    grabbed=1;
 	}
     }
+}
+
+/**
+**	Toggle full screen mode.
+**
+**	@todo FIXME: didn't work with windows,
+**		must quit video system and restart it.
+*/
+global void ToggleFullScreen(void)
+{
+    SDL_WM_ToggleFullScreen(Screen);
 }
 
 #endif // } USE_SDL

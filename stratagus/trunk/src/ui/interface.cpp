@@ -50,6 +50,7 @@
 #include "network.h"
 #include "font.h"
 #include "campaign.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
@@ -315,9 +316,12 @@ local void UiIncrementGameSpeed(void)
 */
 local void UiDecrementGameSpeed(void)
 {
-    VideoSyncSpeed-=10;
-    if( VideoSyncSpeed<=10 ) {
-	VideoSyncSpeed=10;
+    if( VideoSyncSpeed<=0 ) {
+	VideoSyncSpeed=0;
+    } else if( VideoSyncSpeed<11 ) {
+	VideoSyncSpeed-=1;
+    } else {
+	VideoSyncSpeed-=10;
     }
     SetVideoSync();
     SetStatusLine("Slower");
@@ -540,16 +544,7 @@ local int CommandKey(int key)
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-#ifdef USE_SDL
-	    {
-	    #include <SDL.h>
-	    // FIXME: move to system api part!
-	    extern SDL_Surface *Screen;	// internal screen
-
-	    DebugLevel0Fn("%x\n",KeyModifiers);
-	    SDL_WM_ToggleFullScreen(Screen);
-	    }
-#endif
+	    ToggleFullScreen();
 	    break;
 
         case ' ':			// center on last action
