@@ -228,9 +228,9 @@ void ReleaseUnit(Unit* unit)
 }
 
 /**
-**		FIXME: Docu
+**  FIXME: Docu
 */
-static Unit *AllocUnit(void)
+static Unit* AllocUnit(void)
 {
 	Unit* unit;
 	Unit** slot;
@@ -778,7 +778,7 @@ void UnitLost(Unit* unit)
 **
 **  @param unit  FIXME: docu
 */
-void UnitClearOrders(Unit *unit)
+void UnitClearOrders(Unit* unit)
 {
 	int i;
 
@@ -805,10 +805,10 @@ void UnitClearOrders(Unit *unit)
 }
 
 /**
-**		Update for new unit. Food and income ...
+**  Update for new unit. Food and income ...
 **
-**		@param unit		New unit pointer.
-**		@param upgrade		True unit was upgraded.
+**  @param unit     New unit pointer.
+**  @param upgrade  True unit was upgraded.
 */
 void UpdateForNewUnit(const Unit* unit, int upgrade)
 {
@@ -838,13 +838,13 @@ void UpdateForNewUnit(const Unit* unit, int upgrade)
 }
 
 /**
-**		Find nearest point of unit.
+**  Find nearest point of unit.
 **
-**		@param unit		Pointer to unit.
-**		@param tx		X tile map postion.
-**		@param ty		Y tile map postion.
-**		@param dx		Out: nearest point X tile map postion to (tx,ty).
-**		@param dy		Out: nearest point Y tile map postion to (tx,ty).
+**  @param unit  Pointer to unit.
+**  @param tx    X tile map postion.
+**  @param ty    Y tile map postion.
+**  @param dx    Out: nearest point X tile map postion to (tx,ty).
+**  @param dy    Out: nearest point Y tile map postion to (tx,ty).
 */
 void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 {
@@ -871,10 +871,10 @@ void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 }
 
 /**
-**		Copy the unit look in Seen variables. This should be called when
-**		buildings go under fog of war for ThisPlayer.
+**  Copy the unit look in Seen variables. This should be called when
+**  buildings go under fog of war for ThisPlayer.
 **
-**      @param unit		The unit to work on
+**  @param unit  The unit to work on
 */
 static void UnitFillSeenValues(Unit* unit)
 {
@@ -1108,19 +1108,20 @@ void UnitCountSeen(Unit* unit)
 }
 
 /**
-**      Returns true, if the unit is visible. It check the Viscount of
-**		the player and everyone who shares vision with him.
-**		FIXME: optimize this a lot.
+**  Returns true, if the unit is visible. It check the Viscount of
+**  the player and everyone who shares vision with him.
+**  FIXME: optimize this a lot.
 **
-**		@note	This understands shared vision, and should be used all around.
+**  @note	This understands shared vision, and should be used all around.
 **
-**		@param unit				The unit to check.
-**		@param player			The player to check.
+**  @param unit    The unit to check.
+**  @param player  The player to check.
 */
 int UnitVisible(const Unit* unit, const Player* player)
 {
 	int p;
 	int cp;
+
 	//	Current player.
 	cp = player->Player;
 	if (unit->VisCount[cp]) {
@@ -1137,12 +1138,13 @@ int UnitVisible(const Unit* unit, const Player* player)
 }
 
 /**
-**      Returns ture, if unit is visible as an action goal for a player
-**      on the map.
+**  Returns ture, if unit is visible as an action goal for a player
+**  on the map.
 **
-**		@param unit		Unit to be checked.
-**		@param player	Player to check for.
-**		@return			True if visible, false otherwise.
+**  @param unit    Unit to be checked.
+**  @param player  Player to check for.
+**
+**  @return        True if visible, false otherwise.
 */
 int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 {
@@ -1165,38 +1167,37 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 }
 
 /**
-**		Returns true, if unit is visible for this player on the map.
-**		The unit has to be out of fog of war and alive
+**  Returns true, if unit is visible for this player on the map.
+**  The unit has to be out of fog of war and alive
 **
-**		@param unit		Unit to be checked.
-**		@param player	Player to check for.
-**		@return			True if visible, false otherwise.
+**  @param unit    Unit to be checked.
+**  @param player  Player to check for.
+**
+**  @return        True if visible, false otherwise.
 */
 int UnitVisibleOnMap(const Unit* unit, const Player* player)
 {
 	//
 	//	Invisible units.
 	//
-	if (unit->Invisible && (player != unit->Player) &&
-			(!PlayersShareVision(player->Player, unit->Player->Player))) {
+	if (unit->Invisible && player != unit->Player &&
+			!PlayersShareVision(player->Player, unit->Player->Player)) {
 		return 0;
 	}
 
-	return  (!unit->Removed) &&
-			(!unit->Destroyed) &&
-			(unit->HP) &&
-			(unit->Orders->Action != UnitActionDie) &&
-			(UnitVisible(unit, player));
+	return !unit->Removed && !unit->Destroyed && unit->HP &&
+		unit->Orders->Action != UnitActionDie && UnitVisible(unit, player);
 }
 
 /**
-**		Returns true, if unit is shown on minimap.
+**  Returns true, if unit is shown on minimap.
 **
-**		@warning This is for ::ThisPlayer only.
-**		@todo	radar support
+**  @warning This is for ::ThisPlayer only.
+**  @todo	radar support
 **
-**		@param unit		Unit to be checked.
-**		@return			True if wisible, false otherwise.
+**  @param unit  Unit to be checked.
+**
+**  @return      True if wisible, false otherwise.
 */
 int UnitVisibleOnMinimap(const Unit* unit)
 {
@@ -1216,18 +1217,20 @@ int UnitVisibleOnMinimap(const Unit* unit)
 			return 0;
 		}
 		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Player)) && 
-				(unit->Seen.State != 3) &&
-				(!(unit->Seen.Destroyed & (1 << ThisPlayer->Player))) );
+			unit->Seen.State != 3 &&
+			!(unit->Seen.Destroyed & (1 << ThisPlayer->Player)));
 	}
 }
 
 /**
-**		Returns true, if unit is visible in viewport.
+**  Returns true, if unit is visible in viewport.
 **
-**		@warning This is only true for ::ThisPlayer
-**		@param vp			Viewport pointer.
-**		@param unit			Unit to be checked.
-**		@return				True if visible, false otherwise.
+**  @warning This is only true for ::ThisPlayer
+**
+**  @param vp    Viewport pointer.
+**  @param unit  Unit to be checked.
+**
+**  @return      True if visible, false otherwise.
 */
 int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 {
@@ -1250,8 +1253,8 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 	}
 
 	//	Those are never ever visible.
-	if (unit->Invisible && (ThisPlayer != unit->Player) &&
-			(!PlayersShareVision(ThisPlayer->Player, unit->Player->Player))) {
+	if (unit->Invisible && ThisPlayer != unit->Player &&
+			!PlayersShareVision(ThisPlayer->Player, unit->Player->Player)) {
 		return 0;
 	}
 
@@ -1269,10 +1272,11 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 }
 
 /**
-**		Returns true, if unit is visible on current map view (any viewport).
+**  Returns true, if unit is visible on current map view (any viewport).
 **
-**		@param unit		Unit to be checked.
-**		@return				True if visible, false otherwise.
+**  @param unit  Unit to be checked.
+**
+**  @return      True if visible, false otherwise.
 */
 int UnitVisibleOnScreen(const Unit* unit)
 {
@@ -1287,15 +1291,15 @@ int UnitVisibleOnScreen(const Unit* unit)
 }
 
 /**
-**	  Get area of map tiles covered by unit, including its displacement.
+**  Get area of map tiles covered by unit, including its displacement.
 **
-**	  @param unit	 Unit to be checked and set.
-**		@param sx		Out: Top left X tile map postion.
-**		@param sy		Out: Top left Y tile map postion.
-**		@param ex		Out: Bottom right X tile map postion.
-**		@param ey		Out: Bottom right Y tile map postion.
+**  @param unit	 Unit to be checked and set.
+**  @param sx    Out: Top left X tile map postion.
+**  @param sy    Out: Top left Y tile map postion.
+**  @param ex    Out: Bottom right X tile map postion.
+**  @param ey    Out: Bottom right Y tile map postion.
 **
-**	  @return				sx,sy,ex,ey defining area in Map
+**  @return      sx,sy,ex,ey defining area in Map
 */
 void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 {
@@ -1306,12 +1310,10 @@ void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 }
 
 /**
-**		Change the unit's owner
+**  Change the unit's owner
 **
-**		@param unit				Unit which should be consigned.
-**		@param newplayer		New owning player.
-**
-**				inside?
+**  @param unit       Unit which should be consigned.
+**  @param newplayer  New owning player.
 */
 void ChangeUnitOwner(Unit* unit, Player* newplayer)
 {
@@ -1334,15 +1336,15 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	}
 
 	//
-	//		Must change food/gold and other.
+	//  Must change food/gold and other.
 	//
 	UnitLost(unit);
 
 	//
-	//		Now the new side!
+	//  Now the new side!
 	//
 
-	//		Insert into new player table.
+	// Insert into new player table.
 
 	unit->PlayerSlot = newplayer->Units + newplayer->TotalNumUnits++;
 	if (unit->Type->_HitPoints != 0) {
@@ -1367,7 +1369,7 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 
 	unit->Stats = &unit->Type->Stats[newplayer->Player];
 	//
-	//		Must change food/gold and other.
+	//  Must change food/gold and other.
 	//
 	if (unit->Type->GivesResource) {
 		DebugPrint("Resource transfer not supported\n");
@@ -1383,10 +1385,10 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 }
 
 /**
-**		Change the owner of all units of a player.
+**  Change the owner of all units of a player.
 **
-**		@param oldplayer		Old owning player.
-**		@param newplayer		New owning player.
+**  @param oldplayer  Old owning player.
+**  @param newplayer  New owning player.
 */
 static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 {
@@ -1411,9 +1413,9 @@ static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 }
 
 /**
-**		Rescue units.
+**  Rescue units.
 **
-**		Look through all rescueable players, if they could be rescued.
+**  Look through all rescueable players, if they could be rescued.
 */
 void RescueUnits(void)
 {
@@ -1426,13 +1428,13 @@ void RescueUnits(void)
 	int j;
 	int l;
 
-	if (NoRescueCheck) {				// all possible units are rescued
+	if (NoRescueCheck) {  // all possible units are rescued
 		return;
 	}
 	NoRescueCheck = 1;
 
 	//
-	//		Look if player could be rescued.
+	//  Look if player could be rescued.
 	//
 	for (p = Players; p < Players + NumPlayers; ++p) {
 		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
@@ -1465,15 +1467,15 @@ void RescueUnits(void)
 							unit->Y + unit->Type->TileHeight + 2, around);
 				}
 				//
-				//		Look if ally near the unit.
+				//  Look if ally near the unit.
 				//
 				for (i = 0; i < n; ++i) {
 					if (around[i]->Type->CanAttack &&
 							IsAllied(unit->Player, around[i])) {
 						//
-						//		City center converts complete race
-						//		NOTE: I use a trick here, centers could
-						//				store gold. FIXME!!!
+						//  City center converts complete race
+						//  NOTE: I use a trick here, centers could
+						//        store gold. FIXME!!!
 						if (unit->Type->CanStore[GoldCost]) {
 							ChangePlayerOwner(p, around[i]->Player);
 							break;
@@ -1492,15 +1494,15 @@ void RescueUnits(void)
 }
 
 /*----------------------------------------------------------------------------
-  --		Unit headings
-  ----------------------------------------------------------------------------*/
+--  Unit headings
+----------------------------------------------------------------------------*/
 
 /**
-**		Fast arc tangent function.
+**  Fast arc tangent function.
 **
-**		@param val		atan argument
+**  @param val  atan argument
 **
-**		@return				atan(val)
+**  @return     atan(val)
 */
 static int myatan(int val)
 {
@@ -1521,17 +1523,17 @@ static int myatan(int val)
 }
 
 /**
-**		Convert direction to heading.
+**  Convert direction to heading.
 **
-**		@param delta_x		Delta X.
-**		@param delta_y		Delta Y.
+**  @param delta_x  Delta X.
+**  @param delta_y  Delta Y.
 **
-**		@return				Angle (0..255)
+**  @return         Angle (0..255)
 */
 int DirectionToHeading(int delta_x, int delta_y)
 {
 	//
-	//		Check which quadrant.
+	//  Check which quadrant.
 	//
 	if (delta_x > 0) {
 		if (delta_y < 0) {		// Quadrant 1?
@@ -1550,7 +1552,7 @@ int DirectionToHeading(int delta_x, int delta_y)
 }
 
 /**
-**		Update sprite frame for new heading.
+**  Update sprite frame for new heading.
 */
 void UnitUpdateHeading(Unit* unit)
 {
@@ -1582,11 +1584,11 @@ void UnitUpdateHeading(Unit* unit)
 }
 
 /**
-**		Change unit heading/frame from delta direction x, y.
+**  Change unit heading/frame from delta direction x, y.
 **
-**		@param unit		Unit for new direction looking.
-**		@param dx		X map tile delta direction.
-**		@param dy		Y map tile delta direction.
+**  @param unit  Unit for new direction looking.
+**  @param dx    X map tile delta direction.
+**  @param dy    Y map tile delta direction.
 */
 void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
 {

@@ -540,7 +540,7 @@ int AiPlanAttack(AiForce* force)
 	transporter = NULL;
 	if (state) {
 		for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
-			Unit *unit;
+			Unit* unit;
 
 			unit = AiPlayer->Player->Units[i];
 			if (unit->Type->Transporter && UnitIdle(unit)) {
@@ -577,7 +577,7 @@ int AiPlanAttack(AiForce* force)
 	}
 
 	if (AiFindTarget(aiunit->Unit, watermatrix, &x, &y, &state)) {
-		AiUnit *aiunit;
+		AiUnit* aiunit;
 
 		if (transporter) {
 			aiunit = malloc(sizeof (*aiunit));
