@@ -729,6 +729,7 @@ changed:
     }
 }
 
+#if 0
 /**
 **	Parse a network menu packet in client disconneccted state.
 **
@@ -740,6 +741,7 @@ local void ParseClientDisconnected(const InitMessage* msg)
     DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 	    msg->SubType);
 }
+#endif
 
 /**
 **	Parse a Network menu packet.
