@@ -379,76 +379,11 @@ local void* OldMinimapCursorImage;	/// Saved image behind cursor
 */
 global void HideMinimapCursor(void)
 {
-    int i;
-    int w;
-    int h;
-
-    if( !OldMinimapCursorImage ) {
-	return;
-    }
-
-    w=OldMinimapCursorW;
-    h=OldMinimapCursorH;
-
-    // FIXME: Attention 8/16/32 bpp!
-    switch( VideoBpp ) {
-    case 8:
-	{ VMemType8* sp;
-	  VMemType8* dp;
-	sp=OldMinimapCursorImage;
-	dp=VideoMemory8+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType8));
-	sp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp=*sp++;
-	    dp[w]=*sp++;
-	    dp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType8)); }
-	break;
-    case 15:
-    case 16:
-	{ VMemType16* sp;
-	  VMemType16* dp;
-	sp=OldMinimapCursorImage;
-	dp=VideoMemory16+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType16));
-	sp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp=*sp++;
-	    dp[w]=*sp++;
-	    dp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType16)); }
-	break;
-    case 24:
-	{ VMemType24* sp;
-	  VMemType24* dp;
-	sp=OldMinimapCursorImage;
-	dp=VideoMemory24+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType24));
-	sp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp=*sp++;
-	    dp[w]=*sp++;
-	    dp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType24)); }
-	break;
-    case 32:
-	{ VMemType32* sp;
-	  VMemType32* dp;
-	sp=OldMinimapCursorImage;
-	dp=VideoMemory32+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType32));
-	sp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp=*sp++;
-	    dp[w]=*sp++;
-	    dp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType32)); }
-	break;
+    if( OldMinimapCursorW ) {
+      LoadCursorRectangle(OldMinimapCursorImage,
+                          OldMinimapCursorX,OldMinimapCursorY,
+                          OldMinimapCursorW,OldMinimapCursorH);
+      OldMinimapCursorW=0;
     }
 }
 
@@ -466,29 +401,14 @@ global void DrawMinimapCursor(int vx,int vy)
     int h;
     int i;
 
+    // Determine and save region below minimap cursor
     OldMinimapCursorX=x=TheUI.MinimapX+24+MinimapX+
 	    (vx*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorY=y=TheUI.MinimapY+2+MinimapY+
 	    (vy*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorW=w=(MapWidth*MinimapScale)/MINIMAP_FAC;
     OldMinimapCursorH=h=(MapHeight*MinimapScale)/MINIMAP_FAC;
-
-    switch( VideoBpp ) {
-	case 8:
-	    i=(w+1+h)*2*sizeof(VMemType8);
-	    break;
-	case 15:
-	case 16:
-	    i=(w+1+h)*2*sizeof(VMemType16);
-	    break;
-	case 24:
-	    i=(w+1+h)*2*sizeof(VMemType24);
-	    break;
-	default:
-	case 32:
-	    i=(w+1+h)*2*sizeof(VMemType32);
-	    break;
-    }
+    i=(w+1+h)*2*VideoTypeSize;
     if( OldMinimapCursorSize<i ) {
 	if( OldMinimapCursorImage ) {
 	    OldMinimapCursorImage=realloc(OldMinimapCursorImage,i);
@@ -498,78 +418,12 @@ global void DrawMinimapCursor(int vx,int vy)
 	DebugLevel3("Cursor memory %d\n",i);
 	OldMinimapCursorSize=i;
     }
+    SaveCursorRectangle(OldMinimapCursorImage,x,y,w,h);
 
-    // FIXME: not 100% correct
-    switch( VideoBpp ) {
-    case 8:
-	{ VMemType8* sp;
-	VMemType8* dp;
-	dp=OldMinimapCursorImage;
-	sp=VideoMemory8+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType8));
-	dp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp++=*sp;
-	    *dp++=sp[w];
-	    sp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType8));
-	break; }
-    case 15:
-    case 16:
-	{ VMemType16* sp;
-	VMemType16* dp;
-	dp=OldMinimapCursorImage;
-	sp=VideoMemory16+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType16));
-	dp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp++=*sp;
-	    *dp++=sp[w];
-	    sp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType16));
-	break; }
-    case 24:
-	{ VMemType24* sp;
-	VMemType24* dp;
-	dp=OldMinimapCursorImage;
-	sp=VideoMemory24+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType24));
-	dp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp++=*sp;
-	    *dp++=sp[w];
-	    sp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType24));
-	break;
-	}
-    case 32:
-	{ VMemType32* sp;
-	VMemType32* dp;
-	dp=OldMinimapCursorImage;
-	sp=VideoMemory32+OldMinimapCursorY*VideoWidth+OldMinimapCursorX;
-	memcpy(dp,sp,w*sizeof(VMemType32));
-	dp+=w;
-	for( i=0; i<h; ++i ) {
-	    *dp++=*sp;
-	    *dp++=sp[w];
-	    sp+=VideoWidth;
-	}
-	memcpy(dp,sp,(w+1)*sizeof(VMemType32));
-	break; }
-    }
-
+    // Draw cursor as rectangle (Note: unclipped, as it is always visible)
     // FIXME: The viewpoint color should be configurable
-    switch( ThisPlayer->Race ) {
-	case PlayerRaceHuman:
-	    VideoDrawRectangleClip(ColorWhite,x,y,w,h);
-	    break;
-	case PlayerRaceOrc:
-	    VideoDrawRectangleClip(ColorWhite,x,y,w,h);
-	    break;
-    }
+    //VideoDraw50TransRectangle(ThisPlayer->Color,x,y,w,h);
+    VideoDraw50TransRectangle(ColorWhite,x,y,w,h);
 }
 
 /**
