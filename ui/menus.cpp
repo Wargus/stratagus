@@ -2328,7 +2328,6 @@ local void SaveAction(void)
 {
     char *filename;
     char *prefix = SaveGameMenuItems[1].d.input.buffer;
-    char name[1024];
     size_t prefixLength;
 
     prefixLength = strlen(prefix);
@@ -2340,15 +2339,17 @@ local void SaveAction(void)
         SetMessage("Can't save \"%s\": %s", prefix, strerror(errno));
         return;
     }
-    memcpy(filename, prefix, prefixLength);
+    
+    strcpy(filename, "/");
+    strncpy(filename, SaveDir, strlen(SaveDir)+1);
+    strncat(filename + strlen(SaveDir), "/", 1+1);
+    strncat(filename + 1+1, prefix, prefixLength);
 
-    SetMessage("Saved game to: %s", name);
-    strcat(name, SaveDir);
-    strcat(name, "/");
-    strncat(name, prefix, strlen(prefix)-3);
-    SaveGame(name);
+    SaveGame(filename);
 
-    free(name);
+    SetMessage("Saved game to: %s", filename);
+
+    free(filename);
 
     EndMenu();
 }
@@ -2361,8 +2362,17 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-SaveDir="$HOME/.freecraft/save";
-mkdir(SaveDir,0777);
+char *path;
+
+strcpy(path, "test");
+//strcat(buffer,"/");
+//strcat(buffer,FREECRAFT_HOME_PATH);
+//mkdir(buffer,0777);
+//strcat(buffer,"/save");
+//mkdir(buffer,0777);
+//strncpy(SaveDir, buffer, strlen(buffer));
+//free(buffer55);
+SaveDir="/tmp";
 #endif
 }
 
