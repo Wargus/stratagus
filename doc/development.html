@@ -67,8 +67,8 @@ starts the same work.
 
 <H3>Installing CVS client</H3>
 
-If you want to help develop, it is the best that you use CVS. To do so, first you
-need CVS for your system.<P>
+If you want to help develop, it is the best that you use CVS. To do so, first
+you need CVS for your system.<P>
 
 You find all information about CVS on <A HREF="http://www.sourceforge.net/">
 SourceForge</A>.<P>
@@ -76,7 +76,7 @@ SourceForge</A>.<P>
 <UL>
 <LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=763&group_id=1">
 Sourceforge: CVS HOWTO</A><P>
-CVS on SF - rookie should read it. General, should read it, *too*.
+CVS on SF - rookie should read it. General, should read it, <B>*too*.</B>
 <LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=767&group_id=1">
 Win32/CVS/SSH HowTo</A><P>
 A "quick & dirty" guide
@@ -103,13 +103,21 @@ In Debian: apt-get install cvs; apt-get install cvsbook; apt-get install lincvs
 	<B>This module is needed for development.</B>
 
 <LI>fcsp - The FreeCraft Sound Project<P>
+	This module will be removed.<P>
 	A collection of free sounds and music, GPL (GNU General Public License)
 	prefered. But each file can have its own license, so please read.
 
 <LI>fcgp - The FreeCraft Graphic Project<P>
+	This module will be removed.<P>
 	A collection of free graphics, animations and models, GPL
 	(GNU General Public License) prefered. But each file can have its own
 	license, so please read.
+
+<LI>Planned: fcmp - The FreeCraft Media Project<P>
+	This will be the replacement of FcSP and FcGP.<P>
+	A collection of free media (free sounds, music, videos, graphics,
+	animations and models), GPL (GNU General Public License) prefered.
+	But each file can have its own license, so please read.
 
 <LI>crafted - The FreeCraft Map Editor<P>
 	A map editor for FreeCraft. This project has just started and also needs
@@ -160,8 +168,8 @@ up to date. But you find regular snapshots of the FreeCraft source here:
 
 <UL>
 <LI>FTP is no longer available
-<LI><A HREF="http://freecraft.sourceforge.net/snapshots/">HTTP</A>
-<LI><A HREF="http://freecraft.net/snapshots/">HTTP</A>
+<LI><A HREF="http://freecraft.sourceforge.net/snapshots/">HTTP sourceforge</A>
+<LI><A HREF="http://freecraft.net/snapshots/">HTTP freecraft</A>
 </UL>
 
 <H3>Linux(tm)</H3>
@@ -171,7 +179,8 @@ following list refers mainly to Debian packages. You'll have to figure out
 the corresponding packages in your particular distribution.
 <UL>
 <LI>gcc - The GNU C compiler<P>
-    gcc-2.95 preferred.
+    gcc-2.95 preferred. Old gcc 2.96 can't compile FreeCraft. gcc 3.0 produce
+    many wrong! warnings.
 <LI>libc6-dev - GNU C Library: Development Libraries and Header Files<P>
     Contains the symlinks, headers, and object files needed to compile and link
     programs which use the standard C library.
@@ -206,8 +215,8 @@ You need a C compiler for Windows. Get <B>one</B> of the following.
     <UL>
     <LI>Of course, you must buy or own a VC/VC++ 6 development kit.
     <LI>You need <A HREF="http://www.libsdl.org">SDL</A> for VC++ (
-    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.3-VC6.zip">
-    SDL-devel-1.2.3-VC6.zip</A>.
+    <A HREF="http://www.libsdl.org/release/SDL-devel-1.2.4-VC6.zip">
+    SDL-devel-1.2.4-VC6.zip</A>.
     <LI><A HREF="http;//www.libpng.org">libpng</A> for win32 and VC++.
     Sorry, no direct download link.
     <LI><A HREF="http;//www.zlib.org">zlib</A> for win32 and VC++.
@@ -259,19 +268,16 @@ You need a C compiler for Windows. Get <B>one</B> of the following.
 	http://www.libsdl.org/Xmingw32/mingw32.zip</A><P>
 	Compiler package for Windows, built by Sam Lantinga.<P>
 
-    <LI><A HREF="http://prdownloads.sourceforge.net/freecraft/mingw-fc-native-010701.zip">
-	http://prdownloads.sourceforge.net/freecraft/mingw-fc-native-010701.zip</A><P>
+    
+    <LI><A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
+    http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip
+	</A><P>
 
-	My build is based on the above. Contains SDL 1.2.1, libpng, zlib.
+	My build is based on the above. Contains SDL 1.2.4, libpng, zlib.
 	libbz2 and libzzip.  Install this, download the newest FreeCraft
 	source and start FreeCraft development under Windows. Come on!<P>
 	<B>If unclear, please download only this.</B>
-    </UL><P>
-    You can get the missing headerfile stdint.h from <A
-    HREF="http://freecraft.net/snapshots/stdint.h"
-    >http://freecraft.net/snapshots/stdint.h</A>, than change the line
-    "RULESFILE ?= Rules.make" in src/Makefile to "RULESFILE = Rules.make" 
-    and you should copy \bin\sh.exe to \bin\bash.exe before running setup.
+    </UL>
 </UL>
 
 <H3>Windows CE(tm) / PocketPc(tm)</H3>
@@ -282,7 +288,8 @@ You need a C compiler for this platform.<P>
     You can download or order it <A HREF="http://www.microsoft.com/mobile/downloads/emvt30.asp">
     here</A>. 
 <LI>CE support for Visual C++ or Visual Studio<P>
-    This isn't supported yet. If you know the links and how to use, please publish this.
+    This isn't supported yet. If you know the links and how to use, please
+    publish this.
 </UL>
 
 You need the following libs for WinCE.
@@ -318,8 +325,8 @@ With the sources from CVS, you can continue working.<BR>
 
 <H2>Make and makefiles</H2>
 
-<I>Remember the first time you must start ./setup or copy Rules.make.orig to
-Rules.make and edit it.</I><P>
+<I>Remember the first time you must start ./setup <B>or</B> copy
+Rules.make.orig to Rules.make and edit it.</I><P>
 
 Type 'make help' to get an overview what all could be made.<P>
 
@@ -338,7 +345,7 @@ See below: you can use always the source code documentation.<P>
 I have prepared some extra documentation:<P>
 
 <UL>
-<LI><A HREF="datadir.html">FreeCraft data file description.</A>
+<LI><A HREF="datadir.html">FreeCraft data directory description.</A>
 </UL>
 
 <H2>Source code documentation</H2>
@@ -505,23 +512,30 @@ You need FcGP, without this FcSP can't be used. Follow the above instructions.
 <H2>Building FcMP</H2>
 
 The new FcMP (FreeCraft Media Pack) isn't yet availabe from CVS. You
-can only download it as complete archive.
+can only download it as complete archive. Download it, extract it, copy
+the binary freecraft(.exe) into the top directory and start it.
 
 <H2>Building CraftED from CVS</H2>
 
 CraftED uses autoconf and configure. To build from CVS use.<P>
 
-./autogen.sh --enable-new-names<BR>
+./autogen.sh>BR>
 make<BR>
 ./src/crafted<P>
+
+<I>Note: the first time you must enter your path to the FcMP/original data
+directory.</I> For more documentation please look into the docs directory.
 
 <H2>Building CraftED from tarball</H2>
 
 CraftED uses autoconf and configure. To build from tarball distribution use.<P>
 
-./configure --enable-new-names<BR>
+./configure<BR>
 make<BR>
 ./src/crafted<P>
+
+<I>Note: the first time you must enter your path to the FcMP/original data
+directory.</I> For more documentation please look into the docs directory.
 
 <HR>
 All trademarks and copyrights on this page are owned by their respective owners.

@@ -2,12 +2,11 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2001,2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
-----    the Free Software Foundation; either version 2 of the License, or
-----    (at your option) any later version.
+----    the Free Software Foundation; only version 2 of the License.
 
 ----    FreeCraft is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,42 +28,41 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
-Any questions not mentioned here, please contact
+For any questions not mentioned here, please contact
 <A HREF="mailto:aleclone@FreeCraft.org"> aleclone@FreeCraft.org</A>.<P>
 
 <DL>
 <P>
-<DT>Q: I was playing in 800x600 mode, and the graphics around the edge didn't paint the full screen?
+<DT><FONT COLOR="#FF0000">Q: I was playing in 800x600 mode, and the graphics around the edge didn't paint the full screen?</FONT>
 <DD>A: The original graphics aren't designed for this resolutions, you could
     design your own user interface, see "data/ccl/ui.ccl".
 <P>
-<DT>Q: The graphics didn't fit on 800x600 or higher resolution?
+<DT><FONT COLOR="#FF0000">Q: The graphics didn't fit on 800x600 or higher resolution?</FONT>
 <DD>A: The original graphics aren't designed for this resolutions, you could
     design your own user interface, see "data/ccl/ui.ccl".
 <P>
-<DT>Q: gzseek already defined or undefined!
-
+<DT><FONT COLOR="#FF0000">Q: I get the error "gzseek already defined or undefined!", what should I do?</FONT>
 <DD>A: You have an incompatible libpng version, better you install the latest
 libpng1.0.X. You get it here:
     <A HREF="ftp://swrinde.nde.swri.edu/pub/png/">SwRI</A>
 <P>
-<DT>Q: The software cursor is too slow
+<DT><FONT COLOR="#FF0000">Q: The software cursor is too slow, how can I get it quicker?</FONT>
 
 <DD>A: I will improve the speed later, but I was told:<BR>
 Using Accelerated X on a Pentium 75 FreeCraft is now playable.
 <P>
-<DT>Q: Did FreeCraft work with ALSA?
+<DT><FONT COLOR="#FF0000">Q: Did FreeCraft work with ALSA?</FONT>
 
 <DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) - Driver.
-I have tested it with version 0.3.2 - 0.4.1.<P>
+I have tested it with version 0.3.2 - 0.9.0.<P>
 More informations <A HREF="http://www.alsa-project.org">
 http://www.alsa-project.org</A><P>
 <P>
-<DT>Q: How did I get big maps?
+<DT><FONT COLOR="#FF0000">Q: How did I get big maps?</FONT>
 
 <DD>A: If you want a map of the size 256 x 256.
 Create and edit 4 maps (128 x 128) in the original editor.
@@ -83,30 +81,20 @@ bigmap2.pud is in the upper right corner.
 bigmap3.pud is in the lower left corner.
 bigmap4.pud is in the lower right corner.
 <P>
-Soon CraftED - The FreeCraft map editor, will support the creation of big maps.
+CraftED - The FreeCraft map editor, also supports the creation of big maps.
 <P>
-<DT>Q: Can I use the original without expansion?
+<DT><FONT COLOR="#FF0000">Q: Can I use the original without expansion?</FONT>
 
 <DD>A: There are only more graphics and sounds in the expansion CD version.
 Me was told, it works without problems with the german version. Just try it.
 With the new versions this should work without problems.
 
 <P>
-<DT>Q: I get the error message "gcc: No input files", when I build freecraft.
-    (Reported with pgcc version 1.1.1.) What should I do?
-
-<DD>A: Try changing the line in the freecraft toplevel Makefile <BR>
-        $(CC) -Lsrc -lclone $(CLONELIBS) -o freecraft -I. $(CFLAGS) <BR>
-    to <BR>
-        $(CC) -Lsrc -lclone $(CLONELIBS) -o freecraft -I. $(CFLAGS) dummy.c <P>
-    and execute the command "<I>touch dummy.c</I>" in the freecraft toplevel
-    directory. <P>
-    Or install a better gcc version without this bug.
-<P>
-<DT>Q: I have tried to start a level with
-    './freecraft data/puds/internal/internal01.pud.gz' and I only get this error
-    message
-    'pud: fopen,gzopen,bzopen(): No such file or directory'.
+<DT><FONT COLOR="#FF0000">Q: I have tried to start a level with
+    './freecraft data/puds/internal/internal01.pud.gz' and I only get this
+    error message 'pud: fopen,gzopen,bzopen(): No such file or directory'.
+    What do I wrong?
+    </FONT>
 <DD>A: We have changed the loading syntax:
     <UL>
     <LI>file.pud loads relative from $CLONE_LIB_PATH (in my source "data").
@@ -115,46 +103,51 @@ With the new versions this should work without problems.
     </UL>
     This means you must type './freecraft ./data/puds/internal/internal01.pud.gz'!
 <P>
-<DT>Q: The mouse react after seconds on my moves?
+<DT><FONT COLOR="#FF0000">
+    Q: Why did the mouse react after seconds on my moves?</FONT>
 <DD>A: I didn't found the real problem. Currently use the threaded sound
-support and enable it (in data/ccl/sound.ccl) or and add to the line
+    support and enable it (in data/ccl/sound.ccl) or and add to the line
 <P>
 DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG)
 <P>
 "-DSLOW_INPUT" in Rules.make.
 <P>
-<DT>Q: I want play but do not want use CD...  can i copy files from cd to hdd ? 
-    what i have to copy ?
+<DT><FONT COLOR="#FF0000">Q: I want play but do not want use CD...  can i copy files from cd to hdd ? 
+    What i have to copy ?</FONT>
 <DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD isn't
     longer needed. This script converts the data on CD into our own format.
     <BR>
     A: You didn't need to copy, the installation did it for you.
 <P>
-<DT>Q: The game becomes very slow under X11.
+<DT><FONT COLOR="#FF0000">
+    Q: Why did the game becomes very slow under X11?</FONT>
 <DD>A: Give your X11 server a higher priority than the clients.<P>
     renice -5 &lt;pid-of-your-x11-server&gt;<P>
     newer linux distributions (debian) does this automatic.<P>
     or start freecraft with<P>
     nice -n 5 ./freecraft
 <P>
-<DT>Q: Can I use FreeCraft to join in an original network game?
+<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join in an original network game?</FONT>
 <DD>A: Sorry, FreeCraft use its own network protocol. You can only play
     with FreeCraft against other FreeCrafts.
+<P>
+<DT><FONT COLOR="#FF0000">Q: It is planned to support playing against the original in network game?</FONT>
+<DD>A: The both network protocols are that way, that this is impossible.
 
 <P>
-<DT>Q: I only have the original BNE version, can I use it?
+<DT><FONT COLOR="#FF0000">Q: I only have the original BNE version, can I use it?</FONT>
 <DD>A: No. Until now nobody has written a converter for this, if you want to
 	write it, please contact me. It is only a question of time and you
 	must understand writting C.
 
 <P>
-<DT>Q: I get only a black window, after I have installed it on windows. What
-       have I done wrong?
-<DD>A: Install FreeCraft to C:\.
+<DT><FONT COLOR="#FF0000">Q: I get only a black window, after I have installed
+	it on windows. What have I done wrong?</FONT>
+<DD>A: Try installing FreeCraft to C:\.
 
 <P>
-<DT>Q: Can I compile FreeCraft with VC++ or Borland C++?
+<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with VC++ or Borland C++?</FONT>
 <DD>A: This C compiler aren't support yet, you can build a project and than
 mail it to us.<P>
 
@@ -170,15 +163,15 @@ development.<P>
 http://www.libsdl.org/Xmingw32/mingw32.zip</A><P>
 Compiler packet for windows, build by Sam Lantinga.<P>
 
-<A HREF="http://prdownloads.sourceforge.net/freecraft/mingw-fc-native-010701.zip">
-http://prdownloads.sourceforge.net/freecraft/mingw-fc-native-010701.zip</A><P>
+<A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
+http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip</A><P>
 
-Based on above this is my build. Contains SDL 1.2.1, libpng, zlib and zziplib.
+Based on above this is my build. Contains SDL 1.2.4, libpng, zlib and zziplib.
 Install this and download the newest FreeCraft source and start FreeCraft
 development with windows.<P>
 
 <P>
-<DT>Q: What port or ports did FreeCraft use for network play?
+<DT><FONT COLOR="#FF0000">Q: What port or ports did FreeCraft use for network play?</FONT>
 <DD>A: As default is the port 6660 UDP is used on client and server side.
 <P>
 

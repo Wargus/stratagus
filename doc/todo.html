@@ -3,12 +3,11 @@
 <!--
 ----	$Id$
 
-----	(c) Copyright 2001 by Lutz Sammer
+----	(c) Copyright 2001,2002 by Lutz Sammer
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
-----    the Free Software Foundation; either version 2 of the License, or
-----    (at your option) any later version.
+----    the Free Software Foundation; only version 2 of the License.
 
 ----    FreeCraft is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +29,7 @@
 			  T H E   W A R   B E G I N S
 	   FreeCraft - A free fantasy real time strategy game engine
 </PRE>
-<P><B>(C) Copyright 1998-2001 by The FreeCraft Project. Distributed under the
+<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
 <A HREF="gpl.html">"GNU General Public License"</A></B>
 <HR>
 
@@ -48,20 +47,13 @@ http://sourceforge.net/tracker/?atid=351965&group_id=1965&func=browse
 http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 </A>
 
-<H2> This should be done for the release (1.17):</H2>
-<!-- ---- ====== -- ---- --- --- ------- ------- -->
-<UL>
-<LI>Any suggestions?
-</UL>
-
 <H2> This should be done for the release (1.18):</H2>
 <!-- ---- ====== -- ---- --- --- ------- ------- -->
 <UL>
 <LI>Worker with gold/wood could go to depot under construction!
-<LI>DONE: Worker stops, if a nearer mine cannot be reached.
 <LI>Ai can't find any way, tries this to often.
 <LI>Decoration on top not supported.
-<LI>Regenerating forest looks wierd.
+<LI>Regenerating forest looks weird.
 <LI>Touch of darkness has wrong time for damage.
 <LI>SVGALIB version does not support 3 mouse button.
 <LI>Sometime it seems that the command buttons aren't changed.
@@ -73,25 +65,16 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>The color cycling isn't 100% correct. See FIXME: in ColorCycle()
 <LI>Scroll with the keyboard: use state and not the repeat rate. Than make
     the scroll speed configurable. Use the repeat flag for faster scrolling.
-<LI>DONE: Small ships show an explosion if missile hits target add source.
 <LI>Ships do not go up and down, if attacking.
-<LI>DONE: my unit cannot attack enemy building when it is not finished yet (building)
-<LI>I cannot change unit 'pending' or however you call it (command aplied to new
+<LI>I cannot change unit 'pending' or however you call it (command applied to new
     trained units) when there is a unit in train queue, I think I could.
-<LI>DONE: Resource line isn't correctly updated for new units and food.
 <LI>A peon can enter a mine and die in the mine.
-<LI>A peon can enter a deposit and die in the deposite.
-<LI>DONE: Don't let neutral buildings (mine), be attacked with the right button.
-<LI>DONE: The thing is, if whatever is blocking the path to the wood moves, the
-    worker will stay locked up.
+<LI>A peon can enter a deposit and die in the deposits.
 <LI>The thing is, if whatever is blocking the path to the wood moves, the
     worker moves to some wired position (-1,-1), if no hall is available.
-<LI>DONE: Building tower I start see in it range before it completed
 <LI>First sound of attack i never hear, only second,..
-<LI>4map of orc compain - I cann't get option for creation of transport
+<LI>4map of orc campaign - I can't get option for creation of transport
    (can't upgrade townhall)
-<LI>DONE: I can' hear sounds of enemy peons geting lumber when moving to it
-    place with cursor while not see it. bug?
 <LI>Let single player maps played as multiplayer.
 <LI>More suggestions?
 </UL>
@@ -99,16 +82,14 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <H2> Known  bugs scheduled to next release (1.19):</H2>
 <!-- ----- ---- --------- -- ---- ------- ------- -->
 <UL>
-<LI>Building-cursor and cursor over units shouldn't change to looking glas.
+<LI>Building-cursor and cursor over units shouldn't change to looking glass.
 <LI>Flying and ships could only be on even fields.
 <LI>The heading of attacking units isn't 100% correct. 
 <LI>The heading of missiles isn't 100% correct.
 <LI>Units trained says nothing?
-<LI>Only one and incomplete goals implemented.
 <LI>Fix all known core dumpers.
 <LI>Ships should first attack units with distance weapon.
-<LI>Units attacked, which can't reattack should go out of range.
-<LI>DONE: Wrong unit to mine gold 113, find the problem.
+<LI>Units attacked, which can't re-attack should go out of range.
 </UL>
 
 <H2> Next to implement: </H2>
@@ -119,12 +100,9 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>New spell "show units in enemy transporters"
 <LI>Make a spy unit.
 <LI>Costs Spells
-<LI>DONE: Constructions have an own sight-range.
-<LI>Corpse have a sight-range which will slowy reduced.
+<LI>Corpse have a sight-range which will slowly reduced.
 <LI>Reduce memory use. (16 MB)
-<LI>Unit moves away from magni.., glas must disappear. (duplicate)
-<LI>DONE: Speed for daemon and skeleton.
-<LI>DONE: Buildings/Units blink red even after they aren't being hurt.
+<LI>Unit moves away from magni.., glass must disappear. (duplicate)
 <LI>The price and name of something to be built/upgraded doesn't disappear,
 	and will remain on the screen until another price comes up.
 <LI>The brown background is never updated, and it will build a mass of
@@ -132,23 +110,17 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>Water buildings couldn't be always be reached with new ship code.
 <LI>Selecting with rectangle and scrolling with keyboard: some solutions??
 <LI>Transporter and party didn't meet automatic (fixed, but not perfect)!
-<LI>DONE: Multiple orc units selected shows human units!
 <LI>Another big thing I noticed - When loading 
     data/puds/multi/jimland.pud, before the player stats appear,
     MANY lines saying "REGM:  contains unknown action 0x4100" are
     shown.  I didn't even look to see where this message is
     generated, but this serves as a heads-up.
-<LI>DONE: the final mission of the humans data/campaigns/human-exp/levelx12h.pud.gz
-    is very slow and dumps core.
 <LI>Status line isn't correct cleared.
 <LI>Make color-cycling speed configurable.
 <LI>ActionNone is used, where?
-<LI>Show intro (story) message for levels.
-<LI>Show outcome for levels.
-<LI>Support different goals for levels.
 <LI>Support different AI for levels.
-<LI>Let the campaigns play like the orignal.
-<LI>Setting the units limit for each player seperate.
+<LI>Let the campaigns play like the original.
+<LI>Setting the units limit for each player separate.
 </UL>
 
 <H2>In the near future:</H2>
@@ -160,17 +132,16 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>Exploration (correct)
 <LI>Never chop the same wood twice.
 <LI>DGA X11 supported.
-<LI>Invidual speeds for players.
+<LI>individual speeds for players.
 <LI>Training queues without resources.
-<LI>Hear range, and sound handling of only hearable sounds.
+<LI>Hear range, and sound handling of only bearable sounds.
 </UL>
 
 <H2>In the far future:</H2>
 <!-- == === === ======= -->
 <UL>
 <LI>Documentation
-<LI>DONE: Background sound support
-<LI>Support for debian / rpm packets
+<LI>Support for debian / rpm packets (Yes: on www.debian.org or www.suse.de)
 </UL>
 
 <H2>Future plans:</H2>
@@ -197,28 +168,26 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>All icons animated.
 <LI>Paladins: Autohealing + Autoexorcism
 <LI>Ogres: Autobloodlust
-<LI>Upgradable magic: One level of upgrade == -(10-15)% required mana to cast,
+<LI>Upgradeable magic: One level of upgrade == -(10-15)% required mana to cast,
                   but +(15-20)% of cost. Up to level 9.
-<LI>Upgradable weapon accuracy: In the same manner as upgradable magic,
+<LI>Upgradeable weapon accuracy: In the same manner as upgradeable magic,
     damage 4-12 --> 5-12 --> ... --> 12-12. ballistas/ships accuracy increases
     in step of 5. accuracy improvements enabled after full strength upgrades.
-<LI>Count kills for unit/building.
-<LI>Food requires/food provides for units.
 <LI>Units can patrol between other units.
 <LI>Mage Tower/Temple of Death accumulates energy. Then it can be transferred
     to nearby units in x8 value.
 <LI>What about if peon attack is modified in this way that if attacks
-    bulding it returns 1/2 of the resources for it. something like demolishing,
-    not needed buldings or enemy ones.
+    building it returns 1/2 of the resources for it. something like demolishing,
+    not needed buildings or enemy ones.
 <LI>Support for W*rC*rft. (without II)
 <LI>Support for W*rC*rft Alpha. (Some nice ideas was dropped)
 <LI>Allow multiple tilesets / map or pud.
 <LI>1) Randomly generate unit structure. Random health, mana, accuracy.
 <LI>2) Allow bridges over rivers, that can be destroyed.
-<LI>3) Allow true stonewalls - make a big castle that can be defended
-   archers on stonewalls, just mages can destroy stonewall, ballist can
+<LI>3) Allow true stone walls - make a big castle that can be defended
+   archers on stone walls, just mages can destroy stonewall, ballist can
    break gateway into the castle. How ever some war vehicles can overcome
-   stonewall - somethink like ladders.
+   stonewall - something like ladders.
 <LI>4) Allow attack and defend formation:
 
 <PRE>
@@ -230,7 +199,7 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 
    and many others, that will be kept while moving. Also 'disperse' command,
    i.e. while attacked by catapults.
-<LI>5) Allow retreat command, all units that are in fighting area will reatreat.
+<LI>5) Allow retreat command, all units that are in fighting area will retreat.
    Or selected units immediately do retreat.
 <LI>6) Allow army structures, select i.e. 9 footmen mark as a column, select 9 
    columns mark as something other and so on till you select whole army.
@@ -239,7 +208,6 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
 <LI>8) Mage can teleport a unit to another place. Mage could cast spells to
     multiple units, not just to one.
 <LI>Walls with different Hitpoints.
-<LI>DUP: Use or control MP3 music for background.
 <LI>Scrolling/Zooming the minimap.
 <LI>Day and night cycles.
 <LI>Line of sight, shows only viewing direction
@@ -249,12 +217,11 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
     but show up in land, critters which are ridable, the give birth 
     idea could be used as a way to have extinction in those big 1000 x 
     1000 maps :)
-<LI>Trigger system like St*rCr*ft.
 <LI>Add barks.
 <LI>Now we just have to add plant-trees command to peons
 <LI>Make critters attacking all player units.
 </UL>
-<H2>New units/behaviour:</H2>
+<H2>New units/behavior:</H2>
 <!--=== ===== ========= -->
 <UL>
 <LI>Critters
@@ -264,7 +231,7 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
     </UL>
 <LI>Dark Portal -- teleport, portal between worlds
     <UL>
-    <LI> Requres Castle,Church and MageTower to build ( perhaps and some
+    <LI> Requires Castle,Church and MageTower to build ( perhaps and some
          Mages trained? )
     <LI> Collects mana
     <LI> Uses full mana load to place teleport destination
@@ -274,7 +241,7 @@ http://sourceforge.net/tracker/?func=add&group_id=1965&atid=351965
     </UL>
 <LI>Runestone
     <UL>
-    <LI> Requres Castle,Church and MageTower to build ( build by peon,
+    <LI> Requires Castle,Church and MageTower to build ( build by peon,
          activate by mage? )
     <LI> Collects mana
     <LI> Transfers (auto?) mana to all magic units in the range

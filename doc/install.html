@@ -6,8 +6,7 @@
 
 ----    FreeCraft is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
-----    the Free Software Foundation; either version 2 of the License, or
-----    (at your option) any later version.
+----    the Free Software Foundation; only version 2 of the License.
 
 ----    FreeCraft is distributed in the hope that it will be useful,
 ----    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -70,13 +69,13 @@ You need:
 		and most likely will never be.
 	    </UL>
 	</UL>
-	<LI>libpng. (I use libpng-2.1.0, aka 1.0.5)
-	<LI>zlib. (Also needed for libpng, I use libz-1.1.3)
+	<LI>libpng. (I use libpng-2.1, aka 1.0.12)
+	<LI>zlib. (Also needed for libpng, I use libz-1.1.4)
 	<LI>SIOD. (Included in the distribution)
 	<LI>The original game CD or expansion CD for manuals and maindat.war
 	    for graphics and sfxdat.sud for sounds.
-	    <BR>Or use the free replacements from the FreeCraft graphics and
-		sounds projects.
+	    <BR>Or use the free replacements of graphics and sounds from the
+		FreeCraft Media Project.
 </UL>
 These are optional:
 <UL>
@@ -92,11 +91,13 @@ These are optional:
 To use this program you need the following hardware:
 
 <UL>
-	<LI>At least an i586 133 MHz (faster recommended) and 16 MB of RAM.
+	<LI>At least an i586 133 MHz (faster recommended) and 16 MB of RAM
+	    (32 MB for mp3/ogg support).
 	<LI>Any graphic card running with X11 or SVGALib or Win32 in 640x480.
-	<LI>8/16/24/32 bpp video modes working.
-	<LI>Freecraft is believed to be endian safe, so other (big endian)
-	    architectures like PPC should also work at least with Linux.
+	<LI>with 8/16/24/32 bpp video modes working.
+	<LI>Freecraft is believed to be endian and word size safe, so other
+	    architectures like (big endian) PPC or (64bit) Alpha should also
+	    work at least with Linux.
 </UL>
 
     <H2>Installation</H2>
@@ -125,13 +126,17 @@ Please follow the following instructions to get a working program.
 	</UL>
 	<LI><B>With the media from the FreeCraft Media Project:</B>
 	<UL>
-	<LI>Get the correct FcGP (graphic) and FcSP (sound) archives.
-	<LI>FIXME: This are not the direct download links.
-	<LI>Download FcGP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-	<LI>Download FcSP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-	<LI>Extract them.
-	<LI>Read "Readme" file that was in each of the archives for further
-	instructions on how to setup the graphics and sound packs.
+	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
+	    (media) archive.
+	<LI>Take the archive with the same version as the FreeCraft source.
+	<LI>FIXME: for final version add the direct download link.
+	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
+	    FreeCraft - Download</A>
+	<LI>Extract it into the freecraft source directory. It overwrites the
+	    content of data which is only needed with the original CD.
+	<LI>Read "readme" file that is in the archive for further
+	    instructions on how to setup the graphics and sounds packs.
+	    Note: The current version didn't contain it. 
 	</UL>
 	<LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
 	    script.
@@ -150,7 +155,7 @@ Please follow the following instructions to get a working program.
 	<LI>Optional:
 	    <UL>
 	    <LI>Edit "data/ccl/freecraft.ccl" to configure FreeCraft
-		with SIOD support.
+		for your own needs.
 	</UL>
 	<LI>Now you could start with "./freecraft".
 	<LI>That's all, I hope you have enjoyed the game.
@@ -174,7 +179,6 @@ Please follow the following instructions to get a working program.
     <LI>Unpack it into a directory of your choice (~/freecraft)
     <LI>Open a shell.
     <LI>Change to the top level directory. ("cd ~/freecraft")
-	<LI>Install the required libraries (development version!).
 	<LI>You own the original:
 	<UL>
 	<LI>Search the files maindat.war, sfxdat.sud,strdat.war  and rezdat.war
@@ -188,15 +192,19 @@ Please follow the following instructions to get a working program.
 	</UL>
 	<LI><B>With the media from the FreeCraft Media Project:</B>
 	<UL>
-	<LI>Get the correct FcGP (graphic) and FcSP (sound) archives.
-	<LI>FIXME: These are not the direct download links.
-	<LI>Download FcGP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-	<LI>Download FcSP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-	<LI>Extract them.
-	<LI>Read "Readme" file that was in each of the archives for further
-	instructions on how to setup the graphics and sound packs.
+	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
+	    (media) archive.
+	<LI>Take the archive with the same version as the FreeCraft source.
+	<LI>FIXME: for final version add the direct download link.
+	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
+	    FreeCraft - Download</A>
+	<LI>Extract it into the freecraft source directory. It overwrites the
+	    content of data which is only needed with the original CD.
+	<LI>Read "readme" file that is in the archive for further
+	    instructions on how to setup the graphics and sounds packs.
+	    Note: The current version didn't contain it. 
 	</UL>
-    <LI>Noe you could enter "./freecraft" to play.
+    <LI>Now you could enter "./freecraft" to play.
 	<LI>That's all, I hope you have enjoyed the game.
 	<LI>If you find any bug, look in
 		<A HREF="todo.html">todo.html</A>
@@ -215,12 +223,12 @@ Please follow the following instructions to get a working program.
 
 Please follow the following instructions to get a working program. <br>
 <b>Note:</b> If you have not used mingw32 before, remember that in the
-shell that comes with it you must type '/' instead of '\' in path names.
+shell that comes with it, you must type '/' instead of '\' in path names.
 <UL>
     <LI>If you do not have a gnu compiler (eg. mingw32) then download the
-    mingw-fc-native-'date'.zip archive from
-    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=46537">this</a>
-    page. Unzip it into any directory.
+    mingw-fc-native-'date'.zip or freecraft-compiler-'date'.zip archive from
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=1965&release_id=46537">this page.</a>
+    Unzip it into to the C:\ directory.
     <LI>Download freecraft-'date'.zip and unzip it into any directory.
     <LI>Install all required libraries. (If you downloaded mingw32 from the link
     above you should not need to do this)
@@ -235,17 +243,27 @@ shell that comes with it you must type '/' instead of '\' in path names.
     </UL>
     <LI><B>With the media from the FreeCraft Media Project:</B>
     <UL>
-    <LI>Get the correct FcGP (graphic) and FcSP (sound) archives.
-    <LI>FIXME: These are not the direct download links.
-    <LI>Download FcGP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-    <LI>Download FcSP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-    <LI>Extract them into your game directory.
-    <LI>Read "Readme" file that was in each of the archives for further
-    instructions on how to setup the graphics and sound packs.
+	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
+	    (media) archive.
+	<LI>Take the archive with the same version as the FreeCraft source.
+	<LI>FIXME: for final version add the direct download link.
+	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
+	    FreeCraft - Download</A>
+	<LI>Extract it into the freecraft source directory. It overwrites the
+	    content of data which is only needed with the original CD.
+	<LI>Read "readme" file that is in the archive for further
+	    instructions on how to setup the graphics and sounds packs.
+	    Note: The current version didn't contain it. 
     </UL>
-    <LI>Copy Rules.make.orig to Rules.make and edit it. (In the future this
-    may be done by a script)
-    <LI>Enter "make win32" to compile.
+    <LI>Copy Rules.make.orig to Rules.make and edit it or run the setup
+	script.
+    <LI>Type "./setup" to configure the graphics, sound, and compression
+	options.
+	<UL>
+	<LI>"./setup --help" shows a list of available setup options
+	<LI>You have the option of running "make" from the script,
+	    bypassing the next step.
+	</UL>
     <LI>Enter "freecraft" to play.
     <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
 	or <A HREF="../stderr.txt">stderr.txt</A> for more information.
@@ -279,13 +297,17 @@ Please follow the following instructions to get a working program.
     </UL>
     <LI><B>With the media from the FreeCraft Media Project:</B>
     <UL>
-    <LI>Get the correct FcGP (graphic) and FcSP (sound) archives.
-    <LI>FIXME: These are not the direct download links.
-    <LI>Download FcGP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-    <LI>Download FcSP from <A HREF="http://FreeCraft.Org">FreeCraft</A>
-    <LI>Extract them into your game directory.
-    <LI>Read "Readme" file that was in each of the archives for further
-    instructions on how to setup the graphics and sound packs.
+	<LI>FcGP (graphic) and FcSP (sound) are now combined in the FcMP
+	    (media) archive.
+	<LI>Take the archive with the same version as the FreeCraft source.
+	<LI>FIXME: for final version add the direct download link.
+	<LI>Download FcMP from <A HREF="http://FreeCraft.Org/download.html">
+	    FreeCraft - Download</A>
+	<LI>Extract it into the freecraft source directory. It overwrites the
+	    content of data which is only needed with the original CD.
+	<LI>Read "readme" file that is in the archive for further
+	    instructions on how to setup the graphics and sounds packs.
+	    Note: The current version didn't contain it. 
     </UL>
     <LI>Enter "freecraft" to play.
     <LI>If you have problems look into <A HREF="../stdout.txt">stdout.txt</A>
@@ -319,36 +341,42 @@ script should take care of the rest.
     <A HREF="http://www.devolution.com/~slouken/SDL/">
     Simple DirectMedia Layer Home</A>
 
-    <H2>Prepare network play</H2>
+    <H2>Prepare multiplayer play</H2>
 
-You can play FreeCraft via network or may run 2 or more clients on the same computer.  Install
-it on all computers with the above instructions. 
+You can play FreeCraft via network or internet or may run 2 or more clients on
+the same computer.  Install it on all computers with the above instructions. 
 You can now start it on each computer with:
 
-<H3>You need a server:</H3>
+<H3>First you need a server:</H3>
 
-freecraft -p [players] [map]<BR>
+<I>freecraft -p [players] [map]</I><P>
 freecraft -p 2 ./data/puds/multi/3vs3.pud.gz
 
-<P>The game waits until all players are connected. Press ALT-'q' to quit the
-game.
+<P>After the title screen, the game waits with black screen until all players
+are connected.
+Press ALT-'q' to quit the game.
 
-<H3>You need the clients:</H3>
+<H3>Than you need the clients:</H3>
 
-freecraft -n [server] [map]<BR>
+<I>freecraft -n [server] [map]</I><P>
 freecraft -n localhost ./data/puds/multi/3vs3.pud.gz
 
-<P>[server] may be the hostname (e.g. www.freecraft.org) or the IP address (e.g. 192.168.0.1.) of the
-game server. The map must be the same on all computers.
+<P>[server] may be the hostname (e.g. www.freecraft.org) or the IP address
+(e.g. 192.168.0.1.) of the game server. The map must be the same on all
+computers.
 
     <H2>Hints</H2>
 
 <UL>
 	<LI>To run setup, if bash isn't in /bin installed use
 	    "bash -c ". ./setup" .
-	<LI>To run make, if gmake isn't called make, use
+
+	<P><LI>To run make, if gmake isn't called make, use
 	    "gmake MAKE=gmake" .
-	<LI>You find the FreeCraft Media Project here:<BR>
+
+	<P><LI>You can get support on our forums, mailing lists and IRC channel.
+
+	<P><LI>You find the FreeCraft Media Project here:<BR>
 	<A HREF="http://FreeCraft.Net/fcmp/">The FreeCraft Media Project</A>
 
 	<P><LI>You'll get libpng and libz here:<BR>
@@ -393,7 +421,7 @@ game server. The map must be the same on all computers.
 	<P><LI>SIOD: Scheme in One Day<BR>
 	Not needed included in the source distribution.
 	The most recent release is available from
-	<A HREF="http://people.delphi.com/gjc/siod.html">this web page</a>,
+	<A HREF="http://people.delphiforums.com/gjc/siod.html">this web page</a>,
 	and also from <A HREF="ftp://ftp.std.com/pub/gjc/">
 	ftp://ftp.std.com/pub/gjc/</A>
 
