@@ -1079,7 +1079,8 @@ global void SaveCursors(FILE* file)
 	    CursorBuilding ? CursorBuilding->Ident : "()");
     fprintf(file,";;(cursor-position '(%d %d)\n",CursorX,CursorY);
     fprintf(file,";;(cursor-start '(%d %d)\n",CursorStartX,CursorStartY);
-    fprintf(file,";;(unit-under-cursor %s\n",UnitReference(UnitUnderCursor));
+    fprintf(file,";;(unit-under-cursor %s\n",
+	    UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
 }
 
 /**
