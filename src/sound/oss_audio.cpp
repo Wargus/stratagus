@@ -112,7 +112,7 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 	    dummy=((8<<16) |  9);   // 8 Buffers a  512 Bytes
 	    break;
 	default:
-	    DebugLevel0Fn("Unexpected sample frequenze %d\n",freq);
+	    DebugLevel0Fn("Unexpected sample frequenze %d\n" _C_ freq);
 	    // FALL THROUGH
 	case 44100:
 	    dummy=((8<<16) | 10);   // 8 Buffers a 1024 Bytes
@@ -122,7 +122,7 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 	++dummy;			// double buffer size
     }
 
-    DebugLevel0Fn("%d bytes %d ms buffer\n",freq*size/8,
+    DebugLevel0Fn("%d bytes %d ms buffer\n" _C_ freq*size/8 _C_ 
 	((dummy>>16)*(1<<(dummy&0xFFFF))*1000)/(freq*size/8));
 
     if( ioctl(SoundFildes,SNDCTL_DSP_SETFRAGMENT,&dummy)==-1 ) {
@@ -150,8 +150,8 @@ global int InitOssSound(const char* dev,int freq,int size,int wait)
 	return 1;
     }
 
-    DebugLevel2Fn("DSP block size %d\n",dummy);
-    DebugLevel2Fn("DSP sample speed %d\n",freq);
+    DebugLevel2Fn("DSP block size %d\n" _C_ dummy);
+    DebugLevel2Fn("DSP sample speed %d\n" _C_ freq);
 #endif
 
     return 0;
