@@ -986,11 +986,11 @@ extern Unit* ResourceOnMap(int tx, int ty, int resource);
 extern Unit* ResourceDepositOnMap(int tx, int ty, int resource);
 
 	/// Find best enemy in numeric range to attack
-extern Unit* AttackUnitsInDistance(Unit* unit, int range);
+extern Unit* AttackUnitsInDistance(const Unit* unit, int range);
 	/// Find best enemy in attack range to attack
-extern Unit* AttackUnitsInRange(Unit* unit);
+extern Unit* AttackUnitsInRange(const Unit* unit);
 	/// Find best enemy in reaction range to attack
-extern Unit* AttackUnitsInReactRange(Unit* unit);
+extern Unit* AttackUnitsInReactRange(const Unit* unit);
 
 // in groups.c
 

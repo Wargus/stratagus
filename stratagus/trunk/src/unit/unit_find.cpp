@@ -458,7 +458,7 @@ Unit* ResourceDepositOnMap(int tx, int ty, int resource)
 **  @note   Limited to attack range smaller than 16.
 **  @note Will be moved to unit_ai.c soon.
 */
-static Unit* FindRangeAttack(Unit* u, int range)
+static Unit* FindRangeAttack(const Unit* u, int range)
 {
 	int x;
 	int y;
@@ -736,7 +736,7 @@ static Unit* FindRangeAttack(Unit* u, int range)
 **  @return       Unit to be attacked.
 **
 */
-Unit* AttackUnitsInDistance(Unit* unit, int range)
+Unit* AttackUnitsInDistance(const Unit* unit, int range)
 {
 	Unit* dest;
 	const UnitType* type;
@@ -849,19 +849,9 @@ Unit* AttackUnitsInDistance(Unit* unit, int range)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-Unit* AttackUnitsInRange(Unit* unit)
+Unit* AttackUnitsInRange(const Unit* unit)
 {
-	//
-	// Only units which can attack.
-	//
-#ifdef DEBUG
-	if (!unit->Type->CanAttack) {
-		DebugPrint("Should be handled by caller?\n");
-		Assert(0);
-		return NoUnitP;
-	}
-#endif
-
+	Assert(unit->Type->CanAttack);
 	return AttackUnitsInDistance(unit, unit->Stats->AttackRange);
 }
 
@@ -872,22 +862,13 @@ Unit* AttackUnitsInRange(Unit* unit)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-Unit* AttackUnitsInReactRange(Unit* unit)
+Unit* AttackUnitsInReactRange(const Unit* unit)
 {
 	int range;
 	const UnitType* type;
 
-	//
-	// Only units which can attack.
-	//
 	type = unit->Type;
-#ifdef DEBUG
-	if (!type->CanAttack) {
-		DebugPrint("Should be handled by caller?\n");
-		Assert(0);
-		return NoUnitP;
-	}
-#endif
+	Assert(unit->Type->CanAttack);
 
 	if (unit->Player->Type == PlayerPerson) {
 		range = type->ReactRangePerson;
