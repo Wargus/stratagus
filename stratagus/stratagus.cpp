@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name stratagus.c	-	The main file. */
+/**@name stratagus.c - The main file. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -160,7 +160,7 @@
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -175,7 +175,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-extern void beos_init( int argc, char **argv );
+extern void beos_init(int argc, char** argv);
 
 #endif
 
@@ -189,7 +189,7 @@ extern void beos_init( int argc, char **argv );
 //#include "etlib/getopt.h"
 extern char* optarg;
 extern int optind;
-extern int getopt(int argc, char *const*argv, const char *opt);
+extern int getopt(int argc, char* const* argv, const char* opt);
 #endif
 
 #ifdef USE_SDL
@@ -202,7 +202,7 @@ extern int optind;
 extern int optopt;
 extern char *optarg;
 
-extern int getopt(int argc, char *const*argv, const char *opt);
+extern int getopt(int argc, char* const* argv, const char* opt);
 #endif
 
 #include "stratagus.h"
@@ -231,61 +231,61 @@ extern int CclUnits(lua_State* l);
 #endif
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global TitleScreen** TitleScreens;		/// Title screens to show at startup
-global char* MenuBackground;				/// File for menu background
-global char* MenuBackgroundWithTitle;		/// File for menu with title
-global char* MenuMusic;						/// File for menu music
-global char* StratagusLibPath;				/// Path for data directory
-global char LocalPlayerName[16];		/// Name of local player
+global TitleScreen** TitleScreens;          /// Title screens to show at startup
+global char* MenuBackground;                /// File for menu background
+global char* MenuBackgroundWithTitle;       /// File for menu with title
+global char* MenuMusic;                     /// File for menu music
+global char* StratagusLibPath;              /// Path for data directory
+global char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
 global char NameLine[] =
-	"Stratagus V" VERSION ", (c) 1998-2003 by The Stratagus Project.";
+	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
 
-local char* MapName;						/// Filename of the map to load
+local char* MapName;                        /// Filename of the map to load
 
 /*----------------------------------------------------------------------------
---		Speedups FIXME: Move to some other more logic place
+--  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
 global int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
 global int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-global int SpeedBuild = SPEED_BUILD;			/// speed factor for building
-global int SpeedTrain = SPEED_TRAIN;			/// speed factor for training
-global int SpeedUpgrade = SPEED_UPGRADE;	/// speed factor for upgrading
+global int SpeedBuild = SPEED_BUILD;        /// speed factor for building
+global int SpeedTrain = SPEED_TRAIN;        /// speed factor for training
+global int SpeedUpgrade = SPEED_UPGRADE;    /// speed factor for upgrading
 global int SpeedResearch = SPEED_RESEARCH;  /// speed factor for researching
 
 /*============================================================================
-==		DISPLAY
+==  DISPLAY
 ============================================================================*/
 
 // FIXME: move to video header file
-global int VideoPitch;						/// Offset to reach next scan line
-global int VideoWidth;						/// Window width in pixels
-global int VideoHeight;						/// Window height in pixels
+global int VideoPitch;                      /// Offset to reach next scan line
+global int VideoWidth;                      /// Window width in pixels
+global int VideoHeight;                     /// Window height in pixels
 
-global unsigned long NextFrameTicks;		/// Ticks of begin of the next frame
-global unsigned long FrameCounter;		/// Current frame number
-global int SlowFrameCounter;				/// Profile, frames out of sync
+global unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
+global unsigned long FrameCounter;          /// Current frame number
+global int SlowFrameCounter;                /// Profile, frames out of sync
 
 // FIXME: not the correct place
 global int MustRedraw = RedrawEverything;   /// Redraw flags
 global int EnableRedraw = RedrawEverything; /// Enable flags
 
-global unsigned long GameCycle;				/// Game simulation cycle counter
-global unsigned long FastForwardCycle;		/// Cycle to fastforward to in a replay
+global unsigned long GameCycle;             /// Game simulation cycle counter
+global unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*----------------------------------------------------------------------------
---		Random
+--  Random
 ----------------------------------------------------------------------------*/
 
-global unsigned SyncRandSeed;				/// sync random seed value.
+global unsigned SyncRandSeed;               /// sync random seed value.
 
 /**
-**		Inititalize sync rand seed.
+**  Inititalize sync rand seed.
 */
 global void InitSyncRand(void)
 {
@@ -293,10 +293,10 @@ global void InitSyncRand(void)
 }
 
 /**
-**		Syncron rand.
+**  Synchronized random number.
 **
-**		@note This random value must be same on all machines in network game.
-**		Very simple random generations, enough for us.
+**  @note This random value must be same on all machines in network game.
+**  Very simple random generations, enough for us.
 */
 global int SyncRand(void)
 {
@@ -314,12 +314,12 @@ global int SyncRand(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**		String duplicate/concatenate (two arguments)
+**  String duplicate/concatenate (two arguments)
 **
-**		@param l		Left string
-**		@param r		Right string
+**  @param l  Left string
+**  @param r  Right string
 **
-**		@return				Allocated combined string (must be freeded).
+**  @return   Allocated combined string (must be freed).
 */
 global char* strdcat(const char* l, const char* r)
 {
@@ -334,13 +334,13 @@ global char* strdcat(const char* l, const char* r)
 }
 
 /**
-**		String duplicate/concatenate (three arguments)
+**  String duplicate/concatenate (three arguments)
 **
-**		@param l		Left string
-**		@param m		Middle string
-**		@param r		Right string
+**  @param l  Left string
+**  @param m  Middle string
+**  @param r  Right string
 **
-**		@return				Allocated combined string (must be freeded).
+**  @return   Allocated combined string (must be freeded).
 */
 global char* strdcat3(const char* l, const char* m, const char* r)
 {
@@ -357,12 +357,12 @@ global char* strdcat3(const char* l, const char* m, const char* r)
 
 #if !defined(BSD) || defined(__APPLE__)
 /**
-**		Case insensitive version of strstr
+**  Case insensitive version of strstr
 **
-**		@param a		String to search in
-**		@param b		Substring to search for
+**  @param a  String to search in
+**  @param b  Substring to search for
 **
-**		@return				Pointer to first occurence of b or NULL if not found.
+**  @return   Pointer to first occurence of b or NULL if not found.
 */
 global char* strcasestr(const char* a, const char* b)
 {
@@ -389,14 +389,14 @@ global char* strcasestr(const char* a, const char* b)
 #endif // BSD
 
 /**
-**		Compute a square root using ints
+**  Compute a square root using ints
 **
-**		Uses John Halleck's method, see
-**		http://www.cc.utah.edu/~nahaj/factoring/isqrt.legalize.c.html
+**  Uses John Halleck's method, see
+**  http://www.cc.utah.edu/~nahaj/factoring/isqrt.legalize.c.html
 **
-**		@param num		Calculate the square root of this number
+**  @param num  Calculate the square root of this number
 **
-**		@return				The integer square root.
+**  @return     The integer square root.
 */
 global long isqrt(long num)
 {
@@ -409,13 +409,13 @@ global long isqrt(long num)
 	}
 
 	//
-	//		Load the binary constant 01 00 00 ... 00, where the number
-	//		of zero bits to the right of the single one bit
-	//		is even, and the one bit is as far left as is consistant
-	//		with that condition.)
+	//  Load the binary constant 01 00 00 ... 00, where the number
+	//  of zero bits to the right of the single one bit
+	//  is even, and the one bit is as far left as is consistant
+	//  with that condition.)
 	//
-	//		This portable load replaces the loop that used to be
-	//		here, and was donated by  legalize@xmission.com
+	//  This portable load replaces the loop that used to be
+	//  here, and was donated by  legalize@xmission.com
 	//
 	squaredbit  = (long)((((unsigned long)~0L) >> 1) & ~(((unsigned long)~0L) >> 2));
 
@@ -437,15 +437,15 @@ global long isqrt(long num)
 }
 
 /*============================================================================
-==		MAIN
+==  MAIN
 ============================================================================*/
 
-local int WaitNoEvent;						/// Flag got an event
-local int WaitMouseX;						/// Mouse X position
-local int WaitMouseY;						/// Mouse Y position
+local int WaitNoEvent;                      /// Flag got an event
+local int WaitMouseX;                       /// Mouse X position
+local int WaitMouseY;                       /// Mouse Y position
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 {
@@ -454,7 +454,7 @@ local void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
 {
@@ -462,7 +462,7 @@ local void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
@@ -472,7 +472,7 @@ local void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
@@ -481,7 +481,7 @@ local void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
@@ -490,439 +490,26 @@ local void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void WaitCallbackMouse(int x, int y)
 {
-	DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 	WaitMouseX = x;
 	WaitMouseY = y;
 }
 
 /**
-**		Callback for exit.
+**  Callback for exit.
 */
 local void WaitCallbackExit(void)
 {
 	DebugLevel3Fn("Exit\n");
 }
 
-#if 0
-
 /**
-**		Test some video effects.
+**  Wait for any input.
 **
-**		@param frame		Current frame.
-*/
-local void VideoEffect0(int frame, const EventCallback* callbacks)
-{
-	int i;
-	static Graphic* Logo;
-
-	//
-	//		Cleanup
-	//
-	if (frame == -1) {
-		VideoFree(Logo);
-		Logo = NULL;
-		return;
-	}
-
-	//
-	//		Inititialize
-	//
-	if (!Logo) {
-		Logo = LoadSprite("stratagus.png", 628, 141);
-	}
-	VideoLockScreen();
-
-	switch (VideoDepth) {
-		case 15:
-		case 16:
-			for (i = 0; i < VideoWidth * VideoHeight; ++i) {
-				int j;
-
-				j = MyRand() & 0x1F;
-				VideoMemory16[i] = (j << 11) | (j << 6) | (j);
-			}
-			break;
-	}
-
-	VideoDrawTextCentered(VideoWidth / 2, 5, LargeFont, "Press SPACE to continue.");
-	VideoDraw(Logo, 0, (VideoWidth - VideoGraphicWidth(Logo)) / 2, 50);
-
-	VideoUnlockScreen();
-
-	Invalidate();
-	RealizeVideoMemory();
-}
-
-#endif
-
-/**
-**		Draw video effect circle.
-**
-**		@param ptr		Memory pointer
-**		@param depth		depth
-**		@param x		Center x coordinate on the image
-**		@param y		Center y coordinate on the image
-**		@param r		radius of circle
-**
-**		@note if you like optimize play here.
-*/
-global void EffectDrawCircle(int* ptr, int depth, int x, int y, int r)
-{
-	int cx;
-	int cy;
-	int df;
-	int d_e;
-	int d_se;
-
-	cx = 0;
-	cy = r;
-	df = 1 - r;
-	d_e = 3;
-	d_se = -2 * r + 5;
-
-#define EffectDrawPixel(depth, x, y) \
-	do {																\
-		if (0 < (x) && (x) < VideoWidth - 1 &&								\
-				0 < (y) && (y) < VideoHeight - 1) {						\
-			ptr[(x) + (y) * VideoWidth] += depth;						\
-		}																\
-	} while(0)
-
-	do {
-		if (!cx) {
-			EffectDrawPixel(depth, x, y + cy);
-			EffectDrawPixel(depth, x, y - cy);
-			EffectDrawPixel(depth, x + cy, y);
-			EffectDrawPixel(depth, x - cy, y);
-		} else if (cx == cy) {
-			EffectDrawPixel(depth, x + cx, y + cy);
-			EffectDrawPixel(depth, x - cx, y + cy);
-			EffectDrawPixel(depth, x + cx, y - cy);
-			EffectDrawPixel(depth, x - cx, y - cy);
-		} else if (cx < cy) {
-			EffectDrawPixel(depth, x + cx, y + cy);
-			EffectDrawPixel(depth, x + cx, y - cy);
-			EffectDrawPixel(depth, x + cy, y + cx);
-			EffectDrawPixel(depth, x + cy, y - cx);
-			EffectDrawPixel(depth, x - cx, y + cy);
-			EffectDrawPixel(depth, x - cx, y - cy);
-			EffectDrawPixel(depth, x - cy, y + cx);
-			EffectDrawPixel(depth, x - cy, y - cx);
-		}
-		if (df < 0) {
-			df += d_e;
-			d_se += 2;
-		} else {
-			df += d_se;
-			d_se += 4;
-			--cy;
-		}
-		d_e += 2;
-		++cx;
-
-	} while (cx <= cy);
-}
-
-/**
-**		Test some video effects.
-**
-**		@param frame				Current frame.
-**		@param callbacks		Call backs that handle events.
-*/
-#ifdef USE_OPENGL
-local void VideoEffect0(int frame __attribute__((unused)),
-	const EventCallback* callbacks __attribute__((unused)))
-{
-}
-
-#endif
-
-#ifndef USE_SDL_SURFACE
-local void VideoEffect0(int frame,
-	const EventCallback* callbacks __attribute__((unused)))
-{
-	static int* buf1;
-	static int* buf2;
-	static void* vmem;
-	int* tmp;
-	int x;
-	int y;
-
-	//
-	//		Cleanup
-	//
-	if (frame == -1) {
-		free(buf1);
-		free(buf2);
-		free(vmem);
-		vmem = buf1 = buf2 = NULL;
-		return;
-	}
-
-	//
-	//		Inititialize
-	//
-	if (!buf1) {
-		buf1 = calloc(VideoWidth * VideoHeight, sizeof(int));
-		buf2 = calloc(VideoWidth * VideoHeight, sizeof(int));
-		VideoLockScreen();
-		switch (VideoBpp) {
-			case 15:
-			case 16:
-				vmem = malloc(VideoWidth * VideoHeight * sizeof(VMemType16));
-				memcpy(vmem, VideoMemory, VideoWidth * VideoHeight * sizeof(VMemType16));
-				break;
-			case 24:
-				vmem = malloc(VideoWidth * VideoHeight * sizeof(VMemType24));
-				memcpy(vmem, VideoMemory, VideoWidth * VideoHeight * sizeof(VMemType24));
-				break;
-			case 32:
-				vmem = malloc(VideoWidth * VideoHeight * sizeof(VMemType32));
-				memcpy(vmem, VideoMemory, VideoWidth * VideoHeight * sizeof(VMemType32));
-				break;
-		}
-		VideoUnlockScreen();
-
-		if (1) {
-			for (y = 1; y < VideoHeight - 1; y += 16) {
-				for (x = 1; x < VideoWidth - 1; x += 16) {
-					buf1[y * VideoWidth + x] = (rand() % 10) * 20;
-				}
-			}
-		}
-		if (0) {
-			for (x = 1; x < VideoWidth - 1; ++x) {
-				buf2[(VideoHeight - 1) * VideoWidth + x] = !(x % 20) * -100;
-			}
-		}
-	}
-
-	//
-	//		Generate waves
-	//
-	for (y = 1; y < VideoHeight - 1; ++y) {
-		for (x = 1; x < VideoWidth - 1; ++x) {
-			int i;
-
-			i = ((buf1[y * VideoWidth + x - 1] +
-				buf1[y * VideoWidth + x + 1] +
-				buf1[y * VideoWidth - VideoWidth + x] +
-				buf1[y * VideoWidth + VideoWidth + x]) >> 1) -
-				buf2[y * VideoWidth + x];
-			buf2[y * VideoWidth + x] = i - (i >> 7);
-		}
-	}
-
-	//
-	//		Add mouse
-	//
-	if (WaitMouseY && WaitMouseX &&
-			WaitMouseX != VideoWidth - 1 && WaitMouseY != VideoHeight - 1) {
-		EffectDrawCircle(buf2, 10, WaitMouseX, WaitMouseY, 10);
-		//buf2[WaitMouseY * VideoWidth + WaitMouseX] -= 100;
-	}
-	//
-	//		Random drops
-	//
-	if (0) {
-		EffectDrawCircle(buf2, 20, rand() % (VideoWidth - 1),
-			rand() % (VideoHeight - 1), rand() % 7);
-	}
-
-	//
-	//		Draw it
-	//
-	VideoLockScreen();
-	for (y = 1; y < VideoHeight - 1; ++y) {
-#ifdef WITH_ARTSC
-		if (ArtsGetSpace() >= 1024) {
-			callbacks->SoundReady();
-		}
-#endif
-		for (x = 1; x < VideoWidth - 1; ++x) {
-			int xo;
-			int yo;
-			int xt;
-			int yt;
-			VMemType16 pixel16;
-			VMemType24 pixel24;
-			VMemType32 pixel32;
-
-			xo = buf2[y * VideoWidth + x - 1] - buf2[y * VideoWidth + x + 1];
-			yo = buf2[y * VideoWidth - VideoWidth + x] -
-					buf2[y * VideoWidth + VideoWidth + x];
-
-			xt = x + xo;
-			if (xt < 0) {
-				xt = 0;
-			} else if (xt >= VideoWidth) {
-				xt = VideoWidth - 1;
-			}
-			yt = y + yo;
-			if (yt < 0) {
-				yt = 0;
-			} else if (yt >= VideoHeight) {
-				yt = VideoHeight - 1;
-			}
-
-			switch (VideoDepth) {
-				case 15:
-					pixel16 = ((VMemType16*)vmem)[xt + yt * VideoWidth];
-					if (xo) {				// Shading
-						int r;
-						int g;
-						int b;
-
-						r = (pixel16 >> 0) & 0x1F;
-						g = (pixel16 >> 5) & 0x1F;
-						b = (pixel16 >> 10) & 0x1F;
-						r += xo;
-						g += xo;
-						b += xo;
-						r = r < 0 ? 0 : r > 0x1F ? 0x1F : r;
-						g = g < 0 ? 0 : g > 0x1F ? 0x1F : g;
-						b = b < 0 ? 0 : b > 0x1F ? 0x1F : b;
-						pixel16 = r | (g << 5) | (b << 10);
-					}
-					VideoMemory16[x + VideoWidth * y] = pixel16;
-					break;
-				case 16:
-					pixel16 = ((VMemType16*)vmem)[xt + yt * VideoWidth];
-					if (xo) {				// Shading
-						int r;
-						int g;
-						int b;
-
-						r = (pixel16 >> 0) & 0x1F;
-						g = (pixel16 >> 5) & 0x3F;
-						b = (pixel16 >> 11) & 0x1F;
-						r += xo;
-						g += xo * 2;
-						b += xo;
-						r = r < 0 ? 0 : r > 0x1F ? 0x1F : r;
-						g = g < 0 ? 0 : g > 0x3F ? 0x3F : g;
-						b = b < 0 ? 0 : b > 0x1F ? 0x1F : b;
-						pixel16 = r | (g << 5) | (b << 11);
-					}
-					VideoMemory16[x + VideoWidth * y] = pixel16;
-					break;
-				case 24:
-					if (VideoBpp == 24) {
-						pixel24 = ((VMemType24*)vmem)[xt + yt * VideoWidth];
-						if (xo) {
-							int r;
-							int g;
-							int b;
-
-							r = (pixel24.a) & 0xFF;
-							g = (pixel24.b) & 0xFF;
-							b = (pixel24.c) & 0xFF;
-							r += xo << 3;
-							g += xo << 3;
-							b += xo << 3;
-							r = r < 0 ? 0 : r > 0xFF ? 0xFF : r;
-							g = g < 0 ? 0 : g > 0xFF ? 0xFF : g;
-							b = b < 0 ? 0 : b > 0xFF ? 0xFF : b;
-							pixel24.a = r;
-							pixel24.b = g;
-							pixel24.c = b;
-						}
-						VideoMemory24[x + VideoWidth * y] = pixel24;
-						break;
-					}
-					// FALL THROUGH
-				case 32:
-					pixel32 = ((VMemType32*)vmem)[xt + yt * VideoWidth];
-					if (xo) {
-						int r;
-						int g;
-						int b;
-
-						r = (pixel32 >> 0) & 0xFF;
-						g = (pixel32 >> 8) & 0xFF;
-						b = (pixel32 >> 16) & 0xFF;
-						r += xo << 3;
-						g += xo << 3;
-						b += xo << 3;
-						r = r < 0 ? 0 : r > 0xFF ? 0xFF : r;
-						g = g < 0 ? 0 : g > 0xFF ? 0xFF : g;
-						b = b < 0 ? 0 : b > 0xFF ? 0xFF : b;
-						pixel32 = r | (g << 8) | (b << 16);
-					}
-					VideoMemory32[x + VideoWidth * y] = pixel32;
-					break;
-			}
-		}
-	}
-	VideoUnlockScreen();
-
-	Invalidate();
-	RealizeVideoMemory();
-
-	//
-	//		Swap buffers
-	//
-	tmp = buf1;
-	buf1 = buf2;
-	buf2 = tmp;
-}
-#endif
-
-#ifdef DEBUG_DRAWFONTS
-/**
-**		Draw the fonts, for screen shots.
-*/
-local void DebugDrawFonts(void)
-{
-	char* text1 = "Stratagus";
-	char* text2 = "~black~0~red~1~green~2~yellow~3~blue~4~magenta~5~cyan~6~white~7"
-		"~grey~8~light-red~9~light-green~A~light-yellow~B~light-blue~C"
-		"~light-magenta~D~light-cyan~E~light-grey~F";
-	char* text3 = "abdefgABCDEFQ";
-
-	VideoLockScreen();
-	VideoClearScreen();
-
-	PushClipping();
-	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
-
-	VideoFillRectangle(ColorWhite, 0, 0, 40, VideoHeight - 1);
-	VideoDrawTextClip(8,   0 + 10, SmallFont, text1);
-	VideoDrawTextClip(8,   0 + 20, SmallFont, text1);
-	VideoDrawTextClip(8,   0 + 30, SmallFont, text3);
-
-	VideoDrawTextClip(8,  40 + 10, GameFont, text1);
-	VideoDrawTextClip(8,  40 + 25, GameFont, text2);
-	VideoDrawTextClip(8,  40 + 40, GameFont, text3);
-
-	VideoDrawTextClip(8, 100 + 10, LargeFont, text1);
-	VideoDrawTextClip(8, 100 + 25, LargeFont, text2);
-	VideoDrawTextClip(8, 100 + 40, LargeFont, text3);
-
-	VideoDrawTextClip(8, 160 + 10, SmallTitleFont, text1);
-	VideoDrawTextClip(8, 160 + 35, SmallTitleFont, text2);
-	VideoDrawTextClip(8, 160 + 60, SmallTitleFont, text3);
-
-	VideoDrawTextClip(8, 260 + 10, LargeTitleFont, text1);
-	VideoDrawTextClip(8, 260 + 55, LargeTitleFont, text2);
-	VideoDrawTextClip(8, 260 + 100, LargeTitleFont, text3);
-
-	PopClipping();
-
-	VideoUnlockScreen();
-	Invalidate();
-	RealizeVideoMemory();
-}
-#endif
-
-/**
-**		Wait for any input.
-**
-**		@param timeout		Time in seconds to wait.
+**  @param timeout  Time in seconds to wait.
 */
 local void WaitForInput(int timeout)
 {
@@ -940,39 +527,11 @@ local void WaitForInput(int timeout)
 	callbacks.NetworkEvent = NetworkEvent;
 	callbacks.SoundReady = WriteSound;
 
-	//
-	//		FIXME: more work needed, scrolling credits, animations, ...
 	WaitNoEvent = 1;
-#ifdef DEBUG_DRAWFONTS
-	while (WaitNoEvent) {
-		static int init = 0;
-		if (!init) {
-			SetDefaultTextColors(FontYellow, FontWhite);
-			LoadFonts();
-			init = 1;
-		}
-		DebugDrawFonts();
-		WaitEventsOneFrame(&callbacks);
-	}
-#else
-//#ifndef USE_SDL_SURFACE
 	timeout *= CYCLES_PER_SECOND;
 	while (timeout-- && WaitNoEvent) {
-		// FIXME: make this configurable
-
-#ifndef USE_SDL_SURFACE
-		if (0) {
-			VideoEffect0(timeout, &callbacks);
-		}
-#endif
 		WaitEventsOneFrame(&callbacks);
 	}
-#ifndef USE_SDL_SURFACE
-	if (0) {
-		VideoEffect0(-1, &callbacks);
-	}
-#endif
-#endif
 
 #ifdef USE_SDL_SURFACE
 	VideoClearScreen();
@@ -986,9 +545,9 @@ local void WaitForInput(int timeout)
 }
 
 /**
-**		Show load progress.
+**  Show load progress.
 **
-**		@param fmt		printf format string.
+**  @param fmt  printf format string.
 */
 global void ShowLoadProgress(const char* fmt, ...)
 {
@@ -1004,7 +563,8 @@ global void ShowLoadProgress(const char* fmt, ...)
 #ifndef USE_SDL_SURFACE
 		VideoLockScreen();
 #endif
-		for (s = temp; *s; ++s) {		// Remove non printable chars
+		// Remove non printable chars
+		for (s = temp; *s; ++s) {
 			if (*s < 32) {
 				*s = ' ';
 			}
@@ -1024,7 +584,7 @@ global void ShowLoadProgress(const char* fmt, ...)
 //----------------------------------------------------------------------------
 
 /**
-**		Pre menu setup.
+**  Pre menu setup.
 */
 global void PreMenuSetup(void)
 {
@@ -1047,19 +607,18 @@ global void PreMenuSetup(void)
 }
 
 /**
-**		Menu loop.
+**  Menu loop.
 **
-**		Show the menus, start game, return back.
+**  Show the menus, start game, return back.
 **
-**		@param filename		map filename
-**		@param map		map loaded
+**  @param filename  map filename
+**  @param map       map loaded
 */
 global void MenuLoop(char* filename, WorldMap* map)
 {
-
 	for (;;) {
 		//
-		//		Clear screen
+		//  Clear screen
 		//
 #ifdef USE_SDL_SURFACE
 		VideoClearScreen();
@@ -1073,7 +632,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 		RealizeVideoMemory();
 
 		//
-		//		Network part 1 (port set-up)
+		//  Network part 1 (port set-up)
 		//
 		if (NetworkFildes != (Socket)-1) {
 			ExitNetwork1();
@@ -1081,15 +640,15 @@ global void MenuLoop(char* filename, WorldMap* map)
 		InitNetwork1();
 
 		//
-		// Don't leak when called multiple times
-		//		- FIXME: not the ideal place for this..
+		//  Don't leak when called multiple times
+		//    - FIXME: not the ideal place for this..
 		//
 		DebugLevel0Fn("Freeing map info, wrong place\n");
 		FreeMapInfo(map->Info);
 		map->Info = NULL;
 
 		//
-		//		No filename given, choose with the menus
+		//  No filename given, choose with the menus
 		//
 		if (!filename) {
 			NetPlayers = 0;
@@ -1134,20 +693,20 @@ global void MenuLoop(char* filename, WorldMap* map)
 		}
 
 		//
-		//		Start editor or game.
+		//  Start editor or game.
 		//
 		if (EditorRunning) {
 			EditorMainLoop();
 		} else {
 			//
-			//		Create the game.
+			//  Create the game.
 			//
 			CreateGame(filename, map);
 
 			SetStatusLine(NameLine);
 			SetMessage("Do it! Do it now!");
 			//
-			//		Play the game.
+			//  Play the game.
 			//
 			GameMainLoop();
 		}
@@ -1155,7 +714,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 		CleanModules();
 		CleanFonts();
 
-		LoadCcl();						// Reload the main config file
+		// Reload the main config file
+		LoadCcl();
 		PlaySectionMusic(PlaySectionMainMenu);
 
 		PreMenuSetup();
@@ -1168,11 +728,11 @@ global void MenuLoop(char* filename, WorldMap* map)
 //----------------------------------------------------------------------------
 
 /**
-**		Print headerline, copyright, ...
+**  Print headerline, copyright, ...
 */
 local void PrintHeader(void)
 {
-	// vvv---- looks wired, but is needed for GNU brain damage
+	// vvv---- looks weird, but is needed for GNU brain damage
 	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
 	"\t(http://Stratagus.Org)"
 #ifdef USE_LIBMODPLUG
@@ -1188,9 +748,6 @@ local void PrintHeader(void)
 #endif
 #ifdef DEBUG
 	"DEBUG "
-#endif
-#ifdef DEBUG_FLAGS
-	"DEBUG-FLAGS "
 #endif
 #ifdef USE_ZLIB
 	"ZLIB "
@@ -1249,10 +806,10 @@ local void PrintHeader(void)
 }
 
 /**
-**		Main1, called from main.
+**  Main1, called from main.
 **
-**		@param		argc		Number of arguments.
-**		@param		argv		Vector of arguments.
+**  @param argc  Number of arguments.
+**  @param argv  Vector of arguments.
 */
 global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
@@ -1274,16 +831,19 @@ Use it at your own risk.\n\n");
 	//
 	//		Hardware drivers setup
 	//
-	InitVideo();						// setup video display
+
+	// Setup video display
+	InitVideo();
 #ifdef WITH_SOUND
-	if (!SoundOff && InitSound()) {		// setup sound card
+	// Setup sound card
+	if (!SoundOff && InitSound()) {
 		SoundOff = 1;
 		SoundFildes = -1;
 	}
 #endif
 
-#ifndef DEBUG								// For debug it's better not to have:
-	srand(time(NULL));						// Random counter = random each start
+#ifndef DEBUG           // For debug it's better not to have:
+	srand(time(NULL));  // Random counter = random each start
 #endif
 
 	InitMovie();
@@ -1339,15 +899,12 @@ Use it at your own risk.\n\n");
 }
 
 /**
-**		Exit clone.
+**  Exit the game.
 **
-**		Called from ALT-'X' key or exit game menus.
-**
-**		@param err		Error code to parse to shell.
+**  @param err  Error code to parse to shell.
 */
 global volatile void Exit(int err)
 {
-
 	StopMusic();
 	QuitSound();
 	QuitCD();
@@ -1372,11 +929,10 @@ global volatile void Exit(int err)
 }
 
 /**
-**		Do a fatal exit.
+**  Do a fatal exit.
+**  Called on out of memory or crash.
 **
-**		Called on out of memory or crash.
-**
-**		@param err		Error code to parse to shell.
+**  @param err  Error code to parse to shell.
 */
 global volatile void ExitFatal(int err)
 {
@@ -1385,7 +941,7 @@ global volatile void ExitFatal(int err)
 }
 
 /**
-**		Display the usage.
+**  Display the usage.
 */
 local void Usage(void)
 {
@@ -1417,22 +973,22 @@ map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 }
 
 /**
-**		The main program: initialise, parse options and arguments.
+**  The main program: initialise, parse options and arguments.
 **
-**		@param		argc		Number of arguments.
-**		@param		argv		Vector of arguments.
+**  @param argc  Number of arguments.
+**  @param argv  Vector of arguments.
 */
 global int main(int argc, char** argv)
 {
 #ifdef USE_BEOS
 	//
-	//		Parse arguments for BeOS
+	//  Parse arguments for BeOS
 	//
 	beos_init(argc, argv);
 #endif
 
 	//
-	//		Setup some defaults.
+	//  Setup some defaults.
 	//
 #ifndef __APPLE__
 	StratagusLibPath = STRATAGUS_LIB_PATH;
@@ -1446,7 +1002,7 @@ global int main(int argc, char** argv)
 	// FIXME: Parse options before or after ccl?
 
 	//
-	//		Parse commandline
+	//  Parse commandline
 	//
 	for (;;) {
 		switch (getopt(argc, argv, "c:d:ef:hln:P:s:t:v:wD:N:E:FL:S:U:W?")) {
@@ -1565,8 +1121,8 @@ global int main(int argc, char** argv)
 		--argc;
 	}
 
-
-	InitCcl();								// init CCL and load configurations!
+	// Init CCL and load configurations!
+	InitCcl();
 
 	// Initialise AI module
 	InitAiModule();
