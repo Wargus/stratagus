@@ -782,7 +782,7 @@ local int PassCondition(const Unit* caster, const SpellType* spell, const Unit* 
 	}
 	if (condition->Opponent != CONDITION_TRUE) {
 		if ((condition->Opponent == CONDITION_ONLY) ^
-				IsEnemy(caster->Player, target)) {
+				(IsEnemy(caster->Player, target) && 1)) {
 			return 0;
 		}
 	}
