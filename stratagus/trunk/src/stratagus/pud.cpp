@@ -776,7 +776,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     int height;
     int aiopps;
 
-    if (!(map->Info)) {
+    if (!map->Info) {
 	map->Info = GetPudInfo(pud);
     }
     if( !(input=CLopen(pud)) ) {

@@ -283,13 +283,7 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     }
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
-    DebugLevel0Fn("%d\n",sizeof(player->UnitColors));
-#if __GNUC__>=3
-#warning "Compiler error or coding error?"
-    memcpy(&unit->Colors,&player->UnitColors,sizeof(player->UnitColors));
-#else
     unit->Colors=player->UnitColors;
-#endif
 
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
@@ -302,8 +296,9 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Wait=1;
     unit->Reset=1;
     unit->Removed=1;
+
 #ifdef NEW_DECODRAW
-    unit->deco=NULL;
+    // JOHNS: not needed unit->deco=NULL;
 #endif
 
     // Invisible as default for submarines

@@ -120,7 +120,6 @@ global void CleanPlayers(void)
     }
     ThisPlayer=NULL;
     memset(Players,0,sizeof(Players));
-    SetPlayersPalette();
     NumPlayers=0;
 
     //
@@ -789,6 +788,7 @@ global void PlayersEachSecond(void)
 **	FIXME: use function pointer here.
 **
 **	@param player	Pointer to player.
+**	@param sprite	The sprite in which the colors should be changed.
 */
 global void GraphicPlayerPixels(const Player* player,const Graphic* sprite)
 {
