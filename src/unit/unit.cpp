@@ -334,7 +334,11 @@ global void InitUnit(Unit* unit, UnitType* type)
 	if (type->CanCastSpell) {
 		unit->Mana = (type->_MaxMana * MAGIC_FOR_NEW_UNITS) / 100;
 		unit->AutoCastSpell = malloc(SpellTypeCount);
-		memset(unit->AutoCastSpell, 0, SpellTypeCount);
+		if (unit->Type->AutoCastActive) {
+			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeCount);
+		} else {
+			memset(unit->AutoCastSpell, 0, SpellTypeCount);
+		}
 	}
 	unit->Active = 1;
 
