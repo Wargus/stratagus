@@ -615,7 +615,7 @@ global void MakeTexture(Graphic* graphic,int width,int height)
     h=i;
     graphic->TextureWidth = (float)width/w;
     graphic->TextureHeight = (float)height/h;
-    tex = alloca(w*h*4);
+    tex = (unsigned char*)malloc(w*h*4);
     for( x=0; x<n; ++x ) {
 	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[x]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -661,7 +661,6 @@ global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsign
     int j;
     int h;
     int w;
-//    int x;
     int n;
     unsigned char* tex;
     const unsigned char* sp;
@@ -695,7 +694,7 @@ global void MakePlayerColorTexture(Graphic** g,Graphic* graphic,int frame,unsign
     }
     h=i;
 
-    tex = alloca(w*h*4);
+    tex = (unsigned char*)malloc(w*h*4);
 
     glBindTexture(GL_TEXTURE_2D, (*g)->TextureNames[frame]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
