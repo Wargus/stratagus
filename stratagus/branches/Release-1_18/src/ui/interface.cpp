@@ -853,6 +853,7 @@ local int CommandKey(int key)
 		break;
 	    }
 	    ToggleFullScreen();
+	    SavePreferences();
 	    break;
 
 	case 'g'&0x1F:
