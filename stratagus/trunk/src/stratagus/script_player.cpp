@@ -883,6 +883,40 @@ static int CclSetPlayerData(lua_State* l)
 	return 0;
 }
 
+extern char** AiTypeWcNames;
+/**
+**  Set ai player algo.
+**
+**  @param l  Lua state.
+*/
+static int CclSetAiType(lua_State* l)
+{
+	Player* p;
+	const char* ai;
+	char** cp;
+	int ainum = 0;
+
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushvalue(l, 1);
+	p = CclGetPlayer(l);
+	lua_pop(l, 1);
+
+	ai = LuaToString(l, 2);
+	cp = AiTypeWcNames;
+	while (*cp) {
+		if (!strcmp(ai, *cp)) {
+			PlayerSetAiNum(p, ainum);
+			return 0;
+		}
+		cp++;
+		ainum++;
+	}
+
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -916,6 +950,7 @@ void PlayerCclRegister(void)
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
+	lua_register(Lua, "SetAiType", CclSetAiType);
 }
 
 //@}

@@ -88,25 +88,27 @@ player.
 </pre>
 
 <a name="SetAiType"></a>
-<h3>SetAiType(ai-type)</h3>
+<h3>SetAiType(player, ai-type)</h3>
 
 Set what kind of ai algorithm should be used. For example: an air based
-ai for a map with a lot of obstacles
+ai for a map with a lot of obstacles. Call this function only when creating 
+a game, not during the game.
 
 <p>
 <dl>
+<dt>player</dt>
+<dd>
+The player number.
+</dd>
 <dt>ai-type</dt>
 <dd>
 The name of the ai algorithm to use.
 </dd></dl>
 
-<p>
-Note: This is for the new map format. Not implemented yet. 
-
 <h4>Example</h4>
 
 <pre>
-    SetAiType("ai-air")
+    SetAiType(0, "ai-air")
 </pre>
 
 <a name="SetHeightMap"></a>

@@ -460,6 +460,64 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 }
 
 /**
+**  Select the tileset when loading a map
+**
+**  @param l  Lua state.
+*/
+static int CclSelectTileset(lua_State* l)
+{
+	const char* tileset;
+	int i;
+
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+
+	tileset = LuaToString(l, 1);
+
+	free(TheMap.TerrainName);
+	TheMap.TerrainName = strdup(tileset);
+
+	printf("%s\n", TilesetWcNames[0]);
+	// Lookup the index of this tileset.
+	for (i = 0; TilesetWcNames[i] &&
+		strcmp(tileset, TilesetWcNames[i]); ++i) {
+	}
+	TheMap.Terrain = i;
+	LoadTileset();
+
+	return 0;
+}
+	
+/**
+**  Define Fog graphics
+**
+**  @param l  Lua state.
+*/
+static int CclSetTile(lua_State* l)
+{
+	int tile;
+	int w;
+	int h;
+	Tileset *tileset;
+
+	if (lua_gettop(l) != 3) {
+		LuaError(l, "incorrect argument");
+	}
+	
+	tile = LuaToNumber(l, 1);
+	w = LuaToNumber(l, 2);
+	h = LuaToNumber(l, 3);
+	tileset = Tilesets[TheMap.Terrain];
+
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = tileset->Table[tile];
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Flags = tileset->FlagsTable[tile];
+
+	return 0;
+}
+
+/**
 ** Define the type of each player available for the map
 **
 **  @param l  Lua state.
@@ -519,6 +577,8 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
+	lua_register(Lua, "SelectTileset", CclSelectTileset);
+	lua_register(Lua, "SetTile", CclSetTile);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }
 
