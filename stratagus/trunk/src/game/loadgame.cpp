@@ -54,9 +54,7 @@
 #include "sound_server.h"
 #include "font.h"
 #include "menus.h"
-#ifdef HIERARCHIC_PATHFINDER
 #include "pathfinder.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -172,6 +170,7 @@ global void LoadModules(void)
 
     LoadUnitSounds();
     MapUnitSounds();
+    InitAStar();
 #ifdef WITH_SOUND
     if (SoundFildes!=-1) {
 	//FIXME: must be done after map is loaded
