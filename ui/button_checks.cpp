@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name button_table.c	-	The button table. */
+/**@name button_checks.c	-	The button checks. */
 //
 //	(c) Copyright 1999-2001 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
@@ -25,8 +25,6 @@
 //	$Id$
 
 //@{
-
-/** @todo FIXME: this file can be renamed */
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -219,14 +217,34 @@ global int ButtonCheckResearch(const Unit* unit,const ButtonAction* button)
     }
 
     // check if allowed
-    if ( !CheckDependByIdent( ThisPlayer, button->ValueStr ) ) {
+    if ( !CheckDependByIdent( unit->Player, button->ValueStr ) ) {
 	return 0;
     }
     if ( !strncmp( button->ValueStr,"upgrade-", 8 ) &&
-		UpgradeIdentAllowed( ThisPlayer,button->ValueStr )!='A' ) {
+		UpgradeIdentAllowed( unit->Player,button->ValueStr )!='A' ) {
 	return 0;
     }
     return 1;
+}
+
+/**
+**	Check if all requirements for upgrade research are meet only one
+**	running research allowed.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
+*/
+global int ButtonCheckSingleResearch(const Unit* unit,
+	const ButtonAction* button)
+{
+    if( ButtonCheckResearch(unit,button) ) {
+	if( !unit->Player->UpgradeTimers.Upgrades[
+		UpgradeIdByIdent(button->ValueStr) ] ) {
+	    return 1;
+	}
+    }
+    return 0;
 }
 
 //@}

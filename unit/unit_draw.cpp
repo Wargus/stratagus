@@ -645,8 +645,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    //
 	    } else if( unit->Orders[0].Action==UnitActionResearch ) {
 		DrawManaBar(x,y,type,unit->Data.Research.Upgrade
-			    ->Costs[TimeCost]
-			,unit->Data.Research.Ticks);
+			    ->Costs[TimeCost],
+			unit->Player->UpgradeTimers.Upgrades[
+			    unit->Data.Research.Upgrade-Upgrades]);
 	    //
 	    //	Transporter with units on board.
 	    //
@@ -707,8 +708,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    //
 	    } else if( unit->Orders[0].Action==UnitActionResearch ) {
 		DrawManaSprite(x,y,type,unit->Data.Research.Upgrade
-			    ->Costs[TimeCost]
-			,unit->Data.Research.Ticks);
+			    ->Costs[TimeCost],
+			unit->Player->UpgradeTimers.Upgrades[
+			    unit->Data.Research.Upgrade-Upgrades]);
 	    //
 	    //	Transporter with units on board.
 	    //

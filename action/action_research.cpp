@@ -57,25 +57,42 @@
 */
 global void HandleActionResearch(Unit* unit)
 {
-    Upgrade* upgrade;
-
-    DebugLevel3("Research %d\n",UnitNumber(unit));
+    const Upgrade* upgrade;
 
     if( !unit->SubAction ) {		// first entry
+	upgrade=unit->Data.Research.Upgrade=unit->Orders[0].Arg1;
+#if 0
+	// FIXME: I want to support both, but with network we need this check
+	//	  but if want combined upgrades this is worse
+
+	//
+	//	Check if an other building has already started?
+	//
+	if( unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] ) {
+	    DebugLevel0Fn("Two researches running\n");
+	    PlayerAddCosts(unit->Player,upgrade->Costs);
+
+	    unit->Reset=unit->Wait=1;
+	    unit->Orders[0].Action=UnitActionStill;
+	    unit->SubAction=0;
+	    if( IsOnlySelected(unit) ) {
+		MustRedraw|=RedrawInfoPanel;
+	    }
+	    return;
+	}
+#endif
 	unit->SubAction=1;
-	unit->Data.Research.Ticks=0;
-	unit->Data.Research.Upgrade=unit->Orders[0].Arg1;
+    } else {
+	upgrade=unit->Data.Research.Upgrade;
     }
-    upgrade=unit->Data.Research.Upgrade;
-    unit->Data.Research.Ticks+=SpeedResearch;
 
-    if( unit->Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
+    unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]+=SpeedResearch;
+    if( unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]
+		>=upgrade->Costs[TimeCost] ) {
 
-	// FIXME: should als speak and tell ai. generic notify/message.
-	if( unit->Player==ThisPlayer ) {
-	    SetMessageEvent(unit->X, unit->Y, "%s: Upgrade complete"
-		,unit->Type->Name );
-	} else if( unit->Player->Ai ) {
+	NotifyPlayer(unit->Player,NotifyGreen,unit->X,unit->Y,
+		"%s: complete",unit->Type->Name);
+	if( unit->Player->Ai ) {
 	    AiResearchComplete(unit,upgrade);
 	}
         UpgradeAcquire(unit->Player,upgrade);

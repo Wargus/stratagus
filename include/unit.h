@@ -515,7 +515,6 @@ struct _unit_ {
 	int	Active;			/// how much units are in the resource
     }		Resource;		/// Resource still
     struct _order_research_ {
-	unsigned Ticks;			/// Ticks for research
 	Upgrade* Upgrade;		/// Upgrade researched
     }		Research;		/// Research action
     struct _order_upgradeto_ {

@@ -1012,8 +1012,8 @@ global void DebugPlayers(void)
 **
 **	@todo FIXME:	We must also notfiy allied players.
 */
-global void NotifyPlayer(const Player* player,int type,int x,int y,
-	const char* fmt, ...)
+global void NotifyPlayer(const Player* player,
+	int type __attribute__((unused)),int x,int y,const char* fmt, ...)
 {
     char temp[128];
     va_list va;
