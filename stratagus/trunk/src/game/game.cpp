@@ -333,8 +333,17 @@ void CreateGame(const char* filename, WorldMap* map)
 
 	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
+	
+	if (!TheMap.Info.Filename) {
+		Assert(filename);
+		if (strcasestr(filename, ".pud")) {
+			GetPudInfo(filename, &TheMap.Info);
+		} else if(strcasestr(filename, ".smp")) {
+			LuaLoadFile(filename);
+		}
+	}
 
-	for( i=0; i<16; ++i ) {
+	for (i = 0; i < PlayerMax; ++i) {
 		int p;
 		int aiopps;
 
@@ -348,7 +357,7 @@ void CreateGame(const char* filename, WorldMap* map)
 			}
 			if (p == PlayerComputer) {
 				if (aiopps < GameSettings.Opponents) {
-					aiopps++;
+					++aiopps;
 				} else {
 					p = PlayerNobody;
 				}
