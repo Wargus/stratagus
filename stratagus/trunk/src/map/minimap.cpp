@@ -142,7 +142,15 @@ global void UpdateMinimapXY(int tx, int ty)
 	    tile = TheMap.Fields[x + y].Tile;
 
 #ifdef USE_SDL_SURFACE
-	    // FIXME: todod
+	    // FIXME: todo
+	    int xofs;
+	    int yofs;
+	    xofs = TileSizeX * (tile % TheMap.TileGraphic->Surface->w);
+	    yofs = TileSizeY * (tile / TheMap.TileGraphic->Surface->w);
+	    SDL_LockSurface(MinimapTerrainGraphic->Surface);
+	    ((unsigned char*)MinimapTerrainGraphic->Surface->pixels)[mx + my * TheUI.MinimapW] =
+		((unsigned char*)TheMap.TileGraphic->Surface->pixels)[7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
+	    SDL_UnlockSurface(MinimapTerrainGraphic->Surface);
 #else
 	    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW] =
 		TheMap.Tiles[tile][7 + (mx % scalex) * 8 + (6 + (my % scaley) * 8) * TileSizeX];
@@ -243,23 +251,8 @@ global void CreateMinimap(void)
     MinimapTerrainGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
 
 #ifdef USE_SDL_SURFACE
-    Uint32 rmask, gmask, bmask, amask;
-// FIXME: use defines for this?
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xff000000;
-    gmask = 0x00ff0000;
-    bmask = 0x0000ff00;
-    amask = 0x000000ff;
-#else
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = 0xff000000;
-#endif
-    // FIXME: does NewGraphic do this for MinimapTerrainGraphic??
-    // FIXME: what depth?
     MinimapGraphic = SDL_CreateRGBSurface(SDL_SWSURFACE, TheUI.MinimapW,
-	TheUI.MinimapH, 8, rmask, gmask, bmask, amask);
+	TheUI.MinimapH, 8, RMASK, GMASK, BMASK, AMASK);
 #else
     memset(MinimapTerrainGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
     MinimapGraphic = calloc(TheUI.MinimapW * TheUI.MinimapH, sizeof(VMemType));
@@ -300,7 +293,7 @@ global void CreateMinimap(void)
 	    for (x = MinimapX; x < TheUI.MinimapW - MinimapX; ++x) {
 #ifdef USE_SDL_SURFACE
 		// FIXME: todo
-//		((char*)MinimapGraphic->pixels)[x + y * TheUI.MinimapW] = ColorBlack;
+		VideoDrawPixel(ColorBlack, x, y);
 #else
 		MinimapGraphic[x + y * TheUI.MinimapW] = ColorBlack;
 #endif
