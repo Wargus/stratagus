@@ -30,6 +30,10 @@
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 
+#ifndef USE_SOUND
+#error USE_SOUND must be defined to use cd audio
+#endif
+
 #if defined(USE_SDLCD) 
 #include "SDL.h" 
 #elif defined(USE_LIBCDA) 
