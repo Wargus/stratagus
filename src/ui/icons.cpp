@@ -52,6 +52,10 @@
 */
 global char** IconWcNames;
 
+global int IconWidth;			/// icon width in panels
+global int IconHeight;	    		/// icon height in panels
+global int IconsPerRow;			/// icons per row
+
 local Icon** Icons;			/// Table of all icons.
 local int NumIcons;			/// Number of icons in Icons.
 
@@ -103,8 +107,8 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
     } else {				// new file
 	iconfile=malloc(sizeof(IconFile));
 	iconfile->FileName=strdup(file);
-	iconfile->Width=ICON_WIDTH;
-	iconfile->Height=ICON_HEIGHT;
+	iconfile->Width=IconWidth;
+	iconfile->Height=IconHeight;
 
 	iconfile->Icons=0;
 
@@ -128,9 +132,8 @@ local void AddIcon(char* ident,char* tileset,int index,char* file)
 	icon->Tileset=strdup(tileset);
 	icon->File=iconfile;
 	icon->Index=index;
-	// FIXME: 5 icons pro row hardcoded!
-	icon->X=(index%5)*iconfile->Width;
-	icon->Y=(index/5)*iconfile->Height;
+	icon->X=(index%IconsPerRow)*iconfile->Width;
+	icon->Y=(index/IconsPerRow)*iconfile->Height;
 	icon->Width=iconfile->Width;
 	icon->Height=iconfile->Height;
 
@@ -352,19 +355,19 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
 
     color= (flags&IconActive) ? ColorGray : ColorBlack;
 
-    VideoDrawRectangleClip(color,x,y,ICON_WIDTH+7,ICON_HEIGHT+7);
-    VideoDrawRectangleClip(ColorBlack,x+1,y+1,ICON_WIDTH+5,ICON_HEIGHT+5);
+    VideoDrawRectangleClip(color,x,y,IconWidth+7,IconHeight+7);
+    VideoDrawRectangleClip(ColorBlack,x+1,y+1,IconWidth+5,IconHeight+5);
 
-    VideoDrawVLine(ColorGray,x+ICON_WIDTH+4,y+5,ICON_HEIGHT-1);	// _|
-    VideoDrawVLine(ColorGray,x+ICON_WIDTH+5,y+5,ICON_HEIGHT-1);
-    VideoDrawHLine(ColorGray,x+5,y+ICON_HEIGHT+4,ICON_WIDTH+1);
-    VideoDrawHLine(ColorGray,x+5,y+ICON_HEIGHT+5,ICON_WIDTH+1);
+    VideoDrawVLine(ColorGray,x+IconWidth+4,y+5,IconHeight-1);	// _|
+    VideoDrawVLine(ColorGray,x+IconWidth+5,y+5,IconHeight-1);
+    VideoDrawHLine(ColorGray,x+5,y+IconHeight+4,IconWidth+1);
+    VideoDrawHLine(ColorGray,x+5,y+IconHeight+5,IconWidth+1);
 
     color= (flags&IconClicked) ? ColorGray : ColorWhite;	// |~
-    VideoDrawHLine(color,x+5,y+3,ICON_WIDTH+1);
-    VideoDrawHLine(color,x+5,y+4,ICON_WIDTH+1);
-    VideoDrawVLine(color,x+3,y+3,ICON_HEIGHT+3);
-    VideoDrawVLine(color,x+4,y+3,ICON_HEIGHT+3);
+    VideoDrawHLine(color,x+5,y+3,IconWidth+1);
+    VideoDrawHLine(color,x+5,y+4,IconWidth+1);
+    VideoDrawVLine(color,x+3,y+3,IconHeight+3);
+    VideoDrawVLine(color,x+4,y+3,IconHeight+3);
 
     if( flags&IconClicked ) {
 	++x; ++y;
@@ -375,7 +378,7 @@ global void DrawUnitIcon(const Player* player,Icon* icon,unsigned flags
     DrawIcon(player,icon,x,y);
 
     if( flags&IconSelected ) {
-	VideoDrawRectangleClip(ColorGreen,x,y,ICON_WIDTH,ICON_HEIGHT);
+	VideoDrawRectangleClip(ColorGreen,x,y,IconWidth,IconHeight);
     }
 }
 
@@ -518,6 +521,30 @@ local SCM CclDefineIconWcNames(SCM list)
 }
 
 /**
+**	Set icon size
+**
+**	@param width	Width of icon.
+**	@param height	Height of icon.
+*/
+local SCM CclSetIconSize(SCM width,SCM height)
+{
+    IconWidth=gh_scm2int(width);
+    IconHeight=gh_scm2int(height);
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Set icons per row
+**
+**	@param icons	Icons per row.
+*/
+local SCM CclSetIconsPerRow(SCM icons)
+{
+    IconsPerRow=gh_scm2int(icons);
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for icons.
 **
 **	@todo
@@ -529,6 +556,9 @@ global void IconCclRegister(void)
     gh_new_procedure2_0("define-icon-alias",CclDefineIconAlias);
 
     gh_new_procedureN("define-icon-wc-names",CclDefineIconWcNames);
+
+    gh_new_procedure2_0("set-icon-size!",CclSetIconSize);
+    gh_new_procedure1_0("set-icons-per-row!",CclSetIconsPerRow);
 }
 
 //@}
