@@ -500,7 +500,7 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(70*VideoWidth/640,80*VideoHeight/480,320*VideoWidth/640,
+	ScrollText(70*VideoWidth/640,80*VideoHeight/480,70*VideoWidth/640+320,
 	    170*VideoHeight/480,line,scrolling_text);
 
 	//
@@ -526,9 +526,15 @@ global void ShowIntro(const Intro *intro)
 
 	VideoUnlockScreen();
 
-	// FIXME: update only the changed area!!!!
-
-	Invalidate();
+	if( !line && !c ) {
+	    Invalidate();
+	} else {
+	    InvalidateAreaAndCheckCursor(70*VideoWidth/640,80*VideoHeight/480,
+		70*VideoWidth/640+320+1,170*VideoHeight/480+1);
+	    InvalidateAreaAndCheckCursor(ContinueButtonX,ContinueButtonY,
+		106,27);
+	    InvalidateCursorAreas();
+	}
 	RealizeVideoMemory();
 
 	if( !IntroNoEvent ) {
@@ -537,8 +543,7 @@ global void ShowIntro(const Intro *intro)
 	WaitEventsOneFrame(&callbacks);
 	if( c==0 ) {
 	    c=1;
-	}
-	else {
+	} else {
 	    c=0;
 	    ++line;
 	}
