@@ -1291,7 +1291,10 @@ pawn:
 							unit=MakeUnitAndPlace(MapOffsetX+x,MapOffsetY+y
 									,UnitTypeByWcNum(t),&Players[o]);
 							if( unit->Type->GivesResource ) {
-								DebugCheck( !v );
+								if (!v) {
+									DebugLevel0Fn("empty resource IN PUD.\n");
+									v = 10;
+								}
 								unit->Value=v*2500;
 							} else {
 								// active/inactive AI units!!
