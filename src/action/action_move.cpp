@@ -148,7 +148,17 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	x+=unit->Type->TileWidth/2;
 	y+=unit->Type->TileHeight/2;
 
-	MapMarkNewSight(unit->Player,x,y,unit->Stats->SightRange,xd,yd);
+	MapMarkNewSight(unit->Player,x,y,unit->CurrentSightRange,xd,yd);
+	//  Remove unit from the current selection
+	if( unit->Selected && !IsMapFieldVisible(ThisPlayer,unit->X,unit->Y)) {
+	    if( NumSelected==1 ) {          //  Remove building cursor
+		CancelBuildingMode();
+	    }
+	    UnSelectUnit(unit);
+	    MustRedraw|=RedrawPanels;
+	    UpdateButtonPanel();
+	}
+
 	if ( unit->Type->Transporter ) {
 	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 		if( unit->OnBoard[i] != NoUnitP ) {
