@@ -1050,12 +1050,14 @@ void LoadPud(const char* pud,WorldMap* map)
 
 				for( i=0; i<16; ++i ) {
 					v=PudReadByte(input);
+					#ifndef LUA_MAP_API
 					v=PlayerRaces.Race[PlayerRacesIndex(v)];
 					if (GameSettings.Presets[i].Race == SettingsPresetMapDefault) {
 						PlayerSetSide(&Players[i],v);
 					} else {
 						PlayerSetSide(&Players[i],GameSettings.Presets[i].Race);
 					}
+					#endif
 				}
 				continue;
 			} else {
@@ -1073,7 +1075,9 @@ void LoadPud(const char* pud,WorldMap* map)
 
 				for( i=0; i<16; ++i ) {
 					v=PudReadWord(input);
+					#ifndef LUA_MAP_API
 					PlayerSetResource(&Players[i],GoldCost,v);
+					#endif
 				}
 				continue;
 			} else {
@@ -1091,7 +1095,9 @@ void LoadPud(const char* pud,WorldMap* map)
 
 				for( i=0; i<16; ++i ) {
 					v=PudReadWord(input);
+					#ifndef LUA_MAP_API
 					PlayerSetResource(&Players[i],WoodCost,v);
+					#endif
 				}
 				continue;
 			} else {
@@ -1109,7 +1115,9 @@ void LoadPud(const char* pud,WorldMap* map)
 
 				for( i=0; i<16; ++i ) {
 					v=PudReadWord(input);
+					#ifndef LUA_MAP_API
 					PlayerSetResource(&Players[i],OilCost,v);
+					#endif
 				}
 				continue;
 			} else {
@@ -1224,6 +1232,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		// Units
 		//
 		if( !memcmp(header,"UNIT",4) ) {
+#ifndef LUA_MAP_API
 			int x;
 			int y;
 			int t;
@@ -1304,6 +1313,7 @@ pawn:
 
 				length-=8;
 			}
+#endif
 			continue;
 		}
 
