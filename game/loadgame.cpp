@@ -85,6 +85,7 @@ global void CleanModules(void)
 	CleanMenus();
 #endif
 	CleanUserInterface();
+	CleanFonts();
 	CleanCampaign();
 	CleanTriggers();
 	CleanAi();
@@ -219,6 +220,9 @@ global void LoadGame(char* filename)
 	CommandLogDisabled = 1;
 
 	LoadCcl();
+
+	SetDefaultTextColors(FontYellow, FontWhite);
+	LoadFonts();
 
 	CclGarbageCollect(0);
 	InitVisionTable();
