@@ -107,7 +107,7 @@ static Graphic** FontColorGraphics[MaxFonts];   ///< Font color graphics
 **  @param y       Y screen position
 */
 #ifndef USE_OPENGL
-static void VideoDrawChar(const Graphic* sprite,
+static void VideoDrawChar(const Graphic* g,
 	int gx, int gy, int w, int h, int x, int y)
 {
 	SDL_Rect srect;
@@ -121,9 +121,9 @@ static void VideoDrawChar(const Graphic* sprite,
 	drect.x = x;
 	drect.y = y;
 
-	SDL_SetColors(sprite->Surface, FontColor->Color, 0, NumFontColors);
+	SDL_SetColors(g->Surface, FontColor->Color, 0, NumFontColors);
 
-	SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 }
 #else
 static void VideoDrawChar(const Graphic* g,
