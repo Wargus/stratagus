@@ -261,11 +261,6 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
 
-#ifndef NEW_ORDERS
-    if( type->CowerWorker ) {
-	unit->WoodToHarvest=CHOP_FOR_WOOD;
-    }
-#endif
     if( type->CanCastSpell ) {
 	unit->Mana=MAGIC_FOR_NEW_UNITS;
     }
@@ -279,7 +274,6 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
     // DEFAULT! unit->Revealer = 0;		// FOW revealer
 
-#ifdef NEW_ORDERS
     unit->OrderCount=1;
     unit->Orders[0].Action=UnitActionStill;
     DebugCheck( unit->Orders[0].Goal );
@@ -287,11 +281,6 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     DebugCheck( unit->NewOrder.Goal );
     unit->SavedOrder.Action=UnitActionStill;
     DebugCheck( unit->SavedOrder.Goal );
-#else
-    unit->Command.Action=UnitActionStill;
-    unit->PendCommand.Action=UnitActionStill;
-    unit->SavedCommand.Action=UnitActionStill;
-#endif
 
     DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
 
@@ -512,13 +501,8 @@ global void UnitLost(const Unit* unit)
 	// FIXME: most redraws only needed for player==ThisPlayer
 
 	// Still under construction
-#ifdef NEW_ORDERS
 	// FIXME: could use unit::Constructed?
-	if( unit->Orders[0].Action!=UnitActionBuilded )
-#else
-	if( unit->Command.Action!=UnitActionBuilded )
-#endif
-	{
+	if( unit->Orders[0].Action!=UnitActionBuilded ) {
 	    if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
 		player->Food-=4;
 		MustRedraw |= RedrawResources;
@@ -769,7 +753,7 @@ global int UnitVisible(const Unit* unit)
     //
     for( ; (int)h>=0; --h) {
 	for( w=w0; (int)w>=0; --w ) {
-	    if( IsMapFieldVisible(x+w,y+h) 
+	    if( IsMapFieldVisible(x+w,y+h)
 		    || (unit->Type->Building && unit->SeenFrame!=0xFF
 			&& IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
@@ -1273,12 +1257,9 @@ found:
     // FIXME: This only works with 1x1 big units
     TheMap.Fields[x+y*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
-#ifdef NEW_ORDERS
     //unit->Orders[0].Action=UnitActionStill;
     //DebugCheck( unit->SubAction );
-#else
-    unit->Command.Action=UnitActionStill;
-#endif
+
     if( unit->Wait!=1 ) {
 	unit->Wait=1;
 	DebugLevel2Fn("Check this\n");
@@ -1390,13 +1371,6 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 	    DebugCheck( unit->Type->TileWidth!=1 || unit->Type->TileHeight!=1 );
 	    TheMap.Fields[bestx+besty*TheMap.Width].Flags|=UnitFieldFlags(unit);
 
-#ifndef NEW_ORDERS
-	    unit->Command.Action=UnitActionStill;
-	    if( unit->Wait!=1 ) {
-		unit->Wait=1;
-		DebugLevel2Fn("Check this\n");
-	    }
-#endif
 	    unit->Removed=0;
 	    UnitCacheInsert(unit);
 
@@ -1441,11 +1415,7 @@ global void DropOutAll(const Unit* source)
 	if( unit->X==source->X && unit->Y==source->Y ) {
 	    DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
-#ifdef NEW_ORDERS
 	    unit->Orders[0].Action=UnitActionStill;
-#else
-	    unit->Command.Action=UnitActionStill;
-#endif
 	    unit->Wait=unit->Reset=1;
 	    unit->SubAction=0;
 	}
@@ -2038,15 +2008,9 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 	unit=*table;
 	// We don't use UnitUnusable() to be able to select
 	// a building under construction.
-#ifdef NEW_ORDERS
 	if( unit->Removed || unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
-#else
-	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-#endif
 	type=unit->Type;
 
 	//
@@ -2100,16 +2064,13 @@ global Unit* UnitOnScreen(Unit* ounit,unsigned x,unsigned y)
 global void DestroyUnit(Unit* unit)
 {
     UnitType* type;
-#ifdef NEW_ORDERS
     int i;
-#endif
 
     unit->HP=0;
     unit->Moving=0;
 
     MustRedraw|=RedrawResources; // for food usage indicator
 
-#ifdef NEW_ORDERS
     //
     //	Release all references
     //
@@ -2124,9 +2085,6 @@ global void DestroyUnit(Unit* unit)
 	}
 	unit->OrderCount=1;
     }
-#else
-    // FIXME: unit has still references, can't be reseted here.
-#endif
 
     type=unit->Type;
 
@@ -2166,7 +2124,6 @@ global void DestroyUnit(Unit* unit)
 	    ,unit->Y*TileSizeY+type->TileHeight*TileSizeY/2
 	    ,0,0);
 
-#ifdef NEW_ORDERS
 	//
 	//	Building with units inside?
 	//
@@ -2176,17 +2133,6 @@ global void DestroyUnit(Unit* unit)
 		|| unit->Orders[0].Action==UnitActionBuilded ) {
 	    DestroyAllInside(unit);
 	}
-#else
-	//
-	//	Building with units inside?
-	//
-	if( type->GoldMine
-		|| type->StoresGold || type->StoresWood
-		|| type->GivesOil || type->StoresOil
-		|| unit->Command.Action==UnitActionBuilded ) {
-	    DestroyAllInside(unit);
-	}
-#endif
 
 	RemoveUnit(unit);
 	UnitLost(unit);
@@ -2203,20 +2149,10 @@ global void DestroyUnit(Unit* unit)
 	    unit->SubAction=0;
 	    unit->Removed=0;
 	    unit->Frame=0;
-#ifdef NEW_ORDERS
 	    unit->Orders[0].Action=UnitActionDie;
-#else
-	    unit->Command.Action=UnitActionDie;
-#endif
 
 	    DebugCheck( !unit->Type->Animations
 		    || !unit->Type->Animations->Die );
-#ifndef NEW_ORDERS
-	    if( unit->NextCount ) {
-		DebugLevel0Fn("NextCount = %d\n",unit->NextCount);
-	    }
-	    unit->NextCount=0;
-#endif
 	    UnitShowAnimation(unit,unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n",unit->Frame);
 
@@ -2257,11 +2193,7 @@ global void DestroyUnit(Unit* unit)
     unit->State=0;
     unit->Reset=0;
     unit->Wait=1;
-#ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionDie;
-#else
-    unit->Command.Action=UnitActionDie;
-#endif
 }
 
 /**
@@ -2289,7 +2221,6 @@ global void DestroyAllInside(Unit* source)
 	return;
     }
 
-#ifdef NEW_ORDERS
     //
     // Destroy the peon in building under construction...
     //
@@ -2298,17 +2229,6 @@ global void DestroyAllInside(Unit* source)
 	DestroyUnit(source->Data.Builded.Worker);
 	return;
     }
-#else
-    //
-    // Destroy the peon in building under construction...
-    //
-    if( source->Type->Building
-	    && source->Command.Action==UnitActionBuilded
-	    && source->Command.Data.Builded.Worker ) {
-	DestroyUnit(source->Command.Data.Builded.Worker);
-	return;
-    }
-#endif
 
     // FIXME: should use a better methode, linking all units in a building
     // FIXME: f.e. with the next pointer.
@@ -2424,15 +2344,9 @@ global void HitUnit(Unit* unit,int damage)
     //
     //	Unit is working?
     //
-#ifdef NEW_ORDERS
     if( unit->Orders[0].Action!=UnitActionStill ) {
 	return;
     }
-#else
-    if( unit->Command.Action!=UnitActionStill ) {
-	return;
-    }
-#endif
 
     //
     //	Attack units in range (which or the attacker?)
@@ -2443,11 +2357,7 @@ global void HitUnit(Unit* unit,int damage)
 	    if( goal ) {
 		// FIXME: should rewrite command handling
 		CommandAttack(unit,unit->X,unit->Y,NULL,FlushCommands);
-#ifdef NEW_ORDERS
 		unit->SavedOrder=unit->Orders[1];
-#else
-		unit->SavedCommand=unit->NextCommand[0];
-#endif
 		CommandAttack(unit,goal->X,goal->Y,NoUnitP,FlushCommands);
 		return;
 	    }
@@ -2676,268 +2586,12 @@ local char* UnitReference(const Unit* unit)
     return ref;
 }
 
-#ifdef NEW_ORDERS
-
-#else
-
-/**
-**	Save the current command of an unit.
-*/
-local void SaveCommand(const Command* command,FILE* file)
-{
-    char* ref;
-
-    fprintf(file,"\t(");
-    switch( command->Action ) {
-	case UnitActionNone:
-	    fprintf(file,"'none");
-	    break;
-	case UnitActionStill:
-	    fprintf(file,"'still");
-	    /*
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    */
-	    break;
-	case UnitActionStandGround:
-	    fprintf(file,"'stand-ground");
-	    /*
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    */
-	    break;
-	case UnitActionFollow:
-	    fprintf(file,"'follow");
-	    ref=UnitReference(command->Data.Move.Goal);
-	    fprintf(file," %s",ref);
-	    fprintf(file," %d",command->Data.Move.Range);
-	    free(ref);
-	    break;
-	case UnitActionMove:
-	    fprintf(file,"'move");
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.SX,command->Data.Move.SY);
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.DX,command->Data.Move.DY);
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    fprintf(file," %d",command->Data.Move.Range);
-	    break;
-	case UnitActionAttack:
-	    fprintf(file,"'attack");
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.SX,command->Data.Move.SY);
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.DX,command->Data.Move.DY);
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    fprintf(file," %d",command->Data.Move.Range);
-	    break;
-	case UnitActionAttackGround:
-	    fprintf(file,"'attack-ground");
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.SX,command->Data.Move.SY);
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.DX,command->Data.Move.DY);
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    fprintf(file," %d",command->Data.Move.Range);
-	    break;
-	case UnitActionDie:
-	    fprintf(file,"'die");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionSpellCast:
-	    fprintf(file,"'spell-cast");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionTrain:
-	    fprintf(file,"'train");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionUpgradeTo:
-	    fprintf(file,"'upgrade-to");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	/*
-	case UnitActionUpgrade:
-	    fprintf(file,"'upgrade");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	*/
-	case UnitActionResearch:
-	    fprintf(file,"'research");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionBuilded:
-	    fprintf(file,"'builded");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionBoard:
-	    fprintf(file,"'board");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionUnload:
-	    fprintf(file,"'unload");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionPatrol:
-	    fprintf(file,"'patrol");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionBuild:
-	    fprintf(file,"'build");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionRepair:
-	    fprintf(file,"'repair");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionHarvest:
-	    fprintf(file,"'harvest");
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.SX,command->Data.Move.SY);
-	    fprintf(file," (%d %d)"
-		,command->Data.Move.DX,command->Data.Move.DY);
-	    if( command->Data.Move.Goal ) {
-		ref=UnitReference(command->Data.Move.Goal);
-		fprintf(file," %s",ref);
-		free(ref);
-	    }
-	    fprintf(file," %d",command->Data.Move.Range);
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionMineGold:
-	    fprintf(file,"'mine-gold");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionMineOre:
-	    fprintf(file,"'mine-ore");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionMineCoal:
-	    fprintf(file,"'mine-coal");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionQuarryStone:
-	    fprintf(file,"'break-stone");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionHaulOil:
-	    fprintf(file,"'haul-oil");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionReturnGoods:
-	    fprintf(file,"'return-goods");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-	case UnitActionDemolish:
-	    fprintf(file,"'demolish");
-	    fprintf(file," \"FIXME:\"");
-	    break;
-    }
-    fprintf(file,")\n");
-}
-
-#endif
-
 /**
 **	Save the state of an unit to file.
 */
 global void SaveUnit(const Unit* unit,FILE* file)
 {
-#ifdef NEW_ORDERS
-#else
-    char* ref;
-    int i;
-
-    ref=UnitReference(unit);
-    fprintf(file,"(unit %s ",ref);
-    free(ref);
-
-    // FIXME: This part has nobody (=johns) updated!
-
-    fprintf(file,"'%s ",unit->Type->Ident);
-    fprintf(file,"\t'player %d\n",unit->Player->Player);
-    fprintf(file,"\t'x %d 'y %d ",unit->X,unit->Y);
-    fprintf(file,"'ix %d 'iy %d ",unit->IX,unit->IY);
-    //fprintf(file,"'frame %d 'seen %d ",unit->Frame,unit->SeenFrame);
-    fprintf(file,"'frame %d ",unit->Frame);
-    fprintf(file,"'dir %d\n",(unit->Direction*360)/256);
-    i=0;
-    if( unit->Attacked ) {
-	fprintf(file,"\t'attacked");
-	i=1;
-    }
-    if( unit->Burning ) {
-	fprintf(file,"\t'burning");
-	i=1;
-    }
-    /*
-    if( unit->Visible ) {
-	fprintf(file,"\t'visible");
-	i=1;
-    }
-    */
-    if( unit->Removed ) {
-	fprintf(file,"\t'removed");
-	i=1;
-    }
-    /*
-    if( unit->Selected ) {
-	fprintf(file,"\t'selected");
-	i=1;
-    }
-    */
-    if( unit->Constructed ) {
-	fprintf(file,"\t'constructed");
-	i=1;
-    }
-    if( i ) {
-	fprintf(file,"\n");
-    }
-    fprintf(file,"\t'mana %d ",unit->Mana);
-    fprintf(file,"'hp %d ",unit->HP);
-    fprintf(file,"'spells (%d %d %d %d %d %d)\n"
-	    ,unit->Bloodlust
-	    ,unit->Haste
-	    ,unit->Slow
-	    ,unit->Invisible
-	    ,unit->FlameShield
-	    ,unit->UnholyArmor);
-    fprintf(file,"\t'group %d ",unit->GroupId);
-    fprintf(file,"'value %d\n",unit->Value);
-
-    fprintf(file,"\t'states (%d %d %d%s)\n"
-	,unit->State,unit->SubAction,unit->Wait,unit->Reset ? " 'reset" : "");
-
-    fprintf(file,"\t'command ");
-    SaveCommand(&unit->Command,file);
-
-    if( unit->NextCount ) {
-	fprintf(file,"\t( 'command ");
-	for( i=0; i<unit->NextCount; ++i ) {	// Save all commands
-	    SaveCommand(unit->NextCommand+i,file);
-	}
-	fprintf(file," )");
-    }
-    fprintf(file," )\n");
-#endif
+    DebugLevel0Fn("FIXME: not written\n");
 }
 
 /**
