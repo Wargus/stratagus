@@ -57,6 +57,11 @@ local SCM CclFreeCraftMap(SCM list)
     //
     //	Parse the list:	(still everything could be changed!)
     //
+
+    if(!TheMap.Info) {
+	TheMap.Info=calloc(1, sizeof(MapInfo));
+    }
+
     while( !gh_null_p(list) ) {
 
 	value=gh_car(list);
@@ -74,12 +79,16 @@ local SCM CclFreeCraftMap(SCM list)
 		fprintf(stderr,"Warning not saved with this version.\n");
 	    }
 	    free(str);
+	} else if( gh_eq_p(value,gh_symbol2scm("uid")) ) {
+	    TheMap.Info->MapUID = gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("description")) ) {
 	    data=gh_car(list);
 	    list=gh_cdr(list);
 
 	    str=gh_scm2newstr(data,NULL);
 	    strncpy(TheMap.Description,str,sizeof(TheMap.Description));
+	    TheMap.Info->Description=strdup(str);
 	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("the-map")) ) {
 	    data=gh_car(list);
