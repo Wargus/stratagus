@@ -4616,7 +4616,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_PASSIVE;
 	} else {
 	    // don't allow network and button events to intercept server player's action on pulldown buttons!
-	    if (!(menu->Items[SERVER_PLAYER_STATE + i].flags&MenuButtonClicked)) {
+	    if (!(menu->Items[SERVER_PLAYER_STATE + i].flags & MenuButtonClicked)) {
 		if (initial == 1 ||
 		    (initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].mitype != MI_TYPE_PULLDOWN)) {
 		    menu->Items[SERVER_PLAYER_STATE + i] = NetMultiButtonStorage[0];
@@ -4635,7 +4635,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    menu->Items[SERVER_PLAYER_LAG - 1 + i].d.gem.state = MI_GSTATE_INVISIBLE;
 	}
 
-	menu->Items[SERVER_PLAYER_STATE + i].yofs = 32 + (i&7) * 22;
+	menu->Items[SERVER_PLAYER_STATE + i].yofs = 32 + (i & 7) * 22;
 	if (i > 7) {
 	    menu->Items[SERVER_PLAYER_STATE + i].xofs = 320 + 40;
 	}
@@ -4797,14 +4797,14 @@ local void MultiGameSetupInit(Menuitem *mi)
 
     // FIXME: Remove this when .cm is supported
     if (*CurrentMapPath && strstr(CurrentMapPath, ".cm\0")) {
-	*CurrentMapPath='\0';
+	*CurrentMapPath = '\0';
     }
 
     GameSetupInit(mi);
     NetworkInitServerConnect();
     mi->menu->Items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
     mi->menu->Items[SERVER_PLAYER_STATE].yofs = 32;
-    MultiGameFWSAction(NULL,mi->menu->Items[27].d.pulldown.defopt);
+    MultiGameFWSAction(NULL, mi->menu->Items[27].d.pulldown.defopt);
 
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
     //	Calculate available slots from pudinfo
@@ -4847,7 +4847,7 @@ local void MultiGameCancel(void)
     NetworkExitServerConnect();
 
     if (MetaServerInUse) {
-	SendMetaCommand("AbandonGame","");
+	SendMetaCommand("AbandonGame", "");
     }
 
     NetPlayers = 0;		// Make single player menus work again!
@@ -4911,7 +4911,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
     DebugLevel3Fn("Hosts[%d].PlyName = %s\n" _C_ i _C_ Hosts[i].PlyName);
-    VideoDrawText(TheUI.Offset640X+mi->xofs, TheUI.Offset480Y+mi->yofs, GameFont, Hosts[i].PlyName);
+    VideoDrawText(TheUI.Offset640X + mi->xofs, TheUI.Offset480Y + mi->yofs, GameFont, Hosts[i].PlyName);
 
     SetDefaultTextColors(nc, rc);
 }
@@ -4952,7 +4952,7 @@ local void MultiGameClientExit(Menuitem *mi)
 
     // ugly hack to prevent NetMultiButtonStorage[0].d.pulldown.options
     // from being freed
-    for (i=0; i<PlayerMax-1; ++i) {
+    for (i = 0; i < PlayerMax-1; ++i) {
 	mi->menu->Items[CLIENT_PLAYER_STATE + i] = NetMultiButtonStorage[1];
     }
 }
@@ -5196,7 +5196,7 @@ local void EditorNewMap(void)
     VideoUnlockScreen();
     Invalidate();
 
-    EditorCancelled=0;
+    EditorCancelled = 0;
 
     menu = FindMenu("menu-editor-new");
     menu->Items[2].d.input.buffer = description;
@@ -5222,7 +5222,7 @@ local void EditorNewMap(void)
     }
 
     TheMap.Info = calloc(1, sizeof(MapInfo));
-    description[strlen(description)-3] = '\0';
+    description[strlen(description) - 3] = '\0';
     TheMap.Info->Description = strdup(description);
     TheMap.Info->MapTerrain = v[menu->Items[7].d.pulldown.curopt];
     TheMap.Info->MapWidth = atoi(width);
@@ -5299,13 +5299,13 @@ local void EditorNewOk(void)
 	    menu->Items[5].d.input.nch = strlen(menu->Items[5].d.text.text) - 3;
 	}
 	ErrorMenu("Size larger than 1024");
-    } else if (value1/32*32 != value1 || value2/32*32 != value2) {
-	if (value1/32*32 != value1) {
-	    sprintf(menu->Items[4].d.input.buffer, "%d~!_", (value1+16)/32*32);
+    } else if (value1 / 32 * 32 != value1 || value2/32*32 != value2) {
+	if (value1 / 32 * 32 != value1) {
+	    sprintf(menu->Items[4].d.input.buffer, "%d~!_", (value1 + 16) / 32 * 32);
 	    menu->Items[4].d.input.nch = strlen(menu->Items[4].d.text.text) - 3;
 	}
-	if (value2/32*32 != value2) {
-	    sprintf(menu->Items[5].d.input.buffer, "%d~!_", (value2+16)/32*32);
+	if (value2 / 32 * 32 != value2) {
+	    sprintf(menu->Items[5].d.input.buffer, "%d~!_", (value2 + 16) / 32 * 32);
 	    menu->Items[5].d.input.nch = strlen(menu->Items[5].d.text.text) - 3;
 	}
 	ErrorMenu("Size must be a multiple of 32");
@@ -5320,7 +5320,7 @@ local void EditorNewOk(void)
 */
 local void EditorNewCancel(void)
 {
-    EditorCancelled=1;
+    EditorCancelled = 1;
     EndMenu();
 }
 
@@ -5383,7 +5383,7 @@ local void EditorMainLoadLBInit(Menuitem *mi)
 
     EditorMainLoadLBExit(mi);
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorMainLoadRDFilter,
-	(FileList **)&(mi->d.listbox.options));
+	(FileList **) & (mi->d.listbox.options));
 
     if (i == 0) {
 	free(mi->menu->Items[3].d.button.text);
@@ -5439,7 +5439,7 @@ local int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
     }
     fl->type = -1;
 #ifdef USE_ZZIPLIB
-    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+    if ((zzf = zzip_open(pathbuf, O_RDONLY | O_BINARY))) {
 	sz = zzip_file_real(zzf);
 	zzip_close(zzf);
 	if (!sz) {
@@ -5568,7 +5568,7 @@ local void EditorMainLoadOk(void)
 	if (fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->Items[5].flags&MenuButtonDisabled) {
+	    if (menu->Items[5].flags & MenuButtonDisabled) {
 		menu->Items[5].flags &= ~MenuButtonDisabled;
 		menu->Items[5].d.button.text = ScenSelectDisplayPath;
 	    } else {
@@ -5643,20 +5643,20 @@ local unsigned char *EditorMainLoadLBRetrieve(Menuitem *mi, int i)
 	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
 		if ((info = fl[i].xdata)) {
 		    if (info->Description) {
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+234,LargeFont,info->Description);
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234, LargeFont, info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    VideoDrawText(mi->menu->X+8,mi->menu->Y+234+20,LargeFont,buffer);
+		    VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 20, LargeFont, buffer);
 		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+234+40,LargeFont,"1 player");
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 40, LargeFont, "1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			VideoDrawText(mi->menu->X+8,mi->menu->Y+234+40,LargeFont,buffer);
+			VideoDrawText(mi->menu->X + 8, mi->menu->Y + 234 + 40, LargeFont, buffer);
 		    }
 		}
 	    }
@@ -5706,8 +5706,8 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -5715,8 +5715,8 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 		}
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+	    } else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -5731,9 +5731,9 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
@@ -5746,26 +5746,29 @@ local void EditorMainLoadVSAction(Menuitem *mi, int i)
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions) {
 				break;
+			    }
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
 				     (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
 			    d2 = mi[1].d.vslider.curper - op;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt--;
 			    if (mi->d.listbox.curopt < 0) {
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0) {
 				break;
+			    }
 			}
 		    }
 		}
@@ -5791,7 +5794,7 @@ global void EditorLoadMenu(void)
     char *p;
     char *s;
 
-    EditorCancelled=0;
+    EditorCancelled = 0;
     ProcessMenu("menu-editor-load", 1);
     GetInfoFromSelectPath();
 
@@ -5806,7 +5809,7 @@ global void EditorLoadMenu(void)
     if (ScenSelectPath[0]) {
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
-	strcpy(s+1, ScenSelectFileName);	// Final map name with path
+	strcpy(s + 1, ScenSelectFileName);	// Final map name with path
 	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
@@ -5837,7 +5840,7 @@ local void EditorLoadOk(void)
 	if (fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->Items[5].flags&MenuButtonDisabled) {
+	    if (menu->Items[5].flags & MenuButtonDisabled) {
 		menu->Items[5].flags &= ~MenuButtonDisabled;
 		menu->Items[5].d.button.text = ScenSelectDisplayPath;
 	    } else {
@@ -5866,7 +5869,7 @@ local void EditorLoadCancel(void)
 {
     char *s;
 
-    EditorCancelled=1;
+    EditorCancelled = 1;
 
     //
     //  Use last selected map.
@@ -5909,7 +5912,7 @@ local void EditorMapPropertiesMenu(void)
     menu->Items[2].d.input.buffer = description;
     strcpy(description, TheMap.Info->Description);
     strcat(description, "~!_");
-    menu->Items[2].d.input.nch = strlen(description)-3;
+    menu->Items[2].d.input.nch = strlen(description) - 3;
     menu->Items[2].d.input.maxch = 31;
 
     sprintf(size, "%d x %d", TheMap.Width, TheMap.Height);
@@ -5958,14 +5961,14 @@ local void EditorMapPropertiesOk(void)
     if (old != v[menu->Items[6].d.pulldown.curopt]) {
 	TheMap.Info->MapTerrain = v[menu->Items[6].d.pulldown.curopt];
 	free(TheMap.Info->MapTerrainName);
-	TheMap.Info->MapTerrainName=strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
+	TheMap.Info->MapTerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
 	TheMap.Terrain = TheMap.Info->MapTerrain;
 	free(TheMap.TerrainName);
 	TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info->MapTerrain]);
 	TheMap.Tileset = Tilesets[TheMap.Info->MapTerrain];
 
 	LoadTileset();
-	ChangeTilesetPud(old,&TheMap);
+	ChangeTilesetPud(old, &TheMap);
 	LoadRGB(GlobalPalette,
 		s=strdcat3(StratagusLibPath,"/graphics/",
 		    TheMap.Tileset->PaletteFile));
@@ -5997,7 +6000,7 @@ local void EditorPlayerPropertiesDrawFunc(Menuitem *mi __attribute__((unused)))
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi,
 	int key __attribute__((unused)))
 {
-    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
 	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
     }
 }
@@ -6084,30 +6087,30 @@ local void EditorPlayerPropertiesMenu(void)
 #define LUMBER_POSITION 89
 #define OIL_POSITION 106
 
-    for (i=0; i<PlayerMax; ++i) {
-	menu->Items[RACE_POSITION+i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
-	menu->Items[TYPE_POSITION+i].d.pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
-	menu->Items[AI_POSITION+i].d.pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
+    for (i = 0; i < PlayerMax; ++i) {
+	menu->Items[RACE_POSITION + i].d.pulldown.defopt = TheMap.Info->PlayerSide[i];
+	menu->Items[TYPE_POSITION + i].d.pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info->PlayerType[i]];
+	menu->Items[AI_POSITION + i].d.pulldown.defopt = PlayerAiFcToMenu(TheMap.Info->PlayerAi[i]);
 	sprintf(gold[i], "%d~!_", TheMap.Info->PlayerResources[i][GoldCost]);
 	sprintf(lumber[i], "%d~!_", TheMap.Info->PlayerResources[i][WoodCost]);
 	sprintf(oil[i], "%d~!_", TheMap.Info->PlayerResources[i][OilCost]);
-	menu->Items[GOLD_POSITION+i].d.input.buffer = gold[i];
-	menu->Items[GOLD_POSITION+i].d.input.nch = strlen(gold[i]) - 3;
-	menu->Items[GOLD_POSITION+i].d.input.maxch = 7;
-	menu->Items[LUMBER_POSITION+i].d.input.buffer = lumber[i];
-	menu->Items[LUMBER_POSITION+i].d.input.nch = strlen(lumber[i]) - 3;
-	menu->Items[LUMBER_POSITION+i].d.input.maxch = 7;
-	menu->Items[OIL_POSITION+i].d.input.buffer = oil[i];
-	menu->Items[OIL_POSITION+i].d.input.nch = strlen(oil[i]) - 3;
-	menu->Items[OIL_POSITION+i].d.input.maxch = 7;
+	menu->Items[GOLD_POSITION + i].d.input.buffer = gold[i];
+	menu->Items[GOLD_POSITION + i].d.input.nch = strlen(gold[i]) - 3;
+	menu->Items[GOLD_POSITION + i].d.input.maxch = 7;
+	menu->Items[LUMBER_POSITION + i].d.input.buffer = lumber[i];
+	menu->Items[LUMBER_POSITION + i].d.input.nch = strlen(lumber[i]) - 3;
+	menu->Items[LUMBER_POSITION + i].d.input.maxch = 7;
+	menu->Items[OIL_POSITION + i].d.input.buffer = oil[i];
+	menu->Items[OIL_POSITION + i].d.input.nch = strlen(oil[i]) - 3;
+	menu->Items[OIL_POSITION + i].d.input.maxch = 7;
     }
 
     ProcessMenu("menu-editor-player-properties", 1);
 
-    for (i=0; i<PlayerMax; ++i) {
-	TheMap.Info->PlayerSide[i] = menu->Items[RACE_POSITION+i].d.pulldown.curopt;
-	TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION+i].d.pulldown.curopt];
-	TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION+i].d.pulldown.curopt);
+    for (i = 0; i < PlayerMax; ++i) {
+	TheMap.Info->PlayerSide[i] = menu->Items[RACE_POSITION + i].d.pulldown.curopt;
+	TheMap.Info->PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].d.pulldown.curopt];
+	TheMap.Info->PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].d.pulldown.curopt);
 	TheMap.Info->PlayerResources[i][GoldCost] = atoi(gold[i]);
 	TheMap.Info->PlayerResources[i][WoodCost] = atoi(lumber[i]);
 	TheMap.Info->PlayerResources[i][OilCost] = atoi(oil[i]);
@@ -6140,7 +6143,7 @@ global void EditorEditResource(void)
 */
 local void EditorEditResourceEnterAction(Menuitem *mi,int key)
 {
-    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
 	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
     } else if (key==10 || key==13) {
 	EditorEditResourceOk();
@@ -6171,8 +6174,8 @@ local void EditorEditResourceOk(void)
 	menu->Items[1].d.text.text = "Must be smaller than 655000";
 	ProcessMenu("menu-editor-error", 1);
 	menu->Items[1].d.text.text = NULL;
-    } else if (value/2500*2500 != value) {
-	value = (value+1250)/2500*2500;
+    } else if (value / 2500 * 2500 != value) {
+	value = (value + 1250)/ 2500 * 2500;
 	sprintf(menu->Items[1].d.text.text, "%d~!_", value);
 	menu->Items[1].d.input.nch = strlen(menu->Items[1].d.text.text) - 3;
 	menu = FindMenu("menu-editor-error");
@@ -6285,7 +6288,7 @@ global int EditorSaveMenu(void)
 	}
 	s = ScenSelectPath + strlen(ScenSelectPath);
 	*s = '/';
-	strcpy(s+1, ScenSelectFileName);	// Final map name with path
+	strcpy(s + 1, ScenSelectFileName);	// Final map name with path
 	p = ScenSelectPath + strlen(StratagusLibPath) + 1;
 	strcpy(CurrentMapPath, p);
 	*s = '\0';
@@ -6302,7 +6305,7 @@ local void EditorSaveLBInit(Menuitem *mi)
 
     EditorSaveLBExit(mi);
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, EditorSaveRDFilter,
-	(FileList **)&(mi->d.listbox.options));
+	(FileList **) & (mi->d.listbox.options));
 
     if (i == 0) {
 	free(mi->menu->Items[4].d.button.text);
@@ -6450,7 +6453,7 @@ local void EditorSaveOk(void)
 	if (mi->menu->Items[3].d.input.nch == 0 && fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->Items[6].flags&MenuButtonDisabled) {
+	    if (menu->Items[6].flags & MenuButtonDisabled) {
 		menu->Items[6].flags &= ~MenuButtonDisabled;
 		menu->Items[6].d.button.text = ScenSelectDisplayPath;
 	    } else {
@@ -6465,7 +6468,7 @@ local void EditorSaveOk(void)
 	    MustRedraw |= RedrawMenu;
 	} else {
 	    strcpy(ScenSelectFileName, menu->Items[3].d.input.buffer);	// Final map name
-	    ScenSelectFileName[strlen(ScenSelectFileName)-3] = '\0';
+	    ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
 	    if (!strcasestr(ScenSelectFileName, ".pud\0")) {
 		strcat(ScenSelectFileName, ".pud");
 	    }
@@ -6558,8 +6561,8 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -6567,8 +6570,8 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 		}
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+	    } else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -6579,13 +6582,13 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 	    }
 	    EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
-		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
@@ -6598,12 +6601,12 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 == mi->d.listbox.noptions)
 				break;
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
 				     (mi->d.listbox.noptions - 1);
@@ -6616,7 +6619,7 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline == 0)
 				break;
 			}
 		    }
@@ -6624,7 +6627,7 @@ local void EditorSaveVSAction(Menuitem *mi, int i)
 
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.noptions > 0 &&
-		    mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+		    mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 		EditorSaveLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
@@ -6648,7 +6651,7 @@ local void EditorSaveEnterAction(Menuitem *mi, int key)
 	    mi->menu->Items[4].d.button.text = strdup("Save");
 	}
 	mi->menu->Items[4].flags &= ~MenuButtonDisabled;
-	if (key==10 || key==13) {
+	if (key == 10 || key == 13) {
 	    EditorSaveOk();
 	}
     }
@@ -6714,22 +6717,22 @@ local void EditorEndMenu(void)
 local void ReplayGameMenu(void)
 {
 #ifdef USE_WIN32
-    strcpy(TempPathBuf,GameName);
+    strcpy(TempPathBuf, GameName);
     mkdir(TempPathBuf);
-    strcat(TempPathBuf,"/logs");
+    strcat(TempPathBuf, "/logs");
     mkdir(TempPathBuf);
 
-    sprintf(ScenSelectPath, "%s/logs",GameName);
+    sprintf(ScenSelectPath, "%s/logs", GameName);
 #else
-    sprintf(TempPathBuf,"%s/%s",getenv("HOME"),STRATAGUS_HOME_PATH);
-    mkdir(TempPathBuf,0777);
-    strcat(TempPathBuf,"/");
-    strcat(TempPathBuf,GameName);
-    mkdir(TempPathBuf,0777);
-    strcat(TempPathBuf,"/logs");
-    mkdir(TempPathBuf,0777);
+    sprintf(TempPathBuf,"%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH);
+    mkdir(TempPathBuf, 0777);
+    strcat(TempPathBuf, "/");
+    strcat(TempPathBuf, GameName);
+    mkdir(TempPathBuf, 0777);
+    strcat(TempPathBuf, "/logs");
+    mkdir(TempPathBuf, 0777);
 
-    sprintf(ScenSelectPath,"%s/%s/%s/logs", getenv("HOME"), STRATAGUS_HOME_PATH,GameName);
+    sprintf(ScenSelectPath, "%s/%s/%s/logs", getenv("HOME"), STRATAGUS_HOME_PATH, GameName);
 #endif
     *ScenSelectDisplayPath = '\0';
 
@@ -6740,7 +6743,7 @@ local void ReplayGameMenu(void)
     Invalidate();
 
     GuiGameStarted = 0;
-    ProcessMenu("menu-replay-game",1);
+    ProcessMenu("menu-replay-game", 1);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
@@ -6768,7 +6771,7 @@ local void ReplayGameLBInit(Menuitem *mi)
 
     ReplayGameLBExit(mi);
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ReplayGameRDFilter,
-	(FileList **)&(mi->d.listbox.options));
+	(FileList **) & (mi->d.listbox.options));
 
     if (i == 0) {
 	free(mi->menu->Items[3].d.button.text);
@@ -6826,7 +6829,7 @@ local int ReplayGameRDFilter(char *pathbuf, FileList *fl)
     cp--;
     fl->type = -1;
 #ifdef USE_ZZIPLIB
-    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+    if ((zzf = zzip_open(pathbuf, O_RDONLY | O_BINARY))) {
 	sz = zzip_file_real(zzf);
 	zzip_close(zzf);
 	if (!sz) {
@@ -6921,8 +6924,8 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
 		    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 			mi->d.listbox.curopt--;
@@ -6930,8 +6933,8 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 		    }
 		    MustRedraw |= RedrawMenu;
 		}
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP) {
-		if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+	    } else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
+		if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 		    mi->d.listbox.curopt--;
 		    if (mi->d.listbox.curopt < 0) {
 			mi->d.listbox.curopt++;
@@ -6942,52 +6945,56 @@ local void ReplayGameVSAction(Menuitem *mi, int i)
 	    }
 	    ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 	    if (i == 2) {
-		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 	    }
 	    break;
 	case 1:		// mouse - move
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
+	    if (mi[1].d.vslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
 		if (mi[1].d.vslider.curper > mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline + 1 < mi->d.listbox.noptions) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline + 1) * 100) /
 				 (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.curper - mi[1].d.vslider.percent;
 			    d2 = op - mi[1].d.vslider.curper;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt++;
 			    if (mi->d.listbox.curopt >= mi->d.listbox.nlines) {
 				mi->d.listbox.curopt--;
 				mi->d.listbox.startline++;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline+1 == mi->d.listbox.noptions)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline+1 == mi->d.listbox.noptions) {
 				break;
+			    }
 			}
 		    }
 		} else if (mi[1].d.vslider.curper < mi[1].d.vslider.percent) {
-		    if (mi->d.listbox.curopt+mi->d.listbox.startline > 0) {
+		    if (mi->d.listbox.curopt + mi->d.listbox.startline > 0) {
 			for (;;) {
 			    op = ((mi->d.listbox.curopt + mi->d.listbox.startline - 1) * 100) /
 				     (mi->d.listbox.noptions - 1);
 			    d1 = mi[1].d.vslider.percent - mi[1].d.vslider.curper;
 			    d2 = mi[1].d.vslider.curper - op;
-			    if (d2 >= d1)
+			    if (d2 >= d1) {
 				break;
+			    }
 			    mi->d.listbox.curopt--;
 			    if (mi->d.listbox.curopt < 0) {
 				mi->d.listbox.curopt++;
 				mi->d.listbox.startline--;
 			    }
-			    if (mi->d.listbox.curopt+mi->d.listbox.startline == 0)
+			    if (mi->d.listbox.curopt + mi->d.listbox.startline == 0) {
 				break;
+			    }
 			}
 		    }
 		}
 
 		DebugCheck(mi->d.listbox.startline < 0);
 		DebugCheck(mi->d.listbox.noptions > 0 &&
-		    mi->d.listbox.startline+mi->d.listbox.curopt >= mi->d.listbox.noptions);
+		    mi->d.listbox.startline + mi->d.listbox.curopt >= mi->d.listbox.noptions);
 
 		ReplayGameLBAction(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 		MustRedraw |= RedrawMenu;
@@ -7058,7 +7065,7 @@ local void ReplayGameOk(void)
 	if (fl[i].type == 0) {
 	    strcat(ScenSelectPath, "/");
 	    strcat(ScenSelectPath, fl[i].name);
-	    if (menu->Items[5].flags&MenuButtonDisabled) {
+	    if (menu->Items[5].flags & MenuButtonDisabled) {
 		menu->Items[5].flags &= ~MenuButtonDisabled;
 		menu->Items[5].d.button.text = ScenSelectDisplayPath;
 	    } else {
@@ -7327,7 +7334,7 @@ local void MultiMetaServerGameSetupInit(Menuitem* mi)
     Menu* menu;
     char* port;
 
-    SendMetaCommand("NumberOfGames","");
+    SendMetaCommand("NumberOfGames", "");
     menu = FindMenu("metaserver-list");
 
     reply = NULL;
@@ -7411,7 +7418,7 @@ local void SelectGameServer(Menuitem *mi)
     Invalidate();
     EndMenu();
 
-    strcpy(server_host_buffer, mi->menu->Items[j-4].d.text.text);
+    strcpy(server_host_buffer, mi->menu->Items[j - 4].d.text.text);
 
 
     //Launch join directly
@@ -7427,7 +7434,7 @@ local void SelectGameServer(Menuitem *mi)
 	VideoLockScreen();
 	MenusSetBackground();
 	VideoUnlockScreen();
-	ProcessMenu("metaserver-list",1);
+	ProcessMenu("metaserver-list", 1);
 	return;
     }
     NetworkInitClientConnect();
@@ -7462,7 +7469,7 @@ local void AddGameServer(void)
     //send message to meta server. meta server will detect IP address.
     //Meta-server will return "BUSY" if the list of online games is busy.
 
-    SendMetaCommand("AddGame","%s\n%d\n%s\n%s\n%s\n%s\n","IP",NetworkPort,"Name","Map","Players","Free");
+    SendMetaCommand("AddGame", "%s\n%d\n%s\n%s\n%s\n%s\n", "IP",NetworkPort,"Name","Map","Players","Free");
 
     // FIXME: Get Reply from Queue
 
@@ -7489,7 +7496,7 @@ local void ChangeGameServer(void)
 	    ++freespots;
 	}
     }
-    SendMetaCommand("ChangeGame","%s\n%s\n%d\n%d\n","Name",ScenSelectFileName,players,freespots-1);
+    SendMetaCommand("ChangeGame", "%s\n%s\n%d\n%d\n", "Name", ScenSelectFileName, players, freespots - 1);
 
     // FIXME: Get Reply from Queue
 
