@@ -93,55 +93,6 @@ typedef struct _graphic_config_ {
 	Graphic*		Graphic;				/// graphic pointer to use to run time
 } GraphicConfig;
 
-/**
-**		General graphic object type.
-*/
-typedef struct _graphic_type_ {
-		///		Draw the object unclipped.
-	void (*Draw)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object unclipped and flipped in X direction.
-	void (*DrawX)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object clipped to the current clipping.
-	void (*DrawClip)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object clipped and flipped in X direction.
-	void (*DrawClipX)(const Graphic* o, unsigned f, int x, int y);
-
-		///50% Translucide functions
-		///		Draw the object unclipped.
-	void (*DrawTrans50)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object unclipped and flipped in X direction.
-	void (*DrawXTrans50)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object clipped to the current clipping.
-	void (*DrawClipTrans50)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the object clipped and flipped in X direction.
-	void (*DrawClipXTrans50)(const Graphic* o, unsigned f, int x, int y);
-
-		///		Draw the shadow object clipped to the current clipping.
-	void (*DrawShadowClip)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw the shadow object clipped and flipped in X direction.
-	void (*DrawShadowClipX)(const Graphic* o, unsigned f, int x, int y);
-		///		Draw part of the object unclipped.
-	void (*DrawSub)(const Graphic* o, int gx, int gy,
-		int w, int h, int x, int y);
-		///		Draw part of the object unclipped and flipped in X direction.
-	void (*DrawSubX)(const Graphic* o, int gx, int gy,
-		int w, int h, int x, int y);
-		///		Draw part of the object clipped to the current clipping.
-	void (*DrawSubClip)(const Graphic* o, int gx, int gy,
-		int w, int h, int x, int y);
-		///		Draw part of the object clipped and flipped in X direction.
-	void (*DrawSubClipX)(const Graphic* o, int gx, int gy,
-		int w, int h, int x, int y);
-
-		///		Draw the object unclipped and zoomed.
-	void (*DrawZoom)(const Graphic* o, unsigned f, int x, int y, int z);
-
-	// FIXME: add zooming functions.
-
-		///		Free the object.
-	void (*Free)(Graphic* o);
-} GraphicType;
-
 	///		Creates a shared hardware palette from an independent Palette struct.
 extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
 
@@ -156,16 +107,17 @@ extern int ColorCycleAll;				/// Flag color cycle palettes
 typedef struct _palette_link_ PaletteLink;
 
 /**
-**		Links all palettes together to join the same palettes.
+**  Links all palettes together to join the same palettes.
 */
 struct _palette_link_ {
-	PaletteLink*		Prev;				/// Previous palette
-	SDL_Surface*		Surface;		/// Surface that contains palette
+	SDL_Surface* Surface;               /// Surface that contains palette
+	PaletteLink* Next;                  /// Previous palette
 };
 
 extern PaletteLink* PaletteList;		/// List of all used palettes loaded
 
 extern void VideoPaletteListAdd(SDL_Surface* surface);
+extern void VideoPaletteListRemove(SDL_Surface* surface);
 
 	/**
 	**		Video synchronization speed. Synchronization time in percent.
@@ -528,11 +480,10 @@ extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
 extern void VideoDrawShadowClipX(const Graphic*, unsigned frame,
 	int x, int y);
 
-// FIXME FIXME FIXME: need to implement all of this
 	///		Free a graphic object.
-#define VideoFree(o)		//((o)->Type->Free)((o))
+extern void VideoFree(Graphic* o);
 	///		Save (NULL) free a graphic object.
-#define VideoSaveFree(o) // do { if ((o)) ((o)->Type->Free)((o)); } while(0)
+#define VideoSaveFree(o) do { if ((o)) VideoFree((o)); } while(0)
 
 	/// Get the width of a single frame of a graphic object
 #define VideoGraphicWidth(o)		((o)->Width)

@@ -52,8 +52,10 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
+#ifndef USE_SDL_SURFACE
 local GraphicType GraphicSprite8Type;		/// sprite type 8bit palette
 local GraphicType GraphicSprite16Type;		/// sprite type 16bit palette
+#endif
 
 #ifdef USE_SDL_SURFACE
 global void VideoDrawRawClip(SDL_Surface *surface,

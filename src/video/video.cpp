@@ -426,11 +426,7 @@ local long GetPaletteChecksum(const Palette* palette)
 #endif
 
 /**
-**		Creates a shared hardware palette from an independend Palette struct.
-**
-**		@param palette		System independend RGB palette structure.
-**
-**		@return				A palette in hardware  dependend format.
+**  FIXME: docu
 */
 #ifdef USE_SDL_SURFACE
 global void VideoPaletteListAdd(SDL_Surface* surface)
@@ -440,19 +436,35 @@ global void VideoPaletteListAdd(SDL_Surface* surface)
 	curlink = malloc(sizeof(PaletteLink));
 
 	curlink->Surface = surface;
-	curlink->Prev = PaletteList;
+	curlink->Next = PaletteList;
 
 	PaletteList = curlink;
 }
 
-global void VideoPaletteListClean()
+/**
+**  FIXME: docu
+*/
+global void VideoPaletteListRemove(SDL_Surface* surface)
 {
-	PaletteLink* curlink;
+	PaletteLink** curlink;
+	PaletteLink* tmp;
 
-	while (PaletteList) {
-		curlink = PaletteList->Prev;
+	curlink = &PaletteList;
+	while (*curlink) {
+		if ((*curlink)->Surface == surface) {
+			break;
+		}
+		curlink = &((*curlink)->Next);
+	}
+	DebugCheck(!*curlink);
+	if (*curlink == PaletteList) {
+		tmp = PaletteList->Next;
 		free(PaletteList);
-		PaletteList = curlink;
+		PaletteList = tmp;
+	} else {
+		tmp = *curlink;
+		*curlink = tmp->Next;
+		free(tmp);
 	}
 }
 #else
@@ -628,7 +640,7 @@ global void ColorCycle(void)
 
 			SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
 				colors, 0, 256);
-			curlink = curlink->Prev;
+			curlink = curlink->Next;
 		}
 	} else {
 		//
