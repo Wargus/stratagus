@@ -529,14 +529,15 @@ global Unit* UnitTypeOnMap(int tx,int ty,UnitType* type)
 }
 
 /**
-**	Oil patch on map tile
+**	Resource on map tile
 **
 **	@param tx	X position on map, tile-based.
 **	@param ty	Y position on map, tile-based.
+**	@param resource	resource type.
 **
-**	@return		Returns the oil patch if found, or NoUnitP.
+**	@return		Returns the deposit if found, or NoUnitP.
 */
-global Unit* OilPatchOnMap(int tx,int ty)
+global Unit* ResourceOnMap(int tx,int ty,int resource)
 {
     Unit* table[UnitMax];
     int i;
@@ -544,33 +545,10 @@ global Unit* OilPatchOnMap(int tx,int ty)
 
     n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
-	if( table[i]->Type->GivesResource==OilCost ) {
-	    return table[i];
-	}
-    }
-    return NoUnitP;
-}
-
-/**
-**	Oil platform on map tile
-**
-**	@param tx	X position on map, tile-based.
-**	@param ty	Y position on map, tile-based.
-**
-**	@return		Returns the oil platform if found, or NoUnitP.
-*/
-global Unit* PlatformOnMap(int tx,int ty)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-
-    n=SelectUnitsOnTile(tx,ty,table);
-    for( i=0; i<n; ++i ) {
-	if( UnitUnusable(table[i]) ) {
+	if( UnitUnusable(table[i]) || !table[i]->Type->CanHarvest ){
 	    continue;
 	}
-	if( table[i]->Type->GivesResource==OilCost ) {
+	if( table[i]->Type->GivesResource==resource ) {
 	    return table[i];
 	}
     }

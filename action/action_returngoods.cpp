@@ -66,7 +66,31 @@ global void HandleActionReturnGoods(Unit* unit)
     type=unit->Type;
     //
     //	Select target to return goods. FIXME: more races support
-    //
+    // 
+    if( type->Harvester ) {
+	if( !unit->Orders[0].Goal ) {
+	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,type->ResourceHarvested)) ) {
+		DebugLevel3Fn("No deposit -> can't return\n");
+		unit->Orders[0].Action=UnitActionStill;
+		return;
+	    }
+	    unit->Orders[0].Goal=destu;
+	    RefsDebugCheck( !destu->Refs );
+	    ++destu->Refs;
+	}
+	DebugLevel3("Return to %d=%d,%d\n"
+		_C_ UnitNumber(unit->Orders[0].Goal)
+		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+	unit->Orders[0].Action=UnitActionResource;
+	// Somewhere on the way the loaded worker changed Arg1.
+	// Bummer, go get the closest resource to the depot
+	unit->Orders[0].Arg1=(void*)-1;
+	NewResetPath(unit);
+	unit->SubAction=70;
+	unit->Wait=1;
+	return;
+    }
+    
     if( type==UnitTypeHumanWorkerWithGold || type==UnitTypeOrcWorkerWithGold ) {
 	if( !unit->Orders[0].Goal ) {
 	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,GoldCost)) ) {
@@ -111,31 +135,6 @@ global void HandleActionReturnGoods(Unit* unit)
 	unit->Wait=1;
 	return;
     }
-
-    if( type->Harvester ) {
-	if( !unit->Orders[0].Goal ) {
-	    if( !(destu=FindDeposit(unit->Player,unit->X,unit->Y,type->ResourceHarvested)) ) {
-		// No deposit -> can't return
-		unit->Orders[0].Action=UnitActionStill;
-		return;
-	    }
-	    unit->Orders[0].Goal=destu;
-	    RefsDebugCheck( !destu->Refs );
-	    ++destu->Refs;
-	}
-	DebugLevel3("Return to %d=%d,%d\n"
-		_C_ UnitNumber(unit->Orders[0].Goal)
-		_C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-	unit->Orders[0].Action=UnitActionResource;
-	// Somewhere on the way the loaded worker changed Arg1.
-	// Bummer, go get the closest resource to the depot
-	unit->Orders[0].Arg1=(void*)-1;
-	NewResetPath(unit);
-	unit->SubAction=70;
-	unit->Wait=1;
-	return;
-    }
-
 }
 
 //@}

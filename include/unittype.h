@@ -649,10 +649,6 @@ extern UnitType* UnitTypes[UnitTypeMax];	/// All unit-types
 extern int NumUnitTypes;			/// Number of unit-types made
 
 // FIXME: this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeHumanTanker;		/// Orc tanker unit-type pointer
-extern UnitType*UnitTypeOrcTanker;		/// Human tanker unit-type pointer
-extern UnitType*UnitTypeHumanTankerFull;	/// Orc tanker full unit-type pointer
-extern UnitType*UnitTypeOrcTankerFull;		/// Human tanker full unit-type pointer
 extern UnitType*UnitTypeHumanWorker;		/// Human worker
 extern UnitType*UnitTypeOrcWorker;		/// Orc worker
 extern UnitType*UnitTypeHumanWorkerWithGold;	/// Human worker with gold
