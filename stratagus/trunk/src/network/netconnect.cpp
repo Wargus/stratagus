@@ -264,19 +264,33 @@ global void NetworkServerSetup(WorldMap *map)
     //
     //	Assign the players.
     //
-    // FIXME: randomize the slots :)
     // FIXME: ARI: selectable by 'Position' selector in Network setup menus!
 
-    for (n = i = 0; i < NumPlayers && n < NetPlayers; ++i) {
+    // Make a list of the player slots.
+    for (n = i = 0; i < NumPlayers; ++i) {
 	if (Players[i].Type == PlayerPerson) {
-	    Hosts[n].PlyNr = num[n] = i;
-	    DebugLevel3Fn("Assigning player slots: %d -> %d\n", i, n);
+	    num[n] = i;
+	    DebugLevel3Fn("Player slot %i is available for a person\n", i);
 	    n++;
 	}
     }
     if (n < NetPlayers) {
 	fprintf(stderr, "Not enough person slots\n");
 	exit(-1);
+    }
+
+    // Randomize them.
+    for(i = 0; i<NetPlayers; ++i)  {
+      if(n>0) {
+	int chosen=MyRand()%n;
+
+	DebugLevel3Fn("Assigning player %i to slot %i\n", i, chosen);
+	Hosts[i].PlyNr=num[chosen];
+	num[chosen]=num[n-1];
+	--n;
+      } else {
+	Hosts[i].PlyNr=num[0];
+      }
     }
 
     //
