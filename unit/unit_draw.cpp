@@ -1912,7 +1912,8 @@ global void DrawUnits(const void* v)
     //
     corpses = &DestroyedBuildings;
     while( *corpses ) {
-	if( UnitVisibleInViewport(vp,*corpses) && !(*corpses)->SeenDestroyed ) {
+	if( UnitVisibleInViewport(vp,*corpses) && !(*corpses)->SeenDestroyed
+		&& ((*corpses)->Visible & 1<<ThisPlayer->Player)) {
 	    DrawBuilding(*corpses);
 	}
 	corpses=&(*corpses)->Next;

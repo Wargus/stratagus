@@ -184,6 +184,7 @@ global void ReleaseUnit(Unit* unit)
 		for( ; h-->0; ) {
 		    for( w=w0; w-->0; ) {
 			if( !IsMapFieldVisible(&Players[i],x+w,y+h)
+			    && IsMapFieldExplored(&Players[i],x+w,y+h)
 			    && Players[i].Type == PlayerPerson ) {
 			    unit->Visible |= (1 << i);
 			}
