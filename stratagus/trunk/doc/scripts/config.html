@@ -100,6 +100,7 @@
 <a href="#ShadowSprite">ShadowSprite</a>
 <a href="#ShowEnergySelectedOnly">ShowEnergySelectedOnly</a>
 <a href="#ShowFull">ShowFull</a>
+<a href="#DefineDecoration">DefineDecoration</a>
 <a href="#ShowHealthBar">ShowHealthBar</a>
 <a href="#ShowHealthDot">ShowHealthDot</a>
 <a href="#ShowHealthHorizontal">ShowHealthHorizontal</a>
@@ -155,7 +156,7 @@ AStar("fixed-unit-cost", 1000, "moving-unit-cost", 20, "know-unseen-terrain", "u
 <a name="DecorationOnTop"></a>
 <h3>DecorationOnTop()</h3>
 
-Show bars and dots always on top. (Planned feature)
+Show bars and dots always on top.
 
 <a name="HealthSprite"></a>
 <h3>HealthSprite(file, hotx, hoty, width, height)</h3>
@@ -164,17 +165,12 @@ Define health-sprite.
 
 <dl>
   <dt>file</dt>
-  <dd>.</dd>
-  <dt>hotx</dt>
-  <dd>.</dd>
-  <dt>hoty</dt>
-  <dd>.</dd>
-  <dt>width</dt>
-  <dd>.</dd>
-  <dt>height</dt>
-  <dd>.</dd>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the image.</dd>
 </dl>
-
 <h4>Example</h4>
 <pre>
 HealthSprite("graphics/ui/health2.png", 0, -4, 31, 4)
@@ -187,17 +183,12 @@ define mana-sprite.
 
 <dl>
   <dt>file</dt>
-  <dd>.</dd>
-  <dt>hotx</dt>
-  <dd>.</dd>
-  <dt>hoty</dt>
-  <dd>.</dd>
-  <dt>width</dt>
-  <dd>.</dd>
-  <dt>height</dt>
-  <dd>.</dd>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the image.</dd>
 </dl>
-
 <h4>Example</h4>
 <pre>
 ManaSprite("graphics/ui/mana2.png", 0, -1, 31, 4)
@@ -707,15 +698,11 @@ Define shadow-sprite.
 
 <dl>
   <dt>file</dt>
-  <dd>.</dd>
-  <dt>hotx</dt>
-  <dd>.</dd>
-  <dt>hoty</dt>
-  <dd>.</dd>
-  <dt>width</dt>
-  <dd>.</dd>
-  <dt>height</dt>
-  <dd>.</dd>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the image.</dd>
 </dl>
 
 <h4>Example</h4>
@@ -724,82 +711,155 @@ Define shadow-sprite.
 ShadowSprite("graphics/missiles/unit_shadow.png",3, 42, 32, 32)
 </pre>
 
+<a name="DefineDecorations"></a>
+<h3>DefineDecorations({tag = value, ...}, ...)</h3>
+Define how to show variables. 
+
+<dl>
+  <dt>Index = variable</dt>
+  <dd>
+  To which variable it applies. Variables could be
+  <dl>
+    <dt>Hitpoints</dt>
+    <dd>represent the HP of the unit.</dd>
+    <dt>Mana</dt>
+    <dd>represent the mana of the unit.</dd>
+    <dt>Transport</dt>
+    <dd>represent how many units are in the unit.</dd>
+    <dt>Ressources</dt>
+    <dd>represent ressource for gathering and gathered unit.</dd>
+    <dt>Training</dt>
+    <dd>represent the elapsed time of unit in training.</dd>
+    <dt>Research</dt>
+    <dd>represent the elapsed time for research.</dd>
+    <dt>UpgradeTo</dt>
+    <dd>represent the elapse time to evolve in the new unit.</dd>
+    <dt>variable</dt>
+    <dd>variable defined with <a href="unittype.html#DefineVariables">DefineVariables()</a></dd>
+  </dl>
+  </dd>
+  <dt>Offset = {x, y}, OffsetPercent = {xp, yp}</dt>
+  <dd>Decoration is placed at {x + weight(unit) * xp, y + height(unit) * yp} from the unit.</dd>
+  <dt>CenterX = boolean, CenterY = boolean</dt>
+  <dd>If set to true, use center of decoration instead of the upper-left corner.</dd>
+  <dt>ShowIfNotEnable = boolean</dt>
+  <dd>if false (default), show decoration only when variable is enable.</dd>
+  <dt>ShowWhenNull = boolean</dt>
+  <dd>if true, show also when variable value is 0.</dd>
+  <dt>HideHalf = boolean</dt>
+  <dd>if true, don't show when variable value is not 0 nor max.</dd>
+  <dt>ShowWhenMax = boolean</dt>
+  <dd>if false, don't show when variable value is max.</dd>
+  <dt>ShowOnlySelected = boolean</dt>
+  <dd>if true, show only when unit is selected.</dd>
+  <dt>HideNeutral = boolean</dt>
+  <dd>if true, don't show for neutral unit.</dd>
+  <dt>HideAllied = boolean</dt>
+  <dd>if true, don't show for allied unit (but show your :) ).</dd>
+  <dt>ShowOpponent = boolean</dt>
+  <dd>if true, show also for opponent unit.</dd>
+  
+  <dt>Method = {method-name, {tag = value}}</dt>
+    <dd>Which method we use to show variable. It could be a bar, a sprite, a number...</dd>
+    <dl>
+      <dt>"text", {}</dt>
+      <dd>Show the value with a number</dd>
+      <dt>"static-sprite", {number}</dt>
+      <dd>Use the number icon of the SpellSprite</dd>
+      <dt>"sprite", {number}</dt>
+      <dd>Use ManaSprite (0), or the HealthSprite(1)</dd>
+      <dt>"bar", {tag, value}</dt>
+      <dd>Show like a rectangular bar.</dd>
+      <dl>
+        <dt>Orientation = "vertical" or "horizontal"<dt>
+        <dd>orientation of the bar, default is horizontal</dd>
+        <dt>SEToNW = boolean</dt>
+        <dd>
+        if true, bar is growing from bottom to uppper border (for vertical bar)
+        or right to left (for horizontal bar)
+        (South-Easth to Nord-Weast).
+        </dd>
+        <dt>Height = number, Width = number</dt>
+        <dd>size of the bar, 0 assume size of the unit.</dd>
+        <dt>BorderSize = number</dt>
+        <dd>bar is surroundded with a border.</dd>
+        <dt>ShowFullBackground</dt>
+        <dd>Show badgroung like if value is max</dd>
+      </dl>
+    </dl>
+</dl>
+
+
 <a name="ShowEnergySelectedOnly"></a>
 <h3>ShowEnergySelectedOnly()</h3>
+Show decoration only for selected unit.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
-FIXME.
 
 <a name="ShowFull"></a>
 <h3>ShowFull()</h3>
-
-Use to show always bars or dots. No parameters.
+Use to show bars or dots also when bar is full.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowHealthBar"></a>
 <h3>ShowHealthBar()</h3>
-
-Adds a health bar to the left of the unit. No parameters.
+Equivalent of <a href="#ShowHealthVertical">ShowHealthVertical()</a>
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowHealthDot"></a>
 <h3>ShowHealthDot()</h3>
-
-Adds a health dot to the left of the unit. No parameters.
+Adds a health sprite to the bottom of the unit.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowHealthHorizontal"></a>
 <h3>ShowHealthHorizontal()</h3>
-
-Show health bars horizontal. No parameters.
+Show health bars horizontal.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowHealthVertical"></a>
 <h3>ShowHealthVertical()</h3>
-
-Show health bars vertical. No parameters.
+Show health bars vertical.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowManaBar"></a>
 <h3>ShowManaBar()</h3>
-
-Show a mana bar to the right of the unit. No parameters.
+Equivalent of <a href="#ShowManaVertical">ShowManaVertical()</a>
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowManaDot"></a>
 <h3>ShowManaDot()</h3>
-
-Show a mana dot to the right of the unit. No parameters.
+Show a mana sprite to the bottom of the unit.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowManaHorizontal"></a>
 <h3>ShowManaHorizontal()</h3>
-
-Show mana bars horizontal. No parameters.
+Show mana bars horizontal.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowManaVertical"></a>
 <h3>ShowManaVertical()</h3>
-
-Show mana bars vertical. No parameters.
+Show mana bars vertical.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="ShowNoFull"></a>
 <h3>ShowNoFull()</h3>
-
-Use to get no full bars or dots. No parameters.
+Hide decorations when value is full.
+<br>Note : you could use <a href="#DefineDecorations">DefineDecorations()</a> instead.
 
 <a name="SpellSprite"></a>
 <h3>SpellSprite("file", hotx, hoty, width, height)</h3>
-
 Define spell-sprite.
 with bloodlust, haste, slow, invisible and shield
 
 <dl>
   <dt>file</dt>
-  <dd>.</dd>
-  <dt>hotx</dt>
-  <dd>.</dd>
-  <dt>hoty</dt>
-  <dd>.</dd>
-  <dt>width</dt>
-  <dd>.</dd>
-  <dt>height</dt>
-  <dd>.</dd>
+  <dd>file where is the image.</dd>
+  <dt>hotx, hoty</dt>
+  <dd>offset when it is drawn.</dd>
+  <dt>width, height</dt>
+  <dd>Size of the image.</dd>
 </dl>
-
 <h4>Example</h4>
-
 <pre>
 SpellSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png",
   1, 1, 16, 16)
