@@ -10,7 +10,7 @@
 //
 /**@name master.c	-	The master server. */
 //
-//	(c) Copyright 2003 by Jimmy Salmon
+//	(c) Copyright 2003 by Tom Zickel and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
