@@ -32,9 +32,6 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-
-// FIXME: this is the old button concept will be changed soon
-
     /// Button Commands
 enum _button_cmd_ {
     B_Move,				/// order move
@@ -45,7 +42,6 @@ enum _button_cmd_ {
     B_Button,				/// choose other button set
     B_Build,				/// order build
     B_Train,				/// order train
-    //B_Upgrade,				/// order upgrade
     B_Patrol,				/// order patrol
     B_StandGround,			/// order stand ground
     B_AttackGround,			/// order attack ground
@@ -57,7 +53,7 @@ enum _button_cmd_ {
     B_Unload,				/// order unload unit
     B_Cancel,				/// cancel
     B_CancelTrain,			/// cancel training
-    B_CancelBuild			/// cancel building
+    B_CancelBuild,			/// cancel building
 };
 
     /// typedef for action of button
@@ -93,25 +89,24 @@ enum _key_codes_ {
     KeyCodeRight,			/// internal keycode: cursor right key
     KeyCodePause,			/// internal keycode: game pause key
 
-    KeyCodeF1,				/// internal keycodes for function keys
-    KeyCodeF2,
-    KeyCodeF3,
-    KeyCodeF4,
-    KeyCodeF5,
-    KeyCodeF6,
-    KeyCodeF7,
-    KeyCodeF8,
-    KeyCodeF9,
-    KeyCodeF10,
-    KeyCodeF11,
-    KeyCodeF12,
+    KeyCodeF1,				/// internal keycode: F1 function keys
+    KeyCodeF2,				/// internal keycode: F2 function keys
+    KeyCodeF3,				/// internal keycode: F3 function keys
+    KeyCodeF4,				/// internal keycode: F4 function keys
+    KeyCodeF5,				/// internal keycode: F5 function keys
+    KeyCodeF6,				/// internal keycode: F6 function keys
+    KeyCodeF7,				/// internal keycode: F7 function keys
+    KeyCodeF8,				/// internal keycode: F8 function keys
+    KeyCodeF9,				/// internal keycode: F9 function keys
+    KeyCodeF10,				/// internal keycode: F10 function keys
+    KeyCodeF11,				/// internal keycode: F11 function keys
+    KeyCodeF12,				/// internal keycode: F12 function keys
 
-    KeyCodeShift,			/// internal keycodes for Modifier Keys
-    KeyCodeControl,
-    KeyCodeAlt,
-    KeyCodeSuper,
-    KeyCodeHyper,
-
+    KeyCodeShift,			/// internal keycode: shift modifier
+    KeyCodeControl,			/// internal keycode: ctrl modifier
+    KeyCodeAlt,				/// internal keycode: alt modifier
+    KeyCodeSuper,			/// internal keycode: super modifier
+    KeyCodeHyper,			/// internal keycode: hyper modifier
 };
 
     /// Key modifier
@@ -120,7 +115,7 @@ enum _key_modifiers_ {
     ModifierControl	= 2,		/// any controll key pressed
     ModifierAlt		= 4,		/// any alt key pressed
     ModifierSuper	= 8,		/// super key (reserved for WM)
-    ModifierHyper	= 16		/// any hyper key pressed
+    ModifierHyper	= 16,		/// any hyper key pressed
 };
 
     /// pressed mouse button flags
@@ -128,18 +123,22 @@ enum _mouse_buttons_ {
     LeftButton		= 2,		/// Left button on mouse
     MiddleButton	= 4,		/// Middle button on mouse
     RightButton		= 8,		/// Right button on mouse
-    /// FIXME: support wheel and more buttons
 
+    // FIXME: support wheel and more buttons
+
+	/// Left+Middle button on mouse
     LeftAndMiddleButton	= LeftButton|MiddleButton,
+	/// Left+Right button on mouse
     LeftAndRightButton	= LeftButton|RightButton,
-    MiddleAndRightButton= MiddleButton|RightButton
+	/// Middle+Right button on mouse
+    MiddleAndRightButton= MiddleButton|RightButton,
 };
 
     /// Cursor state
 enum _cursor_state_ {
     CursorStatePoint,			/// normal cursor
     CursorStateSelect,			/// select position
-    CursorStateRectangle		/// rectangle selecting
+    CursorStateRectangle,		/// rectangle selecting
 };
 
     /// Where is our cursor ?
@@ -155,22 +154,21 @@ enum _cursor_on_ {
     CursorOnScrollLeftUp,		/// in scroll left+up area
     CursorOnScrollLeftDown,		/// in scroll left+down area
     CursorOnScrollRightUp,		/// in scroll right+up area
-    CursorOnScrollRightDown		/// in scroll right+down area
+    CursorOnScrollRightDown,		/// in scroll right+down area
 };
 
-/// Are We Scrolling With the Keyboard ?
+    /// Are We Scrolling With the Keyboard ?
 enum _scroll_state_ {
-	ScrollNone = 0,			/// not scrolling
-	ScrollUp = 1,			/// up pressed only
-	ScrollDown = 2,			/// etc ...
-	ScrollLeft = 4,
-	ScrollRight = 8,
-	ScrollLeftUp = 5,
-	ScrollLeftDown = 6,
-	ScrollRightUp = 9,
-	ScrollRightDown = 10
+    ScrollNone = 0,			/// not scrolling
+    ScrollUp = 1,			/// scroll up only
+    ScrollDown = 2,			/// scroll down only
+    ScrollLeft = 4,			/// scroll left only
+    ScrollRight = 8,			/// scroll right only
+    ScrollLeftUp = 5,			/// scroll left+up
+    ScrollLeftDown = 6,			/// scroll left+down
+    ScrollRightUp = 9,			/// scroll right+up
+    ScrollRightDown = 10,		/// scroll right+down
 };
-
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -187,8 +185,9 @@ extern enum _key_modifiers_ KeyModifiers;
 extern enum _cursor_state_ CursorState;
     /// current interface state
 extern enum _iface_state_ InterfaceState;
-    /// current scroll state
+    /// current scroll state of keyboard
 extern enum _scroll_state_ KeyScrollState;
+    /// current scroll state of mouse
 extern enum _scroll_state_ MouseScrollState;
 
     /// pointer to unit under the cursor
@@ -204,7 +203,7 @@ extern enum _cursor_on_ CursorOn;
 extern int CurrentButtonLevel;
 
     /// Display the command key in the buttons.
-extern int ShowCommandKey;
+extern char ShowCommandKey;
 
     /// All buttons in game
 extern ButtonAction AllButtons[];
@@ -213,6 +212,15 @@ extern ButtonAction AllButtons[];
 --	Functions
 ----------------------------------------------------------------------------*/
 
+//
+//	in console.c
+//
+    /// Console clear
+extern void ConsoleClear(void);
+    /// Console printf
+extern void ConsolePrintf(const char*,...);
+    /// Redraw the console
+extern void DrawConsole(void);
 //
 //	in botpanel.c
 //
@@ -237,11 +245,12 @@ extern int HandleKeyDown(int key);
     /// Called when a key is released
 extern int HandleKeyUp(int key);
 
-    /// FIXME: more docu
+    /// Called if right mouse button is pressed
 extern void DoRightButton(int x,int y);
     /// cancel the building input mode
 extern void CancelBuildingMode(void);
 
+    /// FIXME: more docu
 extern void DrawMessage(void);
 
 extern void DrawResources(void);
