@@ -1145,7 +1145,7 @@ static int DefaultResourceNumber(const char* name)
 }
 
 /**
-**	Define an AI player.
+** Define an AI player.
 **
 **  @param l  Lua state.
 */
@@ -1174,7 +1174,7 @@ static int CclDefineAiPlayer(lua_State* l)
 	ai->Player = &Players[i];
 
 	//
-	//	Parse the list:	(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
 		value = LuaToString(l, j + 1);

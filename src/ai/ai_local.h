@@ -55,28 +55,28 @@ typedef struct _ai_type_ AiType;
 **  Ai Type structure.
 */
 struct _ai_type_{
-	AiType* Next;  /// Next ai type
+	AiType* Next;  ///< Next ai type
 
-	char*   Name;  /// Name of this ai
-	char*   Race;  /// for this race
-	char*   Class; /// class of this ai
+	char*   Name;  ///< Name of this ai
+	char*   Race;  ///< for this race
+	char*   Class; ///< class of this ai
 
 	// nice flags
 #if 0
-	unsigned char AllExplored : 1; /// Ai sees unexplored area
-	unsigned char AllVisbile : 1;  /// Ai sees invisibile area
+	unsigned char AllExplored : 1; ///< Ai sees unexplored area
+	unsigned char AllVisbile : 1;  ///< Ai sees invisibile area
 #endif
 
-	char* Script; /// Main script
-	char* FunctionName;	/// Name of the function
+	char* Script; ///< Main script
+	char* FunctionName; ///< Name of the function
 };
 
 /**
 **  AI unit-type table with counter in front.
 */
 typedef struct _ai_unittype_table_ {
-	int       Count;    /// elements in table
-	UnitType* Table[1]; /// the table
+	int       Count;    ///< elements in table
+	UnitType* Table[1]; ///< the table
 } AiUnitTypeTable;
 
 /**
@@ -88,9 +88,9 @@ typedef struct _ai_unit_type_ AiUnitType;
 **  Ai unit-type in a force.
 */
 struct _ai_unit_type_ {
-	AiUnitType* Next; /// next unit-type
-	int         Want; /// number of this unit-type wanted
-	UnitType*   Type; /// unit-type self
+	AiUnitType* Next; ///< next unit-type
+	int         Want; ///< number of this unit-type wanted
+	UnitType*   Type; ///< unit-type self
 };
 
 /**
@@ -102,16 +102,16 @@ typedef struct _ai_unit_ AiUnit;
 **  Ai unit in a force.
 */
 struct _ai_unit_ {
-	AiUnit* Next; /// next unit
-	Unit*   Unit; /// unit self
+	AiUnit* Next; ///< next unit
+	Unit*   Unit; ///< unit self
 };
 
 /**
 **  Roles for forces
 */
 enum _ai_force_role_ {
-	AiForceRoleAttack, /// Force should attack
-	AiForceRoleDefend, /// Force should defend
+	AiForceRoleAttack, ///< Force should attack
+	AiForceRoleDefend, ///< Force should defend
 };
 
 
@@ -121,21 +121,21 @@ enum _ai_force_role_ {
 **  A force is a group of units belonging together.
 */
 typedef struct _ai_force_ {
-	char Completed;     /// Flag saying force is complete build
-	char Defending;     /// Flag saying force is defending
-	char Attacking;     /// Flag saying force is attacking
-	char Role;          /// Role of the force
+	char Completed;     ///< Flag saying force is complete build
+	char Defending;     ///< Flag saying force is defending
+	char Attacking;     ///< Flag saying force is attacking
+	char Role;          ///< Role of the force
 
-	AiUnitType* UnitTypes; /// Count and types of unit-type
-	AiUnit*     Units;     /// Units in the force
+	AiUnitType* UnitTypes; ///< Count and types of unit-type
+	AiUnit*     Units;     ///< Units in the force
 
 	//
 	// If attacking
 	//
-	int State;         /// Attack state
-	int GoalX;         /// Attack point X tile map position
-	int GoalY;         /// Attack point Y tile map position
-	int MustTransport; /// Flag must use transporter
+	int State;         ///< Attack state
+	int GoalX;         ///< Attack point X tile map position
+	int GoalY;         ///< Attack point Y tile map position
+	int MustTransport; ///< Flag must use transporter
 } AiForce;
 
 /**
@@ -149,19 +149,19 @@ typedef struct _ai_build_queue_ AiBuildQueue;
 **  List of orders for the resource manager to handle
 */
 struct _ai_build_queue_ {
-	AiBuildQueue* Next; /// next request
-	int           Want; /// requested number
-	int           Made; /// builded number
-	UnitType*     Type; /// unit-type
+	AiBuildQueue* Next; ///< next request
+	int           Want; ///< requested number
+	int           Made; ///< builded number
+	UnitType*     Type; ///< unit-type
 };
 
 typedef struct _ai_exploration_request_ AiExplorationRequest;
 
 struct _ai_exploration_request_ {
-	int                   X;    /// x pos on map
-	int                   Y;    /// y pos on map
-	int                   Mask; /// mask ( ex: MapFieldLandUnit )
-	AiExplorationRequest* Next; /// Next in linked list
+	int                   X;    ///< x pos on map
+	int                   Y;    ///< y pos on map
+	int                   Mask; ///< mask ( ex: MapFieldLandUnit )
+	AiExplorationRequest* Next; ///< Next in linked list
 };
 
 typedef struct _ai_transport_request_ AiTransportRequest;
@@ -176,38 +176,38 @@ struct _ai_transport_request_ {
 **  AI variables.
 */
 typedef struct _player_ai_ {
-	Player* Player; /// Engine player structure
-	AiType* AiType; /// AI type of this player AI
+	Player* Player; ///< Engine player structure
+	AiType* AiType; ///< AI type of this player AI
 	// controller
-	char*               Script;          /// Script executed
-	int                 ScriptDebug;     /// Flag script debuging on/off
-	unsigned long       SleepCycles;     /// Cycles to sleep
+	char*               Script;          ///< Script executed
+	int                 ScriptDebug;     ///< Flag script debuging on/off
+	unsigned long       SleepCycles;     ///< Cycles to sleep
 
 	// forces
-#define AI_MAX_FORCES 10                    /// How many forces are supported
-#define AI_MAX_ATTACKING_FORCES 30          /// Attacking forces
-	AiForce Force[AI_MAX_ATTACKING_FORCES]; /// Forces controlled by AI
+#define AI_MAX_FORCES 10                    ///< How many forces are supported
+#define AI_MAX_ATTACKING_FORCES 30          ///< Attacking forces
+	AiForce Force[AI_MAX_ATTACKING_FORCES]; ///< Forces controlled by AI
 
 	// resource manager
-	int Reserve[MaxCosts]; /// Resources to keep in reserve
-	int Used[MaxCosts];    /// Used resources
-	int Needed[MaxCosts];  /// Needed resources
-	int Collect[MaxCosts]; /// Collect % of resources
-	int NeededMask;        /// Mask for needed resources
-	int NeedSupply;        /// Flag need food
+	int Reserve[MaxCosts]; ///< Resources to keep in reserve
+	int Used[MaxCosts];    ///< Used resources
+	int Needed[MaxCosts];  ///< Needed resources
+	int Collect[MaxCosts]; ///< Collect % of resources
+	int NeededMask;        ///< Mask for needed resources
+	int NeedSupply;        ///< Flag need food
 
-	AiExplorationRequest* FirstExplorationRequest;  /// Requests for exploration
-	unsigned long         LastExplorationGameCycle; /// When did the last explore occur?
-	AiTransportRequest*   TransportRequests;        /// Requests for transport
-	unsigned long         LastCanNotMoveGameCycle;  /// Last can not move cycle
-	int                   UnitTypeRequestsCount;    /// unit-types to build/train request,priority list
-	AiUnitTypeTable*      UnitTypeRequests;         /// number of elements in UpgradeRequests
-	int                   UpgradeToRequestsCount;   /// Upgrade to unit-type requested and priority list
-	UnitType**            UpgradeToRequests;        /// number of elements in ResearchRequests
-	int                   ResearchRequestsCount;    /// Upgrades requested and priority list
-	Upgrade**             ResearchRequests;         /// What the resource manager should build
-	AiBuildQueue*         UnitTypeBuilded;          /// Last building checked for repair in this turn
-	int                   LastRepairBuilding;       /// No. workers that failed trying to repair a building
+	AiExplorationRequest* FirstExplorationRequest;  ///< Requests for exploration
+	unsigned long         LastExplorationGameCycle; ///< When did the last explore occur?
+	AiTransportRequest*   TransportRequests;        ///< Requests for transport
+	unsigned long         LastCanNotMoveGameCycle;  ///< Last can not move cycle
+	int                   UnitTypeRequestsCount;    ///< unit-types to build/train request,priority list
+	AiUnitTypeTable*      UnitTypeRequests;         ///< number of elements in UpgradeRequests
+	int                   UpgradeToRequestsCount;   ///< Upgrade to unit-type requested and priority list
+	UnitType**            UpgradeToRequests;        ///< number of elements in ResearchRequests
+	int                   ResearchRequestsCount;    ///< Upgrades requested and priority list
+	Upgrade**             ResearchRequests;         ///< What the resource manager should build
+	AiBuildQueue*         UnitTypeBuilded;          ///< Last building checked for repair in this turn
+	int                   LastRepairBuilding;       ///< No. workers that failed trying to repair a building
 	unsigned              TriedRepairWorkers[UnitMax];
 } PlayerAi;
 
@@ -267,12 +267,12 @@ typedef struct _ai_helper_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern AiType* AiTypes; /// List of all AI types
-extern AiHelper AiHelpers; /// AI helper variables
+extern AiType* AiTypes; ///< List of all AI types
+extern AiHelper AiHelpers; ///< AI helper variables
 
-extern int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
-extern PlayerAi* AiPlayer; /// Current AI player
-extern char** AiTypeWcNames; /// pud num to internal string mapping
+extern int UnitTypeEquivs[UnitTypeMax + 1]; ///< equivalence between unittypes
+extern PlayerAi* AiPlayer; ///< Current AI player
+extern char** AiTypeWcNames; ///< pud num to internal string mapping
 
 /*----------------------------------------------------------------------------
 --  Functions

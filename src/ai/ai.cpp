@@ -34,109 +34,109 @@
 #define noTIMEIT  /// Enable CPU use debugging
 
 //----------------------------------------------------------------------------
-//	  Documentation
+// Documentation
 //----------------------------------------------------------------------------
 
 /**
-**	  @page AiModule Module - AI
+** @page AiModule Module - AI
 **
-**	  @section aibasics What is it?
+** @section aibasics What is it?
 **
-**		Stratagus uses a very simple scripted AI. There are no optimizations
-**		yet. The complete AI was written on one weekend.
-**		Until no AI specialist joins, I keep this AI.
+** Stratagus uses a very simple scripted AI. There are no optimizations
+** yet. The complete AI was written on one weekend.
+** Until no AI specialist joins, I keep this AI.
 **
-**		@subsection aiscripted What is scripted AI?
+** @subsection aiscripted What is scripted AI?
 **
-**		The AI script tells the engine build 4 workers, than build 3 footman,
-**		than attack the player, than sleep 100 frames.
+** The AI script tells the engine build 4 workers, than build 3 footman,
+** than attack the player, than sleep 100 frames.
 **
-**	  @section API The AI API
+** @section API The AI API
 **
-**		@subsection aimanage Management calls
+** @subsection aimanage Management calls
 **
-**		Manage the inititialse and cleanup of the AI players.
+** Manage the inititialse and cleanup of the AI players.
 **
-**		::InitAiModule(void)
+** ::InitAiModule(void)
 **
-**				Initialise all global varaibles and structures.
-**				Called before AiInit, or before game loading.
+** Initialise all global varaibles and structures.
+** Called before AiInit, or before game loading.
 **
-**		::AiInit(::Player)
+** ::AiInit(::Player)
 **
-**				Called for each player, to setup the AI structures
-**				Player::Aiin the player structure. It can use Player::AiNum to
-**				select different AI's.
+** Called for each player, to setup the AI structures
+** Player::Aiin the player structure. It can use Player::AiNum to
+** select different AI's.
 **
-**		::CleanAi(void)
+** ::CleanAi(void)
 **
-**				Called to release all the memory for all AI structures.
-**				Must handle self which players contains AI structures.
+** Called to release all the memory for all AI structures.
+** Must handle self which players contains AI structures.
 **
-**		::SaveAi(::FILE*)
+** ::SaveAi(::FILE*)
 **
-**				Save the AI structures of all players to file.
-**				Must handle self which players contains AI structures.
-**
-**
-**		@subsection aipcall Periodic calls
-**
-**		This functions are called regular for all AI players.
-**
-**		::AiEachCycle(::Player)
-**
-**				Called each game cycle, to handle quick checks, which needs
-**				less CPU.
-**
-**		::AiEachSecond(::Player)
-**
-**				Called each second, to handle more CPU intensive things.
+** Save the AI structures of all players to file.
+** Must handle self which players contains AI structures.
 **
 **
-**		@subsection aiecall Event call-backs
+** @subsection aipcall Periodic calls
 **
-**				This functions are called, when some special events happens.
+** This functions are called regular for all AI players.
 **
-**		::AiHelpMe()
+** ::AiEachCycle(::Player)
 **
-**				Called if an unit owned by the AI is attacked.
+** Called each game cycle, to handle quick checks, which needs
+** less CPU.
 **
-**		::AiUnitKilled()
+** ::AiEachSecond(::Player)
 **
-**				Called if an unit owned by the AI is killed.
+** Called each second, to handle more CPU intensive things.
 **
-**		::AiNeedMoreSupply()
 **
-**				Called if an trained unit is ready, but not enough food is
-**				available for it.
+** @subsection aiecall Event call-backs
 **
-**		::AiWorkComplete()
+** This functions are called, when some special events happens.
 **
-**				Called if an unit has completed its work.
+** ::AiHelpMe()
 **
-**		::AiCanNotBuild()
+** Called if an unit owned by the AI is attacked.
 **
-**				Called if the AI unit can't build the requested unit-type.
+** ::AiUnitKilled()
 **
-**		::AiCanNotReach()
+** Called if an unit owned by the AI is killed.
 **
-**				Called if the AI unit can't reach the building place.
+** ::AiNeedMoreSupply()
 **
-**		::AiTrainingComplete()
+** Called if an trained unit is ready, but not enough food is
+** available for it.
 **
-**				Called if AI unit has completed training a new unit.
+** ::AiWorkComplete()
 **
-**		::AiUpgradeToComplete()
+** Called if an unit has completed its work.
 **
-**				Called if AI unit has completed upgrade to new unit-type.
+** ::AiCanNotBuild()
 **
-**		::AiResearchComplete()
+** Called if the AI unit can't build the requested unit-type.
 **
-**				Called if AI unit has completed research of an upgrade or spell.
+** ::AiCanNotReach()
+**
+** Called if the AI unit can't reach the building place.
+**
+** ::AiTrainingComplete()
+**
+** Called if AI unit has completed training a new unit.
+**
+** ::AiUpgradeToComplete()
+**
+** Called if AI unit has completed upgrade to new unit-type.
+**
+** ::AiResearchComplete()
+**
+** Called if AI unit has completed research of an upgrade or spell.
 */
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <string.h>
@@ -160,24 +160,24 @@
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-int AiSleepCycles;				/// Ai sleeps # cycles
-int AiTimeFactor = 100;				/// Adjust the AI build times
-int AiCostFactor = 100;				/// Adjust the AI costs
+int AiSleepCycles; /// Ai sleeps # cycles
+int AiTimeFactor = 100; /// Adjust the AI build times
+int AiCostFactor = 100; /// Adjust the AI costs
 
-AiType* AiTypes;						/// List of all AI types.
-AiHelper AiHelpers;				/// AI helper variables
+AiType* AiTypes; /// List of all AI types.
+AiHelper AiHelpers; /// AI helper variables
 
-PlayerAi* AiPlayer;				/// Current AI player
+PlayerAi* AiPlayer; /// Current AI player
 /**
 **  W*rCr*ft number to internal ai-type name.
 */
 char** AiTypeWcNames;
 
 /*----------------------------------------------------------------------------
---		Lowlevel functions
+-- Lowlevel functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -244,7 +244,7 @@ static void AiCheckUnits(void)
 		x = AiPlayer->UnitTypeRequests[i].Count;
 
 		//
-		//	Add equivalent units
+		// Add equivalent units
 		//
 		e = unit_types_count[t];
 		if (t < AiHelpers.EquivCount && AiHelpers.Equiv[t]) {
@@ -335,7 +335,7 @@ static void AiCheckUnits(void)
 }
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 #if 0
@@ -396,18 +396,18 @@ static void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name,
+							CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (upgrade) {
 							if (f + strlen(Upgrades[i].Ident) > 78) {
-								f = CLprintf(file, "\n	");
+								f = CLprintf(file, "\n\t");
 							}
 							f += CLprintf(file, ", \"%s\"", Upgrades[i].Ident);
 						} else {
 							if (f + strlen(UnitTypes[i]->Ident) > 78) {
-								f = CLprintf(file, "\n	");
+								f = CLprintf(file, "\n\t");
 							}
 							f += CLprintf(file, ", \"%s\"", UnitTypes[i]->Ident);
 						}
@@ -440,11 +440,11 @@ static void SaveAiEquivTable(CLFile* file, const char* name, int n,
 
 	for (i = 0; i < n; ++i) {
 		if (table[i]) {
-			CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name, UnitTypes[i]->Ident);
+			CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name, UnitTypes[i]->Ident);
 			f = 4;
 			for (j = 0; j < table[i]->Count; ++j) {
 				if (f + strlen(table[i]->Table[j]->Ident) > 78) {
-					f = CLprintf(file, "\n	");
+					f = CLprintf(file, "\n\t");
 				}
 				f += CLprintf(file, ", \"%s\"", table[i]->Table[j]->Ident);
 			}
@@ -483,12 +483,12 @@ static void SaveAiCostTable(CLFile* file, const char* name, int n,
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  (list '%s '%s\n	", name,
+							CLprintf(file, "\n  (list '%s '%s\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (f + strlen(DefaultResourceNames[i]) > 78) {
-							f = CLprintf(file, "\n	");
+							f = CLprintf(file, "\n\t");
 						}
 						f += CLprintf(file, "'%s ", DefaultResourceNames[i]);
 					}
@@ -527,12 +527,12 @@ static void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name,
+							CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (f + strlen("food") > 78) {
-							f = CLprintf(file, "\n	");
+							f = CLprintf(file, "\n\t");
 						}
 						f += CLprintf(file, ",\"%s\" ", "food");
 					}
@@ -1037,7 +1037,7 @@ void CleanAi(void)
 	//
 	//  Mapping original AI numbers in puds to our internal strings
 	//
-	if ((cp = AiTypeWcNames)) {				// Free all old names
+	if ((cp = AiTypeWcNames)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -1049,7 +1049,7 @@ void CleanAi(void)
 }
 
 /*----------------------------------------------------------------------------
---		Support functions
+-- Support functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -1168,7 +1168,7 @@ static void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
 }
 
 /*----------------------------------------------------------------------------
---		Callback Functions
+-- Callback Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -1459,8 +1459,8 @@ static void AiMoveUnitInTheWay(Unit* unit)
 
 #ifdef MAP_REGIONS
 /**
-**		Return : 0 if nothing available
-**				 1 if exists (unit may still be null if no one ready)
+** Return : 0 if nothing available
+** 1 if exists (unit may still be null if no one ready)
 */
 static int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 	int x, int y, unsigned unitType, Unit** bestunit)
@@ -1761,8 +1761,8 @@ void AiTrainingComplete(Unit* unit, Unit* what)
 /**
 **  Called if upgrading of an unit is completed.
 **
-**  @param unit		Pointer to unit working.
-**  @param what		Pointer to the new unit-type.
+**  @param unit Pointer to unit working.
+**  @param what Pointer to the new unit-type.
 */
 void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
 	const UnitType* what __attribute__((unused)))
