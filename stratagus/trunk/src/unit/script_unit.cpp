@@ -274,7 +274,7 @@ local void CclParseOrder(SCM list,Order* order)
 	} else if( gh_eq_p(value,gh_symbol2scm("arg1")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    order->Arg1 = (void * )gh_scm2int (value);
+	    order->Arg1 = (void * )gh_scm2int(value);
 
 	} else {
 	   // FIXME: this leaves a half initialized unit
@@ -307,40 +307,41 @@ local void CclParseOrders(Unit* unit,SCM vector)
 **	@param unit	Unit pointer which should be filled with the data.
 **	@param list	All options of the builded data.
 */
-local void CclParseBuilded (Unit *unit, SCM list)
+local void CclParseBuilded(Unit* unit, SCM list)
 {
     SCM value;
-    char *str;
+    char* str;
 
-    while ( !gh_null_p (list) ) {
-	value = gh_car (list);
-	list = gh_cdr (list);
-	if (gh_eq_p (value, gh_symbol2scm ("worker")) ) {
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("worker"))) {
 	    int slot;
-	    value = gh_car (list);
-	    str = gh_scm2newstr (value, NULL);
-	    slot = strtol(str+1,NULL,16);
+
+	    value = gh_car(list);
+	    str = gh_scm2newstr(value, NULL);
+	    slot = strtol(str + 1, NULL, 16);
+	    DebugCheck( !UnitSlots[slot] );
 	    unit->Data.Builded.Worker = UnitSlots[slot];
 	    ++UnitSlots[slot]->Refs;
-	    free (str);
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("sum")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Builded.Sum = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("add")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Builded.Add = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("val")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Builded.Val = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("sub")) ) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    unit->Data.Builded.Sub = gh_scm2int (value);
-	} else if (gh_eq_p (value, gh_symbol2scm ("cancel")) ) {
+	    free(str);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("sum"))) {
+	    unit->Data.Builded.Sum = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("add"))) {
+	    unit->Data.Builded.Add = gh_scm2int(gh_car(list));
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("val"))) {
+	    unit->Data.Builded.Val = gh_scm2int(gh_car(list));
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("sub"))) {
+	    unit->Data.Builded.Sub = gh_scm2int(gh_car(list));
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("cancel"))) {
 	    unit->Data.Builded.Cancel = 1;
 	}
     }
@@ -402,12 +403,10 @@ local SCM CclUnit(SCM list)
     char* str;
     char* s;
 
-    str=gh_scm2newstr(gh_car(list),NULL);
+    slot=gh_scm2int(gh_car(list));
     list=gh_cdr(list);
+    DebugLevel3Fn("parsing unit #%d\n" _C_ slot);
 
-    slot=strtol(str+1,NULL,16);
-    DebugLevel0Fn ("parsing unit #%d\n" _C_ slot);
-    free(str);
     unit=NULL;
     type=NULL;
     player=NULL;
@@ -443,15 +442,15 @@ local SCM CclUnit(SCM list)
 	    // until we parsed at least Unit::Orders[].
 	    DebugCheck( !type );
 	    unit = UnitSlots[slot];
-	    //InitUnit (unit, type, player);
-	    InitUnit (unit, type);
+	    InitUnit(unit, type);
 	    unit->Active=0;
 	    unit->Removed=0;
-	    unit->Reset=0;
+	    unit->Reset=0;		// JOHNS ????
 	    DebugCheck( unit->Slot!=slot );
 	} else if( gh_eq_p(value,gh_symbol2scm("next")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
+	    DebugLevel0Fn("FIXME: 'next of unit %d\n" _C_ slot);
 #if 0
 	    // This is currently not used.
 	    if( !gh_null_p(value) ) {
@@ -594,9 +593,7 @@ local SCM CclUnit(SCM list)
 
 		    slot=strtol(str+1,NULL,16);
 		    unit->OnBoard[i]=UnitSlots[slot];
-		    if( !UnitSlots[slot] ) {
-			DebugLevel0Fn("FIXME: Forward reference not supported\n");
-		    }
+		    DebugCheck( !UnitSlots[slot] );
 		    ++UnitSlots[slot]->Refs;
 		    free(str);
 		}
@@ -663,10 +660,10 @@ local SCM CclUnit(SCM list)
     }
 
     // FIXME: johns: works only for debug code.
-    if (unit->Moving)
+    if (unit->Moving) {
 	NewResetPath(unit);
-    DebugLevel0Fn("FIXME: not written\n");
-    DebugLevel0Fn ("unit #%d parsed\n" _C_ slot);
+    }
+    DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
 
     return SCM_UNSPECIFIED;
 }
