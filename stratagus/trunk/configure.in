@@ -91,7 +91,10 @@ dnl    [  --enable-optimization	  [Enable detection of optimization flags (defau
 dnl FIXME: todo
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config)
-VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `sdl-config --cflags`"
+if test  x$SDLCONFIG = x; then
+    AC_CHECK_PROGS(SDLCONFIG, sdl11-config)
+fi
+VIDEO_CFLAGS="-DUSE_SDL -DUSE_SDLA `$SDLCONFIG --cflags`"
 if test "$enable_static" != "yes"; then
     VIDEO_LIBS="`$SDLCONFIG --libs`"
 else
@@ -103,6 +106,9 @@ if test "$WIN32" = "1"; then
     else
 	VIDEO_LIBS="$VIDEO_LIBS -lwsock32 -lws2_32 -lmingwex -lgmon"
     fi
+fi
+if test $ARCH = bsd; then
+    VIDEO_LIBS="$VIDEO_LIBS -lc"
 fi
 AC_SUBST(VIDEO_CFLAGS)
 AC_SUBST(VIDEO_LIBS)
@@ -200,7 +206,7 @@ AC_ARG_WITH(cdaudio,
     [  --with-cdaudio=libcda,sdlcd,cdda,no
 			  [Enable CD Audio support (default: no)]], CDAUDIO="$with_cdaudio")
 if test "$CDAUDIO" = "sdl"; then
-    CDAUDIO_CFLAGS="`sdl-config --cflags`"
+    CDAUDIO_CFLAGS="`$SDLCONFIG --cflags`"
     CDAUDIO_LIBS=""
 elif test "$CDAUDIO" = "cdda"; then
     CDAUDIO_CFLAGS="-DUSE_CDDA"
@@ -231,7 +237,7 @@ if test x$LUACONFIG != x; then
 else
     LUA_CFLAGS="$CFLAGS"
     LUA_LIBS="$LIBS"
-    if test x$WIN32 = x ; then
+    if test $ARCH = linux ; then
 	LUA_LIBS="$LUA_LIBS -ldl"
     fi
     AC_CHECK_LIB(lua, lua_getfenv, LUA_LIBS="$LUA_LIBS -llua",
