@@ -91,7 +91,10 @@
 	fprintf(stderr,"DebugCheck at %s:%d\n",__FILE__,__LINE__); \
 	abort(); } }while( 0 )
 
-#ifdef _MSVC_	// {
+#ifdef _MSC_VER	// { m$ auto detection
+
+#define inline __inline			// fix m$ brain damage
+
 /**
 **	Print debug information of level 0.
 */
@@ -125,7 +128,7 @@ static inline void DebugLevel2Fn(const char* fmt,...) {};
 */
 static inline void DebugLevel3Fn(const char* fmt,...) {};
 
-#else	// }{ _MSVC_
+#else	// }{ _MSC_VER
 
 /**
 **	Print debug information of level 0.
@@ -167,14 +170,14 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 */
 #define DebugLevel3Fn(fmt,args...)	/* TURNED OFF: printf(__FUNCTION__": "fmt,##args) */
 
-#endif	// !_MSVC_
+#endif	// } !_MSC_VER
 
 #else	// }{ DEBUG
 
 #define IfDebug(code)
 #define DebugCheck(cond)
 
-#ifdef _MSVC_	// {
+#ifdef _MSC_VER	// { m$ auto detection
 
 static inline void DebugLevel0(const char* fmt,...) {};
 static inline void DebugLevel1(const char* fmt,...) {};
@@ -185,7 +188,7 @@ static inline void DebugLevel1Fn(const char* fmt,...) {};
 static inline void DebugLevel2Fn(const char* fmt,...) {};
 static inline void DebugLevel3Fn(const char* fmt,...) {};
 
-#else	// }{ _MSVC_
+#else	// }{ _MSC_VER
 
 #define DebugLevel0(fmt...)
 #define DebugLevel1(fmt...)
@@ -196,7 +199,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define DebugLevel2Fn(fmt...)
 #define DebugLevel3Fn(fmt...)
 
-#endif	// !_MSVC_
+#endif	// } !_MSC_VER
 
 #endif	// } !DEBUG
 
@@ -296,7 +299,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 
 // FIXME: this values should go into a general ui structure.
 
-#define noGRID		1		/// Map is show with a grid, if 1
+#define noGRID		1		/// Map is shown with a grid, if 1
 
 #define DEFAULT_VIDEO_WIDTH	640	/// Default video width
 #define DEFAULT_VIDEO_HEIGHT	480	/// Default video height
@@ -353,11 +356,23 @@ enum MustRedraw_e {
     /// Must redraw all panels
 #define RedrawPanels		(RedrawInfoPanel|RedrawButtonPanel)
 
+#ifdef _MSC_VER	// { m$ auto detection
+
 /**
 **	Show load progress.
 **	FIXME: Some time this should be shown in tile screen.
 */
-#define ShowLoadProgress(fmt...)	//printf(fmt,##args)
+static inline void ShowLoadProgress(const char* fmt,...) {};
+
+#else	// }{ _MSC_VER
+
+/**
+**	Show load progress.
+**	FIXME: Some time this should be shown in tile screen.
+*/
+#define ShowLoadProgress(fmt,args...)	//printf(fmt,##args)
+
+#endif	// } !_MSC_VER
 
     /// mainscreen width (default 640)
 extern int VideoWidth;
