@@ -536,7 +536,7 @@ global int AiNearHall(Unit * hall, Unit * worker, UnitType * type, int *dx,
 	    );				// remove compiler warning
     DebugLevel3("%d,%d\n", type->TileWidth, type->TileHeight);
     /// leave two fields free!
-#define SPACE 2
+#define SPACE 2		/// Space arround buildings
     x -= type->TileWidth + SPACE;	// this should correct it
     y -= type->TileHeight + SPACE - 1;
     addx += type->TileWidth + SPACE + 1;
