@@ -151,6 +151,58 @@ global void CreatePlayer(char* name,int type)
     player->Enemy=0;
     player->Allied=0;
     player->AiNum=PlayerAiUniversal;
+
+    //
+    //	Calculate enemy/allied mask.
+    //
+    for( i=0; i<NumPlayers; ++i ) {
+	switch( type ) {
+	    case PlayerNeutral:
+	    case PlayerNobody:
+	    default:
+		break;
+	    case PlayerComputer:
+		// Computer allied with computer and enemy of all humans.
+		if( Players[i].Type==PlayerComputer ) {
+		    player->Allied|=(1<<i);
+		    Players[i].Allied|=(1<<NumPlayers);
+		} else if( Players[i].Type==PlayerHuman
+			|| Players[i].Type==PlayerRescueActive ) {
+		    player->Enemy|=(1<<i);
+		    Players[i].Enemy|=(1<<NumPlayers);
+		}
+		break;
+	    case PlayerHuman:
+		// Humans are enemy of all?
+		if( Players[i].Type==PlayerComputer
+			|| Players[i].Type==PlayerHuman ) {
+		    player->Enemy|=(1<<i);
+		    Players[i].Enemy|=(1<<NumPlayers);
+		} else if( Players[i].Type==PlayerRescueActive
+			|| Players[i].Type==PlayerRescuePassive ) {
+		    player->Allied|=(1<<i);
+		    Players[i].Allied|=(1<<NumPlayers);
+		}
+		break;
+	    case PlayerRescuePassive:
+		// Rescue passive are allied with humans
+		if( Players[i].Type==PlayerHuman ) {
+		    player->Allied|=(1<<i);
+		    Players[i].Allied|=(1<<NumPlayers);
+		}
+		break;
+	    case PlayerRescueActive:
+		// Rescue active are allied with humans and enemies of computer
+		if( Players[i].Type==PlayerComputer ) {
+		    player->Enemy|=(1<<i);
+		    Players[i].Enemy|=(1<<NumPlayers);
+		} else if( Players[i].Type==PlayerHuman ) {
+		    player->Allied|=(1<<i);
+		    Players[i].Allied|=(1<<NumPlayers);
+		}
+		break;
+	}
+    }
     
     //
     //	Initial default resources.

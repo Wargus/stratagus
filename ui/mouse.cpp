@@ -288,12 +288,11 @@ global void DoRightButton(int x,int y)
         //
         if( action==MouseActionAttack ) {
             // FIXME: more units on same tile
+	    // FIXME: should use enemy first, than other functions!
             dest=TargetOnMapTile(unit,x,y);
             if( dest ) {
                 dest->Blink=3;
-                if( dest->Player==ThisPlayer || 
-		        dest->Player->Player==PlayerNumNeutral) {
-		    // FIXME: lokh: maybe we should add the ally players here
+                if( dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest) ) {
 		    SendCommandFollow(unit,dest,flush);
                     continue;
                 } else {
