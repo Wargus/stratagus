@@ -240,11 +240,9 @@ void DrawSelectionNone(Uint32 color, int x1, int y1,
 **  @param x1,y1  Coordinates of the top left corner.
 **  @param x2,y2  Coordinates of the bottom right corner.
 */
-void DrawSelectionCircle(Uint32 color, int x1, int x2,
-	int y1, int y2)
+void DrawSelectionCircle(Uint32 color, int x1, int y1,
+	int x2, int y2)
 {
-	VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
-		min((x2 - x1) / 2, (y2 - y1) / 2));
 	VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 		min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
