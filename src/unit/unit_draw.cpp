@@ -1733,7 +1733,7 @@ local void DrawUnitPlayerColor(const UnitType* type,int player,int frame,int x,i
 **	@param x	X position.
 **	@param y	Y position.
 */
-local void DrawConstruction(const Unit* unit,int x,int y)
+local void DrawConstruction(const Unit* unit,int frame,int x,int y)
 {
     ConstructionFrame* cframe;
 
@@ -1745,14 +1745,14 @@ local void DrawConstruction(const Unit* unit,int x,int y)
 	x-=construction->Width/2;
 	y-=construction->Height/2;
 	GraphicUnitPixels(unit,construction->Sprite);
-	VideoDrawClip(construction->Sprite,cframe->Frame,x,y);
+	VideoDrawClip(construction->Sprite,frame,x,y);
     } else {
 	x-=unit->Type->Sprite->Width/2;
 	y-=unit->Type->Sprite->Height/2;
 	GraphicUnitPixels(unit,unit->Type->Sprite);
-	DrawUnitType(unit->Type,cframe->Frame,x,y);
+	DrawUnitType(unit->Type,frame,x,y);
 #ifdef USE_OPENGL
-	DrawUnitPlayerColor(unit->Type,unit->Player->Player,cframe->Frame,x,y);
+	DrawUnitPlayerColor(unit->Type,unit->Player->Player,frame,x,y);
 #endif
     }
 }
@@ -1821,7 +1821,7 @@ global void DrawBuilding(const Unit* unit)
     //
     if( state == 1 ) {
 	if( constructed ) {
-	    DrawConstruction(unit
+	    DrawConstruction(unit,frame
 		,x+(type->TileWidth*TileSizeX)/2
 		,y+(type->TileHeight*TileSizeY)/2);
 	}
