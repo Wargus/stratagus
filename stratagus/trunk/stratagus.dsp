@@ -862,10 +862,6 @@ SOURCE=.\etlib\getopt.c
 
 SOURCE=.\etlib\hash.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\etlib\prgname.c
-# End Source File
 # End Group
 # End Group
 # Begin Group "Header Files"
@@ -888,10 +884,6 @@ SOURCE=.\src\include\etlib\generic.h
 # Begin Source File
 
 SOURCE=.\src\include\etlib\hash.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\etlib\xmalloc.h
 # End Source File
 # End Group
 # Begin Group "vp31."
@@ -1081,10 +1073,6 @@ SOURCE=.\src\include\pathfinder.h
 # Begin Source File
 
 SOURCE=.\src\include\player.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\etlib\prgname.h
 # End Source File
 # Begin Source File
 
