@@ -51,7 +51,6 @@
 
 #define NumFontColors 7
 
-#ifdef USE_SDL_SURFACE
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
 	char* ColorName;                        /// Font color name
@@ -60,26 +59,6 @@ typedef struct _font_color_mapping_ {
 } FontColorMapping;
 
 local FontColorMapping* FontColor;
-#else
-	/// Font color mapping
-typedef struct _font_color_mapping_ {
-	char* Color;                            /// Font color
-	struct {
-		int R;
-		int G;
-		int B;
-	} RGB[NumFontColors];
-	VMemType Pixels[NumFontColors];         /// Array of hardware dependent pixels
-	struct _font_color_mapping_* Next;      /// Next pointer
-} FontColorMapping;
-
-local const VMemType* FontPixels;           /// Font pixels
-#define FontPixels8  (&FontPixels->D8)      /// font pixels  8bpp
-#define FontPixels16 (&FontPixels->D16)     /// font pixels 16bpp
-#define FontPixels24 (&FontPixels->D24)     /// font pixels 24bpp
-#define FontPixels32 (&FontPixels->D32)     /// font pixels 32bpp
-
-#endif
 
 	/// Font color mappings
 local FontColorMapping* FontColorMappings;
@@ -91,32 +70,19 @@ local FontColorMapping* FontColorMappings;
 */
 local ColorFont Fonts[MaxFonts];
 
-#ifdef USE_SDL_SURFACE
 	/// Last text color
 local FontColorMapping* LastTextColor;
 	/// Default text color
 local FontColorMapping* DefaultTextColor;
 	/// Reverse text color
 local FontColorMapping* ReverseTextColor;
-#else
-	/// Last text color
-local const VMemType* LastTextColor;
-	/// Default text color
-local const VMemType* DefaultTextColor;
-	/// Reverse text color
-local const VMemType* ReverseTextColor;
-#endif
 	/// Default normal color index
 local char* DefaultNormalColorIndex;
 	/// Default reverse color index
 local char* DefaultReverseColorIndex;
 
 	/// Draw character with current video depth.
-#ifdef USE_SDL_SURFACE
 local void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
-#else
-local void (*VideoDrawChar)(const Graphic*, int, int, int, int, int, int);
-#endif
 
 #ifdef USE_OPENGL
 	/// Font bitmaps
@@ -149,7 +115,6 @@ global char* FontNames[] = {
 
 // FIXME: should use RLE encoded fonts, not color key fonts.
 
-#ifdef USE_SDL_SURFACE
 /**
 **  Draw character with current color.
 **
@@ -202,229 +167,7 @@ local void VideoDrawChar(const Graphic* sprite,
 	glEnable(GL_TEXTURE_2D);
 }
 #endif
-#else
-/**
-**  Draw character with current color into 8bit video memory.
-**
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
-*/
-local void VideoDrawChar8(const Graphic* sprite,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	int p;
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	VMemType8* dp;
-	int da;
 
-	sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
-	gp = sp + sprite->Width * h;
-	sa = sprite->Width - w;
-	dp = VideoMemory8 + x + y * VideoWidth - 1;
-	da = VideoWidth - w;
-	--w;
-
-#define UNROLL \
-	++dp; \
-	p = *++sp; \
-	if (p != 255) { \
-		if (p < NumFontColors) { \
-			*dp = FontPixels8[p]; \
-		} else { \
-			*dp = ((VMemType8*)sprite->Pixels)[p]; \
-		} \
-	}
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {  // loop with unroll
-			UNROLL;
-			UNROLL;
-		}
-		if (sp <= lp) {
-			UNROLL;
-		}
-		sp += sa;
-		dp += da;
-	}
-#undef UNROLL
-}
-
-/**
-**  Draw character with current color into 16bit video memory.
-**
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
-*/
-local void VideoDrawChar16(const Graphic* sprite,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	int p;
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	VMemType16* dp;
-	int da;
-
-	sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
-	gp = sp + sprite->Width * h;
-	sa = sprite->Width - w;
-	dp = VideoMemory16 + x + y * VideoWidth - 1;
-	da = VideoWidth - w;
-	--w;
-
-#define UNROLL \
-	++dp; \
-	p = *++sp; \
-	if (p != 255) { \
-		if (p < NumFontColors) { \
-			*dp = FontPixels16[p]; \
-		} else { \
-			*dp = ((VMemType16*)sprite->Pixels)[p]; \
-		} \
-	}
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {  // loop with unroll
-			UNROLL;
-			UNROLL;
-		}
-		if (sp <= lp) {
-			UNROLL;
-		}
-		sp += sa;
-		dp += da;
-	}
-#undef UNROLL
-}
-
-/**
-**  Draw character with current color into 24bit video memory.
-**
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
-*/
-local void VideoDrawChar24(const Graphic* sprite,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	int p;
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	VMemType24* dp;
-	int da;
-
-	sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
-	gp = sp + sprite->Width * h;
-	sa = sprite->Width - w;
-	dp = VideoMemory24 + x + y * VideoWidth - 1;
-	da = VideoWidth - w;
-	--w;
-
-#define UNROLL \
-	++dp; \
-	p = *++sp; \
-	if (p != 255) { \
-		if (p < NumFontColors) { \
-			*dp = FontPixels24[p]; \
-		} else { \
-			*dp = ((VMemType24*)sprite->Pixels)[p]; \
-		} \
-	}
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {  // loop with unroll
-			UNROLL;
-			UNROLL;
-		}
-		if (sp <= lp) {
-			UNROLL;
-		}
-		sp += sa;
-		dp += da;
-	}
-#undef UNROLL
-}
-
-/**
-**  Draw character with current color into 32bit video memory.
-**
-**  @param sprite  Pointer to object
-**  @param gx      X offset into object
-**  @param gy      Y offset into object
-**  @param w       width to display
-**  @param h       height to display
-**  @param x       X screen position
-**  @param y       Y screen position
-*/
-local void VideoDrawChar32(const Graphic* sprite,
-	int gx, int gy, int w, int h, int x, int y)
-{
-	int p;
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-	int sa;
-	VMemType32* dp;
-	int da;
-
-	sp = (const unsigned char*)sprite->Frames + gx + gy * sprite->Width - 1;
-	gp = sp + sprite->Width * h;
-	sa = sprite->Width - w;
-	dp = VideoMemory32 + x + y * VideoWidth - 1;
-	da = VideoWidth - w;
-	--w;
-
-#define UNROLL \
-	++dp; \
-	p = *++sp; \
-	if (p != 255) { \
-		if (p < NumFontColors) { \
-			*dp = FontPixels32[p]; \
-		} else { \
-			*dp = ((VMemType32*)sprite->Pixels)[p]; \
-		} \
-	}
-
-	while (sp < gp) {
-		lp = sp + w;
-		while (sp < lp) {  // loop with unroll
-			UNROLL;
-			UNROLL;
-		}
-		if (sp <= lp) {
-			UNROLL;
-		}
-		sp += sa;
-		dp += da;
-	}
-#undef UNROLL
-}
-#endif
-
-#ifdef USE_SDL_SURFACE
 /**
 **  FIXME: docu
 */
@@ -443,26 +186,6 @@ local FontColorMapping* GetFontColorMapping(char* color)
 	ExitFatal(1);
 	return NULL;
 }
-#else
-/**
-**  FIXME: docu
-*/
-local const VMemType* GetFontColorMapping(char* color)
-{
-	FontColorMapping* fcm;
-
-	fcm = FontColorMappings;
-	while (fcm) {
-		if (!strcmp(fcm->Color, color)) {
-			return fcm->Pixels;
-		}
-		fcm = fcm->Next;
-	}
-	fprintf(stderr, "Font mapping not found: '%s'\n", color);
-	ExitFatal(1);
-	return NULL;
-}
-#endif
 
 /**
 **  Set the default text colors.
@@ -474,11 +197,7 @@ global void SetDefaultTextColors(char* normal, char* reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
-#ifdef USE_SDL_SURFACE
 	LastTextColor = DefaultTextColor = FontColor = GetFontColorMapping(normal);
-#else
-	LastTextColor = DefaultTextColor = FontPixels = GetFontColorMapping(normal);
-#endif
 	ReverseTextColor = GetFontColorMapping(reverse);
 }
 
@@ -588,11 +307,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	int height;
 	int widths;
 	const ColorFont* fp;
-#ifdef USE_SDL_SURFACE
 	FontColorMapping* rev;
-#else
-	const VMemType* rev;
-#endif
 	char* color;
 	const unsigned char* p;
 	void (*DrawChar)(const Graphic*, int, int, int, int, int, int);
@@ -618,34 +333,19 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 				case '~':
 					break;
 				case '!':
-#ifdef USE_SDL_SURFACE
 					rev = FontColor;
 					FontColor = ReverseTextColor;
-#else
-					rev = FontPixels;
-					FontPixels = ReverseTextColor;
-#endif
 
 					++text;
 					break;
 				case '<':
-#ifdef USE_SDL_SURFACE
 					LastTextColor = FontColor;
 					FontColor = ReverseTextColor;
-#else
-					LastTextColor = FontPixels;
-					FontPixels = ReverseTextColor;
-#endif
 					continue;
 				case '>':
 					rev = LastTextColor;  // swap last and current color
-#ifdef USE_SDL_SURFACE
 					LastTextColor = FontColor;
 					FontColor = rev;
-#else
-					LastTextColor = FontPixels;
-					FontPixels = rev;
-#endif
 					continue;
 
 				default:
@@ -661,13 +361,8 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 					memcpy(color, text, p - text);
 					color[p - text] = '\0';
 					text = p;
-#ifdef USE_SDL_SURFACE
 					LastTextColor = FontColor;
 					FontColor = GetFontColorMapping(color);
-#else
-					LastTextColor = FontPixels;
-					FontPixels = GetFontColorMapping(color);
-#endif
 					free(color);
 					continue;
 			}
@@ -684,11 +379,7 @@ local int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 		}
 		widths += w + 1;
 		if (rev) {
-#ifdef USE_SDL_SURFACE
 			FontColor = rev;
-#else
-			FontPixels = rev;
-#endif
 			rev = NULL;
 		}
 	}
@@ -754,15 +445,9 @@ global int VideoDrawReverseText(int x, int y, unsigned font,
 {
 	int w;
 
-#ifdef USE_SDL_SURFACE
 	FontColor = ReverseTextColor;
 	w = VideoDrawText(x, y, font, text);
 	FontColor = DefaultTextColor;
-#else
-	FontPixels = ReverseTextColor;
-	w = VideoDrawText(x, y, font, text);
-	FontPixels = DefaultTextColor;
-#endif
 
 	return w;
 }
@@ -856,7 +541,6 @@ global int VideoDrawReverseNumber(int x, int y, unsigned font, int number)
 	return VideoDrawReverseText(x, y, font, buf);
 }
 
-#ifdef USE_SDL_SURFACE
 local void FontMeasureWidths(ColorFont* fp)
 {
 	// FIXME: todo.. can this be optimized?
@@ -896,48 +580,6 @@ local void FontMeasureWidths(ColorFont* fp)
 	}
 	SDL_UnlockSurface(fp->Graphic->Surface);
 }
-#else
-/**
-**  Calculate widths table for a font.
-**
-// FIXME: ARI: This is runtime and fairly slow!
-// FIXME: ARI: Maybe integrate into wartool and load from file!
-*/
-local void FontMeasureWidths(ColorFont* fp)
-{
-	int y;
-	const unsigned char* sp;
-	const unsigned char* lp;
-	const unsigned char* gp;
-
-	for (y = 1; y < 207; ++y) {
-		fp->CharWidth[y] = 0;
-	}
-
-	for (y = 1; y < 207; ++y) {
-		sp = (const unsigned char *)fp->Graphic->Frames +
-			y * fp->Height * fp->Graphic->Width - 1;
-		gp = sp + fp->Graphic->Width * fp->Height;
-		//		Bail out cause there are no letters left
-		if (gp >= ((const unsigned char *)fp->Graphic->Frames +
-				fp->Graphic->Width * fp->Graphic->Height)) {
-			break;
-		}
-		while (sp < gp) {
-			lp = sp + fp->Graphic->Width - 1;
-			for (; sp < lp; --lp) {
-				if (*lp != 255) {
-					if (lp - sp > fp->CharWidth[y]) {  // max width
-						fp->CharWidth[y] = lp - sp;
-					}
-				}
-			}
-			sp += fp->Graphic->Width;
-		}
-	}
-	fp->CharWidth[0] = fp->Width / 2;  // a reasonable value for SPACE
-}
-#endif
 
 /**
 **  Make font bitmap.
@@ -999,38 +641,6 @@ local void MakeFontBitmap(Graphic* g, int font)
 global void LoadFonts(void)
 {
 	unsigned i;
-#ifndef USE_SDL_SURFACE
-	FontColorMapping* fcm;
-	void* pixels;
-#endif
-
-	//
-	//  First select the font drawing procedure.
-	//
-#ifndef USE_SDL_SURFACE
-	switch (VideoBpp) {
-		case 8:
-			VideoDrawChar = VideoDrawChar8;
-			break;
-
-		case 15:
-		case 16:
-			VideoDrawChar = VideoDrawChar16;
-			break;
-
-		case 24:
-			VideoDrawChar = VideoDrawChar24;
-			break;
-
-		case 32:
-			VideoDrawChar = VideoDrawChar32;
-			break;
-
-		default:
-			DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
-			abort();
-	}
-#endif
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		if (Fonts[i].File && !Fonts[i].Graphic) {
@@ -1042,35 +652,6 @@ global void LoadFonts(void)
 #endif
 		}
 	}
-
-#ifndef USE_SDL_SURFACE
-	fcm = FontColorMappings;
-	while (fcm) {
-		pixels = fcm->Pixels;
-		for (i = 0; i < NumFontColors; ++i) {
-			VMemType c;
-
-			c = VideoMapRGB(fcm->RGB[i].R, fcm->RGB[i].G, fcm->RGB[i].B);
-
-			switch (VideoBpp) {
-				case 8:
-					((VMemType8*)pixels)[i] = c.D8;
-					break;
-				case 15:
-				case 16:
-					((VMemType16*)pixels)[i] = c.D16;
-					break;
-				case 24:
-					((VMemType24*)pixels)[i] = c.D24;
-					break;
-				case 32:
-					((VMemType32*)pixels)[i] = c.D32;
-					break;
-			}
-		}
-		fcm = fcm->Next;
-	}
-#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1193,17 +774,9 @@ local int CclDefineFontColor(lua_State* l)
 	} else {
 		fcmp = &FontColorMappings;
 		while (*fcmp) {
-#ifdef USE_SDL_SURFACE
 			if (!strcmp((*fcmp)->ColorName, color)) {
-#else
-			if (!strcmp((*fcmp)->Color, color)) {
-#endif
 				fprintf(stderr, "Warning: Redefining color '%s'\n", color);
-#ifdef USE_SDL_SURFACE
 				free((*fcmp)->ColorName);
-#else
-				free((*fcmp)->Color);
-#endif
 				fcm = *fcmp;
 				break;
 			}
@@ -1212,11 +785,7 @@ local int CclDefineFontColor(lua_State* l)
 		*fcmp = calloc(sizeof(*FontColorMappings), 1);
 		fcm = *fcmp;
 	}
-#ifdef USE_SDL_SURFACE
 	fcm->ColorName = color;
-#else
-	fcm->Color = color;
-#endif
 	fcm->Next = NULL;
 
 	if (luaL_getn(l, 2) != NumFontColors * 3) {
@@ -1224,25 +793,13 @@ local int CclDefineFontColor(lua_State* l)
 	}
 	for (i = 0; i < NumFontColors; ++i) {
 		lua_rawgeti(l, 2, i * 3 + 1);
-#ifdef USE_SDL_SURFACE
 		fcm->Color[i].r = LuaToNumber(l, -1);
-#else
-		fcm->RGB[i].R = LuaToNumber(l, -1);
-#endif
 		lua_pop(l, 1);
 		lua_rawgeti(l, 2, i * 3 + 2);
-#ifdef USE_SDL_SURFACE
 		fcm->Color[i].g = LuaToNumber(l, -1);
-#else
-		fcm->RGB[i].G = LuaToNumber(l, -1);
-#endif
 		lua_pop(l, 1);
 		lua_rawgeti(l, 2, i * 3 + 3);
-#ifdef USE_SDL_SURFACE
 		fcm->Color[i].b = LuaToNumber(l, -1);
-#else
-		fcm->RGB[i].B = LuaToNumber(l, -1);
-#endif
 		lua_pop(l, 1);
 	}
 
@@ -1275,10 +832,6 @@ global void FontsCclRegister(void)
 global void CleanFonts(void)
 {
 	unsigned i;
-#ifndef USE_SDL_SURFACE
-	FontColorMapping* fcm;
-	FontColorMapping* temp;
-#endif
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		free(Fonts[i].File);
@@ -1287,15 +840,6 @@ global void CleanFonts(void)
 		Fonts[i].Graphic = NULL;
 	}
 
-#ifndef USE_SDL_SURFACE
-	fcm = FontColorMappings;
-	while (fcm) {
-		temp = fcm->Next;
-		free(fcm->Color);
-		free(fcm);
-		fcm = temp;
-	}
-#endif
 	FontColorMappings = NULL;
 }
 

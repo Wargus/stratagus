@@ -379,9 +379,7 @@
 #include "construct.h"
 #include "ccl.h"
 
-#ifdef USE_SDL_SURFACE
 #include "SDL.h"
-#endif
 
 #ifdef NEW_DECODRAW
 #include "deco.h"
@@ -728,11 +726,7 @@ extern char EnableBuildingCapture;		/// Config: building capture enabled
 extern char RevealAttacker;				/// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
-#ifdef USE_SDL_SURFACE
 extern void (*DrawSelection)(Uint32, int, int, int, int);
-#else
-extern void (*DrawSelection)(VMemType, int, int, int, int);
-#endif
 extern int MaxSelectable;				/// How many units could be selected
 
 extern Unit** Selected;						/// currently selected units
@@ -911,7 +905,6 @@ extern void InitUnitCache(void);
 
 //		in unit_draw.c
 //--------------------
-#ifdef USE_SDL_SURFACE
 	/// Draw nothing around unit
 extern void DrawSelectionNone(Uint32, int, int, int, int);
 	/// Draw circle around unit
@@ -924,20 +917,6 @@ extern void DrawSelectionRectangle(Uint32, int, int, int, int);
 extern void DrawSelectionRectangleWithTrans(Uint32, int, int, int, int);
 	/// Draw corners around unit
 extern void DrawSelectionCorners(Uint32, int, int, int, int);
-#else
-	/// Draw nothing around unit
-extern void DrawSelectionNone(VMemType, int, int, int, int);
-	/// Draw circle around unit
-extern void DrawSelectionCircle(VMemType, int, int, int, int);
-	/// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(VMemType, int, int, int, int);
-	/// Draw rectangle around unit
-extern void DrawSelectionRectangle(VMemType, int, int, int, int);
-	/// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(VMemType, int, int, int, int);
-	/// Draw corners around unit
-extern void DrawSelectionCorners(VMemType, int, int, int, int);
-#endif
 
 	/// Register CCL decorations features
 extern void DecorationCclRegister(void);

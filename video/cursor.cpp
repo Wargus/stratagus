@@ -127,11 +127,7 @@ local int HiddenCursorH;		/// saved cursor height in pixel
 
 		/// Memory re-use, so can be defined although no save present!
 local int OldCursorSize;		/// size of saved cursor image
-#ifdef USE_SDL_SURFACE
 local SDL_Surface* OldCursorImage;				/// background saved behind cursor
-#else
-local void* OldCursorImage;				/// background saved behind cursor
-#endif
 
 	/**
 	**		Function pointer: Save 2D image behind sprite cursor
@@ -145,7 +141,6 @@ local void* OldCursorImage;				/// background saved behind cursor
 	**		non-empty
 	**	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 	*/
-#ifdef USE_SDL_SURFACE
 #ifndef USE_OPENGL
 local void SaveCursorBackground(int x, int y, int w, int h);
 	/// Function pointer: Load background behind cursor
@@ -153,12 +148,6 @@ local void LoadCursorBackground(int x, int y, int w, int h);
 #else
 #define LoadCursorBackground(x, y, w, h)  // nothing
 #define SaveCursorBackground(x, y, w, h)  // nothing
-#endif
-
-#else
-local void (*SaveCursorBackground)(int x, int y, int w, int h);
-	/// Function pointer: Load background behind cursor
-local void (*LoadCursorBackground)(int x, int y, int w, int h);
 #endif
 
 /*--- DRAW RECTANGLE CURSOR ------------------------------------------------*/
@@ -192,11 +181,7 @@ local int HiddenCursorRectangleH;		/// saved cursor height in pixel
 **	 (x >= 0, y >= 0, w > 0, h > 0, (x + w - 1) <= VideoWidth, (y + h - 1) <= VideoHeight)
 */
 #ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
 global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h);
-#else
-global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
-#endif
 #endif
 
 /**
@@ -211,11 +196,7 @@ global void (*SaveCursorRectangle)(void* buffer, int x, int y, int w, int h);
 **		@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
 #ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h);
-#else
-global void (*LoadCursorRectangle)(void* buffer, int x, int y, int w, int h);
-#endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -293,7 +274,6 @@ global CursorType* CursorTypeByIdent(const char* ident)
 --		DRAW RECTANGLE CURSOR
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_SDL_SURFACE
 #ifndef USE_OPENGL
 global void LoadCursorRectangle(void* buffer, int x, int y, int w, int h)
 {
@@ -356,139 +336,6 @@ global void SaveCursorRectangle(void* buffer, int x, int y, int w, int h)
 	VideoUnlockScreen();
 }
 #endif
-#else
-/**
-**		Puts stored 'image' from SAVECURSORRECTANGLE back on the screen.
-**	  Note w and h are both > 0
-**
-**		FIXME: this kind of macros are hard to single step with gdb.
-**		FIXME: inline functions should have the same speed and are debugable.
-*/
-#define LOADCURSORRECTANGLE(buffer, video, memtype, x, y, w, h)  { \
-	const memtype* sp; \
-	memtype* dp; \
-	sp = (memtype*)buffer; \
-	dp = video + y * VideoWidth + x; \
-	memcpy(dp, sp, w * sizeof(memtype)); \
-	if (--h) { \
-		sp += w; \
-		dp += VideoWidth; \
-		while (--h) { \
-			*dp = *sp++; \
-			dp[w - 1] = *sp++; \
-			dp += VideoWidth; \
-		} \
-		memcpy(dp, sp, w * sizeof(memtype)); \
-	} \
-}
-
-/**
-**		Saves 'image' of screen overlapped by rectangle cursor, to be able to
-**	  restore it later using LOADCURSORRECTANGLE.
-**	  Note w and h > 0
-**
-**		FIXME: this kind of macros are hard to single step with gdb.
-**		FIXME: inline functions should have the same speed and are debugable.
-*/
-#define SAVECURSORRECTANGLE(buffer, video, memtype, x, y, w, h)  { \
-	const memtype* sp; \
-	memtype* dp; \
-	sp = video + y * VideoWidth + x; \
-	dp = (memtype*)buffer; \
-	memcpy(dp, sp, w * sizeof(memtype)); \
-	if (--h) { \
-		dp += w; \
-		sp += VideoWidth; \
-		while (--h) { \
-			*dp++ = *sp; \
-			*dp++ = sp[w - 1]; \
-			sp += VideoWidth; \
-		} \
-		memcpy(dp, sp, w * sizeof(memtype)); \
-	} \
-}
-
-
-/**
-**		Restore cursor rectangle for 8bpp frame buffer.
-**		 (See description function pointer LoadCursorRectangle)
-**		@see LoadCursorRectangle
-*/
-global void LoadCursorRectangle8(void* buffer, int x, int y, int w, int h)
-{
-	LOADCURSORRECTANGLE(buffer, VideoMemory8, VMemType8, x, y, w, h);
-}
-
-/**
-**		Restore cursor rectangle for 16bpp frame buffer.
-**		 (See description function pointer LoadCursorRectangle)
-**		@see LoadCursorRectangle
-*/
-global void LoadCursorRectangle16(void* buffer, int x, int y, int w, int h)
-{
-	LOADCURSORRECTANGLE(buffer, VideoMemory16, VMemType16, x, y, w, h);
-}
-
-/**
-**		Restore cursor rectangle for 24bpp frame buffer.
-**		 (See description function pointer LoadCursorRectangle)
-**		@see LoadCursorRectangle
-*/
-global void LoadCursorRectangle24(void* buffer, int x, int y, int w, int h)
-{
-	LOADCURSORRECTANGLE(buffer,VideoMemory24, VMemType24, x, y, w, h);
-}
-
-/**
-**		Restore cursor rectangle for 32bpp frame buffer.
-**		 (See description function pointer LoadCursorRectangle)
-**		@see LoadCursorRectangle
-*/
-global void LoadCursorRectangle32(void* buffer, int x, int y, int w, int h)
-{
-	LOADCURSORRECTANGLE(buffer, VideoMemory32, VMemType32, x, y, w, h);
-}
-
-/**
-**		Save cursor rectangle for 8bpp frame buffer.
-**		 (See description function pointer SaveCursorRectangle)
-**		@see SaveCursorRectangle
-*/
-global void SaveCursorRectangle8(void* buffer, int x, int y, int w, int h)
-{
-	SAVECURSORRECTANGLE(buffer, VideoMemory8, VMemType8, x, y, w, h);
-}
-
-/**
-**		Save cursor rectangle for 16bpp frame buffer.
-**		 (See description function pointer SaveCursorRectangle)
-**		@see SaveCursorRectangle
-*/
-global void SaveCursorRectangle16(void* buffer, int x, int y, int w, int h)
-{
-	SAVECURSORRECTANGLE(buffer, VideoMemory16, VMemType16, x, y, w, h);
-}
-
-/**
-**		Save cursor rectangle for 24bpp frame buffer.
-**		 (See description function pointer SaveCursorRectangle)
-**		@see SaveCursorRectangle
-*/
-global void SaveCursorRectangle24(void* buffer, int x, int y, int w, int h)
-{
-	SAVECURSORRECTANGLE(buffer, VideoMemory24, VMemType24, x, y, w, h);
-}
-
-/**
-**		Save cursor rectangle for 32bpp frame buffer.
-**		 (See description function pointer SaveCursorRectangle)
-**		@see SaveCursorRectangle
-*/
-global void SaveCursorRectangle32(void* buffer, int x, int y, int w, int h)
-{
-	SAVECURSORRECTANGLE(buffer, VideoMemory32, VMemType32, x, y, w, h);
-}
-#endif
 
 /**
 **		Draw rectangle cursor when visible, defined by
@@ -547,7 +394,6 @@ local void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 /*----------------------------------------------------------------------------
 --		DRAW SPRITE CURSOR
 ----------------------------------------------------------------------------*/
-#ifdef USE_SDL_SURFACE
 #ifndef USE_OPENGL
 local void LoadCursorBackground(int x, int y, int w, int h)
 {
@@ -577,183 +423,6 @@ local void SaveCursorBackground(int x, int y, int w, int h)
 	SDL_BlitSurface(TheScreen, &srect, OldCursorImage, NULL);
 }
 #endif
-#else
-/**
-**		Restore cursor background for 8bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void LoadCursorBackground8(int x, int y, int w, int h)
-{
-	const VMemType8* sp;
-	VMemType8* dp;
-
-	sp = OldCursorImage;
-	dp = VideoMemory8 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType8));
-		sp += w;
-		dp += VideoWidth;
-	}
-}
-
-/**
-**		Restore cursor background for 16bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void LoadCursorBackground16(int x, int y, int w, int h)
-{
-	const VMemType16* sp;
-	VMemType16* dp;
-
-	sp = OldCursorImage;
-	dp = VideoMemory16 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType16));
-		sp += w;
-		dp += VideoWidth;
-	}
-}
-
-/**
-**		Restore cursor background for 24bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void LoadCursorBackground24(int x, int y, int w, int h)
-{
-	const VMemType24* sp;
-	VMemType24* dp;
-
-	sp = OldCursorImage;
-	dp = VideoMemory24 + y * VideoWidth+x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType24));
-		sp += w;
-		dp += VideoWidth;
-	}
-}
-
-/**
-**		Restore cursor background for 32bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void LoadCursorBackground32(int x, int y, int w, int h)
-{
-	const VMemType32* sp;
-	VMemType32* dp;
-
-	sp = OldCursorImage;
-	dp = VideoMemory32 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType32));
-		sp += w;
-		dp += VideoWidth;
-	}
-}
-
-/**
-**		Save cursor background for 8bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void SaveCursorBackground8(int x, int y, int w, int h)
-{
-	VMemType8* dp;
-	VMemType8* sp;
-
-	dp = OldCursorImage;
-	sp = VideoMemory8 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType8));
-		dp += w;
-		sp += VideoWidth;
-	}
-}
-
-/**
-**		Save cursor background for 16bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void SaveCursorBackground16(int x, int y, int w, int h)
-{
-	VMemType16* dp;
-	const VMemType16* sp;
-
-	dp = OldCursorImage;
-	sp = VideoMemory16 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType16));
-		dp += w;
-		sp += VideoWidth;
-	}
-}
-
-/**
-**		Save cursor background for 24bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void SaveCursorBackground24(int x, int y, int w, int h)
-{
-	VMemType24* dp;
-	const VMemType24* sp;
-
-	dp = OldCursorImage;
-	sp = VideoMemory24 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType24));
-		dp += w;
-		sp += VideoWidth;
-	}
-}
-
-/**
-**		Save cursor background for 32bpp frame buffer.
-**
-**		@param x		Screen X pixels coordinate.
-**		@param y		Screen Y pixels coordinate.
-**		@param w		Width in pixels.
-**		@param h		Height in pixels.
-*/
-local void SaveCursorBackground32(int x, int y, int w, int h)
-{
-	VMemType32* dp;
-	const VMemType32* sp;
-
-	dp = OldCursorImage;
-	sp = VideoMemory32 + y * VideoWidth + x;
-	while (h--) {
-		memcpy(dp, sp, w * sizeof(VMemType32));
-		dp += w;
-		sp += VideoWidth;
-	}
-}
-#endif
 
 /**
 **		Destroy image behind cursor.
@@ -761,11 +430,7 @@ local void SaveCursorBackground32(int x, int y, int w, int h)
 global void DestroyCursorBackground(void)
 {
 	if (OldCursorImage) {
-#ifdef USE_SDL_SURFACE
 		SDL_FreeSurface(OldCursorImage);
-#else
-		free(OldCursorImage);
-#endif
 		OldCursorImage = NULL;
 	}
 	OldCursorSize = 0;
@@ -799,23 +464,11 @@ local void DrawCursor(const CursorType* type, int x, int y, int frame)
 	h = VideoGraphicHeight(type->Sprite);
 
 	//Reserve enough memory for background of sprite (also for future calls)
-#ifdef USE_SDL_SURFACE
 	size = w * h;
 	if (OldCursorSize < size) {
 		OldCursorImage = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, BMASK, GMASK, RMASK, AMASK);
 		OldCursorSize = size;
 	}
-#else
-	size = w * h * MemSize;
-	if (OldCursorSize < size) {
-		if (OldCursorImage) {
-			OldCursorImage = realloc(OldCursorImage, size);
-		} else {
-			OldCursorImage = malloc(size);
-		}
-		OldCursorSize = size;
-	}
-#endif
 	//Save (seen) area behind sprite
 	CLIP_RECTANGLE(x, y, w, h);
 	SaveCursorBackground(OldCursorX = x, OldCursorY = y,
@@ -838,13 +491,7 @@ local void DrawBuildingCursor(void)
 	int y;
 	int mx;
 	int my;
-#ifdef USE_SDL_SURFACE
 	Uint32 color;
-#else
-	int x1;
-	int y1;
-	VMemType color;
-#endif
 	int f;
 	int w;
 	int w0;
@@ -891,12 +538,6 @@ local void DrawBuildingCursor(void)
 	while (h--) {
 		w = w0;
 		while (w--) {
-#ifndef USE_SDL_SURFACE
-			int basex;
-			int basey;
-			int i;
-			int j;
-#endif
 
 			// FIXME: The field is covered by fog of war!
 			if (f && (CursorBuilding->MustBuildOnTop ||
@@ -909,29 +550,8 @@ local void DrawBuildingCursor(void)
 			} else {
 				color = ColorRed;
 			}
-#ifdef USE_SDL_SURFACE
 			VideoFillTransRectangle(color, x + w * TileSizeX, y + h *
 				TileSizeY, TileSizeX, TileSizeY, 95);
-#else
-			// FIXME: I could do this faster+better
-			/* latimerius: I'm not sure what you have in mind but I can
-			 * at least move invariants out of the loops. */
-			basex = x + w * TileSizeX;
-			basey = y + h * TileSizeY;
-			for (y1 = 0; y1 < TileSizeY; ++y1) {
-				j = basey + y1;
-				for (x1 = y1 & 1; x1 < TileSizeX; x1 += 2) {
-					i = basex + x1;
-					if (i > vp->EndX) {
-						break;
-					}
-					VideoDrawPixel(color, i, j);
-				}
-				if (j > vp->EndY) {
-					break;
-				}
-			}
-#endif
 		}
 	}
 }
@@ -1191,46 +811,8 @@ global void InitVideoCursors(void)
 		free(OldCursorRectangle);
 		OldCursorRectangle = 0;
 	}
-#ifdef USE_SDL_SURFACE
 	OldCursorRectangle = malloc((2 * VideoWidth + 2 *
 		(VideoHeight - 2)) * TheScreen->format->BytesPerPixel);
-#else
-	switch (VideoBpp) {
-		case 8:
-			SaveCursorBackground = SaveCursorBackground8;
-			LoadCursorBackground = LoadCursorBackground8;
-			MemSize = sizeof(VMemType8);
-			SaveCursorRectangle = SaveCursorRectangle8;
-			LoadCursorRectangle = LoadCursorRectangle8;
-			break;
-		case 15:
-		case 16:
-			SaveCursorBackground = SaveCursorBackground16;
-			LoadCursorBackground = LoadCursorBackground16;
-			MemSize = sizeof(VMemType16);
-			SaveCursorRectangle = SaveCursorRectangle16;
-			LoadCursorRectangle = LoadCursorRectangle16;
-			break;
-		case 24:
-			SaveCursorBackground = SaveCursorBackground24;
-			LoadCursorBackground = LoadCursorBackground24;
-			MemSize = sizeof(VMemType24);
-			SaveCursorRectangle = SaveCursorRectangle24;
-			LoadCursorRectangle = LoadCursorRectangle24;
-			break;
-		case 32:
-			SaveCursorBackground = SaveCursorBackground32;
-			LoadCursorBackground = LoadCursorBackground32;
-			MemSize = sizeof(VMemType32);
-			SaveCursorRectangle = SaveCursorRectangle32;
-			LoadCursorRectangle = LoadCursorRectangle32;
-			break;
-		default:
-			DebugLevel0Fn("unsupported %d bpp\n" _C_ VideoBpp);
-			abort();
-	}
-	OldCursorRectangle = malloc((2 * VideoWidth + 2 * (VideoHeight - 2)) * MemSize);
-#endif // ifdef USE_SDL_SURFACE
 #endif
 
 	CursorX = VideoWidth / 2;

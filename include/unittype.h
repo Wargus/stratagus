@@ -738,11 +738,7 @@ struct _unit_type_ {
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo* ResInfo[MaxCosts];    /// Resource information.
 	UnitType* MustBuildOnTop;           /// Must be built on top of something.
-#ifdef USE_SDL_SURFACE
 	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
-#else
-	VMemType NeutralMinimapColorRGB;    /// Minimap Color for Neutral Units.
-#endif
 
 	UnitSound Sound;                /// Sounds for events
 	// FIXME: temporary solution

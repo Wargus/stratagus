@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ccl_unittype.c	-	The unit-type ccl functions. */
+/**@name ccl_unittype.c - The unit-type ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -345,7 +345,6 @@ local int CclDefineUnitType(lua_State* l)
 				lua_pushstring(l, "incorrect argument");
 				lua_error(l);
 			}
-#ifdef USE_SDL_SURFACE
 			lua_rawgeti(l, -1, 1);
 			type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
 			lua_pop(l, 1);
@@ -355,17 +354,6 @@ local int CclDefineUnitType(lua_State* l)
 			lua_rawgeti(l, -1, 3);
 			type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-#else
-			lua_rawgeti(l, -1, 1);
-			type->NeutralMinimapColorRGB.D24.a = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->NeutralMinimapColorRGB.D24.b = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
-			type->NeutralMinimapColorRGB.D24.c = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-#endif
 		} else if (!strcmp(value, "BoxSize")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				lua_pushstring(l, "incorrect argument");

@@ -417,9 +417,6 @@ local void RecalculateShownUnits(void)
 */
 local void DrawTileIcons(void)
 {
-#ifndef USE_SDL_SURFACE
-	unsigned char** tiles;
-#endif
 	int x;
 	int y;
 	int i;
@@ -458,10 +455,6 @@ local void DrawTileIcons(void)
 		MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
 	y += 20;
 
-#ifndef USE_SDL_SURFACE
-	tiles = TheMap.Tiles;
-#endif
-
 	y = TheUI.ButtonPanelY + 4;
 	i = 0;
 
@@ -475,11 +468,7 @@ local void DrawTileIcons(void)
 #ifdef USE_OPENGL
 			MapDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
 #else
-#ifdef USE_SDL_SURFACE
 			VideoDrawTile(TheMap.Tileset->Table[0x10 + i * 16], x, y);
-#else
-			VideoDrawTile(tiles[TheMap.Tileset->Table[0x10 + i * 16]], x, y);
-#endif
 #endif
 			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
@@ -673,11 +662,7 @@ local void DrawUnitIcons(void)
 */
 local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 {
-#ifdef USE_SDL_SURFACE
 	Uint32 color;
-#else
-	VMemType color;
-#endif
 
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
@@ -705,11 +690,7 @@ local void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 #ifdef USE_OPENGL
 	MapDrawTile(TheMap.Tileset->Table[tilenum], x, y);
 #else
-#ifdef USE_SDL_SURFACE
 	VideoDrawTile(TheMap.Tileset->Table[tilenum], x, y);
-#else
-	VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[tilenum]], x, y);
-#endif
 #endif
 
 	if (flags & IconSelected) {
@@ -800,13 +781,8 @@ local void DrawMapCursor(void)
 #ifdef USE_OPENGL
 					MapDrawTile(TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
 #else
-#ifdef USE_SDL_SURFACE
 					VideoDrawTile(TheMap.Tileset->Table[0x10 +
 						TileCursor * 16], tx, ty);
-#else
-					VideoDrawTile(TheMap.Tiles[TheMap.Tileset->Table[0x10 +
-						TileCursor * 16]], tx, ty);
-#endif
 #endif
 				}
 			}
@@ -920,10 +896,6 @@ global void EditorUpdateDisplay(void)
 {
 	int i;
 
-#ifndef USE_SDL_SURFACE
-	VideoLockScreen(); // { prepare video write
-#endif
-
 	HideAnyCursor(); // remove cursor (when available)
 
 	DrawMapArea(); // draw the map area
@@ -1013,10 +985,6 @@ global void EditorUpdateDisplay(void)
 	DrawStatusLine();
 
 	DrawAnyCursor();
-
-#ifdef USE_SDL_SURFACE
-	VideoUnlockScreen();				// } end write access
-#endif
 
 	// FIXME: For now update everything each frame
 
@@ -2118,13 +2086,7 @@ global void EditorMainLoop(void)
 		InterfaceState = IfaceStateMenu;
 		GameCursor = TheUI.Point.Cursor;
 
-#ifdef USE_SDL_SURFACE
 		VideoClearScreen();
-#else
-		VideoLockScreen();
-		VideoClearScreen();
-		VideoUnlockScreen();
-#endif
 		Invalidate();
 	} while (EditorMapLoaded);
 

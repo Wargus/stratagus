@@ -37,9 +37,6 @@
 ==		Config definitions
 ============================================================================*/
 
-// Temporary define, remove
-#define USE_SDL_SURFACE
-
 	//
 	//		Default speed for many things, set it higher for faster actions.
 	//

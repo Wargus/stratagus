@@ -183,15 +183,10 @@ global void InitUserInterface(const char* race_name)
 		SetViewportMode(VIEWPORT_SINGLE);
 	}
 
-#ifdef USE_SDL_SURFACE
 	TheUI.CompletedBarColor = SDL_MapRGB(TheScreen->format,
 		TheUI.CompletedBarColorRGB.r,
 		TheUI.CompletedBarColorRGB.g,
 		TheUI.CompletedBarColorRGB.b);
-#else
-	TheUI.CompletedBarColor = VideoMapRGB(TheUI.CompletedBarColorRGB.D24.a,
-		TheUI.CompletedBarColorRGB.D24.b, TheUI.CompletedBarColorRGB.D24.c);
-#endif
 	TheUI.ViewportCursorColor = ColorWhite;
 }
 
@@ -512,13 +507,8 @@ local void SaveUi(CLFile* file, const UI* ui)
 	CLprintf(file, ")");
 
 	CLprintf(file, "\n	'completed-bar (list");
-#ifdef USE_SDL_SURFACE
 	CLprintf(file, "\n	  'color '(%d %d %d)", ui->CompletedBarColorRGB.r,
 		ui->CompletedBarColorRGB.g, ui->CompletedBarColorRGB.b);
-#else
-	CLprintf(file, "\n	  'color '(%d %d %d)", ui->CompletedBarColorRGB.D24.a,
-		ui->CompletedBarColorRGB.D24.b, ui->CompletedBarColorRGB.D24.c);
-#endif
 	CLprintf(file, "\n	  'pos '(%d %d)", ui->CompletedBarX, ui->CompletedBarY);
 	CLprintf(file, "\n	  'size '(%d %d)", ui->CompletedBarW, ui->CompletedBarH);
 	CLprintf(file, "\n	  'text (list", ui->CompletedBarText);

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name png.c		-	The png graphic file loader. */
+/**@name png.c - The png graphic file loader. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -80,12 +80,7 @@ local void CL_png_readfn(png_structp png_ptr, png_bytep data, png_size_t length)
 global Graphic* LoadGraphicPNG(const char* name)
 {
 	Graphic* graphic;
-#ifdef USE_SDL_SURFACE
-//	SDL_Palette* palette;
 	SDL_Color* palettecolors;
-#else
-	Palette* palette;
-#endif
 	CLFile* fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -137,11 +132,7 @@ global Graphic* LoadGraphicPNG(const char* name)
 
 	//		Setup translators:
 
-#ifdef USE_SDL_SURFACE
 	palettecolors = (SDL_Color*)calloc(256, sizeof(SDL_Color));
-#else
-	palette = (Palette*)calloc(256, sizeof(Palette));
-#endif
 
 	if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE) {
 		DebugLevel3("Color palette\n");
@@ -151,22 +142,12 @@ global Graphic* LoadGraphicPNG(const char* name)
 				abort();
 			}
 			for (i = 0; i < info_ptr->num_palette; ++i) {
-#ifdef USE_SDL_SURFACE
 				palettecolors[i].r = info_ptr->palette[i].red;
 				palettecolors[i].g = info_ptr->palette[i].green;
 				palettecolors[i].b = info_ptr->palette[i].blue;
-#else
-				palette[i].r = info_ptr->palette[i].red;
-				palette[i].g = info_ptr->palette[i].green;
-				palette[i].b = info_ptr->palette[i].blue;
-#endif
 			}
-			for(; i < 256; ++i) {
-#ifdef USE_SDL_SURFACE
+			for (; i < 256; ++i) {
 				palettecolors[i].r = palettecolors[i].g = palettecolors[i].b = 0;
-#else
-				palette[i].r = palette[i].g = palette[i].b = 0;
-#endif
 			}
 		}
 	}
@@ -230,12 +211,8 @@ global Graphic* LoadGraphicPNG(const char* name)
 	CLclose(fp);
 
 	graphic = MakeGraphic(8, w, h, data, w * h);		// data freed by make graphic
-#ifdef USE_SDL_SURFACE
-	SDL_SetPalette(graphic->Surface, SDL_LOGPAL|SDL_PHYSPAL, palettecolors, 0, 256);
-	SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY|SDL_RLEACCEL, 255);
-#else
-	graphic->Palette = palette;  //FIXME: should this be part of MakeGraphic
-#endif
+	SDL_SetPalette(graphic->Surface, SDL_LOGPAL | SDL_PHYSPAL, palettecolors, 0, 256);
+	SDL_SetColorKey(graphic->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
 
 	return graphic;
 }
@@ -253,13 +230,9 @@ global void SaveScreenshotPNG(const char* name)
 	unsigned char* row;
 	int i;
 	int j;
-#ifdef USE_SDL_SURFACE
-//	Uint32 c;
 	int bpp;
 
 	bpp = TheScreen->format->BytesPerPixel;
-#else
-#endif
 
 	fp = fopen(name, "wb");
 	if (fp == NULL) {
@@ -302,7 +275,6 @@ global void SaveScreenshotPNG(const char* name)
 	png_write_info(png_ptr, info_ptr);
 
 	for (i = 0; i < VideoHeight; ++i) {
-#ifdef USE_SDL_SURFACE
 		switch (VideoDepth) {
 			case 15: {
 				Uint16 c;
@@ -343,46 +315,6 @@ global void SaveScreenshotPNG(const char* name)
 				break;
 			}
 		}
-#else
-		switch (VideoDepth) {
-		case 8:
-			// FIXME: Finish
-			break;
-		case 15:
-			for (j = 0; j < VideoWidth; ++j) {
-				VMemType16 c;
-				c = VideoMemory16[i * VideoWidth + j];
-				row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-				row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
-				row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
-			}
-			break;
-		case 16:
-			for (j = 0; j < VideoWidth; ++j) {
-				VMemType16 c;
-				c = VideoMemory16[i*VideoWidth+j];
-				row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
-				row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
-				row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
-			}
-			break;
-		case 24:
-			if (VideoBpp == 24) {
-				memcpy(row, VideoMemory24 + i * VideoWidth, VideoWidth * 3);
-				break;
-			}
-			// FALL THROUGH
-		case 32:
-			for (j = 0; j < VideoWidth; ++j) {
-				VMemType32 c;
-				c = VideoMemory32[i * VideoWidth + j];
-				row[j * 3 + 0] = ((c >> 0) & 0xff);
-				row[j * 3 + 1] = ((c >> 8) & 0xff);
-				row[j * 3 + 2] = ((c >> 16) & 0xff);
-			}
-			break;
-		}
-#endif
 		png_write_row(png_ptr, row);
 	}
 

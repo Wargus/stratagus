@@ -4,13 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name video.c	-	The universal video functions. */
+/**@name video.c - The universal video functions. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer and Nehal Mistry
+//      (c) Copyright 1999-2004 by Lutz Sammer and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
@@ -184,11 +184,7 @@ global int VideoTypeSize;
 	**		@see InitVideo @see InitVideoSdl
 	**		@see VMemType
 	*/
-#ifdef USE_SDL_SURFACE
 global SDL_Surface* TheScreen;
-#else
-global VMemType* VideoMemory;
-#endif
 
 global int VideoSyncSpeed = 100;		/// 0 disable interrupts
 global volatile int VideoInterrupts;		/// be happy, were are quicker
@@ -207,17 +203,10 @@ global volatile int VideoInterrupts;		/// be happy, were are quicker
 	**  lookup50trans8:
 	**  The same for 50% color1 and 50% color2.
 	*/
-#ifdef USE_SDL_SURFACE
 	// FIXME: docu
 global SDL_Color* lookup25trans8;
 	// FIXME: docu
 global SDL_Color* lookup50trans8;
-#else
-	// FIXME: docu
-global VMemType8* lookup25trans8;
-	// FIXME: docu
-global VMemType8* lookup50trans8;
-#endif
 
 global int ColorWaterCycleStart;
 global int ColorWaterCycleEnd;
@@ -227,7 +216,6 @@ global int ColorBuildingCycleStart;
 global int ColorBuildingCycleEnd;
 
 	/// Does ColorCycling..
-#ifdef USE_SDL_SURFACE
 global void ColorCycle(void);
 
 Uint32 ColorBlack;
@@ -239,20 +227,6 @@ Uint32 ColorGray;
 Uint32 ColorRed;
 Uint32 ColorGreen;
 Uint32 ColorYellow;
-#else
-global void (*ColorCycle)(void);
-
-VMemType ColorBlack;
-VMemType ColorDarkGreen;
-VMemType ColorBlue;
-VMemType ColorOrange;
-VMemType ColorWhite;
-VMemType ColorNPC;
-VMemType ColorGray;
-VMemType ColorRed;
-VMemType ColorGreen;
-VMemType ColorYellow;
-#endif
 
 
 /*----------------------------------------------------------------------------
@@ -402,33 +376,8 @@ global void PopClipping(void)
 }
 
 /**
-**		Creates a checksum used to compare palettes.
-**
-**		@param palette		Palette source.
-**
-**		@return				Calculated hash/checksum.
-*/
-#ifndef USE_SDL_SURFACE
-local long GetPaletteChecksum(const Palette* palette)
-{
-	long retVal;
-	int i;
-
-	for (retVal = i = 0; i < 256; ++i){
-		//This is designed to return different values if
-		// the pixels are in a different order.
-		retVal = ((palette[i].r + i) & 0xff) + retVal;
-		retVal = ((palette[i].g + i) & 0xff) + retVal;
-		retVal = ((palette[i].b + i) & 0xff) + retVal;
-	}
-	return retVal;
-}
-#endif
-
-/**
 **  FIXME: docu
 */
-#ifdef USE_SDL_SURFACE
 global void VideoPaletteListAdd(SDL_Surface* surface)
 {
 	PaletteLink* curlink;
@@ -467,78 +416,6 @@ global void VideoPaletteListRemove(SDL_Surface* surface)
 		free(tmp);
 	}
 }
-#else
-global VMemType* VideoCreateSharedPalette(const Palette* palette)
-{
-	PaletteLink* current_link;
-	PaletteLink** prev_link;
-	VMemType* pixels;
-	long checksum;
-
-	pixels = VideoCreateNewPalette(palette);
-	checksum = GetPaletteChecksum(palette);
-	prev_link = &PaletteList;
-	while ((current_link = *prev_link)) {
-		if (current_link->Checksum == checksum &&
-				!memcmp(current_link->Palette, pixels,
-					256 * ((VideoDepth + 7) / 8))) {
-			break;
-		}
-		prev_link = &current_link->Next;
-	}
-
-	if (current_link) {						// Palette found (reuse)
-		free(pixels);
-		pixels = current_link->Palette;
-		++current_link->RefCount;
-		DebugLevel3("uses palette %p %d\n" _C_ pixels _C_ current_link->RefCount);
-	} else {								// Palette NOT found
-		DebugLevel3("loading new palette %p\n" _C_ pixels);
-
-		current_link = *prev_link = malloc(sizeof(PaletteLink));
-		current_link->Checksum = checksum;
-		current_link->Next = NULL;
-		current_link->Palette = pixels;
-		current_link->RefCount = 1;
-	}
-
-	return pixels;
-}
-
-/**
-**		Free a shared hardware palette.
-**
-**		@param pixels		palette in hardware dependend format
-*/
-global void VideoFreeSharedPalette(VMemType* pixels)
-{
-	PaletteLink* current_link;
-	PaletteLink** prev_link;
-
-//	if (pixels == Pixels) {
-//		DebugLevel3Fn("Freeing global palette\n");
-//	}
-
-	//
-	//  Find and free palette.
-	//
-	prev_link = &PaletteList;
-	while ((current_link = *prev_link)) {
-		if (current_link->Palette == pixels) {
-			break;
-		}
-		prev_link = &current_link->Next;
-	}
-	if (current_link) {
-		if (!--current_link->RefCount) {
-			DebugLevel3Fn("Free palette %p\n" _C_ pixels);
-			free(current_link->Palette);
-			*prev_link = current_link->Next;
-			free(current_link);
-		}
-	}
-}
-#endif
 
 /**
 **		Load a picture and display it on the screen (full screen),
@@ -556,7 +433,6 @@ global void DisplayPicture(const char* name)
 	MakeTexture(picture, picture->Width, picture->Height);
 #endif
 
-#ifdef USE_SDL_SURFACE
 #ifndef USE_OPENGL
 	// Unset the alpha color key, not needed
 	SDL_SetColorKey(picture->Surface, 0, 0);
@@ -564,12 +440,6 @@ global void DisplayPicture(const char* name)
 #else
 	VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
 		(VideoWidth - picture->Width) / 2, (VideoHeight - picture->Height) / 2);
-#endif
-#else
-	VideoLockScreen();
-	VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
-		(VideoWidth - picture->Width) / 2, (VideoHeight - picture->Height) / 2);
-	VideoUnlockScreen();
 #endif
 
 	VideoFree(picture);
@@ -603,11 +473,8 @@ global void DisplayPicture(const char* name)
 // 205-207		cycle				(lights on christmas tree)
 // 240-244		cycle				(water around ships, Runestone, Dark Portal)
 
-#ifdef USE_SDL_SURFACE
 /**
 **  Color cycle.
-**
-**  FIXME: Also icons and some units use color cycling.
 */
 // FIXME: cpu intensive to go through the whole PaletteList
 global void ColorCycle(void)
@@ -673,229 +540,6 @@ global void ColorCycle(void)
 
 	MustRedraw |= RedrawColorCycle;
 }
-#else
-local void ColorCycle8(void)
-{
-	int i;
-	int x;
-	VMemType8* pixels;
-
-	if (ColorCycleAll) {
-		PaletteLink* current_link;
-
-		current_link = PaletteList;
-		while (current_link != NULL) {
-			x = ((VMemType8*)(current_link->Palette))[ColorWaterCycleStart];
-			for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-				((VMemType8*)(current_link->Palette))[i] =
-					((VMemType8*)(current_link->Palette))[i + 1];
-			}
-			((VMemType8*)(current_link->Palette))[ColorWaterCycleEnd] = x;
-
-			x = ((VMemType8*)(current_link->Palette))[ColorIconCycleStart];
-			for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-				((VMemType8*)(current_link->Palette))[i] =
-					((VMemType8*)(current_link->Palette))[i + 1];
-			}
-			((VMemType8*) (current_link->Palette))[ColorIconCycleEnd] = x;
-
-			x = ((VMemType8*)(current_link->Palette))[ColorBuildingCycleStart];
-			for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// buildings color cycle
-				((VMemType8*)(current_link->Palette))[i] =
-					((VMemType8*)(current_link->Palette))[i + 1];
-			}
-			((VMemType8*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
-
-			current_link = current_link->Next;
-		}
-	} else {
-
-		//
-		//		Color cycle tileset palette
-		//
-		pixels = TheMap.TileData->Pixels;
-		x = pixels[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-			pixels[i] = pixels[i + 1];
-		}
-		pixels[ColorWaterCycleEnd] = x;
-	}
-
-	MapColorCycle();				// FIXME: could be little more informative
-	MustRedraw |= RedrawColorCycle;
-}
-
-/**
-**		Color cycle for 16 bpp video mode.
-**
-**		FIXME: Also icons and some units use color cycling.
-**		FIXME: must be configured by the tileset or global.
-*/
-local void ColorCycle16(void)
-{
-	int i;
-	int x;
-	VMemType16* pixels;
-
-	if (ColorCycleAll) {
-		PaletteLink* current_link;
-
-		current_link = PaletteList;
-		while (current_link != NULL) {
-			x = ((VMemType16*)(current_link->Palette))[ColorWaterCycleStart];
-			for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-				((VMemType16*)(current_link->Palette))[i] =
-					((VMemType16*)(current_link->Palette))[i + 1];
-			}
-			((VMemType16*)(current_link->Palette))[ColorWaterCycleEnd] = x;
-
-			x = ((VMemType16*)(current_link->Palette))[ColorIconCycleStart];
-			for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-				((VMemType16*)(current_link->Palette))[i] =
-					((VMemType16*)(current_link->Palette))[i + 1];
-			}
-			((VMemType16*)(current_link->Palette))[ColorIconCycleEnd] = x;
-
-			x = ((VMemType16*)(current_link->Palette))[ColorBuildingCycleStart];
-			for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-				((VMemType16*)(current_link->Palette))[i] =
-					((VMemType16*)(current_link->Palette))[i + 1];
-			}
-			((VMemType16*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
-
-			current_link = current_link->Next;
-		}
-	} else {
-
-		//
-		//		Color cycle tileset palette
-		//
-		pixels = TheMap.TileData->Pixels;
-		x = pixels[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-			pixels[i] = pixels[i + 1];
-		}
-		pixels[ColorWaterCycleEnd] = x;
-	}
-
-	MapColorCycle();				// FIXME: could be little more informative
-	MustRedraw |= RedrawColorCycle;
-}
-
-/**
-**		Color cycle for 24 bpp video mode.
-**
-**		FIXME: Also icons and some units use color cycling.
-**		FIXME: must be configured by the tileset or global.
-*/
-local void ColorCycle24(void)
-{
-	int i;
-	VMemType24 x;
-	VMemType24* pixels;
-
-	if (ColorCycleAll) {
-		PaletteLink* current_link;
-
-		current_link = PaletteList;
-		while (current_link != NULL) {
-			x = ((VMemType24*)(current_link->Palette))[ColorWaterCycleStart];
-			for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-				((VMemType24*)(current_link->Palette))[i] =
-					((VMemType24*)(current_link->Palette))[i + 1];
-			}
-			((VMemType24*)(current_link->Palette))[ColorWaterCycleEnd] = x;
-
-			x = ((VMemType24*)(current_link->Palette))[ColorIconCycleStart];
-			for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-				((VMemType24*)(current_link->Palette))[i] =
-					((VMemType24*)(current_link->Palette))[i + 1];
-			}
-			((VMemType24*)(current_link->Palette))[ColorIconCycleEnd] = x;
-
-			x = ((VMemType24*)(current_link->Palette))[ColorBuildingCycleStart];
-			for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-				((VMemType24*)(current_link->Palette))[i] =
-					((VMemType24*)(current_link->Palette))[i + 1];
-			}
-			((VMemType24*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
-
-			current_link = current_link->Next;
-		}
-	} else {
-
-		//
-		//		Color cycle tileset palette
-		//
-		pixels = TheMap.TileData->Pixels;
-		x = pixels[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-			pixels[i] = pixels[i + 1];
-		}
-		pixels[ColorWaterCycleEnd] = x;
-	}
-
-	MapColorCycle();				// FIXME: could be little more informative
-	MustRedraw |= RedrawColorCycle;
-}
-
-/**
-**		Color cycle for 32 bpp video mode.
-**
-**		FIXME: Also icons and some units use color cycling.
-**		FIXME: must be configured by the tileset or global.
-*/
-local void ColorCycle32(void)
-{
-	int i;
-	int x;
-	VMemType32* pixels;
-
-	if (ColorCycleAll) {
-		PaletteLink* current_link;
-
-		current_link = PaletteList;
-		while (current_link != NULL) {
-			x = ((VMemType32*)(current_link->Palette))[ColorWaterCycleStart];
-			for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) { // tileset color cycle
-				((VMemType32*)(current_link->Palette))[i] =
-					((VMemType32*)(current_link->Palette))[i + 1];
-			}
-			((VMemType32*)(current_link->Palette))[ColorWaterCycleEnd] = x;
-
-			x = ((VMemType32*)(current_link->Palette))[ColorIconCycleStart];
-			for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-				((VMemType32*)(current_link->Palette))[i] =
-					((VMemType32*)(current_link->Palette))[i + 1];
-			}
-			((VMemType32*)(current_link->Palette))[ColorIconCycleEnd] = x;
-
-			x = ((VMemType32*)(current_link->Palette))[ColorBuildingCycleStart];
-			for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-				((VMemType32*)(current_link->Palette))[i] =
-					((VMemType32*)(current_link->Palette))[i + 1];
-			}
-			((VMemType32*)(current_link->Palette))[ColorBuildingCycleEnd] = x;
-
-			current_link = current_link->Next;
-		}
-	} else {
-
-		//
-		//		  Color cycle tileset palette
-		//
-		pixels = TheMap.TileData->Pixels;
-		x = pixels[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {
-			pixels[i] = pixels[i + 1];
-		}
-		pixels[ColorWaterCycleEnd] = x;
-	}
-
-	MapColorCycle();				// FIXME: could be little more informative
-	MustRedraw |= RedrawColorCycle;
-}
-#endif
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -946,22 +590,6 @@ global void InitVideo(void)
 {
 #ifdef USE_SDL
 	InitVideoSdl();
-#endif
-
-	//
-	//		General (video) modules and settings
-	//
-#ifdef USE_SDL_SURFACE
-#else
-	switch (VideoBpp) {
-		case  8: ColorCycle = ColorCycle8; break;
-		case 15:
-		case 16: ColorCycle = ColorCycle16; break;
-		case 24: ColorCycle = ColorCycle24; break;
-		case 32: ColorCycle = ColorCycle32; break;
-		default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
-	}
-	VideoTypeSize = VideoBpp / 8;
 #endif
 
 	//
