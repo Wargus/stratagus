@@ -328,6 +328,7 @@ global void ShowIntro(const Intro *intro)
     int l;
     int x;
     int y;
+    int c;
     CLFile* file;
     char buf[1024];
     int stage;
@@ -335,7 +336,10 @@ global void ShowIntro(const Intro *intro)
     TextLines* ObjectivesText[MAX_OBJECTIVES];
     int OldVideoSyncSpeed;
 
-    UseContinueButton=0;
+    UseContinueButton=1;
+    InitContinueButton(455,480-40);
+    GameCursor=TheUI.Point.Cursor;
+    DestroyCursorBackground();
 
     VideoLockScreen();
     VideoClearScreen();
@@ -394,7 +398,8 @@ global void ShowIntro(const Intro *intro)
     line=0;
     stage=1;
     IntroNoEvent=1;
-    while( IntroNoEvent ) {
+    c=0;
+    while( 1 ) {
 	y=(VideoHeight-480)/2;
 	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
 		intro->VoiceFile[stage] ) {
@@ -402,6 +407,7 @@ global void ShowIntro(const Intro *intro)
 	    stage++;
 	}
 	VideoLockScreen();
+	HideAnyCursor();
 	//
 	//	Draw background
 	//
@@ -434,6 +440,9 @@ global void ShowIntro(const Intro *intro)
 	    }
 	}
 
+	DrawContinueButton();
+	DrawAnyCursor();
+
 	VideoUnlockScreen();
 
 	// FIXME: update only the changed area!!!!
@@ -441,9 +450,16 @@ global void ShowIntro(const Intro *intro)
 	Invalidate();
 	RealizeVideoMemory();
 
+	if( !IntroNoEvent )
+	    break;
 	WaitEventsOneFrame(&callbacks);
-	WaitEventsOneFrame(&callbacks);
-	++line;
+	if( c==0 ) {
+	    c=1;
+	}
+	else {
+	    c=0;
+	    ++line;
+	}
     }
 
     FreeTextLines(&ScrollingText);
