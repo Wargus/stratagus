@@ -91,7 +91,7 @@ local char TileToolDecoration;		/// Tile tool draws with decorations
 local int TileCursorSize;		/// Tile cursor size 1x1 2x2 ... 4x4
 local int TileCursor;			/// Tile type number
 
-local enum _mode_buttons_ {
+enum _mode_buttons_ {
     SelectButton=201,			/// Select mode button
     UnitButton,				/// Unit mode button
     TileButton,				/// Tile mode button
