@@ -317,6 +317,22 @@ local SCM CclDefineCursor(SCM list)
 }
 
 /**
+**	Set the current game cursor.
+**
+**	@param ident	Cursor identifier.
+*/
+local SCM CclGameCursor(SCM ident)
+{
+    char* str;
+
+    str=gh_scm2newstr(ident,NULL);
+    GameCursor=CursorTypeByIdent(str);
+    free(str);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Define the look+feel of the user interface.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -1243,7 +1259,9 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("original-resources",CclOriginalResources);
 
     gh_new_procedure1_0("race-add",CclRaceAdd);
+
     gh_new_procedureN("define-cursor",CclDefineCursor);
+    gh_new_procedure1_0("game-cursor",CclGameCursor);
     gh_new_procedureN("define-ui",CclDefineUI);
 
     gh_new_procedure1_0("key-scroll-speed", CclKeyScrollSpeed);
