@@ -631,6 +631,7 @@ global void UnitCclRegister(void)
     gh_new_procedure2_0("make-unit",CclMakeUnit);
     gh_new_procedure3_0("place-unit",CclPlaceUnit);
 
+    // unit member access functions
     gh_new_procedure1_0("get-unit-unholy-armor",CclGetUnitUnholyArmor);
     gh_new_procedure2_0("set-unit-unholy-armor!",CclSetUnitUnholyArmor);
 }
