@@ -176,8 +176,10 @@ global void NetworkServerSetup(WorldMap *map)
 	    }
 	}
 	if (n) {
-	    fprintf(stderr, "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
-			map->Info ? (unsigned int)map->Info->MapUID : 0, ntohl(msg->MapUID));
+	    fprintf(stderr,
+		    "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+			map->Info ? (unsigned int)map->Info->MapUID : 0,
+			(unsigned int)ntohl(msg->MapUID));
 	    message.SubType = ICMMapUidMismatch; /// MAP Uid  doesn't match
 	    n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &message,
 			sizeof(message));
@@ -443,7 +445,9 @@ global void NetworkClientSetup(WorldMap *map)
 
 			case ICMMapUidMismatch:
 			    fprintf(stderr, "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
-					map->Info ? (unsigned int)map->Info->MapUID : 0, ntohl(msg->MapUID));
+					map->Info ?
+					    (unsigned int)map->Info->MapUID : 0,
+					    (unsigned int)ntohl(msg->MapUID));
 			    exit(-1);
 
 			case ICMGameFull:
