@@ -737,6 +737,7 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 {
     int repeat;
 
+    unit->Invisible = 0;		// unit is invisible until attacks
     repeat = 0;
     if (target) {
 	x = target->X;
