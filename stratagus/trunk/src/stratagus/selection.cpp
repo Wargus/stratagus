@@ -4,13 +4,13 @@
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
-//  ______________________			     ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//  ______________________      ______________________
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name selection.c	-	The units' selection. */
+/**@name selection.c - The units' selection. */
 //
-//	(c) Copyright 1999-2003 by Patrice Fortier, Lutz Sammer
+// (c) Copyright 1999-2003 by Patrice Fortier, Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,44 +51,44 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-int NumSelected;					/// Number of selected units
-int TeamNumSelected[PlayerMax];  /// how many units selected
-int MaxSelectable;				/// Maximum number of selected units
-Unit** Selected;					/// All selected units
-Unit** TeamSelected[PlayerMax];  /// teams currently selected units
+int NumSelected;                 ///< Number of selected units
+int TeamNumSelected[PlayerMax];  ///< How many units selected
+int MaxSelectable;               ///< Maximum number of selected units
+Unit** Selected;                 ///< All selected units
+Unit** TeamSelected[PlayerMax];  ///< teams currently selected units
 
 
-static unsigned GroupId;					/// Unique group # for automatic groups
+static unsigned GroupId;         ///< Unique group # for automatic groups
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Unselect all the units in the current selection
+** Unselect all the units in the current selection
 */
 void UnSelectAll(void)
 {
 	Unit* unit;
 
-	while (!++GroupId) {				// Advance group id, but keep non zero
+	while (!++GroupId) { // Advance group id, but keep non zero
 	}
 
 	while (NumSelected) {
 		unit = Selected[--NumSelected];
-		Selected[NumSelected] = NoUnitP;		// FIXME: only needed for old code
+		Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
 		unit->Selected = 0;
 	}
 
 }
 
 /**
-**		Handle a suicide unit click
+** Handle a suicide unit click
 **
-**		@param unit		suicide unit.
+** @param unit suicide unit.
 */
 static void HandleSuicideClick(Unit* unit)
 {
@@ -111,10 +111,10 @@ static void HandleSuicideClick(Unit* unit)
 }
 
 /**
-**		Replace a group of selected units by an other group of units.
+** Replace a group of selected units by an other group of units.
 **
-**		@param units		Array of units to be selected.
-**		@param count		Number of units in array to be selected.
+** @param units    Array of units to be selected.
+** @param count    Number of units in array to be selected.
 */
 void ChangeSelectedUnits(Unit** units,int count)
 {
@@ -163,7 +163,7 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 			while (TeamNumSelected[player->Player]) {
 				unit = TeamSelected[player->Player][--TeamNumSelected[player->Player]];
 				unit->TeamSelected &= ~(1 << player->Player);
-				TeamSelected[player->Player][TeamNumSelected[player->Player]] = NoUnitP;		// FIXME: only needed for old code
+				TeamSelected[player->Player][TeamNumSelected[player->Player]] = NoUnitP; // FIXME: only needed for old code
 			}
 			// FALL THROUGH
 		case 2:
@@ -179,7 +179,7 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 			for (n = 0; n < TeamNumSelected[player->Player]; ++n) {
 				for (i = 0; i < count; ++i) {
 					if (units[i] == TeamSelected[player->Player][n]) {
-						TeamSelected[player->Player][n] = 
+						TeamSelected[player->Player][n] =
 							TeamSelected[player->Player][TeamNumSelected[player->Player]--];
 					}
 				}
@@ -192,21 +192,21 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 }
 
 /**
-**		Add a unit to the other selected units.
+** Add a unit to the other selected units.
 **
-**		@param unit		Pointer to unit to add.
-**		@return				true if added to selection, false otherwise
-**						(if NumSelected == MaxSelectable or
-**						unit is already selected or unselectable)
+** @param unit Pointer to unit to add.
+** @return true if added to selection, false otherwise
+** (if NumSelected == MaxSelectable or
+** unit is already selected or unselectable)
 */
 int SelectUnit(Unit* unit)
 {
-	if (unit->Type->Revealer) {				// Revealers cannot be selected
+	if (unit->Type->Revealer) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
 		return 0;
 	}
 
-	if (unit->Removed) {				// Removed cannot be selected
+	if (unit->Removed) { // Removed cannot be selected
 		DebugPrint("Selecting removed?\n");
 		return 0;
 	}
@@ -232,9 +232,9 @@ int SelectUnit(Unit* unit)
 }
 
 /**
-**		Select a single unit, unselecting the previous ones
+** Select a single unit, unselecting the previous ones
 **
-**		@param unit		Pointer to unit to be selected.
+** @param unit Pointer to unit to be selected.
 */
 void SelectSingleUnit(Unit* unit)
 {
@@ -242,9 +242,9 @@ void SelectSingleUnit(Unit* unit)
 }
 
 /**
-**		Unselect unit
+** Unselect unit
 **
-**		@param unit		Pointer to unit to be unselected.
+** @param unit Pointer to unit to be unselected.
 */
 void UnSelectUnit(Unit* unit)
 {
@@ -280,23 +280,23 @@ void UnSelectUnit(Unit* unit)
 		Selected[i] = Selected[NumSelected];
 	}
 
-	if (NumSelected > 1) {				// Assign new group to remaining units
-		while (!++GroupId) {				// Advance group id, but keep non zero
+	if (NumSelected > 1) { // Assign new group to remaining units
+		while (!++GroupId) { // Advance group id, but keep non zero
 		}
 		for (i = 0; i < NumSelected; ++i) {
 			Selected[i]->LastGroup = GroupId;
 		}
 	}
 
-	Selected[NumSelected] = NoUnitP;		// FIXME: only needed for old code
+	Selected[NumSelected] = NoUnitP; // FIXME: only needed for old code
 	unit->Selected = 0;
 }
 
 /**
-**		Toggle the selection of a unit in a group of selected units
+** Toggle the selection of a unit in a group of selected units
 **
-**		@param unit		Pointer to unit to be toggled.
-**		@return				0 if unselected, 1 otherwise
+** @param unit Pointer to unit to be toggled.
+** @return 0 if unselected, 1 otherwise
 */
 int ToggleSelectUnit(Unit* unit)
 {
@@ -309,18 +309,18 @@ int ToggleSelectUnit(Unit* unit)
 }
 
 /**
- **		Select units from a particular type and belonging to the local player.
+ ** Select units from a particular type and belonging to the local player.
  **
- **		The base is included in the selection and defines
- **		the type of the other units to be selected.
+ ** The base is included in the selection and defines
+ ** the type of the other units to be selected.
  **
- **		@param base		Select all units of same type.
- **		@return				Number of units found, 0 means selection unchanged
+ ** @param base Select all units of same type.
+ ** @return Number of units found, 0 means selection unchanged
  **
- **		@todo
- **		FIXME: 0 can't happen. Maybe when scripting will use it?
+ ** @todo
+ ** FIXME: 0 can't happen. Maybe when scripting will use it?
  **
- **		FIXME: should always select the nearest 9 units to the base!
+ ** FIXME: should always select the nearest 9 units to the base!
  */
 int SelectUnitsByType(Unit* base)
 {
@@ -372,10 +372,10 @@ int SelectUnitsByType(Unit* base)
 	}
 
 	//
-	//		Search for other visible units of the same type
+	// Search for other visible units of the same type
 	//
 	// FIXME: peon/peasant with gold/wood & co are considered from
-	//			  different type... idem for tankers
+	//   different type... idem for tankers
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
@@ -408,18 +408,18 @@ int SelectUnitsByType(Unit* base)
 }
 
 /**
-**		Toggle units from a particular type and belonging to the local player.
+** Toggle units from a particular type and belonging to the local player.
 **
-**		The base is included in the selection and defines
-**		the type of the other units to be selected.
+** The base is included in the selection and defines
+** the type of the other units to be selected.
 **
-**		@param base		Toggle all units of same type.
-**		@return				Number of units found, 0 means selection unchanged
+** @param base Toggle all units of same type.
+** @return Number of units found, 0 means selection unchanged
 **
-**		@todo
-**		FIXME: toggle not written
+** @todo
+** FIXME: toggle not written
 **
-**		FIXME: should always select the nearest 9 units to the base!
+** FIXME: should always select the nearest 9 units to the base!
 */
 int ToggleUnitsByType(Unit* base)
 {
@@ -451,29 +451,29 @@ int ToggleUnitsByType(Unit* base)
 		return 0;
 	}
 
-	if (!SelectUnit(base)) {				// Add base to selection
+	if (!SelectUnit(base)) { // Add base to selection
 		return 0;
 	}
 	//
 	//  Search for other visible units of the same type
 	//
 	// FIXME: peon/peasant with gold/wood & co are considered from
-	//		different type... idem for tankers
+	// different type... idem for tankers
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		if (!CanSelectMultipleUnits(unit->Player) || unit->Type != type) {
 			continue;
 		}
-		if (UnitUnusable(unit)) {		// guess SelectUnits doesn't check this
+		if (UnitUnusable(unit)) { // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (unit == base) {				// no need to have the same unit twice
+		if (unit == base) { // no need to have the same unit twice
 			continue;
 		}
 		if (unit->TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		if (!SelectUnit(unit)) {		// add unit to selection
+		if (!SelectUnit(unit)) { // add unit to selection
 			return NumSelected;
 		}
 	}
@@ -483,11 +483,11 @@ int ToggleUnitsByType(Unit* base)
 }
 
 /**
-**		Change selected units to units from group #group_number
-**		Doesn't change the selection if the group has no unit.
+** Change selected units to units from group #group_number
+** Doesn't change the selection if the group has no unit.
 **
-**		@param group_number		number of the group to be selected.
-**		@return						number of units in the group.
+** @param group_number number of the group to be selected.
+** @return number of units in the group.
 */
 int SelectGroup(int group_number)
 {
@@ -504,18 +504,18 @@ int SelectGroup(int group_number)
 }
 
 /**
-**		Add units from group of a particular unit to selection.
+** Add units from group of a particular unit to selection.
 **
-**		@param unit		unit belonging to the group to be selected.
-**		@return				0 if the unit doesn't belong to a group,
-**						or the number of units in the group.
+** @param unit unit belonging to the group to be selected.
+** @return 0 if the unit doesn't belong to a group,
+** or the number of units in the group.
 */
 int AddGroupFromUnitToSelection(Unit* unit)
 {
 	int i;
 	int group;
 
-	if (!(group = unit->LastGroup)) {		// belongs to no group
+	if (!(group = unit->LastGroup)) { // belongs to no group
 		return 0;
 	}
 
@@ -531,17 +531,17 @@ int AddGroupFromUnitToSelection(Unit* unit)
 }
 
 /**
-**		Select units from group of a particular unit.
-**		Doesn't change the selection if the group has no unit,
-**		or the unit doesn't belong to any group.
+** Select units from group of a particular unit.
+** Doesn't change the selection if the group has no unit,
+** or the unit doesn't belong to any group.
 **
-**		@param unit		unit belonging to the group to be selected.
-**		@return				0 if the unit doesn't belong to a group,
-**						or the number of units in the group.
+** @param unit unit belonging to the group to be selected.
+** @return 0 if the unit doesn't belong to a group,
+** or the number of units in the group.
 */
 int SelectGroupFromUnit(Unit* unit)
 {
-	if (!unit->LastGroup) {				// belongs to no group
+	if (!unit->LastGroup) { // belongs to no group
 		return 0;
 	}
 
@@ -550,13 +550,13 @@ int SelectGroupFromUnit(Unit* unit)
 }
 
 /**
- **		Select the units selecteable by rectangle in a local table.
- **		Act like a filter: The source table is modified.
- **		Return the original table if no unit is found.
+ ** Select the units selecteable by rectangle in a local table.
+ ** Act like a filter: The source table is modified.
+ ** Return the original table if no unit is found.
  **
- **		@param table				Input/Output table of units.
- **		@param num_units		Number of units in input table.
- **		@return						the number of units found.
+ ** @param table        Input/Output table of units.
+ ** @param num_units    Number of units in input table.
+ ** @return             the number of units found.
  */
 static int SelectOrganicUnitsInTable(Unit** table,int num_units)
 {
@@ -584,19 +584,19 @@ static int SelectOrganicUnitsInTable(Unit** table,int num_units)
 }
 
 /**
-**		Selects units from the table whose sprite is at least partially
-**		covered by the rectangle. The rectangle is determined by coordinates
-**		of its upper left and lower right corner expressed in screen map
-**		coordinate system.
+** Selects units from the table whose sprite is at least partially
+** covered by the rectangle. The rectangle is determined by coordinates
+** of its upper left and lower right corner expressed in screen map
+** coordinate system.
 **
-**		@param sx0		x-coord of upper left corner of the rectangle
-**		@param sy0		y-coord of upper left corner of the rectangle
-**		@param sx1		x-coord of lower right corner of the rectangle
-**		@param sy1		y-coord of lower right corner of the rectangle
-**		@param table		table of units
-**		@param num_units		number of units in table
+** @param sx0          x-coord of upper left corner of the rectangle
+** @param sy0          y-coord of upper left corner of the rectangle
+** @param sx1          x-coord of lower right corner of the rectangle
+** @param sy1          y-coord of lower right corner of the rectangle
+** @param table        table of units
+** @param num_units    number of units in table
 **
-**		@return				number of units found
+** @return number of units found
 */
 static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 	Unit** table, int num_units)
@@ -634,13 +634,13 @@ static int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 }
 
 /**
- **		Add the units in the rectangle to the current selection
+ ** Add the units in the rectangle to the current selection
  **
- **		@param x0		X start of selection rectangle in tile coordinates
- **		@param y0		Y start of selection rectangle in tile coordinates
- **		@param x1		X start of selection rectangle in tile coordinates
- **		@param y1		Y start of selection rectangle in tile coordinates
- **		@return				the _total_ number of units selected.
+ ** @param x0     X start of selection rectangle in tile coordinates
+ ** @param y0     Y start of selection rectangle in tile coordinates
+ ** @param x1     X start of selection rectangle in tile coordinates
+ ** @param y1     Y start of selection rectangle in tile coordinates
+ ** @return       the _total_ number of units selected.
  */
 int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 {
@@ -649,21 +649,21 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 	int n;
 	int i;
 
-	//		If there is no selected unit yet, do a simple selection.
+	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
 		return SelectUnitsInRectangle(x0, y0, x1, y1);
 	}
 
-	//		Check if the original selected unit (if it's alone) is ours,
-	//		and can be selectable by rectangle.
-	//		In this case, do nothing.
+	// Check if the original selected unit (if it's alone) is ours,
+	// and can be selectable by rectangle.
+	// In this case, do nothing.
 	if (NumSelected == 1 &&
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
 		return NumSelected;
 	}
 
-	//		If no unit in rectangle area... do nothing
+	// If no unit in rectangle area... do nothing
 	toggle_num = UnitCacheSelect((x0 / TileSizeX) - 2, (y0 / TileSizeY) - 2,
 		(x1 / TileSizeX) + 2 + 1, (y1 / TileSizeX) + 2 + 1, table);
 	if (!toggle_num) {
@@ -674,8 +674,8 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 		return NumSelected;
 	}
 
-	//		Now we should only have mobile (organic) units belonging to us,
-	//		so if there's no such units in the rectangle, do nothing.
+	// Now we should only have mobile (organic) units belonging to us,
+	// so if there's no such units in the rectangle, do nothing.
 	if (!(n = SelectOrganicUnitsInTable(table, toggle_num))) {
 		return NumSelected;
 	}
@@ -687,19 +687,19 @@ int AddSelectedUnitsInRectangle(int x0, int y0, int x1, int y1)
 }
 
 /**
-**		Select units in a rectangle.
-**		Proceed in order in none found:
-**		  @li select local player mobile units
-**		  @li select one local player static unit (random)
-**		  @li select one neutral unit (critter, mine...)
-**		  @li select one enemy unit (random)
+** Select units in a rectangle.
+** Proceed in order in none found:
+**   @li select local player mobile units
+**   @li select one local player static unit (random)
+**   @li select one neutral unit (critter, mine...)
+**   @li select one enemy unit (random)
 **
-**		@param sx0		X start of selection rectangle in tile coordinates
-**		@param sy0		Y start of selection rectangle in tile coordinates
-**		@param sx1		X start of selection rectangle in tile coordinates
-**		@param sy1		Y start of selection rectangle in tile coordinates
+** @param sx0    X start of selection rectangle in tile coordinates
+** @param sy0    Y start of selection rectangle in tile coordinates
+** @param sx1    X start of selection rectangle in tile coordinates
+** @param sy1    Y start of selection rectangle in tile coordinates
 **
-**		@return				the number of units found.
+** @return       the number of units found.
 */
 int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 {
@@ -723,7 +723,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	r = SelectSpritesInsideRectangle(sx0, sy0, sx1, sy1, table, r);
 
 	//
-	//		1) search for the player units selectable with rectangle
+	// 1) search for the player units selectable with rectangle
 	//
 	if ((n = SelectOrganicUnitsInTable(table, r))) {
 		ChangeSelectedUnits(table, n);
@@ -731,7 +731,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	}
 
 	//
-	//		2) If no unit found, try a player's unit not selectable by rectangle
+	// 2) If no unit found, try a player's unit not selectable by rectangle
 	//
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
@@ -746,7 +746,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	}
 
 	//
-	//		3) If no unit found, try a resource or a neutral critter
+	// 3) If no unit found, try a resource or a neutral critter
 	//
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
@@ -766,7 +766,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	}
 
 	//
-	//		4) If no unit found, select an enemy unit (first found)
+	// 4) If no unit found, select an enemy unit (first found)
 	//
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
@@ -788,14 +788,14 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**		Select own ground units in a rectangle.
+** Select own ground units in a rectangle.
 **
-**		@param sx0		X start of selection rectangle in tile coordinates
-**		@param sy0		Y start of selection rectangle in tile coordinates
-**		@param sx1		X start of selection rectangle in tile coordinates
-**		@param sy1		Y start of selection rectangle in tile coordinates
+** @param sx0    X start of selection rectangle in tile coordinates
+** @param sy0    Y start of selection rectangle in tile coordinates
+** @param sx1    X start of selection rectangle in tile coordinates
+** @param sy1    Y start of selection rectangle in tile coordinates
 **
-**		@return				the number of units found.
+** @return       the number of units found.
 */
 int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
@@ -843,14 +843,14 @@ int SelectGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**		Select own air units in a rectangle.
+** Select own air units in a rectangle.
 **
-**		@param sx0		X start of selection rectangle in tile coordinates
-**		@param sy0		Y start of selection rectangle in tile coordinates
-**		@param sx1		X start of selection rectangle in tile coordinates
-**		@param sy1		Y start of selection rectangle in tile coordinates
+** @param sx0    X start of selection rectangle in tile coordinates
+** @param sy0    Y start of selection rectangle in tile coordinates
+** @param sx1    X start of selection rectangle in tile coordinates
+** @param sy1    Y start of selection rectangle in tile coordinates
 **
-**		@return				the number of units found.
+** @return       the number of units found.
 */
 int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
@@ -898,14 +898,14 @@ int SelectAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**		Add the ground units in the rectangle to the current selection
+** Add the ground units in the rectangle to the current selection
 **
-**		@param sx0		X start of selection rectangle in tile coordinates
-**		@param sy0		Y start of selection rectangle in tile coordinates
-**		@param sx1		X start of selection rectangle in tile coordinates
-**		@param sy1		Y start of selection rectangle in tile coordinates
+** @param sx0    X start of selection rectangle in tile coordinates
+** @param sy0    Y start of selection rectangle in tile coordinates
+** @param sx1    X start of selection rectangle in tile coordinates
+** @param sy1    Y start of selection rectangle in tile coordinates
 **
-**		@return				the number of units found.
+** @return       the number of units found.
 */
 int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
@@ -919,14 +919,14 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	int tx1;
 	int ty1;
 
-	//		If there is no selected unit yet, do a simple selection.
+	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
 		return SelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	//		Check if the original selected unit (if it's alone) is ours,
-	//		and can be selectable by rectangle.
-	//		In this case, do nothing.
+	// Check if the original selected unit (if it's alone) is ours,
+	// and can be selectable by rectangle.
+	// In this case, do nothing.
 	if (NumSelected == 1 &&
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
@@ -963,7 +963,7 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	}
 
 	//
-	//		Add the units to selected.
+	// Add the units to selected.
 	//
 	for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(table[i]);
@@ -972,14 +972,14 @@ int AddSelectedGroundUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 }
 
 /**
-**		Add the air units in the rectangle to the current selection
+** Add the air units in the rectangle to the current selection
 **
-**		@param sx0		X start of selection rectangle in tile coordinates
-**		@param sy0		Y start of selection rectangle in tile coordinates
-**		@param sx1		X start of selection rectangle in tile coordinates
-**		@param sy1		Y start of selection rectangle in tile coordinates
+** @param sx0    X start of selection rectangle in tile coordinates
+** @param sy0    Y start of selection rectangle in tile coordinates
+** @param sx1    X start of selection rectangle in tile coordinates
+** @param sy1    Y start of selection rectangle in tile coordinates
 **
-**		@return				the number of units found.
+** @return       the number of units found.
 */
 int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 {
@@ -993,14 +993,14 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	int tx1;
 	int ty1;
 
-	//		If there is no selected unit yet, do a simple selection.
+	// If there is no selected unit yet, do a simple selection.
 	if (!NumSelected) {
 		return SelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
 	}
 
-	//		Check if the original selected unit (if it's alone) is ours,
-	//		and can be selectable by rectangle.
-	//		In this case, do nothing.
+	// Check if the original selected unit (if it's alone) is ours,
+	// and can be selectable by rectangle.
+	// In this case, do nothing.
 	if (NumSelected == 1 &&
 			(!CanSelectMultipleUnits(Selected[0]->Player) ||
 				!Selected[0]->Type->SelectableByRectangle)) {
@@ -1017,7 +1017,7 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 
 	for (n = i = 0; i < r; ++i) {
 		unit = table[i];
-		if (!CanSelectMultipleUnits(unit->Player) || 
+		if (!CanSelectMultipleUnits(unit->Player) ||
 			!unit->Type->SelectableByRectangle) {
 			continue;
 		}
@@ -1037,7 +1037,7 @@ int AddSelectedAirUnitsInRectangle(int sx0, int sy0, int sx1, int sy1)
 	}
 
 	//
-	//		Add the units to selected.
+	// Add the units to selected.
 	//
 	for (i = 0; i < n && NumSelected < MaxSelectable; ++i) {
 		SelectUnit(table[i]);
@@ -1055,7 +1055,7 @@ void InitSelections(void)
 	if (!Selected) {
 		Selected = malloc(MaxSelectable * sizeof(Unit*));
 	}
-	
+
 	for (i = 0; i < PlayerMax; ++i) {
 		if (!TeamSelected[i]) {
 			TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
@@ -1095,7 +1095,7 @@ void CleanSelections(void)
 
 	GroupId = 0;
 	NumSelected = 0;
-	Assert(!NoUnitP);				// Code fails if none zero
+	Assert(!NoUnitP); // Code fails if none zero
 	free(Selected);
 	Selected = NULL;
 

@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -56,15 +56,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int NumPlayers;                  /// How many player slots used
-Player Players[PlayerMax];       /// All players in play
-Player* ThisPlayer;              /// Player on this computer
-PlayerRace PlayerRaces;          /// Player races
+int NumPlayers;                  ///< How many player slots used
+Player Players[PlayerMax];       ///< All players in play
+Player* ThisPlayer;              ///< Player on this computer
+PlayerRace PlayerRaces;          ///< Player races
 
-int NoRescueCheck;               /// Disable rescue check
+int NoRescueCheck;               ///< Disable rescue check
 
 /**
-**  Colors used for minimap.  FIXME: make this configurable
+**  Colors used for minimap.
+** @todo FIXME: make this configurable
 */
 static SDL_Color PlayerColorsRGB[PlayerMax][4];
 Uint32 PlayerColors[PlayerMax][4];
@@ -183,7 +184,7 @@ void CleanPlayers(void)
 	NumPlayers = 0;
 
 	//
-	//		Mapping the original race numbers in puds to our internal strings
+	// Mapping the original race numbers in puds to our internal strings
 	//
 	for (p = 0; p < PlayerRaces.Count; ++p) {
 		free(PlayerRaces.Name[p]);
@@ -252,7 +253,7 @@ void SavePlayers(CLFile* file)
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n	");
+					CLprintf(file, "\n ");
 				} else {
 					CLprintf(file, " ");
 				}
@@ -265,7 +266,7 @@ void SavePlayers(CLFile* file)
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n	");
+					CLprintf(file, "\n ");
 				} else {
 					CLprintf(file, " ");
 				}
@@ -278,7 +279,7 @@ void SavePlayers(CLFile* file)
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n	");
+					CLprintf(file, "\n ");
 				} else {
 					CLprintf(file, " ");
 				}
@@ -291,7 +292,7 @@ void SavePlayers(CLFile* file)
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n	");
+					CLprintf(file, "\n ");
 				} else {
 					CLprintf(file, " ");
 				}
@@ -365,7 +366,7 @@ void CreatePlayer(int type)
 	int i;
 	Player* player;
 
-	if (NumPlayers == PlayerMax) {		// already done for bigmaps!
+	if (NumPlayers == PlayerMax) { // already done for bigmaps!
 		return;
 	}
 	player = &Players[NumPlayers];
@@ -866,7 +867,7 @@ void SetPlayersPalette(void)
 	int i;
 	int o;
 
-	//o = rand() & 0x7;						// FIXME: random colors didn't work
+	//o = rand() & 0x7; // FIXME: random colors didn't work
 	o = 0;
 	for (i = 0; i < PlayerMax; ++i) {
 		memcpy(Players[o].UnitColors.Colors, PlayerColorsRGB[i],
@@ -889,7 +890,7 @@ void DebugPlayers(void)
 		"yellow"
 	};
 
-	DebugPrint("Nr   Color   I Name	 Type		 Race	Ai\n");
+	DebugPrint("Nr   Color   I Name  Type  Race Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
@@ -900,14 +901,14 @@ void DebugPlayers(void)
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name);
 		switch (Players[i].Type) {
-			case 0: DebugPrint("Don't know 0 ");		break;
-			case 1: DebugPrint("Don't know 1 ");		break;
-			case 2: DebugPrint("neutral	  ");		break;
-			case 3: DebugPrint("nobody	   ");		break;
-			case 4: DebugPrint("computer	 ");		break;
-			case 5: DebugPrint("person	   ");		break;
-			case 6: DebugPrint("rescue pas.  ");		break;
-			case 7: DebugPrint("rescue akt.  ");		break;
+			case 0: DebugPrint("Don't know 0 "); break;
+			case 1: DebugPrint("Don't know 1 "); break;
+			case 2: DebugPrint("neutral   "); break;
+			case 3: DebugPrint("nobody    "); break;
+			case 4: DebugPrint("computer  "); break;
+			case 5: DebugPrint("person    "); break;
+			case 6: DebugPrint("rescue pas.  "); break;
+			case 7: DebugPrint("rescue akt.  "); break;
 		}
 		k = PlayerRacesIndex(Players[i].Race);
 		DebugPrint("%9s" _C_ PlayerRaces.Name[k]);
@@ -960,7 +961,7 @@ void NotifyPlayer(const Player* player,
 	} else {
 		SetMessageEvent(x, y, "(%s): %s", player->Name, temp);
 	}
-	
+
 }
 
 //@}

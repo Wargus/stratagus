@@ -229,9 +229,9 @@ void _hash_stat(void* tab, int size, struct hash_st* st)
 #include <io.h>
 #include <string.h>
 
-int	opterr = 1;
-int	optind = 1;
-int	optopt;
+int opterr = 1;
+int optind = 1;
+int optopt;
 char* optarg;
 
 static void getopt_err(char* argv0, char* str, char opt)
@@ -272,7 +272,7 @@ int getopt(int argc, char** argv, char* opts)
 	optopt = c = argv[optind][sp];
 	if (c == ':' || (cp = strchr(opts, c)) == NULL) {
 		getopt_err(argv[0], ": illegal option -", (char)c);
-		cp = "xx";	/* make the next if false */
+		cp = "xx"; /* make the next if false */
 		c = '?';
 	}
 	if (*++cp == ':') {

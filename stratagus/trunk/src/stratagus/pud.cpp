@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name pud.c		-	The pud. */
+/**@name pud.c - The pud. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+// (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -74,24 +74,24 @@
 #include "myendian.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-static int MapOffsetX;						/// Offset X for combined maps
-static int MapOffsetY;						/// Offset Y for combined maps
+static int MapOffsetX; ///< Offset X for combined maps
+static int MapOffsetY; ///< Offset Y for combined maps
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 /*============================================================================
-==		Simple Helper
+== Simple Helper
 ============================================================================*/
 
 /**
-**		Checksum a memory area using a simple hash
+** Checksum a memory area using a simple hash
 **
-**		@param adr		Address of data
-**		@param length		length of area
+** @param adr      Address of data
+** @param length   length of area
 */
 static unsigned int ChksumArea(const unsigned char* adr,int length)
 {
@@ -109,16 +109,16 @@ static unsigned int ChksumArea(const unsigned char* adr,int length)
 }
 
 /*============================================================================
-==		Convert
+== Convert
 ============================================================================*/
 
 /**
-**		Convert puds MTXM section into internal format.
+** Convert puds MTXM section into internal format.
 **
-**		@param mtxm		Section data
-**		@param width		Section width
-**		@param height		Section height
-**		@param map		Map to store into
+** @param mtxm     Section data
+** @param width    Section width
+** @param height   Section height
+** @param map      Map to store into
 */
 static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			,WorldMap* map)
@@ -127,22 +127,22 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	int h;
 	int w;
 
-	Assert( UnitTypeOrcWall->_HitPoints < 256
-			&& UnitTypeHumanWall->_HitPoints < 256 );
+	Assert(UnitTypeOrcWall->_HitPoints < 256
+			&& UnitTypeHumanWall->_HitPoints < 256);
 
-	if( map->Terrain<TilesetMax ) {
+	if(map->Terrain < TilesetMax) {
 		// FIXME: should use terrain name or better map->Tileset!!
 		//Assert( map->Tileset->Table == Tilesets[map->Terrain]->Table );
-		ctab=Tilesets[map->Terrain]->Table;
+		ctab = Tilesets[map->Terrain]->Table;
 		DebugPrint("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
 				map->TerrainName);
 	} else {
 		DebugPrint("Unknown terrain!\n");
 		// FIXME: don't use TilesetSummer
-		ctab=Tilesets[TilesetSummer]->Table;
+		ctab = Tilesets[TilesetSummer]->Table;
 	}
 
-	for( h=0; h<height; ++h ) {
+	for(h=0; h<height; ++h ) {
 		for( w=0; w<width; ++w ) {
 			int v;
 
@@ -150,7 +150,7 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Tile=ctab[v];
 			map->Fields[MapOffsetX+w+(MapOffsetY+h)*TheMap.Width].Value=0;
 			//
-			//		Walls are handled special (very ugly).
+			// Walls are handled special (very ugly).
 			//
 			if( (v&0xFFF0)==0x00A0
 					|| (v&0xFFF0)==0x00C0
@@ -168,12 +168,12 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 }
 
 /**
-**		Convert puds SQM section into our internal format.
+** Convert puds SQM section into our internal format.
 **
-**		@param sqm		Section data
-**		@param width		Section width
-**		@param height		Section height
-**		@param map		Map to store into
+** @param sqm       Section data
+** @param width     Section width
+** @param height    Section height
+** @param map       Map to store into
 */
 static void ConvertSQM(const unsigned short* sqm,int width,int height
 		,WorldMap* map)
@@ -235,12 +235,12 @@ static void ConvertSQM(const unsigned short* sqm,int width,int height
 }
 
 /**
-**		Convert puds REGM section into internal format.
+** Convert puds REGM section into internal format.
 **
-**		@param regm		Section data
-**		@param width		Section width
-**		@param height		Section height
-**		@param map		Map to store into
+** @param regm     Section data
+** @param width    Section width
+** @param height   Section height
+** @param map      Map to store into
 */
 static void ConvertREGM(const unsigned short* regm,int width,int height
 		,WorldMap* map)
@@ -254,29 +254,29 @@ static void ConvertREGM(const unsigned short* regm,int width,int height
 		for( w=0; w<width; ++w ) {
 			v=ConvertLE16(regm[w+h*width]);
 			i=MapOffsetX+w+(MapOffsetY+h)*TheMap.Width;
-			if( v==MapActionForest ) {		// forest could be chopped
+			if( v==MapActionForest ) { // forest could be chopped
 				map->Fields[i].Flags|=MapFieldForest;
 				continue;
 			}
-			if( v==MapActionRocks ) {		// rocks could be blown away
+			if( v==MapActionRocks ) { // rocks could be blown away
 				map->Fields[i].Flags|=MapFieldRocks;
 				continue;
 			}
-			if( v==MapActionWall ) {		// wall could be destroyed
+			if( v==MapActionWall ) { // wall could be destroyed
 				map->Fields[i].Flags|=MapFieldWall;
 				continue;
 			}
-			if( v==MapActionIsland ) {		// island no transporter
+			if( v==MapActionIsland ) { // island no transporter
 				// FIXME: don't know what todo here
 				//map->Fields[i].Flags|=MapFieldWall;
 				DebugPrint("%d,%d %d\n" _C_ w _C_ h _C_ v);
 				continue;
 			}
-			v&=~0xFF;						// low byte is region
-			if( v==MapActionWater ) {		// water
+			v&=~0xFF; // low byte is region
+			if( v==MapActionWater ) { // water
 				continue;
 			}
-			if( v==MapActionLand ) {		// land
+			if( v==MapActionLand ) { // land
 				continue;
 			}
 			DebugPrint("REGM: contains unknown action %#04X at %d,%d\n"
@@ -286,18 +286,18 @@ static void ConvertREGM(const unsigned short* regm,int width,int height
 }
 
 /*============================================================================
-==		Read
+== Read
 ============================================================================*/
 
 /**
-**		Read header of pud:
+** Read header of pud:
 **
-**		@param input		Input file
-**		@param header		Header is filled in.
-**		@param length		Length is filled in.
+** @param input    Input file
+** @param header   Header is filled in.
+** @param length   Length is filled in.
 **
-**				4 bytes header tag (TYPE )...
-**				uint32_t length
+** 4 bytes header tag (TYPE )...
+** uint32_t length
 */
 static int PudReadHeader(CLFile* input,char* header,uint32_t* length)
 {
@@ -316,9 +316,9 @@ static int PudReadHeader(CLFile* input,char* header,uint32_t* length)
 }
 
 /**
-**		Read word from pud.
+** Read word from pud.
 **
-**		@param input		Input file
+** @param input Input file
 */
 static int PudReadWord(CLFile* input)
 {
@@ -333,9 +333,9 @@ static int PudReadWord(CLFile* input)
 }
 
 /**
-**		Read byte from pud.
+** Read byte from pud.
 **
-**		@param input		Input file
+** @param input Input file
 */
 static int PudReadByte(CLFile* input)
 {
@@ -350,7 +350,7 @@ static int PudReadByte(CLFile* input)
 }
 
 /**
-**		Get the info for a pud.
+** Get the info for a pud.
 */
 MapInfo* GetPudInfo(const char* pud)
 {
@@ -376,17 +376,17 @@ MapInfo* GetPudInfo(const char* pud)
 		fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
 		return NULL;
 	}
-	if( CLread(input,buf,16)!=16 ) {		// IGNORE TYPE
+	if( CLread(input,buf,16)!=16 ) { // IGNORE TYPE
 		perror("CLread()");
 		return NULL;
 	}
 	buf[16] = 0;
-	if( strcmp(buf,"WAR2 MAP") ) {		// ONLY CHECK STRING
+	if( strcmp(buf,"WAR2 MAP") ) { // ONLY CHECK STRING
 		fprintf(stderr,"GetPudInfo: %s: invalid pud type [%s]\n", pud, buf);
 		return NULL;
 	}
 
-	info=calloc(1, sizeof(MapInfo));		// clears with 0
+	info=calloc(1, sizeof(MapInfo)); // clears with 0
 	if (!info) {
 		return NULL;
 	}
@@ -394,13 +394,13 @@ MapInfo* GetPudInfo(const char* pud)
 	info->Filename = strdup(pud);
 
 	//
-	//		Parse all sections.
+	// Parse all sections.
 	//
 	while( PudReadHeader(input,header,&length) ) {
 		info->MapUID += ChksumArea(header, 4);
 
 		//
-		//		PUD version
+		// PUD version
 		//
 		if( !memcmp(header,"VER ",4) ) {
 			if( length==2 ) {
@@ -415,7 +415,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Map description
+		// Map description
 		//
 		if( !memcmp(header,"DESC",4) ) {
 			if( (uint32_t)CLread(input,buf,length)!=length ) {
@@ -429,7 +429,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Player definitions.
+		// Player definitions.
 		//
 		if( !memcmp(header,"OWNR",4) ) {
 			if( length==16 ) {
@@ -449,7 +449,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Terrain type or extended terrain type.
+		// Terrain type or extended terrain type.
 		//
 		if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 			if( length==2 ) {
@@ -458,7 +458,7 @@ MapInfo* GetPudInfo(const char* pud)
 
 				t=PudReadWord(input);
 				//
-				//		Look if we have this as tileset.
+				// Look if we have this as tileset.
 				//
 				for( i=0; i<t && TilesetWcNames[i]; ++i ) {
 				}
@@ -477,7 +477,7 @@ MapInfo* GetPudInfo(const char* pud)
 
 
 		//
-		//		Dimension
+		// Dimension
 		//
 		if( !memcmp(header,"DIM ",4) ) {
 
@@ -492,7 +492,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Unit data (optional)
+		// Unit data (optional)
 		//
 		if( !memcmp(header,"UDTA",4) ) {
 			char* bufp;
@@ -519,7 +519,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Pud restrictions (optional)
+		// Pud restrictions (optional)
 		//
 		if( !memcmp(header,"ALOW",4) ) {
 			char* bufp;
@@ -541,7 +541,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Upgrade data (optional)
+		// Upgrade data (optional)
 		//
 		if( !memcmp(header,"UGRD",4) ) {
 			char* bufp;
@@ -568,7 +568,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Identifies race of each player
+		// Identifies race of each player
 		//
 		if( !memcmp(header,"SIDE",4) ) {
 			if( length==16 ) {
@@ -589,7 +589,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Starting gold
+		// Starting gold
 		//
 		if( !memcmp(header,"SGLD",4) ) {
 			if( length==32 ) {
@@ -610,7 +610,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Starting lumber
+		// Starting lumber
 		//
 		if( !memcmp(header,"SLBR",4) ) {
 			if( length==32 ) {
@@ -631,7 +631,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Starting oil
+		// Starting oil
 		//
 		if( !memcmp(header,"SOIL",4) ) {
 			if( length==32 ) {
@@ -654,7 +654,7 @@ MapInfo* GetPudInfo(const char* pud)
 		// FIXME: support the extended resources with puds?
 
 		//
-		//		AI for each player
+		// AI for each player
 		//
 		if( !memcmp(header,"AIPL",4) ) {
 			if( length==16 ) {
@@ -674,15 +674,15 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		obsolete oil map
+		// obsolete oil map
 		//
 		if( !memcmp(header,"OILM",4) ) {
-			CLseek(input,length,SEEK_CUR);		// skip section
+			CLseek(input,length,SEEK_CUR); // skip section
 			continue;
 		}
 
 		//
-		//		Tiles MAP
+		// Tiles MAP
 		//
 		if( !memcmp(header,"MTXM",4) ) {
 			unsigned short* mtxm;
@@ -706,7 +706,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Movement MAP
+		// Movement MAP
 		//
 		if( !memcmp(header,"SQM ",4) ) {
 			unsigned short* sqm;
@@ -729,7 +729,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Action MAP
+		// Action MAP
 		//
 		if( !memcmp(header,"REGM",4) ) {
 			unsigned short* regm;
@@ -752,7 +752,7 @@ MapInfo* GetPudInfo(const char* pud)
 		}
 
 		//
-		//		Units
+		// Units
 		//
 		if( !memcmp(header,"UNIT",4) ) {
 			int x;
@@ -792,10 +792,10 @@ MapInfo* GetPudInfo(const char* pud)
 }
 
 /**
-**		Load pud.
+** Load pud.
 **
-**		@param pud		File name.
-**		@param map		Map filled in.
+** @param pud    File name.
+** @param map    Map filled in.
 */
 void LoadPud(const char* pud,WorldMap* map)
 {
@@ -829,11 +829,11 @@ void LoadPud(const char* pud,WorldMap* map)
 		fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 		ExitFatal(-1);
 	}
-	if( CLread(input,buf,16)!=16 ) {		// IGNORE TYPE
+	if( CLread(input,buf,16)!=16 ) { // IGNORE TYPE
 		perror("CLread()");
 		ExitFatal(-1);
 	}
-	if( strcmp(buf,"WAR2 MAP") ) {		// ONLY CHECK STRING
+	if( strcmp(buf,"WAR2 MAP") ) { // ONLY CHECK STRING
 		fprintf(stderr,"LoadPud: %s: invalid pud\n", pud);
 		ExitFatal(-1);
 	}
@@ -841,11 +841,11 @@ void LoadPud(const char* pud,WorldMap* map)
 	aiopps=width=height=0;
 
 	//
-	//		Parse all sections.
+	// Parse all sections.
 	//
 	while( PudReadHeader(input,header,&length) ) {
 		//
-		//		PUD version
+		// PUD version
 		//
 		if( !memcmp(header,"VER ",4) ) {
 			if( length==2 ) {
@@ -859,7 +859,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Map description
+		// Map description
 		//
 		if( !memcmp(header,"DESC",4) ) {
 			if( (uint32_t)CLread(input,buf,length)!=length ) {
@@ -873,7 +873,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Player definitions.
+		// Player definitions.
 		//
 		if( !memcmp(header,"OWNR",4) ) {
 			if( length==16 ) {
@@ -909,7 +909,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Terrain type or extended terrain type.
+		// Terrain type or extended terrain type.
 		//
 		if( !memcmp(header,"ERA ",4) || !memcmp(header,"ERAX",4) ) {
 			if( length==2 ) {
@@ -924,7 +924,7 @@ void LoadPud(const char* pud,WorldMap* map)
 					free(map->TerrainName);
 				}
 				//
-				//		Look if we have this as tileset.
+				// Look if we have this as tileset.
 				//
 				for( i=0; i<t && TilesetWcNames[i]; ++i ) {
 				}
@@ -942,7 +942,7 @@ void LoadPud(const char* pud,WorldMap* map)
 
 
 		//
-		//		Dimension
+		// Dimension
 		//
 		if( !memcmp(header,"DIM ",4) ) {
 
@@ -965,14 +965,14 @@ void LoadPud(const char* pud,WorldMap* map)
 				}
 				InitUnitCache();
 				// FIXME: this should be CreateMap or InitMap?
-			} else {						// FIXME: should do some checks here!
+			} else { // FIXME: should do some checks here!
 				DebugPrint("Warning: Fields already allocated\n");
 			}
 			continue;
 		}
 
 		//
-		//		Unit data (optional)
+		// Unit data (optional)
 		//
 		if( !memcmp(header,"UDTA",4) ) {
 			char* bufp;
@@ -997,7 +997,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Pud restrictions (optional)
+		// Pud restrictions (optional)
 		//
 		if( !memcmp(header,"ALOW",4) ) {
 			char* bufp;
@@ -1017,7 +1017,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Upgrade data (optional)
+		// Upgrade data (optional)
 		//
 		if( !memcmp(header,"UGRD",4) ) {
 			char* bufp;
@@ -1042,7 +1042,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Identifies race of each player
+		// Identifies race of each player
 		//
 		if( !memcmp(header,"SIDE",4) ) {
 			if( length==16 ) {
@@ -1065,7 +1065,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Starting gold
+		// Starting gold
 		//
 		if( !memcmp(header,"SGLD",4) ) {
 			if( length==32 ) {
@@ -1083,7 +1083,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Starting lumber
+		// Starting lumber
 		//
 		if( !memcmp(header,"SLBR",4) ) {
 			if( length==32 ) {
@@ -1101,7 +1101,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Starting oil
+		// Starting oil
 		//
 		if( !memcmp(header,"SOIL",4) ) {
 			if( length==32 ) {
@@ -1121,7 +1121,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		// FIXME: support the extended resources with puds?
 
 		//
-		//		AI for each player
+		// AI for each player
 		//
 		if( !memcmp(header,"AIPL",4) ) {
 			if( length==16 ) {
@@ -1139,15 +1139,15 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		obsolete oil map
+		// obsolete oil map
 		//
 		if( !memcmp(header,"OILM",4) ) {
-			CLseek(input,length,SEEK_CUR);		// skip section
+			CLseek(input,length,SEEK_CUR); // skip section
 			continue;
 		}
 
 		//
-		//		Tiles MAP
+		// Tiles MAP
 		//
 		if( !memcmp(header,"MTXM",4) ) {
 			unsigned short* mtxm;
@@ -1172,7 +1172,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Movement MAP
+		// Movement MAP
 		//
 		if( !memcmp(header,"SQM ",4) ) {
 			unsigned short* sqm;
@@ -1197,7 +1197,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Action MAP
+		// Action MAP
 		//
 		if( !memcmp(header,"REGM",4) ) {
 			unsigned short* regm;
@@ -1222,7 +1222,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		}
 
 		//
-		//		Units
+		// Units
 		//
 		if( !memcmp(header,"UNIT",4) ) {
 			int x;
@@ -1234,7 +1234,7 @@ void LoadPud(const char* pud,WorldMap* map)
 			Unit* unit;
 
 			//
-			//		FIXME: should split this into parts.
+			// FIXME: should split this into parts.
 			//
 			while( length>=8 ) {
 				x=PudReadWord(input);
@@ -1244,7 +1244,7 @@ void LoadPud(const char* pud,WorldMap* map)
 				v=PudReadWord(input);
 
 				if( t==WC_StartLocationHuman
-						|| t==WC_StartLocationOrc ) {		// starting points?
+						|| t==WC_StartLocationOrc ) { // starting points?
 
 					Players[o].StartX=MapOffsetX+x;
 					Players[o].StartY=MapOffsetY+y;
@@ -1321,11 +1321,11 @@ pawn:
 }
 
 /**
-**		Convert the map to MTXM format and save in a buffer.
+** Convert the map to MTXM format and save in a buffer.
 **
-**		@param mtxm		Buffer to save MTXM data
-**		@param map		Map to convert
-**		@param tileset		Tileset used to convert
+** @param mtxm      Buffer to save MTXM data
+** @param map       Map to convert
+** @param tileset   Tileset used to convert
 */
 static void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
 			Tileset* tileset)
@@ -1353,11 +1353,11 @@ static void PudConvertMTXM(unsigned char* mtxm,const WorldMap* map,
 #ifdef USE_ZLIB
 
 /**
-**		Write pud header.
+** Write pud header.
 **
-**		@param f		File handle
-**		@param type		4 byte header
-**		@param length		section length
+** @param f       File handle
+** @param type    4 byte header
+** @param length  section length
 */
 static void PudWriteHeader(gzFile f,char* type,int length)
 {
@@ -1379,10 +1379,10 @@ static void PudWriteHeader(gzFile f,char* type,int length)
 }
 
 /**
-**		Save the MTXM section
+** Save the MTXM section
 **
-**		@param f		File handle
-**		@param map		Map to save.
+** @param f     File handle
+** @param map   Map to save.
 */
 static void PudWriteMTXM(gzFile f,const WorldMap* map)
 {
@@ -1402,10 +1402,10 @@ static void PudWriteMTXM(gzFile f,const WorldMap* map)
 }
 
 /**
-**		Save the SQM section
+** Save the SQM section
 **
-**		@param f		File handle
-**		@param map		Map to save.
+** @param f      File handle
+** @param map    Map to save.
 */
 static void PudWriteSQM(gzFile f,const WorldMap* map)
 {
@@ -1470,10 +1470,10 @@ static void PudWriteSQM(gzFile f,const WorldMap* map)
 }
 
 /**
-**		Save the REGM section
+** Save the REGM section
 **
-**		@param f		File handle
-**		@param map		Map to save.
+** @param f      File handle
+** @param map    Map to save.
 */
 static void PudWriteREGM(gzFile f,const WorldMap* map)
 {
@@ -1496,7 +1496,7 @@ static void PudWriteREGM(gzFile f,const WorldMap* map)
 			v=MapActionRocks;
 		} else if( f&MapFieldWall ) {
 			v=MapActionWall;
-		} else if( f&0 ) {				// FIXME: not supported
+		} else if( f&0 ) { // FIXME: not supported
 			v=MapActionIsland;
 		} else if( f&MapFieldWaterAllowed ) {
 			v=MapActionWater;
@@ -1512,9 +1512,9 @@ static void PudWriteREGM(gzFile f,const WorldMap* map)
 }
 
 /**
-**		Save the units to pud.
+** Save the units to pud.
 **
-**		@param f		File handle
+** @param f File handle
 */
 static void PudSaveUnits(gzFile f)
 {
@@ -1550,10 +1550,10 @@ static void PudSaveUnits(gzFile f)
 }
 
 /**
-**		Save pud.
+** Save pud.
 **
-**		@param pud		File name.
-**		@param map		Map to save.
+** @param pud    File name.
+** @param map    Map to save.
 */
 int SavePud(const char* pud,const WorldMap* map)
 {
@@ -1579,7 +1579,7 @@ int SavePud(const char* pud,const WorldMap* map)
 	gzwrite(f,buf,16);
 
 	PudWriteHeader(f,"VER ",2);
-	buf[0]=0x13;		// 1.3
+	buf[0]=0x13; // 1.3
 	buf[1]=0x00;
 	gzwrite(f,buf,2);
 
@@ -1678,10 +1678,10 @@ int SavePud(const char* pud,const WorldMap* map)
 #else
 
 /**
-**		Save pud.
+** Save pud.
 **
-**		@param pud		File name.
-**		@param map		Map to save.
+** @param pud    File name.
+** @param map    Map to save.
 */
 int SavePud(const char* pud __attribute__((unused)),
 		const WorldMap* map __attribute__((unused)))
@@ -1692,10 +1692,10 @@ int SavePud(const char* pud __attribute__((unused)),
 #endif
 
 /**
-**		Change a pud's tileset
+** Change a pud's tileset
 **
-**		@param old			Number of old tileset
-**		@param map			Map to change
+** @param old    Number of old tileset
+** @param map    Map to change
 */
 void ChangeTilesetPud(int old,WorldMap* map)
 {
@@ -1709,7 +1709,7 @@ void ChangeTilesetPud(int old,WorldMap* map)
 }
 
 /**
-**		Clean pud module.
+** Clean pud module.
 */
 void CleanPud(void)
 {

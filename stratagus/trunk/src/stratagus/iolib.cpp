@@ -45,7 +45,7 @@
 #include "stratagus.h"
 #include "iocompat.h"
 
-#include "campaign.h"						// for CurrentMapPath
+#include "campaign.h" // for CurrentMapPath
 
 #include "iolib.h"
 
@@ -65,14 +65,14 @@
 
 #ifdef USE_ZLIB
 
-#ifndef z_off_t								// { ZLIB_VERSION<="1.0.4"
+#ifndef z_off_t // { ZLIB_VERSION<="1.0.4"
 
 /**
-**		Seek on compressed input. (Newer libs support it directly)
+** Seek on compressed input. (Newer libs support it directly)
 **
-**		@param file		File handle
-**		@param offset		Seek position
-**		@param whence		How to seek
+** @param file     File handle
+** @param offset   Seek position
+** @param whence   How to seek
 */
 static int gzseek(CLFile* file, unsigned offset, int whence)
 {
@@ -85,26 +85,26 @@ static int gzseek(CLFile* file, unsigned offset, int whence)
 	return gzread(file, buf, offset);
 }
 
-#endif		// } ZLIB_VERSION<="1.0.4"
+#endif // } ZLIB_VERSION<="1.0.4"
 
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 
 #ifdef USE_BZ2LIB
 
 /* libbzip2 version 1.0 has a naming change in the API - how bright! */
-#ifdef BZ_CONFIG_ERROR		// { defined only if LIBBZIP2_VERSION >= "1.0"
+#ifdef BZ_CONFIG_ERROR // { defined only if LIBBZIP2_VERSION >= "1.0"
 #define bzread BZ2_bzread
 #define bzopen BZ2_bzopen
 #define bzclose BZ2_bzclose
 #define bzwrite BZ2_bzwrite
-#endif		// } LIBBZIP2_VERSION >= "1.0"
+#endif // } LIBBZIP2_VERSION >= "1.0"
 
 /**
-**		Seek on compressed input. (I hope newer libs support it directly)
+** Seek on compressed input. (I hope newer libs support it directly)
 **
-**		@param file		File handle
-**		@param offset		Seek position
-**		@param whence		How to seek
+** @param file      File handle
+** @param offset    Seek position
+** @param whence    How to seek
 */
 static void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unused)))
 {
@@ -117,17 +117,17 @@ static void bzseek(BZFILE* file, unsigned offset, int whence __attribute__((unus
 	bzread(file, buf, offset);
 }
 
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 
 #if defined(USE_ZLIB) || defined(USE_BZ2LIB)
 
 /**
-**		CLopen				Library file open
+** CLopen Library file open
 **
-**		@param fn				File name.
-**		@param openflags		Open read, or write and compression options
+** @param fn           File name.
+** @param openflags    Open read, or write and compression options
 **
-**		@return						File Pointer
+** @return File Pointer
 */
 CLFile* CLopen(const char* fn, long openflags)
 {
@@ -167,7 +167,7 @@ CLFile* CLopen(const char* fn, long openflags)
 			clf.cl_type = CLF_TYPE_PLAIN;
 		}
 	} else {
-		if (!(clf.cl_plain = fopen(fn, openstring))) {				// try plain first
+		if (!(clf.cl_plain = fopen(fn, openstring))) { // try plain first
 #ifdef USE_ZLIB
 			if ((clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), "rb"))) {
 				clf.cl_type = CLF_TYPE_GZIP;
@@ -195,9 +195,9 @@ CLFile* CLopen(const char* fn, long openflags)
 						}
 					}
 				}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 #ifdef USE_ZLIB
-				if (buf[0] == 0x1f) {		// don't check for buf[1] == 0x8b, so that old compress also works!
+				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
 					fclose(clf.cl_plain);
 					if ((clf.cl_gz = gzopen(fn, "rb"))) {
 						clf.cl_type = CLF_TYPE_GZIP;
@@ -207,9 +207,9 @@ CLFile* CLopen(const char* fn, long openflags)
 						}
 					}
 				}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 			}
-			if (clf.cl_type == CLF_TYPE_PLAIN) {		// ok, it is not compressed
+			if (clf.cl_type == CLF_TYPE_PLAIN) { // ok, it is not compressed
 				rewind(clf.cl_plain);
 			}
 		}
@@ -229,9 +229,9 @@ CLFile* CLopen(const char* fn, long openflags)
 }
 
 /**
-**		CLclose				Library file close
+** CLclose Library file close
 **
-**		@param file		CLFile pointer.
+** @param file CLFile pointer.
 */
 int CLclose(CLFile* file)
 {
@@ -248,13 +248,13 @@ int CLclose(CLFile* file)
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzclose(file->cl_gz);
 		}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
 			bzclose(file->cl_bz);
 			ret = 0;
 		}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 		free(file);
 	} else {
 		errno = EBADF;
@@ -263,11 +263,11 @@ int CLclose(CLFile* file)
 }
 
 /**
-**		CLread				Library file read
+** CLread Library file read
 **
-**		@param file		CLFile pointer.
-**		@param buf		Pointer to read the data to.
-**		@param len		number of bytes to read.
+** @param file     CLFile pointer.
+** @param buf      Pointer to read the data to.
+** @param len      number of bytes to read.
 */
 int CLread(CLFile* file, void* buf, size_t len)
 {
@@ -284,19 +284,19 @@ int CLread(CLFile* file, void* buf, size_t len)
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzread(file->cl_gz, buf, len);
 		}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
 			ret = bzread(file->cl_bz, buf, len);
 		}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
 	return ret;
 }
 
-void CLflush(CLFile * file)
+void CLflush(CLFile* file)
 {
 	int tp;
 	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID && tp == CLF_TYPE_PLAIN) {
@@ -306,11 +306,11 @@ void CLflush(CLFile * file)
 
 
 /**
-**		CLprintf		Library file write
+** CLprintf Library file write
 **
-**		@param file		CLFile pointer.
-**		@param format		String Format.
-**		@param ...		Parameter List.
+** @param file      CLFile pointer.
+** @param format    String Format.
+** @param ...       Parameter List.
 */
 int CLprintf(CLFile* file, char* format, ...)
 {
@@ -338,7 +338,7 @@ int CLprintf(CLFile* file, char* format, ...)
 		/* Else try again with more space. */
 		if (n > -1) { /* glibc 2.1 */
 			size = n + 1; /* precisely what is needed */
-		} else {		   /* glibc 2.0 */
+		} else {    /* glibc 2.0 */
 			DebugPrint("Something could be wrong in CLprintf.\n");
 			size *= 2;  /* twice the old size */
 		}
@@ -358,12 +358,12 @@ int CLprintf(CLFile* file, char* format, ...)
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzwrite(file->cl_gz, p, size);
 		}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
 			ret = bzwrite(file->cl_bz, p, size);
 		}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -372,11 +372,11 @@ int CLprintf(CLFile* file, char* format, ...)
 }
 
 /**
-**		CLseek				Library file seek
+** CLseek Library file seek
 **
-**		@param file		CLFile pointer.
-**		@param offset		Seek position
-**		@param whence		How to seek
+** @param file     CLFile pointer.
+** @param offset   Seek position
+** @param whence   How to seek
 */
 int CLseek(CLFile* file, long offset, int whence)
 {
@@ -393,13 +393,13 @@ int CLseek(CLFile* file, long offset, int whence)
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gzseek(file->cl_gz, offset, whence);
 		}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
 			bzseek(file->cl_bz, offset, whence);
 			ret = 0;
 		}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
@@ -407,9 +407,9 @@ int CLseek(CLFile* file, long offset, int whence)
 }
 
 /**
-**		CLtell			Library file tell
+** CLtell Library file tell
 **
-**		@param file		CLFile pointer.
+** @param file CLFile pointer.
 */
 long CLtell(CLFile* file)
 {
@@ -426,44 +426,44 @@ long CLtell(CLFile* file)
 		if (tp == CLF_TYPE_GZIP) {
 			ret = gztell(file->cl_gz);
 		}
-#endif		// USE_ZLIB
+#endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
 			// FIXME: need to implement this
 			ret = -1;
 		}
-#endif		// USE_BZ2LIB
+#endif // USE_BZ2LIB
 	} else {
 		errno = EBADF;
 	}
 	return ret;
 }
 
-#endif		// USE_ZLIB || USE_BZ2LIB
+#endif // USE_ZLIB || USE_BZ2LIB
 
 /**
-**		Generate a filename into library.
+** Generate a filename into library.
 **
-**		Try current directory, user home directory, global directory.
-**		This supports .gz, .bz2 and .zip.
+** Try current directory, user home directory, global directory.
+** This supports .gz, .bz2 and .zip.
 **
-**		@param file		Filename to open.
-**		@param buffer		Allocated buffer for generated filename.
+** @param file     Filename to open.
+** @param buffer   Allocated buffer for generated filename.
 **
-**		@return				Pointer to buffer.
+** @return Pointer to buffer.
 */
 char* LibraryFileName(const char* file, char* buffer)
 {
 	char* s;
 
 	//
-	//		Absolute path or in current directory.
+	// Absolute path or in current directory.
 	//
 	strcpy(buffer, file);
 	if (*buffer == '/' || !access(buffer, R_OK)) {
 		return buffer;
 	}
-#ifdef USE_ZLIB				// gzip or bzip2 in current directory
+#ifdef USE_ZLIB // gzip or bzip2 in current directory
 	sprintf(buffer, "%s.gz", file);
 	if (!access(buffer, R_OK)) {
 		return buffer;
@@ -477,7 +477,7 @@ char* LibraryFileName(const char* file, char* buffer)
 #endif
 
 	//
-	//		Try in map directory
+	// Try in map directory
 	//
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
@@ -501,7 +501,7 @@ char* LibraryFileName(const char* file, char* buffer)
 			return buffer;
 		}
 
-#ifdef USE_ZLIB				// gzip or bzip2 in map directory directory
+#ifdef USE_ZLIB // gzip or bzip2 in map directory directory
 		strcat(buffer, ".gz");
 		if (!access(buffer, R_OK)) {
 			return buffer;
@@ -549,7 +549,7 @@ char* LibraryFileName(const char* file, char* buffer)
 		if (!access(buffer,R_OK)) {
 			return buffer;
 		}
-#ifdef USE_ZLIB				// gzip or bzip2 in user home directory
+#ifdef USE_ZLIB // gzip or bzip2 in user home directory
 		sprintf(buffer, "%s/%s/%s/%s.gz", s, STRATAGUS_HOME_PATH, GameName, file);
 		if (!access(buffer, R_OK)) {
 			return buffer;
@@ -564,13 +564,13 @@ char* LibraryFileName(const char* file, char* buffer)
 	}
 
 	//
-	//		In global shared directory
+	// In global shared directory
 	//
 	sprintf(buffer, "%s/%s", StratagusLibPath, file);
 	if (!access(buffer, R_OK)) {
 		return buffer;
 	}
-#ifdef USE_ZLIB				// gzip or bzip2 in global shared directory
+#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buffer, "%s/%s.gz", StratagusLibPath, file);
 	if (!access(buffer, R_OK)) {
 		return buffer;
@@ -589,12 +589,12 @@ char* LibraryFileName(const char* file, char* buffer)
 }
 
 /**
-**		Compare two directory structures.
+** Compare two directory structures.
 **
-**		@param		v1		First structure
-**		@param		v2		Second structure
+** @param v1    First structure
+** @param v2    Second structure
 **
-**		@return				v1-v2
+** @return v1-v2
 */
 static int flqcmp(const void* v1, const void* v2)
 {
@@ -612,13 +612,13 @@ static int flqcmp(const void* v1, const void* v2)
 }
 
 /**
-**		Generate a list of files within a specified directory
+** Generate a list of files within a specified directory
 **
-**		@param dirname		Directory to read.
-**		@param filter		Optional xdata-filter function.
-**		@param flp		Filelist pointer.
+** @param dirname    Directory to read.
+** @param filter     Optional xdata-filter function.
+** @param flp        Filelist pointer.
 **
-**		@return				Pointer to FileList struct describing Files found.
+** @return Pointer to FileList struct describing Files found.
 */
 int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
 {

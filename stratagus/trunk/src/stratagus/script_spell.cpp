@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E	  W A R	  B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
 /**@name script_spell.c - The spell script functions.. */
 //
-//	(c) Copyright 1998-2003 by Joris Dauphin and Crestez Leonard
+// (c) Copyright 1998-2003 by Joris Dauphin and Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -48,7 +48,7 @@
 #include "script.h"
 
 // **************************************************************************
-//				Action parsers for spellAction
+// Action parsers for spellAction
 // **************************************************************************
 
 /**
@@ -450,14 +450,14 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	int j;
 
 	//
-	//		Initializations:
+	// Initializations:
 	//
 
-	//		Set everything to 0:
+	// Set everything to 0:
 	memset(condition, 0, sizeof(ConditionInfo));
-	//		Flags are defaulted to 0(CONDITION_TRUE)
+	// Flags are defaulted to 0(CONDITION_TRUE)
 	condition->BoolFlag = calloc(NumberBoolFlag, sizeof(*condition->BoolFlag));
-	//		Initialize min/max stuff to values with no effect.
+	// Initialize min/max stuff to values with no effect.
 	condition->MinHpPercent = -10;
 	condition->MaxHpPercent = 1000;
 	condition->MinManaPercent = -10;
@@ -552,12 +552,12 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 }
 
 /*
-**		Parse the Condition for spell.
+** Parse the Condition for spell.
 **
-**		@param list				SCM object to parse
-**		@param autocast				pointer to autocast to fill with data.
+** @param list SCM object to parse
+** @param autocast pointer to autocast to fill with data.
 **
-**		@notes: autocast must be allocated. All data already in is LOST.
+** @notes: autocast must be allocated. All data already in is LOST.
 */
 static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 {
@@ -743,7 +743,7 @@ static int CclDefineSpell(lua_State* l)
 }
 
 /**
-**		Register CCL features for Spell.
+** Register CCL features for Spell.
 */
 void SpellCclRegister(void)
 {
@@ -753,10 +753,10 @@ void SpellCclRegister(void)
 #if 0 // Use old ccl config.
 
 /**
-**		Save a spell action to a file.
+** Save a spell action to a file.
 **
-** 		@param file		File pointer to save to
-**		@param action		Pointer to action to save.
+**  @param file File pointer to save to
+** @param action Pointer to action to save.
 */
 static void SaveSpellAction(CLFile* file, SpellActionType* action)
 {
@@ -784,7 +784,7 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 				action->Data.SpawnMissile.TTL,
 				action->Data.SpawnMissile.Damage);
 		//
-		//		Save start-point
+		// Save start-point
 		//
 		loc=&action->Data.SpawnMissile.StartPoint;
 		CLprintf(file, "start-point (base ");
@@ -796,7 +796,7 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 		CLprintf(file, " add-x %d add-y %d add-rand-x %d add-rand-y %d) ",
 				loc->AddX,loc->AddY,loc->AddRandX,loc->AddRandY);
 		//
-		//		Save end-point
+		// Save end-point
 		//
 		loc=&action->Data.SpawnMissile.EndPoint;
 		CLprintf(file, "end-point (base ");
@@ -868,9 +868,9 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 {
 	char condstrings[3][10] = {
-		"true",						/// CONDITION_TRUE
-		"false",				/// CONDITION_FALSE
-		"only"						/// CONDITION_ONLY
+		"true", /// CONDITION_TRUE
+		"false", /// CONDITION_FALSE
+		"only" /// CONDITION_ONLY
 	};
 	int i;
 	Assert(file);
@@ -878,8 +878,8 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 
 	CLprintf(file, "( ");
 	//
-	//		First save data related to flags.
-	//		NOTE: (int) is there to keep compilers happy.
+	// First save data related to flags.
+	// NOTE: (int) is there to keep compilers happy.
 	//
 	if (condition->Coward != CONDITION_TRUE) {
 		CLprintf(file, "coward %s ", condstrings[(int)condition->Coward]);
@@ -900,14 +900,14 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 		}
 	}
 	//
-	//		Min/Max vital percents
+	// Min/Max vital percents
 	//
 	CLprintf(file, "min-hp-percent %d ", condition->MinHpPercent);
 	CLprintf(file, "max-hp-percent %d ", condition->MaxHpPercent);
 	CLprintf(file, "min-mana-percent %d ", condition->MinManaPercent);
 	CLprintf(file, "max-mana-percent %d ", condition->MaxManaPercent);
 	//
-	//		Max buff ticks stuff
+	// Max buff ticks stuff
 	//
 	CLprintf(file, "max-slow-ticks %d ", condition->MaxSlowTicks);
 	CLprintf(file, "max-haste-ticks %d ", condition->MaxHasteTicks);
@@ -915,23 +915,23 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 	CLprintf(file, "max-invisibility-ticks %d ", condition->MaxInvisibilityTicks);
 	CLprintf(file, "max-invincibility-ticks %d ", condition->MaxInvincibilityTicks);
 	//
-	//		The end.
+	// The end.
 	//
 	CLprintf(file, ")\n");
 }
 
 /**
-**		Save autocast info to a CCL file
+** Save autocast info to a CCL file
 **
-**		@param file		The file to save to.
-**		@param autocast		Auocastinfo to save.
+** @param file The file to save to.
+** @param autocast Auocastinfo to save.
 */
 void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 {
 	char condstrings[3][10] = {
-		"true",						/// CONDITION_TRUE
-		"false",				/// CONDITION_FALSE
-		"only"						/// CONDITION_ONLY
+		"true", /// CONDITION_TRUE
+		"false", /// CONDITION_FALSE
+		"only" /// CONDITION_ONLY
 	};
 
 	CLprintf(file, "( range %d ", autocast->Range);
