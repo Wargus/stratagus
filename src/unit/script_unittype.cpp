@@ -375,6 +375,16 @@ static int CclDefineUnitType(lua_State* l)
 			lua_rawgeti(l, -1, 2);
 			type->Height = LuaToNumber(l, -1);
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "Offset")) {
+			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_rawgeti(l, -1, 1);
+			type->OffsetX = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, -1, 2);
+			type->OffsetY = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {

@@ -697,6 +697,8 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 	// FIXME: move this calculation to high level.
 	x -= (type->Width - type->TileWidth * TileSizeX) / 2;
 	y -= (type->Height - type->TileHeight * TileSizeY) / 2;
+	x += type->OffsetX;
+	y += type->OffsetY;
 
 	if (type->Flip) {
 		if (frame < 0) {
