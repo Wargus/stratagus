@@ -3062,25 +3062,6 @@ local SCM CclDefineButton(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    ba.Hint=gh_scm2newstr(value,NULL);
-	} else if( gh_eq_p(value,gh_symbol2scm("for-unit-with-resource")) )
-	    // FIXME: ba.UnitMask shouldn't be a string
-	    value=gh_car(list);
-	    list=gh_cdr(list);
-	    s1=strdup(",");
-	    while( !gh_null_p(value) ) {
-		s2=gh_scm2newstr(gh_car(value),NULL);
-		s1=realloc(s1,strlen(s1)+strlen(s2)+2);
-		strcat(s1,s2);
-		strcat(s1,",");
-		value=gh_cdr(value);
-		free(s2);
-	    }
-	    ba.UnitMask=s1;
-	    //If not allowed, allow for when have a resource
-	    if( !strncmp(ba.UnitMask,",R,",3) ) {
-		free(ba.UnitMask);
-		ba.UnitMask=strdup("R");
-	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("for-unit")) ) {
 	    // FIXME: ba.UnitMask shouldn't be a string
 	    value=gh_car(list);
