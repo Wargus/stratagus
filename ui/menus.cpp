@@ -254,7 +254,7 @@ local Menuitem GameMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Game Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 16, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 16, 40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, GameMenuSave, KeyCodeF11} } },
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
@@ -1043,6 +1043,27 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 #endif
 };
 
+local Menuitem SaveGameMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Save Game", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
+	{ input:{ "", 50, 8, MI_TFLAGS_CENTERED, NULL, 4, 22} } },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Save Game", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Save Game", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Save", 106, 27, MBUTTON_GM_HALF, EndMenu, 's'} } },
+    { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'} } },
+    { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'} } },
+
+#else
+    { 0 }
+#endif
+};
 
 /**
 **	FIXME: Ari please look, this is now in TheUI.
@@ -1298,6 +1319,16 @@ global Menu Menus[] = {
 	ImagePanel5,
 	17, 17,
 	KeystrokeHelpMenuItems,
+	NULL,
+    },
+    {
+	// Save Menu
+	176+(14*TileSizeX-384)/2,
+	16+(14*TileSizeY-256)/2,
+	384, 256,
+	ImagePanel3,
+	7, 7,
+	SaveGameMenuItems,
 	NULL,
     },
 
@@ -1882,7 +1913,7 @@ local void GameMenuReturn(void)
 
 local void GameMenuSave(void)
 {
-    SaveAll();	// FIXME: Sample code
+    ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
 local void GameMenuLoad(void)
