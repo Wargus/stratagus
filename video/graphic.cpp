@@ -436,15 +436,12 @@ local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
 /**
 **		Free graphic object.
 */
-local void FreeGraphic8(Graphic* graphic)
+#ifdef USE_SDL_SURFACE
+local void VideoFree(Graphic* graphic)
 {
 #ifdef DEBUG
-#ifdef USE_SDL_SURFACE
 	AllocatedGraphicMemory -=
 		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
-#else
-	AllocatedGraphicMemory -= graphic->Size;
-#endif
 	AllocatedGraphicMemory -= sizeof(Graphic);
 #endif
 
@@ -455,30 +452,41 @@ local void FreeGraphic8(Graphic* graphic)
 	}
 #endif
 
-#ifdef USE_SDL_SURFACE
+	VideoPaletteListRemove(graphic->Surface);
 	SDL_FreeSurface(graphic->Surface);
 	if (graphic->SurfaceFlip) {
 #ifdef DEBUG
 		AllocatedGraphicMemory -=
 			graphic->Width * graphic->Height * graphic->SurfaceFlip->format->BytesPerPixel;
 #endif
+		VideoPaletteListRemove(graphic->SurfaceFlip);
 		SDL_FreeSurface(graphic->SurfaceFlip);
 	}
+	free(graphic);
+}
 #else
+local void FreeGraphic8(Graphic* graphic)
+{
+#ifdef DEBUG
+	AllocatedGraphicMemory -= graphic->Size;
+	AllocatedGraphicMemory -= sizeof(Graphic);
+#endif
+
+#ifdef USE_OPENGL
+	if (graphic->NumTextureNames) {
+		glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
+		free(graphic->TextureNames);
+	}
+#endif
+
 	VideoFreeSharedPalette(graphic->Pixels);
 	if (graphic->Palette) {
 		free(graphic->Palette);
 	}
 	free(graphic->Frames);
-#endif
 	free(graphic);
 }
-
-// FIXME: need frame version
-
-// FIXME: need 16 bit palette version
-
-// FIXME: need zooming version
+#endif
 
 
 /*----------------------------------------------------------------------------
@@ -581,6 +589,7 @@ global void FlipGraphic(Graphic* graphic)
 
 	s = graphic->SurfaceFlip = SDL_ConvertSurface(graphic->Surface,
 		graphic->Surface->format, SDL_SWSURFACE);
+	VideoPaletteListAdd(graphic->SurfaceFlip);
 #ifdef DEBUG
 	AllocatedGraphicMemory +=
 		graphic->Width * graphic->Height * graphic->Surface->format->BytesPerPixel;
@@ -836,9 +845,11 @@ global void ResizeGraphic(Graphic *g, int w, int h)
 #ifdef USE_SDL_SURFACE
 	SDL_UnlockSurface(g->Surface);
 	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
+	VideoPaletteListRemove(g->Surface);
 	SDL_FreeSurface(g->Surface);
 
 	g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
+	VideoPaletteListAdd(g->Surface);
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 	SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
 
