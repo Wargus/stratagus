@@ -717,6 +717,7 @@ local int MissileDrawLevelCompare(const void* v1, const void* v2)
 **	Draw all missiles on map.
 **
 **	@param vp	Viewport pointer.
+**	@param table
 */
 global int FindAndSortMissiles(const Viewport* vp, Missile** table)
 {

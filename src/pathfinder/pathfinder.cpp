@@ -153,10 +153,10 @@ global unsigned char* MakeMatrix(void)
 /**
 **	Mark place in matrix.
 **
-**	@param x	X position of target area
-**	@param y	Y position of target area
-**	@param w	Width of target area
-**	@param h	Height of target area
+**	@param x1	X1 position of target area
+**	@param y1	Y1 position of target area
+**	@param x2	X2 position of target area, range is [x1,x2]
+**	@param y2	Y2 position of target area, range is [y1,y2]
 **	@param matrix	Target area marked in matrix
 **
 **	@returns	depth, -1 unreachable
@@ -442,13 +442,10 @@ global int UnitReachable(Unit* src,const Unit* dst,int range)
 **	Fast search new path.
 **
 **	@param unit	Path for this unit.
-**	@param gx	Goal X position.
-**	@param gy	Goal Y position.
-**	@param ox	Offset in X.
-**	@param oy	Offset in Y.
-**
-**	@param xdp	OUT: Pointer for x direction.
-**	@param ydp	OUT: Pointer for y direction.
+**	@param x1
+**	@param y1
+**	@param x2
+**	@param y2
 **
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
@@ -616,10 +613,10 @@ local void PathTraceBack(const unsigned char* matrix,int add,int x,int y
 **	Complex search new path.
 **
 **	@param unit	Path for this unit.
-**	@param gx	Goal X position.
-**	@param gy	Goal Y position.
-**	@param ox	Offset in X.
-**	@param oy	Offset in Y.
+**	@param x1	
+**	@param y1	
+**	@param x2	
+**	@param y2	
 **
 **	@param path	OUT: part of the path.
 **
@@ -884,8 +881,6 @@ local int ComplexNewPath(Unit* unit,int x1,int y1,int x2,int y2,char* path)
 **	@note	The destination could become negative coordinates!
 **
 **	@param unit	Path for this unit.
-**	@param xdp	Pointer for x direction return.
-**	@param ydp	Pointer for y direction return.
 **
 **      @return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.

@@ -178,7 +178,7 @@
 
     /**
     **	This simulates vararg macros.
-    **	@example
+    **	Example:
     **		DebugLevel0("Test %d\n" _C_ 1);
     **		DebugLevel0("Test %d %d\n" _C_ 1 _C_ 2);
     */
