@@ -3688,6 +3688,8 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 			s1 = strdup(LuaToString(l, -1));
 			lua_pop(l, 1);
 			item->D.Input.reversecolor = s1;
+		} else if (!strcmp(value, "password")) {
+			item->D.Input.iflags = 1;
 		} else {
 			LuaError(l, "Unsupported property: %s" _C_ value);
 		}

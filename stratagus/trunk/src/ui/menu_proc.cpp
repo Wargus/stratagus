@@ -971,7 +971,17 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 		PopClipping();
 		text = mi->D.Input.buffer;
 		if (text) {
+			if (mi->D.Input.iflags & MI_IFLAGS_PASSWORD) {
+				char* p;
+				p = text = strdup(text);
+				while (*p && strcmp(p, "~!_")) {
+					*p++ = '*';
+				}
+			}
 			VideoDrawText(x + 2, y + 2, mi->Font, text);
+			if (mi->D.Input.iflags & MI_IFLAGS_PASSWORD) {
+				free(text);
+			}
 		}
 		if (flags & MenuButtonSelected) {
 			if (flags & MenuButtonDisabled) {
