@@ -1751,8 +1751,6 @@ global void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
     int x;
     int y;
     int i;
-    int w;
-    int h;
     int mask;
 
     //FIXME: vladi: this debug check fails when used for teleporting...
@@ -1770,8 +1768,6 @@ global void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 
 
     mask = UnitMovementMask(unit);
-    w = unit->Type->TileWidth;
-    h = unit->Type->TileHeight;
 
     if (heading < LookingNE || heading > LookingNW) {
 	x += addx - 1;
@@ -1794,28 +1790,28 @@ global void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
     for (;;) {
 startw:
 	for (i = addy; i--; ++y) {
-	    if (CanMoveToMask(x, y, w, h,mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		goto found;
 	    }
 	}
 	++addx;
 starts:
 	for (i = addx; i--; ++x) {
-	    if (CanMoveToMask(x, y, w, h,mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		goto found;
 	    }
 	}
 	++addy;
 starte:
 	for (i = addy; i--; --y) {
-	    if (CanMoveToMask(x, y, w, h,mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		goto found;
 	    }
 	}
 	++addx;
 startn:
 	for (i = addx; i--; --x) {
-	    if (CanMoveToMask(x, y, w, h,mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		goto found;
 	    }
 	}
@@ -1846,8 +1842,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
     int besty;
     int bestd;
     int mask;
-    int w;
-    int h;
     int n;
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
@@ -1865,8 +1859,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 
     DebugCheck(x == -1 || y == -1);
     mask = UnitMovementMask(unit);
-    w = unit->Type->TileWidth;
-    h = unit->Type->TileHeight;
 
     bestd = 99999;
 #ifdef DEBUG
@@ -1877,7 +1869,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
     --x;
     for (;;) {
 	for (i = addy; i--; ++y) {	// go down
-	    if (CanMoveToMask(x, y, w, h, mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < bestd) {
@@ -1889,7 +1881,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	}
 	++addx;
 	for (i = addx; i--; ++x) {	// go right
-	    if (CanMoveToMask(x, y, w, h, mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < bestd) {
@@ -1901,7 +1893,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	}
 	++addy;
 	for (i = addy; i--; --y) {	// go up
-	    if (CanMoveToMask(x, y, w, h, mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < bestd) {
@@ -1913,7 +1905,7 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	}
 	++addx;
 	for (i = addx; i--; --x) {	// go left
-	    if (CanMoveToMask(x, y, w, h, mask)) {
+	    if (CheckedCanMoveToMask(x, y, mask)) {
 		n = MapDistance(gx, gy, x, y);
 		DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 		if (n < bestd) {
@@ -2322,13 +2314,13 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		    continue;
 		}
 		//	Look if found what was required.
-		if (rvresult ? CanMoveToMask(x, y, 1, 1, resmask) : !CanMoveToMask(x, y, 1, 1, resmask)) {
+		if (rvresult ? CanMoveToMask(x, y, resmask) : !CanMoveToMask(x, y, resmask)) {
 		    *px = x;
 		    *py = y;
 		    DebugLevel3("Found it! %X %X\n" _C_ TheMap.Fields[x+y*TheMap.Width].Flags _C_ resmask);
 		    return 1;
 		}
-		if (CanMoveToMask(x, y, 1, 1, movemask)) {	// reachable
+		if (CanMoveToMask(x, y, movemask)) {	// reachable
 		    *m = 1;
 		    points[wp].X = x;		// push the point
 		    points[wp].Y = y;
@@ -2390,8 +2382,6 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
     int ep;
     int i;
     int w;
-    int uw;
-    int uh;
     int n;
     unsigned char* m;
     unsigned char* matrix;
@@ -2419,8 +2409,6 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
     matrix += w + w + 2;
     //  Unit movement mask
     mask = UnitMovementMask(unit);
-    uw = unit->Type->TileWidth;
-    uh = unit->Type->TileHeight;
     //  Ignore all units along the way. Might seem wierd, but otherwise
     //  peasants would lock at a mine with a lot of workers.
     mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit);
@@ -2472,7 +2460,7 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 		    }
 		}
 
-		if (CanMoveToMask(x, y, uw, uh, mask)) {	// reachable
+		if (CanMoveToMask(x, y, mask)) {	// reachable
 		    *m = 1;
 		    points[wp].X = x;		// push the point
 		    points[wp].Y = y;
@@ -2538,8 +2526,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
     int ep;
     int i;
     int w;
-    int uw;
-    int uh;
     int nodes_searched;
     unsigned char* m;
     unsigned char* matrix;
@@ -2561,8 +2547,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
     matrix += w + w + 2;
     //  Unit movement mask
     mask = UnitMovementMask(unit);
-    uw = unit->Type->TileWidth;
-    uh = unit->Type->TileHeight;
     //  Ignore all units along the way. Might seem wierd, but otherwise
     //  peasants would lock at a mine with a lot of workers.
     mask &= ~(MapFieldLandUnit | MapFieldSeaUnit | MapFieldAirUnit | MapFieldBuilding);
@@ -2606,7 +2590,7 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 		    DebugLevel3("Found a resource deposit at %d,%d\n" _C_ x _C_ y);
 		    return depot;
 		}
-		if (CanMoveToMask(x, y, uw, uh, mask)) {	// reachable
+		if (CanMoveToMask(x, y, mask)) {	// reachable
 		    *m = 1;
 		    points[wp].X = x;		// push the point
 		    points[wp].Y = y;
