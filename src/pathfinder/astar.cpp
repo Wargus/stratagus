@@ -627,7 +627,7 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 */
 global int NextPathElement(Unit* unit,int* pxd,int *pyd)
 {
-    static int LastGameCycle;
+    static unsigned long LastGameCycle;
     static int UnreachableCounter;
     int result;
 
