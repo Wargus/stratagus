@@ -211,8 +211,8 @@ global void ShowIntro(const Intro *intro)
 
     CallbackMusicOff();
     StopMusic();
-    if( intro->VoiceFile1 ) {
-	PlayFile(intro->VoiceFile1);
+    if( intro->VoiceFile[0] ) {
+	PlayFile(intro->VoiceFile[0]);
     }
 
     x=(VideoWidth-640)/2;
@@ -220,8 +220,9 @@ global void ShowIntro(const Intro *intro)
     IntroNoEvent=1;
     while( IntroNoEvent ) {
 	y=(VideoHeight-480)/2;
-	if( !PlayingMusic && !stage && intro->VoiceFile2 ) {
-	    PlayFile(intro->VoiceFile2);
+	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
+		intro->VoiceFile[stage] ) {
+	    PlayFile(intro->VoiceFile[stage]);
 	    stage++;
 	}
 	VideoLockScreen();
