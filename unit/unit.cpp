@@ -2925,6 +2925,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 {
     UnitType* type;
     Unit* goal;
+    unsigned long lastattack;
 
     if (!damage) {			// Can now happen by splash damage
 	DebugLevel0Fn("Warning no damage, try to fix by caller?\n");
@@ -2953,7 +2954,11 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
     }
 
     type = target->Type;
-    if (!target->Attacked) {
+    lastattack = target->Attacked;
+    target->Attacked = GameCycle ? GameCycle : 1;
+
+
+    if (!lastattack || lastattack + 2 * CYCLES_PER_SECOND < GameCycle) {
 	// NOTE: perhaps this should also be moved into the notify?
 	if (target->Player == ThisPlayer) {
 	    // FIXME: Problem with load+save.
@@ -2982,7 +2987,6 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	    AiHelpMe(attacker, target);
 	}
     }
-    target->Attacked = 7;
 
     if (target->HP <= damage) {	// unit is killed or destroyed
 	//  increase scores of the attacker, but not if attacking it's own units.
@@ -3535,7 +3539,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "'not-seen ");
     }
     CLprintf(file, "'direction %d\n  ", unit->Direction);
-    CLprintf(file, "'attacked %d\n ", unit->Attacked);
+    CLprintf(file, "'attacked %lu\n ", unit->Attacked);
     CLprintf(file, " 'current-sight-range %d", unit->CurrentSightRange);
     if (unit->Burning) {
 	CLprintf(file, " 'burning");

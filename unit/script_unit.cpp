@@ -612,6 +612,7 @@ local SCM CclUnit(SCM list)
 	    unit->Direction = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("attacked"))) {
+	    // FIXME : unsigned long should be better handled
 	    unit->Attacked = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("burning"))) {
@@ -663,6 +664,7 @@ local SCM CclUnit(SCM list)
 	    unit->Kills = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
+	    // FIXME : unsigned long should be better handled
 	    unit->TTL = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("bloodlust"))) {
