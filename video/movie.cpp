@@ -208,10 +208,17 @@ int PlayMovie(const char* name)
 
 	data->File = f;
 
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = VideoWidth;
-	rect.h = VideoHeight;
+	if (data->tinfo.frame_width * 3 / 4 > data->tinfo.frame_height) {
+		rect.w = VideoWidth;
+		rect.h = VideoWidth * data->tinfo.frame_height / data->tinfo.frame_width;
+		rect.x = 0;
+		rect.y = (VideoHeight - rect.h) / 2;
+	} else {
+		rect.w = VideoHeight * data->tinfo.frame_width / data->tinfo.frame_height;
+		rect.h = VideoHeight;
+		rect.x = (VideoWidth - rect.w) / 2;
+		rect.y = 0;
+	}
 
 	yuv_overlay = SDL_CreateYUVOverlay(data->tinfo.frame_width,
 		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
@@ -240,6 +247,9 @@ int PlayMovie(const char* name)
 	callbacks.KeyReleased = MovieCallbackKeyReleased;
 	callbacks.KeyRepeated = MovieCallbackKeyRepeated;
 	callbacks.NetworkEvent = NetworkEvent;
+
+	Invalidate();
+	RealizeVideoMemory();
 
 	MovieStop = 0;
 	start_ticks = SDL_GetTicks();
