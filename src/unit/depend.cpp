@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name depend.c	-	The units/upgrade dependencies */
+/**@name depend.c - The units/upgrade dependencies */
 //
-//	(c) Copyright 2000-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
-//	                           and Jimmy Salmon
+//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -47,23 +47,23 @@
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 	/// All dependencies hash
 local DependRule* DependHash[101];
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Add a new dependency. If already exits append to and rule.
+**  Add a new dependency. If already exits append to and rule.
 **
-**		@param target		Target of the dependency.
-**		@param required		Requirement of the dependency.
-**		@param count		Amount of the required needed.
-**		@param or_flag		Start of or rule.
+**  @param target    Target of the dependency.
+**  @param required  Requirement of the dependency.
+**  @param count     Amount of the required needed.
+**  @param or_flag   Start of or rule.
 */
 global void AddDependency(const char* target, const char* required, int count,
 	int or_flag)
@@ -74,7 +74,7 @@ global void AddDependency(const char* target, const char* required, int count,
 	int hash;
 
 	//
-	//		Setup structure.
+	//  Setup structure.
 	//
 	if (!strncmp(target, "unit-", 5)) {
 		// target string refers to unit-xxx
@@ -92,12 +92,12 @@ global void AddDependency(const char* target, const char* required, int count,
 	hash = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
 
 	//
-	//		Find correct hash slot.
+	//  Find correct hash slot.
 	//
-	if ((node = DependHash[hash])) {		// find correct entry
+	if ((node = DependHash[hash])) {  // find correct entry
 		while (node->Type != rule.Type ||
 				node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {				// end of list
+			if (!node->Next) {  // end of list
 				temp = malloc(sizeof(DependRule));
 				temp->Next = NULL;
 				temp->Rule = NULL;
@@ -109,7 +109,7 @@ global void AddDependency(const char* target, const char* required, int count,
 			}
 			node = node->Next;
 		}
-	} else {								// create new slow
+	} else {  // create new slow
 		node = malloc(sizeof(DependRule));
 		node->Next = NULL;
 		node->Rule = NULL;
@@ -119,7 +119,7 @@ global void AddDependency(const char* target, const char* required, int count,
 	}
 
 	//
-	//		Adjust count.
+	//  Adjust count.
 	//
 	if (count < 0 || count > 255) {
 		DebugLevel0Fn("wrong count `%d' range 0 .. 255\n" _C_ count);
@@ -131,7 +131,7 @@ global void AddDependency(const char* target, const char* required, int count,
 	temp->Next = NULL;
 	temp->Count = count;
 	//
-	//		Setup structure.
+	//  Setup structure.
 	//
 	if (!strncmp(required, "unit-", 5)) {
 		// required string refers to unit-xxx
@@ -149,12 +149,12 @@ global void AddDependency(const char* target, const char* required, int count,
 	}
 
 	if (or_flag) {
-			// move rule to temp->next
-		temp->Next = node->Rule;				// insert rule
+		// move rule to temp->next
+		temp->Next = node->Rule;  // insert rule
 		node->Rule = temp;
 	} else {
-			// move rule to temp->rule
-		temp->Rule = node->Rule;				// insert rule
+		// move rule to temp->rule
+		temp->Rule = node->Rule;  // insert rule
 
 		// also Link temp to old "or" list
 		if (node->Rule) {
@@ -181,12 +181,12 @@ global void AddDependency(const char* target, const char* required, int count,
 }
 
 /**
-**		Check if this upgrade or unit is available.
+**  Check if this upgrade or unit is available.
 **
-**		@param player		For this player available.
-**		@param target		Unit or Upgrade.
+**  @param player  For this player available.
+**  @param target  Unit or Upgrade.
 **
-**		@return				True if available, false otherwise.
+**  @return        True if available, false otherwise.
 */
 global int CheckDependByIdent(const Player* player, const char* target)
 {
@@ -196,7 +196,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
 	int i;
 
 	//
-	//		first have to check, if target is allowed itself
+	//  first have to check, if target is allowed itself
 	//
 	if (!strncmp(target, "unit-", 5)) {
 		// target string refers to unit-XXX
@@ -218,14 +218,14 @@ global int CheckDependByIdent(const Player* player, const char* target)
 	}
 
 	//
-	//		Find rule
+	//  Find rule
 	//
 	i = (int)(long)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash));
 
-	if ((node = DependHash[i])) {		// find correct entry
+	if ((node = DependHash[i])) {  // find correct entry
 		while (node->Type != rule.Type ||
 				node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {				// end of list
+			if (!node->Next) {  // end of list
 				return 1;
 			}
 			node = node->Next;
@@ -235,7 +235,7 @@ global int CheckDependByIdent(const Player* player, const char* target)
 	}
 
 	//
-	//		Prove the rules
+	//  Prove the rules
 	//
 	node = node->Rule;
 
@@ -258,24 +258,24 @@ global int CheckDependByIdent(const Player* player, const char* target)
 			}
 			temp = temp->Rule;
 		}
-		return 1;								// all rules matches.
+		return 1;  // all rules matches.
 
 try_or:
 		node = node->Next;
 	}
 
-	return 0;										// no rule matches
+	return 0;  // no rule matches
 }
 
 /**
-**		Initialize unit and upgrade dependencies.
+**  Initialize unit and upgrade dependencies.
 */
 global void InitDependencies(void)
 {
 }
 
 /**
-**		Clean up unit and upgrade dependencies.
+**  Clean up unit and upgrade dependencies.
 */
 global void CleanDependencies(void)
 {
@@ -289,7 +289,7 @@ global void CleanDependencies(void)
 
 	for (u = 0; u < sizeof(DependHash) / sizeof(*DependHash); ++u) {
 		node = DependHash[u];
-		while (node) {						// all hash links
+		while (node) {  // all hash links
 			// All or cases
 
 			rule = node->Rule;
@@ -315,13 +315,13 @@ global void CleanDependencies(void)
 }
 
 /*----------------------------------------------------------------------------
---		Ccl part of dependencies
+--  Ccl part of dependencies
 ----------------------------------------------------------------------------*/
 
 /**
-**		Define a new dependency.
+**  Define a new dependency.
 **
-**		@param list		List of the dependency.
+**  @param list  List of the dependency.
 */
 local int CclDefineDependency(lua_State* l)
 {
@@ -342,7 +342,7 @@ local int CclDefineDependency(lua_State* l)
 	++j;
 
 	//
-	//		All or rules.
+	//  All or rules.
 	//
 	or_flag = 0;
 	for (; j < args; ++j) {
@@ -385,11 +385,11 @@ local int CclDefineDependency(lua_State* l)
 }
 
 /**
-**		Get the dependency.
+**  Get the dependency.
 **
-**		@todo not written.
+**  @todo not written.
 **
-**		@param target		Unit type or upgrade.
+**  @param target  Unit type or upgrade.
 */
 local int CclGetDependency(lua_State* l __attribute__((unused)))
 {
@@ -399,11 +399,11 @@ local int CclGetDependency(lua_State* l __attribute__((unused)))
 }
 
 /**
-**		Check the dependency.
+**  Check the dependency.
 **
-**		@todo not written.
+**  @todo not written.
 **
-**		@param target		Unit type or upgrade.
+**  @param target  Unit type or upgrade.
 */
 local int CclCheckDependency(lua_State* l __attribute__((unused)))
 {
@@ -413,7 +413,7 @@ local int CclCheckDependency(lua_State* l __attribute__((unused)))
 }
 
 /**
-**		Register CCL features for dependencies.
+**  Register CCL features for dependencies.
 */
 global void DependenciesCclRegister(void)
 {
