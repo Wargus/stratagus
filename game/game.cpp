@@ -130,34 +130,6 @@ global void LoadMap(const char* filename,WorldMap* map)
     LoadPud(filename,map);
 }
 
-/**
-**	Save a map.
-**
-**	@param file	Output file.
-*/
-global void SaveMap(FILE* file)
-{
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: map $Id$\n");
-
-    fprintf(file,"(freecraft-map\n");
-
-    // FIXME: Need version number here!
-    fprintf(file,"  '(version %d.%d)\n",0,0);
-    fprintf(file,"  '(description \"Saved\")\n");
-    fprintf(file,"  '(terrain %d \"%s\")\n"
-	    ,TheMap.Terrain,Tilesets[TheMap.Terrain].Name);
-    fprintf(file,"  '(tiles #(\n");
-    fprintf(file,"  )\n");
-
-    fprintf(file,")\n");
-
-    fprintf(file,"(the-map\n");
-    fprintf(file,"  (%d %d)\n",TheMap.Width,TheMap.Height);
-    fprintf(file,"  %d\n",TheMap.NoFogOfWar);
-    fprintf(file,")\n");
-}
-
 /*----------------------------------------------------------------------------
 --	Game creation
 ----------------------------------------------------------------------------*/
