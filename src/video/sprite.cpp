@@ -2076,8 +2076,8 @@ local void VideoDraw8to16ClipTrans50(const Graphic* sprite, unsigned frame, int 
     
 //Added by Mohydine
 
-    VMemType16* p;
-    p = VideoMemory16 + y * VideoWidth + x;
+//    VMemType16* p;
+//    p = VideoMemory16 + y * VideoWidth + x;
 
 //Added by Mohydine
     //
@@ -4709,6 +4709,9 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawX = VideoDraw8to8X;
 	    GraphicSprite8Type.DrawClipX = VideoDraw8to8ClipX;
 	    GraphicSprite8Type.DrawShadowClipX = VideoDraw8to8ShadowClipX;
+	    GraphicSprite8Type.DrawClipTrans50 = VideoDraw8to8ClipTrans50;
+	    GraphicSprite8Type.DrawXTrans50 = VideoDraw8to8XTrans50;
+	    GraphicSprite8Type.DrawClipXTrans50 = VideoDraw8to8ClipXTrans50;
             VideoDrawRawClip = VideoDrawRaw8Clip;
 	    break;
 
@@ -4720,6 +4723,9 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawX = VideoDraw8to16X;
 	    GraphicSprite8Type.DrawClipX = VideoDraw8to16ClipX;
 	    GraphicSprite8Type.DrawShadowClipX = VideoDraw8to16ShadowClipX;
+	    GraphicSprite8Type.DrawClipTrans50 = VideoDraw8to16ClipTrans50;
+	    GraphicSprite8Type.DrawXTrans50 = VideoDraw8to16XTrans50;
+	    GraphicSprite8Type.DrawClipXTrans50 = VideoDraw8to16ClipXTrans50;
             VideoDrawRawClip = VideoDrawRaw16Clip;
 	    break;
 
@@ -4730,6 +4736,9 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawX = VideoDraw8to24X;
 	    GraphicSprite8Type.DrawClipX = VideoDraw8to24ClipX;
 	    GraphicSprite8Type.DrawShadowClipX = VideoDraw8to24ShadowClipX;
+	    GraphicSprite8Type.DrawClipTrans50 = VideoDraw8to24ClipTrans50;
+	    GraphicSprite8Type.DrawXTrans50 = VideoDraw8to24XTrans50;
+	    GraphicSprite8Type.DrawClipXTrans50 = VideoDraw8to24ClipXTrans50;
             VideoDrawRawClip = VideoDrawRaw24Clip;
 	    break;
 
@@ -4740,6 +4749,9 @@ global void InitSprite(void)
 	    GraphicSprite8Type.DrawX = VideoDraw8to32X;
 	    GraphicSprite8Type.DrawClipX = VideoDraw8to32ClipX;
 	    GraphicSprite8Type.DrawShadowClipX = VideoDraw8to32ShadowClipX;
+	    GraphicSprite8Type.DrawClipTrans50 = VideoDraw8to32ClipTrans50;
+	    GraphicSprite8Type.DrawXTrans50 = VideoDraw8to32XTrans50;
+	    GraphicSprite8Type.DrawClipXTrans50 = VideoDraw8to32ClipXTrans50;
             VideoDrawRawClip = VideoDrawRaw32Clip;
 	    break;
 
