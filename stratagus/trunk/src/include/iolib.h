@@ -46,10 +46,6 @@
 #ifdef USE_BZ2LIB
 #include <bzlib.h>
 #endif
-
-#ifdef USE_ZZIPLIB
-#include <zzip.h>
-#endif
 #undef DrawIcon
 #undef EndMenu
 #undef FindResource
@@ -68,7 +64,7 @@ typedef struct _filelist_ {
 } FileList;
 
 
-#if 0 && !defined(USE_ZLIB) && !defined(USE_BZ2LIB) && !defined(USE_ZZIPLIB)
+#if 0 && !defined(USE_ZLIB) && !defined(USE_BZ2LIB)
 
 // FIXME: This is broken, should write a CLopen for plain files
 // FIXME: but we can avoid it anyway.
@@ -81,7 +77,7 @@ typedef struct _filelist_ {
 #define CLflush(file)               fflush(file)
 #define CLclose(file)               fclose(file)
 
-#else  // !USE_ZLIB && !USE_BZ2LIB && !defined(USE_ZZIPLIB)
+#else  // !USE_ZLIB && !USE_BZ2LIB
 
 /**
 **  Defines a library file
@@ -97,9 +93,6 @@ typedef struct _CL_File_ {
 #ifdef USE_BZ2LIB
 	BZFILE* cl_bz;  /// bzip2 file pointer
 #endif // !USE_BZ2LIB
-#ifdef USE_ZZIPLIB
-	ZZIP_FILE* cl_zz; /// zzip file pointer
-#endif // !USE_ZZIPLIB
 } CLFile;
 
 enum {
@@ -107,7 +100,6 @@ enum {
 	CLF_TYPE_PLAIN,    /// plain text file handle
 	CLF_TYPE_GZIP,     /// gzip file handle
 	CLF_TYPE_BZIP2,    /// bzip2 file handle
-	CLF_TYPE_ZZIP,     /// zzip file handle
 };
 
 #define CL_OPEN_READ 0x1
@@ -133,7 +125,7 @@ extern int CLseek(CLFile *file, long offset, int whence);
 extern int CLprintf(CLFile *file, char *format, ...);
 
 
-#endif // USE_ZLIB || USE_BZ2LIB || USE_ZZIPLIB
+#endif // USE_ZLIB || USE_BZ2LIB
 
 	/// Build libary path name
 extern char* LibraryFileName(const char* file,char* buffer);
