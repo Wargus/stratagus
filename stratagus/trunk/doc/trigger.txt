@@ -10,66 +10,21 @@
     (C) Copyright 2002-2003 by The FreeCraft Project. Distributed under the GPL.
     $Id$
 
-Triggers:
----------
 
-Here is the suggested syntax. (A GUI trigger editor is needed later)
 
-(add-trigger condition action)
-	- creates a new trigger
 
-'condition' can be
-	(lambda () (or (and condition1 conditon2 ...)
-	   (and condition3 condition4 ...)))
-	...
-	- condition1 and condition2 and ... must be true or condition3
-	  and condition4 and ... must be true to execute the action.
+******************************** ATTENTION ***********************************
+*
+*  THIS FILE ONLY CONTAINS SUGGESTIONS FOR FUTURE TRIGGERS.  FOR DOCUMENTATION
+*  ON TRIGGERS SEE doc/ccl/triggers.html.
+*
+******************************************************************************
 
-For the start the condition can be any CCL (scheme) condition, but later
-the condition are parsed and converted into an internal format. Not all
-triggers must be checked always. Also a fixed format is better for the
-trigger editor.
 
-'action' can be any valid scheme (CCL) statement and is executed if
-the condition is true.
 
-Condition and action are wrapped as lambda (function in scheme).
-    (lambda () (action-victory))
 
-For the following syntax I use:
-
-<player>
-	0 .. 16	Player number
-	'any    Matches any player
-	'all	All players (Not used)
-	'this	Player on the local computer, Human player in the campaign.
-<resource>
-	'gold 'wood 'oil 'ore 'stone 'coal	Quantity in store
-	'all					Sum of all resources in store
-	'any					Any resource
-<unit>
-	'unit-name	Unit type of this name
-	'any		Matches any unit type
-	'all		All units (sum of units and buildings)
-	'units		All non building units
-	'building	All building units
-<op>
-	'==		operator equal
-	'>		operator greater than
-	'>=		operator greater than or equal
-	'<		operator less than
-	'<=		operator less than or equal
-<quantity>
-	0 ... oo	Number for the quantity
-<location>
-	'(x y)		Point in tile coordinates on the map
-	'(x1 y1 x2 y2)	A rectangle in tile coordinates on the map
 
 -- resource
-(if-resource <player> <op> <quantity> <resource>)
-	o player has the quantity of resources
-        This condition is used to specify how many or how little resources
-        (gold, oil, lumber) a player must have for the action.
 (if-resource-least <player> <op> <quantity> <resource>)
 	o player has the least quantity of resources
         This condition is used to specify how many or how little resources
@@ -79,17 +34,10 @@ For the following syntax I use:
         This condition is used to specify how many or how little resources
         (gold, oil, lumber) a player must have at most for the action.
 -- unit
-(if-unit <player> <op> <quantity> <unit>)
-	o player has the quantity of unit-type
-        Which unit and how many units must control the player for the action.
 (if-near <player> <op> <quantity> <unit> <location>)
 	o player has the quantity of unit-type near to location
         Which unit and how many units must the player have near to a location
         for the action.
-(if-near-unit <player> <op> <quantity> <unit> <unit>)
-	o player has the quantity of unit-type near to unit-type
-        Which unit and how many units must the player have near to an other
-        unit for the action.
 (if-unit-least <player> <op> <quantity> <unit>)
 	o player has the least quantity of unit-type
         Which unit and how many units must control the player at least for
@@ -114,17 +62,10 @@ For the following syntax I use:
 	o player has the most quantity of unit-type near to unit-type
 	Which unit and how many units must the player at most have near to
         an other unit for the action.
-(if-rescued-near-unit <player> <op> <quantity> <unit> <unit>)
-        o player has the quantity of rescued unit-type near to unit-type
-        Which rescued unit and how many units must the player have near to a
-        unit for the action.
 (if-deaths <player> <op> <unit>)
 	o player has quantity of unit dies
         Which quantity of the unit must be lost by the player for the
 	action.
-(if-kills <player> <op> <quantity>)
-	o player has quantity of kills
-        Which quantity must be killed by the player for the action.
 (if-kills-least <player> <op> <unit>)
 	o player has the least quantity of unit-type killed
         The player has killed the quantity of the unit at least for the
@@ -132,85 +73,9 @@ For the following syntax I use:
 (if-kills-most <player> <op> <unit>)
 	o player has the most quantity of unit killed
         The player has killed the quantity of the unit at most for the action.
-(if-score <player> <op> <quantity>)
-	o player has the quantity of score
-        If the player reaches the quantity of score the action is executed.
-(if-opponents <player> <op> <quantity>)
-	o player has quantity opponents remaining in game
-        If less than quantity opponents of the player remaining in game the
-	action is executed.
-(if-elapsed <op> <quantity>)
-	o game run for duration
-        If the game run for the duration game cycles the action is executed.
-(if-timer <op> <quantity>)
-	o timer reaches quantity
-        If the timer reaches quantity the action is executed.
 
 The most are needed if a player should win for a number kills, but must have
 more kills than all other players.
 The least are needed if a special action should be done for the weakest
 player.
 
-The only actions I support for the start are.
-
-(action-victory)
-	The condition player is set to victory.
-(action-defeat)
-	The condition player is set to defeat.
-(action-draw)
-	The condition player is set to draw.
-(action-set-timer <# cycles> <increasing>)
-	Set the timer to a number of cycles and 1 for increasing,
-	0 for decreasing.
-(action-start-timer)
-	Start the timer.
-(action-stop-timer)
-	Stop the timer.
-(add-message "Bla bla bla")
-	Show message in message area, it is not automatically split at the
-	edge of the screen!
-(play-file "voice.ogg")
-	Play a story voice file.
-
-Some examples:
-
-The default triggers for single player:
-
-;;
-;;	If the player on the console lost all his units he lose.
-;;
-(add-trigger
-  ;; Condition
-  (lambda () (if-unit 'this '== 0 'all))
-  ;; Action
-  (lambda () (action-defeat)))
-;;
-;;	If the player on the console has killed all his opponents he won.
-;;
-(add-trigger
-  ;; Condition
-  (lambda () (if-opponents 'this '== 0))
-  ;; Action
-  (lambda () (action-victory)))
-
-This is an example for a bring to goal trigger:
-
-;;
-;;	Person on the console must bring an archer to the circle of power
-;;	to win the game.
-;;
-(add-trigger
-  ;; Condition
-  (lambda () (and (if-unit 1 '== 0 'unit-archer)
-    (if-near-unit 'this '== 1 'unit-archer 'unit-circle-of-power)) )
-  ;; Action
-  (lambda () (action-victory)))
-
-;;
-;;	Player lose if all units are killed.
-;;
-(add-trigger
-  ;; Condition
-  (lambda () (if-unit 'this '== 0 'all))
-  ;; Action
-  (lambda () (action-defeat)))
