@@ -245,6 +245,8 @@ global Unit* TargetOnMapTile(const Unit* source,int tx,int ty)
 	type=unit->Type;
 	if( tx<unit->X || tx>=unit->X+type->TileWidth
 		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
+	    // When does that happen???
+	    DebugLevel0("This is a wierd world");
 	    continue;
 	}
 	if( !CanTarget(source->Type,unit->Type) ) {

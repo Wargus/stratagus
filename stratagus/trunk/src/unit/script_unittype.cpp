@@ -377,6 +377,13 @@ local SCM CclDefineUnitType(SCM list)
 
 	} else if( gh_eq_p(value,gh_symbol2scm("building")) ) {
 	    type->Building=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("builder-inside")) ) {
+	    type->BuilderInside=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("builder-lost")) ) {
+	    type->BuilderLost=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("auto-build-rate")) ) {
+	    type->AutoBuildRate=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("shore-building")) ) {
 	    type->ShoreBuilding=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("land-unit")) ) {

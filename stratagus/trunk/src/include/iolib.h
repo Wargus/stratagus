@@ -67,12 +67,14 @@ typedef struct _filelist_ {
 } FileList;
 
 
-#if !defined(USE_ZLIB) && !defined(USE_BZ2LIB) && !defined(USE_ZZIPLIB)
+#if 0 && !defined(USE_ZLIB) && !defined(USE_BZ2LIB) && !defined(USE_ZZIPLIB)
 
+// FIXME: This is broken, should write a CLopen for plain files
+// FIXME: but we can avoid it anyway.
 // use plain file routines directly
 
 #define CLFile				FILE
-#define CLopen(file)			fopen(file,"rb")
+#define CLopen(file,whatever)		fopen(file,"rwb")
 #define CLread(file,buf,len)		fread(buf,1,len,file)
 #define CLseek(file,offset,whence)	fseek(file,offset,whence)
 #define CLclose(file)			fclose(file)

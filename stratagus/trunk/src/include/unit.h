@@ -716,13 +716,13 @@ extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern unsigned long ShowOrdersCount;	/// Show orders for some time
 extern int HitPointRegeneration;	/// Hit point regeneration for all units
-extern int XpDamage;				/// unit XP adds more damage to attacks
+extern int XpDamage;			/// unit XP adds more damage to attacks
 extern char EnableTrainingQueue;	/// Config: training queues enabled
 extern char EnableBuildingCapture;	/// Config: building capture enabled
 extern char RevealAttacker;		/// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
-   /// Draw the selection
-extern void (*DrawSelection)(const Unit*,const UnitType*,int,int);
+extern void DrawUnitSelection(const Unit*);
+extern void (*DrawSelection)(int,int,int,int,int);
 
 //	in selection.c
 extern Unit* Selected[MaxSelectable];	/// currently selected units
@@ -909,23 +909,17 @@ extern void DeadCacheRemove(Unit* unit,Unit** List );
 //	in unit_draw.c
 //--------------------
     /// Draw nothing around unit
-extern void DrawSelectionNone(const Unit* unit,const UnitType* type
-	,int x,int y);
+extern void DrawSelectionNone(int,int,int,int,int);
     /// Draw circle around unit
-extern void DrawSelectionCircle(const Unit* unit,const UnitType* type
-	,int x,int y);
+extern void DrawSelectionCircle(int,int,int,int,int);
     /// Draw circle filled with alpha around unit
-extern void DrawSelectionCircleWithTrans(const Unit* unit,const UnitType* type
-	,int x,int y);
+extern void DrawSelectionCircleWithTrans(int,int,int,int,int);
     /// Draw rectangle around unit
-extern void DrawSelectionRectangle(const Unit* unit,const UnitType* type
-	,int x,int y);
+extern void DrawSelectionRectangle(int,int,int,int,int);
     /// Draw rectangle filled with alpha around unit
-extern void DrawSelectionRectangleWithTrans(const Unit* unit
-	,const UnitType* type,int x,int y);
+extern void DrawSelectionRectangleWithTrans(int,int,int,int,int);
     /// Draw corners around unit
-extern void DrawSelectionCorners(const Unit* unit,const UnitType* type
-	,int x,int y);
+extern void DrawSelectionCorners(int,int,int,int,int);
 
     /// Register CCL decorations features
 extern void DecorationCclRegister(void);

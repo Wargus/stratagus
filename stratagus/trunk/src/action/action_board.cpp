@@ -66,6 +66,8 @@ local int MoveToTransporter(Unit* unit)
     i=DoActionMove(unit);
     // We have to reset a lot, or else they will circle each other and stuff.
     if (x!=unit->X||y!=unit->Y) {
+	unit->Orders[0].RangeX=1;
+	unit->Orders[0].RangeY=1;
         NewResetPath(unit);
     }
     // New code has this as default.

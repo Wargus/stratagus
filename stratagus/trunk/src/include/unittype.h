@@ -583,6 +583,9 @@ struct _unit_type_ {
     unsigned CanCastSpell : 1;		/// Unit is able to use spells.
     unsigned CanAttack : 1;		/// Unit can attack.
     unsigned CanRepair : 1;		/// Unit can repair .
+    unsigned BuilderInside : 1;		/// The builder goes inside during the build.
+    unsigned BuilderLost : 1;		/// The builder is lost after the build.
+    unsigned AutoBuildRate;		/// The rate at which the building builds itself
     unsigned Tower : 1;			/// Unit can attack, but not move.
     unsigned Hero : 1;			/// Is hero only used for triggers .
     unsigned Volatile : 1;		/// Invisiblity/unholy armor kills unit.
