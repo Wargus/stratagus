@@ -1139,13 +1139,14 @@ global void MissileHit(Missile* missile)
 
 /**
 **	Handle action for a missile.
+**
+**	@param missile	Missile pointer.
 */
 local void MissileAction(Missile* missile)
 {
     int neg;
 
-    //StephanR FIXME:needed here?
-    //	Johns FIXME: this is needed if the missiles moves or disappears.
+    // Mark missile area on screen to be drawn, if missile moves or disappears.
     CheckMissileToBeDrawn(missile);
 
     switch( missile->Type->Class ) {
