@@ -399,7 +399,7 @@ Sample* LoadVorbis(const char* name,int flags)
 		return NULL;
 	}
 
-	data = malloc(sizeof(OggData));
+	data = calloc(1, sizeof(OggData));
 
 	if (OggInit(f, data) || !data->audio) {
 		free(data);
