@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+	<!--
+	----	(c) Copyright 2004 by Crestez Leonard
+
+	----    This program is free software; you can redistribute it and/or modify
+	----    it under the terms of the GNU General Public License as published by
+	----    the Free Software Foundation; version 2 dated June, 1991.
+	----
+	----    This program is distributed in the hope that it will be useful,
+	----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+	----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	----    GNU General Public License for more details.
+	----
+	----    You should have received a copy of the GNU General Public License
+	----    along with this program; if not, write to the Free Software
+	----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+	----    02111-1307, USA.
+	-->
+	<title>Stratagus Scripting Language Description: Content</title>
+	<meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+	<meta name="Author" content="cleonard@go.ro">
+	<meta name="Keyword" content="scripting">
+	<meta name="Description" content="Documentation for Stratagus.Players.*">
+</head><body>
+    <h1>Stratagus Scripting Language: Stratagus.Players.*</h1>
+	<p><b>
+		(C) Copyright 1998-2004 by The Stratagus Project. Distributed under the
+		<a href="../gpl.html">"GNU General Public License"</a>
+	</b></p>
+	<hr>
+	<a href="../faq.html">FAQ</a> 
+	<a href="script.html">Script main</a> 
+	<a href="script-index.html">Script index</a> 
+	<hr>
+	<a href="stratagus.html">Stratagus.*</a>
+	<a href="missiletypes.html">Stratagus.MissileTypes.*</a>
+	<a href="players.html">Stratagus.Players.*</a>
+	<hr>
+	<dl>
+	<!-- SCRIPT -->
+	    <a name="Stratagus.Players">
+	    <dt><b>Stratagus.Players</b></dt>
+		    <dd><b>Type:</b> array </dd>
+			<dd>This is the interface to Player information in the game. You can
+			only index it with an integer. There is a max of 16 players right now.</dd>
+	    <a name="Stratagus.Players[].Allied">
+	    <dt><b>Stratagus.Players[].Allied</b></dt>
+		    <dd><b>Type:</b> bool array </dd>
+			<dd>This boolean array represents the allied status of the player.
+			Players[1].Allied[2] is true if player 1 is allied with player 2.
+			This is not reciprocal, if player 1 is allied with 2 it will only
+			stop his units attacking, player 2 doesn't have to do the same.</dd> 
+		<a name="Stratagus.Players[].BuildingLimit">
+	    <dt><b>Stratagus.Players[].BuildingLimit</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Maximum number of buildings the player is allowed to have.</dd>
+	    <a name="Stratagus.Players[].Demand">
+	    <dt><b>Stratagus.Players[].Demand</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Amount of food consumed by the player's units.</dd>
+		<a name="Stratagus.Players[].Enemy">
+	    <dt><b>Stratagus.Players[].Enemy</b></dt>
+		    <dd><b>Type:</b> bool array </dd>
+			<dd>This boolean array represents the enemy status of the player.
+			Players[1].Enemy[2] is true if player 1 is enemy with player 2.
+			This does not have to be reciprocal, see
+			<a href="players.html#Stratagus.Players[].Allied">Allied</a>.</dd>
+		<a name="Stratagus.Players[].Name">
+	    <dt><b>Stratagus.Players[].Name</b></dt>
+		    <dd><b>Type:</b> string </dd>
+			<dd>The name of the player, as selected by him.</dd>
+	    <a name="Stratagus.Players[].NumBuildings">
+	    <dt><b>Stratagus.Players[].NumBuildings</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Total number of buildings for the player</dd>
+	    <a name="Stratagus.Players[].NumUnits">
+	    <dt><b>Stratagus.Players[].NumUnits</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Total number of units for the player</dd>
+	    <a name="Stratagus.Players[].Score">
+	    <dt><b>Stratagus.Players[].Score</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>The player's score. <b>FIXME:</b> Document now how this is calculated.</dd>
+		<a name="Stratagus.Players[].SharedVision">
+	    <dt><b>Stratagus.Players[].SharedVision</b></dt>
+		    <dd><b>Type:</b> bool array </dd>
+			<dd>This boolean array represents the shared vision status of a
+			player. Players[1].SharedVision[2] is true if player 1 wants to
+			share vision with player 2. Share vision only takes effect if both
+			players agree on it and share vision with each other.</dd>
+		<a name="Stratagus.Players[].Slot">
+	    <dt><b>Stratagus.Players[].Slot</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>This is perhaps confusing and rarely usefull. It's the index in the
+			player array. Stratagus.Players[x].Slot == x.</dd>
+	    <a name="Stratagus.Players[].StartX">
+	    <dt><b>Stratagus.Players[].StartX</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>X coordinate of the player's start location. This only specifies where
+			the screen is placed at the start of the game.</dd>
+		<a name="Stratagus.Players[].StartY">
+	    <dt><b>Stratagus.Players[].StartY</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Y coordinate of the player's start location. This only specifies where
+			the screen is placed at the start of the game.</dd>
+		<a name="Stratagus.Players[].Supply">
+	    <dt><b>Stratagus.Players[].Supply</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Total amount of food supplied for the player.</dd>
+	    <a name="Stratagus.Players[].TotalBuildings">
+	    <dt><b>Stratagus.Players[].TotalBuildings</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>The player's building score. This should be the total number of units
+			built by the player.</dd>
+		<a name="Stratagus.Players[].TotalKills">
+	    <dt><b>Stratagus.Players[].TotalKills</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>How many units the player has killed.</dd> 
+		<a name="Stratagus.Players[].TotalRazings">
+	    <dt><b>Stratagus.Players[].TotalRazings</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>How many buildings the player has destroyed.</dd> 
+		<a name="Stratagus.Players[].TotalUnitLimit">
+	    <dt><b>Stratagus.Players[].TotalUnitLimit</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Maximum number of units and buildings (buildings can be considered units that
+			don't move)</dd>
+	    <a name="Stratagus.Players[].TotalUnits">
+	    <dt><b>Stratagus.Players[].TotalUnits</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>The player's unit score. This should be the total number of units
+			trained by the player.</dd>
+		<a name="Stratagus.Players[].UnitLimit">
+	    <dt><b>Stratagus.Players[].UnitLimit</b></dt>
+		    <dd><b>Type:</b> int </dd>
+			<dd>Maximum number of units the player is allowed to have.</dd>
+	    <a name="Stratagus.Players[].UnitTypesCount">
+	    <dt><b>Stratagus.Players[].UnitTypesCount</b></dt>
+		    <dd><b>Type:</b> int array </dd>
+			<dd>This is the number of units that the player has, organized by type.
+			You can index this by both unit number, or better yet by unit-ident</dd>
+	<!-- SCRIPT -->
+	</dl><hr>
+	Last changed: $Id$<br>
+	All trademarks and copyrights on this page are owned by their respective owners.
+	<address>(c) 2002-2004 by <a href="http://stratagus.org">The Stratagus Project</a></address>
+</body></html>
