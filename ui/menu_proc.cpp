@@ -1378,7 +1378,7 @@ local void MenuHandleButtonUp(unsigned b)
 **	End process menu
 **
 */
-local void EndMenu(void)
+global void EndMenu(void)
 {
     CursorOn = CursorOnUnknown;
     CurrentMenu = NULL;
