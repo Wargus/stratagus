@@ -207,6 +207,7 @@ global void MenusSetBackground(void)
 **
 **	@param button	Button identifier
 **	@param flags	State of Button (clicked, mouse over...)
+**	@param transparent	State of button transparency: 0=No, 1=Yes
 **	@param w	Button width (for border)
 **	@param h	Button height (for border)
 **	@param x	X display position
@@ -216,7 +217,7 @@ global void MenusSetBackground(void)
 **	@param normalcolor
 **	@param reversecolor
 */
-global void DrawMenuButton(MenuButtonId button, unsigned flags, int w, int h,
+global void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
     int x, int y, const int font, const unsigned char* text,
     char* normalcolor, char* reversecolor)
 {
@@ -284,7 +285,12 @@ global void DrawMenuButton(MenuButtonId button, unsigned flags, int w, int h,
 	    }
 	}
 	if (rb < MenuButtonGfx.Sprite->NumFrames) {
-	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
+		if (transparent) {
+			VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x, y);
+		} else {
+			VideoDrawClip(MenuButtonGfx.Sprite, rb, x, y);
+		}
+
 	} else {
 	    if (rb < button) {
 		VideoDrawRectangleClip(ColorGray, x + 1, y + 1, w - 2, h - 2);
@@ -504,7 +510,11 @@ local void DrawPulldown(Menuitem* mi, int mx, int my)
 	    while (i--) {
 		PushClipping();
 		SetClipping(0, 0, x + w, VideoHeight - 1);
+		if (mi->transparent) {
+		VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
+		} else {
 		VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
+		}
 		PopClipping();
 		text = mi->d.pulldown.options[i];
 		if (text) {
@@ -536,7 +546,11 @@ local void DrawPulldown(Menuitem* mi, int mx, int my)
 	    } else {
 		SetClipping(0, 0, x + w - 1, VideoHeight - 1);
 	    }
-	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+		if (mi->transparent) {
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+		} else {
+		VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+		}
 	    PopClipping();
 	    if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN,
@@ -606,7 +620,11 @@ local void DrawListbox(Menuitem* mi, int mx, int my)
     while (i--) {
 	PushClipping();
 	SetClipping(0, 0, x + w, VideoHeight - 1);
+	if (mi->transparent) {
+	VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + 18 * i);
+	} else {
 	VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + 18 * i);
+	}
 	PopClipping();
 	if (!(flags & MenuButtonDisabled)) {
 	    if (i < mi->d.listbox.noptions) {
@@ -692,16 +710,26 @@ local void DrawVSlider(Menuitem* mi, int mx, int my)
 	if (flags & MenuButtonDisabled) {
 	    PushClipping();
 	    SetClipping(0, 0, VideoWidth - 1, y + h - 20);
-	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+		if (mi->transparent) {
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h / 2);
+		} else {
+		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
 	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y + h / 2);
+		}
 	    PopClipping();
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
 	} else {
 	    PushClipping();
 	    SetClipping(0, 0, VideoWidth - 1, y + h - 20);
-	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+		if (mi->transparent) {
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
+		} else {
+		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
 	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
+		}
 	    PopClipping();
 	    if (mi->d.vslider.cflags & MI_CFLAGS_UP) {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
@@ -785,16 +813,26 @@ local void DrawHSlider(Menuitem* mi, int mx, int my)
 	if (flags & MenuButtonDisabled) {
 	    PushClipping();
 	    SetClipping(0, 0, x + w - 20, VideoHeight - 1);
-	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+		if (mi->transparent) {
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w / 2, y);
+		} else {
+		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x - 2, y);
 	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT - 1, x + w / 2, y);
+		}
 	    PopClipping();
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW - 1, x - 2, y);
 	    VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
 	} else {
 	    PushClipping();
 	    SetClipping(0, 0, x + w - 20, VideoHeight - 1);
-	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+		if (mi->transparent) {
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
+	    VideoDrawClipTrans50(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
+		} else {
+		VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
 	    VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
+		}
 	    PopClipping();
 	    if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
@@ -939,7 +977,11 @@ local void DrawInput(Menuitem* mi, int mx, int my)
 
 	PushClipping();
 	SetClipping(0, 0, x + w, VideoHeight - 1);
+	if (mi->transparent) {
+	VideoDrawClipTrans50(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+	} else {
 	VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
+	}
 	PopClipping();
 	text = mi->d.input.buffer;
 	if (text) {
@@ -1068,7 +1110,7 @@ global void DrawMenu(Menu* menu)
 		SetDefaultTextColors(oldnc, oldrc);
 		break;
 	    case MI_TYPE_BUTTON:
-		DrawMenuButton(mi->d.button.button, mi->flags,
+		DrawMenuButton(mi->d.button.button, mi->flags, mi->transparent,
 		    mi->d.button.xsize, mi->d.button.ysize,
 		    menu->X + mi->xofs, menu->Y + mi->yofs,
 		    mi->font, mi->d.button.text,
