@@ -972,6 +972,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     InputMouseTimeout(callbacks,ticks);
     InputKeyTimeout(callbacks,ticks);
+    CursorAnimate(ticks);
 
     for( ;; ) {
 #ifdef SLOW_INPUT

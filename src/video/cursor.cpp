@@ -881,7 +881,7 @@ global void DrawAnyCursor(void)
     //	Last, Normal cursor.
     //  This will also save (part of) drawn rectangle cursor, but that's ok.
     //
-    DrawCursor(GameCursor,CursorX,CursorY,0);
+    DrawCursor(GameCursor,CursorX,CursorY,GameCursor->SpriteFrame);
 }
 
 /**
@@ -937,6 +937,29 @@ global void HideAnyCursor(void)
 	MarkDrawAreaMap(BuildingCursorSX,BuildingCursorSY,
 		BuildingCursorEX,BuildingCursorEY);
         BuildingCursor=0;
+    }
+}
+
+/**
+**	Animate the cursor.
+**
+**	@param ticks	Current tick
+*/
+global void CursorAnimate(unsigned ticks)
+{
+    static int Last = 0;
+
+    if (!GameCursor) {
+	return;
+    }
+    if (ticks > Last + GameCursor->FrameRate) {
+	Last = ticks + GameCursor->FrameRate;
+	GameCursor->SpriteFrame++;
+	if ((GameCursor->SpriteFrame & 127)
+		>= VideoGraphicFrames(GameCursor->Sprite)) {
+	    GameCursor->SpriteFrame = 0;
+	}
+	MustRedraw |= RedrawCursor;
     }
 }
 
