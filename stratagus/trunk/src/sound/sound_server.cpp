@@ -652,40 +652,30 @@ static void ClipMixToStereo16(const int* mix, int size, short* output)
 static Sample* LoadSample(const char* name)
 {
 	Sample* sample;
-	char* buf;
+	char buf[PATH_MAX];
 
-	// FIXME: find a better way to detect sound not in sound dir
-	if (strstr(name, "campaign")) {
-		buf = strdcat3(StratagusLibPath, "/", name);
-	} else {
-		buf = strdcat3(StratagusLibPath, "/sounds/", name);
-	}
+	LibraryFileName(name, buf);
 
 	if ((sample = LoadWav(buf, PlayAudioLoadInMemory))) {
-		free(buf);
 		return sample;
 	}
 #ifdef USE_OGG
 	if ((sample = LoadOgg(buf, PlayAudioLoadInMemory))) {
-		free(buf);
 		return sample;
 	}
 #endif
 #ifdef USE_FLAC
 	if ((sample = LoadFlac(buf, PlayAudioLoadInMemory))) {
-		free(buf);
 		return sample;
 	}
 #endif
 #ifdef USE_MAD
 	if ((sample = LoadMp3(buf, PlayAudioLoadInMemory))) {
-		free(buf);
 		return sample;
 	}
 #endif
 #ifdef USE_MIKMOD
 	if ((sample = LoadMikMod(buf, PlayAudioLoadInMemory))) {
-		free(buf);
 		return sample;
 	}
 #endif

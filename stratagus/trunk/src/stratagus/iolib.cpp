@@ -442,6 +442,38 @@ long CLtell(CLFile* file)
 #endif // USE_ZLIB || USE_BZ2LIB
 
 /**
+** Find a file with its correct extension ("", ".gz" or ".bz2")
+**
+** @param file The string with the file path. Upon success, the string 
+**      is replaced by the full filename witht he correct extension.
+** @return 1 if the file has been found.
+**/
+static int FindFileWithExtension(char* file)
+{
+	char buf[PATH_MAX];
+
+	if (!access(file, R_OK)) {
+		return 1;
+	}
+#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
+	sprintf(buf, "%s.gz", file);
+	if (!access(buf, R_OK)) {
+		strcpy(file, buf);
+		return 1;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	sprintf(buf, "%s.bz2", file);
+	if (!access(buf, R_OK)) {
+		strcpy(file, buf);
+		return 1;
+	}
+#endif
+
+	return 0;
+}
+
+/**
 ** Generate a filename into library.
 **
 ** Try current directory, user home directory, global directory.
@@ -456,29 +488,16 @@ char* LibraryFileName(const char* file, char* buffer)
 {
 	char* s;
 
-	//
 	// Absolute path or in current directory.
-	//
 	strcpy(buffer, file);
-	if (*buffer == '/' || !access(buffer, R_OK)) {
+	if (*buffer == '/') {
 		return buffer;
 	}
-#ifdef USE_ZLIB // gzip or bzip2 in current directory
-	sprintf(buffer, "%s.gz", file);
-	if (!access(buffer, R_OK)) {
+	if (FindFileWithExtension(buffer)) {
 		return buffer;
 	}
-#endif
-#ifdef USE_BZ2LIB
-	sprintf(buffer, "%s.bz2", file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
-#endif
 
-	//
 	// Try in map directory
-	//
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
 			strcpy(buffer, CurrentMapPath);
@@ -497,115 +516,52 @@ char* LibraryFileName(const char* file, char* buffer)
 			}
 			strcat(buffer, file);
 		}
-		if (!access(buffer, R_OK)) {
+		if (FindFileWithExtension(buffer)) {
 			return buffer;
 		}
-
-#ifdef USE_ZLIB // gzip or bzip2 in map directory directory
-		strcat(buffer, ".gz");
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-		*strrchr(buffer, '.') = '\0';
-#endif
-#ifdef USE_BZ2LIB
-		strcat(buffer, ".bz2");
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-		*strrchr(buffer, '.') = '\0';
-#endif
 	}
 
 #ifdef USE_WIN32
-	//
 	//  In user home directory
-	//
 	if (GameName) {
 		sprintf(buffer, "%s/%s", GameName, file);
-		if (!access(buffer,R_OK)) {
+		if (FindFileWithExtension(buffer)) {
 			return buffer;
 		}
-#ifdef USE_ZLIB  // gzip or bzip2 in user home directory
-		sprintf(buffer, "%s/%s.gz", GameName, file);
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-#endif
-#ifdef USE_BZ2LIB
-		sprintf(buffer, "%s/%s.bz2", GameName, file);
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-#endif
 	}
 #endif
 
+	//  In user home directory
 	if ((s = getenv("HOME")) && GameName) {
-		//
-		//  In user home directory
-		//
 		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
-		if (!access(buffer,R_OK)) {
+		if (FindFileWithExtension(buffer)) {
 			return buffer;
 		}
-#ifdef USE_ZLIB // gzip or bzip2 in user home directory
-		sprintf(buffer, "%s/%s/%s/%s.gz", s, STRATAGUS_HOME_PATH, GameName, file);
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-#endif
-#ifdef USE_BZ2LIB
-		sprintf(buffer, "%s/%s/%s/%s.bz2", s, STRATAGUS_HOME_PATH, GameName, file);
-		if (!access(buffer, R_OK)) {
-			return buffer;
-		}
-#endif
 	}
 
-	//
 	// In global shared directory
-	//
 	sprintf(buffer, "%s/%s", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
+	if (FindFileWithExtension(buffer)) {
 		return buffer;
 	}
-#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
-	sprintf(buffer, "%s/%s.gz", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
-#endif
-#ifdef USE_BZ2LIB
-	sprintf(buffer, "%s/%s.bz2", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
-#endif
 
-	// 
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	//
 	sprintf(buffer, "%s/graphics/%s", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
+	if (FindFileWithExtension(buffer)) {
 		return buffer;
 	}
-#ifdef USE_ZLIB // gzip or bzip2 in global shared directory
-	sprintf(buffer, "%s/graphics/%s.gz", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
-#endif
-#ifdef USE_BZ2LIB
-	sprintf(buffer, "%s/graphics/%s.bz2", StratagusLibPath, file);
-	if (!access(buffer, R_OK)) {
-		return buffer;
-	}
-#endif
-	DebugPrint("File `%s' not found\n" _C_ file);
 
+	// Support for sounds in default sounds dir.
+	// They could be anywhere now, but check if they haven't
+	// got full paths.
+	sprintf(buffer, "%s/sounds/%s", StratagusLibPath, file);
+	if (FindFileWithExtension(buffer)) {
+		return buffer;
+	}
+
+	DebugPrint("File `%s' not found\n" _C_ file);
 	strcpy(buffer, file);
 	return buffer;
 }
