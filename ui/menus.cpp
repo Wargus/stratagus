@@ -95,8 +95,9 @@ local void ObjectivesExit(Menuitem *mi);
 
 // Victory, lost
 local void GameMenuEnd(void);
-local void SaveReplayInit(void);
 local void SaveReplay(void);
+local void SaveReplayEnterAction(Menuitem *mi, int key);
+local void SaveReplayOk(void);
 
 // Scenario select
 local void ScenSelectLBExit(Menuitem *mi);
@@ -459,8 +460,9 @@ global void InitMenuFuncHash(void) {
 
 // Victory, lost
     HASHADD(GameMenuEnd,"game-menu-end");
-    HASHADD(SaveReplayInit,"save-replay-init");
     HASHADD(SaveReplay,"save-replay");
+    HASHADD(SaveReplayEnterAction,"save-replay-enter-action");
+    HASHADD(SaveReplayOk,"save-replay-ok");
 
 // Scenario select
     HASHADD(ScenSelectLBExit,"scen-select-lb-exit");
@@ -2197,7 +2199,10 @@ local void GameMenuEnd(void)
     CurrentMenu = NULL;
 }
 
-local void SaveReplayInit(void)
+/**
+**	Save replay of completed game.
+*/
+local void SaveReplay(void)
 {
     char filename[32];
     Menu *menu;
@@ -2213,9 +2218,24 @@ local void SaveReplayInit(void)
 }
 
 /**
-**	TODO
+**	Input field action of save replay menu.
 */
-local void SaveReplay(void)
+local void SaveReplayEnterAction(Menuitem *mi, int key)
+{
+    if (mi->d.input.nch == 0) {
+	mi[1].flags = MenuButtonDisabled;
+    } else {
+	mi[1].flags &= ~MenuButtonDisabled;
+	if (key == 10 || key == 13) {
+	    SaveReplayOk();
+	}
+    }
+}
+
+/**
+**	Save replay Ok button.
+*/
+local void SaveReplayOk(void)
 {
     char filename[128];
     char tmpname[128];
@@ -2237,6 +2257,13 @@ local void SaveReplay(void)
     strcat(filename,"/");
     strncat(filename, menu->items[1].d.input.buffer,
 	    menu->items[1].d.input.nch);
+
+    if (!strstr(menu->items[1].d.input.buffer + menu->items[1].d.input.nch - 4, 
+	        ".log"))
+    {
+	strcat(filename, ".log");
+    }
+	
     sprintf(tmpname,"%s/log_of_freecraft_%d.log",tmpname,ThisPlayer->Player);
 
     stat(tmpname, &s);
