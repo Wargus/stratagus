@@ -233,7 +233,7 @@ local void AiCheckUnits(void)
 	}
 	
 	if( x>e+counter[t] ) {	// Request it.
-	    DebugLevel2Fn("Need %s *%d\n" _C_
+	    DebugLevel3Fn("Need %s *%d\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
 		    x-e-counter[t]);
@@ -524,7 +524,7 @@ global void AiHelpMe(const Unit* attacker,Unit * defender)
 
     DebugLevel3Fn("Sending force 0 and 1 to defend\n");
     //
-    //	Send force 0 defending, also send force 1 of this is home.
+    //	Send force 0 defending, also send force 1 if this is home.
     //
     if( attacker ) {
 	AiAttackWithForceAt(0,attacker->X,attacker->Y);
