@@ -104,6 +104,7 @@ local SCM CclFreeCraftMap(SCM list)
 		    }
 		    TheMap.Terrain=i;
 		    // Ignore: str=gh_scm2newstr(gh_cadr(value),NULL);
+		    LoadTileset();
 		   
 		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
 		    value=gh_car(data);

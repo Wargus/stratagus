@@ -348,7 +348,6 @@ global void CreateGame(char* filename, WorldMap* map)
     //
     //	Graphic part
     //
-    LoadTileset();
     LoadRGB(GlobalPalette,
 	    s=strdcat3(FreeCraftLibPath,"/graphics/",
 		TheMap.Tileset->PaletteFile));

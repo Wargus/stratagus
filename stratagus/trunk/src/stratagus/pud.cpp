@@ -919,7 +919,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 		}
 		map->TerrainName=strdup(TilesetWcNames[t]);
 		map->Terrain=t;
-		// FIXME: Should set tileset here!
+		LoadTileset();
 		continue;
 	    } else {
 		DebugLevel1("Wrong terrain type length\n");
