@@ -72,7 +72,11 @@ if test "$with_client" = "x11"; then
     AC_CHECK_HEADERS(X11/Xlib.h,, AC_MSG_ERROR(could not find X11/Xlib.h))
     VIDEO_CFLAGS="-DUSE_X11"
     VIDEO_LIBS="-lXext -lX11 -L/usr/X11R6/lib -I/usr/X11R6/include"
-    THREAD_LIBS="-lpthread"
+    if test "$PLATFORM" = "-DBSD"; then
+	THREAD_LIBS="-pthread"
+    else
+	THREAD_LIBS="-lpthread"
+    fi
 elif test "$with_client" = "svgalib"; then
     VIDEO_CFLAGS="-DUSE_SVGALIB" 
     VIDEO_LIBS="-lvga"
