@@ -80,6 +80,10 @@
 #define UseWin32	1
 #endif
 
+#ifndef UseX11
+#define UseX11		0
+#endif
+
 /**
 **	Structure of pushed clippings.
 */
