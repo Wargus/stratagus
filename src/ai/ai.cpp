@@ -168,17 +168,17 @@ global int AiSleepCycles;		/// Ai sleeps # cycles
 global int AiTimeFactor = 100;		/// Adjust the AI build times
 global int AiCostFactor = 100;		/// Adjust the AI costs
 
-global AiType *AiTypes;			/// List of all AI types.
+global AiType* AiTypes;			/// List of all AI types.
 global AiHelper AiHelpers;		/// AI helper variables
 global int AiScriptActionNum = 0;	/// number of action script ( FIXME : initialized only once )
 global AiScriptAction AiScriptActions[MaxAiScriptActions];	/// definitions of action scripts
 
-global PlayerAi *AiPlayer;		/// Current AI player
-global AiRunningScript *AiScript;	/// Current AI script
+global PlayerAi* AiPlayer;		/// Current AI player
+global AiRunningScript* AiScript;	/// Current AI script
 /**
 **	W*rCr*ft number to internal ai-type name.
 */
-global char **AiTypeWcNames;
+global char** AiTypeWcNames;
 
 /*----------------------------------------------------------------------------
 --	Lowlevel functions
@@ -187,11 +187,12 @@ global char **AiTypeWcNames;
 local void debugForces(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    const AiActionEvaluation * aiaction;
-    int force, i;
-    int count[UnitTypeMax+1];
-    int want[UnitTypeMax+1];
-    char * str;
+    const AiActionEvaluation* aiaction;
+    int force;
+    int i;
+    int count[UnitTypeMax + 1];
+    int want[UnitTypeMax + 1];
+    char* str;
 
     DebugLevel2Fn(" AI MEMORY (%d)\n" _C_ AiPlayer->EvaluationCount);
     aiaction = AiPlayer->FirstEvaluation;
@@ -208,7 +209,7 @@ local void debugForces(void)
 	aiaction = aiaction->Next;
     }
     DebugLevel2Fn(" AI FORCES      ! : completed    A/D : attacking/defending\n");
-    for (force = 0; force < AI_MAX_FORCES; force++) {
+    for (force = 0; force < AI_MAX_FORCES; ++force) {
 	DebugLevel2("force %5d %c%c :" _C_
 	    force _C_
 	    (AiPlayer->Force[force].Role == AiForceRoleAttack ? 'A' : 'D') _C_
@@ -216,12 +217,12 @@ local void debugForces(void)
 
 	AiForceCountUnits(force, count);
 	
-	for (i = 0; i <= UnitTypeMax; i++) {
+	for (i = 0; i <= UnitTypeMax; ++i) {
 	    want[i] = 0;
 	}
 	AiForceSubstractWant(force, want);
 	
-	for (i = 0; i < UnitTypeMax; i++) {
+	for (i = 0; i < UnitTypeMax; ++i) {
 	    if (count[i] || want[i]) {
 		DebugLevel2(" %s(%d/%d)" _C_ UnitTypes[i]->Ident _C_ count[i] _C_ (-want[i]));
 	    }
@@ -248,7 +249,7 @@ local void AiExecuteScripts(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     int i;
-    PlayerAi *pai;
+    PlayerAi* pai;
     SCM value;
 
     pai = AiPlayer;
@@ -258,7 +259,7 @@ local void AiExecuteScripts(void)
 	debugForces();
     }
 
-    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; i++) {
+    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 	AiScript = pai->Scripts + i;
 	if (!gh_null_p(AiScript->Script)) {
 	    /*DebugLevel3Fn("%d.%d (%12s) @ %3d.%3d :" _C_ pai->Player->Player _C_ i _C_ AiScript->ident _C_ AiScript->HotSpot_X _C_ AiScript->HotSpot_Y);
@@ -285,8 +286,8 @@ local void AiExecuteScripts(void)
 local void AiCheckUnits(void)
 {
     int counter[UnitTypeMax];
-    const AiBuildQueue *queue;
-    const int *unit_types_count;
+    const AiBuildQueue* queue;
+    const int* unit_types_count;
     int i;
     int j;
     int n;
@@ -365,7 +366,7 @@ local void AiCheckUnits(void)
     // create missing units
     //
     for (i = 0; i < AI_MAX_FORCES; ++i) {
-	const AiUnitType *aiut;
+	const AiUnitType* aiut;
 
 	// Create units only for AiForceCreateFromScratch forces
 	if (AiPlayer->Force[i].PopulateMode != AiForcePopulateFromScratch) {
@@ -438,9 +439,9 @@ local void AiCheckUnits(void)
 **
 **	@param file	Output file.
 */
-local void SaveAiTypesWcName(CLFile * file)
+local void SaveAiTypesWcName(CLFile* file)
 {
-    char **cp;
+    char** cp;
     int i;
 
     //
@@ -469,8 +470,8 @@ local void SaveAiTypesWcName(CLFile * file)
 **	@param n	Number of elements in table
 **	@param table	unit-type table.
 */
-local void SaveAiHelperTable(CLFile * file, const char *name, int upgrade, int n,
-    AiUnitTypeTable * const *table)
+local void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n,
+    AiUnitTypeTable* const* table)
 {
     int t;
     int i;
@@ -517,8 +518,8 @@ local void SaveAiHelperTable(CLFile * file, const char *name, int upgrade, int n
 **	@param n	Number of elements in table
 **	@param table	unit-type table.
 */
-local void SaveAiEquivTable(CLFile * file, const char *name, int n,
-    AiUnitTypeTable * const *table)
+local void SaveAiEquivTable(CLFile* file, const char* name, int n,
+    AiUnitTypeTable* const* table)
 {
     int i;
     int j;
@@ -547,8 +548,8 @@ local void SaveAiEquivTable(CLFile * file, const char *name, int n,
 **	@param n	Number of elements in table
 **	@param table	unit-type table.
 */
-local void SaveAiCostTable(CLFile * file, const char *name, int n,
-    AiUnitTypeTable * const *table)
+local void SaveAiCostTable(CLFile* file, const char* name, int n,
+    AiUnitTypeTable* const* table)
 {
     int t;
     int i;
@@ -588,8 +589,8 @@ local void SaveAiCostTable(CLFile * file, const char *name, int n,
 **	@param n	Number of elements in table
 **	@param table	unit-type table.
 */
-local void SaveAiUnitLimitTable(CLFile * file, const char *name, int n,
-    AiUnitTypeTable * const *table)
+local void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
+    AiUnitTypeTable* const* table)
 {
     int t;
     int i;
@@ -626,7 +627,7 @@ local void SaveAiUnitLimitTable(CLFile * file, const char *name, int n,
 **
 **	@param file	Output file.
 */
-local void SaveAiHelper(CLFile * file)
+local void SaveAiHelper(CLFile* file)
 {
     CLprintf(file, "(define-ai-helper");
     //
@@ -673,14 +674,14 @@ local void SaveAiHelper(CLFile * file)
 **
 **	@param file	Output file
 */
-local void SaveAiScriptActions(CLFile * file)
+local void SaveAiScriptActions(CLFile* file)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
-    AiScriptAction *aiScriptAction;
+    AiScriptAction* aiScriptAction;
     int i;
 
     // FIXME : should import the built-in lambda as well ( really needed ? )
-    for (i = 0; i < AiScriptActionNum; i++) {
+    for (i = 0; i < AiScriptActionNum; ++i) {
 	aiScriptAction = AiScriptActions + i;
 
 	CLprintf(file, "(define-ai-action '(%s%s)\n  '",
@@ -700,7 +701,7 @@ local void SaveAiScriptActions(CLFile * file)
 **	@param file	Output file.
 **	@param aitype	AI type to save.
 */
-local void SaveAiType(CLFile * file, const AiType * aitype)
+local void SaveAiType(CLFile* file, const AiType* aitype)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     SCM list;
@@ -730,7 +731,7 @@ local void SaveAiType(CLFile * file, const AiType * aitype)
 **
 **	@param file	Output file.
 */
-local void SaveAiTypes(CLFile * file)
+local void SaveAiTypes(CLFile* file)
 {
     SaveAiType(file, AiTypes);
 
@@ -745,7 +746,7 @@ local void SaveAiTypes(CLFile * file)
 **	@param plynr	Player number.
 **	@param ai	Player AI.
 */
-local void SaveAiPlayer(CLFile * file, unsigned plynr, PlayerAi * ai)
+local void SaveAiPlayer(CLFile* file, unsigned plynr, PlayerAi* ai)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     IOOutFile = file;
@@ -764,7 +765,7 @@ local void SaveAiPlayer(CLFile * file, unsigned plynr, PlayerAi * ai)
 **
 **	@param file	Output file.
 */
-local void SaveAiPlayers(CLFile * file)
+local void SaveAiPlayers(CLFile* file)
 {
     unsigned p;
 
@@ -780,7 +781,7 @@ local void SaveAiPlayers(CLFile * file)
 **
 **	@param file	Output file.
 */
-global void SaveAi(CLFile * file)
+global void SaveAi(CLFile* file)
 {
     CLprintf(file, "\n;;; -----------------------------------------\n");
     CLprintf(file,
@@ -800,12 +801,12 @@ global void SaveAi(CLFile * file)
 **
 **      @param player   The player structure pointer.
 */
-global void AiInit(Player * player)
+global void AiInit(Player* player)
 {
     int i;
-    PlayerAi *pai;
-    AiType *ait;
-    char *ainame;
+    PlayerAi* pai;
+    AiType* ait;
+    char* ainame;
 
     DebugLevel0Fn("%d - %s -" _C_ player->Player _C_ player->Name);
 
@@ -817,7 +818,7 @@ global void AiInit(Player * player)
     pai->Player = player;
     ait = AiTypes;
 
-    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; i++) {
+    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
 	pai->Scripts[i].ownForce = AI_GENERIC_FORCES + i;
 	pai->Scripts[i].HotSpot_X = -1;
 	pai->Scripts[i].HotSpot_Y = -1;
@@ -835,7 +836,7 @@ global void AiInit(Player * player)
     // Set autoattack to 1 as default
     pai->AutoAttack = 1;
 
-    for (i = 0; i < AI_GENERIC_FORCES; i++) {
+    for (i = 0; i < AI_GENERIC_FORCES; ++i) {
 	// First force defend, others are attacking...
 	pai->Force[i].Role = (i ? AiForceRoleAttack : AiForceRoleDefend);
 
@@ -926,12 +927,12 @@ global void CleanAi(void)
 {
     int i;
     int p;
-    PlayerAi *pai;
-    void *temp;
-    AiType *aitype;
-    AiBuildQueue *queue;
+    PlayerAi* pai;
+    void* temp;
+    AiType* aitype;
+    AiBuildQueue* queue;
     AiExplorationRequest* request;
-    char **cp;
+    char** cp;
 
     for (p = 0; p < PlayerMax; ++p) {
 	if ((pai = Players[p].Ai)) {
@@ -939,8 +940,8 @@ global void CleanAi(void)
 	    //  Free forces
 	    //
 	    for (i = 0; i < AI_MAX_FORCES; ++i) {
-		AiUnitType *aut;
-		AiUnit *aiunit;
+		AiUnitType* aut;
+		AiUnit* aiunit;
 
 		for (aut = pai->Force[i].UnitTypes; aut; aut = temp) {
 		    temp = aut->Next;
@@ -1068,7 +1069,7 @@ global void CleanAi(void)
     }
 
     // Free script action scm...
-    for (i = 0; i < AiScriptActionNum; i++) {
+    for (i = 0; i < AiScriptActionNum; ++i) {
 #if defined(USE_GUILE) || defined(USE_SIOD)
 	CclGcUnprotect(&AiScriptActions[i].Action);
 #elif defined(USE_LUA)
@@ -1091,10 +1092,10 @@ global void CleanAi(void)
 **	@param type	Unit-type which is now available.
 **	@return		True, if unit-type was found in list.
 */
-local int AiRemoveFromBuilded2(PlayerAi * pai, const UnitType * type)
+local int AiRemoveFromBuilded2(PlayerAi* pai, const UnitType* type)
 {
-    AiBuildQueue **queue;
-    AiBuildQueue *next;
+    AiBuildQueue** queue;
+    AiBuildQueue* next;
 
     //
     //  Search the unit-type order.
@@ -1119,7 +1120,7 @@ local int AiRemoveFromBuilded2(PlayerAi * pai, const UnitType * type)
 **	@param pai	Computer AI player.
 **	@param type	Unit-type which is now available.
 */
-local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
+local void AiRemoveFromBuilded(PlayerAi* pai, const UnitType* type)
 {
     int i;
     int equivalents[UnitTypeMax+1];
@@ -1133,7 +1134,7 @@ local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
     //  This could happen if an upgrade is ready, look for equivalent units.
     //
     equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
-    for (i = 0; i < equivalentsCount; i++) {
+    for (i = 0; i < equivalentsCount; ++i) {
 	if (AiRemoveFromBuilded2(pai, UnitTypes[equivalents[i]])) {
 	    return;
 	}
@@ -1155,9 +1156,9 @@ local void AiRemoveFromBuilded(PlayerAi * pai, const UnitType * type)
 **	@param type	Unit-type which is now available.
 **	@return		True if the unit-type could be reduced.
 */
-local int AiReduceMadeInBuilded2(const PlayerAi * pai, const UnitType * type)
+local int AiReduceMadeInBuilded2(const PlayerAi* pai, const UnitType* type)
 {
-    AiBuildQueue *queue;
+    AiBuildQueue* queue;
     //
     //  Search the unit-type order.
     //
@@ -1176,7 +1177,7 @@ local int AiReduceMadeInBuilded2(const PlayerAi * pai, const UnitType * type)
 **	@param pai	Computer AI player.
 **	@param type	Unit-type which is now available.
 */
-local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
+local void AiReduceMadeInBuilded(const PlayerAi* pai, const UnitType* type)
 {
     int i;
     int equivs[UnitTypeMax + 1];
@@ -1209,10 +1210,10 @@ local void AiReduceMadeInBuilded(const PlayerAi * pai, const UnitType * type)
 **	@param attacker	Pointer to attacker unit.
 **	@param defender	Pointer to unit that is being attacked.
 */
-global void AiHelpMe(const Unit * attacker, Unit * defender)
+global void AiHelpMe(const Unit* attacker, Unit* defender)
 {
-    PlayerAi *pai;
-    AiUnit *aiunit;
+    PlayerAi* pai;
+    AiUnit* aiunit;
     int force;
 
     DebugLevel0Fn("%d: %d(%s) attacked at %d,%d\n" _C_
@@ -1252,7 +1253,7 @@ global void AiHelpMe(const Unit * attacker, Unit * defender)
 **
 **	@param unit	Pointer to unit.
 */
-global void AiUnitKilled(Unit * unit)
+global void AiUnitKilled(Unit* unit)
 {
     DebugLevel1Fn("%d: %d(%s) killed\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
@@ -1290,7 +1291,7 @@ global void AiUnitKilled(Unit * unit)
 **	@param unit	Pointer to unit that builds the building.
 **	@param what	Pointer to unit building that was built.
 */
-global void AiWorkComplete(Unit * unit, Unit * what)
+global void AiWorkComplete(Unit* unit, Unit* what)
 {
     if (unit) {
 	DebugLevel1Fn("%d: %d(%s) build %s at %d,%d completed\n" _C_
@@ -1312,7 +1313,7 @@ global void AiWorkComplete(Unit * unit, Unit * what)
 **	@param unit	Pointer to unit what builds the building.
 **	@param what	Pointer to unit-type.
 */
-global void AiCanNotBuild(Unit * unit, const UnitType * what)
+global void AiCanNotBuild(Unit* unit, const UnitType* what)
 {
     DebugLevel0Fn("%d: %d(%s) Can't build %s at %d,%d\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident
@@ -1329,7 +1330,7 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
 **	@param unit	Pointer to unit what builds the building.
 **	@param what	Pointer to unit-type.
 */
-global void AiCanNotReach(Unit * unit, const UnitType * what)
+global void AiCanNotReach(Unit* unit, const UnitType* what)
 {
     DebugLevel3Fn("%d: %d(%s) Can't reach %s at %d,%d\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1342,15 +1343,22 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 
 local void AiMoveUnitInTheWay(Unit* unit)
 {
-    static int dirs[8][2]={{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
-    int ux0,uy0,ux1,uy1;
-    int bx0,by0,bx1,by1;
-    int x,y;
+    static int dirs[8][2] = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
+    int ux0;
+    int uy0;
+    int ux1;
+    int uy1;
+    int bx0;
+    int by0;
+    int bx1;
+    int by1;
+    int x;
+    int y;
     int trycount,i;
-    Unit * blocker;
-    UnitType * unittype;
-    UnitType * blockertype;
-    Unit * movableunits[16];
+    Unit* blocker;
+    UnitType* unittype;
+    UnitType* blockertype;
+    Unit* movableunits[16];
     int movablepos[16][2];
     int movablenb;
 
@@ -1409,9 +1417,9 @@ local void AiMoveUnitInTheWay(Unit* unit)
 	// Check for collision
 #define int_min(a,b)  ((a)<(b)?(a):(b))
 #define int_max(a,b)  ((a)>(b)?(a):(b))
-	if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) && 
+	if (!((ux0 == bx1 + 1 || ux1 == bx0 - 1) &&
 	    	(int_max(by0, uy0) <= int_min(by1, uy1)))
-	    && !((uy0 == by1 + 1 || uy1 == by0 - 1) && 
+	    && !((uy0 == by1 + 1 || uy1 == by0 - 1) &&
 	    	(int_max(bx0, ux0) <= int_min(bx1, ux1)))) {
 	   continue;
 	}
@@ -1428,7 +1436,7 @@ local void AiMoveUnitInTheWay(Unit* unit)
 	while (trycount > 0) {
 	    i = (i + 1) &7;
 	    trycount--;
-	    
+
 	    x = blocker->X + dirs[i][0];
 	    y = blocker->Y + dirs[i][1];
 
@@ -1468,39 +1476,39 @@ local void AiMoveUnitInTheWay(Unit* unit)
 **		 1 if exists (unit may still be null if no one ready)
 **
 */
-local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
-				int x,int y,unsigned int unitType,
-				Unit ** bestunit)
+local int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
+    int x, int y, unsigned unitType, Unit** bestunit)
 {
-    static ZoneSet TransporterZones={0};
-    Unit ** allunits;
-    Unit * unit;
+    static ZoneSet TransporterZones = {0};
+    Unit** allunits;
+    Unit* unit;
     int i;
     int unitdst;
     int unitok;
     int result;
     int bestunitdst;
-    int unitX,unitY;
-    
+    int unitX;
+    int unitY;
+
     result = 0;
     *bestunit = 0;
     bestunitdst = -1;
     unitdst = -1;
-    
+
     // Travel through all units
     allunits = AiPlayer->Player->Units;
-    for (i = 0; i < AiPlayer->Player->TotalNumUnits; i++) {
+    for (i = 0; i < AiPlayer->Player->TotalNumUnits; ++i) {
 	unit = allunits[i];
 	
 	if (UnitUnusable(unit)) {
 	    continue;
 	}
-	if (unit->Type->UnitType != unitType || !unit->Type->Transporter) {
+	if ((unsigned)unit->Type->UnitType != unitType || !unit->Type->Transporter) {
 	    continue;
 	}
 	
 	result = 1;
-	    
+
 	if (unit->InsideCount >= unit->Type->MaxOnBoard) {
 	    continue;
 	}
@@ -1524,17 +1532,17 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
 	    unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
 	    unit->InsideCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
 		
-	    
+
 	    // Check that it will unload in the dest zone
 	    ZoneSetClear(&TransporterZones);
-	    ZoneSetAddCell(&TransporterZones, 
+	    ZoneSetAddCell(&TransporterZones,
 		unit->Orders[unit->OrderCount - 1].X, unit->Orders[unit->OrderCount - 1].Y);
-	    
+
 	    unitok = ZoneSetHasIntersect(&TransporterZones, destzones);
 	    if (unitok) {
 		if (unit->Orders[unit->OrderFlush ? 1 : 0].Goal) {
 		    unitX = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->X;
-		    unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->Y;    
+		    unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->Y;
 		} else {
 		    unitX = unit->Orders[unit->OrderFlush ? 1 : 0].X;
 		    unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Y;
@@ -1558,11 +1566,13 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
     return result;
 }
 
-local void HelpWithTransporter(Unit * unit, Unit * transporter, int transporterzone, int destzone)
+local void HelpWithTransporter(Unit* unit, Unit* transporter, int transporterzone, int destzone)
 {
-    int x,y;
+    int x;
+    int y;
+
     //    Order temp;
-    
+
     if (UnitIdle(transporter)) {
 	CommandFollow(transporter, unit, FlushCommands);
 	ZoneFindConnexion(destzone, transporterzone, unit->X, unit->Y, &x, &y);
@@ -1583,19 +1593,23 @@ local void HelpWithTransporter(Unit * unit, Unit * transporter, int transporterz
 **	@param unit	Pointer to unit what builds the building.
 **	@param what	Pointer to unit-type.
 */
-global void AiCanNotMove(Unit * unit)
+global void AiCanNotMove(Unit* unit)
 {
 
 #ifdef MAP_REGIONS
     AiTransportRequest* aitr;
 #endif
-    int gx,gy,gw,gh;
-    int minrange, maxrange;
-    
+    int gx;
+    int gy;
+    int gw;
+    int gh;
+    int minrange;
+    int maxrange;
+
     DebugLevel2Fn("%s at %d %d\n" _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
 
     AiPlayer = unit->Player->Ai;
-    
+
     if (unit->Orders[0].Goal) {
     	gw=unit->Orders[0].Goal->Type->TileWidth;
 	gh=unit->Orders[0].Goal->Type->TileHeight;
@@ -1614,7 +1628,7 @@ global void AiCanNotMove(Unit * unit)
 	gx=unit->Orders[0].X;
 	gy=unit->Orders[0].Y;
     }
-    
+
     if (PlaceReachable(unit, gx, gy, gw, gh, minrange, maxrange) || unit->Type->UnitType == UnitTypeFly) {
 	// Path probably closed by unit here
 	DebugLevel2Fn("Place reacheable, move unit in the way.\n");
@@ -1630,7 +1644,7 @@ global void AiCanNotMove(Unit * unit)
 	}
 	aitr = aitr->Next;
     }
-    
+
     aitr = malloc(sizeof(AiTransportRequest));
     aitr->Next = AiPlayer->TransportRequests;
     aitr->Unit = unit;
@@ -1645,20 +1659,25 @@ global void AiCanNotMove(Unit * unit)
 }
 
 #ifdef MAP_REGIONS
-local void HandleTransportRequests(AiTransportRequest * aitr)
+local void HandleTransportRequests(AiTransportRequest* aitr)
 {
-    static ZoneSet UnitZones={0};
-    static ZoneSet DestZones={0};
+    static ZoneSet UnitZones = {0};
+    static ZoneSet DestZones = {0};
 
-    Unit * transporter;
+    Unit* transporter;
     int zonepath[MaxZoneNumber];
     int zonepathlen;
-    int gx,gy,gw,gh,maxrange,minrange;
-    
+    int gx;
+    int gy;
+    int gw;
+    int gh;
+    int maxrange;
+    int minrange;
+
     if (aitr->Unit->Removed) {
 	return;
     }
-    
+
     if (aitr->Order.Goal) {
 	// Check for dead goal here (?)
 	if (aitr->Order.Goal->Removed) {
@@ -1696,7 +1715,7 @@ local void HandleTransportRequests(AiTransportRequest * aitr)
 	// Can go, nothing to do.
 	return;
     }
-    
+
     if (!ZoneSetFindPath(&UnitZones, &DestZones, zonepath, &zonepathlen)) {
 	DebugLevel2Fn("no way over there.\n");
     	return;
@@ -1723,7 +1742,7 @@ local void HandleTransportRequests(AiTransportRequest * aitr)
 **	@param unit	Point to unit.
 **      @param what     Pointer to unit-type.
 */
-global void AiNeedMoreSupply(Unit * unit, const UnitType * what __attribute__ ((unused)))
+global void AiNeedMoreSupply(Unit* unit, const UnitType* what __attribute__((unused)))
 {
     DebugLevel3Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1731,7 +1750,7 @@ global void AiNeedMoreSupply(Unit * unit, const UnitType * what __attribute__ ((
 
     DebugCheck(unit->Player->Type == PlayerPerson);
 
-    ((PlayerAi *) unit->Player->Ai)->NeedSupply = 1;
+    ((PlayerAi*)unit->Player->Ai)->NeedSupply = 1;
 }
 
 /**
@@ -1740,7 +1759,7 @@ global void AiNeedMoreSupply(Unit * unit, const UnitType * what __attribute__ ((
 **	@param unit	Pointer to unit making.
 **	@param what	Pointer to new ready trained unit.
 */
-global void AiTrainingComplete(Unit * unit, Unit * what)
+global void AiTrainingComplete(Unit* unit, Unit* what)
 {
     DebugLevel1Fn("%d: %d(%s) training %s at %d,%d completed\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1761,8 +1780,8 @@ global void AiTrainingComplete(Unit * unit, Unit * what)
 **	@param unit	Pointer to unit working.
 **	@param what	Pointer to the new unit-type.
 */
-global void AiUpgradeToComplete(Unit * unit __attribute__ ((unused)),
-    const UnitType * what __attribute__ ((unused)))
+global void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
+    const UnitType* what __attribute__((unused)))
 {
     DebugLevel1Fn("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1777,8 +1796,8 @@ global void AiUpgradeToComplete(Unit * unit __attribute__ ((unused)),
 **	@param unit	Pointer to unit working.
 **	@param what	Pointer to the new upgrade.
 */
-global void AiResearchComplete(Unit * unit __attribute__ ((unused)),
-    const Upgrade * what __attribute__ ((unused)))
+global void AiResearchComplete(Unit* unit __attribute__((unused)),
+    const Upgrade* what __attribute__((unused)))
 {
     DebugLevel1Fn("%d: %d(%s) research %s at %d,%d completed\n" _C_
 	unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1794,12 +1813,13 @@ global void AiResearchComplete(Unit * unit __attribute__ ((unused)),
 **
 **	@param player	The player structure pointer.
 */
-global void AiEachCycle(Player * player __attribute__ ((unused)))
+global void AiEachCycle(Player* player __attribute__((unused)))
 {
-    AiTransportRequest * aitr, * next;
-    
+    AiTransportRequest* aitr;
+    AiTransportRequest* next;
+
     AiPlayer = player->Ai;
-    
+
     aitr = AiPlayer->TransportRequests;
     while (aitr) {
 	next = aitr->Next;
@@ -1824,7 +1844,7 @@ global void AiEachCycle(Player * player __attribute__ ((unused)))
 **
 **	@param player	The player structure pointer.
 */
-global void AiEachSecond(Player * player)
+global void AiEachSecond(Player* player)
 {
 #ifdef TIMEIT
     u_int64_t sv = rdtsc();
