@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name iocompat.h	-	IO platform compatibility header file. */
+/**@name iocompat.h - IO platform compatibility header file. */
 //
-//	(c) Copyright 2002 by Andreas Arens
+//      (c) Copyright 2002-2004 by Andreas Arens
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __IOCOMPAT_H__
 #define __IOCOMPAT_H__
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Platform dependant IO-related Includes and Definitions
+--  Platform dependant IO-related Includes and Definitions
 ----------------------------------------------------------------------------*/
 
 #ifndef _MSC_VER
@@ -49,8 +49,8 @@
 
 #else // _MSC_VER
 
-#define R_OK		4
-#define F_OK		0
+#define R_OK 4
+#define F_OK 0
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
@@ -65,9 +65,9 @@
 #endif // _MSC_VER
 
 #ifndef O_BINARY
-#define O_BINARY		0
+#define O_BINARY 0
 #endif
 
 //@}
 
-#endif		// !__IOCOMPAT_H__
+#endif // !__IOCOMPAT_H__

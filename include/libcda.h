@@ -12,8 +12,8 @@ extern "C" {
 
 
 /* High-byte is major version, low-byte is minor. */
-#define LIBCDA_VERSION		0x0005
-#define LIBCDA_VERSION_STR	"0.5"
+#define LIBCDA_VERSION      0x0005
+#define LIBCDA_VERSION_STR  "0.5"
 
 
 extern const char *cd_error;
@@ -31,10 +31,10 @@ void cd_resume(void);
 int cd_is_paused(void);
 void cd_stop(void);
 
-int cd_get_tracks(int *first, int *last);
+int cd_get_tracks(int* first, int* last);
 int cd_is_audio(int track);
 
-void cd_get_volume(int *c0, int *c1);
+void cd_get_volume(int* c0, int* c1);
 void cd_set_volume(int c0, int c1);
 
 void cd_eject(void);
