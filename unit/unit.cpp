@@ -3321,7 +3321,7 @@ global char* UnitReference(const Unit* unit)
 **  @param order  Order who should be saved.
 **  @param file   Output file.
 */
-local void SaveOrder(const Order* order, CLFile* file)
+global void SaveOrder(const Order* order, CLFile* file)
 {
 	char* ref;
 

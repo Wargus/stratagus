@@ -167,7 +167,7 @@ local Unit* CclGetUnit(lua_State* l)
 **		@param list		All options of the order.
 **		@param order		OUT: resulting order.
 */
-local void CclParseOrder(lua_State* l, Order* order)
+global void CclParseOrder(lua_State* l, Order* order)
 {
 	const char* value;
 	int args;

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name unit.h		-	The unit headerfile. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __UNIT_H__
 #define __UNIT_H__
@@ -368,6 +368,7 @@
 #include "upgrade_structs.h"
 #include "upgrade.h"
 #include "construct.h"
+#include "ccl.h"
 
 #ifdef USE_SDL_SURFACE
 #include "SDL.h"
@@ -859,6 +860,8 @@ extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 	/// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
+	/// Save an order
+extern void SaveOrder(const Order* order, CLFile* file);
 	/// save unit-structure
 extern void SaveUnit(const Unit* unit,CLFile* file);
 	/// save all units
@@ -1063,6 +1066,8 @@ extern void SelectionCclRegister(void);
 
 //		in ccl_unit.c
 
+	/// Parse order
+extern void CclParseOrder(lua_State* l, Order* order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
 
