@@ -34,7 +34,12 @@
 
 #include "freecraft.h"
 
+#if defined(USE_OPENGL) && defined(_MSC_VER)
+#undef NOUSER
 #include "video.h"
+#else
+#include "video.h"
+#endif
 #include "font.h"
 #include "interface.h"
 #include "menus.h"
