@@ -47,12 +47,7 @@ You need:
 </UL>
 These are optional:
 <UL>
-	<LI>Guile. 	(GNU extension language, I use guile-1.2,guile-1.3)
-	    <BR>Currently replaced with SIOD.
 	<LI>libpthread. (For threaded sound support)
-	<LI>guile-gtk.	(Guile bindings for gtk)
-	<LI>gtk.	(Gimp toolkit)
-	<LI>glib.	(Glib needed by gimp toolkit)
 	<LI>SVGALib	(for console support)
 	<LI>SDL		(Additional SDK support)
 </UL>
@@ -113,9 +108,7 @@ Please follow the following instruction to get a working program.
   	<LI>Type "make". (Should compile without errors :-)
 	<LI>Optional:
 	    <UL>
-	    <LI>Edit "data/ccl/clone.ccl" to configure FreeCraft with
-		Guile support.
-	    <LI>or edit "data/ccl/freecraft.ccl" to configure FreeCraft
+	    <LI>Edit "data/ccl/freecraft.ccl" to configure FreeCraft
 		with SIOD support.
 	</UL>
 	<LI>Now you could start with "./freecraft".
@@ -222,42 +215,21 @@ Please follow the following instruction to get a working program.
 	    http://www.cdrom.com/pub/infozip/zlib/zlib.html
 	</A>
 
-	<P>You get guile here:<BR>
-	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/">
-	    ftp://prep.ai.mit.edu/pub/gnu/guile/ Directory (try first)
-	</A><BR>
-	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.2.tar.gz">
-	    ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.2.tar.gz
-	</A><BR>
-	<A HREF="ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.3.4.tar.gz">
-	    ftp://prep.ai.mit.edu/pub/gnu/guile/guile-1.3.4.tar.gz
-	</A>
-	<P>Alternative the snapshots:
-	<A HREF="ftp://ftp.red-bean.com/pub/guile/snapshots/guile-core-snap.tar.gz">
-	    ftp://ftp.red-bean.com/pub/guile/snapshots/guile-core-snap.tar.gz
-	</A>
 	<P>You get pthread here:<BR>
 	Please see the LinuxThreads homepage for more information:<BR>
 	<A HREF="http://pauillac.inria.fr/~xleroy/linuxthreads">
 	        http://pauillac.inria.fr/~xleroy/linuxthreads
 	</A>
-	<P>You get guile-gtk here:<BR>
-	<A HREF="http://www.ping.de/sites/zagadka/guile-gtk/">
-	    http://www.ping.de/sites/zagadka/guile-gtk/</A>
-	<P>Alternative from the gnome cvs, see the gnome homepage
-	<A HREF="http://www.gnome.org">www.gnome.org</A>
-	<P>You get gtk here:<BR>
-	<A HREF="ftp://ftp.gtk.org/pub/gtk">
-	    ftp://ftp.gtk.org/pub/gtk</A>
-	<P>Please see the GTK homepage for more information:<BR>
-	<A HREF="http://www.gtk.org">
-	    http://www.gtk.org/</A>
+
 	<P>You can get SVGALIB here:<BR>
 	<A HREF="http://www.svgalib.org/">
 	    http://www.svgalib.org/</A>
 	<P>You can get SDL here:<BR>
 	<A HREF="http://www.devolution.com/~slouken/SDL/">
 	    http://www.devolution.com/~slouken/SDL/</A>
+	<P>Or you can get SDL here:<BR>
+	<A HREF="http://www.libsdl.org/">
+	    http://www.libsdl.org/</A>
 	<P>SIOD: Scheme in One Day<BR>
 	The most recent release is available from
 	<A HREF="http://people.delphi.com/gjc/siod.html">this web page</a>,

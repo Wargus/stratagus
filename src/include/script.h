@@ -23,20 +23,14 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_CCL
-#include <guile/gh.h>			// I use guile for a quick hack
-#endif
-
-#ifdef USE_CCL2
 #include <string.h>
-#include "siod.h"			// now I try SIOD
-#endif
+#include "siod.h"
 
 /*----------------------------------------------------------------------------
 --	Macros
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_CCL2
+#ifdef USE_CCL
 
 #define SCM LISP
 #define SCM_UNSPECIFIED NIL
@@ -87,7 +81,7 @@ extern LISP sym_t;
 
 //extern SCM CclEachSecond;		/// Scheme function called each second
 
-#endif	// USE_CCL2
+#endif	// USE_CCL
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -103,17 +97,6 @@ extern int CclInConfigFile;		/// True while config file parsing
 extern void CclInit(void);		/// Initialise ccl
 extern void CclCommand(char*);		/// Execute a ccl command
 extern void CclFree(void*);		/// Save free
-
-#ifdef USE_CCL
-extern SCM gh_new_procedureN(char* proc_name, SCM (*fn) ());
-
-#ifdef LIBGUILE12			// my snapshot version 19980430
-					// didn't need it
-#define gh_vector_ref(vector,index) gh_vref(vector,index)
-
-#endif	// LIBGUILE12
-
-#endif	// USE_CCL
 
 //@}
 

@@ -52,7 +52,7 @@ What did FreeCraft need?
 Linux X11 with 16bit server or Win32 with 16bit videomode, libpng, libz and
 the original game CD or expansion CD.
 
-Optional libguile, libpthreads, guile-gtk and gtk.
+Optional libpthreads, svgalib and SDL.
 
 Copying-policy:
 ---------------

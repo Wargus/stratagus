@@ -895,7 +895,7 @@ global void SaveUpgrades(FILE* file)
 --	Ccl part of upgrades
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 
 #include "ccl.h"
 
@@ -990,7 +990,7 @@ global void UpgradesCclRegister(void)
     gh_new_procedureN("define-allow",CclDefineAllow);
 }
 
-#endif	// defined(USE_CCL) || defined(USE_CCL2)
+#endif	// defined(USE_CCL)
 
 
 

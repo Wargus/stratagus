@@ -46,16 +46,6 @@ libpng1.0.X. You get it here:
 <DD>A: I will improve the speed later, but me was told:<BR>
 Using Accelerated X on a Pentium 75 FreeCraft is now playable.
 <P>
-<DT>Q: Why did Guile 1.3 not work?
-
-<DD>A: Applies only to older versions, since october 1998 supported.<P>
-
-Change the line in 'Rules.make':<P>
-    GUILELIB=       -lguile -ldl<P>
-into<P>
-    GUILELIB=       `guile-config link` -lreadline -lncurses<P>
-With this I got guile 1.3 working.
-<P>
 <DT>Q: Did FreeCraft work with ALSA?
 
 <DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) - Driver.
@@ -112,21 +102,12 @@ With the new versions this should work without problems.
     </UL>
     This means you must type './freecraft ./data/puds/internal/internal01.pud.gz'!
 <P>
-<DT>Q: I got following error messages if I start freecraft from the binary release.
-<BR>ERROR: In procedure primitive-load-path:
-<BR>ERROR: Unable to find file "ice-9/boot-9.scm" in load path 
-<DD>A: Install the runtime system for guile/libguile.
-<BR>If you have it already installed or the installation didn't fix this error,
-try to use: "GUILE_LOAD_PATH=where_you_have_the_ice-9_directory ./freecraft"
-to start.
-<P>This sections should be outdated, currently SIOD is used.
-<P>
 <DT>Q: The mouse react after seconds on my moves?
 <DD>A: I didn't found the real problem. Currently use the threaded sound
 support and enable it (in data/ccl/sound.ccl) or and add to the line
 <P>
-DFLAGS= $(THREAD) $(GUILE) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND)
-$(DEBUG)
+DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
+	$(DEBUG)
 <P>
 "-DSLOW_INPUT" in Rules.make.
 <DT>Q: I want play but do not want use CD...  can i copy files from cd to hdd ? 

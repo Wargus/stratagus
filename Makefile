@@ -140,7 +140,7 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
-CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
+CCLS	= data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
 	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
 	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
