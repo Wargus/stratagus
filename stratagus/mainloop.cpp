@@ -542,6 +542,7 @@ global void GameMainLoop(void)
 	SetStatusLine("You have won!");
 	ProcessMenu(MENU_VICTORY, 1);
     }
+    GamePaused=0;
 }
 
 //@}
