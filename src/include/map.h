@@ -127,10 +127,6 @@
 **
 **  The world-map structure members:
 **
-**  WorldMap::Width WorldMap::Height
-**
-**    The map size in tiles.
-**
 **  WorldMap::Fields
 **
 **    An array WorldMap::Width*WorldMap::Height of all fields
@@ -163,10 +159,6 @@
 **  WorldMap::TileData
 **
 **    Tiles graphic for the map, loaded from WorldMap::Tileset::File.
-**
-**  WorldMap::Description[32]
-**
-**    Short description of the map.
 **
 **  WorldMap::Info
 **
