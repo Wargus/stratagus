@@ -155,7 +155,7 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 **  @param fade     Amount to fade
 */
 #ifndef USE_OPENGL
-global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
+global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
 {
 	int alpha;
@@ -166,7 +166,7 @@ global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
 	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
 }
 #else
-global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
+global void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
 {
 	// FIXME: not done
@@ -186,7 +186,7 @@ global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
 **  @param y        Y screen position
 **  @param fade     Amount to fade
 */
-global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
+global void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char fade)
 {
 	int oldx;
@@ -195,7 +195,7 @@ global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
 	oldx = x;
 	oldy = y;
 	CLIP_RECTANGLE(gx, gy, w, h);
-	VideoDrawSubFaded(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, fade);
+	VideoDrawSubTrans(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, fade);
 }
 
 /**
