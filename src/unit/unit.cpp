@@ -3271,21 +3271,12 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( type->Building && !target->Burning ) {
 	int f;
 	Missile* missile;
+	MissileType* fire;
 
 	f=(100*target->HP)/target->Stats->HitPoints;
-	if( f>75) {
-	    ; // No fire for this
-	} else if( f>50 ) {
-	    missile=MakeMissile(MissileTypeSmallFire
-		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
-		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
-		    -TileSizeY
-		    ,0,0);
-	    missile->SourceUnit=target;
-	    target->Burning=1;
-	    ++target->Refs;
-	} else {
-	    missile=MakeMissile(MissileTypeBigFire
+	fire=MissileBurningBuilding(f);
+	if( fire ) {
+	    missile=MakeMissile(fire
 		    ,target->X*TileSizeX+(type->TileWidth*TileSizeX)/2
 		    ,target->Y*TileSizeY+(type->TileHeight*TileSizeY)/2
 		    -TileSizeY

@@ -198,29 +198,29 @@ local SCM CclMissile(SCM list)
     type=NULL;
     x = dx = y = dy = -1;
 
-    while (!gh_null_p (list)) {
-	value = gh_car (list);
-	list = gh_cdr (list);
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
 
-	if (gh_eq_p (value, gh_symbol2scm ("type"))) {
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    str = gh_scm2newstr (value, NULL);
-	    type = MissileTypeByIdent (str);
-	    free (str);
-	} else if (gh_eq_p (value, gh_symbol2scm ("pos"))) {
-	    SCM sublist = gh_car (list);
-	    list = gh_cdr (list);
-	    x = gh_scm2int (gh_car (sublist));
-	    y = gh_scm2int (gh_cadr (sublist));
-	} else if (gh_eq_p (value, gh_symbol2scm ("goal"))) {
-	    SCM sublist = gh_car (list);
-	    list = gh_cdr (list);
-	    dx = gh_scm2int (gh_car (sublist));
-	    dy = gh_scm2int (gh_cadr (sublist));
-	} else if (gh_eq_p (value, gh_symbol2scm ("local"))) {
-	    DebugCheck (!type);
-	    missile = MakeLocalMissile (type, x, y, dx, dy);
+	if (gh_eq_p(value, gh_symbol2scm("type"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(value, NULL);
+	    type = MissileTypeByIdent(str);
+	    free(str);
+	} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
+	    SCM sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    x = gh_scm2int(gh_car(sublist));
+	    y = gh_scm2int(gh_cadr(sublist));
+	} else if (gh_eq_p(value, gh_symbol2scm("goal"))) {
+	    SCM sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    dx = gh_scm2int(gh_car(sublist));
+	    dy = gh_scm2int(gh_cadr(sublist));
+	} else if (gh_eq_p(value, gh_symbol2scm("local"))) {
+	    DebugCheck(!type);
+	    missile = MakeLocalMissile(type, x, y, dx, dy);
 		// we need to reinitialize position parameters - that's because of
 		// the way InitMissile() (called from MakeLocalMissile()) computes
 		// them - it works for creating a missile during a game but breaks
@@ -230,74 +230,122 @@ local SCM CclMissile(SCM list)
 		missile->DX = dx;
 		missile->DY = dy;
 	    missile->Local = 1;
-	} else if (gh_eq_p (value, gh_symbol2scm ("global"))) {
+	} else if (gh_eq_p(value, gh_symbol2scm("global"))) {
 	    DebugCheck (!type);
-	    missile = MakeMissile (type, x, y, dx, dy);
+	    missile = MakeMissile(type, x, y, dx, dy);
 		missile->X = x;
 		missile->Y = y;
 		missile->DX = dx;
 		missile->DY = dy;
 	    missile->Local = 0;
-	} else if (gh_eq_p (value, gh_symbol2scm ("frame"))) {
-	    DebugCheck (!missile);
-	    missile->SpriteFrame = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("state"))) {
-	    DebugCheck (!missile);
-	    missile->State = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("wait"))) {
-	    DebugCheck (!missile);
-	    missile->Wait = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("delay"))) {
-	    DebugCheck (!missile);
-	    missile->Delay = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("source"))) {
-	    DebugCheck (!missile);
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    str = gh_scm2newstr (value, NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
+	    DebugCheck(!missile);
+	    missile->SpriteFrame = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("state"))) {
+	    DebugCheck(!missile);
+	    missile->State = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("wait"))) {
+	    DebugCheck(!missile);
+	    missile->Wait = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p (value, gh_symbol2scm("delay"))) {
+	    DebugCheck(!missile);
+	    missile->Delay = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("source"))) {
+	    DebugCheck(!missile);
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(value, NULL);
 	    missile->SourceUnit = UnitSlots[strtol (str+1, 0, 16)];
 	    free(str);
 	    ++missile->SourceUnit->Refs;
-	} else if (gh_eq_p (value, gh_symbol2scm ("target"))) {
-	    DebugCheck (!missile);
-	    value = gh_car (list);
-	    list = gh_cdr (list);
-	    str = gh_scm2newstr (value, NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("target"))) {
+	    DebugCheck(!missile);
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    str = gh_scm2newstr(value, NULL);
 	    missile->TargetUnit = UnitSlots[strtol (str+1, 0, 16)];
 	    free(str);
 	    ++missile->TargetUnit->Refs;
-	} else if (gh_eq_p (value, gh_symbol2scm ("damage"))) {
-	    DebugCheck (!missile);
-	    missile->Damage = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("ttl"))) {
-	    DebugCheck (!missile);
-	    missile->TTL = gh_scm2int (gh_car (list));
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("controller"))) {
-	    DebugCheck (!missile);
-	    DebugLevel0Fn ("FIXME: no point in reading a pointer value from "
+	} else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+	    DebugCheck(!missile);
+	    missile->Damage = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
+	    DebugCheck(!missile);
+	    missile->TTL = gh_scm2int(gh_car(list));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("controller"))) {
+	    DebugCheck(!missile);
+	    DebugLevel0Fn("FIXME: no point in reading a pointer value from "
 		    "a saved game!!\n");
-	    //missile->Controller = gh_scm2int (gh_car (list));
+	    //missile->Controller = gh_scm2int(gh_car(list));
 	    missile->Controller = NULL;
-	    list = gh_cdr (list);
-	} else if (gh_eq_p (value, gh_symbol2scm ("data"))) {
-	    SCM sublist = gh_car (list);
-	    list = gh_cdr (list);
-	    missile->D = gh_scm2int (gh_car (sublist));
-	    sublist = gh_cdr (sublist);
-	    missile->Dx = gh_scm2int (gh_car (sublist));
-	    sublist = gh_cdr (sublist);
-	    missile->Dy = gh_scm2int (gh_car (sublist));
-	    sublist = gh_cdr (sublist);
-	    missile->Xstep = gh_scm2int (gh_car (sublist));
-	    sublist = gh_cdr (sublist);
-	    missile->Ystep = gh_scm2int (gh_car (sublist));
+	    list = gh_cdr(list);
+	} else if (gh_eq_p(value, gh_symbol2scm("data"))) {
+	    SCM sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    missile->D = gh_scm2int(gh_car(sublist));
+	    sublist = gh_cdr(sublist);
+	    missile->Dx = gh_scm2int(gh_car(sublist));
+	    sublist = gh_cdr(sublist);
+	    missile->Dy = gh_scm2int(gh_car(sublist));
+	    sublist = gh_cdr(sublist);
+	    missile->Xstep = gh_scm2int(gh_car(sublist));
+	    sublist = gh_cdr(sublist);
+	    missile->Ystep = gh_scm2int(gh_car(sublist));
 	}
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
+**	Define burning building missiles.
+**
+**	@param list	.
+*/
+local SCM CclDefineBurningBuilding(SCM list)
+{
+    SCM value;
+    SCM sublist;
+    BurningBuildingFrame **frame;
+    BurningBuildingFrame *next;
+    char *str;
+
+    frame = &BurningBuildingFrames;
+    while (*frame) {
+	next = (*frame)->Next;
+	free(*frame);
+	frame = &next;
+    }
+
+    frame = &BurningBuildingFrames;
+
+    while (!gh_null_p(list)) {
+	sublist = gh_car(list);
+	list = gh_cdr(list);
+
+	*frame = calloc(1, sizeof(BurningBuildingFrame));
+	while (!gh_null_p(sublist)) {
+	    value = gh_car(sublist);
+	    sublist = gh_cdr(sublist);
+
+	    if (gh_eq_p(value, gh_symbol2scm("percent"))) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		(*frame)->Percent = gh_scm2int(value);
+	    } else if (gh_eq_p(value, gh_symbol2scm("missile"))) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		str = gh_scm2newstr(value, NULL);
+		(*frame)->Missile = MissileTypeByIdent(str);
+		free(str);
+	    }
+	}
+	frame = &((*frame)->Next);
     }
     return SCM_UNSPECIFIED;
 }
@@ -311,6 +359,7 @@ global void MissileCclRegister(void)
 	    CclDefineMissileTypeWcNames);
     gh_new_procedureN("define-missile-type",CclDefineMissileType);
     gh_new_procedureN("missile",CclMissile);
+    gh_new_procedureN("define-burning-building",CclDefineBurningBuilding);
 }
 
 //@}
