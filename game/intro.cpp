@@ -820,11 +820,12 @@ global void ShowPicture(CampaignChapter* chapter)
     max = chapter->Data.Picture.FadeIn;
     while (IntroNoEvent && i < max) {
 #ifdef USE_SDL_SURFACE
+	VideoClearScreen();
 	VideoDrawSubClipFaded(background, 0, 0,
 	    background->Width, background->Height,
 	    (VideoWidth - background->Width) / 2,
 	    (VideoHeight - background->Height) / 2,
-	    255 - (255 * i / max));
+	    255 * i / max);
 	PictureDrawText(chapter, lines);
 #else
 	VideoLockScreen();
@@ -880,11 +881,12 @@ global void ShowPicture(CampaignChapter* chapter)
     max = chapter->Data.Picture.FadeOut;
     while (i >= 0) {
 #ifdef USE_SDL_SURFACE
+	VideoClearScreen();
 	VideoDrawSubClipFaded(background, 0, 0,
 	    background->Width, background->Height,
 	    (VideoWidth - background->Width) / 2,
 	    (VideoHeight - background->Height) / 2,
-	    255 - (255 * i / max));
+	    255 * i / max);
 	PictureDrawText(chapter, lines);
 #else
 	VideoLockScreen();

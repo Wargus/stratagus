@@ -82,17 +82,22 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
     drect.x = x;
     drect.y = y;
 
-    CLIP_RECTANGLE(gx, gy, w, h);
-
     SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
-//    InvalidateArea(x, y, w, h);
 }
 
 global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
     int w, int h, int x, int y)
 {
+    CLIP_RECTANGLE(gx, gy, w, h);
+    VideoDrawSub(graphic, gx, gy, w, h, x, y);
+}
+
+global void VideoDrawSubFaded(const Graphic* graphic, int gx, int gy,
+    int w, int h, int x, int y, unsigned char fade)
+{
     SDL_Rect srect;
     SDL_Rect drect;
+    int alpha;
 
     srect.x = gx;
     srect.y = gy;
@@ -102,11 +107,17 @@ global void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
     drect.x = x;
     drect.y = y;
 
-    CLIP_RECTANGLE(gx, gy, w, h);
-
+    alpha = graphic->Surface->format->alpha;
+    SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, fade);
     SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
-//    InvalidateArea(x, y, w, h);
-//    Invalidate();
+    SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
+}
+
+global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
+    int w, int h, int x, int y, unsigned char fade)
+{
+    CLIP_RECTANGLE(gx, gy, w, h);
+    VideoDrawSubFaded(graphic, gx, gy, w, h, x, y, fade);
 }
 
 #else
@@ -480,6 +491,7 @@ local void FreeGraphic8(Graphic* graphic)
 --	Global functions
 ----------------------------------------------------------------------------*/
 
+#ifndef USE_SDL_SURFACE
 /**
 **	Video draw part of a graphic clipped and faded.
 **
@@ -498,6 +510,7 @@ global void VideoDrawSubClipFaded(Graphic* graphic, int gx, int gy,
     VideoDrawSubClip(graphic, gx, gy, w, h, x, y);
     VideoFillTransRectangle(ColorBlack, x, y, w, h, fade);
 }
+#endif
 
 /**
 **	Make a graphic object.
