@@ -160,8 +160,6 @@ local SCM CclDefineUnitType(SCM list)
 
     type->NumDirections = 8;
 
-    type->Property = SCM_UNSPECIFIED;
-
     //
     //	Parse the list:	(still everything could be changed!)
     //
@@ -754,8 +752,6 @@ local int CclDefineUnitType(lua_State* l)
     memset(type->CanTargetFlag, 0, NumberBoolFlag * sizeof (*type->CanTargetFlag));
 
     type->NumDirections = 8;
-
-//    type->Property = SCM_UNSPECIFIED;
 
     //
     //	Parse the list:	(still everything could be changed!)
@@ -1776,59 +1772,6 @@ local SCM CclSetUnitTypeName(SCM ptr, SCM name)
 #elif defined(USE_LUA)
 #endif
 
-// FIXME: write the missing access functions
-
-/**
-**	Get the property of the unit-type structure.
-**
-**	@param ptr	Unit-type object.
-**
-**	@return		The property of the unit-type.
-*/
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclGetUnitTypeProperty(SCM ptr)
-{
-    const UnitType* type;
-
-    type = CclGetUnitType(ptr);
-    return type->Property;
-}
-#elif defined(USE_LUA)
-#endif
-
-/**
-**	Set the property of the unit-type structure.
-**
-**	@param ptr	Unit-type object.
-**	@param property	The property to set.
-**
-**	@return		The property of the unit-type.
-*/
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclSetUnitTypeProperty(SCM ptr, SCM property)
-{
-    UnitType* type;
-
-    type = CclGetUnitType(ptr);
-
-    if (!property) {
-	DebugLevel0Fn("oops, my fault\n");
-    }
-
-    if (property != SCM_UNSPECIFIED && (SCM)type->Property == SCM_UNSPECIFIED) {
-    	CclGcProtect((SCM*)&type->Property);
-    } else if (property == SCM_UNSPECIFIED && (SCM)type->Property != SCM_UNSPECIFIED) {
-	CclGcProtectedAssign((SCM*)&type->Property, property);
-	CclGcUnprotect((SCM*)&type->Property);
-    } else {
-	CclGcProtectedAssign((SCM*)&type->Property, property);
-    }
-
-    return property;
-}
-#elif defined(USE_LUA)
-#endif
-
 /**
 **	Define tileset mapping from original number to internal symbol
 **
@@ -2203,11 +2146,6 @@ global void UnitTypeCclRegister(void)
     gh_new_procedure1_0("get-unit-type-name", CclGetUnitTypeName);
     gh_new_procedure2_0("set-unit-type-name!", CclSetUnitTypeName);
 
-    // FIXME: write the missing access functions
-
-    gh_new_procedure1_0("get-unit-type-property", CclGetUnitTypeProperty);
-    gh_new_procedure2_0("set-unit-type-property!", CclSetUnitTypeProperty);
-
     gh_new_procedureN("define-unittype-wc-names", CclDefineUnitTypeWcNames);
 
     gh_new_procedureN("define-animations", CclDefineAnimations);
@@ -2224,11 +2162,6 @@ global void UnitTypeCclRegister(void)
 //    lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 //    lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 //    lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
-
-    // FIXME: write the missing access functions
-
-//    lua_register(Lua, "GetUnitTypeProperty", CclGetUnitTypeProperty);
-//    lua_register(Lua, "SetUnitTypeProperty", CclSetUnitTypeProperty);
 
     lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
