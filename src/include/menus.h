@@ -406,6 +406,8 @@ extern void EditorEditAiProperties(void);
 extern int EditorSaveMenu(void);
     /// Load map from the editor
 extern void EditorLoadMenu(void);
+    /// Setup Editor Paths
+extern void SetupEditor(void);
 
     /// Error menu
 extern void ErrorMenu(char *);

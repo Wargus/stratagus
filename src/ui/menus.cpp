@@ -5033,13 +5033,24 @@ global void NetClientUpdateState(void)
 */
 local void StartEditor(void)
 {
-    char* s;
 
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
+    SetupEditor();
+
+    EditorRunning = 1;
+    EndMenu();
+}
+
+/**
+**	Setup Editor Paths
+*/
+global void SetupEditor(void)
+{
+    char *s;
     //
     //  Create a default path + map.
     //
@@ -5066,9 +5077,8 @@ local void StartEditor(void)
 	*ScenSelectDisplayPath = '\0';
     }
 
-    EditorRunning = 1;
-    EndMenu();
 }
+
 
 /**
 **	Editor select cancel button callback
