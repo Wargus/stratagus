@@ -87,6 +87,9 @@ global char* Tips[MAX_TIPS + 1];        /// Array of tips
 global int ShowTips;                    /// Show tips at start of level
 global int CurrentTip;                  /// Current tip to display
 global int NoRandomPlacementMultiplayer = 0;///Disable the random placement of players in muliplayer mode
+
+global char UseHPForXp = 0;             /// true if gain XP by dealing damage, false if by killing.
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -431,6 +434,22 @@ local int CclSetLocalPlayerName(lua_State* l)
 	return 0;
 }
 
+
+/**
+**  Affect UseHPForXp.
+**
+**  @param l lua_state with boolean value to affect to UseHPForXp.
+**	@return 0.
+*/
+local int ScriptSetUseHPForXp(lua_State* l)
+{
+	if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+	UseHPForXp = lua_toboolean(l, 1);
+	lua_pop(l, 1);
+	return 0;
+}
 
 /**
 **		Removes Randomization of Player position in Multiplayer mode
@@ -1036,6 +1055,7 @@ global void InitCcl(void)
 	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
 	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
 	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
+	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
 
 	lua_register(Lua, "DefineDefaultResources", CclDefineDefaultResources);
 	lua_register(Lua, "DefineDefaultResourcesLow", CclDefineDefaultResourcesLow);
