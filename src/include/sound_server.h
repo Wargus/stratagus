@@ -258,6 +258,9 @@ extern Sample* LoadWav(const char* name,int flags);	/// Load a wav file
 extern Sample* LoadOgg(const char* name,int flags);	/// Load an ogg file
 extern Sample* LoadMp3(const char* name,int flags);	/// Load a mp3 file
 
+extern int ConvertToStereo32(const char* in, char* out, int frequency,
+    int bitrate, int channels, int bytes);
+
     ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned number);
 
