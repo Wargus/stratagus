@@ -233,7 +233,8 @@ This defines how a special AI works. Each level can use his own AI definition.
 <DT>class</DT>
 <DD>Class name of this definition. Used to chooce the AI for computer players.
 The puds contains numbers which are mapped by the C table AiTypeWcNames into
-internal names. Some common used names are "passive", "land", "sea", "air".
+internal names. Some common used names are "passive", "land-attack",
+"sea-attack", "air-attack".
 </DD>
 <DT>script</DT>
 <DD>A list of scheme statements executed one after another.<P>
@@ -258,8 +259,8 @@ time the next statement is executed. No statement should use more than 3 ms.
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME="ai-debug"></A>
-<H3>ai-debug</H3>
+<A NAME="ai:debug"></A>
+<H3>ai:debug</H3>
 
 <H4>Description</H4>
 
@@ -288,12 +289,12 @@ Enable or disable the debug output of the AI script execution.
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
 <A NAME="ai:need"></A>
-<H3>ai-need</H3>
+<H3>ai:need</H3>
 
 <H4>Description</H4>
 
 Tells the AI that it should have an unit of this unit-type. The AI builds or
-trains units in this order of the ai:need commands. If the unit or an
+trains units in this order of the ai:set/ai:need commands. If the unit or an
 equivalent unit already exists, the AI does nothing. If the unit is lost, it is
 automatic rebuild. If the units are requested in wrong order, the AI could 
 hang up. Resources are collected automatic and farms are automatic build, but
@@ -322,383 +323,384 @@ additional could be requested.
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:set"></A>
+<H3>ai:set</H3>
 
 <H4>Description</H4>
 
+This ai:need with a number. Tells the AI that it should have a specified number
+of an unit of this unit-type. The AI builds or trains units in this order of
+the ai:set/ai:need commands. If the unit or an equivalent unit already exists,
+the AI does nothing. If the units are lost, they are automatic rebuild. If the
+units are requested in wrong order, the AI could hang up. Resources are
+collected automatic and farms are automatic build, but additional could be
+requested. In the opposite to ai:need, which always inserts a request, ai:set
+modifies the last request to the new number.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:set unit-type count)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
+<DT>unit-type</DT>
+<DD>Name of the unit-type(s) required.
 </DD>
-<DT></DT>
-<DD>
+<DT>count</DT>
+<DD>Number of unit-types(s) required.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:set (unit-type 'unit-footman) 2)
 </PRE>
 
-<P>
+<P>Request two footmans.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:wait"></A>
+<H3>ai:wait</H3>
 
 <H4>Description</H4>
 
+Waits until the *first* request of this unit-type is completed.
+Don't forget to request an unit-type, before you wait on it.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:wait type)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
+<DT>type</DT>
+<DD>Wait for this unit type.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:need 'unit-peasant)
+    (ai:wait 'unit-peasant)
 </PRE>
 
-<P>
+<P>Proceed only if a peasant is ready.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:force"></A>
+<H3>ai:force</H3>
 
 <H4>Description</H4>
 
+Define a force, what and how many units should belong to a force. Up to 10
+forces are currently supported.
+<BR>
+Force 0 is currently fixed to be the defence force. Send to a building or
+unit under attack.
+<BR>
+If there are any unassigned units of the requested unit-type, than they are
+assigned to the force.
+<BR>
+Note: The low-level didn't support the reduce of a force.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:force force unit-type-1 count-1 ... unit-type-N count-N)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
+<DT>force</DT>
+<DD>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
 </DD>
-<DT></DT>
-<DD>
+<DT>unit-type-1</DT>
+<DT>unit-type-N</DT>
+<DD>Unit-type that should be in the force. Currently only mobile (trained) units
+are allowed.
+</DD>
+</DL>
+<DT>count-1</DT>
+<DT>count-N</DT>
+<DD>How many of this units should be in the force.
+</DD>
+</DL>
+
+<I>The unit-types should be build in a fixed order. From left to right? or from
+each unit-type one after the other?</I>
+
+<H4>Example</H4>
+
+<PRE>
+    (ai:force 0 'unit-footman 4 'unit-bowman 5)
+    (ai:force 1 'unit-footman 3 'unit-bowman 2)
+</PRE>
+
+<P>First the force 0 is filled up with 4 footmans and 5 bowmans, after this
+force 1 is filled with 3 footmans and 2 bowmans.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME="ai:wait-force"></A>
+<H3>ai:wait-force</H3>
+
+<H4>Description</H4>
+
+Wait until a force is complete, the forces are build in force number order.
+First 0, than 1, last 9.
+
+<H4>Syntax</H4>
+
+<CODE>(ai:wit-force force)</CODE>
+
+<DL>
+<DT>force</DT>
+<DD>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:force 0 'unit-footman 1)
+    (ai:wait-force 0)
 </PRE>
 
-<P>
+<P>Force 0 is build with one footman. The script continues processing, if the
+footman is ready trained.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:attack-with-force"></A>
+<H3>ai:attack-with-force</H3>
 
 <H4>Description</H4>
 
+Attack the opponent with a force. The place is choosen by the AI. If there
+are flyers, ships and land units in the force they could attack different
+goals.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:attack-with-force force)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
+<DT>force</DT>
+<DD>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
 </DD>
-<DT></DT>
-<DD>
+</DL>
+
+<I>The force isn't moved as unit, faster units attacks first, than later the
+slower units will attack.</I>
+
+<H4>Example</H4>
+
+<PRE>
+    (ai:force 0 'unit-footman 1)
+    (ai:wait-force 0)
+    (ai:attack-with-force 0)
+</PRE>
+
+<P>Force 0 is build with one footman. The script continues processing, if the
+footman is ready trained. Now attack the opponent with force 0.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+
+<A NAME="ai:sleep"></A>
+<H3>ai:sleep</H3>
+
+<H4>Description</H4>
+
+Wait some frames, to let the opponent (you) recover.
+
+<H4>Syntax</H4>
+
+<CODE>(ai:sleep frames)</CODE>
+
+<DL>
+<DT>frames</DT>
+<DD>How many frames (~1/30s) the AI shouldn't proceed with the script.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:sleep 500)
 </PRE>
 
-<P>
+<P>Wait 500 frames ~16s.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:research"></A>
+<H3>ai:research</H3>
 
 <H4>Description</H4>
 
+Let the AI research an upgrade, upgrades are reseached in command order.
+And automatic researched if lost. Building orders have a higher priority.
+The script writer is responsible for the correct order. If wrong the
+AI could hang up.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:research upgrade)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
+<DT>upgrade</DT>
+<DD>Upgrade name to be researched.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:research 'upgrade-shield1)
 </PRE>
 
-<P>
+<P>Research a better armor for land units.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:upgrade-to"></A>
+<H3>ai:upgrade-to</H3>
 
 <H4>Description</H4>
 
+Upgrade units to an improved type. You must give for each unit you want to
+upgrade an upgrade command. The computer automatic searches which unit it
+upgrades.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:upgrade-to unit-type)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
+<DT>unit-type</DT>
+<DD>Unit type to that an unit should be upgraded.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+    (ai:upgrade-to 'unit-keep)
 </PRE>
 
-<P>
+<P>Upgrade a town-hall to keep.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:script"></A>
+<H3>ai:script</H3>
 
 <H4>Description</H4>
 
+Execute a new script, can be used for loops, subroutines. But this must be
+handled by the user.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
+<CODE>(ai:script script)</CODE>
 
 <DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
+<DT>script</DT>
+<DD>A list of AI commands. Executed one after the other.
 </DD>
 </DL>
 
 <H4>Example</H4>
 
 <PRE>
+(define attack-endloop
+  '((ai:with-force 1)
+    (ai:attack-with-force 1)
+    (ai:script attack-endloop) ))
 </PRE>
 
-<P>
+<P>An example with a for ever loop. Wait for force 1 ready (all units trained),
+than attack with the force 1. This is done endless.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<A NAME="ai:restart"></A>
+<H3>ai:restart</H3>
 
 <H4>Description</H4>
 
+Restart with the main AI script. Could be used as longjmp for the AI
+scripts.
+
 <H4>Syntax</H4>
 
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
+<CODE>(ai:restart)</CODE>
 
 <H4>Example</H4>
 
 <PRE>
+(define-ai "passive" "*" "passive"
+  '( (ai:sleep   10000)
+     (ai:restart) ))
 </PRE>
 
-<P>
+<P>A endless script doing nothing.
 
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
 
-<A NAME=""></A>
-<H3></H3>
+<H2>Notes</H2>
 
-<H4>Description</H4>
+The current AI script support is very limited, many new functions are needed.
+If you want to write this you know who to contact.
 
-<H4>Syntax</H4>
-
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
+<H2>Examples</H2>
 
 <PRE>
-</PRE>
+(define-ai "wc2-example" 'orc 'land-attack
+</PRE><P STYLE="margin-left:1cm;">
+This is the AI "wc2-example" usable for human race and land-attack.
+</P><PRE>
+  '( (ai:need (unit-type 'unit-great-hall))
+</PRE><P STYLE="margin-left:1cm;">
+The first need unit is the great-hall.
+</P><PRE>
+     (ai:need 'unit-peon)
+</PRE><P STYLE="margin-left:1cm;">
+The next unit should be the peon.
+</P><PRE>
+     (ai:wait 'unit-great-hall)
+</PRE><P STYLE="margin-left:1cm;">
+Now wait until the great hall is available. Could hang if no great hall can be
+build.
+</P><PRE>
+     (ai:wait 'unit-peon) ))
+</PRE><P STYLE="margin-left:1cm;">
+Now wait unit we have a worker to build the next things.
+</P>
 
-<P>
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
-
-<A NAME=""></A>
-<H3></H3>
-
-<H4>Description</H4>
-
-<H4>Syntax</H4>
-
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-</PRE>
-
-<P>
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
-
-<A NAME=""></A>
-<H3></H3>
-
-<H4>Description</H4>
-
-<H4>Syntax</H4>
-
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-</PRE>
-
-<P>
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
-
-<A NAME=""></A>
-<H3></H3>
-
-<H4>Description</H4>
-
-<H4>Syntax</H4>
-
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-</PRE>
-
-<P>
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
-
-
-<A NAME=""></A>
-<H3></H3>
-
-<H4>Description</H4>
-
-<H4>Syntax</H4>
-
-<CODE></CODE>
-
-<DL>
-<DT></DT>
-<DD>
-</DD>
-<DT></DT>
-<DD>
-</DD>
-</DL>
-
-<H4>Example</H4>
-
-<PRE>
-</PRE>
-
-<P>
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/ai.ccl"> $LIBARYPATH/ccl/ai.ccl </A>
+FIXME: need some complex examples.
 
 <HR>
 Last changed: $Id$<BR>
