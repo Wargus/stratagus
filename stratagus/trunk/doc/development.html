@@ -58,7 +58,163 @@ Before you starting doing some work, please ask on the mailing list, if not
 already somebody is doing the same thing and write what you plan todo, that 
 nobody starts the same work.
 
+<H2>Compiling and tools and libraries</H2>
+
+<H3>Installing CVS client</H3>
+
+If you want to help develop it is the best, that you use CVS. First you
+need CVS for your system.<P>
+
+You find all informations about CVS on <A HREF="http://www.sourceforge.net/">
+SourceForge</A>.<P>
+
+<UL>
+<LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=763&group_id=1">
+Sourceforge: CVS HOWTO</A><P>
+CVS on SF - rookie should read it. General, should read it, *too*.
+<LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=767&group_id=1">
+Win32/CVS/SSH HowTo</A><P>
+A "quick & dirty" guide
+<LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=769&group_id=1">
+Win32/CVS/SSH addendum for WinCVS</A><P>
+Read after the Win32 Guide & Howto
+<LI><A HREF="http://sourceforge.net/docman/display_doc.php?docid=770&group_id=1">
+SourceForge setup tool for CVS/SSH/Win32</A><P>
+There's a tool to help
+<LI>Linux<P>
+Install CVS, CVS-BOOK, and if you like a CVS GUI.
+<P>
+Debian: apt-get install cvs; apt-get install cvsbook; apt-get install lincvs
+</UL>
+
+<H3>Getting FreeCraft from CVS</H3>
+
+<H4>There a 4 modules in CVS.</H4>
+
+<UL>
+<LI>freecraft - The FreeCraft engine source<P>
+	All you need to use with the original WC2 CD. The sources have the GPL
+	(GNU General Public License). If you want to develop for FreeCraft you
+	need this.
+
+<LI>fcsp - The FreeCraft Sound Project<P>
+	A collection of free sounds and music, GPL (GNU General Public License)
+	prefered. But each file can have its own license, please read.
+
+<LI>fcgp - The FreeCraft Graphic Project<P>
+	A collection of free graphics, animations and models, GPL
+	(GNU General Public License) prefered. But each file can have its own
+	license, please read.
+
+<LI>crafted - The FreeCraft Map Editor<P>
+	A map editor for FreeCraft. This project has just started and needs
+	also more developer.
+</UL>
+
+<H4>How to access this modules?</H4>
+
+<H5>Anonymous CVS Access</H5>
+
+This is for all user/developer/designer without accout on SourceForge.<P>
+
+Make somewhere a directory FreeCraft. Enter this directory.<P>
+
+cvs -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft login<BR>
+<I>"When prompted for a password for anonymous, simply press the Enter key."</I><BR>
+cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<BR>
+cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co crafted<BR>
+cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcgp<BR>
+cvs -z3 -d:pserver:anonymous@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcsp<P>
+
+You will now have the directories freecraft, crafted, fcpg and fcsp.<P>
+
+In the future only go into any directory and enter "cvs -q update -d" to get
+the latest version.<P>
+
+<H5>Developer CVS Access via SSH</H5>
+
+Only project developers can access the CVS tree via this method. Substitute
+<I>developername</I> with the proper values. Enter your site password when
+prompted.<P>
+
+export CVS_RSH=ssh<BR>
+cvs -z3 -d:ext:<I>developername</I>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co freecraft<BR>
+cvs -z3 -d:ext:<I>developername</I>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co crafted<BR>
+cvs -z3 -d:ext:<I>developername</I>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcgp<BR>
+cvs -z3 -d:ext:<I>developername</I>@cvs.freecraft.sourceforge.net:/cvsroot/freecraft co fcsp<P>
+
+You will now have the directories freecraft, crafted, fcpg and fcsp.<P>
+
+In the future only go into any directory and enter "cvs -q update -d" to get
+the latest version.<P>
+
+<H3>Linux(tm)</H3>
+
+To build the freecraft with linux you need the following packets.
+<UL>
+<LI>gcc - The GNU C compiler<P>
+    gcc-2.95 prefered.
+<LI>libc6-dev - GNU C Library: Development Libraries and Header Files<P>
+    Contains the symlinks, headers, and object files needed to compile and link
+    programs which use the standard C library.
+<LI>libpng2-dev - PNG library - development<P>
+    libpng is a library implementing an interface for reading and writing PNG
+    (Portable Network Graphics) format files.
+<LI>zlib-dev - compression library - development<P>
+    zlib is a library implementing the deflate compression method found in gzip
+    and pkzip.  This package includes the development support files.
+<LI>xlibs-dev - X Window System client library development files<P>
+    xlibs-dev provides static versions of the libraries provided in xlibs, as
+    well as several libraries that do not exist in shared object form for  
+    various reasons (such as the fact that their API's have not stabilized, or
+    that they are deprecated).  Include files and manual pages are also
+    provided.
+<LI>libsdl1.2-dev - Development files for Simple DirectMedia Layer<P>
+    Very simply, SDL is a library that allows you portable low level access to
+    a video framebuffer, audio output, mouse, and keyboard.<P>
+    This package contains the files needed to compile and link programs which
+    use SDL.<P>
+    If not included in your distribution you can get it
+    <A HREF="http://www.libsdl.org">here</A>.
+</UL>
+
+<H3>Windows(tm)</H3>
+
+You need a C compiler for windows.
+<UL>
+<LI>VC or VC++<P>
+    This isn't supported yet. If you have created a project please send me 
+    the url.
+<LI><A HREF="http://sources.redhat.com/cygwin/">cygwin</A><P>
+    The Cygwin tools are ports of the popular GNU development tools and
+    utilities for Windows. They function by using the Cygwin library which
+    provides a UNIX-like API on top of the Win32 API.
+<LI><A HREF="http://www.mingw.org">MinGW</A><P>
+    MinGW is a collection of header files and import libraries that allow one
+    to use GCC and produce native Windows32 programs that do not rely on any
+    3rd-party DLLs.<P>
+
+    <UL>
+    <LI><A HREF="http://www.libsdl.org/Xmingw32/">
+	http://www.libsdl.org/Xmingw32/</A><P>
+	Informations how to use MingGW and libSDL for cross development and
+	native development.<P>
+    <LI><A HREF="http://www.libsdl.org/Xmingw32/mingw32.zip">
+	http://www.libsdl.org/Xmingw32/mingw32.zip</A><P>
+	Compiler packet for windows, build by Sam Lantinga.<P>
+
+    <LI><A HREF="ftp://freecraft.sourceforge.net/pub/freecraft/freecraft-native-010408.zip">
+	ftp://freecraft.sourceforge.net/pub/freecraft/freecraft-native-010408.zip</A><P>
+
+	Based on above this is my build. Contains SDL 1.2, libpng, zlib.
+	Install this and download the newest FreeCraft source and start
+	FreeCraft development.<P>
+    </UL>
+
 <H2>Make and makefiles</H2>
+
+<I>Remember the first time you must start ./setup or copy Rules.make.orig to
+Rules.make and edit it.</I><P>
 
 Type 'make help' to get an overview what all could be made.<P>
 
@@ -200,6 +356,20 @@ If you fix in other modules, please imitate the coding style of the old coder.
 <LI>No line should be longer than 78 characters.
 <LI>Use C++ comments for to end of line comments.
 <LI>Use { } also for one statement blocks.
+</UL>
+
+<H2>Sending a patch</H2>
+
+Now you something made, how this should be included into the main distribution.
+<P>
+
+Than process the following steps:<P>
+
+<UL>
+<LI>cvs -q update -d
+<LI>cvs -q diff -u > your-nickname.diff
+<LI>send the patch to <A HREF="mailto:aleclone@freecraft.org">aleclone@freecraft.org</A>
+<LI>or upload it to <A HREF="http://sourceforge.net/tracker/?func=add&group_id=1965&atid=301965">patch tracker on sourceforge</A>
 </UL>
 
 <HR>
