@@ -8,10 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_fog.c	-	The map fog of war handling. */
+/**@name map_fog.c - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2003 by Lutz Sammer, Vladi Shabanski,
-//								  Russell Smith, and Jimmy Salmon
+//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Shabanski,
+//                                 Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -482,11 +482,11 @@ global void UpdateFogOfWarChange(void)
 
 #ifndef USE_OPENGL
 /**
-**		Fast draw solid fog of war 16x16 tile for 8 bpp video modes.
+**  Draw fog of war
 **
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory.
-**		@param y		Y position into video memory.
+**  @param tile  tile number
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
 */
 global void VideoDrawFogSDL(const int tile, int x, int y)
 {
@@ -509,6 +509,13 @@ global void VideoDrawFogSDL(const int tile, int x, int y)
 	SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_RLEACCEL, 0);
 }
 
+/**
+**  Draw unexplored fog of war
+**
+**  @param tile  tile number
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+*/
 global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 {
 	int tilepitch;
@@ -527,6 +534,12 @@ global void VideoDrawUnexploredSDL(const int tile, int x, int y)
 	SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
+/**
+**  Draw only fog of war
+**
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
+*/
 global void VideoDrawOnlyFogSDL(int x, int y)
 {
 	SDL_Rect drect;
@@ -535,65 +548,145 @@ global void VideoDrawOnlyFogSDL(int x, int y)
 	drect.y = y;
 
 	SDL_BlitSurface(OnlyFogSurface, NULL, TheScreen, &drect);
-	//VideoFillTransRectangleClip(ColorBlack, x, y, TileSizeX, TileSizeY, FogOfWarOpacity);
 }
 
 #else
 
 /**
-**		Fast draw solid unexplored tile.
+**  Draw fog of war
 **
-**		@param data		pointer to tile graphic data
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
+**  @param tile  tile number
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
 */
-global void VideoDrawUnexploredSolidOpenGL(
+global void VideoDrawFogOpenGL(
 	const int tile __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
+	int tilepitch;
+	Graphic* graphic;
+	int gx;
+	int gy;
+	int sx;
+	int ex;
+	int sy;
+	int ey;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
+
+	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+	graphic = TheMap.TileGraphic;
+
+	gx = TileSizeX * (tile % tilepitch);
+	gy = TileSizeY * (tile / tilepitch);
+
+	sx = x;
+	ex = sx + TileSizeX;
+	sy = y;
+	ey = y + TileSizeY;
+
+	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
+	etx = (GLfloat)(gx + TileSizeX) / graphic->Width * graphic->TextureWidth;
+	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
+	ety = (GLfloat)(gy + TileSizeY) / graphic->Height * graphic->TextureHeight;
+
+	// FIXME: slow
+	glColor4ub(0, 0, 0, FogOfWarOpacity);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, sty);
+	glVertex2i(sx, sy);
+	glTexCoord2f(stx, ety);
+	glVertex2i(sx, ey);
+	glTexCoord2f(etx, ety);
+	glVertex2i(ex, ey);
+	glTexCoord2f(etx, sty);
+	glVertex2i(ex, sy);
+	glEnd();
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
 /**
-**		Fast draw alpha fog of war Opengl.
+**  Draw unexplored fog of war
 **
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
+**  @param tile  tile number
+**  @param x     X position into video memory
+**  @param y     Y position into video memory
 */
-global void VideoDrawFogAlphaOpenGL(
-	const int tile __attribute__((unused)),
-	int x __attribute__((unused)), int y __attribute__((unused)))
+global void VideoDrawUnexploredOpenGL(const int tile, int x, int y)
 {
+	int tilepitch;
+	Graphic* graphic;
+	int gx;
+	int gy;
+	int sx;
+	int ex;
+	int sy;
+	int ey;
+	GLfloat stx;
+	GLfloat etx;
+	GLfloat sty;
+	GLfloat ety;
+
+	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+	graphic = TheMap.TileGraphic;
+
+	gx = TileSizeX * (tile % tilepitch);
+	gy = TileSizeY * (tile / tilepitch);
+
+	sx = x;
+	ex = sx + TileSizeX;
+	sy = y;
+	ey = y + TileSizeY;
+
+	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
+	etx = (GLfloat)(gx + TileSizeX) / graphic->Width * graphic->TextureWidth;
+	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
+	ety = (GLfloat)(gy + TileSizeY) / graphic->Height * graphic->TextureHeight;
+
+	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(stx, sty);
+	glVertex2i(sx, sy);
+	glTexCoord2f(stx, ety);
+	glVertex2i(sx, ey);
+	glTexCoord2f(etx, ety);
+	glVertex2i(ex, ey);
+	glTexCoord2f(etx, sty);
+	glVertex2i(ex, sy);
+	glEnd();
 }
 
 /**
-**		Fast draw 100% fog of war Opengl.
+**  Draw only fog of war
 **
-**		@param data		pointer to tile graphic data.
-**		@param x		X position into video memory
-**		@param y		Y position into video memory
+**  @param x  X position into video memory
+**  @param y  Y position into video memory
 */
-global void VideoDrawOnlyFogAlphaOpenGL(int x, int y)
+global void VideoDrawOnlyFogOpenGL(int x, int y)
 {
 	GLint sx;
 	GLint ex;
 	GLint sy;
 	GLint ey;
-	Graphic *g;
 
-	g = TheMap.TileGraphic;
 	sx = x;
 	ex = sx + TileSizeX;
 	sy = y;
 	ey = sy + TileSizeY;
 
 	glDisable(GL_TEXTURE_2D);
-	glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+	glColor4ub(0, 0, 0, FogOfWarOpacity);
 	glBegin(GL_QUADS);
 	glVertex2i(sx, sy);
-	glVertex2i(sx, sy);
+	glVertex2i(sx, ey);
 	glVertex2i(ex, ey);
-	glVertex2i(ex, ey);
+	glVertex2i(ex, sy);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
@@ -823,11 +916,7 @@ global void DrawMapFogOfWar(Viewport* vp, int x, int y)
 					if (VisibleTable[my * TheMap.Width + mx] || ReplayRevealMap) {
 						DrawFogOfWarTile(sx, sy, dx, dy);
 					} else {
-#ifdef USE_OPENGL
-						MapDrawTile(UNEXPLORED_TILE, dx, dy);
-#else
 						VideoFillRectangle(ColorBlack, dx, dy, TileSizeX, TileSizeY);
-#endif
 					}
 #endif
 
@@ -920,9 +1009,9 @@ global void InitMapFogOfWar(void)
 	VisibleTable = malloc(TheMap.Width * TheMap.Height * sizeof(*VisibleTable));
 
 #ifdef USE_OPENGL
-	VideoDrawFog = VideoDrawFogAlphaOpenGL;
-	VideoDrawOnlyFog = VideoDrawOnlyFogAlphaOpenGL;
-	VideoDrawUnexplored = VideoDrawUnexploredSolidOpenGL;
+	VideoDrawUnexplored = VideoDrawUnexploredOpenGL;
+	VideoDrawFog = VideoDrawFogOpenGL;
+	VideoDrawOnlyFog = VideoDrawOnlyFogOpenGL;
 #else
 	//
 	//	Generate Only Fog surface.
