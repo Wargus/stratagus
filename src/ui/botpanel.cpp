@@ -95,7 +95,7 @@ global void InitButtons(void)
     //	Resolve the icon names.
     //
     for (z = 0; z < NumUnitButtons; z++) {
-	UnitButtonTable[z]->Icon.Icon 
+	UnitButtonTable[z]->Icon.Icon
 		= IconByIdent(UnitButtonTable[z]->Icon.Name);
     }
 }
@@ -171,7 +171,7 @@ global void SaveButtons(FILE* file)
 	} else {
 	    fprintf(file,"\n");
 	}
-	if( UnitButtonTable[i]->Allowed ) { 
+	if( UnitButtonTable[i]->Allowed ) {
 	    fprintf(file,"  'allowed ");
 	    if( UnitButtonTable[i]->Allowed == ButtonCheckTrue ) {
 		fprintf(file,"'check-true");
@@ -482,9 +482,9 @@ global void DrawButtonPanel(void)
 		    case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
 			stats=&UnitTypes[v].Stats[ThisPlayer->Player];
-			DebugLevel1("Upgrade to %s %d %d %d %d %d\n"
+			DebugLevel3("Upgrade to %s %d %d %d %d %d\n"
 				,UnitTypes[v].Ident
-                ,UnitTypes[v].Demand
+				,UnitTypes[v].Demand
 				,UnitTypes[v]._Costs[GoldCost]
 				,UnitTypes[v]._Costs[WoodCost]
 				,stats->Costs[GoldCost]
