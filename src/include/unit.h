@@ -313,7 +313,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_PLAYER__
+#if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
 #define __STRUCT_PLAYER__
 typedef struct _player_ Player;		// recursive includes :(
 #endif

@@ -10,12 +10,11 @@
 //
 /**@name upgrade.h	-	The upgrades headerfile. */
 //
-//	(c) Copyright 1999-2001 by Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2002 by Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +32,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __STRUCT_PLAYER__
+#if !defined(__STRUCT_PLAYER__) && !defined(DOXYGEN)
 #define __STRUCT_PLAYER__
 typedef struct _player_ Player;		// recursive includes :(
 #endif
