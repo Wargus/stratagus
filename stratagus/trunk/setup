@@ -475,7 +475,7 @@ fi
 echo "# Video support" >> $RULESFILE
 case $VIDSEL in
   [sS])
-	echo -n "Using SDL"
+	echo -n "-> Using SDL"
   	USESDL=1
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
@@ -499,13 +499,13 @@ case $VIDSEL in
 	;;
 
   [vV])
-	echo "Using SVGALIB"
+	echo "-> Using SVGALIB"
 	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
 	echo "VIDEOLIB	= -lvga $DL" >> $RULESFILE
 	;;
 
   [bB])
-	echo -n "Using SDL/SVGALIB"
+	echo -n "-> Using SDL/SVGALIB"
   	USESDL=1
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
@@ -524,7 +524,7 @@ case $VIDSEL in
 
   *)
 	if [ "$WIN32" = "1" ] ; then
-	  echo "Using SDL"
+	  echo "-> Using SDL"
   	  USESDL=1
 	  SDLLIB="\$(shell $SDL_CONFIG --libs) -lmingwex"
 	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
@@ -535,7 +535,7 @@ case $VIDSEL in
 	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	  echo >> $RULESFILE
 	else  
-	  echo "Using X11"
+	  echo "-> Using X11"
 	  echo "VIDEO		= -DUSE_X11" >> $RULESFILE
 	  echo "VIDEOLIB	= -lXext -lX11 $DL" >> $RULESFILE
 	fi
@@ -566,33 +566,34 @@ read $N ANSWER
 echo
 case $ANSWER in
   [nN])
-	echo "No sound support"
+	echo "-> No sound support"
 	;;
 
   *)
-	echo "Compiling with sound support"
+	echo "-> Compiling with sound support"
 	echo "# Sound support" >> $RULESFILE
 	echo "DSOUND		= -DWITH_SOUND" >> $RULESFILE
 
 	# Check for arts client
-	echo
-	if [ "`artsc-config --version 2>/dev/null` x" = " x" ] ; then
-	  echo "...You do not appear to have the arts client installed"
+	if [ "$WIN32" = "1" ]; then
+	  test
+	elif [ "`artsc-config --version 2>/dev/null` x" = " x" ] ; then
+	  echo
+	  echo "-> You do not appear to have the arts client installed"
 	else
+	  echo
 	  echo -n "Do you want use arts daemon sound output? (y) "
 	  read $N ANSWERA
 	  echo
 	  case $ANSWERA in
 	    [nN])
-	        echo
-		echo "No arts daemon support"
+		echo "-> No arts daemon support"
 		;;
 	    *)
 		HAVEARTS=1
 		echo "ARTSC		= -DWITH_ARTSC \$(shell artsc-config --cflags)" >> $RULESFILE
 		echo "ARTSCLIB	= \$(shell artsc-config --libs)" >> $RULESFILE
-	        echo
-		echo "Compiling with arts daemon support"
+		echo "-> Compiling with arts daemon support"
 		;;
 	  esac
 	fi
@@ -607,13 +608,19 @@ case $ANSWER in
 	    echo -n "do you want to compile with threaded sound? (n) "
 	    read $N ANSWER2
 	    echo
-	    case $ANSWER2 in [yY])
-	      echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
-		if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
-		  echo "THREADLIB   = -pthread" >> $RULESFILE
-		else
-		  echo "THREADLIB   = -lpthread" >> $RULESFILE
-		fi
+	    case $ANSWER2 in 
+	      [yY])
+	        echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
+		  if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
+		    echo "THREADLIB   = -pthread" >> $RULESFILE
+		  else
+		    echo "THREADLIB   = -lpthread" >> $RULESFILE
+		  fi
+		echo "-> Compiling with thread support"
+		;;
+	      *)
+	        echo "-> No thread support"
+		;;
 	    esac
 	  fi
 	fi
@@ -628,12 +635,14 @@ case $ANSWER in
 	    [yY])
 		echo "FLAC		= -DUSE_FLAC" >> $RULESFILE
 		echo "FLACLIB		= -lFLAC" >> $RULESFILE
+		echo "-> Compiling with FLAC support"
 		;;
 	    *)
+		echo "-> No FLAC support"
 		;;
 	esac
 	else
-	echo "libFLAC not found"
+	echo "-> libFLAC not found"
 	fi
 	echo
 	
@@ -646,12 +655,15 @@ case $ANSWER in
 	    [yY])
 		echo "OGG		= -DUSE_OGG" >> $RULESFILE
 		echo "OGGLIB		= -lvorbisfile -lvorbis -logg" >> $RULESFILE
+		echo "-> Compiling with OGG support"
 		;;
 	    *)
+		echo "-> No OGG support"
 		;;
 	esac
 	else
 	LIBCHECK="-lvorbisfile"; check_for_libs
+	echo -n "-> "
 	if test "$?" != 0 ; then
 	echo -n "libvorbisfile "
 	fi
@@ -676,12 +688,14 @@ case $ANSWER in
 	    [yY])
 		echo "MAD		= -DUSE_MAD" >> $RULESFILE
 		echo "MP3LIB		= -lmad" >> $RULESFILE
+		echo "-> Compiling with MAD MP3 support"
 		;;
 	    *)
+		echo "-> No MAD MP3 support"
 		;;
 	esac
 	else
-	echo "libmad not found"
+	echo "-> libmad not found"
 	fi
 	echo
 
@@ -694,7 +708,7 @@ case $ANSWER in
 	echo
 	case $CDMode in
 	    [sS])
-		echo "Using SDL cdrom support"
+		echo "-> Compiling with SDL cdrom support"
 		USE_SDLCD=1
 		USE_LIBCDA=0
 		echo "SDLCD           = -DUSE_SDLCD" >> $RULESFILE
@@ -705,14 +719,14 @@ case $ANSWER in
 		echo >> $RULESFILE
 		;;
 	    [iI])
-		echo "Using internal cdrom support"
+		echo "-> Compiling with internal (libcda) cdrom support"
 		USE_SDLCD=0
 		USE_LIBCDA=1
 		echo "LIBCDA          = -DUSE_LIBCDA" >> $RULESFILE
 		echo >> $RULESFILE
 		;;
 	    *)
-		echo "Using none cdrom support"
+		echo "-> No cdrom support"
 		USE_SDLCD=0
 		USE_LIBCDA=0
 		;;
@@ -783,30 +797,30 @@ echo "# Compression support" >> $RULESFILE
 
 case $COMPOPT in
   [nN])
-	echo "Using no compression"
+	echo "-> Using no compression"
 	echo "ZDEFS		=" >> $RULESFILE
 	echo "ZLIBS		=" >> $RULESFILE
 	;;
 
   [bB])
-	echo "Using Bzip2 compression"
+	echo "-> Using Bzip2 compression"
 	echo "ZDEFS		= -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lbz2" >> $RULESFILE
 	;;
 
   [oO])
-	echo "Using GZ and Bzip2 compression"
+	echo "-> Using GZ and Bzip2 compression"
 	echo "ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lz -lbz2" >> $RULESFILE
 	;;
   [aA])
-	echo "Using GZ, Bzip2, ZZip  compression"
+	echo "-> Using GZ, Bzip2, ZZip  compression"
 	echo "ZDEFS		= -DUSE_ZZIPLIB -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
 	echo "ZLIBS		= -lzzip -lz -lbz2" >> $RULESFILE
 	;;
 
   *)
-	echo "Using GZ compression"
+	echo "-> Using GZ compression"
 	echo "ZDEFS		= -DUSE_ZLIB" >> $RULESFILE
 	echo "ZLIBS		= -lz" >> $RULESFILE
 	;;
