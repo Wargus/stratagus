@@ -249,7 +249,7 @@ local void AllocPalette8(Palette * palette, Palette * syspalette,
 
 	    if (color.pixel > 255) {	// DEBUG: should not happen?
 		fprintf(stderr, "System 8bit color above unsupported 255\n");
-		exit(-1);
+		FatalExit(-1);
 	    }
 	    // Fill palette, to get from system to RGB
 	    j = color.pixel >> 5;
@@ -308,7 +308,7 @@ global void GameInitDisplay(void)
 
     if( !(TheDisplay=XOpenDisplay(NULL)) ) {
 	fprintf(stderr,"Cannot connect to X-Server.\n");
-	exit(-1);
+	FatalExit(-1);
     }
 
     gettimeofday(&X11TicksStart,NULL);
@@ -319,11 +319,11 @@ global void GameInitDisplay(void)
 
     if( !XShmQueryVersion(TheDisplay,&shm_major,&shm_minor,&pixmap_support) ) {
 	fprintf(stderr,"SHM-Extensions required.\n");
-	exit(-1);
+	FatalExit(-1);
     }
     if( !pixmap_support ) {
 	fprintf(stderr,"SHM-Extensions with pixmap supported required.\n");
-	exit(-1);
+	FatalExit(-1);
     }
 
     //  Look for a nice visual
@@ -351,7 +351,7 @@ global void GameInitDisplay(void)
 	goto foundvisual;
     }
     fprintf(stderr,"Sorry, I couldn't find an 8, 15, 16, 24 or 32 bit visual.\n");
-    exit(-1);
+    FatalExit(-1);
 
 foundvisual:
 
@@ -364,7 +364,7 @@ foundvisual:
     }
     if(i<0)  {
 	fprintf(stderr,"No Pixmap format for visual depth?\n");
-	exit(-1);
+	FatalExit(-1);
     }
     if( !VideoDepth ) {
 	VideoDepth=xvi.depth;
@@ -386,20 +386,20 @@ foundvisual:
 
     if( !shminfo.shmid==-1 ) {
 	fprintf(stderr,"shmget failed.\n");
-	exit(-1);
+	FatalExit(-1);
     }
     VideoMemory=(void*)shminfo.shmaddr=shmat(shminfo.shmid,0,0);
     if( shminfo.shmaddr==(void*)-1 ) {
 	shmctl(shminfo.shmid,IPC_RMID,0);
 	fprintf(stderr,"shmat failed.\n");
-	exit(-1);
+	FatalExit(-1);
     }
     shminfo.readOnly=False;
 
     if( !XShmAttach(TheDisplay,&shminfo) ) {
 	shmctl(shminfo.shmid,IPC_RMID,0);
 	fprintf(stderr,"XShmAttach failed.\n");
-	exit(-1);
+	FatalExit(-1);
     }
     // Mark segment as deleted as soon as both us and the X server have
     // attached to it.  The POSIX spec says that a segment marked as deleted
@@ -1286,7 +1286,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	if( !XAllocColor(TheDisplay,xwa.colormap,&color) ) {
 	    fprintf(stderr,"Cannot allocate color\n");
 	    // FIXME: Must find the nearest matching color
-	    //exit(-1);
+	    //FatalExit(-1);
 	}
 
 	switch( VideoBpp ) {

@@ -524,7 +524,7 @@ global void LoadRGB(Palette *pal, const char *name)
 
     if( !(fp=CLopen(name)) || CLread(fp,buffer,256*3)!=256*3 ) {
 	fprintf(stderr,"Can't load palette %s\n",name);
-	exit(-1);
+	FatalExit(-1);
     }
 
     p=buffer;
