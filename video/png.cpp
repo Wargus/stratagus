@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -43,19 +43,19 @@
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		png read callback for CL-IO.
+**  png read callback for CL-IO.
 **
-**		@param png_ptr		png struct pointer.
-**		@param data		byte address to read to.
-**		@param length		number of bytes to read.
+**  @param png_ptr  png struct pointer.
+**  @param data     byte address to read to.
+**  @param length   number of bytes to read.
 */
 local void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -238,10 +238,6 @@ global Graphic* LoadGraphicPNG(const char* name)
 				(Uint8)transv->blue);
 		}
 		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
-	} else if (color_type == PNG_COLOR_TYPE_PALETTE) {
-		// Use 255 for transparency by default
-		// FIXME: make the images set transparency correctly
-		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, 255);
 	}
 
 	/* Create the array of pointers to image data */
