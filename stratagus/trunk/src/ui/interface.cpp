@@ -865,6 +865,9 @@ local int CommandKey(int key)
 	case '\t':			// TAB toggles minimap.
 					// FIXME: more...
 					// FIXME: shift+TAB
+	    if( KeyModifiers&ModifierAlt ) {
+		break;
+	    }
 	    UiToggleTerrain();
 	    break;
 
