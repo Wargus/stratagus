@@ -1012,10 +1012,10 @@ local Menuitem KeystrokeHelpMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Keystroke Help Menu", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "TEMP1", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "TEMP2", 224, 27, MBUTTON_GM_FULL, NULL, 't'} } },
+    { MI_TYPE_TEXT, 16, 40, 0, SmallFont, NULL, NULL,
+	{ text:{ "TEST", MI_TFLAGS_LALIGN} } },
+    { MI_TYPE_VSLIDER, 256 - 18 - 16, 40, 0, 0, NULL, NULL,
+	{ vslider:{ 0, 18, 11*18, NULL, -1, 0, 0, 0, NULL} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
 #else
