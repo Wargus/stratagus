@@ -432,7 +432,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 		h = h0;
 		while (h-- >= 0) {
 #ifndef USE_OPENGL
-			VideoGetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
+			SDL_GetRGB(color, TheScreen->format, &c.r, &c.g, &c.b);
 			((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
 				VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
 #else
