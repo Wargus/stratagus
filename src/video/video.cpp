@@ -387,21 +387,18 @@ global void VideoPaletteListRemove(SDL_Surface* surface)
 */
 global void DisplayPicture(const char* name)
 {
-	Graphic* picture;
+	Graphic* g;
 
-	picture = LoadGraphic(name);
-	ResizeGraphic(picture, VideoWidth, VideoHeight);
+	g = LoadGraphic(name);
+	// FIXME: make resizing optional?
+	// FIXME: keep aspect ratio?
+	ResizeGraphic(g, VideoWidth, VideoHeight);
 
-#ifndef USE_OPENGL
-	// Unset the alpha color key, not needed
-	SDL_SetColorKey(picture->Surface, 0, 0);
-	SDL_BlitSurface(picture->Surface, NULL, TheScreen, NULL);
-#else
-	VideoDrawSubClip(picture, 0, 0, picture->Width, picture->Height,
-		(VideoWidth - picture->Width) / 2, (VideoHeight - picture->Height) / 2);
-#endif
+	// FIXME: should be able to specify a location
+	VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
+		(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
 
-	VideoFree(picture);
+	VideoFree(g);
 }
 
 /**
