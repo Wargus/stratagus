@@ -137,7 +137,7 @@ static int NbSoundsInGroup(char* const* const group)
 {
 	int i;
 
-	for (i = 0;i < MaxSimpleGroups; ++i) {
+	for (i = 0; i < MaxSimpleGroups; ++i) {
 		if (!group[i]) {
 			return i;
 		}

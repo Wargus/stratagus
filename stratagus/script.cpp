@@ -455,42 +455,42 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 		key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
-		if (!strcmp(key, "Add")){
+		if (!strcmp(key, "Add")) {
 			res->e = ENumber_Add;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Sub")){
+		} else if (!strcmp(key, "Sub")) {
 			res->e = ENumber_Sub;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Mul")){
+		} else if (!strcmp(key, "Mul")) {
 			res->e = ENumber_Mul;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Div")){
+		} else if (!strcmp(key, "Div")) {
 			res->e = ENumber_Div;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Min")){
+		} else if (!strcmp(key, "Min")) {
 			res->e = ENumber_Min;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Max")){
+		} else if (!strcmp(key, "Max")) {
 			res->e = ENumber_Max;
 			ParseBinOp(l, &res->D.BinOp);
-		} else if (!strcmp(key, "Rand")){
+		} else if (!strcmp(key, "Rand")) {
 			res->e = ENumber_Rand;
 			res->D.N = CclParseNumberDesc(l);
-		} else if (!strcmp(key, "UnitVar")){
+		} else if (!strcmp(key, "UnitVar")) {
 			Assert(lua_istable(l, -1));
 
 			res->e = ENumber_UnitStat;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
-				if (!strcmp(key, "Unit")){
+				if (!strcmp(key, "Unit")) {
 					res->D.UnitStat.Unit = CclParseUnitDesc(l);
 					lua_pushnil(l);
-				} else if (!strcmp(key, "Variable")){
+				} else if (!strcmp(key, "Variable")) {
 					res->D.UnitStat.Index = GetVariableIndex(LuaToString(l, -1));
 					if (res->D.UnitStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
-				} else if (!strcmp(key, "Component")){
+				} else if (!strcmp(key, "Component")) {
 					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);

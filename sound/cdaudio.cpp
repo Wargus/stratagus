@@ -287,7 +287,7 @@ static int InitCD(void)
 	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
 	ioctl(CDDrive, CDROMRESET);
 	ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
-	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
+	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i) {
 		CDtocentry[i].cdte_format = CDROM_LBA;
 		CDtocentry[i].cdte_track = i;
 		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);

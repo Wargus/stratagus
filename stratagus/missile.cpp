@@ -350,7 +350,7 @@ static void FreeMissile(Missile* missile)
 	if ((unit = missile->SourceUnit)) {
 		RefsDecrease(unit);
 	}
-	if((unit = missile->TargetUnit)) {
+	if ((unit = missile->TargetUnit)) {
 		RefsDecrease(unit);
 	}
 
@@ -1781,7 +1781,7 @@ void MissileActionWhirlwind(Missile* missile)
 		// we should parameter this
 		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 		for (i = 0; i < n; ++i) {
-			if((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
+			if ((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
 				// should be in missile
 				HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
 			}

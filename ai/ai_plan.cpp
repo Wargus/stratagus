@@ -77,7 +77,7 @@ static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 	for (i = 0; i < n; ++i) {
 		unit = table[i];
 		// unusable unit ?
-		// if( UnitUnusable(unit) ) can't attack constructions
+		// if (UnitUnusable(unit)) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
 		if (unit->Removed || unit->Invisible || !unit->HP ||

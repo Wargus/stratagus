@@ -85,7 +85,7 @@ static void StartXpm(FILE * f, int sx,int sy, int nbcols)
 	fprintf(f, "  \"%d %d %d %d\",\n", sx, sy, nbcols, 4);
 	fprintf(f, "  /* colors */\n");
 
-	for (i = 0 ;i < nbcols; i++) {
+	for (i = 0; i < nbcols; ++i) {
 		color = colors[i & 3] ^ xors[(i >> 2) & 7];
 			fprintf(f, "  \"%04x c #%06x\",\n",i,color);
 	}
@@ -162,15 +162,15 @@ void MapSplitterDebug(void)
 
 	/* Output the map regions */
 	for (y = 0; y < TheMap.Info.MapHeight; y++) {
-			fprintf(f, "  \"");
+		fprintf(f, "  \"");
 		for (x = 0; x < TheMap.Info.MapWidth; x++) {
 			if (!TileMappable(x, y)) {
 				color = 0;
 			} else {
 				reg = RegionMapping(x,y);
-					if (reg == NoRegion){
+				if (reg == NoRegion) {
 					color = 0;
-					} else {
+				} else {
 					color = Regions[reg].Color + 1;
 				}
 			}
