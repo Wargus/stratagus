@@ -781,9 +781,7 @@ global Unit* AttackUnitsInDistance(Unit* unit, int range)
 	for (i = 0; i < n; ++i) {
 		dest = table[i];
 
-		// Do NOT check vision.
-		if (dest->Removed || dest->Invisible || !unit->HP
-				|| dest->Orders[0].Action == UnitActionDie) {
+		if (!UnitVisibleOnMap(dest, unit->Player)) {
 			continue;
 		}
 

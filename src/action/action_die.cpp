@@ -82,10 +82,12 @@ global void HandleActionDie(Unit* unit)
 
 		DebugCheck(unit->Type->TileWidth != unit->Type->CorpseType->TileWidth ||
 				unit->Type->TileHeight != unit->Type->CorpseType->TileHeight);
-		unit->Type = unit->Type->CorpseType;
 
 		// Update sight for new corpse
+		// We have to unmark BEFORE changing the type.
+		// Always do that, since types can have different vision properties.
 		MapUnmarkUnitSight(unit);
+		unit->Type = unit->Type->CorpseType;
 		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Player].SightRange;
 		MapMarkUnitSight(unit);
 
