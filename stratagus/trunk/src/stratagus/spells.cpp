@@ -432,6 +432,9 @@ int CastSpawnMissile(Unit* caster, const SpellType* spell,
 int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
+	if (!target) {
+		return 0;
+	}
 	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
 		target->Haste = action->Data.AdjustBuffs.HasteTicks;
 	}
@@ -473,8 +476,9 @@ int CastAdjustVariable(Unit* caster, const SpellType* spell,
 	index = action->Data.AdjustVariable.Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 	unit = (action->Data.AdjustVariable.TargetIsCaster) ? caster : target;
-	Assert(unit);
-
+	if (unit) {
+		return 0;
+	}
 	// Enable flag.
 	if (action->Data.AdjustVariable.ModifEnable) {
 		unit->Variable[index].Enable = action->Data.AdjustVariable.Enable;
@@ -532,6 +536,11 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	int mana;
 	int manacost;
 
+	Assert(caster);
+	Assert(spell);
+	if (!target) {
+		return 0;
+	}
 	hp = action->Data.AdjustVitals.HP;
 	mana = action->Data.AdjustVitals.Mana;
 	manacost = spell->ManaCost;
@@ -606,6 +615,9 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 	int j;
 	UnitType* type;
 
+	if (!target) {
+		return 0;
+	}
 	type = action->Data.Polymorph.NewForm;
 
 	x = x - type->TileWidth / 2;
