@@ -185,7 +185,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	source=resource->ResourceOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel2Fn("Found %d,%d=%d\n",unit->X,unit->Y
+	    DebugLevel3Fn("Found %d,%d=%d\n",unit->X,unit->Y
 		,UnitNumber(source));
 	    if( !source ) {
 		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
