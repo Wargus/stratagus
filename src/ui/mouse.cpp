@@ -132,6 +132,8 @@ local void DrawMouseCoordsOnMap(int x,int y)
 **
 **	@param x	X map tile position.
 **	@param y	Y map tile position.
+**
+**	@todo	FIXME: Should rewrote not to use tile coordinates.
 */
 global void DoRightButton(int x,int y)
 {
@@ -177,6 +179,21 @@ global void DoRightButton(int x,int y)
         type=unit->Type;
         action=type->MouseAction;
 	DebugLevel3Fn("Mouse action %d\n",action);
+
+	//
+	//	Control + right click on unit is follow anything.
+	//
+	if( KeyModifiers&ModifierControl ) {
+	    // FIXME: what todo if more than one unit on that tile?
+	    dest=UnitOnMapTile(x,y);
+            if( dest ) {
+                if( dest!=unit ) {
+		    dest->Blink=3;
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
+		}
+            }
+	}
 
         //
         //      Enter transporters?
@@ -237,31 +254,34 @@ global void DoRightButton(int x,int y)
                     continue;
                 }
             }
-            // FIXME: repair/attack/follow/board
 
             dest=TargetOnMapTile(unit,x,y);
             if( dest ) {
-                dest->Blink=3;
-                if( dest->Player==ThisPlayer ||
-		        dest->Player->Player==PlayerNumNeutral) {
-		    // FIXME: lokh: maybe we should add the ally players here
-		    // FIXME: don't work must check repairable first
-                    // SendCommandFollow(unit,dest,flush);
-                    // continue;
-                } else {
-                    // FIXME: can I attack this unit?
-                    SendCommandAttack(unit,x,y,dest,flush);
-                    continue;
-                }
+                if( IsEnemy(ThisPlayer,dest) ) {
+		    dest->Blink=3;
+		    SendCommandAttack(unit,x,y,dest,flush);
+		    continue;
+		}
             }
 
 	    // cade: this is default repair action
 	    dest=RepairableOnMapTile(x,y);
 	    if( dest && dest->Type && dest->Player==ThisPlayer ) {
 	        SendCommandRepair(unit,x,y,dest,flush);
-	    } else {
-	        SendCommandMove(unit,x,y,flush);
+		continue;
 	    }
+
+	    dest=UnitOnMapTile(x,y);
+            if( dest ) {
+                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+			&& dest!=unit ) {
+		    dest->Blink=3;
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
+		}
+            }
+
+	    SendCommandMove(unit,x,y,flush);
 	    continue;
 	}
 
@@ -289,6 +309,16 @@ global void DoRightButton(int x,int y)
                 }
             }
 
+	    dest=UnitOnMapTile(x,y);
+            if( dest ) {
+                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+			&& dest!=unit ) {
+		    dest->Blink=3;
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
+		}
+            }
+
 #ifdef NEW_SHIPS
 	    if( unit->Type->UnitType!=UnitTypeLand ) {
 		x&=~1;
@@ -307,13 +337,8 @@ global void DoRightButton(int x,int y)
 	    // FIXME: should use enemy first, than other functions!
             dest=TargetOnMapTile(unit,x,y);
             if( dest ) {
-                dest->Blink=3;
-		// Follow allied units, but not self.
-                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
-			&& dest!=unit ) {
-		    SendCommandFollow(unit,dest,flush);
-                    continue;
-                } else if( IsEnemy(ThisPlayer,dest) ) {
+                if( IsEnemy(ThisPlayer,dest) ) {
+		    dest->Blink=3;
                     // FIXME: can I attack this unit?
                     SendCommandAttack(unit,x,y,dest,flush);
                     continue;
@@ -333,6 +358,16 @@ global void DoRightButton(int x,int y)
                 }
             }
 
+	    dest=UnitOnMapTile(x,y);
+            if( dest ) {
+                if( (dest->Player==ThisPlayer || IsAllied(ThisPlayer,dest))
+			&& dest!=unit ) {
+		    dest->Blink=3;
+		    SendCommandFollow(unit,dest,flush);
+                    continue;
+		}
+            }
+
 #ifdef NEW_SHIPS
 	    if( unit->Type->UnitType!=UnitTypeLand ) {
 		x&=~1;
@@ -341,16 +376,27 @@ global void DoRightButton(int x,int y)
 #endif
 
 	    // empty space
-	    if( RightButtonAttacks || (KeyModifiers&ModifierControl) ) {
-		SendCommandAttack(unit,x,y,NoUnitP,flush);
+	    if( (KeyModifiers&ModifierControl) ) {
+		if( RightButtonAttacks ) {
+		    SendCommandMove(unit,x,y,flush);
+		} else {
+		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		}
 	    } else {
-		// Note: move is correct here, right default is move
-		SendCommandMove(unit,x,y,flush);
+		if( RightButtonAttacks ) {
+		    SendCommandAttack(unit,x,y,NoUnitP,flush);
+		} else {
+		    // Note: move is correct here, right default is move
+		    SendCommandMove(unit,x,y,flush);
+		}
 	    }
             continue;
         }
 
-	// FIXME: demolish!!!!!!!
+        if( action==MouseActionDemolish ) {
+	    // FIXME: demolish!!!!!!!
+	    DebugLevel0Fn("FIXME: demolish\n");
+	}
 
 	// FIXME: attack/follow/board ...
 	if( action==MouseActionMove || action==MouseActionSail ) {
