@@ -9,11 +9,11 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unittype.h	-	The unit types headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
+//
 
 #ifndef __UNITTYPE_H__
 #define __UNITTYPE_H__
@@ -72,15 +72,6 @@ typedef struct _missile_config_ {
     void*	Missile;		/// identifier to use to run time
 } MissileConfig;
 
-#if 0
-#define CorpseNone	0	/// Unit has no corpse
-#define CorpseHuman	1	/// Unit has a human corpse
-#define CorpseOrc	2	/// Unit has a orc corpse
-#define CorpseShip	3	/// Unit has a ship corpse
-#define CorpseLandSite	4	/// Unit has a land corpse
-#define CorpseWaterSite	5	/// Unit has a water corpse
-#endif
-
 /**
 **	Typedef of base structure of unit-type
 */
@@ -109,7 +100,7 @@ struct _unit_type_ {
     MissileConfig Missile;		/// missile weapon
 
     char*	CorpseName;		/// corpse type name
-    UnitType*	CorpseType;		/// corpse unit-type 
+    UnitType*	CorpseType;		/// corpse unit-type
     int		CorpseScript;		/// corpse script start
 
     int		_Speed;			/// movement speed
@@ -305,7 +296,7 @@ struct _unit_type_ {
 #define UnitStronghold		0x59
 #define UnitCastle		0x5A
 #define UnitFortress		0x5B
-#define UnitGoldMine		0x5C
+//#define UnitGoldMine		0x5C
 #define UnitOilPatch		0x5D
 #define UnitStartLocationHuman	0x5E
 #define UnitStartLocationOrc	0x5F
@@ -348,7 +339,9 @@ struct _unit_type_ {
 
 extern char	UnitTypeType[];			/// unit type type
 // FIXME: this limit must be removed!
-extern UnitType UnitTypes[UnitTypeInternalMax];	/// all unit types
+extern UnitType	UnitTypes[UnitTypeInternalMax];	/// all unit types
+
+extern UnitType*UnitTypeGoldMine;	/// Gold-mine unit type pointer.
 
 /*----------------------------------------------------------------------------
 --	Functions

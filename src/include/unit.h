@@ -165,11 +165,10 @@ struct _unit_ {
 #ifdef NEW_UNIT
     short	Refs;			/// Reference counter
     UnitRef	Slot;			/// Assignd slot number
-    UnitRef	UnitSlot;		/// slot number in Units
-    UnitRef	PlayerSlot;		/// slot number in Player->Units
+    Unit**	UnitSlot;		/// slot pointer of Units
+    Unit**	PlayerSlot;		/// slot pointer of Player->Units
     Unit*	Next;			/// generic link pointer
 #else
-    // FIXME: this will be removed
     unsigned	Id;			/// unique unit id
 #endif
 
@@ -368,7 +367,8 @@ extern int CanBuildHere(UnitType* type,unsigned x,unsigned y);
 extern int CanBuildOn(int x,int y,int mask);
 extern int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y);
 
-extern Unit* FindGoldMine(int x,int y);
+    /// Find nearest gold mine
+extern Unit* FindGoldMine(const Unit*,int x,int y);
 extern Unit* GoldDepositOnMap(int tx,int ty);
 extern Unit* FindGoldDeposit(const Player* player,int x,int y);
 
@@ -394,8 +394,6 @@ extern int ViewPointDistanceToUnit(Unit* dest);
 
 extern int IsEnemy(const Player* player,const Unit* dest);
 extern int CanTarget(const UnitType* type,const UnitType* dest);
-
-extern void UnitConflicts(void);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
 extern void SaveUnits(FILE* file);			/// save all units
@@ -424,7 +422,8 @@ extern void DrawUnits(void);
 
 //	in unit_find.c
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
-extern int FindUnitsByType(int type,Unit** table);
+    /// Find all units of this type
+extern int FindUnitsByType(const UnitType* type,Unit** table);
 extern int FindPlayerUnitsByType(const Player* player,int type,Unit** table);
 extern Unit* UnitOnMapTile(unsigned tx,unsigned ty);
 extern Unit* TargetOnMapTile(Unit* unit,unsigned tx,unsigned ty);

@@ -308,7 +308,7 @@ global void HandleActionMineGold(Unit* unit)
 	    if( !unit->Value ) {
 		// FIXME: return to last position!
 		// FIXME: Ari says, don't automatic search a new mine.
-		if( !(destu=FindGoldMine(unit->X,unit->Y)) ) {
+		if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
 		    DropOutOnSide(unit,HeadingW
 			    ,UnitTypes[UnitGreatHall].TileWidth
 			    ,UnitTypes[UnitGreatHall].TileHeight);

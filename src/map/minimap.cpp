@@ -217,7 +217,14 @@ global void DrawMinimap(int vx,int vy)
     int flags;
     int x;
     int y;
-#ifndef NEW_UNIT
+#ifdef NEW_UNIT
+    UnitType* type;
+    Unit** table;
+    Unit* unit;
+    int w;
+    int h;
+    int h0;
+#else
     UnitType* type;
     Unit* unit;
     int i;
@@ -253,7 +260,69 @@ global void DrawMinimap(int vx,int vy)
     }
 
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    //
+    //	Draw units on map
+    //	FIXME: I should rewrite this complet
+    //	FIXME: make a bitmap of the units, and update it with the moves
+    //	FIXME: and other changes
+    //
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	SysColors color;
+
+	unit=*table;
+
+	flags=TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags;
+	// Draw only units on explored fields
+	if( !(flags&MapFieldExplored) ) {
+	    continue;
+	}
+	// Draw only units on visible fields
+	if( !TheMap.NoFogOfWar && !(flags&MapFieldVisible) ) {
+	    continue;
+	}
+	// FIXME: buildings under fog of war.
+	// FIXME: submarine not visible
+
+	type=unit->Type;
+	if( unit->Player->Player==PlayerNumNeutral ) {
+	    if( type->Critter ) {
+		color=ColorNPC;
+	    } else if( type->OilPatch ) {
+		color=ColorBlack;
+	    } else {
+		color=ColorYellow;
+	    }
+	} else if( unit->Player==ThisPlayer ) {
+	    if( unit->Attacked && RedPhase ) {
+		color=ColorRed;
+		// better to clear to fast, than to clear never :?)
+		unit->Attacked=0;
+	    } else if( MinimapShowSelected && unit->Selected ) {
+		color=ColorWhite;
+	    } else {
+		color=ColorGreen;
+	    }
+	} else {
+	    color=unit->Player->Color;
+	}
+
+	mx=x+1+MinimapX+Map2MinimapX[unit->X];
+	my=y+1+MinimapY+Map2MinimapY[unit->Y];
+	w=Map2MinimapX[type->TileWidth];
+	if( mx+w>=x+MINIMAP_W ) {	// clip right side
+	    w=x+MINIMAP_W-mx;
+	}
+	h0=Map2MinimapY[type->TileHeight];
+	if( my+h0>=y+MINIMAP_H ) {	// clip bottom side
+	    h0=y+MINIMAP_H-my;
+	}
+	while( w-->=0 ) {
+	    h=h0;
+	    while( h-->=0 ) {
+		VideoDrawPixel(color,mx+w,my+h);
+	    }
+	}
+    }
 #else
     //
     //	Draw units on map
