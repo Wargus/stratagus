@@ -1507,32 +1507,64 @@ normkey:
 }
 
 /**
-** Handle keys in menu mode.
+**  Handle keys in menu mode.
 **
-** @param key        Key scancode.
-** @param keychar    ASCII character code of key.
+**  @param key      Key scancode.
+**  @param keychar  ASCII character code of key.
 */
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
+	Menuitem* mi;
+	Menu* menu;
+
 	HandleKeyModifiersUp(key, keychar);
+
+	if (CurrentMenu == NULL) {
+		return;
+	}
+
+	menu = CurrentMenu;
+	if (key == KeyCodeUp || key == KeyCodeDown) {
+		if (MenuButtonCurSel != -1) {
+			mi = menu->Items + MenuButtonCurSel;
+			if (mi->mitype == MI_TYPE_VSLIDER) {
+				if (key == KeyCodeDown) {
+					mi->d.vslider.cflags &= ~MI_CFLAGS_DOWN;
+				} else {
+					mi->d.vslider.cflags &= ~MI_CFLAGS_UP;
+				}
+			}
+		}
+	}
 }
 
 /**
-** Handle keys repeated in menu mode.
+**  Handle keys repeated in menu mode.
 **
-** @param key        Key scancode.
-** @param keychar    ASCII character code of key.
+**  @param key      Key scancode.
+**  @param keychar  ASCII character code of key.
 */
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
+	Menuitem* mi;
+	Menu* menu;
+
 	HandleKeyModifiersDown(key, keychar);
 
 	if (CurrentMenu == NULL) {
 		return;
 	}
 
-	if (MenuButtonCurSel != -1 && CurrentMenu->Items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
-		MenuHandleKeyDown(key, keychar);
+	menu = CurrentMenu;
+	mi = menu->Items + MenuButtonCurSel;
+	if (MenuButtonCurSel != -1) {
+		if (mi->mitype == MI_TYPE_INPUT) {
+			MenuHandleKeyDown(key, keychar);
+		} else if (mi->mitype == MI_TYPE_VSLIDER || mi->mitype == MI_TYPE_LISTBOX) {
+			if (key == KeyCodeDown || key == KeyCodeUp) {
+				MenuHandleKeyDown(key, keychar);
+			}
+		}
 	}
 }
 
