@@ -138,7 +138,7 @@ extern void HandleActionDemolish(Unit* unit);
 ----------------------------------------------------------------------------*/
 
     /// handle the animation of a unit
-extern int UnitShowAnimation(Unit* unit,Animation* animation);
+extern int UnitShowAnimation(Unit* unit,const Animation* animation);
     /// Handle the actions of all units each frame
 extern void UnitActions(void);
 
