@@ -349,7 +349,7 @@ local int CclPlayer(lua_State* l)
 			}
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, j + 1, k + 1);
-				player->UpgradeTimers.Upgrades[i] = LuaToNumber(l, -1);
+				player->UpgradeTimers.Upgrades[k] = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			}
 		} else {
