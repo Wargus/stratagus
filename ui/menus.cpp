@@ -337,7 +337,7 @@ local char ScenSelectDisplayPath[1024];		/// Displayed selector path
 local char ScenSelectFileName[128];		/// Scenario selector name
 global char ScenSelectFullPath[1024];		/// Scenario selector path+name
 
-global MapInfo *ScenSelectPudInfo;		/// Selected pud info
+global MapInfo *ScenSelectMapInfo;		/// Selected pud info
 
     /// FIXME: Docu
 global int nKeyStrokeHelps;
@@ -1995,7 +1995,7 @@ local void GameShowCredits(void)
 }
 
 /**
-**	Show the Quit To Menu Confirm menu
+**	Show the Restart Confirm menu
 */
 global void RestartConfirmMenu(void)
 {
@@ -2006,7 +2006,7 @@ global void RestartConfirmMenu(void)
 }
 
 /**
-**	Show the Quit To Menu Confirm menu
+**	Show the Surrender  Confirm menu
 */
 local void SurrenderConfirmMenu(void)
 {
@@ -2043,7 +2043,7 @@ local void GameMenuEndScenario(void)
     ProcessMenu("menu-end-scenario", 1);
     if (!GameRunning) {
 	EndMenu();
-	InterfaceState=IfaceStateNormal;
+	InterfaceState = IfaceStateNormal;
     }
 }
 
@@ -2134,10 +2134,10 @@ local void FreeTips(void)
     Menu *menu;
 
     menu = FindMenu("menu-tips");
-    for( i=5; i<13; i++ ) {
-	if( menu->items[i].d.text.text ) {
+    for (i = 5; i < 13; i++) {
+	if (menu->items[i].d.text.text) {
 	    free(menu->items[i].d.text.text);
-	    menu->items[i].d.text.text=NULL;
+	    menu->items[i].d.text.text = NULL;
 	}
     }
 }
@@ -2351,14 +2351,14 @@ local void GameMenuObjectives(void)
 }
 
 /**
-**	Get pud info from select path+name
+**	Get map info from select path+name
 */
 local void GetInfoFromSelectPath(void)
 {
     int i;
 
-    FreeMapInfo(ScenSelectPudInfo);
-    ScenSelectPudInfo = NULL;
+    FreeMapInfo(ScenSelectMapInfo);
+    ScenSelectMapInfo = NULL;
 
     if (ScenSelectPath[0]) {
 	i = strlen(ScenSelectPath);
@@ -2368,13 +2368,13 @@ local void GetInfoFromSelectPath(void)
     }
     strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     if (strcasestr(ScenSelectFileName, ".pud")) {
-	ScenSelectPudInfo = GetPudInfo(ScenSelectPath);
+	ScenSelectMapInfo = GetPudInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	ScenSelectPudInfo = GetScmInfo(ScenSelectPath);
+	ScenSelectMapInfo = GetScmInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	ScenSelectPudInfo = GetChkInfo(ScenSelectPath);
+	ScenSelectMapInfo = GetChkInfo(ScenSelectPath);
 	strcpy(ScenSelectFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
@@ -2398,12 +2398,12 @@ local void ScenSelectMenu(void)
 
     menu = FindMenu("menu-custom-game");
     // FIXME: This check is only needed until GetCmInfo works
-    if (!ScenSelectPudInfo) {
+    if (!ScenSelectMapInfo) {
 	menu->items[12].d.pulldown.noptions = PlayerMax-1;
 	menu->items[12].d.pulldown.curopt = 0;
     } else {
 	for (n = j = 0; j < PlayerMax; ++j) {
-	    t = ScenSelectPudInfo->PlayerType[j];
+	    t = ScenSelectMapInfo->PlayerType[j];
 	    if (t == PlayerPerson || t == PlayerComputer) {
 		n++;
 	    }
@@ -3706,8 +3706,8 @@ local void GameCancel(void)
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
-    FreeMapInfo(ScenSelectPudInfo);
-    ScenSelectPudInfo = NULL;
+    FreeMapInfo(ScenSelectMapInfo);
+    ScenSelectMapInfo = NULL;
     EndMenu();
 }
 
@@ -3719,8 +3719,8 @@ local void CustomGameStart(void)
     int i;
     char *p;
 
-    FreeMapInfo(ScenSelectPudInfo);
-    ScenSelectPudInfo = NULL;
+    FreeMapInfo(ScenSelectMapInfo);
+    ScenSelectMapInfo = NULL;
 
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
@@ -3788,12 +3788,12 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 
     menu = FindMenu("menu-custom-game");
     // FIXME: This check is only needed until GetCmInfo works
-    if (!ScenSelectPudInfo) {
+    if (!ScenSelectMapInfo) {
 	menu->items[12].d.pulldown.noptions = PlayerMax-1;
 	menu->items[12].d.pulldown.curopt = 0;
     } else {
 	for (n = j = 0; j < PlayerMax; ++j) {
-	    t = ScenSelectPudInfo->PlayerType[j];
+	    t = ScenSelectMapInfo->PlayerType[j];
 	    if (t == PlayerPerson || t == PlayerComputer) {
 		n++;
 	    }
@@ -3821,11 +3821,11 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
     l = VideoTextLength(GameFont, "Scenario:");
     VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
     VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360+24 , GameFont, ScenSelectFileName);
-    if (ScenSelectPudInfo) {
-	if (ScenSelectPudInfo->Description) {
-	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, ScenSelectPudInfo->Description);
+    if (ScenSelectMapInfo) {
+	if (ScenSelectMapInfo->Description) {
+	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, ScenSelectMapInfo->Description);
 	}
-	sprintf(buffer, " (%d x %d)", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
+	sprintf(buffer, " (%d x %d)", ScenSelectMapInfo->MapWidth, ScenSelectMapInfo->MapHeight);
 	VideoDrawText(TheUI.Offset640X + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360+24, GameFont, buffer);
     }
 #if 0
@@ -4030,7 +4030,7 @@ local void NetworkGamePrepareGameSettings(void)
     int num[PlayerMax];
     int comp[PlayerMax];
 
-    DebugCheck(!ScenSelectPudInfo);
+    DebugCheck(!ScenSelectMapInfo);
 
     DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
 
@@ -4050,11 +4050,11 @@ local void NetworkGamePrepareGameSettings(void)
 
     // Make a list of the available player slots.
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
 	    DebugLevel3Fn("Player slot %i is available for a person\n" _C_ i);
 	    num[h++] = i;
 	}
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
 	    comp[c++] = i;	// available computer player slots
 	}
     }
@@ -4125,10 +4125,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
     //	Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available interactive player slots
 	}
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
 	    c++;	// available computer player slots
 	}
     }
@@ -4258,10 +4258,10 @@ local void MultiClientUpdate(int initial)
 
     //  Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;			// available interactive player slots
 	}
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
 	    c++;			// available computer player slots
 	}
     }
@@ -4354,7 +4354,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
     //	Calculate available slots from pudinfo
     for (h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available interactive player slots
 	}
     }
@@ -4577,8 +4577,8 @@ global int NetClientSelectScenario(void)
 {
     char *cp;
 
-    FreeMapInfo(ScenSelectPudInfo);
-    ScenSelectPudInfo = NULL;
+    FreeMapInfo(ScenSelectMapInfo);
+    ScenSelectMapInfo = NULL;
 
     cp = strrchr(ScenSelectFullPath, '/');
     if (cp) {
@@ -4592,15 +4592,15 @@ global int NetClientSelectScenario(void)
     }
 
     if (strcasestr(ScenSelectFileName, ".pud")) {
-	ScenSelectPudInfo = GetPudInfo(ScenSelectFullPath);
+	ScenSelectMapInfo = GetPudInfo(ScenSelectFullPath);
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	ScenSelectPudInfo = GetScmInfo(ScenSelectFullPath);
+	ScenSelectMapInfo = GetScmInfo(ScenSelectFullPath);
     } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	ScenSelectPudInfo = GetChkInfo(ScenSelectFullPath);
+	ScenSelectMapInfo = GetChkInfo(ScenSelectFullPath);
     } else {
 	// FIXME: GetCmInfo();
     }
-    return ScenSelectPudInfo == NULL;
+    return ScenSelectMapInfo == NULL;
 }
 
 /**
