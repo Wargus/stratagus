@@ -250,6 +250,7 @@ local void UiAddToAlternateGroup(unsigned group)
 */
 local void UiToggleSound(void)
 {
+#ifdef WITH_SOUND
     if( SoundFildes != -1 ) {
 	SoundOff^=1;
     }
@@ -258,6 +259,9 @@ local void UiToggleSound(void)
     } else {
 	SetStatusLine("Sound is on.");
     }
+#else
+    SetStatusLine("Compiled without sound support.");
+#endif
 }
 
 /**

@@ -88,7 +88,7 @@ extern void DisplaySoundHashTable(void);
 
 #ifndef WITH_SOUND	// {
 
-#define SoundIdForName(n)		/// Dummy macro for without sound
+#define SoundIdForName(n)	NULL	/// Dummy macro for without sound
 
 #endif	// } WITH_SOUND
 
