@@ -92,7 +92,7 @@ local char* SaveGlobal(lua_State *l, int is_root)
 	char *tmp;
 	int b;
 
-//	DebugCheck(is_root && lua_gettop(l));
+//	Assert(!is_root || !lua_gettop(l));
 	first = 1;
 	res = NULL;
 	if (is_root) {
@@ -100,7 +100,7 @@ local char* SaveGlobal(lua_State *l, int is_root)
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
 	sep = (is_root) ? "" : ", ";
-	DebugCheck(!lua_istable(l, -1));
+	Assert(lua_istable(l, -1));
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
 		type_key = lua_type(l, -2);
@@ -213,7 +213,7 @@ local char* SaveGlobal(lua_State *l, int is_root)
 		free(tmp);
 	}
 	lua_pop(l, 1); // pop the table
-//	DebugCheck(is_root && lua_gettop(l));
+//	Assert(!is_root || !lua_gettop(l));
 	return res;
 }
 

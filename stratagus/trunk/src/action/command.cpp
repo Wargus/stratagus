@@ -187,7 +187,7 @@ global void CommandMoveOrder(Unit* unit, int src, int dst)
 {
 	Order tmp;
 	int i;
-	DebugCheck(src == 0 || dst == 0 || src >= unit->OrderCount || dst >= unit->OrderCount);
+	Assert(src != 0 && dst != 0 && src < unit->OrderCount && dst < unit->OrderCount);
 
 	if (src == dst) {
 		return;
@@ -537,7 +537,7 @@ global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 		order->Y = y;
 		order->Range = 0;
 		order->Type = NULL;
-		DebugCheck(unit->X & ~0xFFFF || unit->Y & ~0xFFFF);
+		Assert(!(unit->X & ~0xFFFF) || !(unit->Y & ~0xFFFF));
 		// FIXME: BUG-ALERT: encode source into arg1 as two 16 bit values!
 		order->Arg1 = (void*)((unit->X << 16) | unit->Y);
 	}
@@ -902,7 +902,7 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 				ReleaseOrders(unit);
 				unit->Orders[1].Action = UnitActionTrain;
 			}
-			DebugCheck(unit->OrderCount != 1 || unit->OrderFlush != 1);
+			Assert(unit->OrderCount == 1 && unit->OrderFlush == 1);
 
 			unit->OrderCount = 2;
 			unit->Orders[1].Type = type;
@@ -948,7 +948,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	//
 	if (unit->Orders[0].Action == UnitActionTrain) {
 		n = unit->Data.Train.Count;
-		DebugCheck(n < 1);
+		Assert(n >= 1);
 		if (slot == -1) {				// default last slot!
 			slot += n;
 		}
@@ -1190,7 +1190,7 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 
 	DebugLevel0Fn(": %d casts %s at %d %d on %d\n" _C_
 		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
-	DebugCheck(!unit->Type->CanCastSpell[spell->Slot]);
+	Assert(unit->Type->CanCastSpell[spell->Slot]);
 
 	//
 	// Check if unit is still valid? (NETWORK!)

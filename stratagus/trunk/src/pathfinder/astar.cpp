@@ -310,7 +310,7 @@ local int CostMoveTo(Unit* unit, int ex, int ey, int mask, int current_cost) {
 		goal = UnitCacheOnXY(ex, ey, unit->Type->UnitType);
 		if (!goal) {
 			// Shouldn't happen, mask says there is something on this tile
-			DebugCheck(1);
+			Assert(0);
 			return -1;
 		}
 		if (goal->Moving)  {

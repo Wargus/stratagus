@@ -266,7 +266,7 @@ global void HandleActionMove(Unit* unit)
 		unit->SubAction = 1;
 		NewResetPath(unit);
 
-		DebugCheck(unit->State != 0);
+		Assert(unit->State == 0);
 	}
 
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...

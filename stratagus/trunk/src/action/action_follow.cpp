@@ -112,7 +112,7 @@ global void HandleActionFollow(Unit* unit)
 	if (!unit->SubAction) {			// first entry
 		unit->SubAction = 1;
 		NewResetPath(unit);
-		DebugCheck(unit->State != 0);
+		Assert(unit->State == 0);
 	}
 
 	switch (DoActionMove(unit)) {		// reached end-point?

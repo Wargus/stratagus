@@ -69,7 +69,7 @@ global void HandleActionPatrol(Unit* unit)
 	if (DoActionMove(unit) < 0) {		// reached end-point or stop
 		int tmp;
 
-		DebugCheck(unit->Orders[0].Action != UnitActionPatrol);
+		Assert(unit->Orders[0].Action == UnitActionPatrol);
 
 		//
 		// Swap the points.

@@ -95,7 +95,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 global void AnimateActionAttack(Unit* unit)
 {
 	if (unit->Type->Animations) {
-		DebugCheck(!unit->Type->Animations->Attack);
+		Assert(unit->Type->Animations->Attack);
 		DoActionAttackGeneric(unit, unit->Type->Animations->Attack);
 	}
 }
@@ -189,7 +189,7 @@ local int CheckForTargetInRange(Unit* unit)
 		if (goal) {
 			if (unit->SavedOrder.Action == UnitActionStill) {
 				// Save current command to continue it later.
-				DebugCheck(unit->Orders[0].Goal);
+				Assert(!unit->Orders[0].Goal);
 				unit->SavedOrder = unit->Orders[0];
 			}
 			RefsIncrease(goal);
@@ -230,9 +230,9 @@ local int CheckForTargetInRange(Unit* unit)
 		}
 	}
 
-	DebugCheck(unit->Type->Vanishes || unit->Destroyed || unit->Removed);
-	DebugCheck(unit->Orders[0].Action != UnitActionAttack &&
-		unit->Orders[0].Action != UnitActionAttackGround);
+	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
+	Assert(unit->Orders[0].Action == UnitActionAttack ||
+		unit->Orders[0].Action == UnitActionAttackGround);
 
 	return 0;
 }
@@ -346,9 +346,9 @@ local void MoveToTarget(Unit* unit)
 
 		return;
 	}
-	DebugCheck(unit->Type->Vanishes || unit->Destroyed || unit->Removed);
-	DebugCheck(unit->Orders[0].Action != UnitActionAttack  &&
-		unit->Orders[0].Action != UnitActionAttackGround);
+	Assert(!unit->Type->Vanishes && !unit->Destroyed && !unit->Removed);
+	Assert(unit->Orders[0].Action == UnitActionAttack ||
+		unit->Orders[0].Action == UnitActionAttackGround);
 }
 
 /**
@@ -405,14 +405,14 @@ local void AttackTarget(Unit* unit)
 				// Return to old task?
 				if (unit->SavedOrder.Action != UnitActionStill) {
 					unit->SubAction = 0;
-					DebugCheck(unit->Orders[0].Goal != NoUnitP);
+					Assert(unit->Orders[0].Goal == NoUnitP);
 					unit->Orders[0] = unit->SavedOrder;
 					NewResetPath(unit);
 					// Must finish, if saved command finishes
 					unit->SavedOrder.Action = UnitActionStill;
 
 					// This isn't supported
-					DebugCheck(unit->SavedOrder.Goal != NoUnitP);
+					Assert(unit->SavedOrder.Goal == NoUnitP);
 				}
 				return;
 			}
@@ -540,7 +540,7 @@ global void HandleActionAttack(Unit* unit)
 			//
 			// FIXME: should use a reachable place to reduce pathfinder time.
 			//
-			DebugCheck(unit->State != 0);
+			Assert(unit->State == 0);
 			//
 			// Look for target, if already in range. Attack if So
 			//

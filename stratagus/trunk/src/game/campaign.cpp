@@ -163,7 +163,7 @@ global void PlayCampaign(const char* name)
 	GameResult = GameVictory;
 
 	filename = NextChapter();
-	DebugCheck(!filename);
+	Assert(filename);
 
 	SkipCurrentChapter = 1;
 	GameResult = GameNoResult;

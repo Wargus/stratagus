@@ -157,7 +157,7 @@ global void LoadMissileSprite(MissileType* mtype)
 		FlipGraphic(mtype->Sprite);
 
 		// Correct the number of frames in graphic
-		DebugCheck(mtype->Sprite->NumFrames < mtype->SpriteFrames);
+		Assert(mtype->Sprite->NumFrames >= mtype->SpriteFrames);
 		mtype->Sprite->NumFrames = mtype->SpriteFrames;
 		// FIXME: Don't use NumFrames as number of frames.
 	}
@@ -374,16 +374,16 @@ local void FreeMissile(Missile* missile)
 	// Note: removing the last missile works.
 	//
 	if (missile->Local) {
-		DebugCheck(*missile->MissileSlot != missile);
+		Assert(*missile->MissileSlot == missile);
 		temp = LocalMissiles[--NumLocalMissiles];
-		DebugCheck(*temp->MissileSlot != temp);
+		Assert(*temp->MissileSlot == temp);
 		temp->MissileSlot = missile->MissileSlot;
 		*missile->MissileSlot = temp;
 		LocalMissiles[NumLocalMissiles] = NULL;
 	} else {
-		DebugCheck(*missile->MissileSlot != missile);
+		Assert(*missile->MissileSlot == missile);
 		temp = GlobalMissiles[--NumGlobalMissiles];
-		DebugCheck(*temp->MissileSlot != temp);
+		Assert(*temp->MissileSlot == temp);
 		temp->MissileSlot = missile->MissileSlot;
 		*missile->MissileSlot = temp;
 		GlobalMissiles[NumGlobalMissiles] = NULL;
@@ -423,7 +423,7 @@ local int CalculateDamageStats(const UnitStats* attacker_stats,
 
 	damage = max(basic_damage - goal_stats->Armor, 1) + piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
-	DebugCheck(damage < 0);
+	Assert(damage >= 0);
 
 	DebugLevel3Fn("\nDamage done [%d] %d %d ->%d\n" _C_ goal_stats->Armor _C_
 		basic_damage _C_ piercing_damage _C_ damage);
@@ -527,7 +527,7 @@ global void FireMissile(Unit* unit)
 	}
 
 	if (goal) {
-		DebugCheck(!goal->Type);  // Target invalid?
+		Assert(goal->Type);  // Target invalid?
 		//
 		// Moved out of attack range?
 		//
@@ -756,13 +756,13 @@ local void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
 
 	nextdir = 128 / (missile->Type->NumDirections - 1);
-	DebugCheck(nextdir == 0);
+	Assert(nextdir != 0);
 	dir = ((DirectionToHeading(10 * dx, 10 * dy) + nextdir / 2) & 0xFF) / nextdir;
 	if (dir >= missile->Type->NumDirections) {
 		dir -= (missile->Type->NumDirections - 1) * 2;
 	}
-	DebugCheck(dir >= missile->Type->NumDirections);
-	DebugCheck(dir < -missile->Type->NumDirections + 1);
+	Assert(dir < missile->Type->NumDirections);
+	Assert(dir >= -missile->Type->NumDirections + 1);
 	missile->SpriteFrame = dir;
 	if (missile->SpriteFrame < 0) {
 		missile->SpriteFrame--;
@@ -794,7 +794,7 @@ local int MissileInitMove(Missile* missile)
 		missile->State++;
 		return 0;
 	}
-	DebugCheck(missile->TotalStep == 0);
+	Assert(missile->TotalStep != 0);
 	missile->CurrentStep += missile->Type->Speed;
 	if (missile->CurrentStep >= missile->TotalStep) {
 		missile->X = missile->DX;
@@ -822,8 +822,8 @@ local int PointToPointMissile(Missile* missile)
 		return 1;
 	}
 
-	DebugCheck(missile->Type == NULL);
-	DebugCheck(missile->TotalStep == 0);
+	Assert(missile->Type != NULL);
+	Assert(missile->TotalStep != 0);
 	xstep = (missile->DX - missile->SourceX) * 1024 / missile->TotalStep;
 	ystep = (missile->DY - missile->SourceY) * 1024 / missile->TotalStep;
 	missile->X = missile->SourceX + xstep * missile->CurrentStep / 1024;
@@ -864,17 +864,17 @@ local int ParabolicMissile(Missile* missile)
 	if (MissileInitMove(missile) == 1) {
 		return 1;
 	}
-	DebugCheck(missile->Type == NULL);
+	Assert(missile->Type != NULL);
 	orig_x = missile->X;
 	orig_y = missile->Y;
 	xstep = missile->DX - missile->SourceX;
 	ystep = missile->DY - missile->SourceY;
-	DebugCheck(missile->TotalStep == 0);
+	Assert(missile->TotalStep != 0);
 	xstep = xstep * 1000 / missile->TotalStep;
 	ystep = ystep * 1000 / missile->TotalStep;
 	missile->X = missile->SourceX + xstep * missile->CurrentStep / 1000;
 	missile->Y = missile->SourceY + ystep * missile->CurrentStep / 1000;
-	DebugCheck(K == 0);
+	Assert(K != 0);
 	Z = missile->CurrentStep * (missile->TotalStep - missile->CurrentStep) / K;
 	// Until Z is used for drawing, modify X and Y.
 	missile->X += Z * ZprojToX / 64;
@@ -905,7 +905,7 @@ local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 		if (missile->Damage) {  // direct damage, spells mostly
 			HitUnit(missile->SourceUnit, goal, missile->Damage / splash);
 		} else {
-			DebugCheck(missile->SourceUnit == NULL);
+			Assert(missile->SourceUnit != NULL);
 			HitUnit(missile->SourceUnit, goal,
 				CalculateDamage(missile->SourceUnit->Stats, goal,
 					missile->SourceUnit->Bloodlust, 0) / splash);
@@ -939,7 +939,7 @@ local void MissileHitsWall(const Missile* missile, int x, int y, int splash)
 			if (missile->Damage) {  // direct damage, spells mostly
 				HitWall(x, y, missile->Damage / splash);
 			} else {
-				DebugCheck(missile->SourceUnit == NULL);
+				Assert(missile->SourceUnit != NULL);
 				HitWall(x, y,
 					CalculateDamageStats(missile->SourceUnit->Stats,
 						UnitTypeOrcWall->Stats, 0, 0) / splash);
@@ -1030,7 +1030,7 @@ global void MissileHit(Missile* missile)
 	//
 	i = missile->Type->Range;
 	n = UnitCacheSelect(x - i + 1, y - i + 1, x + i, y + i, table);
-	DebugCheck(missile->SourceUnit == NULL);
+	Assert(missile->SourceUnit != NULL);
 	for (i = 0; i < n; ++i) {
 		goal = table[i];
 		//
@@ -1260,7 +1260,7 @@ global MissileType* MissileBurningBuilding(int percent)
 		frame = tmp;
 		tmp = tmp->Next;
 	}
-	DebugCheck(frame == NULL);
+	Assert(frame != NULL);
 	return frame->Missile;
 }
 
@@ -1863,7 +1863,7 @@ global void MissileActionDeathCoil(Missile* missile)
 	missile->Wait = missile->Type->Sleep;
 	if (PointToPointMissile(missile)) {
 		source = missile->SourceUnit;
-		DebugCheck(source == NULL);
+		Assert(source != NULL);
 		if (source->Destroyed) {
 			return;
 		}

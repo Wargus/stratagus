@@ -273,12 +273,12 @@ local int CclMissile(lua_State* l)
 			dy = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "local")) {
-			DebugCheck(!type);
+			Assert(type);
 			missile = MakeLocalMissile(type, x, y, dx, dy);
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
-			DebugCheck(!type);
+			Assert(type);
 			missile = MakeMissile(type, x, y, dx, dy);
 			missile->X = x;
 			missile->Y = y;
@@ -289,42 +289,42 @@ local int CclMissile(lua_State* l)
 			missile->Local = 0;
 			--j;
 		} else if (!strcmp(value, "frame")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->SpriteFrame = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "state")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->State = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "anim-wait")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->AnimWait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "wait")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->Wait = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "delay")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->Delay = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "source")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			value = LuaToString(l, j + 1);
 			missile->SourceUnit = UnitSlots[strtol(value + 1, 0, 16)];
 			RefsIncrease(missile->SourceUnit);
 		} else if (!strcmp(value, "target")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			value = LuaToString(l, j + 1);
 			missile->TargetUnit = UnitSlots[strtol(value + 1, 0, 16)];
 			RefsIncrease(missile->TargetUnit);
 		} else if (!strcmp(value, "damage")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->Damage = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->TTL = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "hidden")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			missile->Hidden = 1;
 			--j;
 		} else if (!strcmp(value, "step")) {
-			DebugCheck(!missile);
+			Assert(missile);
 			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}

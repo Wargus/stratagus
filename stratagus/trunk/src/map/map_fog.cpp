@@ -250,14 +250,14 @@ global void MapUnmarkTileSight(const Player* player, int x, int y)
 	switch (v) {
 		case 255:
 			// FIXME: (mr-russ) Lookupsight is broken :(
-			DebugCheck(1);
+			Assert(0);
 			v = LookupSight(player, x, y);
-			DebugCheck(v < 254);
+			Assert(v >= 254);
 			break;
 		case 0:  // Unexplored
 		case 1:
 			// We are at minimum, don't do anything shouldn't happen.
-			DebugCheck(1);
+			Assert(0);
 			break;
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.
@@ -290,7 +290,7 @@ global void MapMarkTileDetectCloak(const Player* player, int x, int y)
 	if (v == 0) {
 		UnitsOnTileMarkSeen(player, x, y, 1);
 	}
-	DebugCheck(v == 255);
+	Assert(v != 255);
 	++v;
 	TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player] = v;
 }
@@ -307,7 +307,7 @@ global void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 	unsigned char v;
 
 	v = TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player];
-	DebugCheck(v == 0);
+	Assert(v != 0);
 	if (v == 1) {
 		UnitsOnTileUnmarkSeen(player, x, y, 1);
 	}

@@ -149,7 +149,7 @@ global int UnloadUnit(Unit* unit)
 	int x;
 	int y;
 
-	DebugCheck(!unit->Removed);
+	Assert(unit->Removed);
 	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, UnitMovementMask(unit))) {
 		return 0;
 	}
@@ -312,7 +312,7 @@ local int MoveToDropZone(Unit* unit)
 			return 0;
 	}
 
-	DebugCheck(unit->Orders[0].Action != UnitActionUnload);
+	Assert(unit->Orders[0].Action == UnitActionUnload);
 	return 1;
 }
 

@@ -404,10 +404,10 @@ local void HandleUnitAction(Unit* unit)
 						unit->SubAction == 60) {
 					// FIXME: SUB_GATHER_RESOURCE ?
 					unit->Orders[0].Goal->Data.Resource.Active--;
-					DebugCheck(unit->Orders[0].Goal->Data.Resource.Active < 0);
+					Assert(unit->Orders[0].Goal->Data.Resource.Active >= 0);
 				}
 				// Still shouldn't have a reference
-				DebugCheck(unit->Orders[0].Action == UnitActionStill);
+				Assert(unit->Orders[0].Action != UnitActionStill);
 				RefsDecrease(unit->Orders->Goal);
 			}
 			if (unit->CurrentResource) {

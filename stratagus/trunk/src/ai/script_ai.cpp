@@ -349,10 +349,10 @@ local int CclDefineAi(lua_State* l)
 // Get name of function
 	lua_pushstring(l, "debug");
 	lua_gettable(l, LUA_GLOBALSINDEX);
-	DebugCheck(lua_isnil(l, -1));
+	Assert(!lua_isnil(l, -1));
 	lua_pushstring(l, "getinfo");
 	lua_gettable(l, -2);
-	DebugCheck(!lua_isfunction(l, -1));
+	Assert(lua_isfunction(l, -1));
 	lua_pushvalue(l, 4);
 	lua_call(l, 1, 1);
 	lua_pushstring(l, "name");
@@ -848,7 +848,7 @@ local int CclAiWaitForce(lua_State* l)
 #if 0
 	// Debuging
 	AiCleanForces();
-	DebugCheck(AiPlayer->Force[force].Completed);
+	Assert(!AiPlayer->Force[force].Completed);
 #endif
 
 	lua_pushboolean(l, 1);
@@ -1150,7 +1150,7 @@ local int DefaultResourceNumber(const char* name)
 		}
 	}
 	// Resource not found, should never happen
-	DebugCheck(1);
+	Assert(0);
 	return -1;
 }
 
@@ -1175,10 +1175,10 @@ local int CclDefineAiPlayer(lua_State* l)
 	i = LuaToNumber(l, j + 1);
 	++j;
 
-	DebugCheck(i < 0 || i > PlayerMax);
+	Assert(i >= 0 && i <= PlayerMax);
 	DebugLevel0Fn("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled );
 	// FIXME: lose this:
-	// DebugCheck(Players[i].Ai || !Players[i].AiEnabled);
+	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 
 	ai = Players[i].Ai = calloc(1, sizeof(PlayerAi));
 	ai->Player = &Players[i];
