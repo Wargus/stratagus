@@ -2295,19 +2295,17 @@ local void SaveAction(void)
     char *filename;
     char *prefix = SaveGameMenuItems[1].d.input.buffer;
     size_t prefixLength;
-    const char suffix[] = ".ccl";
 
     prefixLength = strlen(prefix);
     prefixLength -= 3;
-    if ( (filename = malloc(prefixLength + sizeof suffix)) == NULL)
+    if ( (filename = malloc(prefixLength)) == NULL)
     {
         fprintf(stderr,
-                  "Can't save \"%s%s\": %s", prefix, suffix, strerror(errno));
-        SetMessage("Can't save \"%s%s\": %s", prefix, suffix, strerror(errno));
+                  "Can't save \"%s\": %s", prefix, strerror(errno));
+        SetMessage("Can't save \"%s\": %s", prefix, strerror(errno));
         return;
     }
     memcpy(filename, prefix, prefixLength);
-    memcpy(filename + prefixLength, suffix, sizeof suffix);
     SaveGame(filename);
     SetMessage("Saved game to: %s", filename);
 
