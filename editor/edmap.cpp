@@ -606,11 +606,11 @@ static void TileFill(int x, int y, int tile, int size)
 #define ROCK_TILE   0x80
 
 /**
-**  FIXME: docu
+**  Randomize tiles and fill in map
 **
-**  @param tile      FIXME: docu
-**  @param count     FIXME: docu
-**  @param max_size  FIXME: docu
+**  @param tile      tile number to use
+**  @param count     number of times to apply randomization
+**  @param max_size  maximum size of the fill rectangle
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
@@ -637,11 +637,11 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 }
 
 /**
-**  FIXME: docu
+**  Add a unit to random locations on the map, unit will be neutral
 **
-**  @param unit_type  FIXME: docu
-**  @param count      FIXME: docu
-**  @param value      FIXME: docu
+**  @param unit_type  unit type to add to map as a character string
+**  @param count      the number of times to add the unit
+**  @param value      resources to be stored in that unit
 */
 static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 {

@@ -216,7 +216,7 @@ static FullReplay* StartReplay(void)
 }
 
 /**
-** FIXME: docu
+**  Applies settings the game used at the start of the replay
 */
 static void ApplyReplaySettings(void)
 {
@@ -256,7 +256,9 @@ static void ApplyReplaySettings(void)
 }
 
 /**
-** FIXME: docu
+**  Free a replay from memory
+**
+**  @param reply  Pointer to the replay to be freed
 */
 static void DeleteReplay(FullReplay* replay)
 {
@@ -375,7 +377,7 @@ static void SaveFullLog(CLFile* dest)
 /**
 **  Append the LogEntry structure at the end of currentLog, and to LogFile
 **
-**  @param log   FIXME: docu
+**  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
 static void AppendLog(LogEntry* log, CLFile* dest)
@@ -1479,7 +1481,7 @@ void SendCommandSharedVision(int player, int state, int opponent)
 }
 
 /**
-**  FIXME: docu
+**  Register Ccl functions with lua
 */
 void NetworkCclRegister(void)
 {
