@@ -54,11 +54,12 @@ extern int AiCostFactor;			/// Adjust the AI costs
 extern void AiEachCycle(Player* player);	/// Called each game cycle
 extern void AiEachSecond(Player* player);	/// Called each second
 
+extern void InitAiModule(void);			/// Init AI global structures
 extern void AiInit(Player* player);		/// Init AI for this player
 extern void CleanAi(void);			/// Cleanup the AI module
 extern void SaveAi(CLFile*file);		/// Save the AI state
 
-extern void AiCclRegister(void);	/// Register ccl features
+extern void AiCclRegister(void);		/// Register ccl features
 
 /*--------------------------------------------------------
 --     Call Backs/Triggers

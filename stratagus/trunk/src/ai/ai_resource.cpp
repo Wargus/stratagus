@@ -469,49 +469,61 @@ local int AiMakeUnit(UnitType * type)
     const int *unit_count;
     AiUnitTypeTable *const *tablep;
     const AiUnitTypeTable *table;
-
+    
+    int usableTypes[UnitTypeMax+1];
+    int usableTypesCount;
+    int currentType;
+    
     DebugLevel3Fn(":%s\n" _C_ type->Name);
 
-    //
-    //  Check if we have a place for building or an unit to build.
-    //
-    if (type->Building) {
-	n = AiHelpers.BuildCount;
-	tablep = AiHelpers.Build;
-    } else {
-	n = AiHelpers.TrainCount;
-	tablep = AiHelpers.Train;
-    }
-    if (type->Type > n) {		// Oops not known.
-	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
-	return 0;
-    }
-    table = tablep[type->Type];
-    if (!table) {			// Oops not known.
-	DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
-	return 0;
-    }
-    n = table->Count;
+    // Find equivalents unittypes.
+    usableTypesCount = AiFindAvailableUnitTypeEquiv(type, usableTypes);
+    
+    // Iterate them
+    for (currentType = 0; currentType < usableTypesCount; currentType++) {
 
-    unit_count = AiPlayer->Player->UnitTypesCount;
-    for (i = 0; i < n; ++i) {
+	type = UnitTypes[usableTypes[currentType]];
+
 	//
-	//      The type for builder/trainer is available
+	//  Check if we have a place for building or an unit to build.
 	//
-	if (unit_count[table->Table[i]->Type]) {
-	    DebugLevel3("Found a builder for a %s.\n" _C_ type->ident);
-	    if (type->Building) {
-		if (AiBuildBuilding(table->Table[i], type)) {
-		    return 1;
-		}
-	    } else {
-		if (AiTrainUnit(table->Table[i], type)) {
-		    return 1;
+	if (type->Building) {
+	    n = AiHelpers.BuildCount;
+	    tablep = AiHelpers.Build;
+	} else {
+	    n = AiHelpers.TrainCount;
+	    tablep = AiHelpers.Train;
+	}
+	if (type->Type > n) {		// Oops not known.
+	    DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	    continue;
+	}
+	table = tablep[type->Type];
+	if (!table) {			// Oops not known.
+	    DebugLevel0Fn("Nothing known about `%s'\n" _C_ type->Ident);
+	    continue;
+	}
+	n = table->Count;
+
+	unit_count = AiPlayer->Player->UnitTypesCount;
+	for (i = 0; i < n; ++i) {
+	    //
+	    //      The type for builder/trainer is available
+	    //
+	    if (unit_count[table->Table[i]->Type]) {
+		DebugLevel3("Found a builder for a %s.\n" _C_ type->ident);
+		if (type->Building) {
+		    if (AiBuildBuilding(table->Table[i], type)) {
+			return 1;
+		    }
+		} else {
+		    if (AiTrainUnit(table->Table[i], type)) {
+			return 1;
+		    }
 		}
 	    }
 	}
     }
-
     return 0;
 }
 
@@ -1336,6 +1348,7 @@ global void AiResourceManager(void)
     //  Collect resources.
     //
     AiCollectResources();
+
     //
     //  Check repair.
     //

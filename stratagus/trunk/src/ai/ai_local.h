@@ -228,7 +228,7 @@ typedef struct _ai_action_evaluation_ AiActionEvaluation;
 */
 struct _ai_action_evaluation_ {
     AiScriptAction*	aiScriptAction;	/// Action evaluated
-
+    int			gamecycle;	/// Gamecycle when this evaluation occured
     int			hotSpotX;	/// X position of the hotspot, or -1
     int			hotSpotY;	/// Y position of the hotspot, or -1
 
@@ -372,7 +372,7 @@ extern AiHelper AiHelpers;		/// AI helper variables
 #define MaxAiScriptActions	64	/// How many AiScriptActions are supported
 extern int AiScriptActionNum;		/// Current number of AiScriptAction
 extern AiScriptAction AiScriptActions[MaxAiScriptActions];/// All availables AI script actions   
-
+extern int UnitTypeEquivs[UnitTypeMax + 1];/// equivalence between unittypes
 extern PlayerAi* AiPlayer;		/// Current AI player
 extern AiRunningScript* AiScript;	/// Currently running script
 extern char** AiTypeWcNames;		/// pud num to internal string mapping
@@ -396,6 +396,14 @@ extern void AiResourceManager(void);
 extern void AiExplore(int x, int y, int exploreMask);
     /// Count the number of builder unit available for the given unittype 
 extern int AiCountUnitBuilders(UnitType * type);
+    /// Make two unittypes be considered equals
+extern void AiNewUnitTypeEquiv(UnitType * a,UnitType * b);
+    /// Remove any equivalence between unittypes
+extern void AiResetUnitTypeEquiv(void);
+    /// Finds all equivalents units to a given one
+extern int AiFindUnitTypeEquiv(const UnitType * i,int * result);
+    /// Finds all available equivalents units to a given one, in the prefered order
+extern int AiFindAvailableUnitTypeEquiv(const UnitType * i,int * result);
 
 //
 //      Buildings

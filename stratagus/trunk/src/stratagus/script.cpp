@@ -68,6 +68,7 @@
 #include "cdaudio.h"
 #include "spells.h"
 
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -244,6 +245,15 @@ global void CclGcUnprotect(SCM obj)
       }
     
     setvar(sym, new_lst, NIL);
+#endif
+}
+
+global void CclFlushOutput(void)
+{
+#ifdef USE_GUILE
+    scm_flush_all_ports();
+#else
+    fflush(stdout);
 #endif
 }
 

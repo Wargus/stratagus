@@ -1516,7 +1516,12 @@ global int main(int argc, char** argv)
 	--argc;
     }
 
+
     InitCcl();				// init CCL and load configurations!
+
+    // Initialise AI module
+    InitAiModule();
+
     LoadCcl();
 
     main1(argc, argv);
