@@ -166,9 +166,7 @@ typedef struct _missile_type_ MissileType;
 --  General
 ----------------------------------------------------------------------------*/
 
-#ifndef VERSION
-#define VERSION  "V(Unknown)"                 ///< Engine version shown
-#endif
+#define VERSION  "2.1"                 ///< Engine version shown
 
 #ifndef StratagusMajorVerion
 	/// Stratagus major version
