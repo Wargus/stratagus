@@ -183,6 +183,11 @@ local int OffsetX = 0;
 local int OffsetY = 0;
 
 /**
+**	The background picture used by start menues
+*/
+local Graphic* Menusbgnd = NULL;
+
+/**
 **	Items for the Game Menu
 **
 **	@todo FIXME: Configure with CCL.
@@ -1224,7 +1229,20 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 {
     DestroyCursorBackground();
     // FIXME: make this configurable from CCL.
-    DisplayPicture("graphics/ui/Menu background without title.png");
+    if (!Menusbgnd) {
+	Menusbgnd = LoadGraphic("graphics/ui/Menu background without title.png");
+	VideoSetPalette(Menusbgnd->Pixels);
+    }
+
+    VideoLockScreen();
+
+    // FIXME: bigger window ?
+    VideoDrawSubClip(Menusbgnd,0,0,
+	Menusbgnd->Width,Menusbgnd->Height,
+	(VideoWidth-Menusbgnd->Width)/2,(VideoHeight-Menusbgnd->Height)/2);
+
+    VideoUnlockScreen();
+
 }
 
 /**
@@ -1500,11 +1518,18 @@ local void ScenSelectLBExit(Menuitem *mi)
     }
 }
 
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
     char *suf, *cp, *lcp, *np;
     static int p, sz, szl[] = { -1, 32, 64, 96, 128 };
+#ifdef USE_ZZIPLIB
+    ZZIP_FILE *zzf;
+#endif
 
     if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
 	suf = ".cm";
@@ -1522,6 +1547,12 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     cp = np;
     cp--;
     fl->type = -1;
+#ifdef USE_ZZIPLIB
+    if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+	zzip_close(zzf);
+	goto usezzf;
+    }
+#endif
     do {
 	lcp = cp++;
 	cp = strstr(cp, suf);
@@ -1539,12 +1570,13 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	}
 #endif
 	if (*cp == 0) {
+usezzf:
 	    if (p) {
 		if (strstr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
+		    DebugLevel3Fn("GetPudInfo(%s) : %p\n", pathbuf, info);
 		} else {
 		    info = NULL;
-		    // info = GetCmInfo(pathbuf);
 		}
 		if (info) {
 		    sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
@@ -1562,9 +1594,11 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 		    fl->xdata = NULL;
 		}
 	    } else {
+		info = NULL;
+		// info = GetCmInfo(pathbuf);
 		fl->type = 1;
 		fl->name = strdup(np);
-		fl->xdata = NULL;
+		fl->xdata = info;
 		return 1;
 	    }
 	}
@@ -3018,6 +3052,19 @@ global void InitMenus(unsigned int race)
 #else
     CustomGameMenuItems[14].d.pulldown.noptions = 4;
 #endif
+}
+
+/**
+**	Exit Menus code (freeing data)
+**
+**	// FIXME: NOT CALLED YET.....!!!!!
+*/
+global void ExitMenus(void)
+{
+    if (Menusbgnd) {
+	VideoFree(Menusbgnd);
+	Menusbgnd = NULL;
+    }
 }
 
 //@}
