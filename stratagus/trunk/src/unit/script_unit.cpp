@@ -704,6 +704,10 @@ local SCM CclUnit(SCM list)
 	    CclParseOrders(unit,sublist);
 	    // now we know unit's action so we can assign it to a player
 	    AssignUnitToPlayer (unit, player);
+	    if( unit->Orders[0].Action==UnitActionBuilded ) {
+		// HACK: the building is not ready yet
+		unit->Player->UnitTypesCount[type->Type]--;
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
