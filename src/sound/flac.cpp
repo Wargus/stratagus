@@ -124,6 +124,7 @@ local void FLAC_metadata_callback(
 	const FLAC__StreamMetadata * metadata, void *user)
 {
     Sample *sample;
+    int rate;
 
     if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 	sample = ((FlacData*)user)->Sample;
@@ -131,6 +132,12 @@ local void FLAC_metadata_callback(
 	sample->Channels = metadata->data.stream_info.channels;
 	sample->Frequency = metadata->data.stream_info.sample_rate;
 	sample->SampleSize = metadata->data.stream_info.bits_per_sample;
+
+	rate = 44100 / sample->Frequency;
+	// will overbuffer, so double the amount to allocate
+	sample = realloc(sample, sizeof(*sample) + 2*rate*FLAC_BUFFER_SIZE);
+	((FlacData*)(sample->User))->Sample = sample;
+	((FlacData*)(sample->User))->PointerInBuffer = sample->Data;
 
 	DebugLevel3Fn("Stream %d Channels, %d frequency, %d bits\n" _C_
 		sample->Channels _C_ sample->Frequency _C_ sample->SampleSize);
@@ -373,7 +380,6 @@ global Sample* LoadFlac(const char* name, int flags)
 	return NULL;
     }
 
-    // FLAC_read_callback overbuffers, so we need 2*FLAC_BUFFER_SIZE
     sample = malloc(sizeof(*sample) + 2*FLAC_BUFFER_SIZE);
 
     data = malloc(sizeof(FlacData));
