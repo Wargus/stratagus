@@ -1752,6 +1752,8 @@ global void SoundOptions(void)
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
 	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
+    else
+	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #ifdef USE_LIBCDA
     cd_get_volume(&i, &i);
     SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
@@ -1837,14 +1839,14 @@ local void SetCdPower(Menuitem *mi)
     /// Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
-	if (!cd_current_track())
-	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         cd_stop();
 	CDMode = ":stopped";
     }
 #endif
+    EndMenu();
+    SoundOptions();
 }
 
 local void SetFogOfWar(Menuitem *mi)
