@@ -352,7 +352,7 @@ global void UpdateDisplay(void)
     if( MustRedraw==-1 ) {
 	Invalidate();
     } else {
-	if( (MustRedraw&RedrawMap) || (MustRedraw&RedrawMapOverlay) ) {
+	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateArea(TheUI.MapX,TheUI.MapY
 		    ,TheUI.MapWidth-TheUI.MapX,TheUI.MapHeight-TheUI.MapY);
