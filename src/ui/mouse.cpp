@@ -508,18 +508,19 @@ local void HandleMouseOn(int x,int y)
     if (x>=TheUI.MapArea.X && x<=TheUI.MapArea.EndX
 	    && y>=TheUI.MapArea.Y && y<=TheUI.MapArea.EndY) {
 	CursorOn = CursorOnMap;
+
+	viewport = GetViewport(x, y);
+	if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
+	    TheUI.ActiveViewport = viewport;
+	    DebugLevel0Fn("active viewport changed to %d.\n" _C_ viewport);
+	}
+	// Note cursor on map can be in scroll area
     } else {
 	CursorOn = -1;
     }
 
-    viewport = GetViewport(x, y);
-    if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
-	TheUI.ActiveViewport = viewport;
-	DebugLevel0Fn("active viewport changed to %d.\n" _C_ viewport);
-    }
-
     //
-    //	Scrolling Region Handling
+    //	Scrolling Region Handling.
     //
     HandleMouseScrollArea(x,y);
 }
