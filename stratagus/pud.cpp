@@ -284,7 +284,8 @@ local int PudReadHeader(CLFile* input,char* header,long* length)
     }
     if( CLread(input,&len,4)!=4 ) {
 	perror("CLread()");
-	ExitFatal(-1);
+	return 0;
+	// ExitFatal(-1);
     }
     *length=ConvertLE32(len);
     return 1;
@@ -340,24 +341,25 @@ global MapInfo* GetPudInfo(const char* pud)
     if( !(input=CLopen(pud)) ) {
 	fprintf(stderr,"Try ./path/name\n");
 	fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
-	ExitFatal(-1);
+	return NULL;
     }
     header[4]='\0';
     if( !PudReadHeader(input,header,&length) ) {
 	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	ExitFatal(-1);
+	return NULL;
     }
     if( memcmp(header,"TYPE",4) || length!=16 ) {
 	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	ExitFatal(-1);
+	return NULL;
     }
     if( CLread(input,buf,16)!=16 ) {	// IGNORE TYPE
 	perror("CLread()");
-	ExitFatal(-1);
+	return NULL;
     }
+    buf[16] = 0;
     if( strcmp(buf,"WAR2 MAP") ) {	// ONLY CHECK STRING
-	fprintf(stderr,"GetPudInfo: %s: invalid pud\n", pud);
-	ExitFatal(-1);
+	fprintf(stderr,"GetPudInfo: %s: invalid pud type [%s]\n", pud, buf);
+	return NULL;
     }
 
     info=calloc(1, sizeof(MapInfo));	// clears with 0
@@ -395,7 +397,8 @@ global MapInfo* GetPudInfo(const char* pud)
 	if( !memcmp(header,"DESC",4) ) {
 	    if( CLread(input,buf,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea(buf, length);
 	    info->Description=strdup(buf);
@@ -480,11 +483,13 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -500,11 +505,13 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -525,11 +532,13 @@ global MapInfo* GetPudInfo(const char* pud)
 		bufp=buf;
 	    } else if( !(bufp=alloca(length)) ) {
 		perror("alloca()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,bufp,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea(bufp, length);
 	    continue;
@@ -667,11 +676,14 @@ global MapInfo* GetPudInfo(const char* pud)
 	    // FIXME: linux didn't like this big alloca :((((((
 	    if( !(mtxm=malloc(length)) ) {
 		perror("malloc()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,mtxm,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		free(mtxm);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)mtxm, length);
 	    free(mtxm);
@@ -687,11 +699,14 @@ global MapInfo* GetPudInfo(const char* pud)
 
 	    if( !(sqm=malloc(length)) ) {
 		perror("malloc()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,sqm,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		free(sqm);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)sqm, length);
 	    free(sqm);
@@ -707,11 +722,14 @@ global MapInfo* GetPudInfo(const char* pud)
 
 	    if( !(regm=malloc(length)) ) {
 		perror("malloc()");
-		ExitFatal(-1);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    if( CLread(input,regm,length)!=length ) {
 		perror("CLread()");
-		ExitFatal(-1);
+		free(regm);
+		FreeMapInfo(info);
+		return NULL;
 	    }
 	    info->MapUID += ChksumArea((unsigned char *)regm, length);
 	    free(regm);
