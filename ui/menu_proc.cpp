@@ -602,7 +602,7 @@ local void DrawInput(Menuitem *mi, int mx, int my)
 /**
 **	Draw a menu.
 **
-**	@param menu_id	The menu number to display
+**	@param menu	The menu number to display (NULL allowed)
 */
 global void DrawMenu(Menu *menu)
 {
