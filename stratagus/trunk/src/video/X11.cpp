@@ -886,7 +886,7 @@ global void WaitEventsAndKeepSync(void)
 **
 **	@param palette	Hardware independend palette.
 **
-**	@returns	A hardware dependend pixel table.
+**	@return		A hardware dependend pixel table.
 */
 global VMemType* VideoCreateNewPalette(const Palette *palette)
 {
