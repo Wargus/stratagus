@@ -315,8 +315,6 @@ extern void InitMapDecoration(void);
 extern Deco* MapDecoration;
 #endif
 
-	/// Use original style fog of war
-extern int OriginalFogOfWar;
 	/// Contrast of fog of war
 extern int FogOfWarOpacity;
 	/// Forest regeneration

@@ -142,8 +142,6 @@ local void GlobalOptionsInit(Menuitem *mi);
 local void GlobalOptionsExit(Menuitem *mi);
 local void GlobalOptionsResolutionGem(Menuitem *mi);
 local void GlobalOptionsFullscreenGem(Menuitem *mi);
-local void GlobalOptionsFogOriginalGem(Menuitem *mi);
-local void GlobalOptionsFogAlphaGem(Menuitem *mi);
 
 // Tips
 local void TipsInit(Menuitem *mi);
@@ -533,8 +531,6 @@ global void InitMenuFuncHash(void)
 	HASHADD(GlobalOptionsExit,"global-options-exit");
 	HASHADD(GlobalOptionsResolutionGem,"global-options-resolution-gem");
 	HASHADD(GlobalOptionsFullscreenGem,"global-options-fullscreen-gem");
-	HASHADD(GlobalOptionsFogOriginalGem,"global-options-fog-original-gem");
-	HASHADD(GlobalOptionsFogAlphaGem,"global-options-fog-alpha-gem");
 
 // Tips
 	HASHADD(TipsInit,"tips-init");
@@ -1780,24 +1776,6 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 local void GlobalOptionsFullscreenGem(Menuitem *mi __attribute__((unused)))
 {
 	ToggleFullScreen();
-	GlobalOptionsInit(NULL);
-}
-
-/**
-**		Global options fog original gem callback
-*/
-local void GlobalOptionsFogOriginalGem(Menuitem *mi __attribute__((unused)))
-{
-	OriginalFogOfWar = 1;
-	GlobalOptionsInit(NULL);
-}
-
-/**
-**		Global options fog alpha gem callback
-*/
-local void GlobalOptionsFogAlphaGem(Menuitem *mi __attribute__((unused)))
-{
-	OriginalFogOfWar = 0;
 	GlobalOptionsInit(NULL);
 }
 
