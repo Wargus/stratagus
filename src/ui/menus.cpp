@@ -82,11 +82,13 @@ local void GameMenuReturn(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
+local void Preferences(void);
+local void GameOptions(void);
+
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
-local void Preferences(void);
-local void GameOptions(void);
+local void SetFogOfWar(Menuitem *mi);
 
 global void SoundOptions(void);
 global void SpeedSettings(void);
@@ -857,10 +859,12 @@ local Menuitem PreferencesMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Preferences", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower} } },
-    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
-	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
+
+    { MI_TYPE_GEM, 16, 36*1, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetFogOfWar} } },	
+    { MI_TYPE_TEXT, 46, 36*1 + 2, 0, LargeFont, NULL, NULL,
+	{ text:{ "Fog of War Enabled", MI_TFLAGS_LALIGN} } },
+
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
@@ -911,7 +915,7 @@ local Menuitem GameOptionsMenuItems[] = {
 	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonDisabled, LargeFont, NULL, NULL,
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9} } },
     { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
@@ -1122,7 +1126,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	2, 4,
+	4, 4,
 	PreferencesMenuItems,
 	NULL,
     },
@@ -1851,7 +1855,19 @@ local void SetCdPower(Menuitem *mi)
 #endif
 }
 
-
+local void SetFogOfWar(Menuitem *mi)
+{
+    if (!TheMap.NoFogOfWar) {
+        TheMap.NoFogOfWar = 1;
+        UpdateFogOfWarChange();
+        MapUpdateVisible();
+    } else {
+        TheMap.NoFogOfWar = 0;
+        UpdateFogOfWarChange();
+        MapUpdateVisible();
+    }
+}											
+											
 global void SpeedSettings(void)
 {
     int i = 2;
@@ -1871,6 +1887,10 @@ global void SpeedSettings(void)
 
 local void Preferences(void)
 {
+    if (!TheMap.NoFogOfWar)
+	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
+    else
+	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
     ProcessMenu(MENU_PREFERENCES, 1);
 }
 
