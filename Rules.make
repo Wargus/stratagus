@@ -203,7 +203,9 @@ CC=cc
 RM=rm -f
 MAKE=make
 
-CTAGSFLAGS=-i defmpstuvFS -a -f
+# TAGS 5.0
+CTAGSFLAGS=--c-types=defmpstuvx -a -f
+#CTAGSFLAGS=-i defmpstuvFS -a -f
 #CTAGSFLAGS=-i defptvS -a -f
 
 #
