@@ -216,11 +216,9 @@ local int CclDefineMissileTypeWcNames(lua_State* l)
 **
 **  @param list  List of all names.
 */
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclMissile(SCM list)
+local int CclMissile(lua_State* l)
 {
-	SCM value;
-	char* str;
+	const char* value;
 	MissileType* type;
 	int x;
 	int y;
@@ -229,6 +227,8 @@ local SCM CclMissile(SCM list)
 	int sx;
 	int sy;
 	Missile* missile;
+	int args;
+	int j;
 
 	DebugLevel0Fn("FIXME: not finished\n");
 
@@ -236,38 +236,47 @@ local SCM CclMissile(SCM list)
 	type = NULL;
 	x = dx = y = dy = sx = sy = -1;
 
-	while (!gh_null_p(list)) {
-		value = gh_car(list);
-		list = gh_cdr(list);
+	args = lua_gettop(l);
+	for (j = 0; j < args; ++j) {
+		value = LuaToString(l, j + 1);
+		++j;
 
-		if (gh_eq_p(value, gh_symbol2scm("type"))) {
-			value = gh_car(list);
-			list = gh_cdr(list);
-			str = gh_scm2newstr(value, NULL);
-			type = MissileTypeByIdent(str);
-			free(str);
-		} else if (gh_eq_p(value, gh_symbol2scm("pos"))) {
-			SCM sublist;
-
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-			x = gh_scm2int(gh_car(sublist));
-			y = gh_scm2int(gh_cadr(sublist));
-		} else if (gh_eq_p(value, gh_symbol2scm("origin-pos"))) {
-			SCM sublist;
-
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-			sx = gh_scm2int(gh_car(sublist));
-			sy = gh_scm2int(gh_cadr(sublist));
-		} else if (gh_eq_p(value, gh_symbol2scm("goal"))) {
-			SCM sublist;
-
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-			dx = gh_scm2int(gh_car(sublist));
-			dy = gh_scm2int(gh_cadr(sublist));
-		} else if (gh_eq_p(value, gh_symbol2scm("local"))) {
+		if (!strcmp(value, "type")) {
+			type = MissileTypeByIdent(LuaToString(l, j + 1));
+		} else if (!strcmp(value, "pos")) {
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, j + 1, 1);
+			x = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			y = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "origin-pos")) {
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, j + 1, 1);
+			sx = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			sy = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "goal")) {
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, j + 1, 1);
+			dx = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			dy = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "local")) {
 			DebugCheck(!type);
 			missile = MakeLocalMissile(type, x, y, dx, dy);
 			// we need to reinitialize position parameters - that's because of
@@ -281,7 +290,8 @@ local SCM CclMissile(SCM list)
 			missile->DX = dx;
 			missile->DY = dy;
 			missile->Local = 1;
-		} else if (gh_eq_p(value, gh_symbol2scm("global"))) {
+			--j;
+		} else if (!strcmp(value, "global")) {
 			DebugCheck(!type);
 			missile = MakeMissile(type, x, y, dx, dy);
 			missile->X = x;
@@ -291,72 +301,58 @@ local SCM CclMissile(SCM list)
 			missile->DX = dx;
 			missile->DY = dy;
 			missile->Local = 0;
-		} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
+			--j;
+		} else if (!strcmp(value, "frame")) {
 			DebugCheck(!missile);
-			missile->SpriteFrame = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("state"))) {
+			missile->SpriteFrame = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "state")) {
 			DebugCheck(!missile);
-			missile->State = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("anim-wait"))) {
+			missile->State = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "anim-wait")) {
 			DebugCheck(!missile);
-			missile->AnimWait = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("wait"))) {
+			missile->AnimWait = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "wait")) {
 			DebugCheck(!missile);
-			missile->Wait = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("delay"))) {
+			missile->Wait = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "delay")) {
 			DebugCheck(!missile);
-			missile->Delay = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("source"))) {
+			missile->Delay = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "source")) {
 			DebugCheck(!missile);
-			value = gh_car(list);
-			list = gh_cdr(list);
-			str = gh_scm2newstr(value, NULL);
-			missile->SourceUnit = UnitSlots[strtol(str + 1, 0, 16)];
-			free(str);
-			++missile->SourceUnit->Refs;
-		} else if (gh_eq_p(value, gh_symbol2scm("target"))) {
+			value = LuaToString(l, j + 1);
+			missile->SourceUnit = UnitSlots[strtol(value + 1, 0, 16)];
+			missile->SourceUnit->Refs++;
+		} else if (!strcmp(value, "target")) {
 			DebugCheck(!missile);
-			value = gh_car(list);
-			list = gh_cdr(list);
-			str = gh_scm2newstr(value, NULL);
-			missile->TargetUnit = UnitSlots[strtol(str + 1, 0, 16)];
-			free(str);
+			value = LuaToString(l, j + 1);
+			missile->TargetUnit = UnitSlots[strtol(value + 1, 0, 16)];
 			missile->TargetUnit->Refs++;
-		} else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+		} else if (!strcmp(value, "damage")) {
 			DebugCheck(!missile);
-			missile->Damage = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
+			missile->Damage = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "ttl")) {
 			DebugCheck(!missile);
-			missile->TTL = gh_scm2int(gh_car(list));
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("hidden"))) {
+			missile->TTL = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "hidden")) {
 			DebugCheck(!missile);
 			missile->Hidden = 1;
-			list = gh_cdr(list);
-		} else if (gh_eq_p(value, gh_symbol2scm("step"))) {
-			SCM sublist;
-
+			--j;
+		} else if (!strcmp(value, "step")) {
 			DebugCheck(!missile);
-			sublist = gh_car(list);
-			list = gh_cdr(list);
-			missile->CurrentStep = gh_scm2int(gh_car(sublist));
-			missile->TotalStep = gh_scm2int(gh_cadr(sublist));
+			if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+				lua_pushstring(l, "incorrect argument");
+				lua_error(l);
+			}
+			lua_rawgeti(l, j + 1, 1);
+			missile->CurrentStep = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			lua_rawgeti(l, j + 1, 2);
+			missile->TotalStep = LuaToNumber(l, -1);
+			lua_pop(l, 1);
 		}
 	}
-	return SCM_UNSPECIFIED;
-}
-#elif defined(USE_LUA)
-local int CclMissile(lua_State* l)
-{
 	return 0;
 }
-#endif
 
 /**
 **  Define burning building missiles.
