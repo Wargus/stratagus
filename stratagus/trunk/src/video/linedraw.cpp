@@ -1444,21 +1444,77 @@ void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 void VideoDrawRectangleClip(Uint32 color, int x, int y,
 	int w, int h)
 {
-	#define _x              x
-	#define _y              y
-	#define _w              w
-	#define _h              h
-	#define _hline(x, y,w)   VideoDrawHLine(color, x, y, w)
-	#define _vline(x, y,h)   VideoDrawVLine(color, x, y, h)
+	int f;
+	int left;
+	int right;
+	int top;
+	int bottom;
 
-	#include "_clip_rectangle"
+	// Ensure non-empty rectangle
+	if (!(w && h)) {
+		// rectangle is `void'
+		return;
+	}
 
-	#undef _x
-	#undef _y
-	#undef _w
-	#undef _h
-	#undef _hline
-	#undef _vline
+	// Clip rectangle boundary
+	left = right = top = bottom = 1;
+
+	if (x < ClipX1) {            // no left side
+		f = ClipX1 - x;
+		if (w <= f) {
+			return;                    // entire rectangle left --> not visible
+		}
+		w -= f;
+		x = ClipX1;
+		left = 0;
+	}
+	if ((x + w) > ClipX2 + 1) {     // no right side
+		if (x > ClipX2) {
+			return;                    // entire rectangle right --> not visible
+		}
+		w = ClipX2 - x + 1;
+		right = 0;
+	}
+	if (y < ClipY1) {               // no top
+		f = ClipY1 - y;
+		if (h <= f) {
+			return;                    // entire rectangle above --> not visible
+		}
+		h -= f;
+		y = ClipY1;
+		top = 0;
+	}
+	if ((y + h) > ClipY2 + 1) {    // no bottom
+		if (y > ClipY2) {
+			return;                  // entire rectangle below --> not visible
+		}
+		h = ClipY2 - y + 1;
+		bottom = 0;
+	}
+
+	// Draw (part of) rectangle sides
+	// Note: _hline and _vline should be able to handle zero width/height
+	if (top) {
+		VideoDrawHLine(color, x, y, w);
+		if (!--h) {
+			return;                    // rectangle as horizontal line
+		}
+		++y;
+	}
+	if (bottom) {
+		VideoDrawHLine(color, x, y + h - 1, w);
+		--h;
+	}
+	if (left) {
+		VideoDrawVLine(color, x, y, h);
+		if (!--w) {
+			return;                    // rectangle as vertical line
+		}
+		++x;
+	}
+	if (right) {
+		VideoDrawVLine(color, x + w - 1, y, h);
+	}
 }
 
 /**
