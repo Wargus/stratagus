@@ -26,7 +26,7 @@
 #define noDEBUG				/// Define to include debug code
 #define noFLAG_DEBUG		/// ARI: Define to include map flag debug
 
-#define noUSE_CCL2			/// Remove no for version with siod
+#define noUSE_CCL			/// Remove no for version with siod
 #define noUSE_ONLYCCL			/// version only supports ccl config
 #define noUSE_THREAD			/// Remove no for version with thread
 

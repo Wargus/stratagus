@@ -35,7 +35,7 @@
 extern int WoodTable[16];		/// Table for wood removable.
 extern int RockTable[20];		/// Table for rock removable.
 
-#if !defined(USE_CCL) && !defined(USE_CCL2)
+#if !defined(USE_CCL)
 /**
 **	Default without CCL support.
 */
@@ -53,7 +53,7 @@ local char* DefaultTilesetWcNames[] = {
 **	0=summer, 1=winter, 2=wasteland, 3=swamp.
 */
 global char** TilesetWcNames
-#if !defined(USE_CCL) && !defined(USE_CCL2)
+#if !defined(USE_CCL)
     =DefaultTilesetWcNames
 #endif
     ;

@@ -30,7 +30,7 @@
 
 #include "freecraft.h"
 
-#if defined(USE_CCL) || defined(USE_CCL2)	// {
+#if defined(USE_CCL)	// {
 
 #include "video.h"
 #include "tileset.h"
@@ -122,8 +122,6 @@ global void PathfinderCclRegister(void)
     gh_new_procedure1_0("a-star-moving-unit-cost",CclAStarSetMovingUCC);
 }
 
-
-
-#endif	// } defined(USE_CCL) || defined(USE_CCL2)
+#endif	// } defined(USE_CCL)
 
 //@}

@@ -71,7 +71,7 @@ local void LoadCloneMap(const char* filename,WorldMap* map)
 {
     DebugLevel3Fn("%p \n",map);
 
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
     if (lcm_prevent_recurse) {
 	fprintf(stderr,"recursive use of load clone map!\n");
 	exit(-1);
@@ -84,7 +84,7 @@ local void LoadCloneMap(const char* filename,WorldMap* map)
 	exit(-1);
     }
 #else
-    fprintf(stderr,"Sorry, you need guile/siod installed to use clone maps!\n");
+    fprintf(stderr,"Sorry, you need siod installed to use clone maps!\n");
     exit(-1);
 #endif
 }

@@ -471,7 +471,7 @@ global void SaveDependencies(FILE* file)
 --	Ccl part of dependencies
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 
 #include "ccl.h"
 
@@ -534,6 +534,6 @@ global void DependenciesCclRegister(void)
     gh_new_procedure1_0("get-dependency",CclGetDependency);
 }
 
-#endif	// defined(USE_CCL) || defined(USE_CCL2)
+#endif	// defined(USE_CCL)
 
 //@}

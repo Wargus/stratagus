@@ -619,7 +619,7 @@ global void LoadFonts(void)
 --	CCL
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_CCL) || defined(USE_CCL2)	// {
+#if defined(USE_CCL)	// {
 
 #include "ccl.h"
 
@@ -693,6 +693,6 @@ global void FontsCclRegister(void)
     //gh_new_procedure4_0("draw-reverse-number",CclDrawReverseNumber);
 }
 
-#endif	// } USE_CCL or USE_CCL2
+#endif	// } USE_CCL
 
 //@}

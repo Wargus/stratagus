@@ -281,7 +281,7 @@ global Decoration ShadowSprite = {
 */
 global Graphic* SpellSprites;
 
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 
 /**
 **	Define mana sprite.
@@ -325,7 +325,7 @@ global SCM CclHealthSprite(SCM file,SCM x,SCM y,SCM w,SCM h)
     return SCM_UNSPECIFIED;
 }
 
-#endif	// defined(USE_CCL) || defined(USE_CCL2)
+#endif	// defined(USE_CCL)
 
 /**
 **	Load decoration.

@@ -83,7 +83,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(DEBUG) && (defined(USE_CCL) || defined(USE_CCL2))
+#if defined(DEBUG) && defined(USE_CCL)
 extern SCM CclUnits(void);
 #endif
 
@@ -228,7 +228,7 @@ global char* strdcat3(const char* l, const char* m, const char* r) {
 ============================================================================*/
 
 /**
-**	Main1, called from guile main / main.
+**	Main1, called from main.
 **
 **	@param	argc	Number of arguments.
 **	@param	argv	Vector of arguments.
@@ -237,18 +237,18 @@ global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
-#ifdef USE_CCL2
+#ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
+#endif
+#ifdef USE_SDL
+    "\n  SDL Copyright by Sam Lantinga."
 #endif
     "\nCompile options "
 #ifdef USE_CCL
     "CCL "
 #endif
-#ifdef USE_CCL2
-    "CCL2 "
-#endif
-#ifdef GUILE_GTK
-    "GTK "
+#ifdef USE_ONLYCCL
+    "ONLYCCL "
 #endif
 #ifdef USE_THREAD
     "THREAD "
@@ -262,14 +262,11 @@ global int main1(int argc __attribute__ ((unused)),
 #ifdef USE_BZ2LIB
     "BZ2LIB "
 #endif
-#ifdef USE_GLIB
-    "GLIB "
+#ifdef USE_SDL
+    "SDL "
 #endif
 #ifdef USE_SDLA
     "SDL-AUDIO "
-#endif
-#ifdef USE_SDL
-    "SDL "
 #endif
 #ifdef USE_X11
     "X11 "
@@ -390,8 +387,8 @@ global volatile void Exit(int err)
 		,PfCounterFail,PfCounterNotReachable
 		,PfCounterOk,PfCounterDepth);
     );
-#if defined(DEBUG) && (defined(USE_CCL) || defined(USE_CCL2))
-	CclUnits();
+#if defined(DEBUG) && defined(USE_CCL)
+    CclUnits();
 #endif
     fprintf(stderr,"Thanks for playing FreeCraft.\n");
     exit(err);
@@ -403,7 +400,7 @@ global volatile void Exit(int err)
 local void Usage(void)
 {
     printf("%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others."
-#ifdef USE_CCL2
+#ifdef USE_CCL
     "\n  SIOD Copyright by George J. Carrette."
 #endif
 "\n\nUsage: freecraft [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
@@ -452,7 +449,7 @@ global int main(int argc,char** argv)
 #else
     TitleScreen=strdup("graphic/title.png");
 #endif
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
     CclStartFile="ccl/freecraft.ccl";
 #endif
 
@@ -463,7 +460,7 @@ global int main(int argc,char** argv)
     //
     for( ;; ) {
 	switch( getopt(argc,argv,"c:d:f:hln:p:s:t:v:D:FL:S:U:W?") ) {
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
 	    case 'c':
 		CclStartFile=optarg;
 		continue;
@@ -557,7 +554,7 @@ global int main(int argc,char** argv)
 	--argc;
     }
 
-#if defined(USE_CCL) || defined(USE_CCL2)
+#if defined(USE_CCL)
     if (CclStartFile[0] != '/' && CclStartFile[0] != '.') {
         CclStartFile = strdcat3(FreeCraftLibPath, "/", CclStartFile);
     }
