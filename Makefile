@@ -436,12 +436,30 @@ win32distclean:
 #	INSTALL/UNINSTALL
 ##############################################################################
 
-install:	all
-	install -m 755 freecraft $(DESTDIR)/usr/games/freecraft
+install:	all install-freecraft install-tools
+
+install-freecraft:
+	@echo installing freecraft
+	mkdir -p $(PREFIX)/lib/games/freecraft
+	mkdir -p /var/lib/games
+	install -m 755 freecraft $(PREFIX)/lib/games/freecraft
+	cp -R data $(PREFIX)/lib/games/freecraft
+	echo "$(PREFIX)/lib/games/freecraft/freecraft \
+	-d $(PREFIX)/lib/games/freecraft/data > /var/lib/games/freecraft.log" \
+	>$(PREFIX)/bin/freecraft
+	chmod +x $(PREFIX)/bin/freecraft
+	@echo installation of freecraft complete
 
 install-tools:	all
-	install -m 755 tools/wartool  $(DESTDIR)/usr/lib/freecraft/tools/
-	install -m 755 tools/build.sh $(DESTDIR)/usr/lib/freecraft/tools/
+	@echo installing freecraft tools
+	mkdir -p $(PREFIX)/lib/games/freecraft/tools
+	install -m 755 tools/wartool  $(PREFIX)/lib/games/freecraft/tools
+	install -m 755 tools/build.sh $(PREFIX)/lib/games/freecraft/tools
+	@echo installation of freecraft tools complete
 
 uninstall:
-	@echo "under construction: make it by hand :)"
+	@echo uninstalling freecraft and freecraft tools
+	rm -rf $(PREFIX)/lib/games/freecraft
+	rm $(PREFIX)/bin/freecraft
+	@echo uninstallation complete
+
