@@ -209,6 +209,7 @@ global void SendCommandMove(Unit* unit,int x,int y,int flush)
 **	@param unit	pointer to unit.
 **	@param x	X map tile position to repair.
 **	@param y	Y map tile position to repair.
+**	@param dest	Unit to be repaired.
 **	@param flush	Flag flush all pending commands.
 */
 global void SendCommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
@@ -588,7 +589,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
     DebugLevel3Fn(" %d frame %d\n", msgnr, FrameCounter);
 
     unit=UnitSlots[unum];
-    DebugCheck( !unit );
+    DebugCheck( !unit || !unit->Type );
     //
     //	Check if unit is already killed?
     //
@@ -606,6 +607,8 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    return;
 	case MessageQuit:
 	    return;
+	case MessageChat:
+	    return;
 
 	case MessageCommandStop:
 	    CommandLog("stop",unit,FlushCommands,-1,-1,NoUnitP,NULL,-1);
@@ -619,7 +622,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("follow",unit,status,-1,-1,dest,NULL,-1);
 	    CommandFollow(unit,dest,status);
@@ -628,11 +631,20 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandLog("move",unit,status,x,y,NoUnitP,NULL,-1);
 	    CommandMove(unit,x,y,status);
 	    break;
+	case MessageCommandRepair:
+	    dest=NoUnitP;
+	    if( dstnr!=(unsigned short)0xFFFF ) {
+		dest=UnitSlots[dstnr];
+		DebugCheck( !dest || !dest->Type );
+	    }
+	    CommandLog("repair",unit,status,x,y,NoUnitP,NULL,-1);
+	    CommandRepair(unit,x,y,dest,status);
+	    break;
 	case MessageCommandAttack:
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("attack",unit,status,x,y,dest,NULL,-1);
 	    CommandAttack(unit,x,y,dest,status);
@@ -649,7 +661,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("board",unit,status,x,y,dest,NULL,-1);
 	    CommandBoard(unit,dest,status);
@@ -658,7 +670,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("unload",unit,status,x,y,dest,NULL,-1);
 	    CommandUnload(unit,x,y,dest,status);
@@ -672,7 +684,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("cancel-build",unit,FlushCommands,-1,-1,dest,NULL,-1);
 	    CommandCancelBuilding(unit,dest);
@@ -685,7 +697,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("mine",unit,status,-1,-1,dest,NULL,-1);
 	    CommandMineGold(unit,dest,status);
@@ -694,7 +706,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("haul",unit,status,-1,-1,dest,NULL,-1);
 	    CommandHaulOil(unit,dest,status);
@@ -703,7 +715,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("return",unit,status,-1,-1,dest,NULL,-1);
 	    CommandReturnGoods(unit,dest,status);
@@ -741,7 +753,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandLog("demolish",unit,status,x,y,dest,NULL,-1);
 	    CommandDemolish(unit,x,y,dest,status);
@@ -751,7 +763,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    dest=NoUnitP;
 	    if( dstnr!=(unsigned short)0xFFFF ) {
 		dest=UnitSlots[dstnr];
-		DebugCheck( !dest );
+		DebugCheck( !dest || !dest->Type );
 	    }
 	    CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
 	    break;
