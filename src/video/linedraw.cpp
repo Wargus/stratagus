@@ -1026,16 +1026,17 @@ global void VideoFillTransRectangle(Uint32 color, int x, int y,
 
 	// FIXME: optimize
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
-		32, RMASK, GMASK, BMASK, AMASK);
+		24, RMASK, GMASK, BMASK, 0);
 
 	SDL_GetRGB(color, TheScreen->format, &r, &g, &b);
-	color = SDL_MapRGBA(s->format, r, g, b, alpha);
+	color = SDL_MapRGB(s->format, r, g, b);
 
 	SDL_FillRect(s, NULL, color);
 
 	drect.x = x;
 	drect.y = y;
 
+	SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, alpha);
 	SDL_BlitSurface(s, NULL, TheScreen, &drect);
 	SDL_FreeSurface(s);
 }
