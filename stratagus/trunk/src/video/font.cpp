@@ -492,10 +492,21 @@ global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 */
 global int VideoDrawNumber(int x,int y,unsigned font,int number)
 {
-    char buf[sizeof(int)*10+2];
-
-    sprintf(buf,"%d",number);
-    return VideoDrawText(x,y,font,buf);
+    //char buf[sizeof(int)*10+2];
+    //sprintf(buf,"%d",number);
+    char bufs[16];
+    char bufd[16];
+    int sl, s, d;
+    sl = s = d = 0;
+    sprintf(bufs,"%d",number);
+    sl = strlen( bufs );
+    while(4)
+      {
+      if( s > 0 && s < sl && (s - (sl % 3)) % 3 == 0 ) bufd[d++] = ',';
+      bufd[d++] = bufs[s++];
+      if ( s > sl ) break;
+      }
+    return VideoDrawText(x,y,font,bufd);
 }
 
 /**
