@@ -314,6 +314,12 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
     //
     value = gh_car(list);
     l=gh_vector_length(value);
+
+    // hack for sc tilesets, remove when fixed
+    if( l>16 ) {
+	ExtendTilesetTables(tileset,index+l);
+    }
+
     for( i=0; i<l; ++i ) {
 	data=gh_vector_ref(value,gh_int2scm(i));
 	tileset->Table[index+i]=gh_scm2int(data);
@@ -329,7 +335,12 @@ local int DefineTilesetParseSolid(Tileset* tileset,int index,SCM list)
 	++i;
     }
 
-    return index+16;
+    // hack for sc tilesets, remove when fixed
+    if( l<16 ) {
+	return index+16;
+    }
+    return index+l;
+//    return index+16;
 }
 
 /**
