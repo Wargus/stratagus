@@ -46,6 +46,7 @@
 #include "ui.h"
 #include "ai.h"
 #include "campaign.h"
+#include "trigger.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -68,6 +69,7 @@ global void CleanModules(void)
     CleanCursors();
     CleanUserInterface();
     CleanCampaign();
+    CleanTriggers();
     CleanAi();
     CleanPlayers();
     CleanConstructions();

@@ -38,6 +38,7 @@ typedef struct _settings_ Settings;
 #endif
 
 #include "player.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --	Settings  __WIP__
@@ -56,15 +57,15 @@ struct _settings_ {
 //  Individual presets:
 //  For single-player game only Presets[0] will be used..
     struct {
-	unsigned	Race;		/// race of the player
-	unsigned	Team;		/// team of player -- NOT SELECTABLE YET
+	unsigned	Race;		/// Race of the player
+	unsigned	Team;		/// Team of player -- NOT SELECTABLE YET
     }	Presets[PlayerMax];
 
 //  Common settings:
-    unsigned	Resources;		/// preset resource factor
-    unsigned	NumUnits;		/// preset # of units
-    unsigned	Opponents;		/// preset # of ai-opponents
-    unsigned	Terrain;		/// terrain type (summer,winter,...)
+    unsigned	Resources;		/// Preset resource factor
+    unsigned	NumUnits;		/// Preset # of units
+    unsigned	Opponents;		/// Preset # of ai-opponents
+    unsigned	Terrain;		/// Terrain type (summer,winter,...)
 };
 
 #define SettingsPresetMapDefault	(~0ul)	/// Special: Use pud/cm supplied
@@ -83,19 +84,32 @@ struct _settings_ {
 #define SettingsNumUnitsMapDefault	SettingsPresetMapDefault
 #define SettingsNumUnits1		0
 
-/*----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
+#define MAX_OBJECTIVES 9
+
+typedef struct _intro_ {
+    char*	Title;				/// Intro title
+    char*	Background;			/// Background picture
+    char*	TextFile;			/// Intro text file
+    char*	VoiceFile1;			/// Intro voice file
+    char*	VoiceFile2;			/// Intro voice file
+    char*	Objectives[MAX_OBJECTIVES];	/// Objectives
+} Intro;					/// Intro definition
+
+/*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern Settings GameSettings;		/// Game Settings
+extern Settings GameSettings;		/// Game settings
+extern Intro	GameIntro;		/// Game intro
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
     /// Show level intro
-extern void ShowIntro(void);
+extern void ShowIntro(const Intro* intro);
     /// Create a game
 extern void CreateGame(char* filename,WorldMap* map);
     /// Init Setting to default values

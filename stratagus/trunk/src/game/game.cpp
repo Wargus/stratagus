@@ -196,7 +196,9 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
     }
 
-    ShowIntro();
+    if( GameIntro.Title ) {
+	ShowIntro(&GameIntro);
+    }
 
     if( FlagRevealMap ) {
 	RevealMap();

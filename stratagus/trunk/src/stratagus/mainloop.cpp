@@ -51,6 +51,8 @@
 #include "goal.h"
 #include "ui.h"
 #include "deco.h"
+#include "trigger.h"
+#include "campaign.h"
 
 #ifdef USE_SDL
 	// FIXME: move to system api part!
@@ -451,6 +453,7 @@ global void GameMainLoop(void)
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
 	    PlayersEachFrame();		// handle players
+	    TriggersEachFrame();	// handle triggers
 
 	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
 
@@ -526,6 +529,18 @@ global void GameMainLoop(void)
 	CheckVideoInterrupts();		// look if already an interrupt
 
 	WaitEventsAndKeepSync();
+    }
+
+    NetworkQuit();
+    if( GameResult==GameDefeat ) {
+	fprintf(stderr,"You have lost!\n");
+	SetStatusLine("You have lost!");
+	ProcessMenu(MENU_LOST, 1);
+    }
+    if( GameResult==GameVictory ) {
+	fprintf(stderr,"You have won!\n");
+	SetStatusLine("You have won!");
+	ProcessMenu(MENU_VICTORY, 1);
     }
 }
 
