@@ -678,11 +678,11 @@ global void CommandBuildBuilding(Unit* unit,int x,int y
 	    order->X=x;
 	    order->Y=y;
 	}
-	if(!what->BuilderInside) {
+	if(what->BuilderOutside) {
 	    // FIXME: n0body: brain damage. Walk around buggy moving to
 	    // FIXME: the building position.
-	    order->RangeX=what->TileWidth+10;
-	    order->RangeY=what->TileWidth+10;
+	    order->RangeX=what->TileWidth*10;
+	    order->RangeY=what->TileWidth*10;
 	}
 	order->Type=what;
 	order->Arg1=NULL;

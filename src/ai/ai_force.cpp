@@ -526,8 +526,6 @@ local void AiSendTransporter(AiForce* force)
 **
 **	@param force	Force pointer.
 **
-**	@todo	If units blocks the unload process we should move them away.
-**		FIXME: hangs if the unit can't unloaded.
 */
 local void AiWaitLanded(AiForce* force)
 {

@@ -1090,8 +1090,7 @@ local int AutoCastInvisibility(Unit* unit, SpellType* spell)
 	}
 
 	// Skip invisible units and cowards
-	if (table[i]->Invisible || table[i]->Type->CowerWorker
-		|| table[i]->Type->CowerMage) {
+	if (table[i]->Invisible || table[i]->Type->Coward) {
 	    continue;
 	}
 
@@ -1165,8 +1164,7 @@ local int AutoCastBloodlust(Unit* unit, SpellType* spell)
 	}
 
 	// Skip bloodlusted units and cowards
-	if (table[i]->Bloodlust || table[i]->Type->CowerWorker
-		|| table[i]->Type->CowerMage) {
+	if (table[i]->Bloodlust || table[i]->Type->Coward) {
 	    continue;
 	}
 
@@ -1274,8 +1272,7 @@ local int AutoCastHaste(Unit* unit, SpellType* spell)
 	}
 
 	// Skip haste units and cowards
-	if (table[i]->Haste || table[i]->Type->CowerWorker
-		|| table[i]->Type->CowerMage) {
+	if (table[i]->Haste || table[i]->Type->Coward) {
 	    continue;
 	}
 
@@ -1335,8 +1332,7 @@ local int AutoCastUnholyArmor(Unit* unit, SpellType* spell)
 	}
 
 	// Skip unholy armor units and cowards
-	if (table[i]->UnholyArmor || table[i]->Type->CowerWorker
-		|| table[i]->Type->CowerMage) {
+	if (table[i]->UnholyArmor || table[i]->Type->Coward) {
 	    continue;
 	}
 

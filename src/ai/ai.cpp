@@ -1254,18 +1254,23 @@ global void AiUnitKilled(Unit* unit)
 /**
 **	Called if work complete (Buildings).
 **
-**	@param unit	Pointer to unit what builds the building.
-**	@param what	Pointer to unit building that was build.
+**	@param unit	Pointer to unit that builds the building.
+**	@param what	Pointer to unit building that was built.
 */
 global void AiWorkComplete(Unit* unit,Unit* what)
 {
-    DebugLevel1Fn("%d: %d(%s) build %s at %d,%d completed\n" _C_
-	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
-	    what->Type->Ident _C_ unit->X _C_ unit->Y);
+    if (unit) {
+	DebugLevel1Fn("%d: %d(%s) build %s at %d,%d completed\n" _C_
+		what->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		what->Type->Ident _C_ unit->X _C_ unit->Y);
+    } else {
+	DebugLevel1Fn("%d: building %s at %d,%d completed\n" _C_
+		what->Player->Player _C_ what->Type->Ident _C_ what->X _C_ what->Y);
+    }
 
-    DebugCheck(unit->Player->Type == PlayerPerson);
+    DebugCheck(what->Player->Type == PlayerPerson);
 
-    AiRemoveFromBuilded(unit->Player->Ai,what->Type);
+    AiRemoveFromBuilded(what->Player->Ai,what->Type);
 }
 
 /**

@@ -746,6 +746,7 @@ local void DrawBuildingCursor(void)
 	    // FIXME: The field is covered by fog of war!
 	    if( f && ( CursorBuilding->MustBuildOnTop || 
 		    CanBuildOn(mx+w,my+h,mask & ((Selected[0] && 
+			!CursorBuilding->BuilderOutside &&
 			Selected[0]->X==mx+w && Selected[0]->Y==my+h)
 			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1)))
 		  && IsMapFieldExplored(ThisPlayer,mx+w,my+h) )  {
