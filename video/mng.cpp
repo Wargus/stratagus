@@ -178,6 +178,11 @@ static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 
 		memcpy((char*)mng->Surface->pixels + i * mng->Surface->pitch,
 			mng->Buffer + i * mng->Surface->w * 3, mng->Surface->w * 3);
 	}
+#ifdef USE_OPENGL
+	glBindTexture(GL_TEXTURE_2D, mng->TextureName);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->Surface->w, mng->Surface->h,
+		GL_RGB, GL_UNSIGNED_BYTE, mng->Surface->pixels);
+#endif
 	SDL_UnlockSurface(mng->Surface);
 
 	return MNG_TRUE;
@@ -242,14 +247,6 @@ void DisplayMNG(Mng* mng, int x, int y)
 
 	if (mng->Ticks <= GetTicks()) {
 		mng_display_resume((mng_handle)mng->Handle);
-
-#ifdef USE_OPENGL
-		glBindTexture(GL_TEXTURE_2D, mng->TextureName);
-		SDL_LockSurface(mng->Surface);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->Surface->w, mng->Surface->h,
-			GL_RGB, GL_UNSIGNED_BYTE, mng->Surface->pixels);
-		SDL_UnlockSurface(mng->Surface);
-#endif
 	}
 
 #ifndef USE_OPENGL
