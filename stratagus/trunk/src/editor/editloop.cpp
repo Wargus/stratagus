@@ -148,6 +148,11 @@ local void EditTile(int x, int y, int tile)
 	MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 	MapFieldWall | MapFieldRocks | MapFieldForest);
 
+#if 1
+    TheMap.Fields[y * TheMap.Width + x].Flags |= 
+	    TheMap.Tileset->FlagsTable[16 + tile * 16];
+    DebugLevel3Fn("Table %x\n" _C_ TheMap.Fields[y * TheMap.Width + x].Flags);
+#else
     switch (tile) {
 	case 0:			// LIGHT_WATER
 	case 1:			// DARK_WATER
@@ -198,6 +203,7 @@ local void EditTile(int x, int y, int tile)
 		| MapFieldWall | MapFieldRocks | MapFieldForest;
 	    break;
     }
+#endif
 
     UpdateMinimapSeenXY(x,y);
     UpdateMinimapXY(x,y);
