@@ -181,7 +181,7 @@ typedef struct _menuitem_ {
     /// for MI_TYPE_GEM
 #define MI_GSTATE_CHECKED 1
 #define MI_GSTATE_INVISIBLE 2
-#define MI_GSTATE_PASSIVE 3
+#define MI_GSTATE_PASSIVE 4
 
 /**
 **	Menu definition.
@@ -195,6 +195,7 @@ typedef struct _menus_ {
     int defsel;				/// initial selected item number (or -1)
     int nitems;				/// number of items to follow
     Menuitem *items;			/// buttons, etc
+    void (*netaction)(void);		/// network action callback
 } Menu;
 
 
@@ -207,7 +208,10 @@ typedef struct _menus_ {
 #define MENU_ENTER_NAME 6
 #define MENU_NET_CREATE_JOIN 7
 #define MENU_NET_MULTI_SETUP 8
-#define MENU_MAX 8			/// highest available menu id (for ccl)
+#define MENU_NET_ENTER_SERVER_IP 9
+#define MENU_NET_MULTI_CLIENT 10
+#define MENU_NET_CONNECTING 11
+#define MENU_MAX 10			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
