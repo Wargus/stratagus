@@ -1213,12 +1213,8 @@ global void NetworkEvent(void)
 	    break;
 
 	case MessageQuit:
-	    DebugLevel0("Frames %d, Slow frames %d = %d%%\n"
-		    ,FrameCounter,SlowFrameCounter      
-		    ,(SlowFrameCounter*100)/FrameCounter);
-	    IfDebug( UnitCacheStatistic(); );
             DebugLevel0("Got quit from network.\n");
-            exit(0);
+            Exit(0);
 	case MessageSync:
 	    if( FrameCounter!=ntohl(message.Data.Sync.Frame) ) {
 		DebugLevel0("Out of sync %d - %lu\n"
