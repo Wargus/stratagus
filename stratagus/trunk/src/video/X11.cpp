@@ -712,6 +712,9 @@ local unsigned X112InternalKeycode(const KeySym code)
 	case XK_Print:
 	    icode=KeyCodePrint;
 	    break;
+	case XK_Delete:
+	    icode=KeyCodeDelete;
+	    break;
 
 	case XK_dead_circumflex:
 	    icode='^';
