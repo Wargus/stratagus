@@ -26,7 +26,6 @@
 
 #include "freecraft.h"
 #include "video.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -51,6 +50,11 @@ global unsigned SyncHash;	/// Hash calculated to find sync failures
 /**
 **	Show unit animation.
 **		Returns animation flags.
+**
+**	@param unit		Unit of the animation.
+**	@param animation	Animation script to handle.
+**
+**	@return			The flags of the current script step.
 */
 global int UnitShowAnimation(Unit* unit,const Animation* animation)
 {
@@ -73,18 +77,19 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
     unit->IY+=animation[state].Pixel;
     unit->Wait=animation[state].Sleep;
 
+    // Anything changed the display?
     if( (animation[state].Frame || animation[state].Pixel) ) {
         CheckUnitToBeDrawn(unit);
     }
 
     flags=animation[state].Flags;
-    if( flags&AnimationReset ) {
+    if( flags&AnimationReset ) {	// Reset can check for other actions
 	unit->Reset=1;
     }
-    if( flags&AnimationRestart ) {
+    if( flags&AnimationRestart ) {	// Restart animation script
 	unit->State=0;
     } else {
-	++unit->State;
+	++unit->State;			// Advance to next script
     }
 
     return flags;
@@ -95,6 +100,143 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 ----------------------------------------------------------------------------*/
 
 /**
+**	Unit does nothing!
+**
+**	@param unit	Unit pointer for none action.
+*/
+local void HandleActionNone(Unit* unit)
+{
+    DebugLevel1Fn("FIXME: Should not happen!\n");
+    DebugLevel1Fn("FIXME: Unit (%Zd) %s has action none.!\n",
+	    UnitNumber(unit),unit->Type->Ident);
+}
+
+/**
+**	Unit has notwritten function.
+**
+**	@param unit	Unit pointer for notwritten action.
+*/
+local void HandleActionNotWritten(Unit* unit)
+{
+    DebugLevel1Fn("FIXME: Not written!\n");
+    DebugLevel1Fn("FIXME: Unit (%Zd) %s has action %d.!\n",
+	    UnitNumber(unit),unit->Type->Ident,unit->Orders[0].Action);
+}
+
+/**
+**	Jump table for actions.
+**
+**	@note can move function into unit structure.
+*/
+local void (*HandleActionTable[256])(Unit*) = {
+    HandleActionNone,
+    HandleActionStill,
+    HandleActionStandGround,
+    HandleActionFollow,
+    HandleActionMove,
+    HandleActionAttack,
+    HandleActionAttack,		// HandleActionAttackGround,
+    HandleActionDie,
+    HandleActionSpellCast,
+    HandleActionTrain,
+    HandleActionUpgradeTo,
+    HandleActionResearch,
+    HandleActionBuilded,
+    HandleActionBoard,
+    HandleActionUnload,
+    HandleActionPatrol,
+    HandleActionBuild,
+    HandleActionRepair,
+    HandleActionHarvest,
+    HandleActionMineGold,
+    HandleActionNotWritten,	// HandleActionMineOre,
+    HandleActionNotWritten,	// HandleActionMineCoal,
+    HandleActionNotWritten,	// HandleActionQuarryStone,
+    HandleActionHaulOil,
+    HandleActionReturnGoods,
+    HandleActionDemolish,
+
+    // Enough for the future ?
+    HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+    HandleActionNotWritten, HandleActionNotWritten, HandleActionNotWritten,
+};
+
+/**
 **	Handle the action of an unit.
 **
 **	@param unit	Pointer to handled unit.
@@ -102,12 +244,6 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 local void HandleUnitAction(Unit* unit)
 {
     int z;
-
-    // FIXME: Revealer is special unit, that should reveal the map.
-    // FIXME: Johns: What should this do here?
-    if ( unit->Revealer ) {
-	unit->Orders[0].Action = UnitActionDie;
-    }
 
     //
     //	If current action is breakable proceed with next one.
@@ -165,102 +301,9 @@ local void HandleUnitAction(Unit* unit)
     // FIXME: fire handling should be moved to here.
 
     //
-    //	Select action. FIXME: should us function pointers|array.
+    //	Select action. FIXME: should us function pointers in unit structure.
     //
-    switch( unit->Orders[0].Action ) {
-	case UnitActionNone:
-	    DebugLevel1Fn("FIXME: Should not happen!\n");
-	    break;
-
-	case UnitActionStill:
-	    HandleActionStill(unit);
-	    break;
-
-	case UnitActionStandGround:
-	    HandleActionStandGround(unit);
-	    break;
-
-	case UnitActionFollow:		// FIXME: not written
-	    //HandleActionFollow(unit);
-	    //break;
-
-	case UnitActionMove:		// THE HARD ONE
-	    HandleActionMove(unit);
-	    break;
-
-	case UnitActionPatrol:
-	    HandleActionPatrol(unit);
-	    break;
-
-	case UnitActionRepair:
-	    HandleActionRepair(unit);
-	    break;
-
-	case UnitActionAttack:
-	case UnitActionAttackGround:
-	    HandleActionAttack(unit);
-	    break;
-
-	case UnitActionBoard:
-	    HandleActionBoard(unit);
-	    break;
-
-	case UnitActionUnload:
-	    HandleActionUnload(unit);
-	    break;
-
-	case UnitActionDie:
-	    HandleActionDie(unit);
-	    break;
-
-	case UnitActionTrain:
-	    HandleActionTrain(unit);
-	    break;
-
-	case UnitActionUpgradeTo:
-	    HandleActionUpgradeTo(unit);
-	    break;
-
-	case UnitActionResearch:
-	    HandleActionResearch(unit);
-	    break;
-
-	case UnitActionBuild:
-	    HandleActionBuild(unit);
-	    break;
-
-	case UnitActionBuilded:
-	    HandleActionBuilded(unit);
-	    break;
-
-	case UnitActionHarvest:
-	    HandleActionHarvest(unit);
-	    break;
-
-	case UnitActionMineGold:
-	    HandleActionMineGold(unit);
-	    break;
-
-	case UnitActionHaulOil:
-	    HandleActionHaulOil(unit);
-	    break;
-
-	case UnitActionReturnGoods:
-	    HandleActionReturnGoods(unit);
-	    break;
-
-	case UnitActionDemolish:
-	    HandleActionDemolish(unit);
-	    break;
-
-	case UnitActionSpellCast:
-	    HandleActionSpellCast(unit);
-	    break;
-
-	default:
-	    DebugLevel1Fn("Unknown action %d\n",unit->Orders[0].Action);
-	    break;
-    }
+    HandleActionTable[unit->Orders[0].Action](unit);
 }
 
 /**
