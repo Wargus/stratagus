@@ -418,6 +418,10 @@ extern void DrawMapFogOfWar(const Viewport* vp,int x,int y);
 extern void InitMapFogOfWar(void);
     /// Cleanup memory for fog of war tables
 extern void CleanMapFogOfWar(void);
+    /// Builds Vision and Goal Tables
+extern void InitVisionTable(void);
+    /// Cleans up Vision and Goal Tables
+extern void FreeVisionTable(void);
 
 //
 //	in map_wall.c
