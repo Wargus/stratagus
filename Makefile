@@ -312,46 +312,48 @@ MYDATE	= $(shell date +%y%m%d)
 PCRAFT= freecraft-$(MYDATE).tar.bz2
 LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
 WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCRAFT=	../fcraft-0.15.tar.gz
-SCRAFT= ../scraft-0.02.tar.bz2
+FCGP1=	../fcgp-011108.tar.bz2
+FCSP1=	../fcsp-general-20010819.tar.bz2
+FCSP2=	../fcsp-mythical-20010819.tar.bz2
+FCSP3=	../fcsp-alliance-20010819.tar.bz2
 
 linux-complete:
-	tar xzf $(FCRAFT)
-	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	tar xjf $(SCRAFT)
+	mkdir freecraft-complete
+	tar xjf $(FCGP1)
+	tar xjCf freecraft-complete $(FCSP1)
+	tar xjCf freecraft-complete $(FCSP2)
+	tar xjCf freecraft-complete $(FCSP3)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
-	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	cp -a fcraft/* freecraft-complete
-	cp -a fclone/* freecraft-complete
+	cp -a fcgp-*/* freecraft-complete
+	cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	rm -rf fcraft
-	rm -rf fclone
+	rm -rf fcgp-*
 	chmod 777 freecraft-complete
-	chown -R johns:freecraft $(distdir)
+	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
 	-tar czhf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
 	-tar cjhf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
 	rm -rf freecraft-complete
 
 win32-complete:
-	tar xzf $(FCRAFT)
-	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
-	tar xjf $(SCRAFT)
+	mkdir freecraft-complete
+	tar xjf $(FCGP1)
+	tar xjCf freecraft-complete $(FCSP1)
+	tar xjCf freecraft-complete $(FCSP2)
+	tar xjCf freecraft-complete $(FCSP3)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
-	mkdir freecraft-complete
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	cp -a fcraft/* freecraft-complete
-	cp -a fclone/* freecraft-complete
+	cp -a fcgp-*/* freecraft-complete
+	cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	rm -rf fcraft
-	rm -rf fclone
+	rm -rf fcgp-*
 	chmod 777 freecraft-complete
-	chown -R johns:freecraft $(distdir)
+	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
 	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
