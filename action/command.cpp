@@ -587,27 +587,6 @@ void CommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 	// Check if unit is still valid? (NETWORK!)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
-		//
-		// For bunkers, don't go into an action. Just drop everything here and now.
-		//
-		if (unit->Type->Building) {
-			int i;
-			Unit* uins;
-
-			// Unload all units.
-			uins = unit->UnitInside;
-			for (i = unit->InsideCount; i; --i, uins = uins->NextContained) {
-				if (uins->Boarded) {
-					uins->X = unit->X;
-					uins->Y = unit->Y;
-					if (UnloadUnit(uins)) {
-						unit->BoardCount--;
-					}
-				}
-			}
-			return;
-		}
-
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
 		}
