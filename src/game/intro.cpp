@@ -538,7 +538,7 @@ global void ShowIntro(const Intro *intro)
     CallbackMusicOn();
     StopMusic();
     // FIXME: should this be GameMusic?
-    if (CDMode == "off")
+    if (!strcmp(CDMode, "off"))
     {
 	PlayMusic(MenuMusic);
     }
