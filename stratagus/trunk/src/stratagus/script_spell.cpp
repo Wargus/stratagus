@@ -120,9 +120,9 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 
     if (gh_eq_p(value, gh_symbol2scm("spawn-missile"))) {
 	spellaction->CastFunction = CastSpawnMissile;
-	spellaction->Data.SpawnMissile.StartPoint.Base=LocBaseCaster;
-	spellaction->Data.SpawnMissile.EndPoint.Base=LocBaseTarget;
-	spellaction->Data.SpawnMissile.TTL=-1;
+	spellaction->Data.SpawnMissile.StartPoint.Base = LocBaseCaster;
+	spellaction->Data.SpawnMissile.EndPoint.Base = LocBaseTarget;
+	spellaction->Data.SpawnMissile.TTL = -1;
 	while (!gh_null_p(list)) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
@@ -311,6 +311,218 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
     }
 }
 #elif defined(USE_LUA)
+local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
+{
+    char* str;
+    const char* value;
+    int args;
+    int j;
+
+#if 0
+    value = gh_car(list);
+    list = gh_cdr(list);
+
+    if (!strcmp(value, "spawn-missile")) {
+	spellaction->CastFunction = CastSpawnMissile;
+	spellaction->Data.SpawnMissile.StartPoint.Base = LocBaseCaster;
+	spellaction->Data.SpawnMissile.EndPoint.Base = LocBaseTarget;
+	spellaction->Data.SpawnMissile.TTL = -1;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "damage")) {
+		spellaction->Data.SpawnMissile.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "delay")) {
+		spellaction->Data.SpawnMissile.Delay = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "ttl")) {
+		spellaction->Data.SpawnMissile.TTL = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "start-point")) {
+		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.StartPoint);
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "end-point")) {
+		CclSpellMissileLocation(gh_car(list),&spellaction->Data.SpawnMissile.EndPoint);
+		list = gh_cdr(list);
+	    } else {
+		errl("Unsupported area-bombardment tag", value);
+	    }
+	}
+    } else if (!strcmp(value, "area-adjust-vitals")) {
+	spellaction->CastFunction = CastAreaAdjustVitals;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "hit-points")) {
+		spellaction->Data.AreaAdjustVitals.HP = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "mana-points")) {
+		spellaction->Data.AreaAdjustVitals.Mana = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		lua_pushfstring(l, "Unsupported area-adjust-vitals tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "area-bombardment")) {
+	spellaction->CastFunction = CastAreaBombardment;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "fields")) {
+		spellaction->Data.AreaBombardment.Fields = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "shards")) {
+		spellaction->Data.AreaBombardment.Shards = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "damage")) {
+		spellaction->Data.AreaBombardment.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "start-offset-x")) {
+		spellaction->Data.AreaBombardment.StartOffsetX = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "start-offset-y")) {
+		spellaction->Data.AreaBombardment.StartOffsetY = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		errl("Unsupported area-bombardment tag", value);
+	    }
+	}
+    } else if (!strcmp(value, "demolish")) {
+	spellaction->CastFunction = CastDemolish;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, gh_symbol2scm("range"))) {
+		spellaction->Data.Demolish.Range = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, gh_symbol2scm("damage"))) {
+		spellaction->Data.Demolish.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		lua_pushfstring(l, "Unsupported demolish tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "adjust-buffs")) {
+	spellaction->CastFunction = CastAdjustBuffs;
+	spellaction->Data.AdjustBuffs.HasteTicks = BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.SlowTicks = BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.BloodlustTicks = BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.InvisibilityTicks = BUFF_NOT_AFFECTED;
+	spellaction->Data.AdjustBuffs.InvincibilityTicks = BUFF_NOT_AFFECTED;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "haste-ticks")) {
+		spellaction->Data.AdjustBuffs.HasteTicks = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "slow-ticks")) {
+		spellaction->Data.AdjustBuffs.SlowTicks  = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "bloodlust-ticks")) {
+		spellaction->Data.AdjustBuffs.BloodlustTicks  = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "invisibility-ticks")) {
+		spellaction->Data.AdjustBuffs.InvisibilityTicks  = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "invincibility-ticks")) {
+		spellaction->Data.AdjustBuffs.InvincibilityTicks  = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		lua_pushfstring(l, "Unsupported adjust-buffs tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "summon")) {
+	spellaction->CastFunction = CastSummon;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "unit-type")) {
+		str = gh_scm2newstr(gh_car(list), 0);
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		if (!spellaction->Data.Summon.UnitType) {
+		    spellaction->Data.Summon.UnitType = 0;
+		    DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ str);
+		}
+		free(str);
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "time-to-live")) {
+		spellaction->Data.Summon.TTL = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "require-corpse")) {
+		spellaction->Data.Summon.RequireCorpse = 1;
+	    } else {
+		lua_pushfstring(l, "Unsupported summon tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "spawn-portal")) {
+	spellaction->CastFunction = CastSpawnPortal;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "portal-type")) {
+		str = gh_scm2newstr(gh_car(list), 0);
+		spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(str);
+		if (!spellaction->Data.SpawnPortal.PortalType) {
+		    spellaction->Data.SpawnPortal.PortalType = 0;
+		    DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ str);
+		}
+		free(str);
+		list = gh_cdr(list);
+	    } else {
+		lua_pushfstring(l, "Unsupported spawn-portal tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "polymorph")) {
+	spellaction->CastFunction = CastPolymorph;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "new-form")) {
+		str = gh_scm2newstr(gh_car(list),0);
+		spellaction->Data.Summon.UnitType = UnitTypeByIdent(str);
+		if (!spellaction->Data.Summon.UnitType) {
+		    spellaction->Data.Summon.UnitType = 0;
+		    DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ str);
+		}
+		free(str);
+		list = gh_cdr(list);
+		//FIXME : temp polymorphs? hard to do.
+	    } else {
+		lua_pushfstring(l, "Unsupported polymorph tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else if (!strcmp(value, "adjust-vitals")) {
+	spellaction->CastFunction = CastAdjustVitals;
+	while (!gh_null_p(list)) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (!strcmp(value, "hit-points")) {
+		spellaction->Data.AdjustVitals.HP = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "mana-points")) {
+		spellaction->Data.AdjustVitals.Mana = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (!strcmp(value, "max-multi-cast")) {
+		spellaction->Data.AdjustVitals.MaxMultiCast = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else {
+		lua_pushfstring(l, "Unsupported adjust-vitals tag: %s", value);
+		lua_error(l);
+	    }
+	}
+    } else {
+	lua_pushfstring(l, "Unsupported action type: %s", value);
+	lua_error(l);
+    }
+#endif
+}
 #endif
 
 /**
@@ -337,6 +549,20 @@ global char Scm2Condition(SCM value)
     }
 }
 #elif defined(USE_LUA)
+global char Ccl2Condition(lua_State* l, const char* value)
+{
+    if (!strcmp(value, "true")) {
+	return CONDITION_TRUE;
+    } else if (!strcmp(value, "false")) {
+	return CONDITION_FALSE;
+    } else if (!strcmp(value, "only")) {
+	return CONDITION_ONLY;
+    } else {
+	lua_pushfstring(l, "Bad condition result: %s", value);
+	lua_error(l);
+	return -1;
+    }
+}
 #endif
 
 /**
@@ -352,6 +578,7 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
 {
     SCM value;
     int i;
+
     //
     //	Initializations:
     //
@@ -359,8 +586,7 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
     //	Set everything to 0:
     memset(condition, 0, sizeof(ConditionInfo));
     //	Flags are defaulted to 0(CONDITION_TRUE)
-    condition->BoolFlag = malloc(NumberBoolFlag * sizeof (*condition->BoolFlag));
-    memset(condition->BoolFlag, 0, NumberBoolFlag * sizeof (*condition->BoolFlag));
+    condition->BoolFlag = calloc(NumberBoolFlag, sizeof (*condition->BoolFlag));
     //	Initialize min/max stuff to values with no effect.
     condition->MinHpPercent = -10;
     condition->MaxHpPercent = 1000;
@@ -431,6 +657,172 @@ local void CclSpellCondition(SCM list, ConditionInfo* condition)
     }
 }
 #elif defined(USE_LUA)
+local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
+{
+    const char* value;
+    int i;
+    int args;
+    int j;
+
+    //
+    //	Initializations:
+    //
+
+    //	Set everything to 0:
+    memset(condition, 0, sizeof(ConditionInfo));
+    //	Flags are defaulted to 0(CONDITION_TRUE)
+    condition->BoolFlag = calloc(NumberBoolFlag, sizeof (*condition->BoolFlag));
+    //	Initialize min/max stuff to values with no effect.
+    condition->MinHpPercent = -10;
+    condition->MaxHpPercent = 1000;
+    condition->MinManaPercent = -10;
+    condition->MaxManaPercent = 1000;
+    //  Buffs too.
+    condition->MaxHasteTicks = 0xFFFFFFF;
+    condition->MaxSlowTicks = 0xFFFFFFF;
+    condition->MaxBloodlustTicks = 0xFFFFFFF;
+    condition->MaxInvisibilityTicks = 0xFFFFFFF;
+    condition->MaxInvincibilityTicks = 0xFFFFFFF;
+    //  Now parse the list and set values.
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "coward")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->Coward = Ccl2Condition(l, lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "alliance")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->Alliance = Ccl2Condition(l, lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "building")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->Building = Ccl2Condition(l, lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "self")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->TargetSelf = Ccl2Condition(l, lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "min-hp-percent")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MinHpPercent = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-hp-percent")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxHpPercent = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "min-mana-percent")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MinManaPercent = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-mana-percent")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxManaPercent = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-slow-ticks")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxSlowTicks = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-haste-ticks")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxHasteTicks = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-bloodlust-ticks")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxBloodlustTicks = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-invisibility-ticks")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxInvisibilityTicks = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "max-invincibility-ticks")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    condition->MaxInvincibilityTicks = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else {
+	    for (i = 0; i < NumberBoolFlag; i++) { // User defined flags
+	        if (!strcmp(value, BoolFlagName[i])) {
+		    lua_rawgeti(l, -1, j + 1);
+		    if (!lua_isstring(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+	            condition->BoolFlag[i] = Ccl2Condition(l, lua_tostring(l, -1));
+		    lua_pop(l, 1);
+	            break;
+                }
+	    }
+	    if (i != NumberBoolFlag) {
+	        continue;
+	    }
+	    lua_pushfstring(l, "Unsuported condition tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
 #endif
 
 /*
@@ -470,6 +862,55 @@ local void CclSpellAutocast(SCM list, AutoCastInfo* autocast)
     }
 }
 #elif defined(USE_LUA)
+local void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
+{
+    const char* value;
+    int args;
+    int j;
+
+    if (!lua_istable(l, -1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    args = luaL_getn(l, -1);
+    for (j = 0; j < args; ++j) {
+	lua_rawgeti(l, -1, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	++j;
+	if (!strcmp(value, "range")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    autocast->Range = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "combat")) {
+	    lua_rawgeti(l, -1, j + 1);
+	    if (!lua_isstring(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    autocast->Combat = Ccl2Condition(l, lua_tostring(l, -1));
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "condition")) {
+	    if (!autocast->Condition) {
+		autocast->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    }
+	    lua_rawgeti(l, -1, j + 1);
+	    CclSpellCondition(l, autocast->Condition);
+	    lua_pop(l, 1);
+	} else {
+	    lua_pushfstring(l, "Unsupported autocast tag: %s", value);
+	    lua_error(l);
+	}
+    }
+}
 #endif
 
 /**
@@ -521,7 +962,7 @@ local SCM CclDefineSpell(SCM list)
 	    }
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("repeat-cast"))) {
-	    spell->RepeatCast=1;
+	    spell->RepeatCast = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("target"))) {
 	    value = gh_car(list);
 	    if (gh_eq_p(value, gh_symbol2scm("self"))) {
@@ -536,17 +977,17 @@ local SCM CclDefineSpell(SCM list)
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("action"))) {
 	    spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
-	    act=spell->Action;
+	    act = spell->Action;
 	    memset(act, 0, sizeof(SpellActionType));
-	    sublist=gh_car(list);
+	    sublist = gh_car(list);
 	    CclSpellAction(gh_car(sublist), act);
-	    sublist=gh_cdr(sublist);
+	    sublist = gh_cdr(sublist);
 	    while (!gh_null_p(sublist)) {
 		act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
-		act=act->Next;
+		act = act->Next;
 		memset(act, 0, sizeof(SpellActionType));
 		CclSpellAction(gh_car(sublist), act);
-		sublist=gh_cdr(sublist);
+		sublist = gh_cdr(sublist);
 	    }
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("condition"))) {
@@ -606,6 +1047,173 @@ local SCM CclDefineSpell(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineSpell(lua_State* l)
+{
+    char* identname;
+    SpellType* spell;
+    const char* value;
+    SpellActionType* act;
+    int args;
+    int j;
+
+    args = lua_gettop(l);
+    j = 0;
+    if (!lua_isstring(l, j + 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    identname = strdup(lua_tostring(l, j + 1));
+    ++j;
+    spell = SpellTypeByIdent(identname);
+    if (spell != NULL) {
+    	DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
+	free(identname);
+    } else {
+	SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType));
+	spell = &SpellTypeTable[SpellTypeCount++];
+	memset(spell, 0, sizeof(SpellType));
+	spell->Ident = SpellTypeCount - 1;
+	spell->IdentName = identname;
+	spell->DependencyId = -1;
+    }
+    for (; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "showname")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (spell->Name) { 
+	    	free(spell->Name);
+	    }
+	    spell->Name = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "manacost")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    spell->ManaCost = lua_tonumber(l, j + 1);
+	} else if (!strcmp(value, "range")) {
+	    if (!lua_isstring(l, j + 1) && !lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (lua_isstring(l, j + 1) && !strcmp(lua_tostring(l, j + 1), "infinite")) {
+		spell->Range = INFINITE_RANGE;
+	    } else if (lua_isnumber(l, j + 1)) {
+		spell->Range = lua_tonumber(l, j + 1);
+	    } else {
+		lua_pushstring(l, "Invalid range");
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "repeat-cast")) {
+	    spell->RepeatCast = 1;
+	    --j;
+	} else if (!strcmp(value, "target")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    if (!strcmp(value, "self")) {
+		spell->Target = TargetSelf;
+	    } else if (!strcmp(value, "unit")) {
+		spell->Target = TargetUnit;
+	    } else if (!strcmp(value, "position")) {
+		spell->Target = TargetPosition;
+	    } else {
+		lua_pushfstring(l, "Unsupported spell target type tag: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "action")) {
+	    spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
+	    act = spell->Action;
+	    memset(act, 0, sizeof(SpellActionType));
+#if 0
+	    sublist = gh_car(list);
+	    CclSpellAction(gh_car(sublist), act);
+	    sublist = gh_cdr(sublist);
+	    while (!gh_null_p(sublist)) {
+		act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
+		act = act->Next;
+		memset(act, 0, sizeof(SpellActionType));
+		CclSpellAction(gh_car(sublist), act);
+		sublist=gh_cdr(sublist);
+	    }
+	    list = gh_cdr(list);
+#endif
+	} else if (!strcmp(value, "condition")) {
+	    if (!spell->Condition) {
+		spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+	    }
+	    lua_pushvalue(l, j + 1);
+	    CclSpellCondition(l, spell->Condition);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "autocast")) {
+	    if (!spell->AutoCast) {
+		spell->AutoCast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+		memset(spell->AutoCast, 0, sizeof(AutoCastInfo));
+	    }
+	    lua_pushvalue(l, j + 1);
+	    CclSpellAutocast(l, spell->AutoCast);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "ai-cast")) {
+	    if (!spell->AICast) {
+		spell->AICast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
+		memset(spell->AICast, 0, sizeof(AutoCastInfo));
+	    }
+	    lua_pushvalue(l, j + 1);
+	    CclSpellAutocast(l, spell->AICast);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "sound-when-cast")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    //  Free the old name, get the new one
+	    if (spell->SoundWhenCast.Name) {
+		free(spell->SoundWhenCast.Name);
+	    }
+	    spell->SoundWhenCast.Name = strdup(lua_tostring(l, j + 1));
+	    spell->SoundWhenCast.Sound = SoundIdForName(spell->SoundWhenCast.Name);
+	    //  Check for sound.
+	    if (!spell->SoundWhenCast.Sound) {
+		free(spell->SoundWhenCast.Name);
+		spell->SoundWhenCast.Name = 0;
+	    }
+	} else if (!strcmp(value, "missile-when-cast")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    spell->Missile = MissileTypeByIdent(value);
+	    if (spell->Missile == NULL) {
+		DebugLevel0Fn("in spell-type '%s' : missile %s does not exist\n" _C_
+		    spell->Name _C_ value);
+	    }
+	} else if (!strcmp(value, "depend-upgrade")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    spell->DependencyId = UpgradeIdByIdent(value);
+	    if (spell->DependencyId == -1) {
+		lua_pushfstring(l, "Bad upgrade name: %s", value);
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+    return 0;
+}
 #endif
 
 /**
@@ -615,6 +1223,8 @@ global void SpellCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedureN("define-spell", CclDefineSpell);
+#elif defined(USE_LUA)
+    lua_register(Lua, "DefineSpell", CclDefineSpell);
 #endif
 }
 
