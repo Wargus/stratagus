@@ -7110,7 +7110,7 @@ local int CclSetGroupKeys(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    UIGroupKeys = strdup(LuaToString(l, 1));
+    UiGroupKeys = strdup(LuaToString(l, 1));
     return 0;
 }
 #endif
