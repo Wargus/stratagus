@@ -714,7 +714,7 @@ local int FillOneChannel(SoundRequest* sr)
     return old_free;
 }
 
-/*
+/**
 ** get orders from the fifo and put them into channels. This function takes
 ** care of registering sound sources.
 //FIXME: is this the correct place to do this?
