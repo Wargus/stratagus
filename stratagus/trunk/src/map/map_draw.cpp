@@ -115,29 +115,44 @@ global void VideoDrawTile(const int tile, int x, int y)
 #else
 global void VideoDrawTile(const int tile, int x, int y)
 {
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
+	int tilepitch;
+	int gx;
+	int gy;
+	int sx;
+	int ex;
+	int sy;
+	int ey;
 	GLfloat stx;
 	GLfloat etx;
 	GLfloat sty;
 	GLfloat ety;
 	Graphic *g;
-	int t;
+	int oldx;
+	int oldy;
+	int w;
+	int h;
+
+	w = TileSizeX;
+	h = TileSizeY;
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
 
 	g = TheMap.TileGraphic;
-	sx = x;
-	ex = sx + TileSizeX;
-	sy = y;
-	ey = sy + TileSizeY;
+	tilepitch = g->Width / TileSizeX;
 
-	t = tile % (g->Width / TileSizeX);
-	stx = (GLfloat)t * TileSizeX / g->Width * g->TextureWidth;
-	etx = (GLfloat)(t * TileSizeX + TileSizeX) / g->Width * g->TextureWidth;
-	t = tile / (g->Width / TileSizeX);
-	sty = (GLfloat)t * TileSizeY / g->Height * g->TextureHeight;
-	ety = (GLfloat)(t * TileSizeY + TileSizeY) / g->Height * g->TextureHeight;
+	gx = TileSizeX * (tile % tilepitch);
+	gy = TileSizeY * (tile / tilepitch);
+
+	sx = x;
+	ex = sx + w;
+	sy = y;
+	ey = sy + h;
+
+	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
+	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
+	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
+	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
 
 	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
 	glBegin(GL_QUADS);

@@ -568,7 +568,6 @@ global void VideoDrawFog(
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
 	int tilepitch;
-	Graphic* graphic;
 	int gx;
 	int gy;
 	int sx;
@@ -579,28 +578,39 @@ global void VideoDrawFog(
 	GLfloat etx;
 	GLfloat sty;
 	GLfloat ety;
+	Graphic* g;
+	int oldx;
+	int oldy;
+	int w;
+	int h;
 
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-	graphic = TheMap.TileGraphic;
+	w = TileSizeX;
+	h = TileSizeY;
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+
+	g = TheMap.TileGraphic;
+	tilepitch = g->Width / TileSizeX;
 
 	gx = TileSizeX * (tile % tilepitch);
 	gy = TileSizeY * (tile / tilepitch);
 
 	sx = x;
-	ex = sx + TileSizeX;
+	ex = sx + w;
 	sy = y;
-	ey = y + TileSizeY;
+	ey = sy + h;
 
-	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
-	etx = (GLfloat)(gx + TileSizeX) / graphic->Width * graphic->TextureWidth;
-	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
-	ety = (GLfloat)(gy + TileSizeY) / graphic->Height * graphic->TextureHeight;
+	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
+	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
+	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
+	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
 
 	// FIXME: slow
 	glColor4ub(0, 0, 0, FogOfWarOpacity);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
@@ -625,7 +635,6 @@ global void VideoDrawFog(
 global void VideoDrawUnexplored(const int tile, int x, int y)
 {
 	int tilepitch;
-	Graphic* graphic;
 	int gx;
 	int gy;
 	int sx;
@@ -636,24 +645,35 @@ global void VideoDrawUnexplored(const int tile, int x, int y)
 	GLfloat etx;
 	GLfloat sty;
 	GLfloat ety;
+	Graphic* g;
+	int oldx;
+	int oldy;
+	int w;
+	int h;
 
-	tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-	graphic = TheMap.TileGraphic;
+	w = TileSizeX;
+	h = TileSizeY;
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+
+	g = TheMap.TileGraphic;
+	tilepitch = g->Width / TileSizeX;
 
 	gx = TileSizeX * (tile % tilepitch);
 	gy = TileSizeY * (tile / tilepitch);
 
 	sx = x;
-	ex = sx + TileSizeX;
+	ex = sx + w;
 	sy = y;
-	ey = y + TileSizeY;
+	ey = sy + h;
 
-	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
-	etx = (GLfloat)(gx + TileSizeX) / graphic->Width * graphic->TextureWidth;
-	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
-	ety = (GLfloat)(gy + TileSizeY) / graphic->Height * graphic->TextureHeight;
+	stx = (GLfloat)(gx + x - oldx) / g->Width * g->TextureWidth;
+	etx = (GLfloat)(gx + x - oldx + w) / g->Width * g->TextureWidth;
+	sty = (GLfloat)(gy + y - oldy) / g->Height * g->TextureHeight;
+	ety = (GLfloat)(gy + y - oldy + h) / g->Height * g->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
+	glBindTexture(GL_TEXTURE_2D, g->TextureNames[0]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
@@ -674,8 +694,17 @@ global void VideoDrawUnexplored(const int tile, int x, int y)
 */
 global void VideoDrawOnlyFog(int x, int y)
 {
-	VideoFillRectangle(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y,
-		TileSizeX, TileSizeY);
+	int oldx;
+	int oldy;
+	int w;
+	int h;
+
+	oldx = x;
+	oldy = y;
+	w = TileSizeX;
+	h = TileSizeY;
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoFillRectangle(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y, w, h);
 }
 #endif
 
