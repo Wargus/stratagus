@@ -436,8 +436,8 @@ extern void FireMissile(Unit*);
     /// check if missile should be drawn
 extern int CheckMissileToBeDrawn(const Missile* missile);
 
-    /// draw all missiles
-extern void DrawMissiles (int);
+    /// Draw all missiles
+extern void DrawMissiles(int v);
 
     /// handle all missiles
 extern void MissileActions(void);
