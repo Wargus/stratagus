@@ -187,8 +187,7 @@ enum MustRedraw_e {
     RedrawCosts		= 1024,		/// Costs in status line
     RedrawMenuButton	= 2048,		/// Area above minimap
     RedrawMinimapCursor	= 4096,		/// Minimap cursor changed
-    RedrawMapOverlay	= 8192,		/// Menu overlay on map area
-    RedrawMenu		= 16384		/// Menu
+    RedrawMenu		= 8192,		/// Menu
 };
 
     /// Must redraw all maps
