@@ -633,7 +633,6 @@ local int CclUnit(lua_State* l)
 	Player* player;
 	int slot;
 	int i;
-	int insidecount;
 	const char* s;
 	int args;
 	int j;
@@ -641,7 +640,6 @@ local int CclUnit(lua_State* l)
 	args = lua_gettop(l);
 	j = 0;
 
-	insidecount = -1;
 	slot = LuaToNumber(l, j + 1);
 	++j;
 	DebugLevel3Fn("parsing unit #%d\n" _C_ slot);
@@ -860,8 +858,8 @@ local int CclUnit(lua_State* l)
 			--j;
 		} else if (!strcmp(value, "rs")) {
 			unit->Rs = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "units-contained-count")) {
-			insidecount = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "units-boarded-count")) {
+			unit->BoardCount = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "units-contained")) {
 			int subargs;
 			int k;

@@ -3632,7 +3632,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, " \"moving\",");
 	}
 	CLprintf(file, " \"rs\", %d,", unit->Rs);
-	CLprintf(file, " \"units-contained-count\", %d,", unit->InsideCount);
+	CLprintf(file, " \"units-boarded-count\", %d,", unit->BoardCount);
 	CLprintf(file, "\n  \"units-contained\", {");
 	uins = unit->UnitInside;
 	for (i = unit->InsideCount; i; --i, uins = uins->NextContained) {
