@@ -48,8 +48,6 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(NEW_AI)
-
 /**
 **	Setup AI helper table.
 **
@@ -1297,30 +1295,6 @@ local SCM CclDefineAiPlayer(SCM list)
     return SCM_UNSPECIFIED;
 }
 
-#else
-
-/**
-**	Define helper for AI.
-**
-**	@param list	List of the AI player.
-*/
-local SCM CclDefineAiHelper(SCM list)
-{
-    return list;
-}
-
-/**
-**	Define an AI engine.
-**
-**	@param list	List of the AI.
-*/
-local SCM CclDefineAi(SCM list)
-{
-    return list;
-}
-
-#endif
-
 /**
 **	Register CCL features for unit-type.
 */
@@ -1332,7 +1306,6 @@ global void AiCclRegister(void)
     gh_new_procedureN("define-ai-helper",CclDefineAiHelper);
     gh_new_procedureN("define-ai",CclDefineAi);
 
-#if defined(NEW_AI)
     gh_new_procedure0_0("ai:get-race",CclAiGetRace);
     gh_new_procedure0_0("ai:get-sleep-cycles",CclAiGetSleepCycles);
 
@@ -1360,7 +1333,6 @@ global void AiCclRegister(void)
     gh_new_procedureN("define-ai-wc-names",CclDefineAiWcNames);
 
     gh_new_procedureN("define-ai-player",CclDefineAiPlayer);
-#endif
 }
 
 //@}

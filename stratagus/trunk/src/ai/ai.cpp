@@ -28,8 +28,6 @@
 //
 //      $Id$
 
-#ifdef NEW_AI	// {
-
 
 //@{
 
@@ -1416,5 +1414,3 @@ global void AiEachSecond(Player* player)
 }
 
 //@}
-
-#endif // } NEW_AI

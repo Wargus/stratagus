@@ -31,8 +31,6 @@
 #ifndef __AI_LOCAL_H__
 #define __AI_LOCAL_H__
 
-#ifdef NEW_AI
-
 //@{
 
 /*----------------------------------------------------------------------------
@@ -324,7 +322,5 @@ extern int AiPlanAttack(AiForce* force);
 extern void AiCheckMagic(void);
 
 //@}
-
-#endif	// NEW_AI
 
 #endif	// !__AI_LOCAL_H__

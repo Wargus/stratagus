@@ -929,9 +929,6 @@ global void InitCcl(void)
 #ifdef HIERARCHIC_PATHFINDER
     gh_define("stratagus-feature-hierarchic-pathfinder",SCM_BOOL_T);
 #endif
-#ifdef NEW_AI
-    gh_define("stratagus-feature-new-ai",SCM_BOOL_T);
-#endif
 #ifdef NEW_SHIPS
     gh_define("stratagus-feature-new-ships",SCM_BOOL_T);
 #endif
