@@ -3006,8 +3006,8 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     UnitType* type;
     Unit* goal;
 
-    if( damage==0 ) {			// Can now happen by splash damage
-	DebugLevel0Fn("Warning no damage\n");
+    if( !damage ) {			// Can now happen by splash damage
+	DebugLevel0Fn("Warning no damage, try to fix by caller?\n");
 	return;
     }
 
@@ -3015,6 +3015,11 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 
     if ( target->UnholyArmor > 0 ) {
 	// vladi: units with active UnholyArmour are invulnerable
+	return;
+    }
+
+    if ( target->Removed ) {
+	DebugLevel0Fn("Removed target hit\n");
 	return;
     }
 
