@@ -77,6 +77,17 @@ global void HandleActionTrain(Unit* unit)
 	    >=unit->Data.Train.What[0]
 		->Stats[player->Player].Costs[TimeCost] ) {
 	//
+	//	Check if there are still unit slots.
+	//
+	if( NumUnits>=UnitMax  ) {
+	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
+		    ->Stats[player->Player].Costs[TimeCost];
+	    unit->Reset=1;
+	    unit->Wait=FRAMES_PER_SECOND/6;
+	    return;
+	}
+
+	//
 	//	Check if enough food available.
 	//
 	if( player->Food<=player->NumFoodUnits ) {
@@ -89,7 +100,8 @@ global void HandleActionTrain(Unit* unit)
 		AiNeedMoreFarms(unit,unit->Orders[0].Type);
 	    }
 
-	    unit->Data.Train.Ticks-=SpeedTrain;
+	    unit->Data.Train.Ticks=unit->Data.Train.What[0]
+		    ->Stats[player->Player].Costs[TimeCost];
 	    unit->Reset=1;
 	    unit->Wait=FRAMES_PER_SECOND/6;
 	    return;

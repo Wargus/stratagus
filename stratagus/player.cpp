@@ -464,17 +464,25 @@ global void PlayerSetResource(Player* player,int resource,int value)
 **
 **	@param player	Pointer to player.
 **	@param type	Type of unit.
+**
 **	@return		True if enought, false otherwise.
+**
+**	@note	The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckLimits(const Player* player,const UnitType* type)
 {
     // FIXME: currently all units costs 1 unit slot.
-
-    if( player->NumFoodUnits<player->FoodUnitLimit
-	    && player->NumBuildings<player->BuildingLimit
-	    && player->TotalNumUnits<player->TotalUnitLimit ) {
-	return 1;
+    //
+    //	Check game limits.
+    //
+    if( NumUnits<UnitMax ) {
+	if( (type->Building ?  player->NumBuildings<player->BuildingLimit
+		: player->NumFoodUnits<player->FoodUnitLimit)
+		&& player->TotalNumUnits<player->TotalUnitLimit ) {
+	    return 1;
+	}
     }
+
     // FIXME: need a general notify function
     if( player==ThisPlayer ) {
 	SetMessage("Cannot create more units.");
@@ -490,6 +498,8 @@ global int PlayerCheckLimits(const Player* player,const UnitType* type)
 **	@param player	Pointer to player.
 **	@param type	Type of unit.
 **	@return		True if enought, false otherwise.
+**
+**	@note	The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckFood(const Player* player,const UnitType* type)
 {
@@ -514,6 +524,8 @@ global int PlayerCheckFood(const Player* player,const UnitType* type)
 **	@param player	Pointer to player.
 **	@param costs	How many costs.
 **	@return		False if all enought, otherwise a bit mask.
+**
+**	@note	The return values of the PlayerCheck functions are inconsistent.
 */
 global int PlayerCheckCosts(const Player* player,const int* costs)
 {
