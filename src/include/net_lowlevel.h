@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name net_lowlevel.h	-	The network low level header file. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __NET_LOWLEVEL_H
 #define __NET_LOWLEVEL_H
@@ -56,8 +55,8 @@
 ----------------------------------------------------------------------------*/
 
 #define NIPQUAD(ad) \
-	(((ad) >> 24) & 0xff), (((ad) >> 16) & 0xff), \
-	(((ad) >> 8) & 0xff), ((ad) & 0xff)
+	(int)(((ad) >> 24) & 0xff), (int)(((ad) >> 16) & 0xff), \
+	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
 /*----------------------------------------------------------------------------
 --	Declarations
