@@ -101,8 +101,8 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 
 	sx = x;
 	ex = sx + w;
-	ey = VideoHeight - y;
-	sy = ey - h;
+	sy = y;
+	ey = y + h;
 
 	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
 	etx = (GLfloat)(gx + w) / graphic->Width * graphic->TextureWidth;
@@ -111,13 +111,13 @@ global void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 
 	glBindTexture(GL_TEXTURE_2D, graphic->TextureNames[0]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(stx, 1.0f - ety);
+	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
-	glTexCoord2f(stx, 1.0f - sty);
+	glTexCoord2f(stx, ety);
 	glVertex2i(sx, ey);
-	glTexCoord2f(etx, 1.0f - sty);
+	glTexCoord2f(etx, ety);
 	glVertex2i(ex, ey);
-	glTexCoord2f(etx, 1.0f - ety);
+	glTexCoord2f(etx, sty);
 	glVertex2i(ex, sy);
 	glEnd();
 }
@@ -209,30 +209,6 @@ global void VideoFree(Graphic* graphic)
 	}
 	free(graphic);
 }
-
-#if 0
-local void FreeGraphic8(Graphic* graphic)
-{
-#ifdef DEBUG
-	AllocatedGraphicMemory -= graphic->Size;
-	AllocatedGraphicMemory -= sizeof(Graphic);
-#endif
-
-#ifdef USE_OPENGL
-	if (graphic->NumTextureNames) {
-		glDeleteTextures(graphic->NumTextureNames, graphic->TextureNames);
-		free(graphic->TextureNames);
-	}
-#endif
-
-	VideoFreeSharedPalette(graphic->Pixels);
-	if (graphic->Palette) {
-		free(graphic->Palette);
-	}
-	free(graphic->Frames);
-	free(graphic);
-}
-#endif
 
 /*----------------------------------------------------------------------------
 --		Global functions
@@ -380,7 +356,7 @@ global void MakeTexture(Graphic* graphic, int width, int height)
 				int c;
 				SDL_Color p;
 
-				c = (h - i - 1) * w * 4 + j * 4;
+				c = i * w * 4 + j * 4;
 				if (*sp == 255) {
 					tex[c + 3] = 0;
 				} else {

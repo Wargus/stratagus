@@ -157,7 +157,7 @@ local void VideoDrawChar(const Graphic* sprite,
 	for (i = 0; i < NumFontColors; ++i) {
 		c = FontColor->Color + i;
 		glColor3ub(c->r, c->g, c->b);
-		glRasterPos2i(x, VideoHeight - y - h);
+		glRasterPos2i(x, y + h);
 		glBitmap(FontBitmapWidths[CurrentFont] * 8, h,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			FontBitmaps[CurrentFont][i] +
@@ -609,7 +609,7 @@ local void MakeFontBitmap(Graphic* g, int font)
 		x = 0;
 		numfonts = g->Height / Fonts[font].Height;
 		for (k = 0; k < numfonts; ++k) {
-			for (i = 0; i<Fonts[font].Height; ++i) {
+			for (i = 0; i < Fonts[font].Height; ++i) {
 				c = FontBitmaps[font][n] + k * Fonts[font].Height * FontBitmapWidths[font] +
 					(Fonts[font].Height - 1 - i) * FontBitmapWidths[font];
 				for (j = 0; j < g->Width; ++j) {
