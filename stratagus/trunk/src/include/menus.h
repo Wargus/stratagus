@@ -191,8 +191,8 @@ typedef struct _menuitem_ {
     /// for MI_TYPE_xSLIDER
 #define MI_CFLAGS_UP 1
 #define MI_CFLAGS_DOWN 2
-#define MI_CFLAGS_LEFT MI_CURC_UP
-#define MI_CFLAGS_RIGHT MI_CURC_DOWN
+#define MI_CFLAGS_LEFT 1
+#define MI_CFLAGS_RIGHT 2
 #define MI_CFLAGS_KNOB 4
 #define MI_CFLAGS_CONT 8
 
