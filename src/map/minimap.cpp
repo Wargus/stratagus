@@ -173,17 +173,21 @@ global void CreateMinimap(void)
 		SDL_Color c;
 		int x;
 		int y;
+		int sx;
+		int sy;
 		Uint32* dp;
 
 		dp = (Uint32*)MinimapSurface;
+		sy = TheUI.MinimapPosY - TheUI.MinimapPanelY;
+		sx = TheUI.MinimapPosX - TheUI.MinimapPanelX;
 		s = TheUI.MinimapPanel.Graphic->Surface;
 		SDL_LockSurface(s);
 		if (s->format->BytesPerPixel == 1) {
 			Uint8* sp;
 
-			for (y = 0; y < s->h; ++y) {
-				sp = (Uint8*)s->pixels + y * s->pitch;
-				for (x = 0; x < s->w; ++x) {
+			for (y = 0; y < TheUI.MinimapH; ++y, ++sy) {
+				sp = (Uint8*)s->pixels + sy * s->pitch + sx;
+				for (x = 0; x < TheUI.MinimapW; ++x) {
 					c = s->format->palette->colors[*sp++];
 					*dp++ = VideoMapRGB(0, c.r, c.g, c.b);
 				}
@@ -191,9 +195,9 @@ global void CreateMinimap(void)
 		} else {
 			Uint32* sp;
 
-			for (y = 0; y < s->h; ++y) {
-				sp = (Uint32*)((Uint8*)s->pixels + y * s->pitch);
-				for (x = 0; x < s->w; ++x) {
+			for (y = 0; y < TheUI.MinimapH; ++y, ++sy) {
+				sp = (Uint32*)((Uint8*)s->pixels + sy * s->pitch + sx);
+				for (x = 0; x < TheUI.MinimapW; ++x) {
 					VideoGetRGBA(*sp, &c.r, &c.g, &c.b, &c.unused);
 					*dp++ = VideoMapRGBA(0, c.r, c.g, c.b, c.unused);
 				}
