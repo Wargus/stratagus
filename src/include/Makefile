@@ -45,7 +45,7 @@ HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
 	  siod.h siodp.h iolib.h iocompat.h depend.h settings.h myendian.h \
 	  net_lowlevel.h netconnect.h rdtsc.h campaign.h trigger.h libcda.h \
 	  etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h \
-	  editor.h movie.h
+	  editor.h movie.h avi.h
 
 all:
 	echo done.
