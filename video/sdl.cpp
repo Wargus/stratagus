@@ -133,7 +133,7 @@ local void InitOpenGL(void)
     glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0,1,0,1,-1,1);
+    glOrtho(0,VideoWidth,0,VideoHeight,-1,1);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0f);
