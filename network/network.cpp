@@ -437,8 +437,8 @@ global void InitNetwork1(void)
 	}
     }
 
-#ifdef BSD
-    // FIXME: need a working interface check for BSD
+#if 1
+    // FIXME: need a working interface check
     NetworkNumInterfaces = 1;
 #else
     NetworkNumInterfaces = NetSocketAddr(NetworkFildes);
