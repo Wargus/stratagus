@@ -448,6 +448,7 @@ global void (*VideoFillTransRectangle)(VMemType color, int x, int y,
 
 #ifdef USE_SDL_SURFACE
     // FIXME: BIG todo
+    // FIXME: optimize all these
 global void InitLineDraw()
 {
 }
@@ -475,9 +476,13 @@ global void VideoDrawPixelClip(SDL_Color color, int x, int y)
 {
     DebugCheck(1);
 }
-global void VideoDrawVLine(SDL_Color color, int x, int y, int width)
+global void VideoDrawVLine(SDL_Color color, int x, int y, int height)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < height; ++i) {
+	VideoDrawPixel(color, x, y + i);
+    }
 }
 global void VideoDrawTransVLine(SDL_Color color, int x, int y,
     int height, unsigned char alpha)
@@ -491,7 +496,11 @@ global void VideoDrawVLineClip(SDL_Color color, int x, int y, int width)
 
 global void VideoDrawHLine(SDL_Color color, int x, int y, int width)
 {
-    DebugCheck(1);
+    int i;
+
+    for (i = 1; i < width; ++i) {
+	VideoDrawPixel(color, x + i, y);
+    }
 }
 global void VideoDrawHLineClip(SDL_Color color, int x, int y, int width)
 {
@@ -534,7 +543,6 @@ global void VideoDrawRectangle(SDL_Color color, int x, int y,
     for (i = 1; i < h; ++i) {
 	VideoDrawPixel(color, x, y + i);
 	VideoDrawPixel(color, x + w, y + i);
-
     }
 }
 
@@ -554,14 +562,26 @@ global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     for (i = 1; i < h; ++i) {
 	VideoDrawPixel(color, x, y + i);
 	VideoDrawPixel(color, x + w, y + i);
-
     }
 }
 
 global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    DebugCheck(1);
+    int i;
+
+    // FIXME: transparency
+    // FIXME: should be able to optimize this
+
+    for (i = 0; i <= w; ++i) {
+	VideoDrawPixel(color, x + i, y);
+	VideoDrawPixel(color, x + i, y + h);
+    }
+
+    for (i = 1; i < h; ++i) {
+	VideoDrawPixel(color, x, y + i);
+	VideoDrawPixel(color, x + w, y + i);
+    }
 }
 
 global void VideoFillRectangle(SDL_Color color, int x, int y,
