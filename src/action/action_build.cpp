@@ -86,26 +86,20 @@ static void UpdateConstructionFrame(Unit* unit)
 }
 
 /**
-**  Unit builds a building.
-**
-**  @param unit  Unit that builds a building.
+**  Move to build location
 */
-void HandleActionBuild(Unit* unit)
+static void MoveToLocation(Unit* unit)
 {
-	int x;
-	int y;
-	UnitType* type;
-	const UnitStats* stats;
-	Unit* build;
-	Unit* ontop;
-	BuildRestriction* b;
-
-	if (!unit->SubAction) { // first entry
+	// First entry
+	if (!unit->SubAction) {
 		unit->SubAction = 1;
 		NewResetPath(unit);
 	}
 
-	type = unit->Orders[0].Type;
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
+	}
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
@@ -122,7 +116,7 @@ void HandleActionBuild(Unit* unit)
 			NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
 				"You cannot reach building place");
 			if (unit->Player->AiEnabled) {
-				AiCanNotReach(unit,type);
+				AiCanNotReach(unit, unit->Orders[0].Type);
 			}
 
 			unit->Orders[0].Action = UnitActionStill;
@@ -133,28 +127,47 @@ void HandleActionBuild(Unit* unit)
 			return;
 
 		case PF_REACHED:
-			break;
+			unit->SubAction = 20;
+			return;
 
 		default:
+			// Moving...
 			return;
+	}
+}
+
+/**
+**  Check if the unit can build
+*/
+static Unit* CheckCanBuild(Unit* unit)
+{
+	int x;
+	int y;
+	UnitType* type;
+	Unit* ontop;
+
+	if (unit->Wait) {
+		unit->Wait--;
+		return NULL;
 	}
 
 	x = unit->Orders[0].X;
 	y = unit->Orders[0].Y;
+	type = unit->Orders[0].Type;
 
 	//
-	// Check if the building could be build there.
+	// Check if the building could be built there.
 	// if on NULL, really attempt to build here
 	//
 	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
 		//
 		// Some tries to build the building.
 		//
-		if (unit->SubAction++ < 10) {
+		if (unit->SubAction++ < 30) {
 			// To keep the load low, retry each 10 cycles
 			// NOTE: we can already inform the AI about this problem?
 			unit->Wait = 10;
-			return;
+			return NULL;
 		}
 
 		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
@@ -169,16 +182,15 @@ void HandleActionBuild(Unit* unit)
 			SelectedUnitChanged();
 		}
 
-		return;
+		return NULL;
 	}
 
 	//
 	// FIXME: got bug report about unit->Type==NULL in building
 	//
 	Assert(unit->Type && unit->HP);
-
 	if (!unit->Type || !unit->HP) {
-		return;
+		return NULL;
 	}
 
 	//
@@ -197,7 +209,7 @@ void HandleActionBuild(Unit* unit)
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
-		return;
+		return NULL;
 	}
 
 	//
@@ -215,8 +227,29 @@ void HandleActionBuild(Unit* unit)
 		if (unit->Selected) { // update display for new action
 			SelectedUnitChanged();
 		}
-		return;
+		return NULL;
 	}
+
+	unit->SubAction = 40;
+	return ontop;
+}
+
+/**
+**  Start building
+*/
+static void StartBuilding(Unit* unit, Unit* ontop)
+{
+	int x;
+	int y;
+	UnitType* type;
+	Unit* build;
+	BuildRestriction* b;
+	const UnitStats* stats;
+
+	x = unit->Orders[0].X;
+	y = unit->Orders[0].Y;
+	type = unit->Orders[0].Type;
+
 	PlayerSubUnitType(unit->Player, type);
 
 	build = MakeUnit(type, unit->Player);
@@ -269,18 +302,116 @@ void HandleActionBuild(Unit* unit)
 		unit->Orders[0].Goal = NULL;
 		unit->SubAction = 0;
 	} else {
-		// Make the builder repair the newly spawned building.
-		unit->Orders[0].Action = UnitActionRepair;
 		unit->Orders[0].Goal = build;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
+		// FIXME: Should have a BuildRange?
 		unit->Orders[0].Range = unit->Type->RepairRange;
-		unit->SubAction = 0;
+		unit->SubAction = 50;
 		unit->Wait = 1;
 		RefsIncrease(build);
 		// Mark the new building seen.
 		MapMarkUnitSight(build);
 	}
 	UpdateConstructionFrame(build);
+}
+
+/**
+**  Animate unit build
+**
+**  @param unit Unit, for that the build animation is played.
+*/
+static int AnimateActionBuild(Unit* unit)
+{
+	if (unit->Type->Animations) {
+		int flags;
+
+		Assert(unit->Type->Animations->Repair);
+		flags = UnitShowAnimation(unit, unit->Type->Animations->Repair);
+		if ((flags & AnimationSound)) {
+			PlayUnitSound(unit, VoiceRepairing);
+		}
+	} else if (unit->Type->NewAnimations) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Build);
+	}
+
+	return 0;
+}
+
+/**
+**  Build the building
+*/
+static void BuildBuilding(Unit* unit)
+{
+	Unit* goal;
+	int hp;
+	int animlength;
+	Animation* anim;
+
+	AnimateActionBuild(unit);
+	if ((!unit->Type->NewAnimations && unit->Reset) ||
+			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+		goal = unit->Orders[0].Goal;
+
+		// hp is the current damage taken by the unit.
+		hp = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
+			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - goal->HP;
+		//
+		// Calculate the length of the attack (repair) anim.
+		//
+		animlength = 0;
+		for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
+			animlength += anim->Sleep;
+		}
+
+		// FIXME: implement this below:
+		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
+		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
+		// Keep the same level of damage while increasing HP.
+		goal->HP = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
+			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - hp;
+		if (goal->HP > goal->Stats->HitPoints) {
+			goal->HP = goal->Stats->HitPoints;
+		}
+
+		//
+		// Building is gone or finished
+		//
+		if (!goal || goal->HP >= goal->Stats->HitPoints) {
+			if (goal) { // release reference
+				RefsDecrease(goal);
+				unit->Orders[0].Goal = NULL;
+			}
+			unit->Orders[0].Action = UnitActionStill;
+			unit->SubAction = unit->State = 0;
+			if (unit->Selected) { // update display for new action
+				SelectedUnitChanged();
+			}
+			return;
+		}
+	}
+}
+
+/**
+**  Unit builds a building.
+**
+**  @param unit  Unit that builds a building.
+*/
+void HandleActionBuild(Unit* unit)
+{
+	Unit* ontop;
+
+	if (unit->SubAction <= 10) {
+		MoveToLocation(unit);
+	}
+	if (20 <= unit->SubAction && unit->SubAction <= 30) {
+		ontop = CheckCanBuild(unit);
+	}
+	if (unit->SubAction == 40) {
+		StartBuilding(unit, ontop);
+	}
+	if (unit->SubAction == 50) {
+		BuildBuilding(unit);
+	}
 }
 
 /**
