@@ -733,7 +733,7 @@ global void LoadRGB(Palette* pal, const char* name)
 **	FIXME: Also icons and some units use color cycling.
 */
 // FIXME: cpu intensive to go through the whole PaletteList
-local void ColorCycle(void)
+global void ColorCycle(void)
 {
     int i;
     SDL_Palette* pal;
