@@ -1345,11 +1345,21 @@ global void CommandDiplomacy(int player,int state,int opponent)
 */
 global void CommandSharedVision(int player,int state,int opponent)
 {
+    int i;
+    Unit* unit;
+    
     if( state==0 ) {
 	Players[player].SharedVision&=~(1<<opponent);
     } else {
 	Players[player].SharedVision|=(1<<opponent);
     }
+    // MUST update seen buildings when vision is shared or unshared
+    for( i=0; i<NumUnits; ++i) {
+	unit = Units[i];
+	UnitMarkSeen(unit);
+    }
+
+    
 }
 
 //@}
