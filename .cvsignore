@@ -14,8 +14,6 @@ freeceaft.vpj
 stderr.txt
 stdout.txt
 cscope.out
-save
-logs
 Debug
 Release
 include
@@ -24,9 +22,11 @@ stratagus.opt
 stratagus.plg
 stratagus.ncb
 *.log
-preferences*
 screen*
 *.pud.gz
 autom4te.cache
 config.status
 configure
+aclocal.m4
+config.h
+config.h.in
