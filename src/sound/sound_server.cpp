@@ -112,7 +112,6 @@ global int CallbackMusic;		/// flag true callback ccl if stops
 
 #ifdef DEBUG
 global unsigned AllocatedSoundMemory;	/// memory used by sound
-global unsigned CompressedSoundMemory;	/// compressed memory used by sound
 #endif
 
 global int GlobalVolume = 128;		/// global sound volume

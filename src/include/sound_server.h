@@ -248,8 +248,6 @@ extern int SoundThreadRunning;
 #ifdef DEBUG
     /// allocated memory for sound samples
 extern unsigned AllocatedSoundMemory;
-    /// allocated memory for compressed sound samples
-extern unsigned CompressedSoundMemory;
 #endif
 
 extern Sample* MusicSample;		/// Music samples

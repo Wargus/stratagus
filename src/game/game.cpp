@@ -444,10 +444,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	AllocatedSoundMemory _C_
 	AllocatedSoundMemory / 1024 _C_
 	AllocatedSoundMemory / 1024 / 1024);
-    DebugLevel0("Compressed sounds uses %d bytes (%d KB, %d MB)\n" _C_
-	CompressedSoundMemory _C_
-	CompressedSoundMemory / 1024 _C_
-	CompressedSoundMemory / 1024 / 1024);
 #endif
 
     //
