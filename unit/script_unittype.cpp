@@ -759,6 +759,7 @@ local SCM CclDefineAnimations(SCM list)
 
     // I generate a scheme variable containing the pointer!
     gh_define(str,gh_int2scm((int)anims));
+    free(str);
 
     return SCM_UNSPECIFIED;
 }
