@@ -3097,12 +3097,11 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 
 	menu = FindMenu("menu-select-scenario");
 
-	curopt = menu->Items[6].D.Pulldown.curopt;
-	//MAPTODO remove map type pulldown code
-	if (curopt == 0) {
-		suf[0] = ".smp";
-		suf[1] = NULL;
-	}
+	//MAPTODO simplify
+	curopt = 0;
+	suf[0] = ".smp";
+	suf[1] = NULL;
+	
 	
 	np = strrchr(pathbuf, '/');
 	if (np) {

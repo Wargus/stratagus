@@ -117,7 +117,6 @@ static void LoadStratagusMap(const char* mapname,
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	// FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
 	if (!TheMap.Info.MapWidth || !TheMap.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
@@ -168,8 +167,9 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "-- File licensed under the GNU GPL version 2.\n\n");
 
 	gzprintf(f, "DefinePlayerTypes(");
-	for(i = 0; i < PlayerMax && map->Info.PlayerType[i]!=PlayerNobody; i++) {
-	   gzprintf(f, "\"%s\",", type[map->Info.PlayerType[i]]);
+	gzprintf(f, "\"%s\"", type[map->Info.PlayerType[0]]);
+	for(i = 1; i < PlayerMax && map->Info.PlayerType[i] != PlayerNobody; ++i) {
+		gzprintf(f, ", \"%s\"", type[map->Info.PlayerType[i]]);
 	}
 	gzprintf(f, ")\n");
 	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d)\n",
@@ -188,7 +188,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "-- File licensed under the GNU GPL version 2.\n\n");
 	
 	gzprintf(f, "-- player configuration\n");
-	for(i=0; i<PlayerMax; i++) {
+	for (i = 0; i < PlayerMax; ++i) {
 		gzprintf(f, "SetStartView(%d, %d, %d)\n", i, Players[i].StartX, Players[i].StartY);
 		gzprintf(f, "SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 				i, DefaultResourceNames[WoodCost], 
@@ -209,10 +209,15 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "-- load tilesets\n");
 	gzprintf(f, "SelectTileset(\"%s\")\n\n", TheMap.TerrainName);
 	
-	for(i = 0; i < TheMap.Info.MapHeight; ++i) {
-		for(j = 0; j < TheMap.Info.MapWidth; ++j) {
-			gzprintf(f, "SetTile(%d, %d, %d)\n",
-					TheMap.Fields[j+i*TheMap.Info.MapWidth].Tile, j, i);
+	for (i = 0; i < TheMap.Info.MapHeight; ++i) {
+		for (j = 0; j < TheMap.Info.MapWidth; ++j) {
+			int tile;
+			int n;
+			
+			tile = TheMap.Fields[j+i*TheMap.Info.MapWidth].Tile;
+			for (n=0; n < TheMap.Tileset->NumTiles && tile != TheMap.Tileset->Table[n]; ++n) {
+			}
+			gzprintf(f, "SetTile(%3d, %d, %d)\n", n, j, i);
 		}
 	}
 
