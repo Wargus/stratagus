@@ -581,7 +581,7 @@ local SCM CclDefineUnitType(SCM list)
 	    while (!gh_null_p(sublist)) {
 		value = gh_car(sublist);
 		sublist = gh_cdr(sublist);
-		for (i = 0; i < NumberBoolFlag; i++) {
+		for (i = 0; i < NumberBoolFlag; ++i) {
 		    if (gh_eq_p(value, gh_symbol2scm(BoolFlagName[i]))) {
 		        type->CanTargetFlag[i] = Scm2Condition(gh_car(sublist));
 		        sublist = gh_cdr(sublist);
@@ -710,7 +710,6 @@ local SCM CclDefineUnitType(SCM list)
 local int CclDefineUnitType(lua_State* l)
 {
     const char* value;
-//    SCM sublist;
     UnitType* type;
     UnitType* auxtype;
     ResourceInfo* res;
@@ -809,31 +808,56 @@ local int CclDefineUnitType(lua_State* l)
 		lua_pop(l, 1);
 	    }
 	} else if (!strcmp(value, "shadow")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
 
-		if (gh_eq_p(value, "file")) {
+		if (!strcmp(value, "file")) {
 		    if (redefine) {
 			free(type->ShadowFile);
 		    }
-		    type->ShadowFile = gh_scm2newstr(gh_car(sublist), NULL);
-		} else if (gh_eq_p(value, "size")) {
-		    type->ShadowWidth = gh_scm2int(gh_car(gh_car(sublist)));
-		    type->ShadowHeight = gh_scm2int(gh_car(gh_cdr(gh_car(sublist))));
-		} else if (gh_eq_p(value, "height")) {
-		} else if (gh_eq_p(value, "offset")) {
-		    type->ShadowOffsetX = gh_scm2int(gh_car(gh_car(sublist)));
-		    type->ShadowOffsetY = gh_scm2int(gh_car(gh_cdr(gh_car(sublist))));
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->ShadowFile = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "size")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    type->ShadowWidth = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 2);
+		    type->ShadowHeight = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
+		} else if (!strcmp(value, "height")) {
+		} else if (!strcmp(value, "offset")) {
+		    lua_rawgeti(l, j + 1, k + 1);
+		    if (!lua_istable(l, -1)) {
+			lua_pushstring(l, "incorrect argument");
+			lua_error(l);
+		    }
+		    lua_rawgeti(l, -1, 1);
+		    type->ShadowOffsetX = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_rawgeti(l, -1, 2);
+		    type->ShadowOffsetY = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
+		    lua_pop(l, 1);
 		} else {
-		    errl("Unsupported shadow tag", value);
+		    lua_pushfstring(l, "Unsupported shadow tag: %s", value);
+		    lua_error(l);
 		}
-		sublist = gh_cdr(sublist);
 	    }
-#endif
 	} else if (!strcmp(value, "size")) {
 	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
 		lua_pushstring(l, "incorrect argument");
@@ -854,28 +878,39 @@ local int CclDefineUnitType(lua_State* l)
 	    type->Icon.Name = strdup(LuaToString(l, j + 1));
 	    type->Icon.Icon = NULL;
 	} else if (!strcmp(value, "costs")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type->_Costs[CclGetResourceByName(value)] = gh_scm2int(gh_car(sublist));
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
 	    }
-#endif
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		int res;
+
+		lua_rawgeti(l, j + 1, k + 1);
+		res = CclGetResourceByName(l);
+		lua_pop(l, 1);
+		++k;
+		lua_rawgeti(l, j + 1, k + 1);
+		type->_Costs[res] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
 	} else if (!strcmp(value, "improve-production")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type->ImproveIncomes[CclGetResourceByName(value)] =
-			DefaultIncomes[CclGetResourceByName(value)] + gh_scm2int(gh_car(sublist));
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
 	    }
-#endif
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		int res;
+
+		lua_rawgeti(l, j + 1, k + 1);
+		res = CclGetResourceByName(l);
+		lua_pop(l, 1);
+		++k;
+		lua_rawgeti(l, j + 1, k + 1);
+		type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
 	} else if (!strcmp(value, "construction")) {
 	    // FIXME: What if constructions aren't yet loaded?
 	    type->Construction = ConstructionByIdent(LuaToString(l, j + 1));
@@ -918,18 +953,30 @@ local int CclDefineUnitType(lua_State* l)
 	    type->Selectable = 0;
 	    --j;
 	} else if (!strcmp(value, "neutral-minimap-color")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 3) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
 #ifdef USE_SDL_SURFACE
-	    type->NeutralMinimapColorRGB.r = gh_scm2int(gh_car(sublist));
-	    type->NeutralMinimapColorRGB.g = gh_scm2int(gh_car(gh_cdr(sublist)));
-	    type->NeutralMinimapColorRGB.b = gh_scm2int(gh_car(gh_cdr(gh_cdr(sublist))));
+	    lua_rawgeti(l, j + 1, 1);
+	    type->NeutralMinimapColorRGB.r = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    type->NeutralMinimapColorRGB.g = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 3);
+	    type->NeutralMinimapColorRGB.b = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
 #else
-	    type->NeutralMinimapColorRGB.D24.a = gh_scm2int(gh_car(sublist));
-	    type->NeutralMinimapColorRGB.D24.b = gh_scm2int(gh_car(gh_cdr(sublist)));
-	    type->NeutralMinimapColorRGB.D24.c = gh_scm2int(gh_car(gh_cdr(gh_cdr(sublist))));
-#endif
+	    lua_rawgeti(l, j + 1, 1);
+	    type->NeutralMinimapColorRGB.D24.a = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    type->NeutralMinimapColorRGB.D24.b = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 3);
+	    type->NeutralMinimapColorRGB.D24.c = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
 #endif
 	} else if (!strcmp(value, "box-size")) {
 	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
@@ -979,16 +1026,20 @@ local int CclDefineUnitType(lua_State* l)
 	} else if (!strcmp(value, "supply")) {
 	    type->Supply = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "corpse")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
 	    if (redefine) {
 		free(type->CorpseName);
 	    }
-	    type->CorpseName = gh_scm2newstr(gh_car(sublist), NULL);
+	    lua_rawgeti(l, j + 1, 1);
+	    type->CorpseName = strdup(LuaToString(l, -1));
+	    lua_pop(l, 1);
 	    type->CorpseType = NULL;
-	    type->CorpseScript = gh_scm2int(gh_cadr(sublist));
-#endif
+	    lua_rawgeti(l, j + 1, 2);
+	    type->CorpseScript = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
 	} else if (!strcmp(value, "explode-when-killed")) {
 	    type->ExplodeWhenKilled = 1;
 	    type->Explosion.Name = strdup(LuaToString(l, j + 1));
@@ -1033,16 +1084,22 @@ local int CclDefineUnitType(lua_State* l)
 	} else if (!strcmp(value, "repair-hp")) {
 	    type->RepairHP = LuaToNumber(l, j + 1);
 	} else if (!strcmp(value, "repair-costs")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		type->RepairCosts[CclGetResourceByName(value)] = gh_scm2int(gh_car(sublist));
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
 	    }
-#endif
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		int res;
+
+		lua_rawgeti(l, j + 1, k + 1);
+		res = CclGetResourceByName(l);
+		lua_pop(l, 1);
+		++k;
+		lua_rawgeti(l, j + 1, k + 1);
+		type->RepairCosts[res] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
 	} else if (!strcmp(value, "can-target-land")) {
 	    type->CanTarget |= CanTargetLand;
 	    --j;
@@ -1098,44 +1155,62 @@ local int CclDefineUnitType(lua_State* l)
 	} else if (!strcmp(value, "can-gather-resource")) {
 	    res = (ResourceInfo*)malloc(sizeof(ResourceInfo));
 	    memset(res, 0, sizeof(ResourceInfo));
-#if 0
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
 		if (!strcmp(value, "resource-id")) {
-		    res->ResourceId = CclGetResourceByName(gh_car(sublist));
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->ResourceId = CclGetResourceByName(l);
+		    lua_pop(l, 1);
 		    type->ResInfo[res->ResourceId] = res;
-		    sublist = gh_cdr(sublist);
 		} else if (!strcmp(value, "resource-step")) {
-		    res->ResourceStep = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->ResourceStep = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "final-resource")) {
-		    res->FinalResource = CclGetResourceByName(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->FinalResource = CclGetResourceByName(l);
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-at-resource")) {
-		    res->WaitAtResource = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->WaitAtResource = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "wait-at-depot")) {
-		    res->WaitAtDepot = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->WaitAtDepot = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "resource-capacity")) {
-		    res->ResourceCapacity = gh_scm2int(gh_car(sublist));
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->ResourceCapacity = LuaToNumber(l, -1);
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "terrain-harvester")) {
 		    res->TerrainHarvester = 1;
+		    --k;
 		} else if (!strcmp(value, "lose-resources")) {
 		    res->LoseResources = 1;
+		    --k;
 		} else if (!strcmp(value, "harvest-from-outside")) {
 		    res->HarvestFromOutside = 1;
+		    --k;
 		} else if (!strcmp(value, "file-when-empty")) {
-		    res->FileWhenEmpty = gh_scm2newstr(gh_car(sublist),0);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->FileWhenEmpty = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "file-when-loaded")) {
-		    res->FileWhenLoaded = gh_scm2newstr(gh_car(sublist),0);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    res->FileWhenLoaded = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else {
 		   printf("\n%s\n",type->Name);
-		   errl("Unsupported tag", value);
+		   lua_pushfstring(l, "Unsupported tag: %s", value);
+		   lua_error(l);
 		   DebugCheck(1);
 		}
 	    }
@@ -1144,7 +1219,6 @@ local int CclDefineUnitType(lua_State* l)
 		res->FinalResource = res->ResourceId;
 	    }
 	    DebugCheck(!res->ResourceId);
-#endif
 	} else if (!strcmp(value, "gives-resource")) {
 	    lua_pushvalue(l, j + 1);
 	    type->GivesResource = CclGetResourceByName(l);
@@ -1155,19 +1229,23 @@ local int CclDefineUnitType(lua_State* l)
 	    type->CanHarvest = 1;
 	    --j;
 	} else if (!strcmp(value, "can-store")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		type->CanStore[CclGetResourceByName(gh_car(sublist))] = 1;
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
 	    }
-#endif
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		type->CanStore[CclGetResourceByName(l)] = 1;
+	    }
 	} else if (!strcmp(value, "vanishes")) {
 	    type->Vanishes = 1;
 	    --j;
 	} else if (!strcmp(value, "can-cast-spell")) {
-#if 0
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
 	    //
 	    //    Warning: can-cast-spell should only be used AFTER all spells
 	    //    have been defined. FIXME: MaxSpellType=500 or something?
@@ -1176,36 +1254,44 @@ local int CclDefineUnitType(lua_State* l)
 		type->CanCastSpell = malloc(SpellTypeCount);
 		memset(type->CanCastSpell, 0, SpellTypeCount);
 	    }
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
 	    type->Magic = 0;
-	    while (!gh_null_p(sublist)) {
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
 		int id;
-		id = CclGetSpellByIdent(gh_car(sublist));
+
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		id = CclGetSpellByIdent(l);
+		lua_pop(l, 1);
 		DebugLevel3Fn("%d \n" _C_ id);
 		if (id == -1) {
-		    errl("Unknown spell type", gh_car(sublist));
+		    lua_pushfstring(l, "Unknown spell type: %s", value);
+		    lua_error(l);
 		}
 		type->CanCastSpell[id] = 1;
-		sublist = gh_cdr(sublist);
 		type->Magic = 1;
 	    }
-#endif
 	} else if (!strcmp(value, "can-target-flag")) {
-#if 0
 	    //
 	    //    Warning: can-target-flag should only be used AFTER all bool flags
 	    //    have been defined.
 	    //
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
-		for (i = 0; i < NumberBoolFlag; i++) {
-		    if (!strcmp(value, BoolFlagName[i]))) {
-		        type->CanTargetFlag[i] = Scm2Condition(gh_car(sublist));
-		        sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+		for (i = 0; i < NumberBoolFlag; ++i) {
+		    if (!strcmp(value, BoolFlagName[i])) {
+			lua_rawgeti(l, j + 1, k + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+		        type->CanTargetFlag[i] = Ccl2Condition(l, value);
 		        break;
 		    }
 		}
@@ -1213,9 +1299,9 @@ local int CclDefineUnitType(lua_State* l)
 		    continue;
 		}
 		printf("\n%s\n", type->Name);
-		errl("Unsupported flag tag for can-target-flag", value);
+		lua_pushfstring(l, "Unsupported flag tag for can-target-flag: %s", value);
+		lua_error(l);
 	    }
-#endif
 	} else if (!strcmp(value, "selectable-by-rectangle")) {
 	    type->SelectableByRectangle = 1;
 	    --j;
@@ -1223,90 +1309,94 @@ local int CclDefineUnitType(lua_State* l)
 	    type->Teleporter = 1;
 	    --j;
 	} else if (!strcmp(value, "sounds")) {
-#if 0
-	    sublist = gh_car(list);
-	    list = gh_cdr(list);
-	    while (!gh_null_p(sublist)) {
-
-		value = gh_car(sublist);
-		sublist = gh_cdr(sublist);
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
 
 		if (!strcmp(value, "selected")) {
 		    if (redefine) {
 			free(type->Sound.Selected.Name);
 		    }
-		    type->Sound.Selected.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Selected.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "acknowledge")) {
 		    if (redefine) {
 			free(type->Sound.Acknowledgement.Name);
 		    }
-		    type->Sound.Acknowledgement.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Acknowledgement.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "ready")) {
 		    if (redefine) {
 			free(type->Sound.Ready.Name);
 		    }
-		    type->Sound.Ready.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Ready.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "repair")) {
 		    if (redefine) {
 			free(type->Sound.Repair.Name);
 		    }
-		    type->Sound.Repair.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Repair.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "harvest")) {
 		    int res;
-		    char* name;
+		    const char* name;
 
-		    name = gh_scm2newstr(gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    name = LuaToString(l, -1 );
+		    lua_pop(l, 1);
+		    ++k;
 		    for (res = 0; res < MaxCosts; ++res) {
 			if (!strcmp(name, DefaultResourceNames[res])) {
 			    break;
 			}
 		    }
 		    if (res == MaxCosts) {
-			errl("Resource not found", value);
+			lua_pushfstring(l, "Resource not found: %s", value);
+			lua_error(l);
 		    }
-		    free(name);
 		    if (redefine) {
 			free(type->Sound.Harvest[res].Name);
 		    }
-		    type->Sound.Harvest[res].Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Harvest[res].Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "help")) {
 		    if (redefine) {
 			free(type->Sound.Help.Name);
 		    }
-		    type->Sound.Help.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Help.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "dead")) {
 		    if (redefine) {
 			free(type->Sound.Dead.Name);
 		    }
-		    type->Sound.Dead.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Sound.Dead.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else if (!strcmp(value, "attack")) {
 		    if (redefine) {
 			free(type->Weapon.Attack.Name);
 		    }
-		    type->Weapon.Attack.Name = gh_scm2newstr(
-			gh_car(sublist), NULL);
-		    sublist = gh_cdr(sublist);
+		    lua_rawgeti(l, j + 1, k + 1);
+		    type->Weapon.Attack.Name = strdup(LuaToString(l, -1));
+		    lua_pop(l, 1);
 		} else {
 		    lua_pushfstring(l, "Unsupported sound tag: %s", value);
 		    lua_error(l);
 		}
 	    }
-#endif
 	} else {
 	    for (i = 0; i < NumberBoolFlag; ++i) { // User defined bool flags
 		if (!strcmp(value, BoolFlagName[i])) {
