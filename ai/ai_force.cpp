@@ -156,7 +156,7 @@ global void AiAssignToForce(Unit* unit)
 	if( AiCheckBelongsToForce(force,unit->Type) ) {
 	    AiUnit* aiunit;
 
-	    aiunit=malloc(sizeof(aiunit));
+	    aiunit=malloc(sizeof(*aiunit));
 	    aiunit->Next=AiPlayer->Force[force].Units;
 	    aiunit->Unit=unit;
 	    RefsDebugCheck( unit->Destroyed || !unit->Refs );
