@@ -1200,7 +1200,7 @@ Use it at your own risk.\n\n");
     //
     InitVideo();			// setup video display
 #ifdef WITH_SOUND
-    if( InitSound() ) {			// setup sound card
+    if( !SoundOff && InitSound() ) {			// setup sound card
 	SoundOff=1;
 	SoundFildes=-1;
     }

@@ -59,6 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 global int SoundOff;			/// True quiet, sound turned off
+global int MusicOff;			/// Music turned off
 
 /**
 **	Various sounds used in game.

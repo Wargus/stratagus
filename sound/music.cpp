@@ -450,6 +450,10 @@ global void PlayMusic(const char* name)
     }
 #endif
 
+    if (MusicOff) {
+	return;
+    }
+
     name = LibraryFileName(name, buffer);
 
 #ifdef USE_OGG
