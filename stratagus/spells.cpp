@@ -801,8 +801,9 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 		++unit->Kills;
 		LetUnitDie(target);
 	    }
+	    // FIXME: If another target is around do more damage on it.
 	    PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
-	    MakeMissile(MissileTypeHealing,
+	    MakeMissile(MissileTypeExorcism,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
 		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
 	} else {
