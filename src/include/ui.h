@@ -177,6 +177,16 @@ typedef struct _ui_ {
     int		OriginalResources;	/// original resource mode
 
     struct {
+#if 0
+	int	IconX;			/// Icon X position
+	int	IconY;			/// Icon Y position
+	IconConfig	Icon;		/// Icon for resource
+	int	TextX;			/// Text X position
+	int	TextX;			/// Text Y position
+	char*	Text;			/// Text for resource
+	int	AmountX;		/// Amount X position
+	int	AmountY;		/// Amount Y position
+#endif
 	GraphicConfig Icon;		/// icon image
 	int	IconRow;		/// icon image row (frame)
 	int	IconX;			/// icon X position
