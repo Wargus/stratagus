@@ -1481,6 +1481,9 @@ global void CleanMissileTypes(void)
 {
     MissileType* mtype;
 
+    if (!MissileTypes) {
+	return;
+    }
     for (mtype = MissileTypes; mtype->OType; ++mtype) {
 	hash_del(MissileTypeHash, mtype->Ident);
 
