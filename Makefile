@@ -141,8 +141,7 @@ CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/anim.ccl data/ccl/upgrade.ccl data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
-	  contrib/ore,stone,coal.png \
-	  contrib/food.png contrib/score.png contrib/ui/*/*.png
+	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
 
 MISC    = Makefile Common.mk Rules.make.orig doxygen-clone.cfg \
 	  doxygen-0.4.diff setup \
@@ -258,6 +257,7 @@ buildclean:
 	data/interface data/campaigns
 
 release:
+	make ci
 	make distclean
 	make depend
 	make bin-dist
