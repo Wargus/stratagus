@@ -410,7 +410,7 @@ global void CleanUserInterface(void)
 **
 **	@return		viewport number (index into TheUI.VP) or -1
 **			if this pixel is not inside any of the viewports.
-*/	
+*/
 global int GetViewport (int x, int y)
 {
     int i;
@@ -433,7 +433,7 @@ global int GetViewport (int x, int y)
 **	@return		viewport number (index into TheUI.VP) or -1
 **			if this map tile is not displayed in any of
 **			the viewports.
-*/	
+*/
 global int MapTileGetViewport (int tx, int ty)
 {
     int i;
@@ -457,9 +457,15 @@ local void SetViewportModeSingle (void)
     TheUI.NumViewports = 1;
 
     TheUI.VP[0].X = TheUI.MapArea.X;
-    TheUI.VP[0].EndX = TheUI.MapArea.EndX;
+    TheUI.VP[0].EndX = TheUI.MapArea.X + TheMap.Width * TileSizeX;
+    if( TheUI.VP[0].EndX > TheUI.MapArea.EndX ) {       // Map fits
+	TheUI.VP[0].EndX = TheUI.MapArea.EndX;
+    }
     TheUI.VP[0].Y = TheUI.MapArea.Y;
-    TheUI.VP[0].EndY = TheUI.MapArea.EndY;
+    TheUI.VP[0].EndY = TheUI.MapArea.Y + TheMap.Height * TileSizeY;
+    if( TheUI.VP[0].EndY > TheUI.MapArea.EndY ) {	// Map fits
+	TheUI.VP[0].EndY = TheUI.MapArea.EndY;
+    }
 
     TheUI.VP[0].MapWidth = (TheUI.VP[0].EndX - TheUI.VP[0].X + TileSizeX) /
 		TileSizeX;
@@ -484,11 +490,13 @@ local void SetViewportModeSplitHoriz (void)
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y+(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
     new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = new_vps[0].EndY + 1;
     new_vps[1].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     if (TheUI.NumViewports < 2) {
 	for (i=0; i < 2; i++) {
@@ -539,19 +547,22 @@ local void SetViewportModeSplitHoriz3 (void)
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
     new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[1].X = TheUI.MapArea.X;
     new_vps[1].EndX = TheUI.MapArea.X +(TheUI.MapArea.EndX-TheUI.MapArea.X+1)/2;
-    // I don't know why I need to add 1 but if I don't do it the routines in 
+    // I don't know why I need to add 1 but if I don't do it the routines in
     // map_draw.c complain about unaligned memory.
     new_vps[1].EndX -= (new_vps[1].EndX - new_vps[1].X) % TileSizeX + 1;
     new_vps[1].Y = new_vps[0].EndY + 1;
     new_vps[1].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[2].X = new_vps[1].EndX + 1;
     new_vps[2].EndX = TheUI.MapArea.EndX;
     new_vps[2].Y = new_vps[0].EndY + 1;
     new_vps[2].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     if (TheUI.NumViewports < 3) {
 	for (i=0; i < 3; i++) {
@@ -602,11 +613,13 @@ local void SetViewportModeSplitVert (void)
     new_vps[0].EndX -= (new_vps[0].EndX - new_vps[0].X) % TileSizeX + 1;
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[1].X = new_vps[0].EndX + 1;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
     new_vps[1].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     /* If the number of viewports increases we need to compute what to display
      * in the newly created ones.  We need to do this before we store new
@@ -668,21 +681,25 @@ local void SetViewportModeQuad (void)
     new_vps[0].Y = TheUI.MapArea.Y;
     new_vps[0].EndY = TheUI.MapArea.Y +(TheUI.MapArea.EndY-TheUI.MapArea.Y+1)/2;
     new_vps[0].EndY -= (new_vps[0].EndY - new_vps[0].Y) % TileSizeY + 1;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[1].X = new_vps[0].EndX + 1;
     new_vps[1].EndX = TheUI.MapArea.EndX;
     new_vps[1].Y = TheUI.MapArea.Y;
     new_vps[1].EndY = new_vps[0].EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[2].X = TheUI.MapArea.X;
     new_vps[2].EndX = new_vps[0].EndX;
     new_vps[2].Y = new_vps[0].EndY + 1;
     new_vps[2].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     new_vps[3].X = new_vps[1].X;
     new_vps[3].EndX = TheUI.MapArea.EndX;
     new_vps[3].Y = new_vps[2].Y;
     new_vps[3].EndY = TheUI.MapArea.EndY;
+    // FIXME: Use SetViewportModeSingle map size check
 
     if (TheUI.NumViewports < 4) {
 	for (i=0; i < 4; i++) {
