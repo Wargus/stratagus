@@ -1492,14 +1492,23 @@ global void UIHandleButtonDown(unsigned button)
 		    }
 		}
 		else if( NumSelected==1 && Selected[0]->Type->Building &&
-		         Selected[0]->Orders[0].Action==UnitActionTrain ) {
-		    DebugLevel0Fn("Cancel slot %d %s\n" _C_
-			ButtonUnderCursor-4 _C_
-			Selected[0]->Data.Train.What[ButtonUnderCursor-4]
-			    ->Ident);
-		    SendCommandCancelTraining(Selected[0],
-			ButtonUnderCursor-4,
-			Selected[0]->Data.Train.What[ButtonUnderCursor-4]);
+		         Selected[0]->Orders[0].Action==UnitActionTrain) {
+		    int slotid = ButtonUnderCursor-4;
+		    if ( Selected[0]->Data.Train.Count == 1 ) {
+			// FIXME: ignore clicks that did not hit
+			// FIXME: with only one unit being built, this
+			// unit is displayed between two slots.
+			slotid = 0;
+		    }
+		    if ( slotid < Selected[0]->Data.Train.Count ) {
+		    	DebugLevel0Fn("Cancel slot %d %s\n" _C_
+			    slotid _C_
+			    Selected[0]->Data.Train.What[slotid]
+			        ->Ident);
+		        SendCommandCancelTraining(Selected[0],
+			    slotid,
+			    Selected[0]->Data.Train.What[slotid]);
+		    }
 		}
 	    } else if( ButtonUnderCursor>9 ) {
 		DoButtonButtonClicked(ButtonUnderCursor-10);
