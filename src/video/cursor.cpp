@@ -942,6 +942,7 @@ global void InitCursor(void)
 	    break;
 	case 32:
 	    SaveCursorBackground=SaveCursorBackground32;
+	    LoadCursorBackground=LoadCursorBackground32;
             memsize=sizeof(VMemType32);
 	    SaveCursorRectangle=SaveCursorRectangle32;
 	    LoadCursorRectangle=LoadCursorRectangle32;
