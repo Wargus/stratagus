@@ -2729,12 +2729,6 @@ local void GetInfoFromSelectPath(void)
     if (strcasestr(ScenSelectFileName, ".pud")) {
 	MenuMapInfo = GetPudInfo(ScenSelectPath);
 	strcpy(MenuMapFullPath, ScenSelectPath);
-    } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	MenuMapInfo = GetScmInfo(ScenSelectPath);
-	strcpy(MenuMapFullPath, ScenSelectPath);
-    } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	MenuMapInfo = GetChkInfo(ScenSelectPath);
-	strcpy(MenuMapFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -3469,36 +3463,6 @@ usezzf:
 			return 1;
 		    } else {
 			FreeMapInfo(info);
-		    }
-		}
-	    } else {
-		if (strcasestr(np, ".scm")) {
-		    info = GetScmInfo(pathbuf);
-		    if (info) {
-			DebugLevel3Fn("GetScmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-			sz = szl[menu->Items[8].d.pulldown.curopt];
-			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-			    fl->type = 1;
-			    fl->name = strdup(np);
-			    fl->xdata = info;
-			    return 1;
-			} else {
-			    FreeMapInfo(info);
-			}
-		    }
-		} else {
-		    info = GetChkInfo(pathbuf);
-		    if (info) {
-			DebugLevel3Fn("GetChkInfo(%s) : %p\n" _C_ pathbuf _C_ info);
-			sz = szl[menu->Items[8].d.pulldown.curopt];
-			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-			    fl->type = 1;
-			    fl->name = strdup(np);
-			    fl->xdata = info;
-			    return 1;
-			} else {
-			    FreeMapInfo(info);
-			}
 		    }
 		}
 	    }
@@ -5061,10 +5025,6 @@ global int NetClientSelectScenario(void)
 
     if (strcasestr(ScenSelectFileName, ".pud")) {
 	MenuMapInfo = GetPudInfo(MenuMapFullPath);
-    } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	MenuMapInfo = GetScmInfo(MenuMapFullPath);
-    } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	MenuMapInfo = GetChkInfo(MenuMapFullPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -5483,22 +5443,6 @@ usezzf:
 #endif
 	    if (strcasestr(np, ".pud")) {
 		info = GetPudInfo(pathbuf);
-		if (info) {
-		    fl->type = 1;
-		    fl->name = strdup(np);
-		    fl->xdata = info;
-		    return 1;
-		}
-	    } else if (strcasestr(np, ".scm")) {
-		info = GetScmInfo(pathbuf);
-		if (info) {
-		    fl->type = 1;
-		    fl->name = strdup(np);
-		    fl->xdata = info;
-		    return 1;
-		}
-	    } else {
-		info = GetChkInfo(pathbuf);
 		if (info) {
 		    fl->type = 1;
 		    fl->name = strdup(np);
