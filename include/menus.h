@@ -288,6 +288,11 @@ extern void NetConnectForceDisplayUpdate(void);
     /// and force Update when changes have occured.
 extern void NetClientCheckLocalState(void);
 
+    /// Sound options menu
+extern void SoundOptions(void);
+    /// Speed options menu
+extern void SpeedSettings(void);
+
 //@}
 
 #endif	// !__MENUS_H__

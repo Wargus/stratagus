@@ -81,11 +81,12 @@ local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void CDRomDisabled(void);
-local void SoundOptions(void);
 local void SetCdMode(Menuitem *mi);
 local void Preferences(void);
-local void SpeedSettings(void);
 local void GameOptions(void);
+
+global void SoundOptions(void);
+global void SpeedSettings(void);
 
 local void EndScenarioRestart(void);
 local void EndScenarioSurrender(void);
@@ -1655,7 +1656,7 @@ local void GameMenuLoad(void)
     LoadAll();	// FIXME: Sample code
 }
 
-local void SoundOptions(void)
+global void SoundOptions(void)
 {
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
     SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
@@ -1696,7 +1697,7 @@ local void SetCdMode(Menuitem *mi)
 #endif
 }
 
-local void SpeedSettings(void)
+global void SpeedSettings(void)
 {
     int i = 2;
     SpeedSettingsMenuItems[i].d.hslider.percent = VideoSyncSpeed - 50;
