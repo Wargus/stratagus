@@ -278,7 +278,7 @@ local int PlayCDRom(const char* name)
 	return 1;
     }
 
-    StopMusic();			// FIXME: JOHNS: why stop music here?
+//    StopMusic();			// FIXME: JOHNS: why stop music here?
 
     // FIXME: no cdrom, must stop it now!
 
@@ -381,10 +381,16 @@ local int PlayCDRom(const char* name)
 {
     int i;
     Sample *sample;
+    struct cdrom_volctrl cdvolume;
 
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
 	    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
+	    ioctl(CDDrive, CDROMRESET);
+
+	    ioctl(CDDrive, CDROM_DRIVE_STATUS);
+	    ioctl(CDDrive, CDROM_DISC_STATUS);
+
 	    ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
 
 	    for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
@@ -393,6 +399,9 @@ local int PlayCDRom(const char* name)
 		ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
 	    }
 	    NumCDTracks = i + 1;
+	    
+	    ioctl(CDDrive, CDROMVOLREAD, &cdvolume);
+	    
 
 	    if (NumCDTracks == 0) {
 		CDMode = ":off";
@@ -402,7 +411,7 @@ local int PlayCDRom(const char* name)
 	}
     }
 
-    StopMusic();
+//    StopMusic();
 
     if (!strncmp(name, ":", 1)) {
 
@@ -423,9 +432,9 @@ local int PlayCDRom(const char* name)
 		CDTrack = MyRand() % NumCDTracks;
 	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
-
-	sample = LoadCD(NULL, CDTrack);
+	CDTrack = 3;
 	StopMusic();
+	sample = LoadCD(NULL, CDTrack);
 	MusicSample = sample;
 	PlayingMusic = 1;
 	return 1;

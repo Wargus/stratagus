@@ -45,18 +45,19 @@ global struct cdrom_read_audio data;
 
 local int CDRead(Sample *sample, void *buf, int len)
 {
-    int pos;
-    
-    pos = (int)sample->User;
+    static int pos = 0;
 
-    data.addr.lba = CDtocentry[CDTrack].cdte_addr;
+    sample->User = alloca(len);
+
+    data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos;
     data.addr_format = CDROM_LBA;
-    data.nframes = 50;
+    data.nframes = len / 2352;
     data.buf = sample->User;
     ioctl(CDDrive, CDROMREADAUDIO, &data);
 
-    memcpy(buf, data.buf + pos, data.nframes * 2352);
-    sample->User = (void*)(pos + len * 2352);
+    pos += len;
+
+    memcpy(buf, sample->User, len);
 
     return len;
 }
@@ -89,15 +90,9 @@ global Sample* LoadCD(const char* name, int flags)
     sample->Channels = 2;
     sample->SampleSize = 16;
     sample->Frequency = 44100;
-    sample->Length = 0;
+    sample->User = malloc(8192 * 10);
     sample->Type = &CDStreamSampleType;
-    sample->User = malloc(50 * 2352);
-
-    data.addr.lba = CDtocentry[flags].cdte_addr.lba;
-    data.addr_format = CDROM_LBA;
-    data.nframes = 50;
-    data.buf = sample->User;
-    ioctl(CDDrive, CDROMREADAUDIO, &data);
+    sample->Length = 0;
 
     return sample;
 }

@@ -139,7 +139,7 @@ global int SoundThreadRunning;		/// FIXME: docu
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG) || defined(USE_CDDA)
 
 /**
 **	Mix music to stereo 32 bit.
