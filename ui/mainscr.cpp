@@ -229,7 +229,11 @@ global void DrawUnitInfo(const Unit* unit)
     //
     if( type->GoldMine ) {
 	VideoDrawText(x+37,y+8+78,GameFont,"Gold Left:");
-	VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	if ( unit->Value == 0 ) {
+  	    VideoDrawText(x+108,y+8+78,GameFont,"(depleted)");
+	} else {
+  	    VideoDrawNumber(x+108,y+8+78,GameFont,unit->Value);
+	}
 	return;
     }
     // Not our building and not under construction

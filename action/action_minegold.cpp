@@ -190,7 +190,13 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	Update gold mine.
 	//
-	mine->Value-=DEFAULT_INCOMES[GoldCost];	// remove gold from store
+	if ( OptionUseDepletedMines && mine->Value < DEFAULT_INCOMES[GoldCost] ) {
+	    mine->Value = 0;
+	    unit->Rs = 5; // vladi: income reduced to 5% (mine depleted)
+	} else {
+	    mine->Value-=DEFAULT_INCOMES[GoldCost];	// remove gold from store
+  	    unit->Rs = 100; // vladi: normal income 100%
+	}
 	if( !--mine->Data.Resource.Active ) {
 	    mine->Frame=0;
 	    CheckUnitToBeDrawn(mine);
@@ -202,7 +208,7 @@ local int MineInGoldmine(Unit* unit)
 	//
 	//	End of gold: destroy gold-mine.
 	//
-	if( mine->Value<DEFAULT_INCOMES[GoldCost] ) {
+	if( !OptionUseDepletedMines && mine->Value<DEFAULT_INCOMES[GoldCost] ) {
 	    DebugLevel0Fn("Mine destroyed %d,%d\n",mine->X,mine->Y);
 	    DropOutAll(mine);
 	    LetUnitDie(mine);
@@ -355,7 +361,11 @@ local int MoveToGoldDeposit(Unit* unit)
     //
     //	Update gold.
     //
-    unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
+    if ( OptionUseDepletedMines && unit->Rs == 5 ) {
+        unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost] / 20;
+    } else {  
+        unit->Player->Resources[GoldCost]+=unit->Player->Incomes[GoldCost];
+    }
     if( unit->Player==ThisPlayer ) {
 	MustRedraw|=RedrawResources;
     }
