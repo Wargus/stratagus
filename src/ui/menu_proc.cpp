@@ -1314,6 +1314,8 @@ inkey:
 			}
 			if (mi->D.Input.action) {
 				(*mi->D.Input.action)(mi, key);
+			} else if (mi->LuaHandle) {
+				CallHandler(mi->LuaHandle, key);
 			}
 			return;
 		}
@@ -1330,8 +1332,8 @@ normkey:
 						if (!(mi->Flags & MenuButtonDisabled)) {
 							if (mi->D.Button.Handler) {
 								(*mi->D.Button.Handler)();
-							} else if (mi->D.Button.LuaHandle) {
-								CallHandler(mi->D.Button.LuaHandle);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, 0);
 							}
 						}
 						return;
@@ -1350,8 +1352,8 @@ normkey:
 					case MI_TYPE_BUTTON:
 						if (mi->D.Button.Handler) {
 							(*mi->D.Button.Handler)();
-						} else if (mi->D.Button.LuaHandle) {
-							CallHandler(mi->D.Button.LuaHandle);
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, 0);
 						}
 						return;
 					case MI_TYPE_LISTBOX:
@@ -1372,6 +1374,8 @@ normkey:
 					case MI_TYPE_CHECKBOX:
 						if (mi->D.Checkbox.Action) {
 							(*mi->D.Checkbox.Action)(mi);
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, mi->D.Checkbox.State);
 						}
 						return;
 					default:
@@ -1400,6 +1404,8 @@ normkey:
 							}
 							if (mi->D.Pulldown.action) {
 								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 							}
 							break;
 						case MI_TYPE_LISTBOX:
@@ -1427,6 +1433,8 @@ normkey:
 							}
 							if (mi[1].D.VSlider.action) {
 								(*mi[1].D.VSlider.action)(mi);
+							} else if (mi[1].LuaHandle) {
+								CallHandler(mi[1].LuaHandle, mi[1].D.VSlider.percent);
 							}
 							break;
 						case MI_TYPE_VSLIDER:
@@ -1452,6 +1460,8 @@ normkey:
 							}
 							if (mi->D.VSlider.action) {
 								(*mi->D.VSlider.action)(mi);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.VSlider.percent);
 							}
 							break;
 						default:
@@ -1480,6 +1490,8 @@ normkey:
 							}
 							if (mi->D.HSlider.action) {
 								(*mi->D.HSlider.action)(mi);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 							}
 							break;
 						default:
@@ -1677,6 +1689,8 @@ static void MenuHandleMouseMove(int x, int y)
 							mi->D.Pulldown.cursel = j;
 							if (mi->D.Pulldown.action) {
 								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.cursel);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 							}
 						}
 					}
@@ -1698,6 +1712,8 @@ static void MenuHandleMouseMove(int x, int y)
 							mi->D.Pulldown.cursel = j;
 							if (mi->D.Pulldown.action) {
 								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.cursel);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 							}
 						}
 					}
@@ -1809,6 +1825,8 @@ static void MenuHandleMouseMove(int x, int y)
 								mi->D.Listbox.curopt = mi->D.Listbox.cursel;
 								if (mi->D.Listbox.action) {
 									(*mi->D.Listbox.action)(mi, mi->D.Listbox.curopt);
+								} else if (mi->LuaHandle) {
+									CallHandler(mi->LuaHandle, mi->D.Listbox.curopt);
 								}
 							}
 						}
@@ -1890,6 +1908,8 @@ static void MenuHandleMouseMove(int x, int y)
 						if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
 							if (mi->D.VSlider.action) {
 								(*mi->D.VSlider.action)(mi);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.VSlider.percent);
 							}
 						}
 						break;
@@ -1952,6 +1972,8 @@ static void MenuHandleMouseMove(int x, int y)
 							mi->D.HSlider.percent = mi->D.HSlider.curper;
 							if (mi->D.HSlider.action) {
 								(*mi->D.HSlider.action)(mi);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 							}
 						}
 						break;
@@ -2074,6 +2096,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.VSlider.action) {
 						(*mi->D.VSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.VSlider.percent);
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
@@ -2090,6 +2114,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.HSlider.action) {
 						(*mi->D.HSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
@@ -2104,6 +2130,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						mi->D.Listbox.curopt = mi->D.Listbox.cursel;
 						if (mi->D.Listbox.action) {
 							(*mi->D.Listbox.action)(mi, mi->D.Listbox.curopt);
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, mi->D.Listbox.curopt);
 						}
 					} else {
 						mi->D.Listbox.dohandler = 1;
@@ -2124,6 +2152,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						PasteFromClipboard(mi);
 						if (mi->D.Input.action) {
 							(*mi->D.Input.action)(mi, 'x');
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, 0);
 						}
 						break;
 					default:
@@ -2148,6 +2178,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi[1].D.VSlider.action) {
 						(*mi[1].D.VSlider.action)(mi);
+					} else if (mi[1].LuaHandle) {
+						CallHandler(mi[1].LuaHandle, mi[1].D.VSlider.percent);
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
@@ -2162,6 +2194,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.VSlider.action) {
 						(*mi->D.VSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.VSlider.percent);
 					}
 					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
@@ -2172,6 +2206,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.HSlider.action) {
 						(*mi->D.HSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
@@ -2179,6 +2215,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						--mi->D.Pulldown.curopt;
 						if (mi->D.Pulldown.action) {
 							(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 						}
 					}
 					break;
@@ -2214,6 +2252,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.VSlider.action) {
 						(*mi->D.VSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.VSlider.percent);
 					}
 					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
@@ -2224,6 +2264,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					if (mi->D.HSlider.action) {
 						(*mi->D.HSlider.action)(mi);
+					} else if (mi->LuaHandle) {
+						CallHandler(mi->LuaHandle, mi->D.HSlider.percent);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
@@ -2231,6 +2273,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 						++mi->D.Pulldown.curopt;
 						if (mi->D.Pulldown.action) {
 							(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
+						} else if (mi->LuaHandle) {
+							CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 						}
 					}
 					break;
@@ -2279,6 +2323,8 @@ static void MenuHandleButtonUp(unsigned b)
 							}
 							if (mi->D.Checkbox.Action) {
 								(*mi->D.Checkbox.Action)(mi);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, mi->D.Checkbox.State);
 							}
 						}
 					}
@@ -2303,8 +2349,8 @@ static void MenuHandleButtonUp(unsigned b)
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Button.Handler) {
 								(*mi->D.Button.Handler)();
-							} else if (mi->D.Button.LuaHandle) {
-								CallHandler(mi->D.Button.LuaHandle);
+							} else if (mi->LuaHandle) {
+								CallHandler(mi->LuaHandle, 0);
 							}
 						}
 					}
@@ -2321,6 +2367,8 @@ static void MenuHandleButtonUp(unsigned b)
 								mi->D.Pulldown.curopt = mi->D.Pulldown.cursel;
 								if (mi->D.Pulldown.action) {
 									(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
+								} else if (mi->LuaHandle) {
+									CallHandler(mi->LuaHandle, mi->D.Pulldown.curopt);
 								}
 							}
 						}
