@@ -229,8 +229,7 @@ local int CclLoad(lua_State* l)
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
-		lua_pushfstring(l, "Load failed: %s", LuaToString(l, 1));
-		lua_error(l);
+		printf("Load failed: %s", LuaToString(l, 1));
 	}
 	return 0;
 }
@@ -1297,50 +1296,6 @@ global void InitCcl(void)
 }
 
 /**
-**  Load user preferences
-*/
-local void LoadPreferences1(void)
-{
-	FILE* fd;
-	char buf[PATH_MAX];
-
-#ifdef USE_WIN32
-	sprintf(buf, "%s/preferences1.lua", GameName);
-#else
-	sprintf(buf, "%s/%s/%s/preferences1.lua", getenv("HOME"),
-		STRATAGUS_HOME_PATH, GameName);
-#endif
-
-	fd = fopen(buf, "r");
-	if (fd) {
-		fclose(fd);
-		LuaLoadFile(buf);
-	}
-}
-
-/**
-**  Load user preferences
-*/
-local void LoadPreferences2(void)
-{
-	FILE* fd;
-	char buf[PATH_MAX];
-
-#ifdef USE_WIN32
-	sprintf(buf, "%s/preferences2.lua", GameName);
-#else
-	sprintf(buf, "%s/%s/%s/preferences2.lua", getenv("HOME"),
-		STRATAGUS_HOME_PATH, GameName);
-#endif
-
-	fd = fopen(buf, "r");
-	if (fd) {
-		fclose(fd);
-		LuaLoadFile(buf);
-	}
-}
-
-/**
 **  Save user preferences
 */
 global void SavePreferences(void)
@@ -1491,9 +1446,7 @@ global void LoadCcl(void)
 	}
 
 	ShowLoadProgress("Script %s\n", file);
-	LoadPreferences1();
 	LuaLoadFile(file);
-	LoadPreferences2();
 	CclInConfigFile = 0;
 	CclGarbageCollect(0);  // Cleanup memory after load
 }
