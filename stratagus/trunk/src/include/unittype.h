@@ -129,7 +129,8 @@ struct _unit_type_ {
     int		WeaponsUpgradable;	/// Weapons could be upgraded
     int		ArmorUpgradable;	/// Armor could be upgraded
     //int	MissileWeapon;		/// Missile type used when it attacks
-    int		UnitType;		/// land / fly / naval (visual effect)
+    int		UnitType;		/// land / fly / naval
+    // FIXME: original only visual effect, we do more with this!
 #define UnitTypeLand	0			/// Unit lives on land
 #define UnitTypeFly	1			/// Unit lives in air
 #define UnitTypeNaval	2			/// Unit lives on water
