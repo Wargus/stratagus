@@ -195,7 +195,7 @@ int VideoTextLength(unsigned font, const unsigned char* text)
 	isformat = 0;
 	for (width = 0, s = text; *s; ++s) {
 		if (*s == '~') {
-			if (!*++s) {  // bad formated string
+			if (!*++s) {  // bad formatted string
 				break;
 			}
 			if (*s == '<' || *s == '>') {
@@ -296,7 +296,7 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 	for (rev = NULL, widths = 0; *text; ++text) {
 		if (*text == '~') {
 			switch (*++text) {
-				case '\0':  // wrong formated string.
+				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");
 					return widths;
 				case '~':
