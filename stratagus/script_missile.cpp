@@ -10,7 +10,7 @@
 //
 /**@name ccl_missile.c	-	The missile-type ccl functions. */
 //
-//	(c) Copyright 2001 by Lutz Sammer
+//	(c) Copyright 2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -57,6 +57,8 @@ extern int NoWarningMissileType;		/// quiet ident lookup.
 **	Parse missile-type.
 **
 **	@param list	List describing missile-type.
+**
+**	@todo FIXME: CanHitOwner and FriendlyFire not supported!
 */
 local SCM CclDefineMissileType(SCM list)
 {
