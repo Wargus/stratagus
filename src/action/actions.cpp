@@ -32,9 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
 #include <time.h>
-#endif
 
 #include "freecraft.h"
 #include "video.h"
@@ -421,12 +419,12 @@ global void UnitActions(void)
 	    fprintf(logf,";;;\tMap: %s\n\n",TheMap.Description);
 	}
 
-	fprintf(logf,"%d: ",GameCycle);
-	fprintf(logf,"%d %s S%d/%d-%d P%d Refs %d\n",
+	fprintf(logf,"%lu: ",GameCycle);
+	fprintf(logf,"%d %s S%d/%d-%d P%d Refs %d: %X\n",
 	    UnitNumber(unit),unit->Type ? unit->Type->Ident : "unit-killed",
 		unit->State,unit->SubAction,
 		unit->Orders[0].Action,
-		unit->Player->Player,unit->Refs);
+		unit->Player->Player,unit->Refs,SyncRandSeed);
 		
 	// SaveUnit(unit,logf);
 	fflush(NULL);
