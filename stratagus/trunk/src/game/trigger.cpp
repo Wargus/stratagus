@@ -10,7 +10,7 @@
 //
 /**@name trigger.c	-	The trigger handling. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -490,6 +490,7 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
     const char* res;
     const char* op;
     CompareFunction Compare;
+    int i;
 
     plynr=TriggerGetPlayer(player);
     op=get_c_string(operation);
@@ -508,50 +509,24 @@ local SCM CclIfResource(SCM player,SCM operation,SCM quantity,SCM resource)
 	pn=plynr+1;
     }
 
-    if( !strcmp(res, DefaultResourceNames[GoldCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[GoldCost],q) ) {
-		return SCM_BOOL_T;
+    for( i=0; i<MaxCosts; ++i ) {
+	if( !strcmp(res, DefaultResourceNames[i]) ) {
+	    for( ; plynr<pn; ++plynr ) {
+		if( Compare(Players[plynr].Resources[i],q) ) {
+		    return SCM_BOOL_T;
+		}
 	    }
+	    return SCM_BOOL_F;
 	}
-    } else if( !strcmp(res, DefaultResourceNames[WoodCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[WoodCost],q) ) {
-		return SCM_BOOL_T;
-	    }
-	}
-    } else if( !strcmp(res, DefaultResourceNames[OilCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[OilCost],q) ) {
-		return SCM_BOOL_T;
-	    }
-	}
-    } else if( !strcmp(res, DefaultResourceNames[OreCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[OreCost],q) ) {
-		return SCM_BOOL_T;
-	    }
-	}
-    } else if( !strcmp(res, DefaultResourceNames[StoneCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[StoneCost],q) ) {
-		return SCM_BOOL_T;
-	    }
-	}
-    } else if( !strcmp(res, DefaultResourceNames[CoalCost]) ) {
-	for( ; plynr<pn; ++plynr ) {
-	    if( Compare(Players[plynr].Resources[CoalCost],q) ) {
-		return SCM_BOOL_T;
-	    }
-	}
-    } else if( !strcmp(res, "all") ) {
+    }
+    if( !strcmp(res, "all") ) {
 	int j;
 	int sum;
 
 	sum=0;
 	for( ; plynr<pn; ++plynr ) {
 	    for( j=1; j<MaxCosts; ++j ) {
-		sum += Players[plynr].Resources[j];
+		sum+=Players[plynr].Resources[j];
 	    }
 	}
 	if( Compare(sum,q) ) {
