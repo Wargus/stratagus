@@ -637,11 +637,7 @@ local int CclUnit(lua_State* l)
 	const char* s;
 	int args;
 	int j;
-	int savrefs;
 
-#ifdef DEBUG
-	savrefs = 0;
-#endif
 	args = lua_gettop(l);
 	j = 0;
 
@@ -693,7 +689,7 @@ local int CclUnit(lua_State* l)
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "refs")) {
-			savrefs = LuaToNumber(l, j + 1);
+			unit->Refs = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "host-info")) {
 			int x;
 			int y;
@@ -959,23 +955,22 @@ local int CclUnit(lua_State* l)
 		MapMarkUnitSight(unit);
 	}
 
-	// Units Dieing may have sight
-	if (unit->Removed && unit->Orders[0].Action == UnitActionDie) {
-		MapMarkUnitSight(unit);
-	}
-
 	//		Place on map
 	if (!unit->Removed && !unit->Destroyed && !unit->Type->Vanishes) {
 		unit->Removed = 1;
 		PlaceUnit(unit, unit->X, unit->Y);
 	}
 
-	if (unit->UnitSlot) {
+	if (unit->UnitSlot && (unit->Destroyed || unit->Orders->Action == UnitActionDie)) {
 		UnitCacheRemove(unit);
 		UnitCacheInsert(unit);
 	}
 
-	// FIXME: johns: works only for debug code.
+	// Units Dieing may have sight
+	if (unit->Removed && unit->Orders[0].Action == UnitActionDie) {
+		MapMarkUnitSight(unit);
+	}
+
 	if (unit->Moving) {
 		NewResetPath(unit);
 	}
@@ -984,8 +979,6 @@ local int CclUnit(lua_State* l)
 		unit->Colors = &unit->RescuedFrom->UnitColors;
 	}
 	
-	// Fix references. REFERENCES GET SAVED!.
-	unit->Refs = savrefs;
 	DebugLevel3Fn("unit #%d parsed\n" _C_ slot);
 
 	return 0;

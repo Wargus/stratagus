@@ -324,12 +324,12 @@ local int CclMissile(lua_State* l)
 			DebugCheck(!missile);
 			value = LuaToString(l, j + 1);
 			missile->SourceUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			missile->SourceUnit->Refs++;
+			RefsIncrease(missile->SourceUnit);
 		} else if (!strcmp(value, "target")) {
 			DebugCheck(!missile);
 			value = LuaToString(l, j + 1);
 			missile->TargetUnit = UnitSlots[strtol(value + 1, 0, 16)];
-			missile->TargetUnit->Refs++;
+			RefsIncrease(missile->TargetUnit);
 		} else if (!strcmp(value, "damage")) {
 			DebugCheck(!missile);
 			missile->Damage = LuaToNumber(l, j + 1);
