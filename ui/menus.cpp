@@ -4460,6 +4460,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     NetworkInitServerConnect();
     mi->menu->items[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
     mi->menu->items[SERVER_PLAYER_STATE].yofs = 32;
+    MultiGameFWSAction(NULL,mi->menu->items[27].d.pulldown.defopt);
 
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
     //	Calculate available slots from pudinfo
