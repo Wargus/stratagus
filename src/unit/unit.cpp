@@ -1976,20 +1976,21 @@ global void DropOutAll(const Unit* source)
 }
 
 /*----------------------------------------------------------------------------
-  --		Building units
+  --  Building units
   ----------------------------------------------------------------------------*/
 
 /**
-**		Can build unit here.
-**		Hall to near to goldmine.
-**		Refinery or shipyard to near to oil patch.
+**  Can build unit here.
+**  Hall to near to goldmine.
+**  Refinery or shipyard to near to oil patch.
 **
-**		@param type		unit-type to be checked.
-**		@param x		Map X position.
-**		@param y		Map Y position.
-**		@return				True if could build here, otherwise false.
+**  @param type  unit-type to be checked.
+**  @param x     Map X position.
+**  @param y     Map Y position.
+**
+**  @return      True if could build here, otherwise false.
 */
-global int CanBuildHere(const UnitType* type, int x, int y)
+global int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 {
 	Unit* table[UnitMax];
 	int n;
@@ -1999,7 +2000,7 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 	int found;
 
 	//
-	//		Can't build outside the map
+	//  Can't build outside the map
 	//
 	if (x + type->TileWidth > TheMap.Width) {
 		return 0;
@@ -2008,33 +2009,12 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 		return 0;
 	}
 
-	if (EditorRunning) {
-		if (type->GivesResource == OilCost) {
-			// FIXME: Better ideas? type->OnlyPlaceable on odd tiles? Yuck.
-			// Oil patches and platforms can only be placed on even tiles
-			if (!(x & 1 && y & 1)) {
-				return 0;
-			}
-			n = UnitCacheSelect(x, y, x + type->TileWidth, y + type->TileHeight, table);
-			for (i = 0; i < n; ++i) {
-				if (table[i]->Type->GivesResource == OilCost) {
-					return 0;
-				}
-			}
-		} else if (type->UnitType == UnitTypeFly || type->UnitType == UnitTypeNaval) {
-			// Flyers and naval units can only be placed on odd tiles
-			if (x & 1 || y & 1) {
-				return 0;
-			}
-		}
-	}
-
 	// Must be checked before oil!
 	if (type->ShoreBuilding) {
 		found = 0;
 
 		DebugLevel3("Shore building\n");
-		// Need atleast one coast tile
+		// Need at least one coast tile
 		for (h = type->TileHeight; h--;) {
 			for (w = type->TileWidth; w--;) {
 				if (TheMap.Fields[x + w + (y + h) * TheMap.Width].Flags &
@@ -2049,7 +2029,7 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 		}
 	}
 
-	//		resource deposit can't be build too near to resource
+	// resource deposit can't be build too near to resource
 	// FIXME: (mr-russ) check bound for Select
 	n = UnitCacheSelect(x - RESOURCE_DISTANCE, y - RESOURCE_DISTANCE,
 		x + type->TileWidth + RESOURCE_DISTANCE, y + type->TileHeight + RESOURCE_DISTANCE, table);
@@ -2059,24 +2039,32 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 		}
 	}
 
-	if (type->MustBuildOnTop && !EditorRunning) {
-		// Resource platform could only be build on resource patch.
-		n = UnitCacheSelect(x, y, x + 1, y + 1, table);
+	if (type->MustBuildOnTop) {
+		Unit* target;
+
+		// Resource platform could only be built on resource patch.
+		target = NULL;
+		n = UnitCacheSelect(x, y, x + type->TileWidth, y + type->TileHeight, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Type != type->MustBuildOnTop) {
+			if (table[i] == unit) {
 				continue;
 			}
+			if (table[i]->Type != type->MustBuildOnTop) {
+				return 0;
+			}
 			if (table[i]->Orders[0].Action == UnitActionBuilded) {
-				continue;
+				return 0;
 			}
 			if (table[i]->Destroyed || table[i]->Orders[0].Action == UnitActionDie) {
 				continue;
 			}
 			if (table[i]->X == x && table[i]->Y == y) {
-				return 1;
+				target = table[i];
 			}
 		}
-
+		if (target) {
+			return 1;
+		}
 		return 0;
 	}
 
@@ -2084,7 +2072,7 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 }
 
 /**
-**		Can build on this point.
+**  Can build on this point.
 */
 global int CanBuildOn(int x, int y, int mask)
 {
@@ -2095,16 +2083,17 @@ global int CanBuildOn(int x, int y, int mask)
 }
 
 /**
-**		Can build unit-type on this point.
+**  Can build unit-type on this point.
 **
-**		@param unit		Worker that want to build the building or NULL.
-**		@param type		Building unit-type.
-**		@param x		X tile map position.
-**		@param y		Y tile map position.
+**  @param unit  Worker that want to build the building or NULL.
+**  @param type  Building unit-type.
+**  @param x     X tile map position.
+**  @param y     Y tile map position.
 **  @param real  Really build, or just placement
-**		@return				True if the building could be build..
 **
-**		@todo can't handle building units !1x1, needs a rewrite.
+**  @return      True if the building could be build..
+**
+**  @todo can't handle building units !1x1, needs a rewrite.
 */
 global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int real)
 {
@@ -2116,96 +2105,19 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 
 	// Terrain Flags don't matter.
 	if (type->MustBuildOnTop) {
-		return CanBuildHere(type, x, y);
+		return CanBuildHere(unit, type, x, y);
 	}
 
 	//
-	//		Remove unit that is building!
+	//  Remove unit that is building!
 	//
-#ifdef DEBUG
 	j = 0;
-#endif
 	if (unit) {
 		// FIXME: This only works with 1x1 big units
 		DebugCheck(unit->Type->TileWidth != 1 || unit->Type->TileHeight != 1);
 		j = unit->Type->FieldFlags;
 		TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags &= ~j;
 	}
-
-#if 0
-	// FIXME: Should be moved into unittype structure, and allow more types.
-	if (type->ShoreBuilding) {
-		mask = MapFieldLandUnit |
-			MapFieldSeaUnit |
-			MapFieldBuilding |		// already occuppied
-			MapFieldWall |
-			MapFieldRocks |
-			MapFieldForest |		// wall,rock,forest not 100% clear?
-			MapFieldLandAllowed |		// can't build on this
-			//MapFieldUnpassable |		// FIXME: I think shouldn't be used
-			MapFieldNoBuilding;
-	} else if (type->Building) {
-		switch (type->UnitType) {
-			case UnitTypeLand:
-				mask = MapFieldLandUnit |
-					MapFieldBuilding |		// already occuppied
-					MapFieldWall |
-					MapFieldRocks |
-					MapFieldForest |		// wall,rock,forest not 100% clear?
-					MapFieldCoastAllowed |
-					MapFieldWaterAllowed |		// can't build on this
-					MapFieldUnpassable |		// FIXME: I think shouldn't be used
-					MapFieldNoBuilding;
-				break;
-			case UnitTypeNaval:
-				mask = MapFieldSeaUnit |
-					MapFieldBuilding |		// already occuppied
-					MapFieldCoastAllowed |
-					MapFieldLandAllowed |		// can't build on this
-					MapFieldUnpassable |		// FIXME: I think shouldn't be used
-					MapFieldNoBuilding;
-				break;
-			case UnitTypeFly:
-				mask = MapFieldAirUnit;		// already occuppied
-				break;
-			default:
-				DebugLevel1Fn("Were moves this unit?\n");
-				if (unit) {
-					TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
-				}
-				return 0;
-		}
-	} else switch (type->UnitType) {
-		case UnitTypeLand:
-			mask = MapFieldLandUnit |
-				MapFieldBuilding |		// already occuppied
-				MapFieldWall |
-				MapFieldRocks |
-				MapFieldForest |		// wall,rock,forest not 100% clear?
-				MapFieldCoastAllowed |
-				MapFieldWaterAllowed |		// can't build on this
-				MapFieldUnpassable;		// FIXME: I think shouldn't be used
-			break;
-		case UnitTypeNaval:
-			mask = MapFieldSeaUnit |
-				MapFieldBuilding |		// already occuppied
-				MapFieldCoastAllowed |
-				MapFieldLandAllowed |		// can't build on this
-				MapFieldUnpassable;		// FIXME: I think shouldn't be used
-			break;
-		case UnitTypeFly:
-			mask = MapFieldAirUnit;		// already occuppied
-			break;
-		default:
-			DebugLevel1Fn("Were moves this unit?\n");
-			if (unit) {
-				TheMap.Fields[unit->X + unit->Y * TheMap.Width].Flags |= j;
-			}
-			return 0;
-	}
-#else
-
-#endif
 
 	player = NULL;
 
@@ -2238,7 +2150,7 @@ global int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y
 	//
 	//		We can build here: check distance to gold mine/oil patch!
 	//
-	return CanBuildHere(type, x, y);
+	return CanBuildHere(unit, type, x, y);
 }
 
 /*----------------------------------------------------------------------------
