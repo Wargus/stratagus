@@ -105,6 +105,51 @@ local int MenuButtonCurSel = -1;
 ----------------------------------------------------------------------------*/
 
 /**
+**	FIXME: docu
+*/
+global char *MenuButtonStyle(int style)
+{
+    switch (style) {
+	case MBUTTON_MAIN:
+	    return "main";
+	case MBUTTON_NETWORK:
+	    return "network";
+	case MBUTTON_GM_HALF:
+	    return "gm-half";
+	case MBUTTON_132:
+	    return "132";
+	case MBUTTON_GM_FULL:
+	    return "gm-full";
+	case MBUTTON_GEM_ROUND:
+	    return "gem-round";
+	case MBUTTON_GEM_SQUARE:
+	    return "gem-square";
+	case MBUTTON_UP_ARROW:
+	    return "up-arrow";
+	case MBUTTON_DOWN_ARROW:
+	    return "down-arrow";
+	case MBUTTON_LEFT_ARROW:
+	    return "left-arrow";
+	case MBUTTON_RIGHT_ARROW:
+	    return "right-arrow";
+	case MBUTTON_S_KNOB:
+	    return "s-knob";
+	case MBUTTON_S_VCONT:
+	    return "s-vcont";
+	case MBUTTON_S_HCONT:
+	    return "s-hcont";
+	case MBUTTON_PULLDOWN:
+	    return "pulldown";
+	case MBUTTON_VTHIN:
+	    return "vthin";
+	case MBUTTON_FOLDER:
+	    return "folder";
+    }
+    fprintf(stderr,"MenuButtonStyle not found: %d\n", style);
+    return "";
+}
+
+/**
 **	Find a menu by ident.
 **
 **	@param menu_id	Unique identifier for the menu.
@@ -2343,9 +2388,6 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
-		if (CurrentMenu->Panel && !strcmp(CurrentMenu->Panel, ScPanel)) {
-		    MustRedraw = RedrawEverything;
-		}
 		if (MustRedraw == RedrawEverything) {
 		    InterfaceState = IfaceStateNormal;
 		    UpdateDisplay();

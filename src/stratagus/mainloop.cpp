@@ -254,23 +254,40 @@ global void DebugTestDisplay(void)
 /**
 **	Draw menu button area.
 **
-**	With debug it shows the used frame time and arrival of network packets.
-**
-**	@todo	Must be more configurable. Adding diplomacy menu here?
+**	With DRAW_DEBUG it shows the used frame time and arrival of network packets.
 */
 local void DrawMenuButtonArea(void)
 {
-    VideoDrawSub(TheUI.MenuButton.Graphic,0,0
-	    ,TheUI.MenuButton.Graphic->Width
-	    ,TheUI.MenuButton.Graphic->Height
-	    ,TheUI.MenuButtonX,TheUI.MenuButtonY);
-
-    DrawMenuButton(MBUTTON_MAIN,
-	    (ButtonUnderCursor == 0 ? MenuButtonActive : 0)|
-	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
-	    128, 19,
-	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-	    GameFont,"Menu (~<F10~>)",NULL,NULL);
+    if( NetworkFildes==-1 ) {
+	if( TheUI.MenuButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.MenuButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderMenu ? MenuButtonActive : 0)|
+		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.MenuButton.Width, TheUI.MenuButton.Height,
+		    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+		    GameFont,TheUI.MenuButton.Text,NULL,NULL);
+	}
+    } else {
+	if( TheUI.NetworkMenuButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.NetworkMenuButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderNetworkMenu ? MenuButtonActive : 0)|
+		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.NetworkMenuButton.Width, TheUI.NetworkMenuButton.Height,
+		    TheUI.NetworkMenuButton.X,TheUI.NetworkMenuButton.Y,
+		    GameFont,TheUI.NetworkMenuButton.Text,NULL,NULL);
+	}
+	if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+	    DrawMenuButton(TheUI.NetworkDiplomacyButton.Button,
+		    (ButtonAreaUnderCursor==ButtonAreaMenu
+			&& ButtonUnderCursor==ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0)|
+		    (GameMenuButtonClicked ? MenuButtonClicked : 0),
+		    TheUI.NetworkDiplomacyButton.Width, TheUI.NetworkDiplomacyButton.Height,
+		    TheUI.NetworkDiplomacyButton.X,TheUI.NetworkDiplomacyButton.Y,
+		    GameFont,TheUI.NetworkDiplomacyButton.Text,NULL,NULL);
+	}
+    }
 
 #ifdef DRAW_DEBUG
     //
@@ -508,77 +525,52 @@ global void DrawMapArea(void)
 */
 global void UpdateDisplay(void)
 {
+    int i;
+
     MustRedraw&=EnableRedraw;		// Don't redraw disabled parts
 
     VideoLockScreen();			// prepare video write
 
     HideAnyCursor();			// remove cursor (when available)
 
-    if( MustRedraw&RedrawMap ) {
+    if( GuiGameStarted ) {
 	DrawMapArea();
-    }
 
-    if( MustRedraw&(RedrawMessage|RedrawMap) ) {
 	DrawMessages();
-    }
 
-    if( MustRedraw&RedrawFillers ) {
-	int i;
 
-	for( i=0; i<TheUI.NumFillers; ++i ) {
-	    VideoDrawSub(TheUI.Filler[i].Graphic,0,0
-		    ,TheUI.Filler[i].Graphic->Width
-		    ,TheUI.Filler[i].Graphic->Height
-		    ,TheUI.FillerX[i],TheUI.FillerY[i]);
+	for( i=0; i<TheUI.NumPanels; ++i ) {
+	    VideoDraw(TheUI.Panel[i].Graphic,0,
+		    TheUI.PanelX[i],TheUI.PanelY[i]);
 	}
-    }
 
-    if( MustRedraw&RedrawMenuButton ) {
 	DrawMenuButtonArea();
-    }
-    if( MustRedraw&RedrawMinimapBorder ) {
-	VideoDrawSub(TheUI.Minimap.Graphic,0,0
-		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height
-		,TheUI.MinimapX,TheUI.MinimapY);
-    }
 
-    PlayerPixels(Players);		// Reset to default colors
+	PlayerPixels(Players);		// Reset to default colors
 
-    if( MustRedraw&RedrawMinimap ) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
 	DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
 		TheUI.SelectedViewport->MapY);
-    } else if (MustRedraw&RedrawMinimapCursor) {
-	HideMinimapCursor();
-	DrawMinimapCursor(TheUI.SelectedViewport->MapX,
-		TheUI.SelectedViewport->MapY);
-    }
 
-    if( MustRedraw&RedrawInfoPanel ) {
 	DrawInfoPanel();
 	PlayerPixels(Players);		// Reset to default colors
-    }
-    if( MustRedraw&RedrawButtonPanel ) {
+
 	DrawButtonPanel();
 	PlayerPixels(Players);		// Reset to default colors
-    }
-    if( MustRedraw&RedrawResources ) {
+
 	DrawResources();
-    }
-    if( MustRedraw&RedrawStatusLine ) {
+
 	DrawStatusLine();
 	MustRedraw|=RedrawCosts;
-    }
-    if( MustRedraw&RedrawCosts ) {
+
 	DrawCosts();
-    }
-    if( MustRedraw&RedrawTimer ) {
+
 	DrawTimer();
     }
 
-    if( MustRedraw&RedrawMenu ) {
+    if( CurrentMenu ) {
 	DrawMenu(CurrentMenu);
     }
 
@@ -596,59 +588,94 @@ global void UpdateDisplay(void)
 	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.MapArea.X,TheUI.MapArea.Y
-		    ,TheUI.MapArea.EndX-TheUI.MapArea.X+1
-		    ,TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
+		    TheUI.MapArea.X,TheUI.MapArea.Y,
+		    TheUI.MapArea.EndX-TheUI.MapArea.X+1,
+		    TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
 	}
 	if( MustRedraw&RedrawFillers ) {
 	    int i;
 
-	    for( i=0; i<TheUI.NumFillers; ++i ) {
+	    for( i=0; i<TheUI.NumPanels; ++i ) {
 		InvalidateAreaAndCheckCursor(
-			 TheUI.FillerX[i],TheUI.FillerY[i]
-			,TheUI.Filler[i].Graphic->Width
-			,TheUI.Filler[i].Graphic->Height);
+			TheUI.PanelX[i],TheUI.PanelY[i],
+			TheUI.Panel[i].Graphic->Width,
+			TheUI.Panel[i].Graphic->Height);
 	    }
 	}
 	if(MustRedraw&RedrawMenuButton ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.MenuButtonX,TheUI.MenuButtonY
-		    ,TheUI.MenuButton.Graphic->Width
-		    ,TheUI.MenuButton.Graphic->Height);
+	    if( NetworkFildes==-1 ) {
+		if( TheUI.MenuButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.MenuButton.X,TheUI.MenuButton.Y,
+			    TheUI.MenuButton.Width,
+			    TheUI.MenuButton.Height);
+		}
+	    } else {
+		if( TheUI.NetworkMenuButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.NetworkMenuButton.X,
+			    TheUI.NetworkMenuButton.Y,
+			    TheUI.NetworkMenuButton.Width,
+			    TheUI.NetworkMenuButton.Height);
+		}
+		if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.NetworkDiplomacyButton.X,
+			    TheUI.NetworkDiplomacyButton.Y,
+			    TheUI.NetworkDiplomacyButton.Width,
+			    TheUI.NetworkDiplomacyButton.Height);
+		}
+	    }
 	}
 	if( MustRedraw&RedrawMinimapBorder ) {
-	    InvalidateAreaAndCheckCursor(
-		 TheUI.MinimapX,TheUI.MinimapY
-		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height);
+	    // Unused
+//	    InvalidateAreaAndCheckCursor(
+//		 TheUI.MinimapX,TheUI.MinimapY
+//		,TheUI.Minimap.Graphic->Width,TheUI.Minimap.Graphic->Height);
 	} else if( (MustRedraw&RedrawMinimap)
 		|| (MustRedraw&RedrawMinimapCursor) ) {
 	    // FIXME: Redraws too much of the minimap
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.MinimapX+24,TheUI.MinimapY+2
-		    ,MINIMAP_W,MINIMAP_H);
+	    if( TheUI.MinimapX!=-1 ) {
+		InvalidateAreaAndCheckCursor(
+			TheUI.MinimapX,TheUI.MinimapY,
+			TheUI.MinimapW,TheUI.MinimapH);
+	    }
 	}
 	if( MustRedraw&RedrawInfoPanel ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.InfoPanelX,TheUI.InfoPanelY
-		    ,TheUI.InfoPanelW,TheUI.InfoPanelH);
+	    if( TheUI.InfoPanelX!=-1 ) {
+		InvalidateAreaAndCheckCursor(
+			TheUI.InfoPanelX,TheUI.InfoPanelY,
+			TheUI.InfoPanelW,TheUI.InfoPanelH);
+	    }
 	}
 	if( MustRedraw&RedrawButtonPanel ) {
 	    InvalidateAreaAndCheckCursor(
-		     TheUI.ButtonPanelX,TheUI.ButtonPanelY
-		    ,TheUI.ButtonPanel.Graphic->Width
-		    ,TheUI.ButtonPanel.Graphic->Height);
+		    TheUI.ButtonPanelX,TheUI.ButtonPanelY,
+		    TheUI.ButtonPanelEndX-TheUI.ButtonPanelX+7,
+		    TheUI.ButtonPanelEndY-TheUI.ButtonPanelY+7);
 	}
 	if( MustRedraw&RedrawResources ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.ResourceX,TheUI.ResourceY
-		    ,TheUI.Resource.Graphic->Width
-		    ,TheUI.Resource.Graphic->Height);
+	    for( i=0; i<MaxCosts+2; ++i ) {
+		if( TheUI.Resources[i].TextX!=-1 ) {
+		    // FIXME: width is wrong
+		    static int width=0;
+		    if( !width ) {
+			width=VideoTextLength(GameFont,"99,999");
+		    }
+		    InvalidateAreaAndCheckCursor(
+			    TheUI.Resources[i].TextX,TheUI.Resources[i].TextY,
+			    width,
+			    VideoTextHeight(GameFont));
+		}
+	    }
 	}
 	if( MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts ) {
-	    InvalidateAreaAndCheckCursor(
-		     TheUI.StatusLineX,TheUI.StatusLineY
-		    ,TheUI.StatusLine.Graphic->Width
-		    ,TheUI.StatusLine.Graphic->Height);
+	    if( TheUI.StatusLineX!=-1 ) {
+		InvalidateAreaAndCheckCursor(
+			TheUI.StatusLineX,TheUI.StatusLineY,
+			TheUI.StatusLineW,
+			VideoTextHeight(TheUI.StatusLineFont));
+	    }
 	}
 	if( MustRedraw&RedrawTimer ) {
 	    // FIXME: Invalidate timer area
@@ -841,10 +868,6 @@ global void GameMainLoop(void)
 		    || !(GameCycle & 0x3f)) ) {
 	    if( Callbacks==&MenuCallbacks ) {
 		MustRedraw|=RedrawMenu;
-	    }
-	    if( CurrentMenu && CurrentMenu->Panel
-		    && !strcmp(CurrentMenu->Panel, ScPanel) ) {
-		MustRedraw = RedrawEverything;
 	    }
 
 	    //For debuggin only: replace UpdateDisplay by DebugTestDisplay when

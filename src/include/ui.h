@@ -53,9 +53,6 @@
 */
 #define MOUSESCALE	1
 
-    /// MACRO - HARDCODED NUMBER OF BUTTONS on screen
-#define MaxButtons	19
-
     /// typedef for buttons on screen themselves
 typedef struct _button_ Button;
 
@@ -166,11 +163,11 @@ typedef struct _ui_ {
     char*	NormalFontColor;	/// Color for normal text displayed
     char*	ReverseFontColor;	/// Color for reverse text displayed
 
-    //	Fillers
-    GraphicConfig* Filler;		/// Filler graphics
-    int*	FillerX;		/// Filler X positions
-    int*	FillerY;		/// Filler Y positions
-    int		NumFillers;		/// Number of fillers
+    //	Panels
+    GraphicConfig* Panel;		/// Panel graphics
+    int*	PanelX;			/// Panel X positions
+    int*	PanelY;			/// Panel Y positions
+    int		NumPanels;		/// Number of panels
 
     //	Resource line
     GraphicConfig Resource;		/// Resource background
@@ -198,44 +195,36 @@ typedef struct _ui_ {
 	int	IconH;			/// icon H position
 	int	TextX;			/// text X position
 	int	TextY;			/// text Y position
-    }		Resources[MaxCosts];	/// Icon+Text of all resources
-
-    GraphicConfig FoodIcon;		/// units icon image
-    int		FoodIconRow;		/// units icon image row (frame)
-    int		FoodIconX;		/// units icon X position
-    int		FoodIconY;		/// units icon Y position
-    int		FoodIconW;		/// units icon W position
-    int		FoodIconH;		/// units icon H position
-    int		FoodTextX;		/// units text X position
-    int		FoodTextY;		/// units text Y position
-
-    GraphicConfig ScoreIcon;		/// score icon image
-    int		ScoreIconRow;		/// score icon image row (frame)
-    int		ScoreIconX;		/// score icon X position
-    int		ScoreIconY;		/// score icon Y position
-    int		ScoreIconW;		/// score icon W position
-    int		ScoreIconH;		/// score icon H position
-    int		ScoreTextX;		/// score text X position
-    int		ScoreTextY;		/// score text Y position
+    }		Resources[MaxCosts+2];	/// Icon+Text of all resources
+					/// +2 for food and score
 
     // Info panel
     GraphicConfig InfoPanel;		/// Info panel background
     int		InfoPanelX;		/// Info panel screen X position
     int		InfoPanelY;		/// Info panel screen Y position
-    int		InfoPanelW;		/// Info panel width
-    int		InfoPanelH;		/// Info panel height
+    int		InfoPanelW;		/// Info panel screen width
+    int		InfoPanelH;		/// Info panel screen height
+    int		InfoPanelNeutralFrame;
+    int		InfoPanelSelectedFrame;
+    int		InfoPanelMagicFrame;
+    int		InfoPanelConstructionFrame;
 
     // Complete bar
     int		CompleteBarColor;	/// color for complete bar
     int		CompleteBarX;		/// complete bar X position
     int		CompleteBarY;		/// complete bar Y position
+    int		CompleteBarW;		/// complete bar width
+    int		CompleteBarH;		/// complete bar height
+    char*	CompleteBarText;	/// complete bar text
+    unsigned	CompleteBarFont;	/// complete bar font
     int		CompleteTextX;		/// complete text X position
     int		CompleteTextY;		/// complete text Y position
 
     // Button panel
-    GraphicConfig ButtonPanel;		/// Button panel background
     int		ButtonPanelX;		/// Button panel screen X position
     int		ButtonPanelY;		/// Button panel screen Y position
+    int		ButtonPanelEndX;	/// Button panel screen end X position
+    int		ButtonPanelEndY;	/// Button panel screen end Y position
 
     // Map area
     ViewportMode ViewportMode;		/// Current viewport mode
@@ -247,25 +236,42 @@ typedef struct _ui_ {
     Viewport	MapArea;		/// geometry of the whole map area
 
     // The menu button
-    GraphicConfig MenuButton;		/// menu button background
-    int		MenuButtonX;		/// menu button screen X position
-    int		MenuButtonY;		/// menu button screen Y position
+    struct {
+	int	X;			/// button screen X position
+	int	Y;			/// button screen Y position
+	char*	Text;			/// button caption
+	int	Width;			/// button width
+	int	Height;			/// button height
+	int	Button;			/// button style
+    }		MenuButton,
+		NetworkMenuButton,
+		NetworkDiplomacyButton;
 
     // The minimap
-    GraphicConfig Minimap;		/// minimap panel background
     int		MinimapX;		/// minimap screen X position
     int		MinimapY;		/// minimap screen Y position
-    int		ViewportCursorColor;	/// minimap cursor color
+    int		MinimapW;		/// minimap screen width
+    int		MinimapH;		/// minimap screen height
+    int		MinimapCursorColor;	/// minimap cursor color
 
     // The status line
-    GraphicConfig StatusLine;		/// Status line background
-    int		StatusLineX;		/// status line screeen X position
-    int		StatusLineY;		/// status line screeen Y position
+    int		StatusLineX;		/// Status line screen X position
+    int		StatusLineY;		/// Status line screen Y position
+    int		StatusLineW;		/// Status line screen width
+    unsigned	StatusLineFont;		/// Status line font
 
-	/// all buttons (1 Menu, 9 Group, 9 Command)
-    Button	Buttons[MaxButtons];
-	/// used for displaying unit training queues
-    Button	Buttons2[6];
+    // Message area
+    int		MessageAreaX;		/// Message screen X position
+    int		MessageAreaY;		/// Message screen Y position
+    int		MessageAreaW;		/// Message screen width
+    unsigned	MessageAreaFont;	/// Message font
+
+    Button*	InfoButtons;		/// Info buttons
+    int		NumInfoButtons;		/// Number of info buttons
+    Button*	TrainingButtons;	/// Training buttons
+    int		NumTrainingButtons;	/// Number of training buttons
+    Button*	ButtonButtons;		/// Button panel buttons
+    int		NumButtonButtons;	/// Number of button panel buttons
 
     // Offsets for 640x480 center used by menus
     int		Offset640X;		/// Offset for 640x480 X position

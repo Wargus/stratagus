@@ -61,8 +61,10 @@ global enum _mouse_buttons_ MouseButtons;/// Current pressed mouse buttons
 global enum _key_modifiers_ KeyModifiers;/// Current keyboard modifiers
 
 global Unit* UnitUnderCursor;		/// Unit under cursor
+global int ButtonAreaUnderCursor=-1;	/// Button area under cursor
 global int ButtonUnderCursor=-1;	/// Button under cursor
-global char GameMenuButtonClicked;	/// Game menu button (F10) was clicked
+global char GameMenuButtonClicked;	/// Menu button was clicked
+global char GameDiplomacyButtonClicked;	/// Diplomacy button was clicked
 global char LeaveStops;			/// Mouse leaves windows stops scroll
 
 global enum _cursor_on_ CursorOn=CursorOnUnknown;	/// Cursor on field
@@ -103,31 +105,31 @@ local void DrawMouseCoordsOnMap(int x,int y)
 	return;
     }
     VideoLockScreen();
-    VideoDrawSub(TheUI.MenuButton.Graphic,0,0
-	    ,TheUI.MenuButton.Graphic->Width
-	    ,TheUI.MenuButton.Graphic->Height
-	    ,TheUI.MenuButtonX,TheUI.MenuButtonY);
+    VideoDrawSub(TheUI.MenuButton.Graphic,0,0,
+	    TheUI.MenuButton.Graphic->Width,
+	    TheUI.MenuButton.Graphic->Height,
+	    TheUI.MenuButtonX,TheUI.MenuButtonY);
     flags=TheMap.Fields[x+y*TheMap.Width].Flags;
 //  sprintf(buf,"%3d,%3d=%02X|%04X|%c%c%c%c%c%c%c%c%c",x,y
-    sprintf(buf,"%3d,%3d=%02X|%04X|%c%c%c%c%c%c%c",x,y
-	    ,TheMap.Fields[x+y*TheMap.Width].Value
-	    ,flags
+    sprintf(buf,"%3d,%3d=%02X|%04X|%c%c%c%c%c%c%c",x,y,
+	    TheMap.Fields[x+y*TheMap.Width].Value,
+	    flags,
 	    //,TheMap.Fields[x+y*TheMap.Width].Tile
-	    ,flags&MapFieldUnpassable	?'u':'-'
-	    ,flags&MapFieldNoBuilding	?'n':'-'
-	    ,flags&MapFieldForest	?'f':'-'
-	    ,flags&MapFieldWaterAllowed ?'w':'-'
-	    ,flags&MapFieldCoastAllowed ?'c':'-'
-	    ,flags&MapFieldLandAllowed	?'l':'-'
-	    ,flags&MapFieldHuman	?'h':'-'
-//	    ,flags&MapFieldExplored	?'e':'-'
-//	    ,flags&MapFieldVisible	?'v':'-'
+	    flags&MapFieldUnpassable	?'u':'-',
+	    flags&MapFieldNoBuilding	?'n':'-',
+	    flags&MapFieldForest	?'f':'-',
+	    flags&MapFieldWaterAllowed ?'w':'-',
+	    flags&MapFieldCoastAllowed ?'c':'-',
+	    flags&MapFieldLandAllowed	?'l':'-',
+	    flags&MapFieldHuman	?'h':'-'
+//	    flags&MapFieldExplored	?'e':'-'
+//	    flags&MapFieldVisible	?'v':'-'
 	);
     VideoDrawText(TheUI.MenuButtonX+3,TheUI.MenuButtonY+3,GameFont,buf);
     VideoUnlockScreen();
-    InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY
-	    ,TheUI.MenuButton.Graphic->Width
-	    ,TheUI.MenuButton.Graphic->Height);
+    InvalidateArea(TheUI.MenuButtonX,TheUI.MenuButtonY,
+	    TheUI.MenuButton.Graphic->Width,
+	    TheUI.MenuButton.Graphic->Height);
 }
 #endif	// } FLAG_DEBUG
 
@@ -463,46 +465,105 @@ local void HandleMouseOn(int x,int y)
     //
     //	Handle buttons
     //
-    for( i=0; i<(int)(sizeof(TheUI.Buttons)/sizeof(*TheUI.Buttons)); ++i ) {
-	if( x<TheUI.Buttons[i].X
-		|| x>TheUI.Buttons[i].X+TheUI.Buttons[i].Width
-		|| y<TheUI.Buttons[i].Y
-		|| y>TheUI.Buttons[i].Y+TheUI.Buttons[i].Height ) {
-	    continue;
-	}
-	DebugLevel3("On button %d\n" _C_ i);
-	ButtonUnderCursor=i;
-	CursorOn=CursorOnButton;
-	if( i<10 ) {
-	    if (i == 0) {		// Menu button
+    if( NetworkFildes==-1 ) {
+	if( TheUI.MenuButton.X!=-1 ) {
+	    if( x>=TheUI.MenuButton.X
+		    && x<=TheUI.MenuButton.X+TheUI.MenuButton.Width
+		    && y>TheUI.MenuButton.Y
+		    && y<=TheUI.MenuButton.Y+TheUI.MenuButton.Height ) {
+		ButtonAreaUnderCursor=ButtonAreaMenu;
+		ButtonUnderCursor=ButtonUnderMenu;
+		CursorOn=CursorOnButton;
 		MustRedraw|=RedrawMenuButton;
-	    } else {
-		MustRedraw|=RedrawInfoPanel;
+		return;
 	    }
-	} else {
-	    MustRedraw|=RedrawButtonPanel;
 	}
-	return;
+    } else {
+	if( TheUI.NetworkMenuButton.X!=-1 ) {
+	    if( x>=TheUI.NetworkMenuButton.X
+		    && x<=TheUI.NetworkMenuButton.X+TheUI.NetworkMenuButton.Width
+		    && y>TheUI.NetworkMenuButton.Y
+		    && y<=TheUI.NetworkMenuButton.Y+TheUI.NetworkMenuButton.Height ) {
+		ButtonAreaUnderCursor=ButtonAreaMenu;
+		ButtonUnderCursor=ButtonUnderNetworkMenu;
+		CursorOn=CursorOnButton;
+		MustRedraw|=RedrawMenuButton;
+		return;
+	    }
+	}
+	if( TheUI.NetworkDiplomacyButton.X!=-1 ) {
+	    if( x>=TheUI.NetworkDiplomacyButton.X
+		    && x<=TheUI.NetworkDiplomacyButton.X+TheUI.NetworkDiplomacyButton.Width
+		    && y>TheUI.NetworkDiplomacyButton.Y
+		    && y<=TheUI.NetworkDiplomacyButton.Y+TheUI.NetworkDiplomacyButton.Height ) {
+		ButtonAreaUnderCursor=ButtonAreaMenu;
+		ButtonUnderCursor=ButtonUnderNetworkDiplomacy;
+		CursorOn=CursorOnButton;
+		MustRedraw|=RedrawMenuButton;
+		return;
+	    }
+	}
+    }
+    for( i=0; i<TheUI.NumButtonButtons; ++i ) {
+	if( x>=TheUI.ButtonButtons[i].X
+		&& x<=TheUI.ButtonButtons[i].X+TheUI.ButtonButtons[i].Width+7
+		&& y>TheUI.ButtonButtons[i].Y
+		&& y<=TheUI.ButtonButtons[i].Y+TheUI.ButtonButtons[i].Height+7 ) {
+	    ButtonAreaUnderCursor=ButtonAreaButton;
+	    ButtonUnderCursor=i;
+	    CursorOn=CursorOnButton;
+	    MustRedraw|=RedrawButtonPanel;
+	    return;
+	}
+    }
+    if( NumSelected==1 && Selected[0]->Type->Building
+	    && Selected[0]->Orders[0].Action==UnitActionTrain
+	    && Selected[0]->Data.Train.Count>1 ) {
+	for( i=0; i<TheUI.NumTrainingButtons; ++i ) {
+	    if( x>=TheUI.TrainingButtons[i].X
+		    && x<=TheUI.TrainingButtons[i].X+TheUI.TrainingButtons[i].Width+7
+		    && y>TheUI.TrainingButtons[i].Y
+		    && y<=TheUI.TrainingButtons[i].Y+TheUI.TrainingButtons[i].Height+7 ) {
+		ButtonAreaUnderCursor=ButtonAreaTraining;
+		ButtonUnderCursor=i;
+		CursorOn=CursorOnButton;
+		MustRedraw|=RedrawButtonPanel;
+		return;
+	    }
+	}
+    } else {
+	for( i=0; i<TheUI.NumInfoButtons; ++i ) {
+	    if( x>=TheUI.InfoButtons[i].X
+		    && x<=TheUI.InfoButtons[i].X+TheUI.InfoButtons[i].Width+7
+		    && y>TheUI.InfoButtons[i].Y
+		    && y<=TheUI.InfoButtons[i].Y+TheUI.InfoButtons[i].Height+7 ) {
+		ButtonAreaUnderCursor=ButtonAreaInfo;
+		ButtonUnderCursor=i;
+		CursorOn=CursorOnButton;
+		MustRedraw|=RedrawButtonPanel;
+		return;
+	    }
+	}
     }
 
     if( ButtonUnderCursor!=-1 ) {	// remove old display
-	if( ButtonUnderCursor<10 ) {
-	    if (ButtonUnderCursor == 0) {	// Menu button
-		MustRedraw|=RedrawMenuButton;
-	    } else {
-		MustRedraw|=RedrawInfoPanel;
-	    }
+	if( ButtonAreaUnderCursor==ButtonAreaMenu ) {
+	    MustRedraw|=RedrawMenuButton;
+	} else if( ButtonAreaUnderCursor==ButtonAreaInfo ) {
+	    MustRedraw|=RedrawInfoPanel;
 	} else {
 	    MustRedraw|=RedrawButtonPanel;
 	}
+	ButtonAreaUnderCursor=-1;
 	ButtonUnderCursor=-1;
     }
 
     //
     //	Minimap
     //
-    if( x>=TheUI.MinimapX+24 && x<TheUI.MinimapX+24+MINIMAP_W
-	    && y>=TheUI.MinimapY+2 && y<TheUI.MinimapY+2+MINIMAP_H ) {
+    if( TheUI.MinimapX!=-1
+	    && x>=TheUI.MinimapX && x<TheUI.MinimapX+TheUI.MinimapW
+	    && y>=TheUI.MinimapY && y<TheUI.MinimapY+TheUI.MinimapH ) {
 	CursorOn=CursorOnMinimap;
 	return;
     }
@@ -596,18 +657,18 @@ global void RestrictCursorToViewport(void)
 */
 global void RestrictCursorToMinimap(void)
 {
-    if (CursorX < TheUI.MinimapX + 24) {
-	CursorStartX = TheUI.MinimapX + 24;
-    } else if (CursorX >= TheUI.MinimapX + 24 + MINIMAP_W) {
-	CursorStartX = TheUI.MinimapX + 24 + MINIMAP_W - 1;
+    if (CursorX < TheUI.MinimapX) {
+	CursorStartX = TheUI.MinimapX;
+    } else if (CursorX >= TheUI.MinimapX + TheUI.MinimapW) {
+	CursorStartX = TheUI.MinimapX + TheUI.MinimapW - 1;
     } else {
 	CursorStartX = CursorX;
     }
 
-    if (CursorY < TheUI.MinimapY + 2) {
-	CursorStartY = TheUI.MinimapY + 2;
-    } else if (CursorY >= TheUI.MinimapY + 2 + MINIMAP_H) {
-	CursorStartY = TheUI.MinimapY + 2 + MINIMAP_H - 1;
+    if (CursorY < TheUI.MinimapY) {
+	CursorStartY = TheUI.MinimapY;
+    } else if (CursorY >= TheUI.MinimapY + TheUI.MinimapH) {
+	CursorStartY = TheUI.MinimapY + TheUI.MinimapH - 1;
     } else {
 	CursorStartY = CursorY;
     }
@@ -694,7 +755,7 @@ global void UIHandleMouseMove(int x,int y)
     //
     //	User may be draging with button pressed.
     //
-    if( GameMenuButtonClicked ) {
+    if( GameMenuButtonClicked || GameDiplomacyButtonClicked ) {
 	return;
     }
 
@@ -1215,11 +1276,11 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	sx = CursorX - vp->X + TileSizeX * vp->MapX;
 	sy = CursorY - vp->Y + TileSizeY * vp->MapY;
 	if( MouseButtons&LeftButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
-		    ,vp->MapX*TileSizeX+CursorX - vp->X
-		    ,vp->MapY*TileSizeY+CursorY - vp->Y
-		    ,vp->MapX*TileSizeX+CursorX - vp->X
-		    ,vp->MapY*TileSizeY+CursorY - vp->Y);
+	    MakeLocalMissile(MissileTypeGreenCross,
+		    vp->MapX*TileSizeX+CursorX - vp->X,
+		    vp->MapY*TileSizeY+CursorY - vp->Y,
+		    vp->MapX*TileSizeX+CursorX - vp->X,
+		    vp->MapY*TileSizeY+CursorY - vp->Y);
 	    SendCommand(sx, sy);
 	}
 	return;
@@ -1244,8 +1305,8 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	    CurrentButtonLevel = 0; // reset unit buttons to normal
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
-	    MakeLocalMissile(MissileTypeGreenCross
-		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
+	    MakeLocalMissile(MissileTypeGreenCross,
+		    sx+TileSizeX/2,sy+TileSizeY/2,0,0);
 	    SendCommand(sx,sy);
 	} else {
 	    ViewportCenterViewpoint(TheUI.SelectedViewport, mx, my);
@@ -1255,8 +1316,8 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 
     if( CursorOn==CursorOnButton ) {
 	// FIXME: other buttons?
-	if( ButtonUnderCursor>9 ) {
-	    DoButtonButtonClicked(ButtonUnderCursor-10);
+	if( ButtonAreaUnderCursor==ButtonAreaButton ) {
+	    DoButtonButtonClicked(ButtonUnderCursor);
 	    return;
 	}
     }
@@ -1363,16 +1424,16 @@ global void UIHandleButtonDown(unsigned button)
 		}
 		if( CanBuildUnitType(Selected[0],CursorBuilding,x,y)
 			&& (explored || ReplayRevealMap) ) {
-		    PlayGameSound(GameSounds.PlacementSuccess.Sound
-			    ,MaxSampleVolume);
-		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding
-			    ,!(KeyModifiers&ModifierShift));
+		    PlayGameSound(GameSounds.PlacementSuccess.Sound,
+			    MaxSampleVolume);
+		    SendCommandBuildBuilding(Selected[0],x,y,CursorBuilding,
+			    !(KeyModifiers&ModifierShift));
 		    if( !(KeyModifiers&ModifierAlt) ) {
 			CancelBuildingMode();
 		    }
 		} else {
-		    PlayGameSound(GameSounds.PlacementError.Sound
-			    ,MaxSampleVolume);
+		    PlayGameSound(GameSounds.PlacementError.Sound,
+			    MaxSampleVolume);
 		}
 	    } else {
 		CancelBuildingMode();
@@ -1418,10 +1479,10 @@ global void UIHandleButtonDown(unsigned button)
 		if( UnitUnderCursor && (unit=UnitOnScreenMapPosition(x,y)) ) {
 		    unit->Blink=4;	// if right click on building -- blink
 		} else {	// if not not click on building -- green cross
-		    MakeLocalMissile(MissileTypeGreenCross
-			,TheUI.MouseViewport->MapX*TileSizeX
-			    +CursorX-TheUI.MouseViewport->X
-			,TheUI.MouseViewport->MapY*TileSizeY
+		    MakeLocalMissile(MissileTypeGreenCross,
+			TheUI.MouseViewport->MapX*TileSizeX
+			    +CursorX-TheUI.MouseViewport->X,
+			TheUI.MouseViewport->MapY*TileSizeY
 			    +CursorY-TheUI.MouseViewport->Y,0,0);
 		}
 		DoRightButton(x,y);
@@ -1436,9 +1497,9 @@ global void UIHandleButtonDown(unsigned button)
 		ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY));
 	} else if( MouseButtons&RightButton ) {
 	    if( !GameObserve && !GamePaused ) {
-		MakeLocalMissile(MissileTypeGreenCross
-			,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
-			,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+		MakeLocalMissile(MissileTypeGreenCross,
+			ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2,
+			ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
 		// DoRightButton() takes screen map coordinates
 		DoRightButton(ScreenMinimap2MapX(CursorX) * TileSizeX,
 			ScreenMinimap2MapY(CursorY) * TileSizeY);
@@ -1451,75 +1512,82 @@ global void UIHandleButtonDown(unsigned button)
 	//
 	//	clicked on info panel - selection shown
 	//
-	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
+	if( NumSelected>1 && ButtonAreaUnderCursor==ButtonAreaInfo ) {
 	    if( !GameObserve && !GamePaused ) {
-		DoSelectionButtons(ButtonUnderCursor-1,button);
+		DoSelectionButtons(ButtonUnderCursor,button);
 	    }
 	} else if( (MouseButtons&LeftButton) ) {
 	    //
 	    //	clicked on menu button
 	    //
-	    if( ButtonUnderCursor==0 && !GameMenuButtonClicked ) {
-		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
-		GameMenuButtonClicked = 1;
-		MustRedraw|=RedrawMenuButton;
+	    if( ButtonAreaUnderCursor==ButtonAreaMenu ) {
+		if( (ButtonUnderCursor==ButtonUnderMenu
+			    || ButtonUnderCursor==ButtonUnderNetworkMenu)
+			&& !GameMenuButtonClicked ) {
+		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+		    GameMenuButtonClicked=1;
+		    MustRedraw|=RedrawMenuButton;
+		} else if( ButtonUnderCursor==ButtonUnderNetworkDiplomacy
+			&& !GameDiplomacyButtonClicked ) {
+		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+		    GameDiplomacyButtonClicked=1;
+		    MustRedraw|=RedrawMenuButton;
+		}
 	    //
-	    //	clicked on info panel - single unit shown
+	    //	clicked on info panel
 	    //
-	    } else if( ButtonUnderCursor==1 && NumSelected==1 ) {
-		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
-		ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
-			Selected[0]->Y);
-	    //
-	    //	clicked on info panel - single unit shown
-	    //		for transporter - training queues
-	    //
-	    } else if( ButtonUnderCursor>3 && ButtonUnderCursor<10 ) {
-		if( NumSelected==1 && Selected[0]->Type->Transporter ) {
-		    if( !GameObserve && !GamePaused ) {
-			if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
-			    // FIXME: should check if valid here.
-			    SendCommandUnload(Selected[0]
-				    ,Selected[0]->X,Selected[0]->Y
-				    ,Selected[0]->OnBoard[ButtonUnderCursor-4]
-				    ,!(KeyModifiers&ModifierShift));
+	    } else if( ButtonAreaUnderCursor==ButtonAreaInfo ) {
+		//
+		//  clicked on single unit shown
+		//
+		if( ButtonUnderCursor==0 && NumSelected==1 ) {
+		    PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
+		    ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
+			    Selected[0]->Y);
+		//
+		//  for transporter
+		//
+		} else if( ButtonUnderCursor>2 && ButtonUnderCursor<9 ) {
+		    if( NumSelected==1 && Selected[0]->Type->Transporter ) {
+			if( !GameObserve && !GamePaused ) {
+			    if( Selected[0]->OnBoard[ButtonUnderCursor-3] ) {
+				// FIXME: should check if valid here.
+				SendCommandUnload(Selected[0],
+					Selected[0]->X,Selected[0]->Y,
+					Selected[0]->OnBoard[ButtonUnderCursor-3],
+					!(KeyModifiers&ModifierShift));
+			    }
 			}
 		    }
 		}
-		else if( NumSelected==1 && Selected[0]->Type->Building &&
-		         Selected[0]->Orders[0].Action==UnitActionTrain) {
-		    if( !GameObserve && !GamePaused ) {
-			int slotid = ButtonUnderCursor-4;
-			if ( Selected[0]->Data.Train.Count == 1 ) {
-			    // FIXME: ignore clicks that did not hit
-			    // FIXME: with only one unit being built, this
-			    // unit is displayed between two slots.
-			    slotid = 0;
-			}
-			if ( slotid < Selected[0]->Data.Train.Count ) {
-			    DebugLevel0Fn("Cancel slot %d %s\n" _C_
-				slotid _C_
-				Selected[0]->Data.Train.What[slotid]
-				    ->Ident);
-			    SendCommandCancelTraining(Selected[0],
-				slotid,
-				Selected[0]->Data.Train.What[slotid]);
-			}
+	    //
+	    //	clicked on training button
+	    //
+	    } else if( ButtonAreaUnderCursor==ButtonAreaTraining ) {
+		if( !GameObserve && !GamePaused ) {
+		    if( ButtonUnderCursor<Selected[0]->Data.Train.Count ) {
+			DebugLevel0Fn("Cancel slot %d %s\n" _C_
+			    ButtonUnderCursor _C_
+			    Selected[0]->Data.Train.What[ButtonUnderCursor]->Ident);
+			SendCommandCancelTraining(Selected[0],
+			    ButtonUnderCursor,
+			    Selected[0]->Data.Train.What[ButtonUnderCursor]);
 		    }
 		}
 	    //
 	    //	clicked on button panel
 	    //
-	    } else if( ButtonUnderCursor>9 ) {
+	    } else if( ButtonAreaUnderCursor==ButtonAreaButton ) {
 		if( !GameObserve && !GamePaused ) {
-		    DoButtonButtonClicked(ButtonUnderCursor-10);
+		    DoButtonButtonClicked(ButtonUnderCursor);
 		}
 	    }
 	} else if( (MouseButtons&MiddleButton) ) {
 	    //
 	    //	clicked on info panel - single unit shown
 	    //
-	    if( ButtonUnderCursor==1 && NumSelected==1 ) {
+	    if( ButtonAreaUnderCursor==ButtonAreaInfo
+		    && ButtonUnderCursor==0 && NumSelected==1 ) {
 		PlayGameSound(GameSounds.Click.Sound,MaxSampleVolume);
 		if( TheUI.SelectedViewport->Unit == Selected[0] ) {
 		    TheUI.SelectedViewport->Unit = NULL;
@@ -1553,13 +1621,29 @@ global void UIHandleButtonUp(unsigned button)
     if( (1<<button) == LeftButton && GameMenuButtonClicked == 1 ) {
 	GameMenuButtonClicked = 0;
 	MustRedraw|=RedrawMenuButton;
-	if( ButtonUnderCursor == 0 ) {
+	if( ButtonAreaUnderCursor==ButtonAreaMenu
+		&& (ButtonUnderCursor==ButtonUnderMenu
+		    || ButtonUnderCursor==ButtonUnderNetworkMenu) ) {
 	    // FIXME: Not if, in input mode.
 	    if( NetworkFildes==-1 ) {
 		GamePaused=1;
 		SetStatusLine("Game Paused");
 	    }
 	    ProcessMenu("menu-game",0);
+	    return;
+	}
+    }
+
+    //
+    //	Diplomacy button
+    //
+    if( (1<<button) == LeftButton && GameDiplomacyButtonClicked == 1 ) {
+	GameDiplomacyButtonClicked = 0;
+	MustRedraw|=RedrawMenuButton;
+	if( ButtonAreaUnderCursor==ButtonAreaMenu
+		&& ButtonUnderCursor==ButtonUnderNetworkDiplomacy) {
+	    // FIXME: Not if, in input mode.
+	    ProcessMenu("menu-diplomacy",0);
 	    return;
 	}
     }
@@ -1637,10 +1721,10 @@ global void UIHandleButtonUp(unsigned button)
 	    if( IsMapFieldVisible(ThisPlayer,
 			Viewport2MapX(TheUI.MouseViewport,CursorX),
 			Viewport2MapY(TheUI.MouseViewport,CursorY)) || ReplayRevealMap ) {
-		unit=UnitOnScreen(unit
-		    ,CursorX-TheUI.MouseViewport->X+
-			TheUI.MouseViewport->MapX*TileSizeX
-		    ,CursorY-TheUI.MouseViewport->Y+
+		unit=UnitOnScreen(unit,
+		    CursorX-TheUI.MouseViewport->X+
+			TheUI.MouseViewport->MapX*TileSizeX,
+		    CursorY-TheUI.MouseViewport->Y+
 			TheUI.MouseViewport->MapY*TileSizeY);
 	    }
 	    if( unit ) {
