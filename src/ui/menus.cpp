@@ -1562,7 +1562,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 	menu->items[11].flags = 0;
     }
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
+    if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 	menu->items[8].flags = MenuButtonDisabled;
 	menu->items[11].flags = MenuButtonDisabled;
     }
@@ -1580,7 +1580,7 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
     menu->items[21].flags = MenuButtonDisabled;		// random tracks button
 #if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     menu->items[17].flags = 0;			// cd power
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
+    if (CDMode != CDModeStopped && CDMode != CDModeOff) {
 #if (!defined(USE_WIN32) && defined(USE_LIBCDA)) || defined(USE_CDDA)
 	int i = 0;
 #ifdef USE_LIBCDA
@@ -1595,10 +1595,10 @@ local void SoundOptionsInit(Menuitem *mi __attribute__((unused)))
 	menu->items[19].flags = 0;
 	menu->items[21].flags = 0;
 
-	if (!strcmp(":all", CDMode)) {
+	if (CDMode == CDModeAll) {
 	    menu->items[19].d.gem.state = MI_GSTATE_CHECKED;
 	    menu->items[21].d.gem.state = MI_GSTATE_UNCHECKED;
-	} else if (!strcmp(":random", CDMode)) {
+	} else if (CDMode == CDModeRandom) {
 	    menu->items[19].d.gem.state = MI_GSTATE_UNCHECKED;
 	    menu->items[21].d.gem.state = MI_GSTATE_CHECKED;
 	}
@@ -1814,36 +1814,36 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 #ifdef WITH_SOUND
 #ifdef USE_SDLCD
     // Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
+    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
 #ifdef USE_WIN32
 	SDL_CDResume(CDRom);
 #endif
-	PlayCDRom(":random");
+	PlayCDRom(CDModeRandom);
     } else {
     // Stop Playing CD
         SDL_CDPause(CDRom);
-	CDMode = ":stopped";
+	CDMode = CDModeStopped;
     }
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
+    if (CDMode != CDModeOff && CDMode != CDModeStopped) {
 	StopMusic();
     }
 #elif defined(USE_LIBCDA)
     // Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayCDRom(":random");
+    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
+	PlayCDRom(CDModeRandom);
     } else {
     // Stop Playing CD
         cd_pause();
-	CDMode = ":stopped";
+	CDMode = CDModeStopped;
     }
 #elif defined(USE_CDDA)
     // Start Playing CD
-    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayCDRom(":random");
+    if (CDMode == CDModeOff || CDMode == CDModeStopped) {
+	PlayCDRom(CDModeRandom);
     } else {
     // Stop Playing CD
 	StopMusic();
-	CDMode = ":stopped";
+	CDMode = CDModeStopped;
     }
 #endif
 #endif
@@ -1889,7 +1889,7 @@ local void SetCommandKey(Menuitem *mi __attribute__((unused)))
 local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 {
 #if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
-    CDMode = ":all";
+    CDMode = CDModeAll;
 #endif
     SoundOptionsInit(NULL);
 }
@@ -1900,7 +1900,7 @@ local void SetCdModeAll(Menuitem *mi __attribute__((unused)))
 local void SetCdModeRandom(Menuitem *mi __attribute__((unused)))
 {
 #if defined(WITH_SOUND) && (defined(USE_LIBCDA) || defined(USE_SDLCD))
-    CDMode = ":random";
+    CDMode = CDModeRandom;
 #endif
     SoundOptionsInit(NULL);
 }

@@ -66,8 +66,6 @@
 global Sample* MusicSample;		/// Music samples
 #endif
 
-global char *CDMode = ":off";	/// cd play mode, ":off" ":random" ":all" or ":defined"
-//global char *CDPlaySection = "menu";
 #if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global int CDTrack = 0;			/// Current cd track
 #endif
@@ -242,16 +240,16 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 **
 **	@return		True if name is handled by the cdrom module.
 */
-global int PlayCDRom(const char* name)
+global int PlayCDRom(int name)
 {
     // Old mode off, starting cdrom play.
-    if (!strcmp(CDMode, ":off")) {
+    if (CDMode == CDModeOff) {
 	if (!strncmp(name, ":", 1)) {
 	    if (SDL_Init(SDL_INIT_CDROM) < 0)
 		return 1;
 	    CDRom = SDL_CDOpen(0);
 	    if (!SDL_CDStatus(CDRom)) {
-		CDMode = ":off";
+		CDMode = CDModeOff;
 		return 1;
 	    }
 	}
@@ -264,22 +262,22 @@ global int PlayCDRom(const char* name)
 
 	if (!CDRom) {
 	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
-	    CDMode = ":stopped";
+	    CDMode = CDModeStopped;
 	    return 1;
 	}
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
-	    CDMode = ":all";
+	    CDMode = CDModeAll;
 	    if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0)
-		CDMode = ":stopped";
+		CDMode = CDModeStopped;
 	    return 1;
 	}
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
-	    CDMode = ":random";
+	    CDMode = CDModeRandom;
 	    CDTrack = MyRand() % CDRom->numtracks;
 	    if (SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0) < 0)
-		CDMode = ":stopped";
+		CDMode = CDModeStopped;
 	}
 	return 1;
     }
@@ -297,105 +295,99 @@ global int PlayCDRom(const char* name)
 **
 **	@return		True if name is handled by the cdrom module.
 */
-global int PlayCDRom(const char* name)
+global int PlayCDRom(int name)
 {
     int i;
     int data_cd;
     int track;
 
-    if (!strcmp(CDMode, ":off")) {
-	if (!strncmp(name, ":", 1)) {
-	    if (cd_init()) {
-		fprintf(stderr, "Error initialising libcda \n");
-		CDMode = ":off";
-		return 1;
-	    }
-	    if (cd_get_tracks(&CDTrack, &NumCDTracks)) {
-		CDMode = ":off";
-		return 1;
-	    }
-	    data_cd = 1;
-	    for (i = 1; i <= NumCDTracks; ++i) {
-		if (cd_is_audio(i) > 0) {
-		    data_cd = 0;
-		    break;
-		}
-	    }
-	    if (data_cd || !NumCDTracks) {
-		CDMode = ":off";
-		return 1;
+    if (CDMode == CDModeOff) {
+        if (cd_init()) {
+	    fprintf(stderr, "Error initialising libcda \n");
+	    CDMode = CDModeOff;
+	    return 1;
+	}
+	if (cd_get_tracks(&CDTrack, &NumCDTracks)) {
+	    CDMode = CDModeOff;
+	    return 1;
+	}
+	data_cd = 1;
+	for (i = 1; i <= NumCDTracks; ++i) {
+	    if (cd_is_audio(i) > 0) {
+	        data_cd = 0;
+	        break;
 	    }
 	}
-	--CDTrack;
+	if (data_cd || !NumCDTracks) {
+	    CDMode = CDModeOff;
+	    return 1;
+	}
+    }
+    --CDTrack;
+
+    StopMusic();
+
+    if (cd_get_tracks(NULL, NULL) == -1)
+        return 1;
+
+    // if mode is play all tracks
+    if (name == CDModeAll) {
+        CDMode = CDModeAll;
+	do {
+	    if (CDTrack >= NumCDTracks)
+	        CDTrack = 0;
+	} while (cd_is_audio(++CDTrack) < 1);
+	if (cd_play(CDTrack))
+	    CDMode = CDModeStopped;
+	return 1;
+    }
+    // if mode is play random tracks
+    if (name == CDModeRandom) {
+        CDMode = CDModeRandom;
+        do {
+	    CDTrack = MyRand() % NumCDTracks;
+	} while (cd_is_audio(CDTrack) < 1);
+	if (cd_play(CDTrack))
+	    CDMode = CDModeStopped;
+	return 1;
     }
 
-    if (!strncmp(name, ":", 1)) {
-
-	StopMusic();
-
-	if (cd_get_tracks(NULL, NULL) == -1)
-	    return 1;
-
-	// if mode is play all tracks
-	if (!strcmp(name, ":all")) {
-	    CDMode = ":all";
-	    do {
-		if (CDTrack >= NumCDTracks)
-		    CDTrack = 0;
-	    } while (cd_is_audio(++CDTrack) < 1);
-	    if (cd_play(CDTrack))
-		CDMode = ":stopped";
-	    return 1;
-	}
-	// if mode is play random tracks
-	if (!strcmp(name, ":random")) {
-	    CDMode = ":random";
-	    do {
-		CDTrack = MyRand() % NumCDTracks;
-	    } while (cd_is_audio(CDTrack) < 1);
-	    if (cd_play(CDTrack))
-		CDMode = ":stopped";
-	    return 1;
-	}
-	// FIXME: remove :defined
-	if (!strcmp(name, ":defined")) {
-	    CDMode = ":defined";
-	    track = cd_current_track();
-	    if (PlaySection == PlaySectionStats) {
-		if (GameResult == GameVictory) {
-		    if (!ThisPlayer->Race && track != 8) {
-			cd_play(8);
-		    } else if (ThisPlayer->Race && track != 16) {
-			cd_play(16);
-		    }
-		} else {
-		    if (!ThisPlayer->Race && track != 9) {
-			cd_play(9);
-		    } else if (ThisPlayer->Race && track != 17) {
-			cd_play(17);
-		    }
+    if (name == CDModeDefined) {
+        CDMode = CDModeDefined;
+        track = cd_current_track();
+        if (PlaySection == PlaySectionStats) {
+	    if (GameResult == GameVictory) {
+		if (!ThisPlayer->Race && track != 8) {
+		    cd_play(8);
+		} else if (ThisPlayer->Race && track != 16) {
+		    cd_play(16);
 		}
-	    } else if (PlaySection == PlaySectionBriefing) {
-		if (!ThisPlayer->Race && track != 7) {
-		    cd_play(7);
-		} else if (ThisPlayer->Race && track != 15) {
-		    cd_play(15);
+	    } else {
+		if (!ThisPlayer->Race && track != 9) {
+		    cd_play(9);
+		} else if (ThisPlayer->Race && track != 17) {
+		    cd_play(17);
 		}
-	    } else if ((PlaySection == PlaySectionMainMenu) && track != 15) {
-		cd_play(15);
-	    } else if ((PlaySection == PlaySectionGame) && 
-		       !ThisPlayer->Race && (track < 3 || track > 6)) {
-		do CDTrack = (MyRand() % NumCDTracks) + 3;
-		while (CDTrack < 3 || CDTrack > 7); 
-		cd_play(CDTrack);
-	    } else if ((PlaySection == PlaySectionGame) && 
-		       ThisPlayer->Race && (track < 10 || track > 14)) {
-		do CDTrack = (MyRand() % NumCDTracks) + 9;
-		while (CDTrack < 11 || CDTrack > 14); 
-		cd_play(CDTrack);
 	    }
+	} else if (PlaySection == PlaySectionBriefing) {
+	    if (!ThisPlayer->Race && track != 7) {
+	        cd_play(7);
+	    } else if (ThisPlayer->Race && track != 15) {
+	        cd_play(15);
+	    }
+	} else if ((PlaySection == PlaySectionMainMenu) && track != 15) {
+	    cd_play(15);
+	} else if ((PlaySection == PlaySectionGame) && 
+		    !ThisPlayer->Race && (track < 3 || track > 6)) {
+	    do CDTrack = (MyRand() % NumCDTracks) + 3;
+	    while (CDTrack < 3 || CDTrack > 7); 
+	    cd_play(CDTrack);
+	} else if ((PlaySection == PlaySectionGame) && 
+		    ThisPlayer->Race && (track < 10 || track > 14)) {
+	    do CDTrack = (MyRand() % NumCDTracks) + 9;
+	    while (CDTrack < 11 || CDTrack > 14); 
+	    cd_play(CDTrack);
 	}
-	return 1;
     }
 
     return 0;
@@ -415,7 +407,7 @@ local int PlayCDRom(const char* name)
     int i;
     Sample *sample;
 
-    if (!strcmp(CDMode, ":off")) {
+    if (CDMode == CDModeOff) {
 	if (!strncmp(name, ":", 1)) {
 	    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
 	    ioctl(CDDrive, CDROMRESET);
@@ -430,7 +422,7 @@ local int PlayCDRom(const char* name)
 	    NumCDTracks = i - 1;
 
 	    if (NumCDTracks == 0) {
-		CDMode = ":off";
+		CDMode = CDModeOff;
 		return 1;
 	    }
 	}
@@ -442,7 +434,7 @@ local int PlayCDRom(const char* name)
 
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
-	    CDMode = ":all";
+	    CDMode = CDModeAll;
 	    do {
 		if (CDTrack >= NumCDTracks)
 		    CDTrack = 0;
@@ -450,7 +442,7 @@ local int PlayCDRom(const char* name)
 	}
 	// if mode is play random tracks
 	if (!strcmp(name, ":random")) {
-	    CDMode = ":random";
+	    CDMode = CDModeRanom;
 	    do {
 		CDTrack = MyRand() % NumCDTracks;
 	    } while (CDtocentry[CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
