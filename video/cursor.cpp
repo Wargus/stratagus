@@ -724,11 +724,10 @@ local void DrawBuildingCursor(void)
     SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
     DrawShadow(NULL, CursorBuilding, x, y);
     GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
-    if (VideoGraphicFrames(CursorBuilding->Sprite) > 5) {
-	DrawUnitType(CursorBuilding, 4, x, y);
-    } else {
-	DrawUnitType(CursorBuilding, 0, x, y);
-    }
+    DrawUnitType(CursorBuilding,
+	CursorBuilding->Animations->Still[0].Frame +
+	    (CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
+	x, y);
     PopClipping();
 
     //
