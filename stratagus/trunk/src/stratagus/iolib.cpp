@@ -47,11 +47,6 @@
 #include "freecraft.h"
 #include "iolib.h"
 
-#ifdef USE_ZZIPLIB
-#include <zziplib.h>
-#include <zzipformat.h>
-#endif
-
 #ifndef O_BINARY
 #define O_BINARY	0
 #endif
@@ -489,7 +484,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     // ATTENTION: valid until end of file!
     #define readdir zzip_readdir
     #define closedir zzip_closedir
-    int entvalid;
+    int i, entvalid;
     char zzbasepath[PATH_MAX];
 #else
     DIR *dirp;
@@ -534,12 +529,10 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	dirp = zzip_opendir(dirname);
 	zzbasepath[0] = 0;
     }
+    IfDebug( if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n", dirname); } );
 #else
     dirp = opendir(dirname);
 #endif
-    if (!dirp) {
-	DebugLevel0Fn("Dir `%s' not found\n", dirname);
-    }
     if (dirp) {
 	while ((dp = readdir(dirp)) != NULL) {
 	    if (strcmp(dp->d_name, ".") == 0)
@@ -572,32 +565,29 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		    }
 		}
 	    } else {
-		entvalid = 0;
 		if (zzbasepath[0]) {
 		    cp = (char *)dirname + strlen(zzbasepath) + 1;
 		    cp = strchr(cp, '/') + 1;
 		    DebugLevel3Fn("dirprefix `%s', `%s'\n", cp, np);
-		    isdir = strlen(cp);
-		    if (strlen(dp->d_name) >= isdir && memcmp(dp->d_name, cp, isdir) == 0 &&
-				dp->d_name[isdir] == '/' &&
-				dp->d_name[isdir + 1]) {
-			entvalid = 1;
-			strcpy(np, dp->d_name + isdir + 1);
+		    i = strlen(cp);
+		    if (strlen(dp->d_name) >= i && memcmp(dp->d_name, cp, i) == 0 &&
+				dp->d_name[i] == '/' && dp->d_name[i + 1]) {
+			strcpy(np, dp->d_name + i + 1);
+			goto zzentry;
 		    }
 		} else {
+zzentry:
+		    DebugLevel3Fn("zzip-entry `%s', `%s'\n", buffer, np);
 		    entvalid = 1;
-		}
-		if (entvalid) {
 		    cp = strrchr(np, '/');
-		    if (cp && cp[1]) {
-			entvalid = 0;
-		    } else {
-			entvalid = 1;
-			isdir = ( cp && dp->d_compr == ZZIP_IS_STORED &&
-			      dp->st_size == 0 );
-			      // FIXME: also check for crc == 0... how ?
-			if (isdir) {
-			    *cp = 0;
+		    if (cp) {
+			isdir = 1;
+			*cp = 0;
+			for (i = 0; i < n; i++) {
+			    if (fl[i].type == 0 && strcmp(fl[i].name, np) == 0) {
+				entvalid = 0;	// already there
+				break;
+			    }
 			}
 		    }
 		}
