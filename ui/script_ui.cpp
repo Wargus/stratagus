@@ -401,36 +401,6 @@ local int CclSetMenuBackground(lua_State* l)
 }
 
 /**
-**		Default menu background with title.
-**
-**		@param background		background. (nil reports only)
-**
-**		@return				Old menu background.
-*/
-local int CclSetMenuBackgroundWithTitle(lua_State* l)
-{
-	char* old;
-
-	old = NULL;
-	if (MenuBackgroundWithTitle) {
-		old = strdup(MenuBackgroundWithTitle);
-	}
-	if (lua_gettop(l) != 1) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	if (MenuBackgroundWithTitle) {
-		free(MenuBackgroundWithTitle);
-		MenuBackgroundWithTitle = NULL;
-	}
-	MenuBackgroundWithTitle = strdup(LuaToString(l, 1));
-
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
-}
-
-/**
 **		Default menu music.
 **
 **		@param music		menu music. (nil reports only)
@@ -4288,8 +4258,6 @@ global void UserInterfaceCclRegister(void)
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "SetMenuBackground", CclSetMenuBackground);
-	lua_register(Lua, "SetMenuBackgroundWithTitle",
-		CclSetMenuBackgroundWithTitle);
 	lua_register(Lua, "SetMenuMusic", CclSetMenuMusic);
 
 	lua_register(Lua, "DisplayPicture", CclDisplayPicture);
