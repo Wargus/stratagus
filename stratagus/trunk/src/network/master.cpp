@@ -8,9 +8,9 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name unittype.c	-	The unit types. */
+/**@name master.c	-	The master server. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//	(c) Copyright 2003 by Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
