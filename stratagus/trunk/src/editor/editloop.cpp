@@ -382,7 +382,11 @@ local void DrawTileIcons(void)
 */
 local void DrawUnitIcons(void)
 {
-    int x, y, i, j, percent;
+    int x;
+    int y;
+    int i;
+    int j;
+    int percent;
     char buf[256];
     Icon *icon;
 
@@ -545,7 +549,7 @@ local void DrawUnitIcons(void)
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
     }
 
-    percent = UnitIndex * 100 / MaxUnitIndex;
+    percent = UnitIndex * 100 / (MaxUnitIndex - 3);
     i = (percent * (j - 54)) / 100;
     VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
