@@ -608,25 +608,47 @@ local void MovementTypeAddSuperGroup (int type, SuperGroup *s)
 	}
 }
 
-local void MovementTypeDeleteSuperGroup (int type, SuperGroup *sg)
+local void MovementTypeDeleteSuperGroup(int type, SuperGroup * sg)
 {
-	SuperGroup *s, *p;
+#if 1
+    SuperGroup *s;
+    SuperGroup *p;
 
-	if (MovementTypes[type].SuperGroups == NULL)
-		return;
+    if (MovementTypes[type].SuperGroups == NULL) {
+	return;
+    }
 
-	if (MovementTypes[type].SuperGroups == sg) {
-		MovementTypes[type].SuperGroups = MovementTypes[type].SuperGroups->Next;
-		sg->Next = NULL;
-		return;
+    if (MovementTypes[type].SuperGroups == sg) {
+	MovementTypes[type].SuperGroups =
+	    MovementTypes[type].SuperGroups->Next;
+	sg->Next = NULL;
+	return;
+    }
+
+    DebugLevel0Fn("FIXME: s unintialized, please control my fix!\n");
+    for (p = MovementTypes[type].SuperGroups, s = p->Next;
+		s; p = s, s = s->Next) {
+	if (s == sg) {
+	    p->Next = s->Next;
+	    s->Next = NULL;
+	    return;
 	}
+    }
+#else
+    // JOHNS: should do the same as the above part :)
+    SuperGroup **p;
+    SuperGroup *s;
 
-	for (p = MovementTypes[type].SuperGroups, s; s; p=s, s=s->Next)
-		if (s == sg) {
-			p->Next = s->Next;
-			s->Next = NULL;
-			return;
-		}
+    p = &MovementTypes[type].SuperGroups;
+    while ((s=*p)) {
+	if (s == sg) {
+	    *p = s->Next;
+	    s->Next = NULL;
+	    return;
+	}
+	p = &s->Next;
+    }
+#endif
 }
 
 local int MovementTypeCheckPassability (int type, unsigned short flags)
