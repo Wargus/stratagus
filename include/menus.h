@@ -254,7 +254,9 @@ typedef struct _menus_ {
 #define MENU_TIPS 21
 #define MENU_HELP 22
 #define MENU_KEYSTROKE_HELP 23
-#define MENU_MAX 23			/// highest available menu id (for ccl)
+#define MENU_SAVE_GAME 24
+#define MENU_LOAD_GAME 25
+#define MENU_MAX 25			/// highest available menu id (for ccl)
 
 /// FIXME: FILL IN THIS TABLE!!!!
 
