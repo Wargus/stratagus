@@ -309,27 +309,26 @@ global int CDRomCheck(void *unused __attribute__((unused)))
 **	@return		the number of bytes used to fill buffer
 **
 **	@todo		Can mix faster if signed 8 bit buffers are used.
-**	@todo	FIXME:	Remove float for stereo!
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
-			      float stereo,int* buffer,int size)
+			      char stereo,int* buffer,int size)
 {
     int ri;				// read index
     int wi;				// write index
     int length;
     int v;
     int local_volume;
-    float left,right;
+    unsigned char left,right;
 
     local_volume=((int)volume+1)*2*GlobalVolume/MaxVolume;
     length=sample->Length-index;
-    if( stereo < 0.0 ) {
-	left=1.0;
-	right=1.0+stereo;
+    if( stereo < 0 ) {
+	left=128;
+	right=128+stereo;
     }
     else {
-	left=1.0-stereo;
-	right=1.0;
+	left=128-stereo;
+	right=128;
     }
     DebugLevel3("Length %d\n" _C_ length);
 
@@ -351,8 +350,8 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	    // FIXME: must interpolate samples!
 	    v=(rp[ri]-127)*local_volume;
 
-	    buffer[wi++]+=v*left;
-	    buffer[wi++]+=v*right;	// left+right channel
+	    buffer[wi++]+=v*left/128;
+	    buffer[wi++]+=v*right/128;	// left+right channel
 	}
 	ri=(wi*sample->Frequency)/SoundFrequency;
 	ri/=2;				// adjust for mono
@@ -375,8 +374,8 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	    // FIXME: must interpolate samples!
 	    v=rp[ri]*local_volume/256;
 
-	    buffer[wi++]+=v*left;
-	    buffer[wi++]+=v*right;
+	    buffer[wi++]+=v*left/128;
+	    buffer[wi++]+=v*right/128;
 	}
 	ri=(wi*sample->Frequency)/SoundFrequency;
     }
