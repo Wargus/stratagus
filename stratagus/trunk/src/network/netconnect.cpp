@@ -1291,6 +1291,9 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		// look up the host
 		for (h = 0; h < HostsCount; ++h) {
 		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			ServerSetupState.LastFrame[h] = FrameCounter;
+			NetConnectForceDisplayUpdate();
+
 			switch (NetStates[h].State) {
 			    /// client has recvd welcome and is waiting for info
 			    case ccs_connecting:
@@ -1415,6 +1418,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n",
 						 h, ServerSetupState.Ready[h], ServerSetupState.Race[h]);
 				/// Add additional info usage here!
+				ServerSetupState.LastFrame[h] = FrameCounter;
 				NetConnectForceDisplayUpdate();
 				/* Fall through */
 			    case ccs_async:
