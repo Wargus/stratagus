@@ -315,6 +315,7 @@ extern void QuitCD(void);
 #define InitSound()	0		/// Dummy macro for without sound
 #define WriteSound	NULL		/// Dummy macro for without sound
 #define QuitSound()			/// Dummy macro for without sound
+#define QuitCD()			/// Dummy macro for without sound
 
 
 #endif	// } WITH_SOUND
