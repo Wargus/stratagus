@@ -353,14 +353,14 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define MINIMAP_W	128		/// minimap width in pixels
 #define MINIMAP_H	128		/// minimap height in pixels
 
-    /// scrolling area (<= 10 y)
-#define SCROLL_UP	10
-    /// scrolling area (>= VideoHeight-11 y)
-#define SCROLL_DOWN	(VideoHeight-11)
-    /// scrolling area (<= 10 y)
-#define SCROLL_LEFT	10
-    /// scrolling area (>= VideoWidth-11 x)
-#define SCROLL_RIGHT	(VideoWidth-11)
+    /// scrolling area (<= 18 y)
+#define SCROLL_UP	18
+    /// scrolling area (>= VideoHeight-19 y)
+#define SCROLL_DOWN	(VideoHeight-19)
+    /// scrolling area (<= 18 y)
+#define SCROLL_LEFT	18
+    /// scrolling area (>= VideoWidth-19 x)
+#define SCROLL_RIGHT	(VideoWidth-19)
 
     /// mouse scrolling magnify
 #define MOUSE_SCROLL_SPEED	3
