@@ -1,12 +1,12 @@
-//   ___________		     _________		      _____  __
-//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//   ___________                     _________                _____  __
+//   \_   _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
 //    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
 //    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
-//	  \/		    \/	   \/	     \/		   \/
+//        \/                \/     \/        \/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   FreeCraft - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ai.c           -       The computer player AI main file. */
 //
@@ -16,7 +16,11 @@
 
 //@{
 
-#ifndef NEW_AI	// {
+#ifndef NEW_AI				// {
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +39,10 @@
 #include "pathfinder.h"
 #include "actions.h"
 #include "ai.h"
+
+/*----------------------------------------------------------------------------
+--	Declarations
+----------------------------------------------------------------------------*/
 
 /*
 **	Names for the unit-type table slots as used in puds.
@@ -67,8 +75,8 @@
 #define UnitDentarg		0x17
 #define UnitKhadgar		0x18
 #define UnitGromHellscream	0x19
-//#define UnitTankerHuman	0x1A
-//#define UnitTankerOrc		0x1B
+//#define UnitTankerHuman       0x1A
+//#define UnitTankerOrc         0x1B
 #define UnitTransportHuman	0x1C
 #define UnitTransportOrc	0x1D
 #define UnitElvenDestroyer	0x1E
@@ -133,7 +141,7 @@
 #define UnitStronghold		0x59
 #define UnitCastle		0x5A
 #define UnitFortress		0x5B
-//#define UnitGoldMine		0x5C
+//#define UnitGoldMine          0x5C
 #define UnitOilPatch		0x5D
 #define UnitStartLocationHuman	0x5E
 #define UnitStartLocationOrc	0x5F
@@ -153,6 +161,10 @@
 #define Unit4x4DestroyedPlace	0x6D
 
 /*----------------------------------------------------------------------------
+--	Variables
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
 --      Ai tables
 ----------------------------------------------------------------------------*/
 
@@ -163,7 +175,8 @@ global int AiCostFactor = 100;		/// Adjust the AI costs
 /**
 **	All possible AI control command types.
 */
-enum _ai_command_type_ {
+enum _ai_command_type_
+{
     AiCmdBuild,				/// unit must be built
     AiCmdCreature,			/// creature must be built
     AiCmdArmy,				/// attack the opponent
@@ -172,39 +185,43 @@ enum _ai_command_type_ {
 /**
 **	Define the AI commands.
 */
-typedef struct _ai_command_ {
-    int		Command;	/// The command it self
-    int         Unit;           /// Unittype to Build, unless AiCmdArmy,
-                                /// then Units to stay home
-    int		Number;		/// Number of Units
-} AiCommand;
+typedef struct _ai_command_
+{
+    int Command;			/// The command it self
+    int Unit;				/// Unittype to Build, unless AiCmdArmy,
+					/// then Units to stay home
+    int Number;				/// Number of Units
+}
+AiCommand;
 
-typedef struct _ai_force_ {
-     int Worker;
-     int Footman;
-     int Archer;
-     int Ballista;
-     int Knight;
-     int GryphonRider;
-} AiForce;
+typedef struct _ai_force_
+{
+    int Worker;
+    int Footman;
+    int Archer;
+    int Ballista;
+    int Knight;
+    int GryphonRider;
+}
+AiForce;
 
 #define X(num) 0
 
 local AiForce ForceAtHome[] = {
 //      pea ftm  arc  bal  kni  gry
-     {   3,  1,   0,   0,   0,   0,  },
-     {   9,  2,   0,   0,   0,   0,  },
-     {   9,  3,   1,   0,   0,   0,  },
-     {  15,  5,   2,   0,   0,   0,  },
+    {3, 1, 0, 0, 0, 0,},
+    {9, 2, 0, 0, 0, 0,},
+    {9, 3, 1, 0, 0, 0,},
+    {15, 5, 2, 0, 0, 0,},
 };
 
 local AiForce ForceAttacking[] = {
 //      pea ftm  arc  bal  kni  gry
-     {   0,  0,   0,   0,   0,   0,  },
-     {   0,  1,   0,   0,   0,   0,  },
-     {   0,  3,   1,   0,   0,   0,  },
-     {   0,  5,   2,   0,   0,   0,  },
-     {   0,  7,   4,   2,   0,   0,  },
+    {0, 0, 0, 0, 0, 0,},
+    {0, 1, 0, 0, 0, 0,},
+    {0, 3, 1, 0, 0, 0,},
+    {0, 5, 2, 0, 0, 0,},
+    {0, 7, 4, 2, 0, 0,},
 };
 
 //Makes it less Confusing
@@ -214,32 +231,34 @@ local AiForce ForceAttacking[] = {
 **      Default AI command table:
 */
 local AiCommand AiTable1[] = {
-  //               AtHome    Attacking    UnitType            Qty
-    { AiCmdArmy,   Wave(0),  Wave(1),                              },
-    { AiCmdArmy,   Wave(1),  Wave(2),                              },
-    { AiCmdBuild,                         UnitBarracksHuman,   2,  },
-    { AiCmdArmy,   Wave(2),  Wave(3),                              },
-    { AiCmdArmy,   Wave(3),  Wave(4),                              },
-    { AiCmdBuild,                         UnitScoutTowerHuman, 2,  },
-    { 0, 0, 0 }
+    //               AtHome    Attacking    UnitType            Qty
+    {AiCmdArmy, Wave(0), Wave(1),},
+    {AiCmdArmy, Wave(1), Wave(2),},
+    {AiCmdBuild, UnitBarracksHuman, 2,},
+    {AiCmdArmy, Wave(2), Wave(3),},
+    {AiCmdArmy, Wave(3), Wave(4),},
+    {AiCmdBuild, UnitScoutTowerHuman, 2,},
+    {0, 0, 0}
 };
 
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
+
 /**
 **	Define the AI goals.
 **	All conditions the AI must check each frame.
 */
 typedef struct _ai_goal_ AiGoal;
 
-struct _ai_goal_ {
-    AiGoal*	Next;			/// double linked list of all goals
-    AiGoal*	Prev;			/// double linked list of all goals
+struct _ai_goal_
+{
+    AiGoal *Next;			/// double linked list of all goals
+    AiGoal *Prev;			/// double linked list of all goals
 
-    int		Action;			/// action to be done for goal
-    int		Number;			/// number of units
-    int         Unit;                   /// type of unit
+    int Action;				/// action to be done for goal
+    int Number;				/// number of units
+    int Unit;				/// type of unit
 };
 
 /**
@@ -247,35 +266,36 @@ struct _ai_goal_ {
 **
 **	@see Players
 */
-typedef struct _player_ai_ {
-    Player*	Player;			/// player number in Players
-    AiGoal*	GoalHead;		/// start of double linked list
-    AiGoal*	GoalNil1;		/// dummy end of double linked list
-    AiGoal*	GoalTail;		/// end of double linked list
+typedef struct _player_ai_
+{
+    Player *Player;			/// player number in Players
+    AiGoal *GoalHead;			/// start of double linked list
+    AiGoal *GoalNil1;			/// dummy end of double linked list
+    AiGoal *GoalTail;			/// end of double linked list
 
-    unsigned	Build[ (UnitTypeInternalMax+BitsOf(unsigned)-1)
-                 /BitsOf(unsigned)];   /// flags what units are currently build
+    unsigned Build[(UnitTypeInternalMax + BitsOf(unsigned) - 1)
+		   / BitsOf(unsigned)];	/// flags what units are currently build
 
-    Unit*	MainHall;		/// home point
+    Unit *MainHall;			/// home point
 
-    int		NeedGold;		/// gold resources needed
-    int		NeedWood;		/// wood resources needed
-    int		NeedOil;		/// oil resources needed
+    int NeedGold;			/// gold resources needed
+    int NeedWood;			/// wood resources needed
+    int NeedOil;			/// oil resources needed
 
-    int		NoGold;			/// there is no gold
-    int		NoWood;			/// there is no wood
-    int		NoOil;			/// there is no oil
+    int NoGold;				/// there is no gold
+    int NoWood;				/// there is no wood
+    int NoOil;				/// there is no oil
 
-    int		CurrentAttack;		/// army at attack
-    int		CurrentHome;		/// army at home
+    int CurrentAttack;			/// army at attack
+    int CurrentHome;			/// army at home
 
-    int		DoCommands;		/// true: process new commands
-    int		CmdIndex;		/// current command
-    AiCommand*	Commands;		/// command table
+    int DoCommands;			/// true: process new commands
+    int CmdIndex;			/// current command
+    AiCommand *Commands;		/// command table
 } PlayerAi;
 
-local PlayerAi* AiPlayer;               /// current ai player
-local PlayerAi Ais[PlayerMax];          /// storage for all players
+local PlayerAi *AiPlayer;		/// current ai player
+local PlayerAi Ais[PlayerMax];		/// storage for all players
 
 /*----------------------------------------------------------------------------
 --   Finding units
@@ -285,70 +305,88 @@ local PlayerAi Ais[PlayerMax];          /// storage for all players
 **  Chooses which Race the building/unit needs to be.
 */
 local int AiChooseRace(int type)
-    {
-    if(AiPlayer->Player->Race==PlayerRaceHuman)
-        {
-        if(type % 2 == 0) return type;
-        return type-1;
-        }
-    if(type % 2 == 1) return type;
-    return type+1;
+{
+    if (AiPlayer->Player->Race == PlayerRaceHuman) {
+	if (type % 2 == 0)
+	    return type;
+	return type - 1;
     }
+    if (type % 2 == 1)
+	return type;
+    return type + 1;
+}
 
 /**
 **      Find all free workers of the current player.
 */
-local int AiFindFreeWorkers(Unit** table)
-    {
-    int nunits,num,i;
-    Unit* unit;
+local int AiFindFreeWorkers(Unit ** table)
+{
+    int nunits;
+    int num;
+    int i;
+    Unit *unit;
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitTypeHumanWorker->Type),table);
+				   UnitTypes +
+				   AiChooseRace(UnitTypeHumanWorker->Type),
+				   table);
     /*
-    nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithGold),table+nunits);
-    nunits += FindPlayerUnitsByType(AiPlayer->Player,
-             UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithWood),table+nunits);
-    */
+       nunits += FindPlayerUnitsByType(AiPlayer->Player,
+       UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithGold->Type),
+       table+nunits);
+       nunits += FindPlayerUnitsByType(AiPlayer->Player,
+       UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithWood->Type),
+       table+nunits);
+     */
 
-    // Remove all workers on the way building
-    for(num=0, i=0; i<nunits; i++)
-        {
-        unit = table[i];
-        if(unit->Command.Action != UnitActionBuild
-	  && unit->NextCommand[0].Action != UnitActionBuild)
-            table[num++]=unit;
-        else {return 0;}
-        }
-    return num;
+    //
+    //  Remove all workers on the way building something
+    //
+    for (num = i = 0; i < nunits; i++) {
+	unit = table[i];
+#ifdef NEW_ORDERS
+	if (unit->Orders[0].Action != UnitActionBuild
+	    && unit->Orders[1].Action != UnitActionBuild) {
+	    table[num++] = unit;
+	}
+#else
+	if (unit->Command.Action != UnitActionBuild
+	    && unit->NextCommand[0].Action != UnitActionBuild) {
+	    table[num++] = unit;
+	}
+#endif
     }
+    return num;
+}
 
 /**
 **      Find all halls of the current player.
 */
-local int AiFindHalls(Unit** table)
-    {
-    Unit* unit;
-    UnitType* type;
-    Unit** units;
-    int num,nunits,i;
+local int AiFindHalls(Unit ** table)
+{
+    Unit *unit;
+    UnitType *type;
+    Unit **units;
+    int num, nunits, i;
 
-    nunits=AiPlayer->Player->TotalNumUnits;
-    units=AiPlayer->Player->Units;
-    for(num=0, i=0; i<nunits; i++)
-        {
-        unit=units[i];
-        if(UnitUnusable(unit)) {continue;}
-        type=unit->Type;
-        // Speeds up the tests by avoiding the next serie
-        // as a mobile unit can't be a hall...
-        if(type->Building && (type->Type==AiChooseRace(UnitTownHall)
-          || type->Type==AiChooseRace(UnitKeep)
-          || type->Type==AiChooseRace(UnitCastle))) {table[num++]=unit;}
-        }
-    return num;
+    nunits = AiPlayer->Player->TotalNumUnits;
+    units = AiPlayer->Player->Units;
+    for (num = 0, i = 0; i < nunits; i++) {
+	unit = units[i];
+	if (UnitUnusable(unit)) {
+	    continue;
+	}
+	type = unit->Type;
+	// Speeds up the tests by avoiding the next serie
+	// as a mobile unit can't be a hall...
+	if (type->Building && (type->Type == AiChooseRace(UnitTownHall)
+			       || type->Type == AiChooseRace(UnitKeep)
+			       || type->Type == AiChooseRace(UnitCastle))) {
+	    table[num++] = unit;
+	}
     }
+    return num;
+}
 
 /*============================================================================
 ==       Counting TOOLS
@@ -367,19 +405,18 @@ local int UnitTypesCount[UnitTypeInternalMax];
 **      @see UnitTypesCount
 */
 local void AiCountUnits(void)
-    {
-    Unit** units;
-    int nunits,i;
+{
+    Unit **units;
+    int nunits, i;
 
     // FIXME: No longer needed done by MakeUnit...
-    memset(UnitTypesCount,0,sizeof(UnitTypesCount));
-    nunits=AiPlayer->Player->TotalNumUnits;
-    units=AiPlayer->Player->Units;
-    for(i=0; i<nunits; i++)
-        {
-        ++UnitTypesCount[units[i]->Type->Type];
-        }
+    memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
+    nunits = AiPlayer->Player->TotalNumUnits;
+    units = AiPlayer->Player->Units;
+    for (i = 0; i < nunits; i++) {
+	++UnitTypesCount[units[i]->Type->Type];
     }
+}
 
 /*----------------------------------------------------------------------------
 --      Building flags
@@ -391,8 +428,8 @@ local void AiCountUnits(void)
 */
 local int AiBuildingUnitType(int type)
 {
-    return AiPlayer->Build[type/BitsOf(*AiPlayer->Build)]
-            &(1<<(type%BitsOf(*AiPlayer->Build)));
+    return AiPlayer->Build[type / BitsOf(*AiPlayer->Build)]
+	    & (1 << (type % BitsOf(*AiPlayer->Build)));
 }
 
 /**
@@ -401,8 +438,8 @@ local int AiBuildingUnitType(int type)
 */
 local void AiMarkBuildUnitType(int type)
 {
-    AiPlayer->Build[type/BitsOf(*AiPlayer->Build)]
-            |=(1<<(type%BitsOf(*AiPlayer->Build)));
+    AiPlayer->Build[type / BitsOf(*AiPlayer->Build)]
+	    |= (1 << (type % BitsOf(*AiPlayer->Build)));
 }
 
 /**
@@ -411,51 +448,42 @@ local void AiMarkBuildUnitType(int type)
 */
 local void AiClearBuildUnitType(int type)
 {
-    AiPlayer->Build[type/BitsOf(*AiPlayer->Build)]
-            &=~(1<<(type%BitsOf(*AiPlayer->Build)));
+    AiPlayer->Build[type / BitsOf(*AiPlayer->Build)]
+	    &= ~(1 << (type % BitsOf(*AiPlayer->Build)));
 }
-
 
 /*----------------------------------------------------------------------------
 --      Resource management
 ----------------------------------------------------------------------------*/
 
-
 /**
 **   Check for Resources
 */
-local int AiNeedResources(const UnitType* type)
-    {
+local int AiNeedResources(const UnitType * type)
+{
     int err;
 
-    Player* player;
-    player=AiPlayer->Player;
-    if( (err=PlayerCheckUnitType(player,type)) )
-        {
-        if(err&(1<<GoldCost))
-           {
-           DebugLevel3Fn("%Zd Need gold\n"
-		    ,AiPlayer->Player-Players);
-           AiPlayer->NeedGold=1;
-	   }
-        if(err&(1<<WoodCost))
-           {
-           DebugLevel3Fn("%Zd Need wood\n"
-		    ,AiPlayer->Player-Players);
-	   AiPlayer->NeedWood=1;
-	   }
-        if(err&(1<<OilCost))
-           {
-           DebugLevel3Fn("%Zd Need oil\n"
-		    ,AiPlayer->Player-Players);
-	   AiPlayer->NeedOil=1;
-	   }
-	// FIXME: more resources!!!
-        return 1;
-        }
-    return 0;
-    }
+    Player *player;
 
+    player = AiPlayer->Player;
+    if ((err = PlayerCheckUnitType(player, type))) {
+	if (err & (1 << GoldCost)) {
+	    DebugLevel3Fn("%Zd Need gold\n", AiPlayer->Player - Players);
+	    AiPlayer->NeedGold = 1;
+	}
+	if (err & (1 << WoodCost)) {
+	    DebugLevel3Fn("%Zd Need wood\n", AiPlayer->Player - Players);
+	    AiPlayer->NeedWood = 1;
+	}
+	if (err & (1 << OilCost)) {
+	    DebugLevel3Fn("%Zd Need oil\n", AiPlayer->Player - Players);
+	    AiPlayer->NeedOil = 1;
+	}
+	// FIXME: more resources!!!
+	return 1;
+    }
+    return 0;
+}
 
 /*----------------------------------------------------------------------------
 --      BUILDING
@@ -484,184 +512,201 @@ local int AiNeedResources(const UnitType* type)
 **      11111111111111111
 **      11111111111111111
 */
-local int AiNearGoldmine(Unit* goldmine,Unit* worker,int type,int* dx,int *dy)
-    {
+local int AiNearGoldmine(Unit * goldmine, Unit * worker, int type, int *dx,
+			 int *dy)
+{
     int wx, wy, x, y, addx, addy, i, best_x, best_y, d, cost;
-    wx=worker->X;
-    wy=worker->Y;
-    x=goldmine->X;
-    y=goldmine->Y;
-    addx=goldmine->Type->TileWidth;
-    addy=goldmine->Type->TileHeight;
-    DebugLevel3("%d,%d\n",UnitTypes[type].TileWidth,UnitTypes[type].TileHeight);
-    x-=UnitTypes[type].TileWidth;       // this should correct it
-    y-=UnitTypes[type].TileHeight-1;
-    addx+=UnitTypes[type].TileWidth-1;
-    addy+=UnitTypes[type].TileHeight-1;
-    DebugLevel3("XXXXX: %d,%d\n",addx,addy);
-    cost=99999;
-    IfDebug( best_x=best_y=0; );        // remove compiler warning
-    for( ;; )
-        {   // test rectangles arround the mine
-	for(i=addy; i--; y++)
-            {
-	    DebugLevel3("\t\tTest %3d,%3d\n",x,y);
-	    if(CanBuildUnitType(worker,&UnitTypes[type],x,y))
-                {
-		d=MapDistanceToType(wx,wy,&UnitTypes[type],x,y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n",wx,wy,x,y,d);
-		if(d<cost)
-                    {
-		    cost=d;
-		    best_x=x;
-		    best_y=y;
-		    }
-	        }
+
+    wx = worker->X;
+    wy = worker->Y;
+    x = goldmine->X;
+    y = goldmine->Y;
+    addx = goldmine->Type->TileWidth;
+    addy = goldmine->Type->TileHeight;
+    DebugLevel3("%d,%d\n", UnitTypes[type].TileWidth,
+		UnitTypes[type].TileHeight);
+    x -= UnitTypes[type].TileWidth;	// this should correct it
+    y -= UnitTypes[type].TileHeight - 1;
+    addx += UnitTypes[type].TileWidth - 1;
+    addy += UnitTypes[type].TileHeight - 1;
+    DebugLevel3("XXXXX: %d,%d\n", addx, addy);
+    cost = 99999;
+    IfDebug(best_x = best_y = 0;
+	    );				// remove compiler warning
+    for (;;) {				// test rectangles arround the mine
+	for (i = addy; i--; y++) {
+	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    if (CanBuildUnitType(worker, &UnitTypes[type], x, y)) {
+		d = MapDistanceToType(wx, wy, &UnitTypes[type], x, y);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		if (d < cost) {
+		    cost = d;
+		    best_x = x;
+		    best_y = y;
+		}
 	    }
+	}
 	++addx;
-	for(i=addx; i--; x++)
-            {
-	    DebugLevel3("\t\tTest %3d,%3d\n",x,y);
-	    if(CanBuildUnitType(worker,&UnitTypes[type],x,y))
-                {
-		d=MapDistanceToType(wx,wy,&UnitTypes[type],x,y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n",wx,wy,x,y,d);
-		if(d<cost)
-                    {
-		    cost=d;
-		    best_x=x;
-		    best_y=y;
-		    }
-	        }
+	for (i = addx; i--; x++) {
+	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    if (CanBuildUnitType(worker, &UnitTypes[type], x, y)) {
+		d = MapDistanceToType(wx, wy, &UnitTypes[type], x, y);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		if (d < cost) {
+		    cost = d;
+		    best_x = x;
+		    best_y = y;
+		}
 	    }
+	}
 	++addy;
-	for(i=addy; i--; y--)
-            {
-	    DebugLevel3("\t\tTest %3d,%3d\n",x,y);
-	    if(CanBuildUnitType(worker,&UnitTypes[type],x,y))
-                {
-		d=MapDistanceToType(wx,wy,&UnitTypes[type],x,y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n",wx,wy,x,y,d);
-		if(d<cost)
-                    {
-		    cost=d;
-		    best_x=x;
-		    best_y=y;
-		    }
-	        }
+	for (i = addy; i--; y--) {
+	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    if (CanBuildUnitType(worker, &UnitTypes[type], x, y)) {
+		d = MapDistanceToType(wx, wy, &UnitTypes[type], x, y);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		if (d < cost) {
+		    cost = d;
+		    best_x = x;
+		    best_y = y;
+		}
 	    }
+	}
 	++addx;
-	for(i=addx; i--; x--)
-            {
-	    DebugLevel3("\t\tTest %3d,%3d\n",x,y);
-	    if(CanBuildUnitType(worker,&UnitTypes[type],x,y))
-                {
-		d=MapDistanceToType(wx,wy,&UnitTypes[type],x,y);
-		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n",wx,wy,x,y,d);
-		if(d<cost)
-                    {
-		    cost=d;
-		    best_x=x;
-		    best_y=y;
-		    }
-	        }
+	for (i = addx; i--; x--) {
+	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	    if (CanBuildUnitType(worker, &UnitTypes[type], x, y)) {
+		d = MapDistanceToType(wx, wy, &UnitTypes[type], x, y);
+		DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+		if (d < cost) {
+		    cost = d;
+		    best_x = x;
+		    best_y = y;
+		}
 	    }
-	if(cost!=99999)
-            {
-	    DebugLevel3("\tBuild at %d,%d\n",best_x,best_y);
-	    *dx=best_x;
-	    *dy=best_y;
+	}
+	if (cost != 99999) {
+	    DebugLevel3("\tBuild at %d,%d\n", best_x, best_y);
+	    *dx = best_x;
+	    *dy = best_y;
 	    return 0;
-	    }
+	}
 	++addy;
-        }
-    abort();  // shouldn't be reached
-    return 1;
     }
+    abort();				// shouldn't be reached
+    return 1;
+}
 
 /**
 **      Find free building place near hall.
 **
 **      FIXME: can move own units out of the way!!
 */
-global int AiNearHall(Unit* hall,Unit* worker,UnitType* type,int* dx,int *dy)
-    {
+global int AiNearHall(Unit * hall, Unit * worker, UnitType * type, int *dx,
+		      int *dy)
+{
     int wx, wy, x, y, addx, addy, num_goldmine, g;
     int end, state, best_x, best_y, d, cost;
-    Unit* goldmines[MAX_UNITS];
+    Unit *goldmines[MAX_UNITS];
 
-    DebugLevel3Fn("hall %d %d,%d\n",UnitNumber(hall),
-                    hall->X,hall->Y);
+    DebugLevel3Fn("hall %d %d,%d\n", UnitNumber(hall), hall->X, hall->Y);
 
-    if( !hall ) {			// No hall take units place.
+    if (!hall) {			// No hall take units place.
 	DebugLevel3Fn("Called without hall\n");
-	*dx=worker->X;
-	*dy=worker->Y;
+	*dx = worker->X;
+	*dy = worker->Y;
 	return 99998;
     }
 
-    num_goldmine=FindUnitsByType(UnitTypeGoldMine,goldmines);
-    DebugLevel3("\tGoldmines %d\n",num_goldmine);
-    wx=worker->X;    wy=worker->Y;
-    x=hall->X;       y=hall->Y;
-    addx=hall->Type->TileWidth;
-    addy=hall->Type->TileHeight;
-    cost=99999;
-    IfDebug( best_x=best_y=0; );        // remove compiler warning
-    DebugLevel3("%d,%d\n",type->TileWidth,type->TileHeight);
+    num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
+    DebugLevel3("\tGoldmines %d\n", num_goldmine);
+    wx = worker->X;
+    wy = worker->Y;
+    x = hall->X;
+    y = hall->Y;
+    addx = hall->Type->TileWidth;
+    addy = hall->Type->TileHeight;
+    cost = 99999;
+    IfDebug(best_x = best_y = 0;
+	    );				// remove compiler warning
+    DebugLevel3("%d,%d\n", type->TileWidth, type->TileHeight);
     /// leave two fields free!
 #define SPACE 2
-    x-=type->TileWidth+SPACE;           // this should correct it
-    y-=type->TileHeight+SPACE-1;
-    addx+=type->TileWidth+SPACE+1;
-    addy+=type->TileHeight+SPACE+1;
+    x -= type->TileWidth + SPACE;	// this should correct it
+    y -= type->TileHeight + SPACE - 1;
+    addx += type->TileWidth + SPACE + 1;
+    addy += type->TileHeight + SPACE + 1;
 #undef SPACE
-    state=0;
-    end=y+addy-1;
-    for( ;; )
-        {                         // test rectangles arround the hall
-	switch(state)
-            {
-	    case 0: if(y++==end) {++state;  end=x+addx++;} break;
-	    case 1: if(x++==end) {++state;  end=y-addy++;} break;
-	    case 2: if(y--==end) {++state;  end=x-addx++;} break;
-	    case 3: if(x--==end)
-                {
-                state=0;  end=y+addy++;
-		if(cost!=99999)
-                    {
-		    DebugLevel3("\tBuild at %d,%d\n",best_x,best_y);
-		    *dx=best_x;
-		    *dy=best_y;
+    state = 0;
+    end = y + addy - 1;
+    for (;;) {				// test rectangles arround the hall
+	switch (state) {
+	case 0:
+	    if (y++ == end) {
+		++state;
+		end = x + addx++;
+	    }
+	    break;
+	case 1:
+	    if (x++ == end) {
+		++state;
+		end = y - addy++;
+	    }
+	    break;
+	case 2:
+	    if (y-- == end) {
+		++state;
+		end = x - addx++;
+	    }
+	    break;
+	case 3:
+	    if (x-- == end) {
+		state = 0;
+		end = y + addy++;
+		if (cost != 99999) {
+		    DebugLevel3("\tBuild at %d,%d\n", best_x, best_y);
+		    *dx = best_x;
+		    *dy = best_y;
 		    return cost;
-		    }
-		}  break;
+		}
 	    }
+	    break;
+	}
 	// FIXME: this check outside the map could be speeded up.
-	if(y<0 || x<0 || y>=TheMap.Height || x>=TheMap.Width)
-            {DebugLevel3("\t\tSkip %3d,%3d\n",x,y); continue;}
-	DebugLevel3("\t\tTest %3d,%3d\n",x,y);
-	if(CanBuildUnitType(worker,type,x,y))
-            {
-	    if (x == hall->X || y == hall->Y
-	       || x == hall->X+1 || y == hall->Y+1
-	       || x == hall->X+2 || y == hall->Y+2
-	       || x == hall->X-2 || y == hall->Y-2
-	       || x == hall->X-1 || y == hall->Y-1) {continue;}
-	    // Check if too near to goldmine
-	    for(g=0; g<num_goldmine; ++g)
-                {
-		if(MapDistanceToType(x,y,UnitTypeGoldMine
-		   ,goldmines[g]->X,goldmines[g]->Y)<4) {break;}
-	        }
-	    if(g!=num_goldmine) {continue;}  //too near goldmine
-	    d=MapDistanceToType(wx,wy,type,x,y);
-	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n",wx,wy,x,y,d);
-	    if(d<cost) {cost=d;  best_x=x;  best_y=y;}
+	if (y < 0 || x < 0 || y >= TheMap.Height || x >= TheMap.Width) {
+	    DebugLevel3("\t\tSkip %3d,%3d\n", x, y);
+	    continue;
+	}
+	DebugLevel3("\t\tTest %3d,%3d\n", x, y);
+	if (CanBuildUnitType(worker, type, x, y)) {
+	    if (x == hall->X || y == hall->Y || x == hall->X + 1
+		|| y == hall->Y + 1 || x == hall->X + 2 || y == hall->Y + 2
+		|| x == hall->X - 2 || y == hall->Y - 2 || x == hall->X - 1
+		|| y == hall->Y - 1) {
+		continue;
 	    }
-        }
-    return 0;
+	    // Check if too near to goldmine
+	    for (g = 0; g < num_goldmine; ++g) {
+		if (MapDistanceToType
+		    (x, y, UnitTypeGoldMine, goldmines[g]->X,
+		     goldmines[g]->Y) < 4) {
+		    break;
+		}
+	    }
+	    if (g != num_goldmine) {
+		continue;
+	    }				//too near goldmine
+	    d = MapDistanceToType(wx, wy, type, x, y);
+	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", wx, wy, x, y, d);
+	    if (d < cost) {
+		cost = d;
+		best_x = x;
+		best_y = y;
+	    }
+	}
     }
+    return 0;
+}
 
 /**
 **      Find the best place for a hall.
@@ -681,63 +726,66 @@ global int AiNearHall(Unit* hall,Unit* worker,UnitType* type,int* dx,int *dy)
 **              !5) no hall already near
 */
 local int AiBuildHall(int type)
-    {
-    Unit* workers[MAX_UNITS];
-    Unit* goldmines[MAX_UNITS];
+{
+    Unit *workers[MAX_UNITS];
+    Unit *goldmines[MAX_UNITS];
     int num_goldmine, g, best_w, best_g, best_x, best_y, cost;
     int x, y, d, num_worker, w;
 
     DebugLevel3Fn("\n");
 
     //  Find all available peon/peasants.
-    num_worker=AiFindFreeWorkers(workers);
-    DebugLevel3("\tWorkers %d\n",num_worker);
-    if(!num_worker) {return -1;}  // QUESTION: only not working ??
+    num_worker = AiFindFreeWorkers(workers);
+    DebugLevel3("\tWorkers %d\n", num_worker);
+    if (!num_worker) {
+	return -1;
+    }					// QUESTION: only not working ??
 
     //  Find all goldmines.
-    num_goldmine=FindUnitsByType(UnitTypeGoldMine,goldmines);
-    DebugLevel3("\tGoldmines %d\n",num_goldmine);
-    if(!num_goldmine ) {return -1;}
-
+    num_goldmine = FindUnitsByType(UnitTypeGoldMine, goldmines);
+    DebugLevel3("\tGoldmines %d\n", num_goldmine);
+    if (!num_goldmine) {
+	return -1;
+    }
     //
     //  Find best place.
     //  FIXME: this isn't the best, can later write a better routine
     //
 
     //  Find worker with the shortest distance to a gold-mine.
-    cost=99999;
-    IfDebug( best_w=best_g=0; );        // remove compiler warning
-    for(w=0; w<num_worker; ++w)
-        {
-	x=workers[w]->X;
-	y=workers[w]->Y;
-	for(g=0; g<num_goldmine; ++g)
-            {
-	    d=MapDistanceToUnit(x,y,goldmines[g]);
-	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n"
-		    ,x,y,goldmines[g]->X,goldmines[g]->Y,d);
-	    if(d<cost && UnitReachable(workers[w],goldmines[g],1))
-                {
-		best_w=w;
-		best_g=g;
-		cost=d;
-	        }
+    cost = 99999;
+    IfDebug(best_w = best_g = 0;
+	    );				// remove compiler warning
+    for (w = 0; w < num_worker; ++w) {
+	x = workers[w]->X;
+	y = workers[w]->Y;
+	for (g = 0; g < num_goldmine; ++g) {
+	    d = MapDistanceToUnit(x, y, goldmines[g]);
+	    DebugLevel3("\t\t%3d,%3d -> %3d,%3d = %3d\n", x, y,
+			goldmines[g]->X, goldmines[g]->Y, d);
+	    if (d < cost && UnitReachable(workers[w], goldmines[g], 1)) {
+		best_w = w;
+		best_g = g;
+		cost = d;
 	    }
-        }
+	}
+    }
     // Did use the first if no could be moved.
-    DebugLevel3("\tWorker %Zd %d,%d -> Goldmine %Zd %d,%d\n"
-	,UnitNumber(workers[best_w])
-	,workers[best_w]->X,workers[best_w]->Y
-	,UnitNumber(goldmines[best_g])
-	,goldmines[best_g]->X,goldmines[best_g]->Y);
+    DebugLevel3("\tWorker %Zd %d,%d -> Goldmine %Zd %d,%d\n",
+		UnitNumber(workers[best_w])
+		, workers[best_w]->X, workers[best_w]->Y,
+		UnitNumber(goldmines[best_g])
+		, goldmines[best_g]->X, goldmines[best_g]->Y);
 
     //  Find the nearest buildable place near the gold-mine.
-    if(AiNearGoldmine(goldmines[best_g]
-	    ,workers[best_w],type,&best_x,&best_y)) {return -1;}
-    CommandBuildBuilding(workers[best_w],best_x,best_y,&UnitTypes[type],1);
+    if (AiNearGoldmine(goldmines[best_g]
+		       , workers[best_w], type, &best_x, &best_y)) {
+	return -1;
+    }
+    CommandBuildBuilding(workers[best_w], best_x, best_y, &UnitTypes[type], 1);
     AiMarkBuildUnitType(type);
     return 0;
-    }
+}
 
 /**
 **      Find place for farm/barracks/etc..
@@ -754,16 +802,18 @@ local int AiBuildHall(int type)
 **              !4) no enemy near it.
 */
 local int AiBuildBuilding(int type)
-    {
-    Unit* workers[MAX_UNITS];
-    int num_worker,cost,best_w,best_x,best_y,x,y,d,w;
-    DebugLevel3Fn("(%d)\n",type);
+{
+    Unit *workers[MAX_UNITS];
+    int num_worker, cost, best_w, best_x, best_y, x, y, d, w;
+
+    DebugLevel3Fn("(%d)\n", type);
 
     //  Find all available peon/peasants.
-    num_worker=AiFindFreeWorkers(workers);
-    DebugLevel3("\tWorkers %d\n",num_worker);
-    if(!num_worker) {return -1;}
-
+    num_worker = AiFindFreeWorkers(workers);
+    DebugLevel3("\tWorkers %d\n", num_worker);
+    if (!num_worker) {
+	return -1;
+    }
     //  Build near to main hall.
     //if( !AiPlayer->MainHall ) {return -1;}
 
@@ -771,34 +821,33 @@ local int AiBuildBuilding(int type)
     //  FIXME: don't block the way to the gold mine
 
     //  Find best worker near a building place near home hall.
-    cost=99999;
-    IfDebug(best_w=best_x=best_y=0;); // keep the compiler happy
-    for(w=0; w<num_worker; ++w)
-        {
-	if((d=AiNearHall(AiPlayer->MainHall,
-            workers[w],&UnitTypes[type],&x,&y)))
-            {
-	    if(d<cost && PlaceReachable(workers[w],x,y,1))
-                {
+    cost = 99999;
+    IfDebug(best_w = best_x = best_y = 0;
+	    );				// keep the compiler happy
+    for (w = 0; w < num_worker; ++w) {
+	if ((d =
+	     AiNearHall(AiPlayer->MainHall, workers[w], &UnitTypes[type], &x,
+			&y))) {
+	    if (d < cost && PlaceReachable(workers[w], x, y, 1)) {
 		// JOHNS: ?if(x != y)
-                    {
-		    cost=d;
-		    best_w=w;
-		    best_x=x;
-		    best_y=y;
-		    }
-	        }
+		{
+		    cost = d;
+		    best_w = w;
+		    best_x = x;
+		    best_y = y;
+		}
 	    }
-        }
-    if(cost!=99999)
-        {
-	DebugLevel3Fn("at %d,%d\n",best_x,best_y);
-	CommandBuildBuilding(workers[best_w],best_x,best_y,&UnitTypes[type],1);
+	}
+    }
+    if (cost != 99999) {
+	DebugLevel3Fn("at %d,%d\n", best_x, best_y);
+	CommandBuildBuilding(workers[best_w], best_x, best_y, &UnitTypes[type],
+			     1);
 	AiMarkBuildUnitType(type);
 	return 0;
-        }
-    return -1;
     }
+    return -1;
+}
 
 /*----------------------------------------------------------------------------
 --      Train
@@ -812,33 +861,41 @@ local int AiBuildBuilding(int type)
 **                               0 started
 */
 local int AiTrainCreature(int type)
-    {
-    Unit* units[MAX_UNITS];
+{
+    Unit *units[MAX_UNITS];
     int nunits;
-    Player* player;
+    Player *player;
+
     DebugLevel3Fn("\n");
-    if(type == AiChooseRace(UnitTypeHumanWorker->Type))
-        {nunits = AiFindHalls(units);}
-    else
-        {
-        nunits = FindPlayerUnitsByType(AiPlayer->Player,
-			UnitTypes+AiChooseRace(UnitBarracksHuman),
-	 //FIXME: jon: AiChooseTrainer(type),
-			units);
-        }
-    if(!nunits) {return -1;}
-    while(nunits--)
-        {
-	if(units[nunits]->Command.Action!=UnitActionStill){continue;}
-        player=AiPlayer->Player;
-	PlayerSubUnitType(player,&UnitTypes[type]);
-	CommandTrainUnit(units[nunits],&UnitTypes[type],1);
+    if (type == AiChooseRace(UnitTypeHumanWorker->Type)) {
+	nunits = AiFindHalls(units);
+    } else {
+	nunits = FindPlayerUnitsByType(AiPlayer->Player,
+	    UnitTypes + AiChooseRace(UnitBarracksHuman),
+	    //FIXME: jon: AiChooseTrainer(type),
+	    units);
+    }
+    if (!nunits) {
+	return -1;
+    }
+    while (nunits--) {
+#ifdef NEW_ORDERS
+	if (units[nunits]->Orders[0].Action != UnitActionStill) {
+	    continue;
+	}
+#else
+	if (units[nunits]->Command.Action != UnitActionStill) {
+	    continue;
+	}
+#endif
+	player = AiPlayer->Player;
+	PlayerSubUnitType(player, &UnitTypes[type]);
+	CommandTrainUnit(units[nunits], &UnitTypes[type], 1);
 	AiMarkBuildUnitType(type);
 	return 0;
-        }
-    return 1;
     }
-
+    return 1;
+}
 
 /*----------------------------------------------------------------------------
 --      WORKERS/RESOURCES
@@ -850,309 +907,317 @@ local int AiTrainCreature(int type)
 **      IDEA: If no way to goldmine, we must dig the way.
 **      IDEA: If goldmine is on an other island, we must transport the workers.
 */
-local void AiMineGold(Unit* unit)
-    {
-    Unit* dest;
-    DebugLevel3Fn("%d\n",UnitNumber(unit));
-    dest=FindGoldMine(unit,unit->X,unit->Y);
-    if(!dest)
-        {
+local void AiMineGold(Unit * unit)
+{
+    Unit *dest;
+
+    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    dest = FindGoldMine(unit, unit->X, unit->Y);
+    if (!dest) {
 	// FIXME: now not really, no goldmine.
 	DebugLevel0Fn("goldmine not reachable\n");
 	//AiPlayer->NoGold=1;
 	return;
-        }
-    CommandMineGold(unit,dest,1);
     }
+    CommandMineGold(unit, dest, 1);
+}
 
 /**
 **      Assign worker to harvest.
 */
-local int AiHarvest(Unit* unit)
-    {
-    int x,y,addx,addy,i,n,r,wx,wy,bestx,besty,cost;
-    Unit* dest;
-    DebugLevel3Fn("%d\n",UnitNumber(unit));
-    x=unit->X;
-    y=unit->Y;
-    addx=unit->Type->TileWidth;
-    addy=unit->Type->TileHeight;
-    r=TheMap.Width;
-    if(r<TheMap.Height) {r=TheMap.Height;}
+local int AiHarvest(Unit * unit)
+{
+    int x, y, addx, addy, i, n, r, wx, wy, bestx, besty, cost;
+    Unit *dest;
 
+    DebugLevel3Fn("%d\n", UnitNumber(unit));
+    x = unit->X;
+    y = unit->Y;
+    addx = unit->Type->TileWidth;
+    addy = unit->Type->TileHeight;
+    r = TheMap.Width;
+    if (r < TheMap.Height) {
+	r = TheMap.Height;
+    }
     //  This is correct, but can this be written faster???
-    if((dest=FindWoodDeposit(unit->Player,x,y)))
-        {
-	NearestOfUnit(dest,x,y,&wx,&wy);
-	DebugLevel3("To %d,%d\n",wx,wy);
-        }
-    else
-        {
-	wx=unit->X;
-	wy=unit->Y;
-        }
-    cost=99999;
-    IfDebug(bestx=besty=0;);   // keep the compiler happy
+    if ((dest = FindWoodDeposit(unit->Player, x, y))) {
+	NearestOfUnit(dest, x, y, &wx, &wy);
+	DebugLevel3("To %d,%d\n", wx, wy);
+    } else {
+	wx = unit->X;
+	wy = unit->Y;
+    }
+    cost = 99999;
+    IfDebug(bestx = besty = 0;
+	    );				// keep the compiler happy
 
     // FIXME: if we reach the map borders we can go fast up, left, ...
     --x;
-    while(addx<=r && addy<=r)
-        {
-	for(i=addy; i--; y++)
-            {       // go down
-	    if(CheckedForestOnMap(x,y))
-                {
-		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
-		if(n<cost)
-                    {
-		    cost=n;
-		    bestx=x;
-		    besty=y;
-		    }
-	        }
+    while (addx <= r && addy <= r) {
+	for (i = addy; i--; y++) {	// go down
+	    if (CheckedForestOnMap(x, y)) {
+		n = max(abs(wx - x), abs(wy - y));
+		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		if (n < cost) {
+		    cost = n;
+		    bestx = x;
+		    besty = y;
+		}
 	    }
+	}
 	++addx;
-	for(i=addx; i--; x++)
-            {       // go right
-	    if(CheckedForestOnMap(x,y))
-                {
-		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
-		if(n<cost)
-                    {
-		    cost=n;
-		    bestx=x;
-		    besty=y;
-		    }
-	        }
+	for (i = addx; i--; x++) {	// go right
+	    if (CheckedForestOnMap(x, y)) {
+		n = max(abs(wx - x), abs(wy - y));
+		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		if (n < cost) {
+		    cost = n;
+		    bestx = x;
+		    besty = y;
+		}
 	    }
+	}
 	++addy;
-	for(i=addy; i--; y--)
-            {       // go up
-	    if(CheckedForestOnMap(x,y))
-                {
-		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
-		if(n<cost)
-                    {
-		    cost=n;
-		    bestx=x;
-		    besty=y;
-		    }
-	        }
+	for (i = addy; i--; y--) {	// go up
+	    if (CheckedForestOnMap(x, y)) {
+		n = max(abs(wx - x), abs(wy - y));
+		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		if (n < cost) {
+		    cost = n;
+		    bestx = x;
+		    besty = y;
+		}
 	    }
+	}
 	++addx;
-	for(i=addx; i--; x--)
-            {       // go left
-	    if(CheckedForestOnMap(x,y))
-                {
-		n=max(abs(wx-x),abs(wy-y));
-		DebugLevel3("Distance %d,%d %d\n",x,y,n);
-		if(n<cost)
-                    {
-		    cost=n;
-		    bestx=x;
-		    besty=y;
-		    }
-	        }
+	for (i = addx; i--; x--) {	// go left
+	    if (CheckedForestOnMap(x, y)) {
+		n = max(abs(wx - x), abs(wy - y));
+		DebugLevel3("Distance %d,%d %d\n", x, y, n);
+		if (n < cost) {
+		    cost = n;
+		    bestx = x;
+		    besty = y;
+		}
 	    }
-	if(cost!=99999)
-            {
-	    DebugLevel3Fn("wood on %d,%d\n",x,y);
-	    CommandHarvest(unit,bestx,besty,1);
+	}
+	if (cost != 99999) {
+	    DebugLevel3Fn("wood on %d,%d\n", x, y);
+	    CommandHarvest(unit, bestx, besty, 1);
 	    return 1;
-	    }
+	}
 	++addy;
-        }
-    DebugLevel0Fn("no wood on map\n");
-    AiPlayer->NoWood=1;
-    return 0;
     }
-
+    DebugLevel0Fn("no wood on map\n");
+    AiPlayer->NoWood = 1;
+    return 0;
+}
 
 /**
 **      Assigned workers: let them do something.
 */
 local void AiAssignWorker(void)
-    {
-    Unit* workers[MAX_UNITS];
+{
+    Unit *workers[MAX_UNITS];
     int num_worker, num_gold, num_wood, num_repair, num_still;
     int action, type, w;
 
     DebugLevel3Fn("\n");
 
     //  Count workers
-    num_worker=AiFindFreeWorkers(workers);
-    if( num_worker) {
-    num_still=num_gold=num_wood=num_repair=0;
-    for(w=0; w<num_worker; ++w)
-        {
-	action=workers[w]->Command.Action;
-	switch(action)
-            {
-	    case UnitActionStill:    ++num_still;  break;
-	    case UnitActionMineGold: ++num_gold;   break;
-	    case UnitActionHarvest:  ++num_wood;   break;
-	    case UnitActionRepair:   ++num_repair; break;
-	    default: DebugLevel0("%d\n",action); break;
+    num_worker = AiFindFreeWorkers(workers);
+    if (num_worker) {
+	num_still = num_gold = num_wood = num_repair = 0;
+	for (w = 0; w < num_worker; ++w) {
+#ifdef NEW_ORDERS
+	    action = workers[w]->Orders[0].Action;
+#else
+	    action = workers[w]->Command.Action;
+#endif
+	    switch (action) {
+	    case UnitActionStill:
+		++num_still;
+		break;
+	    case UnitActionMineGold:
+		++num_gold;
+		break;
+	    case UnitActionHarvest:
+		++num_wood;
+		break;
+	    case UnitActionRepair:
+		++num_repair;
+		break;
+	    default:
+		DebugLevel0("%d\n", action);
+		break;
 	    }
-        }
+	}
 
-    DebugLevel3("Ai: Player %Zd: ",AiPlayer->Player-Players);
-    DebugLevel3("Workers %d, Gold %d, Wood %d, Repair %d, Still %d.\n"
-	,num_worker,num_gold,num_wood,num_repair,num_still);
+	DebugLevel3("Ai: Player %Zd: ", AiPlayer->Player - Players);
+	DebugLevel3("Workers %d, Gold %d, Wood %d, Repair %d, Still %d.\n",
+		    num_worker, num_gold, num_wood, num_repair, num_still);
 
-    if(AiPlayer->NeedGold && AiPlayer->NeedWood)
-        {
-	DebugLevel3("Ai: Player %Zd need gold and wood\n"
-	    ,AiPlayer->Player-Players);
-	//      Assign half to wood and gold.
-	if(num_still)
-            {               // assign the non-working
-	    for(w=0; w<num_worker; ++w)
-                {
-		type=workers[w]->Type->Type;
-		action=workers[w]->Command.Action;
-		if(action==UnitActionStill)
-                    {
-		    if(type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type) ||
-                       type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type))
-                      {CommandReturnGoods(workers[w],1);}
-                    else
-                      {
-                      if(num_gold<=num_wood)
-			{AiMineGold(workers[w]); ++num_gold;}
-	              else
-			{AiHarvest(workers[w]); ++num_wood;}
-		      }
-                    }
-	        }
-	    }
-	return; //Continue
-        }
-
-    if(AiPlayer->NeedGold)
-        {
-	DebugLevel3("Ai: Player %Zd need gold\n"
-	    ,AiPlayer->Player-Players);
-	//      Assign all to mine gold.
-	for(w=0; w<num_worker; ++w)
-            {
-	    type=workers[w]->Type->Type;
-	    if(type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type) ||
-               type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type))
-                {CommandReturnGoods(workers[w],1);}
-	    else
-                {
-                // FIXME: don't interrupt chopping
-	        action=workers[w]->Command.Action;
-	        if(action==UnitActionStill || action==UnitActionHarvest)
-                    {
-		    AiMineGold(workers[w]);
-		    DebugLevel3("\tAdd worker to gold\n");
-	            }
-                }
-	    }
-	return;
-        }
-
-    if(AiPlayer->NeedWood)
-        {
-	DebugLevel3("Ai: Player %Zd need wood\n"
-	    ,AiPlayer->Player-Players);
-	//      Assign all to harvest wood.
-	for(w=0; w<num_worker; ++w)
-            {
-	    type=workers[w]->Type->Type;
-	    if(type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type) ||
-               type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type))
-                {CommandReturnGoods(workers[w],1);}
-	    else
-                {
-	        action=workers[w]->Command.Action;
-	        if(action==UnitActionStill || action==UnitActionMineGold)
-                    {AiHarvest(workers[w]);}
-                }
-	    }
-	return;
-        }
-
-    //  Unassigned workers: let them do something.
-    //          FIXME: if there is no gold/no wood forget this!
-    if(num_still)
-        {          // assign the non working
-	for(w=0; w<num_worker; ++w)
-	    {
-	    action=workers[w]->Command.Action;
-	    if(action==UnitActionStill)
-		{
-		type=workers[w]->Type->Type;
-		if(type==AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
-		  || type==AiChooseRace(UnitTypeHumanWorkerWithWood->Type))
-		    {
-		    if(AiPlayer->MainHall)
-			{
-			CommandReturnGoods(workers[w],1);
+	if (AiPlayer->NeedGold && AiPlayer->NeedWood) {
+	    DebugLevel3("Ai: Player %Zd need gold and wood\n",
+			AiPlayer->Player - Players);
+	    //      Assign half to wood and gold.
+	    if (num_still) {		// assign the non-working
+		for (w = 0; w < num_worker; ++w) {
+		    type = workers[w]->Type->Type;
+#ifdef NEW_ORDERS
+		    action = workers[w]->Orders[0].Action;
+#else
+		    action = workers[w]->Command.Action;
+#endif
+		    if (action == UnitActionStill) {
+			if (type ==
+			    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
+			    || type ==
+			    AiChooseRace(UnitTypeHumanWorkerWithWood->Type)) {
+			    CommandReturnGoods(workers[w], 1);
+			} else {
+			    if (num_gold <= num_wood) {
+				AiMineGold(workers[w]);
+				++num_gold;
+			    } else {
+				AiHarvest(workers[w]);
+				++num_wood;
+			    }
 			}
-		    continue;
 		    }
-		if(!AiPlayer->NoGold && num_gold<=num_wood)
-		    {
-		    AiMineGold(workers[w]);
-		    ++num_gold;
+		}
+	    }
+	    return;			//Continue
+	}
+
+	if (AiPlayer->NeedGold) {
+	    DebugLevel3("Ai: Player %Zd need gold\n",
+			AiPlayer->Player - Players);
+	    //      Assign all to mine gold.
+	    for (w = 0; w < num_worker; ++w) {
+		type = workers[w]->Type->Type;
+		if (type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type)
+		    || type ==
+		    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)) {
+		    CommandReturnGoods(workers[w], 1);
+		} else {
+		    // FIXME: don't interrupt chopping
+#ifdef NEW_ORDERS
+		    action = workers[w]->Orders[0].Action;
+#else
+		    action = workers[w]->Command.Action;
+#endif
+		    if (action == UnitActionStill
+			|| action == UnitActionHarvest) {
+			AiMineGold(workers[w]);
+			DebugLevel3("\tAdd worker to gold\n");
 		    }
-		else if(!AiPlayer->NoWood)
-		    {
-		    AiHarvest(workers[w]);
-		    ++num_wood;
+		}
+	    }
+	    return;
+	}
+
+	if (AiPlayer->NeedWood) {
+	    DebugLevel3("Ai: Player %Zd need wood\n",
+			AiPlayer->Player - Players);
+	    //      Assign all to harvest wood.
+	    for (w = 0; w < num_worker; ++w) {
+		type = workers[w]->Type->Type;
+		if (type == AiChooseRace(UnitTypeHumanWorkerWithWood->Type)
+		    || type ==
+		    AiChooseRace(UnitTypeHumanWorkerWithGold->Type)) {
+		    CommandReturnGoods(workers[w], 1);
+		} else {
+#ifdef NEW_ORDERS
+		    action = workers[w]->Orders[0].Action;
+#else
+		    action = workers[w]->Command.Action;
+#endif
+		    if (action == UnitActionStill
+			|| action == UnitActionMineGold) {
+			AiHarvest(workers[w]);
+		    }
+		}
+	    }
+	    return;
+	}
+	//  Unassigned workers: let them do something.
+	//          FIXME: if there is no gold/no wood forget this!
+	if (num_still) {		// assign the non working
+	    for (w = 0; w < num_worker; ++w) {
+#ifdef NEW_ORDERS
+		action = workers[w]->Orders[0].Action;
+#else
+		action = workers[w]->Command.Action;
+#endif
+		if (action == UnitActionStill) {
+		    type = workers[w]->Type->Type;
+		    if (type == AiChooseRace(UnitTypeHumanWorkerWithGold->Type)
+			|| type ==
+			AiChooseRace(UnitTypeHumanWorkerWithWood->Type)) {
+			if (AiPlayer->MainHall) {
+			    CommandReturnGoods(workers[w], 1);
+			}
+			continue;
+		    }
+		    if (!AiPlayer->NoGold && num_gold <= num_wood) {
+			AiMineGold(workers[w]);
+			++num_gold;
+		    } else if (!AiPlayer->NoWood) {
+			AiHarvest(workers[w]);
+			++num_wood;
 		    }
 		}
 	    }
 	    // FIXME: reassign units !!
 	}
-	}
-
+    }
 #if 1
     //
-    //	Send standing workers home.
+    //  Send standing workers home.
     //
-    num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithGold->Type),workers);
-    DebugLevel3("Gold %d\n",num_worker);
-    if(num_worker)
-	{          // assign the non working
-	if(AiPlayer->MainHall)
-	    {
-	    for(w=0; w<num_worker; ++w)
-		{
-		action=workers[w]->Command.Action;
-		if(action==UnitActionStill)
-		    {
-                        CommandReturnGoods(workers[w],1);
-		    }
-		}
-	    }
-	}
-    num_worker = FindPlayerUnitsByType(AiPlayer->Player,
-	 UnitTypes+AiChooseRace(UnitTypeHumanWorkerWithWood->Type),workers);
-    DebugLevel3("Wood %d\n",num_worker);
-    if(num_worker)
-	{          // assign the non working
-	if(AiPlayer->MainHall)
-	    {
-	    for(w=0; w<num_worker; ++w)
-		{
-		action=workers[w]->Command.Action;
-		if(action==UnitActionStill)
-		    {
-                        CommandReturnGoods(workers[w],1);
-		    }
-		}
-	    }
-	}
+    num_worker =
+	    FindPlayerUnitsByType(AiPlayer->Player,
+				  UnitTypes +
+				  AiChooseRace(UnitTypeHumanWorkerWithGold->
+					       Type), workers);
+    DebugLevel3("Gold %d\n", num_worker);
+    if (num_worker) {			// assign the non working
+	if (AiPlayer->MainHall) {
+	    for (w = 0; w < num_worker; ++w) {
+#ifdef NEW_ORDERS
+		action = workers[w]->Orders[0].Action;
+#else
+		action = workers[w]->Command.Action;
 #endif
+		if (action == UnitActionStill) {
+		    CommandReturnGoods(workers[w], 1);
+		}
+	    }
+	}
     }
+    num_worker =
+	    FindPlayerUnitsByType(AiPlayer->Player,
+				  UnitTypes +
+				  AiChooseRace(UnitTypeHumanWorkerWithWood->
+					       Type), workers);
+    DebugLevel3("Wood %d\n", num_worker);
+    if (num_worker) {			// assign the non working
+	if (AiPlayer->MainHall) {
+	    for (w = 0; w < num_worker; ++w) {
+#ifdef NEW_ORDERS
+		action = workers[w]->Orders[0].Action;
+#else
+		action = workers[w]->Command.Action;
+#endif
+		if (action == UnitActionStill) {
+		    CommandReturnGoods(workers[w], 1);
+		}
+	    }
+	}
+    }
+#endif
+}
 
 /*----------------------------------------------------------------------------
 --      GOAL
@@ -1161,236 +1226,262 @@ local void AiAssignWorker(void)
 /**
 **	Show Goal
 */
-local void AiShowGoal(const char* function,const AiGoal* goal)
+local void AiShowGoal(const char *function, const AiGoal * goal)
 {
-    IfDebug(
+    IfDebug(printf("\t%s:%d ", function, AiPlayer - Ais); switch (goal->Action) {
+case AiCmdBuild:			/// unit must be built
+printf("build %d*%s\n", goal->Number, UnitTypes[goal->Unit].Ident); break; case AiCmdCreature:	/// creature must be built
+printf("train %d*%s\n", goal->Number, UnitTypes[goal->Unit].Ident); break; case AiCmdArmy:	/// attack the opponent
+	    printf("army %d*%d\n", goal->Number, goal->Unit); break;}
 
-    printf("\t%s:%d ",function,AiPlayer-Ais);
-    switch( goal->Action ) {
-	case AiCmdBuild:		/// unit must be built
-	    printf("build %d*%s\n",
-		goal->Number,UnitTypes[goal->Unit].Ident);
-	    break;
-	case AiCmdCreature:		/// creature must be built
-	    printf("train %d*%s\n",
-		goal->Number,UnitTypes[goal->Unit].Ident);
-	    break;
-	case AiCmdArmy:			/// attack the opponent
-	    printf("army %d*%d\n",
-		goal->Number,goal->Unit);
-	    break;
-    }
-
-    );
+    ) ;
 }
 
 /**
 **      Insert a new goal into the Ai player goal list.
 */
-local void AiNewGoal(int action,int number,int type)
-    {
-    AiGoal* goal;
+local void AiNewGoal(int action, int number, int type)
+{
+    AiGoal *goal;
 
-    if(AiPlayer->GoalHead != 0) if(AiPlayer->GoalHead->Action == action
-      && AiPlayer->GoalHead->Number == number
-      && AiPlayer->GoalHead->Unit == type) {return;}
+    if (AiPlayer->GoalHead != 0)
+	if (AiPlayer->GoalHead->Action == action
+	    && AiPlayer->GoalHead->Number == number
+	    && AiPlayer->GoalHead->Unit == type) {
+	    return;
+	}
 
-    goal=malloc(sizeof(AiGoal));
-    goal->Next=AiPlayer->GoalHead;
-    goal->Prev=(AiGoal*)&AiPlayer->GoalHead;
+    goal = malloc(sizeof(AiGoal));
+    goal->Next = AiPlayer->GoalHead;
+    goal->Prev = (AiGoal *) & AiPlayer->GoalHead;
     AiPlayer->GoalHead->Prev = goal;
-    goal->Action=action;
-    goal->Number=number;
-    goal->Unit=type;
-    AiPlayer->GoalHead=goal;
+    goal->Action = action;
+    goal->Number = number;
+    goal->Unit = type;
+    AiPlayer->GoalHead = goal;
 
-    AiShowGoal(__FUNCTION__,goal);
-    }
+    AiShowGoal(__FUNCTION__, goal);
+}
 
 /**
 **      Delete a goal from the Ai player goal list.
 */
-local void AiDelGoal(AiGoal* goal)
-    {
-    AiShowGoal(__FUNCTION__,goal);
-    goal->Next->Prev=goal->Prev;
-    goal->Prev->Next=goal->Next;
+local void AiDelGoal(AiGoal * goal)
+{
+    AiShowGoal(__FUNCTION__, goal);
+    goal->Next->Prev = goal->Prev;
+    goal->Prev->Next = goal->Next;
     free(goal);
-    }
+}
 
 /**
 **   Check for Food
 **   Returns TRUE if not enough food.
 */
-local int AiNeedFood(const UnitType* type)
-    {
-    Player* player;
-    player=AiPlayer->Player;
-    if(!PlayerCheckFood(player,type))
-        {
-        // already building new food (farm or hall)
-        if(AiBuildingUnitType(AiChooseRace(UnitFarm))
-          || AiBuildingUnitType(AiChooseRace(UnitTownHall))) {return 1;}
-	AiNewGoal(AiCmdBuild,
-          UnitTypesCount[AiChooseRace(UnitFarm)] + 1,
-          AiChooseRace(UnitFarm));
+local int AiNeedFood(const UnitType * type)
+{
+    Player *player;
+
+    player = AiPlayer->Player;
+    if (!PlayerCheckFood(player, type)) {
+	// already building new food (farm or hall)
+	if (AiBuildingUnitType(AiChooseRace(UnitFarm))
+	    || AiBuildingUnitType(AiChooseRace(UnitTownHall))) {
+	    return 1;
+	}
+	AiNewGoal(AiCmdBuild, UnitTypesCount[AiChooseRace(UnitFarm)] + 1,
+		  AiChooseRace(UnitFarm));
 	return 1;
-        }
-    return 0;
     }
+    return 0;
+}
 
 /*
 **   Check to see if building exists
 **   Returns TRUE if building doesn't exist
 */
 local int AiNoBuilding(int type)
-    {
+{
     type = AiChooseRace(type);
-    if(type == AiChooseRace(UnitTownHall))
-        {
-	if(!UnitTypesCount[type]
-	  && !UnitTypesCount[AiChooseRace(UnitKeep)]
-	  && !UnitTypesCount[AiChooseRace(UnitCastle)])
-            {
-            if(!AiBuildingUnitType(type)) AiNewGoal(AiCmdBuild,1,type);
-            return 1;
-            }
-        return 0;
-        }
-    if(!UnitTypesCount[type])
-        {
-        if(!AiBuildingUnitType(type)) AiNewGoal(AiCmdBuild,1,type);
-        return 1;
-        }
-    return 0;
+    if (type == AiChooseRace(UnitTownHall)) {
+	if (!UnitTypesCount[type]
+	    && !UnitTypesCount[AiChooseRace(UnitKeep)]
+	    && !UnitTypesCount[AiChooseRace(UnitCastle)]) {
+	    if (!AiBuildingUnitType(type))
+		AiNewGoal(AiCmdBuild, 1, type);
+	    return 1;
+	}
+	return 0;
     }
+    if (!UnitTypesCount[type]) {
+	if (!AiBuildingUnitType(type))
+	    AiNewGoal(AiCmdBuild, 1, type);
+	return 1;
+    }
+    return 0;
+}
 
 /**
 **  Check to see if building is needed.
 **  Returns TRUE if building needed and building doesn't exist.
 */
 local int AiNeedBuilding(int type)
-    {
-    UnitType* typep;
+{
+    UnitType *typep;
+
     type = AiChooseRace(type);
     // FIXME: johns should use dependence rules some time
-    typep=UnitTypes+type;
-    if( typep==UnitTypeHumanWorker || typep==UnitTypeOrcWorker ) {
-	if(AiNoBuilding(UnitTownHall)) return 1;
-    } else if( typep==UnitTypeByIdent("unit-ballista")
-	    || typep==UnitTypeByIdent("unit-catapult") ) {
-	if(AiNoBuilding(UnitTownHall)) return 1;
-	if(AiNoBuilding(UnitBlacksmithHuman)) return 1;
-    } else if( typep==UnitTypeByIdent("unit-archer")
-	    || typep==UnitTypeByIdent("unit-axethrower") ) {
-	if(AiNoBuilding(UnitTownHall)) return 1;
-	if(AiNoBuilding(UnitElvenLumberMill)) return 1;
-    } else if( typep==UnitTypeByIdent("unit-footman")
-	    || typep==UnitTypeByIdent("unit-grunt") ) {
-	if(AiNoBuilding(UnitTownHall)) return 1;
-	if(AiNoBuilding(UnitBarracksHuman)) return 1;
+    typep = UnitTypes + type;
+    if (typep == UnitTypeHumanWorker || typep == UnitTypeOrcWorker) {
+	if (AiNoBuilding(UnitTownHall))
+	    return 1;
+    } else if (typep == UnitTypeByIdent("unit-ballista")
+	       || typep == UnitTypeByIdent("unit-catapult")) {
+	if (AiNoBuilding(UnitTownHall))
+	    return 1;
+	if (AiNoBuilding(UnitBlacksmithHuman))
+	    return 1;
+    } else if (typep == UnitTypeByIdent("unit-archer")
+	       || typep == UnitTypeByIdent("unit-axethrower")) {
+	if (AiNoBuilding(UnitTownHall))
+	    return 1;
+	if (AiNoBuilding(UnitElvenLumberMill))
+	    return 1;
+    } else if (typep == UnitTypeByIdent("unit-footman")
+	       || typep == UnitTypeByIdent("unit-grunt")) {
+	if (AiNoBuilding(UnitTownHall))
+	    return 1;
+	if (AiNoBuilding(UnitBarracksHuman))
+	    return 1;
     }
     return 0;
-    }
+}
 
 /**
 **      We need a number of units.
 **      Returns TRUE when number is reached.
 */
-local int AiCommandBuild(int type,int number,int action)
-    {
-    DebugLevel3Fn("%d, %d, %d\n",type,number,action);
-    if(number == 0) return 1;
+local int AiCommandBuild(int type, int number, int action)
+{
+    DebugLevel3Fn("%d, %d, %d\n", type, number, action);
+    if (number == 0)
+	return 1;
     type = AiChooseRace(type);
-    if(AiBuildingUnitType(type)) {return 0;} //already training
+    if (AiBuildingUnitType(type)) {
+	return 0;
+    }					//already training
     AiCountUnits();
-    if(type == AiChooseRace(UnitTypeHumanWorker->Type))
-        {
-        if((UnitTypesCount[type]
-           +UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithGold->Type)]
-           +UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithWood->Type)])
-		>= number)
-           return 1;
-        }
-    else { if(UnitTypesCount[type] >= number) return 1; }
-    if(AiNeedBuilding(type)) return 0;
-    if(AiNeedResources(&UnitTypes[type])) return 0;
-    if(action == AiCmdCreature)
-        {
-        if(AiNeedFood(&UnitTypes[type])) return 0;
-        AiTrainCreature(type);
-        return 0;
-        }
-    if(type == AiChooseRace(UnitTownHall)) {AiBuildHall(type);}
-    else {AiBuildBuilding(type);}
-    return 0;
+    if (type == AiChooseRace(UnitTypeHumanWorker->Type)) {
+	if ((UnitTypesCount[type]
+	     + UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithGold->Type)]
+	     + UnitTypesCount[AiChooseRace(UnitTypeHumanWorkerWithWood->Type)])
+	    >= number)
+	    return 1;
+    } else {
+	if (UnitTypesCount[type] >= number)
+	    return 1;
     }
+    if (AiNeedBuilding(type))
+	return 0;
+    if (AiNeedResources(&UnitTypes[type]))
+	return 0;
+    if (action == AiCmdCreature) {
+	if (AiNeedFood(&UnitTypes[type]))
+	    return 0;
+	AiTrainCreature(type);
+	return 0;
+    }
+    if (type == AiChooseRace(UnitTownHall)) {
+	AiBuildHall(type);
+    } else {
+	AiBuildBuilding(type);
+    }
+    return 0;
+}
 
 /**
 **   Tell the Ai to start Attacking
 */
-local int AiCommandAttack(int unittype,int attack,int home)
-    {
-    int nunits,i;
-    Unit * enemy;
-    Unit* table[MAX_UNITS];
+local int AiCommandAttack(int unittype, int attack, int home)
+{
+    int nunits, i;
+    Unit *enemy;
+    Unit *table[MAX_UNITS];
 
     nunits = FindPlayerUnitsByType(AiPlayer->Player,
-        UnitTypes+AiChooseRace(unittype),table);
-    if(nunits < attack + home) return 0;
-    for(i=0; i<attack; i++)
-       {
-       enemy = AttackUnitsInDistance(table[i],1000);
-       if(enemy) { CommandAttack(table[i],enemy->X,enemy->Y,NULL,1); }
-       }
-    return 1;
+				   UnitTypes + AiChooseRace(unittype), table);
+    if (nunits < attack + home)
+	return 0;
+    for (i = 0; i < attack; i++) {
+	enemy = AttackUnitsInDistance(table[i], 1000);
+	if (enemy) {
+	    CommandAttack(table[i], enemy->X, enemy->Y, NULL, 1);
+	}
     }
+    return 1;
+}
 
 /**
 **    Create an Attack Force
 **    Returns TRUE when Force Complete;
 */
 local int AiCommandArmy(int home, int attack)
-    {
-    if(!AiCommandBuild(UnitTypeHumanWorker->Type,ForceAtHome[home].Worker +
-        ForceAttacking[attack].Worker, AiCmdCreature)) {return 0;}
-    if(!AiCommandBuild(UnitFootman,ForceAtHome[home].Footman +
-        ForceAttacking[attack].Footman, AiCmdCreature)) {return 0;}
-    if(!AiCommandBuild(UnitArcher,ForceAtHome[home].Archer +
-        ForceAttacking[attack].Archer, AiCmdCreature)) {return 0;}
-    if(!AiCommandBuild(UnitBallista,ForceAtHome[home].Ballista +
-        ForceAttacking[attack].Ballista, AiCmdCreature)) {return 0;}
+{
+    if (!AiCommandBuild
+	(UnitTypeHumanWorker->Type,
+	 ForceAtHome[home].Worker + ForceAttacking[attack].Worker,
+	 AiCmdCreature)) {
+	return 0;
+    }
+    if (!AiCommandBuild
+	(UnitFootman,
+	 ForceAtHome[home].Footman + ForceAttacking[attack].Footman,
+	 AiCmdCreature)) {
+	return 0;
+    }
+    if (!AiCommandBuild
+	(UnitArcher, ForceAtHome[home].Archer + ForceAttacking[attack].Archer,
+	 AiCmdCreature)) {
+	return 0;
+    }
+    if (!AiCommandBuild
+	(UnitBallista,
+	 ForceAtHome[home].Ballista + ForceAttacking[attack].Ballista,
+	 AiCmdCreature)) {
+	return 0;
+    }
     AiPlayer->CurrentAttack = attack;
     AiPlayer->CurrentHome = home;
     return 1;
-    }
+}
 
 /**
 **      Next goal.
 */
 local void AiNextGoal(void)
-    {
-    AiGoal *goal,*temp;
-    AiPlayer->NeedGold=AiPlayer->NeedWood=AiPlayer->NeedOil=0;
-    for(goal=AiPlayer->GoalHead; (temp=goal->Next); goal=temp)
-        {
-        if(goal->Action == AiCmdArmy)
-            {
-            if(AiCommandArmy(goal->Unit,goal->Number))
-                {AiDelGoal(goal);}
-            }
-        else
-            {
-	    if( goal->Unit==-1 ) {
+{
+    AiGoal *goal, *temp;
+
+    AiPlayer->NeedGold = AiPlayer->NeedWood = AiPlayer->NeedOil = 0;
+    for (goal = AiPlayer->GoalHead; (temp = goal->Next); goal = temp) {
+	if (goal->Action == AiCmdArmy) {
+	    if (AiCommandArmy(goal->Unit, goal->Number)) {
+		AiDelGoal(goal);
+	    }
+	} else {
+	    if (goal->Unit == -1) {
 		DebugLevel0Fn("Oops\n");
 		continue;
 	    }
-            if(AiCommandBuild(goal->Unit,goal->Number,goal->Action))
-                {AiDelGoal(goal);}
-            }
-        }
-    if(AiPlayer->NeedGold || AiPlayer->NeedWood) {AiAssignWorker();}
+	    if (AiCommandBuild(goal->Unit, goal->Number, goal->Action)) {
+		AiDelGoal(goal);
+	    }
+	}
     }
+    if (AiPlayer->NeedGold || AiPlayer->NeedWood) {
+	AiAssignWorker();
+    }
+}
 
 /*----------------------------------------------------------------------------
 --      CALL BACKS
@@ -1403,9 +1494,9 @@ local void AiNextGoal(void)
 **
 */
 global void AiHelpMe(Unit * unit)
-    {
-    DebugLevel0("HELP %d %d",unit->X,unit->Y);
-    }
+{
+    DebugLevel0("HELP %d %d", unit->X, unit->Y);
+}
 
 /**
 **      Called if work complete (Buildings).
@@ -1413,18 +1504,21 @@ global void AiHelpMe(Unit * unit)
 **      @param unit     Pointer to unit what builds the building.
 **      @param what     Pointer to unit building that was build.
 */
-global void AiWorkComplete(Unit* unit,Unit* what)
-    {
-    DebugLevel3("Ai: Player %Zd: %Zd Work %Zd complete\n"
-	,unit->Player-Players,UnitNumber(unit),UnitNumber(what));
+global void AiWorkComplete(Unit * unit, Unit * what)
+{
+    DebugLevel3("Ai: Player %Zd: %Zd Work %Zd complete\n",
+		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
-    if(unit->Player->Type==PlayerHuman) {return;}
-    AiPlayer=&Ais[unit->Player->Player];
-    AiClearBuildUnitType(what->Type->Type);
-    if(!AiPlayer->MainHall && what->Type->Type==AiChooseRace(UnitGreatHall))
-        {AiPlayer->MainHall=what;}
-    AiAssignWorker();
+    if (unit->Player->Type == PlayerHuman) {
+	return;
     }
+    AiPlayer = &Ais[unit->Player->Player];
+    AiClearBuildUnitType(what->Type->Type);
+    if (!AiPlayer->MainHall && what->Type->Type == AiChooseRace(UnitGreatHall)) {
+	AiPlayer->MainHall = what;
+    }
+    AiAssignWorker();
+}
 
 /**
 **      Called if building can't be build.
@@ -1432,16 +1526,19 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 **      @param unit     Pointer to unit what builds the building.
 **      @param what     Pointer to unit-type.
 */
-global void AiCanNotBuild(Unit* unit,const UnitType* what)
-    {
-    DebugLevel1("Ai: Player %Zd: %Zd Can't build %d at %d,%d\n"
-	,unit->Player-Players,UnitNumber(unit),what->Type,unit->X,unit->Y);
+global void AiCanNotBuild(Unit * unit, const UnitType * what)
+{
+    DebugLevel1("Ai: Player %Zd: %Zd Can't build %d at %d,%d\n",
+		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
+		unit->Y);
     // FIXME: correct position
-    if(unit->Player->Type==PlayerHuman) {return;}
-    AiPlayer=&Ais[unit->Player->Player];
-    AiClearBuildUnitType(what->Type);
-    AiNewGoal(AiCmdBuild,1,what->Type);
+    if (unit->Player->Type == PlayerHuman) {
+	return;
     }
+    AiPlayer = &Ais[unit->Player->Player];
+    AiClearBuildUnitType(what->Type);
+    AiNewGoal(AiCmdBuild, 1, what->Type);
+}
 
 /**
 **      Called if building place can't be reached.
@@ -1449,18 +1546,21 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 **      @param unit     Pointer to unit what builds the building.
 **      @param what     Pointer to unit-type.
 */
-global void AiCanNotReach(Unit* unit,const UnitType* what)
-    {
-    DebugLevel3("Ai: Player %Zd: %Zd Can't reach %d at %d,%d\n"
-	    ,unit->Player-Players,UnitNumber(unit),what->Type,unit->X,unit->Y);
+global void AiCanNotReach(Unit * unit, const UnitType * what)
+{
+    DebugLevel3("Ai: Player %Zd: %Zd Can't reach %d at %d,%d\n",
+		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
+		unit->Y);
     // FIXME: correct position
-    if(unit->Player->Type==PlayerHuman) {return;}
-    AiPlayer=&Ais[unit->Player->Player];
+    if (unit->Player->Type == PlayerHuman) {
+	return;
+    }
+    AiPlayer = &Ais[unit->Player->Player];
     AiClearBuildUnitType(what->Type);
-    AiNewGoal(AiCmdBuild,1,what->Type);
+    AiNewGoal(AiCmdBuild, 1, what->Type);
     //CommandBuildBuilding(unit,unit->X,unit->Y,&UnitTypes[UnitWallHuman],1);
     //FIXME: should be a better way than above line.
-    }
+}
 
 /**
 **      Called if training of an unit is completed.
@@ -1468,133 +1568,131 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 **      @param unit     Pointer to unit.
 **      @param what     Pointer to type.
 */
-global void AiTrainingComplete(Unit* unit,Unit* what)
-    {
-    DebugLevel3("Ai: Player %Zd: %Zd Training %Zd complete\n"
-	,unit->Player-Players,UnitNumber(unit),UnitNumber(what));
+global void AiTrainingComplete(Unit * unit, Unit * what)
+{
+    DebugLevel3("Ai: Player %Zd: %Zd Training %Zd complete\n",
+		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
-    if(unit->Player->Type==PlayerHuman) {
+    if (unit->Player->Type == PlayerHuman) {
 	return;
     }
     // FIXME: Should I put an AiPlayer pointer into the player struct?
-    AiPlayer=&Ais[unit->Player->Player];
-    if(what->Type->CowerWorker) {
+    AiPlayer = &Ais[unit->Player->Player];
+    if (what->Type->CowerWorker) {
 	AiAssignWorker();
     }
     AiClearBuildUnitType(what->Type->Type);
-    }
+}
 
 /**
 **      This is called for each player, each frame.
 **
 **      @param player   The player structure pointer.
 */
-global void AiEachFrame(Player* player)
-    {
+global void AiEachFrame(Player * player)
+{
     AiCommand command;
 
-    if( AiSleep ) {			// wait some time. FIXME: should become
-					// an AI command :)
+    if (AiSleep) {			// wait some time. FIXME: should become
+	// an AI command :)
 	--AiSleep;
 	return;
     }
 
-    AiPlayer=player->Ai;
-    DebugLevel3Fn("Player %d\n",player->Player);
+    AiPlayer = player->Ai;
+    DebugLevel3Fn("Player %d\n", player->Player);
     command = AiPlayer->Commands[AiPlayer->CmdIndex];
-    if(AiPlayer->GoalHead->Next == 0)
-        {
-        if(command.Number == 0 && command.Command == 0)
-            {
-            DebugLevel3("Ai Starting Over\n");
-            //AiPlayer->CmdIndex = 0;
-            AiPlayer->DoCommands = 0;
-            }
-	if( AiPlayer->DoCommands ) {
+    if (AiPlayer->GoalHead->Next == 0) {
+	if (command.Number == 0 && command.Command == 0) {
+	    DebugLevel3("Ai Starting Over\n");
+	    //AiPlayer->CmdIndex = 0;
+	    AiPlayer->DoCommands = 0;
+	}
+	if (AiPlayer->DoCommands) {
 	    AiNewGoal(command.Command, command.Number, command.Unit);
 	    AiPlayer->CmdIndex++;
-	    }
-        }
-    AiNextGoal();
+	}
     }
+    AiNextGoal();
+}
 
 /**
 **      This called for each player, each second.
 **
 **      @param player   The player structure pointer.
 */
-global void AiEachSecond(Player* player)
-    {
-    DebugLevel3Fn("Player %d\n",player->Player);
-    if( AiSleep ) {			// wait some time. FIXME: see above
+global void AiEachSecond(Player * player)
+{
+    DebugLevel3Fn("Player %d\n", player->Player);
+    if (AiSleep) {			// wait some time. FIXME: see above
 	return;
     }
-    AiPlayer=player->Ai;	//  Prepare ai.
+    AiPlayer = player->Ai;		//  Prepare ai.
     AiAssignWorker();
-    if(AiCommandAttack(UnitBallista,
-	ForceAttacking[AiPlayer->CurrentAttack].Ballista,
-	  ForceAtHome[AiPlayer->CurrentHome].Ballista))
-    if(AiCommandAttack(UnitArcher,
-	ForceAttacking[AiPlayer->CurrentAttack].Archer,
-	  ForceAtHome[AiPlayer->CurrentHome].Archer))
-    if(AiCommandAttack(UnitFootman,
-	ForceAttacking[AiPlayer->CurrentAttack].Footman,
-	  ForceAtHome[AiPlayer->CurrentHome].Footman))
-	    AiPlayer->CurrentAttack = 0;
-    }
+    if (AiCommandAttack
+	(UnitBallista, ForceAttacking[AiPlayer->CurrentAttack].Ballista,
+	 ForceAtHome[AiPlayer->CurrentHome].Ballista))
+	if (AiCommandAttack
+	    (UnitArcher, ForceAttacking[AiPlayer->CurrentAttack].Archer,
+	     ForceAtHome[AiPlayer->CurrentHome].Archer))
+	    if (AiCommandAttack
+		(UnitFootman, ForceAttacking[AiPlayer->CurrentAttack].Footman,
+		 ForceAtHome[AiPlayer->CurrentHome].Footman))
+		AiPlayer->CurrentAttack = 0;
+}
 
 /**
 **      Setup all at start.
 **
 **      @param player   The player structure pointer.
 */
-global void AiInit(Player* player)
-    {
+global void AiInit(Player * player)
+{
     int i;
     int j;
-    PlayerAi* aip;
-    Unit* units[MAX_UNITS];
+    PlayerAi *aip;
+    Unit *units[MAX_UNITS];
 
     DebugLevel2Fn("Player %d\n" _C_ player->Player);
-    player->Ai=aip=&Ais[player->Player];
-    aip->Player=player;
+    player->Ai = aip = &Ais[player->Player];
+    aip->Player = player;
 
-    for(i=0; i<UnitTypeInternalMax/(sizeof(int)*8); ++i) {aip->Build[i]=0;}
-    aip->GoalHead=(AiGoal*)&aip->GoalNil1;
-    aip->GoalNil1=(AiGoal*)0;
-    aip->GoalTail=(AiGoal*)&aip->GoalHead;
-    aip->MainHall=NoUnitP;
-    aip->NeedGold=0;
-    aip->NeedWood=0;
-    aip->NeedOil=0;
-    aip->NoGold=0;
-    aip->NoWood=0;
-    aip->NoOil=0;
-    aip->CurrentAttack=0;
-    aip->CurrentHome=0;
-    aip->DoCommands=1;
-    aip->CmdIndex=0;
-    aip->Commands=AiTable1;
+    for (i = 0; i < UnitTypeInternalMax / (sizeof(int) * 8); ++i) {
+	aip->Build[i] = 0;
+    }
+    aip->GoalHead = (AiGoal *) & aip->GoalNil1;
+    aip->GoalNil1 = (AiGoal *) 0;
+    aip->GoalTail = (AiGoal *) & aip->GoalHead;
+    aip->MainHall = NoUnitP;
+    aip->NeedGold = 0;
+    aip->NeedWood = 0;
+    aip->NeedOil = 0;
+    aip->NoGold = 0;
+    aip->NoWood = 0;
+    aip->NoOil = 0;
+    aip->CurrentAttack = 0;
+    aip->CurrentHome = 0;
+    aip->DoCommands = 1;
+    aip->CmdIndex = 0;
+    aip->Commands = AiTable1;
 
     //
-    //	Adjust costs for AI Player
+    //  Adjust costs for AI Player
     //
-    for( i=0; i<UnitTypeInternalMax; ++i ) {
-	for( j=0; j<MaxCosts; ++j ) {
-	    UnitTypes[i].Stats[player->Player].Costs[j]*=
-		    j==TimeCost ? AiTimeFactor : AiCostFactor;
-	    UnitTypes[i].Stats[player->Player].Costs[j]/=100;
+    for (i = 0; i < UnitTypeInternalMax; ++i) {
+	for (j = 0; j < MaxCosts; ++j) {
+	    UnitTypes[i].Stats[player->Player].Costs[j] *=
+		    j == TimeCost ? AiTimeFactor : AiCostFactor;
+	    UnitTypes[i].Stats[player->Player].Costs[j] /= 100;
 	}
     }
 
-    AiPlayer=aip;
-    if( AiFindHalls(units) )
-	{		// without this nothing works
-	aip->MainHall=units[0];
-	}
+    AiPlayer = aip;
+    if (AiFindHalls(units)) {		// without this nothing works
+	aip->MainHall = units[0];
     }
+}
 
-
-#endif	// } NEW_AI
+#endif // } NEW_AI
 
 //@}

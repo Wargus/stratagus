@@ -376,7 +376,7 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 		color=ColorRed;
 	    }
 	    if ( ShowHealthHorizontal )  {
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(NEW_ORDERS)
 		// Johns: I want to see fast moving.
 		VideoFillRectangleClip(unit->Command.Data.Move.Fast 
 			? ColorBlack : ColorWhite

@@ -426,10 +426,12 @@ global int CanCastSpell( Unit* unit, int SpellId )
 **      @return 0 if spell should/can continue or =! 0 to stop
 **
 */
-global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
+global int SpellCast( const SpellType* spell, Unit* unit, Unit* target,
+	int x, int y )
 {
-  int repeat = 0;
-  const SpellType* spell = SpellTypeById( SpellId );
+  int repeat;
+
+  repeat = 0;
 /*
   this does not work when no target unit
   DebugLevel0Fn("Spell cast: %d (%s), %s -> %s (%d,%d)",

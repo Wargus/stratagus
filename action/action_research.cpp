@@ -16,6 +16,10 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,27 +35,47 @@
 #include "upgrade.h"
 #include "interface.h"
 
-/*
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
+
+/**
 **	Unit researches!
+**
+**	@param unit	Pointer of researching unit.
 */
 global void HandleActionResearch(Unit* unit)
 {
     Upgrade* upgrade;
 
     DebugLevel3("Research %Zd\n",UnitNumber(unit));
+
+#ifdef NEW_ORDERS
+    upgrade=unit->Data.Research.Upgrade;
+    unit->Data.Research.Ticks+=SpeedResearch;
+
+    if( unit->Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
+#else
     upgrade=unit->Command.Data.Research.What;
     unit->Command.Data.Research.Ticks+=SpeedResearch;
+
     if( unit->Command.Data.Research.Ticks>=upgrade->Costs[TimeCost] ) {
+#endif
 
 	// FIXME: should als speak and tell ai. generic notify/message.
 	if( unit->Player==ThisPlayer ) {
-	  SetMessage2( unit->X, unit->Y, "%s: Upgrade complete", unit->Type->Name );
+	    SetMessage2(unit->X, unit->Y, "%s: Upgrade complete"
+		,unit->Type->Name );
 	}
         UpgradeAcquire(unit->Player,upgrade);
 
 	unit->Reset=1;
 	unit->Wait=1;
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action=UnitActionStill;
+#else
 	unit->Command.Action=UnitActionStill;
+#endif
 
 	// Upgrade can change all
 	UpdateButtonPanel();
@@ -66,6 +90,7 @@ global void HandleActionResearch(Unit* unit)
 
     unit->Reset=1;
     unit->Wait=FRAMES_PER_SECOND/6;
+
     // FIXME: should animations here?
 }
 

@@ -60,9 +60,14 @@ global void HandleActionDemolish(Unit* unit)
 	    // FIXME: reset first!! why? (johns)
 	    err=HandleActionMove(unit);
 	    if( unit->Reset ) {
+#ifdef NEW_ORDERS
+		goal=unit->Orders[0].Goal;
+#else
 		goal=unit->Command.Data.Move.Goal;
+#endif
 		//
-		//	Target is dead, stop demolish
+		//	Target is dead, stop demolish.
+		//	FIXME: what should I do, go back or explode on place?
 		//
 		if( goal ) {
 		    if( goal->Destroyed ) {
@@ -71,8 +76,21 @@ global void HandleActionDemolish(Unit* unit)
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
-			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			// FIXME: perhaps I should choose an alternative
+#ifdef NEW_ORDERS
+			unit->Orders[0].Goal=goal=NoUnitP;
+			unit->Orders[0].Action=UnitActionStill;
+			return;
+		    } else if( goal->Removed || !goal->HP
+				|| goal->Orders[0].Action==UnitActionDie ) {
+			RefsDebugCheck( !goal->Refs );
+			--goal->Refs;
+			RefsDebugCheck( !goal->Refs );
+			unit->Orders[0].Goal=goal=NoUnitP;
+			// FIXME: perhaps I should choose an alternative
+			unit->Orders[0].Action=UnitActionStill;
+#else
+			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			unit->Command.Action=UnitActionStill;
 			return;
 		    } else if( goal->Removed || !goal->HP
@@ -80,9 +98,10 @@ global void HandleActionDemolish(Unit* unit)
 			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
 			RefsDebugCheck( !goal->Refs );
-			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			// FIXME: perhaps I should choose an alternative
+			unit->Command.Data.Move.Goal=goal=NoUnitP;
 			unit->Command.Action=UnitActionStill;
+#endif
 			return;
 		    }
 		}
@@ -96,14 +115,22 @@ global void HandleActionDemolish(Unit* unit)
 			unit->SubAction=1;
 		    }
 		} else if( MapDistance(unit->X,unit->Y
+#ifdef NEW_ORDERS
+			,unit->Orders[0].X,unit->Orders[0].Y)<=1 ) {
+#else
 			,unit->Command.Data.Move.DX
 			,unit->Command.Data.Move.DY)<=1 ) {
+#endif
 		    unit->State=0;
 		    unit->SubAction=1;
 		} else if( err==PF_UNREACHABLE ) {
 		    return;
 		}
+#ifdef NEW_ORDERS
+		unit->Orders[0].Action=UnitActionDemolish;
+#else
 		unit->Command.Action=UnitActionDemolish;
+#endif
 	    }
 	    break;
 
@@ -111,12 +138,20 @@ global void HandleActionDemolish(Unit* unit)
 	//	Demolish the target.
 	//
 	case 1:
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal;
+#else
 	    goal=unit->Command.Data.Move.Goal;
+#endif
 	    if( goal ) {
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
+#ifdef NEW_ORDERS
+		unit->Orders[0].Goal=NoUnitP;
+#else
 		unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 	    }
 
             x=unit->X;

@@ -346,8 +346,6 @@ local int ReturnWithWood(Unit* unit)
 	return 0;
     }
 
-    DebugCheck( !destu );
-
     //
     //	Target is dead, stop harvest
     //
@@ -373,6 +371,17 @@ local int ReturnWithWood(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
+
+    unit->Orders[0].Action=UnitActionHarvest;
+
+    //
+    //	If depot is still under construction, wait!
+    //
+    if( destu->Orders[0].Action==UnitActionBuilded ) {
+        DebugLevel2Fn("Invalid depot\n");
+	return 0;
+    }
+
     unit->Orders[0].Goal=NoUnitP;
 
     RefsDebugCheck( !destu->Refs );
@@ -382,14 +391,12 @@ local int ReturnWithWood(Unit* unit)
     if( i==PF_UNREACHABLE ) {
 	// FIXME: could try another depot, or retry later.
 	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
-		  ,UnitNumber(destu),x,y
+		  ,UnitNumber(destu),destu->X,destu->Y
 		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
 	unit->Orders[0].Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
     }
-
-    unit->Orders[0].Action=UnitActionHarvest;
 
 #else
 
@@ -400,8 +407,6 @@ local int ReturnWithWood(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
-
-    DebugCheck( !destu );
 
     //
     //	Target is dead, stop harvest
@@ -428,6 +433,17 @@ local int ReturnWithWood(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
+
+    unit->Command.Action=UnitActionHarvest;
+
+    //
+    //	If depot is still under construction, wait!
+    //
+    if( destu->Command.Action==UnitActionBuilded ) {
+        DebugLevel2Fn("Invalid depot\n");
+	return 0;
+    }
+
     unit->Command.Data.Move.Goal=NoUnitP;
 
     RefsDebugCheck( !destu->Refs );
@@ -443,8 +459,6 @@ local int ReturnWithWood(Unit* unit)
 	unit->SubAction=0;
 	return 0;
     }
-
-    unit->Command.Action=UnitActionHarvest;
 
 #endif
 
