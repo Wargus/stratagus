@@ -637,7 +637,9 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 		_C_ zzbasepath _C_ dirname);
 	}
     }
+#ifndef _MSC_VER
     IfDebug(if (!dirp) { DebugLevel0Fn("Dir `%s' not found\n" _C_ dirname); });
+#endif
 #else
 #ifndef _MSC_VER
     dirp = opendir(dirname);
