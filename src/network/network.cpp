@@ -62,6 +62,10 @@
 
 #define BASE_OF(type, elem, p) ((type *)((char *)(p) - offsetof(type, elem)))
 
+#define NIPQUAD(ad) \
+	(((ad) >> 24) & 0xff), (((ad) >> 16) & 0xff), \
+	(((ad) >> 8) & 0xff), ((ad) & 0xff)
+
 //----------------------------------------------------------------------------
 //	Declaration
 //----------------------------------------------------------------------------
@@ -69,7 +73,7 @@
 #define NetworkPort	6660		/// Default port for communication
 #define NetworkDups	4		/// Repeat old commands
 
-#define NetworkProtocolVersion 1	/// Network protocol version
+#define NetworkProtocolVersion 2	/// Network protocol version
 
 /**
 **	Network hosts
@@ -89,10 +93,12 @@ enum _message_type_ {
 
     MessageSync,			/// heart beat
     MessageQuit,			/// quit game
+    MessageQuitAck,			/// quit reply - UNUSED YET	Protocol Version 2 - Reserved for menus
     MessageResend,			/// resend message
 
     MessageChat,			/// chat message
     MessageChatCont,			/// chat message continue
+    MessageChatTerm,			/// chat message termination -  Protocol Version 2
 
     MessageCommandStop,			/// unit command stop
     MessageCommandStand,		/// unit command stand ground
@@ -127,7 +133,7 @@ typedef struct _init_message_ {
     unsigned char	Type;		/// Init message type.
     int			Version;	/// Network protocol version.
     int			Lag;		/// Lag time
-    int			Updates;	/// Update frequence
+    int			Updates;	/// Update frequency
     char		HostsCount;	/// Number of hosts.
     NetworkHost		Hosts[PlayerMax];/// Host and ports of all players.
     char		Num[PlayerMax];	/// Player number.
@@ -137,12 +143,13 @@ typedef struct _init_message_ {
 **	Network command message.
 */
 typedef struct _network_command_ {
-    unsigned char	Type;		/// Network command type
-    unsigned char	Frame;		/// Destination frame
-    UnitRef		Unit;		/// Command for unit
+    unsigned char	Type;		/// Network command type.
+    unsigned char	Frame;		/// Destination frame.
+    UnitRef		Unit;		/// Command for unit.
     unsigned short	X;		/// Map position X.
     unsigned short	Y;		/// Map position Y.
     UnitRef 		Dest;		/// Destination unit.
+    int			xdata;		/// Extra data for some commands - Protocol Version 2,
 } NetworkCommand;
 
 /**
@@ -181,6 +188,7 @@ local void NetworkSendPacket(NetworkCommandQueue* ncq);
 //	Variables
 //----------------------------------------------------------------------------
 
+global char NetworkName[16];		/// Network Name of local player
 global int NetworkFildes = -1;		/// Network file descriptor
 global int NetworkInSync = 1;		/// Network is in sync
 global int NetworkUpdates = 5;		/// Network update each # frames
@@ -753,7 +761,7 @@ local int NetLastPort;			/// Last port number (net format)
 
 #ifdef USE_SDL_NET	// {
 
-// FIXME: Not written, I (johns) leave this for other peoples.
+// FIXME: Not written, I (johns) leave this for other people.
 
 /**
 **	Hardware dependend network init.
@@ -906,7 +914,7 @@ global int NetOpenUDP(int port)
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_addr.s_addr = INADDR_ANY;
 	sock_addr.sin_port = htons(port);
-											// Bind the socket for listening
+	// Bind the socket for listening
 	if ( bind(sockfd,(struct sockaddr*)&sock_addr,sizeof(sock_addr))<0 ) {
 	    fprintf(stderr,"Couldn't bind to local port\n");
 	    NetCloseUDP(sockfd);
@@ -965,7 +973,7 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
     }
     NetLastHost=sock_addr.sin_addr.s_addr;
     NetLastPort=sock_addr.sin_port;
-    DebugLevel3Fn(" %ld:%d\n",NetLastHost,ntohs(NetLastPort));
+    DebugLevel3Fn(" %d.%d.%d.%d:%d\n",NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
     return 1;
 }
 
@@ -998,6 +1006,8 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
 //@{
 
 local int NetPlyNr[PlayerMax];		/// Player nummer
+local char NetMsgBuf[128][PlayerMax];	/// Chat message buffers
+local int NetMsgBufLen[PlayerMax];	/// Stored chat message length
 local NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
 local int HostsCount;			/// Number of hosts.
 IfDebug(
@@ -1040,8 +1050,8 @@ global void NetworkBroadcast(void* buf,int len)
 	int n;
 
 	n=NetSendUDP(NetworkFildes,Hosts[i].Host,Hosts[i].Port,buf,len);
-	DebugLevel3Fn(" Sending %d to %ld:%d\n"
-		,n,Hosts[i].Host,ntohs(Hosts[i].Port));
+	DebugLevel3Fn(" Sending %d to %d.%d.%d.%d:%d\n"
+		,n,NIPQUAD(ntohl(Hosts[i].Host)),ntohs(Hosts[i].Port));
     }
 #endif
 }
@@ -1066,8 +1076,8 @@ local void NetworkServerSetup(void)
 	if( !NetRecvUDP(NetworkFildes,&message,sizeof(message)) ) {
 	    exit(-1);
 	}
-	DebugLevel0Fn(" receive hello %ld:%d\n"
-		,NetLastHost,ntohs(NetLastPort));
+	DebugLevel0Fn(" receive hello %d.%d.%d.%d:%d\n"
+		,NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 
 	if( message.Type!=MessageInitHello ) {
 	    DebugLevel0Fn(" wrong message\n");
@@ -1106,8 +1116,8 @@ local void NetworkServerSetup(void)
 	if( n==HostsCount ) {
 	    Hosts[HostsCount].Host=NetLastHost;
 	    Hosts[HostsCount++].Port=NetLastPort;
-	    DebugLevel0Fn(" New client %ld:%d\n"
-		    ,NetLastHost,ntohs(NetLastPort));
+	    DebugLevel0Fn(" New client %d.%d.%d.%d:%d\n"
+		    ,NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 	    ++i;
 	}
 
@@ -1134,6 +1144,7 @@ local void NetworkServerSetup(void)
     }
 
     // FIXME: randomize the slots :)
+    // ARI: also FIXME: selectable by 'Position' selector in Network setup menus!
 
     //
     //	Send all clients host:ports to all clients.
@@ -1179,8 +1190,8 @@ local void NetworkServerSetup(void)
 	    InitMessage msg;
 
 	    NetRecvUDP(NetworkFildes,&msg,sizeof(msg));
-	    DebugLevel0Fn(" receive ack %d %ld:%d\n",
-		    msg.Type,NetLastHost,ntohs(NetLastPort));
+	    DebugLevel0Fn(" receive ack %d %d.%d.%d.%d:%d\n",
+		    msg.Type,NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
 
 	    if( message.Type==MessageInitHello ) {
 		DebugLevel0Fn(" Acknowledge lost\n");
@@ -1236,8 +1247,7 @@ local void NetworkClientSetup(void)
 	fprintf(stderr,"Can't resolve host %s\n",NetworkArg);
 	exit(-1);
     }
-    DebugLevel0Fn(" Server host:port %ld.%ld.%ld.%ld:%d\n"
-	,host & 0xff, (host >> 8) & 0xff, (host >> 16) & 0xff, (host >> 24) & 0xff ,ntohs(port));
+    DebugLevel0Fn(" Server host:port %d.%d.%d.%d:%d\n", NIPQUAD(ntohl(host)), ntohs(port));
 
     //
     //	Connecting to server
@@ -1273,7 +1283,7 @@ local void NetworkClientSetup(void)
     }
 
     //
-    //	Wait for address of other clients.
+    //	Wait for addresses of other clients.
     //
     for( ;; ) {
 	DebugLevel0Fn(" waiting for clients\n");
@@ -1295,8 +1305,9 @@ local void NetworkClientSetup(void)
 		DebugLevel0Fn(" SELF %d\n",message.Num[i]);
 		ThisPlayer=&Players[(int)message.Num[i]];
 	    }
-	    DebugLevel0Fn(" Client %d %ld:%d\n"
-		    ,message.Num[i],message.Hosts[i].Host
+	    DebugLevel0Fn(" Client %d %d.%d.%d.%d:%d\n"
+		    ,message.Num[i]
+		    ,NIPQUAD(ntohl(message.Hosts[i].Host))
 		    ,ntohs(message.Hosts[i].Port));
 	}
 	NetPlyNr[HostsCount]=message.Num[i];
@@ -1326,12 +1337,12 @@ local void NetworkClientSetup(void)
 }
 
 /**
-**	Initialise network.
+**	Initialise network part 1.
 */
-global void InitNetwork(void)
+global void InitNetwork1(void)
 {
-    int i;
-    int n;
+    int i, port;
+    char* cp;
 
     DebugLevel0Fn("\n");
 
@@ -1341,87 +1352,105 @@ global void InitNetwork(void)
     DebugLevel3Fn(" Packet %d\n",sizeof(NetworkCommand));
     DebugLevel3Fn(" Packet %d\n",sizeof(NetworkChat));
 
+    DebugLevel0Fn(" %d players\n",NetPlayers);
+    DebugLevel0Fn(" %s arg\n",NetworkArg);
 
     NetworkFildes=-1;
     NetworkInSync=1;
 
-    if( NetPlayers>1 || NetworkArg ) {	// with network
-	char* cp;
-	int port;
+    NetInit();			// machine dependend setup
 
-	DebugLevel0Fn(" %d players\n",NetPlayers);
-	DebugLevel0Fn(" %s arg\n",NetworkArg);
-
-	NetInit();			// machine dependend setup
-
-	if( NetworkUpdates<=0 ) {
-	    NetworkUpdates=1;
-	}
-	// Lag must be multiple of Updates?
-	NetworkLag/=NetworkUpdates;
-	NetworkLag*=NetworkUpdates;
-
-	port=NetworkPort;
-	if( NetworkArg ) {
-	    i=strtol(NetworkArg,&cp,0);
-	    if( cp!=NetworkArg && (*cp==':' || *cp=='\0') ) {
-		if(*cp==':')
-		    cp++;
-		NetworkArg=cp;
-		port=i;
-	    }
-	}
-
-	// Our communication port
-	NetworkFildes=NetOpenUDP(port);
-	if( NetworkFildes==-1 ) {
-	    NetworkFildes=NetOpenUDP(port+1);
-	    if( NetworkFildes==-1 ) {
-		fprintf(stderr,"No free ports %d-%d available, aborting\n"
-			,port,port+1);
-		exit(-1);
-	    }
-	}
-	IfDebug({
-	    char buf[128];
-
-	    gethostname(buf,sizeof(buf));
-	    DebugLevel0Fn(" %s\n",buf);
-	    MyHost=NetResolveHost(buf);
-	    MyPort=NetLastPort;
-	    DebugLevel0Fn(" My host:port %ld.%ld.%ld.%ld:%d\n"
-	    ,MyHost & 0xff, (MyHost >> 8) & 0xff, (MyHost >> 16) & 0xff, (MyHost >> 24) & 0xff ,ntohs(MyPort));
-	});
-
-	//
-	//	Server
-	//
-	if( NetPlayers ) {
-	    NetworkServerSetup();
-	    DebugLevel0Fn(" Server setup ready\n");
-
-	//
-	// Client
-	//
-	} else {
-	    NetworkClientSetup();
-	    DebugLevel0Fn(" Client setup ready\n");
-	}
-
-	//
-	//	Prepare first time without syncs.
-	//
-	for( i=0; i<=NetworkLag; i+=NetworkUpdates ) {
-	    for( n=0; n<HostsCount; ++n ) {
-		NetworkIn[i][NetPlyNr[n]].Time=i;
-		NetworkIn[i][NetPlyNr[n]].Data.Frame=i;
-		NetworkIn[i][NetPlyNr[n]].Data.Type=MessageSync;
-	    }
-	}
-
-	dl_init(CommandsIn);
-	dl_init(CommandsOut);
+    for (i=0;i<PlayerMax;i++) {
+	NetMsgBufLen[i] = 0;
     }
+
+    if( NetworkUpdates<=0 ) {
+	NetworkUpdates=1;
+    }
+    // Lag must be multiple of Updates?
+    NetworkLag/=NetworkUpdates;
+    NetworkLag*=NetworkUpdates;
+
+    port=NetworkPort;
+    if( NetworkArg ) {
+	i=strtol(NetworkArg,&cp,0);
+	if( cp!=NetworkArg && (*cp==':' || *cp=='\0') ) {
+	    if(*cp==':')
+		cp++;
+	    NetworkArg=cp;
+	    port=i;
+	}
+    }
+
+    // Our communication port
+    NetworkFildes=NetOpenUDP(port);
+    if( NetworkFildes==-1 ) {
+	NetworkFildes=NetOpenUDP(port+1);
+	if( NetworkFildes==-1 ) {
+	    fprintf(stderr,"No free ports %d-%d available, aborting\n"
+		    ,port,port+1);
+	    exit(-1);
+	}
+    }
+    IfDebug({
+	char buf[128];
+
+	gethostname(buf,sizeof(buf));
+	DebugLevel0Fn(" %s\n",buf);
+	MyHost=NetResolveHost(buf);
+	MyPort=NetLastPort;
+	DebugLevel0Fn(" My host:port %d.%d.%d.%d:%d\n", NIPQUAD(ntohl(MyHost)), ntohs(MyPort));
+    });
+}
+
+/**
+**	Cleanup network part 1. (to be called _AFTER_ part 2 :)
+*/
+global void ExitNetwork1(void)
+{
+    NetCloseUDP(NetworkFildes);
+
+    NetExit();			// machine dependend setup
+	
+    NetworkFildes=-1;
+    NetworkInSync=1;
+}
+
+/**
+**	Initialise network part 2.
+*/
+global void InitNetwork2(void)
+{
+    int i,n;
+
+    //
+    //	Server
+    //
+    if( NetPlayers ) {
+	NetworkServerSetup();
+	DebugLevel0Fn(" Server setup ready\n");
+
+    //
+    // Client
+    //
+    } else {
+	NetworkClientSetup();
+	DebugLevel0Fn(" Client setup ready\n");
+    }
+
+    //
+    //	Prepare first time without syncs.
+    //
+    for( i=0; i<=NetworkLag; i+=NetworkUpdates ) {
+	for( n=0; n<HostsCount; ++n ) {
+	    NetworkIn[i][NetPlyNr[n]].Time=i;
+	    NetworkIn[i][NetPlyNr[n]].Data.Frame=i;
+	    NetworkIn[i][NetPlyNr[n]].Data.Type=MessageSync;
+	}
+    }
+
+    dl_init(CommandsIn);
+    dl_init(CommandsOut);
 }
 
 /**
@@ -1511,7 +1540,7 @@ global void NetworkEvent(void)
 
 	// need player number. This could also be calculated from the
 	//	sender ip, port.
-	if( nc->Type==MessageChat || nc->Type==MessageChatCont ) {
+	if( nc->Type==MessageChat || nc->Type==MessageChatCont || nc->Type==MessageChatTerm ) {
 	    player=((NetworkChat*)nc)->Player;
 	} else if( nc->Type==MessageSync ) {
 	    player=ntohs(nc->X);
@@ -1595,7 +1624,7 @@ global void NetworkChatMessage(const char* msg)
 	}
 	ncq=malloc(sizeof(NetworkCommandQueue));
 	dl_insert_last(CommandsIn,ncq->List);
-	ncq->Data.Type=t;
+	ncq->Data.Type=MessageChatTerm;
 	ncm=(NetworkChat*)(&ncq->Data);
 	ncm->Player=ThisPlayer->Player;
 	memcpy(ncm->Text,cp,n+1);		// see >= above :)
@@ -1618,18 +1647,26 @@ local void ParseNetworkCommand(const NetworkCommandQueue* ncq)
     if( ncq->Data.Type==MessageSync ) {
 	return;
     }
-    if( ncq->Data.Type==MessageChat || ncq->Data.Type==MessageChatCont ) {
-	NetworkChat* ncm;
-	char buf[256];
-
-	ncm=(NetworkChat*)(&ncq->Data);
-	memcpy(buf,ncm->Text,sizeof(ncm->Text));
-	buf[sizeof(ncm->Text)]='\0';
-
-	if( ncq->Data.Type==MessageChatCont ) {
-	    SetMessageDupCat(buf);
-	} else {
-	    SetMessageDup(buf);
+    if( ncq->Data.Type==MessageChat || ncq->Data.Type==MessageChatCont || ncq->Data.Type==MessageChatTerm ) {
+	NetworkChat *ncm=(NetworkChat*)(&ncq->Data);
+	int ply=ncm->Player;
+	if ( NetMsgBufLen[ply]+sizeof(ncm->Text)<128 ) {
+	    memcpy(((char *)NetMsgBuf[ply])+NetMsgBufLen[ply],ncm->Text,sizeof(ncm->Text));
+	}
+	switch( ncq->Data.Type ) {
+	    case MessageChat:
+		NetMsgBufLen[ply]=sizeof(ncm->Text);
+		break;
+	    case MessageChatCont:
+		NetMsgBufLen[ply]+=sizeof(ncm->Text);
+		break;
+	    case MessageChatTerm:
+		NetMsgBuf[127][ply] = '\0';
+		SetMessageDup(NetMsgBuf[ply]);
+		NetMsgBufLen[ply]=0;
+		/* FALL THROUGH */
+	    default:
+		break;
 	}
 	return;
     }
@@ -1865,7 +1902,7 @@ local void NetworkExecCommands(void)
 	    //
 	    while( !dl_empty(CommandsOut) ) {
 		ncq=(NetworkCommandQueue*)(CommandsOut->last);
-		// FIXME: how many packets must be exact keeped?
+		// FIXME: how many packets must be kept exactly?
 		//if( ncq->Time+NetworkLag+NetworkUpdates>=FrameCounter )
 		// THIS is too much if( ncq->Time>=FrameCounter ) 
 		if( ncq->Time+NetworkLag>=FrameCounter ) {
