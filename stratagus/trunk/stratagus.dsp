@@ -695,18 +695,6 @@ SOURCE=.\src\video\video.c
 # End Source File
 # End Group
 # End Group
-# Begin Group "etlib"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\etlib\getopt.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\etlib\hash.c
-# End Source File
-# End Group
 # End Group
 # Begin Group "Header Files"
 
@@ -714,22 +702,6 @@ SOURCE=.\etlib\hash.c
 # Begin Group "include"
 
 # PROP Default_Filter ""
-# Begin Group "etlib."
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\include\etlib\dllist.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\etlib\generic.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\etlib\hash.h
-# End Source File
-# End Group
 # Begin Group "vp31."
 
 # PROP Default_Filter ""
