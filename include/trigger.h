@@ -57,11 +57,24 @@ typedef struct _timer_ {
 #define ALL_FOODUNITS ((const UnitType*)-2)
 #define ALL_BUILDINGS ((const UnitType*)-3)
 
+
+/**
+**  Data to referer game info when game running.
+*/
+typedef struct {
+	Unit* Attacker;  ///< Unit which send the missile.
+	Unit* Defender;  ///< Unit Which is hit by missile.
+} TriggerDataType;
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 extern Timer GameTimer; ///< the game timer
+
+/// Some data accessible for script during the game.
+extern TriggerDataType TriggerData;
+
 
 /*----------------------------------------------------------------------------
 --  Functions
