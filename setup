@@ -360,9 +360,9 @@ else
     echo "section of this script to find out how to install a local"
     echo "local copy of the libz."
     echo
-  fi
 
-  exit 1
+    exit 1
+  fi
 fi
 
 #------------------------------------------------------------------------------
