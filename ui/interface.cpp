@@ -505,10 +505,10 @@ local void UiIncreaseGameSpeed(void)
 */
 local void UiDecreaseGameSpeed(void)
 {
-	if (VideoSyncSpeed <= 0) {
-		VideoSyncSpeed = 0;
-	} else if (VideoSyncSpeed < 11) {
-		VideoSyncSpeed -= 1;
+	if (VideoSyncSpeed <= 10) {
+		if (VideoSyncSpeed > 1) {
+			--VideoSyncSpeed;
+		}
 	} else {
 		VideoSyncSpeed -= 10;
 	}
