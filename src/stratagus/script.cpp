@@ -36,6 +36,8 @@
 
 #include "freecraft.h"
 
+#include "iocompat.h"
+
 #include "iolib.h"
 #include "ccl.h"
 #include "missile.h"
