@@ -797,6 +797,8 @@ local int AiAssignHarvester(Unit * unit, int resource)
     //  These will hold the coordinates of the forest.
     int forestx;
     int foresty;
+    int i;
+    int exploremask;
     //  This will hold the resulting gather destination.
     Unit *dest;
 
@@ -811,15 +813,38 @@ local int AiAssignHarvester(Unit * unit, int resource)
 	    CommandResourceLoc(unit, forestx, foresty, FlushCommands);
 	    return 1;
 	}
+	// Ask the AI to explore...
+	AiExplore(unit->X, unit->Y, MapFieldLandUnit);
     } else {
 	//
-	//      Find a resource to ravest from.
+	//      Find a resource to harvest from.
 	//
 	if ((dest = FindResource(unit, unit->X, unit->Y, 1000, resource))) {
 	    CommandResource(unit, dest, FlushCommands);
 	    return 1;
 	}
+	exploremask = 0;
+	for (i = 0; i <= UnitTypeMax; i++) {	    
+	    if (UnitTypes[i] && UnitTypes[i]->GivesResource == resource) {
+		switch (UnitTypes[i]->UnitType) {
+		case UnitTypeLand:
+		    exploremask |= MapFieldLandUnit;
+		    break;
+		case UnitTypeFly:
+		    exploremask |= MapFieldAirUnit;
+		    break;
+		case UnitTypeNaval:
+		    exploremask |= MapFieldSeaUnit;
+		    break;
+		default:
+		    DebugCheck(1);
+		}
+	    }
+	}
+	// Ask the AI to explore
+	AiExplore(unit->X, unit->Y, exploremask);
     }
+    
     //  Failed.
     return 0;
 }
@@ -1266,6 +1291,29 @@ global void AiAddUnitTypeRequest(UnitType * type, int count)
     (*queue)->Type = type;
     (*queue)->Want = count;
     (*queue)->Made = 0;
+}
+
+/**
+**	Mark that a zone is requiring exploration.
+**
+**	@param x	X pos of the zone
+**	@param y	Y pos of the zone
+**	@param mask	Mask to explore ( land/sea/air )
+*/
+global void AiExplore(int x, int y, int mask)
+{
+    AiExplorationRequest * req;
+
+    // Alloc a new struct,
+    req = (AiExplorationRequest*) malloc(sizeof(AiExplorationRequest));
+
+    // Link into the exploration requests list
+    req->X = x;
+    req->Y = y;
+    req->Mask = mask;
+
+    req->Next = AiPlayer->FirstExplorationRequest;
+    AiPlayer->FirstExplorationRequest = req;
 }
 
 /**

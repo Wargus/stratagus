@@ -875,6 +875,7 @@ global void CleanAi(void)
     void *temp;
     AiType *aitype;
     AiBuildQueue *queue;
+    AiExplorationRequest* request;
     char **cp;
 
     for (p = 0; p < PlayerMax; ++p) {
@@ -913,6 +914,15 @@ global void CleanAi(void)
 	    for (queue = pai->UnitTypeBuilded; queue; queue = temp) {
 		temp = queue->Next;
 		free(queue);
+	    }
+
+	    //
+	    // Free ExplorationRequest list
+	    //
+	    while (pai->FirstExplorationRequest) {
+		request = pai->FirstExplorationRequest->Next;
+		free(pai->FirstExplorationRequest);
+		pai->FirstExplorationRequest = request;
 	    }
 
 	    free(pai);
@@ -1378,6 +1388,12 @@ global void AiEachSecond(Player * player)
     if (AiPlayer->AutoAttack) {
 	AiPeriodicAttack();
     }
+
+    // At most 1 explorer each 5 seconds
+    if (GameCycle > AiPlayer->LastExplorationGameCycle + 5 * CYCLES_PER_SECOND) {
+    	AiSendExplorers();
+    }
+
 #ifdef TIMEIT
     ev = rdtsc();
     sx = (ev - sv);

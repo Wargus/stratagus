@@ -597,4 +597,139 @@ global int AiPlanAttack(AiForce * force)
     return 0;
 }
 
+/**
+**	Respond to ExplorationRequests
+*/
+void AiSendExplorers(void)
+{
+    AiExplorationRequest* request;
+    int requestcount;
+    int requestid;
+    int centerx,centery;
+    int x,y;
+    int i;
+    int targetok;
+    int ray;
+    int trycount;
+    int outtrycount;
+    
+    Unit** unit;
+    UnitType * type;
+    Unit* bestunit;
+    int distance;
+    int bestdistance;
+    int flyeronly;
+    
+    // Count requests...
+    request = AiPlayer->FirstExplorationRequest;
+    requestcount = 0;
+
+    while (request) {
+	requestcount ++;
+	
+	request = request->Next;
+    }
+
+    // Nothing => abort
+    if (! requestcount) {
+	return;
+    }
+
+    outtrycount = 0;
+    do {
+	bestunit = 0;
+	outtrycount++;
+
+	// Choose a request
+	requestid = SyncRand() % requestcount;
+
+	request = AiPlayer->FirstExplorationRequest;
+	while (requestid) {
+	    request = request->Next;
+	    requestid--;
+	}
+	// Choose a target, "near"
+	centerx = request->X;
+	centery = request->Y;
+	ray = 3;
+	trycount = 0;
+
+	do {
+	    targetok = 0;
+
+	    x = centerx + SyncRand() % (2 * ray + 1) - ray;
+	    y = centery + SyncRand() % (2 * ray + 1) - ray;
+
+	    if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height) {
+		targetok = !IsMapFieldExplored(AiPlayer->Player, x, y);
+	    }
+
+	    ray = 3 * ray / 2;
+	    trycount ++;
+	} while (trycount < 8 && ! targetok);
+
+	if (! targetok) {
+	    continue;
+	}
+
+	// We have an unexplored tile in sight (x,y)
+
+	// Find an idle unit, responding to the mask
+	flyeronly = 0;
+	bestdistance = -1;
+
+	unit = AiPlayer->Player->Units;
+	for (i = AiPlayer->Player->TotalNumUnits; i > 0; unit++) {
+	    i--;
+
+	    if (!UnitIdle((*unit))) {
+		continue;
+	    }
+	    
+	    if ((*unit)->X == -1 || (*unit)->Y == -1) {
+		continue;
+	    }
+
+	    type = (*unit)->Type;
+
+	    if (type->Building) {
+		continue;
+	    }
+	    
+	    if (type->UnitType != UnitTypeFly) {
+		if (flyeronly) {
+		    continue;
+		}
+		if ((request->Mask & MapFieldLandUnit) && (type->UnitType != UnitTypeLand)) {
+		    continue;
+		}
+		if ((request->Mask & MapFieldSeaUnit) && (type->UnitType != UnitTypeNaval)) {
+		    continue;
+		}
+	    } else {
+		flyeronly = 1;
+	    }
+
+	    distance = ((*unit)->X - x) * ((*unit)->X - x) + ((*unit)->Y - y) * ((*unit)->Y - y);
+	    if (bestdistance == -1 || distance <= bestdistance || 
+		    (bestunit->Type->UnitType != UnitTypeFly && type->UnitType == UnitTypeFly)) {
+		bestdistance = distance;
+		bestunit = (*unit);
+	    }
+	}
+    } while(outtrycount <= 4 && !bestunit);
+    
+    if (bestunit) {
+	CommandMove(bestunit, x, y, FlushCommands);
+	AiPlayer->LastExplorationGameCycle=GameCycle;
+    }
+
+    // Remove all requests
+    while (AiPlayer->FirstExplorationRequest) {
+	request = AiPlayer->FirstExplorationRequest->Next;
+	free(AiPlayer->FirstExplorationRequest);
+	AiPlayer->FirstExplorationRequest = request;
+    }
+}
+
 //@}

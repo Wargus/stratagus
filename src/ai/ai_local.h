@@ -239,6 +239,15 @@ struct _ai_action_evaluation_ {
     AiActionEvaluation*	Next;		/// Next in linked list
 };
 
+typedef struct _ai_exploration_request_ AiExplorationRequest;
+
+struct _ai_exploration_request_ {
+    int			X;		/// x pos on map
+    int			Y;		/// y pos on map
+    int			Mask;		/// mask ( ex: MapFieldLandUnit )
+    AiExplorationRequest*Next;		/// Next in linked list
+};
+
 /**
 **	AI variables.
 */
@@ -275,6 +284,9 @@ typedef struct _player_ai_ {
     int			NeededMask;	/// Mask for needed resources
 
     int			NeedFood;	/// Flag need food
+
+    AiExplorationRequest*FirstExplorationRequest;/// Requests for exploration
+    unsigned int	LastExplorationGameCycle;/// When did the last explore occur ?
 
     /// number of elements in UnitTypeRequests
     int			UnitTypeRequestsCount;
@@ -380,7 +392,9 @@ extern void AiAddUpgradeToRequest(UnitType * type);
 extern void AiAddResearchRequest(Upgrade * upgrade);
     /// Periodic called resource manager handler
 extern void AiResourceManager(void);
-    /// Count the number of builder unit available for the given unittype
+    /// Ask the ai to explore around x,y
+extern void AiExplore(int x, int y, int exploreMask);
+    /// Count the number of builder unit available for the given unittype 
 extern int AiCountUnitBuilders(UnitType * type);
 
 //
@@ -436,6 +450,8 @@ extern int AiForceSubstractWant(int force, int *unittypeCount);
 extern int AiFindWall(AiForce * force);
     /// Plan the an attack
 extern int AiPlanAttack(AiForce * force);
+    /// Send explorers around the map
+extern void AiSendExplorers(void);
 
 //
 //      Scripts
