@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file (3 level).
 ##
-##	(c) Copyright 1998-2000 by Lutz Sammer
+##	(c) Copyright 1998-2001 by Lutz Sammer
 ##
 ##	$Id$
 ##
@@ -21,10 +21,9 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = clone
 
-OBJS	= clone.$(OE) unit.$(OE) unit_draw.$(OE) unitcache.$(OE) \
-	  unit_find.$(OE) missile.$(OE) construct.$(OE)\
-	  player.$(OE) pud.$(OE) ccl.$(OE) interface.$(OE) iolib.$(OE) \
-	  mainloop.$(OE) goal.$(OE) selection.$(OE) groups.$(OE) \
-	  spells.$(OE) ccl_missile.$(OE)
+OBJS	= clone.$(OE) mainloop.$(OE) goal.$(OE) selection.$(OE) groups.$(OE) \
+	  unit.$(OE) unit_draw.$(OE) unitcache.$(OE) unit_find.$(OE) \
+	  construct.$(OE) player.$(OE) pud.$(OE) ccl.$(OE) interface.$(OE) \
+	  iolib.$(OE) spells.$(OE)
 
 include $(TOPDIR)/Common.mk
