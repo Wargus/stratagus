@@ -714,8 +714,7 @@ local void AiCheckingWork(void)
 **		Or we could do a flood fill search starting from x.y. The
 **		first found gold mine is it.
 */
-global Unit* AiFindGoldMine(const Unit* source,
-	int x __attribute__((unused)),int y __attribute__((unused)))
+local Unit* AiFindGoldMine(const Unit* source, Unit* used_mine)
 {
     Unit** table;
     Unit* unit;
@@ -723,12 +722,16 @@ global Unit* AiFindGoldMine(const Unit* source,
     int best_d;
     int d;
 
-    best=NoUnitP;
-    best_d=99999;
+    best=used_mine;
+    if( used_mine==NoUnitP ) {
+	best_d=99999;
+    } else {
+	best_d=MapDistanceBetweenUnits(source,used_mine);
+    }
     for( table=Units; table<Units+NumUnits; table++ ) {
 	unit=*table;
 	// Want gold-mine and not dieing.
-	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
+	if( !unit->Type->GoldMine || unit==used_mine || UnitUnusable(unit) ) {
 	    continue;
 	}
 
@@ -752,15 +755,13 @@ global Unit* AiFindGoldMine(const Unit* source,
 **
 **      IDEA: If no way to goldmine, we must dig the way.
 **      IDEA: If goldmine is on an other island, we must transport the workers.
-**
-**	@note	I can cache the gold-mine.
 */
-local int AiMineGold(Unit* unit)
+local int AiMineGold(Unit* unit, Unit* used_mine)
 {
     Unit* dest;
 
     DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
-    dest = AiFindGoldMine(unit, unit->X, unit->Y);
+    dest = AiFindGoldMine(unit, used_mine);
     if (!dest) {
 	DebugLevel0Fn("goldmine not reachable by %s(%d,%d)\n"
 		_C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
@@ -1047,13 +1048,12 @@ local int AiHaulOil(Unit * unit)
 */
 local void AiCollectResources(void)
 {
-#if 1
-    Unit* resource[UnitMax][MaxCosts];	// Worker with resource
-    int rn[MaxCosts];
-    Unit* assigned[UnitMax][MaxCosts];	// Worker assigned to resource
-    int an[MaxCosts];
-    Unit* unassigned[UnitMax];		// Unassigned workers
-    int un;
+    Unit* units_with_resource[UnitMax][MaxCosts];	// Worker with resource
+    int num_units_with_resource[MaxCosts];
+    Unit* units_assigned[UnitMax][MaxCosts];	// Worker assigned to resource
+    int num_units_assigned[MaxCosts];
+    Unit* units_unassigned[UnitMax];		// Unassigned workers
+    int num_units_unassigned;
     int total;				// Total of workers
     int c;
     int i;
@@ -1062,23 +1062,25 @@ local void AiCollectResources(void)
     int n;
     Unit** units;
     Unit* unit;
-    int p[MaxCosts];
-    int pt;
+    Unit* used_mine;
+    int percent[MaxCosts];
+    int percent_total;
 
+    used_mine = NoUnitP;
     //
     //	Collect statistics about the current assignment
     //
-    pt = 100;
-    for( i=0; i<MaxCosts; i++ ) {
-	rn[i]=0;
-	an[i]=0;
-	p[i]=AiPlayer->Collect[i];
-	if( (AiPlayer->NeededMask&(1<<i)) ) {	// Double percent if needed
-	    pt+=p[i];
-	    p[i]<<=1;
+    percent_total = 100;
+    for( c=0; c<MaxCosts; c++ ) {
+	num_units_with_resource[c]=0;
+	num_units_assigned[c]=0;
+	percent[c]=AiPlayer->Collect[c];
+	if( (AiPlayer->NeededMask&(1<<c)) ) {	// Double percent if needed
+	    percent_total+=percent[c];
+	    percent[c]<<=1;
 	}
     }
-    total=un=0;
+    num_units_unassigned=0;
 
     n=AiPlayer->Player->TotalNumUnits;
     units=AiPlayer->Player->Units;
@@ -1087,15 +1089,22 @@ local void AiCollectResources(void)
 	if( !unit->Type->CowerWorker && !unit->Type->Tanker ) {
 	    continue;
 	}
+
+	//
+	//	See if it's assigned already
+	//
 	switch( unit->Orders[0].Action ) {
 	    case UnitActionMineGold:
-		assigned[an[GoldCost]++][GoldCost]=unit;
+		units_assigned[num_units_assigned[GoldCost]++][GoldCost]=unit;
+		if( unit->Orders[0].Goal && unit->Orders[0].Goal->Type->GoldMine ) {
+		    used_mine=unit->Orders[0].Goal;
+		}
 		continue;
 	    case UnitActionHarvest:
-		assigned[an[WoodCost]++][WoodCost]=unit;
+		units_assigned[num_units_assigned[WoodCost]++][WoodCost]=unit;
 		continue;
 	    case UnitActionHaulOil:
-		assigned[an[OilCost]++][OilCost]=unit;
+		units_assigned[num_units_assigned[OilCost]++][OilCost]=unit;
 		continue;
 		// FIXME: the other resources
 	    default:
@@ -1119,7 +1128,7 @@ local void AiCollectResources(void)
 	    tn=AiHelpers.WithGoods[c]->Count;
 	    for( j=0; j<tn; ++j ) {
 		if( unit->Type==types[j] ) {
-		    resource[rn[c]++][c]=unit;
+		    units_with_resource[num_units_with_resource[c]++][c]=unit;
 		    if (unit->Orders[0].Action == UnitActionStill
 			    && unit->OrderCount==1 ) {
 			CommandReturnGoods(unit,NULL,FlushCommands);
@@ -1140,7 +1149,7 @@ local void AiCollectResources(void)
 		if( unit->Type==types[j] ) {
 		    if (unit->Orders[0].Action == UnitActionStill
 			    && unit->OrderCount==1 && !unit->Removed ) {
-			unassigned[un++]=unit;
+			units_unassigned[num_units_unassigned++]=unit;
 			break;
 		    }
 		}
@@ -1153,25 +1162,63 @@ local void AiCollectResources(void)
 
     total=0;
     for( c=0; c<MaxCosts; ++c ) {
-	total+=an[c]+rn[c];
-	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ an[c]);
-	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ rn[c]);
+	total+=num_units_assigned[c]+num_units_with_resource[c];
+	DebugLevel3Fn("Assigned %d = %d\n" _C_ c _C_ num_units_assigned[c]);
+	DebugLevel3Fn("Resource %d = %d\n" _C_ c _C_ num_units_with_resource[c]);
     }
-    DebugLevel3Fn("Unassigned %d of total %d\n" _C_ un _C_ total);
+    DebugLevel3Fn("Unassigned %d of total %d\n" _C_ num_units_unassigned _C_ total);
+
+    //
+    //	Reassign workers
+    //
+    if( num_units_unassigned==0 ) {
+	for( c=0; c<MaxCosts; ++c ) {
+	    if( percent[c] == 0 ) {
+		continue;
+	    }
+	    for( i=0; i<MaxCosts; ++i ) {
+		if( i==c /*|| percent[i]>=percent[c]*/ ) {
+		    continue;
+		}
+		if( (percent[i] < percent[c] &&
+		    ((num_units_assigned[c]+num_units_with_resource[c]-1)*percent_total > total*percent[c] || 
+		      num_units_assigned[c]+num_units_with_resource[c]==0)) ||
+		    (num_units_assigned[i]+num_units_with_resource[i]-1)*percent_total > total*percent[i] ) {
+		    int j;
+		    for( j=num_units_assigned[i]-1; j>=0; --j ) {
+			unit=units_assigned[j][i];
+			if( unit && unit->SubAction < 64 ) {
+			    units_assigned[j][i] = units_assigned[--num_units_assigned[i]][i];
+			    --total;
+			    units_unassigned[num_units_unassigned++]=unit;
+			    break;
+			}
+		    }
+		}
+	    }
+	}
+    }
 
     //
     //	Now assign the free workers.
     //
-    for( i=0; i<un; i++ ) {
+    for( i=0; i<num_units_unassigned; i++ ) {
 	int t;
+	int max;
 
-	unit=unassigned[i];
+	unit=units_unassigned[i];
 
-	for( o=c=0; c<MaxCosts; ++c ) {
-	    DebugLevel3Fn("%d, %d, %d\n" _C_ (an[c]+rn[c])*pt _C_ p[c] _C_ total*p[c]);
-	    if( (an[c]+rn[c])*pt<total*p[c] ) {
-		o=c;
-		break;
+	for( max=o=c=0; c<MaxCosts; ++c ) {
+	    DebugLevel3Fn("%d, %d, %d\n" _C_
+		(num_units_assigned[c]+num_units_with_resource[c])*percent_total _C_
+		percent[c] _C_
+		total*percent[c]);
+	    t=(num_units_assigned[c]+num_units_with_resource[c])*percent_total;
+	    if( t < total*percent[c] ) {
+		if( total*percent[c]-t > max ) {
+		    max=total*percent[c]-t;
+		    o=c;
+		}
 	    }
 	}
 
@@ -1193,28 +1240,26 @@ local void AiCollectResources(void)
 	    types=AiHelpers.Collect[c]->Table;
 	    tn=AiHelpers.Collect[c]->Count;
 	    for( j=0; j<tn; ++j ) {
-		if( unit->Type==types[j]
-			&& unit->Orders[0].Action == UnitActionStill
-			&& unit->OrderCount==1 ) {
+		if( unit->Type==types[j] && unit->OrderCount==1 ) {
 		    switch( c ) {
 			case GoldCost:
-			    if( AiMineGold(unit) ) {
-				DebugLevel3Fn("Assigned\n");
-				assigned[an[c]++][c]=unit;
+			    if( unit->Orders[0].Action==UnitActionMineGold || AiMineGold(unit,used_mine) ) {
+				DebugLevel3Fn("Assigned to gold\n");
+				units_assigned[num_units_assigned[c]++][c]=unit;
 				++total;
 			    }
 			    break;
 			case WoodCost:
-			    if( AiHarvest(unit) ) {
-				DebugLevel3Fn("Assigned\n");
-				assigned[an[c]++][c]=unit;
+			    if( unit->Orders[0].Action==UnitActionHarvest || AiHarvest(unit) ) {
+				DebugLevel3Fn("Assigned to harvest\n");
+				units_assigned[num_units_assigned[c]++][c]=unit;
 				++total;
 			    }
 			    break;
 			case OilCost:
-			    if( AiHaulOil(unit) ) {
-				DebugLevel3Fn("Assigned\n");
-				assigned[an[c]++][c]=unit;
+			    if( unit->Orders[0].Action==UnitActionHaulOil || AiHaulOil(unit) ) {
+				DebugLevel3Fn("Assigned to oil\n");
+				units_assigned[num_units_assigned[c]++][c]=unit;
 				++total;
 			    }
 			    break;
@@ -1225,166 +1270,6 @@ local void AiCollectResources(void)
 	    }
 	}
     }
-
-    //
-    //	Now look if too much workers are assigned to a resource 
-    //	FIXME: If one resource can't be collected this is bad
-    //
-#if 0
-    for( c=0; c<MaxCosts; ++c ) {
-	DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*pt,p[c],total*p[c]);
-	if( (an[c]+rn[c]-1)*pt>total*p[c] ) {
-	    for( i=0; i<an[c]; ++i ) {
-		unit=assigned[i][c];
-		if( unit->SubAction<64 ) {
-		    DebugLevel3Fn("Must deassign %d\n",c);
-		    CommandStopUnit(unit);
-		    break;
-		}
-	    }
-	    break;
-	}
-    }
-#endif
-
-#else
-    int c;
-    int i;
-    int n;
-    UnitType** types;
-    Unit* table[UnitMax];
-    int nunits;
-
-    DebugLevel3Fn("Needed resources %x\n" _C_ AiPlayer->NeededMask);
-
-    //
-    //	Look through all costs, if needed.
-    //
-    for( c=0; c<OreCost; ++c ) {
-	if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c]
-		|| !(AiPlayer->NeededMask&(1<<c)) ) {
-	    continue;
-	}
-
-	//
-	//	Get all workers that can collect this resource.
-	//
-	types=AiHelpers.Collect[c]->Table;
-	n=AiHelpers.Collect[c]->Count;
-	nunits=0;
-	for( i=0; i<n; ++i ) {
-	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
-		    types[i],table+nunits);
-	}
-	DebugLevel3Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
-
-	//
-	//	Assign the the first half of the worker
-	//
-	for( i=0; i<nunits/2; ++i ) {
-	    // Unit is already *very* busy
-	    if (table[i]->Orders[0].Action != UnitActionBuild
-		    && table[i]->Orders[0].Action != UnitActionRepair
-		    && table[i]->OrderCount==1 ) {
-		DebugLevel0Fn("Reassign %d\n",UnitNumber(table[i]));
-		switch( c ) {
-		    case GoldCost:
-			if (table[i]->Orders[0].Action != UnitActionMineGold ) {
-			    AiMineGold(table[i]);
-			}
-			break;
-		    case WoodCost:
-			if (table[i]->Orders[0].Action != UnitActionHarvest ) {
-			    AiHarvest(table[i]);
-			}
-			break;
-
-		    case OilCost:
-			if (table[i]->Orders[0].Action != UnitActionHaulOil ) {
-			    AiHaulOil(table[i]);
-			}
-			break;
-		    default:
-			DebugCheck( 1 );
-		}
-	    }
-	}
-    }
-
-    //
-    //	Assign the remaining unit.
-    //
-    for( c=0; c<OreCost; ++c ) {
-	if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
-	    continue;
-	}
-
-	//
-	//	Get all workers that can collect this resource.
-	//
-	types=AiHelpers.Collect[c]->Table;
-	n=AiHelpers.Collect[c]->Count;
-	nunits=0;
-	for( i=0; i<n; ++i ) {
-	    nunits += FindPlayerUnitsByType(AiPlayer->Player,
-		    types[i],table+nunits);
-	}
-	DebugLevel3Fn("%s: units %d\n" _C_ DEFAULT_NAMES[c] _C_ nunits);
-
-	//
-	//	Assign the worker
-	//
-	for( i=0; i<nunits; ++i ) {
-	    // Unit is already busy
-	    if (table[i]->Orders[0].Action != UnitActionStill
-		    || table[i]->OrderCount>1 ) {
-		continue;
-	    }
-	    switch( c ) {
-		case GoldCost:
-		    AiMineGold(table[i]);
-		    break;
-		case WoodCost:
-		    AiHarvest(table[i]);
-		    break;
-		case OilCost:
-		    AiHaulOil(table[i]);
-		    break;
-		default:
-		    DebugCheck( 1 );
-	    }
-	}
-    }
-
-    //
-    //	Let all workers with resource return it.
-    //
-    nunits=0;
-    for( c=0; c<OreCost; ++c ) {
-	if( c>=AiHelpers.WithGoodsCount || !AiHelpers.WithGoods[c] ) {
-	    continue;
-	}
-	types=AiHelpers.WithGoods[c]->Table;
-	n=AiHelpers.WithGoods[c]->Count;
-	for( i=0; i<n; ++i ) {
-	    nunits+=FindPlayerUnitsByType(AiPlayer->Player,
-		    types[i],table+nunits);
-	}
-    }
-    DebugLevel3Fn("Return: units %d\n" _C_ nunits);
-
-    //
-    //	Assign the workers with goods
-    //
-    for( i=0; i<nunits; ++i ) {
-	// Unit is already busy
-	if (table[i]->Orders[0].Action != UnitActionStill
-		|| table[i]->OrderCount>1 ) {
-	    continue;
-	}
-	CommandReturnGoods(table[i],NULL,FlushCommands);
-    }
-#endif
 }
 
 /*----------------------------------------------------------------------------
