@@ -63,7 +63,8 @@ typedef struct _timer_ {
 */
 typedef struct {
 	Unit* Attacker;  ///< Unit which send the missile.
-	Unit* Defender;  ///< Unit Which is hit by missile.
+	Unit* Defender;  ///< Unit which is hit by missile.
+	Unit* Active;    ///< Unit which is selected or else under cursor unit.
 } TriggerDataType;
 
 /*----------------------------------------------------------------------------
