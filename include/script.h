@@ -80,7 +80,7 @@ extern void InitCcl(void);                /// Initialise ccl
 extern void LoadCcl(void);                /// Load ccl config file
 extern void SaveCcl(CLFile* file);        /// Save CCL module
 extern void SavePreferences(void);        /// Save user preferences
-extern void CclCommand(const char*);      /// Execute a ccl command
+extern int CclCommand(const char*);      /// Execute a ccl command
 extern void CclFree(void*);               /// Save free
 extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
