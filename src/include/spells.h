@@ -189,7 +189,6 @@ typedef struct ConditionInfo {
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-    char Volatile;		/// Target is volatile (suicide bomber).
     char Coward;		/// Target is coward. Don't bloodlust them.
     char Alliance;		/// Target is allied.
     char Building;		/// Target is a building.

@@ -490,7 +490,7 @@ global void ParsePudUDTA(const char* udta, int length __attribute__((unused)))
 	unittype->CanAttack = BIT(19, v);
 //	unittype->Hero = BIT(23, v);
 	unittype->CanStore[OilCost] = BIT(24, v);
-	unittype->Volatile = BIT(25, v);
+//	unittype->Volatile = BIT(25, v);
 //	unittype->Organic = BIT(27, v);
 	
 	if (BIT(11, v) || BIT(21, v)) {
@@ -1042,9 +1042,6 @@ local void SaveUnitType(CLFile* file, const UnitType* type, int all)
 
     if (type->Vanishes) {
 	CLprintf(file, "  'vanishes\n");
-    }
-    if (type->Volatile) {
-	CLprintf(file, "  'volatile\n");
     }
     if (type->SelectableByRectangle) {
 	CLprintf(file, "  'selectable-by-rectangle\n");
