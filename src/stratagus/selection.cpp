@@ -53,12 +53,13 @@ global Unit* Selected[MaxSelectable] = {
  */
 global void UnSelectAll(void)
 {
-    Unit *u;
+    Unit *unit;
+
     while( NumSelected ) {
-        u=Selected[--NumSelected];
+        unit=Selected[--NumSelected];
         Selected[NumSelected]=NoUnitP;  // FIXME: only needed for old code
-        u->Selected=0;
-        CheckUnitToBeDrawn(u);
+        unit->Selected=0;
+        CheckUnitToBeDrawn(unit);
     }
 }
 

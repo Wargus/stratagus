@@ -121,7 +121,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     if ( CheckUnitToBeDrawn(goal) ) {
 	MustRedraw|=RedrawMinimap;
     }
-    if( IsSelected(goal) ) {		// Update panel if unit is selected
+    if( IsOnlySelected(goal) ) {	// Update panel if unit is selected
 	MustRedraw|=RedrawInfoPanel;
     }
 }

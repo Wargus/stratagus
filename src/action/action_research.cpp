@@ -80,7 +80,7 @@ global void HandleActionResearch(Unit* unit)
 	return;
     }
 
-    if( IsSelected(unit) ) {
+    if( IsOnlySelected(unit) ) {
 	MustRedraw|=RedrawInfoPanel;
     }
 

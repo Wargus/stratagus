@@ -184,6 +184,14 @@
 **
 **	Unit::GroupId
 **
+**		Number of the group to that the unit belongs. This is the main
+**		group showed on map, an unit can belong to many groups.
+**
+**	Unit::LastGroup
+**
+**		Automatic group number, to reselect the same units. When the
+**		user selects more than one unit all units is given the next
+**		same number. (Used for ALT-CLICK)
 **
 **	Unit::Value
 **
@@ -433,6 +441,7 @@ struct _unit_ {
     unsigned	UnholyArmor;		/// ticks unholy armor
 
     unsigned	GroupId;		/// unit belongs to this group id
+    unsigned	LastGroup;		/// unit belongs to this last group
 
     unsigned	Value;			/// value used for much
 
@@ -792,9 +801,7 @@ extern void RemoveUnitFromGroup(Unit *unit);
 //	in selection.c
 
     /// Check if unit is the currently only selected
-// FIXME: lokh: Is it necessary to check if NumSelected==1?
-//              Maybe we can add a #define IsOnlySelected(unit)?
-#define IsSelected(unit)	(NumSelected==1 && Selected[0]==(unit))
+#define IsOnlySelected(unit)	(NumSelected==1 && Selected[0]==(unit))
 
     /// Clear current selection
 extern void UnSelectAll(void);

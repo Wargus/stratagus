@@ -66,7 +66,7 @@ global void HandleActionFollow(Unit* unit)
 	    unit->Wait=1;
 	    unit->SubAction=0;
 	    unit->Orders[0].Action=UnitActionStill;
-	    if( IsSelected(unit) ) {	// update display for new action
+	    if( IsOnlySelected(unit) ) { // update display for new action
 		UpdateButtonPanel();
 	    }
 	    return;
@@ -101,7 +101,7 @@ global void HandleActionFollow(Unit* unit)
 		unit->Wait=1;
 		unit->SubAction=0;
 		unit->Orders[0].Action=UnitActionStill;
-		if( IsSelected(unit) ) {	// update display for new action
+		if( IsOnlySelected(unit) ) { // update display for new action
 		    UpdateButtonPanel();
 		}
 		return;

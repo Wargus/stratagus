@@ -39,11 +39,12 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-// FIXME?: wanted to use 'SelectionGroup' but it is already used
-// in the unitsound.c file...
-typedef struct _group_ {
-    Unit *units[NUM_UNITS_PER_GROUP];
-    int num_units;
+/**
+**	Defines a group of units.
+*/
+typedef struct _unit_group_ {
+    Unit *units[NUM_UNITS_PER_GROUP];	/// Units in the group
+    int num_units;			/// How many units in the group
 } UnitGroup;	/// group of units
 
 global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined

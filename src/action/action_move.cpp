@@ -263,7 +263,7 @@ global void HandleActionMove(Unit* unit)
 		unit->Orders[0].Goal=NoUnitP;
 	    }
 	    unit->Orders[0].Action=UnitActionStill;
-	    if( IsSelected(unit) ) {	// update display for new action
+	    if( unit->Selected ) {	// update display for new action
 		UpdateButtonPanel();
 	    }
 	    return;

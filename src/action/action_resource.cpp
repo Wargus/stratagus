@@ -185,7 +185,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//
 	source=resource->ResourceOnMap(unit->X,unit->Y);
 	IfDebug(
-	    DebugLevel3Fn("Found %d,%d=%Zd\n",unit->X,unit->Y
+	    DebugLevel2Fn("Found %d,%d=%Zd\n",unit->X,unit->Y
 		,UnitNumber(source));
 	    if( !source ) {
 		DebugLevel0Fn("No unit? (%d,%d)\n",unit->X,unit->Y);
@@ -202,7 +202,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    source->Frame=0;
 	    CheckUnitToBeDrawn(source);
 	}
-	if( IsSelected(source) ) {
+	if( IsOnlySelected(source) ) {
 	    MustRedraw|=RedrawInfoPanel;
 	}
 
@@ -210,9 +210,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	//	End of resource: destroy the resource.
 	//
 	if( source->Value<DEFAULT_INCOMES[resource->Cost] ) {
-	    unit->Removed=0;		// BUG ALERT: Unit not dropped out!
 	    DropOutAll(source);
-	    unit->Removed=1;
 	    DestroyUnit(source);
 	    source=NULL;
 	}
@@ -237,8 +235,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    if( source ) {
 		DropOutOnSide(unit,LookingW
 		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    } else {
-		DropOutOnSide(unit,LookingW,1,1);
 	    }
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
@@ -248,9 +244,6 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 		DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
 		    ,depot->Y+depot->Type->TileHeight/2
 		    ,source->Type->TileWidth,source->Type->TileHeight);
-	    } else {
-		DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
-		    ,depot->Y+depot->Type->TileHeight/2,1,1);
 	    }
 	    unit->Orders[0].Goal=depot;
 	    RefsDebugCheck( !depot->Refs );
@@ -258,11 +251,12 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
 	    unit->Orders[0].X=unit->Orders[0].Y=-1;
 	    unit->Orders[0].Action=resource->Action;
+	    unit->SubAction=64;
 	    NewResetPath(unit);
 	}
 
         CheckUnitToBeDrawn(unit);
-	if( IsSelected(unit) ) {
+	if( IsOnlySelected(unit) ) {
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel;
 	}
