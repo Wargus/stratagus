@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name button_table.c	-	The button table. */
-/*
-**	(c) Copyright 1999-2000 by Lutz Sammer, Vladi Belperchinov-Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -137,7 +136,7 @@ local int CheckUnits(const Unit* unit,const ButtonAction* button)
     buf=alloca(strlen(button->AllowStr)+1);
     strcpy(buf,button->AllowStr);
     for( s=strtok(buf,","); s; s=strtok(NULL,",") ) {
-    	if( !HaveUnitTypeByIdent(player,s) ) {
+	if( !HaveUnitTypeByIdent(player,s) ) {
 	    return 0;
 	}
     }
@@ -441,7 +440,7 @@ global ButtonAction AllButtons[] = {
 
 // build basic/advanced structs -----------------------------------------------
 {   7, 0, { "icon-build-basic" },
-    B_Button, 		1, "1",
+    B_Button,		1, "1",
     NULL,		NULL,
     'b', "~!BUILD BASIC STRUCTURE",
     WORKERS_H
@@ -514,49 +513,49 @@ global ButtonAction AllButtons[] = {
     B_Build,		0, "unit-human-shipyard",
     NULL,		NULL,
     's', "BUILD ~!SHIPYARD",
-    WORKERS_H 
+    WORKERS_H
 },
 {   2, 2, { "icon-human-foundry" },
     B_Build,		0, "unit-human-foundry",
     NULL,		NULL,
     'f', "BUILD ~!FOUNDRY",
-    WORKERS_H 
+    WORKERS_H
 },
 {   3, 2, { "icon-human-refinery" },
     B_Build,		0, "unit-human-refinery",
     NULL,		NULL,
     'r', "BUILD ~!REFINERY",
-    WORKERS_H 
+    WORKERS_H
 },
 {   4, 2, { "icon-gnomish-inventor" },
     B_Build,		0, "unit-gnomish-inventor",
     NULL,		NULL,
     'i', "BUILD GNOMISH ~!INVENTOR",
-    WORKERS_H 
+    WORKERS_H
 },
 {   5, 2, { "icon-stables" },
     B_Build,		0, "unit-stables",
     NULL,		NULL,
     'a', "BUILD ST~!ABLES",
-    WORKERS_H 
+    WORKERS_H
 },
 {   6, 2, { "icon-mage-tower" },
     B_Build,		0, "unit-mage-tower",
     NULL,		NULL,
     'm', "BUILD ~!MAGE TOWER",
-    WORKERS_H 
+    WORKERS_H
 },
 {   7, 2, { "icon-church" },
     B_Build,		0, "unit-church",
     NULL,		NULL,
     'c', "BUILD ~!CHURCH",
-    WORKERS_H 
+    WORKERS_H
 },
 {   8, 2, { "icon-gryphon-aviary" },
     B_Build,		0, "unit-gryphon-aviary",
     NULL,		NULL,
     'g', "BUILD ~!GRYPHON AVIARY",
-    WORKERS_H 
+    WORKERS_H
 },
 {   9, 2, { "icon-cancel" },
     B_Button,		0, NULL,
@@ -754,14 +753,14 @@ global ButtonAction AllButtons[] = {
     ",unit-battleship,unit-elven-destroyer,unit-human-transport"
 },
 {   2, 0, { "icon-human-ship-armor1" },
-    B_Stop, 		0, NULL,
+    B_Stop,		0, NULL,
     NULL,		NULL,
     's', "~!STOP",
     "unit-human-oil-tanker,unit-human-oil-tanker-full,unit-gnomish-submarine"
     ",unit-battleship,unit-elven-destroyer,unit-human-transport"
 },
 {   3, 0, { "icon-human-unload" },
-    B_Unload, 		0, NULL,
+    B_Unload,		0, NULL,
     NULL,		NULL,
     'u', "~!UNLOAD",
     "unit-human-transport"
@@ -986,20 +985,20 @@ global ButtonAction AllButtons[] = {
     ",unit-death-knight" ",unit-deathwing" ",orc-group"
 },
 {   2, 0, { "icon-orc-shield1" },
-    B_Stop, 		0, NULL,
+    B_Stop,		0, NULL,
     NULL,		NULL,
     's', "~!STOP",
     ORC_LAND_FORCES3 "," ORC_AIR_FORCES ",unit-attack-peon"
     ",unit-death-knight" ",unit-deathwing" ",orc-group"
 },
 {   2, 0, { "icon-orc-shield2" },
-    B_Stop, 		0, NULL,
+    B_Stop,		0, NULL,
     CheckUpgrade,	"upgrade-orc-shield1",
     's', "~!STOP",
     ORC_LAND_FORCES
 },
 {   2, 0, { "icon-orc-shield3" },
-    B_Stop, 		0, NULL,
+    B_Stop,		0, NULL,
     CheckUpgrade,	"upgrade-orc-shield2",
     's', "~!STOP",
     ORC_LAND_FORCES
@@ -1199,7 +1198,7 @@ global ButtonAction AllButtons[] = {
 #ifdef USE_EXTENSIONS
 {   9, 0, { "icon-build-advanced" },
     B_Button,		3, "3",
-    CheckUnits, 	"unit-fortress,unit-temple-of-the-damned"
+    CheckUnits,		"unit-fortress,unit-temple-of-the-damned"
 			",unit-altar-of-storms",
     'e', "BUILD SP~!ECIAL STRUCTURE",
     WORKERS_O
@@ -1210,13 +1209,13 @@ global ButtonAction AllButtons[] = {
     B_Build,		0, "unit-pig-farm",
     NULL,		NULL,
     'f', "BUILD PIG ~!FARM",
-    WORKERS_O  
+    WORKERS_O
 },
 {   2, 1, { "icon-orc-barracks" },
     B_Build,		0, "unit-orc-barracks",
     NULL,		NULL,
     'b', "BUILD ~!BARRACKS",
-    WORKERS_O  
+    WORKERS_O
 },
 {   3, 1, { "icon-great-hall" },
     B_Build,		0, "unit-great-hall",
@@ -1234,19 +1233,19 @@ global ButtonAction AllButtons[] = {
     B_Build,		0, "unit-orc-blacksmith",
     NULL,		NULL,
     's', "BUILD BLACK~!SMITH",
-    WORKERS_O 
+    WORKERS_O
 },
 {   7, 1, { "icon-orc-watch-tower" },
     B_Build,		0, "unit-orc-watch-tower",
     NULL,		NULL,
     't', "BUILD ~!TOWER",
-    WORKERS_O 
+    WORKERS_O
 },
 {   8, 1, { "icon-orc-wall" },
     B_Build,		0, "unit-orc-wall",
     CheckNetwork,	NULL,
     'w', "BUILD ~!WALL",
-    WORKERS_O 
+    WORKERS_O
 },
 {   9, 1, { "icon-cancel" },
     B_Button,		0, NULL,
@@ -1259,49 +1258,49 @@ global ButtonAction AllButtons[] = {
     B_Build,		0, "unit-orc-shipyard",
     NULL,		NULL,
     's', "BUILD ~!SHIPYARD",
-    WORKERS_O 
+    WORKERS_O
 },
 {   2, 2, { "icon-orc-foundry" },
     B_Build,		0, "unit-orc-foundry",
     NULL,		NULL,
     'f', "BUILD ~!FOUNDRY",
-    WORKERS_O 
+    WORKERS_O
 },
 {   3, 2, { "icon-orc-refinery" },
     B_Build,		0, "unit-orc-refinery",
     NULL,		NULL,
     'r', "BUILD ~!REFINERY",
-    WORKERS_O 
+    WORKERS_O
 },
 {   4, 2, { "icon-goblin-alchemist" },
     B_Build,		0, "unit-goblin-alchemist",
     NULL,		NULL,
     'a', "BUILD GOBLIN ~!ALCHEMIST",
-    WORKERS_O 
+    WORKERS_O
 },
 {   5, 2, { "icon-ogre-mound" },
     B_Build,		0, "unit-ogre-mound",
     NULL,		NULL,
     'o', "BUILD ~!OGRE MOUND",
-    WORKERS_O 
+    WORKERS_O
 },
 {   6, 2, { "icon-temple-of-the-damned" },
     B_Build,		0, "unit-temple-of-the-damned",
     NULL,		NULL,
     't', "BUILD ~!TEMPLE OF THE DAMNED",
-    WORKERS_O 
+    WORKERS_O
 },
 {   7, 2, { "icon-altar-of-storms" },
     B_Build,		0, "unit-altar-of-storms",
     NULL,		NULL,
     'l', "BUILD ~!ALTAR OF STORMS",
-    WORKERS_O 
+    WORKERS_O
 },
 {   8, 2, { "icon-dragon-roost" },
     B_Build,		0, "unit-dragon-roost",
     NULL,		NULL,
     'd', "BUILD ~!DRAGON ROOST",
-    WORKERS_O 
+    WORKERS_O
 },
 {   9, 2, { "icon-cancel" },
     B_Button,		0, NULL,
@@ -1498,14 +1497,14 @@ global ButtonAction AllButtons[] = {
     ",unit-ogre-juggernaught,unit-troll-destroyer,unit-orc-transport"
 },
 {   2, 0, { "icon-orc-ship-armor1" },
-    B_Stop, 		0, NULL,
+    B_Stop,		0, NULL,
     NULL,		NULL,
     's', "~!STOP",
     "unit-orc-oil-tanker,unit-orc-oil-tanker-full,unit-giant-turtle"
     ",unit-ogre-juggernaught,unit-troll-destroyer,unit-orc-transport"
 },
 {   3, 0, { "icon-orc-unload" },
-    B_Unload, 		0, NULL,
+    B_Unload,		0, NULL,
     NULL,		NULL,
     'u', "~!UNLOAD",
     "unit-orc-transport"

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unitsound.c	-	The unit sounds. */
-/*
-**	(c) Copyright 1999,2000 by Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Fabrice Rossi
+//
+//	$Id$
 
 //@{
 
@@ -58,7 +57,7 @@ typedef struct _simple_sound_ {
     char *Name; /// name of the sound
     char *File; /// corresponding sound file
 } SimpleSound;
- 
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -251,7 +250,7 @@ SoundGroup Acknowledgments[]={
 /// table of selection sounds
 SoundGroup Selections[]={
 {     "basic human voices selected",
-    { 	"basic human voices selected 1.wav",
+    {	"basic human voices selected 1.wav",
 	"basic human voices selected 2.wav",
 	"basic human voices selected 3.wav",
 	"basic human voices selected 4.wav",
@@ -259,7 +258,7 @@ SoundGroup Selections[]={
 	"basic human voices selected 6.wav" },
 },
 {     "basic orc voices selected",
-    { 	"basic orc voices selected 1.wav",
+    {	"basic orc voices selected 1.wav",
 	"basic orc voices selected 2.wav",
 	"basic orc voices selected 3.wav",
 	"basic orc voices selected 4.wav",
@@ -365,7 +364,7 @@ SoundGroup Selections[]={
     {   "khadgar selected 1.wav",
         "khadgar selected 2.wav",
         "khadgar selected 3.wav" },
-}, 
+},
 {
       "kurdran selected",
     {   "kurdran selected 1.wav",
@@ -416,11 +415,11 @@ SoundGroup Annoyed[]={
 	"basic human voices annoyed",
 	{
 	    "basic human voices annoyed 1.wav",
-	    "basic human voices annoyed 2.wav", 
-	    "basic human voices annoyed 3.wav", 
-	    "basic human voices annoyed 4.wav", 
-	    "basic human voices annoyed 5.wav", 
-	    "basic human voices annoyed 6.wav", 
+	    "basic human voices annoyed 2.wav",
+	    "basic human voices annoyed 3.wav",
+	    "basic human voices annoyed 4.wav",
+	    "basic human voices annoyed 5.wav",
+	    "basic human voices annoyed 6.wav",
 	    "basic human voices annoyed 7.wav"
 	}
     },
@@ -813,19 +812,19 @@ SelectionGroup SelectionGroups[]={
 
 /// table of unclassified sound groups
 SoundGroup OtherGroups[]={
-    {	
+    {
 	"building destroyed",
-	{	
+	{
 	    "explosion 1.wav",
 	    "explosion 2.wav",
-	    "explosion 3.wav"	
+	    "explosion 3.wav"
 	},
     },
     {
 	"sword attack",
 	{
 	    "sword attack 1.wav",
-	    "sword attack 2.wav", 
+	    "sword attack 2.wav",
 	    "sword attack 3.wav"
 	}
     },
@@ -1306,11 +1305,11 @@ Remap Remaps[]={
     //FIXME: what sound for ships?
     { "elven-destroyer-attack",
       "catapult-ballista attack"},
-    { "troll-destroyer-attack", 
+    { "troll-destroyer-attack",
       "catapult-ballista attack"},
-    { "battleship-attack", 
+    { "battleship-attack",
       "catapult-ballista attack"},
-    { "ogre-juggernaught-attack", 
+    { "ogre-juggernaught-attack",
       "catapult-ballista attack"},
     { "gnomish-submarine-attack",
       "catapult-ballista attack"},
@@ -1485,7 +1484,7 @@ local void RemapSounds(void) {
     default:
 	DebugLevel2("Unknown Terrain %d\n",TheMap.Terrain);
     }
-    
+
 }
 
 /*----------------------------------------------------------------------------
