@@ -645,7 +645,9 @@ local SCM CclDefineUI(SCM list)
 	for( ; UI_Table[i]; ++i ) {
 	    if( UI_Table[i]->Width==x && UI_Table[i]->Height==y
 		    && !strcmp(UI_Table[i]->Name,str) ) {
-		ui=UI_Table[i];
+		CleanUI(UI_Table[i]);
+		ui=calloc(1,sizeof(UI));
+		UI_Table[i]=ui;
 		break;
 	    }
 	}
@@ -660,7 +662,6 @@ local SCM CclDefineUI(SCM list)
 	UI_Table[i+1]=NULL;
     }
 
-    free(ui->Name);
     ui->Name=str;
     ui->Width=x;
     ui->Height=y;
@@ -696,7 +697,6 @@ local SCM CclDefineUI(SCM list)
     if( gh_eq_p(value,gh_symbol2scm("normal-font-color")) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);
-	free(ui->NormalFontColor);
 	ui->NormalFontColor=gh_scm2newstr(value,NULL);
     }
     value=gh_car(list);
@@ -704,7 +704,6 @@ local SCM CclDefineUI(SCM list)
     if( gh_eq_p(value,gh_symbol2scm("reverse-font-color")) ) {
 	value=gh_car(list);
 	list=gh_cdr(list);
-	free(ui->ReverseFontColor);
 	ui->ReverseFontColor=gh_scm2newstr(value,NULL);
     }
 
@@ -755,14 +754,11 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->Resource.File);
     ui->Resource.File=str;
     ui->ResourceX=x;
     ui->ResourceY=y;
 
-    //
-    //	Parse icons
-    //
+    //	Resource Icons
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
@@ -826,7 +822,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
-    //	InfoPanel
+    //	Info Panel
     temp=gh_car(list);
     list=gh_cdr(list);
 
@@ -845,7 +841,6 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->InfoPanel.File);
     ui->InfoPanel.File=str;
     ui->InfoPanelX=x;
     ui->InfoPanelY=y;
@@ -859,7 +854,7 @@ local SCM CclDefineUI(SCM list)
     ui->InfoPanelW=x;
     ui->InfoPanelH=y;
 
-    // Completed bar
+    //	Completed Bar
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("completed-bar")) ) {
@@ -901,7 +896,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
-    //	ButtonPanel
+    //	Button Panel
     temp=gh_car(list);
     list=gh_cdr(list);
 
@@ -920,12 +915,11 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->ButtonPanel.File);
     ui->ButtonPanel.File=str;
     ui->ButtonPanelX=x;
     ui->ButtonPanelY=y;
 
-    // The map
+    // The Map
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("map-area")) ) {
@@ -957,7 +951,7 @@ local SCM CclDefineUI(SCM list)
 	ui->MapArea.EndY=ui->MapArea.Y+h-1;
     }
 
-    //	MenuButton
+    //	Menu Button
     temp=gh_car(list);
     list=gh_cdr(list);
 
@@ -976,7 +970,6 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->MenuButtonGraphic.File);
     ui->MenuButtonGraphic.File=str;
     ui->MenuButtonGraphicX=x;
     ui->MenuButtonGraphicY=y;
@@ -1000,36 +993,44 @@ local SCM CclDefineUI(SCM list)
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
 
-    free(ui->Minimap.File);
     ui->Minimap.File=str;
     ui->MinimapX=x;
     ui->MinimapY=y;
 
-    //	StatusLine
-    temp=gh_car(list);
+    //	Status Line
+    value=gh_car(list);
     list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+    if( gh_eq_p(value,gh_symbol2scm("status-line")) ) {
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->StatusLine.File=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->StatusLineX=gh_scm2int(gh_car(value));
+		ui->StatusLineY=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->StatusLineTextX=gh_scm2int(gh_car(value));
+		ui->StatusLineTextY=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->StatusLineFont=CclFontByIdentifier(value);
+	    } else {
+		errl("Unsupported tag",value);
+	    }
+	}
     }
 
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-
-    free(ui->StatusLine.File);
-    ui->StatusLine.File=str;
-    ui->StatusLineX=x;
-    ui->StatusLineY=y;
-
-    // Buttons
+    //	Buttons
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("menu-button")) ) {
@@ -1229,9 +1230,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
-    //
-    //	Get the cursors definitions.
-    //
+    //	Cursors
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("cursors")) ) {
@@ -1243,77 +1242,62 @@ local SCM CclDefineUI(SCM list)
 	    if( gh_eq_p(value,gh_symbol2scm("point")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->Point.Name);
 		ui->Point.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("glass")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->Glass.Name);
 		ui->Glass.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("cross")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->Cross.Name);
 		ui->Cross.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("yellow")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->YellowHair.Name);
 		ui->YellowHair.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("green")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->GreenHair.Name);
 		ui->GreenHair.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("red")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->RedHair.Name);
 		ui->RedHair.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("scroll")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->Scroll.Name);
 		ui->Scroll.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-e")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowE.Name);
 		ui->ArrowE.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-ne")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowNE.Name);
 		ui->ArrowNE.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-n")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowN.Name);
 		ui->ArrowN.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-nw")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowNW.Name);
 		ui->ArrowNW.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-w")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowW.Name);
 		ui->ArrowW.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-sw")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowSW.Name);
 		ui->ArrowSW.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-s")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowS.Name);
 		ui->ArrowS.Name=gh_scm2newstr(value,NULL);
 	    } else if( gh_eq_p(value,gh_symbol2scm("arrow-se")) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		free(ui->ArrowSE.Name);
 		ui->ArrowSE.Name=gh_scm2newstr(value,NULL);
 	    } else {
 		errl("Unsupported tag",value);
@@ -1321,9 +1305,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
-    //
-    //	Panels
-    //
+    //	Menu Panels
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("menu-panels")) ) {
@@ -1346,6 +1328,7 @@ local SCM CclDefineUI(SCM list)
 	}
     }
 
+    //	Backgrounds
     value=gh_car(list);
     list=gh_cdr(list);
     if( gh_eq_p(value,gh_symbol2scm("victory-background")) ) {
