@@ -21,6 +21,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "freecraft.h"
@@ -507,6 +508,21 @@ global int Map2ScreenX(int x)
 global int Map2ScreenY(int y)
 {
     return (TheUI.MapY+((y)-MapY)*TileSizeY);
+}
+
+/**
+**	Release info about a map.
+**
+**	@param info	MapInfo pointer.
+*/
+global void FreeMapInfo(MapInfo* info)
+{
+    if (info) {
+	if (info->Description) {
+	    free(info->Description);
+	}
+	free(info);
+    }
 }
 
 //@}

@@ -207,7 +207,7 @@ local char ScenSelectPath[1024];
 local char ScenSelectDisplayPath[1024];
 local char ScenSelectFileName[128];
 local int CustomGameStarted = 0;
-local PudInfo *ScenSelectPudInfo = NULL;
+local MapInfo *ScenSelectPudInfo = NULL;
 
 local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 176, 8, 0, LargeFont, ScenSelectInit, NULL,
@@ -950,7 +950,7 @@ local void ScenSelectMenu(void)
 
     ProcessMenu(MENU_SCEN_SELECT, 1);
     // StartMenusSetBackground(NULL);
-    FreePudInfo(ScenSelectPudInfo);
+    FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     if (ScenSelectPath[0]) {
 	i = strlen(ScenSelectPath);
@@ -1045,13 +1045,13 @@ local void MultiPlayerGameMenu(void)
 }
 
 
-local void FreePudInfos(FileList *fl, int n)
+local void FreeMapInfos(FileList *fl, int n)
 {
     int i;
 
     for (i = 0; i < n; i++) {
 	if (fl[i].type && fl[i].xdata) {
-	    FreePudInfo(fl[i].xdata);
+	    FreeMapInfo(fl[i].xdata);
 	    fl[i].xdata = NULL;
 	}
     }
@@ -1088,7 +1088,7 @@ local void ScenSelectLBExit(Menuitem *mi)
 
     if (mi->d.listbox.noptions) {
 	fl = mi->d.listbox.options;
-	FreePudInfos(fl, mi->d.listbox.noptions);
+	FreeMapInfos(fl, mi->d.listbox.noptions);
 	free(fl);
 	mi->d.listbox.options = NULL;
 	mi->d.listbox.noptions = 0;
@@ -1098,7 +1098,7 @@ local void ScenSelectLBExit(Menuitem *mi)
 
 local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
-    PudInfo *info;
+    MapInfo *info;
     char *suf, *cp, *lcp, *np;
     static int p, sz, szl[] = { -1, 32, 64, 96, 128 };
 
@@ -1150,7 +1150,7 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 			fl->xdata = info;
 			return 1;
 		    } else {
-			FreePudInfo(info);
+			FreeMapInfo(info);
 		    }
 		} else {
 		    fl->type = 1;
@@ -1196,7 +1196,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 {
     FileList *fl;
     Menu *menu;
-    PudInfo *info;
+    MapInfo *info;
     static char buffer[1024];
     int j, n;
 
@@ -1391,7 +1391,7 @@ local void CustomGameCancel(void)
 {
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
-    FreePudInfo(ScenSelectPudInfo);
+    FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     EndMenu();
 
@@ -1399,7 +1399,7 @@ local void CustomGameCancel(void)
 
 local void CustomGameStart(void)
 {
-    FreePudInfo(ScenSelectPudInfo);
+    FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");

@@ -71,9 +71,9 @@ extern int NetPlyNr[PlayerMax];		/// Player nummer	FIXME: belongs into NetworkHo
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void NetworkServerSetup(void);	/// connection server setup
-extern void NetworkClientSetup(void);	/// connection client setup
-extern void NetworkSetupArgs(void);	/// setup command line connection parameters
+extern void NetworkServerSetup(WorldMap *map);	/// connection server setup
+extern void NetworkClientSetup(WorldMap *map);	/// connection client setup
+extern void NetworkSetupArgs(void);		/// setup command line connection parameters
 extern void NetworkParseSetupEvent(const char *buf, int size); /// parse a setup event
 
 //@}

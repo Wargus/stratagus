@@ -29,6 +29,7 @@
 #include "net_lowlevel.h"
 #include "freecraft.h"
 #include "player.h"
+#include "map.h"
 #include "network.h"
 #include "netconnect.h"
 
@@ -105,7 +106,7 @@ global void NetworkSetupArgs(void)
 /**
 **	Server Setup.
 */
-global void NetworkServerSetup(void)
+global void NetworkServerSetup(WorldMap* map)
 {
     int i, j, n;
     char buf[1024];
@@ -117,7 +118,7 @@ global void NetworkServerSetup(void)
     //
     //	Wait for all clients to connect.
     //
-    DebugLevel1Fn("Waiting for %d clients\n",NetPlayers-1);
+    DebugLevel1Fn("Waiting for %d client(s)\n",NetPlayers-1);
     acknowledge.Type=MessageInitReply;
     msg=(InitMessage*)buf;
     for (i = 1; i < NetPlayers;) {
@@ -125,13 +126,12 @@ global void NetworkServerSetup(void)
 	    exit(-1);
 	}
 
-	DebugLevel0Fn("Receive hello? %d(%d) from %d.%d.%d.%d:%d\n",
-		msg->Type,n,NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
-
 	if (msg->Type != MessageInitHello || n!=sizeof(*msg)) {
 	    DebugLevel0Fn("Wrong message\n");
 	    continue;
 	}
+	DebugLevel0Fn("Received InitHello %d(%d) from %d.%d.%d.%d:%d\n",
+		msg->Type,n,NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 	if( ntohl(msg->FreeCraft)!=FreeCraftVersion ) {
 	    fprintf(stderr,"Incompatible FreeCraft version "
@@ -148,6 +148,21 @@ global void NetworkServerSetup(void)
 			NetworkProtocolFormatString "\n"
 		    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
 		    ,NetworkProtocolFormatArgs(NetworkProtocolVersion));
+	    exit(-1);
+	}
+	n = 0;
+	if (map->Info) {
+	    if (ntohl(msg->MapUID) != map->Info->MapUID) {
+		n = 1;
+	    }
+	} else {
+	    if (ntohl(msg->MapUID) != 0L) {
+		n = 1;
+	    }
+	}
+	if (n) {
+	    fprintf(stderr,"FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+			map->Info ? (unsigned int)map->Info->MapUID : 0, msg->MapUID);
 	    exit(-1);
 	}
 
@@ -190,16 +205,19 @@ global void NetworkServerSetup(void)
 	// Acknowledge the packet.
 	n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		sizeof(acknowledge));
-	DebugLevel0Fn("Sending reply for hello (%d)\n", n);
+	DebugLevel0Fn("Sending ack for InitHello (%d)\n", n);
     }
 
     //
     //	Assign the players.
     //
+    // FIXME: randomize the slots :)
+    // FIXME: ARI: selectable by 'Position' selector in Network setup menus!
+
     for (n = i = 0; i < NumPlayers && n < NetPlayers; ++i) {
 	if (Players[i].Type == PlayerHuman) {
 	    NetPlyNr[n] = num[n] = i;
-	    DebugLevel3Fn("Assigning %d -> %d\n", i, n);
+	    DebugLevel3Fn("Assigning player slots: %d -> %d\n", i, n);
 	    n++;
 	}
     }
@@ -207,9 +225,6 @@ global void NetworkServerSetup(void)
 	fprintf(stderr, "Not enough human slots\n");
 	exit(-1);
     }
-
-    // FIXME: randomize the slots :)
-    // FIXME: ARI: selectable by 'Position' selector in Network setup menus!
 
     //
     //	Send all clients host:ports to all clients.
@@ -222,6 +237,11 @@ global void NetworkServerSetup(void)
     message.Version = htonl(NetworkProtocolVersion);
     message.Lag = htonl(NetworkLag);
     message.Updates = htonl(NetworkUpdates);
+    if (map->Info) {
+	message.MapUID = htonl(map->Info->MapUID);
+    } else {
+	message.MapUID = 0L;
+    }
 
     message.HostsCount = HostsCount + 1;
     for (i = 0; i < HostsCount; ++i) {
@@ -235,7 +255,7 @@ global void NetworkServerSetup(void)
     DebugLevel3Fn("Player here %d\n", num[i]);
     ThisPlayer = &Players[num[i]];
 
-    DebugLevel1Fn("Ready, assigning to %d hosts\n",HostsCount);
+    DebugLevel1Fn("Ready, sending InitConfig to %d host(s)\n",HostsCount);
     //
     //	Send all clients host:ports to all clients.
     //
@@ -252,7 +272,7 @@ global void NetworkServerSetup(void)
 		message.Hosts[i].Host = message.Hosts[i].Port = 0;
 		n = NetSendUDP(NetworkFildes, host, port, &message,
 			sizeof(message));
-		DebugLevel0Fn("Sending config (%d) to %d.%d.%d.%d:%d\n"
+		DebugLevel0Fn("Sending InitConfig (%d) to %d.%d.%d.%d:%d\n"
 			,n,NIPQUAD(ntohl(host)),ntohs(port));
 		message.Hosts[i].Host = host;
 		message.Hosts[i].Port = port;
@@ -260,25 +280,30 @@ global void NetworkServerSetup(void)
 	}
 
 	// Wait for acknowledge
-	while (NetSocketReady(NetworkFildes,1000)) {
+	while (j && NetSocketReady(NetworkFildes,1000)) {
 	    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+		DebugLevel0Fn("*Receive ack failed: (%d) from %d.%d.%d.%d:%d\n",
+		    n,
+		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 		continue;
 	    }
 
-	    DebugLevel0Fn("Receive ack %d(%d) from %d.%d.%d.%d:%d\n",
-		    msg->Type,n,
-		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+	    // DebugLevel0Fn("Received ack %d(%d) from %d.%d.%d.%d:%d\n",
+	// 	    msg->Type,n,
+	// 	    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 	    if (msg->Type == MessageInitHello && n==sizeof(*msg)) {
-		DebugLevel0Fn("Acknowledge for hello was lost\n");
+		DebugLevel0Fn("Acknowledge for InitHello was lost\n");
 
 		// Acknowledge the hello packets.
 		acknowledge.Type = MessageInitReply;
 		n=NetSendUDP(NetworkFildes,NetLastHost,NetLastPort,&acknowledge,
 			sizeof(acknowledge));
-		DebugLevel0Fn("Sending reply for hello (%d)\n", n);
+		DebugLevel0Fn("Sending ack for InitHello (%d)\n", n);
 	    } else {
-		DebugLevel0Fn("Acknowledge for config got?\n");
+		DebugLevel0Fn("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n",
+		n,
+		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 		for (i = 0; i < HostsCount; ++i) {
 		    if (NetLastHost == Hosts[i].Host
@@ -286,9 +311,9 @@ global void NetworkServerSetup(void)
 			    && msg->Type == MessageInitReply
 			    && n==1 ) {
 			if (num[i] != -1) {
-			    DebugLevel0Fn("Removing host\n");
 			    num[i] = -1;
 			    j--;
+			    DebugLevel0Fn("Removing host (j = %d)\n", j);
 			} else {
 			    DebugLevel0Fn("Already removed host\n");
 			}
@@ -298,12 +323,13 @@ global void NetworkServerSetup(void)
 	    }
 	}
     }
+    DebugLevel0Fn("DONE: All configs acked - starting game\n");
 }
 
 /**
 **	Client Setup.
 */
-global void NetworkClientSetup(void)
+global void NetworkClientSetup(WorldMap* map)
 {
     char buf[1024];
     InitMessage* msg;
@@ -341,6 +367,11 @@ global void NetworkClientSetup(void)
     message.Version = htonl(NetworkProtocolVersion);
     message.Lag = htonl(NetworkLag);
     message.Updates = htonl(NetworkUpdates);
+    if (map->Info) {
+	message.MapUID = htonl(map->Info->MapUID);
+    } else {
+	message.MapUID = 0L;
+    }
     msg=(InitMessage*)buf;
     for (;;) {
 	n = NetSendUDP(NetworkFildes, host, port, &message, sizeof(message));
@@ -381,7 +412,7 @@ global void NetworkClientSetup(void)
 	    exit(-1);
 	}
 
-	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
+	DebugLevel0Fn("Received config? %d(%d) %d.%d.%d.%d:%d\n",
 		msg->Type,n,
 		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
@@ -391,7 +422,7 @@ global void NetworkClientSetup(void)
 	    continue;
 	}
 
-	DebugLevel0Fn("Received clients\n");
+	DebugLevel0Fn("Received ClientConfig\n");
 
 	NetworkLag=ntohl(msg->Lag);
 	NetworkUpdates=ntohl(msg->Updates);
@@ -401,13 +432,13 @@ global void NetworkClientSetup(void)
 		NetPlyNr[HostsCount] = msg->Num[i];
 		Hosts[HostsCount].Host = msg->Hosts[i].Host;
 		Hosts[HostsCount++].Port = msg->Hosts[i].Port;
+		DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d\n",
+			msg->Num[i],NIPQUAD(ntohl(msg->Hosts[i].Host)),
+			ntohs(msg->Hosts[i].Port));
 	    } else {			// Own client
 		DebugLevel0Fn("SELF %d\n", msg->Num[i]);
 		ThisPlayer = &Players[(int)msg->Num[i]];
 	    }
-	    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d\n",
-		    msg->Num[i],NIPQUAD(ntohl(msg->Hosts[i].Host)),
-		    ntohs(msg->Hosts[i].Port));
 	}
 	NetPlyNr[HostsCount] = msg->Num[i];
 	Hosts[HostsCount].Host = host;
@@ -416,31 +447,31 @@ global void NetworkClientSetup(void)
 	// Acknowledge the packets.
 	n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		sizeof(acknowledge));
-	DebugLevel0Fn("Sending config ack (%d)\n", n);
+	DebugLevel0Fn("Sending ClientConfig ack (%d)\n", n);
 	break;
     }
 
     //
-    //	Wait for acknowledge lost (timeout 3s)
+    //	Wait for lost acknowledge (timeout 3s)
     //
     while (NetSocketReady(NetworkFildes, 3000)) {
 	if ( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
 	    exit(-1);
 	}
 
-	DebugLevel0Fn("Receive config? %d(%d) %d.%d.%d.%d:%d\n",
+	DebugLevel0Fn("Received config? %d(%d) %d.%d.%d.%d:%d\n",
 		msg->Type,n,
 		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 	if (NetLastHost == host && NetLastPort == port
 		&& msg->Type == MessageInitConfig && n==sizeof(InitMessage)) {
 
-	    DebugLevel0Fn("Received late client\n");
+	    DebugLevel0Fn("Received DUP ClientConfig (SERVER LOST ACK)\n");
 
 	    // Acknowledge the packets.
 	    n=NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &acknowledge,
 		    sizeof(acknowledge));
-	    DebugLevel0Fn("Sending config ack (%d)\n", n);
+	    DebugLevel0Fn("Sending DUP ClientConfig ack (%d)\n", n);
 	    continue;
 	}
 
@@ -450,6 +481,7 @@ global void NetworkClientSetup(void)
 	    break;
 	}
     }
+    DebugLevel0Fn("DONE: All client config received - starting game\n");
 }
 
 /**
