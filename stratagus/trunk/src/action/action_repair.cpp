@@ -115,8 +115,8 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     PlayerSubCosts(player,costs);
 
-    if( UnitVisible(goal) ) {
-        MustRedraw|=RedrawMaps;
+    if ( CheckUnitToBeDrawn(goal) ) {
+	MustRedraw|=RedrawMinimap;
     }
     if( IsSelected(goal) ) {		// Update panel if unit is selected
 	MustRedraw|=RedrawInfoPanel;

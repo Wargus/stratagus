@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -605,14 +604,24 @@ local SCM CclDefineUI(SCM list)
     y=gh_scm2int(value);
     ui->MapX=x;
     ui->MapY=y;
+    if ( ui->MapX < 0 || ui->MapY < 0 ) {
+	fprintf(stderr,"map top-left point expected\n");
+	return SCM_UNSPECIFIED;
+    }
     value=gh_car(temp);
     temp=gh_cdr(temp);
     x=gh_scm2int(value);
     value=gh_car(temp);
     temp=gh_cdr(temp);
     y=gh_scm2int(value);
-    ui->MapWidth=x;
-    ui->MapHeight=y;
+    //StephanR: note that the bottom-right point is one pixel off
+    ui->MapEndX=x - 1;
+    ui->MapEndY=y - 1;
+    if ( ui->MapEndX < 0 || ui->MapEndY < 0 ||
+         ui->MapEndX < ui->MapX || ui->MapEndY < ui->MapY ) {
+	fprintf(stderr,"map bottom-right point expected\n");
+	return SCM_UNSPECIFIED;
+    }
 
     //	MenuButton
     temp=gh_car(list);
@@ -743,7 +752,7 @@ local SCM CclDefineUI(SCM list)
 	y=gh_scm2int(value);
 	ui->Buttons2[i].Height=y;
     }
-    
+
     return SCM_UNSPECIFIED;
 }
 
@@ -753,7 +762,7 @@ local SCM CclDefineUI(SCM list)
 local SCM CclMouseScrollSpeed(SCM num)
 {
 	int speed;
-	
+
 	speed=gh_scm2int(num);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedMouseScroll=MOUSE_SCROLL_SPEED;
@@ -768,7 +777,7 @@ local SCM CclMouseScrollSpeed(SCM num)
 local SCM CclKeyScrollSpeed(SCM num)
 {
 	int speed;
-	
+
 	speed=gh_scm2int(num);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedKeyScroll=KEY_SCROLL_SPEED;
@@ -847,7 +856,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("right-button-attacks",CclRightButtonAttacks);
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
     gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
- 
+
 }
 
 #endif	// } USE_CCL

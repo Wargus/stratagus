@@ -17,7 +17,7 @@
 //		Real quad tree.
 //		Priority search tree.
 //
-//	(c) Copyright 1998-2000 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Lutz Sammer
 //
 //	$Id$
 
@@ -445,6 +445,7 @@ local int SelectQuadTreeLeaf(QuadTreeLeaf* leaf,QuadTreeValue** table,int index)
 
 /**
 **	Select all values in a node.
+**      StephanR: why x1<=i,y1<=j and not x2>=i,y2>=j ???
 */
 local int SelectQuadTreeNode(QuadTreeNode* node,int kx,int ky,int levels
 	,int x1,int y1,int x2,int y2,QuadTreeValue** table,int index)
@@ -649,9 +650,7 @@ global void UnitCacheChange(Unit* unit)
 */
 global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 {
-    int i;
-    int j;
-    int n;
+    int i,j,n,sx,sy,ex,ey;
     Unit* unit;
 
     //
@@ -670,6 +669,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	y2=TheMap.Height;
     }
 
+    /StephanR: seems to be within (i-1,j-1;x2,y2) ???
     n=QuadTreeSelect(PositionCache,i,j,x2,y2,table);
 
     //
@@ -677,12 +677,10 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     //
     for( i=j=0; i<n; ++i ) {
 	unit=table[i];
-
-	if( unit->X+unit->Type->TileWidth<=x1 || unit->X>x2
-		|| unit->Y+unit->Type->TileHeight<=y1 || unit->Y>y2 ) {
-	    continue;
-	}
-	table[j++]=unit;
+        GetUnitMapArea( unit, &sx, &sy, &ex, &ey );
+        if( ex>=x1 && sx<=x2 && ey>=y1 && sy<=y2 ) {
+          table[j++]=unit;
+        }
     }
 
     return j;
@@ -872,7 +870,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
     for( n=0; y<y2; ++y ) {
 	mf=TheMap.Fields+y*TheMap.Width+x;
 	for( i=x; i<x2; ++i ) {
-	    
+
 	    for( unit=mf->Here.Units; unit; unit=unit->Next ) {
 		IfDebug(
 		    if( !unit->Type ) {

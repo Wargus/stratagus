@@ -207,9 +207,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* move)
     unit->Frame+=move[state].Frame;
     unit->Wait=move[state].Sleep;
 
-    if( (move[state].Pixel || move[state].Frame) && UnitVisible(unit) ) {
+    if( (move[state].Pixel || move[state].Frame) ) {
 	// FIXME: Must do better flags.
-	MustRedraw|=RedrawMap;
+        CheckUnitToBeDrawn(unit);
     }
 
     if( move[state].Flags&AnimationReset ) {

@@ -53,9 +53,12 @@ global Unit* Selected[MaxSelectable] = {
  */
 global void UnSelectAll(void)
 {
+    Unit *u;
     while( NumSelected ) {
-        Selected[--NumSelected]->Selected=0;
-        Selected[NumSelected]=NoUnitP;	// FIXME: only needed for old code
+        u=Selected[--NumSelected];
+        Selected[NumSelected]=NoUnitP;  // FIXME: only needed for old code
+        u->Selected=0;
+        CheckUnitToBeDrawn(u);
     }
 }
 
@@ -67,14 +70,16 @@ global void UnSelectAll(void)
  */
 global void ChangeSelectedUnits(Unit** units,int count)
 {
+    Unit *u;
     int i;
 
     DebugCheck( count>MaxSelectable );
 
     UnSelectAll();
     for( i=0; i<count; i++ ) {
-        Selected[i]=units[i];
-	Selected[i]->Selected=1;
+        Selected[i]=u=units[i];
+        u->Selected=1;
+        CheckUnitToBeDrawn(u);
     }
     NumSelected=count;
 }
@@ -92,7 +97,7 @@ global int SelectUnit(Unit* unit)
     {
 	return 0; // Revealers cannot be selected
     }
-    
+
     if( NumSelected == MaxSelectable ) {
         return 0;
     }
@@ -103,6 +108,7 @@ global int SelectUnit(Unit* unit)
 
     Selected[NumSelected++]=unit;
     unit->Selected=1;
+    CheckUnitToBeDrawn(unit);
     return 1;
 }
 
@@ -139,6 +145,7 @@ global void UnSelectUnit(Unit* unit)
     }
     Selected[NumSelected]=NoUnitP;	// FIXME: only needed for old code
     unit->Selected=0;
+    CheckUnitToBeDrawn(unit);
 }
 
 /**
@@ -183,6 +190,7 @@ global int SelectUnitsByType(Unit* base)
     DebugLevel3Fn(" (%d)\n",base->UnitType->Type);
 
     // select all visible units.
+    // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
     r=SelectUnits(MapX-1,MapY-1,MapX+MapWidth+1,MapY+MapHeight+1,table);
 
     // if unit is a cadaver or hidden (not on map)
@@ -201,6 +209,7 @@ global int SelectUnitsByType(Unit* base)
     Selected[0]=base;
     base->Selected=1;
     NumSelected=1;
+    CheckUnitToBeDrawn(base);
 
     // if unit isn't belonging to the player, or is a static unit
     // (like a building), only 1 unit can be selected at the same time.
@@ -226,6 +235,7 @@ global int SelectUnitsByType(Unit* base)
 	}
 	Selected[NumSelected++]=unit;
 	unit->Selected=1;
+        CheckUnitToBeDrawn(unit);
 	if( NumSelected==MaxSelectable ) {
 	    break;
 	}
@@ -327,7 +337,7 @@ global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
         return NumSelected;
     }
 
-    //  Check if the original selected unit (if it's alone) is ours, 
+    //  Check if the original selected unit (if it's alone) is ours,
     //  and can be selectable by rectangle.
     //  In this case, do nothing.
     if( NumSelected == 1 &&
@@ -392,12 +402,12 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
 	}
 	// FIXME: Can we get this?
 #ifdef NEW_ORDERS
-	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) { 
+	if( !unit->Removed && unit->Orders[0].Action!=UnitActionDie ) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}
 #else
-	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) { 
+	if( !unit->Removed && unit->Command.Action!=UnitActionDie ) {
 	    SelectSingleUnit(unit);
 	    return 1;
 	}

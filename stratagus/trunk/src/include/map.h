@@ -128,7 +128,7 @@ typedef struct _world_map_ {
     unsigned		Terrain;	/// terrain type (summer,winter,...)
     Tileset*		Tileset;	/// tileset data
 
-    unsigned 		TileCount;	/// how many tiles are available
+    unsigned		TileCount;	/// how many tiles are available
     unsigned char**	Tiles;		/// pointer to tile data
     Graphic*		TileData;	/// tiles graphic for map
 
@@ -187,6 +187,15 @@ extern void MapColorCycle(void);
 extern void DrawMapBackground(int x,int y);
     /// Build tables for map.
 extern void InitMap(void);
+
+    /// Mark position inside screenmap be drawn for next display update.
+extern int MarkDrawPosMap( int x, int y );
+    /// Denote wether area in map is overlapping
+extern int AreaVisibleInMap( int sx, int sy, int ex, int ey );
+    /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
+extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
+    /// Set all entries in MustRedrawRow and MustRedrawTile
+extern  void MarkDrawEntireMap(void);
 
 //
 //	in map_fog.c

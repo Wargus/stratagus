@@ -50,7 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 global Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
-global Unit** UnitSlotFree; 		/// First free unit slot
+global Unit** UnitSlotFree;		/// First free unit slot
 local Unit* ReleasedHead;		/// List of released units.
 local Unit** ReleasedTail;		/// List tail of released units.
 
@@ -459,7 +459,7 @@ global void RemoveUnit(Unit* unit)
     DebugLevel3Fn("%Zd %p %p\n",UnitNumber(unit),unit,unit->Next);
     UnitCacheRemove(unit);
 #ifdef UNIT_ON_MAP
-    if( 0 ) {	
+    if( 0 ) {
 	Unit* list;
 
 	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
@@ -475,9 +475,7 @@ global void RemoveUnit(Unit* unit)
 #endif
 
     MustRedraw|=RedrawMinimap;
-    if( UnitVisible(unit) ) {
-	MustRedraw|=RedrawMap;
-    }
+    CheckUnitToBeDrawn(unit);
 }
 
 /**
@@ -517,7 +515,7 @@ global void UnitLost(const Unit* unit)
 		MustRedraw |= RedrawResources;
 	    } else if( type==UnitTypeByIdent("unit-elven-lumber-mill")
 		    || type==UnitTypeByIdent("unit-troll-lumber-mill") ) {
-		
+
 		if( !(HaveUnitTypeByIdent(player,"unit-elven-lumber-mill")
 			+HaveUnitTypeByIdent(player
 				,"unit-elven-lumber-mill")) ) {
@@ -765,6 +763,58 @@ global int UnitVisible(const Unit* unit)
 #endif
 }
 
+/**
+**      StephanR: Get area of tiles covered by unit, including its displacement
+**
+**      @param unit     Unit to be checked and set.
+**      @return         sx,sy,ex,ey defining area in Map
+*/
+global void GetUnitMapArea( const Unit* unit,
+                            int *sx, int *sy, int *ex, int *ey )
+{
+    *sx = unit->X - (unit->IX < 0);
+    *ex = *sx + unit->Type->TileWidth - !unit->IX;
+    *sy = unit->Y - (unit->IY < 0);
+    *ey = *sy + unit->Type->TileHeight - !unit->IY;
+}
+
+/**
+**      Check and sets if unit must be drawn on screen-map
+**
+**      @param unit     Unit to be checked.
+**      @return         True if map marked to be drawn, false otherwise.
+*/
+global int CheckUnitToBeDrawn(const Unit* unit)
+{
+  #ifdef NEW_MAPDRAW
+    int sx,sy,ex,ey;
+
+    // in debug-mode check unsupported displacement exceeding an entire Tile
+    // FIXME: displacement could always be made positive and smaller than Tile
+    #if NEW_MAPDRAW > 1
+      if ( unit->IX <= -TileSizeX || unit->IX >= TileSizeX ||
+           unit->IY <= -TileSizeY || unit->IY >= TileSizeY )
+        printf( "internal error in CheckUnitToBeDrawn\n" );
+    #endif
+
+    GetUnitMapArea( unit, &sx, &sy, &ex, &ey );
+
+    // FIXME: extra tiles added here for attached statusbar/mana/shadow/..
+      sx--;sy--;ex++;ey++;
+
+    if ( MarkDrawAreaMap( sx, sy, ex, ey ) ) {
+    //  MustRedraw|=RedrawMinimap;
+      return 1;
+    }
+  #else
+    if( UnitVisible( unit ) ) {
+      MustRedraw|=RedrawMap;
+      return 1;
+    }
+  #endif
+    return 0;
+}
+
 // FIXME: perhaps I should write a function UnitSelectable?
 
 /**
@@ -792,14 +842,14 @@ global void UnitIncrementMana(void)
 	    unit->Mana++;
 
 	    // some frames delayed done my color cycling
-	    if( 0 && UnitVisible(unit) ) {
-		MustRedraw|=RedrawMap;
+	    if( 0 ) {
+                CheckUnitToBeDrawn(unit);
 	    }
 	    if( unit->Selected ) {
 		MustRedraw|=RedrawInfoPanel;
 	    }
 	}
-	
+
 	//
 	// decrease spells effects time
 	//
@@ -807,7 +857,7 @@ global void UnitIncrementMana(void)
 	  unit->Bloodlust--;
 	if ( unit->Haste > 0 )
 	  unit->Haste--;
-	if ( unit->Slow > 0 ) 
+	if ( unit->Slow > 0 )
 	  unit->Slow--;
 	if ( unit->Invisible > 0 )
 	  unit->Invisible--;
@@ -841,8 +891,8 @@ global void UnitIncrementHealth(void)
 	    ++unit->HP;			// FIXME: how fast do we regenerate
 
 	    // some frames delayed done my color cycling
-	    if( 0 && UnitVisible(unit) ) {
-		MustRedraw|=RedrawMap;
+	    if( 0 ) {
+                CheckUnitToBeDrawn(unit);
 	    }
 	    if( unit->Selected ) {
 		MustRedraw|=RedrawInfoPanel;
@@ -998,7 +1048,7 @@ global void RescueUnits(void)
 		    }
 		}
 	    }
-	} 
+	}
     }
 }
 
@@ -1036,7 +1086,7 @@ local int myatan(int val)
 **	@param delta_x	Delta X.
 **	@param delta_y	Delta Y.
 **
-**	@returns 	Angle (0..255)
+**	@returns	Angle (0..255)
 */
 global int DirectionToHeading(int delta_x,int delta_y)
 {
@@ -1194,9 +1244,7 @@ found:
 #endif
 
     MustRedraw|=RedrawMinimap;
-    if( UnitVisible(unit) ) {
-	MustRedraw|=RedrawMaps;
-    }
+    CheckUnitToBeDrawn(unit);
 }
 
 /**
@@ -1306,9 +1354,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 #endif
 
 	    MustRedraw|=RedrawMinimap;
-	    if( UnitVisible(unit) ) {
-		MustRedraw|=RedrawMaps;
-	    }
+            CheckUnitToBeDrawn(unit);
 	    return;
 	}
 	++addy;
@@ -2226,7 +2272,7 @@ global void HitUnit(Unit* unit,int damage)
       { //NOTE: vladi: units with active UnholyArmour are invulnerable
       return;
       }
-    
+
     type=unit->Type;
     if( !unit->Attacked ) {
 	if( unit->Player==ThisPlayer ) {

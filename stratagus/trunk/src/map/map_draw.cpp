@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map_draw.c	-	The map drawing. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -252,7 +251,7 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
     da=VideoWidth;
     dp=VideoMemory16+x+y*VideoWidth;
 
-    IfDebug( 
+    IfDebug(
 	if( ((long)sp)&1 ) {
 	    DebugLevel0("Not aligned memory\n");
 	}
@@ -306,7 +305,7 @@ global void VideoDraw24Tile32(const unsigned char* data,int x,int y)
     da=VideoWidth;
     dp=VideoMemory24+x+y*VideoWidth;
 
-    IfDebug( 
+    IfDebug(
 	if( ((long)sp)&1 ) {
 	    DebugLevel0("Not aligned memory\n");
 	}
@@ -542,7 +541,7 @@ local void FillCache24AndDraw32(const unsigned char* data,VMemType24* cache
     va=VideoWidth;
     vp=VideoMemory24+x+y*VideoWidth;
 
-    IfDebug( 
+    IfDebug(
 	if( ((long)sp)&1 ) {
 	    DebugLevel0("Not aligned memory\n");
 	}
@@ -603,7 +602,7 @@ local void FillCache32AndDraw32(const unsigned char* data,VMemType32* cache
     va=VideoWidth;
     vp=VideoMemory32+x+y*VideoWidth;
 
-    IfDebug( 
+    IfDebug(
 	if( ((long)sp)&1 ) {
 	    DebugLevel0("Not aligned memory\n");
 	}
@@ -1285,10 +1284,128 @@ global void MapColorCycle(void)
 }
 
 /**
+**      Mark position inside screenmap be drawn for next display update.
+**
+**      @param x,y  position in Map to be checked.
+**
+**      @return     True if inside and marked, false otherwise.
+*/
+global int MarkDrawPosMap( int x, int y ) {
+    if ( (x-=MapX)>=0 && (y-=MapY)>=0 && x<MapWidth && y<MapHeight ) {
+  #ifdef NEW_MAPDRAW
+      MustRedrawRow[y]=MustRedrawTile[y*MapWidth+x]=NEW_MAPDRAW;
+  #endif
+      MustRedraw|=RedrawMap;
+      return 1;
+    }
+    return 0;
+}
+
+/**
+**      Denote wether area in screenmap is overlapping
+**
+**      @param sx,sy,ex,ey  area in Map to be checked.
+**
+**      @return             True if overlapping, false otherwise.
+*/
+global int AreaVisibleInMap( int sx, int sy, int ex, int ey ) {
+    return ( sx>=MapX && sy>=MapY && ex<MapX+MapWidth && ey<MapY+MapHeight );
+}
+
+/**
+**
+**      Mark overlapping area with screenmap be drawn for next display update.
+**
+**      @param sx,sy,ex,ey  area in Map to be checked.
+**      @return             True if overlapping and marked, false otherwise.
+**
+*/
+global int MarkDrawAreaMap( int sx, int sy, int ex, int ey ) {
+    if ( (ex-=MapX)>=0 && (ey-=MapY)>=0 &&
+         (sx-=MapX)<MapWidth && (sy-=MapY)<MapHeight ) {
+  #ifdef NEW_MAPDRAW
+      char *row, *tile;
+
+    // Get area in screenmap
+      if ( sx < 0 )
+        sx = 0;
+      if ( ex >= MapWidth )
+        ex = MapWidth-1;
+      if ( sy < 0 )
+        sy = 0;
+      if ( ey >= MapHeight )
+        ey = MapHeight-1;
+
+    // Denote area in screenmap
+      row  = MustRedrawRow + sy;
+      tile = MustRedrawTile + sy*MapWidth+sx;
+      ex  -= sx;            //now: ex=width+1
+      ey  -= sy;            //     ey=height+1
+      do
+
+      {
+        row[ey]=NEW_MAPDRAW;
+        sx = ex;
+        do tile[sx]=NEW_MAPDRAW;
+        while ( --sx >= 0 );
+        tile += MapWidth;
+      }
+      while ( --ey >= 0 );
+  #endif
+
+      MustRedraw|=RedrawMap;
+      return 1;
+    }
+    return 0;
+}
+
+/**
+**
+**      Enable entire map be drawn for next display update.
+**
+*/
+global void MarkDrawEntireMap(void)
+{
+    #ifdef NEW_MAPDRAW
+    int i;
+
+    for( i=0; i<MapHeight; ++i ) {
+        MustRedrawRow[i]=1;
+    }
+    for( i=0; i<MapHeight*MapWidth; ++i ) {
+        MustRedrawTile[i]=1;
+    }
+    #endif
+
+    MustRedraw|=RedrawMap;
+}
+
+/**
 **	Draw the map backgrounds.
 **
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
+**
+** StephanR: variables explained below for screen:
+** *---------------------------------------*
+** |                                       |
+** |          *-----------------------*    |<-TheUi.MapY,dy (in pixels)
+** |          |   |   |   |   |   |   |    |  |
+** |          |   |   |   |   |   |   |    |  |
+** |          |---+---+---+---+---+---|    |  |
+** |          |   |   |   |   |   |   |    |  |MapHeight (in tiles)
+** |          |   |   |   |   |   |   |    |  |
+** |          |---+---+---+---+---+---|    |  |
+** |          |   |   |   |   |   |   |    |  |
+** |          |   |   |   |   |   |   |    |  |
+** |          *-----------------------*    |<-ey,TheUI.MapEndY (in pixels)
+** |                                       |
+** |                                       |
+** *---------------------------------------*
+**            ^                       ^
+**          dx|-----------------------|ex,TheUI.MapEndX (in pixels)
+** TheUI.MapX    MapWidth (in tiles)
+** (in pixels)
 */
 global void DrawMapBackground(int x,int y)
 {
@@ -1312,22 +1429,30 @@ global void DrawMapBackground(int x,int y)
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 
-    ex=TheUI.MapX+MapWidth*TileSizeX;
+    ex=TheUI.MapEndX;
     sy=y*TheMap.Width;
     dy=TheUI.MapY;
-    ey=dy+MapHeight*TileSizeX;
+    ey=TheUI.MapEndY;
 
-    while( dy<ey ) {
+    while( dy<=ey ) {
 	if( *redraw_row++ ) {		// row must be redrawn
 	    sx=x+sy;
 	    dx=TheUI.MapX;
-	    while( dx<ex ) {
+	    while( dx<=ex ) {
 		//
 		//	draw only tiles which must be drawn
 		//
-		if( *redraw_tile++) {
+		if( *redraw_tile++ ) {
 		    // FIXME: unexplored fields could be drawn faster
 		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
+
+                // StephanR: debug-mode denote tiles that are redrawn
+                #if NEW_MAPDRAW > 1
+                  VideoDrawRectangle( redraw_tile[-1] > 1
+                                      ? ColorWhite
+                                      : ColorRed,
+                                      dx, dy, 32, 32 );
+                #endif
 		}
 		++sx;
 		dx+=TileSizeX;

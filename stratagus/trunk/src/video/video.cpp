@@ -102,6 +102,8 @@ global int ClipX2;			/// current clipping bottom right
 global int ClipY2;			/// current clipping bottom right
 
 local Clip* Clips;			/// stack of all clips.
+local Clip* ClipsGarbage = NULL;        /// garbage-list of available clips.
+
 
 extern PaletteLink *palette_list;
 
@@ -159,7 +161,7 @@ global void SetClipping(int left,int top,int right,int bottom)
 {
     if( left>right ) { left^=right; right^=left; left^=right; }
     if( top>bottom ) { top^=bottom; bottom^=top; top^=bottom; }
-    
+
     if( left<0 )    left=0;
     else if( left>=VideoWidth )		left=VideoWidth-1;
     if( top<0 )	    top=0;
@@ -168,7 +170,7 @@ global void SetClipping(int left,int top,int right,int bottom)
     else if( right>=VideoWidth )	right=VideoWidth-1;
     if( bottom<0 )  bottom=0;
     else if( bottom>=VideoHeight )	bottom=VideoHeight-1;
-    
+
     ClipX1=left;
     ClipY1=top;
     ClipX2=right;
@@ -182,7 +184,11 @@ global void PushClipping(void)
 {
     Clip* clip;
 
-    clip=malloc(sizeof(Clip));
+    if(( clip=ClipsGarbage ))
+      ClipsGarbage=ClipsGarbage->Next;
+    else
+      clip=malloc(sizeof(Clip));
+
     clip->Next=Clips;
     clip->X1=ClipX1;
     clip->Y1=ClipY1;
@@ -205,7 +211,9 @@ global void PopClipping(void)
 	ClipY1=clip->Y1;
 	ClipX2=clip->X2;
 	ClipY2=clip->Y2;
-	free(clip);
+
+        clip->Next   = ClipsGarbage;
+        ClipsGarbage = clip;
     } else {
 	ClipX1=0;
 	ClipY1=0;
@@ -262,7 +270,7 @@ global void LoadRGB(Palette *pal, const char *name)
 {
     FILE *fp;
     int i;
-    
+
     if((fp=fopen(name,"rb")) == NULL) {
 	fprintf(stderr,"Can't load palette %s\n",name);
 	exit(-1);
@@ -273,7 +281,7 @@ global void LoadRGB(Palette *pal, const char *name)
 	pal[i].g=fgetc(fp)<<2;
 	pal[i].b=fgetc(fp)<<2;
     }
-    
+
     fclose(fp);
 }
 
@@ -327,7 +335,7 @@ global void ColorCycle8(void)
 	    ((VMemType8*)(current_link->Palette))[i+1];
 	}
 	((VMemType8*)(current_link->Palette))[47]=x;
-	
+
 	x=((VMemType8*)(current_link->Palette))[240];
 	for( i=240; i<244; ++i ) {	// units/icons color cycle
 	  ((VMemType8*)(current_link->Palette))[i]=
@@ -336,7 +344,7 @@ global void ColorCycle8(void)
 	((VMemType8*)(current_link->Palette))[244]=x;
 	current_link = current_link->Next;
       }
-    } else { 
+    } else {
 
       //
       //	Color cycle tileset palette
@@ -347,20 +355,20 @@ global void ColorCycle8(void)
 	pixels[i] = pixels[i+1];
       }
       pixels[47] = x;
-      
+
       x=Pixels8[38];
       for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels8[i]=Pixels8[i+1];
       }
       Pixels8[47]=x;
-      
+
       x=Pixels8[240];
       for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels8[i]=Pixels8[i+1];
       }
       Pixels8[244]=x;
     }
-      
+
     MapColorCycle();		// FIXME: could be little more informativer
     MustRedraw|=RedrawMap|RedrawInfoPanel;
 }
@@ -387,7 +395,7 @@ global void ColorCycle16(void)
 	    ((VMemType16*)(current_link->Palette))[i+1];
 	}
 	((VMemType16*)(current_link->Palette))[47]=x;
-	
+
 	x=((VMemType16*)(current_link->Palette))[240];
 	for( i=240; i<244; ++i ) {	// units/icons color cycle
 	  ((VMemType16*)(current_link->Palette))[i]=
@@ -396,7 +404,7 @@ global void ColorCycle16(void)
 	((VMemType16*)(current_link->Palette))[244]=x;
 	current_link = current_link->Next;
       }
-    } else { 
+    } else {
 
       //
       //	Color cycle tileset palette
@@ -407,7 +415,7 @@ global void ColorCycle16(void)
 	pixels[i] = pixels[i+1];
       }
       pixels[47] = x;
-      
+
       x=Pixels16[38];
       for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels16[i]=Pixels16[i+1];
@@ -447,7 +455,7 @@ global void ColorCycle24(void)
 	    ((VMemType24*)(current_link->Palette))[i+1];
 	}
 	((VMemType24*)(current_link->Palette))[47]=x;
-	
+
 	x=((VMemType24*)(current_link->Palette))[240];
 	for( i=240; i<244; ++i ) {	// units/icons color cycle
 	  ((VMemType24*)(current_link->Palette))[i]=
@@ -456,7 +464,7 @@ global void ColorCycle24(void)
 	((VMemType24*)(current_link->Palette))[244]=x;
 	current_link = current_link->Next;
       }
-    } else { 
+    } else {
 
       //
       //	Color cycle tileset palette
@@ -467,13 +475,13 @@ global void ColorCycle24(void)
 	pixels[i] = pixels[i+1];
       }
       pixels[47] = x;
-      
+
       x=Pixels24[38];
       for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels24[i]=Pixels24[i+1];
       }
       Pixels24[47]=x;
-      
+
       x=Pixels24[240];
       for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels24[i]=Pixels24[i+1];
@@ -507,7 +515,7 @@ global void ColorCycle32(void)
 	    ((VMemType32*)(current_link->Palette))[i+1];
 	}
 	((VMemType32*)(current_link->Palette))[47]=x;
-	
+
 	x=((VMemType32*)(current_link->Palette))[240];
 	for( i=240; i<244; ++i ) {	// units/icons color cycle
 	  ((VMemType32*)(current_link->Palette))[i]=
@@ -516,7 +524,7 @@ global void ColorCycle32(void)
 	((VMemType32*)(current_link->Palette))[244]=x;
 	current_link = current_link->Next;
       }
-    } else { 
+    } else {
 
       //
       //	Color cycle tileset palette
@@ -527,13 +535,13 @@ global void ColorCycle32(void)
 	pixels[i] = pixels[i+1];
       }
       pixels[47] = x;
-      
+
       x=Pixels32[38];
       for( i=38; i<47; ++i ) {	// tileset color cycle
 	Pixels32[i]=Pixels32[i+1];
       }
       Pixels32[47]=x;
-      
+
       x=Pixels32[240];
       for( i=240; i<244; ++i ) {	// units/icons color cycle
 	Pixels32[i]=Pixels32[i+1];

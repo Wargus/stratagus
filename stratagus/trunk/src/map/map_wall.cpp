@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map_wall.c	-	The map wall handling. */
-/*
-**	(c) Copyright 1999,2000 by Vladi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Vladi Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -173,7 +172,8 @@ global void MapRemoveWall(unsigned x,unsigned y)
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
-	MustRedraw|=RedrawMaps;
+        MarkDrawPosMap(x,y);
+	MustRedraw|=RedrawMinimap;
 	MapMarkSeenTile(x,y);
     }
 }
@@ -206,7 +206,8 @@ global void MapSetWall(unsigned x,unsigned y,int humanwall)
 #else
     if( mf->Flags&MapFieldVisible ) {
 #endif
-	MustRedraw|=RedrawMaps;
+        MarkDrawPosMap(x,y);
+	MustRedraw|=RedrawMinimap;
 	MapMarkSeenTile(x,y);
     }
 }

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map.c		-	The map. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -143,6 +142,9 @@ global void RevealMap(void)
 */
 global void MapSetViewpoint(int x,int y)
 {
+    if (x==MapX && y==MapY)
+      return;
+
     if( x<0 ) {
 	MapX=0;
     } else if( x>TheMap.Width-MapWidth ) {
@@ -157,7 +159,8 @@ global void MapSetViewpoint(int x,int y)
     } else {
 	MapY=y;
     }
-    MustRedraw|=RedrawMaps|RedrawMinimapCursor;
+    MarkDrawEntireMap();
+    MustRedraw|=RedrawMinimap|RedrawMinimapCursor;
 }
 
 /**

@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name menubuttons.c	-	The menu buttons. */
-/*
-**	(c) Copyright 1999,2000 by Andreas Arens
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Andreas Arens
+//
+//	$Id$
 
 //@{
 
@@ -55,7 +54,7 @@ local void GameMenuSave(void);
 local void GameMenuEnd(void);
 local void GameMenuReturn(void);
 
-local void StartMenusSetBackground(Menuitem *mi);	
+local void StartMenusSetBackground(Menuitem *mi);
 local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
@@ -591,7 +590,7 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 	h *= i;
 	while (i--) {
 	    PushClipping();
-	    SetClipping(0,0,x+w,VideoHeight);
+	    SetClipping(0,0,x+w,VideoHeight-1);
 	    VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + oh*i);
 	    PopClipping();
 	    text = mi->d.pulldown.options[i];
@@ -615,9 +614,9 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 		SetDefaultTextColors(rc,rc);
 	    }
 	}
-	
+
 	PushClipping();
-	SetClipping(0,0,x+w-20,VideoHeight);
+	SetClipping(0,0,x+w-20,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
 	PopClipping();
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN, x-1 + w-20, y-2);
@@ -659,12 +658,12 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 
     if (flags&MenuButtonDisabled) {
 	rb--;
-    } 
+    }
     i = mi->d.listbox.nlines;
     s = mi->d.listbox.startline;
     while (i--) {
 	PushClipping();
-	SetClipping(0,0,x+w,VideoHeight);
+	SetClipping(0,0,x+w,VideoHeight-1);
 	VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1 + 18*i);
 	PopClipping();
 	if (!(flags&MenuButtonDisabled)) {
@@ -711,14 +710,14 @@ local void DrawVSlider(Menuitem *mi, unsigned mx, unsigned my)
 
     if (flags&MenuButtonDisabled) {
 	PushClipping();
-	SetClipping(0,0,VideoWidth,y + h - 20);
+	SetClipping(0,0,VideoWidth-1,y + h - 20);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT - 1, x, y - 2);
 	PopClipping();
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW - 1, x, y - 2);
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
     } else {
 	PushClipping();
-	SetClipping(0,0,VideoWidth,y + h - 20);
+	SetClipping(0,0,VideoWidth-1,y + h - 20);
 	VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y - 2);
 	PopClipping();
 	if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
@@ -770,9 +769,9 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
 	rb--;
 	SetDefaultTextColors(FontGrey,FontGrey);
     }
-    
+
     PushClipping();
-    SetClipping(0,0,x+w,VideoHeight);
+    SetClipping(0,0,x+w,VideoHeight-1);
     VideoDrawClip(MenuButtonGfx.Sprite, rb, x-1, y-1);
     PopClipping();
     text = mi->d.input.buffer;
@@ -890,7 +889,7 @@ local void GameMenuReturn(void)
     MustRedraw &= ~RedrawMenu;
     InterfaceState = IfaceStateNormal;
     ClearStatusLine();
-    MustRedraw |= RedrawMap;
+    MarkDrawEntireMap(); //FIXME: some tiles could be left as they were?
     GamePaused = 0;
 }
 
@@ -991,7 +990,7 @@ local void MultiPlayerGameMenu(void)
     if (EnterNameMenuItems[1].d.input.nch == 0) {
 	return;
     }
-    
+
     NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
     strcpy(NetworkName, NameBuf);
     // Here we really go...
@@ -1348,7 +1347,7 @@ local void CustomGameCancel(void)
     FreePudInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     EndMenu();
-    
+
 }
 
 local void CustomGameStart(void)
@@ -2017,7 +2016,7 @@ global void ProcessMenu(int MenuId, int Loop)
     Menu *menu;
     Menuitem *mi;
     int CurrentMenuSave = -1, MenuButtonUnderCursorSave = -1, MenuButtonCurSelSave = -1;
-    
+
     // Recursion protection:
     if (Loop) {
 	CurrentMenuSave = CurrentMenu;
@@ -2138,7 +2137,7 @@ global void InitMenus(unsigned int race)
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
 	CustomGameMenuItems[14].d.pulldown.noptions = 4;
-	
+
     }
 }
 
