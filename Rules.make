@@ -23,8 +23,12 @@ CCL		= -DUSE_CCL
 CCLLIB		= -lm
 
 # Video support
-VIDEO		= -DUSE_X11
-VIDEOLIB	= -lXext -lX11 -ldl
+SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
+SDL_CFLAGS	= $(shell sdl-config --cflags)
+SDLLIB		= $(shell sdl-config --libs)
+
+VIDEO             = $(SDL)
+VIDEOLIB	= $(SDLLIB) -ldl
 
 # Sound support
 DSOUND		= -DWITH_SOUND
