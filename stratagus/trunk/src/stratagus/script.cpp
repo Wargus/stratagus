@@ -98,23 +98,15 @@ local SCM CclFreeCraftLibraryPath(void)
     return gh_str02scm(FreeCraftLibPath);
 }
 
-#if 0
 /**
-**	Show tips at the start of a level.
+**	Return the freecraft game-cycle
+**
+**	@return		Current game cycle.
 */
-local SCM CclShowTips(void)
+local SCM CclGameCycle(void)
 {
-    static int InitTips=1;
-
-    if( !InitTips )
-	return SCM_UNSPECIFIED;
-
-    InitTips=0;
-    ShowTips=1;
-    // JOHNS: Done by system: memset(Tips,0,sizeof(Tips));
-    return SCM_UNSPECIFIED;
+    return gh_int2scm(GameCycle);
 }
-#endif
 
 /**
 **	Enable/disable Showing the tips at the start of a level.
@@ -452,7 +444,8 @@ global void InitCcl(void)
     sargv[4] = buf;			// never freed
     siod_init(5,sargv);
 
-    init_subr_0("library-path",CclFreeCraftLibraryPath);
+    gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
+    gh_new_procedure0_0("game-cycle",CclGameCycle);
 
 
     gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
