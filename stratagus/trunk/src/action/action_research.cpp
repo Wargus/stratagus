@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_research.c -	The research action. */
+/**@name action_research.c - The research action. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -51,76 +51,76 @@
 #include "ai.h"
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Unit researches!
+**  Unit researches!
 **
-**	@param unit	Pointer of researching unit.
+**  @param unit  Pointer of researching unit.
 */
 global void HandleActionResearch(Unit* unit)
 {
-    const Upgrade* upgrade;
+	const Upgrade* upgrade;
 
-    if (!unit->SubAction) {		// first entry
-	upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1;
+	if (!unit->SubAction) { // first entry
+		upgrade = unit->Data.Research.Upgrade = unit->Orders[0].Arg1;
 #if 0
-	// FIXME: I want to support both, but with network we need this check
-	//	  but if want combined upgrades this is worse
+		// FIXME: I want to support both, but with network we need this check
+		//  but if want combined upgrades this is worse
 
-	//
-	//	Check if an other building has already started?
-	//
-	if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]) {
-	    DebugLevel0Fn("Two researches running\n");
-	    PlayerAddCosts(unit->Player, upgrade->Costs);
+		//
+		// Check if an other building has already started?
+		//
+		if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]) {
+			DebugLevel0Fn("Two researches running\n");
+			PlayerAddCosts(unit->Player, upgrade->Costs);
 
-	    unit->Reset = unit->Wait = 1;
-	    unit->Orders[0].Action = UnitActionStill;
-	    unit->SubAction = 0;
-	    if (IsOnlySelected(unit)) {
-		MustRedraw |= RedrawInfoPanel;
-	    }
-	    return;
-	}
+			unit->Reset = unit->Wait = 1;
+			unit->Orders[0].Action = UnitActionStill;
+			unit->SubAction = 0;
+			if (IsOnlySelected(unit)) {
+				MustRedraw |= RedrawInfoPanel;
+			}
+			return;
+		}
 #endif
-	unit->SubAction = 1;
-    } else {
-	upgrade = unit->Data.Research.Upgrade;
-    }
-
-    unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] += SpeedResearch;
-    if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] >=
-	    upgrade->Costs[TimeCost]) {
-
-	NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
-	    "%s: complete", unit->Type->Name);
-	if (unit->Player->AiEnabled) {
-	    AiResearchComplete(unit, upgrade);
+		unit->SubAction = 1;
+	} else {
+		upgrade = unit->Data.Research.Upgrade;
 	}
-        UpgradeAcquire(unit->Player, upgrade);
 
-	unit->Reset = unit->Wait = 1;
-	unit->Orders[0].Action = UnitActionStill;
-	unit->SubAction = 0;
+	unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] += SpeedResearch;
+	if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] >=
+			upgrade->Costs[TimeCost]) {
 
-	// Upgrade can change all
-	SelectedUnitChanged();
-	MustRedraw |= RedrawInfoPanel;
+		NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,
+			"%s: complete", unit->Type->Name);
+		if (unit->Player->AiEnabled) {
+			AiResearchComplete(unit, upgrade);
+		}
+		UpgradeAcquire(unit->Player, upgrade);
 
-	return;
-    }
+		unit->Reset = unit->Wait = 1;
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = 0;
 
-    if (IsOnlySelected(unit)) {
-	// refresh info panel (to show progress, I think)
-	MustRedraw |= RedrawInfoPanel;
-    }
+		// Upgrade can change all
+		SelectedUnitChanged();
+		MustRedraw |= RedrawInfoPanel;
 
-    unit->Reset = 1;
-    unit->Wait = CYCLES_PER_SECOND / 6;
+		return;
+	}
 
-    // FIXME: should be animations here?
+	if (IsOnlySelected(unit)) {
+		// refresh info panel (to show progress, I think)
+		MustRedraw |= RedrawInfoPanel;
+	}
+
+	unit->Reset = 1;
+	unit->Wait = CYCLES_PER_SECOND / 6;
+
+	// FIXME: should be animations here?
 }
 
 //@}
