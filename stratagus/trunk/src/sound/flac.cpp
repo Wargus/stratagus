@@ -171,17 +171,17 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 
     if (sample->Type == &FlacSampleType) {
 	// not streaming
-	printf("ALLOC MORE MEM");
-	printf("LEN = %d\n", sample->Length);
 	sample = realloc(sample, sizeof(*sample) + sample->Length + i);
 	if (!sample) {
 	    fprintf(stderr, "Out of memory!\n");
 	    CLclose(data->FlacFile);
 	    ExitFatal(-1);
 	}
+	data->Sample = sample;
+	data->PointerInBuffer = sample->Data;
     }
 
-    p = data->PointerInBuffer + sample->Length;
+    p = sample->Data + sample->Length;
     sample->Length += i;
     data->Bytes -= i;
 
@@ -220,15 +220,15 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 */
 local int FlacRead(Sample* sample, void* buf, int len)
 {
-    int pos;
+    char *pos;
 
-    pos = (int)sample->User;
-    if (pos + len > sample->Length) {		// Not enough data?
-	len = sample->Length - pos;
+    pos = ((FlacData*)sample->User)->PointerInBuffer;
+
+    if ((pos - sample->Data) + len > sample->Length) {
+	len = sample->Length - (pos - sample->Data);
     }
-    memcpy(buf, sample->Data + pos, len);
-
-    sample->User = (void*)(pos + len);
+    memcpy(buf, ((FlacData*)sample->User)->PointerInBuffer, len);
+    ((FlacData*)sample->User)->PointerInBuffer += len;
 
     return len;
 }
@@ -383,22 +383,24 @@ global Sample* LoadFlac(const char* name, int flags)
     FLAC__stream_decoder_set_client_data(stream, data);
     FLAC__stream_decoder_init(stream);
 
-    while (FLAC__stream_decoder_get_state(stream) != FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) {
-        // read metadata
-        FLAC__stream_decoder_process_single(stream);
-    }
-
-    if (1 && flags & PlayAudioStream) {
+    if (flags & PlayAudioStream) {
 	sample->Type = &FlacStreamSampleType;
+
+	FLAC__stream_decoder_process_until_end_of_metadata(stream);
     } else {
 	sample->Type = &FlacSampleType;
 
-        FLAC__stream_decoder_process_until_end_of_stream(stream);
+	DebugCheck(FLAC__stream_decoder_get_state(stream) != 
+	    FLAC__STREAM_DECODER_SEARCH_FOR_METADATA);
+        if (FLAC__stream_decoder_process_until_end_of_stream(stream))
+	DebugCheck(FLAC__stream_decoder_get_state(stream) != 
+	    FLAC__STREAM_DECODER_END_OF_STREAM);
+
         FLAC__stream_decoder_finish(stream);
         FLAC__stream_decoder_delete(stream);
         CLclose(f);
     }
-    return sample;
+    return data->Sample;
 }
 
 #endif	// } WITH_SOUND && USE_FLAC
