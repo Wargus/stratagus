@@ -937,6 +937,55 @@ local int AutoCastHealing(Unit* unit, SpellType* spell)
 }
 
 /**
+**	Auto cast exorcism if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastExorcism(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on an enemy
+	if (table[i] == unit || (unit->Player == table[i]->Player
+		|| IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastExorcism(table[i], spell)) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
 **	Auto cast slow if possible.
 **
 **	@param unit	Unit that casts the spell
@@ -1272,7 +1321,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 	    return AutoCastHealing(unit, spell);
 
 	case SpellActionExorcism:
-	    return 0;
+	    return AutoCastExorcism(unit, spell);
 
 //  ---human mages---
 	case SpellActionFireball:
