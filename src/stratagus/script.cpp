@@ -109,6 +109,15 @@ local SCM CclGameCycle(void)
 }
 
 /**
+**	Set the freecraft game-cycle
+*/
+local SCM CclSetGameCycle(SCM cycle)
+{
+    GameCycle=gh_scm2int(cycle);
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Enable/disable Showing the tips at the start of a level.
 **
 **	@param flag	True = turn on, false = off.
@@ -442,7 +451,7 @@ global void InitCcl(void)
 
     gh_new_procedure0_0("library-path",CclFreeCraftLibraryPath);
     gh_new_procedure0_0("game-cycle",CclGameCycle);
-
+    gh_new_procedure1_0("set-game-cycle!",CclSetGameCycle);
 
     gh_new_procedure1_0("set-show-tips!",CclSetShowTips);
     gh_new_procedure1_0("add-tip",CclAddTip);
