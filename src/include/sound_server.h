@@ -52,15 +52,54 @@ extern sem_t SoundThreadChannelSemaphore;
 #define MaxVolume 255
 
 /**
+**	General sample object typedef. (forward)
+*/
+typedef struct _sample_ Sample;
+
+/**
+**	General sound object type.
+**
+**	@todo	FIXME: This is the planned new sample handling,
+**		which supports streaming, decompressing on demand, caching.
+*/
+typedef struct _sample_type_ {
+	/**
+	**	Read samples from object.
+	**
+	**	@param o	pointer to object.
+	**	@param buf	buffer to fill.
+	**	@param len	length of buffer.
+	**
+	**	@return		Number of bytes filled.
+	*/
+    int (*Read)		(Sample* o, void* buf, int len);
+	/**
+	**	Free the sample object.
+	**
+	**	@param o	pointer to object.
+	*/
+    void (*Free)	(Sample* o);
+} SampleType;
+
+/**
 **	RAW samples.
 */
-typedef struct _sample_ {
+struct _sample_ {
+    SampleType*		Type;		/// Object type dependend
+    void*		User;		/// Object user data
+
     unsigned char	Channels;	/// mono or stereo
     unsigned char	SampleSize;	/// sample size in bits
     unsigned int	Frequency;	/// frequency in hz
     unsigned int	Length;		/// sample length
     char		Data[1];	/// sample bytes
-} Sample;
+};
+
+    /// Free a sample object.
+#define SoundFree(o)            ((o)->Type->Free)((o))
+    /// Save (NULL) free a sample object.
+#define SoundSaveFree(o) \
+    do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
 
 /**
 **	Sound double group: a sound that groups two sounds, used to implement
@@ -173,16 +212,16 @@ extern unsigned AllocatedSoundMemory;
 extern unsigned CompressedSoundMemory;
 #endif
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) 
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
     /// cd play mode, ":off" ":random" or ":all"
 extern char *CDMode;
     /// FIXME: docu
 extern int CDTrack;
-#endif 
-#ifdef USE_LIBCDA 
+#endif
+#ifdef USE_LIBCDA
     /// number of tracks on the cd
 extern int NumCDTracks;
-#endif 
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -197,7 +236,7 @@ extern Sample* LoadMp3(const char* name);	/// Load a mp3 file
 extern SoundId RegisterSound(char* file[],unsigned number);
 
     /**
-    ** 	Ask the sound server to put together two sounds to form a special sound.
+    **	Ask the sound server to put together two sounds to form a special sound.
     **	@param first	first part of the group
     **	@param second	second part of the group
     **	@return		the special sound unique identifier
