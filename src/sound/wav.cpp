@@ -256,7 +256,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
     //
     //  Read sample
     //
-    sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE*wavfmt.Channels);
+    sample = malloc(sizeof(*sample) + WAV_BUFFER_SIZE * wavfmt.Channels * wavfmt.SampleSize);
     sample->Channels = wavfmt.Channels;
     sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
     sample->Frequency = wavfmt.Frequency;
