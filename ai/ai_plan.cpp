@@ -10,7 +10,7 @@
 //
 /**@name ai_plan.c	-	AI planning functions. */
 //
-//      (c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -40,6 +40,7 @@
 #include "unittype.h"
 #include "map.h"
 #include "pathfinder.h"
+#include "actions.h"
 #include "ai_local.h"
 
 /*----------------------------------------------------------------------------
@@ -355,6 +356,140 @@ local int AiFindTarget(const Unit* unit,unsigned char* matrix,
 	}
 	ep=wp;
     }
+    return 0;
+}
+
+/**
+**	Find possible walls to target.
+**
+**	@param force	Attack force.
+**
+**	@return 	True if wall found.
+*/
+global int AiFindWall(AiForce* force)
+{
+    static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
+    static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
+    struct {
+	unsigned short X;
+	unsigned short Y;
+    } * points;
+    int size;
+    int x;
+    int y;
+    int rx;
+    int ry;
+    int mask;
+    int wp;
+    int rp;
+    int ep;
+    int i;
+    int w;
+    unsigned char* m;
+    unsigned char* matrix;
+    int destx;
+    int desty;
+    AiUnit* aiunit;
+    Unit* unit;
+
+    // Find a unit to use.  Best choice is a land unit with range 1.
+    // Next best choice is any land unit.  Otherwise just use the first.
+    aiunit=force->Units;
+    unit=aiunit->Unit;
+    while( aiunit ) {
+	if( aiunit->Unit->Type->UnitType==UnitTypeLand ) {
+	    unit=aiunit->Unit;
+	    if( aiunit->Unit->Type->Missile.Missile->Range==1 ) {
+		break;
+	    }
+	}
+	aiunit=aiunit->Next;
+    }
+
+    x=unit->X;
+    y=unit->Y;
+    size=TheMap.Width*TheMap.Height/4;
+    points=alloca(size*sizeof(*points));
+
+    destx=-1;
+    desty=-1;
+
+    matrix=CreateMatrix();
+    w=TheMap.Width+2;
+    matrix+=w+w+2;
+
+    points[0].X=x;
+    points[0].Y=y;
+    rp=0;
+    matrix[x+y*w]=1;				// mark start point
+    ep=wp=1;					// start with one point
+
+    mask=UnitMovementMask(unit);
+
+    //
+    //	Pop a point from stack, push all neighbors which could be entered.
+    //
+    for( ; destx==-1; ) {
+	while( rp!=ep && destx==-1 ) {
+	    rx=points[rp].X;
+	    ry=points[rp].Y;
+	    for( i=0; i<8; ++i ) {		// mark all neighbors
+		x=rx+xoffset[i];
+		y=ry+yoffset[i];
+		m=matrix+x+y*w;
+		if( *m ) {
+		    continue;
+		}
+
+		// 
+		//	Check for a wall
+		//
+		if( WallOnMap(x,y) ) {
+		    DebugLevel0Fn("Wall found %d,%d\n" _C_ x _C_ y);
+		    destx=x;
+		    desty=y;
+		    break;
+		}
+
+		if( CanMoveToMask(x,y,mask) ) {	// reachable
+		    *m=1;
+		    points[wp].X=x;		// push the point
+		    points[wp].Y=y;
+		    if( ++wp>=size ) {		// round about
+			wp=0;
+		    }
+		} else {			// unreachable
+		    *m=99;
+		}
+	    }
+	    if( ++rp>=size ) {			// round about
+		rp=0;
+	    }
+	}
+
+	//
+	//	Continue with next frame.
+	//
+	if( rp==wp ) {			// unreachable, no more points available
+	    break;
+	}
+	ep=wp;
+    }
+
+    if( destx!=-1 ) {
+	force->State=0;
+	aiunit=force->Units;
+	while( aiunit ) {
+	    if( aiunit->Unit->Type->CanAttack ) {
+		CommandAttack(aiunit->Unit,destx,desty,NULL,FlushCommands);
+	    } else {
+		CommandMove(aiunit->Unit,destx,desty,FlushCommands);
+	    }
+	    aiunit=aiunit->Next;
+	}
+	return 1;
+    }
+
     return 0;
 }
 
