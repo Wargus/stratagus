@@ -25,6 +25,9 @@
 #include "freecraft.h"
 #include "icons.h"
 #include "unittype.h"
+#include "upgrade.h"
+#include "depend.h"
+#include "interface.h"
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
@@ -45,11 +48,11 @@ global void CleanModules(void)
     CleanIcons();
     // CleanUI();
     CleanUnitTypes();
-#if 0
     CleanUnits();
     CleanUpgrades();
     CleanDependencies();
     CleanButtons();
+#if 0
     CleanMissileTypes();
     CleanMissiles();
     CleanTileset();
@@ -67,6 +70,11 @@ global void InitModules(void)
     InitIcons();
     // InitUI();
     InitUnitTypes();
+    InitUnits();
+    InitUpgrades();
+    InitDependencies();
+
+    InitButtons();
 }
 
 /**
@@ -79,6 +87,8 @@ global void LoadModules(void)
     LoadIcons();
     // LoadUI();
     LoadUnitTypes();
+
+    // LoadButtons();
 }
 
 /**
