@@ -76,6 +76,7 @@ local Unit** ReleasedTail;		/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];	/// Array of used slots
 global int NumUnits;			/// Number of slots used
+global Unit* DestroyedBuildings;	/// List of DestroyedBuildings
 global Unit* CorpseList;		/// List of Corpses On Map
 
 global int XpDamage;			/// Hit point regeneration for all units
@@ -110,6 +111,7 @@ global void InitUnitsMemory(void)
 
     ReleasedTail = &ReleasedHead;		// list of unfreed units.
     NumUnits = 0;
+    DestroyedBuildings = NULL;
     CorpseList = NULL;
 }
 
@@ -199,6 +201,37 @@ global void ReleaseUnit(Unit* unit)
 	//
 	unit->Destroyed = 1;		// mark as destroyed
 
+	// Mark building as can't be destroyed, since it's still seen
+	if (unit->Type->Building) {
+	    int i;
+	    int x;
+	    int y;
+	    int w;
+	    int w0;
+	    int h;
+
+	    // Mark the Destroyed building, with who has seen it destroyed.
+	    x = unit->X;
+	    y = unit->Y;
+	    unit->Visible = 0x0000;
+	    for (i = 0; i < PlayerMax; ++i) {
+		w = w0 = unit->Type->TileWidth;
+		h = unit->Type->TileHeight;
+		for (; h-- > 0;) {
+		    for (w = w0; w-- > 0;) {
+			if (!IsMapFieldVisible(&Players[i], x + w, y + h) &&
+				IsMapFieldExplored(&Players[i], x + w, y + h) &&
+				Players[i].Type == PlayerPerson) {
+			    unit->Visible |= (1 << i);
+			}
+		    }
+		}
+	    }
+	}
+
+	if (unit->Type->Building && unit->Visible != 0x0000) {
+	    return;
+	}
 	RefsDebugCheck(!unit->Refs);
 	if (--unit->Refs > 0) {
 	    DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle _C_
@@ -212,7 +245,11 @@ global void ReleaseUnit(Unit* unit)
 
     // Update Corpse Cache
     if (unit->Orders[0].Action == UnitActionDie) {
-	CorpseCacheRemove(unit);
+	if (unit->Type->Building) {
+	    DeadBuildingCacheRemove(unit);
+	} else {
+	    CorpseCacheRemove(unit);
+	}
     }
 
     RefsDebugCheck(unit->Refs);
@@ -313,7 +350,7 @@ global void InitUnit(Unit* unit, UnitType* type)
     //  Initialise unit structure (must be zero filled!)
     //
     unit->Type = type;
-    unit->Seen.Frame = UnitNotSeen;		// Unit isn't yet seen
+    unit->SeenFrame = UnitNotSeen;		// Unit isn't yet seen
 
     // FIXME: this is not needed for load+save, must move to other place
     if (1) {				// Call CCL for name generation
@@ -350,6 +387,11 @@ global void InitUnit(Unit* unit, UnitType* type)
     unit->Wait = 1;
     unit->Reset = 1;
     unit->Removed = 1;
+
+    // Invisible as default for submarines
+    if (!type->PermanentCloak) {
+	unit->Visible = -1;		// Visible as default
+    }
 
     unit->Rs = MyRand() % 100;		// used for fancy buildings and others
 
@@ -505,6 +547,10 @@ global void PlaceUnit(Unit* unit, int x, int y)
 	}
 	unit->CurrentSightRange = unit->Stats->SightRange;
 	MapMarkUnitSight(unit);
+
+	if (type->DetectCloak) {
+	    MapDetectCloakedUnits(unit);
+	}
     }
 
     unit->Removed = 0;
@@ -512,7 +558,7 @@ global void PlaceUnit(Unit* unit, int x, int y)
 
     MustRedraw |= RedrawMinimap;
     CheckUnitToBeDrawn(unit);
-    UnitCountSeen(unit);
+    UnitMarkSeen(unit);
 }
 
 /**
@@ -932,29 +978,34 @@ global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 */
 global int UnitVisibleOnMap(const Unit* unit)
 {
-    int p;
-    Player* player;
+    int x;
+    int y;
+    int w;
+    int w0;
+    int h;
 
     DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
 
-    player = unit->Player;
-    p = 0;
-    // Removed unit
-    if (unit->Removed) {
-	return 0;
-    }
-    //  If it's your own unit, of course you can see it, right?
-    //  WRONG, it can have a vision range of 0.
-    // Invisible by spell
-    if (unit->Invisible) {
+    //
+    //	Unit invisible (by spell), removed or submarine.
+    //
+    if (unit->Invisible || unit->Removed ||
+	    !(unit->Visible & (1 << ThisPlayer->Player))) {
 	return 0;
     }
 
-    // If units are watching it... what do you think?
-    for (p = 0; p < PlayerMax ; ++p) {
-	if ((p == player->Player) || (player->SharedVision & (1 << p) && 
-	    Players[p].SharedVision & (1 << player->Player))) {
-	    if (unit->VisCount[p]) {
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+
+    //
+    //	Check if visible, not under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for (; h-- > 0;) {
+	for (w = w0; w-- > 0;) {
+	    if (IsMapFieldVisible(ThisPlayer, x + w, y + h)) {
 		return 1;
 	    }
 	}
@@ -963,240 +1014,184 @@ global int UnitVisibleOnMap(const Unit* unit)
 }
 
 /**
-**	Returns true if the unit should be drawn on map.
-**	Unlike UnitVisibleOnMap this will return true for corpses and
-**	buildings under fog of war. Only for ThisPlayer
+**	Returns true, if unit is visible for this player on the map.
+**	An unit is visible, if any field could be seen.
 **
-**	@param unit	The unit to check.
+**	@warning	This is only true for ::ThisPlayer.
+**
+**	@param unit	Unit to be checked.
+**	@return		True if visible, false otherwise.
 */
-global int UnitDrawableOnMap(const Unit* unit)
-{
-    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
-
-    //  All units are always visible in the editor.
-    if (EditorRunning) {
-	return 1;
-    }
-
-    //  If it's your own unit, of course you can see it, right?
-    //  WRONG, it can have a vision range of 0.
-    // Invisible by spell
-    if (unit->Invisible) {
-	return 0;
-    }
-    // If units are watching it... what do you think?
-    // Units are always visible if the editor is running.
-    if (unit->VisCount[ThisPlayer->Player]) {
-	return 1;
-    } else { // Not watched by any units.
-	// Cloaked, sorry, not known
-	if (unit->Type->PermanentCloak) {
-	    return 0;
-	}
-
-	// Unit is visible under fog and was already discovered once.
-	if (unit->Type->VisibleUnderFog && unit->Seen.Frame != UnitNotSeen) {
-	    return 1;
-	}
-	return 0;
-    }
-}
-
-/**
-** 	This function fills in the Seen fields of an unit from current fields.
-**	To be called when unit goes out of view, or when the map is revealed.
-**
-** 	@param unit	The unit to work on
-*/
-local void UnitFillSeenValues(Unit* unit)
-{
-    //	Seen values are undefined for visible units.
-    unit->Seen.IY = unit->IY;
-    unit->Seen.IX = unit->IX;
-    unit->Seen.Frame = unit->Frame;
-    unit->Seen.State = (unit->Orders[0].Action == UnitActionBuilded) |
-	((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
-    if (unit->Orders[0].Action == UnitActionDie) {
-	unit->Seen.State = 3;
-    }
-    unit->Seen.Type = unit->Type;
-    unit->Seen.Constructed = unit->Constructed;
-    unit->Seen.Destroyed = unit->Destroyed;
-    unit->Seen.CFrame = unit->Data.Builded.Frame;
-}
-
-/**
-**	This function should get called when an unit goes out of fog of war.
-**
-**	@param unit	The unit that goes out of fog.
-**	@param p	The player the unit goes out of fog for.
-**
-**	@note For units that are visible under fog (mostly buildings)
-**	we use reference counts, from the players that know about
-**	the building. When an building goes under fog it gets a refs
-**	increase, and when it shows up it gets a decrease. It must
-**	not get an decrease the first time it's seen, so we have to
-**	keep track of what player saw what units, with SeenByPlayer.
-*/
-local void UnitGoesOutOfFog(Unit* unit, int p)
-{
-    if (unit->Type->VisibleUnderFog) {
-	if (unit->SeenByPlayer & (1 << p)) {
-	    DebugLevel3Fn("unit %d(%s): cleaned a ref from player %d\n" _C_
-		    unit->Slot _C_ unit->Type->Name _C_ p);
-	    if (Players[p].Type == PlayerPerson) {
-		RefsDecrease(unit);
-	    }
-	} else {
-	    unit->SeenByPlayer |= (1 << p);
-	}
-    }
-}
-
-/**
-**	This function should get called when an unit goes under fog of war.
-**
-**	@param unit	The unit that goes under fog.
-**	@param p	The player the unit goes out of fog for.
-*/
-global void UnitGoesUnderFog(Unit* unit, int p)
-{
-    if (unit->Type->VisibleUnderFog) {
-	DebugLevel3Fn("unit %d(%s): got a ref from player %d\n" _C_
-		unit->Slot _C_ unit->Type->Name _C_ p);
-	if (Players[p].Type == PlayerPerson) {
-	    RefsIncrease(unit);
-	}
-	if (p == ThisPlayer->Player) {
-	    UnitFillSeenValues(unit);
-	}
-    }
-}
-
-/**
-**	This function marks units on x, y as seen. It uses a reference count.
-**
-**	@param player	The player to mark for.
-**	@param x	x location to check if building is on, and mark as seen
-**	@param y	y location to check if building is on, and mark as seen
-**	@param cloak	If this is for cloaked units.
-*/
-global void UnitsMarkSeen(const Player* player, int x, int y, int cloak)
-{
-    int p;
-    int n;
-    Unit* units[UnitMax];
-    Unit* unit;
-
-    n = SelectUnitsOnTile(x, y, units);
-    p = 0;
-    DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
-    while (n) {
-	unit = units[--n];
-	if (cloak != (int)unit->Type->PermanentCloak) {
-	    continue;
-	}
-	unit->VisCount[player->Player]++;
-	DebugCheck(unit->VisCount[player->Player] >
-	    unit->Type->TileWidth * unit->Type->TileHeight);
-	for (p = 0; p < PlayerMax ; ++p) {
-	    if ((p == player->Player) || (player->SharedVision & (1 << p) && 
-		Players[p].SharedVision & (1 << player->Player))) {
-		if (!unit->VisCount[p]) {
-		    UnitGoesOutOfFog(unit, p);
-		}
-	    }
-	}
-    }
-}
-
-/**
-**	This function unmarks units on x, y as seen. It uses a reference count.
-**
-**	@param player	The player to mark for.
-**	@param x	x location to check if building is on, and mark as seen
-**	@param y	y location to check if building is on, and mark as seen
-**	@param cloak	If this is for cloaked units.
-*/
-global void UnitsUnmarkSeen(const Player* player, int x, int y, int cloak)
-{
-    int p;
-    int n;
-    Unit* units[UnitMax];
-    Unit* unit;
-
-    n = SelectUnitsOnTile(x, y, units);
-    p = 0;
-    DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
-    while (n) {
-	unit = units[--n];
-	if (cloak != (int)unit->Type->PermanentCloak) {
-	    continue;
-	}
-	DebugCheck(!unit->VisCount[player->Player]);
-	unit->VisCount[player->Player]--;
-	for (p = 0; p < PlayerMax ; ++p) {
-	    if ((p == player->Player) || (player->SharedVision & (1 << p) && 
-		Players[p].SharedVision & (1 << player->Player))) {
-		if (!unit->VisCount[p]) {
-		    UnitGoesUnderFog(unit,p);
-		}
-	    }
-	}
-    }
-}
-
-
-/**
-**	Makes an unit count it's visibility again.
-**
-**	@param unit	pointer to the unit to check if seen
-*/
-global void UnitCountSeen(Unit* unit)
+global int BuildingVisibleOnMap(const Unit* unit)
 {
     int x;
     int y;
-    int p;
-    int oldv;
-    int newv;
+    int w;
+    int w0;
+    int h;
 
-    DebugCheck(!unit->Type);
+    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+    
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
 
-    //	FIXME: optimize, only work on certain players?
-    //	This is for instance good for updating shared vision...
-    for (p = 0; p < PlayerMax; ++p) {
-	if (Players[p].Type == PlayerNobody) {
-	    continue;
-	}
-	//
-	//	First calculate the new visibility count.
-	//
-	oldv = unit->VisCount[p];
-	newv = 0;
-	for (x = 0; x < unit->Type->TileWidth; ++x) {
-	    for (y = 0; y < unit->Type->TileHeight; ++y) {
-		if (unit->Type->PermanentCloak) {
-		    if (TheMap.Fields[(unit->Y + y) * TheMap.Width + x + unit->X].VisCloak[p]) {
-			newv++;
-		    }
-	        } else {
-		    if (TheMap.Fields[(unit->Y + y) * TheMap.Width + x + unit->X].Visible[p]) {
-			newv++;
-		    }
-		}
+    //
+    //	Check if visible, not under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for (; h-- > 0;) {
+	for (w = w0; w-- > 0;) {
+	    if (IsMapFieldVisible(ThisPlayer, x + w, y + h)) {
+		return 1;
 	    }
 	}
-	// Shared Vision Calculation here.
-	// Do I share vision, and if so, so I see/hide unit now.
-	if ((oldv == 0) && (newv)) {
-	    UnitGoesOutOfFog(unit, p);
-	}
-	if ((oldv) && (newv == 0)) {
-	    UnitGoesUnderFog(unit, p);
-	}
-	//  Now set the new visibility count
-	unit->VisCount[p] = newv;
     }
+    return 0;
+}
+
+/**
+**	FIXME: docu
+**
+**	@param x	x location to check if building is on, and mark as seen
+**	@param y	y location to check if building is on, and mark as seen
+*/
+global void UnitsMarkSeen(int x, int y)
+{
+    int n;
+    Unit* units[UnitMax];
+    Unit* unit;
+
+    if (IsMapFieldVisible(ThisPlayer, x, y)) {
+	n = SelectUnitsOnTile(x, y,units);
+	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
+	// FIXME: need to handle Dead buldings
+	while (n) {
+	    unit = units[n - 1];
+	    if (unit->SeenFrame == UnitNotSeen) {
+		DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
+		    unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
+	    }
+	    unit->SeenIY = unit->IY;
+	    unit->SeenIX = unit->IX;
+	    unit->SeenFrame = unit->Frame;
+	    unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
+		((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
+	    if (unit->Orders[0].Action == UnitActionDie) {
+		unit->SeenState = 3;
+	    }
+	    if (unit->SeenState == 2) {
+		unit->SeenType = unit->Orders[0].Type;
+	    } else {
+		unit->SeenType = unit->Type;
+	    }
+	    unit->SeenConstructed = unit->Constructed;
+	    unit->SeenDestroyed = unit->Destroyed;
+	    --n;
+	}
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param unit	pointer to the unit to check if seen
+*/
+global void UnitMarkSeen(Unit* unit)
+{
+    int x;
+    int y;
+
+    // Update Building Seen
+    if (!unit->Type) {
+	DebugLevel0Fn("UnitMarkSeen: Type is NULL\n");
+	return;
+    }
+    for (x = 0; x < unit->Type->TileWidth; ++x) {
+	for (y = 0; y < unit->Type->TileHeight; ++y) {
+	    if (IsMapFieldVisible(ThisPlayer, unit->X + x, unit->Y + y)) {
+		unit->SeenIY = unit->IY;
+		unit->SeenIX = unit->IX;
+		if (unit->SeenFrame == UnitNotSeen) {
+		    DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_
+			unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
+		}
+		unit->SeenFrame = unit->Frame;
+		unit->SeenState = (unit->Orders[0].Action == UnitActionBuilded) |
+		    ((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
+		if (unit->Orders[0].Action == UnitActionDie) {
+		    unit->SeenState = 3;
+		}
+		if (unit->SeenState == 2) {
+		    unit->SeenType = unit->Orders[0].Type;
+		} else {
+		    unit->SeenType = unit->Type;
+		}
+		unit->SeenConstructed = unit->Constructed;
+		unit->SeenDestroyed = unit->Destroyed;
+		x = unit->Type->TileWidth;
+		y = unit->Type->TileHeight;
+		//  If we found one visible square, END.
+		break;
+	    }
+	}
+    }
+}
+
+/**
+**	Returns true, if unit is known on the map. Special case for buildings.
+**
+**	@param unit	Unit to be checked.
+**	@return		True if known, false otherwise.
+*/
+global int UnitKnownOnMap(const Unit* unit)
+{
+    int x;
+    int y;
+    int w;
+    int w0;
+    int h;
+
+    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+
+    if (unit->Player != ThisPlayer) {
+	//FIXME: vladi: should handle teams and shared vision
+	// Invisible by spell
+	if (unit->Invisible) {
+	    return 0;
+	}
+	// Visible submarine
+	if (!(unit->Visible & (1 << ThisPlayer->Player))) {
+	    return 0;
+	}
+    }
+
+    //
+    //	Check if visible on screen.
+    //		FIXME: This could be better checked, tells to much!
+    //		FIXME: This is needed to show moving units.
+    //		FIXME: flyers disappears to fast.
+    //
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+    //
+    //	Check explored or if visible (building) under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for (; h-- > 0;) {
+	for (w = w0; w-- > 0;) {
+	    if (IsMapFieldVisible(ThisPlayer, x + w, y + h) ||
+		    (unit->Type->Building && unit->SeenFrame != UnitNotSeen
+			&& IsMapFieldExplored(ThisPlayer, x + w, y + h))) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
 }
 
 /**
@@ -1211,21 +1206,63 @@ global int UnitVisibleInViewport(const Viewport* vp, const Unit* unit)
     int x;
     int y;
     int w;
+    int w0;
     int h;
+
+    DebugCheck(!unit->Type);	// FIXME: Can this happen, if yes it is a bug
+
+    if (!ThisPlayer) {
+	//FIXME: ARI: Added here for early game setup state by
+	//	MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
+	//	so don't show anything until first real map-draw.
+	return 0;
+    }
+
+    // FIXME: Need to be able to see enemy submarines seen by my shared vision
+    //		partners
+    if (ThisPlayer != unit->Player &&
+	    !(unit->Player->SharedVision & (1 << ThisPlayer->Player) &&
+		ThisPlayer->SharedVision & (1 << unit->Player->Player))) {
+	// Invisible by spell
+	if (unit->Invisible) {
+	    return 0;
+	}
+	// Visible submarine
+	if (!(unit->Visible & (1 << ThisPlayer->Player)) && !unit->Type->Building) {
+	    return 0;
+	}
+    }
 
     //
     //	Check if visible on screen.
+    //		FIXME: This could be better checked, tells to much!
+    //		FIXME: This is needed to show moving units.
+    //		FIXME: flyers disappears to fast.
     //
     x = unit->X;
     y = unit->Y;
-    w = unit->Type->TileWidth;
+    w = w0 = unit->Type->TileWidth;
     h = unit->Type->TileHeight;
     if ((x + w) < vp->MapX || x > (vp->MapX + vp->MapWidth) ||
 	    (y + h) < vp->MapY || y > (vp->MapY + vp->MapHeight)) {
 	return 0;
     }
 
-    return UnitDrawableOnMap(unit);
+    //
+    //	Check explored or if visible (building) under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for (; h-- > 0;) {
+	for (w = w0; w-- > 0;) {
+	    if (IsMapFieldVisible(ThisPlayer, x + w, y + h) || ReplayRevealMap ||
+		    (unit->Type->VisibleUnderFog && unit->SeenFrame != UnitNotSeen &&
+			IsMapFieldExplored(ThisPlayer, x + w, y + h))) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
 }
 
 /**
@@ -2828,19 +2865,20 @@ global void LetUnitDie(Unit* unit)
 		!unit->Type->Animations->Die);
 	    UnitShowAnimation(unit, unit->Type->Animations->Die);
 	    DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
-	    CorpseCacheInsert(unit);	//Insert into corpse list
+	    unit->Visible = 0xffff;
+	    DeadBuildingCacheInsert(unit);	//Insert into corpse list
 	    // FIXME: (mr-russ) Hack to make sure we see our own building destroyed
 	    MapMarkUnitSight(unit);
-	    UnitCountSeen(unit);
+	    UnitMarkSeen(unit);
 	    MapUnmarkUnitSight(unit);
-	    UnitCountSeen(unit);
+	    UnitMarkSeen(unit);
 	    return;
 	}
 
 	// no corpse available
 	// FIXME: (mr-russ) Hack to make sure we see our own building destroyed
 	MapMarkUnitSight(unit);
-	UnitCountSeen(unit);
+	UnitMarkSeen(unit);
 	MapUnmarkUnitSight(unit);
 	ReleaseUnit(unit);
 	return;
@@ -3017,7 +3055,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
 
-    if (UnitVisibleOnMap(target) && DamageMissile) {
+    if ((UnitVisibleOnMap(target) || ReplayRevealMap) && DamageMissile) {
 	MakeLocalMissile(MissileTypeByIdent(DamageMissile),
 		target->X * TileSizeX + target->Type->TileWidth * TileSizeX / 2,
 		target->Y * TileSizeY + target->Type->TileHeight * TileSizeY / 2,
@@ -3480,13 +3518,14 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     char* ref;
     Unit* uins;
     int i;
-    ConstructionFrame* cframe;
-    int frame;
 
     CLprintf(file, "\n(unit %d ", UnitNumber(unit));
 
     // 'type and 'player must be first, needed to create the unit slot
     CLprintf(file, "'type '%s ", unit->Type->Ident);
+    if (unit->SeenType) {
+	CLprintf(file, "'seen-type '%s ", unit->SeenType->Ident);
+    }
 
     CLprintf(file, "'player %d\n  ", unit->Player->Player);
 
@@ -3516,10 +3555,17 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     CLprintf(file, "'stats %d\n  ", unit->Player->Player);
 #endif
     CLprintf(file, "'pixel '(%d %d) ", unit->IX, unit->IY);
+    CLprintf(file, "'seen-pixel '(%d %d) ", unit->SeenIX, unit->SeenIY);
     CLprintf(file, "'%sframe %d ",
 	unit->Frame < 0 ? "flipped-" : "",
 	unit->Frame < 0 ? -unit->Frame : unit->Frame);
-
+    if (unit->SeenFrame != UnitNotSeen) {
+	CLprintf(file, "'%sseen %d ",
+	    unit->SeenFrame < 0 ? "flipped-" : "",
+	    unit->SeenFrame < 0 ? -unit->SeenFrame : unit->SeenFrame);
+    } else {
+	CLprintf(file, "'not-seen ");
+    }
     CLprintf(file, "'direction %d\n  ", unit->Direction);
     CLprintf(file, "'attacked %lu\n ", unit->Attacked);
     CLprintf(file, " 'current-sight-range %d", unit->CurrentSightRange);
@@ -3528,6 +3574,9 @@ global void SaveUnit(const Unit* unit, CLFile* file)
     }
     if (unit->Destroyed) {
 	CLprintf(file, " 'destroyed");
+    }
+    if (unit->SeenDestroyed) {
+	CLprintf(file, " 'seen-destroyed");
     }
     if (unit->Removed) {
 	CLprintf(file, " 'removed");
@@ -3548,51 +3597,21 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	    unit->Container->Type->TileWidth,
 	    unit->Container->Type->TileHeight);
     }
+    CLprintf(file, " 'visible \"");
+    for (i = 0; i < PlayerMax; ++i) {
+	CLprintf(file, "%c", (unit->Visible & (1 << i)) ? 'X' : '_');
+    }
+    CLprintf(file, "\"\n ");
     if (unit->Constructed) {
 	CLprintf(file, " 'constructed");
     }
+    if (unit->SeenConstructed) {
+	CLprintf(file, " 'seen-constructed");
+    }
+    CLprintf(file, " 'seen-state %d ", unit->SeenState);
     if (unit->Active) {
 	CLprintf(file, " 'active");
     }
-
-    //
-    //	Now save Seen stuff.
-    //
-    CLprintf(file, "\n  'vis-count #(%d", unit->VisCount[0]);
-    for (i = 1; i < PlayerMax; ++i) {
-	CLprintf(file, " %d", unit->VisCount[i]);
-    }
-    CLprintf(file, ")\n  ");
-    if (unit->VisCount[ThisPlayer->Player]==0 && unit->Type->VisibleUnderFog) {
-	CLprintf(file, "'seen-pixel '(%d %d) ", unit->Seen.IX, unit->Seen.IY);
-	if (unit->Seen.Type) {
-	    CLprintf(file, "'seen-type '%s ", unit->Seen.Type->Ident);
-	}
-	if (unit->Seen.Frame != UnitNotSeen) {
-	    CLprintf(file, "'%sseen %d ",
-		unit->Seen.Frame < 0 ? "flipped-" : "",
-		unit->Seen.Frame < 0 ? -unit->Seen.Frame : unit->Seen.Frame);
-	} else {
-	    CLprintf(file, "'not-seen ");
-	}
-	if (unit->Seen.Constructed) {
-	    CLprintf(file, " 'seen-constructed");
-	}
-	if (unit->Seen.Destroyed) {
-	    CLprintf(file, " 'seen-destroyed");
-	}
-	CLprintf(file, " 'seen-state %d ", unit->Seen.State);
-	if (unit->Orders->Action == UnitActionBuilded) {
-	    cframe = unit->Type->Construction->Frames;
-	    frame = 0;
-	    while (cframe != unit->Seen.CFrame) {
-		cframe = cframe->Next;
-		++frame;
-	    }
-	    CLprintf(file," 'seen-construction-frame %d");
-	}
-    }
-
     CLprintf(file, " 'mana %d", unit->Mana);
     CLprintf(file, " 'hp %d", unit->HP);
     CLprintf(file, " 'xp %d", unit->XP);
@@ -3667,6 +3686,9 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	    break;
 	case UnitActionBuilded:
 	    {
+		ConstructionFrame* cframe;
+		int frame;
+
 		cframe = unit->Type->Construction->Frames;
 		frame = 0;
 		while (cframe != unit->Data.Builded.Frame) {
