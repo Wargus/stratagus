@@ -62,11 +62,11 @@ global int SoundOff;			/// True quiet, sound turned off
 /**
 **	Various sounds used in game.
 **
-**	FIXME: @todo support more races. Must make more configurable
+**	FIXME: @todo support more races. Must remove static config.
 */
 global GameSound GameSounds
 #ifndef laterUSE_CCL
-// FIXME: Must make this configurable through CCL.
+// FIXME: Removing this crashes?
 ={
     { "placement error" , NULL },
     { "placement success" , NULL },
@@ -104,7 +104,6 @@ local void InsertSoundRequest(Unit* unit,unsigned id,unsigned char power,
 			      unsigned char selection,unsigned char volume) 
 {
 #ifdef USE_SDLA
-// FIXME: Don't know if this is the right position
     SDL_LockAudio();
 #endif
     //FIXME: valid only in a shared memory context...
@@ -138,15 +137,22 @@ local void InsertSoundRequest(Unit* unit,unsigned id,unsigned char power,
 	}
     }
 #ifdef USE_SDLA
-// FIXME: Don't know if this is the right position
     SDL_UnlockAudio();
 #endif
 }
 
 /**
 **	Maps a UnitVoiceGroup to a SoundId. 
+**
+**	@param unit	Sound initiator
+**	@param voice	Type of sound wanted
+**
+**	@return		Sound identifier
+**
+**	@todo FIXME: The work completed sounds only supports two races.
 */
-local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
+local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
+{
     switch (voice) {
     case VoiceAcknowledging:
 	return unit->Type->Sound.Acknowledgement.Sound;
@@ -164,9 +170,9 @@ local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
 	return GameSounds.TreeChopping.Sound;
     case VoiceWorkCompleted:
 	// FIXME: make this more configurable
-	if (unit->Type==UnitTypeHumanWorker) 
+	if (unit->Type==UnitTypeHumanWorker) {
 	    return GameSounds.PeasantWorkComplete.Sound;
-	else if( ThisPlayer->Race==PlayerRaceHuman ) {
+	} else if( ThisPlayer->Race==PlayerRaceHuman ) {
 	    return GameSounds.HumanWorkComplete.Sound;
 	} else {
 	    return GameSounds.OrcWorkComplete.Sound;
@@ -181,13 +187,16 @@ local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
     return NULL;
 }
 
-
 /**
-**	FIXME: docu
+**	Ask to the sound server to play a sound attached to an unit. The
+**	sound server may discard the sound if needed (e.g., when the same
+**	unit is already speaking).
+**
+**	@param unit	Sound initiator, unit speaking
+**	@param voice	Type of sound wanted (Ready,Die,Yes,...)
 */
-global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
+global void PlayUnitSound(const Unit* unit,UnitVoiceGroup unit_voice_group)
 {
-    DebugLevel3("FIXME: fabrice please look\n");
     InsertSoundRequest(unit,
 		       unit->Slot,
 		       ViewPointDistanceToUnit(unit),
@@ -201,7 +210,8 @@ global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 /**
 **	FIXME: docu
 */
-global void PlayMissileSound(const Missile* missile,SoundId sound) {
+global void PlayMissileSound(const Missile* missile,SoundId sound)
+{
     DebugLevel3("Playing %p\n",sound);
     InsertSoundRequest(NULL,
 		       0,
@@ -215,7 +225,8 @@ global void PlayMissileSound(const Missile* missile,SoundId sound) {
 /**
 **	FIXME: docu
 */
-global void PlayGameSound(SoundId sound,unsigned char volume) {
+global void PlayGameSound(SoundId sound,unsigned char volume)
+{
     DebugLevel3("Playing %p at volume %u\n",sound,volume);
     InsertSoundRequest(NULL,
 		       0,
@@ -229,7 +240,8 @@ global void PlayGameSound(SoundId sound,unsigned char volume) {
 /**
 **	FIXME: docu
 */
-global void SetGlobalVolume(int volume) {
+global void SetGlobalVolume(int volume)
+{
     //FIXME: we use here the fact that we are in a shared memory context. This
     // should send a message to the sound server
     // silently discard out of range values
