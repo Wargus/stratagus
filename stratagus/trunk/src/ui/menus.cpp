@@ -1746,12 +1746,13 @@ local void GlobalOptionsResolutionGem(Menuitem *mi)
 		PreMenuSetup();
 		GameCursor = TheUI.Point.Cursor;
 		menu = FindMenu("menu-program-start");
-		for (i=0; i<menu->NumItems; ++i) {
+		for (i = 0; i < menu->NumItems; ++i) {
 			if (menu->Items[i].initfunc) {
 				(*menu->Items[i].initfunc)(menu->Items + i);
 			}
 		}
 		DrawMenu(menu);
+		CurrentMenu = FindMenu("menu-global-options");
 	}
 	GlobalOptionsInit(NULL);
 }
