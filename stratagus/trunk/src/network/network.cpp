@@ -145,6 +145,12 @@ local NetworkCommandQueue NetworkIn[256][PlayerMax]; /// Per-player network pack
 local struct dl_head CommandsIn[1];	/// Network command input queue
 local struct dl_head CommandsOut[1];	/// Network command output queue
 
+#ifdef DEBUG
+local int NetworkReceivedEarly;		/// Packets received too early
+local int NetworkReceivedLate;		/// Packets received too late
+local int NetworkReceivedDups;		/// Packets received as duplicates
+#endif
+
 /**@name api */
 //@{
 
@@ -161,7 +167,7 @@ global void NetworkBroadcast(void *buf, int len)
 {
     int i;
 #if 0
-#define DELAY 30
+#define DELAY 5
     static char delay_buf[DELAY][1024];
     static int delay_len[DELAY];
     static int index;
@@ -720,7 +726,13 @@ global void NetworkEvent(void)
     //
     //	Read the packet.
     //
-    NetRecvUDP(NetworkFildes, &packet, sizeof(packet));
+    if( !NetRecvUDP(NetworkFildes, &packet, sizeof(packet)) ) {
+	//
+	//	Server gone?
+	//
+	DebugLevel0("Server gone.\n");
+	Exit(0);
+    }
 
     if (packet.Commands[0].Type == MessageInitReply) {
 	DebugLevel0Fn("late init reply\n");
@@ -934,6 +946,10 @@ local void NetworkResendCommands(void)
     packet.Commands[0].Type = MessageResend;
     packet.Commands[0].Frame =
 	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates;
+
+    DebugLevel0Fn("In frame %d for frame %d(%x)\n",FrameCounter,
+	    (FrameCounter / NetworkUpdates) * NetworkUpdates + NetworkUpdates,
+	    packet.Commands[0].Frame);
 
     ncq = (NetworkCommandQueue *)(CommandsOut->last);
 
