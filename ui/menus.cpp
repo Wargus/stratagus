@@ -3021,11 +3021,11 @@ local void JoinNetGameMenu(void)
     Menu *menu;
 
 #ifdef USE_SDL_SURFACE
-    VideoUnlockScreen();
+    MenusSetBackground();
     Invalidate();
 #else
     VideoLockScreen();
-    MenusSetBackground();
+
     VideoUnlockScreen();
     Invalidate();
 #endif
