@@ -1005,7 +1005,98 @@ local SCM CclDefineAiWcNames(SCM list)
 */
 local SCM CclDefineAiPlayer(SCM list __attribute__((unused)))
 {
+    SCM value;
+    SCM sublist;
+    int i;
+    char* str;
+    PlayerAi* ai;
+
     DebugLevel0Fn("FIXME: Ai Player loading not supported\n");
+
+    i=gh_scm2int(gh_car(list));
+    list=gh_cdr(list);
+
+    DebugCheck( i<0 || i>PlayerMax );
+    DebugLevel0Fn("%p %d\n" _C_ Players[i].Ai _C_ Players[i].AiEnabled );
+    // FIXME: loose this:
+    // DebugCheck( Players[i].Ai || !Players[i].AiEnabled );
+
+    ai=Players[i].Ai=calloc(1,sizeof(PlayerAi));
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    while( !gh_null_p(list) ) {
+
+	value=gh_car(list);
+	list=gh_cdr(list);
+
+	if( gh_eq_p(value,gh_symbol2scm("ai-type")) ) {
+	    AiType* ait;
+
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    for( ait=AiTypes; ait; ait=ait->Next ) {
+		if( !strcmp(ait->Name,str) ) {
+		    break;
+		}
+	    }
+	    free(str);
+	    if( !ait ) {
+	       errl("ai-type not found",gh_car(list));
+	    }
+	    ai->AiType=ait;
+	    ai->Script=ait->Script;
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("script")) ) {
+	    sublist=gh_car(list);
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("aitypes")) ) {
+		i=gh_scm2int(gh_car(sublist));
+		while( i-- ) {
+		    ai->Script=gh_cdr(ai->Script);
+		}
+	    } else {
+		DebugLevel0Fn("FIXME: not written\n");
+	    }
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("script-debug")) ) {
+	    ai->ScriptDebug=gh_scm2bool(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("sleep-cycles")) ) {
+	    i=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("force")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("reserve")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("used")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("needed")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("collect")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("need-mask")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("need-food")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("unit-type")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("upgrade")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("building")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("repair-building")) ) {
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("repair-workers")) ) {
+	    list=gh_cdr(list);
+	} else {
+	   // FIXME: this leaves a half initialized ai player
+	   errl("Unsupported tag",value);
+	}
+    }
 
     return SCM_UNSPECIFIED;
 }

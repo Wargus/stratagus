@@ -27,7 +27,82 @@
 
 //@{
 
-#define noTIMEIT			/// Enable cpu use debugging
+#define noTIMEIT			/// Enable CPU use debugging
+
+//----------------------------------------------------------------------------
+//	Documentation
+//----------------------------------------------------------------------------
+
+/**
+**      @page AiModule Module - AI
+**
+**      @section aibasics What is it?
+**
+**	FreeCraft uses a very simple scripted AI. There are no optimizations
+**	yet. The complete AI was written on one weekend.
+**	Until no AI specialist joins, I keep this AI.
+**
+**	@subsection aiscripted What is scripted AI?
+**
+**	The AI script tells the engine build 4 workers, than build 3 footman,
+**	than attack the player, than sleep 100 frames.
+**
+**      @section API The AI API
+**
+**	@subsection aipcall Periodic calls
+**
+**	This functions are called regular for all AI players.
+**
+**	::AiEachCycle(::Player)
+**
+**		Called each game cycle, to handle quick checks, which needs
+**		less CPU.
+**
+**	::AiEachSecond(::Player)
+**
+**		Called each second, to handle more CPU intensive things.
+**
+**	@subsection aiecall Event call-backs
+**
+**		This functions are called, when some special events happens.
+**
+**	::AiHelpMe()
+**
+**		Called if an unit owned by the AI is attacked.
+**
+**	::AiUnitKilled()
+**
+**		Called if an unit owned by the AI is killed.
+**
+**	::AiNeedMoreFarms()
+**
+**		Called if an trained unit is ready, but not enough food is
+**		available.
+**
+**	::AiWorkComplete()
+**
+**		Called if an unit has completed its work.
+**
+**	::AiCanNotBuild()
+**
+**		Called if the AI unit can't build the requested unit-type.
+**
+**	::AiCanNotReach()
+**
+**		Called if the AI unit can't reach the building place.
+**
+**	::AiTrainingComplete()
+**
+**		Called if AI unit has completed training a new unit.
+**
+**	::AiUpgradeToComplete()
+**
+**		Called if AI unit has completed upgrade to new unit-type.
+**
+**	::AiResearchComplete()
+**
+**		Called if AI unit has completed research of an upgrade or spell.
+*/
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -83,7 +158,7 @@ local void AiExecuteScript(void)
 	    gh_display(gh_car(pai->Script));
 	    gh_newline();
 	}
-	value=leval(gh_car(pai->Script),NIL);
+	value=gh_eval(gh_car(pai->Script),NIL);
 	if( !gh_eq_p(value,SCM_BOOL_T) ) {
 	    pai->Script=gh_cdr(pai->Script);
 	}
