@@ -10,7 +10,7 @@
 //
 /**@name trigger.c - The trigger handling. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -181,86 +181,6 @@ static CompareFunction GetCompareFunction(const char* op)
 		return &CompareNEq;
 	}
 	return NULL;
-}
-
-/**
-**  Player has the quantity of unit-type.
-*/
-static int CclIfUnit(lua_State* l)
-{
-	int plynr;
-	int q;
-	int pn;
-	const UnitType* unittype;
-	const char* op;
-	CompareFunction compare;
-
-	if (lua_gettop(l) != 4) {
-		LuaError(l, "incorrect argument");
-	}
-
-	lua_pushvalue(l, 1);
-	plynr = TriggerGetPlayer(l);
-	lua_pop(l, 1);
-	op = LuaToString(l, 2);
-	q = LuaToNumber(l, 3);
-	unittype = TriggerGetUnitType(l);
-
-	compare = GetCompareFunction(op);
-	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-unit: %s" _C_ op);
-	}
-
-	if (plynr == -1) {
-		plynr = 0;
-		pn = PlayerMax;
-	} else {
-		pn = plynr + 1;
-	}
-
-	if (unittype == ANY_UNIT) {
-		for (; plynr < pn; ++plynr) {
-			int j;
-
-			for (j = 0; j < NumUnitTypes; ++j) {
-				if (compare(Players[plynr].UnitTypesCount[j], q)) {
-					lua_pushboolean(l, 1);
-					return 1;
-				}
-			}
-		}
-	} else if (unittype == ALL_UNITS) {
-		for (; plynr < pn; ++plynr) {
-			if (compare(Players[plynr].TotalNumUnits, q)) {
-				lua_pushboolean(l, 1);
-				return 1;
-			}
-		}
-	} else if (unittype == ALL_FOODUNITS) {
-		for (; plynr < pn; ++plynr) {
-			if (compare(Players[plynr].TotalNumUnits - Players[plynr].NumBuildings, q)) {
-				lua_pushboolean(l, 1);
-				return 1;
-			}
-		}
-	} else if (unittype == ALL_BUILDINGS) {
-		for (; plynr < pn; ++plynr) {
-			if (compare(Players[plynr].NumBuildings, q)) {
-				lua_pushboolean(l, 1);
-				return 1;
-			}
-		}
-	} else {
-		for (; plynr < pn; ++plynr) {
-			if (compare(Players[plynr].UnitTypesCount[unittype->Slot], q)) {
-				lua_pushboolean(l, 1);
-				return 1;
-			}
-		}
-	}
-
-	lua_pushboolean(l, 0);
-	return 1;
 }
 
 /**
@@ -917,7 +837,6 @@ void TriggerCclRegister(void)
 	lua_register(Lua, "SetTriggers", CclSetTriggers);
 	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
 	// Conditions
-	lua_register(Lua, "IfUnit", CclIfUnit);
 	lua_register(Lua, "IfUnitAt", CclIfUnitAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
 	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
