@@ -43,22 +43,26 @@
 ----------------------------------------------------------------------------*/
 
 #define MaxSampleVolume 255		/// Maximum sample volume
-#define NO_SOUND 0
+#define NO_SOUND 0			/// No valid sound ID
 
 /**
-**	Global game sounds, not associated to any unit type
+**	Global game sounds, not associated to any unit-type
 */
 typedef struct _game_sound_ {
     SoundConfig PlacementError;		/// used by ui
     SoundConfig PlacementSuccess;	/// used by ui
     SoundConfig Click;			/// used by ui
-    SoundConfig TreeChopping;		/// currently unused
+
+    SoundConfig TreeChopping;		/// FIXME: currently unused
     SoundConfig Docking;		/// ship reaches coast
     SoundConfig BuildingConstruction;	/// building under construction
+
 //FIXME: (Fabrice) I don't think it's the correct place to put this
     SoundConfig HumanWorkComplete;	/// building ready
     SoundConfig PeasantWorkComplete;	/// building ready
     SoundConfig OrcWorkComplete;	/// building ready
+
+    SoundConfig Repair;			/// repair sound
 
     SoundConfig HumanRescue;		/// rescue units
     SoundConfig OrcRescue;		/// rescue units
@@ -68,9 +72,10 @@ typedef struct _game_sound_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-/** client side sound control. Can be used to turn on/off sound without really
-    turning it off on the server side.
- */
+    /**
+    **	Client side sound control. Can be used to turn on/off sound without
+    **	really turning it off on the server side.
+    */
 extern int SoundOff;
 
 /*----------------------------------------------------------------------------
