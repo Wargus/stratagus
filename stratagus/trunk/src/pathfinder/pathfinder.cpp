@@ -402,7 +402,7 @@ global int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __
 	//  Find a path to the place.
 	//
 	if ((depth=CheckPlaceInMatrix(x, y, w, h, range, LocalMatrix)) < 0) {
-		DebugLevel1("Can't move to destination, not route to goal\n");
+		DebugPrint("Can't move to destination, not route to goal\n");
 		return 0;
 	}
 

@@ -155,7 +155,7 @@ local int StartGathering(Unit* unit)
 		// This shouldn't happend?
 #if 0
 		if (!ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
-			DebugLevel0Fn("Wood gone, just like that?\n");
+			DebugPrint("Wood gone, just like that?\n");
 			return 0;
 		}
 #endif
