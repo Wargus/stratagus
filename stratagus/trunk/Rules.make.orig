@@ -14,8 +14,7 @@
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
-##	by the Free Software Foundation; either version 2 of the License,
-##	or (at your option) any later version.
+##	by the Free Software Foundation; only version 2 of the License.
 ##
 ##	FreeCraft is distributed in the hope that it will be useful,
 ##	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -106,6 +105,15 @@ VIDEOLIB	= -lXext -lX11 -ldl
 
 DSOUND		= -DWITH_SOUND
 
+# Uncomment the next to enable Ogg vorbis support.
+OGGLIB		= -lvorbisfile -lvorbis -logg
+
+# Uncomment the next to enable Flac support.
+FLACLIB		= -lFLAC
+
+# Uncomment the next to enable mp3 support (using libmad).
+MP3LIB		= -lmad
+
 #------------------------------------------------------------------------------
 #	File I/O part
 #------------------------------------------------------------------------------
@@ -162,7 +170,7 @@ VERSION=	'-DVERSION="1.17pre1-build17"'
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
 
 # Libraries needed to build freecraft
-CLONELIBS=$(XLDFLAGS) -lpng -lz -lm \
+CLONELIBS=$(XLDFLAGS) -lpng -lz -lm $(FLACLIB) $(OGGLIB) $(MP3LIB) \
 	$(THREADLIB) $(CCLLIB) $(VIDEOLIB) $(ZLIBS) #-lefence
 
 DISTLIST=$(TOPDIR)/distlist
@@ -204,18 +212,19 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## USE_LIBMODPLUG:	Use modplug audio player support.
 ## USE_SDLCD		Use the SDL cd player support.
 ## USE_LIBCDA		Use the LIBCDA cd player support.
-## These aren't working yet:
-## NEW_MAPDRAW:		Stephans new map draw code (broken in this release)
-## USE_FFMPEG		Use ffmpeg video player support.
 ## USE_FLAC:		Use flac audio player support.
 ## USE_OGG:		Use ogg audio player support.
 ## USE_MAD:		Use mad mp3 audio player support.
+## These aren't working yet:
+## NEW_MAPDRAW:		Stephans new map draw code (broken in this release)
+## USE_FFMPEG		Use ffmpeg video player support.
 ## NEW_FOW:		New fog of war code, should work correct
 ## NEW_SHIPS:		New correct ship movement.
 ## HIERARCHIC_PATHFINDER:	Use hierarchic pathfinder
 ## USE_LUA:		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
+	# -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
