@@ -35,7 +35,6 @@
 #include "commands.h"
 #include "minimap.h"
 #include "font.h"
-#include "image.h"
 #include "cursor.h"
 #include "interface.h"
 #include "menus.h"

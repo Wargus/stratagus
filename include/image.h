@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name image.h	-	The standard images headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
@@ -24,18 +23,18 @@
 --	Images
 ----------------------------------------------------------------------------*/
 
-/*
+/**
 **	Constant graphics
-**	FIXME: This should also become more flexible.
+**
+**	@todo	FIXME: This should also become more flexible.
 */
-#define ImageNone		(-1)
-
 enum __images__ {
-    ImagePanel1,
-    ImagePanel2,
-    ImagePanel3,
-    ImagePanel4,
-    ImagePanel5,
+    ImagePanel1,			/// game menue panel
+    ImagePanel2,			/// menue panel (unused)
+    ImagePanel3,			/// menue panel (unused)
+    ImagePanel4,			/// victory menue panel
+    ImagePanel5,			/// scenario menue panel
+    ImageNone=(-1)			/// use no image or image not found
 };
 
 /*----------------------------------------------------------------------------
@@ -46,12 +45,14 @@ enum __images__ {
 --	Functions
 ----------------------------------------------------------------------------*/
 
+    /// Draw image sub area at screen unclipped.
 extern void DrawImage(int image,int row,int frame,int x,int y);
+    /// Load images for a race.
 extern void LoadImages(unsigned int race);
 
-    /// Image width
+    /// Return image width
 extern int ImageWidth(int image);
-    /// Image height
+    /// Return image height
 extern int ImageHeight(int image);
 
 //@}

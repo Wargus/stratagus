@@ -26,7 +26,6 @@
 #include "video.h"
 #include "tileset.h"
 #include "map.h"
-#include "image.h"
 #include "font.h"
 #include "sound_id.h"
 #include "unitsound.h"
