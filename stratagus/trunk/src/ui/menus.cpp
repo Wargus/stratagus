@@ -5234,6 +5234,7 @@ local void MenuHandleButtonUp(unsigned b)
 		    }
 		    break;
 		case MI_TYPE_LISTBOX:
+		case MI_TYPE_INPUT:
 		    if (mi->flags&MenuButtonClicked) {
 			RedrawFlag = 1;
 			mi->flags &= ~MenuButtonClicked;
