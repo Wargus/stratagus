@@ -572,15 +572,23 @@ global void GameMainLoop(void)
 			ShowOrdersCount--;
 		    }
 		    break;
+	    }
+	    
+	    //
+	    // Work todo each realtime second.
+	    //		Check cd-rom (every 2nd second)
+	    //
+	    switch( GameCycle% ((CYCLES_PER_SECOND*VideoSyncSpeed/100)+1) ) {
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
-		case 8:				// Check cd-rom
-#ifdef USE_SDLCD
-		    if ( !GameCycle%3 )
-#endif
+		case 1:				// Check cd-rom
+		    if ( !(GameCycle%3) ) {	// every 2nd second
 			CDRomCheck();
+			fprintf(stderr,"TEST\n");
+		    }
 		    break;
 #endif
 	    }
+
 	}
 
 	//
