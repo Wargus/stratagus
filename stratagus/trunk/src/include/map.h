@@ -49,16 +49,52 @@
 **
 **	MapField::Flags
 **
-**		FIXME: continue docu.
+**		Contains special information of that tile. What units are
+**		on this field, what units could be placed on this field.
+**
+**		This is the list of all flags currently used:
+**
+**		::MapFieldVisible field is visible.
+**		::MapFieldExplored field is explored.
+**		::MapFieldHuman	human player is the owner of the field used for
+**			walls.
+**		::MapFieldLandAllowed land units are allowed.
+**		::MapFieldCoastAllowed coast units (transporter) and coast
+**			buildings (shipyard) are allowed.
+**		::MapFieldWaterAllowed water units allowed.
+**		::MapFieldNoBuilding no buildings allowed.
+**		::MapFieldUnpassable field is movement blocked.
+**		::MapFieldWall field contains wall.
+**		::MapFieldRocks	field contains rocks.
+**		::MapFieldForest field contains forest.
+**		::MapFieldLandUnit land unit on field.
+**		::MapFieldAirUnit air unit on field.
+**		::MapFieldSeaUnit water unit on field.
+**		::MapFieldBuilding building on field.
+**
+**		Note: We want to add support for more unit-types like under
+**		ground units.
 **
 **	MapField::Value
 **
+**		Extra value for each tile. This currently only used for
+**		walls, contains the remaining hit points of the wall and
+**		for forest, contains the frames until they grow.
+**
 **	MapField::VisibleLastFrame
 **
-**	MapField::Here
+**		Currently contains the two flags ::MapFieldCompletelyVisible,
+**		field completely visible and ::MapFieldPartiallyVisible field
+**		partially visible. Used for optimized map redraw.
+**		This can be coded into the 2 bits in MapField::Flags:
+**		0 Unexplored, 1 Explored, 2 PartialVisible, 3 CompleteVisible.
 **
-**	MapField::Here
+**	MapField::Here MapField::Here::Units
 **
+**		Contains a list of all units currently on this field.
+**		Note: currently units are only inserted at the insert point.
+**		This means units of the size of 2x2 fields are inserted at the
+**		top and right most map coordinate.
 */
 
 /**
@@ -72,7 +108,56 @@
 **	A world is a rectangle of any size. In the future it is planned to
 **	support multiple worlds.
 **
-**	FIXME: continue docu.
+**	The world-map structure members:
+**
+**	WorldMap::Width WorldMap::Height
+**
+**		The map size in tiles.
+**
+**	WorldMap::Fields
+**
+**		An array WorldMap::Width*WorldMap::Height of all fields
+**		belonging to this map.
+**
+**	WorldMap::NoFogOfWar
+**
+**		Flag if true, the fog of war is disabled.
+**
+**	WorldMap::TerrainName
+**
+**		Terrain as name. Used for unit-type look changes depending on
+**		the current terrain type. In the future we want to support
+**		multiple terrains pro map.
+**
+**	WorldMap::Terrain
+**
+**		The terrain as number, this should be removed.
+**
+**	WorldMap::Tileset
+**
+**		Tileset data for the map. See ::Tileset. This contains all
+**		information about the tile.
+**
+**	WorldMap::TileCount
+**
+**		How many graphic tiles are available.
+**
+**	WorldMap::Tiles
+**
+**		Pointer into the tile graphic data. Used to find fast the start
+**		of different tiles.
+**
+**	WorldMap::TileData
+**
+**		Tiles graphic for the map, loaded from WorldMap::Tileset::File.
+**
+**	WorldMap::Description[32]
+**
+**		Short description of the map.
+**
+**	WorldMap::Info
+**
+**		Descriptive information of the map.
 */
 
 /*----------------------------------------------------------------------------
@@ -114,9 +199,7 @@ typedef struct _unit_array_ {
 
 #endif
 
-/**
-**	Describes a field of the map.
-*/
+    /// Describes a field of the map
 typedef struct _map_field_ {
     unsigned short	Tile;		/// graphic tile number
     unsigned short	SeenTile;	/// last seen tile (FOW)
@@ -145,6 +228,7 @@ typedef struct _map_field_ {
 #endif
 } MapField;
 
+// FIXME: should be removed
 #define MapFieldCompletelyVisible   0x0001  /// Field completely visible
 #define MapFieldPartiallyVisible    0x0002  /// Field partially visible
 
@@ -172,7 +256,6 @@ typedef struct _map_field_ {
 #define MapFieldAirUnit		0x2000	/// Air unit on field
 #define MapFieldSeaUnit		0x4000	/// Water unit on field
 #define MapFieldBuilding	0x8000	/// Building on field
-
 
 /*----------------------------------------------------------------------------
 --	Map info structure
@@ -202,9 +285,7 @@ typedef struct _map_info_ {
 --	Map itself
 ----------------------------------------------------------------------------*/
 
-/**
-**	Describes the wold map
-*/
+    /// Describes the wold map
 typedef struct _world_map_ {
     unsigned		Width;		/// the map width
     unsigned		Height;		/// the map height
@@ -374,7 +455,7 @@ extern void LoadMap(const char* file,WorldMap* map);
     /// Save the map
 extern void SaveMap(FILE* file);
 
-    /// Release info for a map.
+    /// Release info for a map
 extern void FreeMapInfo(MapInfo* info);
 
     /// Mark a tile as seen by the player
@@ -387,32 +468,32 @@ extern void MapCenter(int x,int y);
     /// Set the current map view to x,y (upper,left corner)
 extern void MapSetViewpoint(int x,int y);
 
-    /// FIXME: docu
+    /// Returns true, if water on the map tile field
 extern int WaterOnMap(int x,int y);
-    /// FIXME: docu
+    /// Returns true, if coast on the map tile field
 extern int CoastOnMap(int x,int y);
 
-    /// FIXME: docu
+    /// Returns true, if wall on the map tile field
 extern int WallOnMap(int x,int y);
-    /// FIXME: docu
+    /// Returns true, if human wall on the map tile field
 extern int HumanWallOnMap(int x,int y);
-    /// FIXME: docu
+    /// Returns true, if orc wall on the map tile field
 extern int OrcWallOnMap(int x,int y);
 
-    /// FIXME: docu
+    /// Returns true, if forest on the map tile field with bounds check
 extern int CheckedForestOnMap(int x,int y);
-    /// FIXME: docu
+    /// Returns true, if forest on the map tile field
 extern int ForestOnMap(int x,int y);
 
-    /// FIXME: docu
+    /// Returns true, if rock on the map tile field
 extern int RockOnMap(int x,int y);
 
-    /// FIXME: docu
+    /// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x,int y,int mask);
-    /// FIXME: docu
+    /// Returns true, if the unit-type(mask) can enter the field
 extern int CanMoveToMask(int x,int y,int mask);
 
-    /// FIXME: docu
+    /// Preprocess map, for internal use.
 extern void PreprocessMap(void);
 
     /// Set wall on field
@@ -421,6 +502,9 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 /*----------------------------------------------------------------------------
 --	Defines
 ----------------------------------------------------------------------------*/
+
+    /// Tile number of the tile drawn for unexplored space
+#define UNEXPLORED_TILE 0
 
     /// Can an unit with 'mask' can enter the field
 #define CanMoveToMask(x,y,mask) \
@@ -443,8 +527,6 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define IsMapFieldVisible(x,y) \
     (TheMap.Fields[(y)*TheMap.Width+(x)].Flags&MapFieldVisible)
 #endif
-
-#define UNEXPLORED_TILE 0
 
 //@}
 
