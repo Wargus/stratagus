@@ -120,6 +120,11 @@ local void RepairUnit(Unit* unit, Unit* goal)
 		// Subtract the resources
 		//
 		PlayerSubCosts(player, goal->Type->RepairCosts);
+
+		goal->HP += goal->Type->RepairHP;
+		if (goal->HP > goal->Stats->HitPoints) {
+			goal->HP = goal->Stats->HitPoints;
+		}
 	} else {
 		// hp is the current damage taken by the unit.
 		hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
