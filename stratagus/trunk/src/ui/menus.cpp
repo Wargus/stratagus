@@ -318,7 +318,7 @@ local Menuitem PrgStartMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, PrgStartInit, NULL,
 	{ drawfunc:{ NameLineDrawFunc } } },
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Single Player Game", 224, 27, MBUTTON_GM_FULL, SinglePlayerGameMenu, 's'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'} } },
@@ -460,7 +460,7 @@ local Menuitem EnterServerIPMenuItems[] = {
 */
 local Menuitem NetCreateJoinMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, StartMenusSetBackground, NULL,
+    { MI_TYPE_BUTTON, 208, 320, 0, LargeFont, NULL/*StartMenusSetBackground*/, NULL,
 	{ button:{ "~!Join Game", 224, 27, MBUTTON_GM_FULL, JoinNetGameMenu, 'j'} } },
     { MI_TYPE_BUTTON, 208, 320 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Create Game", 224, 27, MBUTTON_GM_FULL, CreateNetGameMenu, 'c'} } },
@@ -1123,6 +1123,7 @@ global void DrawMenu(int MenuId)
     Menu *menu;
     Menuitem *mi, *mip;
 
+    MustRedraw &= ~RedrawMenu;
     if (MenuId == -1) {
 	return;
     }
@@ -1308,7 +1309,6 @@ local void ScenSelectMenu(void)
     int i;
 
     ProcessMenu(MENU_SCEN_SELECT, 1);
-    // StartMenusSetBackground(NULL);
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     if (ScenSelectPath[0]) {
@@ -2694,7 +2694,8 @@ global void MenuHandleMouseMove(int x,int y)
 			}
 			break;
 		    default:
-			break;
+			continue;
+			// break;
 		}
 		switch (mi->mitype) {
 		    case MI_TYPE_GEM:
@@ -2711,7 +2712,6 @@ global void MenuHandleMouseMove(int x,int y)
 			    RedrawFlag = 1;
 			    mi->flags |= MenuButtonActive;
 			}
-			DebugLevel3Fn("On menu item %d\n", i);
 			MenuButtonUnderCursor = i;
 		    default:
 			break;
