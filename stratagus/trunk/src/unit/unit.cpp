@@ -330,6 +330,7 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 	//		on Oilpatch could be build.
 	//
 
+	// FIXME: should be done more general.
 	if( unit->HP ) {
 	    for( h=type->TileHeight; h--; ) {
 		for( w=type->TileWidth; w--; ) {
@@ -428,19 +429,26 @@ global void RemoveUnit(Unit* unit)
     //
     type=unit->Type;
     if( type->Building ) {
+	//
+	//	Unmark building on movement map.
+	//		buildings that could be entered have no HP!
+	//		on Oilpatch could be build.
+	//
 
-	IfDebug(
-	    // FIXME: Removing buildings without HP.
-	    if( !type->Stats[unit->Player->Player].HitPoints
-		    && !type->OilPatch ) {
-		DebugLevel0Fn("internal error\n");
+	// FIXME: should be done more general.
+	if( unit->Stats->HitPoints ) {
+	    for( h=type->TileHeight; h--; ) {
+		for( w=type->TileWidth; w--; ) {
+		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
+			    &=~MapFieldBuilding;
+		}
 	    }
-	);
-
-	for( h=type->TileHeight; h--; ) {
-	    for( w=type->TileWidth; w--; ) {
-		TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
-			&=~MapFieldBuilding;
+	} else if( !type->OilPatch ) {
+	    for( h=type->TileHeight; h--; ) {
+		for( w=type->TileWidth; w--; ) {
+		    TheMap.Fields[unit->X+w+(unit->Y+h)*TheMap.Width].Flags
+			    &=~MapFieldNoBuilding;
+		}
 	    }
 	}
     } else {
@@ -552,10 +560,12 @@ global void UnitLost(const Unit* unit)
 	}
     }
 
+    DebugLevel3Fn("Lost %s(%Zd)\n",unit->Type->Ident,UnitNumber(unit));
+
     //
     //	Destroy oil-platform, must re-make oil patch.
     //
-    if( type->GivesOil && unit->Value > 0 ) {
+    if( type->GivesOil && unit->Value>0 ) {
 	// NOTE: I wasn't sure the best UnitType/Player
 	// NOTE: This should really NOT be hardcoded?!
 	temp=MakeUnitAndPlace(unit->X,unit->Y
@@ -1059,7 +1069,7 @@ global void RescueUnits(void)
 **
 **	@param val	atan argument
 **
-**	@returns	atan(val)
+**	@return		atan(val)
 */
 local int myatan(int val)
 {
@@ -1084,7 +1094,7 @@ local int myatan(int val)
 **	@param delta_x	Delta X.
 **	@param delta_y	Delta Y.
 **
-**	@returns	Angle (0..255)
+**	@return		Angle (0..255)
 */
 global int DirectionToHeading(int delta_x,int delta_y)
 {
@@ -1259,7 +1269,7 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
     int bestd;
     int mask;
 
-    DebugLevel3Fn("%d\n",unit);
+    DebugLevel3Fn("%Zd\n",UnitNumber(unit));
 
     x=unit->X;
     y=unit->Y;
@@ -1605,7 +1615,7 @@ global int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y)
 **	@param x	X tile position to start.
 **	@param y	Y tile position to start.
 **
-**	@returns	Pointer to the nearest gold mine.
+**	@return		Pointer to the nearest gold mine.
 */
 global Unit* FindGoldMine(const Unit* source,int x,int y)
 {
@@ -1648,7 +1658,7 @@ global Unit* FindGoldMine(const Unit* source,int x,int y)
 **	@param x	X tile position to start.
 **	@param y	Y tile position to start.
 **
-**	@returns	Pointer to the nearest gold mine.
+**	@return		Pointer to the nearest gold mine.
 */
 global Unit* FindGoldDeposit(const Unit* source,int x,int y)
 {
@@ -1747,7 +1757,7 @@ global int FindWoodInSight(Unit* unit,int* px,int* py)
     int bestd;
     Unit* destu;
 
-    DebugLevel3Fn("%d %d,%d\n",unit,unit->X,unit->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(unit),unit->X,unit->Y);
 
     x=unit->X;
     y=unit->Y;
@@ -1873,7 +1883,7 @@ global Unit* FindOilPlatform(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",best-Units,best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -1920,7 +1930,7 @@ global Unit* FindOilDeposit(const Player* player,int x,int y)
 	}
     }
 
-    DebugLevel3Fn("%d %d,%d\n",best-Units,best->X,best->Y);
+    DebugLevel3Fn("%Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
     return best;
 }
 
@@ -2534,7 +2544,7 @@ global int IsAllied(const Player* player,const Unit* dest)
 #endif
 
 /**
-**	Can the source unit attack the destionation unit.
+**	Can the source unit attack the destination unit.
 **
 **	@param source	Unit type pointer of the attacker.
 **	@param dest	Unit type pointer of the target.
