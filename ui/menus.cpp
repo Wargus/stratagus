@@ -2363,19 +2363,15 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-//char *path;
+char *path = malloc(1);
 
-// HEY ! path is unitialized => pointing to random location!!!!!
-////// strcpy(path, "test");
-
-//strcat(buffer,"/");
-//strcat(buffer,FREECRAFT_HOME_PATH);
-//mkdir(buffer,0777);
-//strcat(buffer,"/save");
-//mkdir(buffer,0777);
-//strncpy(SaveDir, buffer, strlen(buffer));
-//free(buffer55);
-SaveDir="/tmp";
+strcpy(path,getenv("HOME"));
+strcat(path,"/");
+strcat(path,FREECRAFT_HOME_PATH);
+mkdir(path,0777);
+strcat(path,"/save");
+mkdir(path,0777);
+strncpy(SaveDir, buffer, strlen(buffer));
 #endif
 }
 
