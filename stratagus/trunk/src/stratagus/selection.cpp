@@ -10,12 +10,11 @@
 //
 /**@name selection.c	-	The units' selection. */
 //
-//	(c) Copyright 1999-2001 by Patrice Fortier
+//	(c) Copyright 1999-2002 by Patrice Fortier, Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -110,26 +109,26 @@ global void ChangeSelectedUnits(Unit** units,int count)
  **	@return		false if NumSelected == MaxSelectable or
  **			unit is already selected, true otherwise.
  */
-global int SelectUnit(Unit* unit)
+global int SelectUnit(Unit * unit)
 {
-    if ( unit->Revealer ) {		// Revealers cannot be selected
+    if (unit->Revealer) {		// Revealers cannot be selected
 	DebugLevel0Fn("Selecting revealer?\n");
 	return 0;
     }
 
-    if( NumSelected == MaxSelectable ) {
-        return 0;
+    if (NumSelected == MaxSelectable) {
+	return 0;
     }
 
-    if( unit->Selected ) {
-        return 0;
+    if (unit->Selected) {
+	return 0;
     }
 
-    Selected[NumSelected++]=unit;
-    unit->Selected=1;
-    if( NumSelected>1 ) {
-	Selected[0]->LastGroup=unit->LastGroup=GroupId;
-    };
+    Selected[NumSelected++] = unit;
+    unit->Selected = 1;
+    if (NumSelected > 1) {
+	Selected[0]->LastGroup = unit->LastGroup = GroupId;
+    }
     CheckUnitToBeDrawn(unit);
     return 1;
 }
@@ -270,6 +269,75 @@ global int SelectUnitsByType(Unit* base)
     if( NumSelected>1 ) {
 	for( i=0; i<NumSelected; ++i ) {
 	    Selected[i]->LastGroup=GroupId;
+	}
+    }
+
+    return NumSelected;
+}
+
+/**
+**	Toggle units from a particular type and belonging to the local player.
+**
+**	The base is included in the selection and defines
+**	the type of the other units to be selected.
+**
+**	@param base	Toggle all units of same type.
+**	@return		Number of units found, 0 means selection unchanged
+**
+**	@todo
+**	FIXME: toggle not written
+**
+**	FIXME: should always select the nearest 9 units to the base!
+*/
+global int ToggleUnitsByType(Unit* base)
+{
+    Unit* unit;
+    Unit* table[UnitMax];
+    const UnitType* type;
+    int r;
+    int i;
+
+    type = base->Type;
+
+    DebugLevel2Fn(" %s FIXME: toggle not written.\n", base->Type->Ident);
+
+    // select all visible units.
+    // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
+    r = SelectUnits(MapX - 1, MapY - 1, MapX + MapWidth + 1,
+	MapY + MapHeight + 1, table);
+
+    // if unit is a cadaver or hidden (not on map)
+    // no unit can be selected.
+    if (base->Removed || base->Orders[0].Action == UnitActionDie) {
+	return 0;
+    }
+    // if unit isn't belonging to the player, or is a static unit
+    // (like a building), only 1 unit can be selected at the same time.
+    if (base->Player != ThisPlayer || !type->SelectableByRectangle) {
+	return 0;
+    }
+
+    if (!SelectUnit(base)) {		// Add base to selection
+	return 0;
+    }
+    //
+    //  Search for other visible units of the same type
+    //
+    // FIXME: peon/peasant with gold/wood & co are considered from
+    //        different type... idem for tankers
+    for (i = 0; i < r; ++i) {
+	unit = table[i];
+	if (unit->Player != ThisPlayer || unit->Type != type) {
+	    continue;
+	}
+	if (UnitUnusable(unit)) {	// guess SelectUnits doesn't check this
+	    continue;
+	}
+	if (unit == base) {		// no need to have the same unit twice
+	    continue;
+	}
+	if (!SelectUnit(unit)) {	// add unit to selection
+	    return NumSelected;
 	}
     }
 

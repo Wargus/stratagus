@@ -915,6 +915,8 @@ extern void UnSelectUnit(Unit* unit);
 extern int ToggleSelectUnit(Unit* unit);
     /// Select units from the same type (if selectable by rectangle)
 extern int SelectUnitsByType(Unit* base);
+    /// Toggle units from the same type (if selectable by rectangle)
+extern int ToggleUnitsByType(Unit* base);
     /// Select the units belonging to a particular group
 extern int SelectGroup(int group_number);
     /// Select the unit from the same group as the one in parameter
