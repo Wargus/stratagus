@@ -2397,15 +2397,10 @@ static void PushMenu(void)
 static void PopMenu(void)
 {
 	MenuStack* menu;
-	Menuitem* mi;
-	int i;
 
 	if (Menus && Menus->Menu == CurrentMenu) {
-		for (i = 0; i < CurrentMenu->NumItems; ++i) {
-			mi = CurrentMenu->Items + i;
-			if (mi->ExitFunc) {
-				(*mi->ExitFunc)(mi); // action/destructor
-			}
+		if (CurrentMenu->ExitFunc) {
+			CurrentMenu->ExitFunc(CurrentMenu); // action/destructor
 		}
 
 		MenuButtonUnderCursor = -1;
@@ -2533,9 +2528,9 @@ void ProcessMenu(const char* menu_id, int loop)
 			default:
 				break;
 		}
-		if (mi->InitFunc) {
-			(*mi->InitFunc)(mi);
-		}
+	}
+	if (menu->InitFunc) {
+		menu->InitFunc(menu);
 	}
 	MenuButtonUnderCursor = -1;
 
@@ -2567,18 +2562,15 @@ void ProcessMenu(const char* menu_id, int loop)
 			// stopped by network activity?
 			if (oldncr == 2 && NetConnectRunning == 0) {
 				if (menu->NetAction) {
-					(*menu->NetAction)();
+					menu->NetAction();
 				}
 			}
 		}
 	}
 
 	if (loop) {
-		for (i = 0; i < menu->NumItems; ++i) {
-			mi = menu->Items + i;
-			if (mi->ExitFunc) {
-				(*mi->ExitFunc)(mi); // action/destructor
-			}
+		if (menu->ExitFunc) {
+			menu->ExitFunc(menu); // action/destructor
 		}
 		CurrentMenu = CurrentMenuSave;
 		MenuButtonUnderCursor = MenuButtonUnderCursorSave;
