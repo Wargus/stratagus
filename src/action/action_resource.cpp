@@ -250,9 +250,14 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	    unit->SubAction=0;
 	    // should return 0, done below!
 	} else {
-	    DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+	    if( source ) {
+		DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
 		    ,depot->Y+depot->Type->TileHeight/2
 		    ,source->Type->TileWidth,source->Type->TileHeight);
+	    } else {
+		DropOutNearest(unit,depot->X+depot->Type->TileWidth/2
+		    ,depot->Y+depot->Type->TileHeight/2,1,1);
+	    }
 	    unit->Orders[0].Goal=depot;
 	    RefsDebugCheck( !depot->Refs );
 	    ++depot->Refs;
