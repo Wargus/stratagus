@@ -239,8 +239,10 @@ global void LoadCursors(const char* race)
 			buf = alloca(strlen(file) + 9 + 1);
 			file = strcat(strcpy(buf,"graphics/"), file);
 			ShowLoadProgress("Cursor %s", file);
-			Cursors[i].Sprite = LoadSprite(file,
-				Cursors[i].Width, Cursors[i].Height);
+			if (!Cursors[i].Sprite) {
+				Cursors[i].Sprite = LoadSprite(file,
+					Cursors[i].Width, Cursors[i].Height);
+			}
 		}
 	}
 }

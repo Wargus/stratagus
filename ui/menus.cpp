@@ -3273,6 +3273,7 @@ local void FreeMapInfos(FileList *fl, int n)
 			FreeMapInfo(fl[i].xdata);
 			fl[i].xdata = NULL;
 		}
+		free(fl[i].name);
 	}
 }
 
@@ -3825,7 +3826,6 @@ local void ScenSelectCancel(void)
 
 	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
 */
-
 	CurrentMenu->Items[9].d.button.text = NULL;
 
 	EndMenu();
