@@ -44,6 +44,7 @@
 #include "sound_server.h"
 #include "movie.h"
 #include "network.h"
+#include "iocompat.h"
 #include "iolib.h"
 
 #include "SDL.h"
@@ -180,6 +181,9 @@ int PlayMovie(const char* name)
 	EventCallback callbacks;
 	unsigned int start_ticks;
 	int need_data;
+	char buffer[PATH_MAX];
+
+	name = LibraryFileName(name, buffer);
 
 	if (!(f = CLopen(name, CL_OPEN_READ))) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
