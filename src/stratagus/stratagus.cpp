@@ -250,9 +250,6 @@ global char NameLine[] =
 
 local char* MapName;			/// Filename of the map to load
 
-    //FIXME: all game global options should be moved in structure like `TheUI'
-global int OptionUseDepletedMines;	/// Use depleted mines or destroy them
-
 /*----------------------------------------------------------------------------
 --	Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/

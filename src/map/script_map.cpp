@@ -478,30 +478,6 @@ local SCM CclSetForestRegeneration(SCM speed)
 }
 
 /**
-**	Set gold-mine depleted rate.
-**
-**	@param rate	New depleted rate (0 disabled)
-**
-**	@return		Old rate
-*/
-local SCM CclSetGoldmineDepleted(SCM rate)
-{
-    int i;
-    int o;
-
-    i = gh_scm2int(rate);
-    if (i < 0 || i > 100) {
-	PrintFunction();
-	fprintf(stdout, "Deplated rate should be 0-100\n");
-	i = 0;
-    }
-    o = OptionUseDepletedMines;
-    OptionUseDepletedMines = i;
-
-    return gh_int2scm(o);
-}
-
-/**
 **	Set burning buildings percent and rate.
 **
 **	@param percent	    Max percent needed to burn buildings
@@ -560,8 +536,7 @@ global void MapCclRegister(void)
     gh_new_procedure1_0("set-fog-of-war-brightness!", CclSetFogOfWarBrightness);
     gh_new_procedure1_0("set-fog-of-war-saturation!", CclSetFogOfWarSaturation);
 
-    gh_new_procedure1_0("set-forest-regeneration!", CclSetForestRegeneration);
-    gh_new_procedure1_0("set-goldmine-depleted!", CclSetGoldmineDepleted);
+    gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
 
     gh_new_procedure3_0("set-burn-buildings!", CclSetBurnBuildings);
 }

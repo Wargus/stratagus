@@ -119,25 +119,26 @@ typedef union
 	int TTL;		/// time to live (ticks)
     } FlameShield;
 
-    struct s_haste {
-	int flag;		/// flag for know what variable to set.
-	int value;		/// the set value. (nb sec).
-    struct s_haste *next;	/// Other variable to set ?
-    } haste;
+    struct {
+	int HasteTicks;		/// Number of ticks to set Haste to.
+	int SlowTicks;		/// Number of ticks to set Slow to.
+	int BloodlustTicks;	/// Number of ticks to set Bloodlust to.
+	int InvisibilityTicks;	/// Number of ticks to set Invisibility to.
+	int InvincibilityTicks;	/// Number of ticks to set UnholyArmor to.
+#define BUFF_NOT_AFFECTED 0xC0FF33 /// Don't like the value? The value doesn't like you!
+    } AdjustBuffs;
     
     struct {
-	int HP;			/// HP gain for manacost.(negative for exorcism)
-    } healing;
+	int HP;			/// Target HP gain.(can be negative)
+	int Mana;		/// Target Mana gain.(can be negative)
+	/// This spell is designed to be used wit very small amounts. The spell
+	/// can scale up to MaxMultiCast times. Use 0 for infinite.
+	int MaxMultiCast; 
+    } AdjustVitals;
     
     struct {
 	UnitType *revealer;	/// Type of unit to be summoned: (unit-revealer).
-    } holyvision;
-    
-    struct {
-	int flag;		/// unholyarmor or invisibility.
-	int value;		/// the set value. (nb sec).
-	MissileType *missile;	/// missile for the target.
-    } invisibility;
+    } HolyVision;
     
     struct {
 	UnitType *NewForm;	/// The new form
@@ -150,7 +151,7 @@ typedef union
     } Summon;
     
     struct {
-	UnitType *Skeleton;	/// The unit to spawn from corpses
+	UnitType *UnitRaised;	/// The unit to spawn from corpses
 	int TTL;		/// Time to live for summon. 0 means infinite.
     } RaiseDead;
     //  What about a resurection spell?
@@ -158,12 +159,12 @@ typedef union
     struct {
 	int TTL;		/// time to live (ticks)
 	int Damage;		/// Damage.
-    } runes;
+    } Runes;
     
     struct {
 	int  TTL;		/// time to live (ticks)
 	// FIXME: more configurations
-    } whirlwind;
+    } Whirlwind;
 } SpellActionType;
 
 /*
@@ -261,7 +262,7 @@ typedef struct _spell_type_ {
 
     //	Spell Specifications
     TargetType	Target;			/// Targetting information. See TargetType.
-    SpellFunc *f;				/// function to cast the spell.
+    SpellFunc *CastFunction;		/// function to cast the spell.
     SpellActionType *SpellAction;	/// More arguments for spell (damage, delay, additional sounds...).
     int Range;				/// Max range of the target.
     int ManaCost;			/// required mana for each cast
@@ -339,11 +340,10 @@ extern unsigned CclGetSpellByIdent(SCM value);
 */
 
 SpellFunc CastHolyVision;
-SpellFunc CastHealing;
-SpellFunc CastHaste;
+SpellFunc CastAdjustVitals;
+SpellFunc CastAdjustBuffs;
 SpellFunc CastFireball;
 SpellFunc CastFlameShield;
-SpellFunc CastInvisibility;
 SpellFunc CastPolymorph;
 SpellFunc CastAreaBombardment;
 SpellFunc CastSummon;
