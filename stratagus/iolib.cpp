@@ -10,7 +10,7 @@
 //
 /**@name iolib.c	-	Compression-IO helper functions. */
 //
-//	(c) Copyright 2000-2002 by Andreas Arens, Lutz Sammer
+//	(c) Copyright 2000-2003 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -145,7 +145,8 @@ local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((u
 */
 global CLFile *CLopen(const char *fn)
 {
-    CLFile input, *clf;
+    CLFile input;
+    CLFile *clf;
     char buf[512];
 
     input.cl_type = CLF_TYPE_INVALID;
@@ -221,7 +222,10 @@ global CLFile *CLopen(const char *fn)
 */
 global int CLclose(CLFile *file)
 {
-    int tp, ret = EOF;
+    int tp;
+    int ret;
+    
+    ret = EOF;
 
     if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
 	if (tp == CLF_TYPE_PLAIN) {
@@ -260,7 +264,10 @@ global int CLclose(CLFile *file)
 */
 global int CLread(CLFile *file, void *buf, size_t len)
 {
-    int tp, ret = 0;
+    int tp;
+    int ret;
+    
+    ret = 0;
 
     if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
 	if (tp == CLF_TYPE_PLAIN) {
@@ -296,7 +303,10 @@ global int CLread(CLFile *file, void *buf, size_t len)
 */
 global int CLseek(CLFile *file, long offset, int whence)
 {
-    int tp, ret = -1;
+    int tp;
+    int ret;
+    
+    ret = -1;
 
     if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
 	if (tp == CLF_TYPE_PLAIN) {
@@ -491,12 +501,17 @@ global char* LibraryFileName(const char* file,char* buffer)
 */
 local int flqcmp(const void *v1, const void *v2)
 {
-    const FileList *c1 = v1, *c2 = v2;
+    const FileList *c1;
+    const FileList *c2;
 
-    if (c1->type == c2->type)
+    c1 = v1;
+    c2 = v2;
+
+    if (c1->type == c2->type) {
 	return strcmp(c1->name, c2->name);
-    else
+    } else {
 	return c2->type - c1->type;
+    }
 }
 
 #ifdef USE_ZZIPLIB
@@ -512,8 +527,19 @@ local int
 __my_zzip_open_zip(const char* filename, int filemode)
 {
     auto char file[PATH_MAX];
-    int fd = -1;
-    int len = strlen(filename);
+    int fd;
+    int len;
+#ifndef USE_WIN32
+    static const char* my_zzip_default_fileext[] =
+    {
+	".zip", ".ZIP", /* common extension */
+	0
+    };
+    const char** ext;
+#endif
+    
+    fd = -1;
+    len = strlen(filename);
 #ifdef USE_WIN32
     if (len+4 < PATH_MAX) {
 	strcpy(file, filename);
@@ -521,18 +547,11 @@ __my_zzip_open_zip(const char* filename, int filemode)
 	fd = open(file, filemode);
     }
 #else
-    static const char* my_zzip_default_fileext[] =
-    {
-	".zip", ".ZIP", /* common extension */
-	0
-    };
-    const char** ext = my_zzip_default_fileext;
-
+    ext = my_zzip_default_fileext;
     if (len+4 < PATH_MAX) {
 	memcpy(file, filename, len+1);
 
-	for ( ; *ext ; ++ext)
-	{
+	for ( ; *ext ; ++ext) {
 	    strcpy (file+len, *ext);
 	    fd = open(file, filemode);
 	    if (fd != -1) {
