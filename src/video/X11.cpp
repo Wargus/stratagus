@@ -94,8 +94,10 @@ local Atom WmDeleteWindowAtom;		/// Atom for WM_DELETE_WINDOW
 --	Sync
 ----------------------------------------------------------------------------*/
 
+#ifndef NEW_VIDEO
 global int VideoSyncSpeed=100;		// 0 disable interrupts
 volatile int VideoInterrupts;		// be happy, were are quicker
+#endif
 
 /**
 **	Called from SIGALRM.

@@ -196,13 +196,17 @@ extern void PlayersEachFrame(void);
     /// FIXME: write short docu
 extern void PlayersEachSecond(void);
 
+#ifdef NEW_VIDEO
     /// Change current color set to new player.
 extern void PlayerPixels(const Player* player);
 
     /// Change current color set to new player of the sprite
-#ifdef NEW_VIDEO
 extern void GraphicPlayerPixels(const Player* player, const Graphic * sprite);
 #else
+    /// Change current color set to new player.
+extern void PlayerPixels(const Player* player);
+
+    /// Change current color set to new player of the sprite
 extern void RLEPlayerPixels(const Player* player, const RleSprite * sprite);
 #endif
 
