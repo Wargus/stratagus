@@ -71,6 +71,10 @@ local Uint32 VideoSyncHandler(Uint32 unused)
 
     ++VideoInterrupts;
 
+    // FIXME: this solves the timer problem with WIN32
+    // WSACancelBlockingCall();
+    // kill(0,SIGALRM);
+
     return (100*1000/FRAMES_PER_SECOND)/VideoSyncSpeed;
 }
 
@@ -87,6 +91,7 @@ global void SetVideoSync(void)
 #ifdef __linux__
     {
 	// ARI: kick svgalib's butt - WE handled SIGALRM, no bombing any more!
+	// JOHNS: I think this will no longer work with SDL 1.1
 	extern void SDL_TimerInit();
 	SDL_TimerInit();
     }
@@ -537,8 +542,14 @@ global void WaitEventsAndKeepSync(void)
 	}
 #endif
 
+#if 0
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(i=SDL_PollEvent(event)) ? &tv : NULL);
+#else
+	// QUICK HACK to fix the event/timer problem
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
+	i=SDL_PollEvent(event);
+#endif
 
 	if ( i ) {
 	    // Handle SDL event
