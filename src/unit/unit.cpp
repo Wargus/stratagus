@@ -3222,7 +3222,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     }
 
     if( GodMode ) {
-	if( attacker->Player==ThisPlayer ) {
+	if( attacker && attacker->Player==ThisPlayer ) {
 	    damage=255;
 	}
 	if( target->Player==ThisPlayer ) {
