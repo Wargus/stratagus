@@ -10,12 +10,11 @@
 //
 /**@name action_train.c -	The building train action. */
 //
-//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//	(c) Copyright 1998,2000-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -136,27 +135,38 @@ global void HandleActionTrain(Unit* unit)
 	    unit->SubAction=0;
 	}
 
-	if( unit->NewOrder.Goal ) {
-	    if( unit->NewOrder.Goal->Destroyed ) {
-		// FIXME: perhaps we should use another goal?
-		DebugLevel0Fn("Destroyed unit in train unit\n");
-		RefsDebugCheck( !unit->NewOrder.Goal->Refs );
-		if( !--unit->NewOrder.Goal->Refs ) {
-		    ReleaseUnit(unit->NewOrder.Goal);
+	//
+	//	FIXME: we must check if the units supports the new order.
+	//
+	if( (unit->NewOrder.Action==UnitActionHaulOil
+		    && !nunit->Type->Tanker)
+		|| (unit->NewOrder.Action==UnitActionAttack
+		    && !nunit->Type->CanAttack) ) {
+	    DebugLevel0Fn("Wrong order for unit\n");
+	    unit->Orders[0].Action=UnitActionStill;
+	} else {
+	    if( unit->NewOrder.Goal ) {
+		if( unit->NewOrder.Goal->Destroyed ) {
+		    // FIXME: perhaps we should use another goal?
+		    DebugLevel0Fn("Destroyed unit in train unit\n");
+		    RefsDebugCheck( !unit->NewOrder.Goal->Refs );
+		    if( !--unit->NewOrder.Goal->Refs ) {
+			ReleaseUnit(unit->NewOrder.Goal);
+		    }
+		    unit->NewOrder.Goal=NoUnitP;
+		    unit->NewOrder.Action=UnitActionStill;
 		}
-		unit->NewOrder.Goal=NoUnitP;
-		unit->NewOrder.Action=UnitActionStill;
 	    }
-	}
 
-	nunit->Orders[0]=unit->NewOrder;
+	    nunit->Orders[0]=unit->NewOrder;
 
-	//
-	// FIXME: Pending command uses any references?
-	//
-	if( nunit->Orders[0].Goal ) {
-	    RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
-	    nunit->Orders[0].Goal->Refs++;
+	    //
+	    // FIXME: Pending command uses any references?
+	    //
+	    if( nunit->Orders[0].Goal ) {
+		RefsDebugCheck( !nunit->Orders[0].Goal->Refs );
+		nunit->Orders[0].Goal->Refs++;
+	    }
 	}
 
 	if( IsOnlySelected(unit) ) {
