@@ -524,7 +524,7 @@ global void DrawMinimapCursor(int vx, int vy)
     SaveCursorRectangle(OldMinimapCursorImage, x, y, w, h);
 
     // Draw cursor as rectangle (Note: unclipped, as it is always visible)
-    VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 50);
+    VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 128);
 }
 
 #else // USE_SDL_SURFACE
