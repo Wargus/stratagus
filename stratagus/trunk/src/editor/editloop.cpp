@@ -891,7 +891,7 @@ global void EditorUpdateDisplay(void)
 	    (GameMenuButtonClicked ? MenuButtonClicked : 0),
 	    128, 19,
 	    TheUI.MenuButtonX+24,TheUI.MenuButtonY+2,
-	    GameFont,"Menu (~<F10~>)");
+	    GameFont,"Menu (~<F10~>)",NULL,NULL);
 
     //
     //  Minimap border
