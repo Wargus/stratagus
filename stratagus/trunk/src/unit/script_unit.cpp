@@ -936,7 +936,11 @@ local int CclUnit(lua_State* l)
 			unit->Goal = UnitSlots[(int)LuaToNumber(l, j + 1)];
 		} else if (!strcmp(value, "auto-cast")) {
 			s = LuaToString(l, j + 1);
-			DebugCheck(SpellTypeByIdent(s)->Slot == -1);
+			DebugCheck(!SpellTypeByIdent(s));
+			if (!unit->AutoCastSpell) {
+				unit->AutoCastSpell = malloc(SpellTypeCount);
+				memset(unit->AutoCastSpell, 0, SpellTypeCount);
+			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {
 		   // FIXME: this leaves a half initialized unit
