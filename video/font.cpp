@@ -97,7 +97,7 @@ local void VideoDrawChar8(const Graphic* sprite,
     VMemType8* dp;
     int da;
 
-    sp=sprite->Frames+gx+gy*sprite->Width-1;
+    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
     gp=sp+sprite->Width*h;
     sa=sprite->Width-w;
     dp=VideoMemory8+x+y*VideoWidth-1;
@@ -152,7 +152,7 @@ local void VideoDrawChar16(const Graphic* sprite,
     VMemType16* dp;
     int da;
 
-    sp=sprite->Frames+gx+gy*sprite->Width-1;
+    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
     gp=sp+sprite->Width*h;
     sa=sprite->Width-w;
     dp=VideoMemory16+x+y*VideoWidth-1;
@@ -207,7 +207,7 @@ local void VideoDrawChar24(const Graphic* sprite,
     VMemType24* dp;
     int da;
 
-    sp=sprite->Frames+gx+gy*sprite->Width-1;
+    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
     gp=sp+sprite->Width*h;
     sa=sprite->Width-w;
     dp=VideoMemory24+x+y*VideoWidth-1;
@@ -262,7 +262,7 @@ local void VideoDrawChar32(const Graphic* sprite,
     VMemType32* dp;
     int da;
 
-    sp=sprite->Frames+gx+gy*sprite->Width-1;
+    sp=(const unsigned char*)sprite->Frames+gx+gy*sprite->Width-1;
     gp=sp+sprite->Width*h;
     sa=sprite->Width-w;
     dp=VideoMemory32+x+y*VideoWidth-1;
@@ -535,10 +535,10 @@ local void FontMeasureWidths(ColorFont* fp)
     }
 
     for (y = 1; y < 207; y++) {
-	sp = fp->Graphic->Frames + y * fp->Height * fp->Graphic->Width - 1;
+	sp = (const unsigned char*)fp->Graphic->Frames + y * fp->Height * fp->Graphic->Width - 1;
 	gp = sp + fp->Graphic->Width * fp->Height;
 	//	fp->CharWidth[y] = 0;
-	if(gp >= (unsigned char* )(fp->Graphic->Frames+fp->Graphic->Width*fp->Graphic->Height))
+	if(gp >= ((const unsigned char*)fp->Graphic->Frames+fp->Graphic->Width*fp->Graphic->Height))
 	  break; //Bail out cause there are no letters left
 	while (sp < gp) {
 	    lp = sp + fp->Graphic->Width - 1;
