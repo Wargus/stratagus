@@ -143,6 +143,15 @@
 **
 **		@see icons.h @see icons.c
 **
+**	@subsection Editor Editor
+**
+**		This is the integrated editor, it shouldn't be a perfect
+**		editor. It is used to test new features of the engine.
+**
+**		See page @ref EditorModule for more information upon supported
+**		features and API.
+**
+**		@see editor.h @see editor.c
 */
 
 /*----------------------------------------------------------------------------

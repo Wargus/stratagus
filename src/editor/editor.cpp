@@ -25,6 +25,23 @@
 
 //@{
 
+//----------------------------------------------------------------------------
+//	Documentation
+//----------------------------------------------------------------------------
+
+/**
+**      @page EditorModule Module - Editor
+**
+**	This is a very simple editor for the FreeCraft engine.
+**
+**      @section Missing Missing features
+**
+**	@li Save menu
+**	@li Edit upgrade section
+**	@li Edit allow section
+**
+*/
+
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
