@@ -327,7 +327,7 @@ global void AssignUnitToPlayer(Unit *unit, Player *player)
     type = unit->Type;
 
     //
-    //	Build player unit table
+    //	Build player unit table    
     //
     if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
@@ -576,7 +576,11 @@ global void RemoveUnit(Unit* unit)
 	return;
     }
     unit->Removed=1;
-
+#ifdef NEW_FOW
+    MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				     ,unit->Y+unit->Type->TileHeight/2
+				     ,unit->Stats->SightRange);
+#endif
     //  Remove unit from the current selection
     if( unit->Selected ) {
         if( NumSelected==1 ) {		//  Remove building cursor

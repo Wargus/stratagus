@@ -40,6 +40,10 @@
 #include "depend.h"
 #include "interface.h"
 
+#ifdef NEW_FOW
+#include "map.h"
+#endif
+
 #include "myendian.h"
 
 #include "etlib/hash.h"
@@ -1361,9 +1365,34 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 	if (um->ApplyTo[z] == 'X') {
 
 	    DebugLevel3Fn(" applied to %d\n" _C_ z);
-	    // upgrade stats
+	    // upgrade stats     
 	    UnitTypes[z].Stats[pn].AttackRange += um->Modifier.AttackRange;
 	    UnitTypes[z].Stats[pn].SightRange += um->Modifier.SightRange;
+#ifdef NEW_FOW
+	    //If Sight range is upgraded, we need to change EVERY unit
+	    //to the new range, otherwise the counters get confused.
+	    if (um->Modifier.SightRange) {
+		int numunits;
+		Unit* sightupgrade[UnitMax];
+		
+		numunits = FindUnitsByType(&UnitTypes[z],sightupgrade);
+		numunits--; //Change to 0 Start not 1 start
+		while (numunits >= 0) {
+		    if (sightupgrade[numunits]->Player->Player == player->Player) {
+			MapUnmarkSight(player,
+					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
+					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
+					UnitTypes[z].Stats[pn].SightRange -
+						um->Modifier.SightRange);
+			MapMarkSight(player,
+					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
+					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
+					UnitTypes[z].Stats[pn].SightRange);
+		    }                                   
+		    numunits--;
+		}
+	    }
+#endif
 	    UnitTypes[z].Stats[pn].BasicDamage += um->Modifier.BasicDamage;
 	    UnitTypes[z].Stats[pn].PiercingDamage
 		    += um->Modifier.PiercingDamage;
