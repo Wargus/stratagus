@@ -116,8 +116,8 @@ local void UiDrawManaBar(const Unit* unit,int x,int y)
     VideoFillRectangleClip(ColorBlack,x,y+3,ICON_WIDTH+7,4);
     if( unit->HP ) {
 	/* s0m3body: mana bar should represent proportional value of Mana with respect to
-	 * MaxMana (unit->Type->Magic) for the unit */
-	f=(100*unit->Mana)/unit->Type->Magic;
+	 * MaxMana (unit->Type->_MaxMana) for the unit */
+	f=(100*unit->Mana)/unit->Type->_MaxMana;
 	f=(f*(ICON_WIDTH+5))/100;
 	VideoFillRectangleClip(ColorBlue,x+1,y+3+1,f,2);
     }
@@ -529,7 +529,7 @@ global void DrawUnitInfo(const Unit* unit)
 		VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
 		VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
 		VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
-		i=(100*unit->Mana)/unit->Type->Magic;
+		i=(100*unit->Mana)/unit->Type->_MaxMana;
 		i=(i*(61-4))/100;
 		VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
 
@@ -539,7 +539,7 @@ global void DrawUnitInfo(const Unit* unit)
 		/* s0m3body: fix to display mana bar properly for any maxmana
 		   value */
 		/* s0m3body: max mana can vary for the unit */
-		i=(100*unit->Mana)/unit->Type->Magic;
+		i=(100*unit->Mana)/unit->Type->_MaxMana;
 		i=(i*w)/100;
 		VideoDrawRectangleClip(ColorGray, x+16,  y+8+140, w+4,  16  );
 		VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,w+2,16-2);
@@ -1112,7 +1112,7 @@ global void DrawInfoPanel(void)
 			|| Selected[0]->Orders[0].Action==UnitActionUpgradeTo
 			|| Selected[0]->Orders[0].Action==UnitActionTrain) ) {
 		    i=3;
-		} else if( Selected[0]->Type->Magic ) {
+		} else if( Selected[0]->Type->_MaxMana ) {
 		    i=2;
 		} else {
 		    i=1;
