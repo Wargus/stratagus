@@ -860,7 +860,7 @@ global void LoadUnitTypes(void)
 global void CleanUnitTypes(void)
 {
 	UnitType* type;
-	void** ptr;
+	char** ptr;
 	int i;
 	int j;
 	int res;
@@ -871,7 +871,7 @@ global void CleanUnitTypes(void)
 	//
 	//  Mapping the original unit-type numbers in puds to our internal strings
 	//
-	if ((ptr = (void**)UnitTypeWcNames)) { // Free all old names
+	if ((ptr = UnitTypeWcNames)) { // Free all old names
 		while (*ptr) {
 			free(*ptr++);
 		}
