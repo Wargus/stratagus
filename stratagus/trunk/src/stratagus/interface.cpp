@@ -203,7 +203,6 @@ local int CommandKey(int key)
 	    break;
 	    // FIXME: shift+TAB
 
-	case 'q':
 	case 'Q':			// should be better protected
 	    Exit(0);
 	case KeyCodeUp:
