@@ -128,6 +128,13 @@ typedef struct _missile_type_ MissileType;
 #ifdef DEBUG  // {
 
 	/**
+	**  Assert a condition. If cond is not true abort with file,line.
+	*/
+#define Assert(cond)  do { if (!(cond)) { \
+	fprintf(stderr, "Assertion failed at %s:%d: %s\n", __FILE__, __LINE__, #cond); \
+	abort(); }} while (0)
+
+	/**
 	**  Debug check condition. If cond is true abort with file,line.
 	*/
 #define DebugCheck(cond)  do { if (cond) { \
@@ -184,6 +191,7 @@ typedef struct _missile_type_ MissileType;
 
 #else  // }{ DEBUG
 
+#define Assert(cond)         /* disabled */
 #define DebugCheck(cond)     /* disabled */
 
 #define DebugLevel0(args)    /* disabled */
@@ -202,12 +210,20 @@ typedef struct _missile_type_ MissileType;
 	/**
 	**  Debug check condition for references
 	*/
+#define RefsAssert(cond)  do { if (!(cond)) { \
+	fprintf(stderr, "Assertion failed at %s:%d\n", __FILE__, __LINE__); \
+	abort(); } } while (0)
+
+	/**
+	**  Debug check condition for references
+	*/
 #define RefsDebugCheck(cond)  do { if (cond) { \
 	fprintf(stderr, "DebugCheck at %s:%d\n", __FILE__, __LINE__); \
 	abort(); } } while (0)
 
 #else  // }{ REFS_DEBUG
 
+#define RefsAssert(cond)      /* disabled */
 #define RefsDebugCheck(cond)  /* disabled */
 
 #endif  // } !REFS_DEBUG
