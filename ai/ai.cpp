@@ -951,6 +951,9 @@ global void CleanAi(void)
 	    }
 
 	    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
+		if (pai->Scripts[i].gauges) {
+		    free(pai->Scripts[i].gauges);
+		}
 #if defined(USE_GUILE) || defined(USE_SIOD)
 		CclGcUnprotect(&pai->Scripts[i].Script);
 #elif defined(USE_LUA)
