@@ -231,66 +231,44 @@ local SCM CclAddTip(SCM tip)
 }
 
 /**
-**	For debug increase mining speed.
+**	Set resource harvesting speed.
 **
-**	@param speed	Speed factor of gold mining.
+**	@param resource	Name of resource.
+**	@param speed	Speed factor of harvesting resource.
 */
-local SCM CclSetSpeedMine(SCM speed)
+local SCM CclSetSpeedResourcesHarvest(SCM resource,SCM speed)
 {
-    SpeedMine=gh_scm2int(speed);
+    int i;
 
-    return speed;
+    for( i=0; i<MaxCosts; ++i ) {
+	if( gh_eq_p(resource,gh_symbol2scm(DefaultResourceNames[i])) ) {
+	    SpeedResourcesHarvest[i]=gh_scm2int(speed);
+	    return SCM_UNSPECIFIED;
+	}
+    }
+    errl("Resource not found",resource);
+    return SCM_UNSPECIFIED;
 }
 
 /**
-**	For debug increase gold delivery speed.
+**	Set resource returning speed.
 **
-**	@param speed	Speed factor of gold mining.
+**	@param resource	Name of resource.
+**	@param speed	Speed factor of returning resource.
 */
-local SCM CclSetSpeedGold(SCM speed)
+local SCM CclSetSpeedResourcesReturn(SCM resource,SCM speed)
 {
-    SpeedGold=gh_scm2int(speed);
+    int i;
 
-    return speed;
-}
-
-/**
-**	For debug increase wood chopping speed.
-*/
-local SCM CclSetSpeedChop(SCM speed)
-{
-    SpeedChop=gh_scm2int(speed);
-
-    return speed;
-}
-
-/**
-**	For debug increase wood delivery speed.
-*/
-local SCM CclSetSpeedWood(SCM speed)
-{
-    SpeedWood=gh_scm2int(speed);
-
-    return speed;
-}
-
-/**
-**	For debug increase haul speed.
-*/
-local SCM CclSetSpeedHaul(SCM speed)
-{
-    SpeedHaul=gh_scm2int(speed);
-
-    return speed;
-}
-
-/**
-**	For debug increase oil delivery speed.
-*/
-local SCM CclSetSpeedOil(SCM speed)
-{
-    SpeedOil=gh_scm2int(speed);
-
+    for( i=0; i<MaxCosts; ++i ) {
+	if( gh_eq_p(resource,gh_symbol2scm(DefaultResourceNames[i])) ) {
+	    SpeedResourcesReturn[i]=gh_scm2int(speed);
+	    break;
+	}
+    }
+    if( i==MaxCosts ) {
+	errl("Resource not found",resource);
+    }
     return speed;
 }
 
@@ -339,13 +317,15 @@ local SCM CclSetSpeedResearch(SCM speed)
 */
 local SCM CclSetSpeeds(SCM speed)
 {
-    SpeedMine=SpeedGold=
-	SpeedChop=SpeedWood=
-	SpeedHaul=SpeedOil=
-	SpeedBuild=
-	SpeedTrain=
-	SpeedUpgrade=
-	SpeedResearch=gh_scm2int(speed);
+    int i;
+    int s;
+
+    s=gh_scm2int(speed);
+    for( i=0; i<MaxCosts; ++i ) {
+	SpeedResourcesHarvest[i]=s;
+	SpeedResourcesReturn[i]=s;
+    }
+    SpeedBuild=SpeedTrain=SpeedUpgrade=SpeedResearch=s;
 
     return speed;
 }
@@ -659,12 +639,8 @@ global void InitCcl(void)
     gh_new_procedure1_0("set-current-tip!",CclSetCurrentTip);
     gh_new_procedure1_0("add-tip",CclAddTip);
 
-    gh_new_procedure1_0("set-speed-mine!",CclSetSpeedMine);
-    gh_new_procedure1_0("set-speed-gold!",CclSetSpeedGold);
-    gh_new_procedure1_0("set-speed-chop!",CclSetSpeedChop);
-    gh_new_procedure1_0("set-speed-wood!",CclSetSpeedWood);
-    gh_new_procedure1_0("set-speed-haul!",CclSetSpeedHaul);
-    gh_new_procedure1_0("set-speed-oil!",CclSetSpeedOil);
+    gh_new_procedure2_0("set-speed-resources-harvest!",CclSetSpeedResourcesHarvest);
+    gh_new_procedure2_0("set-speed-resources-return!",CclSetSpeedResourcesReturn);
     gh_new_procedure1_0("set-speed-build!",CclSetSpeedBuild);
     gh_new_procedure1_0("set-speed-train!",CclSetSpeedTrain);
     gh_new_procedure1_0("set-speed-upgrade!",CclSetSpeedUpgrade);

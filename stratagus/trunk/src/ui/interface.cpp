@@ -962,6 +962,7 @@ local int CommandKey(int key)
 global int HandleCheats(const char* Input)
 {
     int ret;
+    int i;
 
     ret = 1;
 
@@ -970,7 +971,7 @@ global int HandleCheats(const char* Input)
 	// FIXME: no function yet.
 	SetMessage("cheat enabled");
     } else if (strcmp(Input, "hatchet") == 0) {
-	SpeedChop = 52 / 2;
+	SpeedResourcesHarvest[WoodCost] = 52 / 2;
 	SetMessage("Wow -- I got jigsaw!");
     } else if (strcmp(Input, "glittering prizes") == 0) {
 	ThisPlayer->Resources[GoldCost] += 12000;
@@ -994,36 +995,30 @@ global int HandleCheats(const char* Input)
 	UpdateFogOfWarChange();
 	SetMessage("Fog Of War is now OFF");
     } else if (strcmp(Input, "fast debug") == 0) {
-	SpeedMine = 10;	// speed factor for mine gold
-	SpeedGold = 10;	// speed factor for getting gold
-	SpeedChop = 10;	// speed factor for chop
-	SpeedWood = 10;	// speed factor for getting wood
-	SpeedHaul = 10;	// speed factor for haul oil
-	SpeedOil = 10;	// speed factor for getting oil
+	for (i=1; i<MaxCosts; ++i) {
+	    SpeedResourcesHarvest[i] = 10;
+	    SpeedResourcesReturn[i] = 10;
+	}
 	SpeedBuild = 10;	// speed factor for building
 	SpeedTrain = 10;	// speed factor for training
 	SpeedUpgrade = 10;	// speed factor for upgrading
 	SpeedResearch = 10;	// speed factor for researching
 	SetMessage("FAST DEBUG SPEED");
     } else if (strcmp(Input, "normal debug") == 0) {
-	SpeedMine = 1;	// speed factor for mine gold
-	SpeedGold = 1;	// speed factor for getting gold
-	SpeedChop = 1;	// speed factor for chop
-	SpeedWood = 1;	// speed factor for getting wood
-	SpeedHaul = 1;	// speed factor for haul oil
-	SpeedOil = 1;	// speed factor for getting oil
+	for (i=1; i<MaxCosts; ++i) {
+	    SpeedResourcesHarvest[i] = 1;
+	    SpeedResourcesReturn[i] = 1;
+	}
 	SpeedBuild = 1;	// speed factor for building
 	SpeedTrain = 1;	// speed factor for training
 	SpeedUpgrade = 1;	// speed factor for upgrading
 	SpeedResearch = 1;	// speed factor for researching
 	SetMessage("NORMAL DEBUG SPEED");
     } else if (strcmp(Input, "make it so") == 0) {
-	SpeedMine = 10;	// speed factor for mine gold
-	SpeedGold = 10;	// speed factor for getting gold
-	SpeedChop = 10;	// speed factor for chop
-	SpeedWood = 10;	// speed factor for getting wood
-	SpeedHaul = 10;	// speed factor for haul oil
-	SpeedOil = 10;	// speed factor for getting oil
+	for (i=1; i<MaxCosts; ++i) {
+	    SpeedResourcesHarvest[i] = 10;
+	    SpeedResourcesReturn[i] = 10;
+	}
 	SpeedBuild = 10;	// speed factor for building
 	SpeedTrain = 10;	// speed factor for training
 	SpeedUpgrade = 10;	// speed factor for upgrading
