@@ -285,13 +285,14 @@ global void HandleActionBuild(Unit* unit)
 	unit->Orders[0].Goal=build;
 	unit->Orders[0].X=unit->Orders[0].Y=-1;
 	unit->Orders[0].RangeX=unit->Orders[0].RangeY=REPAIR_RANGE;
-	//unit->Orders[0].Type=unit->Orders[0].Arg1=NULL;
 	unit->SubAction=0;
 	unit->Wait=1;
-//	unit->Reset=1;
 	RefsDebugCheck( !build->Refs );
 	build->Refs++;
 	UnitMarkSeen(unit);
+	//  Mark the new building seen.
+	MapMarkSight(build->Player,x+build->Type->TileWidth/2,y+build->Type->TileHeight/2,build->CurrentSightRange);
+	
 	// We need somebody to work on it.
 	build->Data.Builded.Sub=build->Data.Builded.Add=0;
 	build->HP=1;
