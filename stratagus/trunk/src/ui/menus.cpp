@@ -784,24 +784,35 @@ local Menuitem CDRomDisabledMenuItems[] = {
 
 local Menuitem SoundOptionsMenuItems[] = {
 #ifdef __GNUC__
-    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 176, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Sound Options", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 64, 36*1, 0, LargeFont, NULL, NULL,
-	{ text:{ "Master Volume", MI_TFLAGS_CENTERED} } },
+
+    { MI_TYPE_TEXT, 16, 36*1, 0, LargeFont, NULL, NULL,
+	{ text:{ "Master Volume", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_HSLIDER, 32, 36*1.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*2 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*2 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_TEXT, 64, 36*3, 0, LargeFont, NULL, NULL,
-	{ text:{ "Music Volume", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 240, 36*1.5, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 266, 36*1.5 + 2, 0, LargeFont, NULL, NULL,
+	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
+
+    { MI_TYPE_TEXT, 16, 36*3, 0, LargeFont, NULL, NULL,
+	{ text:{ "Music Volume", MI_TFLAGS_LALIGN} } },
     { MI_TYPE_HSLIDER, 32, 36*3.5, 0, 0, NULL, NULL,
         { hslider:{ 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 44, 36*4 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*4 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_GEM, 240, 36*3.5, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+    { MI_TYPE_TEXT, 266, 36*3.5 + 2, 0, LargeFont, NULL, NULL,
+	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
+
     { MI_TYPE_TEXT, 64, 36*5, 0, LargeFont, NULL, NULL,
 	{ text:{ "CD Volume", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 32, 36*5.5, 0, 0, NULL, NULL,
@@ -810,19 +821,12 @@ local Menuitem SoundOptionsMenuItems[] = {
 	{ text:{ "slow", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 218, 36*6 + 6, 0, SmallFont, NULL, NULL,
 	{ text:{ "fast", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
+    { MI_TYPE_GEM, 240, 36*5.5, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
-    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
-	{ text:{ "Sound Enabled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
-    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
-	{ text:{ "Music Enabled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 36*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
-    { MI_TYPE_TEXT, 144, 36*7, 0, LargeFont, NULL, NULL,
-	{ text:{ "CD Audio Enaled", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+    { MI_TYPE_TEXT, 266, 36*5.5 + 2, 0, LargeFont, NULL, NULL,
+	{ text:{ "Enabled", MI_TFLAGS_LALIGN} } },
+
+    { MI_TYPE_BUTTON, 176 - (106 / 2), 352 - 11 - 27, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
 #else
     { 0 }
@@ -1707,23 +1711,25 @@ local void GameMenuLoad(void)
 
 global void SoundOptions(void)
 {
+    int i = 17;
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
-    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #else
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
-	SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
+	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
 #endif
     ProcessMenu(MENU_SOUND_OPTIONS, 1);
 }
 
 local void SetCdMode(Menuitem *mi)
 {
+    int i = 17;
 #ifdef USE_SDLCD
     /// Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
 	if (SDL_CDStatus(CDRom) <= 1)
-	    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         SDL_CDStop(CDRom);
@@ -1734,7 +1740,7 @@ local void SetCdMode(Menuitem *mi)
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
 	if (!cd_current_track())
-	    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+	    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
     } else {
     /// Stop Playing CD
         cd_stop();
@@ -1742,7 +1748,7 @@ local void SetCdMode(Menuitem *mi)
     }
 #else
     ProcessMenu(MENU_CDROM_DISABLED, 1);
-    SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
 }
 
