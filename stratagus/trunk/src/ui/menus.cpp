@@ -121,7 +121,6 @@ local void EndScenarioSurrender(void);
 local void EndScenarioQuitMenu(void);
 
 local void PrgStartInit(Menuitem *mi);		// master init
-local void StartMenusSetBackground(Menuitem *mi);
 local void NameLineDrawFunc(Menuitem *mi);
 local void EnterNameAction(Menuitem *mi, int key);
 local void EnterNameCancel(void);
@@ -150,11 +149,11 @@ local void LoadOk(void);
 local int SaveRDFilter(char *pathbuf, FileList *fl);
 
 local void FcDeleteMenu(void);
-local void FcDeleteInit(Menuitem *mi __attribute__((unused)));
+local void FcDeleteInit(Menuitem *mi);
 local void FcDeleteFile(void);
 
 //local void ConfirmSaveMenu(void);
-local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)));
+local void ConfirmSaveInit(Menuitem *mi);
 local void ConfirmSaveFile(void);
 
 local void LoadAction(void);
@@ -259,17 +258,18 @@ local void EditorQuitMenu(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef SAVE_MENU_CCL
-typedef char char30[30];
-global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
-#endif
 global _MenuHash MenuHash;
 global _MenuFuncHash MenuFuncHash;
+
+#define HASHADD(x,y) { \
+    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
+}
 
     /// Name, Version, Copyright FIXME: move to headerfile
 extern char NameLine[];
 
 local int GameLoaded;
+local int GuiGameStarted;
 local int EditorLoadCancelled;
 
 /**
@@ -282,9 +282,6 @@ local int OffsetY = 0;
 **	Other client and server selection state for Multiplayer clients
 */
 global ServerSetup ServerSetupState, LocalSetupState;
-
-
-local int GuiGameStarted;
 
 local char ScenSelectPath[1024];		/// Scenario selector path
 local char ScenSelectDisplayPath[1024];		/// Displayed selector path
@@ -401,18 +398,6 @@ local void InitNetMultiButtonStorage() {
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
-
-#ifdef SAVE_MENU_CCL
-#define HASHADD(x,y) { \
-    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
-    sprintf(buf,"%p",(x)); \
-    strcpy((char*)hash_add(MenuFuncHash2,buf), (y)); \
-}
-#else
-#define HASHADD(x,y) { \
-    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
-}
-#endif
 
 global void InitMenuFuncHash(void) {
 #ifdef SAVE_MENU_CCL
@@ -632,23 +617,15 @@ global void InitMenuFuncHash(void) {
 ----------------------------------------------------------------------------*/
 
 /**
-**	Set start menu backgound and draw it.
-*/
-local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
-{
-    MenusSetBackground();
-}
-
-/**
 **	Draw the version and copyright at bottom of the screen.
 **	Also include now the license.
 */
-local void NameLineDrawFunc(Menuitem *mi)
+local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
 {
     int nc, rc;
 
     GetDefaultTextColors(&nc, &rc);
-    StartMenusSetBackground(mi);
+    MenusSetBackground();
     SetDefaultTextColors(rc, rc);
 
 #ifdef WITH_SOUND
@@ -2181,7 +2158,7 @@ local void CampaignGameMenu(void)
     Menu *menu;
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2232,7 +2209,7 @@ local void CampaignGameMenu(void)
 local void StartCampaignFromMenu(int number)
 {
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2250,7 +2227,7 @@ local void StartCampaignFromMenu(int number)
     GuiGameStarted = 1;
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoClearScreen();
     VideoUnlockScreen();
     Invalidate();
@@ -2368,7 +2345,7 @@ local void JoinNetGameMenu(void)
     Menu *menu;
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2394,7 +2371,7 @@ local void JoinNetGameMenu(void)
     ProcessMenu("menu-enter-server", 1);
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
 
     if (menu->items[1].d.input.nch == 0) {
@@ -2406,7 +2383,7 @@ local void JoinNetGameMenu(void)
 	menu->items[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu("menu-net-error", 1);
 	VideoLockScreen();
-	StartMenusSetBackground(NULL);
+	MenusSetBackground();
 	VideoUnlockScreen();
 	return;
     }
@@ -2421,7 +2398,7 @@ local void JoinNetGameMenu(void)
 
     if (GuiGameStarted) {
 	VideoLockScreen();
-	StartMenusSetBackground(NULL);
+	MenusSetBackground();
 	VideoUnlockScreen();
 	Invalidate();
 	EndMenu();
@@ -2434,7 +2411,7 @@ local void JoinNetGameMenu(void)
 local void NetConnectingCancel(void)
 {
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     NetworkExitClientConnect();
     // Trigger TerminateNetConnect() to call us again and end the menu
@@ -2523,7 +2500,7 @@ local void CreateNetGameMenu(void)
 local void MultiGameStart(void)
 {
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2542,7 +2519,7 @@ local void MultiPlayerGameMenu(void)
     Menu *menu;
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -2557,7 +2534,7 @@ local void MultiPlayerGameMenu(void)
     ProcessMenu("menu-enter-name", 1);
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
 
     if (menu->items[1].d.input.nch == 0) {
@@ -3372,7 +3349,7 @@ local void ScenSelectCancel(void)
 local void GameCancel(void)
 {
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
@@ -3451,13 +3428,13 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
     GetInfoFromSelectPath();
 }
 
-local void GameDrawFunc(Menuitem *mi)
+local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 {
     int nc, rc, l;
     char buffer[32];
 
     GetDefaultTextColors(&nc, &rc);
-    StartMenusSetBackground(mi);
+    MenusSetBackground();
     SetDefaultTextColors(rc, rc);
     l = VideoTextLength(GameFont, "Scenario:");
     VideoDrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
@@ -4171,7 +4148,7 @@ local void StartEditor(void)
     char* s;
 
     VideoLockScreen();
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
     VideoUnlockScreen();
     Invalidate();
 
@@ -4224,7 +4201,7 @@ local void EditorLoadMap(void)
 
     if (EditorLoadCancelled) {
 	VideoLockScreen();
-	StartMenusSetBackground(NULL);
+	MenusSetBackground();
 	VideoUnlockScreen();
 	return;
     }
@@ -4685,7 +4662,7 @@ local void EditorMapPropertiesCancel(void)
 
 local void EditorPlayerPropertiesDrawFunc(Menuitem *mi)
 {
-    StartMenusSetBackground(NULL);
+    MenusSetBackground();
 }
 
 local void EditorPlayerPropertiesEnterAction(Menuitem *mi, int key)
