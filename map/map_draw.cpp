@@ -182,7 +182,7 @@ global void (*VideoDrawTile)(const GraphicData*,int,int);
 **
 **	Draws tiles display and video mode independ
 */
-global void (*MapDrawTile)(int,int,int);
+local void (*MapDrawTile)(int,int,int);
 
 /*----------------------------------------------------------------------------
 --	Functions
