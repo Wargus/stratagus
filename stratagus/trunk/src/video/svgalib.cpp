@@ -41,6 +41,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include <vga.h>
 #include <vgamouse.h>
@@ -93,6 +94,10 @@ local void KeyboardEvent(int scancode,int press);
 --	Sync
 ----------------------------------------------------------------------------*/
 
+#define noUSE_ITIMER			/// Use the old ITIMER code (obsolete)
+
+#ifdef USE_ITIMER
+
 /*
 **	The timer resolution is 10ms, which make the timer useless for us.
 */
@@ -136,6 +141,41 @@ global void SetVideoSync(void)
 
     DebugLevel3Fn("Timer installed\n");
 }
+
+#else
+
+local int FrameTicks;			/// Frame length in ms
+local int FrameRemainder;		/// Frame remainder 0.1 ms
+local int FrameFraction;		/// Frame fractional term
+local int SkipFrames;			/// Skip this frames
+
+/**
+**	Initialise video sync.
+**	Calculate the length of video frame and any simulation skips.
+**
+**	@see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
+*/
+global void SetVideoSync(void)
+{
+    int ms;
+
+    if( VideoSyncSpeed ) {
+	ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+    } else {
+	ms = INT_MAX;
+    }
+    SkipFrames = ms / 400;
+    while (SkipFrames && ms / SkipFrames < 200) {
+	--SkipFrames;
+    }
+    ms /= SkipFrames + 1;
+
+    FrameTicks = ms / 10;
+    FrameRemainder = ms % 10;
+    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
+}
+
+#endif
 
 /**
 **	SVGALib get ticks in ms.
@@ -365,41 +405,43 @@ global void Invalidate(void)
 /**
 **	Handle interactive input events.
 */
-local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry, int drz) {
-    if((old_button == 0) && (button == MOUSE_LEFTBUTTON)) {
+local void MouseEvent(int button, int dx, int dy, int dz, int drx, int dry,
+    int drz)
+{
+    if (!old_button && button == MOUSE_LEFTBUTTON) {
 	DebugLevel3Fn("first down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),1);
+	InputMouseButtonPress(SVGALibCallbacks, SVGAGetTicks(), 1);
     }
-    if((old_button == 0) && (button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON))) {
+    if (!old_button && button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON)) {
 	DebugLevel3Fn("second down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),2);
+	InputMouseButtonPress(SVGALibCallbacks, SVGAGetTicks(), 2);
     }
-    if((old_button == 0) && (button == MOUSE_RIGHTBUTTON)) {
+    if (!old_button && button == MOUSE_RIGHTBUTTON) {
 	DebugLevel3Fn("third down\n");
-	InputMouseButtonPress(SVGALibCallbacks,SVGAGetTicks(),3);
+	InputMouseButtonPress(SVGALibCallbacks, SVGAGetTicks(), 3);
     }
-    if((old_button == MOUSE_LEFTBUTTON) && (button == 0)) {
+    if (old_button == MOUSE_LEFTBUTTON && !button) {
 	DebugLevel3Fn("first up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),1);
+	InputMouseButtonRelease(SVGALibCallbacks, SVGAGetTicks(), 1);
     }
-    if((old_button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON)) && (button == 0)) {
+    if (old_button == (MOUSE_LEFTBUTTON + MOUSE_RIGHTBUTTON) && !button) {
 	DebugLevel3Fn("second up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),2);
+	InputMouseButtonRelease(SVGALibCallbacks, SVGAGetTicks(), 2);
     }
-    if((old_button == MOUSE_RIGHTBUTTON) && (button == 0)) {
+    if (old_button == MOUSE_RIGHTBUTTON && !button) {
 	DebugLevel3Fn("third up\n");
-	InputMouseButtonRelease(SVGALibCallbacks,SVGAGetTicks(),3);
+	InputMouseButtonRelease(SVGALibCallbacks, SVGAGetTicks(), 3);
     }
     old_button = button;
 
-    if(dx != 0 || dy != 0) {
-        if(mouse_x + dx/TheUI.MouseAdjust >= 0
-		&& mouse_x + dx/TheUI.MouseAdjust <= VideoWidth)
-	    mouse_x += dx/TheUI.MouseAdjust;
-	if(mouse_y + dy/TheUI.MouseAdjust >= 0
-		&& mouse_y + dy/TheUI.MouseAdjust <= VideoHeight)
-	    mouse_y += dy/TheUI.MouseAdjust;
-	InputMouseMove(SVGALibCallbacks,SVGAGetTicks(),mouse_x,mouse_y);
+    if (dx || dy) {
+	if (mouse_x + dx / TheUI.MouseAdjust >= 0
+	    && mouse_x + dx / TheUI.MouseAdjust <= VideoWidth)
+	    mouse_x += dx / TheUI.MouseAdjust;
+	if (mouse_y + dy / TheUI.MouseAdjust >= 0
+	    && mouse_y + dy / TheUI.MouseAdjust <= VideoHeight)
+	    mouse_y += dy / TheUI.MouseAdjust;
+	InputMouseMove(SVGALibCallbacks, SVGAGetTicks(), mouse_x, mouse_y);
 	MustRedraw |= RedrawCursor;
     }
 }
@@ -997,6 +1039,8 @@ local void KeyboardEvent(int scancode, int press)
 **	Returns if the time for one frame is over.
 **
 **	@param callbacks	Call backs that handle the events.
+**
+**	@todo FIXME:	the initialition could be moved out of the loop
 */
 global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
@@ -1004,10 +1048,37 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     fd_set rfds;
     fd_set wfds;
     int ret;
+    unsigned long ticks;
 
     SVGALibCallbacks=callbacks;
 
+#ifdef WITH_SOUND
+    // FIXME: ugly hack, move into sound part!!!
+    if( SoundFildes==-1 ) {
+	SoundOff=1;
+    }
+#endif
+    if( !++FrameCounter ) {
+	// FIXME: tests with frame counter now fails :(
+	// FIXME: Should happen in 68 years :)
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+    }
+
+#ifndef USE_ITIMER
+    ticks=SVGAGetTicks();
+    if( ticks>NextFrameTicks ) {	// We are too slow :(
+	IfDebug(
+	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	);
+	++SlowFrameCounter;
+    }
+#endif
+
     InputMouseTimeout(callbacks,SVGAGetTicks());
+
     for(;;) {
 	//
 	//	Prepare select
@@ -1017,6 +1088,31 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 
+#ifndef USE_ITIMER
+	//
+	//      Time of frame over? This makes the CPU happy. :(
+	//
+	ticks=SVGAGetTicks();
+	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
+	    tv.tv_usec=(NextFrameTicks-ticks)*1000;
+	}
+	while( ticks>=NextFrameTicks ) {
+	    ++VideoInterrupts;
+	    FrameFraction+=FrameRemainder;
+	    if( FrameFraction>10 ) {
+		FrameFraction-=10;
+		++NextFrameTicks;
+	    }
+	    NextFrameTicks+=FrameTicks;
+	}
+#endif
+	//
+	//	Sound
+	//
+	if( !SoundOff && !SoundThreadRunning ) {
+	    FD_SET(SoundFildes, &wfds);
+	}
+
 	//
 	//	Network
 	//
@@ -1024,30 +1120,27 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    FD_SET(NetworkFildes, &rfds);
 	}
 
-	//
-	//	Sound
-	//
-	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
-	    FD_SET(SoundFildes, &wfds);
-	}
-
-	ret = vga_waitevent(VGA_MOUSEEVENT | VGA_KEYEVENT, &rfds, &wfds, NULL, &tv);
+	ret = vga_waitevent(VGA_MOUSEEVENT | VGA_KEYEVENT, &rfds, &wfds, NULL,
+		&tv);
 
 	if(ret >= 0) {
 	    //
 	    //	Sound
 	    //
-	    if(!SoundOff && !SoundThreadRunning && SoundFildes!=-1 
-			&& FD_ISSET(SoundFildes, &wfds)) {
+	    if(!SoundOff && !SoundThreadRunning
+		    && FD_ISSET(SoundFildes, &wfds)) {
 		callbacks->SoundReady();
 	    }
 
+#if 0
+	    // ARI: needs network packets!
 	    //
 	    //	Network in sync and time for frame over: return
 	    //
-	    if(VideoInterrupts) {
+	    if(NetworkInSync && VideoInterrupts) {
 		break;
 	    }
+#endif
 
 	    //
 	    //	Network
@@ -1069,6 +1162,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //	Prepare return, time for one frame is over.
     //
     VideoInterrupts=0;
+
+#ifndef USE_ITIMER
+    if( !SkipGameCycle-- ) {
+	SkipGameCycle=SkipFrames;
+    }
+#endif
 }
 
 /**
@@ -1086,88 +1185,20 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 global void WaitEventsAndKeepSync(void)
 {
     EventCallback callbacks;
-    struct timeval tv;
-    fd_set rfds;
-    fd_set wfds;
-    int ret;
 
     callbacks.ButtonPressed=(void*)HandleButtonDown;
     callbacks.ButtonReleased=(void*)HandleButtonUp;
     callbacks.MouseMoved=(void*)HandleMouseMove;
-    callbacks.MouseExit=(void*)HandleMouseExit; // @note never called!
+    callbacks.MouseExit=(void*)HandleMouseExit;
 
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
-    SVGALibCallbacks=&callbacks;
 
-    InputMouseTimeout(&callbacks,SVGAGetTicks());
-    for(;;) {
-	//
-	//	Prepare select
-	//
-	tv.tv_sec = tv.tv_usec = 0;
-
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-
-	//
-	//	Network
-	//
-	if(NetworkFildes != -1) {
-	    FD_SET(NetworkFildes, &rfds);
-	    if( !NetworkInSync ) {
-		NetworkRecover();	// recover network
-	    }
-	}
-
-	//
-	//	Sound
-	//
-	if( !SoundOff && !SoundThreadRunning && SoundFildes!=-1 ) {
-	    FD_SET(SoundFildes, &wfds);
-	}
-
-	ret = vga_waitevent(VGA_MOUSEEVENT | VGA_KEYEVENT, &rfds, &wfds, NULL, &tv);
-
-	if(ret >= 0) {
-	    //
-	    //	Sound
-	    //
-	    if(!SoundOff && !SoundThreadRunning && SoundFildes!=-1 
-			&& FD_ISSET(SoundFildes, &wfds)) {
-		callbacks.SoundReady();
-	    }
-
-	    //
-	    //	Network in sync and time for frame over: return
-	    //
-	    if(NetworkInSync && VideoInterrupts) {
-		break;
-	    }
-
-	    //
-	    //	Network
-	    //
-	    if(NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds)) {
-		callbacks.NetworkEvent();
-	    }
-	}
-
-	//
-	//	Network in sync and time for frame over: return
-	//
-	if(NetworkInSync && VideoInterrupts) {
-	    break;
-	}
-    }
-
-    //
-    //	Prepare return, time for one frame is over.
-    //
-    VideoInterrupts=0;
+    DebugLevel0Fn("Don't use this function\n");
+    WaitEventsOneFrame(&callbacks);
 }
 
 /**
@@ -1262,6 +1293,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 */
 global void CheckVideoInterrupts(void)
 {
+#ifdef USE_ITIMER
     if( VideoInterrupts ) {
         //DebugLevel1Fn("Slow frame\n");
 	IfDebug(
@@ -1269,6 +1301,7 @@ global void CheckVideoInterrupts(void)
 	);
         ++SlowFrameCounter;
     }
+#endif
 }
 
 /**
@@ -1288,6 +1321,13 @@ global void RealizeVideoMemory(void)
 **	Toggle grab mouse.
 */
 global void ToggleGrabMouse(void)
+{
+}
+
+/**
+**	Toggle full screen mode.
+*/
+global void ToggleFullScreen(void)
 {
 }
 
