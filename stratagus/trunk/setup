@@ -468,7 +468,7 @@ case $VIDSEL in
   	USESDL=1
 	SDLLIB="\$(shell $SDL_CONFIG --libs)"
 	echo "SDL		:= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
-	echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+	echo "SDL_CFLAGS	:= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
 
         if test "$STATIC x" != " x" ; then
 	  SDLLIB="\$(shell $SDL_CONFIG --static-libs)"
