@@ -210,7 +210,9 @@ global void DrawButtonPanel(void)
 	return;
     }
 
+#ifndef NEW_VIDEO
     PlayerPixels(ThisPlayer);		// could only select own units.
+#endif
 
     for( i=0; i<9; ++i ) {
 	if( buttons[i].Pos!=-1 ) {
@@ -270,8 +272,13 @@ global void DrawButtonPanel(void)
 		}
 	    }
 
+#ifdef NEW_VIDEO
+	    DrawUnitIcon(ThisPlayer,buttons[i].Icon.Icon
+		    ,v,TheUI.Buttons[i+10].X,TheUI.Buttons[i+10].Y);
+#else
 	    DrawUnitIcon(buttons[i].Icon.Icon
 		    ,v,TheUI.Buttons[i+10].X,TheUI.Buttons[i+10].Y);
+#endif
 
 	    //
 	    //	Update status line for this button
