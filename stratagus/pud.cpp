@@ -1263,7 +1263,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
 pawn:
 			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
-			    if (NetworkFildes == -1) {
+			    if (NetworkFildes == -1 && o == ThisPlayer->Player) {
 				s = GameSettings.Presets[0].Race;
 			    } else {
 				s = GameSettings.Presets[o].Race;
