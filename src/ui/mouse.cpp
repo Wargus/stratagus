@@ -1277,7 +1277,6 @@ global void UIHandleButtonUp(unsigned button)
 	    //
 	    if( NumSelected==1 ) {
 		if( Selected[0]->Orders[0].Action==UnitActionBuilded ) {
-		// FIXME: if( Selected[0]->Constructed )
 		    PlayUnitSound(Selected[0],VoiceBuilding);
 		} else if( Selected[0]->Burning ) {
 		    // FIXME: use GameSounds.Burning
