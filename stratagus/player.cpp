@@ -265,6 +265,9 @@ global void PlayerSetSide(Player* player,int side)
 	case PlayerRaceOrc:
 	    player->RaceName="orc";
 	    break;
+	case PlayerRaceNeutral:
+	    player->RaceName="neutral";
+	    break;
 	default:
 	    DebugLevel0Fn("Unsupported side %d\n",side);
 	    player->RaceName="oops";
