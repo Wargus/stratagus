@@ -10,7 +10,7 @@
 //
 /**@name editloop.c	-	The editor main loop. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -971,6 +971,12 @@ local void EditorCallbackButtonUp(unsigned button)
 {
     DebugLevel3Fn("Pressed %8x %8x\n" _C_ MouseButtons _C_ dummy);
 
+    if( GameCursor==TheUI.Scroll.Cursor ) {
+	// Move map.
+	GameCursor=TheUI.Point.Cursor;		// Reset
+	return;
+    }
+
     if( (1<<button) == LeftButton && GameMenuButtonClicked==1 ) {
 	GameMenuButtonClicked=0;
 	if( ButtonUnderCursor==0 ) {
@@ -1189,34 +1195,44 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 
 	vp = GetViewport(CursorX, CursorY);
 	DebugCheck( !vp );
-	if (TheUI.SelectedViewport != vp) {	// viewport changed
+	if ((MouseButtons&LeftButton) && TheUI.SelectedViewport != vp) {
+	    // viewport changed
 	    TheUI.SelectedViewport = vp;
 	    MustRedraw = RedrawMinimapCursor | RedrawMap;
 	}
 
-	if (EditorState == EditorEditTile) {
-	    EditTiles(Viewport2MapX(TheUI.MouseViewport, CursorX),
-		Viewport2MapY(TheUI.MouseViewport, CursorY), TileCursor,
-		TileCursorSize);
-	}
-	if (!UnitPlacedThisPress) {
-	    if (EditorState == EditorEditUnit && CursorBuilding) {
-		if (CanBuildUnitType(NULL, CursorBuilding,
-			Viewport2MapX(TheUI.MouseViewport, CursorX),
-			Viewport2MapY(TheUI.MouseViewport, CursorY))) {
-		    PlayGameSound(GameSounds.PlacementSuccess.Sound,
-			MaxSampleVolume);
-		    EditUnit(Viewport2MapX(TheUI.MouseViewport,CursorX),
-			Viewport2MapY(TheUI.MouseViewport, CursorY),
-			CursorBuilding, Players + SelectedPlayer);
-		    UnitPlacedThisPress = 1;
-		    ClearStatusLine();
-		} else {
-		    SetStatusLine("Unit can't be placed here.");
-		    PlayGameSound(GameSounds.PlacementError.Sound,
-			MaxSampleVolume);
+	if (MouseButtons&LeftButton) {
+	    if (EditorState == EditorEditTile) {
+		EditTiles(Viewport2MapX(TheUI.MouseViewport, CursorX),
+		    Viewport2MapY(TheUI.MouseViewport, CursorY), TileCursor,
+		    TileCursorSize);
+	    }
+	    if (!UnitPlacedThisPress) {
+		if (EditorState == EditorEditUnit && CursorBuilding) {
+		    if (CanBuildUnitType(NULL, CursorBuilding,
+			    Viewport2MapX(TheUI.MouseViewport, CursorX),
+			    Viewport2MapY(TheUI.MouseViewport, CursorY))) {
+			PlayGameSound(GameSounds.PlacementSuccess.Sound,
+			    MaxSampleVolume);
+			EditUnit(Viewport2MapX(TheUI.MouseViewport,CursorX),
+			    Viewport2MapY(TheUI.MouseViewport, CursorY),
+			    CursorBuilding, Players + SelectedPlayer);
+			UnitPlacedThisPress = 1;
+			ClearStatusLine();
+		    } else {
+			SetStatusLine("Unit can't be placed here.");
+			PlayGameSound(GameSounds.PlacementError.Sound,
+			    MaxSampleVolume);
+		    }
 		}
 	    }
+	} else if (MouseButtons&MiddleButton) {
+	    // enter move map mode
+	    CursorStartX=CursorX;
+	    CursorStartY=CursorY;
+	    GameCursor=TheUI.Scroll.Cursor;
+	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
+	    MustRedraw|=RedrawCursor;
 	}
     }
 }
@@ -1403,6 +1419,45 @@ local void EditorCallbackMouse(int x, int y)
     DebugLevel3Fn("Moved %d,%d\n" _C_ x _C_ y);
 
     HandleCursorMove(&x, &y);		// Reduce to screen
+
+    //
+    //	Move map.
+    //
+    if (GameCursor == TheUI.Scroll.Cursor) {
+	int xo;
+	int yo;
+
+	// FIXME: Support with CTRL for faster scrolling.
+	xo = TheUI.MouseViewport->MapX;
+	yo = TheUI.MouseViewport->MapY;
+	if (TheUI.ReverseMouseMove) {
+	    if (x < CursorStartX) {
+		xo++;
+	    } else if (x > CursorStartX) {
+		xo--;
+	    }
+	    if (y < CursorStartY) {
+		yo++;
+	    } else if (y > CursorStartY) {
+		yo--;
+	    }
+	} else {
+	    if (x < CursorStartX) {
+		xo--;
+	    } else if (x > CursorStartX) {
+		xo++;
+	    }
+	    if (y < CursorStartY) {
+		yo--;
+	    } else if (y > CursorStartY) {
+		yo++;
+	    }
+	}
+	TheUI.WarpX = CursorStartX;
+	TheUI.WarpY = CursorStartY;
+	ViewportSetViewpoint(TheUI.MouseViewport, xo, yo);
+	return;
+    }
 
     // Automatically unpress when map tile has changed
     if (LastMapX != Viewport2MapX(TheUI.SelectedViewport, CursorX) ||
