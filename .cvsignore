@@ -3,7 +3,7 @@ freecraft
 gmon.out
 save_file_of_freecraft.ccl
 .cvsignore
-Rules.make
+Rules.make.WIN32
 core
 srcdoc
 .depend
