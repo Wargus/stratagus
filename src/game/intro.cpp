@@ -45,6 +45,15 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+/**
+**	Linked list struct used to split text up into lines
+*/
+typedef struct TextLines {
+    char* text;			/// line of text
+    struct TextLines* next;	/// pointer to next line
+} TextLines;
+
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -106,52 +115,114 @@ local void IntroCallbackExit(void)
 }
 
 /**
-**	Scroll text.
+**	Splits text up into a linked list of lines less than a given width.
 **
-**	@param x	x start pixel screen position.
-**	@param y	y start pixel screen position.
-**	@param i	scroll index.
-**	@param text	Text to display.
-**
-**	@note this is very slow, a faster way can be written.
+**	@param text	The text to be split up.
+**	@param w	Maximum width of a line.
+**	@param lines	Pointer to linked list structure.
 */
-local void ScrollText(int x,int y,int i,const char* text)
+local void SplitTextIntoLines(const char* text,int w,TextLines** lines)
 {
-    char* s;
     int l;
+    char* s;
+    char* str;
+    TextLines** ptr;
 
     l=0;
-    //
-    //	Split the text into lines.
-    //
-    for( ; y<250; ) {
-	char* s1;
+    s=str=strdup(text);
+    ptr=lines;
 
-	s=strdup(text+l);
+    for( ;; ) {
+	char* s1;
+	char* space;
+
 	if( (s1=strchr(s,'\n')) ) {
 	    *s1='\0';
 	}
+	space=NULL;
 	for( ;; ) {
-	    if( VideoTextLength(LargeFont,s)<370 ) {
+	    if( VideoTextLength(LargeFont,s)<w ) {
 		break;
 	    }
-	    *strrchr(s,' ')='\0';
+	    s1=strrchr(s,' ');
+	    if( !s1 ) {
+		fprintf(stderr, "line too long: \"%s\"\n", s);
+		break;
+	    }
+	    if( space )
+		*space=' ';
+	    space=s1;
+	    *space='\0';
 	}
 
-	if( i<24 ) {
-	    // FIXME: must clip the text
-	    VideoDrawText(x,y-i,LargeFont,s);
-	    y+=24;
-	} else {
-	    i-=24;
-	}
+	*ptr=(TextLines*)malloc(sizeof(TextLines));
+	(*ptr)->text=strdup(s);
+	(*ptr)->next=NULL;
+	ptr=&((*ptr)->next);
+
 	l+=strlen(s);
-	free(s);
 	if( !text[l] ) {
 	    break;
 	}
 	++l;
+	s=str+l;
     }
+
+    free(str);
+}
+
+/**
+**	Frees memory in a TextLines struct
+**
+**	@param lines	Address of the pointer to free
+*/
+local void FreeTextLines(TextLines** lines)
+{
+    TextLines* ptr;
+    while( *lines ) {
+	ptr=(*lines)->next;
+	free((*lines)->text);
+	free(*lines);
+	*lines=ptr;
+    }
+}
+
+/**
+**	Scroll text.
+**
+**	@param x	x start pixel screen position.
+**	@param y	y start pixel screen position.
+**	@param w	width of text area
+**	@param h	height of text area
+**	@param i	scroll index.
+**	@param text	Text to display.
+*/
+local void ScrollText(int x,int y,int w,int h,int i,TextLines *lines)
+{
+    int miny,endy;
+    TextLines* ptr;
+
+    PushClipping();
+    SetClipping(x,y,x+w,y+h);
+
+    miny=y-24;
+    endy=y+h;
+    y=endy-i;
+    ptr=lines;
+
+    for( ; y<endy; ) {
+	if( !ptr )
+	    break;
+
+	if( y>=miny ) {
+	    VideoDrawTextClip(x,y,LargeFont,ptr->text);
+	}
+	y+=24;
+
+	ptr=ptr->next;
+    }
+
+    PopClipping();
 }
 
 /**
@@ -172,6 +243,8 @@ global void ShowIntro(const Intro *intro)
     CLFile* file;
     char buf[1024];
     int stage;
+    TextLines* ScrollingText;
+    TextLines* ObjectivesText[MAX_OBJECTIVES];
 
     VideoLockScreen();
     VideoClearScreen();
@@ -214,6 +287,16 @@ global void ShowIntro(const Intro *intro)
 	PlayFile(intro->VoiceFile[0]);
     }
 
+    SplitTextIntoLines(text,320,&ScrollingText);
+    for( i=0; i<MAX_OBJECTIVES; i++) {
+	if( intro->Objectives[i] ) {
+	    SplitTextIntoLines(intro->Objectives[i],260,&ObjectivesText[i]);
+	}
+	else {
+	    ObjectivesText[i]=NULL;
+	}
+    }
+
     x=(VideoWidth-640)/2;
     line=0;
     stage=1;
@@ -240,39 +323,21 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw scrolling text
 	//
-	PushClipping();
-	SetClipping(x+268,y+80,x+640-1,y+480-1);
-	ScrollText(x+268,y+80,line,text);
-	PopClipping();
+	ScrollText(x+70,y+80,320,170,line,ScrollingText);
+
 	//
 	//	Draw objectives
 	//
 	VideoDrawText(x+372,y+306,LargeFont,"Objectives:");
 	y+=330;
-	for( i=0; i<MAX_OBJECTIVES && intro->Objectives[i]; ++i ) {
-	    char buf[1024];
+	for( i=0; i<MAX_OBJECTIVES && ObjectivesText[i]; ++i ) {
+	    TextLines* ptr;
 
-	    l=0;
-	    //
-	    //	Split the text into lines.
-	    //
-	    for( ;; ) {
-		strncpy(buf,intro->Objectives[i]+l,sizeof(buf));
-		buf[sizeof(buf)-1]='\0';
-		for( ;; ) {
-		    if( VideoTextLength(LargeFont,buf)<260 ) {
-			break;
-		    }
-		    *strrchr(buf,' ')='\0';
-		}
-
-		VideoDrawText(x+372,y,LargeFont,buf);
+	    ptr=ObjectivesText[i];
+	    while( ptr ) {
+		VideoDrawText(x+372,y,LargeFont,ptr->text);
 		y+=22;
-		l+=strlen(buf);
-		if( !intro->Objectives[i][l] ) {
-		    break;
-		}
-		++l;
+		ptr=ptr->next;
 	    }
 	}
 
@@ -289,6 +354,12 @@ global void ShowIntro(const Intro *intro)
 	WaitEventsOneFrame(&callbacks);
 	WaitEventsOneFrame(&callbacks);
 	++line;
+    }
+
+    FreeTextLines(&ScrollingText);
+    for( i=0; i<MAX_OBJECTIVES; i++ ) {
+	if( ObjectivesText[i] )
+	    FreeTextLines(&ObjectivesText[i]);
     }
 
     free(text);

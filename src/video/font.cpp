@@ -353,29 +353,50 @@ global int VideoTextLength(unsigned font,const unsigned char* text)
 }
 
 /**
-**	Draw text with font at x,y unclipped.
+**	Returns the height of the font.
 **
-**	~	is special prefix.
-**	~~	is the ~ character self.
-**	~!	print next character reverse.
-**	~n	0123456789abcdef print text in color 1-16.
-**	~<	start reverse.
-**	~>	switch back to last used color.
+**	@param font	Font number.
 **
+**	@return		The height of the font.
+*/
+global int VideoTextHeight(unsigned font)
+{
+    return Fonts[font].Height;
+}
+
+/**
+**	Draw character with current color clipped into 8 bit framebuffer.
+**
+**	@param graphic	Pointer to object
+**	@param gx	X offset into object
+**	@param gy	Y offset into object
+**	@param w	width to display
+**	@param h	height to display
 **	@param x	X screen position
 **	@param y	Y screen position
-**	@param font	Font number
-**	@param text	Text to be displayed.
-**
-**	@return		The lenght of the printed text.
 */
-global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
+local void VideoDrawCharClip(const Graphic* graphic,int gx,int gy,int w,int h,
+			     int x,int y)
+{
+    int ox,oy,ex;
+    CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
+    VideoDrawChar(graphic,gx+ox,gy+oy,w,h,x,y);
+}
+
+local int DrawText(int x,int y,unsigned font,const unsigned char* text,
+			int clip)
 {
     int w;
     int height;
     int widths;
     const ColorFont* fp;
     const unsigned char* rev;
+    void (*DrawChar)(const Graphic*,int,int,int,int,int,int);
+
+    if( clip )
+	DrawChar=VideoDrawCharClip;
+    else
+	DrawChar=VideoDrawChar;
 
     fp=Fonts+font;
     height=fp->Height;
@@ -423,10 +444,10 @@ global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 
 	if( height*(*text-32)<fp->Graphic->Height ) {
 	    w=fp->CharWidth[*text-32];
-	    VideoDrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
+	    DrawChar(fp->Graphic,0,height*(*text-32),w,height,x+widths,y);
 	} else {
 	    w=fp->CharWidth[0];
-	    VideoDrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
+	    DrawChar(fp->Graphic,0,height*0,w,height,x+widths,y);
 	}
 	widths+=w+1;
 	if( rev ) {
@@ -439,6 +460,41 @@ global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 }
 
 /**
+**	Draw text with font at x,y unclipped.
+**
+**	~	is special prefix.
+**	~~	is the ~ character self.
+**	~!	print next character reverse.
+**	~n	0123456789abcdef print text in color 1-16.
+**	~<	start reverse.
+**	~>	switch back to last used color.
+**
+**	@param x	X screen position
+**	@param y	Y screen position
+**	@param font	Font number
+**	@param text	Text to be displayed.
+**
+**	@return		The length of the printed text.
+*/
+global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
+{
+    return DrawText(x,y,font,text,0);
+}
+
+/**
+**	Draw text with font at x,y clipped.
+**
+**	See VideoDrawText.
+**
+**	@return		The length of the printed text.
+*/
+global int VideoDrawTextClip(int x,int y,unsigned font,
+			     const unsigned char* text)
+{
+    return DrawText(x,y,font,text,1);
+}
+
+/**
 **	Draw reverse text with font at x,y unclipped.
 **
 **	@see VideoDrawText for full description.
@@ -448,7 +504,7 @@ global int VideoDrawText(int x,int y,unsigned font,const unsigned char* text)
 **	@param font	Font number
 **	@param text	Text to be displayed.
 **
-**	@return		The lenght of the printed text.
+**	@return		The length of the printed text.
 */
 global int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* text)
 {
@@ -471,7 +527,7 @@ global int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* t
 **	@param font	Font number
 **	@param text	Text to be displayed.
 **
-**	@return		The lenght of the printed text.
+**	@return		The length of the printed text.
 */
 global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* text)
 {
@@ -491,7 +547,7 @@ global int VideoDrawTextCentered(int x,int y,unsigned font,const unsigned char* 
 **	@param font	Font number
 **	@param number	Number to be displayed.
 **
-**	@return		The lenght of the printed text.
+**	@return		The length of the printed text.
 */
 global int VideoDrawNumber(int x, int y, unsigned font, int number)
 {
@@ -522,24 +578,14 @@ global int VideoDrawNumber(int x, int y, unsigned font, int number)
 **	@param font	Font number
 **	@param number	Number to be displayed.
 **
-**	@return		The lenght of the printed text.
-**
-**	@todo	Not real clipped, not drawn if too long!
+**	@return		The length of the printed text.
 */
-global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
+global int VideoDrawNumberClip(int x,int y,unsigned font,int number)
 {
-    char buf[sizeof(int) * 10 + 2];
-    const ColorFont* fp;
-    int n;
+    char buf[sizeof(int)*10+2];
 
-    fp = Fonts + font;
-    sprintf(buf, "%d", number);
-    n = VideoTextLength(font, buf);
-
-    if( x<ClipX1 || x+n>ClipX2 || y<ClipY1 || y+fp->Height>ClipY2 ) {
-	return 0;
-    }
-    return VideoDrawText(x, y, font, buf);
+    sprintf(buf,"%d",number);
+    return VideoDrawTextClip(x,y,font,buf);
 }
 
 /**
@@ -550,7 +596,7 @@ global int VideoDrawNumberClip(int x, int y, unsigned font, int number)
 **	@param font	Font number
 **	@param number	Number to be displayed.
 **
-**	@return		The lenght of the printed text.
+**	@return		The length of the printed text.
 */
 global int VideoDrawReverseNumber(int x,int y,unsigned font,int number)
 {

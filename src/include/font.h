@@ -133,8 +133,12 @@ extern void SetDefaultTextColors(int normal,int reverse);
 extern void GetDefaultTextColors(int *normalp,int *reversep);
     /// Returns the pixel length of a text
 extern int VideoTextLength(unsigned font,const unsigned char* text);
+    /// Returns the height of the font
+extern int VideoTextHeight(unsigned font);
     /// Draw text unclipped
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
+    /// Draw text unclipped
+extern int VideoDrawTextClip(int x,int y,unsigned font,const unsigned char* text);
     /// Draw reverse text unclipped
 extern int VideoDrawReverseText(int x,int y,unsigned font,const unsigned char* text);
     /// Draw text centered and unclipped
