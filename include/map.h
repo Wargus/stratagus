@@ -384,8 +384,6 @@ extern void MapUnmarkTileRadarJammer(const struct _player_* player, int x, int y
 //
 // in map_wall.c
 //
-	/// Check if the seen tile-type is wall
-extern int MapIsSeenTileWall(int x, int y, int walltype);
 	/// Correct the seen wall field, depending on the surrounding
 extern void MapFixSeenWallTile(int x, int y);
 	/// Correct the surrounding seen wall fields

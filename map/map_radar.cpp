@@ -73,7 +73,7 @@ unsigned char UnitVisibleOnRadar(const Player* pradar, const Unit* punit)
 		}
 	}
 
-	// Can't exit till the end, as we might be be able to see a different tile 
+	// Can't exit till the end, as we might be be able to see a different tile
 	return 0;
 }
 
