@@ -169,9 +169,9 @@ void AddDependency(const char* target, const char* required, int count,
 	printf("New rules are :");
 	node = node->Rule;
 	while (node) {
-			temp = node;
-		while (temp){
-				printf("temp->Kind.UnitType=%p ", temp->Kind.UnitType);
+		temp = node;
+		while (temp) {
+			printf("temp->Kind.UnitType=%p ", temp->Kind.UnitType);
 			temp = temp->Rule;
 		}
 		node = node->Next;

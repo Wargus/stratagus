@@ -780,7 +780,7 @@ void NetworkEvent(void)
 	//
 	// Read the packet.
 	//
-	if( (i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
+	if ((i = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
 		//
 		// Server or client gone?
 		//

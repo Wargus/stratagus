@@ -96,15 +96,15 @@ void RegionUnassignTile(RegionId region, int x, int y)
 	// Remove from segments
 	cur = adef->FirstSegment;
 	while (cur) {
-			if (cur->Y == y && cur->MinX <= x && cur->MaxX >= x){
+		if (cur->Y == y && cur->MinX <= x && cur->MaxX >= x) {
 			if (x == cur->MinX) {
 				cur->MinX++;
-				if (cur->MinX > cur->MaxX){
+				if (cur->MinX > cur->MaxX) {
 					RegionDelSegment(adef, cur);
 				}
 			} else if (x == cur->MaxX) {
 				cur->MaxX--;
-				if (cur->MinX > cur->MaxX){
+				if (cur->MinX > cur->MaxX) {
 					RegionDelSegment(adef, cur);
 				}
 			} else {
@@ -233,7 +233,7 @@ RegionId NewRegion(int iswater)
 	Regions[result].Dirty = -1;
 
 	++NextFreeRegion;
-	while (NextFreeRegion < RegionMax && Regions[NextFreeRegion].TileCount){
+	while (NextFreeRegion < RegionMax && Regions[NextFreeRegion].TileCount) {
 		++NextFreeRegion;
 	}
 	return result;
@@ -643,7 +643,7 @@ static void MapSplitterTileOccuped(int x, int y)
 	}
 
 	// Count different path from the removed cell.
-	for (i = 0; i < 8; ++i){
+	for (i = 0; i < 8; ++i) {
 		tx = x + adjacents[i][0];
 		ty = y + adjacents[i][1];
 
@@ -880,7 +880,7 @@ static void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 	}
 
 	// Try in yinc dir
-	for (i = 0; i < 2; ++i){
+	for (i = 0; i < 2; ++i) {
 		y = starty + (i ? -1 : 1);
 			for (x = x0 - 1;x <= x1 + 1; ++x) {
 			if (!InMap(x, y)) {
@@ -1034,7 +1034,7 @@ void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 								continue;
 							}
 							dst = (x - refx) * (x - refx) + (y - refy) * (y - refy);
-							if (bestdst == -1 || dst < bestdst){
+							if (bestdst == -1 || dst < bestdst) {
 								*rsltx = x;
 								*rslty = y;
 								bestdst = dst;

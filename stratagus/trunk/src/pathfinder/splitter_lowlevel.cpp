@@ -133,7 +133,7 @@ void RegionAppendSegment(RegionDefinition* def, int x0, int x1, int y)
 */
 void RegionUpdateMinMax(RegionDefinition* adef,int x,int y)
 {
-	if (adef->TileCount == 0){
+	if (adef->TileCount == 0) {
 		adef->MinX = x;
 		adef->MaxX = x;
 		adef->MinY = y;
@@ -366,7 +366,7 @@ static int RegionTempStorageMarkPoints(RegionId regid, MapPoint* points, int nbp
 		rslt = nbpoints;
 
 		// Mark all points
-			for (id = 0; id < nbpoints; id++){
+		for (id = 0; id < nbpoints; ++id) {
 			RegionTempStorage[points[id].X + TheMap.Info.MapWidth * points[id].Y] = markvalue;
 		}
 	}
@@ -447,7 +447,7 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 			// Count obstacle when travelling throught adjacents
 			lasti = region_ok[7];
 			obstacle = 0;
-			for (i = 0;i < 8; i++){
+			for (i = 0; i < 8; ++i) {
 				if (lasti != region_ok[i]) {
 					obstacle++;
 				}
@@ -745,7 +745,7 @@ void RegionRescanAdjacents(RegionId regid)
 
 	LastId++;
 	if (LastId == 1) {
-		for (i = 0; i < MaxRegionNumber; i++){
+		for (i = 0; i < MaxRegionNumber; i++) {
 			Connected[i] = 1;
 		}
 		LastId++;

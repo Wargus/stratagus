@@ -582,14 +582,14 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 			//
 			// Unit we won't kill are evaluated the same
 			//
-			if (effective_hp > 0){
+			if (effective_hp > 0) {
 				effective_hp = 0;
 			}
 
 			//
 			// Unit we are sure to kill are all evaluated the same (except PRIORITY)
 			//
-			if (effective_hp < -hp_damage_evaluate){
+			if (effective_hp < -hp_damage_evaluate) {
 				effective_hp = -hp_damage_evaluate;
 			}
 
@@ -669,17 +669,17 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 
 		// put in x-y the real point which will be hit...
 		// (only meaningfull when dtype->TileWidth > 1)
-		if (u->X < dest->X){
+		if (u->X < dest->X) {
 			x = dest->X;
-		} else if (u->X > dest->X + dtype->TileWidth - 1){
+		} else if (u->X > dest->X + dtype->TileWidth - 1) {
 			x = dest->X + dtype->TileWidth - 1;
 		} else {
 			x = u->X;
 		}
 
-		if (u->Y < dest->Y){
+		if (u->Y < dest->Y) {
 			y = dest->Y;
-		} else if(u->Y > dest->Y + dtype->TileWidth - 1){
+		} else if (u->Y > dest->Y + dtype->TileWidth - 1) {
 			y = dest->Y + dtype->TileWidth - 1;
 		} else {
 			y = u->Y;

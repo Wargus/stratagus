@@ -581,7 +581,7 @@ static int CclDefineTileset(lua_State* l)
 	//
 	if (Tilesets) {
 		for (type = 0; type < NumTilesets; ++type) {
-			if(!strcmp(Tilesets[type]->Ident, ident)) {
+			if (!strcmp(Tilesets[type]->Ident, ident)) {
 				free(Tilesets[type]->Ident);
 				free(Tilesets[type]->File);
 				free(Tilesets[type]->Class);
