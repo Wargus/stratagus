@@ -10,7 +10,7 @@
 //
 /**@name missile.c	-	The missiles. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1818,6 +1818,8 @@ global int ViewPointDistanceToMissile(const Missile* missile)
 **	Save the missile-types to file.
 **
 **	@param file	Output file.
+**
+**	@todo FIXME: CanHitOwner and FriendlyFire not supported!
 */
 global void SaveMissileTypes(FILE* file)
 {
