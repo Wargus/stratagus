@@ -298,7 +298,7 @@ local SCM CclSetContrast(SCM contrast)
     }
     TheUI.Contrast = i;
 #ifdef USE_SDL_SURFACE
-    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+    // FIXME
 #else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
 #endif
@@ -352,7 +352,7 @@ local SCM CclSetBrightness(SCM brightness)
     }
     TheUI.Brightness = i;
 #ifdef USE_SDL_SURFACE
-    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+    // FIXME:
 #else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
 #endif
@@ -406,7 +406,7 @@ local SCM CclSetSaturation(SCM saturation)
     }
     TheUI.Saturation = i;
 #ifdef USE_SDL_SURFACE
-    VideoCreatePalette(&GlobalPalette);	// rebuild palette
+    // FIXME
 #else
     VideoCreatePalette(GlobalPalette);	// rebuild palette
 #endif

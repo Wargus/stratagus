@@ -228,7 +228,7 @@ extern SDL_Palette *Pixels;
 
     ///	Loaded system palette. 256-entries long, active system palette.
 // FIXME: use SDL_Palette
-extern SDL_Palette GlobalPalette;
+extern SDL_Palette* GlobalPalette;
 
 typedef unsigned char GraphicData;	/// generic graphic data type
 
@@ -291,10 +291,7 @@ extern void RealizeVideoMemory(void);
     ///	Load palette from resource. Just loads palette, to set it use
     ///	VideoCreatePalette, which sets system palette.
 // FIXME: use SDL_Palette
-extern void LoadRGB(SDL_Palette* pal,const char* name);
-
-    ///	Set the system hardware palette from an independant Palette struct.
-extern void VideoCreatePalette(const SDL_Palette* palette);
+extern SDL_Palette* LoadRGB(const char* name);
 
     /// Load sprite
 extern Graphic* LoadSprite(const char* file, int w, int h);

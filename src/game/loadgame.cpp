@@ -204,11 +204,10 @@ global void LoadModules(void)
 #endif
 
 #ifdef USE_SDL_SURFACE
-    LoadRGB(&GlobalPalette,
-	    s = strdcat3(StratagusLibPath, "/graphics/",
+    GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
 		TheMap.Tileset->PaletteFile));
     free(s);
-    VideoCreatePalette(&GlobalPalette);
+    SetPlayersPalette();
 #else
     LoadRGB(GlobalPalette,
 	    s = strdcat3(StratagusLibPath, "/graphics/",
