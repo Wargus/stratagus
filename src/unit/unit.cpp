@@ -251,33 +251,37 @@ local Unit *AllocUnit (void)
 }
 
 /**
-**	FIXME: Docu
+**	Initialize the unit slot with default values.
+**
+**	@param unit	Unit pointer (allocated zero filled)
+**	@param type	Unit-type
 */
-global void InitUnit (Unit *unit, UnitType *type)
+global void InitUnit(Unit* unit, UnitType* type)
 {
-    /* Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
-     * is called from game loading code, Refs can already have a nonzero
-     * value (thanks to forward references in the save file).  Incrementing
-     * should not matter during in-game unit creation because in that case
-     * Refs should be 0 anyway. */
+    // Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
+    // is called from game loading code, Refs can already have a nonzero
+    // value (thanks to forward references in the save file).  Incrementing
+    // should not matter during in-game unit creation because in that case
+    // Refs is 0 anyway.
+
     ++unit->Refs;
-    //unit->Refs=1;
 
     //
-    //	Build all unit table
+    //  Build all unit table
     //
-    unit->UnitSlot=&Units[NumUnits];	// back pointer
-    Units[NumUnits++]=unit;
+    unit->UnitSlot = &Units[NumUnits];	// back pointer
+    Units[NumUnits++] = unit;
 
     DebugLevel3Fn("%p %d\n" _C_ unit _C_ UnitNumber(unit));
 
     //
-    //	Initialise unit structure (must be zero filled!)
+    //  Initialise unit structure (must be zero filled!)
     //
-    unit->Type=type;
-    unit->SeenFrame=0xFF;
+    unit->Type = type;
+    unit->SeenFrame = 0xFF;		// Unit isn't yet seen
 
-    if( 1 ) {				// Call CCL for name generation
+    // FIXME: this is not needed for load+save, must move to other place
+    if (1) {				// Call CCL for name generation
 	SCM fun;
 
 	fun = gh_symbol2scm("gen-unit-name");
@@ -286,49 +290,43 @@ global void InitUnit (Unit *unit, UnitType *type)
 
 	    value = symbol_value(fun, NIL);
 	    if (!gh_null_p(value)) {
-		value=gh_apply(value, cons(gh_symbol2scm(type->Ident),NIL));
-		unit->Name=gh_scm2newstr(value,NULL);
+		value = gh_apply(value, cons(gh_symbol2scm(type->Ident), NIL));
+		unit->Name = gh_scm2newstr(value, NULL);
 	    }
 	}
     }
 
-    if( !type->Building && type->Sprite
-	    && VideoGraphicFrames(type->Sprite)>5 ) {
-        unit->Direction=(MyRand()>>8)&0xFF;	// random heading
+    if (!type->Building && type->Sprite
+	    && VideoGraphicFrames(type->Sprite) > 5) {
+	unit->Direction = (MyRand() >> 8) & 0xFF;	// random heading
 	UnitUpdateHeading(unit);
     }
 
-    if( type->CanCastSpell ) {
-	unit->Mana=MAGIC_FOR_NEW_UNITS;
+    if (type->CanCastSpell) {
+	unit->Mana = MAGIC_FOR_NEW_UNITS;
     }
-    unit->Active=1;
+    unit->Active = 1;
 
-    // JOHNS: not needed unit->GroupId=0;
-
-    unit->Wait=1;
-    unit->Reset=1;
-    unit->Removed=1;
-
-#ifdef NEW_DECODRAW
-    // JOHNS: not needed unit->deco=NULL;
-#endif
+    unit->Wait = 1;
+    unit->Reset = 1;
+    unit->Removed = 1;
 
     // Invisible as default for submarines
-    if( !type->Submarine ) {
-	unit->Visible=-1;		// Visible as default
+    if (!type->Submarine) {
+	unit->Visible = -1;		// Visible as default
     }
 
-    unit->Rs=MyRand()%100; // used for random fancy buildings and other things
+    unit->Rs = MyRand() % 100;		// used for fancy buildings and others
 
-    unit->OrderCount=1;
-    unit->Orders[0].Action=UnitActionStill;
-    DebugCheck( unit->Orders[0].Goal );
-    unit->NewOrder.Action=UnitActionStill;
-    DebugCheck( unit->NewOrder.Goal );
-    unit->SavedOrder.Action=UnitActionStill;
-    DebugCheck( unit->SavedOrder.Goal );
+    unit->OrderCount = 1;		// No orders
+    unit->Orders[0].Action = UnitActionStill;
+    DebugCheck(unit->Orders[0].Goal);
+    unit->NewOrder.Action = UnitActionStill;
+    DebugCheck(unit->NewOrder.Goal);
+    unit->SavedOrder.Action = UnitActionStill;
+    DebugCheck(unit->SavedOrder.Goal);
 
-    DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
+    DebugCheck(NoUnitP);		// Init fails if NoUnitP!=0
 }
 
 /**
@@ -360,8 +358,9 @@ global void AssignUnitToPlayer (Unit *unit, Player *player)
 	    MustRedraw|=RedrawResources;	// update food
 	}
     }
-    if( type->Building )
+    if( type->Building ) {
 	player->NumBuildings++;
+    }
 
     unit->Player=player;
     unit->Stats=&type->Stats[unit->Player->Player];
@@ -673,18 +672,27 @@ global void UnitLost(Unit* unit)
     //
     //	Remove the unit from the player's units table.
     //
-    if( player ) {
+    type=unit->Type;
+    if( player && !type->Vanishes ) {
 	DebugCheck( *unit->PlayerSlot!=unit );
 	temp=player->Units[--player->TotalNumUnits];
 	temp->PlayerSlot=unit->PlayerSlot;
 	*unit->PlayerSlot=temp;
 	player->Units[player->TotalNumUnits]=NULL;
+
+	if( unit->Type->Building ) {
+	    player->NumBuildings--;
+	}
+
+	if( unit->Orders[0].Action!=UnitActionBuilded ) {
+	    player->UnitTypesCount[type->Type]--;
+	}
     }
+
 
     //
     //	Handle unit demand. (Currently only food supported.)
     //
-    type=unit->Type;
     if( type->Demand ) {
 	player->NumFoodUnits-=type->Demand;
 	if( player==ThisPlayer ) {
@@ -693,16 +701,10 @@ global void UnitLost(Unit* unit)
 	}
     }
 
-    if( unit->Type->Building ) {
-	player->NumBuildings--;
-    }
-
     //
     //	Update informations.
     //
     if( unit->Orders[0].Action!=UnitActionBuilded ) {
-	player->UnitTypesCount[type->Type]--;
-
 	if( type->Supply ) {			// supply
 	    player->Food-=type->Supply;
 	    if( player==ThisPlayer ) {
@@ -2306,7 +2308,7 @@ global int CanBuildOn(int x,int y,int mask)
 **	@param y	Y tile map position.
 **	@return		True if the building could be build..
 **
-**	@todo can't handle building units !1x1
+**	@todo can't handle building units !1x1, needs a rewrite.
 */
 global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 {
@@ -2336,7 +2338,8 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 		| MapFieldLandAllowed	// can't build on this
 		//| MapFieldUnpassable	// FIXME: I think shouldn't be used
 		| MapFieldNoBuilding;
-    } else switch( type->UnitType ) {
+    } else if( type->Building ) {
+	switch( type->UnitType ) {
 	case UnitTypeLand:
 	    mask=MapFieldLandUnit
 		| MapFieldBuilding	// already occuppied
@@ -2361,6 +2364,37 @@ global int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y)
 	    break;
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
+	    if( unit ) {
+		TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+	    }
+	    return 0;
+	}
+    } else switch( type->UnitType ) {
+	case UnitTypeLand:
+	    mask=MapFieldLandUnit
+		| MapFieldBuilding	// already occuppied
+		| MapFieldWall
+		| MapFieldRocks
+		| MapFieldForest	// wall,rock,forest not 100% clear?
+		| MapFieldCoastAllowed
+		| MapFieldWaterAllowed	// can't build on this
+		| MapFieldUnpassable;	// FIXME: I think shouldn't be used
+	    break;
+	case UnitTypeNaval:
+	    mask=MapFieldSeaUnit
+		| MapFieldBuilding	// already occuppied
+		| MapFieldCoastAllowed
+		| MapFieldLandAllowed	// can't build on this
+		| MapFieldUnpassable;	// FIXME: I think shouldn't be used
+	    break;
+	case UnitTypeFly:
+	    mask=MapFieldAirUnit;	// already occuppied
+	    break;
+	default:
+	    DebugLevel1Fn("Were moves this unit?\n");
+	    if( unit ) {
+		TheMap.Fields[unit->X+unit->Y*TheMap.Width].Flags|=j;
+	    }
 	    return 0;
     }
 
@@ -3812,8 +3846,8 @@ global void SaveUnit(const Unit* unit,FILE* file)
     char* ref;
     int i;
 
-    fprintf(file,"\n(unit '%s ",ref=UnitReference(unit));
-    free(ref);
+    fprintf(file,"\n(unit %d ",UnitNumber(unit));
+
     // 'type and 'player must be first, needed to create the unit slot
     fprintf(file,"'type '%s ",unit->Type->Ident);
     fprintf(file,"'player %d\n  ",unit->Player->Player);
