@@ -48,7 +48,7 @@ local int AddUpgradeModifier(int,int,int,int,int,int,int,int,int*,
 */
 global const char UpgradeType[] = "upgrade";
 
-global Upgrade Upgrades[MAXUACOUNT];	/// The main user useable upgrades
+global Upgrade Upgrades[UpgradeMax];	/// The main user useable upgrades
 local int UpgradesCount;		/// Upgrades used
 
     /// How many upgrades modifiers supported
@@ -341,7 +341,7 @@ local Upgrade* AddUpgrade(const char* ident,const char* icon,const int* costs)
 
     //	Check for free slot.
 
-    if ( UpgradesCount == MAXUACOUNT ) {
+    if ( UpgradesCount == UpgradeMax ) {
 	DebugLevel0Fn("Upgrades limit reached.\n");
 	return NULL;
     }
@@ -876,7 +876,7 @@ global void SaveUpgrades(FILE* file)
 	    }
 	}
 
-	for( j=0; j<MAXUNITTYPES; ++j ) {	// allow/forbid units
+	for( j=0; j<UnitTypeMax; ++j ) {	// allow/forbid units
 	    if( UpgradeModifiers[i]->ChangeUnits[j]!='?' ) {
 		fprintf(file,"\n  '(allow %s %d)",
 			UnitTypes[j].Ident,
@@ -884,14 +884,14 @@ global void SaveUpgrades(FILE* file)
 	    }
 	}
 
-	for( j=0; j<MAXUPGRADES; ++j ) {	// allow/forbid upgrades
+	for( j=0; j<UpgradeMax; ++j ) {		// allow/forbid upgrades
 	    if( UpgradeModifiers[i]->ChangeUpgrades[j]!='?' ) {
 		fprintf(file,"\n  '(allow %s %c)",Upgrades[j].Ident,
 			UpgradeModifiers[i]->ChangeUpgrades[j]);
 	    }
 	}
 
-	for( j=0; j<MAXUNITTYPES; ++j ) {	// apply to units
+	for( j=0; j<UnitTypeMax; ++j ) {	// apply to units
 	    if( UpgradeModifiers[i]->ApplyTo[j]!='?' ) {
 		fprintf(file,"\n  '(apply-to %s)",UnitTypes[j].Ident);
 	    }
@@ -973,9 +973,9 @@ local SCM CclDefineModifier(SCM list)
     int speed;
     int hit_points;
     int costs[MaxCosts];
-    char units[MAXUNITTYPES];
-    char upgrades[MAXUPGRADES];
-    char apply_to[MAXUNITTYPES];
+    char units[UnitTypeMax];
+    char upgrades[UpgradeMax];
+    char apply_to[UnitTypeMax];
     UnitType* convert_to;
 
     attack_range=0;
@@ -1537,7 +1537,7 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
     int pn;
 
     pn = player->Player;		// player number
-    for (z = 0; z < MAXUACOUNT; z++) {
+    for (z = 0; z < UpgradeMax; z++) {
 	// allow/forbid unit types for player
 	if (um->ChangeUnits[z] == 'A') {
 	    player->Allow.Units[z] = 'A';
@@ -1688,7 +1688,7 @@ global void AllowUpgradeId( Player* player,  int id, char af )
 */
 global char UnitIdAllowed(const Player* player,  int id )
 {
-  if ( id < 0 || id >= MAXUACOUNT ) return 'F';
+  if ( id < 0 || id >= UpgradeMax ) return 'F';
   return player->Allow.Units[id];
 }
 
@@ -1698,7 +1698,7 @@ global char UnitIdAllowed(const Player* player,  int id )
 global char UpgradeIdAllowed(const Player* player,  int id )
 {
     // JOHNS: Don't be kind, the people should code correct!
-    DebugCheck( id < 0 || id >= MAXUACOUNT );
+    DebugCheck( id < 0 || id >= UpgradeMax );
 
     return player->Allow.Upgrades[id];
 }

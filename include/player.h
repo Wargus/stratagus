@@ -81,10 +81,10 @@ struct _player_ {
 
 //  FIXME: needed again? if not remove
 //    unsigned	UnitFlags[
-//	(UnitTypeInternalMax+BitsOf(unsigned)-1)
+//	(UnitTypeMax+BitsOf(unsigned)-1)
 //	    /BitsOf(unsigned)];		/// flags what units are available
     // FIXME: shouldn't use the constant
-    unsigned    UnitTypesCount[UnitTypeInternalMax];       /// each type unit count
+    unsigned    UnitTypesCount[UnitTypeMax];       /// each type unit count
 
     unsigned	AiEnabled;		/// handle ai on this computer
     void*	Ai;			/// Ai structure pointer

@@ -186,8 +186,6 @@ struct _unit_type_ {
 
 // --- FILLED UP ---
 
-	// FIXME: Should be included from "player.h", but recursive includes
-#define PlayerMax		16	/// maximal players supported
 	// FIXME: This stats should? be moved into the player struct
     UnitStats Stats[PlayerMax];		/// Unit status for each player
 
@@ -201,7 +199,7 @@ struct _unit_type_ {
 
     // FIXME: ARI: should be dynamic (ccl..)
     /// How many unit-types are currently supported.
-#define UnitTypeInternalMax	0xFF
+#define UnitTypeMax	0xFF
 
 /*----------------------------------------------------------------------------
 --	Variables
