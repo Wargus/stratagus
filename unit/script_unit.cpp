@@ -623,6 +623,8 @@ local SCM CclUnit(SCM list)
 	    unit->Removed=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
 	    unit->Selected=1;
+	} else if( gh_eq_p(value,gh_symbol2scm("rescued")) ) {
+	    unit->Rescued=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("visible")) ) {
 	    str=s=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);

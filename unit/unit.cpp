@@ -4213,6 +4213,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Selected ) {
 	fprintf(file," 'selected");
     }
+    if( unit->Rescued ) {
+	fprintf(file," 'rescued");
+    }
     if( unit->Next && unit->Removed ) {
 	fprintf(file," 'host-tile '(%d %d) ",
 		unit->Next->X+unit->Next->Type->TileWidth/2,
