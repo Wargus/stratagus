@@ -307,7 +307,7 @@ typedef struct _ui_ {
 	SDL_Color     ButtonAutoCastBorderColorRGB; ///< Auto cast border color
 
 	// Pie Menu
-	GraphicConfig PieMenuBackground;      ///< Optional background image for the piemenu
+	Graphic* PieMenuBackgroundG;         ///< Optional background image for the piemenu
 	enum _mouse_buttons_ PieMouseButton; ///< Which mouse button pops up the piemenu. Deactivate with the NoButton value.
 	int PieX[8];                         ///< X position of the pies
 	int PieY[8];                         ///< Y position of the pies
@@ -372,8 +372,8 @@ typedef struct _ui_ {
 
 	MenuPanel* MenuPanels;              ///< Menu panels
 
-	GraphicConfig VictoryBackground;    ///< FIXME: docu
-	GraphicConfig DefeatBackground;     ///< FIXME: docu
+	Graphic* VictoryBackgroundG;        ///< FIXME: docu
+	Graphic* DefeatBackgroundG;         ///< FIXME: docu
 } UI;
 
 /*----------------------------------------------------------------------------
