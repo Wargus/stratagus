@@ -137,25 +137,6 @@ local void HandleUnitAction(Unit* unit)
 	    }
 
 	    //
-	    //	Old order has a saved order
-	    //
-	    if( unit->SavedOrder.Action!=UnitActionStill ) {
-		//
-		//	Release pending references.
-		//
-		if( unit->SavedOrder.Goal ) {
-#ifdef REFS_DEBUG
-		    DebugCheck( !unit->SavedOrder.Goal->Refs );
-#endif
-		    if( !--unit->SavedOrder.Goal->Refs ) {
-			ReleaseUnit(unit->SavedOrder.Goal);
-		    }
-		}
-		unit->SavedOrder.Action=UnitActionStill;
-		unit->SavedOrder.Goal=NoUnitP;
-	    }
-
-	    //
 	    //	Shift queue with structure assignment
 	    //
 	    unit->OrderCount--;
