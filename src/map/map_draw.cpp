@@ -1141,6 +1141,7 @@ local void MapDraw8Tile32(int tile,int x,int y)
 */
 local void MapDraw16Tile32(int tile,int x,int y)
 {
+    DebugLevel0Fn("%d %p\n",tile,TileCached[tile]);
     if( TileCached[tile] ) {
 	VideoDraw16Tile32Cached(TileCached[tile],x,y);
     } else {
@@ -1458,11 +1459,11 @@ global void DrawMapBackground(int x,int y)
     dy=TheUI.MapY;
     ey=TheUI.MapEndY;
 
-    while( dy<=ey ) {
+    while( dy<ey ) {
 	if( *redraw_row++ ) {		// row must be redrawn
 	    sx=x+sy;
 	    dx=TheUI.MapX;
-	    while( dx<=ex ) {
+	    while( dx<ex ) {
 		//
 		//	draw only tiles which must be drawn
 		//
