@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-global struct cdrom_read_audio readdata;
+local struct cdrom_read_audio readdata;
 local void *bufstart;
 
 /*----------------------------------------------------------------------------
@@ -50,32 +50,30 @@ local int CDRead(Sample *sample, void *buf, int len)
     static int count = 0;
     int end = (int)bufstart + 2352 * 28;
 
-    ++count;
-
     readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
     readdata.addr_format = CDROM_LBA;
     readdata.nframes = 14;
 
-    if (count == 5) {
+    ++count;
+    pos += len;
+
+    if (count == (end - (int)bufstart) / len / 2 + 1) {
 	readdata.buf = bufstart;
 	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
     } else if (count == 1) {
 	readdata.buf = bufstart + 2352 * 14;
 	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
     }
-    
-    pos += len;
-    sample->User += len;
 
     if ((int)sample->User + len <= end) {
 	memcpy(buf, sample->User, len);
+	sample->User += len;
     } else {
 	count = 0;
 	memcpy(buf, sample->User, end - (int)sample->User);
 	memcpy(buf + (end - (int)sample->User), bufstart, 
 	       len - (end - (int)sample->User));
-//	sample->User = bufstart + len - (end - (int)sample->User);
-	sample->User = bufstart + (end - (int)sample->User);
+	sample->User = bufstart + len - (end - (int)sample->User);
     }
 
     return len;
