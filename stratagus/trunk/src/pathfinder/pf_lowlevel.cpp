@@ -3,17 +3,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
 
 #include "hierarchical.h"
 #include "region_set.h"
 #include "pf_lowlevel.h"
 #include "pf_low_open.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 #define COST_MOVING_UNIT	2
 #define COST_WAITING_UNIT	4
@@ -101,14 +106,14 @@ int LowlevelInit (void)
 	if ( LowOpenInit (size) < 0)
 		return -1;
 
-	Neighbor[0].Offset = -TheMap.Width;          /* up */
+	Neighbor[0].Offset = -(int)TheMap.Width;          /* up */
 	Neighbor[1].Offset = 1;                      /* right */
 	Neighbor[2].Offset = TheMap.Width;           /* down */
 	Neighbor[3].Offset = -1;                     /* left */
-	Neighbor[4].Offset = -TheMap.Width + 1;      /* upper right */
+	Neighbor[4].Offset = -(int)TheMap.Width + 1;      /* upper right */
 	Neighbor[5].Offset = TheMap.Width + 1;       /* lower right */
 	Neighbor[6].Offset = TheMap.Width - 1;       /* lower left */
-	Neighbor[7].Offset = -TheMap.Width - 1;      /* upper left */
+	Neighbor[7].Offset = -(int)TheMap.Width - 1;      /* upper left */
 
 	Neighbor[0].dx = 0;
 	Neighbor[0].dy = -1;
@@ -251,8 +256,10 @@ local MapField *LowAstarLoop (Unit *unit)
 {
 	int MovementMask = UnitMovementMask (unit);
 	MapField *mf;
+#if defined(DEBUG) && defined(TIMEIT)
 	//unsigned ts0, ts1, zzz;
 	unsigned ts2, ts[9];
+#endif
 	int expanded = 0;
 
 	while ( (mf = LowOpenGetFirst()) ) {
@@ -302,7 +309,9 @@ local MapField *LowAstarLoop (Unit *unit)
 		if (mf->h < Lowlevel.BestSoFar->h)
 			Lowlevel.BestSoFar = mf;
 
+#if defined(DEBUG) && defined(TIMEIT)
 		l_rdtsc (ts2);
+#endif
 
 		for (i=0; i<8; i++) {
 			int neigho = mfo + Neighbor[i].Offset;
@@ -312,7 +321,9 @@ local MapField *LowAstarLoop (Unit *unit)
 			int g;
 			int byte, bit;
 
+#if defined(DEBUG) && defined(TIMEIT)
 			ts[i] = rdtsc ();
+#endif
 
 			/* FIXME what order of the following tests is the best? */
 
@@ -424,7 +435,9 @@ local MapField *LowAstarLoop (Unit *unit)
 				}
 			}
 		}
+#if defined(DEBUG) && defined(TIMEIT)
 		ts[i] = rdtsc ();
+#endif
 		mf->Set = HIER_LOW_CLOSED;
 		//LowOpenPrint ();
 	}
@@ -510,11 +523,15 @@ local int ComputeH (MapField *mf, int x, int y)
 	int ah = AreaGetHeight ();
 	int tmp0, tmp1, H;
 	FieldCoords InArea;
+#if defined(DEBUG) && defined(TIMEIT)
 	unsigned ts0, ts1, ts2;
+#endif
 
 //	++h_count;
 
+#if defined(DEBUG) && defined(TIMEIT)
 	l_rdtsc (ts0);
+#endif
 
 	/* TODO: find a better way of finding the appropriate HighPathStep than
 	 * this dumb linear search */
@@ -523,7 +540,9 @@ local int ComputeH (MapField *mf, int x, int y)
 			break;
 	}
 
+#if defined(DEBUG) && defined(TIMEIT)
 	l_rdtsc (ts1);
+#endif
 
 	if (h==0 || h==1 || h==Lowlevel.HighPath->NumSteps) {
 		/* we're either inside goal region or inside one of the regions
@@ -545,7 +564,9 @@ local int ComputeH (MapField *mf, int x, int y)
 	tmp0 = ul - ((ul-ur) * InArea.X) / (aw-1);
 	tmp1 = ll - ((ll-lr) * InArea.X) / (aw-1);
 	H = tmp0 - ((tmp0-tmp1) * InArea.Y) / (ah-1);
+#if defined(DEBUG) && defined(TIMEIT)
 	l_rdtsc (ts2);
+#endif
 	//printf ("H(%3d,%3d, regid=%4d)==%4d\n", x, y, mf->RegId, H);
 	//printf ("ComputeH(): %4d %4d cycles\n", ts1-ts0, ts2-ts1);
 	return H;
@@ -567,10 +588,16 @@ local void StudyHighlevelPath (HighlevelPath *hp)
 		int Offset;
 		FieldCoords Center;
 		FieldCoords Corners[NUM_CORNERS];
-	} a[hp->NumSteps-1 + LOOK_AHEAD], *Areas;
+	} *a, *Areas;
+#if defined(DEBUG) && defined(TIMEIT)
 	unsigned ts0, ts1;
+#endif
 
+	a = alloca((hp->NumSteps-1 + LOOK_AHEAD) * sizeof(*a));
+
+#if defined(DEBUG) && defined(TIMEIT)
 	l_rdtsc (ts0);
+#endif
 
 	Areas = a + LOOK_AHEAD;
 	for (h=0; h < hp->NumSteps; h++) {
@@ -627,7 +654,9 @@ local void StudyHighlevelPath (HighlevelPath *hp)
 			hp->Sequence[h].H[i] -= (aw-1)*SCALE + SQUARE_PENALTY;
 		}
 	}
+#if defined(DEBUG) && defined(TIMEIT)
 	l_rdtsc (ts1);
+#endif
 	//printf ("path studied in %d cycles.\n", ts1-ts0);
 }
 
@@ -674,3 +703,5 @@ void ExportMap (void)
 	fclose (mapfile);
 }
 #endif
+
+#endif	// } HIERARCHIC_PATHFINDER

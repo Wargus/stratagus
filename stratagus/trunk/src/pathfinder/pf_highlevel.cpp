@@ -3,11 +3,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "freecraft.h"
 #include "unit.h"
 #include "map.h"
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
 
 #include "hierarchical.h"
 #include "region_set.h"
@@ -15,6 +18,8 @@
 #include "pf_highlevel.h"
 #include "pf_high_open.h"
 #include "pf_goal.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 /* >>3 is the equivalent of /8, &0x7 is the equivalent of %8 */
 #define SET_SEEN(regid)		(Highlevel.Seen[(regid)>>3] |= (1 << ((regid)&0x7)))
@@ -860,3 +865,4 @@ void HighPrintStats (void)
 #endif /* GATHER_STATS */
 }
 
+#endif	// } HIERARCHIC_PATHFINDER

@@ -3,8 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "freecraft.h"
 #include "region.h"
 #include "pf_high_open.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 /*
  * This implementation of Open set for the highlevel part of the hierarchical
@@ -95,3 +98,5 @@ static int heap_get_node_index (Region *reg)
 			return i;
 	return -1;
 }
+
+#endif	// } HIERARCHIC_PATHFINDER

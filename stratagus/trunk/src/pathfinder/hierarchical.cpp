@@ -15,10 +15,12 @@
 #include "pf_lowlevel.h"
 #include "pf_goal.h"
 
-#define TIMEIT
+//#define TIMEIT
 #if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
 #endif
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 struct rect {
 	int Width, Height;
@@ -88,8 +90,10 @@ void PfHierClean (void)
 
 int PfHierComputePath (Unit *unit, int *dx, int *dy)
 {
+#if defined(DEBUG) && defined(TIMEIT)
 	unsigned int ts0, ts1, ts2, ts3, hightime, lowtime;
 	unsigned int low_reset, low_mark, low_path;
+#endif
 	HighlevelPath *HighPath;
 	int retval;
 
@@ -119,29 +123,45 @@ int PfHierComputePath (Unit *unit, int *dx, int *dy)
 	 * will mark goal fields for the lowlevel one. Running LowlevelReset()
 	 * *after* the highlevel pathfinder has run would erase this information.
 	 */
+#if defined(DEBUG) && defined(TIMEIT)
 	ts0 = rdtsc ();
+#endif
 	LowlevelReset ();
+#if defined(DEBUG) && defined(TIMEIT)
 	ts1 = rdtsc ();
 	low_reset = ts1-ts0;
+#endif
 
+#if defined(DEBUG) && defined(TIMEIT)
 	ts0 = rdtsc ();
+#endif
 	HighPath = ComputeHighlevelPath (unit);
+#if defined(DEBUG) && defined(TIMEIT)
 	ts1 = rdtsc ();
+#endif
 	if (!HighPath)
 		return -2;	/* PF_UNREACHABLE */
 
+#if defined(DEBUG) && defined(TIMEIT)
 	hightime = ts1-ts0;
+#endif
 	//HighPrintStats ();
 	//HighPrintPath (HighPath, unit->Type->UnitType != UnitTypeFly);
 
+#if defined(DEBUG) && defined(TIMEIT)
 	ts1 = rdtsc ();
+#endif
 	MarkLowlevelGoal (unit, HighPath);
+#if defined(DEBUG) && defined(TIMEIT)
 	ts2 = rdtsc ();
 	low_mark = ts2-ts1;
+#endif
 	LowlevelPath (unit, HighPath);
+#if defined(DEBUG) && defined(TIMEIT)
 	ts3 = rdtsc ();
 	lowtime = ts3-ts0;
 	low_path = ts3-ts2;
+#endif
 	//LowPrintStats ();
 	//printf ("hierarchical: %d/%d(%d,%d,%d) cycles.\n\n", hightime, lowtime,
 	//			low_reset, low_mark, low_path);
@@ -479,7 +499,9 @@ local int ResolveDeadlock (Unit *unit, Unit *obstacle, int *dx, int *dy)
  * to make sure that these conditions really hold */
 void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 {
+#if defined(DEBUG) && defined(TIMEIT)
 	unsigned ts1, ts0 = rdtsc ();
+#endif
 	int ax0 = x0 / AreaGetWidth();
 	int ay0 = y0 / AreaGetHeight();
 	int ax1 = x1 / AreaGetWidth();
@@ -544,8 +566,10 @@ void PfHierMapChangedCallback (int x0, int y0, int x1, int y1)
 		 * highlevel pathfinder. */
 		HighlevelInit ();
 	}
+#if defined(DEBUG) && defined(TIMEIT)
 	ts1 = rdtsc ();
 	printf ("PfHierMapChangedCallback(): %d cycles.\n", ts1-ts0);
+#endif
 }
 
 local int GetGroupIds (int ax0, int ay0, int ax1, int ay1,
@@ -837,3 +861,5 @@ local unsigned short MapFieldGetPassability (int tx, int ty)
 {
 	return TheMap.Fields[ty*TheMap.Height+tx].Flags & MOVEMENT_IMPORTANT_FLAGS;
 }
+
+#endif	// } HIERARCHIC_PATHFINDER

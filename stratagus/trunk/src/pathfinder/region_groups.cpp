@@ -7,11 +7,15 @@
 #include "freecraft.h"
 #include "map.h"
 #include "unit.h"
+#if defined(DEBUG) && defined(TIMEIT)
 #include "rdtsc.h"
+#endif
 
 #include "region.h"
 #include "region_set.h"
 #include "region_groups.h"
+
+#ifdef HIERARCHIC_PATHFINDER	// {
 
 #define MOVEMENT_TYPE_TRANSPORTER	0
 #define MOVEMENT_TYPE_HOVERCRAFT	1
@@ -680,7 +684,9 @@ local void ExpandGroup (int type, SuperGroup *s, RegGroup *g)
 					ExpandGroup (type, s, ng);
 				} else {
 					if (ng->SuperGroup[type] != g->SuperGroup[type]) {
+#ifdef DEBUG
 						longjmp (main_loop, 1);
+#endif
 					}
 					//DebugCheck (ng->SuperGroup[type] != g->SuperGroup[type]);
 				}
@@ -691,11 +697,15 @@ local void ExpandGroup (int type, SuperGroup *s, RegGroup *g)
 
 local void InitSuperGroups (void)
 {
+#if defined(DEBUG) && defined(TIMEIT)
 	unsigned ts1, ts0 = rdtsc ();
+#endif
 	MovementTypeInitSuperGroups (MOVEMENT_TYPE_TRANSPORTER);
 	MovementTypeInitSuperGroups (MOVEMENT_TYPE_HOVERCRAFT);
+#if defined(DEBUG) && defined(TIMEIT)
 	ts1 = rdtsc ();
 	printf ("InitSuperGroups(): %d cycles.\n", ts1-ts0);
+#endif
 }
 
 int RegGroupCheckConnectivity (Unit *unit, int groupid0, int groupid1)
@@ -768,3 +778,5 @@ local void PrintSuperGroupDescriptor (SuperGroup *sg)
 }
 
 #endif
+
+#endif	// } HIERARCHIC_PATHFINDER
