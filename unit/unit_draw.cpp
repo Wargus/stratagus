@@ -760,6 +760,10 @@ local void ShowOrder(const Unit* unit)
 	    color=ColorGray;
 	    break;
 
+	case UnitActionSpellCast:
+	    color=ColorBlue;
+	    break;
+
 	case UnitActionTrain:
 	    color=ColorGray;
 	    break;
