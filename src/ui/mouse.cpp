@@ -315,8 +315,14 @@ global void DoRightButton(int x,int y)
                     SendCommandAttack(unit,x,y,NoUnitP,flush);
                 }
             }
-	    // Note: move is correct here, right default is move
-            SendCommandMove(unit,x,y,flush);
+
+	    // empty space
+	    if( RightButtonAttacks ) {
+		SendCommandAttack(unit,x,y,NoUnitP,flush);
+	    } else {
+		// Note: move is correct here, right default is move
+		SendCommandMove(unit,x,y,flush);
+	    }
             continue;
         }
 
@@ -404,6 +410,8 @@ local void HandleMouseOn(int x,int y)
     // 
     //	Scrolling Region Handling
     //	FIXME: perhaps I should change the complete scroll handling.
+    //  FIXME: show scrolling cursor only, if scrolling is possible
+    //	FIXME: scrolling with edge resistance
     //
     if( x<SCROLL_LEFT ) {
 	CursorOn=CursorOnScrollLeft;
