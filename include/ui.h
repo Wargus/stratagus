@@ -94,7 +94,7 @@ typedef struct _viewport_ Viewport;	/// Viewport typedef
 **	Viewport::Unit
 **
 **		Viewport is bound to an unit. If the unit moves the viewport
-**		changes the position together with the unit. 
+**		changes the position together with the unit.
 **		@todo binding to a group.
 **
 **	@todo mixing unsigned and int is dangerous!!!
@@ -163,6 +163,9 @@ typedef struct _ui_ {
     int		MouseAdjust;		/// Mouse speed adjust
     int		MouseScale;		/// Mouse speed scale
 
+    char	NormalFontColor;	/// Color for normal text displayed
+    char	ReverseFontColor;	/// Color for reverse text displayed
+
     //	Fillers
     GraphicConfig Filler1;		/// filler 1 graphic
     int		Filler1X;		/// filler 1 X position
@@ -229,7 +232,7 @@ typedef struct _ui_ {
 	/// Contains (or last contained) pointer (index into VP[])
     int		ActiveViewport;
     int		LastClickedVP;		/// Last clicked = active viewport
-    int		NumViewports;		/// Viewports currently used
+    int		NumViewports;		/// # Viewports currently used
     Viewport	VP[MAX_NUM_VIEWPORTS];	/// Parameters of all viewports
     // Map* attributes of Viewport are unused here:
     Viewport	MapArea;		/// geometry of the whole map area
@@ -289,7 +292,6 @@ typedef struct _ui_ {
     GraphicConfig	Menue2Panel;	/// Panel 384 x 256
     GraphicConfig	VictoryPanel;	/// Panel 288 x 128
     GraphicConfig	ScenarioPanel;	/// Panel 352 x 352
-
 } UI;
 
 /*----------------------------------------------------------------------------
