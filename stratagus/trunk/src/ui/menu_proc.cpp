@@ -116,6 +116,8 @@ local int MenuRedrawH;
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
+local int DrawScPanel;
+
 /*----------------------------------------------------------------------------
 --	Menu operation functions
 ----------------------------------------------------------------------------*/
@@ -193,46 +195,107 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
     int rc;
 
     GetDefaultTextColors(&nc, &rc);
-    if (flags&MenuButtonDisabled) {
-	rb = button - 1;
-	s = 0;
-	SetDefaultTextColors(FontGrey,FontGrey);
-    } else if (flags&MenuButtonClicked) {
-	rb = button + 1;
-	s = 2;
-	SetDefaultTextColors(rc,rc);
+    if (button == MBUTTON_SC_BUTTON) {
+	// Outer circle
+	VideoDrawHLineClip(ColorBlue,x+3,y,w-6);
+	VideoDrawHLineClip(ColorBlue,x+3,y+h-1,w-6);
+	VideoDrawVLineClip(ColorBlue,x,y+3,h-6);
+	VideoDrawVLineClip(ColorBlue,x+w-1,y+3,h-6);
+	// top left
+	VideoDrawPixelClip(ColorBlue,x+1,y+1);
+	VideoDrawPixelClip(ColorBlue,x+2,y+1);
+	VideoDrawPixelClip(ColorBlue,x+1,y+2);
+	// top right
+	VideoDrawPixelClip(ColorBlue,x+w-3,y+1);
+	VideoDrawPixelClip(ColorBlue,x+w-2,y+1);
+	VideoDrawPixelClip(ColorBlue,x+w-2,y+2);
+	// bottom left
+	VideoDrawPixelClip(ColorBlue,x+1,y+h-3);
+	VideoDrawPixelClip(ColorBlue,x+1,y+h-2);
+	VideoDrawPixelClip(ColorBlue,x+2,y+h-2);
+	// bottom right
+	VideoDrawPixelClip(ColorBlue,x+w-3,y+h-2);
+	VideoDrawPixelClip(ColorBlue,x+w-2,y+h-2);
+	VideoDrawPixelClip(ColorBlue,x+w-2,y+h-3);
+
+	// Inner circle
+	VideoDrawHLineClip(ColorBlue,x+8,y+3,w-16);
+	VideoDrawHLineClip(ColorBlue,x+8,y+h-4,w-16);
+	VideoDrawVLineClip(ColorBlue,x+4,y+7,h-14);
+	VideoDrawVLineClip(ColorBlue,x+w-5,y+7,h-14);
+	// top left
+	VideoDrawPixelClip(ColorBlue,x+6,y+4);
+	VideoDrawPixelClip(ColorBlue,x+7,y+4);
+	VideoDrawPixelClip(ColorBlue,x+5,y+5);
+	VideoDrawPixelClip(ColorBlue,x+5,y+6);
+	// top right
+	VideoDrawPixelClip(ColorBlue,x+w-8,y+4);
+	VideoDrawPixelClip(ColorBlue,x+w-7,y+4);
+	VideoDrawPixelClip(ColorBlue,x+w-6,y+5);
+	VideoDrawPixelClip(ColorBlue,x+w-6,y+6);
+	// bottom left
+	VideoDrawPixelClip(ColorBlue,x+5,y+h-7);
+	VideoDrawPixelClip(ColorBlue,x+5,y+h-6);
+	VideoDrawPixelClip(ColorBlue,x+6,y+h-5);
+	VideoDrawPixelClip(ColorBlue,x+7,y+h-5);
+	// bottom right
+	VideoDrawPixelClip(ColorBlue,x+w-6,y+h-7);
+	VideoDrawPixelClip(ColorBlue,x+w-6,y+h-6);
+	VideoDrawPixelClip(ColorBlue,x+w-8,y+h-5);
+	VideoDrawPixelClip(ColorBlue,x+w-7,y+h-5);
+
+	if (text) {
+	    VideoDrawTextCentered(x+w/2,y+(h-VideoTextHeight(font))/2,font,text);
+	}
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x,y,w-1,h);
+	    } else {
+		VideoDrawRectangleClip(ColorBlue,x,y,w-1,h);
+	    }
+	}
     } else {
-	rb = button;
-	s = 0;
-	if (flags&MenuButtonActive) {
-	    SetDefaultTextColors(rc,rc);
-	}
-    }
-    if (rb < MenuButtonGfx.Sprite->NumFrames) {
-	VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
-    } else {
-	if (rb < button) {
-	    VideoDrawRectangleClip(ColorGray,x+1,y+1,w-2,h-2);
-	    VideoDrawRectangleClip(ColorGray,x+2,y+2,w-4,h-4);
-	} else {
-	    // FIXME: Temp-workaround for missing folder button in non-expansion gfx
-	    VideoDrawRectangleClip(ColorYellow,x+1,y+1,w-2,h-2);
-	    VideoDrawRectangleClip(ColorYellow,x+2,y+2,w-4,h-4);
-	}
-    }
-    if (text) {
-	if (button != MBUTTON_FOLDER) {
-	    VideoDrawTextCentered(s+x+w/2,s+y+(h-VideoTextHeight(font))/2+2,font,text);
-	} else {
-	    SetDefaultTextColors(nc,rc);
-	    VideoDrawText(x+44,y+6,font,text);
-	}
-    }
-    if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
-	    VideoDrawRectangleClip(ColorGray,x,y,w-1,h);
+	    rb = button - 1;
+	    s = 0;
+	    SetDefaultTextColors(FontGrey,FontGrey);
+	} else if (flags&MenuButtonClicked) {
+	    rb = button + 1;
+	    s = 2;
+	    SetDefaultTextColors(rc,rc);
 	} else {
-	    VideoDrawRectangleClip(ColorYellow,x,y,w-1,h);
+	    rb = button;
+	    s = 0;
+	    if (flags&MenuButtonActive) {
+		SetDefaultTextColors(rc,rc);
+	    }
+	}
+	if (rb < MenuButtonGfx.Sprite->NumFrames) {
+	    VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+	} else {
+	    if (rb < button) {
+		VideoDrawRectangleClip(ColorGray,x+1,y+1,w-2,h-2);
+		VideoDrawRectangleClip(ColorGray,x+2,y+2,w-4,h-4);
+	    } else {
+		// FIXME: Temp-workaround for missing folder button in non-expansion gfx
+		VideoDrawRectangleClip(ColorYellow,x+1,y+1,w-2,h-2);
+		VideoDrawRectangleClip(ColorYellow,x+2,y+2,w-4,h-4);
+	    }
+	}
+	if (text) {
+	    if (button != MBUTTON_FOLDER) {
+		VideoDrawTextCentered(s+x+w/2,s+y+(h-VideoTextHeight(font))/2+2,font,text);
+	    } else {
+		SetDefaultTextColors(nc,rc);
+		VideoDrawText(x+44,y+6,font,text);
+	    }
+	}
+	if (flags&MenuButtonSelected) {
+	    if (flags&MenuButtonDisabled) {
+		VideoDrawRectangleClip(ColorGray,x,y,w-1,h);
+	    } else {
+		VideoDrawRectangleClip(ColorYellow,x,y,w-1,h);
+	    }
 	}
     }
     SetDefaultTextColors(nc,rc);
@@ -628,6 +691,35 @@ global void DrawMenu(Menu *menu)
     MenuRedrawH = menu->ysize;
 
     switch (menu->image) {
+	case ScPanel:
+	    if (!DrawScPanel) {
+		break;
+	    }
+	    DrawScPanel = 0;
+	    // Background
+	    VideoFill50TransRectangle(ColorBlack,MenuRedrawX+1,MenuRedrawY+1,MenuRedrawW-2,MenuRedrawH-2);
+	    VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY,MenuRedrawW-6);
+	    VideoDrawHLineClip(ColorBlue,MenuRedrawX+3,MenuRedrawY+MenuRedrawH-1,MenuRedrawW-6);
+	    VideoDrawVLineClip(ColorBlue,MenuRedrawX,MenuRedrawY+3,MenuRedrawH-6);
+	    VideoDrawVLineClip(ColorBlue,MenuRedrawX+MenuRedrawW-1,MenuRedrawY+3,MenuRedrawH-6);
+	    // top left
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+1);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+1);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+2);
+	    // top right
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+1);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+1);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+2);
+	    // bottom left
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-3);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+1,MenuRedrawY+MenuRedrawH-2);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+2,MenuRedrawY+MenuRedrawH-2);
+	    // bottom right
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-3,MenuRedrawY+MenuRedrawH-2);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-2);
+	    VideoDrawPixelClip(ColorBlue,MenuRedrawX+MenuRedrawW-2,MenuRedrawY+MenuRedrawH-3);
+	    break;
+
 	case ImagePanel1:
 	    VideoDrawSub(TheUI.GameMenuePanel.Graphic,0,0,
 		    VideoGraphicWidth(TheUI.GameMenuePanel.Graphic),
@@ -1649,10 +1741,7 @@ global void EndMenu(void)
     CurrentMenu = NULL;
 
     MustRedraw = RedrawEverything;
-    InterfaceState = IfaceStateNormal;
-    UpdateDisplay();
-    InterfaceState = IfaceStateMenu;
-    MustRedraw = RedrawMenu;
+    DrawScPanel = 1;
 }
 
 /**
@@ -1747,26 +1836,26 @@ global void ProcessMenu(const char *menu_id, int loop)
 	}
     }
     MenuButtonUnderCursor = -1;
+
     if (loop) {
 	SetVideoSync();
-#ifndef USE_OPENGL
-	MustRedraw = 0;
-#endif
 	MenuHandleMouseMove(CursorX,CursorY);	// This activates buttons as appropriate!
-	MustRedraw |= RedrawCursor;
     }
 
-    VideoLockScreen();
-    DrawMenu(CurrentMenu);
-    MustRedraw&=~RedrawMenu;
-    VideoUnlockScreen();
-    InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
-
     if (loop) {
+	MustRedraw = RedrawEverything;
 	while (CurrentMenu != NULL) {
 	    DebugLevel3("MustRedraw: 0x%08x\n" _C_ MustRedraw);
 	    if (MustRedraw) {
-		UpdateDisplay();
+		if (MustRedraw == RedrawEverything) {
+		    DrawScPanel = 1;
+		    InterfaceState = IfaceStateNormal;
+		    UpdateDisplay();
+		    InterfaceState = IfaceStateMenu;
+		    MustRedraw = RedrawMenu;
+		} else {
+		    UpdateDisplay();
+		}
 	    }
 	    RealizeVideoMemory();
 	    oldncr = NetConnectRunning;
@@ -1785,6 +1874,12 @@ global void ProcessMenu(const char *menu_id, int loop)
 		}
 	    }
 	}
+    } else {
+	VideoLockScreen();
+	DrawMenu(CurrentMenu);
+	MustRedraw&=~RedrawMenu;
+	VideoUnlockScreen();
+	InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
     }
 
     for (i = 0; i < menu->nitems; ++i) {
