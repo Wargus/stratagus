@@ -255,10 +255,10 @@ typedef struct _ui_ {
     // Map* attributes of Viewport are unused here:
     Viewport	MapArea;		/// geometry of the whole map area
 
-    // The menu button graphic
-    GraphicConfig MenuButtonGraphic;	/// menu button background
-    int		MenuButtonGraphicX;	/// menu button screen X position
-    int		MenuButtonGraphicY;	/// menu button screen Y position
+    // The menu panel
+    GraphicConfig MenuPanel;		/// menu panel background
+    int		MenuPanelX;		/// menu panel screen X position
+    int		MenuPanelY;		/// menu panel screen Y position
 
     /// Menu buttons
     struct {

@@ -239,12 +239,12 @@ global void LoadUserInterface(void)
 	    TheUI.ButtonPanel.Graphic->Height);
 #endif
     }
-    if (TheUI.MenuButtonGraphic.File) {
-	TheUI.MenuButtonGraphic.Graphic = LoadGraphic(TheUI.MenuButtonGraphic.File);
+    if (TheUI.MenuPanel.File) {
+	TheUI.MenuPanel.Graphic = LoadGraphic(TheUI.MenuPanel.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.MenuButtonGraphic.Graphic,
-	    TheUI.MenuButtonGraphic.Graphic->Width,
-	    TheUI.MenuButtonGraphic.Graphic->Height);
+	MakeTexture(TheUI.MenuPanel.Graphic,
+	    TheUI.MenuPanel.Graphic->Width,
+	    TheUI.MenuPanel.Graphic->Height);
 #endif
     }
     if (TheUI.MinimapPanel.File) {
@@ -512,8 +512,8 @@ local void SaveUi(CLFile* file, const UI* ui)
 
     CLprintf(file, "  ; Menu button background\n");
     CLprintf(file, "  'menu-panel (list \"%s\" %d %d)\n",
-	ui->MenuButtonGraphic.File, ui->MenuButtonGraphicX,
-	ui->MenuButtonGraphicY);
+	ui->MenuPanel.File, ui->MenuPanelX,
+	ui->MenuPanelY);
 
     CLprintf(file, "  'minimap (list\n");
     CLprintf(file, "    'file \"%s\"\n", ui->MinimapPanel.File);
@@ -706,7 +706,7 @@ global void CleanUI(UI* ui)
     free(ui->ButtonPanel.File);
 
     // Menu Button
-    free(ui->MenuButtonGraphic.File);
+    free(ui->MenuPanel.File);
 
     // Minimap
     free(ui->MinimapPanel.File);
@@ -776,7 +776,7 @@ global void CleanUserInterface(void)
 
     VideoSaveFree(TheUI.InfoPanel.Graphic);
     VideoSaveFree(TheUI.ButtonPanel.Graphic);
-    VideoSaveFree(TheUI.MenuButtonGraphic.Graphic);
+    VideoSaveFree(TheUI.MenuPanel.Graphic);
     VideoSaveFree(TheUI.MinimapPanel.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
 

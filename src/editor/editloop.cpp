@@ -905,11 +905,11 @@ global void EditorUpdateDisplay(void)
     //
     //  Menu button
     //
-    if (TheUI.MenuButtonGraphic.Graphic) {
-	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic, 0, 0,
-	    TheUI.MenuButtonGraphic.Graphic->Width,
-	    TheUI.MenuButtonGraphic.Graphic->Height,
-	    TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
+    if (TheUI.MenuPanel.Graphic) {
+	VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
+	    TheUI.MenuPanel.Graphic->Width,
+	    TheUI.MenuPanel.Graphic->Height,
+	    TheUI.MenuPanelX, TheUI.MenuPanelY);
     }
     DrawMenuButton(TheUI.MenuButton.Button,
 	(ButtonAreaUnderCursor == ButtonAreaMenu

@@ -266,11 +266,11 @@ global void DebugTestDisplay(void)
 */
 local void DrawMenuButtonArea(void)
 {
-    if (TheUI.MenuButtonGraphic.Graphic) {
-	VideoDrawSub(TheUI.MenuButtonGraphic.Graphic, 0, 0,
-	    TheUI.MenuButtonGraphic.Graphic->Width,
-	    TheUI.MenuButtonGraphic.Graphic->Height,
-	    TheUI.MenuButtonGraphicX, TheUI.MenuButtonGraphicY);
+    if (TheUI.MenuPanel.Graphic) {
+	VideoDrawSub(TheUI.MenuPanel.Graphic, 0, 0,
+	    TheUI.MenuPanel.Graphic->Width,
+	    TheUI.MenuPanel.Graphic->Height,
+	    TheUI.MenuPanelX, TheUI.MenuPanelY);
     }
     if (NetworkFildes == (Socket)-1) {
 	if (TheUI.MenuButton.X != -1) {
