@@ -73,6 +73,7 @@ global void CleanModules(void)
     CleanAi();
     CleanPlayers();
     CleanConstructions();
+    CleanDecorations();
     CleanUnitTypes();
     CleanUnits();
     CleanSelections();
@@ -132,6 +133,7 @@ global void LoadModules(void)
     LoadMissileSprites();
     LoadConstructions();
     LoadUnitTypes();
+    LoadDecorations();
 
     LoadTileset();
 
