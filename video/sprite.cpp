@@ -480,11 +480,12 @@ global void VideoDrawClip(const Graphic* sprite, unsigned frame, int x, int y)
     srect.w = sprite->Width;
     srect.h = sprite->Height;
 
+    // FIXME: is this right?
     if (x + srect.w > ClipX2) {
-	drect.w = ClipX2 - x;
+	srect.w = ClipX2 - x;
     }
     if (y + srect.h > ClipY2) {
-	drect.h = ClipY2 - y;
+	srect.h = ClipY2 - y;
     }
     if (x < ClipX1) {
 	x = ClipX1;
