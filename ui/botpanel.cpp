@@ -792,7 +792,7 @@ void DoButtonButtonClicked(int button)
 			// Follow Next -> Select target.
 		case ButtonRepair:
 			if (KeyModifiers & ModifierControl) {
-				int autorepair;
+				unsigned autorepair;
 
 				autorepair = 0;
 				// If any selected unit doesn't have autocast on turn it on
