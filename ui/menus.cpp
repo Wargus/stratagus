@@ -1504,6 +1504,7 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
 {
+    ToggleFullScreen();
 }
 
 local void SetShadowFogAlpha(Menuitem *mi __attribute__((unused)))
