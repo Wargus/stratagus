@@ -738,16 +738,18 @@ global void UIHandleMouseMove(int x,int y)
 /**
 **	Send selected units to repair
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 */
-local void SendRepair(int x,int y)
+local void SendRepair(int sx,int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
+    int x = sx / TileSizeX;
+    int y = sy / TileSizeY;
 
-    dest=RepairableOnMapTile(x,y);
+    dest=RepairableOnScreenMapPosition (sx,sy);
     if( !dest || !dest->Type || dest->Player!=ThisPlayer ) {
 	// FIXME: Should move test in repairable
 	dest=NoUnitP;
@@ -793,21 +795,23 @@ local void SendMove(int x,int y)
 **	To unit:
 **		Move to unit attacking and tracing the unit until dead.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param x	X screen map position.
+**	@param y	Y screen map position.
 **
 **	@see Selected, @see NumSelected
 */
-local void SendAttack(int x,int y)
+local void SendAttack (int sx,int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
+    int x = sx / TileSizeX;
+    int y = sy / TileSizeY;
 
     for( i=0; i<NumSelected; i++ ) {
         unit=Selected[i];
 	if( unit->Type->CanAttack || unit->Type->Building ) {
-	    dest=TargetOnMapTile(unit,x,y);
+	    dest=TargetOnScreenMapPosition (unit,sx,sy);
 	    DebugLevel3Fn("Attacking %p\n",dest);
 	    if( dest ) {
 		dest->Blink=3;
@@ -859,18 +863,23 @@ local void SendPatrol(int x,int y)
 
 /**
 **	Let a unit explode at selected point
+**
+**	@param sx	X screen map position
+**	@param sy	Y screen map position
 */
-local void SendDemolish(int x,int y)
+local void SendDemolish (int sx,int sy)
 {
     int i;
     Unit* unit;
     Unit* dest;
+    int x = sx / TileSizeX;
+    int y = sy / TileSizeY;
 
     for( i=0; i<NumSelected; ++i ) {
         unit=Selected[i];
 	if( unit->Type->Volatile ) {
 	    // FIXME: choose correct unit no flying ...
-	    dest=TargetOnMapTile(unit,x,y);
+	    dest=TargetOnScreenMapPosition (unit,sx,sy);
 	    if( dest==unit ) {	// don't let an unit self destruct
 	        dest=NoUnitP;
 	    }
@@ -933,18 +942,20 @@ local void SendUnload(int x,int y)
 **	To unit:
 **		Spell cast on unit or on map spot.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen map position.
+**	@param sy	Y screen map position.
 **
 **	@see Selected, @see NumSelected
 */
-local void SendSpellCast(int x, int y)
+local void SendSpellCast (int sx, int sy)
 {
     int i;
     Unit *unit;
     Unit *dest;
+    int x = sx / TileSizeX;
+    int y = sy / TileSizeY;
 
-    dest = UnitOnMapTile(x, y);
+    dest = UnitOnScreenMapPosition (sx, sy);
     DebugLevel3Fn("SpellCast on: %p (%d,%d)\n", dest, x, y);
     /*  NOTE: Vladi:
        This is a high-level function, it sends target spot and unit
@@ -968,12 +979,14 @@ local void SendSpellCast(int x, int y)
 /**
 **	Send a command to selected units.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param sx	X screen map position in pixels.
+**	@param sy	Y screen map position in pixels.
 */
-local void SendCommand(int x,int y)
+local void SendCommand (int sx, int sy)
 {
     int i;
+    int x = sx / TileSizeX;
+    int y = sy / TileSizeY;
 
     CurrentButtonLevel = 0; // reset unit buttons to normal
     UpdateButtonPanel();
@@ -982,10 +995,10 @@ local void SendCommand(int x,int y)
 	    SendMove(x,y);
 	    break;
 	case ButtonRepair:
-	    SendRepair(x,y);
+	    SendRepair(sx,sy);
 	    break;
 	case ButtonAttack:
-	    SendAttack(x,y);
+	    SendAttack(sx,sy);
 	    break;
 	case ButtonAttackGround:
 	    SendAttackGround(x,y);
@@ -1000,10 +1013,10 @@ local void SendCommand(int x,int y)
 	    SendUnload(x,y);
 	    break;
 	case ButtonDemolish:
-	    SendDemolish(x,y);
+	    SendDemolish(sx,sy);
 	    break;
         case ButtonSpellCast:
-	    SendSpellCast(x,y);
+	    SendSpellCast(sx,sy);
 	    break;
 	default:
 	    DebugLevel1("Unsupported send action %d\n",CursorAction);
@@ -1065,8 +1078,7 @@ local void DoSelectionButtons(unsigned num,unsigned button __attribute__((unused
 */
 local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 {
-    int mx;
-    int my;
+    int sx, sy;
 
     //
     //	Clicking on the map.
@@ -1079,15 +1091,15 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 	MustRedraw|=RedrawButtonPanel|RedrawCursor;
-	mx=Screen2MapX(CursorX);
-	my=Screen2MapY(CursorY);
+	sx = CursorX - TheUI.MapX + TileSizeX*MapX;
+	sy = CursorY - TheUI.MapY + TileSizeY*MapY;
 	if( MouseButtons&LeftButton ) {
 	    MakeLocalMissile(MissileTypeGreenCross
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY
 		    ,MapX*TileSizeX+CursorX-TheUI.MapX
 		    ,MapY*TileSizeY+CursorY-TheUI.MapY);
-	    SendCommand(mx,my);
+	    SendCommand (sx, sy);
 	}
 	return;
     }
@@ -1096,9 +1108,11 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
     //	Clicking on the minimap.
     //
     if( CursorOn==CursorOnMinimap ) {
-	mx=ScreenMinimap2MapX(CursorX);
-	my=ScreenMinimap2MapY(CursorY);
+	int mx=ScreenMinimap2MapX(CursorX);
+	int my=ScreenMinimap2MapY(CursorY);
 	if( MouseButtons&LeftButton ) {
+	    sx=mx*TileSizeX;
+	    sy=my*TileSizeY;
 	    ClearStatusLine();
 	    ClearCosts();
 	    CursorState=CursorStatePoint;
@@ -1107,8 +1121,8 @@ local void UISelectStateButtonDown(unsigned button __attribute__((unused)))
 	    UpdateButtonPanel();
 	    MustRedraw|=RedrawButtonPanel|RedrawCursor;
 	    MakeLocalMissile(MissileTypeGreenCross
-		    ,mx*TileSizeX+TileSizeX/2,my*TileSizeY+TileSizeY/2,0,0);
-	    SendCommand(mx,my);
+		    ,sx+TileSizeX/2,sy+TileSizeY/2,0,0);
+	    SendCommand(sx,sy);
 	} else {
 	    MapSetViewpoint(mx-MapWidth/2,my-MapHeight/2);
 	}
