@@ -186,7 +186,7 @@ dnl ----------------------------
 dnl --- CHECK FOR CDAUDIO ------
 AC_ARG_WITH(cdaudio,
     [  --with-cdaudio=libcda,sdlcd,cdda,no
-			  [Enable CD Audio support (default: libcda)]], CDAUDIO="$with_cdaudio")
+			  [Enable CD Audio support (default: platform-dependant)]], CDAUDIO="$with_cdaudio")
 if test "$CDAUDIO" = "sdl"; then
     CDAUDIO_CFLAGS="`sdl-config --cflags`"
     if test "$enable_static" != "yes"; then
@@ -194,11 +194,11 @@ if test "$CDAUDIO" = "sdl"; then
     else 
 	CDAUDIO_LIBS="`sdl-config --static-libs`"
     fi
+elif test "$CDAUDIO" = "no" -o "$PLATFORM" = "-DBSD"; then
+    CDAUDIO_CFLAGS=""
+    CDAUDIO_LIBS=""
 elif test "$CDAUDIO" = "cdda"; then
     CDAUDIO_CFLAGS="-DUSE_CDDA"
-    CDAUDIO_LIBS=""
-elif test "$CDAUDIO" = "no"; then
-    CDAUDIO_CFLAGS=""
     CDAUDIO_LIBS=""
 else
     CDAUDIO_CFLAGS="-DUSE_LIBCDA"
