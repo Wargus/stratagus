@@ -38,6 +38,7 @@
 #include <stdio.h>
 
 global struct cdrom_read_audio data;
+local void *bufstart;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -46,15 +47,21 @@ global struct cdrom_read_audio data;
 local int CDRead(Sample *sample, void *buf, int len)
 {
     static int pos = 0;
+    static int count = 0;
 
-    sample->User = alloca(len);
+    ++count;
 
-    data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos;
-    data.addr_format = CDROM_LBA;
-    data.nframes = len / 2352;
-    data.buf = sample->User;
-    ioctl(CDDrive, CDROMREADAUDIO, &data);
-
+    if (count == 8) {
+	count = 0;
+	sample->User = bufstart;
+	data.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
+	data.addr_format = CDROM_LBA;
+	data.nframes = len * 8 / 2352;
+	data.buf = sample->User;
+	ioctl(CDDrive, CDROMREADAUDIO, &data);
+    } else {
+	sample->User += len;
+    }
     pos += len;
 
     memcpy(buf, sample->User, len);
@@ -93,6 +100,8 @@ global Sample* LoadCD(const char* name __attribute__((unused)),
     sample->User = malloc(8192 * 10);
     sample->Type = &CDStreamSampleType;
     sample->Length = 0;
+    
+    bufstart = sample->User;
 
     return sample;
 }
