@@ -2062,10 +2062,11 @@ global void EndMenu(void)
     MustRedraw = RedrawEverything;
     PopMenu();
 
-    if (!CurrentMenu && Callbacks!=&GameCallbacks) {
-	InterfaceState=IfaceStateNormal;
-	Callbacks=&GameCallbacks;
-	GamePaused=0;
+    if (!CurrentMenu && Callbacks != &GameCallbacks) {
+	InterfaceState = IfaceStateNormal;
+	Callbacks = &GameCallbacks;
+	GamePaused = 0;
+	UIHandleMouseMove(CursorX, CursorY);
     }
 }
 
@@ -2101,6 +2102,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	InterfaceState = IfaceStateMenu;
     }
 
+    ButtonUnderCursor = -1;
     VideoLockScreen();
     HideAnyCursor();
     VideoUnlockScreen();
