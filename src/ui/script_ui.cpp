@@ -1183,18 +1183,12 @@ static int CclDefineUI(lua_State* l)
 			ui->Filler = realloc(ui->Filler, ui->NumFillers * sizeof(*ui->Filler));
 			ui->FillerX = realloc(ui->FillerX, ui->NumFillers * sizeof(*ui->FillerX));
 			ui->FillerY = realloc(ui->FillerY, ui->NumFillers * sizeof(*ui->FillerY));
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
+			lua_pushnil(l);
+			while (lua_next(l, j + 1)) {
+				value = LuaToString(l, -2);
 				if (!strcmp(value, "file")) {
-					lua_rawgeti(l, j + 1, k + 1);
 					ui->Filler[ui->NumFillers - 1].File = strdup(LuaToString(l, -1));
-					lua_pop(l, 1);
 				} else if (!strcmp(value, "pos")) {
-					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1203,7 +1197,6 @@ static int CclDefineUI(lua_State* l)
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
 					ui->FillerY[ui->NumFillers - 1] = LuaToNumber(l, -1);
-					lua_pop(l, 1);
 					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1216,8 +1209,6 @@ static int CclDefineUI(lua_State* l)
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
 				int res;
-				int subk;
-				int subsubargs;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
@@ -1241,14 +1232,10 @@ static int CclDefineUI(lua_State* l)
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				subsubargs = luaL_getn(l, -1);
-				for (subk = 0; subk < subsubargs; ++subk) {
-					lua_rawgeti(l, -1, subk + 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					++subk;
-					if (!strcmp(value, "pos")) {
-						lua_rawgeti(l, -1, subk + 1);
+				lua_pushnil(l);
+				while (lua_next(l, -2)) {
+					value = LuaToString(l, -2);
+					if (!strcmp(value, "Pos")) {
 						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 							LuaError(l, "incorrect argument");
 						}
@@ -1258,17 +1245,11 @@ static int CclDefineUI(lua_State* l)
 						lua_rawgeti(l, -1, 2);
 						ui->Resources[res].IconY = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "file")) {
-						lua_rawgeti(l, -1, subk + 1);
+					} else if (!strcmp(value, "File")) {
 						ui->Resources[res].Icon.File = strdup(LuaToString(l, -1));
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "frame")) {
-						lua_rawgeti(l, -1, subk + 1);
+					} else if (!strcmp(value, "Frame")) {
 						ui->Resources[res].IconFrame = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "size")) {
-						lua_rawgeti(l, -1, subk + 1);
+					} else if (!strcmp(value, "Size")) {
 						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 							LuaError(l, "incorrect argument");
 						}
@@ -1278,9 +1259,7 @@ static int CclDefineUI(lua_State* l)
 						lua_rawgeti(l, -1, 2);
 						ui->Resources[res].IconH = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "text-pos")) {
-						lua_rawgeti(l, -1, subk + 1);
+					} else if (!strcmp(value, "TextPos")) {
 						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 							LuaError(l, "incorrect argument");
 						}
@@ -1290,10 +1269,10 @@ static int CclDefineUI(lua_State* l)
 						lua_rawgeti(l, -1, 2);
 						ui->Resources[res].TextY = LuaToNumber(l, -1);
 						lua_pop(l, 1);
-						lua_pop(l, 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
+					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
 			}
@@ -1608,132 +1587,51 @@ static int CclDefineUI(lua_State* l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			for (k = 0; k < subargs; ++k) {
-				int subk;
-				int subsubargs;
+				Button* button;
 
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				++k;
 				if (!strcmp(value, "menu-button")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						++subk;
-						if (!strcmp(value, "pos")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->MenuButton.X = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->MenuButton.Y = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "caption")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->MenuButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "style")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->MenuButton.Style = FindButtonStyle(LuaToString(l, -1));
-							if (!ui->MenuButton.Style) {
-								LuaError(l, "Invalid button style: %s" _C_
-									LuaToString(l, -1));
-							}
-							lua_pop(l, 1);
-						} else {
-							LuaError(l, "Unsupported tag: %s" _C_ value);
-						}
-					}
+					button = &ui->MenuButton;
 				} else if (!strcmp(value, "network-menu-button")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						++subk;
-						if (!strcmp(value, "pos")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->NetworkMenuButton.X = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->NetworkMenuButton.Y = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "caption")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkMenuButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "style")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkMenuButton.Style = FindButtonStyle(LuaToString(l, -1));
-							if (!ui->NetworkMenuButton.Style) {
-								LuaError(l, "Invalid button style: %s" _C_
-									LuaToString(l, -1));
-							}
-							lua_pop(l, 1);
-						} else {
-							LuaError(l, "Unsupported tag: %s" _C_ value);
-						}
-					}
+					button = &ui->NetworkMenuButton;
 				} else if (!strcmp(value, "network-diplomacy-button")) {
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					subsubargs = luaL_getn(l, -1);
-					for (subk = 0; subk < subsubargs; ++subk) {
-						lua_rawgeti(l, -1, subk + 1);
-						value = LuaToString(l, -1);
-						lua_pop(l, 1);
-						++subk;
-						if (!strcmp(value, "pos")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->NetworkDiplomacyButton.X = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->NetworkDiplomacyButton.Y = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "caption")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkDiplomacyButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "style")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkDiplomacyButton.Style = FindButtonStyle(LuaToString(l, -1));
-							if (!ui->NetworkDiplomacyButton.Style) {
-								LuaError(l, "Invalid button style: %s" _C_
-									LuaToString(l, -1));
-							}
-							lua_pop(l, 1);
-						} else {
-							LuaError(l, "Unsupported tag: %s" _C_ value);
-						}
-					}
+					button = &ui->NetworkDiplomacyButton;
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				lua_pushnil(l);
+				while (lua_next(l, -2)) {
+					value = LuaToString(l, -2);
+					if (!strcmp(value, "Pos")) {
+						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+							LuaError(l, "incorrect argument");
+						}
+						lua_rawgeti(l, -1, 1);
+						button->X = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+						lua_rawgeti(l, -1, 2);
+						button->Y = LuaToNumber(l, -1);
+						lua_pop(l, 1);
+					} else if (!strcmp(value, "Caption")) {
+						button->Text = strdup(LuaToString(l, -1));
+					} else if (!strcmp(value, "Style")) {
+						button->Style = FindButtonStyle(LuaToString(l, -1));
+						if (!button->Style) {
+							LuaError(l, "Invalid button style: %s" _C_
+								LuaToString(l, -1));
+						}
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+					lua_pop(l, 1);
 				}
 			}
 		} else if (!strcmp(value, "minimap")) {
@@ -1774,14 +1672,10 @@ static int CclDefineUI(lua_State* l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			subargs = luaL_getn(l, j + 1);
-			for (k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, j + 1, k + 1);
-				value = LuaToString(l, -1);
-				lua_pop(l, 1);
-				++k;
-				if (!strcmp(value, "text-pos")) {
-					lua_rawgeti(l, j + 1, k + 1);
+			lua_pushnil(l);
+			while (lua_next(l, j + 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "TextPos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1791,18 +1685,14 @@ static int CclDefineUI(lua_State* l)
 					lua_rawgeti(l, -1, 2);
 					ui->StatusLineTextY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "width")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Width")) {
 					ui->StatusLineW = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "font")) {
-					lua_rawgeti(l, j + 1, k + 1);
+				} else if (!strcmp(value, "Font")) {
 					ui->StatusLineFont = FontByIdent(LuaToString(l, -1));
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "cursors")) {
 			if (!lua_istable(l, j + 1)) {
