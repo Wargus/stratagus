@@ -10,7 +10,7 @@
 //
 /**@name command.c	-	Give units a command. */
 //
-//	(c) Copyright 1998,2000-2002 by Lutz Sammer
+//	(c) Copyright 1998,2000-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1107,7 +1107,20 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 
 	if( !flush ) {
 	    DebugLevel0Fn("FIXME: must support order queing!!");
+	} else {
+	    if( unit->Orders[0].Action==UnitActionResearch ) {
+		const Upgrade* upgrade;
+
+		// Cancel current research
+		upgrade=unit->Data.Research.Upgrade;
+		unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades]=0;
+		PlayerAddCostsFactor(unit->Player,upgrade->Costs,
+			CancelResearchCostsFactor);
+		unit->SubAction=0;
+		unit->Wait=unit->Reset=1;    // immediately start next command.
+	    }
 	}
+
 	if( !(order=GetNextOrder(unit,flush)) ) {
 	    return;
 	}
