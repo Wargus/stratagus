@@ -2401,7 +2401,6 @@ local void SaveSelectLBInit(Menuitem *mi)
     i = mi->d.listbox.noptions = ReadDataDirectory(SaveDir, NULL,
 						     (FileList **)&(mi->d.listbox.options));
     if (i != 0) {
-	SaveSelectLBAction(mi, 0);
 	if (i > 7) {
 	    SaveGameMenuItems[3].flags = MenuButtonSelected;
 	} else {
