@@ -316,12 +316,11 @@ local int HowManyFree(void)
 local int KeepRequest(SoundRequest* sr) {
 	//FIXME: take fight flag into account
 	int channel;
+	const SoundChannel* theChannel;
 
 	if (sr->Sound == NO_SOUND) {
 		return 0;
 	}
-
-	const SoundChannel* theChannel;
 
 	// slow but working solution: we look for the source in the channels
 	theChannel = Channels;
