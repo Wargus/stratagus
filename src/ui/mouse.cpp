@@ -701,7 +701,7 @@ local void SendAttack(int x,int y)
 
     for( i=0; i<NumSelected; i++ ) {
         unit=Selected[i];
-	if( unit->Type->CanAttack ) {
+	if( unit->Type->CanAttack || unit->Type->Building ) {
 	    dest=TargetOnMapTile(unit,x,y);
 	    DebugLevel3Fn("Attacking %p\n",dest);
 	    if( dest!=unit ) {  // don't let an unit self destruct
