@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cdaudio.c			-	cd audio */
+/**@name cdaudio.c - cd audio */
 //
-//	(c) Copyright 2003 by Nehal Mistry
+// (c) Copyright 2003 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -55,35 +55,34 @@
 #endif
 
 /*----------------------------------------------------------------------------
---		Declaration
+-- Declaration
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-int CDTrack;						/// Current cd track
-
-int NumCDTracks;						/// Number of tracks on the cd
+int CDTrack;      ///< Current cd track
+int NumCDTracks;  ///< Number of tracks on the cd
 
 #if defined(USE_SDLCD)
-static SDL_CD* CDRom;						/// SDL cdrom device
+static SDL_CD* CDRom;                  ///< SDL cdrom device
 #elif defined(USE_CDDA)
-int CDDrive;						/// CDRom device
-struct cdrom_tocentry CDtocentry[64];		/// TOC track header struct
-static struct cdrom_tochdr CDchdr;				/// TOC header struct
-static struct cdrom_read_audio CDdata;				/// struct for reading data
+int CDDrive;                           ///< CDRom device
+struct cdrom_tocentry CDtocentry[64];  ///< TOC track header struct
+static struct cdrom_tochdr CDchdr;     ///< TOC header struct
+static struct cdrom_read_audio CDdata; ///< struct for reading data
 #endif
 
-CDModes CDMode;						/// CD mode
+CDModes CDMode; ///< CD mode
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 #if defined (USE_SDLCD)
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 static int InitCD(void)
 {
@@ -100,7 +99,7 @@ static int InitCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -109,7 +108,7 @@ int PlayCDTrack(int track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void ResumeCD(void)
 {
@@ -120,7 +119,7 @@ void ResumeCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void PauseCD(void)
 {
@@ -130,7 +129,7 @@ void PauseCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsAudioTrack(int track)
 {
@@ -139,7 +138,7 @@ int IsAudioTrack(int track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -151,7 +150,7 @@ int IsCDPlaying(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -159,7 +158,7 @@ int GetCDVolume(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -167,7 +166,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void QuitCD(void)
 {
@@ -182,7 +181,7 @@ void QuitCD(void)
 }
 #elif defined(USE_LIBCDA)
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 static int InitCD(void)
 {
@@ -197,7 +196,7 @@ static int InitCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -206,7 +205,7 @@ int PlayCDTrack(int track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void ResumeCD(void)
 {
@@ -214,7 +213,7 @@ void ResumeCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void PauseCD(void)
 {
@@ -224,7 +223,7 @@ void PauseCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsAudioTrack(int track)
 {
@@ -232,7 +231,7 @@ int IsAudioTrack(int track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -244,7 +243,7 @@ int IsCDPlaying(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -255,7 +254,7 @@ int GetCDVolume(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -263,7 +262,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void QuitCD(void)
 {
@@ -279,7 +278,7 @@ void QuitCD(void)
 }
 #elif defined(USE_CDDA)
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 static int InitCD(void)
 {
@@ -303,7 +302,7 @@ static int InitCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int PlayCDTrack(int track)
 {
@@ -317,7 +316,7 @@ int PlayCDTrack(int track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void ResumeCD(void)
 {
@@ -325,7 +324,7 @@ void ResumeCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void PauseCD(void)
 {
@@ -335,7 +334,7 @@ void PauseCD(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsAudioTrack(track)
 {
@@ -343,7 +342,7 @@ int IsAudioTrack(track)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int IsCDPlaying(void)
 {
@@ -351,7 +350,7 @@ int IsCDPlaying(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 int GetCDVolume(void)
 {
@@ -359,7 +358,7 @@ int GetCDVolume(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void SetCDVolume(int vol)
 {
@@ -367,7 +366,7 @@ void SetCDVolume(int vol)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 void QuitCD(void)
 {
@@ -376,9 +375,9 @@ void QuitCD(void)
 #endif
 
 /**
-**	  Check cdrom.
+**   Check cdrom.
 **
-**	  Perodic called from the main loop.
+**   Perodic called from the main loop.
 */
 int CDRomCheck(void* unused __attribute__ ((unused)))
 {
@@ -391,9 +390,9 @@ int CDRomCheck(void* unused __attribute__ ((unused)))
 }
 
 /*
-**		Play CDRom
+** Play CDRom
 **
-**		@param name		name of play mode, CDModeAll, CDModeRandom, CDModeDefined
+** @param name name of play mode, CDModeAll, CDModeRandom, CDModeDefined
 */
 int PlayCDRom(int name)
 {
@@ -469,6 +468,6 @@ int PlayCDRom(int name)
 }
 
 
-#endif		// } USE_CDAUDIO
+#endif // } USE_CDAUDIO
 
 //@}

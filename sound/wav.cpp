@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name wav.c			-	wav support */
+/**@name wav.c - wav support */
 //
-//	(c) Copyright 2003-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+// (c) Copyright 2003-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
@@ -54,8 +54,8 @@
 **  Private wav data structure to handle wav streaming.
 */
 typedef struct _wav_data_ {
-	CLFile* WavFile;      /// Wav file handle
-	int ChunkRem;         /// Bytes remaining in chunk
+	CLFile* WavFile;      ///< Wav file handle
+	int ChunkRem;         ///< Bytes remaining in chunk
 } WavData;
 
 /*----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 	WavData* data;
 	WavChunk chunk;
 	char* sndbuf;
-	int comp;		// number of compressed bytes actually read
+	int comp; // number of compressed bytes actually read
 	int i;
 	int read;
 	int bufrem;
@@ -173,7 +173,7 @@ static void WavFree(Sample* sample)
 }
 
 /**
-**	  wav stream type structure.
+**   wav stream type structure.
 */
 static const SampleType WavSampleType = {
 	WavRead,
@@ -300,7 +300,7 @@ Sample* LoadWav(const char* name, int flags)
 		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &WavStreamSampleType;
 	} else {
-		int comp;		// number of compressed bytes actually read
+		int comp; // number of compressed bytes actually read
 		int i;
 		int rem;
 		int read;
