@@ -604,7 +604,7 @@ typedef struct _new_animation_ {
 
 typedef struct _new_animations_ {
 	NewAnimation* Start;
-	NewAnimation* Idle;
+	NewAnimation* Still;
 	NewAnimation* Death;
 	NewAnimation* StartAttack;
 	NewAnimation* Attack;
@@ -881,6 +881,7 @@ struct _unit_type_ {
 	int ShadowOffsetY;              ///< Shadow vertical offset
 
 	Animations* Animations;         ///< Animation scripts
+	NewAnimations* NewAnimations;   ///< NewAnimation scripts
 
 	IconConfig Icon;                ///< Icon to display for this unit
 	MissileConfig Missile;          ///< Missile weapon
@@ -1045,6 +1046,7 @@ extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
 
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
+extern NewAnimations* NewAnimationsByIdent(const char* ident);
 
 extern void SaveUnitTypes(struct _CL_File_* file);  ///< Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            ///< Allocate an empty unit-type slot

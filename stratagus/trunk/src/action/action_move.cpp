@@ -196,7 +196,8 @@ int CanMove(const Unit* unit)
 {
 	Assert(unit);
 	Assert(unit->Type);
-	return (unit->Type->Animations && unit->Type->Animations->Move);
+	return (unit->Type->Animations && unit->Type->Animations->Move) ||
+		unit->Type->NewAnimations;
 }
 
 
@@ -210,8 +211,93 @@ int CanMove(const Unit* unit)
 */
 int DoActionMove(Unit* unit)
 {
+	int xd;     // X movement in tile.
+	int yd;     // Y movement in tile.
+	int d;
+	int x;      // Unit->X
+	int y;      // Unit->Y
+	int move;
+
 	Assert(CanMove(unit));
-	return ActionMoveGeneric(unit, unit->Type->Animations->Move);
+	if (unit->Type->Animations) {
+		return ActionMoveGeneric(unit, unit->Type->Animations->Move);
+	}
+
+	if (!unit->Moving) {
+		// FIXME: So units flying up and down are not affected.
+		unit->IX = unit->IY = 0;
+
+		UnmarkUnitFieldFlags(unit);
+		d = NextPathElement(unit, &xd, &yd);
+		MarkUnitFieldFlags(unit);
+		switch (d) {
+			case PF_UNREACHABLE: // Can't reach, stop
+				if (unit->Player->AiEnabled) {
+					AiCanNotMove(unit);
+				}
+				unit->Moving = 0;
+				return d;
+			case PF_REACHED: // Reached goal, stop
+				unit->Moving = 0;
+				return d;
+			case PF_WAIT: // No path, wait
+				unit->Moving = 0;
+				return d;
+			default: // On the way moving
+				unit->Moving = 1;
+				break;
+		}
+		x = unit->X;
+		y = unit->Y;
+		//
+		// Transporter (un)docking?
+		//
+		// FIXME: This is an ugly hack
+		if (unit->Type->CanTransport &&
+				((WaterOnMap(x, y) && CoastOnMap(x + xd, y + yd)) ||
+				(CoastOnMap(x, y) && WaterOnMap(x + xd, y + yd)))) {
+			PlayUnitSound(unit, VoiceDocking);
+		}
+
+		x = unit->X + xd;
+		y = unit->Y + yd;
+		MoveUnitToXY(unit, x, y);
+
+		// Remove unit from the current selection
+		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
+			if (NumSelected == 1) { //  Remove building cursor
+				CancelBuildingMode();
+			}
+			if (!ReplayRevealMap) {
+				UnSelectUnit(unit);
+				SelectionChanged();
+			}
+		}
+
+		unit->IX = -xd * TileSizeX;
+		unit->IY = -yd * TileSizeY;
+		unit->Frame = 0;
+		UnitHeadingFromDeltaXY(unit, xd, yd);
+		//  Recalculate the seen count.
+		UnitCountSeen(unit);
+	} else {
+		xd = Heading2X[unit->Direction / NextDirection];
+		yd = Heading2Y[unit->Direction / NextDirection];
+		d = 0;
+	}
+
+	move = UnitShowNewAnimation(unit, unit->Type->NewAnimations->Move);
+
+	unit->IX += xd * move;
+	unit->IY += yd * move;
+
+	// Finished move animation, set Moving to 0 so we recalculate the path
+	// next frame
+	if (unit->Anim.Anim == unit->Anim.CurrAnim) {
+		unit->Moving = 0;
+	}
+
+	return d;
 }
 
 /**

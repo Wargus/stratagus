@@ -396,6 +396,7 @@ struct _graphic_;
 #endif
 struct _unit_type_;
 struct _unit_stats_;
+struct _new_animation;
 struct _spell_type_;
 struct _unit_colors_;
 struct _construction_frame_;
@@ -613,6 +614,13 @@ struct _unit_ {
 	unsigned Blink : 3;     ///< Let selection rectangle blink
 	unsigned Moving : 1;    ///< The unit is moving
 	unsigned ReCast : 1;    ///< Recast again next cycle
+
+	struct {
+		const struct _new_animation_* Anim;
+		const struct _new_animation_* CurrAnim;
+		int Wait;
+		int Unbreakable;
+	} Anim;
 
 	/** set to random 1..100 when MakeUnit()
 	** used for fancy buildings

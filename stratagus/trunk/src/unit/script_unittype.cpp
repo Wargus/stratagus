@@ -388,6 +388,8 @@ static int CclDefineUnitType(lua_State* l)
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Animations")) {
 			type->Animations = AnimationsByIdent(LuaToString(l, -1));
+		} else if (!strcmp(value, "NewAnimations")) {
+			type->NewAnimations = NewAnimationsByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "Icon")) {
 			if (redefine) {
 				free(type->Icon.Name);
@@ -618,7 +620,7 @@ static int CclDefineUnitType(lua_State* l)
 				BuildRestriction* f;
 
 				x = 0;
-				while(type->BuildingRules[x] != NULL) {
+				while (type->BuildingRules[x] != NULL) {
 					b = type->BuildingRules[x];
 					while (b != NULL) {
 						f = b;
@@ -1549,8 +1551,8 @@ static int CclDefineNewAnimations(lua_State* l)
 
 		if (!strcmp(value, "Start")) {
 			anims->Start = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Idle")) {
-			anims->Idle = ParseAnimation(l, -1);
+		} else if (!strcmp(value, "Still")) {
+			anims->Still = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Death")) {
 			anims->Death = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "StartAttack")) {

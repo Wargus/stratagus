@@ -330,8 +330,11 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
 	// On Load, Some units don't have Still animation, eg Deadbody
-	if (unit->Type->Animations->Still) {
+	if (unit->Type->Animations && unit->Type->Animations->Still) {
 		unit->Frame = unit->Type->Animations->Still[0].Frame + (type->NumDirections / 2 + 1 - 1);
+	} else if (unit->Type->NewAnimations) {
+		// FIXME: this shouldn't be here
+		unit->Frame = type->NumDirections / 2 + 1 - 1;
 	}
 
 	if (UnitTypeVar.NumberVariable) {
@@ -698,8 +701,8 @@ void UnmarkUnitFieldFlags(const Unit* unit)
 #ifdef MAP_REGIONS
 	// Update map splitting.
 	if (!CanMove(unit) && (flags &
-		 (MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
-		  MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))){
+			(MapFieldLandUnit | MapFieldSeaUnit | MapFieldBuilding |
+			MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest))) {
 		MapSplitterTilesCleared(x, y, x + type->TileWidth - 1, y + type->TileHeight - 1);
 	}
 #endif
