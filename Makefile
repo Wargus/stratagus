@@ -278,7 +278,7 @@ WIN32=	\
 win32new:
 	@make distclean
 	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
-	make depend
+	make $(WIN32) depend
 
 win32_2:
 	make $(WIN32) all
