@@ -1068,7 +1068,7 @@ global void DebugPlayers(void)
     int i;
     int k;
     const char* colors[16] = {
-	"red", "blue", "green", "violett", "orange", "black", "white", "yellow",
+	"red", "blue", "green", "violet", "orange", "black", "white", "yellow",
 	"yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow",
 	"yellow"
     };
