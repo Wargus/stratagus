@@ -79,6 +79,15 @@
 **
 **		Impact sound for this missile.
 **
+**	MissileType::CanHitOwner
+**
+**		Can hit the unit that have fired the missile.
+**
+**	MissileType::FriendlyFire
+**
+**		Can't hit the units of the same player, that has the
+**		missile fired.
+**
 **	MissileType::Class
 **
 **		Class of the missile-type, defines the basic effects of the
@@ -254,6 +263,9 @@ struct _missile_type_ {
 	// FIXME: FireSound defined but not used!
     SoundConfig FiredSound;		/// fired sound
     SoundConfig ImpactSound;		/// impact sound for this missile-type
+
+    unsigned	CanHitOwner : 1;	/// missile can hit the owner
+    unsigned	FriendlyFire : 1;	/// missile can't hit own units
 
     int		Class;			/// missile class
     int		Delay;			/// missile delay

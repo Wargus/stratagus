@@ -186,8 +186,6 @@ local int NumMissiles;			/// currently used missiles
     /// lookup table for missile names
 local hashtable(MissileType*,65) MissileTypeHash;
 
-local int BlizzardMissileHit;		/// Flag for blizzards.
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -281,6 +279,10 @@ global MissileType* NewMissileTypeSlot(char* ident)
 	*(MissileType**)hash_add(MissileTypeHash,MissileTypes[i].Ident)
 		=&MissileTypes[i];
     }
+
+    mtype->CanHitOwner=0;		// defaults 
+    mtype->FriendlyFire=0;
+
     return mtype;
 }
 
@@ -332,7 +334,7 @@ found:
     missile->Frame=0;
     missile->State=0;
     missile->Wait=mtype->Sleep;		// initial wait = sleep
-    missile->Delay=mtype->Delay;		// initial delay
+    missile->Delay=mtype->Delay;	// initial delay
 
     missile->SourceUnit=NULL;
 
@@ -818,7 +820,7 @@ local int PointToPointMissile(Missile* missile)
 */
 local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
 {
-    if ( BlizzardMissileHit && goal == missile->SourceUnit ) {
+    if ( !missile->Type->CanHitOwner && goal == missile->SourceUnit ) {
 	return;		// blizzard cannot hit owner unit
     }
 
@@ -1144,10 +1146,7 @@ global void MissileActions(void)
 		    missile->Frame+=4;	// FIXME: frames pro row
 		    if( (missile->Frame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			//NOTE: vladi: blizzard cannot hit owner...
-			BlizzardMissileHit = 1;
 			MissileHit(missile);
-			BlizzardMissileHit = 0;
 			FreeMissile(missile);
 		    }
 		}
@@ -1159,9 +1158,7 @@ global void MissileActions(void)
 		missile->Wait=missile->Type->Sleep;
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    BlizzardMissileHit = 1;
 		    MissileHit(missile);
-		    BlizzardMissileHit = 0;
 		    FreeMissile(missile);
 		}
 		break;
