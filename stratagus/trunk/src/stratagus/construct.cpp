@@ -390,6 +390,7 @@ local SCM CclDefineConstruction(SCM list)
 	    int w;
 	    int h;
 
+	    tileset=0;
 	    file=NULL;
 	    w=0;
 	    h=0;
