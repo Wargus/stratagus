@@ -322,7 +322,7 @@ local void MoveToTarget(Unit* unit)
 		CheckUnitToBeDrawn(unit);
 	    }
 	    unit->SubAction++;
-	} else if( (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
+	} else if( !goal && (WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)
 		    || unit->Orders[0].Action==UnitActionAttackGround)
 		&& MapDistance(unit->X,unit->Y
 		    ,unit->Orders[0].X,unit->Orders[0].Y)
