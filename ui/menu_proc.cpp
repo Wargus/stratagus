@@ -195,7 +195,7 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,
     }
     if (text) {
 	if (button != MBUTTON_FOLDER) {
-	    VideoDrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
+	    VideoDrawTextCentered(s+x+w/2,s+y+(h-VideoTextHeight(font))/2+2,font,text);
 	} else {
 	    SetDefaultTextColors(nc,rc);
 	    VideoDrawText(x+44,y+6,font,text);
