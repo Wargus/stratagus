@@ -635,7 +635,7 @@ global void SaveAiPlayer(FILE* file,unsigned plynr,const PlayerAi* ai)
 
     }
     fprintf(file,"  'script-debug #%s\n",ai->ScriptDebug ? "t" : "f");
-    fprintf(file,"  'sleep-cycles %d\n",ai->SleepCycles);
+    fprintf(file,"  'sleep-cycles %lu\n",ai->SleepCycles);
 
     //
     //	All forces
