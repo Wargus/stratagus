@@ -46,6 +46,13 @@
 #include "sound.h"
 #include "ccl.h"
 
+#ifdef WIN32
+#define DrawIcon WinDrawIcon
+#define EndMenu WinEndMenu
+#include <windows.h>
+#undef EndMenu
+#undef DrawIcon
+#endif
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -1292,6 +1299,11 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 {
     Menuitem *mi;
     Menu *menu;
+#ifdef WIN32
+    int i;
+    HGLOBAL handle;
+    char *clipboard;
+#endif
 
     if (CurrentMenu == NULL) {
 	return;
@@ -1358,6 +1370,42 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    break;
 		default:
 		    break;
+	    }
+	}
+    }
+
+    if (MouseButtons&MiddleButton) {
+	if (MenuButtonUnderCursor != -1) {
+	    mi = menu->items + MenuButtonUnderCursor;
+	    if (!(mi->flags&MenuButtonClicked)) {
+		switch (mi->mitype) {
+		    case MI_TYPE_INPUT:
+#ifdef WIN32
+			if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL))
+			    break; 
+			handle = GetClipboardData(CF_TEXT);
+			if (!handle)
+			    break;
+			clipboard = GlobalLock(handle);
+			if (!clipboard)
+			    break;
+			for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i)
+			{
+			    if (clipboard[i] != '\r' && clipboard[i] != '\n')
+			    {
+				mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
+				++mi->d.input.nch;
+			    }
+			}
+			strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+			GlobalUnlock(handle);
+			CloseClipboard();
+			MustRedraw |= RedrawMenu;
+#endif
+			break;
+		    default:
+			break;
+		}
 	    }
 	}
     }
