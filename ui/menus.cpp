@@ -2099,11 +2099,6 @@ local void GameGlobalOptionsMenu(void)
 */
 local void GameShowCredits(void)
 {
-    VideoLockScreen();
-    StartMenusSetBackground(NULL);
-    VideoUnlockScreen();
-    Invalidate();
-
     ShowCredits(&GameCredits);
 }
 
@@ -3374,7 +3369,9 @@ local void ScenSelectCancel(void)
 
 local void GameCancel(void)
 {
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
     EndMenu();
