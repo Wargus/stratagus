@@ -2485,9 +2485,9 @@ global void ProcessMenu(const char* menu_id, int loop)
 }
 
 /**
-**		Init Menus for a specific race
+**  Init Menus for a specific race
 **
-**		@param race		The Race to set-up for
+**  @param race  The Race to set-up for
 */
 global void InitMenus(int race)
 {
@@ -2498,7 +2498,6 @@ global void InitMenus(int race)
 	int height;
 
 	InitMenuData();
-	InitMenuFunctions();
 
 #ifndef USE_OPENGL
 	if (race == last_race) {		// same race? already loaded!
