@@ -25,7 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef DEBUG
 #define DEBUG
+#endif
 
 #include "freecraft.h"
 
