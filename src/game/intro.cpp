@@ -1398,6 +1398,7 @@ local SCM CclDefineRanks(SCM list)
     int i;
     int len;
 
+    rank=NULL;
     race=get_c_string(gh_car(list));
     for( i=0; RaceWcNames[i]; ++i ) {
 	if( !strcmp(RaceWcNames[i], race) ) {
