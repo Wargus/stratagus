@@ -122,6 +122,11 @@ local void RepairUnit(Unit* unit,Unit* goal)
 	    if( player==ThisPlayer ) {
 		SetMessage("We need resources for repair!");
 	    } else {
+		RefsDebugCheck( !goal->Refs );
+		if( !--goal->Refs ) {
+		    ReleaseUnit(goal);
+		}
+		unit->Orders[0].Goal=NULL;
 		unit->Orders[0].Action=UnitActionStill;
 		unit->State=unit->SubAction=0;
 		if( unit->Selected ) {	// update display for new action
@@ -294,6 +299,7 @@ global void HandleActionRepair(Unit* unit)
 		}
 		if( goal ) {
 		    RepairUnit(unit,goal);
+		    goal=unit->Orders[0].Goal;
 		}
 
 		//

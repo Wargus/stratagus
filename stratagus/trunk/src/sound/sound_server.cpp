@@ -696,8 +696,13 @@ local void FillChannels(int free_channels,int* discarded,int* started) {
     }
 }
 
-/*
+/**
 **	Mix channels to stereo 32 bit.
+**
+**	@param buffer	Buffer for mixed samples.
+**	@param size	Number of samples that fits into buffer.
+**
+**	@return		How many channels become free after mixing them.
 */
 local int MixChannelsToStereo32(int* buffer,int size)
 {
@@ -707,7 +712,8 @@ local int MixChannelsToStereo32(int* buffer,int size)
 
     new_free_channels=0;
     for( channel=0; channel<MaxChannels; ++channel ) {
-	if( Channels[channel].Command==ChannelPlay && Channels[channel].Sample) {
+	if( Channels[channel].Command==ChannelPlay
+		&& Channels[channel].Sample) {
 	    i=MixSampleToStereo32(
 		    Channels[channel].Sample,Channels[channel].Point,
 		    Channels[channel].Volume,buffer,size);
