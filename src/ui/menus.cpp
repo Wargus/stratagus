@@ -29,6 +29,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2324,13 +2325,27 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 
 local void SaveAction(void)
 {
-    int len;
     char *filename;
-    len = strlen(SaveGameMenuItems[1].d.input.buffer);
-    strncpy(filename,SaveGameMenuItems[1].d.input.buffer,len - 3);
-    strcat(filename,".ccl");
+    char *prefix = SaveGameMenuItems[1].d.input.buffer;
+    size_t prefixLength;
+    const char suffix[] = ".ccl";
+
+    prefixLength = strlen(prefix);
+    prefixLength -= 3;
+    if ( (filename = malloc(prefixLength + sizeof suffix)) == NULL)
+    {
+        fprintf(stderr,
+                  "Can't save \"%s%s\": %s", prefix, suffix, strerror(errno));
+        SetMessage("Can't save \"%s%s\": %s", prefix, suffix, strerror(errno));
+        return;
+    }
+    memcpy(filename, prefix, prefixLength);
+    memcpy(filename + prefixLength, suffix, sizeof suffix);
     SaveGame(filename);
     SetMessage("Saved game to: %s", filename);
+
+    free(filename);
+
     EndMenu();
 }
 
