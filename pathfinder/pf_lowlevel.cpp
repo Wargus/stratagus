@@ -243,13 +243,14 @@ local void LowMarkGoal (Unit *unit)
 	Lowlevel.Goal.Y = (ymax+ymin) / 2;
 }
 
-static int h_count=0;
+//static int h_count=0;
 
 local MapField *LowAstarLoop (Unit *unit)
 {
 	int MovementMask = UnitMovementMask (unit);
 	MapField *mf;
-	unsigned ts0, ts1, ts2, ts[9], zzz;
+	//unsigned ts0, ts1, zzz;
+	unsigned ts2, ts[9];
 	int expanded = 0;
 
 	while ( (mf = LowOpenGetFirst()) ) {
@@ -306,7 +307,7 @@ local MapField *LowAstarLoop (Unit *unit)
 			MapField *neigh = TheMap.Fields + neigho;
 			int neighx, neighy;
 			int blocked, NeighCost;
-			int f, g, h;
+			int g;
 			int byte, bit;
 
 			ts[i] = rdtsc ();
