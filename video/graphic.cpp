@@ -400,87 +400,6 @@ local void FreeGraphic8(Graphic* graphic)
 
 // FIXME: need zooming version
 
-/**
-**	Allocates a new palette and fades
-*/
-local void* FadePixels(void* pixels,int fade)
-{
-    void* p;
-    int i;
-
-    p=NULL;
-
-    if( VideoBpp==8 ) {
-	VMemType8 c;
-
-	p=malloc(256*sizeof(VMemType8));
-	for( i=0; i<256; i++ ) {
-	    c=((VMemType8*)pixels)[i];
-	    // FIXME: doesn't work for 8bpp yet
-	    ((VMemType8*)p)[i]=c;
-	}
-    }
-    else if( VideoBpp==15 ) {
-	VMemType16 c;
-	VMemType16 bl;
-
-	bl=Pixels16[ColorBlack];
-	p=malloc(256*sizeof(VMemType16));
-	for( i=0; i<256; i++ ) {
-	    int r,g,b;
-	    c=((VMemType16*)pixels)[i];
-	    r=(((c>>10)&0x1f)-((bl>>10)&0x1f)) * fade/256 + ((bl>>10)&0x1f);
-	    g=(((c>>5)&0x1f)-((bl>>5)&0x1f)) * fade/256 + ((bl>>5)&0x1f);
-	    b=((c&0x1f)-(bl&0x1f)) * fade/256 + (bl&0x1f);
-	    ((VMemType16*)p)[i] = (r<<10) | (g<<5) | b;
-	}
-    }
-    else if( VideoBpp==16 ) {
-	VMemType16 c;
-	VMemType16 bl;
-
-	bl=Pixels16[ColorBlack];
-	p=malloc(256*sizeof(VMemType16));
-	for( i=0; i<256; i++ ) {
-	    int r,g,b;
-	    c=((VMemType16*)pixels)[i];
-	    r=(((c>>11)&0x1f)-((bl>>11)&0x1f)) * fade/256 + ((bl>>11)&0x1f);
-	    g=(((c>>5)&0x3f)-((bl>>5)&0x3f)) * fade/256 + ((bl>>5)&0x3f);
-	    b=((c&0x1f)-(bl&0x1f)) * fade/256 + (bl&0x1f);
-	    ((VMemType16*)p)[i] = (r<<11) | (g<<5) | b;
-	}
-    }
-    else if( VideoBpp==24 ) {
-	VMemType24 c;
-	VMemType24 bl;
-
-	bl=Pixels24[ColorBlack];
-	p=malloc(256*sizeof(VMemType24));
-	for( i=0; i<256; i++ ) {
-	    c=((VMemType24*)pixels)[i];
-	    ((VMemType24*)p)[i].a=((unsigned char)c.a-bl.a) * fade/256 + bl.a;
-	    ((VMemType24*)p)[i].b=((unsigned char)c.b-bl.b) * fade/256 + bl.b;
-	    ((VMemType24*)p)[i].c=((unsigned char)c.c-bl.c) * fade/256 + bl.c;
-	}
-    }
-    else if( VideoBpp==32 ) {
-	VMemType32 c;
-	unsigned char* x;
-	VMemType32 bl;
-
-	bl=Pixels32[ColorBlack];
-	p=malloc(256*sizeof(VMemType32));
-	for( i=0; i<256; i++ ) {
-	    c=((VMemType32*)pixels)[i];
-	    x=(char*)&((VMemType32*)p)[i];
-	    x[2]=(((c>>16)&0xff)-((bl>>16)&0xff)) * fade/256 + ((bl>>16)&0xff);
-	    x[1]=(((c>>8)&0xff)-((bl>>8)&0xff)) * fade/256 + ((bl>>8)&0xff);
-	    x[0]=((c&0xff)-(bl&0xff)) * fade/256 + (bl&0xff);
-	}
-    }
-
-    return p;
-}
 
 /*----------------------------------------------------------------------------
 --	Global functions
@@ -496,21 +415,14 @@ local void* FadePixels(void* pixels,int fade)
 **	@param h	height to display
 **	@param x	X screen position
 **	@param y	Y screen position
-**	@param fade	Amount faded, from 0 (black) to 256 (no fading)
+**	@param fade	Amount faded, from 0 (black) to 255 (no fading)
 */
 global void VideoDrawSubClipFaded(
 	Graphic* graphic,int gx,int gy,int w,int h,
-	int x,int y,int fade)
+	int x,int y,unsigned char fade)
 {
-    void* oldpixels;
-
-    oldpixels=graphic->Pixels;
-
-    graphic->Pixels=FadePixels(graphic->Pixels,fade);
     VideoDrawSubClip(graphic,gx,gy,w,h,x,y);
-
-    free(graphic->Pixels);
-    graphic->Pixels=oldpixels;
+    VideoFillTransRectangle(ColorBlack,x,y,w,h,fade);
 }
 
 /**
