@@ -122,6 +122,11 @@ local void EnterServerIPCancel(void);
 local void EnterSaveGameAction(Menuitem *mi, int key);
 local void SaveAction(void);
 
+local void SaveSelectLBExit(Menuitem *mi);
+local void SaveSelectLBInit(Menuitem *mi);
+local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i);
+local void SaveSelectLBAction(Menuitem *mi, int i);
+
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
 
@@ -1399,25 +1404,9 @@ local void InitKeystrokeHelpMenuItems() {
 
 local Menuitem SaveGameMenuItems[] = {
     { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, NULL, NULL, {{NULL, 0}} },
-/*
-    { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL,
-	{ input:{ "test123", 384-16-16, 16, MI_TFLAGS_CENTERED, NULL, 7, 33} } },
-    ARI->NEHAL: Was WRONG: you can't write to static strings (those go into the rdonly code segment!).
-    You need to initialize before usage. (see GameSaveMenu...).
-    You used flag (copy bug from above) where button is required for box size.
-    Action function is required to enable/disable Save(and maybe Delete) button and to
-    define 'Enter' action... See EnterIP for sample..
-    NOTE: Input type Item was not designed to overlay listbox!! This will need adjustments
-    to basic menu code.. I'll check when done with NET...
-*/
     { MI_TYPE_INPUT, 16, 11+36*1, 0, SmallFont, NULL, NULL, {{NULL,0}} },
-
-/* ARI->NEHAL: THIS IS WRONG: "ScenSelect" stands for ScenarioSelection, that is what the
-   functions do. You need to provide your own Init, Exit, LBAction, LBRetrieve,
-   VSAction, and OK functions to fill the listbox with data!!!! */
-    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, ScenSelectLBInit, ScenSelectLBExit, {{NULL,0}} },
+    { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveSelectLBInit, SaveSelectLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
-
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 2*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 3*384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1425,8 +1414,8 @@ local Menuitem SaveGameMenuItems[] = {
 local void InitSaveGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
     MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
-    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 7, 0,
-			   (void *)ScenSelectLBRetrieve, ScenSelectOk};
+    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveSelectLBAction, 0, 0, 0, 0, 7, 0,
+			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
     MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'};
@@ -2336,6 +2325,105 @@ local void GameMenuSave(void)
     SaveGameMenuItems[1].d.input.maxch = 24;
     SaveGameMenuItems[4].flags = MenuButtonDisabled;	/* Save button! */
     ProcessMenu(MENU_SAVE_GAME, 1);
+}
+
+local void SaveSelectLBExit(Menuitem *mi)
+{
+    FileList *fl;
+
+    if (mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+//	FreeMapInfos(fl, mi->d.listbox.noptions);
+	free(fl);
+	mi->d.listbox.options = NULL;
+	mi->d.listbox.noptions = 0;
+	mi[1].flags |= MenuButtonDisabled;
+    }
+}
+
+local void SaveSelectLBInit(Menuitem *mi)
+{
+    int i;
+
+    ScenSelectLBExit(mi);
+    if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
+	ScenSelectMenuItems[8].flags |= MenuButtonDisabled;
+    } else {
+	ScenSelectMenuItems[8].flags &= ~MenuButtonDisabled;
+    }
+//    i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
+//						     (FileList **)&(mi->d.listbox.options));
+    if (i == 0) {
+	ScenSelectMenuItems[3].d.button.text = "OK";
+	ScenSelectMenuItems[3].flags |= MenuButtonDisabled;
+    } else {
+	ScenSelectLBAction(mi, 0);
+	ScenSelectMenuItems[3].flags &= ~MenuButtonDisabled;
+	if (i > 5) {
+	    mi[1].flags &= ~MenuButtonDisabled;
+	}
+    }
+}
+
+local unsigned char *SaveSelectLBRetrieve(Menuitem *mi, int i)
+{
+    FileList *fl;
+    Menu *menu;
+    MapInfo *info;
+    static char buffer[1024];
+    int j, n;
+
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    if (i - mi->d.listbox.startline == mi->d.listbox.curopt) {
+		if ((info = fl[i].xdata)) {
+		    menu = Menus + MENU_SCEN_SELECT;
+		    if (info->Description) {
+			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+		    }
+		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
+		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    for (n = j = 0; j < PlayerMax; j++) {
+			if (info->PlayerType[j] == PlayerPerson) {
+			    n++;
+			}
+		    }
+		    if (n == 1) {
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+		    } else {
+			sprintf(buffer, "%d players", n);
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+		    }
+		}
+	    }
+	    strcpy(buffer, "   ");
+	} else {
+	    strcpy(buffer, "\260 ");
+	}
+	strcat(buffer, fl[i].name);
+	return buffer;
+    }
+    return NULL;
+}
+
+local void SaveSelectLBAction(Menuitem *mi, int i)
+{
+    FileList *fl;
+
+    DebugCheck(i<0);
+    if (i < mi->d.listbox.noptions) {
+	fl = mi->d.listbox.options;
+	if (fl[i].type) {
+	    ScenSelectMenuItems[3].d.button.text = "OK";
+	} else {
+	    ScenSelectMenuItems[3].d.button.text = "Open";
+	}
+	if (mi->d.listbox.noptions > 5) {
+	    mi[1].d.vslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
+	}
+    }
 }
 
 local void GameMenuLoad(void)
