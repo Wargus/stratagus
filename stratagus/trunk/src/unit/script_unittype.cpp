@@ -381,6 +381,14 @@ local SCM CclDefineUnitType(SCM list)
 	}
     }
 
+    //
+    //	Unit type checks.
+    //
+    if( type->CanCastSpell && type->_MaxMana ) {
+	DebugLevel0Fn("%s: Need max mana value\n" _C_ type->Ident);
+	type->_MaxMana=1;
+    }
+
     return SCM_UNSPECIFIED;
 }
 
