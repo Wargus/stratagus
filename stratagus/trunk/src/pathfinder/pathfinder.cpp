@@ -68,7 +68,7 @@
 **		88:	Marks the possible goal fields.
 **		98:	Marks map border, for faster limits checks.
 */
-global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+2)];	/// Path matrix
+global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)];	/// Path matrix
 
 IfDebug(
 global unsigned PfCounterFail;
