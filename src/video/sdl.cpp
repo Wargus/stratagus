@@ -121,6 +121,9 @@ global void SetVideoSync(void)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_OPENGL
+/**
+**	Initialize open gl for doing 2d with 3d.
+*/
 local void InitOpenGL(void)
 {
     glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
@@ -233,15 +236,6 @@ global void InitVideoSdl(void)
 
 	    for( i=0; j&(1<<i); ++i ) {
 	    }
-
-#if 0
-	// FIXME: johns I think this now works out of the box for beos.
-#ifdef USE_BEOS
-	    if( i==24 ) {	// beos compatibility hack
-		i=32;
-	    }
-#endif
-#endif
 
 	    VideoDepth=i;
 	} else {
