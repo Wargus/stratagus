@@ -601,6 +601,7 @@ extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
 extern int EnableTrainingQueue;		/// Config: training queues enabled
+extern int EnableBuildingCapture;	/// Config: building capture enabled
 
 //	in selection.c
 extern Unit* Selected[MaxSelectable];	/// currently selected units

@@ -86,6 +86,24 @@ local SCM CclSetTrainingQueue(SCM flag)
 }
 
 /**
+ * **  Set capture buildings
+ * **
+ * **  @param flag Flag enabling or disabling it.
+ * **
+ * **  @return     The old state of the flag
+ * */
+local SCM CclSetBuildingCapture(SCM flag)
+{
+    int old;
+
+    old=EnableBuildingCapture;
+    EnableBuildingCapture=gh_scm2bool(flag);
+
+    return gh_bool2scm(old);
+}
+
+
+/**
 **	Parse unit
 **
 **	@param list	List describing unit
@@ -388,6 +406,7 @@ global void UnitCclRegister(void)
     gh_new_procedure1_0("set-hitpoint-regeneration!",
 	    CclSetHitPointRegeneration);
     gh_new_procedure1_0("set-training-queue!",CclSetTrainingQueue);
+    gh_new_procedure1_0("set-building-capture!",CclSetBuildingCapture);
 
     gh_new_procedureN("unit",CclUnit);
 
