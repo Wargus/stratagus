@@ -151,6 +151,11 @@ local struct {
 */
 global int CurrentMenu = -1;
 
+/**
+**	Other client and server selection state for Multiplayer clients
+*/
+global ServerSetup ServerSetupState;
+
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
 
@@ -233,6 +238,7 @@ local char ScenSelectDisplayPath[1024];
 local char ScenSelectFileName[128];
 local int CustomGameStarted = 0;
 local char ScenSelectPath[1024];
+
 global char ScenSelectFullPath[1024];
 global MapInfo *ScenSelectPudInfo = NULL;
 
@@ -1756,6 +1762,8 @@ local void GameRCSAction (Menuitem *mi __attribute__((unused)), int i)
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
 
     GameSettings.Presets[0].Race = v[i];
+    ServerSetupState.Race[0] = i;		/// FIXME : mark: send update to clients
+    						/// FIXME : Do similar for clients
 }
 
 local void GameRESAction (Menuitem *mi __attribute__((unused)), int i)
@@ -1764,11 +1772,13 @@ local void GameRESAction (Menuitem *mi __attribute__((unused)), int i)
 		SettingsResourcesMedium, SettingsResourcesHigh };
 
     GameSettings.Resources = v[i];
+    ServerSetupState.ResOpt = i;		/// FIXME : mark: send update to clients
 }
 
 local void GameUNSAction (Menuitem *mi __attribute__((unused)), int i)
 {
     GameSettings.NumUnits = i ? SettingsNumUnits1 : SettingsNumUnitsMapDefault;
+    ServerSetupState.UnsOpt = i;		/// FIXME : mark: send update to clients
 }
 
 local void GameTSSAction (Menuitem *mi __attribute__((unused)), int i)
@@ -1776,6 +1786,7 @@ local void GameTSSAction (Menuitem *mi __attribute__((unused)), int i)
     int v[] = { SettingsPresetMapDefault, TilesetSummer, TilesetWinter, TilesetWasteland, TilesetSwamp };
 
     GameSettings.Terrain = v[i];
+    ServerSetupState.TssOpt = i;		/// FIXME : mark: send update to clients
 }
 
 local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
@@ -1786,6 +1797,7 @@ local void CustomGameOPSAction (Menuitem *mi __attribute__((unused)), int i)
 local void MultiGameFWSAction (Menuitem *mi __attribute__((unused)), int i)
 {
     FlagRevealMap = i;
+    ServerSetupState.FwsOpt = i;		/// FIXME : mark: send update to clients
 }
 
 local void MultiGameDrawFunc(Menuitem *mi)
@@ -1823,6 +1835,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     if (initial) {
 	NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
 	NetMultiSetupMenuItems[5].yofs = 32;
+	memset(&ServerSetupState, 0, sizeof(ServerSetup));
     }
     for (i = 1; i < 8; i++) {
 	if (initial) {
@@ -1840,7 +1853,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
 	if (i >= h) {
 	    /* FIXME: This can be wrong - avoid slots of net-connected player! */
-	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 1;
+	    if (initial) {
+		ServerSetupState.CompOpt[i] = 1;
+	    }
+	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
 
 	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
 	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
@@ -1869,8 +1885,11 @@ local void MultiGameClientUpdate(int initial)
 	}
     }
 
-    NetMultiClientMenuItems[5] = NetMultiButtonStorage[1];
-    NetMultiClientMenuItems[5].yofs = 32;
+    if (initial) {
+	NetMultiClientMenuItems[5] = NetMultiButtonStorage[1];
+	NetMultiClientMenuItems[5].yofs = 32;
+	memset(&ServerSetupState, 0, sizeof(ServerSetup));
+    }
     for (i = 1; i < 8; i++) {
 	if (Hosts[i].PlyNr) {
 	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[1];
@@ -1880,18 +1899,19 @@ local void MultiGameClientUpdate(int initial)
 	NetMultiClientMenuItems[5 + i].yofs = 32 + i * 22;
 
 	NetMultiClientMenuItems[22 + i].flags = 0;
+	if (ServerSetupState.Ready[i]) {
+	    NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_CHECKED;
+	} else {
+	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_CHECKED;
+	}
 	if (i == NetLocalHostsSlot) {
-	    /* FIXME: This is wrong - read from stored! */
 	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
 	} else {
-	    /* FIXME: This is wrong - read from Server! */
 	    NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_PASSIVE;
 	}
 
-
 	if (i >= h) {
-	    /* FIXME: This is wrong - read from server! */
-	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 1;
+	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
 	}
 	if (i >= h + c) {
 	    NetMultiClientMenuItems[22 + i].flags = MenuButtonDisabled;
@@ -1982,6 +2002,12 @@ global int NetClientSelectScenario(void)
 global void NetConnectForceDisplayUpdate(void)
 {
     MultiGamePlayerSelectorsUpdate(0);
+    MustRedraw |= RedrawMenu;
+}
+
+global void NetClientUpdateState(void)
+{
+    // FIXME: data in ServerSetupState now - update appropriate menu items..
     MustRedraw |= RedrawMenu;
 }
 
