@@ -205,8 +205,9 @@ local void MixMusicToStereo32(int* buffer, int size)
 #else
 
 /// Dummy functions if no music support is enabled
-global void PlayMusic(const char* name __attribute__((unused)))
+global int PlayMusic(const char* name __attribute__((unused)))
 {
+    return 0;
 }
 
 /// Dummy functions if no music support is enabled
