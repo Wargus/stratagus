@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "freecraft.h"
 #include "iolib.h"
@@ -532,6 +533,28 @@ local SCM CclWithSound(void)
 #endif
 }
 
+/**
+**	Get FreeCraft home path.
+*/
+local SCM CclGetFreeCraftHomePath(void)
+{
+    char buf[PATH_MAX];
+
+    strcpy(buf,getenv("HOME"));
+    strcat(buf,"/");
+    strcat(buf,FREECRAFT_HOME_PATH);
+
+    return gh_str02scm(buf);
+}
+
+/**
+**	Get FreeCraft library path.
+*/
+local SCM CclGetFreeCraftLibraryPath(void)
+{
+    return gh_str02scm(FREECRAFT_LIB_PATH);
+}
+
 /*............................................................................
 ..	Tables
 ............................................................................*/
@@ -974,7 +997,11 @@ global void CclInit(void)
 
     gh_new_procedure0_0("mouse-scroll-off",CclMouseScrollOff);
     gh_new_procedure0_0("units",CclUnits);
+
     gh_new_procedure0_0("with-sound",CclWithSound);
+    gh_new_procedure0_0("get-freecraft-home-path",CclGetFreeCraftHomePath);
+    gh_new_procedure0_0("get-freecraft-library-path"
+	    ,CclGetFreeCraftLibraryPath);
 
     print_welcome();
 
