@@ -1158,7 +1158,7 @@ local void AiCheckRepair(void)
 		&& unit->Orders[0].Action!=UnitActionUpgradeTo
 		&& unit->HP<unit->Stats->HitPoints ) {
 
-	    DebugLevel2Fn("Have building to repair %d(%s)\n" _C_
+	    DebugLevel3Fn("Have building to repair %d(%s)\n" _C_
 		    UnitNumber(unit) _C_ unit->Type->Ident);
 
 	    //

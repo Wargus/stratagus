@@ -43,6 +43,7 @@
 #include "pathfinder.h"
 #include "sound.h"
 #include "interface.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -167,9 +168,9 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	    MapMarkUnitOnBoardSight(uninside,unit);
 	}
 
-	//  Reveal Submarines and stuff.
+	//  Reveal cloaked units.
 	if( unit->Type->DetectCloak ) {
-	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	    MapDetectCloakedUnits(unit);
 	}
 
 	unit->IX=-xd*TileSizeX;

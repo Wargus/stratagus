@@ -57,8 +57,8 @@
 
 #ifdef DEBUG
 
-// Uncomment this to see FOW visibility for every tile
-// #define DEBUG_FOG_OF_WAR
+// Use this to see FOW visibility for every tile
+#define noDEBUG_FOG_OF_WAR
 
 #define noTIMEIT			/// defined time function
 #endif
@@ -222,21 +222,22 @@ global int IsTileVisible(const Player* player,int x,int y)
 **	@param player	Player to mark sight.
 **	@param x	X tile to mark.
 **	@param y	Y tile to mark.
-**	@param v	Pointer to visible value.
 */
-global void MapMarkTileSight(const Player* player, int x, int y, unsigned char *v)
+global void MapMarkTileSight(const Player* player, int x, int y)
 {
+    unsigned char v;
     Unit* unit;
     Unit* remove;
     Unit** corpses;
     int w;
     int h;
+    v=TheMap.Fields[x+y*TheMap.Width].Visible[player->Player];
 
-    switch( *v ) {
+    switch( v ) {
     case 0:		// Unexplored
     case 1:		// Unseen
     // FIXME: mark for screen update
-	*v=2;
+	v=2;
 	if( player->Type == PlayerPerson ) {
 	    corpses = &DestroyedBuildings;
 	    while( *corpses ) {
@@ -258,30 +259,41 @@ global void MapMarkTileSight(const Player* player, int x, int y, unsigned char *
 		}
 	    }
         }
+	TheMap.Fields[x+y*TheMap.Width].Visible[player->Player]=v;
 	if( IsTileVisible(ThisPlayer,x,y) > 1) {
 	    MapMarkSeenTile(x,y);
 	    UnitsMarkSeen(x,y);
 	}
 
-	break;
+	return;
     case 255:		// Overflow
 	DebugLevel0Fn("Visible overflow (Player): %d\n" _C_ player->Player);
 	break;
 
     default:		// seen -> seen
-	*v=*v+1;
+	v++;
 	break;
     }
+    TheMap.Fields[x+y*TheMap.Width].Visible[player->Player]=v;
 }
 
-global void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v)
+/**
+**	Unmark a tile's sight. (Explore and make visible.)
+**
+**	@param player	Player to mark sight.
+**	@param x	X tile to mark.
+**	@param y	Y tile to mark.
+*/
+global void MapUnmarkTileSight(const Player* player,int x,int y)
 {
-    switch( *v ) {
+    unsigned char v;
+    v=TheMap.Fields[x+y*TheMap.Width].Visible[player->Player];
+    switch( v ) {
 	case 255:
 	    // FIXME: (mr-russ) Lookupsight is broken :(
 	    DebugCheck( 1 );
-	    *v = LookupSight(player,x,y);
-	    DebugCheck( *v < 254 );
+	    v = LookupSight(player,x,y);
+	    DebugCheck( v < 254 );
 	    break;
 	case 0:		// Unexplored
 	case 1:
@@ -295,8 +307,30 @@ global void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v
 		UnitsMarkSeen(x,y);
 	    }
 	default:		// seen -> seen
-	    *v=*v-1;
+	    v--;
 	    break;
+    }
+    TheMap.Fields[x+y*TheMap.Width].Visible[player->Player]=v;
+}
+
+/**
+**	Mark cloacked units on a tile as detected.
+**
+**	@param player	Player to mark sight.
+**	@param x	X tile to mark.
+**	@param y	Y tile to mark.
+*/
+global void MapDetectUnitsOnTile(const Player* player,int x,int y)
+{
+    Unit* table[UnitMax];
+    int n;
+    int i;
+    int pm;
+
+    n=SelectUnitsOnTile(x,y,table);
+    pm=((1<<player->Player)|player->SharedVision);
+    for( i=0; i<n; ++i ) {
+	table[i]->Visible|=pm;
     }
 }
 
@@ -310,7 +344,7 @@ global void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v
 **	@param range	Radius to mark.
 **	@param marker	Function to mark or unmark sight
 */
-global void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int,unsigned char*))
+global void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int))
 {
     int mx;
     int my;
@@ -332,7 +366,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
     for(mx=x-range; mx < x+range+w; mx++) {
         for(my=y; my < y+h; my++) {
 	    if( mx >= 0 && mx < TheMap.Width ) {
-		marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
+		marker(player,mx,my);
 	    }
 	}
     }
@@ -341,7 +375,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
     for(my=y-range; my < y; my++) {
         for(mx=x; mx < x+w; mx++) {
 	    if( my >= 0 && my < TheMap.Width ) {
-		marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
+		marker(player,mx,my);
 	    }
 	}
     }
@@ -350,7 +384,7 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
     for(my=y+h; my < y+range+h; my++) {
         for(mx=x; mx < x+w; mx++) {
 	if( my >= 0 && my < TheMap.Width ) {
-	    marker(player,mx,my,&TheMap.Fields[mx+my*TheMap.Width].Visible[p]);
+	    marker(player,mx,my);
 	}
 	}
     }
@@ -385,16 +419,16 @@ global void MapSight(const Player* player, int x, int y, int w, int h, int range
 		cx[3]+=VisionTable[1][steps];
 		cy[3]-=VisionTable[2][steps];
 		if( cx[0] < TheMap.Width && cy[0] >= 0) {
-		    marker(player,cx[0],cy[0],&TheMap.Fields[cx[0]+cy[0]*TheMap.Width].Visible[p]);
+		    marker(player,cx[0],cy[0]);
 		}
 		if( cx[1] >= 0 && cy[1] >= 0) {
-		    marker(player,cx[1],cy[1],&TheMap.Fields[cx[1]+cy[1]*TheMap.Width].Visible[p]);
+		    marker(player,cx[1],cy[1]);
 		}
 		if( cx[2] >= 0 && cy[2] < TheMap.Height ) {
-		    marker(player,cx[2],cy[2],&TheMap.Fields[cx[2]+cy[2]*TheMap.Width].Visible[p]);
+		    marker(player,cx[2],cy[2]);
 		}
 		if( cx[3] < TheMap.Width && cy[3] < TheMap.Height ) {
-		    marker(player,cx[3],cy[3],&TheMap.Fields[cx[3]+cy[3]*TheMap.Width].Visible[p]);
+		    marker(player,cx[3],cy[3]);
 		}
 	    }
 	    steps++;
@@ -2600,8 +2634,10 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	char seen[7];
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
-	//sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
-	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[0]);
+	//  Really long and ugly:
+	//sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsMapFieldVisible(ThisPlayer,x,y));
+	//  Shorter version:
+	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player]);
 	if( TheMap.Fields[y*TheMap.Width+x].Visible[0] ) {
 	    VideoDrawText(dx,dy, GameFont,seen);
 	}

@@ -764,8 +764,6 @@ extern void UnitClearOrders(Unit *unit);
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
     /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
-    /// Mark submarine as seen
-extern void MarkSubmarineSeen(const Player* player,int x,int y,int range);
     /// Returns true, if unit is visible on the map
 extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if building is known on the map
@@ -822,7 +820,7 @@ extern int CanBuildUnitType(const Unit* unit,const UnitType* type,int x,int y);
     /// Find resource
 extern Unit* FindResource(const Unit* unit,int x,int y,int range,int resource);
     /// Find nearest deposit
-extern Unit* FindDeposit(const Unit* unit,int x,int y,int range);
+extern Unit* FindDeposit(const Unit* unit,int x,int y,int range,int resource);
     /// Find the next idle worker
 extern Unit* FindIdleWorker(const Player* player,const Unit* last);
 
