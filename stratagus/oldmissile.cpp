@@ -744,6 +744,9 @@ global MissileType* NewMissileTypeSlot(char* ident)
 **	@param dy	Missile y destination point in pixel.
 **
 **	@return		created missile.
+**
+**	@todo
+**		Need a better memory management for missiles.
 */
 global Missile* MakeMissile(MissileType* type,int sx,int sy,int dx,int dy)
 {
@@ -792,6 +795,9 @@ found:
 
 /**
 **	Free a missile. FIXME: could be done better memory management.
+**
+**	@todo
+**		Need a better memory management for missiles.
 **
 **	@param missile	Missile pointer.
 */
@@ -901,8 +907,6 @@ global void FireMissile(Unit* unit)
 
     DebugLevel3Fn("\n");
 
-    // FIXME: make sure thats the correct unit.
-
     //
     //	Goal dead?
     //
@@ -923,6 +927,10 @@ global void FireMissile(Unit* unit)
 	    DebugLevel3Fn("Missile hits dead unit!\n");
 	    return;
 	}
+
+	// FIXME: this is wrong some missiles didn't hit the target
+	// FIXME: they hit the field of the target and all units on it.
+	// FIXME: goal is already dead, but missile could hit others?
     }
 
     //
@@ -954,8 +962,6 @@ global void FireMissile(Unit* unit)
 
 	return;
     }
-
-    // FIXME: goal is already dead, but missile could hit others?
 
     x=unit->X*TileSizeX+TileSizeX/2;	// missile starts in tile middle
     y=unit->Y*TileSizeY+TileSizeY/2;
@@ -1070,8 +1076,8 @@ global void DrawMissile(const MissileType* type,unsigned frame,int x,int y)
 */
 global void DrawMissiles(void)
 {
-    Missile* missile;
-    Missile* missiles_end;
+    const Missile* missile;
+    const Missile* missiles_end;
     int x;
     int y;
 
@@ -1257,7 +1263,7 @@ local int PointToPointMissile(Missile* missile)
 **
 **	@param missile	Missile reaching end-point.
 */
-global void MissileHit(const Missile* missile)
+global void MissileHit(Missile* missile)
 {
     Unit* goal;
     int x;
@@ -1322,9 +1328,11 @@ global void MissileHit(const Missile* missile)
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
+	    missile->TargetUnit=NoUnitP;
 	    return;
 	}
     } else {
+	// FIXME: hits all or only enemies?
 	goal=UnitOnMapTile(x,y);
     }
 
@@ -1372,7 +1380,7 @@ global void MissileHit(const Missile* missile)
 global void MissileActions(void)
 {
     Missile* missile;
-    Missile* missiles_end;
+    const Missile* missiles_end;
 
     missiles_end=Missiles+NumMissiles;
     for( missile=Missiles; missile<missiles_end; ++missile ) {
@@ -1575,11 +1583,6 @@ global void MissileActions(void)
 
 		    unit=missile->SourceUnit;
 		    if( unit->Destroyed || !unit->HP ) {
-			RefsDebugCheck( !unit->Refs );
-			if( !--unit->Refs ) {
-			    ReleaseUnit(unit);
-			}
-			missile->SourceUnit=NoUnitP;
 			FreeMissile(missile);
 			break;
 		    }
