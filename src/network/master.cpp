@@ -68,7 +68,7 @@
 ----------------------------------------------------------------------------*/
 
 //###### For Magnant META SERVER
-local int sockfd;  // This is a TCP socket. 
+local Socket sockfd;  // This is a TCP socket. 
 global int MetaServerInUse;
 
 /*----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ global int MetaInit(void)
 	return -1; 
     }
 	
-    if (SendMetaCommand("Login","") == -1) {
+    if (SendMetaCommand("Login", "") == -1) {
 	//TODO: Notify player that connection was aborted...
 	return -1;
     }
@@ -142,7 +142,7 @@ global int MetaClose(void)
 */
 global int MetaServerOK(char** reply)
 {
-    return !strcmp("OK\r\n",*reply) || !strcmp("OK\n",*reply);
+    return !strcmp("OK\r\n", *reply) || !strcmp("OK\n", *reply);
 }
 
 /**
@@ -231,7 +231,7 @@ global int RecvMetaReply(char** reply)
 {
     int n;
     int size;
-    char *p;
+    char* p;
     char buf[1024];
 
     if (NetSocketReady(sockfd, 5000) == -1) {
