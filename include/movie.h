@@ -88,6 +88,7 @@ typedef struct _ogg_data_ {
 ----------------------------------------------------------------------------*/
 
 extern int OggInit(CLFile *f, OggData *data);
+extern void OggFree(OggData *data);
 extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
