@@ -4369,6 +4369,7 @@ local void FreeMapInfos(FileList *fl, int n)
 local void ScenSelectInit(Menuitem * mi __attribute__ ((unused)))
 {
     Menu *menu;
+
     menu = FindMenu(MENU_SCEN_SELECT);
     DebugCheck(!*ScenSelectPath);
     menu->items[9].flags =
@@ -4542,7 +4543,6 @@ local void ScenSelectLBInit(Menuitem *mi)
     } else {
 	menu->items[8].flags &= ~MenuButtonDisabled;
     }
-    strcpy(ScenSelectPath,"/home/mouse");
     i = mi->d.listbox.noptions = ReadDataDirectory(ScenSelectPath, ScenSelectRDFilter,
 						     (FileList **)&(mi->d.listbox.options));
     if (i == 0) {
