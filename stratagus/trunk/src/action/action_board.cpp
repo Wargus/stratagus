@@ -150,9 +150,10 @@ local void EnterTransporter(Unit* unit)
     for( i=0; i<sizeof(unit->OnBoard)/sizeof(*unit->OnBoard); ++i ) {
 	if( transporter->OnBoard[i]==NoUnitP ) {
 	    transporter->OnBoard[i]=unit;
+	    // FIXME: reference counts?
 	    transporter->Value++;
 	    RemoveUnit(unit);
-	    if( IsSelected(transporter) ) {
+	    if( IsOnlySelected(transporter) ) {
 		UpdateButtonPanel();
 		MustRedraw|=RedrawPanels;
 	    }

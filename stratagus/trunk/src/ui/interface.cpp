@@ -25,7 +25,8 @@
 #include "freecraft.h"
 #include "video.h"
 #include "sound_id.h"
-#include "unitsound.h"
+#include "sound.h"
+#include "sound_server.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -81,6 +82,124 @@ local void ShowInput(void)
 }
 
 /**
+**	Begin input.
+*/
+local void BeginInput(void)
+{
+    KeyState=KeyStateInput;
+    Input[0]='\0';
+    InputIndex=0;
+    ShowInput();
+}
+
+//-----------------------------------------------------------------------------
+//	User interface group commands
+//-----------------------------------------------------------------------------
+
+// Johns: I make small functions to allow later new keyboard bindings.
+
+/**
+**	Unselect all currently selected units.
+*/
+local void UiUnselectAll(void)
+{
+    UnSelectAll();
+    UpdateButtonPanel();
+}
+
+/**
+**	Select group. If already selected center on the group.
+**
+**	@param group	Group number to select.
+*/
+local void UiSelectGroup(unsigned group)
+{
+    SelectGroup(group);
+    UpdateButtonPanel();
+    MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
+}
+
+/**
+**	Add group to current selection.
+**
+**	@param group	Group number to add.
+*/
+local void UiAddGroupToSelection(unsigned group)
+{
+    SelectGroup(group);
+    UpdateButtonPanel();
+    MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
+}
+
+/**
+**	Define a group. The current selected units become a new group.
+**
+**	@param group	Group number to create.
+*/
+local void UiDefineGroup(unsigned group)
+{
+    SetGroup(Selected,NumSelected,group);
+}
+
+/**
+**	Add to group. The current selected units are added to the group.
+**
+**	@param group	Group number to be expanded.
+*/
+local void UiAddToGroup(unsigned group)
+{
+}
+
+/**
+**	Define an alternate group. The current selected units become a new
+**	group. But remains in the old group.
+**
+**	@param group	Group number to create.
+*/
+local void UiDefineAlternateGroup(unsigned group)
+{
+    SetGroup(Selected,NumSelected,group);
+}
+
+/**
+**	Add to alternate group. The current selected units are added to the
+**	group. But remains in the old group.
+**
+**	@param group	Group number to be expanded.
+*/
+local void UiAddToAlternateGroup(unsigned group)
+{
+}
+
+/**
+**	Toggle sound on / off.
+*/
+local void UiToggleSound(void)
+{
+    if( SoundFildes != -1 ) {
+	SoundOff^=1;
+    }
+    if( SoundOff ) {
+	SetMessage("Sound is off.");
+    } else {
+	SetMessage("Sound is off.");
+    }
+}
+
+/**
+**	Toggle pause on / off.
+*/
+local void UiTogglePause(void)
+{
+    GamePaused^=1;
+    if(GamePaused) {
+	SetStatusLine("Game Paused");
+    } else {
+	SetStatusLine("Game Resumed");
+    }
+}
+
+/**
 **	Handle keys in command mode.
 **
 **	@param key	Key scancode.
@@ -90,45 +209,35 @@ local int CommandKey(int key)
 {
     switch( key ) {
 	case '\r':			// Return enters chat/input mode.
-	    KeyState=KeyStateInput;
-	    Input[0]='\0';
-	    InputIndex=0;
-	    ShowInput();
+	    BeginInput();
 	    return 1;
+
 	case '^':			// Unselect everything
-	    UnSelectAll();
-            UpdateButtonPanel();
+	    UiUnselectAll();
             break;
-        case '0':			// Group selection
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
+        case '0': case '1': case '2':	// Group selection
+        case '3': case '4': case '5':
+        case '6': case '7': case '8':
         case '9':
             if( KeyModifiers&ModifierShift ) {
-		DebugLevel0("FIXME: not written\n");
+		if( KeyModifiers&ModifierAlt ) {
+		    UiAddToAlternateGroup(key-'0');
+		} else if( KeyModifiers&ModifierControl ) {
+		    UiAddToGroup(key-'0');
+		} else {
+		    UiAddGroupToSelection(key-'0');
+		}
+	    } else {
+		if( KeyModifiers&ModifierAlt ) {
+		    UiDefineAlternateGroup(key-'0');
+		} else if( KeyModifiers&ModifierControl ) {
+		    UiDefineGroup(key-'0');
+		} else {
+		    UiSelectGroup(key-'0');
+		}
 	    }
-            if( KeyModifiers&ModifierAlt ) {
-		DebugLevel0("FIXME: not written\n");
-	    }
-            if( KeyModifiers&ModifierHyper ) {
-		DebugLevel0("FIXME: not written\n");
-	    }
-            if( KeyModifiers&ModifierControl ) {
-                //  dirty atoi version :)
-                SetGroup(Selected,NumSelected,key-48);
-		// FIXME: center on group??
-            } else {
-                SelectGroup(key-48);
-            }
-	    // FIXME: this should be moved into the select/group functions.
-            UpdateButtonPanel();
-            MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
             break;
+
 #if 0
     IfDebug(
 	case '0':
@@ -149,19 +258,14 @@ local int CommandKey(int key)
     );
 #endif
 
+	case 'p'&0x1F:
 	case 'p':			// If pause-key didn't work
-	case 'P':
+	case 'P':			// CTRL-P, ALT-P Toggle pause
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
         case KeyCodePause:
-            if(GamePaused) {
-                GamePaused=0;
-                SetStatusLine("Game Resumed");
-	    } else {
-                GamePaused=1;
-                SetStatusLine("Game Paused");
-	    }
+	    UiTogglePause();
 	    break;
 
 	case KeyCodeF1:
@@ -206,6 +310,10 @@ local int CommandKey(int key)
 	    SetStatusLine("Slower");
 	    break;
 
+	case 's'&0x1F:			// Ctrl + S - Turn sound on / off 
+	    UiToggleSound();
+	    break;
+
 	case 's':			// ALT s F11 save game menu
 	case 'S':
 	    if( !(KeyModifiers&ModifierAlt) ) {
@@ -222,6 +330,7 @@ local int CommandKey(int key)
 	    }
 	    break;
 
+	case 'g'&0x1F:
 	case 'g':
 	case 'G':			// ALT+G, CTRL+G grab mouse pointer
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
@@ -231,6 +340,7 @@ local int CommandKey(int key)
 	    ToggleGrabMouse();
 	    break;
 
+	case 'f'&0x1F:
 	case 'f':
 	case 'F':			// toggle fullscreen
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
@@ -260,6 +370,7 @@ local int CommandKey(int key)
 	    MustRedraw|=RedrawMinimap;
 	    break;
 
+	case 'x'&0x1F:
 	case 'x':
 	case 'X':			// ALT+X, CTRL+X: Exit game
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
@@ -267,6 +378,7 @@ local int CommandKey(int key)
 	    }
 	    Exit(0);
 
+	case 'q'&0x1F:
 	case 'q':
 	case 'Q':			// ALT+Q, CTRL+Q: Quit level
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {

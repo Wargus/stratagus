@@ -115,7 +115,7 @@ local void LeaveTransporter(Unit* unit)
 	    }
 	}
     }
-    if( IsSelected(unit) ) {
+    if( IsOnlySelected(unit) ) {
 	UpdateButtonPanel();
 	MustRedraw|=RedrawPanels;
     }
