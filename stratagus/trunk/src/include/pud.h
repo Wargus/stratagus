@@ -84,8 +84,6 @@
 #define WC_StartLocationHuman	0x5E	/// start location human
 #define WC_StartLocationOrc	0x5F	/// start location orc
 
-#define SC_StartLocation	214	/// sc start location
-
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -103,10 +101,6 @@ extern MapInfo* GetChkInfo(const char*);
 
     /// Load a pud file
 extern void LoadPud(const char* pud,WorldMap* map);
-    /// Load a scm file
-extern void LoadScm(const char* scm,WorldMap* map);
-    /// Load a chk file
-extern void LoadChk(const char* chk,WorldMap* map);
 
     /// Save a pud file
 extern int SavePud(const char* pud,const WorldMap* map);
@@ -115,10 +109,6 @@ extern void ChangeTilesetPud(int old,WorldMap* map);
 
     /// Clean the pud module
 extern void CleanPud(void);
-    /// Clean the scm module
-extern void CleanScm(void);
-    /// Clean the chk module
-extern void CleanChk(void);
 
 //@}
 
