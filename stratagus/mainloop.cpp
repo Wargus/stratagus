@@ -667,7 +667,6 @@ global void GameMainLoop(void)
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
 	    TriggersEachCycle();	// handle triggers
-	    UpdateMessages();		// update messages
 	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time
@@ -732,6 +731,8 @@ global void GameMainLoop(void)
 	    }
 #endif
 	}
+
+	UpdateMessages();		// update messages
 
 	//
 	//	Map scrolling
