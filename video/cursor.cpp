@@ -123,8 +123,8 @@ void LoadCursors(const char* race)
 	//  Free old cursor sprites.
 	//
 	for (i = 0; Cursors[i].OType; ++i) {
-		FreeGraphic(Cursors[i].Sprite);
-		Cursors[i].Sprite = NULL;
+		FreeGraphic(Cursors[i].G);
+		Cursors[i].G = NULL;
 	}
 
 	//
@@ -138,13 +138,9 @@ void LoadCursors(const char* race)
 			continue;
 		}
 
-		if (Cursors[i].File) {
-			ShowLoadProgress("Cursor %s", Cursors[i].File);
-			if (!Cursors[i].Sprite) {
-				Cursors[i].Sprite = NewGraphic(Cursors[i].File,
-					Cursors[i].Width, Cursors[i].Height);
-				LoadGraphic(Cursors[i].Sprite);
-			}
+		if (Cursors[i].G && !GraphicLoaded(Cursors[i].G)) {
+			ShowLoadProgress("Cursor %s", Cursors[i].G->File);
+			LoadGraphic(Cursors[i].G);
 		}
 	}
 }
@@ -166,7 +162,7 @@ CursorType* CursorTypeByIdent(const char* ident)
 		if (strcmp(cursortype->Ident, ident)) {
 			continue;
 		}
-		if (!cursortype->Race || cursortype->Sprite) {
+		if (!cursortype->Race || cursortype->G) {
 			return cursortype;
 		}
 	}
@@ -239,7 +235,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 */
 static void DrawCursor(const CursorType* type, int x, int y, int frame)
 {
-	VideoDrawClip(type->Sprite, frame, x - type->HotX, y - type->HotY);
+	VideoDrawClip(type->G, frame, x - type->HotX, y - type->HotY);
 }
 
 /*----------------------------------------------------------------------------
@@ -277,7 +273,7 @@ static void DrawBuildingCursor(void)
 	//  Draw building
 	//
 #ifdef DYNAMIC_LOAD
-	if (!CursorBuilding->Sprite) {
+	if (!GraphicLoaded(CursorBuilding->G)) {
 		LoadUnitTypeSprite(CursorBuilding);
 	}
 #endif
@@ -396,7 +392,7 @@ void CursorAnimate(unsigned ticks)
 		last = ticks + GameCursor->FrameRate;
 		GameCursor->SpriteFrame++;
 		if ((GameCursor->SpriteFrame & 127) >=
-				VideoGraphicFrames(GameCursor->Sprite)) {
+				VideoGraphicFrames(GameCursor->G)) {
 			GameCursor->SpriteFrame = 0;
 		}
 	}
@@ -421,7 +417,6 @@ void CleanCursors(void)
 	for (i = 0; Cursors[i].OType; ++i) {
 		free(Cursors[i].Ident);
 		free(Cursors[i].Race);
-		free(Cursors[i].File);
 	}
 	free(Cursors);
 	Cursors = NULL;

@@ -247,6 +247,8 @@ extern void MakePlayerColorTexture(Graphic* graphic, int player);
 	/// Load graphic
 extern void LoadGraphic(Graphic* g);
 
+#define GraphicLoaded(g) (g)->Surface
+
 	/// Flip graphic and store in graphic->SurfaceFlip
 extern void FlipGraphic(Graphic* graphic);
 
