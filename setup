@@ -23,7 +23,9 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT"
+EXTRA_CFLAGS="-DSLOW_INPUT -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING"
+# This could be used for experimental version
+# -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING # -DNEW_FOW # -DNEW_NAMES -DNEW_VIDEO
 
 # Compile commands
 CC=gcc
@@ -33,7 +35,7 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build4\""
+VERSION="-DVERSION=\"1.17pre1-build5\""
 WIN32=-1
 
 # Choose optimization level
@@ -443,8 +445,6 @@ fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
 echo "	\$(DEBUG) " >> $RULESFILE
-# This could be used
-# -DNEW_UNIT -DNEW_NETWORK -DNEW_HEADING # -DNEW_VIDEO -DNEW_NAMES
 
 echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
 
@@ -502,6 +502,7 @@ case $ANSWER in
  	echo "Done generating Rules.make.  Type 'make' to compile!"
 	;;
  *)
+	make depend
 	make
 	;;
 	
