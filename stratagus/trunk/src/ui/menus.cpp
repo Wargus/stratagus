@@ -375,9 +375,6 @@ global _MenuFuncHash MenuFuncHash;
     *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
 }
 
-    /// Name, Version, Copyright FIXME: move to headerfile
-extern char NameLine[];
-
     /// A game was loaded
 local int GameLoaded;
     /// Game started
@@ -395,9 +392,9 @@ global ServerSetup ServerSetupState, LocalSetupState;
 local char ScenSelectPath[1024];		/// Scenario selector path
 local char ScenSelectDisplayPath[1024];		/// Displayed selector path
 local char ScenSelectFileName[128];		/// Scenario selector name
-global char ScenSelectFullPath[1024];		/// Scenario selector path+name
 
-global MapInfo *ScenSelectMapInfo;		/// Selected pud info
+global MapInfo *MenuMapInfo;			/// Selected map info
+global char MenuMapFullPath[1024];		/// Selected map path+name
 
 local char *SaveDir;				/// Save game directory
 local char TempPathBuf[PATH_MAX];		/// Temporary buffer for paths
@@ -2388,8 +2385,8 @@ local void GetInfoFromSelectPath(void)
 {
     int i;
 
-    FreeMapInfo(ScenSelectMapInfo);
-    ScenSelectMapInfo = NULL;
+    FreeMapInfo(MenuMapInfo);
+    MenuMapInfo = NULL;
 
     if (ScenSelectPath[0]) {
 	i = strlen(ScenSelectPath);
@@ -2399,14 +2396,14 @@ local void GetInfoFromSelectPath(void)
     }
     strcat(ScenSelectPath, ScenSelectFileName);	// Final map name with path
     if (strcasestr(ScenSelectFileName, ".pud")) {
-	ScenSelectMapInfo = GetPudInfo(ScenSelectPath);
-	strcpy(ScenSelectFullPath, ScenSelectPath);
+	MenuMapInfo = GetPudInfo(ScenSelectPath);
+	strcpy(MenuMapFullPath, ScenSelectPath);
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	ScenSelectMapInfo = GetScmInfo(ScenSelectPath);
-	strcpy(ScenSelectFullPath, ScenSelectPath);
+	MenuMapInfo = GetScmInfo(ScenSelectPath);
+	strcpy(MenuMapFullPath, ScenSelectPath);
     } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	ScenSelectMapInfo = GetChkInfo(ScenSelectPath);
-	strcpy(ScenSelectFullPath, ScenSelectPath);
+	MenuMapInfo = GetChkInfo(ScenSelectPath);
+	strcpy(MenuMapFullPath, ScenSelectPath);
     } else {
 	// FIXME: GetCmInfo();
     }
@@ -2429,12 +2426,12 @@ local void ScenSelectMenu(void)
 
     menu = FindMenu("menu-custom-game");
     // FIXME: This check is only needed until GetCmInfo works
-    if (!ScenSelectMapInfo) {
+    if (!MenuMapInfo) {
 	menu->items[12].d.pulldown.noptions = PlayerMax-1;
 	menu->items[12].d.pulldown.curopt = 0;
     } else {
 	for (n = j = 0; j < PlayerMax; ++j) {
-	    t = ScenSelectMapInfo->PlayerType[j];
+	    t = MenuMapInfo->PlayerType[j];
 	    if (t == PlayerPerson || t == PlayerComputer) {
 		n++;
 	    }
@@ -3761,8 +3758,8 @@ local void GameCancel(void)
     VideoLockScreen();
     MenusSetBackground();
     VideoUnlockScreen();
-    FreeMapInfo(ScenSelectMapInfo);
-    ScenSelectMapInfo = NULL;
+    FreeMapInfo(MenuMapInfo);
+    MenuMapInfo = NULL;
     EndMenu();
 }
 
@@ -3774,8 +3771,8 @@ local void CustomGameStart(void)
     int i;
     char *p;
 
-    FreeMapInfo(ScenSelectMapInfo);
-    ScenSelectMapInfo = NULL;
+    FreeMapInfo(MenuMapInfo);
+    MenuMapInfo = NULL;
 
     if (ScenSelectPath[0]) {
 	strcat(ScenSelectPath, "/");
@@ -3843,12 +3840,12 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 
     menu = FindMenu("menu-custom-game");
     // FIXME: This check is only needed until GetCmInfo works
-    if (!ScenSelectMapInfo) {
+    if (!MenuMapInfo) {
 	menu->items[12].d.pulldown.noptions = PlayerMax-1;
 	menu->items[12].d.pulldown.curopt = 0;
     } else {
 	for (n = j = 0; j < PlayerMax; ++j) {
-	    t = ScenSelectMapInfo->PlayerType[j];
+	    t = MenuMapInfo->PlayerType[j];
 	    if (t == PlayerPerson || t == PlayerComputer) {
 		n++;
 	    }
@@ -3876,11 +3873,11 @@ local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
     l = VideoTextLength(GameFont, "Scenario:");
     VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360, GameFont, "Scenario:");
     VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 360+24 , GameFont, ScenSelectFileName);
-    if (ScenSelectMapInfo) {
-	if (ScenSelectMapInfo->Description) {
-	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, ScenSelectMapInfo->Description);
+    if (MenuMapInfo) {
+	if (MenuMapInfo->Description) {
+	    VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 360, GameFont, MenuMapInfo->Description);
 	}
-	sprintf(buffer, " (%d x %d)", ScenSelectMapInfo->MapWidth, ScenSelectMapInfo->MapHeight);
+	sprintf(buffer, " (%d x %d)", MenuMapInfo->MapWidth, MenuMapInfo->MapHeight);
 	VideoDrawText(TheUI.Offset640X + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 360+24, GameFont, buffer);
     }
 #if 0
@@ -4082,7 +4079,7 @@ local void NetworkGamePrepareGameSettings(void)
     int num[PlayerMax];
     int comp[PlayerMax];
 
-    DebugCheck(!ScenSelectMapInfo);
+    DebugCheck(!MenuMapInfo);
 
     DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
 
@@ -4102,11 +4099,11 @@ local void NetworkGamePrepareGameSettings(void)
 
     // Make a list of the available player slots.
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
+	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
 	    DebugLevel3Fn("Player slot %i is available for a person\n" _C_ i);
 	    num[h++] = i;
 	}
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
+	if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
 	    comp[c++] = i;	// available computer player slots
 	}
     }
@@ -4177,10 +4174,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
     //	Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
+	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available interactive player slots
 	}
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
+	if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
 	    c++;	// available computer player slots
 	}
     }
@@ -4310,10 +4307,10 @@ local void MultiClientUpdate(int initial)
 
     //  Calculate available slots from pudinfo
     for (c = h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
+	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;			// available interactive player slots
 	}
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerComputer) {
+	if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
 	    c++;			// available computer player slots
 	}
     }
@@ -4406,7 +4403,7 @@ local void MultiGameSetupInit(Menuitem *mi)
     memset(&ServerSetupState, 0, sizeof(ServerSetup));
     //	Calculate available slots from pudinfo
     for (h = i = 0; i < PlayerMax; i++) {
-	if (ScenSelectMapInfo->PlayerType[i] == PlayerPerson) {
+	if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available interactive player slots
 	}
     }
@@ -4629,30 +4626,30 @@ global int NetClientSelectScenario(void)
 {
     char *cp;
 
-    FreeMapInfo(ScenSelectMapInfo);
-    ScenSelectMapInfo = NULL;
+    FreeMapInfo(MenuMapInfo);
+    MenuMapInfo = NULL;
 
-    cp = strrchr(ScenSelectFullPath, '/');
+    cp = strrchr(MenuMapFullPath, '/');
     if (cp) {
 	strcpy(ScenSelectFileName, cp + 1);
 	*cp = 0;
-	strcpy(ScenSelectPath, ScenSelectFullPath);
+	strcpy(ScenSelectPath, MenuMapFullPath);
 	*cp = '/';
     } else {
-	strcpy(ScenSelectFileName, ScenSelectFullPath);
+	strcpy(ScenSelectFileName, MenuMapFullPath);
 	ScenSelectPath[0] = 0;
     }
 
     if (strcasestr(ScenSelectFileName, ".pud")) {
-	ScenSelectMapInfo = GetPudInfo(ScenSelectFullPath);
+	MenuMapInfo = GetPudInfo(MenuMapFullPath);
     } else if (strcasestr(ScenSelectFileName, ".scm")) {
-	ScenSelectMapInfo = GetScmInfo(ScenSelectFullPath);
+	MenuMapInfo = GetScmInfo(MenuMapFullPath);
     } else if (strcasestr(ScenSelectFileName, ".chk")) {
-	ScenSelectMapInfo = GetChkInfo(ScenSelectFullPath);
+	MenuMapInfo = GetChkInfo(MenuMapFullPath);
     } else {
 	// FIXME: GetCmInfo();
     }
-    return ScenSelectMapInfo == NULL;
+    return MenuMapInfo == NULL;
 }
 
 /**
@@ -6741,16 +6738,16 @@ global void InitMenuFunctions(void)
     //
     //	Autodetect the swamp tileset
     //
-    strcpy(ScenSelectFullPath, FreeCraftLibPath);
-    if (ScenSelectFullPath[0]) {
-	strcat(ScenSelectFullPath, "/graphics/tilesets/");
+    strcpy(MenuMapFullPath, FreeCraftLibPath);
+    if (MenuMapFullPath[0]) {
+	strcat(MenuMapFullPath, "/graphics/tilesets/");
     }
-    strcat(ScenSelectFullPath, "swamp");
+    strcat(MenuMapFullPath, "swamp");
     menu = FindMenu("menu-custom-game");
     //
     //	FIXME: Johns: this didn't work if the files are in ZIP archive.
     //
-    if (access(ScenSelectFullPath, F_OK) != 0) {
+    if (access(MenuMapFullPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....
 	// - FIXME2:
