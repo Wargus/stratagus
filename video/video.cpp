@@ -258,7 +258,7 @@ global SDL_Color* lookup25trans8;
     // FIXME: docu
 global SDL_Color* lookup50trans8;
     // FIXME: docu
-global void VideoAllocPalette(SDL_Palette* palette, SDL_Palette* 
+global void VideoAllocPalette(SDL_Palette* palette, SDL_Palette*
     syspalette);
 #else
 global Palette* commonpalette;
@@ -589,6 +589,10 @@ global void VideoFreeSharedPalette(VMemType* pixels)
 global void DisplayPicture(const char* name)
 {
     Graphic* picture;
+#ifdef USE_SDL_SURFACE
+    SDL_Rect srect;
+    SDL_Rect drect;
+#endif
 
     picture = LoadGraphic(name);
     ResizeGraphic(picture, VideoWidth, VideoHeight);
@@ -597,9 +601,6 @@ global void DisplayPicture(const char* name)
 #endif
 
 #ifdef USE_SDL_SURFACE
-    SDL_Rect srect;
-    SDL_Rect drect;
-
     srect.x = 0;
     srect.y = 0;
     srect.w = picture->Width;
@@ -1503,7 +1504,7 @@ global void InitVideo(void)
 	case 16: ColorCycle = ColorCycle16; break;
 	case 24: ColorCycle = ColorCycle24; break;
 	case 32: ColorCycle = ColorCycle32; break;
-        default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
+	default: DebugLevel0Fn("Video %d bpp unsupported\n" _C_ VideoBpp);
     }
     VideoTypeSize = VideoBpp / 8;
 #endif

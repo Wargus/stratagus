@@ -83,8 +83,6 @@ global Graphic* LoadGraphicPNG(const char* name)
 #ifdef USE_SDL_SURFACE
 //    SDL_Palette* palette;
     SDL_Color* palettecolors;
-int ckey;
-    ckey = -1;
 #else
     Palette* palette;
 #endif
@@ -330,7 +328,7 @@ global void SaveScreenshotPNG(const char* name)
 		Uint8 c;
 		for (j = 0; j < VideoWidth; ++j) {
 		    c = ((Uint8*)TheScreen->pixels)[j * bpp + i * VideoWidth * 3];
-		    memcpy(row, TheScreen->pixels + i * VideoWidth, VideoWidth * 3);
+		    memcpy(row, (char*)TheScreen->pixels + i * VideoWidth, VideoWidth * 3);
 		}
 		break;
 	    }
