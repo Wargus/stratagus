@@ -4,6 +4,7 @@ if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
   RULESFILE=Rules.make
 else
   RULESFILE=Rules.make.WIN32
+  CROSS=" win32"
 fi
 
 BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
@@ -396,25 +397,25 @@ if [ "$DARWIN" != "1" ] ; then
   fi
 fi
 
-echo
-echo "VIDEO DRIVER OPTIONS"
-echo
-if test "$WIN32" = "0" ; then
+if test "$WIN32" = 0 ; then
+  echo
+  echo "VIDEO DRIVER OPTIONS"
+  echo
   echo "  X-X11 Support (default)"
-fi
 
-if test "$HAVESDL" = 1 ; then
-  echo "  S-SDL Support"
+  if test "$HAVESDL" = 1 ; then
+    echo "  S-SDL Support"
+  fi
+  if test "$HAVESVGA" = 1 ; then
+    echo "  V-SVGALIB Support"
+  fi
+  if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
+    echo "  B-SDL/SVGALIB Support"
+  fi
+  echo
+  echo -n "Please enter selection: "
+  read VIDSEL
 fi
-if test "$HAVESVGA" = 1 ; then
-  echo "  V-SVGALIB Support"
-fi
-if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
-  echo "  B-SDL/SVGALIB Support"
-fi
-echo
-echo -n "Please enter selection: "
-read VIDSEL
 
 else
 
@@ -445,14 +446,12 @@ case $VIDSEL in
 
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
-if [ "$WIN32" != "1" ] ; then
-	echo "VIDEO		= \$(SDL)" >> $RULESFILE
     if [ "$BEOS" != "1" ] ; then
 	    echo "VIDEOLIB	= \$(SDLLIB) $DL" >> $RULESFILE
     else
 	    echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
     fi
-fi
+
 
 	echo
 	;;
@@ -482,9 +481,23 @@ fi
 	;;
 
   *)
-	echo "Using X11"
-	echo "VIDEO		= -DUSE_X11" >> $RULESFILE
-	echo "VIDEOLIB	= -lXext -lX11 $DL" >> $RULESFILE
+	if [ "$WIN32" = "1" ] ; then
+	  echo "Using SDL"
+  	  USESDL=1
+	  SDLLIB="\$(shell $SDL_CONFIG --libs)"
+	  echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
+	  echo "SDL_CFLAGS	= \$(shell $SDL_CONFIG --cflags)" >> $RULESFILE
+          if test "$STATIC x" != " x" ; then
+	    SDLLIB="$SDLLIB -lesd"
+	  fi
+	  echo "SDLLIB		= $SDLLIB" >> $RULESFILE
+	  echo >> $RULESFILE
+          echo "VIDEO             = \$(SDL)" >> $RULESFILE
+	else  
+	  echo "Using X11"
+	  echo "VIDEO		= -DUSE_X11" >> $RULESFILE
+	  echo "VIDEOLIB	= -lXext -lX11 $DL" >> $RULESFILE
+	fi
 	;;
 
 esac
@@ -547,7 +560,6 @@ echo
 #------------------------------------------------------------------------------
 #	CDRom options part
 #------------------------------------------------------------------------------
-echo
 echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
 read CDMode
 case $CDMode in
@@ -851,11 +863,11 @@ read ANSWER
 case $ANSWER in
  [nN])
  	echo
- 	echo "Done generating $RULESFILE.  Type '$MAKE' to compile!"
+ 	echo "Done generating $RULESFILE.  Type '$MAKE$CROSS' to compile!"
 	;;
  *)
 	$MAKE depend
-	$MAKE
+	$MAKE$CROSS
 	;;
 
 esac
