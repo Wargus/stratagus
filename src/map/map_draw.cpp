@@ -277,7 +277,7 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
 
 	UNROLL32(0);
 #if GRID==1
-	dp[31]=Pixels[0];
+	dp[31]=Pixels16[0];
 #endif
 	sp+=TileSizeX;
 	dp+=da;
@@ -285,7 +285,7 @@ global void VideoDraw16Tile32(const unsigned char* data,int x,int y)
 
 #if GRID==1
     for( da=TileSizeX; da--; ) {	// with grid no need to be fast
-	dp[da]=Pixels[0];
+	dp[da]=Pixels16[0];
     }
 #endif
 }
@@ -332,7 +332,7 @@ global void VideoDraw24Tile32(const unsigned char* data,int x,int y)
 
 	UNROLL32(0);
 #if GRID==1
-	dp[31]=Pixels[0];
+	dp[31]=Pixels24[0];
 #endif
 	sp+=TileSizeX;
 	dp+=da;
@@ -340,7 +340,7 @@ global void VideoDraw24Tile32(const unsigned char* data,int x,int y)
 
 #if GRID==1
     for( da=TileSizeX; da--; ) {	// with grid no need to be fast
-	dp[da]=Pixels[0];
+	dp[da]=Pixels24[0];
     }
 #endif
 }
