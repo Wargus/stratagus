@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name missile.c	-	The missiles. */
+/**@name missile.c - The missiles. */
 //
 //      (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
 //
