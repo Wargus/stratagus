@@ -1404,9 +1404,21 @@ global void UIHandleButtonUp(unsigned button)
 		y1 = swap;
 	    }
 	    if ( KeyModifiers & ModifierShift ) {
-		num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
+		if( KeyModifiers & ModifierAlt ) {
+		    num=AddSelectedGroundUnitsInRectangle (x0, y0, x1, y1);
+		} else if( KeyModifiers & ModifierControl ) {
+		    num=AddSelectedAirUnitsInRectangle (x0, y0, x1, y1);
+		} else {
+		    num=AddSelectedUnitsInRectangle (x0 ,y0, x1, y1);
+		}
 	    } else {
-		num=SelectUnitsInRectangle (x0, y0, x1, y1);
+		if( KeyModifiers & ModifierAlt ) {
+		    num=SelectGroundUnitsInRectangle (x0, y0, x1, y1);
+		} else if( KeyModifiers & ModifierControl ) {
+		    num=SelectAirUnitsInRectangle (x0, y0, x1, y1);
+		} else {
+		    num=SelectUnitsInRectangle (x0, y0, x1, y1);
+		}
 	    }
 	} else {
 	    //
