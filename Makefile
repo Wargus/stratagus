@@ -184,7 +184,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
-PUDS	= contrib/puds/single/*.pud.gz contrib/puds/multi/*.pud.gz
+PUDS	= contrib/puds/single/*.pud.gz contrib/puds/multi/*.pud.gz \
+	  contrib/puds/single/*.txt contrib/puds/multi/*.txt
 
 CCLS	= data/ccl/units.ccl data/ccl/human/units.ccl data/ccl/orc/units.ccl \
 	  data/ccl/constructions.ccl data/ccl/human/constructions.ccl \
