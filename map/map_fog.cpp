@@ -96,8 +96,6 @@ global int FogOfWarSaturation=40;	/// Saturation of fog of war
 #define MapFieldCompletelyVisible   0x0001  /// Field completely visible
 #define MapFieldPartiallyVisible    0x0002  /// Field partially visible
 
-local char OldFogOfWar[MAXMAP_W*MAXMAP_H]; /// Flags old fog of war state
-
 /**
 **	Mapping for fog of war tiles.
 */
@@ -1649,9 +1647,9 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 }
 
 #ifdef HIERARCHIC_PATHFINDER
-/* hack */
+// hack
 #include "../pathfinder/region_set.h"
-#endif /* HIERARCHIC_PATHFINDER */
+#endif	// HIERARCHIC_PATHFINDER
 
 /**
 **	Draw the map fog of war.
@@ -1738,7 +1736,7 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 			    VideoDrawText (dx, dy+19, GameFont, groupstr);
 			}
 		    }
-#endif /* HIERARCHIC_PATHFINDER */
+#endif	// HIERARCHIC_PATHFINDER
 		}
                 ++redraw_tile;
 		++sx;
