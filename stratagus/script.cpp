@@ -393,6 +393,7 @@ static Unit** Str2UnitRef(lua_State* l, const char *s)
 
 	Assert(l);
 	Assert(s);
+	res = NULL;
 	if (!strcmp(s, "Attacker")) {
 		res = &TriggerData.Attacker;
 	} else if (!strcmp(s, "Defender")) {
