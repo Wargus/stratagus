@@ -504,6 +504,8 @@ extern void MissileCclRegister(void);
 
 	/// load the graphics for a missile type
 extern void LoadMissileSprite(MissileType* mtype);
+	/// load all missile sprites
+extern void LoadMissileSprites();
 	/// allocate an empty missile-type slot
 extern MissileType* NewMissileTypeSlot(char*);
 	/// Get missile-type by ident

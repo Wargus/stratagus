@@ -512,9 +512,11 @@ local void DrawBuildingCursor(void)
 	//
 	//		Draw building
 	//
+#ifdef DYNAMIC_LOAD
 	if (!CursorBuilding->Sprite) {
 		LoadUnitTypeSprite(CursorBuilding);
 	}
+#endif
 	frame = CursorBuilding->Animations->Still[0].Frame +
 		(CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1);
 	PushClipping();
