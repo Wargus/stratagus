@@ -129,7 +129,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     if( info_ptr->color_type==PNG_COLOR_TYPE_PALETTE ) {
 	DebugLevel3("Color palette\n");
 	if( info_ptr->valid&PNG_INFO_PLTE ) {
-	    DebugLevel3(__FUNCTION__": palette %d\n",info_ptr->num_palette);
+	    DebugLevel3Fn(" palette %d\n",info_ptr->num_palette);
 	    if( info_ptr->num_palette>256 ) {
 		abort();
 	    }
@@ -171,7 +171,8 @@ global Graphic* LoadGraphicPNG(const char* name)
     w=info_ptr->width;
     h=info_ptr->height;
     if( info_ptr->width!=info_ptr->rowbytes ) {
-	DebugLevel0("width!=rowbytes\n");
+	DebugLevel0("width(%ld)!=rowbytes(%ld)\n"
+	    ,info_ptr->width,info_ptr->rowbytes);
 	abort();
     }
 
