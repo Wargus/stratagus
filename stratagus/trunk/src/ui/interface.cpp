@@ -540,7 +540,7 @@ local int CommandKey(int key)
 	    }
 #ifdef USE_SDL
 	    {
-	    #include <SDL/SDL.h>
+	    #include <SDL.h>
 	    // FIXME: move to system api part!
 	    extern SDL_Surface *Screen;	// internal screen
 
