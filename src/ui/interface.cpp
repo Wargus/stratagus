@@ -1031,11 +1031,10 @@ local int InputKey(int key)
     return 0;
 }
 
-
 /**
 **	Save a screenshot.
 */
-local void Screenshot()
+local void Screenshot(void)
 {
     CLFile *fd;
     char filename[1024];
@@ -1051,7 +1050,6 @@ local void Screenshot()
     SaveScreenshotPNG(filename);
 }
 
-
 /**
 **	Update KeyModifiers if a key is pressed.
 **
@@ -1060,30 +1058,31 @@ local void Screenshot()
 **
 **	@return		1 if modifier found, 0 otherwise
 */
-global int HandleKeyModifiersDown(unsigned key,
-    unsigned keychar __attribute__((unused)))
+global int HandleKeyModifiersDown(unsigned key, unsigned keychar
+    __attribute__ ((unused)))
 {
-    switch( key ) {
+    switch (key) {
 	case KeyCodeShift:
-	    KeyModifiers|=ModifierShift;
+	    KeyModifiers |= ModifierShift;
 	    return 1;
 	case KeyCodeControl:
-	    KeyModifiers|=ModifierControl;
+	    KeyModifiers |= ModifierControl;
 	    return 1;
 	case KeyCodeAlt:
-	    KeyModifiers|=ModifierAlt;
+	    KeyModifiers |= ModifierAlt;
 	    if (InterfaceState == IfaceStateNormal) {
-		UpdateButtonPanel(); //VLADI: to allow alt-buttons
+		UpdateButtonPanel();	//VLADI: to allow alt-buttons
 	    }
 	    return 1;
 	case KeyCodeSuper:
-	    KeyModifiers|=ModifierSuper;
+	    KeyModifiers |= ModifierSuper;
 	    return 1;
 	case KeyCodeHyper:
-	    KeyModifiers|=ModifierHyper;
+	    KeyModifiers |= ModifierHyper;
 	    return 1;
 	case KeyCodePrint:
 	    Screenshot();
+	    SetMessage("Screenshot made.");
 	    return 1;
 	default:
 	    break;
