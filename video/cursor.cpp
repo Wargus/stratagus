@@ -693,33 +693,21 @@ local void DrawBuildingCursor(void)
     int w0;
     int h;
     int mask;
+    Viewport *vp;
 
     // Align to grid
-#ifdef SPLIT_SCREEN_SUPPORT
-    Viewport *vp = &TheUI.VP[TheUI.ActiveViewport];
+    vp = &TheUI.VP[TheUI.ActiveViewport];
 
     x=CursorX-(CursorX - vp->X)%TileSizeX;
     y=CursorY-(CursorY - vp->Y)%TileSizeY;
-    BuildingCursorSX = mx = Viewport2MapX (TheUI.ActiveViewport, x);
-    BuildingCursorSY = my = Viewport2MapY (TheUI.ActiveViewport, y);
-
-    //
-    //	Draw building
-    //
-    PushClipping ();
-    SetClipping (vp->X, vp->Y, vp->EndX, vp->EndY);
-#else /* SPLIT_SCREEN_SUPPORT */
-    x=CursorX-(CursorX-TheUI.MapX)%TileSizeX;
-    y=CursorY-(CursorY-TheUI.MapY)%TileSizeY;
-    BuildingCursorSX=mx=Screen2MapX(x);
-    BuildingCursorSY=my=Screen2MapY(y);
+    BuildingCursorSX = mx = Viewport2MapX(TheUI.ActiveViewport, x);
+    BuildingCursorSY = my = Viewport2MapY(TheUI.ActiveViewport, y);
 
     //
     //	Draw building
     //
     PushClipping();
-    SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
-#endif /* SPLIT_SCREEN_SUPPORT */
+    SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
     GraphicPlayerPixels(ThisPlayer,CursorBuilding->Sprite);
     if( VideoGraphicFrames(CursorBuilding->Sprite)>5 ) {
 	DrawUnitType(CursorBuilding,4,x,y);
@@ -743,7 +731,8 @@ local void DrawBuildingCursor(void)
 		| MapFieldLandAllowed	// can't build on this
 		//| MapFieldUnpassable	// FIXME: I think shouldn't be used
 		| MapFieldNoBuilding;
-    } else switch( CursorBuilding->UnitType ) {
+    } else {
+	switch( CursorBuilding->UnitType ) {
 	case UnitTypeLand:
 	    mask=MapFieldLandUnit
 		| MapFieldBuilding	// already occuppied
@@ -770,6 +759,10 @@ local void DrawBuildingCursor(void)
 	default:
 	    DebugLevel1Fn("Were moves this unit?\n");
 	    return;
+	}
+	if( !CursorBuilding->Building ) {
+	    mask &= ~MapFieldNoBuilding;
+	}
     }
 
     h=CursorBuilding->TileHeight;
