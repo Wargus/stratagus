@@ -411,8 +411,8 @@ global void DrawUnitInfo(const Unit* unit)
 	return;
     }
 
-    if( type->Building ) {
-	// Make some bit in the unit type structure.
+    if( type->Building && !type->Tower ) {
+	// FIXME: Make some bit in the unit-type structure.
 	if( type==UnitTypeHumanFarm || type==UnitTypeOrcFarm ) {
 	    DrawText(x+16,y+8+63,GameFont,"Food Usage");
 	    DrawText(x+58,y+8+78,GameFont,"Grown:");
