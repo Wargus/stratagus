@@ -210,10 +210,9 @@ global void VideoDraw8to8X(const Graphic* sprite,unsigned frame,int x,int y)
     pixels=(VMemType8*)sprite->Pixels;
     sp=((unsigned char**)sprite->Frames)[frame];
     w=sprite->Width;
-    dp=VideoMemory8+x+y*VideoWidth+w;
+    dp=VideoMemory8+x+y*VideoWidth+w-1;
     da=VideoWidth+w;
     ep=dp+VideoWidth*sprite->Height;
-
     do {
 	lp=dp-w;
 	do {				// 1 line
@@ -254,7 +253,7 @@ global void VideoDraw8to16X(const Graphic* sprite,unsigned frame,int x,int y)
     pixels=(VMemType16*)sprite->Pixels;
     sp=((unsigned char**)sprite->Frames)[frame];
     w=sprite->Width;
-    dp=VideoMemory16+x+y*VideoWidth+w;
+    dp=VideoMemory16+x+y*VideoWidth+w-1;
     da=VideoWidth+w;
     ep=dp+VideoWidth*sprite->Height;
 
@@ -298,7 +297,7 @@ global void VideoDraw8to24X(const Graphic* sprite,unsigned frame,int x,int y)
     pixels=(VMemType24*)sprite->Pixels;
     sp=((unsigned char**)sprite->Frames)[frame];
     w=sprite->Width;
-    dp=VideoMemory24+x+y*VideoWidth+w;
+    dp=VideoMemory24+x+y*VideoWidth+w-1;
     da=VideoWidth+w;
     ep=dp+VideoWidth*sprite->Height;
 
@@ -342,7 +341,7 @@ global void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
     pixels=(VMemType32*)sprite->Pixels;
     sp=((unsigned char**)sprite->Frames)[frame];
     w=sprite->Width;
-    dp=VideoMemory32+x+y*VideoWidth+w;
+    dp=VideoMemory32+x+y*VideoWidth+w-1;
     da=VideoWidth+w;
     ep=dp+VideoWidth*sprite->Height;
 

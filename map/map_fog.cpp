@@ -1017,7 +1017,7 @@ global void VideoDraw8OnlyFog32Alpha(const GraphicData* data,int x,int y)
     int da;
 
     dp=VideoMemory8+x+y*VideoWidth;
-    gp=dp+VideoWidth*TileSizeX;
+    gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
 
     while( dp<gp ) {
@@ -1105,7 +1105,7 @@ global void VideoDraw16OnlyFog32Alpha(const GraphicData* data,int x,int y)
     //int o;
 
     dp=VideoMemory16+x+y*VideoWidth;
-    gp=dp+VideoWidth*TileSizeX;
+    gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
 
     while( dp<gp ) {
@@ -1206,7 +1206,7 @@ global void VideoDraw24OnlyFog32Alpha(const GraphicData* data,int x,int y)
     int r, g, b, v;
 
     dp=VideoMemory24+x+y*VideoWidth;
-    gp=dp+VideoWidth*TileSizeX;
+    gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
 
     while( dp<gp ) {
@@ -1324,7 +1324,7 @@ global void VideoDraw32OnlyFog32Alpha(const GraphicData* data,int x,int y)
     int i, r, g, b, v;
 
     dp=VideoMemory32+x+y*VideoWidth;
-    gp=dp+VideoWidth*TileSizeX;
+    gp=dp+VideoWidth*TileSizeY;
     da=VideoWidth;
 
     while( dp<gp ) {
@@ -1608,12 +1608,27 @@ global void InitMapFogOfWar(void)
 	int rshft,gshft,bshft;
 	int rloss,gloss,bloss;
 
+
 	switch( VideoDepth ) {
 	    case 8:
 		n=1<<(sizeof(VMemType8)*8);
 		if( !FogOfWarAlphaTable ) {
 		    FogOfWarAlphaTable=malloc(n*sizeof(VMemType8));
 		}
+              if ( lookup25trans8 ) // if enabled, make use of it in 8bpp ;)
+              {
+                unsigned int trans_color, j;
+                trans_color=Pixels8[ColorBlack];
+                trans_color<<=8;
+
+              //FIXME: determine which lookup table to use based on
+              //    FogOfWarSaturation,FogOfWarContrast and FogOfWarBrightness
+		for( j=0; j<n; ++j )
+                  ((VMemType8*)FogOfWarAlphaTable)[j] =
+                   lookup50trans8[ trans_color | j ];
+              }
+              else
+              {
 		for( i=0; i<n; ++i ) {
 		    int j;
 		    int l;
@@ -1664,6 +1679,7 @@ global void InitMapFogOfWar(void)
 			    ,GlobalPalette[l].b);
 		    ((VMemType8*)FogOfWarAlphaTable)[i]=l;
 		}
+             }
 
 		VideoDrawFog=VideoDraw8Fog32Alpha;
 		VideoDrawOnlyFog=VideoDraw8OnlyFog32Alpha;
