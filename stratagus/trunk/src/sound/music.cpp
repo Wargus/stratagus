@@ -330,9 +330,11 @@ global void PlayMusic(const char* name)
 #endif
     name = LibraryFileName(name, buffer);
 
+#if defined(USE_SDLCD) || defined(USE_LIBCDA)
     if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped")) {
 	return;
     }
+#endif
 
 #ifdef USE_OGG
     if ((sample = LoadOgg(name))) {
