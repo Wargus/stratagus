@@ -705,19 +705,19 @@ local void GetMissileMapArea( const Missile* missile,
 **
 **      @return         Returns true if visible, false otherwise.
 */
-local int MissileVisibleInViewport (int v, const Missile* missile)
+local int MissileVisibleInViewport(int v, const Missile* missile)
 {
-    int tileMinX;
-    int tileMaxX;
-    int tileMinY;
-    int tileMaxY;
+    int min_x;
+    int max_x;
+    int min_y;
+    int max_y;
 
-    GetMissileMapArea(missile,&tileMinX,&tileMinY,&tileMaxX,&tileMaxY);
-    if (!AnyMapAreaVisibleInViewport (v,tileMinX,tileMinY,tileMaxX,tileMaxY) ) {
+    GetMissileMapArea(missile, &min_x, &min_y, &max_x, &max_y);
+    if (!AnyMapAreaVisibleInViewport(v, min_x, min_y, max_x, max_y)) {
 	return 0;
     }
-    DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_
-		tileMinX _C_ tileMaxX _C_ tileMinY _C_ tileMaxY);
+    DebugLevel3Fn("Missile bounding box %d %d %d %d\n" _C_ min_x _C_ max_x _C_
+	min_y _C_ max_y);
     return 1;
 }
 
@@ -729,14 +729,22 @@ local int MissileVisibleInViewport (int v, const Missile* missile)
 */
 global int CheckMissileToBeDrawn(const Missile* missile)
 {
-    int sx,sy,ex,ey;
+    int sx;
+    int sy;
+    int ex;
+    int ey;
 
-    GetMissileMapArea( missile, &sx, &sy, &ex, &ey );
-    return MarkDrawAreaMap( sx, sy, ex, ey );
+    GetMissileMapArea(missile, &sx, &sy, &ex, &ey);
+    return MarkDrawAreaMap(sx, sy, ex, ey);
 }
 
 /**
 **	Draw missile.
+**
+**	@param mtype	Missile type
+**	@param frame	Animation frame
+**	@param x	Screen pixel X position
+**	@param y	Screen pixel Y position
 */
 local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 {
@@ -750,10 +758,12 @@ local void DrawMissile(const MissileType* mtype,int frame,int x,int y)
 
 /**
 **	Draw all missiles on map.
+**
+**	@param v	Viewport
 */
 global void DrawMissiles(int v)
 {
-    Viewport *view = &TheUI.VP[v];
+    const Viewport* view;
     const Missile* missile;
     Missile* const* missiles;
     Missile* const* missiles_end;
@@ -761,6 +771,7 @@ global void DrawMissiles(int v)
     int y;
     int flag;
 
+    view = &TheUI.VP[v];
     //
     //	Loop through global missiles, than through locals.
     //
@@ -830,6 +841,8 @@ local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
 
 /**
 **	Handle point to point missile.
+**
+**	@param missile	Missile pointer.
 */
 local int PointToPointMissile(Missile* missile)
 {
@@ -965,19 +978,19 @@ local int PointToPointMissile(Missile* missile)
 **	@param goal	Goal of the missile.
 **	@param splash	Splash damage divisor.
 */
-local void MissileHitsGoal(const Missile* missile,Unit* goal,int splash)
+local void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 {
-    if ( !missile->Type->CanHitOwner && goal == missile->SourceUnit ) {
-	return;		// blizzard cannot hit owner unit
+    if (!missile->Type->CanHitOwner && goal == missile->SourceUnit) {
+	return;				// blizzard cannot hit owner unit
     }
 
-    if( goal->HP && goal->Orders[0].Action!=UnitActionDie ) {
-	if ( missile->Damage ) {	// direct damage, spells mostly
-	    HitUnit(missile->SourceUnit,goal,missile->Damage/splash);
+    if (goal->HP && goal->Orders[0].Action != UnitActionDie) {
+	if (missile->Damage) {		// direct damage, spells mostly
+	    HitUnit(missile->SourceUnit, goal, missile->Damage / splash);
 	} else {
-	    HitUnit(missile->SourceUnit,goal,
-		    CalculateDamage(missile->SourceUnit->Stats,goal,
-			missile->SourceUnit->Bloodlust,0)/splash);
+	    HitUnit(missile->SourceUnit, goal,
+		CalculateDamage(missile->SourceUnit->Stats, goal,
+		    missile->SourceUnit->Bloodlust, 0) / splash);
 	}
     }
 }
