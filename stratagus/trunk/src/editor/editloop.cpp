@@ -646,6 +646,7 @@ local void EditorUpdateDisplay(void)
 
     // refresh entire screen, so no further invalidate needed
     InvalidateAreaAndCheckCursor(0, 0, VideoWidth, VideoHeight);
+    RealizeVideoMemory();
 }
 
 /*----------------------------------------------------------------------------
@@ -1090,7 +1091,6 @@ global void EditorMainLoop(void)
 	}
 
 	WaitEventsOneFrame(&callbacks);
-
     }
 
     //
