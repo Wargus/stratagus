@@ -90,16 +90,16 @@ static int AiCheckSurrounding(const Unit* worker, const UnitType* type, int x, i
 	dir = -1;
 	surroundingnb = 0;
 	while (dir < 4) {
-		if ((unsigned)x < (unsigned)TheMap.Width && (unsigned)y < (unsigned)TheMap.Height) {
+		if ((unsigned)x < (unsigned)TheMap.Info.MapWidth && (unsigned)y < (unsigned)TheMap.Info.MapHeight) {
 			if (worker && x == worker->X && y == worker->Y) {
 				surrounding[surroundingnb++] = 1;
-			} else if (TheMap.Fields[x + y * TheMap.Width].Flags &
+			} else if (TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags &
 						(MapFieldUnpassable | MapFieldWall | MapFieldRocks |
 						MapFieldForest | MapFieldBuilding)) {
 				surrounding[surroundingnb++] = 0;
 			} else{
 				// Can pass there
-				surrounding[surroundingnb++] = (TheMap.Fields[x + y * TheMap.Width].Flags &
+				surrounding[surroundingnb++] = (TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags &
 						(MapFieldWaterAllowed + MapFieldCoastAllowed + MapFieldLandAllowed)) != 0;;
 			}
 		} else {
@@ -173,8 +173,8 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	unsigned char* m;
 	unsigned char* matrix;
 
-	points = malloc(TheMap.Width * TheMap.Height);
-	size = TheMap.Width * TheMap.Height / sizeof (*points);
+	points = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof (*points);
 
 	x = ox;
 	y = oy;
@@ -192,7 +192,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	//  Make movement matrix.
 	//
 	matrix = CreateMatrix();
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 
 	mask = UnitMovementMask(worker);
 	// Ignore all possible mobile units.
@@ -201,8 +201,8 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	points[0].X = x;
 	points[0].Y = y;
 	// also use the bottom right
-	if (type->TileWidth > 1 && x + type->TileWidth - 1 < TheMap.Width &&
-		y + type->TileHeight - 1 < TheMap.Height) {
+	if (type->TileWidth > 1 && x + type->TileWidth - 1 < TheMap.Info.MapWidth &&
+		y + type->TileHeight - 1 < TheMap.Info.MapHeight) {
 		points[1].X = x + type->TileWidth - 1;
 		points[1].Y = y + type->TileWidth - 1;
 		ep = wp = 2; // start with two points
@@ -319,14 +319,14 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 
 	destx = x = worker->X;
 	desty = y = worker->Y;
-	size = TheMap.Width * TheMap.Height / 4;
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
 	points = malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
 	//
 	morg = MakeMatrix();
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 	matrix = morg + w + w + 2;
 
 	points[0].X = x;
@@ -378,12 +378,12 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 						miny = 0;
 					}
 					maxx = mine->X + mine->Type->TileWidth + 5;
-					if (maxx > TheMap.Width) {
-						maxx = TheMap.Width;
+					if (maxx > TheMap.Info.MapWidth) {
+						maxx = TheMap.Info.MapWidth;
 					}
 					maxy = mine->Y + mine->Type->TileHeight + 5;
-					if (maxy > TheMap.Height) {
-						maxy = TheMap.Height;
+					if (maxy > TheMap.Info.MapHeight) {
+						maxy = TheMap.Info.MapHeight;
 					}
 
 					nunits = UnitCacheSelect(minx, miny, maxx, maxy, units);
@@ -484,14 +484,14 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 
 	x = worker->X;
 	y = worker->Y;
-	size = TheMap.Width * TheMap.Height / 4;
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
 	points = malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix.
 	//
 	morg = MakeMatrix();
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 	matrix = morg + w + w + 2;
 
 	points[0].X = x;

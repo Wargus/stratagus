@@ -212,7 +212,7 @@ static void ZoneSetAddPassableRange(ZoneSet* zs, int x0, int y0, int x1, int y1,
 	y = y0;
 	dir = -1;
 	do {
-		if (InMap(x, y) && !(TheMap.Fields[x + y * TheMap.Width].Flags & mask)) {
+		if (InMap(x, y) && !(TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags & mask)) {
 			ZoneSetAddCell(zs, x, y);
 		}
 
@@ -296,7 +296,7 @@ void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,i
 		// For goal zone, check mask as well
 		for (y = goal_y0; y <= goal_y1; y++) {
 			for (x = goal_x0; x <= goal_x1; x++) {
-				if (InMap(x, y) && !(TheMap.Fields[x+y*TheMap.Width].Flags & unitmask)) {
+				if (InMap(x, y) && !(TheMap.Fields[x+y*TheMap.Info.MapWidth].Flags & unitmask)) {
 					ZoneSetAddCell(dest, x, y);
 				}
 			}

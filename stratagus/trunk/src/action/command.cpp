@@ -327,7 +327,7 @@ void CommandMove(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	//
 	//  Check if unit is still valid? (NETWORK!)
@@ -413,7 +413,7 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 {
 	Order* order;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -474,7 +474,7 @@ void CommandAttackGround(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -514,7 +514,7 @@ void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 {
 	Order* order;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	//
 	// Check if unit is still valid? (NETWORK!)
@@ -1124,7 +1124,7 @@ void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 {
 	Order* order;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
@@ -1256,9 +1256,9 @@ void CommandSharedVision(int player, int state, int opponent)
 		//
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
 		//
-		for (x = 0; x < TheMap.Width; ++x) {
-			for (y = 0; y < TheMap.Height; ++y) {
-				i = x + y * TheMap.Width;
+		for (x = 0; x < TheMap.Info.MapWidth; ++x) {
+			for (y = 0; y < TheMap.Info.MapHeight; ++y) {
+				i = x + y * TheMap.Info.MapWidth;
 				if (TheMap.Fields[i].Visible[player] && !TheMap.Fields[i].Visible[opponent]) {
 					TheMap.Fields[i].Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Player) {

@@ -140,14 +140,14 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	if (xmin < 0) {
 		xmin = 0;
 	}
-	if (xmax > TheMap.Width - 1) {
-		xmax = TheMap.Width - 1;
+	if (xmax > TheMap.Info.MapWidth - 1) {
+		xmax = TheMap.Info.MapWidth - 1;
 	}
 	if (ymin < 0) {
 		ymin = 0;
 	}
-	if (ymax > TheMap.Height - 1) {
-		ymax = TheMap.Height - 1;
+	if (ymax > TheMap.Info.MapHeight - 1) {
+		ymax = TheMap.Info.MapHeight - 1;
 	}
 
 	//
@@ -169,7 +169,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	//
 	for (ix = xmin; ix <= xmax; ++ix) {
 		for (iy = ymin; iy <= ymax; ++iy) {
-			n = TheMap.Fields[ix + iy * TheMap.Width].Flags;
+			n = TheMap.Fields[ix + iy * TheMap.Info.MapWidth].Flags;
 			if (MapDistance(ix, iy, x, y ) > action->Data.Demolish.Range) {
 				// Not in circle range
 				continue;
@@ -317,7 +317,7 @@ int CastAreaBombardment(Unit* caster, const SpellType* spell,
 			// find new destination in the map
 			dx = x + SyncRand() % 5 - 2;
 			dy = y + SyncRand() % 5 - 2;
-		} while (dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height);
+		} while (dx < 0 && dy < 0 && dx >= TheMap.Info.MapWidth && dy >= TheMap.Info.MapHeight);
 		for (i = 0; i < shards; ++i) {
 			mis = MakeMissile(missile,
 				dx * TileSizeX + TileSizeX / 2 + offsetx,

@@ -118,7 +118,7 @@ static void LoadStratagusMap(const char* mapname,
 	}
 	// FIXME: Retrieve map->Info from somewhere... If LoadPud is used in CCL it magically is set there :)
 #endif
-	if (!TheMap.Width || !TheMap.Height) {
+	if (!TheMap.Info.MapWidth || !TheMap.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
@@ -211,7 +211,7 @@ static void GameTypeTopVsBottom(void)
 	int top;
 	int middle;
 
-	middle = TheMap.Height / 2;
+	middle = TheMap.Info.MapHeight / 2;
 	for (i = 0; i < PlayerMax - 1; ++i) {
 		top = Players[i].StartY <= middle;
 		for (j = 0; j < PlayerMax - 1; ++j) {
@@ -238,7 +238,7 @@ static void GameTypeLeftVsRight(void)
 	int left;
 	int middle;
 
-	middle = TheMap.Width / 2;
+	middle = TheMap.Info.MapWidth / 2;
 	for (i = 0; i < PlayerMax - 1; ++i) {
 		left = Players[i].StartX <= middle;
 		for (j = 0; j < PlayerMax - 1; ++j) {

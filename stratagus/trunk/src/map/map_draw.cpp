@@ -136,7 +136,7 @@ int Viewport2MapX(const Viewport* vp, int x)
 	int r;
 
 	r = (x - vp->X + vp->MapX * TileSizeX + vp->OffsetX) / TileSizeX;
-	return r < TheMap.Width ? r : TheMap.Width - 1;
+	return r < TheMap.Info.MapWidth ? r : TheMap.Info.MapWidth - 1;
 }
 
 /**
@@ -154,7 +154,7 @@ int Viewport2MapY(const Viewport* vp, int y)
 	int r;
 
 	r = (y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY) / TileSizeY;
-	return r < TheMap.Height ? r : TheMap.Height - 1;
+	return r < TheMap.Info.MapHeight ? r : TheMap.Info.MapHeight - 1;
 }
 
 /**
@@ -206,11 +206,11 @@ void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int offsety)
 	if (y < 0) {
 		y = 0;
 	}
-	if (x > TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1) {
-		x = TheMap.Width * TileSizeX - (vp->EndX - vp->X) - 1;
+	if (x > TheMap.Info.MapWidth * TileSizeX - (vp->EndX - vp->X) - 1) {
+		x = TheMap.Info.MapWidth * TileSizeX - (vp->EndX - vp->X) - 1;
 	}
-	if (y > TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1) {
-		y = TheMap.Height * TileSizeY - (vp->EndY - vp->Y) - 1;
+	if (y > TheMap.Info.MapHeight * TileSizeY - (vp->EndY - vp->Y) - 1) {
+		y = TheMap.Info.MapHeight * TileSizeY - (vp->EndY - vp->Y) - 1;
 	}
 	vp->MapX = x / TileSizeX;
 	vp->MapY = y / TileSizeY;
@@ -280,7 +280,7 @@ void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 #endif
 
 	ex = vp->EndX;
-	sy = y * TheMap.Width;
+	sy = y * TheMap.Info.MapWidth;
 	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
@@ -297,7 +297,7 @@ void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 			++sx;
 			dx += TileSizeX;
 		}
-		sy += TheMap.Width;
+		sy += TheMap.Info.MapWidth;
 		dy += TileSizeY;
 	}
 

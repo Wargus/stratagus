@@ -1428,7 +1428,7 @@ static void AiMoveUnitInTheWay(Unit* unit)
 			y = blocker->Y + dirs[i][1];
 
 			// Out of the map => no !
-			if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+			if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 				continue;
 			}
 			// move to blocker ? => no !

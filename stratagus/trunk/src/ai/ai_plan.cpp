@@ -137,15 +137,15 @@ static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 
 	x = unit->X;
 	y = unit->Y;
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 	matrix += w + w + 2;
 	if (matrix[x + y * w]) { // already marked
 		DebugPrint("Done\n");
 		return;
 	}
 
-	points = malloc(TheMap.Width * TheMap.Height);
-	size = TheMap.Width * TheMap.Height / sizeof(*points);
+	points = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof(*points);
 
 	//
 	// Make movement matrix.
@@ -245,13 +245,13 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 	} state;
 	unsigned char* m;
 
-	size = TheMap.Width * TheMap.Height / 2;
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
 	points = malloc(size * sizeof(*points));
 
 	x = unit->X;
 	y = unit->Y;
 
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 	mask = UnitMovementMask(unit);
 	// Ignore all possible mobile units.
 	mask &= ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
@@ -409,14 +409,14 @@ int AiFindWall(AiForce* force)
 
 	x = unit->X;
 	y = unit->Y;
-	size = TheMap.Width * TheMap.Height / 4;
+	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
 	points = malloc(size * sizeof(*points));
 
 	destx = -1;
 	desty = -1;
 
 	matrix = CreateMatrix();
-	w = TheMap.Width + 2;
+	w = TheMap.Info.MapWidth + 2;
 	matrix += w + w + 2;
 
 	points[0].X = x;
@@ -665,7 +665,7 @@ void AiSendExplorers(void)
 			x = centerx + SyncRand() % (2 * ray + 1) - ray;
 			y = centery + SyncRand() % (2 * ray + 1) - ray;
 
-			if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height) {
+			if (x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight) {
 				targetok = !IsMapFieldExplored(AiPlayer->Player, x, y);
 			}
 
