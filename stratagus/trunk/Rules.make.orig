@@ -10,7 +10,7 @@
 ##
 ##	Rules.make	-	Make RULES (GNU MAKE) (included from Makefile).
 ##
-##	(c) Copyright 1998-2001 by Lutz Sammer
+##	(c) Copyright 1998-2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -213,7 +213,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## HIERARCHIC_PATHFINDER:	Use hierarchic pathfinder
 ## USE_LUA:		Lua scripting support
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
-	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DNEW_FOW2 # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
+	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS -DNEW_NETMENUS
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)

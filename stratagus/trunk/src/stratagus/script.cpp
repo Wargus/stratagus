@@ -10,7 +10,7 @@
 //
 /**@name ccl.c		-	The craft configuration language. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -523,9 +523,7 @@ local SCM CclDefineMap(SCM width,SCM height)
     TheMap.Height=gh_scm2int(height);
 
     TheMap.Fields=calloc(TheMap.Width*TheMap.Height,sizeof(*TheMap.Fields));
-#ifdef NEW_FOW2
     TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
-#endif
     InitUnitCache();
     // FIXME: this should be CreateMap or InitMap?
 
