@@ -584,10 +584,12 @@ global SpellType *SpellTypeById(int id)
 **	Check if healing can be cast on the target.
 **
 **	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
 **
 **	@return		=!0 if spell should/can casted, 0 if not
 */
-local int CanCastHealing(const Unit* target)
+local int CanCastHealing(const Unit* target,
+    const SpellType* spell __attribute__((unused)))
 {
     // only can heal organic units, with injury.
     if (target && target->Type->Organic
@@ -595,6 +597,98 @@ local int CanCastHealing(const Unit* target)
 	return 1;
     }
     // FIXME: johns: should we support healing near own units?
+    return 0;
+}
+
+/**
+**	Check if exorcism can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastExorcism(const Unit* target,
+    const SpellType* spell __attribute__((unused)))
+{
+    // FIXME: johns: target is random selected within range of 6 fields
+    // exorcism works only on undead units
+    if (target && target->Type->IsUndead && target->HP ) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if slow can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastSlow(const Unit* target, const SpellType* spell)
+{
+    // slow doesn't work on buildings
+    if (target && !target->Type->Building
+	    && target->Slow < spell->TTL / CYCLES_PER_SECOND) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if flame shield can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastFlameShield(const Unit* target, const SpellType* spell)
+{
+    // flame shield only on land and sea units
+    if (target && !target->Type->Building
+	    && (target->Type->UnitType == UnitTypeLand
+		|| target->Type->UnitType == UnitTypeNaval)
+	    && target->FlameShield < spell->TTL ) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if invisibility can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastInvisibility(const Unit* target, const SpellType* spell)
+{
+    // invisible doesn't work on buildings
+    if (target && !target->Type->Building
+	    && target->Invisible < spell->TTL / CYCLES_PER_SECOND) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if polymorph can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastPolymorph(const Unit* target, const SpellType* spell)
+{
+    // only can polymorph organic units
+    if (target && target->Type->Organic) {
+	return 1;
+    }
     return 0;
 }
 
@@ -613,6 +707,56 @@ local int CanCastBloodlust(const Unit* target, const SpellType* spell)
 	return 1;
     }
     // FIXME: should we support making bloodlust in range?
+    return 0;
+}
+
+/**
+**	Check if death coil can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastDeathCoil(const Unit* target, const SpellType* spell)
+{
+    if ((target && target->Type->Organic) || (!target)) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if haste can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastHaste(const Unit* target, const SpellType* spell)
+{
+    if (target && !target->Type->Building
+	    && target->Haste < spell->TTL / CYCLES_PER_SECOND) {
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Check if unholy armor can be cast on the target.
+**
+**	@param target	Target unit that spell is addressed to
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell should/can casted, 0 if not
+*/
+local int CanCastUnholyArmor(const Unit* target, const SpellType* spell)
+{
+    if (target && !target->Type->Building
+	    && target->UnholyArmor < spell->TTL / CYCLES_PER_SECOND) {
+	return 1;
+    }
     return 0;
 }
 
@@ -648,52 +792,26 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 1;
 
 	case SpellActionHealing:
-	    return CanCastHealing(target);
+	    return CanCastHealing(target, spell);
 
 	case SpellActionExorcism:
-	    // FIXME: johns: target is random selected within range of 6 fields
-	    // exorcism works only on undead units
-	    if (target && target->Type->IsUndead && target->HP ) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastExorcism(target, spell);
 
 //  ---human mages---
 	case SpellActionFireball:
 	    return 1;
 
 	case SpellActionSlow:
-	    // slow didn't work on buildings
-	    if (target && !target->Type->Building
-		    && target->Slow < spell->TTL / CYCLES_PER_SECOND) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastSlow(target, spell);
 
 	case SpellActionFlameShield:
-	    // flame shield only on land and sea units
-	    if (target && !target->Type->Building
-		    && (target->Type->UnitType == UnitTypeLand
-			|| target->Type->UnitType == UnitTypeNaval)
-		    && target->FlameShield < spell->TTL ) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastFlameShield(target, spell);
 
 	case SpellActionInvisibility:
-	    // invisible didn't work on buildings
-	    if (target && !target->Type->Building
-		    && target->Invisible < spell->TTL / CYCLES_PER_SECOND) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastInvisibility(target, spell);
 
 	case SpellActionPolymorph:
-	    // only can polymorph organic units
-	    if (target && target->Type->Organic) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastPolymorph(target, spell);
 
 	case SpellActionBlizzard:
 	    return 1;
@@ -710,17 +828,10 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 
 //  ---orc death knights---
 	case SpellActionDeathCoil:
-	    if ((target && target->Type->Organic) || (!target)) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastDeathCoil(target, spell);
 
 	case SpellActionHaste:
-	    if (target && !target->Type->Building
-		    && target->Haste < spell->TTL / CYCLES_PER_SECOND) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastHaste(target, spell);
 
 	case SpellActionRaiseDead:
 	    return 1;
@@ -729,11 +840,7 @@ global int CanCastSpell(const Unit* unit, const SpellType* spell,
 	    return 1;
 
 	case SpellActionUnholyArmor:
-	    if (target && !target->Type->Building
-		    && target->UnholyArmor < spell->TTL / CYCLES_PER_SECOND) {
-		return 1;
-	    }
-	    return 0;
+	    return CanCastUnholyArmor(target, spell);
 
 	case SpellActionDeathAndDecay:
 	    return 1;
@@ -779,7 +886,108 @@ local int AutoCastHealing(Unit* unit, SpellType* spell)
 	    continue;
 	}
 
-	if (!CanCastHealing(table[i])) {
+	if (!CanCastHealing(table[i], spell)) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Auto cast slow if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastSlow(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on an enemy
+	if (table[i] == unit || (unit->Player == table[i]->Player
+		|| IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastSlow(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip slow units and units that can't attack
+	if (table[i]->Slow || !table[i]->Type->CanAttack) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Auto cast invisibility if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastInvisibility(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on ourselves or an ally
+	if (table[i] == unit || (unit->Player != table[i]->Player
+		&& !IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastInvisibility(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip invisible units and cowards
+	if (table[i]->Invisible || table[i]->Type->CowerWorker
+		|| table[i]->Type->CowerMage) {
 	    continue;
 	}
 
@@ -846,6 +1054,108 @@ local int AutoCastBloodlust(Unit* unit, SpellType* spell)
 }
 
 /**
+**	Auto cast haste if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastHaste(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on ourselves or an ally
+	if (table[i] == unit || (unit->Player != table[i]->Player
+		&& !IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastHaste(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip haste units and cowards
+	if (table[i]->Haste || table[i]->Type->CowerWorker
+		|| table[i]->Type->CowerMage) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
+**	Auto cast unholy armor if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastUnholyArmor(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    r = unit->Type->ReactRangePerson;
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on ourselves or an ally
+	if (table[i] == unit || (unit->Player != table[i]->Player
+		&& !IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastUnholyArmor(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip unholy armor units and cowards
+	if (table[i]->UnholyArmor || table[i]->Type->CowerWorker
+		|| table[i]->Type->CowerMage) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
 **	Auto cast the spell if possible.
 **
 **	@param unit	Unit that casts the spell
@@ -882,13 +1192,13 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 	    return 0;
 
 	case SpellActionSlow:
-	    return 0;
+	    return AutoCastSlow(unit, spell);
 
 	case SpellActionFlameShield:
 	    return 0;
 
 	case SpellActionInvisibility:
-	    return 0;
+	    return AutoCastInvisibility(unit, spell);
 
 	case SpellActionPolymorph:
 	    return 0;
@@ -911,7 +1221,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 	    return 0;
 
 	case SpellActionHaste:
-	    return 0;
+	    return AutoCastHaste(unit, spell);
 
 	case SpellActionRaiseDead:
 	    return 0;
@@ -920,7 +1230,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 	    return 0;
 
 	case SpellActionUnholyArmor:
-	    return 0;
+	    return AutoCastUnholyArmor(unit, spell);
 
 	case SpellActionDeathAndDecay:
 	    return 0;
