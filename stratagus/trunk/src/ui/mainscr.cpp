@@ -613,7 +613,7 @@ static void DrawUnitInfo(const Unit* unit)
 		//  Building training units.
 		//
 		if (unit->Orders[0].Action == UnitActionTrain) {
-			if (unit->Orders[1].Action != UnitActionTrain) {
+			if (unit->OrderCount == 1 || unit->Orders[1].Action != UnitActionTrain) {
 				if (TheUI.SingleTrainingText) {
 					VideoDrawText(TheUI.SingleTrainingTextX, TheUI.SingleTrainingTextY,
 						TheUI.SingleTrainingFont, TheUI.SingleTrainingText);
