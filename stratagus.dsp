@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib /nologo /stack:0x2000000 /subsystem:windows /profile /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libbz2.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib mikmod.lib libFLAC.lib libmad.lib theora_static.lib libmng.lib /nologo /stack:0x2000000 /subsystem:windows /profile /machine:I386 /libpath:"lib"
 
 !ELSEIF  "$(CFG)" == "stratagus - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib /nologo /stack:0x2000000 /subsystem:windows /debug /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib opengl32.lib SDL.lib SDLmain.lib zlib.lib libbz2.lib libpng.lib lua.lib ogg_static.lib vorbis_static.lib mikmod.lib libFLAC.lib libmad.lib theora_static.lib libmng.lib /nologo /stack:0x2000000 /subsystem:windows /debug /machine:I386 /libpath:"lib"
 # SUBTRACT LINK32 /profile
 
 !ENDIF 
@@ -832,57 +832,5 @@ SOURCE=.\contrib\stratagus.ico
 SOURCE=.\src\stratagus.rc
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\lib\zlib.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\ogg_static.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\SDL.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\SDLmain.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\vorbis_static.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\libpng.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\libmad.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\libFLAC.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\libbz2.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\lua.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\mikmod.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\libmng.lib
-# End Source File
-# Begin Source File
-
-SOURCE=.\lib\theora_static.lib
-# End Source File
 # End Target
 # End Project
