@@ -547,7 +547,7 @@ local void FreeSprite(Graphic* graphic)
 global Graphic* LoadSprite(const char* name, int width, int height)
 {
 #ifndef USE_OPENGL
-	Graphic * g;
+	Graphic* g;
 	int nframes;
 
 	g = LoadGraphic(name);
@@ -561,7 +561,6 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 	return g;
 #else
 	Graphic* graphic;
-	int depth;
 
 	graphic = LoadGraphic(name);
 	if (!width) {
@@ -572,8 +571,6 @@ global Graphic* LoadSprite(const char* name, int width, int height)
 	}
 
 	DebugCheck(width > graphic->Width || height > graphic->Height);
-
-	depth = 8;
 
 	if (((graphic->Width / width) * width != graphic->Width) ||
 			((graphic->Height / height) * height != graphic->Height)) {
