@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+// T H E   W A R   B E G I N S
+// Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netconnect.c	-	The network high level connection code. */
+/**@name netconnect.c - The network high level connection code. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens.
+// (c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 //@{
 
 //----------------------------------------------------------------------------
-//		Includes
+// Includes
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -52,7 +52,7 @@
 
 
 //----------------------------------------------------------------------------
-//		Declaration
+// Declaration
 //----------------------------------------------------------------------------
 
 // received nothing from client for xx frames?
@@ -60,52 +60,52 @@
 #define CLIENT_IS_DEAD 300
 
 //----------------------------------------------------------------------------
-//		Variables
+// Variables
 //----------------------------------------------------------------------------
 
-char* NetworkArg;				/// Network command line argument
-int NetPlayers;						/// How many network players
-int NetworkPort = NetworkDefaultPort;		/// Local network port to use
+char* NetworkArg;                      ///< Network command line argument
+int NetPlayers;                        ///< How many network players
+int NetworkPort = NetworkDefaultPort;  ///< Local network port to use
 
 #ifdef DEBUG
-extern unsigned long MyHost;				/// My host number.
-extern int MyPort;						/// My port number.
+extern unsigned long MyHost;           ///< My host number.
+extern int MyPort;                     ///< My port number.
 #endif
 
-int HostsCount;						/// Number of hosts.
-NetworkHost Hosts[PlayerMax];		/// Host and ports of all players.
+int HostsCount;                        ///< Number of hosts.
+NetworkHost Hosts[PlayerMax];          ///< Host and ports of all players.
 
-int NetConnectRunning;				/// Network menu: Setup mode active
-NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
-unsigned char NetLocalState;		/// Network menu: Local Server/Client connect state;
-int NetLocalHostsSlot;				/// Network menu: Slot # in Hosts array of local client
-char NetTriesText[32];				/// Network menu: Client tries count text
-char NetServerText[64];				/// Network menu: Text describing the Network Server IP
-int NetLocalPlayerNumber;		/// Player number of local client
+int NetConnectRunning;                 ///< Network menu: Setup mode active
+NetworkState NetStates[PlayerMax];     ///< Network menu: Server: Client Host states
+unsigned char NetLocalState;           ///< Network menu: Local Server/Client connect state;
+int NetLocalHostsSlot;                 ///< Network menu: Slot # in Hosts array of local client
+char NetTriesText[32];                 ///< Network menu: Client tries count text
+char NetServerText[64];                ///< Network menu: Text describing the Network Server IP
+int NetLocalPlayerNumber;              ///< Player number of local client
 
-static int NetStateMsgCnt;				/// Number of consecutive msgs of same type sent
-static unsigned char LastStateMsgType;		/// Subtype of last InitConfig message sent
-static unsigned long NetLastPacketSent;		/// Tick the last network packet was sent
-static unsigned long NetworkServerIP;		/// Network Client: IP of server to join
+static int NetStateMsgCnt;              ///< Number of consecutive msgs of same type sent
+static unsigned char LastStateMsgType;  ///< Subtype of last InitConfig message sent
+static unsigned long NetLastPacketSent; ///< Tick the last network packet was sent
+static unsigned long NetworkServerIP;   ///< Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
 /// For now just specify with the -P port command line arg...
-static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
+static int NetworkServerPort = NetworkDefaultPort; ///< Server network port to use
 
 //----------------------------------------------------------------------------
-//		Functions
+// Functions
 //----------------------------------------------------------------------------
 
 /**
-**		Send an InitConfig message across the Network
+** Send an InitConfig message across the Network
 **
-**		@param host		Host to send to (network byte order).
-**		@param port		Port of host to send to (network byte order).
-**		@param msg		The message to send
+** @param host Host to send to (network byte order).
+** @param port Port of host to send to (network byte order).
+** @param msg The message to send
 **
-**		@todo		FIXME: we don't need to put the header into all messages.
-**				(header = msg->Stratagus ... )
+** @todo FIXME: we don't need to put the header into all messages.
+** (header = msg->Stratagus ... )
 */
 static int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
 {
@@ -120,58 +120,58 @@ static int NetworkSendICMessage(unsigned long host, int port, InitMessage* msg)
 #ifdef DEBUG
 static const char* ncconstatenames[] = {
 	"ccs_unused",
-	"ccs_connecting",				// new client
-	"ccs_connected",				// has received slot info
-	"ccs_mapinfo",				// has received matching map-info
-	"ccs_badmap",				// has received non-matching map-info
-	"ccs_synced",				// client is in sync with server
-	"ccs_async",				// server user has changed selection
-	"ccs_changed",				// client user has made menu selection
-	"ccs_detaching",				// client user wants to detach
-	"ccs_disconnected",				// client has detached
-	"ccs_unreachable",				// server is unreachable
-	"ccs_usercanceled",				// user canceled game
-	"ccs_nofreeslots",				// server has no more free slots
-	"ccs_serverquits",				// server quits
-	"ccs_goahead",				// server wants to start game
-	"ccs_started",				// server has started game
-	"ccs_incompatibleengine",		// incompatible engine version
-	"ccs_incompatiblenetwork",		// incompatible network version
+	"ccs_connecting",          // new client
+	"ccs_connected",           // has received slot info
+	"ccs_mapinfo",             // has received matching map-info
+	"ccs_badmap",              // has received non-matching map-info
+	"ccs_synced",              // client is in sync with server
+	"ccs_async",               // server user has changed selection
+	"ccs_changed",             // client user has made menu selection
+	"ccs_detaching",           // client user wants to detach
+	"ccs_disconnected",        // client has detached
+	"ccs_unreachable",         // server is unreachable
+	"ccs_usercanceled",        // user canceled game
+	"ccs_nofreeslots",         // server has no more free slots
+	"ccs_serverquits",         // server quits
+	"ccs_goahead",             // server wants to start game
+	"ccs_started",             // server has started game
+	"ccs_incompatibleengine",  // incompatible engine version
+	"ccs_incompatiblenetwork", // incompatible network version
 };
 
 static const char* icmsgsubtypenames[] = {
-	"Hello",						// Client Request
-	"Config",						// Setup message configure clients
+	"Hello",                   // Client Request
+	"Config",                  // Setup message configure clients
 
-	"EngineMismatch",				// Stratagus engine version doesn't match
-	"ProtocolMismatch",				// Network protocol version doesn't match
-	"EngineConfMismatch",		// Engine configuration isn't identical
-	"MapUidMismatch",				// MAP UID doesn't match
+	"EngineMismatch",          // Stratagus engine version doesn't match
+	"ProtocolMismatch",        // Network protocol version doesn't match
+	"EngineConfMismatch",      // Engine configuration isn't identical
+	"MapUidMismatch",          // MAP UID doesn't match
 
-	"GameFull",						// No player slots available
-	"Welcome",						// Acknowledge for new client connections
+	"GameFull",                // No player slots available
+	"Welcome",                 // Acknowledge for new client connections
 
-	"Waiting",						// Client has received Welcome and is waiting for Map/State
-	"Map",						// MapInfo (and Mapinfo Ack)
-	"State",						// StateInfo
-	"Resync",						// Ack StateInfo change
+	"Waiting",                 // Client has received Welcome and is waiting for Map/State
+	"Map",                     // MapInfo (and Mapinfo Ack)
+	"State",                   // StateInfo
+	"Resync",                  // Ack StateInfo change
 
-	"ServerQuit",				// Server has quit game
-	"GoodBye",						// Client wants to leave game
-	"SeeYou",						// Client has left game
+	"ServerQuit",              // Server has quit game
+	"GoodBye",                 // Client wants to leave game
+	"SeeYou",                  // Client has left game
 
-	"Go",						// Client is ready to run
-	"AreYouThere",				// Server asks are you there
-	"IAmHere",						// Client answers I am here
+	"Go",                      // Client is ready to run
+	"AreYouThere",             // Server asks are you there
+	"IAmHere",                 // Client answers I am here
 };
 #endif
 
 /**
-**		Send a message to the server, but only if the last packet was a while
-**		ago
+** Send a message to the server, but only if the last packet was a while
+** ago
 **
-**		@param msg		The message to send
-**		@param msecs		microseconds to delay
+** @param msg    The message to send
+** @param msecs  microseconds to delay
 */
 static void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long msecs)
 {
@@ -200,11 +200,11 @@ static void NetworkSendRateLimitedClientMessage(InitMessage* msg, unsigned long 
 }
 
 /**
-**		Setup the IP-Address of the network server to connect to
+** Setup the IP-Address of the network server to connect to
 **
-**		@param serveraddr		the serveraddress the user has entered
+** @param serveraddr the serveraddress the user has entered
 **
-**		@return						True, if error; otherwise false.
+** @return True, if error; otherwise false.
 */
 int NetworkSetupServerAddress(const char* serveraddr)
 {
@@ -224,7 +224,7 @@ int NetworkSetupServerAddress(const char* serveraddr)
 }
 
 /**
-**		Setup Network connect state machine for clients
+** Setup Network connect state machine for clients
 */
 void NetworkInitClientConnect(void)
 {
@@ -245,16 +245,16 @@ void NetworkInitClientConnect(void)
 }
 
 /**
-**		Terminate Network connect state machine for clients
+** Terminate Network connect state machine for clients
 */
 void NetworkExitClientConnect(void)
 {
 	NetConnectRunning = 0;
-	NetPlayers = 0;				// Make single player menus work again!
+	NetPlayers = 0; // Make single player menus work again!
 }
 
 /**
-**		Terminate and detach Network connect state machine for the client
+** Terminate and detach Network connect state machine for the client
 */
 void NetworkDetachFromServer(void)
 {
@@ -263,7 +263,7 @@ void NetworkDetachFromServer(void)
 }
 
 /**
-**		Setup Network connect state machine for the server
+** Setup Network connect state machine for the server
 */
 void NetworkInitServerConnect(void)
 {
@@ -276,7 +276,7 @@ void NetworkInitServerConnect(void)
 		NetStates[i].State = ccs_unused;
 		Hosts[i].Host = 0;
 		Hosts[i].Port = 0;
-		Hosts[i].PlyNr = 0;				// slotnr until final cfg msg
+		Hosts[i].PlyNr = 0; // slotnr until final cfg msg
 		memset(Hosts[i].PlyName, 0, 16);
 	}
 
@@ -285,7 +285,7 @@ void NetworkInitServerConnect(void)
 }
 
 /**
-**		Terminate Network connect state machine for the server
+** Terminate Network connect state machine for the server
 */
 void NetworkExitServerConnect(void)
 {
@@ -308,13 +308,13 @@ void NetworkExitServerConnect(void)
 		}
 	}
 
-	NetworkInitServerConnect();		// Reset Hosts slots
+	NetworkInitServerConnect(); // Reset Hosts slots
 
 	NetConnectRunning = 0;
 }
 
 /**
-**		Notify state change by menu user to connected clients
+** Notify state change by menu user to connected clients
 */
 void NetworkServerResyncClients(void)
 {
@@ -330,7 +330,7 @@ void NetworkServerResyncClients(void)
 }
 
 /**
-**		Server user has finally hit the start game button
+** Server user has finally hit the start game button
 */
 void NetworkServerStartGame(void)
 {
@@ -439,41 +439,41 @@ void NetworkServerStartGame(void)
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
-	} else { 
-	    for (i = 0; i < NetPlayers; ++i) {
-		    if (j > 0) {
-			    int k;
-			    int o;
-			    int chosen;
+	} else {
+		for (i = 0; i < NetPlayers; ++i) {
+			if (j > 0) {
+				int k;
+				int o;
+				int chosen;
 
-			    chosen = MyRand() % j;
+				chosen = MyRand() % j;
 
-			    n = num[chosen];
-			    Hosts[i].PlyNr = n; 
-			    k = org[i];
-			    if (k != n) {
-				    for (o = 0; o < PlayerMax; ++o) {
-					    if (org[o] == n) {
-						    org[o] = k;
-						    break;
-					    }
-				    }
-				    org[i] = n;
-			    }
-			    DebugPrint("Assigning player %d to slot %d (%d)\n" _C_
-				i _C_ n _C_ org[i]);
+				n = num[chosen];
+				Hosts[i].PlyNr = n;
+				k = org[i];
+				if (k != n) {
+					for (o = 0; o < PlayerMax; ++o) {
+						if (org[o] == n) {
+							org[o] = k;
+							break;
+						}
+					}
+					org[i] = n;
+				}
+				DebugPrint("Assigning player %d to slot %d (%d)\n" _C_
+					i _C_ n _C_ org[i]);
 
-			    num[chosen] = num[--j];
-		    } else {
-			    Assert(0);
+				num[chosen] = num[--j];
+			} else {
+				Assert(0);
 #if 0
 			// ARI: is this code path really executed? (initially h >= NetPlayers..)
 			// Above Debugcheck will catch it..
-			    Hosts[i].PlyNr = num[0];
-			    DebugPrint("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
+				Hosts[i].PlyNr = num[0];
+				DebugPrint("Hosts[%d].PlyNr = %i\n" _C_ i _C_ num[0]);
 #endif
-		    }
-	    }
+			}
+		}
 	}
 
 	// Complete all setup states for the assigned slots.
@@ -488,7 +488,7 @@ void NetworkServerStartGame(void)
 	/* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
 
 	//
-	//		Send all clients host:ports to all clients.
+	// Send all clients host:ports to all clients.
 	//  Slot 0 is the server!
 	//
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
@@ -497,7 +497,7 @@ void NetworkServerStartGame(void)
 	//
 	// Move ourselves (server slot 0) to the end of the list
 	//
-	Hosts[PlayerMax - 1] = Hosts[0];				// last slot unused (special), use as tempstore..
+	Hosts[PlayerMax - 1] = Hosts[0]; // last slot unused (special), use as tempstore..
 	Hosts[0] = Hosts[HostsCount];
 	Hosts[HostsCount] = Hosts[PlayerMax - 1];
 	Hosts[PlayerMax - 1].PlyNr = 0;
@@ -524,7 +524,7 @@ void NetworkServerStartGame(void)
 	msg = (InitMessage*)buf;
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
 	//
-	//		Send all clients host:ports to all clients.
+	// Send all clients host:ports to all clients.
 	//
 	for (j = HostsCount; j;) {
 
@@ -534,7 +534,7 @@ breakout:
 			unsigned long host;
 			int port;
 
-			if (num[Hosts[i].PlyNr] == 1) {				// not acknowledged yet
+			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				host = message.u.Hosts[i].Host;
 				port = message.u.Hosts[i].Port;
 				message.u.Hosts[i].Host = message.u.Hosts[i].Port = 0;
@@ -620,7 +620,7 @@ breakout:
 }
 
 /**
-**		Assign player slots and names in a network game..
+** Assign player slots and names in a network game..
 */
 void NetworkConnectSetupGame(void)
 {
@@ -633,7 +633,7 @@ void NetworkConnectSetupGame(void)
 }
 
 /**
-**		Client Menu Loop: Send out client request messages
+** Client Menu Loop: Send out client request messages
 */
 void NetworkProcessClientRequest(void)
 {
@@ -651,22 +651,22 @@ changed:
 				NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 			}
 			NetLocalState = ccs_usercanceled;
-			NetConnectRunning = 0;		// End the menu..
+			NetConnectRunning = 0; // End the menu..
 			break;
 		case ccs_detaching:
-			if (NetStateMsgCnt < 10) {		// 10 retries = 1 second
+			if (NetStateMsgCnt < 10) { // 10 retries = 1 second
 				message.Type = MessageInitHello;
 				message.SubType = ICMGoodBye;
 				NetworkSendRateLimitedClientMessage(&message, 100);
 			} else {
 				// Server is ignoring us - break out!
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_detaching: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
-		case ccs_connecting:				// connect to server
-			if (NetStateMsgCnt < 48) {		// 48 retries = 24 seconds
+		case ccs_connecting: // connect to server
+			if (NetStateMsgCnt < 48) { // 48 retries = 24 seconds
 				message.Type = MessageInitHello;
 				message.SubType = ICMHello;
 				memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);
@@ -675,18 +675,18 @@ changed:
 				sprintf(NetTriesText, "Connecting try %d of 48", NetStateMsgCnt);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_connecting: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
 		case ccs_connected:
-			if (NetStateMsgCnt < 20) {		// 20 retries
+			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMWaiting;
 				NetworkSendRateLimitedClientMessage(&message, 650);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_connected: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
@@ -701,7 +701,7 @@ changed:
 			NetworkSendRateLimitedClientMessage(&message, 850);
 			break;
 		case ccs_changed:
-			if (NetStateMsgCnt < 20) {												// 20 retries
+			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMState;
 				message.u.State = LocalSetupState;
@@ -709,65 +709,65 @@ changed:
 				NetworkSendRateLimitedClientMessage(&message, 450);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_changed: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
 		case ccs_async:
-			if (NetStateMsgCnt < 20) {												// 20 retries
+			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMResync;
 				NetworkSendRateLimitedClientMessage(&message, 450);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_async: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
 		case ccs_mapinfo:
-			if (NetStateMsgCnt < 20 && MenuMapInfo != NULL) {				// 20 retries
+			if (NetStateMsgCnt < 20 && MenuMapInfo != NULL) { // 20 retries
 				message.Type = MessageInitHello;
-				message.SubType = ICMMap;										// ICMMapAck..
+				message.SubType = ICMMap; // ICMMapAck..
 				message.MapUID = htonl(MenuMapInfo->MapUID);
 				NetworkSendRateLimitedClientMessage(&message, 650);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_mapinfo: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 		case ccs_badmap:
-			if (NetStateMsgCnt < 20) {		// 20 retries
+			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMMapUidMismatch;
 				if (MenuMapInfo) {
-					message.MapUID = htonl(MenuMapInfo->MapUID);				// MAP Uid doesn't match
+					message.MapUID = htonl(MenuMapInfo->MapUID); // MAP Uid doesn't match
 				} else {
-					message.MapUID = 0L;										// Map not found
+					message.MapUID = 0L; // Map not found
 				}
 				NetworkSendRateLimitedClientMessage(&message, 650);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_badmap: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 			break;
 		case ccs_goahead:
-			if (NetStateMsgCnt < 50) {		// 50 retries
+			if (NetStateMsgCnt < 50) { // 50 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMConfig;
 				NetworkSendRateLimitedClientMessage(&message, 250);
 			} else {
 				NetLocalState = ccs_unreachable;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				DebugPrint("ccs_goahead: Above message limit %d\n" _C_ NetStateMsgCnt);
 			}
 		case ccs_started:
-			if (NetStateMsgCnt < 20) {		// 20 retries
+			if (NetStateMsgCnt < 20) { // 20 retries
 				message.Type = MessageInitHello;
 				message.SubType = ICMGo;
 				NetworkSendRateLimitedClientMessage(&message, 250);
 			} else {
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 			}
 			break;
 		default:
@@ -776,9 +776,9 @@ changed:
 }
 
 /**
-**		Kick a client that doesn't answer to our packets
+** Kick a client that doesn't answer to our packets
 **
-**		@param c		The client (host slot) to kick
+** @param c The client (host slot) to kick
 */
 static void KickDeadClient(int c)
 {
@@ -804,7 +804,7 @@ static void KickDeadClient(int c)
 }
 
 /**
-**		Server Menu Loop: Send out server request messages
+** Server Menu Loop: Send out server request messages
 */
 void NetworkProcessServerRequest(void)
 {
@@ -826,7 +826,7 @@ void NetworkProcessServerRequest(void)
 					KickDeadClient(i);
 				} else if (fcd % 5 == 0) {
 					message.Type = MessageInitReply;
-					message.SubType = ICMAYT;		// Probe for the client
+					message.SubType = ICMAYT; // Probe for the client
 					message.MapUID = 0L;
 					n = NetworkSendICMessage(Hosts[i].Host, Hosts[i].Port, &message);
 					DebugPrint("Sending InitReply Message AreYouThere: (%d) to %d.%d.%d.%d:%d (%ld:%ld)\n" _C_
@@ -840,9 +840,9 @@ void NetworkProcessServerRequest(void)
 
 #ifdef DEBUG
 /**
-**		Parse a network menu packet in client disconnected state.
+** Parse a network menu packet in client disconnected state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseDisconnected(
 	const InitMessage* msg __attribute__((unused)))
@@ -853,15 +853,15 @@ static void ClientParseDisconnected(
 #endif
 
 /**
-**		Parse a network menu packet in client detaching state.
+** Parse a network menu packet in client detaching state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseDetaching(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
-		case ICMGoodBye:		// Server has let us go
+		case ICMGoodBye: // Server has let us go
 			NetLocalState = ccs_disconnected;
 			NetStateMsgCnt = 0;
 			break;
@@ -873,9 +873,9 @@ static void ClientParseDetaching(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client connecting state.
+** Parse a network menu packet in client connecting state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseConnecting(const InitMessage* msg)
 {
@@ -892,7 +892,7 @@ static void ClientParseConnecting(const InitMessage* msg)
 				StratagusFormatArgs(StratagusVersion),
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_incompatibleengine;
-			NetConnectRunning = 0;		// End the menu..
+			NetConnectRunning = 0; // End the menu..
 			return;
 
 		case ICMProtocolMismatch: // Network protocol version doesn't match
@@ -904,17 +904,17 @@ static void ClientParseConnecting(const InitMessage* msg)
 				NetworkProtocolFormatArgs(NetworkProtocolVersion),
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_incompatiblenetwork;
-			NetConnectRunning = 0;		// End the menu..
+			NetConnectRunning = 0; // End the menu..
 			return;
 
-		case ICMGameFull:		// Game is full - server rejected connnection
+		case ICMGameFull: // Game is full - server rejected connnection
 			fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
 				NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 			NetLocalState = ccs_nofreeslots;
-			NetConnectRunning = 0;		// End the menu..
+			NetConnectRunning = 0; // End the menu..
 			return;
 
-		case ICMWelcome:		// Server has accepted us
+		case ICMWelcome: // Server has accepted us
 			NetLocalState = ccs_connected;
 			NetStateMsgCnt = 0;
 			NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
@@ -947,9 +947,9 @@ static void ClientParseConnecting(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client connected state.
+** Parse a network menu packet in client connected state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseConnected(const InitMessage* msg)
 {
@@ -957,7 +957,7 @@ static void ClientParseConnected(const InitMessage* msg)
 
 	switch (msg->SubType) {
 
-		case ICMMap:				// Server has sent us new map info
+		case ICMMap: // Server has sent us new map info
 			pathlen = sprintf(MenuMapFullPath, "%s/", StratagusLibPath);
 			memcpy(MenuMapFullPath + pathlen, msg->u.MapPath, 256);
 			MenuMapFullPath[pathlen + 255] = 0;
@@ -974,10 +974,10 @@ static void ClientParseConnected(const InitMessage* msg)
 			}
 			NetLocalState = ccs_mapinfo;
 			NetStateMsgCnt = 0;
-			NetConnectRunning = 0;		// Kick the menu..
+			NetConnectRunning = 0; // Kick the menu..
 			break;
 
-		case ICMWelcome:		// Server has accepted us (dup)
+		case ICMWelcome: // Server has accepted us (dup)
 			break;
 
 		default:
@@ -987,15 +987,15 @@ static void ClientParseConnected(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client initial mapinfo state.
+** Parse a network menu packet in client initial mapinfo state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseMapInfo(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
-		case ICMState:				// Server has sent us first state info
+		case ICMState: // Server has sent us first state info
 			ServerSetupState = msg->u.State;
 			NetClientUpdateState();
 			NetLocalState = ccs_synced;
@@ -1009,9 +1009,9 @@ static void ClientParseMapInfo(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client synced state.
+** Parse a network menu packet in client synced state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseSynced(const InitMessage* msg)
 {
@@ -1019,14 +1019,14 @@ static void ClientParseSynced(const InitMessage* msg)
 
 	switch(msg->SubType) {
 
-		case ICMState:				// Server has sent us new state info
+		case ICMState: // Server has sent us new state info
 			ServerSetupState = msg->u.State;
 			NetClientUpdateState();
 			NetLocalState = ccs_async;
 			NetStateMsgCnt = 0;
 			break;
 
-		case ICMConfig:				// Server gives the go ahead.. - start game
+		case ICMConfig: // Server gives the go ahead.. - start game
 			DebugPrint("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
 			HostsCount = 0;
 			for (i = 0; i < msg->HostsCount - 1; ++i) {
@@ -1039,7 +1039,7 @@ static void ClientParseSynced(const InitMessage* msg)
 					DebugPrint("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
 							ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
 							ntohs(msg->u.Hosts[i].Port) _C_ msg->u.Hosts[i].PlyName);
-				} else {						// Own client
+				} else { // Own client
 					NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
 					DebugPrint("SELF %d [%s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
 							msg->u.Hosts[i].PlyName);
@@ -1073,9 +1073,9 @@ static void ClientParseSynced(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client async state.
+** Parse a network menu packet in client async state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseAsync(const InitMessage* msg)
 {
@@ -1083,7 +1083,7 @@ static void ClientParseAsync(const InitMessage* msg)
 
 	switch(msg->SubType) {
 
-		case ICMResync:				// Server has resynced with us and sends resync data
+		case ICMResync: // Server has resynced with us and sends resync data
 			for (i = 1; i < PlayerMax - 1; ++i) {
 				if (i != NetLocalHostsSlot) {
 					Hosts[i].Host = msg->u.Hosts[i].Host;
@@ -1109,18 +1109,18 @@ static void ClientParseAsync(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client final goahead waiting state.
+** Parse a network menu packet in client final goahead waiting state.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseGoAhead(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
-		case ICMConfig:				// Server go ahead dup - ignore..
+		case ICMConfig: // Server go ahead dup - ignore..
 			break;
 
-		case ICMState:				// Server has sent final state info
+		case ICMState: // Server has sent final state info
 			DebugPrint("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
 			ServerSetupState = msg->u.State;
 			NetLocalState = ccs_started;
@@ -1134,16 +1134,16 @@ static void ClientParseGoAhead(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu packet in client final started state
+** Parse a network menu packet in client final started state
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseStarted(const InitMessage* msg)
 {
 	switch(msg->SubType) {
 
-		case ICMGo:						// Server's final go ..
-			NetConnectRunning = 0;		// End the menu..
+		case ICMGo: // Server's final go ..
+			NetConnectRunning = 0; // End the menu..
 			break;
 
 		default:
@@ -1153,9 +1153,9 @@ static void ClientParseStarted(const InitMessage* msg)
 }
 
 /**
-**		Parse a network menu AreYouThere keepalive packet and reply IAmHere.
+** Parse a network menu AreYouThere keepalive packet and reply IAmHere.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)))
 {
@@ -1167,9 +1167,9 @@ static void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)
 }
 
 /**
-**		Parse a network menu Bad Map reply from server.
+** Parse a network menu Bad Map reply from server.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
 {
@@ -1182,22 +1182,22 @@ static void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
 	for (i = 0; i < 5; ++i) {
 		NetworkSendICMessage(NetworkServerIP, htons(NetworkServerPort), &message);
 	}
-	NetConnectRunning = 0;		// End the menu..
+	NetConnectRunning = 0; // End the menu..
 }
 
 
 /**
-**		Parse the initial 'Hello' message of new client that wants to join the game
+** Parse the initial 'Hello' message of new client that wants to join the game
 **
-**		@param h		slot number of host msg originates from
-**		@param msg		message received
+** @param h slot number of host msg originates from
+** @param msg message received
 */
 static void ServerParseHello(int h, const InitMessage* msg)
 {
 	int i, n;
 	InitMessage message;
 
-	if (h == -1) {		// it is a new client
+	if (h == -1) { // it is a new client
 		for (i = 1; i < PlayerMax - 1; ++i) {
 			// occupy first available slot
 			if (ServerSetupState.CompOpt[i] == 0) {
@@ -1218,7 +1218,7 @@ static void ServerParseHello(int h, const InitMessage* msg)
 			NetStates[h].MsgCnt = 0;
 		} else {
 			message.Type = MessageInitReply;
-			message.SubType = ICMGameFull;		// Game is full - reject connnection
+			message.SubType = ICMGameFull; // Game is full - reject connnection
 			message.MapUID = 0L;
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message GameFull: (%d) to %d.%d.%d.%d:%d\n" _C_
@@ -1229,11 +1229,11 @@ static void ServerParseHello(int h, const InitMessage* msg)
 	// this code path happens until client sends waiting (= has received this message)
 	ServerSetupState.LastFrame[h] = FrameCounter;
 	message.Type = MessageInitReply;
-	message.SubType = ICMWelcome;								// Acknowledge: Client is welcome
-	message.u.Hosts[0].PlyNr = htons(h);						// Host array slot number
-	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16);		// Name of server player
+	message.SubType = ICMWelcome; // Acknowledge: Client is welcome
+	message.u.Hosts[0].PlyNr = htons(h); // Host array slot number
+	memcpy(message.u.Hosts[0].PlyName, LocalPlayerName, 16); // Name of server player
 	message.MapUID = 0L;
-	for (i = 1; i < PlayerMax - 1; ++i) {						// Info about other clients
+	for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 		if (i != h) {
 			if (Hosts[i].PlyNr) {
 				message.u.Hosts[i].Host = Hosts[i].Host;
@@ -1261,9 +1261,9 @@ static void ServerParseHello(int h, const InitMessage* msg)
 }
 
 /**
-**		Parse client resync request after client user has changed menu selection
+** Parse client resync request after client user has changed menu selection
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseResync(const int h)
 {
@@ -1285,7 +1285,7 @@ static void ServerParseResync(const int h)
 			// (indicating Resync has completed)
 			message.Type = MessageInitReply;
 			message.SubType = ICMResync;
-			for (i = 1; i < PlayerMax - 1; ++i) {		// Info about other clients
+			for (i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
 				if (i != h) {
 					if (Hosts[i].PlyNr) {
 						message.u.Hosts[i].Host = Hosts[i].Host;
@@ -1317,9 +1317,9 @@ static void ServerParseResync(const int h)
 }
 
 /**
-**		Parse client heart beat waiting message
+** Parse client heart beat waiting message
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseWaiting(const int h)
 {
@@ -1340,7 +1340,7 @@ static void ServerParseWaiting(const int h)
 		case ccs_connected:
 			// this code path happens until client acknoledges the map
 			message.Type = MessageInitReply;
-			message.SubType = ICMMap;						// Send Map info to the client
+			message.SubType = ICMMap; // Send Map info to the client
 			pathlen = strlen(StratagusLibPath) + 1;
 			memcpy(message.u.MapPath, MenuMapFullPath + pathlen, 256);
 			message.MapUID = htonl(MenuMapInfo->MapUID);
@@ -1375,7 +1375,7 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknoledges the state change
 			// by sending ICMResync
 			message.Type = MessageInitReply;
-			message.SubType = ICMState;				// Send new state info to the client
+			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(MenuMapInfo->MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1396,9 +1396,9 @@ static void ServerParseWaiting(const int h)
 }
 
 /**
-**		Parse client map info acknoledge message
+** Parse client map info acknoledge message
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseMap(const int h)
 {
@@ -1416,7 +1416,7 @@ static void ServerParseMap(const int h)
 			// this code path happens until client acknoledges the state info
 			// by falling back to ICMWaiting with prev. State synced
 			message.Type = MessageInitReply;
-			message.SubType = ICMState;				// Send State info to the client
+			message.SubType = ICMState; // Send State info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(MenuMapInfo->MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1436,10 +1436,10 @@ static void ServerParseMap(const int h)
 }
 
 /**
-**		Parse locate state change notifiction or initial state info request of client
+** Parse locate state change notifiction or initial state info request of client
 **
-**		@param h		slot number of host msg originates from
-**		@param msg		message received
+** @param h slot number of host msg originates from
+** @param msg message received
 */
 static void ServerParseState(const int h, const InitMessage* msg)
 {
@@ -1473,7 +1473,7 @@ static void ServerParseState(const int h, const InitMessage* msg)
 			// this code path happens until client acknoledges the state change reply
 			// by sending ICMResync
 			message.Type = MessageInitReply;
-			message.SubType = ICMState;				// Send new state info to the client
+			message.SubType = ICMState; // Send new state info to the client
 			message.u.State = ServerSetupState;
 			message.MapUID = htonl(MenuMapInfo->MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
@@ -1493,9 +1493,9 @@ static void ServerParseState(const int h, const InitMessage* msg)
 }
 
 /**
-**		Parse the disconnect request of a client by sending out good bye
+** Parse the disconnect request of a client by sending out good bye
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseGoodBye(const int h)
 {
@@ -1527,9 +1527,9 @@ static void ServerParseGoodBye(const int h)
 }
 
 /**
-**		Parse the final see you msg of a disconnecting client
+** Parse the final see you msg of a disconnecting client
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseSeeYou(const int h)
 {
@@ -1546,9 +1546,9 @@ static void ServerParseSeeYou(const int h)
 }
 
 /**
-**		Parse the 'I am Here' reply to the servers' 'Are you there' msg
+** Parse the 'I am Here' reply to the servers' 'Are you there' msg
 **
-**		@param h		slot number of host msg originates from
+** @param h slot number of host msg originates from
 */
 static void ServerParseIAmHere(const int h)
 {
@@ -1557,11 +1557,11 @@ static void ServerParseIAmHere(const int h)
 }
 
 /**
-**		Check if the Stratagus version and Network Protocol match
+** Check if the Stratagus version and Network Protocol match
 **
-**		@param msg		message received
+** @param msg message received
 **
-**		@return				0 if the versions match, -1 otherwise
+** @return 0 if the versions match, -1 otherwise
 */
 static int CheckVersions(const InitMessage* msg)
 {
@@ -1608,9 +1608,9 @@ static int CheckVersions(const InitMessage* msg)
 }
 
 /**
-**		Parse a Network menu packet.
+** Parse a Network menu packet.
 **
-**		@param msg		message received
+** @param msg message received
 */
 static void NetworkParseMenuPacket(const InitMessage* msg)
 {
@@ -1618,15 +1618,15 @@ static void NetworkParseMenuPacket(const InitMessage* msg)
 		icmsgsubtypenames[msg->SubType] _C_ msg->Type _C_ msg->SubType _C_ NIPQUAD(ntohl(NetLastHost)) _C_
 		ntohs(NetLastPort) _C_ FrameCounter);
 
-	if (NetConnectRunning == 2) {				// client
+	if (NetConnectRunning == 2) { // client
 		if (msg->Type == MessageInitReply) {
 			if (msg->SubType == ICMServerQuit) { // Server user canceled, should work in all states
 				NetLocalState = ccs_serverquits;
-				NetConnectRunning = 0;		// End the menu..
+				NetConnectRunning = 0; // End the menu..
 				// No ack here - Server will spew out a few Quit msgs, which has to be enough
 				return;
 			}
-			if (msg->SubType == ICMAYT) {		// Server is checking for our presence
+			if (msg->SubType == ICMAYT) { // Server is checking for our presence
 				ClientParseAreYouThere(msg);
 				return;
 			}
@@ -1680,7 +1680,7 @@ static void NetworkParseMenuPacket(const InitMessage* msg)
 			}
 		}
 
-	} else if (NetConnectRunning == 1) {		// server
+	} else if (NetConnectRunning == 1) { // server
 		int i;
 
 		if (CheckVersions(msg)) {
@@ -1691,7 +1691,7 @@ static void NetworkParseMenuPacket(const InitMessage* msg)
 		for (i = 0; i < PlayerMax - 1; ++i) {
 			if (Hosts[i].Host == NetLastHost && Hosts[i].Port == NetLastPort) {
 				switch(msg->SubType) {
-					case ICMHello:				// a new client has arrived
+					case ICMHello: // a new client has arrived
 						ServerParseHello(i, msg);
 						break;
 
@@ -1739,12 +1739,12 @@ static void NetworkParseMenuPacket(const InitMessage* msg)
 }
 
 /**
-**		Parse a setup event. (Command type <= MessageInitEvent)
+** Parse a setup event. (Command type <= MessageInitEvent)
 **
-**		@param buf		Packet received
-**		@param size		size of the received packet.
+** @param buf Packet received
+** @param size size of the received packet.
 **
-**		@return				1 if packet is an InitConfig message, 0 otherwise
+** @return 1 if packet is an InitConfig message, 0 otherwise
 */
 int NetworkParseSetupEvent(const char* buf, int size)
 {
@@ -1755,7 +1755,7 @@ int NetworkParseSetupEvent(const char* buf, int size)
 			// Client has acked ready to start and receives first real network packet.
 			// This indicates that we missed the 'Go' in started state and the game
 			// has been started by the server, so do the same for the client.
-			NetConnectRunning = 0;		// End the menu..
+			NetConnectRunning = 0; // End the menu..
 		}
 		return 0;
 	}

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name commands.c	-	Global command handler - network support. */
+/**@name commands.c - Global command handler - network support. */
 //
 //      (c) Copyright 2000-2004 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //
@@ -31,7 +31,7 @@
 //@{
 
 //----------------------------------------------------------------------------
-//		Includes
+// Includes
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -46,7 +46,7 @@
 #include "player.h"
 #include "network.h"
 #include "netconnect.h"
-#include "campaign.h"						// for CurrentMapPath
+#include "campaign.h" // for CurrentMapPath
 #include "script.h"
 #include "commands.h"
 #include "interface.h"
@@ -54,104 +54,104 @@
 #include "settings.h"
 
 //----------------------------------------------------------------------------
-//		Declaration
+// Declaration
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//		Structures
+// Structures
 //----------------------------------------------------------------------------
 
 /**
-**		LogEntry typedef
+** LogEntry typedef
 */
 typedef struct _log_entry_ LogEntry;
 
 /**
-**		LogEntry structure.
+** LogEntry structure.
 */
 struct _log_entry_ {
-	unsigned long   GameCycle;
-	int				UnitNumber;
-	char*		UnitIdent;
-	char*		Action;
-	int				Flush;
-	int				PosX;
-	int				PosY;
-	int				DestUnitNumber;
-	char*		Value;
-	int				Num;
-	unsigned		SyncRandSeed;
-	LogEntry*		Next;
+	unsigned long GameCycle;
+	int UnitNumber;
+	char* UnitIdent;
+	char* Action;
+	int Flush;
+	int PosX;
+	int PosY;
+	int DestUnitNumber;
+	char* Value;
+	int Num;
+	unsigned SyncRandSeed;
+	LogEntry* Next;
 };
 
 /**
-**		Multiplayer Player definition
+** Multiplayer Player definition
 */
 typedef struct _multiplayer_player_ {
-	char*		Name;
-	int				Race;
-	int				Team;
-	int 		Type;
+	char* Name;
+	int Race;
+	int Team;
+	int Type;
 } MPPlayer;
 
 /**
-**		Full replay structure (definition + logs)
+** Full replay structure (definition + logs)
 */
 typedef struct _full_replay_ {
-	char* 		Comment1;
-	char* 		Comment2;
-	char* 		Comment3;
-	char*		Date;
-	char*		Map;
-	char*		MapPath;
-	unsigned		MapId;
+	char* Comment1;
+	char* Comment2;
+	char* Comment3;
+	char* Date;
+	char* Map;
+	char* MapPath;
+	unsigned MapId;
 
-	int				Type;
-	int				Race;
-	int				LocalPlayer;
-	MPPlayer		Players[PlayerMax];
+	int Type;
+	int Race;
+	int LocalPlayer;
+	MPPlayer Players[PlayerMax];
 
-	int 		Resource;
-	int				NumUnits;
-	int				TileSet;
-	int				NoFow;
-	int				RevealMap;
-	int				GameType;
-	int				Opponents;
-	int				Engine[3];
-	int				Network[3];
-	LogEntry*		Commands;
+	int  Resource;
+	int NumUnits;
+	int TileSet;
+	int NoFow;
+	int RevealMap;
+	int GameType;
+	int Opponents;
+	int Engine[3];
+	int Network[3];
+	LogEntry* Commands;
 } FullReplay;
 
 //----------------------------------------------------------------------------
-//		Constants
+// Constants
 //----------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------
-//		Variables
+// Variables
 //----------------------------------------------------------------------------
 
-int CommandLogDisabled;				/// True if command log is off
-ReplayType ReplayGameType;		/// Replay game type
-static int DisabledLog;						/// Disabled log for replay
-static int DisabledShowTips;				/// Disabled show tips
-static CLFile* LogFile;						/// Replay log file
-static unsigned long NextLogCycle;		/// Next log cycle number
-static int InitReplay;						/// Initialize replay
+int CommandLogDisabled;            ///< True if command log is off
+ReplayType ReplayGameType;         ///< Replay game type
+static int DisabledLog;            ///< Disabled log for replay
+static int DisabledShowTips;       ///< Disabled show tips
+static CLFile* LogFile;            ///< Replay log file
+static unsigned long NextLogCycle; ///< Next log cycle number
+static int InitReplay;             ///< Initialize replay
 static FullReplay* CurrentReplay;
 static LogEntry* ReplayStep;
 
 static void AppendLog(LogEntry* log, CLFile* dest);
 
 //----------------------------------------------------------------------------
-//		Log commands
+// Log commands
 //----------------------------------------------------------------------------
 
 /**
-**		Allocate & fill a new FullReplay structure, from GameSettings.
+** Allocate & fill a new FullReplay structure, from GameSettings.
 **
-**		@return		A new FullReplay structure
+** @return A new FullReplay structure
 */
 static FullReplay* StartReplay(void)
 {
@@ -213,7 +213,7 @@ static FullReplay* StartReplay(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 static void ApplyReplaySettings(void)
 {
@@ -253,7 +253,7 @@ static void ApplyReplaySettings(void)
 }
 
 /**
-**		FIXME: docu
+** FIXME: docu
 */
 static void DeleteReplay(FullReplay* replay)
 {
@@ -340,9 +340,9 @@ static void SaveFullLog(CLFile* dest)
 	CLprintf(dest, "  Players = {\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (CurrentReplay->Players[i].Name) {
-			CLprintf(dest, "	{ Name = \"%s\",", CurrentReplay->Players[i].Name);
+			CLprintf(dest, "\t{ Name = \"%s\",", CurrentReplay->Players[i].Name);
 		} else {
-			CLprintf(dest, "	{");
+			CLprintf(dest, "\t{");
 		}
 		CLprintf(dest, " Race = %d,", CurrentReplay->Players[i].Race);
 		CLprintf(dest, " Team = %d,", CurrentReplay->Players[i].Team);
@@ -398,31 +398,31 @@ static void AppendLog(LogEntry* log, CLFile* dest)
 }
 
 /**
-**		Log commands into file.
+** Log commands into file.
 **
-**		This could later be used to recover, crashed games.
+** This could later be used to recover, crashed games.
 **
-**		@param action		Command name (move,attack,...).
-**		@param unit		Unit that receive the command.
-**		@param flush		Append command or flush old commands.
-**		@param x		optional X map position.
-**		@param y		optional y map position.
-**		@param dest		optional destination unit.
-**		@param value		optional command argument (unit-type,...).
-**		@param num		optional number argument
+** @param action    Command name (move,attack,...).
+** @param unit      Unit that receive the command.
+** @param flush     Append command or flush old commands.
+** @param x         optional X map position.
+** @param y         optional y map position.
+** @param dest      optional destination unit.
+** @param value     optional command argument (unit-type,...).
+** @param num       optional number argument
 */
 void CommandLog(const char* action, const Unit* unit, int flush,
 	int x, int y, const Unit* dest, const char* value, int num)
 {
 	LogEntry* log;
 
-	if (CommandLogDisabled) {				// No log wanted
+	if (CommandLogDisabled) { // No log wanted
 		return;
 	}
 
 	//
-	//		Create and write header of log file. The player number is added
-	//  to the save file name, to test more than one player on one computer.
+	// Create and write header of log file. The player number is added
+	// to the save file name, to test more than one player on one computer.
 	//
 	if (!LogFile) {
 		char buf[PATH_MAX];
@@ -468,7 +468,7 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 	log = (LogEntry*)malloc(sizeof(LogEntry));
 
 	//
-	//		Frame, unit, (type-ident only to be better readable).
+	// Frame, unit, (type-ident only to be better readable).
 	//
 	log->GameCycle = GameCycle;
 
@@ -479,23 +479,23 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 	log->Flush = flush;
 
 	//
-	//		Coordinates given.
+	// Coordinates given.
 	//
 	log->PosX = x;
 	log->PosY = y;
 
 	//
-	//		Destination given.
+	// Destination given.
 	//
 	log->DestUnitNumber = (dest ? UnitNumber(dest) : -1);
 
 	//
-	//		Value given.
+	// Value given.
 	//
 	log->Value = (value ? strdup(value) : NULL);
 
 	//
-	//		Number given.
+	// Number given.
 	//
 	log->Num = num;
 
@@ -506,7 +506,7 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 }
 
 /**
-**		Parse log
+** Parse log
 */
 static int CclLog(lua_State* l)
 {
@@ -570,7 +570,7 @@ static int CclLog(lua_State* l)
 }
 
 /**
-**		Parse replay-log
+** Parse replay-log
 */
 static int CclReplayLog(lua_State* l)
 {
@@ -737,7 +737,7 @@ int LoadReplay(char* name)
 }
 
 /**
-**		End logging
+** End logging
 */
 void EndReplayLog(void)
 {
@@ -753,7 +753,7 @@ void EndReplayLog(void)
 }
 
 /**
-**		Clean replay log
+** Clean replay log
 */
 void CleanReplayLog(void)
 {
@@ -763,10 +763,10 @@ void CleanReplayLog(void)
 	}
 	ReplayStep = NULL;
 
-//	if (DisabledLog) {
+// if (DisabledLog) {
 		CommandLogDisabled = 0;
 		DisabledLog = 0;
-//	}
+// }
 	if (DisabledShowTips) {
 		ShowTips = 1;
 		DisabledShowTips = 0;
@@ -777,7 +777,7 @@ void CleanReplayLog(void)
 }
 
 /**
-**		Do next replay
+** Do next replay
 */
 static void DoNextReplay(void)
 {
@@ -916,7 +916,7 @@ static void DoNextReplay(void)
 }
 
 /**
-**		Replay user commands from log each cycle
+** Replay user commands from log each cycle
 */
 static void ReplayEachCycle(void)
 {
@@ -957,7 +957,7 @@ static void ReplayEachCycle(void)
 }
 
 /**
-**		Replay user commands from log each cycle, single player games
+** Replay user commands from log each cycle, single player games
 */
 void SinglePlayerReplayEachCycle(void)
 {
@@ -967,7 +967,7 @@ void SinglePlayerReplayEachCycle(void)
 }
 
 /**
-**		Replay user commands from log each cycle, multiplayer games
+** Replay user commands from log each cycle, multiplayer games
 */
 void MultiPlayerReplayEachCycle(void)
 {
@@ -978,16 +978,16 @@ void MultiPlayerReplayEachCycle(void)
 //@}
 
 //----------------------------------------------------------------------------
-//		Send game commands, maybe over the network.
+// Send game commands, maybe over the network.
 //----------------------------------------------------------------------------
 
 /**@name send */
 //@{
 
 /**
-**		Send command: Unit stop.
+** Send command: Unit stop.
 **
-**		@param unit		pointer to unit.
+** @param unit pointer to unit.
 */
 void SendCommandStopUnit(Unit* unit)
 {
@@ -1000,10 +1000,10 @@ void SendCommandStopUnit(Unit* unit)
 }
 
 /**
-**		Send command: Unit stand ground.
+** Send command: Unit stand ground.
 **
-**		@param unit		pointer to unit.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandStandGround(Unit* unit, int flush)
 {
@@ -1016,11 +1016,11 @@ void SendCommandStandGround(Unit* unit, int flush)
 }
 
 /**
-**		Send command: Follow unit to position.
+** Send command: Follow unit to position.
 **
-**		@param unit		pointer to unit.
-**		@param dest		follow this unit.
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param dest    follow this unit.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandFollow(Unit* unit, Unit* dest, int flush)
 {
@@ -1033,12 +1033,12 @@ void SendCommandFollow(Unit* unit, Unit* dest, int flush)
 }
 
 /**
-**		Send command: Move unit to position.
+** Send command: Move unit to position.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position to move to.
-**		@param y		Y map tile position to move to.
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param x       X map tile position to move to.
+** @param y       Y map tile position to move to.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandMove(Unit* unit, int x, int y, int flush)
 {
@@ -1051,13 +1051,13 @@ void SendCommandMove(Unit* unit, int x, int y, int flush)
 }
 
 /**
-**		Send command: Unit repair.
+** Send command: Unit repair.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position to repair.
-**		@param y		Y map tile position to repair.
-**		@param dest		Unit to be repaired.
-**		@param flush		Flag flush all pending commands.
+** @param unit    Pointer to unit.
+** @param x       X map tile position to repair.
+** @param y       Y map tile position to repair.
+** @param dest    Unit to be repaired.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 {
@@ -1070,13 +1070,13 @@ void SendCommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 }
 
 /**
-**		Send command: Unit attack unit or at position.
+** Send command: Unit attack unit or at position.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position to attack.
-**		@param y		Y map tile position to attack.
-**		@param attack		or !=NoUnitP unit to be attacked.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param x        X map tile position to attack.
+** @param y        Y map tile position to attack.
+** @param attack   or !=NoUnitP unit to be attacked.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 {
@@ -1089,12 +1089,12 @@ void SendCommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 }
 
 /**
-**		Send command: Unit attack ground.
+** Send command: Unit attack ground.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position to fire on.
-**		@param y		Y map tile position to fire on.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param x        X map tile position to fire on.
+** @param y        Y map tile position to fire on.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
 {
@@ -1107,12 +1107,12 @@ void SendCommandAttackGround(Unit* unit, int x, int y, int flush)
 }
 
 /**
-**		Send command: Unit patrol between current and position.
+** Send command: Unit patrol between current and position.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position to patrol between.
-**		@param y		Y map tile position to patrol between.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param x        X map tile position to patrol between.
+** @param y        Y map tile position to patrol between.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandPatrol(Unit* unit, int x, int y, int flush)
 {
@@ -1125,13 +1125,13 @@ void SendCommandPatrol(Unit* unit, int x, int y, int flush)
 }
 
 /**
-**		Send command: Unit board unit.
+** Send command: Unit board unit.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position (unused).
-**		@param y		Y map tile position (unused).
-**		@param dest		Destination to be boarded.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param x        X map tile position (unused).
+** @param y        Y map tile position (unused).
+** @param dest     Destination to be boarded.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
 {
@@ -1144,13 +1144,13 @@ void SendCommandBoard(Unit* unit, int x, int y, Unit* dest, int flush)
 }
 
 /**
-**		Send command: Unit unload unit.
+** Send command: Unit unload unit.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position of unload.
-**		@param y		Y map tile position of unload.
-**		@param what		Passagier to be unloaded.
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param x       X map tile position of unload.
+** @param y       Y map tile position of unload.
+** @param what    Passagier to be unloaded.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 {
@@ -1163,13 +1163,13 @@ void SendCommandUnload(Unit* unit, int x, int y, Unit* what, int flush)
 }
 
 /**
-**		Send command: Unit builds building at position.
+** Send command: Unit builds building at position.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position of construction.
-**		@param y		Y map tile position of construction.
-**		@param what		pointer to unit-type of the building.
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param x       X map tile position of construction.
+** @param y       Y map tile position of construction.
+** @param what    pointer to unit-type of the building.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandBuildBuilding(Unit* unit, int x, int y,
 	UnitType* what, int flush)
@@ -1200,12 +1200,12 @@ void SendCommandDismiss(Unit* unit)
 }
 
 /**
-** 		Send command: Unit harvests a location (wood for now).
+**  Send command: Unit harvests a location (wood for now).
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position where to harvest.
-**		@param y		Y map tile position where to harvest.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param x        X map tile position where to harvest.
+** @param y        Y map tile position where to harvest.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
 {
@@ -1218,11 +1218,11 @@ void SendCommandResourceLoc(Unit* unit, int x, int y, int flush)
 }
 
 /**
-**		Send command: Unit harvest resources
+** Send command: Unit harvest resources
 **
-**		@param unit		pointer to unit.
-**		@param dest		pointer to destination (oil-platform,gold mine).
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param dest    pointer to destination (oil-platform,gold mine).
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandResource(Unit* unit, Unit* dest, int flush)
 {
@@ -1235,11 +1235,11 @@ void SendCommandResource(Unit* unit, Unit* dest, int flush)
 }
 
 /**
-**		Send command: Unit return goods.
+** Send command: Unit return goods.
 **
-**		@param unit		pointer to unit.
-**		@param goal		pointer to destination of the goods. (NULL=search best)
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param goal    pointer to destination of the goods. (NULL=search best)
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
 {
@@ -1252,11 +1252,11 @@ void SendCommandReturnGoods(Unit* unit, Unit* goal, int flush)
 }
 
 /**
-**		Send command: Building/unit train new unit.
+** Send command: Building/unit train new unit.
 **
-**		@param unit		pointer to unit.
-**		@param what		pointer to unit-type of the unit to be trained.
-**		@param flush		Flag flush all pending commands.
+** @param unit    pointer to unit.
+** @param what    pointer to unit-type of the unit to be trained.
+** @param flush   Flag flush all pending commands.
 */
 void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
 {
@@ -1269,11 +1269,11 @@ void SendCommandTrainUnit(Unit* unit, UnitType* what, int flush)
 }
 
 /**
-**		Send command: Cancel training.
+** Send command: Cancel training.
 **
-**		@param unit		Pointer to unit.
-**		@param slot		Slot of training queue to cancel.
-**		@param type		Unit-type of unit to cancel.
+** @param unit    Pointer to unit.
+** @param slot    Slot of training queue to cancel.
+** @param type    Unit-type of unit to cancel.
 */
 void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 {
@@ -1288,11 +1288,11 @@ void SendCommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 }
 
 /**
-**		Send command: Building starts upgrading to.
+** Send command: Building starts upgrading to.
 **
-**		@param unit		pointer to unit.
-**		@param what		pointer to unit-type of the unit upgrade.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param what     pointer to unit-type of the unit upgrade.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
 {
@@ -1305,9 +1305,9 @@ void SendCommandUpgradeTo(Unit* unit, UnitType* what, int flush)
 }
 
 /**
-**		Send command: Cancel building upgrading to.
+** Send command: Cancel building upgrading to.
 **
-**		@param unit		pointer to unit.
+** @param unit  Pointer to unit.
 */
 void SendCommandCancelUpgradeTo(Unit* unit)
 {
@@ -1322,11 +1322,11 @@ void SendCommandCancelUpgradeTo(Unit* unit)
 }
 
 /**
-**		Send command: Building/unit research.
+** Send command: Building/unit research.
 **
-**		@param unit		pointer to unit.
-**		@param what		research-type of the research.
-**		@param flush		Flag flush all pending commands.
+** @param unit     pointer to unit.
+** @param what     research-type of the research.
+** @param flush    Flag flush all pending commands.
 */
 void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 {
@@ -1340,9 +1340,9 @@ void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 }
 
 /**
-**		Send command: Cancel Building/unit research.
+** Send command: Cancel Building/unit research.
 **
-**		@param unit		pointer to unit.
+** @param unit pointer to unit.
 */
 void SendCommandCancelResearch(Unit* unit)
 {
@@ -1356,14 +1356,14 @@ void SendCommandCancelResearch(Unit* unit)
 }
 
 /**
-**		Send command: Unit spell cast on position/unit.
+** Send command: Unit spell cast on position/unit.
 **
-**		@param unit		pointer to unit.
-**		@param x		X map tile position where to cast spell.
-**		@param y		Y map tile position where to cast spell.
-**		@param dest		Cast spell on unit (if exist).
-**		@param spellid  Spell type id.
-**		@param flush		Flag flush all pending commands.
+** @param unit      pointer to unit.
+** @param x         X map tile position where to cast spell.
+** @param y         Y map tile position where to cast spell.
+** @param dest      Cast spell on unit (if exist).
+** @param spellid   Spell type id.
+** @param flush     Flag flush all pending commands.
 */
 void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spellid,
 	int flush)
@@ -1378,11 +1378,11 @@ void SendCommandSpellCast(Unit* unit, int x, int y, Unit* dest, int spellid,
 }
 
 /**
-**		Send command: Unit auto spell cast.
+** Send command: Unit auto spell cast.
 **
-**		@param unit		pointer to unit.
-**		@param spellid  Spell type id.
-**		@param on		1 for auto cast on, 0 for off.
+** @param unit      pointer to unit.
+** @param spellid   Spell type id.
+** @param on        1 for auto cast on, 0 for off.
 */
 void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 {
@@ -1397,11 +1397,11 @@ void SendCommandAutoSpellCast(Unit* unit, int spellid, int on)
 }
 
 /**
-**		Send command: Diplomacy changed.
+** Send command: Diplomacy changed.
 **
-**		@param player		Player which changes his state.
-**		@param state		New diplomacy state.
-**		@param opponent		Opponent.
+** @param player     Player which changes his state.
+** @param state      New diplomacy state.
+** @param opponent   Opponent.
 */
 void SendCommandDiplomacy(int player, int state, int opponent)
 {
@@ -1432,11 +1432,11 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 }
 
 /**
-**		Send command: Shared vision changed.
+** Send command: Shared vision changed.
 **
-**		@param player		Player which changes his state.
-**		@param state		New shared vision state.
-**		@param opponent		Opponent.
+** @param player     Player which changes his state.
+** @param state      New shared vision state.
+** @param opponent   Opponent.
 */
 void SendCommandSharedVision(int player, int state, int opponent)
 {
@@ -1467,20 +1467,20 @@ void NetworkCclRegister(void)
 //@}
 
 //----------------------------------------------------------------------------
-//		Parse the message, from the network.
+// Parse the message, from the network.
 //----------------------------------------------------------------------------
 
 /**@name parse */
 //@{
 
 /**
-**		Parse a command (from network).
+** Parse a command (from network).
 **
-**		@param msgnr		Network message type
-**		@param unum		Unit number (slot) that receive the command.
-**		@param x		optional X map position.
-**		@param y		optional y map position.
-**		@param dstnr		optional destination unit.
+** @param msgnr    Network message type
+** @param unum     Unit number (slot) that receive the command.
+** @param x        optional X map position.
+** @param y        optional y map position.
+** @param dstnr    optional destination unit.
 */
 void ParseCommand(unsigned char msgnr, UnitRef unum,
 	unsigned short x, unsigned short y, UnitRef dstnr)
@@ -1493,7 +1493,7 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 	unit = UnitSlots[unum];
 	Assert(unit);
 	//
-	//		Check if unit is already killed?
+	// Check if unit is already killed?
 	//
 	if (unit->Destroyed) {
 		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
@@ -1666,14 +1666,14 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 }
 
 /**
-**		Parse an extended command (from network).
+** Parse an extended command (from network).
 **
-**		@param type		Network extended message type
-**		@param status		Bit 7 of message type
-**		@param arg1		Messe argument 1
-**		@param arg2		Messe argument 2
-**		@param arg3		Messe argument 3
-**		@param arg4		Messe argument 4
+** @param type     Network extended message type
+** @param status   Bit 7 of message type
+** @param arg1     Messe argument 1
+** @param arg2     Messe argument 2
+** @param arg3     Messe argument 3
+** @param arg4     Messe argument 4
 */
 void ParseExtendedCommand(unsigned char type, int status,
 	unsigned char arg1, unsigned short arg2, unsigned short arg3,
