@@ -171,7 +171,7 @@ global void ActionStillGeneric(Unit* unit,int ground)
 	    if( (goal=AttackUnitsInReactRange(unit)) ) {
 		// Weak goal, can choose other unit, come back after attack
 		CommandAttack(unit,goal->X,goal->Y,NULL,FlushCommands);
-		DebugLevel2Fn(" %Zd Attacking in range %d\n"
+		DebugLevel3Fn(" %Zd Attacking in range %d\n"
 			,UnitNumber(unit),unit->SubAction);
 #ifdef NEW_ORDERS
 		unit->SavedOrder.Action=UnitActionAttack;
