@@ -1309,10 +1309,11 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 
     switch( VideoBpp ) {
     case 8:
-        if ( colorcube8 )
+        if ( colorcube8 ) {
         // Shortcut: get palette from already allocated common palette.
         // FIXME: shortcut should be placed in video.c, for all video support.
-          return (VMemType*)VideoFindNewPalette8( colorcube8, palette );
+	    return (VMemType*)VideoFindNewPalette8( colorcube8, palette );
+	}
 	pixels=malloc(256*sizeof(VMemType8));
 	break;
     case 15:
