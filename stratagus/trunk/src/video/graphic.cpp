@@ -128,13 +128,13 @@ void VideoDrawSub(const Graphic* g, int gx, int gy,
 /**
 **  Video draw part of graphic clipped.
 **
-**  @param graphic  Pointer to object
-**  @param gx       X offset into object
-**  @param gy       Y offset into object
-**  @param w        width to display
-**  @param h        height to display
-**  @param x        X screen position
-**  @param y        Y screen position
+**  @param g   Pointer to object
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
 */
 void VideoDrawSubClip(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y)
@@ -151,14 +151,14 @@ void VideoDrawSubClip(const Graphic* g, int gx, int gy,
 /**
 **  Video draw part of graphic with alpha.
 **
-**  @param graphic  Pointer to object
-**  @param gx       X offset into object
-**  @param gy       Y offset into object
-**  @param w        width to display
-**  @param h        height to display
-**  @param x        X screen position
-**  @param y        Y screen position
-**  @param alpha    Alpha
+**  @param g      Pointer to object
+**  @param gx     X offset into object
+**  @param gy     Y offset into object
+**  @param w      width to display
+**  @param h      height to display
+**  @param x      X screen position
+**  @param y      Y screen position
+**  @param alpha  Alpha
 */
 #ifndef USE_OPENGL
 void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
@@ -185,14 +185,14 @@ void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 /**
 **  Video draw part of graphic with alpha and clipped.
 **
-**  @param graphic  Pointer to object
-**  @param gx       X offset into object
-**  @param gy       Y offset into object
-**  @param w        width to display
-**  @param h        height to display
-**  @param x        X screen position
-**  @param y        Y screen position
-**  @param alpha    Alpha
+**  @param g      Pointer to object
+**  @param gx     X offset into object
+**  @param gy     Y offset into object
+**  @param w      width to display
+**  @param h      height to display
+**  @param x      X screen position
+**  @param y      Y screen position
+**  @param alpha  Alpha
 */
 void VideoDrawSubClipTrans(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
@@ -213,7 +213,7 @@ void VideoDrawSubClipTrans(const Graphic* g, int gx, int gy,
 /**
 **  Make a new graphic object.
 **
-**  @param name  Filename
+**  @param file  Filename
 **  @param w     Width of a frame (optional)
 **  @param h     Height of a frame (optional)
 **
