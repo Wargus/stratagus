@@ -20,7 +20,7 @@
     <title>Stratagus Configuration Language Description: Icon</title>
     <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
     <meta name="Author" content="johns98@gmx.net">
-    <meta name="Keyword" content="ccl,tileset">
+    <meta name="Keyword" content="script,tileset">
     <meta name="Description" content="">
 </head>
 <body>
@@ -42,54 +42,39 @@
 <a href="../stratagus.html">Stratagus</a> 
 <a href="../readme.html">Readme</a> 
 <a href="../faq.html">FAQ</a> 
-<a href="ccl.html">CCL</a> 
+<a href="ccl.html">Script</a> 
 <a href="game.html">PREV</a> 
 <a href="magic.html">NEXT</a> 
 <a href="ccl-index.html">Index</a> 
 <hr>
-<a href="#define-icon">define-icon</a>
-<a href="#define-icon-alias">define-icon-alias</a>
-<a href="pud.html#define-icon-wc-names">define-icon-wc-names</a>
-<a href="#set-icon-size!">set-icon-size!</a>
+<a href="#define-icon">DefineIcon</a>
+<a href="#define-icon-alias">DefineIconAlias</a>
+<a href="pud.html#define-icon-wc-names">DefineIconWcNames</a>
 <hr>
 <h2>Intro - Introduction to icon functions and variables</h2>
 
 Everything around the C icon structure.
 <h2>Functions</h2>
 <a name="define-icon"></a>
-<h3>(define-icon ident 'tileset tileset 'size '(x y) type '(index file))</h3>
+<h3>DefineIcon({flag = value, ...})</h3>
 
     Define an icon for the engine.<p>
 
     This could also be defined in own levels. <p>
-
-
 <dl>
-<dt>ident</dt>
+<dt>Name = ident</dt>
 <dd>The name of the icon.
 </dd>
-<dt>'tileset tileset</dt>
+<dt>Tileset = tileset-name</dt>
 <dd>Optional name of the tileset.
 </dd>
-<dt>'size '(x y)</dt>
+<dt>Size = {width, height}</dt>
 <dd>Size of the icon in pixel.
 </dd>
-<dt>x</dt>
-<dd>Width in pixel.
-</dd>
-<dt>y</dt>
-<dd>Height in pixel.
-</dd>
-<dt>type</dt>
-<dd>
-    <ul>
-    <li>'normal is a normal icon, its look is defined with (index file).
-    </ul>
-</dd>
-<dt>index</dt>
+<dt>Index = number</dt>
 <dd>The index into the graphic file.
 </dd>
-<dt>file</dt>
+<dt>File = filename</dt>
 <dd>The filename of the graphic file containing the graphics.
 </dd>
 </dl>
@@ -97,18 +82,16 @@ Everything around the C icon structure.
 <h4>Example</h4>
 
 <pre>
-    (define summer-icons-file "tilesets/summer/icons.png")
-    (define-icon 'icon-peasant 'tileset 'tileset-summer 'size '(46 38) 'normal
-	'(0 summer-icons-file))
+DefineIcon({Name = "icon-peasant", Tileset= "tileset-summer",
+  Size = {46, 38}, Index = 0, File = "tilesets/summer/icons.png"})
 </pre>
 
 Define the peasant icon referenced with icon-peasant for the summer tileset.
 It is a normal static icon with a sizeof 46x38 pixel.  The graphic is loaded
-from summer-icons-file, which is defined to be the file
-"tilesets/summer/icons.png" and is the first icon in this file.
+from the file "tilesets/summer/icons.png" and is the first icon in this file.
 
 <a name="define-icon-alias"></a>
-<h3>(define-icon-alias alias icon)</h3>
+<h3>DefineIconAlias("alias", icon-name)</h3>
 
     Define an icon alias for an icon.<p>
     This is an alternative name for the icon.
@@ -126,37 +109,11 @@ from summer-icons-file, which is defined to be the file
 <h4>Example</h4>
 
 <pre>
-    (define-icon-alias 'icon-raise-dead 'icon-skeleton)
+DefineIconAlias("icon-raise-dead", "icon-skeleton")
 </pre>
 
 Now it is possible to get the icon "skeleton" also with the name
 "icon-raise-dead".
-
-<a name="set-icon-size!"></a>
-<h3>(set-icon-size! width height)</h3>
-
-.
-
-
-<dl>
-<dt>width</dt>
-<dd>Width of the icons.
-</dd>
-<dt>height</dt>
-<dd>Height of the icons.
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    ;; Sets the icon size to 46x38.
-    (set-icon-size! 46 38)
-</pre>
-
-<h4>Used</h4>
-
-<a href="../../data/ccl/icons.ccl"> $LIBARYPATH/ccl/icons.ccl </a>
 
 <hr>
 Last changed: $Id$<br>
