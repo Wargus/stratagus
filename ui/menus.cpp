@@ -2355,8 +2355,9 @@ strcat(path,FREECRAFT_HOME_PATH);
 mkdir(path,0777);
 strcat(path,"/save");
 mkdir(path,0777);
-SaveDir = malloc(strlen(path)+1);
-strcpy(SaveDir, path);
+if (SaveDir)
+    free(SaveDir);
+SaveDir = strdup(path);
 #endif
 }
 
@@ -2472,6 +2473,8 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
     int op, d1, d2;
 
     mi--;
+    if (mi->d.listbox.curopt == -1)
+	mi->d.listbox.curopt = 0;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
