@@ -202,6 +202,7 @@ local FullReplay* StartReplay(void)
 	replay->TileSet = GameSettings.Terrain;
 	replay->NoFow = GameSettings.NoFogOfWar;
 	replay->GameType = GameSettings.GameType;
+	replay->RevealMap = GameSettings.RevealMap;
 	replay->Opponents = GameSettings.Opponents;
 
 	replay->Engine[0] = StratagusMajorVersion;
