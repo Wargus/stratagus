@@ -144,6 +144,9 @@ global void SavePlayers(FILE* file)
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: players $Id$\n\n");
 
+    //
+    //	Dump table wc2 race numbers -> internal symbol.
+    //
     if( (cp=RaceWcNames) ) {
 	fprintf(file,"(define-race-wc-names");
 
@@ -157,6 +160,9 @@ global void SavePlayers(FILE* file)
 	fprintf(file,")\n\n");
     }
 
+    //
+    //	Dump all players
+    //
     for( i=0; i<NumPlayers; ++i ) {
 	fprintf(file,"(player %d\n",i);
 	fprintf(file,"  'name \"%s\"\n",Players[i].Name);
@@ -238,6 +244,9 @@ global void SavePlayers(FILE* file)
 	fprintf(file,")\n\n");
     }
 
+    //
+    //	Dump local variables
+    //
     fprintf(file,"(this-player %d)\n\n",ThisPlayer->Player);
 }
 
