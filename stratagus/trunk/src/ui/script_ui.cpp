@@ -2731,7 +2731,216 @@ local SCM CclDefineMenu(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineMenu(lua_State* l)
+{
+    const char* value;
+    Menu* menu;
+    Menu item;
+    char* name;
+    void** func;
+    int args;
+    int j;
 
+    DebugLevel3Fn("Define menu\n");
+
+    name = NULL;
+    TheUI.Offset640X = (VideoWidth - 640) / 2;
+    TheUI.Offset480Y = (VideoHeight - 480) / 2;
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    memset(&item, 0, sizeof(Menu));
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	if (!lua_isstring(l, j + 1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	value = lua_tostring(l, j + 1);
+	++j;
+	if (!strcmp(value, "geometry")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 4) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.X = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.Y = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 3);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.Width = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 4);
+	    if (!lua_isnumber(l, -1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.Height = lua_tonumber(l, -1);
+	    lua_pop(l, 1);
+
+	} else if (!strcmp(value, "name")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    name = strdup(lua_tostring(l, j + 1));
+	} else if (!strcmp(value, "panel")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    if (strcmp(lua_tostring(l, j + 1), "none")) {
+		item.Panel = strdup(lua_tostring(l, j + 1));
+	    }
+	} else if (!strcmp(value, "default")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.DefSel = lua_tonumber(l, j + 1);
+/*
+	} else if (!strcmp(value, "nitems")) {
+	    if (!lua_isnumber(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    item.nitems = lua_tonumber(l, j + 1);
+*/
+	} else if (!strcmp(value, "netaction")) {
+	    if (!lua_isstring(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    value = lua_tostring(l, j + 1);
+	    func = (void**)hash_find(MenuFuncHash, value);
+	    if (func != NULL) {
+		item.NetAction = (void*)*func;
+	    } else {
+		lua_pushfstring(l, "Can't find function: %s\n", value);
+		lua_error(l);
+	    }
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+
+    if (name) {
+	menu = FindMenu(name);
+	if (!menu) {
+	    menu = malloc(sizeof(Menu));
+	    *(Menu**)hash_add(MenuHash, name) = menu;
+	} else {
+	    int i;
+	    int mitype;
+
+	    free(menu->Panel);
+	    for (i = 0; i < menu->NumItems; ++i) {
+		mitype = menu->Items[i].mitype;
+		if (mitype == MI_TYPE_TEXT) {
+		    if (menu->Items[i].d.text.text) {
+			free(menu->Items[i].d.text.text);
+		    }
+		    if (menu->Items[i].d.text.normalcolor) {
+			free(menu->Items[i].d.text.normalcolor);
+		    }
+		    if (menu->Items[i].d.text.reversecolor) {
+			free(menu->Items[i].d.text.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_BUTTON) {
+		    if (menu->Items[i].d.button.text) {
+			free(menu->Items[i].d.button.text);
+		    }
+		    if (menu->Items[i].d.button.normalcolor) {
+			free(menu->Items[i].d.button.normalcolor);
+		    }
+		    if (menu->Items[i].d.button.reversecolor) {
+			free(menu->Items[i].d.button.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_PULLDOWN) {
+		    int j;
+		    j = menu->Items[i].d.pulldown.noptions-1;
+		    for (; j >= 0; --j) {
+			free(menu->Items[i].d.pulldown.options[j]);
+		    }
+		    free(menu->Items[i].d.pulldown.options);
+		    if (menu->Items[i].d.pulldown.normalcolor) {
+			free(menu->Items[i].d.pulldown.normalcolor);
+		    }
+		    if (menu->Items[i].d.pulldown.reversecolor) {
+			free(menu->Items[i].d.pulldown.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_LISTBOX) {
+		    if (menu->Items[i].d.listbox.normalcolor) {
+			free(menu->Items[i].d.listbox.normalcolor);
+		    }
+		    if (menu->Items[i].d.listbox.reversecolor) {
+			free(menu->Items[i].d.listbox.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_INPUT) {
+		    if (menu->Items[i].d.input.normalcolor) {
+			free(menu->Items[i].d.input.normalcolor);
+		    }
+		    if (menu->Items[i].d.input.reversecolor) {
+			free(menu->Items[i].d.input.normalcolor);
+		    }
+		} else if (mitype == MI_TYPE_GEM) {
+		    if (menu->Items[i].d.gem.normalcolor) {
+			free(menu->Items[i].d.gem.normalcolor);
+		    }
+		    if (menu->Items[i].d.gem.reversecolor) {
+			free(menu->Items[i].d.gem.normalcolor);
+		    }
+		}
+	    }
+	    free(menu->Items);
+	    menu->Items = NULL;
+	}
+	menu->NumItems = 0; // reset to zero
+	memcpy(menu, &item, sizeof(Menu));
+	//move the buttons for different resolutions..
+	if (VideoWidth != 640) {
+	    if (VideoWidth == 0) {
+		if (DEFAULT_VIDEO_WIDTH != 640) {
+		    menu->X += (DEFAULT_VIDEO_WIDTH - 640) / 2;
+		}
+		if (DEFAULT_VIDEO_HEIGHT != 480) {
+		    menu->Y += (DEFAULT_VIDEO_HEIGHT - 480) / 2;
+		}
+	    } else {
+		//printf("VideoWidth = %d\n", VideoWidth);
+		menu->X += TheUI.Offset640X;
+		menu->Y += TheUI.Offset480Y;
+	    }
+	}
+	//printf("Me:%s\n", name);
+	free(name);
+    } else {
+	fprintf(stderr, "Name of menu is missed, skip definition\n");
+    }
+
+    return 0;
+}
+#endif
+
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local int scm2hotkey(SCM value)
 {
     char* s;
@@ -4511,7 +4720,7 @@ global void UserInterfaceCclRegister(void)
 //    lua_register(Lua, "DefineButton", CclDefineButton);
 
 //    lua_register(Lua, "DefineMenuItem", CclDefineMenuItem);
-//    lua_register(Lua, "DefineMenu", CclDefineMenu);
+    lua_register(Lua, "DefineMenu", CclDefineMenu);
     lua_register(Lua, "DefineMenuGraphics", CclDefineMenuGraphics);
 
     //
