@@ -10,7 +10,7 @@
 //
 /**@name stratagus.c - The main file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -888,11 +888,10 @@ static void Usage(void)
 \t-t factor\tComputer units built time factor\n\
 \t-v mode\t\tVideo mode (0=default,1=640x480,2=800x600,\n\
 \t\t\t\t3=1024x768,4=1280x960,5=1600x1200)\n\
-\t-w\t\tWait for sound device (OSS sound driver only)\n\
 \t-D\t\tVideo mode depth = pixel per point (for Win32/TNT)\n\
-\t-F\t\tFull screen video mode (only supported with SDL)\n\
+\t-F\t\tFull screen video mode\n\
 \t-S\t\tSync speed (100 = 30 frames/s)\n\
-\t-W\t\tWindowed video mode (only supported with SDL)\n\
+\t-W\t\tWindowed video mode\n\
 map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n\
 ");
 }
@@ -1065,10 +1064,6 @@ int main(int argc, char** argv)
 						Usage();
 						ExitFatal(-1);
 				}
-				continue;
-
-			case 'w':
-				WaitForSoundDevice = 1;
 				continue;
 
 			case 'L':

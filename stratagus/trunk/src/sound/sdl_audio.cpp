@@ -5,12 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name sdl_audio.c - SDL hardware support */
 //
-// (c) Copyright 2002-2003 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 2002-2005 by Lutz Sammer, Fabrice Rossi, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -51,15 +52,12 @@ extern void FillAudio(void* udata __attribute__((unused)), Uint8* stream,
 /**
 ** Initialize sound card hardware part with SDL.
 **
-** @param dev     Device name ("/dev/dsp").
 ** @param freq    Sample frequenz (44100,22050,11025 hz).
 ** @param size    Sampe size (8bit, 16bit)
-** @param wait    Flag, if true wait for sound device to open.
 **
 ** @return True if failure, false if everything ok.
 */
-int InitSdlSound(const char* dev __attribute__((unused)), int freq,
-	int size, int wait __attribute__((unused)))
+int InitSdlSound(int freq, int size)
 {
 	SDL_AudioSpec wanted;
 
