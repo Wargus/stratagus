@@ -62,7 +62,7 @@ typedef enum _spell_action_type_ {
     SpellActionPolymorph,		/// Polymorph
     SpellActionBlizzard,		/// Blizzard
 //	---orc ogres---
-    SpellActionEyeOfKilrogg,		/// Eye
+    SpellActionEyeOfVision,		/// Eye
     SpellActionBloodlust,		/// Blood lust
     SpellActionRunes,			/// Runes
 //	---orc death knights---
