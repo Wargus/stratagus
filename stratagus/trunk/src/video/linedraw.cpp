@@ -66,8 +66,6 @@ typedef enum {
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_SDL_SURFACE
-local SDL_Surface* PixelSurface;
-
 // FIXME: comments
 global void (*VideoDrawPixel)(Uint32 color, int x, int y);
 global void (*VideoDrawTransPixel)(Uint32 color, int x, int y, unsigned char alpha);
@@ -552,6 +550,16 @@ global void VideoDrawVLineClip(Uint32 color, int x, int y, int height)
     VideoDrawVLine(color, x, y, height);
 }
 
+global void VideoDrawTransVLineClip(Uint32 color, int x, int y,
+    int height, unsigned char alpha)
+{
+    int i;
+
+    for (i = 0; i < height; ++i) {
+	VideoDrawTransPixelClip(color, x, y + i, alpha);
+    }
+}
+
 global void VideoDrawHLine(Uint32 color, int x, int y, int width)
 {
     int i;
@@ -575,6 +583,16 @@ global void VideoDrawTransHLine(Uint32 color, int x, int y,
 
     for (i = 0; i < width; ++i) {
 	VideoDrawTransPixel(color, x + i, y, alpha);
+    }
+}
+
+global void VideoDrawTransHLineClip(Uint32 color, int x, int y,
+    int width, unsigned char alpha)
+{
+    int i;
+
+    for (i = 0; i < width; ++i) {
+	VideoDrawTransPixelClip(color, x + i, y, alpha);
     }
 }
 
@@ -681,18 +699,103 @@ global void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 
 global void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    int x;
+    int y;
+    int xlen;
+    int ylen;
+    int incr;
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
+    if (sx == dx) {
+	if (sy < dy) {
+	    VideoDrawVLineClip(color, sx, sy, dy - sy + 1);
+	} else {
+	    VideoDrawVLineClip(color, dx, dy, sy - dy + 1);
+	}
+	return;
+    }
 
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoDrawLine(color, sx, sy, dx, dy);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    if (sy == dy) {
+	if (sx < dx) {
+	    VideoDrawHLineClip(color, sx, sy, dx - sx + 1);
+	} else {
+	    VideoDrawHLineClip(color, dx, dy, sx - dx + 1);
+	}
+	return;
+    }
+
+    // exchange coordinates
+    if (sy > dy) {
+	int t;
+	t = dx;
+	dx = sx;
+	sx = t;
+	t = dy;
+	dy = sy;
+	sy = t;
+    }
+    ylen = dy - sy;
+
+    if (sx > dx) {
+	xlen = sx - dx;
+	incr = -1;
+    } else {
+	xlen = dx - sx;
+	incr = 1;
+    }
+
+    y = sy;
+    x = sx;
+
+    if (xlen > ylen) {
+	int p;
+
+	if (sx > dx) {
+	    int t;
+	    t = sx;
+	    sx = dx;
+	    dx = t;
+	    y = dy;
+	}
+
+	p = (ylen << 1) - xlen;
+
+	for (x = sx; x < dx; ++x) {
+	    VideoDrawPixelClip(color, x, y);
+	    if (p >= 0) {
+		y += incr;
+		p += (ylen - xlen) << 1;
+	    } else {
+		p += (ylen << 1);
+	    }
+	}
+	return;
+    }
+
+    if (ylen > xlen) {
+	int p;
+
+	p = (xlen << 1) - ylen;
+
+	for (y = sy; y < dy; ++y) {
+	    VideoDrawPixelClip(color, x, y);
+	    if (p >= 0) {
+		x += incr;
+		p += (xlen - ylen) << 1;
+	    } else {
+		p += (xlen << 1);
+	    }
+	}
+	return;
+    }
+
+    // Draw a diagonal line
+    if (ylen == xlen) {
+	while (y != dy) {
+	    VideoDrawPixelClip(color, x, y);
+	    x += incr;
+	    ++y;
+	}
+    }
 }
 
 global void VideoDrawTransLine(Uint32 color, int sx, int sy,
@@ -715,18 +818,11 @@ global void VideoDrawRectangle(Uint32 color, int x, int y,
 global void VideoDrawRectangleClip(Uint32 color, int x, int y,
     int w, int h)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    VideoDrawHLineClip(color, x, y, w);
+    VideoDrawHLineClip(color, x, y + h - 1, w);
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
-
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoDrawRectangle(color, x, y, w, h);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    VideoDrawVLineClip(color, x, y + 1, h - 2);
+    VideoDrawVLineClip(color, x + w - 1, y + 1, h - 2);
 }
 
 global void VideoDrawTransRectangle(Uint32 color, int x, int y,
@@ -865,35 +961,61 @@ global void VideoDrawTransCircle(Uint32 color, int x, int y,
 
 global void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    int p;
+    int px;
+    int py;
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
+    p = 1 - r;
+    py = r;
 
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoDrawCircle(color, x, y, r);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    for (px = 0; px <= py + 1; ++px) {
+	VideoDrawPixelClip(color, x + px, y + py);
+	VideoDrawPixelClip(color, x + px, y - py);
+	VideoDrawPixelClip(color, x - px, y + py);
+	VideoDrawPixelClip(color, x - px, y - py);
+
+	VideoDrawPixelClip(color, x + py, y + px);
+	VideoDrawPixelClip(color, x + py, y - px);
+	VideoDrawPixelClip(color, x - py, y + px);
+	VideoDrawPixelClip(color, x - py, y - px);
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+	}
+    }
 }
 
 global void VideoDrawTransCircleClip(Uint32 color, int x, int y,
     int r, unsigned char alpha)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    int p;
+    int px;
+    int py;
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
+    p = 1 - r;
+    py = r;
 
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoDrawTransCircle(color, x, y, r, alpha);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    for (px = 0; px <= py + 1; ++px) {
+	VideoDrawTransPixelClip(color, x + px, y + py, alpha);
+	VideoDrawTransPixelClip(color, x + px, y - py, alpha);
+	VideoDrawTransPixelClip(color, x - px, y + py, alpha);
+	VideoDrawTransPixelClip(color, x - px, y - py, alpha);
+
+	VideoDrawTransPixelClip(color, x + py, y + px, alpha);
+	VideoDrawTransPixelClip(color, x + py, y - px, alpha);
+	VideoDrawTransPixelClip(color, x - py, y + px, alpha);
+	VideoDrawTransPixelClip(color, x - py, y - px, alpha);
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+	}
+    }
 }
 
 global void VideoFillCircle(Uint32 color, int x, int y, int r)
@@ -971,47 +1093,79 @@ global void VideoFillTransCircle(Uint32 color, int x, int y,
 
 global void VideoFillCircleClip(Uint32 color, int x, int y, int r)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    int p;
+    int px;
+    int py;
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
+    p = 1 - r;
+    py = r;
 
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoFillCircle(color, x, y, r);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    for (px = 0; px <= py; ++px) {
+
+	// Fill up the middle half of the circle
+	VideoDrawVLineClip(color, x + px, y, py + 1);
+        VideoDrawVLineClip(color, x + px, y - py, py);
+	if (px) {
+	    VideoDrawVLineClip(color, x - px, y, py + 1);
+	    VideoDrawVLineClip(color, x - px, y - py, py);
+	}
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+
+	    // Fill up the left/right half of the circle
+	    if (py >= px) {
+		VideoDrawVLineClip(color, x + py + 1, y, px + 1);
+		VideoDrawVLineClip(color, x + py + 1, y - px, px);
+		VideoDrawVLineClip(color, x - py - 1, y, px + 1);
+		VideoDrawVLineClip(color, x - py - 1, y - px,  px);
+	    }
+	}
+    }
 }
 
 global void VideoFillTransCircleClip(Uint32 color, int x, int y,
     int r, unsigned char alpha)
 {
-    SDL_Rect oldrect;
-    SDL_Rect newrect;
+    int p;
+    int px;
+    int py;
 
-    SDL_GetClipRect(TheScreen, &oldrect);
-    newrect.x = ClipX1;
-    newrect.y = ClipY1;
-    newrect.w = ClipX2 + 1 - ClipX1;
-    newrect.h = ClipY2 + 1 - ClipY1;
+    p = 1 - r;
+    py = r;
 
-    SDL_SetClipRect(TheScreen, &newrect);
-    VideoFillTransCircle(color, x, y, r, alpha);
-    SDL_SetClipRect(TheScreen, &oldrect);
+    for (px = 0; px <= py + 1; ++px) {
+
+	// Fill up the middle half of the circle
+	VideoDrawTransVLineClip(color, x + px, y, py + 1, alpha);
+        VideoDrawTransVLineClip(color, x + px, y - py, py, alpha);
+	if (px) {
+	    VideoDrawTransVLineClip(color, x - px, y, py + 1, alpha);
+	    VideoDrawTransVLineClip(color, x - px, y - py, py, alpha);
+	}
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+
+	    // Fill up the left/right half of the circle
+	    if (py >= px) {
+		VideoDrawTransVLineClip(color, x + py + 1, y, px + 1, alpha);
+		VideoDrawTransVLineClip(color, x + py + 1, y - px, px, alpha);
+		VideoDrawTransVLineClip(color, x - py - 1, y, px + 1, alpha);
+		VideoDrawTransVLineClip(color, x - py - 1, y - px,  px, alpha);
+	    }
+	}
+    }
 }
 
 global void InitLineDraw()
 {
-/*
-    SDL_Surface* s;
-
-    s = SDL_CreateRGBSurface(SDL_SWSURFACE, 1, 1, 32, 
-	RMASK, GMASK, BMASK, AMASK);
-    PixelSurface = SDL_DisplayFormatAlpha(s);
-    SDL_FreeSurface(s);
-*/
     switch (VideoDepth) {
 	case 16:
 	    VideoDrawPixel = VideoDrawPixel16;
