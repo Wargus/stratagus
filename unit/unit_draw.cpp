@@ -1742,7 +1742,7 @@ local void DrawConstruction(const Unit* unit, int frame, int x, int y)
 	x -= unit->Type->TileWidth * TileSizeX / 2;
 	y -= unit->Type->TileHeight * TileSizeY / 2;
 	GraphicUnitPixels(unit, unit->Type->Sprite);
-	DrawUnitType(unit->Type, frame, x, y);
+	DrawUnitType(unit->Type, unit->Type->Sprite, frame, x, y);
 #ifdef USE_OPENGL
 	DrawUnitPlayerColor(unit->Type, unit->Player->Player, frame, x, y);
 #endif
@@ -1762,23 +1762,27 @@ local void DrawConstruction(const Unit* unit, int frame, int x, int y)
 */
 
 /**
-**	Draw building on map.
+**	Draw unit on map.
 **
-**	@param unit	Pointer to the building
+**	@param unit	Pointer to the unit.
 */
-global void DrawBuilding(const Unit* unit)
+global void DrawUnit(const Unit* unit)
 {
     int x;
     int y;
-    const UnitType* type;
     int frame;
-    int visible;
     int state;
     int constructed;
+    Graphic* sprite;
+    ResourceInfo* resinfo;
+    const UnitType* type;
 
-    visible = BuildingVisibleOnMap(unit);
+    if (unit->Type->Revealer) {		// Revealers are not drawn
+	DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
+	return;
+    }
 
-    if (ReplayRevealMap) {
+    if (ReplayRevealMap || !unit->Type->VisibleUnderFog) {
 	type = unit->Type;
 	frame = unit->Frame;
 	y = unit->IY;
@@ -1795,14 +1799,19 @@ global void DrawBuilding(const Unit* unit)
 	state = unit->SeenState;
     }
 
-    x += Map2ViewportX(CurrentViewport, unit->X);
-    y += Map2ViewportY(CurrentViewport, unit->Y);
-
     if (frame == UnitNotSeen) {
-	DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen time %lu?.\n" _C_
+	DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
 	    unit->Slot _C_ GameCycle);
 	return;
     }
+
+#ifdef NEW_DECODRAW
+    if (!CurrentViewport) {
+	CurrentViewport = TheUI.SelectedViewport;
+    }
+#endif
+    x += Map2ViewportX(CurrentViewport, unit->X);
+    y += Map2ViewportY(CurrentViewport, unit->Y);
 
     if (state == 1 && constructed) {
 	DrawConstructionShadow(unit, frame, x, y);
@@ -1815,7 +1824,27 @@ global void DrawBuilding(const Unit* unit)
     //
     DrawUnitSelection(unit);
 
+    GraphicUnitPixels(unit, type->Sprite);
+
     //
+    //	Adjust sprite for Harvesters.
+    //
+    sprite = type->Sprite;
+    if (type->Harvester && unit->CurrentResource) {
+	resinfo = type->ResInfo[unit->CurrentResource];
+	if (unit->Value) {
+	    if (resinfo->SpriteWhenLoaded) {
+		sprite = resinfo->SpriteWhenLoaded;
+	    }
+	} else {
+	    if (resinfo->SpriteWhenEmpty) {
+		sprite = resinfo->SpriteWhenEmpty;
+	    }
+	}
+    }
+
+    //
+    //	Now draw!
     //	Buildings under construction/upgrade/ready.
     //
     if (state == 1) {
@@ -1830,90 +1859,20 @@ global void DrawBuilding(const Unit* unit)
     } else if (state == 2) {
 	// FIXME: this frame is hardcoded!!!
 	GraphicUnitPixels(unit, type->Sprite);
-	DrawUnitType(type, frame < 0 ? -1 : 1, x, y);
+	DrawUnitType(type, sprite, frame < 0 ? -1 : 1, x, y);
 #ifdef USE_OPENGL
 	DrawUnitPlayerColor(type, unit->Player->Player,
 	    frame < 0 ? -1 : 1, x, y);
 #endif
     } else {
-	GraphicUnitPixels(unit, type->Sprite);
-	DrawUnitType(type, frame, x, y);
+	DrawUnitType(type, sprite, frame, x, y);
 #ifdef USE_OPENGL
 	DrawUnitPlayerColor(type, unit->Player->Player, frame, x, y);
 #endif
     }
 
-    // FIXME: johns: ugly check here, should be removed!
-    if (visible || ReplayRevealMap) {
-	DrawInformations(unit, type, x, y);
-    }
-}
-
-/**
-**	Draw unit on map.
-**
-**	@param unit	Pointer to the unit.
-*/
-global void DrawUnit(const Unit* unit)
-{
-    int x;
-    int y;
-    Graphic* sprite;
-    ResourceInfo* resinfo;
-    const UnitType* type;
-
-    if (unit->Type->Revealer) {		// Revealers are not drawn
-	DebugLevel3Fn("Drawing revealer %d\n" _C_ UnitNumber(unit));
-	return;
-    }
-
-#ifdef NEW_DECODRAW
-    if (!CurrentViewport) {
-	CurrentViewport = TheUI.SelectedViewport;
-    }
-#endif
-    x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX;
-    y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY;
-
-    type = unit->Type;
-
-    DrawShadow(unit, NULL, unit->Frame, x, y);
-
-    //
-    //	Show that the unit is selected
-    //
-    DrawUnitSelection(unit);
-
-    GraphicUnitPixels(unit, type->Sprite);
-
-    sprite = type->Sprite;
-    if (type->Harvester && unit->CurrentResource) {
-	resinfo = type->ResInfo[unit->CurrentResource];
-	if (unit->Value) {
-	    if (resinfo->SpriteWhenLoaded) {
-		sprite = resinfo->SpriteWhenLoaded;
-	    }
-	} else {
-	    if (resinfo->SpriteWhenEmpty) {
-		sprite = resinfo->SpriteWhenEmpty;
-	    }
-	}
-    }
-    if (unit->Frame < 0) {
-	VideoDrawClipX(sprite, -unit->Frame,
-	    x - (type->Width - type->TileWidth * TileSizeX) / 2,
-	    y - (type->Height - type->TileHeight * TileSizeY) / 2);
-    } else {
-	VideoDrawClip(sprite, unit->Frame,
-	    x - (type->Width - type->TileWidth * TileSizeX) / 2,
-	    y - (type->Height - type->TileHeight * TileSizeY) / 2);
-    }
-#ifdef USE_OPENGL
-    DrawUnitPlayerColor(type, unit->Player->Player, unit->Frame, x, y);
-#endif
-
 #ifndef NEW_DECODRAW
-// Unit's extras not fully supported.. need to be decorations themselves.
+    // Unit's extras not fully supported.. need to be decorations themselves.
     DrawInformations(unit, type, x, y);
 #endif
 }
