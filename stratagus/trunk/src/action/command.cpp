@@ -153,6 +153,9 @@ global void CommandStopUnit(Unit* unit)
     order->Arg1=NULL;
     ReleaseOrder(&unit->SavedOrder);
     ReleaseOrder(&unit->NewOrder);
+#ifdef HIERARCHIC_PATHFINDER
+	PfHierReleaseData (unit);
+#endif
     unit->SavedOrder=unit->NewOrder=*order;
 }
 
@@ -277,6 +280,7 @@ global void CommandMove(Unit* unit,int x,int y,int flush)
 	 * that this unit intents to move asap.
 	 */
 	unit->Moving = 1;
+	PfHierReleaseData (unit);
 #endif
     }
     ClearSavedAction(unit);

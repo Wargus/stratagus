@@ -221,6 +221,10 @@ local int ChopWood(Unit* unit)
 	    //	Update the map.
 	    //
 	    MapRemoveWood(unit->Orders[0].X,unit->Orders[0].Y);
+#ifdef HIERARCHIC_PATHFINDER
+	    PfHierMapChangedCallback (unit->Orders[0].X, unit->Orders[0].Y,
+			unit->Orders[0].X, unit->Orders[0].Y);
+#endif
 
 	    //
 	    //	Find place to return wood.
