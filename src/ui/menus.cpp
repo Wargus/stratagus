@@ -3616,7 +3616,7 @@ local void MouseScrollHSAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
 		TheUI.MouseScroll = 1;
 		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
@@ -3665,7 +3665,7 @@ local void KeyboardScrollHSAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
 		TheUI.KeyScroll = 1;
 		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		if (mi[1].d.hslider.percent == 0)
@@ -3711,7 +3711,7 @@ local void MasterVolumeHSAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
 		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -3754,7 +3754,7 @@ local void MusicVolumeHSAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
 		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
@@ -3802,7 +3802,7 @@ local void CdVolumeHSAction(Menuitem *mi, int i)
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
 		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 6) / 10 * 10;
+		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
 #ifdef USE_LIBCDA
 		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 #else
