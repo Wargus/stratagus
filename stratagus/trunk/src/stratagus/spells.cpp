@@ -254,8 +254,8 @@ global int SpellWhirlwindController( void* missile )
     do
       {
       // find new destination in the map
-      nx = x  +  rand() % 5 - 2;
-      ny = y  +  rand() % 5 - 2;
+      nx = x  +  SyncRand() % 5 - 2;
+      ny = y  +  SyncRand() % 5 - 2;
       }
     while(  nx < 0 && ny < 0 && nx >= TheMap.Width && ny >= TheMap.Height );
     mis->X = mis->DX;
@@ -580,12 +580,12 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   do
 	     {
 	     // find new destination in the map
-	     dx = x  +  rand() % 5 - 2;
-	     dy = y  +  rand() % 5 - 2;
+	     dx = x  +  SyncRand() % 5 - 2;
+	     dy = y  +  SyncRand() % 5 - 2;
 	     }
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
-           sx = dx - 1 - rand() % 4;
-	   sy = dy - 1 - rand() % 4;
+           sx = dx - 1 - SyncRand() % 4;
+	   sy = dy - 1 - SyncRand() % 4;
  	 
 	   PlayGameSound(SoundIdForName(spell->SoundIdent),MaxSampleVolume); \
 	   mis = MakeMissile( MissileTypeByIdent( "missile-blizzard" ), 
@@ -756,8 +756,8 @@ global int SpellCast( int SpellId, Unit* unit, Unit* target, int x, int y )
 	   do
 	     {
 	     // find new destination in the map
-	     dx = x  +  rand() % 5 - 2;
-	     dy = y  +  rand() % 5 - 2;
+	     dx = x  +  SyncRand() % 5 - 2;
+	     dy = y  +  SyncRand() % 5 - 2;
 	     }
 	   while(  dx < 0 && dy < 0 && dx >= TheMap.Width && dy >= TheMap.Height );
  	 
