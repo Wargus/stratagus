@@ -1054,7 +1054,7 @@ local void PasteFromClipboard(Menuitem *mi)
     }
 #endif
     for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i]; ++i) {
-	if (clipboard[i] >= 32 && clipboard[i] < 0x100 && clipboard[i] != '~') {
+	if (clipboard[i] >= 32 && clipboard[i] != '~') {
 	    mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
 	    ++mi->d.input.nch;
 	}
