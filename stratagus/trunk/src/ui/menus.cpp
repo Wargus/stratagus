@@ -2058,11 +2058,14 @@ local void DrawGem(Menuitem *mi, unsigned mx, unsigned my)
     }
     if (flags&MenuButtonDisabled) {
 	rb--;
-    } else if (flags&MenuButtonClicked) {
-	rb++;
     }
-    if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
-	rb += 2;
+    else {
+	if (flags&MenuButtonClicked) {
+	    rb++;
+	}
+	if ((mi->d.gem.state & MI_GSTATE_CHECKED)) {
+	    rb += 2;
+	}
     }
     VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
 }
@@ -2540,6 +2543,12 @@ global void Preferences(void)
 	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_CHECKED;
     else
 	PreferencesMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
+
+    if (NetworkFildes == -1)
+	PreferencesMenuItems[1].flags = MI_ENABLED;
+    else
+	PreferencesMenuItems[1].flags = MI_DISABLED;
+
     ProcessMenu(MENU_PREFERENCES, 1);
 }
 
