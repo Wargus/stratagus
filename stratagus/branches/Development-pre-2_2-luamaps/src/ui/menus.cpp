@@ -112,7 +112,6 @@ static void ScenSelectLBInit(Menuitem* mi);
 static void ScenSelectLBAction(Menuitem* mi, int i);
 static void ScenSelectTPMSAction(Menuitem* mi, int i);
 static void ScenSelectVSAction(Menuitem* mi);
-static void ScenSelectFolder(void);
 static void ScenSelectInit(Menuitem* mi);
 static void ScenSelectOk(void);
 static void ScenSelectCancel(void);
@@ -311,7 +310,6 @@ static void EditorMainLoadLBAction(Menuitem* mi, int i);
 static void EditorMainLoadVSAction(Menuitem* mi);
 static void EditorMainLoadOk(void);
 static void EditorMainLoadCancel(void);
-static void EditorMainLoadFolder(void);
 static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl);
 
 // Editor load map
@@ -343,7 +341,6 @@ static void EditorEditAiPropertiesCancel(void);
 
 // Editor save
 static void EditorSaveLBInit(Menuitem* mi);
-static void EditorSaveFolder(void);
 static void EditorSaveLBAction(Menuitem* mi, int i);
 static void EditorSaveVSAction(Menuitem* mi);
 static void EditorSaveEnterAction(Menuitem* mi, int key);
@@ -361,7 +358,6 @@ static void ReplayGameInit(Menuitem* mi);
 static void ReplayGameLBInit(Menuitem* mi);
 static void ReplayGameLBAction(Menuitem* mi, int i);
 static void ReplayGameVSAction(Menuitem* mi);
-static void ReplayGameFolder(void);
 static void ReplayGameDisableFog(Menuitem* mi);
 static void ReplayGameOk(void);
 static void ReplayGameCancel(void);
@@ -447,6 +443,88 @@ static void InitNetMultiButtonStorage(void) {
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
+
+/////////////////////
+// Folder.         //
+/////////////////////
+
+/**
+**  Go to parent folder.
+**
+**  @return 1 if path have changed.
+*/
+static int ParentFolder(Menuitem* button)
+{
+	char *cp;
+
+	if (!ScenSelectDisplayPath[0]) {
+		return 0;
+	}
+	cp = strrchr(ScenSelectDisplayPath, '/');
+	if (cp) {
+		*cp = '\0';
+	} else {
+		button->Flags |= MenuButtonDisabled;
+		button->D.Button.Text = NULL;
+		ScenSelectDisplayPath[0] = '\0';
+	}
+	cp = strrchr(ScenSelectPath, '/');
+	Assert(cp);
+	*cp = 0;
+//	ScenSelectPathName[0] = '\0';
+	ScenSelectFileName[0] = '\0';
+	return 1;
+}
+
+/**
+** Scenario select folder button
+*/
+static void ScenSelectFolder(void)
+{
+	if (ParentFolder(&CurrentMenu->Items[9])) {
+		ScenSelectLBInit(CurrentMenu->Items + 1);
+		CurrentMenu->Items[2].D.VSlider.percent = 0;
+		CurrentMenu->Items[2].D.HSlider.percent = 0;
+	}
+}
+/**
+** Editor main load folder button
+*/
+static void EditorMainLoadFolder(void)
+{
+	if (ParentFolder(&CurrentMenu->Items[5])) {
+		EditorMainLoadLBInit(CurrentMenu->Items + 1);
+		CurrentMenu->Items[2].D.VSlider.percent = 0;
+		CurrentMenu->Items[2].D.HSlider.percent = 0;
+	}
+}
+/**
+** Editor save folder button
+*/
+static void EditorSaveFolder(void)
+{
+	if (ParentFolder(&CurrentMenu->Items[6])) {
+		EditorSaveLBInit(CurrentMenu->Items + 1);
+		CurrentMenu->Items[2].D.VSlider.percent = 0;
+		CurrentMenu->Items[2].D.HSlider.percent = 0;
+	}
+}
+/**
+**  Replay game folder button callback
+*/
+static void ReplayGameFolder(void)
+{
+	if (ParentFolder(&CurrentMenu->Items[5])) {
+		ReplayGameLBInit(CurrentMenu->Items + 1);
+		CurrentMenu->Items[2].D.VSlider.percent = 0;
+		CurrentMenu->Items[2].D.HSlider.percent = 0;
+	}
+}
+
+////////////////////
+// Map info stuff //
+////////////////////
+
 /**
 **  Allocate and deep copy a MapInfo structure
 **
@@ -3376,39 +3454,6 @@ static void CdVolumeHSAction(Menuitem* mi __attribute__((unused)))
 #endif
 
 /**
-** Scenario select folder button
-*/
-static void ScenSelectFolder(void)
-{
-	char *cp;
-	Menu* menu;
-	Menuitem* mi;
-
-	menu = CurrentMenu;
-	mi = menu->Items + 1;
-	if (ScenSelectDisplayPath[0]) {
-		cp = strrchr(ScenSelectDisplayPath, '/');
-		if (cp) {
-			*cp = 0;
-		} else {
-			ScenSelectDisplayPath[0] = 0;
-			menu->Items[9].Flags |= MenuButtonDisabled;
-			menu->Items[9].D.Button.Text = NULL;
-		}
-		cp = strrchr(ScenSelectPath, '/');
-		if (cp) {
-			*cp = 0;
-			ScenSelectLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		}
-	}
-}
-
-/**
 ** Scenario select ok button
 */
 static void ScenSelectOk(void)
@@ -4687,40 +4732,6 @@ static void EditorMainLoadLBInit(Menuitem* mi)
 }
 
 /**
-** Editor main load folder button
-*/
-static void EditorMainLoadFolder(void)
-{
-	Menu* menu;
-	Menuitem* mi;
-	char *cp;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-
-	if (ScenSelectDisplayPath[0]) {
-		cp = strrchr(ScenSelectDisplayPath, '/');
-		if (cp) {
-			*cp = 0;
-		} else {
-			ScenSelectDisplayPath[0] = 0;
-			menu->Items[5].Flags |= MenuButtonDisabled;
-			menu->Items[5].D.Button.Text = NULL;
-		}
-		cp = strrchr(ScenSelectPath, '/');
-		if (cp) {
-			*cp = 0;
-			EditorMainLoadLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		}
-	}
-}
-
-/**
 ** Editor main load ok button
 */
 static void EditorMainLoadOk(void)
@@ -5337,39 +5348,6 @@ static void EditorSaveLBInit(Menuitem* mi)
 }
 
 /**
-** Editor save folder button
-*/
-static void EditorSaveFolder(void)
-{
-	Menu* menu;
-	Menuitem* mi;
-	char *cp;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-
-	if (ScenSelectDisplayPath[0]) {
-		cp = strrchr(ScenSelectDisplayPath, '/');
-		if (cp) {
-			*cp = 0;
-		} else {
-			ScenSelectDisplayPath[0] = 0;
-			menu->Items[6].Flags |= MenuButtonDisabled;
-			menu->Items[6].D.Button.Text = NULL;
-		}
-		cp = strrchr(ScenSelectPath, '/');
-		if (cp) {
-			*cp = 0;
-			EditorSaveLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-		}
-	}
-}
-
-/**
 ** Editor save ok button
 */
 static void EditorSaveOk(void)
@@ -5630,40 +5608,6 @@ static void ReplayGameLBAction(Menuitem* mi, int i)
 */
 static void ReplayGameVSAction(Menuitem* mi)
 {
-}
-
-/**
-**  Replay game folder button callback
-*/
-static void ReplayGameFolder(void)
-{
-	Menu* menu;
-	Menuitem* mi;
-	char *cp;
-
-	menu = CurrentMenu;
-	mi = &menu->Items[1];
-
-	if (ScenSelectDisplayPath[0]) {
-		cp = strrchr(ScenSelectDisplayPath, '/');
-		if (cp) {
-			*cp = 0;
-		} else {
-			ScenSelectDisplayPath[0] = 0;
-			menu->Items[5].Flags |= MenuButtonDisabled;
-			menu->Items[5].D.Button.Text = NULL;
-		}
-		cp = strrchr(ScenSelectPath, '/');
-		if (cp) {
-			*cp = 0;
-			ReplayGameLBInit(mi);
-			mi->D.Listbox.cursel = -1;
-			mi->D.Listbox.startline = 0;
-			mi->D.Listbox.curopt = 0;
-			mi[1].D.VSlider.percent = 0;
-			mi[1].D.HSlider.percent = 0;
-		}
-	}
 }
 
 /**
