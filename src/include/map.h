@@ -335,15 +335,6 @@ typedef struct _world_map_ {
 
 extern WorldMap TheMap;			/// The current map
 
-#ifndef SPLIT_SCREEN_SUPPORT
-extern unsigned MapX;			/// The map X tile start on display
-extern unsigned MapY;			/// The map Y tile start on display
-    /// map width in tiles for current mode (14 for 640x480)
-extern unsigned MapWidth;
-    /// map height in tiles for current mode (14 for 640x480)
-extern unsigned MapHeight;
-#endif
-
 extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
 extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 
@@ -387,10 +378,8 @@ extern int FlagRevealMap;
     /// Called when the color cycles
 extern void MapColorCycle(void);
 
-#ifdef SPLIT_SCREEN_SUPPORT
     /// Draw the map background
 extern void DrawMapBackgroundInViewport (int ,int , int );
-#endif /* SPLIT_SCREEN_SUPPORT */
     /// Draw the map background
 extern void DrawMapBackground(int x,int y);
     /// Build tables for map
@@ -402,12 +391,10 @@ extern int MarkDrawPosMap( int x, int y );
 extern int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
     /// Check if any part of an area is visible
 extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
-#ifdef SPLIT_SCREEN_SUPPORT
     /// FIXME: docu
 extern int MapAreaVisibleInViewport (int , int , int , int , int );
     /// FIXME: docu
 extern int AnyMapAreaVisibleInViewport (int , int , int , int , int );
-#endif /* SPLIT_SCREEN_SUPPORT */
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
@@ -434,13 +421,8 @@ extern void UpdateFogOfWarChange(void);
     /// Update visible areas for fog of war
 extern void MapUpdateVisible(void);
 
-#ifdef SPLIT_SCREEN_SUPPORT
     /// Draw the map fog of war
-extern void DrawMapFogOfWar (int , int , int );
-#else /* SPLIT_SCREEN_SUPPORT */
-    /// Draw the map fog of war
-extern void DrawMapFogOfWar(int x,int y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+extern void DrawMapFogOfWar (int ,int ,int );
     /// Build tables for fog of war
 extern void InitMapFogOfWar(void);
     /// Cleanup memory for fog of war tables
@@ -521,12 +503,10 @@ extern void MapCenter(int x,int y);
     /// Set the current map view to x,y (upper,left corner)
 extern void MapSetViewpoint(int x,int y);
 
-#ifdef SPLIT_SCREEN_SUPPORT
     /// FIXME: docu
 extern void MapViewportSetViewpoint (int , int , int );
     /// FIXME: docu
 extern void MapCenterViewport (int , int , int );
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     /// Returns true, if the tile field is empty
 extern int IsMapFieldEmpty(int x,int y);

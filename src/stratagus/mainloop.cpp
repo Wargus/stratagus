@@ -111,7 +111,6 @@ local void MoveMapViewPointUp(int step)
 */
 local void MoveMapViewPointLeft(int step)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
     if (v->MapX > step) {
@@ -119,13 +118,6 @@ local void MoveMapViewPointLeft(int step)
     } else {
 	v->MapX = 0;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if (MapX > step) {
-	MapX -= step;
-    } else {
-	MapX = 0;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -135,7 +127,6 @@ local void MoveMapViewPointLeft(int step)
 */
 local void MoveMapViewPointDown(int step)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
     if (TheMap.Height > v->MapHeight
@@ -144,13 +135,6 @@ local void MoveMapViewPointDown(int step)
     } else {
 	v->MapY = TheMap.Height - v->MapHeight;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if (MapY < TheMap.Height - MapHeight - step) {
-	MapY += step;
-    } else {
-	MapY = TheMap.Height - MapHeight;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -160,7 +144,6 @@ local void MoveMapViewPointDown(int step)
 */
 local void MoveMapViewPointRight(int step)
 {
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
 
     if (TheMap.Width > v->MapWidth
@@ -169,13 +152,6 @@ local void MoveMapViewPointRight(int step)
     } else {
 	v->MapX = TheMap.Width - v->MapWidth;
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if (MapX < TheMap.Width - MapWidth - step) {
-	MapX += step;
-    } else {
-	MapX = TheMap.Width - MapWidth;
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -197,13 +173,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
     int stepy;
 
     if (fast) {
-#ifdef SPLIT_SCREEN_SUPPORT
 	stepx = TheUI.VP[TheUI.LastClickedVP].MapWidth / 2;
 	stepy = TheUI.VP[TheUI.LastClickedVP].MapHeight / 2;
-#else /* SPLIT_SCREEN_SUPPORT */
-	stepx = MapWidth / 2;
-	stepy = MapHeight / 2;
-#endif /* SPLIT_SCREEN_SUPPORT */
     } else {		// dynamic: let these variables increase upto fast..
 	stepx = stepy = 1;
     }
@@ -338,8 +309,6 @@ local void DrawMenuButtonArea(void)
 #endif
 }
 
-#ifdef SPLIT_SCREEN_SUPPORT
-
 /**
 **	Draw a map viewport.
 **
@@ -446,61 +415,6 @@ global void DrawMapArea(void)
     }
 }
 
-#else /* SPLIT_SCREEN_SUPPORT */
-
-/**
-**	Draw map area
-*/
-global void DrawMapArea(void)
-{
-#ifdef NEW_DECODRAW
-    // Experimental new drawing mechanism, which can keep track of what is
-    // overlapping and draw only that what has changed..
-    // Every to-be-drawn item added to this mechanism, can be handed by this
-    // call.
-    if (InterfaceState == IfaceStateNormal) {
-      // DecorationRefreshDisplay();
-      DecorationUpdateDisplay();
-    }
-
-#else
-    if (InterfaceState == IfaceStateNormal) {
-#ifdef NEW_MAPDRAW
-	MapUpdateFogOfWar(MapX,MapY);
-#else
-	unsigned u;
-
-	// FIXME: only needed until flags are correct set
-	for( u=0; u<MapHeight; ++u ) {
-	    MustRedrawRow[u]=1;
-	}
-	for( u=0; u<MapHeight*MapWidth; ++u ) {
-	    MustRedrawTile[u]=1;
-	}
-#endif
-
-	SetClipping(TheUI.MapX,TheUI.MapY,TheUI.MapEndX,TheUI.MapEndY);
-
-	DrawMapBackground(MapX,MapY);
-	DrawUnits();
-	DrawMapFogOfWar(MapX,MapY);
-	DrawMissiles();
-	DrawConsole();
-	SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-    }
-
-    // Resources over map!
-    // FIXME: trick17! must find a better solution
-    // FIXME: must take resource end into account
-    if( TheUI.MapX<=TheUI.ResourceX && TheUI.MapEndX>=TheUI.ResourceX
-	    && TheUI.MapY<=TheUI.ResourceY && TheUI.MapEndY>=TheUI.ResourceY ) {
-	MustRedraw|=RedrawResources;
-    }
-#endif
-}
-
-#endif /* SPLIT_SCREEN_SUPPORT */
-
 /**
 **	Display update.
 */
@@ -537,7 +451,6 @@ global void UpdateDisplay(void)
 
     PlayerPixels(Players);		// Reset to default colors
 
-#ifdef SPLIT_SCREEN_SUPPORT
     if( MustRedraw&RedrawMinimap ) {
 	// FIXME: redraw only 1* per second!
 	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
@@ -554,17 +467,6 @@ global void UpdateDisplay(void)
 	    DrawMinimapCursor (TheUI.VP[v].MapX, TheUI.VP[v].MapY);
 	}
     }
-#else /* SPLIT_SCREEN_SUPPORT */
-    if( MustRedraw&RedrawMinimap ) {
-	// FIXME: redraw only 1* per second!
-	// HELPME: Viewpoint rectangle must be drawn faster (if implemented) ?
-	DrawMinimap(MapX,MapY);
-	DrawMinimapCursor(MapX,MapY);
-    } else if( MustRedraw&RedrawMinimapCursor ) {
-	HideMinimapCursor();
-	DrawMinimapCursor(MapX,MapY);
-    }
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     if( MustRedraw&RedrawInfoPanel ) {
 	DrawInfoPanel();
@@ -606,14 +508,9 @@ global void UpdateDisplay(void)
 	if( MustRedraw&RedrawMap ) {
 	    // FIXME: split into small parts see RedrawTile and RedrawRow
 	    InvalidateAreaAndCheckCursor(
-#ifdef SPLIT_SCREEN_SUPPORT
 		     TheUI.MapArea.X,TheUI.MapArea.Y
 		    ,TheUI.MapArea.EndX-TheUI.MapArea.X+1
 		    ,TheUI.MapArea.EndY-TheUI.MapArea.Y+1);
-#else /* SPLIT_SCREEN_SUPPORT */
-		     TheUI.MapX,TheUI.MapY
-		    ,TheUI.MapEndX-TheUI.MapX+1,TheUI.MapEndY-TheUI.MapY+1);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	}
 	if( (MustRedraw&RedrawFiller1) && TheUI.Filler1.Graphic ) {
 	    InvalidateAreaAndCheckCursor(

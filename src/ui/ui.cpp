@@ -111,14 +111,9 @@ global void InitUserInterface(const char *race_name)
     //
     //	Calculations
     //
-#ifdef SPLIT_SCREEN_SUPPORT
     TheUI.LastClickedVP = 0;
 
     SetViewportMode (VIEWPORT_SINGLE);
-#else /* SPLIT_SCREEN_SUPPORT */
-    MapWidth=(TheUI.MapEndX-TheUI.MapX+TileSizeX)/TileSizeX;
-    MapHeight=(TheUI.MapEndY-TheUI.MapY+TileSizeY)/TileSizeY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 }
 
 /**
@@ -335,12 +330,8 @@ global void SaveUserInterface(FILE* file)
 
     fprintf(file,"  ; The map area\n");
     fprintf(file,"  (list %d %d %d %d)\n",
-#ifdef SPLIT_SCREEN_SUPPORT
 	    TheUI.MapArea.X, TheUI.MapArea.Y,
 	    TheUI.MapArea.EndX+1,TheUI.MapArea.EndY+1);
-#else /* SPLIT_SCREEN_SUPPORT */
-	    TheUI.MapX,TheUI.MapY,TheUI.MapEndX+1,TheUI.MapEndY+1);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     fprintf(file,"  ; Menu button background\n");
     fprintf(file,"  (list \"%s\" %d %d)\n",
@@ -445,8 +436,6 @@ global void CleanUserInterface(void)
 
     memset(&TheUI,0,sizeof(TheUI));
 }
-
-#ifdef SPLIT_SCREEN_SUPPORT
 
 /**
 **	Takes coordinates of a pixel in freecraft's window and computes
@@ -807,6 +796,5 @@ global void CycleViewportMode (int step)
     SetViewportMode (new_mode);
 }
 
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 //@}

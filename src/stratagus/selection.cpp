@@ -39,9 +39,7 @@
 #include "unit.h"
 #include "interface.h"
 #include "map.h"
-#ifdef SPLIT_SCREEN_SUPPORT
 #include "ui.h"
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 #include "ccl.h"
 
@@ -227,9 +225,7 @@ global int SelectUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     type=base->Type;
 
@@ -237,14 +233,10 @@ global int SelectUnitsByType(Unit* base)
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-#ifdef SPLIT_SCREEN_SUPPORT
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
     r = SelectUnits (v->MapX-1, v->MapY-1, v->MapX + v->MapWidth+1,
 		v->MapY + v->MapHeight+1, table);
-#else /* SPLIT_SCREEN_SUPPORT */
-    r=SelectUnits(MapX-1,MapY-1,MapX+MapWidth+1,MapY+MapHeight+1,table);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.
@@ -318,9 +310,7 @@ global int ToggleUnitsByType(Unit* base)
     const UnitType* type;
     int r;
     int i;
-#ifdef SPLIT_SCREEN_SUPPORT
     Viewport *v = &TheUI.VP[TheUI.ActiveViewport];
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     type = base->Type;
 
@@ -328,15 +318,10 @@ global int ToggleUnitsByType(Unit* base)
 
     // select all visible units.
     // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-#ifdef SPLIT_SCREEN_SUPPORT
     /* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
      * took parameters of the selection rectangle as arguments */
     r = SelectUnits(v->MapX-1, v->MapY-1, v->MapX + v->MapWidth + 1,
 		v->MapY + v->MapHeight + 1, table);
-#else /* SPLIT_SCREEN_SUPPORT */
-    r = SelectUnits(MapX - 1, MapY - 1, MapX + MapWidth + 1,
-	MapY + MapHeight + 1, table);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     // if unit is a cadaver or hidden (not on map)
     // no unit can be selected.

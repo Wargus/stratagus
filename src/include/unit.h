@@ -725,14 +725,8 @@ extern int UnitVisibleOnMap(const Unit* unit);
     /// Returns true, if unit is known on the map
 extern int UnitKnownOnMap(const Unit* unit);
 
-#ifdef SPLIT_SCREEN_SUPPORT
-extern int UnitVisibleInViewport (int v, const Unit * );
-#endif /* SPLIT_SCREEN_SUPPORT */
-
-#ifndef SPLIT_SCREEN_SUPPORT
     /// Returns true, if unit is visible on current map view
-extern int UnitVisibleOnScreen(const Unit* unit);
-#endif /* SPLIT_SCREEN_SUPPORT */
+extern int UnitVisibleInViewport (int v, const Unit * );
 
     /// FIXME: more docu
 extern int CheckUnitToBeDrawn(const Unit* unit);
@@ -890,13 +884,8 @@ extern void SaveDecorations(FILE* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
 
-#ifdef SPLIT_SCREEN_SUPPORT
     /// Draw all units visible on map
 extern void DrawUnits (int );
-#else /* SPLIT_SCREEN_SUPPORT */
-    /// Draw all units visible on map
-extern void DrawUnits(void);
-#endif /* SPLIT_SCREEN_SUPPORT */
 
 //	in unit_find.c
     /// Select units in rectangle range
