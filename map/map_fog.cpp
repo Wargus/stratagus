@@ -121,6 +121,8 @@ local const int FogTable[16] = {
 global unsigned char* VisionTable[3];
 global int* VisionLookup;
 
+local unsigned char* VisibleTable;
+
 #ifdef USE_SDL_SURFACE
 SDL_Surface* SolidFog;
 
@@ -201,7 +203,7 @@ local int LookupSight(const Player* player, int tx, int ty)
 **
 **	@return		0 unexplored, 1 explored, > 1 visible.
 */
-global int IsTileVisible(const Player* player, int x, int y)
+global unsigned char IsTileVisible(const Player* player, int x, int y)
 {
     int i;
     unsigned char visiontype;
@@ -2691,6 +2693,11 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
     int x;
     int y;
 
+#define IsMapFieldExploredTable(x, y) \
+    (VisibleTable[(y) * TheMap.Width + (x)])
+#define IsMapFieldVisibleTable(x, y) \
+    (VisibleTable[(y) * TheMap.Width + (x)] > 1)
+
     w = TheMap.Width;
     tile = tile2 = 0;
     x = sx - sy;
@@ -2706,66 +2713,66 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
     if (sy) {
 	if (sx != sy) {
-	    if (!IsMapFieldExplored(ThisPlayer, x - 1, y - 1)) {
+	    if (!IsMapFieldExploredTable(x - 1, y - 1)) {
 		tile2 |= 2;
 		tile |= 2;
-	    } else if (!IsMapFieldVisible(ThisPlayer, x - 1, y - 1)) {
+	    } else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
 		tile |= 2;
 	    }
 	}
-	if (!IsMapFieldExplored(ThisPlayer, x, y - 1)) {
+	if (!IsMapFieldExploredTable(x, y - 1)) {
 	    tile2 |= 3;
 	    tile |= 3;
-	} else if (!IsMapFieldVisible(ThisPlayer, x, y - 1)) {
+	} else if (!IsMapFieldVisibleTable(x, y - 1)) {
 	    tile |= 3;
 	}
 	if (sx != sy + w - 1) {
-	    if (!IsMapFieldExplored(ThisPlayer, x + 1, y - 1)) {
+	    if (!IsMapFieldExploredTable(x + 1, y - 1)) {
 		tile2 |= 1;
 		tile |= 1;
-	    } else if (!IsMapFieldVisible(ThisPlayer, x + 1, y - 1)) {
+	    } else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
 		tile |= 1;
 	    }
 	}
     }
 
     if (sx != sy) {
-	if (!IsMapFieldExplored(ThisPlayer, x - 1, y)) {
+	if (!IsMapFieldExploredTable(x - 1, y)) {
 	    tile2 |= 10;
 	    tile |= 10;
-	} else if (!IsMapFieldVisible(ThisPlayer, x - 1, y)) {
+	} else if (!IsMapFieldVisibleTable(x - 1, y)) {
 	    tile |= 10;
 	}
     }
     if (sx != sy + w - 1) {
-	if (!IsMapFieldExplored(ThisPlayer, x + 1, y)) {
+	if (!IsMapFieldExploredTable(x + 1, y)) {
 	    tile2 |= 5;
 	    tile |= 5;
-	} else if (!IsMapFieldVisible(ThisPlayer, x + 1, y)) {
+	} else if (!IsMapFieldVisibleTable(x + 1, y)) {
 	    tile |= 5;
 	}
     }
 
     if (sy + w < TheMap.Height * w) {
 	if (sx != sy) {
-	    if (!IsMapFieldExplored(ThisPlayer, x - 1, y + 1)) {
+	    if (!IsMapFieldExploredTable(x - 1, y + 1)) {
 		tile2 |= 8;
 		tile |= 8;
-	    } else if (!IsMapFieldVisible(ThisPlayer, x - 1, y + 1)) {
+	    } else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
 		tile |= 8;
 	    }
 	}
-	if (!IsMapFieldExplored(ThisPlayer, x, y + 1)) {
+	if (!IsMapFieldExploredTable(x, y + 1)) {
 	    tile2 |= 12;
 	    tile |= 12;
-	} else if (!IsMapFieldVisible(ThisPlayer, x, y + 1)) {
+	} else if (!IsMapFieldVisibleTable(x, y + 1)) {
 	    tile |= 12;
 	}
 	if (sx != sy + w - 1) {
-	    if (!IsMapFieldExplored(ThisPlayer, x + 1, y + 1)) {
+	    if (!IsMapFieldExploredTable(x + 1, y + 1)) {
 		tile2 |= 4;
 		tile |= 4;
-	    } else if (!IsMapFieldVisible(ThisPlayer, x + 1, y + 1)) {
+	    } else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
 		tile |= 4;
 	    }
 	}
@@ -2779,7 +2786,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	tile = 0;
     }
 
-    if (IsMapFieldVisible(ThisPlayer, x, y) || ReplayRevealMap) {
+    if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 	if (tile) {
 #ifdef USE_SDL_SURFACE
 	    VideoDrawFog(tile, dx, dy);
@@ -2812,6 +2819,9 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	}
 */
     }
+
+#undef IsMapFieldExploredTable
+#undef IsMapFieldVisibleTable
 }
 
 #ifdef HIERARCHIC_PATHFINDER
@@ -2852,6 +2862,28 @@ global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
 
     p = ThisPlayer->Player;
 
+    sx = vp->MapX - 1;
+    if (sx < 0) {
+	sx = 0;
+    }
+    ex = vp->MapX + vp->MapWidth + 1;
+    if (ex > TheMap.Width) {
+	ex = TheMap.Width;
+    }
+    my = vp->MapY - 1;
+    if (my < 0) {
+	my = 0;
+    }
+    ey = vp->MapY + vp->MapHeight + 1;
+    if (ey > TheMap.Height) {
+	ey = TheMap.Height;
+    }
+    for (; my < ey; ++my) {
+	for (mx = sx; mx < ex; ++mx) {
+	    VisibleTable[my * TheMap.Width + mx] = IsTileVisible(ThisPlayer, mx, my);
+	}
+    }
+
     ex = vp->EndX;
     sy = y * TheMap.Width;
     dy = vp->Y;
@@ -2869,12 +2901,12 @@ global void DrawMapFogOfWar(const Viewport* vp, int x, int y)
 	    while (dx < ex) {
 		if (*redraw_tile) {
 #if NEW_MAPDRAW > 1
-                  (*redraw_tile)--;
+		    (*redraw_tile)--;
 #else
-                  *redraw_tile = 0;
+		    *redraw_tile = 0;
 		    mx = (dx - vp->X) / TileSizeX + vp->MapX;
 		    my = (dy - vp->Y) / TileSizeY + vp->MapY;
-		    if (IsTileVisible(ThisPlayer, mx, my) || ReplayRevealMap) {
+		    if (VisibleTable[my * TheMap.Width + mx] || ReplayRevealMap) {
 			DrawFogOfWarTile(sx, sy, dx, dy);
 		    } else {
 #ifdef USE_OPENGL
@@ -2975,6 +3007,7 @@ extern int VideoDrawText(int x, int y, unsigned font, const unsigned char* text)
 */
 global void InitMapFogOfWar(void)
 {
+    VisibleTable = malloc(TheMap.Width * TheMap.Height * sizeof(*VisibleTable));
 
 #ifdef USE_OPENGL
     VideoDrawFog = VideoDrawFogAlphaOpenGL;
@@ -3275,6 +3308,11 @@ build_table:
 */
 global void CleanMapFogOfWar(void)
 {
+    if (VisibleTable) {
+	free(VisibleTable);
+	VisibleTable = NULL;
+    }
+
     if (FogOfWarAlphaTable) {
 	free(FogOfWarAlphaTable);
 	FogOfWarAlphaTable = NULL;
@@ -3432,7 +3470,7 @@ global void InitVisionTable(void)
 */
 global void FreeVisionTable(void)
 {
-   // Free Vision Data
+    // Free Vision Data
     if (VisionTable[0]) {
 	free(VisionTable[0]);
 	VisionTable[0] = NULL;
