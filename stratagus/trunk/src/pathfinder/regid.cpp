@@ -30,7 +30,7 @@ void RegidBitmapInflate (RegidSpace *space)
 
 void RegidBitmapShrink (RegidSpace *space)
 {
-	unsigned int size_needed;
+	int size_needed;
 
 	size_needed = space->RegidHigh/8;
 	if (space->RegidHigh%8)
