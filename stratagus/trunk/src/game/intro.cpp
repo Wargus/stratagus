@@ -377,7 +377,6 @@ global void ShowIntro(const Intro *intro)
     int line;
     int i;
     int l;
-    int x;
     int y;
     int c;
     CLFile* file;
@@ -388,7 +387,7 @@ global void ShowIntro(const Intro *intro)
     int old_video_sync;
 
     UseContinueButton=1;
-    InitContinueButton(VideoWidth-185,VideoHeight-40);
+    InitContinueButton(455*VideoWidth/640,440*VideoHeight/480);
     GameCursor=TheUI.Point.Cursor;
     DestroyCursorBackground();
 
@@ -442,19 +441,18 @@ global void ShowIntro(const Intro *intro)
     SplitTextIntoLines(text,320,&scrolling_text);
     for( i=0; i<MAX_OBJECTIVES; ++i) {
 	if( intro->Objectives[i] ) {
-	    SplitTextIntoLines(intro->Objectives[i],260,&objectives_text[i]);
+	    SplitTextIntoLines(intro->Objectives[i],260*VideoWidth/640,
+		&objectives_text[i]);
 	} else {
 	    objectives_text[i]=NULL;
 	}
     }
 
-    x=TheUI.Offset640X*2;
     line=0;
     stage=1;
     IntroNoEvent=1;
     c=0;
     while( 1 ) {
-	y=TheUI.Offset480Y;
 	if( !PlayingMusic && stage<MAX_BRIEFING_VOICES &&
 		intro->VoiceFile[stage] ) {
 	    PlayFile(intro->VoiceFile[stage]);
@@ -472,24 +470,26 @@ global void ShowIntro(const Intro *intro)
 	//
 	//	Draw title
 	//
-	VideoDrawTextCentered(VideoWidth-218,y+28,LargeFont,intro->Title);
+	VideoDrawTextCentered(422*VideoWidth/640,28*VideoHeight/480,
+	    LargeFont,intro->Title);
 	//
 	//	Draw scrolling text
 	//
-	ScrollText(70,y+80,320,170,line,scrolling_text);
+	ScrollText(70*VideoWidth/640,80*VideoHeight/480,320*VideoWidth/640,
+	    170*VideoHeight/480,line,scrolling_text);
 
 	//
 	//	Draw objectives
 	//
-	y=VideoHeight-(TheUI.Offset480Y/2)-174;
-	VideoDrawText(x+372,y,LargeFont,"Objectives:");
+	y=306*VideoHeight/480;
+	VideoDrawText(372*VideoWidth/640,y,LargeFont,"Objectives:");
 	y+=30;
 	for( i=0; i<MAX_OBJECTIVES && objectives_text[i]; ++i ) {
 	    TextLines* ptr;
 
 	    ptr=objectives_text[i];
 	    while( ptr ) {
-		VideoDrawText(x+372,y,LargeFont,ptr->Text);
+		VideoDrawText(372*VideoWidth/640,y,LargeFont,ptr->Text);
 		y+=22;
 		ptr=ptr->Next;
 	    }
@@ -676,20 +676,22 @@ local void PictureDrawText(CampaignChapter* chapter,ChapterTextLines* chlines)
 {
     ChapterPictureText* text;
     TextLines* lines;
+    int x;
     int y;
     int (*draw)(int,int,unsigned,const unsigned char*);
 
     text=chapter->Data.Picture.Text;
     while( text ) {
-	y=text->Y;
 	if( text->Align==PictureTextAlignLeft ) {
 	    draw=VideoDrawText;
 	} else {
 	    draw=VideoDrawTextCentered;
 	}
+	x=text->X*VideoWidth/640;
+	y=text->Y*VideoHeight/480;
 	lines=chlines->Text;
 	while( lines ) {
-	    draw(text->X,y,text->Font,lines->Text);
+	    draw(x,y,text->Font,lines->Text);
 	    y+=text->Height;
 	    lines=lines->Next;
 	}
