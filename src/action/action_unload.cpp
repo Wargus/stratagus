@@ -50,44 +50,21 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-
-// Flag for searching a valid tileset for unloading
-#define LandUnitMask ( \
-	MapFieldLandUnit | \
-	MapFieldBuilding | \
-	MapFieldWall | \
-	MapFieldRocks | \
-	MapFieldForest | \
-	MapFieldCoastAllowed | \
-	MapFieldWaterAllowed | \
-	MapFieldUnpassable)
-
-#define NavalUnitMask ( \
-	MapFieldLandUnit | \
-	MapFieldBuilding | \
-	MapFieldWall | \
-	MapFieldRocks | \
-	MapFieldForest | \
-	MapFieldCoastAllowed | \
-	MapFieldLandAllowed | \
-	MapFieldUnpassable)
-
-
 /**
-**  Find a free position close to x, y
+**  Find a free position close to x, y for unit.
 **
+**  @unit        Unit to unload.
 **  @param x     Original x search position
 **  @param y     Original y search position
 **  @param resx  Unload x position.
 **  @param resy  Unload y position.
-**  @param mask  Movement mask for the unit to be droped.
 **
 **  @return      True if a position was found, False otherwise.
 **  @note        resx and resy are undefined if a position is not found.
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
+static int FindUnloadPositionForUnit(const Unit* unit, int x, int y, int* resx, int* resy)
 {
 	int i;
 	int n;
@@ -100,7 +77,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 		// Nobody: There was some code here to check for unloading units that can
 		// only go on even tiles. It's useless, since we can only unload land units.
 		for (i = addy; i--; ++y) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanMoveTo(unit, x, y)) {
 				*resx = x;
 				*resy = y;
 				return 1;
@@ -108,7 +85,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 		}
 		++addx;
 		for (i = addx; i--; ++x) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanMoveTo(unit, x, y)) {
 				*resx = x;
 				*resy = y;
 				return 1;
@@ -116,7 +93,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 		}
 		++addy;
 		for (i = addy; i--; --y) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanMoveTo(unit, x, y)) {
 				*resx = x;
 				*resy = y;
 				return 1;
@@ -124,7 +101,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 		}
 		++addx;
 		for (i = addx; i--; --x) {
-			if (CheckedCanMoveToMask(x, y, mask)) {
+			if (UnitCanMoveTo(unit, x, y)) {
 				*resx = x;
 				*resy = y;
 				return 1;
@@ -134,6 +111,7 @@ static int FindUnloadPosition(int x, int y, int* resx, int* resy, int mask)
 	}
 	return 0;
 }
+
 
 /**
 **  Reappear unit on map.
@@ -150,7 +128,7 @@ int UnloadUnit(Unit* unit)
 	int y;
 
 	Assert(unit->Removed);
-	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, UnitMovementMask(unit))) {
+	if (!FindUnloadPositionForUnit(unit, unit->X, unit->Y, &x, &y)) {
 		return 0;
 	}
 	unit->Wait = 1; // should be correct unit has still action
@@ -168,8 +146,9 @@ int UnloadUnit(Unit* unit)
 **  @param  resy  coast y position
 **
 **  @return       1 if a location was found, 0 otherwise
+**  @todo         Only know area.
 */
-static int ClosestFreeCoast(int x, int y, int* resx, int* resy)
+static int ClosestFreeCoast(const Unit* unit, int x, int y, int* resx, int* resy, int mask)
 {
 	int i;
 	int addx;
@@ -179,54 +158,42 @@ static int ClosestFreeCoast(int x, int y, int* resx, int* resy)
 	int n;
 
 	addx = addy = 1;
-	if (CoastOnMap(x, y) &&
-			FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
+	if ((~TheMap.Fields[x + y * TheMap.Width].Flags & mask) &&
+			FindUnloadPositionForUnit(unit, x, y, &nullx, &nully)) {
 		*resx = x;
 		*resy = y;
 		return 1;
 	}
+#ifdef shortalias
+#warning // rename this define.
+#endif
+#define shortalias \
+	if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height && \
+	(~TheMap.Fields[x + y * TheMap.Width].Flags & mask) && !UnitOnMapTile(x, y) && \
+		FindUnloadPositionForUnit(unit, x, y, &nullx, &nully)) { \
+		*resx = x; \
+		*resy = y; \
+		return 1; \
+	}
+
 	--x;
 	// The maximum distance to the coast. We have to stop somewhere...
 	n = 20;
 	while (n--) {
 		for (i = addy; i--; ++y) {
-			if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
-					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
-				*resx = x;
-				*resy = y;
-				return 1;
-			}
+			shortalias;
 		}
 		++addx;
 		for (i = addx; i--; ++x) {
-			if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x ,y) &&
-					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
-				*resx = x;
-				*resy = y;
-				return 1;
-			}
+			shortalias;
 		}
 		++addy;
 		for (i = addy; i--; --y) {
-			if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
-					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
-				*resx = x;
-				*resy = y;
-				return 1;
-			}
+			shortalias;
 		}
 		++addx;
 		for (i = addx; i--; --x) {
-			if (x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height &&
-					CoastOnMap(x, y) && !UnitOnMapTile(x, y) &&
-					FindUnloadPosition(x, y, &nullx, &nully, LandUnitMask)) {
-				*resx = x;
-				*resy = y;
-				return 1;
-			}
+			shortalias;
 		}
 		++addy;
 	}
@@ -273,20 +240,20 @@ static int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* 
 	switch (transporterType) {
 		case UnitTypeLand:
 			// in this case, loadedType == UnitTypeSea
-			return ClosestFreeCoast(x, y, resx, resy);
+			return ClosestFreeCoast(transporter->UnitInside, x, y, resx, resy, MapFieldCoastAllowed);
 		case UnitTypeNaval:
 			// Same ( but reversed... )
-			return ClosestFreeCoast(x, y, resx, resy);
+			return ClosestFreeCoast(transporter, x, y, resx, resy, MapFieldCoastAllowed);
 		case UnitTypeFly:
-			// Here we have loadedType in [ UnitTypeLand,UnitTypeNaval ]
-			if (loadedType == UnitTypeLand) {
-				return FindUnloadPosition(x, y, resx, resy, LandUnitMask);
-			} else {
-				return FindUnloadPosition(x, y, resx, resy, NavalUnitMask);
-			}
+			// Now, depend of unit inside.
+			return ClosestFreeCoast(transporter->UnitInside, x, y, resx, resy,
+				MapFieldCoastAllowed | (loadedType == UnitTypeNaval) ?
+				MapFieldWaterAllowed : MapFieldLandAllowed);
+		default :
+			DebugPrint("unknow type for transporter\n");
+			abort();
+			return 0;
 	}
-	// Just to avoid a warning
-	return 0;
 }
 
 /**
