@@ -3085,12 +3085,13 @@ int AddHandler(lua_State* l)
 /**
 **  Call a Lua handler
 */
-void CallHandler(unsigned int handle)
+void CallHandler(unsigned int handle, int value)
 {
 	lua_pushstring(Lua, "_handlers_");
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	lua_rawgeti(Lua, -1, handle);
-	LuaCall(0, 1);
+	lua_pushnumber(Lua, value);
+	LuaCall(1, 1);
 	lua_pop(Lua, 1);
 }
 
@@ -3144,7 +3145,6 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 			}
 			if (lua_isstring(l, -1)) {
 				value = lua_tostring(l, -1);
-				//item->D.Button.Handler = hash_mini_get(MenuHndlrHash, s1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
 					item->D.Button.Handler = (void*)*func;
@@ -3152,7 +3152,7 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
 			} else if (lua_isfunction(l, -1)) {
-				item->D.Button.LuaHandle = AddHandler(l);
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3238,7 +3238,7 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3249,6 +3249,8 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3319,7 +3321,7 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3330,6 +3332,8 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3471,7 +3475,7 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 			}
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3482,6 +3486,8 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3595,7 +3601,7 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 			}
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3606,6 +3612,8 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3714,7 +3722,7 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3725,6 +3733,8 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);
@@ -3797,7 +3807,7 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 			}
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
-			if (!lua_isstring(l, -1) && !lua_isnil(l, -1)) {
+			if (!lua_isstring(l, -1) && !lua_isfunction(l, -1) && !lua_isnil(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (lua_isstring(l, -1)) {
@@ -3808,6 +3818,8 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}
+			} else if (lua_isfunction(l, -1)) {
+				item->LuaHandle = AddHandler(l);
 			} else {
 				lua_pushnumber(l, 0);
 				lua_rawseti(l, j + 1, k + 1);

@@ -143,7 +143,6 @@ typedef struct _menuitem_button_ {
 	struct _button_style_* Style;
 	void (*Handler)(void);
 	unsigned HotKey;
-	unsigned int LuaHandle;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
 	unsigned char** options;
@@ -225,6 +224,7 @@ typedef struct _menuitem_ {
 	int YOfs;
 	unsigned Flags;
 	int Font;
+	unsigned int LuaHandle;
 	struct _menu_* Menu;  /// backpointer for speedups
 	union {
 		MenuitemText Text;
