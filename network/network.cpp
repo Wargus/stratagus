@@ -288,6 +288,11 @@ static int NetworkSendResend;              ///< Packets send to resend
 
 static int PlayerQuit[PlayerMax];          ///< Player quit
 
+#define MAX_NCQS 100
+static NetworkCommandQueue NCQs[MAX_NCQS]; ///< NetworkCommandQueues
+static int NumNCQs;                        ///< Number of NCQs in use
+
+
 //----------------------------------------------------------------------------
 // Mid-Level api functions
 //----------------------------------------------------------------------------
@@ -362,11 +367,11 @@ static void NetworkSendPacket(const NetworkCommandQueue* ncq)
 }
 
 //----------------------------------------------------------------------------
-// API init..
+//  API init..
 //----------------------------------------------------------------------------
 
 /**
-** Initialize network part 1.
+**  Initialize network part 1.
 */
 void InitNetwork1(void)
 {
@@ -439,10 +444,12 @@ void InitNetwork1(void)
 
 	dl_init(CommandsIn);
 	dl_init(MsgCommandsIn);
+
+	NumNCQs = 0;
 }
 
 /**
-** Cleanup network part 1. (to be called _AFTER_ part 2 :)
+**  Cleanup network part 1. (to be called _AFTER_ part 2 :)
 */
 void ExitNetwork1(void)
 {
@@ -466,7 +473,7 @@ void ExitNetwork1(void)
 }
 
 /**
-** Initialize network part 2.
+**  Initialize network part 2.
 */
 void InitNetwork2(void)
 {
@@ -497,6 +504,31 @@ void InitNetwork2(void)
 	memset(PlayerQuit, 0, sizeof(PlayerQuit));
 	memset(NetworkStatus, 0, sizeof(NetworkStatus));
 	memset(NetworkLastFrame, 0, sizeof(NetworkLastFrame));
+}
+
+//----------------------------------------------------------------------------
+//  Memory management for NetworkCommandQueues
+//----------------------------------------------------------------------------
+
+/**
+**  Allocate a NetworkCommandQueue
+**
+**  @return  NetworkCommandQueue
+*/
+static NetworkCommandQueue* AllocNCQ(void)
+{
+	Assert(NumNCQs != MAX_NCQS);
+	return &NCQs[NumNCQs++];
+}
+
+/**
+**  Free a NetworkCommandQueue
+**
+**  @param ncq  NetworkCommandQueue to free
+*/
+static void FreeNCQ(NetworkCommandQueue* ncq)
+{
+	NCQs[ncq - NCQs] = NCQs[--NumNCQs];
 }
 
 //----------------------------------------------------------------------------
@@ -543,7 +575,7 @@ void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 		check = (NetworkCommandQueue*)check->List->next;
 	}
 
-	ncq = malloc(sizeof(NetworkCommandQueue));
+	ncq = AllocNCQ();
 	dl_insert_first(CommandsIn, ncq->List);
 
 	ncq->Time = GameCycle;
@@ -583,7 +615,7 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 	NetworkCommandQueue* ncq;
 	NetworkExtendedCommand* nec;
 
-	ncq = malloc(sizeof(NetworkCommandQueue));
+	ncq = AllocNCQ();
 	dl_insert_first(CommandsIn, ncq->List);
 
 	ncq->Time = GameCycle;
@@ -967,7 +999,7 @@ void NetworkChatMessage(const char* msg)
 		cp = msg;
 		n = strlen(msg);
 		while (n >= (int)sizeof(ncm->Text)) {
-			ncq = malloc(sizeof(NetworkCommandQueue));
+			ncq = AllocNCQ();
 			dl_insert_first(MsgCommandsIn, ncq->List);
 			ncq->Type = MessageChat;
 			ncm = (NetworkChat *)(&ncq->Data);
@@ -976,7 +1008,7 @@ void NetworkChatMessage(const char* msg)
 			cp += sizeof(ncm->Text);
 			n -= sizeof(ncm->Text);
 		}
-		ncq = malloc(sizeof(NetworkCommandQueue));
+		ncq = AllocNCQ();
 		dl_insert_first(MsgCommandsIn, ncq->List);
 		ncq->Type = MessageChatTerm;
 		ncm = (NetworkChat*)(&ncq->Data);
@@ -1102,7 +1134,7 @@ static void NetworkSendCommands(void)
 		ncq[0].Time = GameCycle + NetworkLag;
 		numcommands = 1;
 	} else {
-		while( (!dl_empty(CommandsIn) || !dl_empty(MsgCommandsIn)) &&
+		while ((!dl_empty(CommandsIn) || !dl_empty(MsgCommandsIn)) &&
 				numcommands < MaxNetworkCommands) {
 			if (!dl_empty(CommandsIn)) {
 				incommand = (NetworkCommandQueue*)CommandsIn->last;
@@ -1120,9 +1152,10 @@ static void NetworkSendCommands(void)
 				incommand = (NetworkCommandQueue*)MsgCommandsIn->last;
 				dl_remove_last(MsgCommandsIn);
 			}
-			memcpy(&ncq[numcommands],incommand,sizeof(NetworkCommandQueue));
+			memcpy(&ncq[numcommands], incommand, sizeof(NetworkCommandQueue));
 			ncq[numcommands].Time = GameCycle + NetworkLag;
 			++numcommands;
+			FreeNCQ(incommand);
 		}
 	}
 
