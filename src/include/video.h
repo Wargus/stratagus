@@ -505,41 +505,27 @@ extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
     ///	Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
 
+    ///	Draw a shadow graphic object clipped to the current clipping.
+extern void VideoDrawShadowClip(const Graphic*, unsigned frame,
+    int x, int y);
+    ///	Draw a shadow graphic object clipped and flipped in X direction.
+extern void VideoDrawShadowClipX(const Graphic*, unsigned frame,
+    int x, int y);
+
 // FIXME FIXME FIXME: need to implement all of this
-    ///	Draw a graphic object unclipped.
-//#define VideoDraw(o, f, x, y)	//((o)->Type->Draw)((o), (f), (x), (y))
     ///	Free a graphic object.
 #define VideoFree(o)	//((o)->Type->Free)((o))
     ///	Save (NULL) free a graphic object.
 #define VideoSaveFree(o) // do { if ((o)) ((o)->Type->Free)((o)); } while(0)
-//#define VideoDrawSub(a,b,c,d,e,f,g)
-    ///	Draw a graphic object clipped to the current clipping.
-//#define VideoDrawSubClip(o, ix, iy, w, h, x, y)
-    ///	Draw a shadow graphic object clipped to the current clipping.
-#define VideoDrawShadowClip(o, f, x, y)	//((o)->Type->DrawShadowClip)((o),(f),(x),(y))
-    ///	Draw a shadow graphic object clipped and flipped in X direction.
-#define VideoDrawShadowClipX(o, f, x, y)    //((o)->Type->DrawShadowClipX)((o),(f),(x),(y))
 
     /// Get the width of a single frame of a graphic object
 #define VideoGraphicWidth(o)	((o)->Width)
     /// Get the height of a single frame of a graphic object
 #define VideoGraphicHeight(o)	((o)->Height)
 #define VideoGraphicFrames(o) ((o)->NumFrames)
-//    ((o)->Type->DrawSubClip)((o), (ix), (iy), (w), (h), (x), (y))
-
 
     /// MACRO defines speed of colorcycling FIXME: should be made configurable
 #define COLOR_CYCLE_SPEED	(CYCLES_PER_SECOND/4)
-
-extern SDL_Surface* MainSurface;
-
-/*
-#define VideoMemory8	(&VideoMemory->D8)	/// video memory  8bpp
-#define VideoMemory16	(&VideoMemory->D16)	/// video memory 16bpp
-#define VideoMemory24	(&VideoMemory->D24)	/// video memory 24bpp
-#define VideoMemory32	(&VideoMemory->D32)	/// video memory 32bpp
-*/
-
 
 #else
 
