@@ -192,12 +192,13 @@ local SCM CclDefineUnitType(SCM list)
 			free(type->ShadowFile);
 		    }
 		    type->ShadowFile = gh_scm2newstr(gh_car(sublist), NULL);
-		} else if (gh_eq_p(value, gh_symbol2scm("width"))) {
-		    type->ShadowWidth = gh_scm2int(gh_car(sublist));
+		} else if (gh_eq_p(value, gh_symbol2scm("size"))) {
+		    type->ShadowWidth = gh_scm2int(gh_car(gh_car(sublist)));
+		    type->ShadowHeight = gh_scm2int(gh_car(gh_cdr(gh_car(sublist))));
 		} else if (gh_eq_p(value, gh_symbol2scm("height"))) {
-		    type->ShadowHeight = gh_scm2int(gh_car(sublist));
 		} else if (gh_eq_p(value, gh_symbol2scm("offset"))) {
-		    type->ShadowOffset = gh_scm2int(gh_car(sublist));
+		    type->ShadowOffsetX = gh_scm2int(gh_car(gh_car(sublist)));
+		    type->ShadowOffsetY = gh_scm2int(gh_car(gh_cdr(gh_car(sublist))));
 		} else {
 		    errl("Unsupported shadow tag", value);
 		}
