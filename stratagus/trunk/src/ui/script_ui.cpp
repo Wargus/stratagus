@@ -1198,10 +1198,18 @@ local SCM CclDefineButton(SCM list)
     }
     AddButton(ba.Pos,ba.Level,ba.Icon.Name,ba.Action,ba.ValueStr,
 	    ba.Allowed,ba.AllowStr,ba.Key,ba.Hint,ba.UnitMask);
-    free(ba.ValueStr);
-    free(ba.AllowStr);
-    free(ba.Hint);
-    free(ba.UnitMask);
+    if( ba.ValueStr ) {
+	free(ba.ValueStr);
+    }
+    if( ba.AllowStr ) {
+	free(ba.AllowStr);
+    }
+    if( ba.Hint ) {
+        free(ba.Hint);
+    }
+    if( ba.UnitMask ) {
+        free(ba.UnitMask);
+    }
 
     return SCM_UNSPECIFIED;
 }
