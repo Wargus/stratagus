@@ -618,6 +618,7 @@ local void KeyboardEvent(int scancode, int press) {
 	if(HandleKeyDown(icode)) {
 	    return;
 	}
+	// FIXME: Should come first
 	DoButtonPanelKey(icode);
     } else if(press == KEY_EVENTRELEASE) {
 	switch(scancode) {
