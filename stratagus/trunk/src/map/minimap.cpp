@@ -292,7 +292,8 @@ global void DrawMinimap(int vx __attribute__((unused)),
     table = &DestroyedBuildings;
     while( *table ) {
 	SysColors color;
-	if( !BuildingVisibleOnMap( *table ) ) {
+	if( !BuildingVisibleOnMap( *table ) && (*table)->SeenState != 3
+		&& !(*table)->SeenDestroyed ) {
 	    type=(*table)->SeenType;
 	    if( !type ) {
 		table=&(*table)->Next;

@@ -240,7 +240,7 @@ global void ReleaseUnit(Unit* unit)
     IfDebug(
 	DebugLevel2Fn("%lu:No more references %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
-	unit->Type=NULL;			// for debugging.
+	// unit->Type=NULL;			// for debugging.
     );
 }
 
@@ -1120,7 +1120,11 @@ global void UnitsMarkSeen(int x,int y)
 	units[n-1]->SeenType = units[n-1]->Type;
 	units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
 		((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
+	if( units[n-1]->Orders[0].Action==UnitActionDie ) {
+		    units[n-1]->SeenState = 3;
+	}
 	units[n-1]->SeenConstructed = units[n-1]->Constructed;
+	units[n-1]->SeenDestroyed = units[n-1]->Destroyed;
 	--n;
     }
 }
@@ -1148,7 +1152,11 @@ global void UnitMarkSeen(Unit* unit)
 		unit->SeenType = unit->Type;
 		unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
 			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
+		if( unit->Orders[0].Action==UnitActionDie ) {
+		    unit->SeenState = 3;
+		}
 		unit->SeenConstructed = unit->Constructed;
+		unit->SeenDestroyed = unit->Destroyed;
 		x=unit->Type->TileWidth;
 		y=unit->Type->TileHeight;
 	    }
