@@ -1549,7 +1549,7 @@ global void VideoDraw32Unexplored32Solid(const GraphicData* data, int x, int y)
 **		@param y		Y position into video memory
 */
 global void VideoDrawUnexploredSolidOpenGL(
-	const GraphicData* data __attribute__((unused)),
+	const int tile __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
 }
@@ -1562,7 +1562,7 @@ global void VideoDrawUnexploredSolidOpenGL(
 **		@param y		Y position into video memory
 */
 global void VideoDrawFogAlphaOpenGL(
-	const GraphicData* data __attribute__((unused)),
+	const int tile __attribute__((unused)),
 	int x __attribute__((unused)), int y __attribute__((unused)))
 {
 }
@@ -1577,9 +1577,7 @@ global void VideoDrawFogAlphaOpenGL(
 **		@param x		X position into video memory
 **		@param y		Y position into video memory
 */
-global void VideoDrawOnlyFogAlphaOpenGL(
-	const GraphicData* data __attribute__((unused)),
-	int x, int y)
+global void VideoDrawOnlyFogAlphaOpenGL(int x, int y)
 {
 	GLint sx;
 	GLint ex;
@@ -1587,7 +1585,7 @@ global void VideoDrawOnlyFogAlphaOpenGL(
 	GLint ey;
 	Graphic *g;
 
-	g = TheMap.TileData;
+	g = TheMap.TileGraphic;
 	sx = x;
 	ex = sx + TileSizeX;
 	ey = VideoHeight - y;
