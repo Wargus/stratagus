@@ -1079,16 +1079,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		callbacks->SoundReady();
 	    }
 
-#if 0
-	    // ARI: needs network packets!
-	    //
-	    //	No more input and network in sync time for frame over: return
-	    //
-	    if( !morex && NetworkInSync && VideoInterrupts ) {
-		break;
-	    }
-#endif
-
 	    //
 	    //	Network
 	    //
@@ -1101,7 +1091,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Not more input and time for frame over: return
 	//
-	if( !morex && VideoInterrupts ) {
+	if( !morex && maxfd<=0 && VideoInterrupts ) {
 	    break;
 	}
     }
