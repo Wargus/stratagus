@@ -427,7 +427,8 @@ if test "$WIN32" = 0 ; then
   fi
   echo
   echo -n "Please enter selection: "
-  read VIDSEL
+  read -n 1 VIDSEL
+  echo
 fi
 
 else
@@ -534,7 +535,8 @@ fi
 
 echo
 echo -n "Do you want to compile with sound? (y) "
-read ANSWER
+read -n 1 ANSWER
+echo
 case $ANSWER in
   [nN])
 	echo "No sound support"
@@ -554,7 +556,8 @@ case $ANSWER in
 	    echo
 	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
 	    echo -n "do you want to compile with threaded sound? (n) "
-	    read ANSWER2
+	    read -n 1 ANSWER2
+	    echo
 	    case $ANSWER2 in [yY])
 	      echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
 		if [ "`uname -a | grep -is bsd x` " != " x" ] ; then
@@ -568,7 +571,8 @@ case $ANSWER in
 	
 	echo
 	echo -n "Would you like FLAC support? (n) "
-	read ANSWER
+	read -n 1 ANSWER
+	echo
 	case $ANSWER in 
 	    [yY])
 		echo "FLAC		= -DUSE_FLAC" >> $RULESFILE
@@ -580,7 +584,8 @@ case $ANSWER in
 	echo
 	
 	echo -n "Would you like OGG support? (n) "
-	read ANSWER
+	read -n 1 ANSWER
+	echo
 	case $ANSWER in 
 	    [yY])
 		echo "OGG		= -DUSE_OGG" >> $RULESFILE
@@ -592,7 +597,8 @@ case $ANSWER in
 	echo
 	
 	echo -n "Would you like MAD MP3 support? (n) "
-	read ANSWER
+	read -n 1 ANSWER
+	echo
 	case $ANSWER in 
 	    [yY])
 		echo "MAD		= -DUSE_MAD" >> $RULESFILE
@@ -604,7 +610,8 @@ case $ANSWER in
 
 	echo
 	echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
-	read CDMode
+	read -n 1 CDMode
+	echo
 	case $CDMode in
 	    [sS])
 		echo "Using SDL cdrom support"
@@ -687,7 +694,8 @@ if (test "$HAVE_LIBZ" = 1 -o "$HAVE_LIBZ" = 2 && test "$HAVE_LIBBZ2" = 1 && test
 fi
 echo
 echo -n "Please enter selection ($COMPDEF): "
-read COMPOPT
+read -n 1 COMPOPT
+echo
 
 if test "$COMPOPT x" = " x" ; then COMPOPT=$COMPDEF; fi
 
@@ -844,7 +852,8 @@ echo -n "	\$(FLAC) \$(OGG) \$(MAD) " >> $RULESFILE
 
 echo
 echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
-read YESORNO
+read -n 1 YESORNO
+echo
 if [ "$YESORNO" = "Y" -o "$YESORNO" = "y" ] ; then
 echo -n " -DHAVE_EXPANSION" >> $RULESFILE
 fi
@@ -911,7 +920,8 @@ echo
 echo "Done generating $RULESFILE."
 echo
 echo -n "Would you like to compile it now? (y) "
-read ANSWER
+read -n 1 ANSWER
+echo
 
 case $ANSWER in
  [nN])
