@@ -377,6 +377,7 @@ local void PrintHeader(void)
     // vvv---- looks wired, but is needed for GNU brain damage
     fprintf(stdout,"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens and others. (http://FreeCraft.Org)"
     "\n  SIOD Copyright by George J. Carrette."
+    "\n  libmodplug Copyright by Kenton Varda & Olivier Lapique."
 #ifdef USE_SDL
     "\n  SDL Copyright by Sam Lantinga."
 #endif
@@ -388,11 +389,17 @@ local void PrintHeader(void)
 #ifdef DEBUG
     "DEBUG "
 #endif
+#ifdef DEBUG_FLAGS
+    "DEBUG-FLAGS "
+#endif
 #ifdef USE_ZLIB
     "ZLIB "
 #endif
 #ifdef USE_BZ2LIB
     "BZ2LIB "
+#endif
+#ifdef USE_ZZIPLIB
+    "ZZIPLIB "
 #endif
 #ifdef USE_SVGALIB
     "SVGALIB "
@@ -413,6 +420,9 @@ local void PrintHeader(void)
     "\nCompile feature "
 #ifdef UNIT_ON_MAP
     "UNIT-ON-MAP "
+#endif
+#ifdef UNITS_ON_MAP
+    "UNITS-ON-MAP "
 #endif
 #ifdef NEW_MAPDRAW
     "NEW-MAPDRAW "
