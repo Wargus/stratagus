@@ -90,7 +90,7 @@
 
 #endif
 
-#if __GNUC__>=3
+#if __GNUC__>=3 && !defined(__I_KNOW_THAT_GNUC_3_IS_UNSUPPORTED__)
 
 //	It looks that GCC 3.xx is becoming nutty:
 //	__FUNCTION__	can't be concated in the future.
