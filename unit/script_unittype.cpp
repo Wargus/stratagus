@@ -1774,6 +1774,9 @@ void UpdateUnitVariables(const Unit* unit)
 	// Supply
 	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;
 	unit->Variable[SUPPLY_INDEX].Max = unit->Player->Supply;
+	if (unit->Player->Supply < unit->Type->Supply) { // Come with 1st supply building.
+		unit->Variable[SUPPLY_INDEX].Value = unit->Variable[SUPPLY_INDEX].Max;
+	}
 	unit->Variable[SUPPLY_INDEX].Enable = unit->Type->Supply > 0;
 
 	// Demand
