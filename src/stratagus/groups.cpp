@@ -192,7 +192,11 @@ global void AddToGroup(Unit** units, int nunits, int num)
  */
 global void SetGroup(Unit** units, int nunits, int num)
 {
-    DebugCheck(num > NUM_GROUPS || nunits > NumUnitsPerGroup);
+    DebugCheck(num > NUM_GROUPS);
+
+    if (nunits > NumUnitsPerGroup) {
+	nunits = NumUnitsPerGroup;
+    }
 
     ClearGroup(num);
     AddToGroup(units, nunits, num);
