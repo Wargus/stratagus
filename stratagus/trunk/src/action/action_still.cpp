@@ -67,7 +67,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 	// If unit is not bunkered and removed, wait
 	//
 	if (unit->Removed && (!unit->Container ||
-			!unit->Container->Type->Transporter ||
+			!unit->Container->Type->CanTransport ||
 			!unit->Container->Type->AttackFromTransporter ||
 			unit->Type->Missile.Missile->Class == MissileClassNone)) {
 		// If peon is in building or unit is in transporter it is removed.

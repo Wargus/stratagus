@@ -347,7 +347,7 @@ static void DrawUnitInfo(const Unit* unit)
 	//
 	//  Draw unit kills and experience.
 	//
-	if (stats->Level && !(type->Transporter && unit->BoardCount)) {
+	if (stats->Level && !(type->CanTransport && unit->BoardCount)) {
 		sprintf(buf, "XP:~<%d~> Kills:~<%d~>", unit->XP, unit->Kills);
 		VideoDrawTextCentered(x + 114, y + 8 + 15 + 33, GameFont, buf);
 	}
@@ -462,7 +462,7 @@ static void DrawUnitInfo(const Unit* unit)
 	//
 	//  Transporting units.
 	//
-	if (type->Transporter && unit->BoardCount) {
+	if (type->CanTransport && unit->BoardCount) {
 		int j;
 
 		if (TheUI.TransportingText) {

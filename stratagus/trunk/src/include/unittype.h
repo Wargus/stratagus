@@ -698,6 +698,7 @@ struct _unit_type_ {
 	int AutoBuildRate;              ///< The rate at which the building builds itself
 	int RandomMovementProbability;  ///< Probability to move randomly.
 	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
+	char* CanTransport;             ///< Can transport units with this flag.
 	int MaxOnBoard;                 ///< Number of Transporter slots.
 	int StartingResources;          ///< Amount of Resources on build
 	/// @note original only visual effect, we do more with this!
@@ -733,7 +734,6 @@ struct _unit_type_ {
 	unsigned PermanentCloak : 1;    ///< Is only visible by CloakDetectors.
 	unsigned DetectCloak : 1;       ///< Can see Cloaked units.
 	unsigned Coward : 1;            ///< Unit will only attack if instructed.
-	unsigned Transporter : 1;       ///< Can transport units
 	unsigned AttackFromTransporter : 1;  ///< Can attack from transporter
 	unsigned Vanishes : 1;          ///< Corpes & destroyed places.
 	unsigned GroundAttack : 1;      ///< Can do command ground attack.

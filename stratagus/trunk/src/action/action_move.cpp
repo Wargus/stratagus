@@ -116,7 +116,7 @@ static int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		// Transporter (un)docking?
 		//
 		// FIXME: This is an ugly hack
-		if (unit->Type->Transporter &&
+		if (unit->Type->CanTransport &&
 				((WaterOnMap(unit->X, unit->Y) &&
 					CoastOnMap(unit->X + xd, unit->Y + yd)) ||
 				(CoastOnMap(unit->X, unit->Y) &&

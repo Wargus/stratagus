@@ -983,7 +983,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//
 			// Transporter with units on board.
 			//
-			} else if (unit->Type->Transporter) {
+			} else if (unit->Type->CanTransport) {
 				DrawManaBar(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
 			}
 		}
@@ -1051,7 +1051,7 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//
 			// Transporter with units on board.
 			//
-			} else if (unit->Type->Transporter) {
+			} else if (unit->Type->CanTransport) {
 				DrawManaSprite(x, y, type, unit->Type->MaxOnBoard, unit->BoardCount);
 			}
 		}

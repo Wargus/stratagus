@@ -503,6 +503,8 @@ int AiFindWall(AiForce* force)
 **
 **  @todo         Perfect planning.
 **                Only works for water transporter!
+**  @fixme transporter are more selective now (flag with unittypeland).
+**         We must manage it.
 */
 int AiPlanAttack(AiForce* force)
 {
@@ -526,7 +528,7 @@ int AiPlanAttack(AiForce* force)
 	aiunit = force->Units;
 	state = 1;
 	while (aiunit) {
-		if (aiunit->Unit->Type->Transporter) {
+		if (aiunit->Unit->Type->CanTransport) {
 			DebugPrint("Transporter #%d\n" _C_ UnitNumber(aiunit->Unit));
 			AiMarkWaterTransporter(aiunit->Unit, watermatrix);
 			state = 0;
@@ -543,7 +545,7 @@ int AiPlanAttack(AiForce* force)
 			Unit* unit;
 
 			unit = AiPlayer->Player->Units[i];
-			if (unit->Type->Transporter && UnitIdle(unit)) {
+			if (unit->Type->CanTransport && UnitIdle(unit)) {
 				DebugPrint("Assign any transporter\n");
 				AiMarkWaterTransporter(unit, watermatrix);
 				// FIXME: can be the wrong transporter.

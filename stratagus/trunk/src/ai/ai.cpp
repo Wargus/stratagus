@@ -1489,7 +1489,7 @@ static int FindTransporterOnZone(int waterzone, ZoneSet* destzones,
 		if (UnitUnusable(unit)) {
 			continue;
 		}
-		if ((unsigned)unit->Type->UnitType != unitType || !unit->Type->Transporter) {
+		if ((unsigned)unit->Type->UnitType != unitType || !unit->Type->CanTransport) {
 			continue;
 		}
 

@@ -874,10 +874,13 @@ extern int ViewPointDistanceToUnit(const Unit* dest);
 	((player)->Allied & (1 << (dest)->Player->Player))
 	/// Return true, if unit is shared vision with the player
 #define IsSharedVision(player, dest) \
-	(( (player)->SharedVision & (1 << (dest)->Player->Player) ) && \
-	( (dest)->Player->SharedVision & (1 << (player)->Player)))
+	(((player)->SharedVision & (1 << (dest)->Player->Player)) && \
+		((dest)->Player->SharedVision & (1 << (player)->Player)))
 	/// Can this unit-type attack the other (destination)
 extern int CanTarget(const UnitType* type,const UnitType* dest);
+	/// Can transporter transport the other unit
+extern int CanTransport(const Unit* transporter,const Unit* unit);
+
 
 	/// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
