@@ -39,7 +39,9 @@ typedef struct _player_ Player;		// recursive includes :(
 
 typedef struct _unit_ Unit;		/// unit itself
 typedef enum _unit_action_ UnitAction;	/// all possible unit actions
+#ifndef NEW_ORDERS
 typedef struct _command_ Command;	/// unit command
+#endif
 
 /**
 **	Unit references over network, or for memory saving.
@@ -84,6 +86,25 @@ enum _unit_action_ {
     UnitActionDemolish,			/// unit demolish at position/unit
 };
 
+#ifdef NEW_ORDERS
+/**
+**	Unit order structure.
+*/
+typedef struct _order_ {
+    UnitAction		Action : 8;	/// global action
+    unsigned char	Flags;		/// Order flags (unused)
+    unsigned char	RangeX;		/// How near in X direction
+    unsigned char	RangeY;		/// How near in Y direction
+
+    Unit*		Goal;		/// goal of the order (if any)
+    int			X;		/// or X tile coordinate of destination
+    int			Y;		/// or Y tile coordinate of destination
+    UnitType*		Type;		/// Unit-type argument
+
+    void*		Arg1;		/// Extra command argument
+} Order;
+
+#else
 /**
 **	Unit command data structure.
 */
@@ -151,6 +172,7 @@ struct _command_ {
 	} OilWell;			/// oil-well
     } Data;				/// data for action
 };
+#endif
 
 /**
 **	Voice groups for an unit
@@ -192,7 +214,7 @@ enum _directions_ {
 /**
 **	The big unit structure.
 **
-**	Everything belonging to an unit. FIXME: rearrange vor less memory.
+**	Everything belonging to an unit. FIXME: rearrange for less memory.
 */
 struct _unit_ {
     // int is faster than shorts.
@@ -200,7 +222,7 @@ struct _unit_ {
     unsigned	Slot;			/// Assignd slot number
     Unit**	UnitSlot;		/// slot pointer of Units
     Unit**	PlayerSlot;		/// slot pointer of Player->Units
-    Unit*	Next;			/// generic link pointer
+    Unit*	Next;			/// generic link pointer (on map)
 
     int		X;			/// Map position X
     int		Y;			/// Map position Y
@@ -237,6 +259,8 @@ struct _unit_ {
 
     unsigned	GroupId;		/// unit belongs to this group id
 
+    unsigned	Value;			/// value used for much
+
     unsigned	SubAction : 8;		/// sub-action of unit
     unsigned	Wait : 8;		/// action counter
 #define MAX_UNIT_WAIT	255		/// biggest number in action counter
@@ -250,23 +274,39 @@ struct _unit_ {
 					*/
     unsigned 	Rs : 8;
 
-    unsigned	Value;			/// value used for much
-    unsigned	WoodToHarvest;
 #define MAX_UNITS_ONBOARD 6		/// max number of units in transporter
     // FIXME: use the new next pointer
     Unit*	OnBoard[MAX_UNITS_ONBOARD];	/// Units in transporter
 
-#if 0
-    // FIXME: not used
-    union _command_data_ {
-	struct _command_move_ {
-#define MAX_PATH_LENGTH	15		/// max length of precalculated path
-	    unsigned char Length;	/// stored path length
-					/// stored path directions
-	    unsigned char Path[MAX_PATH_LENGTH];
-	}	Move;			/// for command move
+#ifdef NEW_ORDERS	//---------------------------------------------
+
+#define MAX_ORDERS 16			/// How many outstanding orders?
+    char	OrderCount;		/// how many orders in queue
+    char	OrderFlush;		/// cancel current order, take next
+    Order	Orders[MAX_ORDERS];	/// orders to process
+    Order	SavedOrder;		/// order to continue after current
+    Order	NewOrder;		/// order for new trained units.
+
+    union _order_data_ {
+    struct _order_move_ {
+	char	Fast;			/// Flag fast move (one step)
+	char	Length;			/// stored path length
+#define MAX_PATH_LENGTH	14		/// max length of precalculated path
+	char	Path[MAX_PATH_LENGTH];	/// directions of stored path
+    }		Move;			/// ActionMove,...
+    struct _order_builded_ {
+	Unit*	Worker;			/// Worker building this unit.
+	int	Sum;			/// HP for building
+	int	Add;
+	int	Val;			/// Counter
+	int	Sub;
+	int	Cancel;			/// Cancel construction
+    }		Builded;		/// ActionBuilded,...
     }		Data;			/// Storage room for different commands
-#endif
+
+#else			//---------------------------------------------
+
+    unsigned	WoodToHarvest;		/// Ticks for harvest
 
 #define MAX_COMMANDS 16			/// max number of outstanding commands
 //	NEW-ACTIONS:
@@ -276,6 +316,7 @@ struct _unit_ {
     char	NextCount;		/// how many commands are in the queue
     char	NextFlush;	/// true: cancel command and proceed to next one
     Command	PendCommand;		/// pending commands
+#endif			//---------------------------------------------
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
@@ -291,12 +332,21 @@ struct _unit_ {
 */
 #define MAX_UNIT_SLOTS	65535
 
+#ifdef NEW_ORDERS
+/**
+**	Returns true, if unit is unusable. (for attacking,...)
+*/
+#define UnitUnusable(unit) \
+    ( (unit)->Removed || (unit)->Orders[0].Action==UnitActionDie || \
+      (unit)->Orders[0].Action==UnitActionBuilded)
+#else
 /**
 **	Returns true, if unit is unusable. (for attacking,...)
 */
 #define UnitUnusable(unit) \
     ( (unit)->Removed || (unit)->Command.Action==UnitActionDie || \
       (unit)->Command.Action==UnitActionBuilded)
+#endif
 
 /**
 **	Returns unit number (unique to this unit)
