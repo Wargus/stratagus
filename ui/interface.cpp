@@ -879,7 +879,7 @@ global void HandleButtonUp(unsigned button)
 --	Lowlevel input functions
 ----------------------------------------------------------------------------*/
 
-global int DoubleClickDelay=250;	/// Time to detect double clicks.
+global int DoubleClickDelay=300;	/// Time to detect double clicks.
 global int HoldClickDelay=1000;		/// Time to detect hold clicks.
 
 local enum {
