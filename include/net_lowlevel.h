@@ -52,7 +52,7 @@
 #endif
 
 #include <windows.h>
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__CYGWIN__)
 #include <winsock.h>
 #endif
 
