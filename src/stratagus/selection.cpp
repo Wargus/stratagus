@@ -473,7 +473,7 @@ local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 }
 
 /**
- **     Add the units in the rectangle to the current selection
+ **	Add the units in the rectangle to the current selection
  **
  **	@param x0	X start of selection rectangle in tile coordinates
  **	@param y0	Y start of selection rectangle in tile coordinates
@@ -493,6 +493,15 @@ global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
         return SelectUnitsInRectangle(x0, y0, x1, y1);
     }
 
+    //  Check if the original selected unit (if it's alone) is ours,
+    //  and can be selectable by rectangle.
+    //  In this case, do nothing.
+    if( NumSelected == 1 &&
+        ( Selected[0]->Player!=ThisPlayer ||
+            !Selected[0]->Type->SelectableByRectangle )) {
+        return NumSelected;
+    }
+
     //  If no unit in rectangle area... do nothing
     toggle_num=SelectUnits((x0/TileSizeX)-2, (y0/TileSizeY)-2,
 	(x1/TileSizeX)+2+1, (y1/TileSizeX)+2+1, table);
@@ -501,15 +510,6 @@ global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
     }
     toggle_num=SelectSpritesInsideRectangle (x0, y0, x1, y1, table, toggle_num);
     if( !toggle_num ) {
-        return NumSelected;
-    }
-
-    //  Check if the original selected unit (if it's alone) is ours,
-    //  and can be selectable by rectangle.
-    //  In this case, do nothing.
-    if( NumSelected == 1 &&
-        ( Selected[0]->Player!=ThisPlayer ||
-            !Selected[0]->Type->SelectableByRectangle )) {
         return NumSelected;
     }
 
@@ -526,18 +526,20 @@ global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
 }
 
 /**
- **	Select units in a rectangle. Proceed in order in none found:
- **	  - select local player mobile units
- **	  - select one local player static unit (random)
- **	  - select one neutral unit (critter, mine...)
- **	  - select one enemy unit (random)
- **
- **	@param sx0	X start of selection rectangle in tile coordinates
- **	@param sy0	Y start of selection rectangle in tile coordinates
- **	@param sx1	X start of selection rectangle in tile coordinates
- **	@param sy1	Y start of selection rectangle in tile coordinates
- **	@return		the number of units found.
- */
+**	Select units in a rectangle.
+**	Proceed in order in none found:
+**	  @li select local player mobile units
+**	  @li select one local player static unit (random)
+**	  @li select one neutral unit (critter, mine...)
+**	  @li select one enemy unit (random)
+**
+**	@param sx0	X start of selection rectangle in tile coordinates
+**	@param sy0	Y start of selection rectangle in tile coordinates
+**	@param sx1	X start of selection rectangle in tile coordinates
+**	@param sy1	Y start of selection rectangle in tile coordinates
+**
+**	@return		the number of units found.
+*/
 global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 {
     Unit* unit;
@@ -622,6 +624,250 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     }
 
     return 0;
+}
+
+/**
+**	Select own ground units in a rectangle.
+**
+**	@param sx0	X start of selection rectangle in tile coordinates
+**	@param sy0	Y start of selection rectangle in tile coordinates
+**	@param sx1	X start of selection rectangle in tile coordinates
+**	@param sy1	Y start of selection rectangle in tile coordinates
+**
+**	@return		the number of units found.
+*/
+global int SelectGroundUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+{
+    Unit* unit;
+    Unit* table[UnitMax];
+    int r;
+    int n;
+    int i;
+    int tx0;
+    int ty0;
+    int tx1;
+    int ty1;
+
+    tx0 = sx0 / TileSizeX;
+    ty0 = sy0 / TileSizeY;
+    tx1 = sx1 / TileSizeX;
+    ty1 = sy1 / TileSizeY;
+
+    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
+    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+
+    for( n=i=0; i<r; i++ ) {
+	unit=table[i];
+	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+	    continue;
+	}
+	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	    continue;
+	}
+	if( unit->Type->UnitType==UnitTypeFly ) {
+	    continue;
+	}
+	table[n++]=unit;
+	if( n==MaxSelectable ) {
+	    break;
+	}
+    }
+    if( n ) {
+        ChangeSelectedUnits(table,n);
+    }
+    return n;
+}
+
+/**
+**	Select own air units in a rectangle.
+**
+**	@param sx0	X start of selection rectangle in tile coordinates
+**	@param sy0	Y start of selection rectangle in tile coordinates
+**	@param sx1	X start of selection rectangle in tile coordinates
+**	@param sy1	Y start of selection rectangle in tile coordinates
+**
+**	@return		the number of units found.
+*/
+global int SelectAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+{
+    Unit* unit;
+    Unit* table[UnitMax];
+    int r;
+    int n;
+    int i;
+    int tx0;
+    int ty0;
+    int tx1;
+    int ty1;
+
+    tx0 = sx0 / TileSizeX;
+    ty0 = sy0 / TileSizeY;
+    tx1 = sx1 / TileSizeX;
+    ty1 = sy1 / TileSizeY;
+
+    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
+    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+
+    for( n=i=0; i<r; i++ ) {
+	unit=table[i];
+	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+	    continue;
+	}
+	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	    continue;
+	}
+	if( unit->Type->UnitType!=UnitTypeFly ) {
+	    continue;
+	}
+	table[n++]=unit;
+	if( n==MaxSelectable ) {
+	    break;
+	}
+    }
+    if( n ) {
+        ChangeSelectedUnits(table,n);
+    }
+    return n;
+}
+
+/**
+**	Add the ground units in the rectangle to the current selection
+**
+**	@param sx0	X start of selection rectangle in tile coordinates
+**	@param sy0	Y start of selection rectangle in tile coordinates
+**	@param sx1	X start of selection rectangle in tile coordinates
+**	@param sy1	Y start of selection rectangle in tile coordinates
+**
+**	@return		the number of units found.
+*/
+global int AddSelectedGroundUnitsInRectangle (int sx0, int sy0, int sx1,int sy1)
+{
+    Unit* unit;
+    Unit* table[UnitMax];
+    int r;
+    int n;
+    int i;
+    int tx0;
+    int ty0;
+    int tx1;
+    int ty1;
+
+    //  If there is no selected unit yet, do a simple selection.
+    if( !NumSelected ) {
+        return SelectGroundUnitsInRectangle(sx0, sy0, sx1, sy1);
+    }
+
+    //  Check if the original selected unit (if it's alone) is ours,
+    //  and can be selectable by rectangle.
+    //  In this case, do nothing.
+    if( NumSelected == 1 &&
+        ( Selected[0]->Player!=ThisPlayer ||
+            !Selected[0]->Type->SelectableByRectangle )) {
+        return NumSelected;
+    }
+
+    tx0 = sx0 / TileSizeX;
+    ty0 = sy0 / TileSizeY;
+    tx1 = sx1 / TileSizeX;
+    ty1 = sy1 / TileSizeY;
+
+    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
+    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+
+    for( n=i=0; i<r; i++ ) {
+	unit=table[i];
+	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+	    continue;
+	}
+	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	    continue;
+	}
+	if( unit->Type->UnitType==UnitTypeFly ) {
+	    continue;
+	}
+	table[n++]=unit;
+	if( n==MaxSelectable ) {
+	    break;
+	}
+    }
+
+    //
+    //	Add the units to selected.
+    //
+    for( i=0; i<n && NumSelected<MaxSelectable; i++ ) {
+        SelectUnit(table[i]);
+    }
+    return NumSelected;
+}
+
+/**
+**	Add the air units in the rectangle to the current selection
+**
+**	@param sx0	X start of selection rectangle in tile coordinates
+**	@param sy0	Y start of selection rectangle in tile coordinates
+**	@param sx1	X start of selection rectangle in tile coordinates
+**	@param sy1	Y start of selection rectangle in tile coordinates
+**
+**	@return		the number of units found.
+*/
+global int AddSelectedAirUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
+{
+    Unit* unit;
+    Unit* table[UnitMax];
+    int r;
+    int n;
+    int i;
+    int tx0;
+    int ty0;
+    int tx1;
+    int ty1;
+
+    //  If there is no selected unit yet, do a simple selection.
+    if( !NumSelected ) {
+        return SelectAirUnitsInRectangle(sx0, sy0, sx1, sy1);
+    }
+
+    //  Check if the original selected unit (if it's alone) is ours,
+    //  and can be selectable by rectangle.
+    //  In this case, do nothing.
+    if( NumSelected == 1 &&
+        ( Selected[0]->Player!=ThisPlayer ||
+            !Selected[0]->Type->SelectableByRectangle )) {
+        return NumSelected;
+    }
+
+    tx0 = sx0 / TileSizeX;
+    ty0 = sy0 / TileSizeY;
+    tx1 = sx1 / TileSizeX;
+    ty1 = sy1 / TileSizeY;
+
+    r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
+    r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
+
+    for( n=i=0; i<r; i++ ) {
+	unit=table[i];
+	if( unit->Player!=ThisPlayer || !unit->Type->SelectableByRectangle ) {
+	    continue;
+	}
+	if( UnitUnusable(unit) ) {  // guess SelectUnits doesn't check this
+	    continue;
+	}
+	if( unit->Type->UnitType!=UnitTypeFly ) {
+	    continue;
+	}
+	table[n++]=unit;
+	if( n==MaxSelectable ) {
+	    break;
+	}
+    }
+
+    //
+    //	Add the units to selected.
+    //
+    for( i=0; i<n && NumSelected<MaxSelectable; i++ ) {
+        SelectUnit(table[i]);
+    }
+    return NumSelected;
 }
 
 /**

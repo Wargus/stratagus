@@ -658,8 +658,9 @@ local int CommandKey(int key)
 	    GameRunning=0;
 	    break;
 
+	case '.':
 	case 'i':
-	case 'I':			// ALT+I, CTRL+I: Find idle worker
+	case 'I':			// ., ALT+I, CTRL+I: Find idle worker
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
