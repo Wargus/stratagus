@@ -268,14 +268,6 @@ global int SpeedResearch = 1;               /// speed factor for researching
 ==  DISPLAY
 ============================================================================*/
 
-// FIXME: move to video header file
-global int VideoWidth;                      /// Window width in pixels
-global int VideoHeight;                     /// Window height in pixels
-
-global unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
-global unsigned long FrameCounter;          /// Current frame number
-global int SlowFrameCounter;                /// Profile, frames out of sync
-
 // FIXME: not the correct place
 global int MustRedraw = RedrawEverything;   /// Redraw flags
 global int EnableRedraw = RedrawEverything; /// Enable flags

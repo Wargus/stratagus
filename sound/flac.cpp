@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name flac.c			-	flac support */
+/**@name flac.c - flac support */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//      (c) Copyright 2002-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -48,11 +48,11 @@
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
---		Declaration
+--  Declaration
 ----------------------------------------------------------------------------*/
 
 /**
-**	  Private flac data structure to handle flac streaming.
+**  Private flac data structure to handle flac streaming.
 */
 typedef struct _flac_data_ {
 	CLFile* FlacFile;			/// File handle
@@ -67,15 +67,15 @@ typedef struct _flac_data_ {
 local const SampleType FlacSampleType;
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**		Read callback from FLAC stream decoder.
+**  Read callback from FLAC stream decoder.
 **
-**		@param stream		Decoder stream.
-**		@param status		Error state.
-**		@param user		User data.
+**  @param stream  Decoder stream.
+**  @param status  Error state.
+**  @param user    User data.
 */
 local void FLAC_error_callback(const FLAC__StreamDecoder* stream,
 	FLAC__StreamDecoderErrorStatus status, void* user)
@@ -84,14 +84,14 @@ local void FLAC_error_callback(const FLAC__StreamDecoder* stream,
 }
 
 /**
-**		Read callback from FLAC stream decoder.
+**  Read callback from FLAC stream decoder.
 **
-**		@param stream		Decoder stream.
-**		@param buffer		Buffer to be filled.
-**		@param bytes		Number of bytes to be filled.
-**		@param user		User data.
+**  @param stream  Decoder stream.
+**  @param buffer  Buffer to be filled.
+**  @param bytes   Number of bytes to be filled.
+**  @param user    User data.
 **
-**		@return			Error status.
+**  @return        Error status.
 */
 local FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	const FLAC__StreamDecoder * stream,
@@ -116,11 +116,11 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
 }
 
 /**
-**		Write callback from FLAC stream decoder.
+**  Write callback from FLAC stream decoder.
 **
-**		@param stream		Decoder stream.
-**		@param metadata		metadata block
-**		@param user		User data.
+**  @param stream    Decoder stream.
+**  @param metadata  metadata block
+**  @param user      User data.
 */
 local void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 	const FLAC__StreamMetadata* metadata, void *user)
@@ -140,14 +140,14 @@ local void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 }
 
 /**
-**		Write callback from FLAC stream decoder.
+**  Write callback from FLAC stream decoder.
 **
-**		@param stream		Decoder stream.
-**		@param frame		Frame to decode.
-**		@param buffer		Buffer to be filled.
-**		@param user		User data.
+**  @param stream  Decoder stream.
+**  @param frame   Frame to decode.
+**  @param buffer  Buffer to be filled.
+**  @param user    User data.
 **
-**		@return			Error status.
+**  @return        Error status.
 */
 local FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	const FLAC__StreamDecoder* stream,
@@ -223,13 +223,13 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 }
 
 /**
-**		Type member function to read from the flac file
+**  Type member function to read from the flac file
 **
-**		@param sample		Sample reading from
-**		@param buf		Buffer to write data to
-**		@param len		Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return			Number of bytes read
+**  @return        Number of bytes read
 */
 local int FlacRead(Sample* sample, void* buf, int len)
 {
@@ -251,9 +251,9 @@ local int FlacRead(Sample* sample, void* buf, int len)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 /**
-**		Type member function to free an flac file
+**  Type member function to free an flac file
 **
-**		@param sample		Sample to free
+**  @param sample  Sample to free
 */
 local void FlacFree(Sample* sample)
 {
@@ -266,7 +266,7 @@ local void FlacFree(Sample* sample)
 }
 
 /**
-**		Flac object type structure.
+**  Flac object type structure.
 */
 local const SampleType FlacSampleType = {
 	FlacRead,
@@ -274,13 +274,13 @@ local const SampleType FlacSampleType = {
 };
 
 /**
-**		Type member function to read from the flac file
+**  Type member function to read from the flac file
 **
-**		@param sample		Sample reading from
-**		@param buf		Buffer to write data to
-**		@param len		Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return			Number of bytes read
+**  @return        Number of bytes read
 */
 local int FlacStreamRead(Sample* sample, void* buf, int len)
 {
@@ -304,8 +304,7 @@ local int FlacStreamRead(Sample* sample, void* buf, int len)
 	}
 
 	while (sample->Len < SOUND_BUFFER_SIZE / 4 &&
-			FLAC__stream_decoder_get_state(data->Stream)
-			!= FLAC__STREAM_DECODER_END_OF_STREAM) {
+			FLAC__stream_decoder_get_state(data->Stream) != FLAC__STREAM_DECODER_END_OF_STREAM) {
 		// need to read new data
 		FLAC__stream_decoder_process_single(data->Stream);
 	}
@@ -325,9 +324,9 @@ local int FlacStreamRead(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free an flac file
+**  Type member function to free an flac file
 **
-**		@param sample		Sample to free
+**  @param sample  Sample to free
 */
 local void FlacStreamFree(Sample* sample)
 {
@@ -346,7 +345,7 @@ local void FlacStreamFree(Sample* sample)
 }
 
 /**
-**		Flac stream type structure.
+**  Flac stream type structure.
 */
 local const SampleType FlacStreamSampleType = {
 	FlacStreamRead,
@@ -354,12 +353,12 @@ local const SampleType FlacStreamSampleType = {
 };
 
 /**
-**		Load flac.
+**  Load flac.
 **
-**		@param name		File name.
-**		@param flags		Load flags.
+**  @param name   File name.
+**  @param flags  Load flags.
 **
-**		@return			Returns the loaded sample.
+**  @return       Returns the loaded sample.
 */
 global Sample* LoadFlac(const char* name, int flags)
 {
@@ -428,6 +427,6 @@ global Sample* LoadFlac(const char* name, int flags)
 	return sample;
 }
 
-#endif		// USE_FLAC
+#endif  // USE_FLAC
 
 //@}
