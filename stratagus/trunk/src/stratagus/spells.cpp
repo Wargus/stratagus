@@ -714,18 +714,22 @@ int CastSummon(Unit* caster, const SpellType* spell,
 		// FIXME: do summoned units count on food?
 		//
 		target = MakeUnit(unittype, caster->Player);
-		// This is a hack to walk around behaviour of DropOutOnSide
-		target->X = x + 1;
-		target->Y = y;
-		DropOutOnSide(target, LookingW, 0, 0); // FIXME : 0,0) : good parameter ?
-		//
-		//  set life span. ttl=0 results in a permanent unit.
-		//
-		if (ttl) {
-			target->TTL = GameCycle + ttl;
-		}
+		if (target != NoUnitP) {
+			// This is a hack to walk around behaviour of DropOutOnSide
+			target->X = x + 1;
+			target->Y = y;
+			DropOutOnSide(target, LookingW, 0, 0); // FIXME : 0,0) : good parameter ?
+			//
+			//  set life span. ttl=0 results in a permanent unit.
+			//
+			if (ttl) {
+				target->TTL = GameCycle + ttl;
+			}
 
-		caster->Mana -= spell->ManaCost;
+			caster->Mana -= spell->ManaCost;
+		} else {
+			DebugPrint("Unable to allocate Unit");
+		}
 		return 1;
 	}
 	return 0;

@@ -1264,7 +1264,7 @@ pawn:
 						if (Players[o].Type != PlayerNobody) {
 							unit=MakeUnitAndPlace(x, y
 									,UnitTypeByWcNum(t),&Players[o]);
-							if( unit->Type->GivesResource ) {
+							if( unit != NoUnitP && unit->Type->GivesResource ) {
 								if (!v) {
 									DebugPrint("empty resource IN PUD.\n");
 									v = 10;

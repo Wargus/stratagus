@@ -323,13 +323,18 @@ static int CclShowMapLocation(lua_State* l)
 	}
 	unitname = LuaToString(l, 5);
 	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
-	target->Orders[0].Action = UnitActionStill;
-	target->HP = 0;
-	target->X = LuaToNumber(l, 1);
-	target->Y = LuaToNumber(l, 2);
-	target->TTL = GameCycle + LuaToNumber(l, 4);
-	target->CurrentSightRange = LuaToNumber(l, 3);
-	MapMarkUnitSight(target);
+	if (target != NoUnitP) {
+		target->Orders[0].Action = UnitActionStill;
+		target->HP = 0;
+		target->X = LuaToNumber(l, 1);
+		target->Y = LuaToNumber(l, 2);
+		target->TTL = GameCycle + LuaToNumber(l, 4);
+		target->CurrentSightRange = LuaToNumber(l, 3);
+		MapMarkUnitSight(target);
+	} else {
+		DebugPrint("Unable to allocate Unit");
+	}
+
 	return 0;
 }
 

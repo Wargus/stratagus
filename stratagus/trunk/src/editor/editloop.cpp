@@ -291,8 +291,12 @@ static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
-	if (type->GivesResource) {
-		unit->ResourcesHeld = DefaultResourceAmounts[type->GivesResource];
+	if (unit != NoUnitP) {
+		if (type->GivesResource) {
+			unit->ResourcesHeld = DefaultResourceAmounts[type->GivesResource];
+		}
+	} else {
+		DebugPrint("Unable to allocate Unit");
 	}
 }
 
