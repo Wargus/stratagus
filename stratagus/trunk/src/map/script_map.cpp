@@ -402,6 +402,29 @@ local SCM CclSetForestRegeneration(SCM speed)
 }
 
 /**
+**	Set gold-mine depleted rate.
+**
+**	@param speed	New depleted rate (0 disabled)
+**
+**	@return		Old rate
+*/
+local SCM CclSetGoldmineDepleted(SCM rate)
+{
+    int i;
+    int o;
+
+    i=gh_scm2int(rate);
+    if( i<0 || i>100 ) {
+	fprintf(stderr,__FUNCTION__": deplated rate should be 0-100\n");
+	i=0;
+    }
+    o=OptionUseDepletedMines;
+    OptionUseDepletedMines=i;
+
+    return gh_int2scm(o);
+}
+
+/**
 **	Register CCL features for map.
 */
 global void MapCclRegister(void)
@@ -420,6 +443,7 @@ global void MapCclRegister(void)
     gh_new_procedure1_0("set-fog-of-war-saturation!",CclSetFogOfWarSaturation);
 
     gh_new_procedure1_0("set-forest-regeneration!",CclSetForestRegeneration);
+    gh_new_procedure1_0("set-goldmine-depleted!",CclSetGoldmineDepleted);
 }
 
 //@}
