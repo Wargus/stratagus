@@ -209,7 +209,8 @@ global void HandleActionBuilded(Unit* unit)
 	DropOutOnSide(peon,LookingW,type->TileWidth,type->TileHeight);
 
 	// Player gets back 75% of the original cost for a building.
-	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,75);
+	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
+		CancelBuildingCostsFactor);
 	// Cancel building
 	DestroyUnit(unit);
 	return;
