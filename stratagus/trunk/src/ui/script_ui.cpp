@@ -396,16 +396,24 @@ static int CclDisplayPicture(lua_State* l)
 */
 static int CclProcessMenu(lua_State* l)
 {
-	char* mid;
+	int args;
+	int loop;
+	const char* mid;
 
-	if (lua_gettop(l) != 1) {
+	args = lua_gettop(l);
+	if (args != 1 && args != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	mid = strdup(LuaToString(l, 1));
-	if (FindMenu(mid)) {
-		ProcessMenu(mid, 1);
+	mid = LuaToString(l, 1);
+	if (args == 2) {
+		loop = LuaToNumber(l, 2);
+	} else {
+		loop = 0;
 	}
-	free(mid);
+
+	if (FindMenu(mid)) {
+		ProcessMenu(mid, loop);
+	}
 
 	return 0;
 }
