@@ -186,6 +186,9 @@ local int MineInGoldmine(Unit* unit)
 	    mine=NULL;
 	}
 
+	//	Store gold mine position
+	unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
+
 	//
 	//	Find gold depot
 	//
@@ -367,6 +370,8 @@ local int StoreGoldInDeposit(Unit* unit)
 {
     Unit* destu;
     Unit* depot;
+    int x;
+    int y;
 
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
@@ -374,9 +379,16 @@ local int StoreGoldInDeposit(Unit* unit)
 	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 
-	// FIXME: return to last position!
 	// FIXME: Ari says, don't automatic search a new mine.
-	if( !(destu=FindGoldMine(unit,unit->X,unit->Y)) ) {
+	// Return to last position
+	if( unit->Orders[0].Arg1==(void*)-1 ) {
+	    x=unit->X;
+	    y=unit->Y;
+	} else {
+	    x=(int)unit->Orders[0].Arg1>>16;
+	    y=(int)unit->Orders[0].Arg1&0xFFFF;
+	}
+	if( !(destu=FindGoldMine(unit,x,y)) ) {
 	    DropOutOnSide(unit,LookingW
 		    ,depot->Type->TileWidth,depot->Type->TileHeight);
 	    unit->Orders[0].Action=UnitActionStill;
