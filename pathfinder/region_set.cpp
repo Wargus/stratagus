@@ -160,7 +160,8 @@ local void RegionSetCreateNeighborLists (int x0, int y0, int x1, int y1)
 				if (Neighbor.Y < 0 || Neighbor.Y >= TheMap.Height)
 					continue;
 
-				if ((nregid = MapFieldGetRegId (Neighbor.X, Neighbor.Y))) {
+				nregid = MapFieldGetRegId (Neighbor.X, Neighbor.Y);
+				if (nregid && nregid != regid) {
 					Region *nreg = RegionSetFind (nregid);
 
 					if ( !RegionIsNeighbor (reg, nreg)) {
