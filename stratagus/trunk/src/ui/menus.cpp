@@ -782,7 +782,7 @@ local Menuitem CDRomDisabledMenuItems[] = {
 local Menuitem SoundOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+	{ text:{ "Sound Options", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -797,7 +797,7 @@ local Menuitem SoundOptionsMenuItems[] = {
 local Menuitem PreferencesMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
+	{ text:{ "Preferences", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
@@ -1055,7 +1055,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	2, 4,
+	5, 5,
 	SpeedSettingsMenuItems,
 	NULL,
     },
@@ -1597,7 +1597,6 @@ local void GameMenuLoad(void)
 
 local void SoundOptions(void)
 {
-    // TODO
 #if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
     SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #else
