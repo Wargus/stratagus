@@ -247,16 +247,15 @@ local SCM CclStratagusMap(SCM list)
 
 /**
 **	Reveal the complete map.
-**	FIXME: only functional in init file!
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRevealMap(void)
 {
-    if (!CclInConfigFile) {
-	PrintFunction();
-	fprintf(stdout, "Only supported within config file\n");
+    if (CclInConfigFile) {
+	FlagRevealMap = 1;
+    } else {
+	RevealMap();
     }
-    FlagRevealMap = 1;
 
     return SCM_UNSPECIFIED;
 }
@@ -267,11 +266,11 @@ local int CclRevealMap(lua_State* l)
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    if (!CclInConfigFile) {
-	PrintFunction();
-	fprintf(stdout, "Only supported within config file\n");
+    if (CclInConfigFile) {
+	FlagRevealMap = 1;
+    } else {
+	RevealMap();
     }
-    FlagRevealMap = 1;
 
     return 0;
 }
