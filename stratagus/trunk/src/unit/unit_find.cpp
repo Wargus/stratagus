@@ -647,7 +647,7 @@ global Unit* WoodDepositOnMap(int tx,int ty)
 */
 local Unit* FindRangeAttack(const Unit* u, int range)
 {
-    int x, y, n, cost,d;
+    int x, y, n, cost,d,effective_hp,enemy_count;
     int missile_range,attackrange,hp_damage_evaluate;
     int good[32][32], bad[32][32];
     Unit* table[UnitMax];
@@ -678,6 +678,11 @@ local Unit* FindRangeAttack(const Unit* u, int range)
     y = u->Y;
     n = SelectUnits(x - missile_range, y - missile_range,
 	x + missile_range + 1, y + missile_range + 1, table);
+
+    if (!n) {
+	return NoUnitP;
+    }
+
     for (y = 0; y < 2 * missile_range + 1; y++) {
 	for (x = 0; x < 2 * missile_range + 1; x++) {
 	    good[y][x] = 0;
@@ -685,6 +690,7 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	}
     }
 
+    enemy_count=0;
     // FILL good/bad...
     for (i = 0; i < n; i++) {
 	dest = table[i];
@@ -708,17 +714,14 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 
 	if (!IsEnemy(player, dest)) {	// a friend or neutral
 	    table[i] = 0;
-	    if (!IsAllied(player, dest)) {
-		// neutrals... we don't care
-		continue;
-	    }
 
 	    // Calc a negative cost
             // The gost is more important when the unit would be killed
             // by our fire.
 
             // It costs ( is positive ) if hp_damage_evaluate>dest->HP ... )
-	    cost = 100*(2*hp_damage_evaluate-dest->HP) / (dtype->TileWidth * dtype->TileWidth);
+	    // FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
+	    cost = HEALTH_FACTOR*(2*hp_damage_evaluate-dest->HP) / (dtype->TileWidth * dtype->TileWidth);
 	    if (cost < 1) {
 		cost = 1;
 	    }
@@ -736,7 +739,32 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	    //
 	    //  Remaining HP (Health) 0-65535
 	    //
-	    cost -= dest->HP * HEALTH_FACTOR;
+	    // Give a boost to unit we can kill in one shoot only
+
+	    //
+	    // calculate HP which will remain in the enemy unit, after hit
+	    //
+	    effective_hp=(dest->HP-2*hp_damage_evaluate);
+
+	    //
+	    // Unit we won't kill are evaluated the same
+	    //
+	    if (effective_hp>0){
+	      effective_hp=0;
+	    }
+
+	    //
+	    // Unit we are sure to kill are all evaluated the same ( except PRIORITY )
+	    //
+	    if (effective_hp<(-hp_damage_evaluate)){
+	      effective_hp=(-hp_damage_evaluate);
+	    }
+
+	    //
+	    // Here, effective_hp vary from -hp_damage_evaluate ( unit will be killed) to 0 ( unit can't be killed )
+	    // => we prefer killing rather than only hitting...
+	    //
+	    cost += (-effective_hp) * HEALTH_FACTOR;
 
 	    //
 	    //  Unit can attack back.
@@ -745,6 +773,10 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 		cost += CANATTACK_BONUS;
 	    }
 
+            //
+            // the cost may be divided accros multiple cells
+            //
+	    cost=cost / (dtype->TileWidth * dtype->TileWidth);
 	    if (cost < 1) {
 		cost = 1;
 	    }
@@ -753,6 +785,8 @@ local Unit* FindRangeAttack(const Unit* u, int range)
             // FIXME: we don't support moving away!
             if((d<type->MinAttackRange)||(!UnitReachable(u,dest,attackrange))) {
 	    	table[i]=0;
+	    } else {
+	    	enemy_count++;
 	    }
 	}
 
@@ -776,6 +810,10 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	}
     }
 
+    if (!enemy_count) {
+	return NoUnitP;
+    }
+
     // Find the best area...
     // The target which provide the best bad/good ratio is choosen...
     best_x = -1;
@@ -789,8 +827,27 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	dest = table[i];
 	dtype = dest->Type;
 
-	x = dest->X - u->X + missile_range+1;
-	y = dest->Y - u->Y + missile_range+1;
+	// put in x-y the real point which will be hit...
+	// ( only meaningfull when dtype->TileWidth>1 )
+        if (u->X<dest->X){
+	    x=dest->X;
+	} else if (u->X>dest->X+dtype->TileWidth-1){
+	    x=dest->X+dtype->TileWidth-1;
+	} else {
+	    x=u->X;
+	}
+
+	if (u->Y<dest->Y){
+	    y=dest->Y;
+	} else if(u->Y>dest->Y+dtype->TileWidth-1){
+	    y=dest->Y+dtype->TileWidth-1;
+	} else {
+	    y=u->Y;
+	}
+
+ 	// Make x,y relative to u->x...
+	x = x - u->X + missile_range+1;
+	y = y - u->Y + missile_range+1;
 
 	sbad = 0;
 	sgood = 0;
@@ -813,13 +870,12 @@ local Unit* FindRangeAttack(const Unit* u, int range)
 	    }
 	}
 
-	// cost is sbad/sgood....
-	if (sgood < 1) {
-	    sgood = 1;
+	// don't consider small damages...
+	if (sgood < 20) {
+	    sgood = 20;
 	}
-        // Don't attack if really really bad...
-	if (sgood>sbad) continue;
-	cost = (sbad * 10000) / sgood;
+
+	cost = sbad / sgood;
 	if (cost > best_cost) {
 	    best_cost = cost;
 	    best = dest;
