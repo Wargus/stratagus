@@ -42,6 +42,7 @@
 #include "player.h"
 #include "unit.h"
 #include "ccl.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -81,13 +82,14 @@ local SCM CclSetHitPointRegeneration(SCM flag)
 local SCM CclUnit(SCM list)
 {
     SCM value;
-    //SCM sublist;
+    SCM sublist;
     Unit* unit;
     UnitType* type;
     Player* player;
     int slot;
     int i;
     char* str;
+    char* s;
 
     str=gh_scm2newstr(gh_car(list),NULL);
     list=gh_cdr(list);
@@ -119,6 +121,22 @@ local SCM CclUnit(SCM list)
 	    unit->Removed=0;
 	    unit->Reset=0;
 	    DebugCheck( unit->Slot!=slot );
+	} else if( gh_eq_p(value,gh_symbol2scm("next")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+#if 0
+	    // This is currently not used.
+	    if( !gh_null_p(value) ) {
+		str=gh_scm2newstr(value,NULL);
+
+		slot=strtol(str+1,NULL,16);
+		unit->Next=UnitSlots[slot];
+		if( !UnitSlots[slot] ) {
+		    DebugLevel0Fn("FIXME: Forward reference not supported\n");
+		}
+		free(str);
+	    }
+#endif
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
@@ -161,15 +179,16 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("selected")) ) {
 	    unit->Selected=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("visible")) ) {
-	    str=gh_scm2newstr(gh_car(list),NULL);
+	    str=s=gh_scm2newstr(gh_car(list),NULL);
 	    list=gh_cdr(list);
-	    for( i=0; i<PlayerMax && *str; ++i,++str ) {
-		if( *str=='-' || *str=='_' || *str==' ' ) {
+	    for( i=0; i<PlayerMax && *s; ++i,++s ) {
+		if( *s=='-' || *s=='_' || *s==' ' ) {
 		    unit->Visible&=~(1<<i);
 		} else {
 		    unit->Visible|=(1<<i);
 		}
 	    }
+	    free(str);
 	} else if( gh_eq_p(value,gh_symbol2scm("constructed")) ) {
 	    unit->Constructed=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("active")) ) {
@@ -179,6 +198,12 @@ local SCM CclUnit(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("hp")) ) {
 	    unit->HP=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("xp")) ) {
+	    unit->XP=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("kills")) ) {
+	    unit->Kills=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("ttl")) ) {
 	    unit->TTL=gh_scm2int(gh_car(list));
@@ -229,9 +254,21 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("revealer")) ) {
 	    unit->Revealer=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("on-board")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
+		value=gh_vector_ref(sublist,gh_int2scm(i));
+		if( !gh_null_p(value) ) {
+		    str=gh_scm2newstr(value,NULL);
+
+		    slot=strtol(str+1,NULL,16);
+		    unit->OnBoard[i]=UnitSlots[slot];
+		    if( !UnitSlots[slot] ) {
+			DebugLevel0Fn("FIXME: Forward reference not supported\n");
+		    }
+		    free(str);
+		}
+	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("order-count")) ) {
 	    unit->OrderCount=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
@@ -239,7 +276,7 @@ local SCM CclUnit(SCM list)
 	    unit->OrderFlush=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("orders")) ) {
-	    value=gh_car(list);
+	    sublist=gh_car(list);
 	    list=gh_cdr(list);
 	    DebugLevel0Fn("FIXME:\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
@@ -283,6 +320,9 @@ local SCM CclUnit(SCM list)
 	unit->Removed=1;
 	PlaceUnit(unit,unit->X,unit->Y);
     }
+
+    // FIXME: johns: works only for debug code.
+    NewResetPath(unit);
 
     DebugLevel0Fn("FIXME: not written\n");
 
