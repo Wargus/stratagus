@@ -1491,6 +1491,7 @@ local void SetRes(Menuitem *mi)
 
     menu = FindMenu("menu-global-options");
 
+    res=VideoWidth;
     if (mi[+1].d.text.text == menu->items[3].d.text.text) {
 	res=640;
     } else if (mi[+1].d.text.text == menu->items[5].d.text.text) {
