@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	bos.ccl		-	game specific stuff, and wc2 format compatibility
+--	bos.lua		-	game specific stuff, and wc2 format compatibility
 --
 --	(c) Copyright 2001-2003 by Crestez Leonard
 --
@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: bos.lua,v 1.9 2004/12/12 14:53:11 feb Exp $
+--	$Id$
 
 DefineRaceNames(
 	"race", {
