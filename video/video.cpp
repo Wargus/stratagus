@@ -496,6 +496,7 @@ global void VideoCreatePalette(const Palette* palette)
 */
 global void InitVideo(void)
 {
+#ifdef __OPTIMIZE__
     if( UseSdl ) {
 	InitVideoSdl();
     } else if( UseX11 ) {
@@ -507,6 +508,25 @@ global void InitVideo(void)
     } else {
 	IfDebug( abort(); );
     }
+#else
+    #if UseSdl
+	InitVideoSdl();
+    #else
+	#if UseX11
+	    InitVideoX11();
+	#else
+	    #if UseSVGALib
+		InitVideoSVGA();
+	    #else
+		#if UseWin32
+		    InitVideoWin32();
+		#else
+		    abort();
+		#endif
+	    #endif
+	#endif
+    #endif
+#endif
 
     //
     //	Init video sub modules
