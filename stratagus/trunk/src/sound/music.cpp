@@ -608,9 +608,7 @@ global void PlayMusic(const char* name)
 /**
 **	Play a sound file.
 **
-**	Currenly a synonym for PlayMusic
-**
-**	@param name	Name of sound file, format is automatic detected.
+**	@param name	Name of sound file
 */
 global void PlayFile(char* name)
 {
@@ -620,7 +618,7 @@ global void PlayFile(char* name)
     } else {
 	id = MakeSound("dynamic-sound", &name, 1);
     }
-    PlayGameSound(id, MaxSampleVolume);
+    PlayGameSound(id, GlobalVolume);
 }
 
 #endif	// } WITH_SOUND
