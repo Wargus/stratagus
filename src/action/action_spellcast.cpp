@@ -210,7 +210,7 @@ void HandleActionSpellCast(Unit* unit)
 			}
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			NewResetPath(unit);
-			unit->Value = 0; // repeat spell on next pass? (defaults to `no')
+			unit->ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			unit->SubAction = 1;
 			// FALL THROUGH
 		case 1:                         // Move to the target.
@@ -228,10 +228,10 @@ void HandleActionSpellCast(Unit* unit)
 				if (flags & AnimationMissile) {
 					// FIXME: what todo, if unit/goal is removed?
 					if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
-						unit->Value = 0;
+						unit->ReCast = 0;
 					} else {
 						spell = unit->Orders[0].Arg1;
-						unit->Value = SpellCast(unit, spell, unit->Orders[0].Goal,
+						unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
 							unit->Orders[0].X, unit->Orders[0].Y);
 					}
 				}
@@ -241,14 +241,14 @@ void HandleActionSpellCast(Unit* unit)
 			} else {
 				// FIXME: what todo, if unit/goal is removed?
 				if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
-					unit->Value = 0;
+					unit->ReCast = 0;
 				} else {
 					spell = unit->Orders[0].Arg1;
-					unit->Value = SpellCast(unit, spell, unit->Orders[0].Goal,
+					unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
 						unit->Orders[0].X, unit->Orders[0].Y);
 				}
 			}
-			if (!unit->Value) {
+			if (!unit->ReCast) {
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
 				unit->Wait = 1;

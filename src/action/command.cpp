@@ -834,7 +834,7 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 	//
 	if (!unit->Removed && unit->Orders[0].Action != UnitActionDie) {
 		// FIXME: more races, could happen with many orders in queue.
-		if (!unit->Type->Building && !unit->Type->Harvester && !unit->Value) {
+		if (!unit->Type->Building && !unit->Type->Harvester && !unit->ResourcesHeld) {
 			ClearSavedAction(unit);
 			return;
 		}

@@ -785,8 +785,8 @@ static int CclUnit(lua_State* l)
 			unit->GroupId = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "last-group")) {
 			unit->LastGroup = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "value")) {
-			unit->Value = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "resources-held")) {
+			unit->ResourcesHeld = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "current-resource")) {
 			lua_pushvalue(l, j + 1);
 			unit->CurrentResource = CclGetResourceByName(l);
@@ -804,6 +804,9 @@ static int CclUnit(lua_State* l)
 			unit->Blink = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "moving")) {
 			unit->Moving = 1;
+			--j;
+		} else if (!strcmp(value, "re-cast")) {
+			unit->ReCast = 1;
 			--j;
 		} else if (!strcmp(value, "boarded")) {
 			unit->Boarded = 1;

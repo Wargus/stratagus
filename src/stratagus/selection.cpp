@@ -93,21 +93,22 @@ void UnSelectAll(void)
 */
 static void HandleSuicideClick(Unit* unit)
 {
+	static int NumClicks = 0;
+
 	Assert(unit->Type->ClicksToExplode);
 	if (GameObserve) {
 		return;
 	}
 
 	if (NumSelected == 1 && Selected[0] == unit) {
-		unit->Value++;
+		NumClicks++;
 	} else {
-		unit->Value = 1;
+		NumClicks = 1;
 	}
 
-	// FIXME: make this configurable
-	if (unit->Value == unit->Type->ClicksToExplode) {
+	if (NumClicks == unit->Type->ClicksToExplode) {
 		SendCommandDismiss(unit);
-		unit->Value = 0;
+		NumClicks = 0;
 	}
 }
 

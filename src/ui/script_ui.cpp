@@ -1540,6 +1540,7 @@ static int CclDefineUI(lua_State* l)
 				} else if (!strcmp(value, "network-diplomacy-button")) {
 					button = &ui->NetworkDiplomacyButton;
 				} else {
+					button = NULL;
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 

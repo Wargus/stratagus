@@ -687,13 +687,13 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 
 		// FIXME: can overlap units
 		unit = MakeUnitAndPlace(rx, ry , type, &Players[15]);
-		unit->Value = value;
+		unit->ResourcesHeld = value;
 		unit = MakeUnitAndPlace(mx - rx - tw, ry, type, &Players[15]);
-		unit->Value = value;
+		unit->ResourcesHeld = value;
 		unit = MakeUnitAndPlace(rx, my - ry - th, type, &Players[15]);
-		unit->Value = value;
+		unit->ResourcesHeld = value;
 		unit = MakeUnitAndPlace(mx - rx - tw, mx - ry - th, type, &Players[15]);
-		unit->Value = value;
+		unit->ResourcesHeld = value;
 	}
 }
 

@@ -292,7 +292,7 @@ static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	unit = MakeUnitAndPlace(x, y, type, player);
 	if (type->GivesResource) {
-		unit->Value = DefaultResourceAmounts[type->GivesResource];
+		unit->ResourcesHeld = DefaultResourceAmounts[type->GivesResource];
 	}
 }
 
@@ -919,7 +919,7 @@ static void ShowUnitInfo(const Unit* unit)
 		unit->Type->Name, unit->Player->Player,
 		unit->Active ? "active" : "passive");
 	if (unit->Type->GivesResource) {
-		sprintf(buf + i," Amount %d", unit->Value);
+		sprintf(buf + i," Amount %d", unit->ResourcesHeld);
 	}
 	SetStatusLine(buf);
 }

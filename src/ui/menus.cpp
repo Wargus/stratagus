@@ -5286,7 +5286,7 @@ void EditorEditResource(void)
 
 	sprintf(buf2,"Amount of %s:",DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
 	menu->Items[0].D.Text.text = buf2;
-	sprintf(buf, "%d~!_", UnitUnderCursor->Value);
+	sprintf(buf, "%d~!_", UnitUnderCursor->ResourcesHeld);
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = strlen(buf) - 3;
 	menu->Items[1].D.Input.maxch = 6;
@@ -5339,7 +5339,7 @@ static void EditorEditResourceOk(void)
 		ProcessMenu("menu-editor-error", 1);
 		menu->Items[1].D.Text.text = NULL;
 	} else {
-		UnitUnderCursor->Value = value;
+		UnitUnderCursor->ResourcesHeld = value;
 		GameMenuReturn();
 	}
 }

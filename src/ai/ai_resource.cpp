@@ -906,7 +906,7 @@ static void AiCollectResources(void)
 		//
 		// Send workers with resources back home.
 		//
-		if (unit->Value && c) {
+		if (unit->ResourcesHeld && c) {
 			units_with_resource[num_units_with_resource[c]++][c] = unit;
 			CommandReturnGoods(unit, 0, FlushCommands);
 			total_harvester++;
