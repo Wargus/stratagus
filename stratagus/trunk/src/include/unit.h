@@ -633,7 +633,7 @@ struct _unit_ {
 
 
 /**
-*	How many units could be selected
+**	How many units could be selected
 */
 #define MaxSelectable	9
 
@@ -647,6 +647,11 @@ struct _unit_ {
 **	How many groups supported
 */
 #define NUM_GROUPS 10
+
+/**
+**	Always show unit orders
+*/
+#define SHOW_ORDERS_ALWAYS -1
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -672,7 +677,7 @@ extern int ShowSightRange;		/// Flag: show right range
 extern int ShowReactionRange;		/// Flag: show reaction range
 extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
-extern int ShowOrdersCount;		/// Show orders for some time
+extern unsigned long ShowOrdersCount;	/// Show orders for some time
 extern int HitPointRegeneration;	/// Hit point regeneration for all units
 extern int XpDamage;				/// unit XP adds more damage to attacks
 extern char EnableTrainingQueue;	/// Config: training queues enabled

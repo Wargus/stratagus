@@ -785,12 +785,7 @@ global void GameMainLoop(void)
 		case 6:				// overtaking units
 		    RescueUnits();
 		    break;
-		case 7:				// show order some time
-		    if( ShowOrdersCount ) {
-			ShowOrdersCount--;
-		    }
-		    break;
-		case 8:
+		case 7:
 		    BurnBuildings();		// burn buildings
 		    break;
 	    }
