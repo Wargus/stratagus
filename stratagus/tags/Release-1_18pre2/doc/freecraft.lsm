@@ -1,0 +1,24 @@
+Begin4
+Title:          FreeCraft - A free fantasy real time strategy game engine.
+Version:        1.18
+Entered-date:   26MAI2002
+Description:    A realtime, fantasy strategy war game for UNIX or Win32.
+		It comes without graphics, sounds and documentation. You need
+		the original game CD or expansion CD or the free media
+		replacement to use this program .
+Keywords:       RTS realtime strategy game X11
+Author:         johns98@gmx.net (Lutz Sammer) (Valery Shchedrin) (Fabrice Rossi)
+		(Patrice Fortier) (Jon Gabrielson) (Andreas Arens) and others.
+Maintained-by:  http://freecraft.org (The FreeCraft Project Group)
+Primary-site:   ftp://metalab.unc.edu/pub/Linux/games/strategy
+		1.3 MB freecraft-020526.tar.gz
+		2.3 MB freecraft-020526-bin.tar.gz
+Alternate-site: ftp://ibiblio.org/pub/Linux/games/strategy
+		1.3 MB freecraft-020526.tar.gz
+		2.3 MB freecraft-020526-bin.tar.gz
+Original-site:  http://prdownloads.sourceforge.net/freecraft
+		1.3 MB freecraft-020526.tar.gz
+		2.3 MB freecraft-020526-bin.tar.gz
+Platforms:      Unix/Win32,SVGALIB/X11,libz,libpng and the original CD-ROM.
+Copying-policy: GNU General Public License (GPL) 2.0
+End

@@ -1,0 +1,40 @@
+    ________________________________README_________________________________
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+
+Read doc/gpl.html for the FreeCraft software license informations.
+Read doc/gpl.html for the FreeCraft content (art) license informations.
+Read doc/readme.html for more informations.
+Read doc/install.html to install or upgrade FreeCraft.
+
+Note:
+  Extracted graphics and sounds are copyright by the original creator.
+  SIOD Copyright by PARADIGM ASSOCIATES INCORPORATED, CAMBRIDGE, MASSACHUSETTS.
+  ETLIB Copyright by Edgar Toernig.
+  libmodplug Copyright by Kenton Varda & Olivier Lapique.
+  other parts copyrights please look into the doc directory.
+
+This file is part of FreeCraft
+
+    FreeCraft is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; only version 2 of the License.
+
+Warning: 
+    FreeCraft is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FreeCraft; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    (C) 1998-2003 Johns of The FreeCraft Project (http://freecraft.org)     

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<!--
+----	(c) Copyright 2002-2003 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FreeCraft Configuration Language Description: Tileset</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+    <META NAME="Author" CONTENT="johns98@gmx.net">
+    <META NAME="Keyword" CONTENT="ccl,tileset">
+    <META NAME="Description" CONTENT="">
+</HEAD>
+<BODY>
+    <H1>FreeCraft Configuration Language Description: Tileset</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2003 by The FreeCraft Project. Distributed under the
+<A HREF="../gpl.html">"GNU General Public License"</A></B>
+<HR>
+<A HREF="../freecraft.html">FreeCraft</A> 
+<A HREF="../readme.html">Readme</A> 
+<A HREF="../faq.html">FAQ</A> 
+<A HREF="ccl.html">CCL</A> 
+<A HREF="sound.html">PREV</A> 
+<A HREF="triggers.html">NEXT</A> 
+<A HREF="ccl-index.html">Index</A> 
+<HR>
+<A HREF="#define-tileset">define-tileset</A>
+<A HREF="#define-tileset-wc-names">define-tileset-wc-names</A>
+<HR>
+<H2>Intro - Introduction to tileset functions and variables</H2>
+
+Everything around the C Tileset structure.
+<H2>Functions</H2>
+<A NAME="define-tileset"></A>
+<H3>define-tileset</H3>
+
+<H4>Description</H4>
+
+    Define a tileset for the engine.<P>
+
+    This could also be defined in own levels. <P>
+
+<H4>Syntax</H4>
+
+<CODE>(define-tileset ident class name image palette slots animations)</CODE>
+
+FIXME:
+
+<DL>
+<DT>ident</DT>
+<DD>.
+</DD>
+<DT>class</DT>
+<DD>.
+</DD>
+<DT>name</DT>
+<DD>.
+</DD>
+<DT>image</DT>
+<DD>.
+</DD>
+<DT>palette</DT>
+<DD>.
+</DD>
+<DT>slots</DT>
+<DD>.
+</DD>
+<DT>animations</DT>
+<DD>.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-tileset
+</PRE>
+
+<A NAME="define-tileset-wc-names"></A>
+<H3>define-tileset-wc-names</H3>
+
+<H4>Description</H4>
+
+    Define the mapping of the tileset numbers in puds, to the tileset names.
+
+<H4>Syntax</H4>
+
+<CODE>(define-tileset-wc-names tileset0 tileset1 tileset2 tileset3)</CODE>
+
+<DL>
+<DT>tileset0</DT>
+<DD>Name of the tileset assigned to index 0 (summer).
+</DD>
+<DT>tileset1</DT>
+<DD>Name of the tileset assigned to index 1 (winter).
+</DD>
+<DT>tileset2</DT>
+<DD>Name of the tileset assigned to index 2 (wasteland).
+</DD>
+<DT>tileset3</DT>
+<DD>Name of the tileset assigned to index 3 (orc swamp).
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (define-tileset-wc-names 
+      'tileset-summer 'tileset-winter 'tileset-wasteland 'tileset-swamp )
+</PRE>
+
+<P>This is the default tileset mapping.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS>(c) 2002-2003 by <A HREF="http://freecraft.org">
+The FreeCraft Project</A></ADDRESS></BODY></HTML>

@@ -1,0 +1,3 @@
+SRC += src/sound/arts_audio.c src/sound/ccl_sound.c src/sound/flac.c src/sound/libcda.c src/sound/mad.c src/sound/music.c src/sound/ogg.c src/sound/oss_audio.c src/sound/sdl_audio.c src/sound/sound.c src/sound/sound_id.c src/sound/sound_server.c src/sound/unitsound.c src/sound/wav.c src/sound/cdda.c
+HDRS +=
+OBJ += src/sound/$(OBJDIR)/arts_audio.o src/sound/$(OBJDIR)/ccl_sound.o src/sound/$(OBJDIR)/flac.o src/sound/$(OBJDIR)/libcda.o src/sound/$(OBJDIR)/mad.o src/sound/$(OBJDIR)/music.o src/sound/$(OBJDIR)/ogg.o src/sound/$(OBJDIR)/oss_audio.o src/sound/$(OBJDIR)/sdl_audio.o src/sound/$(OBJDIR)/sound.o src/sound/$(OBJDIR)/sound_id.o src/sound/$(OBJDIR)/sound_server.o src/sound/$(OBJDIR)/unitsound.o src/sound/$(OBJDIR)/wav.o src/sound/$(OBJDIR)/cdda.c
