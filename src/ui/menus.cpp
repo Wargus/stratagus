@@ -1797,7 +1797,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 #ifdef USE_WIN32
 	SDL_CDResume(CDRom);
 #endif
-	PlayMusic(":random");
+	PlayCDRom(":random");
     } else {
     // Stop Playing CD
         SDL_CDPause(CDRom);
@@ -1809,7 +1809,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 #elif defined(USE_LIBCDA)
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
+	PlayCDRom(":random");
     } else {
     // Stop Playing CD
         cd_pause();
@@ -1818,7 +1818,7 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
 #elif defined(USE_CDDA)
     // Start Playing CD
     if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
-	PlayMusic(":random");
+	PlayCDRom(":random");
     } else {
     // Stop Playing CD
 	StopMusic();
