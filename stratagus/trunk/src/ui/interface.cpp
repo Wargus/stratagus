@@ -861,6 +861,16 @@ local int CommandKey(int key)
 	    GameRunning=0;
 	    break;
 
+	case 'r'&0x1F:
+	case 'r':
+	case 'R':			// ALT+R, CTRL+R: Restart scenario
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    RestartScenario=1;
+	    GameRunning=0;
+	    break;
+
 	case '.':
 	case 'i':
 	case 'I':			// ., ALT+I, CTRL+I: Find idle worker
