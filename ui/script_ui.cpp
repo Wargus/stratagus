@@ -1692,7 +1692,7 @@ static int CclDefineUI(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
-				(*menupanel)->Panel.File = strdup(LuaToString(l, -1));
+				(*menupanel)->G = NewGraphic(LuaToString(l, -1), 0, 0);
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "victory-background")) {
