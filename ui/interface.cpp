@@ -78,6 +78,7 @@ local char Input[80];		/// line input for messages/long commands
 local int InputIndex;		/// current index into input
 local char InputStatusLine[99];	/// Last input status line
 local int SpeedCheat;		/// Speed up cheat
+local char* ui_group_keys="0123456789`";/// Up to 11 keys, last unselect. Default for qwerty
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
 global char GameObserve;	/// Observe mode
@@ -660,6 +661,16 @@ local void UiTrackUnit(void)
 */
 local int CommandKey(int key)
 {
+    char * ptr;
+    
+    // FIXME: don't handle unicode well. Should work on all latin keyboard.
+    if ((ptr = strchr(ui_group_keys,key))) {
+	key = '0' + ptr - ui_group_keys;
+	if (key > '9') {
+	    key = '`';
+	}
+    }
+    
     switch (key) {
 	case '\r':			// Return enters chat/input mode.
 	    UiBeginInput();
