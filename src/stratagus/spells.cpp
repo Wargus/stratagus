@@ -1337,40 +1337,33 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 
     case SpellActionCircleOfPower:
     {
-    // FIXME: vladi: cop should be placed only on explored land
-    // FIXME: Don't use UnitTypeByIdent during runtime.
-    Unit *cop = (Unit*)(unit->Goal);
-    if ( cop )
-      {
-      // FIXME: if cop is already defined --> move it, but it doesn't work?
-      RemoveUnit( cop );
-      PlaceUnit( cop, x, y );
-      }
-    else
-      {
-      cop = MakeUnitAndPlace(x, y, UnitTypeByIdent( "unit-circle-of-power" ),
-	         unit->Player);
-      }
-    MakeMissile(MissileTypeSpell,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
+	// FIXME: vladi: cop should be placed only on explored land
+	// FIXME: Don't use UnitTypeByIdent during runtime.
+	Unit *cop = (Unit *) (unit->Goal);
 
-    // Goal is used to link destination circle of power and back:
-    // the circle of power owner (source DP)
-    unit->Goal = cop;
-    cop->Goal = unit;
-    unit->Refs++;
-    cop->Refs++;
-    //FIXME: setting destination circle of power should use mana
+	if (cop) {
+	    // FIXME: if cop is already defined --> move it, but it doesn't work?
+	    RemoveUnit(cop);
+	    PlaceUnit(cop, x, y);
+	} else {
+	    cop =
+		MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-circle-of-power"),
+		    unit->Player);
+	}
+	MakeMissile(MissileTypeSpell, x * TileSizeX + TileSizeX / 2,
+	    y * TileSizeY + TileSizeY / 2, x * TileSizeX + TileSizeX / 2,
+	    y * TileSizeY + TileSizeY / 2);
 
-    /*
-    Unit *cop;
-    DebugLevel0Fn( ">>> cop %d,%d\n" _C_ x _C_ y );
-    MakeMissile(MissileTypeHealing,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2,
-		x*TileSizeX+TileSizeX/2, y*TileSizeY+TileSizeY/2 );
-    */
-    };
+	// Goal is used to link destination circle of power and back:
+	// the circle of power owner (source DP)
+	unit->Goal = cop;
+	cop->Goal = unit;
+	RefsDebugCheck(!unit->Refs || unit->Destroyed);
+	unit->Refs++;
+	RefsDebugCheck(!cop->Refs || cop->Destroyed);
+	cop->Refs++;
+	//FIXME: setting destination circle of power should use mana
+    }
     break;
 
     default:
