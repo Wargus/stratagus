@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mainloop.c	-	The main game loop. */
+/**@name mainloop.c - The main game loop. */
 //
 //      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
@@ -826,9 +826,6 @@ global void GameMainLoop(void)
 							PlayersEachSecond(player);
 						}
 					}
-					// Clear scheme heap each second
-					// FIXME: this is too slow to call during the game
-					CclGarbageCollect(1);
 					break;
 				case 1:
 					break;
