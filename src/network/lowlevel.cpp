@@ -36,12 +36,16 @@
 //	Declarations
 //----------------------------------------------------------------------------
 
+#define MAX_LOC_IP 10
+
 //----------------------------------------------------------------------------
 //	Variables
 //----------------------------------------------------------------------------
 
 global unsigned long NetLastHost;	/// Last host number (net format)
 global int NetLastPort;			/// Last port number (net format)
+
+global unsigned long NetLocalAddrs[MAX_LOC_IP]; /// Local IP-Addrs of this host (net format)
 
 //----------------------------------------------------------------------------
 //	Low level functions
@@ -155,8 +159,9 @@ global void NetCloseUDP(int sockfd)
 
 #endif	// } !USE_SDL_NET && !USE_WINSOCK
 
+// ARI: FIXME: Used by debug only? - i.e. IfDebug()?
 /**
-**	Resolve host in name or or colon dot notation.
+**	Resolve host in name or dotted quad notation.
 **
 **	@param host	Host name.
 */
@@ -180,6 +185,89 @@ global unsigned long NetResolveHost(const char* host)
     }
     return INADDR_NONE;
 }
+
+#ifdef NEW_NETMENUES
+// ARI: I knew how to write this for a unix environment,
+//	but am quite certain that porting this can cause you
+//	trouble, esp. to win32. - winipcfg can do, so it's possible..
+/**
+**	Get IP-addrs of local interfaces from Network file descriptor
+**	and store them in the NetLocalAddrs array.
+**
+**	@param sock	local socket.
+**
+**	@returns	number of IP-addrs found.
+*/
+global int NetSocketAddr(const int sock)
+{
+    char buf[4096], *cp, *cplim;
+    struct ifconf ifc;
+    struct ifreq ifreq, *ifr;
+    struct sockaddr_in *sap, sa;
+    int i, nif;
+	
+    nif = 0;
+    if (sock != -1) {
+	ifc.ifc_len = sizeof (buf);
+	ifc.ifc_buf = buf;
+	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
+	    DebugLevel0Fn("SIOCGIFCONF - errno %d\n", errno);
+	    return 0;
+	}
+	/* with some inspiration from routed.. */
+        ifr = ifc.ifc_req;
+	cplim = buf + ifc.ifc_len; /*skip over if's with big ifr_addr's */
+	for (cp = buf; cp < cplim; cp += sizeof (ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
+	    ifr = (struct ifreq *)cp;
+	    ifreq = *ifr;
+	    if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
+		DebugLevel0Fn("%s: SIOCGIFFLAGS - errno %d\n", ifr->ifr_name, errno);
+		continue;
+	    }
+	    if ((ifreq.ifr_flags & IFF_UP) == 0 || ifr->ifr_addr.sa_family == AF_UNSPEC) {
+		continue;
+	    }
+	    /* argh, this'll have to change sometime */
+	    if (ifr->ifr_addr.sa_family != AF_INET) {
+		continue;
+	    }
+	    if (ifreq.ifr_flags & IFF_LOOPBACK) {
+		continue;
+	    }
+	    sap = (struct sockaddr_in *)&ifr->ifr_addr;
+	    sa = *sap;
+	    NetLocalAddrs[nif] = sap->sin_addr.s_addr;
+	    if (ifreq.ifr_flags & IFF_POINTOPOINT) {
+		if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
+		    DebugLevel0Fn("%s: SIOCGIFDSTADDR - errno %d\n", ifr->ifr_name, errno);
+		    /* failed to obtain dst addr - ignore */
+		    continue;
+		}
+		if (ifr->ifr_addr.sa_family == AF_UNSPEC) {
+		    continue;
+		}
+	    }
+	    /* avoid p-t-p links with common src */
+	    if (nif) {
+		for (i = 0; i < nif; i++) {
+		    if (sa.sin_addr.s_addr == NetLocalAddrs[i]) {
+			i = -1;
+			break;
+		    }
+		}
+		if (i == -1)
+		    continue;
+	    }
+	    DebugLevel3Fn("FOUND INTERFACE %s: %d.%d.%d.%d\n", ifr->ifr_name, 
+			NIPQUAD(ntohl(NetLocalAddrs[nif])));
+	    nif++;
+	    if (nif == MAX_LOC_IP)
+		break;
+	}
+    }
+    return nif;
+}
+#endif
 
 /**
 **	Open an UDP Socket port.
@@ -263,6 +351,8 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 	fprintf(stderr,__FUNCTION__": Could not read from UDP socket\n");
 	return 0;
     }
+    // FIXME: ARI: verify that it _really_ is from one of our hosts...
+    // imagine what happens when an udp port scan hits the port...
     NetLastHost=sock_addr.sin_addr.s_addr;
     NetLastPort=sock_addr.sin_port;
     DebugLevel3Fn(" %d.%d.%d.%d:%d\n",NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));

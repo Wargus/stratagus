@@ -42,6 +42,8 @@
 #  include <netinet/in.h>
 #  include <netdb.h>
 #  include <sys/socket.h>
+#  include <sys/ioctl.h>
+#  include <net/if.h>
 #  define INVALID_SOCKET -1
 #endif	// !WIN32
 #endif // !USE_SDL_NET
@@ -68,6 +70,7 @@
 
 extern unsigned long NetLastHost;	/// Last host number (net format)
 extern int NetLastPort;			/// Last port number (net format)
+extern unsigned long NetLocalAddrs[];	/// Local IP-Addrs of this host (net format)
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -79,6 +82,8 @@ extern int NetInit(void);
 extern void NetExit(void);
     /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const char* host);
+    ///	Get local IP from network file descriptor
+extern int NetSocketAddr(const int sock);
     /// Open an UDP Socket port.
 extern int NetOpenUDP(int port);
     /// Close an UDP socket port.

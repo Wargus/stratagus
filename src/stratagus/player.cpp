@@ -109,6 +109,7 @@ global void CreatePlayer(char* name,int type)
 	} else if( !NetPlayers && !NetworkArg ) {
 	    // FIXME: only for single players
 	    type=PlayerComputer;
+	    name="Computer";
 	}
     }
 #else
