@@ -1,0 +1,38 @@
+    _____________________________README.BeOS_______________________________
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __|
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+
+The BeOS port isn't tested in this release, if you like to maintain it, please
+mail us.
+
+---
+You need, libSDL (the 1.2.x series):
+http://www.libsdl.org/download-1.2.html
+
+libpng and libz (the .so versions, not the .a that come with BeOS):
+http://www.bebits.com/app/1367
+
+libogg, libvorbis, libvorbisfile
+http://www.bebits.com/app/1058
+---
+To compile FreeCraft for BeOS, you can either use 'setup' like normal people
+(but the executable produced can't run from the Tracker) or you can use
+BeIDE... BeIDE is the prefered method.
+
+And the simplest. Copy FreeCraft-beos.proj.gz from contrib to the top level
+directory of FreeCraft and uncompress it. Just start the BeIDE, open the
+FreeCraft-beos.proj file, and "Make" it (Alt-M). That's it.
+
+Now you have a working copy of FreeCraft, thats all there is to it.
+---
+Originally written by Kenneth Sanislo <codepoet@cabinriver.com>
+Adapted by Berend de Boer <berend@pobox.com>.
+
+IRC on EFNet in #beos
