@@ -183,6 +183,9 @@ local void EditTile(int x, int y, int tile)
 		| MapFieldWall | MapFieldRocks | MapFieldForest;
 	    break;
     }
+
+    UpdateMinimapSeenXY(x,y);
+    UpdateMinimapXY(x,y);
 }
 
 /*----------------------------------------------------------------------------
