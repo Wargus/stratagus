@@ -2385,9 +2385,13 @@ global void ProcessMenu(const char* menu_id, int loop)
     }
 
     ButtonUnderCursor = -1;
+#ifdef USE_SDL_SURFACE
+    HideAnyCursor();
+#else
     VideoLockScreen();
     HideAnyCursor();
     VideoUnlockScreen();
+#endif
     DestroyCursorBackground();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
