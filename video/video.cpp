@@ -257,7 +257,9 @@ void PopClipping(void)
 }
 
 /**
-**  FIXME: docu
+**  Add a surface to the palette list, used for color cycling
+**
+**  @param surface  The SDL surface to add to the list to cycle.
 */
 void VideoPaletteListAdd(SDL_Surface* surface)
 {
@@ -272,7 +274,9 @@ void VideoPaletteListAdd(SDL_Surface* surface)
 }
 
 /**
-**  FIXME: docu
+**  Remove a surface to the palette list, used for color cycling
+**
+**  @param surface  The SDL surface to add to the list to cycle.
 */
 void VideoPaletteListRemove(SDL_Surface* surface)
 {

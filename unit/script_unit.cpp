@@ -1400,7 +1400,7 @@ static int CclSetUnitUnholyArmor(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Get the usage of unit slots during load to allocate memory
 **
 **  @param l  Lua state.
 */

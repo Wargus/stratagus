@@ -560,8 +560,8 @@ void MakeTexture(Graphic* g)
 /**
 **  Make an OpenGL texture with the player colors.
 **
-**  @param graphic  FIXME: docu
-**  @param player   FIXME: docu
+**  @param graphic  The graphic to texture with player colors.
+**  @param player   Player number to make textures for.
 */
 void MakePlayerColorTexture(Graphic* g, int player)
 {

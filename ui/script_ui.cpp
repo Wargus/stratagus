@@ -597,7 +597,7 @@ static MenuButtonId scm2buttonid(lua_State* l, const char* value)
 **  Parse info panel text
 **
 **  @param l     Lua state.
-**  @param text  FIXME: docu.
+**  @param text  Pointer to decoded text structure, returns data
 */
 static void CclParseInfoText(lua_State* l, InfoText* text)
 {
@@ -646,7 +646,7 @@ static void CclParseInfoText(lua_State* l, InfoText* text)
 **  Parse icon
 **
 **  @param l     Lua state.
-**  @param icon  FIXME: docu.
+**  @param icon  Pointer to the Button information that is returned.
 */
 static void CclParseIcon(lua_State* l, Button* icon)
 {
@@ -689,7 +689,7 @@ static void CclParseIcon(lua_State* l, Button* icon)
 **  Parse info panel selected section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI that is updated.
 */
 static void CclParseSelected(lua_State* l, UI* ui)
 {
@@ -779,7 +779,7 @@ static void CclParseSelected(lua_State* l, UI* ui)
 **  Parse info panel training section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI which is updated.
 */
 static void CclParseTraining(lua_State* l, UI* ui)
 {
@@ -878,7 +878,7 @@ static void CclParseTraining(lua_State* l, UI* ui)
 **  Parse info panel upgrading section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI which is updated.
 */
 static void CclParseUpgrading(lua_State* l, UI* ui)
 {
@@ -910,7 +910,7 @@ static void CclParseUpgrading(lua_State* l, UI* ui)
 **  Parse info panel researching section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI that is updated.
 */
 static void CclParseResearching(lua_State* l, UI* ui)
 {
@@ -942,7 +942,7 @@ static void CclParseResearching(lua_State* l, UI* ui)
 **  Parse info panel transporting section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI which is updated.
 */
 static void CclParseTransporting(lua_State* l, UI* ui)
 {
@@ -985,7 +985,7 @@ static void CclParseTransporting(lua_State* l, UI* ui)
 **  Parse button panel icons section
 **
 **  @param l   Lua state.
-**  @param ui  FIXME: docu.
+**  @param ui  Pointer to the UI which is updated.
 */
 static void CclParseButtonIcons(lua_State* l, UI* ui)
 {
@@ -2890,7 +2890,12 @@ static int CclDefineMenu(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Convert a key string into the keypress code.
+**
+**  @param l      The lua state for reporting errors. 
+**  @param value  Text value of the key to be decoded.
+**
+**  @return  The value of the hotkey as an integer.
 */
 static int scm2hotkey(lua_State* l, const char* value)
 {
@@ -2921,7 +2926,12 @@ static int scm2hotkey(lua_State* l, const char* value)
 }
 
 /**
-**  FIXME: docu
+**  Convert a text string to a slider style
+**
+**  @param l      The lua state for reporting errors.
+**  @param value  The text value of the type of slider.
+**
+**  @return  The value of the slider as an integer.
 */
 static int scm2style(lua_State* l, const char* value)
 {
@@ -4180,7 +4190,7 @@ static int CclSetColorWaterCycleStart(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the palette location at which the Water color cycling ends.
 **
 **  @param l  Lua state.
 */
@@ -4194,7 +4204,7 @@ static int CclSetColorWaterCycleEnd(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the palette location at which the Icon color cycling starts.
 **
 **  @param l  Lua state.
 */
@@ -4208,7 +4218,7 @@ static int CclSetColorIconCycleStart(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the palette location at which the Icon color cycling ends.
 **
 **  @param l  Lua state.
 */
@@ -4222,7 +4232,7 @@ static int CclSetColorIconCycleEnd(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the palette location at which the building color cycling starts.
 **
 **  @param l  Lua state.
 */
@@ -4236,7 +4246,7 @@ static int CclSetColorBuildingCycleStart(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the palette location at which the building color cycling ends.
 **
 **  @param l  Lua state.
 */
@@ -4460,7 +4470,7 @@ static int CclResetKeystrokeHelp(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Set the keys which are use for grouping units, helpful for other keyboards
 **
 **  @param l  Lua state.
 */
