@@ -1131,9 +1131,8 @@ global void MenuLoop(char* filename, WorldMap* map)
 	CleanModules();
 	CleanFonts();
 
-	PlaySectionMusic(PlaySectionMainMenu);
-
 	LoadCcl();			// Reload the main config file
+	PlaySectionMusic(PlaySectionMainMenu);
 
 	PreMenuSetup();
 
