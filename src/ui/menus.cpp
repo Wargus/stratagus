@@ -1526,7 +1526,8 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
     MapInfo *info;
     char *suf, *cp, *lcp, *np;
-    static int p, sz, szl[] = { -1, 32, 64, 96, 128 };
+    int p, sz;
+    static int szl[] = { -1, 32, 64, 96, 128 };
 #ifdef USE_ZZIPLIB
     ZZIP_FILE *zzf;
 #endif
@@ -1549,8 +1550,11 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
     fl->type = -1;
 #ifdef USE_ZZIPLIB
     if ((zzf = zzip_open(pathbuf, O_RDONLY|O_BINARY))) {
+	sz = zzip_file_real(zzf);
 	zzip_close(zzf);
-	goto usezzf;
+	if (!sz) {
+	    goto usezzf;
+	}
     }
 #endif
     do {
@@ -1570,36 +1574,35 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	}
 #endif
 	if (*cp == 0) {
+#ifdef USE_ZZIPLIB
 usezzf:
+#endif
 	    if (p) {
 		if (strstr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
-		    DebugLevel3Fn("GetPudInfo(%s) : %p\n", pathbuf, info);
-		} else {
-		    info = NULL;
-		}
-		if (info) {
-		    sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
-		    if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
-			fl->type = 1;
-			fl->name = strdup(np);
-			fl->xdata = info;
-			return 1;
-		    } else {
-			FreeMapInfo(info);
+		    if (info) {
+			DebugLevel3Fn("GetPudInfo(%s) : %p\n", pathbuf, info);
+			sz = szl[ScenSelectMenuItems[8].d.pulldown.curopt];
+			if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
+			    fl->type = 1;
+			    fl->name = strdup(np);
+			    fl->xdata = info;
+			    return 1;
+			} else {
+			    FreeMapInfo(info);
+			}
 		    }
-		} else {
-		    fl->type = 1;
-		    fl->name = strdup(np);
-		    fl->xdata = NULL;
 		}
 	    } else {
-		info = NULL;
-		// info = GetCmInfo(pathbuf);
-		fl->type = 1;
-		fl->name = strdup(np);
-		fl->xdata = info;
-		return 1;
+		if (strstr(pathbuf, ".cm")) {
+		    // info = GetCmInfo(pathbuf);
+		    info = NULL;
+		    DebugLevel3Fn("GetCmInfo(%s) : %p\n", pathbuf, info);
+		    fl->type = 1;
+		    fl->name = strdup(np);
+		    fl->xdata = info;
+		    return 1;
+		}
 	    }
 	}
     }
