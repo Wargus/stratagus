@@ -69,7 +69,7 @@ make-objdir:
 	@for i in $(MODULES_ALL); do \
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
-%.o: $(@D)../%.c $(RULESFILE)
+%.o: $(@D)../%.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 help:
@@ -176,7 +176,7 @@ depend:
 #	include dependency files, if they exist
 #
 
-$(OBJS):	$(RULESFILE)
+$(OBJ):	$(RULESFILE)
 
 ifeq (.depend,$(wildcard .depend))
 include .depend
