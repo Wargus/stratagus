@@ -1017,9 +1017,9 @@ global void DrawCosts(void)
 				TheUI.Resources[GoldCost].IconH */
 			0, 3 * TheUI.Resources[GoldCost].IconH,
 			TheUI.Resources[GoldCost].IconW, TheUI.Resources[GoldCost].IconH,
-			x, TheUI.StatusLineY + 1);
+			x, TheUI.StatusLineTextY);
 
-		VideoDrawNumber(x + 15, TheUI.StatusLineY + 2, GameFont, CostsMana);
+		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsMana);
 		x += 45;
 	}
 
@@ -1029,9 +1029,9 @@ global void DrawCosts(void)
 				VideoDrawSubClip(TheUI.Resources[i].Icon.Graphic, 0,
 					TheUI.Resources[i].IconRow * TheUI.Resources[i].IconH,
 					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH,
-					x, TheUI.StatusLineY + 1);
+					x, TheUI.StatusLineTextY);
 			}
-			VideoDrawNumber(x + 15, TheUI.StatusLineY + 2, GameFont,Costs[i]);
+			VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont,Costs[i]);
 			x += 45;
 			if (x > VideoWidth - 45) {
 				break;
@@ -1044,8 +1044,8 @@ global void DrawCosts(void)
 		VideoDrawSubClip(TheUI.Resources[FoodCost].Icon.Graphic, 0,
 			TheUI.Resources[FoodCost].IconRow * TheUI.Resources[FoodCost].IconH,
 			TheUI.Resources[FoodCost].IconW, TheUI.Resources[FoodCost].IconH,
-			x, TheUI.StatusLineY + 1);
-		VideoDrawNumber(x + 15, TheUI.StatusLineY + 2, GameFont, CostsFood);
+			x, TheUI.StatusLineTextY);
+		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsFood);
 		x += 45;
 	}
 }
