@@ -3717,7 +3717,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
 	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
 
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = NVARALREADYDEFINED; i < UnitTypeVar.NumberVariable; i++) {
 			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
 				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
