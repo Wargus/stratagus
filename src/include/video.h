@@ -351,6 +351,9 @@ extern unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
 extern unsigned CompressedGraphicMemory;/// memory for compressed objects
 #endif
 
+    // 1 if mouse cursor is inside main window, else 0
+extern int InMainWindow;
+
     /**
     **	Wanted videomode, fullscreen or windowed.
     */
