@@ -70,54 +70,14 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
     // FIXME: Reset flag is cleared by HandleUnitAction.
     if( !(state=unit->State) ) {
 
-	//
-	//	Target killed?
-	//
-#ifdef NEW_ORDERS
-#else
-	Unit* goal;
-
-	if( (goal=unit->Command.Data.Move.Goal) ) {
-	    // FIXME: should this be handled here? JOHNS: No see NEW_ORDERS
-	    // FIXME: Can't choose a better target here!
-	    if( goal->Destroyed ) {
-		DebugLevel0Fn("destroyed unit\n");
-		unit->Command.Data.Move.DX=goal->X+goal->Type->TileWidth/2;
-		unit->Command.Data.Move.DY=goal->Y+goal->Type->TileHeight/2;
-		RefsDebugCheck( !goal->Refs );
-		if( !--goal->Refs ) {
-		    ReleaseUnit(goal);
-		}
-		unit->Command.Data.Move.Goal=NoUnitP;
-		ResetPath(unit->Command);
-	    } else if( goal->Removed ||
-		    !goal->HP || goal->Command.Action==UnitActionDie ) {
-		DebugLevel0Fn("killed unit\n");
-		RefsDebugCheck( !goal->Refs );
-		--goal->Refs;
-		RefsDebugCheck( !goal->Refs );
-		unit->Command.Data.Move.DX=goal->X;
-		unit->Command.Data.Move.DY=goal->Y;
-		unit->Command.Data.Move.Goal=NoUnitP;
-		ResetPath(unit->Command);
-	    }
-	}
-#endif
-
 	switch( d=NextPathElement(unit,&xd,&yd) ) {
 	    case PF_UNREACHABLE:	// Can't reach, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
-#ifndef NEW_ORDERS
-		unit->Command.Action=UnitActionStill;
-#endif
 		return d;
 	    case PF_REACHED:		// Reached goal, stop
 		unit->Reset=unit->Wait=1;
 		unit->Moving=0;
-#ifndef NEW_ORDERS
-		unit->Command.Action=UnitActionStill;
-#endif
 		return d;
 	    case PF_WAIT:		// No path, wait
 		unit->Reset=unit->Wait=1;
@@ -254,9 +214,7 @@ global int DoActionMove(Unit* unit)
 */
 global void HandleActionMove(Unit* unit)
 {
-#ifdef NEW_ORDERS
     Unit* goal;
-#endif
 
     DebugLevel3Fn("%Zd: %Zd %d,%d \n",UnitNumber(unit),
 	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1,
@@ -264,7 +222,6 @@ global void HandleActionMove(Unit* unit)
 
     if( !unit->SubAction ) {		// first entry
 	unit->SubAction=1;
-#ifdef NEW_ORDERS
 	NewResetPath(unit);
 	//
 	//	FIXME: should use a reachable place to reduce pathfinder time.
@@ -273,7 +230,6 @@ global void HandleActionMove(Unit* unit)
 	if( !PlaceReachable(unit,unit->Orders[0].X,unit->Orders[0].Y,1) ) {
 	    DebugLevel0Fn("FIXME: should use other goal.\n");
 	});
-#endif
 	DebugCheck( unit->State!=0 );
     }
 
@@ -283,9 +239,6 @@ global void HandleActionMove(Unit* unit)
 	    //	Some tries to reach the goal
 	    //
 	    if( unit->SubAction++<10 ) {
-#ifndef NEW_ORDERS
-		unit->Command.Action=UnitActionMove;
-#endif
 		//	To keep the load low, retry delayed.
 		unit->Wait=FRAMES_PER_SECOND/10+unit->SubAction;
 		// FIXME: Now the units didn't defend themself :(((((((
@@ -294,7 +247,6 @@ global void HandleActionMove(Unit* unit)
 	    // FALL THROUGH
 	case PF_REACHED:
 	    unit->SubAction=0;
-#ifdef NEW_ORDERS
 	    // Release target, if any.
 	    if( (goal=unit->Orders[0].Goal) ) {
 		RefsDebugCheck( !goal->Refs );
@@ -309,16 +261,11 @@ global void HandleActionMove(Unit* unit)
 		UpdateButtonPanel();
 	    }
 	    return;
-#else
-	    if( IsSelected(unit) ) {	// update display for new action
-		UpdateButtonPanel();
-	    }
-#endif
+
 	default:
 	    break;
     }
 
-#ifdef NEW_ORDERS
     //
     //	Target destroyed?
     //
@@ -333,7 +280,6 @@ global void HandleActionMove(Unit* unit)
 	}
 	NewResetPath(unit);
     }
-#endif
 }
 
 //@}
