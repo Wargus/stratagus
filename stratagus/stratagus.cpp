@@ -1339,7 +1339,7 @@ global int main(int argc,char** argv)
 		AiCostFactor=atoi(optarg);
 		continue;
 	    case 'l':
-		CommandLogEnabled=1;
+		CommandLogDisabled=1;
 		continue;
 	    case 'P':
 		NetworkPort=atoi(optarg);
