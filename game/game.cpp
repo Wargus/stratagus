@@ -284,7 +284,11 @@ global void CreateGame(char* filename, WorldMap* map)
 	if (filename) {
 		s = NULL;
 		// FIXME: LibraryFile here?
-		strcpy(CurrentMapPath, filename);
+		if (CurrentMapPath != filename) {
+			//  strcpy is not safe if parameters overlap.
+			//  Or at least this is what valgrind says.
+			strcpy(CurrentMapPath, filename);
+		}
 		if (filename[0] != '/' && filename[0] != '.') {
 			s = filename = strdcat3(StratagusLibPath, "/", filename);
 		}

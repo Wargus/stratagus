@@ -225,6 +225,9 @@ global void ReleaseUnit(Unit* unit)
 	DebugLevel2Fn("%lu:No more references, only wait for network lag, unit %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
 	unit->Type = NULL;						// for debugging.
+#ifdef NEW_UNIT_CACHE
+	free(unit->CacheLinks);
+#endif
 }
 
 /**
