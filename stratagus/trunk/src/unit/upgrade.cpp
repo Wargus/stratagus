@@ -1169,14 +1169,14 @@ global void AddSimpleUpgrade( const char* ident,
 **	@param ident	The unit-type identifier.
 **	@return		Unit-type ID (int) or -1 if not found.
 */
-global int UnitTypeIdByIdent(const char* sid)
+global int UnitTypeIdByIdent(const char* ident)
 {
     UnitType* type;
 
-    if( (type=UnitTypeByIdent(sid)) ) {
+    if( (type=UnitTypeByIdent(ident)) ) {
 	return type->Type;
     }
-    DebugLevel0Fn(" fix this %s\n",sid);
+    DebugLevel0Fn(" fix this %s\n",ident);
     return -1;
 }
 
@@ -1186,15 +1186,15 @@ global int UnitTypeIdByIdent(const char* sid)
 **	@param ident	The upgrade identifier.
 **	@return		Upgrade ID (int) or -1 if not found.
 */
-global int UpgradeIdByIdent(const char* sid)
+global int UpgradeIdByIdent(const char* ident)
 {
     Upgrade* upgrade;
 
-    upgrade=UpgradeByIdent(sid);
+    upgrade=UpgradeByIdent(ident);
     if( upgrade ) {
 	return upgrade-Upgrades;
     }
-    DebugLevel0Fn(" fix this %s\n",sid);
+    DebugLevel0Fn(" fix this %s\n",ident);
     return -1;
 }
 
@@ -1262,7 +1262,7 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    if( unit->Orders[0].Action==UnitActionTrain ) {
 		for( j=0; j<unit->Data.Train.Count; ++j ) {
 		     if( unit->Data.Train.What[j]==src ) {
-			unit->Data.Train.What[j]=dst; 
+			unit->Data.Train.What[j]=dst;
 			if( IsOnlySelected(unit) ) {
 			    MustRedraw|=RedrawInfoPanel;
 			}
@@ -1270,9 +1270,9 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 		}
 	    }
 	    for( j=1; j<unit->OrderCount; ++j ) {
-		if( unit->Orders[j].Action==UnitActionTrain	
+		if( unit->Orders[j].Action==UnitActionTrain
 			&& unit->Orders[j].Type==src ) {
-		    unit->Orders[j].Type=dst; 
+		    unit->Orders[j].Type=dst;
 		}
 	    }
 	}
@@ -1457,68 +1457,68 @@ global char UpgradeIdAllowed(const Player* player,  int id )
     return player->Allow.Upgrades[id];
 }
 
-// ***************by sid's
+// ***************by string identifiers's
 
 /**
 **	FIXME: docu
 */
-global void UpgradeIncTime2(Player * player, char *sid, int amount)	// by ident string
+global void UpgradeIncTime2(Player * player, char *ident, int amount)	// by ident string
 {
-    UpgradeIncTime(player, UpgradeIdByIdent(sid), amount);
+    UpgradeIncTime(player, UpgradeIdByIdent(ident), amount);
 }
 
 /**
 **	FIXME: docu
 */
-global void UpgradeLost2(Player * player, char *sid)	// by ident string
+global void UpgradeLost2(Player * player, char *ident)	// by ident string
 {
-    UpgradeLost(player, UpgradeIdByIdent(sid));
+    UpgradeLost(player, UpgradeIdByIdent(ident));
 }
 
 /**
 **	FIXME: docu
 */
-global void AllowUnitByIdent(Player * player, const char *sid, char af)
+global void AllowUnitByIdent(Player * player, const char *ident, char af)
 {
-    AllowUnitId(player, UnitTypeIdByIdent(sid), af);
+    AllowUnitId(player, UnitTypeIdByIdent(ident), af);
 }
 
 /**
 **	FIXME: docu
 */
-global void AllowUpgradeByIdent(Player * player, const char *sid, char af)
+global void AllowUpgradeByIdent(Player * player, const char *ident, char af)
 {
-    AllowUpgradeId(player, UpgradeIdByIdent(sid), af);
+    AllowUpgradeId(player, UpgradeIdByIdent(ident), af);
 }
 
 /**
 **	FIXME: docu
 */
-global void AllowByIdent(Player* player,  const char* sid, char af )
+global void AllowByIdent(Player* player,  const char* ident, char af )
 {
-    if( !strncmp(sid,"unit-",5) ) {
-	AllowUnitByIdent(player,sid,af);
-    } else if( !strncmp(sid,"upgrade-",8) ) {
-	AllowUpgradeByIdent(player,sid,af);
+    if( !strncmp(ident,"unit-",5) ) {
+	AllowUnitByIdent(player,ident,af);
+    } else if( !strncmp(ident,"upgrade-",8) ) {
+	AllowUpgradeByIdent(player,ident,af);
     } else {
-	DebugLevel0Fn(" wrong sid %s\n",sid);
+	DebugLevel0Fn(" wrong ident %s\n",ident);
     }
 }
 
 /**
 **	FIXME: docu
 */
-global char UnitIdentAllowed(const Player * player, const char *sid)
+global char UnitIdentAllowed(const Player * player, const char *ident)
 {
-    return UnitIdAllowed(player, UnitTypeIdByIdent(sid));
+    return UnitIdAllowed(player, UnitTypeIdByIdent(ident));
 }
 
 /**
 **	FIXME: docu
 */
-global char UpgradeIdentAllowed(const Player * player, const char *sid)
+global char UpgradeIdentAllowed(const Player * player, const char *ident)
 {
-    return UpgradeIdAllowed(player, UpgradeIdByIdent(sid));
+    return UpgradeIdAllowed(player, UpgradeIdByIdent(ident));
 }
 
 /*----------------------------------------------------------------------------
