@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name interface.c	-	The interface. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -90,17 +89,17 @@ local void ShowInput(void)
 local int CommandKey(int key)
 {
     switch( key ) {
-	case '\r':
+	case '\r':			// Return enters chat/input mode.
 	    KeyState=KeyStateInput;
 	    Input[0]='\0';
 	    InputIndex=0;
 	    ShowInput();
 	    return 1;
-	case '^':
+	case '^':			// Unselect everything
 	    UnSelectAll();
             UpdateButtonPanel();
             break;
-        case '0':
+        case '0':			// Group selection
         case '1':
         case '2':
         case '3':
@@ -126,6 +125,7 @@ local int CommandKey(int key)
             } else {
                 SelectGroup(key-48);
             }
+	    // FIXME: this should be moved into the select/group functions.
             UpdateButtonPanel();
             MustRedraw|=RedrawCursor|RedrawMap|RedrawPanels;
             break;
@@ -201,7 +201,7 @@ local int CommandKey(int key)
 	    {
 	    #include <SDL/SDL.h>
 	    // FIXME: move to system api part!
-	    extern SDL_Surface *Screen;	/// internal screen 
+	    extern SDL_Surface *Screen;	// internal screen
 
 	    SDL_WM_ToggleFullScreen(Screen);
 	    }
@@ -209,32 +209,36 @@ local int CommandKey(int key)
 #endif
 	    break;
 
-        case ' ':
+        case ' ':			// center on last action
             CenterOnMessage();
-            break; 
+            break;
 
-//	TAB toggles minimap.
-//	FIXME: more...
-	case '\t':
+	case '\t':			// TAB toggles minimap.
+					// FIXME: more...
+					// FIXME: shift+TAB
 	    DebugLevel1("TAB\n");
 	    MinimapWithTerrain^=1;
 	    MustRedraw|=RedrawMinimap;
 	    break;
-	    // FIXME: shift+TAB
 
 	case 'Q':			// should be better protected
 	    Exit(0);
+
 	case KeyCodeUp:
-		KeyScrollState |= ScrollUp;
+	case KeyCodeKP8:
+	    KeyScrollState |= ScrollUp;
 	    break;
 	case KeyCodeDown:
-		KeyScrollState |= ScrollDown;
+	case KeyCodeKP2:
+	    KeyScrollState |= ScrollDown;
 	    break;
 	case KeyCodeLeft:
-		KeyScrollState |= ScrollLeft;
+	case KeyCodeKP4:
+	    KeyScrollState |= ScrollLeft;
 	    break;
 	case KeyCodeRight:
-		KeyScrollState |= ScrollRight;
+	case KeyCodeKP6:
+	    KeyScrollState |= ScrollRight;
 	    break;
 
 	default:
@@ -261,18 +265,13 @@ local int InputKey(int key)
 #endif
                 // Handle cheats
 		// FIXME: disable cheats
-                if (strcmp(Input, "there is no aliens level") == 0)
-                  {
+                if (strcmp(Input, "there is no aliens level") == 0) {
 		  // FIXME: no function yet.
                   SetMessage( "cheat enabled" );
-                  } else
-                if (strcmp(Input, "hatchet") == 0)
-                  {
+		} else if (strcmp(Input, "hatchet") == 0) {
                   SpeedChop = 52/2;
                   SetMessage( "Wow -- I got jigsaw!" );
-                  } else
-                if (strcmp(Input, "glittering prizes") == 0)
-                  {
+                } else if (strcmp(Input, "glittering prizes") == 0) {
                   ThisPlayer->Resources[GoldCost] += 12000;
                   ThisPlayer->Resources[WoodCost] +=  5000;
                   ThisPlayer->Resources[OilCost]  +=  5000;
@@ -281,63 +280,51 @@ local int InputKey(int key)
                   ThisPlayer->Resources[CoalCost] +=  5000;
 		  MustRedraw|=RedrawResources;
 		  SetMessage( "!!! :)" );
-                  } else
-                if (strcmp(Input, "on screen") == 0)
-                  {
+		} else if (strcmp(Input, "on screen") == 0) {
                   RevealMap();
-                  } else
-                if (strcmp(Input, "fow on") == 0)
-                  {
+		} else if (strcmp(Input, "fow on") == 0) {
                   TheMap.NoFogOfWar = 0;
                   MapUpdateVisible();
                   SetMessage( "Fog Of War is now ON" );
-                  } else
-                if (strcmp(Input, "fow off") == 0)
-                  {
+		} else if (strcmp(Input, "fow off") == 0) {
                   TheMap.NoFogOfWar = 1;
                   MapUpdateVisible();
                   SetMessage( "Fog Of War is now OFF" );
-                  } else
-                if (strcmp(Input, "fast debug") == 0)
-                  {
-                  SpeedMine=10;         /// speed factor for mine gold
-                  SpeedGold=10;         /// speed factor for getting gold
-                  SpeedChop=10;         /// speed factor for chop
-                  SpeedWood=10;         /// speed factor for getting wood
-                  SpeedHaul=10;         /// speed factor for haul oil
-                  SpeedOil=10;          /// speed factor for getting oil
-                  SpeedBuild=10;        /// speed factor for building
-                  SpeedTrain=10;        /// speed factor for training
-                  SpeedUpgrade=10;      /// speed factor for upgrading
-                  SpeedResearch=10;     /// speed factor for researching
+		} else if (strcmp(Input, "fast debug") == 0) {
+                  SpeedMine=10;         // speed factor for mine gold
+                  SpeedGold=10;         // speed factor for getting gold
+                  SpeedChop=10;         // speed factor for chop
+                  SpeedWood=10;         // speed factor for getting wood
+                  SpeedHaul=10;         // speed factor for haul oil
+                  SpeedOil=10;          // speed factor for getting oil
+                  SpeedBuild=10;        // speed factor for building
+                  SpeedTrain=10;        // speed factor for training
+                  SpeedUpgrade=10;      // speed factor for upgrading
+                  SpeedResearch=10;     // speed factor for researching
                   SetMessage( "FAST DEBUG SPEED" );
-                  } else
-                if (strcmp(Input, "normal debug") == 0)
-                  {
-                  SpeedMine=1;         /// speed factor for mine gold
-                  SpeedGold=1;         /// speed factor for getting gold
-                  SpeedChop=1;         /// speed factor for chop
-                  SpeedWood=1;         /// speed factor for getting wood
-                  SpeedHaul=1;         /// speed factor for haul oil
-                  SpeedOil=1;          /// speed factor for getting oil
-                  SpeedBuild=1;        /// speed factor for building
-                  SpeedTrain=1;        /// speed factor for training
-                  SpeedUpgrade=1;      /// speed factor for upgrading
-                  SpeedResearch=1;     /// speed factor for researching
+		} else if (strcmp(Input, "normal debug") == 0) {
+                  SpeedMine=1;         // speed factor for mine gold
+                  SpeedGold=1;         // speed factor for getting gold
+                  SpeedChop=1;         // speed factor for chop
+                  SpeedWood=1;         // speed factor for getting wood
+                  SpeedHaul=1;         // speed factor for haul oil
+                  SpeedOil=1;          // speed factor for getting oil
+                  SpeedBuild=1;        // speed factor for building
+                  SpeedTrain=1;        // speed factor for training
+                  SpeedUpgrade=1;      // speed factor for upgrading
+                  SpeedResearch=1;     // speed factor for researching
                   SetMessage( "NORMAL DEBUG SPEED" );
-                  }
-                if (strcmp(Input, "make it so") == 0)
-                  {
-                  SpeedMine=10;         /// speed factor for mine gold
-                  SpeedGold=10;         /// speed factor for getting gold
-                  SpeedChop=10;         /// speed factor for chop
-                  SpeedWood=10;         /// speed factor for getting wood
-                  SpeedHaul=10;         /// speed factor for haul oil
-                  SpeedOil=10;          /// speed factor for getting oil
-                  SpeedBuild=10;        /// speed factor for building
-                  SpeedTrain=10;        /// speed factor for training
-                  SpeedUpgrade=10;      /// speed factor for upgrading
-                  SpeedResearch=10;     /// speed factor for researching
+		} else if (strcmp(Input, "make it so") == 0) {
+                  SpeedMine=10;         // speed factor for mine gold
+                  SpeedGold=10;         // speed factor for getting gold
+                  SpeedChop=10;         // speed factor for chop
+                  SpeedWood=10;         // speed factor for getting wood
+                  SpeedHaul=10;         // speed factor for haul oil
+                  SpeedOil=10;          // speed factor for getting oil
+                  SpeedBuild=10;        // speed factor for building
+                  SpeedTrain=10;        // speed factor for training
+                  SpeedUpgrade=10;      // speed factor for upgrading
+                  SpeedResearch=10;     // speed factor for researching
                   ThisPlayer->Resources[GoldCost] += 32000;
                   ThisPlayer->Resources[WoodCost] += 32000;
                   ThisPlayer->Resources[OilCost]  += 32000;
@@ -346,9 +333,10 @@ local int InputKey(int key)
                   ThisPlayer->Resources[CoalCost] += 32000;
 		  MustRedraw|=RedrawResources;
                   SetMessage( "SO!" );
-                  } else
-		// FIXME: only to selected players
-		NetworkChatMessage(Input);
+		} else {
+		  // FIXME: only to selected players ...
+		  NetworkChatMessage(Input);
+		}
 #if defined(USE_CCL) || defined(USE_CCL2)
 	    }
 #endif
@@ -382,12 +370,11 @@ local int InputKey(int key)
 **	Handle key down.
 **
 **	@param key	Key scancode.
-**	@return		True, if key is handles; otherwise false.
+**	@return		True, if key is handled; otherwise false.
 */
 global int HandleKeyDown(int key)
 {
-
-/// Handle Modifier Keys
+    // Handle Modifier Keys
     switch( key ) {
 	case KeyCodeShift:
 	    KeyModifiers|=ModifierShift;
@@ -408,16 +395,16 @@ global int HandleKeyDown(int key)
 	    break;
     }
 
-/// Handle All other keys
+    // Handle All other keys
     switch( InterfaceState ) {
-	case IfaceStateNormal:			/// Normal Game state
+	case IfaceStateNormal:			// Normal Game state
 	    switch( KeyState ) {
 		case KeyStateCommand:
 		    return CommandKey(key);
 		case KeyStateInput:
 		    return InputKey(key);
 	    }
-    	case IfaceStateMenu:			/// Menu active
+	case IfaceStateMenu:			// Menu active
 	    return MenuKey(key);
     }
     return 0;
@@ -432,34 +419,39 @@ global int HandleKeyDown(int key)
 global int HandleKeyUp(int key)
 {
     switch( key ) {
-    case KeyCodeShift:
+	case KeyCodeShift:
 	    KeyModifiers&=~ModifierShift;
 	    break;
-    case KeyCodeControl:
+	case KeyCodeControl:
 	    KeyModifiers&=~ModifierControl;
 	    break;
-    case KeyCodeAlt:
+	case KeyCodeAlt:
 	    KeyModifiers&=~ModifierAlt;
 	    break;
-    case KeyCodeSuper:
+	case KeyCodeSuper:
 	    KeyModifiers&=~ModifierSuper;
 	    break;
-    case KeyCodeHyper:
+	case KeyCodeHyper:
 	    KeyModifiers&=~ModifierHyper;
 	    break;
-    case KeyCodeUp:
+
+	case KeyCodeUp:
+	case KeyCodeKP8:
 	    KeyScrollState &= ~ScrollUp;
 	    break;
-    case KeyCodeDown:
+	case KeyCodeDown:
+	case KeyCodeKP2:
 	    KeyScrollState &= ~ScrollDown;
 	    break;
-    case KeyCodeLeft:
+	case KeyCodeLeft:
+	case KeyCodeKP4:
 	    KeyScrollState &= ~ScrollLeft;
 	    break;
-    case KeyCodeRight:
+	case KeyCodeRight:
+	case KeyCodeKP6:
 	    KeyScrollState &= ~ScrollRight;
 	    break;
-    default:
+	default:
 	    break;
     }
     return 0;
@@ -468,12 +460,12 @@ global int HandleKeyUp(int key)
 /**
 **	Handle movement of the cursor.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param x	screen pixel X position.
+**	@param y	screen pixel Y position.
 */
 global void HandleMouseMove(int x,int y)
 {
-    // 
+    //
     //	Reduce coordinates to window-size.
     //
     if( x<0 ) {
@@ -491,10 +483,10 @@ global void HandleMouseMove(int x,int y)
     CursorY=y;
 
     switch( InterfaceState ) {
-	case IfaceStateNormal:			/// Normal Game state
+	case IfaceStateNormal:			// Normal Game state
 	    UIHandleMouseMove(x, y);
 	    break;
-    	case IfaceStateMenu:			/// Menu active
+	case IfaceStateMenu:			// Menu active
 	    MenuHandleMouseMove(x, y);
 	    break;
     }
@@ -502,16 +494,21 @@ global void HandleMouseMove(int x,int y)
 
 /**
 **	Called if mouse button pressed down.
+**
+**	FIXME: the mouse handling should be complete rewritten
+**	FIXME: this is needed for double click, long click,...
+**
+**	@param b	Mouse button number (0 left, 1 middle, 2 right)
 */
 global void HandleButtonDown(int b)
 {
     MouseButtons|=1<<b;
 
     switch( InterfaceState ) {
-	case IfaceStateNormal:			/// Normal Game state
+	case IfaceStateNormal:			// Normal Game state
 	    UIHandleButtonDown(b);
 	    break;
-    	case IfaceStateMenu:			/// Menu active
+	case IfaceStateMenu:			// Menu active
 	    MenuHandleButtonDown(b);
 	    break;
     }
@@ -519,16 +516,21 @@ global void HandleButtonDown(int b)
 
 /**
 **	Called if mouse button released.
+**
+**	FIXME: the mouse handling should be complete rewritten
+**	FIXME: this is needed for double click, long click,...
+**
+**	@param b	Mouse button number (0 left, 1 middle, 2 right)
 */
 global void HandleButtonUp(int b)
 {
     MouseButtons&=~(1<<b);
 
     switch( InterfaceState ) {
-	case IfaceStateNormal:			/// Normal Game state
+	case IfaceStateNormal:			// Normal Game state
 	    UIHandleButtonUp(b);
 	    break;
-    	case IfaceStateMenu:			/// Menu active
+	case IfaceStateMenu:			// Menu active
 	    MenuHandleButtonUp(b);
 	    break;
     }
