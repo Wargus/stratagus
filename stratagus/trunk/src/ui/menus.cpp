@@ -1693,8 +1693,6 @@ local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 	menu->Items[5].d.gem.state = MI_GSTATE_UNCHECKED;
 	menu->Items[6].d.gem.state = MI_GSTATE_UNCHECKED;
 	menu->Items[7].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[9].d.gem.state = MI_GSTATE_UNCHECKED;
-	menu->Items[10].d.gem.state = MI_GSTATE_UNCHECKED;
 
 	if (VideoWidth == 640) {
 		menu->Items[2].d.gem.state = MI_GSTATE_CHECKED;
@@ -1710,12 +1708,6 @@ local void GlobalOptionsInit(Menuitem *mi __attribute__((unused)))
 
 	if (VideoFullScreen) {
 		menu->Items[7].d.gem.state = MI_GSTATE_CHECKED;
-	}
-
-	if (OriginalFogOfWar) {
-		menu->Items[9].d.gem.state = MI_GSTATE_CHECKED;
-	} else {
-		menu->Items[10].d.gem.state = MI_GSTATE_CHECKED;
 	}
 }
 
