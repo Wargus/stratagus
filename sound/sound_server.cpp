@@ -898,7 +898,7 @@ local Sample* LoadSample(const char* name)
 **	@todo	FIXME: Must handle the errors better.
 **		FIXME: Support for more sample files (ogg/flac/mp3).
 */
-global SoundId RegisterSound(char* files[], unsigned number)
+global SoundId RegisterSound(const char* files[], unsigned number)
 {
     unsigned i;
     ServerSoundId id;

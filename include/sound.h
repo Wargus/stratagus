@@ -148,7 +148,7 @@ extern void InitSoundClient(void);
 extern void PlaySectionMusic(PlaySectionType section);
 
     /// Play a sample file
-extern void PlayFile(char* name);
+extern void PlayFile(const char* name);
     /// Play a music file
 extern int PlayMusic(const char* name);
     /// Stop music playing
