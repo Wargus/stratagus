@@ -222,7 +222,7 @@ typedef struct _menuitem_ {
     int yofs;
     unsigned flags;
     int font;
-	int transparent;			/// Add the transparent flag to draw a transparent flag
+	int transparent;			/// Add the transparent flag to draw a translucide menu
     void (*initfunc)(struct _menuitem_ *);	/// constructor
     void (*exitfunc)(struct _menuitem_ *);	/// destructor
     struct _menus_ *menu;			/// backpointer for speedups
