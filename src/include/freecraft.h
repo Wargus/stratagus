@@ -172,6 +172,10 @@
 --	General
 ----------------------------------------------------------------------------*/
 
+#ifndef VERSION
+#define VERSION	"1.17pre1"		/// Engine version shown.
+#endif
+
 #ifndef FREECRAFT_LIB_PATH
 #define FREECRAFT_LIB_PATH "data"	/// where to find the data files
 #endif
