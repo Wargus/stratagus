@@ -10,7 +10,7 @@
 //
 /**@name command.c - Give units a command. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -405,7 +405,6 @@ void CommandRepair(Unit* unit, int x, int y, Unit* dest, int flush)
 **  Auto repair.
 **
 **  @param unit     pointer to unit.
-**  @param spellid  Spell id.
 **  @param on       1 for auto repair on, 0 for off.
 */
 void CommandAutoRepair(Unit* unit, int on)
