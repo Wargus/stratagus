@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name actions.c	-	The actions. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -26,13 +25,17 @@
 
 #include "freecraft.h"
 #include "video.h"
-#include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
 #include "actions.h"
 #include "interface.h"
+#include "map.h"
+
+/*----------------------------------------------------------------------------
+--	Functions
+----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --	Animation
@@ -52,7 +55,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 	UnitUpdateHeading(unit);		// FIXME: remove this!!
     }
 
-    DebugLevel3(__FUNCTION__": State %2d ",state);
+    DebugLevel3Fn("State %2d ",state);
     DebugLevel3("Flags %2d Pixel %2d Frame %2d Wait %3d "
 	    ,animation[state].Flags,animation[state].Pixel
 	    ,animation[state].Frame,animation[state].Sleep);
@@ -83,7 +86,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 }
 
 /*----------------------------------------------------------------------------
---	Globals
+--	Actions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -137,7 +140,7 @@ local void HandleUnitAction(Unit* unit)
     //
     switch( unit->Command.Action ) {
 	case UnitActionNone:
-	    DebugLevel1("FIXME: Should not happen!\n");
+	    DebugLevel1Fn("FIXME: Should not happen!\n");
 	    break;
 
 	case UnitActionStill:
@@ -222,8 +225,7 @@ local void HandleUnitAction(Unit* unit)
 	    break;
 
 	default:
-	    DebugLevel1(__FUNCTION__": Unknown action %d\n"
-		    ,unit->Command.Action);
+	    DebugLevel1Fn("Unknown action %d\n",unit->Command.Action);
 	    break;
     }
 }
@@ -242,6 +244,39 @@ global void UnitActions(void)
     // Do all actions
     //
     for( table=Units; table<Units+NumUnits; table++ ) {
+#if defined(UNIT_ON_MAP) && 0		// debug unit store
+	Unit* list;
+	Unit* unit;
+
+	unit=*table;
+	list=TheMap.Fields[unit->Y*TheMap.Width+unit->X].Here.Units;
+	while( list ) {				// find the unit
+	    if( list==unit ) {
+		break;
+	    }
+	    list=list->Next;
+	}
+	if( !unit->Removed ) {
+	    if( !list
+		    && (!unit->Type->Vanishes
+			&& !unit->Command.Action==UnitActionDie) ) {
+		DebugLevel0Fn("!removed not on map %Zd\n",UnitNumber(unit));
+		abort();
+	    }
+	} else if( list ) {
+	    DebugLevel0Fn("remove on map %Zd\n",UnitNumber(unit));
+	    abort();
+	}
+	list=unit->Next;
+	while( list ) {
+	    if( list->X!=unit->X || list->Y!=unit->Y ) {
+		DebugLevel0Fn("Wrong X,Y %Zd %d,%d\n",UnitNumber(list)
+			,list->X,list->Y);
+		abort();
+	    }
+	    list=list->Next;
+	}
+#endif
 	if( --(*table)->Wait ) {	// Wait until counter reached
 	    continue;
 	}
