@@ -805,7 +805,6 @@ void LoadPud(const char* pud,WorldMap* map)
 	char pudfull[PATH_MAX];
 	int width;
 	int height;
-	int aiopps;
 
 	strcpy(pudfull, StratagusLibPath);
 	strcat(pudfull, "/");
@@ -835,7 +834,7 @@ void LoadPud(const char* pud,WorldMap* map)
 		ExitFatal(-1);
 	}
 
-	aiopps=width=height=0;
+	width=height=0;
 
 	//
 	// Parse all sections.
