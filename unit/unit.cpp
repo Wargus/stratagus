@@ -766,12 +766,12 @@ global int UnitVisible(const Unit* unit)
     //
     //	Check explored or if visible (building) under fog of war.
     //		FIXME: need only check the boundary, not the complete rectangle.
-    //		FIXME: do we know this building SeenFrame!=-1 ?
     //
     for( ; (int)h>=0; --h) {
 	for( w=w0; (int)w>=0; --w ) {
 	    if( IsMapFieldVisible(x+w,y+h) 
-		    || (unit->Type->Building && IsMapFieldExplored(x+w,y+h)) ) {
+		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+			&& IsMapFieldExplored(x+w,y+h)) ) {
 		return 1;
 	    }
 	}
