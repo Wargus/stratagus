@@ -57,9 +57,7 @@ global void HandleActionDemolish(Unit* unit)
 	//	Move near to target.
 	//
 	case 0:				// first entry.
-#ifdef NEW_ORDERS
 	    NewResetPath(unit);
-#endif
 	    unit->SubAction=1;
 	    // FALL THROUGH
 
@@ -67,11 +65,7 @@ global void HandleActionDemolish(Unit* unit)
 	    // FIXME: reset first!! why? (johns)
 	    err=DoActionMove(unit);
 	    if( unit->Reset ) {
-#ifdef NEW_ORDERS
 		goal=unit->Orders[0].Goal;
-#else
-		goal=unit->Command.Data.Move.Goal;
-#endif
 		//
 		//	Target is dead, stop demolish.
 		//	FIXME: what should I do, go back or explode on place?
@@ -84,8 +78,7 @@ global void HandleActionDemolish(Unit* unit)
 			    ReleaseUnit(goal);
 			}
 			// FIXME: perhaps I should choose an alternative
-#ifdef NEW_ORDERS
-			unit->Orders[0].Goal=goal=NoUnitP;
+			unit->Orders[0].Goal=NoUnitP;
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
 			return;
@@ -94,31 +87,16 @@ global void HandleActionDemolish(Unit* unit)
 			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
 			RefsDebugCheck( !goal->Refs );
-			unit->Orders[0].Goal=goal=NoUnitP;
+			unit->Orders[0].Goal=NoUnitP;
 			// FIXME: perhaps I should choose an alternative
 			unit->Orders[0].Action=UnitActionStill;
 			unit->SubAction=0;
-#else
-			unit->Command.Data.Move.Goal=goal=NoUnitP;
-			unit->Command.Action=UnitActionStill;
-			unit->SubAction=0;
-			return;
-		    } else if( goal->Removed || !goal->HP
-				|| goal->Command.Action==UnitActionDie ) {
-			RefsDebugCheck( !goal->Refs );
-			--goal->Refs;
-			RefsDebugCheck( !goal->Refs );
-			// FIXME: perhaps I should choose an alternative
-			unit->Command.Data.Move.Goal=goal=NoUnitP;
-			unit->Command.Action=UnitActionStill;
-			unit->SubAction=0;
-#endif
 			return;
 		    }
 		}
 
 		//
-		//	Have reached target? FIXME: could use result?
+		//	Have reached target? FIXME: could use pathfinder result?
 		//
 		if( goal ) {
 		    if( MapDistanceToUnit(unit->X,unit->Y,goal)<=1 ) {
@@ -126,22 +104,14 @@ global void HandleActionDemolish(Unit* unit)
 			unit->SubAction=2;
 		    }
 		} else if( MapDistance(unit->X,unit->Y
-#ifdef NEW_ORDERS
 			,unit->Orders[0].X,unit->Orders[0].Y)<=1 ) {
-#else
-			,unit->Command.Data.Move.DX
-			,unit->Command.Data.Move.DY)<=1 ) {
-#endif
 		    unit->State=0;
 		    unit->SubAction=2;
 		} else if( err==PF_UNREACHABLE ) {
+		    unit->Orders[0].Action=UnitActionStill;
 		    return;
 		}
-#ifdef NEW_ORDERS
-		unit->Orders[0].Action=UnitActionDemolish;
-#else
-		unit->Command.Action=UnitActionDemolish;
-#endif
+		DebugCheck( unit->Orders[0].Action!=UnitActionDemolish );
 	    }
 	    break;
 
@@ -149,20 +119,12 @@ global void HandleActionDemolish(Unit* unit)
 	//	Demolish the target.
 	//
 	case 2:
-#ifdef NEW_ORDERS
 	    goal=unit->Orders[0].Goal;
-#else
-	    goal=unit->Command.Data.Move.Goal;
-#endif
 	    if( goal ) {
 		RefsDebugCheck( !goal->Refs );
 		--goal->Refs;
 		RefsDebugCheck( !goal->Refs );
-#ifdef NEW_ORDERS
 		unit->Orders[0].Goal=NoUnitP;
-#else
-		unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 	    }
 
             x=unit->X;
