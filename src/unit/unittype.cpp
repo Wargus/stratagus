@@ -88,7 +88,7 @@ global UnitType*UnitTypeCritter;	/// Critter unit type pointer
 global UnitType*UnitTypeBerserker;	/// Berserker for berserker regeneration
 
 /**
-**	Mapping of W*rCr*ft number to our internal unit-type symbols.
+**	Mapping of W*rCr*ft number to our internal unit-type symbol.
 **	The numbers are used in puds.
 */
 global char** UnitTypeWcNames;
@@ -1066,6 +1066,8 @@ global void CleanUnitTypes(void)
 	UnitTypeWcNames=NULL;
     }
 
+#if 0
+    //	FIXME: scheme contains references on this structure.
     //	Clean all animations.
 
     for( type=UnitTypes; type->OType; ++type ) {
@@ -1095,6 +1097,7 @@ global void CleanUnitTypes(void)
 	}
 	free(anims);
     }
+#endif
 
     //	Clean all unit-types
 
@@ -1123,7 +1126,6 @@ global void CleanUnitTypes(void)
 		free(type->File[3]);
 	    }
 
-#if 0
 	    if( type->Icon.Name ) {
 		free(type->Icon.Name);
 	    }
@@ -1133,7 +1135,6 @@ global void CleanUnitTypes(void)
 	    if( type->CorpseName ) {
 		free(type->CorpseName);
 	    }
-#endif
 
 	    if( type->Sound.Selected.Name ) {
 		free(type->Sound.Selected.Name);
@@ -1154,7 +1155,7 @@ global void CleanUnitTypes(void)
 		free(type->Weapon.Attack.Name);
 	    }
 
-	    if( !type->SameSprite ) {
+	    if( !type->SameSprite ) {	// our own graphics
 		VideoSaveFree(type->Sprite);
 	    }
 	}
