@@ -147,7 +147,10 @@ local void EditorUpdateDisplay(void)
     HideAnyCursor();			// remove cursor (when available)
 
     DrawMapArea();			// draw the map area
-    DrawMapCursor();			// cursor on map
+
+    if (CursorOn==CursorOnMap) {
+	DrawMapCursor();			// cursor on map
+    }
 
     //
     //  Menu button
@@ -472,9 +475,33 @@ local void EditorCallbackMouse(int x, int y)
     }
 
     //
+    //	Map
+    //
+#ifdef SPLIT_SCREEN_SUPPORT
+    if (x>=TheUI.MapArea.X && x<=TheUI.MapArea.EndX
+	    && y>=TheUI.MapArea.Y && y<=TheUI.MapArea.EndY) {
+	CursorOn = CursorOnMap;
+    }
+{
+    int viewport = GetViewport (x, y);
+    if (viewport >= 0 && viewport != TheUI.ActiveViewport) {
+	TheUI.ActiveViewport = viewport;
+	DebugLevel0Fn ("active viewport changed to %d.\n" _C_ viewport);
+    }
+}
+#else /* SPLIT_SCREEN_SUPPORT */
+    if( x>=TheUI.MapX && x<=TheUI.MapEndX
+	    && y>=TheUI.MapY && y<=TheUI.MapEndY ) {
+	CursorOn=CursorOnMap;
+    }
+#endif /* SPLIT_SCREEN_SUPPORT */
+
+    //
     //  Scrolling Region Handling
     //
-    HandleMouseScrollArea(x,y);
+    if (HandleMouseScrollArea(x,y)) {
+	return;
+    }
 
     //  Not reached if cursor is inside the scroll area
 }
