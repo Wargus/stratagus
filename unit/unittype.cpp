@@ -843,6 +843,28 @@ void LoadUnitTypes(void)
 		}
 
 		//
+		// Lookup BuildingTypes
+		if (type->BuildingRules) {
+			int x;
+			BuildRestriction* b;
+			x = 0;
+			while(type->BuildingRules[x] != NULL) {
+				b = type->BuildingRules[x];
+				while (b != NULL) {
+					if (b->RestrictType == RestrictAddOn) {
+						b->Data.AddOn.Parent = UnitTypeByIdent(b->Data.AddOn.ParentName);
+					} else if (b->RestrictType == RestrictOnTop) {
+						b->Data.OnTop.Parent = UnitTypeByIdent(b->Data.OnTop.ParentName);
+					} else if (b->RestrictType == RestrictDistance) {
+						b->Data.Distance.RestrictType = UnitTypeByIdent(b->Data.Distance.RestrictTypeName);
+					}
+					b = b->Next;
+				}
+				++x;
+			}
+		}
+
+		//
 		// Load Sprite
 		//
 #ifndef DYNAMIC_LOAD
@@ -946,6 +968,13 @@ void CleanUnitTypes(void)
 				while (b != NULL) {
 					f = b;
 					b = b->Next;
+					if (f->RestrictType == RestrictAddOn) {
+						free(f->Data.AddOn.ParentName);
+					} else if (f->RestrictType == RestrictOnTop) {
+						free(f->Data.OnTop.ParentName);
+					} else if (f->RestrictType == RestrictDistance) {
+						free(f->Data.Distance.RestrictTypeName);
+					}
 					free(f);
 				}
 				++x;

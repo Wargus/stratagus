@@ -818,12 +818,14 @@ extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
 	/// Drop out all units in the unit
 extern void DropOutAll(const Unit* unit);
 
+	/// Return the rule used to build this building.
+extern BuildRestriction* OnTopDetails(const Unit* unit, const UnitType* parent);
 	/// @todo more docu
-extern int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y);
+extern Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y);
 	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
-extern int CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y, int real);
+extern Unit* CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y, int real);
 
 	/// Find resource
 extern Unit* FindResource(const Unit* unit, int x, int y, int range, int resource);
@@ -854,6 +856,8 @@ extern int MapDistance(int x1, int y1, int x2, int y2);
 extern int MapDistanceToType(int x1, int y1,const UnitType* type, int x2, int y2);
 	/// Returns the map distance to unit
 extern int MapDistanceToUnit(int x, int y,const Unit* dest);
+	/// Returns the map diestance between to unittype as locations
+extern int MapDistanceBetweenTypes(const UnitType* src, int x1, int y1, const UnitType* dst, int x2, int y2);
 	/// Returns the map distance between two units
 extern int MapDistanceBetweenUnits(const Unit* src,const Unit* dst);
 

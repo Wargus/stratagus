@@ -96,6 +96,8 @@ void HandleActionBuild(Unit* unit)
 	UnitType* type;
 	const UnitStats* stats;
 	Unit* build;
+	Unit* ontop;
+	BuildRestriction* b;
 
 	if (!unit->SubAction) { // first entry
 		unit->SubAction = 1;
@@ -141,9 +143,9 @@ void HandleActionBuild(Unit* unit)
 
 	//
 	// Check if the building could be build there.
-	// 1 really attempt to build here
+	// if on NULL, really attempt to build here
 	//
-	if (!CanBuildUnitType(unit, type, x, y, 1)) {
+	if ((ontop = CanBuildUnitType(unit, type, x, y, 1)) == NULL) {
 		//
 		// Some tries to build the building.
 		//
@@ -224,17 +226,16 @@ void HandleActionBuild(Unit* unit)
 		build->CurrentSightRange = 1;
 	}
 
-	// Building on top of something, must remove what is beneath it
-	if (type->MustBuildOnTop) {
-		Unit* temp;
-		if ((temp = UnitTypeOnMap(x, y, type->MustBuildOnTop))) {
-			build->Value = temp->Value; // We capture the value of what is beneath.
-			RemoveUnit(temp, NULL); // Destroy building beneath
-			UnitLost(temp);
-			UnitClearOrders(temp);
-			ReleaseUnit(temp);
-		} else {
-			Assert(0);
+	// Building on top of something, may remove what is beneath it
+	if (ontop != unit) {
+		b = OnTopDetails(build, ontop->Type);
+		Assert(b);
+		if (b->Data.OnTop.ReplaceOnBuild) {
+			build->Value = ontop->Value; // We capture the value of what is beneath.
+			RemoveUnit(ontop, NULL); // Destroy building beneath
+			UnitLost(ontop);
+			UnitClearOrders(ontop);
+			ReleaseUnit(ontop);
 		}
 	}
 

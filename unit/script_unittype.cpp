@@ -124,6 +124,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 			LuaError(l, "incorrect argument");
 		}
 		if (!strcmp(value, "distance")) {
+			(*b)->RestrictType = RestrictDistance;
 			lua_pushnil(l);
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
@@ -160,6 +161,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "tile")) {
+			(*b)->RestrictType = RestrictTiles;
 			lua_pushnil(l);
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
@@ -173,6 +175,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "addon")) {
+			(*b)->RestrictType = RestrictAddOn;
 			lua_pushnil(l);
 			while (lua_next(l, -2)) {
 				value = LuaToString(l, -2);
@@ -184,6 +187,34 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 					(*b)->Data.AddOn.ParentName = strdup(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "direction")) {
+			(*b)->RestrictType = RestrictDirection;
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Direction")) {
+					(*b)->Data.Direction = LuaToNumber(l, -1);
+				} else {
+					LuaError(l, "Unsupported BuildingRules direction tag: %s" _C_ value);
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "ontop")) {
+			(*b)->RestrictType = RestrictOnTop;
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Type")) {
+					(*b)->Data.OnTop.ParentName = strdup(LuaToString(l, -1));
+				} else if (!strcmp(value, "ReplaceOnDie")) {
+					(*b)->Data.OnTop.ReplaceOnDie = LuaToBoolean(l, -1);
+				} else if (!strcmp(value, "ReplaceOnBuild")) {
+					(*b)->Data.OnTop.ReplaceOnBuild = LuaToBoolean(l, -1);
+				} else {
+					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value);
 				}
 				lua_pop(l, 1);
 			}
@@ -204,7 +235,6 @@ static int CclDefineUnitType(lua_State* l)
 {
 	const char* value;
 	UnitType* type;
-	UnitType* auxtype;
 	ResourceInfo* res;
 	char* str;
 	int i;
@@ -421,14 +451,6 @@ static int CclDefineUnitType(lua_State* l)
 			lua_rawgeti(l, -1, 2);
 			type->TileHeight = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "MustBuildOnTop")) {
-			value = LuaToString(l, -1);
-			auxtype = UnitTypeByIdent(value);
-			if (!auxtype) {
-				DebugPrint("Build on top of undefined unit \"%s\".\n" _C_ str);
-				Assert(0);
-			}
-			type->MustBuildOnTop = auxtype;
 		} else if (!strcmp(value, "Decoration")) {
 			type->Decoration = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
@@ -601,6 +623,13 @@ static int CclDefineUnitType(lua_State* l)
 					while (b != NULL) {
 						f = b;
 						b = b->Next;
+						if (f->RestrictType == RestrictAddOn) {
+							free(f->Data.AddOn.ParentName);
+						} else if (f->RestrictType == RestrictOnTop) {
+							free(f->Data.OnTop.ParentName);
+						} else if (f->RestrictType == RestrictDistance) {
+							free(f->Data.Distance.RestrictTypeName);
+						}
 						free(f);
 					}
 					++x;
