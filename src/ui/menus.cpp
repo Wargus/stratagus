@@ -102,9 +102,14 @@ local void GameRESAction(Menuitem *mi, int i);
 local void GameUNSAction(Menuitem *mi, int i);
 local void GameTSSAction(Menuitem *mi, int i);
 
-local void CustomGameCancel(void);
+local void GameCancel(void);
+
 local void CustomGameStart(void);
 local void CustomGameOPSAction(Menuitem *mi, int i);
+
+local void MultiClientReady(void);
+local void MultiClientNotReady(void);
+local void MultiClientGemAction(Menuitem *mi);
 
 local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameSetupExit(Menuitem *mi);	// master exit
@@ -116,7 +121,7 @@ local void MultiScenSelectMenu(void);
 
 local void MultiGameClientInit(Menuitem *mi);	// master init
 local void MultiGameClientDrawFunc(Menuitem *mi);
-local void MultiGameClientUpdate(int initial);
+local void MultiClientUpdate(int initial);
 
 local void NetConnectingCancel(void);
 local void TerminateNetConnect(void);
@@ -239,7 +244,7 @@ local unsigned char *ssmsoptions[] = {
 
 local char ScenSelectDisplayPath[1024];
 local char ScenSelectFileName[128];
-local int CustomGameStarted = 0;
+local int GuiGameStarted = 0;
 local char ScenSelectPath[1024];
 
 global char ScenSelectFullPath[1024];
@@ -349,7 +354,7 @@ local Menuitem CustomGameMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
@@ -433,7 +438,7 @@ local Menuitem NetMultiSetupMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
@@ -474,19 +479,19 @@ local Menuitem NetMultiSetupMenuItems[] = {
 	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
 
     { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
 
 };
 
@@ -496,15 +501,15 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ drawfunc:{ MultiGameClientDrawFunc } } },
 
     { MI_TYPE_TEXT, 640/2+12, 8, 0, LargeFont, NULL, NULL,
-	{ text:{ "~<Multi Player Setup~>", MI_TFLAGS_CENTERED} } },
+	{ text:{ "~<Multi Player Game~>", MI_TFLAGS_CENTERED} } },
 
-    { MI_TYPE_GEM, 0, 0, MenuButtonDisabled, LargeFont, NULL, NULL,				/// FIXME: REMOVE
-	{ gem:{ MI_GSTATE_INVISIBLE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
-    { MI_TYPE_GEM, 600, 0, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_INVISIBLE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Ready", 224, 27, MBUTTON_GM_FULL, MultiClientReady, 'r'} } },
+    { MI_TYPE_BUTTON, 640-224-16, 360+36, 0, LargeFont, NULL, NULL,
+	{ button:{ "~!Not Ready", 224, 27, MBUTTON_GM_FULL, MultiClientNotReady, 'n'} } },
 
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
-	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, CustomGameCancel, 'c'} } },	/// FIXME: Cancelfunc
+	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, GameCancel, 'c'} } },	/// FIXME: Cancelfunc
 
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
 	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
@@ -545,19 +550,19 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
 
     { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*3, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*4, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*5, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*6, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
-	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
 
 };
 
@@ -695,7 +700,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	3, 30,
+	4, 30,
 	NetMultiClientMenuItems,		// FIXME: unfinished
 	NULL,
     },
@@ -1251,9 +1256,9 @@ local void MultiScenSelectMenu(void)
 local void SinglePlayerGameMenu(void)
 {
     DestroyCursorBackground();
-    CustomGameStarted = 0;
+    GuiGameStarted = 0;
     ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
-    if (CustomGameStarted) {
+    if (GuiGameStarted) {
 	GameMenuReturn();
     }
 }
@@ -1340,9 +1345,9 @@ local void TerminateNetConnect(void)
     DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
     NetConnectRunning = 2;
     DestroyCursorBackground();
-    CustomGameStarted = 0;
+    GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_CLIENT, 1);
-    if (CustomGameStarted) {
+    if (GuiGameStarted) {
 	GameMenuReturn();
     } else {
 	NetConnectingCancel();
@@ -1352,9 +1357,9 @@ local void TerminateNetConnect(void)
 local void CreateNetGameMenu(void)
 {
     DestroyCursorBackground();
-    CustomGameStarted = 0;
+    GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_SETUP, 1);
-    if (CustomGameStarted) {
+    if (GuiGameStarted) {
 	GameMenuReturn();
     }
 }
@@ -1727,7 +1732,7 @@ local void ScenSelectCancel(void)
     EndMenu();
 }
 
-local void CustomGameCancel(void)
+local void GameCancel(void)
 {
     DestroyCursorBackground();
     StartMenusSetBackground(NULL);
@@ -1745,7 +1750,7 @@ local void CustomGameStart(void)
     }
     strcat(ScenSelectPath, ScenSelectFileName);		// Final map name with path
     LoadMap(ScenSelectPath, &TheMap);
-    CustomGameStarted = 1;
+    GuiGameStarted = 1;
     EndMenu();
 }
 
@@ -1903,6 +1908,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
 	/* FIXME: don't forget to throw out additional players without available slots here! */
 
+	if (initial) {
+	    NetMultiSetupMenuItems[22 + i].flags = 0;
+	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	}
 	if (i >= h) {
 	    /* FIXME: This can be wrong - avoid slots of net-connected player! */
 	    if (initial) {
@@ -1912,7 +1921,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.state = MI_PSTATE_PASSIVE;
 
 	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
-	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+	    NetMultiSetupMenuItems[22 + i].d.gem.state |= MI_GSTATE_INVISIBLE;
 	}
 	if (i >= h + c) {
 	    NetMultiSetupMenuItems[5 + i].d.pulldown.defopt =
@@ -1922,7 +1931,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     }
 }
 
-local void MultiGameClientUpdate(int initial)
+local void MultiClientUpdate(int initial)
 {
     int i, h, c;
 
@@ -1957,11 +1966,6 @@ local void MultiGameClientUpdate(int initial)
 	} else {
 	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_CHECKED;
 	}
-	if (i == NetLocalHostsSlot) {
-	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
-	} else {
-	    NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_PASSIVE;
-	}
 
 	if (i >= h) {
 	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
@@ -1970,7 +1974,7 @@ local void MultiGameClientUpdate(int initial)
 	    NetMultiClientMenuItems[22 + i].flags = MenuButtonDisabled;
 	    NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
 	    NetMultiClientMenuItems[5 + i].d.pulldown.defopt =
-		    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 2;
+			NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 2;
 	    NetMultiClientMenuItems[5 + i].flags = MenuButtonDisabled;
 	}
     }
@@ -1997,14 +2001,22 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     if (i >= 0 && i < 8) {
 	if (i > 0) {
 	    NetMultiSetupMenuItems[22 + i].flags &= ~MenuButtonDisabled;
-	    // FIXME: check player ready checkmark state
-	    NetMultiSetupMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	    // Note: re-disabled in MultiGamePlayerSelectorsUpdate() for kicked out clients!!
+	    if (ServerSetupState.Ready[i]) {
+		NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
+	    } else {
+		NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	    }
 	}
     } else {
 	i = mi - NetMultiClientMenuItems - 5;
 	if (i > 0) {
 	    NetMultiClientMenuItems[22 + i].flags &= ~MenuButtonDisabled;
-	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	    if (i == NetLocalHostsSlot) {
+		NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+	    } else {
+		NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_PASSIVE;
+	    }
 	}
     }
     /* FIXME: 
@@ -2023,7 +2035,52 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
 {
     // GameSetupInit(mi);
-    MultiGameClientUpdate(1);
+    MultiClientUpdate(1);
+    if (ServerSetupState.Ready[NetLocalHostsSlot]) {
+	NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
+	NetMultiClientMenuItems[3].flags = 0;
+    } else {
+	NetMultiClientMenuItems[3].flags = MenuButtonDisabled;
+	NetMultiClientMenuItems[2].flags = 0;
+    }
+}
+
+local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
+{
+    int i;
+
+    i = mi - NetMultiClientMenuItems - 22;
+    DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n", i, NetLocalHostsSlot);
+    if (i == NetLocalHostsSlot) {
+	ServerSetupState.Ready[i] = !ServerSetupState.Ready[i];
+	if (ServerSetupState.Ready[i]) {
+	    NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
+	    NetMultiClientMenuItems[3].flags = 0;
+	} else {
+	    NetMultiClientMenuItems[3].flags = MenuButtonDisabled;
+	    NetMultiClientMenuItems[2].flags = 0;
+	}
+	MultiClientUpdate(0);
+	/* FIXME: Transmit to Server */
+    }
+}
+
+local void MultiClientReady(void)
+{
+    NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
+    NetMultiClientMenuItems[3].flags = 0;
+    ServerSetupState.Ready[NetLocalHostsSlot] = 1;
+    MultiClientUpdate(0);
+    /* FIXME: Transmit to Server */
+}
+
+local void MultiClientNotReady(void)
+{
+    NetMultiClientMenuItems[3].flags = MenuButtonDisabled;
+    NetMultiClientMenuItems[2].flags = 0;
+    ServerSetupState.Ready[NetLocalHostsSlot] = 0;
+    MultiClientUpdate(0);
+    /* FIXME: Transmit to Server */
 }
 
 global int NetClientSelectScenario(void)
@@ -2078,7 +2135,7 @@ global void NetClientUpdateState(void)
     GameTSSAction(NULL, ServerSetupState.TssOpt);
     NetMultiClientMenuItems[22].d.pulldown.curopt = ServerSetupState.TssOpt;
 
-    MultiGameClientUpdate(0);
+    MultiClientUpdate(0);
 
     MustRedraw |= RedrawMenu;
 }
@@ -2363,9 +2420,6 @@ global void MenuHandleMouseMove(int x,int y)
 	    if (!(mi->flags&MenuButtonDisabled)) {
 		switch (mi->mitype) {
 		    case MI_TYPE_GEM:
-			if ((mi->d.gem.state & MI_GSTATE_PASSIVE)) {
-			    continue;
-			}
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
 			if (x < xs || x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize) {
@@ -2483,6 +2537,10 @@ global void MenuHandleMouseMove(int x,int y)
 		}
 		switch (mi->mitype) {
 		    case MI_TYPE_GEM:
+			if ((mi->d.gem.state & MI_GSTATE_PASSIVE)) {
+			    break;
+			}
+			/* FALL THROUGH */
 		    case MI_TYPE_BUTTON:
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
@@ -2492,7 +2550,7 @@ global void MenuHandleMouseMove(int x,int y)
 			    RedrawFlag = 1;
 			    mi->flags |= MenuButtonActive;
 			}
-			DebugLevel3("On menu item %d\n", i);
+			DebugLevel3Fn("On menu item %d\n", i);
 			MenuButtonUnderCursor = i;
 		    default:
 			break;
@@ -2520,7 +2578,7 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 	    mi = menu->items + MenuButtonUnderCursor;
 	    if (!(mi->flags&MenuButtonClicked)) {
 		switch (mi->mitype) {
-		    case MI_TYPE_GEM:		// FIXME: PASSIVE ???
+		    case MI_TYPE_GEM:
 		    case MI_TYPE_BUTTON:
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
