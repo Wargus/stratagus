@@ -1525,6 +1525,9 @@ global void UIHandleButtonUp(unsigned button)
 	return;
     }
 
+    //
+    //	Menu (F10) button
+    //
     if( (1<<button) == LeftButton && GameMenuButtonClicked == 1 ) {
 	GameMenuButtonClicked = 0;
 	MustRedraw|=RedrawMenuButton;
@@ -1632,6 +1635,7 @@ global void UIHandleButtonUp(unsigned button)
 		} else if( KeyModifiers & ModifierControl ) {
 		    num=SelectAirUnitsInRectangle (x0, y0, x1, y1);
 		} else {
+		    DebugLevel0Fn("%d;%d, %d;%d\n",x0,y0,x1,y1);
 		    num=SelectUnitsInRectangle (x0, y0, x1, y1);
 		}
 	    }
@@ -1645,18 +1649,21 @@ global void UIHandleButtonUp(unsigned button)
 	    }
 	    // cade: cannot select unit on invisible space
 	    // FIXME: johns: only complete invisibile units
-	    if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
-		unit=UnitOnScreen(unit
 #ifdef SPLIT_SCREEN_SUPPORT
+	    if( IsMapFieldVisible(Viewport2MapX(TheUI.ActiveViewport,CursorX),
+			Viewport2MapY (TheUI.ActiveViewport,CursorY)) ) {
+		unit=UnitOnScreen(unit
 		    ,CursorX-TheUI.VP[TheUI.ActiveViewport].X+
 			TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX
 		    ,CursorY-TheUI.VP[TheUI.ActiveViewport].Y+
 			TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY);
+	    }
 #else /* SPLIT_SCREEN_SUPPORT */
+	    if( IsMapFieldVisible(Screen2MapX(CursorX),Screen2MapY(CursorY)) ) {
 		    ,CursorX-TheUI.MapX+MapX*TileSizeX
 		    ,CursorY-TheUI.MapY+MapY*TileSizeY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    }
+#endif /* SPLIT_SCREEN_SUPPORT */
 	    if( unit ) {
 		// FIXME: Not nice coded, button number hardcoded!
 		if( (KeyModifiers&ModifierControl)
