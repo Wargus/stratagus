@@ -107,6 +107,7 @@ local int SelectedUnitIndex;		/// Unit type to draw
 
 local int CursorPlayer;			/// Player under the cursor
 local int SelectedPlayer;		/// Player selected for draw
+local int MouseButtonClicked;		/// Mouse button is pressed down
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -529,12 +530,20 @@ local void DrawUnitIcons(void)
     SetClipping(0,0,x + j - 20,VideoHeight-1);
     VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x - 2, y);
     PopClipping();
-    if (0) {
+    if (TheUI.ButtonPanelX + 4 < CursorX
+	    && CursorX < TheUI.ButtonPanelX + 24
+	    && TheUI.ButtonPanelY + 4 < CursorY
+	    && CursorY < TheUI.ButtonPanelY + 24
+	    && MouseButtonClicked) {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
     } else {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
     }
-    if (1) {
+    if (TheUI.ButtonPanelX + 176 - 24 < CursorX
+	    && CursorX < TheUI.ButtonPanelX + 176 - 4
+	    && TheUI.ButtonPanelY + 4 < CursorY
+	    && CursorY < TheUI.ButtonPanelY + 24
+	    && MouseButtonClicked) {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
     } else {
 	VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + j - 20, y);
@@ -903,6 +912,7 @@ local void EditorCallbackButtonUp(unsigned button)
 	    ProcessMenu("menu-editor",1);
 	}
     }
+    MouseButtonClicked = 0;
 }
 
 /**
@@ -916,6 +926,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 
     DebugLevel3Fn("%x %x\n" _C_ button _C_ MouseButtons);
 
+    MouseButtonClicked = 1;
     //
     //  Click on menu button
     //
