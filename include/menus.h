@@ -125,6 +125,7 @@ typedef struct _menuitem_listbox_ {
     int cursel;		/* used in mouse-over state */
     int nlines;
     int startline;
+    int dohandler;
     void *(*retrieveopt)(struct _menuitem_ *, int);
     void (*handler)(void);	/* for return key */
 } MenuitemListbox;

@@ -538,7 +538,7 @@ local Menuitem ScenSelectMenuItems[] = {
 local void InitScenSelectMenuItems() {
     MenuitemText    i0 = { "Select scenario", MI_TFLAGS_CENTERED};
 
-    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0,
+    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, ScenSelectLBAction, 0, 0, 0, 0, 6, 0, 0,
 			    (void *)ScenSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider  i2 = { 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
 
@@ -1522,7 +1522,7 @@ local Menuitem SaveGameMenuItems[] = {
 local void InitSaveGameMenuItems() {
     MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
     MenuitemInput   i1 = { NULL, 384-16-16, 16, MBUTTON_PULLDOWN, EnterSaveGameAction, 0, 0};
-    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveLBAction, 0, 0, 0, 0, 7, 0,
+    MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveLBAction, 0, 0, 0, 0, 7, 0, 0,
 			   (void *)SaveLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveVSAction, -1, 0, 0, 0, SaveOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
@@ -1546,7 +1546,7 @@ local Menuitem LoadGameMenuItems[] = {
 };
 local void InitLoadGameMenuItems() {
     MenuitemText    i0 = { "Load Game", MI_TFLAGS_CENTERED};
-    MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0,
+    MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0, 0,
 			   (void *)LoadLBRetrieve, ScenSelectOk};
     MenuitemVslider i2 = { 0, 18, 7*18, LoadVSAction, -1, 0, 0, 0, LoadOk};
     MenuitemButton  i3 = { "~!Load", 108, 27, MBUTTON_GM_HALF, LoadAction, 'l'};
@@ -1624,7 +1624,7 @@ local Menuitem EditorLoadMapMenuItems[] = {
 local void InitEditorLoadMapMenuItems() {
     MenuitemText    i0 = { "Select map", MI_TFLAGS_CENTERED};
 
-    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, EditorLoadLBAction, 0, 0, 0, 0, 6, 0,
+    MenuitemListbox  i1 = { NULL, 288, 6*18, MBUTTON_PULLDOWN, EditorLoadLBAction, 0, 0, 0, 0, 6, 0, 0,
 			    (void *)EditorLoadLBRetrieve, EditorLoadOk};
     MenuitemVslider  i2 = { 0, 18, 6*18, EditorLoadVSAction, -1, 0, 0, 0, EditorLoadOk};
 
@@ -6495,6 +6495,13 @@ local void MenuHandleMouseMove(int x,int y)
 			if (j != mi->d.listbox.cursel) {
 			    mi->d.listbox.cursel = j;	// just store for click
 			}
+			if (mi->flags&MenuButtonClicked && mi->flags&MenuButtonActive) {
+			    if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
+				mi->d.listbox.dohandler = 0;
+				mi->d.listbox.curopt = mi->d.listbox.cursel;
+				RedrawFlag = 1;
+			    }
+			}
 			break;
 		    case MI_TYPE_VSLIDER:
 			xs = menu->x + mi->xofs;
@@ -6674,13 +6681,14 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    break;
 		case MI_TYPE_LISTBOX:
 		    if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
+			mi->d.listbox.dohandler = 0;
 			mi->d.listbox.curopt = mi->d.listbox.cursel;
 			if (mi->d.listbox.action) {
 			    (*mi->d.listbox.action)(mi, mi->d.listbox.curopt + mi->d.listbox.startline);
 			}
-		    } else if (mi->d.listbox.handler) {
-			// double click support - maybe limit time!
-			(*mi->d.listbox.handler)();
+		    }
+		    else {
+			mi->d.listbox.dohandler = 1;
 		    }
 		    break;
 		default:
@@ -6758,6 +6766,17 @@ local void MenuHandleButtonUp(unsigned b)
 		    }
 		    break;
 		case MI_TYPE_LISTBOX:
+		    if (mi->flags&MenuButtonClicked) {
+			RedrawFlag = 1;
+			mi->flags &= ~MenuButtonClicked;
+			if (MenuButtonUnderCursor == i) {
+			    MenuButtonUnderCursor = -1;
+			    if (mi->d.listbox.dohandler && mi->d.listbox.handler) {
+				(*mi->d.listbox.handler)();
+			    }
+			}
+		    }
+		    break;
 		case MI_TYPE_INPUT:
 		    if (mi->flags&MenuButtonClicked) {
 			RedrawFlag = 1;
