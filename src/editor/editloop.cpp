@@ -1183,6 +1183,7 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			Viewport2MapY(TheUI.MouseViewport, CursorY),
 			CursorBuilding, Players + SelectedPlayer);
 		    UnitPlacedThisPress = 1;
+		    ClearStatusLine();
 		} else {
 		    SetStatusLine("Unit can't be placed here.");
 		    PlayGameSound(GameSounds.PlacementError.Sound,
@@ -1367,8 +1368,8 @@ local void EditorCallbackMouse(int x, int y)
     int i;
     int bx;
     int by;
-    static int LastMapX=0;
-    static int LastMapY=0;
+    static int LastMapX;
+    static int LastMapY;
     enum _cursor_on_ OldCursorOn;
     char buf[256];
 
@@ -1376,6 +1377,13 @@ local void EditorCallbackMouse(int x, int y)
 
     HandleCursorMove(&x, &y);		// Reduce to screen
 
+	//Automatically unpress when map tile has changed
+	if (LastMapX != Viewport2MapX(TheUI.SelectedViewport, CursorX) ||
+		LastMapY != Viewport2MapY(TheUI.SelectedViewport, CursorY)) {
+	    LastMapX=Viewport2MapX(TheUI.SelectedViewport, CursorX);
+	    LastMapY=Viewport2MapY(TheUI.SelectedViewport, CursorY);
+	    UnitPlacedThisPress = 0;
+	}
     //
     //	Drawing tiles on map.
     //
@@ -1408,15 +1416,6 @@ local void EditorCallbackMouse(int x, int y)
 	    }
 	}
 
-	//Allow another press, Only if we move tiles
-	if (UnitPlacedThisPress && LastMapX !=
-		Viewport2MapY(TheUI.SelectedViewport, CursorY) &&
-		LastMapY != Viewport2MapY(TheUI.SelectedViewport, CursorY)) {
-	    LastMapX=Viewport2MapX(TheUI.SelectedViewport, CursorX);
-	    LastMapY=Viewport2MapY(TheUI.SelectedViewport, CursorY);
-	    UnitPlacedThisPress = 0;
-	}
-
 	//
 	//	Scroll the map, if cursor moves outside the viewport.
 	//
@@ -1434,6 +1433,8 @@ local void EditorCallbackMouse(int x, int y)
 		    EditUnit(Viewport2MapX(TheUI.SelectedViewport, CursorX),
 			Viewport2MapY(TheUI.SelectedViewport, CursorY),
 			CursorBuilding, Players + SelectedPlayer);
+		UnitPlacedThisPress = 1;
+		ClearStatusLine();
 		}
 	    }
 	}
