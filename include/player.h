@@ -132,6 +132,16 @@
 **		Income of the resources, when they are delivered at a store.
 **		@see _costs_, TimeCost, GoldCost, WoodCost, OilCost, MaxCosts.
 **
+**	Player::LastResources[::MaxCosts]
+**
+**		Keeps track of resources in time (used for calculating
+**		Player::Revenue, see below)
+**
+**	Player::Revenue[::MaxCosts]
+**
+**		Production of resources per minute (or estimates)
+**              Used just as information (statistics) for the player...
+**
 **	Player::UnitTypesCount[::UnitTypeMax]
 **
 **		Total count for each different unit type. Used by the AI and
@@ -282,7 +292,9 @@ struct _player_ {
     unsigned	Y;			/// map tile start Y position
 
     unsigned	Resources[MaxCosts];	/// resources in store
+    unsigned	LastResources[MaxCosts];	/// last values for revenue
     int		Incomes[MaxCosts];	/// income of the resources
+    int		Revenue[MaxCosts];	/// income rate of the resources
 
 //  FIXME: needed again? if not remove
 //    unsigned	UnitFlags[
