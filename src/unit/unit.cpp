@@ -1531,6 +1531,14 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     *unit->PlayerSlot=unit;
 
     unit->Player=newplayer;
+#ifdef NEW_FOW
+    MapUnmarkSight(oldplayer,unit->X+unit->Type->TileWidth/2
+	,unit->Y+unit->Type->TileHeight/2
+	,unit->Stats->SightRange);
+    MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+	,unit->Y+unit->Type->TileHeight/2
+	,unit->Stats->SightRange);
+#endif
 
     //
     //	Must change food/gold and other.
@@ -3436,7 +3444,7 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
     DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n"
 	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy);
 
-    return (dy<dx) ? dx : dy;
+    return floor(sqrt(dx*dx+dy*dy));
 }
 
 /**
