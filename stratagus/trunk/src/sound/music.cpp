@@ -282,7 +282,9 @@ local int PlayCDRom(const char* name)
 global void PlayMusic(const char* name)
 {
     char buffer[1024];
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
     Sample *sample;
+#endif
 
 #ifdef USE_SDLCD
     if (PlayCDRom(name)) {
