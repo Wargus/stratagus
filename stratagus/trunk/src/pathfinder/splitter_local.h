@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
 /**@name splitter_local.h - The map headerfile. */
 //
-//	(c) Copyright 1998-2003 by Ludovic Pollet
+// (c) Copyright 1998-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+// $Id$
 
 #ifndef __SPLITTER_LOCAL_H__
 #define __SPLITTER_LOCAL_H__
@@ -46,9 +46,9 @@ struct _region_line_{
 };
 
 typedef struct _region_definition_{
-	int TileCount;		///< Nb of tile assigned to it
-	int MinX, MinY;		///< Upper left corner
-	int MaxX, MaxY;		///< Bottom right corner
+	int TileCount;          ///< Nb of tile assigned to it
+	int MinX, MinY;         ///< Upper left corner
+	int MaxX, MaxY;         ///< Bottom right corner
 
 	long SumX, SumY;        ///< May limit map to ~512x512
 
@@ -84,7 +84,7 @@ typedef struct _circular_filler_{
 /*----------------------------------------------------------------------------
 -- Macros
 ----------------------------------------------------------------------------*/
-#define	MaxZone 1024
+#define MaxZone 1024
 #define InMap(x,y) (((unsigned)(x)<(unsigned)TheMap.Width)&&(((unsigned)(y)<(unsigned)TheMap.Height)))
 #define MapFlag(x,y) TheMap.Fields[x + TheMap.Width * y].Flags
 #define RegionMapping(x,y) (RegionMappingStorage[(x) + TheMap.Width * (y)])

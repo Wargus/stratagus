@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//   T H E   W A R   B E G I N S
+//    Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter.c	-	Map splitter into regions. 	*/
+/**@name splitter.c - Map splitter into regions.  */
 //
-//	(c) Copyright 1999-2003 by Ludovic Pollet
+// (c) Copyright 1999-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
-
-//@{
+// $Id$
 
 #ifdef MAP_REGIONS
 
+//@{
+
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -49,7 +49,7 @@
 #include "splitter_local.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 
@@ -66,17 +66,17 @@ int ZoneNeedRefresh;
 
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 
 /**
-**		Unassign a tile to a region.
-**		Connections are not updated here
+** Unassign a tile to a region.
+** Connections are not updated here
 **
-**		@param region		the region ID
-**		@param x		X coord of the tile
-**		@param y		Y coord of the tile
+** @param region    The region ID
+** @param x         X coord of the tile
+** @param y         Y coord of the tile
 */
 void RegionUnassignTile(RegionId region, int x, int y)
 {
@@ -144,12 +144,12 @@ void RegionUnassignTile(RegionId region, int x, int y)
 }
 
 /**
-**		Assign a tile to a region.
-**		Connections are not updated here
+** Assign a tile to a region.
+** Connections are not updated here
 **
-**		@param region		the region ID
-**		@param x		X coord of the tile
-**		@param y		Y coord of the tile
+** @param region    The region ID
+** @param x         X coord of the tile
+** @param y         Y coord of the tile
 */
 void RegionAssignTile(RegionId region, int x, int y)
 {
@@ -196,10 +196,10 @@ void RegionAssignTile(RegionId region, int x, int y)
 }
 
 /**
-**		Allocate a new region
+** Allocate a new region
 **
-**		@param iswater		Indicate if the region is water/sea/...
-**		@return 		the new RegionID
+** @param iswater Indicate if the region is water/sea/...
+** @return  the new RegionID
 */
 RegionId NewRegion(int iswater)
 {
@@ -241,9 +241,9 @@ RegionId NewRegion(int iswater)
 }
 
 /**
-**		Free a region
+** Free a region
 **
-**		@param regid		The region to free
+** @param regid The region to free
 */
 void RegionFree(RegionId regid)
 {
@@ -273,7 +273,7 @@ void RegionFree(RegionId regid)
 }
 
 /**
-**		Update connections for all regions (slow)
+** Update connections for all regions (slow)
 **
 */
 void UpdateConnections(void)
@@ -293,12 +293,12 @@ void UpdateConnections(void)
 }
 
 /**
-**		Split region according to the content of the "TempStorage"
-**		All tile with equal value will go in the same region
+** Split region according to the content of the "TempStorage"
+** All tile with equal value will go in the same region
 **
-**		@param reg		The region to split
-**		@param nbarea		The number of area
-**		@param updateConnections		indicate if connection should be updated
+** @param reg                  The region to split
+** @param nbarea               The number of area
+** @param updateConnections    Indicate if connection should be updated
 */
 void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 {
@@ -394,10 +394,10 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 }
 
 /**
-**		Join to region into only one. Either a or b is destroyed
+** Join to region into only one. Either a or b is destroyed
 **
-**		@param a		One of the two regions
-**		@param b		One of the two regions
+** @param a   One of the two regions
+** @param b   One of the two regions
 */
 void RegionJoin(RegionId a, RegionId b)
 {
@@ -443,10 +443,10 @@ void RegionJoin(RegionId a, RegionId b)
 }
 
 /**
-**		Split a region in two parts
+** Split a region in two parts
 **
-**		@param regid		the region to broke
-**		@param updateConnections		indicate if connection should be updated as well
+** @param regid the region to broke
+** @param updateConnections indicate if connection should be updated as well
 */
 void RegionSplit(RegionId regid, int updateConnections)
 {
@@ -461,7 +461,7 @@ void RegionSplit(RegionId regid, int updateConnections)
 	int blocker;
 	int oldZoneNeedRefresh;
 	int i;
-	CircularFiller fillers[2];		// We have 2 concurrent floodfiller
+	CircularFiller fillers[2]; // We have 2 concurrent floodfiller
 
 	oldZoneNeedRefresh = ZoneNeedRefresh;
 
@@ -557,10 +557,10 @@ void RegionSplit(RegionId regid, int updateConnections)
 }
 
 /**
-**		Check that the given region is 8 - connex
-**		( all its tiles are reachable )
+** Check that the given region is 8 - connex
+** (all its tiles are reachable)
 **
-**		@param reg		the region ID
+** @param reg the region ID
 */
 void RegionCheckConnex(RegionId reg)
 {
@@ -607,12 +607,13 @@ void RegionCheckConnex(RegionId reg)
 }
 
 /**
-**		Called when a tile should no more belong to any regions
+** Called when a tile should no more belong to any regions
 **
-**		@param x		x position of the tile
-**		@param y		y position of the tile
+** @param x    x position of the tile
+** @param y    y position of the tile
 */
-static void MapSplitterTileOccuped(int x, int y) {
+static void MapSplitterTileOccuped(int x, int y)
+{
 	RegionId reg;
 	int tx;
 	int ty;
@@ -669,14 +670,15 @@ static void MapSplitterTileOccuped(int x, int y) {
 }
 
 /**
-**		Add a rectangle of tiles to region mapping. Called when map change
+** Add a rectangle of tiles to region mapping. Called when map change
 **
-**		@param x0		x0 coord of the changed rectangle
-**		@param y0		y0 coord of the changed rectangle
-**		@param x1		x1 coord of the changed rectangle
-**		@param y1		y1 coord of the changed rectangle
+** @param x0    x0 coord of the changed rectangle
+** @param y0    y0 coord of the changed rectangle
+** @param x1    x1 coord of the changed rectangle
+** @param y1    y1 coord of the changed rectangle
 */
-void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
+void MapSplitterTilesCleared(int x0, int y0, int x1, int y1)
+{
 	static int directions[5][2] = {{1,0},{0,1},{-1,0},{0,-1},{0,0}};
 	int x;
 	int y;
@@ -774,12 +776,12 @@ void MapSplitterTilesCleared(int x0, int y0, int x1, int y1) {
 }
 
 /**
-**		Remove a rectangle of tiles from region mapping. Called when map change
+** Remove a rectangle of tiles from region mapping. Called when map change
 **
-**		@param x0		x0 coord of the changed rectangle
-**		@param y0		y0 coord of the changed rectangle
-**		@param x1		x1 coord of the changed rectangle
-**		@param y1		y1 coord of the changed rectangle
+** @param x0    x0 coord of the changed rectangle
+** @param y0    y0 coord of the changed rectangle
+** @param x1    x1 coord of the changed rectangle
+** @param y1    y1 coord of the changed rectangle
 */
 void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
 {
@@ -798,7 +800,7 @@ void MapSplitterTilesOccuped(int x0, int y0, int x1, int y1)
 }
 
 /**
-**		Decide if region should be broken, regarding size & nb of tiles
+** Decide if region should be broken, regarding size & nb of tiles
 **
 */
 static int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int hardlimit)
@@ -825,7 +827,7 @@ static int ShouldBreakRegion(int x0, int y0, int x1, int y1, int tilecount, int 
 }
 
 /**
-**		Extend A segment, fill it.
+** Extend A segment, fill it.
 **
 */
 static void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
@@ -858,7 +860,7 @@ static void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
 }
 
 /**
-**		Flood fill a region in the mapping area
+** Flood fill a region in the mapping area
 */
 static void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 {
@@ -909,8 +911,8 @@ static void RegionFloodFill(int x0, int x1, int starty, int RegId, int IsWater)
 }
 
 /**
-**		Initialise the region mapping ( map tile => regions )
-**		Need an already initialised map to work correctly
+** Initialise the region mapping ( map tile => regions )
+** Need an already initialised map to work correctly
 */
 void InitaliseMapping(void)
 {
@@ -981,15 +983,15 @@ void InitaliseMapping(void)
 }
 
 /**
-**		Find a point of connexion between two zone.
-**		The point closer to (refx,refy) in (a) is returned
+** Find a point of connexion between two zone.
+** The point closer to (refx,refy) in (a) is returned
 **
-**		@param a		a zone number
-**		@param b		the other zone number
-**		@param refx		Search closest to (refx,refy)
-**		@param refy		Search closest to (refx,refy)
-**		@param rsltx		Will hold result X
-**		@param rsltx		Will hold result Y
+** @param a         a zone number
+** @param b         The other zone number
+** @param refx      Search closest to (refx,refy)
+** @param refy      Search closest to (refx,refy)
+** @param rsltx     Will hold result X
+** @param rsltx     Will hold result Y
 */
 void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 {
@@ -1051,7 +1053,7 @@ void ZoneFindConnexion(int a, int b, int refx, int refy, int* rsltx, int* rslty)
 }
 
 /**
-**		Refresh connection between zones
+** Refresh connection between zones
 */
 static void RefreshZones(void)
 {
@@ -1114,7 +1116,7 @@ static void RefreshZones(void)
 }
 
 /**
-**		Allocate space for tile=>region mapping
+** Allocate space for tile=>region mapping
 */
 static void AllocateMapping(void)
 {
@@ -1128,7 +1130,7 @@ static void AllocateMapping(void)
 }
 
 /**
-** 		Initialise all data structures of the MapSplitter
+**  Initialise all data structures of the MapSplitter
 **
 */
 void MapSplitterInit(void)
@@ -1144,7 +1146,7 @@ void MapSplitterInit(void)
 }
 
 /**
-**		Free all structure owned by the MapSplitter
+** Free all structure owned by the MapSplitter
 **
 */
 void MapSplitterClean(void)
@@ -1154,7 +1156,7 @@ void MapSplitterClean(void)
 }
 
 /**
-**		Called each cycle to maintain correctness of the mapping
+** Called each cycle to maintain correctness of the mapping
 **
 */
 void MapSplitterEachCycle(void)
@@ -1240,16 +1242,16 @@ void MapSplitterEachCycle(void)
 }
 
 /**
-**		Can the unit 'src' reach the place x,y.
+** Can the unit 'src' reach the place x,y.
 **
-**		@param src		Unit for the path.
-**		@param x		Map X tile position.
-**		@param y		Map Y tile position.
-**		@param w		Width of Goal
-**		@param h		Height of Goal
-**		@param range		Range to the tile.
+** @param src    Unit for the path.
+** @param x      Map X tile position.
+** @param y      Map Y tile position.
+** @param w      Width of Goal
+** @param h      Height of Goal
+** @param range  Range to the tile.
 **
-**		@return				Distance to place.
+** @return Distance to place.
 */
 int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
 {
@@ -1271,7 +1273,7 @@ int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange
 }
 
 /**
-**		Check if zone connections need a refresh & do it
+** Check if zone connections need a refresh & do it
 */
 void ClearZoneNeedRefresh(void)
 {
@@ -1281,5 +1283,7 @@ void ClearZoneNeedRefresh(void)
 	}
 }
 
-#endif // MAP_REGIONS
 //@}
+
+#endif // MAP_REGIONS
+
