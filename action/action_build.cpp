@@ -191,6 +191,11 @@ global void HandleActionBuild(Unit* unit)
     build=MakeUnit(type,unit->Player);
     build->Constructed=1;
     PlaceUnit(build,x,y);
+#ifdef HIERARCHIC_PATHFINDER
+    PfHierMapChangedCallback (build->X, build->Y,
+		    build->X + build->Type->TileWidth - 1,
+		    build->Y + build->Type->TileHeight - 1);
+#endif
 
     // HACK: the building is not ready yet
     build->Player->UnitTypesCount[type->Type]--;
