@@ -57,7 +57,6 @@ local int MoveToWood(Unit* unit)
 	return 0;
     }
 
-#ifdef NEW_ORDERS
     if( i==PF_UNREACHABLE ) {
 newtry:
 	if( FindWoodInSight(unit,&unit->Orders[0].X,&unit->Orders[0].Y) ) {
@@ -79,28 +78,6 @@ newtry:
 
     x=unit->Orders[0].X+1;
     y=unit->Orders[0].Y+1;
-
-#else
-
-    if( i==PF_UNREACHABLE ) {
-newtry:
-	if( FindWoodInSight(unit
-		,&unit->Command.Data.Move.DX,&unit->Command.Data.Move.DY) ) {
-
-	    // Move to new wood position
-	    ResetPath(unit->Command);
-	    unit->Command.Data.Move.Goal=NoUnitP;
-	    unit->Command.Data.Move.Range=2;
-	    unit->Command.Action=UnitActionHarvest;
-	    unit->Command.Data.Move.DX--;
-	    unit->Command.Data.Move.DY--;
-	}
-	return 0;
-    }
-
-    x=unit->Command.Data.Move.DX+1;
-    y=unit->Command.Data.Move.DY+1;
-#endif
 
     if( !CheckedForestOnMap(x,y) ) {
 	//
@@ -135,21 +112,12 @@ newtry:
 
     // FIXME: don't chop the same wood!
 
-#ifdef NEW_ORDERS
     unit->Orders[0].X=x;
     unit->Orders[0].Y=y;
     DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
     // turn to wood
     UnitHeadingFromDeltaXY(unit,x-unit->X,y-unit->Y);
     //unit->Value=unit->Data.Harvest.WoodToHarvest;
-#else
-    unit->Command.Data.Move.DX=x;
-    unit->Command.Data.Move.DY=y;
-    unit->Command.Action=UnitActionHarvest;
-    // turn to wood
-    UnitHeadingFromDeltaXY(unit,x-unit->X,y-unit->Y);
-    unit->Value=unit->WoodToHarvest;
-#endif
 
     DebugCheck( unit->Wait!=1 );
 
@@ -192,7 +160,6 @@ local int ChopWood(Unit* unit)
 	}
 #endif
 
-#ifdef NEW_ORDERS
 	//
 	//	Wood gone while chopping?
 	//
@@ -212,40 +179,11 @@ local int ChopWood(Unit* unit)
 	    }
 	    return 0;
 	}
-#else
-	//
-	//	Wood gone while chopping?
-	//
-	if( !ForestOnMap(unit->Command.Data.Move.DX
-		,unit->Command.Data.Move.DY) ) {
-	    if( FindWoodInSight(unit
-		    ,&unit->Command.Data.Move.DX
-		    ,&unit->Command.Data.Move.DY) ) {
-		ResetPath(unit->Command);
-		unit->Command.Data.Move.Goal=NoUnitP;
-		unit->Command.Data.Move.Range=2;
-		unit->Command.Data.Move.DX--;
-		unit->Command.Data.Move.DY--;
-		DebugCheck( unit->Command.Action!=UnitActionHarvest );
-		unit->SubAction=1;
-	    } else {
-		unit->Command.Action=UnitActionStill;
-		unit->SubAction=0;
-		DebugLevel3Fn("NO-WOOD in sight range\n");
-	    }
-	    return 0;
-	}
-#endif
 
 	//
 	//	Ready chopping wood?
 	//
-#ifdef NEW_ORDERS
 	if( !--unit->Value ) {
-#else
-	if( !(unit->WoodToHarvest = --unit->Value) ) {
-#endif
-
 	    // Have wood
 	    if( unit->Type==UnitTypeOrcWorker ) {
 		unit->Type=UnitTypeOrcWorkerWithWood;
@@ -268,7 +206,6 @@ local int ChopWood(Unit* unit)
 	    //
 	    //	Update the map.
 	    //
-#ifdef NEW_ORDERS
 	    MapRemoveWood(unit->Orders[0].X,unit->Orders[0].Y);
 
 	    //
@@ -289,34 +226,6 @@ local int ChopWood(Unit* unit)
 		NewResetPath(unit);
 		return 1;
 	    }
-#else
-	    MapRemoveWood(unit->Command.Data.Move.DX
-		,unit->Command.Data.Move.DY);
-
-	    //
-	    //	Find place to return wood.
-	    //
-	    unit->Command.Data.Move.SX=unit->X;
-	    unit->Command.Data.Move.SY=unit->Y;
-	    if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
-		unit->Command.Action=UnitActionStill;
-		unit->SubAction=0;
-	    } else {
-		ResetPath(unit->Command);
-		unit->Command.Data.Move.Range=1;
-		unit->Command.Data.Move.Goal=destu;
-		RefsDebugCheck( !destu->Refs );
-		destu->Refs++;
-		unit->Command.Data.Move.DX=-1;
-		unit->Command.Data.Move.DY=-1;
-		DebugLevel3Fn("Return to %Zd=%d,%d\n"
-			,UnitNumber(destu)
-			,unit->Command.Data.Move.DX
-			,unit->Command.Data.Move.DY);
-		DebugCheck( unit->Command.Action!=UnitActionHarvest );
-		return 1;
-	    }
-#endif
 	}
     }
     return 0;
@@ -339,8 +248,6 @@ local int ReturnWithWood(Unit* unit)
     }
 
     DebugCheck( unit->Wait!=1 );
-
-#ifdef NEW_ORDERS
 
     destu=unit->Orders[0].Goal;
 
@@ -404,70 +311,6 @@ local int ReturnWithWood(Unit* unit)
 	return 0;
     }
 
-#else
-
-    destu=unit->Command.Data.Move.Goal;
-
-    if( !destu ) {
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-    //
-    //	Target is dead, stop harvest
-    //
-    if( destu->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
-	RefsDebugCheck( !destu->Refs );
-	if( !--destu->Refs ) {
-	    ReleaseUnit(destu);
-	}
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    } else if( destu->Removed || !destu->HP
-		|| destu->Command.Action==UnitActionDie ) {
-	RefsDebugCheck( !destu->Refs );
-	--destu->Refs;
-	RefsDebugCheck( !destu->Refs );
-	unit->Command.Data.Move.Goal=NoUnitP;
-	// FIXME: perhaps we should choose an alternative
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-    unit->Command.Action=UnitActionHarvest;
-
-    //
-    //	If depot is still under construction, wait!
-    //
-    if( destu->Command.Action==UnitActionBuilded ) {
-        DebugLevel2Fn("Invalid depot\n");
-	return 0;
-    }
-
-    unit->Command.Data.Move.Goal=NoUnitP;
-
-    RefsDebugCheck( !destu->Refs );
-    --destu->Refs;
-    RefsDebugCheck( !destu->Refs );
-
-    if( i==PF_UNREACHABLE ) {
-	// FIXME: could try another depot, or retry later.
-	DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
-		  ,UnitNumber(destu),destu->X,destu->Y
-		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
-	unit->Command.Action=UnitActionStill;
-	unit->SubAction=0;
-	return 0;
-    }
-
-#endif
-
     RemoveUnit(unit);
     unit->X=destu->X;
     unit->Y=destu->Y;
@@ -516,7 +359,7 @@ local int WaitInWoodDeposit(Unit* unit)
 	//
 	destu=WoodDepositOnMap(unit->X,unit->Y);
 	DebugCheck( !destu );		// there must be a depot!
-#ifdef NEW_ORDERS
+
 	DropOutNearest(unit
 		,unit->Orders[0].X,unit->Orders[0].Y
 		,destu->Type->TileWidth,destu->Type->TileHeight);
@@ -534,25 +377,6 @@ local int WaitInWoodDeposit(Unit* unit)
 	unit->Wait=1;
 	//unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
 	unit->Value=CHOP_FOR_WOOD;
-#else
-	DropOutNearest(unit
-		,unit->Command.Data.Move.SX,unit->Command.Data.Move.SY
-		,destu->Type->TileWidth,destu->Type->TileHeight);
-
-	//
-	//	Return to chop point.
-	//
-	unit->Command.Action=UnitActionHarvest;
-	ResetPath(unit->Command);
-	unit->Command.Data.Move.Goal=NoUnitP;
-	unit->Command.Data.Move.Range=1;
-	unit->Command.Data.Move.DX=unit->Command.Data.Move.SX;
-	unit->Command.Data.Move.DY=unit->Command.Data.Move.SY;
-
-        CheckUnitToBeDrawn(unit);
-	unit->Wait=1;
-	unit->WoodToHarvest=CHOP_FOR_WOOD;
-#endif
 	return 1;
     }
 
@@ -582,12 +406,9 @@ global void HandleActionHarvest(Unit* unit)
 {
     switch( unit->SubAction ) {
 	case 0:
-#ifdef NEW_ORDERS
 	    NewResetPath(unit);
-	    //unit->Data.Harvest.WoodToHarvest=CHOP_FOR_WOOD;
 	    unit->Value=CHOP_FOR_WOOD;
 	    unit->SubAction=1;
-#endif
 	case 1:
 	    if( MoveToWood(unit) ) {
 		unit->SubAction=64;
