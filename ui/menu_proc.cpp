@@ -129,10 +129,10 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 	char* oldrc;
 	char* nc;
 	char* rc;
-	const char* text;
+	char* text;
 	int l;
 
-	text = mit->text;
+	text = EvalString(mit->text);
 	l = VideoTextLength(font, text);
 	GetDefaultTextColors(&oldnc, &oldrc);
 	if (mit->normalcolor || mit->reversecolor) {
@@ -155,6 +155,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 		VideoDrawText(x, y,	font, text);
 	}
 	SetDefaultTextColors(oldnc, oldrc);
+	free(text);
 }
 
 /**
@@ -1657,6 +1658,7 @@ static void MenuHandleMouseMove(int x, int y)
 	Menu* menu;
 	int ox;
 	int oy;
+	char* tmp;
 
 	ox = CursorX;
 	oy = CursorY; // Old position for rel movement.
@@ -1747,15 +1749,18 @@ static void MenuHandleMouseMove(int x, int y)
 							continue;
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
-						if (x < xs - 4 || x > xs + VideoTextLength(mi->Font, mi->D.Text.text) + 5 ||
+						tmp = EvalString(mi->D.Text.text);
+						if (x < xs - 4 || x > xs + VideoTextLength(mi->Font, tmp) + 5 ||
 								y < ys - 4 || y > ys + VideoTextHeight(mi->Font) + 5) {
 							if (!(mi->Flags & MenuButtonClicked)) {
 								if (mi->Flags & MenuButtonActive) {
 									mi->Flags &= ~MenuButtonActive;
 								}
 							}
+							free(tmp);
 							continue;
 						}
+						free(tmp);
 						break;
 					case MI_TYPE_CHECKBOX:
 						xs = menu->X + mi->XOfs;

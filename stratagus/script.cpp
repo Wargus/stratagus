@@ -585,6 +585,26 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 }
 
 /**
+**  Create a StringDesc with const string.
+**
+**  @param s    direct value for the StringDesc
+**
+**  @return the new StringDesc.
+*/
+StringDesc* NewStringDesc(const char* s)
+{
+	StringDesc* res;
+
+	if (!s) {
+		return NULL;
+	}
+	res = calloc(1, sizeof (*res));
+	res->e = EString_Dir;
+	res->D.Val = strdup(s);
+	return res;
+}
+
+/**
 **  Convert the string in the gameinfo enum number.
 **
 **  @param s    string to convert to enum number.
