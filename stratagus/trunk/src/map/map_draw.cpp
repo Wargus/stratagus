@@ -1705,7 +1705,7 @@ global void DrawMapBackgroundInViewport (int v, int x, int y)
 	mv=sx;
     }
 
-    DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
+    DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx*100)/mv);
 #endif
 }
 
@@ -1799,7 +1799,7 @@ global void DrawMapBackground(int x,int y)
 	mv=sx;
     }
 
-    DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
+    DebugLevel1("%ld %ld %3ld\n" _C_ (long)sx _C_ mv _C_ (sx*100)/mv);
 #endif
 }
 

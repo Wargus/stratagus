@@ -228,7 +228,7 @@ local QuadTreeLeaf* NewQuadTreeLeaf(QuadTreeValue* value,QuadTreeLeaf* next)
 */
 local void QuadTreeLeafFree(QuadTreeLeaf* leaf)
 {
-    DebugLevel3("Free-leaf: %p\n",leaf);
+    DebugLevel3("Free-leaf: %p\n" _C_ leaf);
 
     free(leaf);
 }
@@ -240,7 +240,7 @@ local void QuadTreeLeafFree(QuadTreeLeaf* leaf)
 */
 local void QuadTreeNodeFree(QuadTreeNode* node)
 {
-    DebugLevel3("Free-node: %p\n",node);
+    DebugLevel3("Free-node: %p\n" _C_ node);
 
     free(node);
 }
@@ -280,8 +280,8 @@ local void QuadTreeInsert(QuadTree* tree,QuadTreeValue* value)
     IfDebug(
 	if( leaf->Next ) {
 	    DebugLevel3("More...\n");
-	    DebugLevel3("Leaf: %p %p,",leaf,leaf->Value);
-	    DebugLevel3("Leaf: %p %p\n",leaf->Next,leaf->Next->Value);
+	    DebugLevel3("Leaf: %p %p," _C_ leaf _C_ leaf->Value);
+	    DebugLevel3("Leaf: %p %p\n" _C_ leaf->Next _C_ leaf->Next->Value);
 	}
     );
     *nodep=(QuadTreeNode*)leaf;
@@ -315,7 +315,7 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
 	if( !(node=*nodep) ) {
 	    DebugLevel0Fn("Value not found\n");
 	    DebugLevel0Fn("%d,%d\n"
-		    ,QuadTreeValueXOf(value),QuadTreeValueYOf(value));
+		    _C_ QuadTreeValueXOf(value) _C_ QuadTreeValueYOf(value));
 	    return;
 	}
 	stack[1+level]=nodep;
@@ -333,7 +333,7 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
 	if( !leaf ) {
 	    DebugLevel0Fn("Value not found\n");
 	    DebugLevel0Fn("%d,%d\n"
-		    ,QuadTreeValueXOf(value),QuadTreeValueYOf(value));
+		    _C_ QuadTreeValueXOf(value) _C_ QuadTreeValueYOf(value));
 	    return;
 	}
 	if( leaf->Value==value ) {
@@ -343,8 +343,8 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
     }
     *leafp=leaf->Next;			// remove from list
 
-    DebugLevel3("FREE: %p %p %d,%d\n",leafp,leaf
-	,leaf->Value->X,leaf->Value->Y);
+    DebugLevel3("FREE: %p %p %d,%d\n" _C_ leafp _C_ leaf
+	_C_ leaf->Value->X _C_ leaf->Value->Y);
     QuadTreeLeafFree(leaf);
     StatisticDelLeaf(tree);
 
@@ -361,7 +361,7 @@ local void QuadTreeDelete(QuadTree* tree,QuadTreeValue* value)
 		break;
 	    }
 	    *nodep=NULL;
-	    DebugLevel3("FREE: %p %p\n",nodep,node);
+	    DebugLevel3("FREE: %p %p\n" _C_ nodep _C_ node);
 	    QuadTreeNodeFree(node);
 	    StatisticDelNode(tree);
 	}
@@ -444,7 +444,7 @@ local int SelectQuadTreeLeaf(QuadTreeLeaf* leaf,QuadTreeValue** table,int index)
     if( leaf ) {
 	while( leaf ) {
 	    DebugLevel3("%d,%d "
-		,QuadTreeValueXOf(leaf->Value),QuadTreeValueYOf(leaf->Value));
+		_C_ QuadTreeValueXOf(leaf->Value) _C_ QuadTreeValueYOf(leaf->Value));
 	    table[index++]=leaf->Value;
 	    leaf=leaf->Next;
 	}
@@ -465,10 +465,10 @@ local int SelectQuadTreeNode(QuadTreeNode* node,int kx,int ky,int levels
 
     if( node ) {
 	if( levels ) {
-	    DebugLevel3("Levels %d key %x %x\n",levels,kx,ky);
+	    DebugLevel3("Levels %d key %x %x\n" _C_ levels _C_ kx _C_ ky);
 	    i=kx|(1<<levels);
 	    j=ky|(1<<levels);
-	    DebugLevel3("New key %d %d\n",i,j);
+	    DebugLevel3("New key %d %d\n" _C_ i _C_ j);
 	    if( x1<=i ) {
 		if( y1<=j ) {
 		    index=SelectQuadTreeNode(node->Next[0],kx,ky,levels-1
@@ -491,10 +491,10 @@ local int SelectQuadTreeNode(QuadTreeNode* node,int kx,int ky,int levels
 		}
 	    }
 	} else {
-	    DebugLevel3("Levels %d key %x %x\n",levels,kx,ky);
+	    DebugLevel3("Levels %d key %x %x\n" _C_ levels _C_ kx _C_ ky);
 	    i=kx|(1<<levels);
 	    j=ky|(1<<levels);
-	    DebugLevel3("New key %d %d\n",i,j);
+	    DebugLevel3("New key %d %d\n" _C_ i _C_ j);
 	    if( x1<=i ) {
 		if( y1<=j ) {
 		    index=SelectQuadTreeLeaf((QuadTreeLeaf*)node->Next[0]
@@ -528,7 +528,7 @@ local int QuadTreeSelect(QuadTree* tree
 {
     int num;
 
-    DebugLevel3("%d,%d-%d,%d:",x1,y1,x2,y2);
+    DebugLevel3("%d,%d-%d,%d:" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
     num=SelectQuadTreeNode(tree->Root,0,0,tree->Levels-1,x1,y1,x2,y2,table,0);
     DebugLevel3("\n");
     return num;
@@ -546,7 +546,7 @@ local void PrintQuadTreeLeaf(QuadTreeLeaf* leaf,int level,int levels)
 	    DebugLevel0(" ");
 	}
 	while( leaf ) {
-	    DebugLevel0("%d,%d ",leaf->Value->X,leaf->Value->Y);
+	    DebugLevel0("%d,%d " _C_ leaf->Value->X _C_ leaf->Value->Y);
 	    leaf=leaf->Next;
 	}
 	DebugLevel0("\n");
@@ -564,8 +564,8 @@ local void PrintQuadTreeNode(QuadTreeNode* node,int level,int levels)
 	for( i=0; i<level; ++i ) {
 	    DebugLevel0(" ");
 	}
-	DebugLevel0("%8p(%d): %8p %8p %8p %8p\n",node,levels-level
-	    ,node->Next[0],node->Next[1],node->Next[2],node->Next[3]);
+	DebugLevel0("%8p(%d): %8p %8p %8p %8p\n" _C_ node _C_ levels-level
+	    _C_ node->Next[0] _C_ node->Next[1] _C_ node->Next[2] _C_ node->Next[3]);
 	if( level+1==levels ) {
 	    PrintQuadTreeLeaf((QuadTreeLeaf*)node->Next[0],level+1,levels);
 	    PrintQuadTreeLeaf((QuadTreeLeaf*)node->Next[1],level+1,levels);
@@ -585,7 +585,7 @@ local void PrintQuadTreeNode(QuadTreeNode* node,int level,int levels)
 */
 local void PrintQuadTree(QuadTree* tree)
 {
-    DebugLevel0("Tree: Levels %d\n",tree->Levels);
+    DebugLevel0("Tree: Levels %d\n" _C_ tree->Levels);
     if( !tree->Root ) {
 	DebugLevel0("EMPTY TREE\n");
 	return;
@@ -599,13 +599,13 @@ local void PrintQuadTree(QuadTree* tree)
 local void QuadTreePrintStatistic(QuadTree* tree)
 {
     IfDebug(if (!tree) return;)
-    DebugLevel0("Quad-Tree: %p Levels %d\n",tree,tree->Levels);
+    DebugLevel0("Quad-Tree: %p Levels %d\n" _C_ tree _C_ tree->Levels);
     DebugLevel0("\tInserts %d, deletes %d\n"
-	,tree->Inserts,tree->Deletes);
+	_C_ tree->Inserts _C_ tree->Deletes);
     DebugLevel0("\tNodes %d, made %d, freed %d\n"
-	,tree->Nodes,tree->NodesMade,tree->NodesFreed);
+	_C_ tree->Nodes _C_ tree->NodesMade _C_ tree->NodesFreed);
     DebugLevel0("\tLeafs %d, made %d, freed %d\n"
-	,tree->Leafs,tree->LeafsMade,tree->LeafsFreed);
+	_C_ tree->Leafs _C_ tree->LeafsMade _C_ tree->LeafsFreed);
 }
 
 //*****************************************************************************
@@ -621,7 +621,7 @@ local QuadTree* PositionCache;		/// My quad tree for lookup
 */
 global void UnitCacheInsert(Unit* unit)
 {
-    DebugLevel3Fn("Insert UNIT %8p %08X\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Insert UNIT %8p %08X\n" _C_ unit _C_ UnitNumber(unit));
     QuadTreeInsert(PositionCache,unit);
 }
 
@@ -632,7 +632,7 @@ global void UnitCacheInsert(Unit* unit)
 */
 global void UnitCacheRemove(Unit* unit)
 {
-    DebugLevel3Fn("Remove UNIT %8p %08X\n",unit,UnitNumber(unit));
+    DebugLevel3Fn("Remove UNIT %8p %08X\n" _C_ unit _C_ UnitNumber(unit));
     QuadTreeDelete(PositionCache,unit);
 }
 
@@ -728,9 +728,9 @@ global Unit* UnitCacheOnXY(int x,int y,int type)
 	IfDebug(
 	    // FIXME: the error isn't here!
 	    if( !leaf->Value->Type ) {
-		DebugLevel0("Error UNIT %8p %08X %d,%d\n",leaf->Value
-			,UnitNumber(leaf->Value),leaf->Value->X,leaf->Value->Y);
-		DebugLevel0("Removed unit in cache %d,%d!!!!\n",x,y);
+		DebugLevel0("Error UNIT %8p %08X %d,%d\n" _C_ leaf->Value
+			_C_ UnitNumber(leaf->Value) _C_ leaf->Value->X _C_ leaf->Value->Y);
+		DebugLevel0("Removed unit in cache %d,%d!!!!\n" _C_ x _C_ y);
 		leaf=leaf->Next;
 		continue;
 	    }
@@ -767,7 +767,7 @@ global void InitUnitCache(void)
     for( l=0; n; l++ ) {
 	n>>=1;
     }
-    DebugLevel0("UnitCache: %d Levels\n",l);
+    DebugLevel0("UnitCache: %d Levels\n" _C_ l);
     PositionCache=NewQuadTree(l);
 }
 

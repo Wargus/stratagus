@@ -401,7 +401,7 @@ void RegGroupAddToSuperGroups (int group_id)
 	RegGroup *g = RegGroupSetFindGroup (group_id);
 	Region *r;
 
-	//DebugLevel0Fn ("reinitializing group %d.\n", group_id);
+	//DebugLevel0Fn ("reinitializing group %d.\n" _C_ group_id);
 	for (r = g->Regions; r; r = r->NextInGroup) {
 		int i;
 
@@ -496,8 +496,8 @@ local void SuperGroupAddRegGroup (SuperGroup *s, RegGroup *g)
 		for ( ; gptr->NextInSGroup[type]; gptr=gptr->NextInSGroup[type]);
 		gptr->NextInSGroup[type] = g;
 	}
-	//DebugLevel2Fn ("added Group %4d to SuperGroup %2d of type %d.\n",
-	//			g->Id, s->Id, type);
+	//DebugLevel2Fn ("added Group %4d to SuperGroup %2d of type %d.\n" _C_
+	//			g->Id _C_ s->Id _C_ type);
 }
 
 local void SuperGroupDeleteRegGroup (SuperGroup *s, RegGroup *group)

@@ -365,18 +365,18 @@ global void UnitActions(void)
 	    if( !list
 		    && (!unit->Type->Vanishes
 			&& !unit->Orders[0].Action==UnitActionDie) ) {
-		DebugLevel0Fn("!removed not on map %d\n",UnitNumber(unit));
+		DebugLevel0Fn("!removed not on map %d\n" _C_ UnitNumber(unit));
 		abort();
 	    }
 	} else if( list ) {
-	    DebugLevel0Fn("remove on map %d\n",UnitNumber(unit));
+	    DebugLevel0Fn("remove on map %d\n" _C_ UnitNumber(unit));
 	    abort();
 	}
 	list=unit->Next;
 	while( list ) {
 	    if( list->X!=unit->X || list->Y!=unit->Y ) {
-		DebugLevel0Fn("Wrong X,Y %d %d,%d\n",UnitNumber(list)
-			,list->X,list->Y);
+		DebugLevel0Fn("Wrong X,Y %d %d,%d\n" _C_ UnitNumber(list)
+			_C_ list->X _C_ list->Y);
 		abort();
 	    }
 	    list=list->Next;
