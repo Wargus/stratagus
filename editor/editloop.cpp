@@ -277,12 +277,12 @@ local void EditTiles(int x, int y, int tile, int size)
     int i;
 
     ex = x + size;
-    if (ex >= TheMap.Width) {
-	ex = TheMap.Width - 1;
+    if (ex > TheMap.Width) {
+	ex = TheMap.Width;
     }
     ey = y + size;
-    if (ey >= TheMap.Height) {
-	ey = TheMap.Height - 1;
+    if (ey > TheMap.Height) {
+	ey = TheMap.Height;
     }
     while (y < ey) {
 	for (i = x; i < ex; ++i) {
