@@ -152,15 +152,21 @@ global void HandleActionRepair(Unit* unit)
     DebugLevel3("Repair %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
+	case 0:
+#ifdef NEW_ORDERS
+	    NewResetPath(unit);
+#endif
+	    unit->SubAction=1;
+	    // FALL THROUGH
 	//
 	//	Move near to target.
 	//
-	case 0:
+	case 1:
 	    // FIXME: RESET FIRST!! Why? (Johns)
 	    err=DoActionMove(unit);
 	    if( unit->Reset ) {
 		//
-		//	No goal: if meeting enemy attack it.
+		//	No goal: if meeting damaged building repair it.
 		//
 #ifdef NEW_ORDERS
 		goal=unit->Orders[0].Goal;
@@ -175,41 +181,48 @@ global void HandleActionRepair(Unit* unit)
 		// FIXME: should I do a function for this?
 		if( goal ) {
 		    if( goal->Destroyed ) {
+#ifdef NEW_ORDERS
 			DebugLevel0Fn("destroyed unit\n");
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
 			RefsDebugCheck( !goal->Refs );
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
-#ifdef NEW_ORDERS
 			// FIXME: should I clear this here?
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			NewResetPath(unit);
 			ResetPath(unit->Orders[0]);
 		    } else if( !goal->HP ||
 				goal->Orders[0].Action==UnitActionDie ) {
-#else
-			// FIXME: should I clear this here?
-			unit->Command.Data.Move.DX=goal->X;
-			unit->Command.Data.Move.DY=goal->Y;
-			unit->Command.Data.Move.Goal=goal=NULL;
-			ResetPath(unit->Command);
-		    } else if( !goal->HP ||
-				goal->Command.Action==UnitActionDie ) {
-#endif
-
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
+			unit->Orders[0].Goal=goal=NULL;
 			RefsDebugCheck( !goal->Refs );
 			--goal->Refs;
 			RefsDebugCheck( !goal->Refs );
 			// FIXME: should I clear this here?
-#ifdef NEW_ORDERS
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
-			unit->Orders[0].Goal=goal=NULL;
+			NewResetPath(unit);
 			ResetPath(unit->Orders[0]);
 #else
+			DebugLevel0Fn("destroyed unit\n");
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			RefsDebugCheck( !goal->Refs );
+			if( !--goal->Refs ) {
+			    ReleaseUnit(goal);
+			}
+			// FIXME: should I clear this here?
+			unit->Command.Data.Move.Goal=goal=NULL;
+			ResetPath(unit->Command);
+		    } else if( !goal->HP ||
+				goal->Command.Action==UnitActionDie ) {
+			unit->Command.Data.Move.DX=goal->X;
+			unit->Command.Data.Move.DY=goal->Y;
+			RefsDebugCheck( !goal->Refs );
+			--goal->Refs;
+			RefsDebugCheck( !goal->Refs );
+			// FIXME: should I clear this here?
 			unit->Command.Data.Move.Goal=goal=NULL;
 			ResetPath(unit->Command);
 #endif
@@ -221,7 +234,7 @@ global void HandleActionRepair(Unit* unit)
 		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
 			<=REPAIR_RANGE ) {
 		    unit->State=0;
-		    unit->SubAction=1;
+		    unit->SubAction=2;
 		} else if( err<0 ) {
 #ifdef NEW_ORDERS
 		    DebugCheck( unit->Orders[0].Action!=UnitActionStill );
@@ -233,6 +246,7 @@ global void HandleActionRepair(Unit* unit)
 		    }
 		    return;
 		}
+		// FIXME: Should be it already?
 		unit->Orders[0].Action=UnitActionRepair;
 #else
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
@@ -252,7 +266,7 @@ global void HandleActionRepair(Unit* unit)
 	//
 	//	Repair the target.
 	//
-	case 1:
+	case 2:
 	    AnimateActionRepair(unit);
 	    if( unit->Reset ) {
 #ifdef NEW_ORDERS
@@ -268,16 +282,17 @@ global void HandleActionRepair(Unit* unit)
 		// FIXME: should I do a function for this?
 		if( goal ) {
 		    if( goal->Destroyed ) {
+#ifdef NEW_ORDERS
 			DebugLevel0Fn("destroyed unit\n");
+			unit->Orders[0].X=goal->X;
+			unit->Orders[0].Y=goal->Y;
 			RefsDebugCheck( !goal->Refs );
 			if( !--goal->Refs ) {
 			    ReleaseUnit(goal);
 			}
-#ifdef NEW_ORDERS
 			// FIXME: should I clear this here?
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			NewResetPath(unit);
 			ResetPath(unit->Orders[0]);
 		    } else if( !goal->HP
 				|| goal->Orders[0].Action==UnitActionDie ) {
@@ -285,11 +300,17 @@ global void HandleActionRepair(Unit* unit)
 			unit->Orders[0].X=goal->X;
 			unit->Orders[0].Y=goal->Y;
 			unit->Orders[0].Goal=goal=NULL;
+			NewResetPath(unit);
 			ResetPath(unit->Orders[0]);
 #else
-			// FIXME: should I clear this here?
+			DebugLevel0Fn("destroyed unit\n");
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
+			RefsDebugCheck( !goal->Refs );
+			if( !--goal->Refs ) {
+			    ReleaseUnit(goal);
+			}
+			// FIXME: should I clear this here?
 			unit->Command.Data.Move.Goal=goal=NULL;
 			ResetPath(unit->Command);
 		    } else if( !goal->HP
