@@ -4231,7 +4231,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file,"'name \"%s\" ",unit->Name);
     }
 
-    if( unit->Next ) {
+    if( unit->Next && unit->Removed ) {
 	fprintf(file,"'next '%d ",UnitNumber(unit->Next));
     }
 
