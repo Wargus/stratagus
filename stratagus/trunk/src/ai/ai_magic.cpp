@@ -60,7 +60,7 @@ global void AiCheckMagic(void)
     int n;
     Unit** units;
     Unit* unit;
-    const Player *player;
+    const Player* player;
 #ifdef DEBUG
     int success;
 #endif
@@ -68,11 +68,11 @@ global void AiCheckMagic(void)
     n = AiPlayer->Player->TotalNumUnits;
     units = AiPlayer->Player->Units;
     player = AiPlayer->Player;/*units[0]->Player*/
-    for(i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
 	unit = units[i];
 	//  Check only magic units
-	if(unit->Type->CanCastSpell) {
-	    for (j = 0; j < SpellTypeCount; j++) {
+	if (unit->Type->CanCastSpell) {
+	    for (j = 0; j < SpellTypeCount; ++j) {
 		//  Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 		if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
 			(SpellTypeById(j)->AutoCast || SpellTypeById(j)->AICast)) {
@@ -80,10 +80,10 @@ global void AiCheckMagic(void)
 		    success = // Follow on next line (AutoCastSpell).
 #endif
 		    AutoCastSpell(unit, SpellTypeById(j));
-		    DebugLevel3Fn("Mage '%s' cast '%s' : %s\n"
-				_C_ unit->Type->Ident
-				_C_ SpellTypeById(j)->Ident
-				_C_ success ? "success" : "fail");
+		    DebugLevel3Fn("Mage '%s' cast '%s' : %s\n" _C_
+			unit->Type->Ident _C_
+			SpellTypeById(j)->Ident _C_
+			success ? "success" : "fail");
 		}
 	    }
 	}
