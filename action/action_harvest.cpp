@@ -163,10 +163,10 @@ local int ChopWood(Unit* unit)
 	//		We give a worker a new command and in the next cycle
 	//		the worker is ready chopping.
 	//
-#if 0
-	// FIXME: johns+cade: this didn't work with the current code
-	if( unit->NextCommand[0].Action==UnitActionHarvest
-		 || unit->NextCommand[0].Action==UnitActionMineGold ) {
+#if 1
+	if( unit->Orders[1].Action==UnitActionHarvest
+		 || unit->Orders[1].Action==UnitActionMineGold ) {
+	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	    return 0;
 	}
