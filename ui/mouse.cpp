@@ -299,7 +299,7 @@ global void DoRightButton(int sx,int sy)
 	    // FIXME: How can I remove here the unit type? More races!
 	    if( type==UnitTypeOrcTankerFull || type==UnitTypeHumanTankerFull ) {
 		DebugLevel2("Should return to oil deposit\n");
-		if( (dest=UnitOnMapTile(x,y)) ) {
+		if( (dest=UnitOnMapTile(x,y)) && dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    if( dest->Type->StoresOil ) {
 			DebugLevel3("OIL-DEPOSIT\n");
@@ -308,7 +308,7 @@ global void DoRightButton(int sx,int sy)
 		    }
 		}
 	    } else {
-		if( (dest=PlatformOnMap(x,y)) ) {
+		if( (dest=PlatformOnMap(x,y)) && dest->Player==unit->Player ) {
 		    dest->Blink=4;
 		    DebugLevel3("PLATFORM\n");
 		    SendCommandHaulOil(unit,dest,flush);
