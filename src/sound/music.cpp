@@ -229,6 +229,8 @@ local int PlayCDRom(const char* name)
 */
 local int PlayCDRom(const char* name)
 {
+    int i, DataCd;
+
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
 	    if (cd_init()) {
@@ -237,6 +239,17 @@ local int PlayCDRom(const char* name)
 		return 1;
 	    }
 	    if (cd_get_tracks(&CDTrack, &NumCDTracks)) {
+		CDMode = ":off";
+		return 1;
+	    }
+	    DataCd = 1;
+	    for (i=1; i <= NumCDTracks; ++i) {
+		if (cd_is_audio(i) > 0) {
+		    DataCd = 0;
+		    break;
+		}
+	    }
+	    if (DataCd) {
 		CDMode = ":off";
 		return 1;
 	    }
