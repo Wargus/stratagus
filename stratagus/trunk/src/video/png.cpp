@@ -237,7 +237,7 @@ global Graphic* LoadGraphicPNG(const char* name)
 				(Uint8)transv->green,
 				(Uint8)transv->blue);
 		}
-		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 	}
 
 	/* Create the array of pointers to image data */
