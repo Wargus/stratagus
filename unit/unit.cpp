@@ -3450,7 +3450,7 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 */
 global int MapDistance(int x1,int y1,int x2,int y2)
 {
-    return isqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+    return max(abs(x1-x2),abs(y1-y2));
 }
 
 /**
@@ -3488,9 +3488,9 @@ global int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2)
     }
 
     DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n"
-	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ isqrt(dx*dx+dy*dy));
+	    _C_ x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy );
 
-    return isqrt(dx*dx+dy*dy);
+    return (dy<dx) ? dx : dy;
 }
 
 /**
@@ -3550,7 +3550,7 @@ global int MapDistanceBetweenUnits(const Unit* src,const Unit* dst)
 	}
     }
 
-    return isqrt(dx*dx+dy*dy);
+    return (dy<dx) ? dx : dy;
 }
 
 /**
