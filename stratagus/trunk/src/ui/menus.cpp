@@ -1581,7 +1581,8 @@ local void GameMenuReturn(void)
     MustRedraw &= ~RedrawMenu;
     InterfaceState = IfaceStateNormal;
     ClearStatusLine();
-    MarkDrawEntireMap(); //FIXME: some tiles could be left as they were?
+    MarkDrawEntireMap();	//FIXME: some tiles could be left as they were?
+    MustRedraw=RedrawEverything;
     GamePaused = 0;
 }
 
