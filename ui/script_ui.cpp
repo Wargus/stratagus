@@ -2266,7 +2266,7 @@ local int CclDefineViewports(lua_State* l)
 			lua_rawgeti(l, j + 1, 1);
 			ui->Viewports[i].MapX = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 1);
+			lua_rawgeti(l, j + 1, 2);
 			ui->Viewports[i].MapY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 			++i;

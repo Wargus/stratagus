@@ -182,12 +182,37 @@ global int LuaCall(int narg, int clear)
 global int LuaLoadFile(const char* file)
 {
 	int status;
+	int size;
+	int read;
+	int location;
+	char* buf;
+	CLFile* fp;
 
-	if (!(status = luaL_loadfile(Lua, file))) {
+	if (!(fp = CLopen(file, CL_OPEN_READ))) {
+		perror("Can't open file");
+		return -1;
+	}
+					
+	size = 10000;
+	buf = (char*)malloc(size);
+	location = 0;
+	while ((read = CLread(fp, &buf[location], size - location))) {
+		location += read;
+		size = size * 2;
+		buf = (char*)realloc(buf, size);
+		if (!buf) {
+			fprintf(stderr, "Out of memory\n");
+			ExitFatal(-1);
+		}
+	}
+	CLclose(fp);
+
+	if (!(status = luaL_loadbuffer(Lua, buf, location, file))) {
 		LuaCall(0, 1);
 	} else {
 		report(status);
 	}
+	free(buf);
 	return status;
 }
 
