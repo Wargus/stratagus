@@ -926,7 +926,8 @@ local int InputKey(int key)
 **
 **	@return		1 if modifier found, 0 otherwise
 */
-global int HandleKeyModifiersDown(unsigned key,unsigned keychar)
+global int HandleKeyModifiersDown(unsigned key,
+    unsigned keychar __attribute__((unused)))
 {
     switch( key ) {
 	case KeyCodeShift:
