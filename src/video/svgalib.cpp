@@ -189,7 +189,8 @@ global void InitVideoSVGA(void)
     setuid(geteuid());
 
     if(vga_init() == -1) {
-	fprintf(stderr, "Cannot initialize svgalib.\n");
+	fprintf(stderr, "Cannot initialize svgalib.\n"
+                        "(You are possibly not user 'root')\n" );
 	exit(-1);
     }
     VideoMemory =malloc(VideoWidth * VideoHeight * ((VideoDepth+7) >> 3));
