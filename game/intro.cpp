@@ -1692,14 +1692,19 @@ global void ObjectivesCclRegister(void)
 
 /**
 **  Save the objectives.
+**
+**  @param file  Output file.
 */
 global void SaveObjectives(CLFile* file)
 {
 	int i;
 
 	if (GameIntro.Objectives[0]) {
-		CLprintf(file, "(set-objectives!");
+		CLprintf(file, "SetObjectives(");
 		for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
+			if (i) {
+				CLprintf(file, ",");
+			}
 			CLprintf(file, "\n  \"%s\"", GameIntro.Objectives[i]);
 		}
 		CLprintf(file, ")\n");

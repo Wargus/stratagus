@@ -1283,6 +1283,7 @@ global void InitVideoCursors(void)
 */
 global void SaveCursors(CLFile* file)
 {
+#if 0
 	int i;
 
 	CLprintf(file, "\n;;; -----------------------------------------\n");
@@ -1319,6 +1320,7 @@ global void SaveCursors(CLFile* file)
 	CLprintf(file, ";;(cursor-start '(%d %d)\n", CursorStartX, CursorStartY);
 	CLprintf(file, ";;(unit-under-cursor %s\n",
 		UnitUnderCursor ? UnitReference(UnitUnderCursor) : "()");
+#endif
 }
 
 /**

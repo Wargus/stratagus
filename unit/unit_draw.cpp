@@ -739,6 +739,7 @@ global void LoadDecorations(void)
 */
 global void SaveDecorations(CLFile* file)
 {
+#if 0
 	CLprintf(file, "\n;;; -----------------------------------------\n");
 	CLprintf(file, ";;; MODULE: decorations $Id$\n\n");
 
@@ -795,6 +796,7 @@ global void SaveDecorations(CLFile* file)
 	if (DecorationOnTop) {
 		CLprintf(file, ";(decoration-on-top)\n");
 	}
+#endif
 }
 
 /**

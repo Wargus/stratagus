@@ -422,17 +422,18 @@ global void DrawUnitIcon(const Player* player, Icon* icon, unsigned flags,
 }
 
 /**
-**		Save state of the icons to file.
+**  Save state of the icons to file.
 **
-**		@param file		Output file.
+**  @param file  Output file.
 */
 global void SaveIcons(CLFile* file)
 {
+#if 0
 	char* const* cp;
 	int i;
 
-	CLprintf(file, "\n;;; -----------------------------------------\n");
-	CLprintf(file, ";;; MODULE: icons $Id$\n\n");
+	CLprintf(file, "\n--- -----------------------------------------\n");
+	CLprintf(file, "--- MODULE: icons $Id$\n\n");
 
 	//
 	//  Mapping the original icon numbers in puds to our internal strings
@@ -471,6 +472,7 @@ global void SaveIcons(CLFile* file)
 		CLprintf(file, "(define-icon-alias '%s '%s)\n",
 			IconAliases[i * 2 + 0], IconAliases[i * 2 + 1]);
 	}
+#endif
 }
 
 /**
