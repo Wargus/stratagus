@@ -600,10 +600,11 @@ extern int ShowReactRange;		/// Flag: show react range
 extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
+extern int EnableTrainingQueue;		/// Config: training queues enabled
 
 //	in selection.c
-extern int NumSelected;			/// how many units selected
 extern Unit* Selected[MaxSelectable];	/// currently selected units
+extern int NumSelected;			/// how many units selected
 
 /*----------------------------------------------------------------------------
 --	Functions
