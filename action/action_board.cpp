@@ -48,11 +48,8 @@ local int MoveToTransporter(Unit* unit)
     int i;
 
     i=DoActionMove(unit);
-#ifdef NEW_ORDERS
-    unit->Orders[0].Action=UnitActionBoard;
-#else
-    unit->Command.Action=UnitActionBoard;
-#endif
+    // New code has this as default.
+    DebugCheck( unit->Orders[0].Action!=UnitActionBoard );
     return i;
 }
 
@@ -69,45 +66,33 @@ local int WaitForTransporter(Unit* unit)
     unit->Wait=6;
     unit->Reset=1;
 
-#ifdef NEW_ORDERS
     trans=unit->Orders[0].Goal;
-#else
-    trans=unit->Command.Data.Move.Goal;
-#endif
-    // FIXME: destination destroyed??
+
     if( !trans || !trans->Type->Transporter ) {
-	DebugLevel3Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
+	// FIXME: destination destroyed??
+	DebugLevel2Fn("TRANSPORTER NOT REACHED %d,%d\n",unit->X,unit->Y);
 	return 0;
     }
+
     if( trans->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
+	DebugLevel0Fn("Destroyed transporter\n");
 	RefsDebugCheck( !trans->Refs );
 	if( !--trans->Refs ) {
 	    ReleaseUnit(trans);
 	}
-#ifdef NEW_ORDERS
-	unit->Orders[0].Goal=trans=NoUnitP;
-#else
-	unit->Command.Data.Move.Goal=trans=NoUnitP;
-#endif
+	unit->Orders[0].Goal=NoUnitP;
 	return 0;
     } else if( trans->Removed ||
-#ifdef NEW_ORDERS
 	    !trans->HP || trans->Orders[0].Action==UnitActionDie ) {
-#else
-	    !trans->HP || trans->Command.Action==UnitActionDie ) {
-#endif
+	DebugLevel0Fn("Unusable transporter\n");
 	RefsDebugCheck( !trans->Refs );
 	--trans->Refs;
 	RefsDebugCheck( !trans->Refs );
-#ifdef NEW_ORDERS
-	unit->Orders[0].Goal=trans=NoUnitP;
-#else
-	unit->Command.Data.Move.Goal=trans=NoUnitP;
-#endif
+	unit->Orders[0].Goal=NoUnitP;
 	return 0;
     }
 
+    // FIXME: can use pathfinder result?
     if( MapDistanceToUnit(unit->X,unit->Y,trans)==1 ) {
 	DebugLevel3Fn("Enter transporter\n");
 	return 1;
@@ -129,54 +114,32 @@ local void EnterTransporter(Unit* unit)
     int i;
 
     unit->Wait=1;
-#ifdef NEW_ORDERS
     unit->Orders[0].Action=UnitActionStill;
-#else
-    unit->Command.Action=UnitActionStill;
-#endif
     unit->SubAction=0;
 
-#ifdef NEW_ORDERS
     transporter=unit->Orders[0].Goal;
-#else
-    transporter=unit->Command.Data.Move.Goal;
-#endif
     if( transporter->Destroyed ) {
-	DebugLevel0Fn("Destroyed unit\n");
+	DebugLevel0Fn("Destroyed transporter\n");
 	RefsDebugCheck( !transporter->Refs );
 	if( !--transporter->Refs ) {
 	    ReleaseUnit(transporter);
 	}
-#ifdef NEW_ORDERS
 	unit->Orders[0].Goal=NoUnitP;
-#else
-	unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 	return;
     } else if( transporter->Removed ||
-#ifdef NEW_ORDERS
 	    !transporter->HP || transporter->Orders[0].Action==UnitActionDie ) {
-#else
-	    !transporter->HP || transporter->Command.Action==UnitActionDie ) {
-#endif
+	DebugLevel0Fn("Unuseable transporter\n");
 	RefsDebugCheck( !transporter->Refs );
 	--transporter->Refs;
 	RefsDebugCheck( !transporter->Refs );
-#ifdef NEW_ORDERS
 	unit->Orders[0].Goal=NoUnitP;
-#else
-	unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 	return;
     }
+
     RefsDebugCheck( !transporter->Refs );
     --transporter->Refs;
     RefsDebugCheck( !transporter->Refs );
-#ifdef NEW_ORDERS
     unit->Orders[0].Goal=NoUnitP;
-#else
-    unit->Command.Data.Move.Goal=NoUnitP;
-#endif
 
     //
     //	Find free slot in transporter.
@@ -199,7 +162,7 @@ local void EnterTransporter(Unit* unit)
 /**
 **	The unit boards a transporter.
 **
-**	FIXME: the transporter must drive to the meating point.
+**	@todo FIXME: the transporter must drive to the meating point.
 **
 **	@param unit	Pointer to unit.
 */
@@ -231,9 +194,7 @@ global void HandleActionBoard(Unit* unit)
 	//	Move to transporter
 	//
 	case 0:
-#ifdef NEW_ORDERS
 		NewResetPath(unit);
-#endif
 		unit->SubAction=1;
 		// FALL THROUGH
         default:
@@ -242,7 +203,6 @@ global void HandleActionBoard(Unit* unit)
 		if( (i=MoveToTransporter(unit)) ) {
 		    if( i==PF_UNREACHABLE ) {
 			if( ++unit->SubAction==200 ) {
-#ifdef NEW_ORDERS
 			    unit->Orders[0].Action=UnitActionStill;
 			    if( unit->Orders[0].Goal ) {
 
@@ -251,19 +211,9 @@ global void HandleActionBoard(Unit* unit)
 				RefsDebugCheck(!unit->Orders[0].Goal->Refs);
 				unit->Orders[0].Goal=NoUnitP;
 			    }
-#else
-			    unit->Command.Action=UnitActionStill;
-			    if( unit->Command.Data.Move.Goal ) {
-
-				RefsDebugCheck(!unit->Command.Data.Move.Goal
-					->Refs);
-				--unit->Command.Data.Move.Goal->Refs;
-				RefsDebugCheck(!unit->Command.Data.Move.Goal
-					->Refs);
-				unit->Command.Data.Move.Goal=NoUnitP;
-			    }
-#endif
 			    unit->SubAction=0;
+			} else {
+			    unit->Wait=unit->SubAction;
 			}
 		    } else if( i==PF_REACHED ) {
 			unit->SubAction=201;
