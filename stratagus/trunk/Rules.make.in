@@ -31,7 +31,8 @@ COMP_LIBS		= -lz @BZ2_LIBS@
 
 VERSION=	'-DVERSION="2.0"'
 
-TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm @THREAD_LIBS@ -L/usr/local/lib @STATIC_LDFLAGS@
+TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm @EXTRA_LIBS@ @THREAD_LIBS@ -L/usr/local/lib \
+	@STATIC_LDFLAGS@
 
 STRATAGUS_LIBS= -lpng -lz -lm \
 	@EXTRA_LIBS@ @VIDEO_LIBS@ @THREAD_LIBS@ $(CCLLIB) $(COMP_LIBS) \
