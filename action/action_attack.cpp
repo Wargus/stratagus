@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -280,24 +280,7 @@ local void MoveToTarget(Unit* unit)
 	}
     }
 
-    if( unit->Orders[0].Action==UnitActionAttackGround
-	    || (!unit->Orders[0].Goal &&
-		WallOnMap(unit->Orders[0].X,unit->Orders[0].Y)) ) {
-	// FIXME: workaround for pathfinder problem
-	// FIXME: is this true with the new pathfinding??
-	DebugLevel3Fn("FIXME: Johns remove this for new orders.\n");
-	unit->Orders[0].X-=unit->Orders[0].RangeX;
-	unit->Orders[0].Y-=unit->Orders[0].RangeY;
-	unit->Orders[0].RangeX*=2;
-	unit->Orders[0].RangeY*=2;
-	err=DoActionMove(unit);
-	unit->Orders[0].RangeX/=2;
-	unit->Orders[0].RangeY/=2;
-	unit->Orders[0].X+=unit->Orders[0].RangeX;
-	unit->Orders[0].Y+=unit->Orders[0].RangeY;
-    } else {
-	err=DoActionMove(unit);
-    }
+    err=DoActionMove(unit);
 
     // NEW return codes supported, FIXME: but johns thinks not perfect.
 
@@ -309,7 +292,7 @@ local void MoveToTarget(Unit* unit)
     }
     if (err==PF_REACHED) {
 #else /* HIERARCHIC_PATHDFINDER */
-    if( unit->Reset ) {
+    if (err==PF_REACHED) {
 	//
 	//	Look if we have reached the target.
 	//
@@ -358,7 +341,7 @@ local void MoveToTarget(Unit* unit)
 		    DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_ unit->Orders[0].RangeX);
 		} else {
 		    DebugLevel0(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
-		    if( unit->Orders[0].RangeX < TheMap.Width 
+		    if( unit->Orders[0].RangeX < TheMap.Width
 			|| unit->Orders[0].RangeY < TheMap.Height ) {
 			// Try again with more range
 			unit->Orders[0].RangeX++;
@@ -597,9 +580,6 @@ global void HandleActionAttack(Unit* unit)
 	    if( CheckForTargetInRange(unit) ) {
 		return;
 	    }
-	    HandleActionAttack(unit);
-	    break;
-
 
 	    // FALL THROUGH
 	//

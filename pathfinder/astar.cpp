@@ -301,33 +301,29 @@ local int CostMoveTo(Unit* unit, int ex,int ey,int mask,int current_cost) {
     cost=0;
     j=TheMap.Fields[ex+ey*TheMap.Width].Flags&mask;
     if( j && (AStarKnowUnknown
-	    || TheMap.Fields[ex+ey*TheMap.Width].Visible[unit->Player->Player]) ) {
+	    || IsMapFieldExplored(unit->Player,ex,ey)) ) {
 	if( j&~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit) ) {
 	    // we can't cross fixed units and other unpassable things
 	    return -1;
 	}
-	if( current_cost>=AStarFixedUnitCrossingCost ) {
-	    // we are already crossing a fixed unit. We don't need details
+	goal=UnitCacheOnXY(ex,ey,unit->Type->UnitType);
+	if( !goal ) {
+	    // Shouldn't happen, mask says there is something on this tile
+	    DebugCheck( 1 );
+	    return -1;
+	}
+	if( goal->Moving ) {
+	    // moving unit are crossable
 	    cost+=AStarMovingUnitCrossingCost;
 	} else {
-	    goal=UnitCacheOnXY(ex,ey,unit->Type->UnitType);
-	    if( !goal ) {
-		// Shouldn't happen, mask says there is something on this tile
-	    	DebugCheck( 1 );
-		return -1;
-	    }
-	    if( goal->Moving ) {
-		// moving unit are crossable
-		cost+=AStarMovingUnitCrossingCost;
-	    } else {
-		// for non moving unit
-		cost+=AStarFixedUnitCrossingCost;
-		return -1;
-	    }
+	    // for non moving unit Always Fail
+	    // FIXME: Need support for moving a fixed unit to add cost
+	    return -1;
+	    cost+=AStarFixedUnitCrossingCost;
 	}
     }
-    // empty tile
-    if( !TheMap.Fields[ex+ey*TheMap.Width].Visible[unit->Player->Player] ) {
+    // Add cost of crossing unknown tiles if required
+    if( !IsMapFieldExplored(unit->Player,ex,ey) || AStarKnowUnknown ) {
 	// Tend against unknown tiles.
 	cost+=AStarUnknownTerrainCost;
     }
@@ -373,7 +369,7 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int range, i
                    CloseSet[(*num_in_close)++]=(gy-range)*TheMap.Width+x;
 		}						    
 	    }
-	    if( gy+range+gh < TheMap.Height && CostMoveTo(unit,x,gy+range,mask,AStarFixedUnitCrossingCost)>=0 ) {
+	    if( gy+range+gh < TheMap.Height && CostMoveTo(unit,x,gy+gh+range,mask,AStarFixedUnitCrossingCost)>=0 ) {
 		AStarMatrix[(gy+range+gh)*TheMap.Width+x].InGoal=1;
 		if( *num_in_close<Threshold ) {
 		    CloseSet[(*num_in_close)++]=(gy+range+gh)*TheMap.Width+x;
@@ -541,7 +537,7 @@ global int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int range, 
 	return PF_REACHED;
     }
 
-    counter=TheMap.Width*TheMap.Height;	
+    counter=TheMap.Width*TheMap.Height;
 
     while( 1 ) {
 	//

@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -223,6 +223,7 @@ global void LoadGame(char* filename)
     siod_verbose_level=4;
     user_gc(SCM_BOOL_F);
     siod_verbose_level=old_siod_verbose_level;
+    InitVisionTable();
     gh_load(filename);
     user_gc(SCM_BOOL_F);
 

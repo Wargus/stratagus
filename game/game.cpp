@@ -1,4 +1,4 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -282,7 +282,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	return;
     }
 
-    InitMapFogOfWar();			// build tables for fog of war
+    InitVisionTable();			// build vision table for fog of war
     
     if( filename ) {
 	s = NULL;
@@ -427,6 +427,7 @@ global void CreateGame(char* filename, WorldMap* map)
 
     CreateMinimap();			// create minimap for pud
     InitMap();				// setup draw functions
+    InitMapFogOfWar();			// build tables for fog of war
     PreprocessMap();			// Adjust map for use
     MapColorCycle();			// Setup color cycle
 
