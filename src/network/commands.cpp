@@ -652,7 +652,7 @@ local int CclLog(lua_State* l)
     log->Num = -1;
 
     lua_pushnil(l);
-    while (lua_next(l, 1) != 0) {
+    while (lua_next(l, 1)) {
 	value = LuaToString(l, -2);
 	if (!strcmp(value, "GameCycle")) {
 	    log->GameCycle = LuaToNumber(l, -1);
@@ -1020,7 +1020,7 @@ local void DoNextReplay(void)
     } else if (!strcmp(action, "cancel-upgrade-to")) {
 	SendCommandCancelUpgradeTo(UnitSlots[unit]);
     } else if (!strcmp(action, "research")) {
-	SendCommandResearch(UnitSlots[unit],UpgradeByIdent(val), flags);
+	SendCommandResearch(UnitSlots[unit], UpgradeByIdent(val), flags);
     } else if (!strcmp(action, "cancel-research")) {
 	SendCommandCancelResearch(UnitSlots[unit]);
     } else if (!strcmp(action, "spell-cast")) {
@@ -1794,7 +1794,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 	case MessageCommandResearch:
 	    CommandLog("research", unit, status, -1, -1, NoUnitP,
 		Upgrades[x].Ident, -1);
-	    CommandResearch(unit,Upgrades+x, status);
+	    CommandResearch(unit, Upgrades + x, status);
 	    break;
 	case MessageCommandCancelResearch:
 	    CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP,
@@ -1812,7 +1812,7 @@ global void ParseCommand(unsigned char msgnr, UnitRef unum,
 		CommandLog("spell-cast", unit, status, x, y, dest, NULL, id);
 		CommandSpellCast(unit, x, y, dest, SpellTypeById(id), status);
 	    } else {
-		CommandLog("auto-spell-cast", unit, status,x, -1, NoUnitP, NULL, id);
+		CommandLog("auto-spell-cast", unit, status, x, -1, NoUnitP, NULL, id);
 		CommandAutoSpellCast(unit, x ? SpellTypeById(id) : NULL);
 	    }
 	    break;
@@ -1857,7 +1857,7 @@ global void ParseExtendedCommand(unsigned char type, int status,
 			NoUnitP, "crazy", -1);
 		    break;
 	    }
-	    CommandDiplomacy(arg2,arg3,arg4);
+	    CommandDiplomacy(arg2, arg3, arg4);
 	    break;
 	case ExtendedMessageSharedVision:
 	    if (arg3 == 0) {
