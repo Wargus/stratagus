@@ -117,6 +117,8 @@ local SCM CclDefineUnitType(SCM list)
 	DebugLevel3Fn("Defining unit-type `%s'\n" _C_ str);
 	type=NewUnitTypeSlot(str);
 	redefine = 0;
+	//Set some default values
+	type->_RegenerationRate=0;
     }
 
     type->NumDirections=8;
@@ -251,6 +253,9 @@ local SCM CclDefineUnitType(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
 	    type->_HitPoints=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("regeneration-rate")) ) {
+	    type->_RegenerationRate=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("max-mana")) ) {
 	    type->_MaxMana=gh_scm2int(gh_car(list));
@@ -395,7 +400,7 @@ local SCM CclDefineUnitType(SCM list)
 	    while( !gh_null_p(sublist) ) {
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
-		type->_RepairCosts[CclGetResourceByName(value)]=gh_scm2int(gh_car(sublist));
+		type->RepairCosts[CclGetResourceByName(value)]=gh_scm2int(gh_car(sublist));
 		sublist=gh_cdr(sublist);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("can-target-land")) ) {
@@ -660,6 +665,9 @@ local SCM CclDefineUnitStats(SCM list)
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("hit-points")) ) {
 	    stats->HitPoints=gh_scm2int(gh_car(list));
+	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("regeneration-rate")) ) {
+	    stats->RegenerationRate=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("costs")) ) {
 	    sublist=gh_car(list);

@@ -172,7 +172,7 @@
 **		The HP given to a unit each cycle it's repaired.
 **		If zero, unit cannot be repaired
 **
-**	UnitType::_RepairCosts[::MaxCosts]
+**	UnitType::RepairCosts[::MaxCosts]
 **
 **		Costs per repair cycle to fix a unit.
 **
@@ -228,6 +228,10 @@
 **	UnitType::_PiercingDamage
 **
 **		Piercing damage dealt
+**
+**	UnitType::_RegenerationRate
+**
+**		Regeneration rate in HP per second
 **
 **	UnitType::WeaponsUpgradable
 **
@@ -709,7 +713,7 @@ struct _unit_type_ {
 
     int		_Costs[MaxCosts];	/// How many resources needed
     int		RepairHP;		/// Amount of HP per repair
-    int		_RepairCosts[MaxCosts]; /// How much it costs to repair
+    int		RepairCosts[MaxCosts]; /// How much it costs to repair
 
     int		TileWidth;		/// Tile size on map width
     int		TileHeight;		/// Tile size on map height
@@ -724,6 +728,7 @@ struct _unit_type_ {
     int		Priority;		/// Priority value / AI Treatment
     int		_BasicDamage;		/// Basic damage dealt
     int		_PiercingDamage;	/// Piercing damage dealt
+    int		_RegenerationRate;	/// HP regeneration HP per sec
     int		WeaponsUpgradable;	/// Weapons could be upgraded
     int		ArmorUpgradable;	/// Armor could be upgraded
     // FIXME: original only visual effect, we do more with this!
