@@ -10,7 +10,7 @@
 //
 /**@name action_move.c	-	The move action. */
 //
-//	(c) Copyright 1998,2001 by Lutz Sammer
+//	(c) Copyright 1998,2001,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -59,6 +59,9 @@ local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 --	Function
 ----------------------------------------------------------------------------*/
 
+
+//#include "rdtsc.h"
+
 /**
 **	Generic unit mover.
 **
@@ -68,8 +71,6 @@ local const int Heading2Y[8] = { -1,-1, 0,+1,+1,+1, 0,-1 };
 **	@return		>0 remaining path length, 0 wait for path, -1
 **			reached goal, -2 can't reach the goal.
 */
-
-#include "rdtsc.h"
 local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 {
     int xd;
