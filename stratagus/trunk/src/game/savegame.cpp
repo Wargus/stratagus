@@ -88,6 +88,7 @@ global void SaveGame(const char* filename)
     fprintf(file,";;;\tMap: %s\n",TheMap.Description);
     fprintf(file,";;; -----------------------------------------\n\n");
 
+    SaveCcl(file);
     SaveIcons(file);
     SaveCursors(file);
     SaveUserInterface(file);
