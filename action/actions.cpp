@@ -433,7 +433,7 @@ global void UnitActions(void)
 	    UnitNumber(unit),unit->Type ? unit->Type->Ident : "unit-killed",
 		unit->State,unit->SubAction,
 		unit->Orders[0].Action,
-		unit->Player->Player,unit->Refs,SyncRandSeed);
+		unit->Player ? unit->Player->Player : -1,unit->Refs,SyncRandSeed);
 		
 	// SaveUnit(unit,logf);
 	fflush(NULL);
