@@ -513,7 +513,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 	MapMarkUnitSight(unit);
 
 	if( type->DetectCloak ) {
-	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	    MapDetectCloakedUnits(unit);
 	}
     }
 
@@ -932,31 +932,6 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 }
 
 /**
- **	Mark submarine seen by a submarine detector.
- **
- **	@param player	Player pointer that can see the submarine
- **	@param x	X map tile center position
- **	@param y	Y map tile center position
- **	@param r	Range around center
- **
- **	@note
- **		All units are marked as visible, not only submarines.
- */
-global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
-{
-    Unit* table[UnitMax];
-    int n;
-    int i;
-    int pm;
-
-    n=SelectUnits(x-r,y-r,x+r,y+r,table);
-    pm=((1<<player->Player)|player->SharedVision);
-    for( i=0; i<n; ++i ) {
-	table[i]->Visible|=pm;
-    }
-}
-
-/**
  **	Returns true, if unit is visible for this player on the map.
  **	An unit is visible, if any field could be seen.
  **
@@ -1052,22 +1027,28 @@ global void UnitsMarkSeen(int x,int y)
 {
     int n;
     Unit* units[UnitMax];
+    Unit* unit;
 
     if( IsMapFieldVisible(ThisPlayer, x, y) ) {
 	n = SelectUnitsOnTile(x,y,units);
+	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
 	// FIXME: need to handle Dead buldings
 	while( n ) {
-	    units[n-1]->SeenIY=units[n-1]->IY;
-	    units[n-1]->SeenIX=units[n-1]->IX;
-	    units[n-1]->SeenFrame = units[n-1]->Frame;
-	    units[n-1]->SeenType = units[n-1]->Type;
-	    units[n-1]->SeenState = (units[n-1]->Orders[0].Action==UnitActionBuilded) |
-		((units[n-1]->Orders[0].Action==UnitActionUpgradeTo) << 1);
-	    if( units[n-1]->Orders[0].Action==UnitActionDie ) {
-		units[n-1]->SeenState = 3;
+	    unit=units[n-1];
+	    if (unit->SeenFrame==UnitNotSeen) {
+		DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_ unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
 	    }
-	    units[n-1]->SeenConstructed = units[n-1]->Constructed;
-	    units[n-1]->SeenDestroyed = units[n-1]->Destroyed;
+	    unit->SeenIY=unit->IY;
+	    unit->SeenIX=unit->IX;
+	    unit->SeenFrame = unit->Frame;
+	    unit->SeenType = unit->Type;
+	    unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
+		((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
+	    if( unit->Orders[0].Action==UnitActionDie ) {
+		unit->SeenState = 3;
+	    }
+	    unit->SeenConstructed = unit->Constructed;
+	    unit->SeenDestroyed = unit->Destroyed;
 	    --n;
 	}
     }
@@ -1093,6 +1074,9 @@ global void UnitMarkSeen(Unit* unit)
 	    if( IsMapFieldVisible(ThisPlayer,unit->X+x,unit->Y+y) ) {
 		unit->SeenIY=unit->IY;
 		unit->SeenIX=unit->IX;
+		if (unit->SeenFrame==UnitNotSeen) {
+		    DebugLevel3Fn("unit %d at %d,%d first seen at %lu.\n" _C_ unit->Slot _C_ unit->X _C_ unit->Y _C_ GameCycle);
+		}
 		unit->SeenFrame = unit->Frame;
 		unit->SeenType = unit->Type;
 		unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
@@ -1104,6 +1088,8 @@ global void UnitMarkSeen(Unit* unit)
 		unit->SeenDestroyed = unit->Destroyed;
 		x=unit->Type->TileWidth;
 		y=unit->Type->TileHeight;
+		//  If we found one visible square, END.
+		break;
 	    }
 	}
     }
@@ -1600,8 +1586,7 @@ global void UnitIncrementMana(void)
 	unit=*table;
 	if( unit->Type->DetectCloak && !unit->Removed &&
 		unit->Orders[0].Action!=UnitActionBuilded ) {
-	    MarkSubmarineSeen(unit->Player,unit->X+unit->Type->TileWidth/2,
-		    unit->Y+unit->Type->TileHeight/2,unit->Stats->SightRange);
+	    MapDetectCloakedUnits(unit);
 	}
     }
 }
@@ -2642,7 +2627,7 @@ global Unit* FindResource(const Unit * unit,int x,int y,int range,int resource)
     points=malloc(size*sizeof(*points));
 
     //	Find the nearest gold depot
-    if( (destu=FindDeposit(unit,x,y,range)) ) {
+    if( (destu=FindDeposit(unit,x,y,range,resource)) ) {
 	NearestOfUnit(destu,x,y,&destx,&desty);
     }
     bestd=99999;
@@ -2751,7 +2736,7 @@ global Unit* FindResource(const Unit * unit,int x,int y,int range,int resource)
  **
  **	@return		NoUnitP or oil deposit unit
  */
-global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
+global Unit* FindDeposit(const Unit* unit,int x,int y,int range,int resource)
 {
     static const int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static const int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -2768,15 +2753,15 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
     int ep;
     int i;
     int w;
+    int nodes_searched;
     unsigned char* m;
     unsigned char* matrix;
     Unit* depot;
     int destx;
     int desty;
     int cdist;
-    int resource;
 
-    resource=unit->CurrentResource;
+    nodes_searched=0;
 
     destx=x;
     desty=y;
@@ -2791,7 +2776,7 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
     mask=UnitMovementMask(unit);
     //  Ignore all units along the way. Might seem wierd, but otherwise
     //  peasants would lock at a mine with a lot of workers.
-    mask&=~(MapFieldLandUnit|MapFieldSeaUnit|MapFieldAirUnit);
+    mask&=~(MapFieldLandUnit|MapFieldSeaUnit|MapFieldAirUnit|MapFieldBuilding);
     points[0].X=x;
     points[0].Y=y;
     rp=0;
@@ -2799,6 +2784,7 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
     ep=wp=1;				// start with one point
     cdist=0;				// current distance is 0
 
+    DebugLevel3Fn("Searching for a deposit(%d,%d,%d,%d,%s)" _C_ UnitNumber(unit) _C_ x _C_ y _C_ range _C_ DefaultResourceNames[resource]);
     //
     //	Pop a point from stack, push all neighbors which could be entered.
     //
@@ -2809,6 +2795,8 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
 	    for( i=0; i<8; ++i ) {		// mark all neighbors
 		x=rx+xoffset[i];
 		y=ry+yoffset[i];
+		nodes_searched++;
+		DebugLevel3("(%d,%d) " _C_ x _C_ y);
 		//  Make sure we don't leave the map.
 		if (x<0||y<0||x>=TheMap.Width||y>=TheMap.Height) {
 		    continue; 
@@ -2821,10 +2809,11 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
 		//
 		//	Look if there is a mine
 		//
-		if ((depot=ResourceDepositOnMap(x,y,resource))&&
-			((IsAllied(unit->Player,depot)) ||
-			(unit->Player==depot->Player))) {
+		if (  (depot=ResourceDepositOnMap(x,y,resource)) &&
+			( (IsAllied(unit->Player,depot)) ||
+			(unit->Player==depot->Player) ) ) {
 		    free(points);
+		    DebugLevel3("Found a resource deposit at %d,%d\n" _C_ x _C_ y);
 		    return depot;
 		}
 		if( CanMoveToMask(x,y,mask) ) {	// reachable
@@ -2854,7 +2843,7 @@ global Unit* FindDeposit(const Unit* unit,int x,int y,int range)
 	//	Continue with next set.
 	ep=wp;
     }
-    DebugLevel3Fn("no resource deposit found\n");
+    DebugLevel3("No resource deposit found, after we searched %d nodes.\n" _C_ nodes_searched);
     free(points);
     return NoUnitP;
 }

@@ -1769,8 +1769,7 @@ global void DrawBuilding(const Unit* unit)
     y+=Map2ViewportY(CurrentViewport,unit->Y);
 
     if( frame==UnitNotSeen ) {
-	DebugLevel0Fn("Something is wrong, please send us the log of your game.\n");
-	DrawUnitSelection(unit);
+	DebugLevel0Fn("FIXME: Something is wrong, unit %d not seen time %lu?.\n"_C_ unit->Slot _C_ GameCycle);
 	return;
     }
     

@@ -89,6 +89,8 @@
 
 #define noUSE_TILECACHE			/// defined use tile cache
 #define USE_SMART_TILECACHE		/// defined use a smart tile cache
+#define noGRID		1		/// Map is shown with a grid, if 1
+
 
 #ifdef DEBUG
 #define noTIMEIT			/// defined time function
