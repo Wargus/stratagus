@@ -1252,7 +1252,7 @@ pawn:
 				// active/inactive AI units!!
 				// Johns: it is better to have active buildings
 				if( !unit->Type->Building ) {
-				    unit->Active=v;
+				    unit->Active=!v;
 				}
 			    }
 			    UpdateForNewUnit(unit,0);

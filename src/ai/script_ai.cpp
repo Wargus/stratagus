@@ -859,6 +859,17 @@ local SCM CclAiDump(void)
     int n;
     const AiUnitType* aut;
 
+    //
+    //	Script
+    //
+    printf("-----\n");
+    printf("%d:",AiPlayer->Player->Player);
+    gh_display(gh_car(AiPlayer->Script));
+    gh_newline();
+
+    //
+    //	Requests
+    //
     n=AiPlayer->UnitTypeRequestsCount;
     printf("UnitTypeRequests(%d):\n",n);
     for( i=0; i<n; ++i ) {
@@ -871,9 +882,15 @@ local SCM CclAiDump(void)
 	printf("%s ",AiPlayer->UpgradeToRequests[i]->Ident);
     }
     printf("\n");
+    n=AiPlayer->ResearchRequestsCount;
+    printf("ResearchRequests(%d):\n",n);
+    for( i=0; i<n; ++i ) {
+	printf("%s ",AiPlayer->ResearchRequests[i]->Ident);
+    }
+    printf("\n");
 
     //
-    //	Look if already in force.
+    //	PrintForce
     //
     for( i=0; i<AI_MAX_FORCES; ++i) { 
 	printf("Force(%d%s%s%s):\n",i,
