@@ -1020,7 +1020,7 @@ global void ShowLoadProgress(const char* fmt, ...)
 		InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
 		RealizeVideoMemory();
 	} else {
-		DebugLevel0Fn("!!!!%s" _C_ temp);
+		DebugLevel0Fn("!!!!%s\n" _C_ temp);
 	}
 }
 
@@ -1032,6 +1032,11 @@ global void ShowLoadProgress(const char* fmt, ...)
 global void PreMenuSetup(void)
 {
 	char* s;
+
+	if (Tilesets == NULL) {
+		fprintf(stderr, "Tilesets is null!!\n");
+		ExitFatal(-1);
+	}
 
 	//
 	//  Initial menus require some gfx.

@@ -803,6 +803,7 @@ local int CclDefineAiHelper(lua_State* l)
 		} else {
 			lua_pushfstring(l, "unknown tag: %s", value);
 			lua_error(l);
+			what = -1;
 		}
 
 		//
@@ -2905,6 +2906,7 @@ local int CclAiResearch(lua_State* l)
 	} else {
 		lua_pushfstring(l, "Upgrade needed");
 		lua_error(l);
+		upgrade = 0;
 	}
 
 	InsertResearchRequests(upgrade);
