@@ -31,6 +31,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -497,6 +498,45 @@ global int SelectUnitsInRectangle(int tx,int ty,int w,int h)
     }
 
     return 0;
+}
+
+/**
+**	Initialize the selection module.
+*/
+global void InitSelections(void)
+{
+}
+
+/**
+**	Save current selection state.
+**
+**	@param file	Output file.
+*/
+global void SaveSelections(FILE* file)
+{
+    int i;
+    char *ref;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: selection $Id$\n\n");
+
+    fprintf(file,";;(group-id %d)\n",GroupId);
+    fprintf(file,";;(selection %d '(",NumSelected);
+    for( i=0; i<NumSelected; ++i ) {
+	ref=UnitReference(Selected[i]);
+	fprintf(file,"%s ",ref);
+	free(ref);
+    }
+    fprintf(file,"))\n");
+}
+
+/**
+**	Clean up the selection module.
+*/
+global void CleanSelections(void)
+{
+    NumSelected=0;
+    memset(Selected,0,sizeof(Selected));
 }
 
 //@}
