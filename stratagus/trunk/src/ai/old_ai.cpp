@@ -1379,6 +1379,36 @@ global void AiHelpMe(Unit * unit)
 }
 
 /**
+**	Called if an unit is killed.
+**
+**	@param unit	Pointer to unit.
+*/
+global void AiUnitKilled(Unit* unit)
+{
+    DebugLevel1Fn("%d: %d(%s) killed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+
+    // FIXME: if the unit builds something for us it must restartet!!!!
+}
+
+/**
+**	Called if the AI needs more farms.
+**
+**	@param unit	Point to unit.
+**      @param what     Pointer to unit-type.
+*/
+global void AiNeedMoreFarms(Unit* unit,const UnitType* what)
+{
+    DebugLevel1Fn("%d: %d(%s) need more farms %s at %d,%d\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+}
+
+/**
 **      Called if work complete (Buildings).
 **
 **      @param unit     Pointer to unit what builds the building.
@@ -1486,6 +1516,36 @@ global void AiTrainingComplete(Unit * unit, Unit * what)
 	AiAssignWorker();
     }
     AiClearBuildUnitType(what->Type);
+}
+
+/**
+**	Called if upgrading of an unit is completed.
+**
+**	@param unit	Pointer to unit working.
+**	@param what	Pointer to the new unit-type.
+*/
+global void AiUpgradeToComplete(Unit* unit,const UnitType* what)
+{
+    DebugLevel1Fn("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
+}
+
+/**
+**	Called if reseaching of an unit is completed.
+**
+**	@param unit	Pointer to unit working.
+**	@param what	Pointer to the new upgrade.
+*/
+global void AiResearchComplete(Unit* unit,const Upgrade* what)
+{
+    DebugLevel1Fn("%d: %d(%s) research %s at %d,%d completed\n" _C_
+	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+	    what->Ident _C_ unit->X _C_ unit->Y);
+
+    DebugCheck(unit->Player->Type == PlayerHuman);
 }
 
 /**

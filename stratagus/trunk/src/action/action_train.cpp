@@ -75,9 +75,8 @@ global void HandleActionTrain(Unit* unit)
 	    if( player==ThisPlayer ) {
 		// FIXME: PlayVoice :), see task.txt
 		SetMessage("Not enough food...build more farms.");
-	    } else {
-		// FIXME: Callback for AI!
-		// AiNeedMoreFarms(unit);
+	    } else if( unit->Player->Ai ) {
+		AiNeedMoreFarms(unit,unit->Orders[0].Type);
 	    }
 
 	    unit->Data.Train.Ticks-=SpeedTrain;
@@ -96,7 +95,7 @@ global void HandleActionTrain(Unit* unit)
 	if( player==ThisPlayer ) {
 	    SetMessage2( nunit->X, nunit->Y, "New %s ready", nunit->Type->Name);
 	    PlayUnitSound(nunit,VoiceReady);
-	} else {
+	} else if( unit->Player->Ai ) {
 	    AiTrainingComplete(unit,nunit);
 	}
 

@@ -73,7 +73,7 @@ global void HandleActionBuild(Unit* unit)
 	    // FIXME: use general notify/messages
 	    if( unit->Player==ThisPlayer ) {
 		SetMessage("You cannot reach building place.");
-	    } else {
+	    } else if( unit->Player->Ai ) {
 		AiCanNotReach(unit,type);
 	    }
 
@@ -119,7 +119,7 @@ global void HandleActionBuild(Unit* unit)
 	// FIXME: use general notify/messages
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("You cannot build %s here.", type->Name);
-	} else {
+	} else if( unit->Player->Ai ) {
 	    AiCanNotBuild(unit,type);
 	}
 
@@ -139,7 +139,7 @@ global void HandleActionBuild(Unit* unit)
 	// FIXME: use general notify/messages
         if( unit->Player==ThisPlayer ) {
 	    SetMessage("Not enough resources to build %s.", type->Name);
-	} else {
+	} else if( unit->Player->Ai ) {
 	    AiCanNotBuild(unit,type);
 	}
 
@@ -282,7 +282,7 @@ global void HandleActionBuilded(Unit* unit)
 	if( unit->Player==ThisPlayer ) {
 	    SetMessage2( unit->X, unit->Y, "New %s done", type->Name );
 	    PlayUnitSound(peon,VoiceWorkCompleted);
-	} else {
+	} else if( unit->Player->Ai ) {
 	    AiWorkComplete(peon,unit);
 	}
 
