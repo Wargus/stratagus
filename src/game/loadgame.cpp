@@ -204,9 +204,6 @@ global void LoadModules(void)
 global void LoadGame(char* filename)
 {
     int old_siod_verbose_level;
-#ifdef NEW_FOW
-    int i;
-#endif
     extern int siod_verbose_level;
     unsigned long game_cycle;
 
