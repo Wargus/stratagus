@@ -1492,7 +1492,7 @@ global void CleanMissileTypes(void)
 		free(mtype->ImpactSound.Name);
 		free(mtype->ImpactName);
 		free(mtype->SmokeName);
-		VideoSaveFree(mtype->Sprite);
+		VideoSafeFree(mtype->Sprite);
 	}
 	free(MissileTypes);
 	MissileTypes = NULL;

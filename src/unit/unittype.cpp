@@ -1584,10 +1584,10 @@ global void CleanUnitTypes(void)
 		for (res = 0; res < MaxCosts; ++res) {
 			if (type->ResInfo[res]) {
 				if (type->ResInfo[res]->SpriteWhenLoaded) {
-					VideoSaveFree(type->ResInfo[res]->SpriteWhenLoaded);
+					VideoSafeFree(type->ResInfo[res]->SpriteWhenLoaded);
 				}
 				if (type->ResInfo[res]->SpriteWhenEmpty) {
-					VideoSaveFree(type->ResInfo[res]->SpriteWhenEmpty);
+					VideoSafeFree(type->ResInfo[res]->SpriteWhenEmpty);
 				}
 				if (type->ResInfo[res]->FileWhenEmpty) {
 					free(type->ResInfo[res]->FileWhenEmpty);
@@ -1630,11 +1630,11 @@ global void CleanUnitTypes(void)
 		}
 
 		if (!type->SameSprite) {		// our own graphics
-			VideoSaveFree(type->Sprite);
+			VideoSafeFree(type->Sprite);
 		}
 #ifdef USE_OPENGL
 		for (i = 0; i < PlayerMax; ++i) {
-			VideoSaveFree(type->PlayerColorSprite[i]);
+			VideoSafeFree(type->PlayerColorSprite[i]);
 		}
 #endif
 		free(UnitTypes[i]);

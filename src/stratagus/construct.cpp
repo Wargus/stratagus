@@ -254,13 +254,13 @@ global void CleanConstructions(void)
 					free((*cop)->File[j].File);
 				}
 			}
-			VideoSaveFree((*cop)->Sprite);
+			VideoSafeFree((*cop)->Sprite);
 			for (j = 0; j < TilesetMax; ++j) {
 				if ((*cop)->ShadowFile[j].File) {
 					free((*cop)->ShadowFile[j].File);
 				}
 			}
-			VideoSaveFree((*cop)->ShadowSprite);
+			VideoSafeFree((*cop)->ShadowSprite);
 			cframe = (*cop)->Frames;
 			while (cframe) {
 				tmp = cframe->Next;

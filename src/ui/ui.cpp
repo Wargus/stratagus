@@ -86,23 +86,23 @@ local void CleanUIGraphics(UI* ui)
 	int i;
 
 	for (i = 0; i < ui->NumFillers; ++i) {
-		VideoSaveFree(ui->Filler[i].Graphic);
+		VideoSafeFree(ui->Filler[i].Graphic);
 	}
-	VideoSaveFree(ui->Resource.Graphic);
+	VideoSafeFree(ui->Resource.Graphic);
 
 	for (i = 0; i < MaxCosts + 2; ++i) {
-		VideoSaveFree(ui->Resources[i].Icon.Graphic);
+		VideoSafeFree(ui->Resources[i].Icon.Graphic);
 	}
 
-	VideoSaveFree(ui->InfoPanel.Graphic);
-	VideoSaveFree(ui->ButtonPanel.Graphic);
-	VideoSaveFree(ui->MenuPanel.Graphic);
-	VideoSaveFree(ui->MinimapPanel.Graphic);
-	VideoSaveFree(ui->StatusLine.Graphic);
+	VideoSafeFree(ui->InfoPanel.Graphic);
+	VideoSafeFree(ui->ButtonPanel.Graphic);
+	VideoSafeFree(ui->MenuPanel.Graphic);
+	VideoSafeFree(ui->MinimapPanel.Graphic);
+	VideoSafeFree(ui->StatusLine.Graphic);
 
 	menupanel = ui->MenuPanels;
 	while (menupanel) {
-		VideoSaveFree(menupanel->Panel.Graphic);
+		VideoSafeFree(menupanel->Panel.Graphic);
 		menupanel = menupanel->Next;
 	}
 }

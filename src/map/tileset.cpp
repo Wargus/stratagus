@@ -806,10 +806,10 @@ global void CleanTilesets(void)
 	//		Should this be done by the map?
 	//
 #ifdef USE_SDL_SURFACE
-	VideoSaveFree(TheMap.TileGraphic);
+	VideoSafeFree(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
 #else
-	VideoSaveFree(TheMap.TileData);
+	VideoSafeFree(TheMap.TileData);
 	TheMap.TileData = NULL;
 	free(TheMap.Tiles);
 	TheMap.Tiles = NULL;

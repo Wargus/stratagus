@@ -758,7 +758,7 @@ global void CreateMinimap(void)
 */
 global void DestroyMinimap(void)
 {
-	VideoSaveFree(MinimapTerrainGraphic);
+	VideoSafeFree(MinimapTerrainGraphic);
 	MinimapTerrainGraphic = NULL;
 	if (MinimapGraphic) {
 		free(MinimapGraphic);

@@ -1175,7 +1175,7 @@ local int CclDefineFont(lua_State* l)
 		lua_error(l);
 	}
 	free(Fonts[i].File);
-	VideoSaveFree(Fonts[i].Graphic);
+	VideoSafeFree(Fonts[i].Graphic);
 	Fonts[i].Graphic = NULL;
 	Fonts[i].File = file;
 	Fonts[i].Width = w;
@@ -1295,7 +1295,7 @@ global void CleanFonts(void)
 
 	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
 		free(Fonts[i].File);
-		VideoSaveFree(Fonts[i].Graphic);
+		VideoSafeFree(Fonts[i].Graphic);
 		Fonts[i].File = NULL;
 		Fonts[i].Graphic = NULL;
 	}
