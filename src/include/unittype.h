@@ -844,6 +844,8 @@ struct _unit_type_ {
 	// this is taken from the UDTA section
 	struct _construction_* Construction; ///< What is shown in construction phase
 	int _SightRange;                ///< Sight range
+	int RadarRange;                 ///< Range of radar if any
+	int RadarJammerRange;           ///< Range of radar jamming if any
 	int _HitPoints;                 ///< Maximum hit points
 	int _MaxMana;                   ///< Maximum mana points
 

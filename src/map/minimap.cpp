@@ -429,6 +429,11 @@ static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 		type = unit->Type;
 	} else {
 		type = unit->Seen.Type;
+		// This will happen for radar if the unit has not been seen and we 
+		// have it on radar.
+		if (!type) {
+			type = unit->Type;
+		}
 	}
 	//
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
