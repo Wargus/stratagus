@@ -197,7 +197,7 @@ extern void InvalidateAreaAndCheckCursor( int x, int y, int w, int h );
 extern void InvalidateCursorAreas(void);
 
     /// Initialize the cursor module
-extern void InitCursors(void);
+extern void InitVideoCursors(void);
     /// Save the cursor definitions
 extern void SaveCursors(FILE*);
     /// Cleanup the cursor module

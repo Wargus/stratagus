@@ -995,7 +995,7 @@ global void InvalidateCursorAreas(void)
 **	@todo	FIXME: Now max possible memory for OldCursorRectangle,
 **		to be limited to Map?
 */
-global void InitCursors(void)
+global void InitVideoCursors(void)
 {
     if( OldCursorRectangle ) {	// memory of possible previous video-setting?
 	free( OldCursorRectangle );
