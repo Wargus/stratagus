@@ -2848,6 +2848,7 @@ global void LetUnitDie(Unit* unit)
 			unit->State = unit->Type->CorpseScript;
 			DebugCheck(type->TileWidth != type->CorpseType->TileWidth ||
 					type->TileHeight != type->CorpseType->TileHeight);
+			MapMarkUnitSight(unit);
 			type = unit->Type = type->CorpseType;
 
 #ifdef DYNAMIC_LOAD
@@ -2867,6 +2868,7 @@ global void LetUnitDie(Unit* unit)
 				!unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
 			DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
+			MapUnmarkUnitSight(unit);
 			unit->CurrentSightRange = type->Stats[unit->Player->Player].SightRange;
 			MapMarkUnitSight(unit);
 		} else {
