@@ -164,11 +164,11 @@ local void ccl_spell_missilewhencast(const char *id, SCM list, SpellType *spell)
 {
     char *missilewhencastname = NULL;
 
-    assert (id != NULL);
-    assert (spell != NULL);
+   
 
     MissileType *missile = spell->Missile;
-
+	assert (id != NULL);
+    assert (spell != NULL);
     missilewhencastname = gh_scm2newstr(list, NULL);
     spell->Missile = MissileTypeByIdent(missilewhencastname);
     if (missile != NULL && spell->Missile != missile) {
@@ -393,12 +393,12 @@ local char ccl_spell_action_haste(const char *SpellName, SCM list, SpellActionTy
 */
 local char ccl_spell_action_healing(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
-    assert(SpellName);
-    assert(spellaction != NULL);
+   
 
     SCM	value;
     int HP = 0;
-
+	assert(SpellName);
+    assert(spellaction != NULL);
     for (; !gh_null_p(list); list = gh_cdr(list)) {
 	value = gh_car(list);
 	list = gh_cdr(list);
@@ -514,11 +514,13 @@ local char ccl_spell_action_invisibility(const char *SpellName, SCM list, SpellA
 */
 local char ccl_spell_action_summon(const char *SpellName, SCM list, SpellActionType *spellaction)
 {
-    assert(SpellName);
-    assert(spellaction != NULL);
+    
 
     char *str;
     UnitType *unittype;
+
+	assert(SpellName);
+    assert(spellaction != NULL);
 
     str = gh_scm2newstr(list, NULL);
     unittype = UnitTypeByIdent(str);
@@ -621,10 +623,12 @@ local void ccl_spell_action(const char *id, SCM list, SpellType *spell)
 */
 local void pushback_condition(t_Conditions **begin, t_Conditions *cond)
 {
-    assert(begin != NULL);
-    assert(cond != NULL);
+    
 
     t_Conditions *next;
+
+	assert(begin != NULL);
+    assert(cond != NULL);
 
     if (*begin == NULL) {
 	*begin = cond;
@@ -680,13 +684,13 @@ local int ccl_true(const char *SpellName, const char *id, int *expectvalue, SCM 
 local void ccl_UnitTypeFlag(const char *SpellName, const char *id, SCM list,
 		t_Conditions **generic, t_Conditions **specific)
 {
-    assert(id != NULL);
-    assert(SpellName != NULL);
-    assert(generic != NULL);
-    assert(specific != NULL);
+   
 
     SCM	value;
     t_Conditions *cond;
+
+	
+
     struct {
 	const char *id;
 	int	flag;
@@ -699,6 +703,12 @@ local void ccl_UnitTypeFlag(const char *SpellName, const char *id, SCM list,
 	{NULL, 0}
     };
     int	i;
+
+	assert(id != NULL);
+    assert(SpellName != NULL);
+    assert(generic != NULL);
+    assert(specific != NULL);
+
 
     cond = malloc(sizeof(*cond));
     memset(cond, 0, sizeof(*cond));
@@ -731,10 +741,7 @@ local void ccl_UnitTypeFlag(const char *SpellName, const char *id, SCM list,
 local void	ccl_DurationEffect(const char *SpellName, const char *id, SCM list,
 		t_Conditions **generic, t_Conditions **specific)
 {
-    assert(id != NULL);
-    assert(SpellName != NULL);
-    assert(generic != NULL);
-    assert(specific != NULL);
+    
 
     SCM	value;
     t_Conditions *cond;
@@ -755,6 +762,11 @@ local void	ccl_DurationEffect(const char *SpellName, const char *id, SCM list,
 	{NULL, 0}
     };
     int	i;
+
+	assert(id != NULL);
+    assert(SpellName != NULL);
+    assert(generic != NULL);
+    assert(specific != NULL);
 
     cond = malloc(sizeof(*cond));
     memset(cond, 0, sizeof(*cond));
@@ -805,13 +817,14 @@ local void	ccl_DurationEffect(const char *SpellName, const char *id, SCM list,
 void ccl_enemy_presence(const char *SpellName, const char *id, SCM list,
 		t_Conditions **generic, t_Conditions **specific)
 {
-    assert(id != NULL);
+    
+    SCM	value;
+    t_Conditions *cond;
+	
+	assert(id != NULL);
     assert(SpellName != NULL);
     assert(generic != NULL);
     assert(specific != NULL);
-
-    SCM	value;
-    t_Conditions *cond;
 
     cond = malloc(sizeof(*cond));
     memset(cond, 0, sizeof(*cond));
@@ -847,13 +860,15 @@ void ccl_enemy_presence(const char *SpellName, const char *id, SCM list,
 void ccl_alliance(const char *SpellName, const char *id, SCM list,
 		    t_Conditions **generic, t_Conditions **specific)
 {
+	
+
+	SCM	value;
+	t_Conditions *cond;
+
 	assert(id != NULL);
 	assert(SpellName != NULL);
 	assert(generic != NULL);
 	assert(specific != NULL);
-
-	SCM	value;
-	t_Conditions *cond;
 
 	cond = malloc(sizeof(*cond));
 	memset(cond, 0, sizeof(*cond));
@@ -872,10 +887,7 @@ void ccl_alliance(const char *SpellName, const char *id, SCM list,
 local void ccl_spell_all_condition(const char*SpellName, const char *id, SCM list,
 		t_Conditions **generic, t_Conditions **specific)
 {
-    assert(id != NULL);
-    assert(SpellName != NULL);
-    assert(generic != NULL);
-    assert(specific != NULL);
+   
 
     int	i;
     struct {
@@ -890,6 +902,13 @@ local void ccl_spell_all_condition(const char*SpellName, const char *id, SCM lis
     };
 
     SCM value;
+
+	assert(id != NULL);
+    assert(SpellName != NULL);
+    assert(generic != NULL);
+    assert(specific != NULL);
+
+
     for (; !gh_null_p(list); list = gh_cdr(list)) {
 	value = gh_car(list);
 	for (i = 0; parser[i].id != NULL; i++) {
@@ -917,11 +936,13 @@ local void ccl_spell_condition(const char *id, SCM list, SpellType *spell)
 
 local void ccl_spell_autocast(const char *id, SCM list, SpellType *spell)
 {
-    assert(id != NULL);
-    assert(spell != NULL);
+   
 
     SCM	value;
     int range;
+
+	assert(id != NULL);
+    assert(spell != NULL);
 
     value = gh_car(list);
     if (!gh_eq_p(value, gh_symbol2scm("range"))) {
