@@ -138,6 +138,7 @@ global void HandleActionTrain(Unit* unit)
 
 	if( unit->NewOrder.Goal ) {
 	    if( unit->NewOrder.Goal->Destroyed ) {
+		// FIXME: perhaps we should use another goal?
 		DebugLevel0Fn("Destroyed unit in train unit\n");
 		RefsDebugCheck( !unit->NewOrder.Goal->Refs );
 		if( !--unit->NewOrder.Goal->Refs ) {

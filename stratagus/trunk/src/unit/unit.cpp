@@ -677,6 +677,22 @@ global void UnitLost(Unit* unit)
 	}
 	unit->OrderCount=1;
     }
+    if( unit->NewOrder.Goal ) {
+	RefsDebugCheck( !unit->NewOrder.Goal->Refs );
+	if( !--unit->NewOrder.Goal->Refs ) {
+	    DebugCheck( !unit->NewOrder.Goal->Destroyed );
+	    ReleaseUnit(unit->NewOrder.Goal);
+	}
+	unit->NewOrder.Goal=NoUnitP;
+    }
+    if( unit->SavedOrder.Goal ) {
+	RefsDebugCheck( !unit->SavedOrder.Goal->Refs );
+	if( !--unit->SavedOrder.Goal->Refs ) {
+	    DebugCheck( !unit->SavedOrder.Goal->Destroyed );
+	    ReleaseUnit(unit->SavedOrder.Goal);
+	}
+	unit->SavedOrder.Goal=NoUnitP;
+    }
 
     DebugCheck( player->NumFoodUnits > UnitMax);
     DebugCheck( player->NumBuildings > UnitMax);
@@ -814,7 +830,41 @@ global void MarkSubmarineSeen(const Player* player,int x,int y,int r)
 global int UnitVisibleOnMap(const Unit* unit)
 {
 #ifdef NEW_FOW
-    DebugLevel0Fn("NOT WRITTEN\n");
+    unsigned x;
+    unsigned y;
+    int w;
+    int w0;
+    int h;
+
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
+    //DebugCheck( unit->Player==ThisPlayer );
+
+    //
+    //	Unit invisible (by spell), removed or submarine.
+    //
+    if ( unit->Invisible || unit->Removed
+	    || !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	return 0;
+    }
+
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+
+    //
+    //	Check if visible, not under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
+	    if( IsMapFieldVisible(x+w,y+h) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
 #else
     unsigned x;
     unsigned y;
@@ -861,48 +911,6 @@ global int UnitVisibleOnMap(const Unit* unit)
 */
 global int UnitKnownOnMap(const Unit* unit)
 {
-#ifdef NEW_FOW
-    unsigned x;
-    unsigned y;
-    unsigned w;
-    unsigned h;
-    unsigned i;
-    unsigned m;
-    MapField* mf;
-
-    if( unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	// Invisible by spell
-	if ( unit->Invisible ) {
-	    return 0;
-	}
-	// Visible submarine
-	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-	    return 0;
-	}
-    }
-
-    //
-    //	Check explored and if visible under fog of war.
-    //	Building could always be seen under fog of war.
-    //	FIXME: only known buildings are visible SceenFrame!=-1.
-    //
-    mf=TheMap.Fields+y*TheMap.Width+x;
-    m=1<<ThisPlayer->Player;
-    while( h-- ) {
-	for( i=w; i--; ) {
-	    // FIXME: see below this is wrong (old code).
-	    if( (mf->Explored&m) && (unit->Type->Building
-			|| (mf->Visible&m)) ) {
-		return 1;
-	    }
-	    mf++;
-	}
-	mf+=TheMap.Width-w;
-    }
-    return 0;
-
-#else
     unsigned x;
     unsigned y;
     int w;
@@ -948,7 +956,6 @@ global int UnitKnownOnMap(const Unit* unit)
     }
 
     return 0;
-#endif
 }
 
 /**
@@ -959,58 +966,6 @@ global int UnitKnownOnMap(const Unit* unit)
 */
 global int UnitVisibleOnScreen(const Unit* unit)
 {
-#ifdef NEW_FOW
-    unsigned x;
-    unsigned y;
-    unsigned w;
-    unsigned h;
-    unsigned i;
-    unsigned m;
-    MapField* mf;
-
-    if( unit->Player != ThisPlayer ) {
-	//FIXME: vladi: should handle teams and shared vision
-	// Invisible by spell
-	if ( unit->Invisible ) {
-	    return 0;
-	}
-	// Visible submarine
-	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-	    return 0;
-	}
-    }
-
-    //
-    //	Check if visible on screen
-    //
-    x = unit->X;
-    y = unit->Y;
-    w = unit->Type->TileWidth;
-    h = unit->Type->TileHeight;
-    if( x+w > MapX && x < MapX+MapWidth &&
-	    y+h > MapY && y < MapY+MapHeight ) {
-	//
-	//	Check explored and if visible under fog of war.
-	//	Building could always be seen under fog of war.
-	//	FIXME: only known buildings are visible SceenFrame!=-1.
-	//
-	mf=TheMap.Fields+y*TheMap.Width+x;
-	m=1<<ThisPlayer->Player;
-	while( h-- ) {
-	    for( i=w; i--; ) {
-		// FIXME: see below this is wrong (old code).
-		if( (mf->Explored&m) && (unit->Type->Building
-			    || (mf->Visible&m)) ) {
-		    return 1;
-		}
-		mf++;
-	    }
-	    mf+=TheMap.Width-w;
-	}
-    }
-    return 0;
-
-#else
     unsigned x;
     unsigned y;
     int w;
@@ -1020,9 +975,9 @@ global int UnitVisibleOnScreen(const Unit* unit)
     DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
 
     if (!ThisPlayer) {
-	//FIXME: ARI: Added here for early game setup state by MakeAndPlaceUnit()
-	//            from LoadMap(). ThisPlayer not yet set, so don't show anything
-	//            until first real map-draw.
+	//FIXME: ARI: Added here for early game setup state by
+	//	MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
+	//	so don't show anything until first real map-draw.
 	return 0;
     }
 
@@ -1068,7 +1023,6 @@ global int UnitVisibleOnScreen(const Unit* unit)
     }
 
     return 0;
-#endif
 }
 
 /**
@@ -2921,9 +2875,12 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
 	if( type->CanAttack && !type->Tower ) {
 	    goal=AttackUnitsInReactRange(target);
 	    if( goal ) {
-		// FIXME: should rewrite command handling
-		CommandAttack(target,target->X,target->Y,NoUnitP,FlushCommands);
-		target->SavedOrder=target->Orders[1];
+		if( target->SavedOrder.Action==UnitActionStill ) {
+		    // FIXME: should rewrite command handling
+		    CommandAttack(target,target->X,target->Y,NoUnitP,
+			    FlushCommands);
+		    target->SavedOrder=target->Orders[1];
+		}
 		CommandAttack(target,goal->X,goal->Y,NoUnitP,FlushCommands);
 		return;
 	    }
