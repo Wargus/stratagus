@@ -47,6 +47,7 @@
 #include "pud.h"
 #include "iolib.h"
 #include "settings.h"
+#include "network.h"
 
 #include "myendian.h"
 
@@ -1262,7 +1263,12 @@ global void LoadPud(const char* pud,WorldMap* map)
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
 pawn:
 			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
-			    if ((s = GameSettings.Presets[o].Race) != SettingsPresetMapDefault) {
+			    if (NetworkFildes == -1) {
+				s = GameSettings.Presets[0].Race;
+			    } else {
+				s = GameSettings.Presets[o].Race;
+			    }
+			    if (s != SettingsPresetMapDefault) {
 				if (s == PlayerRaceHuman && (t & 1) == 1) {
 				    t--;
 				}
