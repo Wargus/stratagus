@@ -66,14 +66,12 @@ void HandleActionUpgradeTo(Unit* unit)
 		unit->SubAction = 1;
 	}
 
-	if (unit->Type->NewAnimations) {
-		unit->Type->NewAnimations->Upgrade ?
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade) :
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-		if (unit->Wait) {
-			unit->Wait--;
-			return;
-		}
+	unit->Type->NewAnimations->Upgrade ?
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade) :
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
 	}
 
 	player = unit->Player;
@@ -101,9 +99,6 @@ void HandleActionUpgradeTo(Unit* unit)
 		if (unit->Player->AiEnabled) {
 			AiUpgradeToComplete(unit, type);
 		}
-		if (!unit->Type->NewAnimations) {
-			unit->Reset = unit->Wait = 1;
-		}
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
 
@@ -123,9 +118,6 @@ void HandleActionUpgradeTo(Unit* unit)
 		return;
 	}
 
-	if (!unit->Type->NewAnimations) {
-		unit->Reset = 1;
-	}
 	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 

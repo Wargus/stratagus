@@ -54,22 +54,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Generic unit repair.
-**
-**  @param unit    Unit, for that the repair animation is played.
-**  @param repair  Repair animation.
-*/
-static void DoActionRepairGeneric(Unit* unit, const Animation* repair)
-{
-	int flags;
-
-	flags = UnitShowAnimation(unit, repair);
-	if ((flags & AnimationSound)) {
-		PlayUnitSound(unit, VoiceRepairing);
-	}
-}
-
-/**
 **  Repair a unit.
 **
 **  @param unit  unit repairing
@@ -80,7 +64,6 @@ static void RepairUnit(Unit* unit, Unit* goal)
 	Player* player;
 	int i;
 	int animlength;
-	Animation* anim;
 	int hp;
 	char buf[100];
 
@@ -130,15 +113,8 @@ static void RepairUnit(Unit* unit, Unit* goal)
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
-		if (!unit->Type->NewAnimations) {
-			animlength = 0;
-			for (anim = unit->Type->Animations->Repair; !(anim->Flags & AnimationReset); ++anim) {
-				animlength += anim->Sleep;
-			}
-		} else {
-			animlength = unit->Data.Repair.Cycles;
-			unit->Data.Repair.Cycles = 0;
-		}
+		animlength = unit->Data.Repair.Cycles;
+		unit->Data.Repair.Cycles = 0;
 
 		// FIXME: implement this below:
 		//unit->Data.Built.Worker->Type->BuilderSpeedFactor;
@@ -155,17 +131,11 @@ static void RepairUnit(Unit* unit, Unit* goal)
 /**
 **  Animate unit repair
 **
-**  @param unit Unit, for that the repair animation is played.
+**  @param unit  Unit, for that the repair animation is played.
 */
 static int AnimateActionRepair(Unit* unit)
 {
-	if (unit->Type->Animations) {
-		Assert(unit->Type->Animations->Repair);
-		DoActionRepairGeneric(unit, unit->Type->Animations->Repair);
-	} else if (unit->Type->NewAnimations) {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Repair);
-	}
-
+	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Repair);
 	return 0;
 }
 
@@ -191,8 +161,7 @@ void HandleActionRepair(Unit* unit)
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.
 			err = DoActionMove(unit);
-			if ((!unit->Type->NewAnimations && unit->Reset) ||
-					(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+			if (!unit->Anim.Unbreakable) {
 				//
 				// No goal: if meeting damaged building repair it.
 				//
@@ -225,7 +194,6 @@ void HandleActionRepair(Unit* unit)
 					unit->State = 0;
 					unit->SubAction = 2;
 					unit->Data.Repair.Cycles = 0;
-					unit->Reset = 1;
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
@@ -253,8 +221,7 @@ void HandleActionRepair(Unit* unit)
 		case 2:
 			AnimateActionRepair(unit);
 			unit->Data.Repair.Cycles++;
-			if ((!unit->Type->NewAnimations && unit->Reset) ||
-					(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+			if (!unit->Anim.Unbreakable) {
 				goal = unit->Orders[0].Goal;
 
 				//
@@ -280,7 +247,6 @@ void HandleActionRepair(Unit* unit)
 					// If goal has move, chase after it
 					unit->State = 0;
 					unit->SubAction = 0;
-					unit->Reset = 1;
 				}
 
 

@@ -153,7 +153,6 @@ int UnloadUnit(Unit* unit)
 	if (!FindUnloadPosition(unit->X, unit->Y, &x, &y, UnitMovementMask(unit))) {
 		return 0;
 	}
-	unit->Wait = 1; // should be correct unit has still action
 	unit->Boarded = 0;
 	PlaceUnit(unit, x, y);
 	return 1;
@@ -370,10 +369,7 @@ static void LeaveTransporter(Unit* unit)
 		unit->Orders[0].X = unit->X;
 		unit->Orders[0].Y = unit->Y;
 		unit->SubAction = 0;
-		unit->Reset = 0;
-		unit->Wait = 0;
 	} else {
-		unit->Wait = 1;
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
 	}

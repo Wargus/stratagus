@@ -10,7 +10,7 @@
 //
 /**@name action_board.c - The board action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -87,10 +87,7 @@ static int WaitForTransporter(Unit* unit)
 {
 	Unit* trans;
 
-	if (!unit->Type->NewAnimations) {
-		unit->Wait = 6;
-		unit->Reset = 1;
-	} else if (unit->Wait) {
+	if (unit->Wait) {
 		unit->Wait--;
 		return 0;
 	}
@@ -99,9 +96,7 @@ static int WaitForTransporter(Unit* unit)
 
 	if (!trans || !CanTransport(trans, unit)) {
 		// FIXME: destination destroyed??
-		if (unit->Type->NewAnimations) {
-			unit->Wait = 6;
-		}
+		unit->Wait = 6;
 		return 0;
 	}
 
@@ -109,13 +104,11 @@ static int WaitForTransporter(Unit* unit)
 		DebugPrint("Transporter Gone\n");
 		RefsDecrease(trans);
 		unit->Orders[0].Goal = NoUnitP;
-		if (unit->Type->NewAnimations) {
-			unit->Wait = 6;
-		}
+		unit->Wait = 6;
 		return 0;
 	}
 
-	if (MapDistanceBetweenUnits(unit,trans) == 1) {
+	if (MapDistanceBetweenUnits(unit, trans) == 1) {
 		// enter transporter
 		return 1;
 	}
@@ -146,7 +139,6 @@ static void EnterTransporter(Unit* unit)
 {
 	Unit* transporter;
 
-	unit->Wait = 1;
 	unit->Orders[0].Action = UnitActionStill;
 	unit->SubAction = 0;
 
@@ -203,7 +195,7 @@ void HandleActionBoard(Unit* unit)
 		case 201:
 			if (WaitForTransporter(unit)) {
 				unit->SubAction = 202;
-			} else if (unit->Type->NewAnimations) {
+			} else {
 				UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
 			}
 			break;
@@ -217,7 +209,7 @@ void HandleActionBoard(Unit* unit)
 		// Move to transporter
 		//
 		case 0:
-			if (unit->Type->NewAnimations && unit->Wait) {
+			if (unit->Wait) {
 				unit->Wait--;
 				return;
 			}

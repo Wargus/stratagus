@@ -76,7 +76,6 @@ void HandleActionResearch(Unit* unit)
 			DebugPrint("Two researches running\n");
 			PlayerAddCosts(unit->Player, upgrade->Costs);
 
-			unit->Reset = unit->Wait = 1;
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;
 			return;
@@ -87,14 +86,12 @@ void HandleActionResearch(Unit* unit)
 		upgrade = unit->Data.Research.Upgrade;
 	}
 
-	if (unit->Type->NewAnimations) {
-		unit->Type->NewAnimations->Research ?
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research) :
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-		if (unit->Wait) {
-			unit->Wait--;
-			return;
-		}
+	unit->Type->NewAnimations->Research ?
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research) :
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
 	}
 
 	unit->Player->UpgradeTimers.Upgrades[upgrade - Upgrades] += SpeedResearch;
@@ -108,7 +105,6 @@ void HandleActionResearch(Unit* unit)
 		}
 		UpgradeAcquire(unit->Player, upgrade);
 
-		unit->Reset = unit->Wait = 1;
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
 
@@ -118,10 +114,7 @@ void HandleActionResearch(Unit* unit)
 		return;
 	}
 
-	unit->Reset = 1;
 	unit->Wait = CYCLES_PER_SECOND / 6;
-
-	// FIXME: should be animations here?
 }
 
 //@}

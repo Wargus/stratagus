@@ -104,14 +104,12 @@ void HandleActionTrain(Unit* unit)
 		unit->SubAction = 1;
 	}
 
-	if (unit->Type->NewAnimations) {
-		unit->Type->NewAnimations->Train ?
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Train) :
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
-		if (unit->Wait) {
-			unit->Wait--;
-			return;
-		}
+	unit->Type->NewAnimations->Train ?
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Train) :
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	if (unit->Wait) {
+		unit->Wait--;
+		return;
 	}
 
 	player = unit->Player;
@@ -125,9 +123,6 @@ void HandleActionTrain(Unit* unit)
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			if (!unit->Type->NewAnimations) {
-				unit->Reset = 1;
-			}
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -143,9 +138,6 @@ void HandleActionTrain(Unit* unit)
 
 			unit->Data.Train.Ticks =
 				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
-			if (!unit->Type->NewAnimations) {
-				unit->Reset = 1;
-			}
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -179,10 +171,6 @@ void HandleActionTrain(Unit* unit)
 			}
 			if (unit->Player->AiEnabled) {
 				AiTrainingComplete(unit, nunit);
-			}
-
-			if (!unit->Type->NewAnimations) {
-				unit->Reset = unit->Wait = 1;
 			}
 
 			unit->Orders[0].Action = UnitActionStill;
@@ -228,9 +216,6 @@ void HandleActionTrain(Unit* unit)
 		}
 	}
 
-	if (!unit->Type->NewAnimations) {
-		unit->Reset = 1;
-	}
 	unit->Wait = CYCLES_PER_SECOND / 6;
 }
 

@@ -10,7 +10,7 @@
 //
 /**@name action_spellcast.c - The spell cast action. */
 //
-//      (c) Copyright 2000-2004 by Vladi Belperchinov-Shabanski
+//      (c) Copyright 2000-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ static void SpellMoveToTarget(Unit* unit)
 	err = 1;
 	if (CanMove(unit)) {
 		err = DoActionMove(unit);
-		if (!unit->Reset) {
+		if (unit->Anim.Unbreakable) {
 			return;
 		}
 	}
@@ -194,7 +194,6 @@ void HandleActionSpellCast(Unit* unit)
 				}
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
-				unit->Wait = 1;
 				if (unit->Orders[0].Goal) {
 					RefsDecrease(unit->Orders->Goal);
 					unit->Orders[0].Goal = NoUnitP;
@@ -216,19 +215,9 @@ void HandleActionSpellCast(Unit* unit)
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
-			if (unit->Type->Animations && unit->Type->Animations->Attack) {
-				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
-				if (flags & AnimationMissile) {
-					// FIXME: what todo, if unit/goal is removed?
-					if (unit->Orders[0].Goal && !UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
-						unit->ReCast = 0;
-					} else {
-						spell = unit->Orders[0].Arg1.Spell;
-						unit->ReCast = SpellCast(unit, spell, unit->Orders[0].Goal,
-							unit->Orders[0].X, unit->Orders[0].Y);
-					}
-				}
-				if (!(flags & AnimationReset)) { // end of animation
+			if (unit->Type->NewAnimations->Attack) {
+				flags = UnitShowNewAnimation(unit, unit->Type->NewAnimations->Attack);
+				if (unit->Anim.Unbreakable) { // end of animation
 					return;
 				}
 			} else {
@@ -244,7 +233,6 @@ void HandleActionSpellCast(Unit* unit)
 			if (!unit->ReCast) {
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
-				unit->Wait = 1;
 				if (unit->Orders[0].Goal) {
 					RefsDecrease(unit->Orders->Goal);
 					unit->Orders[0].Goal = NoUnitP;
