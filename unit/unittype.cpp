@@ -44,6 +44,11 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+/*
+**	Next unit type are used hardcoded in the source.
+*/
+global UnitType* UnitTypeGoldMine;	/// Gold mine unit type pointer.
+
 /**
 **	Lookup table for unit-type names
 */
@@ -1040,6 +1045,11 @@ global void InitUnitTypes(void)
 	*(UnitType**)hash_add(UnitTypeHash,UnitTypes[type].Ident)
 		=&UnitTypes[type];
     }
+
+    //
+    //	Setup hardcoded unit types.
+    //
+    UnitTypeGoldMine=UnitTypeByIdent("unit-gold-mine");
 }
 
 /**

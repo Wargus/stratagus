@@ -63,9 +63,9 @@ extern unsigned char* CreateMatrix(void);
     ///
 extern int NewPath(Unit* unit,int* xdp,int* ydp);
     ///
-extern int PlaceReachable(Unit* unit,int x,int y);
+extern int PlaceReachable(const Unit* unit,int x,int y);
     ///
-extern int UnitReachable(Unit* unit,Unit* dest);
+extern int UnitReachable(const Unit* unit,const Unit* dest);
 
 //
 //	in astar.c

@@ -387,6 +387,7 @@ global void InvalidateArea(int x,int y,int w,int h)
 	y=0;
     }
     if( !w<=0 && !h<=0 ) {
+	DebugLevel3("X %d,%d -> %d,%d\n",x,y,w,h);
 	XClearArea(TheDisplay,TheMainWindow,x,y,w,h,False);
     }
 }
@@ -1049,6 +1050,7 @@ global void RealizeVideoMemory(void)
 {
     // in X11 it does flushing the output queue
     XFlush(TheDisplay);
+    //XSync(TheDisplay,False);
 }
 
 /**

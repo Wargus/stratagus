@@ -55,18 +55,28 @@ global int SelectUnits(int x1,int y1,int x2,int y2,Unit** table)
 **
 **	@return		Returns the number of units found.
 */
-global int FindUnitsByType(int type,Unit** table)
+global int FindUnitsByType(const UnitType* type,Unit** table)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
-    return 1;
+    Unit* unit;
+    int i;
+    int num;
+
+    for( num=i=0; i<NumUnits; i++ ) {
+	unit=Units[i];
+	if( unit->Type==type && !UnitUnusable(unit) ) {
+	    table[num++]=unit;
+	}
+    }
+    return num;
 #else
     Unit* unit;
-    int num,i;
+    int i;
+    int num;
 
-    for( num=0, i=0; i<NumUnits; i++ ) {
+    for( num=i=0; i<NumUnits; i++ ) {
 	unit=Units[i];
-	if( unit->Type->Type==type && !UnitUnusable(unit) ) {
+	if( unit->Type==type && !UnitUnusable(unit) ) {
 	    table[num++]=unit;
 	}
     }

@@ -41,6 +41,7 @@
 #include "interface.h"
 #include "sound.h"
 #include "ai.h"
+#include "pathfinder.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -116,39 +117,46 @@ global void InitUnitsMemory(void)
 }
 
 /**
-**	Free the memory for a unit slot.
+**	Free the memory for an unit slot. Update all units tables.
 **
-**	@param unit	Point to unit.
+**	@param unit	Pointer to unit.
 */
 global void FreeUnitMemory(Unit* unit)
 {
 #ifdef NEW_UNIT
     Player* player;
     Unit** slot;
+    Unit* temp;
 
     if( unit->Refs>1 ) {
 	DebugLevel0(__FUNCTION__": too much references\n");
     }
 
-    //	Remove the unit from the player's units list.
-    //		FIXME: a backpointer is faster
+    //	Remove the unit from the player's units table.
 
-    player=unit->Player;
-    if( player ) {
-	// looking for the unit slot...
-	for( slot=player->Units; *slot!=unit; slot++ ) {
-	    ;
-	}
-	*slot=player->Units[--player->TotalNumUnits];
+    if( (player=unit->Player) ) {
+	DebugCheck( *unit->PlayerSlot!=unit );
+	temp=player->Units[--player->TotalNumUnits];
 	player->Units[player->TotalNumUnits]=NULL;
+	temp->PlayerSlot=unit->PlayerSlot;
+	*unit->PlayerSlot=temp;
     }
+
+    //	Remove the unit from the global units table.
+
+    DebugCheck( *unit->UnitSlot!=unit );
+    temp=Units[--NumUnits];
+    Units[NumUnits]=NULL;
+    temp->UnitSlot=unit->UnitSlot;
+    *unit->UnitSlot=temp;
+
+    //	Remove from slot table
 
     slot=UnitSlots+unit->Slot;
     DebugCheck( *slot!=unit );
 
     *slot=(void*)UnitSlotFree;
     free(unit);
-
 #else
     Unit** tmp;
     unsigned tmp_id;
@@ -185,7 +193,7 @@ global void FreeUnitMemory(Unit* unit)
 }
 
 /**
-**	Create new unit.
+**	Create a new unit.
 **
 **	@param type	Pointer to unit-type.
 **	@param player	Pointer to owning player.
@@ -210,6 +218,9 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     DebugLevel3(__FUNCTION__": %s(%Zd)\n",type->Name,player-Players);
 
 #ifdef NEW_UNIT
+    //
+    //	Allocate structure
+    //
     if( !(slot=UnitSlotFree) ) {	// should not happen!
 	DebugLevel0(__FUNCTION__": Maximum of units reached\n");
 	return NoUnitP;
@@ -217,9 +228,25 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     UnitSlotFree=(void*)*slot;
     *slot=unit=calloc(1,sizeof(Unit));
     unit->Refs=1;
-    unit->Slot=slot-UnitSlots;
+    unit->Slot=slot-UnitSlots;		// back index
 
-    ...
+    //
+    //	Build all unit table
+    //
+    unit->UnitSlot=&Units[NumUnits];	// back pointer
+    Units[NumUnits++]=unit;
+
+    //
+    //	Build player unit table
+    //
+    if( player ) {
+	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
+	*unit->PlayerSlot=unit;
+
+	player->UnitTypesCount[type->Type]++;
+    }
+
+    DebugLevel3(__FUNCTION__": %p %Zd\n",unit,UnitNumber(unit));
 #else
     if( NumFreeUnits ) {
 	unit=FreeUnits[--NumFreeUnits];
@@ -229,12 +256,12 @@ global Unit* MakeUnit(UnitType* type,Player* player)
 	DebugLevel0("Maximum of units reached\n");
 	return NoUnitP;
     }
-#endif
 
     DebugLevel3(__FUNCTION__": %p %Zd\n",unit,UnitNumber(unit));
 
     player->Units[player->TotalNumUnits++]=unit;
     player->UnitTypesCount[type->Type]++;
+#endif
 
     //
     //	Initialise unit structure (must be zero filled!)
@@ -658,13 +685,37 @@ global int UnitVisible(const Unit* unit)
 }
 
 /**
-**	Increment mana of all magic units.
+**	Increment mana of all magic units. Called each second.
 **	Also clears the blink flag.
 */
 global void UnitIncrementMana(void)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    Unit** table;
+    Unit* unit;
+
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	// FIXME: This isn't the correct position or the correct function name
+	if( unit->Blink ) {		// clear blink flag
+	    --unit->Blink;
+	}
+
+	if( unit->Type->CanCastSpell ) {
+	    if( unit->Mana!=255 ) {
+		unit->Mana++;
+		/* Done currently by color cycle!
+		// FIXME: if mana is shown on map
+		if( UnitVisible(unit) ) {
+		    MustRedraw|=RedrawMap;
+		}
+		*/
+		if( unit->Selected ) {
+		    MustRedraw|=RedrawInfoPanel;
+		}
+	    }
+	}
+    }
 #else
     Unit* unit;
     int i;
@@ -697,8 +748,13 @@ global void UnitIncrementMana(void)
 */
 global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 {
+#ifdef NEW_UNIT
+    Unit* temp;
+    int i;
+#else
     Unit** tmp;
     int i;
+#endif
 
     // For st*rcr*ft (dark archons),
     if( unit->Type->Transporter ) {
@@ -709,6 +765,19 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
 	}
     }
 
+#ifdef NEW_UNIT
+    //	Remove from old player table
+
+    temp=oldplayer->Units[--oldplayer->TotalNumUnits];
+    oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
+    temp->PlayerSlot=unit->PlayerSlot;
+    *unit->PlayerSlot=temp;
+
+    //	Insert into new player table.
+
+    unit->PlayerSlot=newplayer->Units+newplayer->TotalNumUnits++;
+    *unit->PlayerSlot=unit;
+#else
     newplayer->Units[newplayer->TotalNumUnits++]=unit;
 
     // looking for the unit slot...
@@ -717,6 +786,7 @@ global void ChangeUnitOwner(Unit* unit,Player* oldplayer,Player* newplayer)
     }
     *tmp=oldplayer->Units[--oldplayer->TotalNumUnits];
     oldplayer->Units[oldplayer->TotalNumUnits]=NULL;
+#endif
 
     unit->Player=newplayer;
 }
@@ -1024,7 +1094,21 @@ global void DropOutNearest(Unit* unit,int gx,int gy,int addx,int addy)
 global void DropOutAll(const Unit* source)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    // FIXME: Rewrite this use source->Next;
+    Unit** table;
+    Unit* unit;
+
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	if( !unit->Removed ) {		// unusable unit
+	    continue;
+	}
+	if( unit->X==source->X
+		&& unit->Y==source->Y ) {
+	    DropOutOnSide(unit,HeadingW
+		    ,source->Type->TileWidth,source->Type->TileHeight);
+	}
+    }
 #else
     Unit* unit;
     int i;
@@ -1063,11 +1147,9 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
     Unit* table[MAX_UNITS];
     int n;
     int i;
-#ifndef NEW_UNIT
     Unit* unit;
     int dx;
     int dy;
-#endif
 
     //
     //	Can't build outside the map
@@ -1085,9 +1167,32 @@ global int CanBuildHere(UnitType* type,unsigned x,unsigned y)
 	//
 	// FIXME: use unit-cache here.
 #ifdef NEW_UNIT
-	DebugLevel0("FIXME:");
+        int i;
+
+	for( i=0; i<NumUnits; i++ ) {
+	  unit=Units[i];
+	  if( unit->Type->GoldMine ) {
+	    DebugLevel3("Check goldmine %d,%d\n"
+			,unit->X,unit->Y);
+	    if( unit->X<x ) {
+	      dx=x-unit->X-unit->Type->TileWidth;
+	    } else {
+	      dx=unit->X-x-type->TileWidth;
+	    }
+	    if( unit->Y<y ) {
+	      dy=y-unit->Y-unit->Type->TileHeight;
+	    } else {
+	      dy=unit->Y-y-type->TileHeight;
+	    }
+	    DebugLevel3("Distance %d,%d\n",dx,dy);
+	    if( dx<GOLDMINE_DISTANCE && dy<GOLDMINE_DISTANCE ) {
+	      return 0;
+	    }
+	  }
+	}
 #else
         int i;
+
 	for( i=0; i<NumUnits; i++ ) {
 	  unit=Units[i];
 	  if( unit->Type->GoldMine ) {
@@ -1137,10 +1242,34 @@ next:
 	//	Oil deposit can't be build too near to oil-patch.
 	//
 #ifdef NEW_UNIT
-	DebugLevel0("FIXME:");
+	// FIXME: use unit-cache here.
+	int i;
+
+	for( i=0; i<NumUnits; i++ ) {
+	    unit=Units[i];
+	    if( unit->Type->OilPatch ) {
+	      DebugLevel3("Check oilpatch %d,%d\n"
+			  ,unit->X,unit->Y);
+	      if( unit->X<x ) {
+		dx=x-unit->X-unit->Type->TileWidth;
+	      } else {
+		dx=unit->X-x-type->TileWidth;
+	      }
+	      if( unit->Y<y ) {
+		dy=y-unit->Y-unit->Type->TileHeight;
+	      } else {
+		dy=unit->Y-y-type->TileHeight;
+	      }
+	      DebugLevel3("Distance %d,%d\n",dx,dy);
+	      if( dx<OILPATCH_DISTANCE && dy<OILPATCH_DISTANCE ) {
+		return 0;
+	      }
+	    }
+	}
 #else
 	// FIXME: use unit-cache here.
 	int i;
+
 	for( i=0; i<NumUnits; i++ ) {
 	    unit=Units[i];
 	    if( unit->Type->OilPatch ) {
@@ -1272,14 +1401,45 @@ global int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Find gold mine.
+**	Find the nearest gold mine for unit from x,y.
+**
+**	@param unit	Pointer for source unit.
+**	@param x	X tile position to start.
+**	@param y	Y tile position to start.
+**
+**	@returns	Pointer to the nearest gold mine.
 */
-global Unit* FindGoldMine(int x,int y)
+global Unit* FindGoldMine(const Unit* source,int x,int y)
 {
 #ifdef NEW_UNIT
-    DebugLevel0("FIXME:");
+    Unit** table;
+    Unit* unit;
+    Unit* best;
+    int best_d;
+    int d;
 
-    return NULL;
+    //	FIXME:	this is not the best one
+    //		We need the deposit with the shortest way!
+    //		At least it must be reachable!
+    //		Should use the same pathfinder flood fill, like the attacking
+    //		code.
+
+    best=NoUnitP;
+    best_d=99999;
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	unit=*table;
+	// Want gold-mine and not dieing.
+	if( !unit->Type->GoldMine || UnitUnusable(unit) ) {
+	    continue;
+	}
+	d=MapDistanceToUnit(x,y,unit);
+	if( d<best_d && UnitReachable(source,unit) ) {
+	    best_d=d;
+	    best=unit;
+	}
+    }
+    DebugLevel3(__FUNCTION__": %Zd %d,%d\n",UnitNumber(best),best->X,best->Y);
+    return best;
 #else
     Unit* unit;
     Unit* best;
@@ -2163,16 +2323,6 @@ global int CanTarget(const UnitType* source,const UnitType* dest)
 	return source->CanTarget&CanTargetSea;
     }
     return 0;
-}
-
-/**
-**	Start conflicts.
-**
-**		Attack units in reaction range.
-*/
-global void UnitConflicts(void)
-{
-    // FIXME: here I can resolve all conflicts
 }
 
 /*----------------------------------------------------------------------------

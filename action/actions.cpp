@@ -224,19 +224,26 @@ local void HandleUnitAction(Unit* unit)
 
 /**
 **	Update the actions of all units each frame.
+**
 **	IDEA:	to improve the preformance use slots for waiting.
 */
 global void UnitActions(void)
 {
 #ifdef NEW_UNIT
-    UnitConflicts();			// start attacking
+    Unit** table;
 
-    DebugLevel0("FIXME:\n");
+    //
+    // Do all actions
+    //
+    for( table=Units; table<Units+NumUnits; table++ ) {
+	if( --(*table)->Wait ) {	// Wait until counter reached
+	    continue;
+	}
+	HandleUnitAction(*table);
+    }
 #else
     Unit* unit;
     int i;
-
-    UnitConflicts();			// start attacking
 
     //
     // Do all actions

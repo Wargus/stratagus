@@ -142,7 +142,7 @@ local void MarkPlaceInMatrix(int x,int y,int w,int h,unsigned char* matrix)
 **	       rggr
 **	       rrrr
 */
-local void MarkGoalInMatrix(Unit* unit,int range,unsigned char* matrix)
+local void MarkGoalInMatrix(const Unit* unit,int range,unsigned char* matrix)
 {
     int x;
     int y;
@@ -226,7 +226,7 @@ local void PathTraceBack(const unsigned char* matrix,int x,int y,int n
 /*
 **	Mark path to goal.
 */
-local int MarkPathInMatrix(Unit* unit,unsigned char* matrix)
+local int MarkPathInMatrix(const Unit* unit,unsigned char* matrix)
 {
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
     static int yoffset[]={ -1, 0, 0,+1, -1,-1,+1,+1 };
@@ -317,7 +317,7 @@ local int MarkPathInMatrix(Unit* unit,unsigned char* matrix)
 /*
 **	Can the unit 'src' reach the place x,y.
 */
-global int PlaceReachable(Unit* src,int x,int y)
+global int PlaceReachable(const Unit* src,int x,int y)
 {
     unsigned char* matrix;
 
@@ -340,7 +340,7 @@ global int PlaceReachable(Unit* src,int x,int y)
 /*
 **	Can the unit 'src' reach the unit 'dst'.
 */
-global int UnitReachable(Unit* src,Unit* dst)
+global int UnitReachable(const Unit* src,const Unit* dst)
 {
     unsigned char* matrix;
 
