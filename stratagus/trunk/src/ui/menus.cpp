@@ -1389,7 +1389,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 
     // master volume slider
     if (SoundFildes == -1) {
-	menu->items[2].flags = -1;
+	menu->items[2].flags = MenuButtonDisabled;
     } else {
 	menu->items[2].flags = 0;
 	menu->items[2].d.hslider.percent = (GlobalVolume * 100) / 255;
@@ -1404,7 +1404,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 
     // music volume slider
     if (PlayingMusic != 1 || SoundFildes == -1) {
-	menu->items[8].flags = -1;
+	menu->items[8].flags = MenuButtonDisabled;
     } else {
 	menu->items[8].flags = 0;
 	menu->items[8].d.hslider.percent = (MusicVolume * 100) / 255;
@@ -1412,13 +1412,13 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 
     // music power
     if (SoundFildes == -1) {
-	menu->items[11].flags = -1;
+	menu->items[11].flags = MenuButtonDisabled;
     } else {
 	menu->items[11].flags = 0;
     }
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
-	menu->items[11].flags = -1;
+	menu->items[11].flags = MenuButtonDisabled;
     }
 #endif
     if (PlayingMusic != 1 || SoundFildes == -1) {
@@ -1427,11 +1427,11 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 	menu->items[11].d.gem.state = MI_GSTATE_CHECKED;
     }
 
-    menu->items[14].flags = -1;			// cd volume slider
-    menu->items[17].flags = -1;			// cd power
+    menu->items[14].flags = MenuButtonDisabled;		// cd volume slider
+    menu->items[17].flags = MenuButtonDisabled;		// cd power
     menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
-    menu->items[19].flags = -1;			// all tracks button
-    menu->items[21].flags = -1;			// random tracks button
+    menu->items[19].flags = MenuButtonDisabled;		// all tracks button
+    menu->items[21].flags = MenuButtonDisabled;		// random tracks button
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     menu->items[17].flags = 0;			// cd power
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
@@ -1439,8 +1439,15 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
 	int i = 0;
 
 	cd_get_volume(&i, &i);
+#ifndef USE_WIN32
+	menu->items[14].flags = 0;
 	menu->items[14].d.hslider.percent = (i * 100) / 255;
 #endif
+#endif
+	menu->items[17].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[19].flags = 0;
+	menu->items[21].flags = 0;
+
 	if (!strcmp(":all", CDMode)) {
 	    menu->items[19].d.gem.state = MI_GSTATE_CHECKED;
 	    menu->items[21].d.gem.state = MI_GSTATE_UNCHECKED;
