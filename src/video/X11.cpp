@@ -75,7 +75,7 @@ global int VideoDepth;
 global VMemType8 * Pixels8;
 global VMemType16 * Pixels16;
 global VMemType32 * Pixels32;
-global struct Palette GlobalPalette[256];
+global Palette GlobalPalette[256];
 
 local Display* TheDisplay;
 local int TheScreen;
@@ -824,13 +824,19 @@ global void WaitEventsAndKeepSync(void)
     }
 }
 
-global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
+/**
+**	Create a new hardware dependend palette palette.
+**
+**	@param palette	Hardware independend palette.
+**
+**	@returns	A hardware dependend pixel table.
+*/
+global GraphicData * VideoCreateNewPalette(const Palette *palette)
+{
     XColor color;
     XWindowAttributes xwa;
     int i;
-    VMemType8 * LocalPixels8 = NULL;
-    VMemType16 * LocalPixels16 = NULL;
-    VMemType32 * LocalPixels32 = NULL;
+    void* pixels;
 
     if( !TheDisplay || !TheMainWindow ) {	// no init
 	return NULL;
@@ -838,25 +844,25 @@ global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
 
     switch( VideoDepth ) {
     case 8:
-      LocalPixels8=calloc(256,sizeof(VMemType8));
-      break;
+	pixels=calloc(256,sizeof(VMemType8));
+	break;
     case 15:
     case 16:
-      LocalPixels16=calloc(256,sizeof(VMemType16));
-      break;
+	pixels=calloc(256,sizeof(VMemType16));
+	break;
     case 24:
     case 32:
-      LocalPixels32=calloc(256,sizeof(VMemType32));
-      break;
+	pixels=calloc(256,sizeof(VMemType32));
+	break;
     default:
-      DebugLevel0(__FUNCTION__": Unknown depth\n");
-      break;
+	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	return NULL;
     }
 
     XGetWindowAttributes(TheDisplay,TheMainWindow,&xwa);
 
     //
-    //	Get some colors:
+    //	Convert each palette entry into hardware format.
     //
     for( i=0; i<256; ++i ) {
 	int r;
@@ -869,15 +875,16 @@ global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
 	b=(palette[i].b)&0xFF;
 	v=r+g+b;
 
+	// Apply global saturation,contrast and brightness
 	r= ((((r*3-v)*TheUI.Saturation + v*100)
-		*TheUI.Contrast)
-		+TheUI.Brightness*25600*3)/30000;
+	    *TheUI.Contrast)
+	    +TheUI.Brightness*25600*3)/30000;
 	g= ((((g*3-v)*TheUI.Saturation + v*100)
-		*TheUI.Contrast)
-		+TheUI.Brightness*25600*3)/30000;
+	    *TheUI.Contrast)
+	    +TheUI.Brightness*25600*3)/30000;
 	b= ((((b*3-v)*TheUI.Saturation + v*100)
-		*TheUI.Contrast)
-		+TheUI.Brightness*25600*3)/30000;
+	    *TheUI.Contrast)
+	    +TheUI.Brightness*25600*3)/30000;
 
 	// Boundings
 	r= r<0 ? 0 : r>255 ? 255 : r;
@@ -896,40 +903,20 @@ global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
 
 	switch( VideoDepth ) {
 	case 8:
-	    LocalPixels8[i]=color.pixel;
+	    ((VMemType8*)pixels)[i]=color.pixel;
 	    break;
 	case 15:
 	case 16:
-	    LocalPixels16[i]=color.pixel;
+	    ((VMemType16*)pixels)[i]=color.pixel;
 	    break;
 	case 24:
 	case 32:
-	    LocalPixels32[i]=color.pixel;
+	    ((VMemType32*)pixels)[i]=color.pixel;
 	    break;
 	}
     }
 
-    // -> Video
-    switch( VideoDepth ) {
-    case 8:
-      return (GraphicData *)LocalPixels8;
-      break;
-    case 15:
-    case 16:
-      return (GraphicData *)LocalPixels16;
-      break;
-    case 24:
-    case 32:
-      return (GraphicData *)LocalPixels32;
-      break;
-    default:
-      DebugLevel0(__FUNCTION__": Unknown depth\n");
-      break;
-    }
-    
-    return (GraphicData *)NULL;
-
-
+    return pixels;
 }
 
 /**
