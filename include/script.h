@@ -107,6 +107,7 @@ typedef enum {
 	EString_If,           /// If cond then String1 else String2.
 	EString_UnitName,     /// UnitType Name.
 	EString_SubString,    /// SubString.
+	EString_Line,         /// line n of the string.
 // FIXME: add others.
 } EString; /// All possible value for a string.
 
@@ -217,14 +218,18 @@ struct _StringDesc_ {
 			StringDesc* False; /// String if Cond is false.
 		} If; /// conditional string.
 		struct {
-			StringDesc* String; /// Original string.
+			StringDesc* String;  /// Original string.
 			NumberDesc* Begin;   /// Begin of result string.
 			NumberDesc* End;     /// End of result string.
 		} SubString; /// For extract a substring
+		struct {
+			StringDesc* String;  /// Original string.
+			NumberDesc* Line;    /// Line number.
+			NumberDesc* MaxLen;  /// Max lenght of line.
+			int Font;    /// Font to consider (else (-1) consider just char).
+		} Line; /// For specific line.
 	} D;
 };
-
-
 
 /*----------------------------------------------------------------------------
 --  Variables

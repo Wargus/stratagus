@@ -514,6 +514,94 @@ static void FormatNumber(int number, char* buf)
 }
 
 /**
+**  Return the first occurance of c in [s- s + maxlen]
+**
+**  @param s     original string.
+**  @param c     charrater to find.
+**  @param len   size limit of the search. (0 means unlimited).
+**  @param font  if specified use VideoTextLenght instead of strlen.
+**
+**  @return computed value.
+*/
+static char* strchrlen(char* s, char c, int maxlen, int font)
+{
+	char* res;
+
+	Assert(s);
+	Assert(0 <= maxlen);
+	Assert(font == -1 || 0 <= font);
+
+	res = strchr(s, c);
+
+	if (!maxlen) {
+		return res;
+	}
+	if (font == -1 && s + maxlen < res) {
+		res = strrchr(s + maxlen, ' ');
+		if (!res || res < s) {
+			res = s + maxlen;
+		}
+	} else if (font != -1) {
+		char* end;
+
+		if (!res) {
+			res = s + strlen(s);
+		}
+		end = res;
+		c = *end;
+		*end = '\0';
+		while (VideoTextLength(font, s) > maxlen) {
+			res = strrchr(s, ' ');
+			*end = c;
+			end = res;
+			if (!res) {
+				fprintf(stderr, "line too long: \"%s\"\n", s);
+				return strchr(s, '\n');
+			}
+			c = *end;
+			*end = '\0';
+		}
+		*end = c;
+	}
+	return res;
+}
+
+/**
+**  Return the 'line' line of the string 's'.
+**
+**  @param line    line number.
+**  @param s       multiline string.
+**  @param maxlen  max lenght of the string.
+**  @param font    if specified use VideoTextLenght instead of strlen.
+**
+**  @return computed value.
+*/
+char* GetLineFont(int line, char* s, int maxlen, int font)
+{
+	int i;
+	char* res;
+	char *tmp;
+
+	Assert(0 < line);
+	Assert(s);
+	Assert(0 <= maxlen);
+	Assert(font == -1 || 0 <= font);
+
+	for (i = 1; i < line && (res - 1); ++i) {
+		s = strchrlen(s, '\n', maxlen, font) + 1;
+	}
+	if ((s - 1)) {
+		res = strdup(s);
+		tmp = strchrlen(res, '\n', maxlen, font);
+		if (tmp) {
+			*tmp = '\0';
+		}
+		return res;
+	}
+	return NULL;
+}
+
+/**
 **  Draw number with font at x,y unclipped.
 **
 **  @param x       X screen position
