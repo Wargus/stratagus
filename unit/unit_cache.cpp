@@ -46,7 +46,7 @@
 #include "unit.h"
 #include "map.h"
 
-#ifdef UNIT_ON_MAP
+#ifndef NEW_UNIT_CACHE
 
 /**
 **		Insert new unit into cache.
@@ -226,9 +226,7 @@ global void InitUnitCache(void)
 {
 }
 
-#endif		// } UNIT_ON_MAP
-
-#ifdef NEW_UNIT_CACHE
+#else 		// NEW_UNIT_CACHE
 
 /**
 **		Insert new unit into cache.
