@@ -471,9 +471,12 @@ global int SpellCast( const SpellType* spell, Unit* unit, Unit* target,
     case SpellActionHolyVision:
 	 unit->Mana -= spell->ManaCost; // get mana cost
 	 {
-	 Unit* u = MakeUnit(UnitTypeByIdent("unit-daemon"), unit->Player);
+	 Unit* u;
+
+	 u = MakeUnit(UnitTypeByIdent("unit-daemon"), unit->Player);
 	 u->Revealer = 1;
-	 u->HP = 2;
+	 u->Orders[0].Action=UnitActionDie;
+	 u->HP = 2;			// Counter lifing?
 	 u->X = x;
 	 u->Y = y;
 	 }
