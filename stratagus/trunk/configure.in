@@ -28,23 +28,6 @@ else
     ARCH=linux
 fi
 
-dnl --- CHECK FOR GUILE ---
-AC_ARG_WITH([guile],
-    AC_HELP_STRING([--with-guile], [Enable Guile Support (default: no)]),,
-    with_guile="no")
-
-if test "x$with_guile" = "xyes"; then
-    dnl AC_DEFINE(USE_GUILE,, [Use Guile instead of SIOD])
-
-    AC_CHECK_LIB(guile, main, 
-        [AC_SUBST(GUILE_CFLAGS, "-DUSE_GUILE")
-         AC_SUBST(GUILE_LIBS,   "-lguile")],
-        [ echo "Guile support not available, fallback to SIOD"
-          AC_SUBST(GUILE_CFLAGS, "")
-          AC_SUBST(GUILE_LIBS,   "")])
-fi
-dnl -----------------------
-
 dnl --- CHECK FOR WITH SOUND ---
 AC_ARG_ENABLE(sound,
     [  --enable-sound	  [Use sound (default: yes)]], SOUND="$with_sound")
@@ -222,6 +205,39 @@ fi
 AC_SUBST(CDAUDIO_CFLAGS)
 AC_SUBST(CDAUDIO_LIBS)
 dnl ----------------------------
+
+dnl ---- lua check -------------
+AC_ARG_WITH(lua-libs, 
+    AC_HELP_STRING([--with-lua=PFX], [Prefix where Lua is installed]),
+    LUAPFX="$withval", LUAPFX="")
+if test x$LUAPFX != x ; then
+    CFLAGS="$CFLAGS -I$LUAPFX"
+    LIBS="$LIBS -L$LUAPFX"
+else
+dnl AC_CHECK_HEADER
+dnl Debian, and possibly other systems, include this script...
+    AC_CHECK_PROGS(LUACONFIG, [lua-config lua-config50 lua-config5.0], "")
+    if test x$LUACONFIG != x; then
+        LUA_CFLAGS="`[$LUACONFIG --include]`"
+        LUA_LIBS="`[$LUACONFIG --libs]`"
+    else dnl ...otherwise, attempt to guess
+        LUA_CFLAGS="$CFLAGS -I/usr/include -I/usr/local/include"
+        LUA_LIBS="$LIBS -L/usr/lib -L/usr/local/lib"
+        AC_CHECK_LIB(lua, lua_getfenv, LUA_LIBS="$LUA_LIBS -llua",
+        AC_CHECK_LIB(lua50, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua50",
+        AC_CHECK_LIB(lua5.0, lua_setfenv, LUA_LIBS="$LUA_LIBS -llua5.0",
+        [AC_MSG_ERROR(Lua5 is required)], -lm), -lm), -lm)
+	    AC_CHECK_LIB(lualib, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib",
+	    AC_CHECK_LIB(lualib50, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib50",
+	    AC_CHECK_LIB(lualib5.0, luaopen_base, LUA_LIBS="$LUA_LIBS -llualib5.0",
+	    [AC_MSG_ERROR(Lualib5 is required)], $LUA_LIBS -lm -ldl), $LUA_LIBS -lm -ldl),$LUA_LIBS -lm -ldl)
+	fi
+fi
+LUA_LIBS="$LUA_LIBS -lm -ldl"
+AC_SUBST(LUA_CFLAGS)
+AC_SUBST(LUA_LIBS)
+	
+dnl ---- end of lua check ------
 
 if test "$prefix" = "NONE"; then
     PREFIX=/usr/local
