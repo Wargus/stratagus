@@ -46,6 +46,8 @@
 <A HREF="#define-icon">define-icon</A>
 <A HREF="#define-icon-alias">define-icon-alias</A>
 <A HREF="#define-icon-wc-names">define-icon-wc-names</A>
+<A HREF="#set-icon-size!">set-icon-size!</A>
+<A HREF="#set-icons-per-row!">set-icons-per-row!</A>
 <HR>
 <H2>Intro - Introduction to icon functions and variables</H2>
 
@@ -160,6 +162,67 @@ number are icons defined.
 <H4>Used</H4>
 
 <A HREF="../../data/ccl/wc2.ccl"> $LIBARYPATH/ccl/wc2.ccl </A>
+
+<A NAME="set-icon-size!"></A>
+<H3>set-icon-size!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-icon-size! width height)</CODE>
+
+<DL>
+<DT>width</DT>
+<DD>Width of the icons.
+</DD>
+<DT>height</DT>
+<DD>Height of the icons.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-icon-size! 46 38)
+</PRE>
+
+<P>Sets the icon size to 46x38.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/icons.ccl"> $LIBARYPATH/ccl/icons.ccl </A>
+
+<A NAME="set-icons-per-row!"></A>
+<H3>set-icons-per-row!</H3>
+
+<H4>Description</H4>
+
+.
+
+<H4>Syntax</H4>
+
+<CODE>(set-icons-per-row! icons)</CODE>
+
+<DL>
+<DT>icons</DT>
+<DD>Number of icons per row.
+</DD>
+</DL>
+
+<H4>Example</H4>
+
+<PRE>
+    (set-icons-per-row! 5)
+</PRE>
+
+<P>Sets the number of icons per row to 5.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/icons.ccl"> $LIBARYPATH/ccl/icons.ccl </A>
 
 <HR>
 Last changed: $Id$<BR>
