@@ -10,7 +10,7 @@
 //
 /**@name clone.c	-	The main file. */
 /*
-**	(c) Copyright 1998-2000 by Lutz Sammer
+**	(c) Copyright 1998-2001 by Lutz Sammer
 **
 **	$Id$
 */
@@ -92,7 +92,7 @@ global char* FreeCraftLibPath;		/// Path for data
 
     /// Name, Version, Copyright
 global char NameLine[] =
-    "FreeCraft V" VERSION ", (c) 1998-2000 by The FreeCraft Project.";
+    "FreeCraft V" VERSION ", (c) 1998-2001 by The FreeCraft Project.";
 
     /// Filename of the map to load
 local char* MapName = NULL;
