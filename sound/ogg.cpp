@@ -55,6 +55,13 @@
 --	Declaration
 ----------------------------------------------------------------------------*/
 
+typedef struct _ogg_data_ {
+    OggVorbis_File vf[1];
+    char* p;
+} OggData;
+
+#define OGG_BUFFER_SIZE  64*1024
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -71,7 +78,6 @@
 */
 local size_t OGG_read(void *ptr, size_t size, size_t nmemb, void *user)
 {
-     
     return CLread(user, ptr, size * nmemb) / size;
 }
 
@@ -113,6 +119,70 @@ local long OGG_tell(void* user __attribute__((unused)))
 local int OGG_close(void* user)
 {
     return CLclose(user);
+}
+
+/**
+**	Callback function to read from the ogg file
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
+local int ReadOgg(Sample* sample, void* buf, int len)
+{
+    OggData* data;
+    int i;
+    int n;
+    int bitstream;
+
+    data = (OggData*)sample->User;
+
+    // see if we have enough read already
+    if (data->p + len - sample->Data <= sample->Length) {
+	memcpy(buf, data->p, len);
+	data->p += len;
+	return len;
+    }
+
+    // not enough in buffer, read more
+    n = sample->Length - (data->p - sample->Data);
+    memcpy(sample->Data, data->p, n);
+    sample->Length = n;
+    data->p = sample->Data;
+    n = OGG_BUFFER_SIZE - n;
+    for (;;) {
+	i = ov_read(data->vf, data->p + sample->Length, n, 0, 2, 1, &bitstream);
+	if (i <= 0) {
+	    break;
+	}
+	sample->Length += i;
+	n -= i;
+	if (n <= 4096) {
+	    break;
+	}
+    }
+    if (sample->Length < len) {
+	len = sample->Length;
+    }
+    memcpy(buf, data->p, len);
+    data->p += len;
+    return len;
+}
+
+/**
+**	Callback function to free an ogg file
+**
+**	@param sample	    Sample to free
+*/
+local void FreeOgg(Sample* sample)
+{
+    OggData* data;
+
+    data = (OggData*)sample->User;
+    ov_clear(data->vf);
+    free(data);
 }
 
 /**
@@ -164,6 +234,7 @@ global Sample *LoadOgg(const char* name)
     sample->Channels = info->channels;
     sample->SampleSize = 16;
     sample->Frequency = info->rate;
+    sample->Type = NULL;
     n = sample->Length = 0;
     p = sample->Data;
 
@@ -201,6 +272,81 @@ global Sample *LoadOgg(const char* name)
 
     DebugLevel0Fn(" %d\n" _C_ sample->Length);
     IfDebug( AllocatedSoundMemory += sample->Length; );
+
+    return sample;
+}
+
+/**
+**	Load ogg streaming.
+**
+**	@param name	File name.
+**
+**	@return		Returns the sample.
+*/
+global Sample *LoadOggStreaming(const char* name)
+{
+    CLFile* f;
+    Sample* sample;
+    OggData* data;
+    unsigned int magic[1];
+    vorbis_info* info;
+    static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
+
+    data = (OggData*)malloc(sizeof(OggData));
+    if (!data) {
+	fprintf(stderr, "Out of memory\n");
+	return NULL;
+    }
+
+    if (!(f = CLopen(name))) {
+	fprintf(stderr, "Can't open file `%s'\n", name);
+	return NULL;
+    }
+    CLread(f, magic, sizeof(magic));
+    if (AccessLE32(magic) != 0x5367674F) {	// "OggS" in ASCII
+	CLclose(f);
+	return NULL;
+    }
+
+    DebugLevel2Fn("Have ogg file %s\n" _C_ name);
+
+    if (ov_open_callbacks(f, data->vf, (char *)&magic, sizeof(magic), vc)) {
+	fprintf(stderr, "Can't initialize ogg decoder\n");
+	CLclose(f);
+	return NULL;
+    }
+
+    info = ov_info(data->vf, -1);
+    if( !info ) {
+	fprintf(stderr, "no ogg stream\n");
+	CLclose(f);
+	return NULL;
+    }
+
+    sample = malloc(sizeof(*sample) + OGG_BUFFER_SIZE);
+    if (!sample) {
+	fprintf(stderr, "Out of memory\n");
+	CLclose(f);
+	free(data);
+	return NULL;
+    }
+
+    sample->Channels = info->channels;
+    sample->SampleSize = 16;
+    sample->Frequency = info->rate;
+    sample->User = data;
+    sample->Length = 0;
+    sample->Type = (SampleType*)malloc(sizeof(SampleType));
+    if (!sample->Type) {
+	fprintf(stderr, "Out of memory\n");
+	CLclose(f);
+	free(data);
+	free(sample);
+	return NULL;
+    }
+    sample->Type->Read = &ReadOgg;
+    sample->Type->Free = &FreeOgg;
+    data->p = sample->Data;
 
     return sample;
 }

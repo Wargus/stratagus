@@ -191,19 +191,33 @@ local void MixMusicToStereo32(int* buffer, int size)
 	if (MusicSample) {
 	    short *buf;
 
-	    buf = (short *)(MusicSample->Data + MusicIndex);
-	    if (size * 2 > MusicSample->Length - MusicIndex) {
-		n = MusicSample->Length - MusicIndex;
-	    } else {
-		n = size * 2;
-	    }
-	    n >>= 1;
-	    for (i = 0; i < n; ++i) {	// Add to our samples
-		buffer[i] += (buf[i] * MusicVolume) / 256;
-	    }
-	    MusicIndex += i * 2;
+	    if (MusicSample->Type) {
+		// Streaming
+		buf = alloca(size * sizeof(*buf));
 
-	    n = MusicIndex == MusicSample->Length;
+		n = MusicSample->Type->Read(MusicSample, buf, size * sizeof(*buf));
+
+		for (i = 0; i < n / sizeof(*buf); ++i) {
+		    // Add to our samples
+		    buffer[i] += (buf[i] * MusicVolume) / 256;
+		}
+
+		n = n != size * sizeof(*buf);
+	    } else {
+		buf = (short *)(MusicSample->Data + MusicIndex);
+		if (size * 2 > MusicSample->Length - MusicIndex) {
+		    n = MusicSample->Length - MusicIndex;
+		} else {
+		    n = size * 2;
+		}
+		n >>= 1;
+		for (i = 0; i < n; ++i) {	// Add to our samples
+		    buffer[i] += (buf[i] * MusicVolume) / 256;
+		}
+		MusicIndex += i * 2;
+
+		n = MusicIndex == MusicSample->Length;
+	    }
 	}
 #endif
 
@@ -219,6 +233,10 @@ local void MixMusicToStereo32(int* buffer, int size)
 #endif
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 	    if (MusicSample) {
+		if (MusicSample->Type) {
+		    MusicSample->Type->Free(MusicSample);
+		    free(MusicSample->Type);
+		}
 		free(MusicSample);
 		MusicSample=NULL;
 	    }
