@@ -237,16 +237,17 @@ typedef struct _map_field_ {
 #endif
 #ifdef HIERARCHIC_PATHFINDER
     unsigned short	RegId;	/// Region to which the field belongs
-    // FIXME: Johns: this values can't be placed in the map field.
+    // FIXME: Johns: this values can't be placed in the map field,
+    //	      this needs too much memory.
     unsigned short	f, g;		/// A* parameters (no need to store h)
     unsigned short	h;		///stored only for BestSoFar computation
 #define HIER_LOW_OPEN	0
 #define HIER_LOW_CLOSED	1
     unsigned int	Set:1;		/// Open/Closed
     unsigned int	Goal:1;
-    /* FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
-     * g? There's potentially a *lot* of MapFields in this game and every byte
-     * saved here could translate into 1 MB saved overall for max sized map. */
+    // FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
+    // g? There's potentially a *lot* of MapFields in this game and every byte
+    // saved here could translate into 1 MB saved overall for max sized map.
     char		Traceback;	/// The field through which we arrived
 					/// to this one
 #endif
@@ -379,22 +380,18 @@ extern int FlagRevealMap;
 extern void MapColorCycle(void);
 
     /// Draw the map background
-extern void DrawMapBackgroundInViewport (int ,int , int );
+extern void DrawMapBackgroundInViewport(int ,int , int );
     /// Draw the map background
 extern void DrawMapBackground(int x,int y);
     /// Build tables for map
 extern void InitMap(void);
 
     /// Mark position inside screenmap be drawn for next display update
-extern int MarkDrawPosMap( int x, int y );
-    /// Denote wether area in map is overlapping
-extern int MapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
-    /// Check if any part of an area is visible
-extern int AnyMapAreaVisibleOnScreen( int sx, int sy, int ex, int ey );
-    /// FIXME: docu
-extern int MapAreaVisibleInViewport (int , int , int , int , int );
-    /// FIXME: docu
-extern int AnyMapAreaVisibleInViewport (int , int , int , int , int );
+extern int MarkDrawPosMap(int x, int y );
+    /// Denote wether area in map is overlapping with viewport on screen
+extern int MapAreaVisibleInViewport(int , int , int , int , int );
+    /// Check if any part of an area is visible in viewport
+extern int AnyMapAreaVisibleInViewport(int , int , int , int , int );
     /// Set overlapping area as entries in MustRedrawRow and MustRedrawTile
 extern  int MarkDrawAreaMap( int sx, int sy, int ex, int ey );
     /// Set all entries in MustRedrawRow and MustRedrawTile
@@ -422,7 +419,7 @@ extern void UpdateFogOfWarChange(void);
 extern void MapUpdateVisible(void);
 
     /// Draw the map fog of war
-extern void DrawMapFogOfWar (int ,int ,int );
+extern void DrawMapFogOfWar(int v,int x,int y);
     /// Build tables for fog of war
 extern void InitMapFogOfWar(void);
     /// Cleanup memory for fog of war tables
@@ -498,15 +495,10 @@ extern void MapMarkSeenTile(int x,int y);
     /// Reveal the complete map, make everything known
 extern void RevealMap(void);
 
-    /// Center map on point
-extern void MapCenter(int x,int y);
-    /// Set the current map view to x,y (upper,left corner)
-extern void MapSetViewpoint(int x,int y);
-
-    /// FIXME: docu
-extern void MapViewportSetViewpoint (int , int , int );
-    /// FIXME: docu
-extern void MapCenterViewport (int , int , int );
+    /// Set the current map view to x,y(upper,left corner)
+extern void MapViewportSetViewpoint(int v, int x, int y);
+    /// Center map on point in viewport
+extern void MapViewportCenter(int v, int x, int y);
 
     /// Returns true, if the tile field is empty
 extern int IsMapFieldEmpty(int x,int y);
@@ -532,11 +524,11 @@ extern int RockOnMap(int x,int y);
 
 #ifdef HIERARCHIC_PATHFINDER
     /// FIXME: docu
-extern inline unsigned short MapFieldGetRegId (int , int );
+extern inline unsigned short MapFieldGetRegId(int , int );
     /// FIXME: docu
-extern inline void MapFieldSetRegId (int , int , unsigned short );
+extern inline void MapFieldSetRegId(int , int , unsigned short );
     /// FIXME: docu
-extern inline int MapFieldPassable (int , int , int );
+extern inline int MapFieldPassable(int , int , int );
 #endif
 
     /// Returns true, if the unit-type(mask can enter field with bounds check
@@ -589,16 +581,6 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #endif
 
 #ifdef UNITS_ON_MAP
-#if 0
-    /// FIXME: docu
-#define BuildingOnMapField(mf)	((mf)->Flags & MapFieldBuilding)
-    /// FIXME: docu
-#define LandUnitOnMapField(mf)	((mf)->Flags & MapFieldLandUnit)
-    /// FIXME: docu
-#define SeaUnitOnMapField(mf)	((mf)->Flags & MapFieldSeaUnit)
-    /// FIXME: docu
-#define AirUnitOnMapField(mf)	((mf)->Flags & MapFieldAirUnit)
-#endif
     /// FIXME: docu
 #define BuildingOnMapField(mf)	((mf)->Building != 0xffff)
     /// FIXME: docu
