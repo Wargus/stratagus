@@ -1,9 +1,16 @@
-/*
-**	A clone of a famous game.
-*/
+//   ___________		     _________		      _____  __
+//   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+//    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+//    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+//    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+//	  \/		    \/	   \/	     \/		   \/
+//  ______________________                           ______________________
+//			  T H E   W A R   B E G I N S
+//	   FreeCraft - A free fantasy real time strategy game engine
+//
 /**@name ai.h		-	The ai headerfile. */
 /*
-**	(c) Copyright 1998,1999 by Lutz Sammer
+**	(c) Copyright 1998-2000 by Lutz Sammer
 **
 **	$Id$
 */
@@ -12,6 +19,12 @@
 #define __AI_H__
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Includes
+----------------------------------------------------------------------------*/
+
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -25,9 +38,11 @@ extern int AiCostFactor;		/// Adjust the AI costs
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachFrame(int player);	/// Called each frame
-extern void AiEachSecond(int player);	/// Called each second
-extern void AiInit(int player);		/// Init AI for this player
+extern void AiEachFrame(Player* player);/// Called each frame
+extern void AiEachSecond(Player* player);/// Called each second
+extern void AiInit(Player* player);	/// Init AI for this player
+
+extern void AiCclRegister(void);	/// register ccl features
 
 /*--------------------------------------------------------
 --     Call Backs/Triggers
