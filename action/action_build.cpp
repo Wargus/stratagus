@@ -372,7 +372,7 @@ global void HandleActionBuilded(Unit* unit)
 	//
 	//	Building lumber mill, let worker automatic chopping wood.
 	//
-	if( type->Stores[WoodCost] ) {
+	if( type->CanStore[WoodCost] ) {
 	    CommandHarvest(worker,unit->X+unit->Type->TileWidth/2,
 		    unit->Y+unit->Type->TileHeight/2,0);
 	}
