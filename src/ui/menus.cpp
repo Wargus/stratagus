@@ -52,6 +52,7 @@
 #include "settings.h"
 #include "ui.h"
 #include "campaign.h"
+#include "sound_server.h"
 
 /*----------------------------------------------------------------------------
 --	Prototypes for local functions
@@ -1321,6 +1322,11 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     GetDefaultTextColors(&nc, &rc);
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
+
+    if( SoundFildes==-1 ) {
+	VideoDrawText(16,16,LargeFont,"Sound disabled, please check!");
+    }
+
     VideoDrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
     VideoDrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
 	"Distributed under the terms of the GNU General Public License.");
