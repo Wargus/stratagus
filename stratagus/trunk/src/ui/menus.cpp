@@ -230,7 +230,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, 16 + 12 + 106, 40, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF5} } },
+	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, GameOptions, KeyCodeF5} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
 	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
@@ -827,13 +827,15 @@ local Menuitem SpeedSettingsMenuItems[] = {
 local Menuitem GameOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
-	{ text:{ "Options", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
-    { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
-	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
-    { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
-	{ button:{ "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'} } },
+	{ text:{ "Game Options", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Preferences (~!F~!9)", 224, 27, MBUTTON_GM_FULL, Preferences, KeyCodeF9} } },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, 'o'} } },
 #else
     { 0 }
 #endif
@@ -1061,7 +1063,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	2, 4,
+	4, 5,
 	GameOptionsMenuItems,
 	NULL,
     },
@@ -1631,6 +1633,21 @@ local void SetCdMode(Menuitem *mi)
     ProcessMenu(MENU_CDROM_DISABLED, 1);
     SoundOptionsMenuItems[1].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
+}
+
+local void SpeedSettings(void)
+{
+    ProcessMenu(MENU_SPEED_SETTINGS, 1);
+}
+
+local void Preferences(void)
+{
+    ProcessMenu(MENU_PREFERENCES, 1);
+}
+
+local void GameOptions(void)
+{
+    ProcessMenu(MENU_GAME_OPTIONS, 1);
 }
 
 /**
