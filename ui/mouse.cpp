@@ -481,8 +481,8 @@ local void HandleMouseOn(int x, int y)
     //
     //	Minimap
     //
-    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + MINIMAP_W &&
-	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + MINIMAP_H) {
+    if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
+	    y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
 	CursorOn = CursorOnMinimap;
 	return;
     }
@@ -579,16 +579,16 @@ global void RestrictCursorToMinimap(void)
 {
     if (CursorX < TheUI.MinimapPosX) {
 	CursorStartX = TheUI.MinimapPosX;
-    } else if (CursorX >= TheUI.MinimapPosX + MINIMAP_W) {
-	CursorStartX = TheUI.MinimapPosX + MINIMAP_W - 1;
+    } else if (CursorX >= TheUI.MinimapPosX + TheUI.MinimapW) {
+	CursorStartX = TheUI.MinimapPosX + TheUI.MinimapW - 1;
     } else {
 	CursorStartX = CursorX;
     }
 
     if (CursorY < TheUI.MinimapPosY) {
 	CursorStartY = TheUI.MinimapPosY;
-    } else if (CursorY >= TheUI.MinimapPosY + MINIMAP_H) {
-	CursorStartY = TheUI.MinimapPosY + MINIMAP_H - 1;
+    } else if (CursorY >= TheUI.MinimapPosY + TheUI.MinimapW) {
+	CursorStartY = TheUI.MinimapPosY + TheUI.MinimapH - 1;
     } else {
 	CursorStartY = CursorY;
     }

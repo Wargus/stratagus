@@ -261,6 +261,8 @@ typedef struct _ui_ {
     GraphicConfig MinimapPanel;		/// minimap panel background
     int		MinimapPanelX;		/// minimap panel screen X position
     int		MinimapPanelY;		/// minimap panel screen Y position
+    int		MinimapW;		/// minimap screen Width
+    int		MinimapH;		/// minimap screen Height
     int		MinimapPosX;		/// minimap screen X position
     int		MinimapPosY;		/// minimap screen Y position
     int		ViewportCursorColor;	/// minimap cursor color
