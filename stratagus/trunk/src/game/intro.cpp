@@ -10,7 +10,7 @@
 //
 /**@name intro.c	-	The game intros. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002 by Lutz Sammer and Jimmy Salmon.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -64,33 +64,33 @@ typedef struct TextLines {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-global Intro	GameIntro;		/// Game intro
+global Intro GameIntro;			/// Game intro
 global Credits	GameCredits;		/// Game credits
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-local int IntroNoEvent;			/// Flag got an event.
-local int UseContinueButton;
-local int ContinueButtonX;
-local int ContinueButtonY;
-local int ContinueButtonFlags;
+local int IntroNoEvent;			/// Flag got an event
+local int UseContinueButton;		/// Handle continue button
+local int ContinueButtonX;		/// Continue button position X
+local int ContinueButtonY;		/// Continue button position Y
+local int ContinueButtonFlags;		/// Flags for continue button
 
 /**
 **	Callback for input.
 */
 local void IntroCallbackButton1(unsigned button)
 {
-    if( UseContinueButton ) {
-	if( (1<<button)==LeftButton &&
-	    ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
-	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 ) {
-	    ContinueButtonFlags|=MenuButtonClicked;
+    if (UseContinueButton) {
+	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX
+		&& CursorX <= ContinueButtonX + 106
+		&& ContinueButtonY <= CursorY
+		&& CursorY <= ContinueButtonY + 27) {
+	    ContinueButtonFlags |= MenuButtonClicked;
 	}
-    }
-    else {
-	IntroNoEvent=0;
+    } else {
+	IntroNoEvent = 0;
     }
 }
 
@@ -99,36 +99,38 @@ local void IntroCallbackButton1(unsigned button)
 */
 local void IntroCallbackButton2(unsigned button)
 {
-    if( UseContinueButton ) {
-	if( (1<<button)==LeftButton &&
-	    ContinueButtonX<=CursorX && CursorX<=ContinueButtonX+106 &&
-	    ContinueButtonY<=CursorY && CursorY<=ContinueButtonY+27 &&
-	    (ContinueButtonFlags&MenuButtonClicked) ) {
-	    IntroNoEvent=0;
+    if (UseContinueButton) {
+	if ((1 << button) == LeftButton && ContinueButtonX <= CursorX
+		&& CursorX <= ContinueButtonX + 106
+		&& ContinueButtonY <= CursorY
+		&& CursorY <= ContinueButtonY + 27
+		&& (ContinueButtonFlags & MenuButtonClicked)) {
+	    IntroNoEvent = 0;
 	}
-	ContinueButtonFlags&=~MenuButtonClicked;
+	ContinueButtonFlags &= ~MenuButtonClicked;
     }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey1(unsigned key, unsigned keychar)
+local void IntroCallbackKey1(unsigned key __attribute__((unused)),
+	unsigned keychar)
 {
-    if( UseContinueButton ) {
-	if( keychar=='c' || keychar=='\r' ) {
-	    ContinueButtonFlags|=MenuButtonClicked;
+    if (UseContinueButton) {
+	if (keychar == 'c' || keychar == '\r') {
+	    ContinueButtonFlags |= MenuButtonClicked;
 	}
-    }
-    else {
-	IntroNoEvent=0;
+    } else {
+	IntroNoEvent = 0;
     }
 }
 
 /**
 **	Callback for input.
 */
-local void IntroCallbackKey2(unsigned key, unsigned keychar)
+local void IntroCallbackKey2(unsigned key,
+	unsigned keychar __attribute((unused)))
 {
     if( UseContinueButton ) {
 	if( (key =='c' || key =='\r') &&
@@ -169,7 +171,7 @@ local void IntroCallbackExit(void)
 /**
 **	Draws a continue button at x,y
 */
-local void DrawContinueButton()
+local void DrawContinueButton(void)
 {
     DrawMenuButton(MBUTTON_GM_HALF,ContinueButtonFlags,
 	106,27,
@@ -177,6 +179,12 @@ local void DrawContinueButton()
 	LargeFont,"~!Continue");
 }
 
+/**
+**	Init continue button.
+**
+**	@param x	X screen pixel position of continue button.
+**	@param y	Y screen pixel position of continue button.
+*/
 local void InitContinueButton(int x,int y)
 {
     ContinueButtonX=x;
