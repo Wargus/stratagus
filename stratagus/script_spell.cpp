@@ -486,6 +486,10 @@ local void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			lua_rawgeti(l, -1, j + 1);
 			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
+		} else if (!strcmp(value, "opponent")) {
+			lua_rawgeti(l, -1, j + 1);
+			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1));
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "building")) {
 			lua_rawgeti(l, -1, j + 1);
 			condition->Building = Ccl2Condition(l, LuaToString(l, -1));
@@ -746,6 +750,8 @@ global void SpellCclRegister(void)
 	lua_register(Lua, "DefineSpell", CclDefineSpell);
 }
 
+#if 0 // Use old ccl config.
+
 /**
 **		Save a spell action to a file.
 **
@@ -938,5 +944,7 @@ void SaveSpellAutoCast(CLFile* file, AutoCastInfo* autocast)
 	}
 	CLprintf(file, " )\n");
 }
+
+#endif
 
 //@}
