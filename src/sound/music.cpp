@@ -254,8 +254,12 @@ local int PlayCDRom(const char* name)
 	    }
 	}
     }
+
     // CDPlayer command?
     if (!strncmp(name, ":", 1)) {
+
+	StopMusic();
+
 	if (!CDRom) {
 	    fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
 	    CDMode = ":stopped";
@@ -278,15 +282,9 @@ local int PlayCDRom(const char* name)
 	return 1;
     }
 
-//    StopMusic();			// FIXME: JOHNS: why stop music here?
-
-    // FIXME: no cdrom, must stop it now!
-
     return 0;
 }
-#endif
-
-#ifdef USE_LIBCDA
+#elif defined(USE_LIBCDA)
 /**
 **	Play music from cdrom.
 **
@@ -331,9 +329,9 @@ local int PlayCDRom(const char* name)
 	}
     }
 
-    StopMusic();
-
     if (!strncmp(name, ":", 1)) {
+
+	StopMusic();
 
 	if (cd_get_tracks(NULL, NULL) == -1)
 	    return 1;
@@ -361,13 +359,10 @@ local int PlayCDRom(const char* name)
 	}
 	return 1;
     }
-    // FIXME: no cdrom, must stop it now!
 
     return 0;
 }
-#endif
-
-#ifdef USE_CDDA
+#elif defined(USE_CDDA)
 /**
 **	Play music from cdrom.
 **
@@ -381,15 +376,11 @@ local int PlayCDRom(const char* name)
 {
     int i;
     Sample *sample;
-    struct cdrom_volctrl cdvolume;
 
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
 	    CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
 	    ioctl(CDDrive, CDROMRESET);
-
-	    ioctl(CDDrive, CDROM_DRIVE_STATUS);
-	    ioctl(CDDrive, CDROM_DISC_STATUS);
 
 	    ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
 
@@ -400,9 +391,6 @@ local int PlayCDRom(const char* name)
 	    }
 	    NumCDTracks = i + 1;
 	    
-	    ioctl(CDDrive, CDROMVOLREAD, &cdvolume);
-	    
-
 	    if (NumCDTracks == 0) {
 		CDMode = ":off";
 		return 1;
@@ -411,9 +399,9 @@ local int PlayCDRom(const char* name)
 	}
     }
 
-//    StopMusic();
-
     if (!strncmp(name, ":", 1)) {
+
+	StopMusic();
 
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
@@ -432,14 +420,14 @@ local int PlayCDRom(const char* name)
 		CDTrack = MyRand() % NumCDTracks;
 	    } while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
 	}
-	CDTrack = 3;
-	StopMusic();
+
+	CDTrack = 3; // temporary
+
 	sample = LoadCD(NULL, CDTrack);
 	MusicSample = sample;
 	PlayingMusic = 1;
 	return 1;
     }
-    // FIXME: no cdrom, must stop it now!
 
     return 0;
 

@@ -1743,11 +1743,11 @@ local void SetCdPower(Menuitem *mi __attribute__((unused)))
     }
 #elif defined(USE_CDDA)
     // Start Playing CD
-    if (!PlayingMusic) {
+    if (!strcmp(":off", CDMode) || !strcmp(":stopped", CDMode)) {
 	PlayMusic(":random");
     } else {
     // Stop Playing CD
-	PlayingMusic = 0;
+	StopMusic();
 	CDMode = ":stopped";
     }
 #endif
