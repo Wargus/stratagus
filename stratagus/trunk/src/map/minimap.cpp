@@ -388,7 +388,8 @@ global void UpdateMinimap(void)
 		(*table)->Type->NeutralMinimapColorRGB.D24.b,
 		(*table)->Type->NeutralMinimapColorRGB.D24.c);
 	} else if (unit->Player == ThisPlayer) {
-	    if (unit->Attacked && red_phase) {
+	    if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
+		    (red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
 		color = ColorRed;
 	    } else if (MinimapShowSelected && unit->Selected) {
 		color = ColorWhite;
@@ -416,10 +417,6 @@ global void UpdateMinimap(void)
 	    }
 	}
 
-	// FIXME: bad place, but must be done for all units
-	if (red_phase_changed && unit->Attacked) {
-	    unit->Attacked--;
-	}
     }
 }
 

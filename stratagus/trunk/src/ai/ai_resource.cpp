@@ -1241,10 +1241,12 @@ local void AiCheckRepair(void)
 	unit = AiPlayer->Player->Units[i];
 	repair_flag = 1;
 	// Unit damaged?
+	// Don't repair attacked unit ( wait 5 sec before repairing )
 	if (unit->Type->Building
 	    && unit->Orders[0].Action != UnitActionBuilded
 	    && unit->Orders[0].Action != UnitActionUpgradeTo
-	    && unit->HP < unit->Stats->HitPoints) {
+	    && unit->HP < unit->Stats->HitPoints
+	    && unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
 	    DebugLevel3Fn("Have building to repair %d(%s)\n" _C_
 		UnitNumber(unit) _C_ unit->Type->Ident);

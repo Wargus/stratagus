@@ -194,8 +194,7 @@
 **
 **	Unit::Attacked
 **
-**		If Attacked is non-zero, the unit is attacked. This member is
-**		counted down.
+**		Last cycle the unit was attacked. 0 means never.
 **
 **	Unit::Burning
 **
@@ -520,7 +519,7 @@ struct _unit_ {
 
     unsigned	Direction : 8;		/// angle (0-255) unit looking
 
-    unsigned	Attacked : 4;		/// unit is attacked
+    unsigned long Attacked;		/// gamecycle unit was last attacked
 
     unsigned	Burning : 1;		/// unit is burning
     unsigned	Destroyed : 1;		/// unit is destroyed pending reference
