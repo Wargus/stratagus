@@ -318,6 +318,9 @@ extern void InitMenuData(void);
     /// Post-Initialize the (ccl-loaded) menus
 extern void InitMenuFunctions(void);
 
+    /// Edit resource properties
+extern void EditorEditResource(void);
+
 //@}
 
 #endif	// !__MENUS_H__
