@@ -114,21 +114,24 @@ local void AiCleanForce(int force)
     }
 
     //
-    //	Release units to much in force.
+    //	Release units too much in force.
     //
-    prev=&AiPlayer->Force[force].Units;
-    while( (aiunit=*prev) ) {
-	if( counter[aiunit->Unit->Type->Type]>0 ) {
-	    DebugLevel0Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
-	    counter[aiunit->Unit->Type->Type]--;
-	    RefsDebugCheck( !aiunit->Unit->Refs );
-	    --aiunit->Unit->Refs;
-	    RefsDebugCheck( !aiunit->Unit->Refs );
-	    *prev=aiunit->Next;
-	    free(aiunit);
-	    continue;
+    if( !AiPlayer->Force[force].Attacking ) {
+	prev=&AiPlayer->Force[force].Units;
+	while( (aiunit=*prev) ) {
+	    if( counter[aiunit->Unit->Type->Type]>0 ) {
+		DebugLevel0Fn("Release unit %s\n"
+			_C_ aiunit->Unit->Type->Ident);
+		counter[aiunit->Unit->Type->Type]--;
+		RefsDebugCheck( !aiunit->Unit->Refs );
+		--aiunit->Unit->Refs;
+		RefsDebugCheck( !aiunit->Unit->Refs );
+		*prev=aiunit->Next;
+		free(aiunit);
+		continue;
+	    }
+	    prev=&aiunit->Next;
 	}
-	prev=&aiunit->Next;
     }
 
     DebugLevel3Fn("%d complete %d\n" _C_ force
@@ -221,10 +224,10 @@ global void AiAssignToForce(Unit* unit)
 
 	    aiunit=malloc(sizeof(*aiunit));
 	    aiunit->Next=AiPlayer->Force[force].Units;
+	    AiPlayer->Force[force].Units=aiunit;
 	    aiunit->Unit=unit;
 	    RefsDebugCheck( unit->Destroyed || !unit->Refs );
 	    ++unit->Refs;
-	    AiPlayer->Force[force].Units=aiunit;
 	    break;
 	}
     }
