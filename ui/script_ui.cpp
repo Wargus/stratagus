@@ -3819,12 +3819,12 @@ local SCM CclSetGrabMouse(SCM flag)
 #elif defined(USE_LUA)
 local int CclSetGrabMouse(lua_State* l)
 {
-    if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
+    if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
-    if (lua_isboolean(l, 1)) {
-	ToggleGrabMouse(lua_toboolean(l, 1));
+    if (lua_toboolean(l, 1)) {
+	ToggleGrabMouse(1);
     } else {
 	ToggleGrabMouse(-1);
     }
