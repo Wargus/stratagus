@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #ifndef _MSC_VER
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -2428,7 +2429,7 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 
 local void SaveAction(void)
 {
-    char filename[MAX_PATH];
+    char filename[PATH_MAX];
     char *name = SaveGameMenuItems[1].d.input.buffer;
     size_t nameLength;
 
@@ -2456,7 +2457,7 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-char path[MAX_PATH];
+char path[PATH_MAX];
 
 strcpy(path,getenv("HOME"));
 strcat(path,"/");
