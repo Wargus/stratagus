@@ -69,6 +69,11 @@ typedef struct _mng_ {
 	unsigned char* Buffer;
 	unsigned long Ticks;
 	int Iteration;
+#ifdef USE_OPENGL
+	GLfloat TextureWidth;   ///< Width of the texture
+	GLfloat TextureHeight;  ///< Height of the texture
+	GLuint TextureName;     ///< Texture name
+#endif
 } Mng;
 #endif
 

@@ -107,6 +107,10 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Uint32 Bmask;
 	mng_imgtype type;
 	Mng* mng;
+#ifdef USE_OPENGL
+	unsigned w;
+	unsigned h;
+#endif
 
 	type = mng_get_sigtype(handle);
 	if (type != mng_it_mng) {
@@ -114,7 +118,22 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	}
 
 	mng = (Mng*)mng_get_userdata(handle);
-	mng->Buffer = calloc(width * height * 3, 1);
+
+#ifdef USE_OPENGL
+	for (w = 1; w < width; w <<= 1) {
+	}
+	for (h = 1; h < height; h <<= 1) {
+	}
+	mng->TextureWidth = (float)width / w;
+	mng->TextureHeight = (float)height / h;
+	glGenTextures(1, &mng->TextureName);
+	glBindTexture(GL_TEXTURE_2D, mng->TextureName);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+#endif
 
 	// Allocate the SDL surface to hold the image
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
@@ -126,6 +145,8 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Gmask = 0x00FF0000 >> 8;
 	Bmask = 0x0000FF00 >> 8;
 #endif
+
+	mng->Buffer = calloc(width * height * 3, 1);
 
 	mng->Surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 		8 * 3, Rmask, Gmask, Bmask, 0);
@@ -145,7 +166,7 @@ static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 	return mng->Buffer + linenr * mng->Surface->w * 3;
 }
 
-static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32  x, mng_uint32 y,
+static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 y,
 	mng_uint32 width, mng_uint32 height)
 {
 	Mng* mng;
@@ -212,15 +233,47 @@ void DisplayMNG(Mng* mng, int x, int y)
 {
 #ifndef USE_OPENGL
 	SDL_Rect rect;
+#else
+	GLint sx;
+	GLint ex;
+	GLint sy;
+	GLint ey;
+#endif
 
 	if (mng->Ticks <= GetTicks()) {
 		mng_display_resume((mng_handle)mng->Handle);
+
+#ifdef USE_OPENGL
+		glBindTexture(GL_TEXTURE_2D, mng->TextureName);
+		SDL_LockSurface(mng->Surface);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->Surface->w, mng->Surface->h,
+			GL_RGB, GL_UNSIGNED_BYTE, mng->Surface->pixels);
+		SDL_UnlockSurface(mng->Surface);
+#endif
 	}
+
+#ifndef USE_OPENGL
 	rect.x = x;
 	rect.y = y;
 	rect.w = mng->Surface->w;
 	rect.h = mng->Surface->h;
 	SDL_BlitSurface(mng->Surface, NULL, TheScreen, &rect);
+#else
+	sx = x;
+	ex = sx + mng->Surface->w;
+	sy = y;
+	ey = sy + mng->Surface->h;
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex2i(sx, sy);
+	glTexCoord2f(0.0f, mng->TextureHeight);
+	glVertex2i(sx, ey);
+	glTexCoord2f(mng->TextureWidth, mng->TextureHeight);
+	glVertex2i(ex, ey);
+	glTexCoord2f(mng->TextureWidth, 0.0f);
+	glVertex2i(ex, sy);
+	glEnd();
 #endif
 }
 
@@ -285,6 +338,9 @@ void FreeMNG(Mng* mng)
 	mng_cleanup(&mh);
 	SDL_FreeSurface(mng->Surface);
 	free(mng->Buffer);
+#ifdef USE_OPENGL
+	glDeleteTextures(1, &mng->TextureName);
+#endif
 	free(mng->Name);
 	free(mng);
 }
