@@ -106,11 +106,6 @@ global int UnitShowAnimation(Unit* unit, const Animation* animation)
 		unit->Wait >>= 1;
 	}
 
-	// Anything changed the display?
-	if ((animation[state].Frame || animation[state].Pixel)) {
-		CheckUnitToBeDrawn(unit);
-	}
-
 	flags = animation[state].Flags;
 	if (flags & AnimationReset) {		// Reset can check for other actions
 		unit->Reset = 1;
@@ -278,9 +273,6 @@ local void HandleRegenerations(Unit* unit)
 		if (unit->Mana > unit->Type->_MaxMana) {
 			unit->Mana = unit->Type->_MaxMana;
 		}
-		if (unit->Selected) {
-			MustRedraw |= RedrawInfoPanel;
-		}
 	}
 
 	f = 0;
@@ -304,9 +296,6 @@ local void HandleRegenerations(Unit* unit)
 			if (unit->HP > unit->Stats->HitPoints) {
 				unit->HP = unit->Stats->HitPoints;
 			}
-			if (unit->Selected) {
-				MustRedraw |= RedrawInfoPanel;
-			}
 		}
 	}
 
@@ -322,7 +311,6 @@ local void HandleRegenerations(Unit* unit)
 local void HandleBuffs(Unit* unit, int amount)
 {
 	int deadunit;
-	int flag;
 
 	deadunit = 0;
 	//
@@ -337,13 +325,8 @@ local void HandleBuffs(Unit* unit, int amount)
 		if (unit->HP < 0) {
 			LetUnitDie(unit);
 		}
-		if (unit->Selected) {
-			MustRedraw |= RedrawInfoPanel;
-		}
 	}
 
-	// some frames delayed done my color cycling
-	flag = 1;
 	//
 	// decrease spells effects time, if end redraw unit.
 	//
@@ -353,9 +336,6 @@ local void HandleBuffs(Unit* unit, int amount)
 		unit->Bloodlust -= amount;
 		if (unit->Bloodlust < 0) {
 			unit->Bloodlust = 0 ;
-			if (!flag) {
-				flag = CheckUnitToBeDrawn(unit);
-			}
 		}
 	}
 	// Haste
@@ -363,9 +343,6 @@ local void HandleBuffs(Unit* unit, int amount)
 		unit->Haste -= amount;
 		if (unit->Haste < 0) {
 			unit->Haste = 0;
-			if (!flag) {
-				flag = CheckUnitToBeDrawn(unit);
-			}
 		}
 	}
 	// Slow
@@ -373,9 +350,6 @@ local void HandleBuffs(Unit* unit, int amount)
 		unit->Slow -= amount;
 		if (unit->Slow < 0) {
 			unit->Slow = 0;
-			if (!flag) {
-				flag = CheckUnitToBeDrawn(unit);
-			}
 		}
 	}
 	// Invisible
@@ -383,9 +357,6 @@ local void HandleBuffs(Unit* unit, int amount)
 		unit->Invisible -= amount;
 		if (unit->Invisible < 0) {
 			unit->Invisible = 0;
-			if (!flag) {
-				flag = CheckUnitToBeDrawn(unit);
-			}
 		}
 	}
 	// Unholy armor
@@ -393,9 +364,6 @@ local void HandleBuffs(Unit* unit, int amount)
 		unit->UnholyArmor -= amount;
 		if (unit->UnholyArmor < 0) {
 			unit->UnholyArmor = 0;
-			if (!flag) {
-				flag = CheckUnitToBeDrawn(unit);
-			}
 		}
 	}
 }
@@ -467,7 +435,6 @@ local void HandleUnitAction(Unit* unit)
 
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
-				MustRedraw |= RedrawInfoPanel;
 			}
 		}
 	}

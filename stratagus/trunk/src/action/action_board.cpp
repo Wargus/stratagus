@@ -169,7 +169,6 @@ local void EnterTransporter(Unit* unit)
 
 		if (IsOnlySelected(transporter)) {
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		}
 		return;
 	}

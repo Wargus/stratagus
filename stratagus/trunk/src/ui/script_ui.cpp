@@ -3662,7 +3662,6 @@ local int CclDefineButton(lua_State* l)
 global void SelectionChanged(void)
 {
 	UpdateButtonPanel();
-	MustRedraw |= RedrawInfoPanel;
 }
 
 /**

@@ -81,7 +81,6 @@ global void UnSelectAll(void)
 		unit = Selected[--NumSelected];
 		Selected[NumSelected] = NoUnitP;		// FIXME: only needed for old code
 		unit->Selected = 0;
-		CheckUnitToBeDrawn(unit);
 	}
 
 }
@@ -139,7 +138,6 @@ global void ChangeSelectedUnits(Unit** units,int count)
 			if (count > 1) {
 				unit->LastGroup = GroupId;
 			}
-			CheckUnitToBeDrawn(unit);
 		}
 	}
 	NumSelected = n;
@@ -166,7 +164,6 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 				unit = TeamSelected[player->Player][--TeamNumSelected[player->Player]];
 				unit->TeamSelected &= ~(1 << player->Player);
 				TeamSelected[player->Player][TeamNumSelected[player->Player]] = NoUnitP;		// FIXME: only needed for old code
-				CheckUnitToBeDrawn(unit);
 			}
 			// FALL THROUGH
 		case 2:
@@ -175,7 +172,6 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 					TeamSelected[player->Player][TeamNumSelected[player->Player]++] = units[i];
 					units[i]->TeamSelected |= 1 << player->Player;
 				}
-				CheckUnitToBeDrawn(units[i]);
 			}
 			DebugCheck(TeamNumSelected[player->Player] > MaxSelectable);
 			break;
@@ -232,7 +228,6 @@ global int SelectUnit(Unit* unit)
 	if (NumSelected > 1) {
 		Selected[0]->LastGroup = unit->LastGroup = GroupId;
 	}
-	CheckUnitToBeDrawn(unit);
 	return 1;
 }
 
@@ -295,7 +290,6 @@ global void UnSelectUnit(Unit* unit)
 
 	Selected[NumSelected] = NoUnitP;		// FIXME: only needed for old code
 	unit->Selected = 0;
-	CheckUnitToBeDrawn(unit);
 }
 
 /**
@@ -371,7 +365,6 @@ global int SelectUnitsByType(Unit* base)
 	Selected[0] = base;
 	base->Selected = 1;
 	NumSelected = 1;
-	CheckUnitToBeDrawn(base);
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
@@ -400,7 +393,6 @@ global int SelectUnitsByType(Unit* base)
 		}
 		Selected[NumSelected++] = unit;
 		unit->Selected = 1;
-		CheckUnitToBeDrawn(unit);
 		if (NumSelected == MaxSelectable) {
 			break;
 		}

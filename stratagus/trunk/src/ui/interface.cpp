@@ -190,7 +190,6 @@ local void UiSelectGroup(unsigned group)
 
 	SelectGroup(group);
 	SelectionChanged();
-	MustRedraw |= RedrawMap | RedrawInfoPanel;
 }
 
 /**
@@ -226,7 +225,6 @@ local void UiAddGroupToSelection(unsigned group)
 	}
 
 	SelectionChanged();
-	MustRedraw |= RedrawMap | RedrawInfoPanel;
 }
 
 /**
@@ -465,7 +463,6 @@ local void UiToggleBigMap(void)
 
 		EnableRedraw = RedrawMap | RedrawCursor | RedrawMessage | RedrawMenu |
 			RedrawTimer | RedrawAll;
-		MustRedraw = RedrawEverything;
 		SetStatusLine("Big map enabled");
 		VideoClearScreen();
 	} else {
@@ -477,7 +474,6 @@ local void UiToggleBigMap(void)
 		SetViewportMode(TheUI.ViewportMode);
 
 		EnableRedraw = RedrawEverything;
-		MustRedraw = RedrawEverything;
 		SetStatusLine("Returning to old map");
 		VideoClearScreen();
 	}
@@ -666,26 +662,6 @@ local int CommandKey(int key)
 				}
 			}
 			break;
-
-#if 0
-#ifdef DEBUG
-		case '0':
-			++ThisPlayer;
-			if (ThisPlayer == &Players[PlayerMax]) {
-				ThisPlayer = &Players[0];
-			}
-			MustRedraw = RedrawEverything;
-			break;
-
-		case '1':
-			--ThisPlayer;
-			if (ThisPlayer < &Players[0]) {
-				ThisPlayer = &Players[PlayerMax - 1];
-			}
-			MustRedraw = RedrawEverything;
-			break;
-#endif
-#endif
 
 		case 'p' & 0x1F:
 		case 'p':						// If pause-key didn't work

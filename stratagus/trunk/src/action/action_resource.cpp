@@ -423,10 +423,6 @@ local int GatherResource(Unit* unit)
 				DebugLevel3Fn("Harvested another %d resources.\n" _C_ addload);
 				unit->Value += addload;
 				source->Value -= addload;
-
-				if (IsOnlySelected(source)) {
-					MustRedraw |= RedrawInfoPanel;
-				}
 			}
 
 			//
@@ -546,11 +542,8 @@ local int StopGathering(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	CheckUnitToBeDrawn(unit);
 	if (IsOnlySelected(unit)) {
 		SelectedUnitChanged();
-		// FIXME: redundant?
-		MustRedraw |= RedrawButtonPanel;
 	}
 
 	unit->Wait = 1;
@@ -628,9 +621,6 @@ local int MoveToDepot(Unit* unit)
 	unit->Player->TotalResources[resinfo->FinalResource] +=
 		(unit->Value * unit->Player->Incomes[resinfo->FinalResource]) / 100;
 	unit->Value = 0;
-	if (unit->Player == ThisPlayer) {
-		MustRedraw |= RedrawResources;
-	}
 
 	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId];
 	if (!unit->Wait) {
@@ -697,7 +687,6 @@ local int WaitInDepot(Unit* unit)
 		}
 	}
 
-	CheckUnitToBeDrawn(unit);
 	unit->Wait = 1;
 	return unit->Orders[0].Action != UnitActionStill;
 }

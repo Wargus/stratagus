@@ -210,13 +210,6 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	}
 
 	//
-	// Any graphic change?
-	//
-	if (!state || anim[state].Pixel || anim[state].Frame) {
-		CheckUnitToBeDrawn(unit);
-	}
-
-	//
 	// Handle the flags.
 	//
 	if (anim[state].Flags & AnimationReset) {

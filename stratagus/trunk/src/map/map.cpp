@@ -79,8 +79,6 @@ global void MapMarkSeenTile(int x, int y)
 	//  Nothing changed? Seeing already the correct tile.
 	//
 	if ((tile = mf->Tile) == (seentile = mf->SeenTile)) {
-		// FIXME: Check bounds
-		MarkDrawAreaMap(x - 1, y - 1, x + 1, y + 1);
 		return;
 	}
 	mf->SeenTile = tile;
@@ -210,7 +208,6 @@ global void ViewportSetViewpoint(Viewport* vp, int x, int y, int offsetx, int of
 	vp->MapWidth = ((vp->EndX - vp->X) + vp->OffsetX - 1) / TileSizeX + 1;
 	vp->MapHeight = ((vp->EndY - vp->Y) + vp->OffsetY - 1) / TileSizeY + 1;
 
-	MarkDrawEntireMap();
 	MustRedraw |= RedrawMinimap | RedrawMinimapCursor;
 }
 

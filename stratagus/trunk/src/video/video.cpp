@@ -460,8 +460,6 @@ global void ColorCycle(void)
 		SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
 			colors, 0, 256);
 	}
-
-	MustRedraw |= RedrawColorCycle;
 }
 
 /*----------------------------------------------------------------------------

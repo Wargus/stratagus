@@ -924,8 +924,6 @@ global void EditorUpdateDisplay(void)
 {
 	int i;
 
-	HideAnyCursor(); // remove cursor (when available)
-
 	DrawMapArea(); // draw the map area
 
 	if (CursorOn == CursorOnMap) {
@@ -1017,7 +1015,7 @@ global void EditorUpdateDisplay(void)
 	// FIXME: For now update everything each frame
 
 	// refresh entire screen, so no further invalidate needed
-	InvalidateAreaAndCheckCursor(0, 0, VideoWidth, VideoHeight);
+	Invalidate();
 	RealizeVideoMemory();
 }
 
@@ -1257,7 +1255,6 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		if ((MouseButtons & LeftButton) && TheUI.SelectedViewport != vp) {
 			// viewport changed
 			TheUI.SelectedViewport = vp;
-			MustRedraw = RedrawMinimapCursor | RedrawMap;
 		}
 
 		if (MouseButtons & LeftButton) {
@@ -1291,7 +1288,6 @@ local void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			CursorStartY = CursorY;
 			GameCursor = TheUI.Scroll.Cursor;
 			DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
-			MustRedraw |= RedrawCursor;
 		}
 	}
 }
@@ -1771,7 +1767,6 @@ local void EditorCallbackMouse(int x, int y)
 			ButtonAreaUnderCursor = ButtonAreaMenu;
 			ButtonUnderCursor = ButtonUnderMenu;
 			CursorOn = CursorOnButton;
-			MustRedraw |= RedrawMenuButton;
 			return;
 		}
 	}
@@ -1799,7 +1794,6 @@ local void EditorCallbackMouse(int x, int y)
 			TheUI.MouseViewport = vp;
 			DebugLevel0Fn("active viewport changed to %d.\n" _C_
 				TheUI.Viewports - vp);
-			MustRedraw = RedrawMinimapCursor | RedrawMap;
 		}
 		CursorOn = CursorOnMap;
 
@@ -1975,7 +1969,6 @@ local void CreateEditor(void)
 	UpdateMinimap();
 
 	if (1) {
-		DestroyCursorBackground();
 		ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
 	}
@@ -2009,11 +2002,9 @@ global int EditorSavePud(const char* file)
 	}
 	if (SavePud(file, &TheMap) == -1) {
 		ErrorMenu("Cannot save map");
-		MustRedraw = RedrawEverything;
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();
 		InterfaceState = IfaceStateMenu;
-		MustRedraw = RedrawMenu;
 		return -1;
 	}
 	for (i = 0; i < NumUnits; ++i) {
@@ -2071,14 +2062,9 @@ global void EditorMainLoop(void)
 		while (EditorRunning) {
 			PlayListAdvance();
 
-			if (MustRedraw & RedrawMinimap) {
-				UpdateMinimap();
-			}
+			UpdateMinimap();
 
-			if (MustRedraw) {
-				EditorUpdateDisplay();
-				MustRedraw = 0;
-			}
+			EditorUpdateDisplay();
 
 			//
 			// Map scrolling

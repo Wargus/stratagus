@@ -360,9 +360,6 @@ extern void EndMenu(void);
 	/// Find a menu by id
 extern Menu *FindMenu(const char *MenuId);
 
-	/// Invalidate previously redrawn menu areas
-extern void InvalidateMenuAreas(void);
-
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
 	/// State info received from server, Update the client menu.

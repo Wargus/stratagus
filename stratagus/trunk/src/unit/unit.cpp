@@ -395,9 +395,6 @@ global void AssignUnitToPlayer(Unit* unit, Player* player)
 
 	if (type->Demand) {
 		player->Demand += type->Demand;		// food needed
-		if (player == ThisPlayer) {
-			MustRedraw |= RedrawResources;		// update food
-		}
 	}
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
@@ -516,7 +513,6 @@ global void PlaceUnit(Unit* unit, int x, int y)
 	UnitCacheInsert(unit);
 
 	MustRedraw |= RedrawMinimap;
-	CheckUnitToBeDrawn(unit);
 	UnitCountSeen(unit);
 }
 
@@ -633,7 +629,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 		if (NumSelected == 1) {				//  Remove building cursor
 			CancelBuildingMode();
 		}
-		MustRedraw |= RedrawPanels;
 		UnSelectUnit(unit);
 		SelectionChanged();
 	}
@@ -680,7 +675,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 	}
 
 	MustRedraw |= RedrawMinimap;
-	CheckUnitToBeDrawn(unit);
 }
 
 /**
@@ -745,10 +739,6 @@ global void UnitLost(Unit* unit)
 	//
 	if (type->Demand) {
 		player->Demand -= type->Demand;
-		if (player == ThisPlayer) {
-			MustRedraw |= RedrawResources;  // update food
-			// FIXME: MustRedraw |= RedrawFood;
-		}
 	}
 
 	//
@@ -757,10 +747,6 @@ global void UnitLost(Unit* unit)
 	if (unit->Orders[0].Action != UnitActionBuilded) {
 		if (type->Supply) {
 			player->Supply -= type->Supply;
-			if (player == ThisPlayer) {
-				MustRedraw |= RedrawResources;
-				// FIXME: MustRedraw |= RedrawFood;
-			}
 		}
 
 		//
@@ -780,9 +766,6 @@ global void UnitLost(Unit* unit)
 					}
 				}
 				player->Incomes[i] = m;
-				if (player == ThisPlayer) {
-					MustRedraw |= RedrawInfoPanel;
-				}
 			}
 		}
 	}
@@ -858,9 +841,6 @@ global void UpdateForNewUnit(const Unit* unit, int upgrade)
 	//
 	if (type->Supply && !upgrade) {
 		player->Supply += type->Supply;
-		if (player == ThisPlayer) {
-			MustRedraw |= RedrawResources;		// update food
-		}
 	}
 
 	//
@@ -869,9 +849,6 @@ global void UpdateForNewUnit(const Unit* unit, int upgrade)
 	for (u = 1; u < MaxCosts; ++u) {
 		if (player->Incomes[u] < unit->Type->ImproveIncomes[u]) {
 			player->Incomes[u] = unit->Type->ImproveIncomes[u];
-			if (player == ThisPlayer) {
-				MustRedraw |= RedrawInfoPanel;
-			}
 		}
 	}
 }
@@ -1365,21 +1342,6 @@ global void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 }
 
 /**
-**	  Check and sets if unit must be drawn on screen-map
-**
-**	  @param unit	 Unit to be checked.
-**	  @return		 True if map marked to be drawn, false otherwise.
-*/
-global int CheckUnitToBeDrawn(Unit* unit)
-{
-	if (UnitVisibleOnScreen(unit)) {
-		MustRedraw |= RedrawMap;
-		return 1;
-	}
-	return 0;
-}
-
-/**
 **		Change the unit's owner
 **
 **		@param unit				Unit which should be consigned.
@@ -1448,9 +1410,6 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	}
 	newplayer->Demand += unit->Type->Demand;
 	newplayer->Supply += unit->Type->Supply;
-	if (newplayer == ThisPlayer) {
-		MustRedraw |= RedrawResources;// update food
-	}
 	if (unit->Type->Building) {
 		newplayer->NumBuildings++;
 	}

@@ -165,7 +165,6 @@ global void MapFixSeenWallTile(int x, int y)
 		// FIXME: can this only happen if seen?
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UpdateMinimapSeenXY(x, y);
-			MarkDrawPosMap(x, y);
 			MustRedraw |= RedrawMinimap;
 		}
 	}
@@ -266,7 +265,6 @@ global void MapFixWallTile(int x, int y)
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
 			UpdateMinimapSeenXY(x, y);
 			MapMarkSeenTile(x, y);
-			MarkDrawPosMap(x, y);
 			MustRedraw |= RedrawMinimap;
 		}
 	}
@@ -307,7 +305,6 @@ global void MapRemoveWall(unsigned x, unsigned y)
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
 		MapMarkSeenTile(x, y);
-		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
 #ifdef MAP_REGIONS
@@ -350,7 +347,6 @@ global void MapSetWall(unsigned x, unsigned y, int humanwall)
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
 		UpdateMinimapSeenXY(x, y);
 		MapMarkSeenTile(x, y);
-		MarkDrawPosMap(x, y);
 		MustRedraw |= RedrawMinimap;
 	}
 #ifdef MAP_REGIONS

@@ -497,7 +497,6 @@ local void UpdateButtonPanelMultipleUnits(void)
 	}
 
 	CurrentButtons = _current_buttons;
-	MustRedraw |= RedrawButtonPanel;
 }
 
 /**
@@ -517,8 +516,6 @@ global void UpdateButtonPanel(void)
 	CurrentButtons = NULL;
 
 	if (!NumSelected) {				// no unit selected
-		// FIXME: need only redraw if same state
-		MustRedraw |= RedrawButtonPanel;
 		return;
 	}
 
@@ -675,7 +672,6 @@ global void UpdateButtonPanel(void)
 	}
 
 	CurrentButtons = _current_buttons;
-	MustRedraw |= RedrawButtonPanel;
 }
 
 /**
@@ -763,7 +759,6 @@ global void DoButtonButtonClicked(int button)
 				CursorValue = CurrentButtons[button].Value;
 				CurrentButtonLevel = 9;		// level 9 is cancel-only
 				UpdateButtonPanel();
-				MustRedraw |= RedrawCursor;
 				SetStatusLine("Select Target");
 			}
 			break;
@@ -805,7 +800,6 @@ global void DoButtonButtonClicked(int button)
 			GameCursor = TheUI.Point.Cursor;
 			CursorBuilding = NULL;
 			CursorState = CursorStatePoint;
-			MustRedraw |= RedrawCursor;
 			break;
 
 		case ButtonCancelTrain:
@@ -835,7 +829,6 @@ global void DoButtonButtonClicked(int button)
 				// FIXME: check is this =9 necessary?
 				CurrentButtonLevel = 9;		// level 9 is cancel-only
 				UpdateButtonPanel();
-				MustRedraw |= RedrawCursor;
 			}
 			break;
 

@@ -107,14 +107,9 @@ global void HandleActionUpgradeTo(Unit* unit)
 		if (IsOnlySelected(unit) || player == ThisPlayer) {
 			// could affect the buttons of any selected unit
 			SelectedUnitChanged();
-			MustRedraw |= RedrawInfoPanel;
 		}
 
 		return;
-	}
-
-	if (IsOnlySelected(unit)) {
-		MustRedraw |= RedrawInfoPanel;
 	}
 
 	unit->Reset = 1;

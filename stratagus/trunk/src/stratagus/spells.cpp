@@ -457,7 +457,6 @@ global int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 	if (action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
 		target->UnholyArmor = action->Data.AdjustBuffs.InvincibilityTicks;
 	}
-	CheckUnitToBeDrawn(target);
 	return 0;
 }
 
@@ -696,7 +695,6 @@ global int CastSummon(Unit* caster, const SpellType* spell,
 			//		This is a hack to walk around behaviour of DropOutOnSide
 			target->X++;
 			DropOutOnSide(target, LookingW, 0, 0);
-			CheckUnitToBeDrawn(target);
 		}
 		caster->Mana -= spell->ManaCost;
 		return 1;
