@@ -1,5 +1,9 @@
 #ifndef ETLIB_DLLIST_H
 #define ETLIB_DLLIST_H
+/**
+**	@author	Copyright by Edgar Toernig.
+**	@name	dllist.h		-	Double linked lists.
+*/
 
 struct dl_node
 {
@@ -40,6 +44,13 @@ dl_insert_after(struct dl_node *p, struct dl_node *n)
     n->next->prev = n;
     return n;
 }
+
+	/* A constructor for static list heads. */
+#define DL_LIST(id)	struct dl_head id[1] = {{		\
+			    (struct dl_node *)&id->null,	\
+			    0,					\
+			    (struct dl_node *)&id->first	\
+			}}
 
 #define dl_empty(h)             ((h)->first->next == 0)
 #define dl_insert_before(p, n)  dl_insert_after((p)->prev, (n))
