@@ -541,6 +541,9 @@ local unsigned char *mgptsoptions[] = {
     "Closed",
 };
 
+/**
+**	Single player custom game menu.
+*/
 local Menuitem CustomGameMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, GameSetupInit, NULL,
@@ -637,7 +640,8 @@ local Menuitem NetCreateJoinMenuItems[] = {
 local Menuitem NetMultiButtonStorage[] = {
 #ifdef __GNUC__
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, MultiGamePTSAction, 3, 0, 0, 0, 0} } },
+	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN,
+	    MultiGamePTSAction, 3, 0, 0, 0, 0} } },
     { MI_TYPE_DRAWFUNC, 40, 32, 0, GameFont, NULL, NULL,
 	{ drawfunc:{ NetMultiPlayerDrawFunc } } },
 #else
@@ -645,6 +649,9 @@ local Menuitem NetMultiButtonStorage[] = {
 #endif
 };
 
+/**
+**	Multi player custom game menu (server side).
+*/
 local Menuitem NetMultiSetupMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameSetupInit, NULL,
@@ -658,45 +665,83 @@ local Menuitem NetMultiSetupMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiGameCancel, 'c'} } },
 
-    { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
-    { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    // 8+7 player slots (content here is overwritten!)
+#define SERVER_PLAYER_STATE	5
+    { MI_TYPE_PULLDOWN, 40, 32+22*0, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 40, 32+22*1, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*0, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*1, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL,
+	{ pulldown:
+	{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
 
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction, 3, 2, 2, 0, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, GameRCSAction,
+	3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, 0} } },
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction,
+	4, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, 0} } },
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction,
+	2, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Fog of War:~>", 0} } },
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, 0} } },
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN,
+	MultiGameFWSAction, 2, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, 0} } },
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction,
+	5, 0, 0, 0, 0} } },
 
-    { MI_TYPE_GEM, 10, 32+22, 0, LargeFont, NULL, NULL,
+    // 7+7 player ready buttons
+#define SERVER_PLAYER_READY	30
+    { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
@@ -710,12 +755,67 @@ local Menuitem NetMultiSetupMenuItems[] = {
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
 	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+    // FIXME: Slot 15 is reserved for neutral computer
+    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
+    //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_SQUARE, NULL} } },
+
+    // 7+7 player lag buttons
+#define SERVER_PLAYER_LAG	44
+    { MI_TYPE_GEM, 218, 32+22*1, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 218, 32+22*7, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+
+    { MI_TYPE_GEM, 538, 32+22*0, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*1, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    { MI_TYPE_GEM, 538, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
+    // FIXME: Slot 15 is reserved for neutral computer
+    //{ MI_TYPE_GEM, 538, 32+22*7, 0, LargeFont, NULL, NULL,
+    //	{ gem:{ MI_GSTATE_PASSIVE, 18, 18, MBUTTON_GEM_ROUND, NULL} } },
 #else
     { 0 }
 #endif
 };
 
-
+/**
+**	Multi player client game menu.
+*/
 local Menuitem NetMultiClientMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_DRAWFUNC, 0, 0, 0, GameFont, MultiGameClientInit, NULL,
@@ -732,44 +832,87 @@ local Menuitem NetMultiClientMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiClientCancel, 'c'} } },
 
+    // 8+7 player slots
+#define CLIENT_PLAYER_STATE	5
     { MI_TYPE_PULLDOWN, 40, 32, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*2, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*3, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*4, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*5, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*6, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
     { MI_TYPE_PULLDOWN, 40, 32+22*7, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*2, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*3, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*4, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*5, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
+    { MI_TYPE_PULLDOWN, 360, 32+22*6, 0, GameFont, NULL, NULL,
+	{ pulldown:{
+	mgptsoptions, 172, 20, MBUTTON_PULLDOWN, NULL, 3, 0, 0, 0, 0} } },
 
     { MI_TYPE_TEXT, 40, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Your Race:~>", 0} } },
+#define CLIENT_RACE	21
     { MI_TYPE_PULLDOWN, 40, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN, MultiClientRCSAction, 3, 2, 2, 0, 0} } },
+	{ pulldown:{ rcsoptions, 152, 20, MBUTTON_PULLDOWN,
+	    MultiClientRCSAction, 3, 2, 2, 0, 0} } },
     { MI_TYPE_TEXT, 220, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Resources:~>", 0} } },
+#define CLIENT_RESOURCE	23
     { MI_TYPE_PULLDOWN, 220, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN, GameRESAction, 4, 0, 0, 0, MI_PSTATE_PASSIVE} } },
+	{ pulldown:{ resoptions, 152, 20, MBUTTON_PULLDOWN,
+	    GameRESAction, 4, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 640-224-16, 10+240-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Units:~>", 0} } },
+#define CLIENT_UNITS	25
     { MI_TYPE_PULLDOWN, 640-224-16, 10+240, 0, GameFont, NULL, NULL,
-	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN, GameUNSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
+	{ pulldown:{ unsoptions, 190, 20, MBUTTON_PULLDOWN,
+	    GameUNSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 40, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Fog of War:~>", 0} } },
+#define CLIENT_FOG_OF_WAR	27
     { MI_TYPE_PULLDOWN, 40, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN, MultiGameFWSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
+	{ pulldown:{ mgfwsoptions, 152, 20, MBUTTON_PULLDOWN,
+	    MultiGameFWSAction, 2, 0, 0, 0, MI_PSTATE_PASSIVE} } },
     { MI_TYPE_TEXT, 220, 10+300-20, 0, GameFont, NULL, NULL,
 	{ text:{ "~<Map Tileset:~>", 0} } },
+#define CLIENT_TILESET	29
     { MI_TYPE_PULLDOWN, 220, 10+300, 0, GameFont, NULL, NULL,
-	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN, GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
+	{ pulldown:{ tssoptions, 152, 20, MBUTTON_PULLDOWN,
+	    GameTSSAction, 5, 0, 0, 0, MI_PSTATE_PASSIVE} } },
 
+    // 7+7 player state buttons
+#define CLIENT_PLAYER_READY	30
     { MI_TYPE_GEM, 10, 32+22*1, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*2, 0, LargeFont, NULL, NULL,
@@ -784,6 +927,22 @@ local Menuitem NetMultiClientMenuItems[] = {
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
     { MI_TYPE_GEM, 10, 32+22*7, 0, LargeFont, NULL, NULL,
 	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*0, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*1, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*2, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*3, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*4, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*5, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    { MI_TYPE_GEM, 330, 32+22*6, 0, LargeFont, NULL, NULL,
+	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
+    //{ MI_TYPE_GEM, 330, 32+22*7, 0, LargeFont, NULL, NULL,
+    //	{ gem:{ 0, 18, 18, MBUTTON_GEM_SQUARE, MultiClientGemAction} } },
 #else
     { 0 }
 #endif
@@ -1168,7 +1327,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	3, 30,
+	3, 58,
 	NetMultiSetupMenuItems,
 	NULL,
     },
@@ -1188,7 +1347,7 @@ global Menu Menus[] = {
 	0,
 	640, 480,
 	ImageNone,
-	4, 30,
+	4, 44,
 	NetMultiClientMenuItems,		// FIXME: unfinished
 	TerminateNetConnect,
     },
@@ -2962,7 +3121,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
 		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
-		    for (n = j = 0; j < 16; j++) {
+		    for (n = j = 0; j < PlayerMax; j++) {
 			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
@@ -3560,7 +3719,7 @@ local void GameDrawFunc(Menuitem *mi)
 	VideoDrawText(OffsetX + 16+l+8+VideoTextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
     }
 #if 0
-    for (n = j = 0; j < 16; j++) {
+    for (n = j = 0; j < PlayerMax; j++) {
 	if (info->PlayerType[j] == PlayerPerson) {
 	    n++;
 	}
@@ -3575,6 +3734,11 @@ local void GameDrawFunc(Menuitem *mi)
     SetDefaultTextColors(nc, rc);
 }
 
+/**
+**	Menu setup race pulldown action.
+**
+**	@note FIXME: Todo support more and other races.
+*/
 local void GameRCSAction(Menuitem *mi, int i)
 {
     int v[] = { PlayerRaceHuman, PlayerRaceOrc, SettingsPresetMapDefault };
@@ -3624,6 +3788,11 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
     GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
 
+/**
+**	Menu setup fog-of-war pulldown action.
+**
+**	@note FIXME: Want to support more features. fe. reveal map on start.
+*/
 local void MultiGameFWSAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
@@ -3633,12 +3802,18 @@ local void MultiGameFWSAction(Menuitem *mi, int i)
     }
 }
 
+/**
+**	Multiplayer menu player server states.
+*/
 local void MultiGamePTSAction(Menuitem *mi, int o)
 {
     int i;
 
-    i = mi - NetMultiSetupMenuItems - 5;
-    if (i > 0 && i < 8) {
+    i = mi - NetMultiSetupMenuItems - SERVER_PLAYER_STATE;
+    // JOHNS: didn't must this be always true?
+    DebugCheck( i<0 || i>PlayerMax-1 );
+
+    if (i > 0 && i < PlayerMax-1) {
 	if (mi->d.pulldown.curopt == o) {
 	    ServerSetupState.CompOpt[i] = o;
 	    NetworkServerResyncClients();
@@ -3657,16 +3832,20 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
     GameDrawFunc(mi);
 }
 
+/**
+**	Player selectors have changed.
+*/
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
     int i, h, c;
 
-    /* FIXME: What this has to do:
-	analyze pudinfo for available slots, disable additional buttons - partially done
-	put names of net-connected players in slots
-	announce changes by the game creator to connected clients
-    */
-    for (c = h = i = 0; i < 16; i++) {
+    //	FIXME: What this has to do:
+    //	analyze pudinfo for available slots,
+    //	disable additional buttons - partially done
+    //	put names of net-connected players in slots
+    //	announce changes by the game creator to connected clients
+
+    for (c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available person player slots
 	}
@@ -3675,59 +3854,81 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	}
     }
 
-    /// Tell connect state machines how many person player we can have
+    //	Tell connect state machines how many person player we can have
     NetPlayers = h;
 
     if (initial) {
-	NetMultiSetupMenuItems[5] = NetMultiButtonStorage[1];
-	NetMultiSetupMenuItems[5].yofs = 32;
+	NetMultiSetupMenuItems[SERVER_PLAYER_STATE] = NetMultiButtonStorage[1];
+	NetMultiSetupMenuItems[SERVER_PLAYER_STATE].yofs = 32;
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
     }
-    for (i = 1; i < 8; i++) {
+
+    // Setup the player menu
+    for (i = 1; i < PlayerMax-1; i++) {
 	if (initial) {
-	    NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
+		NetMultiButtonStorage[0];
 	} else {
-	    if (Hosts[i].PlyNr) {
-		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[1];
+	    if (Hosts[i].PlyNr) {	// Our own server slot
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
+			NetMultiButtonStorage[1];
 	    } else {
-		NetMultiSetupMenuItems[5 + i] = NetMultiButtonStorage[0];
-		NetMultiSetupMenuItems[5 + i].d.pulldown.state = 0;
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i] =
+			NetMultiButtonStorage[0];
+		NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i]
+			.d.pulldown.state = 0;
 	    }
 	}
-	NetMultiSetupMenuItems[5 + i].yofs = 32 + i * 22;
+	NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].yofs = 32 + (i&7) * 22;
+	if( i>7 ) {
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].xofs = 320 + 40;
+	}
 
-	/* FIXME: don't forget to throw out additional players without available slots here! */
+	// FIXME: don't forget to throw out additional players
+	//	without available slots here!
 
 	if (initial) {
-	    NetMultiSetupMenuItems[22 + i].flags = 0;
-	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state =
+		MI_GSTATE_PASSIVE;
 	}
 	if (i >= h) {
 	    if (initial) {
 		ServerSetupState.CompOpt[i] = 1;
 	    }
-	    NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
-	    NetMultiSetupMenuItems[5 + i].d.pulldown.state = MI_PSTATE_PASSIVE;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt = 
+		ServerSetupState.CompOpt[i];
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.state = 
+		MI_PSTATE_PASSIVE;
 
-	    NetMultiSetupMenuItems[22 + i].flags = MenuButtonDisabled;
-	    NetMultiSetupMenuItems[22 + i].d.gem.state |= MI_GSTATE_INVISIBLE;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 
+		MenuButtonDisabled;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state |= 
+		MI_GSTATE_INVISIBLE;
 	}
 	if (i >= h + c) {
-	    NetMultiSetupMenuItems[5 + i].d.pulldown.defopt =
-		NetMultiSetupMenuItems[5 + i].d.pulldown.curopt = 2;
-	    NetMultiSetupMenuItems[5 + i].flags = MenuButtonDisabled;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.defopt =
+		2;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.curopt =
+		2;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags =
+		MenuButtonDisabled;
 	}
     }
 }
 
+/**
+**	Update client network menu.
+*/
 local void MultiClientUpdate(int initial)
 {
     int i, h, c;
 
-    /* FIXME: What this has to do:
-	analyze pudinfo for available slots, disable additional buttons - partially done
-    */
-    for (c = h = i = 0; i < 16; i++) {
+    //	FIXME: What this has to do:
+    //	analyze pudinfo for available slots,
+    //	disable additional buttons - partially done
+
+    for (c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available person player slots
 	}
@@ -3737,43 +3938,60 @@ local void MultiClientUpdate(int initial)
     }
 
     if (initial) {
-	NetMultiClientMenuItems[5] = NetMultiButtonStorage[1];
-	NetMultiClientMenuItems[5].yofs = 32;
+	NetMultiClientMenuItems[CLIENT_PLAYER_STATE] = NetMultiButtonStorage[1];
+	NetMultiClientMenuItems[CLIENT_PLAYER_STATE].yofs = 32;
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
 	memset(&LocalSetupState, 0, sizeof(ServerSetup));
     }
-    for (i = 1; i < 8; i++) {
+    for (i = 1; i < PlayerMax - 1; i++) {
 	if (Hosts[i].PlyNr) {
-	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[1];
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i] =
+		NetMultiButtonStorage[1];
 	    if (i == NetLocalHostsSlot) {
-		NetMultiClientMenuItems[22 + i].d.gem.state = 0;
+		NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i]
+			.d.gem.state = 0;
 	    } else {
-		NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+		NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i]
+			.d.gem.state = MI_GSTATE_PASSIVE;
 	    }
 	} else {
-	    NetMultiClientMenuItems[5 + i] = NetMultiButtonStorage[0];
-	    NetMultiClientMenuItems[5 + i].d.pulldown.state = MI_PSTATE_PASSIVE;
-	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
-	    NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i] =
+		NetMultiButtonStorage[0];
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].d.pulldown.state =
+		MI_PSTATE_PASSIVE;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].d.pulldown.curopt =
+		ServerSetupState.CompOpt[i];
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
+		MI_GSTATE_INVISIBLE;
 	}
-	NetMultiClientMenuItems[5 + i].yofs = 32 + i * 22;
+	NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].yofs = 32 + (i&7) * 22;
+	if( i>7 ) {
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].xofs = 320 + 40;
+	}
 
-	NetMultiClientMenuItems[22 + i].flags = 0;
+	NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].flags = 0;
 	if (ServerSetupState.Ready[i]) {
-	    NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_CHECKED;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].d.gem.state |=
+		MI_GSTATE_CHECKED;
 	} else {
-	    NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_CHECKED;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].d.gem.state &=
+		~MI_GSTATE_CHECKED;
 	}
 
 	if (i >= h) {
-	    NetMultiClientMenuItems[5 + i].d.pulldown.curopt = ServerSetupState.CompOpt[i];
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i]
+		    .d.pulldown.curopt = ServerSetupState.CompOpt[i];
 	}
 	if (i >= h + c) {
-	    NetMultiClientMenuItems[22 + i].flags = MenuButtonDisabled;
-	    NetMultiClientMenuItems[22 + i].d.gem.state = MI_GSTATE_INVISIBLE;
-	    NetMultiClientMenuItems[5 + i].d.pulldown.defopt =
-			NetMultiClientMenuItems[5 + i].d.pulldown.curopt = 2;
-	    NetMultiClientMenuItems[5 + i].flags = MenuButtonDisabled;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].flags =
+		MenuButtonDisabled;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].d.gem.state =
+		MI_GSTATE_INVISIBLE;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].d.pulldown.defopt =
+		NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i]
+		    .d.pulldown.curopt = 2;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_STATE + i].flags =
+		MenuButtonDisabled;
 	}
     }
 }
@@ -3797,29 +4015,39 @@ local void MultiGameCancel(void)
     GameCancel();
 }
 
+/**
+**	Draw the multi player setup menu.
+*/
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
     int i, nc, rc;
 
-    i = mi - NetMultiSetupMenuItems - 5;
-    if (i >= 0 && i < 8) {
+    i = mi - NetMultiSetupMenuItems - SERVER_PLAYER_STATE;
+    if (i >= 0 && i < PlayerMax - 1) {		// Ugly test to detect server
 	if (i > 0) {
-	    NetMultiSetupMenuItems[22 + i].flags &= ~MenuButtonDisabled;
-	    // Note: re-disabled in MultiGamePlayerSelectorsUpdate() for kicked out clients!!
+	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags &=
+		~MenuButtonDisabled;
+	    // Note: re-disabled in MultiGamePlayerSelectorsUpdate()
+	    //		for kicked out clients!!
 	    if (ServerSetupState.Ready[i]) {
-		NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
+		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i]
+			.d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
 	    } else {
-		NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
+		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i]
+			.d.gem.state = MI_GSTATE_PASSIVE;
 	    }
 	}
     } else {
-	i = mi - NetMultiClientMenuItems - 5;
+	i = mi - NetMultiClientMenuItems - CLIENT_PLAYER_STATE;
 	if (i > 0) {
-	    NetMultiClientMenuItems[22 + i].flags &= ~MenuButtonDisabled;
+	    NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].flags &=
+		~MenuButtonDisabled;
 	    if (i == NetLocalHostsSlot) {
-		NetMultiClientMenuItems[22 + i].d.gem.state &= ~MI_GSTATE_PASSIVE;
+		NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].
+			d.gem.state &= ~MI_GSTATE_PASSIVE;
 	    } else {
-		NetMultiClientMenuItems[22 + i].d.gem.state |= MI_GSTATE_PASSIVE;
+		NetMultiClientMenuItems[CLIENT_PLAYER_READY - 1 + i].
+			d.gem.state |= MI_GSTATE_PASSIVE;
 	    }
 	}
     }
@@ -3858,7 +4086,7 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
 {
     int i;
 
-    i = mi - NetMultiClientMenuItems - 22;
+    i = mi - NetMultiClientMenuItems - CLIENT_PLAYER_READY + 1;
     DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n", i, NetLocalHostsSlot);
     if (i == NetLocalHostsSlot) {
 	LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
@@ -3950,6 +4178,9 @@ global void NetConnectForceDisplayUpdate(void)
     MustRedraw |= RedrawMenu;
 }
 
+/**
+**	Update client menu of server menu.
+*/
 global void NetClientUpdateState(void)
 {
 #if 0
@@ -3958,16 +4189,20 @@ global void NetClientUpdateState(void)
 #endif
 
     GameRESAction(NULL, ServerSetupState.ResOpt);
-    NetMultiClientMenuItems[16].d.pulldown.curopt = ServerSetupState.ResOpt;
+    NetMultiClientMenuItems[CLIENT_RESOURCE].d.pulldown.curopt =
+	ServerSetupState.ResOpt;
 
     GameUNSAction(NULL, ServerSetupState.UnsOpt);
-    NetMultiClientMenuItems[18].d.pulldown.curopt = ServerSetupState.UnsOpt;
+    NetMultiClientMenuItems[CLIENT_UNITS].d.pulldown.curopt =
+	ServerSetupState.UnsOpt;
 
     MultiGameFWSAction(NULL, ServerSetupState.FwsOpt);
-    NetMultiClientMenuItems[20].d.pulldown.curopt = ServerSetupState.FwsOpt;
+    NetMultiClientMenuItems[CLIENT_FOG_OF_WAR].d.pulldown.curopt =
+	ServerSetupState.FwsOpt;
 
     GameTSSAction(NULL, ServerSetupState.TssOpt);
-    NetMultiClientMenuItems[22].d.pulldown.curopt = ServerSetupState.TssOpt;
+    NetMultiClientMenuItems[CLIENT_TILESET].d.pulldown.curopt =
+	ServerSetupState.TssOpt;
 
     MultiClientUpdate(0);
     DebugLevel1Fn("MultiClientMenuRedraw\n");
