@@ -155,7 +155,7 @@ configure:
 
 configuregl:
 	autoconf
-	./configure --enable-opengl
+	./configure --enable-static --enable-opengl
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
