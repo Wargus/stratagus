@@ -2229,10 +2229,12 @@ global void DrawUnit(const Unit* unit)
 	if (unit->Value) {
 	    if (resinfo->SpriteWhenLoaded) {
 		sprite = resinfo->SpriteWhenLoaded;
+		GraphicUnitPixels(unit, sprite);
 	    }
 	} else {
 	    if (resinfo->SpriteWhenEmpty) {
 		sprite = resinfo->SpriteWhenEmpty;
+		GraphicUnitPixels(unit, sprite);
 	    }
 	}
     }
