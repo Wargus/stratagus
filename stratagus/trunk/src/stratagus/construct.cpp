@@ -40,12 +40,12 @@
 **	Constructions.
 */
 local Construction Constructions[] = {
-{ "construction-0",
-  { "",
-  DEFAULT,
+{ "construction-0",			// added for bad puds they have 0
+  { "land construction site (summer,wasteland).png",
+  "land construction site (winter).png",
   DEFAULT,
   DEFAULT },
-	0,0 },
+	64,64 },
 { "construction-1",
   { "",
   DEFAULT,
