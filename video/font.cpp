@@ -97,6 +97,22 @@ local int FontBitmapWidths[MaxFonts];
 local int CurrentFont;
 #endif
 
+/**
+**	FIXME: should use the names of the real fonts.
+*/
+global char *FontNames[] = {
+    "small",
+    "game",
+    "large",
+    "small-title",
+    "large-title",
+    "user1",
+    "user2",
+    "user3",
+    "user4",
+    "user5",
+};
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
