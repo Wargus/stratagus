@@ -1346,12 +1346,12 @@ pawn:
 
 		    sprintf(buf,"%d",n);
 		    unit=(char**)hash_find(TheMap.Tileset->ItemsHash,buf);
-		    IfDebug(
-			if( !unit ) {
-			    fprintf(stderr,"THG2 n=%d (%d,%d)\n",n,x,y);
-			    continue;
-			}
-		    );
+#ifdef DEBUG
+		    if( !unit ) {
+			fprintf(stderr,"THG2 n=%d (%d,%d)\n",n,x,y);
+			continue;
+		    }
+#endif
 
 		    // FIXME: remove
 		    type = UnitTypeByIdent(*unit);

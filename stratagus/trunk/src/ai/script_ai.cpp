@@ -562,11 +562,12 @@ local SCM CclDefineAiHelper(SCM list)
     UnitType *type;
     Upgrade *upgrade;
     int cost;
-
-    IfDebug(type = NULL;
-	upgrade = NULL;
-	cost = 0;
-	);				// keep the compiler happy
+    
+#ifdef DEBUG
+    type = NULL;
+    upgrade = NULL;
+    cost = 0;
+#endif
     while (!gh_null_p(list)) {
 	sub_list = gh_car(list);
 	list = gh_cdr(list);
