@@ -797,7 +797,7 @@ global void ShowPicture(CampaignChapter* chapter)
 		WaitEventsOneFrame(&callbacks);
 		++i;
 	}
-	i = chapter->Data.Picture.FadeOut * i / max;
+	i = chapter->Data.Picture.FadeOut * i / (max ? max : 1);
 
 	//
 	// Draw background and title
