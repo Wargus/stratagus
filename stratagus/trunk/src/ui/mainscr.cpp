@@ -333,8 +333,9 @@ global void DrawUnitInfo(const Unit* unit)
 		    ,0,x+107,y+8+70);
 
 	    UiDrawCompleted(
-		    unit->Data.Research.Upgrade->Costs[TimeCost]
-		    ,unit->Data.Research.Ticks);
+		    unit->Data.Research.Upgrade->Costs[TimeCost],
+		    unit->Player->UpgradeTimers.Upgrades[
+			    unit->Data.Research.Upgrade-Upgrades]);
 	    return;
 	}
     }

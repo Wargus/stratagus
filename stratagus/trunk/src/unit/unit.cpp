@@ -630,6 +630,14 @@ global void UnitLost(const Unit* unit)
 	player->NumBuildings--;
     }
 
+    //
+    //	Handle research cancels.
+    //
+    if( unit->Orders[0].Action == UnitActionResearch ) {
+	unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade
+		-Upgrades]=0;
+    }
+
     DebugLevel3Fn("Lost %s(%d)\n",unit->Type->Ident,UnitNumber(unit));
 
     //

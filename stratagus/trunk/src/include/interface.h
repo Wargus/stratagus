@@ -326,31 +326,33 @@ extern void DoButtonButtonClicked(int button);
 extern int DoButtonPanelKey(int key);
 
 //
-//	in button_table.c
+//	in button_checks.c
 //
     /// Check is always true
-extern int ButtonCheckTrue(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckTrue(const Unit*,const ButtonAction*);
     /// Check is always false
-extern int ButtonCheckFalse(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckFalse(const Unit*,const ButtonAction*);
     /// Check if allowed upgrade is ready
-extern int ButtonCheckUpgrade(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckUpgrade(const Unit*,const ButtonAction*);
     /// Check if allowed unit exists
-extern int ButtonCheckUnit(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckUnit(const Unit*,const ButtonAction*);
     /// Check if allowed units exists
-extern int ButtonCheckUnits(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckUnits(const Unit*,const ButtonAction*);
     /// Check if have network play
-extern int ButtonCheckNetwork(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckNetwork(const Unit*,const ButtonAction*);
     /// Check if unit isn't working (train,upgrade,research)
-extern int ButtonCheckNoWork(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckNoWork(const Unit*,const ButtonAction*);
     /// Check if unit isn't researching or upgrading
-extern int ButtonCheckNoResearch(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckNoResearch(const Unit*,const ButtonAction*);
 
     /// Check if all requirements for an attack to are meet
-extern int ButtonCheckAttack(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckAttack(const Unit*,const ButtonAction*);
     /// Check if all requirements for an upgrade to are meet
-extern int ButtonCheckUpgradeTo(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckUpgradeTo(const Unit*,const ButtonAction*);
     /// Check if all requirements for a research are meet
-extern int ButtonCheckResearch(const Unit* unit,const ButtonAction* button);
+extern int ButtonCheckResearch(const Unit*,const ButtonAction*);
+    /// Check if all requirements for a single research are meet
+extern int ButtonCheckSingleResearch(const Unit*,const ButtonAction*);
 
 //@}
 
