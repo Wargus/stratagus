@@ -1522,7 +1522,6 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
 	    unit->OrderCount + (unit->OrderFlush?1:0) >= 2 &&
 	    unit->OrderCount < MAX_ORDERS - 1 &&
 	    unit->Orders[unit->OrderFlush ? 1 : 0].Action == UnitActionFollow &&
-	    unit->Orders[unit->OrderFlush ? 1 : 0].Goal &&
 	    unit->Orders[unit->OrderCount - 1].Action == UnitActionUnload &&
 	    unit->InsideCount + unit->OrderCount - (unit->OrderFlush ? 1 : 0) <= unit->Type->MaxOnBoard) {
 		
@@ -1534,8 +1533,13 @@ local int FindTransporterOnZone(int waterzone,ZoneSet * destzones,
 	    
 	    unitok = ZoneSetHasIntersect(&TransporterZones, destzones);
 	    if (unitok) {
-		unitX = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->X;
-		unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->Y;
+		if (unit->Orders[unit->OrderFlush ? 1 : 0].Goal) {
+		    unitX = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->X;
+		    unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Goal->Y;    
+		} else {
+		    unitX = unit->Orders[unit->OrderFlush ? 1 : 0].X;
+		    unitY = unit->Orders[unit->OrderFlush ? 1 : 0].Y;
+		}
 	    }
 	}
 	
