@@ -166,7 +166,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 	    buf = alloca(len);
 	    n = MusicSample->Type->Read(MusicSample, buf, len);
 
-	    for (i = 0; i < n / sizeof(*buf); ++i) {
+	    for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 		// Add to our samples
 		buffer[i] += (buf[i] * MusicVolume) / 256;
 	    }
@@ -175,7 +175,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 	    buf = alloca(len);
 	    n = MusicSample->Type->Read(MusicSample, buf, len);
 
-	    for (i = 0; i < n / sizeof(*buf); ++i) {
+	    for (i = 0; i < n / (int)sizeof(*buf); ++i) {
 		// Add to our samples
 		buffer[i * 2 + 0] += (buf[i] * MusicVolume) / 256;
 		buffer[i * 2 + 1] += (buf[i] * MusicVolume) / 256;
