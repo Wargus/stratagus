@@ -729,19 +729,760 @@ changed:
     }
 }
 
-#if 0
 /**
 **	Parse a network menu packet in client disconneccted state.
 **
 **	@param msg	message received
 */
-local void ParseClientDisconnected(const InitMessage* msg)
+local void ClientParseDisconnected(const InitMessage* msg)
 {
-    // FIXME: Split NetworkParseMenuPacket into small functions.
     DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 	    msg->SubType);
 }
-#endif
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseDetaching(const InitMessage* msg)
+{
+    switch(msg->SubType) {
+
+	case ICMGoodBye:	// Server has let us go
+	    DebugLevel3Fn("ccs_detaching: Server GoodBye subtype %d received - byebye\n" _C_ msg->SubType);
+	    NetLocalState = ccs_disconnected;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_detaching: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseConnecting(const InitMessage* msg)
+{
+    int i;
+
+    switch(msg->SubType) {
+
+	case ICMEngineMismatch: // FreeCraft engine version doesn't match
+	    fprintf(stderr, "Incompatible FreeCraft version "
+			FreeCraftFormatString " <-> "
+			FreeCraftFormatString "\n"
+			"from %d.%d.%d.%d:%d\n",
+		    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+		    FreeCraftFormatArgs(FreeCraftVersion),
+		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    NetLocalState = ccs_incompatibleengine;
+	    NetConnectRunning = 0;	// End the menu..
+	    return;
+
+	case ICMProtocolMismatch: // Network protocol version doesn't match
+	    fprintf(stderr, "Incompatible network protocol version "
+			NetworkProtocolFormatString " <-> "
+			NetworkProtocolFormatString "\n"
+			"from %d.%d.%d.%d:%d\n",
+		    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+		    NetworkProtocolFormatArgs(NetworkProtocolVersion),
+		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    NetLocalState = ccs_incompatiblenetwork;
+	    NetConnectRunning = 0;	// End the menu..
+	    return;
+
+	case ICMGameFull:	// Game is full - server rejected connnection
+	    fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
+		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    NetLocalState = ccs_nofreeslots;
+	    NetConnectRunning = 0;	// End the menu..
+	    return;
+
+	case ICMWelcome:	// Server has accepted us
+	    NetLocalState = ccs_connected;
+	    NetStateMsgCnt = 0;
+	    NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
+	    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); // Name of server player
+	    NetworkLag= ntohl(msg->Lag);
+	    NetworkUpdates= ntohl(msg->Updates);
+
+	    Hosts[0].Host = NetworkServerIP;
+	    Hosts[0].Port = htons(NetworkServerPort);
+	    for (i = 1; i < PlayerMax; i++) {
+		if (i != NetLocalHostsSlot) {
+		    Hosts[i].Host = msg->u.Hosts[i].Host;
+		    Hosts[i].Port = msg->u.Hosts[i].Port;
+		    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+		    if (Hosts[i].PlyNr) {
+			memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+		    }
+		} else {
+		    Hosts[i].PlyNr = i;
+		    memcpy(Hosts[i].PlyName, NetworkName, 16);
+		}
+	    }
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_connecting: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseConnected(const InitMessage* msg)
+{
+    switch(msg->SubType) {
+	int pathlen;
+
+	case ICMMap:		// Server has sent us new map info
+	    sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
+	    pathlen = strlen(ScenSelectFullPath);
+	    memcpy(ScenSelectFullPath+pathlen, msg->u.MapPath, 256);
+	    ScenSelectFullPath[pathlen+255] = 0;
+	    if (NetClientSelectScenario()) {
+		NetLocalState = ccs_badmap;
+		break;
+	    }
+	    if (ntohl(msg->MapUID) != ScenSelectPudInfo->MapUID) {
+		NetLocalState = ccs_badmap;
+		fprintf(stderr,
+		    "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+			    (unsigned int)ScenSelectPudInfo->MapUID,
+			    (unsigned int)ntohl(msg->MapUID));
+		break;
+	    }
+	    NetLocalState = ccs_mapinfo;
+	    NetStateMsgCnt = 0;
+	    NetConnectRunning = 0;	// Kick the menu..
+	    break;
+
+	case ICMWelcome:	// Server has accepted us (dup)
+	    DebugLevel3Fn("ccs_connected: DUP Welcome subtype %d\n" _C_ msg->SubType);
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_connected: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseMapInfo(const InitMessage* msg)
+{
+    switch(msg->SubType) {
+
+	case ICMState:		// Server has sent us first state info
+	    DebugLevel3Fn("ccs_mapinfo: Initial State subtype %d received - going sync\n" _C_ msg->SubType);
+	    ServerSetupState = msg->u.State;
+	    NetClientUpdateState();
+	    NetLocalState = ccs_synced;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_mapinfo: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseSynced(const InitMessage* msg)
+{
+    int i;
+
+    switch(msg->SubType) {
+
+	case ICMState:		// Server has sent us new state info
+	    DebugLevel3Fn("ccs_synced: New State subtype %d received - resynching\n" _C_ msg->SubType);
+	    ServerSetupState = msg->u.State;
+	    NetClientUpdateState();
+	    NetLocalState = ccs_async;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	case ICMConfig:		// Server gives the go ahead..
+	    DebugLevel0Fn("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
+	    HostsCount = 0;
+	    for (i = 0; i < msg->HostsCount - 1; ++i) {
+		if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
+		    Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
+		    Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
+		    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+		    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
+		    HostsCount++;
+		    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
+			    ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
+			    ntohs(msg->u.Hosts[i].Port) _C_ msg->u.Hosts[i].PlyName);
+		} else {			// Own client
+		    NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
+		    DebugLevel0Fn("SELF %d [%s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
+			    msg->u.Hosts[i].PlyName);
+		}
+	    }
+	    // server is last:
+	    Hosts[HostsCount].Host = NetLastHost;
+	    Hosts[HostsCount].Port = NetLastPort;
+	    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+	    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
+	    HostsCount++;
+	    NetPlayers = HostsCount + 1;
+	    DebugLevel0Fn("Server %d = %d.%d.%d.%d:%d [%s]\n" _C_
+		    ntohs(msg->u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
+		    ntohs(NetLastPort) _C_ msg->u.Hosts[i].PlyName);
+
+	    // put ourselves to the end, like on the server..
+	    Hosts[HostsCount].Host = 0;
+	    Hosts[HostsCount].Port = 0;
+	    Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
+	    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
+
+	    NetLocalState = ccs_goahead;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_synced: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseAsync(const InitMessage* msg)
+{
+    int i;
+
+    switch(msg->SubType) {
+
+	case ICMResync:		// Server has resynced with us and sends resync data
+	    for (i = 1; i < PlayerMax-1; i++) {
+		if (i != NetLocalHostsSlot) {
+		    Hosts[i].Host = msg->u.Hosts[i].Host;
+		    Hosts[i].Port = msg->u.Hosts[i].Port;
+		    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+		    if (Hosts[i].PlyNr) {
+			memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
+			DebugLevel3Fn("Other client %d: %s\n" _C_ Hosts[i].PlyNr _C_ Hosts[i].PlyName);
+		    }
+		} else {
+		    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
+		    memcpy(Hosts[i].PlyName, NetworkName, 16);
+		}
+	    }
+	    NetClientUpdateState();
+	    NetLocalState = ccs_synced;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_async: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ClientParseGoAhead(const InitMessage* msg)
+{
+    switch(msg->SubType) {
+
+	case ICMConfig:		// Server go ahead dup - ignore..
+	    DebugLevel3Fn("ccs_goahead: DUP Config subtype %d\n" _C_ msg->SubType);
+	    break;
+
+	case ICMState:		// Server has sent final state info
+	    DebugLevel3Fn("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
+	    ServerSetupState = msg->u.State;
+	    NetLocalState = ccs_started;
+	    NetStateMsgCnt = 0;
+	    break;
+
+	default:
+	    DebugLevel0Fn("ccs_goahead: Unhandled subtype %d\n" _C_ msg->SubType);
+	    break;
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseHello(const InitMessage* msg)
+{
+    int h, k, i, n;
+    InitMessage message;
+
+    // first look up, if client host is already known.
+    k = 0;
+    for (h = 1; h < PlayerMax-1; ++h) {	// last Player slot (15) is special - avoid!
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    k = h;
+	    break;
+	}
+    }
+    if (k == 0) {	// it is a new client
+	for (n = i = 1; i < PlayerMax-1; i++) {
+	    DebugLevel3Fn("SSS.CO[%d] = %d, Hosts[%d].PlyNr = %d\n" _C_ i _C_
+			     ServerSetupState.CompOpt[i] _C_ i _C_ Hosts[i].PlyNr);
+	    // occupy first available slot
+	    if (ServerSetupState.CompOpt[i] == 0) {
+		n++;					// n = total available slots
+		if (k == 0 && Hosts[i].PlyNr == 0) {
+		    k = i;
+		}
+	    }
+	}
+	if (k) {
+	    Hosts[k].Host = NetLastHost;
+	    Hosts[k].Port = NetLastPort;
+	    Hosts[k].PlyNr = k;
+	    memcpy(Hosts[k].PlyName, msg->u.Hosts[0].PlyName, 16);
+	    DebugLevel0Fn("New client %d.%d.%d.%d:%d [%s]\n" _C_
+		NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort) _C_ Hosts[k].PlyName);
+	    NetStates[k].State = ccs_connecting;
+	    NetStates[k].MsgCnt = 0;
+	} else {
+	    message.Type = MessageInitReply;
+	    message.SubType = ICMGameFull;	// Game is full - reject connnection
+	    message.MapUID = 0L;
+	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	    DebugLevel0Fn("Sending InitReply Message GameFull: (%d) to %d.%d.%d.%d:%d\n" _C_
+			n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+	    return;
+	}
+    }
+    // this code path happens until client sends waiting (= has received this message)
+    message.Type = MessageInitReply;
+    message.SubType = ICMWelcome;				// Acknowledge: Client is welcome
+    message.u.Hosts[0].PlyNr = htons(k);			// Host array slot number
+    memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);	// Name of server player
+    message.MapUID = 0L;
+    for (i = 1; i < PlayerMax-1; i++) {			// Info about other clients
+	if (i != k) {
+	    if (Hosts[i].PlyNr) {
+		message.u.Hosts[i].Host = Hosts[i].Host;
+		message.u.Hosts[i].Port = Hosts[i].Port;
+		message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
+		memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+	    } else {
+		message.u.Hosts[i].Host = 0;
+		message.u.Hosts[i].Port = 0;
+		message.u.Hosts[i].PlyNr = 0;
+	    }
+	}
+    }
+    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+    DebugLevel0Fn("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n" _C_
+		n _C_ k _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+    NetStates[h].MsgCnt++;
+    if (NetStates[h].MsgCnt > 50) {
+	// FIXME: Client sends hellos, but doesn't receive our welcome acks....
+	;
+    }
+    NetConnectForceDisplayUpdate();
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseResync(const InitMessage* msg)
+{
+    int h, i, n;
+    InitMessage message;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    switch (NetStates[h].State) {
+		case ccs_mapinfo:
+		    // a delayed ack - fall through..
+		case ccs_async:
+		    // client has recvd welcome and is waiting for info
+		    NetStates[h].State = ccs_synced;
+		    NetStates[h].MsgCnt = 0;
+		    /* Fall through */
+		case ccs_synced:
+		    // this code path happens until client falls back to ICMWaiting
+		    // (indicating Resync has completed)
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMResync;
+		    for (i = 1; i < PlayerMax-1; i++) {	// Info about other clients
+			if (i != h) {
+			    if (Hosts[i].PlyNr) {
+				message.u.Hosts[i].Host = Hosts[i].Host;
+				message.u.Hosts[i].Port = Hosts[i].Port;
+				message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
+				memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
+			    } else {
+				message.u.Hosts[i].Host = 0;
+				message.u.Hosts[i].Port = 0;
+				message.u.Hosts[i].PlyNr = 0;
+			    }
+			}
+		    }
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message Resync: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 50) {
+			// FIXME: Client sends resync, but doesn't receive our resync ack....
+			;
+		    }
+		    break;
+
+		default:
+		    DebugLevel0Fn("Server: ICMResync: Unhandled state %d Host %d\n" _C_
+						     NetStates[h].State _C_ h);
+		    break;
+	    }
+	    break;
+	}
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseWaiting(const InitMessage* msg)
+{
+    int h, i, n;
+    InitMessage message;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort && Hosts[h].PlyNr) {
+	    int pathlen;
+	    ServerSetupState.LastFrame[h] = FrameCounter;
+	    NetConnectForceDisplayUpdate();
+
+	    switch (NetStates[h].State) {
+		// client has recvd welcome and is waiting for info
+		case ccs_connecting:
+		    NetStates[h].State = ccs_connected;
+		    NetStates[h].MsgCnt = 0;
+		    /* Fall through */
+		case ccs_connected:
+		    // this code path happens until client acknoledges the map
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMMap;			// Send Map info to the client
+		    pathlen = strlen(FreeCraftLibPath) + 1;
+		    memcpy(message.u.MapPath, ScenSelectFullPath+pathlen, 256);
+		    message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 50) {
+			// FIXME: Client sends waiting, but doesn't receive our map....
+			;
+		    }
+		    break;
+		case ccs_mapinfo:
+		    NetStates[h].State = ccs_synced;
+		    NetStates[h].MsgCnt = 0;
+		    for (i = 1; i < PlayerMax-1; i++) {
+			if (i != h && Hosts[i].PlyNr) {
+			    // Notify other clients
+			    NetStates[i].State = ccs_async;
+			}
+		    }
+		    /* Fall through */
+		case ccs_synced:
+		    // the wanted state - do nothing.. until start...
+		    NetStates[h].MsgCnt = 0;
+		    break;
+
+		case ccs_async:
+		    // Server User has changed menu selection. This state is set by MENU code
+		    // OR we have received a new client/other client has changed data
+
+		    // this code path happens until client acknoledges the state change
+		    // by sending ICMResync
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMState;		// Send new state info to the client
+		    message.u.State = ServerSetupState;
+		    message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 50) {
+			// FIXME: Client sends waiting, but doesn't receive our state info....
+			;
+		    }
+		    break;
+
+		default:
+		    DebugLevel0Fn("Server: ICMWaiting: Unhandled state %d Host %d\n" _C_
+						     NetStates[h].State _C_ h);
+		    break;
+	    }
+	    break;
+	}
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseMap(const InitMessage* msg)
+{
+    int h, n;
+    InitMessage message;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    switch (NetStates[h].State) {
+		// client has recvd map info waiting for state info
+		case ccs_connected:
+		    NetStates[h].State = ccs_mapinfo;
+		    NetStates[h].MsgCnt = 0;
+		    /* Fall through */
+		case ccs_mapinfo:
+		    // this code path happens until client acknoledges the state info
+		    // by falling back to ICMWaiting with prev. State synced
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMState;		// Send State info to the client
+		    message.u.State = ServerSetupState;
+		    message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 50) {
+			// FIXME: Client sends mapinfo, but doesn't receive our state info....
+			;
+		    }
+		    break;
+		default:
+		    DebugLevel0Fn("Server: ICMMap: Unhandled state %d Host %d\n" _C_
+						     NetStates[h].State _C_ h);
+		    break;
+	    }
+	    break;
+	}
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseState(const InitMessage* msg)
+{
+    int h, n;
+    InitMessage message;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    switch (NetStates[h].State) {
+		case ccs_mapinfo:
+		    // User State Change right after connect - should not happen, but..
+		    /* Fall through */
+		case ccs_synced:
+		    // Default case: Client is in sync with us, but notes a local change
+		    NetStates[h].State = ccs_async;
+		    NetStates[h].MsgCnt = 0;
+		    // Use information supplied by the client:
+		    ServerSetupState.Ready[h] = msg->u.State.Ready[h];
+		    ServerSetupState.Race[h] = msg->u.State.Race[h];
+		    DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n" _C_
+				     h _C_ ServerSetupState.Ready[h] _C_ ServerSetupState.Race[h]);
+		    // Add additional info usage here!
+		    ServerSetupState.LastFrame[h] = FrameCounter;
+		    NetConnectForceDisplayUpdate();
+		    /* Fall through */
+		case ccs_async:
+		    // this code path happens until client acknoledges the state change reply
+		    // by sending ICMResync
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMState;		// Send new state info to the client
+		    message.u.State = ServerSetupState;
+		    message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 50) {
+			// FIXME: Client sends State, but doesn't receive our state info....
+			;
+		    }
+		    break;
+		default:
+		    DebugLevel0Fn("Server: ICMState: Unhandled state %d Host %d\n" _C_
+						     NetStates[h].State _C_ h);
+		    break;
+	    }
+	    break;
+	}
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseGoodBye(const InitMessage* msg)
+{
+    int h, n;
+    InitMessage message;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    switch (NetStates[h].State) {
+		default:
+		    // We can enter here from _ANY_ state!
+		    NetStates[h].MsgCnt = 0;
+		    NetStates[h].State = ccs_detaching;
+		    /* Fall through */
+		case ccs_detaching:
+		    // this code path happens until client acknoledges the GoodBye
+		    // by sending ICMSeeYou;
+		    message.Type = MessageInitReply;
+		    message.SubType = ICMGoodBye;
+		    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+		    DebugLevel0Fn("Sending InitReply Message GoodBye: (%d) to %d.%d.%d.%d:%d\n" _C_
+				n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+		    NetStates[h].MsgCnt++;
+		    if (NetStates[h].MsgCnt > 10) {
+			// FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
+			;
+		    }
+		    break;
+	    }
+	    break;
+	 }
+    }
+}
+
+/**
+**	FIXME: docu
+**
+**	@param msg	message received
+*/
+local void ServerParseSeeYou(const InitMessage* msg)
+{
+    int h, i;
+
+    // look up the host
+    for (h = 0; h < PlayerMax-1; ++h) {
+	if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+	    switch (NetStates[h].State) {
+		case ccs_detaching:
+		    NetStates[h].State = ccs_unused;
+		    Hosts[h].Host = 0;
+		    Hosts[h].Port = 0;
+		    Hosts[h].PlyNr = 0;
+		    memset(Hosts[h].PlyName, 0, 16);
+		    ServerSetupState.Ready[h] = 0;
+		    ServerSetupState.Race[h] = 0;
+
+		    // Resync other clients
+		    for (i = 1; i < PlayerMax-1; i++) {
+			if (i != h && Hosts[i].PlyNr) {
+			    NetStates[i].State = ccs_async;
+			}
+		    }
+		    NetConnectForceDisplayUpdate();
+		    break;
+
+		default:
+		    DebugLevel0Fn("Server: ICMSeeYou: Unhandled state %d Host %d\n" _C_
+						     NetStates[h].State _C_ h);
+		    break;
+	    }
+	    break;
+	 }
+    }
+}
+
+/**
+**	Check if the FreeCraft version and Network Protocol match
+**
+**	@param msg	message received
+**
+**	@return		0 if the versions match, -1 otherwise
+*/
+local int CheckVersions(const InitMessage* msg)
+{
+    int n;
+    InitMessage message;
+
+    if (ntohl(msg->FreeCraft) != FreeCraftVersion) {
+	fprintf(stderr, "Incompatible FreeCraft version "
+		    FreeCraftFormatString " <-> "
+		    FreeCraftFormatString "\n"
+		    "from %d.%d.%d.%d:%d\n",
+		FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+		FreeCraftFormatArgs(FreeCraftVersion),
+		NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+
+	message.Type = MessageInitReply;
+	message.SubType = ICMEngineMismatch; // FreeCraft engine version doesn't match
+	message.MapUID = 0L;
+	n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	DebugLevel0Fn("Sending InitReply Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
+		    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+	return -1;
+    }
+
+    if (ntohl(msg->Version) != NetworkProtocolVersion) {
+	fprintf(stderr, "Incompatible network protocol version "
+		    NetworkProtocolFormatString " <-> "
+		    NetworkProtocolFormatString "\n"
+		    "from %d.%d.%d.%d:%d\n",
+		NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+		NetworkProtocolFormatArgs(NetworkProtocolVersion),
+		NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+
+	message.Type = MessageInitReply;
+	message.SubType = ICMProtocolMismatch; // Network protocol version doesn't match
+	message.MapUID = 0L;
+	n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+	DebugLevel0Fn("Sending InitReply Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
+		    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+	return -1;
+    }
+
+    return 0;
+}
 
 /**
 **	Parse a Network menu packet.
@@ -751,9 +1492,6 @@ local void ParseClientDisconnected(const InitMessage* msg)
 */
 local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 {
-    int i, h, n, k;
-    InitMessage message;
-
     if (msg->Type > MessageInitConfig || size != sizeof(*msg)) {
 	DebugLevel0Fn("Wrong message\n");
 	return;
@@ -772,248 +1510,36 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 	    }
 	    switch(NetLocalState) {
 		case ccs_disconnected:
-		    DebugLevel0Fn("ccs_disconnected: Server sending GoodBye dups %d\n" _C_ msg->SubType);
+		    ClientParseDisconnected(msg);
 		    break;
 
 		case ccs_detaching:
-		    switch(msg->SubType) {
-
-			case ICMGoodBye:	// Server has let us go
-			    DebugLevel3Fn("ccs_detaching: Server GoodBye subtype %d received - byebye\n" _C_ msg->SubType);
-			    NetLocalState = ccs_disconnected;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_detaching: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseDetaching(msg);
 		    break;
 
 		case ccs_connecting:
-		    switch(msg->SubType) {
-
-			case ICMEngineMismatch: // FreeCraft engine version doesn't match
-			    fprintf(stderr, "Incompatible FreeCraft version "
-					FreeCraftFormatString " <-> "
-					FreeCraftFormatString "\n"
-					"from %d.%d.%d.%d:%d\n",
-				    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
-				    FreeCraftFormatArgs(FreeCraftVersion),
-				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-			    NetLocalState = ccs_incompatibleengine;
-			    NetConnectRunning = 0;	// End the menu..
-			    return;
-
-			case ICMProtocolMismatch: // Network protocol version doesn't match
-			    fprintf(stderr, "Incompatible network protocol version "
-					NetworkProtocolFormatString " <-> "
-					NetworkProtocolFormatString "\n"
-					"from %d.%d.%d.%d:%d\n",
-				    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
-				    NetworkProtocolFormatArgs(NetworkProtocolVersion),
-				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-			    NetLocalState = ccs_incompatiblenetwork;
-			    NetConnectRunning = 0;	// End the menu..
-			    return;
-
-			case ICMGameFull:	// Game is full - server rejected connnection
-			    fprintf(stderr, "Server at %d.%d.%d.%d:%d is full!\n",
-				    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-			    NetLocalState = ccs_nofreeslots;
-			    NetConnectRunning = 0;	// End the menu..
-			    return;
-
-			case ICMWelcome:	// Server has accepted us
-			    NetLocalState = ccs_connected;
-			    NetStateMsgCnt = 0;
-			    NetLocalHostsSlot = ntohs(msg->u.Hosts[0].PlyNr);
-			    memcpy(Hosts[0].PlyName, msg->u.Hosts[0].PlyName, 16); // Name of server player
-			    NetworkLag= ntohl(msg->Lag);
-			    NetworkUpdates= ntohl(msg->Updates);
-
-			    Hosts[0].Host = NetworkServerIP;
-			    Hosts[0].Port = htons(NetworkServerPort);
-			    for (i = 1; i < PlayerMax; i++) {
-				if (i != NetLocalHostsSlot) {
-				    Hosts[i].Host = msg->u.Hosts[i].Host;
-				    Hosts[i].Port = msg->u.Hosts[i].Port;
-				    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-				    if (Hosts[i].PlyNr) {
-					memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
-				    }
-				} else {
-				    Hosts[i].PlyNr = i;
-				    memcpy(Hosts[i].PlyName, NetworkName, 16);
-				}
-			    }
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_connecting: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-
-		    }
+		    ClientParseConnecting(msg);
 		    break;
 
 		case ccs_connected:
-		    switch(msg->SubType) {
-			int pathlen;
-
-			case ICMMap:		// Server has sent us new map info
-			    sprintf(ScenSelectFullPath, "%s/", FreeCraftLibPath);
-			    pathlen = strlen(ScenSelectFullPath);
-			    memcpy(ScenSelectFullPath+pathlen, msg->u.MapPath, 256);
-			    ScenSelectFullPath[pathlen+255] = 0;
-			    if (NetClientSelectScenario()) {
-				NetLocalState = ccs_badmap;
-				break;
-			    }
-			    if (ntohl(msg->MapUID) != ScenSelectPudInfo->MapUID) {
-				NetLocalState = ccs_badmap;
-				fprintf(stderr,
-				    "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
-					    (unsigned int)ScenSelectPudInfo->MapUID,
-					    (unsigned int)ntohl(msg->MapUID));
-				break;
-			    }
-			    NetLocalState = ccs_mapinfo;
-			    NetStateMsgCnt = 0;
-			    NetConnectRunning = 0;	// Kick the menu..
-			    break;
-
-			case ICMWelcome:	// Server has accepted us (dup)
-			    DebugLevel3Fn("ccs_connected: DUP Welcome subtype %d\n" _C_ msg->SubType);
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_connected: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseConnected(msg);
 		    break;
 
 		case ccs_mapinfo:
-		    switch(msg->SubType) {
-
-			case ICMState:		// Server has sent us first state info
-			    DebugLevel3Fn("ccs_mapinfo: Initial State subtype %d received - going sync\n" _C_ msg->SubType);
-			    ServerSetupState = msg->u.State;
-			    NetClientUpdateState();
-			    NetLocalState = ccs_synced;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_mapinfo: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseMapInfo(msg);
 		    break;
 
 		case ccs_changed:
 		case ccs_synced:
-		    switch(msg->SubType) {
-
-			case ICMState:		// Server has sent us new state info
-			    DebugLevel3Fn("ccs_synced: New State subtype %d received - resynching\n" _C_ msg->SubType);
-			    ServerSetupState = msg->u.State;
-			    NetClientUpdateState();
-			    NetLocalState = ccs_async;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			case ICMConfig:		// Server gives the go ahead..
-			    DebugLevel0Fn("ccs_synced: Config subtype %d received - starting\n" _C_ msg->SubType);
-			    HostsCount = 0;
-			    for (i = 0; i < msg->HostsCount - 1; ++i) {
-				if (msg->u.Hosts[i].Host || msg->u.Hosts[i].Port) {
-				    Hosts[HostsCount].Host = msg->u.Hosts[i].Host;
-				    Hosts[HostsCount].Port = msg->u.Hosts[i].Port;
-				    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-				    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
-				    HostsCount++;
-				    DebugLevel0Fn("Client %d = %d.%d.%d.%d:%d [%s]\n" _C_
-					    ntohs(ntohs(msg->u.Hosts[i].PlyNr)) _C_ NIPQUAD(ntohl(msg->u.Hosts[i].Host)) _C_
-					    ntohs(msg->u.Hosts[i].Port) _C_ msg->u.Hosts[i].PlyName);
-				} else {			// Own client
-				    NetLocalPlayerNumber = ntohs(msg->u.Hosts[i].PlyNr);
-				    DebugLevel0Fn("SELF %d [%s]\n" _C_ ntohs(msg->u.Hosts[i].PlyNr) _C_
-					    msg->u.Hosts[i].PlyName);
-				}
-			    }
-			    // server is last:
-			    Hosts[HostsCount].Host = NetLastHost;
-			    Hosts[HostsCount].Port = NetLastPort;
-			    Hosts[HostsCount].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-			    memcpy(Hosts[HostsCount].PlyName, msg->u.Hosts[i].PlyName, 16);
-			    HostsCount++;
-			    NetPlayers = HostsCount + 1;
-			    DebugLevel0Fn("Server %d = %d.%d.%d.%d:%d [%s]\n" _C_
-				    ntohs(msg->u.Hosts[i].PlyNr) _C_ NIPQUAD(ntohl(NetLastHost)) _C_
-				    ntohs(NetLastPort) _C_ msg->u.Hosts[i].PlyName);
-
-			    // put ourselves to the end, like on the server..
-			    Hosts[HostsCount].Host = 0;
-			    Hosts[HostsCount].Port = 0;
-			    Hosts[HostsCount].PlyNr = NetLocalPlayerNumber;
-			    memcpy(Hosts[HostsCount].PlyName, NetworkName, 16);
-
-			    NetLocalState = ccs_goahead;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_synced: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseSynced(msg);
 		    break;
 
 		case ccs_async:
-		    switch(msg->SubType) {
-
-			case ICMResync:		// Server has resynced with us and sends resync data
-			    for (i = 1; i < PlayerMax-1; i++) {
-				if (i != NetLocalHostsSlot) {
-				    Hosts[i].Host = msg->u.Hosts[i].Host;
-				    Hosts[i].Port = msg->u.Hosts[i].Port;
-				    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-				    if (Hosts[i].PlyNr) {
-					memcpy(Hosts[i].PlyName, msg->u.Hosts[i].PlyName, 16);
-					DebugLevel3Fn("Other client %d: %s\n" _C_ Hosts[i].PlyNr _C_ Hosts[i].PlyName);
-				    }
-				} else {
-				    Hosts[i].PlyNr = ntohs(msg->u.Hosts[i].PlyNr);
-				    memcpy(Hosts[i].PlyName, NetworkName, 16);
-				}
-			    }
-			    NetClientUpdateState();
-			    NetLocalState = ccs_synced;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_async: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseAsync(msg);
 		    break;
 
 		case ccs_goahead:
-		    switch(msg->SubType) {
-
-			case ICMConfig:		// Server go ahead dup - ignore..
-			    DebugLevel3Fn("ccs_goahead: DUP Config subtype %d\n" _C_ msg->SubType);
-			    break;
-
-			case ICMState:		// Server has sent final state info
-			    DebugLevel3Fn("ccs_goahead: Final State subtype %d received - starting\n" _C_ msg->SubType);
-			    ServerSetupState = msg->u.State;
-			    NetLocalState = ccs_started;
-			    NetStateMsgCnt = 0;
-			    break;
-
-			default:
-			    DebugLevel0Fn("ccs_goahead: Unhandled subtype %d\n" _C_ msg->SubType);
-			    break;
-		    }
+		    ClientParseGoAhead(msg);
 		    break;
 
 		default:
@@ -1024,386 +1550,37 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 
     } else if (NetConnectRunning == 1) {	// server
 
-	if (ntohl(msg->FreeCraft) != FreeCraftVersion) {
-	    fprintf(stderr, "Incompatible FreeCraft version "
-			FreeCraftFormatString " <-> "
-			FreeCraftFormatString "\n"
-			"from %d.%d.%d.%d:%d\n",
-		    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
-		    FreeCraftFormatArgs(FreeCraftVersion),
-		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-
-	    message.Type = MessageInitReply;
-	    message.SubType = ICMEngineMismatch; // FreeCraft engine version doesn't match
-	    message.MapUID = 0L;
-	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-	    DebugLevel0Fn("Sending InitReply Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
-			n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-	    return;
-	}
-
-	if (ntohl(msg->Version) != NetworkProtocolVersion) {
-	    fprintf(stderr, "Incompatible network protocol version "
-			NetworkProtocolFormatString " <-> "
-			NetworkProtocolFormatString "\n"
-			"from %d.%d.%d.%d:%d\n",
-		    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
-		    NetworkProtocolFormatArgs(NetworkProtocolVersion),
-		    NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
-
-	    message.Type = MessageInitReply;
-	    message.SubType = ICMProtocolMismatch; // Network protocol version doesn't match
-	    message.MapUID = 0L;
-	    n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-	    DebugLevel0Fn("Sending InitReply Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n" _C_
-			n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
+	if( CheckVersions(msg) ) {
 	    return;
 	}
 
 	switch(msg->SubType) {
 	    case ICMHello:		// a client has arrived
-		// first look up, if client host is already known.
-		k = 0;
-		for (h = 1; h < PlayerMax-1; ++h) {	// last Player slot (15) is special - avoid!
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			k = h;
-			break;
-		    }
-		}
-		if (k == 0) {	// it is a new client
-		    for (n = i = 1; i < PlayerMax-1; i++) {
-			DebugLevel3Fn("SSS.CO[%d] = %d, Hosts[%d].PlyNr = %d\n" _C_ i _C_
-					 ServerSetupState.CompOpt[i] _C_ i _C_ Hosts[i].PlyNr);
-			// occupy first available slot
-			if (ServerSetupState.CompOpt[i] == 0) {
-			    n++;					// n = total available slots
-			    if (k == 0 && Hosts[i].PlyNr == 0) {
-				k = i;
-			    }
-			}
-		    }
-		    if (k) {
-			Hosts[k].Host = NetLastHost;
-			Hosts[k].Port = NetLastPort;
-			Hosts[k].PlyNr = k;
-			memcpy(Hosts[k].PlyName, msg->u.Hosts[0].PlyName, 16);
-			DebugLevel0Fn("New client %d.%d.%d.%d:%d [%s]\n" _C_
-			    NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort) _C_ Hosts[k].PlyName);
-			NetStates[k].State = ccs_connecting;
-			NetStates[k].MsgCnt = 0;
-		    } else {
-			message.Type = MessageInitReply;
-			message.SubType = ICMGameFull;	// Game is full - reject connnection
-			message.MapUID = 0L;
-			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-			DebugLevel0Fn("Sending InitReply Message GameFull: (%d) to %d.%d.%d.%d:%d\n" _C_
-				    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-			return;
-		    }
-		}
-		// this code path happens until client sends waiting (= has received this message)
-		message.Type = MessageInitReply;
-		message.SubType = ICMWelcome;				// Acknowledge: Client is welcome
-		message.u.Hosts[0].PlyNr = htons(k);			// Host array slot number
-		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);	// Name of server player
-		message.MapUID = 0L;
-		for (i = 1; i < PlayerMax-1; i++) {			// Info about other clients
-		    if (i != k) {
-			if (Hosts[i].PlyNr) {
-			    message.u.Hosts[i].Host = Hosts[i].Host;
-			    message.u.Hosts[i].Port = Hosts[i].Port;
-			    message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-			    memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
-			} else {
-			    message.u.Hosts[i].Host = 0;
-			    message.u.Hosts[i].Port = 0;
-			    message.u.Hosts[i].PlyNr = 0;
-			}
-		    }
-		}
-		n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-		DebugLevel0Fn("Sending InitReply Message Welcome: (%d) [PlyNr: %d] to %d.%d.%d.%d:%d\n" _C_
-			    n _C_ k _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-		NetStates[h].MsgCnt++;
-		if (NetStates[h].MsgCnt > 50) {
-		    // FIXME: Client sends hellos, but doesn't receive our welcome acks....
-		    ;
-		}
-		NetConnectForceDisplayUpdate();
-		return;
+		ServerParseHello(msg);
+		break;
 
 	    case ICMResync:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			switch (NetStates[h].State) {
-			    case ccs_mapinfo:
-				// a delayed ack - fall through..
-			    case ccs_async:
-				// client has recvd welcome and is waiting for info
-				NetStates[h].State = ccs_synced;
-				NetStates[h].MsgCnt = 0;
-				/* Fall through */
-			    case ccs_synced:
-				// this code path happens until client falls back to ICMWaiting
-				// (indicating Resync has completed)
-				message.Type = MessageInitReply;
-				message.SubType = ICMResync;
-				for (i = 1; i < PlayerMax-1; i++) {	// Info about other clients
-				    if (i != h) {
-					if (Hosts[i].PlyNr) {
-					    message.u.Hosts[i].Host = Hosts[i].Host;
-					    message.u.Hosts[i].Port = Hosts[i].Port;
-					    message.u.Hosts[i].PlyNr = htons(Hosts[i].PlyNr);
-					    memcpy(message.u.Hosts[i].PlyName, Hosts[i].PlyName, 16);
-					} else {
-					    message.u.Hosts[i].Host = 0;
-					    message.u.Hosts[i].Port = 0;
-					    message.u.Hosts[i].PlyNr = 0;
-					}
-				    }
-				}
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message Resync: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 50) {
-				    // FIXME: Client sends resync, but doesn't receive our resync ack....
-				    ;
-				}
-				break;
-
-			    default:
-				DebugLevel0Fn("Server: ICMResync: Unhandled state %d Host %d\n" _C_
-								 NetStates[h].State _C_ h);
-				break;
-			}
-			break;
-		    }
-		}
-		break;
-		DebugLevel0Fn("Server: Unhandled subtype %d\n" _C_ msg->SubType);
+		ServerParseResync(msg);
 		break;
 
 	    case ICMWaiting:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort && Hosts[h].PlyNr) {
-			int pathlen;
-			ServerSetupState.LastFrame[h] = FrameCounter;
-			NetConnectForceDisplayUpdate();
-
-			switch (NetStates[h].State) {
-			    // client has recvd welcome and is waiting for info
-			    case ccs_connecting:
-				NetStates[h].State = ccs_connected;
-				NetStates[h].MsgCnt = 0;
-				/* Fall through */
-			    case ccs_connected:
-				// this code path happens until client acknoledges the map
-				message.Type = MessageInitReply;
-				message.SubType = ICMMap;			// Send Map info to the client
-				pathlen = strlen(FreeCraftLibPath) + 1;
-				memcpy(message.u.MapPath, ScenSelectFullPath+pathlen, 256);
-				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 50) {
-				    // FIXME: Client sends waiting, but doesn't receive our map....
-				    ;
-				}
-				break;
-			    case ccs_mapinfo:
-				NetStates[h].State = ccs_synced;
-				NetStates[h].MsgCnt = 0;
-				for (i = 1; i < PlayerMax-1; i++) {
-				    if (i != h && Hosts[i].PlyNr) {
-					// Notify other clients
-					NetStates[i].State = ccs_async;
-				    }
-				}
-				/* Fall through */
-			    case ccs_synced:
-				// the wanted state - do nothing.. until start...
-				NetStates[h].MsgCnt = 0;
-				break;
-
-			    case ccs_async:
-				// Server User has changed menu selection. This state is set by MENU code
-				// OR we have received a new client/other client has changed data
-
-				// this code path happens until client acknoledges the state change
-				// by sending ICMResync
-				message.Type = MessageInitReply;
-				message.SubType = ICMState;		// Send new state info to the client
-				message.u.State = ServerSetupState;
-				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 50) {
-				    // FIXME: Client sends waiting, but doesn't receive our state info....
-				    ;
-				}
-				break;
-
-			    default:
-				DebugLevel0Fn("Server: ICMWaiting: Unhandled state %d Host %d\n" _C_
-								 NetStates[h].State _C_ h);
-				break;
-			}
-			break;
-		    }
-		}
+		ServerParseWaiting(msg);
 		break;
 
 	    case ICMMap:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			switch (NetStates[h].State) {
-			    // client has recvd map info waiting for state info
-			    case ccs_connected:
-				NetStates[h].State = ccs_mapinfo;
-				NetStates[h].MsgCnt = 0;
-				/* Fall through */
-			    case ccs_mapinfo:
-				// this code path happens until client acknoledges the state info
-				// by falling back to ICMWaiting with prev. State synced
-				message.Type = MessageInitReply;
-				message.SubType = ICMState;		// Send State info to the client
-				message.u.State = ServerSetupState;
-				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 50) {
-				    // FIXME: Client sends mapinfo, but doesn't receive our state info....
-				    ;
-				}
-				break;
-			    default:
-				DebugLevel0Fn("Server: ICMMap: Unhandled state %d Host %d\n" _C_
-								 NetStates[h].State _C_ h);
-				break;
-			}
-			break;
-		    }
-		}
+		ServerParseMap(msg);
 		break;
 
 	    case ICMState:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			switch (NetStates[h].State) {
-			    case ccs_mapinfo:
-				// User State Change right after connect - should not happen, but..
-				/* Fall through */
-			    case ccs_synced:
-				// Default case: Client is in sync with us, but notes a local change
-				NetStates[h].State = ccs_async;
-				NetStates[h].MsgCnt = 0;
-				// Use information supplied by the client:
-				ServerSetupState.Ready[h] = msg->u.State.Ready[h];
-				ServerSetupState.Race[h] = msg->u.State.Race[h];
-				DebugLevel3Fn("Server: ICMState: Client[%d]: Ready: %d Race: %d\n" _C_
-						 h _C_ ServerSetupState.Ready[h] _C_ ServerSetupState.Race[h]);
-				// Add additional info usage here!
-				ServerSetupState.LastFrame[h] = FrameCounter;
-				NetConnectForceDisplayUpdate();
-				/* Fall through */
-			    case ccs_async:
-				// this code path happens until client acknoledges the state change reply
-				// by sending ICMResync
-				message.Type = MessageInitReply;
-				message.SubType = ICMState;		// Send new state info to the client
-				message.u.State = ServerSetupState;
-				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 50) {
-				    // FIXME: Client sends State, but doesn't receive our state info....
-				    ;
-				}
-				break;
-			    default:
-				DebugLevel0Fn("Server: ICMState: Unhandled state %d Host %d\n" _C_
-								 NetStates[h].State _C_ h);
-				break;
-			}
-			break;
-		    }
-		}
+		ServerParseState(msg);
 		break;
 
 	    case ICMGoodBye:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			switch (NetStates[h].State) {
-			    default:
-				// We can enter here from _ANY_ state!
-				NetStates[h].MsgCnt = 0;
-				NetStates[h].State = ccs_detaching;
-				/* Fall through */
-			    case ccs_detaching:
-				// this code path happens until client acknoledges the GoodBye
-				// by sending ICMSeeYou;
-				message.Type = MessageInitReply;
-				message.SubType = ICMGoodBye;
-				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
-				DebugLevel0Fn("Sending InitReply Message GoodBye: (%d) to %d.%d.%d.%d:%d\n" _C_
-					    n _C_ NIPQUAD(ntohl(NetLastHost)) _C_ ntohs(NetLastPort));
-				NetStates[h].MsgCnt++;
-				if (NetStates[h].MsgCnt > 10) {
-				    // FIXME: Client sends GoodBye, but doesn't receive our GoodBye....
-				    ;
-				}
-				break;
-			}
-			break;
-		     }
-		}
+		ServerParseGoodBye(msg);
 		break;
 
 	    case ICMSeeYou:
-		// look up the host
-		for (h = 0; h < PlayerMax-1; ++h) {
-		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
-			switch (NetStates[h].State) {
-			    case ccs_detaching:
-				NetStates[h].State = ccs_unused;
-				Hosts[h].Host = 0;
-				Hosts[h].Port = 0;
-				Hosts[h].PlyNr = 0;
-				memset(Hosts[h].PlyName, 0, 16);
-				ServerSetupState.Ready[h] = 0;
-				ServerSetupState.Race[h] = 0;
-
-				// Resync other clients
-				for (i = 1; i < PlayerMax-1; i++) {
-				    if (i != h && Hosts[i].PlyNr) {
-					NetStates[i].State = ccs_async;
-				    }
-				}
-				NetConnectForceDisplayUpdate();
-				break;
-
-			    default:
-				DebugLevel0Fn("Server: ICMSeeYou: Unhandled state %d Host %d\n" _C_
-								 NetStates[h].State _C_ h);
-				break;
-			}
-			break;
-		     }
-		}
+		ServerParseSeeYou(msg);
 		break;
 
 	    default:
