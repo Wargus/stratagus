@@ -959,14 +959,6 @@ global void EditorUpdateDisplay(void)
     }
     DrawEditorPanel();
 
-    //
-    //  Resource
-    //
-    if (TheUI.Resource.Graphic) {
-	VideoDrawSub(TheUI.Resource.Graphic, 0, 0,
-	    TheUI.Resource.Graphic->Width, TheUI.Resource.Graphic->Height,
-	    TheUI.ResourceX, TheUI.ResourceY);
-    }
     if (CursorOn==CursorOnMap) {
 	DrawEditorInfo();
     }
