@@ -976,7 +976,9 @@ local void DrawUnit(Unit* unit)
     UnitType* type;
     UnitStats* stats;
 
-    if ( unit->Revealer ) return; // Revealers are not drawn
+    if ( unit->Revealer ) {		// Revealers are not drawn
+	return;
+    }
 
     type=unit->Type;
 
@@ -1060,7 +1062,7 @@ global void DrawUnits(void)
     //	Select all units touching the viewpoint.
     //
     // FIXME: Must be here +1 on Width, Height.
-    n=SelectUnits(MapX,MapY,MapX+MapWidth,MapY+MapHeight,table);
+    n=SelectUnits(MapX-1,MapY-1,MapX+MapWidth+1,MapY+MapHeight+1,table);
 
     //
     //	2a) corpse aren't in the cache.
@@ -1076,6 +1078,7 @@ global void DrawUnits(void)
 	    DrawUnit(unit);
 	}
     }
+
     //
     //	2b) buildings
     //
