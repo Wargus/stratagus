@@ -1471,11 +1471,11 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
 	    v=MapActionIsland;
 	} else if( f&MapFieldWaterAllowed ) {
 	    v=MapActionWater;
-	} else if( f&MapFieldLandAllowed ) {
+	} else if( (f&MapFieldLandAllowed) || (f&MapFieldCoastAllowed) ) {
 	    v=MapActionLand;
 	}
-	regm[i] = v >> 0;
-	regm[i] = v >> 8;
+	regm[i*2+0]=v >> 0;
+	regm[i*2+1]=v >> 8;
     }
 
     gzwrite(f,regm,n*2);
