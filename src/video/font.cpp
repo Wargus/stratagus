@@ -1292,9 +1292,17 @@ local int CclDefineFontColor(lua_State* l)
     } else {
 	fcmp = &FontColorMappings;
 	while (*fcmp) {
+#ifdef USE_SDL_SURFACE
+	    if (!strcmp((*fcmp)->ColorName, color)) {
+#else
 	    if (!strcmp((*fcmp)->Color, color)) {
+#endif
 		fprintf(stderr, "Warning: Redefining color '%s'\n", color);
+#ifdef USE_SDL_SURFACE
+		free((*fcmp)->ColorName);
+#else
 		free((*fcmp)->Color);
+#endif
 		fcm = *fcmp;
 		break;
 	    }
@@ -1303,7 +1311,11 @@ local int CclDefineFontColor(lua_State* l)
 	*fcmp = calloc(sizeof(*FontColorMappings), 1);
 	fcm = *fcmp;
     }
+#ifdef USE_SDL_SURFACE
+    fcm->ColorName = color;
+#else
     fcm->Color = color;
+#endif
     fcm->Next = NULL;
 
     if (luaL_getn(l, 2) != NumFontColors * 3) {
@@ -1311,13 +1323,25 @@ local int CclDefineFontColor(lua_State* l)
     }
     for (i = 0; i < NumFontColors; ++i) {
 	lua_rawgeti(l, 2, i * 3 + 1);
+#ifdef USE_SDL_SURFACE
+	fcm->Color[i].r = LuaToNumber(l, -1);
+#else
 	fcm->RGB[i].R = LuaToNumber(l, -1);
+#endif
 	lua_pop(l, 1);
 	lua_rawgeti(l, 2, i * 3 + 2);
+#ifdef USE_SDL_SURFACE
+	fcm->Color[i].g = LuaToNumber(l, -1);
+#else
 	fcm->RGB[i].G = LuaToNumber(l, -1);
+#endif
 	lua_pop(l, 1);
 	lua_rawgeti(l, 2, i * 3 + 3);
+#ifdef USE_SDL_SURFACE
+	fcm->Color[i].b = LuaToNumber(l, -1);
+#else
 	fcm->RGB[i].B = LuaToNumber(l, -1);
+#endif
 	lua_pop(l, 1);
     }
 
