@@ -520,9 +520,65 @@ global void VideoDrawFogSolid(const int tile, int x, int y)
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
+global void VideoDrawOnlyFogSolid(const int tile, int x, int y)
+{
+    int tilepitch;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.h = TileSizeY;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+}
+
+global void VideoDrawOnlyFogAlpha(const int tile, int x, int y)
+{
+    int tilepitch;
+    int alpha;
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.h = TileSizeY;
+
+    drect.x = x;
+    drect.y = y;
+
+    alpha = TheMap.TileGraphic->Surface->format->alpha;
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, 128);
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
+}
+
 global void VideoDrawUnexploredSolid(const int tile, int x, int y)
 {
+    int tilepitch;
+    SDL_Rect srect;
+    SDL_Rect drect;
 
+    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
+
+    srect.x = TileSizeX * (tile % tilepitch);
+    srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.h = TileSizeY;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 #else
 // Routines for 8 bit displays .. --------------------------------------------
@@ -2853,6 +2909,15 @@ global void InitMapFogOfWar(void)
 #else
 
 #ifdef USE_SDL_SURFACE
+    if (!OriginalFogOfWar) {
+	VideoDrawFog = VideoDrawFogAlpha;
+	VideoDrawOnlyFog = VideoDrawOnlyFogAlpha;
+	VideoDrawUnexplored = VideoDrawUnexploredSolid;
+    } else {
+	VideoDrawFog = VideoDrawFogSolid;
+	VideoDrawOnlyFog = VideoDrawOnlyFogSolid;
+	VideoDrawUnexplored = VideoDrawUnexploredSolid;
+    }
 
 #else
     if (!OriginalFogOfWar) {
