@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "pathfinder.h"
 #include "network.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -419,6 +420,13 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 		}
 	    }
 	}
+
+	//
+	//	fancy buildings: mirror buildings (but shadows not correct)
+	//
+	if ( FancyBuildings && unit->Rs > 50 ) {
+	    unit->Frame |= 128;
+	}
     } else {
 	unsigned flags;
 
@@ -430,12 +438,19 @@ global Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player)
 	}
     }
 
+#ifdef NEW_FOW
+    //
+    //	Update fog of war.
+    //
+    MapMarkSight(x,y,unit->Stats->SightRange);
+#else
     //
     //	Update fog of war, if unit belongs to player on this computer
     //
     if( player==ThisPlayer ) {
 	MapMarkSight(x,y,unit->Stats->SightRange);
     }
+#endif
 
     UnitCacheInsert(unit);
 
@@ -711,6 +726,46 @@ global void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy)
 */
 global int UnitVisible(const Unit* unit)
 {
+#ifdef NEW_FOW
+    unsigned x;
+    unsigned y;
+    unsigned w;
+    unsigned h;
+    unsigned i;
+    unsigned m;
+    MapField* mf;
+
+    //
+    //	Check if visible on screen
+    //
+    x = unit->X;
+    y = unit->Y;
+    w = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+    if( x+w > MapX && x < MapX+MapWidth &&
+	    y+h > MapY && y < MapY+MapHeight ) {
+	//
+	//	Check explored and if visible under fog of war.
+	//	Building could always be seen under fog of war.
+	//
+	mf=TheMap.Fields+y*TheMap.Width+x;
+	m=1<<ThisPlayer->Player;
+	while( h-- ) {
+	    for( i=w; i--; ) {
+		// FIXME: the NoFogOfWar could be removed here, if visible is
+		// FIXME: correct set.
+		if( (mf->Explored&m) && (TheMap.NoFogOfWar
+			|| unit->Type->Building || (mf->Visible&m)) ) {
+		    return 1;
+		}
+		mf++;
+	    }
+	    mf+=TheMap.Width-w;
+	}
+    }
+    return 0;
+
+#else
     unsigned x;
     unsigned y;
     unsigned w;
@@ -746,6 +801,7 @@ global int UnitVisible(const Unit* unit)
 	return 0;
     }
     return 1;
+#endif
 }
 
 /**
