@@ -812,6 +812,7 @@ global void ClearStatusLine(void)
 --	COSTS
 ----------------------------------------------------------------------------*/
 
+local int CostsFood;			/// mana cost to display in status line
 local int CostsMana;			/// mana cost to display in status line
 local int Costs[MaxCosts];		/// costs to display in status line
 
@@ -853,20 +854,36 @@ global void DrawCosts(void)
 	    }
 	}
     }
+
+    if( CostsFood ) {
+	// FIXME: hardcoded image!!!
+	VideoDrawSub(TheUI.FoodIcon.Graphic
+		,0,TheUI.FoodIconRow*TheUI.FoodIconH
+		,TheUI.FoodIconW,TheUI.FoodIconH
+		,x,TheUI.StatusLineY+1);
+	VideoDrawNumber(x+15,TheUI.StatusLineY+2,GameFont,CostsFood);
+	x+=45;
+    }
 }
 
 /**
 **	Set costs in status line.
 **
-**	@param mana	Mana costs.
+**	@param mana  Mana costs.
+**  @param food     Food costs.
 **	@param costs	Resource costs, NULL pointer if all are zero.
 */
-global void SetCosts(int mana,const int* costs)
+global void SetCosts(int mana,int food,const int* costs)
 {
     int i;
 
     if( CostsMana!=mana ) {
 	CostsMana=mana;
+	MustRedraw|=RedrawCosts;
+    }
+
+    if( CostsFood!=food ) {
+	CostsFood=food;
 	MustRedraw|=RedrawCosts;
     }
 
@@ -895,7 +912,7 @@ global void ClearCosts(void)
     int costs[MaxCosts];
 
     memset(costs,0,sizeof(costs));
-    SetCosts(0,costs);
+    SetCosts(0,0,costs);
 }
 
 /*----------------------------------------------------------------------------

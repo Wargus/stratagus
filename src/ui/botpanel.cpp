@@ -483,20 +483,23 @@ global void DrawButtonPanel(void)
 		    case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
 			stats=&UnitTypes[v].Stats[ThisPlayer->Player];
-			DebugLevel3("Upgrade to %s %d %d %d %d\n"
+			DebugLevel1("Upgrade to %s %d %d %d %d %d\n"
 				,UnitTypes[v].Ident
+                ,UnitTypes[v].Demand
 				,UnitTypes[v]._Costs[GoldCost]
 				,UnitTypes[v]._Costs[WoodCost]
 				,stats->Costs[GoldCost]
 				,stats->Costs[WoodCost]);
-			SetCosts(0,stats->Costs);
+
+			SetCosts(0,UnitTypes[v].Demand,stats->Costs);
+
 			break;
 		    //case ButtonUpgrade:
 		    case ButtonResearch:
-			SetCosts(0,Upgrades[v].Costs);
+			SetCosts(0,0,Upgrades[v].Costs);
 			break;
 		    case ButtonSpellCast:
-			SetCosts(SpellTypeById( v )->ManaCost,NULL);
+			SetCosts(SpellTypeById( v )->ManaCost,0,NULL);
 			break;
 
 		    default:
