@@ -90,6 +90,7 @@ local void ShowInput(void)
     sprintf(InputStatusLine,"MESSAGE:%s~!_",Input);
     input=InputStatusLine;
     // FIXME: That is slow!
+    // FIXME: Must use the real status line length!!
     while( VideoTextLength(GameFont,input)>448 ) {
 	++input;
     }
@@ -558,7 +559,9 @@ local int CommandKey(int key)
 		break;
 	    }
 	case KeyCodeF10:
-	    UiEnterMenu();
+	    if( KeyState!=KeyStateInput ) {
+		UiEnterMenu();
+	    }
 	    break;
 
 	case '+':			// + Faster
