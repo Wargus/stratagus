@@ -66,21 +66,28 @@ local void RepairUnit(Unit* unit,Unit* goal)
     Player* player;
     int costs[MaxCosts];
     int i;
+    int hp;
 #define GIVES_HP	16
+#define MUL		2
 #define DIVISOR		2
 
     player=unit->Player;
 
     //	FIXME: Should substract the correct values for repair
+    //
+    //	Calculate the repair points
+    //
+    hp=((goal->Stats->Costs[TimeCost]*GIVES_HP*FRAMES_PER_SECOND/6)
+	    /goal->Stats->HitPoints)*MUL;
+    DebugLevel3(__FUNCTION__": hitpoints %d\n",hp);
 
     //
-    //	Calculate the costs.
+    //	Calculate the repair costs.
     //
     DebugCheck( !goal->Stats->HitPoints );
     
     for( i=1; i<MaxCosts; ++i ) {
-	costs[i]=((goal->Stats->Costs[i]*GIVES_HP)
-		/goal->Stats->HitPoints)/DIVISOR;
+	costs[i]=((goal->Stats->Costs[i]*hp)/goal->Stats->HitPoints)/DIVISOR;
 
 	// FIXME: unit costs something but to less costs calculated
 	IfDebug(
@@ -102,7 +109,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     //	Repair the unit
     //
-    goal->HP+=GIVES_HP;
+    goal->HP+=hp;
     if ( goal->HP > goal->Stats->HitPoints ) {
 	goal->HP = goal->Stats->HitPoints;
     }
@@ -196,9 +203,11 @@ global int HandleActionRepair(Unit* unit)
 		    unit->SubAction=1;
 		} else if( err ) {
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
-		    if( goal ) {
+#ifdef NEW_UNIT
+		    if( goal ) {		// release reference
 			goal->Refs--;
 		    }
+#endif
 		    return 1;
 		}
 		unit->Command.Action=UnitActionRepair;
@@ -245,9 +254,11 @@ global int HandleActionRepair(Unit* unit)
 		//	Target is fine, choose new one.
 		//
 		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
-		    if( goal ) {
+#ifdef NEW_UNIT
+		    if( goal ) {		// release reference
 			goal->Refs--;
 		    }
+#endif
                     unit->Command.Action=UnitActionStill;
 		    unit->SubAction=0;
 		    unit->State=0;
