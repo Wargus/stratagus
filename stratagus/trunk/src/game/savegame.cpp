@@ -85,12 +85,12 @@ static char* SaveGlobal(lua_State *l, int is_root)
 {
 	int type_key;
 	int type_value;
-	const char *sep;
-	const char *key;
-	char *value;
-	char *res;
+	const char* sep;
+	const char* key;
+	char* value;
+	char* res;
 	int first;
-	char *tmp;
+	char* tmp;
 	int b;
 
 //	Assert(!is_root || !lua_gettop(l));

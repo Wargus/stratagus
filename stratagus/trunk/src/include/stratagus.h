@@ -360,7 +360,7 @@ extern void ShowLoadProgress(const char* fmt,...);
 	/// strdup + strcat
 extern char* strdcat(const char* l, const char* r);
 	/// strdup + strcat + strcat
-extern char* strdcat3(const char* l, const char *m, const char* r);
+extern char* strdcat3(const char* l, const char* m, const char* r);
 
 #if !defined(BSD)
 	/// case insensitive strstr

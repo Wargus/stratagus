@@ -232,7 +232,7 @@ extern Graphic* MakeGraphic(SDL_Surface* surface);
 
 	/// Load a picture and display it on the screen (full screen),
 	/// changing the colormap and so on..
-extern void DisplayPicture(const char *name);
+extern void DisplayPicture(const char* name);
 
 	/// Init line draw
 extern void InitLineDraw(void);

@@ -393,7 +393,7 @@ static void RecalculateShownUnits(void)
 	const UnitType* type;
 
 	if (!ShownUnitTypes) {
-		ShownUnitTypes = malloc(sizeof(char *) * MaxUnitIndex);
+		ShownUnitTypes = malloc(sizeof(char*) * MaxUnitIndex);
 	}
 
 	for (n = i = 0; i < MaxUnitIndex; ++i) {
@@ -1937,7 +1937,7 @@ static void CreateEditor(void)
 			++i;
 		}
 		n = i + 1;
-		EditorUnitTypes = malloc(sizeof(char *) * n);
+		EditorUnitTypes = malloc(sizeof(char*) * n);
 		for (i = 0; i < n; ++i) {
 			EditorUnitTypes[i] = UnitTypeWcNames[i];
 		}

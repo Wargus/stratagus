@@ -610,11 +610,11 @@ static void FontMeasureWidths(ColorFont* fp)
 
 	SDL_LockSurface(fp->Graphic->Surface);
 	for (y = 1; y < 207; ++y) {
-		sp = (const unsigned char *)fp->Graphic->Surface->pixels +
+		sp = (const unsigned char*)fp->Graphic->Surface->pixels +
 			y * fp->Height * fp->Graphic->Surface->pitch - 1;
 		gp = sp + fp->Graphic->Surface->pitch * fp->Height;
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char *)fp->Graphic->Surface->pixels +
+		if (gp >= ((const unsigned char*)fp->Graphic->Surface->pixels +
 				fp->Graphic->Surface->pitch * fp->Graphic->Height)) {
 			break;
 		}

@@ -72,7 +72,7 @@ static int get_subchnl(struct cdrom_subchnl* s)
  */
 int cd_init(void)
 {
-	char *device;
+	char* device;
 
 	device = getenv("CDAUDIO");
 	if (!device) {
@@ -359,7 +359,7 @@ void cd_close(void)
 
 
 static char _cd_error[256];
-const char *cd_error = _cd_error;
+const char* cd_error = _cd_error;
 
 
 /* Hack. */
@@ -372,7 +372,7 @@ static char end_pos[20];
 
 static char ret[256];
 
-static int command(char *fmt, ...)
+static int command(char* fmt, ...)
 {
 	char buf[256];
 	va_list ap;
@@ -414,7 +414,7 @@ void cd_exit(void)
 
 #define startof(track)		(MCI_MAKE_TMSF(track, 0, 0, 0))
 
-static char *lengthof(int track)
+static char* lengthof(int track)
 {
 	command("status cdaudio length track %u", track);
 	return ret;

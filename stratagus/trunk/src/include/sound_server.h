@@ -92,7 +92,7 @@ struct _sample_ {
 	unsigned int Frequency;       ///< frequency in hz
 	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
 
-	unsigned char *Buffer;        ///< sample buffer
+	unsigned char* Buffer;        ///< sample buffer
 	int Pos;                      ///< buffer position
 	int Len;                      ///< length of filled buffer
 };

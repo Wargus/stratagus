@@ -113,7 +113,7 @@ static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 **
 **  @note only works for water transporters!
 */
-static void AiMarkWaterTransporter(const Unit * unit, unsigned char *matrix)
+static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
@@ -385,12 +385,12 @@ int AiFindWall(AiForce* force)
 	int ep;
 	int i;
 	int w;
-	unsigned char *m;
-	unsigned char *matrix;
+	unsigned char* m;
+	unsigned char* matrix;
 	int destx;
 	int desty;
-	AiUnit *aiunit;
-	Unit *unit;
+	AiUnit* aiunit;
+	Unit* unit;
 
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.

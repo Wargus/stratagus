@@ -132,7 +132,7 @@ enum _game_font_ {
 **  Font names
 **  @todo should use the names of the real fonts.
 */
-extern char *FontNames[];
+extern char* FontNames[];
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -257,7 +257,7 @@ int getopt(int argc, char** argv, char* opts)
 {
 	static int sp = 1;
 	register int c;
-	register char *cp;
+	register char* cp;
 
 	optarg = NULL;
 
