@@ -39,7 +39,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include
 #####################################################################
 # Don't change anything below here unless you know what you're doing!
 
-VERSION=	'-DVERSION="1.17.1pre2"'
+VERSION=	'-DVERSION="1.17.2"'
 PROFILE=
 
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
@@ -58,12 +58,11 @@ OBJDIR=obj
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
-DEBUG=	-DDEBUG #-DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) $(SDLCD) $(LIBCDA) \
 	$(FLAC) $(OGG) $(MAD) 
-CFLAGS=-g -O1 -fsigned-char -Wall -Werror $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
+CFLAGS=-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
 CTAGSFLAGS=-i defptvS -a -f 
 
 # Locks versions with a symbolic name

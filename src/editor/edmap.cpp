@@ -38,6 +38,7 @@
 #include "editor.h"
 #include "map.h"
 #include "minimap.h"
+#include "player.h"
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -489,7 +490,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	} else {
 	    mf->Value = UnitTypeOrcWall->_HitPoints;
 	}
-	MapFixWallTile(x + 0, y + 0);
+        MapFixWallTile(x + 0, y + 0);
 	MapFixWallTile(x + 1, y + 0);
 	MapFixWallTile(x + 0, y + 1);
 	MapFixWallTile(x - 1, y + 0);
@@ -610,17 +611,64 @@ global void EditorRandomizeTile( int tile, int count, int max_size )
   
   for( i = 0; i < count; i++ )
     {
-    int rx = MyRand() % (mx / 2);
-    int ry = MyRand() % (my / 2);
-    int rz = MyRand() % max_size + 1;
+    int rx = rand() % (mx / 2);
+    int ry = rand() % (my / 2);
+    int rz = rand() % max_size + 1;
 	    
     TileFill( rx, ry, tile, rz );
     TileFill( mx - rx - 1, ry, tile, rz );
     TileFill( rx, my - ry - 1, tile, rz );
     TileFill( mx - rx - 1, mx - ry - 1, tile, rz );
     }
-    
+
+}
+
+global void EditorRandomizeUnit( const char *unit_type, int count, int value )
+{
+  int mx = TheMap.Width;
+  int my = TheMap.Height;
+  int i;
+  UnitType* type = UnitTypeByIdent(unit_type);
   
+  for( i = 0; i < count; i++ )
+    {
+    Unit *unit;
+    int rx = rand() % (mx / 2);
+    int ry = rand() % (my / 2);
+    int tile = GRASS_TILE;
+    int z = type->TileHeight;
+    
+    //FIXME: vladi: the idea is simple: make proper land for unit(s) :)
+    TileFill( rx, ry, tile, z*2 );
+    TileFill( mx - rx - 1, ry, tile, z*2 );
+    TileFill( rx, my - ry - 1, tile, z*2 );
+    TileFill( mx - rx - 1, mx - ry - 1, tile, z*2 );
+    
+    unit=MakeUnitAndPlace( rx, ry , type, &Players[15]);
+    unit->Value=value;
+    unit=MakeUnitAndPlace( mx - rx - 1, ry, type, &Players[15]);
+    unit->Value=value;
+    unit=MakeUnitAndPlace( rx, my - ry - 1, type, &Players[15]);
+    unit->Value=value;
+    unit=MakeUnitAndPlace( mx - rx - 1, mx - ry - 1, type, &Players[15]);
+    unit->Value=value;
+    }
+
+}
+
+/**
+**	Destroy all units
+*/
+global void EditorDestroyAllUnits()
+{
+    int i;
+    for( i = 0; i < NumUnits; i++) 
+    {
+    Unit* unit=Units[i];
+    RemoveUnit( unit ); 
+    UnitLost( unit ); 
+    ReleaseUnit( unit ); 
+    }
 }
 
 global void EditorCreateRandomMap()
@@ -629,11 +677,15 @@ global void EditorCreateRandomMap()
   
   // make water-base
   TileFill( 0, 0, WATER_TILE, mz * 3 );
+  // remove all units
+  EditorDestroyAllUnits();
   
   EditorRandomizeTile( COAST_TILE, 10, 16 );
   EditorRandomizeTile( GRASS_TILE, 20, 16 );
   EditorRandomizeTile( WOOD_TILE,  60,  4 );
   EditorRandomizeTile( ROCK_TILE,  30,  2 );
+
+  EditorRandomizeUnit( "unit-gold-mine",  5,  50000 );
 }
 
 //@}
