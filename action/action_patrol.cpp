@@ -57,18 +57,22 @@ global void HandleActionPatrol(Unit* unit)
     if( DoActionMove(unit)<0 ) {	// reached end-point or stop
 
 #ifdef NEW_ORDERS
-	Order order;
+	//Order order;
+	int tmp;
 
 	unit->Orders[0].Action=UnitActionPatrol;
 
 	//
 	//	Swap the points.
 	//
-	order=unit->Orders[0];
-
-	DebugLevel0Fn("FIXME: patrol not written\n");
-
+	//order=unit->Orders[0];
+	tmp=(int)unit->Orders[0].Arg1;
+	unit->Orders[0].Arg1=(void*)((unit->Orders[0].X<<16)|unit->Orders[0].Y);
+	unit->Orders[0].X=tmp>>16;
+	unit->Orders[0].Y=tmp&0xFFFF;
 	ResetPath(unit->Orders[0]);
+
+	NewResetPath(unit);
 #else
 	unit->Command.Action=UnitActionPatrol;
 

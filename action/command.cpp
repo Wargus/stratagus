@@ -720,7 +720,7 @@ global void CommandPatrolUnit(Unit* unit,int x,int y,int flush)
 	order->Type=NULL;
 	DebugCheck( unit->X&~0xFFFF || unit->Y&~0xFFFF );
 	// BUG-ALERT: encode source into arg1 as two 16 bit values!
-	order->Arg1=(void*)(unit->X<<16|unit->Y);
+	order->Arg1=(void*)((unit->X<<16)|unit->Y);
     }
 #else
     Command* command;
