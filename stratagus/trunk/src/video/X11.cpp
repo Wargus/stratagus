@@ -304,19 +304,28 @@ global void GameInitDisplay(void)
     //  Look for a nice visual
 
     if( VideoDepth && XMatchVisualInfo(TheDisplay,
-	    TheScreen,VideoDepth,TrueColor,&xvi) )
+	    TheScreen,VideoDepth,TrueColor,&xvi) ) {
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 16, TrueColor, &xvi))
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 16, TrueColor, &xvi)) {
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 15, TrueColor, &xvi))
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 15, TrueColor, &xvi)) {
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi))
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, PseudoColor, &xvi))
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
 	goto foundvisual;
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi))
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, PseudoColor, &xvi)) {
 	goto foundvisual;
-    fprintf(stderr,"Sorry, I couldn't find an 8, 15 , 16 or 24 bit visual.\n");
+    }
+    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi)) {
+	goto foundvisual;
+    }
+    fprintf(stderr,"Sorry, I couldn't find an 8, 15, 16, 24 or 32 bit visual.\n");
     exit(-1);
 
 foundvisual:
