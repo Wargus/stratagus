@@ -4841,7 +4841,7 @@ global UnitType UnitTypes[] = {
    ,{ "missile-none" }		// Missile
    ,CorpseLandSite4x4
 	//Speed	OvFrame	SightR	Hitpnt	Magic	BTime	Gold	Wood	Oil
-	,     0,      0,     0,   5000,     0, {  100,  3000,   3000,  1000 }
+	,     0,      6,     0,   5000,     0, {  100,  3000,   3000,  1000 }
 	//TileW	TileH	BoxW	BoxH	Attack	ReactC	ReactH
 	,     4,    4,   127,    127,        0,      0,      0
 	//Armor	Prior	Damage	Pierc	WUpgr	AUpgr
