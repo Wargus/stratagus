@@ -768,8 +768,8 @@ global void InitMenuFuncHash(void) {
 */
 local void NameLineDrawFunc(Menuitem * mi __attribute__ ((unused)))
 {
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
 
     GetDefaultTextColors(&nc, &rc);
     MenusSetBackground();
@@ -4172,8 +4172,8 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 */
 local void GameDrawFunc(Menuitem *mi __attribute__((unused)))
 {
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
     int l;
     char buffer[32];
 
@@ -4757,8 +4757,8 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
     Menu *menu;
     int i;
-    int nc;
-    int rc;
+    char* nc;
+    char* rc;
 
     menu = FindMenu("menu-multi-setup");
     i = mi - menu->items - SERVER_PLAYER_STATE;

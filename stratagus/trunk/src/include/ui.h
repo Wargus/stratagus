@@ -10,7 +10,7 @@
 //
 /**@name ui.h		-	The user interface header file. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer
+//	(c) Copyright 1999-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -165,8 +165,8 @@ typedef struct _ui_ {
     int		MouseAdjust;		/// Mouse speed adjust
     int		MouseScale;		/// Mouse speed scale
 
-    char	NormalFontColor;	/// Color for normal text displayed
-    char	ReverseFontColor;	/// Color for reverse text displayed
+    char*	NormalFontColor;	/// Color for normal text displayed
+    char*	ReverseFontColor;	/// Color for reverse text displayed
 
     //	Fillers
     GraphicConfig Filler1;		/// filler 1 graphic

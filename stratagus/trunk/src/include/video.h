@@ -1361,27 +1361,38 @@ extern void DisplayPicture(const char *name);
 extern void LoadRGB(Palette* pal,const char* name);
 
     /**
-    **	Creates a hardware palette from an independend Palette struct.
+    **	Maps RGB to a hardware dependent pixel.
     **
-    **	@param palette	System independend palette structure.
+    **	@param r	Red color.
+    **	@param g	Green color.
+    **	@param b	Blue color.
     **
-    **	@return		A palette in hardware dependend format.
+    **	@return		A hardware dependent pixel.
+    */
+extern unsigned long VideoMapRGB(int r, int g, int b);
+
+    /**
+    **	Creates a hardware palette from an independent Palette struct.
+    **
+    **	@param palette	System independent palette structure.
+    **
+    **	@return		A palette in hardware dependent format.
     */
 extern VMemType* VideoCreateNewPalette(const Palette* palette);
 
     /**
-    **	Creates a shared hardware palette from an independend Palette struct.
+    **	Creates a shared hardware palette from an independent Palette struct.
     **
-    **	@param palette	System independend palette structure.
+    **	@param palette	System independent palette structure.
     **
-    **	@return		A palette in hardware dependend format.
+    **	@return		A palette in hardware dependent format.
     */
 extern VMemType* VideoCreateSharedPalette(const Palette* palette);
 
     /**
     **	Free a shared hardware palette.
     **
-    **	@param pixel	palette in hardware dependend format
+    **	@param pixel	palette in hardware dependent format
     */
 extern void VideoFreeSharedPalette(VMemType* pixels);
 
