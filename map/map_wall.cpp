@@ -46,6 +46,12 @@
 local int WallTable[16] = {
 //   0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F
      0,  4,  2,  7,  1,  5,  3,  8,  9, 14, 11, 16, 10, 15, 13, 17
+/*
+    0x90
+    0x92
+    0xA0
+    0x94
+*/
 };
 
 /*----------------------------------------------------------------------------
@@ -76,7 +82,7 @@ global int MapWallChk(int x,int y,int walltype) // used by FixWall, walltype==-1
     t=TheMap.Tileset->TileTypeTable[
 	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile];
     if (walltype == -1) {
-	return t == TileTypeHWall || t == TileTypeOWall ;
+	return t == TileTypeHumanWall || t == TileTypeOrcWall ;
     }
     return t == walltype;
 }
@@ -87,12 +93,17 @@ global int FixWall(int x,int y) // used by MapRemoveWall and PreprocessMap
   int walltype;
   MapField* mf;
 
+  //
+  //	Outside the map
+  //
   if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
       return 0;
   }
   mf=TheMap.Fields+(x)+(y)*TheMap.Width;
   walltype = TheMap.Tileset->TileTypeTable[mf->SeenTile];
-  if ( walltype != TileTypeHWall && walltype != TileTypeOWall ) return 0;
+  if ( walltype != TileTypeHumanWall && walltype != TileTypeOrcWall ) {
+      return 0;
+  }
 
   #define WALL(xx,yy) (MapWallChk(xx,yy,walltype) != 0)
   tile = 0;
@@ -103,7 +114,7 @@ global int FixWall(int x,int y) // used by MapRemoveWall and PreprocessMap
 
   tile = WallTable[tile];
 
-  if (walltype == TileTypeHWall)
+  if (walltype == TileTypeHumanWall)
      {
      if (mf->Value < WALL_50HP)
         tile += TheMap.Tileset->HumanWall50Tile;

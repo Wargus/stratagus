@@ -35,12 +35,9 @@
 global int ForestRegeneration;		/// Forest regeneration
 
 /**
-**	Table for wood removable
+**	Table for wood removable.
 */
-local int WoodTable[16] = {
-//  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F
-   -1, 22, -1,  1, 20, 21,  3,  2, -1,  9, -1, 23,  6,  8,  5,  4
-};
+global int WoodTable[16];
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -88,9 +85,6 @@ global int FixWood(int x,int y) // used by MapRemoveWood2 and PreprocessMap
     if (tile == -1) {
 	MapRemoveWood(x,y);
     } else {
-    // DON'T work EGCC failure tile += TheMap.Tileset->FirstWoodTile;
-	tile += 0x65;
-	DebugLevel3(__FUNCTION__":%x\n", TheMap.Tileset->FirstWoodTile);
 	mf=TheMap.Fields+x+y*TheMap.Width;
 	if ( mf->SeenTile == tile) {
 	    return 0;
@@ -123,7 +117,7 @@ global void MapRemoveWood(unsigned x,unsigned y)
 
     mf=TheMap.Fields+x+y*TheMap.Width;
 
-    mf->Tile=TheMap.Tileset->NoWoodTile;
+    mf->Tile=TheMap.Tileset->RemovedTree;
     mf->Flags &= ~(MapFieldForest|MapFieldUnpassable);
     mf->Value=0;
 
@@ -160,23 +154,23 @@ global void RegenerateForest(void)
     for( x=0; x<TheMap.Width; ++x ) {
 	for( y=0; y<TheMap.Height; ++y ) {
 	    mf=TheMap.Fields+x+y*TheMap.Width;
-	    if( mf->Tile==TheMap.Tileset->NoWoodTile ) {
+	    if( mf->Tile==TheMap.Tileset->RemovedTree ) {
 		if( mf->Value>=ForestRegeneration
 			|| ++mf->Value==ForestRegeneration )  {
 		    if( x && !(mf->Flags&(MapFieldWall|MapFieldUnpassable
 				    |MapFieldLandUnit|MapFieldBuilding)) ) {
 			tmp=mf-TheMap.Width;
-			if( tmp->Tile==TheMap.Tileset->NoWoodTile 
+			if( tmp->Tile==TheMap.Tileset->RemovedTree 
 				&& tmp->Value>=ForestRegeneration
 				&& !(tmp->Flags&(MapFieldWall|MapFieldUnpassable
 				    |MapFieldLandUnit|MapFieldBuilding)) ) {
 
 			    DebugLevel0("Real place wood\n");
-			    tmp->Tile=121;
+			    tmp->Tile=TheMap.Tileset->TopOneTree;
 			    tmp->Value=0;
 			    tmp->Flags|=MapFieldForest|MapFieldUnpassable;
 
-			    mf->Tile=123;
+			    mf->Tile=TheMap.Tileset->BotOneTree;
 			    mf->Value=0;
 			    mf->Flags|=MapFieldForest|MapFieldUnpassable;
 #ifdef NEW_FOW

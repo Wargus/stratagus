@@ -80,11 +80,11 @@ global void MapMarkSeenTile( int x, int y )
 
     // handle WOODs
 
-    if ( st != TheMap.Tileset->NoWoodTile
-	    && t == TheMap.Tileset->NoWoodTile ) {
+    if ( st != TheMap.Tileset->RemovedTree
+	    && t == TheMap.Tileset->RemovedTree ) {
 	MapFixWood( x, y );
-    } else if ( st == TheMap.Tileset->NoWoodTile
-	    && t != TheMap.Tileset->NoWoodTile ) {
+    } else if ( st == TheMap.Tileset->RemovedTree
+	    && t != TheMap.Tileset->RemovedTree ) {
 	FixWood( x, y );
     } else if ( MapWoodChk( x, y ) ) {
 	FixWood( x, y );
@@ -94,12 +94,12 @@ global void MapMarkSeenTile( int x, int y )
     // handle WALLs
 
 #define ISTILEWALL(tile) \
-    (TheMap.Tileset->TileTypeTable[(tile)] == TileTypeHWall	\
-	|| TheMap.Tileset->TileTypeTable[(tile)] == TileTypeOWall)
+    (TheMap.Tileset->TileTypeTable[(tile)] == TileTypeHumanWall	\
+	|| TheMap.Tileset->TileTypeTable[(tile)] == TileTypeOrcWall)
 
-    if ( ISTILEWALL(st) && !ISTILEWALL(st) )
+    if ( ISTILEWALL(st) && !ISTILEWALL(t) )
 	MapFixWall( x, y );
-    else if ( !ISTILEWALL(st) && ISTILEWALL(st) )
+    else if ( !ISTILEWALL(st) && ISTILEWALL(t) )
 	FixWall( x, y );
     else if ( MapWallChk( x, y, -1 ) ) {
 	FixWall( x, y );
