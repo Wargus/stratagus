@@ -2749,6 +2749,9 @@ global int IsAllied(const Player* player,const Unit* dest)
 global int CanTarget(const UnitType* source,const UnitType* dest)
 {
     if( dest->UnitType==UnitTypeLand ) {
+	if( dest->ShoreBuilding ) {
+	    return source->CanTarget&(CanTargetLand|CanTargetSea);
+	}
 	return source->CanTarget&CanTargetLand;
     }
     if( dest->UnitType==UnitTypeFly ) {
