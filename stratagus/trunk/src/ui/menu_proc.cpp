@@ -1369,23 +1369,33 @@ normkey:
 							if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
 								mi[1].d.vslider.percent = (mi->d.listbox.curopt * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
 							}
+							if (mi[1].d.vslider.action) {
+								(*mi->d.vslider.action)(mi);
+							}
 							break;
 						case MI_TYPE_VSLIDER:
 							if (key == KeyCodeDown) {
 								mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
 								// Update listbox
-								if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
-									mi[-1].d.listbox.startline++;
+								if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+									if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
+										mi[-1].d.listbox.startline++;
+									}
 								}
 							} else {
 								mi->d.vslider.cflags |= MI_CFLAGS_UP;
 								// Update listbox
-								if (mi[-1].d.listbox.startline > 0) {
-									mi[-1].d.listbox.startline--;
+								if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+									if (mi[-1].d.listbox.startline > 0) {
+										mi[-1].d.listbox.startline--;
+									}
 								}
 							}
 							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
 								mi->d.vslider.percent = (mi->d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+							}
+							if (mi->d.vslider.action) {
+								(*mi->d.vslider.action)(mi);
 							}
 							break;
 						default:
@@ -1717,7 +1727,9 @@ static void MenuHandleMouseMove(int x, int y)
 					case MI_TYPE_VSLIDER:
 					{
 						int arrowsize;
+						int curper;
 
+						curper = mi->d.vslider.percent;
 						xs = menu->X + mi->xofs;
 						ys = menu->Y + mi->yofs;
 						if (x < xs || x > xs + mi->d.vslider.xsize || y < ys ||
@@ -1764,21 +1776,32 @@ static void MenuHandleMouseMove(int x, int y)
 								j = arrowsize;
 							}
 
-							mi->d.vslider.percent = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
-							if (mi->d.vslider.percent > 100) {
-								mi->d.vslider.percent = 100;
+							curper = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
+							if (curper > 100) {
+								curper = 100;
 							}
 						}
 
 						// Update listbox
-						if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+						if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+							if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+								if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
+									mi[-1].d.listbox.startline = (curper *
+										(mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines) + 50) / 100;
+								}
+							}
 							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-								mi[-1].d.listbox.startline = (mi->d.vslider.percent *
-									(mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines) + 50) / 100;
+								mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+							}
+						} else {
+							if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+								mi->d.vslider.percent = curper;
 							}
 						}
-						if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-							mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+						if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+							if (mi->d.vslider.action) {
+								(*mi->d.vslider.action)(mi);
+							}
 						}
 						break;
 					}
@@ -1949,17 +1972,21 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					mi->d.vslider.cflags = mi->d.vslider.cursel;
 
 					// Update listbox
-					--mi;
-					if (mi[1].d.vslider.cflags & MI_CFLAGS_DOWN) {
-						if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.listbox.noptions) {
-							mi->d.listbox.startline++;
-						}
-					} else if (mi[1].d.vslider.cflags & MI_CFLAGS_UP) {
-						if (mi->d.listbox.startline > 0) {
-							mi->d.listbox.startline--;
+					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+						if (mi->d.vslider.cflags & MI_CFLAGS_DOWN) {
+							if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
+								mi[-1].d.listbox.startline++;
+							}
+						} else if (mi->d.vslider.cflags & MI_CFLAGS_UP) {
+							if (mi[-1].d.listbox.startline > 0) {
+								mi[-1].d.listbox.startline--;
+							}
 						}
 					}
-					++mi;
+					if (mi->d.vslider.action) {
+						(*mi->d.vslider.action)(mi);
+					}
+					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_HSLIDER:
 					mi->d.hslider.cflags = mi->d.hslider.cursel;
@@ -2028,14 +2055,22 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					}
 					mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
 						(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					if (mi[1].d.vslider.action) {
+						(*mi[1].d.vslider.action)(mi);
+					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
 					mi->d.vslider.cflags |= MI_CFLAGS_UP;
 
 					// Update listbox
-					if (mi[-1].d.listbox.startline > 0) {
-						mi[-1].d.listbox.startline--;
+					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+						if (mi[-1].d.listbox.startline > 0) {
+							mi[-1].d.listbox.startline--;
+						}
+					}
+					if (mi->d.vslider.action) {
+						(*mi->d.vslider.action)(mi);
 					}
 					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
@@ -2079,8 +2114,13 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
 
 					// Update listbox
-					if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
-						mi[-1].d.listbox.startline++;
+					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
+						if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
+							mi[-1].d.listbox.startline++;
+						}
+					}
+					if (mi->d.vslider.action) {
+						(*mi->d.vslider.action)(mi);
 					}
 					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
