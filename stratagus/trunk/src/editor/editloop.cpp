@@ -402,8 +402,28 @@ local void DrawUnitIcons(void)
     x = TheUI.InfoPanelX + 4;
     y += 18 * 1 + 4;
     if( SelectedPlayer != -1 ) {
-	sprintf(buf,"Player %d: %s",SelectedPlayer,
-		Players[SelectedPlayer].RaceName);
+	i=sprintf(buf,"Plyr %d %s ",SelectedPlayer,
+		RaceWcNames[TheMap.Info->PlayerSide[SelectedPlayer]]);
+	// Players[SelectedPlayer].RaceName);
+
+	switch( TheMap.Info->PlayerType[SelectedPlayer] ) {
+	    case PlayerNeutral:
+		strcat(buf,"Neutral");
+		break;
+	    case PlayerNobody:
+	    default:
+		strcat(buf,"Nobody");
+		break;
+	    case PlayerPerson:
+		strcat(buf,"Person");
+		break;
+	    case PlayerComputer:
+	    case PlayerRescuePassive:
+	    case PlayerRescueActive:
+		strcat(buf,"Computer");
+		break;
+	}
+
 	VideoDrawText(x, y, GameFont, buf);
     }
 
@@ -1179,8 +1199,9 @@ local void EditorCallbackMouse(int x, int y)
     //
     //	Drawing tiles on map.
     //
-    if( CursorOn == CursorOnMap && EditorState == EditorEditTile
-	    && (MouseButtons&LeftButton) ) {
+    if( CursorOn == CursorOnMap && (MouseButtons&LeftButton)
+		&& (EditorState == EditorEditTile
+		    || EditorState == EditorEditUnit) ) {
 
 	//
 	//	Scroll the map
@@ -1209,9 +1230,28 @@ local void EditorCallbackMouse(int x, int y)
 	//
 	RestrictCursorToViewport();
 
-	EditTiles(Viewport2MapX(TheUI.LastClickedVP, CursorX),
-	    Viewport2MapY(TheUI.LastClickedVP, CursorY), TileCursor,
-	    TileCursorSize);
+	if (EditorState == EditorEditTile) {
+	    EditTiles(Viewport2MapX(TheUI.LastClickedVP, CursorX),
+		Viewport2MapY(TheUI.LastClickedVP, CursorY), TileCursor,
+		TileCursorSize);
+	} else if (EditorState == EditorEditUnit) {
+	    if (CanBuildUnitType(NULL, CursorBuilding,
+		    Viewport2MapX(TheUI.LastClickedVP, CursorX),
+		    Viewport2MapY(TheUI.LastClickedVP, CursorY))) {
+		Unit* unit;
+
+		unit = MakeUnitAndPlace(Viewport2MapX(TheUI.LastClickedVP,
+		    CursorX), Viewport2MapY(TheUI.LastClickedVP, CursorY),
+		    CursorBuilding, Players + SelectedPlayer);
+		if (unit->Type->OilPatch || unit->Type->GivesOil) {
+		    unit->Value = 50000;
+		}
+		if (unit->Type->GoldMine) {
+		    unit->Value = 100000;
+		}
+	    }
+	}
+
 #if 0
 	// FIXME: should scroll the map!
 	viewport = GetViewport(x, y);
