@@ -2065,6 +2065,9 @@ global int CanBuildHere(const UnitType* type, int x, int y)
 			if (table[i]->Orders[0].Action == UnitActionBuilded) {
 				continue;
 			}
+			if (table[i]->Destroyed || table[i]->Orders[0].Action == UnitActionDie) {
+				continue;
+			}
 			if (table[i]->X == x && table[i]->Y == y) {
 				return 1;
 			}
