@@ -100,13 +100,18 @@ local void AiDoOgreMage(Unit* unit)
     int r;
 
     if( unit->Orders[0].Action==UnitActionStill ) {
-	r=SyncRand();
-	if( unit->Mana>MaxMana-10 && !(r%32) ) {
-	    if( unit->Mana>AiEyeOfVision->ManaCost ) {
-		DebugLevel0Fn("`%s' cast eye of vision\n"
+	if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-eye-of-kilrogg")
+		&& UpgradeIdentAvailable(AiPlayer->Player,
+		    "upgrade-ogre-mage") ) {
+	    r=SyncRand();
+	    if( unit->Mana>MaxMana-10 && !(r%32) ) {
+		if( unit->Mana>AiEyeOfVision->ManaCost ) {
+		    DebugLevel0Fn("`%s' cast eye of vision\n"
 			_C_ unit->Type->Ident);
-		CommandSpellCast(unit,unit->X,unit->Y,NoUnitP,
+
+		    CommandSpellCast(unit,unit->X,unit->Y,NoUnitP,
 			AiEyeOfVision,FlushCommands);
+		}
 	    }
 	}
     }
@@ -117,6 +122,36 @@ local void AiDoOgreMage(Unit* unit)
 */
 local void AiDoPaladin(Unit* unit)
 {
+    int r;
+
+    if( unit->Orders[0].Action==UnitActionStill ) {
+	if( UpgradeIdentAvailable(AiPlayer->Player,"upgrade-holy-vision")
+		&& UpgradeIdentAvailable(AiPlayer->Player,
+		    "upgrade-paladin") ) {
+	    r=SyncRand();
+	    if( unit->Mana>MaxMana-10 && !(r%32) ) {
+		if( unit->Mana>AiHolyVision->ManaCost ) {
+		    int x;
+		    int y;
+
+		    DebugLevel0Fn("`%s' cast holy vision\n"
+			_C_ unit->Type->Ident);
+		    // Look around randomly
+		    r>>=5;
+		    x=r&0xFFFF;
+		    if( x>=TheMap.Width ) {
+			x=TheMap.Width-1;
+		    }
+		    y=SyncRand();
+		    if( y>=TheMap.Height ) {
+			y=TheMap.Height-1;
+		    }
+		    CommandSpellCast(unit,x,y,NoUnitP,
+			AiHolyVision,FlushCommands);
+		}
+	    }
+	}
+    }
 }
 
 /**
