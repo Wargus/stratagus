@@ -87,7 +87,7 @@ local struct timeval X11TicksStart;	/// My counter start
 --	Sync
 ----------------------------------------------------------------------------*/
 
-#define USE_ITIMER
+#define noUSE_ITIMER			/// Use the old ITIMER code (obsolete)
 
 #ifdef USE_ITIMER
 
@@ -138,11 +138,35 @@ global void SetVideoSync(void)
 
 #else
 
+local int FrameTicks;			/// Frame length in ms
+local int FrameRemainder;		/// Frame remainder 0.1 ms
+local int FrameFraction;		/// Frame fractional term
+local int SkipFrames;			/// Skip this frames
+
 /**
 **	Initialise video sync.
+**	Calculate the length of video frame and any simulation skips.
+**
+**	@see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
 */
 global void SetVideoSync(void)
 {
+    int ms;
+
+    if( VideoSyncSpeed ) {
+	ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+    } else {
+	ms = INT_MAX;
+    }
+    SkipFrames = ms / 400;
+    while (SkipFrames && ms / SkipFrames < 200) {
+	--SkipFrames;
+    }
+    ms /= SkipFrames + 1;
+
+    FrameTicks = ms / 10;
+    FrameRemainder = ms % 10;
+    DebugLevel0Fn("frames %d - %d.%dms\n", SkipFrames, ms / 10, ms % 10);
 }
 
 #endif
@@ -165,12 +189,14 @@ local void MyConnectionWatch
 **	X11 get ticks in ms.
 **
 **	@return		Game ticks in ms.
+**
+**	@todo	Use if supported RDTSC.
 */
 global unsigned long X11GetTicks(void)
 {
     struct timeval now;
     unsigned long ticks;
- 
+
     gettimeofday(&now,NULL);
 
     ticks=(now.tv_sec-X11TicksStart.tv_sec)*1000
@@ -561,10 +587,10 @@ local void X11HandleModifiers(XKeyEvent* keyevent)
 	    /* Do Nothing */;
     }
     if( mod&ControlMask ) {
-        keyevent->state&=~ControlMask;  // Hack Attack!
+        keyevent->state&=~ControlMask;	// Hack Attack!
     }
     if( mod&Mod1Mask ) {
-        keyevent->state&=~Mod1Mask;     // Hack Attack!
+        keyevent->state&=~Mod1Mask;	// Hack Attack!
     }
 }
 
@@ -689,8 +715,8 @@ local unsigned X112InternalKeycode(const KeySym code)
 	    icode='^';
 	    break;
 
-        // We need these because if you only hit a modifier key,
-        // X doesn't set its state (modifiers) field in the keyevent.
+	// We need these because if you only hit a modifier key,
+	// X doesn't set its state (modifiers) field in the keyevent.
 	case XK_Shift_L:
 	case XK_Shift_R:
 	    icode = KeyCodeShift;
@@ -860,7 +886,7 @@ local void X11DoEvent(const EventCallback* callbacks)
 	}
 	    break;
 
-	case ConfigureNotify:	// IGNORE, not useful for us yet - 
+	case ConfigureNotify:	// IGNORE, not useful for us yet -
 				// we may be able to limit hidden map draw here later
 	    break;
 
@@ -882,6 +908,8 @@ local void X11DoEvent(const EventCallback* callbacks)
 **	Returns if the time for one frame is over.
 **
 **	@param callbacks	Call backs that handle the events.
+**
+**	FIXME:	the initialition could be moved out of the loop
 */
 global void WaitEventsOneFrame(const EventCallback* callbacks)
 {
@@ -894,15 +922,36 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     int i;
     int morex;
     int connection;
+    unsigned long ticks;
 
     connection=ConnectionNumber(TheDisplay);
 #ifdef WITH_SOUND
+    // FIXME: ugly hack, move into sound part!!!
     if( SoundFildes==-1 ) {
 	SoundOff=1;
     }
 #endif
+    if( !++FrameCounter ) {
+	// FIXME: tests with frame counter now fails :(
+	// FIXME: Should happen in 68 years :)
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr,"FIXME: *** round robin ***\n");
+    }
 
-    InputMouseTimeout(callbacks,X11GetTicks());
+    ticks=X11GetTicks();
+    if( ticks>NextFrameTicks ) {	// We are too slow :(
+	IfDebug(
+	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    XClearArea(TheDisplay,TheMainWindow
+		,TheUI.MapX+10,TheUI.MapX+10,13*13,13
+		,False);
+	);
+	++SlowFrameCounter;
+    }
+
+    InputMouseTimeout(callbacks,ticks);
 
     for( ;; ) {
 #ifdef SLOW_INPUT
@@ -910,7 +959,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	   X11DoEvent(callbacks);
 	}
 #endif
-
 	//
 	//	Prepare select
 	//
@@ -920,6 +968,24 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 
+#ifndef USE_ITIMER
+	//
+	//      Time of frame over? This makes the CPU happy. :(
+	//
+	ticks=X11GetTicks();
+	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
+	    tv.tv_usec=ticks*1000;
+	}
+	while( ticks>=NextFrameTicks ) {
+	    ++VideoInterrupts;
+	    FrameFraction+=FrameRemainder;
+	    if( FrameFraction>10 ) {
+		FrameFraction-=10;
+		++NextFrameTicks;
+	    }
+	    NextFrameTicks+=FrameTicks;
+	}
+#endif
 	//
 	//	X11 how many events already in queue
 	//
@@ -967,16 +1033,14 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    FD_SET(NetworkFildes,&rfds);
 	}
 
+#ifdef USE_ITIMER
 	maxfd=select(maxfd+1,&rfds,&wfds,NULL
 		,(morex|VideoInterrupts) ? &tv : NULL);
+#else
+	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
+#endif
 
 	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
-
-#if 0
-	if( maxfd>0 && NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-	    callbacks->NetworkEvent();
-	}
-#endif
 
 	//
 	//	X11
@@ -1009,10 +1073,20 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Sound
 	    //
-	    if( !SoundOff && !SoundThreadRunning 
+	    if( !SoundOff && !SoundThreadRunning
 		    && FD_ISSET(SoundFildes,&wfds) ) {
 		callbacks->SoundReady();
 	    }
+
+#if 0
+	    // ARI: needs network packets!
+	    //
+	    //	No more input and network in sync time for frame over: return
+	    //
+	    if( !morex && NetworkInSync && VideoInterrupts ) {
+		break;
+	    }
+#endif
 
 	    //
 	    //	Network
@@ -1021,12 +1095,6 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 		callbacks->NetworkEvent();
 	    }
 
-	    //
-	    //	No more input and time for frame over: return
-	    //
-	    if( !morex && VideoInterrupts ) {
-		break;
-	    }
 	}
 
 	//
@@ -1041,6 +1109,12 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //	Prepare return, time for one frame is over.
     //
     VideoInterrupts=0;
+
+#ifndef USE_ITIMER
+    if( !SkipGameCycle-- ) {
+	SkipGameCycle=SkipFrames;
+    }
+#endif
 }
 
 /**
@@ -1053,25 +1127,16 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 **
 **	We must handle atlast one X11 event
 **
-**	FIXME:	the initialition could be moved out of the loop
+**	@todo FIXME: Use the ::WaitEventsOneFrame().
 */
 global void WaitEventsAndKeepSync(void)
 {
     EventCallback callbacks;
-    struct timeval tv;
-    fd_set rfds;
-    fd_set wfds;
-    int maxfd;
-    int* xfd;
-    int n;
-    int i;
-    int morex;
-    int connection;
 
-    callbacks.ButtonPressed=HandleButtonDown;
-    callbacks.ButtonReleased=HandleButtonUp;
-    callbacks.MouseMoved=HandleMouseMove;
-    callbacks.MouseExit=HandleMouseExit;
+    callbacks.ButtonPressed=(void*)HandleButtonDown;
+    callbacks.ButtonReleased=(void*)HandleButtonUp;
+    callbacks.MouseMoved=(void*)HandleMouseMove;
+    callbacks.MouseExit=(void*)HandleMouseExit;
 
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
@@ -1079,158 +1144,8 @@ global void WaitEventsAndKeepSync(void)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
-    connection=ConnectionNumber(TheDisplay);
-#ifdef WITH_SOUND
-    if( SoundFildes==-1 ) {
-	SoundOff=1;
-    }
-#endif
-
-    InputMouseTimeout(&callbacks,X11GetTicks());
-
-    for( ;; ) {
-#ifdef SLOW_INPUT
-	while( XPending(TheDisplay) ) {
-	   X11DoEvent(&callbacks);
-	}
-#endif
-
-	//
-	//	Prepare select
-	//
-	maxfd=0;
-	tv.tv_sec=tv.tv_usec=0;
-
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-
-	//
-	//	X11 how many events already in queue
-	//
-	xfd=NULL;
-	morex=QLength(TheDisplay);
-	if( !morex ) {
-	    //
-	    //	X11 connections number
-	    //
-	    maxfd=connection;
-	    FD_SET(connection,&rfds);
-
-	    //
-	    //	Get all X11 internal connections
-	    //
-	    if( !XInternalConnectionNumbers(TheDisplay,&xfd,&n) ) {
-		DebugLevel0Fn(": out of memory\n");
-		abort();
-	    }
-	    for( i=n; i--; ) {
-		FD_SET(xfd[i],&rfds);
-		if( xfd[i]>maxfd ) {
-		    maxfd=xfd[i];
-		}
-	    }
-	}
-
-	//
-	//	Sound
-	//
-	if( !SoundOff && !SoundThreadRunning ) {
-	    if( SoundFildes>maxfd ) {
-		maxfd=SoundFildes;
-	    }
-	    FD_SET(SoundFildes,&wfds);
-	}
-
-	//
-	//	Network
-	//
-	if( NetworkFildes!=-1 ) {
-	    if( NetworkFildes>maxfd ) {
-		maxfd=NetworkFildes;
-	    }
-	    FD_SET(NetworkFildes,&rfds);
-	    if( !NetworkInSync ) {
-		NetworkRecover();	// recover network
-	    }
-	}
-
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		,(morex|VideoInterrupts) ? &tv : NULL);
-
-	DebugLevel3Fn("%d, %d\n",morex|VideoInterrupts,maxfd);
-
-	//
-	//	X11
-	//
-	if( maxfd>0 ) {
-	    if( !morex ) {		// look if new events
-		if (xfd) {
-		    for( i=n; i--; ) {
-			if( FD_ISSET(xfd[i],&rfds) ) {
-			    XProcessInternalConnection(TheDisplay,xfd[i]);
-			}
-		    }
-		}
-		if( FD_ISSET(connection,&rfds) ) {
-		    morex=XEventsQueued(TheDisplay,QueuedAfterReading);
-		} else {
-		    morex=QLength(TheDisplay);
-		}
-	    }
-	}
-	if( xfd) {
-	    XFree(xfd);
-	}
-
-	for( i=morex; i--; ) {		// handle new + *OLD* x11 events
-	   X11DoEvent(&callbacks);
-	}
-
-	if( maxfd>0 ) {
-	    //
-	    //	Sound
-	    //
-	    if( !SoundOff && !SoundThreadRunning 
-		    && FD_ISSET(SoundFildes,&wfds) ) {
-		callbacks.SoundReady();
-	    }
-
-	    //
-	    //	Network
-	    //
-	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
-		callbacks.NetworkEvent();
-	    }
-
-	    //	ARI: ORDER IS IMPORTANT HERE - THIS HAS TO BE LAST,
-	    //	or Network/Sound events wont be handled without X activity
-	    //	which would break for example network menu code
-
-	    //
-	    //	Network in sync and time for frame over: return
-	    //
-	    if( !morex && NetworkInSync && VideoInterrupts ) {
-		break;
-	    }
-
-	}
-
-	//
-	//	Network in sync and time for frame over: return
-	//
-	if(
-#ifndef SLOW_INPUT
-	    !morex &&
-#endif
-		      NetworkInSync && VideoInterrupts ) {
-	    break;
-	}
-    }
-
-    //
-    //	Prepare return, time for one frame is over.
-    //
-    VideoInterrupts=0;
+    DebugLevel0Fn("Don't use this function\n");
+    WaitEventsOneFrame(&callbacks);
 }
 
 /**
@@ -1429,8 +1344,9 @@ global void CheckVideoInterrupts(void)
 global void RealizeVideoMemory(void)
 {
     // in X11 it does flushing the output queue
-    XFlush(TheDisplay);
-    //XSync(TheDisplay,False);
+    //XFlush(TheDisplay);
+    // in X11 wait for all commands done.
+    XSync(TheDisplay,False);
 }
 
 /**
@@ -1451,6 +1367,15 @@ global void ToggleGrabMouse(void)
 	}
 
     }
+}
+
+/**
+**	Toggle full screen mode.
+**
+**	@todo FIXME: not written.
+*/
+global void ToggleFullScreen(void)
+{
 }
 
 #endif	// USE_X11
