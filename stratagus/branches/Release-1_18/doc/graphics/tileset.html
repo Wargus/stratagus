@@ -12,177 +12,177 @@
 ----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ----    GNU General Public License for more details.
 -->
-<HTML><HEAD>
-    <TITLE>FreeCraft tileset graphic format</TITLE>
-</HEAD>
-<BODY>
-    <H1>FreeCraft tileset graphic format</H1>
-<HR>
+<html><head>
+    <title>FreeCraft tileset graphic format</title>
+</head>
+<body>
+    <h1>FreeCraft tileset graphic format</h1>
+<hr>
 
 The freecraft playfield is build with tiles each with the size of 32x32 pixels.
 
-<H2>Tileset graphic file format</H2>
+<h2>Tileset graphic file format</h2>
 
 The graphic data for tiles are stored in the directory:
-    $FREECRAFTHOME/data/graphic/tileset.<P>
+    $FREECRAFTHOME/data/graphic/tileset.<p>
 
-<H3>Fantasy warfare summer tileset</H3>
+<h3>Fantasy warfare summer tileset</h3>
 
-<DIV ALIGN=CENTER>
-<IMG SRC="summer_klein.png" ALT="[SUMMER]">
-</DIV>
+<div align=center>
+<img src="summer_klein.png" alt="[SUMMER]">
+</div>
 
-<UL>
-<LI>Fog of war mask.<BR>
-<IMG SRC="fog_of_war.png" ALT="[FOG OF WAR]">
-<LI>Human walls.<BR>
-<IMG SRC="human_wall.png" ALT="[HUMAN WALL]">
-<LI>Orc walls.<BR>
-<IMG SRC="orc_wall.png" ALT="[ORC WALL]">
-<LI>Defect human walls.<BR>
-<IMG SRC="defect_human_wall.png" ALT="[DEFECT HUMAN WALL]">
-<LI>Defect orc walls.<BR>
-<IMG SRC="defect_orc_wall.png" ALT="[DEFECT ORC WALL]">
-<LI>Destroyed walls.<BR>
-<IMG SRC="destroyed_wall.png" ALT="[DESTROYED WALL]">
-<LI>Forest and ground.<BR>
-<IMG SRC="forest_and_ground.png" ALT="[FOREST GROUND]">
-<LI>Rocks and coast.<BR>
-<IMG SRC="rocks_and_coast.png" ALT="[ROCKS COAST]">
-<LI>Light and dark coast.<BR>
-<IMG SRC="light_and_dark_coast.png" ALT="[LIGHT DARK COAST]">
-<LI>Water and coast.<BR>
-<IMG SRC="water_and_coast.png" ALT="[WATER COAST]">
-<LI>Light and dark ground.<BR>
-<IMG SRC="light_and_dark_ground.png" ALT="[LIGHT DARK GROUND]">
-<LI>Water and light coast.<BR>
-<IMG SRC="water_and_coast.png" ALT="[WATER COAST]">
-<LI>Light and dark water.<BR>
-<IMG SRC="light_and_dark_water.png" ALT="[LIGHT DARK WATER]">
-<LI>Light coast.<BR>
-<IMG SRC="light_coast.png" ALT="[LIGHT COAST]">
-<LI>Dark coast.<BR>
-<IMG SRC="dark_coast.png" ALT="[DARK COAST]">
-<LI>Light ground.<BR>
-<IMG SRC="light_ground.png" ALT="[LIGHT GROUND]">
-<LI>Dark ground.<BR>
-<IMG SRC="dark_ground.png" ALT="[DARK GROUND]">
-</UL>
+<ul>
+<li>Fog of war mask.<br>
+<img src="fog_of_war.png" alt="[FOG OF WAR]">
+<li>Human walls.<br>
+<img src="human_wall.png" alt="[HUMAN WALL]">
+<li>Orc walls.<br>
+<img src="orc_wall.png" alt="[ORC WALL]">
+<li>Defect human walls.<br>
+<img src="defect_human_wall.png" alt="[DEFECT HUMAN WALL]">
+<li>Defect orc walls.<br>
+<img src="defect_orc_wall.png" alt="[DEFECT ORC WALL]">
+<li>Destroyed walls.<br>
+<img src="destroyed_wall.png" alt="[DESTROYED WALL]">
+<li>Forest and ground.<br>
+<img src="forest_and_ground.png" alt="[FOREST GROUND]">
+<li>Rocks and coast.<br>
+<img src="rocks_and_coast.png" alt="[ROCKS COAST]">
+<li>Light and dark coast.<br>
+<img src="light_and_dark_coast.png" alt="[LIGHT DARK COAST]">
+<li>Water and coast.<br>
+<img src="water_and_coast.png" alt="[WATER COAST]">
+<li>Light and dark ground.<br>
+<img src="light_and_dark_ground.png" alt="[LIGHT DARK GROUND]">
+<li>Water and light coast.<br>
+<img src="water_and_coast.png" alt="[WATER COAST]">
+<li>Light and dark water.<br>
+<img src="light_and_dark_water.png" alt="[LIGHT DARK WATER]">
+<li>Light coast.<br>
+<img src="light_coast.png" alt="[LIGHT COAST]">
+<li>Dark coast.<br>
+<img src="dark_coast.png" alt="[DARK COAST]">
+<li>Light ground.<br>
+<img src="light_ground.png" alt="[LIGHT GROUND]">
+<li>Dark ground.<br>
+<img src="dark_ground.png" alt="[DARK GROUND]">
+</ul>
 
-<H2>Tileset map file format</H2>
+<h2>Tileset map file format</h2>
 
-The tiles are stored in the map with this numbers.<P>
+The tiles are stored in the map with this numbers.<p>
 The mapping from the map tile number to the graphic tile number is stored
-in the file $FREECRAFTHOME/data/ccl/tileset.ccl.<P>
+in the file $FREECRAFTHOME/data/ccl/tileset.ccl.<p>
 
 The tiles in the map are numbered from 0 to 0x9DF (2527).
 
-<UL>
-<LI>0x0000 - 0x000F unused
-<LI>0x0010 - 0x001F solid light water
-<LI>0x0020 - 0x002F solid dark water
-<LI>0x0030 - 0x003F solid light coast
-<LI>0x0040 - 0x004F solid dark coast
-<LI>0x0050 - 0x005F solid light ground
-<LI>0x0060 - 0x006F solid dark ground
-<LI>0x0070 - 0x007F solid forest
-<LI>0x0080 - 0x008F solid mountains
-<LI>0x0090 - 0x009F solid human walls
-    <UL>
-    <LI>0x0 Solid wall
-    <LI>0x2 defect wall
-    <LI>0x4 destroyed wall
-    </UL>
-<LI>0x00A0 - 0x00AF solid orc walls
-    <BR>See solid human walls.
-<LI>0x00B0 - 0x00BF solid human walls
-    <BR>See solid human walls.
-<LI>0x00C0 - 0x00CF solid orc walls
-    <BR>See solid human walls.
-<LI>0x00D0 - 0x00FF unused
-<LI>0x0100 - 0x01FF dark and light water
-    <UL>
-    <LI>0x0* filled upper left
-    <LI>0x1* filled upper right
-    <LI>0x2* filled upper half
-    <LI>0x3* filled lower left
-    <LI>0x4* filled left half
-    <LI>0x5* clear upper left and lower right
-    <LI>0x6* clear lower right
-    <LI>0x7* filled lower right
-    <LI>0x8* filled upper left and lower right
-    <LI>0x9* clear left half
-    <LI>0xA* clear lower left
-    <LI>0xB* clear upper half
-    <LI>0xC* clear upper right
-    <LI>0xD* clear upper left
-    <LI>0xE* unused
-    <LI>0xF* unused
-    </UL>
-<LI>0x0200 - 0x02FF water and coast
-    <BR>See dark and light water
-<LI>0x0300 - 0x03FF dark and light coast
-    <BR>See dark and light water
-<LI>0x0400 - 0x04FF mountain and coast
-    <BR>See dark and light water
-<LI>0x0500 - 0x05FF coast and ground
-    <BR>See dark and light water
-<LI>0x0600 - 0x06FF dark and light ground
-    <BR>See dark and light water
-<LI>0x0700 - 0x07FF forest and ground
-    <BR>See dark and light water
-<LI>0x0800 - 0x08FF human wall
-    <BR>See dark and light water
-<LI>0x0900 - 0x09FF orc wall
-    <BR>See dark and light water
-<LI>0x0A00 - 0xFFFF unused
-</UL>
+<ul>
+<li>0x0000 - 0x000F unused
+<li>0x0010 - 0x001F solid light water
+<li>0x0020 - 0x002F solid dark water
+<li>0x0030 - 0x003F solid light coast
+<li>0x0040 - 0x004F solid dark coast
+<li>0x0050 - 0x005F solid light ground
+<li>0x0060 - 0x006F solid dark ground
+<li>0x0070 - 0x007F solid forest
+<li>0x0080 - 0x008F solid mountains
+<li>0x0090 - 0x009F solid human walls
+    <ul>
+    <li>0x0 Solid wall
+    <li>0x2 defect wall
+    <li>0x4 destroyed wall
+    </ul>
+<li>0x00A0 - 0x00AF solid orc walls
+    <br>See solid human walls.
+<li>0x00B0 - 0x00BF solid human walls
+    <br>See solid human walls.
+<li>0x00C0 - 0x00CF solid orc walls
+    <br>See solid human walls.
+<li>0x00D0 - 0x00FF unused
+<li>0x0100 - 0x01FF dark and light water
+    <ul>
+    <li>0x0* filled upper left
+    <li>0x1* filled upper right
+    <li>0x2* filled upper half
+    <li>0x3* filled lower left
+    <li>0x4* filled left half
+    <li>0x5* clear upper left and lower right
+    <li>0x6* clear lower right
+    <li>0x7* filled lower right
+    <li>0x8* filled upper left and lower right
+    <li>0x9* clear left half
+    <li>0xA* clear lower left
+    <li>0xB* clear upper half
+    <li>0xC* clear upper right
+    <li>0xD* clear upper left
+    <li>0xE* unused
+    <li>0xF* unused
+    </ul>
+<li>0x0200 - 0x02FF water and coast
+    <br>See dark and light water
+<li>0x0300 - 0x03FF dark and light coast
+    <br>See dark and light water
+<li>0x0400 - 0x04FF mountain and coast
+    <br>See dark and light water
+<li>0x0500 - 0x05FF coast and ground
+    <br>See dark and light water
+<li>0x0600 - 0x06FF dark and light ground
+    <br>See dark and light water
+<li>0x0700 - 0x07FF forest and ground
+    <br>See dark and light water
+<li>0x0800 - 0x08FF human wall
+    <br>See dark and light water
+<li>0x0900 - 0x09FF orc wall
+    <br>See dark and light water
+<li>0x0A00 - 0xFFFF unused
+</ul>
 
-<H3>Palette</H3>
+<h3>Palette</h3>
 
-The palette are stored with the tilesets.<P>
+The palette are stored with the tilesets.<p>
 This will I change later.
 
-<TABLE>
-<TR><TD>  0	</TD><TD>black	</TD></TR>
-<TR><TD>  1	</TD><TD>blue player color on minimap	</TD></TR>
-<TR><TD>  2	</TD><TD>yellow player color on minimap	</TD></TR>
-<TR><TD>  3	</TD><TD>flash red/green attacked building on minimap</TD></TR>
-<TR><TD>12-15	</TD><TD>4 colors for yellow player	</TD></TR>
-<TR><TD>38- 47	</TD><TD>Water color cycle map	</TD></TR>
-<TR><TD>48- 56	</TD><TD>Water/Coast color cycle map	</TD></TR>
-<TR><TD>104	</TD><TD>Reverse color 1 font	</TD></TR>
-<TR><TD>149	</TD><TD>Dark green for hit points	</TD></TR>
-<TR><TD>192	</TD><TD>Color 0 font	</TD></TR>
-<TR><TD>199	</TD><TD>Color 1 font	</TD></TR>
-<TR><TD>200	</TD><TD>Color 2 font	</TD></TR>
-<TR><TD>202	</TD><TD>Pulsated red (circle of power) </TD></TR>
-<TR><TD>206	</TD><TD>Color for mana points	</TD></TR>
-<TR><TD>208	</TD><TD>red player color on minimap	</TD></TR>
-<TR><TD>208-211	</TD><TD>4 colors for red player	</TD></TR>
-<TR><TD>212-215	</TD><TD>4 colors for blue player	</TD></TR>
-<TR><TD>216	</TD><TD>green player color on minimap	</TD></TR>
-<TR><TD>216-219	</TD><TD>4 colors for green player	</TD></TR>
-<TR><TD>220	</TD><TD>violett player color on minimap	</TD></TR>
-<TR><TD>220-223	</TD><TD>4 colors for violett player	</TD></TR>
-<TR><TD>224	</TD><TD>orange player color on minimap	</TD></TR>
-<TR><TD>224-227	</TD><TD>4 colors for orange player	</TD></TR>
-<TR><TD>228	</TD><TD>black player color on minimap	</TD></TR>
-<TR><TD>228-231	</TD><TD>4 colors for black player	</TD></TR>
-<TR><TD>232-235	</TD><TD>4 colors for black player	</TD></TR>
-<TR><TD>239	</TD><TD>Color 3 font	</TD></TR>
-<TR><TD>240-244	</TD><TD>Water color cycle icons	</TD></TR>
-<TR><TD>246	</TD><TD>Reverse color 0 font (white)	</TD></TR>
-<TR><TD>247	</TD><TD>neutral on minimap	</TD></TR>
-<TR><TD>248	</TD><TD>Gray of icons	</TD></TR>
-<TR><TD>249	</TD><TD>red for hit points	</TD></TR>
-<TR><TD>250	</TD><TD>Green on minimap	</TD></TR>
-<TR><TD>251	</TD><TD>Gold on minimap (yellow)	</TD></TR>
-<TR><TD>252	</TD><TD>blink red/yellow on minimap	</TD></TR>
-<TR><TD>255	</TD><TD>white player color on minimap	</TD></TR>
-<TR><TD>255	</TD><TD>color for view point rectangle	</TD></TR>
-</TABLE>
-<HR>
+<table>
+<tr><td>  0	</td><td>black	</td></tr>
+<tr><td>  1	</td><td>blue player color on minimap	</td></tr>
+<tr><td>  2	</td><td>yellow player color on minimap	</td></tr>
+<tr><td>  3	</td><td>flash red/green attacked building on minimap</td></tr>
+<tr><td>12-15	</td><td>4 colors for yellow player	</td></tr>
+<tr><td>38- 47	</td><td>Water color cycle map	</td></tr>
+<tr><td>48- 56	</td><td>Water/Coast color cycle map	</td></tr>
+<tr><td>104	</td><td>Reverse color 1 font	</td></tr>
+<tr><td>149	</td><td>Dark green for hit points	</td></tr>
+<tr><td>192	</td><td>Color 0 font	</td></tr>
+<tr><td>199	</td><td>Color 1 font	</td></tr>
+<tr><td>200	</td><td>Color 2 font	</td></tr>
+<tr><td>202	</td><td>Pulsated red (circle of power) </td></tr>
+<tr><td>206	</td><td>Color for mana points	</td></tr>
+<tr><td>208	</td><td>red player color on minimap	</td></tr>
+<tr><td>208-211	</td><td>4 colors for red player	</td></tr>
+<tr><td>212-215	</td><td>4 colors for blue player	</td></tr>
+<tr><td>216	</td><td>green player color on minimap	</td></tr>
+<tr><td>216-219	</td><td>4 colors for green player	</td></tr>
+<tr><td>220	</td><td>violett player color on minimap	</td></tr>
+<tr><td>220-223	</td><td>4 colors for violett player	</td></tr>
+<tr><td>224	</td><td>orange player color on minimap	</td></tr>
+<tr><td>224-227	</td><td>4 colors for orange player	</td></tr>
+<tr><td>228	</td><td>black player color on minimap	</td></tr>
+<tr><td>228-231	</td><td>4 colors for black player	</td></tr>
+<tr><td>232-235	</td><td>4 colors for black player	</td></tr>
+<tr><td>239	</td><td>Color 3 font	</td></tr>
+<tr><td>240-244	</td><td>Water color cycle icons	</td></tr>
+<tr><td>246	</td><td>Reverse color 0 font (white)	</td></tr>
+<tr><td>247	</td><td>neutral on minimap	</td></tr>
+<tr><td>248	</td><td>Gray of icons	</td></tr>
+<tr><td>249	</td><td>red for hit points	</td></tr>
+<tr><td>250	</td><td>Green on minimap	</td></tr>
+<tr><td>251	</td><td>Gold on minimap (yellow)	</td></tr>
+<tr><td>252	</td><td>blink red/yellow on minimap	</td></tr>
+<tr><td>255	</td><td>white player color on minimap	</td></tr>
+<tr><td>255	</td><td>color for view point rectangle	</td></tr>
+</table>
+<hr>
 All trademarks and copyrights on this page are owned by their respective owners.
-<ADDRESS><A HREF="http://freecraft.org">The FreeCraft Project</A>
-</ADDRESS></BODY></HTML>
+<address><a href="http://freecraft.org">The FreeCraft Project</a>
+</address></body></html>
