@@ -584,6 +584,7 @@ case $ANSWER in
 		echo "-> No arts daemon support"
 		;;
 	  esac
+	  echo
 	fi
 
 	if (test "$USESDL" != 1 -a "$HAVEARTS" != 1) ; then
