@@ -250,6 +250,19 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
+	//	SCM version additional information
+	//
+	if( !memcmp(header, "IVE2",4) ) {
+	    if( length==2 ) {
+		int v;
+		v = ChkReadWord();
+		// 11 - 1.04 or brood
+		continue;
+	    }
+	    DebugLevel1("Wrong IVE2 length\n");
+	}
+
+	//
 	//	Verification code
 	//
 	if( !memcmp(header, "VCOD",4) ) {
@@ -407,6 +420,17 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
+	//
+	//
+	if( !memcmp(header, "PUPx",4) ) {
+	    if( length==61*12 + 61*12 + 61 + 61 + 61*12 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong PUPx length\n");
+	}
+
+	//
 	//	Player technology restrictions
 	//
 	if( !memcmp(header, "PTEC",4) ) {
@@ -415,6 +439,17 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 		continue;
 	    }
 	    DebugLevel1("Wrong PTEC length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "PTEx",4) ) {
+	    if( length==44*12 + 44*12 + 44 + 44 + 44*12 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong PTEx length\n");
 	}
 
 	//
@@ -427,6 +462,18 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 		continue;
 	    }
 	    DebugLevel1("Wrong UNIT length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "UNIx",4) ) {
+//	    if( length== ) {
+	    if( 1 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong UNIx length\n");
 	}
 
 	//
@@ -614,8 +661,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	//
 	//
 	if( !memcmp(header, "UPGS",4) ) {
-//	    if( length== ) {
-	    if( 1 ) {
+	    if( length==46*1 + 46*2 + 46*2 + 46*2 + 46*2 + 46*2 + 46*2 ) {
 		chk_ptr += length;
 		continue;
 	    }
@@ -625,13 +671,45 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	//
 	//
 	//
+	if( !memcmp(header, "UPGx",4) ) {
+	    if( length==61*1 + 61*2 + 61*2 + 61*2 + 61*2 + 61*2 + 61*2 + 1 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong UPGx length\n");
+	}
+
+	//
+	//
+	//
 	if( !memcmp(header, "TECS",4) ) {
-//	    if( length== ) {
-	    if( 1 ) {
+	    if( length==24*1 + 24*2 + 24*2 + 24*2 + 24*2 ) {
 		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TECS length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "TECx",4) ) {
+	    if( length==44*1 + 44*2 + 44*2 + 44*2 + 44*2 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong TECx length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "SWNM",4) ) {
+	    if( length==256*4 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong SWNM length\n");
 	}
 
 	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
@@ -780,6 +858,18 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 		continue;
 	    }
 	    DebugLevel1("Wrong IVER length\n");
+	}
+
+	//
+	//	SCM version additional information
+	//
+	if( !memcmp(header, "IVE2",4) ) {
+	    if( length==2 ) {
+		int v;
+		v = ChkReadWord();
+		continue;
+	    }
+	    DebugLevel1("Wrong IVE2 length\n");
 	}
 
 	//
@@ -1000,13 +1090,22 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 	//	Player upgrade restrictions
 	//
 	if( !memcmp(header, "UPGR",4) ) {
-	    // 1748
-//	    if( length==45*12 + 45*12 + 45 + 45 + 45*12 ) {
-	    if( 1 ) {
+	    if( length==46*12 + 46*12 + 46 + 46 + 46*12 ) {
 		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong UPGR length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "PUPx",4) ) {
+	    if( length==61*12 + 61*12 + 61 + 61 + 61*12 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong PUPx length\n");
 	}
 
 	//
@@ -1018,6 +1117,17 @@ global void LoadChkFromBuffer(unsigned char* chkdata,int len,WorldMap* map)
 		continue;
 	    }
 	    DebugLevel1("Wrong PTEC length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "PTEx",4) ) {
+	    if( length==44*12 + 44*12 + 44 + 44 + 44*12 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong PTEx length\n");
 	}
 
 	//
@@ -1169,6 +1279,18 @@ pawn:
 	}
 
 	//
+	//
+	//
+	if( !memcmp(header, "UNIx",4) ) {
+//	    if( length== ) {
+	    if( 1 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong UNIx length\n");
+	}
+
+	//
 	//	Isometric tile mapping
 	//
 	if( !memcmp(header, "ISOM",4) ) {
@@ -1266,7 +1388,7 @@ pawn:
 	if( !memcmp(header, "STR ",4) ) {
 //	    if( length== ) {
 	    if( 1 ) {
-#if 0
+#if 1
 		int i;
 		short s;
 
@@ -1396,8 +1518,7 @@ pawn:
 	//
 	//
 	if( !memcmp(header, "UPGS",4) ) {
-//	    if( length== ) {
-	    if( 1 ) {
+	    if( length==46*1 + 46*2 + 46*2 + 46*2 + 46*2 + 46*2 + 46*2 ) {
 		chk_ptr += length;
 		continue;
 	    }
@@ -1407,13 +1528,45 @@ pawn:
 	//
 	//
 	//
+	if( !memcmp(header, "UPGx",4) ) {
+	    if( length==61*1 + 61*2 + 61*2 + 61*2 + 61*2 + 61*2 + 61*2 + 1 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong UPGx length\n");
+	}
+
+	//
+	//
+	//
 	if( !memcmp(header, "TECS",4) ) {
-//	    if( length== ) {
-	    if( 1 ) {
+	    if( length==24*1 + 24*2 + 24*2 + 24*2 + 24*2 ) {
 		chk_ptr += length;
 		continue;
 	    }
 	    DebugLevel1("Wrong TECS length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "TECx",4) ) {
+	    if( length==44*1 + 44*2 + 44*2 + 44*2 + 44*2 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong TECx length\n");
+	}
+
+	//
+	//
+	//
+	if( !memcmp(header, "SWNM",4) ) {
+	    if( length==256*4 ) {
+		chk_ptr += length;
+		continue;
+	    }
+	    DebugLevel1("Wrong SWNM length\n");
 	}
 
 	DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
