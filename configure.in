@@ -24,9 +24,20 @@ elif test "`uname -a | grep -is bsd`"; then
 elif test "`uname -a | grep -is beos`"; then
     ARCH=beos
     PLATFORM="-DUSE_BEOS"
+elif test "`uname -a | grep -is darwin`"; then
+    ARCH=macosx
 else
     ARCH=linux
 fi
+
+if test "$ARCH" = "macosx ; then
+    EXTRA_CFLAGS=-I/sw/include
+    EXTRA_LIBS=-L/sw/lib
+    CPPFLAGS+=-I/sw/include
+fi
+
+AC_SUBST(EXTRA_CFLAGS)
+AC_SUBST(EXTRA_LIBS)
 
 dnl --- CHECK FOR WITH SOUND ---
 AC_ARG_ENABLE(sound,
