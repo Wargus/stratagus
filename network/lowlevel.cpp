@@ -299,7 +299,7 @@ global int NetSocketAddr(const Socket sock)
 	    sizeof(localAddr), &bytesReturned, NULL, NULL);
 	if (wsError == SOCKET_ERROR) {
 	    DebugLevel0Fn("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %ld\n" _C_
-		GetLastError());
+		WSA_GetLastError());
 	}
 
 	// parse interface information
@@ -523,7 +523,7 @@ global int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
     }
 
     memset(&sa, 0, sizeof(sa));
-    memcpy(&sa.sin_addr, &addr,sizeof(addr));
+    memcpy(&sa.sin_addr, &addr, sizeof(addr));
     sa.sin_family = AF_INET;
     sa.sin_port = htons(port);
 
@@ -562,8 +562,8 @@ global int NetSocketReady(Socket sockfd, int timeout)
 
 	// Data available?
 	retval = select(sockfd + 1, &mask, NULL, NULL, &tv);
-#ifdef _MSC_VER
-    } while (retval == SOCKET_ERROR && errno == WSAEINTR);
+#ifdef USE_WINSOCK
+    } while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else
     } while (retval == -1 && errno == EINTR);
 #endif
