@@ -582,8 +582,10 @@ case $ANSWER in
 	    esac
 	  fi
 	fi
-	
 	echo
+
+	LIBCHECK="-lFLAC"; check_for_libs
+	if test "$?" = 0 ; then 
 	echo -n "Would you like FLAC support? (n) "
 	read -n 1 ANSWER
 	echo
@@ -595,8 +597,13 @@ case $ANSWER in
 	    *)
 		;;
 	esac
+	else
+	echo "libFLAC not found"
+	fi
 	echo
 	
+	LIBCHECK="-lvorbisfile -lvorbis -logg"; check_for_libs
+	if test "$?" = 0 ; then 
 	echo -n "Would you like OGG support? (n) "
 	read -n 1 ANSWER
 	echo
@@ -608,8 +615,25 @@ case $ANSWER in
 	    *)
 		;;
 	esac
+	else
+	LIBCHECK="-lvorbisfile"; check_for_libs
+	if test "$?" = 0 ; then
+	echo -n "libvorbisfile "
+	fi
+	LIBCHECK="-lvorbis"; check_for_libs
+	if test "$?" = 0 ; then
+	echo -n "libvorbis "
+	fi
+	LIBCHECK="-logg"; check_for_libs
+	if test "$?" = 0 ; then
+	echo -n "libogg "
+	fi
+	echo "not found"
+	fi
 	echo
 	
+	LIBCHECK="-lmad"; check_for_libs
+	if test "$?" = 0 ; then 
 	echo -n "Would you like MAD MP3 support? (n) "
 	read -n 1 ANSWER
 	echo
@@ -621,8 +645,11 @@ case $ANSWER in
 	    *)
 		;;
 	esac
-
+	else
+	echo "libmad not found"
+	fi
 	echo
+
 	echo -n "Would you like to use [n]one or [i]nternal or [S]DL CD Audio support? (n) "
 	read -n 1 CDMode
 	echo
