@@ -272,7 +272,9 @@ static void HandleRegenerations(Unit* unit)
 	f = 0;
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints &&
-			unit->Orders[0].Action != UnitActionBuilded ) {
+			unit->Orders[0].Action != UnitActionBuilded && 
+			unit->Orders[0].Action != UnitActionDie &&
+			unit->HP != 0) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;
 		if (f <= unit->Type->BurnPercent) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
