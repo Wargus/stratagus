@@ -244,7 +244,7 @@ global void CleanIcons(void)
 
 	    free(Icons[i]->Ident);
 	    free(Icons[i]->Tileset);
-	    
+
 	    ptr=(void**)hash_find(IconFileHash,Icons[i]->File->FileName);
 	    if( ptr && *ptr ) {
 		table[n++]=*ptr;
@@ -323,6 +323,7 @@ global const char* IdentOfIcon(const Icon* icon)
 /**
 **	Draw unit icon 'icon' with border on x,y
 **
+**	@param player	Player pointer used for icon colors
 **	@param icon	Icon identifier
 **	@param flags	State of icon (clicked, mouse over...)
 **	@param x	X display position

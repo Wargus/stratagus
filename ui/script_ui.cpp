@@ -139,8 +139,8 @@ local SCM CclSetContrast(SCM contrast)
 /**
 **	Game brightness.
 **
-**	@param contrast	New brightness -100 - 100.
-**	@return		Old brightness.
+**	@param brightness	New brightness -100 - 100.
+**	@return			Old brightness.
 */
 local SCM CclSetBrightness(SCM brightness)
 {
@@ -163,8 +163,8 @@ local SCM CclSetBrightness(SCM brightness)
 /**
 **	Game saturation.
 **
-**	@param contrast	New saturation -100 - 200.
-**	@return		Old saturation.
+**	@param saturation	New saturation -100 - 200.
+**	@return			Old saturation.
 */
 local SCM CclSetSaturation(SCM saturation)
 {

@@ -118,6 +118,7 @@ local Unit* CclGetUnit(SCM value)
 **	Parse order
 **
 **	@param list	All options of the order.
+**	@param order	OUT: resulting order.
 */
 local void CclParseOrder(SCM list,Order* order)
 {
@@ -257,8 +258,9 @@ local void CclParseOrder(SCM list,Order* order)
 }
 
 /**
-**	Parse orders
+**	Parse orders.
 **
+**	@param unit	Unit pointer which should get the orders.
 **	@param vector	All options of the order.
 */
 local void CclParseOrders(Unit* unit,SCM vector)
@@ -276,6 +278,7 @@ local void CclParseOrders(Unit* unit,SCM vector)
 /**
 **	Parse builded
 **
+**	@param unit	Unit pointer which should be filled with the data.
 **	@param list	All options of the builded data.
 */
 local void CclParseBuilded(Unit* unit __attribute__((unused)),

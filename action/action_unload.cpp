@@ -50,7 +50,6 @@
 **	Reappear unit on map.
 **
 **	@param unit	Unit to drop out.
-**	@param heading	Direction in which the unit should appear.
 **	@param addx	Tile size in x.
 **	@param addy	Tile size in y.
 **

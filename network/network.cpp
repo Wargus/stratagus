@@ -25,6 +25,18 @@
 
 //@{
 
+//----------------------------------------------------------------------------
+//	Documentation
+//----------------------------------------------------------------------------
+
+/**
+**      @page NetworkModule Module - Network
+**
+**      @subsection Basics How does it work.
+**
+**      @subsection API How should it be used.
+*/
+
 // FIXME: should split the next into small modules!
 // FIXME: I (Johns) leave this for other people (this means you!)
 

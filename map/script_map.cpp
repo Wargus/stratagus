@@ -404,7 +404,7 @@ local SCM CclSetForestRegeneration(SCM speed)
 /**
 **	Set gold-mine depleted rate.
 **
-**	@param speed	New depleted rate (0 disabled)
+**	@param rate	New depleted rate (0 disabled)
 **
 **	@return		Old rate
 */

@@ -99,7 +99,7 @@ global char* NextChapter(void)
 /**
 **	Play the campaign.
 **
-**	@param ident	Name of the campaign.
+**	@param name	Name of the campaign.
 */
 global void PlayCampaign(const char* name)
 {

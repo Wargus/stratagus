@@ -77,7 +77,7 @@ typedef struct _resource_ {
 **	Move unit to resource.
 **
 **	@param unit	Pointer to unit.
-**	@param resouce	How to handle the resource.
+**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if reached, otherwise FALSE.
 */
@@ -202,7 +202,7 @@ local int MoveToResource(Unit* unit,const Resource* resource)
 **	Wait in resource, for collecting the resource.
 **
 **	@param unit	Pointer to unit.
-**	@param resouce	How to handle the resource.
+**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if ready, otherwise FALSE.
 */
@@ -323,7 +323,7 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 **	Move to resource depot
 **
 **	@param unit	Pointer to unit.
-**	@param resouce	How to handle the resource.
+**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if reached, otherwise FALSE.
 */
@@ -434,7 +434,7 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 **	Wait in depot, for the resources stored.
 **
 **	@param unit	Pointer to unit.
-**	@param resouce	How to handle the resource.
+**	@param resource	How to handle the resource.
 **
 **	@return		TRUE if ready, otherwise FALSE.
 */
@@ -499,7 +499,7 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 **	This the generic function for oil, gold, ...
 **
 **	@param unit	Pointer to unit.
-**	@param resouce	How to handle the resource.
+**	@param resource	How to handle the resource.
 */
 global void HandleActionResource(Unit* unit,const Resource* resource)
 {

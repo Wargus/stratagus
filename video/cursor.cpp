@@ -156,6 +156,7 @@ local int HiddenCursorRectangleH;	/// saved cursor height in pixel
 /**
 **	Function pointer: Save rectangle behind cursor
 **
+**	@param buffer	Buffer in which the graphic is stored.
 **	@param x	Screen X pixels coordinate for left-top corner.
 **	@param y	Screen Y pixels coordinate for left-top corner.
 **	@param w	Width in pixels for rectangle starting at left-top.
@@ -170,6 +171,7 @@ global void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
 /**
 **	Function pointer: Load rectangle behind cursor
 **
+**	@param buffer	Buffer in which the graphic is stored.
 **	@param x	Screen X pixels coordinate.
 **	@param y	Screen Y pixels coordinate.
 **	@param w	Width in pixels.

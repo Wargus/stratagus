@@ -198,7 +198,7 @@ global void CleanConstructions(void)
 /**
 **	Draw construction.
 **
-**	@param type	Type number of construction.
+**	@param construction	Construction pointer.
 **	@param frame	Frame number to draw.
 **	@param x	X position.
 **	@param y	Y position.
@@ -217,6 +217,8 @@ global void DrawConstruction(const Construction* construction,int frame,
 **	Get construction by identifier.
 **
 **	@param ident	Identfier of the construction
+**
+**	@return		Construction structure pointer
 */
 global Construction* ConstructionByIdent(const char* ident)
 {

@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,7 +72,7 @@ local void AiHelperSetupTable(int* count,AiUnitTypeTable*** table,int n)
 /**
 **	Insert new unit-type element.
 **
-**	@param table	Pointer to table with elements.
+**	@param tablep	Pointer to table with elements.
 **	@param base	Base type to insert into table.
 */
 local void AiHelperInsert(AiUnitTypeTable** tablep,UnitType* base)
@@ -682,6 +681,7 @@ local SCM CclAiForce(SCM list)
 **	Define the role of a force.
 **
 **	@param value	Force number.
+**	@param flag	Which role of the force.
 */
 local SCM CclAiForceRole(SCM value,SCM flag)
 {

@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -203,8 +202,8 @@ global void MapCenter(int x,int y)
 /**
 **	Tile is empty, no rocks, walls, forest, building?
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **
 **	@return		True if empty, false otherwise.
 */
@@ -218,8 +217,8 @@ global int IsMapFieldEmpty(int tx,int ty)
 /**
 **	Water on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **
 **	@return		True if water, false otherwise.
 */
@@ -231,8 +230,8 @@ global int WaterOnMap(int tx,int ty)
 /**
 **	Coast on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **	@return		True if coast, false otherwise.
 */
 global int CoastOnMap(int tx,int ty)
@@ -243,8 +242,8 @@ global int CoastOnMap(int tx,int ty)
 /**
 **	Wall on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **	@return		True if wall, false otherwise.
 */
 global int WallOnMap(int tx,int ty)
@@ -255,8 +254,8 @@ global int WallOnMap(int tx,int ty)
 /**
 **	Human wall on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **	@return		True if human wall, false otherwise.
 */
 global int HumanWallOnMap(int tx,int ty)
@@ -268,8 +267,8 @@ global int HumanWallOnMap(int tx,int ty)
 /**
 **	Orc wall on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **	@return		True if orcish wall, false otherwise.
 */
 global int OrcWallOnMap(int tx,int ty)
@@ -281,8 +280,8 @@ global int OrcWallOnMap(int tx,int ty)
 /**
 **	Forest on map tile. Checking version.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **
 **	@return		True if forest, false otherwise.
 */
@@ -297,8 +296,8 @@ global int CheckedForestOnMap(int tx,int ty)
 /**
 **	Forest on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **
 **	@return		True if forest, false otherwise.
 */
@@ -319,8 +318,8 @@ global int ForestOnMap(int tx,int ty)
 /**
 **	Rock on map tile.
 **
-**	@param x	X map tile position.
-**	@param y	Y map tile position.
+**	@param tx	X map tile position.
+**	@param ty	Y map tile position.
 **
 **	@return		True if rock, false otherwise.
 */
