@@ -126,7 +126,7 @@ SDL_Surface* SolidFog;
 
 local void (*VideoDrawUnexplored)(const int, int, int);
 local void (*VideoDrawFog)(const int, int, int);
-local void (*VideoDrawOnlyFog)(const int, int x, int y);
+local void (*VideoDrawOnlyFog)(int x, int y);
 #else
 /**
 **	Draw unexplored area function pointer. (display and video mode independ)
@@ -548,8 +548,10 @@ global void VideoDrawFogSolid(const int tile, int x, int y)
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
-global void VideoDrawOnlyFogSolid(const int tile, int x, int y)
+global void VideoDrawOnlyFogSolid(int x, int y)
 {
+    // FIXME:
+/*
     int tilepitch;
     SDL_Rect srect;
     SDL_Rect drect;
@@ -565,30 +567,45 @@ global void VideoDrawOnlyFogSolid(const int tile, int x, int y)
     drect.y = y;
 
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
+*/
 }
 
-global void VideoDrawOnlyFogAlpha(const int tile, int x, int y)
+// FIXME: VERY MESSY | Looks different from old video code
+global void VideoDrawOnlyFogAlpha(int x, int y)
 {
-    int tilepitch;
-    int alpha;
-    SDL_Rect srect;
+    int i;
+    int j;
+    Uint16* p;
     SDL_Rect drect;
-
-    tilepitch = TheMap.TileGraphic->Width / TileSizeX;
-
-    srect.x = TileSizeX * (tile % tilepitch);
-    srect.y = TileSizeY * (tile / tilepitch);
-    srect.w = TileSizeX;
-    srect.h = TileSizeY;
+    SDL_Color csrc;
+    SDL_Color cdest;
+    unsigned char alpha;
 
     drect.x = x;
     drect.y = y;
 
-    alpha = TheMap.TileGraphic->Surface->format->alpha;
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA,
-	(100 - FogOfWarContrast) * 255 / 100);
-    SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-    SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
+    SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
+
+    csrc.r = 255;
+    csrc.g = 255;
+    csrc.b = 255;
+
+    alpha = (255 - FogOfWarBrightness * 255 / 100);
+
+    SDL_LockSurface(TheScreen);
+    for (i = y; i < y + TileSizeY; ++i) {
+	for (j = x; j < x + TileSizeX; ++j) {
+	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+	    if (*p) {
+		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
+		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
+		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
+		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
+	    }
+	}
+    }
+    SDL_UnlockSurface(TheScreen);
 }
 
 global void VideoDrawUnexploredSolid(const int tile, int x, int y)
@@ -610,12 +627,19 @@ global void VideoDrawUnexploredSolid(const int tile, int x, int y)
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
 }
 
+// FIXME: VERY MESSY
 global void VideoDrawFogAlpha(const int tile, int x, int y)
 {
+    int i;
+    int j;
+    Uint16* p;
+    Uint8* ptile;
     int tilepitch;
-    int alpha;
     SDL_Rect srect;
     SDL_Rect drect;
+    SDL_Color csrc;
+    SDL_Color cdest;
+    unsigned char alpha;
 
     tilepitch = TheMap.TileGraphic->Width / TileSizeX;
 
@@ -632,6 +656,31 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 	(100 - FogOfWarContrast) * 255 / 100);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
     SDL_SetAlpha(TheMap.TileGraphic->Surface, SDL_SRCALPHA, alpha);
+
+    csrc.r = 255;
+    csrc.g = 255;
+    csrc.b = 255;
+
+    alpha = (255 - FogOfWarBrightness * 255 / 100);
+
+    SDL_LockSurface(TheScreen);
+    for (i = y; i < y + TileSizeY; ++i) {
+	for (j = x; j < x + TileSizeX; ++j) {
+	    p = &((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+	    ptile = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[srect.x + j - x 
+		+ srect.y + (i - y) * TheMap.TileGraphic->Surface->w];
+	    SDL_GetRGB(*ptile, TheMap.TileGraphic->Surface->format, 
+		&cdest.r, &cdest.g, &cdest.b);
+	    if (!(cdest.r | cdest.g | cdest.b) && *p) {
+		SDL_GetRGB(*p, TheScreen->format, &cdest.r, &cdest.g, &cdest.b);
+		cdest.r = ((cdest.r * alpha) + (csrc.r * (255 - alpha))) >> 8;
+		cdest.g = ((cdest.g * alpha) + (csrc.g * (255 - alpha))) >> 8;
+		cdest.b = ((cdest.b * alpha) + (csrc.b * (255 - alpha))) >> 8;
+		*p = SDL_MapRGB(TheScreen->format, cdest.r, cdest.g, cdest.b);
+	    }
+	}
+    }
+    SDL_UnlockSurface(TheScreen);
 }
 #else
 // Routines for 8 bit displays .. --------------------------------------------
@@ -2766,11 +2815,7 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	}
     } else {
 #ifdef USE_SDL_SURFACE
-	SDL_Rect drect;
-	drect.x = dx;
-	drect.y = dy;
-	// Tile is fully FOW
-	SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
+	VideoDrawOnlyFog(dx, dy);
 #else
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
