@@ -1068,12 +1068,12 @@ local int InputKey(int key)
     switch (key) {
 	case '\r':
 	    if (Input[0] == '(') {
-		if (!GameObserve) {
+		if (!GameObserve && !GamePaused) {
 		    CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
 		    CclCommand(Input);
 		}
 	    } else if (NetworkFildes==-1) {
-		if (!GameObserve) {
+		if (!GameObserve && !GamePaused) {
 		    int ret;
 		    ret = HandleCheats(Input);
 		    if (ret) {
@@ -1259,7 +1259,7 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 	// If no modifier look if button bound
 	if( !(KeyModifiers&(ModifierControl|ModifierAlt
 		|ModifierSuper|ModifierHyper)) ) {
-	    if( !GameObserve ) {
+	    if( !GameObserve && !GamePaused ) {
 		if( DoButtonPanelKey(key) ) {
 		    return;
 		}
