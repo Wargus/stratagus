@@ -1447,8 +1447,8 @@ global void UIHandleButtonDown(unsigned button)
 						}
 					}
 				}
-				if (CanBuildUnitTypeMask(Selected[0], CursorBuilding, x, y,
-					Selected[0]->Type->MovementMask) &&
+				// 0 Test build, don't really build
+				if (CanBuildUnitType(Selected[0], CursorBuilding, x, y, 0) &&
 						(explored || ReplayRevealMap)) {
 					PlayGameSound(GameSounds.PlacementSuccess.Sound,
 						MaxSampleVolume);

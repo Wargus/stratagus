@@ -143,8 +143,9 @@ global void HandleActionBuild(Unit* unit)
 
 	//
 	// Check if the building could be build there.
+	// 1 really attempt to build here
 	//
-	if (!CanBuildUnitType(unit, type, x, y)) {
+	if (!CanBuildUnitType(unit, type, x, y, 1)) {
 		//
 		// Some tries to build the building.
 		//
