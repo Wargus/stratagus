@@ -936,7 +936,7 @@ local void UnitFillSeenValues(Unit* unit)
 **	@param unit	The unit that goes under fog.
 **	@param p	The player the unit goes out of fog for.
 */
-local void UnitGoesUnderFog(Unit* unit, const Player* player)
+global void UnitGoesUnderFog(Unit* unit, const Player* player)
 {
 	DebugLevel3Fn("Unit %d(%s) at %d %d goes under fog for %d\n" _C_
 			unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ player->Player);
@@ -981,7 +981,7 @@ local void UnitGoesUnderFog(Unit* unit, const Player* player)
 **	not get an decrease the first time it's seen, so we have to
 **	keep track of what player saw what units, with SeenByPlayer.
 */
-local void UnitGoesOutOfFog(Unit* unit, const Player* player)
+global void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
 	DebugLevel3Fn("Unit %d(%s) at %d %d goes out of fog for %d.\n" _C_
 			unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ player->Player);
