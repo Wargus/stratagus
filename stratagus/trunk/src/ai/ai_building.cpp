@@ -253,11 +253,13 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     if( type->TileWidth>1 ) {			// also use the bottom right
 	points[1].X=x+type->TileWidth-1;
 	points[1].Y=y+type->TileWidth-1;
+	ep=wp=2;				// start with two points
+    } else {
+	ep=wp=1;				// start with one point
     }
     matrix+=w+w+2;
     rp=0;
     matrix[x+y*w]=1;				// mark start point
-    ep=wp=1;					// start with one point
 
     //
     //	Pop a point from stack, push all neightbors which could be entered.
@@ -283,7 +285,6 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 		    *dy=y;
 		    return 1;
 		}
-		fprintf(stderr,"%d,%d\n",x,y);
 
 		if( CanMoveToMask(x,y,mask) ) {	// reachable
 		    *m=1;
@@ -425,15 +426,8 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 	//
 	//  Find a building place near the mine
 	//
-	if( AiFindBuildingPlace2(worker,type,
-	    best_mines[i].unit->X,
+	if( AiFindBuildingPlace2(worker,type,best_mines[i].unit->X,
 	    best_mines[i].unit->Y,dx,dy,0) ) {
-	    return 1;
-	}
-	if( AiFindBuildingPlace2(worker,type,
-	    best_mines[i].unit->X+best_mines[i].unit->Type->TileWidth,
-	    best_mines[i].unit->Y+best_mines[i].unit->Type->TileHeight,
-	    dx,dy,0) ) {
 	    return 1;
 	}
     }
