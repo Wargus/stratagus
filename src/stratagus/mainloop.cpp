@@ -345,6 +345,13 @@ local void DrawMenuButtonArea(void)
 
 #ifdef SPLIT_SCREEN_SUPPORT
 
+/**
+**	Draw a map viewport.
+**
+**	@param v	Viewport number.
+**
+**	@note	Johns: I think parsing the viewport pointer is faster.
+*/
 local void DrawMapViewport (int v)
 {
 #ifdef NEW_DECODRAW
@@ -398,25 +405,29 @@ local void DrawMapViewport (int v)
 /**
 **	Draw map area
 */
-local void DrawMapArea(void)
+global void DrawMapArea(void)
 {
     int i;
+
     for (i=0; i < TheUI.NumViewports; i++) {
 	DrawMapViewport (i);
     }
 
-    /* if we a single viewport, no need to denote the "last clicked" one */
-    if (TheUI.NumViewports==1)
+    // if we a single viewport, no need to denote the "last clicked" one
+    if (TheUI.NumViewports==1) {
 	return;
+    }
 
     for (i=0; i < TheUI.NumViewports; i++) {
 	enum _sys_colors_ color;
 
-	if (i==TheUI.LastClickedVP)
+	if (i==TheUI.LastClickedVP) {
 	    color = ColorOrange;
-	else
+	} else {
 	    color = ColorBlack;
+	}
 
+	// FIXME: johns this should be always on screen?
 	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
 			TheUI.VP[i].X, TheUI.VP[i].EndY);
 	VideoDrawLineClip (color, TheUI.VP[i].X, TheUI.VP[i].Y,
@@ -433,7 +444,7 @@ local void DrawMapArea(void)
 /**
 **	Draw map area
 */
-local void DrawMapArea(void)
+global void DrawMapArea(void)
 {
 #ifdef NEW_DECODRAW
     // Experimental new drawing mechanism, which can keep track of what is
@@ -703,7 +714,7 @@ global void GameMainLoop(void)
 	showtip=ShowTips;
     }
 
-    for( ; GameRunning; ) {
+    while( GameRunning ) {
 #if DEBUG
 	if (setjmp (main_loop)) {
 	    GamePaused = 1;
