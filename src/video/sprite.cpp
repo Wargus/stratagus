@@ -464,10 +464,12 @@ void MakeShadowSprite(Graphic* g)
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 	SDL_SetAlpha(g->Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 
+#ifndef USE_OPENGL
 	if (g->SurfaceFlip) {
 		SDL_SetPalette(g->SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 		SDL_SetAlpha(g->SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	}
+#endif
 #ifdef USE_OPENGL
 	MakeTexture(g);
 #endif

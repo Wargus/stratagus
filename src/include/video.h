@@ -46,7 +46,9 @@
 
 typedef struct _graphic_ {
 	SDL_Surface* Surface;      ///< Surface
+#ifndef USE_OPENGL
 	SDL_Surface* SurfaceFlip;  ///< Flipped surface
+#endif
 	int Width;                 ///< Width of a frame
 	int Height;                ///< Height of a frame
 	int NumFrames;             ///< Number of frames
