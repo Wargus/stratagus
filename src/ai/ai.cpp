@@ -378,11 +378,11 @@ local int AiRemoveFromBuilded2(PlayerAi* pai,const UnitType* type)
     for( queue=&pai->UnitTypeBuilded; (next=*queue); queue=&next->Next ) {
 	DebugCheck( !next->Want );
 	if( type==next->Type && next->Made ) {
+	    --next->Made;
 	    if( !--next->Want ) {
 		*queue=next->Next;
 		free(next);
 	    }
-	    --next->Made;
 	    return 1;
 	}
     }
