@@ -2320,20 +2320,13 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 
 local void SaveAction(void)
 {
-    char *filename;
+    char filename[256];
     char *name = SaveGameMenuItems[1].d.input.buffer;
     size_t nameLength;
 
     nameLength = strlen(name);
     if (TypedFileName)
 	nameLength -= 3;
-    if ( (filename = malloc(256)) == NULL)
-    {
-        fprintf(stderr,
-                  "Can't save \"%s\": %s", name, strerror(errno));
-        SetMessage("Can't save \"%s\": %s", name, strerror(errno));
-        return;
-    }
 
     strcpy(filename, SaveDir);
     strcat(filename, "/");
@@ -2342,8 +2335,6 @@ local void SaveAction(void)
     SaveGame(filename);
 
     SetMessage("Saved game to: %s", filename);
-
-    free(filename);
 
     EndMenu();
 }
@@ -2356,7 +2347,7 @@ local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 SaveDir="save";
 mkdir(SaveDir);
 #else
-char *path = malloc(256);
+char path[256];
 
 strcpy(path,getenv("HOME"));
 strcat(path,"/");
@@ -2366,7 +2357,6 @@ strcat(path,"/save");
 mkdir(path,0777);
 SaveDir = malloc(strlen(path)+1);
 strcpy(SaveDir, path);
-free(path);
 #endif
 }
 
