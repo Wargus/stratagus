@@ -2051,11 +2051,22 @@ global void SavePreferences(void)
 	return;
     }
 
-    fprintf(fd, "--[[\n");
-    fprintf(fd, "	$Id$\n");
-    fprintf(fd, "]]\n");
+    fprintf(fd, "--- -----------------------------------------\n");
+    fprintf(fd, "--- $Id$\n");
 
     fprintf(fd, "SetVideoResolution(%d, %d)\n", VideoWidth, VideoHeight);
+    fprintf(fd, "SetGroupKeys(\"");
+
+    i = 0;
+    while (UiGroupKeys[i]) {
+	if (UiGroupKeys[i] != '"') {
+	    fprintf(fd, "%c", UiGroupKeys[i]);
+	} else {
+	    fprintf(fd, "\\\"");
+	}
+	++i;
+    }
+    fprintf(fd, "\")\n");
 
     fclose(fd);
 #endif
@@ -2159,11 +2170,74 @@ global void SavePreferences(void)
 	return;
     }
 
-    fprintf(fd, "--[[\n");
-    fprintf(fd, "	$Id$\n");
-    fprintf(fd, "]]\n");
+    fprintf(fd, "--- -----------------------------------------\n");
+    fprintf(fd, "--- $Id$\n");
 
-    fprintf(fd, "SetVideoFullscreen(%s)\n", VideoFullScreen ? "true" : "false");
+    // Global options
+    if (OriginalFogOfWar) {
+	fprintf(fd, "OriginalFogOfWar()\n");
+    } else {
+	fprintf(fd, "AlphaFogOfWar()\n");
+    }
+    fprintf(fd, "SetVideoFullScreen(%s)\n", VideoFullScreen ? "true" : "false");
+#if 0
+    // FIXME: Uncomment when this is configurable in the menus
+    fprintf(fd, "SetContrast(%d)\n", TheUI.Contrast);
+    fprintf(fd, "SetBrightness(%d)\n", TheUI.Brightness);
+    fprintf(fd, "SetSaturation(%d)\n", TheUI.Saturation);
+#endif
+    fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
+
+    // Game options
+    fprintf(fd, "SetShowTips(%s)\n", ShowTips ? "true" : "false");
+    fprintf(fd, "SetCurrentTip(%d)\n", CurrentTip);
+
+    fprintf(fd, "SetFogOfWar(%s)\n", !TheMap.NoFogOfWar ? "true" : "false");
+    fprintf(fd, "SetShowCommandKey(%s)\n", ShowCommandKey ? "true" : "false");
+
+    // Speeds
+    fprintf(fd, "SetVideoSyncSpeed(%d)\n", VideoSyncSpeed);
+    fprintf(fd, "SetMouseScrollSpeed(%d)\n", SpeedMouseScroll);
+    fprintf(fd, "SetKeyScrollSpeed(%d)\n", SpeedKeyScroll);
+
+    // Sound options
+    if (!SoundOff) {
+	fprintf(fd, "SoundOn()\n");
+    } else {
+	fprintf(fd, "SoundOff()\n");
+    }
+#ifdef WITH_SOUND
+    fprintf(fd, "SetSoundVolume(%d)\n", GlobalVolume);
+    if (!MusicOff) {
+	fprintf(fd, "MusicOn()\n");
+    } else {
+	fprintf(fd, "MusicOff()\n");
+    }
+    fprintf(fd, "SetMusicVolume(%d)\n", MusicVolume);
+#ifdef USE_CDAUDIO
+    buf[0] = '\0';
+    switch (CDMode) {
+	case CDModeAll:
+	    strcpy(buf, "all");
+	    break;
+	case CDModeRandom:
+	    strcpy(buf, "random");
+	    break;
+	case CDModeDefined:
+	    strcpy(buf, "defined");
+	    break;
+	case CDModeStopped:
+	case CDModeOff:
+	    strcpy(buf, "off");
+	    break;
+	default:
+	    break;
+    }
+    if (buf[0]) {
+	fprintf(fd, "SetCdMode(\"%s\")\n", buf);
+    }
+#endif
+#endif
 #endif
 
     fclose(fd);
