@@ -211,7 +211,9 @@ global void ShowIntro(const Intro *intro)
 
     CallbackMusicOff();
     StopMusic();
-    PlayFile(intro->VoiceFile1);
+    if( intro->VoiceFile1 ) {
+	PlayFile(intro->VoiceFile1);
+    }
 
     x=(VideoWidth-640)/2;
     stage=line=0;
