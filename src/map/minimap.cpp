@@ -294,6 +294,10 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	SysColors color;
 	if( !BuildingVisibleOnMap( *table ) ) {
 	    type=(*table)->SeenType;
+	    if( !type ) {
+		table=&(*table)->Next;
+		continue;
+	    }
 	    if( (*table)->Player->Player==PlayerNumNeutral ) {
 		if( type->Critter ) {
 		    color=ColorNPC;
