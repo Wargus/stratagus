@@ -1224,9 +1224,10 @@ global void LoadPud(const char* pud,WorldMap* map)
 		if( t==WC_StartLocationHuman
 			|| t==WC_StartLocationOrc ) {	// starting points?
 
-		    Players[o].X=MapOffsetX+x;
-		    Players[o].Y=MapOffsetY+y;
-		    if (GameSettings.NumUnits == SettingsNumUnits1 && Players[o].Type != PlayerNobody) {
+		    Players[o].StartX=MapOffsetX+x;
+		    Players[o].StartY=MapOffsetY+y;
+		    if (GameSettings.NumUnits == SettingsNumUnits1
+			    && Players[o].Type != PlayerNobody) {
 			if (t == WC_StartLocationHuman) {
 			    t = WC_UnitPeasant;
 			} else {
@@ -1459,6 +1460,46 @@ local void PudWriteREGM(gzFile f,const WorldMap* map)
 }
 
 /**
+**	Save the units to pud.
+**
+**	@param f	File handle
+*/
+local void PudSaveUnits(gzFile f)
+{
+    char buf[256];
+    int i;
+
+    PudWriteHeader(f,"UNIT",8*NumUnits);
+    for( i=0; i<NumUnits; ++i ) {
+	int j;
+
+	buf[0]=Units[i]->X >> 0;
+	buf[1]=Units[i]->X >> 8;
+	buf[2]=Units[i]->Y >> 0;
+	buf[3]=Units[i]->Y >> 8;
+
+	// Convert our name to pud number
+	for( j=0; UnitTypeWcNames[j]; ++j ) {
+	    if( !strcmp(UnitTypeWcNames[j],Units[i]->Type->Ident) ) {
+		break;
+	    }
+	}
+	buf[4]=j;
+	buf[5]=Units[i]->Player->Player;
+	if( Units[i]->Type->GoldMine
+		|| Units[i]->Type->OilPatch
+		|| Units[i]->Type->GivesOil ) {
+	    buf[6]=(Units[i]->Value/2500) >> 0;
+	    buf[7]=(Units[i]->Value/2500) >> 8;
+	} else {
+	    buf[6]=!Units[i]->Active;
+	    buf[7]=0;
+	}
+	gzwrite(f,buf,8);
+    }
+}
+
+/**
 **	Save pud.
 **
 **	@param pud	File name.
@@ -1577,34 +1618,7 @@ global void SavePud(const char* pud,const WorldMap* map)
 #endif
     PudWriteREGM(f,map);
 
-    PudWriteHeader(f,"UNIT",8*NumUnits);
-    for( i=0; i<NumUnits; ++i ) {
-	int j;
-
-	buf[0]=Units[i]->X >> 0;
-	buf[1]=Units[i]->X >> 8;
-	buf[2]=Units[i]->Y >> 0;
-	buf[3]=Units[i]->Y >> 8;
-
-	// Convert our name to pud number
-	for( j=0; UnitTypeWcNames[j]; ++j ) {
-	    if( !strcmp(UnitTypeWcNames[j],Units[i]->Type->Ident) ) {
-		break;
-	    }
-	}
-	buf[4]=j;
-	buf[5]=Units[i]->Player->Player;
-	if( Units[i]->Type->GoldMine
-		|| Units[i]->Type->OilPatch
-		|| Units[i]->Type->GivesOil ) {
-	    buf[6]=(Units[i]->Value/2500) >> 0;
-	    buf[7]=(Units[i]->Value/2500) >> 8;
-	} else {
-	    buf[6]=!Units[i]->Active;
-	    buf[7]=0;
-	}
-	gzwrite(f,buf,8);
-    }
+    PudSaveUnits(f);
 
     gzclose(f);
 }
