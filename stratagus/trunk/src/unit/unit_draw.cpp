@@ -888,40 +888,10 @@ local void DrawBuilding(Unit* unit)
     UnitType* type;
     int frame;
 
-    // FIXME: This should I rewrite, without checks here!!
-
     type=unit->Type;
-    x = unit->X;
-    y = unit->Y;
 
-#ifdef NEW_FOW
-    if ( !IsMapFieldVisible( x, y ) ) {
-	frame = unit->SeenFrame;
-	if (frame == 255) {
-	    return;
-	}
-    } else {
-	// FIXME: is this the correct place?
-	frame = unit->SeenFrame = unit->Frame;
-    }
-#else
-    // FIXME: johns: this isn't 100% correct, building which are partly
-    // FIXME: johns: under the fog are shown partly.
-
-    // FIXME: There is already a check in the main loop UnitVisible!
-    if ( !IsMapFieldExplored( x, y ) ) {
-	return;
-    }
-
-    if ( !IsMapFieldVisible( x, y ) ) {
-	frame = unit->SeenFrame;
-	if (frame == 255) {
-	    return;
-	}
-    } else {
-	frame = unit->SeenFrame = unit->Frame;
-    }
-#endif
+    // FIXME: is this the correct place?
+    frame = unit->SeenFrame = unit->Frame;
 
     GraphicPlayerPixels(unit->Player,unit->Type->Sprite);
     x=Map2ScreenX(unit->X)+unit->IX;
