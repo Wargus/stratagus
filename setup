@@ -906,7 +906,7 @@ echo >> $RULESFILE
 echo "#ARCHOBJS=stdmman.\$(OE) svgalib.\$(OE) unix_lib.\$(OE) bitm_lnx.\$(OE)" >> $RULESFILE
 
 # include flags
-echo "IFLAGS=	-I\$(TOPDIR)/src/include \$(XIFLAGS)" >> $RULESFILE
+echo "IFLAGS=	-I\$(TOPDIR)/src/include \$(XIFLAGS) -I\$(TOPDIR)/src/movie/vp31/include" >> $RULESFILE
 
 # define flags
 if test "$DEBUG" = 1 ; then

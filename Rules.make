@@ -61,7 +61,7 @@ OE=o
 OBJDIR=obj
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
-IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
+IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) $(SDLCD) $(LIBCDA) \

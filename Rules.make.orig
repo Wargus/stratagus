@@ -200,7 +200,7 @@ OBJDIR=.
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 
 ## include flags
-IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
+IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 ## define flags
 #DEBUG=	-DDEBUG # -DREFS_DEBUG # -DFLAG_DEBUG
 ##
