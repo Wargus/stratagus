@@ -10,12 +10,11 @@
 //
 /**@name video.c	-	The universal video functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,7 +37,7 @@
 **
 **
 **      @subsection VideoMain Video main initialization
-**		
+**
 **              The general setup of platform dependent video and basic video
 **		functionalities is done with function @see InitVideo
 **
@@ -67,7 +66,7 @@
 **		dependent settings/functionailty are located within each
 **		separate files:
 **
-**		X11 		: Xwindows for Linux and other Unix machines
+**		X11		: Xwindows for Linux and other Unix machines
 **
 **		SVGALIB		: (Super) Vga routines for Linux only
 **				  (visit http://www.svgalib.org)
@@ -214,8 +213,8 @@ global int VideoBpp;
     /**
     **  Architecture-dependant video memory-size (byte pro pixel).
     **  Set by InitVideo. (1,2,3,4 equals VideoBpp/8)
-    **  @see InitVideo 
-    */  
+    **  @see InitVideo
+    */
 global int VideoTypeSize;
 
     /**
@@ -241,6 +240,8 @@ global volatile int VideoInterrupts;	/// be happy, were are quicker
 global Palette GlobalPalette[256];
 
     /**
+    ** FIXME: this docu is added only to the first variable!
+    **
     **  As a video 8bpp pixel color doesn't have RGB encoded, but denote some
     **  index (a value from contents Pixels) in a system pallete, the
     **  following precalculated arrays deliver a shortcut.
@@ -250,36 +251,40 @@ global Palette GlobalPalette[256];
     **  The single main color palette denoting all possible colors on which all
     **  other palettes (including above GlobalPalette) are based.
     **  Note:this means other palettes probably doesn't contains unique colors.
-    **  
+    **
     **  commonpalette_defined:
     **  Denotes the defined entries (as bit index) in above palette.
     **  Needed as for X11 it is possible we can't get all 256 colors.
-    **  
+    **
     **  colorcube8:
     **  Array of 32*32*32 system colors, to get from an unsigned int RGB
     **  (5x5x5 bit) to a system color.
-    **  
+    **
     **  lookup25trans8:
     **  Array to get from two system colors as unsigned int (color1<<8)|color2
     **  to a new system color which is aproximately 75% color1 and 25% color2.
     **  lookup50trans8:
     **  The same for 50% color1 and 50% color2.
-    **  
+    **
     **  VideoAllocPalette8:
     **  Funcytion to let hardware independent palette be converted (when set).
     */
-global Palette   *commonpalette    = NULL;
+global Palette   *commonpalette;
+    // FIXME: docu
 global unsigned long commonpalette_defined[8];
-global VMemType8 *colorcube8       = NULL;
-global VMemType8 *lookup25trans8   = NULL;
-global VMemType8 *lookup50trans8   = NULL;
+    // FIXME: docu
+global VMemType8 *colorcube8;
+    // FIXME: docu
+global VMemType8 *lookup25trans8;
+    // FIXME: docu
+global VMemType8 *lookup50trans8;
+    // FIXME: docu
 global void (*VideoAllocPalette8)( Palette *palette,
                                    Palette *syspalette,
                                    unsigned long syspalette_defined[8] )=NULL;
 
     /// Does ColorCycling..
 global void (*ColorCycle)(void);
-
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -370,6 +375,108 @@ global void PopClipping(void)
 }
 
 /**
+**	Creates a checksum used to compare palettes.
+**	JOSH: change the method if you have better ideas.
+**	JOHNS: I say this also always :)
+**
+**	@param palette	Palette source.
+**
+**	@return		Calculated hash/checksum.
+*/
+local long GetPaletteChecksum(const Palette* palette)
+{
+    long retVal;
+    int i;
+
+    for(retVal = i = 0; i < 256; i++){
+	//This is designed to return different values if
+	// the pixels are in a different order.
+	retVal = ((palette[i].r+i)&0xff)+retVal;
+	retVal = ((palette[i].g+i)&0xff)+retVal;
+	retVal = ((palette[i].b+i)&0xff)+retVal;
+    }
+    return retVal;
+}
+
+/**
+**	Creates a shared hardware palette from an independend Palette struct.
+**
+**	@param palette	System independend RGB palette structure.
+**
+**	@return		A palette in hardware  dependend format.
+*/
+global VMemType* VideoCreateSharedPalette(const Palette* palette)
+{
+    PaletteLink* current_link;
+    PaletteLink** prev_link;
+    VMemType* pixels;
+    long checksum;
+
+    pixels = VideoCreateNewPalette(palette);
+    checksum = GetPaletteChecksum(palette);
+    prev_link = &PaletteList;
+    while ((current_link=*prev_link)) {
+	if (current_link->Checksum == checksum
+		&& !memcmp(current_link->Palette,pixels,
+		    256*((VideoDepth+7)/8)) ) {
+	    break;
+	}
+	prev_link = &current_link->Next;
+    }
+
+    if (current_link) {			// Palette found (reuse)
+	free(pixels);
+	pixels = current_link->Palette;
+	++current_link->RefCount;
+	DebugLevel3("uses palette %p %d\n",pixels,current_link->RefCount);
+    } else {				// Palette NOT found
+	DebugLevel3("loading new palette %p\n",pixels);
+
+	current_link = *prev_link = malloc(sizeof(PaletteLink));
+	current_link->Checksum = checksum;
+	current_link->Next = NULL;
+	current_link->Palette = pixels;
+	current_link->RefCount = 1;
+    }
+
+    return pixels;
+}
+
+/**
+**	Free a shared hardware palette.
+**
+**	@param pixel	palette in hardware dependend format
+*/
+global void VideoFreeSharedPalette(VMemType* pixels)
+{
+    PaletteLink* current_link;
+    PaletteLink** prev_link;
+
+//    if( pixels==Pixels ) {
+//	DebugLevel3Fn("Freeing global palette\n");
+//    }
+
+    //
+    //  Find and free palette.
+    //
+    prev_link = &PaletteList;
+    while ((current_link = *prev_link)) {
+	if (current_link->Palette == pixels) {
+	    break;
+	}
+	prev_link = &current_link->Next;
+    }
+    if (current_link) {
+	if (!--current_link->RefCount) {
+	    DebugLevel3Fn("Free palette %p\n",pixels);
+	    free(current_link->Palette);
+	    *prev_link = current_link->Next;
+	    free(current_link);
+	}
+    }
+}
+
+/**
 **	Load a picture and display it on the screen (full screen),
 **	changing the colormap and so on..
 **
@@ -377,22 +484,22 @@ global void PopClipping(void)
 */
 global void DisplayPicture(const char *name)
 {
-    Graphic* title;
+    Graphic* picture;
 
-    title=LoadGraphic(name);
-    VideoSetPalette(title->Pixels);
+    picture=LoadGraphic(name);
+    VideoSetPalette(picture->Pixels);
 
     VideoLockScreen();
 
     // FIXME: bigger window ?
-    VideoDrawSubClip(title,0,0
-	,title->Width,title->Height
-	,(VideoWidth-title->Width)/2,(VideoHeight-title->Height)/2);
+    VideoDrawSubClip(picture,0,0
+	,picture->Width,picture->Height
+	,(VideoWidth-picture->Width)/2,(VideoHeight-picture->Height)/2);
 
     VideoUnlockScreen();
 
-    VideoFree(title);
-    // FIXME: (ARI:) New Palette got stuck in memory?
+    VideoSetPalette(NULL);
+    VideoFree(picture);
 }
 
 /**
@@ -467,8 +574,9 @@ local void ColorCycle8(void)
     VMemType8 *pixels;
 
     if (ColorCycleAll) {
-	PaletteLink *current_link = PaletteList;
+	PaletteLink* current_link;
 
+	current_link = PaletteList;
 	while (current_link != NULL) {
 	    x = ((VMemType8 *) (current_link->Palette))[38];
 	    for (i = 38; i < 47; ++i) {	// tileset color cycle
@@ -527,8 +635,9 @@ local void ColorCycle16(void)
     VMemType16 *pixels;
 
     if (ColorCycleAll) {
-	PaletteLink *current_link = PaletteList;
+	PaletteLink* current_link;
 
+	current_link = PaletteList;
 	while (current_link != NULL) {
 	    x = ((VMemType16 *) (current_link->Palette))[38];
 	    for (i = 38; i < 47; ++i) {	// tileset color cycle
@@ -587,8 +696,9 @@ local void ColorCycle24(void)
     VMemType24 *pixels;
 
     if (ColorCycleAll) {
-	PaletteLink *current_link = PaletteList;
+	PaletteLink* current_link;
 
+	current_link = PaletteList;
 	while (current_link != NULL) {
 	    x = ((VMemType24 *) (current_link->Palette))[38];
 	    for (i = 38; i < 47; ++i) {	// tileset color cycle
@@ -647,8 +757,9 @@ local void ColorCycle32(void)
     VMemType32 *pixels;
 
     if (ColorCycleAll) {
-	PaletteLink *current_link = PaletteList;
+	PaletteLink* current_link;
 
+	current_link = PaletteList;
 	while (current_link != NULL) {
 	    x = ((VMemType32 *) (current_link->Palette))[38];
 	    for (i = 38; i < 47; ++i) { // tileset color cycle
@@ -1033,11 +1144,7 @@ local void InitSingleCommonPalette8( void )
 */
 global void VideoSetPalette(const VMemType* palette)
 {
-#if 0	// ARI: FIXME: This ruins menu palettes, when loaded via default.cm (introduce refcnt?)
-    if( Pixels ) {
-	free(Pixels);//FIXME: free unsufficient, XFreeColors needed for X11
-    }
-#endif
+    DebugLevel3Fn("Palette %x used\n",(unsigned)palette);
 
     Pixels=(VMemType*)palette;
     SetPlayersPalette();
