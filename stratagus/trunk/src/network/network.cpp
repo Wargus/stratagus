@@ -312,7 +312,8 @@ local void NetworkServerSetup(void)
 		port=message.Hosts[i].Port;
 		message.Hosts[i].Host=message.Hosts[i].Port=0;
 		n=NetSendUDP(NetworkFildes,host,port,&message,sizeof(message));
-		DebugLevel0Fn(" Sending config %d\n",n);
+		DebugLevel0Fn(" Sending config %d to %d.%d.%d.%d:%d\n"
+			,n,NIPQUAD(ntohl(host)),ntohs(port));
 		message.Hosts[i].Host=host;
 		message.Hosts[i].Port=port;
 	    }
