@@ -635,7 +635,7 @@ local void DrawUnitIcons(void)
 			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 			DrawIcon(Players + SelectedPlayer, icon, x, y);
 
-			VideoDrawRectangle(ColorGray, x, y, icon->Width, icon->Height);
+			VideoDrawRectangleClip(ColorGray, x, y, icon->Width, icon->Height);
 			if (i == SelectedUnitIndex) {
 				VideoDrawRectangle(ColorGreen, x + 1, y + 1,
 					icon->Width - 2, icon->Height - 2);
