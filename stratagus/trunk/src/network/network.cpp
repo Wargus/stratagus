@@ -487,6 +487,8 @@ global void InitNetwork2(void)
 {
     int i, n;
 
+    NetworkConnectSetupGame();
+
     //
     //	Prepare first time without syncs.
     //
