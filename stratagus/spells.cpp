@@ -837,16 +837,6 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 	if (!target) {
 		return 1;
 	}
-	if (condition->Building != CONDITION_TRUE) {
-		if ((condition->Building == CONDITION_ONLY) ^ (target->Type->Building)) {
-			return 0;
-		}
-	}
-	if (condition->Coward != CONDITION_TRUE) {
-		if ((condition->Coward == CONDITION_ONLY) ^ (target->Type->Coward)) {
-			return 0;
-		}
-	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 		if (condition->BoolFlag[i] != CONDITION_TRUE) {
 			if ((condition->BoolFlag[i] == CONDITION_ONLY) ^ (target->Type->BoolFlag[i])) {

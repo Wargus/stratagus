@@ -541,21 +541,13 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
 		++j;
-		if (!strcmp(value, "coward")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Coward = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "alliance")) {
+		if (!strcmp(value, "alliance")) {
 			lua_rawgeti(l, -1, j + 1);
 			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "opponent")) {
 			lua_rawgeti(l, -1, j + 1);
 			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1));
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "building")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->Building = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "self")) {
 			lua_rawgeti(l, -1, j + 1);
@@ -981,14 +973,8 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 	// First save data related to flags.
 	// NOTE: (int) is there to keep compilers happy.
 	//
-	if (condition->Coward != CONDITION_TRUE) {
-		CLprintf(file, "coward %s ", condstrings[(int)condition->Coward]);
-	}
 	if (condition->Alliance != CONDITION_TRUE) {
 		CLprintf(file, "alliance %s ", condstrings[(int)condition->Alliance]);
-	}
-	if (condition->Building != CONDITION_TRUE) {
-		CLprintf(file, "building %s ", condstrings[(int)condition->Building]);
 	}
 	if (condition->TargetSelf != CONDITION_TRUE) {
 		CLprintf(file, "self %s ", condstrings[(int)condition->TargetSelf]);
