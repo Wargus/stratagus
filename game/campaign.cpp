@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**@name campagin.c	-	The campaign control. */
+/**@name campaign.c	-	The campaign control. */
 //
 //	(c) Copyright 2002 by Lutz Sammer
 //
