@@ -23,8 +23,8 @@ function create
       n[$ji]=$j
       let ji=ji+1
     done
-    convert +append $10${n[1]}.png $10${n[2]}.png $10${n[3]}.png $10${n[4]}.png \
-                    $10${n[5]}.png $10${n[6]}.png $10${n[7]}.png $10${n[8]}.png \
+    convert +append $10${n[1]}.png $10${n[2]}.png $10${n[3]}.png $10${n[4]}.png\
+                    $10${n[5]}.png $10${n[6]}.png $10${n[7]}.png $10${n[8]}.png\
                     tmp$i.png
   done
   mmv "tmp?.png" "tmp0#1.png"
@@ -33,6 +33,13 @@ function create
   rm tmp???.png
 }
 
-create normal unit_buggy.png
-create shadow unit_buggy_s.png
+create normal unit_buggy_tc.png
+create shadow unit_buggy_tc_s.png
 
+pngtc2pngp unit_buggy_tc.png unit_buggy.png \
+           -s unit_buggy_tc_s.png unit_buggy_s.png \
+           --player-color 120  \
+           --title "BOS, unit buggy" \
+           --author "Frank Loeffler" \
+           --copyright "GPL, v2" \
+           --source "buggy.blend"
