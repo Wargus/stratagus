@@ -5,60 +5,60 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//        Stratagus - A free fantasy real time strategy game engine
 //
 /**@name sound_id.c - The sound id. */
 //
-// (c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2005 by Lutz Sammer and Fabrice Rossi
 //
-// it under the terms of the GNU General Public License as published
-// by the Free Software Foundation; only version 2 of the License.
+//      This program is free software; you can redistribute it and/or modify
+//      it under the terms of the GNU General Public License as published by
+//      the Free Software Foundation; only version 2 of the License.
 //
-// Stratagus is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//      This program is distributed in the hope that it will be useful,
+//      but WITHOUT ANY WARRANTY; without even the implied warranty of
+//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//      GNU General Public License for more details.
 //
-// $Id$
+//      You should have received a copy of the GNU General Public License
+//      along with this program; if not, write to the Free Software
+//      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//      02111-1307, USA.
+//
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include "stratagus.h"
-
 #include <stdlib.h>
 #include <string.h>
 
-#include "video.h"
-#include "sound_id.h"
-#include "unitsound.h"
-#include "unittype.h"
-#include "player.h"
-#include "unit.h"
-#include "sound_server.h"
+#include "stratagus.h"
 
+#include "sound_id.h"
+#include "sound_server.h"
 #include "util.h"
 
 /*----------------------------------------------------------------------------
--- Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 #ifdef DOXYGEN // no real code, only for document
 
 /**
-** hash table used to store the mapping between sound name and sound id
+**  hash table used to store the mapping between sound name and sound id
 */
 static int SoundIdHash[61];
 
 #else
 
 /**
-** hash table used to store the mapping between sound name and sound id
+**  hash table used to store the mapping between sound name and sound id
 */
 static hashtable(int, 61) SoundIdHash;
 
@@ -69,11 +69,11 @@ static hashtable(int, 61) SoundIdHash;
 ----------------------------------------------------------------------------*/
 
 /**
-** Add a new mapping (sound name to sound id) in the hash table
-** Create a new mapping between a name and an already valid sound id.
+**  Add a new mapping (sound name to sound id) in the hash table
+**  Create a new mapping between a name and an already valid sound id.
 **
-** @param name   Name of the sound (now freed by caller!).
-** @param id     Sound identifier.
+**  @param name  Name of the sound (now freed by caller!).
+**  @param id    Sound identifier.
 */
 void MapSound(const char* name, const SoundId id)
 {
@@ -81,11 +81,11 @@ void MapSound(const char* name, const SoundId id)
 }
 
 /**
-** Maps a sound name to its id
+**  Maps a sound name to its id
 **
-** @param name Sound name.
+**  @param name  Sound name.
 **
-** @return Sound idenfier for this name.
+**  @return      Sound idenfier for this name.
 */
 SoundId SoundIdForName(const char* name)
 {
@@ -101,16 +101,16 @@ SoundId SoundIdForName(const char* name)
 }
 
 /**
-** Ask the sound server to register a sound and store the mapping
-** between its name and its id.
-** Register a sound group (or an unique sound if nb==1) and get the
-** corresponding sound id.
+**  Ask the sound server to register a sound and store the mapping
+**  between its name and its id.
+**  Register a sound group (or an unique sound if nb==1) and get the
+**  corresponding sound id.
 **
-** @param name     name of this sound group (Freed by caller).
-** @param file     list of sound file names
-** @param nb       number of sounds
+**  @param name  name of this sound group (Freed by caller).
+**  @param file  list of sound file names
+**  @param nb    number of sounds
 **
-** @return the sound id of the created group
+**  @return      the sound id of the created group
 */
 SoundId MakeSound(const char* name, const char* file[], int nb)
 {
@@ -132,17 +132,17 @@ SoundId MakeSound(const char* name, const char* file[], int nb)
 }
 
 /**
-** Ask the sound server to build a special sound group.
+**  Ask the sound server to build a special sound group.
 **
-** Register two sound groups together to make a special sound (for
-** selection). Return the corresponding id after registering it under a
-** given name.
+**  Register two sound groups together to make a special sound (for
+**  selection). Return the corresponding id after registering it under a
+**  given name.
 **
-** @param name     the name of the group (handled by caller).
-** @param first    id of the first group
-** @param second   id of the second group
+**  @param name    the name of the group (handled by caller).
+**  @param first   id of the first group
+**  @param second  id of the second group
 **
-** @return Registered sound identifier.
+**  @return        Registered sound identifier.
 */
 SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 {
