@@ -579,6 +579,7 @@ struct _unit_ {
 #define UNIT_RETREATING		1	/// FIXME: comment missing
 #define UNIT_WINNING		2	/// FIXME: comment missing
     unsigned	Retreating:2;		/// FIXME: comment what is this?
+	void *PfHierData;
 #endif	// HIERARCHIC_PATHFINDER
 
 #ifdef NEW_DECODRAW
