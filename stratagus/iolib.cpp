@@ -510,8 +510,15 @@ local int
 __my_zzip_open_zip(const char* filename, int filemode)
 {
     auto char file[PATH_MAX];
-    int fd;
-    int len = strlen (filename);
+    int fd = -1;
+    int len = strlen(filename);
+#ifdef USE_WIN32
+    if (len+4 < PATH_MAX) {
+	strcpy(file, filename);
+	strcpy(file+len, ".zip");
+	fd = open(file, filemode);
+    }
+#else
     static const char* my_zzip_default_fileext[] =
     {
 	".zip", ".ZIP", /* common extension */
@@ -519,16 +526,20 @@ __my_zzip_open_zip(const char* filename, int filemode)
     };
     const char** ext = my_zzip_default_fileext;
 
-    if (len+4 >= PATH_MAX) return -1;
-    memcpy(file, filename, len+1);
+    if (len+4 < PATH_MAX) {
+	memcpy(file, filename, len+1);
 
-    for ( ; *ext ; ++ext)
-    {
-	strcpy (file+len, *ext);
-	fd = open(file, filemode);
-	if (fd != -1) return fd;
+	for ( ; *ext ; ++ext)
+	{
+	    strcpy (file+len, *ext);
+	    fd = open(file, filemode);
+	    if (fd != -1) {
+		break;
+	    }
+	}
     }
-    return -1;
+#endif
+    return fd;
 }
 #endif
 
@@ -563,17 +574,19 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
     struct stat st;
 #endif
     FileList *nfl, *fl = NULL;
-    int n = 0, isdir = 0; // silence gcc..
+    int n, isdir = 0; // silence gcc..
     char *cp, *np;
     char buffer[PATH_MAX];
     char *filename;
 
     strcpy(buffer, dirname);
-    cp = strrchr(buffer, '/');
-    if (!cp || cp[1]) {
-	strcat(buffer, "/");
+    n = strlen(buffer);
+    if (!n || buffer[n - 1] != '/') {
+	buffer[n++] = '/';
+	buffer[n] = 0;
     }
-    np = strrchr(buffer, '/') + 1;
+    np = buffer + n;
+    n = 0;
 
 #ifdef USE_ZZIPLIB
     strcpy (zzbasepath, dirname);
@@ -585,17 +598,16 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 
 	*cp = '\0'; /* cut at path separator == possible zipfile basename */
 	fd = __my_zzip_open_zip(zzbasepath, O_RDONLY|O_BINARY);
-	if (fd == -1) {
-	    continue;
+	if (fd != -1) {
+	    /* found zip-file, now open it */
+	    dirp = zzip_dir_fdopen(fd, &e);
+	    if (e) {
+		errno = zzip_errno(e);
+		close(fd);
+		dirp = NULL;
+	    }
+	    break;
 	}
-	/* found zip-file, now open it */
-	dirp = zzip_dir_fdopen(fd, &e);
-	if (e) {
-	    errno = zzip_errno(e);
-	    close(fd);
-	    dirp = NULL;
-	}
-	break;
     }
     if (!dirp) {
 	int fd;
@@ -604,7 +616,7 @@ global int ReadDataDirectory(const char* dirname,int (*filter)(char*,FileList *)
 	// this is tricky - we used to simply zzip_opendir(dirname) here, but
 	// zziplib (correctly) prefers real directories over same named zipfiles
 	// and we want it vice versa in this special case. Otherwise it would not
-	// match the path separtor backtrace above, which relies on recursive
+	// match the path separator backtrace above, which relies on recursive
 	// __zip_open_dir(). __zip_open_dir() only detects zipfiles, not real dirs!
 	fd = __my_zzip_open_zip(dirname, O_RDONLY|O_BINARY);
 	if (fd == -1) {
