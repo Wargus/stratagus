@@ -1006,8 +1006,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana bar on right side of unit. FIXME: combine bar and sprite
     //
     if( ShowManaBar ) {
-	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==MaxMana) ) {
-	    DrawManaBar(x,y,type,MaxMana,unit->Mana);
+	    /* s0m3body: mana bar should display man proportionally to unit's max mana (unit->Type->Magic) */
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==unit->Type->Magic) ) {
+	    DrawManaBar(x,y,type,unit->Type->Magic,unit->Mana);
 	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
 	    DrawManaBar(x,y,type,655350,unit->Value);
 	}
@@ -1069,8 +1070,9 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Mana dot on right side of unit.
     //
     if( ShowManaDot ) {
-	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==MaxMana) ) {
-	    DrawManaSprite(x,y,type,MaxMana,unit->Mana);
+	    /* s0m3body: MaxMana can vary for each unit, it is stored in unit->Type->Magic */	
+	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==unit->Type->Magic) ) {
+	    DrawManaSprite(x,y,type,unit->Type->Magic,unit->Mana);
 	} else if( type->GivesOil || type->GoldMine || type->OilPatch ) {
 	    DrawManaSprite(x,y,type,655350,unit->Value);
 	}
