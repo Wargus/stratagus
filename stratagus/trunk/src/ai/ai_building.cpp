@@ -403,7 +403,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
 		//
 		//	Look if there is a mine
 		//
-		if ( mine=GoldMineOnMap(x,y) ) {
+		if ( (mine=GoldMineOnMap(x,y)) ) {
 		    int buildings;
 		    int j;
 		    int minx;
