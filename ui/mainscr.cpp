@@ -611,24 +611,26 @@ global void DrawResources(void)
 			,v>99999 ? SmallFont : GameFont,v);
 	    }
 	}
-	VideoDrawSub(TheUI.FoodIcon.Graphic,0
-		,TheUI.FoodIconRow*TheUI.FoodIconH
-		,TheUI.FoodIconW,TheUI.FoodIconH
-		,TheUI.FoodIconX,TheUI.FoodIconY);
+	VideoDrawSub(TheUI.Resources[FoodCost].Icon.Graphic,0
+		,TheUI.Resources[FoodCost].IconRow*TheUI.Resources[FoodCost].IconH
+		,TheUI.Resources[FoodCost].IconW,TheUI.Resources[FoodCost].IconH
+		,TheUI.Resources[FoodCost].IconX,TheUI.Resources[FoodCost].IconY);
 	sprintf(tmp,"%d/%d",ThisPlayer->NumFoodUnits,ThisPlayer->Food);
 	if( ThisPlayer->Food<ThisPlayer->NumFoodUnits ) {
-	    VideoDrawReverseText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
+	    VideoDrawReverseText(TheUI.Resources[FoodCost].TextX
+		    ,TheUI.Resources[FoodCost].TextY,GameFont,tmp);
 	} else {
-	    VideoDrawText(TheUI.FoodTextX,TheUI.FoodTextY,GameFont,tmp);
+	    VideoDrawText(TheUI.Resources[FoodCost].TextX
+		    ,TheUI.Resources[FoodCost].TextY,GameFont,tmp);
 	}
 
-	VideoDrawSub(TheUI.ScoreIcon.Graphic,0
-		,TheUI.ScoreIconRow*TheUI.ScoreIconH
-		,TheUI.ScoreIconW,TheUI.ScoreIconH
-		,TheUI.ScoreIconX,TheUI.ScoreIconY);
+	VideoDrawSub(TheUI.Resources[ScoreCost].Icon.Graphic,0
+		,TheUI.Resources[ScoreCost].IconRow*TheUI.Resources[ScoreCost].IconH
+		,TheUI.Resources[ScoreCost].IconW,TheUI.Resources[ScoreCost].IconH
+		,TheUI.Resources[ScoreCost].IconX,TheUI.Resources[ScoreCost].IconY);
 	v=ThisPlayer->Score;
-	VideoDrawNumber(TheUI.ScoreTextX
-		,TheUI.ScoreTextY+(v>99999)*3
+	VideoDrawNumber(TheUI.Resources[ScoreCost].TextX
+		,TheUI.Resources[ScoreCost].TextY+(v>99999)*3
 		,v>99999 ? SmallFont : GameFont,v);
     }
 }
@@ -1028,9 +1030,9 @@ global void DrawCosts(void)
 
     if( CostsFood ) {
 	// FIXME: hardcoded image!!!
-	VideoDrawSub(TheUI.FoodIcon.Graphic
-		,0,TheUI.FoodIconRow*TheUI.FoodIconH
-		,TheUI.FoodIconW,TheUI.FoodIconH
+	VideoDrawSub(TheUI.Resources[FoodCost].Icon.Graphic
+		,0,TheUI.Resources[FoodCost].IconRow*TheUI.Resources[FoodCost].IconH
+		,TheUI.Resources[FoodCost].IconW,TheUI.Resources[FoodCost].IconH
 		,x,TheUI.StatusLineY+1);
 	VideoDrawNumber(x+15,TheUI.StatusLineY+2,GameFont,CostsFood);
 	x+=45;

@@ -198,25 +198,8 @@ typedef struct _ui_ {
 	int	IconH;			/// icon H position
 	int	TextX;			/// text X position
 	int	TextY;			/// text Y position
-    }		Resources[MaxCosts];	/// Icon+Text of all resources
-
-    GraphicConfig FoodIcon;		/// units icon image
-    int		FoodIconRow;		/// units icon image row (frame)
-    int		FoodIconX;		/// units icon X position
-    int		FoodIconY;		/// units icon Y position
-    int		FoodIconW;		/// units icon W position
-    int		FoodIconH;		/// units icon H position
-    int		FoodTextX;		/// units text X position
-    int		FoodTextY;		/// units text Y position
-
-    GraphicConfig ScoreIcon;		/// score icon image
-    int		ScoreIconRow;		/// score icon image row (frame)
-    int		ScoreIconX;		/// score icon X position
-    int		ScoreIconY;		/// score icon Y position
-    int		ScoreIconW;		/// score icon W position
-    int		ScoreIconH;		/// score icon H position
-    int		ScoreTextX;		/// score text X position
-    int		ScoreTextY;		/// score text Y position
+    }		Resources[MaxCosts+2];	/// Icon+Text of all resources
+					/// +2 for food and score
 
     // Info panel
     GraphicConfig InfoPanel;		/// Info panel background
