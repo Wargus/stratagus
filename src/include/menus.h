@@ -46,6 +46,7 @@ typedef unsigned MenuButtonId;
 #define MBUTTON_GM_FULL		16
 #define MBUTTON_DOWN_ARROW	32
 #define MBUTTON_PULLDOWN	46
+#define MBUTTON_FOLDER		51
 
 /*----------------------------------------------------------------------------
 --	Menus
@@ -80,24 +81,25 @@ typedef struct _menuitem_ {
 	    unsigned xsize;
 	    unsigned ysize;
 	    MenuButtonId button;
-	    void (*handler)(void);
+	    void (*action)(struct _menuitem_ *, int);
 	    int noptions;
 	    int defopt;
 	    int curopt;
 	    int cursel;		/* used in popup state */
 	} pulldown;
 	struct {
-	    unsigned char **options;
+	    void *options;
 	    unsigned xsize;
 	    unsigned ysize;
 	    MenuButtonId button;
-	    void (*handler)(void);
+	    void (*action)(struct _menuitem_ *, int);
 	    int noptions;
 	    int defopt;
 	    int curopt;
-	    int cursel;		/* used in popup state */
+	    int cursel;		/* used in mouse-over state */
 	    int nlines;
 	    int startline;
+	    void *(*retrieveopt)(struct _menuitem_ *, int);
 	} listbox;
 	/// ... add here ...
 
