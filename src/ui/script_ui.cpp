@@ -673,171 +673,70 @@ local SCM CclDefineUI(SCM list)
     //
     //	Parse icons
     //
-    for( i=1; i<MaxCosts; ++i ) {
-	// icon
-	temp=gh_car(list);
+    value=gh_car(list);
+    list=gh_cdr(list);
+    if( gh_eq_p(value,gh_symbol2scm("resources")) ) {
+	SCM sublist;
+
+	sublist=gh_car(list);
 	list=gh_cdr(list);
+	while( !gh_null_p(sublist) ) {
+	    SCM slist;
+	    int res;
+	    char* name;
 
-	if( gh_null_p(temp) ) {
-	    free(ui->Resources[i].Icon.File);
-	    ui->Resources[i].Icon.File=NULL;
-	    ui->Resources[i].Icon.Graphic=NULL;
-	    ui->Resources[i].IconRow=0;
-	    ui->Resources[i].IconX=0;
-	    ui->Resources[i].IconY=0;
-	    ui->Resources[i].IconW=0;
-	    ui->Resources[i].IconH=0;
-	    ui->Resources[i].TextX=0;
-	    ui->Resources[i].TextY=0;
-	    continue;
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    name=gh_scm2newstr(value,NULL);
+	    for( res=0; res<MaxCosts; ++res ) {
+		if( !strcmp(name,DefaultResourceNames[res]) ) {
+		    break;
+		}
+	    }
+	    if( res==MaxCosts ) {
+		if( !strcmp(name,"food") ) {
+		    res=FoodCost;
+		} else if( !strcmp(name,"score") ) {
+		    res=ScoreCost;
+		} else {
+		    errl("Resource not found",value);
+		}
+	    }
+	    free(name);
+	    slist=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    while( !gh_null_p(slist) ) {
+		value=gh_car(slist);
+		slist=gh_cdr(slist);
+		if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+		    ui->Resources[res].IconX=gh_scm2int(gh_car(value));
+		    ui->Resources[res].IconY=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+		    ui->Resources[res].Icon.File=gh_scm2newstr(value,NULL);
+		} else if( gh_eq_p(value,gh_symbol2scm("row")) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+		    ui->Resources[res].IconRow=gh_scm2int(value);
+		} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+		    ui->Resources[res].IconW=gh_scm2int(gh_car(value));
+		    ui->Resources[res].IconH=gh_scm2int(gh_car(gh_cdr(value)));
+		} else if( gh_eq_p(value,gh_symbol2scm("text-pos")) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+		    ui->Resources[res].TextX=gh_scm2int(gh_car(value));
+		    ui->Resources[res].TextY=gh_scm2int(gh_car(gh_cdr(value)));
+		} else {
+		    errl("Unsupported tag",value);
+		}
+	    }
 	}
-
-	if( !gh_list_p(temp) ) {
-	    fprintf(stderr,"list expected\n");
-	    return SCM_UNSPECIFIED;
-	}
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	str=gh_scm2newstr(value,NULL);
-	free(ui->Resources[i].Icon.File);
-	ui->Resources[i].Icon.File=str;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Resources[i].IconRow=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Resources[i].IconX=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Resources[i].IconY=y;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Resources[i].IconW=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Resources[i].IconH=y;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	x=gh_scm2int(value);
-	ui->Resources[i].TextX=x;
-
-	value=gh_car(temp);
-	temp=gh_cdr(temp);
-	y=gh_scm2int(value);
-	ui->Resources[i].TextY=y;
     }
-
-    //	Food icon
-    temp=gh_car(list);
-    list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    free(ui->FoodIcon.File);
-    ui->FoodIcon.File=str;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    i=gh_scm2int(value);
-    ui->FoodIconRow=i;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->FoodIconX=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->FoodIconY=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->FoodIconW=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->FoodIconH=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->FoodTextX=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->FoodTextY=y;
-
-    //	Score icon
-    temp=gh_car(list);
-    list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
-    }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    free(ui->ScoreIcon.File);
-    ui->ScoreIcon.File=str;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    i=gh_scm2int(value);
-    ui->ScoreIconRow=i;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->ScoreIconX=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->ScoreIconY=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->ScoreIconW=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->ScoreIconH=y;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    ui->ScoreTextX=x;
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-    ui->ScoreTextY=y;
 
     //	InfoPanel
     temp=gh_car(list);

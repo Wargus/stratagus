@@ -10,7 +10,8 @@
 //
 /**@name ui.c		-	The user interface globals. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Andreas Arens
+//	(c) Copyright 1999-2003 by Lutz Sammer, Andreas Arens, and
+//	                           Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -200,17 +201,17 @@ global void LoadUserInterface(void)
     }
 
     // FIXME: reuse same graphics?
-    if( TheUI.FoodIcon.File ) {
-	TheUI.FoodIcon.Graphic=LoadGraphic(TheUI.FoodIcon.File);
+    if( TheUI.Resources[FoodCost].Icon.File ) {
+	TheUI.Resources[FoodCost].Icon.Graphic=LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.FoodIcon.Graphic,TheUI.FoodIcon.Graphic->Width,TheUI.FoodIcon.Graphic->Height);
+	MakeTexture(TheUI.Resources[FoodCost].Icon.Graphic,TheUI.Resources[FoodCost].Icon.Graphic->Width,TheUI.Resources[FoodCost].Icon.Graphic->Height);
 #endif
     }
     // FIXME: reuse same graphics?
-    if( TheUI.ScoreIcon.File ) {
-	TheUI.ScoreIcon.Graphic=LoadGraphic(TheUI.ScoreIcon.File);
+    if( TheUI.Resources[ScoreCost].Icon.File ) {
+	TheUI.Resources[ScoreCost].Icon.Graphic=LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
 #ifdef USE_OPENGL
-	MakeTexture(TheUI.ScoreIcon.Graphic,TheUI.ScoreIcon.Graphic->Width,TheUI.ScoreIcon.Graphic->Height);
+	MakeTexture(TheUI.Resources[ScoreCost].Icon.Graphic,TheUI.Resources[ScoreCost].Icon.Graphic->Width,TheUI.Resources[ScoreCost].Icon.Graphic->Height);
 #endif
     }
 
@@ -299,26 +300,22 @@ local void OldSaveUi(FILE* file,const UI* ui)
     fprintf(file,"  (list \"%s\" %d %d)\n",
 	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
 
-    for( i=1; i<MaxCosts; ++i ) {
-	fprintf(file,"  ; Resource %s\n",DefaultResourceNames[i]);
-	fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
+    fprintf(file,"  'resources (list");
+    for( i=1; i<MaxCosts+2; ++i ) {
+	if( !ui->Resources[i].Icon.File ) {
+	    continue;
+	}
+	fprintf(file,"\n    '%s",
+		i<MaxCosts ? DefaultResourceNames[i] :
+		    i==FoodCost ? "food" : "score");
+	fprintf(file," (list 'file \"%s\" 'row %d\n"
+	             "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
 		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
 		ui->Resources[i].IconX,ui->Resources[i].IconY,
 		ui->Resources[i].IconW,ui->Resources[i].IconH,
 		ui->Resources[i].TextX,ui->Resources[i].TextY);
     }
-    fprintf(file,"  ; Food\n");
-    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
-	    ui->FoodIcon.File,ui->FoodIconRow,
-	    ui->FoodIconX,ui->FoodIconY,
-	    ui->FoodIconW,ui->FoodIconH,
-	    ui->FoodTextX,ui->FoodTextY);
-    fprintf(file,"  ; Score\n");
-    fprintf(file,"  (list \"%s\" %d\n    %d %d %d %d  %d %d)\n",
-	    ui->ScoreIcon.File,ui->ScoreIconRow,
-	    ui->ScoreIconX,ui->ScoreIconY,
-	    ui->ScoreIconW,ui->ScoreIconH,
-	    ui->ScoreTextX,ui->ScoreTextY);
+    fprintf(file,")\n");
 
     fprintf(file,"  ; Info panel\n");
     fprintf(file,"  (list \"%s\" %d %d %d %d)\n",
@@ -586,12 +583,12 @@ global void CleanUserInterface(void)
     }
     VideoSaveFree(TheUI.Resource.Graphic);
 
-    for( i=0; i<MaxCosts; ++i ) {
+    for( i=0; i<MaxCosts+2; ++i ) {
 	VideoSaveFree(TheUI.Resources[i].Icon.Graphic);
+	free(TheUI.Resources[i].Icon.File);
+	TheUI.Resources[i].Icon.File=NULL;
     }
 
-    VideoSaveFree(TheUI.FoodIcon.Graphic);
-    VideoSaveFree(TheUI.ScoreIcon.Graphic);
     VideoSaveFree(TheUI.InfoPanel.Graphic);
     VideoSaveFree(TheUI.ButtonPanel.Graphic);
     VideoSaveFree(TheUI.MenuButton.Graphic);
