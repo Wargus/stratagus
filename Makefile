@@ -135,8 +135,8 @@ DOCS    = README README.BeOS doc/readme.html doc/install.html \
 	  doc/freecraft.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
 	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
-	  doc/artistic-license.html doc/ccl/tileset.html doc/ccl/unittype.html \
-	  doc/graphic/*.html doc/graphic/*.png
+	  doc/artistic-license.html doc/ccl/ccl.html doc/ccl/tileset.html \
+	  doc/ccl/unittype.html doc/graphic/*.html doc/graphic/*.png
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
 
