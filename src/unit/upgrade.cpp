@@ -64,8 +64,8 @@ static void AllowUpgradeId(Player* player, int id, char af);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-Upgrade Upgrades[UpgradeMax];                ///< The main user useable upgrades
-static int NumUpgrades;                      ///< Number of upgrades used
+Upgrade Upgrades[UpgradeMax];                /// The main user useable upgrades
+static int NumUpgrades;                      /// Number of upgrades used
 
 	/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
@@ -75,9 +75,9 @@ static UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 static int NumUpgradeModifiers;
 
 #ifdef DOXYGEN  // no real code, only for documentation
-static Upgrade* UpgradeHash[61];             ///< lookup table for upgrade names
+static Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
 #else
-static hashtable(Upgrade*, 61) UpgradeHash;  ///< lookup table for upgrade names
+static hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
 #endif
 
 /**

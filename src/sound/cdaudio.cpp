@@ -62,19 +62,19 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-int CDTrack;      ///< Current cd track
-int NumCDTracks;  ///< Number of tracks on the cd
+int CDTrack;      /// Current cd track
+int NumCDTracks;  /// Number of tracks on the cd
 
 #if defined(USE_SDLCD)
-static SDL_CD* CDRom;                  ///< SDL cdrom device
+static SDL_CD* CDRom;                  /// SDL cdrom device
 #elif defined(USE_CDDA)
-int CDDrive;                           ///< CDRom device
-struct cdrom_tocentry CDtocentry[64];  ///< TOC track header struct
-static struct cdrom_tochdr CDchdr;     ///< TOC header struct
-static struct cdrom_read_audio CDdata; ///< struct for reading data
+int CDDrive;                           /// CDRom device
+struct cdrom_tocentry CDtocentry[64];  /// TOC track header struct
+static struct cdrom_tochdr CDchdr;     /// TOC header struct
+static struct cdrom_read_audio CDdata; /// struct for reading data
 #endif
 
-CDModes CDMode; ///< CD mode
+CDModes CDMode; /// CD mode
 
 /*----------------------------------------------------------------------------
 -- Functions

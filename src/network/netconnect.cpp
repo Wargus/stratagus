@@ -63,35 +63,35 @@
 // Variables
 //----------------------------------------------------------------------------
 
-char* NetworkArg;                      ///< Network command line argument
-int NetPlayers;                        ///< How many network players
-int NetworkPort = NetworkDefaultPort;  ///< Local network port to use
+char* NetworkArg;                      /// Network command line argument
+int NetPlayers;                        /// How many network players
+int NetworkPort = NetworkDefaultPort;  /// Local network port to use
 
 #ifdef DEBUG
-extern unsigned long MyHost;           ///< My host number.
-extern int MyPort;                     ///< My port number.
+extern unsigned long MyHost;           /// My host number.
+extern int MyPort;                     /// My port number.
 #endif
 
-int HostsCount;                        ///< Number of hosts.
-NetworkHost Hosts[PlayerMax];          ///< Host and ports of all players.
+int HostsCount;                        /// Number of hosts.
+NetworkHost Hosts[PlayerMax];          /// Host and ports of all players.
 
-int NetConnectRunning;                 ///< Network menu: Setup mode active
-NetworkState NetStates[PlayerMax];     ///< Network menu: Server: Client Host states
-unsigned char NetLocalState;           ///< Network menu: Local Server/Client connect state;
-int NetLocalHostsSlot;                 ///< Network menu: Slot # in Hosts array of local client
-char NetTriesText[32];                 ///< Network menu: Client tries count text
-char NetServerText[64];                ///< Network menu: Text describing the Network Server IP
-int NetLocalPlayerNumber;              ///< Player number of local client
+int NetConnectRunning;                 /// Network menu: Setup mode active
+NetworkState NetStates[PlayerMax];     /// Network menu: Server: Client Host states
+unsigned char NetLocalState;           /// Network menu: Local Server/Client connect state;
+int NetLocalHostsSlot;                 /// Network menu: Slot # in Hosts array of local client
+char NetTriesText[32];                 /// Network menu: Client tries count text
+char NetServerText[64];                /// Network menu: Text describing the Network Server IP
+int NetLocalPlayerNumber;              /// Player number of local client
 
-static int NetStateMsgCnt;              ///< Number of consecutive msgs of same type sent
-static unsigned char LastStateMsgType;  ///< Subtype of last InitConfig message sent
-static unsigned long NetLastPacketSent; ///< Tick the last network packet was sent
-static unsigned long NetworkServerIP;   ///< Network Client: IP of server to join
+static int NetStateMsgCnt;              /// Number of consecutive msgs of same type sent
+static unsigned char LastStateMsgType;  /// Subtype of last InitConfig message sent
+static unsigned long NetLastPacketSent; /// Tick the last network packet was sent
+static unsigned long NetworkServerIP;   /// Network Client: IP of server to join
 
 /// FIXME ARI: The following is a kludge to have some way to override the default port
 /// on the server to connect to. Should be selectable by advanced network menus.
 /// For now just specify with the -P port command line arg...
-static int NetworkServerPort = NetworkDefaultPort; ///< Server network port to use
+static int NetworkServerPort = NetworkDefaultPort; /// Server network port to use
 
 //----------------------------------------------------------------------------
 // Functions

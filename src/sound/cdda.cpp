@@ -50,10 +50,10 @@
 ----------------------------------------------------------------------------*/
 
 typedef struct _cdda_data {
-	int PosInCd;                      ///< Offset on CD to read from
-	struct cdrom_read_audio Readdata; ///< Structure for IOCTL
-	char* PointerInBuffer;            ///< Position in buffer
-	char* Buffer;                     ///< Buffer start
+	int PosInCd;                      /// Offset on CD to read from
+	struct cdrom_read_audio Readdata; /// Structure for IOCTL
+	char* PointerInBuffer;            /// Position in buffer
+	char* Buffer;                     /// Buffer start
 } CddaData;
 
 #define FRAME_SIZE 2352

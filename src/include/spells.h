@@ -85,11 +85,11 @@ typedef enum {
 **  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
 */
 typedef struct {
-	LocBaseType Base;   ///< The base for the location (caster/target)
-	int AddX;           ///< Add to the X coordinate
-	int AddY;           ///< Add to the X coordinate
-	int AddRandX;       ///< Random add to the X coordinate
-	int AddRandY;       ///< Random add to the X coordinate
+	LocBaseType Base;   /// The base for the location (caster/target)
+	int AddX;           /// Add to the X coordinate
+	int AddY;           /// Add to the X coordinate
+	int AddRandX;       /// Random add to the X coordinate
+	int AddRandY;       /// Random add to the X coordinate
 } SpellActionMissileLocation;
 
 struct _spell_action_type_ {
@@ -98,89 +98,89 @@ struct _spell_action_type_ {
 	/// @todo some time information doesn't work as it should.
 	union {
 		struct {
-			int HP;         ///< Target HP gain.(can be negative)
-			int Mana;       ///< Target Mana gain.(can be negative)
+			int HP;         /// Target HP gain.(can be negative)
+			int Mana;       /// Target Mana gain.(can be negative)
 		} AreaAdjustVitals;
 
 		struct {
-			int Damage;                             ///< Missile damage.
-			int TTL;                                ///< Missile TTL.
-			int Delay;                              ///< Missile original delay.
-			SpellActionMissileLocation StartPoint;  ///< Start point description.
-			SpellActionMissileLocation EndPoint;    ///< Start point description.
-			MissileType* Missile;                   ///< Missile fired on cast
+			int Damage;                             /// Missile damage.
+			int TTL;                                /// Missile TTL.
+			int Delay;                              /// Missile original delay.
+			SpellActionMissileLocation StartPoint;  /// Start point description.
+			SpellActionMissileLocation EndPoint;    /// Start point description.
+			MissileType* Missile;                   /// Missile fired on cast
 		} SpawnMissile;
 
 		struct {
-			int Damage; ///< Damage for every unit in range.
-			int Range;  ///< Range of the explosion.
+			int Damage; /// Damage for every unit in range.
+			int Range;  /// Range of the explosion.
 		} Demolish;
 
 		struct {
-			int Fields;             ///< The size of the affected square.
-			int Shards;             ///< Number of shards thrown.
-			int Damage;             ///< Damage for every shard.
-			int StartOffsetX;       ///< The offset of the missile start point to the hit location.
-			int StartOffsetY;       ///< The offset of the missile start point to the hit location.
-			MissileType* Missile;   ///< Missile fired on cast
+			int Fields;             /// The size of the affected square.
+			int Shards;             /// Number of shards thrown.
+			int Damage;             /// Damage for every shard.
+			int StartOffsetX;       /// The offset of the missile start point to the hit location.
+			int StartOffsetY;       /// The offset of the missile start point to the hit location.
+			MissileType* Missile;   /// Missile fired on cast
 		} AreaBombardment;
 
 		struct {
-			struct _unit_type_* PortalType;   ///< The unit type spawned
+			struct _unit_type_* PortalType;   /// The unit type spawned
 		} SpawnPortal;
 
 		struct {
-			int HasteTicks;          ///< Number of ticks to set Haste to.
-			int SlowTicks;           ///< Number of ticks to set Slow to.
-			int BloodlustTicks;      ///< Number of ticks to set Bloodlust to.
-			int InvisibilityTicks;   ///< Number of ticks to set Invisibility to.
-			int InvincibilityTicks;  ///< Number of ticks to set UnholyArmor to.
-#define BUFF_NOT_AFFECTED 0xC0FF33   ///< Don't like the value? The value doesn't like you!
+			int HasteTicks;          /// Number of ticks to set Haste to.
+			int SlowTicks;           /// Number of ticks to set Slow to.
+			int BloodlustTicks;      /// Number of ticks to set Bloodlust to.
+			int InvisibilityTicks;   /// Number of ticks to set Invisibility to.
+			int InvincibilityTicks;  /// Number of ticks to set UnholyArmor to.
+#define BUFF_NOT_AFFECTED 0xC0FF33   /// Don't like the value? The value doesn't like you!
 		} AdjustBuffs;
 
 		struct {
-			int Index;                  ///< index of the variable to modify.
+			int Index;                  /// index of the variable to modify.
 
-			int Enable;                 ///< Value to affect to this field.
-			int Value;                  ///< Value to affect to this field.
-			int Max;                    ///< Value to affect to this field.
-			int Increase;               ///< Value to affect to this field.
+			int Enable;                 /// Value to affect to this field.
+			int Value;                  /// Value to affect to this field.
+			int Max;                    /// Value to affect to this field.
+			int Increase;               /// Value to affect to this field.
 
-			char ModifEnable;           ///< true if we modify this field.
-			char ModifValue;            ///< true if we modify this field.
-			char ModifMax;              ///< true if we modify this field.
-			char ModifIncrease;         ///< true if we modify this field.
+			char ModifEnable;           /// true if we modify this field.
+			char ModifValue;            /// true if we modify this field.
+			char ModifMax;              /// true if we modify this field.
+			char ModifIncrease;         /// true if we modify this field.
 
-			char InvertEnable;          ///< true if we invert this field.
-			int AddValue;               ///< Add this value to this field.
-			int AddMax;                 ///< Add this value to this field.
-			int AddIncrease;            ///< Add this value to this field.
-			int IncreaseTime;           ///< How many time increase the Value field.
-			char TargetIsCaster;        ///< true if the target is the caster.
+			char InvertEnable;          /// true if we invert this field.
+			int AddValue;               /// Add this value to this field.
+			int AddMax;                 /// Add this value to this field.
+			int AddIncrease;            /// Add this value to this field.
+			int IncreaseTime;           /// How many time increase the Value field.
+			char TargetIsCaster;        /// true if the target is the caster.
 		} AdjustVariable;
 
 		struct {
-			int HP;         ///< Target HP gain.(can be negative)
-			int Mana;       ///< Target Mana gain.(can be negative)
+			int HP;         /// Target HP gain.(can be negative)
+			int Mana;       /// Target Mana gain.(can be negative)
 			/// This spell is designed to be used wit very small amounts. The spell
 			/// can scale up to MaxMultiCast times. Use 0 for infinite.
 			int MaxMultiCast;
 		} AdjustVitals;
 
 		struct {
-			struct _unit_type_* NewForm;///< The new form
-			int PlayerNeutral;          ///< Convert the unit to the neutral player.
+			struct _unit_type_* NewForm;/// The new form
+			int PlayerNeutral;          /// Convert the unit to the neutral player.
 			// TODO: temporary polymorphs would be awesome, but hard to implement
 		} Polymorph;
 
 		struct {
-			struct _unit_type_* UnitType;///< Type of unit to be summoned.
-			int TTL;                ///< Time to live for summoned unit. 0 means infinite
-			int RequireCorpse;      ///< Corpse consumed while summoning.
+			struct _unit_type_* UnitType;/// Type of unit to be summoned.
+			int TTL;                /// Time to live for summoned unit. 0 means infinite
+			int RequireCorpse;      /// Corpse consumed while summoning.
 		} Summon;
 		//  What about a resurection spell?
 	} Data;
-	SpellActionType* Next; ///< Next action.
+	SpellActionType* Next; /// Next action.
 };
 
 /*
@@ -190,10 +190,10 @@ struct _spell_action_type_ {
 */
 
 typedef struct {
-	TargetType which_sort_of_target;  ///< for identify what sort of target.
-	int X;                            ///< x coord.
-	int Y;                            ///< y coord.
-	struct _unit_* unit;              ///< Unit target.
+	TargetType which_sort_of_target;  /// for identify what sort of target.
+	int X;                            /// x coord.
+	int Y;                            /// y coord.
+	struct _unit_* unit;              /// Unit target.
 } Target;
 
 /*
@@ -214,26 +214,26 @@ typedef struct ConditionInfo {
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-	char Alliance;          ///< Target is allied. (neutral is neither allied, nor opponent)
-	char Opponent;          ///< Target is opponent. (neutral is neither allied, nor opponent)
-	char TargetSelf;        ///< Target is the same as the caster.
-	char* BoolFlag;         ///< User defined boolean flag.
+	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
+	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
+	char TargetSelf;        /// Target is the same as the caster.
+	char* BoolFlag;         /// User defined boolean flag.
 
 	//
 	//  Conditions related to vitals:
 	//
-	int MinHpPercent;       ///< Target must have more hp than that.
-	int MaxHpPercent;       ///< Target must have less hp than that. Used for heal-like spells.
-	int MinManaPercent;     ///< Target must have more mana than that. Mana drain spells?
-	int MaxManaPercent;     ///< Target must have less mana than that. Mana fountains?
+	int MinHpPercent;       /// Target must have more hp than that.
+	int MaxHpPercent;       /// Target must have less hp than that. Used for heal-like spells.
+	int MinManaPercent;     /// Target must have more mana than that. Mana drain spells?
+	int MaxManaPercent;     /// Target must have less mana than that. Mana fountains?
 	//
 	//  Conditions related to buffs:
 	//
-	int MaxHasteTicks;          ///< Target must less haste ticks left.
-	int MaxSlowTicks;           ///< Target must less slow ticks left.
-	int MaxBloodlustTicks;      ///< Target must less bloodlust ticks left.
-	int MaxInvisibilityTicks;   ///< Target must less bloodlust ticks left.
-	int MaxInvincibilityTicks;  ///< Target must less bloodlust ticks left.
+	int MaxHasteTicks;          /// Target must less haste ticks left.
+	int MaxSlowTicks;           /// Target must less slow ticks left.
+	int MaxBloodlustTicks;      /// Target must less bloodlust ticks left.
+	int MaxInvisibilityTicks;   /// Target must less bloodlust ticks left.
+	int MaxInvincibilityTicks;  /// Target must less bloodlust ticks left.
 
 	struct {
 		char Enable;                /// Target is 'user defined variable'.
@@ -259,13 +259,13 @@ typedef struct ConditionInfo {
 */
 typedef struct {
 	/// @todo this below is SQUARE!!!
-	int Range;                   ///< Max range of the target.
+	int Range;                   /// Max range of the target.
 
-	ConditionInfo* Condition;    ///< Conditions to cast the spell.
+	ConditionInfo* Condition;    /// Conditions to cast the spell.
 
 	/// Detalied generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
-	int Combat;                  ///< If it should be casted in combat
+	int Combat;                  /// If it should be casted in combat
 
 	/// @todo Add stuff here for target preference.
 	/// @todo Heal units with the lowest hit points first.
@@ -276,28 +276,28 @@ typedef struct {
 */
 typedef struct _spell_type_ {
 	// Identification stuff
-	char* Ident;    ///< Spell unique identifier (spell-holy-vision)
-	char* Name;     ///< Spell name shown by the engine
-	int Slot;       ///< Spell numeric identifier
+	char* Ident;    /// Spell unique identifier (spell-holy-vision)
+	char* Name;     /// Spell name shown by the engine
+	int Slot;       /// Spell numeric identifier
 
 	// Spell Specifications
-	TargetType Target;          ///< Targetting information. See TargetType.
-	SpellActionType* Action;    ///< More arguments for spell (damage, delay, additional sounds...).
+	TargetType Target;          /// Targetting information. See TargetType.
+	SpellActionType* Action;    /// More arguments for spell (damage, delay, additional sounds...).
 
-	int Range;                  ///< Max range of the target.
+	int Range;                  /// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost;               ///< Required mana for each cast.
-	int RepeatCast;             ///< If the spell will be cast again until out of targets.
+	int ManaCost;               /// Required mana for each cast.
+	int RepeatCast;             /// If the spell will be cast again until out of targets.
 
-	int DependencyId;           ///< Id of upgrade, -1 if no upgrade needed for cast the spell.
-	ConditionInfo *Condition;   ///< Conditions to cast the spell. (generic (no test for each target))
+	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
+	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast informations. No AICast means the AI use AutoCast.
-	AutoCastInfo* AutoCast;     ///< AutoCast information for your own units
-	AutoCastInfo* AICast;       ///< AutoCast information for ai. More detalied.
+	AutoCastInfo* AutoCast;     /// AutoCast information for your own units
+	AutoCastInfo* AICast;       /// AutoCast information for ai. More detalied.
 
 	// Graphics and sounds. Add something else here?
-	SoundConfig SoundWhenCast;  ///< Sound played if cast
+	SoundConfig SoundWhenCast;  /// Sound played if cast
 } SpellType;
 
 /*----------------------------------------------------------------------------

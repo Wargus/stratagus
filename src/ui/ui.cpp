@@ -54,12 +54,12 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-char RightButtonAttacks;                   ///< right button 0 move, 1 attack
-char FancyBuildings;                       ///< Mirror buildings 1 yes, 0 now.
+char RightButtonAttacks;                   /// right button 0 move, 1 attack
+char FancyBuildings;                       /// Mirror buildings 1 yes, 0 now.
 
 
-int SpeedKeyScroll = KEY_SCROLL_SPEED;     ///< keyboard scroll speed
-int SpeedMouseScroll = MOUSE_SCROLL_SPEED; ///< mouse scroll speed
+int SpeedKeyScroll = KEY_SCROLL_SPEED;     /// keyboard scroll speed
+int SpeedMouseScroll = MOUSE_SCROLL_SPEED; /// mouse scroll speed
 
 /**
 **  The user interface configuration

@@ -122,7 +122,7 @@ static hashtable(MissileType*, 61) MissileTypeHash;
 
 BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
 
-extern NumberDesc* Damage;                   ///< Damage calculation for missile.
+extern NumberDesc* Damage;                   /// Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions

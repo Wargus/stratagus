@@ -63,13 +63,13 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-Sample* MusicSample;  ///< Music samples
+Sample* MusicSample;  /// Music samples
 
 char* CurrentMusicFile;
 
-PlaySection* PlaySections;          ///< Play Sections
-int NumPlaySections;                ///< Number of Play Sections
-PlaySectionType CurrentPlaySection; ///< Current Play Section
+PlaySection* PlaySections;          /// Play Sections
+int NumPlaySections;                /// Number of Play Sections
+PlaySectionType CurrentPlaySection; /// Current Play Section
 
 /*----------------------------------------------------------------------------
 -- Functions

@@ -66,18 +66,18 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-enum _mouse_buttons_ MouseButtons;           ///< Current pressed mouse buttons
+enum _mouse_buttons_ MouseButtons;           /// Current pressed mouse buttons
 
-enum _key_modifiers_ KeyModifiers;           ///< Current keyboard modifiers
+enum _key_modifiers_ KeyModifiers;           /// Current keyboard modifiers
 
-Unit* UnitUnderCursor;                       ///< Unit under cursor
-int ButtonAreaUnderCursor = -1;              ///< Button area under cursor
-int ButtonUnderCursor = -1;                  ///< Button under cursor
-char GameMenuButtonClicked;                  ///< Menu button was clicked
-char GameDiplomacyButtonClicked;             ///< Diplomacy button was clicked
-char LeaveStops;                             ///< Mouse leaves windows stops scroll
+Unit* UnitUnderCursor;                       /// Unit under cursor
+int ButtonAreaUnderCursor = -1;              /// Button area under cursor
+int ButtonUnderCursor = -1;                  /// Button under cursor
+char GameMenuButtonClicked;                  /// Menu button was clicked
+char GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
+char LeaveStops;                             /// Mouse leaves windows stops scroll
 
-enum _cursor_on_ CursorOn = CursorOnUnknown; ///< Cursor on field
+enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
 
 /*----------------------------------------------------------------------------
 --  Functions

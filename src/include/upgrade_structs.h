@@ -53,18 +53,18 @@
 **  Indices into costs/resource/income array.
 */
 typedef enum _costs_ {
-	TimeCost,                               ///< time in game cycles
+	TimeCost,                               /// time in game cycles
 
 // standard
-	GoldCost,                               ///< gold  resource
-	WoodCost,                               ///< wood  resource
-	OilCost,                                ///< oil   resource
+	GoldCost,                               /// gold  resource
+	WoodCost,                               /// wood  resource
+	OilCost,                                /// oil   resource
 // extensions
-	Cost4,                                  ///< resource 4
-	Cost5,                                  ///< resource 5
-	Cost6,                                  ///< resource 6
+	Cost4,                                  /// resource 4
+	Cost5,                                  /// resource 5
+	Cost6,                                  /// resource 6
 
-	MaxCosts                                ///< how many different costs
+	MaxCosts                                /// how many different costs
 } CostType;
 
 #define FoodCost MaxCosts
@@ -124,23 +124,23 @@ extern int DefaultResourceAmounts[MaxCosts];
 **  This are the current stats of an unit. Upgraded or downgraded.
 */
 typedef struct _unit_stats_ {
-	struct _variable_type_* Variables;  ///< userdefined variable.
-	int AttackRange;                ///< how far can the unit attack
-	int SightRange;                 ///< how far can the unit see
-	int HitPoints;                  ///< hit points
-	int RegenerationRate;           ///< HP regeration rate in HP
-	int Mana;                       ///< Mana points.
-	int Costs[MaxCosts];            ///< current costs of the unit
+	struct _variable_type_* Variables;  /// userdefined variable.
+	int AttackRange;                /// how far can the unit attack
+	int SightRange;                 /// how far can the unit see
+	int HitPoints;                  /// hit points
+	int RegenerationRate;           /// HP regeration rate in HP
+	int Mana;                       /// Mana points.
+	int Costs[MaxCosts];            /// current costs of the unit
 } UnitStats;
 
 /**
 **  The main useable upgrades.
 */
 typedef struct _upgrade_ {
-	char*       Ident;                      ///< identifier
-	int         Costs[MaxCosts];            ///< costs for the upgrade
+	char*       Ident;                      /// identifier
+	int         Costs[MaxCosts];            /// costs for the upgrade
 		// TODO: not used by buttons
-	IconConfig Icon;                        ///< icon to display to the user
+	IconConfig Icon;                        /// icon to display to the user
 } Upgrade;
 
 /*----------------------------------------------------------------------------
@@ -153,8 +153,8 @@ typedef struct _upgrade_ {
 **  @see UnitStats
 */
 typedef struct _modifiers_ {
-	struct _variable_type_* Variables;  ///< userdefined variable modifier.
-	int Costs[MaxCosts];                ///< costs modifier
+	struct _variable_type_* Variables;  /// userdefined variable modifier.
+	int Costs[MaxCosts];                /// costs modifier
 } Modifiers;
 
 /**
@@ -164,19 +164,19 @@ typedef struct _modifiers_ {
 */
 typedef struct _upgrade_modifier_ {
 
-	int UpgradeId;                      ///< used to filter required modifier
+	int UpgradeId;                      /// used to filter required modifier
 
-	Modifiers Modifier;                 ///< modifier of unit stats
+	Modifiers Modifier;                 /// modifier of unit stats
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?
 	// TODO: pointers or ids would be faster and less memory use
-	int  ChangeUnits[UnitTypeMax];      ///< add/remove allowed units
-	char ChangeUpgrades[UpgradeMax];    ///< allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];          ///< which unit types are affected
+	int  ChangeUnits[UnitTypeMax];      /// add/remove allowed units
+	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
+	char ApplyTo[UnitTypeMax];          /// which unit types are affected
 
-	struct _unit_type_* ConvertTo;      ///< convert to this unit-type.
+	struct _unit_type_* ConvertTo;      /// convert to this unit-type.
 
 } UpgradeModifier;
 
@@ -194,8 +194,8 @@ typedef struct _upgrade_modifier_ {
 **    @li `X' -- fixed, acquired can't be disabled
 */
 typedef struct _allow_ {
-	int  Units[UnitTypeMax];        ///< maximum amount of units allowed
-	char Upgrades[UpgradeMax];      ///< upgrades allowed/disallowed
+	int  Units[UnitTypeMax];        /// maximum amount of units allowed
+	char Upgrades[UpgradeMax];      /// upgrades allowed/disallowed
 } Allow;
 
 /**
@@ -208,7 +208,7 @@ typedef struct _upgrade_timers_ {
 	**  all 0 at the beginning, all upgrade actions do increment values in
 	**  this struct.
 	*/
-	int Upgrades[UpgradeMax];       ///< counter for each upgrade
+	int Upgrades[UpgradeMax];       /// counter for each upgrade
 
 } UpgradeTimers;
 
@@ -216,7 +216,7 @@ typedef struct _upgrade_timers_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern Upgrade Upgrades[UpgradeMax];        ///< the main user usable upgrades
+extern Upgrade Upgrades[UpgradeMax];        /// the main user usable upgrades
 
 //@}
 

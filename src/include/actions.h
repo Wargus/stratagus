@@ -38,11 +38,11 @@
 ----------------------------------------------------------------------------*/
 
 enum _diplomacy_ {
-	DiplomacyAllied,   ///< Ally with opponent
-	DiplomacyNeutral,  ///< Don't attack be neutral
-	DiplomacyEnemy,    ///< Attack opponent
-	DiplomacyCrazy,    ///< Ally and attack opponent
-}; ///< Diplomacy states for CommandDiplomacy
+	DiplomacyAllied,   /// Ally with opponent
+	DiplomacyNeutral,  /// Don't attack be neutral
+	DiplomacyEnemy,    /// Attack opponent
+	DiplomacyCrazy,    /// Ally and attack opponent
+}; /// Diplomacy states for CommandDiplomacy
 
 struct _unit_;
 struct _unit_type_;
@@ -55,7 +55,7 @@ struct _animation_;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned SyncHash;  ///< Hash calculated to find sync failures
+extern unsigned SyncHash;  /// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -58,11 +58,11 @@
 */
 char** IconWcNames;
 
-static Icon** Icons;                         ///< Table of all icons.
-static int NumIcons;                         ///< Number of icons in Icons.
+static Icon** Icons;                         /// Table of all icons.
+static int NumIcons;                         /// Number of icons in Icons.
 
 #ifdef DOXYGEN // no real code, only for docs
-static Icon* IconHash[257];                  ///< lookup table for icon names
+static Icon* IconHash[257];                  /// lookup table for icon names
 #else
 static hashtable(Icon*, 257) IconHash;       /// lookup table for icon names
 #endif

@@ -64,8 +64,8 @@
 static Socket MetaServerFildes;  // This is a TCP socket.
 int MetaServerInUse;
 
-char* MasterHost;       ///< Metaserver Address
-int MasterPort;         ///< Metaserver Port
+char* MasterHost;       /// Metaserver Address
+int MasterPort;         /// Metaserver Port
 
 /*----------------------------------------------------------------------------
 --  Functions

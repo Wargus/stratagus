@@ -76,7 +76,7 @@ static ButtonAction* UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
 static int NumUnitButtons;
 
-ButtonAction* CurrentButtons;             ///< Pointer to current buttons
+ButtonAction* CurrentButtons;             /// Pointer to current buttons
 
 /*----------------------------------------------------------------------------
 --  Functions

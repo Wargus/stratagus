@@ -44,8 +44,8 @@ struct _unit_;
 ----------------------------------------------------------------------------*/
 
 // Should be enough for every one :-)
-#define MaxZoneNumber    512   ///< Max number of zone ( separated area )
-#define MaxRegionNumber  4096  ///< Max number of regions ( divisions of zones )
+#define MaxZoneNumber    512   /// Max number of zone ( separated area )
+#define MaxRegionNumber  4096  /// Max number of regions ( divisions of zones )
 
 #define NoRegion  ((RegionId)~0UL)
 
@@ -59,10 +59,10 @@ typedef unsigned short int RegionId;
 
 /// Zone marque list. Must be a global variable, with MarqueId initialised to 0
 typedef struct _zone_set_ {
-	int Id;                   ///< Internal - must be initialised to 0
-	int ZoneCount;            ///< N° of marqued zones
-	int Marks[MaxZoneNumber]; ///< ZoneMarque[zone] ?= MarqueId
-	int Zones[MaxZoneNumber]; ///< List of marqued zones
+	int Id;                   /// Internal - must be initialised to 0
+	int ZoneCount;            /// N° of marqued zones
+	int Marks[MaxZoneNumber]; /// ZoneMarque[zone] ?= MarqueId
+	int Zones[MaxZoneNumber]; /// List of marqued zones
 } ZoneSet;
 
 /*----------------------------------------------------------------------------

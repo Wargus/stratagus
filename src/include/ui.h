@@ -72,63 +72,63 @@ typedef struct _button_style_properties_ {
 	SDL_Color BorderColorRGB;
 	Uint32 BorderColor;
 	int BorderSize;
-	TextAlignment TextAlign;        ///< Text alignment
-	int TextX;                      ///< Text X location
-	int TextY;                      ///< Text Y location
-	char* TextNormalColor;          ///< Normal text color
-	char* TextReverseColor;         ///< Reverse text color
+	TextAlignment TextAlign;        /// Text alignment
+	int TextX;                      /// Text X location
+	int TextY;                      /// Text Y location
+	char* TextNormalColor;          /// Normal text color
+	char* TextReverseColor;         /// Reverse text color
 } ButtonStyleProperties;
 
 typedef struct _button_style_ {
-	int Width;                      ///< Button width
-	int Height;                     ///< Button height
-	int Font;                       ///< Font
-	char* TextNormalColor;          ///< Normal text color
-	char* TextReverseColor;         ///< Reverse text color
-	TextAlignment TextAlign;        ///< Text alignment
-	int TextX;                      ///< Text X location
-	int TextY;                      ///< Text Y location
-	ButtonStyleProperties Default;  ///< Default button properties
-	ButtonStyleProperties Hover;    ///< Hover button properties
-	ButtonStyleProperties Selected; ///< Selected button properties
-	ButtonStyleProperties Clicked;  ///< Clicked button properties
-	ButtonStyleProperties Disabled; ///< Disabled button properties
+	int Width;                      /// Button width
+	int Height;                     /// Button height
+	int Font;                       /// Font
+	char* TextNormalColor;          /// Normal text color
+	char* TextReverseColor;         /// Reverse text color
+	TextAlignment TextAlign;        /// Text alignment
+	int TextX;                      /// Text X location
+	int TextY;                      /// Text Y location
+	ButtonStyleProperties Default;  /// Default button properties
+	ButtonStyleProperties Hover;    /// Hover button properties
+	ButtonStyleProperties Selected; /// Selected button properties
+	ButtonStyleProperties Clicked;  /// Clicked button properties
+	ButtonStyleProperties Disabled; /// Disabled button properties
 } ButtonStyle;
 
 typedef struct _checkbox_style_ {
-	int Width;                      ///< Checkbox width
-	int Height;                     ///< Checkbox height
-	int Font;                       ///< Font
-	char* TextNormalColor;          ///< Normal text color
-	char* TextReverseColor;         ///< Reverse text color
-	TextAlignment TextAlign;        ///< Text alignment
-	int TextX;                      ///< Text X location
-	int TextY;                      ///< Text Y location
-	ButtonStyleProperties Default;  ///< Default checkbox properties
-	ButtonStyleProperties Hover;    ///< Hover checkbox properties
-	ButtonStyleProperties Selected; ///< Selected checkbox properties
-	ButtonStyleProperties Clicked;  ///< Clicked checkbox properties
-	ButtonStyleProperties Disabled; ///< Disabled checkbox properties
-	ButtonStyleProperties Checked;  ///< Default checkbox properties
-	ButtonStyleProperties CheckedHover;    ///< Checked hover checkbox properties
-	ButtonStyleProperties CheckedSelected; ///< Checked selected checkbox properties
-	ButtonStyleProperties CheckedClicked;  ///< Checked clicked checkbox properties
-	ButtonStyleProperties CheckedDisabled; ///< Checked disabled checkbox properties
+	int Width;                      /// Checkbox width
+	int Height;                     /// Checkbox height
+	int Font;                       /// Font
+	char* TextNormalColor;          /// Normal text color
+	char* TextReverseColor;         /// Reverse text color
+	TextAlignment TextAlign;        /// Text alignment
+	int TextX;                      /// Text X location
+	int TextY;                      /// Text Y location
+	ButtonStyleProperties Default;  /// Default checkbox properties
+	ButtonStyleProperties Hover;    /// Hover checkbox properties
+	ButtonStyleProperties Selected; /// Selected checkbox properties
+	ButtonStyleProperties Clicked;  /// Clicked checkbox properties
+	ButtonStyleProperties Disabled; /// Disabled checkbox properties
+	ButtonStyleProperties Checked;  /// Default checkbox properties
+	ButtonStyleProperties CheckedHover;    /// Checked hover checkbox properties
+	ButtonStyleProperties CheckedSelected; /// Checked selected checkbox properties
+	ButtonStyleProperties CheckedClicked;  /// Checked clicked checkbox properties
+	ButtonStyleProperties CheckedDisabled; /// Checked disabled checkbox properties
 } CheckboxStyle;
 
 	/// buttons on screen themselves
 typedef struct _button_ {
-	int X;                          ///< x coordinate on the screen
-	int Y;                          ///< y coordinate on the screen
-	char* Text;                     ///< button text
-	ButtonStyle* Style;             ///< button style
+	int X;                          /// x coordinate on the screen
+	int Y;                          /// y coordinate on the screen
+	char* Text;                     /// button text
+	ButtonStyle* Style;             /// button style
 } Button;
 
-#define MAX_NUM_VIEWPORTS 8         ///< Number of supported viewports
+#define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
 
 #if !defined(__STRUCT_VIEWPORT__)
-#define __STRUCT_VIEWPORT__         ///< protect duplicate viewport typedef
-typedef struct _viewport_ Viewport; ///< Viewport typedef
+#define __STRUCT_VIEWPORT__         /// protect duplicate viewport typedef
+typedef struct _viewport_ Viewport; /// Viewport typedef
 #endif
 
 /**
@@ -158,19 +158,19 @@ typedef struct _viewport_ Viewport; ///< Viewport typedef
 **    @todo binding to a group.
 */
 struct _viewport_ {
-	int X;                      ///< Screen pixel left corner x coordinate
-	int Y;                      ///< Screen pixel upper corner y coordinate
-	int EndX;                   ///< Screen pixel right x coordinate
-	int EndY;                   ///< Screen pixel bottom y coordinate
+	int X;                      /// Screen pixel left corner x coordinate
+	int Y;                      /// Screen pixel upper corner y coordinate
+	int EndX;                   /// Screen pixel right x coordinate
+	int EndY;                   /// Screen pixel bottom y coordinate
 
-	int MapX;                   ///< Map tile left corner x coordinate
-	int MapY;                   ///< Map tile upper corner y coordinate
-	int OffsetX;                ///< Map tile offset
-	int OffsetY;                ///< Map tile offset
-	int MapWidth;               ///< Width in map tiles
-	int MapHeight;              ///< Height in map tiles
+	int MapX;                   /// Map tile left corner x coordinate
+	int MapY;                   /// Map tile upper corner y coordinate
+	int OffsetX;                /// Map tile offset
+	int OffsetY;                /// Map tile offset
+	int MapWidth;               /// Width in map tiles
+	int MapHeight;              /// Height in map tiles
 
-	struct _unit_* Unit;        ///< Bound to this unit
+	struct _unit_* Unit;        /// Bound to this unit
 };
 
 /**
@@ -179,37 +179,37 @@ struct _viewport_ {
 **  @todo this should be later user configurable
 */
 typedef enum {
-	VIEWPORT_SINGLE,                ///< Old single viewport
-	VIEWPORT_SPLIT_HORIZ,           ///< Two viewports split horizontal
-	VIEWPORT_SPLIT_HORIZ3,          ///< Three viewports split horiontal
-	VIEWPORT_SPLIT_VERT,            ///< Two viewports split vertical
-	VIEWPORT_QUAD,                  ///< Four viewports split symmetric
-	NUM_VIEWPORT_MODES,             ///< Number of different viewports.
+	VIEWPORT_SINGLE,                /// Old single viewport
+	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
+	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
+	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
+	VIEWPORT_QUAD,                  /// Four viewports split symmetric
+	NUM_VIEWPORT_MODES,             /// Number of different viewports.
 } ViewportMode;
 
-#define ScPanel "sc-panel"          ///< hack for transparency
+#define ScPanel "sc-panel"          /// hack for transparency
 
 /**
 **  Menu panels
 */
 typedef struct _menu_panel_ {
-	char*                Ident;     ///< Unique identifier
-	Graphic*             G;         ///< Graphic
-	struct _menu_panel_* Next;      ///< Next pointer
+	char*                Ident;     /// Unique identifier
+	Graphic*             G;         /// Graphic
+	struct _menu_panel_* Next;      /// Next pointer
 } MenuPanel;
 
 /**
 **  Condition to show panel content.
 */
 typedef struct {
-	char ShowOnlySelected;      ///< if true, show only for selected unit.
+	char ShowOnlySelected;      /// if true, show only for selected unit.
 
-	char HideNeutral;           ///< if true, don't show for neutral unit.
-	char HideAllied;            ///< if true, don't show for allied unit. (but show own units)
-	char ShowOpponent;          ///< if true, show for opponent unit.
+	char HideNeutral;           /// if true, don't show for neutral unit.
+	char HideAllied;            /// if true, don't show for allied unit. (but show own units)
+	char ShowOpponent;          /// if true, show for opponent unit.
 
-	char* BoolFlags;            ///< array of condition about user flags.
-	char* Variables;            ///< array of variable to verify (enable and max > 0)
+	char* BoolFlags;            /// array of condition about user flags.
+	char* Variables;            /// array of variable to verify (enable and max > 0)
 } ConditionPanel;
 
 
@@ -221,248 +221,248 @@ typedef void FDrawData(const struct _unit_* unit, struct _content_type_* content
 **  Infos to display the contents of panel.
 */
 typedef struct _content_type_ {
-	int PosX;             ///< X coordinate where to display.
-	int PosY;             ///< Y coordinate where to display.
+	int PosX;             /// X coordinate where to display.
+	int PosY;             /// Y coordinate where to display.
 
-	FDrawData* DrawData;  ///< Tell how show the variable Index.
+	FDrawData* DrawData;  /// Tell how show the variable Index.
 
 	union {
 		struct {
-			StringDesc* Text;            ///< Text to display.
-			int Font;                    ///< Font to use.
-			char Centered;               ///< if true, center the display.
-			int Index;                   ///< Index of the variable to show, -1 if not.
-			EnumVariable Component;      ///< Component of the variable.
-			char ShowName;               ///< If true, Show name's unit.
-			char Stat;                   ///< true to special display.(value or value + diff)
-		} SimpleText;   ///< Show simple text followed by variable value.
+			StringDesc* Text;            /// Text to display.
+			int Font;                    /// Font to use.
+			char Centered;               /// if true, center the display.
+			int Index;                   /// Index of the variable to show, -1 if not.
+			EnumVariable Component;      /// Component of the variable.
+			char ShowName;               /// If true, Show name's unit.
+			char Stat;                   /// true to special display.(value or value + diff)
+		} SimpleText;   /// Show simple text followed by variable value.
 		struct {
-			char* Format;                ///< Text to display
-			int Font;                    ///< Font to use.
-			int Index;                   ///< Index of the variable to show.
-			EnumVariable Component;      ///< Component of the variable.
-			char Centered;               ///< if true, center the display.
-		} FormattedText;   ///< Show formatted text with variable value.
+			char* Format;                /// Text to display
+			int Font;                    /// Font to use.
+			int Index;                   /// Index of the variable to show.
+			EnumVariable Component;      /// Component of the variable.
+			char Centered;               /// if true, center the display.
+		} FormattedText;   /// Show formatted text with variable value.
 		struct {
-			char* Format;                ///< Text to display
-			int Font;                    ///< Font to use.
-			int Index1;                  ///< Index of the variable1 to show.
-			EnumVariable Component1;     ///< Component of the variable1.
-			int Index2;                  ///< Index of the variable to show.
-			EnumVariable Component2;     ///< Component of the variable.
-			char Centered;               ///< if true, center the display.
-		} FormattedText2;   ///< Show formatted text with 2 variable value.
+			char* Format;                /// Text to display
+			int Font;                    /// Font to use.
+			int Index1;                  /// Index of the variable1 to show.
+			EnumVariable Component1;     /// Component of the variable1.
+			int Index2;                  /// Index of the variable to show.
+			EnumVariable Component2;     /// Component of the variable.
+			char Centered;               /// if true, center the display.
+		} FormattedText2;   /// Show formatted text with 2 variable value.
 		struct {
-			EnumUnit UnitRef;           ///< Which unit icon to display.(itself, container, ...)
-		} Icon;         ///< Show icon of the unit
+			EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
+		} Icon;         /// Show icon of the unit
 		struct {
-			int Index;           ///< Index of the variable to show, -1 if not.
-			int Width;           ///< Width of the bar.
-			int Height;          ///< Height of the bar.
+			int Index;           /// Index of the variable to show, -1 if not.
+			int Width;           /// Width of the bar.
+			int Height;          /// Height of the bar.
 #if 0 // FIXME : something for color and value parametrisation (not implemented)
-			Color* colors;       ///< array of color to show (depend of value)
-			int* values;         ///< list of percentage to change color.
+			Color* colors;       /// array of color to show (depend of value)
+			int* values;         /// list of percentage to change color.
 #endif
-		} LifeBar;      ///< Show bar which change color depend of value.
+		} LifeBar;      /// Show bar which change color depend of value.
 		struct {
-			int Index;           ///< Index of the variable to show, -1 if not.
-			int Width;           ///< Width of the bar.
-			int Height;          ///< Height of the bar.
-			char Border;         ///< True for additional border.
+			int Index;           /// Index of the variable to show, -1 if not.
+			int Width;           /// Width of the bar.
+			int Height;          /// Height of the bar.
+			char Border;         /// True for additional border.
 #if 0 // FIXME : something for color parametrisations (not implemented)
 // take TheUI.CompletedBar color for the moment.
-			Color colors;        ///< Color to show (depend of value)
+			Color colors;        /// Color to show (depend of value)
 #endif
-		} CompleteBar;  ///< Show bar.
+		} CompleteBar;  /// Show bar.
 	} Data;
 
 // FIXME : Complete this.
 
-	ConditionPanel* Condition; ///< Condition to show the content; if NULL, no condition.
+	ConditionPanel* Condition; /// Condition to show the content; if NULL, no condition.
 } ContentType;
 
 /**
 **  Info for the panel.
 */
 typedef struct {
-	char* Name;            ///< Ident of the panel.
-	int PosX;              ///< X coordinate of the panel.
-	int PosY;              ///< Y coordinate of the panel.
-	int DefaultFont;       ///< Default font for content.
+	char* Name;            /// Ident of the panel.
+	int PosX;              /// X coordinate of the panel.
+	int PosY;              /// Y coordinate of the panel.
+	int DefaultFont;       /// Default font for content.
 
-	ContentType* Contents; ///< Array of contents to display.
-	int NContents;         ///< Number of content.
+	ContentType* Contents; /// Array of contents to display.
+	int NContents;         /// Number of content.
 
-	ConditionPanel* Condition; ///< Condition to show the panel; if NULL, no condition.
+	ConditionPanel* Condition; /// Condition to show the panel; if NULL, no condition.
 
 } InfoPanel;
 
-extern int NbAllPanels;       ///< Number of panel
-extern InfoPanel* AllPanels;  ///< Array of panels.
+extern int NbAllPanels;       /// Number of panel
+extern InfoPanel* AllPanels;  /// Array of panels.
 
 
 /**
 **  Defines the user interface.
 */
 typedef struct _ui_ {
-	char* Name;                         ///< interface name to select
-	int Width;                          ///< useable for this width
-	int Height;                         ///< useable for this height
+	char* Name;                         /// interface name to select
+	int Width;                          /// useable for this width
+	int Height;                         /// useable for this height
 
-	int MouseScroll;                    ///< Enable mouse scrolling
-	int KeyScroll;                      ///< Enable keyboard scrolling
+	int MouseScroll;                    /// Enable mouse scrolling
+	int KeyScroll;                      /// Enable keyboard scrolling
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault;
 		/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl;
 
-	int MouseWarpX;                     ///< Cursor warp X position
-	int MouseWarpY;                     ///< Cursor warp Y position
+	int MouseWarpX;                     /// Cursor warp X position
+	int MouseWarpY;                     /// Cursor warp Y position
 
-	char* NormalFontColor;              ///< Color for normal text displayed
-	char* ReverseFontColor;             ///< Color for reverse text displayed
+	char* NormalFontColor;              /// Color for normal text displayed
+	char* ReverseFontColor;             /// Color for reverse text displayed
 
 	// Fillers
-	Graphic** Filler;                   ///< Filler graphics
-	int* FillerX;                       ///< Filler X positions
-	int* FillerY;                       ///< Filler Y positions
-	int  NumFillers;                    ///< Number of fillers
+	Graphic** Filler;                   /// Filler graphics
+	int* FillerX;                       /// Filler X positions
+	int* FillerY;                       /// Filler Y positions
+	int  NumFillers;                    /// Number of fillers
 
 	struct {
-		Graphic* G;                     ///< icon graphic
-		int IconFrame;                  ///< icon frame
-		int IconX;                      ///< icon X position
-		int IconY;                      ///< icon Y position
-		int TextX;                      ///< text X position
-		int TextY;                      ///< text Y position
-	} Resources[MaxCosts + 2];          ///< Icon+Text of all resources
-                                        ///< +2 for food and score
+		Graphic* G;                     /// icon graphic
+		int IconFrame;                  /// icon frame
+		int IconX;                      /// icon X position
+		int IconY;                      /// icon Y position
+		int TextX;                      /// text X position
+		int TextY;                      /// text Y position
+	} Resources[MaxCosts + 2];          /// Icon+Text of all resources
+                                        /// +2 for food and score
 
 	// Info panel
-	Graphic* InfoPanelG;                ///< Info panel background
-	int InfoPanelX;                     ///< Info panel screen X position
-	int InfoPanelY;                     ///< Info panel screen Y position
+	Graphic* InfoPanelG;                /// Info panel background
+	int InfoPanelX;                     /// Info panel screen X position
+	int InfoPanelY;                     /// Info panel screen Y position
 
-	char*   PanelIndex;                 ///< Index of the InfoPanel.
-	char    NumberPanel;                ///< Number of Panel.
+	char*   PanelIndex;                 /// Index of the InfoPanel.
+	char    NumberPanel;                /// Number of Panel.
 
-	Button* SingleSelectedButton;       ///< Button for single selected unit
+	Button* SingleSelectedButton;       /// Button for single selected unit
 
-	Button* SelectedButtons;            ///< Selected buttons
-	int     NumSelectedButtons;         ///< Number of selected buttons
-	int     MaxSelectedFont;            ///< Font type to use
-	int     MaxSelectedTextX;           ///< position to place '+#' text
-	int     MaxSelectedTextY;           ///< if > maximum units selected
+	Button* SelectedButtons;            /// Selected buttons
+	int     NumSelectedButtons;         /// Number of selected buttons
+	int     MaxSelectedFont;            /// Font type to use
+	int     MaxSelectedTextX;           /// position to place '+#' text
+	int     MaxSelectedTextY;           /// if > maximum units selected
 
-	Button* SingleTrainingButton;       ///< Button for single training
-	char*   SingleTrainingText;         ///< Text for single training
-	int     SingleTrainingFont;         ///< Font for single traning
-	int     SingleTrainingTextX;        ///< X text position single training
-	int     SingleTrainingTextY;        ///< Y text position single training
+	Button* SingleTrainingButton;       /// Button for single training
+	char*   SingleTrainingText;         /// Text for single training
+	int     SingleTrainingFont;         /// Font for single traning
+	int     SingleTrainingTextX;        /// X text position single training
+	int     SingleTrainingTextY;        /// Y text position single training
 
-	Button* TrainingButtons;            ///< Training buttons
-	int     NumTrainingButtons;         ///< Number of training buttons
-	char*   TrainingText;               ///< Multiple Training Text
-	int     TrainingFont;               ///< Multiple Training Font
-	int     TrainingTextX;              ///< Multiple Training X Text position
-	int     TrainingTextY;              ///< Multiple Training Y Text position
+	Button* TrainingButtons;            /// Training buttons
+	int     NumTrainingButtons;         /// Number of training buttons
+	char*   TrainingText;               /// Multiple Training Text
+	int     TrainingFont;               /// Multiple Training Font
+	int     TrainingTextX;              /// Multiple Training X Text position
+	int     TrainingTextY;              /// Multiple Training Y Text position
 
-	Button* UpgradingButton;            ///< Button info for upgrade
+	Button* UpgradingButton;            /// Button info for upgrade
 
-	Button* ResearchingButton;          ///< Button info for researching
+	Button* ResearchingButton;          /// Button info for researching
 
-	Button* TransportingButtons;        ///< Button info for transporting
-	int     NumTransportingButtons;     ///< Number of transporting buttons
+	Button* TransportingButtons;        /// Button info for transporting
+	int     NumTransportingButtons;     /// Number of transporting buttons
 
 	// Completed bar
-	SDL_Color CompletedBarColorRGB;     ///< color for completed bar
-	Uint32    CompletedBarColor;        ///< color for completed bar
-	int       CompletedBarShadow;       ///< should complete bar have shadow
+	SDL_Color CompletedBarColorRGB;     /// color for completed bar
+	Uint32    CompletedBarColor;        /// color for completed bar
+	int       CompletedBarShadow;       /// should complete bar have shadow
 
 	// Button panel
-	Graphic*      ButtonPanelG;         ///< Button panel background
-	int           ButtonPanelX;         ///< Button panel screen X position
-	int           ButtonPanelY;         ///< Button panel screen Y position
-	Button*       ButtonButtons;        ///< Button panel buttons
-	int           NumButtonButtons;     ///< Number of button panel buttons
-	SDL_Color     ButtonAutoCastBorderColorRGB; ///< Auto cast border color
+	Graphic*      ButtonPanelG;         /// Button panel background
+	int           ButtonPanelX;         /// Button panel screen X position
+	int           ButtonPanelY;         /// Button panel screen Y position
+	Button*       ButtonButtons;        /// Button panel buttons
+	int           NumButtonButtons;     /// Number of button panel buttons
+	SDL_Color     ButtonAutoCastBorderColorRGB; /// Auto cast border color
 
 	// Pie Menu
-	Graphic* PieMenuBackgroundG;        ///< Optional background image for the piemenu
-	enum _mouse_buttons_ PieMouseButton;///< Which mouse button pops up the piemenu. Deactivate with the NoButton value.
-	int PieX[8];                        ///< X position of the pies
-	int PieY[8];                        ///< Y position of the pies
+	Graphic* PieMenuBackgroundG;        /// Optional background image for the piemenu
+	enum _mouse_buttons_ PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
+	int PieX[8];                        /// X position of the pies
+	int PieY[8];                        /// Y position of the pies
 
 	// Map area
-	ViewportMode ViewportMode;          ///< Current viewport mode
-	Viewport*    MouseViewport;         ///< Viewport containing mouse
-	Viewport*    SelectedViewport;      ///< Current selected active viewport
-	int          NumViewports;          ///< # Viewports currently used
-	Viewport     Viewports[MAX_NUM_VIEWPORTS]; ///< Parameters of all viewports
+	ViewportMode ViewportMode;          /// Current viewport mode
+	Viewport*    MouseViewport;         /// Viewport containing mouse
+	Viewport*    SelectedViewport;      /// Current selected active viewport
+	int          NumViewports;          /// # Viewports currently used
+	Viewport     Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
 	// Map* attributes of Viewport are unused here:
-	Viewport     MapArea;               ///< geometry of the whole map area
+	Viewport     MapArea;               /// geometry of the whole map area
 
 	/// Menu buttons
-	Button MenuButton;                  ///< menu button
-	Button NetworkMenuButton;           ///< network menu button
-	Button NetworkDiplomacyButton;      ///< network diplomacy button
+	Button MenuButton;                  /// menu button
+	Button NetworkMenuButton;           /// network menu button
+	Button NetworkDiplomacyButton;      /// network diplomacy button
 
 	// The minimap
-	int           MinimapW;             ///< minimap screen Width
-	int           MinimapH;             ///< minimap screen Height
-	int           MinimapPosX;          ///< minimap screen X position
-	int           MinimapPosY;          ///< minimap screen Y position
-	int           MinimapTransparent;   ///< unexplored areas are transparent
-	Uint32        ViewportCursorColor;  ///< minimap cursor color
+	int           MinimapW;             /// minimap screen Width
+	int           MinimapH;             /// minimap screen Height
+	int           MinimapPosX;          /// minimap screen X position
+	int           MinimapPosY;          /// minimap screen Y position
+	int           MinimapTransparent;   /// unexplored areas are transparent
+	Uint32        ViewportCursorColor;  /// minimap cursor color
 
 	// The status line
-	int           StatusLineW;          ///< status line screen width
-	int           StatusLineTextX;      ///< status line screen text X position
-	int           StatusLineTextY;      ///< status line screen text Y position
-	int           StatusLineFont;       ///< Status line font
+	int           StatusLineW;          /// status line screen width
+	int           StatusLineTextX;      /// status line screen text X position
+	int           StatusLineTextY;      /// status line screen text Y position
+	int           StatusLineFont;       /// Status line font
 
 	// Offsets for 640x480 center used by menus
-	int Offset640X;                     ///< Offset for 640x480 X position
-	int Offset480Y;                     ///< Offset for 640x480 Y position
+	int Offset640X;                     /// Offset for 640x480 X position
+	int Offset480Y;                     /// Offset for 640x480 Y position
 
 	//
 	//  Cursors used.
 	//
-	CursorConfig Point;                 ///< General pointing cursor
-	CursorConfig Glass;                 ///< HourGlass, system is waiting
-	CursorConfig Cross;                 ///< Multi-select cursor.
-	CursorConfig YellowHair;            ///< Yellow action,attack cursor.
-	CursorConfig GreenHair;             ///< Green action,attack cursor.
-	CursorConfig RedHair;               ///< Red action,attack cursor.
-	CursorConfig Scroll;                ///< Cursor for scrolling map around.
+	CursorConfig Point;                 /// General pointing cursor
+	CursorConfig Glass;                 /// HourGlass, system is waiting
+	CursorConfig Cross;                 /// Multi-select cursor.
+	CursorConfig YellowHair;            /// Yellow action,attack cursor.
+	CursorConfig GreenHair;             /// Green action,attack cursor.
+	CursorConfig RedHair;               /// Red action,attack cursor.
+	CursorConfig Scroll;                /// Cursor for scrolling map around.
 
-	CursorConfig ArrowE;                ///< Cursor pointing east
-	CursorConfig ArrowNE;               ///< Cursor pointing north east
-	CursorConfig ArrowN;                ///< Cursor pointing north
-	CursorConfig ArrowNW;               ///< Cursor pointing north west
-	CursorConfig ArrowW;                ///< Cursor pointing west
-	CursorConfig ArrowSW;               ///< Cursor pointing south west
-	CursorConfig ArrowS;                ///< Cursor pointing south
-	CursorConfig ArrowSE;               ///< Cursor pointing south east
+	CursorConfig ArrowE;                /// Cursor pointing east
+	CursorConfig ArrowNE;               /// Cursor pointing north east
+	CursorConfig ArrowN;                /// Cursor pointing north
+	CursorConfig ArrowNW;               /// Cursor pointing north west
+	CursorConfig ArrowW;                /// Cursor pointing west
+	CursorConfig ArrowSW;               /// Cursor pointing south west
+	CursorConfig ArrowS;                /// Cursor pointing south
+	CursorConfig ArrowSE;               /// Cursor pointing south east
 
 /// @todo could use different sounds/speech for the errors
 /// Is in gamesounds?
-/// SoundConfig PlacementError;         ///< played on placements errors
-/// SoundConfig PlacementSuccess;       ///< played on placements success
-/// SoundConfig Click;                  ///< click noice used often
+/// SoundConfig PlacementError;         /// played on placements errors
+/// SoundConfig PlacementSuccess;       /// played on placements success
+/// SoundConfig Click;                  /// click noice used often
 
-	MenuPanel* MenuPanels;              ///< Menu panels
+	MenuPanel* MenuPanels;              /// Menu panels
 
-	Graphic* VictoryBackgroundG;        ///< Victory background graphic
-	Graphic* DefeatBackgroundG;         ///< Defeat background graphic
+	Graphic* VictoryBackgroundG;        /// Victory background graphic
+	Graphic* DefeatBackgroundG;         /// Defeat background graphic
 } UI;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern UI TheUI;                        ///< The user interface
-extern UI** UI_Table;                   ///< All available user interfaces
+extern UI TheUI;                        /// The user interface
+extern UI** UI_Table;                   /// All available user interfaces
 
 	/// Hash table of all the button styles
 typedef hashtable(ButtonStyle*, 128) _ButtonStyleHash;
@@ -472,15 +472,15 @@ extern _ButtonStyleHash ButtonStyleHash;
 typedef hashtable(CheckboxStyle*,128) _CheckboxStyleHash;
 extern _CheckboxStyleHash CheckboxStyleHash;
 
-extern char RightButtonAttacks;         ///< right button 0 move, 1 attack.
-extern struct _button_action_* CurrentButtons;    ///< Current Selected Buttons
-extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
+extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
+extern struct _button_action_* CurrentButtons;    /// Current Selected Buttons
+extern char FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 
-extern int SpeedKeyScroll;              ///< Keyboard Scrolling Speed, in Frames
-extern int SpeedMouseScroll;            ///< Mouse Scrolling Speed, in Frames
+extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
+extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames
 
-extern char DefaultGroupKeys[];    ///< Default group keys
-extern char* UiGroupKeys;               ///< Up to 11 keys used for group selection
+extern char DefaultGroupKeys[];    /// Default group keys
+extern char* UiGroupKeys;               /// Up to 11 keys used for group selection
 
 // only exported to save them
 

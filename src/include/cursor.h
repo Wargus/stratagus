@@ -133,55 +133,55 @@ typedef struct _cursor_type_ CursorType;
 
 	/// Private type which specifies the cursor-type
 struct _cursor_type_ {
-	char*       Ident;  ///< Identifier to reference it
-	char*       Race;   ///< Race name
+	char*       Ident;  /// Identifier to reference it
+	char*       Race;   /// Race name
 
-	int HotX;    ///< Hot point x
-	int HotY;    ///< Hot point y
+	int HotX;    /// Hot point x
+	int HotY;    /// Hot point y
 
-	int SpriteFrame;  ///< Current displayed cursor frame
-	int FrameRate;    ///< Rate of changing the frames
+	int SpriteFrame;  /// Current displayed cursor frame
+	int FrameRate;    /// Rate of changing the frames
 
 // --- FILLED UP ---
 
-	struct _graphic_* G; ///< Cursor sprite image
+	struct _graphic_* G; /// Cursor sprite image
 };
 
 	/// Cursor config reference
 typedef struct _cursor_config_ {
-	char*       Name;    ///< Config cursor-type name
-	CursorType* Cursor;  ///< Cursor-type pointer
+	char*       Name;    /// Config cursor-type name
+	CursorType* Cursor;  /// Cursor-type pointer
 } CursorConfig;
 
 	/// Cursor state
 typedef enum _cursor_states_ {
-	CursorStatePoint,      ///< Normal cursor
-	CursorStateSelect,     ///< Select position
-	CursorStateRectangle,  ///< Rectangle selecting
-	CursorStatePieMenu,    ///< Displaying Pie Menu
+	CursorStatePoint,      /// Normal cursor
+	CursorStateSelect,     /// Select position
+	CursorStateRectangle,  /// Rectangle selecting
+	CursorStatePieMenu,    /// Displaying Pie Menu
 } CursorStates;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CursorType* Cursors;          ///< cursor-types description
-extern int CursorMax;                ///< Number of cursor.
+extern CursorType* Cursors;          /// cursor-types description
+extern int CursorMax;                /// Number of cursor.
 
-extern CursorStates CursorState;  ///< current cursor state (point,...)
-extern int CursorAction;          ///< action for selection
-extern int CursorValue;           ///< value for action (spell type f.e.)
-extern struct _unit_type_* CursorBuilding;  ///< building cursor
+extern CursorStates CursorState;  /// current cursor state (point,...)
+extern int CursorAction;          /// action for selection
+extern int CursorValue;           /// value for action (spell type f.e.)
+extern struct _unit_type_* CursorBuilding;  /// building cursor
 
-extern CursorType* GameCursor;  ///< cursor-type
-extern int CursorX;             ///< cursor position on screen X
-extern int CursorY;             ///< cursor position on screen Y
-extern int CursorStartX;        ///< rectangle started on screen X
-extern int CursorStartY;        ///< rectangle started on screen Y
-extern int CursorStartScrMapX;  ///< the same in screen map coordinate system
-extern int CursorStartScrMapY;  ///< the same in screen map coordinate system
-extern int SubScrollX;          ///< pixels the mouse moved while scrolling
-extern int SubScrollY;          ///< pixels the mouse moved while scrolling
+extern CursorType* GameCursor;  /// cursor-type
+extern int CursorX;             /// cursor position on screen X
+extern int CursorY;             /// cursor position on screen Y
+extern int CursorStartX;        /// rectangle started on screen X
+extern int CursorStartY;        /// rectangle started on screen Y
+extern int CursorStartScrMapX;  /// the same in screen map coordinate system
+extern int CursorStartScrMapY;  /// the same in screen map coordinate system
+extern int SubScrollX;          /// pixels the mouse moved while scrolling
+extern int SubScrollY;          /// pixels the mouse moved while scrolling
 
 /*----------------------------------------------------------------------------
 --  Functions
