@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "freecraft.h"
 #include "video.h"
@@ -337,8 +338,7 @@ global MapInfo* GetPudInfo(const char* pud)
 
     if( !(input=CLopen(pud)) ) {
 	fprintf(stderr,"Try ./path/name\n");
-	sprintf(buf, "pud: CLopen(%s)", pud);
-	perror(buf);
+	fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 	ExitFatal(-1);
     }
     header[4]='\0';
@@ -781,8 +781,7 @@ global void LoadPud(const char* pud,WorldMap* map)
     }
     if( !(input=CLopen(pud)) ) {
 	fprintf(stderr,"Try ./path/name\n");
-	sprintf(buf, "pud: CLopen(%s)", pud);
-	perror(buf);
+	fprintf(stderr,"pud: CLopen(%s): %s\n", pud, strerror(errno));
 	ExitFatal(-1);
     }
     header[4]='\0';
