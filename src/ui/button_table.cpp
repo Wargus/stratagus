@@ -92,6 +92,7 @@
 **	Check for button enabled, if upgrade is ready.
 **
 **	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
 local int CheckUpgrade(const Unit* unit,const ButtonAction* button)
@@ -104,6 +105,7 @@ local int CheckUpgrade(const Unit* unit,const ButtonAction* button)
 **	Check for button enabled, if unit is available.
 **
 **	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
 local int CheckUnit(const Unit* unit,const ButtonAction* button)
@@ -116,6 +118,7 @@ local int CheckUnit(const Unit* unit,const ButtonAction* button)
 **	Check for button enabled, if all units are available.
 **
 **	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
 local int CheckUnits(const Unit* unit,const ButtonAction* button)
@@ -140,6 +143,7 @@ local int CheckUnits(const Unit* unit,const ButtonAction* button)
 **	Check for button enabled, if an upgrade to unit is available.
 **
 **	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
 **	@return		True if enabled.
 */
 local int CheckUpgradeTo(const Unit* unit,const ButtonAction* button)
@@ -154,43 +158,23 @@ local int CheckUpgradeTo(const Unit* unit,const ButtonAction* button)
 /**
 **	Check for button enabled, always true.
 **	This needed to overwrite the internal tests.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
 */
 local int CheckTrue(const Unit* unit,const ButtonAction* button)
 {
     return 1;
 }
 
-
-// FIXME: next will be rewritten
-/**
-**	Check for button enabled, if more than a keep is available.
-**
-**	@param unit	Pointer to unit for button.
-**	@return		True if enabled.
-*/
-// FIXME: the or case can't be handled by depend!
-local int CheckNeedKeep(const Unit* unit,const ButtonAction* button)
-{
-    return HaveUnitTypeByIdent(unit->Player,"unit-keep") > 0
-	    || HaveUnitTypeByIdent(unit->Player,"unit-castle") > 0;
-}
-
-/**
-**	Check for button enabled, if more than a stronghold is available.
-**
-**	@param unit	Pointer to unit for button.
-**	@return		True if enabled.
-*/
-// FIXME: the or case can't be handled by depend!
-local int CheckNeedStronghold(const Unit* unit,const ButtonAction* button)
-{
-    return HaveUnitTypeByIdent(unit->Player,"unit-stronghold") > 0
-	    || HaveUnitTypeByIdent(unit->Player,"unit-fortress") > 0;
-}
-
 /**
 **	Check if network play is enabled.
 **	Needed for walls, which could only be build in network play.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
 **
 **	NOTE: this check could also be moved into intialisation.
 */
@@ -199,30 +183,57 @@ local int CheckNetwork(const Unit* unit,const ButtonAction* button)
     return NetworkFildes!=-1;
 }
 
-global int bc_NoWork(const Unit* unit,const ButtonAction* button )
-{ return ( unit->Type
-	&& unit->Type->Building
-	&& unit->Command.Action != UnitActionTrain
-        && unit->Command.Action != UnitActionUpgradeTo
-	&& unit->Command.Action != UnitActionResearch ); }
-
-local int bc_NoWork2(const Unit* unit,const ButtonAction* button )
-{ return ( unit->Type
-	&& unit->Type->Building
-        && unit->Command.Action != UnitActionUpgradeTo
-	&& unit->Command.Action != UnitActionResearch ); }
-
-local int bc_Training(const Unit* unit,const ButtonAction* button )
-{ return ( unit->Type
-	&& unit->Type->Building
-	&& unit->Command.Action == UnitActionTrain ); }
+/**
+**	Check for button enabled, if the unit isn't working.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
+*/
+local int CheckNoWork(const Unit* unit,const ButtonAction* button)
+{
+    return unit->Type->Building
+	    && unit->Command.Action != UnitActionTrain
+	    && unit->Command.Action != UnitActionUpgradeTo
+	    && unit->Command.Action != UnitActionResearch;
+}
 
 /**
-**	Check if all requirements for upgrade are meet.
+**	Check for button enabled, if the unit isn't researching.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
 */
-local int bc_CheckUpgrade(const Unit* unit,const ButtonAction* button)
+local int CheckNoResearch(const Unit* unit,const ButtonAction* button)
 {
-    if ( !bc_NoWork( unit, button ) ) {		// don't show any if working
+    return unit->Type->Building
+	    && unit->Command.Action != UnitActionUpgradeTo
+	    && unit->Command.Action != UnitActionResearch;
+}
+
+/**
+**	Check for button enabled, if the unit is training.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
+*/
+local int CheckTraining(const Unit* unit,const ButtonAction* button)
+{
+    return unit->Type->Building && unit->Command.Action == UnitActionTrain;
+}
+
+/**
+**	Check if all requirements for upgrade research are meet.
+**
+**	@param unit	Pointer to unit for button.
+**	@param button	Pointer to button to check/enable.
+**	@return		True if enabled.
+*/
+local int CheckResearch(const Unit* unit,const ButtonAction* button)
+{
+    if ( !CheckNoWork( unit, button ) ) {	// don't show any if working
 	return 0;
     }
 
@@ -514,13 +525,13 @@ global ButtonAction AllButtons[] = {
 },
 {   4, 2, { "icon-gnomish-inventor" },
     B_Build,		0, "unit-gnomish-inventor",
-    CheckNeedKeep,	NULL,
+    NULL,		NULL,
     'i', "BUILD GNOMISH ~!INVENTOR",
     WORKERS_H 
 },
 {   5, 2, { "icon-stables" },
     B_Build,		0, "unit-stables",
-    CheckNeedKeep,	NULL,
+    NULL,		NULL,
     'a', "BUILD ST~!ABLES",
     WORKERS_H 
 },
@@ -580,7 +591,7 @@ global ButtonAction AllButtons[] = {
 #endif
 {   1, 0, { "icon-peasant" },
     B_Train,		0, "unit-peasant",
-    bc_NoWork2,		NULL,
+    CheckNoResearch,	NULL,
     'p', "TRAIN ~!PEASANT",
     HALLS_H
 },
@@ -600,27 +611,27 @@ global ButtonAction AllButtons[] = {
 #ifdef USE_EXTENSIONS
 {   5, 0, { "icon-harvest" },
     B_Harvest,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'h', "SET ~!HARVEST LUMBER/MINE GOLD",
     HALLS_H
 },
 {   7, 0, { "icon-move-peasant" },
     B_Move,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'm', "SET ~!MOVE",
     HALLS_H ",unit-human-barracks,unit-mage-tower,unit-gryphon-aviary"
     ",unit-gnomish-inventor"
 },
 {   8, 0, { "icon-human-shield1" },
     B_Stop,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     's', "SET ~!STOP",
     HALLS_H ",unit-human-barracks,unit-mage-tower,unit-gryphon-aviary"
     ",unit-gnomish-inventor"
 },
 {   9, 0, { "icon-sword1" },
     B_Attack,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'a', "SET ~!ATTACK",
     HALLS_H ",unit-human-barracks,unit-mage-tower,unit-gryphon-aviary"
     ",unit-gnomish-inventor"
@@ -795,19 +806,19 @@ global ButtonAction AllButtons[] = {
 #ifdef USE_EXTENSIONS
 {   7, 0, { "icon-human-ship-move" },
     B_Move,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'm', "SET ~!MOVE",
     "unit-human-shipyard"
 },
 {   8, 0, { "icon-human-ship-armor1" },
     B_Stop,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     's', "SET ~!STOP",
     "unit-human-shipyard"
 },
 {   9, 0, { "icon-human-ship-cannon1" },
     B_Attack,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'a', "SET ~!ATTACK",
     "unit-human-shipyard"
 },
@@ -816,145 +827,145 @@ global ButtonAction AllButtons[] = {
 // upgrades
 {   1, 0, { "icon-sword2" },
     B_Research,		0, "upgrade-sword1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'w', "UPGRADE S~!WORDS (Damage +2)",
     "unit-human-blacksmith"
 },
 {   1, 0, { "icon-sword3" },
     B_Research,		0, "upgrade-sword2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'w', "UPGRADE S~!WORDS (Damage +2)",
     "unit-human-blacksmith"
 },
 {   2, 0, { "icon-human-shield2" },
     B_Research,		0, "upgrade-human-shield1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-human-blacksmith"
 },
 {   2, 0, { "icon-human-shield3" },
     B_Research,		0, "upgrade-human-shield2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-human-blacksmith"
 },
 {   3, 0, { "icon-ballista1" },
     B_Research,		0, "upgrade-ballista1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'b', "UPGRADE ~!BALLISTA (Damage +15)",
     "unit-human-blacksmith"
 },
 {   3, 0, { "icon-ballista2" },
     B_Research,		0, "upgrade-ballista2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'b', "UPGRADE ~!BALLISTA (Damage +15)",
     "unit-human-blacksmith"
 },
 {   1, 0, { "icon-arrow2" },
     B_Research,		0, "upgrade-arrow1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'u', "~!UPGRADE ARROWS (Damage +1)",
     "unit-elven-lumber-mill"
 },
 {   1, 0, { "icon-arrow3" },
     B_Research,		0, "upgrade-arrow2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'u', "~!UPGRADE ARROWS (Damage +1)",
     "unit-elven-lumber-mill"
 },
 {   4, 0, { "icon-ranger" },
     B_Research,		0, "upgrade-ranger",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'r', "ELVEN ~!RANGER TRAINING",
     "unit-elven-lumber-mill"
 },
 {   4, 0, { "icon-ranger-scouting" },
     B_Research,		0, "upgrade-ranger-scouting",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "RANGER ~!SCOUTING (Sight:9)",
     "unit-elven-lumber-mill"
 },
 {   5, 0, { "icon-longbow" },
     B_Research,		0, "upgrade-longbow",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'l', "RESEARCH ~!LONGBOW (Range +1)",
     "unit-elven-lumber-mill"
 },
 {   6, 0, { "icon-ranger-marksmanship" },
     B_Research,		0, "upgrade-ranger-marksmanship",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'm', "RANGER ~!MARKSMANSHIP (Damage +3)",
     "unit-elven-lumber-mill"
 },
 {   1, 0, { "icon-paladin" },
     B_Research,		0, "upgrade-paladin",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'p', "UPGRADES KNIGHTS TO ~!PALADINS",
     "unit-church"
 },
 {   2, 0, { "icon-heal" },
     B_Research,		0, "upgrade-healing",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'h', "RESEARCH ~!HEALING",
     "unit-church"
 },
 {   3, 0, { "icon-exorcism" },
     B_Research,		0, "upgrade-exorcism",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'e', "RESEARCH ~!EXORCISM",
     "unit-church"
 },
 {   2, 0, { "icon-slow" },
     B_Research,		0, "upgrade-slow",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'o', "RESEARCH SL~!OW",
     "unit-mage-tower"
 },
 {   3, 0, { "icon-flame-shield" },
     B_Research,		0, "upgrade-flame-shield",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'l', "RESEARCH F~!LAME SHIELD",
     "unit-mage-tower"
 },
 {   4, 0, { "icon-invisibility" },
     B_Research,		0, "upgrade-invisibility",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'i', "RESEARCH ~!INVISIBILITY",
     "unit-mage-tower"
 },
 {   5, 0, { "icon-polymorph" },
     B_Research,		0, "upgrade-polymorph",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'p', "RESEARCH ~!POLYMORPH",
     "unit-mage-tower"
 },
 {   6, 0, { "icon-blizzard" },
     B_Research,		0, "upgrade-blizzard",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'b', "RESEARCH ~!BLIZZARD",
     "unit-mage-tower"
 },
 {   1, 0, { "icon-human-ship-cannon2" },
     B_Research,		0, "upgrade-human-ship-cannon1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CANNONS (Damage +5)",
     "unit-human-foundry"
 },
 {   1, 0, { "icon-human-ship-cannon3" },
     B_Research,		0, "upgrade-human-ship-cannon2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CANNONS (Damage +5)",
     "unit-human-foundry"
 },
 {   2, 0, { "icon-human-ship-armor2" },
     B_Research,		0, "upgrade-human-ship-armor1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'a', "UPGRADE SHIP ~!ARMOR (Armor +5)",
     "unit-human-foundry"
 },
 {   2, 0, { "icon-human-ship-armor3" },
     B_Research,		0, "upgrade-human-ship-armor2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'a', "UPGRADE SHIP ~!ARMOR (Armor +5)",
     "unit-human-foundry"
 },
@@ -1258,14 +1269,12 @@ global ButtonAction AllButtons[] = {
 },
 {   4, 2, { "icon-goblin-alchemist" },
     B_Build,		0, "unit-goblin-alchemist",
-    // FIXME: CheckNeedStronghold,	NULL,
     NULL,		NULL,
     'a', "BUILD GOBLIN ~!ALCHEMIST",
     WORKERS_O 
 },
 {   5, 2, { "icon-ogre-mound" },
     B_Build,		0, "unit-ogre-mound",
-    // FIXME: CheckNeedStronghold,	NULL,
     NULL,		NULL,
     'o', "BUILD ~!OGRE MOUND",
     WORKERS_O 
@@ -1326,7 +1335,7 @@ global ButtonAction AllButtons[] = {
 #endif
 {   1, 0, { "icon-peon" },
     B_Train,		0, "unit-peon",
-    bc_NoWork2,		NULL,
+    CheckNoResearch,	NULL,
     'p', "TRAIN ~!PEON",
     HALLS_O
 },
@@ -1345,27 +1354,27 @@ global ButtonAction AllButtons[] = {
 #ifdef USE_EXTENSIONS
 {   5, 0, { "icon-harvest" },
     B_Harvest,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'h', "SET ~!HARVEST LUMBER/MINE GOLD",
     HALLS_O
 },
 {   7, 0, { "icon-move-peon" },
     B_Move,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'm', "SET ~!MOVE",
     HALLS_O ",unit-orc-barracks" ",unit-temple-of-the-damned"
     ",unit-dragon-roost" ",unit-goblin-alchemist"
 },
 {   8, 0, { "icon-orc-shield1" },
     B_Stop,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     's', "SET ~!STOP",
     HALLS_O ",unit-orc-barracks" ",unit-temple-of-the-damned"
     ",unit-dragon-roost" ",unit-goblin-alchemist"
 },
 {   9, 0, { "icon-battle-axe1" },
     B_Attack,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'a', "SET ~!ATTACK",
     HALLS_O ",unit-orc-barracks" ",unit-temple-of-the-damned"
     ",unit-dragon-roost" ",unit-goblin-alchemist"
@@ -1540,19 +1549,19 @@ global ButtonAction AllButtons[] = {
 #ifdef USE_EXTENSIONS
 {   7, 0, { "icon-orc-ship-move" },
     B_Move,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'm', "SET ~!MOVE",
     "unit-orc-shipyard"
 },
 {   8, 0, { "icon-orc-ship-armor1" },
     B_Stop,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     's', "SET ~!STOP",
     "unit-orc-shipyard"
 },
 {   9, 0, { "icon-orc-ship-cannon1" },
     B_Attack,		0, NULL,
-    bc_NoWork,		NULL,
+    CheckNoWork,	NULL,
     'a', "SET ~!ATTACK",
     "unit-orc-shipyard"
 },
@@ -1560,145 +1569,145 @@ global ButtonAction AllButtons[] = {
 // Updates ------------------------------------------------------------------
 {   1, 0, { "icon-battle-axe2" },
     B_Research,		0, "upgrade-battle-axe1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'w', "UPGRADE ~!WEAPONS (Damage +2)",
     "unit-orc-blacksmith"
 },
 {   1, 0, { "icon-battle-axe3" },
     B_Research,		0, "upgrade-battle-axe2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'w', "UPGRADE ~!WEAPONS (Damage +2)",
     "unit-orc-blacksmith"
 },
 {   2, 0, { "icon-orc-shield2" },
     B_Research,		0, "upgrade-orc-shield1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-orc-blacksmith"
 },
 {   2, 0, { "icon-orc-shield3" },
     B_Research,		0, "upgrade-orc-shield2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "UPGRADE ~!SHIELDS (Armor +2)",
     "unit-orc-blacksmith"
 },
 {   3, 0, { "icon-catapult1" },
     B_Research,		0, "upgrade-catapult1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CATAPULT (Damage +15)",
     "unit-orc-blacksmith"
 },
 {   3, 0, { "icon-catapult2" },
     B_Research,		0, "upgrade-catapult2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CATAPULT (Damage +15)",
     "unit-orc-blacksmith"
 },
 {   1, 0, { "icon-throwing-axe2" },
     B_Research,		0, "upgrade-throwing-axe1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'u', "~!UPGRADE THROWING AXE (Damage +1)",
     "unit-troll-lumber-mill"
 },
 {   1, 0, { "icon-throwing-axe3" },
     B_Research,		0, "upgrade-throwing-axe2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'u', "~!UPGRADE THROWING AXE (Damage +1)",
     "unit-troll-lumber-mill"
 },
 {   4, 0, { "icon-berserker" },
     B_Research,		0, "upgrade-berserker",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'b', "TROLL ~!BERSERKER TRAINING",
     "unit-troll-lumber-mill"
 },
 {   4, 0, { "icon-berserker-scouting" },
     B_Research,		0, "upgrade-berserker-scouting",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     's', "BERSERKER ~!SCOUTING (Sight:9)",
     "unit-troll-lumber-mill"
 },
 {   5, 0, { "icon-light-axes" },
     B_Research,		0, "upgrade-light-axes",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'a', "RESEARCH LIGHTER ~!AXES (Range +1)",
     "unit-troll-lumber-mill"
 },
 {   6, 0, { "icon-berserker-regeneration" },
     B_Research,		0, "upgrade-berserker-regeneration",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'r', "BERSERKER ~!REGENERATION",
     "unit-troll-lumber-mill"
 },
 {   1, 0, { "icon-ogre-mage" },
     B_Research,		0, "upgrade-ogre-mage",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'm', "UPGRADES OGRES TO ~!MAGES",
     "unit-altar-of-storms"
 },
 {   2, 0, { "icon-bloodlust" },
     B_Research,		0, "upgrade-bloodlust",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'b', "RESEARCH ~!BLOODLUST",
     "unit-altar-of-storms"
 },
 {   3, 0, { "icon-runes" },
     B_Research,		0, "upgrade-runes",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'r', "RESEARCH ~!RUNES",
     "unit-altar-of-storms"
 },
 {   2, 0, { "icon-haste" },
     B_Research,		0, "upgrade-haste",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'h', "RESEARCH ~!HASTE",
     "unit-temple-of-the-damned"
 },
 {   3, 0, { "icon-raise-dead" },
     B_Research,		0, "upgrade-raise-dead",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'r', "RESEARCH ~!RAISE DEAD",
     "unit-temple-of-the-damned"
 },
 {   4, 0, { "icon-whirlwind" },
     B_Research,		0, "upgrade-whirlwind",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'w', "RESEARCH ~!WHIRLWIND",
     "unit-temple-of-the-damned"
 },
 {   5, 0, { "icon-unholy-armor" },
     B_Research,		0, "upgrade-unholy-armor",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'u', "RESEARCH ~!UNHOLY ARMOR",
     "unit-temple-of-the-damned"
 },
 {   6, 0, { "icon-death-and-decay" },
     B_Research,		0, "upgrade-death-and-decay",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'd', "RESEARCH ~!DEATH AND DECAY",
     "unit-temple-of-the-damned"
 },
 {   1, 0, { "icon-orc-ship-cannon2" },
     B_Research,		0, "upgrade-orc-ship-cannon1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CANNONS (Damage +5)",
     "unit-orc-foundry"
 },
 {   1, 0, { "icon-orc-ship-cannon3" },
     B_Research,		0, "upgrade-orc-ship-cannon2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'c', "UPGRADE ~!CANNONS (Damage +5)",
     "unit-orc-foundry"
 },
 {   2, 0, { "icon-orc-ship-armor2" },
     B_Research,		0, "upgrade-orc-ship-armor1",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'a', "UPGRADE SHIP ~!ARMOR (Armor +5)",
     "unit-orc-foundry"
 },
 {   2, 0, { "icon-orc-ship-armor3" },
     B_Research,		0, "upgrade-orc-ship-armor2",
-    bc_CheckUpgrade,	NULL,
+    CheckResearch,	NULL,
     'a', "UPGRADE SHIP ~!ARMOR (Armor +5)",
     "unit-orc-foundry"
 },
@@ -1725,7 +1734,7 @@ global ButtonAction AllButtons[] = {
 },
 {   9, 0, { "icon-cancel" },
     B_CancelTrain,	0, NULL,
-    bc_Training,	NULL,
+    CheckTraining,	NULL,
     '\e', "~<ESC~> CANCEL UNIT TRAINING",
     "*"
 },
