@@ -32,7 +32,11 @@ typedef struct _construction_ {
 
 // --- FILLED UP ---
 
-    RleSprite*	RleSprite;		// sprite image
+#ifdef NEW_VIDEO
+    Graphic*	Sprite;			/// construction sprite image
+#else
+    RleSprite*	RleSprite;		/// construction sprite image
+#endif
 } Construction;
 
 #define ConstructionWall	15

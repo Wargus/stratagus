@@ -59,6 +59,20 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 
     flags=UnitShowAnimation(unit,attack);
 
+#ifdef NEW_VIDEO
+    IfDebug(
+	if( (unit->Frame&127)>=VideoGraphicFrames(unit->Type->Sprite) ) {
+	    DebugLevel0("Oops what this %s %d,%d %d #%d\n"
+		,unit->Type->Ident
+		,oframe,oframe&127
+		,unit->Frame&127
+		,VideoGraphicFrames(unit->Type->Sprite));
+	    SaveUnit(unit,stdout);
+	    abort();
+	    return;
+	}
+    );
+#else
     IfDebug(
 	if( (unit->Frame&127)>=unit->Type->RleSprite->NumFrames ) {
 	    DebugLevel0("Oops what this %s %d,%d %d #%d\n"
@@ -71,6 +85,7 @@ local void DoActionAttackGeneric(Unit* unit,const Animation* attack)
 	    return;
 	}
     );
+#endif
 
     if( (flags&AnimationSound) ) {
 	PlayUnitSound(unit,VoiceAttacking);
