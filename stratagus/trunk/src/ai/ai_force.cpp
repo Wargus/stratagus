@@ -64,6 +64,15 @@ local void AiCleanForce(int force)
 	    *prev=aiunit->Next;
 	    free(aiunit);
 	    continue;
+	} else if( !aiunit->Unit->HP
+		|| aiunit->Unit->Orders[0].Action==UnitActionDie ) {
+	    RefsDebugCheck( !aiunit->Unit->Refs );
+	    --aiunit->Unit->Refs;
+	    RefsDebugCheck( !aiunit->Unit->Refs );
+	    AiPlayer->Force[force].Completed=0;
+	    *prev=aiunit->Next;
+	    free(aiunit);
+	    continue;
 	}
 	prev=&aiunit->Next;
     }
@@ -168,6 +177,8 @@ global void AiAttackWithForceAt(int force,int x,int y)
 {
     const AiUnit* aiunit;
 
+    AiCleanForce(force);
+
     AiPlayer->Force[force].Attacking=1;
     aiunit=AiPlayer->Force[force].Units;
 
@@ -189,6 +200,8 @@ global void AiAttackWithForce(int force)
 {
     const AiUnit* aiunit;
     const Unit* enemy;
+
+    AiCleanForce(force);
 
     AiPlayer->Force[force].Attacking=1;
     aiunit=AiPlayer->Force[force].Units;
