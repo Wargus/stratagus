@@ -100,7 +100,10 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		spellaction->Data.FlameShield.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 		/// FIXME:damage, missiles, rotation speed?
-	    } else {
+	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+		spellaction->Data.FlameShield.Damage = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    }else {
 		errl("Unsupported flame-shield tag", value);
 	    }
 	}
@@ -125,10 +128,10 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
+		spellaction->Data.Runes.Damage = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else if (gh_eq_p(value, gh_symbol2scm("ttl"))) {
-		spellaction->Data.Fireball.TTL = gh_scm2int(gh_car(list));
+		spellaction->Data.Runes.TTL = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported runes tag", value);

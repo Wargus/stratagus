@@ -404,9 +404,13 @@ enum _missile_class_ {
 	*/
 	MissileClassHit,
 	/**
-	**	     Missile flies from x,y to x1,y1 using a parabolic path
+	**	Missile flies from x,y to x1,y1 using a parabolic path
 	*/
 	MissileClassParabolic,
+	/**
+	**	Missile wait on x,1 until a non-air unit comes by, the explodes.
+	*/
+	MissileClassLandMine,
 };
 
     ///		Base structure of missile-types
@@ -450,6 +454,7 @@ struct _missile_type_ {
 **	Missile typedef.
 */
 typedef struct _missile_ Missile;
+typedef void FuncController(Missile *);
 
     /// Missile on the map
 struct _missile_ {
@@ -469,7 +474,7 @@ struct _missile_ {
     int		Damage;			/// direct damage that missile applies
 
     int		TTL;			/// time to live (ticks) used for spells
-    void (*Controller)( Missile* );	/// used to controll spells
+    FuncController *Controller;		/// used to controll spells
 
 // Internal use:
     int		D;			/// for point to point missiles
@@ -500,7 +505,6 @@ typedef struct _burning_building_frame_ {
 extern char** MissileTypeWcNames;	/// Mapping wc-number 2 symbol
 
 extern MissileType* MissileTypes;		/// All missile-types
-extern MissileType* MissileTypeExplosion;	/// Explosion missile-type
 
 extern const char* MissileClassNames[];		/// Missile class names
 
@@ -557,6 +561,24 @@ extern void CleanMissileTypes(void);
 extern void InitMissiles(void);
     /// Clean missiles
 extern void CleanMissiles(void);
+
+FuncController SpellDeathCoilController;
+FuncController SpellFireballController;
+FuncController SpellFlameShieldController;
+FuncController SpellRunesController;
+FuncController SpellWhirlwindController;
+
+FuncController MissileActionNone;
+FuncController MissileActionPointToPoint;
+FuncController MissileActionPointToPointWithDelay;
+FuncController MissileActionStayWithDelay;
+FuncController MissileActionPointToPoint3Bounces;
+FuncController MissileActionCycleOnce;
+FuncController MissileActionPointToPointWithHit;
+FuncController MissileActionFire;
+FuncController MissileActionHit;
+FuncController MissileActionParabolic;
+FuncController MissileActionLandMine;
 
 //@}
 

@@ -51,12 +51,6 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-//	TODO : Remove, configure in ccl.
-#define FIREBALL_DAMAGE		20	/// Damage of center fireball
-#define WHIRLWIND_DAMAGE1	 4	/// the center of the whirlwind
-#define WHIRLWIND_DAMAGE2	 1	/// the periphery of the whirlwind
-#define RUNE_DAMAGE		50	/// Rune damage
-
 enum {
     flag_slow,
     flag_haste,
@@ -118,6 +112,7 @@ typedef struct
 	
 	struct {
 	    int TTL;			/// time to live (ticks)
+	    int Damage;			/// Damage.
 	} FlameShield;
 
 	struct {

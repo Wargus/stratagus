@@ -65,9 +65,6 @@
 --	Definitons
 ----------------------------------------------------------------------------*/
 
-// TODO Move this in missile.c and remove Hardcoded string.
-MissileType* MissileTypeRune; // MissileTypeByIdent("missile-rune");
-
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -80,349 +77,6 @@ global SpellType* SpellTypeTable;
 
 /// How many spell-types are available
 global int SpellTypeCount;
-
-/*----------------------------------------------------------------------------
---	Functions (Spells Controllers/Callbacks)
-----------------------------------------------------------------------------*/
-
-// ****************************************************************************
-// Action of the missile of spells
-// ****************************************************************************
-
-/*
-** Missile controllers
-**
-** To cancel a missile set it's TTL to 0, it will be handled right after
-** the controller call and missile will be down.
-**
-*/
-
-// FIXME Move this codes into missile.c
-
-/**
-**	Fireball controller
-**
-**	@param missile	Controlled missile
-**
-**	@todo	Move this code into the missile code
-*/
-local void SpellFireballController(Missile* missile)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-    int x;
-    int y;
-
-    //NOTE: vladi: TTL is used as counter for explosions
-    // explosions start at target and continue (10 tiles) beyond
-    // explosions are on each tile on the way
-
-    // approx
-    if (missile->TTL <= missile->State && missile->TTL % 2 == 0) {
-	//+TileSize/2 to align gfx to baseline
-	x = missile->X + TileSizeX / 2;
-	y = missile->Y + TileSizeY / 2;
-
-	MakeMissile(MissileTypeExplosion, x, y, x, y);
-
-	x = x / TileSizeX;
-	y = y / TileSizeY;
-
-	// Effect of the explosion on units
-	// NOTE: vladi: this is slightly different than original
-	//      now it hits all units in range 1
-	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-	for (i = 0; i < n; ++i)	{
-	    if (table[i]->HP) {
-		HitUnit(missile->SourceUnit, table[i], FIREBALL_DAMAGE); // Should be missile->damage
-	    }
-	}
-    }
-}
-
-/**
-**	Death-Coil controller
-**
-**	@param missile	Controlled missile
-**
-**	@todo	Move this code into the missile code
-*/
-local void SpellDeathCoilController(Missile* missile)
-{
-    Unit* table[UnitMax];
-    int	i;
-    int	n;
-    Unit* source;
-
-    //
-    //  missile has not reached target unit/spot
-    //
-    if (!(missile->X == missile->DX && missile->Y == missile->DY)) {
-	return;
-    }
-    source = missile->SourceUnit;
-    if (source->Destroyed) {
-	return;
-    }
-    // source unit still exists
-    //
-    //	Target unit still exists and casted on a special target
-    //
-    if (missile->TargetUnit && !missile->TargetUnit->Destroyed &&
-	    missile->TargetUnit->HP)  {
-	if (missile->TargetUnit->HP <= 50) {// 50 should be parametrable
-	    source->Player->Score += missile->TargetUnit->Type->Points;
-	    if (missile->TargetUnit->Type->Building) {
-		source->Player->TotalRazings++;
-	    } else {
-		source->Player->TotalKills++;
-	    }
-#ifdef USE_HP_FOR_XP
-	    source->XP += missile->TargetUnit->HP;
-#else
-	    source->XP += missile->TargetUnit->Type->Points;
-#endif
-	    ++source->Kills;
-	    missile->TargetUnit->HP = 0;
-	    LetUnitDie(missile->TargetUnit);
-	} else {
-#ifdef USE_HP_FOR_XP
-	    source->XP += 50;
-#endif
-	    missile->TargetUnit->HP -= 50;
-	}
-	if (source->Orders[0].Action != UnitActionDie) {
-	    source->HP += 50;
-	    if (source->HP > source->Stats->HitPoints) {
-		source->HP = source->Stats->HitPoints;
-	    }
-	}
-    } else {
-	//
-	//  No target unit -- try enemies in range 5x5 // Must be parametrable
-	//
-	int ec;		// enemy count
-	int x;
-	int y;
-
-	ec = 0;
-	x = missile->DX / TileSizeX;
-	y = missile->DY / TileSizeY;
-
-	n = SelectUnits(x - 2, y - 2, x + 2, y + 2, table);
-	if (n == 0) {
-	    return;
-	}
-	// calculate organic enemy count
-	for (i = 0; i < n; ++i) {
-	    ec += (IsEnemy(source->Player, table[i]) && table[i]->Type->Organic != 0);
-	}
-	if (ec > 0)  {
-	    // yes organic enemies found
-	    for (i = 0; i < n; ++i) {
-		if (IsEnemy(source->Player, table[i]) && table[i]->Type->Organic != 0) {
-		    // disperse damage between them
-		    //NOTE: 1 is the minimal damage
-		    if (table[i]->HP <= 50 / ec) {
-			source->Player->Score += table[i]->Type->Points;
-			if (table[i]->Type->Building) {
-			    source->Player->TotalRazings++;
-			} else {
-			    source->Player->TotalKills++;
-			}
-#ifdef USE_HP_FOR_XP
-			source->XP += table[i]->HP;
-#else
-			source->XP += table[i]->Type->Points;
-#endif
-			++source->Kills;
-			table[i]->HP = 0;
-			LetUnitDie(table[i]); // too much damage
-		    } else {
-#ifdef USE_HP_FOR_XP
-			source->XP += 50 / ec;
-#endif
-			table[i]->HP -= 50 / ec;
-		    }
-		}
-	    }
-	    if (source->Orders[0].Action != UnitActionDie) {
-		source->HP += 50;
-		if (source->HP > source->Stats->HitPoints) {
-		    source->HP = source->Stats->HitPoints;
-		}
-	    }
-	}
-    }
-}
-
-/**
-**	Whirlwind controller
-**
-**	@param missile	Controlled missile
-**
-**	@todo	Move this code into the missile code
-*/
-local void SpellWhirlwindController(Missile* missile)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-    int x;
-    int y;
-
-    //
-    //	Center of the tornado
-    //
-    x = (missile->X + TileSizeX / 2 + missile->Type->Width / 2) / TileSizeX;
-    y = (missile->Y + TileSizeY + missile->Type->Height / 2) / TileSizeY;
-    //
-    //	Every 4 cycles 4 points damage in tornado center
-    //
-    if (!(missile->TTL % 4)) {
-	n = SelectUnitsOnTile(x, y, table);
-	for (i = 0; i < n; ++i)	{
-	    if (table[i]->HP) {
-		// should be missile damage?
-		HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE1);
-	    }
-	}
-    }
-    //
-    //	Every 1/10s 1 points damage on tornado periphery
-    //
-    if (!(missile->TTL % (CYCLES_PER_SECOND / 10))) {
-    	// we should parameter this
-	n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
-	DebugLevel3Fn("Damage on %d,%d-%d,%d = %d\n" _C_ x-1 _C_ y-1 _C_ x+1 _C_ y+1 _C_ n);
-	for (i = 0; i < n; ++i) {
-	    if ((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
-		// should be in missile
-		HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
-	    }
-	}
-    }
-    DebugLevel3Fn("Whirlwind: %d, %d, TTL: %d\n" _C_
-	missile->X _C_ missile->Y _C_ missile->TTL);
-
-    //
-    //	Changes direction every 3 seconds (approx.)
-    //
-    if (!(missile->TTL % 100)) { // missile has reached target unit/spot
-	int nx;
-	int ny;
-
-	do {
-	    // find new destination in the map
-	    nx = x + SyncRand() % 5 - 2;
-	    ny = y + SyncRand() % 5 - 2;
-	} while (nx < 0 && ny < 0 && nx >= TheMap.Width && ny >= TheMap.Height);
-	missile->DX = nx * TileSizeX + TileSizeX / 2;
-	missile->DY = ny * TileSizeY + TileSizeY / 2;
-	missile->State = 0;
-	DebugLevel3Fn("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-	    missile->X _C_ missile->Y _C_ missile->TTL);
-    }
-}
-
-/**
-**	Runes controller
-**
-**	@param missile	Controlled missile
-**
-**	@todo	Move this code into the missile code
-*/
-local void SpellRunesController(Missile* missile)
-{
-    Unit* table[UnitMax];
-    int i;
-    int n;
-    int x;
-    int y;
-
-    x = missile->X / TileSizeX;
-    y = missile->Y / TileSizeY;
-
-    n = SelectUnitsOnTile(x, y, table);
-    for (i = 0; i < n; ++i) {
-	if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP) {
-	    // FIXME: don't use ident!!!
-	    PlayMissileSound(missile, SoundIdForName("explosion"));
-	    MakeMissile(MissileTypeExplosion, missile->X, missile->Y,
-		missile->X, missile->Y);
-	    HitUnit(missile->SourceUnit, table[i], RUNE_DAMAGE);
-	    missile->TTL = 0;		// Rune can only hit once
-	}
-    }
-    // show rune every 4 seconds (approx.)
-    if (missile->TTL % 100 == 0) {
-	MakeMissile(MissileTypeRune, missile->X, missile->Y, missile->X, missile->Y);
-    }
-}
-
-/**
-**	FlameShield controller
-**
-**	@param missile	Controlled missile
-**
-**	@todo	Move this code into the missile code
-*/
-local void SpellFlameShieldController(Missile* missile)
-{
-    static int fs_dc[] = {
-	0, 32, 5, 31, 10, 30, 16, 27, 20, 24, 24, 20, 27, 15, 30, 10, 31,
-	5, 32, 0, 31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10,
-	-30, 5, -31, 0, -32, -5, -31, -10, -30, -16, -27, -20, -24, -24, -20,
-	-27, -15, -30, -10, -31, -5, -32, 0, -31, 5, -30, 10, -27, 16, -24,
-	20, -20, 24, -15, 27, -10, 30, -5, 31, 0, 32};
-    Unit* table[UnitMax];
-    int n;
-    int i;
-    int dx;
-    int dy;
-    int ux;
-    int uy;
-    int ix;
-    int iy;
-    int uw;
-    int uh;
-
-    i = missile->TTL % 36;		// 36 positions on the circle
-    dx = fs_dc[i * 2];
-    dy = fs_dc[i * 2 + 1];
-    ux = missile->TargetUnit->X;
-    uy = missile->TargetUnit->Y;
-    ix = missile->TargetUnit->IX;
-    iy = missile->TargetUnit->IY;
-    uw = missile->TargetUnit->Type->Width;
-    uh = missile->TargetUnit->Type->Height;
-    missile->X = ux * TileSizeX + ix + uw / 2 + dx - 32;
-    missile->Y = uy * TileSizeY + iy + uh / 2 + dy - 32 - 16;
-    if (missile->TargetUnit->Orders[0].Action == UnitActionDie) {
-	missile->TTL = i;
-    }
-    if (missile->TTL == 0) {
-	missile->TargetUnit->FlameShield = 0;
-    }
-    //vladi: still no have clear idea what is this about :)
-    CheckMissileToBeDrawn(missile);
-
-    // Only hit 1 out of 8 frames
-    if (missile->TTL & 7) {
-	return;
-    }
-    n = SelectUnits(ux - 1, uy - 1, ux + 1 + 1, uy + 1 + 1, table);
-    for (i = 0; i < n; ++i) {
-	if (table[i] == missile->TargetUnit) {
-	    // cannot hit target unit
-	    continue;
-	}
-	if (table[i]->HP) {
-	    HitUnit(missile->SourceUnit, table[i], 1);
-	}
-    }
-}
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -637,6 +291,7 @@ global int CastFireball(Unit* caster, const SpellType* spell,
     missile = MakeMissile(spell->Missile, sx, sy, x, y);
     missile->State = spell->Action->Data.Fireball.TTL - (dist - 1) * 2;
     missile->TTL = spell->Action->Data.Fireball.TTL;
+    missile->Damage = spell->Action->Data.Fireball.Damage;
     missile->Controller = SpellFireballController;
     missile->SourceUnit = caster;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
@@ -679,6 +334,7 @@ global int CastFlameShield(Unit* caster, const SpellType* spell, Unit* target,
 	mis->TTL = spell->Action->Data.FlameShield.TTL + i * 7;
 	mis->TargetUnit = target;
 	mis->Controller = SpellFlameShieldController;
+	mis->Damage = spell->Action->Data.FlameShield.Damage;
 	RefsDebugCheck(!target->Refs || target->Destroyed);
 	target->Refs++;
     }
@@ -896,7 +552,7 @@ global int CastRunes(Unit* caster, const SpellType* spell,
     int i;
 
     DebugCheck(!caster);
-    DebugCheck(spell);
+    DebugCheck(!spell);
     DebugCheck(!spell->Action);
 //  DebugCheck(x in range, y in range);
 
@@ -909,14 +565,15 @@ global int CastRunes(Unit* caster, const SpellType* spell,
 	x = oldx + xx[i];
 	y = oldy + yy[i];
 	    
-	if (IsMapFieldEmpty(x - 1, y + 0)) {
+	if (IsMapFieldEmpty(x, y)) {
 	    mis = MakeMissile(spell->Missile,
 		x * TileSizeX + TileSizeX / 2,
 		y * TileSizeY + TileSizeY / 2,
 		x * TileSizeX + TileSizeX / 2,
 		y * TileSizeY + TileSizeY / 2);
 	    mis->TTL = spell->Action->Data.Runes.TTL;
-	    mis->Controller = SpellRunesController;
+ 	    mis->Damage = spell->Action->Data.Runes.Damage;
+ 	    mis->SourceUnit = caster;
 	    caster->Mana -= spell->ManaCost / 5;
 	}
     }
