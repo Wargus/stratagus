@@ -67,6 +67,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "ccl.h"
+#include "editor.h"
 
 #if defined(USE_SDLCD) || defined(USE_SDLA)
 #include "SDL.h"
@@ -558,7 +559,7 @@ local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 145 + 36 * 2, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 3, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 5, MenuButtonDisabled, LargeFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 5, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, {{NULL,0}} },
 };
@@ -5597,6 +5598,7 @@ global void NetClientUpdateState(void)
 */
 local void StartEditor(void)
 {
+    EditorMainLoop();
 }
 
 /*----------------------------------------------------------------------------
