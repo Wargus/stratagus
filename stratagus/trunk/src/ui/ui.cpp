@@ -83,12 +83,7 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps);
 */
 static void CleanUIGraphics(UI* ui)
 {
-	MenuPanel* menupanel;
 	int i;
-
-	for (i = 0; i < ui->NumFillers; ++i) {
-		FreeGraphic(ui->Filler[i]);
-	}
 
 	for (i = 0; i < MaxCosts + 2; ++i) {
 		FreeGraphic(ui->Resources[i].Icon.Graphic);
@@ -97,12 +92,6 @@ static void CleanUIGraphics(UI* ui)
 	FreeGraphic(ui->InfoPanel.Graphic);
 	FreeGraphic(ui->ButtonPanel.Graphic);
 	FreeGraphic(ui->PieMenuBackground.Graphic);
-
-	menupanel = ui->MenuPanels;
-	while (menupanel) {
-		FreeGraphic(menupanel->Panel.Graphic);
-		menupanel = menupanel->Next;
-	}
 }
 
 /**
@@ -248,10 +237,7 @@ void LoadUserInterface(void)
 
 	menupanel = TheUI.MenuPanels;
 	while (menupanel) {
-		if (menupanel->Panel.File) {
-			menupanel->Panel.Graphic = NewGraphic(menupanel->Panel.File, 0, 0);
-			LoadGraphic(menupanel->Panel.Graphic);
-		}
+		LoadGraphic(menupanel->G);
 		menupanel = menupanel->Next;
 	}
 }
@@ -300,6 +286,9 @@ void CleanUI(UI* ui)
 	free(ui->ReverseFontColor);
 
 	// Filler
+	for (i = 0; i < ui->NumFillers; ++i) {
+		FreeGraphic(ui->Filler[i]);
+	}
 	free(ui->FillerX);
 	free(ui->FillerY);
 	free(ui->Filler);
@@ -362,7 +351,7 @@ void CleanUI(UI* ui)
 	while (menupanel) {
 		tmp = menupanel;
 		menupanel = menupanel->Next;
-		free(tmp->Panel.File);
+		FreeGraphic(tmp->G);
 		free(tmp->Ident);
 		free(tmp);
 	}

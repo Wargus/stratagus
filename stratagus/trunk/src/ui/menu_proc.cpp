@@ -1048,9 +1048,9 @@ void DrawMenu(Menu* menu)
 			menupanel = menupanel->Next;
 		}
 		if (menupanel) {
-			VideoDrawSub(menupanel->Panel.Graphic, 0, 0,
-				VideoGraphicWidth(menupanel->Panel.Graphic),
-				VideoGraphicHeight(menupanel->Panel.Graphic),
+			VideoDrawSub(menupanel->G, 0, 0,
+				VideoGraphicWidth(menupanel->G),
+				VideoGraphicHeight(menupanel->G),
 				menu->X, menu->Y);
 		}
 	}
