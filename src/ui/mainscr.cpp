@@ -1185,8 +1185,8 @@ global void DrawInfoPanel(void)
     } else {
 	int x;
 	int y;
-	int nc;
-	int rc;
+	char* nc;
+	char* rc;
 	// FIXME: need some cool ideas for this.
 
 	x=TheUI.InfoPanelX+16;
