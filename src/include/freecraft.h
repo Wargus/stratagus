@@ -302,7 +302,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 ----------------------------------------------------------------------------*/
 
 #ifndef VERSION
-#define VERSION	"1.17pre1"		/// Engine version shown
+#define VERSION	"1.17"			/// Engine version shown
 #endif
 
 #ifndef FreeCraftMajorVerion

@@ -210,7 +210,7 @@ CONTRIB	= contrib/cross.png contrib/red_cross.png \
 	  contrib/health2.png contrib/mana2.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png \
 	  contrib/music/toccata.mod.gz \
-	  contrib/msvc.zip
+	  contrib/msvc.zip contrib/stdint.h
 
 MISC    = Makefile Common.mk Rules.make.orig FreeCraft-beos.proj setup \
 	  contrib/doxygen-freecraft.cfg contrib/doxygen-header.html \
@@ -327,26 +327,16 @@ MYDATE	= $(shell date +%y%m%d)
 PCRAFT= freecraft-$(MYDATE).tar.bz2
 LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
 WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCGP1=	../fcgp-*.tar.bz2
-FCSP1=	../fcsp-general-*.tar.bz2
-FCSP2=	../fcsp-mythical-*.tar.bz2
-FCSP3=	../fcsp-alliance-*.tar.bz2
-FCMP=	../fcmp-020409.tar.gz
+FCMP=	../fcmp-*.tar.gz
 
 linux-complete:
 	mkdir freecraft-complete
-	#tar xjf $(FCGP1)
 	tar xjf $(PCRAFT)
 	tar xjf $(LCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	#cp -a fcgp-*/* freecraft-complete
-	#tar xjCf freecraft-complete $(FCSP1)
-	#tar xjCf freecraft-complete $(FCSP2)
 	tar xzCf freecraft-complete $(FCMP)
-	#cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	#rm -rf fcgp-*
 	chmod 777 freecraft-complete
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
@@ -356,19 +346,12 @@ linux-complete:
 
 win32-complete:
 	mkdir freecraft-complete
-	#tar xjf $(FCGP1)
 	tar xjf $(PCRAFT)
 	unzip -oq $(WCRAFT)
 	cp -a freecraft-$(MYDATE)/* freecraft-complete
 	mv freecraft-complete/data freecraft-complete/data.wc2
-	#cp -a fcgp-*/* freecraft-complete
-	#tar xjCf freecraft-complete $(FCSP1)
-	#tar xjCf freecraft-complete $(FCSP2)
-	#tar xjCf freecraft-complete $(FCSP3)
 	tar xzCf freecraft-complete $(FCMP)
-	#cp ../sound.ccl freecraft-complete/data/ccl/
 	rm -rf freecraft-$(MYDATE)
-	#rm -rf fcgp-*
 	chmod 777 freecraft-complete
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
