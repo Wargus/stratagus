@@ -2455,20 +2455,20 @@ local void SaveAction(void)
 local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
 {
 #ifdef USE_WIN32
-SaveDir="save";
-mkdir(SaveDir);
+    SaveDir="save";
+    mkdir(SaveDir);
 #else
-char path[PATH_MAX];
+    char path[PATH_MAX];
 
-strcpy(path,getenv("HOME"));
-strcat(path,"/");
-strcat(path,FREECRAFT_HOME_PATH);
-mkdir(path,0777);
-strcat(path,"/save");
-mkdir(path,0777);
-if (SaveDir)
-    free(SaveDir);
-SaveDir = strdup(path);
+    strcpy(path,getenv("HOME"));
+    strcat(path,"/");
+    strcat(path,FREECRAFT_HOME_PATH);
+    mkdir(path,0777);
+    strcat(path,"/save");
+    mkdir(path,0777);
+    if (SaveDir)
+	free(SaveDir);
+    SaveDir = strdup(path);
 #endif
 }
 
