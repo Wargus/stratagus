@@ -368,14 +368,16 @@ local void SaveAiTypesWcName(CLFile* file)
 	//  Dump table wc2 race numbers -> internal symbol.
 	//
 	if ((cp = AiTypeWcNames)) {
-		CLprintf(file, "(define-ai-wc-names");
+		CLprintf(file, "DefineAiWcNames(");
 
-		i = 90;
+		if (*cp) {
+			i = CLprintf(file, "\n \"%s\"", *cp++);
+		}
 		while (*cp) {
 			if (i + strlen(*cp) > 79) {
 				i = CLprintf(file, "\n ");
 			}
-			i += CLprintf(file, " '%s", *cp++);
+			i += CLprintf(file, ", \"%s\"", *cp++);
 		}
 		CLprintf(file, ")\n\n");
 	}
@@ -397,15 +399,17 @@ local void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n,
 	int i;
 	int j;
 	int f;
+	int max;
 
-	for (t = 0; t < (upgrade ? UpgradeMax : NumUnitTypes); ++t) {
+	max = (upgrade ? UpgradeMax : NumUnitTypes);
+	for (t = 0; t < max; ++t) {
 		// Look if that unit-type can build something
 		for (f = i = 0; i < n; ++i) {
 			if (table[i]) {
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  (list '%s '%s\n	", name,
+							CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
@@ -413,19 +417,19 @@ local void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n,
 							if (f + strlen(Upgrades[i].Ident) > 78) {
 								f = CLprintf(file, "\n	");
 							}
-							f += CLprintf(file, "'%s ", Upgrades[i].Ident);
+							f += CLprintf(file, ", \"%s\"", Upgrades[i].Ident);
 						} else {
 							if (f + strlen(UnitTypes[i]->Ident) > 78) {
 								f = CLprintf(file, "\n	");
 							}
-							f += CLprintf(file, "'%s ", UnitTypes[i]->Ident);
+							f += CLprintf(file, ", \"%s\"", UnitTypes[i]->Ident);
 						}
 					}
 				}
 			}
 		}
 		if (f) {
-			CLprintf(file, ")");
+			CLprintf(file, "},");
 		}
 	}
 }
@@ -447,18 +451,24 @@ local void SaveAiEquivTable(CLFile* file, const char* name, int n,
 
 	for (i = 0; i < n; ++i) {
 		if (table[i]) {
-			CLprintf(file, "\n  (list '%s '%s\n	", name, UnitTypes[i]->Ident);
+			CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name, UnitTypes[i]->Ident);
 			f = 4;
 			for (j = 0; j < table[i]->Count; ++j) {
 				if (f + strlen(table[i]->Table[j]->Ident) > 78) {
 					f = CLprintf(file, "\n	");
 				}
-				f += CLprintf(file, "'%s ", table[i]->Table[j]->Ident);
+				f += CLprintf(file, ", \"%s\"", table[i]->Table[j]->Ident);
 			}
-			CLprintf(file, ")");
+			if (i == n - 1) {
+				CLprintf(file, "}");
+			} else {
+				CLprintf(file, "},");
+			}
 		}
 	}
 }
+
+#if 0 // Not used. Same as SaveAiUnitLimitTable with Defautresource instead of food
 
 /**
 **  Save AI helper sub table.
@@ -501,6 +511,8 @@ local void SaveAiCostTable(CLFile* file, const char* name, int n,
 	}
 }
 
+#endif
+
 /**
 **  Save AI helper sub table.
 **
@@ -524,20 +536,20 @@ local void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  (list '%s '%s\n	", name,
+							CLprintf(file, "\n  {\"%s\", \"%s\"\n	", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (f + strlen("food") > 78) {
 							f = CLprintf(file, "\n	");
 						}
-						f += CLprintf(file, "'%s ", "food");
+						f += CLprintf(file, ",\"%s\" ", "food");
 					}
 				}
 			}
 		}
 		if (f) {
-			CLprintf(file, ")");
+			CLprintf(file, "},");
 		}
 	}
 }
@@ -546,10 +558,11 @@ local void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 **  Save AI helper table.
 **
 **  @param file  Output file.
+**  @todo manage correctly ","
 */
 local void SaveAiHelper(CLFile* file)
 {
-	CLprintf(file, "(define-ai-helper");
+	CLprintf(file, "DefineAiHelper(");
 	//
 	//  Save build table
 	//
@@ -597,27 +610,13 @@ local void SaveAiHelper(CLFile* file)
 */
 local void SaveAiType(CLFile* file, const AiType* aitype)
 {
-#if 0
-	SCM list;
-
 	if (aitype->Next) {
 		SaveAiType(file, aitype->Next);
 	}
 	DebugLevel3Fn("%s,%s,%s\n" _C_ aitype->Name _C_ aitype->Race _C_ aitype->Class);
-	CLprintf(file, "(define-ai \"%s\" '%s '%s\n",
-		aitype->Name, aitype->Race ? aitype->Race : "*", aitype->Class);
-
-	CLprintf(file, "  '(");
-	//  Print the script a little formated
-	list = aitype->Script;
-	while (!gh_null_p(list)) {
-		CLprintf(file, "\n	");
-		lprin1CL(gh_car(list), file);
-		list = gh_cdr(list);
-	}
-	CLprintf(file, " ))\n\n");
-#else
-#endif
+	CLprintf(file, "DefineAi(\"%s\", \"%s\", \"%s\", %s)\n\n",
+		aitype->Name, aitype->Race ? aitype->Race : "*",
+		aitype->Class, aitype->FunctionName);
 }
 
 /**
@@ -821,14 +820,13 @@ global void SaveAi(CLFile* file)
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file,
 		"--- MODULE: AI $Id$\n\n");
-#if 0
+
 	SaveAiTypesWcName(file);
 	SaveAiHelper(file);
 	SaveAiTypes(file);
-#endif
 	SaveAiPlayers(file);
 
-	DebugLevel0Fn("FIXME: Saving AI isn't supported\n");
+	DebugLevel0Fn("FIXME: Saving lua function definition isn't supported\n");
 }
 
 /**
@@ -998,6 +996,7 @@ global void CleanAi(void)
 		free(aitype->Race);
 		free(aitype->Class);
 		free(aitype->Script);
+		free(aitype->FunctionName);
 
 		temp = aitype->Next;
 		free(aitype);

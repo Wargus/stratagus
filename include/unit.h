@@ -748,6 +748,8 @@ extern Unit** TeamSelected[PlayerMax];     /// teams currently selected units
 extern int    NumSelected;                 /// how many units selected
 extern int    NumTeamSelected[PlayerMax];  /// Number of Units a team member has selected
 
+extern Unit*  ReleasedHead;				   /// Head of the released unit list.
+extern Unit*  ReleasedTail;				   /// Tail of the released unit list.
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -1070,7 +1072,7 @@ extern void SelectionCclRegister(void);
 extern void CclParseOrder(lua_State* l, Order* order);
 	/// register CCL units features
 extern void UnitCclRegister(void);
-
+	
 //@}
 
 #endif		// !__UNIT_H__

@@ -828,6 +828,7 @@ local void DoNextReplay(void)
 		} else {
 			NotifyPlayer(ThisPlayer, NotifyYellow, 0, 0, "Replay got out of sync (%lu) !", GameCycle);
 			DebugLevel0("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
+			DebugCheck(1);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
 			// return;

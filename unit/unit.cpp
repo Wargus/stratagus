@@ -71,8 +71,8 @@
 
 global Unit* UnitSlots[MAX_UNIT_SLOTS];		/// All possible units
 global Unit** UnitSlotFree;				/// First free unit slot
-local Unit* ReleasedHead;				/// List of released units.
-local Unit** ReleasedTail;				/// List tail of released units.
+global Unit* ReleasedHead;				/// List of released units.
+global Unit* ReleasedTail;				/// List tail of released units.
 
 global Unit* Units[MAX_UNIT_SLOTS];		/// Array of used slots
 global int NumUnits;						/// Number of slots used
@@ -107,7 +107,7 @@ global void InitUnitsMemory(void)
 	} while (--slot > UnitSlots);
 	UnitSlotFree = slot;
 
-	ReleasedTail = &ReleasedHead;				// list of unfreed units.
+	ReleasedTail = ReleasedHead = 0; // list of unfreed units.
 	NumUnits = 0;
 }
 
@@ -208,7 +208,6 @@ global void ReleaseUnit(Unit* unit)
 	//		on the way. We must wait a little time before we could free the
 	//		memory.
 	//
-	*ReleasedTail = unit;
 	UnitCacheRemove(unit);
 	//
 	//		Remove the unit from the global units table.
@@ -219,8 +218,14 @@ global void ReleaseUnit(Unit* unit)
 	*unit->UnitSlot = temp;
 	Units[NumUnits] = NULL;
 
-	unit->Next = 0;
-	ReleasedTail = &unit->Next;
+	if (ReleasedHead) {
+		ReleasedTail->Next = unit;
+		ReleasedTail = unit;
+		unit->Next = 0;
+	} else {
+		ReleasedHead = ReleasedTail = unit;
+		unit->Next = 0;
+	}
 	unit->Refs = GameCycle + (NetworkMaxLag << 1);	// could be reuse after this time
 	DebugLevel2Fn("%lu:No more references, only wait for network lag, unit %d\n" _C_
 		GameCycle _C_ UnitNumber(unit));
@@ -252,11 +257,11 @@ local Unit *AllocUnit(void)
 	if (ReleasedHead && (unsigned)ReleasedHead->Refs < GameCycle) {
 		unit = ReleasedHead;
 		ReleasedHead = unit->Next;
-		if (ReleasedTail == &unit->Next) {		// last element
-			ReleasedTail = &ReleasedHead;
+		if (ReleasedHead == 0) {		// last element
+			DebugLevel0Fn("Released unit queue emptied\n");
+			ReleasedTail = ReleasedHead = 0;
 		}
-		DebugLevel2Fn("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_
-			UnitNumber(unit));
+		DebugLevel0Fn("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
 		slot = UnitSlots + unit->Slot;
 		memset(unit, 0, sizeof(*unit));
 		// FIXME: can release here more slots, reducing memory needs.
@@ -3730,6 +3735,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 global void SaveUnits(CLFile* file)
 {
 	Unit** table;
+	Unit* unit;
 	int i;
 	unsigned char SlotUsage[MAX_UNIT_SLOTS / 8 + 1];
 	int InRun;
@@ -3793,11 +3799,20 @@ global void SaveUnits(CLFile* file)
 	}
 #endif
 
-	CLprintf (file, ")\n");
+	CLprintf(file, ")\n");
 
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);
 	}
+
+	//  Save the Unit allocator state, sadly. I don't want to do this!
+	CLprintf(file, "\nUnitAllocQueue(\n");
+	for (unit = ReleasedHead; unit; unit = unit->Next) {
+		CLprintf(file, "\t{Slot = %d, FreeCycle = %d}%c \n", unit->Slot, unit->Refs,
+				(unit->Next ? ',' : ' '));
+		DebugLevel0Fn("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
+	}
+	CLprintf(file, ")\n");
 }
 
 /*----------------------------------------------------------------------------
