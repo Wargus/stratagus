@@ -4735,11 +4735,16 @@ local void MoveButtons(void)
 */
 global void InitMenuData(void)
 {
+    Menu *menu;
+
 #ifdef OLD_MENU
     InitOldMenuData();
 #endif
 
-    // FIXME: Get rid of this..
+    // FIXME: Get rid of these..
+    menu = FindMenu("menu-net-connecting");
+    menu->items[1].d.text.text = NetServerText;
+    menu->items[2].d.text.text = NetTriesText;
     InitNetMultiButtonStorage();
 
     if (VideoWidth != 640) {
