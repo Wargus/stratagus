@@ -809,6 +809,16 @@ local SCM CclRightButtonMoves(void)
 }
 
 /**
+**	Enable fancy buildings
+*/
+local SCM CclFancyBuildings(void)
+{
+    FancyBuildings=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -836,6 +846,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("show-command-key",CclShowCommandKey);
     gh_new_procedure0_0("right-button-attacks",CclRightButtonAttacks);
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
+    gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
  
 }
 
