@@ -538,8 +538,7 @@ struct _unit_ {
     Player*     RescuedFrom;            /// The original owner of a rescued unit.
     					/// NULL if the unit was not rescued.
 
-#define MaxMana	255			/// maximal mana for units
-    unsigned	Mana : 8;		/// mana points
+    int		Mana;			/// mana points
     int		HP;			/// hit points
     int		XP;			/// experience points
     int		Kills;			/// how many unit has this unit killed
@@ -568,7 +567,7 @@ struct _unit_ {
 					** ,used for fancy buildings
 					*/
     unsigned	Rs : 8;
-    int		CurrentResource;
+    unsigned char	CurrentResource;
 
 #define MAX_ORDERS 16			/// How many outstanding orders?
     char	OrderCount;		/// how many orders in queue
