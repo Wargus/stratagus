@@ -33,7 +33,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <time.h>
+#endif
 
 #include "freecraft.h"
 #include "video.h"
