@@ -714,7 +714,6 @@ global void NetworkInitServerConnect(void)
 
     for (i = 0; i < NetPlayers; ++i) {
 	NetStates[i].State = ccs_unused;
-	NetStates[i].Ready = 0;
 	Hosts[i].Host = 0;
 	Hosts[i].Port = 0;
 	Hosts[i].PlyNr = 0;		/// slotnr until final cfg msg
@@ -759,6 +758,7 @@ global void NetworkProcessClientRequest(void)
 {
     InitMessage message;
 
+changed:
     switch (NetLocalState) {
 	case ccs_connecting:
 	    if (NetStateMsgCnt < 60) {	/// 60 retries = 30 seconds
@@ -783,9 +783,27 @@ global void NetworkProcessClientRequest(void)
 	    }
 	    break;
 	case ccs_synced:
+	    NetClientCheckLocalState();
+	    if (NetLocalState != ccs_synced) {
+		NetStateMsgCnt = 0;
+		goto changed;
+	    }
 	    message.Type = MessageInitHello;
 	    message.SubType = ICMWaiting;
 	    NetworkSendRateLimitedClientMessage(&message, 850);
+	    break;
+	case ccs_changed:
+	    if (NetStateMsgCnt < 20) {						/// 20 retries 
+		message.Type = MessageInitHello;
+		message.SubType = ICMState;
+		message.u.State = LocalSetupState;
+		message.HostsCount = (char)(NetLocalHostsSlot & 0xff);
+		message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+		NetworkSendRateLimitedClientMessage(&message, 450);
+	    } else {
+		NetLocalState = ccs_unreachable;			
+		NetConnectRunning = 0;	/// End the menu..
+	    }
 	    break;
 	case ccs_async:
 	    if (NetStateMsgCnt < 20) {						/// 20 retries 
@@ -960,6 +978,7 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 		    }
 		    break;
 
+		case ccs_changed:
 		case ccs_synced:
 		    switch(msg->SubType) {
 
@@ -1135,7 +1154,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    case ccs_connecting:
 				NetStates[h].State = ccs_connected;
 				NetStates[h].MsgCnt = 0;
-				NetStates[h].Ready = 0;
 				/* Fall through */
 			    case ccs_connected:
 				/// this code path happens until client acknoledges the map
@@ -1202,7 +1220,6 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 			    case ccs_connected:
 				NetStates[h].State = ccs_mapinfo;
 				NetStates[h].MsgCnt = 0;
-				NetStates[h].Ready = 0;
 				/* Fall through */
 			    case ccs_mapinfo:
 				/// this code path happens until client acknoledges the state info
@@ -1223,6 +1240,47 @@ local void NetworkParseMenuPacket(const InitMessage *msg, int size)
 				break;
 			    default:
 				DebugLevel0Fn("Server: ICMMap: Unhandled state %d Host %d\n",
+								 NetStates[h].State, h);
+				break;
+			}
+			break;
+		    }
+		}
+		break;
+
+	    case ICMState:
+		// look up the host
+		for (h = 0; h < HostsCount; ++h) {
+		    if (Hosts[h].Host == NetLastHost && Hosts[h].Port == NetLastPort) {
+			switch (NetStates[h].State) {
+			    case ccs_synced:
+				/// Default case: Client is in sync with us, but notes a local change
+				NetStates[h].State = ccs_async;
+				NetStates[h].MsgCnt = 0;
+				/// Use information supplied by the client:
+				ServerSetupState.Ready[h] = msg->u.State.Ready[h];
+				ServerSetupState.Race[h] = msg->u.State.Race[h];
+				/// Add additional info usage here!
+				/* Fall through */
+			    case ccs_async:
+				/// this code path happens until client acknoledges the state change reply
+				/// by sending ICMResync
+				message.Type = MessageInitReply;
+				message.SubType = ICMState;		/// Send new state info to the client
+				message.u.State = ServerSetupState;
+				message.HostsCount = (char)(HostsCount & 0xff);
+				message.MapUID = htonl(ScenSelectPudInfo->MapUID);
+				n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
+				DebugLevel0Fn("Sending InitReply Message State: (%d) to %d.%d.%d.%d:%d\n",
+					    n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+				NetStates[h].MsgCnt++;
+				if (NetStates[h].MsgCnt > 50) {
+				    // FIXME: Client sends State, but doesn't receive our state info....
+				    ;
+				}
+				break;
+			    default:
+				DebugLevel0Fn("Server: ICMState: Unhandled state %d Host %d\n",
 								 NetStates[h].State, h);
 				break;
 			}

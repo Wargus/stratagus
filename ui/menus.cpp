@@ -163,7 +163,7 @@ global int CurrentMenu = -1;
 /**
 **	Other client and server selection state for Multiplayer clients
 */
-global ServerSetup ServerSetupState;
+global ServerSetup ServerSetupState, LocalSetupState;
 
 local int MenuButtonUnderCursor = -1;
 local int MenuButtonCurSel = -1;
@@ -1869,7 +1869,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 
     /* FIXME: What this has to do:
 	analyze pudinfo for available slots, disable additional buttons - partially done
-	put names of net-connected players in _available_ slots
+	put names of net-connected players in slots
     	announce changes by the game creator to connected clients
     */
     for (c = h = i = 0; i < 16; i++) {
@@ -1909,7 +1909,6 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    NetMultiSetupMenuItems[22 + i].d.gem.state = MI_GSTATE_PASSIVE;
 	}
 	if (i >= h) {
-	    /* FIXME: This can be wrong - avoid slots of net-connected player! */
 	    if (initial) {
 		ServerSetupState.CompOpt[i] = 1;
 	    }
@@ -1947,6 +1946,7 @@ local void MultiClientUpdate(int initial)
 	NetMultiClientMenuItems[5] = NetMultiButtonStorage[1];
 	NetMultiClientMenuItems[5].yofs = 32;
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
+	memset(&LocalSetupState, 0, sizeof(ServerSetup));
     }
     for (i = 1; i < 8; i++) {
 	if (Hosts[i].PlyNr) {
@@ -2038,7 +2038,7 @@ local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
 {
     // GameSetupInit(mi);
     MultiClientUpdate(1);
-    if (ServerSetupState.Ready[NetLocalHostsSlot]) {
+    if (LocalSetupState.Ready[NetLocalHostsSlot]) {
 	NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
 	NetMultiClientMenuItems[3].flags = 0;
     } else {
@@ -2054,8 +2054,8 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
     i = mi - NetMultiClientMenuItems - 22;
     DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n", i, NetLocalHostsSlot);
     if (i == NetLocalHostsSlot) {
-	ServerSetupState.Ready[i] = !ServerSetupState.Ready[i];
-	if (ServerSetupState.Ready[i]) {
+	LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
+	if (LocalSetupState.Ready[i]) {
 	    NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
 	    NetMultiClientMenuItems[3].flags = 0;
 	} else {
@@ -2063,7 +2063,6 @@ local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
 	    NetMultiClientMenuItems[2].flags = 0;
 	}
 	MultiClientUpdate(0);
-	/* FIXME: Transmit to Server */
     }
 }
 
@@ -2071,18 +2070,30 @@ local void MultiClientReady(void)
 {
     NetMultiClientMenuItems[2].flags = MenuButtonDisabled;
     NetMultiClientMenuItems[3].flags = 0;
-    ServerSetupState.Ready[NetLocalHostsSlot] = 1;
+    LocalSetupState.Ready[NetLocalHostsSlot] = 1;
     MultiClientUpdate(0);
-    /* FIXME: Transmit to Server */
 }
 
 local void MultiClientNotReady(void)
 {
     NetMultiClientMenuItems[3].flags = MenuButtonDisabled;
     NetMultiClientMenuItems[2].flags = 0;
-    ServerSetupState.Ready[NetLocalHostsSlot] = 0;
+    LocalSetupState.Ready[NetLocalHostsSlot] = 0;
     MultiClientUpdate(0);
-    /* FIXME: Transmit to Server */
+}
+
+/*
+ * Callback from Netconnect Loop in Client-Sync State:
+ * Compare Local State with Server's information
+ * and force Update when changes have occured.
+ */
+global void NetClientCheckLocalState(void)
+{
+    if (LocalSetupState.Ready[NetLocalHostsSlot] != ServerSetupState.Ready[NetLocalHostsSlot]) {
+	NetLocalState = ccs_changed;
+	return;
+    }
+    /* ADD HERE  (FIXME: Race) */
 }
 
 global int NetClientSelectScenario(void)

@@ -257,6 +257,9 @@ extern int NetClientSelectScenario(void);
 extern void NetClientUpdateState(void);
     /// Notify menu display code to update info
 extern void NetConnectForceDisplayUpdate(void);
+    /// Compare Local State with Server's information
+    /// and force Update when changes have occured.
+extern void NetClientCheckLocalState(void);
 
 //@}
 
