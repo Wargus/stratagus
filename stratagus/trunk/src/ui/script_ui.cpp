@@ -207,22 +207,6 @@ local SCM CclOriginalResources(void)
 }
 
 /**
-**	Add to race for user interface
-**
-**	@param id	look and feel.
-*/
-local SCM CclRaceAdd(SCM id)
-{
-    int mid;
-    extern int RaceAdd;
-
-    mid=gh_scm2int(id);
-    RaceAdd=mid;
-
-    return SCM_UNSPECIFIED;
-}
-
-/**
 **	Define a cursor.
 **
 **	FIXME: need some general data structure to make this parsing easier.
@@ -337,6 +321,7 @@ local SCM CclGameCursor(SCM ident)
 **	Define the look+feel of the user interface.
 **
 **	FIXME: need some general data structure to make this parsing easier.
+**	FIXME: use the new tagged config format.
 */
 local SCM CclDefineUI(SCM list)
 {
@@ -976,8 +961,6 @@ local SCM CclDefineUI(SCM list)
     CclFree(ui->ArrowSE.Name);
     ui->ArrowSE.Name=str;
 
-    DebugLevel0Fn("Panels\n");
-
     //
     //	Panels
     //
@@ -1308,8 +1291,6 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("process-menu",CclProcessMenu);
 
     gh_new_procedure0_0("original-resources",CclOriginalResources);
-
-    gh_new_procedure1_0("race-add",CclRaceAdd);
 
     gh_new_procedureN("define-cursor",CclDefineCursor);
     gh_new_procedure1_0("game-cursor",CclGameCursor);
