@@ -54,7 +54,7 @@ typedef void* SoundId;			/// sound identifier
 ----------------------------------------------------------------------------*/
 
     /// Make a sound bound to identifier
-extern SoundId MakeSound(const char* sound_name,char* file[], int nb);
+extern SoundId MakeSound(const char* sound_name,const char* file[], int nb);
     /// Get the sound id bound to an identifier
 extern SoundId SoundIdForName(const char* sound_name);
     /// Map sound to identifier

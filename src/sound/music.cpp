@@ -413,7 +413,7 @@ global int PlayMusic(const char* name)
 **
 **	@param name	Name of sound file
 */
-global void PlayFile(char* name)
+global void PlayFile(const char* name)
 {
     SoundId id;
     if (SoundIdForName("dynamic-sound")) {

@@ -134,7 +134,7 @@ global SoundId SoundIdForName(const char* name)
 **
 **	@return the sound id of the created group
 */
-global SoundId MakeSound(const char* name, char* file[], int nb)
+global SoundId MakeSound(const char* name, const char* file[], int nb)
 {
     SoundId id;
     const SoundId* result;
