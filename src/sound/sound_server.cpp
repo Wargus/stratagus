@@ -1222,9 +1222,12 @@ global void QuitSound(void)
 	close(SoundFildes);
 	SoundFildes=-1;
     }
-    
 #endif
+    QuitCD();
+}
 
+global void QuitCD(void)
+{
 #ifdef USE_SDLCD
     if (strcmp(CDMode,":off")) {
 	SDL_CDStop(CDRom);
@@ -1239,7 +1242,6 @@ global void QuitSound(void)
         cd_exit();
     }
 #endif
-
 }
 
 #endif	// } WITH_SOUND
