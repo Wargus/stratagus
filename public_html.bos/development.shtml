@@ -12,10 +12,17 @@ The <a href="download.shtml">Download</a> section explains how to get the develo
 Before starting a new development, contact us to check if it fits in the game 
 and if nobody else is working on it.      
 
-<h2>New Features</h2>
-The design of the game happens on <a href="irc://sterling.freenode.net/bos">irc</a> and on the 
-<a href="http://bos.seul.org/wiki/pmwiki.php">Bos Wiki</a>. 
-Don't hesitate to add your comments and ideas.
+<h2>Contact</h2>
+Discussion and work on the game happens mostly on <a href="irc://sterling.freenode.net/bos">irc</a>. 
+Logs of the #bos irc channel are available at 
+<a href="http://colabti.de/irclogger/irclogger_logs/bos">http://colabti.de/irclogger/irclogger_logs/bos</a>.
+<p>
+
+You can also reach us via the <a href="http://archives.seul.org/bos/dev/">bos-dev</a> mailing list. 
+
+<p>
+Designs and some documentation is written in the <a href="http://bos.seul.org/wiki/pmwiki.php">Bos Wiki</a>. 
+Don't hesitate to add your comments and ideas. 
 
 
 <!--#include file="footer.shtml" -->
