@@ -97,9 +97,9 @@ local void AiCheckUnits(void)
     unit_types_count=AiPlayer->Player->UnitTypesCount;
 
     //
-    //	Look if something is missing.
+    //	Look if some unit-types are missing.
     //
-    n=AiPlayer->RequestsCount;
+    n=AiPlayer->UnitTypeRequestsCount;
     for( i=0; i<n; ++i ) {
 	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
 	x=AiPlayer->UnitTypeRequests[i].Count;
@@ -146,11 +146,42 @@ local void AiCheckUnits(void)
 	    counter[t]-=x;
 	}
     }
+
+    //
+    //	Look if some upgrade-to are missing.
+    //
+    n=AiPlayer->UpgradeToRequestsCount;
+    for( i=0; i<n; ++i ) {
+	DebugLevel0Fn("FIXME: %s\n",AiPlayer->UpgradeToRequests[i]->Ident);
+    }
+
+    //
+    //	Look if some researches are missing.
+    //
+    n=AiPlayer->ResearchRequestsCount;
+    for( i=0; i<n; ++i ) {
+	DebugLevel3Fn("%s - %c\n" _C_
+		AiPlayer->ResearchRequests[i]->Ident _C_
+		UpgradeIdAllowed(AiPlayer->Player,
+		    AiPlayer->ResearchRequests[i]-Upgrades));
+	if( UpgradeIdAllowed(AiPlayer->Player,
+		    AiPlayer->ResearchRequests[i]-Upgrades)=='A' ) {
+	    AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
+	}
+    }
 }
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**	W*rCr*ft number to internal ai-type name.
+*/
+global char* AiTypeWcNames[] = {
+    "land-attack",
+    "passive",
+};
 
 /**
 **      Setup all at start.
@@ -161,6 +192,7 @@ global void AiInit(Player* player)
 {
     PlayerAi* pai;
     AiType* ait;
+    char* ainame;
 
     DebugLevel0Fn("%d - %s\n" _C_ player->Player _C_ player->Name);
 
@@ -171,13 +203,21 @@ global void AiInit(Player* player)
     }
     pai->Player=player;
     ait=AiTypes;
+
+    ainame=NULL;
+    if( player->AiNum<sizeof(AiTypeWcNames)/sizeof(*AiTypeWcNames) ) {
+	ainame=AiTypeWcNames[player->AiNum];
+    }
     //
     //	Search correct AI type.
     //
-    while( ait->Race && strcmp(ait->Race,player->RaceName) ) {
+    while( (!ait->Race || strcmp(ait->Race,player->RaceName))
+	    && (!ainame || strcmp(ainame,ait->Class)) ) {
 	ait=ait->Next;
 	DebugCheck( !ait );
     }
+    DebugLevel0Fn("AI: %s with %s\n", player->RaceName, ainame );
+
     pai->AiType=ait;
     pai->Script=ait->Script;
 
@@ -251,7 +291,7 @@ global void AiHelpMe(Unit* unit)
 {
     PlayerAi* pai;
 
-    DebugLevel0Fn("%d(%s) attacked at %d,%d\n" _C_
+    DebugLevel0Fn("%d: %d(%s) attacked at %d,%d\n" _C_ unit->Player->Player _C_
 	    UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->X _C_ unit->Y);
     //
     //	Send force 0 defending
@@ -271,7 +311,7 @@ global void AiHelpMe(Unit* unit)
 */
 global void AiWorkComplete(Unit* unit,Unit* what)
 {
-    DebugLevel1Fn("AiPlayer %d: %d(%s) build %s at %d,%d completed\n" _C_
+    DebugLevel1Fn("%d: %d(%s) build %s at %d,%d completed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 
@@ -288,7 +328,7 @@ global void AiWorkComplete(Unit* unit,Unit* what)
 */
 global void AiCanNotBuild(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("AiPlayer %d: %d Can't build %s at %d,%d\n" _C_
+    DebugLevel1Fn("%d: %d Can't build %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit), what->Ident _C_
 	    unit->X _C_ unit->Y);
 
@@ -305,7 +345,7 @@ global void AiCanNotBuild(Unit* unit,const UnitType* what)
 */
 global void AiCanNotReach(Unit* unit,const UnitType* what)
 {
-    DebugLevel1Fn("AiPlayer %d: %d(%s) Can't reach %s at %d,%d\n" _C_
+    DebugLevel1Fn("%d: %d(%s) Can't reach %s at %d,%d\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
@@ -322,7 +362,7 @@ global void AiCanNotReach(Unit* unit,const UnitType* what)
 */
 global void AiTrainingComplete(Unit* unit,Unit* what)
 {
-    DebugLevel1Fn("AiPlayer %d: %d(%s) training %s at %d,%d completed\n" _C_
+    DebugLevel1Fn("%d: %d(%s) training %s at %d,%d completed\n" _C_
 	    unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 	    what->Type->Ident _C_ unit->X _C_ unit->Y);
 

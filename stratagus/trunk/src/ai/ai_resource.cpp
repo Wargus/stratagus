@@ -300,6 +300,102 @@ local int AiMakeUnit(UnitType* type)
 }
 
 /**
+**	Check if we can research the upgrade.
+**
+**	@param type	Unit that can research the upgrade.
+**	@param what	What should be researched.
+**	@return		True if made, false if can't be made.
+**
+**	@note 	We must check if the dependencies are fulfilled.
+*/
+local int AiResearchUpgrade(const UnitType* type,Upgrade* what)
+{
+    Unit* table[UnitMax];
+    Unit* unit;
+    int nunits;
+    int i;
+    int num;
+
+    DebugLevel0Fn("%s can research %s\n" _C_ type->Ident _C_ what->Ident);
+
+    IfDebug( unit=NoUnitP; );
+    //
+    //  Remove all units already doing something.
+    //
+    nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
+    for (num = i = 0; i < nunits; i++) {
+	unit = table[i];
+	if (unit->Orders[0].Action==UnitActionStill && unit->OrderCount==1 ) {
+	    table[num++] = unit;
+	}
+    }
+
+    for( i=0; i<num; ++i ) {
+
+	unit=table[i];
+	DebugLevel0Fn("Have an unit to research %d :)\n" _C_ UnitNumber(unit));
+
+	CommandResearch(unit, what,FlushCommands);
+
+	return 1;
+    }
+
+    return 0;
+}
+
+/**
+**	Check if the research can be done.
+*/
+global void AiAddResearchRequest(Upgrade* upgrade)
+{
+    int i;
+    int n;
+    const int* unit_count;
+    AiUnitTypeTable* const* tablep;
+    const AiUnitTypeTable* table;
+
+    //
+    //	Check if resources are available.
+    //
+    if( (i=AiCheckCosts(upgrade->Costs)) ) {
+	AiPlayer->NeededMask|=i;
+	return;
+    }
+
+    //
+    //	Check if we have a place for the upgrade to research
+    //
+    n=AiHelpers.ResearchCount;
+    tablep=AiHelpers.Research;
+
+    if( upgrade-Upgrades>n ) {		// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ upgrade->Ident);
+	return;
+    }
+    table=tablep[upgrade-Upgrades];
+    if( !table ) {			// Oops not known.
+	DebugLevel0Fn("Nothing known about `%s'\n" _C_ upgrade->Ident);
+	return;
+    }
+    i=0;
+    n=table->Count;
+
+    unit_count=AiPlayer->Player->UnitTypesCount;
+    for( i=0; i<n; ++i ) {
+	//
+	//	The type is available
+	//
+	if( unit_count[table->Table[i]->Type] ) {
+	    if( AiResearchUpgrade(table->Table[i],upgrade) ) {
+		return;
+	    }
+	}
+    }
+
+    return;
+}
+
+/**
 **	Check what must be builded / trained.
 */
 local void AiCheckingWork(void)
