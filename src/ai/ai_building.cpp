@@ -207,7 +207,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     struct {
 	unsigned short X;
 	unsigned short Y;
-    } points[TheMap.Width*TheMap.Height/4];
+    } * points;
     int x;
     int y;
     int rx;
@@ -220,6 +220,8 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
     int w;
     unsigned char* m;
     unsigned char* matrix;
+
+    points=alloca(TheMap.Width*TheMap.Height);
 
     x=worker->X;
     y=worker->Y;
