@@ -411,7 +411,7 @@ local void DrawMapViewport(Viewport* vp)
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
-	
+
 	//
 	//	We find and sort units after draw level.
 	//
@@ -758,7 +758,7 @@ global void GameMainLoop(void)
 #endif
     int player;
     int RealVideoSyncSpeed;
-    
+
     GameCallbacks.ButtonPressed = HandleButtonDown;
     GameCallbacks.ButtonReleased = HandleButtonUp;
     GameCallbacks.MouseMoved = HandleMouseMove;
@@ -803,7 +803,7 @@ global void GameMainLoop(void)
 	    NetworkCommands();		// Get network commands
 #ifdef MAP_REGIONS
 	    MapSplitterEachCycle();
-#endif // MAP_REGIONS	    
+#endif // MAP_REGIONS
 	    UnitActions();		// handle units
 	    MissileActions();		// handle missiles
 	    PlayersEachCycle();		// handle players
@@ -820,7 +820,7 @@ global void GameMainLoop(void)
 	    //		Check rescue of units.
 	    //
 	    switch (GameCycle % CYCLES_PER_SECOND) {
-		case 0:				
+		case 0:
 		    // At cycle 0 , start all ai players...
 		    if (GameCycle == 0){
 		    	for (player = 0; player < NumPlayers; ++player){
@@ -830,7 +830,7 @@ global void GameMainLoop(void)
 		    // Clear scheme heap each second
 		    // FIXME: this is too slow to call during the game
 		    CclGarbageCollect(1);
-		    break;		    
+		    break;
 		case 1:
 		    HandleCloak();
 		    break;
@@ -849,11 +849,11 @@ global void GameMainLoop(void)
 		    RescueUnits();
 		    break;
 		default:
-		    // FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7) 
+		    // FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7)
 		    player = (GameCycle % CYCLES_PER_SECOND) - 7;
 		    if (player < NumPlayers){
 		    	PlayersEachSecond(player);
-		    }		    		    
+		    }
 	    }
 
 	    //
@@ -881,7 +881,7 @@ global void GameMainLoop(void)
 
 	TriggersEachCycle();		// handle triggers
 	UpdateMessages();		// update messages
-	
+
 	PlayListAdvance();		// Check for next song
 
 	//
@@ -968,7 +968,7 @@ global void GameMainLoop(void)
 	    EndMenu();
 	}
     }
-    
+
     //
     //	Game over
     //
