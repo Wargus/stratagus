@@ -325,7 +325,7 @@ local void UiEnterSoundOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_SOUND_OPTIONS, 1);
+    SoundOptions();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -340,7 +340,7 @@ local void UiEnterSpeedOptionsMenu(void)
 {
     GamePaused=1;
     SetStatusLine("Game Paused");
-    ProcessMenu(MENU_SPEED_SETTINGS, 1);
+    SpeedSettings();
     InterfaceState=IfaceStateNormal;
     ClearStatusLine();
     MarkDrawEntireMap();
@@ -633,8 +633,7 @@ local int CommandKey(int key)
 
 	case KeyCodeF8:			// Speed Options menu
 	    if( KeyState!=KeyStateInput ) {
-		// FIXME: Enable when this works
-//		UiEnterSpeedOptionsMenu();
+		UiEnterSpeedOptionsMenu();
 	    }
 	    break;
 
