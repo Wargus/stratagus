@@ -81,6 +81,11 @@ global void HandleActionDie(Unit* unit)
 	--unit->OrderCount;		// remove the stop command
 	unit->SubAction=0;
 	unit->Frame=0;
+#ifdef NEW_FOW
+	//Fixes sight from death
+	MapUnmarkSight(unit->Player,unit->X,unit->Y,unit->CurrentSightRange);
+	//unit->CurrentSightRange=unit->Type->Stats->SightRange;
+#endif
 	UnitUpdateHeading(unit);
 	UnitShowAnimation(unit,unit->Type->Animations->Die);
 

@@ -1278,6 +1278,17 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 		    -unit->Stats->HitPoints;
 	    // don't have such unit now
 	    player->UnitTypesCount[src->Type]--;
+#ifdef NEW_FOW
+	    // UnMark the Unit sight for conversion
+	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+		src->TileWidth != dst->TileWidth ||
+		src->TileHeight != dst->TileHeight) {
+		MapUnmarkSight(player,
+			unit->X+unit->Type->TileWidth/2,
+			unit->Y+unit->Type->TileHeight/2,
+			unit->CurrentSightRange);
+	    }
+#endif
 	    unit->Type=dst;
 	    unit->Stats=&dst->Stats[player->Player];
 	    // and we have new one...
@@ -1286,6 +1297,18 @@ local void ConvertUnitTypeTo(Player* player,const UnitType* src,UnitType* dst)
 	    if( dst->CanCastSpell ) {
 		unit->Mana=MAGIC_FOR_NEW_UNITS;
 	    }
+#ifdef NEW_FOW
+	    if (unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+		src->TileWidth != dst->TileWidth ||
+		src->TileHeight != dst->TileHeight) {
+		unit->CurrentSightRange=dst->Stats[player->Player].SightRange;
+		MapMarkSight(player,
+			unit->X+unit->Type->TileWidth/2,
+			unit->Y+unit->Type->TileHeight/2,
+			unit->CurrentSightRange);
+	    }
+#endif
+	    
 	    CheckUnitToBeDrawn(unit);
 	//
 	//	Convert trained units to this type.
@@ -1382,12 +1405,12 @@ local void ApplyUpgradeModifier(Player * player, const UpgradeModifier * um)
 			MapUnmarkSight(player,
 					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
 					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
-					UnitTypes[z].Stats[pn].SightRange -
-						um->Modifier.SightRange);
+					sightupgrade[numunits]->CurrentSightRange);
+			sightupgrade[numunits]->CurrentSightRange=UnitTypes[z].Stats[pn].SightRange;
 			MapMarkSight(player,
 					sightupgrade[numunits]->X+UnitTypes[z].TileWidth/2,
 					sightupgrade[numunits]->Y+UnitTypes[z].TileHeight/2,
-					UnitTypes[z].Stats[pn].SightRange);
+					sightupgrade[numunits]->CurrentSightRange);
 		    }                                   
 		    numunits--;
 		}
