@@ -919,7 +919,7 @@ extern void AddToGroup(Unit **units,int nunits,int num);
     /// Set the contents of a particular group with an array of units
 extern void SetGroup(Unit **units,int nunits,int num);
     /// Remove a unit from a group
-extern void RemoveUnitFromGroup(Unit *unit);
+extern void RemoveUnitFromGroups(Unit *unit);
     /// Register CCL group features
 extern void GroupCclRegister(void);
 
