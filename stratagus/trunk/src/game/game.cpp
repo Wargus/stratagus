@@ -339,6 +339,7 @@ void CreateGame(const char* filename, WorldMap* map)
 		int aiopps;
 
 		p = TheMap.Info.PlayerType[i];
+		aiopps = 0;
 		// Single player games only:
 		// ARI: FIXME: convert to a preset array to share with network game code
 		if (GameSettings.Opponents != SettingsPresetMapDefault) {
