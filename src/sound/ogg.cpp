@@ -103,8 +103,8 @@ local size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 **	@return			Seek position, -1 if failure.
 */
 local int OGG_seek(void* user __attribute__((unused)),
-	int64_t offset __attribute__((unused)),
-	int whence __attribute__((unused)))
+    int64_t offset __attribute__((unused)),
+    int whence __attribute__((unused)))
 {
     return -1;
 }
@@ -155,7 +155,7 @@ local int OggReadStream(Sample* sample, void* buf, int len)
     int divide;
     char sndbuf[OGG_BUFFER_SIZE];
 
-    data = (OggData*) sample->User;
+    data = (OggData*)sample->User;
 
     // see if we have enough read already
     if (data->PointerInBuffer - sample->Data + len > sample->Length) {
@@ -173,13 +173,11 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 
 	for (;;) {
 #ifdef WORDS_BIGENDIAN
-	    i = ov_read(data->VorbisFile,
-		    sndbuf, n/divide, 1, 2, 1,
-		    &bitstream);
+	    i = ov_read(data->VorbisFile, sndbuf, n / divide, 1, 2, 1,
+		&bitstream);
 #else
-	    i = ov_read(data->VorbisFile,
-		    sndbuf, n/divide, 0, 2, 1,
-		    &bitstream);
+	    i = ov_read(data->VorbisFile, sndbuf, n / divide, 0, 2, 1,
+		&bitstream);
 #endif
 	    if (i <= 0) {
 		break;
@@ -213,7 +211,9 @@ local void OggFreeStream(Sample* sample)
 {
     OggData* data;
 
-    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + OGG_BUFFER_SIZE);
+#ifdef DEBUG
+    AllocatedSoundMemory -= sizeof(*sample) + OGG_BUFFER_SIZE;
+#endif
 
     data = (OggData*)sample->User;
     ov_clear(data->VorbisFile);
@@ -260,7 +260,9 @@ local int OggRead(Sample* sample, void* buf, int len)
 */
 local void OggFree(Sample* sample)
 {
-    IfDebug( AllocatedSoundMemory -= sample->Length; );
+#ifdef DEBUG
+    AllocatedSoundMemory -= sample->Length;
+#endif
 
     free(sample);
 }
@@ -316,7 +318,7 @@ global Sample* LoadOgg(const char* name,int flags)
     }
     */
     info = ov_info(vf, -1);
-    if( !info ) {
+    if (!info) {
 	fprintf(stderr, "no ogg stream\n");
 	ov_clear(vf);
 	return NULL;
@@ -337,7 +339,7 @@ global Sample* LoadOgg(const char* name,int flags)
     sample->Frequency = info->rate;
     sample->Length = 0;
 
-    if (flags&PlayAudioStream) {
+    if (flags & PlayAudioStream) {
 	OggData* data;
 
 	data = malloc(sizeof(OggData));
@@ -354,7 +356,9 @@ global Sample* LoadOgg(const char* name,int flags)
 	sample->User = data;
 
 	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + OGG_BUFFER_SIZE);
-	IfDebug( AllocatedSoundMemory += sizeof(*sample) + OGG_BUFFER_SIZE);
+#ifdef DEBUG
+	AllocatedSoundMemory += sizeof(*sample) + OGG_BUFFER_SIZE;
+#endif
     } else {
 	int n;
 	char* p;
@@ -374,7 +378,7 @@ global Sample* LoadOgg(const char* name,int flags)
 	    if (n < 4096) {
 		Sample* s;
 
-		if( sample->Length < 1024*1024 ) {
+		if( sample->Length < 1024 * 1024 ) {
 		    n = sample->Length << 1;
 		} else {
 		    n = 2 * 1024 * 1024;	// Big junks needed for windows
@@ -453,7 +457,7 @@ local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 
     length = AviReadNextAudioFrame(avi, &frame);
     DebugLevel3Fn("Bytes %d - %d\n" _C_ length _C_ avi->AudioBuffer->Length);
-    if ((int)length<0) {
+    if ((int)length < 0) {
 	return 0;
     }
     if (length > nmemb * size) {

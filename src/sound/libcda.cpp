@@ -29,17 +29,17 @@
 static int fd = -1;
 
 static char _cd_error[256];
-const char *cd_error = _cd_error;
+const char* cd_error = _cd_error;
 
 
 static void copy_cd_error(void)
 {
-    strncpy(_cd_error, strerror(errno), sizeof _cd_error);
+    strncpy(_cd_error, strerror(errno), sizeof(_cd_error));
     _cd_error[sizeof _cd_error - 1] = 0;
 }
 
 
-static int get_tocentry(int track, struct cdrom_tocentry *e)
+static int get_tocentry(int track, struct cdrom_tocentry* e)
 {
     memset(e, 0, sizeof(struct cdrom_tocentry));
     e->cdte_track = track;
@@ -54,7 +54,7 @@ static int get_tocentry(int track, struct cdrom_tocentry *e)
 }
 
 
-static int get_subchnl(struct cdrom_subchnl *s)
+static int get_subchnl(struct cdrom_subchnl* s)
 {
     memset(s, 0, sizeof(struct cdrom_subchnl));
     s->cdsc_format = CDROM_MSF;
@@ -70,14 +70,18 @@ static int get_subchnl(struct cdrom_subchnl *s)
 /* cd_init:
  *  Initialise library.  Return zero on success.
  */
-int cd_init()
+int cd_init(void)
 {
     char *device;
 
     device = getenv("CDAUDIO");
-    if (!device) device = "/dev/cdrom";
+    if (!device) {
+	device = "/dev/cdrom";
+    }
 
-    if (fd != -1) close(fd);
+    if (fd != -1) {
+	close(fd);
+    }
 
     fd = open(device, O_RDONLY | O_NONBLOCK);
     if (fd < 0) {
@@ -92,7 +96,7 @@ int cd_init()
 /* cd_exit:
  *  Shutdown.
  */
-void cd_exit()
+void cd_exit(void)
 {
     if (fd != -1) {
 	close(fd);
@@ -113,14 +117,15 @@ static int play(int t1, int t2)
     
     /* cdrom.h: The leadout track is always 0xAA, regardless 
      * of # of tracks on disc. */
-    if (t2 == last)
+    if (t2 == last) {
 	t2 = CDROM_LEADOUT;
-    else
-	t2++;
+    } else {
+	++t2;
+    }
     
-    if ((get_tocentry(t1, &e0) != 0) ||
-	(get_tocentry(t2, &e1) != 0))
+    if ((get_tocentry(t1, &e0) != 0) || (get_tocentry(t2, &e1) != 0)) {
 	return -1;
+    }
 
     msf.cdmsf_min0 = e0.cdte_addr.msf.minute;
     msf.cdmsf_sec0 = e0.cdte_addr.msf.second;
@@ -176,8 +181,9 @@ int cd_play_from(int track)
 {
     int last;
     
-    if (cd_get_tracks(0, &last) != 0)
+    if (cd_get_tracks(0, &last) != 0) {
 	return -1;
+    }
     
     return play(track, last);
 }
@@ -186,22 +192,23 @@ int cd_play_from(int track)
 /* cd_current_track:
  *  Return track currently in playback, or zero if stopped.
  */
-int cd_current_track()
+int cd_current_track(void)
 {
     struct cdrom_subchnl s;
 
     get_subchnl(&s);
-    if (s.cdsc_audiostatus == CDROM_AUDIO_PLAY)
+    if (s.cdsc_audiostatus == CDROM_AUDIO_PLAY) {
 	return s.cdsc_trk;
-    else
+    } else {
 	return 0;
+    }
 }
 
 
 /* cd_pause:
  *  Pause playback.
  */
-void cd_pause()
+void cd_pause(void)
 {
     ioctl(fd, CDROMPAUSE);
 }
@@ -210,17 +217,18 @@ void cd_pause()
 /* cd_resume:
  *  Resume playback.
  */
-void cd_resume()
+void cd_resume(void)
 {
-    if (cd_is_paused())
+    if (cd_is_paused()) {
 	ioctl(fd, CDROMRESUME);
+    }
 }
 
 
 /* cd_is_paused:
  *  Return non-zero if playback is paused.
  */
-int cd_is_paused()
+int cd_is_paused(void)
 {
     struct cdrom_subchnl s;
 
@@ -232,7 +240,7 @@ int cd_is_paused()
 /* cd_stop:
  *  Stop playback.
  */
-void cd_stop()
+void cd_stop(void)
 {
     ioctl(fd, CDROMSTOP);
 }
@@ -241,19 +249,27 @@ void cd_stop()
 /* cd_get_tracks:
  *  Get first and last tracks of CD.  Return zero on success.
  */
-int cd_get_tracks(int *first, int *last)
+int cd_get_tracks(int* first, int* last)
 {
     struct cdrom_tochdr toc;
 
     if (ioctl(fd, CDROMREADTOCHDR, &toc) < 0) {
 	copy_cd_error();
-	if (first) *first = 0;
-	if (last) *last = 0;
+	if (first) {
+	    *first = 0;
+	}
+	if (last) {
+	    *last = 0;
+	}
 	return -1;
     }
 
-    if (first) *first = toc.cdth_trk0;
-    if (last)  *last  = toc.cdth_trk1;
+    if (first) {
+	*first = toc.cdth_trk0;
+    }
+    if (last) {
+	*last  = toc.cdth_trk1;
+    }
     return 0;
 }
 
@@ -266,8 +282,9 @@ int cd_is_audio(int track)
 {
     struct cdrom_tocentry e;
 
-    if ((cd_get_tracks(0, 0) < 0) || (get_tocentry(track, &e) < 0))
+    if ((cd_get_tracks(0, 0) < 0) || (get_tocentry(track, &e) < 0)) {
 	return -1;
+    }
     return (e.cdte_ctrl & CDROM_DATA_TRACK) ? 0 : 1;
 }
 
@@ -275,13 +292,17 @@ int cd_is_audio(int track)
 /* cd_get_volume:
  *  Return volumes of left and right channels.
  */
-void cd_get_volume(int *c0, int *c1)
+void cd_get_volume(int* c0, int* c1)
 {
     struct cdrom_volctrl vol;
 
     ioctl(fd, CDROMVOLREAD, &vol);
-    if (c0) *c0 = vol.channel0;
-    if (c1) *c1 = vol.channel1;
+    if (c0) {
+	*c0 = vol.channel0;
+    }
+    if (c1) {
+	*c1 = vol.channel1;
+    }
 }
 
 
@@ -303,7 +324,7 @@ void cd_set_volume(int c0, int c1)
 /* cd_eject:
  *  Eject CD drive (if possible).
  */
-void cd_eject()
+void cd_eject(void)
 {
     ioctl(fd, CDROMEJECT);
 }
@@ -312,7 +333,7 @@ void cd_eject()
 /* cd_close:
  *  Close CD drive (if possible).
  */
-void cd_close()
+void cd_close(void)
 {
     ioctl(fd, CDROMCLOSETRAY);
 }
@@ -362,8 +383,9 @@ static int command(char *fmt, ...)
     va_end(ap);
 
     err = mciSendString(buf, ret, sizeof ret, 0);
-    if (err) 
+    if (err) {
 	mciGetErrorString(err, _cd_error, sizeof _cd_error);
+    }
     return err ? -1 : 0;
 }
 
@@ -373,8 +395,9 @@ int cd_init(void)
     int err;
 
     err = command("open cdaudio wait");
-    if (!err) 
+    if (!err) {
 	err = command("set cdaudio time format tmsf");
+    }
 
     paused = 0;
     return err;
@@ -424,12 +447,14 @@ int cd_play_from(int track)
 
 int cd_current_track(void)
 {
-    if ((command("status cdaudio mode") != 0) || 
-	(strcmp(ret, "playing") != 0))
+    if ((command("status cdaudio mode") != 0) ||
+	    (strcmp(ret, "playing") != 0)) {
 	return 0;
+    }
 	
-    if (command("status cdaudio current track") != 0)
+    if (command("status cdaudio current track") != 0) {
 	return 0;
+    }
     return atoi(ret);
 }
 
@@ -450,10 +475,11 @@ void cd_resume(void)
     if (!paused)
 	return;
 
-    if (end_pos[0])
+    if (end_pos[0]) {
 	command("play cdaudio from %s to %s", paused_pos, end_pos);
-    else
+    } else {
 	command("play cdaudio from %s", paused_pos);
+    }
     paused = 0;
 }
 
@@ -480,8 +506,12 @@ int cd_get_tracks(int *first, int *last)
 
     i = atoi(ret);
     
-    if (first) *first = 1;
-    if (last) *last = i;
+    if (first) {
+	*first = 1;
+    }
+    if (last) {
+	*last = i;
+    }
     
     return (i) ? 0 : -1;
 }
@@ -489,16 +519,21 @@ int cd_get_tracks(int *first, int *last)
 
 int cd_is_audio(int track)
 {
-    if (command("status cdaudio type track %u", track) != 0)
+    if (command("status cdaudio type track %u", track) != 0) {
 	return -1;
+    }
     return (strcmp(ret, "audio") == 0) ? 1 : 0;
 }
 
 
 void cd_get_volume(int *c0, int *c1)
 {
-    if (c0) *c0 = 128;	/* (shrug) */
-    if (c1) *c1 = 128;
+    if (c0) {
+	*c0 = 128;	/* (shrug) */
+    }
+    if (c1) {
+	*c1 = 128;
+    }
 }
 
 
