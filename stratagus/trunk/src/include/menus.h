@@ -188,6 +188,7 @@ typedef struct _menuitem_input_ {
     int maxch;
 } MenuitemInput;
 typedef struct _menuitem_gem_ {
+    unsigned char *text;
     unsigned int state;
     int xsize;
     int ysize;
