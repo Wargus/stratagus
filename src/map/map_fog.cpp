@@ -521,11 +521,15 @@ global void MapUpdateVisible(void)
     //
     memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
 
+#ifdef DEBUG
     DebugLevel3Fn("Ticks Clear %lu\n",GetTicks()-t);
+#endif
 
     MarkDrawEntireMap();
 
+#ifdef DEBUG
     DebugLevel3Fn("Ticks Mark  %lu\n",GetTicks()-t);
+#endif
 
     //
     //	Mark all units visible range.
@@ -584,7 +588,9 @@ global void MapUpdateVisible(void)
 	}
     }
 
+#ifdef DEBUG
     DebugLevel3Fn("Ticks Total %lu\n",GetTicks()-t);
+#endif
 }
 
 /*----------------------------------------------------------------------------
