@@ -10,12 +10,11 @@
 //
 /**@name ai.c           -       The computer player AI main file. */
 //
-//      (c) Copyright 1998-2001 by Lutz Sammer
+//      (c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -433,7 +432,7 @@ local int AiNearGoldmine(const Unit * goldmine, const Unit * worker,
     DebugLevel3("XXXXX: %d,%d\n", addx, addy);
     cost = 99999;
     IfDebug( best_x = best_y = 0; );	// remove compiler warning
-    for (;;) {				// test rectangles arround the mine
+    for (;;) {				// test rectangles around the mine
 	for (i = addy; i--; y++) {
 	    DebugLevel3("\t\tTest %3d,%3d\n", x, y);
 	    if (CanBuildUnitType(worker, type, x, y)) {
@@ -532,7 +531,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 	    );				// remove compiler warning
     DebugLevel3("%d,%d\n", type->TileWidth, type->TileHeight);
     /// leave two fields free!
-#define SPACE 2		/// Space arround buildings
+#define SPACE 2		/// Space around buildings
     x -= type->TileWidth + SPACE;	// this should correct it
     y -= type->TileHeight + SPACE - 1;
     addx += type->TileWidth + SPACE + 1;
@@ -540,7 +539,7 @@ global int AiNearHall(const Unit * hall, const Unit * worker,
 #undef SPACE
     state = 0;
     end = y + addy - 1;
-    for (;;) {				// test rectangles arround the hall
+    for (;;) {				// test rectangles around the hall
 	switch (state) {
 	case 0:
 	    if (y++ == end) {

@@ -10,12 +10,11 @@
 //
 /**@name ccl_ui.c	-	The ui ccl functions. */
 //
-//	(c) Copyright 1999-2001 by Lutz Sammer
+//	(c) Copyright 1999-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1442,6 +1441,36 @@ local SCM CclSetHoldClickDelay(SCM delay)
 }
 
 /**
+**	Set selection style.
+**
+**	@param style	New style
+**	@return		Old style
+*/
+local SCM CclSetSelectionStyle(SCM style)
+{
+    SCM old;
+
+    old=NIL;
+
+    if( !gh_null_p(style) ) {
+	if( gh_eq_p(style,gh_symbol2scm("rectangle")) ) {
+	    DrawSelection=DrawSelectionRectangle;
+	} else if( gh_eq_p(style,gh_symbol2scm("alpha-rectangle")) ) {
+	    DrawSelection=DrawSelectionRectangleWithTrans;
+	} else if( gh_eq_p(style,gh_symbol2scm("circle")) ) {
+	    DrawSelection=DrawSelectionCircle;
+	} else if( gh_eq_p(style,gh_symbol2scm("alpha-circle")) ) {
+	    DrawSelection=DrawSelectionCircleWithTrans;
+	} else {
+	    errl("Unsupported selection style",style);
+	}
+    } else {
+	DrawSelection=DrawSelectionNone;
+    }
+    return old;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -1484,6 +1513,11 @@ global void UserInterfaceCclRegister(void)
     //
     gh_new_procedure1_0("set-double-click-delay!",CclSetDoubleClickDelay);
     gh_new_procedure1_0("set-hold-click-delay!",CclSetHoldClickDelay);
+
+    //
+    //	Look and feel of units
+    //
+    gh_new_procedure1_0("set-selection-style!",CclSetSelectionStyle);
 }
 
 //@}
