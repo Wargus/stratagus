@@ -51,7 +51,7 @@
 --		Declaration
 ----------------------------------------------------------------------------*/
 
-#define MAD_INBUF_SIZE 32768
+#define MAD_INBUF_SIZE 65536
 
 /**
 **		Private mp3 data structure to handle mp3 streaming.
@@ -122,7 +122,9 @@ local enum mad_flow MAD_write(void* user,
 	int j;
 	int n;
 	void *dest;
-	char *buf;
+	short *buf;
+	int s;
+	int comp;
 
 	DebugLevel3Fn("%d channels %d samples\n" _C_ channels _C_ n);
 
@@ -136,61 +138,35 @@ local enum mad_flow MAD_write(void* user,
 		sample->SampleSize = 16;
 	}
 
-	i = n * pcm->channels * 2;
+	comp = n * pcm->channels * 2;
 
-	buf = malloc(i);
+	buf = malloc(comp);
 
-        // we need to sew back channels together
         for (i = 0; i < n; ++i) {
                 for (j = 0; j < sample->Channels; ++j) {
-                        buf[i * 2 * sample->Channels + j * 2] = ((const char*)pcm->samples[j])[i * 2 * sample->Channels];
-                        buf[i * 2 * sample->Channels + j * 2 + 1] = ((const char*)pcm->samples[j])[i * 2 * sample->Channels + 1];
+			s = pcm->samples[j][i];
+			// round
+			s += (1L << (MAD_F_FRACBITS - 16));
+			// clip
+			if (s >= MAD_F_ONE) {
+				s = MAD_F_ONE - 1;
+			} else if (s < -MAD_F_ONE) {
+				s = -MAD_F_ONE;
+			}
+			// quantize
+			s >>= (MAD_F_FRACBITS + 1 - 16);			
+                        buf[i * sample->Channels + j] = s;
                 }
         }
 
-	i = n * pcm->channels * 2;
-
-	dest = sample->Buffer + sample->Pos + sample->Len;
-        i = ConvertToStereo32(buf, dest, sample->Frequency,
-                sample->SampleSize / 8, sample->Channels, i);
+	dest = (char*)sample->Buffer + sample->Pos + sample->Len;
+        i = ConvertToStereo32((char*)buf, dest, sample->Frequency,
+                sample->SampleSize / 8, sample->Channels, comp);
         sample->Len += i;
 
 	free(buf);
 
 	return MAD_FLOW_CONTINUE;
-/*
-	i = n * channels * 2;
-
-	((MyUser*)user)->Sample = sample =
-		realloc(sample, sizeof(*sample) + sample->Length + i);
-	if (!sample) {
-		fprintf(stderr, "Out of memory!\n");
-		CLclose(((MyUser*) user)->File);
-		ExitFatal(-1);
-	}
-	p = (short*)(sample->Data + sample->Length);
-	sample->Length += i;
-
-	for (i = 0; i < n; ++i) {
-		for (c = 0; c < channels; ++c) {
-			mad_fixed_t b;
-
-			b = pcm->samples[c][i];
-			// round
-			b += (1L << (MAD_F_FRACBITS - 16));
-			// clip
-			if (b >= MAD_F_ONE) {
-				b = MAD_F_ONE - 1;
-			} else if (b < -MAD_F_ONE) {
-				b = -MAD_F_ONE;
-			}
-			// quantize
-			*p++ = b >> (MAD_F_FRACBITS + 1 - 16);
-		}
-	}
-
-	return MAD_FLOW_CONTINUE;
-*/
 }
 
 /**
@@ -386,7 +362,7 @@ local const SampleType Mp3StreamSampleType = {
 */
 local int Mp3Read(Sample* sample, void* buf, int len)
 {
-	if (len > sample->Len) {			// Not enough data
+	if (len > sample->Len) {
 		len = sample->Len;
 	}
 
