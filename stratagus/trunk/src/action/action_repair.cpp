@@ -59,18 +59,18 @@
 **	@param unit	Unit, for that the repair animation is played.
 **	@param repair	Repair animation.
 */
-local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
+local void DoActionRepairGeneric(Unit* unit, const Animation* repair)
 {
     int flags;
 
-    flags=UnitShowAnimation(unit,repair);
+    flags = UnitShowAnimation(unit, repair);
 
 #ifdef WITH_SOUND
-    if( (flags&AnimationSound) ) {
-	if( GameSounds.Repair.Sound==(void*)-1 ) {
-	    PlayUnitSound(unit,VoiceAttacking);
+    if ((flags & AnimationSound)) {
+	if (GameSounds.Repair.Sound == (void*)-1) {
+	    PlayUnitSound(unit, VoiceAttacking);
 	} else {
-	    PlayUnitSound(unit,VoiceRepair);
+	    PlayUnitSound(unit, VoiceRepair);
 	}
     }
 #endif
@@ -95,21 +95,21 @@ local void RepairUnit(Unit* unit, Unit* goal)
 
     player = unit->Player;
 
-    if (goal->Orders[0].Action!=UnitActionBuilded||(!goal->Type->BuilderOutside)) {
+    if (goal->Orders[0].Action != UnitActionBuilded || (!goal->Type->BuilderOutside)) {
 	//
 	//  Calculate the repair costs.
 	//
 	DebugCheck(!goal->Stats->HitPoints);
-
 
 	//
 	//  Check if enough resources are available
 	//
 	for (i = 1; i < MaxCosts; ++i) {
 	    if (player->Resources[i] < goal->Type->RepairCosts[i]) {
-		snprintf(buf,100,"We need more %s for repair!",DefaultResourceNames[i]);
-		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,buf);
-		if( player->Ai ) {
+		snprintf(buf, 100, "We need more %s for repair!",
+		    DefaultResourceNames[i]);
+		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y, buf);
+		if (player->Ai) {
 		    // FIXME: call back to AI?
 		    RefsDebugCheck(!goal->Refs);
 		    if (!--goal->Refs) {
@@ -137,25 +137,25 @@ local void RepairUnit(Unit* unit, Unit* goal)
     //
     if (goal->Type->BuilderOutside) {
 	//  hp is the current damage taken by the unit.
-	hp=(goal->Data.Builded.Progress*goal->Stats->HitPoints)/
-		(goal->Type->Stats->Costs[TimeCost]*600)-goal->HP;
+	hp = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
+	    (goal->Type->Stats->Costs[TimeCost] * 600) - goal->HP;
 	//
 	//  Calculate the length of the attack (repair) anim.
 	//
-	animlength=0;
-	for (anim=unit->Type->Animations->Attack;!(anim->Flags&AnimationReset);anim++) {
-	    animlength+=anim->Sleep;
+	animlength = 0;
+	for (anim = unit->Type->Animations->Attack; !(anim->Flags & AnimationReset); ++anim) {
+	    animlength += anim->Sleep;
 	}
 
 	DebugLevel3("Repair animation is %d cycles long\n" _C_ animlength);
 	// FIXME: implement this below:
 	//unit->Data.Builded.Worker->Type->BuilderSpeedFactor;
-	goal->Data.Builded.Progress+=100*animlength*SpeedBuild;
+	goal->Data.Builded.Progress += 100 * animlength * SpeedBuild;
 	//  Keep the same level of damage while increasing HP.
-	goal->HP=(goal->Data.Builded.Progress*goal->Stats->HitPoints)/
-		(goal->Type->Stats->Costs[TimeCost]*600)-hp;
-	if (goal->HP>goal->Stats->HitPoints) {
-	    goal->HP=goal->Stats->HitPoints;
+	goal->HP = (goal->Data.Builded.Progress * goal->Stats->HitPoints) /
+	    (goal->Type->Stats->Costs[TimeCost] * 600) - hp;
+	if (goal->HP > goal->Stats->HitPoints) {
+	    goal->HP = goal->Stats->HitPoints;
 	}
 	//  HandleActionBuilded will deal with most stuff.
     } else {
@@ -180,10 +180,10 @@ local void RepairUnit(Unit* unit, Unit* goal)
 */
 local int AnimateActionRepair(Unit* unit)
 {
-    if( unit->Type->Animations ) {
-	DebugCheck( !unit->Type->Animations->Attack );
+    if (unit->Type->Animations) {
+	DebugCheck(!unit->Type->Animations->Attack);
 	// FIXME: A seperate repair animation would be nice?
-	DoActionRepairGeneric(unit,unit->Type->Animations->Attack);
+	DoActionRepairGeneric(unit, unit->Type->Animations->Attack);
     }
 
     return 0;
@@ -199,10 +199,10 @@ global void HandleActionRepair(Unit* unit)
     Unit* goal;
     int err;
 
-    switch( unit->SubAction ) {
+    switch( unit->SubAction) {
 	case 0:
 	    NewResetPath(unit);
-	    unit->SubAction=1;
+	    unit->SubAction = 1;
 	    // FALL THROUGH
 	//
 	//	Move near to target.
@@ -210,77 +210,77 @@ global void HandleActionRepair(Unit* unit)
 	case 1:
 	    // FIXME: RESET FIRST!! Why? We move first and than check if
 	    // something is in sight.
-	    err=DoActionMove(unit);
-	    if( unit->Reset ) {
+	    err = DoActionMove(unit);
+	    if (unit->Reset) {
 		//
 		//	No goal: if meeting damaged building repair it.
 		//
-		goal=unit->Orders[0].Goal;
+		goal = unit->Orders[0].Goal;
 
 		//
 		//	Target is dead, choose new one.
 		//
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
-		if( goal ) {
-		    if( goal->Destroyed ) {
+		if (goal) {
+		    if (goal->Destroyed) {
 			DebugLevel0Fn("destroyed unit\n");
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
-			RefsDebugCheck( !goal->Refs );
-			if( !--goal->Refs ) {
+			unit->Orders[0].X = goal->X;
+			unit->Orders[0].Y = goal->Y;
+			RefsDebugCheck(!goal->Refs);
+			if (!--goal->Refs) {
 			    ReleaseUnit(goal);
 			}
 			// FIXME: should I clear this here?
-			unit->Orders[0].Goal=goal=NULL;
+			unit->Orders[0].Goal = goal = NULL;
 			NewResetPath(unit);
-		    } else if( !goal->HP
-				|| goal->Orders[0].Action==UnitActionDie
-				|| goal->HP > goal->Stats->HitPoints ) {
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
-			RefsDebugCheck( !goal->Refs );
+		    } else if (!goal->HP ||
+			    goal->Orders[0].Action == UnitActionDie ||
+			    goal->HP > goal->Stats->HitPoints) {
+			unit->Orders[0].X = goal->X;
+			unit->Orders[0].Y = goal->Y;
+			RefsDebugCheck(!goal->Refs);
 			--goal->Refs;
-			RefsDebugCheck( !goal->Refs );
-			unit->Orders[0].Goal=goal=NULL;
+			RefsDebugCheck(!goal->Refs);
+			unit->Orders[0].Goal = goal = NULL;
 			// FIXME: should I clear this here?
 			NewResetPath(unit);
 		    }
-		} else if ( unit->Player->AiEnabled ) {
+		} else if (unit->Player->AiEnabled) {
 		    // Ai players workers should stop if target is killed
-		    err=-1;
+		    err = -1;
 		}
 
 		//
 		//	Have reached target? FIXME: could use return value
 		//
-		if(goal&&MapDistanceBetweenUnits(unit,goal)<=unit->Type->RepairRange
-			&&goal->HP<goal->Type->Stats->HitPoints) {
-		    unit->State=0;
-		    unit->SubAction=2;
-		    unit->Reset=1;
+		if(goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
+			goal->HP < goal->Type->Stats->HitPoints) {
+		    unit->State = 0;
+		    unit->SubAction = 2;
+		    unit->Reset = 1;
 		    UnitHeadingFromDeltaXY(unit,
-			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
-			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
+			goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
+			goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
 		    // FIXME: only if heading changes
 		    CheckUnitToBeDrawn(unit);
-		} else if( err<0 ) {
-		    if( goal ) {		// release reference
-			RefsDebugCheck( !goal->Refs );
+		} else if (err < 0) {
+		    if (goal) {		// release reference
+			RefsDebugCheck(!goal->Refs);
 			goal->Refs--;
-			RefsDebugCheck( !goal->Refs );
-			unit->Orders[0].Goal=NoUnitP;
+			RefsDebugCheck(!goal->Refs);
+			unit->Orders[0].Goal = NoUnitP;
 		    }
-		    unit->Orders[0].Action=UnitActionStill;
-		    unit->State=unit->SubAction=0;
-		    if( unit->Selected ) {	// update display for new action
+		    unit->Orders[0].Action = UnitActionStill;
+		    unit->State = unit->SubAction = 0;
+		    if (unit->Selected) {	// update display for new action
 			SelectedUnitChanged();
 		    }
 		    return;
 		}
 
 		// FIXME: Should be it already?
-		DebugCheck( unit->Orders[0].Action!=UnitActionRepair );
+		DebugCheck(unit->Orders[0].Action != UnitActionRepair);
 	    }
 	    break;
 
@@ -289,53 +289,53 @@ global void HandleActionRepair(Unit* unit)
 	//
 	case 2:
 	    AnimateActionRepair(unit);
-	    if( unit->Reset ) {
-		goal=unit->Orders[0].Goal;
+	    if (unit->Reset) {
+		goal = unit->Orders[0].Goal;
 
 		//
 		//	Target is dead, choose new one.
 		//
 		// Check if goal is correct unit.
 		// FIXME: should I do a function for this?
-		if( goal ) {
-		    if( goal->Destroyed ) {
+		if (goal) {
+		    if (goal->Destroyed) {
 			DebugLevel0Fn("destroyed unit\n");
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
-			RefsDebugCheck( !goal->Refs );
-			if( !--goal->Refs ) {
+			unit->Orders[0].X = goal->X;
+			unit->Orders[0].Y = goal->Y;
+			RefsDebugCheck(!goal->Refs);
+			if (!--goal->Refs) {
 			    ReleaseUnit(goal);
 			}
 			// FIXME: should I clear this here?
-			unit->Orders[0].Goal=goal=NULL;
+			unit->Orders[0].Goal = goal = NULL;
 			NewResetPath(unit);
-		    } else if( !goal->HP
-				|| goal->Orders[0].Action==UnitActionDie ) {
+		    } else if (!goal->HP ||
+			    goal->Orders[0].Action == UnitActionDie) {
 			// FIXME: should I clear this here?
-			unit->Orders[0].X=goal->X;
-			unit->Orders[0].Y=goal->Y;
-			unit->Orders[0].Goal=goal=NULL;
+			unit->Orders[0].X = goal->X;
+			unit->Orders[0].Y = goal->Y;
+			unit->Orders[0].Goal = goal = NULL;
 			NewResetPath(unit);
 		    }
 		}
-		if( goal ) {
-		    RepairUnit(unit,goal);
-		    goal=unit->Orders[0].Goal;
+		if (goal) {
+		    RepairUnit(unit, goal);
+		    goal = unit->Orders[0].Goal;
 		}
 
 		//
 		//	Target is fine, choose new one.
 		//
-		if( !goal || goal->HP >= goal->Stats->HitPoints ) {
-		    if( goal ) {		// release reference
-			RefsDebugCheck( !goal->Refs );
+		if (!goal || goal->HP >= goal->Stats->HitPoints) {
+		    if (goal) {		// release reference
+			RefsDebugCheck(!goal->Refs);
 			goal->Refs--;
-			RefsDebugCheck( !goal->Refs );
-			unit->Orders[0].Goal=NULL;
+			RefsDebugCheck(!goal->Refs);
+			unit->Orders[0].Goal = NULL;
 		    }
-                    unit->Orders[0].Action=UnitActionStill;
-		    unit->SubAction=unit->State=0;
-		    if( unit->Selected ) {	// update display for new action
+                    unit->Orders[0].Action = UnitActionStill;
+		    unit->SubAction = unit->State = 0;
+		    if (unit->Selected) {	// update display for new action
 			SelectedUnitChanged();
 		    }
                     return;
