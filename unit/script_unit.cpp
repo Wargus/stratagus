@@ -561,10 +561,17 @@ local SCM CclUnit(SCM list)
 	    }
 #endif
 #ifdef NEW_FOW
-	} else if( gh_eq_p(value,gh_symbol2scm("host")) ) {
-	    //Plus one, so we can test for null, unit num can be 0.
-	    unit->Host=(Unit*)(gh_scm2int(gh_car(list))+1);
+	} else if( gh_eq_p(value,gh_symbol2scm("currentsightrange")) ) {
+	    unit->CurrentSightRange=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("host")) ) {
+            unit->Host=UnitSlots[gh_scm2int(gh_car(list))];
+	    list=gh_cdr(list);
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    MapMarkSight(player,gh_scm2int(gh_car(value)),
+				gh_scm2int(gh_cadr(value)),
+				unit->CurrentSightRange);
 #endif    
 	} else if( gh_eq_p(value,gh_symbol2scm("tile")) ) {
 	    value=gh_car(list);

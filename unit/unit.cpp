@@ -3849,6 +3849,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
     fprintf(file,"'direction %d\n  ",unit->Direction);
     fprintf(file,"'attacked %d\n ",unit->Attacked);
+#ifdef NEW_FOW
+    fprintf(file," 'currentsightrange %d",unit->CurrentSightRange);
+#endif
     if( unit->Burning ) {
 	fprintf(file," 'burning");
     }
@@ -3863,7 +3866,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
     }
 #ifdef NEW_FOW
     if( unit->Host ) {
-	fprintf(file," 'host %d",UnitNumber(unit->Host));
+	fprintf(file," 'host %d '(%d %d)",UnitNumber(unit->Host),
+		unit->Host->X+unit->Host->Type->TileWidth/2,
+		unit->Host->Y+unit->Host->Type->TileHeight/2);
     }
 #endif
     fprintf(file," 'visible \"");

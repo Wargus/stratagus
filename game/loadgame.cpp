@@ -226,20 +226,6 @@ global void LoadGame(char* filename)
     InitModules();
     LoadModules();
 
-#ifdef NEW_FOW
-    //FIXME: Hack to get the host pointer correct
-    //FIXME: Look through all units
-    for( i=0; i < MAX_UNIT_SLOTS; ++i ) {
-	if (Units[i] && Units[i]->Host) {
-	    //Moves from Unit number to ingame pointer
-	    Units[i]->Host = Units[(unsigned int)Units[i]->Host-1];
-	    Units[i]->CurrentSightRange=Units[i]->Host->Type->Stats->SightRange;
-	    MapMarkSight(Units[i]->Player,Units[i]->Host->X+Units[i]->Host->Type->TileWidth/2,
-				Units[i]->Host->Y+Units[i]->Host->Type->TileHeight/2,
-				Units[i]->CurrentSightRange);
-	}
-    }
-#endif
     GameCycle=game_cycle;
     //GameCursor=TheUI.Point.Cursor;	// FIXME: just a default.
     GameCursor=CursorTypeByIdent("cursor-point");	// TheUI not cleaned
