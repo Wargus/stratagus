@@ -345,19 +345,22 @@ extern int AnyMapAreaVisibleInViewport(const Viewport*, int , int , int , int);
 //
 // in map_fog.c
 //
+/// Function to (un)mark the vision table.
+typedef void MapMarkerFunc(const Player*, int x, int y);
+
 	/// Filter map flags through fog
 extern int MapFogFilterFlags(Player* player, int x, int y, int mask);
 	/// Mark a tile for normal sight
-extern void MapMarkTileSight(const Player* player, int x, int y);
+extern MapMarkerFunc MapMarkTileSight;
 	/// Unmark a tile for normal sight
-extern void MapUnmarkTileSight(const Player* player, int x, int y);
+extern MapMarkerFunc MapUnmarkTileSight;
 	/// Mark a tile for cloak detection
-extern void MapMarkTileDetectCloak(const Player* player,int x,int y);
+extern MapMarkerFunc MapMarkTileDetectCloak;
 	/// Unmark a tile for cloak detection
-extern void MapUnmarkTileDetectCloak(const Player* player,int x,int y);
+extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 	/// Mark sight changes
-extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*, int, int));
+extern void MapSight(const Player* player, int x, int y, int w, int h, int range, MapMarkerFunc *marker);
 	/// Find if a tile is visible (With shared vision)
 extern unsigned char IsTileVisible(const Player* player, int x, int y);
 	/// Mark tiles with fog of war to be redrawn
@@ -483,6 +486,13 @@ extern void PreprocessMap(void);
 	/// Set wall on field
 extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 
+// in unit.c
+
+/// Mark on vision table the Sight of the unit.
+void MapMarkUnitSight(Unit* unit);
+/// Unmark on vision table the Sight of the unit.
+void MapUnmarkUnitSight(Unit* unit);
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -494,30 +504,6 @@ extern void MapSetWall(unsigned x, unsigned y, int humanwall);
 #define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
 #define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
 
-#define MapMarkUnitSight(unit) \
-{ \
-	MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
-			(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileSight); \
-	if (unit->Type->DetectCloak) { \
-		MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
-				(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapMarkTileDetectCloak); \
-	}\
-}
-
-#define MapUnmarkUnitSight(unit) \
-{ \
-	MapSight((unit)->Player,(unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
-			(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight); \
-	if (unit->Type->DetectCloak) { \
-		MapSight((unit)->Player, (unit)->X,(unit)->Y, (unit)->Type->TileWidth,\
-				(unit)->Type->TileHeight, (unit)->CurrentSightRange, MapUnmarkTileDetectCloak); \
-	}\
-}
-
-#define MapMarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
-	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapMarkTileSight)
-#define MapUnmarkUnitOnBoardSight(unit,host) MapSight((unit)->Player,(host)->X,(host)->Y, \
-	(host)->Type->TileWidth,(host)->Type->TileHeight,(unit)->CurrentSightRange,MapUnmarkTileSight)
 	/// Check if a field for the user is explored
 #define IsMapFieldExplored(player,x,y) \
 	(IsTileVisible((player),(x),(y)))
