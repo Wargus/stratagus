@@ -1390,7 +1390,7 @@ normkey:
 				mi->d.vslider.cflags |= MI_CFLAGS_UP;
 			    }
 			    if (mi->d.vslider.action) {
-				(*mi->d.vslider.action)(mi, 2);		// 0 indicates key down
+				(*mi->d.vslider.action)(mi, 2);
 			    }
 			    MustRedraw |= RedrawMenu;
 			    break;
@@ -1400,19 +1400,26 @@ normkey:
 		}
 	    }
 	    break;
-	case KeyCodeLeft: case KeyCodeRight:
+	case KeyCodeLeft:
+	case KeyCodeRight:
 	    if (MenuButtonCurSel != -1) {
 		mi = menu->Items + MenuButtonCurSel;
 		if (!(mi->flags & MenuButtonClicked)) {
 		    switch (mi->mitype) {
 			case MI_TYPE_HSLIDER:
 			    if (key == KeyCodeLeft) {
-				mi->d.hslider.cflags |= MI_CFLAGS_LEFT;
+				mi->d.hslider.percent -= 10;
+				if (mi->d.hslider.percent < 0) {
+				    mi->d.hslider.percent = 0;
+				}
 			    } else {
-				mi->d.hslider.cflags |= MI_CFLAGS_RIGHT;
+				mi->d.hslider.percent += 10;
+				if (mi->d.hslider.percent > 100) {
+				    mi->d.hslider.percent = 100;
+				}
 			    }
 			    if (mi->d.hslider.action) {
-				(*mi->d.hslider.action)(mi, 2);
+				(*mi->d.hslider.action)(mi);
 			    }
 			    MustRedraw |= RedrawMenu;
 			    break;
@@ -1423,7 +1430,7 @@ normkey:
 	    }
 	    break;
 	case 9:				// TAB			// FIXME: Add Shift-TAB
-	    if (KeyModifiers&ModifierAlt) {
+	    if (KeyModifiers & ModifierAlt) {
 		break;
 	    }
 	    if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].flags & MenuButtonClicked)) {
@@ -1844,8 +1851,12 @@ local void MenuHandleMouseMove(int x, int y)
 				mi->d.hslider.curper = 100;
 			    }
 			}
-			if (mi->d.hslider.action) {
-			    (*mi->d.hslider.action)(mi, 1);		// 1 indicates move
+			if ((mi->d.hslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
+			    mi->d.hslider.percent = mi->d.hslider.curper;
+			    if (mi->d.hslider.action) {
+				(*mi->d.hslider.action)(mi);
+			    }
+			    MustRedraw |= RedrawMenu;
 			}
 			break;
 		    }
@@ -1965,8 +1976,17 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    break;
 		case MI_TYPE_HSLIDER:
 		    mi->d.hslider.cflags = mi->d.hslider.cursel;
+		    if (mi->d.hslider.cflags & MI_CFLAGS_RIGHT) {
+			mi->d.hslider.percent += 10;
+			if (mi->d.hslider.percent > 100)
+			    mi->d.hslider.percent = 100;
+		    } else if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
+			mi->d.hslider.percent -= 10;
+			if (mi->d.hslider.percent < 0)
+			    mi->d.hslider.percent = 0;
+		    }
 		    if (mi->d.hslider.action) {
-			(*mi->d.hslider.action)(mi, 0);		// 0 indicates down
+			(*mi->d.hslider.action)(mi);
 		    }
 		    break;
 		case MI_TYPE_PULLDOWN:
@@ -1993,7 +2013,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	}
     }
 
-    if (MouseButtons&MiddleButton) {
+    if (MouseButtons & MiddleButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->Items + MenuButtonUnderCursor;
 	    if (!(mi->flags & MenuButtonClicked)) {
@@ -2012,7 +2032,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     }
 
     // mousewheel up
-    if (MouseButtons&UpButton) {
+    if (MouseButtons & UpButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->Items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
@@ -2045,9 +2065,12 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    MustRedraw |= RedrawMenu;
 		    break;
 		case MI_TYPE_HSLIDER:
-		    mi->d.hslider.cflags |= MI_CFLAGS_RIGHT;
+		    mi->d.hslider.percent -= 10;
+		    if (mi->d.hslider.percent < 0) {
+			mi->d.hslider.percent = 0;
+		    }
 		    if (mi->d.hslider.action) {
-			(*mi->d.hslider.action)(mi, 2);
+			(*mi->d.hslider.action)(mi);
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;
@@ -2067,7 +2090,7 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
     }
 
     // mousewheel down
-    if (MouseButtons&DownButton) {
+    if (MouseButtons & DownButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->Items + MenuButtonUnderCursor;
 	    switch (mi->mitype) {
@@ -2098,9 +2121,12 @@ local void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 		    MustRedraw |= RedrawMenu;
 		    break;
 		case MI_TYPE_HSLIDER:
-		    mi->d.hslider.cflags |= MI_CFLAGS_LEFT;
+		    mi->d.hslider.percent += 10;
+		    if (mi->d.hslider.percent > 100) {
+			mi->d.hslider.percent = 100;
+		    }
 		    if (mi->d.hslider.action) {
-			(*mi->d.hslider.action)(mi, 2);
+			(*mi->d.hslider.action)(mi);
 		    }
 		    MustRedraw |= RedrawMenu;
 		    break;

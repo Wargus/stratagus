@@ -182,7 +182,7 @@ typedef struct _menuitem_hslider_ {
     unsigned cflags;
     int xsize;		// x-size of slider, not including buttons
     int ysize;		// y-size of slider, not including buttons
-    void (*action)(struct _menuitem_ *, int);
+    void (*action)(struct _menuitem_ *);
     int defper;
     int percent;	// percent of the way to right (0 to 100)
     int curper;		/* used in mouse-move state */
