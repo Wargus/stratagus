@@ -132,6 +132,8 @@ local void SaveSelectLBAction(Menuitem *mi, int i);
 local void SaveSelectVSAction(Menuitem *mi, int i);
 local void SaveSelectOk(void);
 
+local void DeleteFile(void);
+
 local void JoinNetGameMenu(void);
 local void CreateNetGameMenu(void);
 
@@ -1441,7 +1443,7 @@ local void InitSaveGameMenuItems() {
 			   (void *)SaveSelectLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveSelectVSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, EndMenu, 'd'};
+    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, DeleteFile, 'd'};
     MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
     SaveGameMenuItems[0].d.text    = i0;
     SaveGameMenuItems[1].d.input   = i1;
@@ -1450,6 +1452,22 @@ local void InitSaveGameMenuItems() {
     SaveGameMenuItems[4].d.button  = i4;
     SaveGameMenuItems[5].d.button  = i5;
     SaveGameMenuItems[6].d.button  = i6;
+}
+
+local Menuitem ConfirmSaveMenuItems[] = {
+    { MI_TYPE_TEXT, 384/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+};
+local void InitConfirmSaveMenuItems() {
+    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    ConfirmSaveMenuItems[0].d.text = i0;
+}
+
+local Menuitem ConfirmDeleteMenuItems[] = {
+    { MI_TYPE_TEXT, 384/2, 11, 0, GameFont, NULL, NULL, {{NULL, 0}} },
+};
+local void InitConfirmDeleteMenuItems() {
+    MenuitemText    i0 = { "Save Game", MI_TFLAGS_CENTERED};
+    ConfirmDeleteMenuItems[0].d.text = i0;
 }
 
 /**
@@ -1718,7 +1736,26 @@ global Menu Menus[] = {
 	SaveGameMenuItems,
 	NULL,
     },
-
+    {
+	// Confirm Save Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	2, 4,
+	ConfirmSaveMenuItems,
+	NULL,
+    },
+    {
+	// Confirm Delete Menu
+	(640-288)/2,
+	260,
+	288, 128,
+	ImagePanel4,
+	1, 1,
+	ConfirmDeleteMenuItems,
+	NULL,
+    },
 };
 
 /*----------------------------------------------------------------------------
@@ -2553,6 +2590,11 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
 	    break;
     }
     TypedFileName = 0;
+}
+
+local void DeleteFile(void)
+{
+    ProcessMenu(MENU_CONFIRM_DELETE, 1);
 }
 
 global void GameMenuLoad(void)
