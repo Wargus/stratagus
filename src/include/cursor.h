@@ -167,6 +167,8 @@ extern int CursorX;			/// cursor position on screen X
 extern int CursorY;			/// cursor position on screen Y
 extern int CursorStartX;		/// rectangle started on screen X
 extern int CursorStartY;		/// rectangle started on screen Y
+extern int CursorStartScrMapX;	/// the same in screen map coordinate system
+extern int CursorStartScrMapY;	/// the same in screen map coordinate system
 
 /*----------------------------------------------------------------------------
 --	Functions
