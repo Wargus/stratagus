@@ -249,7 +249,7 @@ local int AiFindFreeWorkers(Unit ** table)
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
 	if (unit->Orders[0].Action != UnitActionBuild
-		&& (unit->OrderCount==2
+		&& (unit->OrderCount==1
 		    || unit->Orders[1].Action != UnitActionBuild) ) {
 	    table[num++] = unit;
 	}
