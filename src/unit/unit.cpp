@@ -543,7 +543,7 @@ global void PlaceUnit(Unit* unit,int x,int y)
 				,unit->CurrentSightRange);
 	}
 	unit->Next = NULL;
-	unit->CurrentSightRange=unit->Type->Stats->SightRange;
+	unit->CurrentSightRange=unit->Stats->SightRange;
 	MapMarkSight(unit->Player,x,y,unit->CurrentSightRange);
 #else
 	if( unit->Player==ThisPlayer || 
