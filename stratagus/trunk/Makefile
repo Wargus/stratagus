@@ -151,7 +151,11 @@ distclean:	clean
 
 configure:
 	autoconf
-	./configure
+	./configure --enable-static
+
+configuregl:
+	autoconf
+	./configure --enable-opengl
 
 lockver:
 	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
@@ -243,6 +247,20 @@ bin-dist: all
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
+bin-dist-gl: all
+	$(RM) $(DISTLIST)
+	echo $(DOCS) >>$(DISTLIST)
+	echo stratagus$(EXE) >>$(DISTLIST)
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 777 $(distdir)
+	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
+	chmod -R a+rX $(distdir)
+	strip -s -R .comment $(distdir)/stratagus$(EXE)
+	tar czhf stratagus-$(mydate)-linux-gl.tar.gz $(distdir)
+	$(RM) $(DISTLIST)
+	$(RM) -r $(distdir)
+
 #----------------------------------------------------------------------------
 
 win32-bin-dist2: win32
@@ -281,6 +299,9 @@ release:
 	$(MAKE) configure
 	$(MAKE) depend
 	$(MAKE) bin-dist
+	$(MAKE) configuregl
+	$(MAKE) depend
+	$(MAKE) bin-dist-gl
 	$(MAKE) win32new
 	$(MAKE) win32configure
 	$(MAKE) win32-bin-dist
