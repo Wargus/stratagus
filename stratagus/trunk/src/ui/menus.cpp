@@ -2660,7 +2660,7 @@ local void DeleteInit(Menuitem *mi __attribute__((unused)))
 local void DeleteFile(void)
 {
     char name[256];
-    strcat(name, SaveDir);
+    strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     unlink(name);
