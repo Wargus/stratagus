@@ -48,7 +48,7 @@
 #define DISTANCE_FACTOR		(0x00100000*100)
 #define INRANGE_FACTOR		(0x00010000*100)
 #define INRANGE_BONUS		(0x00100000*100)
-#define CANATTACK_BONUS		(0x00100000*100)
+#define CANATTACK_BONUS		(0x01000000*100)
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -619,7 +619,7 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	    cost-=CANATTACK_BONUS/100;
 	}
 
-	DebugLevel0Fn("%s -> %s\t%08x\n",type->Ident,dtype->Ident,cost);
+	DebugLevel3Fn("%s -> %s\t%08x\n",type->Ident,dtype->Ident,cost);
 	//
 	//	Take this target?
 	//

@@ -108,6 +108,8 @@ typedef struct _missile_ {
 ----------------------------------------------------------------------------*/
 
 extern MissileType MissileTypes[];	/// all missile types
+extern MissileType* MissileTypeSmallFire;	/// Small fire missile type
+extern MissileType* MissileTypeBigFire;		/// Big fire missile type
 
 /*----------------------------------------------------------------------------
 --	Functions

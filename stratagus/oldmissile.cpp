@@ -627,6 +627,7 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
+	    DebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -636,13 +637,17 @@ global void FireMissile(Unit* unit)
 	}
 	if( goal->Removed ) {
 	    DebugLevel3Fn("Missile-none hits removed unit!\n");
+	    DebugCheck( !goal->Refs );
 	    --goal->Refs;
+	    DebugCheck( !goal->Refs );
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
+	    DebugCheck( !goal->Refs );
 	    --goal->Refs;
+	    DebugCheck( !goal->Refs );
 	    unit->Command.Data.Move.Goal=NULL;
 	    return;
 	}
@@ -660,6 +665,7 @@ global void FireMissile(Unit* unit)
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
+	    DebugCheck( !goal->Refs );
 	    if( !--goal->Refs ) {
 		ReleaseUnit(goal);
 	    }
@@ -1123,10 +1129,12 @@ global void MissileActions(void)
 
 		    unit=missile->SourceUnit;
 		    if( unit->Destroyed || !unit->HP ) {
+			DebugCheck( !unit->Refs );
 			if( !--unit->Refs ) {
 			    ReleaseUnit(unit);
 			}
 			missile->Type=MissileFree;
+			missile->SourceUnit=NoUnitP;
 			break;
 		    }
 		    missile->Frame=0;

@@ -86,38 +86,6 @@ global void HandleActionStandGround(Unit* unit)
     }
 
 #if 0
-    //
-    //	Building:	burning FIXME: must moved to general point
-    //
-    if( type->Building ) {
-	if( unit->HP ) {
-	    int f;
-
-	    f=(100*unit->HP)/unit->Stats->HitPoints;
-	    if( f>75) {
-		; // No fire for this
-	    } else if( f>50 ) {
-		MakeMissile(MissileTypeByIdent("missile-small-fire")
-			,unit->X*TileSizeX
-				+(type->TileWidth*TileSizeX)/2
-			,unit->Y*TileSizeY
-				+(type->TileHeight*TileSizeY)/2
-				-TileSizeY
-			,0,0);
-	    } else {
-		MakeMissile(MissileTypeByIdent("missile-big-fire")
-			,unit->X*TileSizeX
-				+(type->TileWidth*TileSizeX)/2
-			,unit->Y*TileSizeY
-				+(type->TileHeight*TileSizeY)/2
-				-TileSizeY
-			,0,0);
-	    }
-	}
-    }
-#endif
-
-#if 0
     // JOHNS: critters removed here
     //
     //	Critters:	are moving random around.

@@ -129,12 +129,14 @@ local void MoveToTarget(Unit* unit)
 	    // FIXME: Should be done by Action Move???????
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
+		DebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 		--goal->Refs;
+		DebugCheck( !goal->Refs );
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
@@ -171,6 +173,7 @@ local void MoveToTarget(Unit* unit)
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
 		goal->Refs--;
+		DebugCheck( !goal->Refs );
 		temp->Refs++;
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.
@@ -249,6 +252,7 @@ local void AttackTarget(Unit* unit)
 	if( goal ) {
 	    if( goal->Destroyed ) {
 		DebugLevel0Fn("destroyed unit\n");
+		DebugCheck( !goal->Refs );
 		if( !--goal->Refs ) {
 		    ReleaseUnit(goal);
 		}
@@ -256,6 +260,7 @@ local void AttackTarget(Unit* unit)
 	    } else if( !goal->HP || goal->Command.Action==UnitActionDie ) {
 		// FIXME: goal->Removed???
 		--goal->Refs;
+		DebugCheck( !goal->Refs );
 		unit->Command.Data.Move.Goal=goal=NoUnitP;
 	    }
 	}
@@ -295,6 +300,7 @@ local void AttackTarget(Unit* unit)
 	    temp=AttackUnitsInReactRange(unit);
 	    if( temp && temp->Type->Priority>goal->Type->Priority ) {
 		goal->Refs--;
+		DebugCheck( !goal->Refs );
 		temp->Refs++;
 		if( unit->SavedCommand.Action==UnitActionStill ) {
 		    // Save current command to come back.

@@ -62,9 +62,11 @@ local int MoveToOilWell(Unit* unit)
 
     well=unit->Command.Data.Move.Goal;
     if( well && (well->Destroyed || !well->HP) ) {
+	DebugCheck( !well->Refs );
 	if( !--well->Refs ) {
 	    ReleaseUnit(well);
 	}
+	unit->Command.Data.Move.Goal=NoUnitP;
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
@@ -82,7 +84,10 @@ local int MoveToOilWell(Unit* unit)
 	return -1;
     }
 
+    DebugCheck( !well->Refs );
     --well->Refs;
+    DebugCheck( !well->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
 
     //
     // Activate oil-well
@@ -258,9 +263,11 @@ local int MoveToOilDepot(Unit* unit)
 
     depot=unit->Command.Data.Move.Goal;
     if( depot && (depot->Destroyed || !depot->HP) ) {
+	DebugCheck( !depot->Refs );
 	if( !--depot->Refs ) {
 	    ReleaseUnit(depot);
 	}
+	unit->Command.Data.Move.Goal=NoUnitP;
 	unit->Command.Action=UnitActionStill;
 	unit->SubAction=0;
 	return 0;
@@ -276,7 +283,10 @@ local int MoveToOilDepot(Unit* unit)
 
     DebugCheck( MapDistanceToUnit(unit->X,unit->Y,depot)!=1 );
 
+    DebugCheck( !depot->Refs );
     --depot->Refs;
+    DebugCheck( !depot->Refs );
+    unit->Command.Data.Move.Goal=NoUnitP;
 
     RemoveUnit(unit);
     unit->X=depot->X;
@@ -387,7 +397,10 @@ global void HandleActionHaulOil(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }
 		} else {
@@ -413,7 +426,10 @@ global void HandleActionHaulOil(Unit* unit)
 			unit->Command.Action=UnitActionStill;
 			unit->SubAction=0;
 			if( unit->Command.Data.Move.Goal ) {
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
 			    --unit->Command.Data.Move.Goal->Refs;
+			    DebugCheck( !unit->Command.Data.Move.Goal->Refs );
+			    unit->Command.Data.Move.Goal=NoUnitP;
 			}
 		    }
 		} else {
