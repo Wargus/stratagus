@@ -10,7 +10,8 @@
 //
 /**@name sound_server.h - The sound server header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -209,9 +210,6 @@ enum _play_audio_flags_ {
 	/// sound file descriptor, if -1 no sound available
 extern int SoundFildes;
 
-	/// Block until sound device available
-extern int WaitForSoundDevice;
-
 	/// sound volume (from 0 to MaxVolume, acts as a multiplier)
 extern int GlobalVolume;
 	/// music volume (from 0 to MaxVolume, acts as a multiplier)
@@ -234,9 +232,6 @@ extern int NextSoundRequestOut;
 extern SoundChannel Channels[MaxChannels];
 	/// Next free channel
 extern int NextFreeChannel;
-
-	/// @todo docu
-extern int SoundThreadRunning;
 
 #ifdef DEBUG
 	/// allocated memory for sound samples
@@ -280,7 +275,7 @@ extern void FreeOneChannel(int channel);
 	/// Initialize the sound card.
 extern int InitSound(void);
 	/// Initialize the sound card with SDL support.
-extern int InitSdlSound(const char* dev, int freq, int size, int wait);
+extern int InitSdlSound(int freq, int size);
 
 	/// Initialize the sound server.
 extern int InitSoundServer(void);
