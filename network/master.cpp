@@ -80,25 +80,25 @@ global int MetaInit(void)
 {
     int i; 
     char* reply;
-    int Port_Range_Min, Port_Range_Max;
-    Port_Range_Min=1234; 
-    Port_Range_Max=1244;
+    int port_range_min;
+    int port_range_max;
+
+    port_range_min = 1234; 
+    port_range_max = 1244;
     reply = NULL;
     MetaServerFildes = NetworkFildes;
-    for (i = Port_Range_Min; i < Port_Range_Max; ++i) {
+    for (i = port_range_min; i < port_range_max; ++i) {
 	MetaServerFildes = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 	if (MetaServerFildes != (Socket)-1) {
 	    if (NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT) != -1) {
 		break;
 	    }
-	    else {
-		if (i == Port_Range_Max) {
-		    return -1;
-		}
-	    }
 	}
     }
-    	
+    if (i == port_range_max) {
+	return -1;
+    }
+
     if (SendMetaCommand("Login", "") == -1) {
 	return -1;
     }
