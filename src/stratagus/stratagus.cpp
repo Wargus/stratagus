@@ -1085,7 +1085,6 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    NetPlayers = 0;
 
 	    // Start new music for menus
-#ifdef WITH_SOUND
 	    if (PlayingMusic && strcmp(CurrentMusicFile, MenuMusic)) {
 		StopMusic();
 	    }
@@ -1093,7 +1092,7 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    if (!PlayingMusic && MenuMusic) {
 		PlayMusic(MenuMusic);
 	    }
-#endif
+
 	    EnableRedraw = RedrawMenu;
 
 	    GuiGameStarted = 0;
