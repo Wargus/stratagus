@@ -75,6 +75,7 @@ local int InputIndex;		/// current index into input
 local char InputStatusLine[99];	/// Last input status line
 global char GameRunning;	/// Current running state
 global char GamePaused;		/// Current pause state
+global char GameObserve;	/// Observe mode
 global char OrdersDuringPause;	/// Allow giving orders in pause mode.
 global char SkipGameCycle;	/// Skip the next game cycle
 global char BigMapMode;		/// Show only the map
@@ -1167,8 +1168,10 @@ global void HandleKeyDown(unsigned key,unsigned keychar)
 	// If no modifier look if button bound
 	if( !(KeyModifiers&(ModifierControl|ModifierAlt
 		|ModifierSuper|ModifierHyper)) ) {
-	    if( DoButtonPanelKey(key) ) {
-		return;
+	    if( !GameObserve ) {
+		if( DoButtonPanelKey(key) ) {
+		    return;
+		}
 	    }
 	}
 	CommandKey(key);
