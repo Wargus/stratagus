@@ -27,7 +27,7 @@
 
 #include "freecraft.h"
 #include "video.h"
-#include "compression.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
