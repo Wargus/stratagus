@@ -90,6 +90,9 @@ local void MovementTypeDeleteSuperGroup (int , SuperGroup * );
 local void MovementTypeInitSuperGroups (int );
 local int  MovementTypeCheckPassability (int , unsigned short );
 local void ExpandGroup (int , SuperGroup * , RegGroup * );
+#if DEBUG
+local void PrintSummary (void);
+#endif
 
 int RegGroupsInitialize (void)
 {
