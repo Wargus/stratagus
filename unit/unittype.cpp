@@ -53,9 +53,18 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
+/**
+**	Unit-type type definition
+*/
+global const char UnitTypeType[] = "unit-type";
+
 IfDebug(
-global int NoWarningUnitType;		/// quiet ident lookup.
+global int NoWarningUnitType;		/// quiet ident lookup
 );
+
+global UnitType* UnitTypes;		/// unit-types definition
+global int NumUnitTypes;		/// number of unit-types made
+
 
 /*
 **	Next unit type are used hardcoded in the source.
@@ -79,140 +88,11 @@ global UnitType*UnitTypeHumanWall;	/// Human wall
 global UnitType*UnitTypeOrcWall;	/// Orc wall
 global UnitType*UnitTypeCritter;	/// Critter unit type pointer
 
-#if !defined(USE_CCL)
-/**
-**	Default without CCL support.
-*/
-local char* DefaultUnitTypeWcNames[] = {
-    "unit-footman",
-    "unit-grunt",
-    "unit-peasant",
-    "unit-peon",
-    "unit-ballista",
-    "unit-catapult",
-    "unit-knight",
-    "unit-ogre",
-    "unit-archer",
-    "unit-axethrower",
-    "unit-mage",
-    "unit-death-knight",
-    "unit-paladin",
-    "unit-ogre-mage",
-    "unit-dwarves",
-    "unit-goblin-sappers",
-    "unit-attack-peasant",
-    "unit-attack-peon",
-    "unit-ranger",
-    "unit-berserker",
-    "unit-alleria",
-    "unit-teron-gorefiend",
-    "unit-kurdan-and-sky-ree",
-    "unit-dentarg",
-    "unit-khadgar",
-    "unit-grom-hellscream",
-    "unit-human-oil-tanker",
-    "unit-orc-oil-tanker",
-    "unit-human-transport",
-    "unit-orc-transport",
-    "unit-elven-destroyer",
-    "unit-troll-destroyer",
-    "unit-battleship",
-    "unit-ogre-juggernaught",
-    "unit-nothing-22",
-    "unit-deathwing",
-    "unit-nothing-24",
-    "unit-nothing-25",
-    "unit-gnomish-submarine",
-    "unit-giant-turtle",
-    "unit-gnomish-flying-machine",
-    "unit-goblin-zeppelin",
-    "unit-gryphon-rider",
-    "unit-dragon",
-    "unit-turalyon",
-    "unit-eye-of-kilrogg",
-    "unit-danath",
-    "unit-korgath-bladefist",
-    "unit-nothing-30",
-    "unit-cho-gall",
-    "unit-lothar",
-    "unit-gul-dan",
-    "unit-uther-lightbringer",
-    "unit-zuljin",
-    "unit-nothing-36",
-    "unit-skeleton",
-    "unit-daemon",
-    "unit-critter",
-    "unit-farm",
-    "unit-pig-farm",
-    "unit-human-barracks",
-    "unit-orc-barracks",
-    "unit-church",
-    "unit-altar-of-storms",
-    "unit-human-watch-tower",
-    "unit-orc-watch-tower",
-    "unit-stables",
-    "unit-ogre-mound",
-    "unit-gnomish-inventor",
-    "unit-goblin-alchemist",
-    "unit-gryphon-aviary",
-    "unit-dragon-roost",
-    "unit-human-shipyard",
-    "unit-orc-shipyard",
-    "unit-town-hall",
-    "unit-great-hall",
-    "unit-elven-lumber-mill",
-    "unit-troll-lumber-mill",
-    "unit-human-foundry",
-    "unit-orc-foundry",
-    "unit-mage-tower",
-    "unit-temple-of-the-damned",
-    "unit-human-blacksmith",
-    "unit-orc-blacksmith",
-    "unit-human-refinery",
-    "unit-orc-refinery",
-    "unit-human-oil-platform",
-    "unit-orc-oil-platform",
-    "unit-keep",
-    "unit-stronghold",
-    "unit-castle",
-    "unit-fortress",
-    "unit-gold-mine",
-    "unit-oil-patch",
-    "unit-human-start-location",
-    "unit-orc-start-location",
-    "unit-human-guard-tower",
-    "unit-orc-guard-tower",
-    "unit-human-cannon-tower",
-    "unit-orc-cannon-tower",
-    "unit-circle-of-power",
-    "unit-dark-portal",
-    "unit-runestone",
-    "unit-human-wall",
-    "unit-orc-wall",
-    "unit-dead-body",
-    "unit-destroyed-1x1-place",
-    "unit-destroyed-2x2-place",
-    "unit-destroyed-3x3-place",
-    "unit-destroyed-4x4-place",
-    "unit-peasant-with-gold",
-    "unit-peon-with-gold",
-    "unit-peasant-with-wood",
-    "unit-peon-with-wood",
-    "unit-human-oil-tanker-full",
-    "unit-orc-oil-tanker-full",
-    NULL
-};
-#endif
-
 /**
 **	Mapping of W*rCr*ft number to our internal unit-type symbols.
 **	The numbers are used in puds.
 */
-global char** UnitTypeWcNames
-#if !defined(USE_CCL)
-    =DefaultUnitTypeWcNames
-#endif
-    ;
+global char** UnitTypeWcNames;
 
 /**
 **	Lookup table for unit-type names

@@ -278,35 +278,35 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("orders")) ) {
 	    sublist=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: orders\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("saved-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: saved order\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("new-order")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: new order\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("data-builded")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
-	} else if( gh_eq_p(value,gh_symbol2scm("data-reseach")) ) {
+	    DebugLevel0Fn("FIXME: builded\n");
+	} else if( gh_eq_p(value,gh_symbol2scm("data-research")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: research\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("data-upgrade-to")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: upgrade-to\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("data-train")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: train\n");
 	} else if( gh_eq_p(value,gh_symbol2scm("data-move")) ) {
 	    value=gh_car(list);
 	    list=gh_cdr(list);
-	    DebugLevel0Fn("FIXME:\n");
+	    DebugLevel0Fn("FIXME: move\n");
 	} else {
 	   // FIXME: this leaves a half initialized unit
 	   errl("Unsupported tag",value);
@@ -319,11 +319,15 @@ local SCM CclUnit(SCM list)
     if( !unit->Removed && !unit->Destroyed ) {
 	unit->Removed=1;
 	PlaceUnit(unit,unit->X,unit->Y);
+
+    //
+    //	Connect unit to position (on-board,building,in store,in deposite)
+    //
+    } else {
     }
 
     // FIXME: johns: works only for debug code.
     NewResetPath(unit);
-
     DebugLevel0Fn("FIXME: not written\n");
 
     return SCM_UNSPECIFIED;

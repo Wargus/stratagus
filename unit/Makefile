@@ -31,7 +31,7 @@ include $(TOPDIR)/Rules.make
 
 MODULE  = unit
 
-OBJS	= ut_table.$(OE) unittype.$(OE) ccl_unittype.$(OE) \
-	  upgrade.$(OE) depend.$(OE) ccl_unit.$(OE)
+OBJS	= unittype.$(OE) ccl_unittype.$(OE) upgrade.$(OE) depend.$(OE) \
+	ccl_unit.$(OE)
 
 include $(TOPDIR)/Common.mk
