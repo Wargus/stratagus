@@ -184,7 +184,7 @@ local void NetworkSendPacket(const NetworkCommandQueue *ncq)
 */
 global void InitNetwork1(void)
 {
-    int i;
+    int i, port;
 
     DebugLevel0Fn("\n");
 
@@ -209,12 +209,13 @@ global void InitNetwork1(void)
     NetworkLag *= NetworkUpdates;
 
     // Our communication port
-    NetworkFildes = NetOpenUDP(NetworkPort);
+    port = NetworkPort;
+    NetworkFildes = NetOpenUDP(port);
     if (NetworkFildes == -1) {
-	NetworkFildes = NetOpenUDP(++NetworkPort);
+	NetworkFildes = NetOpenUDP(++port);
 	if (NetworkFildes == -1) {
 	    fprintf(stderr,"NETWORK: No free ports %d-%d available, aborting\n"
-		    , NetworkPort -1, NetworkPort);
+		    , port -1, port);
 	    NetExit();		// machine dependend network exit
 	    return;
 	}
