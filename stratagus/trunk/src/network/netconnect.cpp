@@ -88,14 +88,28 @@ global void NetworkSetupArgs(void)
 /**
 **	Server Setup.
 */
-global void NetworkServerSetup(WorldMap* map)
+global void NetworkServerSetup(WorldMap *map)
 {
     int i, j, n;
     char buf[1024];
-    InitMessage* msg;
+    InitMessage *msg;
     InitMessage message;
     Acknowledge acknowledge;
     int num[PlayerMax];
+
+    // Prepare reply message:
+    message.Type = MessageInitConfig;
+    message.SubType = ICMGameFull;	/// default: reject connnection
+
+    message.FreeCraft = htonl(FreeCraftVersion);
+    message.Version = htonl(NetworkProtocolVersion);
+    message.Lag = htonl(NetworkLag);
+    message.Updates = htonl(NetworkUpdates);
+    if (map->Info) {
+	message.MapUID = htonl(map->Info->MapUID);
+    } else {
+	message.MapUID = 0L;
+    }
 
     //
     //	Wait for all clients to connect.
@@ -112,25 +126,44 @@ global void NetworkServerSetup(WorldMap* map)
 	    DebugLevel0Fn("Wrong message\n");
 	    continue;
 	}
+
+	// FIXME: ARI: Ignoring all non-supported subtypes here - add chat, client-quit, etc...
+	if (msg->SubType != ICMHello) {
+	    DebugLevel0Fn("Unsupported InitHello Subtype %d\n", (int)msg->SubType);
+	    continue;
+	}
+
 	DebugLevel0Fn("Received InitHello %d:%d(%d) from %d.%d.%d.%d:%d\n",
 		msg->Type, msg->SubType, n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 	if (ntohl(msg->FreeCraft) != FreeCraftVersion) {
 	    fprintf(stderr, "Incompatible FreeCraft version "
 			FreeCraftFormatString " <-> "
-			FreeCraftFormatString "\n"
-		    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
-		    ,FreeCraftFormatArgs(FreeCraftVersion));
-	    exit(-1);
+			FreeCraftFormatString "\n",
+		    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+		    FreeCraftFormatArgs(FreeCraftVersion));
+	    message.SubType = ICMEngineMismatch; /// FreeCraft engine version doesn't match
+	    n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &message,
+			sizeof(message));
+	    DebugLevel0Fn("Sending InitConfig Message EngineMismatch: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    continue;
+	    // exit(-1);
 	}
 
 	if (ntohl(msg->Version) != NetworkProtocolVersion) {
 	    fprintf(stderr, "Incompatible network protocol version "
 			NetworkProtocolFormatString " <-> "
-			NetworkProtocolFormatString "\n"
-		    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
-		    ,NetworkProtocolFormatArgs(NetworkProtocolVersion));
-	    exit(-1);
+			NetworkProtocolFormatString "\n",
+		    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+		    NetworkProtocolFormatArgs(NetworkProtocolVersion));
+	    message.SubType = ICMProtocolMismatch; /// Network protocol version doesn't match
+	    n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &message,
+			sizeof(message));
+	    DebugLevel0Fn("Sending InitConfig Message ProtocolMismatch: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    continue;
+	    // exit(-1);
 	}
 	n = 0;
 	if (map->Info) {
@@ -144,16 +177,22 @@ global void NetworkServerSetup(WorldMap* map)
 	}
 	if (n) {
 	    fprintf(stderr, "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
-			map->Info ? (unsigned int)map->Info->MapUID : 0, msg->MapUID);
-	    exit(-1);
+			map->Info ? (unsigned int)map->Info->MapUID : 0, ntohl(msg->MapUID));
+	    message.SubType = ICMMapUidMismatch; /// MAP Uid  doesn't match
+	    n = NetSendUDP(NetworkFildes, NetLastHost, NetLastPort, &message,
+			sizeof(message));
+	    DebugLevel0Fn("Sending InitConfig Message MapUIDMismatch: (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(NetLastHost)),ntohs(NetLastPort));
+	    continue;
+	    // exit(-1);
 	}
 
 	DebugLevel0Fn("Version=" FreeCraftFormatString
 		    ", Network=" NetworkProtocolFormatString
-		    ", Lag=%ld, Updates=%ld\n"
-	    ,FreeCraftFormatArgs((int)ntohl(msg->FreeCraft))
-	    ,NetworkProtocolFormatArgs((int)ntohl(msg->Version))
-	    ,(long)ntohl(msg->Lag),(long)ntohl(msg->Updates));
+		    ", Lag=%ld, Updates=%ld\n",
+	    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+	    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+	    (long)ntohl(msg->Lag), (long)ntohl(msg->Updates));
 
 	//
 	//	Warning: Server should control it!
@@ -214,20 +253,8 @@ global void NetworkServerSetup(WorldMap* map)
     //	Send all clients host:ports to all clients.
     //
 
-    // Prepare message:
-    message.Type = MessageInitConfig;
-    message.SubType = 0;		// Extension / menue use
-
-    message.FreeCraft = htonl(FreeCraftVersion);
-    message.Version = htonl(NetworkProtocolVersion);
-    message.Lag = htonl(NetworkLag);
-    message.Updates = htonl(NetworkUpdates);
-    if (map->Info) {
-	message.MapUID = htonl(map->Info->MapUID);
-    } else {
-	message.MapUID = 0L;
-    }
-
+    // Prepare config message:
+    message.SubType = ICMConfig;
     message.HostsCount = HostsCount + 1;
     for (i = 0; i < HostsCount; ++i) {
 	message.Hosts[i].Host = Hosts[i].Host;
@@ -261,27 +288,26 @@ global void NetworkServerSetup(WorldMap* map)
 		message.Hosts[i].Host = message.Hosts[i].Port = 0;
 		n = NetSendUDP(NetworkFildes, host, port, &message,
 			sizeof(message));
-		DebugLevel0Fn("Sending InitConfig (%d) to %d.%d.%d.%d:%d\n"
-			,n,NIPQUAD(ntohl(host)),ntohs(port));
+		DebugLevel0Fn("Sending InitConfig Message Config (%d) to %d.%d.%d.%d:%d\n",
+			n, NIPQUAD(ntohl(host)), ntohs(port));
 		message.Hosts[i].Host = host;
 		message.Hosts[i].Port = port;
 	    }
 	}
 
 	// Wait for acknowledge
-	while (j && NetSocketReady(NetworkFildes,1000)) {
-	    if( (n=NetRecvUDP(NetworkFildes, &buf, sizeof(buf)))<0 ) {
+	while (j && NetSocketReady(NetworkFildes, 1000)) {
+	    if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
 		DebugLevel0Fn("*Receive ack failed: (%d) from %d.%d.%d.%d:%d\n",
-		    n,
-		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+			n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 		continue;
 	    }
 
-	    // DebugLevel0Fn("Received ack %d(%d) from %d.%d.%d.%d:%d\n",
+	// DebugLevel0Fn("Received ack %d(%d) from %d.%d.%d.%d:%d\n",
 	// 	    msg->Type,n,
 	// 	    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
-	    if (msg->Type == MessageInitHello && n==sizeof(*msg)) {
+	    if (msg->Type == MessageInitHello && n == sizeof(*msg)) {
 		DebugLevel0Fn("Acknowledge for InitHello was lost\n");
 
 		// Acknowledge the hello packets.
@@ -291,14 +317,13 @@ global void NetworkServerSetup(WorldMap* map)
 		DebugLevel0Fn("Sending ack for InitHello (%d)\n", n);
 	    } else {
 		DebugLevel0Fn("Got ack for InitConfig: (%d) from %d.%d.%d.%d:%d\n",
-		n,
-		NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
+			n, NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 		for (i = 0; i < HostsCount; ++i) {
 		    if (NetLastHost == Hosts[i].Host
 			    && NetLastPort == Hosts[i].Port
 			    && msg->Type == MessageInitReply
-			    && n==1 ) {
+			    && n == 1) {
 			if (num[i] != -1) {
 			    num[i] = -1;
 			    j--;
@@ -318,10 +343,10 @@ global void NetworkServerSetup(WorldMap* map)
 /**
 **	Client Setup.
 */
-global void NetworkClientSetup(WorldMap* map)
+global void NetworkClientSetup(WorldMap *map)
 {
     char buf[1024];
-    InitMessage* msg;
+    InitMessage *msg;
     InitMessage message;
     Acknowledge acknowledge;
     unsigned long host;
@@ -355,7 +380,7 @@ global void NetworkClientSetup(WorldMap* map)
     HostsCount = 0;
 
     message.Type = MessageInitHello;
-    message.SubType = 0;				// Future Extension / For menue use
+    message.SubType = ICMHello;
     message.FreeCraft = htonl(FreeCraftVersion);
     message.Version = htonl(NetworkProtocolVersion);
     message.Lag = htonl(NetworkLag);
@@ -366,7 +391,7 @@ global void NetworkClientSetup(WorldMap* map)
     } else {
 	message.MapUID = 0L;
     }
-    msg = (InitMessage*)buf;
+    msg = (InitMessage *)buf;
     for (;;) {
 	n = NetSendUDP(NetworkFildes, host, port, &message, sizeof(message));
 	DebugLevel0Fn("Sending hello (%d)\n", n);
@@ -376,8 +401,8 @@ global void NetworkClientSetup(WorldMap* map)
 	    if ((n = NetRecvUDP(NetworkFildes, &buf, sizeof(buf))) < 0) {
 		exit(-1);
 	    }
-	    DebugLevel0Fn("Received reply? %d(%d) %d.%d.%d.%d:%d\n",
-		    msg->Type,n,
+	    DebugLevel0Fn("Received reply? %d:%d(%d) %d.%d.%d.%d:%d\n",
+		    msg->Type, msg->SubType, n,
 		    NIPQUAD(ntohl(NetLastHost)), ntohs(NetLastPort));
 
 	    IfDebug(
@@ -387,9 +412,49 @@ global void NetworkClientSetup(WorldMap* map)
 		}
 	    );
 
-	    if (NetLastHost == host && NetLastPort == port
-		    && msg->Type == MessageInitReply && n == 1) {
-		break;
+	    if (NetLastHost == host && NetLastPort == port) {
+		if (msg->Type == MessageInitReply && n == 1) {
+		    break;
+		}
+		if (msg->Type == MessageInitConfig && n == sizeof(InitMessage)) {
+		    if (msg->SubType == ICMConfig) {
+			/// lost ACK - but Config got through!
+			break;
+		    }
+		    switch(msg->SubType) {
+			case ICMEngineMismatch:
+			    fprintf(stderr, "Incompatible FreeCraft version "
+					FreeCraftFormatString " <-> "
+					FreeCraftFormatString "\n",
+				    FreeCraftFormatArgs((int)ntohl(msg->FreeCraft)),
+				    FreeCraftFormatArgs(FreeCraftVersion));
+			    exit(-1);
+
+			case ICMProtocolMismatch:
+			    fprintf(stderr, "Incompatible network protocol version "
+					NetworkProtocolFormatString " <-> "
+					NetworkProtocolFormatString "\n",
+				    NetworkProtocolFormatArgs((int)ntohl(msg->Version)),
+				    NetworkProtocolFormatArgs(NetworkProtocolVersion));
+			    exit(-1);
+
+			case ICMEngineConfMismatch:	/// FIXME: Not Implemented yet
+			    exit(-1);
+
+			case ICMMapUidMismatch:
+			    fprintf(stderr, "FreeCraft maps do not match (0x%08x) <-> (0x%08x)\n",
+					map->Info ? (unsigned int)map->Info->MapUID : 0, ntohl(msg->MapUID));
+			    exit(-1);
+
+			case ICMGameFull:
+			    fprintf(stderr, "Server is full!\n");
+			    exit(-1);
+
+			case ICMServerQuit:
+			    fprintf(stderr, "Server has quit!\n");
+			    exit(-1);
+		    }
+		}
 	    }
 
 	    DebugLevel0Fn("Received wrong packet\n");
@@ -415,6 +480,8 @@ global void NetworkClientSetup(WorldMap* map)
 	    DebugLevel0Fn("Received wrong packet\n");
 	    continue;
 	}
+
+	// FIXME: ARI: add switch over SubType here (ServerQuit, etc)
 
 	DebugLevel0Fn("Received ClientConfig (HostsCount = %d)\n", (int)msg->HostsCount);
 

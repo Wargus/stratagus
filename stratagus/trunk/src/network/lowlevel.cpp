@@ -436,8 +436,8 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 **	Send through an UPD socket to a host:port.
 **
 **	@param sockfd	Socket
-**	@param host	Host to send to.
-**	@param port	Port of host to send to.
+**	@param host	Host to send to (network byte order).
+**	@param port	Port of host to send to (network byte order).
 **	@param buf	Send message buffer.
 **	@param len	Send message buffer length.
 **
