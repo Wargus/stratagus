@@ -1752,18 +1752,8 @@ local void InitEditorPlayerPropertiesMenuItems() {
 }
 #endif
 
-/**
-**	FIXME: Ari please look, this is now in TheUI.
-*/
-enum {
-    ImageNone,
-    ImagePanel1,	// 256 x 288
-    ImagePanel2,	// 288 x 256
-    ImagePanel3,	// 384 x 256
-    ImagePanel4,	// 288 x 128
-    ImagePanel5,	// 352 x 352
-};
 
+#ifdef OLD_MENU
 /**
 **	Menus
 */
@@ -2099,6 +2089,7 @@ global Menu Menus[] = {
 	NULL,
     },
 };
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -7734,6 +7725,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 /**
 **	Move buttons so they're centered on different resolutions
 */
+#ifdef OLD_MENU
 local void MoveButtons()
 {
     int menus = sizeof(Menus) / sizeof(Menu);
@@ -7747,6 +7739,13 @@ local void MoveButtons()
 	Menus[i].y += OffsetY;
     }
 }
+#else
+local void MoveButtons()
+{
+    OffsetX = (VideoWidth - 640) / 2;
+    OffsetY = (VideoHeight - 480) / 2;
+}
+#endif
 
 /**
 **	Init Menus for a specific race
