@@ -105,6 +105,9 @@ local int MoveToWood(Unit* unit)
 		unit->Orders[0].Y--;
 	    }
 	}
+	return 0;
+    }
+    unit->Orders[0].Action=UnitActionHarvest;
 #else
 	if( FindWoodInSight(unit
 		,&unit->Command.Data.Move.DX
@@ -122,10 +125,10 @@ local int MoveToWood(Unit* unit)
 		unit->Command.Data.Move.DY--;
 	    }
 	}
-#endif
 	return 0;
     }
     unit->Command.Action=UnitActionHarvest;
+#endif
 
     // turn to wood
     UnitHeadingFromDeltaXY(unit,dx,dy);
@@ -183,6 +186,30 @@ local int ChopWood(Unit* unit)
 	}
 #endif
 
+#ifdef NEW_ORDERS
+	//
+	//	Wood gone while chopping?
+	//
+	if( !ForestOnMap(unit->Orders[0].X
+		,unit->Orders[0].Y) ) {
+	    if( FindWoodInSight(unit
+		    ,&unit->Orders[0].X
+		    ,&unit->Orders[0].Y) ) {
+		ResetPath(unit->Orders[0]);
+		unit->Orders[0].Goal=NoUnitP;
+		unit->Orders[0].RangeX=0;
+		unit->Orders[0].RangeY=0;
+		// FIXME: shouldn't it be range=1 ??
+		DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
+		unit->SubAction=0;
+	    } else {
+		unit->Orders[0].Action=UnitActionStill;
+		unit->SubAction=0;
+		DebugLevel3Fn("NO-WOOD in sight range\n");
+	    }
+	    return 0;
+	}
+#else
 	//
 	//	Wood gone while chopping?
 	//
@@ -204,6 +231,7 @@ local int ChopWood(Unit* unit)
 	    }
 	    return 0;
 	}
+#endif
 
 	//
 	//	Ready chopping wood?
@@ -236,6 +264,42 @@ local int ChopWood(Unit* unit)
 	    //
 	    //	Update the map.
 	    //
+#ifdef NEW_ORDERS
+	    MapRemoveWood(unit->Orders[0].X,unit->Orders[0].Y);
+
+	    //
+	    //	Find place to return wood.
+	    //
+	    unit->Orders[0].X=unit->X;
+	    unit->Orders[0].Y=unit->Y;
+	    // FIXME: don't work, must store into other place
+	    if( !(destu=FindWoodDeposit(unit->Player,unit->X,unit->Y)) ) {
+		unit->Orders[0].Action=UnitActionStill;
+		unit->SubAction=0;
+	    } else {
+		ResetPath(unit->Orders[0]);
+		unit->Orders[0].RangeX=1;
+		unit->Orders[0].RangeY=1;
+		unit->Orders[0].Goal=destu;
+		destu->Refs++;
+#if 1
+		// Fast movement need this??
+		NearestOfUnit(destu,unit->X,unit->Y
+			,&unit->Orders[0].X
+			,&unit->Orders[0].Y);
+#else
+		unit->Orders[0].X=destu->X;
+		unit->Orders[0].Y=destu->Y;
+#endif
+		DebugLevel3Fn("Return to %Zd=%d,%d\n"
+			    ,UnitNumber(destu)
+			    ,unit->Orders[0].Data.Move.DX
+			    ,unit->Orders[0].Data.Move.DY);
+		DebugCheck( unit->Orders[0].Action!=UnitActionHarvest );
+		return 1;
+	    }
+
+#else
 	    MapRemoveWood(unit->Command.Data.Move.DX
 		,unit->Command.Data.Move.DY);
 
@@ -269,6 +333,7 @@ local int ChopWood(Unit* unit)
 		return 1;
 	    }
 
+#endif
 	}
     }
     return 0;
@@ -290,7 +355,43 @@ local int ReturnWithWood(Unit* unit)
 
     DebugCheck( unit->Wait!=1 );
 
+#ifdef NEW_ORDERS
+    destu=unit->Orders[0].Goal;
+
+    //
+    //	Target is dead, stop harvest
+    //
+    if( destu ) {
+	if( destu->Destroyed ) {
+	    DebugLevel0Fn("Destroyed unit\n");
+#ifdef REFS_DEBUG
+	    DebugCheck( !destu->Refs );
+#endif
+	    if( !--destu->Refs ) {
+		ReleaseUnit(destu);
+	    }
+	    unit->Orders[0].Goal=NoUnitP;
+	    // FIXME: perhaps I should choose an alternative
+	    unit->Orders[0].Action=UnitActionStill;
+	    return 0;
+	} else if( destu->Removed || !destu->HP
+		|| destu->Orders[0].Action==UnitActionDie ) {
+#ifdef REFS_DEBUG
+	    DebugCheck( !destu->Refs );
+#endif
+	    --destu->Refs;
+#ifdef REFS_DEBUG
+	    DebugCheck( !destu->Refs );
+#endif
+	    unit->Orders[0].Goal=NoUnitP;
+	    // FIXME: perhaps I should choose an alternative
+	    unit->Orders[0].Action=UnitActionStill;
+	    return 0;
+	}
+	unit->Orders[0].Goal=NoUnitP;
+#else
     destu=unit->Command.Data.Move.Goal;
+
     //
     //	Target is dead, stop harvest
     //
@@ -322,6 +423,7 @@ local int ReturnWithWood(Unit* unit)
 	    return 0;
 	}
 	unit->Command.Data.Move.Goal=NoUnitP;
+#endif
 #ifdef REFS_DEBUG
 	DebugCheck( !destu->Refs );
 #endif
@@ -331,8 +433,13 @@ local int ReturnWithWood(Unit* unit)
 #endif
     }
 
+#ifdef NEW_ORDERS
+    x=unit->Orders[0].X;
+    y=unit->Orders[0].Y;
+#else
     x=unit->Command.Data.Move.DX;
     y=unit->Command.Data.Move.DY;
+#endif
     destu=WoodDepositOnMap(x,y);
 
     // FIXME: could use the return value of the pathfinder
@@ -340,12 +447,20 @@ local int ReturnWithWood(Unit* unit)
       DebugLevel2Fn("WOOD-DEPOSIT NOT REACHED %Zd=%d,%d ? %d\n"
 		  ,UnitNumber(destu),x,y
 		  ,MapDistanceToUnit(unit->X,unit->Y,destu));
+#ifdef NEW_ORDERS
+	unit->Orders[0].Action=UnitActionStill;
+#else
 	unit->Command.Action=UnitActionStill;
+#endif
 	unit->SubAction=0;
 	return 0;
     }
 
+#ifdef NEW_ORDERS
+    unit->Orders[0].Action=UnitActionHarvest;
+#else
     unit->Command.Action=UnitActionHarvest;
+#endif
 
     RemoveUnit(unit);
     unit->X=destu->X;
