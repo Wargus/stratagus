@@ -10,8 +10,7 @@
 //
 /**@name splitter.h		-	The map splitter headerfile. */
 //
-//	(c) Copyright 1998-2003 by Vladi Shabanski, Lutz Sammer,
-//	                           and Jimmy Salmon
+//	(c) Copyright 1998-2003 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
