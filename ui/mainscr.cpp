@@ -111,7 +111,7 @@ local void UiDrawManaBar(const Unit* unit,int x,int y)
     y+=ICON_HEIGHT+7;
     VideoFillRectangleClip(ColorBlack,x,y+3,ICON_WIDTH+7,4);
     if( unit->HP ) {
-	f=(100*unit->Mana)/255;
+	f=(100*unit->Mana)/MaxMana;
 	f=(f*(ICON_WIDTH+5))/100;
 	VideoFillRectangleClip(ColorBlue,x+1,y+3+1,f,2);
     }
@@ -503,14 +503,14 @@ global void DrawUnitInfo(const Unit* unit)
 	    VideoDrawText(x+59,y+8+140+1,GameFont,"Magic:");
 	    VideoDrawRectangleClip(ColorGray,x+108,y+8+140,61,14);
 	    VideoDrawRectangleClip(ColorBlack,x+108+1,y+8+140+1,61-2,14-2);
-	    i=(100*unit->Mana)/255;
+	    i=(100*unit->Mana)/MaxMana;
 	    i=(i*(61-4))/100;
 	    VideoFillRectangleClip(ColorBlue,x+108+2,y+8+140+2,i,14-4);
 	
 	    VideoDrawNumber(x+128,y+8+140+1,GameFont,unit->Mana);
 	*/    
 	    int w = 130;
-	    i=(100*unit->Mana)/255;
+	    i=(100*unit->Mana)/MaxMana;
 	    i=(i*w)/100;
 	    VideoDrawRectangleClip(ColorGray, x+16,  y+8+140,  x+16+w,  16  );
 	    VideoDrawRectangleClip(ColorBlack,x+16+1,y+8+140+1,x+16+w-2,16-2);
@@ -1036,8 +1036,9 @@ global void DrawInfoPanel(void)
 
 	VideoDrawText(x,y,GameFont,"FreeCraft");
 	y+=16;
-	VideoDrawText(x,y,GameFont,"Game Cycle:");
-	VideoDrawNumber(x+90,y,GameFont,FrameCounter);
+	VideoDrawText(x,y,GameFont,"Cycle:");
+	VideoDrawNumber(x+48,y,GameFont,FrameCounter);
+	VideoDrawNumber(x+110,y,GameFont,FRAMES_PER_SECOND*VideoSyncSpeed/100);
 	y+=20;
 
 	for( i=0; i<PlayerMax; ++i ) {
