@@ -948,6 +948,49 @@ local SCM CclAiDebug(SCM flag)
 }
 
 /**
+**	Activate AI debugging for the given player(s)
+**	Player can be
+**		a number for a specific player 
+**		"self" for current human player (ai me)
+**	 	"none" to disable
+**
+**	@param list the list of player to activate
+*/
+local SCM CclAiDebugPlayer(SCM list)
+{
+    SCM item;
+    int playerid;
+    while (!gh_null_p(list)) {
+	item = gh_car(list);
+	list = gh_cdr(list);
+
+	if (gh_eq_p(item, gh_symbol2scm("none"))) {
+	    for (playerid = 0; playerid < NumPlayers; playerid++) {
+		if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
+		    continue;
+		}
+		((PlayerAi*)Players[playerid].Ai)->ScriptDebug = 0;
+	    }
+	} else {
+	    if (gh_eq_p(item, gh_symbol2scm("self"))) {
+		if (!ThisPlayer) {
+		    continue;
+		}
+		playerid = ThisPlayer->Player;
+	    } else {
+		playerid = gh_scm2int(item);
+	    }
+
+	    if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
+		continue;
+	    }
+	    ((PlayerAi*)Players[playerid].Ai)->ScriptDebug = 1;
+	}
+    }
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Need an unit.
 **
 **	@param value	Unit-type as string/symbol/object.
@@ -1005,6 +1048,7 @@ local SCM CclAiWait(SCM value)
 	if (unit_types_count[type->Type]) {
 	    return SCM_BOOL_F;
 	}
+
 	//
 	//      Look if we have equivalent unit-types.
 	//
@@ -2314,6 +2358,7 @@ global void AiCclRegister(void)
     gh_new_procedure0_0("ai:get-sleep-cycles", CclAiGetSleepCycles);
 
     gh_new_procedure1_0("ai:debug", CclAiDebug);
+    gh_new_procedureN("ai:debug-player", CclAiDebugPlayer);
     gh_new_procedure1_0("ai:need", CclAiNeed);
     gh_new_procedure2_0("ai:set", CclAiSet);
     gh_new_procedure1_0("ai:wait", CclAiWait);
