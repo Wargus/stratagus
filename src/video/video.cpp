@@ -142,6 +142,13 @@ global int VideoDepth;
 global int VideoBpp;
 
     /**
+    **  Architecture-dependant video memory-size (byte pro pixel).
+    **  Set by InitVideo. (1,2,3,4 equals VideoBpp/8)
+    **  @see InitVideo 
+    */  
+global int VideoTypeSize;
+
+    /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
     **	FIXME: need a new function to set it, see #ifdef SDL code
     **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl
@@ -1069,13 +1076,25 @@ global void InitVideo(void)
 #endif
 
     //
+    //	General (video) modules and settings
+    //
+    switch( VideoBpp ) {
+	case  8: ColorCycle=ColorCycle8 ; break;
+	case 15:
+	case 16: ColorCycle=ColorCycle16; break;
+	case 24: ColorCycle=ColorCycle24; break;
+	case 32: ColorCycle=ColorCycle32; break;
+        default: DebugLevel0Fn( "Video %d bpp unsupported\n", VideoBpp );
+    }
+    VideoTypeSize = VideoBpp / 8;
+
+    //
     //	Use single common palette to be used for all palettes in 8bpp
     //
     #ifndef BPP8_NORMAL
     if ( UseX11 && VideoBpp == 8 ) // FIXME: to be extended for all video..
       InitSingleCommonPalette8();
     #endif
-
 
     //
     //	Init video sub modules
@@ -1084,13 +1103,6 @@ global void InitVideo(void)
     InitLineDraw();
     InitSprite();
     InitCursors();
-    switch( VideoBpp ) {
-	case  8: ColorCycle=ColorCycle8 ; break;
-	case 15:
-	case 16: ColorCycle=ColorCycle16; break;
-	case 24: ColorCycle=ColorCycle24; break;
-	case 32: ColorCycle=ColorCycle32; break;
-    }
 
     DebugLevel3Fn("%d %d\n",MapWidth,MapHeight);
 }

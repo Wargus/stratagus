@@ -362,6 +362,13 @@ extern int VideoDepth;
 extern int VideoBpp;
 
     /**
+    **	Architecture-dependant video memory-size (byte pro pixel).
+    **	Set by InitVideo. (1,2,3,4 equals VideoBpp/8)
+    **	@see InitVideo
+    */
+extern int VideoTypeSize;
+
+    /**
     **	Architecture-dependant videomemory. Set by InitVideoXXX.
     **	FIXME: need a new function to set it, see #ifdef SDL code
     **	@see InitVideo @see InitVideoX11 @see InitVideoSVGA @see InitVideoSdl

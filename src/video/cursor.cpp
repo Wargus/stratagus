@@ -165,7 +165,7 @@ local int HiddenCursorRectangleH;	/// saved cursor height in pixel
 **	non-empty
 **     ( x>=0,y>=0,w>0,h>0,(x+w-1)<=VideoWidth,(y+h-1)<=VideoHeight )
 */
-local void (*SaveCursorRectangle)(int x,int y,int w,int h);
+global void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
 
 /**
 **	Function pointer: Load rectangle behind cursor
@@ -177,7 +177,7 @@ local void (*SaveCursorRectangle)(int x,int y,int w,int h);
 **
 **	@note rectangle previously saved with SaveCursorRectangle(x,y,w,h)
 */
-local void (*LoadCursorRectangle)(int x,int y,int w,int h);
+global void (*LoadCursorRectangle)(void *buffer,int x,int y,int w,int h);
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -259,10 +259,10 @@ global CursorType* CursorTypeByIdent(const char* ident)
 **	FIXME: this kind of macros are hard to single step with gdb.
 **	FIXME: inline functions should have the same speed and are debugable.
 */
-#define LOADCURSORRECTANGLE(video,memtype,x,y,w,h)  { \
+#define LOADCURSORRECTANGLE(buffer,video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
-    sp=OldCursorRectangle; \
+    sp=(memtype *)buffer; \
     dp=video+y*VideoWidth+x; \
     memcpy(dp,sp,w*sizeof(memtype)); \
     if ( --h ) { \
@@ -285,11 +285,11 @@ global CursorType* CursorTypeByIdent(const char* ident)
 **	FIXME: this kind of macros are hard to single step with gdb.
 **	FIXME: inline functions should have the same speed and are debugable.
 */
-#define SAVECURSORRECTANGLE(video,memtype,x,y,w,h)  { \
+#define SAVECURSORRECTANGLE(buffer,video,memtype,x,y,w,h)  { \
     const memtype* sp; \
     memtype* dp; \
     sp=video+y*VideoWidth+x; \
-    dp=OldCursorRectangle; \
+    dp=(memtype *)buffer; \
     memcpy(dp,sp,w*sizeof(memtype)); \
     if ( --h ) { \
       dp+=w; \
@@ -303,75 +303,76 @@ global CursorType* CursorTypeByIdent(const char* ident)
     } \
 }
 
+
 /**  Restore cursor rectangle for 8bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 */
-local void LoadCursorRectangle8(int x,int y,int w,int h)
+global void LoadCursorRectangle8(void *buffer,int x,int y,int w,int h)
 {
-	LOADCURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+	LOADCURSORRECTANGLE(buffer,VideoMemory8,VMemType8,x,y,w,h);
 }
 
 /** Restore cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-local void LoadCursorRectangle16(int x,int y,int w,int h)
+global void LoadCursorRectangle16(void *buffer,int x,int y,int w,int h)
 {
-	LOADCURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+	LOADCURSORRECTANGLE(buffer,VideoMemory16,VMemType16,x,y,w,h);
 }
 
 /** Restore cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-local void LoadCursorRectangle24(int x,int y,int w,int h)
+global void LoadCursorRectangle24(void *buffer,int x,int y,int w,int h)
 {
-	LOADCURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+	LOADCURSORRECTANGLE(buffer,VideoMemory24,VMemType24,x,y,w,h);
 }
 
 /** Restore cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer LoadCursorRectangle)
 **	@see LoadCursorRectangle
 */
-local void LoadCursorRectangle32(int x,int y,int w,int h)
+global void LoadCursorRectangle32(void *buffer,int x,int y,int w,int h)
 {
-	LOADCURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+	LOADCURSORRECTANGLE(buffer,VideoMemory32,VMemType32,x,y,w,h);
 }
 
 /** Save cursor rectangle for 8bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-local void SaveCursorRectangle8(int x,int y,int w,int h)
+global void SaveCursorRectangle8(void *buffer,int x,int y,int w,int h)
 {
-	SAVECURSORRECTANGLE(VideoMemory8,VMemType8,x,y,w,h);
+	SAVECURSORRECTANGLE(buffer,VideoMemory8,VMemType8,x,y,w,h);
 }
 
 /** Save cursor rectangle for 16bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-local void SaveCursorRectangle16(int x,int y,int w,int h)
+global void SaveCursorRectangle16(void *buffer,int x,int y,int w,int h)
 {
-	SAVECURSORRECTANGLE(VideoMemory16,VMemType16,x,y,w,h);
+	SAVECURSORRECTANGLE(buffer,VideoMemory16,VMemType16,x,y,w,h);
 }
 
 /** Save cursor rectangle for 24bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-local void SaveCursorRectangle24(int x,int y,int w,int h)
+global void SaveCursorRectangle24(void *buffer,int x,int y,int w,int h)
 {
-	SAVECURSORRECTANGLE(VideoMemory24,VMemType24,x,y,w,h);
+	SAVECURSORRECTANGLE(buffer,VideoMemory24,VMemType24,x,y,w,h);
 }
 
 /** Save cursor rectangle for 32bpp frame buffer.
 **   (See description function pointer SaveCursorRectangle)
 **	@see SaveCursorRectangle
 */
-local void SaveCursorRectangle32(int x,int y,int w,int h)
+global void SaveCursorRectangle32(void *buffer,int x,int y,int w,int h)
 {
-	SAVECURSORRECTANGLE(VideoMemory32,VMemType32,x,y,w,h);
+	SAVECURSORRECTANGLE(buffer,VideoMemory32,VMemType32,x,y,w,h);
 }
 
 /**
@@ -414,7 +415,8 @@ local void DrawVisibleRectangleCursor(int x,int y,int x1,int y1)
 
     if ( w && h )
     {
-      SaveCursorRectangle(OldCursorRectangleX=x,OldCursorRectangleY=y,
+      SaveCursorRectangle(OldCursorRectangle,
+                          OldCursorRectangleX=x,OldCursorRectangleY=y,
   			  OldCursorRectangleW=w,OldCursorRectangleH=h);
       VideoDrawRectangleClip(ColorGreen,x,y,w,h);
       OldCursorRectangleInvalidate=1;
@@ -844,7 +846,8 @@ global void HideAnyCursor(void)
     //
     if( OldCursorRectangleW ) {
         //  restore area of visible cursor
-	LoadCursorRectangle(OldCursorRectangleX,OldCursorRectangleY,
+	LoadCursorRectangle(OldCursorRectangle,
+                            OldCursorRectangleX,OldCursorRectangleY,
 			    OldCursorRectangleW,OldCursorRectangleH);
 
         // save hidden area to be invalidated
