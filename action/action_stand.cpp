@@ -51,7 +51,7 @@
 */
 global void HandleActionStandGround(Unit* unit)
 {
-    ActionStillGeneric(unit,1);
+    ActionStillGeneric(unit, 1);
 }
 
 //@}
