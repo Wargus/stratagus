@@ -253,7 +253,11 @@ void ReleaseUnit(Unit* unit)
 }
 
 /**
-**  FIXME: Docu
+**  Allocate Unit
+**
+**  Allocates memory for a new unit, It will recycle free slots
+**
+**  @return  Pointer to memory allocated for new unit, memory is zero'd
 */
 static Unit* AllocUnit(void)
 {
@@ -464,9 +468,11 @@ Unit* MakeUnit(UnitType* type, Player* player)
 {
 	Unit* unit;
 
-	//Assert(player); // Current code didn't support no player
-
 	unit = AllocUnit();
+	if (unit == NoUnitP) {
+		return NoUnitP;
+	}
+
 	InitUnit(unit, type);
 
 	// Only Assign if a Player was specified
@@ -854,7 +860,10 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 	Unit* unit;
 
 	unit = MakeUnit(type, player);
-	PlaceUnit(unit, x, y);
+
+	if (unit != NoUnitP) {
+		PlaceUnit(unit, x, y);
+	}
 
 	return unit;
 }
@@ -1015,7 +1024,11 @@ void UnitLost(Unit* unit)
 	if ((b = OnTopDetails(unit, NULL)) != NULL) {
 		if (b->Data.OnTop.ReplaceOnDie && (unit->Type->GivesResource && unit->ResourcesHeld != 0)) {
 			temp = MakeUnitAndPlace(unit->X, unit->Y, b->Data.OnTop.Parent, &Players[PlayerNumNeutral]);
-			temp->ResourcesHeld = unit->ResourcesHeld;
+			if (temp == NoUnitP) {
+				DebugPrint("Unable to allocate Unit");
+			} else {
+				temp->ResourcesHeld = unit->ResourcesHeld;
+			}
 		}
 	}
 	Assert(player->NumBuildings <= UnitMax);
@@ -1358,7 +1371,6 @@ void UnitCountSeen(Unit* unit)
 /**
 **  Returns true, if the unit is visible. It check the Viscount of
 **  the player and everyone who shares vision with him.
-**  @todo FIXME: optimize this a lot.
 **
 **  @note This understands shared vision, and should be used all around.
 **
@@ -2831,8 +2843,6 @@ Unit* FindIdleWorker(const Player* player, const Unit* last)
 **    Cycle through units. ounit is the old one.
 **    First take highest unit.
 **
-**  @todo FIXME: If no unit, we could select near units?
-**
 **  @param ounit  Old selected unit.
 **  @param x      X pixel position.
 **  @param y      Y pixel position.
@@ -3212,7 +3222,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 
 	//
-	// FIXME: Can't attack run away.
+	// Can't attack run away.
 	//
 	if (CanMove(target)) {
 		int x;

@@ -1009,18 +1009,23 @@ static int CclCreateUnit(lua_State* l)
 		return 0;
 	}
 	unit = MakeUnit(unittype, &Players[playerno]);
-	mask = UnitMovementMask(unit);
-	if (CheckedCanMoveToMask(ix, iy, mask)) {
-		unit->Wait = 1;
-		PlaceUnit(unit, ix, iy);
+	if (unit == NoUnitP) {
+		DebugPrint("Unable to allocate unit");
+		return 0;
 	} else {
-		unit->X = ix;
-		unit->Y = iy;
-		DropOutOnSide(unit, heading, unittype->TileWidth, unittype->TileHeight);
-	}
+		mask = UnitMovementMask(unit);
+		if (CheckedCanMoveToMask(ix, iy, mask)) {
+			unit->Wait = 1;
+			PlaceUnit(unit, ix, iy);
+		} else {
+			unit->X = ix;
+			unit->Y = iy;
+			DropOutOnSide(unit, heading, unittype->TileWidth, unittype->TileHeight);
+		}
 
-	lua_pushnumber(l, unit->Slot);
-	return 1;
+		lua_pushnumber(l, unit->Slot);
+		return 1;
+	}
 }
 
 /**

@@ -252,6 +252,20 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 	PlayerSubUnitType(unit->Player, type);
 
 	build = MakeUnit(type, unit->Player);
+	
+	// If unable to make unit, stop, and report message
+	if (build == NoUnitP) {
+		unit->Orders[0].Action = UnitActionStill;
+
+		NotifyPlayer(unit->Player, NotifyYellow, unit->X, unit->Y,
+			"Unable to create building %s",type->Name);
+		if (unit->Player->AiEnabled) {
+			AiCanNotBuild(unit, type);
+		}
+		
+		return;
+	}
+	
 	build->Constructed = 1;
 	build->CurrentSightRange = 0;
 

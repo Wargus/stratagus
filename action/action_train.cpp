@@ -151,80 +151,84 @@ void HandleActionTrain(Unit* unit)
 		}
 
 		nunit = MakeUnit(unit->Orders[0].Type, player);
-		nunit->X = unit->X;
-		nunit->Y = unit->Y;
-		type = unit->Type;
 
-		// Some guy made DropOutOnSide set unit to belong to the building
-		// training it. This was an ugly hack, setting X and Y is enough,
-		// no need to add the unit only to be removed.
-		nunit->X = unit->X;
-		nunit->Y = unit->Y;
+		if (nunit != NoUnitP) {
+			nunit->X = unit->X;
+			nunit->Y = unit->Y;
+			type = unit->Type;
 
-		// New unit might supply food
-		UpdateForNewUnit(nunit, 0);
+			// Some guy made DropOutOnSide set unit to belong to the building
+			// training it. This was an ugly hack, setting X and Y is enough,
+			// no need to add the unit only to be removed.
+			nunit->X = unit->X;
+			nunit->Y = unit->Y;
 
-		DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
+			// New unit might supply food
+			UpdateForNewUnit(nunit, 0);
 
-		// Set life span
-		if (type->DecayRate) {
-			nunit->TTL = GameCycle + type->DecayRate * 6 * CYCLES_PER_SECOND;
-		}
+			DropOutOnSide(nunit, LookingW, type->TileWidth, type->TileHeight);
 
-		NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y,
-			"New %s ready", nunit->Type->Name);
-		if (player == ThisPlayer) {
-			PlayUnitSound(nunit, VoiceReady);
-		}
-		if (unit->Player->AiEnabled) {
-			AiTrainingComplete(unit, nunit);
-		}
-
-		if (!unit->Type->NewAnimations) {
-			unit->Reset = unit->Wait = 1;
-		}
-
-		unit->Orders[0].Action = UnitActionStill;
-		unit->SubAction = 0;
-
-		if (!CanHandleOrder(nunit, &unit->NewOrder)) {
-			DebugPrint("Wrong order for unit\n");
-#if 0
-			nunit->Orders[0].Action = UnitActionStandStill;
-#endif
-			// Tell the unit to move instead of trying any funny stuff.
-			nunit->Orders[0] = unit->NewOrder;
-			nunit->Orders[0].Action = UnitActionMove;
-			if (nunit->Orders[0].Goal) {
-				RefsIncrease(nunit->Orders->Goal);
+			// Set life span
+			if (type->DecayRate) {
+				nunit->TTL = GameCycle + type->DecayRate * 6 * CYCLES_PER_SECOND;
 			}
 
-		} else {
-			if (unit->NewOrder.Goal) {
-				if (unit->NewOrder.Goal->Destroyed) {
-					// FIXME: perhaps we should use another goal?
-					DebugPrint("Destroyed unit in train unit\n");
-					RefsDecrease(unit->NewOrder.Goal);
-					unit->NewOrder.Goal = NoUnitP;
-					unit->NewOrder.Action = UnitActionStill;
+			NotifyPlayer(player, NotifyYellow, nunit->X, nunit->Y,
+				"New %s ready", nunit->Type->Name);
+			if (player == ThisPlayer) {
+				PlayUnitSound(nunit, VoiceReady);
+			}
+			if (unit->Player->AiEnabled) {
+				AiTrainingComplete(unit, nunit);
+			}
+
+			if (!unit->Type->NewAnimations) {
+				unit->Reset = unit->Wait = 1;
+			}
+
+			unit->Orders[0].Action = UnitActionStill;
+			unit->SubAction = 0;
+
+			if (!CanHandleOrder(nunit, &unit->NewOrder)) {
+				DebugPrint("Wrong order for unit\n");
+
+				// Tell the unit to move instead of trying any funny stuff.
+				nunit->Orders[0] = unit->NewOrder;
+				nunit->Orders[0].Action = UnitActionMove;
+				if (nunit->Orders[0].Goal) {
+					RefsIncrease(nunit->Orders->Goal);
+				}
+
+			} else {
+				if (unit->NewOrder.Goal) {
+					if (unit->NewOrder.Goal->Destroyed) {
+						// FIXME: perhaps we should use another goal?
+						DebugPrint("Destroyed unit in train unit\n");
+						RefsDecrease(unit->NewOrder.Goal);
+						unit->NewOrder.Goal = NoUnitP;
+						unit->NewOrder.Action = UnitActionStill;
+					}
+				}
+
+				nunit->Orders[0] = unit->NewOrder;
+
+				//
+				// FIXME: Pending command uses any references?
+				//
+				if (nunit->Orders[0].Goal) {
+					RefsIncrease(nunit->Orders->Goal);
 				}
 			}
 
-			nunit->Orders[0] = unit->NewOrder;
-
-			//
-			// FIXME: Pending command uses any references?
-			//
-			if (nunit->Orders[0].Goal) {
-				RefsIncrease(nunit->Orders->Goal);
+			if (IsOnlySelected(unit)) {
+				UpdateButtonPanel();
 			}
-		}
 
-		if (IsOnlySelected(unit)) {
-			UpdateButtonPanel();
+			return;
 		}
-
-		return;
+	} else {
+		NotifyPlayer(player, NotifyYellow, unit->X, unit->Y,
+				"Unable to Train %s", unit->Orders[0].Type->Name);
 	}
 
 	if (!unit->Type->NewAnimations) {
