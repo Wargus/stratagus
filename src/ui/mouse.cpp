@@ -109,7 +109,6 @@ void DoRightButton(int sx, int sy)
 	int y;                  // coordonate in tile.
 	Unit* dest;             // unit under the cursor if any.
 	Unit* unit;             // one of the selected unit.
-	Unit* desttransporter;  // dest if it could transport any unit.
 	UnitType* type;         // type of unit.
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
@@ -159,7 +158,6 @@ void DoRightButton(int sx, int sy)
 		return;
 	}
 
-	desttransporter = NoUnitP;
 	if (dest && dest->Type->CanTransport) {
 		for (i = 0; i < NumSelected; i++) {
 			if (CanTransport(dest, Selected[i])) {
@@ -171,21 +169,16 @@ void DoRightButton(int sx, int sy)
 
 				// Here we flush the order queue
 				SendCommandStopUnit(dest);
-				desttransporter = dest;
 				break;
 			}
 		}
 	}
 
-	// FIXME: the next should be rewritten, must select the units with
-	// FIXME: the box size and not with the tile position
-	// FIXME: and for a group of units this is slow!
 	acknowledged = 0;
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
-		// If we are telling units to board a transporter,
-		// don't give the transport extra orders.
-		if (unit == desttransporter) {
+		// don't self targetting.
+		if (unit == dest) {
 			continue;
 		}
 		Assert(unit);
@@ -206,18 +199,42 @@ void DoRightButton(int sx, int sy)
 		}
 
 		//
-		//  Enter transporters?
+		//  Enter transporters ?
 		//
-		if (dest && CanTransport(dest, unit)) {
-			dest->Blink = 4;
-			DebugPrint("Board transporter\n");
-			// Let the transporter move to the unit. And QUEUE!!!
-			if (CanMove(dest)) {
-				DebugPrint("Send command follow\n");
-				SendCommandFollow(dest, unit, 0);
+		if (dest) {
+			// dest is the transporter
+			if (dest->Type->CanTransport) {
+				// Let the transporter move to the unit. And QUEUE!!!
+				if (CanMove(dest) && CanTransport(dest, unit)) {
+					DebugPrint("Send command follow\n");
+					// is flush value correct ?
+					SendCommandFollow(dest, unit, 0);
+				}
+				// FIXME : manage correctly production units.
+				if (!CanMove(unit) || CanTransport(dest, unit)) {
+					dest->Blink = 4;
+					DebugPrint("Board transporter\n");
+					SendCommandBoard(unit, -1, -1, dest, flush);
+					continue;
+				}
 			}
-			SendCommandBoard(unit, -1, -1, dest, flush);
-			continue;
+			//  unit is the transporter
+			//  FIXME : Make it more configurable ? NumSelect == 1, lua option
+			if (CanTransport(unit, dest)) {
+				// Let the transporter move to the unit. And QUEUE!!!
+				if (CanMove(unit)) {
+					DebugPrint("Send command follow\n");
+					// is flush value correct ?
+					SendCommandFollow(unit, dest, 0);
+				} else if (!CanMove(dest)) {
+					DebugPrint("Want to transport but no unit can move\n");
+					continue;
+				}
+				dest->Blink = 4;
+				DebugPrint("Board transporter\n");
+				SendCommandBoard(dest, -1, -1, unit, flush);
+				continue;
+			}
 		}
 
 		//
