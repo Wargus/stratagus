@@ -1,3 +1,4 @@
+//   ___________		     _________		      _____  __
 //   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
 //    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
 //    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
@@ -7,9 +8,6 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/*
-**	A clone of a famous game.
-*/
 /**@name unit.h		-	The unit headerfile. */
 /*
 **	(c) Copyright 1998-2000 by Lutz Sammer
