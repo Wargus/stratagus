@@ -1898,9 +1898,7 @@ global void InitMapFogOfWar(void)
 		for( j=0; j<n; ++j )
                   ((VMemType8*)FogOfWarAlphaTable)[j] =
                    lookup50trans8[ trans_color | j ];
-              }
-              else
-              {
+              } else {
 		for( i=0; i<n; ++i ) {
 		    int j;
 		    int l;
