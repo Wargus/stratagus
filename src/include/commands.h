@@ -55,8 +55,8 @@ extern ReplayType ReplayGameType;	/// Replay game type
 ----------------------------------------------------------------------------*/
 
     /// Log commands into file
-global void CommandLog(const char*,const Unit*,int,int,int,
-		       const Unit*,const char*,int);
+global void CommandLog(const char*, const Unit*, int, int, int,
+    const Unit*, const char*, int);
     /// Replay user commands from log each cycle, single player games
 extern void SinglePlayerReplayEachCycle(void);
     /// Replay user commands from log each cycle, multiplayer games
