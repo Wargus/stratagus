@@ -126,12 +126,12 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	int h;
 	int w;
 
-	DebugCheck( UnitTypeOrcWall->_HitPoints>=256
-			|| UnitTypeHumanWall->_HitPoints>=256 );
+	Assert( UnitTypeOrcWall->_HitPoints < 256
+			&& UnitTypeHumanWall->_HitPoints < 256 );
 
 	if( map->Terrain<TilesetMax ) {
 		// FIXME: should use terrain name or better map->Tileset!!
-		//DebugCheck( map->Tileset->Table != Tilesets[map->Terrain]->Table );
+		//Assert( map->Tileset->Table == Tilesets[map->Terrain]->Table );
 		ctab=Tilesets[map->Terrain]->Table;
 		DebugLevel0Fn("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
 				map->TerrainName);
@@ -1376,7 +1376,7 @@ local void PudWriteHeader(gzFile f,char* type,int length)
 {
 	unsigned char buf[4];
 
-	DebugCheck( strlen(type)!=4 );
+	Assert( strlen(type)==4 );
 	if( gzwrite(f,type,4)!=4 ) {
 		ExitFatal(-1);
 	}

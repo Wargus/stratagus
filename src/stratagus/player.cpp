@@ -109,7 +109,7 @@ global int PlayerRacesIndex(int race)
 		}
 	}
 	fprintf(stderr, "Invalid race: %d\n", race);
-	DebugCheck(1);
+	Assert(0);
 	return PlayerRaceNeutral;
 }
 
@@ -536,8 +536,8 @@ global void CreatePlayer(int type)
 */
 global void PlayerSetSide(Player* player, int side)
 {
-	DebugCheck(side < 0 || side >= PlayerRaces.Count);
-	DebugCheck(!PlayerRaces.Name[side]);
+	Assert(side >= 0 && side < PlayerRaces.Count);
+	Assert(PlayerRaces.Name[side]);
 
 	player->Race = side;
 	player->RaceName = PlayerRaces.Name[side];

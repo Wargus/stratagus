@@ -66,7 +66,7 @@ local void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* loc
 	int args;
 	int j;
 
-	DebugCheck(location == NULL);
+	Assert(location != NULL);
 	memset(location, 0, sizeof(*location));
 
 	if (!lua_istable(l, -1)) {
@@ -867,8 +867,8 @@ local void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 		"only"						/// CONDITION_ONLY
 	};
 	int i;
-	DebugCheck(!file);
-	DebugCheck(!condition);
+	Assert(file);
+	Assert(condition);
 
 	CLprintf(file, "( ");
 	//

@@ -961,7 +961,7 @@ global int main(int argc, char** argv)
 		 kCFURLPOSIXPathStyle);
 	const char* pathPtr = CFStringGetCStringPtr(macPath, 
 		CFStringGetSystemEncoding());
-	assert(pathPtr);
+	Assert(pathPtr);
 	StratagusLibPath = malloc(strlen(pathPtr) + 1);
 	strcpy(StratagusLibPath, pathPtr);
 #endif
