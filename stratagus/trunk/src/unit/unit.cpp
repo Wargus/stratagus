@@ -267,6 +267,7 @@ global void ReleaseUnit(Unit* unit)
     //	memory.
     //
     *ReleasedTail = unit;
+    unit->Next = NULL;		// Ensure unit does not refer to another.
     ReleasedTail = &unit->Next;
     unit->Refs = GameCycle + NetworkMaxLag;	// could be reuse after this time
 #ifdef DEBUG
