@@ -1213,9 +1213,9 @@ global void SaveUnitTypes(FILE* file)
 */
 global UnitType* UnitTypeByIdent(const char* ident)
 {
-    UnitType** type;
+    UnitType* const* type;
 
-    type=(UnitType**)hash_find(UnitTypeHash,(char*)ident);
+    type=hash_find(UnitTypeHash,(char*)ident);
     if( type ) {
 	return *type;
     }

@@ -183,8 +183,9 @@ global Unit* RepairableOnMapTile(unsigned tx,unsigned ty)
     n=SelectUnitsOnTile(tx,ty,table);
     for( i=0; i<n; ++i ) {
 	// FIXME: could use more or less for repair? Repair of ships/catapults.
-	// Only repairable if target is a building and it's HP is not at max
-	if( table[i]->Type->Building
+	// Only repairable if target is a building or tansporter and it's HP is
+	// not at max
+	if( (table[i]->Type->Building || table[i]->Type->Transporter)
 		&& table[i]->HP < table[i]->Stats->HitPoints ) {
 	    return table[i];
 	}
