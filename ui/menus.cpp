@@ -148,6 +148,7 @@ local void ScenSelectOk(void);
 local void ScenSelectCancel(void);
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i);
+local void KeystrokeHelpDrawFunc(Menuitem *mi);
 
 local void GameSpeedHSAction(Menuitem *mi, int i);
 local void MouseScrollHSAction(Menuitem *mi, int i);
@@ -1362,62 +1363,38 @@ local Menuitem KeystrokeHelpMenuItems[] = {
     { MI_TYPE_TEXT, 352/2, 11, 0, LargeFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 352 - 18 - 16, 40+20, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 352/2 - (224 / 2), 352-40, MenuButtonSelected, LargeFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*2, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*3, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*4, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*5, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*6, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*7, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*8, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*9, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*10, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*11, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*12, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*13, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*14, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*15, 0, GameFont, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_TEXT, 16, 40+20*16, 0, GameFont, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_DRAWFUNC, 16, 40+20, 0, GameFont, NULL, NULL, {{NULL,0}} },
+};
+// FIXME: ccl these...
+// FIXME: add newer helps
+local unsigned char *keystrokehelptexts[] = {
+    "Alt-F  - toggle full screen",
+    "Ctrl-S - mute sound",
+    "Alt-Q  - quit to main menu",
+    "+      - increase game speed",
+    "-      - decrease game speed",
+    "Ctrl-P - pause game",
+    "Alt-G  - toggle grab mouse",
+    "Alt-X  - quit game",
+    "Alt-B  - toggle expand map",
+    "ENTER  - write a message",
+    "TAB    - hide/unhide terrain",
+
+    "Alt-I  - find idle peon",
+    "Alt-V  - next view port",
+    "Ctrl-V - previous view port",
+    "F10    - game menu",
+    "F5     - game options",
 };
 local void InitKeystrokeHelpMenuItems() {
-    MenuitemText    i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
-    MenuitemVslider i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
-    MenuitemButton  i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
-    MenuitemText    i3 = { "Alt-F  - toggle full screen", MI_TFLAGS_LALIGN};
-    MenuitemText    i4 = { "Ctrl-S - mute sound", MI_TFLAGS_LALIGN};
-    MenuitemText    i5 = { "Alt-Q  - quit to main menu", MI_TFLAGS_LALIGN};
-    MenuitemText    i6 = { "+      - increase game speed", MI_TFLAGS_LALIGN};
-    MenuitemText    i7 = { "-      - decrease game speed", MI_TFLAGS_LALIGN};
-    MenuitemText    i8 = { "Ctrl-P - pause game", MI_TFLAGS_LALIGN};
-    MenuitemText    i9 = { "Alt-G  - toggle grab mouse", MI_TFLAGS_LALIGN};
-    MenuitemText    i10 = { "Alt-X  - quit game", MI_TFLAGS_LALIGN};
-    MenuitemText    i11 = { "Alt-B  - toggle expand map", MI_TFLAGS_LALIGN};
-    MenuitemText    i12 = { "ENTER  - write a message", MI_TFLAGS_LALIGN};
-    MenuitemText    i13 = { "TAB    - hide/unhide terrain", MI_TFLAGS_LALIGN};
-    MenuitemText    i14 = { "Alt-I  - find idle peon", MI_TFLAGS_LALIGN};
-    MenuitemText    i15 = { "Alt-V  - next view port", MI_TFLAGS_LALIGN};
-    MenuitemText    i16 = { "Ctrl-V - previous view port", MI_TFLAGS_LALIGN};
-    MenuitemText    i17 = { "F10    - game menu", MI_TFLAGS_LALIGN};
-    MenuitemText    i18 = { "F5     - game options", MI_TFLAGS_LALIGN};
-    KeystrokeHelpMenuItems[0].d.text    = i0;
-    KeystrokeHelpMenuItems[1].d.vslider = i1;
-    KeystrokeHelpMenuItems[2].d.button  = i2;
-    KeystrokeHelpMenuItems[3].d.text    = i3;
-    KeystrokeHelpMenuItems[4].d.text    = i4;
-    KeystrokeHelpMenuItems[5].d.text    = i5;
-    KeystrokeHelpMenuItems[6].d.text    = i6;
-    KeystrokeHelpMenuItems[7].d.text    = i7;
-    KeystrokeHelpMenuItems[8].d.text    = i8;
-    KeystrokeHelpMenuItems[9].d.text    = i9;
-    KeystrokeHelpMenuItems[10].d.text   = i10;
-    KeystrokeHelpMenuItems[11].d.text   = i11;
-    KeystrokeHelpMenuItems[12].d.text   = i12;
-    KeystrokeHelpMenuItems[13].d.text   = i13;
-    KeystrokeHelpMenuItems[14].d.text   = i14;
-    KeystrokeHelpMenuItems[15].d.text   = i15;
-    KeystrokeHelpMenuItems[16].d.text   = i16;
-    KeystrokeHelpMenuItems[17].d.text   = i17;
-    KeystrokeHelpMenuItems[18].d.text   = i18;
+    MenuitemText     i0 = { "Keystroke Help Menu", MI_TFLAGS_CENTERED};
+    MenuitemVslider  i1 = { 0, 18, 12*18, KeystrokeHelpVSAction, -1, 0, 0, 0, NULL};
+    MenuitemButton   i2 = { "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'};
+    MenuitemDrawfunc i3 = { KeystrokeHelpDrawFunc };
+    KeystrokeHelpMenuItems[0].d.text     = i0;
+    KeystrokeHelpMenuItems[1].d.vslider  = i1;
+    KeystrokeHelpMenuItems[2].d.button   = i2;
+    KeystrokeHelpMenuItems[3].d.drawfunc = i3;
 }
 
 local Menuitem SaveGameMenuItems[] = {
@@ -1705,7 +1682,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-288)/2,
 	256, 288,
 	ImagePanel1,
-	4, 4,
+	3, 4,
 	HelpMenuItems,
 	NULL,
     },
@@ -1715,7 +1692,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-352)/2,
 	352, 352,
 	ImagePanel5,
-	19, 19,
+	2, 4,
 	KeystrokeHelpMenuItems,
 	NULL,
     },
@@ -2660,17 +2637,7 @@ local void GameMenuEnd(void)
 
 local void KeystrokeHelpMenu(void)
 {
-    int j;
-    int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
-
-    KeystrokeHelpMenuItems[1].d.hslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
-
-    for (j=3; j < nitems ;++j) {
-	if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
-	    KeystrokeHelpMenuItems[j].mitype = 0;
-	else
-	    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
-    }
+    KeystrokeHelpMenuItems[1].d.vslider.percent = 0;
     ProcessMenu(MENU_KEYSTROKE_HELP, 1);
 }
 
@@ -3695,61 +3662,49 @@ local void ScenSelectVSAction(Menuitem *mi, int i)
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i)
 {
-    int j = 3;
-    int nitems = Menus[MENU_KEYSTROKE_HELP].nitems;
+    int j, nitems = sizeof(keystrokehelptexts) / sizeof(unsigned char *);
 
-    mi--;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
-	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN &&
-	        KeystrokeHelpMenuItems[nitems-1].yofs > (40+20*11)) {
-		    for (j=3; j < nitems ;++j) {
-			KeystrokeHelpMenuItems[j].yofs -= 20;
-			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
-			    (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
-			    KeystrokeHelpMenuItems[j].mitype = 0;
-			else
-			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
-		    }
+	    j = ((mi->d.vslider.percent + 1) * (nitems - 11)) / 100;
+	    if (mi->d.vslider.cflags&MI_CFLAGS_DOWN && j < nitems - 11) {
+		    j++;
 		    MustRedraw |= RedrawMenu;
-	    } else if (mi[1].d.vslider.cflags&MI_CFLAGS_UP &&
-	               KeystrokeHelpMenuItems[3].yofs < (40+20*1)) {
-		    for (j=3; j < nitems ;++j) {
-			KeystrokeHelpMenuItems[j].yofs += 20;
-			if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) ||
-			    (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
-			    KeystrokeHelpMenuItems[j].mitype = 0;
-			else
-			    KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
-		    }
+	    } else if (mi->d.vslider.cflags&MI_CFLAGS_UP && j > 0) {
+		    j--;
 		    MustRedraw |= RedrawMenu;
 	    }
 	    if (i == 2) {
-		mi[1].d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
+		mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN|MI_CFLAGS_UP);
 	    }
-	    mi[1].d.vslider.percent = ( (KeystrokeHelpMenuItems[3].yofs - (40+20*1)) / -20 ) * 100 / (nitems - 11 - 3);
+	    mi->d.vslider.percent = j * 100 / (nitems - 11);
 	    break;
 	case 1:		// mouse - move
-	    if ((mi[1].d.vslider.cflags&MI_CFLAGS_KNOB) && (mi[1].flags&MenuButtonClicked)) {
-		int ys;
-		// ARI: FIXME: No floats please, John!!!
-		float f;
-		f = (int)((float)mi[1].d.vslider.curper/(100/(nitems-11-3))+.5f) * 100 / (float)(nitems-11-3);
-		mi[1].d.vslider.percent = (int)f;
-		ys = ((int)(f * (nitems-11-3) + .5f) / 100) * -20 + (40+20*1);
-		for (j=3; j < nitems; ++j) {
-		    KeystrokeHelpMenuItems[j].yofs = ys + (j-3)*20;
-		    if ((KeystrokeHelpMenuItems[j].yofs < (40+20*1)) || (KeystrokeHelpMenuItems[j].yofs > (40+20*11)))
-			KeystrokeHelpMenuItems[j].mitype = 0;
-		    else
-			KeystrokeHelpMenuItems[j].mitype = MI_TYPE_TEXT;
-		}
+	    if ((mi->d.vslider.cflags&MI_CFLAGS_KNOB) && (mi->flags&MenuButtonClicked)) {
+		j = ((mi->d.vslider.curper + 1) * (nitems - 11)) / 100;
+		mi->d.vslider.percent = mi->d.vslider.curper;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
 	default:
 	    break;
+    }
+}
+
+/**
+**	Draw the Keystroke Help texts
+*/
+local void KeystrokeHelpDrawFunc(Menuitem *mi)
+{
+    int i, j, nitems = sizeof(keystrokehelptexts) / sizeof(unsigned char *);
+    Menu *menu = Menus + MENU_KEYSTROKE_HELP;
+
+    j = ((mi[-2].d.vslider.percent + 1) * (nitems - 11)) / 100;
+    for (i = 0; i < 11; i++) {
+	VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs+(i*20),
+			    mi->font,keystrokehelptexts[j]);
+	j++;
     }
 }
 
