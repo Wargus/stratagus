@@ -779,6 +779,11 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("goal")) ) {
 	    unit->Goal=UnitSlots[gh_scm2int(gh_car(list))];
 	    list=gh_cdr(list);
+	} else if( gh_eq_p(value,gh_symbol2scm("auto-cast")) ) {
+	    str=gh_scm2newstr(gh_car(list),NULL);
+	    unit->AutoCastSpell=SpellTypeByIdent(str);
+	    list=gh_cdr(list);
+	    free(str);
 	} else {
 	   // FIXME: this leaves a half initialized unit
 	   errl("Unsupported tag",value);
