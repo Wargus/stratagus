@@ -72,7 +72,7 @@
 /**
 **		Define the names and effects of all im play available spells.
 */
-global SpellType* SpellTypeTable;
+global SpellType** SpellTypeTable;
 
 
 /// How many spell-types are available
@@ -1001,9 +1001,8 @@ global int SpellIdByIdent(const char* ident)
 	int id;
 
 	DebugCheck(!ident);
-
 	for (id = 0; id < SpellTypeCount; ++id) {
-		if (strcmp(SpellTypeTable[id].IdentName, ident) == 0) {
+		if (strcmp(SpellTypeTable[id]->IdentName, ident) == 0) {
 			return id;
 		}
 	}
@@ -1022,9 +1021,8 @@ global SpellType* SpellTypeByIdent(const char* ident)
 	int id;
 
 	DebugCheck(!ident);
-
 	id = SpellIdByIdent(ident);
-	return (id == -1 ? NULL : &SpellTypeTable[id]);
+	return (id == -1 ? NULL : SpellTypeTable[id]);
 }
 
 /**
@@ -1037,7 +1035,7 @@ global unsigned CclGetSpellByIdent(lua_State* l)
 
 	value = LuaToString(l, -1);
 	for (i = 0; i < SpellTypeCount; ++i) {
-		if (!strcmp(value, SpellTypeTable[i].IdentName)) {
+		if (!strcmp(value, SpellTypeTable[i]->IdentName)) {
 			return i;
 		}
 	}
@@ -1054,7 +1052,7 @@ global unsigned CclGetSpellByIdent(lua_State* l)
 global SpellType* SpellTypeById(int id)
 {
 	DebugCheck(!(0 <= id && id < SpellTypeCount));
-	return &SpellTypeTable[id];
+	return SpellTypeTable[id];
 }
 
 // ****************************************************************************
@@ -1073,7 +1071,7 @@ global int SpellIsAvailable(const Player* player, int spellid)
 	DebugCheck(!player);
 	DebugCheck(!(0 <= spellid && spellid < SpellTypeCount));
 
-	dependencyId = SpellTypeTable[spellid].DependencyId;
+	dependencyId = SpellTypeTable[spellid]->DependencyId;
 
 	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
 }
@@ -1239,12 +1237,14 @@ global int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 */
 void CleanSpells(void)
 {
+	int i;
 	SpellType* spell;
 	SpellActionType *act;
 	SpellActionType *nextact;
 
 	DebugLevel0("Cleaning spells.\n");
-	for (spell = SpellTypeTable; spell < SpellTypeTable + SpellTypeCount; ++spell) {
+	for (i = 0; i < SpellTypeCount; ++i) {
+		spell = SpellTypeTable[i];
 		free(spell->IdentName);
 		free(spell->Name);
 

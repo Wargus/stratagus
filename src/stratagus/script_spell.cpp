@@ -10,7 +10,7 @@
 //
 /**@name script_spells.c	-	The spell script functions.. */
 //
-//	(c) Copyright 1998-2003 by Joris DAUPHIN
+//	(c) Copyright 1998-2003 by Joris Dauphin and Crestez Leonard
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -590,11 +590,11 @@ local int CclDefineSpell(lua_State* l)
 	++j;
 	spell = SpellTypeByIdent(identname);
 	if (spell != NULL) {
-			DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
+		DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
 		free(identname);
 	} else {
-		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType));
-		spell = &SpellTypeTable[SpellTypeCount++];
+		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
+		spell = SpellTypeTable[SpellTypeCount++] = malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
 		spell->Ident = SpellTypeCount - 1;
 		spell->IdentName = identname;
@@ -1010,5 +1010,292 @@ global void SaveSpells(CLFile* file)
 	}
 #endif
 }
+
+#ifdef META_LUA
+
+//
+//	Functions directly acessible from lua. Placed in the stratagus namespace.
+//
+
+/**
+**  Create a new spell
+**
+**	@param l    Lua state, contains one string, the spell name.
+**
+**	@return The spell UserData in the stack.
+*/
+local int ScriptCreateSpell(lua_State* l)
+{
+	const char* name;
+	SpellType* spell;
+
+	if (lua_gettop(l) != 1) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+		return 0;
+	}
+	name = LuaToString(l, 1);
+
+	spell = SpellTypeByIdent(name);
+	if (spell != NULL) {
+		lua_pushstring(l, "Spell allready exists");
+		lua_error(l);
+		return 0;
+	} else {
+		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType));
+		spell = &SpellTypeTable[SpellTypeCount++];
+		memset(spell, 0, sizeof(SpellType));
+		spell->Ident = SpellTypeCount - 1;
+		spell->IdentName = strdup(name);
+		spell->DependencyId = -1;
+		ScriptSpellCreateUserdata(l, spell);
+		return 1;
+	}
+}
+
+/**
+**	Get function for a spell userdata.
+**
+**	@param l	The Lua State.
+*/
+local int ScriptSpellGetValue(lua_State* l)
+{
+	const SpellType* spell;
+	const char* key;
+
+	spell = *((SpellType**)lua_touserdata(l, -2));
+	key = lua_tostring(l, -1);
+	DebugCheck((!spell) || (!key));
+	DebugLevel0Fn("%p->(%s)\n" _C_ spell _C_ key);
+
+	META_GET_STRING("DisplayName", spell->Name);
+	META_GET_STRING("Ident", spell->IdentName);
+	META_GET_INT("ManaCost", spell->ManaCost);
+	META_GET_INT("Range", spell->Range);
+	META_GET_BOOL("RepeatCast", spell->RepeatCast);
+	
+	//  FIXME: macro for enums.
+	if (!strcmp(key, "Target")) {
+		switch (spell->Target) {
+			case TargetSelf:
+				lua_pushstring(l, "TargetSelf");
+				return 1;
+			case TargetPosition:
+				lua_pushstring(l, "TargetPosition");
+				return 1;
+			case TargetUnit:
+				lua_pushstring(l, "TargetUnit");
+				return 1;
+		}
+		// Somehow Target got a bad value
+		DebugCheck(1);
+	}
+
+	lua_pushfstring(l, "Field \"%s\" is innexistent or write-only (yes, we have those).\n", key);
+	lua_error(l);
+	return 0;
+}
+
+/**
+**	Get function for a spell userdata.
+**
+**	@param l	The Lua State.
+*/
+local int ScriptSpellSetValue(lua_State* l)
+{
+	SpellType* spell;
+	const char* key;
+	const char* val;
+
+	spell = *((SpellType**)lua_touserdata(l, -3));
+	key = LuaToString(l, -2);
+	DebugCheck((!spell) || (!key));
+	DebugLevel0Fn("%p->(%s)\n" _C_ spell _C_ key);
+
+	META_SET_STRING("DisplayName", spell->Name);
+	META_SET_STRING("Ident", spell->IdentName);
+	META_SET_INT("ManaCost", spell->ManaCost);
+	META_SET_INT("Range", spell->Range);
+	META_SET_BOOL("RepeatCast", spell->RepeatCast);
+
+	//  FIXME: macro for enums.
+	if (!strcmp(key, "Target")) {
+		val = LuaToString(l, -1);
+		if (!strcmp(val, "TargetSelf")) {
+			spell->Target = TargetSelf;
+			return 0;
+		} else if (!strcmp(val, "TargetPosition")) {
+			spell->Target = TargetPosition;
+			return 0;
+		} else if (!strcmp(val, "TargetUnit")) {
+			spell->Target = TargetUnit;
+			return 0;
+		}
+
+		lua_pushfstring(l, "Enum field \"%s\" can't receive value \"%s\"", key, val);
+		lua_error(l);
+		return 0;
+	}
+
+	lua_pushfstring(l, "Field \"%s\" is innexistent or read-only.\n", key);
+	lua_error(l);
+	return 0;
+}
+
+/**
+**	Garbage collection for a spell
+**
+**	@param l	 The lua state.
+*/
+global int ScriptSpellGCollect(lua_State* l)
+{
+	SpellType* spell;
+
+	spell = *((SpellType**)lua_touserdata(l, -1));
+	DebugLevel0Fn("Collecting ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ spell->ScriptData);
+/*	lua_pushstring(l, "StratagusReferences");
+	lua_gettable(l, LUA_REGISTRYINDEX);
+	lua_pushfstring(l, "%p", spell->ScriptData); //  FIXME: 64-bit?
+	lua_pushnil(l);
+	lua_settable(l, -3);
+	lua_settop(l, -2);
+	spell->ScriptData = 0;*/
+	return 0;
+}
+
+/**
+**  Create a lua table for a spell.
+**
+**	@param l      The lua state.
+**	@param spell  Point to the spell.
+*/
+global void ScriptSpellCreateUserdata(lua_State* l, SpellType* spell)
+{
+	char s[20];
+	int z = lua_gettop(l);
+	SpellType** sp;
+
+	if (spell->ScriptData) {
+		lua_pushstring(l, "StratagusReferences");
+		lua_gettable(l, LUA_REGISTRYINDEX);
+		sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
+		lua_pushstring(l, s);
+		lua_gettable(l, -2);
+		lua_remove(l, -2);
+		DebugLevel0Fn("Reusing ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
+	} else {
+		// Create userdata.
+		sp = (SpellType**)lua_newuserdata(l, sizeof(SpellType));
+		*sp = spell;
+		spell->ScriptData = sp;
+		// Generate the metatable
+		lua_newtable(l);
+		lua_pushstring(l, "__index");
+		lua_pushcfunction(l, ScriptSpellGetValue);
+		lua_settable(l, -3);
+		lua_pushstring(l, "__newindex");
+		lua_pushcfunction(l, ScriptSpellSetValue);
+		lua_settable(l, -3);
+		lua_pushstring(l, "__gc");
+		lua_pushcfunction(l, ScriptSpellGCollect);
+		lua_settable(l, -3);
+		lua_setmetatable(l, -2);
+		// Add to weak ref table.
+		lua_pushstring(l, "StratagusReferences");
+		lua_gettable(l, LUA_REGISTRYINDEX);
+		sprintf(s, "%p", spell->ScriptData); // FIXME: 64-bit.
+		lua_pushstring(l, s);
+		lua_pushvalue(l, -3);
+		lua_settable(l, -3);
+		lua_remove(l, -1);
+		DebugLevel0Fn("Creating ScriptData for a %s at %p.\n" _C_ "SpellType" _C_ lua_touserdata(l, -1));
+	}
+	DebugLevel0Fn("%d -> %d\n" _C_ z _C_ lua_gettop(l));
+}
+
+/**
+**	Create a lua table for the spell array
+**
+**  @param l     The lua state
+*/
+global void ScriptSpellTableCreateUserdata(lua_State* l)
+{
+}
+
+/**
+**	Get function for the big spell list.
+**
+**	@param l	The Lua State.
+*/
+local int ScriptSpellNamespaceGetValue(lua_State* l)
+{
+	int i;
+	const char* key;
+	SpellType* spell;
+
+	//  Index with number
+	if (lua_isnumber(l, 2)) {
+		i = LuaToNumber(l, 2);
+		DebugLevel3Fn("(%d)\n" _C_ i);
+		if (i < 0 || i >= SpellTypeCount) {
+			lua_pushstring(l, "Spell index out of range");
+			lua_error(l);
+			return 0;
+		}
+		ScriptSpellCreateUserdata(l, SpellTypeTable + i);
+		return 1;
+	}
+
+	//  Index with string. FIXME: hashtable? :)
+	key = LuaToString(l, 2);
+	DebugCheck(!key);
+	DebugLevel3Fn("(%s)\n" _C_ key);
+
+	META_GET_INT("n", SpellTypeCount);
+
+	spell = SpellTypeByIdent(key);
+	if (spell) {
+		ScriptSpellCreateUserdata(l, spell);
+		return 1;
+	}
+
+	lua_pushfstring(l, "Spell \"%s\" doesn't exist.\n", key);
+	lua_error(l);
+	return 0;
+}
+
+
+
+/**
+**	Initialize spell scripting. The main table is at -1
+**
+**	@param l   The lua state.
+*/
+global void ScriptSpellInit(void)
+{
+	// Create Stratagus.Spells namespace.
+	// No userdata, there's no data. And no finalizer
+	lua_pushstring(Lua, "Spells");
+	lua_newtable(Lua);
+
+	// Generate the metatable
+	lua_newtable(Lua);
+	lua_pushstring(Lua, "__index");
+	lua_pushcfunction(Lua, ScriptSpellNamespaceGetValue);
+	lua_settable(Lua, -3);
+	lua_pushstring(Lua, "__newindex");
+	lua_pushcfunction(Lua, ScriptSetValueBlock); // Read-Only
+	lua_settable(Lua, -3);
+	lua_setmetatable(Lua, -2);
+
+	// Add functions.
+	lua_pushstring(Lua, "Create");
+	lua_pushcfunction(Lua, ScriptCreateSpell);
+	lua_rawset(Lua, -3);
+
+	lua_rawset(Lua, -3);
+}
+
+#endif
 
 //@}
