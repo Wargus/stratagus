@@ -2016,7 +2016,7 @@ global void SavePreferences(void)
 {
     FILE* fd;
     char buf[1024];
-
+    int i;
     //
     //	    preferences1.ccl
     //	    This file is loaded before stratagus.ccl
@@ -2040,6 +2040,17 @@ global void SavePreferences(void)
     fprintf(fd, ";;; $Id$\n");
 
     fprintf(fd, "(set-video-resolution! %d %d)\n", VideoWidth, VideoHeight);
+    fprintf(fd, "(set-group-keys \"");
+    i = 0;
+    while (ui_group_keys[i]) {
+	if (ui_group_keys[i]!='"') {
+	    fprintf(fd, "%c", ui_group_keys[i]);
+	} else {
+	    fprintf(fd, "\"");
+	}
+	i++;
+    }
+    fprintf(fd, "\"\n");
     
     fclose(fd);
 #elif defined(USE_LUA)
