@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.h	-	The actions headerfile. */
+/**@name actions.h - The actions headerfile. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __ACTIONS_H__
 #define __ACTIONS_H__
@@ -34,7 +34,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "unittype.h"
@@ -43,33 +43,33 @@
 #include "spells.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 enum _diplomacy_ {
-	DiplomacyAllied,				/// Ally with opponent
-	DiplomacyNeutral,				/// Don't attack be neutral
-	DiplomacyEnemy,				/// Attack opponent
-	DiplomacyCrazy,				/// Ally and attack opponent
-};								/// Diplomacy states for CommandDiplomacy
+	DiplomacyAllied,   /// Ally with opponent
+	DiplomacyNeutral,  /// Don't attack be neutral
+	DiplomacyEnemy,    /// Attack opponent
+	DiplomacyCrazy,    /// Ally and attack opponent
+};                     /// Diplomacy states for CommandDiplomacy
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-extern unsigned		SyncHash;			/// Hash calculated to find sync failures
+extern unsigned SyncHash;  /// Hash calculated to find sync failures
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Commands:		in command.c
+--  Commands: in command.c
 ----------------------------------------------------------------------------*/
 
 /*
-**		This functions gives an unit a new command. If the command is given
-**		by the user the function with Send prefix should be used.
+**  This functions gives an unit a new command. If the command is given
+**  by the user the function with Send prefix should be used.
 */
 
 	/// Prepare command quit
@@ -116,8 +116,10 @@ extern void CommandCancelUpgradeTo(Unit* unit);
 extern void CommandResearch(Unit* unit,Upgrade* what,int flush);
 	/// Prepare command cancel research
 extern void CommandCancelResearch(Unit* unit);
+#if 0
 	/// Prepare command upgrade
-//extern void CommandUpgradeUnit(Unit* unit,int what,int flush);
+extern void CommandUpgradeUnit(Unit* unit,int what,int flush);
+#endif
 	/// Prepare command spellcast
 extern void CommandSpellCast(Unit* unit,int x,int y,Unit* dest
 		,SpellType* spell,int flush);
@@ -132,7 +134,7 @@ extern void CommandAnyOrder(Unit* unit,Order * order,int flush);
 	/// Move an order in command queue
 extern void CommandMoveOrder(Unit* unit,int src,int dst);
 /*----------------------------------------------------------------------------
---		Actions:		in action_<name>.c
+--  Actions: in action_<name>.c
 ----------------------------------------------------------------------------*/
 
 	/// Generic still action
@@ -181,7 +183,7 @@ extern void HandleActionResearch(Unit* unit);
 extern void HandleActionSpellCast(Unit* unit);
 
 /*----------------------------------------------------------------------------
---		Actions:		actions.c
+--  Actions: actions.c
 ----------------------------------------------------------------------------*/
 
 	/// Check if a goal is gone/dead/invisible ?under-fow?
