@@ -1252,7 +1252,7 @@ void MapSplitterEachCycle(void)
 **
 ** @return Distance to place.
 */
-int PlaceReachable(Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
+int PlaceReachable(const Unit* src, int goal_x, int goal_y, int w, int h, int minrange, int maxrange)
 {
 	static ZoneSet source = {0};
 	static ZoneSet dest = {0};

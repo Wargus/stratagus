@@ -230,7 +230,7 @@ static void ZoneSetAddPassableRange(ZoneSet* zs, int x0, int y0, int x1, int y1,
 ** @param source   Pointer to a ZoneSet
 ** @param src      Pointer to an unit
 */
-void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
+void ZoneSetAddUnitZones(ZoneSet * source, const Unit * src)
 {
 	int unitmask;
 	int start_x0, start_y0, start_x1, start_y1;
@@ -269,7 +269,7 @@ void ZoneSetAddUnitZones(ZoneSet * source,Unit * src)
 ** @param minrange   minrange to the goal
 ** @param maxrange   maxrange to the goal
 */
-void ZoneSetAddGoalZones(ZoneSet* dest,Unit* src, int goal_x, int goal_y,int w,int h,int minrange,int maxrange)
+void ZoneSetAddGoalZones(ZoneSet* dest, const Unit* src, int goal_x, int goal_y,int w,int h,int minrange,int maxrange)
 {
 	int goal_x0, goal_y0, goal_x1, goal_y1;
 	int unitmask;
