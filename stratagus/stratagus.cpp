@@ -297,6 +297,9 @@ global int main1(int argc __attribute__ ((unused)),
 #ifdef NEW_AI
     "NEW-AI "
 #endif
+#ifdef NEW_SHIPS
+    "NEW-SHIPS "
+#endif
 #ifdef SLOW_INPUT
     "SLOW-INPUT "
 #endif
