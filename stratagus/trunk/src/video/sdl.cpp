@@ -175,7 +175,7 @@ global void InitVideoSdl(void)
 
 	// Set WindowManager Title
 
-	SDL_WM_SetCaption("FreeCraft (formerly known as ALE Clone)","FreeCraft");
+	SDL_WM_SetCaption("FreeCraft","FreeCraft");
     } else {
 	if( VideoBpp == 32 && VideoDepth == 24 ) {
 	    VideoDepth = 0;
