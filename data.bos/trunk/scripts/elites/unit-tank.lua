@@ -53,18 +53,18 @@ DefineUnitType("unit-tank", {
         Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
         Animations = "animations-tank", Icon = "icon-tank",
         Flip = false,
-        Costs = {"time", 120, "titanium", 170, "crystal", 300},
+        Costs = {"time", 150, "titanium", 200, "crystal", 100},
         RepairHp = 1, RepairCosts = {"crystal", 6},
-        Speed = 10, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-        SightRange = 5, Armor = 20, BasicDamage = 10, PiercingDamage = 0,
+        Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+        SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
         Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+        Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
         Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
-	NumDirections = 8, MaxAttackRange = 8,
+	NumDirections = 8, MaxAttackRange = 6,
         Sounds = {}
         })
 
