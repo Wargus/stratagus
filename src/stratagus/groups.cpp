@@ -90,7 +90,7 @@ global void SaveGroups(FILE* file)
 
     for( g=0; g<NUM_GROUPS; g++ ) {
 	fprintf(file,";;(group %d %d '(",g,Groups[g].NumUnits);
-	for( i=0; i<NumSelected; ++i ) {
+	for( i=0; i<Groups[g].NumUnits; ++i ) {
 	    ref=UnitReference(Groups[g].Units[i]);
 	    fprintf(file,"%s ",ref);
 	    free(ref);
