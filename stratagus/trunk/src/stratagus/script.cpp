@@ -869,7 +869,7 @@ global void SavePreferences(void)
     if( OriginalFogOfWar ) {
 	fprintf(fd,"(original-fog-of-war)\n");
     } else {
-	fprintf(fd,"(gray-fog-of-war)\n");
+	fprintf(fd,"(alpha-fog-of-war)\n");
     }
     fprintf(fd,"(set-video-fullscreen! #%c)\n", VideoFullScreen ? 't' : 'f');
 #if 0

@@ -45,8 +45,8 @@
 <A HREF="#a-star">a-star</A>
 <A HREF="#a-star-fixed-unit-cost">a-star-fixed-unit-cost</A>
 <A HREF="#a-star-moving-unit-cost">a-star-moving-unit-cost</A>
+<A HREF="#alpha-fog-of-war">alpha-fog-of-war</A>
 <A HREF="#decoration-on-top">decoration-on-top</A>
-<A HREF="#gray-fog-of-war">gray-fog-of-war</A>
 <A HREF="#health-sprite">health-sprite</A>
 <A HREF="#mana-sprite">mana-sprite</A>
 <A HREF="#no-a-star">no-a-star</A>
@@ -210,6 +210,29 @@ General configurations.
 
 <A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
 
+<A NAME="alpha-fog-of-war"></A>
+<H3>alpha-fog-of-war</H3>
+
+<H4>Description</H4>
+
+Use alpha style fog of war.
+
+<H4>Syntax</H4>
+
+<CODE>(alpha-fog-of-war)</CODE>
+
+<H4>Example</H4>
+
+<PRE>
+    (alpha-fog-of-war)
+</PRE>
+
+<P>Use alpha style fog of war.
+
+<H4>Used</H4>
+
+<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
+
 <A NAME="decoration-on-top"></A>
 <H3>decoration-on-top</H3>
 
@@ -225,29 +248,6 @@ Show bars and dots always on top. (Planned feature)
 
 <PRE>
     (decoration-on-top)
-</PRE>
-
-<P>.
-
-<H4>Used</H4>
-
-<A HREF="../../data/ccl/freecraft.ccl"> $LIBARYPATH/ccl/freecraft.ccl </A>
-
-<A NAME="gray-fog-of-war"></A>
-<H3>gray-fog-of-war</H3>
-
-<H4>Description</H4>
-
-.
-
-<H4>Syntax</H4>
-
-<CODE>(gray-fog-of-war)</CODE>
-
-<H4>Example</H4>
-
-<PRE>
-    (gray-fog-of-war)
 </PRE>
 
 <P>.
@@ -359,7 +359,7 @@ Show bars and dots always on top. (Planned feature)
 
 <H4>Description</H4>
 
-.
+Use original style fog of war.
 
 <H4>Syntax</H4>
 
@@ -371,7 +371,7 @@ Show bars and dots always on top. (Planned feature)
     (original-fog-of-war)
 </PRE>
 
-<P>.
+<P>Use original style fog of war.
 
 <H4>Used</H4>
 
