@@ -747,7 +747,7 @@ local int CommandKey(int key)
 	case 'S':
 	    if( KeyModifiers&ModifierControl ) {
 		if( (KeyModifiers&ModifierAlt) ) {
-		    SavePud("freecraft.pud",&TheMap);
+		    SavePud("freecraft.pud.gz",&TheMap);
 		    SetMessage("Pud saved");
 		    break;
 		}
