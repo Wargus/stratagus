@@ -362,6 +362,55 @@ global void LoadDecorations(void)
 }
 
 /**
+**	Draw mana/working bar.
+**
+**	@param x	X screen pixel position.
+**	@param y	Y screen pixel position.
+**	@param type	Unit type pointer.
+**	@param full	full value
+**	@param ready	ready value
+*/
+local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
+{
+    int f;
+
+    f=(100*ready)/full;
+    if ( ShowManaHorizontal == 0)  {
+	VideoFillRectangleClip(ColorBlue
+		,x+(type->TileWidth*TileSizeX
+			+type->BoxWidth)/2
+		,y+(type->TileHeight*TileSizeY
+			-type->BoxHeight)/2
+		,2,(f*type->BoxHeight)/100);
+    }  else  {
+	//
+	//	Draw the black rectangle in full size?
+	//
+	if( ShowManaBackgroundLong ) {
+	    VideoFillRectangleClip(ColorBlack
+		,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+		,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+			+type->BoxHeight+5
+		,(type->BoxHeight)+1
+		,5);
+	} else {
+	    VideoDrawRectangleClip(ColorBlack
+		,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+		,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+			+type->BoxHeight+5
+		,(f*type->BoxHeight)/100
+		,4);
+	}
+	VideoFillRectangleClip(ColorBlue
+		,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
+		,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+			+type->BoxHeight+6
+		,(f*type->BoxHeight)/100-1
+		,3);
+    }
+}
+
+/**
 **	Draw decoration (invis, for the unit.)
 **
 **	@param unit	Pointer to the unit.
@@ -504,42 +553,46 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //
     if( ShowManaBar ) {
 	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
-	    if ( ShowManaHorizontal == 0)  {
-		f=(100*unit->Mana)/255;
-		VideoFillRectangleClip(ColorBlue
-			,x+(type->TileWidth*TileSizeX
-				+type->BoxWidth)/2
-			,y+(type->TileHeight*TileSizeY
-				-type->BoxHeight)/2
-			,2,(f*type->BoxHeight)/100);
-	    }  else  {
-		f=(100*unit->Mana)/255;
-		//
-		//	Draw the black rectangle in full size?
-		//
-		if( ShowManaBackgroundLong ) {
-		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+5
-			,(type->BoxHeight)+1
-			,5);
-		} else {
-		    VideoDrawRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+5
-			,(f*type->BoxHeight)/100
-			,4);
-		}
-		VideoFillRectangleClip(ColorBlue
-			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+6
-			,(f*type->BoxHeight)/100-1
-			,3);
-	    }
+	    DrawManaBar(x,y,type,255,unit->Mana);
+	}
+	//
+	//	Show working of units.
+	//
+	if( unit->Player==ThisPlayer ) {
 
+	    //
+	    //	Building under constuction.
+	    //
+	    /*
+	    if( unit->Orders[0].Action==UnitActionBuilded ) {
+		DrawManaBar(x,y,type,stats->HitPoints,unit->HP);
+	    } else
+	    */
+
+	    //
+	    //	Building training units.
+	    //
+	    if( unit->Orders[0].Action==UnitActionTrain ) {
+		DrawManaBar(x,y,type,unit->Data.Train.What[0]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
+			,unit->Data.Train.Ticks);
+
+	    //
+	    //	Building upgrading to better type.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+		DrawManaBar(x,y,type,unit->Orders[0].Type
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
+			,unit->Data.UpgradeTo.Ticks);
+
+	    //
+	    //	Building research new technologie.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionResearch ) {
+		DrawManaBar(x,y,type,unit->Data.Research.Upgrade
+			    ->Costs[TimeCost]
+			,unit->Data.Research.Ticks);
+	    }
 	}
     }
 
