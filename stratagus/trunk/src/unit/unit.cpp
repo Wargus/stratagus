@@ -3935,7 +3935,7 @@ global void SaveUnit(const Unit* unit,FILE* file)
     fprintf(file,"\n  'on-board #(");
     for( i=0; i<MAX_UNITS_ONBOARD; ++i ) {
 	if( unit->OnBoard[i] ) {
-	    fprintf(file,"'%s",ref=UnitReference(unit->OnBoard[i]));
+	    fprintf(file,"%s",ref=UnitReference(unit->OnBoard[i]));
 	    free(ref);
 	} else {
 	    fprintf(file,"()");
