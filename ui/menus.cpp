@@ -1497,7 +1497,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
     } else {
 	menu->items[11].flags = 0;
     }
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
+#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 	menu->items[11].flags = MenuButtonDisabled;
     }
@@ -1513,7 +1513,7 @@ local void InitSoundOptions(Menuitem *mi __attribute__((unused)))
     menu->items[17].d.gem.state = MI_GSTATE_UNCHECKED;
     menu->items[19].flags = MenuButtonDisabled;		// all tracks button
     menu->items[21].flags = MenuButtonDisabled;		// random tracks button
-#if defined(USE_LIBCDA) || defined(USE_SDLCD)
+#if defined(USE_LIBCDA) || defined(USE_SDLCD) || defined(USE_CDDA)
     menu->items[17].flags = 0;			// cd power
     if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode)) {
 #ifdef USE_LIBCDA
