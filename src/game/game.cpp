@@ -160,9 +160,6 @@ local void LoadMap(const char* filename,WorldMap* map)
 
 /**
 **	Free for all
-**
-**	@todo FIXME: It is not necessary to use send command, the setup is
-**		executed on all machines.
 */
 local void GameTypeFreeForAll(void)
 {
@@ -180,9 +177,6 @@ local void GameTypeFreeForAll(void)
 
 /**
 **	Top vs Bottom
-**
-**	@todo FIXME: It is not necessary to use send command, the setup is
-**		executed on all machines.
 */
 local void GameTypeTopVsBottom(void)
 {
@@ -209,9 +203,6 @@ local void GameTypeTopVsBottom(void)
 
 /**
 **	Left vs Right
-**
-**	@todo FIXME: It is not necessary to use send command, the setup is
-**		executed on all machines.
 */
 local void GameTypeLeftVsRight(void)
 {
@@ -227,6 +218,30 @@ local void GameTypeLeftVsRight(void)
 	    if (i != j) {
 		if ((top && Players[j].StartX <= middle) ||
 		    (!top && Players[j].StartX > middle)) {
+		    CommandDiplomacy(i,DiplomacyAllied,j);
+		} else {
+		    CommandDiplomacy(i,DiplomacyEnemy,j);
+		}
+	    }
+	}
+    }
+}
+
+/**
+**	Man vs Machine
+*/
+local void GameTypeManVsMachine(void)
+{
+    int i;
+    int j;
+
+    for (i=0; i<15; i++) {
+	if (Players[i].Type!=PlayerPerson && Players[i].Type!=PlayerComputer ) {
+	    continue;
+	}
+	for (j=0; j<15; j++) {
+	    if (i != j) {
+		if (Players[i].Type==Players[j].Type) {
 		    CommandDiplomacy(i,DiplomacyAllied,j);
 		} else {
 		    CommandDiplomacy(i,DiplomacyEnemy,j);
@@ -341,6 +356,9 @@ global void CreateGame(char* filename, WorldMap* map)
 		break;
 	    case SettingsGameTypeLeftVsRight:
 		GameTypeLeftVsRight();
+		break;
+	    case SettingsGameTypeManVsMachine:
+		GameTypeManVsMachine();
 		break;
 
 	    // Future game type ideas
