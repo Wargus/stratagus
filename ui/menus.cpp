@@ -2494,6 +2494,7 @@ local void SaveAction(void)
     strcpy(filename, SaveDir);
     strcat(filename, "/");
     strncat(filename, name, nameLength);
+    strcat(filename, ".sav");
 
     if (access(filename,F_OK)) {
         SaveGame(filename);
@@ -3025,7 +3026,7 @@ local void SaveMenu(void)
 
 local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
 {
-    static char name[128];
+    static char name[PATH_MAX];
     strcpy(name, "the file: ");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     ConfirmSaveMenuItems[2].d.text.text = name;
@@ -3033,10 +3034,11 @@ local void ConfirmSaveInit(Menuitem *mi __attribute__((unused)))
 
 local void ConfirmSaveFile(void)
 {
-    char name[256];
+    char name[PATH_MAX];
     strcpy(name, SaveDir);
     strcat(name, "/");
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
+    strcat(name, ".sav");
     SaveGame(name);
     SetMessage("Saved game to: %s", name);
     EndMenu();
