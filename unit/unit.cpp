@@ -3379,9 +3379,6 @@ int CanTarget(const UnitType* source, const UnitType* dest)
 {
 	int i;
 
-	if (source == dest) { // cannot attack itself.
-		return 0;
-	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
 		if (source->CanTargetFlag[i] != CONDITION_TRUE) {
 			if ((source->CanTargetFlag[i] == CONDITION_ONLY) ^ (dest->BoolFlag[i])) {
