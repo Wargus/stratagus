@@ -190,12 +190,16 @@ endif
 #	TOOLS
 ##############################################################################
 
-tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/startool$(EXE)
+tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/war1tool$(EXE) \
+	tools/startool$(EXE)
 
 tools/aledoc$(EXE): tools/aledoc.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
 tools/wartool$(EXE): tools/wartool.c
+	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
+
+tools/war1tool$(EXE): tools/war1tool.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
 tools/startool$(EXE):	tools/startool.c $(TOPDIR)/src/clone/$(OBJDIR)/mpq.o
