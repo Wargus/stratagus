@@ -38,6 +38,38 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Add unit-type request to resource manager.
+**
+**	@param type	Unit type requested.
+**	@param count	How many units.
+*/
+global void AiAddUnitTypeRequest(UnitType* type,int count)
+{
+    int n;
+
+    DebugLevel0Fn("%s %d\n",type->Ident,count);
+    if( AiPlayer->UnitTypeBuilded ) {
+	n=AiPlayer->BuildedCount;
+	AiPlayer->UnitTypeBuilded=realloc(AiPlayer->UnitTypeBuilded,
+		(n+1)*sizeof(*AiPlayer->UnitTypeBuilded));
+    } else {
+	AiPlayer->UnitTypeBuilded=malloc(sizeof(*AiPlayer->UnitTypeBuilded));
+	n=0;
+    }
+    AiPlayer->UnitTypeBuilded[n].Type=type;
+    AiPlayer->UnitTypeBuilded[n].Want=count;
+    AiPlayer->UnitTypeBuilded[n].Made=0;
+    AiPlayer->BuildedCount=n+1;
+}
+
+/**
+**	Entry point of resource manager, perodic called.
+*/
+global void AiResourceManager(void)
+{
+}
+
 //@}
 
 #endif // } NEW_AI
