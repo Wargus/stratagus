@@ -2651,7 +2651,7 @@ local void DeleteMenu(void)
 
 local void DeleteInit(Menuitem *mi __attribute__((unused)))
 {
-    char text[512]="the file: ";
+    static char text[512]="the file: ";
     strcat(text, SaveGameMenuItems[1].d.input.buffer);
     ConfirmDeleteMenuItems[2].d.text.text = text;
 }
@@ -2664,6 +2664,7 @@ local void DeleteFile(void)
     strcat(name, SaveGameMenuItems[1].d.input.buffer);
     unlink(name);
     EndMenu();
+    ProcessMenu(MENU_SAVE_GAME, 1);
 }
 
 global void GameMenuLoad(void)
