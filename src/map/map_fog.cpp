@@ -208,9 +208,9 @@ global int IsTileVisible(const Player* player, int x, int y)
 	if ( player->SharedVision&(1<<i) &&
 		   (Players[i].SharedVision&(1<<player->Player)) ) {
             if (visiontype < TheMap.Fields[y*TheMap.Width+x].
-					Visible[player->Player]) {
+					Visible[i]) {
 		visiontype=TheMap.Fields[y*TheMap.Width+x].
-					Visible[player->Player];
+					Visible[i];
 	    }
 	}
 	if (visiontype > 1) {
@@ -2063,6 +2063,8 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
     char* redraw_tile;
 #ifdef NEW_FOW
     int p;
+    int my;
+    int mx;
 #endif
 #ifdef TIMEIT
     u_int64_t sv=rdtsc();
@@ -2098,7 +2100,9 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 #else
                   *redraw_tile=0;
 #ifdef NEW_FOW
-		    if( TheMap.Fields[sx].Visible[p] ) {
+		    mx=(dx-vp->X)/TileSizeX + vp->MapX;
+		    my=(dy-vp->Y)/TileSizeY + vp->MapY;
+		    if( IsTileVisible(ThisPlayer,mx,my) ) {
 			DrawFogOfWarTile(sx,sy,dx,dy);
 		    } else {
 #ifdef USE_OPENGL
@@ -2124,11 +2128,10 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 #define GameFont 1
 	{
-	char seen[4];
+	char seen[7];
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
-	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[
-		ThisPlayer->Player]);
+	sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
 	VideoDrawText(dx,dy, GameFont,seen);
 	}
 #endif 
