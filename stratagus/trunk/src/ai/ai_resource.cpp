@@ -1044,6 +1044,180 @@ local int AiHaulOil(Unit * unit)
 */
 local void AiCollectResources(void)
 {
+#if 1
+    Unit* resource[UnitMax][MaxCosts];	// Worker with resource
+    int rn[MaxCosts];
+    Unit* assigned[UnitMax][MaxCosts];	// Worker assigned to resource
+    int an[MaxCosts];
+    Unit* unassigned[UnitMax];		// Unassigned workers
+    int un;
+    int total;				// Total of workers
+    int c;
+    int i;
+    int j;
+    int o;
+    int n;
+    Unit** units;
+    Unit* unit;
+    int p[MaxCosts] = { 0, 50, 50, 0 };
+
+    //
+    //	Collect statistics about the current assignment
+    //
+    for( i=0; i<MaxCosts; i++ ) {
+	rn[i]=0;
+	an[i]=0;
+    }
+    total=un=0;
+#if 0
+    if( (AiPlayer->NeededMask&(1<<i)) ) {	// Double percent if needed
+	p[i]*=2;
+    }
+#endif
+
+    n=AiPlayer->Player->TotalNumUnits;
+    units=AiPlayer->Player->Units;
+    for( i=0; i<n; i++ ) {
+	unit=units[i];
+	if( !unit->Type->CowerWorker && !unit->Type->Tanker ) {
+	    continue;
+	}
+	switch( unit->Orders[0].Action ) {
+	    case UnitActionMineGold:
+		assigned[an[GoldCost]++][GoldCost]=unit;
+		continue;
+	    case UnitActionHarvest:
+		assigned[an[WoodCost]++][WoodCost]=unit;
+		continue;
+	    case UnitActionHaulOil:
+		assigned[an[OilCost]++][OilCost]=unit;
+		continue;
+		// FIXME: the other resources
+	    default:
+		break;
+	}
+
+	//
+	//	Look what the unit can do
+	//
+	for( c=0; c<MaxCosts; ++c ) {
+	    int tn;
+	    UnitType** types;
+
+	    //
+	    //	Send workers with resource home
+	    //
+	    if( c>=AiHelpers.WithGoodsCount || !AiHelpers.WithGoods[c] ) {
+		continue;		// Nothing known about the resource
+	    }
+	    types=AiHelpers.WithGoods[c]->Table;
+	    tn=AiHelpers.WithGoods[c]->Count;
+	    for( j=0; j<tn; ++j ) {
+		if( unit->Type==types[j] ) {
+		    resource[rn[c]++][c]=unit;
+		    if (unit->Orders[0].Action == UnitActionStill
+			    && unit->OrderCount==1 ) {
+			CommandReturnGoods(unit,NULL,FlushCommands);
+		    }
+		    break;
+		}
+	    }
+
+	    //
+	    //	Look if it is a worker
+	    //
+	    if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
+		continue;		// Nothing known about the resource
+	    }
+	    types=AiHelpers.Collect[c]->Table;
+	    tn=AiHelpers.Collect[c]->Count;
+	    for( j=0; j<tn; ++j ) {
+		if( unit->Type==types[j] ) {
+		    if (unit->Orders[0].Action == UnitActionStill
+			    && unit->OrderCount==1 ) {
+			unassigned[un++]=unit;
+			break;
+		    }
+		}
+	    }
+	    if( j<tn ) {
+		break;
+	    }
+	}
+    }
+
+    total=0;
+    for( c=0; c<MaxCosts; ++c ) {
+	total+=an[c]+rn[c];
+	DebugLevel3Fn("Assigned %d = %d\n",c,an[c]);
+	DebugLevel3Fn("Resource %d = %d\n",c,rn[c]);
+    }
+    DebugLevel3Fn("Unassigned %d of total %d\n",un,total);
+
+    //
+    //	Now assign the free workers.
+    //
+    for( i=0; i<un; i++ ) {
+	int t;
+
+	unit=unassigned[i];
+
+	for( o=c=0; c<MaxCosts; ++c ) {
+	    DebugLevel3Fn("%d, %d, %d\n",(an[c]+rn[c])*p[c],p[c],total*100);
+	    if( (an[c]+rn[c])*100<total*p[c] ) {
+		o=c;
+		break;
+	    }
+	}
+
+	//
+	//	Look what the unit can do
+	//
+	for( t=0; t<MaxCosts; ++t ) {
+	    int tn;
+	    UnitType** types;
+
+	    c=(t+o)%MaxCosts;
+
+	    //
+	    //	Look if it is a worker for this resource
+	    //
+	    if( c>=AiHelpers.CollectCount || !AiHelpers.Collect[c] ) {
+		continue;		// Nothing known about the resource
+	    }
+	    types=AiHelpers.Collect[c]->Table;
+	    tn=AiHelpers.Collect[c]->Count;
+	    for( j=0; j<tn; ++j ) {
+		if( unit->Type==types[j]
+			&& unit->Orders[0].Action == UnitActionStill
+			&& unit->OrderCount==1 ) {
+		    switch( c ) {
+			case GoldCost:
+			    if( AiMineGold(unit) ) {
+				assigned[an[c]++][c]=unit;
+				++total;
+			    }
+			    break;
+			case WoodCost:
+			    if( AiHarvest(unit) ) {
+				assigned[an[c]++][c]=unit;
+				++total;
+			    }
+			    break;
+			case OilCost:
+			    if( AiHaulOil(unit) ) {
+				assigned[an[c]++][c]=unit;
+				++total;
+			    }
+			    break;
+			default:
+			    break;
+		    }
+		}
+	    }
+	}
+    }
+#else
     int c;
     int i;
     int n;
@@ -1082,6 +1256,7 @@ local void AiCollectResources(void)
 	    if (table[i]->Orders[0].Action != UnitActionBuild
 		    && table[i]->Orders[0].Action != UnitActionRepair
 		    && table[i]->OrderCount==1 ) {
+		DebugLevel0Fn("Reassign %d\n",UnitNumber(table[i]));
 		switch( c ) {
 		    case GoldCost:
 			if (table[i]->Orders[0].Action != UnitActionMineGold ) {
@@ -1179,6 +1354,7 @@ local void AiCollectResources(void)
 	}
 	CommandReturnGoods(table[i],NULL,FlushCommands);
     }
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -1219,7 +1395,7 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     //  miners can't reach but others can. This will be useful if AI becomes
     //  more flexible (e.g.: transports workers to an island)
     //	FIXME: too hardcoded, not nice, needs improvement.
-    //
+    //  FIXME: too many workers repair the same building!
 
     // Selection of mining workers.
     nunits = FindPlayerUnitsByType(AiPlayer->Player,type,table);
