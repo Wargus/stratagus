@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name minimap.h	-	The minimap headerfile. */
-/*
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998,2000,2001 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __MINIMAP_H__
 #define __MINIMAP_H__
@@ -26,17 +25,16 @@
 
 #define MINIMAP_FAC	(16*3)		/// integer scale factor
 
-/**
-**	Convert minimap cursor X position to map coordinate.
-*/
+    ///	Convert minimap cursor X position to tile map coordinate.
 #define Minimap2MapX(x)	\
     ((((x)-TheUI.MinimapX-24-MinimapX)*MINIMAP_FAC)/MinimapScale)
 
-/**
-**	Convert minimap cursor Y position to map coordinate.
-*/
+    ///	Convert minimap cursor Y position to tile map coordinate.
 #define Minimap2MapY(y)	\
     ((((y)-TheUI.MinimapY-2-MinimapY)*MINIMAP_FAC)/MinimapScale)
+
+    /// Update seen tile change in minimap
+#define UpdateMinimapSeenXY(tx,ty)
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -54,11 +52,17 @@ extern int MinimapShowSelected;		/// highlight selected units
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void UpdateMinimapXY(int tx,int ty);	///
+    /// Update tile change in minimap
+extern void UpdateMinimapXY(int tx,int ty);
+    /// Update complete minimap.
 extern void UpdateMinimap(void);
+    /// Create new minimap.
 extern void CreateMinimap(void);
+    /// Draw minimap with viewpoint.
 extern void DrawMinimap(int vx,int vy);
+    /// Hide minimap cursor.
 extern void HideMinimapCursor(void);
+    /// Draw minimap viewpoint cursor.
 extern void DrawMinimapCursor(int vx,int vy);
 
 //@}

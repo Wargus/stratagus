@@ -1375,10 +1375,6 @@ global Tileset Tilesets[TilesetMax] = {
     ,TileTableSummer
     ,NULL
     ,NULL
-#if 1
-    ,16,52,88
-    ,34,70,88
-#endif
     ,{ 115, 116, 117, 118, 119, 120 }
     ,121, 122, 123
     ,126
@@ -1400,10 +1396,6 @@ global Tileset Tilesets[TilesetMax] = {
     ,TileTableWinter
     ,NULL
     ,NULL
-#if 1
-    ,16,52,88
-    ,34,70,88
-#endif
     ,{ 115, 116, 117, 118, 119, 120 }
     ,121, 122, 123
     ,126
@@ -1425,10 +1417,6 @@ global Tileset Tilesets[TilesetMax] = {
     ,TileTableWasteland
     ,NULL
     ,NULL
-#if 1
-    ,16,52,88
-    ,34,70,88
-#endif
     ,{ 115, 116, 117, 118, 119, 120 }
     ,121, 122, 123
     ,126
@@ -1450,10 +1438,6 @@ global Tileset Tilesets[TilesetMax] = {
     ,TileTableSwamp
     ,NULL
     ,NULL
-#if 1
-    ,16,52,88
-    ,34,70,88
-#endif
     ,{ 115, 116, 117, 118, 119, 120 }
     ,121, 122, 123
     ,126

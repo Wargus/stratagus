@@ -10,11 +10,17 @@
 //
 /**@name map_rock.c	-	The map rock handling. */
 //
-//	(c) Copyright 1999-2001 by Vladi Shabanski
+//	(c) Copyright 1999-2001 by Vladi Shabanski and Lutz Sammer
 //
 //	$Id$
 
 //@{
+
+/*
+**	Note:
+**		This functions are doubled. One for the real map tile and one
+**		for the tile that the player sees.
+*/
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -37,115 +43,219 @@
 
 /**
 **	Table for rock removable.
+**	@todo	Johns: I don't think this table or routines look correct.
+**		But they work correct.
 */
-global int RockTable[20] = {
-//  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F
-   -1, 22, -1,  1, 20, 21,  3,  2, -1,  9, -1, 23,  6,  8,  5, 36
-   ,7, 10, 11, 4
-};
+global int RockTable[20];
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Check if the tile type is rock.
+**	Check if the seen tile-type is rock.
 **
-**	Used by @see FixRock and @see PreprocessMap
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
 */
-local int MapRockChk(int x,int y)
+global int MapIsSeenTileRock(int x, int y)
 {
-    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	return 1;		// outside considered rock
-    }
-
     return TheMap.Tileset->TileTypeTable[
 	    TheMap.Fields[(x)+(y)*TheMap.Width].SeenTile
 	] == TileTypeRock;
 }
 
-// FIXME: docu
-local int FixRock(int x,int y) // used by MapRemoveRock and PreprocessMap
+/**
+**	Correct the seen rock field, depending on the surrounding.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixSeenRockTile(int x, int y)
 {
     int tile;
-    MapField* mf;
+    MapField *mf;
 
-    //	Outside map or no rock.
-    if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	return 0;
+    //  Outside of map or no rock.
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	return;
     }
-    if ( !MapRockChk(x,y) ) {
-	return 0;
+    if (!MapIsSeenTileRock(x,y)) {
+	return;
     }
 
-#define ROCK(xx,yy) (MapRockChk(xx,yy) != 0)
+    //
+    //  Calculate the correct tile. Depends on the surrounding.
+    //
     tile = 0;
-    if (ROCK(x  ,y-1)) tile |= 1<<0;
-    if (ROCK(x+1,y  )) tile |= 1<<1;
-    if (ROCK(x  ,y+1)) tile |= 1<<2;
-    if (ROCK(x-1,y  )) tile |= 1<<3;
-
-    tile = RockTable[tile];
-    if (tile == -1) {
-	MapRemoveRock(x,y);
-    } else {
-	if (tile == RockTable[15]) {
-    // Vladi: still to filter tiles w. corner empties -- note: the original
-    // tiles and order are not perfect either. It's a hack but is enough and
-    // looks almost fine.
-	    if (MapRockChk(x+1,y-1) == 0) tile = RockTable[16]; else
-	    if (MapRockChk(x+1,y+1) == 0) tile = RockTable[17]; else
-	    if (MapRockChk(x-1,y+1) == 0) tile = RockTable[18]; else
-	    if (MapRockChk(x-1,y-1) == 0) tile = RockTable[19]; else
-			    tile = RockTable[15]; // not required really
-	}
-
-	mf=TheMap.Fields+x+y*TheMap.Width;
-	if ( mf->SeenTile == tile) {
-	    return 0;
-	}
-	mf->SeenTile =  tile;
+    if ((y - 1) < 0 || MapIsSeenTileRock(x,y-1)) {
+	tile |= 1 << 0;
     }
-    UpdateMinimapXY(x,y);
-    return 1;
+    if ((x + 1) >= TheMap.Width || MapIsSeenTileRock(x+1,y)) {
+	tile |= 1 << 1;
+    }
+    if ((y + 1) >= TheMap.Height || MapIsSeenTileRock(x,y+1)) {
+	tile |= 1 << 2;
+    }
+    if ((x - 1) < 0 || MapIsSeenTileRock(x-1,y)) {
+	tile |= 1 << 3;
+    }
+    if( tile==15 ) {			// Filter more corners.
+	       if ((y - 1) > 0 && (x + 1) < TheMap.Width
+		&& !MapIsSeenTileRock(x+1,y-1)) {
+	    tile += 1;
+	} else if ((y + 1) < TheMap.Height  && (x + 1) < TheMap.Width
+		&& !MapIsSeenTileRock(x+1,y+1)) {
+	    tile += 2;
+	} else if ((y + 1) < TheMap.Height  && (x - 1) > 0
+		&& !MapIsSeenTileRock(x-1,y+1)) {
+	    tile += 3;
+	} else if ((y - 1) > 0 && (x - 1) > 0
+		&& !MapIsSeenTileRock(x-1,y-1)) {
+	    tile += 4;
+	} else {
+	    return;
+	}
+    }
+    tile = RockTable[tile];
+
+    mf = TheMap.Fields + x + y * TheMap.Width;
+    if (tile == -1) {			// No valid rock remove it.
+	mf->SeenTile = TheMap.Tileset->RemovedRock;
+	MapFixSeenRockNeighbors(x, y);
+    } else if (mf->SeenTile == tile) {
+	return;
+    } else {
+	mf->SeenTile = tile;
+    }
+
+    // FIXME: can this only happen if seen?
+#ifdef NEW_FOW
+    if (mf->Visible & (1 << ThisPlayer->Player)) {
+#else
+    if (mf->Flags & MapFieldVisible) {
+#endif
+	UpdateMinimapSeenXY(x, y);
+	MarkDrawPosMap(x, y);
+	MustRedraw |= RedrawMinimap;
+    }
 }
 
-// FIXME: docu
-global void MapFixRock(int x,int y)
+/**
+**	Correct the surrounding seen rock fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixSeenRockNeighbors(int x, int y)
 {
-    // side neighbors
-    FixRock( x+1, y   );
-    FixRock( x-1, y   );
-    FixRock( x  , y+1 );
-    FixRock( x  , y-1 );
+    MapFixSeenRockTile(x + 1, y);		// side neighbors
+    MapFixSeenRockTile(x - 1, y);
+    MapFixSeenRockTile(x, y + 1);
+    MapFixSeenRockTile(x, y - 1);
+}
+
+/**
+**	Correct the real rock field, depending on the surrounding.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+global void MapFixRockTile(int x, int y)
+{
+    int tile;
+    MapField *mf;
+
+    //  Outside of map or no rock.
+    if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	return;
+    }
+    mf = TheMap.Fields + x + y * TheMap.Width;
+    if (!(mf->Flags & MapFieldRocks)) {
+	return;
+    }
+    //
+    //  Calculate the correct tile. Depends on the surrounding.
+    //
+    tile = 0;
+    if ((y - 1) < 0 || (TheMap.Fields[x + (y - 1) * TheMap.Width].
+	    Flags & MapFieldRocks)) {
+	tile |= 1 << 0;
+    }
+    if ((x + 1) >= TheMap.Width || (TheMap.Fields[x + 1 + y * TheMap.Width].
+	    Flags & MapFieldRocks)) {
+	tile |= 1 << 1;
+    }
+    if ((y + 1) >= TheMap.Height || (TheMap.Fields[x + (y + 1) * TheMap.Width].
+	    Flags & MapFieldRocks)) {
+	tile |= 1 << 2;
+    }
+    if ((x - 1) < 0 || (TheMap.Fields[x - 1 + y * TheMap.Width].
+	    Flags & MapFieldRocks)) {
+	tile |= 1 << 3;
+    }
+    tile = RockTable[tile];
+
+    if (tile == -1) {			// No valid rock remove it.
+	MapRemoveRock(x, y);
+    } else if (mf->Tile != tile) {
+	mf->Tile = tile;
+	UpdateMinimapXY(x, y);
+#ifdef NEW_FOW
+	if (mf->Visible & (1 << ThisPlayer->Player)) {
+#else
+	if (mf->Flags & MapFieldVisible) {
+#endif
+	    UpdateMinimapSeenXY(x, y);
+	    MapMarkSeenTile(x, y);
+	    MarkDrawPosMap(x, y);
+	    MustRedraw |= RedrawMinimap;
+	}
+    }
+}
+
+/**
+**	Correct the surrounding real rock fields.
+**
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
+*/
+local void MapFixRockNeighbors(int x, int y)
+{
+    MapFixRockTile(x + 1, y);		// side neighbors
+    MapFixRockTile(x - 1, y);
+    MapFixRockTile(x, y + 1);
+    MapFixRockTile(x, y - 1);
 }
 
 /**
 **	Remove rock from the map.
 **
-**	@param x	Map X position.
-**	@param y	Map Y position.
+**	@param x	Map X tile-position.
+**	@param y	Map Y tile-position.
 */
-global void MapRemoveRock(unsigned x,unsigned y)
+global void MapRemoveRock(unsigned x, unsigned y)
 {
-    MapField* mf;
+    MapField *mf;
 
-    mf=TheMap.Fields+x+y*TheMap.Width;
+    mf = TheMap.Fields + x + y * TheMap.Width;
 
-    mf->Tile=TheMap.Tileset->RemovedRock;
-    mf->Flags &= ~(MapFieldRocks|MapFieldUnpassable);
+    mf->Tile = TheMap.Tileset->RemovedRock;
+    mf->Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+    mf->Value = 0;
 
-    UpdateMinimapXY(x,y);		// FIXME: should be done if visible?
+    UpdateMinimapXY(x, y);
+    MapFixRockNeighbors(x, y);
 
-    // Must redraw map only if field is visibile
 #ifdef NEW_FOW
-    if( mf->Visible&(1<<ThisPlayer->Player) ) {
+    if (mf->Visible & (1 << ThisPlayer->Player)) {
 #else
-    if( mf->Flags&MapFieldVisible ) {
+    if (mf->Flags & MapFieldVisible) {
 #endif
-        MarkDrawPosMap(x,y);
-	MustRedraw|=RedrawMinimap;
-	// FIXME: didn't make it better MapMarkSeenTile(x,y);
+	UpdateMinimapSeenXY(x, y);
+	MapMarkSeenTile(x, y);
+	MarkDrawPosMap(x, y);
+	MustRedraw |= RedrawMinimap;
     }
 }
 

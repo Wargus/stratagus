@@ -10,7 +10,7 @@
 //
 /**@name map.h		-	The map headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2001 by Vladi Shabanski and Lutz Sammer
 //
 //	$Id$
 
@@ -18,6 +18,62 @@
 #define __MAP_H__
 
 //@{
+
+/*----------------------------------------------------------------------------
+--	Documentation
+----------------------------------------------------------------------------*/
+
+/**
+**	@struct _map_field_ map.h
+**
+**	\#include "map.h"
+**
+**	typedef struct _map_field_ MapField;
+**
+**	This structure contains all informations about a field on map.
+**	It contains it look, properties and content.
+**
+**	The map-field structure members:
+**
+**	MapField::Tile
+**
+**		Tile is number defining the graphic image display for the
+**		map-field. 65535 different tiles are supported. A tile is
+**		currently 32x32 pixels. In the future is planned to support
+**		animated tiles.
+**
+**	MapField::SeenTile
+**
+**		This is the tile number, that the player sitting on the computer
+**		currently knows. Idea: Can be uses for illusions.
+**
+**	MapField::Flags
+**
+**		FIXME: continue docu.
+**
+**	MapField::Value
+**
+**	MapField::VisibleLastFrame
+**
+**	MapField::Here
+**
+**	MapField::Here
+**
+*/
+
+/**
+**	@struct _world_map_ map.h
+**
+**	\#include "map.h"
+**
+**	typedef struct _world_map_ WorldMap;
+**
+**	This structure contains all informations about a freecraft world.
+**	A world is a rectangle of any size. In the future it is planned to
+**	support multiple worlds.
+**
+**	FIXME: continue docu.
+*/
 
 /*----------------------------------------------------------------------------
 --	Includes
@@ -50,10 +106,10 @@
 **	FIXME: unused
 */
 typedef struct _unit_array_ {
-    Unit*		Building;	/// Building or corpse.
-    Unit*		SeaUnit;	/// Sea unit.
-    Unit*		LandUnit;	/// Land unit.
-    Unit*		AirUnit;	/// Air unit.
+    Unit*		Building;	/// Building or corpse
+    Unit*		SeaUnit;	/// Sea unit
+    Unit*		LandUnit;	/// Land unit
+    Unit*		AirUnit;	/// Air unit
 } UnitArray;
 
 #endif
@@ -71,21 +127,21 @@ typedef struct _map_field_ {
 #ifdef NEW_FOW
     unsigned char	VisibleMask:4;	/// Visible mask
     unsigned char	ExploredMask:4;	/// Explored mask
-    unsigned short	Visible;	/// Visible flags for all players.
-    unsigned short	Explored;	/// Explored flags for all players.
+    unsigned short	Visible;	/// Visible flags for all players
+    unsigned short	Explored;	/// Explored flags for all players
 #endif
 #ifdef UNIT_ON_MAP
     union {
-	Unit*		Units;		/// An unit on the map field.
-	UnitArray*	Array;		/// More units on the map field.
-    }			Here;		/// What is on the field.
+	Unit*		Units;		/// An unit on the map field
+	UnitArray*	Array;		/// More units on the map field
+    }			Here;		/// What is on the field
 #endif
 #ifdef UNITS_ON_MAP
 // FIXME: Unused
-    UnitRef		Building;	/// Building or corpse.
-    UnitRef		AirUnit;	/// Air unit.
-    UnitRef		LandUnit;	/// Land unit.
-    UnitRef		SeaUnit;	/// Sea unit.
+    UnitRef		Building;	/// Building or corpse
+    UnitRef		AirUnit;	/// Air unit
+    UnitRef		LandUnit;	/// Land unit
+    UnitRef		SeaUnit;	/// Sea unit
 #endif
 } MapField;
 
@@ -122,7 +178,7 @@ typedef struct _map_field_ {
 ----------------------------------------------------------------------------*/
 
 /**
-**	Describes the wold map.
+**	Describes the wold map
 */
 typedef struct _world_map_ {
     unsigned		Width;		/// the map width
@@ -157,8 +213,8 @@ extern unsigned MapWidth;
     /// map height in tiles for current mode (14 for 640x480)
 extern unsigned MapHeight;
 
-extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row.
-extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile.
+extern char MustRedrawRow[MAXMAP_W];		/// Flags must redraw map row
+extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
 
     ///  Fast draw tile, display and video mode independ
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
@@ -183,21 +239,21 @@ extern int FlagRevealMap;
 //
 //	in map_draw.c
 //
-    /// Fast draw 32x32 tile for 32 bpp video modes.
+    /// Fast draw 32x32 tile for 32 bpp video modes
 //extern void VideoDraw32Tile32(const unsigned char* data,int x,int y);
-    /// Fast draw 32x32 tile for 16 bpp video modes.
+    /// Fast draw 32x32 tile for 16 bpp video modes
 //extern void VideoDraw16Tile32(const unsigned char* data,int x,int y);
-    /// Fast draw 32x32 tile for  8 bpp video modes.
+    /// Fast draw 32x32 tile for  8 bpp video modes
 //extern void VideoDraw8Tile32(const unsigned char* data,int x,int y);
 
     /// Called when the color cycles
 extern void MapColorCycle(void);
     /// Draw the map background
 extern void DrawMapBackground(int x,int y);
-    /// Build tables for map.
+    /// Build tables for map
 extern void InitMap(void);
 
-    /// Mark position inside screenmap be drawn for next display update.
+    /// Mark position inside screenmap be drawn for next display update
 extern int MarkDrawPosMap( int x, int y );
     /// Denote wether area in map is overlapping
 extern int AreaVisibleInMap( int sx, int sy, int ex, int ey );
@@ -234,30 +290,48 @@ extern void InitMapFogOfWar(void);
 //
 //	in map_wall.c
 //
-    /// remove wall on tile
+    ///	Check if the seen tile-type is wall
+extern int MapIsSeenTileWall(int x, int y,int walltype);
+    ///	Correct the seen wall field, depending on the surrounding
+extern void MapFixSeenWallTile(int x, int y);
+    ///	Correct the surrounding seen wall fields
+extern void MapFixSeenWallNeighbors(int x, int y);
+    ///	Correct the real wall field, depending on the surrounding
+extern void MapFixWallTile(int x, int y);
+    /// Remove wall on tile
 extern void MapRemoveWall(unsigned x,unsigned y);
-    /// correct wall on tile
-extern int FixWall(int x,int y);
-    /// correct wall on tile side neighbors
-extern void MapFixWall(int x,int y);
-    /// check wall on tile
-extern int MapWallChk(int x,int y,int walltype);
-    /// wall is hit
+    /// Wall is hit
 extern void HitWall(unsigned x,unsigned y,unsigned damage);
 
 //
 //	in map_wood.c
 //
-    /// remove wood on tile
+    ///	Check if the seen tile-type is wood
+extern int MapIsSeenTileWood(int x, int y);
+    ///	Correct the seen wood field, depending on the surrounding
+extern void MapFixSeenWoodTile(int x, int y);
+    ///	Correct the surrounding seen wood fields
+extern void MapFixSeenWoodNeighbors(int x, int y);
+    ///	Correct the real wood field, depending on the surrounding
+extern void MapFixWoodTile(int x, int y);
+    /// Remove wood from the map
 extern void MapRemoveWood(unsigned x,unsigned y);
-    /// correct wood on tile
-extern int FixWood(int x,int y);
-    /// correct wood on tile side neighbors
-extern void MapFixWood(int x,int y);
-    /// check wood on tile
-extern int MapWoodChk(int x,int y);
-    /// regenerate the forest
+    /// Regenerate the forest
 extern void RegenerateForest(void);
+
+//
+//	in map_rock.c
+//
+    ///	Check if the seen tile-type is rock
+extern int MapIsSeenTileRock(int x, int y);
+    ///	Correct the seen rock field, depending on the surrounding
+extern void MapFixSeenRockTile(int x, int y);
+    ///	Correct the surrounding seen rock fields
+extern void MapFixSeenRockNeighbors(int x, int y);
+    ///	Correct the real rock field, depending on the surrounding
+extern void MapFixRockTile(int x, int y);
+    /// Remove rock from the map
+extern void MapRemoveRock(unsigned x,unsigned y);
 
 //
 //	in ccl_map.c
@@ -265,38 +339,50 @@ extern void RegenerateForest(void);
     /// register ccl features
 extern void MapCclRegister(void);
 
-/*
-**	mixed sources
-*/
+//
+//	mixed sources
+//
     /// Load a map
 extern void LoadMap(const char* file,WorldMap* map);
     /// Save the map
 extern void SaveMap(FILE* file);
 
-    /// Remove rock from the map
-extern void MapRemoveRock(unsigned x,unsigned y);
-
+    /// Mark a tile as seen by the player
 extern void MapMarkSeenTile(int x,int y);
+    /// FIXME: docu
 extern void RevealMap(void);
 
+    /// FIXME: docu
 extern void MapCenter(int x,int y);
+    /// FIXME: docu
 extern void MapSetViewpoint(int x,int y);
 
+    /// FIXME: docu
 extern int WaterOnMap(int x,int y);
+    /// FIXME: docu
 extern int CoastOnMap(int x,int y);
 
+    /// FIXME: docu
 extern int WallOnMap(int x,int y);
+    /// FIXME: docu
 extern int HumanWallOnMap(int x,int y);
+    /// FIXME: docu
 extern int OrcWallOnMap(int x,int y);
 
+    /// FIXME: docu
 extern int CheckedForestOnMap(int x,int y);
+    /// FIXME: docu
 extern int ForestOnMap(int x,int y);
 
+    /// FIXME: docu
 extern int RockOnMap(int x,int y);
 
+    /// FIXME: docu
 extern int CheckedCanMoveToMask(int x,int y,int mask);
+    /// FIXME: docu
 extern int CanMoveToMask(int x,int y,int mask);
 
+    /// FIXME: docu
 extern void PreprocessMap(void);
 
     /// Set wall on field
@@ -306,7 +392,7 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 --	Defines
 ----------------------------------------------------------------------------*/
 
-    /// Can an unit with 'mask' can enter the field.
+    /// Can an unit with 'mask' can enter the field
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 

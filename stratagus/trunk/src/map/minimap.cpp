@@ -29,8 +29,6 @@
 #include "tileset.h"
 #include "map.h"
 #include "minimap.h"
-#include "sound_id.h"
-#include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
 #include "unit.h"
@@ -40,7 +38,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local Graphic* Minimap;			/// generated minimap
+local Graphic* MinimapGraphic;		/// generated minimap
 local int Minimap2MapX[MINIMAP_W];	/// fast conversion table
 local int Minimap2MapY[MINIMAP_H];	/// fast conversion table
 local int Map2MinimapX[MaxMapWidth];	/// fast conversion table
@@ -62,7 +60,10 @@ global int MinimapShowSelected=1;	/// highlight selected units
 ----------------------------------------------------------------------------*/
 
 /**
-**	Update minimap at map position x,y.
+**	Update minimap at map position x,y. This is called when the tile image
+**	of a tile changes.
+**
+**	@todo	FIXME: this is not correct should use SeenTile.
 **
 **	@param tx	Tile X position, where the map changed.
 **	@param ty	Tile Y position, where the map changed.
@@ -77,10 +78,7 @@ global void UpdateMinimapXY(int tx,int ty)
     int y;
     int scale;
 
-    DebugLevel3("Update minimap\n");
-
-    scale=(MinimapScale/MINIMAP_FAC);
-    if( !scale ) {
+    if( !(scale=(MinimapScale/MINIMAP_FAC)) ) {
 	scale=1;
     }
     //
@@ -108,21 +106,16 @@ global void UpdateMinimapXY(int tx,int ty)
 	    }
 
 	    tile=TheMap.Fields[x+y].Tile;
-	    ((char*)Minimap->Frames)[mx+my*MINIMAP_W]=
+	    ((char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
 		TheMap.Tiles[tile][7+(mx%scale)*8+(6+(my%scale)*8)*TileSizeX];
-/*
-		((char*)TheMap.TileData->Frames)[
-		    (tile%TILE_PER_ROW)*TileSizeX+7
-			+(mx%scale)*8
-		    +((tile/TILE_PER_ROW)*TileSizeX+6
-			+(my%scale)*8)*TheMap.TileData->Width];
-*/
 	}
     }
 }
 
 /**
-**	Update a mini map from the tiles of the map.
+**	Update a mini-map from the tiles of the map.
+**
+**	@todo	FIXME: this is not correct should use SeenTile.
 **
 **	FIXME: this can surely speeded up??
 */
@@ -132,10 +125,7 @@ global void UpdateMinimap(void)
     int my;
     int scale;
 
-    DebugLevel3("Update minimap\n");
-
-    scale=(MinimapScale/MINIMAP_FAC);
-    if( !scale ) {
+    if( !(scale=(MinimapScale/MINIMAP_FAC)) ) {
 	scale=1;
     }
 
@@ -147,33 +137,27 @@ global void UpdateMinimap(void)
 	    int tile;
 
 	    tile=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Tile;
-	    ((char*)Minimap->Frames)[mx+my*MINIMAP_W]=
+	    ((char*)MinimapGraphic->Frames)[mx+my*MINIMAP_W]=
 		TheMap.Tiles[tile][7+(mx%scale)*8+(6+(my%scale)*8)*TileSizeX];
-/*
-		((char*)TheMap.TileData->Frames)[
-		    (tile%TILE_PER_ROW)*TileSizeX+7
-			+(mx%scale)*8
-		    +((tile/TILE_PER_ROW)*TileSizeX+6
-			+(my%scale)*8)*TheMap.TileData->Width];
-*/
 	}
     }
 }
 
 /**
-**	Create a mini map from the tiles of the map.
+**	Create a mini-map from the tiles of the map.
+**
+**	@todo 	Scaling and scrolling the minmap is currently not supported.
 */
 global void CreateMinimap(void)
 {
     int n;
 
-    if( TheMap.Width>TheMap.Height ) {
+    if( TheMap.Width>TheMap.Height ) {	// Scale too biggest value.
 	n=TheMap.Width;
     } else {
 	n=TheMap.Height;
     }
     MinimapScale=(MINIMAP_W*MINIMAP_FAC)/n;
-    DebugLevel0("Minimap Scale: %d\n",MinimapScale);
 
     // FIXME: X,Y offset not supported!!
     MinimapX=0;
@@ -195,18 +179,27 @@ global void CreateMinimap(void)
 	Map2MinimapY[n]=(n*MinimapScale)/MINIMAP_FAC;
     }
 
-    Minimap=NewGraphic(8,MINIMAP_W,MINIMAP_H);
+    MinimapGraphic=NewGraphic(8,MINIMAP_W,MINIMAP_H);
 
     UpdateMinimap();
 }
 
 /**
-**	Draw the mini map with current viewpoint.
+**	Destroy mini-map.
+*/
+global void DestroyMinimap(void)
+{
+    VideoSaveFree(MinimapGraphic);
+    MinimapGraphic=NULL;
+}
+
+/**
+**	Draw the mini-map with current viewpoint.
 **
 **	@param vx	View point X position.
 **	@param vy	View point Y position.
 **
-**	This one of the hot-points in the program optimize and optimize!
+**	@note This one of the hot-points in the program optimize and optimize!
 */
 global void DrawMinimap(int vx,int vy)
 {
@@ -233,6 +226,9 @@ global void DrawMinimap(int vx,int vy)
     x=TheUI.MinimapX+24;
     y=TheUI.MinimapY+2;
 
+    //
+    //	Draw the mini-map background.	Note draws a little too much.
+    //
     VideoDrawSub(TheUI.Minimap.Graphic,24,2
 	    ,TheUI.Minimap.Graphic->Width-48,TheUI.Minimap.Graphic->Height-4
 	    ,x,y);
@@ -251,15 +247,15 @@ global void DrawMinimap(int vx,int vy)
 		if( (mf->Explored&bits)
 			&& ( (mf->Visible&bits)
 			    || ((mx&1)==(my&1)) ) ) {
-		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
-			    ,x+mx,y+my);
+		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
+			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
 #else
 		flags=TheMap.Fields[Minimap2MapX[mx]+Minimap2MapY[my]].Flags;
 		if( flags&MapFieldExplored &&
 			( (flags&MapFieldVisible) || ((mx&1)==(my&1)) ) ) {
-		    VideoDrawPixel(((char*)Minimap->Frames)[mx+my*MINIMAP_W]
-			    ,x+mx,y+my);
+		    VideoDrawPixel(((char*)MinimapGraphic->Frames)
+			    [mx+my*MINIMAP_W],x+mx,y+my);
 		}
 #endif
 	    }
