@@ -133,7 +133,7 @@ local int SelectedPlayer;		/// Player selected for draw
 **
 **	@todo	FIXME: Solid tiles are here still hardcoded.
 */
-local int GetTileNumber(int basic, int random, int filler)
+global int GetTileNumber(int basic, int random, int filler)
 {
     int tile;
     int i;
@@ -178,7 +178,7 @@ local int GetTileNumber(int basic, int random, int filler)
 **	@param y	Y map tile coordinate.
 **	@param tile	Tile type to edit.
 */
-local void EditTile(int x, int y, int tile)
+global void EditTile(int x, int y, int tile)
 {
     MapField* mf;
 
@@ -262,7 +262,7 @@ local void EditTile(int x, int y, int tile)
 **	@param tile	Tile type to edit.
 **	@param size	Size of rectangle
 */
-local void EditTiles(int x, int y, int tile, int size)
+global void EditTiles(int x, int y, int tile, int size)
 {
     int ex;
     int ey;
@@ -1129,6 +1129,15 @@ local void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		CycleViewportMode(-1);
 	    } else {
 		CycleViewportMode(1);
+	    }
+	    break;
+
+	case 'r':
+	case 'R':			// CTRL+R Randomize map
+	    if( KeyModifiers & ModifierControl ) 
+            {
+                DebugLevel3Fn("Randomizing map...\n");
+  	        EditorCreateRandomMap();
 	    }
 	    break;
 

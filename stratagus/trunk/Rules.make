@@ -23,17 +23,11 @@ CCL		= -DUSE_CCL
 CCLLIB		= -lm
 
 # Video support
-SDL		= -DUSE_SDL -DUSE_SDLA $(SDL_CFLAGS)
-SDL_CFLAGS	= $(shell sdl-config --cflags)
-SDLLIB		= $(shell sdl-config --libs)
-
-VIDEO             = $(SDL)
-VIDEOLIB	= $(SDLLIB) -ldl
+VIDEO		= -DUSE_X11
+VIDEOLIB	= -lXext -lX11 -ldl
 
 # Sound support
 DSOUND		= -DWITH_SOUND
-SDLCD           = -DUSE_SDLCD
-
 
 # Compression support
 ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB
@@ -45,7 +39,7 @@ XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include
 #####################################################################
 # Don't change anything below here unless you know what you're doing!
 
-VERSION=	'-DVERSION="1.17.1pre1"'
+VERSION=	'-DVERSION="1.17.1pre2"'
 PROFILE=
 
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm $(THREADLIB)
@@ -64,11 +58,12 @@ OBJDIR=obj
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
+DEBUG=	-DDEBUG #-DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) \
 	$(VIDEO) $(ZDEFS) $(DSOUND) \
 	$(DEBUG) $(SDLCD) $(LIBCDA) \
 	$(FLAC) $(OGG) $(MAD) 
-CFLAGS=-O2 -pipe -fsigned-char -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
+CFLAGS=-g -O1 -fsigned-char -Wall -Werror $(IFLAGS) $(DFLAGS)  -DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP
 CTAGSFLAGS=-i defptvS -a -f 
 
 # Locks versions with a symbolic name

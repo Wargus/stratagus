@@ -56,11 +56,18 @@ extern void EditorSavePud(const char *file);
 
     /// Register ccl features
 extern void EditorCclRegister(void);
+   
+   /// Edit tile
+extern void EditTile(int x, int y, int tile);
+   /// Edit tiles
+extern void EditTiles(int x, int y, int tile, int size);
 
     /// Change the view of a tile
 extern void ChangeTile(int x, int y, int tile);
     /// Update surroundings for tile changes
 extern void EditorTileChanged(int x, int y);
+    /// Make random map
+extern void EditorCreateRandomMap();
 
 //@}
 

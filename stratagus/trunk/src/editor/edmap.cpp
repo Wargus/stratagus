@@ -559,4 +559,80 @@ global void EditorTileChanged(int x, int y)
     EditorTileChanged2(x, y, 0xF);
 }
 
+/**
+**	Make random map
+**      FIXME: vladi: we should have parameters control here...
+*/
+
+/**
+**	TileFill
+**
+**	@param x	X map tile coordinate for area center.
+**	@param y	Y map tile coordinate for area center.
+**	@param tile	Tile type to edit.
+**	@param size	Size of surrounding rectangle.
+**
+**      TileFill( centerx, centery, tile_type_water, map_width )
+**      will fill map with water...
+*/
+global void TileFill(int x, int y, int tile, int size)
+{
+    int ix, ax;
+    int iy, ay;
+
+
+    ix = x - size / 2;
+    ax = x + size / 2;
+    iy = y - size / 2;
+    ay = y + size / 2;
+
+    if ( ix < 0 ) ix = 0;
+    if ( ax >= TheMap.Width ) ax = TheMap.Width - 1;
+    if ( iy < 0 ) iy = 0;
+    if ( ay >= TheMap.Height ) ay = TheMap.Height - 1;
+
+    for( x = ix; x <= ax; x++ )
+      for( y = iy; y <= ay; y++ )
+        EditTile( x, y, tile );
+}
+
+#define WATER_TILE      0x10
+#define COAST_TILE      0x30
+#define GRASS_TILE      0x50
+#define WOOD_TILE       0x70
+#define ROCK_TILE       0x80
+
+global void EditorRandomizeTile( int tile, int count, int max_size )
+{
+  int mx = TheMap.Width;
+  int my = TheMap.Height;
+  int i;
+  
+  for( i = 0; i < count; i++ )
+    {
+    int rx = MyRand() % (mx / 2);
+    int ry = MyRand() % (my / 2);
+    int rz = MyRand() % max_size + 1;
+	    
+    TileFill( rx, ry, tile, rz );
+    TileFill( mx - rx - 1, ry, tile, rz );
+    TileFill( rx, my - ry - 1, tile, rz );
+    TileFill( mx - rx - 1, mx - ry - 1, tile, rz );
+    }
+    
+  
+}
+
+global void EditorCreateRandomMap()
+{
+  int mz = TheMap.Width > TheMap.Height ? TheMap.Width : TheMap.Height;
+  
+  // make water-base
+  TileFill( 0, 0, WATER_TILE, mz * 3 );
+  
+  EditorRandomizeTile( COAST_TILE, 10, 16 );
+  EditorRandomizeTile( GRASS_TILE, 10, 16 );
+  EditorRandomizeTile( WOOD_TILE,  60,  8 );
+}
+
 //@}
