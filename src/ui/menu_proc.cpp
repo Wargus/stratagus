@@ -2446,7 +2446,7 @@ global void ProcessMenu(const char *menu_id, int loop)
 	MenuButtonCurSel = MenuButtonCurSelSave;
     }
 
-    // FIXME: Johns good point?
+    // FIXME: should ExitMenus() be called instead?!?
     if (Menusbgnd) {
 	VideoFree(Menusbgnd);
 	Menusbgnd = NULL;
@@ -2498,11 +2498,8 @@ global void InitMenus(int race)
     CurrentMenu = NULL;
 }
 
-#if 0
 /**
 **	Exit Menus code (freeing data)
-**
-**	// FIXME: NOT CALLED YET.....!!!!!
 */
 global void ExitMenus(void)
 {
@@ -2511,4 +2508,3 @@ global void ExitMenus(void)
 	Menusbgnd = NULL;
     }
 }
-#endif
