@@ -2,6 +2,10 @@
 AC_INIT(configure.in)
 AC_PREREQ([2.50])
 
+AM_CONFIG_HEADER(config.h)
+
+AC_CHECK_FUNCS(strcasestr)
+
 CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib -I/sw/include -L/sw/lib"
 
 AC_CHECK_HEADERS(zlib.h,, AC_MSG_ERROR(could not find zlib.h))

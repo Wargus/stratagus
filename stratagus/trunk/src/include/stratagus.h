@@ -33,6 +33,10 @@
 
 //@{
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 /*============================================================================
 ==  Config definitions
 ============================================================================*/
@@ -349,10 +353,10 @@ extern char* strdcat(const char* l, const char* r);
 	/// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char* m, const char* r);
 
-#if !defined(BSD)
+#if !HAVE_STRCASESTR
 	/// case insensitive strstr
 extern char* strcasestr(const char* str, const char* substr);
-#endif // !BSD
+#endif // !HAVE_STRCASESTR
 
 	/// Compute a square root using ints
 extern long isqrt(long num);
