@@ -950,28 +950,11 @@ global int CclCommand(const char* command)
 
 #ifdef META_LUA
 
-#define FAST_GET_STRING(keyval, v) \
-{ \
-	if (!strcmp(key, keyval)) { \
-		lua_pushstring(l, strdup(v)); \
-		return 1; \
-	} \
-}
-
-#define FAST_GET_INT(keyval, v) \
-{ \
-	if (!strcmp(key, keyval)) { \
-		lua_pushnumber(l, v); \
-		return 1; \
-	} \
-}
-
-#define FAST_GET_BOOL(keyval, v) \
-{ \
-	if (!strcmp(key, keyval)) { \
-		lua_pushboolean(l, v); \
-		return 1; \
-	} \
+global int ScriptSetValueBlock(lua_State* l)
+{
+	lua_pushstring(l, "Structure is read-only, sorry.\n");
+	lua_error(l);
+	return 0;
 }
 
 /**
@@ -981,14 +964,14 @@ local int ScriptStratagusGetValue(lua_State* l)
 {
 	const char* key;
 
-	DebugCheck(lua_gettop(l) != 2);
 	key = LuaToString(l, -1);
+	DebugCheck(!key);
+	DebugLevel0Fn("(%s)\n" _C_ key);
 
-	// Here start the fields.
-	FAST_GET_STRING("LibraryPath", StratagusLibPath);
-	FAST_GET_INT("GameCycle", GameCycle);
-	FAST_GET_STRING("GameName", GameName);
-	FAST_GET_BOOL("GamePaused", GamePaused);
+	META_GET_STRING("LibraryPath", StratagusLibPath);
+	META_GET_INT("GameCycle", GameCycle);
+	META_GET_STRING("GameName", GameName);
+	META_GET_BOOL("GamePaused", GamePaused);
 
 	//  Something went wrong.
 	lua_pushfstring(l, "Unknown field \"%s\". Going DOWN!!!\n", key);
@@ -1005,6 +988,8 @@ local int ScriptStratagusSetValue(lua_State* l)
 
 	DebugCheck(lua_gettop(l) != 3);
 	key = LuaToString(l, -2);
+	DebugCheck(!key);
+	DebugLevel0Fn("(%s)\n" _C_ key);
 
 	//  Here start the fields.
 	//  Sorry, none yet.
@@ -1023,19 +1008,29 @@ local void InitScript(void)
 {
 	lua_pushstring(Lua, "Stratagus");
 
-	/* First is the main table, and the metatable for Stratagus. */
+	/* Generate a weak table in the registry */
+	lua_pushstring(Lua, "StratagusReferences");
 	lua_newtable(Lua);
 	lua_newtable(Lua);
-
+	lua_pushstring(Lua, "__mode");
+	lua_pushstring(Lua, "v");
+	lua_settable(Lua, -3);
+	lua_setmetatable(Lua, -2);
+	lua_settable(Lua, LUA_REGISTRYINDEX);
+	
+	/* This is the main table, and the metatable for Stratagus. */
+	lua_newtable(Lua);
+	lua_newtable(Lua);
 	lua_pushstring(Lua, "__index");
 	lua_pushcfunction(Lua, ScriptStratagusGetValue);
 	lua_settable(Lua, -3);
 	lua_pushstring(Lua, "__newindex");
 	lua_pushcfunction(Lua, ScriptStratagusSetValue);
 	lua_settable(Lua, -3);
-
 	lua_setmetatable(Lua, -2);
-		
+	
+	/* Add all our namesspaces and stuff.*/
+	ScriptSpellInit();
 	lua_settable(Lua, LUA_GLOBALSINDEX);
 }
 

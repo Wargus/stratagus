@@ -84,6 +84,79 @@ extern int CclCommand(const char*);      /// Execute a ccl command
 extern void CclFree(void*);               /// Save free
 extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
+#ifdef META_LUA
+
+/*----------------------------------------------------------------------------
+--  Functions.
+----------------------------------------------------------------------------*/
+
+	/// Really dumb set function that always goes into an error.
+extern int ScriptSetValueBlock(lua_State* l);
+
+/*----------------------------------------------------------------------------
+--  Quick macros for meta lua. Use them in well-formed get/set functions.
+----------------------------------------------------------------------------*/
+
+//
+//	Pushing 0 as a string to lua is ok. strdup-ing 0 is not.
+//
+#define META_GET_STRING(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		if (v) { \
+			lua_pushstring(l, strdup(v)); \
+		} else { \
+			lua_pushstring(l, 0); \
+		} \
+		return 1; \
+	} \
+}
+
+#define META_SET_STRING(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		luaL_checktype(l, -1, LUA_TSTRING); \
+		v = strdup(lua_tostring(l, -1)); \
+		return 0; \
+	} \
+}
+
+#define META_GET_INT(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushnumber(l, v); \
+		return 1; \
+	} \
+}
+
+#define META_SET_INT(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		luaL_checktype(l, -1, LUA_TNUMBER); \
+		v = lua_tonumber(l, -1); \
+		return 0; \
+	} \
+}
+
+#define META_GET_BOOL(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		lua_pushboolean(l, v); \
+		return 1; \
+	} \
+}
+
+#define META_SET_BOOL(keyval, v) \
+{ \
+	if (!strcmp(key, keyval)) { \
+		luaL_checktype(l, -1, LUA_TBOOLEAN); \
+		v = lua_toboolean(l, -1); \
+		return 0; \
+	} \
+}
+
+#endif // META_LUA
+
 //@}
 
 #endif // !__CCL_H__
