@@ -2801,13 +2801,20 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     if( target->HP<=damage ) {	// unit is killed or destroyed
 	if( attacker ) {
 	    attacker->Player->Score+=target->Type->Points;
+#ifdef USE_HP_FOR_XP
+	    attacker->XP+=target->HP;
+#else
 	    attacker->XP+=target->Type->Points;
+#endif
 	    ++attacker->Kills;
 	}
 	LetUnitDie(target);
 	return;
     }
     target->HP-=damage;		// UNSIGNED!
+#ifdef USE_HP_FOR_XP
+    attacker->XP+=damage;
+#endif
 
 #if 0
     // FIXME: want to show hits.

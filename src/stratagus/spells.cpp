@@ -227,12 +227,19 @@ local void SpellDeathCoilController(Missile * missile)
 	    if (missile->TargetUnit && !missile->TargetUnit->Destroyed
 		    && missile->TargetUnit->HP) {
 		if (missile->TargetUnit->HP <= 50) {
-		    missile->TargetUnit->HP = 0;
-		    source->Player->Score+=missile->TargetUnit->Type->Points;
+#ifdef USE_HP_FOR_XP
+		    source->XP+=missile->TargetUnit->HP;
+#else
 		    source->XP+=missile->TargetUnit->Type->Points;
+#endif
+		    source->Player->Score+=missile->TargetUnit->Type->Points;
 		    ++source->Kills;
+		    missile->TargetUnit->HP = 0;
 		    LetUnitDie(missile->TargetUnit);
 		} else {
+#ifdef USE_HP_FOR_XP
+		    source->XP+=50;
+#endif
 		    missile->TargetUnit->HP-=50;
 		}
 		if (source->Orders[0].Action!=UnitActionDie) {
@@ -263,13 +270,20 @@ local void SpellDeathCoilController(Missile * missile)
 				// disperse damage between them
 				//NOTE: 1 is the minimal damage
 				if (table[i]->HP <= 50 / ec ) {
-				    table[i]->HP = 0;
+#ifdef USE_HP_FOR_XP
+				    source->XP+=table[i]->HP;
+#else
+				    source->XP+=table[i]->Type->Points;
+#endif
 				    source->Player->Score+=
 					    table[i]->Type->Points;
-				    source->XP+=table[i]->Type->Points;
 				    ++source->Kills;
+				    table[i]->HP = 0;
 				    LetUnitDie(table[i]); // too much damage
 				} else {
+#ifdef USE_HP_FOR_XP
+				    source->XP += 50/ec;
+#endif
 				    table[i]->HP -= 50 / ec;
 				}
 			    }
@@ -713,10 +727,15 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    while (target->HP && unit->Mana > spell->ManaCost) {
 		unit->Mana -= spell->ManaCost;	// get mana cost
 		target->HP--;
+#ifdef USE_HP_FOR_XP
+		unit->XP++;
+#endif
 	    }
 	    if( !target->HP ) {
 		unit->Player->Score+=target->Type->Points;
+#ifndef USE_HP_FOR_XP
 		unit->XP+=target->Type->Points;
+#endif
 		++unit->Kills;
 		LetUnitDie(target);
 	    }
@@ -871,7 +890,11 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 	    UnitType* type;
 
 	    unit->Player->Score+=target->Type->Points;
+#ifdef USE_HP_FOR_XP
+	    unit->XP+=target->HP;
+#else
 	    unit->XP+=target->Type->Points;
+#endif
 	    ++unit->Kills;
 	    // as said somewhere else -- no corpses :)
 	    RemoveUnit(target);
