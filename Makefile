@@ -10,7 +10,7 @@
 ##
 ##	Makefile	-	The make file.
 ##
-##	(c) Copyright 1998-2001 by Lutz Sammer
+##	(c) Copyright 1998-2002 by Lutz Sammer
 ##
 ##	FreeCraft is free software; you can redistribute it and/or modify
 ##	it under the terms of the GNU General Public License as published
@@ -222,7 +222,7 @@ dist::
 	chmod -R a+rX $(distdir)
 	tar chzf $(distdir).tar.gz $(distdir)
 	tar cjhf $(distdir).tar.bz2 $(distdir)
-	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir).zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -243,7 +243,7 @@ small-dist::
 	chmod -R a+rX $(distdir)
 	tar chzf $(distdir)-small.tar.gz $(distdir)
 	tar cjhf $(distdir)-small.tar.bz2 $(distdir)
-	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r $(distdir)-small.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -292,7 +292,7 @@ win32-bin-dist2:: win32
 	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/freecraft$(EXE)
 	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
-	@echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
+	@echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
@@ -312,10 +312,10 @@ MYDATE	= $(shell date +%y%m%d)
 PCRAFT= freecraft-$(MYDATE).tar.bz2
 LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
 WCRAFT= freecraft-$(MYDATE)-win32bin.zip
-FCGP1=	../fcgp-011108.tar.bz2
-FCSP1=	../fcsp-general-20010819.tar.bz2
-FCSP2=	../fcsp-mythical-20010819.tar.bz2
-FCSP3=	../fcsp-alliance-20010819.tar.bz2
+FCGP1=	../fcgp-*.tar.bz2
+FCSP1=	../fcsp-general-*.tar.bz2
+FCSP2=	../fcsp-mythical-*.tar.bz2
+FCSP3=	../fcsp-alliance-*.tar.bz2
 
 linux-complete:
 	mkdir freecraft-complete
@@ -355,7 +355,7 @@ win32-complete:
 	chmod 777 freecraft-complete
 	chown -R johns:freecraft freecraft-complete
 	chmod -R a+rX freecraft-complete
-	echo "(c) 2001 by the FreeCraft Project http://FreeCraft.Org" | \
+	echo "(c) 2002 by the FreeCraft Project http://FreeCraft.Org" | \
 	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
 	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
 		> freecraft-$(MYDATE)-complete-win32.exe
