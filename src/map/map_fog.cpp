@@ -3249,9 +3249,9 @@ build_table:
 						int l;
 						int d;
 
-						r = GlobalPalette[i].r;
-						g = GlobalPalette[i].g;
-						b = GlobalPalette[i].b;
+						r = TheMap.TileData->Palette[i].r;
+						g = TheMap.TileData->Palette[i].g;
+						b = TheMap.TileData->Palette[i].b;
 						DebugLevel3("%d,%d,%d\n" _C_ r _C_ g _C_ b);
 						v = r + g + b;
 
@@ -3274,21 +3274,21 @@ build_table:
 						d = 256 * 3 + 256;
 						for (j = 0; j < 256; ++j) {
 							// simple color distance
-							v = (abs(GlobalPalette[j].r - r) +
-								abs(GlobalPalette[j].g - g) +
-								abs(GlobalPalette[j].b - b)) * 3 +
+							v = (abs(TheMap.TileData->Palette[j].r - r) +
+								abs(TheMap.TileData->Palette[j].g - g) +
+								abs(TheMap.TileData->Palette[j].b - b)) * 3 +
 								// light
-								abs(GlobalPalette[j].r +
-									GlobalPalette[j].g +
-									GlobalPalette[j].b - (r + g + b)) * 1;
+								abs(TheMap.TileData->Palette[j].r +
+									TheMap.TileData->Palette[j].g +
+									TheMap.TileData->Palette[j].b - (r + g + b)) * 1;
 							if (v < d) {
 								d = v;
 								l = j;
 							}
 						}
 						DebugLevel3("%d,%d,%d -> %d,%d,%d\n" _C_ r _C_ g _C_ b _C_
-							GlobalPalette[l].r _C_ GlobalPalette[l].g _C_
-							GlobalPalette[l].b);
+							TheMap.TileData->Palette[l].r _C_ TheMap.TileData->Palette[l].g _C_
+							TheMap.TileData->Palette[l].b);
 						((VMemType8*)FogOfWarAlphaTable)[i] = l;
 					}
 				}

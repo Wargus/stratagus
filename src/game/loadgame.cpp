@@ -151,6 +151,7 @@ global void InitModules(void)
 	InitDependencies();
 
 	InitButtons();
+	InitTriggers();
 
 	InitAiModule();
 
@@ -168,8 +169,7 @@ global void InitModules(void)
 */
 global void LoadModules(void)
 {
-	char* s;
-
+	LoadFonts();
 	LoadIcons();
 	LoadCursors(ThisPlayer->RaceName);
 	LoadUserInterface();
@@ -197,18 +197,7 @@ global void LoadModules(void)
 	}
 #endif
 
-#ifdef USE_SDL_SURFACE
-	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
-				TheMap.Tileset->PaletteFile));
-	free(s);
 	SetPlayersPalette();
-#else
-	LoadRGB(GlobalPalette,
-			s = strdcat3(StratagusLibPath, "/graphics/",
-				TheMap.Tileset->PaletteFile));
-	free(s);
-	VideoCreatePalette(GlobalPalette);
-#endif
 	CreateMinimap();
 
 	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
@@ -232,6 +221,8 @@ global void LoadGame(char* filename)
 	CleanModules();
 	// log will be enabled if found in the save game
 	CommandLogDisabled = 1;
+
+	LoadCcl();
 
 	CclGarbageCollect(0);
 	InitVisionTable();

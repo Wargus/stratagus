@@ -86,12 +86,6 @@
 **						@li 527 pixel: 16 tiles pro row with 1 pixel gap
 **						@li 626 pixel: 19 tiles pro row with 1 pixel gap
 **
-**		Tileset::PaletteFile
-**
-**				Name of the palette file, containing the RGB colors to use
-**				as global sytem palette.
-**				@see GlobalPalette, VideoSetPalette.
-**
 **		Tileset::NumTiles
 **
 **				The number of different tiles in the tables.
@@ -295,7 +289,6 @@ typedef struct _tileset_ {
 	char*		Class;						/// Class for future extensions
 	char*		Name;						/// Nice name to display
 	char*		ImageFile;				/// File containing image data
-	char*		PaletteFile;				/// File containing the global palette
 
 	int				NumTiles;				/// Number of tiles in the tables
 	int				TileSizeX;				/// Size of a tile in X

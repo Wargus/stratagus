@@ -223,11 +223,6 @@ local int CclSetContrast(lua_State* l)
 		lua_error(l);
 	}
 	TheUI.Contrast = i;
-#ifdef USE_SDL_SURFACE
-	// FIXME
-#else
-	VideoCreatePalette(GlobalPalette);		// rebuild palette
-#endif
 	MustRedraw = RedrawEverything;
 
 	lua_pushnumber(l, old);
@@ -256,11 +251,6 @@ local int CclSetBrightness(lua_State* l)
 		lua_error(l);
 	}
 	TheUI.Brightness = i;
-#ifdef USE_SDL_SURFACE
-	// FIXME:
-#else
-	VideoCreatePalette(GlobalPalette);		// rebuild palette
-#endif
 	MustRedraw = RedrawEverything;
 
 	lua_pushnumber(l, old);
@@ -289,11 +279,6 @@ local int CclSetSaturation(lua_State* l)
 		lua_error(l);
 	}
 	TheUI.Saturation = i;
-#ifdef USE_SDL_SURFACE
-	// FIXME:
-#else
-	VideoCreatePalette(GlobalPalette);		// rebuild palette
-#endif
 	MustRedraw = RedrawEverything;
 
 	lua_pushnumber(l, old);

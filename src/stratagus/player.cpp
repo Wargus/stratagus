@@ -67,11 +67,11 @@ global int NoRescueCheck;				/// Disable rescue check
 **		Colors used for minimap.		FIXME: make this configurable
 */
 #ifdef USE_SDL_SURFACE
-local SDL_Color PlayerColorsRGB[PlayerMax];
-global Uint32 PlayerColors[PlayerMax];
+local SDL_Color PlayerColorsRGB[PlayerMax][4];
+global Uint32 PlayerColors[PlayerMax][4];
 #else
-global VMemType PlayerColorsRGB[PlayerMax];
-global VMemType PlayerColors[PlayerMax];
+global VMemType PlayerColorsRGB[PlayerMax][4];
+global VMemType PlayerColors[PlayerMax][4];
 #endif
 
 global char* PlayerColorNames[PlayerMax] = {
@@ -124,55 +124,58 @@ global int PlayerRacesIndex(int race)
 global void InitPlayers(void)
 {
 	int p;
-	// FIXME: remove this
+	int x;
+	// FIXME: make this configurable
 	struct {
 		int R; int G; int B;
-	} PColors[PlayerMax] = {
-		{ 164, 0, 0 },
-		{ 0, 148, 252 },
-		{ 44, 180, 148 },
-		{ 152, 72, 176 },
-		{ 248, 140, 20 },
-		{ 40, 40, 60 },
-		{ 252, 252, 252 },
-		{ 252, 208, 0 },
-		{ 164, 0, 0 },
-		{ 0, 148, 252 },
-		{ 44, 180, 148 },
-		{ 152, 72, 176 },
-		{ 248, 140, 20 },
-		{ 40, 40, 60 },
-		{ 252, 252, 252 },
-		{ 252, 252, 0 },
+	} PColors[PlayerMax][4] = {
+		{{ 164, 0, 0 }, { 124, 0, 0 }, { 92, 4, 0 }, { 68, 4, 0 }},
+		{{ 12, 72, 204 }, { 4, 40, 160 }, { 0, 20, 116 }, { 0, 4, 76 }},
+		{{ 44, 180, 148 }, { 20, 132, 92 }, { 4, 84, 44 }, { 0, 40, 12 }},
+		{{ 152, 72, 176 }, { 116, 44, 132 }, { 80, 24, 88 }, { 44, 8, 44 }},
+		{{ 248, 140, 20 }, { 200, 96, 16 }, { 152, 60, 16 }, { 108, 32, 12 }},
+		{{ 40, 40, 60 }, { 28, 28, 44 }, { 20, 20, 32}, { 12, 12, 20 }},
+		{{ 224, 224, 224 }, { 152, 152, 180 }, { 84, 84, 128 }, { 36, 40, 76 }},
+		{{ 252, 252, 72 }, { 228, 204, 40 }, { 204, 160, 16 }, { 180, 116, 0 }},
+		{{ 164, 0, 0 }, { 124, 0, 0 }, { 92, 4, 0 }, { 68, 4, 0 }},
+		{{ 12, 72, 204 }, { 4, 40, 160 }, { 0, 20, 116 }, { 0, 4, 76 }},
+		{{ 44, 180, 148 }, { 20, 132, 92 }, { 4, 84, 44 }, { 0, 40, 12 }},
+		{{ 152, 72, 176 }, { 116, 44, 132 }, { 80, 24, 88 }, { 44, 8, 44 }},
+		{{ 248, 140, 20 }, { 200, 96, 16 }, { 152, 60, 16 }, { 108, 32, 12 }},
+		{{ 40, 40, 60 }, { 28, 28, 44 }, { 20, 20, 32}, { 12, 12, 20 }},
+		{{ 224, 224, 224 }, { 152, 152, 180 }, { 84, 84, 128 }, { 36, 40, 76 }},
+		{{ 252, 252, 72 }, { 228, 204, 40 }, { 204, 160, 16 }, { 180, 116, 0 }},
 	};
 
 	// FIXME: remove this
+	for (p = 0; p < PlayerMax; ++p) {
+		for (x = 0; x < 4; ++x) {
 #ifdef USE_SDL_SURFACE
-	for (p = 0; p < PlayerMax; ++p) {
-		PlayerColorsRGB[p].r = PColors[p].R;
-		PlayerColorsRGB[p].g = PColors[p].G;
-		PlayerColorsRGB[p].b = PColors[p].B;
-	}
+			PlayerColorsRGB[p][x].r = PColors[p][x].R;
+			PlayerColorsRGB[p][x].g = PColors[p][x].G;
+			PlayerColorsRGB[p][x].b = PColors[p][x].B;
 #else
-	for (p = 0; p < PlayerMax; ++p) {
-		PlayerColorsRGB[p].D24.a = PColors[p].R;
-		PlayerColorsRGB[p].D24.b = PColors[p].G;
-		PlayerColorsRGB[p].D24.c = PColors[p].B;
-	}
+			PlayerColorsRGB[p][x].D24.a = PColors[p][x].R;
+			PlayerColorsRGB[p][x].D24.b = PColors[p][x].G;
+			PlayerColorsRGB[p][x].D24.c = PColors[p][x].B;
 #endif
+		}
+	}
 
 	for (p = 0; p < PlayerMax; ++p) {
 		Players[p].Player = p;
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
+		for (x = 0; x < 4; ++x) {
 #ifdef USE_SDL_SURFACE
-		PlayerColors[p] = SDL_MapRGB(TheScreen->format, PlayerColorsRGB[p].r,
-			PlayerColorsRGB[p].g, PlayerColorsRGB[p].b);
+			PlayerColors[p][x] = SDL_MapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
+				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 #else
-		PlayerColors[p] = VideoMapRGB(PlayerColorsRGB[p].D24.a,
-			PlayerColorsRGB[p].D24.b, PlayerColorsRGB[p].D24.c);
+			PlayerColors[p][x] = VideoMapRGB(PlayerColorsRGB[p][x].D24.a,
+				PlayerColorsRGB[p][x].D24.b, PlayerColorsRGB[p][x].D24.c);
 #endif
+		}
 	}
 }
 
@@ -569,7 +572,7 @@ global void CreatePlayer(int type)
 	player->TotalNumUnits = 0;
 	player->Score = 0;
 
-	player->Color = PlayerColors[NumPlayers];
+	player->Color = PlayerColors[NumPlayers][0];
 
 	if (Players[NumPlayers].Type == PlayerComputer ||
 			Players[NumPlayers].Type == PlayerRescueActive) {
@@ -948,37 +951,6 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 }
 
 /**
-**		Change current color set to new player.
-**
-**		@param player		Pointer to player.
-*/
-global void PlayerPixels(const Player* player)
-{
-#ifdef USE_SDL_SURFACE
-	// FIXME:
-	memcpy(&GlobalPalette->colors[208], player->UnitColors.Colors,
-		sizeof(SDL_Color) * 4);
-#else
-	// FIXME: use function pointer
-	switch (VideoBpp) {
-		case 8:
-			*((struct __4pixel8__*)(Pixels8 + 208)) = player->UnitColors.Depth8;
-			break;
-		case 15:
-		case 16:
-			*((struct __4pixel16__*)(Pixels16 + 208)) = player->UnitColors.Depth16;
-			break;
-		case 24:
-			*((struct __4pixel24__*)(Pixels24 + 208)) = player->UnitColors.Depth24;
-			break;
-		case 32:
-			*((struct __4pixel32__*)(Pixels32 + 208)) = player->UnitColors.Depth32;
-			break;
-	}
-#endif
-}
-
-/**
 **		Setup the player colors for the current palette.
 **
 **		@todo
@@ -993,142 +965,41 @@ global void SetPlayersPalette(void)
 	//o = rand() & 0x7;						// FIXME: random colors didn't work
 	o = 0;
 #ifdef USE_SDL_SURFACE
-	for (i = 0; i < 7; ++i) {
-		memcpy(Players[o].UnitColors.Colors, &GlobalPalette->colors[208 + i * 4],
+	for (i = 0; i < PlayerMax; ++i) {
+		memcpy(Players[o].UnitColors.Colors, PlayerColorsRGB[i],
 			sizeof(SDL_Color) * 4);
-		memcpy(Players[o + 8].UnitColors.Colors, &GlobalPalette->colors[208 + i * 4],
-			sizeof(SDL_Color) * 4);
-		o = (o + 1) & 0x7;
+		o = (o + 1) % PlayerMax;
 	}
-
-	memcpy(Players[o].UnitColors.Colors, &GlobalPalette->colors[12],
-		sizeof(SDL_Color) * 4);
-	memcpy(Players[o + 8].UnitColors.Colors, &GlobalPalette->colors[12],
-		sizeof(SDL_Color) * 4);
-
 #else
 	switch (VideoBpp) {
 	case 8:
-		// New player colors setup
-		if (!Pixels8) {
-			DebugLevel0Fn("Wrong setup order\n");
-			return;
+		for (i = 0; i < PlayerMax; ++i) {
+			memcpy(Players[o].UnitColors.Depth8.Pixels, PlayerColors[i],
+				sizeof(VMemType8) * 4);
+			o = (o + 1) % PlayerMax;
 		}
-
-		for (i = 0; i < 7; ++i) {
-			Players[o].UnitColors.Depth8.Pixels[0] = Pixels8[i * 4 + 208];
-			Players[o].UnitColors.Depth8.Pixels[1] = Pixels8[i * 4 + 209];
-			Players[o].UnitColors.Depth8.Pixels[2] = Pixels8[i * 4 + 210];
-			Players[o].UnitColors.Depth8.Pixels[3] = Pixels8[i * 4 + 211];
-
-			Players[o + 8].UnitColors.Depth8.Pixels[0] = Pixels8[i * 4 + 208];
-			Players[o + 8].UnitColors.Depth8.Pixels[1] = Pixels8[i * 4 + 209];
-			Players[o + 8].UnitColors.Depth8.Pixels[2] = Pixels8[i * 4 + 210];
-			Players[o + 8].UnitColors.Depth8.Pixels[3] = Pixels8[i * 4 + 211];
-			o = (o + 1) & 0x7;
-		}
-
-		Players[o].UnitColors.Depth8.Pixels[0] = Pixels8[12];
-		Players[o].UnitColors.Depth8.Pixels[1] = Pixels8[13];
-		Players[o].UnitColors.Depth8.Pixels[2] = Pixels8[14];
-		Players[o].UnitColors.Depth8.Pixels[3] = Pixels8[15];
-		Players[o+8].UnitColors.Depth8.Pixels[0] = Pixels8[12];
-		Players[o+8].UnitColors.Depth8.Pixels[1] = Pixels8[13];
-		Players[o+8].UnitColors.Depth8.Pixels[2] = Pixels8[14];
-		Players[o+8].UnitColors.Depth8.Pixels[3] = Pixels8[15];
-
 		break;
-
 	case 15:
 	case 16:
-		// New player colors setup
-		if (!Pixels16) {
-			DebugLevel0Fn("Wrong setup order\n");
-			return;
+		for (i = 0; i < PlayerMax; ++i) {
+			memcpy(Players[o].UnitColors.Depth16.Pixels, PlayerColors[i],
+				sizeof(VMemType16) * 4);
+			o = (o + 1) % PlayerMax;
 		}
-
-		for (i = 0; i < 7; ++i) {
-			Players[o].UnitColors.Depth16.Pixels[0] = Pixels16[i * 4 + 208];
-			Players[o].UnitColors.Depth16.Pixels[1] = Pixels16[i * 4 + 209];
-			Players[o].UnitColors.Depth16.Pixels[2] = Pixels16[i * 4 + 210];
-			Players[o].UnitColors.Depth16.Pixels[3] = Pixels16[i * 4 + 211];
-
-			Players[o+8].UnitColors.Depth16.Pixels[0] = Pixels16[i * 4 + 208];
-			Players[o+8].UnitColors.Depth16.Pixels[1] = Pixels16[i * 4 + 209];
-			Players[o+8].UnitColors.Depth16.Pixels[2] = Pixels16[i * 4 + 210];
-			Players[o+8].UnitColors.Depth16.Pixels[3] = Pixels16[i * 4 + 211];
-			o = (o + 1) & 0x7;
-		}
-
-		Players[o].UnitColors.Depth16.Pixels[0] = Pixels16[12];
-		Players[o].UnitColors.Depth16.Pixels[1] = Pixels16[13];
-		Players[o].UnitColors.Depth16.Pixels[2] = Pixels16[14];
-		Players[o].UnitColors.Depth16.Pixels[3] = Pixels16[15];
-		Players[o + 8].UnitColors.Depth16.Pixels[0] = Pixels16[12];
-		Players[o + 8].UnitColors.Depth16.Pixels[1] = Pixels16[13];
-		Players[o + 8].UnitColors.Depth16.Pixels[2] = Pixels16[14];
-		Players[o + 8].UnitColors.Depth16.Pixels[3] = Pixels16[15];
-
 		break;
 	case 24:
-		// New player colors setup
-		if (!Pixels24) {
-			DebugLevel0Fn("Wrong setup order\n");
-			return;
+		for (i = 0; i < PlayerMax; ++i) {
+			memcpy(Players[o].UnitColors.Depth24.Pixels, PlayerColors[i],
+				sizeof(VMemType24) * 4);
+			o = (o + 1) % PlayerMax;
 		}
-
-		for (i = 0; i < 7; ++i) {
-			Players[o].UnitColors.Depth24.Pixels[0] = Pixels24[i * 4 + 208];
-			Players[o].UnitColors.Depth24.Pixels[1] = Pixels24[i * 4 + 209];
-			Players[o].UnitColors.Depth24.Pixels[2] = Pixels24[i * 4 + 210];
-			Players[o].UnitColors.Depth24.Pixels[3] = Pixels24[i * 4 + 211];
-
-			Players[o + 8].UnitColors.Depth24.Pixels[0] = Pixels24[i * 4 + 208];
-			Players[o + 8].UnitColors.Depth24.Pixels[1] = Pixels24[i * 4 + 209];
-			Players[o + 8].UnitColors.Depth24.Pixels[2] = Pixels24[i * 4 + 210];
-			Players[o + 8].UnitColors.Depth24.Pixels[3] = Pixels24[i * 4 + 211];
-			o = (o + 1) & 0x7;
-		}
-
-		Players[o].UnitColors.Depth24.Pixels[0] = Pixels24[12];
-		Players[o].UnitColors.Depth24.Pixels[1] = Pixels24[13];
-		Players[o].UnitColors.Depth24.Pixels[2] = Pixels24[14];
-		Players[o].UnitColors.Depth24.Pixels[3] = Pixels24[15];
-		Players[o + 8].UnitColors.Depth24.Pixels[0] = Pixels24[12];
-		Players[o + 8].UnitColors.Depth24.Pixels[1] = Pixels24[13];
-		Players[o + 8].UnitColors.Depth24.Pixels[2] = Pixels24[14];
-		Players[o + 8].UnitColors.Depth24.Pixels[3] = Pixels24[15];
-
 		break;
 	case 32:
-		// New player colors setup
-		if (!Pixels32) {
-			DebugLevel0Fn("Wrong setup order\n");
-			return;
-		}
-
 		for (i = 0; i < 7; ++i) {
-			Players[o].UnitColors.Depth32.Pixels[0] = Pixels32[i * 4 + 208];
-			Players[o].UnitColors.Depth32.Pixels[1] = Pixels32[i * 4 + 209];
-			Players[o].UnitColors.Depth32.Pixels[2] = Pixels32[i * 4 + 210];
-			Players[o].UnitColors.Depth32.Pixels[3] = Pixels32[i * 4 + 211];
-
-			Players[o + 8].UnitColors.Depth32.Pixels[0] = Pixels32[i * 4 + 208];
-			Players[o + 8].UnitColors.Depth32.Pixels[1] = Pixels32[i * 4 + 209];
-			Players[o + 8].UnitColors.Depth32.Pixels[2] = Pixels32[i * 4 + 210];
-			Players[o + 8].UnitColors.Depth32.Pixels[3] = Pixels32[i * 4 + 211];
-			o = (o + 1) & 0x7;
+			memcpy(Players[o].UnitColors.Depth32.Pixels, PlayerColors[i],
+				sizeof(VMemType32) * 4);
+			o = (o + 1) % PlayerMax;
 		}
-
-		Players[o].UnitColors.Depth32.Pixels[0] = Pixels32[12];
-		Players[o].UnitColors.Depth32.Pixels[1] = Pixels32[13];
-		Players[o].UnitColors.Depth32.Pixels[2] = Pixels32[14];
-		Players[o].UnitColors.Depth32.Pixels[3] = Pixels32[15];
-		Players[o + 8].UnitColors.Depth32.Pixels[0] = Pixels32[12];
-		Players[o + 8].UnitColors.Depth32.Pixels[1] = Pixels32[13];
-		Players[o + 8].UnitColors.Depth32.Pixels[2] = Pixels32[14];
-		Players[o + 8].UnitColors.Depth32.Pixels[3] = Pixels32[15];
-
 		break;
 	}
 #endif

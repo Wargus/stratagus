@@ -114,12 +114,6 @@
 --		Declarations
 ----------------------------------------------------------------------------*/
 
-// JOHNS: This is needed, because later I want to support it all with the same
-//		  executable, choosable at runtime.
-#ifdef USE_SDL
-#define UseSdl				1
-#endif
-
 /**
 **		Structure of pushed clippings.
 */
@@ -196,27 +190,9 @@ global SDL_Surface* TheScreen;
 global VMemType* VideoMemory;
 #endif
 
-	/**
-	**		Architecture-dependant system palette. Applies as conversion between
-	**		GlobalPalette colors and their representation in videomemory.
-	**		Set by VideoCreatePalette or VideoSetPalette.
-	**		@see VideoCreatePalette @see VideoSetPalette
-	*/
-#ifdef USE_SDL_SURFACE
-global SDL_Palette* Pixels;
-#else
-global VMemType* Pixels;
-#endif
-
 global int VideoSyncSpeed = 100;		/// 0 disable interrupts
 global volatile int VideoInterrupts;		/// be happy, were are quicker
 
-	/// Loaded system palette. 256-entries long, active system palette.
-#ifdef USE_SDL_SURFACE
-global SDL_Palette* GlobalPalette;
-#else
-global Palette GlobalPalette[256];
-#endif
 	/**
 	** FIXME: this docu is added only to the first variable!
 	**
@@ -631,73 +607,6 @@ global void DisplayPicture(const char* name)
 	VideoFree(picture);
 }
 
-/**
-** FIXME
-*/
-#ifdef USE_SDL_SURFACE
-global SDL_Palette* LoadRGB(const char* name)
-{
-	CLFile* fp;
-	int i;
-	unsigned char* p;
-	unsigned char buffer[256 * 3];
-	SDL_Palette* pal;
-
-	if (!(fp = CLopen(name, CL_OPEN_READ)) || CLread(fp, buffer, 256 * 3) != 256 * 3) {
-		fprintf(stderr, "Can't load palette %s\n", name);
-		ExitFatal(-1);
-	}
-
-	// FIXME: malloc somewhere else ?!?!
-	pal = malloc(sizeof(SDL_Palette));
-	pal->colors = calloc(256, sizeof(SDL_Color));
-
-	pal->ncolors = 256;
-
-	p = buffer;
-	for (i = 0; i < 256; ++i) {
-		pal->colors[i].r = (*p++);
-		pal->colors[i].g = (*p++);
-		pal->colors[i].b = (*p++);
-	}
-
-	CLclose(fp);
-
-	return pal;
-}
-#else
-/**
-**		Load palette from resource. Just loads palette, to set it use
-**		VideoCreatePalette, which sets system palette.
-**
-**		@param pal buffer to store palette (256-entries long)
-**		@param name resource file name
-**
-**		@see VideoCreatePalette
-*/
-global void LoadRGB(Palette* pal, const char* name)
-{
-	CLFile* fp;
-	int i;
-	unsigned char* p;
-	unsigned char buffer[256 * 3];
-
-	if (!(fp = CLopen(name, CL_OPEN_READ)) || CLread(fp, buffer, 256 * 3) != 256 * 3) {
-		fprintf(stderr, "Can't load palette %s\n", name);
-		ExitFatal(-1);
-	}
-
-	p = buffer;
-	for (i = 0; i < 256; ++i) {
-		pal[i].r = (*p++);
-		pal[i].g = (*p++);
-		pal[i].b = (*p++);
-	}
-
-	CLclose(fp);
-}
-#endif
-
 // FIXME: this isn't 100% correct
 // Color cycling info - forest:
 // 3		flash red/green (attacked building on minimap)
@@ -843,24 +752,6 @@ local void ColorCycle8(void)
 			pixels[i] = pixels[i + 1];
 		}
 		pixels[ColorWaterCycleEnd] = x;
-
-		x = Pixels8[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-			Pixels8[i] = Pixels8[i + 1];
-		}
-		Pixels8[ColorWaterCycleEnd] = x;
-
-		x = Pixels8[ColorIconCycleStart];
-		for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-			Pixels8[i] = Pixels8[i + 1];
-		}
-		Pixels8[ColorIconCycleEnd] = x;
-
-		x = Pixels8[ColorBuildingCycleStart];
-		for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// buildings color cycle
-			Pixels8[i] = Pixels8[i + 1];
-		}
-		Pixels8[ColorBuildingCycleEnd] = x;
 	}
 
 	MapColorCycle();				// FIXME: could be little more informative
@@ -918,24 +809,6 @@ local void ColorCycle16(void)
 			pixels[i] = pixels[i + 1];
 		}
 		pixels[ColorWaterCycleEnd] = x;
-
-		x = Pixels16[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-			Pixels16[i] = Pixels16[i + 1];
-		}
-		Pixels16[ColorWaterCycleEnd] = x;
-
-		x = Pixels16[ColorIconCycleStart];
-		for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-			Pixels16[i] = Pixels16[i + 1];
-		}
-		Pixels16[ColorIconCycleEnd] = x;
-
-		x = Pixels16[ColorBuildingCycleStart];
-		for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-			Pixels16[i] = Pixels16[i + 1];
-		}
-		Pixels16[ColorBuildingCycleEnd] = x;
 	}
 
 	MapColorCycle();				// FIXME: could be little more informative
@@ -993,24 +866,6 @@ local void ColorCycle24(void)
 			pixels[i] = pixels[i + 1];
 		}
 		pixels[ColorWaterCycleEnd] = x;
-
-		x = Pixels24[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-			Pixels24[i] = Pixels24[i + 1];
-		}
-		Pixels24[ColorWaterCycleEnd] = x;
-
-		x = Pixels24[ColorIconCycleStart];
-		for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-			Pixels24[i] = Pixels24[i + 1];
-		}
-		Pixels24[ColorIconCycleEnd] = x;
-
-		x = Pixels24[ColorBuildingCycleStart];
-		for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-			Pixels24[i] = Pixels24[i + 1];
-		}
-		Pixels24[ColorBuildingCycleEnd] = x;
 	}
 
 	MapColorCycle();				// FIXME: could be little more informative
@@ -1068,24 +923,6 @@ local void ColorCycle32(void)
 			pixels[i] = pixels[i + 1];
 		}
 		pixels[ColorWaterCycleEnd] = x;
-
-		x = Pixels32[ColorWaterCycleStart];
-		for (i = ColorWaterCycleStart; i < ColorWaterCycleEnd; ++i) {		// tileset color cycle
-			Pixels32[i] = Pixels32[i + 1];
-		}
-		Pixels32[ColorWaterCycleEnd] = x;
-
-		x = Pixels32[ColorIconCycleStart];
-		for (i = ColorIconCycleStart; i < ColorIconCycleEnd; ++i) {		// units/icons color cycle
-			Pixels32[i] = Pixels32[i + 1];
-		}
-		Pixels32[ColorIconCycleEnd] = x;
-
-		x = Pixels32[ColorBuildingCycleStart];
-		for (i = ColorBuildingCycleStart; i < ColorBuildingCycleEnd; ++i) {		// Buildings color cycle
-			Pixels32[i] = Pixels32[i + 1];
-		}
-		Pixels32[ColorBuildingCycleEnd] = x;
 	}
 
 	MapColorCycle();				// FIXME: could be little more informative
@@ -1462,48 +1299,9 @@ local void InitSingleCommonPalette8(void)
 }
 #endif
 
-/*===========================================================================*/
-
-/**
-**		Initializes system palette. Also calls SetPlayersPalette to set
-**		palette for all players.
-**
-**		@param palette VMemType structure, as created by VideoCreateNewPalette
-**
-**		@see SetPlayersPalette
-*/
-#ifndef USE_SDL_SURFACE
-global void VideoSetPalette(const VMemType* palette)
-{
-	DebugLevel2Fn("Palette %x used\n" _C_ (unsigned)palette);
-
-	if (Pixels) {
-		free(Pixels);
-	}
-	Pixels = (VMemType*)palette;
-	SetPlayersPalette();
-}
-#endif
-
 /*----------------------------------------------------------------------------
 --		Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**		Set the system hardware palette from an independend Palette struct.
-**
-**		@param palette		System independ palette structure.
-*/
-#ifndef USE_SDL_SURFACE
-global void VideoCreatePalette(const Palette* palette)
-{
-	VMemType* temp;
-
-	temp = VideoCreateNewPalette(palette);
-
-	VideoSetPalette(temp);
-}
-#endif
 
 /**
 **		Lock the screen for write access.
@@ -1538,7 +1336,7 @@ global void VideoClearScreen(void)
 */
 global unsigned long GetTicks(void)
 {
-#if UseSdl
+#ifdef USE_SDL
 	return SDL_GetTicks();
 #endif
 }
@@ -1548,20 +1346,8 @@ global unsigned long GetTicks(void)
 */
 global void InitVideo(void)
 {
-#ifdef __OPTIMIZE__
-	if (UseSdl) {
-		InitVideoSdl();
-	} else {
-#ifdef DEBUG
-		abort();
-#endif
-	}
-#else
-	#if UseSdl
-		InitVideoSdl();
-	#else
-		abort();
-	#endif
+#ifdef USE_SDL
+	InitVideoSdl();
 #endif
 
 	//

@@ -169,8 +169,8 @@ local void GameTypeFreeForAll(void)
 	int i;
 	int j;
 
-	for (i = 0; i < 15; ++i) {
-		for (j = 0; j < 15; ++j) {
+	for (i = 0; i < PlayerMax - 1; ++i) {
+		for (j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				CommandDiplomacy(i, DiplomacyEnemy, j);
 			}
@@ -189,9 +189,9 @@ local void GameTypeTopVsBottom(void)
 	int middle;
 
 	middle = TheMap.Height / 2;
-	for (i = 0; i < 15; ++i) {
+	for (i = 0; i < PlayerMax - 1; ++i) {
 		top = Players[i].StartY <= middle;
-		for (j = 0; j < 15; ++j) {
+		for (j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if ((top && Players[j].StartY <= middle) ||
 						(!top && Players[j].StartY > middle)) {
@@ -216,9 +216,9 @@ local void GameTypeLeftVsRight(void)
 	int middle;
 
 	middle = TheMap.Width / 2;
-	for (i = 0; i < 15; ++i) {
+	for (i = 0; i < PlayerMax - 1; ++i) {
 		left = Players[i].StartX <= middle;
-		for (j = 0; j < 15; ++j) {
+		for (j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if ((left && Players[j].StartX <= middle) ||
 						(!left && Players[j].StartX > middle)) {
@@ -240,11 +240,11 @@ local void GameTypeManVsMachine(void)
 	int i;
 	int j;
 
-	for (i = 0; i < 15; ++i) {
+	for (i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer ) {
 			continue;
 		}
-		for (j = 0; j < 15; ++j) {
+		for (j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
 					CommandDiplomacy(i, DiplomacyAllied, j);
@@ -394,18 +394,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	//
 	// Graphic part
 	//
-#ifdef USE_SDL_SURFACE
-	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
-				TheMap.Tileset->PaletteFile));
-	free(s);
 	SetPlayersPalette();
-#else
-	LoadRGB(GlobalPalette,
-			s = strdcat3(StratagusLibPath, "/graphics/",
-				TheMap.Tileset->PaletteFile));
-	free(s);
-	VideoCreatePalette(GlobalPalette);
-#endif
 	InitIcons();
 	LoadIcons();
 

@@ -5750,7 +5750,6 @@ local void EditorMapPropertiesOk(void)
 	Menu *menu;
 	char *description;
 	int old;
-	char *s;
 
 	menu = CurrentMenu;
 
@@ -5760,7 +5759,7 @@ local void EditorMapPropertiesOk(void)
 	TheMap.Info->Description = strdup(description);
 
 	// Change the terrain
-	old=TheMap.Info->MapTerrain;
+	old = TheMap.Info->MapTerrain;
 	if (old != menu->Items[6].d.pulldown.curopt) {
 		TheMap.Info->MapTerrain = menu->Items[6].d.pulldown.curopt;
 		free(TheMap.Info->MapTerrainName);
@@ -5772,19 +5771,7 @@ local void EditorMapPropertiesOk(void)
 
 		LoadTileset();
 		ChangeTilesetPud(old, &TheMap);
-#ifdef USE_SDL_SURFACE
-		GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath,"/graphics/",
-					TheMap.Tileset->PaletteFile));
-		free(s);
 		SetPlayersPalette();
-//		VideoCreatePalette(GlobalPalette);
-#else
-		LoadRGB(GlobalPalette,
-				s=strdcat3(StratagusLibPath,"/graphics/",
-					TheMap.Tileset->PaletteFile));
-		free(s);
-		VideoCreatePalette(GlobalPalette);
-#endif
 		PreprocessMap();
 		LoadConstructions();
 		LoadUnitTypes();

@@ -318,12 +318,11 @@ typedef struct _world_map_ {
 	int      Terrain; /// terrain type (summer,winter,...)
 	Tileset* Tileset; /// tileset data
 
+	unsigned TileCount; /// how many tiles,
 #ifdef USE_SDL_SURFACE
-	unsigned int TileCount; /// how many tiles,
 	/// == TileGraphic->NFrames
 	Graphic* TileGraphic; /// graphic for all the tiles
 #else
-	unsigned        TileCount;  /// how many tiles are available
 	unsigned char** Tiles;      /// pointer to tile data
 	Graphic*        TileData;   /// tiles graphic for map
 #endif
