@@ -364,7 +364,6 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type,
     Unit* mine;
     int destx;
     int desty;
-    int bestd;
 
     destx=x=worker->X;
     desty=y=worker->Y;
