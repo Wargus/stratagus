@@ -129,6 +129,7 @@ local SCM CclUnit(SCM list)
 
 	    DebugCheck( !type );
 	    unit=MakeUnit(type,player);
+	    unit->Active=0;
 	    unit->Removed=0;
 	    unit->Reset=0;
 	    DebugCheck( unit->Slot!=slot );
@@ -176,7 +177,7 @@ local SCM CclUnit(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("not-seen")) ) {
 	    unit->SeenFrame=-1;
 	} else if( gh_eq_p(value,gh_symbol2scm("direction")) ) {
-	    unit->Direction=(gh_scm2int(gh_car(list))*256)/360;
+	    unit->Direction=gh_scm2int(gh_car(list));
 	    list=gh_cdr(list);
 	} else if( gh_eq_p(value,gh_symbol2scm("attacked")) ) {
 	    unit->Attacked=gh_scm2int(gh_car(list));
