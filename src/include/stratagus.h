@@ -411,8 +411,8 @@ extern void LoadAll(void);                  ///< Load all data back
 extern void InitSyncRand(void);             ///< Initialize the syncron rand
 extern int SyncRand(void);                  ///< Syncron rand
 
-extern volatile void Exit(int err);         ///< Exit stratagus
-extern volatile void ExitFatal(int err);    ///< Exit stratagus with fatal error
+extern void Exit(int err);                  ///< Exit stratagus
+extern void ExitFatal(int err);             ///< Exit stratagus with fatal error
 
 extern void UpdateDisplay(void);            ///< Game display update
 extern void InitModules(void);              ///< Initinalize all modules

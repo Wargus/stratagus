@@ -818,7 +818,7 @@ Use it at your own risk.\n\n");
 **
 **  @param err  Error code to parse to shell.
 */
-global volatile void Exit(int err)
+global void Exit(int err)
 {
 	StopMusic();
 	QuitSound();
@@ -848,7 +848,7 @@ global volatile void Exit(int err)
 **
 **  @param err  Error code to parse to shell.
 */
-global volatile void ExitFatal(int err)
+global void ExitFatal(int err)
 {
 	QuitCD();
 	exit(err);
