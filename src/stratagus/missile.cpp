@@ -10,7 +10,7 @@
 //
 /**@name missile.c - The missiles. */
 //
-//      (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1338,6 +1338,7 @@ global MissileType* MissileBurningBuilding(int percent)
 */
 global void SaveMissileTypes(CLFile* file)
 {
+#if 0
 	MissileType* mtype;
 	char** sp;
 	int i;
@@ -1385,7 +1386,7 @@ global void SaveMissileTypes(CLFile* file)
 			CLprintf(file, "\n ");
 		}
 		CLprintf(file, " 'class '%s", MissileClassNames[mtype->Class]);
-		if (mtype->Class==MissileClassPointToPointBounce) {
+		if (mtype->Class == MissileClassPointToPointBounce) {
 			CLprintf(file," 'num-bounces %d",mtype->NumBounces);
 		}
 		CLprintf(file, " 'class '%s", MissileClassNames[mtype->Class]);
@@ -1412,44 +1413,47 @@ global void SaveMissileTypes(CLFile* file)
 		}
 		CLprintf(file, ")\n");
 	}
+#endif
 }
 
 /**
 **  Save the state of a missile to file.
 **
-**  @param missile  FIXME: docu
+**  @param missile  Missile object to save.
 **  @param file     Output file.
 */
 local void SaveMissile(const Missile* missile, CLFile* file)
 {
 	char* s1;
 
-	DebugCheck(missile == NULL);
-	DebugCheck(missile->Type == NULL);
-	DebugCheck(file == NULL);
-	CLprintf(file, "(missile 'type '%s", missile->Type->Ident);
-	CLprintf(file, " 'pos '(%d %d) 'origin-pos '(%d %d) 'goal '(%d %d)",
+	CLprintf(file, "Missile(\"type\", \"%s\",", missile->Type->Ident);
+	CLprintf(file, " \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
 		missile->X, missile->Y, missile->SourceX, missile->SourceY, missile->DX, missile->DY);
-	CLprintf(file, " '%s", missile->Local ? "local" : "global");
-	CLprintf(file, "\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
-		missile->SpriteFrame, missile->State, missile->Wait, missile->Delay);
+	CLprintf(file, "\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
+		missile->SpriteFrame, missile->State, missile->AnimWait, missile->Wait, missile->Delay);
 
 	if (missile->SourceUnit) {
-		CLprintf(file, " 'source '%s", s1 = UnitReference(missile->SourceUnit));
+		CLprintf(file, " \"source\", \"%s\",", s1 = UnitReference(missile->SourceUnit));
 		free(s1);
 	}
 	if (missile->TargetUnit) {
-		CLprintf(file, " 'target '%s", s1 = UnitReference(missile->TargetUnit));
+		CLprintf(file, " \"target\", \"%s\",", s1 = UnitReference(missile->TargetUnit));
 		free(s1);
 	}
-	CLprintf(file, " 'damage %d", missile->Damage);
-	CLprintf(file, " 'ttl %d",		missile->TTL);
+
+	CLprintf(file, " \"damage\", %d,", missile->Damage);
+
+	CLprintf(file, " \"ttl\", %d,",		missile->TTL);
 	if (missile->Hidden) {
-		CLprintf(file, " 'hidden ");
+		CLprintf(file, " \"hidden\", ");
 	}
-	CLprintf(file, " 'step '(%d %d)",
-		missile->CurrentStep,
-		missile->TotalStep);
+
+	CLprintf(file, " \"step\", {%d, %d},",
+		missile->CurrentStep, missile->TotalStep);
+
+	CLprintf(file, " \"%s\",", missile->Local ? "local" : "global");
+	// MissileSlot filled in during init
+
 	CLprintf(file, ")\n");
 }
 
@@ -1462,9 +1466,8 @@ global void SaveMissiles(CLFile* file)
 {
 	Missile* const* missiles;
 
-	DebugCheck(file == NULL);
-	CLprintf(file,"\n;;; -----------------------------------------\n");
-	CLprintf(file,";;; MODULE: missiles $Id$\n\n");
+	CLprintf(file,"\n--- -----------------------------------------\n");
+	CLprintf(file,"--- MODULE: missiles $Id$\n\n");
 
 	for (missiles = GlobalMissiles; *missiles; ++missiles) {
 		SaveMissile(*missiles, file);
