@@ -169,6 +169,7 @@ local void MultiClientGemAction(Menuitem *mi);
 local void MultiClientCancel(void);
 local void MultiClientRCSAction(Menuitem *mi, int i);
 
+local void MultiGameStart(void);
 local void MultiGameCancel(void);
 local void MultiGameSetupInit(Menuitem *mi);	// master init
 local void MultiGameSetupExit(Menuitem *mi);	// master exit
@@ -672,7 +673,7 @@ local Menuitem NetMultiSetupMenuItems[] = {
     { MI_TYPE_BUTTON, 640-224-16, 360, 0, LargeFont, NULL, NULL,
 	{ button:{ "S~!elect Scenario", 224, 27, MBUTTON_GM_FULL, MultiScenSelectMenu, 'e'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, CustomGameStart, 's'} } },
+	{ button:{ "~!Start Game", 224, 27, MBUTTON_GM_FULL, MultiGameStart, 's'} } },
     { MI_TYPE_BUTTON, 640-224-16, 360+36+36, 0, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel Game", 224, 27, MBUTTON_GM_FULL, MultiGameCancel, 'c'} } },
 
@@ -2964,6 +2965,21 @@ local void CreateNetGameMenu(void)
 }
 
 /**
+**	Multiplayer game start game button pressed.
+*/
+local void MultiGameStart(void)
+{
+    VideoLockScreen();
+    StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
+    Invalidate();
+
+    DebugLevel0Fn("Send start to all clients.\n");
+
+    CustomGameStart();
+}
+
+/**
 **	Enter multiplayer game menu.
 */
 local void MultiPlayerGameMenu(void)
@@ -2995,10 +3011,16 @@ local void MultiPlayerGameMenu(void)
     NameBuf[EnterNameMenuItems[1].d.input.nch] = 0;	// Now finally here is the name
     memset(NetworkName, 0, 16);
     strcpy(NetworkName, NameBuf);
+
+    GuiGameStarted = 0;
     // Here we really go...
     ProcessMenu(MENU_NET_CREATE_JOIN, 1);
-}
 
+    DebugLevel0Fn("What here?\n");
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
+}
 
 local void FreeMapInfos(FileList *fl, int n)
 {
@@ -3979,6 +4001,7 @@ local void MultiGameClientDrawFunc(Menuitem *mi)
 local void MultiGamePlayerSelectorsUpdate(int initial)
 {
     int i, h, c;
+    int ready;
 
     //	FIXME: What this has to do:
     //	analyze pudinfo for available slots,
@@ -3986,7 +4009,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     //	put names of net-connected players in slots
     //	announce changes by the game creator to connected clients
 
-    for (c = h = i = 0; i < PlayerMax; i++) {
+    for (ready = c = h = i = 0; i < PlayerMax; i++) {
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
 	    h++;	// available person player slots
 	}
@@ -4032,6 +4055,10 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].flags = 0;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state =
 		MI_GSTATE_PASSIVE;
+
+	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags = 0;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].d.gem.state =
+		MI_GSTATE_PASSIVE;
 	}
 	if (i >= h) {
 	    if (initial) {
@@ -4046,6 +4073,11 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 		MenuButtonDisabled;
 	    NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i].d.gem.state |= 
 		MI_GSTATE_INVISIBLE;
+
+	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags = 
+		MenuButtonDisabled;
+	    NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].d.gem.state |= 
+		MI_GSTATE_INVISIBLE;
 	}
 	if (i >= h + c) {
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].d.pulldown.defopt =
@@ -4055,6 +4087,13 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	    NetMultiSetupMenuItems[SERVER_PLAYER_STATE + i].flags =
 		MenuButtonDisabled;
 	}
+	if (ServerSetupState.Ready[i]) {
+	    ++ready;
+	}
+    }
+    // Check if all players are ready.
+    if( ready + 1 == h ) {
+	NetMultiSetupMenuItems[3].flags = 0;	// enable start game button
     }
 }
 
@@ -4158,6 +4197,8 @@ local void MultiGameCancel(void)
 
 /**
 **	Draw the multi player setup menu.
+**
+**	@note FIXME: the other buttons aren't updated if the player leaves.
 */
 local void NetMultiPlayerDrawFunc(Menuitem *mi)
 {
@@ -4177,6 +4218,18 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 		NetMultiSetupMenuItems[SERVER_PLAYER_READY - 1 + i]
 			.d.gem.state = MI_GSTATE_PASSIVE;
 	    }
+	    if (ServerSetupState.LastFrame[i]+30>FrameCounter) {
+		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags &=
+		    ~MenuButtonDisabled;
+		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i]
+			.d.gem.state = MI_GSTATE_PASSIVE|MI_GSTATE_CHECKED;
+	    } else {
+		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i].flags |=
+		    MenuButtonDisabled;
+		NetMultiSetupMenuItems[SERVER_PLAYER_LAG - 1 + i]
+			.d.gem.state = MI_GSTATE_PASSIVE;
+	    }
+
 	}
     } else {
 	i = mi - NetMultiClientMenuItems - CLIENT_PLAYER_STATE;
@@ -4223,6 +4276,9 @@ local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
     }
 }
 
+/**
+**	Multiplayer client gem action. Toggles ready flag.
+*/
 local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
 {
     int i;
