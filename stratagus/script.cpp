@@ -96,6 +96,34 @@ global void CclGcProtect(SCM obj)
     setvar(var,cons(obj,symbol_value(var,NIL)),NIL);
 }
 
+/**
+**	Remove a SCM object from garbage collectors protection list.
+**
+**	@param obj	Scheme object
+*/
+global void CclGcUnprotect(SCM obj)
+{
+    // Remove obj from the list *ccl-protect*
+    SCM sym;
+    SCM old_lst;
+    SCM new_lst;
+
+    sym = gh_symbol2scm("*ccl-protect*");
+    old_lst = symbol_value(sym, NIL);
+    new_lst = NIL;
+
+    while( !gh_null_p(old_lst) ) {
+        SCM el = gh_car(old_lst);
+
+        if (el != obj)
+          new_lst = cons(el, new_lst);
+        
+        old_lst = gh_cdr(old_lst);
+      }
+    
+    setvar(sym, new_lst, NIL);
+}
+
 /*............................................................................
 ..	Config
 ............................................................................*/
