@@ -8,15 +8,13 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/*
-**	Utility for FreeCraft.
-**
-**	extract.c	-	Extract gfx files.
-**
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//	Utility for FreeCraft.
+//
+//	extract.c	-	Extract gfx files.
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -8,13 +8,11 @@
 //			  T H E   W A R   B E G I N S
 //   Utility for FreeCraft - A free fantasy real time strategy game engine
 //
-/*
-**	tile2png.c	-	Convert tileset files to png files.
-**
-**	(c) Copyright 1998,2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//	tile2png.c	-	Convert tileset files to png files.
+//
+//	(c) Copyright 1998,2000 by Lutz Sammer
+//
+//	$Id$
 
 #include <stdio.h>
 #include <stdlib.h>
