@@ -389,20 +389,47 @@ global void CleanAi(void)
     int i;
     int p;
     PlayerAi* pai;
-    AiType* temp;
+    void* temp;
     AiType* aitype;
+    AiBuildQueue* queue;
 
     for( p=0; p<PlayerMax; ++p ) {
 	if( (pai=Players[p].Ai) ) {
-	    DebugLevel0Fn("FIXME: Cleaning the AI isn't complete written.\n");
-
-	    // Must free forces
+	    //
+	    //	Free forces
+	    //
 	    for( i=0; i<AI_MAX_FORCES; ++i ) {
+		AiUnitType* aut;
+		AiUnit* aiunit;
+
+		for( aut=AiPlayer->Force[i].UnitTypes; aut; aut=temp ) {
+		    temp=aut->Next;
+		    free(aut);
+		}
+		for( aiunit=AiPlayer->Force[i].Units; aiunit; aiunit=temp ) {
+		    temp=aiunit->Next;
+		    free(aiunit);
+		}
 	    }
-	    // Must free UnitTypeRequests
-	    // Must free UpgradeRequests
-	    // Must free ResearchRequests
-	    // Must free UnitTypeBuilded
+	    //
+	    //	Free UnitTypeRequests
+	    //
+	    free(pai->UnitTypeRequests);
+	    //
+	    //	Free UpgradeToRequests
+	    //
+	    free(pai->UpgradeToRequests);
+	    //
+	    //	Free ResearchRequests
+	    //
+	    free(pai->ResearchRequests);
+	    //
+	    //	Free UnitTypeBuilded
+	    //
+	    for( queue=pai->UnitTypeBuilded; queue; queue=temp ) {
+		temp=queue->Next;
+		free(queue);
+	    }
 
 	    free(pai);
 	    Players[p].Ai=NULL;
@@ -413,6 +440,7 @@ global void CleanAi(void)
     //	Free AiTypes.
     //
     for( aitype=AiTypes; aitype; aitype=temp ) {
+	DebugLevel3Fn("%s,%s,%s\n",aitype->Name,aitype->Race,aitype->Class);
 	free(aitype->Name);
 	free(aitype->Race);
 	free(aitype->Class);
