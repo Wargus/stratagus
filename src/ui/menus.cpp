@@ -815,9 +815,9 @@ local Menuitem SpeedSettingsMenuItems[] = {
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Speed Settings", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_HSLIDER, 108, 80, 0, 0, NULL, NULL,
-            { hslider:{ 0, 6*18, 18, ScenSelectVSAction, 1, 0, 0, 0, ScenSelectOk} } },
-    { MI_TYPE_GEM, 15, 42, 0, LargeFont, NULL, NULL,
-	{ gem:{ MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdMode} } },
+            { hslider:{ 0, 6*18, 18, ScenSelectHSAction, -1, 0, 0, 0, ScenSelectOk} } },
+    { MI_TYPE_VSLIDER, 10, 100, 0, 0, NULL, NULL,
+            { vslider:{ 0, 18, 6*18, ScenSelectVSAction, -1, 0, 0, 0, ScenSelectOk} } },
     { MI_TYPE_TEXT, 144, 44, 0, LargeFont, NULL, NULL,
 	{ text:{ "Play CD Audio", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 128 - (106 / 2), 245, MenuButtonSelected, LargeFont, NULL, NULL,
@@ -3194,6 +3194,11 @@ normkey:
 			    (*mi->d.vslider.handler)();
 			}
 			return 1;
+		    case MI_TYPE_HSLIDER:
+			if (mi->d.hslider.handler) {
+			    (*mi->d.hslider.handler)();
+			}
+			return 1;
 		    default:
 			break;
 		}
@@ -3279,6 +3284,7 @@ normkey:
 			case MI_TYPE_BUTTON:
 			case MI_TYPE_LISTBOX:
 			case MI_TYPE_VSLIDER:
+			case MI_TYPE_HSLIDER:
 			case MI_TYPE_INPUT:
 			    if (mi->flags & MenuButtonDisabled) {
 				break;
@@ -3575,6 +3581,7 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 		    case MI_TYPE_PULLDOWN:
 		    case MI_TYPE_LISTBOX:
 		    case MI_TYPE_VSLIDER:
+		    case MI_TYPE_HSLIDER:
 		    case MI_TYPE_INPUT:
 			if (MenuButtonCurSel != -1) {
 			    menu->items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
@@ -3591,6 +3598,12 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
 		    mi->d.vslider.cflags = mi->d.vslider.cursel;
 		    if (mi->d.vslider.action) {
 			(*mi->d.vslider.action)(mi, 0);		// 0 indicates down
+		    }
+		    break;
+		case MI_TYPE_HSLIDER:
+		    mi->d.hslider.cflags = mi->d.hslider.cursel;
+		    if (mi->d.hslider.action) {
+			(*mi->d.hslider.action)(mi, 0);		// 0 indicates down
 		    }
 		    break;
 		case MI_TYPE_PULLDOWN:
@@ -3693,6 +3706,13 @@ global void MenuHandleButtonUp(int b)
 			RedrawFlag = 1;
 			mi->flags &= ~MenuButtonClicked;
 			mi->d.vslider.cflags = 0;
+		    }
+		    break;
+		case MI_TYPE_HSLIDER:
+		    if (mi->flags&MenuButtonClicked) {
+			RedrawFlag = 1;
+			mi->flags &= ~MenuButtonClicked;
+			mi->d.hslider.cflags = 0;
 		    }
 		    break;
 		default:
