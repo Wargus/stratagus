@@ -537,9 +537,6 @@ local int AiFindLumberMillPlace(const Unit * worker, const UnitType * type,
 	ep=wp;
     }
 
-    DebugLevel0Fn("no wood in range by %s(%d,%d)\n"
-	    _C_ worker->Type->Ident _C_ worker->X _C_ worker->Y);
-
     return 0;
 }
 
