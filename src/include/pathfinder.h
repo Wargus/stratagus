@@ -79,6 +79,8 @@ extern int AStarMovingUnitCrossingCost;
 
     /// Create a matrix for the old pathfinder
 extern unsigned char* CreateMatrix(void);
+    /// Allocate a new matrix and initialize
+extern unsigned char* MakeMatrix(void);
     /// Get next element of the way to goal.
 extern int NewPath(Unit* unit,int* xdp,int* ydp);
     /// Return distance to place.
