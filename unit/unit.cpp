@@ -4302,17 +4302,29 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	    }
 	    break;
 	case UnitActionBuilded:
+	{
+	    ConstructionFrame* cframe;
+	    int frame;
+
+	    cframe=unit->Type->Construction->Frames;
+	    frame=0;
+	    while( cframe!=unit->Data.Builded.Frame ) {
+		cframe=cframe->Next;
+		++frame;
+	    }
 	    fprintf(file,"\n  'data-builded '(worker %s",
 		    ref=UnitReference(unit->Data.Builded.Worker));
 	    free(ref);
-	    fprintf(file," sum %d add %d val %d sub %d",
+	    fprintf(file," sum %d add %d val %d sub %d frame %d",
 		    unit->Data.Builded.Sum,unit->Data.Builded.Add,
-		    unit->Data.Builded.Val,unit->Data.Builded.Sub);
+		    unit->Data.Builded.Val,unit->Data.Builded.Sub,
+		    frame);
 	    if( unit->Data.Builded.Cancel ) {
-		fprintf(file,"cancel");
+		fprintf(file," cancel");
 	    }
 	    fprintf(file,")");
 	    break;
+	}
 	case UnitActionResearch:
 	    fprintf(file,"\n  'data-research '(");
 	    fprintf(file,"ident %s", unit->Data.Research.Upgrade->Ident);

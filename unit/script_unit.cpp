@@ -10,7 +10,7 @@
 //
 /**@name ccl_unit.c	-	The unit ccl functions. */
 //
-//	(c) Copyright 2001-2002 by Lutz Sammer
+//	(c) Copyright 2001-2003 by Lutz Sammer and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -362,6 +362,18 @@ local void CclParseBuilded(Unit* unit, SCM list)
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("cancel"))) {
 	    unit->Data.Builded.Cancel = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("frame"))) {
+	    int frame;
+	    ConstructionFrame* cframe;
+
+	    frame = gh_scm2int(gh_car(list));
+	    cframe = unit->Type->Construction->Frames;
+	    while( frame-- ) {
+		cframe = cframe->Next;
+	    }
+	    unit->Data.Builded.Frame = cframe;
+	    value = gh_car(list);
+	    list = gh_cdr(list);
 	}
     }
 }

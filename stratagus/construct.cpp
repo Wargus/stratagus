@@ -139,6 +139,7 @@ global void SaveConstructions(FILE* file)
     int j;
     char** cp;
     Construction** cop;
+    ConstructionFrame* cframe;
 
     fprintf(file,"\n;;; -----------------------------------------\n");
     fprintf(file,";;; MODULE: constructions $Id$\n\n");
@@ -170,7 +171,7 @@ global void SaveConstructions(FILE* file)
 	    fprintf(file,"(define-construction '%s\n",(*cop)->Ident);
 	    for( j=0; j<TilesetMax; ++j ) {
 		if( !(*cop)->File[j].File ) {
-		    break;
+		    continue;
 		}
 		fprintf(file,"  'file '(\n");
 		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
@@ -179,14 +180,29 @@ global void SaveConstructions(FILE* file)
 			(*cop)->File[j].Height);
 	    }
 	    for( j=0; j<TilesetMax; ++j ) {
-		if( (*cop)->ShadowFile ) {
-		    break;
+		if( !(*cop)->ShadowFile[j].File ) {
+		    continue;
 		}
 		fprintf(file,"  'shadow-file '(\n");
 		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
 		fprintf(file,"    file  \"%s\"\n",(*cop)->ShadowFile[j].File);
 		fprintf(file,"    size (%d %d))\n",(*cop)->ShadowFile[j].Width,
 			(*cop)->ShadowFile[j].Height);
+	    }
+	    cframe=(*cop)->Frames;
+	    if( cframe ) {
+		fprintf(file,"  'constructions (list");
+		while( cframe ) {
+		    fprintf(file,"\n    '(percent %d\n",cframe->Percent);
+		    if( cframe->File==ConstructionFileConstruction ) {
+			fprintf(file,"      file construction\n");
+		    } else {
+			fprintf(file,"      file main\n");
+		    }
+		    fprintf(file,"      frame %d)",cframe->Frame);
+		    cframe=cframe->Next;
+		}
+		fprintf(file,")\n");
 	    }
 	    fprintf(file,")\n\n");
 	    ++cop;
@@ -202,6 +218,8 @@ global void CleanConstructions(void)
     char** cp;
     int j;
     Construction** cop;
+    ConstructionFrame* cframe;
+    ConstructionFrame* tmp;
 
     //
     //	Mapping original construction numbers in puds to our internal strings
@@ -234,30 +252,18 @@ global void CleanConstructions(void)
 		}
 	    }
 	    VideoSaveFree((*cop)->ShadowSprite);
+	    cframe=(*cop)->Frames;
+	    while( cframe ) {
+		tmp=cframe->Next;
+		free(cframe);
+		cframe=tmp;
+	    }
 	    free(*cop);
 	    ++cop;
 	}
 	free(Constructions);
 	Constructions=NULL;
     }
-}
-
-/**
-**	Draw construction.
-**
-**	@param construction	Construction pointer.
-**	@param frame	Frame number to draw.
-**	@param x	X position.
-**	@param y	Y position.
-*/
-global void DrawConstruction(const Construction* construction,int frame,
-    int x,int y)
-{
-    // FIXME: This should be moved to caller/init...
-    x-=construction->Width/2;
-    y-=construction->Height/2;
-
-    VideoDrawClip(construction->Sprite,frame,x,y);
 }
 
 /**
@@ -445,6 +451,55 @@ local SCM CclDefineConstruction(SCM list)
 		construction->ShadowFile[tileset].File=file;
 		construction->ShadowFile[tileset].Width=w;
 		construction->ShadowFile[tileset].Height=h;
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("constructions")) ) {
+	    sublist=gh_car(list);
+	    while( !gh_null_p(sublist) ) {
+		SCM slist;
+		int percent;
+		int file;
+		int frame;
+		ConstructionFrame** cframe;
+
+		percent=0;
+		file=0;
+		frame=0;
+
+		slist=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		while( !gh_null_p(slist) ) {
+		    value=gh_car(slist);
+		    slist=gh_cdr(slist);
+
+		    if( gh_eq_p(value,gh_symbol2scm("percent")) ) {
+			percent=gh_scm2int(gh_car(slist));
+			slist=gh_cdr(slist);
+		    } else if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+			value=gh_car(slist);
+			if( gh_eq_p(value,gh_symbol2scm("construction")) ) {
+			    file=ConstructionFileConstruction;
+			} else if( gh_eq_p(value,gh_symbol2scm("main")) ) {
+			    file=ConstructionFileMain;
+			} else {
+			    errl("Unsupported tag",value);
+			}
+			slist=gh_cdr(slist);
+		    } else if( gh_eq_p(value,gh_symbol2scm("frame")) ) {
+			frame=gh_scm2int(gh_car(slist));
+			slist=gh_cdr(slist);
+		    } else {
+			errl("Unsupported tag",value);
+		    }
+		}
+		cframe=&construction->Frames;
+		while( *cframe ) {
+		    cframe=&((*cframe)->Next);
+		}
+		(*cframe)=malloc(sizeof(ConstructionFrame));
+		(*cframe)->Percent=percent;
+		(*cframe)->File=file;
+		(*cframe)->Frame=frame;
+		(*cframe)->Next=NULL;
 	    }
 	} else {
 	    // FIXME: this leaves a half initialized construction
