@@ -2152,9 +2152,9 @@ local void PreferencesInit(Menuitem *mi __attribute__((unused)))
     }
 
     if (ShowCommandKey) {
-	menu->items[3].d.gem.state = MI_GSTATE_CHECKED;
+	menu->items[2].d.gem.state = MI_GSTATE_CHECKED;
     } else {
-	menu->items[3].d.gem.state = MI_GSTATE_UNCHECKED;
+	menu->items[2].d.gem.state = MI_GSTATE_UNCHECKED;
     }
 }
 
