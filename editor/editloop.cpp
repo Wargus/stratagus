@@ -1652,6 +1652,7 @@ local void CreateEditor(void)
     }
 
     if (1) {
+	DestroyCursorBackground();
 	ProcessMenu("menu-editor-tips", 1);
 	InterfaceState = IfaceStateNormal;
     }
