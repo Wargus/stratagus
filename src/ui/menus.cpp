@@ -3571,6 +3571,7 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 local void MultiGameFWSAction(Menuitem *mi, int i)
 {
     if (!mi || mi->d.pulldown.curopt == i) {
+	DebugLevel0Fn("Update fow %d\n" _C_ i);
 	switch (i) {
 	    case 0:
 		TheMap.NoFogOfWar = 0;

@@ -159,62 +159,6 @@ local int MapVisibleMask(void)
 */
 global void MapMarkSight(const Player* player,int tx,int ty,int range)
 {
-#if 0
-    int i;
-    int x;
-    int y;
-    int height;
-    int width;
-    int mask;
-
-    x=tx-range;
-    y=ty-range;
-    width=height=range+range;
-
-    //	Clipping
-    if( y<0 ) {
-	height+=y;
-	y=0;
-    }
-    if( x<0 ) {
-	width+=x;
-	x=0;
-    }
-    if( y+height>=TheMap.Height ) {
-	height=TheMap.Height-y-1;
-    }
-    if( x+width>=TheMap.Width ) {
-	width=TheMap.Width-x-1;
-    }
-
-    mask=1<<player->Player;
-    ++range;
-    while( height-->=0 ) {
-	for( i=x; i<=x+width; ++i ) {
-	    // FIXME: Can use quadrat table!
-	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))==range*range ) {
-		TheMap.Fields[i+y*TheMap.Width].ExploredMask=8;
-		TheMap.Fields[i+y*TheMap.Width].VisibleMask=8;
-
-		TheMap.Fields[i+y*TheMap.Width].Visible|=mask;
-		TheMap.Fields[i+y*TheMap.Width].Explored|=mask;
-		if( player==ThisPlayer ) {
-		    MapMarkSeenTile(i,y);
-		}
-	    } else if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<range*range ) {
-		TheMap.Fields[i+y*TheMap.Width].ExploredMask=0;
-		TheMap.Fields[i+y*TheMap.Width].VisibleMask=0;
-
-		TheMap.Fields[i+y*TheMap.Width].Visible|=mask;
-		TheMap.Fields[i+y*TheMap.Width].Explored|=mask;
-		if( player==ThisPlayer ) {
-		    MapMarkSeenTile(i,y);
-		}
-	    }
-	}
-	++y;
-    }
-#endif
     int i;
     int x;
     int y;
@@ -1733,17 +1677,13 @@ local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 /**
 **	Draw the map fog of war.
 **
+**	@param v	Viewport.
 **	@param x	Map viewpoint x position.
 **	@param y	Map viewpoint y position.
 */
-#ifdef SPLIT_SCREEN_SUPPORT
-global void DrawMapFogOfWar (int v, int x,int y)
+global void DrawMapFogOfWar(int v, int x,int y)
 {
-    Viewport *vp = &TheUI.VP[v];
-#else /* SPLIT_SCREEN_SUPPORT */
-global void DrawMapFogOfWar(int x,int y)
-{
-#endif /* SPLIT_SCREEN_SUPPORT */
+    Viewport* vp;
     int sx;
     int sy;
     int dx;
@@ -1761,6 +1701,7 @@ global void DrawMapFogOfWar(int x,int y)
     static long mv=9999999;
 #endif
 
+    vp = &TheUI.VP[v];
     redraw_row=MustRedrawRow;		// flags must redraw or not
     redraw_tile=MustRedrawTile;
 
@@ -1768,17 +1709,10 @@ global void DrawMapFogOfWar(int x,int y)
     p=ThisPlayer->Player;
 #endif
 
-#ifdef SPLIT_SCREEN_SUPPORT
     ex = vp->EndX;
     sy = y*TheMap.Width;
     dy = vp->Y;
     ey = vp->EndY;
-#else /* SPLIT_SCREEN_SUPPORT */
-    ex=TheUI.MapEndX;
-    sy=y*TheMap.Width;
-    dy=TheUI.MapY;
-    ey=TheUI.MapEndY;
-#endif /* SPLIT_SCREEN_SUPPORT */
 
     while( dy<ey ) {
 	if( *redraw_row ) {		// row must be redrawn
@@ -1788,11 +1722,7 @@ global void DrawMapFogOfWar(int x,int y)
 	    *redraw_row=0;
 #endif
 	    sx=x+sy;
-#ifdef SPLIT_SCREEN_SUPPORT
 	    dx = vp->X;
-#else /* SPLIT_SCREEN_SUPPORT */
-	    dx=TheUI.MapX;
-#endif /* SPLIT_SCREEN_SUPPORT */
 	    while( dx<ex ) {
 		if( *redraw_tile ) {
 #if NEW_MAPDRAW > 1
@@ -1825,13 +1755,8 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 			if (PfHierShowRegIds || PfHierShowGroupIds) {
 			    regid =
 				MapFieldGetRegId (
-#ifdef SPLIT_SCREEN_SUPPORT
 					    (dx-vp->X)/TileSizeX + vp->MapX,
 					    (dy-vp->Y)/TileSizeY + vp->MapY);
-#else /* SPLIT_SCREEN_SUPPORT */
-					    (dx-TheUI.MapX)/TileSizeX + MapX,
-					    (dy-TheUI.MapY)/TileSizeY + MapY);
-#endif /* SPLIT_SCREEN_SUPPORT */
 			    if (regid) {
 				Region *r = RegionSetFind (regid);
 				if (PfHierShowRegIds) {
@@ -1852,11 +1777,7 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 		dx+=TileSizeX;
 	    }
 	} else {
-#ifdef SPLIT_SCREEN_SUPPORT
 	    redraw_tile += vp->MapWidth;
-#else /* SPLIT_SCREEN_SUPPORT */
-	    redraw_tile+=MapWidth;
-#endif /* SPLIT_SCREEN_SUPPORT */
 	}
         ++redraw_row;
 	sy+=TheMap.Width;
@@ -1870,7 +1791,6 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	mv=sx;
     }
 
-    //DebugLevel0("%d\n",countit);
     DebugLevel1("%ld %ld %3ld\n",(long)sx,mv,(sx*100)/mv);
 #endif
 }
