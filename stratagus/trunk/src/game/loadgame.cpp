@@ -124,7 +124,6 @@ global void InitModules(void)
     InitConstructions();
     // InitDecorations();
     InitUnitTypes();
-    UpdateStats();
     InitUnits();
     InitSelections();
     InitGroups();
