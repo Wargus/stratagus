@@ -177,7 +177,6 @@ typedef enum _unit_voice_group_ {
 **	SW		SE
 **		S
 */
-#ifdef NEW_HEADING
 enum _directions_ {
     LookingN	=0*32,			/// Unit looking north
     LookingNE	=1*32,			/// Unit looking north east
@@ -188,19 +187,13 @@ enum _directions_ {
     LookingW	=6*32,			/// Unit looking west
     LookingNW	=7*32,			/// Unit looking north west
 };
-#else
-#define HeadingN		0	/// Unit heading north
-#define HeadingNE		1	/// Unit heading north east
-#define HeadingE		2	/// Unit heading east
-#define HeadingSE		3	/// Unit heading south east
-#define HeadingS		4	/// Unit heading south
-#define HeadingSW		5	/// Unit heading south west
-#define HeadingW		6	/// Unit heading west
-#define HeadingNW		7	/// Unit heading north west
-#endif
+
+#define NextDirection	32		/// Next direction N->NE->E...
 
 /**
 **	The big unit structure.
+**
+**	Everything belonging to an unit. FIXME: rearrange vor less memory.
 */
 struct _unit_ {
 #ifdef NEW_UNIT
@@ -227,11 +220,7 @@ struct _unit_ {
     unsigned	Frame : 8;		/// Image frame: high bit used for flip
     unsigned   	SeenFrame : 8;		/// last seen frame/stage of buildings
 
-#ifdef NEW_HEADING
     unsigned	Direction : 8;		/// angle (0-255) unit looking
-#else
-    unsigned	Heading : 8;		/// direction of unit looking
-#endif
 
     unsigned	Burning : 1;		/// unit is burning
     unsigned	Attacked : 1;		/// unit is attacked
@@ -289,14 +278,13 @@ struct _unit_ {
     Command	Command;		/// current command processed
     Command	SavedCommand;		/// saved command
     Command	NextCommand[MAX_COMMANDS];/// next command to process
-    int		NextCount;		/// how many commands are in the queue
-    int		NextFlush;	/// true: cancel command and proceed to next one
+    char	NextCount;		/// how many commands are in the queue
+    char	NextFlush;	/// true: cancel command and proceed to next one
     Command	PendCommand;		/// pending commands
 };
 
 #define NoUnitP		(Unit*)0	/// return value: for no unit found
 #define InfiniteDistance INT_MAX	/// the distance is unreachable
-
 
 #define FlushCommands	1		/// Flush commands in queue
 
@@ -388,9 +376,13 @@ extern Unit* MakeUnitAndPlace(int x,int y,UnitType* type,Player* player);
 
     /// FIXME: more docu
 extern void UnitLost(const Unit* unit);
+    /// FIXME: more docu
 extern void UpdateForNewUnit(const Unit* unit,int upgrade);
+    /// FIXME: more docu
 extern void NearestOfUnit(const Unit* unit,int tx,int ty,int *dx,int *dy);
+    /// FIXME: more docu
 extern int UnitVisible(const Unit* unit);
+    /// FIXME: more docu
 extern void RemoveUnit(Unit* unit);
     /// Increment mana of all magic units each second.
 extern void UnitIncrementMana(void);
@@ -410,12 +402,18 @@ extern void UnitHeadingFromDeltaXY(Unit* unit,int x,int y);
 
 //extern int HeadingFromXY2XY(int x,int y,int dx,int dy);
 
+    /// FIXME: more docu
 extern void DropOutOnSide(Unit* unit,int heading,int addx,int addy);
+    /// FIXME: more docu
 extern void DropOutNearest(Unit* unit,int x,int y,int addx,int addy);
+    /// FIXME: more docu
 extern void DropOutAll(const Unit* unit);
 
+    /// FIXME: more docu
 extern int CanBuildHere(UnitType* type,unsigned x,unsigned y);
+    /// FIXME: more docu
 extern int CanBuildOn(int x,int y,int mask);
+    /// FIXME: more docu
 extern int CanBuildUnitType(Unit* unit,UnitType* type,int x,int y);
 
     /// Find nearest gold mine
@@ -427,54 +425,81 @@ extern Unit* FindWoodDeposit(const Player* player,int x,int y);
     /// Find nearest oil deposit
 extern Unit* FindOilDeposit(const Player* player,int x,int y);
 
+    /// FIXME: more docu
 extern int FindWoodInSight(Unit* unit,int* x,int* y);
+    /// FIXME: more docu
 extern Unit* FindOilPlatform(const Player* player,int x,int y);
 
+    /// FIXME: more docu
 extern Unit* UnitOnScreen(Unit* unit,unsigned x,unsigned y);
 
+    /// FIXME: more docu
 extern void DestroyUnit(Unit* unit);
+    /// FIXME: more docu
 extern void DestroyAllInside(Unit* source);
+    /// FIXME: more docu
 extern void HitUnit(Unit* unit,int damage);
 
+    /// FIXME: more docu
 extern int MapDistance(int x1,int y1,int x2,int y2);
+    /// FIXME: more docu
 extern int MapDistanceToType(int x1,int y1,const UnitType* type,int x2,int y2);
+    /// FIXME: more docu
 extern int MapDistanceToUnit(int x,int y,const Unit* dest);
 
+    /// FIXME: more docu
 extern int ViewPointDistance(int x,int y);
+    /// FIXME: more docu
 extern int ViewPointDistanceToUnit(Unit* dest);
 
     /// Return true, if unit is an enemy of the player
 extern int IsEnemy(const Player* player,const Unit* dest);
     /// Return true, if unit is allied with the player
 extern int IsAllied(const Player* player,const Unit* dest);
+    /// FIXME: more docu
 extern int CanTarget(const UnitType* type,const UnitType* dest);
 
 extern void SaveUnit(const Unit* unit,FILE* file);	/// save unit-structure
 extern void SaveUnits(FILE* file);			/// save all units
 
 //	in unitcache.c
+    /// FIXME: more docu
 extern void UnitCacheInsert(Unit* unit);
+    /// FIXME: more docu
 extern void UnitCacheRemove(Unit* unit);
+    /// FIXME: more docu
 extern void UnitCacheChange(Unit* unit);
+    /// FIXME: more docu
 extern int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table);
+    /// FIXME: more docu
 extern Unit* UnitCacheOnXY(int x,int y,int type);
+    /// FIXME: more docu
 extern void UnitCacheStatistic(void);
+    /// FIXME: more docu
 extern void InitUnitCache(void);
 
 // 	in map.c 	belongs to map or unit??
+    /// FIXME: more docu
 extern int UnitMovement(const Unit* unit);
+    /// FIXME: more docu
 extern unsigned UnitFieldFlags(const Unit* unit);
+    /// FIXME: more docu
 extern int TypeMovementMask(const UnitType* type);
+    /// FIXME: more docu
 extern int UnitMovementMask(const Unit* unit);
 
 //	in bottom_panel.c
+    /// FIXME: more docu
 extern void UpgradeButtons(int upgrade);
 
 //	in unit_draw.c
+    /// FIXME: more docu
 extern void LoadDecorations(void);
+    /// FIXME: more docu
 extern void DrawUnits(void);
 
 //	in unit_find.c
+    /// FIXME: more docu
 extern int SelectUnits(int x1,int y1,int x2,int y2,Unit** table);
     /// Find all units of this type
 extern int FindUnitsByType(const UnitType* type,Unit** table);
@@ -514,7 +539,7 @@ extern Unit* AttackUnitsInReactRange(const Unit* unit);
     /// Initialize data structures for groups
 extern void InitGroups(void);
 
-    /// 2 functions to conseal the groups internal data structures...
+    // 2 functions to conseal the groups internal data structures...
     /// Get the number of units in a particular group.
 extern int GetNumberUnitsOfGroup(int num);
     /// Get the array of units of a particular group.
@@ -559,4 +584,4 @@ extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
 
 //@}
 
-#endif // !__UNIT_H__
+#endif	// !__UNIT_H__

@@ -243,22 +243,14 @@ global void HandleActionStill(Unit* unit)
     if( type->LandUnit ) {
 	switch( (MyRand()>>8)&0x0FF ) {
 	    case 0:			// Turn clockwise
-#ifdef NEW_HEADING
-		unit->Direction+=32;
-#else
-		unit->Heading=(unit->Heading+1)&7;
-#endif
+		unit->Direction+=NextDirection;
 		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
 		}
 		break;
 	    case 1:			// Turn counter clockwise
-#ifdef NEW_HEADING
-		unit->Direction-=32;
-#else
-		unit->Heading=(unit->Heading-1)&7;
-#endif
+		unit->Direction-=NextDirection;
 		UnitUpdateHeading(unit);
 		if( UnitVisible(unit) ) {
 		    MustRedraw|=RedrawMap;
