@@ -106,7 +106,7 @@ global void DisplayPicture(const char *name)
     { extern SDL_Surface *Screen;		/// internal screen
     SDL_LockSurface(Screen);
 
-    DebugCheck( VideoMemory==Screen->pixels );
+    DebugCheck( VideoMemory!=Screen->pixels );
 #endif
 
     // FIXME: bigger window ?
