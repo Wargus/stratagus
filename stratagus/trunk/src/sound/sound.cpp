@@ -5,12 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound.c	-	The sound. */
+/**@name sound.c - The sound. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer and Fabrice Rossi
+//      (c) Copyright 1998-2004 by Lutz Sammer, Fabrice Rossi,
+//                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -60,7 +61,7 @@
 #include "sound.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 global int SoundOff;						/// True quiet, sound turned off
@@ -200,6 +201,7 @@ local SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 {
 	int stereo;
+	int volume;
 
 	stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
 		unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
@@ -210,7 +212,12 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 		stereo = 127;
 	}
 
-	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
+	volume = ViewPointDistanceToUnit(unit);
+	if (volume > 255) {
+		volume = 255;
+	}
+
+	InsertSoundRequest(unit, unit->Slot, volume,
 		ChooseUnitVoiceSoundId(unit, voice), voice == VoiceAttacking,
 		(voice == VoiceSelected || voice == VoiceBuilding), 0, stereo);
 }
@@ -224,6 +231,7 @@ global void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 global void PlayMissileSound(const Missile* missile, SoundId sound)
 {
 	int stereo;
+	int volume;
 
 	stereo = ((missile->X + missile->Type->Width / 2 -
 		TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
@@ -234,8 +242,12 @@ global void PlayMissileSound(const Missile* missile, SoundId sound)
 		stereo = 127;
 	}
 
-	InsertSoundRequest(NULL, 0, ViewPointDistanceToMissile(missile), sound, 1,
-		0, 0, stereo);
+	volume = ViewPointDistanceToMissile(missile);
+	if (volume > 255) {
+		volume = 255;
+	}
+
+	InsertSoundRequest(NULL, 0, volume, sound, 1, 0, 0, stereo);
 }
 
 /**
