@@ -643,6 +643,8 @@ global void CleanMap(void)
 {
     free(TheMap.Fields);
     free(TheMap.TerrainName);
+    free(TheMap.TileData);
+    free(TheMap.Tiles);
     free(TheMap.Visible[0]);
 
     // Tileset freeed by Tileset?

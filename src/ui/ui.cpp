@@ -689,10 +689,12 @@ global void CleanUI(UI* ui)
 
     // Resource
     free(ui->Resource.File);
+    free(ui->Resource.Graphic);
 
     // Resource Icons
     for (i = 0; i < MaxCosts + 2; ++i) {
 	free(ui->Resources[i].Icon.File);
+	free(ui->Resources[i].Icon.Graphic);
     }
 
     // Info Panel
