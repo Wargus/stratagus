@@ -556,7 +556,11 @@ global void UpdateStats(void)
 	    for( i=0; i<MaxCosts; ++i ) {
 		stats->Costs[i]=type->_Costs[i];
 	    }
-	    stats->Level=1;
+	    if( type->Building ) {
+		stats->Level=0;		// Disables level display
+	    } else {
+		stats->Level=1;
+	    }
 	}
     }
 }

@@ -159,9 +159,11 @@ global void DrawUnitInfo(const Unit* unit)
     x=TheUI.InfoPanelX;
     y=TheUI.InfoPanelY;
 
-    if( unit->HP && unit->HP<10000 ) {
-	sprintf(buf,"%d/%d",unit->HP,stats->HitPoints);
-	DrawTextCentered(x+12+23,y+8+53,SmallFont,buf);
+    if( unit->Player==ThisPlayer ) {	// Only for own units.
+	if( unit->HP && unit->HP<10000 ) {
+	    sprintf(buf,"%d/%d",unit->HP,stats->HitPoints);
+	    DrawTextCentered(x+12+23,y+8+53,SmallFont,buf);
+	}
     }
 
     //
@@ -180,6 +182,14 @@ global void DrawUnitInfo(const Unit* unit)
 	DrawTextCentered(x+114,y+8+17,GameFont,s+1);
     } else {
 	DrawTextCentered(x+114,y+8+17,GameFont,type->Name);
+    }
+
+    //
+    //	Draw unit level.
+    //
+    if( stats->Level ) {
+        sprintf(buf,"Level ~<%d~>",stats->Level);
+	DrawTextCentered(x+114,y+8+33,GameFont,buf);
     }
 
     //
@@ -324,9 +334,6 @@ global void DrawUnitInfo(const Unit* unit)
 	    DrawText(x+126,y+8+109,GameFont,buf);
 	}
     } else if( type->Transporter && unit->Value ) {
-	// FIXME: Level was centered?
-        sprintf(buf,"Level ~<%d~>",stats->Level);
-	DrawText(x+91,y+8+33,GameFont,buf);
 	for( i=0; i<6; ++i ) {
 	    if( unit->OnBoard[i]!=NoUnitP ) {
 		DrawUnitIcon(unit->Player
@@ -337,7 +344,7 @@ global void DrawUnitInfo(const Unit* unit)
 		DrawLifeBar(unit->OnBoard[i]
 			,TheUI.Buttons[i+4].X,TheUI.Buttons[i+4].Y);
 		// FIXME: show also the magic bar :) I want this always.
-		if( ButtonUnderCursor==1+4 ) {
+		if( ButtonUnderCursor==i+4 ) {
 		    SetStatusLine(unit->OnBoard[i]->Type->Name);
 		}
 	    }
@@ -361,8 +368,8 @@ global void DrawUnitInfo(const Unit* unit)
 	}
     } else {
 	// FIXME: Level was centered?
-        sprintf(buf,"Level ~<%d~>",stats->Level);
-	DrawText(x+91,y+8+33,GameFont,buf);
+        //sprintf(buf,"Level ~<%d~>",stats->Level);
+	//DrawText(x+91,y+8+33,GameFont,buf);
 
 	if( !type->Tanker && !type->Submarine ) {
 	    DrawText(x+57,y+8+63,GameFont,"Armor:");
@@ -905,16 +912,20 @@ global void DrawInfoPanel(void)
 	    return;
 	} else {
 	    // FIXME: not correct for enemies units
-	    if( Selected[0]->Type->Building
-		    && (Selected[0]->Orders[0].Action==UnitActionBuilded
+	    if( Selected[0]->Player==ThisPlayer ) {
+		if( Selected[0]->Type->Building
+			&& (Selected[0]->Orders[0].Action==UnitActionBuilded
 			|| Selected[0]->Orders[0].Action==UnitActionResearch
 			|| Selected[0]->Orders[0].Action==UnitActionUpgradeTo
 			|| Selected[0]->Orders[0].Action==UnitActionTrain) ) {
-		i=3;
-	    } else if( Selected[0]->Type->Magic ) {
-		i=2;
+		    i=3;
+		} else if( Selected[0]->Type->Magic ) {
+		    i=2;
+		} else {
+		    i=1;
+		}
 	    } else {
-		i=1;
+		i=0;
 	    }
 	    DrawInfoPanelBackground(i);
 	    DrawUnitInfo(Selected[0]);
