@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -57,7 +57,7 @@
 #include "myendian.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /**
@@ -1371,6 +1371,7 @@ global void LoadUnitTypeSprite(UnitType* unittype)
 		type->ShadowSprite = LoadSprite(file, type->ShadowWidth,
 			type->ShadowHeight);
 		FlipGraphic(type->ShadowSprite);
+		MakeShadowSprite(type->ShadowSprite);
 	}
 
 	if (type->Harvester) {
