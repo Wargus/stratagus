@@ -1079,9 +1079,11 @@ global int main(int argc, char** argv)
 				continue;
 
 			case 'F':
+				VideoForceFullScreen = 1;
 				VideoFullScreen = 1;
 				continue;
 			case 'W':
+				VideoForceFullScreen = 1;
 				VideoFullScreen = 0;
 				continue;
 			case 'D':
