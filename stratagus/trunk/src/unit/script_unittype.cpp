@@ -1870,6 +1870,14 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[POSY_INDEX].Value = unit->Y;
 	unit->Variable[POSY_INDEX].Max = TheMap.Info.MapHeight;
 
+	// RadarRange
+	unit->Variable[RADAR_INDEX].Value = type->RadarRange;
+	unit->Variable[RADAR_INDEX].Max = type->RadarRange;
+
+	// RadarJammerRange
+	unit->Variable[RADARJAMMER_INDEX].Value = type->RadarJammerRange;
+	unit->Variable[RADARJAMMER_INDEX].Max = type->RadarJammerRange;
+
 	// SlotNumber
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;
 	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - UnitSlots - 1;
@@ -1925,7 +1933,7 @@ void InitDefinedVariables()
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "Damage", "ExtraDamage",
-		"PosX", "PosY", "Slot"
+		"PosX", "PosY", "RadarRange", "RadarJammerRange", "Slot"
 		}; // names of the variable.
 	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","
