@@ -10,7 +10,7 @@
 //
 /**@name unit.c - The units. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2914,6 +2914,7 @@ void LetUnitDie(Unit* unit)
 	unit->HP = 0;
 	unit->Moving = 0;
 	unit->TTL = 0;
+	unit->Anim.Unbreakable = 0;
 
 	type = unit->Type;
 
@@ -2989,7 +2990,8 @@ void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	if (type->CorpseType || (type->Animations && type->Animations->Die)) {
+	if (type->CorpseType || (type->Animations && type->Animations->Die) ||
+			(type->NewAnimations && type->NewAnimations->Death)) {
 		unit->Removed = 0;
 		UnitCacheInsert(unit);
 	}
