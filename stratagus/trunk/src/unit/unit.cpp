@@ -1917,6 +1917,7 @@ startn:
 
 found:
     unit->Wait=1;		// should be correct unit has still action
+
     PlaceUnit(unit, x, y);
 }
 
@@ -2040,6 +2041,12 @@ global void DropOutAll(const Unit* source)
 	    ++i;
 	    DropOutOnSide(unit,LookingW
 		,source->Type->TileWidth,source->Type->TileHeight);
+#ifdef NEW_FOW
+	//Worker is back on map, unmark sight
+    MapUnmarkSight(unit->Player,source->X+source->Type->TileWidth/2,
+			source->Y+source->Type->TileHeight/2,
+			source->Stats->SightRange);
+#endif
 	    DebugCheck( unit->Orders[0].Goal );
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->Wait=unit->Reset=1;
