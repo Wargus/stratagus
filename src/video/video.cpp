@@ -600,9 +600,9 @@ global void DisplayPicture(const char* name)
 
 #ifdef USE_SDL_SURFACE
 /**
-**		Color cycle.
+**  Color cycle.
 **
-**		FIXME: Also icons and some units use color cycling.
+**  FIXME: Also icons and some units use color cycling.
 */
 // FIXME: cpu intensive to go through the whole PaletteList
 global void ColorCycle(void)
@@ -644,7 +644,7 @@ global void ColorCycle(void)
 		}
 	} else {
 		//
-		//		Color cycle tileset palette
+		//  Color cycle tileset palette
 		//
 		palcolors = TheMap.TileGraphic->Surface->format->palette->colors;
 
@@ -666,7 +666,6 @@ global void ColorCycle(void)
 			colors, 0, 256);
 	}
 
-	MapColorCycle();				// FIXME: could be little more informative
 	MustRedraw |= RedrawColorCycle;
 }
 #else
