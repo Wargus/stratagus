@@ -139,6 +139,8 @@ int OutputTheora(OggData *data, SDL_Overlay *yuv_overlay, SDL_Rect *rect)
 	}
 	SDL_UnlockYUVOverlay(yuv_overlay);
 
+	SDL_DisplayYUVOverlay(yuv_overlay, rect);
+
 	return 0;
 }
 
