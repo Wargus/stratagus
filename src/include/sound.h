@@ -46,48 +46,48 @@
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define MaxSampleVolume 255  /// Maximum sample volume
-#define NO_SOUND 0           /// No valid sound ID
+#define MaxSampleVolume 255  ///< Maximum sample volume
+#define NO_SOUND 0           ///< No valid sound ID
 
 /**
 **  Global game sounds, not associated to any unit-type
 */
 typedef struct _game_sound_ {
-	SoundConfig PlacementError;    /// used by ui
-	SoundConfig PlacementSuccess;  /// used by ui
-	SoundConfig Click;             /// used by ui
+	SoundConfig PlacementError;    ///< used by ui
+	SoundConfig PlacementSuccess;  ///< used by ui
+	SoundConfig Click;             ///< used by ui
 
-	SoundConfig Docking;               /// ship reaches coast
-	SoundConfig BuildingConstruction;  /// building under construction
+	SoundConfig Docking;               ///< ship reaches coast
+	SoundConfig BuildingConstruction;  ///< building under construction
 
-	//FIXME: (Fabrice) I don't think it's the correct place to put this
-	SoundConfig WorkComplete[MAX_RACES];  /// building ready
+	/// @fixme (Fabrice) I don't think it's the correct place to put this
+	SoundConfig WorkComplete[MAX_RACES];  ///< building ready
 
-	SoundConfig Rescue[MAX_RACES];  /// rescue units
+	SoundConfig Rescue[MAX_RACES];  ///< rescue units
 } GameSound;
 
 typedef enum _play_section_type_ {
-	PlaySectionUnknown = -1,  /// Unknown
-	PlaySectionGame,          /// Game
-	PlaySectionBriefing,      /// Briefing
-	PlaySectionStats,         /// Stats
-	PlaySectionStatsVictory,  /// Stats Victory
-	PlaySectionStatsDefeat,   /// Stats Defeat
-	PlaySectionMainMenu,      /// Main menu
+	PlaySectionUnknown = -1,  ///< Unknown
+	PlaySectionGame,          ///< Game
+	PlaySectionBriefing,      ///< Briefing
+	PlaySectionStats,         ///< Stats
+	PlaySectionStatsVictory,  ///< Stats Victory
+	PlaySectionStatsDefeat,   ///< Stats Defeat
+	PlaySectionMainMenu,      ///< Main menu
 } PlaySectionType;
 
 typedef enum _play_section_order_ {
-	PlaySectionOrderAll,     /// Sequential order
-	PlaySectionOrderRandom,  /// Random order
+	PlaySectionOrderAll,     ///< Sequential order
+	PlaySectionOrderRandom,  ///< Random order
 } PlaySectionOrder;
 
 typedef struct _play_section_ {
-	char*            Race;       /// Race, NULL if for all races
-	PlaySectionType  Type;       /// Type
-	unsigned long    CDTracks;   /// Bit field of cd tracks. 32 enough?
-	PlaySectionOrder CDOrder;    /// CD order
-	char**           Files;      /// Files
-	PlaySectionOrder FileOrder;  /// File order
+	char*            Race;       ///< Race, NULL if for all races
+	PlaySectionType  Type;       ///< Type
+	unsigned long    CDTracks;   ///< Bit field of cd tracks. 32 enough?
+	PlaySectionOrder CDOrder;    ///< CD order
+	char**           Files;      ///< Files
+	PlaySectionOrder FileOrder;  ///< File order
 } PlaySection;
 
 /*----------------------------------------------------------------------------
@@ -99,16 +99,16 @@ typedef struct _play_section_ {
 **  really turning it off on the server side.
 */
 extern int SoundOff;
-extern int MusicOff;  /// Music turned off
+extern int MusicOff;  ///< Music turned off
 
-extern GameSound GameSounds;  /// Game sound configuration
+extern GameSound GameSounds;  ///< Game sound configuration
 
-extern int PlayingMusic;   /// flag true if playing music
-extern int CallbackMusic;  /// flag true callback ccl if stops
+extern int PlayingMusic;   ///< flag true if playing music
+extern int CallbackMusic;  ///< flag true callback ccl if stops
 
-extern PlaySection* PlaySections;  /// Play sections
-extern int NumPlaySections;  /// Number of play sections
-extern PlaySectionType CurrentPlaySection;  /// Current play section type
+extern PlaySection* PlaySections;  ///< Play sections
+extern int NumPlaySections;  ///< Number of play sections
+extern PlaySectionType CurrentPlaySection;  ///< Current play section type
 
 extern char* CurrentMusicFile;
 
@@ -174,23 +174,23 @@ extern void StopMusic(void);
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define SoundOff  1    /// Dummy macro for without sound
-#define PlayingMusic  1    /// Dummy macro for without sound
-#define CurrentMusicFile ""    /// Dummy macro for without sound
+#define SoundOff  1    ///< Dummy macro for without sound
+#define PlayingMusic  1    ///< Dummy macro for without sound
+#define CurrentMusicFile ""    ///< Dummy macro for without sound
 
-#define PlayUnitSound(u,g)    /// Dummy macro for without sound
-#define PlayMissileSound(s,v)    /// Dummy macro for without sound
-#define PlayGameSound(s,v)    /// Dummy macro for without sound
-#define SetGlobalVolume(v)    /// Dummy macro for without sound
-#define SetMusicVolume(v)    /// Dummy macro for without sound
-#define InitSoundClient()    /// Dummy macro for without sound
+#define PlayUnitSound(u,g)    ///< Dummy macro for without sound
+#define PlayMissileSound(s,v)    ///< Dummy macro for without sound
+#define PlayGameSound(s,v)    ///< Dummy macro for without sound
+#define SetGlobalVolume(v)    ///< Dummy macro for without sound
+#define SetMusicVolume(v)    ///< Dummy macro for without sound
+#define InitSoundClient()    ///< Dummy macro for without sound
 
-#define PlaySoundFile(v)      /// Dummy macro for without sound
-#define PlayMusic(v) 0      /// Dummy macro for without sound
-#define StopMusic()      /// Dummy macro for without sound
-#define CallbackMusicOn()    /// Dummy macro for without sound
-#define CallbackMusicOff()    /// Dummy macro for without sound
-#define PlaySectionMusic(v)    /// Dummy macro for without sound
+#define PlaySoundFile(v)      ///< Dummy macro for without sound
+#define PlayMusic(v) 0      ///< Dummy macro for without sound
+#define StopMusic()      ///< Dummy macro for without sound
+#define CallbackMusicOn()    ///< Dummy macro for without sound
+#define CallbackMusicOff()    ///< Dummy macro for without sound
+#define PlaySectionMusic(v)    ///< Dummy macro for without sound
 
 #endif  // } WITH_SOUND
 

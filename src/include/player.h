@@ -294,65 +294,65 @@
 ----------------------------------------------------------------------------*/
 
 #ifndef __STRUCT_PLAYER__
-#define __STRUCT_PLAYER__    /// protect duplicate player typedef
-typedef struct _player_ Player;    /// player typedef
+#define __STRUCT_PLAYER__    ///< protect duplicate player typedef
+typedef struct _player_ Player;    ///< player typedef
 #endif
 
 	///  Player structure
 struct _player_ {
-	int   Player;    /// player as number
-	char* Name;      /// name of non computer
+	int   Player;    ///< player as number
+	char* Name;      ///< name of non computer
 
-	int   Type;      /// type of player (human,computer,...)
-	char* RaceName;  /// name of race
-	int   Race;      /// race of player (orc,human,...)
-	int   AiNum;     /// AI for computer
+	int   Type;      ///< type of player (human,computer,...)
+	char* RaceName;  ///< name of race
+	int   Race;      ///< race of player (orc,human,...)
+	int   AiNum;     ///< AI for computer
 
 	// friend enemy detection
-	int      Team;          /// team of player
-	unsigned Enemy;         /// enemy bit field for this player
-	unsigned Allied;        /// allied bit field for this player
-	unsigned SharedVision;  /// shared vision bit field
+	int      Team;          ///< team of player
+	unsigned Enemy;         ///< enemy bit field for this player
+	unsigned Allied;        ///< allied bit field for this player
+	unsigned SharedVision;  ///< shared vision bit field
 
-	int StartX;  /// map tile start X position
-	int StartY;  /// map tile start Y position
+	int StartX;  ///< map tile start X position
+	int StartY;  ///< map tile start Y position
 
-	int Resources[MaxCosts];      /// resources in store
-	int LastResources[MaxCosts];  /// last values for revenue
-	int Incomes[MaxCosts];        /// income of the resources
-	int Revenue[MaxCosts];        /// income rate of the resources
+	int Resources[MaxCosts];      ///< resources in store
+	int LastResources[MaxCosts];  ///< last values for revenue
+	int Incomes[MaxCosts];        ///< income of the resources
+	int Revenue[MaxCosts];        ///< income rate of the resources
 
 	// FIXME: shouldn't use the constant
-	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
+	int UnitTypesCount[UnitTypeMax];  ///< total units of unit-type
 
-	int   AiEnabled;  /// handle AI on local computer
-	void* Ai;         /// Ai structure pointer
+	int   AiEnabled;  ///< handle AI on local computer
+	void* Ai;         ///< Ai structure pointer
 
-	Unit** Units;          /// units of this player
-	int    TotalNumUnits;  /// total # units for units' list
-	int    NumBuildings;   /// # buildings
-	int    Supply;         /// supply available/produced
-	int    Demand;         /// demand of player
+	Unit** Units;          ///< units of this player
+	int    TotalNumUnits;  ///< total # units for units' list
+	int    NumBuildings;   ///< # buildings
+	int    Supply;         ///< supply available/produced
+	int    Demand;         ///< demand of player
 
-	int    UnitLimit;       /// # food units allowed
-	int    BuildingLimit;   /// # buildings allowed
-	int    TotalUnitLimit;  /// # total unit number allowed
+	int    UnitLimit;       ///< # food units allowed
+	int    BuildingLimit;   ///< # buildings allowed
+	int    TotalUnitLimit;  ///< # total unit number allowed
 
-	int    Score;           /// Points for killing ...
+	int    Score;           ///< Points for killing ...
 	int    TotalUnits;
 	int    TotalBuildings;
 	int    TotalResources[MaxCosts];
 	int    TotalRazings;
-	int    TotalKills;      /// How many unit killed
+	int    TotalKills;      ///< How many unit killed
 
 // Display video
-	Uint32 Color;  /// color of units on minimap
+	Uint32 Color;  ///< color of units on minimap
 
-	UnitColors UnitColors;  /// Unit colors for new units
+	UnitColors UnitColors;  ///< Unit colors for new units
 
 	// Upgrades/Allows:
-	Allow          Allow;          /// Allowed for player
-	UpgradeTimers  UpgradeTimers;  /// Timer for the upgrades
+	Allow          Allow;          ///< Allowed for player
+	UpgradeTimers  UpgradeTimers;  ///< Timer for the upgrades
 };
 
 /**
@@ -362,17 +362,17 @@ struct _player_ {
 */
 #define MAX_RACES 8
 typedef struct _player_race_ {
-	int   Race[MAX_RACES];     /// race number
-	char  Visible[MAX_RACES];  /// race should be visible in pulldown
-	char* Name[MAX_RACES];     /// race names
-	char* Display[MAX_RACES];  /// text to display in pulldown
-	int   Count;               /// number of races
+	int   Race[MAX_RACES];     ///< race number
+	char  Visible[MAX_RACES];  ///< race should be visible in pulldown
+	char* Name[MAX_RACES];     ///< race names
+	char* Display[MAX_RACES];  ///< text to display in pulldown
+	int   Count;               ///< number of races
 } PlayerRace;
 
 
 enum PlayerRacesOld {
-	PlayerRaceHuman = 0,  /// belongs to human
-	PlayerRaceOrc  = 1,   /// belongs to orc
+	PlayerRaceHuman = 0,  ///< belongs to human
+	PlayerRaceOrc  = 1,   ///< belongs to orc
 };
 #define PlayerRaceNeutral (PlayerRaces.Count-1)
 
@@ -415,12 +415,12 @@ enum PlayerRacesOld {
 **    of this player are rescued.
 */
 enum PlayerTypes {
-	PlayerNeutral = 2,        /// neutral
-	PlayerNobody  = 3,        /// unused slot
-	PlayerComputer = 4,       /// computer player
-	PlayerPerson = 5,         /// human player
-	PlayerRescuePassive = 6,  /// rescued passive
-	PlayerRescueActive = 7,   /// rescued  active
+	PlayerNeutral = 2,        ///< neutral
+	PlayerNobody  = 3,        ///< unused slot
+	PlayerComputer = 4,       ///< computer player
+	PlayerPerson = 5,         ///< human player
+	PlayerRescuePassive = 6,  ///< rescued passive
+	PlayerRescueActive = 7,   ///< rescued  active
 };
 
 /**
@@ -429,39 +429,39 @@ enum PlayerTypes {
 **  Mapped with #AiTypeWcNames to internal symbols.
 */
 enum PlayerAis {
-	PlayerAiLand = 0x00,       /// attack at land
-	PlayerAiPassive = 0x01,    /// passive does nothing
-	PlayerAiSea = 0x19,        /// attack at sea
-	PlayerAiAir = 0x1A,        /// attack at air
-	PlayerAiUniversal = 0xFF,  /// attack best possible
+	PlayerAiLand = 0x00,       ///< attack at land
+	PlayerAiPassive = 0x01,    ///< passive does nothing
+	PlayerAiSea = 0x19,        ///< attack at sea
+	PlayerAiAir = 0x1A,        ///< attack at air
+	PlayerAiUniversal = 0xFF,  ///< attack best possible
 };
 
-#define PlayerNumNeutral 15  /// this is the neutral player slot
+#define PlayerNumNeutral 15  ///< this is the neutral player slot
 #if 0
-#define PlayerMax 16  /// maximal players supported
+#define PlayerMax 16  ///< maximal players supported
 #endif
 
 /**
 **  Notify types. Noties are send to the player.
 */
 enum _notify_type_ {
-	NotifyRed,     /// Red alram
-	NotifyYellow,  /// Yellow alarm
-	NotifyGreen,   /// Green alarm
+	NotifyRed,     ///< Red alram
+	NotifyYellow,  ///< Yellow alarm
+	NotifyGreen,   ///< Green alarm
 };
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int NumPlayers;             /// How many player slots used
-extern Player Players[PlayerMax];  /// All players
-extern Player* ThisPlayer;         /// Player on local computer
-extern int NoRescueCheck;          /// Disable rescue check
+extern int NumPlayers;             ///< How many player slots used
+extern Player Players[PlayerMax];  ///< All players
+extern Player* ThisPlayer;         ///< Player on local computer
+extern int NoRescueCheck;          ///< Disable rescue check
 extern Uint32 PlayerColors[PlayerMax][4];
-extern char* PlayerColorNames[PlayerMax];  /// Player color names
+extern char* PlayerColorNames[PlayerMax];  ///< Player color names
 
-extern PlayerRace PlayerRaces;  /// Player races
+extern PlayerRace PlayerRaces;  ///< Player races
 
 /*----------------------------------------------------------------------------
 --  Functions

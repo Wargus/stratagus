@@ -71,8 +71,8 @@ extern int LuaCall(int narg, int clear);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char* CclStartFile;   /// CCL start file
-extern int CclInConfigFile;  /// True while config file parsing
+extern char* CclStartFile;   ///< CCL start file
+extern int CclInConfigFile;  ///< True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -82,14 +82,14 @@ extern const char* LuaToString(lua_State* l, int narg);
 extern lua_Number LuaToNumber(lua_State* l, int narg);
 extern int LuaToBoolean(lua_State* l, int narg);
 
-extern void CclGarbageCollect(int fast);  /// Perform garbage collection
-extern void InitCcl(void);                /// Initialise ccl
-extern void LoadCcl(void);                /// Load ccl config file
-extern void SaveCcl(CLFile* file);        /// Save CCL module
-extern void SavePreferences(void);        /// Save user preferences
-extern int CclCommand(const char*);      /// Execute a ccl command
-extern void CclFree(void*);               /// Save free
-extern void CleanCclCredits();            /// Free Ccl Credits Memory
+extern void CclGarbageCollect(int fast);  ///< Perform garbage collection
+extern void InitCcl(void);                ///< Initialise ccl
+extern void LoadCcl(void);                ///< Load ccl config file
+extern void SaveCcl(CLFile* file);        ///< Save CCL module
+extern void SavePreferences(void);        ///< Save user preferences
+extern int CclCommand(const char*);       ///< Execute a ccl command
+extern void CclFree(void*);               ///< Save free
+extern void CleanCclCredits();            ///< Free Ccl Credits Memory
 
 //@}
 

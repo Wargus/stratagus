@@ -41,6 +41,7 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
+/// @fixme do it configurable.
 #define MASTER_HOST "mohydine.no-ip.com"
 #define MASTER_PORT 7775
 

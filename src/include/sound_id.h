@@ -34,23 +34,23 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Sound referencing.
+**  Sound referencing.
 **
-**		Client side representation of the sound id.
-**		Passed to the sound server API.
+**  Client side representation of the sound id.
+**  Passed to the sound server API.
 */
-typedef void* SoundId;						/// sound identifier
+typedef void* SoundId;  ///< sound identifier
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Make a sound bound to identifier
@@ -64,12 +64,12 @@ extern SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second);
 	/// Helper function, displays the mapping between sound names and sound ids
 extern void DisplaySoundHashTable(void);
 
-#ifndef WITH_SOUND		// {
+#ifndef WITH_SOUND  // {
 
-#define SoundIdForName(n)		NULL		/// Dummy macro for without sound
+#define SoundIdForName(n)  NULL ///< Dummy macro for without sound
 
-#endif		// } WITH_SOUND
+#endif  // } WITH_SOUND
 
 //@}
 
-#endif		// !__SOUND_ID_H__
+#endif  // !__SOUND_ID_H__

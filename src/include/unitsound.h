@@ -35,55 +35,54 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include "sound_id.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Sound definition
+** Sound definition
 */
 typedef struct _sound_config_ {
-	char*		Name;						/// config sound name
-	SoundId		Sound;						/// identifier send to sound server
+	char*   Name;   ///< config sound name
+	SoundId Sound;  ///< identifier send to sound server
 } SoundConfig;
 
 /**
 **		The sounds of the units.
 **
-**		Played for the various events.
+** Played for the various events.
 */
 typedef struct _unit_sound_ {
-	SoundConfig		Selected;				/// selected by user
-	SoundConfig		Acknowledgement;		/// acknowledge of use command
-	SoundConfig		Ready;						/// unit training... ready
-	SoundConfig		Repair;						/// unit repairing
-	SoundConfig		Harvest[MaxCosts];		/// unit harvesting
-	SoundConfig		Help;						/// unit is attacked
-	SoundConfig		Dead;						/// unit is killed
+	SoundConfig Selected;           ///< selected by user
+	SoundConfig Acknowledgement;    ///< acknowledge of use command
+	SoundConfig Ready;              ///< unit training... ready
+	SoundConfig Repair;             ///< unit repairing
+	SoundConfig Harvest[MaxCosts];  ///< unit harvesting
+	SoundConfig Help;               ///< unit is attacked
+	SoundConfig Dead;               ///< unit is killed
 } UnitSound;
 
-//FIXME: temporary solution should perhaps be a member of a more general
-// weapon structure.
+/// @fixme temporary solution should perhaps be a member of a more general weapon structure.
 
 /**
-**		Attack sounds
+** Attack sounds
 */
 typedef struct _weapon_sound_ {
-	SoundConfig		Attack;						/// weapon is fired
+	SoundConfig Attack; ///< weapon is fired
 } WeaponSound;
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -98,12 +97,12 @@ extern void LoadUnitSounds(void);
 */
 extern void MapUnitSounds(void);
 
-#ifndef WITH_SOUND		// {
+#ifndef WITH_SOUND // {
 
-#define LoadUnitSounds()				/// Dummy function for without sound
-#define MapUnitSounds()						/// Dummy function for without sound
+#define LoadUnitSounds()    ///< Dummy function for without sound
+#define MapUnitSounds()     ///< Dummy function for without sound
 
-#endif		// } !WITH_SOUND
+#endif // } !WITH_SOUND
 
 //@}
 

@@ -49,16 +49,16 @@
 **  Play movie flags.
 */
 enum _play_movie_flags_ {
-	PlayMovieFullScreen = 1,  /// Switch to full screen
-	PlayMovieZoomScreen = 2,  /// Zoom to screen size
-	PlayMovieKeepAspect = 4,  /// Keep the aspect while zooming
+	PlayMovieFullScreen = 1,  ///< Switch to full screen
+	PlayMovieZoomScreen = 2,  ///< Zoom to screen size
+	PlayMovieKeepAspect = 4,  ///< Keep the aspect while zooming
 };
 
 /**
 **  Movie handle.
 */
 typedef struct _movie_ {
-	void* File;  /// Demux handler
+	void* File;  ///< Demux handler
 } Movie;
 
 /*----------------------------------------------------------------------------

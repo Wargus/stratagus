@@ -34,49 +34,49 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+-- Includes
 ----------------------------------------------------------------------------*/
 
 #include "script.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+-- Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Timer structure
+** Timer structure
 */
 typedef struct _timer_ {
-	char Init;								/// timer is initialized
-	char Running;						/// timer is running
-	char Increasing;						/// increasing or decreasing
-	long Cycles;						/// current value in game cycles
-	unsigned long LastUpdate;				/// GameCycle of last update
+	char Init;                  ///< timer is initialized
+	char Running;               ///< timer is running
+	char Increasing;            ///< increasing or decreasing
+	long Cycles;                ///< current value in game cycles
+	unsigned long LastUpdate;   ///< GameCycle of last update
 } Timer;
 
-#define ANY_UNIT		((const UnitType*)0)
-#define ALL_UNITS		((const UnitType*)-1)
-#define ALL_FOODUNITS		((const UnitType*)-2)
-#define ALL_BUILDINGS		((const UnitType*)-3)
+#define ANY_UNIT ((const UnitType*)0)
+#define ALL_UNITS ((const UnitType*)-1)
+#define ALL_FOODUNITS ((const UnitType*)-2)
+#define ALL_BUILDINGS ((const UnitType*)-3)
 
 /*----------------------------------------------------------------------------
---		Variables
+-- Variables
 ----------------------------------------------------------------------------*/
 
-extern Timer GameTimer;						/// the game timer
+extern Timer GameTimer; ///< the game timer
 
 /*----------------------------------------------------------------------------
---		Functions
+-- Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(lua_State* l);/// get player number.
-extern const UnitType* TriggerGetUnitType(lua_State* l);		/// get the unit-type
-extern void TriggersEachCycle(void);		/// test triggers
+extern int TriggerGetPlayer(lua_State* l);///< get player number.
+extern const UnitType* TriggerGetUnitType(lua_State* l); ///< get the unit-type
+extern void TriggersEachCycle(void);    ///< test triggers
 
-extern void TriggerCclRegister(void);		/// Register ccl features
-extern void SaveTriggers(CLFile* file);		/// Save the trigger module
-extern void InitTriggers(void);				/// Setup triggers
-extern void CleanTriggers(void);		/// Cleanup the trigger module
+extern void TriggerCclRegister(void);   ///< Register ccl features
+extern void SaveTriggers(CLFile* file); ///< Save the trigger module
+extern void InitTriggers(void);         ///< Setup triggers
+extern void CleanTriggers(void);        ///< Cleanup the trigger module
 
 //@}
 

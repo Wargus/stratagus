@@ -33,10 +33,10 @@
 
 //@{
 
-#ifdef WITH_SOUND		// {
+#ifdef WITH_SOUND  // {
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #if defined(USE_THREAD) && !defined(USE_SDLA)
@@ -48,164 +48,163 @@ extern sem_t SoundThreadChannelSemaphore;
 #include "sound_id.h"
 
 /*----------------------------------------------------------------------------
---		Definitons
+--  Definitons
 ----------------------------------------------------------------------------*/
 
 	/**
-	**		Maximal volume value
+	**  Maximal volume value
 	*/
 #define MaxVolume 255
 
 /**
-**		General sample object typedef. (forward)
+**  General sample object typedef. (forward)
 */
 typedef struct _sample_ Sample;
 
 /**
-**		General sound object type.
+**  General sound object type.
 **
-**		@todo		FIXME: This is the planned new sample handling,
-**				which supports streaming, decompressing on demand, caching.
+**  @fixme This is the planned new sample handling,
+**         which supports streaming, decompressing on demand, caching.
 */
 typedef struct _sample_type_ {
 		/**
-		**		Read next samples from object.
+		**  Read next samples from object.
 		**
-		**		@param o		pointer to object.
-		**		@param buf		buffer to fill.
-		**		@param len		length of buffer.
+		**  @param o     pointer to object.
+		**  @param buf   buffer to fill.
+		**  @param len   length of buffer.
 		**
-		**		@return				Number of bytes filled.
+		**  @return      Number of bytes filled.
 		*/
-	int (*Read)				(Sample* o, void* buf, int len);
+	int (*Read) (Sample* o, void* buf, int len);
 		/**
-		**		Free the sample object.
+		** Free the sample object.
 		**
-		**		@param o		pointer to object.
+		**  @param o     pointer to object.
 		*/
-	void (*Free)		(Sample* o);
+	void (*Free) (Sample* o);
 } SampleType;
 
 /**
-**		RAW samples.
+**  RAW samples.
 */
 struct _sample_ {
-	const SampleType*		Type;				/// Object type dependend
-	void*				User;				/// Object user data
+	const SampleType* Type;  ///< Object type dependend
+	void*             User;  ///< Object user data
 
-	unsigned char		Channels;		/// mono or stereo
-	unsigned char		SampleSize;		/// sample size in bits
-	unsigned int		Frequency;		/// frequency in hz
-	unsigned short		BitsPerSample;		/// bits in a sample 8/16/32
-	int						Length;				/// sample length
-	char				Data[1];		/// sample bytes
+	unsigned char Channels;       ///< mono or stereo
+	unsigned char SampleSize;     ///< sample size in bits
+	unsigned int Frequency;       ///< frequency in hz
+	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
+	int Length;                   ///< sample length
+	char Data[1];                 ///< sample bytes
 };
 
 	/// Free a sample object.
-#define SoundFree(o)			((o)->Type->Free)((o))
+#define SoundFree(o) ((o)->Type->Free)((o))
 	/// Save (NULL) free a sample object.
 #define SoundSaveFree(o) \
 	do { if( (o) ) ((o)->Type->Free)((o)); } while( 0 )
 
 /**
-**		Sound double group: a sound that groups two sounds, used to implement
-**		the annoyed/selected sound system of WC
+**  Sound double group: a sound that groups two sounds, used to implement
+**  the annoyed/selected sound system of WC
 */
 typedef struct _two_groups_ {
-	struct _sound_ *First;				/// first group: selected sound
-	struct _sound_ *Second;				/// second group: annoyed sound
+	struct _sound_ *First;  ///< first group: selected sound
+	struct _sound_ *Second; ///< second group: annoyed sound
 } TwoGroups;
 
 /**
- ** A possible value for Number in the Sound struct: means a simple sound
- */
+** A possible value for Number in the Sound struct: means a simple sound
+*/
 #define ONE_SOUND		0
 /**
- ** A possible value for Number in the Sound struct: means a double group (for
- ** selection/annoyed sounds)
- */
+** A possible value for Number in the Sound struct: means a double group (for
+** selection/annoyed sounds)
+*/
 #define TWO_GROUPS		1
 
 /**
- ** the range value that makes a sound volume distance independent
- */
+** the range value that makes a sound volume distance independent
+*/
 #define INFINITE_SOUND_RANGE 255
 /**
- ** the maximum range value
- */
+** the maximum range value
+*/
 #define MAX_SOUND_RANGE 254
 
 /**
-**		Sound definition.
+**  Sound definition.
 */
 typedef struct _sound_ {
 		/**
-		**		Range is a multiplier for ::DistanceSilent.
-		**		255 means infinite range of the sound.
+		**  Range is a multiplier for ::DistanceSilent.
+		**  255 means infinite range of the sound.
 		*/
-	unsigned char Range;		/// Range is a multiplier for DistanceSilent
-	unsigned char Number;		/// single, group, or table of sounds.
+	unsigned char Range;       ///< Range is a multiplier for DistanceSilent
+	unsigned char Number;      ///< single, group, or table of sounds.
 	union {
-		Sample*	 OneSound;		/// if it's only a simple sound
-		Sample**	OneGroup;		/// when it's a simple group
-		TwoGroups*  TwoGroups;		/// when it's a double group
+		Sample* OneSound;       ///< if it's only a simple sound
+		Sample** OneGroup;      ///< when it's a simple group
+		TwoGroups*  TwoGroups;  ///< when it's a double group
 	} Sound;
 } Sound;
 
 /**
-**		Sound unique identifier
+**  Sound unique identifier
 */
 typedef Sound* ServerSoundId;
 
 /**
-**		Origin of a sound
+**  Origin of a sound
 */
 typedef struct _origin_ {
-	const void* Base;		/// pointer on a Unit
-	unsigned Id;		/// unique identifier (if the pointer has been shared)
+	const void* Base;   ///< pointer on a Unit
+	unsigned Id;        ///< unique identifier (if the pointer has been shared)
 } Origin;
 
 /**
-**		sound request FIFO
+**  sound request FIFO
 */
 typedef struct _sound_request {
-	Origin Source;						/// origin of sound
-	unsigned short Power;				/// Volume or Distance
-	SoundId Sound;						/// which sound
-	unsigned Used : 1;						/// flag for used/unused
-	unsigned Fight : 1;						/// is it a fight sound?
-	unsigned Selection : 1;				/// is it a selection sound?
-	unsigned IsVolume : 1;				/// how to interpret power (as a
-										///volume or as a distance?)
-	char Stereo;						/// stereo location of sound (
-										///-128 left, 0 center, 127 right)
+	Origin Source;          ///< origin of sound
+	unsigned short Power;   ///< Volume or Distance
+	SoundId Sound;          ///< which sound
+	unsigned Used : 1;      ///< flag for used/unused
+	unsigned Fight : 1;     ///< is it a fight sound?
+	unsigned Selection : 1; ///< is it a selection sound?
+	unsigned IsVolume : 1;  ///< how to interpret power (as a
+							///<volume or as a distance?)
+	char Stereo;            ///< stereo location of sound (
+							///<-128 left, 0 center, 127 right)
 } SoundRequest;
 
-#define MAX_SOUND_REQUESTS 32				/// maximal number of sound requests
+#define MAX_SOUND_REQUESTS 32 ///< maximal number of sound requests
 
-#define MaxChannels	 16			  /// How many channels are supported
+#define MaxChannels 16  ///< How many channels are supported
 
 	/// Channels for sound effects and unit speach
 typedef struct _sound_channel_
 {
-	unsigned char	   Command;		/// channel command
-	int				 Point;		  /// point into sample
-	Sample*			 Sample;		 /// sample to play
-	Origin			  Source;		 /// unit playing
-	unsigned char	   Volume;		 /// Volume of this channel
-	SoundId			 Sound;		  /// The sound currently played
-		/// stereo location of sound (-128 left, 0 center, 127 right)
-	signed char		 Stereo;
+	unsigned char Command; ///< channel command
+	int Point;             ///< point into sample
+	Sample* Sample;        ///< sample to play
+	Origin Source;         ///< unit playing
+	unsigned char Volume;  ///< Volume of this channel
+	SoundId Sound;         ///< The sound currently played
+	signed char Stereo;    ///< stereo location of sound (-128 left, 0 center, 127 right)
 } SoundChannel;
 
 /**
 **	  Play audio flags.
 */
 enum _play_audio_flags_ {
-	PlayAudioStream = 1,					/// Stream the file from medium
-	PlayAudioPreLoad = 2,				/// Load compressed in memory
-	PlayAudioLoadInMemory = 4,				/// Preload file into memory
-	PlayAudioLoadOnDemand = 8,				/// Load only if needed.
+	PlayAudioStream = 1,        ///< Stream the file from medium
+	PlayAudioPreLoad = 2,       ///< Load compressed in memory
+	PlayAudioLoadInMemory = 4,  ///< Preload file into memory
+	PlayAudioLoadOnDemand = 8,  ///< Load only if needed.
 };
 
 /*----------------------------------------------------------------------------
@@ -230,8 +229,8 @@ extern int NextSoundRequestIn;
 	/// FIFO index out
 extern int NextSoundRequestOut;
 
-#define ChannelFree	 0			   /// channel is free
-#define ChannelPlay	 3			   /// channel is playing
+#define ChannelFree 0   ///< channel is free
+#define ChannelPlay 3   ///< channel is playing
 
 	/// All possible sound channels
 extern SoundChannel Channels[MaxChannels];
@@ -243,7 +242,7 @@ extern int NextFreeChannel;
 extern int WithSoundThread;
 #endif
 
-	/// FIXME: docu
+	/// @fixme docu
 extern int SoundThreadRunning;
 
 #ifdef DEBUG
@@ -251,29 +250,30 @@ extern int SoundThreadRunning;
 extern unsigned AllocatedSoundMemory;
 #endif
 
-extern Sample* MusicSample;				/// Music samples
+extern Sample* MusicSample;  ///< Music samples
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-extern Sample* LoadFlac(const char* name,int flags);		/// Load a flac file
-extern Sample* LoadWav(const char* name,int flags);		/// Load a wav file
-extern Sample* LoadOgg(const char* name,int flags);		/// Load an ogg file
-extern Sample* LoadMp3(const char* name,int flags);		/// Load a mp3 file
+extern Sample* LoadFlac(const char* name,int flags); ///< Load a flac file
+extern Sample* LoadWav(const char* name,int flags);  ///< Load a wav file
+extern Sample* LoadOgg(const char* name,int flags);  ///< Load an ogg file
+extern Sample* LoadMp3(const char* name,int flags);  ///< Load a mp3 file
 
 extern int ConvertToStereo32(const char* in, char* out, int frequency,
 	int bitrate, int channels, int bytes);
 
-	///		Register a sound (can be a simple sound or a group)
+	/// Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(const char* file[],unsigned number);
 
 	/**
-	**		Ask the sound server to put together two sounds to form a special sound.
-	**		@param first		first part of the group
-	**		@param second		second part of the group
-	**		@return				the special sound unique identifier
 	**  @brief Create a special sound group with two sounds
+	**
+	**  Ask the sound server to put together two sounds to form a special sound.
+	**  @param first    first part of the group
+	**  @param second   second part of the group
+	**  @return         the special sound unique identifier
 	*/
 extern SoundId RegisterTwoGroups(const SoundId first,const SoundId second);
 
@@ -304,30 +304,30 @@ extern int InitSoundServer(void);
 extern void PlayListAdvance(void);
 
 /** Ask the sound layer to write the content of its buffer to the sound
-	device. To be used only in the unthreaded version.
- */
+**  device. To be used only in the unthreaded version.
+*/
 extern void WriteSound(void);
 
-	///		Cleanup sound.
+	///  Cleanup sound.
 extern void QuitSound(void);
 
-#else		// }{ WITH_SOUND
+#else  // }{ WITH_SOUND
 
 /*----------------------------------------------------------------------------
---		Definitons
+--  Definitons
 ----------------------------------------------------------------------------*/
 
-#define SoundFildes		-1				/// Dummy macro for without sound
-#define SoundThreadRunning		0		/// Dummy macro for without sound
+#define SoundFildes -1          ///< Dummy macro for without sound
+#define SoundThreadRunning 0    ///< Dummy macro for without sound
 
-#define InitSound()		0				/// Dummy macro for without sound
-#define WriteSound		NULL				/// Dummy macro for without sound
-#define QuitSound()						/// Dummy macro for without sound
-#define PlayListAdvance()				/// Dummy macro for without sound
-#endif		// } WITH_SOUND
+#define InitSound() 0        ///< Dummy macro for without sound
+#define WriteSound NULL      ///< Dummy macro for without sound
+#define QuitSound()          ///< Dummy macro for without sound
+#define PlayListAdvance()    ///< Dummy macro for without sound
+#endif // } WITH_SOUND
 
-extern int WaitForSoundDevice;				/// Block until sound device available
+extern int WaitForSoundDevice;  ///< Block until sound device available
 
 //@}
 
-#endif		// !__SOUND_SERVER_H__
+#endif  // !__SOUND_SERVER_H__
