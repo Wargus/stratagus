@@ -263,8 +263,13 @@ extern char NameLine[];
 #ifndef STRATAGUS_LIB_PATH
 #define STRATAGUS_LIB_PATH  "data"      /// Where to find the data files
 #endif
+
 #ifndef STRATAGUS_HOME_PATH
+#ifdef __APPLE__
+#define STRATAGUS_HOME_PATH "Library/Stratagus"
+#else
 #define STRATAGUS_HOME_PATH  ".stratagus"/// Data files in user home dir
+#endif
 #endif
 
 #define MAGIC_FOR_NEW_UNITS  33         /// How many percent of max mana for new units
