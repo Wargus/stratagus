@@ -10,12 +10,11 @@
 //
 /**@name player.h	-	The player headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +45,163 @@
 **
 **	Player::Player
 **
-**	FIXME: not written documentation
+**		This is the unique slot number. It is not possible that two
+**		players have the same slot number at the same time. The slot
+**		numbers are reused in the future. Currently #PlayerMax (16)
+**		players are supported. This member is used to access bit fields.
+**		Slot #PlayerNumNeutral (15) is reserved for the neutral units
+**		like gold-mines or critters.
+**
+**		@note Should call this member Slot?
+**
+**	Player::Name
+**
+**		Name of the player used for displays and network game.
+**
+**	Player::Type
+**
+**		Type of the player (See #PlayerTypes). This field is setup
+**		from the level (PUD). We support currently #PlayerNeutral,
+**		#PlayerNobody, #PlayerComputer, #PlayerHuman,
+**		#PlayerRescuePassive and #PlayerRescueActive.
+**
+**	Player::RaceName
+**
+**		Name of the race to which the player belongs, used to select
+**		the user interface and the AI.
+**		We have 'orc', 'human', 'alliance' or 'mythical'. Should
+**		only be used during configuration and not during runtime.
+**
+**	Player::Race
+**
+**		Race number of the player (See #PlayerRaces). This field is
+**		setup from the level (PUD).
+**
+**	Player::AiNum
+**
+**		AI number for computer (See #PlayerAis). This field is setup
+**		from the level (PUD). Choosed to select the AI for the
+**		computer.
+**
+**	Player::Team
+**
+**		FIXME: not written documentation
+**		team of player
+**
+**	Player::Enemy
+**
+**		FIXME: not written documentation
+**		enemy bit field for this player
+**
+**	Player::Allied
+**
+**		FIXME: not written documentation
+**		allied bit field for this player
+**
+**	Player::X
+**
+**		FIXME: not written documentation
+**		map tile start X position
+**
+**	Player::Y
+**
+**		FIXME: not written documentation
+**		map tile start Y position
+**
+**	Player::Resources[MaxCosts]
+**
+**		FIXME: not written documentation
+**		resources in store
+**
+**	Player::Incomes[MaxCosts]
+**
+**		FIXME: not written documentation
+**		income of the resources
+**
+**	Player::UnitTypesCount[UnitTypeMax]
+**
+**		FIXME: not written documentation
+**		each type unit count
+**
+**	Player::AiEnabled
+**
+**		FIXME: not written documentation
+**		handle AI on this computer
+**
+**	Player::Ai
+**
+**		FIXME: not written documentation
+**		AI structure pointer
+**
+**	Player::Units
+**
+**		FIXME: not written documentation
+**		units of this player
+**
+**	Player::TotalNumUnits
+**
+**		FIXME: not written documentation
+**		total # units for units' list
+**
+**	Player::NumFoodUnits
+**
+**		FIXME: not written documentation
+**		# units (need food)
+**
+**	Player::NumBuildings
+**
+**		FIXME: not written documentation
+**		# buildings (don't need food)
+**
+**	Player::Food
+**
+**		FIXME: not written documentation
+**		food available/produced
+**
+**	Player::FoodUnitLimit
+**
+**		FIXME: not written documentation
+**		# food units allowed
+**
+**	Player::BuildingLimit
+**
+**		FIXME: not written documentation
+**		# buildings allowed
+**
+**	Player::TotalUnitLimit
+**
+**		FIXME: not written documentation
+**		# total unit number allowed
+**
+**	Player::LastRepairResource
+**
+**		FIXME: not written documentation
+**		last resource for repair cycles
+**
+**	Player::Score
+**
+**		FIXME: not written documentation
+**		points for killing ...
+**
+**	Player::Color
+**
+**		FIXME: not written documentation
+**		color of units on minimap
+**
+**	Player::UnitColors
+**
+**		FIXME: not written documentation
+**		Unit colors for faster setup
+**
+**	Player::Allow
+**
+**		FIXME: not written documentation
+**		Allowed for player
+**
+**	Player::UpgradeTimers
+**
+**		FIXME: not written documentation
+**		Timer for the upgrades
 */
 
 /*----------------------------------------------------------------------------
@@ -135,37 +290,41 @@ struct _player_ {
     UpgradeTimers	UpgradeTimers;	/// Timer for the upgrades
 };
 
-/*
-**	Races for the player
+/**
+**	Races for the player (must fit to PUD!)
 */
-#define PlayerRaceHuman		0	/// belongs to human
-#define PlayerRaceOrc		1	/// belongs to orc
-#define PlayerRaceNeutral	2	/// belongs to none
+enum PlayerRaces {
+    PlayerRaceHuman	=0,		/// belongs to human
+    PlayerRaceOrc	=1,		/// belongs to orc
+    PlayerRaceNeutral	=2,		/// belongs to none
 
-#define PlayerMaxRaces		2	/// maximal races supported
+    PlayerMaxRaces	=2		/// maximal races supported
+};
 
-/*
-**	Types for the player
+/**
+**	Types for the player (must fit to PUD!)
 */
-#define PlayerNeutral		2	/// neutral
-#define PlayerNobody		3	/// unused slot
-#define PlayerComputer		4	/// computer player
-#define PlayerHuman		5	/// human player
-#define PlayerRescuePassive	6	/// rescued passive
-#define PlayerRescueActive	7	/// rescued  active
+enum PlayerTypes {
+    PlayerNeutral	=2,		/// neutral
+    PlayerNobody	=3,		/// unused slot
+    PlayerComputer	=4,		/// computer player
+    PlayerHuman		=5,		/// human player
+    PlayerRescuePassive	=6,		/// rescued passive
+    PlayerRescueActive	=7,		/// rescued  active
+};
 
-/*
-**	Ai types for the player
+/**
+**	Ai types for the player (must fit to PUD!)
 */
-#define PlayerAiLand		0	/// attack at land
-#define PlayerAiPassive		1
-#define PlayerAiSea		0x19	/// attack at sea
-#define PlayerAiAir		0x1A	/// attack at air
-
-#define PlayerAiUniversal	0xFF	/// attack best
+enum PlayerAis {
+    PlayerAiLand	=0x00,		/// attack at land
+    PlayerAiPassive	=0x01,		/// passive ai does nothing
+    PlayerAiSea		=0x19,		/// attack at sea
+    PlayerAiAir		=0x1A,		/// attack at air
+    PlayerAiUniversal	=0xFF,		/// attack best possible
+};
 
 #define PlayerNumNeutral	15	/// this is the neutral player slot
-
 #define PlayerMax		16	/// maximal players supported
 
 /**
