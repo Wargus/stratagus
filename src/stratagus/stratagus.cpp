@@ -1013,6 +1013,7 @@ global void ShowLoadProgress(const char* fmt, ...)
 	    }
 	}
 	VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);
+	VideoDrawTextCentered(VideoWidth / 2, VideoHeight - 16, GameFont, temp);
 #ifndef USE_SDL_SURFACE
 	VideoUnlockScreen();
 #endif
