@@ -914,8 +914,9 @@ global int NewPath(Unit* unit,int* xdp,int* ydp)
 	    return PF_REACHED;
 	}
 	// This reduces the processor use,
-	// If target isn't reachable and were beside it
-	if( !rx && !ry && x>=gx-1 && x<gx+1 && y>=gy-1 && y<gy+1 ) {
+	// If target isn't reachable and were are beside it
+	// FIXME: should be +2? for ships/flyers?
+	if( rx==1 && ry==1 && x>=gx-1 && x<=gx+1 && y>=gy-1 && y<=gy+1 ) {
 	    if( !CheckedCanMoveToMask(gx,gy,UnitMovementMask(unit)) ) {
 		// target field blocked by something
 		*xdp=*ydp=0;
