@@ -1215,17 +1215,21 @@ local SCM CclAiAdHocForce(SCM requirement, SCM scm_unittypes)
 local SCM CclAiForceActive(SCM list)
 {
     int force;
+    AiUnit* unit;
 
     force = gh_scm2int(list);
     if (force < 0 || force >= AI_MAX_FORCES) {
 	errl("Force out of range", list);
     }
 
-    if (AiPlayer->Force[force].Attacking) {
-	return SCM_BOOL_T;
-    } else {
-	return SCM_BOOL_F;
+    unit = AiPlayer->Force[force].Units;
+    while (unit) {
+	if (!UnitIdle(unit->Unit)) {
+	    return SCM_BOOL_T;
+	}
+	unit = unit->Next;
     }
+    return SCM_BOOL_F;
 }
 
 /**
@@ -1757,16 +1761,9 @@ local SCM CclAiSwitchTo(SCM value)
 */
 local SCM CclAiScript(SCM value)
 {
-    int i;
     CclGcProtectedAssign(&AiPlayer->Scripts[0].Script, value);
     AiPlayer->Scripts[0].SleepCycles = 0;
     snprintf(AiPlayer->Scripts[0].ident, 10, "MainScript");
-    for (i = 1; i < AI_MAX_RUNNING_SCRIPTS; i++) {
-	CclGcProtectedAssign(&AiPlayer->Scripts[i].Script, NIL);
-	AiPlayer->Scripts[i].SleepCycles = 0;
-	AiEraseForce(AiPlayer->Scripts[i].ownForce);
-	snprintf(AiPlayer->Scripts[i].ident, 10, "Empty");
-    }
     return SCM_BOOL_T;
 }
 

@@ -138,7 +138,8 @@ global void DoRightButton(int sx, int sy)
 
     dest = UnitUnderCursor;
     
-    if (dest && dest->Type->Transporter) {
+    // don't allow stopping enemy transporters!
+    if (dest && dest->Type->Transporter && dest->Player == ThisPlayer) {
         // n0b0dy: So we are clicking on a transporter. We have to:
         // 1) Flush the transporters orders.
         // 2) Tell the transporter to follow the units. We have to queue all
