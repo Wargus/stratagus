@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name X11.c		-	XWindows support. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer and Valery Shchedrin
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer and Valery Shchedrin
+//
+//	$Id$
 
 //@{
 
@@ -122,7 +121,7 @@ global void SetVideoSync(void)
 local void MyConnectionWatch
 	(Display* display,XPointer client,int fd,Bool flag,XPointer* data)
 {
-    DebugLevel0(__FUNCTION__": fildes %d flag %d\n",fd,flag);
+    DebugLevel0Fn(": fildes %d flag %d\n",fd,flag);
     if( flag ) {			// file handle opened
     } else {				// file handle closed
     }
@@ -419,6 +418,7 @@ local void X11HandleKey(KeySym code)
     /*
     **	Convert X11 keycodes into internal keycodes.
     */
+    // FIXME: Combine X11 keysym mapping to internal in up and down.
     switch( (icode=code) ) {
 	case XK_Escape:
 	    icode='\e';
@@ -483,6 +483,38 @@ local void X11HandleKey(KeySym code)
 	case XK_F12:
 	    icode=KeyCodeF12;
 	    break;
+
+	case XK_KP_0:
+	    icode=KeyCodeKP0;
+	    break;
+	case XK_KP_1:
+	    icode=KeyCodeKP1;
+	    break;
+	case XK_KP_2:
+	    icode=KeyCodeKP2;
+	    break;
+	case XK_KP_3:
+	    icode=KeyCodeKP3;
+	    break;
+	case XK_KP_4:
+	    icode=KeyCodeKP4;
+	    break;
+	case XK_KP_5:
+	    icode=KeyCodeKP5;
+	    break;
+	case XK_KP_6:
+	    icode=KeyCodeKP6;
+	    break;
+	case XK_KP_7:
+	    icode=KeyCodeKP7;
+	    break;
+	case XK_KP_8:
+	    icode=KeyCodeKP8;
+	    break;
+	case XK_KP_9:
+	    icode=KeyCodeKP9;
+	    break;
+
         // We need these because if you only hit a modifier key,
         // X doesn't set its state (modifiers) field in the keyevent.
 	case XK_Shift_L:
@@ -510,6 +542,7 @@ local void X11HandleKey(KeySym code)
 	default:
 	    break;
     }
+
     if( HandleKeyDown(icode) ) {
 	return;
     }
@@ -524,6 +557,7 @@ local void X11HandleKeyUp(KeySym code)
 {
     int icode;
 
+    // FIXME: Combine X11 keysym mapping to internal in up and down.
     switch( (icode=code) ) {
 	case XK_Shift_L:
 	case XK_Shift_R:
@@ -555,6 +589,37 @@ local void X11HandleKeyUp(KeySym code)
 	    break;
 	case XK_Right:
 	    icode = KeyCodeRight;
+	    break;
+
+	case XK_KP_0:
+	    icode=KeyCodeKP0;
+	    break;
+	case XK_KP_1:
+	    icode=KeyCodeKP1;
+	    break;
+	case XK_KP_2:
+	    icode=KeyCodeKP2;
+	    break;
+	case XK_KP_3:
+	    icode=KeyCodeKP3;
+	    break;
+	case XK_KP_4:
+	    icode=KeyCodeKP4;
+	    break;
+	case XK_KP_5:
+	    icode=KeyCodeKP5;
+	    break;
+	case XK_KP_6:
+	    icode=KeyCodeKP6;
+	    break;
+	case XK_KP_7:
+	    icode=KeyCodeKP7;
+	    break;
+	case XK_KP_8:
+	    icode=KeyCodeKP8;
+	    break;
+	case XK_KP_9:
+	    icode=KeyCodeKP9;
 	    break;
 
 	default:
@@ -636,6 +701,7 @@ local void DoEvent(void)
 	    KeySym keysym;
 
             X11HandleModifiers((XKeyEvent*)&event);
+	    // FIXME: this didn't handle keypad correct!
 	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
 	    DebugLevel3("\tKey %lx `%s'\n",keysym,buf);
 	    if( num==1 ) {
@@ -715,7 +781,7 @@ global void WaitEventsAndKeepSync(void)
 	    //	Get all X11 internal connections
 	    //
 	    if( !XInternalConnectionNumbers(TheDisplay,&xfd,&n) ) {
-		DebugLevel0(__FUNCTION__": out of memory\n");
+		DebugLevel0Fn(": out of memory\n");
 		abort();
 	    }
 	    for( i=n; i--; ) {
@@ -845,7 +911,7 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 	pixels=malloc(256*sizeof(VMemType32));
 	break;
     default:
-	DebugLevel0(__FUNCTION__": Unknown depth\n");
+	DebugLevel0Fn(": Unknown depth\n");
 	return NULL;
     }
 
