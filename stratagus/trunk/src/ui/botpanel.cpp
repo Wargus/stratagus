@@ -10,7 +10,7 @@
 //
 /**@name botpanel.c	-	The bottom panel. */
 //
-//	(c) Copyright 1999-2002 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//	(c) Copyright 1999-2003 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -879,6 +879,12 @@ global void DoButtonButtonClicked(int button)
 		SpellType *spell;
 
 		spell=SpellTypeById(CurrentButtons[button].Value);
+		if( !CanAutoCastSpell(spell) ) {
+		    PlayGameSound(GameSounds.PlacementError.Sound
+			    ,MaxSampleVolume);
+		    break;
+		}
+
 		autocast=0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
