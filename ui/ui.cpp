@@ -300,180 +300,180 @@ global void LoadUserInterface(void)
 **	@param file	Save file handle
 **	@param ui	User interface to save
 */
-local void SaveUi(FILE* file,const UI* ui)
+local void SaveUi(CLFile* file,const UI* ui)
 {
     int i;
     MenuPanel* menupanel;
 
-    fprintf(file,"(define-ui '%s %d %d\t; Selector",
+    CLprintf(file,"(define-ui '%s %d %d\t; Selector",
 	    ui->Name,ui->Width,ui->Height);
 
-    fprintf(file,"\n  'normal-font-color '%s"
+    CLprintf(file,"\n  'normal-font-color '%s"
                  "\n  'reverse-font-color '%s",
 	    ui->NormalFontColor, ui->ReverseFontColor);
-    fprintf(file,"\n");
+    CLprintf(file,"\n");
 
-    fprintf(file,"\n  'filler (list");
-    fprintf(file,"\n    'file \"%s\"",ui->Filler[0].File);
-    fprintf(file,"\n    'pos '(%3d %3d)",ui->FillerX[0],ui->FillerY[0]);
-    fprintf(file,")\n");
+    CLprintf(file,"\n  'filler (list");
+    CLprintf(file,"\n    'file \"%s\"",ui->Filler[0].File);
+    CLprintf(file,"\n    'pos '(%3d %3d)",ui->FillerX[0],ui->FillerY[0]);
+    CLprintf(file,")\n");
 
-    fprintf(file,"\n  ; Resource line");
-    fprintf(file,"\n  'resource-line (list \"%s\" %d %d)",
+    CLprintf(file,"\n  ; Resource line");
+    CLprintf(file,"\n  'resource-line (list \"%s\" %d %d)",
 	    ui->Resource.File,ui->ResourceX,ui->ResourceY);
 
-    fprintf(file,"\n  'resources (list");
+    CLprintf(file,"\n  'resources (list");
     for( i=1; i<MaxCosts+2; ++i ) {
 	if( !ui->Resources[i].Icon.File ) {
 	    continue;
 	}
-	fprintf(file,"\n    '%s",
+	CLprintf(file,"\n    '%s",
 		i<MaxCosts ? DefaultResourceNames[i] :
 		    i==FoodCost ? "food" : "score");
-	fprintf(file," (list 'file \"%s\" 'row %d\n"
+	CLprintf(file," (list 'file \"%s\" 'row %d\n"
 	             "      'pos '(%d %d) 'size '(%d %d) 'text-pos '(%d %d))",
 		ui->Resources[i].Icon.File,ui->Resources[i].IconRow,
 		ui->Resources[i].IconX,ui->Resources[i].IconY,
 		ui->Resources[i].IconW,ui->Resources[i].IconH,
 		ui->Resources[i].TextX,ui->Resources[i].TextY);
     }
-    fprintf(file,")\n");
+    CLprintf(file,")\n");
 
-    fprintf(file,"  'info-panel (list \"%s\" %d %d %d %d)\n",
+    CLprintf(file,"  'info-panel (list \"%s\" %d %d %d %d)\n",
 	    ui->InfoPanel.File,
 	    ui->InfoPanelX,ui->InfoPanelY,
 	    ui->InfoPanelW,ui->InfoPanelH);
 
-    fprintf(file,"\n  'completed-bar '(");
-    fprintf(file,"\n    color %d",ui->CompleteBarColor);
-    fprintf(file,"\n    pos (%3d %3d)",ui->CompleteBarX,ui->CompleteBarY);
-    fprintf(file,"\n    size (%d %d)",ui->CompleteBarW,ui->CompleteBarH);
-    fprintf(file,"\n    text \"%s\"",ui->CompleteBarText);
-    fprintf(file,"\n    font %s",FontNames[ui->CompleteBarFont]);
-    fprintf(file,"\n    text-pos (%3d %3d)",
+    CLprintf(file,"\n  'completed-bar '(");
+    CLprintf(file,"\n    color %d",ui->CompleteBarColor);
+    CLprintf(file,"\n    pos (%3d %3d)",ui->CompleteBarX,ui->CompleteBarY);
+    CLprintf(file,"\n    size (%d %d)",ui->CompleteBarW,ui->CompleteBarH);
+    CLprintf(file,"\n    text \"%s\"",ui->CompleteBarText);
+    CLprintf(file,"\n    font %s",FontNames[ui->CompleteBarFont]);
+    CLprintf(file,"\n    text-pos (%3d %3d)",
 	    ui->CompleteTextX,ui->CompleteTextY);
-    fprintf(file,")\n\n");
+    CLprintf(file,")\n\n");
 
-    fprintf(file,"  'button-panel (list \"%s\" %d %d)\n",
+    CLprintf(file,"  'button-panel (list \"%s\" %d %d)\n",
 	    ui->ButtonPanel.File,ui->ButtonPanelX,ui->ButtonPanelY);
 
-    fprintf(file,"\n  'map-area (list");
-    fprintf(file,"\n    'pos '(%3d %3d)",
+    CLprintf(file,"\n  'map-area (list");
+    CLprintf(file,"\n    'pos '(%3d %3d)",
 	    ui->MapArea.X, ui->MapArea.Y);
-    fprintf(file,"\n    'size '(%d %d)",
+    CLprintf(file,"\n    'size '(%d %d)",
 	    ui->MapArea.EndX-ui->MapArea.X+1,
 	    ui->MapArea.EndY-ui->MapArea.Y+1);
-    fprintf(file,")\n\n");
+    CLprintf(file,")\n\n");
 
-    fprintf(file,"  ; Menu button background\n");
-    fprintf(file,"  'menu-panel (list \"%s\" %d %d)\n",
+    CLprintf(file,"  ; Menu button background\n");
+    CLprintf(file,"  'menu-panel (list \"%s\" %d %d)\n",
 	    ui->MenuButtonGraphic.File,ui->MenuButtonGraphicX,
 	    ui->MenuButtonGraphicY);
 
-    fprintf(file,"  ; Minimap background\n");
-    fprintf(file,"  'minimap-panel (list \"%s\" %d %d)\n",
+    CLprintf(file,"  ; Minimap background\n");
+    CLprintf(file,"  'minimap-panel (list \"%s\" %d %d)\n",
 	    ui->MinimapPanel.File,ui->MinimapPanelX,ui->MinimapPanelY);
-    fprintf(file,"  ; Minimap position\n");
-    fprintf(file,"  'minimap-pos (list %d %d)\n",
+    CLprintf(file,"  ; Minimap position\n");
+    CLprintf(file,"  'minimap-pos (list %d %d)\n",
 	    ui->MinimapPosX,ui->MinimapPosY);
 
-    fprintf(file,"\n  'status-line '(");
-    fprintf(file,"\n    file \"%s\"",ui->StatusLine.File);
-    fprintf(file,"\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
-    fprintf(file,"\n    text-pos (%d %d)",
+    CLprintf(file,"\n  'status-line '(");
+    CLprintf(file,"\n    file \"%s\"",ui->StatusLine.File);
+    CLprintf(file,"\n    pos (%d %d)",ui->StatusLineX,ui->StatusLineY);
+    CLprintf(file,"\n    text-pos (%d %d)",
 	    ui->StatusLineTextX,ui->StatusLineTextY);
-    fprintf(file,"\n    font %s",FontNames[ui->StatusLineFont]);
-    fprintf(file,")\n");
+    CLprintf(file,"\n    font %s",FontNames[ui->StatusLineFont]);
+    CLprintf(file,")\n");
 
-    fprintf(file,"\n  'menu-button '(");
-    fprintf(file,"\n    pos (%d %d)",
+    CLprintf(file,"\n  'menu-button '(");
+    CLprintf(file,"\n    pos (%d %d)",
 	    ui->MenuButton.X,ui->MenuButton.Y);
-    fprintf(file,"\n    size (%d %d)",
+    CLprintf(file,"\n    size (%d %d)",
 	    ui->MenuButton.Width,ui->MenuButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
+    CLprintf(file,"\n    caption \"%s\"",
 	    ui->MenuButton.Text);
-    fprintf(file,"\n    style %s",
+    CLprintf(file,"\n    style %s",
 	    MenuButtonStyle(ui->MenuButton.Button));
-    fprintf(file,")");
+    CLprintf(file,")");
 
-    fprintf(file,"\n  'network-menu-button '(");
-    fprintf(file,"\n    pos (%d %d)",
+    CLprintf(file,"\n  'network-menu-button '(");
+    CLprintf(file,"\n    pos (%d %d)",
 	    ui->NetworkMenuButton.X,ui->NetworkMenuButton.Y);
-    fprintf(file,"\n    size (%d %d)",
+    CLprintf(file,"\n    size (%d %d)",
 	    ui->NetworkMenuButton.Width,ui->NetworkMenuButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
+    CLprintf(file,"\n    caption \"%s\"",
 	    ui->NetworkMenuButton.Text);
-    fprintf(file,"\n    style %s",
+    CLprintf(file,"\n    style %s",
 	    MenuButtonStyle(ui->NetworkMenuButton.Button));
-    fprintf(file,")");
+    CLprintf(file,")");
 
-    fprintf(file,"\n  'network-diplomacy-button '(");
-    fprintf(file,"\n    pos (%d %d)",
+    CLprintf(file,"\n  'network-diplomacy-button '(");
+    CLprintf(file,"\n    pos (%d %d)",
 	    ui->NetworkDiplomacyButton.X,ui->NetworkDiplomacyButton.Y);
-    fprintf(file,"\n    size (%d %d)",
+    CLprintf(file,"\n    size (%d %d)",
 	    ui->NetworkDiplomacyButton.Width,ui->NetworkDiplomacyButton.Height);
-    fprintf(file,"\n    caption \"%s\"",
+    CLprintf(file,"\n    caption \"%s\"",
 	    ui->NetworkDiplomacyButton.Text);
-    fprintf(file,"\n    style %s",
+    CLprintf(file,"\n    style %s",
 	    MenuButtonStyle(ui->NetworkDiplomacyButton.Button));
-    fprintf(file,")");
+    CLprintf(file,")");
 
-    fprintf(file,"\n\n  'info-buttons '(");
+    CLprintf(file,"\n\n  'info-buttons '(");
     for( i=0; i<ui->NumInfoButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
 		ui->InfoButtons[i].X,ui->InfoButtons[i].Y,
 		ui->InfoButtons[i].Width,ui->InfoButtons[i].Height);
     }
-    fprintf(file,")");
-    fprintf(file,"\n  'training-buttons '(");
+    CLprintf(file,")");
+    CLprintf(file,"\n  'training-buttons '(");
     for( i=0; i<ui->NumTrainingButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
 		ui->TrainingButtons[i].X,ui->TrainingButtons[i].Y,
 		ui->TrainingButtons[i].Width,ui->TrainingButtons[i].Height);
     }
-    fprintf(file,")");
-    fprintf(file,"\n  'button-buttons '(");
+    CLprintf(file,")");
+    CLprintf(file,"\n  'button-buttons '(");
     for( i=0; i<ui->NumButtonButtons; ++i ) {
-	fprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
+	CLprintf(file,"\n    (pos (%3d %3d) size (%d %d))",
 		ui->ButtonButtons[i].X,ui->ButtonButtons[i].Y,
 		ui->ButtonButtons[i].Width,ui->ButtonButtons[i].Height);
     }
-    fprintf(file,")");
+    CLprintf(file,")");
 
-    fprintf(file,"\n\n  'cursors '(");
-    fprintf(file,"\n    point %s", ui->Point.Name);
-    fprintf(file,"\n    glass %s", ui->Glass.Name);
-    fprintf(file,"\n    cross %s", ui->Cross.Name);
-    fprintf(file,"\n    yellow %s", ui->YellowHair.Name);
-    fprintf(file,"\n    green %s", ui->GreenHair.Name);
-    fprintf(file,"\n    red %s", ui->RedHair.Name);
-    fprintf(file,"\n    scroll %s", ui->Scroll.Name);
+    CLprintf(file,"\n\n  'cursors '(");
+    CLprintf(file,"\n    point %s", ui->Point.Name);
+    CLprintf(file,"\n    glass %s", ui->Glass.Name);
+    CLprintf(file,"\n    cross %s", ui->Cross.Name);
+    CLprintf(file,"\n    yellow %s", ui->YellowHair.Name);
+    CLprintf(file,"\n    green %s", ui->GreenHair.Name);
+    CLprintf(file,"\n    red %s", ui->RedHair.Name);
+    CLprintf(file,"\n    scroll %s", ui->Scroll.Name);
 
-    fprintf(file,"\n    arrow-e %s", ui->ArrowE.Name);
-    fprintf(file,"\n    arrow-ne %s", ui->ArrowNE.Name);
-    fprintf(file,"\n    arrow-n %s", ui->ArrowN.Name);
-    fprintf(file,"\n    arrow-nw %s", ui->ArrowNW.Name);
-    fprintf(file,"\n    arrow-w %s", ui->ArrowW.Name);
-    fprintf(file,"\n    arrow-sw %s", ui->ArrowSW.Name);
-    fprintf(file,"\n    arrow-s %s", ui->ArrowS.Name);
-    fprintf(file,"\n    arrow-se %s", ui->ArrowSE.Name);
-    fprintf(file,")\n");
+    CLprintf(file,"\n    arrow-e %s", ui->ArrowE.Name);
+    CLprintf(file,"\n    arrow-ne %s", ui->ArrowNE.Name);
+    CLprintf(file,"\n    arrow-n %s", ui->ArrowN.Name);
+    CLprintf(file,"\n    arrow-nw %s", ui->ArrowNW.Name);
+    CLprintf(file,"\n    arrow-w %s", ui->ArrowW.Name);
+    CLprintf(file,"\n    arrow-sw %s", ui->ArrowSW.Name);
+    CLprintf(file,"\n    arrow-s %s", ui->ArrowS.Name);
+    CLprintf(file,"\n    arrow-se %s", ui->ArrowSE.Name);
+    CLprintf(file,")\n");
 
-    fprintf(file,"\n  'menu-panels '(");
+    CLprintf(file,"\n  'menu-panels '(");
     menupanel=ui->MenuPanels;
     while( menupanel ) {
-	fprintf(file,"\n    %s \"%s\"",
+	CLprintf(file,"\n    %s \"%s\"",
 		menupanel->Ident,menupanel->Panel.File);
 	menupanel=menupanel->Next;
     }
-    fprintf(file,")\n");
+    CLprintf(file,")\n");
 
-    fprintf(file,"\n  'victory-background \"%s\"",
+    CLprintf(file,"\n  'victory-background \"%s\"",
 	    ui->VictoryBackground.File);
-    fprintf(file,"\n  'defeat-background \"%s\"",
+    CLprintf(file,"\n  'defeat-background \"%s\"",
 	    ui->DefeatBackground.File);
 
-    fprintf(file," )\n\n");
+    CLprintf(file," )\n\n");
 }
 
 /**
@@ -482,17 +482,17 @@ local void SaveUi(FILE* file,const UI* ui)
 **	@param file	Save file handle
 **	@param ui	User interface to save
 */
-local void SaveViewports(FILE* file,const UI* ui)
+local void SaveViewports(CLFile* file,const UI* ui)
 {
     int i;
     const Viewport* vp;
 
-    fprintf(file, "(define-viewports 'mode %d",ui->ViewportMode);
+    CLprintf(file, "(define-viewports 'mode %d",ui->ViewportMode);
     for (i = 0; i < ui->NumViewports; ++i) {
 	vp = &ui->Viewports[i];
-	fprintf(file, "\n  'viewport '(%d %d)",vp->MapX,vp->MapY);
+	CLprintf(file, "\n  'viewport '(%d %d)",vp->MapX,vp->MapY);
     }
-    fprintf(file, ")\n\n");
+    CLprintf(file, ")\n\n");
 }
 
 /**
@@ -500,29 +500,29 @@ local void SaveViewports(FILE* file,const UI* ui)
 **
 **	@param file	Save file handle
 */
-global void SaveUserInterface(FILE* file)
+global void SaveUserInterface(CLFile* file)
 {
     int i;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: ui $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: ui $Id$\n\n");
 
     // Contrast, Brightness, Saturation
-    fprintf(file,"(set-contrast! %d)\n",TheUI.Contrast);
-    fprintf(file,"(set-brightness! %d)\n",TheUI.Brightness);
-    fprintf(file,"(set-saturation! %d)\n\n",TheUI.Saturation);
+    CLprintf(file,"(set-contrast! %d)\n",TheUI.Contrast);
+    CLprintf(file,"(set-brightness! %d)\n",TheUI.Brightness);
+    CLprintf(file,"(set-saturation! %d)\n\n",TheUI.Saturation);
     // Scrolling
-    fprintf(file,"(set-mouse-scroll! %s)\n",TheUI.MouseScroll ? "#t" : "#f");
-    fprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
-    fprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
-    fprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
-    fprintf(file,"(set-mouse-scroll-speed-default! %d)\n",TheUI.MouseScrollSpeedDefault);
-    fprintf(file,"(set-mouse-scroll-speed-control! %d)\n",TheUI.MouseScrollSpeedControl);
+    CLprintf(file,"(set-mouse-scroll! %s)\n",TheUI.MouseScroll ? "#t" : "#f");
+    CLprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
+    CLprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
+    CLprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
+    CLprintf(file,"(set-mouse-scroll-speed-default! %d)\n",TheUI.MouseScrollSpeedDefault);
+    CLprintf(file,"(set-mouse-scroll-speed-control! %d)\n",TheUI.MouseScrollSpeedControl);
 
-    fprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
-    fprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);
+    CLprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
+    CLprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);
 
-    fprintf(file,"(set-original-resources! %s)\n\n",
+    CLprintf(file,"(set-original-resources! %s)\n\n",
 	    TheUI.OriginalResources ? "#t" : "#f");
 
     // Save the UIs for all resolutions

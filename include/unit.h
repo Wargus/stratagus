@@ -863,9 +863,9 @@ extern int CanTarget(const UnitType* type,const UnitType* dest);
     /// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
     /// save unit-structure
-extern void SaveUnit(const Unit* unit,FILE* file);
+extern void SaveUnit(const Unit* unit,CLFile* file);
     /// save all units
-extern void SaveUnits(FILE* file);
+extern void SaveUnits(CLFile* file);
 
     /// Initialize unit module
 extern void InitUnits(void);
@@ -932,7 +932,7 @@ extern void DecorationCclRegister(void);
     /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
     /// Save the decorations (health,mana) of units
-extern void SaveDecorations(FILE* file);
+extern void SaveDecorations(CLFile* file);
     /// Clean the decorations (health,mana) of units
 extern void CleanDecorations(void);
 
@@ -979,7 +979,7 @@ extern Unit* AttackUnitsInReactRange(Unit* unit);
     /// Initialize data structures for groups
 extern void InitGroups(void);
     /// Save groups
-extern void SaveGroups(FILE* file);
+extern void SaveGroups(CLFile* file);
     /// Cleanup groups
 extern void CleanGroups(void);
 
@@ -1043,7 +1043,7 @@ extern int AddSelectedAirUnitsInRectangle(int tx,int ty,int w,int h);
     /// Init selections
 extern void InitSelections(void);
     /// Save current selection state
-extern void SaveSelections(FILE* file);
+extern void SaveSelections(CLFile* file);
     /// Clean up selections
 extern void CleanSelections(void);
     /// Register CCL selection features

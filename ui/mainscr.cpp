@@ -368,38 +368,7 @@ global void DrawUnitInfo(const Unit* unit)
 	}
     }
 
-    if( type->CanStore[WoodCost] ) {
-	VideoDrawText(x+20,y+8+78,GameFont,"Production");
-	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
-	// I'm assuming that it will be short enough to fit in the space
-	// I'm also assuming that it won't be 100 - x
-	// and since the default is used for comparison we might as well
-	// use that in the printing too.
-	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
-
-	if( unit->Player->Incomes[WoodCost] != DefaultIncomes[WoodCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
-	    VideoDrawText(x+96,y+8+93,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
-        VideoDrawText(x+120,y+8+93,GameFont,buf);
-	return;
-
-    } else if( type->CanStore[OilCost] ) {
-	VideoDrawText(x+20,y+8+78,GameFont,"Production");
-	VideoDrawText(x+54,y+8+93,GameFont,"Oil:");
-	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[OilCost]);
-	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
-	    sprintf(buf, "~<+%i~>",
-		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
-	    VideoDrawText(x+96,y+8+93,GameFont,buf);
-	}
-	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
-        VideoDrawText(x+120,y+8+93,GameFont,buf);
-	return;
-
-    } else if( type->CanStore[GoldCost] ) {
+    if( type->CanStore[GoldCost] ) {
 	VideoDrawText(x+20,y+8+61,GameFont,"Production");
 	VideoDrawText(x+43,y+8+77,GameFont,"Gold:");
 	VideoDrawNumber(x+78,y+8+77,GameFont,DefaultIncomes[GoldCost]);
@@ -432,6 +401,37 @@ global void DrawUnitInfo(const Unit* unit)
 	}
 	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
         VideoDrawText(x+120,y+8+109,GameFont,buf);
+	return;
+
+   } else if (type->CanStore[WoodCost] ) {
+	VideoDrawText(x+20,y+8+78,GameFont,"Production");
+	VideoDrawText(x+22,y+8+93,GameFont,"Lumber:");
+	// I'm assuming that it will be short enough to fit in the space
+	// I'm also assuming that it won't be 100 - x
+	// and since the default is used for comparison we might as well
+	// use that in the printing too.
+	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[WoodCost]);
+
+	if( unit->Player->Incomes[WoodCost] != DefaultIncomes[WoodCost] ) {
+	    sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[WoodCost]-DefaultIncomes[WoodCost]);
+	    VideoDrawText(x+96,y+8+93,GameFont,buf);
+	}
+	sprintf(buf, "(%+.1f)", unit->Player->Revenue[WoodCost] / 1000.0);
+        VideoDrawText(x+120,y+8+93,GameFont,buf);
+	return;
+
+    } else if( type->CanStore[OilCost] ) {
+	VideoDrawText(x+20,y+8+78,GameFont,"Production");
+	VideoDrawText(x+54,y+8+93,GameFont,"Oil:");
+	VideoDrawNumber(x+78,y+8+93,GameFont,DefaultIncomes[OilCost]);
+	if( unit->Player->Incomes[OilCost]!=DefaultIncomes[OilCost] ) {
+	    sprintf(buf, "~<+%i~>",
+		    unit->Player->Incomes[OilCost]-DefaultIncomes[OilCost]);
+	    VideoDrawText(x+96,y+8+93,GameFont,buf);
+	}
+	sprintf(buf, "(%+.1f)", unit->Player->Revenue[OilCost] / 1000.0);
+        VideoDrawText(x+120,y+8+93,GameFont,buf);
 	return;
 
     } else if( type->Transporter && unit->InsideCount ) {

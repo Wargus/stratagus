@@ -138,7 +138,7 @@ global void LoadConstructions(void)
 **
 **	@param file	Output file.
 */
-global void SaveConstructions(FILE* file)
+global void SaveConstructions(CLFile* file)
 {
     int j;
     int i;
@@ -146,8 +146,8 @@ global void SaveConstructions(FILE* file)
     Construction** cop;
     ConstructionFrame* cframe;
 
-    fprintf(file,"\n;;; -----------------------------------------\n");
-    fprintf(file,";;; MODULE: constructions $Id$\n\n");
+    CLprintf(file,"\n;;; -----------------------------------------\n");
+    CLprintf(file,";;; MODULE: constructions $Id$\n\n");
 
     // FIXME: needed?
     
@@ -155,16 +155,16 @@ global void SaveConstructions(FILE* file)
     //	Dump table wc2 construction numbers -> internal symbol.
     //
     if( (cp=ConstructionWcNames) ) {
-	fprintf(file,"(define-construction-wc-names");
+	CLprintf(file,"(define-construction-wc-names");
 
 	i=90;
 	while( *cp ) {
 	    if( i+strlen(*cp)>79 ) {
-		i=fprintf(file,"\n ");
+		i=CLprintf(file,"\n ");
 	    }
-	    i+=fprintf(file," '%s",*cp++);
+	    i+=CLprintf(file," '%s",*cp++);
 	}
-	fprintf(file,")\n\n");
+	CLprintf(file,")\n\n");
     }
 
     //
@@ -175,43 +175,43 @@ global void SaveConstructions(FILE* file)
 	    if( !(*cop)->Ident ) {
 		continue;
 	    }
-	    fprintf(file,"(define-construction '%s\n",(*cop)->Ident);
+	    CLprintf(file,"(define-construction '%s\n",(*cop)->Ident);
 	    for( j=0; j<TilesetMax; ++j ) {
 		if( !(*cop)->File[j].File ) {
 		    continue;
 		}
-		fprintf(file,"  'file '(\n");
-		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
-		fprintf(file,"    file  \"%s\"\n",(*cop)->File[j].File);
-		fprintf(file,"    size (%d %d))\n",(*cop)->File[j].Width,
+		CLprintf(file,"  'file '(\n");
+		CLprintf(file,"    tileset %s\n",Tilesets[j]->Class);
+		CLprintf(file,"    file  \"%s\"\n",(*cop)->File[j].File);
+		CLprintf(file,"    size (%d %d))\n",(*cop)->File[j].Width,
 			(*cop)->File[j].Height);
 	    }
 	    for( j=0; j<TilesetMax; ++j ) {
 		if( !(*cop)->ShadowFile[j].File ) {
 		    continue;
 		}
-		fprintf(file,"  'shadow-file '(\n");
-		fprintf(file,"    tileset %s\n",Tilesets[j]->Class);
-		fprintf(file,"    file  \"%s\"\n",(*cop)->ShadowFile[j].File);
-		fprintf(file,"    size (%d %d))\n",(*cop)->ShadowFile[j].Width,
+		CLprintf(file,"  'shadow-file '(\n");
+		CLprintf(file,"    tileset %s\n",Tilesets[j]->Class);
+		CLprintf(file,"    file  \"%s\"\n",(*cop)->ShadowFile[j].File);
+		CLprintf(file,"    size (%d %d))\n",(*cop)->ShadowFile[j].Width,
 			(*cop)->ShadowFile[j].Height);
 	    }
 	    cframe=(*cop)->Frames;
 	    if( cframe ) {
-		fprintf(file,"  'constructions (list");
+		CLprintf(file,"  'constructions (list");
 		while( cframe ) {
-		    fprintf(file,"\n    '(percent %d\n",cframe->Percent);
+		    CLprintf(file,"\n    '(percent %d\n",cframe->Percent);
 		    if( cframe->File==ConstructionFileConstruction ) {
-			fprintf(file,"      file construction\n");
+			CLprintf(file,"      file construction\n");
 		    } else {
-			fprintf(file,"      file main\n");
+			CLprintf(file,"      file main\n");
 		    }
-		    fprintf(file,"      frame %d)",cframe->Frame);
+		    CLprintf(file,"      frame %d)",cframe->Frame);
 		    cframe=cframe->Next;
 		}
-		fprintf(file,")\n");
+		CLprintf(file,")\n");
 	    }
-	    fprintf(file,")\n\n");
+	    CLprintf(file,")\n\n");
 	    ++cop;
 	}
     }

@@ -1230,7 +1230,7 @@ local void Screenshot(void)
     for( i=1; i<99; ++i ) {
 	// FIXME: what if we can't write to this directory?
 	sprintf(filename, "screen%02d.png", i);
-	if( !(fd = CLopen(filename)) ) {
+	if( !(fd = CLopen(filename,CL_OPEN_READ)) ) {
 	    break;
 	}
 	CLclose(fd);

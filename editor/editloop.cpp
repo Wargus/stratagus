@@ -1811,7 +1811,7 @@ local void CreateEditor(void)
     //  FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
     //
     file = LibraryFileName(EditorStartFile, buf);
-    if ((clf = CLopen(file))) {
+    if ((clf = CLopen(file,CL_OPEN_READ))) {
 	CLclose(clf);
 	ShowLoadProgress("Script %s", file);
 	if ((s = strrchr(file, '.')) && s[1] == 'C') {

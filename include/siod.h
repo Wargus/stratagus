@@ -11,6 +11,8 @@
 #ifndef __SIOD_H__
 #define __SIOD_H__
 
+#include "iolib.h"
+
 struct obj
 {short gc_mark;
  short type;
@@ -239,6 +241,7 @@ LISP symbolconc(LISP args);
 void set_print_hooks(long type,void (*fcn)(LISP, struct gen_printio *));
 LISP lprin1g(LISP exp,struct gen_printio *f);
 LISP lprin1f(LISP exp,FILE *f);
+LISP lprin1CL(LISP exp,CLFile *f);
 LISP lprint(LISP exp,LISP);
 LISP lread(LISP);
 LISP lreadtk(char *,long j);

@@ -138,7 +138,7 @@ extern void InitDependencies(void);
     /// Load the dependencies
 extern void LoadDependencies(FILE* file);
     /// Save the dependencies
-extern void SaveDependencies(FILE* file);
+extern void SaveDependencies(CLFile* file);
     /// Cleanup dependencies module
 extern void CleanDependencies();
 

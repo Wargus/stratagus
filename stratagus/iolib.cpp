@@ -36,6 +36,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #ifndef _MSC_VER
 #include <fcntl.h>
@@ -95,6 +96,7 @@ local int gzseek(CLFile* file,unsigned offset,int whence)
 #define bzread BZ2_bzread
 #define bzopen BZ2_bzopen
 #define bzclose BZ2_bzclose
+#define bzwrite BZ2_bzwrite
 #endif	// } LIBBZIP2_VERSION >= "1.0"
 
 /**
@@ -148,76 +150,107 @@ local void zzip_seek(ZZIP_FILE* file,unsigned offset,int whence __attribute__((u
 **
 **	@param fn	File name.
 */
-global CLFile *CLopen(const char *fn)
+global CLFile *CLopen(const char *fn,long openflags)
 {
-    CLFile input;
-    CLFile *clf;
+    CLFile clf;
+    CLFile *result;
     char buf[512];
+    char openstring[5];
+    if ( (openflags&CL_OPEN_READ) && (openflags&CL_OPEN_WRITE) ) {
+	strcpy(openstring,"rwb");
+    } else if (openflags&CL_OPEN_READ) {
+	strcpy(openstring,"rb");
+    } else if (openflags&CL_OPEN_WRITE) {
+	strcpy(openstring,"wb");
+    } else {
+	DebugLevel0("Bad CLopen flags");
+	DebugCheck(1);
+	return NULL;
+    }
 
-    input.cl_type = CLF_TYPE_INVALID;
-    if (!(input.cl_plain = fopen(fn, "rb"))) {		// try plain first
-#ifdef USE_ZLIB
-	if ((input.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), "rb"))) {
-	    input.cl_type = CLF_TYPE_GZIP;
+    clf.cl_type = CLF_TYPE_INVALID;
+
+    if (openflags&CL_OPEN_WRITE) {
+#ifdef USE_BZ2LIB
+	if ( (openflags&CL_WRITE_BZ2) &&
+		( clf.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), openstring)) ) {
+	    clf.cl_type = CLF_TYPE_BZIP2;
 	} else
 #endif
-#ifdef USE_BZ2LIB
-	if ((input.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), "rb"))) {
-	    input.cl_type = CLF_TYPE_BZIP2;
+#ifdef USE_ZLIB
+	if ( (openflags&CL_WRITE_GZ) &&
+	    	( clf.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), openstring)) ) {
+	    clf.cl_type = CLF_TYPE_GZIP;		
 	} else
+#endif
+	if  ((clf.cl_plain = fopen(fn,openstring))) {
+	    clf.cl_type = CLF_TYPE_PLAIN;
+	}
+    } else {
+	if (!(clf.cl_plain = fopen(fn, openstring))) {		// try plain first
+#ifdef USE_ZLIB
+	    if ((clf.cl_gz = gzopen(strcat(strcpy(buf,fn),".gz"), "rb"))) {
+		clf.cl_type = CLF_TYPE_GZIP;
+	    } else
+#endif
+#ifdef USE_BZ2LIB
+	    if ((clf.cl_bz = bzopen(strcat(strcpy(buf,fn),".bz2"), "rb"))) {
+		clf.cl_type = CLF_TYPE_BZIP2;
+	    } else
 #endif
 #ifdef USE_ZZIPLIB
-	if ((input.cl_zz = zzip_open(strcpy(buf,fn),O_RDONLY|O_BINARY) )) {
-	    input.cl_type = CLF_TYPE_ZZIP;
-	} else
+	    if ((clf.cl_zz = zzip_open(strcpy(buf,fn),O_RDONLY|O_BINARY) )) {
+		clf.cl_type = CLF_TYPE_ZZIP;
+	    } else
 #endif
-	{ }
+	    { }
 
-    } else {
-	input.cl_type = CLF_TYPE_PLAIN;
-	// Hmm, plain worked, but nevertheless the file may be compressed!
-	if (fread(buf, 2, 1, input.cl_plain) == 1) {
+	} else {
+	    clf.cl_type = CLF_TYPE_PLAIN;
+	    // Hmm, plain worked, but nevertheless the file may be compressed!
+	    if (fread(buf, 2, 1, clf.cl_plain) == 1) {
 #ifdef USE_BZ2LIB
-	    if (buf[0] == 'B' && buf[1] == 'Z') {
-		fclose(input.cl_plain);
-		if ((input.cl_bz = bzopen(fn, "rb"))) {
-		    input.cl_type = CLF_TYPE_BZIP2;
-		} else {
-		    if(!(input.cl_plain = fopen(fn, "rb"))) {
-			input.cl_type = CLF_TYPE_INVALID;
+		if (buf[0] == 'B' && buf[1] == 'Z') {
+		    fclose(clf.cl_plain);
+		    if ((clf.cl_bz = bzopen(fn, "rb"))) {
+			clf.cl_type = CLF_TYPE_BZIP2;
+		    } else {
+			if(!(clf.cl_plain = fopen(fn, "rb"))) {
+			    clf.cl_type = CLF_TYPE_INVALID;
+			}
 		    }
 		}
-	    }
 #endif	// USE_BZ2LIB
 #ifdef USE_ZLIB
-	    if (buf[0] == 0x1f) {	// don't check for buf[1] == 0x8b, so that old compress also works!
-		fclose(input.cl_plain);
-		if ((input.cl_gz = gzopen(fn, "rb"))) {
-		    input.cl_type = CLF_TYPE_GZIP;
-		} else {
-		    if(!(input.cl_plain = fopen(fn, "rb"))) {
-			input.cl_type = CLF_TYPE_INVALID;
+		if (buf[0] == 0x1f) {	// don't check for buf[1] == 0x8b, so that old compress also works!
+		    fclose(clf.cl_plain);
+		    if ((clf.cl_gz = gzopen(fn, "rb"))) {
+			clf.cl_type = CLF_TYPE_GZIP;
+		    } else {
+			if(!(clf.cl_plain = fopen(fn, "rb"))) {
+			    clf.cl_type = CLF_TYPE_INVALID;
+			}
 		    }
 		}
-	    }
 #endif	// USE_ZLIB
-	}
-	if (input.cl_type == CLF_TYPE_PLAIN) {	// ok, it is not compressed
-	    rewind(input.cl_plain);
+	    }
+	    if (clf.cl_type == CLF_TYPE_PLAIN) {	// ok, it is not compressed
+		rewind(clf.cl_plain);
+	    }
 	}
     }
 
-    if (input.cl_type == CLF_TYPE_INVALID) {
+    if (clf.cl_type == CLF_TYPE_INVALID) {
 	//fprintf(stderr,"%s in ", buf);
 	return NULL;
     }
 
     // ok, here we go
-    clf = (CLFile *)malloc(sizeof(CLFile));
-    if (clf) {
-	*clf = input;
+    result = (CLFile *)malloc(sizeof(CLFile));
+    if (result) {
+	*result = clf;
     }
-    return clf;
+    return result;
 }
 
 /**
@@ -296,6 +329,78 @@ global int CLread(CLFile *file, void *buf, size_t len)
     } else {
 	errno = EBADF;
     }
+    return ret;
+}
+
+/**
+**	CLprintf	Library file write
+**
+**	@param file	CLFile pointer.
+**	@param format	String Format.
+**	@param ...	Parameter List.
+*/
+global int CLprintf(CLFile *file, char *format, ...)
+{
+    int n;
+    int size;
+    int ret;
+    int tp;
+    char *p;
+    va_list ap;
+
+    size=100;
+    ret=-1;
+    if ((p = malloc (size)) == NULL) {
+	return -1;
+    }
+    while (1) {
+	/* Try to print in the allocated space. */
+	va_start(ap, format);
+	n = vsnprintf (p, size, format, ap);
+	va_end(ap);
+	/* If that worked, string was processed. */
+	if (n > -1 && n < size) {
+	    break;
+	}
+	/* Else try again with more space. */
+	if (n > -1) { /* glibc 2.1 */
+	    size = n+1; /* precisely what is needed */
+	} else {           /* glibc 2.0 */
+	    size *= 2;  /* twice the old size */
+	}
+	if ((p = realloc (p, size)) == NULL) {
+	    return -1;
+	}
+    }
+
+    // Allocate the correct size
+    size = strlen(p);
+
+    if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+	if (tp == CLF_TYPE_PLAIN) {
+	    ret = fwrite(p,size,1,file->cl_plain);
+	}
+#ifdef USE_ZLIB
+	if (tp == CLF_TYPE_GZIP) {
+	    ret = gzwrite(file->cl_gz, p, size);
+	}
+#endif	// USE_ZLIB
+#ifdef USE_BZ2LIB
+	if (tp == CLF_TYPE_BZIP2) {
+	    ret = bzwrite(file->cl_bz, p, size);
+	}
+#endif	// USE_BZ2LIB
+#if defined(USE_ZZIPLIB) && 0
+	// FIXME: Support Unknown and Unsupported
+	if (tp == CLF_TYPE_ZZIP) {
+	    zzip_write(file->cl_zz, p, size);
+	    ret = 0;
+	}
+#endif	// USE_ZZIPLIB
+    } else {
+	errno = EBADF;
+    }
+    free(p);
     return ret;
 }
 

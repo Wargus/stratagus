@@ -322,7 +322,7 @@ global void RemoveButton(int pos);
 #endif
 
     /// Save all buttons
-extern void SaveButtons(FILE* file);
+extern void SaveButtons(CLFile* file);
 
 //
 //	in mouse.c
