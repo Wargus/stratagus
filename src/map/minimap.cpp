@@ -175,6 +175,8 @@ global void UpdateMinimapTerrain(void)
 global void CreateMinimap(void)
 {
     int n;
+    int x;
+    int y;
 
     if (TheMap.Width > TheMap.Height) {	// Scale to biggest value.
 	n = TheMap.Width;
@@ -215,7 +217,24 @@ global void CreateMinimap(void)
     memset(MinimapTerrainGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
     MinimapGraphic = NewGraphic(8, TheUI.MinimapW, TheUI.MinimapH);
     MinimapGraphic->Pixels = VideoCreateNewPalette(GlobalPalette);
-    memset(MinimapGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
+
+    // FIXME: looks too complicated
+    for (y = 0; y < TheUI.MinimapH; ++y) {
+	for (x = 0; x < TheUI.MinimapW; ++x) {
+	    // this only copies the panel background... honest.
+	    ((unsigned char*)MinimapGraphic->Frames)[x + y * TheUI.MinimapW] = 
+		((unsigned char*)TheUI.MinimapPanel.Graphic->Frames)[x+(TheUI.MinimapPosX-TheUI.MinimapPanelX) + (y+TheUI.MinimapPosY-TheUI.MinimapPanelY) * TheUI.MinimapPanel.Graphic->Width];
+	}
+    }
+    if (!TheUI.MinimapTransparent) {
+	// make only the inner part which is going to be used black
+	for (y = MinimapY; y < TheUI.MinimapH - MinimapY; ++y) {
+	    for (x = MinimapX; x < TheUI.MinimapW - MinimapX; ++x) {
+		((unsigned char*)MinimapGraphic->Frames)[x + y * TheUI.MinimapW] =
+		    ColorBlack;
+	    }
+	}
+    }
 
     UpdateMinimapTerrain();
 }
@@ -246,7 +265,7 @@ global void DestroyMinimap(void)
 global void UpdateMinimap(void)
 {
     static int red_phase;
-    int new_phase;
+    int red_phase_changed;
     int mx;
     int my;
     UnitType* type;
@@ -256,32 +275,28 @@ global void UpdateMinimap(void)
     int h;
     int h0;
 
-    w = (FrameCounter / FRAMES_PER_SECOND) & 1;
-    if ((new_phase = red_phase - w)) {
-	red_phase = w;
+    red_phase_changed = red_phase != ((FrameCounter / FRAMES_PER_SECOND) & 1);
+    if (red_phase_changed) {
+	red_phase = !red_phase;
     }
 
     //
-    //	Set the pixels on the minimap background to transparent (0).
+    //	Draw the terrain (or make it black again)
     //
-    // FIXME: make the image really use colorkey
-    // FIXME: I think this is only necessary on each map size change?
-    //        Or maybe if you disable displaying terrain, too?
-    memset(MinimapGraphic->Frames, 0, TheUI.MinimapW * TheUI.MinimapH);
-
-    //
-    //	Draw the terrain
-    //
-    if (MinimapWithTerrain) {
-	for (my = 0; my < TheUI.MinimapH; ++my) {
-	    for (mx = 0; mx < TheUI.MinimapW; ++mx) {
-		if (IsMapFieldVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width) ||
-			(IsMapFieldExplored(ThisPlayer,Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width) &&
-			    ((mx & 1) == (my & 1))) ||
-			ReplayRevealMap) {
-		    ((unsigned char*)MinimapGraphic->Frames)[mx + my * TheUI.MinimapW] =
-			((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW];
-		}
+    for (my = 0; my < TheUI.MinimapH; ++my) {
+	for (mx = 0; mx < TheUI.MinimapW; ++mx) {
+	    int visiontype; // 0 unexplored, 1 explored, >1 visible.
+	    if (ReplayRevealMap) {
+		visiontype = 2;
+	    } else {
+		visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width);
+	    }
+	    if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
+		((unsigned char*)MinimapGraphic->Frames)[mx + my * TheUI.MinimapW] =
+		    ((unsigned char*)MinimapTerrainGraphic->Frames)[mx + my * TheUI.MinimapW];
+	    } else if (visiontype > 0) {
+		((unsigned char*)MinimapGraphic->Frames)[mx + my * TheUI.MinimapW] =
+		    ColorBlack;
 	    }
 	}
     }
@@ -365,6 +380,7 @@ global void UpdateMinimap(void)
 	    if (type->ClicksToExplode) {
 		color = ColorNPC;
 	    } else if (type->GivesResource == OilCost) {
+		// FIXME: move to ccl (OilCost)
 		color = ColorBlack;
 	    } else {
 		color = ColorYellow;
@@ -372,10 +388,6 @@ global void UpdateMinimap(void)
 	} else if (unit->Player == ThisPlayer) {
 	    if (unit->Attacked && red_phase) {
 		color = ColorRed;
-		// better to clear to fast, than to clear never :?)
-		if (new_phase) {
-		    unit->Attacked--;
-		}
 	    } else if (MinimapShowSelected && unit->Selected) {
 		color = ColorWhite;
 	    } else {
@@ -402,6 +414,11 @@ global void UpdateMinimap(void)
 		    mx + w + (my + h) * TheUI.MinimapW] = color;
 	    }
 	}
+
+	// FIXME: bad place, but must be done for all units
+	if (red_phase_changed && unit->Attacked) {
+	    unit->Attacked--;
+	}
     }
 }
 
@@ -414,10 +431,6 @@ global void UpdateMinimap(void)
 global void DrawMinimap(int vx __attribute__((unused)),
 	int vy __attribute__((unused)))
 {
-   // draw background
-    VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
-	TheUI.MinimapPanel.Graphic->Width, TheUI.MinimapPanel.Graphic->Height,
-	TheUI.MinimapPanelX, TheUI.MinimapPanelY);
     VideoDrawSubClip(MinimapGraphic, 0, 0,
 	MinimapGraphic->Width, MinimapGraphic->Height,
 	TheUI.MinimapPosX, TheUI.MinimapPosY);
