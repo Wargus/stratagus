@@ -636,6 +636,8 @@ global void GameMainLoop(void)
 
     MultiPlayerReplayEachCycle();
 
+    CDRomCheck(NULL);
+
     while( GameRunning ) {
 #if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
 	if (setjmp (MainLoopJmpBuf)) {
