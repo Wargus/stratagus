@@ -69,57 +69,57 @@ extern int LuaCall(int narg, int clear);
 #include "iolib.h"
 
 typedef enum {
-	ENumber_Dir,         ///< directly a number.
-	ENumber_Add,         ///< a + b.
-	ENumber_Sub,         ///< a - b.
-	ENumber_Mul,         ///< a * b.
-	ENumber_Div,         ///< a / b.
-	ENumber_Min,         ///< Min(a, b).
-	ENumber_Max,         ///< Max(a, b).
-	ENumber_Rand,        ///< Rand(a) : number in [0..a-1].
+	ENumber_Dir,         /// directly a number.
+	ENumber_Add,         /// a + b.
+	ENumber_Sub,         /// a - b.
+	ENumber_Mul,         /// a * b.
+	ENumber_Div,         /// a / b.
+	ENumber_Min,         /// Min(a, b).
+	ENumber_Max,         /// Max(a, b).
+	ENumber_Rand,        /// Rand(a) : number in [0..a-1].
 
-	ENumber_Gt,          ///< a  > b.
-	ENumber_GtEq,        ///< a >= b.
-	ENumber_Lt,          ///< a  < b.
-	ENumber_LtEq,        ///< a <= b.
-	ENumber_Eq,          ///< a == b.
-	ENumber_NEq,         ///< a <> b.
+	ENumber_Gt,          /// a  > b.
+	ENumber_GtEq,        /// a >= b.
+	ENumber_Lt,          /// a  < b.
+	ENumber_LtEq,        /// a <= b.
+	ENumber_Eq,          /// a == b.
+	ENumber_NEq,         /// a <> b.
 
-	ENumber_VideoTextLength, ///< VideoTextLength(font, string).
-	ENumber_StringFind,      ///< strchr(string, char) - s.
+	ENumber_VideoTextLength, /// VideoTextLength(font, string).
+	ENumber_StringFind,      /// strchr(string, char) - s.
 
 
-	ENumber_UnitStat     ///< Property of Unit.
+	ENumber_UnitStat     /// Property of Unit.
 // FIXME: add others.
-} ENumber; ///< All possible value for a number.
+} ENumber; /// All possible value for a number.
 
 
 typedef enum {
-	EUnit_Ref           ///< Unit direct reference.
+	EUnit_Ref           /// Unit direct reference.
 // FIXME: add others.
-} EUnit; ///< All possible value for a unit.
+} EUnit; /// All possible value for a unit.
 
 typedef enum {
-	EString_Dir,          ///< directly a string.
-	EString_Concat,       ///< a + b [+ c ...].
-	EString_String,       ///< Convert number in string.
-	EString_InverseVideo, ///< Inverse video for the string ("a" -> "~<a~>").
-	EString_If,           ///< If cond then String1 else String2.
-	EString_UnitName,     ///< UnitType Name.
-	EString_SubString,    ///< SubString.
+	EString_Dir,          /// directly a string.
+	EString_Concat,       /// a + b [+ c ...].
+	EString_String,       /// Convert number in string.
+	EString_InverseVideo, /// Inverse video for the string ("a" -> "~<a~>").
+	EString_If,           /// If cond then String1 else String2.
+	EString_UnitName,     /// UnitType Name.
+	EString_SubString,    /// SubString.
 // FIXME: add others.
-} EString; ///< All possible value for a string.
+} EString; /// All possible value for a string.
 
 /**
 **  Enumeration to know which variable to be selected.
 */
 typedef enum {
-	VariableValue = 0,  ///< Value of the variable.
-	VariableMax,        ///< Max of the variable.
-	VariableIncrease,   ///< Increase value of the variable.
-	VariableDiff,       ///< (Max - Value)
-	VariablePercent,    ///< (100 * Value / Max)
-	VariableName        ///< Name of the variable.
+	VariableValue = 0,  /// Value of the variable.
+	VariableMax,        /// Max of the variable.
+	VariableIncrease,   /// Increase value of the variable.
+	VariableDiff,       /// (Max - Value)
+	VariablePercent,    /// (100 * Value / Max)
+	VariableName        /// Name of the variable.
 } EnumVariable;
 
 /**
@@ -127,11 +127,11 @@ typedef enum {
 */
 
 typedef enum {
-	UnitRefItSelf = 0,      ///< unit.
-	UnitRefInside,          ///< unit->Inside.
-	UnitRefContainer,       ///< Unit->Container.
-	UnitRefWorker,          ///< unit->Data.Built.Worker
-	UnitRefGoal,            ///< unit->Goal
+	UnitRefItSelf = 0,      /// unit.
+	UnitRefInside,          /// unit->Inside.
+	UnitRefContainer,       /// Unit->Container.
+	UnitRefWorker,          /// unit->Data.Built.Worker
+	UnitRefGoal,            /// unit->Goal
 } EnumUnit;
 
 
@@ -156,32 +156,32 @@ typedef struct _StringDesc_ StringDesc;
 
 
 typedef struct {
-	NumberDesc* Left;           ///< Left operand.
-	NumberDesc* Right;          ///< Right operand.
-} BinOp;  ///< for Bin operand  a ?? b
+	NumberDesc* Left;           /// Left operand.
+	NumberDesc* Right;          /// Right operand.
+} BinOp;  /// for Bin operand  a ?? b
 
 /**
 **  Number description.
 */
 struct _NumberDesc_ {
-	ENumber e;       ///< which number.
+	ENumber e;       /// which number.
 	union {
-		int Val;       ///< Direct value.
-		NumberDesc* N; ///< Other number.
-		BinOp BinOp;   ///< For binary operand.
+		int Val;       /// Direct value.
+		NumberDesc* N; /// Other number.
+		BinOp BinOp;   /// For binary operand.
 		struct {
-			UnitDesc* Unit;            ///< Which unit.
-			int Index;                 ///< Which index variable.
-			EnumVariable Component;    ///< Which component.
-			int Loc;                   ///< Location of Variables[].
+			UnitDesc* Unit;            /// Which unit.
+			int Index;                 /// Which index variable.
+			EnumVariable Component;    /// Which component.
+			int Loc;                   /// Location of Variables[].
 		} UnitStat;
 		struct {
-			StringDesc* String; ///< String.
-			int Font;           ///< Font.
+			StringDesc* String; /// String.
+			int Font;           /// Font.
 		} VideoTextLength;
 		struct {
-			StringDesc* String; ///< String.
-			char C;             ///< Char.
+			StringDesc* String; /// String.
+			char C;             /// Char.
 		} StringFind;
 
 	} D;
@@ -191,9 +191,9 @@ struct _NumberDesc_ {
 **  Unit description.
 */
 struct _UnitDesc_ {
-	EUnit e;       ///< which unit;
+	EUnit e;       /// which unit;
 	union {
-		Unit** AUnit; ///< Adress of the unit.
+		Unit** AUnit; /// Adress of the unit.
 	} D;
 };
 
@@ -201,26 +201,26 @@ struct _UnitDesc_ {
 **  String description.
 */
 struct _StringDesc_ {
-	EString e;       ///< which number.
+	EString e;       /// which number.
 	union {
-		char *Val;       ///< Direct value.
+		char *Val;       /// Direct value.
 		struct {
-			StringDesc** Strings;  ///< Array of operands.
-			int n;                 ///< number of operand to concat
-		} Concat; ///< for Concat two string.
-		NumberDesc* Number;  ///< Number.
-		StringDesc* String;  ///< String.
-		UnitDesc* Unit;      ///< Unit desciption.
+			StringDesc** Strings;  /// Array of operands.
+			int n;                 /// number of operand to concat
+		} Concat; /// for Concat two string.
+		NumberDesc* Number;  /// Number.
+		StringDesc* String;  /// String.
+		UnitDesc* Unit;      /// Unit desciption.
 		struct {
-			NumberDesc* Cond;  ///< Branch condition.
-			StringDesc* True;  ///< String if Cond is true.
-			StringDesc* False; ///< String if Cond is false.
-		} If; ///< conditional string.
+			NumberDesc* Cond;  /// Branch condition.
+			StringDesc* True;  /// String if Cond is true.
+			StringDesc* False; /// String if Cond is false.
+		} If; /// conditional string.
 		struct {
-			StringDesc* String; ///< Original string.
-			NumberDesc* Begin;   ///< Begin of result string.
-			NumberDesc* End;     ///< End of result string.
-		} SubString; ///< For extract a substring
+			StringDesc* String; /// Original string.
+			NumberDesc* Begin;   /// Begin of result string.
+			NumberDesc* End;     /// End of result string.
+		} SubString; /// For extract a substring
 	} D;
 };
 
@@ -230,8 +230,8 @@ struct _StringDesc_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char* CclStartFile;   ///< CCL start file
-extern int CclInConfigFile;  ///< True while config file parsing
+extern char* CclStartFile;   /// CCL start file
+extern int CclInConfigFile;  /// True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -241,27 +241,27 @@ extern const char* LuaToString(lua_State* l, int narg);
 extern lua_Number LuaToNumber(lua_State* l, int narg);
 extern int LuaToBoolean(lua_State* l, int narg);
 
-extern void CclGarbageCollect(int fast);  ///< Perform garbage collection
-extern void InitCcl(void);                ///< Initialise ccl
-extern void LoadCcl(void);                ///< Load ccl config file
-extern void SaveCcl(CLFile* file);        ///< Save CCL module
-extern void SavePreferences(void);        ///< Save user preferences
-extern int CclCommand(const char* command);///< Execute a ccl command
-extern void CleanCclCredits();            ///< Free Ccl Credits Memory
+extern void CclGarbageCollect(int fast);  /// Perform garbage collection
+extern void InitCcl(void);                /// Initialise ccl
+extern void LoadCcl(void);                /// Load ccl config file
+extern void SaveCcl(CLFile* file);        /// Save CCL module
+extern void SavePreferences(void);        /// Save user preferences
+extern int CclCommand(const char* command);/// Execute a ccl command
+extern void CleanCclCredits();            /// Free Ccl Credits Memory
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State* l, const char *s);
-extern NumberDesc* CclParseNumberDesc(lua_State* l); ///< Parse a number description.
-extern UnitDesc* CclParseUnitDesc(lua_State* l);     ///< Parse a unit description.
-StringDesc* CclParseStringDesc(lua_State* l);        ///< Parse a string description.
+extern NumberDesc* CclParseNumberDesc(lua_State* l); /// Parse a number description.
+extern UnitDesc* CclParseUnitDesc(lua_State* l);     /// Parse a unit description.
+StringDesc* CclParseStringDesc(lua_State* l);        /// Parse a string description.
 
-extern int EvalNumber(const NumberDesc* numberdesc); ///< Evaluate the number.
-extern Unit* EvalUnit(const UnitDesc* unitdesc);     ///< Evaluate the unit.
-char* EvalString(const StringDesc* s);               ///< Evaluate the string.
+extern int EvalNumber(const NumberDesc* numberdesc); /// Evaluate the number.
+extern Unit* EvalUnit(const UnitDesc* unitdesc);     /// Evaluate the unit.
+char* EvalString(const StringDesc* s);               /// Evaluate the string.
 
-void FreeNumberDesc(NumberDesc* number);  ///< Free number description content. (no pointer itself).
-void FreeUnitDesc(UnitDesc* unitdesc);    ///< Free unit description content. (no pointer itself).
-void FreeStringDesc(StringDesc* s);       ///< Frre string description content. (no pointer itself).
+void FreeNumberDesc(NumberDesc* number);  /// Free number description content. (no pointer itself).
+void FreeUnitDesc(UnitDesc* unitdesc);    /// Free unit description content. (no pointer itself).
+void FreeStringDesc(StringDesc* s);       /// Frre string description content. (no pointer itself).
 
 
 //@}

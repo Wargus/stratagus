@@ -243,54 +243,54 @@
 ** Network command input/output queue.
 */
 typedef struct _network_command_queue_ {
-	struct dl_node List[1]; ///< double linked list
-	unsigned long Time;     ///< time to execute
-	unsigned char Type;     ///< Command Type
-	NetworkCommand Data;    ///< command content
+	struct dl_node List[1]; /// double linked list
+	unsigned long Time;     /// time to execute
+	unsigned char Type;     /// Command Type
+	NetworkCommand Data;    /// command content
 } NetworkCommandQueue;
 
 //----------------------------------------------------------------------------
 // Variables
 //----------------------------------------------------------------------------
 
-int NetworkNumInterfaces;                  ///< Network number of interfaces
-Socket NetworkFildes = -1;                 ///< Network file descriptor
-int NetworkInSync = 1;                     ///< Network is in sync
-int NetworkUpdates = 5;                    ///< Network update each # game cycles
-int NetworkLag = 10;                       ///< Network lag in # game cycles
-unsigned long NetworkStatus[PlayerMax];    ///< Network status
-unsigned long NetworkLastFrame[PlayerMax]; ///< Last frame received packet
-int NetworkTimeout = 45;                   ///< Number of seconds until player times out
+int NetworkNumInterfaces;                  /// Network number of interfaces
+Socket NetworkFildes = -1;                 /// Network file descriptor
+int NetworkInSync = 1;                     /// Network is in sync
+int NetworkUpdates = 5;                    /// Network update each # game cycles
+int NetworkLag = 10;                       /// Network lag in # game cycles
+unsigned long NetworkStatus[PlayerMax];    /// Network status
+unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
+int NetworkTimeout = 45;                   /// Number of seconds until player times out
 
-static char NetMsgBuf[PlayerMax][128];     ///< Chat message buffers
-static int NetMsgBufLen[PlayerMax];        ///< Stored chat message length
+static char NetMsgBuf[PlayerMax][128];     /// Chat message buffers
+static int NetMsgBufLen[PlayerMax];        /// Stored chat message length
 #ifdef DEBUG
-unsigned long MyHost;                      ///< My host number.
-int MyPort;                                ///< My port number.
+unsigned long MyHost;                      /// My host number.
+int MyPort;                                /// My port number.
 #endif
-static unsigned long NetworkDelay;         ///< Delay counter for recover.
-static int NetworkSyncSeeds[256];          ///< Network sync seeds.
-static int NetworkSyncHashs[256];          ///< Network sync hashs.
-static NetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; ///< Per-player network packet input queue
-static DL_LIST(CommandsIn);                ///< Network command input queue
-static DL_LIST(MsgCommandsIn);             ///< Network message input queue
+static unsigned long NetworkDelay;         /// Delay counter for recover.
+static int NetworkSyncSeeds[256];          /// Network sync seeds.
+static int NetworkSyncHashs[256];          /// Network sync hashs.
+static NetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
+static DL_LIST(CommandsIn);                /// Network command input queue
+static DL_LIST(MsgCommandsIn);             /// Network message input queue
 
 #ifdef DEBUG
-static int NetworkReceivedPackets;         ///< Packets received packets
-static int NetworkReceivedEarly;           ///< Packets received too early
-static int NetworkReceivedLate;            ///< Packets received too late
-static int NetworkReceivedDups;            ///< Packets received as duplicates
-static int NetworkReceivedLost;            ///< Packets received packet lost
+static int NetworkReceivedPackets;         /// Packets received packets
+static int NetworkReceivedEarly;           /// Packets received too early
+static int NetworkReceivedLate;            /// Packets received too late
+static int NetworkReceivedDups;            /// Packets received as duplicates
+static int NetworkReceivedLost;            /// Packets received packet lost
 
-static int NetworkSendPackets;             ///< Packets send packets
-static int NetworkSendResend;              ///< Packets send to resend
+static int NetworkSendPackets;             /// Packets send packets
+static int NetworkSendResend;              /// Packets send to resend
 #endif
 
-static int PlayerQuit[PlayerMax];          ///< Player quit
+static int PlayerQuit[PlayerMax];          /// Player quit
 
 #define MAX_NCQS 100
-static NetworkCommandQueue NCQs[MAX_NCQS]; ///< NetworkCommandQueues
-static int NumNCQs;                        ///< Number of NCQs in use
+static NetworkCommandQueue NCQs[MAX_NCQS]; /// NetworkCommandQueues
+static int NumNCQs;                        /// Number of NCQs in use
 
 
 //----------------------------------------------------------------------------

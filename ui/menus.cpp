@@ -424,17 +424,17 @@ static int EditorCancelled;
 ServerSetup ServerSetupState;
 ServerSetup LocalSetupState;
 
-static char ScenSelectPath[1024];        ///< Scenario selector path
-static char ScenSelectDisplayPath[1024]; ///< Displayed selector path
-static char ScenSelectFileName[128];     ///< Scenario selector name
+static char ScenSelectPath[1024];        /// Scenario selector path
+static char ScenSelectDisplayPath[1024]; /// Displayed selector path
+static char ScenSelectFileName[128];     /// Scenario selector name
 
-char MenuMapFullPath[1024];              ///< Selected map path+name
+char MenuMapFullPath[1024];              /// Selected map path+name
 
-static char *SaveDir;                    ///< Save game directory
-static char TempPathBuf[PATH_MAX];       ///< Temporary buffer for paths
+static char *SaveDir;                    /// Save game directory
+static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
 
-int nKeyStrokeHelps;                     ///< Number of keystroke help lines
-char **KeyStrokeHelps;                   ///< Array of keystroke help lines
+int nKeyStrokeHelps;                     /// Number of keystroke help lines
+char **KeyStrokeHelps;                   /// Array of keystroke help lines
 
 /// FIXME: -> ccl...
 static unsigned char *mgptsoptions[] = {

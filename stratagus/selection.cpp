@@ -55,14 +55,14 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-int NumSelected;                 ///< Number of selected units
-int TeamNumSelected[PlayerMax];  ///< How many units selected
-int MaxSelectable;               ///< Maximum number of selected units
-Unit** Selected;                 ///< All selected units
-Unit** TeamSelected[PlayerMax];  ///< teams currently selected units
+int NumSelected;                 /// Number of selected units
+int TeamNumSelected[PlayerMax];  /// How many units selected
+int MaxSelectable;               /// Maximum number of selected units
+Unit** Selected;                 /// All selected units
+Unit** TeamSelected[PlayerMax];  /// teams currently selected units
 
 
-static unsigned GroupId;         ///< Unique group # for automatic groups
+static unsigned GroupId;         /// Unique group # for automatic groups
 
 /*----------------------------------------------------------------------------
 -- Functions

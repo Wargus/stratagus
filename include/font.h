@@ -91,13 +91,13 @@ struct _graphic_;
 
 	/// Color font definition
 typedef struct _color_font_ {
-	int  Width;           ///< Max width of characters in file
-	int  Height;          ///< Max height of characters in file
-	char CharWidth[208];  ///< Real font width (starting with ' ')
+	int  Width;           /// Max width of characters in file
+	int  Height;          /// Max height of characters in file
+	char CharWidth[208];  /// Real font width (starting with ' ')
 
 // --- FILLED UP ---
 
-	struct _graphic_* G;  ///< Graphic object used to draw
+	struct _graphic_* G;  /// Graphic object used to draw
 } ColorFont;
 
 /**
@@ -105,14 +105,14 @@ typedef struct _color_font_ {
 **  @todo should be removed
 */
 enum _game_font_ {
-	SmallFont,       ///< Small font used in stats
-	GameFont,        ///< Normal font used in game
-	LargeFont,       ///< Large font used in menus
-	SmallTitleFont,  ///< Small font used in episoden titles
-	LargeTitleFont,  ///< Large font used in episoden titles
+	SmallFont,       /// Small font used in stats
+	GameFont,        /// Normal font used in game
+	LargeFont,       /// Large font used in menus
+	SmallTitleFont,  /// Small font used in episoden titles
+	LargeTitleFont,  /// Large font used in episoden titles
 };
 
-#define MaxFonts 10  ///< Number of fonts supported
+#define MaxFonts 10  /// Number of fonts supported
 
 /**
 **  Color selector for the font functions.

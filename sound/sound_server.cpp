@@ -72,18 +72,18 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int SoundFildes = -1;            ///< audio file descriptor
-int PlayingMusic;                ///< flag true if playing music
-int CallbackMusic;               ///< flag true callback ccl if stops
+int SoundFildes = -1;            /// audio file descriptor
+int PlayingMusic;                /// flag true if playing music
+int CallbackMusic;               /// flag true callback ccl if stops
 
 #ifdef DEBUG
-unsigned AllocatedSoundMemory;   ///< memory used by sound
+unsigned AllocatedSoundMemory;   /// memory used by sound
 #endif
 
-int GlobalVolume = 128;          ///< global sound volume
-int MusicVolume = 128;           ///< music volume
+int GlobalVolume = 128;          /// global sound volume
+int MusicVolume = 128;           /// music volume
 
-int DistanceSilent;              ///< silent distance
+int DistanceSilent;              /// silent distance
 
 // the sound FIFO
 SoundRequest SoundRequests[MAX_SOUND_REQUESTS];

@@ -85,17 +85,17 @@ typedef struct _sample_type_ {
 **  RAW samples.
 */
 struct _sample_ {
-	const SampleType* Type;       ///< Object type dependend
-	void*             User;       ///< Object user data
+	const SampleType* Type;       /// Object type dependend
+	void*             User;       /// Object user data
 
-	unsigned char Channels;       ///< mono or stereo
-	unsigned char SampleSize;     ///< sample size in bits
-	unsigned int Frequency;       ///< frequency in hz
-	unsigned short BitsPerSample; ///< bits in a sample 8/16/32
+	unsigned char Channels;       /// mono or stereo
+	unsigned char SampleSize;     /// sample size in bits
+	unsigned int Frequency;       /// frequency in hz
+	unsigned short BitsPerSample; /// bits in a sample 8/16/32
 
-	unsigned char* Buffer;        ///< sample buffer
-	int Pos;                      ///< buffer position
-	int Len;                      ///< length of filled buffer
+	unsigned char* Buffer;        /// sample buffer
+	int Pos;                      /// buffer position
+	int Len;                      /// length of filled buffer
 };
 
 	/// Free a sample object.
@@ -109,8 +109,8 @@ struct _sample_ {
 **  the annoyed/selected sound system of WC
 */
 typedef struct _two_groups_ {
-	struct _sound_ *First;  ///< first group: selected sound
-	struct _sound_ *Second; ///< second group: annoyed sound
+	struct _sound_ *First;  /// first group: selected sound
+	struct _sound_ *Second; /// second group: annoyed sound
 } TwoGroups;
 
 /**
@@ -140,12 +140,12 @@ typedef struct _sound_ {
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	unsigned char Range;        ///< Range is a multiplier for DistanceSilent
-	unsigned char Number;       ///< single, group, or table of sounds.
+	unsigned char Range;        /// Range is a multiplier for DistanceSilent
+	unsigned char Number;       /// single, group, or table of sounds.
 	union {
-		Sample* OneSound;       ///< if it's only a simple sound
-		Sample** OneGroup;      ///< when it's a simple group
-		TwoGroups* TwoGroups;   ///< when it's a double group
+		Sample* OneSound;       /// if it's only a simple sound
+		Sample** OneGroup;      /// when it's a simple group
+		TwoGroups* TwoGroups;   /// when it's a double group
 	} Sound;
 } Sound;
 
@@ -158,49 +158,49 @@ typedef Sound* ServerSoundId;
 **  Origin of a sound
 */
 typedef struct _origin_ {
-	const void* Base;   ///< pointer on a Unit
-	unsigned Id;        ///< unique identifier (if the pointer has been shared)
+	const void* Base;   /// pointer on a Unit
+	unsigned Id;        /// unique identifier (if the pointer has been shared)
 } Origin;
 
 /**
 **  sound request FIFO
 */
 typedef struct _sound_request {
-	Origin Source;          ///< origin of sound
-	unsigned short Power;   ///< Volume or Distance
-	SoundId Sound;          ///< which sound
-	unsigned Used : 1;      ///< flag for used/unused
-	unsigned Selection : 1; ///< is it a selection sound?
-	unsigned IsVolume : 1;  ///< how to interpret power (as a
-							///<volume or as a distance?)
-	char Stereo;            ///< stereo location of sound (
-							///<-128 left, 0 center, 127 right)
+	Origin Source;          /// origin of sound
+	unsigned short Power;   /// Volume or Distance
+	SoundId Sound;          /// which sound
+	unsigned Used : 1;      /// flag for used/unused
+	unsigned Selection : 1; /// is it a selection sound?
+	unsigned IsVolume : 1;  /// how to interpret power (as a
+							///volume or as a distance?)
+	char Stereo;            /// stereo location of sound (
+							///-128 left, 0 center, 127 right)
 } SoundRequest;
 
-#define MAX_SOUND_REQUESTS 64  ///< maximal number of sound requests
+#define MAX_SOUND_REQUESTS 64  /// maximal number of sound requests
 
-#define MaxChannels 32  ///< How many channels are supported
+#define MaxChannels 32  /// How many channels are supported
 
 	/// Channels for sound effects and unit speach
 typedef struct _sound_channel_
 {
-	unsigned char Command; ///< channel command
-	int Point;             ///< point into sample
-	Sample* Sample;        ///< sample to play
-	Origin Source;         ///< unit playing
-	unsigned char Volume;  ///< Volume of this channel
-	SoundId Sound;         ///< The sound currently played
-	signed char Stereo;    ///< stereo location of sound (-128 left, 0 center, 127 right)
+	unsigned char Command; /// channel command
+	int Point;             /// point into sample
+	Sample* Sample;        /// sample to play
+	Origin Source;         /// unit playing
+	unsigned char Volume;  /// Volume of this channel
+	SoundId Sound;         /// The sound currently played
+	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 } SoundChannel;
 
 /**
 **  Play audio flags.
 */
 enum _play_audio_flags_ {
-	PlayAudioStream = 1,        ///< Stream the file from medium
-	PlayAudioPreLoad = 2,       ///< Load compressed in memory
-	PlayAudioLoadInMemory = 4,  ///< Preload file into memory
-	PlayAudioLoadOnDemand = 8,  ///< Load only if needed.
+	PlayAudioStream = 1,        /// Stream the file from medium
+	PlayAudioPreLoad = 2,       /// Load compressed in memory
+	PlayAudioLoadInMemory = 4,  /// Preload file into memory
+	PlayAudioLoadOnDemand = 8,  /// Load only if needed.
 };
 
 /*----------------------------------------------------------------------------
@@ -225,8 +225,8 @@ extern int NextSoundRequestIn;
 	/// FIFO index out
 extern int NextSoundRequestOut;
 
-#define ChannelFree 0   ///< channel is free
-#define ChannelPlay 3   ///< channel is playing
+#define ChannelFree 0   /// channel is free
+#define ChannelPlay 3   /// channel is playing
 
 	/// All possible sound channels
 extern SoundChannel Channels[MaxChannels];
@@ -238,17 +238,17 @@ extern int NextFreeChannel;
 extern unsigned AllocatedSoundMemory;
 #endif
 
-extern Sample* MusicSample;  ///< Music samples
+extern Sample* MusicSample;  /// Music samples
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern Sample* LoadFlac(const char* name, int flags);   ///< Load a flac file
-extern Sample* LoadWav(const char* name, int flags);    ///< Load a wav file
-extern Sample* LoadVorbis(const char* name, int flags); ///< Load a vorbis file
-extern Sample* LoadMp3(const char* name, int flags);    ///< Load a mp3 file
-extern Sample* LoadMikMod(const char* name, int flags); ///< Load a module file
+extern Sample* LoadFlac(const char* name, int flags);   /// Load a flac file
+extern Sample* LoadWav(const char* name, int flags);    /// Load a wav file
+extern Sample* LoadVorbis(const char* name, int flags); /// Load a vorbis file
+extern Sample* LoadMp3(const char* name, int flags);    /// Load a mp3 file
+extern Sample* LoadMikMod(const char* name, int flags); /// Load a module file
 
 extern int ConvertToStereo32(const char* in, char* out, int frequency,
 	int bitrate, int channels, int bytes);

@@ -39,10 +39,10 @@
 
 	/// Editor is running
 typedef enum _editor_running_state_ {
-	EditorNotRunning = 0,   ///< Not Running
-	EditorStarted = 1,      ///< Editor Enabled at all
-	EditorCommandLine = 2,  ///< Called from Command Line
-	EditorEditing = 4       ///< Editor is fully running
+	EditorNotRunning = 0,   /// Not Running
+	EditorStarted = 1,      /// Editor Enabled at all
+	EditorCommandLine = 2,  /// Called from Command Line
+	EditorEditing = 4       /// Editor is fully running
 } EditorRunningType;
 
 extern EditorRunningType EditorRunning;
@@ -51,22 +51,22 @@ extern EditorRunningType EditorRunning;
 extern char EditorMapLoaded;
 	/// Current editor state type.
 typedef enum _editor_state_type_ {
-	EditorSelecting,  ///< Select
-	EditorEditTile,   ///< Edit tiles
-	EditorEditUnit,   ///< Edit units
-} EditorStateType;    ///< Current editor state
+	EditorSelecting,  /// Select
+	EditorEditTile,   /// Edit tiles
+	EditorEditUnit,   /// Edit units
+} EditorStateType;    /// Current editor state
 	/// Current editor state.
 extern EditorStateType EditorState;
 
 	/// Editor CCL start file
 extern const char* EditorStartFile;
 
-extern char** EditorUnitTypes;  ///< Sorted editor unit-type table
+extern char** EditorUnitTypes;  /// Sorted editor unit-type table
 
-extern int MaxUnitIndex;  ///< Max unit icon draw index
+extern int MaxUnitIndex;  /// Max unit icon draw index
 
-extern char* EditorSelectIcon;  ///< Editor's select icon
-extern char* EditorUnitsIcon;   ///< Editor's units icon
+extern char* EditorSelectIcon;  /// Editor's select icon
+extern char* EditorUnitsIcon;   /// Editor's units icon
 
 /*----------------------------------------------------------------------------
 --  Functions

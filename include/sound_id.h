@@ -43,7 +43,7 @@
 **  Client side representation of the sound id.
 **  Passed to the sound server API.
 */
-typedef void* SoundId;  ///< sound identifier
+typedef void* SoundId;  /// sound identifier
 
 /*----------------------------------------------------------------------------
 --  Variables

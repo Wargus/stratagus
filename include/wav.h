@@ -41,7 +41,7 @@
 //  Define values for WAV format
 //
 
-#define RIFF 0x46464952 ///< "RIFF" chunk names.
+#define RIFF 0x46464952 /// "RIFF" chunk names.
 #define WAVE 0x45564157 /// "WAVE" chunk names.
 #define FMT  0x20746D66 /// "fmt " chunk names.
 #define DATA 0x61746164 /// "data" chunk names.
@@ -71,12 +71,12 @@
 typedef struct __wav_fmt__ {
 	unsigned int   FMTchunk;
 	unsigned int   FMTlength;
-	unsigned short Encoding;       ///< 1 = PCM
-	unsigned short Channels;       ///< 1 = mono, 2 = stereo
-	unsigned int   Frequency;      ///< One of 11025, 22050, or 44100 Hz
-	unsigned int   ByteRate;       ///< Average bytes per second
-	unsigned short SampleSize;     ///< Bytes per sample block
-	unsigned short BitsPerSample;  ///< One of 8, 12, 16
+	unsigned short Encoding;       /// 1 = PCM
+	unsigned short Channels;       /// 1 = mono, 2 = stereo
+	unsigned int   Frequency;      /// One of 11025, 22050, or 44100 Hz
+	unsigned int   ByteRate;       /// Average bytes per second
+	unsigned short SampleSize;     /// Bytes per sample block
+	unsigned short BitsPerSample;  /// One of 8, 12, 16
 } WavFMT;
 
 /**

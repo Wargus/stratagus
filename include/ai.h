@@ -47,23 +47,23 @@ struct _upgrade_;
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int AiSleepCycles;  ///< Ai sleeps # cycles
-extern int AiTimeFactor;   ///< Adjust the AI build times
-extern int AiCostFactor;   ///< Adjust the AI costs
+extern int AiSleepCycles;  /// Ai sleeps # cycles
+extern int AiTimeFactor;   /// Adjust the AI build times
+extern int AiCostFactor;   /// Adjust the AI costs
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void AiEachCycle(struct _player_* player);   ///< Called each game cycle
-extern void AiEachSecond(struct _player_* player);  ///< Called each second
+extern void AiEachCycle(struct _player_* player);   /// Called each game cycle
+extern void AiEachSecond(struct _player_* player);  /// Called each second
 
-extern void InitAiModule(void);       ///< Init AI global structures
-extern void AiInit(struct _player_* player);   ///< Init AI for this player
-extern void CleanAi(void);            ///< Cleanup the AI module
-extern void SaveAi(struct _CL_File_* file);     ///< Save the AI state
+extern void InitAiModule(void);       /// Init AI global structures
+extern void AiInit(struct _player_* player);   /// Init AI for this player
+extern void CleanAi(void);            /// Cleanup the AI module
+extern void SaveAi(struct _CL_File_* file);     /// Save the AI state
 
-extern void AiCclRegister(void);      ///< Register ccl features
+extern void AiCclRegister(void);      /// Register ccl features
 
 /*--------------------------------------------------------
 --  Call Backs/Triggers

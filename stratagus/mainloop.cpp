@@ -86,12 +86,12 @@ enum _scroll_state_ KeyScrollState = ScrollNone;
 enum _scroll_state_ MouseScrollState = ScrollNone;
 
 #if defined(DEBUG)
-jmp_buf MainLoopJmpBuf; ///< Hierarchic pathfinder error exit.
+jmp_buf MainLoopJmpBuf; /// Hierarchic pathfinder error exit.
 #endif
 
-EventCallback* Callbacks;    ///< Current callbacks
-EventCallback GameCallbacks; ///< Game callbacks
-EventCallback MenuCallbacks; ///< Menu callbacks
+EventCallback* Callbacks;    /// Current callbacks
+EventCallback GameCallbacks; /// Game callbacks
+EventCallback MenuCallbacks; /// Menu callbacks
 
 //----------------------------------------------------------------------------
 // Functions

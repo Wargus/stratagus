@@ -2357,7 +2357,7 @@ typedef struct _menu_stack_ {
 	struct _menu_stack_* Next;
 } MenuStack;
 
-MenuStack* Menus;             ///< FIXME : docu
+MenuStack* Menus;             /// FIXME : docu
 
 /**
 ** Push the current menu onto the stack.

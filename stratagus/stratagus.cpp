@@ -230,41 +230,41 @@ extern int CclUnits(lua_State* l);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-TitleScreen** TitleScreens;          ///< Title screens to show at startup
-char* MenuMusic;                     ///< File for menu music
-char* StratagusLibPath;              ///< Path for data directory
-char LocalPlayerName[16];            ///< Name of local player
+TitleScreen** TitleScreens;          /// Title screens to show at startup
+char* MenuMusic;                     /// File for menu music
+char* StratagusLibPath;              /// Path for data directory
+char LocalPlayerName[16];            /// Name of local player
 
 	/// Name, Version, Copyright
 char NameLine[] =
 	"Stratagus V" VERSION ", (c) 1998-2004 by The Stratagus Project.";
 
-static char* MapName;                ///< Filename of the map to load
-char* CompileOptions;                ///< Compile options.
+static char* MapName;                /// Filename of the map to load
+char* CompileOptions;                /// Compile options.
 
 /*----------------------------------------------------------------------------
 --  Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
-int SpeedResourcesHarvest[MaxCosts]; ///< speed factor for harvesting resources
-int SpeedResourcesReturn[MaxCosts];  ///< speed factor for returning resources
-int SpeedBuild = 1;                  ///< speed factor for building
-int SpeedTrain = 1;                  ///< speed factor for training
-int SpeedUpgrade = 1;                ///< speed factor for upgrading
-int SpeedResearch = 1;               ///< speed factor for researching
+int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
+int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
+int SpeedBuild = 1;                  /// speed factor for building
+int SpeedTrain = 1;                  /// speed factor for training
+int SpeedUpgrade = 1;                /// speed factor for upgrading
+int SpeedResearch = 1;               /// speed factor for researching
 
 /*============================================================================
 ==  DISPLAY
 ============================================================================*/
 
-unsigned long GameCycle;             ///< Game simulation cycle counter
-unsigned long FastForwardCycle;      ///< Cycle to fastforward to in a replay
+unsigned long GameCycle;             /// Game simulation cycle counter
+unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 
 /*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;               ///< sync random seed value.
+unsigned SyncRandSeed;               /// sync random seed value.
 
 /**
 **  Inititalize sync rand seed.
@@ -422,9 +422,9 @@ long isqrt(long num)
 ==  MAIN
 ============================================================================*/
 
-static int WaitNoEvent;                      ///< Flag got an event
-static int WaitMouseX;                       ///< Mouse X position
-static int WaitMouseY;                       ///< Mouse Y position
+static int WaitNoEvent;                      /// Flag got an event
+static int WaitMouseX;                       /// Mouse X position
+static int WaitMouseY;                       /// Mouse Y position
 
 /**
 **  Callback for input.

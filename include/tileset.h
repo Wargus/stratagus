@@ -242,11 +242,11 @@
 ----------------------------------------------------------------------------*/
 
 
-extern int TileSizeX; ///< Size of a tile in X
-extern int TileSizeY; ///< Size of a tile in Y
+extern int TileSizeX; /// Size of a tile in X
+extern int TileSizeY; /// Size of a tile in Y
 
 // This is only used for tile cache size
-#define MaxTilesInTileset 5056 ///< Current limit of tiles in tileset
+#define MaxTilesInTileset 5056 /// Current limit of tiles in tileset
 
 /**
 **  These are used for lookup tiles types
@@ -256,99 +256,99 @@ extern int TileSizeY; ///< Size of a tile in Y
 **  I'm not sure, if we have seen and real time to considere.
 */
 typedef enum _tile_type_ {
-	TileTypeUnknown,    ///< Unknown tile type
-	TileTypeWood,       ///< Any wood tile
-	TileTypeRock,       ///< Any rock tile
-	TileTypeCoast,      ///< Any coast tile
-	TileTypeHumanWall,  ///< Any human wall tile
-	TileTypeOrcWall,    ///< Any orc wall tile
-	TileTypeWater,      ///< Any water tile
+	TileTypeUnknown,    /// Unknown tile type
+	TileTypeWood,       /// Any wood tile
+	TileTypeRock,       /// Any rock tile
+	TileTypeCoast,      /// Any coast tile
+	TileTypeHumanWall,  /// Any human wall tile
+	TileTypeOrcWall,    /// Any orc wall tile
+	TileTypeWater,      /// Any water tile
 } TileType;
 
 	/// Single tile definition
 typedef struct _tile_info_ {
-	unsigned char BaseTerrain; ///< Basic terrain of the tile
-	unsigned char MixTerrain;  ///< Terrain mixed with this
+	unsigned char BaseTerrain; /// Basic terrain of the tile
+	unsigned char MixTerrain;  /// Terrain mixed with this
 } TileInfo;
 
 	/// Definition for a terrain type
 typedef struct _solid_terrain_info_ {
-	char* TerrainName;  ///< Name of the terrain
-	int NumSolidTiles;  ///< How many solid tile variants
+	char* TerrainName;  /// Name of the terrain
+	int NumSolidTiles;  /// How many solid tile variants
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
-	unsigned short* SolidTiles; ///< Solid tile IDs
+	unsigned short* SolidTiles; /// Solid tile IDs
 } SolidTerrainInfo;
 
 	/// Tileset definition
 typedef struct _tileset_ {
-	char* Ident;     ///< Tileset identifier
-	char* File;      ///< CCL file containing tileset data
-	char* Class;     ///< Class for future extensions
-	char* Name;      ///< Nice name to display
-	char* ImageFile; ///< File containing image data
+	char* Ident;     /// Tileset identifier
+	char* File;      /// CCL file containing tileset data
+	char* Class;     /// Class for future extensions
+	char* Name;      /// Nice name to display
+	char* ImageFile; /// File containing image data
 
-	int NumTiles;               ///< Number of tiles in the tables
-	int TileSizeX;              ///< Size of a tile in X
-	int TileSizeY;              ///< Size of a tile in Y
-	unsigned short* Table;      ///< Pud to internal conversion table
-	unsigned short* FlagsTable; ///< Flag table for editor
+	int NumTiles;               /// Number of tiles in the tables
+	int TileSizeX;              /// Size of a tile in X
+	int TileSizeY;              /// Size of a tile in Y
+	unsigned short* Table;      /// Pud to internal conversion table
+	unsigned short* FlagsTable; /// Flag table for editor
 
-	TileInfo* Tiles; ///< Tile descriptions
+	TileInfo* Tiles; /// Tile descriptions
 
 
 	// TODO: currently hardcoded
-	unsigned char* TileTypeTable;   ///< For fast lookup of tile type
+	unsigned char* TileTypeTable;   /// For fast lookup of tile type
 	// TODO: currently unsupported
-	unsigned short* AnimationTable; ///< Tile animation sequences
+	unsigned short* AnimationTable; /// Tile animation sequences
 
-	int NumTerrainTypes;                 ///< Number of different terrain types
-	SolidTerrainInfo* SolidTerrainTypes; ///< Information about solid terrains.
+	int NumTerrainTypes;                 /// Number of different terrain types
+	SolidTerrainInfo* SolidTerrainTypes; /// Information about solid terrains.
 
-	unsigned TopOneTree;     ///< Tile for one tree top
-	unsigned MidOneTree;     ///< Tile for one tree middle
-	unsigned BotOneTree;     ///< Tile for one tree bottom
-	int RemovedTree;         ///< Tile placed where trees are gone
-	unsigned GrowingTree[2]; ///< Growing tree tiles
-	int WoodTable[20];       ///< Table for tree removable
-	int MixedLookupTable[MaxTilesInTileset]; ///< Lookup for what part of tile used
-	unsigned TopOneRock;    ///< Tile for one rock top
-	unsigned MidOneRock;    ///< Tile for one rock middle
-	unsigned BotOneRock;    ///< Tile for one rock bottom
-	int RemovedRock;        ///< Tile placed where rocks are gone
-	int RockTable[20];      ///< Removed rock placement table
+	unsigned TopOneTree;     /// Tile for one tree top
+	unsigned MidOneTree;     /// Tile for one tree middle
+	unsigned BotOneTree;     /// Tile for one tree bottom
+	int RemovedTree;         /// Tile placed where trees are gone
+	unsigned GrowingTree[2]; /// Growing tree tiles
+	int WoodTable[20];       /// Table for tree removable
+	int MixedLookupTable[MaxTilesInTileset]; /// Lookup for what part of tile used
+	unsigned TopOneRock;    /// Tile for one rock top
+	unsigned MidOneRock;    /// Tile for one rock middle
+	unsigned BotOneRock;    /// Tile for one rock bottom
+	int RemovedRock;        /// Tile placed where rocks are gone
+	int RockTable[20];      /// Removed rock placement table
 
-	unsigned HumanWallTable[16];    ///< Human wall placement table
-	unsigned OrcWallTable[16];      ///< Orc wall placement table
+	unsigned HumanWallTable[16];    /// Human wall placement table
+	unsigned OrcWallTable[16];      /// Orc wall placement table
 
-	hashtable(char*, 128) ItemsHash;///< Items hash table
+	hashtable(char*, 128) ItemsHash;/// Items hash table
 } Tileset;
 
 /// @todo this #define's should be removed
 
 enum _tileset_nr_ {
-	TilesetSummer,      ///< Reference number for summer
-	TilesetWinter,      ///< Reference number for winter
-	TilesetWasteland,   ///< Reference number for wasteland
-	TilesetSwamp,       ///< Reference number for swamp
+	TilesetSummer,      /// Reference number for summer
+	TilesetWinter,      /// Reference number for winter
+	TilesetWasteland,   /// Reference number for wasteland
+	TilesetSwamp,       /// Reference number for swamp
 };
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char** TilesetWcNames; ///< Mapping wc-number 2 symbol
+extern char** TilesetWcNames; /// Mapping wc-number 2 symbol
 
-extern int NumTilesets;     ///< Number of available tilesets
-extern Tileset** Tilesets;  ///< Tileset information
+extern int NumTilesets;     /// Number of available tilesets
+extern Tileset** Tilesets;  /// Tileset information
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void LoadTileset(void);   ///< Load tileset definition
-extern void CleanTilesets(void); ///< Cleanup the tileset module
+extern void LoadTileset(void);   /// Load tileset definition
+extern void CleanTilesets(void); /// Cleanup the tileset module
 
-extern void TilesetCclRegister(void); ///< Register CCL features for tileset
+extern void TilesetCclRegister(void); /// Register CCL features for tileset
 
 //@}
 

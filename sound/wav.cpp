@@ -54,8 +54,8 @@
 **  Private wav data structure to handle wav streaming.
 */
 typedef struct _wav_data_ {
-	CLFile* WavFile;      ///< Wav file handle
-	int ChunkRem;         ///< Bytes remaining in chunk
+	CLFile* WavFile;      /// Wav file handle
+	int ChunkRem;         /// Bytes remaining in chunk
 } WavData;
 
 /*----------------------------------------------------------------------------

@@ -80,20 +80,20 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-lua_State* Lua;                       ///< Structure to work with lua files.
+lua_State* Lua;                       /// Structure to work with lua files.
 
-char* CclStartFile;                   ///< CCL start file
-char* GameName;                       ///< Game Preferences
-int CclInConfigFile;                  ///< True while config file parsing
-int SaveGameLoading;                  ///< If a Saved Game is Loading
+char* CclStartFile;                   /// CCL start file
+char* GameName;                       /// Game Preferences
+int CclInConfigFile;                  /// True while config file parsing
+int SaveGameLoading;                  /// If a Saved Game is Loading
 
-char* Tips[MAX_TIPS + 1];             ///< Array of tips
-int ShowTips;                         ///< Show tips at start of level
-int CurrentTip;                       ///< Current tip to display
-int NoRandomPlacementMultiplayer = 0; ///< Disable the random placement of players in muliplayer mode
+char* Tips[MAX_TIPS + 1];             /// Array of tips
+int ShowTips;                         /// Show tips at start of level
+int CurrentTip;                       /// Current tip to display
+int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-char UseHPForXp = 0;                  ///< true if gain XP by dealing damage, false if by killing.
-NumberDesc* Damage;                   ///< Damage calculation for missile.
+char UseHPForXp = 0;                  /// true if gain XP by dealing damage, false if by killing.
+NumberDesc* Damage;                   /// Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions

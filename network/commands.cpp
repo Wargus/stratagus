@@ -135,13 +135,13 @@ typedef struct _full_replay_ {
 // Variables
 //----------------------------------------------------------------------------
 
-int CommandLogDisabled;            ///< True if command log is off
-ReplayType ReplayGameType;         ///< Replay game type
-static int DisabledLog;            ///< Disabled log for replay
-static int DisabledShowTips;       ///< Disabled show tips
-static CLFile* LogFile;            ///< Replay log file
-static unsigned long NextLogCycle; ///< Next log cycle number
-static int InitReplay;             ///< Initialize replay
+int CommandLogDisabled;            /// True if command log is off
+ReplayType ReplayGameType;         /// Replay game type
+static int DisabledLog;            /// Disabled log for replay
+static int DisabledShowTips;       /// Disabled show tips
+static CLFile* LogFile;            /// Replay log file
+static unsigned long NextLogCycle; /// Next log cycle number
+static int InitReplay;             /// Initialize replay
 static FullReplay* CurrentReplay;
 static LogEntry* ReplayStep;
 

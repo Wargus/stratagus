@@ -57,10 +57,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-_AnimationsHash AnimationsHash;      ///< Animations hash table
-_NewAnimationsHash NewAnimationsHash;///< NewAnimations hash table
+_AnimationsHash AnimationsHash;      /// Animations hash table
+_NewAnimationsHash NewAnimationsHash;/// NewAnimations hash table
 
-struct _UnitTypeVar_ UnitTypeVar;    ///< Variables for UnitType and unit.
+struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
 
 #define MAX_LABELS 20
 #define MAX_LABEL_LENGTH 256

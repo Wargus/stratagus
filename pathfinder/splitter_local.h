@@ -39,31 +39,31 @@
 typedef struct _region_line_ RegionSegment;
 
 struct _region_line_{
-	int           Y;          ///< y pos of the line
-	int           MinX, MaxX; ///< X bounds (including)
-	RegionSegment *Prev;      ///< previous in region
-	RegionSegment *Next;      ///< Next in region
+	int           Y;          /// y pos of the line
+	int           MinX, MaxX; /// X bounds (including)
+	RegionSegment *Prev;      /// previous in region
+	RegionSegment *Next;      /// Next in region
 };
 
 typedef struct _region_definition_{
-	int TileCount;          ///< Nb of tile assigned to it
-	int MinX, MinY;         ///< Upper left corner
-	int MaxX, MaxY;         ///< Bottom right corner
+	int TileCount;          /// Nb of tile assigned to it
+	int MinX, MinY;         /// Upper left corner
+	int MaxX, MaxY;         /// Bottom right corner
 
-	long SumX, SumY;        ///< May limit map to ~512x512
+	long SumX, SumY;        /// May limit map to ~512x512
 
 	int ConnectionsNumber;
 	int* Connections;
 	int* ConnectionsCount;
 
-	int Color;                   ///< For debugging only.
+	int Color;                   /// For debugging only.
 
-	char IsWater;                ///< This region is water ?
-	int Dirty;                   ///< Should be checked for split & joins ?
-	char NeedConnectTest;        ///< Do we need to test connection for this region ?
-	RegionSegment* FirstSegment; ///< All lines. ( double linked list )
+	char IsWater;                /// This region is water ?
+	int Dirty;                   /// Should be checked for split & joins ?
+	char NeedConnectTest;        /// Do we need to test connection for this region ?
+	RegionSegment* FirstSegment; /// All lines. ( double linked list )
 	RegionSegment* LastSegment;
-	int Zone;                    ///< 8-connex tile zone
+	int Zone;                    /// 8-connex tile zone
 } RegionDefinition;
 
 typedef struct {

@@ -61,8 +61,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int SoundOff; ///< True quiet, sound turned off
-int MusicOff; ///< Music turned off
+int SoundOff; /// True quiet, sound turned off
+int MusicOff; /// Music turned off
 
 /**
 **  Various sounds used in game.

@@ -533,28 +533,28 @@ struct _construction_;
 **  Defines the animation for different actions.
 */
 typedef struct _animation_ {
-	unsigned char Flags;            ///< Flags for actions
-	signed char   Pixel;            ///< Change the position in pixels
-	unsigned char Sleep;            ///< Wait for next animation
-	int           Frame;            ///< Sprite-frame to display
+	unsigned char Flags;            /// Flags for actions
+	signed char   Pixel;            /// Change the position in pixels
+	unsigned char Sleep;            /// Wait for next animation
+	int           Frame;            /// Sprite-frame to display
 } Animation;
 
-#define AnimationRestart  1         ///< Restart animation
-#define AnimationReset    2         ///< Animation could here be aborted
-#define AnimationSound    4         ///< Play sound
-#define AnimationMissile  8         ///< Fire projectil
-#define AnimationEnd      0x80      ///< Animation end in memory
+#define AnimationRestart  1         /// Restart animation
+#define AnimationReset    2         /// Animation could here be aborted
+#define AnimationSound    4         /// Play sound
+#define AnimationMissile  8         /// Fire projectil
+#define AnimationEnd      0x80      /// Animation end in memory
 
 /**
 **  Define all animations scripts of an unittype.
 */
 typedef struct _animations_ {
-	Animation*  Still;              ///< Standing still
-	Animation*  Move;               ///< Unit moving
-	Animation*  Attack;             ///< Unit attacking/working
-	Animation*  Repair;             ///< Unit repairing
-	Animation*  Harvest[MaxCosts];  ///< Unit harvesting
-	Animation*  Die;                ///< Unit dying
+	Animation*  Still;              /// Standing still
+	Animation*  Move;               /// Unit moving
+	Animation*  Attack;             /// Unit attacking/working
+	Animation*  Repair;             /// Unit repairing
+	Animation*  Harvest[MaxCosts];  /// Unit harvesting
+	Animation*  Die;                /// Unit dying
 } Animations;
 
 typedef enum _new_animation_type_ {
@@ -662,28 +662,28 @@ extern _NewAnimationsHash NewAnimationsHash;
 **  @todo Move this to missle.h?
 */
 typedef struct _missile_config_ {
-	char*        Name;              ///< Config missile name
-	MissileType* Missile;           ///< Identifier to use to run time
+	char*        Name;              /// Config missile name
+	MissileType* Missile;           /// Identifier to use to run time
 } MissileConfig;
 
 typedef struct _resource_info_ {
-	char*    FileWhenLoaded;        ///< Change the graphic when the unit is loaded.
-	char*    FileWhenEmpty;         ///< Change the graphic when the unit is empty.
-	unsigned HarvestFromOutside;    ///< Unit harvests without entering the building.
-	unsigned WaitAtResource;        ///< Cycles the unit waits while mining.
-	unsigned ResourceStep;          ///< Resources the unit gains per mining cycle.
-	int      ResourceCapacity;      ///< Max amount of resources to carry.
-	unsigned WaitAtDepot;           ///< Cycles the unit waits while returning.
-	unsigned ResourceId;            ///< Id of the resource harvested. Redundant.
-	unsigned FinalResource;         ///< Convert resource when delivered.
-	unsigned TerrainHarvester;      ///< Unit will harvest terrain(wood only for now).
-	unsigned LoseResources;         ///< The unit will lose it's resource when distracted.
+	char*    FileWhenLoaded;        /// Change the graphic when the unit is loaded.
+	char*    FileWhenEmpty;         /// Change the graphic when the unit is empty.
+	unsigned HarvestFromOutside;    /// Unit harvests without entering the building.
+	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
+	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
+	int      ResourceCapacity;      /// Max amount of resources to carry.
+	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
+	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
+	unsigned FinalResource;         /// Convert resource when delivered.
+	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
+	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	struct _graphic_* SpriteWhenLoaded; ///< The graphic corresponding to FileWhenLoaded.
-	struct _graphic_* SpriteWhenEmpty;  ///< The graphic corresponding to FileWhenEmpty
+	struct _graphic_* SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	struct _graphic_* SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 #ifdef USE_OPENGL
-	struct _graphic_* PlayerColorSpriteWhenLoaded[PlayerMax]; ///< Sprites with player colors
-	struct _graphic_* PlayerColorSpriteWhenEmpty[PlayerMax];  ///< Sprites with player colors
+	struct _graphic_* PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
+	struct _graphic_* PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
 #endif
 } ResourceInfo;
 
@@ -694,10 +694,10 @@ typedef struct _resource_info_ {
 **  to manage magic, energy, shield or other stuff.
 */
 typedef struct _variable_type_ {
-	int Max;           ///< Maximum for the variable. (Assume min is 0.)
-	int Value;         ///< Current (or initial) value of the variable (or initial value).
-	char Increase;     ///< Number to increase(decrease) Value by second.
-	char Enable;       ///< True if the unit doesn't have this variable. (f.e shield)
+	int Max;           /// Maximum for the variable. (Assume min is 0.)
+	int Value;         /// Current (or initial) value of the variable (or initial value).
+	char Increase;     /// Number to increase(decrease) Value by second.
+	char Enable;       /// True if the unit doesn't have this variable. (f.e shield)
 } VariableType;
 
 // Index for boolflag aready defined
@@ -769,57 +769,57 @@ typedef void DrawDecoFunc(int x, int y, const struct _unit_* unit,
 **  @todo add more stuff in this struct.
 */
 typedef struct _decovartype_ {
-	int Index;                  ///< Index of the variable. @see DefineVariables
+	int Index;                  /// Index of the variable. @see DefineVariables
 
-	int OffsetX;                ///< Offset in X coord.
-	int OffsetY;                ///< Offset in Y coord.
+	int OffsetX;                /// Offset in X coord.
+	int OffsetY;                /// Offset in Y coord.
 
-	int OffsetXPercent;         ///< Percent offset (TileWidth) in X coord.
-	int OffsetYPercent;         ///< Percent offset (TileHeight) in Y coord.
+	int OffsetXPercent;         /// Percent offset (TileWidth) in X coord.
+	int OffsetYPercent;         /// Percent offset (TileHeight) in Y coord.
 
-	char IsCenteredInX;         ///< if true, use center of deco instead of left border
-	char IsCenteredInY;         ///< if true, use center of deco instead of upper border
+	char IsCenteredInX;         /// if true, use center of deco instead of left border
+	char IsCenteredInY;         /// if true, use center of deco instead of upper border
 
-	char ShowIfNotEnable;       ///< if false, Show only if var is enable
-	char ShowWhenNull;          ///< if false, don't show if var is null (F.E poison)
-	char HideHalf;              ///< if true, don't show when 0 < var < max.
-	char ShowWhenMax;           ///< if false, don't show if var is to max. (Like mana)
-	char ShowOnlySelected;      ///< if true, show only for selected units.
+	char ShowIfNotEnable;       /// if false, Show only if var is enable
+	char ShowWhenNull;          /// if false, don't show if var is null (F.E poison)
+	char HideHalf;              /// if true, don't show when 0 < var < max.
+	char ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
+	char ShowOnlySelected;      /// if true, show only for selected units.
 
-	char HideNeutral;           ///< if true, don't show for neutral unit.
-	char HideAllied;            ///< if true, don't show for allied unit. (but show own units)
-	char ShowOpponent;          ///< if true, show for opponent unit.
+	char HideNeutral;           /// if true, don't show for neutral unit.
+	char HideAllied;            /// if true, don't show for allied unit. (but show own units)
+	char ShowOpponent;          /// if true, show for opponent unit.
 
-	DrawDecoFunc* f;            ///< function to draw the decorations.
+	DrawDecoFunc* f;            /// function to draw the decorations.
 	union {
 		struct {
-			char IsVertical;            ///< if true, vertical bar, else horizontal.
-			char SEToNW;                ///< (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
-			int Height;                 ///< Height of the bar.
-			int Width;                  ///< Width of the bar.
-			char ShowFullBackground;    ///< if true, show background like value equal to max.
-			char BorderSize;            ///< Size of the border, 0 for no border.
+			char IsVertical;            /// if true, vertical bar, else horizontal.
+			char SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
+			int Height;                 /// Height of the bar.
+			int Width;                  /// Width of the bar.
+			char ShowFullBackground;    /// if true, show background like value equal to max.
+			char BorderSize;            /// Size of the border, 0 for no border.
 // FIXME color depend of percent (red, Orange, Yellow, Green...)
-			Uint32 Color;               ///< Color of bar.
-			Uint32 BColor;              ///< Color of background.
-		} Bar; ///< Use for Horizontal and vertical Bar.
+			Uint32 Color;               /// Color of bar.
+			Uint32 BColor;              /// Color of background.
+		} Bar; /// Use for Horizontal and vertical Bar.
 
 		struct {
-			int Font;                   ///< Font to use to display value.
+			int Font;                   /// Font to use to display value.
 // FIXME : Add Color, format
-		} Text; ///< Use for info text.
+		} Text; /// Use for info text.
 
 		struct {
-			char NSprite;                ///< Index of nuber. (@see DefineSprites and @see GetSpriteIndex)
+			char NSprite;                /// Index of nuber. (@see DefineSprites and @see GetSpriteIndex)
 // FIXME Sprite info. better way ?
-		} SpriteBar; ///< Use for extra info for sprite. Sprite contains frame from full (left)to empty state (right).
+		} SpriteBar; /// Use for extra info for sprite. Sprite contains frame from full (left)to empty state (right).
 
 		struct {
 // FIXME Sprite info. and Replace n with more appropriate var.
-			int n;                      ///< identifiant in SpellSprite
-		} StaticSprite; ///< use to show specific frame in a sprite.
+			int n;                      /// identifiant in SpellSprite
+		} StaticSprite; /// use to show specific frame in a sprite.
 // FIXME : other method here.
-	} Data;         ///< More Datas, depend of showing method
+	} Data;         /// More Datas, depend of showing method
 
 } DecoVarType;
 
@@ -832,7 +832,7 @@ typedef struct _building_restrictions_ BuildRestriction;
 
 struct _building_restrictions_ {
 	enum {
-		RestrictAddOn,          ///< We are refereing to the following restriction
+		RestrictAddOn,          /// We are refereing to the following restriction
 		RestrictOnTop,
 		RestrictDistance,
 		RestrictDirection,
@@ -841,21 +841,21 @@ struct _building_restrictions_ {
 
 	union {
 		struct {
-			int OffsetX;         ///< offset from the main building to place this
-			int OffsetY;         ///< offset from the main building to place this
-			char* ParentName;    ///< building that is unit is an addon too.
-			UnitType* Parent;    ///< building that is unit is an addon too.
+			int OffsetX;         /// offset from the main building to place this
+			int OffsetY;         /// offset from the main building to place this
+			char* ParentName;    /// building that is unit is an addon too.
+			UnitType* Parent;    /// building that is unit is an addon too.
 		} AddOn;
 
 		struct {
 			UnitType* Parent;
-			char* ParentName;    ///< building that is unit is an addon too.
-			int ReplaceOnDie;    ///< recreate the parent on destruction
-			int ReplaceOnBuild;  ///< remove the parent, or just build over it.
+			char* ParentName;    /// building that is unit is an addon too.
+			int ReplaceOnDie;    /// recreate the parent on destruction
+			int ReplaceOnBuild;  /// remove the parent, or just build over it.
 		} OnTop;
 		
 		struct {
-			int Distance;        ///< distance to build (circle)
+			int Distance;        /// distance to build (circle)
 			enum {
 				Equal,
 				NotEqual,
@@ -864,16 +864,16 @@ struct _building_restrictions_ {
 				GreaterThan,
 				GreaterThanEqual,
 			} DistanceType;
-			int Except;          ///< all except this building type.
+			int Except;          /// all except this building type.
 			char* RestrictTypeName; 
 			UnitType* RestrictType; 
 		} Distance;
 
-		int Direction;           ///< Direction mask up,down,left,right,up-left...
+		int Direction;           /// Direction mask up,down,left,right,up-left...
 
 		struct {
-			int Number;          ///< All tiles, or just 1-n,  0 is all as you don't have a rule otherwise
-			int Mask;            ///< Tile mask required
+			int Number;          /// All tiles, or just 1-n,  0 is all as you don't have a rule otherwise
+			int Mask;            /// Tile mask required
 		} Tiles;
 	} Data;
 	BuildRestriction* Next;
@@ -885,140 +885,140 @@ struct _building_restrictions_ {
 ** @todo n0body: AutoBuildRate not implemented.
 */
 struct _unit_type_ {
-	char* Ident;                    ///< Identifier
-	char* Name;                     ///< Pretty name shown from the engine
-	int Slot;                       ///< Type as number
-	char* File[TilesetMax];         ///< Sprite files
-	char* ShadowFile;               ///< Shadow file
+	char* Ident;                    /// Identifier
+	char* Name;                     /// Pretty name shown from the engine
+	int Slot;                       /// Type as number
+	char* File[TilesetMax];         /// Sprite files
+	char* ShadowFile;               /// Shadow file
 
-	int Width;                      ///< Sprite width
-	int Height;                     ///< Sprite height
-	int OffsetX;                    ///< Sprite horizontal offset
-	int OffsetY;                    ///< Sprite vertical offset
-	int DrawLevel;                  ///< Level to Draw UnitType at
-	int ShadowWidth;                ///< Shadow sprite width
-	int ShadowHeight;               ///< Shadow sprite height
-	int ShadowOffsetX;              ///< Shadow horizontal offset
-	int ShadowOffsetY;              ///< Shadow vertical offset
+	int Width;                      /// Sprite width
+	int Height;                     /// Sprite height
+	int OffsetX;                    /// Sprite horizontal offset
+	int OffsetY;                    /// Sprite vertical offset
+	int DrawLevel;                  /// Level to Draw UnitType at
+	int ShadowWidth;                /// Shadow sprite width
+	int ShadowHeight;               /// Shadow sprite height
+	int ShadowOffsetX;              /// Shadow horizontal offset
+	int ShadowOffsetY;              /// Shadow vertical offset
 
-	Animations* Animations;         ///< Animation scripts
-	NewAnimations* NewAnimations;   ///< NewAnimation scripts
+	Animations* Animations;         /// Animation scripts
+	NewAnimations* NewAnimations;   /// NewAnimation scripts
 
-	IconConfig Icon;                ///< Icon to display for this unit
-	MissileConfig Missile;          ///< Missile weapon
-	MissileConfig Explosion;        ///< Missile for unit explosion
+	IconConfig Icon;                /// Icon to display for this unit
+	MissileConfig Missile;          /// Missile weapon
+	MissileConfig Explosion;        /// Missile for unit explosion
 
-	char* CorpseName;               ///< Corpse type name
-	UnitType* CorpseType;           ///< Corpse unit-type
-	int CorpseScript;               ///< Corpse script start
+	char* CorpseName;               /// Corpse type name
+	UnitType* CorpseType;           /// Corpse unit-type
+	int CorpseScript;               /// Corpse script start
 
 	// this is taken from the UDTA section
-	struct _construction_* Construction; ///< What is shown in construction phase
-	int RadarRange;                 ///< Range of radar if any
-	int RadarJammerRange;           ///< Range of radar jamming if any
-	int _HitPoints;                 ///< Maximum hit points
+	struct _construction_* Construction; /// What is shown in construction phase
+	int RadarRange;                 /// Range of radar if any
+	int RadarJammerRange;           /// Range of radar jamming if any
+	int _HitPoints;                 /// Maximum hit points
 
-	int _Costs[MaxCosts];           ///< How many resources needed
-	int RepairHP;                   ///< Amount of HP per repair
-	int RepairCosts[MaxCosts];      ///< How much it costs to repair
+	int _Costs[MaxCosts];           /// How many resources needed
+	int RepairHP;                   /// Amount of HP per repair
+	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	int TileWidth;                  ///< Tile size on map width
-	int TileHeight;                 ///< Tile size on map height
-	int BoxWidth;                   ///< Selected box size width
-	int BoxHeight;                  ///< Selected box size height
-	int NumDirections;              ///< Number of directions unit can face
-	int MinAttackRange;             ///< Minimal attack range
-	int ReactRangeComputer;         ///< Reacts on enemy for computer
-	int ReactRangePerson;           ///< Reacts on enemy for person player
-	int Priority;                   ///< Priority value / AI Treatment
-	int BurnPercent;                ///< Burning percent.
-	int BurnDamageRate;             ///< HP burn rate per sec
-	int RepairRange;                ///< Units repair range.
-	char* CanCastSpell;             ///< Unit is able to use spells.
-	char* AutoCastActive;           ///< Default value for autocast.
-	int AutoBuildRate;              ///< The rate at which the building builds itself
-	int RandomMovementProbability;  ///< Probability to move randomly.
-	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
-	char* CanTransport;             ///< Can transport units with this flag.
-	int MaxOnBoard;                 ///< Number of Transporter slots.
-	int StartingResources;          ///< Amount of Resources on build
+	int TileWidth;                  /// Tile size on map width
+	int TileHeight;                 /// Tile size on map height
+	int BoxWidth;                   /// Selected box size width
+	int BoxHeight;                  /// Selected box size height
+	int NumDirections;              /// Number of directions unit can face
+	int MinAttackRange;             /// Minimal attack range
+	int ReactRangeComputer;         /// Reacts on enemy for computer
+	int ReactRangePerson;           /// Reacts on enemy for person player
+	int Priority;                   /// Priority value / AI Treatment
+	int BurnPercent;                /// Burning percent.
+	int BurnDamageRate;             /// HP burn rate per sec
+	int RepairRange;                /// Units repair range.
+	char* CanCastSpell;             /// Unit is able to use spells.
+	char* AutoCastActive;           /// Default value for autocast.
+	int AutoBuildRate;              /// The rate at which the building builds itself
+	int RandomMovementProbability;  /// Probability to move randomly.
+	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
+	char* CanTransport;             /// Can transport units with this flag.
+	int MaxOnBoard;                 /// Number of Transporter slots.
+	int StartingResources;          /// Amount of Resources on build
 	/// @note original only visual effect, we do more with this!
 	enum {
-		UnitTypeLand,               ///< Unit lives on land
-		UnitTypeFly,                ///< Unit lives in air
-		UnitTypeNaval,              ///< Unit lives on water
-	} UnitType;                     ///< Land / fly / naval
-	int DecayRate;                  ///< Decay rate in 1/6 seconds
+		UnitTypeLand,               /// Unit lives on land
+		UnitTypeFly,                /// Unit lives in air
+		UnitTypeNaval,              /// Unit lives on water
+	} UnitType;                     /// Land / fly / naval
+	int DecayRate;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
-	int AnnoyComputerFactor;        ///< How much this annoys the computer
-	int MouseAction;                ///< Right click action
-#define MouseActionNone      0      ///< Nothing
-#define MouseActionAttack    1      ///< Attack
-#define MouseActionMove      2      ///< Move
-#define MouseActionHarvest   3      ///< Harvest resources
-#define MouseActionSpellCast 5      ///< Cast the first spell known
-#define MouseActionSail      6      ///< Sail
-	int Points;                     ///< How many points you get for unit
-	int CanTarget;                  ///< Which units can it attack
-#define CanTargetLand 1             ///< Can attack land units
-#define CanTargetSea  2             ///< Can attack sea units
-#define CanTargetAir  4             ///< Can attack air units
+	int AnnoyComputerFactor;        /// How much this annoys the computer
+	int MouseAction;                /// Right click action
+#define MouseActionNone      0      /// Nothing
+#define MouseActionAttack    1      /// Attack
+#define MouseActionMove      2      /// Move
+#define MouseActionHarvest   3      /// Harvest resources
+#define MouseActionSpellCast 5      /// Cast the first spell known
+#define MouseActionSail      6      /// Sail
+	int Points;                     /// How many points you get for unit
+	int CanTarget;                  /// Which units can it attack
+#define CanTargetLand 1             /// Can attack land units
+#define CanTargetSea  2             /// Can attack sea units
+#define CanTargetAir  4             /// Can attack air units
 
-	unsigned Flip : 1;              ///< Flip image when facing left
-	unsigned Revealer : 1;          ///< reveal the fog of war
-	unsigned LandUnit : 1;          ///< Land animated
-	unsigned AirUnit : 1;           ///< Air animated
-	unsigned SeaUnit : 1;           ///< Sea animated
-	unsigned ExplodeWhenKilled : 1; ///< Death explosion animated
-	unsigned Building : 1;          ///< Building
-	unsigned VisibleUnderFog : 1;   ///< Unit is visible under fog of war.
-	unsigned PermanentCloak : 1;    ///< Is only visible by CloakDetectors.
-	unsigned DetectCloak : 1;       ///< Can see Cloaked units.
-	unsigned Coward : 1;            ///< Unit will only attack if instructed.
-	unsigned AttackFromTransporter : 1;  ///< Can attack from transporter
-	unsigned Vanishes : 1;          ///< Corpes & destroyed places.
-	unsigned GroundAttack : 1;      ///< Can do command ground attack.
-	unsigned ShoreBuilding : 1;     ///< Building must be build on coast.
-	unsigned CanAttack : 1;         ///< Unit can attack.
-	unsigned BuilderOutside : 1;    ///< The builder stays outside during the build.
-	unsigned BuilderLost : 1;       ///< The builder is lost after the build.
-	unsigned CanHarvest : 1;        ///< Resource can be harvested.
-	unsigned Harvester : 1;         ///< unit is a resource harvester.
-	unsigned char* BoolFlag;        ///< User defined flag. Used for (dis)allow target.
-	VariableType* Variable;         ///< Array of user defined variables.
-	unsigned char* CanTargetFlag;   ///< Flag needed to target with missile.
+	unsigned Flip : 1;              /// Flip image when facing left
+	unsigned Revealer : 1;          /// reveal the fog of war
+	unsigned LandUnit : 1;          /// Land animated
+	unsigned AirUnit : 1;           /// Air animated
+	unsigned SeaUnit : 1;           /// Sea animated
+	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
+	unsigned Building : 1;          /// Building
+	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
+	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
+	unsigned DetectCloak : 1;       /// Can see Cloaked units.
+	unsigned Coward : 1;            /// Unit will only attack if instructed.
+	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
+	unsigned Vanishes : 1;          /// Corpes & destroyed places.
+	unsigned GroundAttack : 1;      /// Can do command ground attack.
+	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
+	unsigned CanAttack : 1;         /// Unit can attack.
+	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
+	unsigned BuilderLost : 1;       /// The builder is lost after the build.
+	unsigned CanHarvest : 1;        /// Resource can be harvested.
+	unsigned Harvester : 1;         /// unit is a resource harvester.
+	unsigned char* BoolFlag;        /// User defined flag. Used for (dis)allow target.
+	VariableType* Variable;         /// Array of user defined variables.
+	unsigned char* CanTargetFlag;   /// Flag needed to target with missile.
 
-	unsigned SelectableByRectangle : 1; ///< Selectable with mouse rectangle.
-	unsigned IsNotSelectable : 1;       ///< Unit should not be selected during game.
-	unsigned Decoration : 1;            ///< Unit is a decoration (act as tile).
-	unsigned Indestructible : 1;        ///< Unit is indestructible (take no damage).
-	unsigned Teleporter : 1;            ///< Can teleport other units.
+	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
+	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
+	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
+	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
+	unsigned Teleporter : 1;            /// Can teleport other units.
 
-	int CanStore[MaxCosts];             ///< Resources that we can store here.
-	int GivesResource;                  ///< The resource this unit gives.
-	ResourceInfo* ResInfo[MaxCosts];    ///< Resource information.
-	BuildRestriction** BuildingRules;   ///< Rules list for building a building.
-	SDL_Color NeutralMinimapColorRGB;   ///< Minimap Color for Neutral Units.
+	int CanStore[MaxCosts];             /// Resources that we can store here.
+	int GivesResource;                  /// The resource this unit gives.
+	ResourceInfo* ResInfo[MaxCosts];    /// Resource information.
+	BuildRestriction** BuildingRules;   /// Rules list for building a building.
+	SDL_Color NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	UnitSound Sound;                ///< Sounds for events
+	UnitSound Sound;                /// Sounds for events
 	// TODO: temporary solution
-	WeaponSound Weapon;             ///< Currently sound for weapon
+	WeaponSound Weapon;             /// Currently sound for weapon
 
-	int Supply;                     ///< Food supply
-	int Demand;                     ///< Food demand
+	int Supply;                     /// Food supply
+	int Demand;                     /// Food demand
 
 // --- FILLED UP ---
 
-	int ImproveIncomes[MaxCosts];   ///< Gives player an improved income
+	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 
-	unsigned FieldFlags;            ///< Unit map field flags
-	unsigned MovementMask;          ///< Unit check this map flags for move
+	unsigned FieldFlags;            /// Unit map field flags
+	unsigned MovementMask;          /// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
-	UnitStats Stats[PlayerMax];     ///< Unit status for each player
+	UnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	struct _graphic_* Sprite;                ///< Sprite images
-	struct _graphic_* ShadowSprite;          ///< Shadow sprite image
+	struct _graphic_* Sprite;                /// Sprite images
+	struct _graphic_* ShadowSprite;          /// Shadow sprite image
 };
 
 	/// @todo ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
@@ -1029,56 +1029,56 @@ struct _unit_type_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern UnitType* UnitTypes[UnitTypeMax];    ///< All unit-types
-extern int NumUnitTypes;                    ///< Number of unit-types made
+extern UnitType* UnitTypes[UnitTypeMax];    /// All unit-types
+extern int NumUnitTypes;                    /// Number of unit-types made
 
 /// @todo this hardcoded unit-types must be removed!!
-extern UnitType*UnitTypeHumanWall;          ///< Human wall
-extern UnitType*UnitTypeOrcWall;            ///< Orc wall
+extern UnitType*UnitTypeHumanWall;          /// Human wall
+extern UnitType*UnitTypeOrcWall;            /// Orc wall
 
-extern char** UnitTypeWcNames;              ///< Mapping wc-number 2 symbol
+extern char** UnitTypeWcNames;              /// Mapping wc-number 2 symbol
 
 /**
 **  Variable info for unit and unittype.
 */
 extern struct _UnitTypeVar_{
-	char** BoolFlagName;                ///< Array of name of user defined bool flag.
-	int NumberBoolFlag;                 ///< Number of user defined bool flag.
+	char** BoolFlagName;                /// Array of name of user defined bool flag.
+	int NumberBoolFlag;                 /// Number of user defined bool flag.
 
-	char** VariableName;                ///< Array of names of user defined variables.
-	VariableType *Variable;             ///< Array of user defined variables (default value for unittype).
-// EventType* Event;                   ///< Array of functions sets to call when en event occurs.
-	int NumberVariable;                 ///< Number of defined variables.
+	char** VariableName;                /// Array of names of user defined variables.
+	VariableType *Variable;             /// Array of user defined variables (default value for unittype).
+// EventType* Event;                   /// Array of functions sets to call when en event occurs.
+	int NumberVariable;                 /// Number of defined variables.
 
-	DecoVarType *DecoVar;               ///< Array to describe how showing variable.
-	int NumberDeco;                     ///< Size of DecoVar.
+	DecoVarType *DecoVar;               /// Array to describe how showing variable.
+	int NumberDeco;                     /// Size of DecoVar.
 } UnitTypeVar;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern UnitType* CclGetUnitType(struct lua_State* l);  ///< Access unit-type object
-extern void UnitTypeCclRegister(void);          ///< Register ccl features
+extern UnitType* CclGetUnitType(struct lua_State* l);  /// Access unit-type object
+extern void UnitTypeCclRegister(void);          /// Register ccl features
 
-extern void UpdateStats(int reset_to_default);  ///< Update unit stats
-extern UnitType* UnitTypeByIdent(const char*);  ///< Get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);     ///< Get unit-type by wc number
-extern int GetVariableIndex(const char *VarName); ///< Get index of the variable
+extern void UpdateStats(int reset_to_default);  /// Update unit stats
+extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
+extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
+extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
 	/// Get the animations structure by ident
 extern Animations* AnimationsByIdent(const char* ident);
 extern NewAnimations* NewAnimationsByIdent(const char* ident);
 
-extern void SaveUnitTypes(struct _CL_File_* file);  ///< Save the unit-type table
-extern UnitType* NewUnitTypeSlot(char*);            ///< Allocate an empty unit-type slot
+extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
+extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType* type, struct _graphic_* sprite, int player,
 	int frame, int x, int y);
 
-extern void InitUnitTypes(int reset_player_stats);  ///< Init unit-type table
-extern void LoadUnitTypeSprite(UnitType* unittype); ///< Load the sprite for a unittype
-extern void LoadUnitTypes(void);                    ///< Load the unit-type data
-extern void CleanUnitTypes(void);                   ///< Cleanup unit-type module
+extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table
+extern void LoadUnitTypeSprite(UnitType* unittype); /// Load the sprite for a unittype
+extern void LoadUnitTypes(void);                    /// Load the unit-type data
+extern void CleanUnitTypes(void);                   /// Cleanup unit-type module
 
 // in script_unittype.c
 

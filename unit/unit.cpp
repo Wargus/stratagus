@@ -68,28 +68,28 @@
   ----------------------------------------------------------------------------*/
 
 #ifndef LimitSearch
-#define LimitSearch 1                     ///< Limit the search
+#define LimitSearch 1                     /// Limit the search
 #endif
 
-Unit* UnitSlots[MAX_UNIT_SLOTS];          ///< All possible units
-Unit** UnitSlotFree;                      ///< First free unit slot
-Unit* ReleasedHead;                       ///< List of released units.
-Unit* ReleasedTail;                       ///< List tail of released units.
+Unit* UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
+Unit** UnitSlotFree;                      /// First free unit slot
+Unit* ReleasedHead;                       /// List of released units.
+Unit* ReleasedTail;                       /// List tail of released units.
 
-Order* ReleasedOrderHead;                 ///< List of released Orders.
-Order* ReleasedOrderTail;                 ///< List tail of released orders.
+Order* ReleasedOrderHead;                 /// List of released Orders.
+Order* ReleasedOrderTail;                 /// List tail of released orders.
 
-Unit* Units[MAX_UNIT_SLOTS];              ///< Array of used slots
-int NumUnits;                             ///< Number of slots used
+Unit* Units[MAX_UNIT_SLOTS];              /// Array of used slots
+int NumUnits;                             /// Number of slots used
 
-int XpDamage;                             ///< Hit point regeneration for all units
-char EnableTrainingQueue;                 ///< Config: training queues enabled
-char EnableBuildingCapture;               ///< Config: capture buildings enabled
-char RevealAttacker;                      ///< Config: reveal attacker enabled
+int XpDamage;                             /// Hit point regeneration for all units
+char EnableTrainingQueue;                 /// Config: training queues enabled
+char EnableBuildingCapture;               /// Config: capture buildings enabled
+char RevealAttacker;                      /// Config: reveal attacker enabled
 
-static unsigned long HelpMeLastCycle;     ///< Last cycle HelpMe sound played
-static int HelpMeLastX;                   ///< Last X coordinate HelpMe sound played
-static int HelpMeLastY;                   ///< Last Y coordinate HelpMe sound played
+static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
+static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
+static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
 
 /*----------------------------------------------------------------------------
 -- Functions

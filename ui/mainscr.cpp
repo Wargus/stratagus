@@ -1149,8 +1149,8 @@ void ClearStatusLine(void)
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int CostsMana;                        ///< mana cost to display in status line
-static int Costs[MaxCosts + 1];              ///< costs to display in status line
+static int CostsMana;                        /// mana cost to display in status line
+static int Costs[MaxCosts + 1];              /// costs to display in status line
 
 /**
 **  Draw costs in status line.

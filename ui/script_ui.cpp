@@ -55,21 +55,21 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-char* ClickMissile;              ///< FIXME:docu
-char* DamageMissile;             ///< FIXME:docu
+char* ClickMissile;              /// FIXME:docu
+char* DamageMissile;             /// FIXME:docu
 
 typedef struct _info_text_ {
-	char* Text;                  ///< FIXME:docu
-	int Font;                    ///< FIXME:docu
-	int X;                       ///< FIXME:docu
-	int Y;                       ///< FIXME:docu
-} InfoText;                      ///< FIXME:docu
+	char* Text;                  /// FIXME:docu
+	int Font;                    /// FIXME:docu
+	int X;                       /// FIXME:docu
+	int Y;                       /// FIXME:docu
+} InfoText;                      /// FIXME:docu
 
 _ButtonStyleHash ButtonStyleHash;
 _CheckboxStyleHash CheckboxStyleHash;
 
-int NbAllPanels = 0; ///< Number of panel
-InfoPanel* AllPanels = 0; ///< Array of panels.
+int NbAllPanels = 0; /// Number of panel
+InfoPanel* AllPanels = 0; /// Array of panels.
 
 /*----------------------------------------------------------------------------
 --  Functions

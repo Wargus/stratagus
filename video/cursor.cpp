@@ -59,7 +59,7 @@
 /**
 **  Cursor-type type definition
 */
-int CursorMax = 0; ///< Number of cursor.
+int CursorMax = 0; /// Number of cursor.
 
 /**
 **  Define cursor-types.
@@ -68,19 +68,19 @@ int CursorMax = 0; ///< Number of cursor.
 */
 CursorType* Cursors;
 
-CursorStates CursorState;    ///< current cursor state (point,...)
-int CursorAction;            ///< action for selection
-int CursorValue;             ///< value for CursorAction (spell type f.e.)
+CursorStates CursorState;    /// current cursor state (point,...)
+int CursorAction;            /// action for selection
+int CursorValue;             /// value for CursorAction (spell type f.e.)
 
 	// Event changed mouse position, can alter at any moment
-int CursorX;                 ///< cursor position on screen X
-int CursorY;                 ///< cursor position on screen Y
+int CursorX;                 /// cursor position on screen X
+int CursorY;                 /// cursor position on screen Y
 
-int CursorStartX;            ///< rectangle started on screen X
-int CursorStartY;            ///< rectangle started on screen Y
+int CursorStartX;            /// rectangle started on screen X
+int CursorStartY;            /// rectangle started on screen Y
 
-int SubScrollX;              ///< pixels the mouse moved while scrolling
-int SubScrollY;              ///< pixels the mouse moved while scrolling
+int SubScrollX;              /// pixels the mouse moved while scrolling
+int SubScrollY;              /// pixels the mouse moved while scrolling
 
 	/// X position of starting point of selection rectangle, in screen pixels.
 int CursorStartScrMapX;
@@ -89,7 +89,7 @@ int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-static int BuildingCursor;           ///< Flag (0/1): last cursor was building
+static int BuildingCursor;           /// Flag (0/1): last cursor was building
 
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
 static int BuildingCursorSX;
@@ -100,11 +100,11 @@ static int BuildingCursorEX;
 	/// area of tiles covered by building cursor (SX,SY;EX,EY)
 static int BuildingCursorEY;
 
-UnitType* CursorBuilding;           ///< building cursor
+UnitType* CursorBuilding;           /// building cursor
 
 
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
-CursorType* GameCursor;             ///< current shown cursor-type
+CursorType* GameCursor;             /// current shown cursor-type
 
 /*----------------------------------------------------------------------------
 --  Functions
