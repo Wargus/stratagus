@@ -301,6 +301,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     int path_length;
     int num_in_close=0;
     int mask=UnitMovementMask(unit);
+    int goal_reachable;
     //int base_mask=mask&~(MapFieldLandUnit|MapFieldAirUnit|MapFieldSeaUnit);
     Unit* goal;
     static int xoffset[]={  0,-1,+1, 0, -1,+1,-1,+1 };
@@ -316,7 +317,7 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
     x=unit->X;
     y=unit->Y;
     r=unit->Command.Data.Move.Range;
-    i=0;
+    goal_reachable=0;
     // Let's first mark goal
     if(unit->Command.Data.Move.Goal) {
 	goal=unit->Command.Data.Move.Goal;
@@ -351,28 +352,31 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 		if(num_in_close<Threshold) {
 		    CloseSet[num_in_close++]=eo;
 		}
-		i=1;
+		goal_reachable=1;
 	    }
 	}
     }
-    if(i) {
-	eo=x*TheMap.Width+y;
-	// it is quite important to start from 1 rather than 0, because we use
-	// 0 as a way to represent nodes that we have not visited yet.
-	AStarMatrix[eo].CostFromStart=1;
-	best_cost_from_start=1;
-	best_cost_to_goal=AStarCosts(x,y,gx,gy);
-	best_x=x;
-	best_y=y;
-	// place start point in open
-	AStarAddNode(x,y,eo,best_cost_to_goal+1);
-	if(num_in_close<Threshold) {
-	    CloseSet[num_in_close++]=OpenSet[0].O;
-	}
-    } else {
-	AStarCleanUp(num_in_close);
-	return -2;
+    // the following test is removed, we path find even if the goal is not
+    // directly reachable.
+    //    if(goal_reachable) {
+    eo=x*TheMap.Width+y;
+    // it is quite important to start from 1 rather than 0, because we use
+    // 0 as a way to represent nodes that we have not visited yet.
+    AStarMatrix[eo].CostFromStart=1;
+    best_cost_from_start=1;
+    best_cost_to_goal=AStarCosts(x,y,gx,gy);
+    best_x=x;
+    best_y=y;
+    // place start point in open
+    AStarAddNode(x,y,eo,best_cost_to_goal+1);
+    if(num_in_close<Threshold) {
+	CloseSet[num_in_close++]=OpenSet[0].O;
     }
+    //    } else {
+    //	AStarCleanUp(num_in_close);
+    //	return -2;
+    //    }
+	
     counter=TheMap.Width*TheMap.Height;	// how many tries
 
     for( ;; ) {
@@ -484,6 +488,13 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    DebugLevel3(__FUNCTION__": %Zd unreachable: going to closest\n",UnitNumber(unit));
 	    break;
 	}
+    }
+    // if the goal was not reachable, we replace it by the best point
+    // this will speed up next path finding
+    if(!goal_reachable) {
+	unit->Command.Data.Move.Goal=0;
+	unit->Command.Data.Move.DX=ex;
+	unit->Command.Data.Move.DY=ey;
     }
     // now we need to backtrack
     path_length=0;
