@@ -338,7 +338,7 @@ global void SendCommandBuildBuilding(Unit* unit,int x,int y
 	,UnitType* what,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("build",unit,flush,x,y,NULL,what->Ident,-1);
+	CommandLog("build",unit,flush,x,y,NoUnitP,what->Ident,-1);
 	CommandBuildBuilding(unit,x,y,what,flush);
     } else {
 	NetworkSendCommand(MessageCommandBuild,unit,x,y,NoUnitP,what,flush);
@@ -442,7 +442,7 @@ global void SendCommandReturnGoods(Unit* unit,Unit* goal,int flush)
 global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("train",unit,flush,-1,-1,NULL,what->Ident,-1);
+	CommandLog("train",unit,flush,-1,-1,NoUnitP,what->Ident,-1);
 	CommandTrainUnit(unit,what,flush);
     } else {
 	NetworkSendCommand(MessageCommandTrain,unit,0,0,NoUnitP,what,flush);
@@ -454,14 +454,16 @@ global void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush)
 **
 **	@param unit	Pointer to unit.
 **	@param slot	Slot of training queue to cancel.
+**	@param type	Unit-type of unit to cancel.
 */
-global void SendCommandCancelTraining(Unit* unit,int slot)
+global void SendCommandCancelTraining(Unit* unit,int slot,const UnitType* type)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,NULL,slot);
-	CommandCancelTraining(unit,slot);
+	CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
+		type ? type->Ident : NULL,slot);
+	CommandCancelTraining(unit,slot,type);
     } else {
-	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,NULL
+	NetworkSendCommand(MessageCommandCancelTrain,unit,slot,0,NoUnitP,type
 		,FlushCommands);
     }
 }
@@ -476,7 +478,7 @@ global void SendCommandCancelTraining(Unit* unit,int slot)
 global void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("upgrade-to",unit,flush,-1,-1,NULL,what->Ident,-1);
+	CommandLog("upgrade-to",unit,flush,-1,-1,NoUnitP,what->Ident,-1);
 	CommandUpgradeTo(unit,what,flush);
     } else {
 	NetworkSendCommand(MessageCommandUpgrade,unit,0,0,NoUnitP,what,flush);
@@ -510,7 +512,7 @@ global void SendCommandCancelUpgradeTo(Unit* unit)
 global void SendCommandResearch(Unit* unit,Upgrade* what,int flush)
 {
     if( NetworkFildes==-1 ) {
-	CommandLog("research",unit,flush,-1,-1,NULL,what->Ident,-1);
+	CommandLog("research",unit,flush,-1,-1,NoUnitP,what->Ident,-1);
 	CommandResearch(unit,what,flush);
     } else {
 	NetworkSendCommand(MessageCommandResearch,unit
@@ -691,7 +693,8 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandUnload(unit,x,y,dest,status);
 	    break;
 	case MessageCommandBuild:
-	    CommandLog("build",unit,status,x,y,NULL,UnitTypes[dstnr].Ident,-1);
+	    CommandLog("build",unit,status,x,y,NoUnitP,UnitTypes[dstnr].Ident,
+		    -1);
 	    CommandBuildBuilding(unit,x,y,UnitTypes+dstnr,status);
 	    break;
 	case MessageCommandCancelBuild:
@@ -736,16 +739,23 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandReturnGoods(unit,dest,status);
 	    break;
 	case MessageCommandTrain:
-	    CommandLog("train",unit,status,-1,-1,NULL
+	    CommandLog("train",unit,status,-1,-1,NoUnitP
 		    ,UnitTypes[dstnr].Ident,-1);
 	    CommandTrainUnit(unit,UnitTypes+dstnr,status);
 	    break;
 	case MessageCommandCancelTrain:
-	    CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,NULL,x);
-	    CommandCancelTraining(unit,x);
+	    if( dstnr!=(unsigned short)0xFFFF ) {
+		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
+			UnitTypes[dstnr].Ident,x);
+		CommandCancelTraining(unit,x,UnitTypes+dstnr);
+	    } else {
+		CommandLog("cancel-train",unit,FlushCommands,-1,-1,NoUnitP,
+			NULL,x);
+		CommandCancelTraining(unit,x,NULL);
+	    }
 	    break;
 	case MessageCommandUpgrade:
-	    CommandLog("upgrade-to",unit,status,-1,-1,NULL
+	    CommandLog("upgrade-to",unit,status,-1,-1,NoUnitP
 		    ,UnitTypes[dstnr].Ident,-1);
 	    CommandUpgradeTo(unit,UnitTypes+dstnr,status);
 	    break;
@@ -755,7 +765,7 @@ global void ParseCommand(unsigned short msgnr,UnitRef unum,
 	    CommandCancelUpgradeTo(unit);
 	    break;
 	case MessageCommandResearch:
-	    CommandLog("research",unit,status,-1,-1,NULL
+	    CommandLog("research",unit,status,-1,-1,NoUnitP
 		    ,Upgrades[x].Ident,-1);
 	    CommandResearch(unit,Upgrades+x,status);
 	    break;

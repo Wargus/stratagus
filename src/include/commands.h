@@ -80,7 +80,7 @@ extern void SendCommandReturnGoods(Unit* unit,Unit* dest,int flush);
     /// Send train command
 extern void SendCommandTrainUnit(Unit* unit,UnitType* what,int flush);
     /// Send cancel training command
-extern void SendCommandCancelTraining(Unit* unit,int slot);
+extern void SendCommandCancelTraining(Unit* unit,int slot,const UnitType* type);
     /// Send upgrade to command
 extern void SendCommandUpgradeTo(Unit* unit,UnitType* what,int flush);
     /// Send cancel upgrade to command

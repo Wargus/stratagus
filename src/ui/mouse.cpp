@@ -1361,7 +1361,13 @@ global void UIHandleButtonDown(unsigned button)
 		}
 		else if( NumSelected==1 && Selected[0]->Type->Building &&
 		         Selected[0]->Orders[0].Action==UnitActionTrain ) {
-		    SendCommandCancelTraining(Selected[0],ButtonUnderCursor-4);
+		    DebugLevel0Fn("Cancel slot %d %s\n",
+			ButtonUnderCursor-4,
+			Selected[0]->Data.Train.What[ButtonUnderCursor-4]
+			    ->Ident);
+		    SendCommandCancelTraining(Selected[0],
+			ButtonUnderCursor-4,
+			Selected[0]->Data.Train.What[ButtonUnderCursor-4]);
 		}
 	    } else if( ButtonUnderCursor>9 ) {
 		DoButtonButtonClicked(ButtonUnderCursor-10);
