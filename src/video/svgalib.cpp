@@ -650,8 +650,6 @@ local void KeyboardEvent(int scancode, int press) {
 	if(HandleKeyDown(icode)) {
 	    return;
 	}
-	// FIXME: Should come first
-	DoButtonPanelKey(icode);
     } else if(press == KEY_EVENTRELEASE) {
 	// FIXME: combine scancode -> internal keycode of press and release
 	switch(scancode) {
