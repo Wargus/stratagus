@@ -221,7 +221,7 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	CLclose(f);
 	ExitFatal(-1);
     }
-    if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.Sample != 4) {
+    if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.SampleSize != 4) {
 	printf("Unsupported sample size %d\n", wavfmt.SampleSize);
 	CLclose(f);
 	ExitFatal(-1);
