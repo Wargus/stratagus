@@ -84,7 +84,6 @@ local SCM sound_id_ccl(SoundId id)
     sound_id = CclMakeSmobObj(SiodSoundTag, id);
     return sound_id;
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -106,6 +105,20 @@ local SCM CclSoundForName(SCM name)
     return sound_id_ccl(id);
 }
 #elif defined(USE_LUA)
+local int CclSoundForName(lua_State* l)
+{
+    SoundId id;
+    const char* sound_name;
+    LuaUserData* data;
+
+    sound_name = LuaToString(l, -1);
+    id = SoundIdForName(sound_name);
+
+    data = lua_newuserdata(l, sizeof(LuaUserData));
+    data->Type = LuaSoundType;
+    data->Data = id;
+    return 1;
+}
 #endif
 
 
@@ -125,6 +138,23 @@ local SoundId CclGetSoundId(SCM sound)
     }
 }
 #elif defined(USE_LUA)
+local SoundId CclGetSoundId(lua_State* l)
+{
+    LuaUserData* data;
+
+    if (lua_isstring(l, -1)) {
+	CclSoundForName(l);
+    }
+    if (lua_isuserdata(l, -1)) {
+	data = lua_touserdata(l, -1);
+	if (data->Type == LuaSoundType) {
+	    return data->Data;
+	}
+    }
+    lua_pushfstring(l, "CclGetSoundId: not a sound");
+    lua_error(l);
+    return NULL;
+}
 #endif
 
 /**
@@ -196,6 +226,55 @@ local SCM CclMakeSound(SCM name, SCM file)
     return sound_id_ccl(id);
 }
 #elif defined(USE_LUA)
+local int CclMakeSound(lua_State* l)
+{
+    SoundId id;
+    const char* c_name;
+    const char* c_file;
+    char** c_files;
+    int args;
+    int j;
+    LuaUserData* data;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    c_name = LuaToString(l, 1);
+    if (lua_isstring(l, 2)) {
+	// only one file
+	c_file = LuaToString(l, 2);
+	id = MakeSound(c_name, &c_file, 1);
+	DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_
+	    c_file _C_ id);
+    } else if (lua_istable(l, 2)) {
+	// several files
+	DebugLevel3("Making sound `%s'\n" _C_ c_name);
+	args = luaL_getn(l, 2);
+	c_files = malloc(args * sizeof(char*));
+	for (j = 0; j < args; ++j) {
+	    lua_rawgeti(l, 2, j + 1);
+	    c_files[j] = strdup(LuaToString(l, -1));
+	    lua_pop(l, 1);
+	    DebugLevel3("\tComponent %d: `%s'\n" _C_ i _C_ c_files[j]);
+	}
+	// FIXME: check size before casting
+	id = MakeSound(c_name, (const char**)c_files, (unsigned char)args);
+	for (j = 0; j < args; ++j) {
+	    free(c_files[j]);
+	}
+	free(c_files);
+    } else {
+	lua_pushfstring(l, "string or table expected");
+	lua_error(l);
+	return 0;
+    }
+    data = lua_newuserdata(l, sizeof(LuaUserData));
+    data->Type = LuaSoundType;
+    data->Data = id;
+    return 1;
+}
 #endif
 
 /**
@@ -226,6 +305,31 @@ local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
     return sound_id_ccl(id);
 }
 #elif defined(USE_LUA)
+local int CclMakeSoundGroup(lua_State* l)
+{
+    SoundId id;
+    const char* c_name;
+    SoundId first;
+    SoundId second;
+    LuaUserData* data;
+
+    if (lua_gettop(l) != 3) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    c_name = LuaToString(l, 1);
+
+    lua_pushvalue(l, 2);
+    first = CclGetSoundId(l);
+    lua_pop(l, 1);
+    second = CclGetSoundId(l);
+    id = MakeSoundGroup(c_name, first, second);
+    data = lua_newuserdata(l, sizeof(LuaUserData));
+    data->Type = LuaSoundType;
+    data->Data = id;
+    return 1;
+}
 #endif
 
 /**
@@ -248,6 +352,19 @@ local SCM CclMapSound(SCM name, SCM sound)
     return sound;
 }
 #elif defined(USE_LUA)
+local int CclMapSound(lua_State* l)
+{
+    const char* sound_name;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    sound_name = LuaToString(l, 1);
+    MapSound(sound_name, CclGetSoundId(l));
+    lua_pushvalue(l, 2);
+    return 1;
+}
 #endif
 
 /**
@@ -267,6 +384,19 @@ local SCM CclPlaySound(SCM sound)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclPlaySound(lua_State* l)
+{
+    SoundId id;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    id = CclGetSoundId(l);
+    PlayGameSound(id, MaxSampleVolume);
+    return 0;
+}
 #endif
 
 /**
@@ -281,7 +411,6 @@ global int ccl_sound_p(SCM sound)
 {
     return CCL_SOUNDP(sound);
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -296,7 +425,6 @@ global SoundId ccl_sound_id(SCM sound)
 {
     return CCL_SOUND_ID(sound);
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -422,6 +550,99 @@ local SCM CclDefineGameSounds(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefineGameSounds(lua_State* l)
+{
+    //FIXME: should allow to define ALL the game sounds
+    const char* value;
+    int i;
+    int args;
+    int j;
+    LuaUserData* data;
+
+    args = lua_gettop(l);
+    for (j = 0; j < args; ++j) {
+	value = LuaToString(l, j + 1);
+	++j;
+
+	// let's handle now the different cases
+	if (!strcmp(value, "click")) {
+	    if (!lua_isuserdata(l, j + 1) ||
+		    (data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+		lua_pushfstring(l, "Sound id expected");
+		lua_error(l);
+	    }
+	    GameSounds.Click.Sound = data->Data;
+	} else if (!strcmp(value, "placement-error")) {
+	    if (!lua_isuserdata(l, j + 1) ||
+		    (data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+		lua_pushfstring(l, "Sound id expected");
+		lua_error(l);
+	    }
+	    GameSounds.PlacementError.Sound = data->Data;
+	} else if (!strcmp(value, "placement-success")) {
+	    if (!lua_isuserdata(l, j + 1) ||
+		    (data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+		lua_pushfstring(l, "Sound id expected");
+		lua_error(l);
+	    }
+	    GameSounds.PlacementSuccess.Sound = data->Data;
+	} else if (!strcmp(value, "work-complete")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    for (i = 0; i < PlayerRaces.Count; ++i) {
+		if (!strcmp(PlayerRaces.Name[i], value)) {
+		    break;
+		}
+	    }
+	    if (i == PlayerRaces.Count) {
+		lua_pushfstring(l, "Unknown race: %s", value);
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isuserdata(l, -1) ||
+		    (data = lua_touserdata(l, -1))->Type != LuaSoundType) {
+		lua_pushfstring(l, "Sound id expected");
+		lua_error(l);
+	    }
+	    lua_pop(l, 1);
+	    GameSounds.WorkComplete[i].Sound = data->Data;
+	} else if (!strcmp(value, "rescue")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    for (i = 0; i < PlayerRaces.Count; ++i) {
+		if (!strcmp(PlayerRaces.Name[i], value)) {
+		    break;
+		}
+	    }
+	    if (i == PlayerRaces.Count) {
+		lua_pushfstring(l, "Unknown race: %s", value);
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 2);
+	    if (!lua_isuserdata(l, -1) ||
+		    (data = lua_touserdata(l, -1))->Type != LuaSoundType) {
+		lua_pushfstring(l, "Sound id expected");
+		lua_error(l);
+	    }
+	    lua_pop(l, 1);
+	    GameSounds.Rescue[i].Sound = data->Data;
+	} else {
+	    lua_pushfstring(l, "Unsupported tag: %s", value);
+	    lua_error(l);
+	}
+    }
+    return 0;
+}
 #endif
 
 /**
@@ -646,6 +867,112 @@ local SCM CclDefinePlaySections(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDefinePlaySections(lua_State* l)
+{
+#if 0
+    SCM value;
+    SCM sublist;
+    PlaySection* p;
+    int i;
+
+    ++NumPlaySections;
+    PlaySections = realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
+    p = PlaySections + NumPlaySections - 1;
+    memset(p, 0, sizeof(PlaySection));
+
+    while (!gh_null_p(list)) {
+	value = gh_car(list);
+	list = gh_cdr(list);
+	if (gh_eq_p(value, gh_symbol2scm("race"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    p->Race = gh_scm2newstr(value, NULL);
+	} else if (gh_eq_p(value, gh_symbol2scm("type"))) {
+	    value = gh_car(list);
+	    list = gh_cdr(list);
+	    if (gh_eq_p(value, gh_symbol2scm("game"))) {
+		p->Type = PlaySectionGame;
+	    } else if (gh_eq_p(value, gh_symbol2scm("briefing"))) {
+		p->Type = PlaySectionBriefing;
+	    } else if (gh_eq_p(value, gh_symbol2scm("stats-victory"))) {
+		p->Type = PlaySectionStatsVictory;
+	    } else if (gh_eq_p(value, gh_symbol2scm("stats-defeat"))) {
+		p->Type = PlaySectionStatsDefeat;
+	    } else if (gh_eq_p(value, gh_symbol2scm("main-menu"))) {
+		p->Type = PlaySectionMainMenu;
+	    } else {
+		errl("Unsupported tag", value);
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("order"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
+			p->CDOrder = PlaySectionOrderAll;
+		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
+			p->CDOrder = PlaySectionOrderRandom;
+		    } else {
+			errl("Unsupported tag", value);
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("tracks"))) {
+		    SCM temp;
+
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    for (i = 0; i < (signed)gh_vector_length(value); ++i) {
+			temp=gh_vector_ref(value, gh_int2scm(i));
+			p->CDTracks |= (1 << gh_scm2int(temp));
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else if (gh_eq_p(value, gh_symbol2scm("no-cd"))) {
+	    sublist = gh_car(list);
+	    list = gh_cdr(list);
+	    while (!gh_null_p(sublist)) {
+		value = gh_car(sublist);
+		sublist = gh_cdr(sublist);
+		if (gh_eq_p(value, gh_symbol2scm("order"))) {
+		    value = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    if (gh_eq_p(value, gh_symbol2scm("all"))) {
+			p->FileOrder = PlaySectionOrderAll;
+		    } else if (gh_eq_p(value, gh_symbol2scm("random"))) {
+			p->FileOrder = PlaySectionOrderRandom;
+		    } else {
+			errl("Unsupported tag", value);
+		    }
+		} else if (gh_eq_p(value, gh_symbol2scm("files"))) {
+		    SCM sublist2;
+
+		    sublist2 = gh_car(sublist);
+		    sublist = gh_cdr(sublist);
+		    i = 0;
+		    while (!gh_null_p(sublist2)) {
+			value = gh_car(sublist2);
+			sublist2 = gh_cdr(sublist2);
+			++i;
+			p->Files = realloc(p->Files, (i + 1) * sizeof(char*));
+			p->Files[i - 1] = gh_scm2newstr(value, NULL);
+			p->Files[i] = NULL;
+		    }
+		} else {
+		    errl("Unsupported tag", value);
+		}
+	    }
+	} else {
+	    errl("Unsupported tag", value);
+	}
+    }
+#endif
+    return 0;
+}
 #endif
 
 /**
@@ -985,13 +1312,11 @@ global void SoundCclRegister(void)
     gh_new_procedure1_0("play-file", CclPlayFile);
     gh_new_procedure0_0("stop-music", CclStopMusic);
 #elif defined(USE_LUA)
-//    SiodSoundTag = CclMakeSmobType("Sound");
-
     lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
     lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);
     lua_register(Lua, "SetCdMode", CclSetCdMode);
 
-//    lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
+    lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
 
     lua_register(Lua, "SoundOff", CclSoundOff);
     lua_register(Lua, "SoundOn", CclSoundOn);
@@ -999,14 +1324,14 @@ global void SoundCclRegister(void)
     lua_register(Lua, "MusicOn", CclMusicOn);
     lua_register(Lua, "SoundThread", CclSoundThread);
     lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
-//    lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
+    lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
     lua_register(Lua, "DisplaySounds", CclDisplaySounds);
-//    lua_register(Lua, "MapSound", CclMapSound);
-//    lua_register(Lua, "SoundForName", CclSoundForName);
+    lua_register(Lua, "MapSound", CclMapSound);
+    lua_register(Lua, "SoundForName", CclSoundForName);
     lua_register(Lua, "SetSoundRange", CclSetSoundRange);
-//    lua_register(Lua, "MakeSound", CclMakeSound);
-//    lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
-//    lua_register(Lua, "PlaySound", CclPlaySound);
+    lua_register(Lua, "MakeSound", CclMakeSound);
+    lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
+    lua_register(Lua, "PlaySound", CclPlaySound);
 
     lua_register(Lua, "PlayMusic", CclPlayMusic);
     lua_register(Lua, "PlayFile", CclPlayFile);
@@ -1029,6 +1354,15 @@ local SCM CclSetSoundVolume(SCM volume)
     return volume;
 }
 #elif defined(USE_LUA)
+local int CclSetSoundVolume(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1042,6 +1376,15 @@ local SCM CclSetMusicVolume(SCM volume)
     return volume;
 }
 #elif defined(USE_LUA)
+local int CclSetMusicVolume(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1055,6 +1398,15 @@ local SCM CclSetCdMode(SCM mode)
     return mode;
 }
 #elif defined(USE_LUA)
+local int CclSetCdMode(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1066,6 +1418,10 @@ local SCM CclSoundOff(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSoundOff(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1080,6 +1436,11 @@ local SCM CclSoundOn(void)
     return SCM_BOOL_T;
 }
 #elif defined(USE_LUA)
+local int CclSoundOn(lua_State* l)
+{
+    lua_pushboolean(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1091,6 +1452,10 @@ local SCM CclMusicOff(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclMusicOff(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1105,6 +1470,10 @@ local SCM CclMusicOn(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclMusicOn(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1118,6 +1487,15 @@ local SCM CclSetGlobalSoundRange(SCM distance)
     return distance;
 }
 #elif defined(USE_LUA)
+local int CclSetGlobalSoundRange(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1132,6 +1510,15 @@ local SCM CclSetSoundRange(SCM sound, SCM range __attribute__((unused)))
     return sound;
 }
 #elif defined(USE_LUA)
+local int CclSetSoundRange(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
 #endif
 
 /**
@@ -1143,6 +1530,10 @@ local SCM CclSoundThread(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSoundThread(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1155,6 +1546,10 @@ local SCM CclDisplaySounds(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclDisplaySounds(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1167,6 +1562,10 @@ local SCM CclSoundForName(SCM name __attribute__((unused)))
     return NIL;
 }
 #elif defined(USE_LUA)
+local int CclSoundForName(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1179,6 +1578,10 @@ local SCM CclDefineGameSounds(SCM list __attribute__((unused)))
     return NIL;
 }
 #elif defined(USE_LUA)
+local SCM CclDefineGameSounds(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1196,6 +1599,15 @@ local SCM CclMapSound(SCM name __attribute__((unused)), SCM sound)
     return sound;
 }
 #elif defined(USE_LUA)
+local int CclMapSound(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    lua_pushvalue(l, 2);
+    return 1;
+}
 #endif
 
 /**
@@ -1209,6 +1621,10 @@ local SCM CclPlayMusic(SCM name __attribute__((unused)))
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclPlayMusic(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1222,6 +1638,10 @@ local SCM CclPlayFile(SCM name __attribute__((unused)))
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclPlayFile(lua_State* l)
+{
+    return 0;
+}
 #endif
 
 /**
@@ -1247,6 +1667,24 @@ global void SoundCclRegister(void)
 
     gh_new_procedure1_0("play-music", CclPlayMusic);
     gh_new_procedure1_0("play-file", CclPlayFile);
+#elif defined(USE_LUA)
+    lua_register(Lua, "SetSoundVolume!", CclSetSoundVolume);
+    lua_register(Lua, "SetMusicVolume!", CclSetMusicVolume);
+    lua_register(Lua, "SetCdMode!", CclSetCdMode);
+    lua_register(Lua, "SoundOff", CclSoundOff);
+    lua_register(Lua, "SoundOn", CclSoundOn);
+    lua_register(Lua, "MusicOff", CclMusicOff);
+    lua_register(Lua, "MusicOn", CclMusicOn);
+    lua_register(Lua, "SoundThread", CclSoundThread);
+    lua_register(Lua, "SetGlobalSoundRange!", CclSetGlobalSoundRange);
+    lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
+    lua_register(Lua, "DisplaySounds", CclDisplaySounds);
+    lua_register(Lua, "MapSound", CclMapSound);
+    lua_register(Lua, "SoundForName", CclSoundForName);
+    lua_register(Lua, "SetSoundRange!", CclSetSoundRange);
+
+    lua_register(Lua, "PlayMusic", CclPlayMusic);
+    lua_register(Lua, "PlayFile", CclPlayFile);
 #endif
 }
 

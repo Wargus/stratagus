@@ -10,7 +10,8 @@
 //
 /**@name groups.c	-	The units' groups handling. */
 //
-//	(c) Copyright 1999-2003 by Patrice Fortier and Lutz Sammer
+//	(c) Copyright 1999-2003 by Patrice Fortier, Lutz Sammer,
+//	                           and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -117,7 +118,7 @@ global void CleanGroups(void)
 
     for (i = 0; i < NUM_GROUPS; ++i) {
 	free(Groups[i].Units);
-        memset(&Groups[i], 0, sizeof(Groups[i]));
+	memset(&Groups[i], 0, sizeof(Groups[i]));
     }
 }
 
@@ -177,7 +178,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
 
     group = &Groups[num];
     for (i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
-        group->Units[group->NumUnits++] = units[i];
+	group->Units[group->NumUnits++] = units[i];
 	units[i]->GroupId |= (1 << num);
     }
 }
@@ -260,6 +261,33 @@ local SCM CclGroup(SCM group, SCM num, SCM units)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclGroup(lua_State* l)
+{
+    int i;
+    UnitGroup* grp;
+    int args;
+    int j;
+
+    if (lua_gettop(l) != 3) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    grp = &Groups[(int)LuaToNumber(l, 1)];
+    grp->NumUnits = LuaToNumber(l, 2);
+    i = 0;
+    args = luaL_getn(l, 3);
+    for (j = 0; j < args; ++j) {
+	const char* str;
+
+	lua_rawgeti(l, 3, j + 1);
+	str = LuaToString(l, -1);
+	lua_pop(l, 1);
+	grp->Units[i++] = (Unit*)strtol(str + 1, NULL, 16);
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -269,6 +297,8 @@ global void GroupCclRegister(void)
 {
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure3_0("group", CclGroup);
+#elif defined(USE_LUA)
+    lua_register(Lua, "Group", CclGroup);
 #endif
 }
 
