@@ -10,7 +10,7 @@
 //
 /**@name action_die.c - The die action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -60,15 +60,22 @@ void HandleActionDie(Unit* unit)
 	//
 	if (unit->Type->Animations && unit->Type->Animations->Die) {
 		UnitShowAnimation(unit, unit->Type->Animations->Die);
+	} else if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
+		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
 	} else {
 		// some units has no death animation
-		unit->Reset = unit->Wait = 1;
+		if (!unit->Type->NewAnimations) {
+			unit->Reset = unit->Wait = 1;
+		} else {
+			unit->Anim.Unbreakable = 0;
+		}
 	}
 
 	//
 	// Die sequence terminated, generate corpse.
 	//
-	if (unit->Reset) {
+	if ((!unit->Type->NewAnimations && unit->Reset) ||
+			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
 		if (!unit->Type->CorpseType) {
 			ReleaseUnit(unit);
 			return;
@@ -77,7 +84,7 @@ void HandleActionDie(Unit* unit)
 		unit->State = unit->Type->CorpseScript;
 
 		Assert(unit->Type->TileWidth == unit->Type->CorpseType->TileWidth &&
-				unit->Type->TileHeight == unit->Type->CorpseType->TileHeight);
+			unit->Type->TileHeight == unit->Type->CorpseType->TileHeight);
 
 		// Update sight for new corpse
 		// We have to unmark BEFORE changing the type.
@@ -98,7 +105,11 @@ void HandleActionDie(Unit* unit)
 		unit->SubAction = 0;
 		unit->Frame = 0;
 		UnitUpdateHeading(unit);
-		UnitShowAnimation(unit, unit->Type->Animations->Die);
+		if (unit->Type->Animations && unit->Type->Animations->Die) {
+			UnitShowAnimation(unit, unit->Type->Animations->Die);
+		} else if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
+			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
+		}
 
 		// FIXME: perhaps later or never is better
 #if 0
