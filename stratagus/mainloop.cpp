@@ -160,7 +160,6 @@ local void MoveMapViewPointDown(int step)
 		vp->MapY = TheMap.Height - vp->MapHeight + 1;
 		vp->OffsetY = 0;
 	}
-		vp->OffsetY = 0;
 }
 
 /**
