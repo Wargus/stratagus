@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "util.h"
+#include "script.h"
 
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
@@ -131,7 +132,7 @@ struct _graphic_;
 */
 struct _menuitem_;
 typedef struct _menuitem_text_ {
-	unsigned char* text;
+	StringDesc* text;
 	unsigned int tflags;
 	char* normalcolor;
 	char* reversecolor;

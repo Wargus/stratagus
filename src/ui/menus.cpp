@@ -96,10 +96,6 @@ static void HelpMenu(void);
 static void ObjectivesMenu(void);
 static void EndScenarioMenu(void);
 
-// Objectives
-static void ObjectivesInit(Menu* menu);
-static void ObjectivesExit(Menu* menu);
-
 // Victory, lost
 static void GameMenuEnd(void);
 static void VictoryInit(Menu* menu);
@@ -1048,10 +1044,6 @@ void InitMenuFuncHash(void)
 	HASHADD(GameMenuReturn,"game-menu-return");
 	HASHADD(EndMenu,"end-menu");
 
-// Objectives
-	HASHADD(ObjectivesInit,"objectives-init");
-	HASHADD(ObjectivesExit,"objectives-exit");
-
 // Victory, lost
 	HASHADD(GameMenuEnd,"game-menu-end");
 	HASHADD(VictoryInit,"victory-init");
@@ -1580,7 +1572,7 @@ static void SaveConfirmInit(Menu* menu)
 	if (strstr(name, ".sav") == NULL) {
 		strcat(name, ".sav");
 	}
-	menu->Items[2].D.Text.text = name;
+	menu->Items[2].D.Text.text = NewStringDesc(name);
 }
 
 /**
@@ -1588,6 +1580,8 @@ static void SaveConfirmInit(Menu* menu)
 */
 static void SaveConfirmExit(Menu* menu)
 {
+	FreeStringDesc(menu->Items[2].D.Text.text);
+	free(menu->Items[2].D.Text.text);
 	menu->Items[2].D.Text.text = NULL;
 }
 
@@ -1644,7 +1638,7 @@ static void DeleteConfirmInit(Menu* menu)
 	strcpy(name, "the file: ");
 	strcat(name, save_menu->Items[1].D.Input.buffer);
 	name[strlen(name) - 3] = '\0';
-	menu->Items[2].D.Text.text = name;
+	menu->Items[2].D.Text.text = NewStringDesc(name);
 }
 
 /**
@@ -1652,6 +1646,8 @@ static void DeleteConfirmInit(Menu* menu)
 */
 static void DeleteConfirmExit(Menu* menu)
 {
+	FreeStringDesc(menu->Items[2].D.Text.text);
+	free(menu->Items[2].D.Text.text);
 	menu->Items[2].D.Text.text = NULL;
 }
 
@@ -2094,7 +2090,7 @@ static void DiplomacyInit(Menu* menu __attribute__ ((unused)))
 
 	for (i = 0; i <= PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
-			menu->Items[4 * j + 4].D.Text.text = Players[i].Name;
+			menu->Items[4 * j + 4].D.Text.text = NewStringDesc(Players[i].Name);
 			if (ThisPlayer->Allied&(1<<Players[i].Player)) {
 				menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_CHECKED;
 			} else {
@@ -2140,6 +2136,8 @@ static void DiplomacyExit(Menu* menu)
 	int i;
 
 	for (i = 0; i <= PlayerMax - 3; ++i) {
+		FreeStringDesc(menu->Items[4 * i + 4].D.Text.text);
+		free(menu->Items[4 * i + 4].D.Text.text);
 		menu->Items[4 * i + 4].D.Text.text = NULL;
 	}
 }
@@ -2543,49 +2541,6 @@ static void TipsMenu(void)
 }
 
 /**
-** Free the tips from the menu
-*/
-static void TipsFreeTips(void)
-{
-	int i;
-	Menu* menu;
-
-	menu = FindMenu("menu-tips");
-	for (i = 4; i < 12; i++) {
-		free(menu->Items[i].D.Text.text);
-		menu->Items[i].D.Text.text = NULL;
-	}
-}
-
-/**
-** Initialize the tips menu
-*/
-static void TipsInit(Menu* menu)
-{
-	int i;
-	int w;
-	int font;
-	char* text;
-
-	if (ShowTips) {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
-	} else {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	}
-	TipsFreeTips();
-
-	w = menu->Width - 2 * menu->Items[5].XOfs;
-	font = menu->Items[5].Font;
-	text = Tips[CurrentTip];
-	if (!text) {
-		text = "";
-	}
-	for (i = 0; i < 8; ++i) {
-		menu->Items[i + 4].D.Text.text = GetLineFont(1 + i, text, w, font);
-	}
-}
-
-/**
 ** Cycle to the next tip
 */
 static void TipsCycleNextTip(void)
@@ -2611,12 +2566,18 @@ static void TipsCyclePreviousTip(void)
 }
 
 /**
+**  Tips menu init callback
+*/
+static void TipsInit(Menu* menu __attribute__((unused)))
+{
+}
+
+/**
 **  Tips menu exit callback
 */
 static void TipsExit(Menu* menu __attribute__((unused)))
 {
 	TipsCycleNextTip();
-	TipsFreeTips();
 	SavePreferences();
 }
 
@@ -2652,7 +2613,6 @@ static void TipsShowTipsText(Menuitem* mi)
 static void TipsNextTip(void)
 {
 	TipsCycleNextTip();
-	TipsInit(CurrentMenu);
 }
 
 /**
@@ -2661,7 +2621,6 @@ static void TipsNextTip(void)
 static void TipsPreviousTip(void)
 {
 	TipsCyclePreviousTip();
-	TipsInit(CurrentMenu);
 }
 
 /**
@@ -2671,51 +2630,6 @@ static void GameMenuExit(void)
 {
 	ExitMenus();
 	Exit(0);
-}
-
-/**
-**  Initialize the game objectives menu
-*/
-static void ObjectivesInit(Menu* menu)
-{
-	int i;
-	int w;
-	int font;
-	char* text;
-	char* tmp;
-
-	ObjectivesExit(menu);
-
-	w = menu->Width - 2 * menu->Items[1].XOfs;
-	font = menu->Items[1].Font;
-	text = GameIntro.Objectives[0];
-	if (!text) {
-		return;
-	}
-	text = strdup(text);
-	for (i = 1; GameIntro.Objectives[i]; ++i) {
-		tmp = strdcat(text, "\n");
-		free(text);
-		text = strdcat(tmp, GameIntro.Objectives[i]);
-		free(tmp);
-	}
-	for (i = 1; i < menu->NumItems - 1; ++i) {
-		menu->Items[i].D.Text.text = GetLineFont(i, text, w, font);
-	}
-	free(text);
-}
-
-/**
-**  Free the game objectives menu memory
-*/
-static void ObjectivesExit(Menu* menu)
-{
-	int i;
-
-	for (i = 1; i < menu->NumItems - 1; ++i) {
-		free(menu->Items[i].D.Text.text);
-		menu->Items[i].D.Text.text = NULL;
-	}
 }
 
 /**
@@ -3039,8 +2953,8 @@ static void JoinNetGameMenu(void)
 */
 static void NetConnectingInit(Menu* menu)
 {
-	menu->Items[1].D.Text.text = NetServerText;
-	menu->Items[2].D.Text.text = NetTriesText;
+	menu->Items[1].D.Text.text = NewStringDesc(NetServerText);
+	menu->Items[2].D.Text.text = NewStringDesc(NetTriesText);
 }
 
 /**
@@ -3048,6 +2962,10 @@ static void NetConnectingInit(Menu* menu)
 */
 static void NetConnectingExit(Menu* menu)
 {
+	FreeStringDesc(menu->Items[1].D.Text.text);
+	FreeStringDesc(menu->Items[2].D.Text.text);
+	free(menu->Items[1].D.Text.text);
+	free(menu->Items[2].D.Text.text);
 	menu->Items[1].D.Text.text = NULL;
 	menu->Items[2].D.Text.text = NULL;
 }
@@ -4490,31 +4408,31 @@ static void EditorNewOk(void)
 	if (value1 < 32 || value2 < 32) {
 		if (value1 < 32) {
 			sprintf(menu->Items[4].D.Input.buffer, "32~!_");
-			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Input.buffer) - 3;
 		}
 		if (value2 < 32) {
 			sprintf(menu->Items[5].D.Input.buffer, "32~!_");
-			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Input.buffer) - 3;
 		}
 		ErrorMenu("Size smaller than 32");
 	} else if (value1 > 1024 || value2 > 1024) {
 		if (value1 == 0) {
 			sprintf(menu->Items[4].D.Input.buffer, "1024~!_");
-			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Input.buffer) - 3;
 		}
 		if (value2 == 0) {
 			sprintf(menu->Items[5].D.Input.buffer, "1024~!_");
-			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Input.buffer) - 3;
 		}
 		ErrorMenu("Size larger than 1024");
 	} else if (value1 / 32 * 32 != value1 || value2/32*32 != value2) {
 		if (value1 / 32 * 32 != value1) {
 			sprintf(menu->Items[4].D.Input.buffer, "%d~!_", (value1 + 16) / 32 * 32);
-			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Text.text) - 3;
+			menu->Items[4].D.Input.nch = strlen(menu->Items[4].D.Input.buffer) - 3;
 		}
 		if (value2 / 32 * 32 != value2) {
 			sprintf(menu->Items[5].D.Input.buffer, "%d~!_", (value2 + 16) / 32 * 32);
-			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Text.text) - 3;
+			menu->Items[5].D.Input.nch = strlen(menu->Items[5].D.Input.buffer) - 3;
 		}
 		ErrorMenu("Size must be a multiple of 32");
 	}
@@ -4754,7 +4672,7 @@ static void EditorMapPropertiesMenu(void)
 	menu->Items[2].D.Input.maxch = 31;
 
 	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	menu->Items[4].D.Text.text = size;
+	menu->Items[4].D.Text.text = NewStringDesc(size);
 
 	menu->Items[6].D.Pulldown.defopt = TheMap.Terrain;
 
@@ -4763,7 +4681,8 @@ static void EditorMapPropertiesMenu(void)
 	menu->Items[8].Flags = -1;
 
 	ProcessMenu("menu-editor-map-properties", 1);
-
+	FreeStringDesc(menu->Items[4].D.Text.text);
+	free(menu->Items[4].D.Text.text);
 	menu->Items[4].D.Text.text = NULL;
 }
 
@@ -4957,13 +4876,15 @@ void EditorEditResource(void)
 
 	menu = FindMenu("menu-editor-edit-resource");
 
-	sprintf(buf2,"Amount of %s:",DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
-	menu->Items[0].D.Text.text = buf2;
+	sprintf(buf2, "Amount of %s:", DefaultResourceNames[UnitUnderCursor->Type->GivesResource]);
+	menu->Items[0].D.Text.text = NewStringDesc(buf2);
 	sprintf(buf, "%d~!_", UnitUnderCursor->ResourcesHeld);
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = strlen(buf) - 3;
 	menu->Items[1].D.Input.maxch = 6;
 	ProcessMenu("menu-editor-edit-resource", 1);
+	FreeStringDesc(menu->Items[0].D.Text.text);
+	free(menu->Items[0].D.Text.text);
 	menu->Items[0].D.Text.text = NULL;
 }
 
@@ -4990,31 +4911,30 @@ static void EditorEditResourceOk(void)
 	menu = CurrentMenu;
 	value = atoi(menu->Items[1].D.Input.buffer);
 	if (value < 2500) {
-		strcpy(menu->Items[1].D.Text.text, "2500~!_");
-		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
+		strcpy(menu->Items[1].D.Input.buffer, "2500~!_");
+		menu->Items[1].D.Input.nch = 4;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = "Must be greater than 2500";
-		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].D.Text.text = NULL;
+		menu->Items[1].D.Text.text = NewStringDesc("Must be greater than 2500");
 	} else if (value > 655000) {
-		strcpy(menu->Items[1].D.Text.text, "655000~!_");
-		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
+		strcpy(menu->Items[1].D.Input.buffer, "655000~!_");
+		menu->Items[1].D.Input.nch = 6;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = "Must be smaller than 655000";
-		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].D.Text.text = NULL;
+		menu->Items[1].D.Text.text = NewStringDesc("Must be smaller than 655000");
 	} else if (value / 2500 * 2500 != value) {
 		value = (value + 1250)/ 2500 * 2500;
-		sprintf(menu->Items[1].D.Text.text, "%d~!_", value);
-		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Text.text) - 3;
+		sprintf(menu->Items[1].D.Input.buffer, "%d~!_", value);
+		menu->Items[1].D.Input.nch = strlen(menu->Items[1].D.Input.buffer) - 3;
 		menu = FindMenu("menu-editor-error");
-		menu->Items[1].D.Text.text = "Must be a multiple of 2500";
-		ProcessMenu("menu-editor-error", 1);
-		menu->Items[1].D.Text.text = NULL;
+		menu->Items[1].D.Text.text = NewStringDesc("Must be a multiple of 2500");
 	} else {
 		UnitUnderCursor->ResourcesHeld = value;
 		GameMenuReturn();
+		return;
 	}
+	ProcessMenu("menu-editor-error", 1);
+	FreeStringDesc(menu->Items[1].D.Text.text);
+	free(menu->Items[1].D.Text.text);
+	menu->Items[1].D.Text.text = NULL;
 }
 
 /**
@@ -5215,7 +5135,7 @@ static void EditorSaveEnterAction(Menuitem* mi, int key)
 */
 static void EditorSaveConfirmInit(Menu* menu)
 {
-	menu->Items[2].D.Text.text = ScenSelectFileName;
+	menu->Items[2].D.Text.text = NewStringDesc(ScenSelectFileName);
 }
 
 /**
@@ -5223,6 +5143,8 @@ static void EditorSaveConfirmInit(Menu* menu)
 */
 static void EditorSaveConfirmOk(void)
 {
+	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
+	free(CurrentMenu->Items[2].D.Text.text);
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorEndMenu();
 }
@@ -5232,6 +5154,8 @@ static void EditorSaveConfirmOk(void)
 */
 static void EditorSaveConfirmCancel(void)
 {
+	FreeStringDesc(CurrentMenu->Items[2].D.Text.text);
+	free(CurrentMenu->Items[2].D.Text.text);
 	CurrentMenu->Items[2].D.Text.text = NULL;
 	EditorCancelled = 1;
 	EditorEndMenu();
@@ -5422,8 +5346,10 @@ static void NetErrorMenu(char *error)
 	Menu* menu;
 
 	menu = FindMenu("menu-net-error");
-	menu->Items[1].D.Text.text = error;
+	menu->Items[1].D.Text.text = NewStringDesc(error);
 	ProcessMenu("menu-net-error", 1);
+	FreeStringDesc(menu->Items[1].D.Text.text);
+	free(menu->Items[1].D.Text.text);
 	menu->Items[1].D.Text.text = NULL;
 }
 
@@ -5443,8 +5369,10 @@ void ErrorMenu(char *error)
 	oldy = menu->Y;
 	menu->X = (VideoWidth - menu->Width) / 2;
 	menu->Y = (VideoHeight - menu->Height) / 2;
-	menu->Items[1].D.Text.text = error;
+	menu->Items[1].D.Text.text = NewStringDesc(error);
 	ProcessMenu("menu-net-error", 1);
+	FreeStringDesc(menu->Items[1].D.Text.text);
+	free(menu->Items[1].D.Text.text);
 	menu->Items[1].D.Text.text = NULL;
 	menu->X = oldx;
 	menu->Y = oldy;
@@ -5625,17 +5553,17 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
 		} else {
 			GetMetaParameter(reply, 0, &parameter);       // Player Name
-			menu->Items[j].D.Text.text = parameter;
+			menu->Items[j].D.Text.text = NewStringDesc(parameter);
 			GetMetaParameter(reply, 3, &parameter);       // IP
 			GetMetaParameter(reply, 4, &port);            // port
 			sprintf(parameter, "%s:%s", parameter, port); // IP:Port
-			menu->Items[j + 1].D.Text.text = parameter;
+			menu->Items[j + 1].D.Text.text = NewStringDesc(parameter);
 			GetMetaParameter(reply, 6, &parameter);
-			menu->Items[j + 2].D.Text.text = parameter;
+			menu->Items[j + 2].D.Text.text = NewStringDesc(parameter);
 			GetMetaParameter(reply, 7, &parameter);
-			menu->Items[j + 3].D.Text.text = parameter;
+			menu->Items[j + 3].D.Text.text = NewStringDesc(parameter);
 			GetMetaParameter(reply, 8, &parameter);
-			menu->Items[j + 4].D.Text.text = parameter;
+			menu->Items[j + 4].D.Text.text = NewStringDesc(parameter);
 			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 		}
 		++k;
@@ -5658,9 +5586,22 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 /**
 **  Multiplayer server menu exit callback
 */
-static void MultiMetaServerGameSetupExit(Menu* menu __attribute__((unused)))
+static void MultiMetaServerGameSetupExit(Menu* menu)
 {
-	// TODO: how to free stuff?
+	int i;
+	int j;
+	int numparam;
+	int nummenu;
+
+	numparam = 5;
+	nummenu = 6;
+	for (j = 4; j <= numparam * nummenu; ++j) {
+		for (i = 0; i < numparam; ++i) {
+			FreeStringDesc(menu->Items[i + j].D.Text.text);
+			free(menu->Items[i + j].D.Text.text);
+			menu->Items[i + j].D.Text.text = NULL;
+		}
+	}
 // EndMenu();
 // EndMenu();
 }
@@ -5673,12 +5614,15 @@ static void SelectGameServer(Menuitem* mi)
 	char server_host_buffer[64];
 	char *port;
 	int j;
+	char* tmp;
 
 	j = mi - mi->Menu->Items;
 	mi->Menu->Items[j].D.Checkbox.State = MI_CSTATE_UNCHECKED;
 	EndMenu();
 
-	strcpy(server_host_buffer, mi->Menu->Items[j - 4].D.Text.text);
+	tmp = EvalString(mi->Menu->Items[j - 4].D.Text.text);
+	strcpy(server_host_buffer, tmp);
+	free(tmp);
 
 	// Launch join directly
 	if ((port = strchr(server_host_buffer, ':')) != NULL) {
