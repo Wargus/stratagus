@@ -249,6 +249,7 @@ local Unit *AllocUnit (void)
     return unit;
 }
 
+#if 0
 /**
 **	FIXME: Docu
 */
@@ -265,7 +266,7 @@ global void InitUnit (Unit *unit, UnitType *type, Player *player)
     //
     //	Build player unit table
     //
-    if( player ) {
+    if( player && !type->Vanishes ) {
 	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
 	if( type->Building ) {
 	    player->TotalBuildings++;
@@ -349,6 +350,117 @@ global void InitUnit (Unit *unit, UnitType *type, Player *player)
 
     DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
 }
+#endif
+
+global void InitUnit (Unit *unit, UnitType *type)
+{
+    /* Refs need to be *increased* by 1, not *set* to 1, because if InitUnit()
+     * is called from game loading code, Refs can already have a nonzero
+     * value (thanks to forward references in the save file).  Incrementing
+     * should not matter during in-game unit creation because in that case
+     * Refs should be 0 anyway. */
+    ++unit->Refs;
+    //unit->Refs=1;
+
+    //
+    //	Build all unit table
+    //
+    unit->UnitSlot=&Units[NumUnits];	// back pointer
+    Units[NumUnits++]=unit;
+
+    DebugLevel3Fn("%p %d\n",unit,UnitNumber(unit));
+
+    //
+    //	Initialise unit structure (must be zero filled!)
+    //
+    unit->Type=type;
+    unit->SeenFrame=0xFF;
+
+    if( 1 ) {				// Call CCL for name generation
+	SCM fun;
+
+	fun = gh_symbol2scm("gen-unit-name");
+	if (!gh_null_p(symbol_boundp(fun, NIL))) {
+	    SCM value;
+
+	    value = symbol_value(fun, NIL);
+	    if (!gh_null_p(value)) {
+		value=gh_apply(value, cons(gh_symbol2scm(type->Ident),NIL));
+		unit->Name=gh_scm2newstr(value,NULL);
+	    }
+	}
+    }
+
+    if( !type->Building )
+        unit->Direction=(MyRand()>>8)&0xFF;	// random heading
+
+    if( type->CanCastSpell ) {
+	unit->Mana=MAGIC_FOR_NEW_UNITS;
+    }
+    unit->Active=1;
+
+    unit->GroupId=0;
+
+    unit->Wait=1;
+    unit->Reset=1;
+    unit->Removed=1;
+
+#ifdef NEW_DECODRAW
+    // JOHNS: not needed unit->deco=NULL;
+#endif
+
+    // Invisible as default for submarines
+    if( !type->Submarine ) {
+	unit->Visible=-1;		// Visible as default
+    }
+
+    unit->Rs=MyRand()%100; // used for random fancy buildings and other things
+
+    unit->OrderCount=1;
+    unit->Orders[0].Action=UnitActionStill;
+    DebugCheck( unit->Orders[0].Goal );
+    unit->NewOrder.Action=UnitActionStill;
+    DebugCheck( unit->NewOrder.Goal );
+    unit->SavedOrder.Action=UnitActionStill;
+    DebugCheck( unit->SavedOrder.Goal );
+
+    DebugCheck( NoUnitP );		// Init fails if NoUnitP!=0
+}
+
+global void AssignUnitToPlayer (Unit *unit, Player *player)
+{
+    UnitType *type = unit->Type;
+    //
+    //	Build player unit table
+    //
+    if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
+	unit->PlayerSlot=player->Units+player->TotalNumUnits++;
+	if( type->Building ) {
+	    player->TotalBuildings++;
+	}
+	else {
+	    player->TotalUnits++;
+	}
+	*unit->PlayerSlot=unit;
+
+	player->UnitTypesCount[type->Type]++;
+    }
+
+    if( type->Demand ) {
+        player->NumFoodUnits+=type->Demand;	// food needed
+	if( player==ThisPlayer ) {
+	    MustRedraw|=RedrawResources;	// update food
+	}
+    }
+    if( type->Building )
+	player->NumBuildings++;
+
+    unit->Player=player;
+    unit->Stats=&type->Stats[unit->Player->Player];
+    unit->Colors=player->UnitColors;
+
+    unit->HP=unit->Stats->HitPoints;
+}
 
 /**
 **	Create a new unit.
@@ -367,7 +479,9 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     DebugLevel3Fn("%s(%d)\n",type->Name,player-Players);
 
     unit = AllocUnit();
-    InitUnit (unit, type, player);
+    //InitUnit (unit, type, player);
+    InitUnit (unit, type);
+    AssignUnitToPlayer (unit, player);
     return unit;
 }
 
@@ -998,6 +1112,92 @@ global int UnitKnownOnMap(const Unit* unit)
     return 0;
 }
 
+#ifdef SPLIT_SCREEN_SUPPORT
+
+/**
+**	Returns true, if unit is visible in viewport.
+**
+**	@param v	Viewport number.
+**	@param unit	Unit to be checked.
+**	@return		True if visible, false otherwise.
+*/
+global int UnitVisibleInViewport (int v, const Unit* unit)
+{
+    unsigned x;
+    unsigned y;
+    int w;
+    int w0;
+    int h;
+    unsigned MapX = TheUI.VP[v].MapX;
+    unsigned MapY = TheUI.VP[v].MapY;
+    unsigned MapWidth = TheUI.VP[v].MapWidth;
+    unsigned MapHeight = TheUI.VP[v].MapHeight;
+
+    DebugCheck( !unit->Type );	// FIXME: Can this happen, if yes it is a bug
+
+    if (!ThisPlayer) {
+	//FIXME: ARI: Added here for early game setup state by
+	//	MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
+	//	so don't show anything until first real map-draw.
+	return 0;
+    }
+
+    if( unit->Player != ThisPlayer ) {
+	//FIXME: vladi: should handle teams and shared vision
+	// Invisible by spell
+	if ( unit->Invisible ) {
+	    return 0;
+	}
+	// Visible submarine
+	if ( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
+	    return 0;
+	}
+    }
+
+    //
+    //	Check if visible on screen.
+    //		FIXME: This could be better checked, tells to much!
+    //		FIXME: This is needed to show moving units.
+    //		FIXME: flyers disappears to fast.
+    //
+    x = unit->X;
+    y = unit->Y;
+    w = w0 = unit->Type->TileWidth;
+    h = unit->Type->TileHeight;
+    if( (x+w) < MapX || x > (MapX+MapWidth)
+	    || (y+h) < MapY || y > (MapY+MapHeight) ) {
+	return 0;
+    }
+
+    //
+    //	Check explored or if visible (building) under fog of war.
+    //		FIXME: need only check the boundary, not the complete rectangle.
+    //
+    for( ; h-->0; ) {
+	for( w=w0; w-->0; ) {
+	    if( IsMapFieldVisible(x+w,y+h)
+		    || (unit->Type->Building && unit->SeenFrame!=0xFF
+			&& IsMapFieldExplored(x+w,y+h)) ) {
+		return 1;
+	    }
+	}
+    }
+
+    return 0;
+}
+
+global int UnitVisibleOnScreen(const Unit* unit)
+{
+    int i;
+    for (i=0; i < TheUI.NumViewports; i++) {
+	if (UnitVisibleInViewport (i, unit))
+	    return 1;
+    }
+    return 0;
+}
+
+#else /* SPLIT_SCREEN_SUPPORT */
+
 /**
 **	Returns true, if unit is visible on current map view.
 **
@@ -1064,6 +1264,8 @@ global int UnitVisibleOnScreen(const Unit* unit)
 
     return 0;
 }
+
+#endif /* SPLIT_SCREEN_SUPPORT */
 
 /**
 **      StephanR: Get area of tiles covered by unit, including its displacement
@@ -2961,7 +3163,7 @@ global void LetUnitDie(Unit* unit)
 	    unit->IY=(type->Height-VideoGraphicHeight(type->Sprite))/2;
 
 	    unit->SubAction=0;
-	    unit->Removed=0;
+	    //unit->Removed=0;
 	    unit->Frame=0;
 	    unit->Orders[0].Action=UnitActionDie;
 
@@ -3003,7 +3205,7 @@ global void LetUnitDie(Unit* unit)
 
     // Not good: UnitUpdateHeading(unit);
     unit->SubAction=0;
-    unit->Removed=0;
+    //unit->Removed=0;
     unit->State=0;
     unit->Reset=0;
     unit->Wait=1;
@@ -3385,8 +3587,14 @@ global int ViewPointDistance(int x,int y)
     int y_v;
 
     // first compute the view point coordinate
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    x_v = v->MapX + v->MapWidth/2;
+    y_v = v->MapY + v->MapHeight/2;
+#else /* SPLIT_SCREEN_SUPPORT */
     x_v=MapX+MapWidth/2;
     y_v=MapY+MapHeight/2;
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     // then use MapDistance
     return MapDistance(x_v,y_v,x,y);
@@ -3406,8 +3614,14 @@ global int ViewPointDistanceToUnit(const Unit* dest)
     int y_v;
 
     // first compute the view point coordinate
+#ifdef SPLIT_SCREEN_SUPPORT
+    Viewport *v = &TheUI.VP[TheUI.LastClickedVP];
+    x_v = v->MapX + v->MapWidth/2;
+    y_v = v->MapY + v->MapHeight/2;
+#else /* SPLIT_SCREEN_SUPPORT */
     x_v=MapX+MapWidth/2;
     y_v=MapY+MapHeight/2;
+#endif /* SPLIT_SCREEN_SUPPORT */
 
     // then use MapDistanceToUnit
     return MapDistanceToUnit(x_v,y_v,dest);
