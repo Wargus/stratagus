@@ -492,21 +492,19 @@ global void DisplayPicture(const char *name)
     Graphic* picture;
 
     picture=LoadGraphic(name);
+    ResizeGraphic(picture,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(picture,picture->Width,picture->Height);
 #endif
-    // JOHNS: NO VideoSetPalette(picture->Pixels);
 
     VideoLockScreen();
 
-    // FIXME: bigger window ?
     VideoDrawSubClip(picture,0,0
 	,picture->Width,picture->Height
 	,(VideoWidth-picture->Width)/2,(VideoHeight-picture->Height)/2);
 
     VideoUnlockScreen();
 
-    // JOHNS: NO VideoSetPalette(NULL);
     VideoFree(picture);
 }
 

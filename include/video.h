@@ -1189,6 +1189,9 @@ extern Graphic* NewGraphic(unsigned d,int w,int h);
     /// Make graphic
 extern Graphic* MakeGraphic(unsigned,int,int,void*,unsigned);
 
+    /// Resize a graphic
+extern void ResizeGraphic(Graphic *g,int w,int h);
+
     /// Load graphic
 extern Graphic* LoadGraphic(const char* file);
 
