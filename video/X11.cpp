@@ -117,24 +117,24 @@ global void SetVideoSync(void)
     struct sigaction sa;
     struct itimerval itv;
 
-    if( !VideoSyncSpeed ) {
+    if (!VideoSyncSpeed) {
 	return;
     }
 
-    sa.sa_handler=VideoSyncHandler;
+    sa.sa_handler = VideoSyncHandler;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags=SA_RESTART;
-    if( sigaction(SIGALRM,&sa,NULL) ) {
-	fprintf(stderr,"Can't set signal handler\n");
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGALRM, &sa, NULL)) {
+	fprintf(stderr, "Can't set signal handler\n");
     }
 
-    itv.it_interval.tv_sec=itv.it_value.tv_sec=
-	(100/CYCLES_PER_SECOND)/VideoSyncSpeed;
-    itv.it_interval.tv_usec=itv.it_value.tv_usec=
-	(100000000/CYCLES_PER_SECOND)/VideoSyncSpeed-
-	itv.it_value.tv_sec*100000;
-    if( setitimer(ITIMER_REAL,&itv,NULL) ) {
-	fprintf(stderr,"Can't set itimer\n");
+    itv.it_interval.tv_sec = itv.it_value.tv_sec =
+	(100 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+    itv.it_interval.tv_usec = itv.it_value.tv_usec =
+	(100000000 / CYCLES_PER_SECOND) / VideoSyncSpeed -
+	itv.it_value.tv_sec * 100000;
+    if (setitimer(ITIMER_REAL, &itv, NULL)) {
+	fprintf(stderr, "Can't set itimer\n");
     }
 
     DebugLevel3("Timer installed %ld,%ld\n" _C_
@@ -158,7 +158,7 @@ global void SetVideoSync(void)
 {
     int ms;
 
-    if( VideoSyncSpeed ) {
+    if (VideoSyncSpeed) {
 	ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
     } else {
 	ms = INT_MAX;
@@ -180,11 +180,11 @@ global void SetVideoSync(void)
 /**
 **	Watch opening/closing of X11 connections. (not needed)
 */
-local void MyConnectionWatch
-	(Display* display,XPointer client,int fd,Bool flag,XPointer* data)
+local void MyConnectionWatch(Display* display, XPointer client, int fd,
+    Bool flag, XPointer* data)
 {
     DebugLevel0Fn(": fildes %d flag %d\n" _C_ fd _C_ flag);
-    if( flag ) {			// file handle opened
+    if (flag) {				// file handle opened
     } else {				// file handle closed
     }
 }
@@ -202,10 +202,10 @@ global unsigned long X11GetTicks(void)
     struct timeval now;
     unsigned long ticks;
 
-    gettimeofday(&now,NULL);
+    gettimeofday(&now, NULL);
 
-    ticks=(now.tv_sec-X11TicksStart.tv_sec)*1000
-	    +(now.tv_usec-X11TicksStart.tv_usec)/1000;
+    ticks = (now.tv_sec - X11TicksStart.tv_sec) * 1000 +
+	(now.tv_usec - X11TicksStart.tv_usec) / 1000;
 
     return ticks;
 }
@@ -221,7 +221,7 @@ global unsigned long X11GetTicks(void)
 **	@param syspalette_defined	Array denoting which entries in above
 **			palette are defined by this function.
 */
-local void AllocPalette8(Palette * palette, Palette * syspalette,
+local void AllocPalette8(Palette* palette, Palette* syspalette,
     unsigned long syspalette_defined[8])
 {
     XWindowAttributes xwa;
@@ -236,12 +236,14 @@ local void AllocPalette8(Palette * palette, Palette * syspalette,
     color.flags = DoRed | DoGreen | DoBlue;
     warning_given = 0;
 
-    for (i = 0; i <= 7; i++) {
+    for (i = 0; i <= 7; ++i) {
 	syspalette_defined[i] = 0;
     }
 
-    for (i = 0; i <= 255; i++, palette++) {
-	unsigned int r, g, b;
+    for (i = 0; i <= 255; ++i, ++palette) {
+	unsigned int r;
+	unsigned int g;
+	unsigned int b;
 
 	// -> Video
 	color.red = (r = palette->r) << 8;
@@ -268,7 +270,7 @@ local void AllocPalette8(Palette * palette, Palette * syspalette,
 		g >>= 1;
 		b += syspalette[color.pixel].b + 1;
 		b >>= 1;
-		average++;
+		++average;
 	    } else {
 		syspalette_defined[j] |= bit;
 	    }
@@ -304,105 +306,106 @@ global void GameInitDisplay(void)
     XWMHints wmhints;
     XClassHint classhint;
     XSetWindowAttributes attributes;
-    int shm_major,shm_minor;
+    int shm_major;
+    int shm_minor;
     Bool pixmap_support;
     XShmSegmentInfo shminfo;
     XVisualInfo xvi;
-    XPixmapFormatValues *xpfv;
+    XPixmapFormatValues* xpfv;
 
-    if( !(TheDisplay=XOpenDisplay(NULL)) ) {
-	fprintf(stderr,"Cannot connect to X-Server.\n");
+    if (!(TheDisplay = XOpenDisplay(NULL))) {
+	fprintf(stderr, "Cannot connect to X-Server.\n");
 	ExitFatal(-1);
     }
 
-    gettimeofday(&X11TicksStart,NULL);
+    gettimeofday(&X11TicksStart, NULL);
 
     TheScreen=DefaultScreen(TheDisplay);
 
     //	I need shared memory pixmap extension.
 
-    if( !XShmQueryVersion(TheDisplay,&shm_major,&shm_minor,&pixmap_support) ) {
-	fprintf(stderr,"SHM-Extensions required.\n");
+    if (!XShmQueryVersion(TheDisplay, &shm_major, &shm_minor, &pixmap_support)) {
+	fprintf(stderr, "SHM-Extensions required.\n");
 	ExitFatal(-1);
     }
-    if( !pixmap_support ) {
-	fprintf(stderr,"SHM-Extensions with pixmap supported required.\n");
+    if (!pixmap_support) {
+	fprintf(stderr, "SHM-Extensions with pixmap supported required.\n");
 	ExitFatal(-1);
     }
 
     //	Look for a nice visual
 
-    if( VideoDepth && XMatchVisualInfo(TheDisplay,
-	    TheScreen,VideoDepth,TrueColor,&xvi) ) {
+    if (VideoDepth && XMatchVisualInfo(TheDisplay,
+	    TheScreen, VideoDepth, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 16, TrueColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 16, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 15, TrueColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 15, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 24, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, PseudoColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 8, PseudoColor, &xvi)) {
 	goto foundvisual;
     }
-    if(XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi)) {
+    if (XMatchVisualInfo(TheDisplay, TheScreen, 8, TrueColor, &xvi)) {
 	goto foundvisual;
     }
-    fprintf(stderr,"Sorry, I couldn't find an 8, 15, 16, 24 or 32 bit visual.\n");
+    fprintf(stderr, "Sorry, I couldn't find an 8, 15, 16, 24 or 32 bit visual.\n");
     ExitFatal(-1);
 
 foundvisual:
 
-    xpfv=XListPixmapFormats(TheDisplay, &i);
-    for( i--; i>=0; i-- )  {
+    xpfv = XListPixmapFormats(TheDisplay, &i);
+    for (--i; i>=0; --i)  {
 	DebugLevel3("pixmap %d\n" _C_ xpfv[i].depth);
-	if( xpfv[i].depth==xvi.depth ) {
+	if (xpfv[i].depth == xvi.depth) {
 	    break;
 	}
     }
-    if(i<0)  {
-	fprintf(stderr,"No Pixmap format for visual depth?\n");
+    if (i < 0)  {
+	fprintf(stderr, "No Pixmap format for visual depth?\n");
 	ExitFatal(-1);
     }
-    if( !VideoDepth ) {
-	VideoDepth=xvi.depth;
+    if (!VideoDepth) {
+	VideoDepth = xvi.depth;
     }
-    VideoBpp=xpfv[i].bits_per_pixel;
-    printf( "Video X11, %d color, %d bpp\n", VideoDepth, VideoBpp );
+    VideoBpp = xpfv[i].bits_per_pixel;
+    printf("Video X11, %d color, %d bpp\n", VideoDepth, VideoBpp);
 
-    if( !VideoWidth ) {
+    if (!VideoWidth) {
 	VideoWidth = DEFAULT_VIDEO_WIDTH;
 	VideoHeight = DEFAULT_VIDEO_HEIGHT;
     }
 
-    shminfo.shmid=shmget(IPC_PRIVATE,
-	    (VideoWidth*xpfv[i].bits_per_pixel+xpfv[i].scanline_pad-1) /
-	    xpfv[i].scanline_pad * xpfv[i].scanline_pad * VideoHeight / 8,
-	    IPC_CREAT|0777);
+    shminfo.shmid = shmget(IPC_PRIVATE,
+	(VideoWidth * xpfv[i].bits_per_pixel + xpfv[i].scanline_pad - 1) /
+	xpfv[i].scanline_pad * xpfv[i].scanline_pad * VideoHeight / 8,
+	IPC_CREAT | 0777);
 
     XFree(xpfv);
 
-    if( !shminfo.shmid==-1 ) {
-	fprintf(stderr,"shmget failed.\n");
+    if (!shminfo.shmid == -1) {
+	fprintf(stderr, "shmget failed.\n");
 	ExitFatal(-1);
     }
-    VideoMemory=(void*)shminfo.shmaddr=shmat(shminfo.shmid,0,0);
-    if( shminfo.shmaddr==(void*)-1 ) {
-	shmctl(shminfo.shmid,IPC_RMID,0);
-	fprintf(stderr,"shmat failed.\n");
+    VideoMemory = (void*)shminfo.shmaddr = shmat(shminfo.shmid, 0, 0);
+    if (shminfo.shmaddr == (void*)-1) {
+	shmctl(shminfo.shmid, IPC_RMID, 0);
+	fprintf(stderr, "shmat failed.\n");
 	ExitFatal(-1);
     }
-    shminfo.readOnly=False;
+    shminfo.readOnly = False;
 
-    if( !XShmAttach(TheDisplay,&shminfo) ) {
-	shmctl(shminfo.shmid,IPC_RMID,0);
-	fprintf(stderr,"XShmAttach failed.\n");
+    if (!XShmAttach(TheDisplay, &shminfo)) {
+	shmctl(shminfo.shmid, IPC_RMID, 0);
+	fprintf(stderr, "XShmAttach failed.\n");
 	ExitFatal(-1);
     }
     // Mark segment as deleted as soon as both us and the X server have
@@ -410,125 +413,122 @@ foundvisual:
     // can no longer have addition processes attach to it, but Linux will let
     // them anyway.
 #if defined(linux)
-    shmctl(shminfo.shmid,IPC_RMID,0);
+    shmctl(shminfo.shmid, IPC_RMID, 0);
 #endif /* linux */
 
-    TheMainDrawable=attributes.background_pixmap=
-	    XShmCreatePixmap(TheDisplay,DefaultRootWindow(TheDisplay)
-		,shminfo.shmaddr,&shminfo
-		,VideoWidth,VideoHeight
-		,xvi.depth);
-    attributes.cursor = XCreateFontCursor(TheDisplay,XC_tcross-1);
+    TheMainDrawable = attributes.background_pixmap =
+	XShmCreatePixmap(TheDisplay,DefaultRootWindow(TheDisplay),
+	    shminfo.shmaddr,&shminfo,VideoWidth, VideoHeight, xvi. depth);
+    attributes.cursor = XCreateFontCursor(TheDisplay, XC_tcross - 1);
     attributes.backing_store = NotUseful;
     attributes.save_under = False;
-    attributes.event_mask = KeyPressMask|KeyReleaseMask|/*ExposureMask|*/
-	FocusChangeMask|ButtonPressMask|PointerMotionMask|ButtonReleaseMask;
-    i = CWBackPixmap|CWBackingStore|CWSaveUnder|CWEventMask|CWCursor;
+    attributes.event_mask = KeyPressMask | KeyReleaseMask | /*ExposureMask|*/
+	FocusChangeMask | ButtonPressMask | PointerMotionMask | ButtonReleaseMask;
+    i = CWBackPixmap | CWBackingStore | CWSaveUnder | CWEventMask | CWCursor;
 
-    if(xvi.class==PseudoColor)	{
-	i|=CWColormap;
+    if (xvi.class == PseudoColor)	{
+	i |= CWColormap;
 	attributes.colormap =
-		XCreateColormap( TheDisplay, DefaultRootWindow(TheDisplay),
-		    xvi.visual, AllocNone);
+	    XCreateColormap(TheDisplay, DefaultRootWindow(TheDisplay),
+		xvi.visual, AllocNone);
 	// FIXME:  Really should fill in the colormap right now
     }
-    window=XCreateWindow(TheDisplay,DefaultRootWindow(TheDisplay)
-	    ,0,0,VideoWidth,VideoHeight,3
-	    ,xvi.depth,InputOutput,xvi.visual,i,&attributes);
-    TheMainWindow=window;
+    window = XCreateWindow(TheDisplay, DefaultRootWindow(TheDisplay),
+	0, 0, VideoWidth, VideoHeight, 3, xvi.depth, InputOutput,
+	xvi.visual, i, &attributes);
+    TheMainWindow = window;
 
-    gcvalue.graphics_exposures=False;
-    GcLine=XCreateGC(TheDisplay,window,GCGraphicsExposures,&gcvalue);
+    gcvalue.graphics_exposures = False;
+    GcLine = XCreateGC(TheDisplay, window, GCGraphicsExposures, &gcvalue);
 
     //
     //	Clear initial window.
     //
-    XSetForeground(TheDisplay,GcLine,BlackPixel(TheDisplay,TheScreen));
-    XFillRectangle(TheDisplay,TheMainDrawable,GcLine,0,0
-	    ,VideoWidth,VideoHeight);
+    XSetForeground(TheDisplay, GcLine, BlackPixel(TheDisplay, TheScreen));
+    XFillRectangle(TheDisplay, TheMainDrawable, GcLine, 0, 0,
+	VideoWidth, VideoHeight);
 
-    WmDeleteWindowAtom=XInternAtom(TheDisplay,"WM_DELETE_WINDOW",False);
+    WmDeleteWindowAtom = XInternAtom(TheDisplay, "WM_DELETE_WINDOW", False);
 
     //
     //	Set some usefull min/max sizes as well as a 1.3 aspect
     //
 #if 0
-    if( geometry ) {
-	hints.flags=0;
-	f=XParseGeometry(geometry
-		,&hints.x,&hints.y,&hints.width,&hints.height);
+    if (geometry) {
+	hints.flags = 0;
+	f = XParseGeometry(geometry, &hints.x, &hints.y,
+	    &hints.width, &hints.height);
 
-	if( f&XValue ) {
-	    if( f&XNegative ) {
-		hints.x+=DisplayWidth-hints.width;
+	if (f & XValue) {
+	    if (f & XNegative) {
+		hints.x += DisplayWidth - hints.width;
 	    }
-	    hints.flags|=USPosition;
+	    hints.flags |= USPosition;
 	    // FIXME: win gravity
 	}
-	if( f&YValue ) {
-	    if( f&YNegative ) {
-		hints.y+=DisplayHeight-hints.height;
+	if (f & YValue) {
+	    if (f & YNegative) {
+		hints.y += DisplayHeight - hints.height;
 	    }
-	    hints.flags|=USPosition;
+	    hints.flags |= USPosition;
 	    // FIXME: win gravity
 	}
-	if( f&WidthValue ) {
-	    hints.flags|=USSize;
+	if (f & WidthValue) {
+	    hints.flags |= USSize;
 	}
-	if( f&HeightValue ) {
-	    hints.flags|=USSize;
+	if (f & HeightValue) {
+	    hints.flags |= USSize;
 	}
     } else {
 #endif
-	hints.width=VideoWidth;
-	hints.height=VideoHeight;
-	hints.flags=PSize;
+	hints.width = VideoWidth;
+	hints.height = VideoHeight;
+	hints.flags = PSize;
 #if 0
     }
 #endif
-    hints.min_width=VideoWidth;
-    hints.min_height=VideoHeight;
-    hints.max_width=VideoWidth;
-    hints.max_height=VideoHeight;
-    hints.min_aspect.x=4;
-    hints.min_aspect.y=3;
+    hints.min_width = VideoWidth;
+    hints.min_height = VideoHeight;
+    hints.max_width = VideoWidth;
+    hints.max_height = VideoHeight;
+    hints.min_aspect.x = 4;
+    hints.min_aspect.y = 3;
 
-    hints.max_aspect.x=4;
-    hints.max_aspect.y=3;
-    hints.width_inc=4;
-    hints.height_inc=3;
+    hints.max_aspect.x = 4;
+    hints.max_aspect.y = 3;
+    hints.width_inc = 4;
+    hints.height_inc = 3;
 
-    hints.flags|=PMinSize|PMaxSize|PAspect|PResizeInc;
+    hints.flags |= PMinSize | PMaxSize | PAspect | PResizeInc;
 
-    wmhints.input=True;
-    wmhints.initial_state=NormalState;
-    wmhints.window_group=window;
-    wmhints.flags=InputHint|StateHint|WindowGroupHint;
+    wmhints.input = True;
+    wmhints.initial_state = NormalState;
+    wmhints.window_group = window;
+    wmhints.flags = InputHint | StateHint | WindowGroupHint;
 
-    classhint.res_name="stratagus";
-    classhint.res_class="Stratagus";
+    classhint.res_name = "stratagus";
+    classhint.res_class = "Stratagus";
 
-    XSetStandardProperties(TheDisplay,window
-	,"Stratagus"
-	,"Stratagus",None,(char**)0,0,&hints);
-    XSetClassHint(TheDisplay,window,&classhint);
-    XSetWMHints(TheDisplay,window,&wmhints);
+    XSetStandardProperties(TheDisplay,window, "Stratagus",
+	"Stratagus", None, (char**)0, 0, &hints);
+    XSetClassHint(TheDisplay, window, &classhint);
+    XSetWMHints(TheDisplay, window, &wmhints);
 
-    XSetWMProtocols(TheDisplay,window,&WmDeleteWindowAtom,1);
+    XSetWMProtocols(TheDisplay, window, &WmDeleteWindowAtom, 1);
 
-    XMapWindow(TheDisplay,window);
+    XMapWindow(TheDisplay, window);
 
     //
     //	Input handling.
     //
-    //XAddConnectionWatch(TheDisplay,MyConnectionWatch,NULL);
+    //XAddConnectionWatch(TheDisplay, MyConnectionWatch, NULL);
 
     XFlush(TheDisplay);
 
     //
     //	Let hardware independent palette be converted.
     //
-    VideoAllocPalette8=AllocPalette8;
+    VideoAllocPalette8 = AllocPalette8;
 }
 
 /**
@@ -536,7 +536,9 @@ foundvisual:
 */
 global int SetVideoMode(int width)
 {
-    if (width == 640) return 1;
+    if (width == 640) {
+	return 1;
+    }
     return 0;
 }
 
@@ -548,20 +550,20 @@ global int SetVideoMode(int width)
 **	@param w	width of rectangle in pixels.
 **	@param h	height of rectangle in pixels.
 */
-global void InvalidateArea(int x,int y,int w,int h)
+global void InvalidateArea(int x, int y, int w, int h)
 {
     // FIXME: This checks should be done at hight level
-    if( x<0 ) {
-	w+=x;
-	x=0;
+    if (x < 0) {
+	w += x;
+	x = 0;
     }
-    if( y<0 ) {
-	h+=y;
-	y=0;
+    if (y < 0) {
+	h += y;
+	y = 0;
     }
-    if( !w<=0 && !h<=0 ) {
+    if (!w <= 0 && !h <= 0) {
 	DebugLevel3("X %d,%d -> %d,%d\n" _C_ x _C_ y _C_ w _C_ h);
-	XClearArea(TheDisplay,TheMainWindow,x,y,w,h,False);
+	XClearArea(TheDisplay, TheMainWindow, x, y, w, h, False);
     }
 }
 
@@ -570,7 +572,7 @@ global void InvalidateArea(int x,int y,int w,int h)
 */
 global void Invalidate(void)
 {
-    XClearWindow(TheDisplay,TheMainWindow);
+    XClearWindow(TheDisplay, TheMainWindow);
 }
 
 /**
@@ -578,7 +580,9 @@ global void Invalidate(void)
 */
 local void X11HandleModifiers(XKeyEvent* keyevent)
 {
-    int mod=keyevent->state;
+    int mod;
+    
+    mod = keyevent->state;
 
     // Here we use an ideous hack to avoid X keysyms mapping.
     // What we need is to know that the player hit key 'x' with
@@ -587,14 +591,14 @@ local void X11HandleModifiers(XKeyEvent* keyevent)
     // Note that we don't use this hack for "shift", because shifted
     // keys can be useful (to get numbers on my french keybord
     // for exemple :)).
-    if( mod&ShiftMask ) {
-	    /* Do Nothing */;
+    if (mod & ShiftMask) {
+	/* Do Nothing */;
     }
-    if( mod&ControlMask ) {
-	keyevent->state&=~ControlMask;	// Hack Attack!
+    if (mod & ControlMask) {
+	keyevent->state &= ~ControlMask;	// Hack Attack!
     }
-    if( mod&Mod1Mask ) {
-	keyevent->state&=~Mod1Mask;	// Hack Attack!
+    if (mod & Mod1Mask) {
+	keyevent->state &= ~Mod1Mask;		// Hack Attack!
     }
 }
 
@@ -613,120 +617,120 @@ local unsigned X112InternalKeycode(const KeySym code)
     **	Convert X11 keycodes into internal keycodes.
     */
     // FIXME: Combine X11 keysym mapping to internal in up and down.
-    switch( (icode=code) ) {
+    switch((icode = code)) {
 	case XK_Escape:
-	    icode='\e';
+	    icode = '\e';
 	    break;
 	case XK_Return:
 	case XK_KP_Enter:
-	    icode='\r';
+	    icode = '\r';
 	    break;
 	case XK_BackSpace:
-	    icode='\b';
+	    icode = '\b';
 	    break;
 	case XK_Tab:
-	    icode='\t';
+	    icode = '\t';
 	    break;
 	case XK_Up:
-	    icode=KeyCodeUp;
+	    icode = KeyCodeUp;
 	    break;
 	case XK_Down:
-	    icode=KeyCodeDown;
+	    icode = KeyCodeDown;
 	    break;
 	case XK_Left:
-	    icode=KeyCodeLeft;
+	    icode = KeyCodeLeft;
 	    break;
 	case XK_Right:
-	    icode=KeyCodeRight;
+	    icode = KeyCodeRight;
 	    break;
 	case XK_Pause:
-	    icode=KeyCodePause;
+	    icode = KeyCodePause;
 	    break;
 	case XK_F1:
-	    icode=KeyCodeF1;
+	    icode = KeyCodeF1;
 	    break;
 	case XK_F2:
-	    icode=KeyCodeF2;
+	    icode = KeyCodeF2;
 	    break;
 	case XK_F3:
-	    icode=KeyCodeF3;
+	    icode = KeyCodeF3;
 	    break;
 	case XK_F4:
-	    icode=KeyCodeF4;
+	    icode = KeyCodeF4;
 	    break;
 	case XK_F5:
-	    icode=KeyCodeF5;
+	    icode = KeyCodeF5;
 	    break;
 	case XK_F6:
-	    icode=KeyCodeF6;
+	    icode = KeyCodeF6;
 	    break;
 	case XK_F7:
-	    icode=KeyCodeF7;
+	    icode = KeyCodeF7;
 	    break;
 	case XK_F8:
-	    icode=KeyCodeF8;
+	    icode = KeyCodeF8;
 	    break;
 	case XK_F9:
-	    icode=KeyCodeF9;
+	    icode = KeyCodeF9;
 	    break;
 	case XK_F10:
-	    icode=KeyCodeF10;
+	    icode = KeyCodeF10;
 	    break;
 	case XK_F11:
-	    icode=KeyCodeF11;
+	    icode = KeyCodeF11;
 	    break;
 	case XK_F12:
-	    icode=KeyCodeF12;
+	    icode = KeyCodeF12;
 	    break;
 
 	case XK_KP_0:
-	    icode=KeyCodeKP0;
+	    icode = KeyCodeKP0;
 	    break;
 	case XK_KP_1:
-	    icode=KeyCodeKP1;
+	    icode = KeyCodeKP1;
 	    break;
 	case XK_KP_2:
-	    icode=KeyCodeKP2;
+	    icode = KeyCodeKP2;
 	    break;
 	case XK_KP_3:
-	    icode=KeyCodeKP3;
+	    icode = KeyCodeKP3;
 	    break;
 	case XK_KP_4:
-	    icode=KeyCodeKP4;
+	    icode = KeyCodeKP4;
 	    break;
 	case XK_KP_5:
-	    icode=KeyCodeKP5;
+	    icode = KeyCodeKP5;
 	    break;
 	case XK_KP_6:
-	    icode=KeyCodeKP6;
+	    icode = KeyCodeKP6;
 	    break;
 	case XK_KP_7:
-	    icode=KeyCodeKP7;
+	    icode = KeyCodeKP7;
 	    break;
 	case XK_KP_8:
-	    icode=KeyCodeKP8;
+	    icode = KeyCodeKP8;
 	    break;
 	case XK_KP_9:
-	    icode=KeyCodeKP9;
+	    icode = KeyCodeKP9;
 	    break;
 	case XK_KP_Add:
-	    icode=KeyCodeKPPlus;
+	    icode = KeyCodeKPPlus;
 	    break;
 	case XK_KP_Subtract:
-	    icode=KeyCodeKPMinus;
+	    icode = KeyCodeKPMinus;
 	    break;
 	case XK_KP_Decimal:
-	    icode=KeyCodeKPPeriod;
+	    icode = KeyCodeKPPeriod;
 	    break;
 	case XK_Print:
-	    icode=KeyCodePrint;
+	    icode = KeyCodePrint;
 	    break;
 	case XK_Delete:
-	    icode=KeyCodeDelete;
+	    icode = KeyCodeDelete;
 	    break;
 
 	case XK_dead_circumflex:
-	    icode='^';
+	    icode = '^';
 	    break;
 
 	// We need these because if you only hit a modifier key,
@@ -767,12 +771,12 @@ local unsigned X112InternalKeycode(const KeySym code)
 **	@param keycode		X11 key symbol.
 **	@param keychar		Keyboard character
 */
-local void X11HandleKeyPress(const EventCallback* callbacks,KeySym keycode,
-	unsigned keychar)
+local void X11HandleKeyPress(const EventCallback* callbacks, KeySym keycode,
+    unsigned keychar)
 {
     int icode;
 
-    icode=X112InternalKeycode(keycode);
+    icode = X112InternalKeycode(keycode);
     InputKeyButtonPress(callbacks, X11GetTicks(), icode, keychar);
 }
 
@@ -783,12 +787,12 @@ local void X11HandleKeyPress(const EventCallback* callbacks,KeySym keycode,
 **	@param keycode		X11 key symbol.
 **	@param keychar		Keyboard character
 */
-local void X11HandleKeyRelease(const EventCallback* callbacks,KeySym keycode,
-	unsigned keychar)
+local void X11HandleKeyRelease(const EventCallback* callbacks, KeySym keycode,
+    unsigned keychar)
 {
     int icode;
 
-    icode=X112InternalKeycode(keycode);
+    icode = X112InternalKeycode(keycode);
     InputKeyButtonRelease(callbacks, X11GetTicks(), icode, keychar);
 }
 
@@ -798,46 +802,46 @@ local void X11HandleKeyRelease(const EventCallback* callbacks,KeySym keycode,
 local void X11DoEvent(const EventCallback* callbacks)
 {
     XEvent event;
-    int xw, yw;
+    int xw;
+    int yw;
 
-    XNextEvent(TheDisplay,&event);
+    XNextEvent(TheDisplay, &event);
 
-    switch( event.type ) {
+    switch (event.type) {
 	case ButtonPress:
 	    DebugLevel3("\tbutton press %d\n" _C_ event.xbutton.button);
 	    InputMouseButtonPress(callbacks, X11GetTicks(),
-		    event.xbutton.button);
+		event.xbutton.button);
 	    break;
 
 	case ButtonRelease:
 	    DebugLevel3("\tbutton release %d\n" _C_ event.xbutton.button);
 	    InputMouseButtonRelease(callbacks, X11GetTicks(),
-		    event.xbutton.button);
+		event.xbutton.button);
 	    break;
 
 	case Expose:
 	    DebugLevel1("\texpose\n");
-	    MustRedraw=-1;
+	    MustRedraw = -1;
 	    break;
 
 	case MotionNotify:
-	    DebugLevel3("\tmotion notify %d,%d\n"
-		 _C_ event.xbutton.x _C_ event.xbutton.y);
+	    DebugLevel3("\tmotion notify %d,%d\n" _C_
+		event.xbutton.x _C_ event.xbutton.y);
 	    InputMouseMove(callbacks, X11GetTicks(),
-		    event.xbutton.x,event.xbutton.y);
-	    if ( (TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1)
-		    && (event.xbutton.x!=TheUI.MouseWarpX
-			 || event.xbutton.y!=TheUI.MouseWarpY)
-		    ) {
+		event.xbutton.x, event.xbutton.y);
+	    if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1) &&
+		    (event.xbutton.x != TheUI.MouseWarpX ||
+			event.xbutton.y != TheUI.MouseWarpY)) {
 		xw = TheUI.MouseWarpX;
 		yw = TheUI.MouseWarpY;
 		TheUI.MouseWarpX = -1;
 		TheUI.MouseWarpY = -1;
 
-		XWarpPointer(TheDisplay,TheMainWindow,TheMainWindow,0,0
-			,0,0,xw,yw);
+		XWarpPointer(TheDisplay, TheMainWindow, TheMainWindow, 0, 0,
+		    0, 0, xw, yw);
 	    }
-	    MustRedraw|=RedrawCursor;
+	    MustRedraw |= RedrawCursor;
 	    break;
 
 	case FocusIn:
@@ -867,13 +871,13 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    KeySym key;
 
 	    X11HandleModifiers((XKeyEvent*)&event);
-	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
-	    key=XLookupKeysym((XKeyEvent*)&event,0);
+	    num=XLookupString((XKeyEvent*)&event, buf, sizeof(buf), &keysym, 0);
+	    key=XLookupKeysym((XKeyEvent*)&event, 0);
 	    DebugLevel3("\tKeyv %lx %lx `%*.*s'\n" _C_ key _C_ keysym _C_ num _C_ num _C_ buf);
-	    if( num==1 ) {
-		X11HandleKeyPress(callbacks,key,*buf);
+	    if (num == 1) {
+		X11HandleKeyPress(callbacks, key, *buf);
 	    } else {
-		X11HandleKeyPress(callbacks,key,keysym);
+		X11HandleKeyPress(callbacks, key, keysym);
 	    }
 	}
 	    break;
@@ -887,13 +891,13 @@ local void X11DoEvent(const EventCallback* callbacks)
 	    KeySym key;
 
 	    X11HandleModifiers((XKeyEvent*)&event);
-	    num=XLookupString((XKeyEvent*)&event,buf,sizeof(buf),&keysym,0);
-	    key=XLookupKeysym((XKeyEvent*)&event,0);
+	    num=XLookupString((XKeyEvent*)&event, buf, sizeof(buf), &keysym, 0);
+	    key=XLookupKeysym((XKeyEvent*)&event, 0);
 	    DebugLevel3("\tKey^ %lx %lx `%*.*s'\n" _C_ key _C_ keysym _C_ num _C_ num _C_ buf);
-	    if( num==1 ) {
-		X11HandleKeyRelease(callbacks,key,*buf);
+	    if (num == 1) {
+		X11HandleKeyRelease(callbacks, key, *buf);
 	    } else {
-		X11HandleKeyRelease(callbacks,key,keysym);
+		X11HandleKeyRelease(callbacks, key, keysym);
 	    }
 	}
 	    break;
@@ -936,53 +940,52 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     int connection;
     unsigned long ticks;
 
-    connection=ConnectionNumber(TheDisplay);
+    connection = ConnectionNumber(TheDisplay);
 #ifdef WITH_SOUND
     // FIXME: ugly hack, move into sound part!!!
-    if( SoundFildes==-1 ) {
-	SoundOff=1;
+    if (SoundFildes == -1) {
+	SoundOff = 1;
     }
 #endif
-    if( !++FrameCounter ) {
+    if (!++FrameCounter) {
 	// FIXME: tests with frame counter now fails :(
 	// FIXME: Should happen in 68 years :)
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
-	fprintf(stderr,"FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
+	fprintf(stderr, "FIXME: *** round robin ***\n");
     }
 
-    ticks=X11GetTicks();
+    ticks = X11GetTicks();
 #ifndef USE_ITIMER
-    if( ticks>NextFrameTicks ) {	// We are too slow :(
-	IfDebug(
-	    if (InterfaceState == IfaceStateNormal) {
-		VideoDrawText(TheUI.MapArea.X+10,TheUI.MapArea.Y+10,GameFont,
-		    "SLOW FRAME!!");
-		XClearArea(TheDisplay,TheMainWindow
-		    ,TheUI.MapArea.X+10,TheUI.MapArea.Y+10,13*13,13
-		    ,False);
-	    }
-	);
+    if (ticks > NextFrameTicks) {	// We are too slow :(
+#ifdef DEBUG
+	if (InterfaceState == IfaceStateNormal) {
+	    VideoDrawText(TheUI.MapArea.X + 10, TheUI.MapArea.Y + 10, GameFont,
+		"SLOW FRAME!!");
+	    XClearArea(TheDisplay, TheMainWindow, TheUI.MapArea.X + 10,
+		TheUI.MapArea.Y + 10, 13 * 13, 13, False);
+	}
+#endif
 	++SlowFrameCounter;
     }
 #endif
 
-    InputMouseTimeout(callbacks,ticks);
-    InputKeyTimeout(callbacks,ticks);
+    InputMouseTimeout(callbacks, ticks);
+    InputKeyTimeout(callbacks, ticks);
     CursorAnimate(ticks);
 
-    for( ;; ) {
+    for (;;) {
 #ifdef SLOW_INPUT
-	while( XPending(TheDisplay) ) {
+	while (XPending(TheDisplay)) {
 	   X11DoEvent(callbacks);
 	}
 #endif
 	//
 	//	Prepare select
 	//
-	maxfd=0;
-	tv.tv_sec=tv.tv_usec=0;
+	maxfd = 0;
+	tv.tv_sec = tv.tv_usec = 0;
 
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
@@ -991,43 +994,43 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Time of frame over? This makes the CPU happy. :(
 	//
-	ticks=X11GetTicks();
-	if( !VideoInterrupts && ticks+11<NextFrameTicks ) {
-	    tv.tv_usec=(NextFrameTicks-ticks)*1000;
+	ticks = X11GetTicks();
+	if (!VideoInterrupts && ticks + 11 < NextFrameTicks) {
+	    tv.tv_usec = (NextFrameTicks - ticks) * 1000;
 	}
-	while( ticks>=NextFrameTicks ) {
+	while (ticks >= NextFrameTicks) {
 	    ++VideoInterrupts;
-	    FrameFraction+=FrameRemainder;
-	    if( FrameFraction>10 ) {
-		FrameFraction-=10;
+	    FrameFraction += FrameRemainder;
+	    if (FrameFraction > 10) {
+		FrameFraction -= 10;
 		++NextFrameTicks;
 	    }
-	    NextFrameTicks+=FrameTicks;
+	    NextFrameTicks += FrameTicks;
 	}
 #endif
 	//
 	//	X11 how many events already in queue
 	//
-	xfd=NULL;
-	morex=QLength(TheDisplay);
-	if( !morex ) {
+	xfd = NULL;
+	morex = QLength(TheDisplay);
+	if (!morex) {
 	    //
 	    //	X11 connections number
 	    //
-	    maxfd=connection;
-	    FD_SET(connection,&rfds);
+	    maxfd = connection;
+	    FD_SET(connection, &rfds);
 
 	    //
 	    //	Get all X11 internal connections
 	    //
-	    if( !XInternalConnectionNumbers(TheDisplay,&xfd,&n) ) {
+	    if (!XInternalConnectionNumbers(TheDisplay, &xfd, &n)) {
 		DebugLevel0Fn(": out of memory\n");
 		abort();
 	    }
-	    for( i=n; i--; ) {
-		FD_SET(xfd[i],&rfds);
-		if( xfd[i]>maxfd ) {
-		    maxfd=xfd[i];
+	    for (i = n; i--;) {
+		FD_SET(xfd[i], &rfds);
+		if (xfd[i] > maxfd) {
+		    maxfd = xfd[i];
 		}
 	    }
 	}
@@ -1036,22 +1039,22 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//	Sound
 	//
 #ifndef WITH_ARTSC
-	if( !SoundOff && !SoundThreadRunning ) {
-	    if( SoundFildes>maxfd ) {
-		maxfd=SoundFildes;
+	if (!SoundOff && !SoundThreadRunning) {
+	    if (SoundFildes > maxfd) {
+		maxfd = SoundFildes;
 	    }
-	    FD_SET(SoundFildes,&wfds);
+	    FD_SET(SoundFildes, &wfds);
 	}
 #endif
 
 	//
 	//	Network
 	//
-	if( NetworkFildes!=-1 ) {
-	    if( NetworkFildes>maxfd ) {
-		maxfd=NetworkFildes;
+	if (NetworkFildes != -1) {
+	    if (NetworkFildes > maxfd) {
+		maxfd = NetworkFildes;
 	    }
-	    FD_SET(NetworkFildes,&rfds);
+	    FD_SET(NetworkFildes, &rfds);
 	}
 
 #ifdef WITH_ARTSC
@@ -1060,10 +1063,10 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	}
 #endif
 #ifdef USE_ITIMER
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL
-		,(morex|VideoInterrupts) ? &tv : NULL);
+	maxfd = select(maxfd + 1, &rfds, &wfds, NULL,
+	    (morex | VideoInterrupts) ? &tv : NULL);
 #else
-	maxfd=select(maxfd+1,&rfds,&wfds,NULL,&tv);
+	maxfd = select(maxfd + 1, &rfds, &wfds, NULL, &tv);
 #endif
 
 	DebugLevel3Fn("%d, %d\n" _C_ morex|VideoInterrupts _C_ maxfd);
@@ -1071,37 +1074,37 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	X11
 	//
-	if( maxfd>0 ) {
-	    if( !morex ) {		// look if new events
+	if (maxfd > 0) {
+	    if (!morex) {		// look if new events
 		if (xfd) {
-		    for( i=n; i--; ) {
-			if( FD_ISSET(xfd[i],&rfds) ) {
-			    XProcessInternalConnection(TheDisplay,xfd[i]);
+		    for (i = n; i--;) {
+			if (FD_ISSET(xfd[i], &rfds)) {
+			    XProcessInternalConnection(TheDisplay, xfd[i]);
 			}
 		    }
 		}
-		if( FD_ISSET(connection,&rfds) ) {
-		    morex=XEventsQueued(TheDisplay,QueuedAfterReading);
+		if (FD_ISSET(connection, &rfds)) {
+		    morex=XEventsQueued(TheDisplay, QueuedAfterReading);
 		} else {
-		    morex=QLength(TheDisplay);
+		    morex = QLength(TheDisplay);
 		}
 	    }
 	}
-	if( xfd) {
+	if (xfd) {
 	    XFree(xfd);
 	}
 
-	for( i=morex; i > 0 && i--; ) {		// handle new + *OLD* x11 events
+	for (i = morex; i > 0 && i--;) {	// handle new + *OLD* x11 events
 	   X11DoEvent(callbacks);
 	}
 
-	if( maxfd>0 ) {
+	if (maxfd > 0) {
 	    //
 	    //	Sound
 	    //
 #ifndef WITH_ARTSC
-	    if( !SoundOff && !SoundThreadRunning
-		    && FD_ISSET(SoundFildes,&wfds) ) {
+	    if (!SoundOff && !SoundThreadRunning &&
+		    FD_ISSET(SoundFildes, &wfds)) {
 		callbacks->SoundReady();
 	    }
 #endif
@@ -1109,7 +1112,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	    //
 	    //	Network
 	    //
-	    if( NetworkFildes!=-1 && FD_ISSET(NetworkFildes,&rfds) ) {
+	    if (NetworkFildes != -1 && FD_ISSET(NetworkFildes, &rfds)) {
 		callbacks->NetworkEvent();
 	    }
 
@@ -1123,7 +1126,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 	//
 	//	Not more input and time for frame over: return
 	//
-	if( !morex && maxfd<=0 && VideoInterrupts ) {
+	if (!morex && maxfd <= 0 && VideoInterrupts) {
 	    break;
 	}
     }
@@ -1131,11 +1134,11 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //
     //	Prepare return, time for one frame is over.
     //
-    VideoInterrupts=0;
+    VideoInterrupts = 0;
 
 #ifndef USE_ITIMER
-    if( !SkipGameCycle-- ) {
-	SkipGameCycle=SkipFrames;
+    if (!SkipGameCycle--) {
+	SkipGameCycle = SkipFrames;
     }
 #endif
 }
@@ -1166,27 +1169,27 @@ local void VideoFreePallette(void* pixels)
     if (pixels) {
 	switch (VideoBpp) {
 	    case 8:
-		for (i = 0; i < 256; i++) {
-		    oldpal[i] = ((VMemType8 *) pixels)[i];
+		for (i = 0; i < 256; ++i) {
+		    oldpal[i] = ((VMemType8*)pixels)[i];
 		}
 		break;
 	    case 15:
 	    case 16:
-		for (i = 0; i < 256; i++) {
-		    oldpal[i] = ((VMemType16 *) pixels)[i];
+		for (i = 0; i < 256; ++i) {
+		    oldpal[i] = ((VMemType16*)pixels)[i];
 		}
 		break;
 	    case 24:
-		for (i = 0; i < 256; i++) {
-		    vp = (char *)(oldpal + i);
-		    vp[0] = ((VMemType24 *) pixels)[i].a;
-		    vp[1] = ((VMemType24 *) pixels)[i].b;
-		    vp[2] = ((VMemType24 *) pixels)[i].c;
+		for (i = 0; i < 256; ++i) {
+		    vp = (char*)(oldpal + i);
+		    vp[0] = ((VMemType24*)pixels)[i].a;
+		    vp[1] = ((VMemType24*)pixels)[i].b;
+		    vp[2] = ((VMemType24*)pixels)[i].c;
 		}
 		break;
 	    case 32:
-		for (i = 0; i < 256; i++) {
-		    oldpal[i] = ((VMemType32 *) pixels)[i];
+		for (i = 0; i < 256; ++i) {
+		    oldpal[i] = ((VMemType32*)pixels)[i];
 		}
 		break;
 	    default:
@@ -1212,16 +1215,16 @@ global unsigned long VideoMapRGB(int r, int g, int b)
     XColor color;
     XWindowAttributes xwa;
 
-    DebugCheck( !TheDisplay || !TheMainWindow );
+    DebugCheck(!TheDisplay || !TheMainWindow);
 
-    XGetWindowAttributes(TheDisplay,TheMainWindow,&xwa);
+    XGetWindowAttributes(TheDisplay, TheMainWindow, &xwa);
 
-    color.red=r<<8;
-    color.green=g<<8;
-    color.blue=b<<8;
-    color.flags=DoRed|DoGreen|DoBlue;
-    if( !XAllocColor(TheDisplay,xwa.colormap,&color) ) {
-	fprintf(stderr,"Cannot allocate color\n");
+    color.red = r << 8;
+    color.green = g << 8;
+    color.blue = b << 8;
+    color.flags = DoRed | DoGreen | DoBlue;
+    if (!XAllocColor(TheDisplay, xwa.colormap, &color)) {
+	fprintf(stderr, "Cannot allocate color\n");
 	// FIXME: Must find the nearest matching color
 	//ExitFatal(-1);
     }
@@ -1238,109 +1241,106 @@ global unsigned long VideoMapRGB(int r, int g, int b)
 **
 **	@todo FIXME: VideoFreePallette should be used to free unused colors
 */
-global VMemType* VideoCreateNewPalette(const Palette *palette)
+global VMemType* VideoCreateNewPalette(const Palette* palette)
 {
     XColor color;
     XWindowAttributes xwa;
     int i;
     void* pixels;
 
-    if( !TheDisplay || !TheMainWindow ) {	// no init
+    if (!TheDisplay || !TheMainWindow) {	// no init
 	return NULL;
     }
 
-    switch( VideoBpp ) {
-    case 8:
-	if ( colorcube8 ) {
-	// Shortcut: get palette from already allocated common palette.
-	// FIXME: shortcut should be placed in video.c, for all video support.
-	    return (VMemType*)VideoFindNewPalette8( colorcube8, palette );
-	}
-	pixels=malloc(256*sizeof(VMemType8));
-	break;
-    case 15:
-    case 16:
-	pixels=malloc(256*sizeof(VMemType16));
-	break;
-    case 24:
-	pixels=malloc(256*sizeof(VMemType24));
-	break;
-    case 32:
-	pixels=malloc(256*sizeof(VMemType32));
-	break;
-    default:
-	DebugLevel0Fn(": Unknown depth\n");
-	return NULL;
+    switch (VideoBpp) {
+	case 8:
+	    if (colorcube8) {
+	    // Shortcut: get palette from already allocated common palette.
+	    // FIXME: shortcut should be placed in video.c, for all video support.
+		return (VMemType*)VideoFindNewPalette8(colorcube8, palette);
+	    }
+	    pixels = malloc(256 * sizeof(VMemType8));
+	    break;
+	case 15:
+	case 16:
+	    pixels = malloc(256 * sizeof(VMemType16));
+	    break;
+	case 24:
+	    pixels = malloc(256 * sizeof(VMemType24));
+	    break;
+	case 32:
+	    pixels = malloc(256 * sizeof(VMemType32));
+	    break;
+	default:
+	    DebugLevel0Fn(": Unknown depth\n");
+	    return NULL;
     }
 
-    XGetWindowAttributes(TheDisplay,TheMainWindow,&xwa);
+    XGetWindowAttributes(TheDisplay, TheMainWindow, &xwa);
 
     //
     //	Convert each palette entry into hardware format.
     //
-    for( i=0; i<256; ++i ) {
+    for (i = 0; i < 256; ++i) {
 	int r;
 	int g;
 	int b;
 	int v;
-	char *vp;
+	char* vp;
 
-	r=(palette[i].r)&0xFF;
-	g=(palette[i].g)&0xFF;
-	b=(palette[i].b)&0xFF;
-	v=r+g+b;
+	r = (palette[i].r) & 0xFF;
+	g = (palette[i].g) & 0xFF;
+	b = (palette[i].b) & 0xFF;
+	v = r + g + b;
 
 	// Apply global saturation,contrast and brightness
-	r= ((((r*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
-	g= ((((g*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
-	b= ((((b*3-v)*TheUI.Saturation + v*100)
-	    *TheUI.Contrast)
-	    +TheUI.Brightness*25600*3)/30000;
+	r = ((((r * 3 - v) * TheUI.Saturation + v * 100) * TheUI.Contrast) +
+	    TheUI.Brightness * 25600 * 3) / 30000;
+	g = ((((g * 3 - v) * TheUI.Saturation + v * 100) * TheUI.Contrast) +
+	    TheUI.Brightness * 25600 * 3) / 30000;
+	b = ((((b * 3 - v) * TheUI.Saturation + v * 100) * TheUI.Contrast) +
+	    TheUI.Brightness * 25600 * 3) / 30000;
 
 	// Boundings
-	r= r<0 ? 0 : r>255 ? 255 : r;
-	g= g<0 ? 0 : g>255 ? 255 : g;
-	b= b<0 ? 0 : b>255 ? 255 : b;
+	r = r < 0 ? 0 : r > 255 ? 255 : r;
+	g = g < 0 ? 0 : g > 255 ? 255 : g;
+	b = b < 0 ? 0 : b > 255 ? 255 : b;
 
 	// -> Video
-	color.red=r<<8;
-	color.green=g<<8;
-	color.blue=b<<8;
-	color.flags=DoRed|DoGreen|DoBlue;
-	if( !XAllocColor(TheDisplay,xwa.colormap,&color) ) {
-	    fprintf(stderr,"Cannot allocate color\n");
+	color.red = r << 8;
+	color.green = g << 8;
+	color.blue = b << 8;
+	color.flags = DoRed | DoGreen | DoBlue;
+	if (!XAllocColor(TheDisplay, xwa.colormap, &color)) {
+	    fprintf(stderr, "Cannot allocate color\n");
 	    // FIXME: Must find the nearest matching color
 	    //ExitFatal(-1);
 	}
 
-	switch( VideoBpp ) {
-	case 8:
-	    ((VMemType8*)pixels)[i]=color.pixel;
-	    break;
-	case 15:
-	case 16:
-	    ((VMemType16*)pixels)[i]=color.pixel;
-	    break;
-	case 24:
-	    // Disliked by gcc 2.95.2, maybe due to size mismatch
-	    // ((VMemType24*)pixels)[i]=color.pixel;
-	    // ARI: Let's hope XAllocColor did correct RGB/BGR DAC mapping
-	    // into color.pixel
-	    // The following brute force hack then should be endian safe, well
-	    // maybe except for vaxen..
-	    // Now just tell users to stay away from strict-aliasing..
-	    vp = (char *)(&color.pixel);
-	    ((VMemType24*)pixels)[i].a=vp[0];
-	    ((VMemType24*)pixels)[i].b=vp[1];
-	    ((VMemType24*)pixels)[i].c=vp[2];
-	    break;
-	case 32:
-	    ((VMemType32*)pixels)[i]=color.pixel;
-	    break;
+	switch (VideoBpp) {
+	    case 8:
+		((VMemType8*)pixels)[i] = color.pixel;
+		break;
+	    case 15:
+	    case 16:
+		((VMemType16*)pixels)[i] = color.pixel;
+		break;
+	    case 24:
+		// Disliked by gcc 2.95.2, maybe due to size mismatch
+		// ((VMemType24*)pixels)[i] = color.pixel;
+		// ARI: Let's hope XAllocColor did correct RGB/BGR DAC mapping
+		// into color.pixel
+		// The following brute force hack then should be endian safe, well
+		// maybe except for vaxen..
+		// Now just tell users to stay away from strict-aliasing..
+		vp = (char *)(&color.pixel);
+		((VMemType24*)pixels)[i].a = vp[0];
+		((VMemType24*)pixels)[i].b = vp[1];
+		((VMemType24*)pixels)[i].c = vp[2];
+		break;
+	    case 32:
+		((VMemType32*)pixels)[i] = color.pixel;
+		break;
 	}
     }
 
@@ -1355,16 +1355,15 @@ global VMemType* VideoCreateNewPalette(const Palette *palette)
 global void CheckVideoInterrupts(void)
 {
 #ifdef USE_ITIMER
-    if( VideoInterrupts ) {
+    if (VideoInterrupts) {
 	//DebugLevel1("Slow frame\n");
-	IfDebug(
+#ifdef DEBUG
 	    if (InterfaceState == IfaceStateNormal) {
-		VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
-		XClearArea(TheDisplay,TheMainWindow
-		    ,TheUI.MapX+10,TheUI.MapX+10,13*13,13
-		    ,False);
+		VideoDrawText(TheUI.MapX + 10, TheUI.MapY + 10, GameFont, "SLOW FRAME!!");
+		XClearArea(TheDisplay, TheMainWindow, TheUI.MapX + 10,
+		    TheUI.MapX + 10, 13 * 13, 13, False);
 	    }
-	);
+#endif
 	++SlowFrameCounter;
     }
 #endif
@@ -1378,7 +1377,7 @@ global void RealizeVideoMemory(void)
     // in X11 it does flushing the output queue
     //XFlush(TheDisplay);
     // in X11 wait for all commands done.
-    XSync(TheDisplay,False);
+    XSync(TheDisplay, False);
 }
 
 /**
@@ -1390,14 +1389,14 @@ global void ToggleGrabMouse(int mode)
 {
     static int grabbed;
 
-    if( mode<=0 && grabbed ) {
-	XUngrabPointer(TheDisplay,CurrentTime);
-	grabbed=0;
-    } else if( mode>=0 && !grabbed ) {
-	if( XGrabPointer(TheDisplay,TheMainWindow,True,0
-		,GrabModeAsync,GrabModeAsync
-		,TheMainWindow, None, CurrentTime)==GrabSuccess ) {
-	    grabbed=1;
+    if (mode <= 0 && grabbed) {
+	XUngrabPointer(TheDisplay, CurrentTime);
+	grabbed = 0;
+    } else if (mode >= 0 && !grabbed) {
+	if (XGrabPointer(TheDisplay, TheMainWindow, True, 0,
+		GrabModeAsync, GrabModeAsync, TheMainWindow,
+		None, CurrentTime) == GrabSuccess) {
+	    grabbed = 1;
 	}
     }
 }
