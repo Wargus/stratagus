@@ -1714,7 +1714,7 @@ global Menu Menus[] = {
 	16+(14*TileSizeY-256)/2,
 	384, 256,
 	ImagePanel3,
-	7, 7,
+	6, 7,
 	SaveGameMenuItems,
 	NULL,
     },
@@ -2310,7 +2310,8 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
     } else {
 	mi[3].flags &= ~MenuButtonDisabled;
 	if (key == 10 || key == 13) {
-	    EndMenu();
+	    SaveAction();
+	    return;
 	}
     }
     TypedFileName = 1;
