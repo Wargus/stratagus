@@ -1669,11 +1669,15 @@ local SCM CclDefineMenuItem(SCM list)
 		value=gh_car(list);
 		list=gh_cdr(list);
 		item->mitype=MI_TYPE_TEXT;
+		item->d.text.text = NULL;
 
-		item->d.text.text=gh_scm2newstr(gh_car(value), NULL);
-		if (!strcmp(item->d.text.text, "null")) {
-		    free(item->d.text.text);
-		    item->d.text.text = NULL;
+		if ( !gh_null_p(gh_car(value)) ) {
+		    item->d.text.text=gh_scm2newstr(gh_car(value), NULL);
+		    // FIXME: can be removed
+		    if (!strcmp(item->d.text.text, "null")) {
+			free(item->d.text.text);
+			item->d.text.text = NULL;
+		    }
 		}
 		value=gh_cdr(value);
 		value=gh_car(value);
@@ -1706,10 +1710,15 @@ local SCM CclDefineMenuItem(SCM list)
 			item->d.button.ysize=gh_scm2int(gh_car(value));
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("caption")) ) {
-			item->d.button.text=gh_scm2newstr(gh_car(sublist),NULL);
-			if ( !strcmp(item->d.button.text, "null") ) {
-			    free(item->d.button.text);
-			    item->d.button.text = NULL;
+			item->d.button.text = NULL;
+			if ( !gh_null_p(gh_car(sublist)) ) {
+			    item->d.button.text = gh_scm2newstr(
+				gh_car(sublist),NULL);
+			    // FIXME: can be removed
+			    if ( !strcmp(item->d.button.text, "null") ) {
+				free(item->d.button.text);
+				item->d.button.text = NULL;
+			    }
 			}
 			sublist=gh_cdr(sublist);
 		    } else if ( gh_eq_p(value, gh_symbol2scm("hotkey")) ) {
