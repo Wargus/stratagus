@@ -337,7 +337,7 @@ char* strdcat3(const char* l, const char* m, const char* r)
 	return res;
 }
 
-#if !defined(BSD)
+#if !HAVE_STRCASESTR
 /**
 **  Case insensitive version of strstr
 **
@@ -368,7 +368,7 @@ char* strcasestr(const char* a, const char* b)
 
 	return NULL;
 }
-#endif // BSD
+#endif // !HAVE_STRCASESTR
 
 /**
 **  Compute a square root using ints
