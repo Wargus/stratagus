@@ -360,23 +360,36 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 #define CYCLES_PER_SECOND	30	// 1/30s 0.33ms
 
     /// must redraw flags
-enum MustRedraw_e {
+enum _must_redraw_flags_ {
+    RedrawNothing	= 1<< 0,	/// nothing to do
+    RedrawMinimap	= 1<< 1,	/// Minimap area
+    RedrawMap		= 1<< 2,	/// Map area
+    RedrawCursor	= 1<< 3,	/// Cursor changed
+    RedrawResources	= 1<< 4,	/// Resources
+
+/* FIXME: Next is planned to reduce the area of redraws
+    RedrawGold		= 1<< 5,	/// Resources 1 gold
+    RedrawWood		= 1<< 6,	/// Resources 2 wood
+    RedrawOil		= 1<< 7,	/// Resources 3 oil
+    RedrawOre		= 1<< 8,	/// Resources 4 ore
+    RedrawStone		= 1<< 9,	/// Resources 5 stone
+    RedrawCoal		= 1<<10,	/// Resources 6 coal
+    RedrawFood		= 1<<11,	/// Resources F food supply / demand
+    RedrawPoints	= 1<<12,	/// Resources S score
+*/
+    RedrawMessage	= 1<<13,	/// Message
+    RedrawStatusLine	= 1<<14,	/// Statusline
+    RedrawInfoPanel	= 1<<15,	/// Unit description
+    RedrawButtonPanel	= 1<<16,	/// Unit buttons
+    RedrawFiller1	= 1<<17,	/// Filler1: Border on right side
+    RedrawMinimapBorder	= 1<<18,	/// Area around minimap
+    RedrawCosts		= 1<<19,	/// Costs in status line
+    RedrawMenuButton	= 1<<20,	/// Area above minimap
+    RedrawMinimapCursor	= 1<<21,	/// Minimap cursor changed
+    RedrawMenu		= 1<<22,	/// Menu
+
+    RedrawAll		= 1<<30,	/// All flag set by RedrawEverything
     RedrawEverything	= -1,		/// must redraw everything
-    RedrawNothing	= 0,		/// nothing to do
-    RedrawMinimap	= 1,		/// Minimap area
-    RedrawMap		= 2,		/// Map area
-    RedrawCursor	= 4,		/// Cursor changed
-    RedrawResources	= 8,		/// Resources
-    RedrawMessage	= 16,		/// Message
-    RedrawStatusLine	= 32,		/// Statusline
-    RedrawInfoPanel	= 64,		/// Unit description
-    RedrawButtonPanel	= 128,		/// Unit buttons
-    RedrawFiller1	= 256,		/// Filler1: Border on right side
-    RedrawMinimapBorder	= 512,		/// Area around minimap
-    RedrawCosts		= 1024,		/// Costs in status line
-    RedrawMenuButton	= 2048,		/// Area above minimap
-    RedrawMinimapCursor	= 4096,		/// Minimap cursor changed
-    RedrawMenu		= 8192,		/// Menu
 };
 
     /// Must redraw all maps
@@ -404,22 +417,25 @@ static inline void ShowLoadProgress(const char* fmt,...) {};
 
 #endif	// } !_MSC_VER
 
-    /// mainscreen width (default 640)
+    /// Mainscreen width (default 640)
 extern int VideoWidth;
 
-    /// mainscreen height (default 480)
+    /// Mainscreen height (default 480)
 extern int VideoHeight;
 
-    /// invalidated map
-extern enum MustRedraw_e MustRedraw;
+    /// Invalidated redraw flags
+extern int MustRedraw;
+
+    /// Enable redraw flags
+extern int EnableRedraw;
 
     /// Next frame ticks
 extern unsigned long NextFrameTicks;
 
-    /// counts frames
-extern int FrameCounter;
+    /// Counts frames
+extern unsigned long FrameCounter;
 
-    /// counts quantity of slow frames
+    /// Counts quantity of slow frames
 extern int SlowFrameCounter;
 
 /*----------------------------------------------------------------------------
