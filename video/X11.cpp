@@ -10,7 +10,7 @@
 //
 /**@name X11.c		-	XWindows support. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer and Valery Shchedrin
+//	(c) Copyright 1998-2003 by Lutz Sammer and Valery Shchedrin
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -613,6 +613,7 @@ local unsigned X112InternalKeycode(const KeySym code)
 	    icode='\e';
 	    break;
 	case XK_Return:
+	case XK_KP_Enter:
 	    icode='\r';
 	    break;
 	case XK_BackSpace:
@@ -708,6 +709,9 @@ local unsigned X112InternalKeycode(const KeySym code)
 	    break;
 	case XK_KP_Subtract:
 	    icode=KeyCodeKPMinus;
+	    break;
+	case XK_KP_Decimal:
+	    icode=KeyCodeKPPeriod;
 	    break;
 	case XK_Print:
 	    icode=KeyCodePrint;
