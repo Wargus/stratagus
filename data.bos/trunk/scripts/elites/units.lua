@@ -73,8 +73,7 @@ DefineUnitType("unit-apcs", {
 		"acknowledge", "apcs-acknowledge",
 		"ready", "apcs-ready",
 		"help", "apcs-help",
-		"dead", "apcs-die",
-		"attack", "apcs-attack"}
+		"dead", "apcs-die"}
 	})
 
 DefineUnitType("unit-medic", {
@@ -99,8 +98,7 @@ DefineUnitType("unit-medic", {
 		"acknowledge", "medic-acknowledge",
 		"ready", "medic-ready",
 		"help", "medic-help",
-		"dead", "medic-die",
-		"attack", "medic-attack"}
+		"dead", "medic-die"}
 	})
 
 DefineUnitType("unit-bazoo", {
@@ -124,8 +122,7 @@ DefineUnitType("unit-bazoo", {
 		"acknowledge", "bazoo-acknowledge",
 		"ready", "bazoo-ready",
 		"help", "bazoo-help",
-		"dead", "bazoo-die",
-		"attack", "bazoo-attack"}
+		"dead", "bazoo-die"}
 	})
 
 DefineUnitType("unit-assault", {
@@ -148,8 +145,7 @@ DefineUnitType("unit-assault", {
 		"acknowledge", "assault-acknowledge",
 		"ready", "assault-ready",
 		"help", "assault-help",
-		"dead", "assault-die",
-		"attack", "assault-attack"}
+		"dead", "assault-die"}
 	})
 
 DefineUnitType("unit-grenadier", {
@@ -171,8 +167,7 @@ DefineUnitType("unit-grenadier", {
 		"acknowledge", "grenadier-acknowledge",
 		"ready", "grenadier-ready",
 		"help", "grenadier-help",
-		"dead", "grenadier-die",
-		"attack", "grenadier-attack"}
+		"dead", "grenadier-die"}
 	})
 
 DefineUnitType("unit-engineer", {
@@ -274,8 +269,7 @@ DefineUnitType("unit-dorcoz", {
 		"acknowledge", "dorcoz-acknowledge",
 		"ready", "dorcoz-ready",
 		"help", "basic terras voices help 1",
-		"dead", "basic terras voices dead",
-		"attack", "dorcoz-attack"}
+		"dead", "basic terras voices dead"}
 	})
 
 DefineUnitType("unit-msilo", {
@@ -537,7 +531,6 @@ DefineUnitType("unit-elites-start-location", {
 		"acknowledge", "elites-start-location-acknowledge",
 		"ready", "elites-start-location-ready",
 		"help", "basic elites voices help 2",
-		"dead", "building destroyed",
-		"attack", "elites-start-location-attack"}
+		"dead", "building destroyed"}
 	})
 

@@ -79,8 +79,7 @@ DefineUnitType("unit-gturret", {
                 "selected", "gen-selected",
                 "ready", "gen-ready",
                 "help", "gen-help",
-                "dead", "gen-dead",
-                "attack", "assault-attack"}
+                "dead", "gen-dead"}
         })
 
 DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")

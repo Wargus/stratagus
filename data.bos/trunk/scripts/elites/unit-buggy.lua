@@ -106,9 +106,7 @@ DefineUnitType("unit-buggy", {
             "acknowledge", "buggy-acknowledge",
             "ready",       "buggy-ready",
             "help",        "buggy-help",
-            "dead",        "buggy-die",
-            "attack",      "assault-attack",
-            }
+            "dead",        "buggy-die"}
         })
 
 DefineAllow("unit-buggy", "AAAAAAAAAAAAAAAA")

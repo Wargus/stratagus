@@ -2,7 +2,8 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 CVS version:
-- Converion of all animations to the new format. (Loïs Taulelle)
+- Removed attack sound entry in unit definitions. (François Beerten)
+- Conversion of all animations to the new format. (Loïs Taulelle)
 - Added artil unit. (TimberDragon, Loïs Taulelle, François Beerten)
 - Added rocket tank unit. (TimberDragon, Loïs Taulelle, François Beerten)
 - Added tank unit. (TimberDragon, Loïs Taulelle, François Beerten)
