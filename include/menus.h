@@ -225,7 +225,7 @@ typedef struct _menus_ {
 #define MENU_CAMPAIN_CONT 13
 #define MENU_OBJECTIVES 14
 #define MENU_END_SCENARIO 15
-#define MENU_GAME_OPTIONS 16
+#define MENU_SOUND_OPTIONS 16
 #define MENU_CDROM_DISABLED 17
 #define MENU_MAX 17			/// highest available menu id (for ccl)
 
