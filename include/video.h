@@ -514,7 +514,7 @@ extern void VideoDrawClip(const Graphic* s, unsigned frame, int x, int y);
 #endif
 
 	/// Draw graphic object clipped and with player colors.
-extern void VideoDrawPlayerColorClip(const Graphic* sprite, int player,
+extern void VideoDrawPlayerColorClip(Graphic* sprite, int player,
 	unsigned frame, int x, int y);
 
 	/// Draw a graphic object clipped to the current clipping.
@@ -537,7 +537,7 @@ extern void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y);
 #endif
 
 	/// Draw graphic object clipped, flipped, and with player colors.
-extern void VideoDrawPlayerColorClipX(const Graphic* sprite, int player,
+extern void VideoDrawPlayerColorClipX(Graphic* sprite, int player,
 	unsigned frame, int x, int y);
 
 	/// Translucent Functions
