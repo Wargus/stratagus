@@ -243,7 +243,8 @@ global void CreatePlayer(int type)
 
     player->Color=PlayerColors[NumPlayers];
 
-    if( Players[NumPlayers].Type==PlayerComputer ) {
+    if( Players[NumPlayers].Type==PlayerComputer
+	    || Players[NumPlayers].Type==PlayerRescueActive) {
 	player->AiEnabled=1;
     } else {
 	player->AiEnabled=0;
