@@ -217,9 +217,48 @@ global void CleanUpgrades(void)
 **
 **	@param alow	Pointer to alow area.
 **	@param length	length of alow area.
+**
+**	@note	Only included for compatibility, for new levels use
+**		CCL (define-allow)
 */
 global void ParsePudALOW(const char* alow,int length)
 {
+    // units allow bits -> wc2num -> internal names.
+    static char unit_for_bit[] = {
+	 0,  1,	// unit-footman			unit-grunt
+	 2,  3,	// unit-peasant			unit-peon
+	 4,  5,	// unit-ballista		unit-catapult
+	 6,  7,	// unit-knight			unit-ogre
+	 7,  9,	// unit-archer			unit-axethrower
+	10, 11,	// unit-mage			unit-death-knight
+	26, 27,	// unit-human-oil-tanker	unit-orc-oil-tanker
+	30, 31,	// unit-elven-destroyer		unit-troll-destroyer
+	28, 29,	// unit-human-transport		unit-orc-transport
+	32, 33,	// unit-battleship		unit-ogre-juggernaught
+	38, 39,	// unit-gnomish-submarine	unit-giant-turtle
+	40, 41,	// unit-gnomish-flying-machine	unit-goblin-zeppelin
+	42, 43,	// unit-gryphon-rider		unit-dragon
+	-1, -1,	// NULL				NULL
+	14, 15,	// unit-dwarves			unit-goblin-sappers
+	 0,  0,	// unit-gryphon-aviary		unit-dragon-roost
+	 0,  0,	// unit-farm			unit-pig-farm
+	 0,  0,	// unit-human-barracks		unit-orc-barracks
+	 0,  0,	// unit-gryphon-aviary		unit-dragon-roost
+	 0,  0,	// unit-elven-lumber-mill	unit-troll-lumber-mill
+	 0,  0,	// unit-stables			unit-ogre-mound
+	 0,  0,	// unit-mage-tower		unit-temple-of-the-damned
+	 0,  0,	// unit-human-foundry		unit-orc-foundry
+	 0,  0,	// unit-human-refinery		unit-orc-refinery
+	 0,  0,	// unit-gnomish-inventor	unit-goblin-alchemist
+	 0,  0,	// unit-church			unit-altar-of-storms
+	 0,  0,	// unit-human-watch-tower	unit-orc-watch-tower
+	 0,  0,	// unit-town-hall		unit-great-hall
+	 0,  0,	// unit-keep			unit-stronghold
+	 0,  0,	// unit-castle			unit-fortress
+	 0,  0,	// unit-human-blacksmith	unit-orc-blacksmith
+	 0,  0,	// unit-human-shipyard		unit-orc-shipyard
+	 0,  0,	// unit-human-wall		unit-orc-wall
+    };
     // FIXME: must loaded from config files
     // units allow bits -> internal names.
     static char* units[] = {
@@ -345,6 +384,10 @@ global void ParsePudALOW(const char* alow,int length)
 	    v=*alow++;
 	    DebugLevel3Fn(" %x\n",v);
 	    for( b=0; b<8; ++b ) {
+		if( units[i*16+0+b*2]>0 ) {
+		    DebugCheck( UnitTypeByIdent(units[i*16+0+b*2])->Type
+			    != unit_for_bit[i*16+0+b*2] );
+		}
 		if( v&(1<<b) ) {
 		    if( units[i*16+0+b*2] ) {
 			DebugLevel3Fn(" %s +\n",
@@ -1536,7 +1579,15 @@ global void AllowByIdent(Player* player,  const char* ident, char af )
 }
 
 /**
-**	FIXME: docu
+**	Return the allow state of an unit-type.
+**
+**	@param player	Check state for this player.
+**	@param ident	Unit-type identifier.
+**
+**	@note	This function shouldn't be used during runtime, it is only
+**		for setup.
+**
+**	@see Allow
 */
 global char UnitIdentAllowed(const Player * player, const char *ident)
 {
@@ -1544,11 +1595,25 @@ global char UnitIdentAllowed(const Player * player, const char *ident)
 }
 
 /**
-**	FIXME: docu
+**	Return the allow state of an upgrade.
+**
+**	@param player	Check state for this player.
+**	@param ident	Upgrade identifier.
+**
+**	@note	This function shouldn't be used during runtime, it is only
+**		for setup.
+**
+**	@see Allow
 */
-global char UpgradeIdentAllowed(const Player * player, const char *ident)
+global char UpgradeIdentAllowed(const Player* player, const char* ident)
 {
-    return UpgradeIdAllowed(player, UpgradeIdByIdent(ident));
+    int id;
+
+    if ((id = UpgradeIdByIdent(ident)) != -1) {
+	return UpgradeIdAllowed(player, id);
+    }
+    DebugLevel0Fn("Fix your code, wrong idenifier `%s'\n" _C_ ident);
+    return '-';
 }
 
 /*----------------------------------------------------------------------------
