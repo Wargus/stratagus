@@ -156,7 +156,8 @@ void ActionStillGeneric(Unit* unit, int ground)
 			y = TheMap.Info.MapHeight - 1;
 		}
 		if (x != unit->X || y != unit->Y) {
-			if (CheckedCanMoveToMask(x, y, TypeMovementMask(type))) {
+			UnmarkUnitFieldFlags(unit);
+			if (UnitCanBeAt(unit, x, y)) {
 				// FIXME: Don't use pathfinder for this, costs too much cpu.
 				unit->Orders[0].Action = UnitActionMove;
 				Assert(!unit->Orders[0].Goal);
@@ -166,6 +167,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 				unit->Orders[0].Y = y;
 				unit->State = 0;
 			}
+			MarkUnitFieldFlags(unit);
 		}
 		// NOTE: critter couldn't attack automatic through the return
 		return;

@@ -342,31 +342,45 @@ int CheckedCanMoveToMask(int x, int y, int mask)
 }
 
 /**
-**  Can a unit of unit-type move to this point.
+**  Can an unit of unit-type be placed at this point.
 **
+**  @param type  unit-type to be checked.
 **  @param x     X map tile position.
 **  @param y     Y map tile position.
-**  @param type  unit-type to be checked.
 **
 **  @return      True if could be entered, false otherwise.
 */
-int UnitTypeCanMoveTo(int x, int y, const UnitType* type)
+int UnitTypeCanBeAt(const UnitType* type, int x, int y)
 {
-	return CanMoveToMask(x, y, TypeMovementMask(type));
+	int addx;  // iterator
+	int addy;  // iterator
+	int mask;  // movement mask of the unit.
+
+	Assert(type);
+	mask = TypeMovementMask(type);
+	for (addx = 0; addx < type->TileWidth; addx++) {
+		for (addy = 0; addy < type->TileHeight; addy++) {
+			if (!CheckedCanMoveToMask(x + addx, y + addy, mask)) {
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 /**
-**  Can an unit move to this point.
+**  Can an unit be placed to this point.
 **
+**  @param unit  unit to be checked.
 **  @param x     X map tile position.
 **  @param y     Y map tile position.
-**  @param unit  unit to be checked.
 **
-**  @return      True if could be entered, false otherwise.
+**  @return      True if could be placeded, false otherwise.
 */
-int UnitCanMoveTo(int x, int y, const Unit* unit)
+int UnitCanBeAt(const Unit* unit, int x, int y)
 {
-	return CanMoveToMask(x, y, TypeMovementMask(unit->Type));
+	Assert(unit);
+	return UnitTypeCanBeAt(unit->Type, x, y);
 }
 
 /**
