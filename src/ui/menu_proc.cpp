@@ -745,6 +745,8 @@ local void DrawGem(Menuitem *mi, int mx, int my)
     MenuButtonId rb;
     int x;
     int y;
+    int nc;
+    int rc;
 
     flags = mi->flags;
     rb = mi->d.gem.button;
@@ -765,6 +767,18 @@ local void DrawGem(Menuitem *mi, int mx, int my)
 	}
     }
     VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+
+    GetDefaultTextColors(&nc, &rc);
+    if (mi->d.gem.text) {
+	// FIXME: find correct x, y for other gem types , add options for other fonts
+	VideoDrawText(x+24, y+3, GameFont, mi->d.gem.text);
+	if (mi->flags&MenuButtonActive) {
+	    SetDefaultTextColors(rc,rc);
+	    VideoDrawRectangleClip(ColorGray,mx+mi->xofs-4,my+mi->yofs-4,
+		    VideoTextLength(GameFont, mi->d.gem.text)+30,VideoTextHeight(GameFont)+12);
+	    SetDefaultTextColors(nc,rc);
+	}
+    }
 }
 
 /**
@@ -1497,7 +1511,10 @@ local void MenuHandleMouseMove(int x,int y)
 		    case MI_TYPE_GEM:
 			xs = menu->x + mi->xofs;
 			ys = menu->y + mi->yofs;
-			if (x < xs || x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize) {
+			if ((!mi->d.gem.text || x < xs - 4 || x > xs + 
+				VideoTextLength(GameFont, mi->d.gem.text)+32 || y < ys - 4 || 
+				y > ys + VideoTextHeight(GameFont)+10) && (x < xs || 
+				x > xs + mi->d.gem.xsize || y < ys || y > ys + mi->d.gem.ysize)) {
 			    if (!(mi->flags&MenuButtonClicked)) {
 				if (mi->flags&MenuButtonActive) {
 				    redraw_flag = 1;
