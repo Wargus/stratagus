@@ -3078,9 +3078,10 @@ global void HitUnit(Unit* attacker,Unit* target,int damage)
     // david: capture enemy buildings
     // Only worker types can capture.
     // Still possible to destroy building if not careful (too many attackers)
-    if( EnableBuildingCapture && type->Building && target->HP<=damage*3 &&
+    if( EnableBuildingCapture && attack
+	    && type->Building && target->HP<=damage*3 &&
 	    (attacker->Type==UnitTypeOrcWorker
-	    || attacker->Type==UnitTypeHumanWorker) ) {
+		|| attacker->Type==UnitTypeHumanWorker) ) {
 	ChangeUnitOwner(target, target->Player, attacker->Player);
 	CommandStopUnit(attacker);	// Attacker shouldn't continue attack!
     }
