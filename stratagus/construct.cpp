@@ -331,17 +331,20 @@ local SCM CclDefineConstruction(SCM list)
 	    while( !gh_null_p(sublist) ) {
 		str=gh_scm2newstr(gh_car(sublist),NULL);
 
-		for( i=0; i<NumTilesets; ++i ) {
-		    if( !strcmp(str,Tilesets[i]->Ident) ) {
-			break;
+		i=0; 
+		if( strcmp(str,"default") ) {
+		    for( ; i<NumTilesets; ++i ) {
+			if( !strcmp(str,Tilesets[i]->Ident) ) {
+			    break;
+			}
+			if( !strcmp(str,Tilesets[i]->Class) ) {
+			    break;
+			}
 		    }
-		    if( !strcmp(str,Tilesets[i]->Class) ) {
-			break;
+		    if( i==NumTilesets ) {
+			fprintf(stderr,"Tileset `%s' not available\n",str);
+			errl("tileset not available",gh_car(sublist));
 		    }
-		}
-		if( i==NumTilesets ) {
-		    fprintf(stderr,"Tileset `%s' not available\n",str);
-		    errl("tileset not available",gh_car(sublist));
 		}
 		sublist=gh_cdr(sublist);
 		free(str);
