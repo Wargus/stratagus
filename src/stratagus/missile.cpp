@@ -285,6 +285,8 @@ local Missile* NewLocalMissile(void)
 local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
     int sy, int dx, int dy)
 {
+    DebugCheck(!mtype);
+    DebugCheck(!missile);
     missile->X = sx - mtype->Width / 2;
     missile->Y = sy - mtype->Height / 2;
     missile->DX = dx - mtype->Width / 2;
@@ -322,6 +324,7 @@ global Missile* MakeMissile(MissileType* mtype,int sx,int sy,int dx,int dy)
 {
     Missile* missile;
 
+    DebugCheck(!mtype);
     DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n" _C_
 	mtype - MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
@@ -348,6 +351,7 @@ global Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx, int
 {
     Missile* missile;
 
+    DebugCheck(!mtype);
     DebugLevel3Fn("type %d(%s) at %d,%d to %d,%d\n" _C_
 	mtype - MissileTypes _C_ mtype->Ident _C_ sx _C_ sy _C_ dx _C_ dy);
 
