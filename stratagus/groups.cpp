@@ -154,7 +154,7 @@ global void ClearGroup(int num)
 	group = &Groups[num];
 	for (i = 0; i < group->NumUnits; ++i) {
 		group->Units[i]->GroupId &= ~(1 << num);
-		DebugCheck(group->Units[i]->Destroyed);
+		Assert(!group->Units[i]->Destroyed);
 	}
 	group->NumUnits = 0;
 }
@@ -171,7 +171,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
 	UnitGroup* group;
 	int i;
 
-	DebugCheck(num > NUM_GROUPS);
+	Assert(num <= NUM_GROUPS);
 
 	group = &Groups[num];
 	for (i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
@@ -189,7 +189,7 @@ global void AddToGroup(Unit** units, int nunits, int num)
 */
 global void SetGroup(Unit** units, int nunits, int num)
 {
-	DebugCheck(num > NUM_GROUPS || nunits > MaxSelectable);
+	Assert(num <= NUM_GROUPS && nunits <= MaxSelectable);
 
 	ClearGroup(num);
 	AddToGroup(units, nunits, num);
@@ -206,7 +206,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 	int num;
 	int i;
 
-	DebugCheck(unit->GroupId == 0);  // unit doesn't belong to a group
+	Assert(unit->GroupId != 0);  // unit doesn't belong to a group
 
 	for (num = 0; unit->GroupId; ++num, unit->GroupId >>= 1) {
 		if ((unit->GroupId & 1) != 1) {
@@ -218,7 +218,7 @@ global void RemoveUnitFromGroups(Unit* unit)
 			;
 		}
 
-		DebugCheck(i >= group->NumUnits);  // oops not found
+		Assert(i < group->NumUnits);  // oops not found
 
 		// This is a clean way that will allow us to add a unit
 		// to a group easily, or make an easy array walk...

@@ -92,7 +92,7 @@ global void UnSelectAll(void)
 */
 local void HandleSuicideClick(Unit* unit)
 {
-	DebugCheck(!unit->Type->ClicksToExplode);
+	Assert(unit->Type->ClicksToExplode);
 	if (GameObserve) {
 		return;
 	}
@@ -122,7 +122,7 @@ global void ChangeSelectedUnits(Unit** units,int count)
 	int i;
 	int n;
 
-	DebugCheck(count > MaxSelectable);
+	Assert(count <= MaxSelectable);
 
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
 		!units[0]->Type->Decoration) {
@@ -173,7 +173,7 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 					units[i]->TeamSelected |= 1 << player->Player;
 				}
 			}
-			DebugCheck(TeamNumSelected[player->Player] > MaxSelectable);
+			Assert(TeamNumSelected[player->Player] <= MaxSelectable);
 			break;
 		case 1:
 			for (n = 0; n < TeamNumSelected[player->Player]; ++n) {
@@ -184,10 +184,10 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 					}
 				}
 			}
-			DebugCheck(TeamNumSelected[player->Player] < 0);
+			Assert(TeamNumSelected[player->Player] >= 0);
 			break;
 		default:
-			DebugCheck(1);
+			Assert(0);
 	}
 }
 
@@ -257,7 +257,7 @@ global void UnSelectUnit(Unit* unit)
 				for (j = 0; TeamSelected[i][j] != unit; ++i) {
 					;
 				}
-				DebugCheck(j >= TeamNumSelected[i]);
+				Assert(j < TeamNumSelected[i]);
 
 				if (j < --TeamNumSelected[i]) {
 
@@ -274,7 +274,7 @@ global void UnSelectUnit(Unit* unit)
 	for (i = 0; Selected[i] != unit; ++i) {
 		;
 	}
-	DebugCheck(i >= NumSelected);
+	Assert(i < NumSelected);
 
 	if (i < --NumSelected) {
 		Selected[i] = Selected[NumSelected];
@@ -331,7 +331,7 @@ global int SelectUnitsByType(Unit* base)
 	int i;
 	const Viewport* vp;
 
-	DebugCheck(!TheUI.MouseViewport);
+	Assert(TheUI.MouseViewport);
 	DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
 	type = base->Type;
@@ -495,7 +495,7 @@ global int SelectGroup(int group_number)
 {
 	int nunits;
 
-	DebugCheck(group_number > NUM_GROUPS);
+	Assert(group_number <= NUM_GROUPS);
 
 	if (!(nunits = GetNumberUnitsOfGroup(group_number))) {
 		return 0;
@@ -1099,7 +1099,7 @@ global void CleanSelections(void)
 
 	GroupId = 0;
 	NumSelected = 0;
-	DebugCheck(NoUnitP);				// Code fails if none zero
+	Assert(!NoUnitP);				// Code fails if none zero
 	free(Selected);
 	Selected = NULL;
 

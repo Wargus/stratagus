@@ -144,7 +144,7 @@ global CLFile* CLopen(const char* fn, long openflags)
 		strcpy(openstring,"wb");
 	} else {
 		DebugLevel0("Bad CLopen flags");
-		DebugCheck(1);
+		Assert(0);
 		return NULL;
 	}
 
