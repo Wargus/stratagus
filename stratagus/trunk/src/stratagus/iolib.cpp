@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name iolib.c	-	Compression-IO helper functions. */
+/**@name iolib.c - Compression-IO helper functions. */
 //
-//	(c) Copyright 2000-2003 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
+//      (c) Copyright 2000-2004 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -50,17 +50,17 @@
 #include "iolib.h"
 
 /*----------------------------------------------------------------------------
---		Defines
+--  Defines
 ----------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_ZLIB
@@ -484,9 +484,30 @@ global char* LibraryFileName(const char* file, char* buffer)
 #endif
 	}
 
+#ifdef USE_WIN32
+	//
+	//  In user home directory
+	//
+	sprintf(buffer, "%s/%s", GameName, file);
+	if (!access(buffer,R_OK)) {
+		return buffer;
+	}
+#ifdef USE_ZLIB  // gzip or bzip2 in user home directory
+	sprintf(buffer, "%s/%s.gz", GameName, file);
+	if (!access(buffer, R_OK)) {
+		return buffer;
+	}
+#endif
+#ifdef USE_BZ2LIB
+	sprintf(buffer, "%s/%s.bz2", GameName, file);
+	if (!access(buffer, R_OK)) {
+		return buffer;
+	}
+#endif
+#else
 	if ((s = getenv("HOME"))) {
 		//
-		//		In user home directory
+		//  In user home directory
 		//
 		sprintf(buffer, "%s/%s/%s/%s", s, STRATAGUS_HOME_PATH, GameName, file);
 		if (!access(buffer,R_OK)) {
@@ -505,6 +526,7 @@ global char* LibraryFileName(const char* file, char* buffer)
 		}
 #endif
 	}
+#endif
 
 	//
 	//		In global shared directory
