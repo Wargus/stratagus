@@ -847,7 +847,8 @@ global void ResizeGraphic(Graphic *g, int w, int h)
     SDL_FreeSurface(g->Surface);
 
     g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-    SDL_SetPalette(g->Surface, SDL_LOGPAL|SDL_PHYSPAL, pal, 0, 256);
+    SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
+    SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, 255);
 
     g->Width = w;
     g->Height = h;
