@@ -1847,18 +1847,18 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// Damage and extradamage
 	if (unit->Stats->PiercingDamage != unit->Type->_PiercingDamage) {
-		if (unit->Stats->PiercingDamage < 30 && unit->Stats->BasicDamage < 30) {
-			unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + 1) / 2;
+		if (unit->Type->_PiercingDamage < 30 && unit->Type->_BasicDamage < 30) {
+			unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + 1) / 2;
 		} else {
-			unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + unit->Stats->BasicDamage - 30) / 2;
+			unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + unit->Type->_BasicDamage - 30) / 2;
 		}
 		unit->Variable[EXTRADAMAGE_INDEX].Value = unit->Stats->BasicDamage - unit->Type->_BasicDamage +
 							(int)isqrt(unit->XP / 100) * XpDamage;
 		unit->Variable[EXTRADAMAGE_INDEX].Max = unit->Variable[EXTRADAMAGE_INDEX].Value;
-	} else if (unit->Stats->PiercingDamage || unit->Stats->BasicDamage < 30) {
-		unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->PiercingDamage + 1) / 2;
+	} else if (unit->Type->_PiercingDamage || unit->Type->_BasicDamage < 30) {
+		unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_PiercingDamage + 1) / 2;
 	} else {
-		unit->Variable[DAMAGE_INDEX].Value = (unit->Stats->BasicDamage - 30) / 2;
+		unit->Variable[DAMAGE_INDEX].Value = (unit->Type->_BasicDamage - 30) / 2;
 	}
 	unit->Variable[DAMAGE_INDEX].Max = unit->Type->_BasicDamage + unit->Type->_PiercingDamage;
 
