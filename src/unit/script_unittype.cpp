@@ -112,16 +112,21 @@ local SCM CclDefineUnitType(SCM list)
 		value=gh_car(sublist);
 		sublist=gh_cdr(sublist);
 
-		for( i=0; i<TilesetMax; ++i ) {
-		    if( gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Ident)) ) {
-			type->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
-			break;
+		// FIXME: use a general get tileset function here!
+		i=0;
+		if( gh_eq_p(value,gh_symbol2scm("default")) ) {
+		    for( ; i<TilesetMax; ++i ) {
+			if( gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Ident)) ||
+				gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Class)) ) {
+			    break;
+			}
+		    }
+		    if( i==TilesetMax ) {
+		       // FIXME: this leaves half initialized unit-type
+		       errl("Unsupported tileset tag",value);
 		    }
 		}
-		if( i==TilesetMax ) {
-		   // FIXME: this leaves half initialized unit-type
-		   errl("Unsupported tileset tag",value);
-		}
+		type->File[i]=gh_scm2newstr(gh_car(sublist),NULL);
 		sublist=gh_cdr(sublist);
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
