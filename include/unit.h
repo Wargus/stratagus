@@ -928,7 +928,8 @@ extern void SaveDecorations(CLFile* file);
 extern void CleanDecorations(void);
 
     /// Draw unit's shadow
-extern void DrawShadow(const Unit* unit, const UnitType* type, int x, int y);
+extern void DrawShadow(const Unit* unit, const UnitType* type, int frame,
+    int x, int y);
     /// Draw A single Unit
 extern void DrawUnit(const Unit* unit);
 extern void DrawBuilding(const Unit* unit);

@@ -709,6 +709,7 @@ local void DrawBuildingCursor(void)
     int h;
     int mask;
     const Viewport* vp;
+    int frame;
 
     // Align to grid
     vp = TheUI.MouseViewport;
@@ -720,14 +721,13 @@ local void DrawBuildingCursor(void)
     //
     //	Draw building
     //
+    frame = CursorBuilding->Animations->Still[0].Frame +
+	(CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1);
     PushClipping();
     SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-    DrawShadow(NULL, CursorBuilding, x, y);
+    DrawShadow(NULL, CursorBuilding, frame, x, y);
     GraphicPlayerPixels(ThisPlayer, CursorBuilding->Sprite);
-    DrawUnitType(CursorBuilding,
-	CursorBuilding->Animations->Still[0].Frame +
-	    (CursorBuilding->Building ? 0 : CursorBuilding->NumDirections / 2 + 1 - 1),
-	x, y);
+    DrawUnitType(CursorBuilding, frame, x, y);
     PopClipping();
 
     //

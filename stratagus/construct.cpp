@@ -101,7 +101,7 @@ global void LoadConstructions(void)
 		(*cop)->Width = (*cop)->File[0].Width;
 		(*cop)->Height = (*cop)->File[0].Height;
 	    }
-	    if (*file) {
+	    if (file && *file) {
 		char* buf;
 
 		buf = alloca(strlen(file) + 9 + 1);
