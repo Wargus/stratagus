@@ -85,6 +85,7 @@ local SCM CclPlayer(SCM list)
     Player* player;
     int i;
     char* str;
+    char* s;
 
     i = gh_scm2int(gh_car(list));
     player = &Players[i];
@@ -95,7 +96,6 @@ local SCM CclPlayer(SCM list)
     player->Color = PlayerColors[i];
     if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
 	DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
-
 	return SCM_UNSPECIFIED;
     }
     list = gh_cdr(list);
@@ -126,8 +126,8 @@ local SCM CclPlayer(SCM list)
 	    } else if (gh_eq_p(value, gh_symbol2scm("rescue-active"))) {
 		player->Type = PlayerRescueActive;
 	    } else {
-	       // FIXME: this leaves a half initialized player
-	       errl("Unsupported tag", value);
+		// FIXME: this leaves a half initialized player
+		errl("Unsupported tag", value);
 	    }
 	} else if (gh_eq_p(value, gh_symbol2scm("race"))) {
 	    str = gh_scm2newstr(gh_car(list),NULL);
@@ -151,7 +151,7 @@ local SCM CclPlayer(SCM list)
 	    player->Team = gh_scm2int(gh_car(list));
 	    list = gh_cdr(list);
 	} else if (gh_eq_p(value, gh_symbol2scm("enemy"))) {
-	    str = gh_scm2newstr(gh_car(list), NULL);
+	    s = str = gh_scm2newstr(gh_car(list), NULL);
 	    list = gh_cdr(list);
 	    for (i = 0; i < PlayerMax && *str; ++i, ++str) {
 		if (*str == '-' || *str == '_' || *str == ' ') {
@@ -160,8 +160,9 @@ local SCM CclPlayer(SCM list)
 		    player->Enemy |= (1 << i);
 		}
 	    }
+	    free(s);
 	} else if (gh_eq_p(value, gh_symbol2scm("allied"))) {
-	    str = gh_scm2newstr(gh_car(list), NULL);
+	    s = str = gh_scm2newstr(gh_car(list), NULL);
 	    list = gh_cdr(list);
 	    for (i = 0; i < PlayerMax && *str; ++i, ++str) {
 		if (*str == '-' || *str == '_' || *str == ' ') {
@@ -170,8 +171,9 @@ local SCM CclPlayer(SCM list)
 		    player->Allied |= (1 << i);
 		}
 	    }
+	    free(s);
 	} else if (gh_eq_p(value, gh_symbol2scm("shared-vision"))) {
-	    str = gh_scm2newstr(gh_car(list), NULL);
+	    s = str = gh_scm2newstr(gh_car(list), NULL);
 	    list = gh_cdr(list);
 	    for (i = 0; i < PlayerMax && *str; ++i, ++str) {
 		if (*str == '-' || *str == '_' || *str == ' ') {
@@ -180,6 +182,7 @@ local SCM CclPlayer(SCM list)
 		    player->SharedVision |= (1 << i);
 		}
 	    }
+	    free(s);
 	} else if (gh_eq_p(value, gh_symbol2scm("start"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
@@ -301,6 +304,230 @@ local SCM CclPlayer(SCM list)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclPlayer(lua_State* l)
+{
+    const char* value;
+    Player* player;
+    int i;
+    int args;
+    int j;
+    int subargs;
+    int k;
+
+    args = lua_gettop(l);
+    j = 0;
+
+    i = LuaToNumber(l, j + 1);
+    ++j;
+    player = &Players[i];
+    if (NumPlayers <= i) {
+	NumPlayers = i + 1;
+    }
+    player->Player = i;
+    player->Color = PlayerColors[i];
+    if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
+	DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
+	return 0;
+    }
+
+    //
+    //	Parse the list:	(still everything could be changed!)
+    //
+    for (; j < args; ++j) {
+	value = LuaToString(l, j + 1);
+	++j;
+
+	if (!strcmp(value, "name")) {
+	    player->Name = strdup(LuaToString(l, j + 1));
+	} else if (!strcmp(value, "type")) {
+	    value = LuaToString(l, j + 1);
+	    if (!strcmp(value, "neutral")) {
+		player->Type = PlayerNeutral;
+	    } else if (!strcmp(value, "nobody")) {
+		player->Type = PlayerNobody;
+	    } else if (!strcmp(value, "computer")) {
+		player->Type = PlayerComputer;
+	    } else if (!strcmp(value, "person")) {
+		player->Type = PlayerPerson;
+	    } else if (!strcmp(value, "rescue-passive")) {
+		player->Type = PlayerRescuePassive;
+	    } else if (!strcmp(value, "rescue-active")) {
+		player->Type = PlayerRescueActive;
+	    } else {
+	       lua_pushfstring(l, "Unsupported tag: %s", value);
+	       lua_error(l);
+	    }
+	} else if (!strcmp(value, "race")) {
+	    value = LuaToString(l, j + 1);
+	    for (i = 0; i < PlayerRaces.Count; ++i) {
+		if (!strcmp(value, PlayerRaces.Name[i])) {
+		    player->RaceName = PlayerRaces.Name[i];
+		    player->Race = i;
+		    break;
+		}
+	    }
+	    if (i == PlayerRaces.Count) {
+		lua_pushfstring(l, "Unsupported race: %s", value);
+		lua_error(l);
+	    }
+	} else if (!strcmp(value, "ai")) {
+	    player->AiNum = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "team")) {
+	    player->Team = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "enemy")) {
+	    value = LuaToString(l, j + 1);
+	    for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+		if (*value == '-' || *value == '_' || *value == ' ') {
+		    player->Enemy &= ~(1 << i);
+		} else {
+		    player->Enemy |= (1 << i);
+		}
+	    }
+	} else if (!strcmp(value, "allied")) {
+	    value = LuaToString(l, j + 1);
+	    for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+		if (*value == '-' || *value == '_' || *value == ' ') {
+		    player->Allied &= ~(1 << i);
+		} else {
+		    player->Allied |= (1 << i);
+		}
+	    }
+	} else if (!strcmp(value, "shared-vision")) {
+	    value = LuaToString(l, j + 1);
+	    for (i = 0; i < PlayerMax && *value; ++i, ++value) {
+		if (*value == '-' || *value == '_' || *value == ' ') {
+		    player->SharedVision &= ~(1 << i);
+		} else {
+		    player->SharedVision |= (1 << i);
+		}
+	    }
+	} else if (!strcmp(value, "start")) {
+	    if (!lua_istable(l, j + 1) || luaL_getn(l, j + 1) != 2) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    lua_rawgeti(l, j + 1, 1);
+	    player->StartX = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	    lua_rawgeti(l, j + 1, 2);
+	    player->StartY = LuaToNumber(l, -1);
+	    lua_pop(l, 1);
+	} else if (!strcmp(value, "resources")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		for (i = 0; i < MaxCosts; ++i) {
+		    if (!strcmp(value, DefaultResourceNames[i])) {
+			lua_rawgeti(l, j + 1, k + 1);
+			player->Resources[i] = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			break;
+		    }
+		}
+		if (i == MaxCosts) {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else if (!strcmp(value, "incomes")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+		++k;
+
+		for (i = 0; i < MaxCosts; ++i) {
+		    if (!strcmp(value, DefaultResourceNames[i])) {
+			lua_rawgeti(l, j + 1, k + 1);
+			player->Resources[i] = LuaToNumber(l, -1);
+			lua_pop(l, 1);
+			break;
+		    }
+		}
+		if (i == MaxCosts) {
+		    lua_pushfstring(l, "Unsupported tag: %s", value);
+		    lua_error(l);
+		}
+	    }
+	} else if (!strcmp(value, "ai-enabled")) {
+	    player->AiEnabled = 1;
+	    --j;
+	} else if (!strcmp(value, "ai-disabled")) {
+	    player->AiEnabled = 0;
+	    --j;
+	} else if (!strcmp(value, "supply")) {
+	    player->Supply = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "demand")) {
+	    player->Demand = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "unit-limit")) {
+	    player->UnitLimit = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "building-limit")) {
+	    player->BuildingLimit = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-unit-limit")) {
+	    player->TotalUnitLimit = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "score")) {
+	    player->Score = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-units")) {
+	    player->TotalUnits = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-buildings")) {
+	    player->TotalBuildings = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-razings")) {
+	    player->TotalRazings = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-kills")) {
+	    player->TotalKills = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "total-resources")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    if (subargs != MaxCosts) {
+		lua_pushfstring(l, "Wrong number of total-resources: %d", i);
+		lua_error(l);
+	    }
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		player->TotalResources[k] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
+	} else if (!strcmp(value, "total-units")) {
+	    player->TotalUnits = LuaToNumber(l, j + 1);
+	} else if (!strcmp(value, "timers")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    if (subargs != UpgradeMax) {
+		lua_pushfstring(l, "Wrong upgrade timer length: %d", i);
+		lua_error(l);
+	    }
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		player->UpgradeTimers.Upgrades[i] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    }
+	} else {
+	   lua_pushfstring(l, "Unsupported tag: %s", value);
+	   lua_error(l);
+	}
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1015,7 +1242,7 @@ global void PlayerCclRegister(void)
     gh_new_procedure2_0("get-player-resource", CclGetPlayerResource);
     gh_new_procedureN("set-player-resource!", CclSetPlayerResource);
 #elif defined(USE_LUA)
-//    lua_register(Lua, "Player", CclPlayer);
+    lua_register(Lua, "Player", CclPlayer);
     lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
     lua_register(Lua, "GetThisPlayer", CclGetThisPlayer);
     lua_register(Lua, "SetThisPlayer", CclSetThisPlayer);
