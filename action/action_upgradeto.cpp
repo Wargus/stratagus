@@ -8,7 +8,7 @@
 //			  T H E   W A R   B E G I N S
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
-/**name action_upgradeto.c -	The unit upgrading to new action. */
+/**@name action_upgradeto.c -	The unit upgrading to new action. */
 //
 //	(c) Copyright 1998,2000,2001 by Lutz Sammer
 //
