@@ -24,8 +24,6 @@
 //
 //	$Id$
 
-// FIXME: TCP support missing (not needed currently for freecraft)
-
 //@{
 
 //----------------------------------------------------------------------------
@@ -99,6 +97,16 @@ global void NetCloseUDP(sock)
     SDLNet_UDP_Close(UDPsocket sock);
 }
 
+/**
+**	Close a TCP socket port.
+**
+**	@param sockfd	Socket fildes
+*/
+global void NetCloseTCP(sock)
+{
+    SDLNet_TCP_Close(TCPsocket sock);
+}
+
 #endif	// } USE_SDL_NET
 
 #ifdef USE_WINSOCK	// {
@@ -152,6 +160,16 @@ global void NetCloseUDP(int sockfd)
     closesocket(sockfd);
 }
 
+/**
+**	Close a TCP socket port.
+**
+**	@param sockfd	Socket fildes
+*/
+global void NetCloseTCP(int sockfd)
+{
+    closesocket(sockfd);
+}
+
 #endif	// } !USE_WINSOCK
 
 #if !defined(USE_SDL_NET) && !defined(USE_WINSOCK)	// {
@@ -177,6 +195,16 @@ global void NetExit(void)
 **	@param sockfd	Socket fildes
 */
 global void NetCloseUDP(int sockfd)
+{
+    close(sockfd);
+}
+
+/**
+**	Close a TCP socket port.
+**
+**	@param sockfd	Socket fildes
+*/
+global void NetCloseTCP(int sockfd)
 {
     close(sockfd);
 }
@@ -381,6 +409,86 @@ global int NetOpenUDP(int port)
 }
 
 /**
+**	Open a TCP socket
+**
+**	@param port	Bind socket to a specific port number
+**
+**	@return		If success the socket fildes, -1 otherwise
+*/
+global int NetOpenTCP(int port)
+{
+    int sockfd;
+
+    sockfd=socket(AF_INET, SOCK_STREAM, 0);
+    DebugLevel3Fn(" socket %d\n" _C_ sockfd);
+    if( sockfd==INVALID_SOCKET ) {
+	return -1;
+    }
+    // bind local port
+    if( port ) {
+	struct sockaddr_in sock_addr;
+	int opt;
+
+	memset(&sock_addr, 0, sizeof(sock_addr));
+	sock_addr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = INADDR_ANY;
+	sock_addr.sin_port = htons(port);
+
+	opt = 1;
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*)&opt, sizeof(opt));
+
+	if( bind(sockfd,(struct sockaddr*)&sock_addr,sizeof(sock_addr))<0 ) {
+	    fprintf(stderr,"Couldn't bind to local port\n");
+	    NetCloseTCP(sockfd);
+	    return -1;
+	}
+	DebugLevel3Fn(" bind ok\n");
+	NetLastHost=sock_addr.sin_addr.s_addr;
+	NetLastPort=sock_addr.sin_port;
+    }
+    return sockfd;
+}
+
+/**
+**	Open a TCP connection
+**
+**	@param sockfd	An open socket to use
+**	@param host	Host to connect to
+**	@param port	Port on remote host to connect to
+**
+**	@return		0 if success, -1 if failure
+*/
+global int NetConnectTCP(int sockfd,char* host,int port)
+{
+    struct hostent* hp;
+    struct sockaddr_in sa;
+    unsigned long addr;
+    int opt;
+
+    opt = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void*)&opt, sizeof(opt));
+    opt = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (void*)&opt, sizeof(opt));
+
+    addr=NetResolveHost(host);
+    if( addr==INADDR_NONE ) {
+	return -1;
+    }
+
+    memset(&sa,0,sizeof(sa));
+    memcpy(&sa.sin_addr,&addr,sizeof(addr));
+    sa.sin_family=AF_INET;
+    sa.sin_port=htons(port);
+
+    if( connect(sockfd,(struct sockaddr*)&sa,sizeof(sa)) < 0 ) {
+	fprintf(stderr,"connect to %s:%d failed\n", host, port);
+	return -1;
+    }
+
+    return sockfd;
+}
+
+/**
 **	Wait for socket ready.
 **
 **	@param sockfd	Socket fildes to probe.
@@ -436,7 +544,7 @@ global int NetSocketReady(int sockfd,int timeout)
 }
 
 /**
-**	Receive from an UDP socket.
+**	Receive from a UDP socket.
 **
 **	@param sockfd	Socket
 **	@param buf	Receive message buffer.
@@ -468,7 +576,21 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 }
 
 /**
-**	Send through an UPD socket to a host:port.
+**	Receive from a TCP socket.
+**
+**	@param sockfd	Socket
+**	@param buf	Receive message buffer.
+**	@param len	Receive message buffer length.
+**
+**	@return		Number of bytes placed in buffer or -1 if failure.
+*/
+global int NetRecvTCP(int sockfd,void* buf,int len)
+{
+    return recv(sockfd,buf,len,0);
+}
+
+/**
+**	Send through a UPD socket to a host:port.
 **
 **	@param sockfd	Socket
 **	@param host	Host to send to (network byte order).
@@ -476,7 +598,7 @@ global int NetRecvUDP(int sockfd,void* buf,int len)
 **	@param buf	Send message buffer.
 **	@param len	Send message buffer length.
 **
-**	@return		Number of bytes send.
+**	@return		Number of bytes sent.
 */
 global int NetSendUDP(int sockfd,unsigned long host,int port
 	,const void* buf,int len)
@@ -492,6 +614,20 @@ global int NetSendUDP(int sockfd,unsigned long host,int port
     // if( MyRand()%7 ) return 0;
 
     return sendto(sockfd,buf,len,0,(struct sockaddr*)&sock_addr,n);
+}
+
+/**
+**	Send through a TCP socket
+**
+**	@param sockfd	Socket
+**	@param buf	Send message buffer.
+**	@param len	Send message buffer length.
+**
+**	@return		Number of bytes sent.
+*/
+global int NetSendTCP(int sockfd,const void* buf,int len)
+{
+    return send(sockfd,buf,len,0);
 }
 
 //@}
