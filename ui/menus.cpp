@@ -827,11 +827,11 @@ local void SaveGameInit(Menuitem *mi __attribute__ ((unused)))
 
     menu = CurrentMenu;
 
-    buf = malloc(32);
+    buf = malloc(64);
     strcpy(buf, "~!_");
     menu->items[1].d.input.buffer = buf;
     menu->items[1].d.input.nch = 0;
-    menu->items[1].d.input.maxch = 24;
+    menu->items[1].d.input.maxch = 60;
 
     menu->items[4].flags = MenuButtonDisabled;
     menu->items[5].flags = MenuButtonDisabled;
@@ -2969,7 +2969,7 @@ local void EnterServerIPAction(Menuitem *mi, int key)
 */
 local void JoinNetGameMenu(void)
 {
-    char server_host_buffer[28];
+    char server_host_buffer[64];
     char *port;
     Menu *menu;
 
@@ -2998,7 +2998,7 @@ local void JoinNetGameMenu(void)
     strcat(server_host_buffer, "~!_");
     menu->items[1].d.input.buffer = server_host_buffer;
     menu->items[1].d.input.nch = strlen(server_host_buffer) - 3;
-    menu->items[1].d.input.maxch = 24;
+    menu->items[1].d.input.maxch = 60;
     if (menu->items[1].d.input.nch) {
 	menu->items[2].flags &= ~MenuButtonDisabled;
     } else {
