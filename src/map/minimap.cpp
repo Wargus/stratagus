@@ -47,6 +47,7 @@
 #include "player.h"
 #include "unit.h"
 #include "ui.h"
+#include "editor.h"
 
 /*----------------------------------------------------------------------------
 --		Variables
@@ -298,7 +299,7 @@ local void DrawUnitOnMinimap(Unit* unit, int red_phase)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Player == PlayerNumNeutral) {
-		if (!UnitVisible(unit, ThisPlayer)) {
+		if ((!EditorRunning) && (!UnitVisible(unit, ThisPlayer))) {
 			color = VideoMapRGB(TheScreen->format,
 				unit->Seen.Type->NeutralMinimapColorRGB.r,
 				unit->Seen.Type->NeutralMinimapColorRGB.g,
