@@ -1,0 +1,824 @@
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>The ALE Clone Version 1.16.1</TITLE>
+</HEAD>
+<BODY>
+    <H1>ALE Clone Version 1.16.1</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+
+<A HREF="#contents">Contents</A>
+
+    <H2><A NAME="copyright">Copyright</A></H2>
+
+    Please refer to the <A HREF="artistic-license.html">LICENSE</A>
+     document provided with this distribution. To proceed beyond this point,
+    is to agree with the licence agreement.
+
+    <H2><A NAME="disclaimer">DISCLAIMER</A></H2>
+
+    This software is provided as-is.  The author(s) can not be held liable for
+    any damage that might arise from the use of this software.<P>
+
+    <B>Use it at your own risk</B>.
+
+    <H2><A NAME="introduction">Introduction</A></H2>
+
+    Read this for the introduction:
+    <A HREF="readme.html">readme.html</A>
+
+    <H2><A NAME="install">Install</A></H2>
+
+    Read this how to install ALE clone:
+    <A HREF="install.html">install.html</A>
+
+    <H2><A NAME="upgrade">Upgrade</A></H2>
+
+    If you upgrade from an older beta version to a new one, please
+    <B>always</B> run build.sh.  Some graphics or formats may have been
+    changed.  <B>Don't forget</B> to backup your modified files.<P>
+
+    Read this how to upgrade ALE clone:
+    <A HREF="install.html">install.html</A>
+
+    <H2><A NAME="changes">Changes</A></H2>
+
+    Read this for the history of ALE clone:
+    <A HREF="ChangeLog.html">ChangeLog.html</A>
+
+    <H2><A NAME="todo">Todo and known bugs</A></H2>
+
+    This file contains the known bugs and what we plan in the future:
+    <A HREF="todo.html">todo.html</A>
+
+    <H2><A NAME="faq">Problems</A></H2>
+
+    Read this, if you have problems compiling, installing or playing ALE Clone:
+    <A HREF="faq.html">faq.html</A>
+
+    <H2><A NAME="features">Features</A></H2>
+
+<UL>
+<LI>Health and mana could be shown on the map.
+<LI>Better path finder routines.
+<LI>Loading of compressed (gzip) puds.
+<LI>Configuration language.
+<LI>Easy replace of unit graphics and sounds.
+<LI>64 times greater maps.
+<LI>Training queues.
+<LI>Waypoints.
+<LI>Correct fog of war (terrain changes are not shown).
+<LI>Nice looking fog of war (alpha-grayscale)
+</UL>
+
+    <H2><A NAME="open-projects">Open projects</A></H2>
+
+    Following projects are not assigned: (Please ask before start working)
+
+<UL>
+<LI>Write a map editor. (with support of greater maps)
+<LI>Write a AI editor.
+<LI>Write front end to ALE clone. (Scenarios, puds, videos...)
+<LI>Or extend the guile-gtk support.
+<LI>Write a video player. (fli or own format)
+<LI>Create own tilesets and unit graphics.
+<LI>Create own sounds, voices, videos and campains.
+<LI>Create an icon for window-manager.
+<LI>Create a jingle for startup and home-page.
+<LI>Write better documentation. (correct my english :-)
+<LI>Improved network support.
+<LI>Write better sound routines. (with mp3 and midi or xmi support)
+<LI>Write "build.sh" for demo-version.
+<LI>Port to X11 8bpp or 32bpp, fullscreen and DGA support.
+<LI>Port to ggi.
+<LI>Port to msdos/djgpp.
+<LI>Port to beos.
+<LI>Write clone of the new game from the same company.
+    (Graphic and sound formats are mostly the same.)
+<LI>Multilanguage support
+<LI>And any other help is welcome.
+</UL>
+
+If you want to help, please join the ALE Clone mailing list and check
+if not already somebody is working on your project. Than tell what you
+want to make.
+
+    <H2><A NAME="documentation">Documentation</A></H2>
+
+    Look into the original game documentation for playing instructions.
+    Look into the sources for more informations.
+
+<H3><A NAME="commandline">Command line options</A></H3>
+
+clone [OPTIONS] [map.pud|map.pud.gz]
+
+<UL>
+<LI>OPTIONS<BR>
+    You can currently give following command line options. Use "clone -h" to
+    get an uptodate information.
+    <UL>
+    <LI>-c "file.ccl"<BR>
+	Load freecraft config file <VAR>"file.ccl"</VAR> insteed of the default
+	"<VAR>libarypath/</VAR>ccl/freecraft.ccl".
+    <LI>-d "path"<BR>
+	Change the freecraft libary path to <VAR>"path"</VAR> insteed of the
+	default "./data" or "/usr/share/games/ale-clone/default".
+    <LI>-f factor<BR>
+	Adjust the build costs of units for the computer players by factor.
+    <LI>-h<BR>
+	Show command line help.
+    <LI>-l<BR>
+	Enable command log to <VAR>"command.log"</VAR>
+    <LI>-p players<BR>
+	Number of network <VAR>players</VAR> to connect.
+    <LI>-s frames<BR>
+	The AI sleeps 'frames' before it starts working.
+    <LI>-t factor<BR>
+	Adjust the build time of units for the computer players by factor.
+    <LI>-D<BR>
+	Video depth = pixel pro point.
+    <LI>-F<BR>
+	Fullscreen videomode.
+    <LI>-W<BR>
+	Windowed videomode.
+    </UL>
+<LI>map.pud<BR>
+    Load the map "map.pud" insteed of the default
+    "<VAR>libarypath/</VAR>default.cm".
+<LI>map.pud.gz<BR>
+    Load the compressed map "map.pud.gz" insteed of the default
+    "<VAR>libarypath/</VAR>default.cm".
+<LI>map.cm<BR>
+    Load the clone map "map.cm" insteed of the default.
+    <P>If you have compile ALE Clone with guile-gtk support you can use this
+    to get a file requester. "clone contrib/req.cm"<P>
+<LI>map.cm.gz<BR>
+    Load the compressed clone map "map.cm.gz" insteed of the default.
+<LI><BR>
+    If no file is given the default map
+    "<VAR>libarypath/</VAR>default.cm" will be loaded.
+</UL>
+
+<H3>Keyboard commands</H3>
+
+<UL>
+<LI><KBD>cursor-left</KBD><BR>
+    Scroll map left. With control scroll faster.
+<LI><KBD>cursor-right</KBD><BR>
+    Scroll map right. With control scroll faster.
+<LI><KBD>cursor-up</KBD><BR>
+    Scroll map up. With control scroll faster.
+<LI><KBD>cursor-down</KBD><BR>
+    Scroll map down. With control scroll faster.
+<LI><KBD>RETURN</KBD><BR>
+    Enter command line.
+<LI><KBD>TAB</KBD><BR>
+    Toggle minimap mode, with/without terrain.
+<LI><KBD>+</KBD><BR>
+    Increase game speed.
+<LI><KBD>-</KBD><BR>
+    Decrease game speed.
+<LI><KBD>c</KBD><BR>
+    Center on selected unit.
+<LI><KBD>q</KBD><BR>
+    Quit program.
+<LI><KBD>^</KBD><BR>
+    Unselect all units.
+<LI><KBD>1-9,0</KBD><BR>
+    Select unit group first time, if group already selected center on group.
+<LI><KBD>CTRL + 1-9,0</KBD><BR>
+    Define unit group.
+<LI><KBD>SHIFT + 1-9,0</KBD><BR>
+    FIXME: code not written.
+<LI><KBD>ALT + 1-9,0</KBD><BR>
+    FIXME: code not written.
+<LI><KBD>G</KBD><BR>
+    Toggle mouse grab mode.
+<LI><KBD>P</KBD> or <KBD>pause</KBD><BR>
+    Toggle pause mode.
+<LI><KBD>S</KBD><BR>
+    Save complete state.
+<LI><KBD>F10</KBD><BR>
+    Enter game menue.
+</UL>
+
+    <H2><A NAME="ccl">CCL: Clone Configuration Language</A></H2>
+
+    The CCL is scheme. I use libguile as a quick hack or SIOD
+    (The most recent release is available from
+    <a href="http://people.delphi.com/gjc/siod.html">this web page</a>)
+    .<P> You can also enter CCL commands at the message prompt. Each
+    line starting with "(" is taken as CCL command.
+
+<H3>Files</H3>
+
+<UL>
+<LI><VAR>libarypath</VAR>/ccl/clone.ccl is loaded before any initialisation.
+<LI><VAR>libarypath</VAR>/ccl/freecraft.ccl is loaded before any initialisation.
+Contains general configuration.
+<LI><VAR>libarypath</VAR>/ccl/missile.ccl is loaded from freecraft.ccl.
+Contains missile configuration.
+<LI><VAR>libarypath</VAR>/ccl/sound.ccl is loaded from freecraft.ccl.
+Contains sound configuration.
+<LI><VAR>libarypath</VAR>/ccl/tilesets.ccl is loaded from freecraft.ccl.
+Contains tileset configuration.
+<LI><VAR>libarypath</VAR>/ccl/units.ccl is loaded from freecraft.ccl.
+Contains units configuration.
+</UL>
+
+<H3>Functions</H3>
+
+Without any order:
+
+<H2>Map CCL functions/variables</H2>
+
+<DL>
+<DT><VAR>reveal-map</VAR>
+<DD>Reveal the complete map.
+
+<DT><VAR>fog-of-war</VAR><BR>
+<DD>Enable the fog of war.
+
+<DT><VAR>no-fog-of-war</VAR><BR>
+<DD>Disable the fog of war.
+
+<DT><VAR>minimap-terrain</VAR><BR>
+<DD>Enable display of terrain in the minimap window.
+
+<DT><VAR>no-minimap-terrain</VAR><BR>
+<DD>Disable display of terrain in the minimap window.
+
+<DT><VAR>original-fog-of-war</VAR>
+<DD>Enable original like fog of war style.
+
+<DT><VAR>gray-fog-of-war</VAR>
+<DD>Enable gray fog of war style.
+
+<DT><VAR>fog-of-war-contrast contrast</VAR>
+<DD>Set the gray style fog of war contrast.
+    Contrast could be from 0 to OO.
+    A contrast of 100 didn't change anything.
+
+<DT><VAR>fog-of-war-brightness brightness</VAR>
+<DD>Set the gray style fog of war brightness.
+    Brightness could be from -100 to 100.
+    A brightness of 0 didn't change anything.
+
+<DT><VAR>fog-of-war-saturation saturation</VAR>
+<DD>Set the gray style fog of war saturation.
+    Saturation could be from -100 to 200.
+    A saturation of 100 didn't change anything.
+
+</DL>
+
+<H2>Unsorted CCL functions/variables</H2>
+
+<UL>
+<LI><VAR>title-screen</VAR><BR>
+    Change the default title screen ("title.png").<P>
+    (title-screen title)<P>
+    <UL>
+    <LI>title<BR>
+	The title graphic file.
+    </UL>
+    <H4>Example:</H4>
+	(title-screen "ale-title.png")<P>
+    Change the title to "ale-title.png".<P>
+
+<LI><VAR>show-health-bar</VAR><BR>
+    Show the health as bar on the map.<P>
+
+<LI><VAR>show-health-dot</VAR><BR>
+    Show the health as dot on the map.<P>
+
+<LI><VAR>show-mana-bar</VAR><BR>
+    Show the mana as bar on the map.<P>
+
+<LI><VAR>show-mana-dot</VAR><BR>
+    Show the mana as dot on the map.<P>
+
+<LI><VAR>show-full</VAR><BR>
+    Show full health or mana on the map.<P>
+
+<LI><VAR>show-no-full</VAR><BR>
+    Show no full health or mana on the map.<P>
+
+<LI><VAR>show-sight-range</VAR><BR>
+    Show the sight range of the selected unit on map.<P>
+
+<LI><VAR>show-react-range</VAR><BR>
+    Show the react range of the selected unit on map.<P>
+
+<LI><VAR>show-attack-range</VAR><BR>
+    Show the attack range of the selected unit on map.<P>
+
+<LI><VAR>speed-mine</VAR><BR>
+    Decrease the mining time by this factor.
+
+<LI><VAR>speed-gold</VAR><BR>
+    Decrease the time in a gold deposit by this factor.
+
+<LI><VAR>speed-chop</VAR><BR>
+    Decrease the time for chopping a tree by this factor.
+
+<LI><VAR>speed-wood</VAR><BR>
+    Decrease the time in a wood deposit by this factor.
+
+<LI><VAR>speed-haul</VAR><BR>
+    Decrease the time for haul oil by this factor.
+
+<LI><VAR>speed-oil</VAR><BR>
+    Decrease the time in an oil deposit by this factor.
+
+<LI><VAR>speed-build</VAR><BR>
+    Decrease the time to build a unit by this factor.
+
+<LI><VAR>speed-train</VAR><BR>
+    Decrease the time to train a unit by this factor.
+
+<LI><VAR>speed-upgrade</VAR><BR>
+    Decrease the time to upgrade a unit by this factor.
+
+<LI><VAR>speed-research</VAR><BR>
+    Decrease the time to research by this factor.
+
+<LI><VAR>speeds</VAR><BR>
+    Decrease the time off all by this factor.
+
+<LI><VAR>tileset</VAR><BR>
+    Defines a tileset.<P>
+    (tileset slot-name name file table)<P>
+    <UL>
+    <LI>slot-name<BR>
+	The tileset slot name.
+    <LI>name<BR>
+	The tileset name.
+    <LI>file<BR>
+	The tileset graphic file.
+    <LI>table<BR>
+	The conversion table from pud tile number (0 - 0x9DF) into internal
+	tile number.
+    </UL>
+    <H4>Example:</H4>
+	(tileset 'tileset-summer "summer" "summer.png" #( ... ) )<P>
+	Define the tileset slot 0 as summer with the graphics in summer.png.
+	#( ... ) is the conversion table of 2528 entries.
+
+<LI><VAR>missile-type</VAR><BR>
+    Defines the missile types.<P>
+    (missile-type slot name file width height)<P>
+    <UL>
+    <LI>slot<BR>
+	The missile slot number.
+    <LI>name<BR>
+	The missile name.
+    <LI>file<BR>
+	The graphic sprites file.
+    <LI>width<BR>
+	The width of a sprite.
+    <LI>height<BR>
+	The height of a sprite.
+    </UL>
+    <H4>Example:</H4>
+	(missile-type MissileLightning "Lightning" "lightning.png" 32 32)<P>
+	Define the missile slot 0 as "Lightning".<P>
+
+<LI><VAR>define-unit-type</VAR><BR>
+    Defines an unit type.<P>
+    (define-unit-type ident name graphics ...)
+    <DL>
+    <DT>ident</DT>
+    <DD>The unit-type unique identifier.</DD>
+    <DT>name</DT>
+    <DD>The unit-type name shown in the game.</DD>
+    <DT>graphics</DT>
+    </DL>
+    More to come.
+
+    <H4>Example:</H4>
+<PRE>
+(define-unit-type "unit-footman" "Footman"
+  ;; graphic data
+  #("footman.png" nil nil nil )
+  '(  72  72 )			;; graphic size
+  "animations-footman"	;; animations
+  "icon-footman"
+  ;;Speed OvFrame SightR Hitpnt Magic  BTime	Gold	Wood	Oil
+      10       0      4     60      0 #(   60    600       0      0 )
+  ;;Tile    Box Size    Attack	ReactC	ReactH
+  '( 1 1 ) '(  31  31 )     1       6       4
+  ;;Armor Prior	Damage	Pierc	WUpgr	AUpgr
+       2    60      6      3       1       1
+  ;;Decay Annoy	Points
+      0      0      50
+  "missile-none"
+  'type-land
+  'right-attack
+  'can-target-land 
+  ;; flags
+  'land-unit
+  'can-attack
+  'organic
+  'selectable-by-rectangle
+  ;; sounds
+  #("footman-selected"
+    "footman-acknowledge"
+    "footman-ready"
+    "footman-help"
+    "footman-dead" )
+  "footman-attack" )
+</PRE>
+	Define the unit-type unit-footman as footman.<P>
+
+<LI><VAR>print-unit-type-table</VAR><BR>
+    Print the current unit type table for the C code. (src/unittype/ut_table.c
+    contains the result) Use "Save" to generate the scheme tables. <P>
+
+<LI><VAR>unit-type</VAR><BR>
+    Get the pointer to the unit type structure.<P>
+    (unit-type ident)
+    <DL>
+    <DT>ident</DT>
+    <DD>The unit-type unique identifier.</DD>
+    </DL>
+    <P>
+    <H4>Example:</H4>
+    (unit-type "unit-peon")<P>
+    Get the unit type structure of the peon. #<UnitType 0x80ac350 unit-peon><P>
+
+<LI><VAR>unit-type-array</VAR><BR>
+    Get an array of all currently defined unit type structures.<P>
+    (unit-type-array)
+    <P>
+
+<LI><VAR>get-unit-type-ident</VAR><BR>
+    Get the unique identfier of the unit type structure.<P>
+    (get-unit-type-ident type)
+    <DL>
+    <DT>type</DT>
+    <DD>Unit type pointer</DD>
+    </DL>
+    <P>
+    <H4>Example:</H4>
+    (get-unit-type-ident (unit-type "unit-peon"))<P>
+    Get the identifier of the unit type peon.<P>
+
+<LI><VAR>define-map</VAR><BR>
+    Define the size of a new map.<P>
+    (define-map width height)
+    <UL>
+    <LI>width<BR>
+	The width of the new map.
+    <LI>height<BR>
+	The height of the new map.
+    </UL>
+
+    <H4>Example:</H4>
+	(define-map 256 256)
+	Define a new map of the size 256 x 256.<P>
+
+<LI><VAR>load-pud</VAR><BR>
+    Load a map in pud format.<P>
+    (load-pud name)
+    <UL>
+    <LI>name<BR>
+	The file name.
+    </UL>
+
+    <H4>Example:</H4>
+	(load-pud "data/default.pud.gz")
+	Load "default.pud.gz".<P>
+
+<LI><VAR>clone-map</VAR><BR>
+    Define a map in clone own format.<P>
+    (clone-map ...)
+
+    <P>FIXME: Must write docu<P>
+
+<LI><VAR>key-scroll-speed</VAR><BR>
+    Set the speed of keyboard scrolling. <P>
+    (key-scroll-speed speed)
+    <UL>
+    <LI>speed<BR>
+	Number frames to wait between scrolls.
+    </UL>
+
+    <H4>Example:</H4>
+	(key-scroll-speed 1)
+	Sets keyboard scrolling speed to fastest.<P>
+
+<LI><VAR>mouse-scroll-speed</VAR><BR>
+    Set the speed of mouse scrolling. <P>
+    (mouse-scroll-speed speed)
+    <UL>
+    <LI>speed<BR>
+	Number frames to wait between scrolls.
+    </UL>
+
+    <H4>Example:</H4>
+	(mouse-scroll-speed 10)
+	Sets mouse scrolling speed to pretty slow ( 3 times / second.)<P>
+
+
+<LI>Sound part
+<UL>
+
+<LI><VAR>sound-thread</VAR><BR>
+    Tells clone engine to use a threaded sound server. MUST be used in the
+    sound.ccl file, BEFORE the game fully starts. As no effect during the
+    game. 
+
+<LI><VAR>sound-volume</VAR><BR>
+    Set global volume.<P>
+    (set-sound-volume volume)<P>
+    <UL>
+    <LI>volume<BR>
+	The volume from 0 (min=quiet) to 255 (max).
+    </UL>
+    <H4>Example:</H4>
+	(set-sound-volume 128)<p>
+	Set volume to 1/2.
+
+<LI><VAR>sound-off</VAR><BR>
+    Turn sound off. Can be later turned on by sound-on.
+
+<LI><VAR>sound-on</VAR><BR>
+    Turn sound on.
+
+<LI><VAR>sound-for-name</VAR><BR>
+    Return a guile sound id to be used in other functions.<P>
+    (sound-for-name name)<p>
+    <UL>
+    <LI>name<BR>
+	The name of the sound (a string). 
+    </UL>
+    <H4>Example:</H4>
+	(sound-for-name "tree chopping")<p>
+	Returns the sound id of the tree chopping sound.
+
+
+<LI><VAR>set-global-sound-range</VAR><BR>
+    Set the cut off distance.<P>
+    (set-global-sound-range distance)<p>
+    <UL>
+    <LI>distance<BR>
+	The maximum range of a sound in tiles.
+    </UL>
+    <H4>Example:</H4>
+	(set-global-sound-range 64)<p>
+	Set the maximal sound range to 64 tiles. Sound events happening more
+	than 64 tiles away from the viewpoint won't be eared.
+
+<LI><VAR>set-sound-range</VAR><BR>
+    Set the cut off distance for a given sound.<P>
+    (set-sound-range sound ratio)<p>
+    <UL>
+    <LI>sound<BR>
+    The sound either described by its name (a string) or by its guile sound
+    id. 
+    <LI>ratio<BR>
+    This value (between 0 and 255) allows to compute the range of the
+    sound. 255 means an infinite range. Any number strictly below 255 is a
+    coefficient that will be applied to the cut off distance: the cut off
+    distance for this sound is ratio/254*cut off distance.
+    </UL>
+    <H4>Example:</H4>
+	(set-sound-range "tree chopping" 50)<p>
+	Set the sound range for "tree chopping" to 50/254 times the cut off
+	distance. 
+
+
+<LI><VAR>define-game-sounds</VAR><BR>
+    Allows to define what sounds are going to be used for some game level
+    events (such as the click sound).
+
+    <P>FIXME: Must write docu<P>
+
+<LI><VAR>display-sounds</VAR><BR>
+    Test function. Dump on stdio all the client side mappings between sound
+    names and sound ids.
+
+<LI><VAR>map-sound</VAR><BR>
+    Defines a new mapping between a sound name (a string) and a sound id.
+
+    <P>FIXME: Must write docu<P>
+
+<LI><VAR>make-sound</VAR><BR>
+   Ask the sound server to register a new sound. Ask the sound client to store
+   the mapping between the obtained sound id and the given sound name.
+
+    <P>FIXME: Must write docu<P>
+
+<LI><VAR>play-sound</VAR><BR>
+   Ask the sound server to play a sound.
+
+    <P>FIXME: Must write docu<P>
+</UL>
+
+<UL>
+</UL>
+
+</UL>
+
+    <H2><A NAME="internal">Internal Formats</A></H2>
+
+<H3><A NAME="internal-tileset">Tileset</A></H3>
+
+    The tileset graphic is loaded from 'png'-files. Only files with 256
+    indexed colors are currently supported.<P>
+    The format of the tileset graphic is:<P>
+
+    32x32 pixels of a tile.<P>
+
+    16 tiles are stored per row.<P>
+
+    The pixels (7,6),(7,14),(7,22),(7,30), (15,6),(15,14),(15,22),(15,30), 
+    (23,6),(23,14),(23,22),(23,30) and (31,6),(31,14),(31,22),(31,30) 
+    are used for the minimap picture. For a 32x32 map all 16 Pixels are used.
+    For a 128x128 map only the first one.<P>
+
+    The colors of the palette reserved for the tileset:<BR>
+	HELPME: I don't know!<P> 
+
+    The conversion table from pud file to the internal format could be
+    changed with ccl.
+
+    <A HREF="graphic/tileset.html">More tileset informations</A>
+
+<H3><A NAME="internal-ui">User Interface</A></H3>
+
+    <A HREF="graphic/ui.html">More user interface informations</A>
+
+<H3><A NAME="internal-sprites">Sprites</A></H3>
+
+    The graphics are loaded from 'png'-files. Only files with 256 indexed
+    colors are currently supported.<P>
+    The format of an unit sprite is:<P>
+
+    FIXME: more to come
+
+<H3><A NAME="internal-palette">Palette</A></H3>
+
+    Look into tileset documentation, what I have found.
+
+<H3><A NAME="internal-sounds">Sounds</A></H3>
+
+    The sounds are loaded from 'wav'-files.  Files with 8 or 16 bit, mono and
+    11025hz sample frequence are currently supported.<P>
+
+    <H3><A NAME="utilities">Utilities</A></H3>
+
+    <H4>extract</H4>
+	Extract a compressed entry out of the original game data file.<P>
+
+	Read the knowledge bases which entry contains what.
+
+    <H5>Usage: extract data-file entry output</H5>
+    <UL>
+    <LI>data-file<BR>
+	Compressed input data file. (normaly maindat.war)
+    <LI>entry<BR>
+	Entry number of the data-file.
+    <LI>output<BR>
+	Output file for the uncompressed entry.
+    </UL>
+
+    <H4>gfx2png</H4>
+	Convert compressed graphic (unit sprites) to png graphic file.
+
+    <H5>Usage: gfx2png palette file.gfx</H5>
+    <UL>
+    <LI>palette<BR>
+	Use palette in png file. "palette" is a raw file containing 768
+	bytes for 256 colors of r g b.
+    <LI>file.gfx<BR>
+	File.gfx contains the graphics of the sprites. The output file is
+	file.png.
+    </UL>
+
+    <H4>gfu2png</H4>
+	FIXME: must write docu.
+
+    <H4>img2png</H4>
+	FIXME: must write docu.
+
+    <H4>cur2png</H4>
+	FIXME: must write docu.
+
+    <H4>fnt2png</H4>
+	FIXME: must write docu.
+
+    <H4>tile2png</H4>
+	FIXME: must write docu.
+
+    <H4>aledoc</H4>
+	FIXME: must write docu.
+
+    <H2><A NAME="arts">Arts</A></H2>
+
+    Following things are used from other peoples. If not other mentioned,
+    protected by the following license <A HREF="opl.html">"OpenContent License"
+    </A></B>
+
+    <DL>
+    <DT>cross.png, health.png, mana.png.
+    <DD>(c) Copyright 1998-2000 by Johns.
+    <DT>food.png
+    <DD>Food resource icon (c) Copyright 2000 by the Guardian.
+    <DT>score.png
+    <DD>Score icon in resource (c) Copyright 2000 by the Guardian.
+    <DT>ore,stone,coal.png
+    <DD>Orc icon in resource, Stone icon in resource,
+	(c) Copyright 2000 by the Guardian.
+    </DL>
+
+    <H2><A NAME="thanks">Thanks</A></H2>
+
+    Thanks to following people for helping me develop clone:
+    <UL>
+    <LI>Ari
+    <LI>Edgar
+    <LI>Valery Shchedrin
+    <LI>Iftikhar Rathore
+    <LI>Charles K Hardin
+    <LI>Fabrice Rossi
+    <LI>DigiCat
+    <LI>Josh Cogliati
+    <LI>Patrick Mullen
+    <LI>Vladi Shabanski
+    <LI>Cris Daniluk
+    <LI>Patrice Fortier
+    <LI>FT Rathore
+    <LI>Trent Piepho
+    <LI>Josh Cogliati
+    <LI>Jon Gabrielson
+    <LI>Lukas Hejtmanek
+    <LI>Steinar Hamre
+    <LI>Ian Farmer
+    <LI>Sebastioan Drews
+    <LI>Jarek Sobieszek
+    <LI>Anthony Towns
+    <LI>Stefan Dirsch
+    <LI>Al Koskelin
+    <LI>George J. Carrette
+    <LI>Guardian
+    <LI>Michael O'Reilly
+    <LI>Dan Hensley
+    <LI>Sean McMillian
+    <LI>Mike Earl
+    </UL>
+    <P><EM>And to all I have forgot to write up!</EM><BR>
+    Please drop me an email if I forgot you.
+
+    <H2><A NAME="contents">Contents</A></H2>
+
+<UL>
+    <LI><A HREF="#copyright">Copyright</A>
+    <LI><A HREF="#disclaimer">Disclaimer</A>
+    <LI><A HREF="#introduction">Introduction</A>
+    <LI><A HREF="#install">Install</A>
+    <LI><A HREF="#upgrade">Upgrade</A>
+    <LI><A HREF="#changes">Changes</A>
+    <LI><A HREF="#todo">Todo</A>
+    <LI><A HREF="#faq">FAQ</A>
+    <LI><A HREF="#features">Features</A>
+    <LI><A HREF="#open-projects">Open projects</A>
+    <LI><A HREF="#documentation">Documentation</A>
+    <UL>
+	<LI><A HREF="#commandline">Command line options</A>
+	<LI><A HREF="#ccl">CCL: Clone Configuration language</A>
+	<LI><A HREF="#internal">Internal Formats</A>
+	<UL>
+	    <LI><A HREF="#internal-tileset">Tileset</A>
+	    <LI><A HREF="#internal-ui">User interface</A>
+	    <LI><A HREF="#internal-sprites">Sprites</A>
+	    <LI><A HREF="#internal-sounds">Sounds</A>
+	    <LI><A HREF="#internal-palette">Palette</A>
+	</UL>
+    </UL>
+    <LI><A HREF="#utilities">Utilites</A>
+    <UL>
+    </UL>
+    <LI><A HREF="#arts">Arts</A>
+    <LI><A HREF="#thanks">Thanks</A>
+    <LI><A HREF="#contents">Contents</A>
+</UL>
+
+<HR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>

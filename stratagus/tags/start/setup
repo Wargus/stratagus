@@ -1,0 +1,507 @@
+#!/bin/sh
+RULESFILE=Rules.make
+
+cat << .. > $RULESFILE
+##   ___________		     _________		      _____  __
+##   \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+##    |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+##    |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+##    \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+##	  \/		    \/	   \/	     \/		   \/
+##  ______________________                           ______________________
+##			  T H E   W A R   B E G I N S
+##	   FreeCraft - A free fantasy real time strategy game engine
+##	
+..
+##	setup		-	Configure Rules.make (GNU MAKE rules).
+##
+##	(c) Copyright 2000 by Dan Hensley
+##
+##	$Id$
+##
+
+#------------------------------------------------------------------------------
+# HERE ARE SOME USER-CONFIGURABLE VARIABLES
+
+EXTRA_CFLAGS="-DSLOW_INPUT"
+
+# Compile commands
+CC=gcc
+RM="rm -f"
+MAKE=make
+
+#------------------------------------------------------------------------------
+# DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
+
+VERSION="-DVERSION=\"1.16.1pre2-19\""
+WIN32=-1
+
+# Choose optimization level
+#DEBUG_CFLAGS="-g -O0 \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
+DEBUG_CFLAGS="-g -O1 -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
+#-- Production (default)
+CFLAGS="-O2 -pipe -fomit-frame-pointer -fconserve-space -fexpensive-optimizations -ffast-math  \$(IFLAGS) \$(DFLAGS)"
+
+#------------------------------------------------------------------------------
+# Function declarations
+
+function check_for_libs() {
+
+  TEMPFILE=temp$$
+  cat << "  EOF" > $TEMPFILE.c
+  int main(){ int i; }
+  EOF
+  if test "`cc -o $TEMPFILE.a -w $TEMPFILE.c $LIBCHECK 2>&1` x" != " x" ; then
+    rm -f $TEMPFILE.[coa] > /dev/null 2>&1
+    return 1
+  else
+    rm -f $TEMPFILE.[coa] > /dev/null 2>&1
+    return 0
+  fi
+}
+
+#------------------------------------------------------------------------------
+# Parse input arguments
+
+while test $# != 0 ; do
+  case $1 in
+    "-?"|"--help")
+      echo
+      echo "usage: setup [--static] [--nowin32] [--win32] [--debug] [--profile]"
+      echo
+      echo "Setup will create a Rules.make file that Freecraft needs to compile."
+      echo "Supported command-line arguments (you may use more than one at a time):"
+      echo "  static  : Compile Freecraft using static libraries (default dynamic)"
+      echo "  nowin32 : Force NOT to use WIN32 compile options (default auto check)"
+      echo "  win32   : Force WIN32 compile options (default auto check)"
+      echo "  debug   : Compile with debug options (default no)"
+      echo "  profile : Compile with profile support (default off)"
+      echo
+      exit
+      ;;
+      
+    "--static")
+      STATIC=-static
+      ;;
+      
+    "--nowin32")
+      WIN32=0
+      ;;
+      
+    "--win32")
+      WIN32=1
+      ;;
+       
+    "--profile")
+      PROFILE=-pg
+      ;;
+       
+    "--debug")
+      CFLAGS=$DEBUG_CFLAGS
+      DEBUG=1
+      ;;
+     
+    *)
+      echo "Unknown command-line option '$1'"
+      exit
+      
+  esac
+  
+  shift
+done
+
+#
+# Display banner
+
+cat $RULESFILE
+echo >> $RULESFILE
+echo; echo
+
+#------------------------------------------------------------------------------
+# Determine if this is for WIN32
+
+if test "$WIN32" = -1 ; then
+  if test "`uname | grep -is cygwin` x" != " x" ; then
+    WIN32=1
+    echo "It appears that you are in a Cygwin/win32 environment..."
+    echo "Use --nowin32 to override"
+  else
+    WIN32=0
+    echo "You appear to be in a Linux/*nix environment..."
+    echo "Use --win32 to force a Cygwin environment"
+  fi
+  echo
+fi
+
+#------------------------------------------------------------------------------
+# Write the compile commands first
+
+echo "# Compile commands" >> $RULESFILE
+echo "CC=$CC" >> $RULESFILE
+echo "RM=$RM" >> $RULESFILE
+echo "MAKE=$MAKE" >> $RULESFILE
+echo >> $RULESFILE
+
+#------------------------------------------------------------------------------
+#       SIOD support part
+#------------------------------------------------------------------------------
+
+echo "# Use SIOD support" >> $RULESFILE
+echo "CCL		= -DUSE_CCL2" >> $RULESFILE
+echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+echo >> $RULESFILE
+
+#------------------------------------------------------------------------------
+#	Video driver part
+#------------------------------------------------------------------------------
+
+# Check for various libraries
+echo "Checking for various video libraries..."
+
+# Check for SDL >= 1.x
+if test "$(sdl-config --version 2>/dev/null)" = "1.*" ; then
+  echo "...You do not appear to have SDL installed"
+else
+  HAVESDL=1
+fi
+# Check for SVGALIB
+LIBCHECK="-lvga -lvgagl"
+check_for_libs
+if test "$?" = 0 ; then
+  HAVESVGA=1
+else
+  echo "...You do not appear to have SVGALIB installed"
+fi
+
+echo
+echo "VIDEO DRIVER OPTIONS"
+echo
+echo "  X-X11 Support (default)"
+if test "$HAVESDL" = 1 ; then
+  echo "  S-SDL Support"
+fi
+if test "$HAVESVGA" = 1 ; then
+  echo "  V-SVGALIB Support"
+fi
+if (test "$HAVESVGA" = 1 && test "$HAVESDL" = 1) ; then
+  echo "  B-SDL/SVGALIB Support"
+fi
+echo
+echo -n "Please enter selection: "
+read VIDSEL
+
+#
+
+echo "# Video support" >> $RULESFILE
+case $VIDSEL in
+  [sS])
+	echo -n "Using SDL"
+  	USESDL=1
+	SDLLIB="\$(shell sdl-config --libs)"
+	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell sdl-config --cflags)" >> $RULESFILE
+
+        if test "$STATIC x" != " x" ; then
+	  SDLLIB="$SDLLIB -lesd"
+	fi
+	
+	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
+	echo >> $RULESFILE
+	echo "VIDEO		= \$(SDL)" >> $RULESFILE
+	echo "VIDEOLIB	= \$(SDLLIB) -ldl" >> $RULESFILE
+	echo
+	;;
+	
+  [vV])
+	echo "Using SVGALIB"
+	echo "VIDEO		= -DUSE_SVGALIB" >> $RULESFILE
+	echo "VIDEOLIB	= -lvga" >> $RULESFILE
+	;;
+	
+  [bB])
+	echo -n "Using SDL/SVGALIB"
+  	USESDL=1
+	SDLLIB="\$(shell sdl-config --libs)"
+	echo "SDL		= -DUSE_SDL -DUSE_SDLA \$(SDL_CFLAGS)" >> $RULESFILE
+	echo "SDL_CFLAGS	= \$(shell sdl-config --cflags)" >> $RULESFILE
+
+        if test "$STATIC x" != " x" ; then
+	  SDLLIB="$SDLLIB -lesd"
+	fi
+	
+	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
+	echo >> $RULESFILE
+	echo "VIDEO		= \$(SDL)" >> $RULESFILE
+	echo "VIDEOLIB	= \$(SDLLIB) -lvga -lvgagl -ldl" >> $RULESFILE
+	echo
+	;;
+	
+	
+  *)	
+	echo "Using X11"
+	echo "VIDEO		= -DUSE_X11" >> $RULESFILE
+	echo "VIDEOLIB	= -lXext -lX11 -ldl" >> $RULESFILE
+	;;
+	
+esac
+echo "" >> $RULESFILE
+
+#
+# Put in Cygwin/win32 stuff if necessary, and test for mingw32
+
+if test "$WIN32" = "1" ; then
+	echo "VIDEO		= -DUSE_WIN32 \$(SDL)" >> $RULESFILE
+	if test "`gcc -v 2>&1 | grep -is mingw32` x" = " x" ; then
+	  echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+	else
+	  echo "VIDEOLIB	= \$(SDLLIB) -lwsock32 -Wl,--stack,33554432" >> $RULESFILE
+	fi
+fi
+
+#------------------------------------------------------------------------------
+#	Sound part
+#------------------------------------------------------------------------------
+
+echo
+echo -n "Do you want to compile with sound? (y) "
+read ANSWER
+case $ANSWER in
+  [nN])
+	echo "No sound support"
+	;;
+
+  *)
+	echo "Compiling with sound support"
+	echo "# Sound support" >> $RULESFILE
+	echo "DSOUND		= -DWITH_SOUND" >> $RULESFILE
+	if ! test "$USESDL" = 1 ; then
+	
+	  # Check for libpthread
+	
+	  LIBCHECK="-lpthread"
+	  check_for_libs
+	  if test "$?" = 0 ; then
+	    echo "Assuming you have a thread-safe X11 (libc6 or glibc),"
+	    echo -n "do you want to compile with threaded sound? (n) "
+	    read ANSWER2
+	    case $ANSWER2 in [yY])
+	      echo "THREAD		= -D_REENTRANT -DUSE_THREAD" >> $RULESFILE
+	      echo "THREADLIB	= -lpthread" >> $RULESFILE
+	      ;;
+	    esac
+	  fi
+	fi
+esac
+	
+echo >> $RULESFILE
+echo
+
+#------------------------------------------------------------------------------
+#	Compression options part
+#------------------------------------------------------------------------------
+
+# Check for compression libraries
+echo "Checking for compression libraries..."
+echo
+
+# libz
+LIBCHECK="-lz"; check_for_libs
+if test "$?" = 0 ; then HAVE_LIBZ=1; fi
+
+# libbz2
+LIBCHECK="-lbz2"; check_for_libs
+if test "$?" = 0 ; then HAVE_LIBBZ2=1; fi
+if test "$WIN32" = 1 ; then HAVE_LIBBZ2=0; fi	# Bzip2 not supported by Cygwin
+
+# Determine default compression option based on what's available
+
+if (test "$HAVE_LIBZ" = 1 && test "$HAVE_LIBBZ2" = 1) ; then
+  DEF4=" (default)"; COMPDEF="O"
+elif test "$HAVE_LIBBZ2" = 1 ; then
+  DEF3=" (default)"; COMPDEF="B"
+elif test "$HAVE_LIBZ" = 1 ; then
+  DEF2=" (default)"; COMPDEF="G"
+else
+  DEF1=" (default)"; COMPDEF="N"
+fi
+
+# Display menu
+
+echo "COMPRESSION OPTIONS"
+echo
+echo "  N-None"$DEF1
+if test "$HAVE_LIBZ" = 1 ; then
+  echo "  G-GZ"$DEF2
+fi
+if test "$HAVE_LIBBZ2" = 1 ; then
+  echo "  B-Bzip2"$DEF3
+fi
+if (test "$HAVE_LIBZ" = 1 && test "$HAVE_LIBBZ2" = 1) ; then
+  echo "  O-Both GZ and Bzip2"$DEF4
+fi
+echo
+echo -n "Please enter selection ($COMPDEF): "
+read COMPOPT
+
+if test "$COMPOPT x" = " x" ; then COMPOPT=$COMPDEF; fi
+
+echo "# Compression support" >> $RULESFILE
+
+case $COMPOPT in
+  [nN])
+	echo "Using no compression"
+	echo "ZDEFS		=" >> $RULESFILE
+	echo "ZLIBS		=" >> $RULESFILE
+	;;
+	
+  [bB])
+	echo "Using Bzip2 compression"
+	echo "ZDEFS		= -DUSE_BZ2LIB" >> $RULESFILE
+	echo "ZLIBS		= -lbz2" >> $RULESFILE
+	;;
+	
+  [oO])
+	echo "Using GZ and Bzip2 compression"
+	echo "ZDEFS		= -DUSE_ZLIB -DUSE_BZ2LIB" >> $RULESFILE
+	echo "ZLIBS		= -lz -lbz2" >> $RULESFILE
+	;;
+	
+  *)	
+	echo "Using GZ compression"
+	echo "ZDEFS		= -DUSE_ZLIB" >> $RULESFILE
+	echo "ZLIBS		= -lz" >> $RULESFILE
+	;;
+	
+esac
+echo "" >> $RULESFILE
+
+
+###############################################################################
+# Write required information to the file
+
+# May be required on some distributions for libpng and libz!
+# extra linker flags and include directory
+# -L/usr/lib 
+
+echo "XLDFLAGS	= -L/usr/X11R6/lib -L/usr/local/lib \\" >> $RULESFILE
+echo "		  -L\$(TOPDIR)/libpng-1.0.5 -L\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+echo "XIFLAGS		= -I/usr/X11R6/include -I/usr/local/include \\" >> $RULESFILE
+echo "		  -I\$(TOPDIR)/libpng-1.0.5 -I\$(TOPDIR)/zlib-1.1.3" >> $RULESFILE
+echo >> $RULESFILE
+
+# Add the last bits
+# below this, nothing should be changed!
+
+echo "#####################################################################" >> $RULESFILE
+echo "# Don't change anything below here unless you know what you're doing!" >> $RULESFILE
+echo >> $RULESFILE
+
+echo "VERSION=	'$VERSION'" >> $RULESFILE
+echo "PROFILE=$PROFILE" >> $RULESFILE
+echo >> $RULESFILE
+
+# Libraries needed to build tools
+echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
+
+# Libraries needed to build freecraft
+echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+
+echo "DISTLIST=\$(TOPDIR)/distlist" >> $RULESFILE
+echo "TAGS=\$(TOPDIR)/src/tags" >> $RULESFILE
+
+echo >> $RULESFILE
+# WIN32
+if test "$WIN32" = 1 ; then
+  echo "# Win32" >> $RULESFILE
+  echo "EXE=.exe" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/clone\$(EXE)" >> $RULESFILE
+  echo "ARCH=win32" >> $RULESFILE
+  echo "OE=o" >> $RULESFILE
+else
+# LINUX
+  echo "# Linux" >> $RULESFILE
+  echo "EXE=" >> $RULESFILE
+  echo "OUTFILE=\$(TOPDIR)/clone" >> $RULESFILE
+  echo "ARCH=linux" >> $RULESFILE
+  echo "OE=o" >> $RULESFILE
+fi
+
+#------------------------------------------------------------------------------
+# architecture-dependent objects
+
+echo >> $RULESFILE
+echo "#ARCHOBJS=stdmman.\$(OE) svgalib.\$(OE) unix_lib.\$(OE) bitm_lnx.\$(OE)" >> $RULESFILE
+
+# include flags
+echo "IFLAGS=	-I\$(TOPDIR)/src/include \$(XIFLAGS)" >> $RULESFILE
+
+# define flags
+if test "$DEBUG" = 1 ; then
+  echo "DEBUG=	-DDEBUG #-DFLAG_DEBUG" >> $RULESFILE
+fi
+echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
+echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
+echo "	\$(DEBUG) -DNEW_VIDEO" >> $RULESFILE
+
+echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
+
+## JOHNS: my ctags didn't support
+#CTAGSFLAGS=-i defmpstuvFS -a -f 
+
+echo "CTAGSFLAGS=-i defptvS -a -f " >> $RULESFILE
+echo >> $RULESFILE
+
+#
+#	Locks versions with symbolic name
+
+echo "# Locks versions with a symbolic name" >> $RULESFILE
+echo "LOCKVER=	rcs -q -n\$(NAME)" >> $RULESFILE
+echo >> $RULESFILE
+
+#------------------------------------------------------------------------------
+
+echo "%.o: %.c" >> $RULESFILE
+echo "	\$(CC) -c \$(CFLAGS) \$< -o \$@" >> $RULESFILE
+echo "	@ar cru \$(TOPDIR)/src/libclone.a \$@" >> $RULESFILE
+
+#
+# Source code documentation
+
+echo >> $RULESFILE
+echo "# Source code documentation" >> $RULESFILE
+
+echo "DOXYGEN=	doxygen" >> $RULESFILE
+
+echo "DOCIFY=		docify" >> $RULESFILE
+echo "DOCPP=		doc++" >> $RULESFILE
+# Still didn't work
+#echo "DOCIFY=		/root/doc++-3.3.11/src/docify" >> $RULESFILE
+#echo "DOCPP=		/root/doc++-3.3.11/src/doc++" >> $RULESFILE
+
+echo >> $RULESFILE
+echo "%.doc: %.c" >> $RULESFILE
+echo "	@\$(TOPDIR)/tools/aledoc \$< | \$(DOCIFY) > \$*-c.doc 2>/dev/null" >> $RULESFILE
+
+echo "%.doc: %.h" >> $RULESFILE
+echo "	@\$(TOPDIR)/tools/aledoc \$< | \$(DOCIFY) > \$*-h.doc 2>/dev/null" >> $RULESFILE
+
+#------------------------------------------------------------------------------
+# Final comments
+
+echo
+echo "Done generating Rules.make."
+echo -n "Would you like to compile it now? (y) "
+read ANSWER
+
+case $ANSWER in
+ [nN])
+ 	echo
+ 	echo "Done generating Rules.make.  Type 'make' to compile!"
+	;;
+ *)
+	make
+	;;
+	
+esac
+

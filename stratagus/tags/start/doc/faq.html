@@ -1,0 +1,139 @@
+<!--
+----	$Id$
+-->
+<HTML><HEAD>
+    <TITLE>FAQ for ALE Clone Version 1.16.1</TITLE>
+</HEAD>
+<BODY>
+    <H1>FAQ for ALE Clone Version 1.16.1</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2000 by The FreeCraft Project. Distributed under the
+<A HREF="artistic-license.html">"Artistic License"</A></B>
+<HR>
+
+Any questions not mentioned here, please contact
+<A HREF="mailto:aleclone@FreeCraft.org"> aleclone@FreeCraft.org</A>.<P>
+
+<DL>
+<P>
+<DT>Q: I was playing in 800x600 mode, and the graphics around the edge didn't paint the full screen?
+<DD>A: The original graphics aren't designed for this resolutions, you could
+    design your own user interface, see "data/ccl/ui.ccl".
+<P>
+<DT>Q: The graphics didn't fit on 800x600 or higher resolution?
+<DD>A: The original graphics aren't designed for this resolutions, you could
+    design your own user interface, see "data/ccl/ui.ccl".
+<P>
+<DT>Q: The graphics didn't fit on 800x600 or higher resolution?
+<DT>Q: gzseek already defined or undefined!
+
+<DD>A: You have an incompatible libpng version, better you install the latest
+libpng1.0.X. You get it here:
+    <A HREF="ftp://swrinde.nde.swri.edu/pub/png/">SwRI</A>
+<P>
+<DT>Q: The software cursor is too slow
+
+<DD>A: I will improve the speed later, but me was told:<BR>
+Using Accelerated X on a Pentium 75 ALE Clone is now playable.
+<P>
+<DT>Q: Why did Guile 1.3 not work?
+
+<DD>A: Applies only to older versions, since october 1998 supported.<P>
+
+Change the line in 'Rules.make':<P>
+    GUILELIB=       -lguile -ldl<P>
+into<P>
+    GUILELIB=       `guile-config link` -lreadline -lncurses<P>
+With this I got guile 1.3 working.
+<P>
+<DT>Q: Did ALE Clone work with ALSA?
+
+<DD>A: Yes, ALE Clone works with the Advanced Linux Sound Architecture (ALSA) - Driver.
+I have tested it with version 0.3.2 - 0.4.1.<P>
+More informations <A HREF="http://www.alsa-project.org">
+http://www.alsa-project.org</A><P>
+<P>
+<DT>Q: How did I get big maps?
+
+<DD>A: If you want a map of the size 256 x 256.
+Create and edit 4 maps (128 x 128) in the original editor.
+Save them as bigmap1.pud, bigmap2.pud, bigmap3.pud and bigmap4.pud.
+Now create a file bigmap.cm containing:
+<P><PRE>
+	(define-map 256 256)
+	(load-pud "bigmap1.pud")
+	(load-pud "bigmap2.pud")
+	(load-pud "bigmap3.pud")
+	(load-pud "bigmap4.pud")
+</PRE><P>
+If you now load this file as map (clone bigmap.cm), you see this big map.
+bigmap1.pud is in the upper left corner.
+bigmap2.pud is in the upper right corner.
+bigmap3.pud is in the lower left corner.
+bigmap4.pud is in the lower right corner.
+<P>
+<DT>Q: Can I use the original without expansion?
+
+<DD>A: There are only more graphics and sounds in the expansion CD version.
+Me was told, it works without problems with the german version. Just try it.
+With the new versions this should work without problems.
+
+<P>
+<DT>Q: I get the error message "gcc: No input files", when I build clone.
+    (Reported with pgcc version 1.1.1.) What should I do?
+
+<DD>A: Try changing the line in the clone toplevel Makefile <BR>
+        $(CC) -Lsrc -lclone $(CLONELIBS) -o clone -I. $(CFLAGS) <BR>
+    to <BR>
+        $(CC) -Lsrc -lclone $(CLONELIBS) -o clone -I. $(CFLAGS) dummy.c <P>
+    and execute the command "<I>touch dummy.c</I>" in the clone toplevel
+    directory. <P>
+    Or install a better gcc version without this bug.
+<P>
+<DT>Q: I have tried to start a level with
+    './clone data/puds/internal/internal01.pud.gz' and I only get this error
+    message
+    'pud: fopen,gzopen,bzopen(): No such file or directory'.
+<DD>A: We have changed the loading syntax:
+    <UL>
+    <LI>file.pud loads relative from $CLONE_LIB_PATH (in my source "data").
+    <LI>./file.pud loads relative from the current directory.
+    <LI>/file.pud loads absolute from the root directory.
+    </UL>
+    This means you must type './clone ./data/puds/internal/internal01.pud.gz'!
+<P>
+<DT>Q: I got following error messages if I start clone from the binary release.
+<BR>ERROR: In procedure primitive-load-path:
+<BR>ERROR: Unable to find file "ice-9/boot-9.scm" in load path 
+<DD>A: Install the runtime system for guile/libguile.
+<BR>If you have it already installed or the installation didn't fix this error,
+try to use: "GUILE_LOAD_PATH=where_you_have_the_ice-9_directory ./clone"
+to start.
+<P>This sections should be outdated, currently SIOD is used.
+<P>
+<DT>Q: The mouse react after seconds on my moves?
+<DD>A: I didn't found the real problem. Currently use the threaded sound
+support and enable it (in data/ccl/sound.ccl) or and add to the line
+<P>
+DFLAGS= $(THREAD) $(GUILE) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND)
+$(DEBUG) -DNEW_VIDEO
+<P>
+"-DSLOW_INPUT" in Rules.make.
+
+</DL>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
