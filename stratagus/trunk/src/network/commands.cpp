@@ -94,7 +94,7 @@ global void CommandLog(const char* name,const Unit* unit,int flag,
 	int x,int y,const Unit* dest,const char* value,int num)
 {
     if( CommandLogDisabled ) {		// No log wanted
-//	return;
+	return;
     }
 
     //
