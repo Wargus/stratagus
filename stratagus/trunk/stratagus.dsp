@@ -595,10 +595,6 @@ SOURCE=.\src\pathfinder\splitter_zoneset.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\sound\arts_audio.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\sound\cdaudio.c
 # End Source File
 # Begin Source File
@@ -624,10 +620,6 @@ SOURCE=.\src\sound\music.c
 # Begin Source File
 
 SOURCE=.\src\sound\ogg.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\sound\oss_audio.c
 # End Source File
 # Begin Source File
 
