@@ -805,6 +805,9 @@ extern void DrawSelectionRectangle(const Unit* unit,const UnitType* type
     /// Draw rectangle filled with alpha around unit
 extern void DrawSelectionRectangleWithTrans(const Unit* unit
 	,const UnitType* type,int x,int y);
+    /// Draw corners around unit
+extern void DrawSelectionCorners(const Unit* unit,const UnitType* type
+	,int x,int y);
 
     /// Load the decorations (health,mana) of units
 extern void LoadDecorations(void);
