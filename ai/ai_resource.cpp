@@ -1016,6 +1016,7 @@ local void AiCheckRepair(void)
 	    //
 	    //	Find a free worker, who can build this building can repair it?
 	    //
+	    // FIXME: must check, if there are enough resources
 	    AiRepairUnit(unit);
 	}
     }
