@@ -945,10 +945,6 @@ extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 extern void ShowOrder(const Unit* unit);
 
 //		in unit_find.c
-	/// Select units in rectangle range
-extern int SelectUnits(int x1, int y1, int x2, int y2, Unit** table);
-	/// Select units on map tile
-extern int SelectUnitsOnTile(int x, int y, Unit** table);
 	/// Find all units of this type
 extern int FindUnitsByType(const UnitType* type, Unit** table);
 	/// Find all units of this type of the player

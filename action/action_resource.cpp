@@ -712,7 +712,8 @@ void ResourceGiveUp(Unit* unit)
 	unit->Reset = 1;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	unit->SubAction = 0;
-	if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
+	if (unit->CurrentResource && 
+			unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
 			unit->Value < unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity) {
 		unit->Value = 0;
 		unit->CurrentResource = 0;
@@ -752,12 +753,16 @@ global void HandleActionResource(Unit* unit)
 			// Drop other resources.
 			unit->Value = 0;
 		}
-		unit->CurrentResource = newres;
-		NewResetPath(unit);
-		DebugLevel3Fn("Started mining. reset path.\n");
-		unit->SubAction = SUB_MOVE_TO_RESOURCE;
+		if ((unit->CurrentResource = newres)) {
+			NewResetPath(unit);
+			DebugLevel3Fn("Started mining. reset path.\n");
+			unit->SubAction = SUB_MOVE_TO_RESOURCE;
+		} else {
+			unit->Value = 0;
+			ResourceGiveUp(unit);
+			return;
+		}
 	}
-	DebugCheck(!unit->CurrentResource);
 
 	// Move to the resource location.
 	if (unit->SubAction >= SUB_MOVE_TO_RESOURCE &&

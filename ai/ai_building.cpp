@@ -388,7 +388,7 @@ local int AiFindHallPlace(const Unit * worker, const UnitType * type, int *dx, i
 						maxy = TheMap.Height;
 					}
 
-					nunits = SelectUnits(minx, miny, maxx, maxy, units);
+					nunits = UnitCacheSelect(minx, miny, maxx, maxy, units);
 					for (j = 0; j < nunits; ++j) {
 						// Enemy near mine
 						if (AiPlayer->Player->Enemy & (1 << units[j]->Player->Player)) {

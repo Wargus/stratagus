@@ -339,7 +339,7 @@ local int CclIfUnitAt(lua_State* l)
 	// FIXME: I hope SelectUnits checks bounds?
 	// FIXME: Yes, but caller should check.
 	// NOTE: +1 right,bottom isn't inclusive :(
-	an = SelectUnits(x1, y1, x2 + 1, y2 + 1, table);
+	an = UnitCacheSelect(x1, y1, x2 + 1, y2 + 1, table);
 	//
 	// Count the requested units
 	//
@@ -424,11 +424,11 @@ local int CclIfNearUnit(lua_State* l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = SelectUnits(unit->X - 1, unit->Y - 1,
+			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around);
 		} else {
-			an = SelectUnits(unit->X - 2, unit->Y - 2,
+			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
@@ -524,11 +524,11 @@ local int CclIfRescuedNearUnit(lua_State* l)
 		// FIXME: Yes, but caller should check.
 		// NOTE: +1 right,bottom isn't inclusive :(
 		if (unit->Type->UnitType == UnitTypeLand) {
-			an = SelectUnits(unit->X - 1, unit->Y - 1,
+			an = UnitCacheSelect(unit->X - 1, unit->Y - 1,
 				unit->X + unit->Type->TileWidth + 1,
 				unit->Y + unit->Type->TileHeight + 1, around);
 		} else {
-			an = SelectUnits(unit->X - 2, unit->Y - 2,
+			an = UnitCacheSelect(unit->X - 2, unit->Y - 2,
 				unit->X + unit->Type->TileWidth + 2,
 				unit->Y + unit->Type->TileHeight + 2, around);
 		}
