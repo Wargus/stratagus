@@ -869,7 +869,7 @@ global void CenterOnMessage(void)
     if (MessagesEventIndex >= MessagesEventCount) {
 	return;
     }
-    MapCenterViewport (TheUI.LastClickedVP, MessagesEventX[MessagesEventIndex],
+    MapViewportCenter(TheUI.LastClickedVP, MessagesEventX[MessagesEventIndex],
 	    MessagesEventY[MessagesEventIndex]);
     SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
     MessagesEventIndex++;
