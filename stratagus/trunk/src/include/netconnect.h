@@ -181,14 +181,15 @@ extern char* NetworkArg;		/// Network command line argument
 extern int NetPlayers;			/// Network players
 extern int NetworkPort;			/// Local network port to use
 
+extern char LocalPlayerName[16];	/// Name of local player
+
 extern int HostsCount;			/// Number of hosts.
 extern NetworkHost Hosts[PlayerMax];	/// Host, port, and number of all players.
 
-extern NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
-extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
-extern char NetworkName[16];		/// Network menu: Name of local player
 extern int NetConnectRunning;		/// Network menu: Setup mode active
+extern NetworkState NetStates[PlayerMax];/// Network menu: Server: Client Host states
 extern unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state
+extern int NetLocalHostsSlot;		/// Network menu: Slot # in Hosts array of local client
 extern char NetTriesText[32];		/// Network menu: Client tries count text
 extern char NetServerText[64];		/// Network menu: Text describing the Network Server IP
 

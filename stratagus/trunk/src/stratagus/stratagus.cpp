@@ -232,6 +232,7 @@ global char* MenuBackgroundWithTitle;	/// File for menu with title
 global char* TitleMusic;		/// File for title music
 global char* MenuMusic;			/// File for menu music
 global char* FreeCraftLibPath;		/// Path for data directory
+global char LocalPlayerName[16];	/// Name of local player
 
     /// Name, Version, Copyright
 global char NameLine[] =
@@ -1352,8 +1353,8 @@ global int main(int argc,char** argv)
     CclStartFile="ccl/freecraft.ccl";
     EditorStartFile="ccl/editor.ccl";
 
-    memset(NetworkName, 0, 16);
-    strcpy(NetworkName, "Anonymous");
+    memset(LocalPlayerName, 0, 16);
+    strcpy(LocalPlayerName, "Anonymous");
 
     // FIXME: Parse options before or after ccl?
 
@@ -1387,8 +1388,8 @@ global int main(int argc,char** argv)
 		NetworkArg=strdup(optarg);
 		continue;
 	    case 'N':
-		memset(NetworkName, 0, 16);
-		strncpy(NetworkName, optarg, 16);
+		memset(LocalPlayerName, 0, 16);
+		strncpy(LocalPlayerName, optarg, 16);
 		continue;
 	    case 's':
 		AiSleepCycles=atoi(optarg);

@@ -2851,7 +2851,7 @@ local void MultiPlayerGameMenu(void)
 
     menu = FindMenu("menu-enter-name");
     menu->items[1].d.input.buffer = NameBuf;
-    strcpy(NameBuf, NetworkName);
+    strcpy(NameBuf, LocalPlayerName);
     strcat(NameBuf, "~!_");
     menu->items[1].d.input.nch = strlen(NameBuf) - 3;
     menu->items[1].d.input.maxch = 15;
@@ -2868,8 +2868,8 @@ local void MultiPlayerGameMenu(void)
     }
 
     NameBuf[menu->items[1].d.input.nch] = 0;	// Now finally here is the name
-    memset(NetworkName, 0, 16);
-    strcpy(NetworkName, NameBuf);
+    memset(LocalPlayerName, 0, 16);
+    strcpy(LocalPlayerName, NameBuf);
 
     GuiGameStarted = 0;
     // Here we really go...
