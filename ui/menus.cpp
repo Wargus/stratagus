@@ -2570,6 +2570,7 @@ local void TipsPreviousTip(void)
 */
 local void GameMenuExit(void)
 {
+    ExitMenus();
     Exit(0);
 }
 
