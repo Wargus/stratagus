@@ -708,40 +708,33 @@ local SCM CclDefineUI(SCM list)
 	ui->ReverseFontColor=gh_scm2newstr(value,NULL);
     }
 
-    //	Filler 1
-    temp=gh_car(list);
+    //	Filler
+    value=gh_car(list);
     list=gh_cdr(list);
-
-    if( !gh_list_p(temp) ) {
-	fprintf(stderr,"list expected\n");
-	return SCM_UNSPECIFIED;
+    if( gh_eq_p(value,gh_symbol2scm("filler")) ) {
+	sublist=gh_car(list);
+	list=gh_cdr(list);
+	ui->NumFillers++;
+	ui->Filler=realloc(ui->Filler,ui->NumFillers*sizeof(*ui->Filler));
+	ui->FillerX=realloc(ui->FillerX,ui->NumFillers*sizeof(*ui->FillerX));
+	ui->FillerY=realloc(ui->FillerY,ui->NumFillers*sizeof(*ui->FillerY));
+	while( !gh_null_p(sublist) ) {
+	    value=gh_car(sublist);
+	    sublist=gh_cdr(sublist);
+	    if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->Filler[ui->NumFillers-1].File=gh_scm2newstr(value,NULL);
+	    } else if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+		value=gh_car(sublist);
+		sublist=gh_cdr(sublist);
+		ui->FillerX[ui->NumFillers-1]=gh_scm2int(gh_car(value));
+		ui->FillerY[ui->NumFillers-1]=gh_scm2int(gh_car(gh_cdr(value)));
+	    } else {
+		errl("Unsupported tag",value);
+	    }
+	}
     }
-
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    str=gh_scm2newstr(value,NULL);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    x=gh_scm2int(value);
-    value=gh_car(temp);
-    temp=gh_cdr(temp);
-    y=gh_scm2int(value);
-
-    for( i=0; i<ui->NumFillers; ++i ) {
-	free(ui->Filler[i].File);
-    }
-    free(ui->Filler);
-    free(ui->FillerX);
-    free(ui->FillerY);
-
-    ui->NumFillers=1;
-    ui->Filler=malloc(ui->NumFillers*sizeof(*ui->Filler));
-    ui->FillerX=malloc(ui->NumFillers*sizeof(*ui->FillerX));
-    ui->FillerY=malloc(ui->NumFillers*sizeof(*ui->FillerY));
-
-    ui->Filler[0].File=str;
-    ui->FillerX[0]=x;
-    ui->FillerY[0]=y;
 
     //	Resource
     temp=gh_car(list);
