@@ -1022,7 +1022,8 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//		Carry resource.
 			//		Don't display if empty.
 			//
-			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0) {
+			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
+				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
 				DrawManaBar(x, y, type, unit->Type->ResInfo[
 						unit->CurrentResource]->ResourceCapacity,
 					unit->Value);
@@ -1089,8 +1090,8 @@ local void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 			//
 			//		Carry resource.
 			//
-			} else if (unit->Type->Harvester &&
-					unit->CurrentResource&&unit->Value > 0) {
+			} else if (unit->Type->Harvester && unit->CurrentResource && unit->Value > 0 &&
+				!(ShowNoFull && unit->Value == unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity)) {
 				DrawManaSprite(x, y, type,
 					unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity,
 					unit->Value);
