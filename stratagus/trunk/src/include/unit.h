@@ -580,6 +580,7 @@ extern int ShowSightRange;		/// Flag: show right range
 extern int ShowReactRange;		/// Flag: show react range
 extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
+extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
 
 //	in selection.c
 extern int NumSelected;			/// how many units selected

@@ -312,6 +312,16 @@ local SCM CclShowOrders(void)
 }
 
 /**
+**	Enable hit point regeneration
+*/
+local SCM CclHitPointRegeneration(void)
+{
+    HitPointRegeneration=1;
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	For debug increase mining speed.
 **
 **	@param speed	Speed factor of gold mining.
@@ -738,6 +748,7 @@ global void CclInit(void)
     init_subr_0("show-react-range",CclShowReactRange);
     init_subr_0("show-attack-range",CclShowAttackRange);
     init_subr_0("show-orders",CclShowOrders);
+	init_subr_0("hitpoint-regeneration", CclHitPointRegeneration);
 
     init_subr_1("speed-mine",CclSpeedMine);
     init_subr_1("speed-gold",CclSpeedGold);
