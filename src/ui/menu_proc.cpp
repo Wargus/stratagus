@@ -10,7 +10,7 @@
 //
 /**@name menu_proc.c	-	The menu processing code. */
 //
-//	(c) Copyright 1999-2002 by Andreas Arens
+//	(c) Copyright 1999-2003 by Andreas Arens and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1573,7 +1573,7 @@ local void MenuHandleMouseMove(int x,int y)
 		}
 		switch (mi->mitype) {
 		    case MI_TYPE_GEM:
-			if ((mi->d.gem.state & MI_GSTATE_PASSIVE)) {
+			if ((mi->d.gem.state & (MI_GSTATE_PASSIVE|MI_GSTATE_INVISIBLE))) {
 			    break;
 			}
 			/* FALL THROUGH */
