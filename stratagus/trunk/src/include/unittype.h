@@ -323,6 +323,10 @@
 **
 **				Can transport units
 **
+**  UnitType::AttackFromTransporter
+**    
+**    Units inside this transporter can attack with missiles.
+**
 **		UnitType::MaxOnBoard
 **
 **				Maximum units on board (for transporters), and resources
@@ -719,6 +723,7 @@ struct _unit_type_ {
 	unsigned DetectCloak : 1;       /// Can see Cloaked units.
 	unsigned Coward : 1;            /// Unit will only attack if instructed.
 	unsigned Transporter : 1;       /// Can transport units
+	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
 	unsigned Vanishes : 1;          /// Corpes & destroyed places.
 	unsigned GroundAttack : 1;      /// Can do command ground attack.
 	unsigned ShoreBuilding : 1;     /// Building must be build on coast.

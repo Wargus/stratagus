@@ -506,10 +506,21 @@ local Unit* FindRangeAttack(Unit* u, int range)
 
 	DebugCheck(2 * missile_range + 1 >= 32);
 
-	x = u->X;
-	y = u->Y;
-	n = SelectUnits(x - missile_range, y - missile_range,
-		x + missile_range + 1, y + missile_range + 1, table);
+	//
+	// If unit is removed, use containers x and y
+	if (u->Removed) {
+		x = u->Container->X;
+		y = u->Container->Y;
+		n = SelectUnits(x - missile_range, y - missile_range,
+			x + missile_range + u->Container->Type->TileWidth, 
+			y + missile_range + u->Container->Type->TileHeight, table);
+	} else {
+		x = u->X;
+		y = u->Y;
+		n = SelectUnits(x - missile_range, y - missile_range,
+			x + missile_range + u->Type->TileWidth, 
+			y + missile_range + u->Type->TileHeight, table);
+	}
 
 	if (!n) {
 		return NoUnitP;
@@ -607,7 +618,15 @@ local Unit* FindRangeAttack(Unit* u, int range)
 			if (cost < 1) {
 				cost = 1;
 			}
-	 			d = MapDistanceBetweenUnits(u, dest);
+
+			//
+			// Removed Unit's are in bunkers
+			//
+			if (u->Removed) {
+				d = MapDistanceBetweenUnits(u->Container, dest);
+			} else {
+				d = MapDistanceBetweenUnits(u, dest);
+			}
 
 			if (d <= attackrange || (d <= range && UnitReachable(u, dest, attackrange))) {
 				++enemy_count;
