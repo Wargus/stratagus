@@ -32,11 +32,19 @@ include $(TOPDIR)/$(RULESFILE)
 MODULE  = pathfinder
 
 ifeq (HIERARCHIC_PATHFINDER, $(findstring HIERARCHIC_PATHFINDER, $(CFLAGS)))
-	SRCS	= pathfinder.c astar.c ccl_pathfinder.c avl_tree.c hierarchical.c \
-			  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
-			  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
+    INCL = avl_tree.h pf_high_open.h pf_lowlevel.h region_groups.h \
+	  hierarchical.h pf_highlevel.h regid.h region_set.h pf_goal.h	\
+	  pf_low_open.h region.h types.h
+    SRCS = pathfinder.c astar.c ccl_pathfinder.c avl_tree.c hierarchical.c \
+	  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
+	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
 else
-	SRCS	= pathfinder.c astar.c ccl_pathfinder.c
+    INCL = avl_tree.h pf_high_open.h pf_lowlevel.h region_groups.h \
+	  hierarchical.h pf_highlevel.h regid.h region_set.h pf_goal.h	\
+	  pf_low_open.h region.h types.h avl_tree.c hierarchical.c \
+	  regid.c region.c region_set.c region_groups.c pf_highlevel.c \
+	  pf_high_open.c pf_lowlevel.c pf_low_open.c pf_goal.c
+    SRCS = pathfinder.c astar.c ccl_pathfinder.c
 endif
 
 OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
