@@ -2473,11 +2473,12 @@ local void SaveSelectVSAction(Menuitem *mi, int i)
     int op, d1, d2;
 
     mi--;
-    if (mi->d.listbox.curopt == -1)
-	mi->d.listbox.curopt = 0;
     switch (i) {
 	case 0:		// click - down
 	case 2:		// key - down
+	    if (mi->d.listbox.curopt == -1)
+	    mi->d.listbox.curopt = 0;
+
 	    if (mi[1].d.vslider.cflags&MI_CFLAGS_DOWN) {
 		if (mi->d.listbox.curopt+mi->d.listbox.startline+1 < mi->d.listbox.noptions) {
 		    mi->d.listbox.curopt++;
