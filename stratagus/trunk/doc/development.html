@@ -174,33 +174,33 @@ Please read the doxygen/doc++ documentation.
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/ 
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//  Stratagus - A free fantasy real time strategy game engine
 //
 /**@name {filename}.c	-	{One line description of this file} */
 //
-//      (c) Copyright 2004 by {insert your name here}
+//  (c) Copyright 2004 by {insert your name here}
 //
-//      This program is free software; you can redistribute it and/or modify
-//      it under the terms of the GNU General Public License as published by
-//      the Free Software Foundation; only version 2 of the License.
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; only version 2 of the License.
 //
-//      This program is distributed in the hope that it will be useful,
-//      but WITHOUT ANY WARRANTY; without even the implied warranty of
-//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//      GNU General Public License for more details.
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
 //
-//      You should have received a copy of the GNU General Public License
-//      along with this program; if not, write to the Free Software
-//      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-//      02111-1307, USA.
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+//  02111-1307, USA.
 //
-//      $Id$
+//  $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include &lt;stdio.h&gt;
@@ -210,13 +210,13 @@ Please read the doxygen/doc++ documentation.
 // More game includes.
 
 /*----------------------------------------------------------------------------
---	Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
 // Global and local variables of this module.
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 // Local and global functions of this module.
@@ -234,11 +234,55 @@ If you fix in other modules, please imitate the coding style of the original cod
 found online <a href="http://lwn.net/2001/1115/a/CodingStyle.php3">here</a>).
 <ul>
     <li>Write ANSI C.
-    <li>Use 4 spaces tabulators.
+    <li>All Tabs (Developers use 4 columns for a tab).
     <li>No line should be longer than 78 characters.
 	<li>All comments should be on their own line.
     <li>Use { } even for one statement blocks.
 </ul>
+
+<b>Coding Examples:</b>
+<pre>
+    // Example for statement with i incremented
+    for (i = 0; i < sample->Length &gt;&gt; 1; ++i) {
+        ...
+    }
+
+    // if statement with brackets and functions.
+    if ((i = CLread(f, &amp;chunk, sizeof(chunk))) != sizeof(chunk)) {
+        ...
+    }
+
+    // function with variables defined.
+    int function(int a, int b)
+	{
+        int x;
+        int y;
+
+        x = a;
+        y = b;
+
+        return 0;
+    }
+	
+    // Example of a function
+    static int CclLoadPud(lua_State* l)
+    {
+        const char* name;
+
+        if (SaveGameLoading) {
+            return 0;
+        }
+
+        if (lua_gettop(l) != 1) {
+            LuaError(l, "incorrect argument");
+        }
+        name = LuaToString(l, 1);
+        LoadPud(name, &amp;TheMap);
+
+        // FIXME: LoadPud should return an error
+        return 0;
+    }
+</pre>
 
 NOTE: If you make big changes please always extend the copyright with your name, 
 and always update the copyright year if required.<p>
