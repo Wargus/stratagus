@@ -344,14 +344,12 @@ static int CalculateUnitIcons(void)
 	i = 0;
 	count = 0;
 	x = TheUI.ButtonPanelY + 24;
-	while (x < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
-			- IconHeight) {
+	while (x < TheUI.ButtonPanelY + TheUI.ButtonPanelG->Height - IconHeight) {
 		++i;
 		x += IconHeight + 2;
 	}
 	x = TheUI.ButtonPanelX + 10;
-	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width
-			- IconWidth) {
+	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanelG->Width - IconWidth) {
 		count += i;
 		x += IconWidth + 8;
 	}
@@ -648,13 +646,13 @@ static void DrawUnitIcons(void)
 	//
 	y = TheUI.ButtonPanelY + 24;
 	i = UnitIndex;
-	while (y < TheUI.ButtonPanelY + TheUI.ButtonPanel.Graphic->Height
+	while (y < TheUI.ButtonPanelY + TheUI.ButtonPanelG->Height
 			- IconHeight) {
 		if (i >= MaxShownUnits) {
 			break;
 		}
 		x = TheUI.ButtonPanelX + 10;
-		while (x < TheUI.ButtonPanelX + TheUI.ButtonPanel.Graphic->Width
+		while (x < TheUI.ButtonPanelX + TheUI.ButtonPanelG->Width
 				- IconWidth) {
 			if (i >= MaxShownUnits) {
 				break;
@@ -964,10 +962,10 @@ void EditorUpdateDisplay(void)
 	//
 	// Button panel
 	//
-	if (TheUI.ButtonPanel.Graphic) {
-		VideoDrawSub(TheUI.ButtonPanel.Graphic, 0, 0,
-			TheUI.ButtonPanel.Graphic->Width,
-			TheUI.ButtonPanel.Graphic->Height, TheUI.ButtonPanelX,
+	if (TheUI.ButtonPanelG) {
+		VideoDrawSub(TheUI.ButtonPanelG, 0, 0,
+			TheUI.ButtonPanelG->Width,
+			TheUI.ButtonPanelG->Height, TheUI.ButtonPanelX,
 			TheUI.ButtonPanelY);
 	}
 	DrawEditorPanel();
@@ -1609,7 +1607,7 @@ static void EditorCallbackMouse(int x, int y)
 		i = UnitIndex;
 		by = TheUI.ButtonPanelY + 24;
 		while (by < TheUI.ButtonPanelY +
-				TheUI.ButtonPanel.Graphic->Height - IconHeight) {
+				TheUI.ButtonPanelG->Height - IconHeight) {
 			if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 				break;
 			}
