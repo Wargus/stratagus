@@ -1344,7 +1344,7 @@ global int UnitGetNextPathSegment (Unit *unit, int *dx, int *dy)
 **	Increment mana of all magic units. Called each second.
 **	Also clears the blink flag and handles submarines.
 **
-**	@NOTE: we could build a table of all magic units reducing cpu use.
+**	@note	we could build a table of all magic units reducing cpu use.
 **
 **	@todo FIXME: Split this into more functions, to make the use clearer
 **		or rename the function.
