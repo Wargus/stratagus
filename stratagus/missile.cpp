@@ -600,9 +600,17 @@ global void FireMissile(Unit* unit)
 
     if( goal && RevealAttacker ) {	// attacking units are seen
 #ifdef NEW_FOW
-	// FIXME: Need a way to temporarily mark this tile, place a TTL
-	// FIXME: Unit is the best solution, but need other fixes first.
-	MapMarkSight(goal->Player,unit->X,unit->Y,1);
+	Unit* target;
+	// FIXME: Don't use UnitTypeByIdent during runtime.
+	target = MakeUnit(UnitTypeByIdent("unit-reveal-attacker"), unit->Player);
+	target->Orders[0].Action = UnitActionStill;
+	target->HP = 0;
+	target->X = unit->X;
+	target->Y = unit->Y;
+	target->TTL=GameCycle+CYCLES_PER_SECOND+CYCLES_PER_SECOND/2;
+	target->CurrentSightRange=target->Stats->SightRange;
+	MapMarkSight(target->Player,unit->X,unit->Y,target->CurrentSightRange);
+	CheckUnitToBeDrawn(target);
 #else
 	if( goal->Player==ThisPlayer || IsSharedVision(ThisPlayer,goal) ) {
 	    MapMarkSight(unit->X,unit->Y,1);
