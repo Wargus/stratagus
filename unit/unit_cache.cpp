@@ -118,6 +118,8 @@ struct _quad_tree_ {
 
 #else	// }{ STATISTIC
 
+#define StatisticInsert(tree)
+#define StatisticDelete(tree)
 #define StatisticNewNode(tree)
 #define StatisticNewLeaf(tree)
 #define StatisticDelNode(tree)
