@@ -1021,6 +1021,20 @@ local SCM CclSetGroupId(SCM id)
     return old;
 }
 #elif defined(USE_LUA)
+local int CclSetGroupId(lua_State* l)
+{
+    int old;
+
+    if (lua_gettop(l) != 1 || !lua_isnumber(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    old = GroupId;
+    GroupId = lua_tonumber(l, 1);
+
+    lua_pushnumber(l, old);
+    return 1;
+}
 #endif
 
 /**
@@ -1049,6 +1063,35 @@ local SCM CclSelection(SCM num, SCM units)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclSelection(lua_State* l)
+{
+    int i;
+    int args;
+    int j;
+
+    if (lua_gettop(l) != 2 || !lua_isnumber(l, 1) || !lua_istable(l, 2)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    InitSelections();
+    NumSelected = lua_tonumber(l, 1);
+    i = 0;
+    args = luaL_getn(l, 2);
+    for (j = 0; j < args; ++j) {
+	const char* str;
+
+	lua_rawgeti(l, 2, j + 1);
+	if (!lua_isstring(l, -1)) {
+	    lua_pushstring(l, "incorrect argument");
+	    lua_error(l);
+	}
+	str = lua_tostring(l, -1);
+	lua_pop(l, 1);
+	Selected[i++] = UnitSlots[strtol(str + 1, NULL, 16)];
+    }
+
+    return 0;
+}
 #endif
 
 /**
@@ -1059,6 +1102,9 @@ global void SelectionCclRegister(void)
 #if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("set-group-id!", CclSetGroupId);
     gh_new_procedure2_0("selection", CclSelection);
+#elif defined(USE_LUA)
+    lua_register(Lua, "SetGroupId", CclSetGroupId);
+    lua_register(Lua, "Selection", CclSelection);
 #endif
 }
 
