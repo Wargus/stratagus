@@ -10,7 +10,7 @@
 //
 /**@name unit.c		-	The units. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -3250,7 +3250,7 @@ local void SaveOrder(const Order* order,FILE* file)
 {
     char* ref;
 
-    fprintf(file,"'(");
+    fprintf(file,"(");
     switch( order->Action ) {
 	case UnitActionNone:
 	    fprintf(file,"action-none");
@@ -3336,6 +3336,9 @@ local void SaveOrder(const Order* order,FILE* file)
 	case UnitActionDemolish:
 	    fprintf(file,"action-demolish");
 	    break;
+
+	default:
+	    DebugLevel0Fn("Unknown action in order\n");
     }
     fprintf(file," flags %d",order->Flags);
     fprintf(file," range (%d %d)",order->RangeX,order->RangeY);
@@ -3484,9 +3487,9 @@ global void SaveUnit(const Unit* unit,FILE* file)
 	fprintf(file,"\n    ");
 	SaveOrder(&unit->Orders[i],file);
     }
-    fprintf(file,")\n  'saved-order ");
+    fprintf(file,")\n  'saved-order '");
     SaveOrder(&unit->SavedOrder,file);
-    fprintf(file,"\n  'new-order ");
+    fprintf(file,"\n  'new-order '");
     SaveOrder(&unit->NewOrder,file);
 
     //
