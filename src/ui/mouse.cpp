@@ -95,15 +95,10 @@ local void DrawMouseCoordsOnMap(int x,int y)
     char buf[128];
     unsigned flags;
 
-#ifdef SPLIT_SCREEN_SUPPORT
-    x = Viewport2MapX (TheUI.ActiveViewport, x);
-    y = Viewport2MapY (TheUI.ActiveViewport, y);
-#else /* SPLIT_SCREEN_SUPPORT */
-    x=Screen2MapX(x);
-    y=Screen2MapY(y);
-#endif /* SPLIT_SCREEN_SUPPORT */
+    x = Viewport2MapX(TheUI.ActiveViewport, x);
+    y = Viewport2MapY(TheUI.ActiveViewport, y);
     if( x<0 || y<0 || x>=TheMap.Width || y>=TheMap.Height ) {
-	DebugLevel0Fn("coords outside map %d,%d\n",x,y);
+	DebugLevel0Fn("coords outside map %d,%d\n" _C_ x _C_ y);
 	return;
     }
     VideoLockScreen ();
