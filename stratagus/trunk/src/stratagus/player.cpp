@@ -1104,7 +1104,7 @@ global void NotifyPlayer(const Player* player,
     //
     //	FIXME: show minimap animation for the event.
     //
-    SetMessageEvent(x,y,temp);
+    SetMessageEvent(x,y,"%s",temp);
 }
 
 //@}
