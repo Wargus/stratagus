@@ -281,8 +281,8 @@ void UpdateConnections(void)
 	int y;
 	RegionId reg;
 
-	for (x = 0; x < TheMap.Width; ++x) {
-			for (y = 0; y < TheMap.Height; ++y) {
+	for (x = 0; x < TheMap.Info.MapWidth; ++x) {
+			for (y = 0; y < TheMap.Info.MapHeight; ++y) {
 			reg = RegionMapping(x, y);
 			if (reg != NoRegion) {
 				RegionUpdateConnection(reg, x, y, 1, 0);
@@ -343,7 +343,7 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 		minx = seg->MinX;
 		maxx = seg->MinX;
 
-		tempptr = RegionTempStorage + seg->Y * TheMap.Width + seg->MinX;
+		tempptr = RegionTempStorage + seg->Y * TheMap.Info.MapWidth + seg->MinX;
 
 		while (minx <= seg->MaxX) {
 			initval = *tempptr;
@@ -414,7 +414,7 @@ void RegionJoin(RegionId a, RegionId b)
 
 	cur = Regions[b].FirstSegment;
 	while (cur) {
-		mapptr = RegionMappingStorage + cur->MinX + cur->Y * TheMap.Width;
+		mapptr = RegionMappingStorage + cur->MinX + cur->Y * TheMap.Info.MapWidth;
 		for ( i = cur->MaxX - cur->MinX + 1; i > 0; --i) {
 			*(mapptr++) = a;
 		}
@@ -496,19 +496,19 @@ void RegionSplit(RegionId regid, int updateConnections)
 	// Find two correct starting place for flood filling
 	if (adef->MaxX - adef->MinX > adef->MaxY - adef->MinY) {
 		RegionFindPointOnX(adef, adef->MinX, &x, &y);
-		Assert(!RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Info.MapWidth * y]);
 		CircularFillerInit(fillers, regid, x, y, 1);
 
 		RegionFindPointOnX(adef, adef->MaxX, &x, &y);
-		Assert(!RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Info.MapWidth * y]);
 		CircularFillerInit(fillers + 1, regid, x, y, 2);
 	} else {
 		RegionFindPointOnY(adef, adef->MinY, &x, &y);
-		Assert(!RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Info.MapWidth * y]);
 		CircularFillerInit(fillers, regid, x, y, 1);
 
 		RegionFindPointOnY(adef, adef->MaxY, &x, &y);
-		Assert(!RegionTempStorage[x + TheMap.Width * y]);
+		Assert(!RegionTempStorage[x + TheMap.Info.MapWidth * y]);
 		CircularFillerInit(fillers + 1, regid, x, y, 2);
 	}
 
@@ -579,7 +579,7 @@ void RegionCheckConnex(RegionId reg)
 	tilesleft = Regions[reg].TileCount;
 	seg = Regions[reg].FirstSegment;
 	while (seg) {
-		if (!RegionTempStorage[seg->MinX + TheMap.Width * seg->Y]) {
+		if (!RegionTempStorage[seg->MinX + TheMap.Info.MapWidth * seg->Y]) {
 			nbarea++;
 			CircularFillerInit(&filler, reg, seg->MinX, seg->Y, nbarea);
 			--tilesleft;
@@ -849,7 +849,7 @@ static void FindHExtent(int x, int y, int* vx0, int* vx1, int water)
 	}
 
 	// Try extending to the right
-	while ((x1 + 1 < TheMap.Width && (TileMappable(x1 + 1, y)) &&
+	while ((x1 + 1 < TheMap.Info.MapWidth && (TileMappable(x1 + 1, y)) &&
 			((TileIsWater(x1 + 1, y) != 0) == water))) {
 		++x1;
 	}
@@ -933,13 +933,13 @@ void InitaliseMapping(void)
 		Regions[i].LastSegment = 0;
 	}
 
-	total = TheMap.Width * TheMap.Height;
+	total = TheMap.Info.MapWidth * TheMap.Info.MapHeight;
 	for (i = 0; i < total; ++i) {
 		RegionMappingStorage[i] = NoRegion;
 	}
 
-	for (y = 0; y < TheMap.Height; ++y) {
-			for (x = 0; x < TheMap.Width; ++x) {
+	for (y = 0; y < TheMap.Info.MapHeight; ++y) {
+			for (x = 0; x < TheMap.Info.MapWidth; ++x) {
 			if (!TileMappable(x, y)) {
 				continue;
 			}
@@ -1121,7 +1121,7 @@ static void AllocateMapping(void)
 {
 	int total;
 
-	total = TheMap.Width * TheMap.Height;
+	total = TheMap.Info.MapWidth * TheMap.Info.MapHeight;
 	RegionMappingStorage = (RegionId*) malloc(sizeof(RegionId) * total);
 	NextFreeRegion = 0;
 	RegionCount = 0;

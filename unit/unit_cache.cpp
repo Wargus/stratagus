@@ -63,7 +63,7 @@ void UnitCacheInsert(Unit* unit)
 	Assert(!unit->Removed);
 
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
-		mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + unit->X;
+		mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + unit->X;
 		listitem = unit->CacheLinks + i * unit->Type->TileWidth;
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			Assert(!listitem->Next && !listitem->Prev);
@@ -102,7 +102,7 @@ void UnitCacheRemove(Unit* unit)
 				listitem->Prev->Next = listitem->Next;
 			} else {
 				// item is head of the list.
-				mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
+				mf = TheMap.Fields + (i + unit->Y) * TheMap.Info.MapWidth + j + unit->X;
 				Assert(mf->UnitCache == listitem);
 				mf->UnitCache = listitem->Next;
 				Assert(!mf->UnitCache || !mf->UnitCache->Prev);
@@ -146,17 +146,17 @@ int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	if (y1 < 0) {
 		y1 = 0;
 	}
-	if (x2 > TheMap.Width) {
-		x2 = TheMap.Width;
+	if (x2 > TheMap.Info.MapWidth) {
+		x2 = TheMap.Info.MapWidth;
 	}
-	if (y2 > TheMap.Height) {
-		y2 = TheMap.Height;
+	if (y2 > TheMap.Info.MapHeight) {
+		y2 = TheMap.Info.MapHeight;
 	}
 
 	n = 0;
 	for (i = y1; i < y2; ++i) {
 		for (j = x1; j < x2; ++j) {
-			listitem = TheMap.Fields[i * TheMap.Width + j].UnitCache;
+			listitem = TheMap.Fields[i * TheMap.Info.MapWidth + j].UnitCache;
 			for (; listitem; listitem = listitem->Next) {
 				//
 				// To avoid getting a unit in multiple times we use a cache lock.
@@ -201,7 +201,7 @@ int UnitCacheOnTile(int x, int y, Unit** table)
 	// so there is no need for Cache Locks.
 	//
 	n = 0;
-	listitem = TheMap.Fields[y * TheMap.Width + x].UnitCache;
+	listitem = TheMap.Fields[y * TheMap.Info.MapWidth + x].UnitCache;
 	for (; listitem; listitem = listitem->Next) {
 		if (!listitem->Unit->CacheLock) {
 			Assert(!listitem->Unit->Removed);

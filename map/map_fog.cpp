@@ -140,7 +140,7 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 	unsigned char visiontype;
 	unsigned char* visible;
 
-	visible = TheMap.Fields[y * TheMap.Width + x].Visible;
+	visible = TheMap.Fields[y * TheMap.Info.MapWidth + x].Visible;
 	visiontype = visible[player->Player];
 
 	if (visiontype > 1) {
@@ -186,7 +186,7 @@ int MapFogFilterFlags(Player* player, int x, int y, int mask)
 	Unit* table[UnitMax];
 
 	// Calculate Mask for tile with fog
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 		return mask;
 	}
 
@@ -213,9 +213,9 @@ void MapMarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	Assert(0 <= x && x < TheMap.Width);
-	Assert(0 <= y && y < TheMap.Height);
-	v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
+	Assert(0 <= x && x < TheMap.Info.MapWidth);
+	Assert(0 <= y && y < TheMap.Info.MapHeight);
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player];
 	switch (v) {
 		case 0:  // Unexplored
 		case 1:  // Unseen
@@ -224,7 +224,7 @@ void MapMarkTileSight(const Player* player, int x, int y)
 				UnitsOnTileMarkSeen(player, x, y, 0);
 			}
 			v = 2;
-			TheMap.Fields[x + y * TheMap.Width].Visible[player->Player] = v;
+			TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
 			if (IsTileVisible(ThisPlayer, x, y) > 1) {
 				MapMarkSeenTile(x, y);
 			}
@@ -236,7 +236,7 @@ void MapMarkTileSight(const Player* player, int x, int y)
 			++v;
 			break;
 	}
-	TheMap.Fields[x + y * TheMap.Width].Visible[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
 }
 
 /**
@@ -250,9 +250,9 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	Assert(0 <= x && x < TheMap.Width);
-	Assert(0 <= y && y < TheMap.Height);
-	v = TheMap.Fields[x + y * TheMap.Width].Visible[player->Player];
+	Assert(0 <= x && x < TheMap.Info.MapWidth);
+	Assert(0 <= y && y < TheMap.Info.MapHeight);
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player];
 	switch (v) {
 		case 255:
 			// FIXME: (mr-russ) Lookupsight is broken :(
@@ -278,7 +278,7 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 			v--;
 			break;
 	}
-	TheMap.Fields[x + y * TheMap.Width].Visible[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
 }
 
 /**
@@ -292,13 +292,13 @@ void MapMarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	v = TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player];
 	if (v == 0) {
 		UnitsOnTileMarkSeen(player, x, y, 1);
 	}
 	Assert(v != 255);
 	++v;
-	TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player] = v;
 }
 
 /**
@@ -312,13 +312,13 @@ void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	v = TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player];
 	Assert(v != 0);
 	if (v == 1) {
 		UnitsOnTileUnmarkSeen(player, x, y, 1);
 	}
 	--v;
-	TheMap.Fields[x + y * TheMap.Width].VisCloak[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player] = v;
 }
 
 /**
@@ -354,7 +354,7 @@ void MapSight(const Player* player, int x, int y, int w, int h, int range,
 	// Mark Horizontal sight for unit
 	for (mx = x - range; mx < x + range + w; ++mx) {
 		for (my = y; my < y + h; ++my) {
-			if (mx >= 0 && mx < TheMap.Width) {
+			if (mx >= 0 && mx < TheMap.Info.MapWidth) {
 				marker(player, mx, my);
 			}
 		}
@@ -363,7 +363,7 @@ void MapSight(const Player* player, int x, int y, int w, int h, int range,
 	// Mark vertical sight for unit (don't remark self) (above unit)
 	for (my = y - range; my < y; ++my) {
 		for (mx = x; mx < x + w; ++mx) {
-			if (my >= 0 && my < TheMap.Width) {
+			if (my >= 0 && my < TheMap.Info.MapWidth) {
 				marker(player, mx, my);
 			}
 		}
@@ -372,7 +372,7 @@ void MapSight(const Player* player, int x, int y, int w, int h, int range,
 	// Mark vertical sight for unit (don't remark self) (below unit)
 	for (my = y + h; my < y + range + h; ++my) {
 		for (mx = x; mx < x + w; ++mx) {
-			if (my >= 0 && my < TheMap.Width) {
+			if (my >= 0 && my < TheMap.Info.MapWidth) {
 				marker(player, mx, my);
 			}
 		}
@@ -407,16 +407,16 @@ void MapSight(const Player* player, int x, int y, int w, int h, int range,
 				cy[2] -= VisionTable[2][steps];
 				cx[3] += VisionTable[1][steps];
 				cy[3] -= VisionTable[2][steps];
-				if (cx[0] < TheMap.Width && cy[0] >= 0) {
+				if (cx[0] < TheMap.Info.MapWidth && cy[0] >= 0) {
 					marker(player, cx[0], cy[0]);
 				}
 				if (cx[1] >= 0 && cy[1] >= 0) {
 					marker(player, cx[1], cy[1]);
 				}
-				if (cx[2] >= 0 && cy[2] < TheMap.Height) {
+				if (cx[2] >= 0 && cy[2] < TheMap.Info.MapHeight) {
 					marker(player, cx[2], cy[2]);
 				}
-				if (cx[3] < TheMap.Width && cy[3] < TheMap.Height) {
+				if (cx[3] < TheMap.Info.MapWidth && cy[3] < TheMap.Info.MapHeight) {
 					marker(player, cx[3], cy[3]);
 				}
 			}
@@ -439,9 +439,9 @@ void UpdateFogOfWarChange(void)
 	//  Mark all explored fields as visible again.
 	//
 	if (TheMap.NoFogOfWar) {
-		w = TheMap.Width;
-		for (y = 0; y < TheMap.Height; ++y) {
-			for (x = 0; x < TheMap.Width; ++x) {
+		w = TheMap.Info.MapWidth;
+		for (y = 0; y < TheMap.Info.MapHeight; ++y) {
+			for (x = 0; x < TheMap.Info.MapWidth; ++x) {
 				if (IsMapFieldExplored(ThisPlayer, x, y)) {
 					MapMarkSeenTile(x, y);
 				}
@@ -535,14 +535,14 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	int y;
 
 #define IsMapFieldExploredTable(x, y) \
-	(VisibleTable[(y) * TheMap.Width + (x)])
+	(VisibleTable[(y) * TheMap.Info.MapWidth + (x)])
 #define IsMapFieldVisibleTable(x, y) \
-	(VisibleTable[(y) * TheMap.Width + (x)] > 1)
+	(VisibleTable[(y) * TheMap.Info.MapWidth + (x)] > 1)
 
-	w = TheMap.Width;
+	w = TheMap.Info.MapWidth;
 	tile = tile2 = 0;
 	x = sx - sy;
-	y = sy / TheMap.Width;
+	y = sy / TheMap.Info.MapWidth;
 
 	//
 	//  Which Tile to draw for fog
@@ -594,7 +594,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		}
 	}
 
-	if (sy + w < TheMap.Height * w) {
+	if (sy + w < TheMap.Info.MapHeight * w) {
 		if (sx != sy) {
 			if (!IsMapFieldExploredTable(x - 1, y + 1)) {
 				tile2 |= 8;
@@ -681,26 +681,26 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 		sx = 0;
 	}
 	ex = vp->MapX + vp->MapWidth + 1;
-	if (ex > TheMap.Width) {
-		ex = TheMap.Width;
+	if (ex > TheMap.Info.MapWidth) {
+		ex = TheMap.Info.MapWidth;
 	}
 	my = vp->MapY - 1;
 	if (my < 0) {
 		my = 0;
 	}
 	ey = vp->MapY + vp->MapHeight + 1;
-	if (ey > TheMap.Height) {
-		ey = TheMap.Height;
+	if (ey > TheMap.Info.MapHeight) {
+		ey = TheMap.Info.MapHeight;
 	}
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 	for (; my < ey; ++my) {
 		for (mx = sx; mx < ex; ++mx) {
-			VisibleTable[my * TheMap.Width + mx] = IsTileVisible(ThisPlayer, mx, my);
+			VisibleTable[my * TheMap.Info.MapWidth + mx] = IsTileVisible(ThisPlayer, mx, my);
 		}
 	}
 	ex = vp->EndX;
-	sy = y * TheMap.Width;
+	sy = y * TheMap.Info.MapWidth;
 	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
@@ -710,7 +710,7 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 		while (dx <= ex) {
 			mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;
 			my = (dy - vp->Y + vp->OffsetY) / TileSizeY + vp->MapY;
-			if (VisibleTable[my * TheMap.Width + mx]) {
+			if (VisibleTable[my * TheMap.Info.MapWidth + mx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
 				VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
@@ -718,7 +718,7 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 			++sx;
 			dx += TileSizeX;
 		}
-		sy += TheMap.Width;
+		sy += TheMap.Info.MapWidth;
 		dy += TileSizeY;
 	}
 
@@ -815,7 +815,7 @@ void InitMapFogOfWar(void)
 	AlphaFogG.NumFrames = 1;
 #endif
 
-	VisibleTable = malloc(TheMap.Width * TheMap.Height * sizeof(*VisibleTable));
+	VisibleTable = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(*VisibleTable));
 }
 
 /**

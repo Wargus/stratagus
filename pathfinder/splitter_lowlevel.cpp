@@ -184,7 +184,7 @@ void RegionFindPointOnX(RegionDefinition* def,int x,int * vx,int * vy)
 	while (cur) {
 		cury = cur->Y;
 		for (curx = cur->MinX; curx <= cur->MaxX; curx++) {
-			if (RegionTempStorage[curx + TheMap.Width * cury]) {
+			if (RegionTempStorage[curx + TheMap.Info.MapWidth * cury]) {
 				continue;
 			}
 			xdelta = abs(curx - x);
@@ -237,7 +237,7 @@ void RegionFindPointOnY(RegionDefinition* def,int y,int * vx,int * vy)
 	while (cur) {
 		cury = cur->Y;
 		for (curx = cur->MinX; curx <= cur->MaxX; curx++) {
-			if (RegionTempStorage[curx + TheMap.Width * cury]) {
+			if (RegionTempStorage[curx + TheMap.Info.MapWidth * cury]) {
 				continue;
 			}
 
@@ -266,7 +266,7 @@ void RegionFindPointOnY(RegionDefinition* def,int y,int * vx,int * vy)
 */
 void RegionTempStorageAllocate(void)
 {
-	RegionTempStorage = (int*) malloc(TheMap.Width * TheMap.Height * sizeof(int));
+	RegionTempStorage = (int*) malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int));
 }
 
 /**
@@ -292,7 +292,7 @@ void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 	cur = adef->FirstSegment;
 
 	while (cur) {
-		segstart = RegionTempStorage + cur->MinX + cur->Y * TheMap.Width;
+		segstart = RegionTempStorage + cur->MinX + cur->Y * TheMap.Info.MapWidth;
 		i = cur->MaxX - cur->MinX + 1;
 		while(i) {
 			*(segstart++) = value;
@@ -321,7 +321,7 @@ void RegionTempStorageUnmarkPoints(RegionId regid, int markvalue)
 
 	while (seg) {
 		y = seg->Y;
-		ptr = RegionTempStorage + seg->MinX + y * TheMap.Width;
+		ptr = RegionTempStorage + seg->MinX + y * TheMap.Info.MapWidth;
 		for (x = seg->MinX; x <= seg->MaxX; x++) {
 			if (*ptr == markvalue) {
 				*ptr = 0;
@@ -355,7 +355,7 @@ static int RegionTempStorageMarkPoints(RegionId regid, MapPoint* points, int nbp
 		while (maxmark) {
 			id = SyncRand() % nbpoints;
 
-			RegionTempStorage[points[id].X + TheMap.Width * points[id].Y] = markvalue;
+			RegionTempStorage[points[id].X + TheMap.Info.MapWidth * points[id].Y] = markvalue;
 
 			nbpoints--;
 			maxmark--;
@@ -367,7 +367,7 @@ static int RegionTempStorageMarkPoints(RegionId regid, MapPoint* points, int nbp
 
 		// Mark all points
 			for (id = 0; id < nbpoints; id++){
-			RegionTempStorage[points[id].X + TheMap.Width * points[id].Y] = markvalue;
+			RegionTempStorage[points[id].X + TheMap.Info.MapWidth * points[id].Y] = markvalue;
 		}
 	}
 	return rslt;
@@ -409,7 +409,7 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 		y = seg->Y;
 
 		for (x = seg->MinX; x <= seg->MaxX; x++) {
-			if (RegionTempStorage[x + y * TheMap.Width]) {
+			if (RegionTempStorage[x + y * TheMap.Info.MapWidth]) {
 				continue;
 			}
 
@@ -501,7 +501,7 @@ int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 		y = seg->Y;
 
 		for (x = seg->MinX; x <= seg->MaxX; x++) {
-			if (RegionTempStorage[x + y * TheMap.Width]) {
+			if (RegionTempStorage[x + y * TheMap.Info.MapWidth]) {
 				continue;
 			}
 
@@ -513,7 +513,7 @@ int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 					continue;
 				}
 
-				if (RegionTempStorage[tx + ty * TheMap.Height] == markvalue) {
+				if (RegionTempStorage[tx + ty * TheMap.Info.MapHeight] == markvalue) {
 					mustmark = 1;
 					break;
 				}
@@ -659,7 +659,7 @@ void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int
 	filler->RestrictTo = region;
 	filler->Direction = 0;
 
-	RegionTempStorage[startx + TheMap.Width * starty] = value;
+	RegionTempStorage[startx + TheMap.Info.MapWidth * starty] = value;
 }
 
 /**
@@ -706,11 +706,11 @@ int CircularFillerStep(CircularFiller * filler)
 				continue;
 			}
 
-			if (RegionTempStorage[adjx + TheMap.Width * adjy] != 0) {
+			if (RegionTempStorage[adjx + TheMap.Info.MapWidth * adjy] != 0) {
 				continue;
 			}
 
-			RegionTempStorage[adjx + TheMap.Width * adjy] = filler->FillValue;
+			RegionTempStorage[adjx + TheMap.Info.MapWidth * adjy] = filler->FillValue;
 
 			filler->LastOne++;
 

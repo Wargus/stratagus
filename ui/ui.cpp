@@ -134,11 +134,11 @@ void InitUserInterface(const char* race_name)
 	//
 	// Calculations
 	//
-	if (TheUI.MapArea.EndX > TheMap.Width * TileSizeX - 1) {
-		TheUI.MapArea.EndX = TheMap.Width * TileSizeX - 1;
+	if (TheUI.MapArea.EndX > TheMap.Info.MapWidth * TileSizeX - 1) {
+		TheUI.MapArea.EndX = TheMap.Info.MapWidth * TileSizeX - 1;
 	}
-	if (TheUI.MapArea.EndY > TheMap.Height * TileSizeY - 1) {
-		TheUI.MapArea.EndY = TheMap.Height * TileSizeY - 1;
+	if (TheUI.MapArea.EndY > TheMap.Info.MapHeight * TileSizeY - 1) {
+		TheUI.MapArea.EndY = TheMap.Info.MapHeight * TileSizeY - 1;
 	}
 
 	TheUI.SelectedViewport = TheUI.Viewports;
@@ -569,8 +569,8 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 static void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
-	vp->EndX = vp->X + TheMap.Width * TileSizeX - 1;
-	vp->EndY = vp->Y + TheMap.Height * TileSizeY - 1;
+	vp->EndX = vp->X + TheMap.Info.MapWidth * TileSizeX - 1;
+	vp->EndY = vp->Y + TheMap.Info.MapHeight * TileSizeY - 1;
 
 	// first clip it to MapArea size if necessary
 	if (vp->EndX > ClipX) {

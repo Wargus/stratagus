@@ -85,9 +85,9 @@ typedef struct _circular_filler_{
 -- Macros
 ----------------------------------------------------------------------------*/
 #define MaxZone 1024
-#define InMap(x,y) (((unsigned)(x)<(unsigned)TheMap.Width)&&(((unsigned)(y)<(unsigned)TheMap.Height)))
-#define MapFlag(x,y) TheMap.Fields[x + TheMap.Width * y].Flags
-#define RegionMapping(x,y) (RegionMappingStorage[(x) + TheMap.Width * (y)])
+#define InMap(x,y) (((unsigned)(x)<(unsigned)TheMap.Info.MapWidth)&&(((unsigned)(y)<(unsigned)TheMap.Info.MapHeight)))
+#define MapFlag(x,y) TheMap.Fields[x + TheMap.Info.MapWidth * y].Flags
+#define RegionMapping(x,y) (RegionMappingStorage[(x) + TheMap.Info.MapWidth * (y)])
 #define TileMappable(x,y)\
 	( (MapFlag(x,y) & (MapFieldLandAllowed | MapFieldWaterAllowed | MapFieldCoastAllowed)) &&\
 		(!(MapFlag(x,y) & (MapFieldBuilding | MapFieldWall | MapFieldRocks | MapFieldForest))))
@@ -95,7 +95,7 @@ typedef struct _circular_filler_{
 	((MapFlag(x,y) & (MapFieldLandUnit + MapFieldSeaUnit)) == 0)
 
 #define TileIsWater(x,y)\
-	((TheMap.Fields[x + TheMap.Width * y].Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) != 0)
+	((TheMap.Fields[x + TheMap.Info.MapWidth * y].Flags & (MapFieldWaterAllowed | MapFieldCoastAllowed)) != 0)
 
 
 

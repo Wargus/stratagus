@@ -145,13 +145,13 @@ void ActionStillGeneric(Unit* unit, int ground)
 		}
 		if (x < 0) {
 			x = 0;
-		} else if (x >= TheMap.Width) {
-			x = TheMap.Width - 1;
+		} else if (x >= TheMap.Info.MapWidth) {
+			x = TheMap.Info.MapWidth - 1;
 		}
 		if (y < 0) {
 			y = 0;
-		} else if (y >= TheMap.Height) {
-			y = TheMap.Height - 1;
+		} else if (y >= TheMap.Info.MapHeight) {
+			y = TheMap.Info.MapHeight - 1;
 		}
 		if (x != unit->X || y != unit->Y) {
 			if (CheckedCanMoveToMask(x, y, TypeMovementMask(type))) {

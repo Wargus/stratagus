@@ -1828,9 +1828,9 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// Position
 	unit->Variable[POSX_INDEX].Value = unit->X;
-	unit->Variable[POSX_INDEX].Max = TheMap.Width;
+	unit->Variable[POSX_INDEX].Max = TheMap.Info.MapWidth;
 	unit->Variable[POSY_INDEX].Value = unit->Y;
-	unit->Variable[POSY_INDEX].Max = TheMap.Height;
+	unit->Variable[POSY_INDEX].Max = TheMap.Info.MapHeight;
 
 	// SlotNumber
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;

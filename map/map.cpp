@@ -80,7 +80,7 @@ void MapMarkSeenTile(int x, int y)
 	int seentile;
 	MapField* mf;
 
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 	//
 	//  Nothing changed? Seeing already the correct tile.
 	//
@@ -147,12 +147,12 @@ void RevealMap(void)
 	//
 	//  Mark every explored tile as visible. 1 turns into 2.
 	//
-	for (x = 0; x < TheMap.Width; ++x) {
-		for (y = 0; y < TheMap.Height; ++y) {
+	for (x = 0; x < TheMap.Info.MapWidth; ++x) {
+		for (y = 0; y < TheMap.Info.MapHeight; ++y) {
 			int i;
 			for (i = 0; i < PlayerMax; ++i) {
-				if (!TheMap.Fields[x+y*TheMap.Width].Visible[i]) {
-					TheMap.Fields[x+y*TheMap.Width].Visible[i] = 1;
+				if (!TheMap.Fields[x+y*TheMap.Info.MapWidth].Visible[i]) {
+					TheMap.Fields[x+y*TheMap.Info.MapWidth].Visible[i] = 1;
 				}
 			}
 			MapMarkSeenTile(x, y);
@@ -194,7 +194,7 @@ void RevealMap(void)
 */
 int IsMapFieldEmpty(int tx, int ty)
 {
-	return !(TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	return !(TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags &
 		(MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest |
 			MapFieldBuilding));
 }
@@ -209,7 +209,7 @@ int IsMapFieldEmpty(int tx, int ty)
 */
 int WaterOnMap(int tx, int ty)
 {
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWaterAllowed;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldWaterAllowed;
 }
 
 /**
@@ -222,7 +222,7 @@ int WaterOnMap(int tx, int ty)
 */
 int CoastOnMap(int tx, int ty)
 {
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldCoastAllowed;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldCoastAllowed;
 }
 
 /**
@@ -235,7 +235,7 @@ int CoastOnMap(int tx, int ty)
 */
 int WallOnMap(int tx, int ty)
 {
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldWall;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldWall;
 }
 
 /**
@@ -248,7 +248,7 @@ int WallOnMap(int tx, int ty)
 */
 int HumanWallOnMap(int tx, int ty)
 {
-	return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	return (TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags &
 		(MapFieldWall | MapFieldHuman)) == (MapFieldWall | MapFieldHuman);
 }
 
@@ -262,7 +262,7 @@ int HumanWallOnMap(int tx, int ty)
 */
 int OrcWallOnMap(int tx, int ty)
 {
-	return (TheMap.Fields[tx + ty * TheMap.Width].Flags &
+	return (TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags &
 		(MapFieldWall | MapFieldHuman)) == MapFieldWall;
 }
 
@@ -276,10 +276,10 @@ int OrcWallOnMap(int tx, int ty)
 */
 int CheckedForestOnMap(int tx, int ty)
 {
-	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
+	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
 		return 0;
 	}
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldForest;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldForest;
 }
 
 /**
@@ -293,7 +293,7 @@ int CheckedForestOnMap(int tx, int ty)
 int ForestOnMap(int tx, int ty)
 {
 #ifdef DEBUG
-	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
+	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
 		// FIXME: must cleanup calling function !
 		fprintf(stderr, "Used x %d, y %d\n", tx, ty);
 		abort();
@@ -301,7 +301,7 @@ int ForestOnMap(int tx, int ty)
 	}
 #endif
 
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldForest;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldForest;
 }
 
 /**
@@ -315,7 +315,7 @@ int ForestOnMap(int tx, int ty)
 int RockOnMap(int tx, int ty)
 {
 #ifdef DEBUG
-	if (tx < 0 || ty < 0 || tx >= TheMap.Width || ty >= TheMap.Height) {
+	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
 		// FIXME: must cleanup calling function !
 		fprintf(stderr, "Used x %d, y %d\n", tx, ty);
 		abort();
@@ -323,7 +323,7 @@ int RockOnMap(int tx, int ty)
 	}
 #endif
 
-	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldRocks;
+	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldRocks;
 }
 
 /**
@@ -337,11 +337,11 @@ int RockOnMap(int tx, int ty)
 */
 int CheckedCanMoveToMask(int x, int y, int mask)
 {
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 		return 0;
 	}
 
-	return !(TheMap.Fields[x + y * TheMap.Width].Flags & mask);
+	return !(TheMap.Fields[x + y * TheMap.Info.MapWidth].Flags & mask);
 }
 
 /**
@@ -381,16 +381,16 @@ void PreprocessMap(void)
 	int iy;
 	MapField* mf;
 
-	for (ix = 0; ix < TheMap.Width; ++ix) {
-		for (iy = 0; iy < TheMap.Height; ++iy) {
-			mf = TheMap.Fields + ix + iy * TheMap.Width;
+	for (ix = 0; ix < TheMap.Info.MapWidth; ++ix) {
+		for (iy = 0; iy < TheMap.Info.MapHeight; ++iy) {
+			mf = TheMap.Fields + ix + iy * TheMap.Info.MapWidth;
 			mf->SeenTile = mf->Tile;
 		}
 	}
 
 	// it is required for fixing the wood that all tiles are marked as seen!
-	for (ix = 0; ix < TheMap.Width; ++ix) {
-		for (iy = 0; iy < TheMap.Height; ++iy) {
+	for (ix = 0; ix < TheMap.Info.MapWidth; ++ix) {
+		for (iy = 0; iy < TheMap.Info.MapHeight; ++iy) {
 			MapFixWallTile(ix, iy);
 			MapFixSeenWallTile(ix, iy);
 		}
@@ -457,10 +457,10 @@ int MapIsSeenTile(unsigned short type, int x, int y)
 	switch (type) {
 		case MapFieldForest:
 			return TheMap.Tileset->TileTypeTable[
-				TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeWood;
+				TheMap.Fields[x + y * TheMap.Info.MapWidth].SeenTile] == TileTypeWood;
 		case MapFieldRocks:
 			return TheMap.Tileset->TileTypeTable[
-				TheMap.Fields[x + y * TheMap.Width].SeenTile] == TileTypeRock;
+				TheMap.Fields[x + y * TheMap.Info.MapWidth].SeenTile] == TileTypeRock;
 		default:
 			return 0;
 	}
@@ -488,11 +488,11 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 
 
 	//  Outside of map or no wood.
-	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
+	if (x < 0 || y < 0 || x >= TheMap.Info.MapWidth || y >= TheMap.Info.MapHeight) {
 		return;
 	}
 
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 
 	if (seen && !MapIsSeenTile(type, x, y)) {
 		return;
@@ -526,32 +526,32 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 	} else {
 		if (seen) {
 			ttup = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + (y - 1) * TheMap.Width].SeenTile];
+				TheMap.Fields[x + (y - 1) * TheMap.Info.MapWidth].SeenTile];
 		} else {
 			ttup = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + (y - 1) * TheMap.Width].Tile];
+				TheMap.Fields[x + (y - 1) * TheMap.Info.MapWidth].Tile];
 		}
 	}
-	if (x + 1 >= TheMap.Width) {
+	if (x + 1 >= TheMap.Info.MapWidth) {
 		ttright = 15; //Assign trees in all directions
 	} else {
 		if (seen) {
 			ttright = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + 1 + y  * TheMap.Width].SeenTile];
+				TheMap.Fields[x + 1 + y  * TheMap.Info.MapWidth].SeenTile];
 		} else {
 			ttright = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + 1 + y  * TheMap.Width].Tile];
+				TheMap.Fields[x + 1 + y  * TheMap.Info.MapWidth].Tile];
 		}
 	}
-	if (y + 1 >= TheMap.Height) {
+	if (y + 1 >= TheMap.Info.MapHeight) {
 		ttdown = 15; //Assign trees in all directions
 	} else {
 		if (seen) {
 			ttdown = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + (y + 1) * TheMap.Width].SeenTile];
+				TheMap.Fields[x + (y + 1) * TheMap.Info.MapWidth].SeenTile];
 		} else {
 			ttdown = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x + (y + 1) * TheMap.Width].Tile];
+				TheMap.Fields[x + (y + 1) * TheMap.Info.MapWidth].Tile];
 		}
 	}
 	if (x - 1 < 0) {
@@ -559,10 +559,10 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 	} else {
 		if (seen) {
 			ttleft = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x -1 + y * TheMap.Width].SeenTile];
+				TheMap.Fields[x -1 + y * TheMap.Info.MapWidth].SeenTile];
 		} else {
 			ttleft = TheMap.Tileset->MixedLookupTable[
-				TheMap.Fields[x -1 + y * TheMap.Width].Tile];
+				TheMap.Fields[x -1 + y * TheMap.Info.MapWidth].Tile];
 		}
 	}
 
@@ -667,7 +667,7 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 	int removedtile;
 	int flags;
 
-	mf = TheMap.Fields + x + y * TheMap.Width;
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 
 	// Select Table to lookup
 	switch (type) {
@@ -718,15 +718,15 @@ void RegenerateForest(void)
 	//  If gown up, place new wood.
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
-	for (x = 0; x < TheMap.Width; ++x) {
-		for (y = 0; y < TheMap.Height; ++y) {
-			mf = TheMap.Fields + x + y * TheMap.Width;
+	for (x = 0; x < TheMap.Info.MapWidth; ++x) {
+		for (y = 0; y < TheMap.Info.MapHeight; ++y) {
+			mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
 			if (mf->Tile == TheMap.Tileset->RemovedTree) {
 				if (mf->Value >= ForestRegeneration ||
 						++mf->Value == ForestRegeneration) {
 					if (x && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
 							  MapFieldLandUnit | MapFieldBuilding))) {
-						tmp = mf - TheMap.Width;
+						tmp = mf - TheMap.Info.MapWidth;
 						if (tmp->Tile == TheMap.Tileset->RemovedTree &&
 								tmp->Value >= ForestRegeneration &&
 								!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |

@@ -5085,7 +5085,7 @@ static void EditorMapPropertiesMenu(void)
 	menu->Items[2].D.Input.nch = strlen(description) - 3;
 	menu->Items[2].D.Input.maxch = 31;
 
-	sprintf(size, "%d x %d", TheMap.Width, TheMap.Height);
+	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	menu->Items[4].D.Text.text = size;
 
 	menu->Items[6].D.Pulldown.defopt = TheMap.Terrain;

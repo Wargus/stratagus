@@ -16,7 +16,7 @@
 //      it under the terms of the GNU General Public License as published by
 //      the Free Software Foundation; only version 2 of the License.
 //
-//      This program is distributed in the hope that it will be useful,
+//      This program is TheMap.Info.MapHeight in the hope that it will be useful,
 //      but WITHOUT ANY WARRANTY; without even the implied warranty of
 //      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //      GNU General Public License for more details.
@@ -128,17 +128,17 @@ static int CclStratagusMap(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					TheMap.Width = LuaToNumber(l, -1);
+					TheMap.Info.MapWidth = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					TheMap.Height = LuaToNumber(l, -1);
+					TheMap.Info.MapHeight = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 
 					free(TheMap.Fields);
-					TheMap.Fields = calloc(TheMap.Width * TheMap.Height,
+					TheMap.Fields = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight,
 						sizeof(*TheMap.Fields));
-					TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
+					TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
@@ -162,7 +162,7 @@ static int CclStratagusMap(lua_State* l)
 					}
 
 					subsubargs = luaL_getn(l, -1);
-					if (subsubargs != TheMap.Width * TheMap.Height) {
+					if (subsubargs != TheMap.Info.MapWidth * TheMap.Info.MapHeight) {
 						fprintf(stderr, "Wrong tile table length: %d\n", subsubargs);
 					}
 					i = 0;

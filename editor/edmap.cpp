@@ -100,7 +100,7 @@ static unsigned QuadFromTile(int x, int y)
 	//
 	// find the abstact tile number
 	//
-	tile = TheMap.Fields[y * TheMap.Width + x].Tile;
+	tile = TheMap.Fields[y * TheMap.Info.MapWidth + x].Tile;
 	for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
 		if (tile == TheMap.Tileset->Table[i]) {
 			break;
@@ -413,10 +413,10 @@ void ChangeTile(int x, int y, int tile)
 {
 	MapField *mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 	Assert(tile >= 0 && tile < TheMap.Tileset->NumTiles);
 
-	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	mf->Tile = mf->SeenTile = TheMap.Tileset->Table[tile];
 }
 
@@ -437,14 +437,14 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 {
 	MapField* mf;
 
-	Assert(x >= 0 && y >= 0 && x < TheMap.Width && y < TheMap.Height);
+	Assert(x >= 0 && y >= 0 && x < TheMap.Info.MapWidth && y < TheMap.Info.MapHeight);
 
 	ChangeTile(x, y, tile);
 
 	//
 	// Change the flags
 	//
-	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	mf->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
@@ -481,7 +481,7 @@ static void EditorTileChanged2(int x, int y, int d)
 	//
 	// Special case 1) Walls.
 	//
-	mf = &TheMap.Fields[y * TheMap.Width + x];
+	mf = &TheMap.Fields[y * TheMap.Info.MapWidth + x];
 	if (mf->Flags & MapFieldWall) {
 		if (mf->Flags & MapFieldHuman) {
 			mf->Value = UnitTypeHumanWall->_HitPoints;
@@ -513,7 +513,7 @@ static void EditorTileChanged2(int x, int y, int d)
 			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
 		}
 	}
-	if (d & DIR_DOWN && y < TheMap.Height - 1) {
+	if (d & DIR_DOWN && y < TheMap.Info.MapHeight - 1) {
 		//
 		// Insert into the top the new tile.
 		//
@@ -535,7 +535,7 @@ static void EditorTileChanged2(int x, int y, int d)
 			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 		}
 	}
-	if (d & DIR_RIGHT && x < TheMap.Width - 1) {
+	if (d & DIR_RIGHT && x < TheMap.Info.MapWidth - 1) {
 		//
 		// Insert into the right the new tile.
 		//
@@ -591,14 +591,14 @@ static void TileFill(int x, int y, int tile, int size)
 	if (ix < 0) {
 		ix = 0;
 	}
-	if (ax >= TheMap.Width) {
-		ax = TheMap.Width - 1;
+	if (ax >= TheMap.Info.MapWidth) {
+		ax = TheMap.Info.MapWidth - 1;
 	}
 	if (iy < 0) {
 		iy = 0;
 	}
-	if (ay >= TheMap.Height) {
-		ay = TheMap.Height - 1;
+	if (ay >= TheMap.Info.MapHeight) {
+		ay = TheMap.Info.MapHeight - 1;
 	}
 
 	for (x = ix; x <= ax; ++x) {
@@ -630,8 +630,8 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 	int ry;
 	int rz;
 
-	mx = TheMap.Width;
-	my = TheMap.Height;
+	mx = TheMap.Info.MapWidth;
+	my = TheMap.Info.MapHeight;
 
 	for (i = 0; i < count; ++i) {
 		rx = rand() % (mx / 2);
@@ -666,8 +666,8 @@ static void EditorRandomizeUnit(const char* unit_type, int count, int value)
 	UnitType* type;
 	Unit* unit;
 
-	mx = TheMap.Width;
-	my = TheMap.Height;
+	mx = TheMap.Info.MapWidth;
+	my = TheMap.Info.MapHeight;
 	type = UnitTypeByIdent(unit_type);
 	tw = type->TileWidth;
 	th = type->TileHeight;
@@ -720,7 +720,7 @@ void EditorCreateRandomMap(void)
 {
 	int mz;
 
-	mz = TheMap.Width > TheMap.Height ? TheMap.Width : TheMap.Height;
+	mz = TheMap.Info.MapWidth > TheMap.Info.MapHeight ? TheMap.Info.MapWidth : TheMap.Info.MapHeight;
 
 	// make water-base
 	TileFill(0, 0, WATER_TILE, mz * 3);

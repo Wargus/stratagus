@@ -92,18 +92,18 @@ void CreateMinimap(void)
 	SDL_PixelFormat* f;
 #endif
 
-	if (TheMap.Width > TheMap.Height) { // Scale to biggest value.
-		n = TheMap.Width;
+	if (TheMap.Info.MapWidth > TheMap.Info.MapHeight) { // Scale to biggest value.
+		n = TheMap.Info.MapWidth;
 	} else {
-		n = TheMap.Height;
+		n = TheMap.Info.MapHeight;
 	}
 	MinimapScaleX = (TheUI.MinimapW * MINIMAP_FAC + n - 1) / n;
 	MinimapScaleY = (TheUI.MinimapH * MINIMAP_FAC + n - 1) / n;
 
-	MinimapX = ((TheUI.MinimapW * MINIMAP_FAC) / MinimapScaleX - TheMap.Width) / 2;
-	MinimapY = ((TheUI.MinimapH * MINIMAP_FAC) / MinimapScaleY - TheMap.Height) / 2;
-	MinimapX = (TheUI.MinimapW - (TheMap.Width * MinimapScaleX) / MINIMAP_FAC) / 2;
-	MinimapY = (TheUI.MinimapH - (TheMap.Height * MinimapScaleY) / MINIMAP_FAC) / 2;
+	MinimapX = ((TheUI.MinimapW * MINIMAP_FAC) / MinimapScaleX - TheMap.Info.MapWidth) / 2;
+	MinimapY = ((TheUI.MinimapH * MINIMAP_FAC) / MinimapScaleY - TheMap.Info.MapHeight) / 2;
+	MinimapX = (TheUI.MinimapW - (TheMap.Info.MapWidth * MinimapScaleX) / MINIMAP_FAC) / 2;
+	MinimapY = (TheUI.MinimapH - (TheMap.Info.MapHeight * MinimapScaleY) / MINIMAP_FAC) / 2;
 
 	DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
 		MinimapScaleX / MINIMAP_FAC _C_ MinimapScaleY / MINIMAP_FAC _C_
@@ -121,12 +121,12 @@ void CreateMinimap(void)
 		Minimap2MapX[n] = ((n - MinimapX) * MINIMAP_FAC) / MinimapScaleX;
 	}
 	for (n = MinimapY; n < TheUI.MinimapH - MinimapY; ++n) {
-		Minimap2MapY[n] = (((n - MinimapY) * MINIMAP_FAC) / MinimapScaleY) * TheMap.Width;
+		Minimap2MapY[n] = (((n - MinimapY) * MINIMAP_FAC) / MinimapScaleY) * TheMap.Info.MapWidth;
 	}
-	for (n = 0; n < TheMap.Width; ++n) {
+	for (n = 0; n < TheMap.Info.MapWidth; ++n) {
 		Map2MinimapX[n] = (n * MinimapScaleX) / MINIMAP_FAC;
 	}
-	for (n = 0; n < TheMap.Height; ++n) {
+	for (n = 0; n < TheMap.Info.MapHeight; ++n) {
 		Map2MinimapY[n] = (n * MinimapScaleY) / MINIMAP_FAC;
 	}
 
@@ -318,7 +318,7 @@ void UpdateMinimapXY(int tx, int ty)
 #endif
 	SDL_LockSurface(TheMap.TileGraphic->Surface);
 
-	ty *= TheMap.Width;
+	ty *= TheMap.Info.MapWidth;
 	for (my = MinimapY; my < TheUI.MinimapH - MinimapY; ++my) {
 		y = Minimap2MapY[my];
 		if (y < ty) {
@@ -524,7 +524,7 @@ void UpdateMinimap(void)
 			if (ReplayRevealMap) {
 				visiontype = 2;
 			} else {
-				visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Width);
+				visiontype = IsTileVisible(ThisPlayer, Minimap2MapX[mx], Minimap2MapY[my] / TheMap.Info.MapWidth);
 			}
 
 			if (MinimapWithTerrain && (visiontype > 1 || (visiontype == 1 && ((mx & 1) == (my & 1))))) {
@@ -580,7 +580,7 @@ void UpdateMinimap(void)
 	// Draw units on map
 	// FIXME: We should rewrite this completely
 	//
-	n = UnitCacheSelect(0, 0, TheMap.Height, TheMap.Width, table);
+	n = UnitCacheSelect(0, 0, TheMap.Info.MapHeight, TheMap.Info.MapWidth, table);
 	while (n--) {
 		DrawUnitOnMinimap(table[n], red_phase);
 	}
@@ -637,7 +637,7 @@ int ScreenMinimap2MapX(int x)
 	if (tx < 0) {
 		return 0;
 	}
-	return tx < TheMap.Width ? tx : TheMap.Width - 1;
+	return tx < TheMap.Info.MapWidth ? tx : TheMap.Info.MapWidth - 1;
 }
 
 /**
@@ -655,7 +655,7 @@ int ScreenMinimap2MapY(int y)
 	if (ty < 0) {
 		return 0;
 	}
-	return ty < TheMap.Height ? ty : TheMap.Height - 1;
+	return ty < TheMap.Info.MapHeight ? ty : TheMap.Info.MapHeight - 1;
 }
 
 /**
