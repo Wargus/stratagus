@@ -5,7 +5,7 @@ if [ "`echo $* | grep \"\-\-win32\"`" = "" ]; then
   DEPEND=depend
 else
   RULESFILE=Rules.make.WIN32
-  depend=win32new
+  DEPEND=win32new
   CROSS=" win32"
 fi
 
