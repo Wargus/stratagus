@@ -206,13 +206,13 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_CONT 8
 
     /// for MI_TYPE_PULLDOWN
-#define MI_PSTATE_PASSIVE 1
+#define MI_PSTATE_PASSIVE 1		/// Pulldown is passive (grey) drawn
 
     /// for MI_TYPE_GEM
-#define MI_GSTATE_UNCHECKED 0
-#define MI_GSTATE_PASSIVE 1
-#define MI_GSTATE_INVISIBLE 2
-#define MI_GSTATE_CHECKED 4
+#define MI_GSTATE_UNCHECKED 0		/// Gem has no check mark
+#define MI_GSTATE_PASSIVE 1		/// Gem is passive (grey) drawn
+#define MI_GSTATE_INVISIBLE 2		/// Gem is not drawn
+#define MI_GSTATE_CHECKED 4		/// Gem is with check mark drawn
 
 /**
 **	Menu definition.
