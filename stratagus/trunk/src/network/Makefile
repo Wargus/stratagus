@@ -20,6 +20,6 @@ TOPDIR	= ../..
 include $(TOPDIR)/Rules.make
 
 MODULE	= network
-OBJS	= network.$(OE)
+OBJS	= network.$(OE) new_network.$(OE)
 
 include $(TOPDIR)/Common.mk
