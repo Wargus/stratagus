@@ -30,7 +30,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef __MSC__
 #include <unistd.h>
+#endif
 
 #include <png.h>
 

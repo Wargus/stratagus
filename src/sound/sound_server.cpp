@@ -34,7 +34,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifndef __MSC__
 #include <unistd.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <limits.h>
