@@ -454,6 +454,7 @@ extern int SlowFrameCounter;
 #define MyRand()	rand()
 
 extern char* TitleScreen;		/// File for title screen
+global char* GameName;			/// Name of the game (wc2,wc1)
 extern char* MenuBackground;		/// File for menu background
 extern char* MenuBackgroundWithTitle;	/// File for menu with title
 extern char* TitleMusic;		/// File for title music
