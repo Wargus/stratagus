@@ -91,6 +91,8 @@ local SCM CclDefineMissileType(SCM list)
     }
 
     mtype->NumDirections = 1;
+    // Ensure we don't divide by zero.
+    mtype->SplashFactor = 100;
     //
     //	Parse the arguments, already the new tagged format.
     //
@@ -149,9 +151,11 @@ local SCM CclDefineMissileType(SCM list)
 	    free(mtype->ImpactName);
 	    mtype->SmokeName = gh_scm2newstr(gh_car(list), NULL);
 	} else if (gh_eq_p(value, gh_symbol2scm("can-hit-owner"))) {
-	    mtype->CanHitOwner = gh_scm2bool(gh_car(list));
+	    mtype->CanHitOwner = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("friendly-fire"))) {
-	    mtype->FriendlyFire = gh_scm2bool(gh_car(list));
+	    mtype->FriendlyFire = 1;
+	} else if (gh_eq_p(value, gh_symbol2scm("splash-factor"))) {
+	    mtype->SplashFactor = gh_scm2int(gh_car(list));;
 	} else {
 	    // FIXME: this leaves a half initialized missile-type
 	    errl("Unsupported tag", value);
@@ -256,9 +260,11 @@ local int CclDefineMissileType(lua_State* l)
 	    free(mtype->ImpactName);
 	    mtype->SmokeName = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "can-hit-owner")) {
-	    mtype->CanHitOwner = LuaToBoolean(l, j + 1);
+	    mtype->CanHitOwner = 1;
 	} else if (!strcmp(value, "friendly-fire")) {
-	    mtype->FriendlyFire = LuaToBoolean(l, j + 1);
+	    mtype->FriendlyFire = 1;
+	} else if (!strcmp(value, "splash-factor")) {
+	    mtype->SplashFactor = LuaToNumber(l, j + 1);
 	} else {
 	    // FIXME: this leaves a half initialized missile-type
 	    lua_pushfstring(l, "Unsupported tag: %s", value);
