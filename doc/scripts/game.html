@@ -1465,25 +1465,36 @@ Set the default map path.
 
 <h4>Description</h4>
 
-.
+Alters the diplomacy setting between two players. eg Enemy,Allied
 
 <h4>Syntax</h4>
 
-<code>(set-diplomacy!)</code>
+<code>(set-diplomacy! player state enemy)</code>
 
 <dl>
-<dt></dt>
-<dd>.
+<dt>player</dt>
+<dd>Player to effect change of diplomacy on.
 </dd>
 </dl>
+<dl>
+<dt>state</dt>
+<dd>State of relationship between players ('allied 'enemy 'neutral 'crazy).
+</dd>
+</dl>
+<dl>
+<dt>enemy</dt>
+<dd>Other player involved in diplomacy.
+</dd>
+</dl>
+
 
 <h4>Example</h4>
 
 <pre>
-    (set-diplomacy!)
+    (set-diplomacy! 0 'enemy 1)
 </pre>
 
-<p>.
+<p>Sets player 1 to be an enemy of player 0.
 
 <h4>Not Used</h4>
 
