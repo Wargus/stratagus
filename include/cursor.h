@@ -184,6 +184,13 @@ extern CursorType* CursorTypeByIdent(const char* ident);
 extern void DrawAnyCursor(void);
     /// Hide any cursor
 extern void HideAnyCursor(void);
+
+    /// Save/load rectangle region from/to screen
+    /// Note: this is made extern for minimap only
+extern void (*SaveCursorRectangle)(void *buffer,int x,int y,int w,int h);
+extern void (*LoadCursorRectangle)(void *buffer,int x,int y,int w,int h);
+
+
     /// Invalidate given area and check if cursor won't need any
 extern void InvalidateAreaAndCheckCursor( int x, int y, int w, int h );
     /// Invalidate (remaining) cursor areas 
