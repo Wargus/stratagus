@@ -354,6 +354,7 @@ extern int SpeedKeyScroll;		/// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;		/// Mouse Scrolling Speed, in Frames
 
 extern void SaveAll(void);		/// Call all modules to save states
+extern void LoadAll(void);		/// Load all data back.
 
 extern int SyncRand(void);
 
