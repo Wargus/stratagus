@@ -31,3 +31,6 @@ configure.lineno
 aclocal.m4
 config.h
 config.h.in
+metaserver.plg
+metaserver___Win32_Debug
+metaserver___Win32_Release
