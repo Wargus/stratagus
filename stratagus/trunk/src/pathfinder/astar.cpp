@@ -360,6 +360,27 @@ local int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange
 	}
     }
 
+    for (x = gx; x < gx + gy && !minrange; ++x) {
+	for (y = gy; y < gy + gh; ++y) {
+	    if (x < 0 || x >= TheMap.Width || y < 0 || y >= TheMap.Height) {
+		continue;
+	    }
+	    if (CostMoveTo(unit, x, y, mask, AStarFixedUnitCrossingCost) >= 0) {
+		AStarMatrix[y * TheMap.Width + x].InGoal = 1;
+		goal_reachable = 1;
+	    }
+	    if (*num_in_close < Threshold) {
+		CloseSet[(*num_in_close)++] = y * TheMap.Width + x;
+	    }
+	}
+    }
+
+    if (gw) {
+	gw--;
+    }
+    if (gh) {
+	gh--;
+    }
     // Mark top, bottom, left, right
     for(range=minrange; range <= maxrange; range++) {
 	// Mark Top and Bottom of Goal

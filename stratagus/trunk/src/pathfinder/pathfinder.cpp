@@ -470,8 +470,8 @@ global int NewPath(Unit* unit)
     char* path;
 
     if( unit->Orders[0].Goal ) {
-	gw=unit->Orders[0].Goal->Type->TileWidth-1;
-	gh=unit->Orders[0].Goal->Type->TileHeight-1;
+	gw=unit->Orders[0].Goal->Type->TileWidth;
+	gh=unit->Orders[0].Goal->Type->TileHeight;
 	gx=unit->Orders[0].Goal->X;
 	gy=unit->Orders[0].Goal->Y;
 	maxrange=unit->Orders[0].Range;
