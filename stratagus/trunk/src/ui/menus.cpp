@@ -117,9 +117,10 @@ local void EnterNameCancel(void);
 local void EnterServerIPAction(Menuitem *mi, int key);
 local void EnterServerIPCancel(void);
 
+local void InitSaveGameMenu(Menuitem *mi);
 local void EnterSaveGameAction(Menuitem *mi, int key);
 local void SaveAction(void);
-local void CreateSaveDir(Menuitem *mi);
+local void CreateSaveDir(void);
 
 local void SaveLBExit(Menuitem *mi);
 local void SaveLBInit(Menuitem *mi);
@@ -128,6 +129,7 @@ local void SaveLBAction(Menuitem *mi, int i);
 local void SaveVSAction(Menuitem *mi, int i);
 local void SaveOk(void);
 
+local void InitLoadGameMenu(Menuitem *mi);
 local void LoadLBExit(Menuitem *mi);
 local void LoadLBInit(Menuitem *mi);
 local unsigned char *LoadLBRetrieve(Menuitem *mi, int i);
@@ -1523,7 +1525,7 @@ local void InitKeystrokeHelpMenuItems() {
 }
 
 local Menuitem SaveGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitSaveGameMenu, NULL, {{NULL, 0}} },
     { MI_TYPE_INPUT, 16, 11+36*1, 0, GameFont, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, SaveLBInit, SaveLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
@@ -1537,9 +1539,9 @@ local void InitSaveGameMenuItems() {
     MenuitemListbox i2 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, SaveLBAction, 0, 0, 0, 0, 7, 0, 0,
 			   (void *)SaveLBRetrieve, ScenSelectOk};
     MenuitemVslider i3 = { 0, 18, 7*18, SaveVSAction, -1, 0, 0, 0, SaveOk};
-    MenuitemButton  i4 = { "~!Save", 106, 27, MBUTTON_GM_HALF, SaveAction, 's'};
-    MenuitemButton  i5 = { "~!Delete", 106, 27, MBUTTON_GM_HALF, FcDeleteMenu, 'd'};
-    MenuitemButton  i6 = { "~!Cancel", 106, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    MenuitemButton  i4 = { "Save (~<F11~>)", 106, 27, MBUTTON_GM_HALF, SaveAction, KeyCodeF11};
+    MenuitemButton  i5 = { "Delete (~<F5~>)", 106, 27, MBUTTON_GM_HALF, FcDeleteMenu, KeyCodeF5};
+    MenuitemButton  i6 = { "Cancel (~<Esc~>)", 106, 27, MBUTTON_GM_HALF, EndMenu, '\033'};
     SaveGameMenuItems[0].d.text    = i0;
     SaveGameMenuItems[1].d.input   = i1;
     SaveGameMenuItems[2].d.listbox = i2;
@@ -1550,7 +1552,7 @@ local void InitSaveGameMenuItems() {
 }
 
 local Menuitem LoadGameMenuItems[] = {
-    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, CreateSaveDir, NULL, {{NULL, 0}} },
+    { MI_TYPE_TEXT, 384/2, 11, 0, LargeFont, InitLoadGameMenu, NULL, {{NULL, 0}} },
     { MI_TYPE_LISTBOX, 16, 11+36*1.5, 0, GameFont, LoadLBInit, LoadLBExit, {{NULL,0}} },
     { MI_TYPE_VSLIDER, 384-16-16, 11+36*1.5, 0, 0, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 384/3 - 106 - 10, 256-16-27, 0, LargeFont, NULL, NULL, {{NULL,0}} },
@@ -1561,8 +1563,8 @@ local void InitLoadGameMenuItems() {
     MenuitemListbox i1 = { NULL, 384-16-16-16, 7*18, MBUTTON_PULLDOWN, LoadLBAction, 0, 0, 0, 0, 7, 0, 0,
 			   (void *)LoadLBRetrieve, ScenSelectOk};
     MenuitemVslider i2 = { 0, 18, 7*18, LoadVSAction, -1, 0, 0, 0, LoadOk};
-    MenuitemButton  i3 = { "~!Load", 108, 27, MBUTTON_GM_HALF, LoadAction, 'l'};
-    MenuitemButton  i4 = { "~!Cancel", 108, 27, MBUTTON_GM_HALF, EndMenu, 'c'};
+    MenuitemButton  i3 = { "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, LoadAction, KeyCodeF12};
+    MenuitemButton  i4 = { "~!Cancel (~<Esc~>)", 106, 27, MBUTTON_GM_HALF, EndMenu, '\033'};
     LoadGameMenuItems[0].d.text    = i0;
     LoadGameMenuItems[1].d.listbox = i1;
     LoadGameMenuItems[2].d.vslider = i2;
@@ -2631,6 +2633,13 @@ local void GameMenuReturn(void)
 local char *SaveDir;
 local int TypedFileName;
 
+local void InitSaveGameMenu(Menuitem *mi)
+{
+    SaveGameMenuItems[4].flags = MenuButtonDisabled;    
+    SaveGameMenuItems[5].flags = MenuButtonDisabled;
+    CreateSaveDir();
+}
+
 /**
 **	FIXME: docu.
 */
@@ -2646,6 +2655,7 @@ local void EnterSaveGameAction(Menuitem *mi, int key)
 	}
     }
     TypedFileName = 1;
+    SaveGameMenuItems[5].flags = MenuButtonDisabled;
 }
 
 local void SaveAction(void)
@@ -2679,7 +2689,7 @@ local void SaveAction(void)
     EndMenu();
 }
 
-local void CreateSaveDir(Menuitem *mi __attribute__((unused)))
+local void CreateSaveDir()
 {
 #ifdef USE_WIN32
     SaveDir="save";
@@ -2739,9 +2749,9 @@ local void SaveLBInit(Menuitem * mi)
 	    NULL, (FileList **) & (mi->d.listbox.options));
     if (i != 0) {
 	if (i > 7) {
-	    menu->items[3].flags = MenuButtonSelected;
+	    menu->items[3].flags = MI_ENABLED;
 	} else {
-	    menu->items[3].flags = MenuButtonDisabled;
+	    menu->items[3].flags = MI_DISABLED;
 	}
     }
     mi->d.listbox.curopt = -1;
@@ -2806,9 +2816,11 @@ local void SaveLBAction(Menuitem *mi, int i)
 	if (fl[i].type) {
 	    strcpy(menu->items[1].d.input.buffer, fl[i].name);
 	    menu->items[1].d.input.nch = strlen(fl[i].name);
-	    menu->items[4].flags = MenuButtonSelected;
+	    menu->items[4].flags = MI_ENABLED;
+	    menu->items[5].flags = MI_ENABLED;
 	} else {
 	    menu->items[4].flags = MenuButtonDisabled;
+	    menu->items[5].flags = MenuButtonDisabled;
 	}
     }
     TypedFileName = 0;
@@ -2978,6 +2990,12 @@ local int SaveRDFilter(char *pathbuf, FileList *fl)
     return 0;
 }
 
+local void InitLoadGameMenu(Menuitem *mi)
+{
+    LoadGameMenuItems[3].flags = MI_DISABLED;
+    CreateSaveDir();
+}
+
 // FIXME: modify function
 local void LoadLBExit(Menuitem *mi)
 {
@@ -3065,9 +3083,9 @@ local void LoadLBAction(Menuitem *mi, int i)
 	    mi[1].d.hslider.percent = (i * 100) / (mi->d.listbox.noptions - 1);
 	}
 	if (fl[i].type) {
-	    LoadGameMenuItems[3].flags = MenuButtonSelected;
+	    LoadGameMenuItems[3].flags = MI_ENABLED;
 	} else {
-	    LoadGameMenuItems[3].flags = MenuButtonDisabled;
+	    LoadGameMenuItems[3].flags = MI_DISABLED;
 	}
     }
 }
@@ -3303,7 +3321,7 @@ global void GameMenuLoad(void)
     Menu *menu;
 
     menu = FindMenu(MENU_LOAD_GAME);
-    menu->items[3].flags = MenuButtonDisabled;		// Load button!
+    menu->items[3].flags = MI_DISABLED;		// Load button!
     GameLoaded=0;
     ProcessMenu(MENU_LOAD_GAME, 1);
     if( GameLoaded ) {
