@@ -1189,6 +1189,9 @@ global void DrawInfoPanel(void)
 
     if( NumSelected ) {
 	if( NumSelected>1 ) {
+	    //
+	    //  If there are more units selected draw their pictures and a health bar
+	    //
 	    PlayerPixels(ThisPlayer);	// can only be own!
 	    DrawInfoPanelBackground(0);
             for( i=0; i<NumSelected; ++i ) {
