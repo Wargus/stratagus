@@ -115,13 +115,13 @@ local Upgrade* AddUpgrade(const char* ident, const char* icon,
 	// Check for free slot.
 
 	if (NumUpgrades == UpgradeMax) {
-		DebugLevel0Fn("Upgrades limit reached.\n");
+		DebugPrint("Upgrades limit reached.\n");
 		return NULL;
 	}
 	// Fill upgrade structure
 
 	if ((tmp = (Upgrade**)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
-		DebugLevel0Fn("Already defined upgrade `%s'\n" _C_ ident);
+		DebugPrint("Already defined upgrade `%s'\n" _C_ ident);
 		upgrade = *tmp;
 		free(upgrade->Icon.Name);
 	} else {
@@ -160,7 +160,7 @@ global Upgrade* UpgradeByIdent(const char* ident)
 		return *upgrade;
 	}
 
-	DebugLevel0Fn(" upgrade %s not found\n" _C_ ident);
+	DebugPrint(" upgrade %s not found\n" _C_ ident);
 
 	return NULL;
 }
@@ -350,7 +350,7 @@ global void ParsePudALOW(const char* alow, int length __attribute__((unused)))
 	int b;
 	Player* player;
 
-	DebugLevel0Fn(" Length %d FIXME: constant must be moved to ccl\n" _C_ length);
+	DebugPrint(" Length %d FIXME: constant must be moved to ccl\n" _C_ length);
 
 	//
 	//		Allow units
@@ -510,7 +510,6 @@ global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 	int flags;
 	int costs[MaxCosts];
 
-	DebugLevel3Fn(" Length %d\n" _C_ length);
 	Assert(length == 780);
 
 	for (i = 0; i < 52; ++i) {
@@ -521,9 +520,6 @@ global void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 		icon = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52) * 2);
 		group = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52 + 52) * 2);
 		flags = AccessLE16(		ugrd + 52 + (i + 52 + 52 + 52 + 52 + 52) * 2);
-		DebugLevel3Fn(" (%d)%s %d,%d,%d,%d (%d)%s %d %08X\n" _C_
-			i _C_ UpgradeWcNames[i] _C_ time _C_ gold _C_ lumber _C_ oil _C_
-			icon _C_ IconWcNames[icon] _C_ group _C_ flags);
 
 		memset(costs, 0, sizeof(costs));
 		costs[TimeCost] = time;
@@ -690,7 +686,6 @@ local int CclDefineModifier(lua_State* l)
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			DebugLevel3Fn("%s\n" _C_ value);
 			if (!strncmp(value, "unit-", 5)) {
 				lua_rawgeti(l, j + 1, 3);
 				units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
@@ -702,7 +697,6 @@ local int CclDefineModifier(lua_State* l)
 			lua_rawgeti(l, j + 1, 2);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			DebugLevel3Fn("%s\n" _C_ value);
 			if (!strncmp(value, "upgrade-", 8)) {
 				lua_rawgeti(l, j + 1, 3);
 				upgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
@@ -808,7 +802,7 @@ local int CclDefineUnitAllow(lua_State* l)
 	++j;
 
 	if (strncmp(ident, "unit-", 5)) {
-		DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+		DebugPrint(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
 	id = UnitTypeIdByIdent(ident);
@@ -862,7 +856,7 @@ local int CclDefineAllow(lua_State* l)
 				AllowUpgradeId(&Players[i], id, ids[i]);
 			}
 		} else {
-			DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 	}
 
@@ -1056,7 +1050,6 @@ local int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	for (s2 = strtok(s1, ","); s2; s2 = strtok(NULL, ",")) {
 		int id;
 
-		DebugLevel3Fn(" %s\n" _C_ s2);
 		id = UnitTypeIdByIdent(s2);
 		if (id == -1) {
 			break;				// cade: should we cancel all and return error?!
@@ -1091,7 +1084,7 @@ global int UnitTypeIdByIdent(const char* ident)
 	if ((type = UnitTypeByIdent(ident))) {
 		return type->Slot;
 	}
-	DebugLevel0Fn(" fix this %s\n" _C_ ident);
+	DebugPrint(" fix this %s\n" _C_ ident);
 	return -1;
 }
 
@@ -1109,7 +1102,7 @@ global int UpgradeIdByIdent(const char* ident)
 	if (upgrade) {
 		return upgrade - Upgrades;
 	}
-	DebugLevel0Fn(" fix this %s\n" _C_ ident);
+	DebugPrint(" fix this %s\n" _C_ ident);
 	return -1;
 }
 
@@ -1232,7 +1225,6 @@ local void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 		// this modifier should be applied to unittype id == z
 		if (um->ApplyTo[z] == 'X') {
 
-			DebugLevel3Fn(" applied to %d\n" _C_ z);
 			// upgrade stats
 			UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.AttackRange;
 			UnitTypes[z]->Stats[pn].SightRange += um->Modifier.SightRange;
@@ -1392,7 +1384,7 @@ global char UpgradeIdentAllowed(const Player* player, const char* ident)
 	if ((id = UpgradeIdByIdent(ident)) != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugLevel0Fn("Fix your code, wrong idenifier `%s'\n" _C_ ident);
+	DebugPrint("Fix your code, wrong idenifier `%s'\n" _C_ ident);
 	return '-';
 }
 

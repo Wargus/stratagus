@@ -137,8 +137,6 @@ global void LoadTileset(void)
 
 	TheMap.TileCount = n =
 		tiles_per_row * (TheMap.TileGraphic->Height / TileSizeY);
-	DebugLevel2Fn(" %d Tiles in file %s, %d per row\n" _C_ TheMap.
-		TileCount _C_ TheMap.Tileset->ImageFile _C_ tiles_per_row);
 
 	if (n > MaxTilesInTileset) {
 		fprintf(stderr,

@@ -86,7 +86,7 @@ local int CclDefineMissileType(lua_State* l)
 	NoWarningMissileType = i;
 #endif
 	if (mtype) {
-		DebugLevel0Fn("Redefining missile-type `%s'\n" _C_ str);
+		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
 		free(str);
 	} else {
 		mtype = NewMissileTypeSlot(str);  // str consumed!
@@ -229,7 +229,7 @@ local int CclMissile(lua_State* l)
 	int args;
 	int j;
 
-	DebugLevel0Fn("FIXME: not finished\n");
+	DebugPrint("FIXME: not finished\n");
 
 	missile = NULL;
 	type = NULL;

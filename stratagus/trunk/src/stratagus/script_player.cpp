@@ -91,7 +91,7 @@ local int CclPlayer(lua_State* l)
 	}
 	player->Player = i;
 	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
-		DebugLevel0("Not enough memory to create player %d.\n" _C_ i);
+		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
 	}
 

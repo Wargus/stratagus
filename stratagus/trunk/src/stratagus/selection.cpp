@@ -202,12 +202,12 @@ global void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, in
 global int SelectUnit(Unit* unit)
 {
 	if (unit->Type->Revealer) {				// Revealers cannot be selected
-		DebugLevel0Fn("Selecting revealer?\n");
+		DebugPrint("Selecting revealer?\n");
 		return 0;
 	}
 
 	if (unit->Removed) {				// Removed cannot be selected
-		DebugLevel0Fn("Selecting removed?\n");
+		DebugPrint("Selecting removed?\n");
 		return 0;
 	}
 
@@ -332,7 +332,6 @@ global int SelectUnitsByType(Unit* base)
 	const Viewport* vp;
 
 	Assert(TheUI.MouseViewport);
-	DebugLevel3Fn(" %s\n" _C_ base->Type->Ident);
 
 	type = base->Type;
 
@@ -431,7 +430,6 @@ global int ToggleUnitsByType(Unit* base)
 	int i;
 
 	type = base->Type;
-	DebugLevel2Fn(" %s FIXME: toggle not written.\n" _C_ type->Ident);
 
 	// select all visible units.
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
@@ -715,8 +713,6 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	int ty0;
 	int tx1;
 	int ty1;
-
-	DebugLevel3Fn(" (%d,%d,%d,%d)\n" _C_ sx0 _C_ sy0 _C_ sx1 _C_ sy1);
 
 	tx0 = sx0 / TileSizeX;
 	ty0 = sy0 / TileSizeY;

@@ -604,7 +604,7 @@ local void SetViewportModeSingle(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-	DebugLevel0("Single viewport set\n");
+	DebugPrint("Single viewport set\n");
 
 	new_vps[0].X = TheUI.MapArea.X;
 	new_vps[0].Y = TheUI.MapArea.Y;
@@ -627,7 +627,7 @@ local void SetViewportModeSplitHoriz(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-	DebugLevel0("Two horizontal viewports set\n");
+	DebugPrint("Two horizontal viewports set\n");
 
 	new_vps[0].X = TheUI.MapArea.X;
 	new_vps[0].Y = TheUI.MapArea.Y;
@@ -656,7 +656,7 @@ local void SetViewportModeSplitHoriz3(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-	DebugLevel0("Horizontal 3-way viewport division set\n");
+	DebugPrint("Horizontal 3-way viewport division set\n");
 
 	new_vps[0].X = TheUI.MapArea.X;
 	new_vps[0].Y = TheUI.MapArea.Y;
@@ -690,7 +690,7 @@ local void SetViewportModeSplitVert(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-	DebugLevel0("Two vertical viewports set\n");
+	DebugPrint("Two vertical viewports set\n");
 
 	new_vps[0].X = TheUI.MapArea.X;
 	new_vps[0].Y = TheUI.MapArea.Y;
@@ -719,7 +719,7 @@ local void SetViewportModeQuad(void)
 {
 	Viewport new_vps[MAX_NUM_VIEWPORTS];
 
-	DebugLevel0("Four viewports set\n");
+	DebugPrint("Four viewports set\n");
 
 	new_vps[0].X = TheUI.MapArea.X;
 	new_vps[0].Y = TheUI.MapArea.Y;
@@ -770,7 +770,7 @@ global void SetViewportMode(ViewportMode new_mode)
 			SetViewportModeQuad();
 			break;
 		default:
-			DebugLevel0Fn("trying to set an unknown mode!!\n");
+			DebugPrint("trying to set an unknown mode!!\n");
 			break;
 	}
 }

@@ -178,7 +178,7 @@ global void HandleActionTrain(Unit* unit)
 		}
 
 		if (!CanHandleOrder(nunit, &unit->NewOrder)) {
-			DebugLevel0Fn("Wrong order for unit\n");
+			DebugPrint("Wrong order for unit\n");
 #if 0
 			nunit->Orders[0].Action = UnitActionStandStill;
 #endif
@@ -193,7 +193,7 @@ global void HandleActionTrain(Unit* unit)
 			if (unit->NewOrder.Goal) {
 				if (unit->NewOrder.Goal->Destroyed) {
 					// FIXME: perhaps we should use another goal?
-					DebugLevel0Fn("Destroyed unit in train unit\n");
+					DebugPrint("Destroyed unit in train unit\n");
 					RefsDecrease(unit->NewOrder.Goal);
 					unit->NewOrder.Goal = NoUnitP;
 					unit->NewOrder.Action = UnitActionStill;

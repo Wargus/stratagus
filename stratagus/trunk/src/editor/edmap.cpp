@@ -108,8 +108,6 @@ local unsigned QuadFromTile(int x, int y)
 	base = TheMap.Tileset->Tiles[i].BaseTerrain;
 	mix = TheMap.Tileset->Tiles[i].MixTerrain;
 
-	DebugLevel3Fn("Tile %d:%04x %d,%d\n" _C_ tile _C_ i _C_ quad _C_ mix);
-
 	if (!mix) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
 	}
@@ -167,8 +165,6 @@ local int FindTilePath(int base, int goal, int length, char* marks, int* tile)
 	int l;
 	int j;
 	int n;
-
-	DebugLevel3Fn("base %X goal %X\n" _C_ base _C_ goal);
 
 	//
 	// Find any mixed tile
@@ -241,8 +237,6 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	int direction;
 	// 0  1  2  3   4  5  6  7   8  9  A   B  C   D  E  F
 	char table[16] = { 0, 7, 3, 11, 1, 9, 5, 13, 0, 8, 4, 12, 2, 10, 6, 0 };
-
-	DebugLevel3Fn("%x %x\n" _C_ fixed _C_ quad);
 
 	//
 	// Get tile type from fixed.
@@ -339,8 +333,6 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 		}
 	}
 
-	DebugLevel3Fn("type1 %x type2 %x\n" _C_ type1 _C_ type2);
-
 	//
 	// Need a mixed tile
 	//
@@ -368,7 +360,6 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	if (i >= TheMap.Tileset->NumTiles) {
 		char* marks;
 
-		DebugLevel3Fn("No good mix found\n");
 		//
 		// Find the best tile path.
 		//
@@ -376,7 +367,7 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 		memset(marks, 0, TheMap.Tileset->NumTerrainTypes);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
-			DebugLevel0Fn("Huch, no mix found!!!!!!!!!!!\n");
+			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
 			goto find_solid;
 		}
 		if (type1 == TheMap.Tileset->Tiles[i].MixTerrain) {
@@ -402,9 +393,6 @@ local int TileFromQuad(unsigned fixed, unsigned quad)
 	if (((quad >> 0) & 0xFF) == type1) {
 		direction |= 1;
 	}
-
-	DebugLevel3Fn("%08x %x %x %d\n" _C_ quad _C_ type1 _C_ type2 _C_
-		direction);
 
 	return base | (table[direction] << 4);
 }
@@ -482,8 +470,6 @@ local void EditorTileChanged2(int x, int y, int d)
 	MapField* mf;
 
 	quad = QuadFromTile(x, y);
-	DebugLevel3Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
-		TheMap.Fields[y * TheMap.Width + x].Tile);
 
 	//
 	// Change the surrounding
@@ -520,9 +506,7 @@ local void EditorTileChanged2(int x, int y, int d)
 		q2 = QuadFromTile(x, y - 1);
 		u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("U+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & BH_QUAD_M, u);
-			DebugLevel3Fn("= %08x\n" _C_ tile);
 			EditorChangeTile(x, y - 1, tile, d&~DIR_DOWN);
 		}
 	}
@@ -533,7 +517,6 @@ local void EditorTileChanged2(int x, int y, int d)
 		q2 = QuadFromTile(x, y + 1);
 		u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("D+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & TH_QUAD_M, u);
 			EditorChangeTile(x, y + 1, tile, d&~DIR_UP);
 		}
@@ -545,7 +528,6 @@ local void EditorTileChanged2(int x, int y, int d)
 		q2 = QuadFromTile(x - 1, y);
 		u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("L+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & RH_QUAD_M, u);
 			EditorChangeTile(x - 1, y, tile, d&~DIR_RIGHT);
 		}
@@ -557,7 +539,6 @@ local void EditorTileChanged2(int x, int y, int d)
 		q2 = QuadFromTile(x + 1, y);
 		u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 		if (u != q2) {
-			DebugLevel3Fn("R+    %08x -> %08x\n" _C_ q2 _C_ u);
 			tile = TileFromQuad(u & LH_QUAD_M, u);
 			EditorChangeTile(x + 1, y, tile, d&~DIR_LEFT);
 		}

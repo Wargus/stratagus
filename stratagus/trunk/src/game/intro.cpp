@@ -200,7 +200,6 @@ local void IntroCallbackMouse(int x, int y)
 */
 local void IntroCallbackExit(void)
 {
-	DebugLevel3Fn("Exit\n");
 }
 
 /**

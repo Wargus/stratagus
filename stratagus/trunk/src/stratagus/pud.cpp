@@ -133,10 +133,10 @@ local void ConvertMTXM(const unsigned short* mtxm,int width,int height
 		// FIXME: should use terrain name or better map->Tileset!!
 		//Assert( map->Tileset->Table == Tilesets[map->Terrain]->Table );
 		ctab=Tilesets[map->Terrain]->Table;
-		DebugLevel0Fn("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
+		DebugPrint("FIXME: %s <-> %s\n" _C_ Tilesets[map->Terrain]->Class _C_
 				map->TerrainName);
 	} else {
-		DebugLevel1("Unknown terrain!\n");
+		DebugPrint("Unknown terrain!\n");
 		// FIXME: don't use TilesetSummer
 		ctab=Tilesets[TilesetSummer]->Table;
 	}
@@ -194,13 +194,13 @@ local void ConvertSQM(const unsigned short* sqm,int width,int height
 			}
 			if( v&MapMoveWallO ) {
 				if( !map->Fields[i].Flags&MapFieldWall ) {
-					DebugLevel0("Should already be wall %d\n" _C_ i);
+					DebugPrint("Should already be wall %d\n" _C_ i);
 					map->Fields[i].Flags|=MapFieldWall;
 				}
 			}
 			if( v&MapMoveHuman ) {
 				if( !map->Fields[i].Flags&MapFieldWall ) {
-					DebugLevel0("Should already be wall %d\n" _C_ i);
+					DebugPrint("Should already be wall %d\n" _C_ i);
 					map->Fields[i].Flags|=MapFieldWall;
 				}
 				map->Fields[i].Flags|=MapFieldHuman;
@@ -227,7 +227,7 @@ local void ConvertSQM(const unsigned short* sqm,int width,int height
 				map->Fields[i].Flags|=MapFieldBuilding;
 			}
 			if( v&0x20 ) {
-				DebugLevel0("SQM: contains unknown action %#04X\n" _C_ v);
+				DebugPrint("SQM: contains unknown action %#04X\n" _C_ v);
 			}
 		}
 	}
@@ -268,7 +268,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 			if( v==MapActionIsland ) {		// island no transporter
 				// FIXME: don't know what todo here
 				//map->Fields[i].Flags|=MapFieldWall;
-				DebugLevel0Fn("%d,%d %d\n" _C_ w _C_ h _C_ v);
+				DebugPrint("%d,%d %d\n" _C_ w _C_ h _C_ v);
 				continue;
 			}
 			v&=~0xFF;						// low byte is region
@@ -278,7 +278,7 @@ local void ConvertREGM(const unsigned short* regm,int width,int height
 			if( v==MapActionLand ) {		// land
 				continue;
 			}
-			DebugLevel0("REGM: contains unknown action %#04X at %d,%d\n"
+			DebugPrint("REGM: contains unknown action %#04X at %d,%d\n"
 				_C_ v _C_ w _C_ h);
 		}
 	}
@@ -396,8 +396,6 @@ global MapInfo* GetPudInfo(const char* pud)
 	//		Parse all sections.
 	//
 	while( PudReadHeader(input,header,&length) ) {
-		DebugLevel3("\tSection: %4.4s\n" _C_ header);
-
 		info->MapUID += ChksumArea(header, 4);
 
 		//
@@ -408,12 +406,11 @@ global MapInfo* GetPudInfo(const char* pud)
 				int v;
 
 				v=PudReadWord(input);
-				DebugLevel3("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
 				buf[0] = v & 0xFF;
 				info->MapUID += ChksumArea(buf, 1);
 				continue;
 			}
-			DebugLevel1("Wrong version length\n");
+			DebugPrint("Wrong version length\n");
 		}
 
 		//
@@ -446,7 +443,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong player length\n");
+				DebugPrint("Wrong player length\n");
 			}
 		}
 
@@ -473,7 +470,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				info->MapUID += ChksumArea(buf, 1);
 				continue;
 			} else {
-				DebugLevel1("Wrong terrain type length\n");
+				DebugPrint("Wrong terrain type length\n");
 			}
 		}
 
@@ -586,7 +583,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong side length\n");
+				DebugPrint("Wrong side length\n");
 			}
 		}
 
@@ -607,7 +604,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting gold length\n");
+				DebugPrint("Wrong starting gold length\n");
 			}
 		}
 
@@ -628,7 +625,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting lumber length\n");
+				DebugPrint("Wrong starting lumber length\n");
 			}
 		}
 
@@ -649,7 +646,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting oil length\n");
+				DebugPrint("Wrong starting oil length\n");
 			}
 		}
 
@@ -671,7 +668,7 @@ global MapInfo* GetPudInfo(const char* pud)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong AI player length\n");
+				DebugPrint("Wrong AI player length\n");
 			}
 		}
 
@@ -785,8 +782,6 @@ global MapInfo* GetPudInfo(const char* pud)
 			continue;
 		}
 
-		DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
-
 		CLseek(input,length,SEEK_CUR);
 	}
 
@@ -843,8 +838,6 @@ global void LoadPud(const char* pud,WorldMap* map)
 	//		Parse all sections.
 	//
 	while( PudReadHeader(input,header,&length) ) {
-		DebugLevel3("\tSection: %4.4s\n" _C_ header);
-
 		//
 		//		PUD version
 		//
@@ -853,10 +846,10 @@ global void LoadPud(const char* pud,WorldMap* map)
 				unsigned int v;
 
 				v=PudReadWord(input);
-				DebugLevel1("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
+				DebugPrint("\tVER: %d.%d\n" _C_ (v&0xF0)>>4 _C_ v&0xF);
 				continue;
 			}
-			DebugLevel1("Wrong version length\n");
+			DebugPrint("Wrong version length\n");
 		}
 
 		//
@@ -867,7 +860,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				perror("CLread()");
 				ExitFatal(-1);
 			}
-			DebugLevel1("\tDESC: %s\n" _C_ buf);
+			DebugPrint("\tDESC: %s\n" _C_ buf);
 			strncpy(map->Description,buf,sizeof(map->Description));
 			map->Description[sizeof(map->Description)-1]='\0';
 			continue;
@@ -905,7 +898,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong player length\n");
+				DebugPrint("Wrong player length\n");
 			}
 		}
 
@@ -937,7 +930,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				LoadTileset();
 				continue;
 			} else {
-				DebugLevel1("Wrong terrain type length\n");
+				DebugPrint("Wrong terrain type length\n");
 			}
 		}
 
@@ -949,8 +942,6 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 			width=PudReadWord(input);
 			height=PudReadWord(input);
-
-			DebugLevel2("\tMap %d x %d\n" _C_ width _C_ height);
 
 			if( !map->Fields ) {
 				map->Width=width;
@@ -969,7 +960,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				InitUnitCache();
 				// FIXME: this should be CreateMap or InitMap?
 			} else {						// FIXME: should do some checks here!
-				DebugLevel0Fn("Warning: Fields already allocated\n");
+				DebugPrint("Warning: Fields already allocated\n");
 			}
 			continue;
 		}
@@ -982,7 +973,6 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 			length-=2;
 			if( PudReadWord(input) ) {
-				DebugLevel3("\tUsing default data\n");
 				CLseek(input,length,SEEK_CUR);
 			} else {
 				if( length<(long)sizeof(buf) ) {
@@ -1028,7 +1018,6 @@ global void LoadPud(const char* pud,WorldMap* map)
 
 			length-=2;
 			if( PudReadWord(input) ) {
-				DebugLevel3("\tUsing default data\n");
 				CLseek(input,length,SEEK_CUR);
 			} else {
 				if( length<(long)sizeof(buf) ) {
@@ -1065,7 +1054,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong side length\n");
+				DebugPrint("Wrong side length\n");
 			}
 		}
 
@@ -1083,7 +1072,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting gold length\n");
+				DebugPrint("Wrong starting gold length\n");
 			}
 		}
 
@@ -1101,7 +1090,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting lumber length\n");
+				DebugPrint("Wrong starting lumber length\n");
 			}
 		}
 
@@ -1119,7 +1108,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong starting oil length\n");
+				DebugPrint("Wrong starting oil length\n");
 			}
 		}
 
@@ -1139,7 +1128,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 				}
 				continue;
 			} else {
-				DebugLevel1("Wrong AI player length\n");
+				DebugPrint("Wrong AI player length\n");
 			}
 		}
 
@@ -1158,7 +1147,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			unsigned short* mtxm;
 
 			if( length!=(uint32_t)width*height*2 ) {
-				DebugLevel1("wrong length of MTXM section %u\n" _C_ length);
+				DebugPrint("wrong length of MTXM section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
 			if( !(mtxm=malloc(length)) ) {
@@ -1183,7 +1172,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			unsigned short* sqm;
 
 			if( length!=(uint32_t)width*height*sizeof(short) ) {
-				DebugLevel1("wrong length of SQM  section %u\n" _C_ length);
+				DebugPrint("wrong length of SQM  section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
 			if( !(sqm=malloc(length)) ) {
@@ -1208,7 +1197,7 @@ global void LoadPud(const char* pud,WorldMap* map)
 			unsigned short* regm;
 
 			if( length!=(uint32_t)width*height*sizeof(short) ) {
-				DebugLevel1("wrong length of REGM section %u\n" _C_ length);
+				DebugPrint("wrong length of REGM section %u\n" _C_ length);
 				ExitFatal(-1);
 			}
 			if( !(regm=malloc(length)) ) {
@@ -1292,7 +1281,7 @@ pawn:
 									,UnitTypeByWcNum(t),&Players[o]);
 							if( unit->Type->GivesResource ) {
 								if (!v) {
-									DebugLevel0Fn("empty resource IN PUD.\n");
+									DebugPrint("empty resource IN PUD.\n");
 									v = 10;
 								}
 								unit->Value=v*2500;
@@ -1313,18 +1302,10 @@ pawn:
 			continue;
 		}
 
-		DebugLevel2("Unsupported Section: %4.4s\n" _C_ header);
-
 		CLseek(input,length,SEEK_CUR);
 	}
 
 	CLclose(input);
-
-	DebugLevel3("Memory for pud %d\n"
-			_C_ width*height*sizeof(*map->Fields)
-// FIXME: remove this
-			+width*height*sizeof(short)
-			+width*height*sizeof(short) );
 
 	MapOffsetX+=width;
 	if( MapOffsetX>=map->Width ) {
@@ -1699,7 +1680,7 @@ global int SavePud(const char* pud,const WorldMap* map)
 global int SavePud(const char* pud __attribute__((unused)),
 		const WorldMap* map __attribute__((unused)))
 {
-	DebugLevel0Fn("Only supported with ZLIB\n");
+	DebugPrint("Only supported with ZLIB\n");
 }
 
 #endif

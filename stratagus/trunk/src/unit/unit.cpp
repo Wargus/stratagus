@@ -176,8 +176,6 @@ global void RefsDecrease(Unit* unit)
 global void ReleaseUnit(Unit* unit)
 {
 	Unit* temp;
-	DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
-		unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
 	Assert(unit->Type);				// already free.
 	Assert(unit->OrderCount == 1);
@@ -187,7 +185,7 @@ global void ReleaseUnit(Unit* unit)
 	//		First release, remove from lists/tables.
 	//
 	if (!unit->Destroyed) {
-		DebugLevel0Fn("First release %d\n" _C_ unit->Slot);
+		DebugPrint("First release %d\n" _C_ unit->Slot);
 
 		//
 		//		Are more references remaining?
@@ -195,8 +193,6 @@ global void ReleaseUnit(Unit* unit)
 		unit->Destroyed = 1;				// mark as destroyed
 
 		if (--unit->Refs > 0) {
-			DebugLevel2Fn("%lu:More references of %d #%d\n" _C_ GameCycle _C_
-				UnitNumber(unit) _C_ unit->Refs);
 			return;
 		}
 	}
@@ -227,8 +223,6 @@ global void ReleaseUnit(Unit* unit)
 		unit->Next = 0;
 	}
 	unit->Refs = GameCycle + (NetworkMaxLag << 1);	// could be reuse after this time
-	DebugLevel2Fn("%lu:No more references, only wait for network lag, unit %d\n" _C_
-		GameCycle _C_ UnitNumber(unit));
 	unit->Type = 0; 						// for debugging.
 	free(unit->CacheLinks);
 }
@@ -244,7 +238,7 @@ local Unit *AllocUnit(void)
 	//		Game unit limit reached.
 	//
 	if (NumUnits >= UnitMax) {
-		DebugLevel0Fn("Over all unit limit (%d) reached.\n" _C_ UnitMax);
+		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
 		// FIXME: Hoping this is checked everywhere.
 		return NoUnitP;
 	}
@@ -256,10 +250,10 @@ local Unit *AllocUnit(void)
 		unit = ReleasedHead;
 		ReleasedHead = unit->Next;
 		if (ReleasedHead == 0) {		// last element
-			DebugLevel0Fn("Released unit queue emptied\n");
+			DebugPrint("Released unit queue emptied\n");
 			ReleasedTail = ReleasedHead = 0;
 		}
-		DebugLevel0Fn("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
+		DebugPrint("%lu:Release %p %d\n" _C_ GameCycle _C_ unit _C_ unit->Slot);
 		slot = UnitSlots + unit->Slot;
 		memset(unit, 0, sizeof(*unit));
 		// FIXME: can release here more slots, reducing memory needs.
@@ -268,7 +262,7 @@ local Unit *AllocUnit(void)
 		//		Allocate structure
 		//
 		if (!(slot = UnitSlotFree)) {		// should not happen!
-			DebugLevel0Fn("Maximum of units reached\n");
+			DebugPrint("Maximum of units reached\n");
 			return NoUnitP;
 		}
 		UnitSlotFree = (void*)*slot;
@@ -298,8 +292,6 @@ global void InitUnit(Unit* unit, UnitType* type)
 	//
 	unit->UnitSlot = &Units[NumUnits];		// back pointer
 	Units[NumUnits++] = unit;
-
-	DebugLevel3Fn("%p %d\n" _C_ unit _C_ UnitNumber(unit));
 
 	//
 	//  Initialise unit structure (must be zero filled!)
@@ -539,7 +531,7 @@ global Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 global void AddUnitInContainer(Unit* unit, Unit* host)
 {
 	if (unit->Container) {
-		DebugLevel0Fn("Unit is already contained.\n");
+		DebugPrint("Unit is already contained.\n");
 		exit(0);
 	}
 	unit->Container = host;
@@ -565,11 +557,11 @@ global void RemoveUnitFromContainer(Unit* unit)
 	Unit* host;
 	host = unit->Container;
 	if (!unit->Container) {
-		DebugLevel0Fn("Unit not contained.\n");
+		DebugPrint("Unit not contained.\n");
 		exit(0);
 	}
 	if (host->InsideCount == 0) {
-		DebugLevel0Fn("host's inside count reached -1.");
+		DebugPrint("host's inside count reached -1.");
 		exit(0);
 	}
 	host->InsideCount--;
@@ -660,8 +652,6 @@ global void RemoveUnit(Unit* unit, Unit* host)
 			unit->X + type->TileWidth - 1, unit->Y + type->TileHeight - 1);
 	}
 #endif
-
-	DebugLevel3Fn("%d %p %p\n" _C_ UnitNumber(unit) _C_ unit _C_ unit->Next);
 
 	if (host) {
 		UnitCacheRemove(unit);
@@ -771,7 +761,7 @@ global void UnitLost(Unit* unit)
 		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades] = 0;
 	}
 
-	DebugLevel0Fn("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
+	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
 	if (type->MustBuildOnTop && unit->Value > 0) {
@@ -864,7 +854,6 @@ global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 	x = unit->X;
 	y = unit->Y;
 
-	DebugLevel3("Nearest of (%d,%d) - (%d,%d)\n" _C_ tx _C_ ty _C_ x _C_ y);
 	if (tx >= x + unit->Type->TileWidth) {
 		*dx = x + unit->Type->TileWidth - 1;
 	} else if (tx < x) {
@@ -879,8 +868,6 @@ global void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 	} else {
 		*dy = ty;
 	}
-
-	DebugLevel3Fn("Goal is (%d,%d)\n" _C_ *dx _C_ *dy);
 }
 
 /**
@@ -913,12 +900,8 @@ local void UnitFillSeenValues(Unit* unit)
 */
 global void UnitGoesUnderFog(Unit* unit, const Player* player)
 {
-	DebugLevel3Fn("Unit %d(%s) at %d %d goes under fog for %d\n" _C_
-			unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ player->Player);
 	if (unit->Type->VisibleUnderFog) {
 		if (player->Type == PlayerPerson && !unit->Destroyed) {
-			DebugLevel3Fn("unit %d(%s): got a ref from player %d\n" _C_
-					unit->Slot _C_ unit->Type->Name _C_ p);
 			RefsIncrease(unit);
 		}
 		//
@@ -958,19 +941,13 @@ global void UnitGoesUnderFog(Unit* unit, const Player* player)
 */
 global void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
-	DebugLevel3Fn("Unit %d(%s) at %d %d goes out of fog for %d.\n" _C_
-			unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y _C_ player->Player);
 	if (unit->Type->VisibleUnderFog) {
 		if (unit->Seen.ByPlayer & (1 << (player->Player))) {
 			if ((player->Type == PlayerPerson) &&
 					(!(   unit->Seen.Destroyed & (1 << player->Player)   )) ) {
-				DebugLevel3Fn("unit %d(%s): cleaned a ref from player %d\n" _C_
-						unit->Slot _C_ unit->Type->Name _C_ player->Player);
 				RefsDecrease(unit);
 			}
 		} else {
-			DebugLevel3Fn("Player %d discovers unit %d(%s) at %d %d.\n" _C_ player->Player _C_
-					unit->Slot _C_ unit->Type->Name _C_ unit->X _C_ unit->Y);
 			unit->Seen.ByPlayer |= (1 << (player->Player));
 		}
 	}
@@ -992,14 +969,11 @@ global void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 	Unit* unit;
 
 	n = UnitCacheOnTile(x, y,units);
-	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
 	while (n) {
 		unit = units[--n];
 		if (cloak != (int)unit->Type->PermanentCloak) {
 			continue;
 		}
-		DebugLevel3("Unit %d(%d, %d) player %d seen %d -> %d (%d, %d)\n" _C_ unit->Slot _C_ unit->X _C_ unit->Y _C_
-				player->Player _C_ unit->VisCount[player->Player] _C_ unit->VisCount[player->Player] + 1 _C_ x _C_ y);
 		//
 		//  If the unit goes out of fog, this can happen for any player that
 		//  this player shares vision with, and can't YET see the unit.
@@ -1032,12 +1006,11 @@ global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 	Unit* unit;
 
 	n = UnitCacheOnTile(x, y, units);
-	DebugLevel3Fn("I can see %d units from here.\n" _C_ n);
 	while (n) {
 		unit = units[--n];
 		if ((unit->X > x || unit->X + unit->Type->TileWidth - 1 < x ||
 				unit->Y > y || unit->Y + unit->Type->TileHeight - 1 < y)) {
-			DebugLevel0Fn("Wrong cache %d %d -> %d %d\n" _C_ x _C_ y _C_ unit->X _C_ unit->Y);
+			DebugPrint("Wrong cache %d %d -> %d %d\n" _C_ x _C_ y _C_ unit->X _C_ unit->Y);
 		}
 		Assert(unit->X <= x && unit->X + unit->Type->TileWidth - 1 >= x &&
 			unit->Y <= y && unit->Y + unit->Type->TileHeight - 1 >= y);
@@ -1045,8 +1018,6 @@ global void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 			continue;
 		}
 		p = player->Player;
-		DebugLevel3("Unit %d(%d, %d) player %d seen %d -> %d (%d, %d)\n" _C_ unit->Slot _C_ unit->X _C_ unit->Y _C_
-				p _C_ unit->VisCount[p] _C_ unit->VisCount[p] - 1 _C_ x _C_ y);
 		Assert(unit->VisCount[p]);
 		unit->VisCount[p]--;
 		//
@@ -1274,7 +1245,7 @@ global int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 		//FIXME: ARI: Added here for early game setup state by
 		//		MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
 		//		so don't show anything until first real map-draw.
-		DebugLevel0Fn("Fix ME ThisPlayer not set yet?!\n");
+		DebugPrint("Fix ME ThisPlayer not set yet?!\n");
 		return 0;
 	}
 
@@ -1309,7 +1280,6 @@ global int UnitVisibleOnScreen(const Unit* unit)
 
 	for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
 		if (UnitVisibleInViewport(unit, vp)) {
-			DebugLevel3Fn("unit %d(%s) is visibile\n" _C_ unit->Slot _C_ unit->Type->Ident);
 			return 1;
 		}
 	}
@@ -1353,7 +1323,7 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
 
 	// This shouldn't happen
 	if (oldplayer == newplayer) {
-		DebugLevel0Fn("Change the unit owner to the same player???\n");
+		DebugPrint("Change the unit owner to the same player???\n");
 		return;
 	}
 
@@ -1400,7 +1370,7 @@ global void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	//		Must change food/gold and other.
 	//
 	if (unit->Type->GivesResource) {
-		DebugLevel0Fn("Resource transfer not supported\n");
+		DebugPrint("Resource transfer not supported\n");
 	}
 	newplayer->Demand += unit->Type->Demand;
 	newplayer->Supply += unit->Type->Supply;
@@ -1480,8 +1450,6 @@ global void RescueUnits(void)
 				if (unit->Removed) {
 					continue;
 				}
-				DebugLevel3("Checking %d(%s)" _C_ UnitNumber(unit) _C_
-					unit->Type->Ident);
 				// FIXME: I hope SelectUnits checks bounds?
 				// FIXME: Yes, but caller should check.
 				// NOTE: +1 right,bottom isn't inclusive :(
@@ -1496,7 +1464,6 @@ global void RescueUnits(void)
 							unit->X + unit->Type->TileWidth + 2,
 							unit->Y + unit->Type->TileHeight + 2, around);
 				}
-				DebugLevel3(" = %d\n" _C_ n);
 				//
 				//		Look if ally near the unit.
 				//
@@ -1733,7 +1700,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 	int mask;
 	int n;
 
-	DebugLevel3Fn("%d\n" _C_ UnitNumber(unit));
 	Assert(unit->Removed);
 
 	x = y = -1;
@@ -1759,7 +1725,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		for (i = addy; i--; ++y) {		// go down
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
-				DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 				if (n < bestd) {
 					bestd = n;
 					bestx = x;
@@ -1771,7 +1736,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		for (i = addx; i--; ++x) {		// go right
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
-				DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 				if (n < bestd) {
 					bestd = n;
 					bestx = x;
@@ -1783,7 +1747,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		for (i = addy; i--; --y) {		// go up
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
-				DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 				if (n < bestd) {
 					bestd = n;
 					bestx = x;
@@ -1795,7 +1758,6 @@ global void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 		for (i = addx; i--; --x) {		// go left
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
-				DebugLevel3("Distance %d,%d %d\n" _C_ x _C_ y _C_ n);
 				if (n < bestd) {
 					bestd = n;
 					bestx = x;
@@ -1831,7 +1793,7 @@ global void DropOutAll(const Unit* source)
 		unit->Wait=unit->Reset = 1;
 		unit->SubAction = 0;
 	}
-	DebugLevel0Fn("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
+	DebugPrint("Drop out %d of %d\n" _C_ i _C_ source->Data.Resource.Active);
 }
 
 /*----------------------------------------------------------------------------
@@ -1873,7 +1835,6 @@ global int CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 	if (type->ShoreBuilding) {
 		found = 0;
 
-		DebugLevel3("Shore building\n");
 		// Need at least one coast tile
 		for (h = type->TileHeight; h--;) {
 			for (w = type->TileWidth; w--;) {
@@ -2100,7 +2061,6 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			DebugLevel3("%d,%d\n" _C_ rx _C_ ry);
 			for (i = 0; i < 8; ++i) {				// mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
@@ -2117,7 +2077,6 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				if (rvresult ? CanMoveToMask(x, y, resmask) : !CanMoveToMask(x, y, resmask)) {
 					*px = x;
 					*py = y;
-					DebugLevel3("Found it! %X %X\n" _C_ TheMap.Fields[x+y*TheMap.Width].Flags _C_ resmask);
 					free(points);
 					return 1;
 				}
@@ -2130,7 +2089,7 @@ global int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 					}
 					if (wp == ep) {
 						//  We are out of points, give up!
-						DebugLevel0Fn("Ran out of points the hard way, beware.\n");
+						DebugPrint("Ran out of points the hard way, beware.\n");
 						break;
 					}
 				} else {						// unreachable
@@ -2293,7 +2252,6 @@ global Unit* FindResource(const Unit* unit, int x, int y, int range, int resourc
 		//		Continue with next set.
 		ep = wp;
 	}
-	DebugLevel3Fn("no resource found\n");
 	free(points);
 	return NoUnitP;
 }
@@ -2360,8 +2318,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 	ep = wp = 1;						// start with one point
 	cdist = 0;								// current distance is 0
 
-	DebugLevel3Fn("Searching for a deposit(%d,%d,%d,%d,%s)" _C_
-		UnitNumber(unit) _C_ x _C_ y _C_ range _C_ DefaultResourceNames[resource]);
 	//
 	//		Pop a point from stack, push all neighbors which could be entered.
 	//
@@ -2373,7 +2329,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				++nodes_searched;
-				DebugLevel3("(%d,%d) " _C_ x _C_ y);
 				//  Make sure we don't leave the map.
 				if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
 					continue;
@@ -2390,7 +2345,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 						((IsAllied(unit->Player, depot)) ||
 							(unit->Player == depot->Player))) {
 					free(points);
-					DebugLevel3("Found a resource deposit at %d,%d\n" _C_ x _C_ y);
 					return depot;
 				}
 				if (CanMoveToMask(x, y, mask)) {		// reachable
@@ -2402,7 +2356,7 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 					}
 					if (wp == ep) {
 						//  We are out of points, give up!
-						DebugLevel0Fn("Ran out of points the hard way, beware.\n");
+						DebugPrint("Ran out of points the hard way, beware.\n");
 						break;
 					}
 				} else {						// unreachable
@@ -2420,7 +2374,6 @@ global Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource
 		//		Continue with next set.
 		ep = wp;
 	}
-	DebugLevel3("No resource deposit found, after we searched %d nodes.\n" _C_ nodes_searched);
 	free(points);
 	return NoUnitP;
 }
@@ -2578,7 +2531,7 @@ global void LetUnitDie(Unit* unit)
 
 	//		removed units,  just remove.
 	if (unit->Removed) {
-		DebugLevel0Fn("Killing a removed unit?\n");
+		DebugPrint("Killing a removed unit?\n");
 		RemoveUnit(unit, NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);
@@ -2656,7 +2609,7 @@ global void LetUnitDie(Unit* unit)
 			Assert(unit->Type->Animations &&
 				unit->Type->Animations->Die);
 			UnitShowAnimation(unit, unit->Type->Animations->Die);
-			DebugLevel0Fn("Frame %d\n" _C_ unit->Frame);
+			DebugPrint("Frame %d\n" _C_ unit->Frame);
 			MapUnmarkUnitSight(unit);
 			unit->CurrentSightRange = type->Stats[unit->Player->Player].SightRange;
 			MapMarkUnitSight(unit);
@@ -2737,7 +2690,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	if (!damage) {						// Can now happen by splash damage
 #ifdef DEBUG
 		if (!GodMode) {
-			DebugLevel0Fn("Warning no damage, try to fix by caller?\n");
+			DebugPrint("Warning no damage, try to fix by caller?\n");
 		}
 #endif
 		return;
@@ -2752,7 +2705,7 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 
 	if (target->Removed) {
-		DebugLevel0Fn("Removed target hit\n");
+		DebugPrint("Removed target hit\n");
 		return;
 	}
 
@@ -2917,8 +2870,6 @@ global void HitUnit(Unit* attacker, Unit* target, int damage)
 		int y;
 		int d;
 
-		DebugLevel3Fn("Unit at %d, %d attacked from %d, %d, running away.\n" _C_
-				target->X _C_ target->Y _C_ attacker->X _C_ attacker->Y);
 		x = target->X - attacker->X;
 		y = target->Y - attacker->Y;
 		d = isqrt(x * x + y * y);
@@ -2984,9 +2935,6 @@ global int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y
 			dy = 0;
 		}
 	}
-
-	DebugLevel3("\tDistance %d,%d -> %d,%d = %d\n" _C_
-		x1 _C_ y1 _C_ x2 _C_ y2 _C_ (dy<dx) ? dx : dy);
 
 	return isqrt(dy * dy + dx * dx);
 }
@@ -3218,7 +3166,7 @@ global void SaveOrder(const Order* order, CLFile* file)
 			break;
 
 		default:
-			DebugLevel0Fn("Unknown action in order\n");
+			DebugPrint("Unknown action in order\n");
 	}
 	CLprintf(file, " \"flags\", %d,", order->Flags);
 	CLprintf(file, " \"range\", %d,", order->Range);
@@ -3433,7 +3381,6 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 			}
 			break;
 		case UnitActionResource:
-			DebugLevel3("Unit %d save TimeToHarvest %d\n" _C_ unit->Slot _C_ unit->Data.ResWorker.TimeToHarvest);
 			CLprintf(file, ", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
 			if (unit->Data.ResWorker.DoneHarvesting) {
 				CLprintf(file, " \"done-harvesting\",");
@@ -3604,7 +3551,7 @@ global void SaveUnits(CLFile* file)
 	for (unit = ReleasedHead; unit; unit = unit->Next) {
 		CLprintf(file, "\t{Slot = %d, FreeCycle = %d}%c \n", unit->Slot, unit->Refs,
 				(unit->Next ? ',' : ' '));
-		DebugLevel0Fn("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
+		DebugPrint("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
 	}
 	CLprintf(file, ")\n");
 }

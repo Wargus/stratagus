@@ -127,7 +127,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 				ba->Value = SpellTypeByIdent(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
-					DebugLevel0("Spell %s does not exist?\n" _C_ value);
+					DebugPrint("Spell %s does not exist?\n" _C_ value);
 					Assert(ba->Value >= 0);
 				}
 #endif
@@ -360,12 +360,6 @@ global void DrawButtonPanel(void)
 					case ButtonUpgradeTo:
 						// FIXME: store pointer in button table!
 						stats = &UnitTypes[v]->Stats[player->Player];
-						DebugLevel3("Upgrade to %s %d %d %d %d %d\n" _C_
-							UnitTypes[v].Ident _C_ UnitTypes[v].Demand _C_
-							UnitTypes[v]._Costs[GoldCost] _C_
-							UnitTypes[v]._Costs[WoodCost] _C_
-							stats->Costs[GoldCost] _C_
-							stats->Costs[WoodCost]);
 
 						SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
 						break;
@@ -441,7 +435,6 @@ local void UpdateButtonPanelMultipleUnits(void)
 			int allow;
 
 			allow = 0;
-			DebugLevel3("%d: %p\n" _C_ z _C_ UnitButtonTable[z]->Allowed);
 			if (UnitButtonTable[z]->Allowed) {
 				// there is check function -- call it
 				if (UnitButtonTable[z]->Allowed(NULL, UnitButtonTable[z])) {
@@ -515,8 +508,6 @@ global void UpdateButtonPanel(void)
 	ButtonAction* buttonaction;
 	int z;
 	int allow;
-
-	DebugLevel3Fn("update buttons\n");
 
 	CurrentButtons = NULL;
 
@@ -668,7 +659,7 @@ global void UpdateButtonPanel(void)
 					break;
 
 				default:
-					DebugLevel0Fn("Unsupported button-action %d\n" _C_
+					DebugPrint("Unsupported button-action %d\n" _C_
 						buttonaction->Action);
 					break;
 			}
@@ -693,8 +684,6 @@ global void DoButtonButtonClicked(int button)
 	int i;
 	UnitType* type;
 
-	DebugLevel3Fn("Button clicked %d\n" _C_ button);
-
 	// no buttons
 	if (!CurrentButtons) {
 		return;
@@ -713,8 +702,6 @@ global void DoButtonButtonClicked(int button)
 	//
 	//  Handle action on button.
 	//
-	DebugLevel3Fn("Button clicked %d=%d\n" _C_ button _C_
-		CurrentButtons[button].Action);
 	switch (CurrentButtons[button].Action) {
 		case ButtonUnload:
 			//
@@ -868,8 +855,6 @@ global void DoButtonButtonClicked(int button)
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
 			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
-				DebugLevel3("Upgrade to %s %d %d\n" _C_ type->Ident _C_
-					type->_Costs[GoldCost] _C_ type->_Costs[WoodCost]);
 				//PlayerSubUnitType(player,type);
 				SendCommandUpgradeTo(Selected[0],type,
 					!(KeyModifiers & ModifierShift));
@@ -888,7 +873,7 @@ global void DoButtonButtonClicked(int button)
 			}
 			break;
 		default:
-			DebugLevel1Fn("Unknown action %d\n" _C_
+			DebugPrint("Unknown action %d\n" _C_
 				CurrentButtons[button].Action);
 			break;
 	}

@@ -1505,7 +1505,6 @@ normkey:
 				}
 				++mi;
 			}
-			DebugLevel3("Key %d\n" _C_ key);
 			return;
 	}
 	return;

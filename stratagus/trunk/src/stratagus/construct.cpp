@@ -211,7 +211,7 @@ global Construction* ConstructionByIdent(const char* ident)
 			++cop;
 		}
 	}
-	DebugLevel0Fn("Construction `%s' not found.\n" _C_ ident);
+	DebugPrint("Construction `%s' not found.\n" _C_ ident);
 	return NULL;
 }
 

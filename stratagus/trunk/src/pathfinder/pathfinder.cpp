@@ -387,8 +387,6 @@ global int PlaceReachable(Unit* src, int x, int y, int w, int h, int minrange __
 	static unsigned long LastGameCycle;
 	static unsigned mask;
 
-	DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
-
 	//
 	//  Setup movement.
 	//
@@ -426,19 +424,13 @@ global int UnitReachable(Unit* src, Unit* dst, int range)
 {
 	int depth;
 
-	DebugLevel3Fn("%d(%d,%d,%s)->%d(%d,%d,%s)+%d "
-		_C_ UnitNumber(src) _C_ src->X _C_ src->Y _C_ src->Type->Ident
-		_C_ UnitNumber(dst) _C_ dst->X _C_ dst->Y _C_ dst->Type->Ident _C_ range);
-
 	//
 	//		Find a path to the goal.
 	//
 	depth=PlaceReachable(src, dst->X, dst->Y, dst->Type->TileWidth, dst->Type->TileHeight, 0, range);
 	if (depth <= 0) {
-		DebugLevel3("NO WAY\n");
 		return 0;
 	}
-	DebugLevel3("OK\n");
 
 	return depth;
 }

@@ -116,7 +116,7 @@ global SoundId SoundIdForName(const char* name)
 	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
 		return *result;
 	}
-	DebugLevel0("Can't find sound `%s' in sound table\n" _C_ name);
+	DebugPrint("Can't find sound `%s' in sound table\n" _C_ name);
 	return NULL;
 }
 
@@ -140,7 +140,7 @@ global SoundId MakeSound(const char* name, const char* file[], int nb)
 	Assert(nb <= 255);
 
 	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-		DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
+		DebugPrint("re-register sound `%s'\n" _C_ name);
 		return *result;
 	}
 
@@ -170,7 +170,7 @@ global SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
 	const SoundId* result;
 
 	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-		DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
+		DebugPrint("re-register sound `%s'\n" _C_ name);
 		return *result;
 	}
 

@@ -171,7 +171,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				value = LuaToString(l, -1);
 				spellaction->Data.SpawnMissile.Missile = MissileTypeByIdent(value);
 				if (spellaction->Data.SpawnMissile.Missile == NULL) {
-					DebugLevel0Fn("in spawn-missile : missile %s does not exist\n" _C_ value);
+					DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
 				}
 				lua_pop(l, 1);
 			} else {
@@ -233,7 +233,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				value = LuaToString(l, -1);
 				spellaction->Data.AreaBombardment.Missile = MissileTypeByIdent(value);
 				if (spellaction->Data.AreaBombardment.Missile == NULL) {
-					DebugLevel0Fn("in area-bombardement : missile %s does not exist\n" _C_ value);
+					DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
 				}
 				lua_pop(l, 1);
 			} else {
@@ -313,7 +313,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.Summon.UnitType = UnitTypeByIdent(value);
 				if (!spellaction->Data.Summon.UnitType) {
 					spellaction->Data.Summon.UnitType = 0;
-					DebugLevel0("unit type \"%s\" not found for summon spell.\n" _C_ value);
+					DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
 				}
 			} else if (!strcmp(value, "time-to-live")) {
 				lua_rawgeti(l, -1, j + 1);
@@ -344,7 +344,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(value);
 				if (!spellaction->Data.SpawnPortal.PortalType) {
 					spellaction->Data.SpawnPortal.PortalType = 0;
-					DebugLevel0("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
+					DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 				}
 			} else {
 				LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
@@ -368,7 +368,7 @@ local void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				spellaction->Data.Polymorph.NewForm = UnitTypeByIdent(value);
 				if (!spellaction->Data.Polymorph.NewForm) {
 					spellaction->Data.Polymorph.NewForm= 0;
-					DebugLevel0("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
+					DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 				}
 				// FIXME: temp polymorphs? hard to do.
 			} else if (!strcmp(value, "player-neutral")) {
@@ -609,7 +609,7 @@ local int CclDefineSpell(lua_State* l)
 	identname = LuaToString(l, 1);
 	spell = SpellTypeByIdent(identname);
 	if (spell != NULL) {
-		DebugLevel0Fn("Redefining spell-type `%s'\n" _C_ identname);
+		DebugPrint("Redefining spell-type `%s'\n" _C_ identname);
 	} else {
 		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
 		spell = SpellTypeTable[SpellTypeCount] = malloc(sizeof(SpellType));

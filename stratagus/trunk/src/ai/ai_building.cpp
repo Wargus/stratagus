@@ -226,9 +226,6 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 					continue;
 				}
 
-				DebugLevel3Fn("Checking to build %s(%s) at %d,%d\n" _C_
-					type->Ident _C_ type->Name _C_ x _C_ y);
-
 				//
 				// Look if we can build here.
 				//
@@ -237,7 +234,6 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 					*dx = x;
 					*dy = y;
 					free(points);
-					DebugLevel3Fn("Found a building place!!!\n");
 					return 1;
 				}
 
@@ -579,9 +575,9 @@ global int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx
 	//
 	// Find a good place for a new hall
 	//
-	DebugLevel0Fn("Want to build a %s(%s)\n" _C_ type->Ident _C_ type->Name);
+	DebugPrint("Want to build a %s(%s)\n" _C_ type->Ident _C_ type->Name);
 	if (type->CanStore[GoldCost] && AiFindHallPlace(worker, type, dx, dy)) {
-		DebugLevel0Fn("Found place for town hall (%s,%s)\n" _C_ type->Ident _C_ type->
+		DebugPrint("Found place for town hall (%s,%s)\n" _C_ type->Ident _C_ type->
 			Name);
 		return 1;
 	}

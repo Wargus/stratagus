@@ -63,8 +63,6 @@ global void ActionStillGeneric(Unit* unit, int ground)
 	Unit* goal;
 	int i;
 
-	DebugLevel3Fn(" %d\n" _C_ UnitNumber(unit));
-
 	//
 	// If unit is not bunkered and removed, wait
 	//
@@ -191,8 +189,6 @@ global void ActionStillGeneric(Unit* unit, int ground)
 			if ((goal = AttackUnitsInReactRange(unit))) {
 				// Weak goal, can choose other unit, come back after attack
 				CommandAttack(unit, goal->X, goal->Y, NULL, FlushCommands);
-				DebugLevel3Fn(" %d Attacking in range %d\n" _C_
-					UnitNumber(unit) _C_ unit->SubAction);
 				Assert(unit->SavedOrder.Action == UnitActionStill);
 				Assert(!unit->SavedOrder.Goal);
 				unit->SavedOrder.Action = UnitActionAttack;
@@ -202,7 +198,6 @@ global void ActionStillGeneric(Unit* unit, int ground)
 				unit->SavedOrder.Goal = NoUnitP;
 			}
 		} else if ((goal = AttackUnitsInRange(unit))) {
-			DebugLevel3Fn(" %d #%d\n" _C_ UnitNumber(goal) _C_ goal->Refs);
 			//
 			// Old goal destroyed.
 			//

@@ -181,11 +181,6 @@ global int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTyp
 			}
 		}
 	}
-	DebugLevel3Fn("prefered order for %s is " _C_ unittype->Ident);
-	for (i = 0; i < usableTypesCount; ++i) {
-		DebugLevel3(" %s" _C_ UnitTypes[usableTypes[i]]->Ident);
-	}
-	DebugLevel3("\n");
 
 	return usableTypesCount;
 }
@@ -240,7 +235,6 @@ local void AiCleanForce(int force)
 	aitype = AiPlayer->Force[force].UnitTypes;
 	while (aitype) {
 		if (aitype->Want > counter[aitype->Type->Slot]) {
-			DebugLevel3Fn("%d: missing %s.\n" _C_ force _C_ aitype->Type->Ident);
 			AiPlayer->Force[force].Completed = 0;
 		}
 		counter[aitype->Type->Slot] -= aitype->Want;
@@ -254,7 +248,6 @@ local void AiCleanForce(int force)
 		prev = &AiPlayer->Force[force].Units;
 		while ((aiunit = *prev)) {
 			if (counter[aiunit->Unit->Type->Slot] > 0) {
-				DebugLevel3Fn("Release unit %s\n" _C_ aiunit->Unit->Type->Ident);
 				counter[UnitTypeEquivs[aiunit->Unit->Type->Slot]]--;
 				RefsDecrease(aiunit->Unit);
 				*prev = aiunit->Next;
@@ -264,8 +257,6 @@ local void AiCleanForce(int force)
 			prev = &aiunit->Next;
 		}
 	}
-
-	DebugLevel3Fn("%d complete %d\n" _C_ force _C_ AiPlayer->Force[force].Completed);
 }
 
 /**
@@ -459,7 +450,7 @@ global void AiAttackWithForce(int force)
 		while (AiPlayer->Force[f].Attacking) {
 			++f;
 			if (f == AI_MAX_ATTACKING_FORCES) {
-				DebugLevel0Fn("No free attacking forces\n");
+				DebugPrint("No free attacking forces\n");
 				f = force;
 				break;
 			}
@@ -492,7 +483,6 @@ global void AiAttackWithForce(int force)
 	AiPlayer->Force[force].Attacking = 0;
 	if ((aiunit = AiPlayer->Force[force].Units)) {
 		AiPlayer->Force[force].Attacking = 1;
-		DebugLevel3Fn("FORCE %d started (AiAttackWithForce)\n" _C_ force);
 
 		enemy = NoUnitP;
 		while (aiunit && !enemy) {
@@ -503,10 +493,10 @@ global void AiAttackWithForce(int force)
 		}
 
 		if (!enemy) {
-			DebugLevel0Fn("Need to plan an attack with transporter\n");
+			DebugPrint("Need to plan an attack with transporter\n");
 			if (!AiPlayer->Force[force].State &&
 					!AiPlanAttack(&AiPlayer->Force[force])) {
-				DebugLevel0Fn("Can't transport, look for walls\n");
+				DebugPrint("Can't transport, look for walls\n");
 				if (!AiFindWall(&AiPlayer->Force[force])) {
 					AiPlayer->Force[force].Attacking = 0;
 				}
@@ -551,16 +541,10 @@ local void AiForceAttacks(AiForce* force)
 		}
 		// Must mark the attack as terminated
 		if (!aiunit) {
-			DebugLevel3Fn("FORCE stopped ( AiForceAttacks, unitactionstill )\n");
-			DebugLevel3Fn("force target was %d %d\n" _C_ force->GoalX _C_ force->GoalY);
-			DebugLevel3Fn("unit pos was %d %d\n" _C_ force->Units->Unit->X _C_ force->
-			Units->Unit->Y);
-
 			force->Attacking = 0;
 			// AiAttackWithForce(force-AiPlayer->Force);
 		}
 	} else {
-		DebugLevel3Fn("FORCE stopped ( AiAttackWithForce, no unit )\n");
 		force->Attacking = 0;
 	}
 }
@@ -594,7 +578,7 @@ global void AiForceManager(void)
 				aiunit = aiunit->Next;
 			}
 			if (!aiunit) {		// No enemies go home.
-				DebugLevel0Fn("FIXME: not written, should send force home\n");
+				DebugPrint("FIXME: not written, should send force home\n");
 				AiPlayer->Force[force].Defending = 0;
 				AiPlayer->Force[force].Attacking = 0;
 			}

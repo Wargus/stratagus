@@ -232,7 +232,7 @@ local int CclLoad(lua_State* l)
 	}
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
-		DebugLevel0Fn("Load failed: %s" _C_ LuaToString(l, 1));
+		DebugPrint("Load failed: %s" _C_ LuaToString(l, 1));
 	}
 	return 0;
 }
@@ -261,7 +261,7 @@ local int CclSaveGame(lua_State* l)
 			if (!strcasestr(LuaToString(l, -1), ".pud")) {
 				LibraryFileName(LuaToString(l, -1), buf);
 				if (LuaLoadFile(buf) == -1) {
-					DebugLevel0Fn("Load failed: %s" _C_ value);
+					DebugPrint("Load failed: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "SyncHash")) {
@@ -320,12 +320,12 @@ global int LuaToBoolean(lua_State* l, int narg)
 */
 global void CclGarbageCollect(int fast)
 {
-	DebugLevel0Fn("Garbage collect (before): %d/%d\n" _C_
+	DebugPrint("Garbage collect (before): %d/%d\n" _C_
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 
 	lua_setgcthreshold(Lua, 0);
 
-	DebugLevel0Fn("Garbage collect (after): %d/%d\n" _C_
+	DebugPrint("Garbage collect (after): %d/%d\n" _C_
 		lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
 }
 
@@ -944,10 +944,10 @@ local int CclGetCompileFeature(lua_State* l)
 
 	str = LuaToString(l, 1);
 	if (strstr(CompileOptions, str)) {
-		DebugLevel0Fn("I have %s\n" _C_ str);
+		DebugPrint("I have %s\n" _C_ str);
 		lua_pushboolean(l, 1);
 	} else {
-		DebugLevel0Fn("I don't have %s\n" _C_ str);
+		DebugPrint("I don't have %s\n" _C_ str);
 		lua_pushboolean(l, 0);
 	}
 

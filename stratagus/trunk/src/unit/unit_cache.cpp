@@ -58,7 +58,6 @@ global void UnitCacheInsert(Unit* unit)
 	MapField* mf;
 	UnitListItem* listitem;
 
-	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
@@ -89,7 +88,6 @@ global void UnitCacheRemove(Unit* unit)
 	MapField* mf;
 	UnitListItem* listitem;
 
-	DebugLevel3Fn("%d,%d %d %s\n" _C_ unit->X _C_ unit->Y _C_ unit->Slot _C_ unit->Type->Name);
 	for (i = 0; i < unit->Type->TileHeight; ++i) {
 		for (j = 0; j < unit->Type->TileWidth; ++j) {
 			mf = TheMap.Fields + (i + unit->Y) * TheMap.Width + j + unit->X;
@@ -102,7 +100,7 @@ global void UnitCacheRemove(Unit* unit)
 				listitem->Prev->Next = listitem->Next;
 			} else {
 				if (mf->UnitCache != listitem) {
-					DebugLevel0Fn("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
+					DebugPrint("Try to remove unit not in cache. (%d)\n" _C_ unit->Slot);
 				} else {
 					// item is head of the list.
 					mf->UnitCache = listitem->Next;
@@ -165,7 +163,6 @@ global int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table)
 	if (y2 > TheMap.Height) {
 		y2 = TheMap.Height;
 	}
-	DebugLevel3Fn("%d,%d %d,%d\n" _C_ x1 _C_ y1 _C_ x2 _C_ y2);
 
 	n = 0;
 	for (i = y1; i < y2; ++i) {

@@ -85,12 +85,6 @@ global int UnitShowAnimation(Unit* unit, const Animation* animation)
 		UnitUpdateHeading(unit);	// FIXME: remove this!!
 	}
 
-	DebugLevel3Fn("State %2d " _C_ state);
-	DebugLevel3("Flags %2d Pixel %2d Frame %2d Wait %3d " _C_
-		animation[state].Flags _C_ animation[state].Pixel _C_
-		animation[state].Frame _C_ animation[state].Sleep);
-	DebugLevel3("Heading %d +%d,%d\n" _C_ unit->Direction _C_ unit->IX _C_ unit->IY);
-
 	if (unit->Frame < 0) {
 		unit->Frame -= animation[state].Frame;
 	} else {
@@ -130,8 +124,8 @@ global int UnitShowAnimation(Unit* unit, const Animation* animation)
 */
 local void HandleActionNone(Unit* unit __attribute__((unused)))
 {
-	DebugLevel1Fn("FIXME: Should not happen!\n");
-	DebugLevel1Fn("FIXME: Unit (%d) %s has action none.!\n" _C_
+	DebugPrint("FIXME: Should not happen!\n");
+	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
 		UnitNumber(unit) _C_ unit->Type->Ident);
 }
 
@@ -142,8 +136,8 @@ local void HandleActionNone(Unit* unit __attribute__((unused)))
 */
 local void HandleActionNotWritten(Unit* unit __attribute__((unused)))
 {
-	DebugLevel1Fn("FIXME: Not written!\n");
-	DebugLevel1Fn("FIXME: Unit (%d) %s has action %d.!\n" _C_
+	DebugPrint("FIXME: Not written!\n");
+	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_
 		UnitNumber(unit) _C_ unit->Type->Ident _C_ unit->Orders[0].Action);
 }
 
@@ -317,7 +311,7 @@ local void HandleBuffs(Unit* unit, int amount)
 	// Look if the time to live is over.
 	//
 	if (unit->TTL && unit->TTL < (GameCycle - unit->HP)) {
-		DebugLevel0Fn("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
+		DebugPrint("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
 		//
 		// Hit unit does some funky stuff...
 		//
@@ -390,7 +384,7 @@ local void HandleUnitAction(Unit* unit)
 				(unit->Orders[0].Action == UnitActionStill || unit->OrderFlush)) {
 
 			if (unit->Removed) {	// FIXME: johns I see this as an error
-				DebugLevel0Fn("Flushing removed unit\n");
+				DebugPrint("Flushing removed unit\n");
 				// This happens, if building with ALT+SHIFT.
 				return;
 			}

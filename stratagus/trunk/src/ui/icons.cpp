@@ -123,7 +123,7 @@ local void AddIcon(const char* ident, const char* tileset,
 	}
 	ptr = (IconFile**)hash_find(IconHash, str);
 	if (ptr && *ptr) {
-		DebugLevel0Fn("FIXME: Icon already defined `%s,%s'\n" _C_
+		DebugPrint("FIXME: Icon already defined `%s,%s'\n" _C_
 			ident _C_ tileset);
 		// This is more a config error
 		free(str);
@@ -209,7 +209,7 @@ global void LoadIcons(void)
 			}
 			icon->Sprite = icon->File->Sprite;
 			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
-				DebugLevel0Fn("Invalid icon index: %s - %d\n" _C_
+				DebugPrint("Invalid icon index: %s - %d\n" _C_
 					icon->Ident _C_ icon->Index);
 				icon->Index = 0;
 			}
@@ -318,7 +318,7 @@ global Icon* IconByIdent(const char* ident)
 		return *icon;
 	}
 
-	DebugLevel0Fn("Icon %s not found\n" _C_ ident);
+	DebugPrint("Icon %s not found\n" _C_ ident);
 	return NoIcon;
 }
 

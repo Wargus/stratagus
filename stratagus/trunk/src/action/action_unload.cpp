@@ -232,7 +232,7 @@ local int ClosestFreeCoast(int x, int y, int* resx, int* resy)
 		}
 		++addy;
 	}
-	DebugLevel0Fn("Try clicking closer to an actual coast.\n");
+	DebugPrint("Try clicking closer to an actual coast.\n");
 	return 0;
 }
 
@@ -300,11 +300,8 @@ local int ClosestFreeDropZone(Unit* transporter, int x, int y, int* resx, int* r
 */
 local int MoveToDropZone(Unit* unit)
 {
-	DebugLevel3Fn("%p\n" _C_ unit->Orders[0].Goal);
-
 	switch (DoActionMove(unit)) {		// reached end-point?
 		case PF_UNREACHABLE:
-			DebugLevel2Fn("CAN'T REACH DROPZONE\n");
 			return -1;
 		case PF_REACHED:
 			break;
@@ -333,11 +330,10 @@ local void LeaveTransporter(Unit* unit)
 	// Goal is the specific unit unit that you want to unload.
 	// This can be NULL, in case you want to unload everything.
 	//
-	DebugLevel3Fn("Goal %p\n" _C_ goal);
 	if (goal) {
 		unit->Orders[0].Goal = NoUnitP;
 		if (goal->Destroyed) {
-			DebugLevel0Fn("destroyed unit unloading?\n");
+			DebugPrint("destroyed unit unloading?\n");
 			RefsDecrease(goal);
 			return;
 		}
@@ -395,9 +391,6 @@ global void HandleActionUnload(Unit* unit)
 	int i;
 	int x;
 	int y;
-
-	DebugLevel3Fn("%p(%d) SubAction %d\n" _C_
-		unit _C_ UnitNumber(unit) _C_ unit->SubAction);
 
 	switch (unit->SubAction) {
 		//

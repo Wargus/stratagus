@@ -2767,10 +2767,10 @@ local void CampaignGameMenu(void)
 	Invalidate();
 
 	menu = FindMenu("menu-campaign-select");
-	DebugLevel0Fn("%d campaigns available\n" _C_ NumCampaigns);
+	DebugPrint("%d campaigns available\n" _C_ NumCampaigns);
 #ifdef DEBUG
 	for (i = 0; i < NumCampaigns; ++i) {
-		DebugLevel0Fn("Campaign %d: %16.16s: %s\n" _C_ i _C_
+		DebugPrint("Campaign %d: %16.16s: %s\n" _C_ i _C_
 			Campaigns[i].Ident _C_
 			Campaigns[i].Name);
 	}
@@ -3086,7 +3086,7 @@ local void TerminateNetConnect(void)
 			break;
 	}
 
-	DebugLevel1Fn("NetLocalState %d\n" _C_ NetLocalState);
+	DebugPrint("NetLocalState %d\n" _C_ NetLocalState);
 	NetConnectRunning = 2;
 	GuiGameStarted = 0;
 	ProcessMenu("menu-net-multi-client", 1);
@@ -3185,7 +3185,7 @@ local void MultiPlayerGameMenu(void)
 	ProcessMenu("menu-multi-net-type-menu", 1);
 
 
-	DebugLevel0Fn("GuiGameStarted: %d\n" _C_ GuiGameStarted);
+	DebugPrint("GuiGameStarted: %d\n" _C_ GuiGameStarted);
 	if (GuiGameStarted) {
 		GameMenuReturn();
 	}
@@ -3246,7 +3246,7 @@ local void ScenSelectInit(Menuitem *mi)
 	mi->menu->Items[9].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[9].d.button.text = ScenSelectDisplayPath;
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
@@ -3360,7 +3360,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 			if (curopt == 0) {
 				// info = GetCmInfo(pathbuf);
 				info = NULL;
-				DebugLevel3Fn("GetCmInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 				fl->type = 1;
 				fl->name = strdup(np);
 				fl->xdata = info;
@@ -3368,7 +3367,6 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 			} else if (curopt == 1) {
 				info = GetPudInfo(pathbuf);
 				if (info) {
-					DebugLevel3Fn("GetPudInfo(%s) : %p\n" _C_ pathbuf _C_ info);
 					sz = szl[menu->Items[8].d.pulldown.curopt];
 					if (sz < 0 || (info->MapWidth == sz && info->MapHeight == sz)) {
 						fl->type = 1;
@@ -3758,7 +3756,7 @@ local void ScenSelectCancel(void)
 	//
 	//  Use last selected map.
 	//
-	DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
 	strcpy(ScenSelectPath, StratagusLibPath);
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
@@ -3775,7 +3773,7 @@ local void ScenSelectCancel(void)
 		*ScenSelectDisplayPath = '\0';
 	}
 
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 */
 	CurrentMenu->Items[9].d.button.text = NULL;
 
@@ -3844,7 +3842,7 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 		strcpy(CurrentMapPath, DefaultMap);
 	}
 
-	DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
 	strcpy(ScenSelectPath, StratagusLibPath);
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
@@ -3860,7 +3858,7 @@ local void GameSetupInit(Menuitem *mi __attribute__ ((unused)))
 	} else {
 		*ScenSelectDisplayPath = '\0';
 	}
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
 	GetInfoFromSelectPath();
 
@@ -4025,7 +4023,7 @@ local void CustomGameOPSAction(Menuitem *mi __attribute__((unused)), int i)
 local void MultiGameFWSAction(Menuitem *mi, int i)
 {
 	if (!mi || mi->d.pulldown.curopt == i) {
-		DebugLevel0Fn("Update fow %d\n" _C_ i);
+		DebugPrint("Update fow %d\n" _C_ i);
 		switch (i) {
 			case 0:
 				TheMap.NoFogOfWar = 0;
@@ -4120,7 +4118,7 @@ local void NetworkGamePrepareGameSettings(void)
 
 	Assert(MenuMapInfo);
 
-	DebugLevel0Fn("NetPlayers = %d\n" _C_ NetPlayers);
+	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
 
 	GameSettings.NetGameType=SettingsMultiPlayerGame;
 
@@ -4141,7 +4139,6 @@ local void NetworkGamePrepareGameSettings(void)
 	// Make a list of the available player slots.
 	for (c = h = i = 0; i < PlayerMax; i++) {
 		if (MenuMapInfo->PlayerType[i] == PlayerPerson) {
-			DebugLevel3Fn("Player slot %i is available for a person\n" _C_ i);
 			num[h++] = i;
 		}
 		if (MenuMapInfo->PlayerType[i] == PlayerComputer) {
@@ -4152,7 +4149,6 @@ local void NetworkGamePrepareGameSettings(void)
 		switch(ServerSetupState.CompOpt[num[i]]) {
 			case 0:
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				DebugLevel3Fn("Settings[%d].Type == Person\n" _C_ num[i]);
 				for (n = 0, v = 0; n < PlayerRaces.Count; ++n) {
 					if (PlayerRaces.Visible[n]) {
 						++v;
@@ -4173,11 +4169,9 @@ local void NetworkGamePrepareGameSettings(void)
 				break;
 			case 1:
 				GameSettings.Presets[num[i]].Type = PlayerComputer;
-				DebugLevel3Fn("Settings[%d].Type == Computer\n" _C_ num[i]);
 				break;
 			case 2:
 				GameSettings.Presets[num[i]].Type = PlayerNobody;
-				DebugLevel3Fn("Settings[%d].Type == Closed\n" _C_ num[i]);
 			default:
 				break;
 		}
@@ -4185,7 +4179,7 @@ local void NetworkGamePrepareGameSettings(void)
 	for (i = 0; i < c; i++) {
 		if (ServerSetupState.CompOpt[comp[i]] == 2) {		// closed..
 			GameSettings.Presets[comp[i]].Type = PlayerNobody;
-			DebugLevel0Fn("Settings[%d].Type == Closed\n" _C_ comp[i]);
+			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
 		}
 	}
 
@@ -4218,8 +4212,6 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	//		FIXME: What this has to do:
 	//		Use lag gem as KICK button
 	//  Notify clients about MAP change: (initial = 1...)
-
-	DebugLevel3Fn("initial = %d\n" _C_ initial);
 
 	//		Calculate available slots from pudinfo
 	for (c = h = i = 0; i < PlayerMax; i++) {
@@ -4320,7 +4312,7 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
 	//		Tell connect state machines how many interactive players we can have
 	NetPlayers = avail;
 	//		Check if all players are ready.
-	DebugLevel0Fn("READY to START: AVAIL = %d, READY = %d\n" _C_ avail
+	DebugPrint("READY to START: AVAIL = %d, READY = %d\n" _C_ avail
 			_C_ ready);
 
 	// Disable the select scenario after players have joined.
@@ -4378,8 +4370,6 @@ local void MultiClientUpdate(int initial)
 		memset(&LocalSetupState, 0, sizeof(ServerSetup));
 	}
 	for (i = 1; i < PlayerMax - 1; i++) {
-		DebugLevel3Fn("%d: %d %d\n" _C_ i _C_ Hosts[i].PlyNr
-				_C_ NetLocalHostsSlot);
 		//
 		//		Johns: This works only if initial. Hosts[i].PlyNr is later lost.
 		//
@@ -4465,7 +4455,6 @@ local void MultiGameSetupInit(Menuitem *mi)
 		ServerSetupState.CompOpt[i] = 1;
 	}
 	MultiGamePlayerSelectorsUpdate(1);
-	DebugLevel3Fn("h = %d, NetPlayers = %d\n" _C_ h _C_ NetPlayers);
 
 	if (MetaServerInUse) {
 		ChangeGameServer();
@@ -4558,7 +4547,6 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
 
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
-	DebugLevel3Fn("Hosts[%d].PlyName = %s\n" _C_ i _C_ Hosts[i].PlyName);
 	VideoDrawText(TheUI.Offset640X + mi->xofs, TheUI.Offset480Y + mi->yofs, GameFont, Hosts[i].PlyName);
 
 	SetDefaultTextColors(nc, rc);
@@ -4613,7 +4601,6 @@ local void MultiClientGemAction(Menuitem *mi)
 	int i;
 
 	i = mi - mi->menu->Items - CLIENT_PLAYER_READY + 1;
-	DebugLevel3Fn("i = %d, NetLocalHostsSlot = %d\n" _C_ i _C_ NetLocalHostsSlot);
 	if (i == NetLocalHostsSlot) {
 		LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
 		if (LocalSetupState.Ready[i]) {
@@ -4755,7 +4742,7 @@ global void NetClientUpdateState(void)
 		ServerSetupState.GaTOpt;
 
 	MultiClientUpdate(0);
-	DebugLevel1Fn("MultiClientMenuRedraw\n");
+	DebugPrint("MultiClientMenuRedraw\n");
 }
 
 /**
@@ -4997,7 +4984,7 @@ local void EditorMainLoadInit(Menuitem *mi)
 	mi->menu->Items[5].flags =
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
@@ -5194,7 +5181,7 @@ local void EditorMainLoadCancel(void)
 	//
 	//  Use last selected map.
 	//
-	DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
 	strcpy(ScenSelectPath, StratagusLibPath);
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
@@ -5211,7 +5198,7 @@ local void EditorMainLoadCancel(void)
 		*ScenSelectDisplayPath = '\0';
 	}
 
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
 	CurrentMenu->Items[5].d.button.text = NULL;
 
@@ -5460,7 +5447,7 @@ local void EditorLoadCancel(void)
 	//
 	//  Use last selected map.
 	//
-	DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
 	strcpy(ScenSelectPath, StratagusLibPath);
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
@@ -5477,7 +5464,7 @@ local void EditorLoadCancel(void)
 		*ScenSelectDisplayPath = '\0';
 	}
 
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
 	CurrentMenu->Items[5].d.button.text = NULL;
 
@@ -5622,7 +5609,7 @@ local int PlayerAiFcToMenu(int num)
 	} else if (num == PlayerAiAir) {
 		return 3;
 	}
-	DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
+	DebugPrint("Invalid Ai number: %d\n" _C_ num);
 	return -1;
 }
 
@@ -5642,7 +5629,7 @@ local int PlayerAiMenuToFc(int num)
 	} else if (num == 3) {
 		return PlayerAiAir;
 	}
-	DebugLevel0Fn("Invalid Ai number: %d\n" _C_ num);
+	DebugPrint("Invalid Ai number: %d\n" _C_ num);
 	return -1;
 }
 
@@ -6313,7 +6300,7 @@ local void ReplayGameInit(Menuitem *mi)
 		*ScenSelectDisplayPath ? 0 : MenuButtonDisabled;
 	mi->menu->Items[5].d.button.text = ScenSelectDisplayPath;
 	mi->menu->Items[6].d.gem.state = MI_GSTATE_UNCHECKED;
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 }
 
 /**
@@ -6655,7 +6642,7 @@ local void ReplayGameCancel(void)
 	//
 	//  Use last selected map.
 	//
-	DebugLevel0Fn("Map   path: %s\n" _C_ CurrentMapPath);
+	DebugPrint("Map   path: %s\n" _C_ CurrentMapPath);
 	strcpy(ScenSelectPath, StratagusLibPath);
 	if (*ScenSelectPath) {
 		strcat(ScenSelectPath, "/");
@@ -6672,7 +6659,7 @@ local void ReplayGameCancel(void)
 		*ScenSelectDisplayPath = '\0';
 	}
 
-	DebugLevel0Fn("Start path: %s\n" _C_ ScenSelectPath);
+	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
 	CurrentMenu->Items[5].d.button.text = NULL;
 

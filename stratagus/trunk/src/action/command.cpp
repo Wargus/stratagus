@@ -296,7 +296,7 @@ global void CommandMove(Unit* unit, int x, int y, int flush)
 
 #ifdef DEBUG
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugLevel0Fn("Internal movement error\n");
+		DebugPrint("Internal movement error\n");
 		return;
 	}
 #endif
@@ -396,7 +396,7 @@ global void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 
 #ifdef DEBUG
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugLevel0Fn("Internal movement error\n");
+		DebugPrint("Internal movement error\n");
 		return;
 	}
 #endif
@@ -467,7 +467,7 @@ global void CommandAttackGround(Unit* unit, int x, int y, int flush)
 
 #ifdef DEBUG
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugLevel0Fn("Internal movement error\n");
+		DebugPrint("Internal movement error\n");
 		return;
 	}
 #endif
@@ -493,7 +493,7 @@ global void CommandAttackGround(Unit* unit, int x, int y, int flush)
 		order->Type = NULL;
 		order->Arg1 = NULL;
 
-		DebugLevel0("FIXME this next\n");
+		DebugPrint("FIXME this next\n");
 	}
 	ClearSavedAction(unit);
 }
@@ -514,7 +514,7 @@ global void CommandPatrolUnit(Unit* unit, int x, int y, int flush)
 
 #ifdef DEBUG
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugLevel0Fn("Internal movement error\n");
+		DebugPrint("Internal movement error\n");
 		return;
 	}
 #endif
@@ -716,7 +716,7 @@ global void CommandDismiss(Unit* unit)
 	if (unit->Orders[0].Action == UnitActionBuilded) {
 		unit->Data.Builded.Cancel = 1;
 	} else {
-		DebugLevel0("Suicide unit ... \n");
+		DebugPrint("Suicide unit ... \n");
 		LetUnitDie(unit);
 	}
 	ClearSavedAction(unit);
@@ -751,24 +751,22 @@ global void CommandResourceLoc(Unit* unit, int x, int y, int flush)
 		order->Action = UnitActionResource;
 
 		//  Find the closest piece of wood next to a tile where the unit can move
-		DebugLevel3("Want to harvest from %d,%d.\n" _C_ x _C_ y);
 		if (!FindTerrainType(0, (unit->Type->MovementMask), 1, 20,
 				unit->Player, x, y, &nx, &ny)) {
-			DebugLevel0Fn("FIXME: Give up???\n");
+			DebugPrint("FIXME: Give up???\n");
 		}
+
 		// Max Value > 1
 		if ((abs(nx - x) | abs(ny - y)) > 1) {
-			DebugLevel3("Closest tile reachable is at %d,%d.\n" _C_ x _C_ y);
 			if (!FindTerrainType(0, MapFieldForest, 0, 20, unit->Player,
 					nx, ny, &nx, &ny)) {
-				DebugLevel0Fn("FIXME: Give up???\n");
+				DebugPrint("FIXME: Give up???\n");
 			}
 		} else {
 			// The destination is next to a reacahble tile.
 			nx = x;
 			ny = y;
 		}
-		DebugLevel3("So the final destination is %d,%d.\n" _C_ nx _C_ ny);
 		order->X = nx;
 		order->Y = ny;
 
@@ -897,7 +895,7 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 		//
 		if (unit->Orders[0].Action != UnitActionTrain) {
 			if (unit->OrderCount == 2 && unit->Orders[1].Action == UnitActionTrain) {
-				DebugLevel0Fn("FIXME: not supported. Unit queue full!\n");
+				DebugPrint("FIXME: not supported. Unit queue full!\n");
 				return;
 			} else {
 				ReleaseOrders(unit);
@@ -915,7 +913,7 @@ global void CommandTrainUnit(Unit* unit, UnitType* type,
 			// Training slots are all already full. (NETWORK!)
 			//
 			if (!EnableTrainingQueue || unit->Data.Train.Count >= MAX_UNIT_TRAIN) {
-				DebugLevel0Fn("Unit queue full!\n");
+				DebugPrint("Unit queue full!\n");
 				return;
 			}
 
@@ -939,7 +937,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	int i;
 	int n;
 
-	DebugLevel0Fn("Cancel %d type: %s\n" _C_ slot _C_
+	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
 		type ? type->Ident : "-any-");
 
 	ClearSavedAction(unit);
@@ -961,7 +959,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 			return;
 		}
 
-		DebugLevel0Fn("Cancel training\n");
+		DebugPrint	("Cancel training\n");
 
 		PlayerAddCostsFactor(unit->Player,
 			unit->Data.Train.What[slot]->Stats[unit->Player->Player].Costs,
@@ -978,7 +976,7 @@ global void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 			}
 			unit->Data.Train.Count = n;
 		} else {
-			DebugLevel0Fn("Last slot\n");
+			DebugPrint("Last slot\n");
 			unit->Orders[0].Action = UnitActionStill;
 			unit->SubAction = 0;
 			unit->Wait = unit->Reset = 1;
@@ -1016,7 +1014,7 @@ global void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 		}
 
 		if (!flush) {
-			DebugLevel0Fn("FIXME: must support order queing!!");
+			DebugPrint("FIXME: must support order queing!!");
 		}
 		if (!(order = GetNextOrder(unit, flush))) {
 			return;
@@ -1095,7 +1093,7 @@ global void CommandResearch(Unit* unit, Upgrade* what, int flush)
 		}
 
 		if (!flush) {
-			DebugLevel0Fn("FIXME: must support order queing!!");
+			DebugPrint("FIXME: must support order queing!!");
 		} else {
 			if (unit->Orders[0].Action == UnitActionResearch) {
 				const Upgrade* upgrade;
@@ -1184,12 +1182,12 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 
 #ifdef DEBUG
 	if (x < 0 || y < 0 || x >= TheMap.Width || y >= TheMap.Height) {
-		DebugLevel0("Internal movement error\n");
+		DebugPrint("Internal movement error\n");
 		return;
 	}
 #endif
 
-	DebugLevel0Fn(": %d casts %s at %d %d on %d\n" _C_
+	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 		UnitNumber(unit) _C_ spell->Ident _C_ x _C_ y _C_ dest ? UnitNumber(dest) : 0);
 	Assert(unit->Type->CanCastSpell[spell->Slot]);
 
@@ -1244,9 +1242,6 @@ global void CommandSpellCast(Unit* unit, int x, int y, Unit* dest,
 */
 global void CommandAutoSpellCast(Unit* unit, int spellid, int on)
 {
-	DebugLevel3Fn(": %d auto-spell-casts %s\n" _C_
-		UnitNumber(unit) _C_ spell->Ident);
-
 	//
 	// Check if unit is still valid? (NETWORK!)
 	//

@@ -112,8 +112,7 @@ typedef struct _missile_type_ MissileType;
 	/**
 	**  This simulates vararg macros.
 	**  Example:
-	**    DebugLevel0("Test %d\n" _C_ 1);
-	**    DebugLevel0("Test %d %d\n" _C_ 1 _C_ 2);
+	**    DebugPrint("Test %d %d\n" _C_ 1 _C_ 2);
 	*/
 #define _C_  ,    ///< Debug , to simulate vararg macros
 
@@ -132,67 +131,17 @@ typedef struct _missile_type_ MissileType;
 	abort(); }} while (0)
 
 	/**
-	**  Print debug information of level 0.
+	**  Print debug information with function name.
 	*/
-#define DebugLevel0(args) \
-	do { fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 1.
-	*/
-#define DebugLevel1(args)\
-	do { fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 2.
-	*/
-#define DebugLevel2(args)\
-	do { fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 3. (normal = disable)
-	*/
-#define DebugLevel3(args) \
-	/* TURNED OFF: do { fprintf(stdout, args); } while (0) */
-
-	/**
-	**  Print debug information of level 0 with function name.
-	*/
-#define DebugLevel0Fn(args) \
+#define DebugPrint(args) \
 	do { PrintFunction(); fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 1 with function name.
-	*/
-#define DebugLevel1Fn(args) \
-	do { PrintFunction(); fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 2 with function name.
-	*/
-#define DebugLevel2Fn(args) \
-	do { PrintFunction(); fprintf(stdout, args); } while (0)
-
-	/**
-	**  Print debug information of level 3 with function name.
-	*/
-#define DebugLevel3Fn(args) \
-	/* TURNED OFF: do { fprintf(stdout, __FUNCTION__ ": " args); } while (0) */
 
 #else  // }{ DEBUG
 
-#define Assert(cond)         /* disabled */
+#define Assert(cond)        /* disabled */
+#define DebugPrint(args)    /* disabled */
 
-#define DebugLevel0(args)    /* disabled */
-#define DebugLevel1(args)    /* disabled */
-#define DebugLevel2(args)    /* disabled */
-#define DebugLevel3(args)    /* disabled */
-#define DebugLevel0Fn(args)  /* disabled */
-#define DebugLevel1Fn(args)  /* disabled */
-#define DebugLevel2Fn(args)  /* disabled */
-#define DebugLevel3Fn(args)  /* disabled */
-
-#endif  // } !DEBUG
+#endif
 
 #ifdef REFS_DEBUG  // {
 
