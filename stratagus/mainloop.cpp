@@ -246,6 +246,7 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 	default:
 	    return;			// skip marking map
     }
+    HandleMouseMove(CursorX, CursorY);
     MarkDrawEntireMap();
     MustRedraw |= RedrawMinimap | RedrawCursors;
 }
