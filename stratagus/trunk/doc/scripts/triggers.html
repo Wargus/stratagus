@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith, François Beerten
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 			  T H E   W A R   B E G I N S
 	   Stratagus - A free fantasy real time strategy game engine
 </pre>
-<p><b>(C) Copyright 2002-2004 by The Stratagus Project. Distributed under the
+<p><b>(C) Copyright 2002-2005 by The Stratagus Project. Distributed under the
 <a href="../gpl.html">"GNU General Public License"</a></b>
 <hr>
 <a href="../index.html">Stratagus</a> 
@@ -56,7 +56,7 @@
 <a href="#GetNumOpponents">GetNumOpponents</a>
 <a href="#IfRescuedNearUnit">IfRescuedNearUnit</a>
 <a href="#GetTimer">GetTimer</a>
-<a href="#IfUnitAt">IfUnitAt</a>
+<a href="#GetNumUnitsAt">GetNumUnitsAt</a>
 <hr>
 <h2>Intro - Introduction to trigger functions and variables</h2>
 
@@ -405,29 +405,17 @@ Return the number of cycles the timer ran.
 time = GetTimer() == 17
 </pre>
 
-<a name="IfUnitAt"></a>
-<h3>IfUnitAt(player, op, quantity, unit-type, {x1, y1}, {x2, y2})</h3>
+<a name="GetNumUnitsAt"></a>
+<h3>GetNumUnitsAt(player, unit-type, {x1, y1}, {x2, y2})</h3>
  
-Return true if number of unit of type unit-type which are in the rectangle defined with (x1, y1, x2, y2)
-of the player "op" quantity is true.
+Return the number of units of type unit-type which are in the rectangle defined with (x1, y1, x2, y2)
+of the player.
 
 <dl>
   <dt>player</dt>
   <dd><pre>
 0 .. 16     Player number
-"any"       Matches any player
-"this"      Player on the local computer, Human player in the campaign.
 </pre></dd>
-  <dt>op</dt>
-  <dd><pre>
-"=="         operator equal
-"&gt;"          operator greater than
-"&gt;="         operator greater than or equal
-"&lt;"          operator less than
-"&lt;="         operator less than or equal
-</pre></dd>
-  <dt>quantity</dt>
-  <dd>Number to compare with number of units</dd>
   <dt>unit</dt>
   <dd><pre>
 unit-name    Unit type of this name
@@ -446,7 +434,7 @@ unit-name    Unit type of this name
 <pre>
 -- True when the player on the console has at least 8 archers in the rectangle
 -- (10 10) to (12 14).
-IfUnitAt("this", "'&gt;=", 8, "unit-archer", {10, 10}, {12, 14})
+GetNumUnitsAt(GetThisPlayer(), "unit-archer", {10, 10}, {12, 14}) >= 8
 </pre>
 
 <hr>
