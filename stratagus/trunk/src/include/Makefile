@@ -42,8 +42,8 @@ HDRS	= actions.h ai.h ccl.h freecraft.h construct.h cursor.h font.h icons.h \
 	  pud.h tileset.h unit.h unittype.h upgrade.h upgrade_structs.h \
 	  ccl_sound.h sound.h sound_id.h unitsound.h wav.h sound_server.h \
 	  deco.h video.h network.h commands.h ui.h menus.h spells.h \
-	  siod.h siodp.h iolib.h depend.h settings.h myendian.h net_lowlevel.h \
-	  netconnect.h rdtsc.h campaign.h trigger.h libcda.h \
+	  siod.h siodp.h iolib.h iocompat.h depend.h settings.h myendian.h \
+	  net_lowlevel.h netconnect.h rdtsc.h campaign.h trigger.h libcda.h \
 	  etlib/generic.h etlib/xmalloc.h etlib/hash.h etlib/dllist.h \
 	  editor.h
 
