@@ -53,6 +53,7 @@
 #include "trigger.h"
 #include "campaign.h"
 #include "sound_server.h"
+#include "settings.h"
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 #include "sound_server.h"
