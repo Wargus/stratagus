@@ -2170,10 +2170,6 @@ global void ProcessMenu(const char *menu_id, int loop)
 	    }
 	}
     } else {
-	VideoLockScreen();
-	DrawMenu(CurrentMenu);
-	MustRedraw &= ~RedrawMenu;
-	VideoUnlockScreen();
 	InvalidateAreaAndCheckCursor(MenuRedrawX,MenuRedrawY,MenuRedrawW,MenuRedrawH);
     }
 
