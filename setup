@@ -1,5 +1,7 @@
 #!/bin/sh
+
 RULESFILE=Rules.make
+BEOS_CONFIGFILE=/boot/home/config/settings/FreeCraft/FreeCraft.cfg
 
 cat << .. > $RULESFILE
 ##   ___________		     _________		      _____  __
@@ -35,8 +37,10 @@ MAKE=make
 #------------------------------------------------------------------------------
 # DON'T CHANGE ANYTHING FROM HERE DOWN UNLESS YOU KNOW WHAT YOU ARE DOING
 
-VERSION="-DVERSION=\"1.17pre1-build8\""
-WIN32=-1
+VERSION="-DVERSION=\"1.17pre1-build9\""
+UNIX=0
+BEOS=0
+WIN32=0
 
 # Choose optimization level
 #DEBUG_CFLAGS="-g -O0 \$(PROFILE) -pipe -Wall -Werror \$(IFLAGS) \$(DFLAGS)"
@@ -69,12 +73,13 @@ while test $# != 0 ; do
   case $1 in
     "-?"|"--help")
       echo
-      echo "usage: setup [--static] [--nowin32] [--win32] [--debug] [--profile]"
+      echo "usage: setup [--static] [--unix] [--beos] [--win32] [--debug] [--profile]"
       echo
       echo "Setup will create a Rules.make file that Freecraft needs to compile."
       echo "Supported command-line arguments (you may use more than one at a time):"
       echo "  static  : Compile Freecraft using static libraries (default dynamic)"
-      echo "  nowin32 : Force NOT to use WIN32 compile options (default auto check)"
+      echo "  unix    : Force Unix/Linux compile options (default auto check)"
+      echo "  beos    : Force BeOS compile options (default auto check)"
       echo "  win32   : Force WIN32 compile options (default auto check)"
       echo "  debug   : Compile with debug options (default no)"
       echo "  profile : Compile with profile support (default off)"
@@ -86,14 +91,24 @@ while test $# != 0 ; do
       STATIC=-static
       ;;
       
-    "--nowin32")
+    "--unix")
+      UNIX=1
+      BEOS=0
       WIN32=0
       ;;
-      
+
+    "--beos")
+      UNIX=0
+      BEOS=1
+      WIN32=0
+      ;;
+
     "--win32")
+      UNIX=0
+      BEOS=0
       WIN32=1
       ;;
-       
+
     "--profile")
       PROFILE=-pg
       ;;
@@ -120,23 +135,49 @@ echo >> $RULESFILE
 echo; echo
 
 #------------------------------------------------------------------------------
-# Determine if this is for WIN32
+# Determine if this is for UNIX, BEOS, or WIN32
 
-if test "$WIN32" = -1 ; then
-  if test "`uname | grep -is cygwin` x" != " x" ; then
+if [ "$UNIX" != "1" ] ; then
+  if [ "$BEOS" != "1" ] ; then
+    if [ "$WIN32" != "1" ] ; then
+
+if [ "$WIN32" = "0" ] ; then
+  if [ "`uname | grep -is cygwin` x" != " x" ] ; then
+    UNIX=0
+    BEOS=0
     WIN32=1
     echo "It appears that you are in a Cygwin/win32 environment..."
-    echo "Use --nowin32 to override"
-  else
-    WIN32=0
-    echo "You appear to be in a Linux/*nix environment..."
-    echo "Use --win32 to force a Cygwin environment"
+    echo "Use --unix or --beos to override"
   fi
-  echo
 fi
 
-#------------------------------------------------------------------------------
-# Write the compile commands first
+if [ "$BEOS" = "0" ] ; then
+  if [ "`uname -a | grep -is beos` x" != " x" ] ; then
+    UNIX=0
+    BEOS=1
+    WIN32=0
+    echo "It appears that you are in a BeOS environment..."
+    echo "Use --unix or --win32 to override"
+  fi
+fi
+
+if [ "$UNIX" = "0" ] ; then
+  if [ "$BEOS" = "0" ] ; then
+    if [ "$WIN32" = "0" ] ; then
+      UNIX=1
+      BEOS=0
+      WIN32=0
+      echo "It appears that you are in a UNIX environment..."
+      echo "Use --beos or --win32 to override"
+    fi
+  fi  
+fi
+
+    fi
+  fi
+fi
+
+echo
 
 echo "# Compile commands" >> $RULESFILE
 echo "CC=$CC" >> $RULESFILE
@@ -149,8 +190,13 @@ echo >> $RULESFILE
 #------------------------------------------------------------------------------
 
 echo "# Use SIOD support" >> $RULESFILE
-echo "CCL		= -DUSE_CCL2" >> $RULESFILE
-echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+if [ "$BEOS" != "1" ] ; then
+  echo "CCL		= -DUSE_CCL2" >> $RULESFILE
+  echo "CCLLIB		= -lm -ldl" >> $RULESFILE
+else
+  echo "CCL             = -DUSE_CCL2 -DUSE_BEOS" >> $RULESFILE
+  echo "CCLLIB		=" >> $RULESFILE
+fi
 echo >> $RULESFILE
 
 #------------------------------------------------------------------------------
@@ -166,6 +212,9 @@ if test "$(sdl-config --version 2>/dev/null)" = "1.*" ; then
 else
   HAVESDL=1
 fi
+
+if [ "$BEOS" != "1" ] ; then
+
 # Check for SVGALIB
 LIBCHECK="-lvga -lvgagl"
 check_for_libs
@@ -179,6 +228,7 @@ echo
 echo "VIDEO DRIVER OPTIONS"
 echo
 echo "  X-X11 Support (default)"
+
 if test "$HAVESDL" = 1 ; then
   echo "  S-SDL Support"
 fi
@@ -191,6 +241,18 @@ fi
 echo
 echo -n "Please enter selection: "
 read VIDSEL
+
+else
+
+if [ "$HAVESDL" = 1 ] ; then
+  VIDSEL="S"
+else
+  echo "FreeCraft on BeOS currently only supports SDL for video"
+  echo "Please install SDL and try again."
+  exit -1
+fi
+
+fi
 
 #
 
@@ -210,7 +272,12 @@ case $VIDSEL in
 	echo "SDLLIB		= $SDLLIB" >> $RULESFILE
 	echo >> $RULESFILE
 	echo "VIDEO		= \$(SDL)" >> $RULESFILE
+if [ "$BEOS" != "1" ] ; then
 	echo "VIDEOLIB	= \$(SDLLIB) -ldl" >> $RULESFILE
+else
+        echo "VIDEOLIB	= \$(SDLLIB)" >> $RULESFILE
+fi
+
 	echo
 	;;
 	
@@ -402,12 +469,22 @@ echo "VERSION=	'$VERSION'" >> $RULESFILE
 echo "PROFILE=$PROFILE" >> $RULESFILE
 echo >> $RULESFILE
 
-# Libraries needed to build tools
-echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
+if [ "$BEOS" != 1 ] ; then
+  # Libraries needed to build tools
+  echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz -lm \$(THREADLIB)" >> $RULESFILE
 
-# Libraries needed to build freecraft
-echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
-echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+  # Libraries needed to build freecraft
+  echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz -lm \\" >> $RULESFILE
+  echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+else
+  # Libraries needed to build tools
+  echo "TOOLLIBS=\$(XLDFLAGS) -lpng -lz \$(THREADLIB)" >> $RULESFILE
+
+  # Libraries needed to build freecraft
+  echo "CLONELIBS=\$(XLDFLAGS) -lpng -lz \\" >> $RULESFILE
+  echo "	\$(THREADLIB) \$(CCLLIB) \$(VIDEOLIB) \$(ZLIBS)" >> $RULESFILE
+fi
+
 
 echo "DISTLIST=\$(TOPDIR)/distlist" >> $RULESFILE
 echo "TAGS=\$(TOPDIR)/src/tags" >> $RULESFILE
@@ -444,7 +521,16 @@ if test "$DEBUG" = 1 ; then
 fi
 echo "DFLAGS=	\$(THREAD) \$(CCL) \$(VERSION) \\" >> $RULESFILE
 echo "	\$(VIDEO) \$(ZDEFS) \$(DSOUND) \\" >> $RULESFILE
-echo "	\$(DEBUG) " >> $RULESFILE
+echo -n "	\$(DEBUG)" >> $RULESFILE
+  
+echo
+echo -n "Are you using the WarCraft 2 Expansion CD? (n): "
+read YESORNO
+if [ "$YESORNO" = "Y" -o "$YESORNO" = "y" ] ; then
+echo -n " -DHAVE_EXPANSION" >> $RULESFILE
+fi
+
+echo "" >> $RULESFILE
 
 echo "CFLAGS=$CFLAGS $STATIC $EXTRA_CFLAGS" >> $RULESFILE
 
