@@ -2970,9 +2970,12 @@ static void MultiPlayerGameMenu(void)
 	SavePreferences();
 
 	GuiGameStarted = 0;
-	// Here we really go...
-	ProcessMenu("menu-create-join-menu", 1);
-	// ProcessMenu("menu-multi-net-type-menu", 1);
+	if (!MasterHost) {
+		// No Metaserver Configured - Go right to LAN Game.
+		ProcessMenu("menu-create-join-menu", 1);
+	} else {
+		ProcessMenu("menu-multi-net-type-menu", 1);
+	}
 
 
 	DebugPrint("GuiGameStarted: %d\n" _C_ GuiGameStarted);

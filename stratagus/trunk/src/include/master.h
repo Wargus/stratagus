@@ -40,10 +40,7 @@
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
-
-/// @todo do it configurable.
-#define MASTER_HOST "mohydine.no-ip.com"
-#define MASTER_PORT 7775
+struct lua_State;
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -55,13 +52,16 @@
 
 extern int MetaServerInUse;
 
+extern char* MasterHost;
+extern int MasterPort;
+
 extern int MetaInit(void);
 extern int MetaClose(void);
 extern int MetaServerOK(char* reply);
 extern int SendMetaCommand(char* command, char* format, ...);
 extern int RecvMetaReply(char** reply);
 extern int GetMetaParameter(char* reply, int pos, char** value);
-
+extern int CclSetMetaServer(struct lua_State* l);
 //@}
 
 #endif // !__MASTER_H__
