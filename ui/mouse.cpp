@@ -50,6 +50,7 @@
 #include "menus.h"
 #include "sound.h"
 #include "ui.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -1542,9 +1543,11 @@ global void UIHandleButtonUp(unsigned button)
 	MustRedraw|=RedrawMenuButton;
 	if( ButtonUnderCursor == 0 ) {
 	    // FIXME: Not if, in input mode.
-	    GamePaused=1;
-	    SetStatusLine("Game Paused");
-	    ProcessMenu("menu-game", 1);
+	    if( NetworkFildes==-1 ) {
+		GamePaused=1;
+		SetStatusLine("Game Paused");
+	    }
+	    ProcessMenu("menu-game",0);
 	    return;
 	}
     }
