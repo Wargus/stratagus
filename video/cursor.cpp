@@ -736,7 +736,7 @@ local void DrawBuildingCursor(void)
 		    ((Selected[0]
 			    && Selected[0]->X==mx+w && Selected[0]->Y==my+h)
 			? ~(MapFieldLandUnit|MapFieldSeaUnit) : -1))
-		  && IsMapFieldExplored(mx+w,my+h) ) {
+		  && IsMapFieldExplored(ThisPlayer,mx+w,my+h) ) {
 		color=ColorGreen;
 	    } else {
 		color=ColorRed;

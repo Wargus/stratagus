@@ -258,8 +258,8 @@ global void DrawMinimap(int vx __attribute__((unused)),
 	for( my=0; my<MINIMAP_H; ++my ) {
 	    for( mx=0; mx<MINIMAP_W; ++mx ) {
 #ifdef NEW_FOW
-		if( IsMapFieldVisible(Minimap2MapX[mx],(Minimap2MapY[my]/TheMap.Width))
-			|| (IsMapFieldExplored(Minimap2MapX[mx],
+		if( IsMapFieldVisible(ThisPlayer,Minimap2MapX[mx],(Minimap2MapY[my]/TheMap.Width))
+			|| (IsMapFieldExplored(ThisPlayer,Minimap2MapX[mx],
 					(Minimap2MapY[my]/TheMap.Width)) &&
 					((mx&1)==(my&1)))) {
 		    VideoDrawPixel(((unsigned char*)MinimapGraphic->Frames)
