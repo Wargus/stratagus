@@ -1775,8 +1775,8 @@ local void GameMenuEndScenario(void)
 */
 local void EndScenarioRestart(void)
 {
-    RestartScenario=1;
-    GameRunning=0;
+    RestartScenario = 1;
+    GameRunning = 0;
     EndMenu();
 }
 
@@ -1785,8 +1785,8 @@ local void EndScenarioRestart(void)
 */
 local void EndScenarioSurrender(void)
 {
-    GameResult=GameDefeat;
-    GameRunning=0;
+    GameResult = GameDefeat;
+    GameRunning = 0;
     EndMenu();
 }
 
@@ -1795,8 +1795,8 @@ local void EndScenarioSurrender(void)
 */
 local void EndScenarioQuitMenu(void)
 {
-    QuitToMenu=1;
-    GameRunning=0;
+    QuitToMenu = 1;
+    GameRunning = 0;
     EndMenu();
 }
 
@@ -1805,10 +1805,10 @@ local void EndScenarioQuitMenu(void)
 */
 local void GameMenuEnd(void)
 {
-    InterfaceState=IfaceStateNormal;
-    GameRunning=0;
-    CursorOn=CursorOnUnknown;
-    CurrentMenu=NULL;
+    InterfaceState = IfaceStateNormal;
+    GameRunning = 0;
+    CursorOn = CursorOnUnknown;
+    CurrentMenu = NULL;
 }
 
 local void KeystrokeHelpMenu(void)
@@ -4936,7 +4936,7 @@ local void EditorEditAiPropertiesCancel(void)
 */
 local void EditorQuitMenu(void)
 {
-    EditorRunning=0;
+    EditorRunning = 0;
     GameMenuReturn();
 }
 
