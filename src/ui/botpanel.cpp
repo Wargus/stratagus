@@ -125,71 +125,86 @@ global void InitButtons(void)
 global ButtonAction* CurrentButtons;
 global ButtonAction  _current_buttons[9]; //FIXME: this is just for test
 
-int AddButton( int pos, int level, const char* IconIdent,
-	enum _button_cmd_ action, const char* value,
-	const void* func, const void* allow,
-	int key, const char* hint, const char* umask )
+/// FIXME: docu
+int AddButton(int pos, int level, const char *IconIdent,
+	enum _button_cmd_ action, const char *value, const void *func,
+	const void *allow, int key, const char *hint, const char *umask)
 {
-  char buf[2048];
-  ButtonAction* ba = (ButtonAction*)malloc(sizeof(ButtonAction));
-  DebugCheck(!ba); //FIXME: perhaps should return error?
-  ba->Pos = pos;
-  ba->Level = level;
-  ba->Icon.Name = (char*)IconIdent;
-  ba->Icon.Icon = IconByIdent( IconIdent );
-  ba->Action = action;
-  if( value ) {
-      ba->ValueStr = strdup( value );
-      switch( action )
-	{
-	case B_SpellCast:	ba->Value = SpellIdByIdent( value ); break;
-	case B_Train:		ba->Value = UnitTypeIdByIdent( value ); break;
-	case B_Research:	ba->Value = UpgradeIdByIdent( value ); break;
-	case B_UpgradeTo:	ba->Value = UnitTypeIdByIdent( value ); break;
-	case B_Build:		ba->Value = UnitTypeIdByIdent( value ); break;
-        default:		ba->Value = atoi( value ); break;
+    char buf[2048];
+    ButtonAction *ba;
+
+    ba = (ButtonAction *) malloc(sizeof(ButtonAction));
+    DebugCheck(!ba);			//FIXME: perhaps should return error?
+
+    ba->Pos = pos;
+    ba->Level = level;
+    ba->Icon.Name = (char *)IconIdent;
+    ba->Icon.Icon = IconByIdent(IconIdent);
+    ba->Action = action;
+    if (value) {
+	ba->ValueStr = strdup(value);
+	switch (action) {
+	case B_SpellCast:
+	    ba->Value = SpellIdByIdent(value);
+	    break;
+	case B_Train:
+	    ba->Value = UnitTypeIdByIdent(value);
+	    break;
+	case B_Research:
+	    ba->Value = UpgradeIdByIdent(value);
+	    break;
+	case B_UpgradeTo:
+	    ba->Value = UnitTypeIdByIdent(value);
+	    break;
+	case B_Build:
+	    ba->Value = UnitTypeIdByIdent(value);
+	    break;
+	default:
+	    ba->Value = atoi(value);
+	    break;
 	}
-  } else {
-      ba->ValueStr = NULL;
-      ba->Value = 0;
-  }
+    } else {
+	ba->ValueStr = NULL;
+	ba->Value = 0;
+    }
 
-  ba->Allowed = func;
-  if( allow ) {
-      ba->AllowStr=strdup(allow);
-  } else {
-      ba->AllowStr=NULL;
-  }
+    ba->Allowed = func;
+    if (allow) {
+	ba->AllowStr = strdup(allow);
+    } else {
+	ba->AllowStr = NULL;
+    }
 
-  ba->Key = key;
-  ba->Hint = strdup( hint );
-  //FIXME: here should be added costs to the hint
-  //FIXME: johns: show should be nice done?
-  if ( umask[0] == '*' )
-    strcpy( buf, umask );
-  else
-    sprintf( buf, ",%s,", umask );
-  ba->UMask = strdup( buf );
-  UnitButtonTable[UnitButtonCount++] = ba;
+    ba->Key = key;
+    ba->Hint = strdup(hint);
+    //FIXME: here should be added costs to the hint
+    //FIXME: johns: show should be nice done?
+    if (umask[0] == '*') {
+	strcpy(buf, umask);
+    } else {
+	sprintf(buf, ",%s,", umask);
+    }
+    ba->UMask = strdup(buf);
+    UnitButtonTable[UnitButtonCount++] = ba;
 
-  DebugCheck( ba->Icon.Icon==-1 );	// just checks, that's why at the end
-  return 1;
-};
+    DebugCheck(ba->Icon.Icon == -1);	// just checks, that's why at the end
+    return 1;
+}
 
-
+/// FIXME: docu
 global void DoneButtons(void)
 {
     int z;
 
-    for ( z = 0; z < UnitButtonCount; z++ ) {
-	DebugCheck( !UnitButtonTable[z] );
-	free( UnitButtonTable[z]->ValueStr );
-	free( UnitButtonTable[z]->Hint );
-	free( UnitButtonTable[z]->UMask );
-	free( UnitButtonTable[z] );
+    for (z = 0; z < UnitButtonCount; z++) {
+	DebugCheck(!UnitButtonTable[z]);
+	free(UnitButtonTable[z]->ValueStr);
+	free(UnitButtonTable[z]->Hint);
+	free(UnitButtonTable[z]->UMask);
+	free(UnitButtonTable[z]);
     }
     UnitButtonCount = 0;
-};
+}
 
 /**
 **	Draw bottom panel.
@@ -345,10 +360,18 @@ local void UpdateButtonPanelMultipleUnits(void)
 
     // when we have more races this should become a function
     switch( ThisPlayer->Race ) {
-	case PlayerRaceHuman: unit_ident=",human-group,"; break;
-	case PlayerRaceOrc: unit_ident=",orc-group,"; break;
-	case PlayerRaceNeutral: unit_ident=",neutral-group,"; break;
-	default: DebugLevel0("what %d ",ThisPlayer->Race); abort();
+	case PlayerRaceHuman:
+	    unit_ident=",human-group,";
+	    break;
+	case PlayerRaceOrc:
+	    unit_ident=",orc-group,";
+	    break;
+	case PlayerRaceNeutral:
+	    unit_ident=",neutral-group,";
+	    break;
+	default:
+	    DebugLevel0("what %d ",ThisPlayer->Race);
+	    abort();
     }
 
     for( z = 0; z < UnitButtonCount; z++ ) {
@@ -561,7 +584,6 @@ global void DoButtonButtonClicked(int button)
 {
     int i;
     UnitType* type;
-    const UnitStats* stats;
 
     DebugLevel3Fn("Button clicked %d\n",button);
 
@@ -637,16 +659,8 @@ global void DoButtonButtonClicked(int button)
 	case B_Cancel:
 	    if ( NumSelected==1 && Selected[0]->Type->Building ) {
 		if( Selected[0]->Command.Action == UnitActionUpgradeTo ) {
-		    type=Selected[0]->Command.Data.UpgradeTo.What;
-		    stats=&type->Stats[ThisPlayer->Player];
-		    // FIXME: should this be added on command execution?
-		    PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
 		    SendCommandCancelUpgradeTo(Selected[0]);
 		} else if( Selected[0]->Command.Action == UnitActionResearch ) {
-		    // FIXME: should this be added on command execution?
-		    PlayerAddCostsFactor(ThisPlayer
-			    ,Selected[0]->Command.Data.Research.What->Costs
-			    ,75);
 		    SendCommandCancelResearch(Selected[0]);
 		}
 	    }
@@ -661,34 +675,23 @@ global void DoButtonButtonClicked(int button)
 	    break;
 
 	case B_CancelTrain:
-	    // FIXME: This didn't work in the network
-	    DebugCheck( !Selected[0]->Command.Data.Train.Count );
-#if 0
-	    // FIXME: didn't support cancel of the last slot :(
-	    PlayerAddUnitType(ThisPlayer
-		,Selected[0]->Command.Data.Train.What[
-		    Selected[0]->Command.Data.Train.Count-1]);
-	    ClearStatusLine();
-	    ClearCosts();
-	    SendCommandCancelTraining(Selected[0]
-		    ,Selected[0]->Command.Data.Train.Count-1);
-#endif
-	    PlayerAddUnitType(ThisPlayer
-		    ,Selected[0]->Command.Data.Train.What[0]);
+	    DebugCheck( Selected[0]->Command.Action!=UnitActionTrain
+		    || !Selected[0]->Command.Data.Train.Count );
 	    ClearStatusLine();
 	    ClearCosts();
 	    SendCommandCancelTraining(Selected[0],0);
 	    UpdateButtonPanel();
 	    break;
+
 	case B_CancelBuild:
 	    // FIXME: johns is this not sure, only building should have this?
-	    if( NumSelected==1 && Selected[0]->Type->Building) {
-	        stats=Selected[0]->Stats;
-		// Player gets back 75% of the original cost for a building.
-		// FIXME: should this be added on command execution?
-		PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
+	    if( NumSelected==1 && Selected[0]->Type->Building ) {
 		SendCommandCancelBuilding(Selected[0],
+#ifdef NEW_ORDERS
+		        Selected[0]->Data.Builded.Worker);
+#else
 		        Selected[0]->Command.Data.Builded.Worker);
+#endif
 	    }
 	    break;
 
@@ -708,18 +711,29 @@ global void DoButtonButtonClicked(int button)
 	case B_Train:
 	    type=&UnitTypes[CurrentButtons[button].Value];
 	    // FIXME: Johns: I want to place commands in queue, even if not
-	    // FIXME: enought resources are available
-	    if( Selected[0]->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
+	    // FIXME:	enough resources are available.
+	    // FIXME: training queue full check is not correct for network.
+#ifdef NEW_ORDERS
+	    if( Selected[0]->Command.Action==UnitActionTrain
+		    && Selected[0]->Data.Train.Count==MAX_UNIT_TRAIN ) {
+#else
+	    if( Selected[0]->Command.Action==UnitActionTrain
+		    && Selected[0]->Command.Data.Train.Count==MAX_UNIT_TRAIN ) {
+#endif
 		SetMessage( "Unit training queue is full" );
 	    } else if( PlayerCheckFood(ThisPlayer,type)
 			&& !PlayerCheckUnitType(ThisPlayer,type) ) {
 		PlayerSubUnitType(ThisPlayer,type);
+		DebugLevel0Fn("Train %d - %d,%d,%d\n",
+		    Selected[0]->Command.Action==UnitActionTrain
+			? Selected[0]->Command.Data.Train.Count : 0,
+		    ThisPlayer->Resources[GoldCost],
+		    ThisPlayer->Resources[WoodCost],
+		    ThisPlayer->Resources[OilCost]);
 		SendCommandTrainUnit(Selected[0],type
 			,!(KeyModifiers&ModifierShift));
 		ClearStatusLine();
 		ClearCosts();
-		UpdateButtonPanel();
-		MustRedraw|=RedrawInfoPanel;
 	    }
 	    break;
 
