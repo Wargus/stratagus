@@ -278,6 +278,7 @@ local void WaitForInput(int timeout)
     //
     //	FIXME: more work needed, scrolling credits, animations, ...
     VideoLockScreen();
+    //DrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
     DrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
     VideoUnlockScreen();
     Invalidate();
