@@ -708,7 +708,7 @@ local void SaveAiTypes(CLFile * file)
 **	@param plynr	Player number.
 **	@param ai	Player AI.
 */
-local void SaveAiPlayer(CLFile * file, unsigned plynr, const PlayerAi * ai)
+local void SaveAiPlayer(CLFile * file, unsigned plynr, PlayerAi * ai)
 {
     IOOutFile = file;
     IOLoadingMode = 0;
