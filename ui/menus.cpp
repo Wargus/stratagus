@@ -1779,6 +1779,7 @@ local void SetMasterPower(Menuitem *mi)
 	InitSound();
 	MapUnitSounds();
 	InitSoundServer();
+	InitSoundClient();
 	SoundOff=0;
     }
 #else 
@@ -1789,6 +1790,7 @@ local void SetMasterPower(Menuitem *mi)
 	InitSound();
 	MapUnitSounds();
 	InitSoundServer();
+	InitSoundClient();
 	SoundOff=0;
     }
 #endif 				
