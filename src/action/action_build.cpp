@@ -225,9 +225,31 @@ global void HandleActionBuild(Unit* unit)
     }
 
     RemoveUnit(unit);	// automaticly: CheckUnitToBeDrawn(unit)
+#if 1
+    // FIXME: this is a hack, but solves the problem, a better solution is
+    // FIXME: still wanted.
 
+    // Place unit where pathfinder is more likely to work
+    if (unit->X < x) {
+	PlaceUnit(unit,x,unit->Y);
+ 	RemoveUnit(unit);		// Unit removal necessary to free map tiles
+    }
+    if (unit->X > x+type->TileWidth-1) {
+	PlaceUnit(unit,x+type->TileWidth-1,unit->Y);
+	RemoveUnit(unit);
+    }
+    if (unit->Y < y) {
+	PlaceUnit(unit,unit->X,y);
+	RemoveUnit(unit);
+    }
+    if (unit->Y > y+type->TileHeight-1) {
+	PlaceUnit(unit,unit->X,y+type->TileHeight-1);
+	RemoveUnit(unit);
+    }
+#else
     unit->X=x;
     unit->Y=y;
+#endif
     unit->Orders[0].Action=UnitActionStill;
     unit->SubAction=0;
 
