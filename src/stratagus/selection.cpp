@@ -1005,6 +1005,7 @@ global void CleanSelections(void)
     NumSelected = 0;
     DebugCheck(NoUnitP);		// Code fails if none zero
     free(Selected);
+    Selected = NULL;
 }
 
 // ----------------------------------------------------------------------------
