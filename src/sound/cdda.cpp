@@ -10,7 +10,7 @@
 //
 /**@name cdda.c			-	cdda support */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 2002-2003 by Nehal Mistry
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "sound.h"
 #include "sound_server.h"
 
@@ -42,9 +43,14 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
-local struct cdrom_read_audio readdata;
-local void *bufstart;
-static local int pos;
+typedef struct _cdda_data {
+    int PosInCd;			// Offset on CD to read from
+    struct cdrom_read_audio Readdata;	// Structure for IOCTL
+    char* PointerInBuffer;		// Position in buffer
+    char* Buffer;			// Buffer start
+} CddaData;
+
+#define CDDA_BUFFER_SIZE (12 * 2352)
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -61,46 +67,40 @@ static local int pos;
 */
 local int CDRead(Sample *sample, void *buf, int len)
 {
-    static int count = 0;
-    int end = (int)bufstart + 2352 * 28;
+    CddaData *data;
 
-    readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + pos / 2352;
-    readdata.addr_format = CDROM_LBA;
-    readdata.nframes = 14;
+    int n;
 
-    ++count;
-    pos += len;
+    data = (CddaData*)sample->User;
+
+    data->Readdata.addr.lba = CDtocentry[CDTrack].cdte_addr.lba + data->PosInCd / 2352;
+    data->Readdata.addr_format = CDROM_LBA;
 
     // end of track
-    if (len > 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos) {
-        len = 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - pos;
-        pos = 0;
-        memcpy(buf, sample->User, len);
-	PlayingMusic = 0;
-        return len;
+    if (2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - 
+	    CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd < len) {
+	len = 2352 * (CDtocentry[CDTrack+1].cdte_addr.lba - CDtocentry[CDTrack].cdte_addr.lba) - data->PosInCd;
+	data->PosInCd = 0;
     }
 
-    // pre-buffer new data
-    if (count == (end - (int)bufstart) / len / 2 + 1) {
-	readdata.buf = bufstart;
-	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
-    } else if (count == 1) {
-	readdata.buf = bufstart + 2352 * 14;
-	ioctl(CDDrive, CDROMREADAUDIO, &readdata);
+    if (sample->Length - (data->PointerInBuffer - data->Buffer) < len) {
+	// need to read more data
+	sample->Length -= data->PointerInBuffer - data->Buffer;
+	memcpy(data->Buffer, data->PointerInBuffer, sample->Length);
+	data->PointerInBuffer = data->Buffer;
+
+	n = CDDA_BUFFER_SIZE - sample->Length;
+
+	data->Readdata.nframes = n/2352;
+	data->Readdata.buf = data->PointerInBuffer + sample->Length;
+	ioctl(CDDrive, CDROMREADAUDIO, &data->Readdata);
+
+	sample->Length += data->Readdata.nframes*2352;
+	data->PosInCd += data->Readdata.nframes*2352;
     }
 
-    // copy data into buffer
-    if ((int)sample->User + len <= end) {
-	memcpy(buf, sample->User, len);
-	sample->User += len;
-    } else {
-	count = 0;
-	memcpy(buf, sample->User, end - (int)sample->User);
-	memcpy(buf + (end - (int)sample->User), bufstart, 
-	       len - (end - (int)sample->User));
-	sample->User = bufstart + len - (end - (int)sample->User);
-    }
-
+    memcpy(buf, data->PointerInBuffer, len);
+    data->PointerInBuffer += len;
     return len;
 }
 
@@ -135,17 +135,20 @@ global Sample* LoadCD(const char* name __attribute__((unused)),
 	int flags __attribute__((unused)))
 {
     Sample* sample;
+    CddaData* data;
 
     sample = malloc(sizeof(*sample));
     sample->Channels = 2;
     sample->SampleSize = 16;
     sample->Frequency = 44100;
-    sample->User = malloc(2352 * 28);
     sample->Type = &CDStreamSampleType;
     sample->Length = 0;
-    
-    bufstart = sample->User;
-    pos = 0;
+
+    data = malloc(sizeof(CddaData));
+    data->PosInCd = 0;
+    data->Buffer = malloc(CDDA_BUFFER_SIZE);
+    data->PointerInBuffer = data->Buffer;
+    sample->User = data;
 
     return sample;
 }
