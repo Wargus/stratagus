@@ -670,18 +670,6 @@ struct _unit_ {
 #define UnitMovementMask(unit) \
     ((unit)->Type->MovementMask)
 
-
-/**
-**	How many units could be selected
-*/
-#define MaxSelectable	54
-
-// FIXME: hardcoded...
-/**
-**	How many units could be in a group
-*/
-#define NUM_UNITS_PER_GROUP MaxSelectable
-
 /**
 **	How many groups supported
 */
@@ -727,9 +715,12 @@ extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
 extern void (*DrawSelection)(VMemType, int, int, int, int);
 
-//	in selection.c
-extern Unit* Selected[MaxSelectable];	/// currently selected units
+extern int MaxSelectable;		/// How many units could be selected
+extern int NumUnitsPerGroup;		/// How many units could be in a group
+
+extern Unit** Selected;			/// currently selected units
 extern int NumSelected;			/// how many units selected
+
 
 /*----------------------------------------------------------------------------
 --	Functions
