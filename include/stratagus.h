@@ -299,6 +299,7 @@ typedef struct _title_screen_ {
 	char* File;
 	char* Music;
 	int Timeout;
+	int Iterations;
 	TitleScreenLabel** Labels;
 } TitleScreen;
 

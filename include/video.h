@@ -60,6 +60,25 @@ typedef struct _graphic_ {
 #endif
 } Graphic;
 
+#ifdef USE_MNG
+#ifdef USE_WIN32
+#define MNG_USE_DLL
+#else
+#define MNG_USE_SO
+#endif
+#include <libmng.h>
+#undef LOCAL
+typedef struct _mng_ {
+	char* Name;
+	FILE* FD;
+	mng_handle Handle;
+	SDL_Surface* Surface;
+	unsigned char* Buffer;
+	unsigned long Ticks;
+	int Iteration;
+} Mng;
+#endif
+
 typedef struct _unit_colors_ {
 	SDL_Color Colors[4];
 } UnitColors;
@@ -206,6 +225,15 @@ extern void ResizeGraphic(Graphic* g, int w, int h);
 
 	/// Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
+
+#ifdef USE_MNG
+	/// Load a MNG file
+extern Mng* LoadMNG(const char* name);
+	/// Display a MNG file
+extern void DisplayMNG(Mng* mng, int x, int y);
+	/// Free a MNG file
+extern void FreeMNG(Mng* mng);
+#endif
 
 #ifdef USE_OPENGL
 	/// Make an OpenGL texture
