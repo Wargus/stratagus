@@ -81,7 +81,6 @@ local void EditorEndMenu(void);
 local void GameMenuEnd(void);
 local void GameMenuExit(void);
 local void GameMenuReturn(void);
-local void GameGlobalOptionsMenu(void);
 local void GameShowCredits(void);
 local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
@@ -96,6 +95,17 @@ local void SetTips(Menuitem *mi);
 local void ShowNextTip(void);
 
 local void InitGameMenu(Menuitem *mi);
+
+local void GlobalOptions(Menuitem *mi);
+local void InitGlobalOptions(Menuitem *mi);
+local void SetRes640(Menuitem *mi);
+local void SetRes800(Menuitem *mi);
+local void SetRes1024(Menuitem *mi);
+local void SetRes1280(Menuitem *mi);
+local void SetRes1600(Menuitem *mi);
+local void SetFullscreen(Menuitem *mi);
+local void SetShadowFogAlpha(Menuitem *mi);
+local void SetShadowFogGrayFog(Menuitem *mi);
 
 local void SetMasterPower(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
@@ -531,7 +541,7 @@ local Menuitem PrgStartMenuItems[] = {
     { MI_TYPE_BUTTON, 208, 145 + 36 * 1, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 2, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 3, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
-    { MI_TYPE_BUTTON, 208, 145 + 36 * 4, MenuButtonDisabled, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
+    { MI_TYPE_BUTTON, 208, 145 + 36 * 4, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 5, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 6, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
     { MI_TYPE_BUTTON, 208, 145 + 36 * 7, 0, LargeFont, NULL, NULL, NULL, {{NULL,0}} },
@@ -543,7 +553,7 @@ local void InitPrgStartMenuItems() {
     MenuitemButton   i2 = { "~!Multi Player Game", 224, 27, MBUTTON_GM_FULL, MultiPlayerGameMenu, 'm'};
     MenuitemButton   i3 = { "~!Campaign Game", 224, 27, MBUTTON_GM_FULL, CampaignGameMenu, 'c'};
     MenuitemButton   i4 = { "~!Load Game", 224, 27, MBUTTON_GM_FULL, GameMenuLoad, 'l'};
-    MenuitemButton   i5 = { "~!Options", 224, 27, MBUTTON_GM_FULL, GameGlobalOptionsMenu, 'o'};
+    MenuitemButton   i5 = { "~!Options", 224, 27, MBUTTON_GM_FULL, GlobalOptions, 'o'};
     MenuitemButton   i6 = { "~!Editor", 224, 27, MBUTTON_GM_FULL, StartEditor, 'e'};
     MenuitemButton   i7 = { "S~!how Credits", 224, 27, MBUTTON_GM_FULL, GameShowCredits, 'h'};
     MenuitemButton   i8 = { "E~!xit Program", 224, 27, MBUTTON_GM_FULL, GameMenuExit, 'x'};
@@ -2169,10 +2179,10 @@ global void InitMenuFuncHash(void) {
     HASHADD(SinglePlayerGameMenu,"single-player-game-menu");
     HASHADD(MultiPlayerGameMenu,"multi-player-game-menu");
     HASHADD(CampaignGameMenu,"campaign-game-menu");
-    HASHADD(GameGlobalOptionsMenu,"game-global-options");
     HASHADD(StartEditor,"game-start-editor");
     HASHADD(GameShowCredits,"game-show-credits");
     HASHADD(GameMenuExit,"game-menu-exit");
+    HASHADD(GlobalOptions,"game-global-options");
 
 // Tips
     HASHADD(InitTips,"init-tips");
@@ -3240,6 +3250,46 @@ global void SoundOptions(void)
     else
 	ProcessMenu(MENU_SOUND_OPTIONS, 1);
 #endif // with sound
+}
+
+local void GlobalOptions(Menuitem *mi)
+{
+}
+
+local void InitGlobalOptions(Menuitem *mi)
+{
+}
+
+local void SetRes640(Menuitem *mi)
+{
+}
+
+local void SetRes800(Menuitem *mi)
+{
+}
+
+local void SetRes1024(Menuitem *mi)
+{
+}
+
+local void SetRes1280(Menuitem *mi)
+{
+}
+
+local void SetRes1600(Menuitem *mi)
+{
+}
+
+local void SetFullscreen(Menuitem *mi)
+{
+}
+
+local void SetShadowFogAlpha(Menuitem *mi)
+{
+}
+
+local void SetShadowFogGrayFog(Menuitem *mi)
+{
 }
 
 local void SetMasterPower(Menuitem *mi __attribute__((unused)))
