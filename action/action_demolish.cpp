@@ -170,14 +170,6 @@ global void HandleActionDemolish(Unit* unit)
 
 		// FIXME: Must play explosion sound
 
-		//	FIXME: Currently we take the X fields, the original only the O
-		//		XXXXX ..O..
-		//		XXXXX .OOO.
-		//		XX.XX OO.OO
-		//		XXXXX .OOO.
-		//		XXXXX ..O..
-		//
-
 		//
 		//	 Effect of the explosion on units. Don't bother if damage is 0
 		//
@@ -185,7 +177,8 @@ global void HandleActionDemolish(Unit* unit)
 		    n=SelectUnits(xmin,ymin, xmax, ymax,table);
 		    for( i=0; i<n; ++i ) {
 			if( table[i]->Type->UnitType!=UnitTypeFly && table[i]->HP
-			    && table[i] != unit ) {
+			    && table[i] != unit 
+			    && MapDistanceBetweenUnits(unit,table[i]) <= unit->Type->DemolishRange) {
 			    // Don't hit flying units!
 			    HitUnit(unit,table[i],unit->Type->DemolishDamage);
 			}
@@ -198,7 +191,10 @@ global void HandleActionDemolish(Unit* unit)
 		for( ix=xmin; ix<=xmax; ix++ ) {
 		    for( iy=ymin; iy<=ymax; iy++ ) {
 			n=TheMap.Fields[ix+iy*TheMap.Width].Flags;
-			if( n&MapFieldWall ) {
+			if ( MapDistanceToUnit(ix,iy,unit) > unit->Type->DemolishRange ) {
+			    // Not in circle range
+			    continue;
+			} else if( n&MapFieldWall ) {
 			    MapRemoveWall(ix,iy);
 			} else if( n&MapFieldRocks ) {
 			    MapRemoveRock(ix,iy);
