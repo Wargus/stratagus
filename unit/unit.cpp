@@ -460,15 +460,6 @@ global void PlaceUnit(Unit* unit,int x,int y)
 
     type=unit->Type;
 
-#ifdef NEW_SHIPS
-    //
-    //	Sea and air units are 2 tiles aligned
-    //
-    if( type->UnitType==UnitTypeFly || type->UnitType==UnitTypeNaval ) {
-	x&=~1;
-	y&=~1;
-    }
-#endif
 
     unit->X=x;
     unit->Y=y;
@@ -1793,11 +1784,6 @@ global void DropOutOnSide(Unit* unit,int heading,int addx,int addy)
     for( ;; ) {
 startw:
 	for( i=addy; i--; y++ ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		goto found;
 	    }
@@ -1805,11 +1791,6 @@ startw:
 	++addx;
 starts:
 	for( i=addx; i--; x++ ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		goto found;
 	    }
@@ -1817,11 +1798,6 @@ starts:
 	++addy;
 starte:
 	for( i=addy; i--; y-- ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		goto found;
 	    }
@@ -1829,11 +1805,6 @@ starte:
 	++addx;
 startn:
 	for( i=addx; i--; x-- ) {
-#ifdef NEW_SHIPS
-	    if( unit->Type->UnitType!=UnitTypeLand && ((x&1) || (y&1)) ) {
-		continue;
-	    }
-#endif
 	    if( CheckedCanMoveToMask(x,y,mask) ) {
 		goto found;
 	    }

@@ -297,12 +297,6 @@ global void DoRightButton(int sx, int sy)
 		    continue;
 		}
 
-#ifdef NEW_SHIPS
-		if (unit->Type->UnitType != UnitTypeLand) {
-		    x &= ~1;
-		    y &= ~1;			// Ships could only even fields
-		}
-#endif
 	    }
 
 	    // empty space
@@ -336,16 +330,6 @@ global void DoRightButton(int sx, int sy)
 	//
 	//	Ships
 	//
-#ifdef NEW_SHIPS
-	if (action == MouseActionSail) {
-	    x &= ~1;
-	    y &= ~1;			// Ships could only even fields
-	}
-	if (unit->Type->UnitType != UnitTypeLand) {
-	    x &= ~1;
-	    y &= ~1;			// Ships could only even fields
-	}
-#endif
 
         if (type->Building) {
 	    if (dest && dest->Type->GivesResource) {

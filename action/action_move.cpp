@@ -179,20 +179,9 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 	unit->Frame = 0;
 	UnitHeadingFromDeltaXY(unit, xd, yd);
     } else {
-#ifdef NEW_SHIPS
-	if (unit->Type->UnitType == UnitTypeLand) {
-	    xd = Heading2X[unit->Direction / NextDirection];
-	    yd = Heading2Y[unit->Direction / NextDirection];
-	} else {
-	    xd = Heading2X[unit->Direction / NextDirection] * 2;
-	    yd = Heading2Y[unit->Direction / NextDirection] * 2;
-	}
-	d = 0;
-#else
 	xd = Heading2X[unit->Direction / NextDirection];
 	yd = Heading2Y[unit->Direction / NextDirection];
 	d = 0;
-#endif
     }
 
     DebugLevel3Fn(": %d,%d State %2d " _C_ xd _C_ yd _C_ unit->State);
