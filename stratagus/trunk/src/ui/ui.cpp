@@ -484,6 +484,22 @@ global void LoadUserInterface(void)
     TheUI.ArrowSW.Cursor=CursorTypeByIdent(TheUI.ArrowSW.Name);
     TheUI.ArrowS.Cursor=CursorTypeByIdent(TheUI.ArrowS.Name);
     TheUI.ArrowSE.Cursor=CursorTypeByIdent(TheUI.ArrowSE.Name);
+
+    if( TheUI.GameMenuePanel.File ) {
+	TheUI.GameMenuePanel.Graphic=LoadGraphic(TheUI.GameMenuePanel.File);
+    }
+    if( TheUI.Menue1Panel.File ) {
+	TheUI.Menue1Panel.Graphic=LoadGraphic(TheUI.Menue1Panel.File);
+    }
+    if( TheUI.Menue2Panel.File ) {
+	TheUI.Menue2Panel.Graphic=LoadGraphic(TheUI.Menue2Panel.File);
+    }
+    if( TheUI.VictoryPanel.File ) {
+	TheUI.VictoryPanel.Graphic=LoadGraphic(TheUI.VictoryPanel.File);
+    }
+    if( TheUI.ScenarioPanel.File ) {
+	TheUI.ScenarioPanel.Graphic=LoadGraphic(TheUI.ScenarioPanel.File);
+    }
 }
 
 /**
@@ -510,6 +526,12 @@ global void CleanUserInterface(void)
     VideoSaveFree(TheUI.MenuButton.Graphic);
     VideoSaveFree(TheUI.Minimap.Graphic);
     VideoSaveFree(TheUI.StatusLine.Graphic);
+
+    VideoSaveFree(TheUI.GameMenuePanel.Graphic);
+    VideoSaveFree(TheUI.Menue1Panel.Graphic);
+    VideoSaveFree(TheUI.Menue2Panel.Graphic);
+    VideoSaveFree(TheUI.VictoryPanel.Graphic);
+    VideoSaveFree(TheUI.ScenarioPanel.Graphic);
 
     memset(&TheUI,0,sizeof(TheUI));
 
