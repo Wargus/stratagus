@@ -260,7 +260,7 @@ static void (*HandleActionTable[256])(Unit*) = {
 	HandleActionTrain,
 	HandleActionUpgradeTo,
 	HandleActionResearch,
-	HandleActionBuilded,
+	HandleActionBuilt,
 	HandleActionBoard,
 	HandleActionUnload,
 	HandleActionPatrol,
@@ -373,7 +373,7 @@ static void HandleRegenerations(Unit* unit)
 	f = 0;
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints &&
-			unit->Orders[0].Action != UnitActionBuilded && 
+			unit->Orders[0].Action != UnitActionBuilt && 
 			unit->Orders[0].Action != UnitActionDie &&
 			unit->HP != 0) {
 		f = (100 * unit->HP) / unit->Stats->HitPoints;

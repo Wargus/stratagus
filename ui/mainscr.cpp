@@ -275,8 +275,8 @@ const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
 		case UnitRefContainer :
 			return unit->Container;
 		case UnitRefWorker :
-			if (unit->Orders[0].Action == UnitActionBuilded) {
-				return unit->Data.Builded.Worker;
+			if (unit->Orders[0].Action == UnitActionBuilt) {
+				return unit->Data.Built.Worker;
 			} else {
 				return 0;
 			}
@@ -1285,7 +1285,7 @@ void DrawInfoPanel(void)
 					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
 					PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
 					ReplayRevealMap) {
-				if (Selected[0]->Orders[0].Action == UnitActionBuilded ||
+				if (Selected[0]->Orders[0].Action == UnitActionBuilt ||
 					Selected[0]->Orders[0].Action == UnitActionResearch ||
 					Selected[0]->Orders[0].Action == UnitActionUpgradeTo ||
 					Selected[0]->Orders[0].Action == UnitActionTrain) {

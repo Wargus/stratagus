@@ -154,7 +154,7 @@ typedef struct _ai_build_queue_ AiBuildQueue;
 struct _ai_build_queue_ {
 	AiBuildQueue*       Next; ///< next request
 	int                 Want; ///< requested number
-	int                 Made; ///< builded number
+	int                 Made; ///< built number
 	struct _unit_type_* Type; ///< unit-type
 };
 
@@ -209,7 +209,7 @@ typedef struct _player_ai_ {
 	struct _unit_type_**  UpgradeToRequests;        ///< number of elements in ResearchRequests
 	int                   ResearchRequestsCount;    ///< Upgrades requested and priority list
 	struct _upgrade_**    ResearchRequests;         ///< What the resource manager should build
-	AiBuildQueue*         UnitTypeBuilded;          ///< Last building checked for repair in this turn
+	AiBuildQueue*         UnitTypeBuilt;          ///< Last building checked for repair in this turn
 	int                   LastRepairBuilding;       ///< No. workers that failed trying to repair a building
 	unsigned              TriedRepairWorkers[UnitMax];
 } PlayerAi;
@@ -219,7 +219,7 @@ typedef struct _player_ai_ {
 **
 **  Contains informations needed for the AI. If the AI needs an unit or
 **  building or upgrade or spell, it could lookup in this tables to find
-**  where it could be trained, builded or researched.
+**  where it could be trained, built or researched.
 */
 typedef struct _ai_helper_ {
 	/**

@@ -501,7 +501,7 @@ static void UpdateButtonPanelMultipleUnits(void)
 					}
 				} else if (UnitButtonTable[z]->Action == ButtonCancelBuild) {
 					for (i = NumSelected; --i;) {
-						if (Selected[i]->Orders[0].Action == UnitActionBuilded) {
+						if (Selected[i]->Orders[0].Action == UnitActionBuilt) {
 							allow = 1;
 							break;
 						}
@@ -578,7 +578,7 @@ void UpdateButtonPanel(void)
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
-	if (unit->Orders[0].Action == UnitActionBuilded) {
+	if (unit->Orders[0].Action == UnitActionBuilt) {
 		// Trick 17 to get the cancel-build button
 		strcpy(unit_ident, ",cancel-build,");
 	} else if (unit->Orders[0].Action == UnitActionUpgradeTo) {
@@ -692,7 +692,7 @@ void UpdateButtonPanel(void)
 					allow = unit->Orders[0].Action == UnitActionTrain;
 					break;
 				case ButtonCancelBuild:
-					allow = unit->Orders[0].Action == UnitActionBuilded;
+					allow = unit->Orders[0].Action == UnitActionBuilt;
 					break;
 
 				default:
@@ -874,7 +874,7 @@ void DoButtonButtonClicked(int button)
 
 		case ButtonCancelBuild:
 			// FIXME: johns is this not sure, only building should have this?
-			Assert(Selected[0]->Orders[0].Action == UnitActionBuilded);
+			Assert(Selected[0]->Orders[0].Action == UnitActionBuilt);
 			if (NumSelected == 1) {
 				SendCommandDismiss(Selected[0]);
 			}

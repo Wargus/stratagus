@@ -177,8 +177,8 @@ extern void HandleActionReturnGoods(struct _unit_* unit);
 extern void HandleActionDie(struct _unit_* unit);
 	/// Handle command build
 extern void HandleActionBuild(struct _unit_* unit);
-	/// Handle command builded
-extern void HandleActionBuilded(struct _unit_* unit);
+	/// Handle command built
+extern void HandleActionBuilt(struct _unit_* unit);
 	/// Handle command train
 extern void HandleActionTrain(struct _unit_* unit);
 	/// Handle command upgrade to
