@@ -168,9 +168,11 @@ extern Player* ThisPlayer;		/// Player on this computer
 ----------------------------------------------------------------------------*/
 
     /// Create a new player
-extern void CreatePlayer(char* name,int type);
+extern void CreatePlayer(int type);
     /// Change player side.
 extern void PlayerSetSide(Player* player,int side);
+    /// Change player name.
+extern void PlayerSetName(Player* player,char* name);
     /// Change player AI.
 extern void PlayerSetAiNum(Player* player,int ai);
 

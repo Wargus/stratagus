@@ -28,7 +28,7 @@
     /// Network protocol minor version (maximal 99)
 #define NetworkProtocolMinorVersion	3
     /// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel	0
+#define NetworkProtocolPatchLevel	1
     /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \
 	(NetworkProtocolMajorVersion*10000+NetworkProtocolMinorVersion*100 \
@@ -49,10 +49,28 @@
 **	Network systems active in current game.
 */
 typedef struct _network_host_ {
-    unsigned long	Host;		/// host address
-    int			Port;		/// port on host
+    unsigned long	Host;		/// Host address
+    unsigned short	Port;		/// Port on host
+    unsigned short	PlyNr;		/// Player nummer
+    char		PlyName[16];	/// Name of player
 } NetworkHost;
 
+/**
+**	Network init message.
+*/
+typedef struct _init_message_ {
+    unsigned char  Type;		/// Init message type.
+    unsigned char  SubType;		/// Init message subtype.
+    int		   FreeCraft;		/// FreeCraft engine version.
+    int		   Version;		/// Network protocol version.
+    unsigned int   ConfUID;		/// Engine configuration UID (Checksum)	// FIXME: not available yet
+    unsigned int   MapUID;		/// UID of map to play.	// FIXME: add MAP name, path, etc
+    int		   Lag;			/// Lag time
+    int		   Updates;		/// Update frequency
+    char	   HostsCount;		/// Number of hosts.
+    
+    NetworkHost	   Hosts[PlayerMax];	/// Participant information.
+} InitMessage;
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -62,10 +80,9 @@ extern char* NetworkArg;		/// Network command line argument
 extern int NetPlayers;			/// Network players
 extern int NetworkPort;			/// Local network port to use
 extern char NetworkName[16];		/// Network Name of local player
-extern int HostsCount;			/// Number of hosts.
-extern NetworkHost Hosts[PlayerMax];	/// Host and ports of all players.
-extern int NetPlyNr[PlayerMax];		/// Player nummer	FIXME: belongs into NetworkHost
 
+extern int HostsCount;			/// Number of hosts.
+extern NetworkHost Hosts[PlayerMax];	/// Host, port, and number of all players.
 
 /*----------------------------------------------------------------------------
 --	Functions
