@@ -176,6 +176,7 @@ enum {
 extern lua_State* Lua;
 
 extern int LuaLoadFile(const char* file);
+extern int LuaCall(int narg, int clear);
 
 
 #endif // USE_LUA
