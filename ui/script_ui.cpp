@@ -4530,9 +4530,8 @@ local SCM CclDefineMenuItem(SCM list)
 	    item->xofs = gh_scm2int(gh_car(value));
 	    value = gh_cdr(value);
 	    item->yofs = gh_scm2int(gh_car(value));
-	// Addition of the transparent flag
 	} else if (gh_eq_p(value, gh_symbol2scm("transparent"))) {
-		item->transparent = 1;
+	    item->transparent = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("menu"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
@@ -5169,9 +5168,33 @@ local int CclDefineMenuItem(lua_State* l)
 	    lua_pop(l, 1);
 	} else if (!strcmp(value, "menu")) {
 	    name = strdup(LuaToString(l, j + 1));
-    } else if (!strcmp(value, "flags")) {
-        item->transparent = 1 Coucou Jim4
+	} else if (!strcmp(value, "transparent")) {
+	    item->transparent = 1;
+	    --j;
 	} else if (!strcmp(value, "flags")) {
+	    if (!lua_istable(l, j + 1)) {
+		lua_pushstring(l, "incorrect argument");
+		lua_error(l);
+	    }
+	    subargs = luaL_getn(l, j + 1);
+	    for (k = 0; k < subargs; ++k) {
+		lua_rawgeti(l, j + 1, k + 1);
+		value = LuaToString(l, -1);
+		lua_pop(l, 1);
+
+		if (!strcmp(value, "active")) {
+		    item->flags |= MenuButtonActive;
+		} else if (!strcmp(value, "clicked")) {
+		    item->flags |= MenuButtonClicked;
+		} else if (!strcmp(value, "selected")) {
+		    item->flags |= MenuButtonSelected;
+		} else if (!strcmp(value, "disabled")) {
+		    item->flags |= MenuButtonDisabled;
+		} else {
+		    lua_pushfstring(l, "Unknown flag: %s", value);
+		    lua_error(l);
+		}
+	    }
 	} else if (!strcmp(value, "font")) {
 	    item->font = CclFontByIdentifier(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "init")) {
