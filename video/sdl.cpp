@@ -419,15 +419,14 @@ local int Sdl2InternalKeycode(const SDL_keysym * code, int *keychar)
 **	@param callback	Callback funktion for key down.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKeyPress(void (*const callback) (unsigned,unsigned),
+local void SdlHandleKeyPress(const EventCallback* callbacks,
     const SDL_keysym* code)
 {
     int icode;
     int keychar;
 
     icode = Sdl2InternalKeycode(code,&keychar);
-
-    callback(icode,keychar);
+    InputKeyButtonPress(callbacks, SDL_GetTicks(), icode, keychar);
 }
 
 /**
@@ -436,15 +435,14 @@ local void SdlHandleKeyPress(void (*const callback) (unsigned,unsigned),
 **	@param callback	Callback funktion for key up.
 **	@param code	SDL keysym structure pointer.
 */
-local void SdlHandleKeyRelease(void (*const callback) (unsigned,unsigned),
+local void SdlHandleKeyRelease(const EventCallback* callbacks,
     const SDL_keysym* code)
 {
     int icode;
     int keychar;
 
     icode=Sdl2InternalKeycode(code,&keychar);
-
-    callback(icode,keychar);
+    InputKeyButtonRelease(callbacks, SDL_GetTicks(), icode, keychar);
 }
 
 /**
@@ -506,12 +504,12 @@ local void SdlDoEvent(const EventCallback* callbacks, const SDL_Event * event)
 
 	case SDL_KEYDOWN:
 	    DebugLevel3("\tKey press\n");
-	    SdlHandleKeyPress(callbacks->KeyPressed, &event->key.keysym);
+	    SdlHandleKeyPress(callbacks, &event->key.keysym);
 	    break;
 
 	case SDL_KEYUP:
 	    DebugLevel3("\tKey release\n");
-	    SdlHandleKeyRelease(callbacks->KeyReleased, &event->key.keysym);
+	    SdlHandleKeyRelease(callbacks, &event->key.keysym);
 	    break;
 
 	case SDL_QUIT:
@@ -594,6 +592,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     }
 
     InputMouseTimeout(callbacks,ticks);
+    InputKeyTimeout(callbacks,ticks);
     for(;;) {
 	//
 	//	Time of frame over? This makes the CPU happy. :(

@@ -1150,6 +1150,17 @@ global void HandleKeyUp(unsigned key,unsigned keychar)
 }
 
 /**
+**	Handle key up.
+**
+**	@param key	Key scancode.
+**	@param keychar	Character code.
+*/
+global void HandleKeyRepeat(unsigned key __attribute__((unused)),
+			    unsigned keychar __attribute__((unused)))
+{
+}
+
+/**
 **	Keep coordinates in window and update cursor position
 **
 **	@param x	screen pixel X position.
@@ -1352,6 +1363,36 @@ global void InputMouseTimeout(const EventCallback* callbacks,unsigned ticks)
 	    callbacks->ButtonPressed(LastMouseButton|
 		    (LastMouseButton<<MouseHoldShift));
 	}
+    }
+}
+
+
+global int HoldKeyDelay=250;		/// Time to detect hold key
+
+local unsigned LastIKey;		/// last key handled
+local unsigned LastIKeyChar;		/// last keychar handled
+local int LastKeyTicks;			/// Ticks of last key
+
+global void InputKeyButtonPress(const EventCallback* callbacks,
+	unsigned ticks, unsigned ikey, unsigned ikeychar)
+{
+    LastIKey=ikey;
+    LastIKeyChar=ikeychar;
+    LastKeyTicks=ticks;
+    callbacks->KeyPressed(ikey, ikeychar);
+}
+
+global void InputKeyButtonRelease(const EventCallback* callbacks,
+	unsigned ticks, unsigned ikey, unsigned ikeychar)
+{
+    LastIKey=0;
+    callbacks->KeyReleased(ikey, ikeychar);
+}
+
+global void InputKeyTimeout(const EventCallback* callbacks,unsigned ticks)
+{
+    if( LastIKey && ticks>LastKeyTicks+HoldKeyDelay) {
+	callbacks->KeyRepeated(LastIKey, LastIKeyChar);
     }
 }
 

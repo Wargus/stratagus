@@ -332,6 +332,8 @@ typedef struct _event_callback_ {
     void	(*KeyPressed)(unsigned keycode,unsigned keychar);
 	/// Callback for key release
     void	(*KeyReleased)(unsigned keycode,unsigned keychar);
+	/// Callback for key repeated
+    void	(*KeyRepeated)(unsigned keycode,unsigned keychar);
 
 	/// Callback for network event
     void	(*NetworkEvent)(void);

@@ -682,6 +682,7 @@ global void GameMainLoop(void)
 
     callbacks.KeyPressed=HandleKeyDown;
     callbacks.KeyReleased=HandleKeyUp;
+    callbacks.KeyRepeated=HandleKeyRepeat;
 
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
