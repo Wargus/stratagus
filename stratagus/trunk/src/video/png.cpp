@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name png.c		-	The png graphic file loader. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -53,10 +52,9 @@ void CL_png_readfn(png_structp png_ptr,png_bytep data,png_size_t length)
    png_size_t check;
 
    check = (png_size_t)CLread((CLFile *)png_get_io_ptr(png_ptr), data, (size_t)length);
-   if (check != length)
-   {
+   if (check != length) {
       png_error(png_ptr, "Read Error");
-   }       
+   }
 }
 
 /**
@@ -113,7 +111,7 @@ global Graphic* LoadGraphicPNG(const char* name)
     //
     png_read_info(png_ptr,info_ptr);
 
-    DebugLevel3("%s: width %d height %d = %d bytes\n"
+    DebugLevel3("%s: width %ld height %ld = %ld bytes\n"
 	    ,name,info_ptr->width,info_ptr->height
 	    ,info_ptr->width*info_ptr->height);
     DebugLevel3("%s: %s",name
