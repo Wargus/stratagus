@@ -1695,25 +1695,9 @@ static int CclDefineUI(lua_State* l)
 							ui->MenuButton.Y = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
-						} else if (!strcmp(value, "size")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->MenuButton.Width = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->MenuButton.Height = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
 						} else if (!strcmp(value, "caption")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->MenuButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "font")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->MenuButton.Font = FontByIdent(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
@@ -1750,25 +1734,9 @@ static int CclDefineUI(lua_State* l)
 							ui->NetworkMenuButton.Y = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
-						} else if (!strcmp(value, "size")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->NetworkMenuButton.Width = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->NetworkMenuButton.Height = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
 						} else if (!strcmp(value, "caption")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->NetworkMenuButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "font")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkMenuButton.Font = FontByIdent(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
@@ -1805,25 +1773,9 @@ static int CclDefineUI(lua_State* l)
 							ui->NetworkDiplomacyButton.Y = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
-						} else if (!strcmp(value, "size")) {
-							lua_rawgeti(l, -1, subk + 1);
-							if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-								LuaError(l, "incorrect argument");
-							}
-							lua_rawgeti(l, -1, 1);
-							ui->NetworkDiplomacyButton.Width = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_rawgeti(l, -1, 2);
-							ui->NetworkDiplomacyButton.Height = LuaToNumber(l, -1);
-							lua_pop(l, 1);
-							lua_pop(l, 1);
 						} else if (!strcmp(value, "caption")) {
 							lua_rawgeti(l, -1, subk + 1);
 							ui->NetworkDiplomacyButton.Text = strdup(LuaToString(l, -1));
-							lua_pop(l, 1);
-						} else if (!strcmp(value, "font")) {
-							lua_rawgeti(l, -1, subk + 1);
-							ui->NetworkDiplomacyButton.Font = FontByIdent(LuaToString(l, -1));
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "style")) {
 							lua_rawgeti(l, -1, subk + 1);
