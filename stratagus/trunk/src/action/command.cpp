@@ -10,7 +10,7 @@
 //
 /**@name command.c - Give units a command. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -918,7 +918,6 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 			RemoveOrder(unit, 0);
 		}
 		unit->Data.Train.Ticks = 0;
-		unit->Wait = unit->Reset = 1; // immediately start next training
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
 		}
@@ -944,7 +943,6 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 	
 		if (!slot) { // Canceled in work slot
 			unit->Data.Train.Ticks = 0;
-			unit->Wait = unit->Reset = 1; // immediately start next training
 		}
 		RemoveOrder(unit, slot);
 
@@ -1028,8 +1026,6 @@ void CommandCancelUpgradeTo(Unit* unit)
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
 		}
-
-		unit->Wait = unit->Reset = 1; // immediately start next command.
 	}
 	ClearSavedAction(unit);
 }
@@ -1068,7 +1064,6 @@ void CommandResearch(Unit* unit, Upgrade* what, int flush)
 				PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 					CancelResearchCostsFactor);
 				unit->SubAction = 0;
-				unit->Wait = unit->Reset = 1; // immediately start next command.
 			}
 		}
 
@@ -1120,8 +1115,6 @@ void CommandCancelResearch(Unit* unit)
 		if (unit->Player == ThisPlayer && unit->Selected) {
 			SelectedUnitChanged();
 		}
-
-		unit->Wait = unit->Reset = 1; // immediately start next command.
 	}
 	ClearSavedAction(unit);
 }

@@ -10,7 +10,7 @@
 //
 /**@name action_patrol.c - The patrol action. */
 //
-//      (c) Copyright 1998,2000-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -85,8 +85,7 @@ void HandleActionPatrol(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	if ((!unit->Type->NewAnimations && unit->Reset) ||
-			(unit->Type->NewAnimations && !unit->Anim.Unbreakable)) {
+	if (!unit->Anim.Unbreakable) {
 		//
 		// Attack any enemy in reaction range.
 		//  If don't set the goal, the unit can than choose a
@@ -102,7 +101,6 @@ void HandleActionPatrol(Unit* unit)
 				unit->Orders[0].Action = UnitActionStill;
 				unit->Orders[0].Goal = NoUnitP;
 				unit->SubAction = 0;
-				DebugPrint("Wait %d\n" _C_ unit->Wait);
 			}
 		}
 	}

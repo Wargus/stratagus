@@ -10,7 +10,7 @@
 //
 /**@name action_follow.c - The follow action. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer
+//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -73,7 +73,6 @@ void HandleActionFollow(Unit* unit)
 				RefsDecrease(goal);
 			}
 			unit->Orders[0].Goal = NoUnitP;
-			unit->Wait = 1;
 			unit->SubAction = 0;
 			unit->Orders[0].Action = UnitActionStill;
 			if (IsOnlySelected(unit)) { // update display for new action
@@ -98,7 +97,6 @@ void HandleActionFollow(Unit* unit)
 #else
 		// FIXME: Unit doesn't animate.
 		if ((goal->X == unit->Orders[0].X && goal->Y == unit->Orders[0].Y)) {
-			unit->Reset = 1;
 			unit->Wait = 10;
 			if (unit->Orders[0].Range > 1) {
 				unit->Orders[0].Range = 1;
@@ -150,7 +148,6 @@ void HandleActionFollow(Unit* unit)
 					unit->X * TileSizeX + TileSizeX / 2,
 					unit->Y * TileSizeY + TileSizeY / 2);
 #endif
-				unit->Wait = 1;
 				unit->SubAction = 0;
 				unit->Orders[0].Action = UnitActionStill;
 
@@ -194,7 +191,6 @@ void HandleActionFollow(Unit* unit)
 			}
 
 			if (!(goal = unit->Orders[0].Goal)) { // goal has died
-				unit->Wait = 1;
 				unit->SubAction = 0;
 				unit->Orders[0].Action = UnitActionStill;
 				if (IsOnlySelected(unit)) { // update display for new action
@@ -224,7 +220,7 @@ void HandleActionFollow(Unit* unit)
 		NewResetPath(unit);
 	}
 
-	if (unit->Reset) {
+	if (!unit->Anim.Unbreakable) {
 		//
 		// If our leader is dead or stops or attacks:
 		// Attack any enemy in reaction range.
@@ -243,7 +239,6 @@ void HandleActionFollow(Unit* unit)
 				unit->Orders[0].Action = UnitActionStill;
 				unit->Orders[0].Goal = NoUnitP;
 				unit->SubAction = 0;
-				unit->Wait = 1;
 			}
 		}
 	}

@@ -10,7 +10,7 @@
 //
 /**@name action_still.c - The stand still action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 
 	Assert(unit->Orders[0].Action == UnitActionStill ||
 		unit->Orders[0].Action == UnitActionStandGround);
+
 	//
 	// If unit is not bunkered and removed, wait
 	//
@@ -107,7 +108,6 @@ void ActionStillGeneric(Unit* unit, int ground)
 			!unit->Container->Type->AttackFromTransporter ||
 			unit->Type->Missile.Missile->Class == MissileClassNone)) {
 		// If peon is in building or unit is in transporter it is removed.
-//		unit->Wait = CYCLES_PER_SECOND / 6;
 		return;
 	}
 
@@ -126,43 +126,17 @@ void ActionStillGeneric(Unit* unit, int ground)
 		//
 		// Still animation
 		//
-		if (type->NewAnimations) {
-			UnitShowNewAnimation(unit, type->NewAnimations->Still);
-		} else {
-			Assert(type->Animations && type->Animations->Still);
-			UnitShowAnimation(unit, type->Animations->Still);
-
-			//
-			// FIXME: this a workaround for some bad code.
-			// UnitShowAnimation resets frame.
-			// FIXME: the frames are hardcoded they should be configurable
-			//
-			if (unit->State == 1 && type->GivesResource == GoldCost) {
-				if (unit->Frame < 0) {
-					unit->Frame = unit->Data.Resource.Active ? -1 - 1 : -1;
-				} else {
-					unit->Frame = unit->Data.Resource.Active ? 1 : 0;
-				}
-			}
-			if (unit->State == 1 && type->GivesResource == OilCost) {
-				if (unit->Frame < 0) {
-					unit->Frame = unit->Data.Resource.Active ? -2 - 1 : -1;
-				} else {
-					unit->Frame = unit->Data.Resource.Active ? 2 : 0;
-				}
-			}
-		}
+		UnitShowNewAnimation(unit, type->NewAnimations->Still);
 	}
 
-	if ((unit->Type->NewAnimations && unit->Anim.Unbreakable) || 
-			(!unit->Type->NewAnimations && !unit->Reset)) { // animation can't be aborted here
+	if (unit->Anim.Unbreakable) { // animation can't be aborted here
 		return;
 	}
 
 	//
 	// Some units, like critter are moving random around randomly
 	//
-	if (!unit->Type->NewAnimations && type->RandomMovementProbability &&
+	if (type->RandomMovementProbability &&
 			((SyncRand() % 100) <= type->RandomMovementProbability)) {
 		int x;
 		int y;
@@ -253,7 +227,6 @@ void ActionStillGeneric(Unit* unit, int ground)
 				unit->SavedOrder.Goal = NoUnitP;
 			}
 		} else if ((goal = AttackUnitsInRange(unit))) {
-			unit->Reset = 0;
 			//
 			// Old goal unavailable.
 			//
@@ -287,24 +260,6 @@ void ActionStillGeneric(Unit* unit, int ground)
 		unit->SubAction = unit->State = 0; // No attacking, restart
 	}
 	Assert(!unit->Orders[0].Goal);
-	//
-	// Land units are turning left/right.
-	//
-	if (!type->NewAnimations && type->LandUnit) {
-		switch ((MyRand() >> 8) & 0x0FF) {
-			case 0: // Turn clockwise
-				unit->Direction += NextDirection;
-				UnitUpdateHeading(unit);
-				break;
-			case 1: // Turn counter clockwise
-				unit->Direction -= NextDirection;
-				UnitUpdateHeading(unit);
-				break;
-			default: // does nothing
-				break;
-		}
-		return;
-	}
 
 	//
 	// Sea and air units are floating up/down.

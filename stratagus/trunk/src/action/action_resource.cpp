@@ -10,7 +10,7 @@
 //
 /**@name action_resource.c - The generic resource action. */
 //
-//      (c) Copyright 2001-2004 by Crestez Leonard
+//      (c) Copyright 2001-2005 by Crestez Leonard and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -128,8 +128,7 @@ static int MoveToResource(Unit* unit)
 				break;
 			default:
 				// Goal gone or something.
-				if ((!unit->Type->NewAnimations && !unit->Reset) ||
-						(unit->Type->NewAnimations && unit->Anim.Unbreakable) ||
+				if (unit->Anim.Unbreakable ||
 						UnitVisibleAsGoal(goal, unit->Player)) {
 					return 0;
 				}
@@ -217,7 +216,6 @@ static int StartGathering(Unit* unit)
 		// FIXME: Think minerals in st*rcr*ft!!
 		// However the CPU usage is really low (no pathfinding stuff).
 		unit->Wait = 10;
-		unit->Reset = 1;
 		return 0;
 	}
 
@@ -249,19 +247,8 @@ static int StartGathering(Unit* unit)
 */
 static void AnimateActionHarvest(Unit* unit)
 {
-	int flags;
-
-	if (unit->Type->Animations) {
-		Assert(unit->Type->Animations->Harvest[unit->CurrentResource]);
-		flags = UnitShowAnimation(unit,
-			unit->Type->Animations->Harvest[unit->CurrentResource]);
-		if ((flags & AnimationSound) && (UnitVisible(unit, ThisPlayer) || ReplayRevealMap)) {
-			PlayUnitSound(unit, VoiceHarvesting);
-		}
-	} else if (unit->Type->NewAnimations) {
-		Assert(unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
-	}
+	Assert(unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
+	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
 }
 
 /*
@@ -299,7 +286,6 @@ static void LoseResource(Unit* unit, const Unit* source)
 		RefsIncrease(depot);
 		NewResetPath(unit);
 		unit->SubAction = SUB_MOVE_TO_DEPOT;
-		unit->Wait = unit->Reset = 1;
 		unit->State = 0;
 		DebugPrint("Sent unit %d to depot\n" _C_ unit->Slot);
 		return;
@@ -318,14 +304,12 @@ static void LoseResource(Unit* unit, const Unit* source)
 			10, unit->CurrentResource))) {
 		DebugPrint("Unit %d found another resource.\n" _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
-		unit->Wait = unit->Reset = 1;
 		unit->State = 0;
 		RefsIncrease(unit->Orders[0].Goal);
 	} else {
 		DebugPrint("Unit %d just sits around confused.\n" _C_ unit->Slot);
 		unit->Orders[0].Action = UnitActionStill;
 		unit->SubAction = 0;
-		unit->Wait = unit->Reset = 1;
 		unit->State = 0;
 	}
 }
@@ -352,38 +336,29 @@ static int GatherResource(Unit* unit)
 		AnimateActionHarvest(unit);
 		unit->Data.ResWorker.TimeToHarvest -= unit->Wait;
 	} else {
-		if (unit->Type->NewAnimations) {
-			unit->Anim.CurrAnim = NULL;
-		}
+		unit->Anim.CurrAnim = NULL;
 		unit->Data.ResWorker.TimeToHarvest--;
-		unit->Wait = 1;
 	}
 
 	if (unit->Data.ResWorker.DoneHarvesting) {
 		Assert(resinfo->HarvestFromOutside || resinfo->TerrainHarvester);
-		return (!unit->Type->NewAnimations && unit->Reset) ||
-			(unit->Type->NewAnimations && !unit->Anim.Unbreakable);
+		return !unit->Anim.Unbreakable;
 	}
 
 	// Target gone?
 	if (resinfo->TerrainHarvester && !ForestOnMap(unit->Orders->X, unit->Orders->Y)) {
-		if ((unit->Type->NewAnimations && !unit->Anim.Unbreakable) ||
-				(!unit->Type->NewAnimations && unit->Reset)) {
+		if (!unit->Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
 			// Give it some reasonable look while serching.
-			if (unit->Type->Animations) {
-				unit->Frame = unit->Type->Animations->Still->Frame;
-			} else {
-				// FIXME: which frame?
-				unit->Frame = 0;
-			}
+			// FIXME: which frame?
+			unit->Frame = 0;
 		}
 		return 0;
 		// No wood? Freeze!!!
 	}
 
-	while ((!unit->Data.ResWorker.DoneHarvesting) &&
+	while (!unit->Data.ResWorker.DoneHarvesting &&
 			unit->Data.ResWorker.TimeToHarvest < 0) {
 		unit->Data.ResWorker.TimeToHarvest += resinfo->WaitAtResource /
 			SpeedResourcesHarvest[resinfo->ResourceId];
@@ -549,7 +524,6 @@ static int StopGathering(Unit* unit)
 		SelectedUnitChanged();
 	}
 
-	unit->Wait = 1;
 	return unit->Orders[0].Action != UnitActionStill;
 }
 
@@ -576,8 +550,7 @@ static int MoveToDepot(Unit* unit)
 		case PF_REACHED:
 			break;
 		default:
-			if ((unit->Type->NewAnimations && unit->Anim.Unbreakable) ||
-					(!unit->Type->NewAnimations && !unit->Reset) || UnitVisibleAsGoal(goal, unit->Player)) {
+			if (unit->Anim.Unbreakable || UnitVisibleAsGoal(goal, unit->Player)) {
 				return 0;
 			}
 			break;
@@ -596,8 +569,6 @@ static int MoveToDepot(Unit* unit)
 		return 0;
 	}
 
-	Assert((!unit->Type->NewAnimations && unit->Wait == 1) || unit->Type->NewAnimations);
-
 	//
 	// If resource depot is still under construction, wait!
 	//
@@ -613,9 +584,7 @@ static int MoveToDepot(Unit* unit)
 	// Place unit inside the depot
 	//
 	RemoveUnit(unit, goal);
-	if (unit->Type->NewAnimations) {
-		unit->Anim.CurrAnim = NULL;
-	}
+	unit->Anim.CurrAnim = NULL;
 
 	//
 	// Update resource.
@@ -691,7 +660,6 @@ static int WaitInDepot(Unit* unit)
 		}
 	}
 
-	unit->Wait = 1;
 	return unit->Orders[0].Action != UnitActionStill;
 }
 
@@ -708,8 +676,6 @@ void ResourceGiveUp(Unit* unit)
 	}
 	memset(unit->Orders, 0, sizeof(*unit->Orders));
 	unit->Orders[0].Action = UnitActionStill;
-	unit->Wait = 1;
-	unit->Reset = 1;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	unit->SubAction = 0;
 	if (unit->CurrentResource &&

@@ -10,7 +10,7 @@
 //
 /**@name action_move.c - The move action. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -60,127 +60,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Generic unit mover.
-**
-**  @param unit  Unit that moves.
-**  @param anim  Animation script for unit.
-**
-**  @return      >0 remaining path length, 0 wait for path, -1
-**               reached goal, -2 can't reach the goal.
-*/
-static int ActionMoveGeneric(Unit* unit, const Animation* anim)
-{
-	int xd;     // X movement in tile.
-	int yd;     // Y movement in tile.
-	int state;
-	int d;
-	int x;      // Unit->X
-	int y;      // Unit->Y
-
-	// FIXME: state 0?, should be wrong, should be Reset.
-	// FIXME: Reset flag is cleared by HandleUnitAction.
-	if (!(state = unit->State)) {
-		// FIXME: So units flying up and down are not affected.
-		unit->IX = unit->IY = 0;
-
-		UnmarkUnitFieldFlags(unit);
-		d = NextPathElement(unit, &xd, &yd);
-		MarkUnitFieldFlags(unit);
-		switch (d) {
-			case PF_UNREACHABLE: // Can't reach, stop
-				if (unit->Player->AiEnabled) {
-					AiCanNotMove(unit);
-				}
-
-				unit->Reset = unit->Wait = 1;
-				unit->Moving = 0;
-
-				return d;
-			case PF_REACHED: // Reached goal, stop
-				unit->Reset = unit->Wait = 1;
-				unit->Moving = 0;
-				return d;
-			case PF_WAIT: // No path, wait
-				unit->Reset = unit->Wait = 1;
-				unit->Moving = 0;
-				return d;
-			default: // On the way moving
-				unit->Moving = 1;
-				break;
-		}
-		x = unit->X;
-		y = unit->Y;
-		//
-		// Transporter (un)docking?
-		//
-		// FIXME: This is an ugly hack
-		if (unit->Type->CanTransport &&
-				((WaterOnMap(x, y) && CoastOnMap(x + xd, y + yd)) ||
-				(CoastOnMap(x, y) && WaterOnMap(x + xd, y + yd)))) {
-			PlayUnitSound(unit, VoiceDocking);
-		}
-
-		x = unit->X + xd;
-		y = unit->Y + yd;
-		MoveUnitToXY(unit, x, y);
-
-		// Remove unit from the current selection
-		if (unit->Selected && !IsMapFieldVisible(ThisPlayer, x, y)) {
-			if (NumSelected == 1) { //  Remove building cursor
-				CancelBuildingMode();
-			}
-			if (!ReplayRevealMap) {
-				UnSelectUnit(unit);
-				SelectionChanged();
-			}
-		}
-
-		unit->IX = -xd * TileSizeX;
-		unit->IY = -yd * TileSizeY;
-		unit->Frame = 0;
-		UnitHeadingFromDeltaXY(unit, xd, yd);
-		//  Recalculate the seen count.
-		UnitCountSeen(unit);
-	} else {
-		xd = Heading2X[unit->Direction / NextDirection];
-		yd = Heading2Y[unit->Direction / NextDirection];
-		d = 0;
-	}
-
-	//
-	// Next animation.
-	//
-	unit->IX += xd * anim[state].Pixel;
-	unit->IY += yd * anim[state].Pixel;
-	if (unit->Frame < 0) {
-		unit->Frame += -anim[state].Frame;
-	} else {
-		unit->Frame += anim[state].Frame;
-	}
-	unit->Wait = anim[state].Sleep;
-	if (unit->Slow) { // unit is slowed down
-		unit->Wait <<= 1;
-	}
-	if (unit->Haste && unit->Wait > 1) { // unit is accelerated
-		unit->Wait >>= 1;
-	}
-
-	//
-	// Handle the flags.
-	//
-	if (anim[state].Flags & AnimationReset) {
-		unit->Reset = 1;
-	}
-	if (anim[state].Flags & AnimationRestart) {
-		unit->State = 0;
-	} else {
-		++unit->State;
-	}
-
-	return d;
-}
-
-/**
 **  Test if unit can move.
 **  For the moment only check for move animation.
 **
@@ -192,8 +71,7 @@ int CanMove(const Unit* unit)
 {
 	Assert(unit);
 	Assert(unit->Type);
-	return (unit->Type->Animations && unit->Type->Animations->Move) ||
-		(unit->Type->NewAnimations && unit->Type->NewAnimations->Move);
+	return unit->Type->NewAnimations && unit->Type->NewAnimations->Move;
 }
 
 
@@ -215,10 +93,6 @@ int DoActionMove(Unit* unit)
 	int move;
 
 	Assert(CanMove(unit));
-	if (unit->Type->Animations) {
-		return ActionMoveGeneric(unit, unit->Type->Animations->Move);
-	}
-
 	if (!unit->Moving) {
 		// FIXME: So units flying up and down are not affected.
 		unit->IX = unit->IY = 0;
