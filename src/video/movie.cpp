@@ -376,6 +376,9 @@ global int PlayMovie(const char* file, int flags)
 {
 	printf("FIXME: PlayMovie(\"%s\",%x) not supported.\n", file, flags);
 
+	if (strcasestr(file, ".avi\0")) {
+		return 0;
+	}
 	return 1;
 }
 
