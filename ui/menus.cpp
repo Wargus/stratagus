@@ -1856,7 +1856,7 @@ local void SetCdPower(Menuitem *mi)
 global void SpeedSettings(void)
 {
     int i = 2;
-    SpeedSettingsMenuItems[i].d.hslider.percent = VideoSyncSpeed - 50;
+    SpeedSettingsMenuItems[i].d.hslider.percent = ((VideoSyncSpeed - MIN_GAME_SPEED) * 100) / (MAX_GAME_SPEED - MIN_GAME_SPEED);
     if (SpeedSettingsMenuItems[i].d.hslider.percent < 0)
 	SpeedSettingsMenuItems[i].d.hslider.percent = 0;
     if (SpeedSettingsMenuItems[i].d.hslider.percent > 100)
@@ -2628,14 +2628,14 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 		SetVideoSync();
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing game speed by 10%s\n", "%");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 		SetVideoSync();
 	    }
 	    if (i == 2) {
@@ -2646,11 +2646,11 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		    VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 		    SetVideoSync();
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    VideoSyncSpeed = mi[1].d.hslider.percent + 50;
+		    VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
 		    SetVideoSync();
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
