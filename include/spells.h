@@ -150,8 +150,8 @@ typedef struct
 	} Runes;
 	
 	struct {
-	    int  TTL;			/// time to live (ticks)
-	    // FIXME: more configurations
+	    int TTL;			/// time to live (ticks)
+	    int Damage;			/// Damage.
 	} Whirlwind;
     } Data;
 } SpellActionType;

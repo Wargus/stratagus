@@ -122,19 +122,6 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 		errl("Unsupported fireball tag", value);
 	    }
 	}
-    } else if (gh_eq_p(value, gh_symbol2scm("death-coil"))) {
-	spellaction->CastFunction = CastDeathCoil;
-	while (!gh_null_p(list)) {
-	    value = gh_car(list);
-	    list = gh_cdr(list);
-	    if (gh_eq_p(value, gh_symbol2scm("damage"))) {
-		spellaction->Data.Fireball.Damage = gh_scm2int(gh_car(list));
-		list = gh_cdr(list);
-	    } else {
-		errl("Unsupported death-coil tag", value);
-	    }
-	}
-
     } else if (gh_eq_p(value, gh_symbol2scm("runes"))) {
 	spellaction->CastFunction = CastRunes;
 	while (!gh_null_p(list)) {
@@ -157,6 +144,9 @@ local void CclSpellAction(SCM list, SpellActionType* spellaction)
 	    list = gh_cdr(list);
 	    if (gh_eq_p(value, gh_symbol2scm("duration"))) {
 		spellaction->Data.Whirlwind.TTL = gh_scm2int(gh_car(list));
+		list = gh_cdr(list);
+	    } else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
+		spellaction->Data.Whirlwind.Damage = gh_scm2int(gh_car(list));
 		list = gh_cdr(list);
 	    } else {
 		errl("Unsupported runes tag", value);
@@ -621,13 +611,9 @@ local void SaveSpellAction(CLFile *file,SpellActionType* action)
     } else if (action->CastFunction == CastSpawnPortal) {
 	CLprintf(file, "(spawn-portal portal-type %s)",
 	    action->Data.SpawnPortal.PortalType->Ident);
-    } else if (action->CastFunction == CastDeathCoil) {
-	CLprintf(file, "(death-coil)");
-	// FIXME: more?
     } else if (action->CastFunction == CastWhirlwind) {
-	CLprintf(file, "(whirlwind duration %d)",
-	    action->Data.Whirlwind.TTL);
-	// FIXME: more?
+	CLprintf(file, "(whirlwind duration %d damage %d)",
+	    action->Data.Whirlwind.TTL, action->Data.Whirlwind.Damage);
     } 
 }
 
