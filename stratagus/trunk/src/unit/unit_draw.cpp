@@ -384,16 +384,16 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 			,2,(f*type->BoxHeight)/100);
 	    }  else  {
 		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
-				+type->BoxHeight+1
-			,((f*type->BoxHeight)/100)+2
-			,5);
-		    VideoFillRectangleClip(color
 			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
 			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
+				+type->BoxHeight+1
+			,((f*type->BoxHeight)/100)+1
+			,5);
+		    VideoFillRectangleClip(color
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)+1
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)
 				+type->BoxHeight+2
-			,(f*type->BoxHeight)/100
+			,(f*type->BoxHeight)/100-1
 			,3);
 	    }
 	}
@@ -459,14 +459,14 @@ local void DrawDecoration(Unit* unit,const UnitType* type,int x,int y)
 	    }  else  {
 		    f=(100*unit->Mana)/255;
 		    VideoFillRectangleClip(ColorBlack
-			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)-1
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+6
-			,(type->BoxHeight)+2
+			,x+((type->TileWidth*TileSizeX-type->BoxWidth)/2)
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+5
+			,(type->BoxHeight)+1
 			,5);
 		    VideoFillRectangleClip(ColorBlue
-			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2
-			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+7
-			,(f*type->BoxHeight)/100
+			,x+(type->TileWidth*TileSizeX-type->BoxWidth)/2+1
+			,(y+(type->TileHeight*TileSizeY-type->BoxHeight)/2)+type->BoxHeight+6
+			,(f*type->BoxHeight)/100-1
 			,3);
 	    }
 
