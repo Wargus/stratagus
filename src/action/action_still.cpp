@@ -200,8 +200,9 @@ global void ActionStillGeneric(Unit* unit,int ground)
 		unit->State=0;
 		unit->SubAction=1;	// Mark attacking.
 		if( !type->Tower ) {
-		    UnitHeadingFromDeltaXY(unit,goal->X-unit->X
-			    ,goal->Y-unit->Y);
+		    UnitHeadingFromDeltaXY(unit,
+			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
+			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
 		    AnimateActionAttack(unit);
 		}
 	    }
