@@ -39,7 +39,6 @@
 #include <string.h>
 
 #include "stratagus.h"
-#include "tileset.h"
 #include "map.h"
 #include "video.h"
 #include "icons.h"
@@ -219,7 +218,7 @@ global void LoadIcons(void)
 }
 
 /**
-**  Cleanup memory used by the icons.
+**  Clean up memory used by the icons.
 */
 global void CleanIcons(void)
 {
