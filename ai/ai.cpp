@@ -79,9 +79,11 @@ local void AiCheckUnits(void)
     const AiBuildQueue* queue;
     const int* unit_types_count;
     int i;
+    int j;
     int n;
     int t;
     int x;
+    int e;
 
     memset(counter,0,sizeof(counter));
     //
@@ -101,12 +103,25 @@ local void AiCheckUnits(void)
     for( i=0; i<n; ++i ) {
 	t=AiPlayer->UnitTypeRequests[i].Table[0]->Type;
 	x=AiPlayer->UnitTypeRequests[i].Count;
-	if( x>unit_types_count[t]+counter[t] ) {	// Request it.
+
+	//
+	//	Add equivalent units
+	//
+	e=unit_types_count[t];
+	if( t<AiHelpers.EquivCount && AiHelpers.Equiv[t] ) {
+	    DebugLevel3Fn("Equivalence for %s\n",
+		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
+	    for( j=0; j<AiHelpers.Equiv[t]->Count; ++j ) {
+		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
+	    }
+	}
+	
+	if( x>e+counter[t] ) {	// Request it.
 	    DebugLevel3Fn("Need %s *%d\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident,x);
 	    AiAddUnitTypeRequest(AiPlayer->UnitTypeRequests[i].Table[0],
-		    x-unit_types_count[t]-counter[t]);
-	    counter[t]+=x-unit_types_count[t]-counter[t];
+		    x-e-counter[t]);
+	    counter[t]+=x-e-counter[t];
 	}
 	counter[t]-=x;
     }
