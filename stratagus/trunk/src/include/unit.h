@@ -837,6 +837,8 @@ extern void AddToGroup(Unit **units,int nunits,int num);
 extern void SetGroup(Unit **units,int nunits,int num);
     /// Remove a unit from a group
 extern void RemoveUnitFromGroup(Unit *unit);
+    /// Register CCL group features
+extern void GroupCclRegister(void);
 
 //	in selection.c
 
@@ -872,10 +874,12 @@ extern void InitSelections(void);
 extern void SaveSelections(FILE* file);
     /// Clean up selections
 extern void CleanSelections(void);
+    /// Register CCL selection features
+extern void SelectionCclRegister(void);
 
 //	in ccl_unit.c
 
-    /// register ccl features
+    /// register CCL units features
 extern void UnitCclRegister(void);
 
 //@}
