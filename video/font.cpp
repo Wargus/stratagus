@@ -344,6 +344,7 @@ local void VideoDrawChar32(const Graphic* sprite,
     }
 }
 
+#ifdef USE_OPENGL
 /**
 **	Draw character with current color.
 **
@@ -355,7 +356,6 @@ local void VideoDrawChar32(const Graphic* sprite,
 **	@param x	X screen position
 **	@param y	Y screen position
 */
-#ifdef USE_OPENGL
 local void VideoDrawCharOpenGL(const Graphic* sprite,
 	int gx,int gy,int w,int h,int x,int y)
 {

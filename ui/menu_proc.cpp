@@ -217,6 +217,8 @@ global void MenusSetBackground(void)
 **	@param y	Y display position
 **	@param font	font number for text
 **	@param text	text to print on button
+**	@param normalcolor
+**	@param reversecolor
 */
 global void DrawMenuButton(MenuButtonId button,unsigned flags,int w,int h,int x,int y,
 	const int font,const unsigned char *text,char *normalcolor,char *reversecolor)

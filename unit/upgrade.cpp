@@ -101,7 +101,7 @@ local char** UpgradeWcNames;
 **
 **	@param ident	upgrade identifier.
 **	@param icon	icon displayed for this upgrade,
-**			NULL for generated name (icon-<ident>).
+**			NULL for generated name (icon-<em>ident</em>).
 **	@param costs	costs to upgrade.
 **
 **	@return		upgrade id or -1 for error
