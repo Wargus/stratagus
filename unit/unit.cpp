@@ -272,7 +272,6 @@ global Unit* MakeUnit(UnitType* type,Player* player)
     unit->Reset=1;
 
     unit->Rs=MyRand()%100; // used for random fancy buildings and other things
-    // DEFAULT! unit->Revealer = 0;		// FOW revealer
 
     unit->OrderCount=1;
     unit->Orders[0].Action=UnitActionStill;
