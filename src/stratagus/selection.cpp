@@ -475,25 +475,32 @@ local int SelectSpritesInsideRectangle (int sx0, int sy0, int sx1, int sy1,
 /**
  **     Add the units in the rectangle to the current selection
  **
- **	@param tx	X start of selection rectangle in tile coordinates
- **	@param ty	Y start of selection rectangle in tile coordinates
- **	@param w	Selection rectangle width.
- **	@param h	Selection rectangle height.
+ **	@param x0	X start of selection rectangle in tile coordinates
+ **	@param y0	Y start of selection rectangle in tile coordinates
+ **	@param x1	X start of selection rectangle in tile coordinates
+ **	@param y1	Y start of selection rectangle in tile coordinates
  **	@return		the _total_ number of units selected.
  */
-global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
+global int AddSelectedUnitsInRectangle(int x0,int y0,int x1,int y1)
 {
     Unit* table[UnitMax];
     int toggle_num;
-    int n,i;
+    int n;
+    int i;
 
     //  If there is no selected unit yet, do a simple selection.
     if( !NumSelected ) {
-        return SelectUnitsInRectangle(tx, ty, w, h);
+        return SelectUnitsInRectangle(x0, y0, x1, y1);
     }
 
     //  If no unit in rectangle area... do nothing
-    if( !(toggle_num=SelectUnits(tx,ty,tx+w+1,ty+h+1,table)) ) {
+    toggle_num=SelectUnits((x0/TileSizeX)-2, (y0/TileSizeY)-2,
+	(x1/TileSizeX)+2+1, (y1/TileSizeX)+2+1, table);
+    if( !toggle_num ) {
+        return NumSelected;
+    }
+    toggle_num=SelectSpritesInsideRectangle (x0, y0, x1, y1, table, toggle_num);
+    if( !toggle_num ) {
         return NumSelected;
     }
 
@@ -525,10 +532,10 @@ global int AddSelectedUnitsInRectangle(int tx,int ty,int w,int h)
  **	  - select one neutral unit (critter, mine...)
  **	  - select one enemy unit (random)
  **
- **	@param tx	X start of selection rectangle in tile coordinates
- **	@param ty	Y start of selection rectangle in tile coordinates
- **	@param w	Selection rectangle width.
- **	@param h	Selection rectangle height.
+ **	@param sx0	X start of selection rectangle in tile coordinates
+ **	@param sy0	Y start of selection rectangle in tile coordinates
+ **	@param sx1	X start of selection rectangle in tile coordinates
+ **	@param sy1	Y start of selection rectangle in tile coordinates
  **	@return		the number of units found.
  */
 global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
@@ -548,7 +555,6 @@ global int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
     tx1 = sx1 / TileSizeX;
     ty1 = sy1 / TileSizeY;
 
-//  r=SelectUnits(tx,ty,tx+w+1,ty+h+1,table);
     r=SelectUnits (tx0-2, ty0-2, tx1+2+1, ty1+2+1, table);
     r=SelectSpritesInsideRectangle (sx0, sy0, sx1, sy1, table, r);
 
