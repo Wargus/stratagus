@@ -2556,6 +2556,10 @@ local void SaveCommand(const Command* command,FILE* file)
 	    fprintf(file,"'demolish");
 	    fprintf(file," \"FIXME:\"");
 	    break;
+	case UnitActionSpellCast:
+	    fprintf(file,"'spell-cast");
+	    fprintf(file," \"FIXME:\"");
+	    break;
     }
     fprintf(file,")\n");
 }
