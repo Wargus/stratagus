@@ -76,6 +76,10 @@
 **
 **		Path file name of shadow sprite file for the different tilesets.
 **
+**	UnitType::DrawLevel
+**
+**		The Level/Order to draw this type of unit in. 0-255 usually.
+**
 **	UnitType::Width UnitType::Height
 **
 **		Size of a sprite frame in pixels. All frames of a sprite have
@@ -494,6 +498,7 @@ struct _unit_type_ {
 
     int		Width;			/// Sprite width
     int		Height;			/// Sprite height
+    int		DrawLevel;		/// Level to Draw Unittype at
     int		ShadowWidth;		/// Shadow sprite width
     int		ShadowHeight;		/// Shadow sprite height
     int		ShadowOffset;		/// Shadow vertical offset

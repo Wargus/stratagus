@@ -70,6 +70,10 @@
 **		@note Note that only 8 directions are currently supported and
 **		only 5 are stored in the image (N NW W SW S) and 4 are mirrored.
 **
+**	MissileType::DrawLevel
+**
+**		The Level/Order to draw the missile in, usually 0-255
+**
 **	MissileType::Width MissileType::Height
 **
 **		Size (width and height) of a frame in the image. All sprite
@@ -316,10 +320,85 @@ typedef struct _missile_type_ MissileType;
 
 #endif
 
+#define MAX_MISSILES    1800            /// maximum number of missiles
+
 /**
 **	Missile-type-class typedef
 */
 typedef int MissileClass;
+
+/**
+**      Missile-class this defines how a missile-type reacts.
+**
+**      @todo
+**              Here is something double defined, the whirlwind is
+**              ClassWhirlwind and also handled by controler.
+**
+**      FIXME:  We need no class or no controller.
+*/
+enum _missile_class_ {
+        /**
+        **      Missile does nothing
+        */
+	MissileClassNone,
+        /**
+         **      Missile flies from x,y to x1,y1
+         */
+	MissileClassPointToPoint,
+	/**
+	**      Missile flies from x,y to x1,y1 and stays there for a moment
+	*/
+	MissileClassPointToPointWithDelay,
+	/**
+	**      Missile don't move, than disappears
+	*/
+	MissileClassStayWithDelay,
+	/**
+	**      Missile flies from x,y to x1,y1 than bounces three times.
+	*/
+	MissileClassPointToPoint3Bounces,
+	/**
+	**      Missile flies from x,y to x1,y1 than changes into flame shield
+	*/
+	MissileClassFireball,
+	/**
+	**      Missile surround x,y
+	*/
+	MissileClassFlameShield,
+	/**
+	**      Missile appears at x,y, is blizzard
+	*/
+	MissileClassBlizzard,
+	/**
+	**      Missile appears at x,y, is death and decay
+	*/
+	MissileClassDeathDecay,
+	/**
+	**      Missile appears at x,y, is whirlwind
+	*/
+	MissileClassWhirlwind,
+	/**
+	**      Missile appears at x,y, than cycle through the frames up and
+	**      down.
+	*/
+	MissileClassCycleOnce,
+	/**
+	**      Missile flies from x,y to x1,y1 than shows hit animation.
+	*/
+	MissileClassPointToPointWithHit,
+	/**
+	**      Missile don't move, than checks the source unit for HP.
+	*/
+	MissileClassFire,
+	/**
+	**      Missile is controlled completely by Controller() function.
+	*/
+	MissileClassCustom,
+	/**
+	**      Missile shows the hit points.
+	*/
+	MissileClassHit,
+};
 
     ///		Base structure of missile-types
 struct _missile_type_ {
@@ -330,6 +409,7 @@ struct _missile_type_ {
 
     int		Width;			/// missile width in pixels
     int		Height;			/// missile height in pixels
+    int		DrawLevel;		/// Level to draw missile at
     int		SpriteFrames;		/// number of sprite frames in graphic
     int		NumDirections;		/// number of directions missile can face
 
@@ -436,7 +516,8 @@ extern void FireMissile(Unit*);
 extern int CheckMissileToBeDrawn(const Missile* missile);
 
     /// Draw all missiles
-extern void DrawMissiles(const Viewport* vp);
+extern void DrawMissile(const MissileType* mtype,int frame,int x,int y);
+extern int DrawMissiles(const Viewport* vp, Missile** table);
 
     /// handle all missiles
 extern void MissileActions(void);
