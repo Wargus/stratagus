@@ -124,6 +124,7 @@ extern int DefaultResourceAmounts[MaxCosts];
 **  This are the current stats of an unit. Upgraded or downgraded.
 */
 typedef struct _unit_stats_ {
+	struct _variable_type_* Variables;  ///< userdefined variable.
 	int AttackRange;                ///< how far can the unit attack
 	int SightRange;                 ///< how far can the unit see
 	int Armor;                      ///< armor strength
@@ -155,6 +156,7 @@ typedef struct _upgrade_ {
 **  @see UnitStats
 */
 typedef struct _modifiers_ {
+	struct _variable_type_* Variables;  ///< userdefined variable modifier.
 	int AttackRange;                ///< attack range modifier
 	int SightRange;                 ///< sight range modifier
 	int BasicDamage;                ///< basic damage modifier

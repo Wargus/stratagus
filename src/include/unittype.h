@@ -1018,6 +1018,10 @@ extern void LoadUnitTypes(void);                    ///< Load the unit-type data
 extern void CleanUnitTypes(void);                   ///< Cleanup unit-type module
 
 // in script_unittype.c
+
+	/// Parse User Variables field.
+extern void DefineVariableField(struct lua_State* l, struct _variable_type_* var, int lua_index);
+
 	/// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(const struct _unit_* unit);
 

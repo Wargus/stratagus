@@ -182,64 +182,62 @@ must be full filled before an unit or research can be used.
 </pre>
 
 <a name="DefineModifier"></a>
-<h3>DefineModifier( upgrade-name '(effect1 effect1-arg) ... )</h3>
+<h3>DefineModifier("upgrade-name", {effect1, effect1-arg}, {effect2, effect2-arg}, ... )</h3>
 
-Define the effects (modifier) of an upgrade. An upgrade can have multiple 
+Define the effects (modifier) of an upgrade. An upgrade can have multiple
 modifiers. It can activate, enable or disable other upgrades and allows
 complex reactions.
 
-
 <dl>
-<dt>upgrade-name</dt>
+<dt>"upgrade-name"</dt>
 <dd>Name of the upgrade, which has this effects. All effects change
 all old units and any new unit of a player.
 </dd>
-<dt>'(effectN effectN-arg)</dt>
+<dt>{effectN, effectN-arg}</dt>
 <dd>A list of effects of the upgrade. Here are all possible effects:
   <dl>
-  <dt>'(attack-range N)</dt>
-  <dd>Change the attack range of all units of the unit-types given with
+  <dt>{"attack-range", N}</dt>
+  <dd>Increase the attack range of all units of the unit-types given with
   '(apply-to ...). Note it can be increased with positive numbers and decreased
   with negative numbers.
   </dd>
-  <dt>'(sight-range N)</dt>
-  <dd>Change the sight range of all units of the unit-types given with
+  <dt>{"sight-range", N}</dt>
+  <dd>Increase the sight range of all units of the unit-types given with
   '(apply-to ...).
   </dd>
-  <dt>'(basic-damage N)</dt>
-  <dd>Change the basic damage of all units of the unit-types given with
+  <dt>{"basic-damage", N}</dt>
+  <dd>Increase the basic damage of all units of the unit-types given with
   '(apply-to ...).
   </dd>
-  <dt>'(piercing-damage N)</dt>
-  <dd>Change the piercing damage of all units of the unit-types given with
+  <dt>{"piercing-damage", N}</dt>
+  <dd>Increase the piercing damage of all units of the unit-types given with
   '(apply-to ...).
   </dd>
-  <dt>'(armor N)</dt>
-  <dd>Change the armor of all units of the unit-types given with
+  <dt>{"armor", N}</dt>
+  <dd>Increase the armor of all units of the unit-types given with
   '(apply-to ...).
   </dd>
-  <dt>'(speed N)</dt>
-  <dd>Change the speed of all units of the unit-types given with
-  '(apply-to ...). <b>Attention</b>: This changes only the displayed value
-  and not the real unit-speed!
-  </dd>
-  <dt>'(hit-points N)</dt>
-  <dd>Change the hit points of all units of the unit-types given with
+  <dt>{"hit-points", N}</dt>
+  <dd>Increase the hit points of all units of the unit-types given with
   '(apply-to ...).
   </dd>
-  <dt>'(regeneration-rate N)</dt>
-  <dd>amount of HP a unit gains per seconds</dt>
-  <dt>'(cost (resource N))</dt>
-  <dd>Change the costs for the resource type of all unit-types
+  <dt>{"regeneration-rate", N}</dt>
+  <dd>Increase the amount of HP a unit gains per seconds</dt>
+  <dt>{"variable-name", N}</dt>
+  <dd>Increase the user defined variable of all units of the unit-types given with
+  '(apply-to ...). Note Variable must be defined with DefineVariables().
+  </dd>
+  <dt>{"cost", ("resource-name", N}}</dt>
+  <dd>Increase the costs for the resource type of all unit-types
   or upgrade-ids given with '(apply-to ...).
   </dd>
-  <dt>'(allow-unit unit-type-id N)</dt>
+  <dt>{"allow-unit", "unit-type", N}</dt>
   <dd>
       Change the state of an upgrade. N is the maximum quantity
       of this unit per player.
   </dd>
-  <dt>'(allow upgrade-id N)</dt>
-  <dd>Change the state of an upgrade. N can be
+  <dt>{"allow", "upgrade", 'A' or 'E' or 'F' or 'R' or 'Q'}</dt>
+  <dd>Change the state of an upgrade. state can be
       <ul>
       <li>A - Allowed
       <li>E - Enabled, allowed by level but currently forbidden
@@ -249,10 +247,9 @@ all old units and any new unit of a player.
       </ul>
       FIXME: The correct possible changed must be described.
   </dd>
-  <dt>'(apply-to unit-type-id) or '(apply-to upgrade-id)</dt>
-  <dd>The modifiers are applied to this unit-type or upgrade.
-  </dd>
-  <dt>'(convert-to unit-type-id)</dt>
+  <dt>{"apply-to", "unit-type" or "upgrade"}</dt>
+  <dd>The modifiers are applied to this unit-type or upgrade.</dd>
+  <dt>{"convert-to", "unit-type"}</dt>
   <dd>All units of the unit-types given with '(apply-to ...) are converted
   into this unit-type.
   </dd>
@@ -263,45 +260,44 @@ all old units and any new unit of a player.
 <h4>Example</h4>
 
 <pre>
-    ;; This is the default effect of the first sword upgrade. The piercing damage
-    ;; of the listed units is increased.
-    (define-modifier 'upgrade-sword1
-      '(piercing-damage 2)
-      '(apply-to unit-footman) '(apply-to unit-knight) '(apply-to unit-paladin)
-      '(apply-to unit-dwarves) '(apply-to unit-d_____) '(apply-to unit-l_____)
-      '(apply-to unit-u____-l___________) '(apply-to unit-t_______))
+-- This is the default effect of the first sword upgrade. The piercing damage
+-- of the listed units is increased.
+DefineModifier("upgrade-sword1",
+  {"piercing-damage", 2},
+  {"apply-to", "unit-footman"}, {"apply-to", "unit-knight"}, {"apply-to", "unit-paladin"},
+  {"apply-to", "unit-dwarves"}, {"apply-to", "unit-arthor-literios"}, {"apply-to", "unit-wise-man"},
+  {"apply-to", "unit-man-of-light"}, {"apply-to", "unit-knight-rider"})
 </pre>
 
 <a name="DefineUpgrade"></a>
-<h3>DefineUpgrade( name 'icon icon-id 'costs #( costs ... ))</h3>
+<h3>DefineUpgrade("name", "icon", "icon-name", "costs", { costs, ... })</h3>
 
 Define an upgrade, how it is shown and how much it costs.
 
 
 <dl>
 <dt>name</dt>
-<dd>Name of the upgrade, used in buttons (define-button) and 
+<dd>Name of the upgrade, used in buttons (define-button) and
 <a href="#DefineModifier">DefineModifier()</a>.
 </dd>
-<dt>'icon icon-id</dt>
+<dt>"icon", "icon-name"</dt>
 <dd>Name of the upgrade icon, shown in buttons or during the research of the
-upgrade.  The icon is defined with 
+upgrade.  The icon is defined with
 <a href="icon.html#DefineIcon">DefineIcon()</a> or
 <a href="icon.html#DefineIconAlias">DefineIconAlias()</a>
-<dt>'costs #( time resource1 resource2 resource3 resource4 resource5 resource6)</dt>
+<dt>"costs", {time, resource1, resource2, resource3, resource4, resource5, resource6}</dt>
 <dd>This are the costs for the upgrade. The costs (resource1-resource6) could
-be redefined, the default is: 'costs #( time gold wood oil ore stone coal).
+be redefined, the default is: "costs", {time, gold, wood, oil, ore, stone, coal}.
 </dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    ;; This is the default definition of the first sword upgrade. The icon
-    ;; "icon-sword2" is shown in buttons and during the upgrade. The upgrade costs
-    ;; 200 frame cycles to research and 800 gold from the store.
-    (define-upgrade 'upgrade-sword1 'icon 'icon-sword2
-      'costs #(   200   800     0     0     0     0     0))
+-- This is the default definition of the first sword upgrade. The icon
+-- "icon-sword1" is shown in buttons and during the upgrade. The upgrade costs
+-- 200 frame cycles to research and 800 gold from the store.
+DefineUpgrade("upgrade-sword1", "icon", "icon-sword2",
+  "costs", {   200,   800,     0,     0,     0,     0,     0})
 </pre>
 
 <a name="GetDependency"></a>
