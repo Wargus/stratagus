@@ -1,16 +1,16 @@
-//       _________ __                 __                               
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-//             \/                  \/          \//_____/            \/ 
+//             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name beos.c		-	The BeOS functions */
+/**@name beos.c - The BeOS functions */
 //
-//	(c) Copyright 2000,2001 by Kenneth Sanislo
+//      (c) Copyright 2000-2004 by Kenneth Sanislo
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 // NOTE: setup/make use beos.c and BeIDE use beos.cpp
 
 /*----------------------------------------------------------------------------
---	Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
@@ -41,14 +41,16 @@
 #ifdef USE_BEOS
 
 /*----------------------------------------------------------------------------
---	Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /**
-**	Need init function for beos.
+**  Need init function for beos.
+**
+**  @param argc  Number of command line argurments
 */
-global void beos_init( int argc, char **argv )
-{ 
+global void beos_init(int argc, char **argv)
+{
 }
 
 #endif
