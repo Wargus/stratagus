@@ -41,6 +41,22 @@
 #include "iolib.h"
 #include "sound_server.h"
 
+//
+//	Use this if you have still an old flac version.
+//
+#ifdef FLAC_IDIOTIC
+
+#define FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM \
+    FLAC__STREAM_DECODER_READ_END_OF_STREAM
+#define FLAC__STREAM_DECODER_READ_STATUS_CONTINUE \
+    FLAC__STREAM_DECODER_READ_CONTINUE
+#define FLAC__StreamMetadata \
+    FLAC__StreamMetaData
+#define FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE \
+    FLAC__STREAM_DECODER_WRITE_CONTINUE
+
+#endif
+
 /*----------------------------------------------------------------------------
 --	Declaration
 ----------------------------------------------------------------------------*/
@@ -96,10 +112,10 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
     if ((i = CLread(f, buffer, *bytes)) != *bytes) {
 	*bytes = i;
 	if (!i) {
-	    return FLAC__STREAM_DECODER_READ_END_OF_STREAM;
+	    return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
 	}
     }
-    return FLAC__STREAM_DECODER_READ_CONTINUE;
+    return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
 /**
@@ -111,7 +127,7 @@ local FLAC__StreamDecoderReadStatus FLAC_read_callback(
 */
 local void FLAC_metadata_callback(
 	const FLAC__StreamDecoder * stream __attribute__((unused)),
-	const FLAC__StreamMetaData * metadata, void *user)
+	const FLAC__StreamMetadata * metadata, void *user)
 {
     Sample *sample;
 
@@ -138,8 +154,8 @@ local void FLAC_metadata_callback(
 **	@return		Error status.
 */
 local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
-    FLAC__StreamDecoder * stream __attribute__((unused)),
-    const FLAC__Frame * frame, const FLAC__int32 * buffer[], void *user)
+    FLAC__StreamDecoder * decoder __attribute__((unused)),
+    const FLAC__Frame * frame, const FLAC__int32 * const buffer[], void *user)
 {
     Sample *sample;
     int i;
@@ -187,7 +203,7 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 	    ExitFatal(-1);
     }
 
-    return FLAC__STREAM_DECODER_WRITE_CONTINUE;
+    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
 /**
