@@ -1274,7 +1274,7 @@ local void EditorCallbackMouse(int x, int y)
 	    EditTiles(Viewport2MapX(TheUI.LastClickedVP, CursorX),
 		Viewport2MapY(TheUI.LastClickedVP, CursorY), TileCursor,
 		TileCursorSize);
-	} else if (EditorState == EditorEditUnit) {
+	} else if (EditorState == EditorEditUnit && CursorBuilding) {
 	    if (CanBuildUnitType(NULL, CursorBuilding,
 		    Viewport2MapX(TheUI.LastClickedVP, CursorX),
 		    Viewport2MapY(TheUI.LastClickedVP, CursorY))) {
