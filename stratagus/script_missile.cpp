@@ -270,7 +270,7 @@ local SCM CclMissile(SCM list)
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    str = gh_scm2newstr(value, NULL);
-	    missile->SourceUnit = UnitSlots[strtol (str + 1, 0, 16)];
+	    missile->SourceUnit = UnitSlots[strtol(str + 1, 0, 16)];
 	    free(str);
 	    ++missile->SourceUnit->Refs;
 	} else if (gh_eq_p(value, gh_symbol2scm("target"))) {
@@ -278,7 +278,7 @@ local SCM CclMissile(SCM list)
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    str = gh_scm2newstr(value, NULL);
-	    missile->TargetUnit = UnitSlots[strtol (str + 1, 0, 16)];
+	    missile->TargetUnit = UnitSlots[strtol(str + 1, 0, 16)];
 	    free(str);
 	    missile->TargetUnit->Refs++;
 	} else if (gh_eq_p(value, gh_symbol2scm("damage"))) {
