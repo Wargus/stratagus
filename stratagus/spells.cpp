@@ -1391,6 +1391,8 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
     case SpellActionRaiseDead:
     {
 	Unit **corpses;
+	Unit *tempcorpse;
+
 	corpses = &CorpseList;
 
 	while( *corpses ) {
@@ -1402,23 +1404,27 @@ global int SpellCast(Unit * unit, const SpellType * spell, Unit * target,
 		    && (*corpses)->Y >= y-1 && (*corpses)->Y <= y+1) {
 
 		// FIXME: did they count on food?
-		// Can there be more than 1 skeleton created on the same tile?
+		// Can there be more than 1 skeleton created on the same tile? yes
 		// FIXME: Don't use UnitTypeByIdent during runtime.
-		target=MakeUnitAndPlace(x, y, UnitTypeByIdent("unit-skeleton"),
-			unit->Player);
+		target=MakeUnitAndPlace((*corpses)->X, (*corpses)->Y,
+			UnitTypeByIdent("unit-skeleton"), unit->Player);
 		// set life span
 		target->TTL=GameCycle+
 			target->Type->DecayRate*6*CYCLES_PER_SECOND;
 		CheckUnitToBeDrawn(target);
 
-		ReleaseUnit( *corpses );
+		tempcorpse = *corpses;
+		corpses=&(*corpses)->Next;
+
+		ReleaseUnit( tempcorpse );
 
 		unit->Mana -= spell->ManaCost;
 		if( unit->Mana < spell->ManaCost ) {
 		    break;
 		}
+	    } else {
+		corpses=&(*corpses)->Next;
 	    }
-	    corpses=&(*corpses)->Next;
 	}
 
 	PlayGameSound(spell->Casted.Sound,MaxSampleVolume);
