@@ -72,7 +72,7 @@ static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
 **  @param y        Y screen position
 */
 #ifndef USE_OPENGL
-void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+void VideoDrawSub(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	SDL_Rect srect;
@@ -86,10 +86,10 @@ void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	drect.x = x;
 	drect.y = y;
 
-	SDL_BlitSurface(graphic->Surface, &srect, TheScreen, &drect);
+	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
 }
 #else
-void VideoDrawSub(const Graphic* graphic, int gx, int gy,
+void VideoDrawSub(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	int sx;
@@ -106,12 +106,12 @@ void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 	sy = y;
 	ey = y + h;
 
-	stx = (GLfloat)gx / graphic->Width * graphic->TextureWidth;
-	etx = (GLfloat)(gx + w) / graphic->Width * graphic->TextureWidth;
-	sty = (GLfloat)gy / graphic->Height * graphic->TextureHeight;
-	ety = (GLfloat)(gy + h) / graphic->Height * graphic->TextureHeight;
+	stx = (GLfloat)gx / g->Width * g->TextureWidth;
+	etx = (GLfloat)(gx + w) / g->Width * g->TextureWidth;
+	sty = (GLfloat)gy / g->Height * g->TextureHeight;
+	ety = (GLfloat)(gy + h) / g->Height * g->TextureHeight;
 
-	glBindTexture(GL_TEXTURE_2D, graphic->Textures[0]);
+	glBindTexture(GL_TEXTURE_2D, g->Textures[0]);
 	glBegin(GL_QUADS);
 	glTexCoord2f(stx, sty);
 	glVertex2i(sx, sy);
@@ -136,7 +136,7 @@ void VideoDrawSub(const Graphic* graphic, int gx, int gy,
 **  @param x        X screen position
 **  @param y        Y screen position
 */
-void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubClip(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y)
 {
 	int oldx;
@@ -145,7 +145,7 @@ void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 	oldx = x;
 	oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y);
+	VideoDrawSub(g, gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
 /**
@@ -161,22 +161,22 @@ void VideoDrawSubClip(const Graphic* graphic, int gx, int gy,
 **  @param alpha    Alpha
 */
 #ifndef USE_OPENGL
-void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	int oldalpha;
 
-	oldalpha = graphic->Surface->format->alpha;
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, alpha);
-	VideoDrawSub(graphic, gx, gy, w, h, x, y);
-	SDL_SetAlpha(graphic->Surface, SDL_SRCALPHA, oldalpha);
+	oldalpha = g->Surface->format->alpha;
+	SDL_SetAlpha(g->Surface, SDL_SRCALPHA, alpha);
+	VideoDrawSub(g, gx, gy, w, h, x, y);
+	SDL_SetAlpha(g->Surface, SDL_SRCALPHA, oldalpha);
 }
 #else
-void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	// FIXME: not done
-	VideoDrawSub(graphic, gx, gy, w, h, x, y);
+	VideoDrawSub(g, gx, gy, w, h, x, y);
 }
 #endif
 
@@ -192,7 +192,7 @@ void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 **  @param y        Y screen position
 **  @param alpha    Alpha
 */
-void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
+void VideoDrawSubClipTrans(const Graphic* g, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha)
 {
 	int oldx;
@@ -201,7 +201,7 @@ void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	oldx = x;
 	oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSubTrans(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	VideoDrawSubTrans(g, gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
 }
 
 /*----------------------------------------------------------------------------
@@ -219,29 +219,29 @@ void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 */
 Graphic* NewGraphic(const char* file, int w, int h)
 {
-	Graphic* graphic;
-	Graphic** g;
+	Graphic* g;
+	Graphic** ptr;
 
-	g = (Graphic**)hash_find(GraphicHash, file);
-	if (!g || !*g) {
-		graphic = calloc(1, sizeof(Graphic));
-		if (!graphic) {
+	ptr = (Graphic**)hash_find(GraphicHash, file);
+	if (!ptr || !*ptr) {
+		g = calloc(1, sizeof(Graphic));
+		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
 		}
-		graphic->File = strdup(file);
-		graphic->Width = w;
-		graphic->Height = h;
-		graphic->NumFrames = 1;
-		graphic->Refs = 1;
-		*(Graphic**)hash_add(GraphicHash, file) = graphic;
+		g->File = strdup(file);
+		g->Width = w;
+		g->Height = h;
+		g->NumFrames = 1;
+		g->Refs = 1;
+		*(Graphic**)hash_add(GraphicHash, file) = g;
 	} else {
-		graphic = *g;
-		++graphic->Refs;
-		Assert((w == 0 || graphic->Width == w) && (graphic->Height == h || h == 0));
+		g = *ptr;
+		++g->Refs;
+		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
 
-	return graphic;
+	return g;
 }
 
 /**
@@ -295,7 +295,6 @@ void LoadGraphic(Graphic* g)
 */
 void FreeGraphic(Graphic* g)
 {
-
 #ifdef USE_OPENGL
 	int i;
 #endif
@@ -341,8 +340,6 @@ void FreeGraphic(Graphic* g)
 		free(g->File);
 		free(g);
 	}
-
-	return;
 }
 
 /**
@@ -547,15 +544,15 @@ static void MakeTextures(Graphic* g, GLuint* textures, UnitColors* colors)
 **
 **  @param graphic  The graphic object.
 */
-void MakeTexture(Graphic* graphic)
+void MakeTexture(Graphic* g)
 {
-	if (graphic->Textures) {
+	if (g->Textures) {
 		return;
 	}
 
-	graphic->Textures = (GLuint*)malloc(graphic->NumFrames * sizeof(GLuint));
-	glGenTextures(graphic->NumFrames, graphic->Textures);
-	MakeTextures(graphic, graphic->Textures, NULL);
+	g->Textures = (GLuint*)malloc(g->NumFrames * sizeof(GLuint));
+	glGenTextures(g->NumFrames, g->Textures);
+	MakeTextures(g, g->Textures, NULL);
 }
 
 /**
@@ -564,11 +561,11 @@ void MakeTexture(Graphic* graphic)
 **  @param graphic  FIXME: docu
 **  @param player   FIXME: docu
 */
-void MakePlayerColorTexture(Graphic* graphic, int player)
+void MakePlayerColorTexture(Graphic* g, int player)
 {
-	graphic->PlayerColorTextures[player] = malloc(graphic->NumFrames * sizeof(GLuint));
-	glGenTextures(graphic->NumFrames, graphic->PlayerColorTextures[player]);
-	MakeTextures(graphic, graphic->PlayerColorTextures[player], &Players[player].UnitColors);
+	g->PlayerColorTextures[player] = malloc(g->NumFrames * sizeof(GLuint));
+	glGenTextures(g->NumFrames, g->PlayerColorTextures[player]);
+	MakeTextures(g, g->PlayerColorTextures[player], &Players[player].UnitColors);
 }
 #endif
 
