@@ -79,6 +79,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #ifdef DEBUG
 extern unsigned AllocatedGraphicMemory;
 extern unsigned CompressedGraphicMemory;
+extern SCM CclUnits(void);
 #endif
 
 /*----------------------------------------------------------------------------
