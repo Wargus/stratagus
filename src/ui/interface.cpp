@@ -314,6 +314,9 @@ local void UiEnterMenu(void)
     ProcessMenu(MENU_GAME, 1);
 }
 
+/**
+**	Enter help menu
+*/
 local void UiEnterHelpMenu(void)
 {
     GamePaused=1;
@@ -326,7 +329,7 @@ local void UiEnterHelpMenu(void)
 }
 
 /**
-**	Enter Options menu
+**	Enter options menu
 */
 local void UiEnterOptionsMenu(void)
 {
@@ -778,6 +781,15 @@ local int CommandKey(int key)
 	    UiCenterOnSelected();
 	    break;
 
+	case 'f'&0x1F:
+	case 'f':
+	case 'F':			// ALT+F, CTRL+F toggle fullscreen
+	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
+		break;
+	    }
+	    ToggleFullScreen();
+	    break;
+
 	case 'g'&0x1F:
 	case 'g':
 	case 'G':			// ALT+G, CTRL+G grab mouse pointer
@@ -787,13 +799,13 @@ local int CommandKey(int key)
 	    UiToggleGrabMouse();
 	    break;
 
-	case 'f'&0x1F:
-	case 'f':
-	case 'F':			// toggle fullscreen
+	case 'h'&0x1F:
+	case 'h':
+	case 'H':			// ALT+H, CTRL+H Help menu
 	    if( !(KeyModifiers&(ModifierAlt|ModifierControl)) ) {
 		break;
 	    }
-	    ToggleFullScreen();
+	    UiEnterHelpMenu();
 	    break;
 
         case ' ':			// center on last action
