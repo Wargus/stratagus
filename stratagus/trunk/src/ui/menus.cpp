@@ -167,6 +167,8 @@ local void MultiPlayerGameMenu(void);
 local void CampaignGameMenu(void);
 local void ScenSelectMenu(void);
 
+local void MultiPlayerLANGame(void);
+
 local void CampaignMenu1(void);
 local void CampaignMenu2(void);
 local void CampaignMenu3(void);
@@ -339,11 +341,8 @@ global char ScenSelectFullPath[1024];		/// Scenario selector path+name
 
 global MapInfo *ScenSelectMapInfo;		/// Selected pud info
 
-    /// FIXME: Docu
-global int nKeyStrokeHelps;
-
-    /// FIXME: Docu
-global char **KeyStrokeHelps;
+global int nKeyStrokeHelps;			/// Number of keystroke help lines
+global char **KeyStrokeHelps;			/// Array of keystroke help lines
 
 /// FIXME: -> ccl...
 local unsigned char *mgptsoptions[] = {
@@ -456,6 +455,9 @@ global void InitMenuFuncHash(void) {
 // Net create join
     HASHADD(JoinNetGameMenu,"net-join-game");
     HASHADD(CreateNetGameMenu,"net-create-game");
+
+// Multi net type
+    HASHADD(MultiPlayerLANGame,"net-lan-game");
 
 // Net multi setup
     HASHADD(MultiGameSetupInit,"multi-game-setup-init");
@@ -2860,12 +2862,21 @@ local void MultiPlayerGameMenu(void)
 
     GuiGameStarted = 0;
     // Here we really go...
-    ProcessMenu("menu-create-join-menu", 1);
+    // ProcessMenu("menu-create-join-menu", 1);
+    ProcessMenu("menu-multi-net-type-menu", 1);
 
     DebugLevel0Fn("GuiGameStarted: %d\n" _C_ GuiGameStarted);
     if (GuiGameStarted) {
 	GameMenuReturn();
     }
+}
+
+/**
+**	Process LAN/P2P game menu
+*/
+local void MultiPlayerLANGame(void)
+{
+    ProcessMenu("menu-create-join-menu", 1);
 }
 
 /**
