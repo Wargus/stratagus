@@ -1906,6 +1906,10 @@ global void DrawUnit(const Unit* unit)
 		state = (unit->Orders[0].Action == UnitActionBuilded) |
 			((unit->Orders[0].Action == UnitActionUpgradeTo) << 1);
 		constructed = unit->Constructed;
+		// Reset Type to the type being upgraded to
+		if (state == 2) {
+			type = unit->Orders[0].Type;
+		}
 		// This is trash unless the unit is being built, and that's when we use it.
 		cframe = unit->Data.Builded.Frame;
 	} else {
