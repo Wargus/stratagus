@@ -10,7 +10,7 @@
 //
 /**@name movie.c	-	Movie playback functions. */
 //
-//	(c) Copyright 2002 by Lutz Sammer
+//	(c) Copyright 2002-2003 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ extern void VPDeInitLibrary(void);
 
 #ifdef USE_SDL				/// Only supported with SDL for now
 
-extern SDL_Surface *Screen;		/// internal screen
+extern SDL_Surface* Screen;		/// internal screen
 
 /*----------------------------------------------------------------------------
 --	Defines
@@ -116,7 +116,7 @@ global void MovieClose(AviFile* avi)
 global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
     SDL_Overlay* overlay, SDL_Rect rect)
 {
-    unsigned char *frame;
+    unsigned char* frame;
     int length;
     int i;
     YUV_BUFFER_CONFIG yuv;
@@ -160,7 +160,7 @@ global int MovieDisplayFrame(AviFile* avi, PB_INSTANCE* pbi,
 */
 local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
 {
-    MovieKeyPressed=0;
+    MovieKeyPressed = 0;
 }
 
 /**
@@ -169,7 +169,7 @@ local void MovieCallbackKey(unsigned dummy __attribute__((unused)))
 local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-    MovieKeyPressed=0;
+    MovieKeyPressed = 0;
 }
 
 /**
@@ -178,7 +178,7 @@ local void MovieCallbackKey2(unsigned dummy1 __attribute__((unused)),
 local void MovieCallbackKey3(unsigned dummy1 __attribute__((unused)),
 	unsigned dummy2 __attribute__((unused)))
 {
-    MovieKeyPressed=0;
+    MovieKeyPressed = 0;
 }
 
 /**
@@ -206,11 +206,11 @@ local void MovieCallbackExit(void)
 **
 **	@todo Support full screen and resolution changes.
 */
-global int PlayMovie(const char *name, int flags)
+global int PlayMovie(const char* name, int flags)
 {
-    AviFile *avi;
-    SDL_Overlay *overlay;
-    PB_INSTANCE *pbi;
+    AviFile* avi;
+    SDL_Overlay* overlay;
+    PB_INSTANCE* pbi;
     EventCallback callbacks;
     SDL_Rect rect;
 
@@ -220,7 +220,7 @@ global int PlayMovie(const char *name, int flags)
 	return 1;
     }
 
-    if( avi->AudioStream != -1 ) {	// Only if audio available
+    if (avi->AudioStream != -1) {	// Only if audio available
 	StopMusic();
     }
 
@@ -230,9 +230,8 @@ global int PlayMovie(const char *name, int flags)
     if (flags & PlayMovieFullScreen) {
 	DebugLevel0Fn("FIXME: full screen switch not supported\n");
     }
-    overlay =
-	SDL_CreateYUVOverlay(avi->Width, avi->Height, SDL_YV12_OVERLAY,
-	Screen);
+    overlay = SDL_CreateYUVOverlay(avi->Width, avi->Height,
+	SDL_YV12_OVERLAY, Screen);
     if (!overlay) {
 	fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 	exit(1);
@@ -246,20 +245,20 @@ global int PlayMovie(const char *name, int flags)
     StartDecoder(&pbi, avi->Width, avi->Height);
 
 #if defined(WITH_SOUND) && defined(USE_OGG)
-    if( avi->AudioStream != -1 ) {	// Only if audio available
+    if (avi->AudioStream != -1) {	// Only if audio available
 	PlayAviOgg(avi);
     }
 #endif
 
-    callbacks.ButtonPressed=MovieCallbackKey;
-    callbacks.ButtonReleased=MovieCallbackKey;
-    callbacks.MouseMoved=MovieCallbackMouse;
-    callbacks.MouseExit=MovieCallbackExit;
-    callbacks.KeyPressed=MovieCallbackKey2;
-    callbacks.KeyReleased=MovieCallbackKey2;
-    callbacks.KeyRepeated=MovieCallbackKey3;
-    callbacks.NetworkEvent=NetworkEvent;
-    callbacks.SoundReady=WriteSound;
+    callbacks.ButtonPressed = MovieCallbackKey;
+    callbacks.ButtonReleased = MovieCallbackKey;
+    callbacks.MouseMoved = MovieCallbackMouse;
+    callbacks.MouseExit = MovieCallbackExit;
+    callbacks.KeyPressed = MovieCallbackKey2;
+    callbacks.KeyReleased = MovieCallbackKey2;
+    callbacks.KeyRepeated = MovieCallbackKey3;
+    callbacks.NetworkEvent = NetworkEvent;
+    callbacks.SoundReady = WriteSound;
 
     if (flags & PlayMovieZoomScreen) {
 	if (flags & PlayMovieKeepAspect) {
@@ -269,7 +268,7 @@ global int PlayMovie(const char *name, int flags)
 	    wa = VideoWidth * 100 / avi->Width;
 	    ha = VideoHeight * 100 / avi->Height;
 	    DebugLevel0Fn(" %d x %d\n" _C_ wa _C_ ha);
-	    if( wa < ha ) {			// Keep the aspect ratio
+	    if (wa < ha) {			// Keep the aspect ratio
 		rect.w = VideoWidth;
 		rect.h = avi->Height * wa / 100;
 	    } else {
@@ -287,7 +286,7 @@ global int PlayMovie(const char *name, int flags)
     rect.x = (VideoWidth - rect.w) / 2;
     rect.y = (VideoHeight - rect.h) / 2;
 
-    if( 1 ) {
+    if (1) {
 	int i;
 
 	GetPbParam(pbi, PBC_SET_POSTPROC, &i);
@@ -305,7 +304,7 @@ global int PlayMovie(const char *name, int flags)
 	WaitEventsOneFrame(&callbacks);
     }
 
-    if( avi->AudioStream != -1 ) {	// Only if audio available
+    if (avi->AudioStream != -1) {	// Only if audio available
 	StopMusic();
     }
 
