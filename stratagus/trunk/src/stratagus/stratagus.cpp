@@ -221,6 +221,7 @@ extern int getopt(int argc, char *const*argv, const char *opt);
 #include "editor.h"
 #include "movie.h"
 #include "cdaudio.h"
+#include "pathfinder.h"
 
 #ifdef DEBUG
 extern SCM CclUnits(void);
@@ -1127,6 +1128,10 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    //	Play the game.
 	    //
 	    GameMainLoop();
+
+	    if (AStarOn) {
+		FreeAStar();
+	    }
 	}
 
 	CleanModules();
