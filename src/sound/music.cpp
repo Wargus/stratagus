@@ -40,10 +40,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef USE_LIBMODPLUG
-#include "../libmodplug/modplug.h"
-#endif
-
 #ifdef USE_SDL
 #include "SDL.h"
 #endif
@@ -67,7 +63,7 @@
 --		Variables
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 global Sample* MusicSample;			 /// Music samples
 #endif
 
@@ -90,7 +86,7 @@ global void StopMusic(void)
 {
 	if (PlayingMusic) {
 		PlayingMusic = 0;				// Callback!
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 		if (MusicSample) {
 #ifdef USE_SDL
 			SDL_LockAudio();
@@ -105,125 +101,6 @@ global void StopMusic(void)
 #endif
 	}
 }
-
-#ifdef USE_LIBMODPLUG
-/**
-**	  Read next samples from libmodplug object.
-**
-**	  @param o		pointer to object.
-**	  @param buf	  buffer to fill.
-**	  @param len	  length of buffer in bytes.
-**
-**	  @return		 Number of bytes filled.
-*/
-local int ModRead(Sample* o, void* buf, int len)
-{
-	return ModPlug_Read(o->User, buf, len);
-}
-
-/**
-**	  Free the sample of libmodplug object.
-**
-**	  @param o		pointer to object.
-*/
-local void ModFree(Sample* o)
-{
-	ModPlug_Unload(o->User);
-	free(o);
-}
-
-/**
-**		Libmodplug object type structure.
-*/
-local const SampleType ModSampleType = {
-	ModRead,
-	ModFree,
-};
-
-/**
-**		Load a mod file.
-**
-**		@param name		A possible mod file.
-**		@param flags		Load flags.
-**
-**		@return				Sample to mix the mod, if the file is a mod.
-**
-**		@todo				If CL supports file size query, loading can be done
-**						faster, perhaps we can rewrite modplug to support
-**						streaming.
-*/
-local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
-{
-	ModPlug_Settings settings;
-	ModPlugFile* modfile;
-	Sample* sample;
-	CLFile* f;
-	char* buffer;
-	int size;
-	int i;
-	int ticks;
-	int n;
-
-	ticks = GetTicks();
-	DebugLevel0Fn("Trying `%s'\n" _C_ name);
-	if (!(f = CLopen(name,CL_OPEN_READ))) {
-		printf("Can't open file `%s'\n", name);
-		return NULL;
-	}
-
-	// Load complete file into memory, with realloc = slow
-	size = 0;
-	n = 16384;
-	buffer = malloc(n);
-	while ((i = CLread(f, buffer + size, n)) == n) {
-		size += n;
-		if (n < 1024 * 1024) {
-			n <<= 1;
-		} else {
-			n = 2 * 1024 * 1024;
-		}
-		buffer = realloc(buffer, size + n);
-	}
-	size += i;
-	buffer = realloc(buffer, size);
-
-	CLclose(f);
-
-	StopMusic();						// stop music before new music
-
-	ModPlug_GetSettings(&settings);		// Conversion settings
-	settings.mFrequency = SoundFrequency;
-#ifdef USE_LIBMODPLUG32
-	settings.mBits = 32;
-#else
-	settings.mBits = 16;
-#endif
-	settings.mLoopCount = 0;				// Disable looping
-	ModPlug_SetSettings(&settings);
-
-	modfile = ModPlug_Load(buffer, size);
-
-	free(buffer);
-
-	if (modfile) {
-		DebugLevel0Fn("Started ticks %ld\n" _C_ GetTicks() - ticks);
-		sample = malloc(sizeof(*sample));
-		sample->Type = &ModSampleType;
-		sample->User = modfile;
-		sample->Channels = 2;
-#ifdef USE_LIBMODPLUG32
-		sample->SampleSize = 32;
-#else
-		sample->SampleSize = 16;
-#endif
-		sample->Frequency = SoundFrequency;
-		sample->Length = 0;
-		return sample;
-	}
-
-	return NULL;
-}
-#endif
 
 /**
 **		FIXME: docu
@@ -330,7 +207,7 @@ global void PlaySectionMusic(PlaySectionType section)
 global int PlayMusic(const char* name)
 {
 	char buffer[PATH_MAX];
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
 	Sample* sample;
 #endif
 
@@ -391,13 +268,6 @@ global int PlayMusic(const char* name)
 		}
 */
 		StopMusic();
-		MusicSample = sample;
-		PlayingMusic = 1;
-		return 1;
-	}
-#endif
-#ifdef USE_LIBMODPLUG
-	if ((sample = LoadMod(name, PlayAudioStream))) {
 		MusicSample = sample;
 		PlayingMusic = 1;
 		return 1;
