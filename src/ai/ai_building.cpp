@@ -595,7 +595,7 @@ global int AiFindBuildingPlace(const Unit* worker, const UnitType* type, int* dx
 	// Platforms can only be built on oil patches
 	//
 	if (type->GivesResource != OilCost &&
-		AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
+			AiFindBuildingPlace2(worker, type, worker->X, worker->Y, dx, dy, 1)) {
 		return 1;
 	}
 	// FIXME: Should do this if all units can't build better!
