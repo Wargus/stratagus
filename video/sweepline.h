@@ -10,7 +10,7 @@
 //
 /**@name sweepline.h 	-	Invalidate rectangles from given marked areas */
 //
-//	(c) Copyright 2002 by Lutz Sammer and Stephan Rasenberg
+//	(c) Copyright 2002-2003 by Lutz Sammer and Stephan Rasenberg
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
 /**
 ** 
 **
-**/
+*/
 
 /*----------------------------------------------------------------------------
 --      Functions
@@ -60,8 +60,8 @@
 **      @note: For this to work all segments should be added with an increasing
 **      or equal y-coordinate, to make the merge possible and ensure the
 **      invalidate order.
-**/
-extern void SweeplineAdd( int leftx, int rightx, int y );
+*/
+extern void SweeplineAdd(int leftx, int rightx, int y);
 
 /**
 **      Invalidate all segments which exist too long (have bottomyshadow
@@ -70,13 +70,13 @@ extern void SweeplineAdd( int leftx, int rightx, int y );
 **      @note: This leaves segments which might still be 'merged' with new ones
 **      or are the last and need to be invalidated separetely with
 **      SweeplineInvalidateAll
-**/
-extern void SweeplineInvalidate( int y );
+*/
+extern void SweeplineInvalidate(int y);
 
 /**
 **      Invalidate all segments still available in this structure.
-**/
-extern void SweeplineInvalidateAll( void );
+*/
+extern void SweeplineInvalidateAll(void);
 
 
 

@@ -9,7 +9,7 @@
 //	   Stratagus - A free fantasy real time strategy game engine
 //
 /**@name sweepline.c    -       Invalidate rectangles from given marked areas *///
-//	(c) Copyright 2002 by Lutz Sammer and Stephan Rasenberg
+//	(c) Copyright 2002-2003 by Lutz Sammer and Stephan Rasenberg
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@
 **	SWEEPLINE_MERGE pixels of another segment and than will combine them.
 **	@note: SWEEPLINE_MERGE>0, as SWEEPLINE_MERGE==1 will merge only
 **	touching segments, wich is the atleast you can do.
-**/
+*/
 #define SWEEPLINE_MERGE 10
 
 /**
@@ -96,12 +96,19 @@
 **				next in line to be invalidated. When the
 **				current sweepline y-pos >= bottomyshadow we
 **				have a candidate to invalidate.
-**/
+*/
 typedef struct SRectangle {
-  struct SRectangle *nextleft, *nextright;
-  struct SRectangle *midleft, *midright, **pnode;
-  struct SRectangle *bottomprv, *bottomnxt;
-  int leftx, rightx, topy, bottomyshadow;
+  struct SRectangle* nextleft;
+  struct SRectangle* nextright;
+  struct SRectangle* midleft;
+  struct SRectangle* midright;
+  struct SRectangle** pnode;
+  struct SRectangle* bottomprv;
+  struct SRectangle* bottomnxt;
+  int leftx;
+  int rightx;
+  int topy;
+  int bottomyshadow;
 } SRectangle;
 
 
@@ -121,8 +128,8 @@ typedef struct SRectangle {
 **      FIXME: this will result into a memory-leak when this mechanism is no
 **      longer used. But I expect this to be needed througout the program and
 **      so no memory is given back.
-**/
-static SRectangle *sweepline_garbage=NULL;
+*/
+local SRectangle* sweepline_garbage;
 
 /**
 **	The double link-list that contains all segments ordered in which they
@@ -130,9 +137,9 @@ static SRectangle *sweepline_garbage=NULL;
 **	firt to be invalidated and should then have current sweepline y-pos
 **	bigger/equal to  head's bottomyshadow. The tail is used to add new
 **	segments to the back, so we get a FIFO-like of getting rectangles.
-**/
-static SRectangle *sweepline_bottom_head=NULL;
-static SRectangle *sweepline_bottom_tail=NULL;
+*/
+local SRectangle* sweepline_bottom_head;
+local SRectangle* sweepline_bottom_tail;
 
 
 /*----------------------------------------------------------------------------
@@ -142,40 +149,47 @@ static SRectangle *sweepline_bottom_tail=NULL;
 /**
 **	Delete a segment from all lists.. making it re-useable as garbage
 **	Pre: given segment should have been added with SweeplineAdd
-**/
-static void DeleteSRectangle( SRectangle *node )
+*/
+local void DeleteSRectangle(SRectangle* node)
 {
-// remove from double link-list nextleft,nextright
-  if ( node->nextleft )
-    node->nextleft->nextright = node->nextright;
-  if ( node->nextright )
-    node->nextright->nextleft = node->nextleft;
-
-// remove from double link-list bottomprv,bottomnxt
-  if ( node->bottomprv )
-    node->bottomprv->bottomnxt = node->bottomnxt;
-  else sweepline_bottom_head = node->bottomnxt;
-  if ( node->bottomnxt )
-    node->bottomnxt->bottomprv = node->bottomprv;
-  else sweepline_bottom_tail = node->bottomprv;
-
-// remove from binary tree midleft,midright,pnode
-  if ( node->midright )
-  {
-    *node->pnode = node->midright;
-    if ( node->midleft )
-    {
-      SRectangle *q = node->midright;
-      while ( q->midleft )
-        q = q->midleft;
-      q->midleft = node->midleft;
+    // remove from double link-list nextleft,nextright
+    if (node->nextleft) {
+	node->nextleft->nextright = node->nextright;
     }
-  }
-  else *node->pnode = node->midleft;
+    if (node->nextright) {
+	node->nextright->nextleft = node->nextleft;
+    }
 
-// Add to single link-list by nextright (for memory re-use)
-  node->nextright = sweepline_garbage;
-  sweepline_garbage = node;
+    // remove from double link-list bottomprv,bottomnxt
+    if (node->bottomprv) {
+	node->bottomprv->bottomnxt = node->bottomnxt;
+    } else {
+	sweepline_bottom_head = node->bottomnxt;
+    }
+    if (node->bottomnxt) {
+	node->bottomnxt->bottomprv = node->bottomprv;
+    } else {
+	sweepline_bottom_tail = node->bottomprv;
+    }
+
+    // remove from binary tree midleft,midright,pnode
+    if (node->midright) {
+	*node->pnode = node->midright;
+	if (node->midleft) {
+	    SRectangle* q;
+	    q = node->midright;
+	    while (q->midleft) {
+		q = q->midleft;
+	    }
+	    q->midleft = node->midleft;
+	}
+    } else {
+	*node->pnode = node->midleft;
+    }
+
+    // Add to single link-list by nextright (for memory re-use)
+    node->nextright = sweepline_garbage;
+    sweepline_garbage = node;
 }
 
 /**
@@ -184,22 +198,23 @@ static void DeleteSRectangle( SRectangle *node )
 **	(y+SWEEPLINE_MERGE) >= bottomyshadow. It will do so placing the node
 **	at the back again with bottomyshadow (y+SWEEPLINE_MERGE)
 **	Pre: given segment should have been added with SweeplineAdd
-**/
-static void UpdateRectangleBottom( SRectangle *node, int y )
+*/
+local void UpdateRectangleBottom(SRectangle* node, int y)
 {
-  node->bottomyshadow = y + SWEEPLINE_MERGE;
-  if ( node->bottomnxt )
-  {
-  // remove from double link-list bottomprv,bottomnxt
-    if ( node->bottomprv )
-      node->bottomprv->bottomnxt = node->bottomnxt;
-    else sweepline_bottom_head = node->bottomnxt;
-    node->bottomnxt->bottomprv = node->bottomprv;
-  // add node to the tail (to make FIFO on bottomyshadow possible)
-    sweepline_bottom_tail->bottomnxt = node;
-    node->bottomprv = sweepline_bottom_tail;
-    node->bottomnxt = NULL;
-  }
+    node->bottomyshadow = y + SWEEPLINE_MERGE;
+    if (node->bottomnxt) {
+	// remove from double link-list bottomprv,bottomnxt
+	if (node->bottomprv) {
+	    node->bottomprv->bottomnxt = node->bottomnxt;
+	} else {
+	    sweepline_bottom_head = node->bottomnxt;
+	}
+	node->bottomnxt->bottomprv = node->bottomprv;
+	// add node to the tail (to make FIFO on bottomyshadow possible)
+	sweepline_bottom_tail->bottomnxt = node;
+	node->bottomprv = sweepline_bottom_tail;
+	node->bottomnxt = NULL;
+    }
 }
 
 /**
@@ -219,125 +234,124 @@ static void UpdateRectangleBottom( SRectangle *node, int y )
 **
 **	FIXME: prevent merging, when concerning a line consistent of a numer
 **	       of blocks. Which would now deliver one big rectangle for a line
-**/
-void SweeplineAdd( int leftx, int rightx, int y )
+*/
+void SweeplineAdd(int leftx, int rightx, int y)
 {
-  static SRectangle *sweepline_root=NULL;
+    static SRectangle* sweepline_root = NULL;
+    SRectangle** pnode;
+    SRectangle* nextleft;
+    SRectangle* nextright;
+    SRectangle* node;
+    int shadowleftx;
+    int shadowrightx;
 
-  SRectangle **pnode, *nextleft, *nextright, *node;
-  int shadowleftx, shadowrightx;
+#ifdef DEBUG
+    nextleft = nextright = NULL;
+#endif
 
-  IfDebug( nextleft=nextright=NULL);
+    DebugCheck(leftx > rightx);
 
-  DebugCheck( leftx > rightx );
+    shadowleftx  = leftx  - SWEEPLINE_MERGE;
+    shadowrightx = rightx + SWEEPLINE_MERGE;
 
-  shadowleftx  = leftx  - SWEEPLINE_MERGE;
-  shadowrightx = rightx + SWEEPLINE_MERGE;
-
-  pnode  = &sweepline_root;
-  while ( (node=*pnode) )
-  {
-    if ( shadowrightx < node->leftx )
-    // given segment left of found segment --> try next left segment
-    {
-      pnode     = &node->midleft;
-      nextright = node;
+    pnode = &sweepline_root;
+    while ((node = *pnode)) {
+	if (shadowrightx < node->leftx) {
+	    // given segment left of found segment --> try next left segment
+	    pnode     = &node->midleft;
+	    nextright = node;
+	} else if (shadowleftx > node->rightx) {
+	    // given segment right of found segment --> try next right segment
+	    pnode    = &node->midright;
+	    nextleft = node;
+	} else {
+	    // Handle overlap: merge and delete ununique segments
+	    if (leftx < node->leftx) {
+		SRectangle* l;
+		l = node->nextleft;
+		if (l && l->rightx >= shadowleftx) {
+		    // merge found segment(s) on leftside
+		    SRectangle *last = l;
+		    while ((l = last->nextleft) && l->rightx >= shadowleftx) {
+			DeleteSRectangle(last);
+			last = l;
+		    }
+		    if (last->leftx < leftx) {
+			leftx = last->leftx;
+		    }
+		    DeleteSRectangle(last);
+		}
+		node->leftx = leftx;
+	    }
+	    if (rightx > node->rightx) {
+		SRectangle* r;
+		r = node->nextright;
+		if (r && r->leftx <= shadowrightx) {
+		    // merge found segment(s) on rightside
+		    SRectangle* last;
+		    last = r;
+		    while ((r = last->nextright) && r->leftx <= shadowrightx) {
+			DeleteSRectangle(last);
+			last = r;
+		    }
+		    if (last->rightx > rightx) {
+			rightx = last->rightx;
+		    }
+		    DeleteSRectangle(last);
+		}
+		node->rightx = rightx;
+	    }
+	    UpdateRectangleBottom(node, y);
+	    return;
+	}
     }
-    else if ( shadowleftx > node->rightx )
-    // given segment right of found segment --> try next right segment
-    {
-      pnode    = &node->midright;
-      nextleft = node;
+
+    // no overlapping segment found --> create new one as leaf node
+
+    // Allocate memory for garbage link-list
+    if (!sweepline_garbage) {
+	int size;
+	size = 256;  // begin support for 256 rectangles at one line
+	sweepline_garbage = node = malloc(size * sizeof(SRectangle));
+	if (!node) {
+	    printf("Out of memory (SweeplineAdd,video/sweepline.c)\n");
+	    exit(1);
+	}
+	while (--size > 0) {
+	    node->nextright = node + 1;
+	    ++node;
+	}
+	node->nextright = NULL;
     }
-    else 
-    {
-    // Handle overlap: merge and delete ununique segments
-      if ( leftx < node->leftx )
-      {
-        SRectangle *l = node->nextleft;
-        if ( l && l->rightx >= shadowleftx )
-        { // merge found segment(s) on leftside
-          SRectangle *last = l;
-          while ( (l=last->nextleft) && l->rightx >= shadowleftx )
-          {
-            DeleteSRectangle( last );
-            last = l;
-          }
-          if ( last->leftx < leftx )
-            leftx = last->leftx;
-          DeleteSRectangle( last );
-        }
-        node->leftx = leftx;
-      }
-      if ( rightx > node->rightx )
-      {
-        SRectangle *r = r->nextright;
-        if ( r && r->leftx <= shadowrightx )
-        { // merge found segment(s) on rightside
-          SRectangle *last = r;
-          while ( (r=last->nextright) && r->leftx <= shadowrightx )
-          {
-            DeleteSRectangle( last );
-            last = r;
-          }
-          if ( last->rightx > rightx )
-            rightx = last->rightx;
-          DeleteSRectangle( last );
-        }
-        node->rightx = rightx;
-      }
-      UpdateRectangleBottom( node, y );
-      return;
+
+    // Take new segment from garbage link-list
+    node = *pnode = sweepline_garbage;
+    sweepline_garbage = sweepline_garbage->nextright;
+
+    // Fill in segment struct
+    node->leftx         = leftx;
+    node->rightx        = rightx;
+    node->topy          = y;
+    UpdateRectangleBottom(node, y);
+    node->pnode         = pnode;
+    node->midleft       = node->midright = NULL;
+    if (nextleft) {
+	node->nextleft      = nextleft;
+	nextleft->nextright = node;
+    } else {
+	node->nextleft = NULL;
     }
-  }
-
-// no overlapping segment found --> create new one as leaf node
-
-  // Allocate memory for garbage link-list
-  if ( !sweepline_garbage )
-  {
-    int size=256;  // begin support for 256 rectangles at one line
-    sweepline_garbage = node = malloc(size*sizeof(SRectangle));
-    if ( !node )
-    {
-      printf( "Out of memory (SweeplineAdd,video/sweepline.c)\n" );
-      exit( 1 );
+    if (nextright) {
+	node->nextright     = nextright;
+	nextright->nextleft = node;
     }
-    while ( --size > 0 )
-    {
-      node->nextright = node + 1;
-      node++;
+    else {
+	node->nextright = NULL;
     }
-    node->nextright=NULL;
-  }
 
-  // Take new segment from garbage link-list
-  node = *pnode = sweepline_garbage;
-  sweepline_garbage = sweepline_garbage->nextright;
-
-  // Fill in segment struct
-  node->leftx         = leftx;
-  node->rightx        = rightx;
-  node->topy          = y;
-  UpdateRectangleBottom( node, y );
-  node->pnode         = pnode;
-  node->midleft       = node->midright = NULL;
-  if ( nextleft )
-  {
-    node->nextleft      = nextleft;
-    nextleft->nextright = node;
-  }
-  else node->nextleft = NULL;
-  if ( nextright )
-  {
-    node->nextright     = nextright;
-    nextright->nextleft = node;
-  }
-  else node->nextright = NULL;
-
-// FIXME: It might be good to balance the binary searchtree at this point
-// (reduces searchpath length for next insertions), but this has some cost.
-// Investigate first wether it's worth it to do on a such small tree.
+    // FIXME: It might be good to balance the binary searchtree at this point
+    // (reduces searchpath length for next insertions), but this has some cost.
+    // Investigate first wether it's worth it to do on a such small tree.
 }
 
 /**
@@ -347,33 +361,31 @@ void SweeplineAdd( int leftx, int rightx, int y )
 **	@note: This leaves segments which might still be 'merged' with new ones
 **	or are the last and need to be invalidated separetely with
 **	SweeplineInvalidateAll
-**/
-void SweeplineInvalidate( int y )
+*/
+void SweeplineInvalidate(int y)
 {
-  while ( sweepline_bottom_head &&
-          sweepline_bottom_head->bottomyshadow <= y )
-  {
-    InvalidateArea( sweepline_bottom_head->leftx,
-                    sweepline_bottom_head->topy,
-                    sweepline_bottom_head->rightx,
-                    sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
-    DeleteSRectangle( sweepline_bottom_head );
-  }
+    while (sweepline_bottom_head &&
+	    sweepline_bottom_head->bottomyshadow <= y) {
+	InvalidateArea(sweepline_bottom_head->leftx,
+	    sweepline_bottom_head->topy,
+	    sweepline_bottom_head->rightx,
+	    sweepline_bottom_head->bottomyshadow - SWEEPLINE_MERGE);
+	DeleteSRectangle(sweepline_bottom_head);
+    }
 }
 
 /**
 **	Invalidate all segments still available in this structure.
-**/
-void SweeplineInvalidateAll( void )
+*/
+void SweeplineInvalidateAll(void)
 {
-  while ( sweepline_bottom_head )
-  {
-    InvalidateArea( sweepline_bottom_head->leftx,
-                    sweepline_bottom_head->topy,
-                    sweepline_bottom_head->rightx, 
-                    sweepline_bottom_head->bottomyshadow-SWEEPLINE_MERGE );
-    DeleteSRectangle( sweepline_bottom_head );
-  }
+    while (sweepline_bottom_head) {
+	InvalidateArea(sweepline_bottom_head->leftx,
+	    sweepline_bottom_head->topy,
+	    sweepline_bottom_head->rightx, 
+	    sweepline_bottom_head->bottomyshadow - SWEEPLINE_MERGE);
+	DeleteSRectangle(sweepline_bottom_head);
+    }
 }
 
 #endif
