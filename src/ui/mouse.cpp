@@ -1330,7 +1330,9 @@ global void UIHandleButtonDown(unsigned button)
     //	Selecting target. (Move,Attack,Patrol,... commands);
     //
     if( CursorState==CursorStateSelect ) {
-	UISelectStateButtonDown(button);
+	if( !GameObserve ) {
+	    UISelectStateButtonDown(button);
+	}
 	return;
     }
 
@@ -1406,39 +1408,41 @@ global void UIHandleButtonDown(unsigned button)
 	    DebugLevel3("Cursor middle down %d,%d\n" _C_ CursorX _C_ CursorY);
 	    MustRedraw|=RedrawCursor;
 	} else if( MouseButtons&RightButton ) {
-	    Unit* unit;
-	    // FIXME: Rethink the complete chaos of coordinates here
-	    // FIXME: Johns: Perhaps we should use a pixel map coordinates
+	    if( !GameObserve ) {
+		Unit* unit;
+		// FIXME: Rethink the complete chaos of coordinates here
+		// FIXME: Johns: Perhaps we should use a pixel map coordinates
 #ifdef SPLIT_SCREEN_SUPPORT
-	    int v = TheUI.ActiveViewport;
-	    int x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
-	    int y = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
+		int v = TheUI.ActiveViewport;
+		int x = CursorX - TheUI.VP[v].X + TheUI.VP[v].MapX*TileSizeX;
+		int y = CursorY - TheUI.VP[v].Y + TheUI.VP[v].MapY*TileSizeY;
 #else /* SPLIT_SCREEN_SUPPORT */
-	    int x = CursorX - TheUI.MapX + MapX*TileSizeX;
-	    int y = CursorY - TheUI.MapY + MapY*TileSizeY;
+		int x = CursorX - TheUI.MapX + MapX*TileSizeX;
+		int y = CursorY - TheUI.MapY + MapY*TileSizeY;
 #endif /* SPLIT_SCREEN_SUPPORT */
 
-	    if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
-		x = (TheMap.Width-1)*TileSizeX;
-	    }
-	    if( y>=TheMap.Height*TileSizeY ) {	// Reduce to map limits
-		y = (TheMap.Height-1)*TileSizeY;
-	    }
+		if( x>=TheMap.Width*TileSizeX ) {	// Reduce to map limits
+		    x = (TheMap.Width-1)*TileSizeX;
+		}
+		if( y>=TheMap.Height*TileSizeY ) {	// Reduce to map limits
+		    y = (TheMap.Height-1)*TileSizeY;
+		}
 
-	    unit = UnitOnScreenMapPosition (x, y);
-	    if ( unit ) {	// if right click on building -- blink
-		unit->Blink=4;
-	    } else {		// if not not click on building -- green cross
-		MakeLocalMissile(MissileTypeGreenCross
+		unit = UnitOnScreenMapPosition (x, y);
+		if ( unit ) {	// if right click on building -- blink
+		    unit->Blink=4;
+		} else {		// if not not click on building -- green cross
+		    MakeLocalMissile(MissileTypeGreenCross
 #ifdef SPLIT_SCREEN_SUPPORT
-		    ,TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX+CursorX-TheUI.VP[TheUI.ActiveViewport].X
-		    ,TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY+CursorY-TheUI.VP[TheUI.ActiveViewport].Y,0,0);
+			,TheUI.VP[TheUI.ActiveViewport].MapX*TileSizeX+CursorX-TheUI.VP[TheUI.ActiveViewport].X
+			,TheUI.VP[TheUI.ActiveViewport].MapY*TileSizeY+CursorY-TheUI.VP[TheUI.ActiveViewport].Y,0,0);
 #else /* SPLIT_SCREEN_SUPPORT */
-		    ,MapX*TileSizeX+CursorX-TheUI.MapX
-		    ,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
+			,MapX*TileSizeX+CursorX-TheUI.MapX
+			,MapY*TileSizeY+CursorY-TheUI.MapY,0,0);
 #endif /* SPLIT_SCREEN_SUPPORT */
+		}
+		DoRightButton (x, y);
 	    }
-	    DoRightButton (x, y);
 	}
     //
     //	Cursor is on the minimap area
@@ -1455,12 +1459,14 @@ global void UIHandleButtonDown(unsigned button)
 		    ,ScreenMinimap2MapY(CursorY)-MapHeight/2);
 #endif /* SPLIT_SCREEN_SUPPORT */
 	} else if( MouseButtons&RightButton ) {
-	    MakeLocalMissile(MissileTypeGreenCross
-		    ,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
-		    ,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
-	    // DoRightButton() takes screen map coordinates
-	    DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
-		    ScreenMinimap2MapY(CursorY) * TileSizeY);
+	    if( !GameObserve ) {
+		MakeLocalMissile(MissileTypeGreenCross
+			,ScreenMinimap2MapX(CursorX)*TileSizeX+TileSizeX/2
+			,ScreenMinimap2MapY(CursorY)*TileSizeY+TileSizeY/2,0,0);
+		// DoRightButton() takes screen map coordinates
+		DoRightButton (ScreenMinimap2MapX(CursorX) * TileSizeX,
+			ScreenMinimap2MapY(CursorY) * TileSizeY);
+	    }
 	}
     //
     //	Cursor is on the buttons: group or command
@@ -1470,7 +1476,9 @@ global void UIHandleButtonDown(unsigned button)
 	//	clicked on info panel - selection shown
 	//
 	if( NumSelected>1 && ButtonUnderCursor && ButtonUnderCursor<10 ) {
-	    DoSelectionButtons(ButtonUnderCursor-1,button);
+	    if( !GameObserve ) {
+		DoSelectionButtons(ButtonUnderCursor-1,button);
+	    }
 	} else if( (MouseButtons&LeftButton) ) {
 	    //
 	    //	clicked on menu button
@@ -1492,38 +1500,44 @@ global void UIHandleButtonDown(unsigned button)
 	    //
 	    } else if( ButtonUnderCursor>3 && ButtonUnderCursor<10 ) {
 		if( NumSelected==1 && Selected[0]->Type->Transporter ) {
-		    if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
-			// FIXME: should check if valid here.
-			SendCommandUnload(Selected[0]
-				,Selected[0]->X,Selected[0]->Y
-				,Selected[0]->OnBoard[ButtonUnderCursor-4]
-				,!(KeyModifiers&ModifierShift));
+		    if( !GameObserve ) {
+			if( Selected[0]->OnBoard[ButtonUnderCursor-4] ) {
+			    // FIXME: should check if valid here.
+			    SendCommandUnload(Selected[0]
+				    ,Selected[0]->X,Selected[0]->Y
+				    ,Selected[0]->OnBoard[ButtonUnderCursor-4]
+				    ,!(KeyModifiers&ModifierShift));
+			}
 		    }
 		}
 		else if( NumSelected==1 && Selected[0]->Type->Building &&
 		         Selected[0]->Orders[0].Action==UnitActionTrain) {
-		    int slotid = ButtonUnderCursor-4;
-		    if ( Selected[0]->Data.Train.Count == 1 ) {
-			// FIXME: ignore clicks that did not hit
-			// FIXME: with only one unit being built, this
-			// unit is displayed between two slots.
-			slotid = 0;
-		    }
-		    if ( slotid < Selected[0]->Data.Train.Count ) {
-		    	DebugLevel0Fn("Cancel slot %d %s\n" _C_
-			    slotid _C_
-			    Selected[0]->Data.Train.What[slotid]
-			        ->Ident);
-		        SendCommandCancelTraining(Selected[0],
-			    slotid,
-			    Selected[0]->Data.Train.What[slotid]);
+		    if( !GameObserve ) {
+			int slotid = ButtonUnderCursor-4;
+			if ( Selected[0]->Data.Train.Count == 1 ) {
+			    // FIXME: ignore clicks that did not hit
+			    // FIXME: with only one unit being built, this
+			    // unit is displayed between two slots.
+			    slotid = 0;
+			}
+			if ( slotid < Selected[0]->Data.Train.Count ) {
+		    	    DebugLevel0Fn("Cancel slot %d %s\n" _C_
+				slotid _C_
+				Selected[0]->Data.Train.What[slotid]
+				    ->Ident);
+			    SendCommandCancelTraining(Selected[0],
+				slotid,
+				Selected[0]->Data.Train.What[slotid]);
+			}
 		    }
 		}
 	    //
 	    //	clicked on button panel
 	    //
 	    } else if( ButtonUnderCursor>9 ) {
-		DoButtonButtonClicked(ButtonUnderCursor-10);
+		if( !GameObserve ) {
+		    DoButtonButtonClicked(ButtonUnderCursor-10);
+		}
 	    }
 	} else if( (MouseButtons&MiddleButton) ) {
 	    //
