@@ -4530,7 +4530,9 @@ local SCM CclDefineMenuItem(SCM list)
 	    item->xofs = gh_scm2int(gh_car(value));
 	    value = gh_cdr(value);
 	    item->yofs = gh_scm2int(gh_car(value));
-
+	// Addition of the transparent flag
+	} else if (gh_eq_p(value, gh_symbol2scm("transparent"))) {
+		item->transparent = 1;
 	} else if (gh_eq_p(value, gh_symbol2scm("menu"))) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
