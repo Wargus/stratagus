@@ -10,7 +10,7 @@
 //
 /**@name loadgame.c	-	Load game. */
 //
-//	(c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens
+//	(c) Copyright 2001-2003 by Lutz Sammer, Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -75,6 +75,7 @@ global void CleanModules(void)
 {
     SCM var;
 
+    EndReplayLog();
     CleanMessages();
 
     CleanIcons();
