@@ -72,7 +72,7 @@ typedef struct _sample_ Sample;
 */
 typedef struct _sample_type_ {
 	/**
-	**	Read samples from object.
+	**	Read next samples from object.
 	**
 	**	@param o	pointer to object.
 	**	@param buf	buffer to fill.
@@ -93,7 +93,7 @@ typedef struct _sample_type_ {
 **	RAW samples.
 */
 struct _sample_ {
-    SampleType*		Type;		/// Object type dependend
+    const SampleType*	Type;		/// Object type dependend
     void*		User;		/// Object user data
 
     unsigned char	Channels;	/// mono or stereo
@@ -185,6 +185,16 @@ typedef struct _sound_request {
 
 #define MAX_SOUND_REQUESTS 32		/// maximal number of sound requests
 
+/**
+**      Play audio flags.
+*/
+enum _play_audio_flags_ {
+    PlayAudioStream = 1,            	/// Stream the file from medium
+    PlayAudioPreLoad = 2,		/// Load compressed in memory
+    PlayAudioLoadInMemory = 4,		/// Preload file into memory
+    PlayAudioLoadOnDemand = 8,		/// Load only if needed.
+};
+
 /*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
@@ -242,11 +252,10 @@ extern SDL_CD *CDRom;                   /// SDL cdrom device
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern Sample* LoadFlac(const char* name);	/// Load a flac file
-extern Sample* LoadWav(const char* name);	/// Load a wav file
-extern Sample* LoadOgg(const char* name);	/// Load an ogg file
-extern Sample* LoadOggStreaming(const char* name);  /// Stream an ogg file
-extern Sample* LoadMp3(const char* name);	/// Load a mp3 file
+extern Sample* LoadFlac(const char* name,int flags);	/// Load a flac file
+extern Sample* LoadWav(const char* name,int flags);	/// Load a wav file
+extern Sample* LoadOgg(const char* name,int flags);	/// Load an ogg file
+extern Sample* LoadMp3(const char* name,int flags);	/// Load a mp3 file
 
     ///	Register a sound (can be a simple sound or a group)
 extern SoundId RegisterSound(char* file[],unsigned number);

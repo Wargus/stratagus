@@ -50,17 +50,21 @@
 #include "myendian.h"
 #include "iolib.h"
 #include "sound_server.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --	Declaration
 ----------------------------------------------------------------------------*/
 
+/**
+**	Private ogg data structure to handle ogg streaming.
+*/
 typedef struct _ogg_data_ {
-    OggVorbis_File vf[1];
-    char* p;
+    char*		PointerInBuffer;	/// Pointer into buffer
+    OggVorbis_File	VorbisFile[1];		/// Vorbis file handle
 } OggData;
 
-#define OGG_BUFFER_SIZE  64*1024
+#define OGG_BUFFER_SIZE  (12 * 1024)		/// Buffer size to fill
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -103,11 +107,11 @@ local int OGG_seek(void* user __attribute__((unused)),
 **	@param user		User argument.
 **
 **	@return			Current seek postition.
-*/
 local long OGG_tell(void* user __attribute__((unused)))
 {
     return -1;
 }
+*/
 
 /**
 **	OGG vorbis close callback.
@@ -122,7 +126,7 @@ local int OGG_close(void* user)
 }
 
 /**
-**	Callback function to read from the ogg file
+**	Type member function to read from the ogg file
 **
 **	@param sample	    Sample reading from
 **	@param buf	    Buffer to write data to
@@ -130,80 +134,134 @@ local int OGG_close(void* user)
 **
 **	@return		    Number of bytes read
 */
-local int ReadOgg(Sample* sample, void* buf, int len)
+local int OggReadStream(Sample* sample, void* buf, int len)
 {
     OggData* data;
     int i;
     int n;
     int bitstream;
 
-    data = (OggData*)sample->User;
+    data = (OggData*) sample->User;
 
     // see if we have enough read already
-    if (data->p + len - sample->Data <= sample->Length) {
-	memcpy(buf, data->p, len);
-	data->p += len;
-	return len;
+    if (data->PointerInBuffer + len - sample->Data > sample->Length) {
+	// not enough in buffer, read more
+	n = sample->Length - (data->PointerInBuffer - sample->Data);
+	memcpy(sample->Data, data->PointerInBuffer, n);
+	sample->Length = n;
+	data->PointerInBuffer = sample->Data;
+
+	n = OGG_BUFFER_SIZE - n;
+	for (;;) {
+	    i = ov_read(data->VorbisFile,
+		    data->PointerInBuffer + sample->Length, n, 0, 2, 1,
+		    &bitstream);
+	    if (i <= 0) {
+		break;
+	    }
+	    sample->Length += i;
+	    n -= i;
+	    if (n < 4096) {
+		break;
+	    }
+	}
+	if (sample->Length < len) {
+	    len = sample->Length;
+	}
     }
 
-    // not enough in buffer, read more
-    n = sample->Length - (data->p - sample->Data);
-    memcpy(sample->Data, data->p, n);
-    sample->Length = n;
-    data->p = sample->Data;
-    n = OGG_BUFFER_SIZE - n;
-    for (;;) {
-	i = ov_read(data->vf, data->p + sample->Length, n, 0, 2, 1, &bitstream);
-	if (i <= 0) {
-	    break;
-	}
-	sample->Length += i;
-	n -= i;
-	if (n <= 4096) {
-	    break;
-	}
-    }
-    if (sample->Length < len) {
-	len = sample->Length;
-    }
-    memcpy(buf, data->p, len);
-    data->p += len;
+    memcpy(buf, data->PointerInBuffer, len);
+    data->PointerInBuffer += len;
     return len;
 }
 
 /**
-**	Callback function to free an ogg file
+**	Type member function to free an ogg file
 **
 **	@param sample	    Sample to free
 */
-local void FreeOgg(Sample* sample)
+local void OggFreeStream(Sample* sample)
 {
     OggData* data;
 
+    IfDebug( AllocatedSoundMemory -= sizeof(*sample) + OGG_BUFFER_SIZE);
+
     data = (OggData*)sample->User;
-    ov_clear(data->vf);
+    ov_clear(data->VorbisFile);
     free(data);
+    free(sample);
 }
+
+/**
+**	Ogg object type structure.
+*/
+local const SampleType OggStreamSampleType = {
+    OggReadStream,
+    OggFreeStream,
+};
+
+/**
+**	Type member function to read from the ogg file
+**
+**	@param sample	    Sample reading from
+**	@param buf	    Buffer to write data to
+**	@param len	    Length of the buffer
+**
+**	@return		    Number of bytes read
+*/
+local int OggRead(Sample* sample, void *buf, int len)
+{
+    unsigned pos;
+
+    pos = (unsigned)sample->User;
+    if (pos + len > sample->Length) {		// Not enough data?
+	len = sample->Length - pos;
+    }
+    memcpy(buf, sample->Data + pos, len);
+
+    sample->User = (void*)(pos + len);
+
+    return len;
+}
+
+/**
+**	Type member function to free an ogg file
+**
+**	@param sample	    Sample to free
+*/
+local void OggFree(Sample* sample)
+{
+    IfDebug( AllocatedSoundMemory -= sample->Length; );
+
+    free(sample);
+}
+
+/**
+**	Ogg object type structure.
+*/
+local const SampleType OggSampleType = {
+    OggRead,
+    OggFree,
+};
 
 /**
 **	Load ogg.
 **
 **	@param name	File name.
+**	@param flags	Load flags.
 **
 **	@return		Returns the loaded sample.
 **
-**	@todo		FIXME: Should rewrite loop and the sample structure.
+**	@todo		Support more flags, LoadOnDemand.
 */
-global Sample *LoadOgg(const char* name)
+global Sample* LoadOgg(const char* name,int flags)
 {
+    static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, NULL };
     CLFile* f;
     Sample* sample;
     OggVorbis_File vf[1];
     unsigned int magic[1];
     vorbis_info* info;
-    static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
-    int n;
-    char *p;
 
     if (!(f = CLopen(name))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
@@ -222,131 +280,103 @@ global Sample *LoadOgg(const char* name)
 	CLclose(f);
 	return NULL;
     }
-
+    /* JOHNS: ov_test_callbacks didn't worked for me 1.0 RC3
+    if (ov_test_open(vf)) {
+	ov_clear(vf);
+	return NULL;
+    }
+    */
     info = ov_info(vf, -1);
     if( !info ) {
 	fprintf(stderr, "no ogg stream\n");
-	CLclose(f);
+	ov_clear(vf);
 	return NULL;
     }
 
-    sample = malloc(sizeof(*sample));
-    sample->Channels = info->channels;
-    sample->SampleSize = 16;
-    sample->Frequency = info->rate;
-    sample->Type = NULL;
-    n = sample->Length = 0;
-    p = sample->Data;
-
-    for (;;) {
-	int bitstream;
-	int i;
-
-	if (n < 8192) {
-	    Sample* s;
-
-	    n = 8192 * 64;
-	    s = realloc(sample, sizeof(*sample) + sample->Length + n);
-	    if (!s) {
-		free(sample);
-		fprintf(stderr, "out of memory\n");
-		ov_clear(vf);
-		return NULL;
-	    }
-	    sample = s;
-	    p = sample->Data + sample->Length;
-	}
-
-	i = ov_read(vf, p, 8192, 0, 2, 1, &bitstream);
-	if (i <= 0) {
-	    break;
-	}
-	p += i;
-	sample->Length += i;
-	n -= i;
-    }
-    // Shrink to real size
-    sample = realloc(sample, sizeof(*sample) + sample->Length);
-
-    ov_clear(vf);
-
-    DebugLevel0Fn(" %d\n" _C_ sample->Length);
-    IfDebug( AllocatedSoundMemory += sample->Length; );
-
-    return sample;
-}
-
-/**
-**	Load ogg streaming.
-**
-**	@param name	File name.
-**
-**	@return		Returns the sample.
-*/
-global Sample *LoadOggStreaming(const char* name)
-{
-    CLFile* f;
-    Sample* sample;
-    OggData* data;
-    unsigned int magic[1];
-    vorbis_info* info;
-    static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
-
-    data = (OggData*)malloc(sizeof(OggData));
-    if (!data) {
-	fprintf(stderr, "Out of memory\n");
-	return NULL;
-    }
-
-    if (!(f = CLopen(name))) {
-	fprintf(stderr, "Can't open file `%s'\n", name);
-	return NULL;
-    }
-    CLread(f, magic, sizeof(magic));
-    if (AccessLE32(magic) != 0x5367674F) {	// "OggS" in ASCII
-	CLclose(f);
-	return NULL;
-    }
-
-    DebugLevel2Fn("Have ogg file %s\n" _C_ name);
-
-    if (ov_open_callbacks(f, data->vf, (char *)&magic, sizeof(magic), vc)) {
-	fprintf(stderr, "Can't initialize ogg decoder\n");
-	CLclose(f);
-	return NULL;
-    }
-
-    info = ov_info(data->vf, -1);
-    if( !info ) {
-	fprintf(stderr, "no ogg stream\n");
-	CLclose(f);
-	return NULL;
-    }
+    //
+    //	We have now a correct OGG stream
+    //
 
     sample = malloc(sizeof(*sample) + OGG_BUFFER_SIZE);
     if (!sample) {
 	fprintf(stderr, "Out of memory\n");
-	CLclose(f);
-	free(data);
+	ov_clear(vf);
 	return NULL;
     }
-
     sample->Channels = info->channels;
     sample->SampleSize = 16;
     sample->Frequency = info->rate;
-    sample->User = data;
     sample->Length = 0;
-    sample->Type = (SampleType*)malloc(sizeof(SampleType));
-    if (!sample->Type) {
-	fprintf(stderr, "Out of memory\n");
-	CLclose(f);
-	free(data);
-	free(sample);
-	return NULL;
+
+    if (flags&PlayAudioStream&0) {
+	OggData* data;
+
+	data = malloc(sizeof(OggData));
+	if (!data) {
+	    fprintf(stderr, "Out of memory\n");
+	    free(sample);
+	    ov_clear(vf);
+	    return NULL;
+	}
+	data->VorbisFile[0] = vf[0];
+	data->PointerInBuffer = sample->Data;
+
+	sample->Type = &OggStreamSampleType;
+	sample->User = data;
+
+	DebugLevel0Fn(" %d\n" _C_ sizeof(*sample) + OGG_BUFFER_SIZE);
+	IfDebug( AllocatedSoundMemory += sizeof(*sample) + OGG_BUFFER_SIZE);
+    } else {
+	int n;
+	char* p;
+
+	sample->Type = &OggSampleType;
+	sample->User = 0;
+
+	n = OGG_BUFFER_SIZE;
+	p = sample->Data;
+
+	// CLread is not seekable and ov_pcm_total(vf,-1) not supported :(
+
+	for (;;) {
+	    int bitstream;
+	    int i;
+
+	    if (n < 4096) {
+		Sample* s;
+
+		if( sample->Length < 1024*1024 ) {
+		    n = sample->Length << 1;
+		} else {
+		    n = 2 * 1024 * 1024;	// Big junks needed for windows
+		}
+		s = realloc(sample, sizeof(*sample) + sample->Length + n);
+		if (!s) {
+		    fprintf(stderr, "out of memory\n");
+		    free(sample);
+		    ov_clear(vf);
+		    return NULL;
+		}
+		sample = s;
+		p = sample->Data + sample->Length;
+	    }
+
+	    i = ov_read(vf, p, 4096, 0, 2, 1, &bitstream);
+	    if (i <= 0) {
+		break;
+	    }
+	    p += i;
+	    sample->Length += i;
+	    n -= i;
+	}
+	// Shrink to real size
+	sample = realloc(sample, sizeof(*sample) + sample->Length);
+
+	ov_clear(vf);
+
+	DebugLevel0Fn(" %d\n" _C_ sample->Length);
+	IfDebug( AllocatedSoundMemory += sample->Length; );
     }
-    sample->Type->Read = &ReadOgg;
-    sample->Type->Free = &FreeOgg;
-    data->p = sample->Data;
 
     return sample;
 }

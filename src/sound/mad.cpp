@@ -182,10 +182,11 @@ local enum mad_flow MAD_error(void *user __attribute__((unused)),
 **	Load mp3.
 **
 **	@param name	File name.
+**	@param flags	Load flags.
 **
 **	@return		Returns the loaded sample.
 */
-global Sample *LoadMp3(const char* name)
+global Sample *LoadMp3(const char* name, int flags __attribute__((unused)))
 {
     MyUser user;
     CLFile* f;

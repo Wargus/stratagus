@@ -210,10 +210,11 @@ local FLAC__StreamDecoderWriteStatus FLAC_write_callback(const
 **	Load flac.
 **
 **	@param name	File name.
+**	@param flags	Load flags.
 **
 **	@return		Returns the loaded sample.
 */
-global Sample* LoadFlac(const char* name)
+global Sample* LoadFlac(const char* name, int flags __attribute__((unused)))
 {
     MyUser user;
     CLFile* f;

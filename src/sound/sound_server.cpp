@@ -143,104 +143,44 @@ global int SoundThreadRunning;		/// FIXME: docu
 --	Functions
 ----------------------------------------------------------------------------*/
 
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
-extern Sample* MusicSample;		/// Music samples
-extern int MusicIndex;			/// Music sample index
-#endif
-
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 
-extern ModPlugFile* ModFile;		/// Mod file loaded into memory
+extern Sample* MusicSample;		/// Music samples
 
 /**
 **	Mix music to stereo 32 bit.
 **
 **	@param buffer	Buffer for mixed samples.
 **	@param size	Number of samples that fits into buffer.
+**
+**	@todo this functions can be called from inside the SDL audio callback,
+**		which is bad, the buffer should be precalculated.
 */
 local void MixMusicToStereo32(int* buffer, int size)
 {
     int i;
     int n;
+    short* buf;
 
     if (PlayingMusic) {
-	n = 0;
-#ifdef USE_LIBMODPLUG
-	if (ModFile) {
-#ifdef USE_LIBMODPLUG32
-	    long *buf;
-#else
-	    short *buf;
-#endif
-	    buf = alloca(size * sizeof(*buf));
+	DebugCheck(!MusicSample && !MusicSample->Type);
 
-	    n = ModPlug_Read(ModFile, buf, size * sizeof(*buf));
+	// FIXME: if samples are shared this fails
+	buf = alloca(size * sizeof(*buf));
+	n = MusicSample->Type->Read(MusicSample, buf, size * sizeof(*buf));
 
-	    for (i = 0; i < n / sizeof(*buf); ++i) {	// Add to our samples
-#ifdef USE_LIBMODPLUG32
-		buffer[i] += ((buf[i] >> 16) * MusicVolume) / 256;
-#else
-		buffer[i] += (buf[i] * MusicVolume) / 256;
-#endif
-	    }
-
-	    n = n != size * sizeof(*buf);	// End reached?
+	for (i = 0; i < n / sizeof(*buf); ++i) {
+	    // Add to our samples
+	    buffer[i] += (buf[i] * MusicVolume) / 256;
 	}
-#endif
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
-	if (MusicSample) {
-	    short *buf;
 
-	    if (MusicSample->Type) {
-		// Streaming
-		buf = alloca(size * sizeof(*buf));
-
-		n = MusicSample->Type->Read(MusicSample, buf, size * sizeof(*buf));
-
-		for (i = 0; i < n / sizeof(*buf); ++i) {
-		    // Add to our samples
-		    buffer[i] += (buf[i] * MusicVolume) / 256;
-		}
-
-		n = n != size * sizeof(*buf);
-	    } else {
-		buf = (short *)(MusicSample->Data + MusicIndex);
-		if (size * 2 > MusicSample->Length - MusicIndex) {
-		    n = MusicSample->Length - MusicIndex;
-		} else {
-		    n = size * 2;
-		}
-		n >>= 1;
-		for (i = 0; i < n; ++i) {	// Add to our samples
-		    buffer[i] += (buf[i] * MusicVolume) / 256;
-		}
-		MusicIndex += i * 2;
-
-		n = MusicIndex == MusicSample->Length;
-	    }
-	}
-#endif
-
-	if (n) {			// End reached
+	if (n != size * sizeof(*buf)) {	// End reached
 	    SCM cb;
 
 	    PlayingMusic = 0;
-#ifdef USE_LIBMODPLUG
-	    if (ModFile) {
-		ModPlug_Unload(ModFile);
-		ModFile=NULL;
-	    }
-#endif
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
-	    if (MusicSample) {
-		if (MusicSample->Type) {
-		    MusicSample->Type->Free(MusicSample);
-		    free(MusicSample->Type);
-		}
-		free(MusicSample);
-		MusicSample=NULL;
-	    }
-#endif
+	    SoundFree(MusicSample);
+	    MusicSample = NULL;
+
 	    // FIXME: we are inside the SDL callback!
 	    if (CallbackMusic) {
 		cb = gh_symbol2scm("music-stopped");
@@ -259,14 +199,17 @@ local void MixMusicToStereo32(int* buffer, int size)
 
 #else
 
+/// Dummy functions if no music support is enabled
 global void PlayMusic(const char* name __attribute__((unused)))
 {
 }
 
+/// Dummy functions if no music support is enabled
 global void StopMusic(void)
 {
 }
 
+/// Dummy functions if no music support is enabled
 #define MixMusicToStereo32(buffer,size)
 
 #endif
@@ -276,10 +219,11 @@ global void StopMusic(void)
 **
 **	Perodic called from the main loop.
 */
-global int CDRomCheck(void *unused __attribute__((unused)))
+global int CDRomCheck(void *unused __attribute__ ((unused)))
 {
 #ifdef USE_SDLCD
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && SDL_CDStatus(CDRom) == 1) {
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
+	    && SDL_CDStatus(CDRom) == 1) {
 	DebugLevel0Fn("Playing new track\n");
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
@@ -290,7 +234,8 @@ global int CDRomCheck(void *unused __attribute__((unused)))
 #endif
 
 #ifdef USE_LIBCDA
-    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped") && !cd_current_track()) {
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
+	    && !cd_current_track()) {
 	DebugLevel0Fn("Playing new track\n");
 	if (!strcmp(CDMode, ":all")) {
 	    PlayMusic(":all");
@@ -299,9 +244,10 @@ global int CDRomCheck(void *unused __attribute__((unused)))
 	}
     } else if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
 	DebugLevel0Fn("get track\n");
-        CDTrack = cd_current_track() + 1;
-	if (CDTrack > NumCDTracks)
+	CDTrack = cd_current_track() + 1;
+	if (CDTrack > NumCDTracks) {
 	    CDTrack = 1;
+	}
     }
 #endif
     return 0;
@@ -855,7 +801,9 @@ local void ClipMixToStereo16(const int* mix,int size,short* output)
 **
 **	@param name	File name of sample (short version).
 **
-**	@return		Wav sample loaded from file.
+**	@return		General sample loaded from file into memory.
+**
+**	@todo 		Add streaming, cashing support.
 */
 local Sample* LoadSample(const char* name)
 {
@@ -864,22 +812,25 @@ local Sample* LoadSample(const char* name)
 
     buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
 #ifdef USE_OGG
-    if( (sample=LoadOgg(buf)) ) {
+    if ((sample = LoadOgg(buf, PlayAudioLoadInMemory))) {
+	free(buf);
 	return sample;
     }
 #endif
 #ifdef USE_FLAC
-    if( (sample=LoadFlac(buf)) ) {
+    if ((sample = LoadFlac(buf, PlayAudioLoadInMemory))) {
+	free(buf);
 	return sample;
     }
 #endif
 #ifdef USE_MAD
-    if( (sample=LoadMp3(buf)) ) {
+    if ((sample = LoadMp3(buf, PlayAudioLoadInMemory))) {
+	free(buf);
 	return sample;
     }
 #endif
-    if( !(sample=LoadWav(buf)) ) {
-	fprintf(stderr,"Can't load the sound `%s'\n",name);
+    if (!(sample = LoadWav(buf, PlayAudioLoadInMemory))) {
+	fprintf(stderr, "Can't load the sound `%s'\n", name);
     }
     // FIXME: should support more sample formats, mp3.
     free(buf);

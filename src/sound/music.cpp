@@ -50,6 +50,7 @@
 #endif
 
 #include "iolib.h"
+#include "iocompat.h"
 #include "sound.h"
 #include "sound_server.h"
 
@@ -63,12 +64,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_LIBMODPLUG
-global ModPlugFile* ModFile;		/// Mod file loaded into memory
-#endif
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 global Sample* MusicSample;		/// Music samples
-global int MusicIndex;			/// Music sample index
 #endif
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
@@ -94,22 +91,16 @@ global void StopMusic(void)
 {
     if (PlayingMusic) {
 	PlayingMusic = 0;		// Callback!
-#ifdef USE_LIBMODPLUG
-	if (ModFile) {
-	    ModPlug_Unload(ModFile);
-	    ModFile = NULL;
-	    return;
-	}
-#endif
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 	if (MusicSample) {
-	    if (MusicSample->Type) {
-		MusicSample->Type->Free(MusicSample);
-		free(MusicSample->Type);
-	    }
-	    free(MusicSample);
+#ifdef USE_SDL
+	    SDL_LockAudio();
+#endif
+	    SoundFree(MusicSample);
 	    MusicSample = NULL;
-	    MusicIndex = 0;
+#ifdef USE_SDL
+	    SDL_UnlockAudio();
+#endif
 	    return;
 	}
 #endif
@@ -118,56 +109,112 @@ global void StopMusic(void)
 
 #ifdef USE_LIBMODPLUG
 /**
-**	Load a mod file.
+**      Read next samples from libmodplug object.
+**
+**      @param o        pointer to object.
+**      @param buf      buffer to fill.
+**      @param len      length of buffer in bytes.
+**
+**      @return         Number of bytes filled.
 */
-local int LoadMod(const char* name)
+local int ModRead(Sample* o, void* buf, int len)
+{
+    return ModPlug_Read(o->User, buf, len);
+}
+
+/**
+**      Free the sample of libmodplug object.
+**
+**      @param o        pointer to object.
+*/
+local void ModFree(Sample* o)
+{
+    ModPlug_Unload(o->User);
+    free(o);
+}
+
+/**
+**	Libmodplug object type structure.
+*/
+local const SampleType ModSampleType = {
+    ModRead,
+    ModFree,
+};
+
+/**
+**	Load a mod file.
+**
+**	@param name	A possible mod file.
+**	@param flags	Load flags.
+**
+**	@return		Sample to mix the mod, if the file is a mod.
+**
+**	@todo		If CL supports file size query, loading can be done
+**			faster, perhaps we can rewrite modplug to support
+**			streaming.
+*/
+local Sample* LoadMod(const char* name,int flags __attribute((unused)))
 {
     ModPlug_Settings settings;
+    ModPlugFile* modfile;
+    Sample* sample;
     CLFile* f;
     char* buffer;
     int size;
     int i;
-    
-    ModPlug_GetSettings(&settings);
-    settings.mFrequency=SoundFrequency;
-#ifdef USE_LIBMODPLUG32
-    settings.mBits=32;
-#else
-    settings.mBits=16;
-#endif
-    settings.mLoopCount=0;		// Disable looping
-    ModPlug_SetSettings(&settings);
+    int ticks;
 
-    buffer=malloc(8192);
-    DebugLevel2Fn("Loading `%s'\n" _C_ name);
-
-    if( !(f=CLopen(name)) ) {
-	printf("Can't open file `%s'\n",name);
-	return 0;
+    ticks=GetTicks();
+    DebugLevel0Fn("Trying `%s'\n" _C_ name);
+    if (!(f = CLopen(name))) {
+	printf("Can't open file `%s'\n", name);
+	return NULL;
     }
 
-    size=0;
-    while( (i=CLread(f,buffer+size,8192))==8192 ) {
-	size+=8192;
-	buffer=realloc(buffer,size+8192);
+    // Load complete file into memory, with realloc = slow
+    size = 0;
+    buffer = malloc(16384);
+    while ((i = CLread(f, buffer + size, 16384)) == 16384) {
+	size += 16384;
+	buffer = realloc(buffer, size + 16384);
     }
-    size+=i;
-    buffer=realloc(buffer,size);
-    DebugLevel3Fn("%d\n" _C_ size);
+    size += i;
+    buffer = realloc(buffer, size);
 
     StopMusic();			// stop music before new music
 
-    ModFile=ModPlug_Load(buffer,size);
+    ModPlug_GetSettings(&settings);	// Conversion settings
+    settings.mFrequency = SoundFrequency;
+#ifdef USE_LIBMODPLUG32
+    settings.mBits = 32;
+#else
+    settings.mBits = 16;
+#endif
+    settings.mLoopCount = 0;		// Disable looping
+    ModPlug_SetSettings(&settings);
+
+    modfile = ModPlug_Load(buffer, size);
 
     free(buffer);
 
-    if( ModFile ) {
-	DebugLevel0Fn("Started\n");
-	PlayingMusic=1;
-	return 1;
+    if (modfile) {
+	DebugLevel0Fn("Started ticks %ld\n" _C_ GetTicks() - ticks);
+	sample = malloc(sizeof(*sample));
+	sample->Type = &ModSampleType;
+	sample->User = modfile;
+	sample->Channels = 2;
+#ifdef USE_LIBMODPLUG32
+	sample->SampleSize = 32;
+#else
+	sample->SampleSize = 16;
+#endif
+	sample->Frequency = SoundFrequency;
+	sample->Length = 0;
+	PlayingMusic = 1;
+	return sample;
     }
 
-    return 0;
+    return NULL;
 }
 #endif
 
@@ -178,6 +225,8 @@ local int LoadMod(const char* name)
 **	:all :random :off
 **
 **	@param name	Name starting with ":".
+**
+**	@return		True if name is handled by the cdrom module.
 */
 local int PlayCDRom(const char* name)
 {
@@ -193,7 +242,6 @@ local int PlayCDRom(const char* name)
 	    }
 	}
     }
-
     // CDPlayer command?
     if (!strncmp(name, ":", 1)) {
 	if (!CDRom) {
@@ -217,8 +265,8 @@ local int PlayCDRom(const char* name)
 	}
 	return 1;
     }
-    
-    StopMusic();
+
+    StopMusic();			// FIXME: JOHNS: why stop music here?
 
     // FIXME: no cdrom, must stop it now!
 
@@ -233,10 +281,13 @@ local int PlayCDRom(const char* name)
 **	:all :random :off
 **
 **	@param name	Name starting with ":".
+**
+**	@return		True if name is handled by the cdrom module.
 */
 local int PlayCDRom(const char* name)
 {
-    int i, DataCd;
+    int i;
+    int data_cd;
 
     if (!strcmp(CDMode, ":off")) {
 	if (!strncmp(name, ":", 1)) {
@@ -249,14 +300,14 @@ local int PlayCDRom(const char* name)
 		CDMode = ":off";
 		return 1;
 	    }
-	    DataCd = 1;
-	    for (i=1; i <= NumCDTracks; ++i) {
+	    data_cd = 1;
+	    for (i = 1; i <= NumCDTracks; ++i) {
 		if (cd_is_audio(i) > 0) {
-		    DataCd = 0;
+		    data_cd = 0;
 		    break;
 		}
 	    }
-	    if (DataCd) {
+	    if (data_cd) {
 		CDMode = ":off";
 		return 1;
 	    }
@@ -274,7 +325,7 @@ local int PlayCDRom(const char* name)
 
 	if (cd_get_tracks(NULL, NULL) == -1)
 	    return 1;
-	    
+
 	// if mode is play all tracks
 	if (!strcmp(name, ":all")) {
 	    CDMode = ":all";
@@ -298,7 +349,6 @@ local int PlayCDRom(const char* name)
 	}
 	return 1;
     }
-
     // FIXME: no cdrom, must stop it now!
 
     return 0;
@@ -307,154 +357,93 @@ local int PlayCDRom(const char* name)
 
 /**
 **	Play a music file.
-**	Currently supported are .mod, .it, .s3m, .wav, .xm.
-**	Optional .ogg, mp3 and cdrom.
 **
-**	Some quick hacks for mods.
+**	Currently supported are .mod, .it, .s3m, .wav, .xm.
+**	Optional .ogg, .mp3, .flac and cdrom.
 **
 **	@param name	Name of sound file, format is automatic detected.
 **			Names starting with ':' control the cdrom.
 */
 global void PlayMusic(const char* name)
 {
-    char buffer[1024];
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
-    Sample *sample;
+    char buffer[PATH_MAX];
+#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
+    Sample* sample;
 #endif
-
-#ifdef USE_SDLCD
-    if (PlayCDRom(name)) {
-	return;
-    }
-#endif
-#ifdef USE_LIBCDA
-    if (PlayCDRom(name)) {
-	return;
-    }
-#endif
-    name = LibraryFileName(name, buffer);
 
 #if defined(USE_SDLCD) || defined(USE_LIBCDA)
-    if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped")) {
+    if (PlayCDRom(name)) {
+	return;
+    }
+    if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")) {
 	return;
     }
 #endif
 
+    name = LibraryFileName(name, buffer);
+
 #ifdef USE_OGG
-    if ((sample = LoadOggStreaming(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
+    if ((sample = LoadOgg(name, PlayAudioStream))) {
+	if (sample->Channels != 2 || sample->SampleSize != 16
+	    || sample->Frequency != SoundFrequency) {
 	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
+	    SoundFree(sample);
 	    return;
 	}
 	StopMusic();
 	MusicSample = sample;
-	MusicIndex = 0;
 	PlayingMusic = 1;
 	return;
     }
 #endif
 #ifdef USE_MAD
-    if ((sample = LoadMp3(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
+    if ((sample = LoadMp3(name, PlayAudioStream))) {
+	if (sample->Channels != 2 || sample->SampleSize != 16
+	    || sample->Frequency != SoundFrequency) {
 	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
+	    SoundFree(sample);
 	    return;
 	}
 	StopMusic();
 	MusicSample = sample;
-	MusicIndex = 0;
 	PlayingMusic = 1;
 	return;
     }
 #endif
 #ifdef USE_FLAC
-    if ((sample = LoadFlac(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
+    if ((sample = LoadFlac(name, PlayAudioStream))) {
+	if (sample->Channels != 2 || sample->SampleSize != 16
+	    || sample->Frequency != SoundFrequency) {
 	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
+	    SoundFree(sample);
 	    return;
 	}
 	StopMusic();
 	MusicSample = sample;
-	MusicIndex = 0;
 	PlayingMusic = 1;
 	return;
     }
 #endif
 #ifdef USE_LIBMODPLUG
-    if (LoadMod(name)) {
+    if ((sample = LoadMod(name, PlayAudioStream))) {
+	MusicSample = sample;
+	PlayingMusic = 1;
 	return;
     }
 #endif
 }
 
+/**
+**	Play a sound file.
+**
+**	Currenly a synomy for PlayMusi
+**
+**	@param name	Name of sound file, format is automatic detected.
+**			Names starting with ':' control the cdrom.
+*/
 global void PlayFile(const char* name)
 {
-    char buffer[1024];
-#if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD)
-    Sample *sample;
-#endif
-    name = LibraryFileName(name, buffer);
-#ifdef USE_OGG
-    if ((sample = LoadOgg(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
-	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
-	    return;
-	}
-	StopMusic();
-	MusicSample = sample;
-	MusicIndex = 0;
-	PlayingMusic = 1;
-	return;
-    }
-#endif
-#ifdef USE_MAD
-    if ((sample = LoadMp3(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
-	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
-	    return;
-	}
-	StopMusic();
-	MusicSample = sample;
-	MusicIndex = 0;
-	PlayingMusic = 1;
-	return;
-    }
-#endif
-#ifdef USE_FLAC
-    if ((sample = LoadFlac(name))) {
-	if( sample->Channels!=2
-		|| sample->SampleSize!=16
-		|| sample->Frequency!=SoundFrequency ) {
-	    DebugLevel0Fn("Not supported music format\n");
-	    free(sample);
-	    return;
-	}
-	StopMusic();
-	MusicSample = sample;
-	MusicIndex = 0;
-	PlayingMusic = 1;
-	return;
-    }
-#endif
-#ifdef USE_LIBMODPLUG
-    if (LoadMod(name)) {
-	return;
-    }
-#endif
+    PlayMusic(name);
 }
 
 #endif	// } WITH_SOUND
