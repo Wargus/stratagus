@@ -256,7 +256,6 @@ extern void DrawMessage(void);
 extern void DrawResources(void);
 extern void DrawMessage(void);
 extern void SetMessage( char* fmt, ... );
-extern void ClearMessage(void);
 extern void DrawStatusLine(void);
 extern void DrawCosts(void);
 extern void SetCosts(int,const int* costs);	/// set costs to be displayed
