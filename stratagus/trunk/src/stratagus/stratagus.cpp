@@ -325,6 +325,12 @@ local void WaitForInput(int timeout)
     while( timeout-- && WaitNoEvent ) {
 	WaitEventsOneFrame(&callbacks);
     }
+
+    VideoLockScreen();
+    DrawTextCentered(VideoWidth/2,5,LargeFont,"----------------------------");
+    VideoUnlockScreen();
+    Invalidate();
+    RealizeVideoMemory();
 }
 
 /**
