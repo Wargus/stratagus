@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name map_fog.c	-	The map fog of war handling. */
-/*
-**	(c) Copyright 1999,2000 by Lutz Sammer and Vladi Shabanski
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1999-2001 by Lutz Sammer and Vladi Shabanski
+//
+//	$Id$
 
 //@{
 
@@ -338,7 +337,11 @@ global void MapUpdateVisible(void)
 	    //  This is not a big deal as far as only mines are
 	    //  concerned, but for more units (like parasited ones
 	    //  in *craft), maybe we should create a dedicated queue...
+#ifdef NEW_ORDERS
+	    if( unit->Orders[0].Action==UnitActionMineGold ) {
+#else
 	    if( unit->Command.Action==UnitActionMineGold ) {
+#endif
 	        mine=GoldMineOnMap(unit->X,unit->Y);
 		if( mine ) {  // Somtimes, the peon is at home :).
 #ifdef NEW_FOW

@@ -660,9 +660,16 @@ global void FireMissile(Unit* unit)
     //	None missile hits immediately!
     //
     if( ((MissileType*)unit->Type->Missile.Missile)->Class==MissileClassNone ) {
+#ifdef NEW_ORDERS
+	// No goal, take target coordinates
+	if( !(goal=unit->Orders[0].Goal) ) {
+	    dx=unit->Orders[0].X;
+	    dy=unit->Orders[0].Y;
+#else
 	if( !(goal=unit->Command.Data.Move.Goal) ) {
 	    dx=unit->Command.Data.Move.DX;
 	    dy=unit->Command.Data.Move.DY;
+#endif
 	    if( WallOnMap(dx,dy) ) {
 		if( HumanWallOnMap(dx,dy) ) {
 		    // FIXME: don't use UnitTypeByIdent here, this is slow!
@@ -692,7 +699,12 @@ global void FireMissile(Unit* unit)
 		ReleaseUnit(goal);
 	    }
 	    // FIXME: should I clear this here?
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+#else
 	    unit->Command.Data.Move.Goal=NULL;
+#endif
+
 	    return;
 	}
 	if( goal->Removed ) {
@@ -704,10 +716,18 @@ global void FireMissile(Unit* unit)
 #ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+#else
 	    unit->Command.Data.Move.Goal=NULL;
+#endif
 	    return;
 	}
+#ifdef NEW_ORDERS
+	if( !goal->HP || goal->Orders[0].Action==UnitActionDie ) {
+#else
 	if( !goal->HP || goal->Command.Action==UnitActionDie ) {
+#endif
 	    DebugLevel3Fn("Missile-none hits dead unit!\n");
 #ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
@@ -716,7 +736,11 @@ global void FireMissile(Unit* unit)
 #ifdef REFS_DEBUG
 	    DebugCheck( !goal->Refs );
 #endif
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+#else
 	    unit->Command.Data.Move.Goal=NULL;
+#endif
 	    return;
 	}
 
@@ -729,7 +753,11 @@ global void FireMissile(Unit* unit)
 
     x=unit->X*TileSizeX+TileSizeX/2;	// missile starts in tile middle
     y=unit->Y*TileSizeY+TileSizeY/2;
+#ifdef NEW_ORDERS
+    if( (goal=unit->Orders[0].Goal) ) {
+#else
     if( (goal=unit->Command.Data.Move.Goal) ) {
+#endif
 	// Check if goal is correct unit.
 	if( goal->Destroyed ) {
 	    DebugLevel0Fn("destroyed unit\n");
@@ -740,7 +768,11 @@ global void FireMissile(Unit* unit)
 		ReleaseUnit(goal);
 	    }
 	    // FIXME: should I clear this here?
+#ifdef NEW_ORDERS
+	    goal=unit->Orders[0].Goal=NULL;
+#else
 	    unit->Command.Data.Move.Goal=NULL;
+#endif
 	    return;
 	}
 	DebugCheck( !goal->Type );	// Target invalid?
@@ -748,8 +780,13 @@ global void FireMissile(Unit* unit)
 	NearestOfUnit(goal,unit->X,unit->Y,&dx,&dy);
 	DebugLevel3Fn("Fire to unit at %d,%d\n",dx,dy);
     } else {
+#ifdef NEW_ORDERS
+	dx=unit->Orders[0].X;
+	dy=unit->Orders[0].Y;
+#else
 	dx=unit->Command.Data.Move.DX;
 	dy=unit->Command.Data.Move.DY;
+#endif
     }
 
     //
