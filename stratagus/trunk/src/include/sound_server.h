@@ -191,6 +191,9 @@ extern int InitSoundServer(void);
  */
 extern void WriteSound(void);
 
+    ///	Cleanup sound.
+extern void QuitSound(void);
+
 #else	// }{ WITH_SOUND
 
 /*----------------------------------------------------------------------------
@@ -202,6 +205,7 @@ extern void WriteSound(void);
 
 #define InitSound()	0		/// Dummy macro for without sound
 #define WriteSound()			/// Dummy macro for without sound
+#define QuitSound()			/// Dummy macro for without sound
 
 #endif	// { WITH_SOUND
 
