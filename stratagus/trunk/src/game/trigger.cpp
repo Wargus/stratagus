@@ -315,7 +315,8 @@ local SCM CclIfUnitAt(SCM list)
 	//
 	//	Check unit type
 	//
-	if( (unittype==ANY_UNIT && unittype==ALL_UNITS)
+	// FIXME: ALL_UNITS
+	if( unittype==ANY_UNIT
 		|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
 		|| (unittype==ALL_BUILDINGS && unit->Type->Building)
 		|| (unittype==unit->Type) ) {
@@ -401,7 +402,8 @@ local SCM CclIfNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 	    //
 	    //	Check unit type
 	    //
-	    if( (unittype==ANY_UNIT && unittype==ALL_UNITS)
+	    // FIXME: ALL_UNITS
+	    if( unittype==ANY_UNIT
 		    || (unittype==ALL_FOODUNITS && !unit->Type->Building)
 		    || (unittype==ALL_BUILDINGS && unit->Type->Building)
 		    || (unittype==unit->Type) ) {
@@ -489,7 +491,8 @@ local SCM CclIfRescuedNearUnit(SCM player,SCM operation,SCM quantity,SCM unit,
 		//
 		//	Check unit type
 		//
-		if( (unittype==ANY_UNIT && unittype==ALL_UNITS)
+		// FIXME: ALL_UNITS
+		if( unittype==ANY_UNIT
 			|| (unittype==ALL_FOODUNITS && !unit->Type->Building)
 			|| (unittype==ALL_BUILDINGS && unit->Type->Building)
 			|| (unittype==unit->Type) ) {
