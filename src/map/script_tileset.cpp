@@ -267,6 +267,10 @@ local void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
     flags = 0;
     while (1) {
 	lua_rawgeti(l, -1, *j + 1);
+	if (!lua_isstring(l, -1)) {   
+	    lua_pop(l, 1);   
+	    break;   
+	} 
 	++(*j);
 	value = LuaToString(l, -1);
 	lua_pop(l, 1);
