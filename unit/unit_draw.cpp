@@ -1113,8 +1113,8 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
     if( NumSelected==1 && unit->Selected ) {
 	if( ShowSightRange ) {
 	    VideoDrawRectangleClip(ColorGreen
-		,x+TileSizeX/2-stats->SightRange*TileSizeX
-		,y+TileSizeY/2-stats->SightRange*TileSizeY
+		,x+type->TileWidth*TileSizeX/2-stats->SightRange*TileSizeX
+		,y+type->TileHeight*TileSizeY/2-stats->SightRange*TileSizeY
 		,stats->SightRange*TileSizeX*2
 		,stats->SightRange*TileSizeY*2);
 	}
@@ -1125,7 +1125,7 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 			: type->ReactRangeComputer;
 		if( r ) {
 		    VideoDrawRectangleClip(ColorBlue
-			,x+TileSizeX/2-r*TileSizeX
+			,x+type->TileWidth*TileSizeX/2-r*TileSizeX
 			,y+TileSizeY/2-r*TileSizeY
 			,r*TileSizeX*2
 			,r*TileSizeY*2);
@@ -1133,8 +1133,8 @@ local void DrawInformations(const Unit* unit,const UnitType* type,int x,int y)
 	    }
 	    if( ShowAttackRange && stats->AttackRange ) {
 		VideoDrawRectangleClip(ColorRed
-		    ,x+TileSizeX/2-stats->AttackRange*TileSizeX
-		    ,y+TileSizeY/2-stats->AttackRange*TileSizeY
+		    ,x+type->TileWidth*TileSizeX/2-stats->AttackRange*TileSizeX
+		    ,y+type->TileHeight*TileSizeY/2-stats->AttackRange*TileSizeY
 		    ,stats->AttackRange*TileSizeX*2
 		    ,stats->AttackRange*TileSizeY*2);
 	    }

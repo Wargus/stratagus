@@ -134,6 +134,8 @@ found:
 
     unit->Removed=0;
 
+    x+=unit->Type->TileWidth/2;
+    y+=unit->Type->TileHeight/2;
 #ifdef NEW_FOW
     //
     //	Update fog of war.
@@ -148,7 +150,7 @@ found:
     }
 #endif
     if( unit->Type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,unit->X,unit->Y,unit->Stats->SightRange);
+	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
     }
 
     MustRedraw|=RedrawMinimap;
