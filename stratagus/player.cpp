@@ -311,6 +311,9 @@ global void CreatePlayer(int type)
 	    type=PlayerComputer;
 	}
     }
+    if( NetPlayers && NumPlayers==NetLocalPlayerNumber ) {
+	ThisPlayer=&Players[NetLocalPlayerNumber];
+    }
 
     if( NumPlayers==PlayerMax ) {
 	static int already_warned;
