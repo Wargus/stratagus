@@ -217,6 +217,9 @@ extern void QuitSound(void);
 
 #endif	// { WITH_SOUND
 
+    /// Check the cdrom status
+extern void CDRomCheck(void);
+
 //@}
 
 #endif	// !__SOUND_SERVER_H__
