@@ -190,10 +190,11 @@ local void TerminateNetConnect(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local EventCallback callbacks;
-
     /// Name, Version, Copyright
 extern char NameLine[];
+extern int NetStateMsgCnt;	/// Number of consecutive msgs of same type sent
+
+local EventCallback callbacks;
 
 // FIXME: Johns: this must be all be configured from ccl some time.
 
@@ -233,6 +234,11 @@ local int MenuButtonCurSel = -1;
 **	Text describing the Network Server IP
 */
 local char NetworkServerText[64];
+
+/**
+**	Text tries
+*/
+local char NetworkTriesText[32];
 
 /**
 **	Offsets from top and left, used for different resolutions
@@ -394,6 +400,7 @@ local Menuitem EndScenarioMenuItems[] = {
 **	Items for the SelectScen Menu
 */
 local unsigned char *ssmtoptions[] = {
+    "All scenarios (cm+pud)",
     "Freecraft scenario (cm)",
     "Foreign scenario (pud)"
     // FIXME: what is about levels in zips?
@@ -444,7 +451,7 @@ local Menuitem ScenSelectMenuItems[] = {
     { MI_TYPE_TEXT, 132, 40, 0, LargeFont, NULL, NULL,
 	{ text:{ "Type:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 40, 0, GameFont, NULL, NULL,
-	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 2, 1, 1, 0, 0} } },
+	{ pulldown:{ ssmtoptions, 192, 20, MBUTTON_PULLDOWN, ScenSelectTPMSAction, 3, 0, 0, 0, 0} } },
     { MI_TYPE_TEXT, 132, 80, 0, LargeFont, NULL, NULL,
 	{ text:{ "Map size:", MI_TFLAGS_RALIGN} } },
     { MI_TYPE_PULLDOWN, 140, 80, 0, GameFont, NULL, NULL,
@@ -974,6 +981,8 @@ local Menuitem ConnectingMenuItems[] = {
 	{ text:{ "Connecting to server", MI_TFLAGS_CENTERED} } },
     { MI_TYPE_TEXT, 144, 32, 0, LargeFont, NULL, NULL,
 	{ text:{ NetworkServerText, MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_TEXT, 144, 53, 0, LargeFont, NULL, NULL,
+	{ text:{ NetworkTriesText , MI_TFLAGS_CENTERED} } },
     { MI_TYPE_BUTTON, 32, 90, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "~!Cancel", 224, 27, MBUTTON_GM_FULL, NetConnectingCancel, 'c'} } },
 #else
@@ -1361,7 +1370,7 @@ global Menu Menus[] = {
 	260,
 	288, 128,
 	ImagePanel4,
-	2, 3,
+	2, 4,
 	ConnectingMenuItems,
 	TerminateNetConnect,
     },
@@ -2828,12 +2837,18 @@ local void EnterNameAction(Menuitem *mi, int key)
     }
 }
 
+/**
+**	Cancel button of enter server ip/name menu pressed.
+*/
 local void EnterServerIPCancel(void)
 {
     EnterServerIPMenuItems[1].d.input.nch = 0;
     EndMenu();
 }
 
+/**
+**	Input field action of server ip/name.
+*/
 local void EnterServerIPAction(Menuitem *mi, int key)
 {
     if (mi->d.input.nch == 0) {
@@ -2846,6 +2861,9 @@ local void EnterServerIPAction(Menuitem *mi, int key)
     }
 }
 
+/**
+**	Start processing join a network game menu.
+*/
 local void JoinNetGameMenu(void)
 {
     char ServerHostBuf[32];
@@ -2855,11 +2873,23 @@ local void JoinNetGameMenu(void)
     VideoUnlockScreen();
     Invalidate();
 
+    //
+    //	Prepare enter ip/hostname menu
+    //
     EnterServerIPMenuItems[1].d.input.buffer = ServerHostBuf;
-    strcpy(ServerHostBuf, "~!_");
+    if( NetworkArg ) {
+	strcpy(ServerHostBuf,NetworkArg);
+    } else {
+	ServerHostBuf[0]='\0';
+    }
+    strcat(ServerHostBuf, "~!_");
     EnterServerIPMenuItems[1].d.input.nch = strlen(ServerHostBuf) - 3;
     EnterServerIPMenuItems[1].d.input.maxch = 24;
-    EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
+    if( EnterServerIPMenuItems[1].d.input.nch ) {
+	EnterServerIPMenuItems[2].flags &= ~MenuButtonDisabled;
+    } else {
+	EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
+    }
 
     ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
 
@@ -2871,7 +2901,8 @@ local void JoinNetGameMenu(void)
 	return;
     }
 
-    ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;	// Now finally here is the address
+    // Now finally here is the address
+    ServerHostBuf[EnterServerIPMenuItems[1].d.input.nch] = 0;
     if (NetworkSetupServerAddress(ServerHostBuf, NetworkServerText) != 0) {
 	NetErrorMenuItems[1].d.text.text = "Unable to lookup host.";
 	ProcessMenu(MENU_NET_ERROR, 1);
@@ -2886,19 +2917,27 @@ local void JoinNetGameMenu(void)
     ProcessMenu(MENU_NET_CONNECTING, 1);
 }
 
+/**
+**	Cancel button of network connect menu pressed.
+*/
 local void NetConnectingCancel(void)
 {
     VideoLockScreen();
     StartMenusSetBackground(NULL);
     VideoUnlockScreen();
     NetworkExitClientConnect();
-    NetLocalState = ccs_unreachable;	// Trigger TerminateNetConnect() to call us again and end the menu
+    // Trigger TerminateNetConnect() to call us again and end the menu
+    NetLocalState = ccs_unreachable;
     EndMenu();
 }
 
+/**
+**	Call back from menu loop, if network state has changed.
+*/
 local void TerminateNetConnect(void)
 {
     if (NetLocalState == ccs_unreachable) {
+	// FIXME: Should show a menu with error code if can't reach server
 	NetConnectingCancel();
 	return;
     }
@@ -3032,6 +3071,9 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
 
     if (ScenSelectMenuItems[6].d.pulldown.curopt == 0) {
+	suf = NULL;
+	p = -1;
+    } else if (ScenSelectMenuItems[6].d.pulldown.curopt == 1) {
 	suf = ".cm";
 	p = 0;
     } else {
@@ -3058,7 +3100,21 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #endif
     do {
 	lcp = cp++;
-	cp = strcasestr(cp, suf);
+	if( suf ) {
+	    printf("suf %s\n",pathbuf);
+	    cp = strcasestr(cp, suf);
+	} else if( !suf && (cp = strcasestr(cp, ".cm")) ) {
+	    printf("cm %s\n",pathbuf);
+	    suf = ".cm";
+	    p = 0;
+	} else if( !suf && (cp = strcasestr(cp, ".pud")) ) {
+	    printf("pud %s\n",pathbuf);
+	    suf = ".pud";
+	    p = 1;
+	} else {
+	    printf("none %s\n",pathbuf);
+	    cp=NULL;
+	}
     } while (cp != NULL);
     if (lcp >= np) {
 	cp = lcp + strlen(suf);
@@ -3076,6 +3132,14 @@ local int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 #ifdef USE_ZZIPLIB
 usezzf:
 #endif
+	    if( p==-1 ) {
+		printf("What now ?\n");
+		if (strcasestr(pathbuf, ".pud")) {
+		    p=1;
+		} else {
+		    p=0;
+		}
+	    }
 	    if (p) {
 		if (strcasestr(pathbuf, ".pud")) {
 		    info = GetPudInfo(pathbuf);
@@ -5085,8 +5149,17 @@ global void ProcessMenu(int menu_id, int loop)
 	    WaitEventsOneFrame(&callbacks);
 	    if (NetConnectRunning == 2) {
 		NetworkProcessClientRequest();
+		if( NetLocalState==ccs_connecting ) {
+		    sprintf(NetworkTriesText,"Connecting try %d of 60",
+			NetStateMsgCnt);
+		} else {
+		    sprintf(NetworkTriesText,"Connected try %d of 20",
+			NetStateMsgCnt);
+		}
+		MustRedraw |= RedrawMenu;
 	    }
-	    if (oldncr == 2 && NetConnectRunning == 0) {	// stopped by network activity
+	    // stopped by network activity?
+	    if (oldncr == 2 && NetConnectRunning == 0) {
 		if (menu->netaction) {
 		    (*menu->netaction)();
 		}

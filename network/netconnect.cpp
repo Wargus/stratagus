@@ -72,7 +72,7 @@ global char NetworkName[16];		/// Network menu: Name of local player
 global int NetConnectRunning;		/// Network menu: Setup mode active
 global unsigned char NetLocalState;	/// Network menu: Local Server/Client connect state;
 
-local int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
+global int NetStateMsgCnt;		/// Number of consecutive msgs of same type sent
 local unsigned char LastStateMsgType;	/// Subtype of last InitConfig message sent
 local unsigned long NetLastPacketSent;	/// Tick the last network packet was sent
 local unsigned long NetworkServerIP;	/// Network Client: IP of server to join
@@ -834,8 +834,8 @@ changed:
 		DebugLevel0Fn("ccs_detaching: Above message limit %d\n", NetStateMsgCnt);
 	    }
 	    break;
-	case ccs_connecting:
-	    if (NetStateMsgCnt < 60) {	/// 60 retries = 30 seconds
+	case ccs_connecting:		// connect to server
+	    if (NetStateMsgCnt < 60) {	// 60 retries = 30 seconds
 		message.Type = MessageInitHello;
 		message.SubType = ICMHello;
 		memcpy(message.u.Hosts[0].PlyName, NetworkName, 16);
