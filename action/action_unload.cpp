@@ -133,7 +133,7 @@ global void HandleActionUnload(Unit* unit)
 {
     int i;
 
-    DebugLevel3Fn("%p(%Zd) SubAction %d\n"
+    DebugLevel3Fn("%p(%d) SubAction %d\n"
 	    ,unit,UnitNumber(unit),unit->SubAction);
 
     switch( unit->SubAction ) {

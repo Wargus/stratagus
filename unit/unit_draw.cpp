@@ -1022,7 +1022,7 @@ local void DrawUnit(const Unit* unit)
     const UnitStats* stats;
 
     if ( unit->Revealer ) {		// Revealers are not drawn
-	DebugLevel3Fn("Drawing revealer %Zd\n",UnitNumber(unit));
+	DebugLevel3Fn("Drawing revealer %d\n",UnitNumber(unit));
 	return;
     }
 

@@ -222,7 +222,7 @@ global void HandleActionMove(Unit* unit)
 {
     Unit* goal;
 
-    DebugLevel3Fn("%Zd: %Zd %d,%d \n",UnitNumber(unit),
+    DebugLevel3Fn("%d: %d %d,%d \n",UnitNumber(unit),
 	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1,
 	    unit->Orders[0].X,unit->Orders[0].Y);
 

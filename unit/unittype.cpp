@@ -778,7 +778,7 @@ global void ParsePudUDTA(const char* udta,int length)
     // FIXME: peon applies also to peon-with-gold and peon-with-wood
     // FIXME: oil-tanker applies also to oil-tanker-full
 
-    DebugLevel0("\tUDTA used %Zd bytes\n",udta-start);
+    DebugLevel0("\tUDTA used %d bytes\n",udta-start);
 
     UpdateStats();
 }

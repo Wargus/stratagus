@@ -360,15 +360,15 @@ local int AiNeedResources(const UnitType * type)
     player = AiPlayer->Player;
     if ((err = PlayerCheckUnitType(player, type))) {
 	if (err & (1 << GoldCost)) {
-	    DebugLevel3Fn("%Zd Need gold\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need gold\n", AiPlayer->Player - Players);
 	    AiPlayer->NeedGold = 1;
 	}
 	if (err & (1 << WoodCost)) {
-	    DebugLevel3Fn("%Zd Need wood\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need wood\n", AiPlayer->Player - Players);
 	    AiPlayer->NeedWood = 1;
 	}
 	if (err & (1 << OilCost)) {
-	    DebugLevel3Fn("%Zd Need oil\n", AiPlayer->Player - Players);
+	    DebugLevel3Fn("%d Need oil\n", AiPlayer->Player - Players);
 	    AiPlayer->NeedOil = 1;
 	}
 	// FIXME: more resources!!!
@@ -662,7 +662,7 @@ local int AiBuildHall(int type)
 	}
     }
     // Did use the first if no could be moved.
-    DebugLevel3("\tWorker %Zd %d,%d -> Goldmine %Zd %d,%d\n",
+    DebugLevel3("\tWorker %d %d,%d -> Goldmine %d %d,%d\n",
 		UnitNumber(workers[best_w])
 		, workers[best_w]->X, workers[best_w]->Y,
 		UnitNumber(goldmines[best_g])
@@ -916,7 +916,7 @@ local void AiAssignWorker(void)
 
     //  Count workers
     num_worker = AiFindFreeWorkers(workers);
-    DebugLevel3Fn("Player %Zd: %d\n", AiPlayer->Player - Players, num_worker);
+    DebugLevel3Fn("Player %d: %d\n", AiPlayer->Player - Players, num_worker);
     if (num_worker) {
 	num_still = num_gold = num_wood = num_repair = 0;
 	for (w = 0; w < num_worker; ++w) {
@@ -940,12 +940,12 @@ local void AiAssignWorker(void)
 	    }
 	}
 
-	DebugLevel3("Ai: Player %Zd: ", AiPlayer->Player - Players);
+	DebugLevel3("Ai: Player %d: ", AiPlayer->Player - Players);
 	DebugLevel3("Workers %d, Gold %d, Wood %d, Repair %d, Still %d.\n",
 		    num_worker, num_gold, num_wood, num_repair, num_still);
 
 	if (AiPlayer->NeedGold && AiPlayer->NeedWood) {
-	    DebugLevel3("Ai: Player %Zd need gold and wood\n",
+	    DebugLevel3("Ai: Player %d need gold and wood\n",
 			AiPlayer->Player - Players);
 	    //      Assign half to wood and gold.
 	    if (num_still) {		// assign the non-working
@@ -976,7 +976,7 @@ local void AiAssignWorker(void)
 	}
 
 	if (AiPlayer->NeedGold) {
-	    DebugLevel3("Ai: Player %Zd need gold\n",
+	    DebugLevel3("Ai: Player %d need gold\n",
 			AiPlayer->Player - Players);
 	    //      Assign all to mine gold.
 	    for (w = 0; w < num_worker; ++w) {
@@ -999,7 +999,7 @@ local void AiAssignWorker(void)
 	}
 
 	if (AiPlayer->NeedWood) {
-	    DebugLevel3("Ai: Player %Zd need wood\n",
+	    DebugLevel3("Ai: Player %d need wood\n",
 			AiPlayer->Player - Players);
 	    //      Assign all to harvest wood.
 	    for (w = 0; w < num_worker; ++w) {
@@ -1386,7 +1386,7 @@ global void AiHelpMe(Unit * unit)
 */
 global void AiWorkComplete(Unit * unit, Unit * what)
 {
-    DebugLevel3("Ai: Player %Zd: %Zd Work %Zd complete\n",
+    DebugLevel3("Ai: Player %d: %d Work %d complete\n",
 		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
     if (unit->Player->Type == PlayerHuman) {
@@ -1411,7 +1411,7 @@ global void AiCanNotBuild(Unit * unit, const UnitType * what)
 {
     int i;
 
-    DebugLevel1("Ai: Player %Zd: %Zd Can't build %d at %d,%d\n",
+    DebugLevel1("Ai: Player %d: %d Can't build %d at %d,%d\n",
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
     // FIXME: correct position
@@ -1442,7 +1442,7 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 {
     int i;
 
-    DebugLevel3("Ai: Player %Zd: %Zd Can't reach %d at %d,%d\n",
+    DebugLevel3("Ai: Player %d: %d Can't reach %d at %d,%d\n",
 		unit->Player - Players, UnitNumber(unit), what->Type, unit->X,
 		unit->Y);
     // FIXME: correct position
@@ -1474,7 +1474,7 @@ global void AiCanNotReach(Unit * unit, const UnitType * what)
 */
 global void AiTrainingComplete(Unit * unit, Unit * what)
 {
-    DebugLevel3("Ai: Player %Zd: %Zd Training %Zd complete\n",
+    DebugLevel3("Ai: Player %d: %d Training %d complete\n",
 		unit->Player - Players, UnitNumber(unit), UnitNumber(what));
     // FIXME: correct position
     if (unit->Player->Type == PlayerHuman) {

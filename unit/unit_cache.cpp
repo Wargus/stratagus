@@ -874,7 +874,7 @@ global int UnitCacheSelect(int x1,int y1,int x2,int y2,Unit** table)
 	    for( unit=mf->Here.Units; unit; unit=unit->Next ) {
 		IfDebug(
 		    if( !unit->Type ) {
-			DebugLevel0Fn("%d,%d: %Zd, %d,%d\n"
+			DebugLevel0Fn("%d,%d: %d, %d,%d\n"
 			    ,i,y,UnitNumber(unit),unit->X,unit->Y);
 			fflush(stdout);
 		    }
