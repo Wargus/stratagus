@@ -38,6 +38,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "upgrade_structs.h"
+#include "construct.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -113,7 +114,7 @@ struct _unit_type_ {
     int		_Speed;			/// movement speed
 
 // this is taken from the UDTA section
-    int		OverlapFrame;		/// what is shown in construction phase
+    Construction*Construction;		/// what is shown in construction phase
     int		_SightRange;		/// sight range
     unsigned	_HitPoints;		/// maximum hit points
     // FIXME: only flag
