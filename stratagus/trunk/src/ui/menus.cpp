@@ -65,12 +65,8 @@
 #include "commands.h"
 #include "actions.h"
 
-#if defined(USE_SDLCD) || defined(USE_SDLA)
+#ifdef USE_SDLA
 #include "SDL.h"
-#endif
-
-#ifdef USE_LIBCDA
-#include "libcda.h"
 #endif
 
 //#define SAVE_MENU_CCL		/// SAVE (REWRITE!) the menus.ccl file

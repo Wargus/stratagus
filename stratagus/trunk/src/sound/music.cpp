@@ -41,11 +41,7 @@
 #include "../libmodplug/modplug.h"
 #endif
 
-#ifdef USE_LIBCDA
-#include "libcda.h"
-#endif
-
-#if defined(USE_SDLCD) || defined(USE_SDL)
+#ifdef USE_SDL
 #include <SDL.h>
 #endif
 
@@ -67,15 +63,18 @@
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
 global Sample* MusicSample;		/// Music samples
 #endif
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
 global char *CDMode = ":off";	/// cd play mode, ":off" ":random" or ":all"
 global int CDTrack;			/// Current cd track
 #endif
-#ifdef USE_SDLCD
+
+#if defined(USE_SDLCD)
 global SDL_CD *CDRom;			/// SDL cdrom device
-#endif
-#ifdef USE_LIBCDA
+#elif defined(USE_LIBCDA)
 global int NumCDTracks;			/// Number of tracks on the cd
+#elif defined(USE_CDDA)
+// FIXME: fill up
 #endif
 
 /*----------------------------------------------------------------------------
@@ -379,7 +378,7 @@ global void PlayMusic(const char* name)
     Sample* sample;
 #endif
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA)
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     if (PlayCDRom(name)) {
 	return;
     }

@@ -79,18 +79,18 @@
 #include "../libmodplug/modplug.h"
 #endif
 
-#ifdef USE_LIBCDA
+#if defined(USE_SDLCD)
+#include <SDL.h>
+#elif defined(USE_LIBCDA)
 #include "libcda.h"
+#elif defined(USE_CDDA)
+
 #endif
 
 #ifdef USE_GLIB
 #include <glib.h>
 #else
 #include "etlib/hash.h"
-#endif
-
-#ifdef USE_SDLCD
-#include <SDL.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ global void StopMusic(void)
 */
 global int CDRomCheck(void *unused __attribute__ ((unused)))
 {
-#ifdef USE_SDLCD
+#if defined(USE_SDLCD)
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
 	    && SDL_CDStatus(CDRom) == 1) {
 	DebugLevel0Fn("Playing new track\n");
@@ -239,9 +239,7 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	    PlayMusic(":random");
 	}
     }
-#endif
-
-#ifdef USE_LIBCDA
+#elif defined(USE_LIBCDA)
     if (strcmp(CDMode, ":off") && strcmp(CDMode, ":stopped")
 	    && !cd_current_track()) {
 	DebugLevel0Fn("Playing new track\n");
@@ -257,6 +255,8 @@ global int CDRomCheck(void *unused __attribute__ ((unused)))
 	    CDTrack = 1;
 	}
     }
+#elif defined(USE_CDDA)
+
 #endif
     return 0;
 }
@@ -1255,7 +1255,7 @@ global void QuitSound(void)
 
 global void QuitCD(void)
 {
-#ifdef USE_SDLCD
+#if defined(USE_SDLCD)
     if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
 	SDL_CDStop(CDRom);
 	CDMode = ":stopped";
@@ -1263,9 +1263,7 @@ global void QuitCD(void)
         SDL_CDClose(CDRom);
 	CDMode = ":off";
     }
-#endif
-
-#ifdef USE_LIBCDA
+#elif defined(USE_LIBCDA)
     if (strcmp(CDMode,":off") && strcmp(CDMode,":stopped"))
         cd_stop();
 	CDMode = ":stopped";
@@ -1274,6 +1272,8 @@ global void QuitCD(void)
         cd_exit();
 	CDMode = ":off";
     }
+#elif defined(USE_CDDA)
+
 #endif
 }
 
