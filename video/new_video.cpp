@@ -69,6 +69,17 @@
 #define UseWin32	1
 #endif
 
+/**
+**	Structure of pushed clippings.
+*/
+typedef struct _clip_ {
+    struct _clip_*	Next;		/// next pushed clipping.
+    int			X1;		/// pushed clipping top left
+    int			Y1;		/// pushed clipping top left
+    int			X2;		/// pushed clipping bottom right
+    int			Y2;		/// pushed clipping bottom right
+} Clip;
+
 /*----------------------------------------------------------------------------
 --	Externals
 ----------------------------------------------------------------------------*/
@@ -90,6 +101,8 @@ global int ClipX1;			/// current clipping top left
 global int ClipY1;			/// current clipping top left
 global int ClipX2;			/// current clipping bottom right
 global int ClipY2;			/// current clipping bottom right
+
+local Clip* Clips;			/// stack of all clips.
 
 #ifdef DEBUG
 global unsigned AllocatedGraphicMemory;	/// Allocated memory for objects
@@ -119,6 +132,9 @@ global VMemType* VideoMemory;
     **	@see VideoCreatePalette @VideoSetPalette
     */
 global VMemType* Pixels;
+
+global int VideoSyncSpeed=100;		/// 0 disable interrupts
+global volatile int VideoInterrupts;	/// be happy, were are quicker
 
 #endif
 
@@ -155,7 +171,7 @@ global void SetClipping(int left,int top,int right,int bottom)
 
     if( left>=VideoWidth )	left=VideoWidth-1;
     if( right>=VideoWidth )	right=VideoWidth-1;
-    if( bottom>=VideoHeight ) bottom=VideoHeight-1;
+    if( bottom>=VideoHeight )	bottom=VideoHeight-1;
     if( top>=VideoHeight )	top=VideoHeight-1;
     
     ClipX1=left;
@@ -163,6 +179,45 @@ global void SetClipping(int left,int top,int right,int bottom)
     ClipX2=right;
     ClipY2=bottom;
 }
+
+/**
+**	Push current clipping.
+*/
+global void PushClipping(void)
+{
+    Clip* clip;
+
+    clip=malloc(sizeof(Clip));
+    clip->Next=Clips;
+    clip->X1=ClipX1;
+    clip->Y1=ClipY1;
+    clip->X2=ClipX2;
+    clip->Y2=ClipY2;
+    Clips=clip;
+}
+
+/**
+**	Pop current clipping.
+*/
+global void PopClipping(void)
+{
+    Clip* clip;
+
+    clip=Clips;
+    if( clip ) {
+	Clips=clip->Next;
+	ClipX1=clip->X1;
+	ClipY1=clip->Y1;
+	ClipX2=clip->X2;
+	ClipY2=clip->Y2;
+    } else {
+	ClipX1=0;
+	ClipY1=0;
+	ClipX2=VideoWidth;
+	ClipY2=VideoHeight;
+    }
+}
+
 #endif
 
 /**

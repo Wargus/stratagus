@@ -496,6 +496,16 @@ extern void VideoFillRectangle(SysColors color,int x,int y
 extern void SetClipping(int left,int top,int right,int bottom);
 
     /**
+    **	Push current clipping.
+    */
+extern void PushClipping(void);
+
+    /**
+    **	Pop current clipping.
+    */
+extern void PopClipping(void);
+
+    /**
     **	Load a picture and display it on the screen (full screen),
     **	changing the colormap and so on..
     **
