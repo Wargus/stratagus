@@ -50,6 +50,7 @@
 #include "network.h"
 #include "goal.h"
 #include "ui.h"
+#include "deco.h"
 
 #ifdef USE_SDL
 	// FIXME: move to system api part!
@@ -224,6 +225,18 @@ global void UpdateDisplay(void)
 
     HideAnyCursor();	// remove cursor (when available)
 
+#ifdef NEW_DECODRAW
+// Experimental new drawing mechanism, which can keep track of what is
+// overlapping and draw only that what has changed..
+// Every to-be-drawn item added to this mechanism, can be handed by this call.
+    if( MustRedraw&RedrawMap ) {
+	if (InterfaceState == IfaceStateNormal) {
+          // DecorationRefreshDisplay();
+          DecorationUpdateDisplay();
+	}
+    }
+
+#else
     if( MustRedraw&RedrawMap ) {
 	if (InterfaceState == IfaceStateNormal) {
 #ifdef NEW_MAPDRAW
@@ -256,6 +269,8 @@ global void UpdateDisplay(void)
 	    MustRedraw|=RedrawResources;
 	}
     }
+#endif
+
 
     if( MustRedraw&(RedrawMessage|RedrawMap) ) {
 	DrawMessage();

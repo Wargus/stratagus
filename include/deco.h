@@ -72,9 +72,9 @@ typedef struct DecorationSingle {
   char *tiles;
 // 16bit bitmask which denote the area in above tiles overlapped by this deco
   unsigned int lefttopmask, righttopmask, leftbottommask, rightbottommask;
-// the bit index (bity+bitx) of the left-top in the first tile
-// @note  bity is a multiple of 4 tiles (so no multiple needed)
-  int bitx, bity;
+// the bit index (bity4+bitx) of the left-top in the first tile
+// @note  bity4 is a multiple of 4 tiles (so no multiple needed)
+  int bitx, bity4;
 // left-top pixel position
   int topleftx, toplefty;
 } DecorationSingle;
@@ -85,35 +85,26 @@ typedef struct DecorationSingle {
 **	structu, so the mechanism can use it and automaticly update any other
 **	decoration overlapping it.
 **
-**	mark	= a function that marks the part of the screen covered by
-**		  this decoration using DecorationMark.. functions below.
-**	check	= a function that check the part of the screen covered by
-**		  this decoration using DecorationCheck.. functions below.
-**
-**	@note: the mark and check functions are made in control of external
-**	functions, as not every decoration is marked as a single box, but need
-**	to mark/check multiple box-areas (ie. a line).
-**
-**	draw	= a function that draws the given decoration, just as it
-**	normaly would, directly using the video draw functions.
-**
-**	@note: the mark,check and draw functions need to be consistent with
-**	eachother (both mark as check need to cover a total area exactly/bigger
-**	than the draw routine will affect), else the screen would looked
-**	screwed up. The mark function might mark a slightly larger area when
-**	marking accurately is expensive in CPU usage (ie marking a line), but
-**	this will cause unneeded drawings as other check operations will
-**	trigger upon this area.
-**
+**	draw	= an user given function that draws the decoration using
+**	          some vidoe functions based on the clip rectangle ClipX1,..
+**      data    = an user given data-type given to above function, to be able
+**	          to provide a generic draw-function independent of its data.
+**	x,y,w,h = dimension as given to DecorationAdd..
+**	          @note now needed outside, but might be removed in the future
+**	l       = decoration level as given to DecorationAdd (internal use only)
+**	singles = The sub-decoration type, as this decoration might be split
+**	          into multiple small/fixed-sized data-type (internal use only)
+**	prv	= prev decoration based on depth-level (internal use only)
 **	nxt	= next decoration based on depth-level (internal use only)
 **/
-typedef struct Decoration {
+typedef struct Deco {
   void *data;
   void (*drawclip)(void *data);
   struct DecorationSingle *singles;
-  struct Decoration *nxt;
+  struct Deco *prv, *nxt;
   int x, y, w, h;
-} Decoration;
+  DecorationLevel l;
+} Deco;
 
 /**
 **
@@ -127,14 +118,14 @@ typedef struct Decoration {
 
 extern void DecorationInit(void);
 
-extern Decoration *DecorationAdd( void *data,
+extern Deco *DecorationAdd( void *data,
 				   void (*drawclip)(void *data),
 				   DecorationLevel l, 
 				   unsigned x, unsigned y,
 				   unsigned w, unsigned h );
-extern void DecorationRemove( Decoration *d );
+extern void DecorationRemove( Deco *d );
 
-extern void DecorationMark( Decoration *d );
+extern void DecorationMark( Deco *d );
 
 extern void DecorationRefreshDisplay(void);
 extern void DecorationUpdateDisplay(void);

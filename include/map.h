@@ -343,6 +343,12 @@ extern char MustRedrawTile[MAXMAP_W*MAXMAP_H];	/// Flags must redraw tile
     ///  Fast draw tile, display and video mode independ
 extern void (*VideoDrawTile)(const unsigned char*,int,int);
 
+#ifdef NEW_DECODRAW
+extern void (*MapDrawTile)(int,int,int);
+extern void InitMapDecoration(void);
+#endif
+
+
     /// Use original style fog of war
 extern int OriginalFogOfWar;
     /// Contrast of fog of war

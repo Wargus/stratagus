@@ -72,6 +72,7 @@
 #include "player.h"
 #include "pathfinder.h"
 #include "ui.h"
+#include "deco.h"
 
 #include "etlib/dllist.h"
 #if defined(DEBUG) && defined(TIMEIT)
@@ -183,6 +184,13 @@ global void (*VideoDrawTile)(const GraphicData*,int,int);
 **	Draws tiles display and video mode independ
 */
 local void (*MapDrawTile)(int,int,int);
+
+#ifdef NEW_DECODRAW
+/**
+**	Decoration as registered for decoration mechanism to draw map tiles
+*/
+local Deco *mapdeco = NULL;
+#endif
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -443,6 +451,35 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 	dp[da]=((VMemType32*)TheMap.TileData->Pixels)[0];
     }
 #endif
+}
+
+/**
+**	Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
+**	(needed for decoration mechanism, which wants to draw tile partly)
+**	FIXME: this separate function is only needed for compatibility with
+**             variable VideoDrawTile, can be replaced by MapDrawXXTileClip
+**
+**	@param data	pointer to tile graphic data
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void VideoDrawXXTileClip(const unsigned char* data,int x,int y)
+{
+  VideoDrawRawClip( (VMemType*) TheMap.TileData->Pixels,
+                    data, x, y, TileSizeX, TileSizeY );
+}
+
+/**
+**	Draw TileSizeX x TileSizeY clipped for XX bpp video modes.
+**	(needed for decoration mechanism, which wants to draw tile partly)
+**
+**	@param tile	Tile number to draw.
+**	@param x	X position into video memory
+**	@param y	Y position into video memory
+*/
+local void MapDrawXXTileClip(int tile,int x,int y)
+{
+  VideoDrawXXTileClip(TheMap.Tiles[tile],x,y);
 }
 
 /*----------------------------------------------------------------------------
@@ -1483,8 +1520,13 @@ global void MarkDrawEntireMap(void)
     }
 #endif
 
+#ifdef NEW_DECODRAW
+  DecorationMark( mapdeco );
+#endif
+
     MustRedraw|=RedrawMap;
 }
+
 
 /**
 **	Draw the map backgrounds.
@@ -1582,7 +1624,51 @@ global void DrawMapBackground(int x,int y)
 #endif
 }
 
+#ifdef NEW_DECODRAW
 /**
+**      Decoration redraw function that will redraw map for set clip rectangle
+**
+**      @param dummy_data  should be NULL; needed to make callback possible
+*/
+local void mapdeco_draw( void *dummy_data )
+{
+  MapField *src;
+  int x, y, w, h, nextline;
+
+  extern int ClipX1;
+  extern int ClipY1;
+  extern int ClipX2;
+  extern int ClipY2;
+
+//  VideoDrawRectangle( ColorWhite, ClipX1, ClipY1,
+//                      ClipX2-ClipX1+1, ClipY2-ClipY1+1 );
+  w = (ClipX2 - ClipX1) / TileSizeX + 1;
+  h = (ClipY2 - ClipY1) / TileSizeY + 1;
+  x = (ClipX1 - TheUI.MapX) / TileSizeX;
+  y = (ClipY1 - TheUI.MapY) / TileSizeY;
+  src = TheMap.Fields + MapX + x + (MapY + y) * TheMap.Width;
+  x = TheUI.MapX + x * TileSizeX;
+  y = TheUI.MapY + y * TileSizeY;
+  nextline=TheMap.Width-w;
+  do
+  {
+    int w2=w;
+    do
+    {
+      MapDrawTile(src->SeenTile,x,y);
+      x+=TileSizeX;
+      src++;
+    }
+    while ( --w2 );
+    y+=TileSizeY;
+    src+=nextline;
+  }
+  while ( --h );
+}
+#endif
+
+/**
+:w
 **	Initialise the fog of war.
 **	Build tables, setup functions.
 **
@@ -1590,6 +1676,21 @@ global void DrawMapBackground(int x,int y)
 */
 void InitMap(void)
 {
+#ifdef NEW_DECODRAW
+// StephanR: Using the decoration mechanism we need to support drawing tiles
+// clipped, as by only updating a small part of the tile, we don't have to
+// redraw items overlapping the remaining part of the tile.. it might need
+// some performance increase though, but atleast the video dependent depth is
+// not done here, making the switch(VideoBpp) obsolete..
+  MapDrawTile=MapDrawXXTileClip;
+  VideoDrawTile=VideoDrawXXTileClip;
+  mapdeco = DecorationAdd( NULL /* no data to pass to */,
+                           mapdeco_draw, LevGround,
+                           TheUI.MapX, TheUI.MapY,
+                           TheUI.MapEndX-TheUI.MapX+1,
+                           TheUI.MapEndY-TheUI.MapY+1 );
+
+#else
     switch( VideoBpp ) {
 	case  8:
 	    VideoDrawTile=VideoDraw8Tile32;
@@ -1630,6 +1731,7 @@ void InitMap(void)
 	    DebugLevel0Fn("Depth unsupported\n");
 	    break;
     }
+#endif
 }
 
 //@}

@@ -315,6 +315,24 @@
 #define DIRTYSCREEN_BITDETAIL 4 // 4bit-->16x16 pixels for each screen-tile
 #define DIRTYSCREEN_DETAILSIZE (1 << DIRTYSCREEN_BITDETAIL)
 
+/**
+**  The restricted number of tiles as both width and height for
+**  DecorationSingle which only can handle a 2x2 of 16bit matrix.
+**  So we could support a DECOSINGLE_TILES==8 (2 16bit matrixes with each a
+**  width of 4 tiles) when the decoration start at the upper-left corner of the
+**  tile-area represented. But in the worst-case, the decoration start at the
+**  lower-right corner of the upper-left tile, making only a maximum of 5 tiles
+**  possible in that case.. Even more so, the current code of CheckRedraw will
+**  restrict this further concerning the height, as it will translate the
+**  'dirty' bits of all 4 16bit matrixes into a single 32bit for 8x4 tiles,
+**  making it much eassier to check anbd find the 'dirty' bits..
+**  FIXME: investigate if the use of a selection to get the best possible
+**         representation is worth the trouble and so doesn't result in
+**         a performance loss.
+**/
+#define DECOSINGLE_TILES 4
+#define DECOSINGLE_PIXELS (DECOSINGLE_TILES*DIRTYSCREEN_DETAILSIZE)
+
 
 /*----------------------------------------------------------------------------
 --	Externals
@@ -322,15 +340,15 @@
 
 extern void DecorationInit(void);
 
-extern Decoration *DecorationAdd( void *data,
-				 void (*drawclip)(void *data),
-				 DecorationLevel l, 
-				 unsigned x, unsigned y,
-				 unsigned w, unsigned h );
-extern void DecorationRemove( Decoration *d );
+extern Deco *DecorationAdd( void *data,
+			    void (*drawclip)(void *data),
+			    DecorationLevel l, 
+			    unsigned x, unsigned y,
+			    unsigned w, unsigned h );
+extern void DecorationRemove( Deco *d );
 
 
-extern void DecorationMark( Decoration *d );
+extern void DecorationMark( Deco *d );
 
 extern void DecorationRefreshDisplay(void);
 extern void DecorationUpdateDisplay(void);
@@ -406,7 +424,7 @@ static unsigned ybitmasktail[4] = {
 **	All decoration structs ordered by their depth level are stored in
 **	this array as a link-list for every depth-level.
 **/
-static Decoration *dhead[LevCount] = { NULL };
+static Deco *dhead[LevCount] = { NULL };
 
 /**
 **	We have a separate link-list to store decorations which are deleted,
@@ -416,7 +434,7 @@ static Decoration *dhead[LevCount] = { NULL };
 **	longer used. But I expect this to be needed througout the program and
 **	so no memory is given back.
 **/
-static Decoration *dgarbage = NULL;
+static Deco *dgarbage = NULL;
 static DecorationSingle *dsgarbage = NULL;
 
 
@@ -476,7 +494,7 @@ static DecorationSingle *DecorationSingleAllocate(void)
 **	@note it might not be referenced as the old given type, as it should
 **	be considered de-allocated (access can result in undefined behavior).
 **/
-static void DecorationDelete( Decoration *d )
+static void DecorationDelete( Deco *d )
 {
   d->nxt   = dgarbage;
   dgarbage = d;
@@ -485,15 +503,15 @@ static void DecorationDelete( Decoration *d )
 /**
 **	Allocate (or re-use from garage list) a Decoration struct
 **/
-static Decoration *DecorationAllocate(void)
+static Deco *DecorationAllocate(void)
 {
-  Decoration *d;
+  Deco *d;
 
   // Get memory for garbage link-list
   if ( !dgarbage )
   {
-    int size = 1024 / sizeof( Decoration ); // about 1KB at a time
-    dgarbage = d = malloc( size * sizeof( Decoration ) );
+    int size = 1024 / sizeof( Deco ); // about 1KB at a time
+    dgarbage = d = malloc( size * sizeof( Deco ) );
     if ( !d )
     {
       printf( "Out of memory (DecorationTypeAllocate,video/deco.c)\n" );
@@ -521,12 +539,23 @@ static Decoration *DecorationAllocate(void)
 **	@param d	= decoration as been created with DecorationAdd
 **
 **	@note: it should be prevented that Decorations are added and directly
-**	deleted, as they still have parts of the screen marked 'dirty' and
+**	removed, as they still have parts of the screen marked 'dirty' and
 **	will influence other decorations to be re-drawn unneededly.
 **/
-void DecorationRemove( Decoration *d )
+void DecorationRemove( Deco *d )
 {
   DecorationSingle *t, *tmp;
+
+// Mark is needed.. as we possibly need to redraw what was overlapping it
+  DecorationMark( d );
+
+// remove from linklists and let its memory be re-used again
+  if ( d->prv )
+    d->prv->nxt = d->nxt;
+  else dhead[ d->l ] = NULL;
+
+  if ( d->nxt )
+    d->nxt->prv = d->prv;
 
   t = d->singles;
   DecorationDelete( d );
@@ -559,8 +588,8 @@ void DecorationInit(void)
 {
   // Some platform dependent assumpions of the entire mechanism.
   // If failure, please fix..
-  DebugCheck( sizeof(unsigned long) >= 4 ); // atleast 32bit 
-  DebugCheck( sizeof(unsigned int) >= 2 );  // atleast 16bit 
+  DebugCheck( sizeof(unsigned long) < 4 ); // atleast 32bit 
+  DebugCheck( sizeof(unsigned int) < 2 );  // atleast 16bit 
 
   // The number of screen-tiles we support, a lower DIRTYSCREEN_BITDETAIL
   // means detailed smaller tiles, but also costs more memory.
@@ -590,7 +619,7 @@ void DecorationInit(void)
     for ( i = 0; i < LevCount; i++ )
       while ( dhead[i] != NULL )
       {
-        Decoration *d = dhead[i];
+        Deco *d = dhead[i];
         dhead[i] = d->nxt;
         DecorationDelete( d );
       }
@@ -644,24 +673,145 @@ static void MarkPos( unsigned x, unsigned y )
 **      be invalidated.
 **      @param x        = x-position in pixels on screen
 **      @param y        = y-position in pixels on screen
-**      @param width    = width in pixels on screen
-**      @param height   = height in pixels on screen
+**      @param width    = width in pixels on screen (> 0)
+**      @param height   = height in pixels on screen (> 0)
 **      pre : given (x,y;x+width-1,y+height-1) should be inside screen
-**            resolution as given through DecorationInit and width,height>0
+**            resolution as determined by DecorationInit 
 **/
-static void MarkArea( unsigned x, unsigned y, unsigned w, unsigned h )
+void MarkArea( int x, int y, int w, int h )
 {
-  unsigned w2;
+  char *tiles;
+  unsigned int xmaskhead, xmasktail, ymaskhead, ymasktail, bits;
+  int w2, nextline, bitindex;
 
-  DebugCheck( w <= 0 || h <= 0 );
-  do
-  {
-    w2 = w;
-    // FIXME: need to improve performance by setting multiple bits at once.
-    do MarkDirtyscreenPos( x + w2 - 1, y + h - 1 );
-    while ( --w2 > 0 );
+  DebugCheck( x <= 0 || y <= 0 || w <= 0 || h <= 0 ||
+              (x+w) >= VideoWidth || (y+h) >= VideoHeight );
+
+  // First scale (x,y) down to the tile-index as it is stored in array
+  // dirtyscreen and let w,h denote the width/height in tiles iso pixels
+  x >>= DIRTYSCREEN_BITDETAIL;
+  y >>= DIRTYSCREEN_BITDETAIL;
+  w = ((w - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
+  h = ((h - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
+  DebugCheck( w > dirtyscreen_xtiles || h > dirtyscreen_ytiles );
+
+  // Reference to top-left 4x4bit matrix containing tile (x,y) in dirtyscreen
+  tiles = dirtyscreen + ((y*dirtyscreen_xtiles+x)>>3);
+
+  // Now scale (w,h) down to the number of 16bit elements (in a 4x4 bit matrix)
+  // to check and denote when we need to check the four sides with a bitmask
+  // or just check wether the 4x4 matrix(es) should be entirely zero.
+  bitindex = (x & 0x3);
+  xmaskhead = xbitmaskhead[ bitindex ];
+  xmasktail = xbitmasktail[ (x+w) & 0x3 ];
+  if ( w < 4 && w <= 4 - bitindex )
+  { // xmaskhead and xmasktail in same 4x4 matrix column  --> combine to one
+    if ( x >= dirtyscreen_xtiles - 4 ) // at rightmost side of screen
+    { // move one 4x4 matrix to the left to prevent acces outside 2D dimension
+      tiles  -= 4 * 2;
+      xmasktail &= xmaskhead;
+      xmaskhead = 0;
+    }
+    else
+    {
+      xmaskhead &= xmasktail;
+      xmasktail = 0;
+    }
   }
-  while ( --h > 0 );
+  bitindex  = (y & 0x3);
+  ymaskhead = ybitmaskhead[ bitindex ];
+  ymasktail = ybitmasktail[ (y+h) & 0x3 ];
+  if ( h < 4 && h <= 4 - bitindex )
+  { // ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
+    if ( y >= dirtyscreen_ytiles - 4 ) // at bottom side of screen
+    { // move one 4x4 matrix upwards to prevent acces outside 2D dimension
+      tiles  -= 4 * 2 * dirtyscreen_xtiles;
+      ymasktail &= ymaskhead;
+      ymaskhead = 0;
+    }
+    else
+    {
+      ymaskhead &= ymasktail;
+      ymasktail  = 0;
+    }
+  }
+
+  //
+  // Mark the tiles with above bitmasks..
+  //
+  nextline=(dirtyscreen_xtiles-w)*2;
+  w-=2;
+  h-=2;
+
+  // upper-left 4x4 matrixes
+  bits = (tiles[1] << 8) | tiles[0];
+  bits |= (ymaskhead&xmaskhead);
+  tiles[0] = bits & 0x00FF;
+  tiles[1] = bits & 0xFF00;
+
+  // upper-middle 4x4 matrixes
+  w2=2;
+  while (  tiles+=2, w2-- > 0 )
+  {
+    bits = (tiles[1] << 8) | tiles[0];
+    bits |= ymaskhead;
+    tiles[0] = bits & 0x00FF;
+    tiles[1] = bits & 0xFF00;
+  }
+
+  // upper-right 4x4 matrix
+  bits = (tiles[1] << 8) | tiles[0];
+  bits |= (ymaskhead&xmasktail);
+  tiles[0] = bits & 0x00FF;
+  tiles[1] = bits & 0xFF00;
+
+  h--;
+
+  // middle 4x4 matrixes
+  while (  tiles+=nextline, h-- > 0 )
+  {
+    // left-middle 4x4 matrix
+    bits = (tiles[1] << 8) | tiles[0];
+    bits |= xmaskhead;
+    tiles[0] = bits & 0x00FF;
+    tiles[1] = bits & 0xFF00;
+
+    // middle 4x4 matrixes
+    w2 = w;
+    while (  tiles+=2, w2-- > 0 )
+    {
+      tiles[0] |= 0xFF;
+      tiles[1] |= 0xFF;
+    }
+
+    // right-middle 4x4 matrix
+    bits = (tiles[1] << 8) | tiles[0];
+    bits |= xmasktail;
+    tiles[0] = bits & 0x00FF;
+    tiles[1] = bits & 0xFF00;
+  }
+
+  // lower-left 4x4 matrix
+  bits = (tiles[1] << 8) | tiles[0];
+  bits |= (ymasktail&xmaskhead);
+  tiles[0] = bits & 0x00FF;
+  tiles[1] = bits & 0xFF00;
+
+  // lower-middle 4x4 matrixes
+  w2 = w;
+  while (  tiles+=2, w2-- > 0 )
+  {
+    bits = (tiles[1] << 8) | tiles[0];
+    bits |= ymasktail;
+    tiles[0] = bits & 0x00FF;
+    tiles[1] = bits & 0xFF00;
+  }
+
+  // lower-right 4x4 matrix
+  bits = (tiles[1] << 8) | tiles[0];
+  bits |= (ymasktail&xmasktail);
+  tiles[0] = bits & 0x00FF;
+  tiles[1] = bits & 0xFF00;
 }
 
 /**
@@ -689,7 +839,7 @@ static void DrawArea( int x, int y, int w, int h,
 **      @param d   = valid decoration
 **      @param t   = one of the single-tile decorations of above
 **/
-static void CheckRedraw( Decoration *d, DecorationSingle *t )
+static void CheckRedraw( Deco *d, DecorationSingle *t )
 {
   char *top, *bottom;
   unsigned long topbits, bottombits, leftbits, rightbits, bits;
@@ -704,7 +854,11 @@ static void CheckRedraw( Decoration *d, DecorationSingle *t )
   bottombits  = (bottom[1] << 8) | bottom[0];
   bottombits &= t->leftbottommask;
   leftbits    = (bottombits << 16) | topbits;
-  leftbits  >>= t->bity;
+  leftbits  >>= t->bity4;
+  leftbits = ((leftbits & 0xF000) << 12)
+           | ((leftbits & 0x0F00) <<  8)
+           | ((leftbits & 0x00F0) <<  4)
+           |  (leftbits & 0x000F);
 
   // Get right-top and -bottom 16bit 4x4 matrixes, masked to get the 'dirty'
   // area overlapped by this decoration in a single 32bit back to 16bit
@@ -713,10 +867,14 @@ static void CheckRedraw( Decoration *d, DecorationSingle *t )
   bottombits  = (bottom[3] << 8) | bottom[2];
   bottombits &= t->rightbottommask;
   rightbits   = (bottombits << 16) | topbits;
-  rightbits >>= t->bity;
+  rightbits >>= t->bity4;
+  rightbits = ((rightbits & 0xF000) << 16)
+            | ((rightbits & 0x0F00) << 12)
+            | ((rightbits & 0x00F0) <<  8)
+            | ((rightbits & 0x000F) <<  4);
 
   // Now combine both left+right 16bit into one 32bit
-  bits = (rightbits << 16) || leftbits;
+  bits = rightbits | leftbits;
 
   // Check this 32bit as a 8x4 tile area
   // FIXME: try merging neighbouring 'dirty' bits, to minimize DrawIt calls
@@ -748,8 +906,83 @@ static void CheckRedraw( Decoration *d, DecorationSingle *t )
                   d->data, d->drawclip );
 
       y += DIRTYSCREEN_DETAILSIZE;
-      bits >= 8; // next line of 8 bits
+      bits >>= 8; // next line of 8 bits
     } while ( bits );
+  }
+}
+
+global decobits( unsigned long bits )
+{
+  int y;
+  printf( "16bits as 4x4: 3210\n" );
+  for ( y=0; y<=3; y++ )
+  {
+    printf( "             %d %c%c%c%c\n", y,
+            bits&8?'1':'0', bits&4?'1':'0',
+            bits&2?'1':'0', bits&1?'1':'0' );
+    bits >>= 4;
+  }
+}
+
+global singlebits( DecorationSingle *t )
+{
+  unsigned long leftbits, rightbits, bits32;
+  int y;
+  int x;
+
+  leftbits = t->leftbottommask;
+  leftbits <<= 16;
+  leftbits  |= t->lefttopmask;
+  leftbits >>= t->bity4;
+
+  leftbits = ((leftbits & 0xF000) << 12)
+           | ((leftbits & 0x0F00) <<  8)
+           | ((leftbits & 0x00F0) <<  4)
+           |  (leftbits & 0x000F);
+
+  rightbits = t->rightbottommask;
+  rightbits <<= 16;
+  rightbits  |= t->righttopmask;
+  rightbits >>= t->bity4;
+
+  rightbits = ((rightbits & 0xF000) << 16)
+            | ((rightbits & 0x0F00) << 12)
+            | ((rightbits & 0x00F0) <<  8)
+            | ((rightbits & 0x000F) <<  4);
+
+  bits32 = rightbits | leftbits;
+
+  printf( "DecorationSingle as 8x8 tiles\n" );
+  printf( "     76543210\n     ");
+  for ( x=7; t->bitx<x; x-- )
+    printf( " " );
+  printf( "^\n" );
+  leftbits  = t->lefttopmask;
+  rightbits = t->righttopmask;
+  for ( y=0; y<=7; y++ )
+  {
+    printf( "%s%d ", (y * 4 == t->bity4) ? "-->" : "   ", y );
+    for ( x=8; x; x>>=1 )
+      printf( "%c", rightbits & x ? '1' : '0' );
+    rightbits >>= 4;
+    for ( x=8; x; x>>=1 )
+      printf( "%c", leftbits & x ? '1' : '0' );
+    leftbits  >>= 4;
+
+    if ( y < 4 )
+    {
+      printf( "  " );
+      for ( x=128; x; x>>=1 )
+        printf( "%c", bits32 & x ? '1' : '0' );
+      bits32  >>= 8;
+    }
+
+    printf( "\n" );
+    if ( y == 3 )
+    {
+      leftbits = t->leftbottommask;
+      rightbits = t->rightbottommask;
+    }
   }
 }
 
@@ -791,7 +1024,7 @@ static void DecorationSingleMark( DecorationSingle *t )
 /**
 **
 **/
-void DecorationMark( Decoration *d )
+void DecorationMark( Deco *d )
 {
   DecorationSingle *t;
   for ( t = d->singles; t; t = t->nxt )
@@ -807,17 +1040,18 @@ void DecorationMark( Decoration *d )
 **	@param h	= height in pixels of area to be drawn from (x,y)
 **/
 static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
-                                            unsigned w, unsigned h )
+                                              unsigned w, unsigned h )
 {
   DecorationSingle *t;
   unsigned bitindex, xmaskhead, xmasktail, ymaskhead, ymasktail;
 
   DebugCheck( x < 0 || y < 0 || w <= 0 || h <= 0 ||
-              w > DIRTYSCREEN_DETAILSIZE || h > DIRTYSCREEN_DETAILSIZE ||
               (x+w) >= VideoWidth || (y+h) >= VideoHeight );
 
   // Fill in this new Decoration so it can be used
   t = DecorationSingleAllocate();
+  t->topleftx = x;
+  t->toplefty = y;
 
   // Instead of storing given (x,y,w,h), we use prepared pointer and bitmasks
   // to the dirtyscreen array, as these are fast and can be used again..
@@ -828,6 +1062,7 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
   y >>= DIRTYSCREEN_BITDETAIL;
   w = ((w - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
   h = ((h - 1) >> DIRTYSCREEN_BITDETAIL) + 1;
+  DebugCheck( w > DECOSINGLE_TILES || h > DECOSINGLE_TILES );
 
   // Reference to top-left 4x4bit matrix containing tile (x,y) in dirtyscreen
   t->tiles = dirtyscreen + ((y*dirtyscreen_xtiles+x)>>3);
@@ -853,12 +1088,12 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
     }
   }
   bitindex  = (y & 0x3);
-  t->bity   = (bitindex * 4);
+  t->bity4  = (bitindex * 4);
   ymaskhead = ybitmaskhead[ bitindex ];
   ymasktail = ybitmasktail[ (y+h) & 0x3 ];
   if ( h < 4 && h <= 4 - bitindex )
   { // ymaskhead and ymasktail in same 4x4 matrix row  --> combine to one
-    if ( x >= dirtyscreen_xtiles - 4 ) // at bottom side of screen
+    if ( y >= dirtyscreen_ytiles - 4 ) // at bottom side of screen
     { // move one 4x4 matrix upwards to prevent acces outside 2D dimension
       t->tiles  -= 4 * 2 * dirtyscreen_xtiles;
       ymasktail &= ymaskhead;
@@ -902,15 +1137,14 @@ static DecorationSingle *DecorationSingleNew( unsigned x, unsigned y,
 **	@param w	= width in pixels of area to be drawn from (x,y)
 **	@param h	= height in pixels of area to be drawn from (x,y)
 **/
-Decoration *DecorationAdd( void *data,
-                           void (*drawclip)(void *data),
-                           DecorationLevel l, 
-                           unsigned x, unsigned y,
-                           unsigned w, unsigned h )
+Deco *DecorationAdd( void *data,
+                     void (*drawclip)(void *data),
+                     DecorationLevel l, 
+                     unsigned x, unsigned y,
+                     unsigned w, unsigned h )
 {
   DecorationSingle **prevt;
-  Decoration *list, *d, **prev;
-  unsigned w2, x2;
+  Deco *list, *d, *prv, **pprv;
 
   DebugCheck( x < 0 || y < 0 || w <= 0 || h <= 0 ||
               (x+w) >= VideoWidth || (y+h) >= VideoHeight );
@@ -919,47 +1153,90 @@ Decoration *DecorationAdd( void *data,
   d = DecorationAllocate();
   d->drawclip  = drawclip;
   d->data      = data;
+  d->l         = l;
   d->x         = x;
   d->y         = y;
   d->w         = w;
   d->h         = h;
 
-  // Find entry for this decoration ordered on z:y:x and add it
+  // Restrict to screen (keeping original total location in d)
+  if( x<0 ) {
+    int ofs=-x;
+    if( w<=ofs ) {
+      DecorationDelete( d );
+      return NULL;
+    }
+    x=0;
+    w-=ofs;
+  }
+  if( (x+w)>VideoWidth ) {
+    if( x>=VideoWidth ) {
+      DecorationDelete( d );
+      return NULL;
+    }
+    w=VideoWidth-x;
+  }
+  if( y<0 ) {
+    int ofs=-y;
+    if( h<=ofs ) {
+      DecorationDelete( d );
+      return NULL;
+    }
+    y=0;
+    h-=ofs;
+  }
+  if( (y+h)>VideoHeight ) {
+    if( y>=VideoHeight ) {
+      DecorationDelete( d );
+      return NULL;
+    }
+    h=VideoHeight-y;
+  }
+  
+
+  // Find entry for this decoration ordered on z(l):y:x and add it
   // @note we only need z-level really, but also do y:x to be able to draw
   // decorations of same z-levle on top of eachother as compatible with original
   // FIXME: use a smarter more faster method
-  prev = dhead + l;
-  while ( (list = *prev) && (list->y < y || (list->y == y && list->x < x) ) )
-    list = list->nxt;
-  d->nxt = *prev;
-  *prev = d;
+  prv  = NULL;
+  pprv = dhead + l;
+  while ( (list = *pprv) && (list->y < y || (list->y == y && list->x < x) ) )
+  {
+    prv  = list;
+    pprv = &list->nxt;
+  }
+  *pprv = d;
+  d->prv = prv;
+  d->nxt = list;
+  if ( list )
+    list->prv = d;
 
   // Split given area up into multiple Decorations of DIRTYSCREEN_DETAILSIZE
   // FIXME: can be done faster, or maybe we should do without?
   prevt = &d->singles;
-  while ( h > DIRTYSCREEN_DETAILSIZE )
+  while ( h > DECOSINGLE_PIXELS )
   {
-    h -= DIRTYSCREEN_DETAILSIZE;
-    x2 = x;
-    w2 = w;
-    while ( w2 > DIRTYSCREEN_DETAILSIZE )
+    int x2 = x;
+    int w2 = w;
+    while ( w2 > DECOSINGLE_PIXELS )
     {
-      w2 -= DIRTYSCREEN_DETAILSIZE;
       *prevt = DecorationSingleNew( x2, y,
-  		         DIRTYSCREEN_DETAILSIZE, DIRTYSCREEN_DETAILSIZE );
+                                    DECOSINGLE_PIXELS, DECOSINGLE_PIXELS );
       prevt = &(*prevt)->nxt;
-      x2 += DIRTYSCREEN_DETAILSIZE;
+      x2 += DECOSINGLE_PIXELS;
+      w2 -= DECOSINGLE_PIXELS;
     }
-    *prevt = DecorationSingleNew( x, y, w, DIRTYSCREEN_DETAILSIZE );
+    *prevt = DecorationSingleNew( x2, y, w2, DECOSINGLE_PIXELS );
     prevt = &(*prevt)->nxt;
-    y += DIRTYSCREEN_DETAILSIZE;
+    y += DECOSINGLE_PIXELS;
+    h -= DECOSINGLE_PIXELS;
   }
-  while ( w > DIRTYSCREEN_DETAILSIZE )
+  while ( w > DECOSINGLE_PIXELS )
   {
-    w -= DIRTYSCREEN_DETAILSIZE;
-    *prevt = DecorationSingleNew( x, y, DIRTYSCREEN_DETAILSIZE, h );
+    *prevt = DecorationSingleNew( x, y, DECOSINGLE_PIXELS, h );
     prevt = &(*prevt)->nxt;
-    x += DIRTYSCREEN_DETAILSIZE;
+    x += DECOSINGLE_PIXELS;
+    w -= DECOSINGLE_PIXELS;
   }
   *prevt = DecorationSingleNew( x, y, w, h );
   (*prevt)->nxt = NULL;
@@ -1033,7 +1310,7 @@ static void InvalidateDirtyscreen(void)
 **/
 void DecorationRefreshDisplay(void)
 {
-  Decoration *d;
+  Deco *d;
   int i;
 
 // save clip rectangle
@@ -1063,7 +1340,7 @@ void DecorationRefreshDisplay(void)
 void DecorationUpdateDisplay(void)
 {
   DecorationSingle *t;
-  Decoration *d;
+  Deco *d;
   int i;
 
 // save clip rectangle
@@ -1073,8 +1350,9 @@ void DecorationUpdateDisplay(void)
   for ( i = 0; i < LevCount; i++ )
     for ( d = dhead[i]; d; d = d->nxt )
       for ( t = d->singles; t; t = t->nxt )
-        CheckDraw( d, t );
+        CheckRedraw( d, t );
 
+// FIXME: use followin function instead for speed.. never tried out though
 //  InvalidateDirtyscreen();
   Invalidate();
 
