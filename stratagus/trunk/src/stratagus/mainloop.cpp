@@ -824,9 +824,9 @@ global void GameMainLoop(void)
 			//
 			switch (GameCycle % CYCLES_PER_SECOND) {
 				case 0:
-					// At cycle 0 , start all ai players...
-					if (GameCycle == 0){
-							for (player = 0; player < NumPlayers; ++player){
+					// At cycle 0, start all ai players...
+					if (GameCycle == 0) {
+						for (player = 0; player < NumPlayers; ++player) {
 							PlayersEachSecond(player);
 						}
 					}
@@ -852,11 +852,11 @@ global void GameMainLoop(void)
 					RescueUnits();
 					break;
 				default:
-					// FIXME : assume that NumPlayers < (CYCLES_PER_SECOND -7)
+					// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
 					player = (GameCycle % CYCLES_PER_SECOND) - 7;
 					DebugCheck(player < 0);
 					if (player < NumPlayers){
-							PlayersEachSecond(player);
+						PlayersEachSecond(player);
 					}
 			}
 
