@@ -554,8 +554,17 @@ global void CleanUserInterface(void)
     //
     if( UI_Table ) {
 	for( i=0; UI_Table[i]; ++i ) {
+	    int j;
+
 	    ui=UI_Table[i];
-	    // FIXME: not completely written
+
+	    for( j=0; j<ui->NumFillers; ++j ) {
+		free(ui->Filler[j].File);
+	    }
+	    free(ui->FillerX);
+	    free(ui->FillerY);
+	    free(ui->Filler);
+
 	    menupanel=ui->MenuPanels;
 	    while( menupanel ) {
 		tmp=menupanel;
