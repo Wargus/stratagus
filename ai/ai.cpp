@@ -213,7 +213,7 @@ local void AiCheckUnits(void)
 	//
 	e=unit_types_count[t];
 	if( t<AiHelpers.EquivCount && AiHelpers.Equiv[t] ) {
-	    DebugLevel3Fn("Equivalence for %s\n",
+	    DebugLevel3Fn("Equivalence for %s\n" _C_
 		    AiPlayer->UnitTypeRequests[i].Table[0]->Ident);
 	    for( j=0; j<AiHelpers.Equiv[t]->Count; ++j ) {
 		e+=unit_types_count[AiHelpers.Equiv[t]->Table[j]->Type];
@@ -365,8 +365,9 @@ global void AiInit(Player* player)
 **
 **	@param pai	Computer AI player.
 **	@param type	Unit-type which is now available.
+**	@return		True, if unit-type was found in list.
 */
-local void AiRemoveFromBuilded(PlayerAi* pai,const UnitType* type)
+local int AiRemoveFromBuilded2(PlayerAi* pai,const UnitType* type)
 {
     AiBuildQueue** queue;
     AiBuildQueue* next;
@@ -382,10 +383,62 @@ local void AiRemoveFromBuilded(PlayerAi* pai,const UnitType* type)
 		free(next);
 	    }
 	    --next->Made;
-	    return;
+	    return 1;
 	}
     }
+    return 0;
+}
+
+/**
+**	Remove unit-type from build list.
+**
+**	@param pai	Computer AI player.
+**	@param type	Unit-type which is now available.
+*/
+local void AiRemoveFromBuilded(PlayerAi* pai,const UnitType* type)
+{
+    int i;
+
+    if( AiRemoveFromBuilded2(pai,type) ) {
+	return;
+    }
+    //
+    //	This could happen if an upgrade is ready, look for equivalent units.
+    //
+    if( type->Type<AiHelpers.EquivCount && AiHelpers.Equiv[type->Type] ) {
+	DebugLevel2Fn("Equivalence for %s\n" _C_ type ->Ident);
+	for( i=0; i<AiHelpers.Equiv[type->Type]->Count; ++i ) {
+	    if( AiRemoveFromBuilded2(pai,
+		    AiHelpers.Equiv[type->Type]->Table[i]) ) {
+		return;
+	    }
+	}
+    }
+
     DebugCheck( 1 );
+}
+
+/**
+**	Reduce made unit-type from build list.
+**
+**	@param pai	Computer AI player.
+**	@param type	Unit-type which is now available.
+**	@return		True if the unit-type could be reduced.
+*/
+local int AiReduceMadeInBuilded2(const PlayerAi* pai,const UnitType* type)
+{
+    AiBuildQueue* queue;
+
+    //
+    //	Search the unit-type order.
+    //
+    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
+	if( type==queue->Type && queue->Made ) {
+	    queue->Made--;
+	    return 1;
+	}
+    }
+    return 0;
 }
 
 /**
@@ -396,17 +449,24 @@ local void AiRemoveFromBuilded(PlayerAi* pai,const UnitType* type)
 */
 local void AiReduceMadeInBuilded(const PlayerAi* pai,const UnitType* type)
 {
-    AiBuildQueue* queue;
+    int i;
 
+    if( AiReduceMadeInBuilded2(pai,type) ) {
+	return;
+    }
     //
-    //	Search the unit-type order.
+    //	This could happen if an upgrade is ready, look for equivalent units.
     //
-    for( queue=pai->UnitTypeBuilded; queue; queue=queue->Next ) {
-	if( type==queue->Type && queue->Made ) {
-	    queue->Made--;
-	    return;
+    if( type->Type<AiHelpers.EquivCount && AiHelpers.Equiv[type->Type] ) {
+	DebugLevel2Fn("Equivalence for %s\n" _C_ type ->Ident);
+	for( i=0; i<AiHelpers.Equiv[type->Type]->Count; ++i ) {
+	    if( AiReduceMadeInBuilded2(pai,
+		    AiHelpers.Equiv[type->Type]->Table[i]) ) {
+		return;
+	    }
 	}
     }
+
     DebugCheck( 1 );
 }
 
@@ -592,6 +652,8 @@ global void AiResearchComplete(Unit* unit,const Upgrade* what)
 	    what->Ident _C_ unit->X _C_ unit->Y);
 
     DebugCheck(unit->Player->Type == PlayerHuman);
+
+    // FIXME: upgrading knights -> paladins, must rebuild lists!
 }
 
 /**
