@@ -258,7 +258,7 @@ local void AiExecuteScripts(void)
 
 	    value = gh_eval(gh_car(AiScript->Script), NIL);
 	    if (!gh_eq_p(value, SCM_BOOL_T)) {
-		AiScript->Script = gh_cdr(AiScript->Script);
+		CclGcProtectedAssign(&AiScript->Script, gh_cdr(AiScript->Script));
 	    }
 
 	    if ((gh_null_p(AiScript->Script)) && (AiScript->ownForce)) {
@@ -805,6 +805,7 @@ global void AiInit(Player * player)
 	pai->Scripts[i].gauges = 0;
 	pai->Scripts[i].SleepCycles = 0;
 	pai->Scripts[i].Script = NIL;
+	CclGcProtect(&pai->Scripts[i].Script);
 	snprintf(pai->Scripts[i].ident, 10, "Empty");
     }
 
@@ -871,7 +872,7 @@ global void AiInit(Player * player)
 	_C_ ainame _C_ ait->Class);
 
     pai->AiType = ait;
-    pai->Scripts[0].Script = ait->Script;
+    CclGcProtectedAssign(&pai->Scripts[0].Script, ait->Script);
 
     pai->Collect[TimeCost] = 0;
     pai->Collect[GoldCost] = 50;
@@ -924,6 +925,11 @@ global void CleanAi(void)
 		    free(aiunit);
 		}
 	    }
+
+	    for (i = 0; i < AI_MAX_RUNNING_SCRIPTS; ++i) {
+		CclGcUnprotect(&pai->Scripts[i].Script);
+	    }
+
 	    //
 	    //  Free UnitTypeRequests
 	    //
@@ -968,6 +974,7 @@ global void CleanAi(void)
 	free(aitype->Class);
 
 	// ai-type->Script freed by ccl
+	CclGcUnprotect(&aitype->Script);
 
 	temp = aitype->Next;
 	free(aitype);
@@ -1025,9 +1032,13 @@ global void CleanAi(void)
 	AiTypeWcNames = NULL;
     }
 
+    // Free script action scm...
+    for (i = 0; i < AiScriptActionNum; i++) {
+	CclGcUnprotect(&AiScriptActions[i].Action);
+    }
+
     AiResetUnitTypeEquiv();
-    
-    // TODO : AiScriptActions are not freed
+
     AiScriptActionNum = 0;
 }
 
@@ -1212,7 +1223,6 @@ global void AiUnitKilled(Unit * unit)
     DebugCheck(unit->Player->Type == PlayerPerson);
 
     // FIXME: must handle all orders...
-
     switch (unit->Orders[0].Action) {
 	case UnitActionStill:
 	case UnitActionAttack:

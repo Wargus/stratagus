@@ -719,7 +719,7 @@ local SCM CclDefineAiAction(SCM type, SCM definition)
     memset(aiScriptAction, 0, sizeof (AiScriptAction));
 
     aiScriptAction->Action = definition;
-    CclGcProtect(aiScriptAction->Action);
+    CclGcProtect(&aiScriptAction->Action);
 
     while (!gh_null_p(type)) {
 	if (gh_eq_p(gh_car(type), gh_symbol2scm("defense"))) {
@@ -799,7 +799,7 @@ local SCM CclDefineAi(SCM list)
     aitype->Script = value;
 
     // Protect the scheme script against GC garbage-collect.
-    CclGcProtect(value);
+    CclGcProtect(&aitype->Script);
 
     return list;
 }

@@ -57,7 +57,6 @@
 #  define aset1(array, pos, value)      gh_vector_set_x(array, pos, value)
 #  define repl_c_string(msg, a, b, c  ) gh_eval_str(msg)
 #  define print_welcome()         
-#  define user_gc(a)              scm_gc()
 #  define gh_scm2newstr(scm, lenp) \
   (gh_symbol_p(scm) ? gh_symbol2newstr(scm, lenp) : gh_scm2newstr(scm,lenp))
 #  define gh_scm2int(val) \
@@ -170,8 +169,10 @@ extern SCM             CclMakeSmobObj(ccl_smob_type_t tag, void* ptr);
 extern void*           CclGetSmobData(SCM smob);
 extern ccl_smob_type_t CclGetSmobType(SCM smob);
 
-extern void CclGcProtect(SCM obj);	/// Protect scm object for GC
-extern void CclGcUnprotect(SCM obj);	/// Unprotect scm object for GC
+extern void CclGcProtect(SCM* obj);	/// Protect scm var for GC
+extern void CclGcUnprotect(SCM* obj);	/// Unprotect scm var for GC
+extern void CclGcProtectedAssign(SCM* obj, SCM value); /// Alter garbage protected scm var.
+extern void CclGarbageCollect(int fast);/// Perform garbage collection
 extern void CclFlushOutput();		/// Flush ccl output
 extern void InitCcl(void);		/// Initialise ccl
 extern void LoadCcl(void);		/// Load ccl config file
