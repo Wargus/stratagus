@@ -73,7 +73,7 @@ typedef struct PlayerRanks {
 } PlayerRanks;
 
 /**
-**	Linked list of TextLines 
+**	Linked list of TextLines
 */
 typedef struct ChapterTextLines {
     struct TextLines* Text;		/// TextLines struct
@@ -476,8 +476,8 @@ global void ShowIntro(const Intro* intro)
     while (1) {
 #ifdef WITH_SOUND
 	// FIXME: move sound specific code to the sound files
-	if (soundfree != -1 && (!Channels[soundfree].Command) && 
-		stage < MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut && 
+	if (soundfree != -1 && (!Channels[soundfree].Command) &&
+		stage < MAX_BRIEFING_VOICES && soundout != NextSoundRequestOut &&
 		intro->VoiceFile[stage]) {
 	    // FIXME: is there a better way to do this?
 	    if (soundcount == 15) {
@@ -1133,7 +1133,7 @@ local int GameStatsDrawFunc(int frame)
 	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-            sprintf(buf, "%u", p->TotalResources[GoldCost]);
+	    sprintf(buf, "%u", p->TotalResources[GoldCost]);
 	    percent = p->TotalResources[GoldCost] * 100 / max;
 	    DrawStatBox(x + 190, y + bottom_offset + description_offset + line_spacing * c,
 		buf, p->Color, percent);
@@ -1166,7 +1166,7 @@ local int GameStatsDrawFunc(int frame)
 	    if (p == ThisPlayer || p->Type == PlayerNobody) {
 		continue;
 	    }
-            sprintf(buf, "%u", p->TotalResources[WoodCost]);
+	    sprintf(buf, "%u", p->TotalResources[WoodCost]);
 	    percent = p->TotalResources[WoodCost] * 100 / max;
 	    DrawStatBox(x + 280, y + bottom_offset + description_offset + line_spacing * c,
 		buf, p->Color,percent);
@@ -1463,26 +1463,14 @@ local int CclCredits(lua_State* l)
 
     args = lua_gettop(l);
     for (j = 0; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	value = lua_tostring(l, j + 1);
+	value = LuaToString(l, j + 1);
 	++j;
 	if (!strcmp(value, "background")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    GameCredits.Background = strdup(lua_tostring(l, j + 1));
+	    GameCredits.Background = strdup(LuaToString(l, j + 1));
 	} else if (!strcmp(value, "name") ||
 		!strcmp(value, "title") ||
 		!strcmp(value, "comment")) {
-	    if (!lua_isstring(l, j + 1)) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	    }
-	    n = lua_tostring(l, j + 1);
+	    n = LuaToString(l, j + 1);
 	    nlen = strlen(n);
 	    GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
 	    if (len != 0) {
@@ -1687,12 +1675,12 @@ local int CclDefineRanks(lua_State* l)
     int len;
     int args;
 
-    if (lua_gettop(l) != 2 || !lua_isstring(l, 1) || !lua_istable(l, 2)) {
+    if (lua_gettop(l) != 2) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     rank = NULL;
-    race = lua_tostring(l, 1);
+    race = LuaToString(l, 1);
     for (i = 0; i < PlayerRaces.Count; ++i) {
 	if (!strcmp(PlayerRaces.Name[i], race)) {
 	    rank = &Ranks[i];
@@ -1722,19 +1710,11 @@ local int CclDefineRanks(lua_State* l)
     i = 0;
     for (j = 0; j < args; ++j) {
 	lua_rawgeti(l, 2, j + 1);
-	if (!lua_isnumber(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	rank->Scores[i] = lua_tonumber(l, -1);
+	rank->Scores[i] = LuaToNumber(l, -1);
 	lua_pop(l, 1);
 	++j;
 	lua_rawgeti(l, 2, j + 1);
-	if (!lua_isstring(l, -1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	rank->Ranks[i] = strdup(lua_tostring(l, -1));
+	rank->Ranks[i] = strdup(LuaToString(l, -1));
 	lua_pop(l, 1);
 	++i;
     }

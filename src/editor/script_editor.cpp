@@ -109,11 +109,7 @@ local int CclDefineEditorUnitTypes(lua_State* l)
     EditorUnitTypes = cp = malloc((args + 1) * sizeof(char*));
     MaxUnitIndex = args;
     for (j = 0; j < args; ++j) {
-	if (!lua_isstring(l, j + 1)) {
-	    lua_pushstring(l, "incorrect argument");
-	    lua_error(l);
-	}
-	*cp++ = strdup(lua_tostring(l, j + 1));
+	*cp++ = strdup(LuaToString(l, j + 1));
     }
     *cp = NULL;
 
@@ -134,12 +130,12 @@ local SCM CclSetEditorSelectIcon(SCM icon)
 #elif defined(USE_LUA)
 local int CclSetEditorSelectIcon(lua_State* l)
 {
-    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(EditorSelectIcon);
-    EditorSelectIcon = strdup(lua_tostring(l, 1));
+    EditorSelectIcon = strdup(LuaToString(l, 1));
     return 0;
 }
 #endif
@@ -157,12 +153,12 @@ local SCM CclSetEditorUnitsIcon(SCM icon)
 #elif defined(USE_LUA)
 local int CclSetEditorUnitsIcon(lua_State* l)
 {
-    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+    if (lua_gettop(l) != 1) {
 	lua_pushstring(l, "incorrect argument");
 	lua_error(l);
     }
     free(EditorUnitsIcon);
-    EditorUnitsIcon = strdup(lua_tostring(l, 1));
+    EditorUnitsIcon = strdup(LuaToString(l, 1));
     return 0;
 }
 #endif
