@@ -126,7 +126,10 @@ static void laction(int i)
 }
 
 /**
-**  FIXME: docu
+**  Print error message and exit.
+**
+**  @param pname Source of the error.
+**  @param msg   error message to print.
 */
 static void l_message(const char* pname, const char* msg)
 {
@@ -138,11 +141,12 @@ static void l_message(const char* pname, const char* msg)
 }
 
 /**
-**  FIXME: docu
+**  Check error status, and print eeror message and exit
+**  if status is different of 0.
 **
-**  @param status  FIXME: docu
+**  @param status  status of the last lua call. (0: success)
 **
-**  @return        FIXME: docu
+**  @return        0 in success, else exit.
 */
 static int report(int status)
 {
@@ -165,7 +169,7 @@ static int report(int status)
 **  @param narg   Number of arguments
 **  @param clear  Clear the return value(s)
 **
-**  @return       FIXME: docu
+**  @return       0 in success, else exit.
 */
 int LuaCall(int narg, int clear)
 {
@@ -189,7 +193,7 @@ int LuaCall(int narg, int clear)
 **
 **  @param file  File to load and execute
 **
-**  @return      FIXME: docu
+**  @return      0 in success, else exit.
 */
 int LuaLoadFile(const char* file)
 {
@@ -244,9 +248,11 @@ static int CclSavePreferences(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Load a file and execute it.
 **
 **  @param l  Lua state.
+**
+**  @return 0 in success, else exit.
 */
 static int CclLoad(lua_State* l)
 {
@@ -305,10 +311,15 @@ static int CclSaveGame(lua_State* l)
 }
 
 /**
-**  FIXME: docu
+**  Convert lua string in char*.
+**  It checks also type and exit in case of error.
+**
+**  @note char* could be invalidated with lua garbage collector.
 **
 **  @param l     Lua state.
 **  @param narg  Argument number.
+**
+**  @return    char* from lua.
 */
 const char* LuaToString(lua_State* l, int narg)
 {
@@ -317,10 +328,13 @@ const char* LuaToString(lua_State* l, int narg)
 }
 
 /**
-**  FIXME: docu
+**  Convert lua number in C number.
+**  It checks also type and exit in case of error.
 **
 **  @param l     Lua state.
 **  @param narg  Argument number.
+**
+**  @return    C number from lua.
 */
 lua_Number LuaToNumber(lua_State* l, int narg)
 {
@@ -329,10 +343,13 @@ lua_Number LuaToNumber(lua_State* l, int narg)
 }
 
 /**
-**  FIXME: docu
+**  Convert lua boolean in 1 for true, 0 for false.
+**  It checks also type and exit in case of error.
 **
 **  @param l     Lua state.
 **  @param narg  Argument number.
+**
+**  @return    1 for true, 0 for false from lua.
 */
 int LuaToBoolean(lua_State* l, int narg)
 {
