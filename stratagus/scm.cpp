@@ -61,8 +61,8 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-local char *chk_ptr;
-local char *chk_endptr;
+local char *chk_ptr;			/// FIXME: docu
+local char *chk_endptr;			/// FIXME: docu
 
 local int MapOffsetX;			/// Offset X for combined maps
 local int MapOffsetY;			/// Offset Y for combined maps
@@ -79,7 +79,8 @@ local int MapOffsetY;			/// Offset Y for combined maps
 **	@param height	Section height
 **	@param map	Map to store into
 */
-local void ChkConvertMTXM(const unsigned short * mtxm,int width,int height,WorldMap* map)
+local void ChkConvertMTXM(const unsigned short * mtxm,int width,int height,
+	WorldMap* map)
 {
     const unsigned short* ctab;
     int h;
@@ -109,6 +110,8 @@ local void ChkConvertMTXM(const unsigned short * mtxm,int width,int height,World
 
 /**
 **	Read header
+**
+**	@todo FIXME: docu
 */
 local int ChkReadHeader(char* header,long* length)
 {
@@ -127,6 +130,8 @@ local int ChkReadHeader(char* header,long* length)
 
 /**
 **	Read dword
+**
+**	@todo FIXME: docu
 */
 local int ChkReadDWord(void)
 {
@@ -139,6 +144,8 @@ local int ChkReadDWord(void)
 
 /**
 **	Read word
+**
+**	@todo FIXME: docu
 */
 local int ChkReadWord(void)
 {
@@ -150,22 +157,21 @@ local int ChkReadWord(void)
 }
 
 /**
-**	Read byte
+**	@brief Read byte
+**
+**	Read a byte from #chk_ptr.
+**
+**	@return		Next byte from #chk_ptr.
 */
-local int ChkReadByte(void)
+local inline int ChkReadByte(void)
 {
-    unsigned char temp_char;
-
-    temp_char = *chk_ptr;
-    chk_ptr += 1;
-    return temp_char;
+    return *((unsigned char*)chk_ptr)++;
 }
 
 /**
 **	Extract/uncompress entry.
 **
 **	@param mpqfd	The mpq file
-**	@param name	Name of the entry to extract
 **	@param entry	Returns the entry, NULL if not found
 **	@param size	Returns the size of the entry
 */
@@ -436,7 +442,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "TILE",4) ) {
 //	    if( length== ) {
@@ -448,7 +454,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "DD2 ",4) ) {
 //	    if( length== ) {
@@ -472,7 +478,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "MASK",4) ) {
 //	    if( length== ) {
@@ -497,7 +503,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPRP",4) ) {
 //	    if( length== ) {
@@ -509,7 +515,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPUS",4) ) {
 //	    if( length== ) {
@@ -521,7 +527,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "MRGN",4) ) {
 //	    if( length== ) {
@@ -557,7 +563,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "SPRP",4) ) {
 //	    if( length== ) {
@@ -569,7 +575,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "FORC",4) ) {
 //	    if( length== ) {
@@ -581,7 +587,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "WAV ",4) ) {
 //	    if( length== ) {
@@ -593,7 +599,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UNIS",4) ) {
 //	    if( length== ) {
@@ -605,7 +611,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPGS",4) ) {
 //	    if( length== ) {
@@ -617,7 +623,7 @@ global MapInfo* GetChkInfoFromBuffer(unsigned char* chkdata, int len)
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "TECS",4) ) {
 //	    if( length== ) {
@@ -1107,7 +1113,7 @@ pawn:
 				    DebugCheck( !v );
 				    unit->Value=v;
 #endif
-				} else {	
+				} else {
 				    // active/inactive AI units!!
 				    // Johns: it is better to have active buildings
 				    if( !unit->Type->Building ) {
@@ -1175,7 +1181,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "TILE",4) ) {
 //	    if( length== ) {
@@ -1187,7 +1193,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "DD2 ",4) ) {
 //	    if( length== ) {
@@ -1243,7 +1249,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "MASK",4) ) {
 //	    if( length== ) {
@@ -1268,7 +1274,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPRP",4) ) {
 //	    if( length== ) {
@@ -1280,7 +1286,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPUS",4) ) {
 //	    if( length== ) {
@@ -1292,7 +1298,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "MRGN",4) ) {
 //	    if( length== ) {
@@ -1328,7 +1334,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "SPRP",4) ) {
 //	    if( length== ) {
@@ -1340,7 +1346,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "FORC",4) ) {
 //	    if( length== ) {
@@ -1352,7 +1358,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "WAV ",4) ) {
 //	    if( length== ) {
@@ -1364,7 +1370,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UNIS",4) ) {
 //	    if( length== ) {
@@ -1376,7 +1382,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "UPGS",4) ) {
 //	    if( length== ) {
@@ -1388,7 +1394,7 @@ pawn:
 	}
 
 	//
-	//	
+	//
 	//
 	if( !memcmp(header, "TECS",4) ) {
 //	    if( length== ) {
