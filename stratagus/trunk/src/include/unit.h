@@ -968,8 +968,10 @@ extern int SelectUnitsByType(Unit* base);
 extern int ToggleUnitsByType(Unit* base);
     /// Select the units belonging to a particular group
 extern int SelectGroup(int group_number);
-    /// Select the unit from the same group as the one in parameter
-extern int SelectGroupFromUnit(Unit *unit);
+    /// Add the units from the same group as the one in parameter
+extern int AddGroupFromUnitToSelection(Unit* unit);
+    /// Select the units from the same group as the one in parameter
+extern int SelectGroupFromUnit(Unit* unit);
     /// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(int tx,int ty,int w,int h);
     /// Select ground units in the selection rectangle

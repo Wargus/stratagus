@@ -56,6 +56,8 @@ global UnitGroup Groups[NUM_GROUPS];	/// Number of groups predefined
 
 /**
 **	Initialize group part.
+**
+**	@todo Not needed with the new unit code!
 */
 global void InitGroups(void)
 {
@@ -66,6 +68,7 @@ global void InitGroups(void)
 
 	if( (n=Groups[i].NumUnits) ) {		// Cleanup after load
 	    while( n-- ) {
+		DebugLevel0Fn("FIXME: old code!\n");
 		Groups[i].Units[n]=UnitSlots[(int)Groups[i].Units[n]];
 	    }
 	}

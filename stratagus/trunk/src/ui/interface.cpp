@@ -143,6 +143,7 @@ local void UiCenterOnGroup(unsigned group)
     n=GetNumberUnitsOfGroup(group);
     if( n-- ) {
 	units=GetUnitsOfGroup(group);
+	// FIXME: what should we do with the removed units? ignore?
 
 	x=units[n]->X;
 	y=units[n]->Y;
@@ -171,6 +172,7 @@ local void UiSelectGroup(unsigned group)
     if( n && NumSelected==n ) {
 	units=GetUnitsOfGroup(group);
 
+	// FIXME: what should we do with the removed units? ignore?
 	while( n-- && units[n]==Selected[n] ) {
 	}
 	if( n==-1 ) {
@@ -211,7 +213,9 @@ local void UiAddGroupToSelection(unsigned group)
     }
 
     while( n-- ) {
-	SelectUnit(units[n]);
+	if( !units[n]->Removed ) {
+	    SelectUnit(units[n]);
+	}
     }
 
     UpdateButtonPanel();
