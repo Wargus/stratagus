@@ -27,6 +27,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <signal.h>
+
 #include "freecraft.h"
 #include "net_lowlevel.h"
 #include "etlib/dllist.h"
@@ -101,7 +103,7 @@ global int NetInit(void)
     // ARI: well, I need winsock2 for SIO_GET_INTERFACE_LIST..
     // some day this needs to be rewritten using wsock32.dll's WsControl(),
     // so that we can support Windows 95 with only winsock 1.1..
-    // For now winsock2.dll has to do..
+    // For now ws2_32.dll has to do..
     if ( WSAStartup(MAKEWORD(2,2), &wsaData) ) {
 	fprintf(stderr,"Couldn't initialize Winsock 2\n");
 	return -1;
@@ -372,7 +374,7 @@ global int NetOpenUDP(int port)
 /**
 **	Wait for socket ready.
 **
-**	@param sockfd	Socket fildes to prove.
+**	@param sockfd	Socket fildes to probe.
 **	@param timeout	Timeout in 1/1000 seconds.
 **
 **	@return		1 if data is available, 0 if not, -1 if failure.
@@ -382,6 +384,17 @@ global int NetSocketReady(int sockfd,int timeout)
     int retval;
     struct timeval tv;
     fd_set mask;
+    sigset_t sigmask;
+
+    // FIXME: ARI: does this work with NON_UNIX hosts ? Posix, but..
+    // Linux requires SIGALRM to be blocked, otherwise the
+    // itimer set in VIDEO_X11 always kills the select() with EINTR.
+    // The SA_RESTART in the sigaction() handler setup doesn't seem
+    // to apply to the setitimer() call starting the SIGALRM ticker...
+    // This broke NetSocketReady().
+    sigemptyset(&sigmask);
+    sigaddset(&sigmask, SIGALRM);
+    sigprocmask(SIG_BLOCK, &sigmask, NULL);
 
     //	Check the file descriptors for available data
     do {
@@ -396,6 +409,10 @@ global int NetSocketReady(int sockfd,int timeout)
 	// Data available?
 	retval = select(sockfd+1, &mask, NULL, NULL, &tv);
     } while ( retval==-1 && errno == EINTR );
+
+    sigemptyset(&sigmask);
+    sigaddset(&sigmask, SIGALRM);
+    sigprocmask(SIG_UNBLOCK, &sigmask, NULL);
 
     return retval;
 }
