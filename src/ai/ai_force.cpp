@@ -259,7 +259,7 @@ global void AiAttackWithForce(int force)
     //	Send all units in the force to enemy.
     //
     while( aiunit ) {
-	CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL,FlushCommands);
+	CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL, FlushCommands);
 	aiunit=aiunit->Next;
     }
 }

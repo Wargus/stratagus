@@ -313,7 +313,11 @@ local SCM CclDefineAi(SCM list)
     list=gh_cdr(list);
     str=gh_scm2newstr(value,NULL);
     DebugLevel0Fn("%s\n" _C_ str);
-    aitype->Race=str;
+    if( *str!='*' ) {
+	aitype->Race=str;
+    } else {
+	aitype->Race=NULL;
+    }
 
     //
     //	AI Class
@@ -376,12 +380,12 @@ extern UnitType* CclGetUnitType(SCM ptr);
 **	@param type	Unit-type to be appended.
 **	@param count	How many unit-types to build.
 */
-local void InsertRequests(UnitType* type,int count)
+local void InsertUnitTypeRequests(UnitType* type,int count)
 {
     int n;
 
     if( AiPlayer->UnitTypeRequests ) {
-	n=AiPlayer->RequestsCount;
+	n=AiPlayer->UnitTypeRequestsCount;
 	AiPlayer->UnitTypeRequests=realloc(AiPlayer->UnitTypeRequests,
 		(n+1)*sizeof(*AiPlayer->UnitTypeRequests));
     } else {
@@ -390,7 +394,7 @@ local void InsertRequests(UnitType* type,int count)
     }
     AiPlayer->UnitTypeRequests[n].Table[0]=type;
     AiPlayer->UnitTypeRequests[n].Count=count;
-    AiPlayer->RequestsCount=n+1;
+    AiPlayer->UnitTypeRequestsCount=n+1;
 }
 
 /**
@@ -398,13 +402,13 @@ local void InsertRequests(UnitType* type,int count)
 **
 **	@param type	Unit-type to be found.
 */
-local AiUnitTypeTable* FindInRequests(const UnitType* type)
+local AiUnitTypeTable* FindInUnitTypeRequests(const UnitType* type)
 {
     int i;
     int n;
 
 
-    n=AiPlayer->RequestsCount;
+    n=AiPlayer->UnitTypeRequestsCount;
     for( i=0; i<n; ++i ) {
 	if( AiPlayer->UnitTypeRequests[i].Table[0]==type ) {
 	    return &AiPlayer->UnitTypeRequests[i];
@@ -412,6 +416,52 @@ local AiUnitTypeTable* FindInRequests(const UnitType* type)
     }
     return NULL;
 }
+
+/**
+**	Append unit-type to request table.
+**
+**	@param type	Unit-type to be appended.
+*/
+local void InsertUpgradeToRequests(UnitType* type)
+{
+    int n;
+
+    if( AiPlayer->UpgradeToRequests ) {
+	n=AiPlayer->UpgradeToRequestsCount;
+	AiPlayer->UpgradeToRequests=realloc(AiPlayer->UpgradeToRequests,
+		(n+1)*sizeof(*AiPlayer->UpgradeToRequests));
+    } else {
+	AiPlayer->UpgradeToRequests=
+		malloc(sizeof(*AiPlayer->UpgradeToRequests));
+	n=0;
+    }
+    AiPlayer->UpgradeToRequests[n]=type;
+    AiPlayer->UpgradeToRequestsCount=n+1;
+}
+
+/**
+**	Append unit-type to request table.
+**
+**	@param upgrade	Upgrade to be appended.
+*/
+local void InsertResearchRequests(Upgrade* upgrade)
+{
+    int n;
+
+    if( AiPlayer->ResearchRequests ) {
+	n=AiPlayer->ResearchRequestsCount;
+	AiPlayer->ResearchRequests=realloc(AiPlayer->ResearchRequests,
+		(n+1)*sizeof(*AiPlayer->ResearchRequests));
+    } else {
+	AiPlayer->ResearchRequests=malloc(sizeof(*AiPlayer->ResearchRequests));
+	n=0;
+    }
+    AiPlayer->ResearchRequests[n]=upgrade;
+    AiPlayer->ResearchRequestsCount=n+1;
+}
+
+//----------------------------------------------------------------------------
+
 /**
 **	Set debuging flag of AI script.
 */
@@ -432,7 +482,7 @@ local SCM CclAiDebug(SCM flag)
 */
 local SCM CclAiNeed(SCM value)
 {
-    InsertRequests(CclGetUnitType(value),1);
+    InsertUnitTypeRequests(CclGetUnitType(value),1);
 
     return SCM_BOOL_F;
 }
@@ -448,15 +498,11 @@ local SCM CclAiSet(SCM value,SCM count)
     AiUnitTypeTable* autt;
     UnitType* type;
 
-    printf("Set: ");
-    gh_display(value);
-    gh_newline();
-
     type=CclGetUnitType(value);
-    if( (autt=FindInRequests(type)) ) {
+    if( (autt=FindInUnitTypeRequests(type)) ) {
 	autt->Count=gh_scm2int(count);
     } else {
-	InsertRequests(type,gh_scm2int(count));
+	InsertUnitTypeRequests(type,gh_scm2int(count));
     }
 
     return SCM_BOOL_F;
@@ -472,19 +518,13 @@ local SCM CclAiWait(SCM value)
     AiUnitTypeTable* autt;
     UnitType* type;
 
-    IfDebug(
-	printf("Wait: ");
-	gh_display(value);
-	gh_newline();
-    );
-
     type=CclGetUnitType(value);
-    if( !(autt=FindInRequests(type)) ) {
+    if( !(autt=FindInUnitTypeRequests(type)) ) {
 	DebugLevel0Fn("Broken, waiting on unit-type which wasn't requested.\n");
 	return SCM_BOOL_F;
     }
     // units available?
-    DebugLevel0Fn("%d,%d\n"
+    DebugLevel3Fn("%d,%d\n"
 	    _C_ AiPlayer->Player->UnitTypesCount[type->Type] _C_ autt->Count);
     if( AiPlayer->Player->UnitTypesCount[type->Type]>=autt->Count ) {
 	return SCM_BOOL_F;
@@ -505,12 +545,6 @@ local SCM CclAiForce(SCM list)
     UnitType* type;
     int count;
     int force;
-
-    IfDebug(
-	printf("Force: ");
-	gh_display(list);
-	gh_newline();
-    );
 
     force=gh_scm2int(gh_car(list));
     if( force<0 || force>=AI_MAX_FORCES ) {
@@ -565,12 +599,6 @@ local SCM CclAiWaitForce(SCM value)
 {
     int force;
 
-    IfDebug(
-	printf("Wait-Force: ");
-	gh_display(value);
-	gh_newline();
-    );
-
     force=gh_scm2int(value);
     if( force<0 || force>=AI_MAX_FORCES ) {
 	errl("Force out of range",value);
@@ -590,12 +618,6 @@ local SCM CclAiWaitForce(SCM value)
 local SCM CclAiAttackWithForce(SCM value)
 {
     int force;
-
-    IfDebug(
-	printf("Attack: ");
-	gh_display(value);
-	gh_newline();
-    );
 
     force=gh_scm2int(value);
     if( force<0 || force>=AI_MAX_FORCES ) {
@@ -617,13 +639,6 @@ local SCM CclAiSleep(SCM value)
     static int fc;
     int i;
 
-    IfDebug(
-	printf("Sleep: ");
-	gh_display(value);
-	printf(" %d %d",fc,FrameCounter);
-	gh_newline();
-    );
-
     i=gh_scm2int(value);
     if( fc ) {
 	if( fc<FrameCounter ) {
@@ -644,13 +659,18 @@ local SCM CclAiSleep(SCM value)
 */
 local SCM CclAiResearch(SCM value)
 {
-    IfDebug(
-	printf("Research: ");
-	gh_display(value);
-	gh_newline();
-    );
+    const char* str;
+    Upgrade* upgrade;
 
-    DebugLevel0Fn("FIXME:\n");
+    // Be kind allow also strings or symbols
+    if( (str=try_get_c_string(value)) ) {
+	upgrade=UpgradeByIdent(str);
+    } else {
+	errl("Upgrade needed",value);
+	return SCM_BOOL_F;
+    }
+
+    InsertResearchRequests(upgrade);
 
     return SCM_BOOL_F;
 }
@@ -662,13 +682,10 @@ local SCM CclAiResearch(SCM value)
 */
 local SCM CclAiUpgradeTo(SCM value)
 {
-    IfDebug(
-	printf("Upgrade-to: ");
-	gh_display(value);
-	gh_newline();
-    );
+    UnitType* type;
 
-    DebugLevel0Fn("FIXME:\n");
+    type=CclGetUnitType(value);
+    InsertUpgradeToRequests(type);
 
     return SCM_BOOL_F;
 }
