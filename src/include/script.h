@@ -85,6 +85,10 @@ typedef enum {
 	ENumber_Eq,          ///< a == b.
 	ENumber_NEq,         ///< a <> b.
 
+	ENumber_VideoTextLength, ///< VideoTextLength(font, string).
+	ENumber_StringFind,      ///< strchr(string, char) - s.
+
+
 	ENumber_UnitStat     ///< Property of Unit.
 // FIXME: add others.
 } ENumber; ///< All possible value for a number.
@@ -102,9 +106,7 @@ typedef enum {
 	EString_InverseVideo, ///< Inverse video for the string ("a" -> "~<a~>").
 	EString_If,           ///< If cond then String1 else String2.
 	EString_UnitName,     ///< UnitType Name.
-#if 0
-	EString_Extract,     ///< Substring.
-#endif
+	EString_SubString,    ///< SubString.
 // FIXME: add others.
 } EString; ///< All possible value for a string.
 
@@ -172,6 +174,15 @@ struct _NumberDesc_ {
 			int Index;                 ///< Which index variable.
 			EnumVariable Component;    ///< Which component.
 		} UnitStat;
+		struct {
+			StringDesc* String; ///< String.
+			int Font;           ///< Font.
+		} VideoTextLength;
+		struct {
+			StringDesc* String; ///< String.
+			char C;             ///< Char.
+		} StringFind;
+
 	} D;
 };
 
@@ -204,16 +215,11 @@ struct _StringDesc_ {
 			StringDesc* True;  ///< String if Cond is true.
 			StringDesc* False; ///< String if Cond is false.
 		} If; ///< conditional string.
-
-
-#if 0
 		struct {
-			StringDesc* s; ///< Original string.
-			int Begin;     ///< Begin of result string.
-			int End;       ///< End of result string.
-		} Extract; ///< For extract a substring
-#endif
-
+			StringDesc* String; ///< Original string.
+			NumberDesc* Begin;   ///< Begin of result string.
+			NumberDesc* End;     ///< End of result string.
+		} SubString; ///< For extract a substring
 	} D;
 };
 
