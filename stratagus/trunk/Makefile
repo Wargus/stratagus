@@ -79,7 +79,7 @@ etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
 freecraft:	src etlib/hash.o src/libclone.a 
-	$(CC) -o freecraft src/libclone.a -lefence $(CLONELIBS) -I. $(CFLAGS)
+	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
@@ -90,7 +90,7 @@ freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
 src/freecraftrc.o: src/freecraft.rc
 	windres --include-dir contrib -osrc/freecraftrc.o src/freecraft.rc
 
-# -L. 
+# -L. -lefence 
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl 
 
 tools::
@@ -131,10 +131,11 @@ depend::
 #	Distributions
 ##############################################################################
 
-DOCS    = README doc/readme.html doc/install.html doc/freecraft.html \
+DOCS    = README README.BeOS doc/readme.html doc/install.html \
+	  doc/freecraft.html \
 	  doc/faq.html doc/ChangeLog.html doc/todo.html doc/freecraft.lsm \
 	  doc/development.html doc/LICENSE doc/OPL doc/opl.html \
-	  doc/artistic-license.html doc/ccl/unittype.html \
+	  doc/artistic-license.html doc/ccl/tileset.html doc/ccl/unittype.html \
 	  doc/graphic/*.html doc/graphic/*.png
 
 PICS    = contrib/freecraft.png contrib/freecraft.ico
@@ -142,13 +143,15 @@ PICS    = contrib/freecraft.png contrib/freecraft.ico
 CCLS	= data/ccl/clone.ccl data/ccl/units.ccl data/ccl/missiles.ccl \
 	  data/ccl/tilesets.ccl data/ccl/sound.ccl data/ccl/freecraft.ccl \
 	  data/ccl/ui.ccl data/ccl/fonts.ccl data/ccl/ai.ccl \
-	  data/ccl/anim.ccl data/ccl/upgrade.ccl data/default.cm
+	  data/ccl/summer.ccl data/ccl/winter.ccl data/ccl/wasteland.ccl \
+	  data/ccl/swamp.ccl data/ccl/anim.ccl data/ccl/upgrade.ccl \
+	  data/default.cm
 
 CONTRIB	= contrib/cross.png contrib/health.png contrib/mana.png \
 	  contrib/ore,stone,coal.png contrib/food.png contrib/score.png
 
 MISC    = Makefile Common.mk Rules.make.orig doxygen-clone.cfg \
-	  doxygen-0.4.diff setup \
+	  doxygen-0.4.diff FreeCraft-beos.proj setup \
 	  .indent.pro make/common.scc make/rules.scc make/makefile.scc \
 	  make/README tools/udta.c tools/ugrd.c contrib/req.cm $(CONTRIB) \
 	  etlib/hash.c etlib/getopt.c etlib/prgname.c etlib/prgname.h
@@ -246,7 +249,7 @@ win32-bin-dist2:: win32
 	du -h freecraft-$(mydate)-win32bin.zip
 
 win32-bin-dist: win32
-	@export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
+	@export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
 	$(MAKE) $(WIN32) win32-bin-dist2
 
 win32-exe-dist:	win32-bin-dist
@@ -255,46 +258,53 @@ win32-exe-dist:	win32-bin-dist
 
 #----------------------------------------------------------------------------
 
-PCRAFT= ../archive/clone-000402.tar.bz2
-LCRAFT= ../archive/clone-000402-bin.tar.bz2
-WCRAFT= ../archive/clone-000402-win32bin.zip
-FCRAFT=	../fcraft-0.13.tar.gz
+MYDATE	= $(shell date +%y%m%d)
+PCRAFT= freecraft-$(MYDATE).tar.bz2
+LCRAFT= freecraft-$(MYDATE)-bin.tar.bz2
+WCRAFT= freecraft-$(MYDATE)-win32bin.zip
+FCRAFT=	../fcraft-0.14.tar.gz
 SCRAFT= ../sclone-0.01.tar.bz2
 
 linux-complete:
 	tar xzf $(FCRAFT)
+	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
+	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xIf $(SCRAFT)
 	tar xIf $(PCRAFT)
 	tar xIf $(LCRAFT)
-	mkdir clone-complete
-	cp -a clone-000402/* clone-complete
-	cp -a fcraft/* clone-complete
-	cp -a fclone/* clone-complete
-	rm -rf clone-000402
+	mkdir freecraft-complete
+	cp -a freecraft-$(MYDATE)/* freecraft-complete
+	cp -a fcraft/* freecraft-complete
+	cp -a fclone/* freecraft-complete
+	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
-	tar chzf clone-000402-complete-linux.tar.gz clone-complete
-	tar chIf clone-000402-complete-linux.tar.bz2 clone-complete
-	rm -rf clone-complete
+	tar chzf freecraft-$(MYDATE)-complete-linux.tar.gz freecraft-complete
+	tar chIf freecraft-$(MYDATE)-complete-linux.tar.bz2 freecraft-complete
+	rm -rf freecraft-complete
 
 win32-complete:
 	tar xzf $(FCRAFT)
+	rm -rf fcraft/freecraft fcraft/data/cvs_ccl
+	cp data/graphic/title.png "data/graphic/interface/Menu background without title.png"
 	tar xIf $(SCRAFT)
 	tar xIf $(PCRAFT)
 	unzip -oq $(WCRAFT)
-	mkdir clone-complete
-	cp -a clone-000402/* clone-complete
-	cp -a fcraft/* clone-complete
-	cp -a fclone/* clone-complete
-	rm -rf clone-000402
+	mkdir freecraft-complete
+	cp -a freecraft-$(MYDATE)/* freecraft-complete
+	cp -a fcraft/* freecraft-complete
+	cp -a fclone/* freecraft-complete
+	rm -rf freecraft-$(MYDATE)
 	rm -rf fcraft
 	rm -rf fclone
-	mv clone-complete/CONTRIB clone-complete/CONTRIB.txt
+	mv freecraft-complete/CONTRIB freecraft-complete/CONTRIB.txt
 	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
-	zip -zq9r clone-000402-complete-win32.zip clone-complete
-	cat tools/SFXWiz32-gcc.exe clone-000402-complete-win32.zip \
-		> clone-000402-complete-win32.exe
-	rm -rf clone-complete
+	zip -zq9r freecraft-$(MYDATE)-complete-win32.zip freecraft-complete
+	cat tools/SFXWiz32-gcc.exe freecraft-$(MYDATE)-complete-win32.zip \
+		> freecraft-$(MYDATE)-complete-win32.exe
+	rm -rf freecraft-complete
+
+complete:	linux-complete win32-complete
 
 #----------------------------------------------------------------------------
 difffile=	freecraft-`date +%y%m%d`.diff
@@ -334,22 +344,22 @@ release:
 WIN32=	\
     EXE='.exe' \
     VIDEO='-DUSE_WIN32 $(SDL)'	\
-    VIDEOLIB='$(SDLLIB) -lwsock32 -Wl,--stack,16777216'
+    VIDEOLIB='-L/usr/local/cross-tools/i386-mingw32msvc/lib $(SDLLIB) -lwsock32 -Wl,--stack,16777216'
 
 win32new:
 	@$(MAKE) distclean
-	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
+	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
 	$(MAKE) $(WIN32) depend
 
 win32_2:
 	$(MAKE) $(WIN32) all
 
 win32:
-	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
+	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
 	$(MAKE) win32_2
 
 win32distclean:
-	export PATH=/usr/local/cross-tools/i386-mingw32/bin:$$PATH; \
+	export PATH=/usr/local/cross-tools/i386-mingw32msvc/bin:$$PATH; \
 	$(MAKE) $(WIN32) distclean
 
 ##############################################################################
