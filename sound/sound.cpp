@@ -77,6 +77,7 @@ global GameSound GameSounds
     { "basic human voices work complete" },
     { "peasant work complete" },
     { "basic orc voices work complete" },
+    { "repair" },
     { "rescue (human)" },
     { "rescue (orc)" },
 }
@@ -174,6 +175,8 @@ local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
 	return GameSounds.BuildingConstruction.Sound;
     case VoiceDocking:
 	return GameSounds.Docking.Sound;
+    case VoiceRepair:
+	return GameSounds.Repair.Sound;
     }
     return NULL;
 }
@@ -284,6 +287,10 @@ global void InitSoundClient(void)
     if( !GameSounds.OrcWorkComplete.Sound ) {
 	GameSounds.OrcWorkComplete.Sound=
 		SoundIdForName(GameSounds.OrcWorkComplete.Name);
+    }
+    if( !GameSounds.Repair.Sound ) {
+	GameSounds.Repair.Sound=
+		SoundIdForName(GameSounds.Repair.Name);
     }
     if( !GameSounds.HumanRescue.Sound ) {
 	GameSounds.HumanRescue.Sound=

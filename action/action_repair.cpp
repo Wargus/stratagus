@@ -61,7 +61,11 @@ local void DoActionRepairGeneric(Unit* unit,const Animation* repair)
     flags=UnitShowAnimation(unit,repair);
 
     if( (flags&AnimationSound) ) {
-	PlayUnitSound(unit,VoiceAttacking); //FIXME: should be something else...
+	if( GameSounds.Repair.Sound==(void*)-1 ) {
+	    PlayUnitSound(unit,VoiceAttacking);
+	} else {
+	    PlayUnitSound(unit,VoiceRepair);
+	}
     }
 }
 
