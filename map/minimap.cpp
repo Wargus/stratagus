@@ -286,6 +286,46 @@ global void DrawMinimap(int vx __attribute__((unused)),
     //	FIXME: make a bitmap of the units, and update it with the moves
     //	FIXME: and other changes
     //
+
+#ifdef BUILDING_DESTROYED
+    //	Draw Destroyed Buildings On Map
+    table = &DestroyedBuildings;
+    while( *table ) {
+	SysColors color;
+	if( !BuildingVisibleOnMap( *table ) ) {
+	    type=(*table)->SeenType;
+	    if( (*table)->Player->Player==PlayerNumNeutral ) {
+		if( type->Critter ) {
+		    color=ColorNPC;
+		} else if( type->OilPatch ) {
+		    color=ColorBlack;
+		} else {
+		    color=ColorYellow;
+		}
+	    } else {
+		color=(*table)->Player->Color;
+	    }
+
+	    mx=x+1+MinimapX+Map2MinimapX[(*table)->X];
+	    my=y+1+MinimapY+Map2MinimapY[(*table)->Y];
+	    w=Map2MinimapX[type->TileWidth];
+	    if( mx+w>=x+MINIMAP_W ) {	// clip right side
+		w=x+MINIMAP_W-mx;
+	    }
+	    h0=Map2MinimapY[type->TileHeight];
+	    if( my+h0>=y+MINIMAP_H ) {	// clip bottom side
+		h0=y+MINIMAP_H-my;
+	    }
+	    while( w-->=0 ) {
+		h=h0;
+		while( h-->=0 ) {
+		    VideoDrawPixel(color,mx+w,my+h);
+		}
+	    }
+	}
+	table=&(*table)->Next;
+    }
+#endif
     for( table=Units; table<Units+NumUnits; table++ ) {
 	SysColors color;
 

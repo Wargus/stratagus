@@ -1757,8 +1757,8 @@ local void DrawBuilding(Unit* unit)
 #endif
     // FIXME: is this the correct place? No, but now correct working.
     if( visible ) {
-	y=unit->IY;
-	x=unit->IX;
+	y=unit->SeenIY=unit->IY;
+	x=unit->SeenIX=unit->IX;
 	frame = unit->SeenFrame = unit->Frame;
 	type = unit->SeenType = unit->Type;
 	state = unit->SeenState = (unit->Orders[0].Action==UnitActionBuilded) |
@@ -1766,8 +1766,8 @@ local void DrawBuilding(Unit* unit)
 	constructed = unit->SeenConstructed = unit->Constructed;
 	
     } else {
-	x=0;
-	y=0;
+	y=unit->SeenIY;
+	x=unit->SeenIX;
 	frame = unit->SeenFrame;
 	type = unit->SeenType;
 	constructed = unit->SeenConstructed;
@@ -1780,6 +1780,8 @@ local void DrawBuilding(Unit* unit)
     if( ReplayRevealMap ) {
 	type = unit->Type;
 	frame = unit->Frame;
+	y=unit->IY;
+	x=unit->IX;
 	state = (unit->Orders[0].Action==UnitActionBuilded) |
 			((unit->Orders[0].Action==UnitActionUpgradeTo) << 1);
 	constructed = unit->Constructed;
@@ -1922,8 +1924,7 @@ global void DrawUnits(const void* v)
     //
     corpses = &DestroyedBuildings;
     while( *corpses ) {
-	if( UnitVisibleInViewport(vp,*corpses) ) {
-	    printf("Drawing Destroyed: ",(*corpses)->SeenType);
+	if( UnitVisibleInViewport(vp,*corpses) && (*corpses)->Visible&(1 << ThisPlayer->Player) ) {
 	    DrawBuilding(*corpses);
 	}
 	corpses=&(*corpses)->Next;

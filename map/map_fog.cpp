@@ -302,22 +302,22 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 #ifdef BUILDING_DESTROYED
 			if( player->Type == PlayerPerson ) {
-			corpses = &DestroyedBuildings;
-			while( *corpses ) {
-			    if( !((*corpses)->Visible & 1 << player->Player) ) {
-				w = (*corpses)->Type->TileWidth;
-				h = (*corpses)->Type->TileHeight;
-				if( i >= (*corpses)->X && y >= (*corpses)->Y
-				    && i < (*corpses)->X+w && y < (*corpses)->Y+h ) {
-					(*corpses)->Visible |= (1 << player->Player);
+			    corpses = &DestroyedBuildings;
+			    while( *corpses ) {
+				if( ((*corpses)->Visible & 1 << player->Player) ) {
+				    w = (*corpses)->Type->TileWidth;
+				    h = (*corpses)->Type->TileHeight;
+				    if( i >= (*corpses)->X && y >= (*corpses)->Y
+					&& i < (*corpses)->X+w && y < (*corpses)->Y+h ) {
+					    (*corpses)->Visible &= ~(1 << player->Player);
+				    }
+				}
+				remove = corpses;
+				corpses=&(*corpses)->Next;
+				if( (*remove)->Visible == 0x0000 ) {
+				    ReleaseUnit( *remove );
 				}
 			    }
-			    remove = corpses;
-			    corpses=&(*corpses)->Next;
-			    if( (*remove)->Visible == 0xFFFF ) {
-				ReleaseUnit( *remove );
-			    }
-			}
                         }
 #endif
 			if( IsTileVisible(ThisPlayer,i,y) > 1) {
@@ -2001,8 +2001,8 @@ extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
 	int x=(dx-vp->X)/TileSizeX + vp->MapX;
 	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
 	//sprintf(seen,"%d(%d)",TheMap.Fields[y*TheMap.Width+x].Visible[ThisPlayer->Player],IsTileVisible(ThisPlayer,x,y));
-	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[1]);
-	if( TheMap.Fields[y*TheMap.Width+x].Visible[1] ) {
+	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[0]);
+	if( TheMap.Fields[y*TheMap.Width+x].Visible[0] ) {
 	    VideoDrawText(dx,dy, GameFont,seen);
 	}
 	}
