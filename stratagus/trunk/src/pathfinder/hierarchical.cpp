@@ -52,7 +52,7 @@ int PfHierShowGroupIds = 1;
 local void AreaDestroyRegions (int , int );
 local int AreasInitialize (void);
 local void AreasDestroy (void);
-local void AreasFillRegionLists (void);
+// local void AreasFillRegionLists (void);
 local int PfHierGetPrecomputed (Unit * , int * , int * );
 local int ResolveDeadlock (Unit * , Unit * , int * , int * );
 local int GetGroupIds (int , int , int , int , unsigned short ** );
