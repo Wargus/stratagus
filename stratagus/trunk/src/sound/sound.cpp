@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name sound.c	-	The sound. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer and Fabrice Rossi
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2001 by Lutz Sammer and Fabrice Rossi
+//
+//	$Id$
 
 //@{
 
@@ -184,7 +183,7 @@ global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 **	FIXME: docu
 */
 global void PlayMissileSound(const Missile* missile,SoundId sound) {
-    DebugLevel3("Playing %p at volume %u\n",sound,volume);
+    DebugLevel3("Playing %p\n",sound);
     InsertSoundRequest(NULL,
 		       0,
 		       ViewPointDistanceToMissile(missile),
