@@ -43,17 +43,6 @@
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---	Externals
-----------------------------------------------------------------------------*/
-
-#if 0 // FIXME: in intern_video.h
-extern int ClipX1;			/// current clipping top left
-extern int ClipY1;			/// current clipping top left
-extern int ClipX2;			/// current clipping bottom right
-extern int ClipY2;			/// current clipping bottom right
-#endif
-
-/*----------------------------------------------------------------------------
 --	Variables
 ----------------------------------------------------------------------------*/
 
@@ -1597,6 +1586,8 @@ local void FreeSprite8(Graphic* graphic)
 {
     IfDebug( AllocatedGraphicMemory-=graphic->Size );
     IfDebug( AllocatedGraphicMemory-=sizeof(Graphic) );
+
+    VideoFreeSharedPalette(graphic->Pixels);
     free(graphic->Frames);
     free(graphic);
 }
@@ -1761,6 +1752,7 @@ global Graphic* LoadSprite(const char* name,unsigned width,unsigned height)
 
     IfDebug( CompressedGraphicMemory+=i; );
 
+    graphic->Pixels=NULL;		// We own now the shared pixels
     VideoFree(graphic);
 
     return sprite;
