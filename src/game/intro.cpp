@@ -50,6 +50,8 @@ typedef struct _intro_ {
     char*	Title;				/// Intro title
     char*	Background;			/// Background picture
     char*	TextFile;			/// Intro text file
+    char*	VoiceFile1;			/// Intro voice file
+    char*	VoiceFile2;			/// Intro voice file
     char*	Objectives[MAX_OBJECTIVES];	/// Objectives
 } Intro;					/// Intro definition
 
@@ -61,7 +63,9 @@ local Intro MyIntro[1] = {
 {
     "I. Welcome to FreeCraft",
     "campaigns/human/interface/introscreen1.png",
-    "data/campaigns/human/level01h.txt.gz",
+    "campaigns/human/level01h.txt.gz",
+    "campaigns/human/level01h-intro1.wav.gz",
+    "campaigns/human/level01h-intro2.wav.gz",
     {
 	"- This is a dummy intro",
 	"- Kill all enemies",
@@ -190,6 +194,7 @@ global void ShowIntro(void)
     const Intro* intro;
     CLFile* file;
     char buf[1024];
+    int stage;
 
     intro=MyIntro;
 
@@ -229,11 +234,17 @@ global void ShowIntro(void)
     l+=i+1;
     text=realloc(text,l);
 
+    CallbackMusicOff();
     StopMusic();
+    PlayFile(intro->VoiceFile1);
 
-    line=0;
+    stage=line=0;
     IntroNoEvent=1;
     while( IntroNoEvent ) {
+	if( !PlayingMusic && !stage && intro->VoiceFile2 ) {
+	    PlayFile(intro->VoiceFile2);
+	    stage++;
+	}
 	VideoLockScreen();
 	//
 	//	Draw background
@@ -307,9 +318,9 @@ global void ShowIntro(void)
     Invalidate();
     RealizeVideoMemory();
 
+    CallbackMusicOn();
     // FIXME: should make it configurable
     PlayMusic("music/default.mod");
-
 }
 
 //@}
