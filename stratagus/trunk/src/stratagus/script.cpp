@@ -1571,6 +1571,21 @@ local SCM CclLoadPud(SCM file)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclLoadPud(lua_State* l)
+{
+    const char* name;
+    char buffer[1024];
+
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    name = lua_tostring(l, 1);
+    LoadPud(LibraryFileName(name, buffer), &TheMap);
+
+    // FIXME: LoadPud should return an error
+    return 0;
+}
 #endif
 
 /**
@@ -1596,30 +1611,23 @@ local SCM CclLoadMap(SCM file)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
-#endif
-
-/**
-**	Define a map.
-**
-**	@param width	Map width.
-**	@param height	Map height.
-*/
-#if defined(USE_GUILE) || defined(USE_SIOD)
-local SCM CclDefineMap(SCM width, SCM height)
+local int CclLoadMap(lua_State* l)
 {
-    TheMap.Width = gh_scm2int(width);
-    TheMap.Height = gh_scm2int(height);
+    const char* name;
+    char buffer[1024];
 
-    TheMap.Fields = calloc(TheMap.Width * TheMap.Height, sizeof(*TheMap.Fields));
-    TheMap.Visible[0] = calloc(TheMap.Width * TheMap.Height / 8, 1);
-    InitUnitCache();
-    // FIXME: this should be CreateMap or InitMap?
+    if (lua_gettop(l) != 1 || !lua_isstring(l, 1)) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    name = lua_tostring(l, 1);
+    if (strcasestr(name, ".pud")) {
+	LoadPud(LibraryFileName(name, buffer), &TheMap);
+    }
 
-    // MapX = MapY = 0;
-
-    return SCM_UNSPECIFIED;
+    // FIXME: LoadPud should return an error
+    return 0;
 }
-#elif defined(USE_LUA)
 #endif
 
 /*............................................................................
@@ -1802,7 +1810,6 @@ global void InitCcl(void)
 
     gh_new_procedure1_0("load-pud", CclLoadPud);
     gh_new_procedure1_0("load-map", CclLoadMap);
-    gh_new_procedure2_0("define-map", CclDefineMap);
 
     gh_new_procedure0_0("units", CclUnits);
 
@@ -1877,9 +1884,8 @@ global void InitCcl(void)
 
     print_welcome();
 #elif defined(USE_LUA)
-//    lua_register(Lua, "LoadPud", CclLoadPud);
-//    lua_register(Lua, "LoadMap", CclLoadMap);
-//    lua_register(Lua, "DefineMap", CclDefineMap);
+    lua_register(Lua, "LoadPud", CclLoadPud);
+    lua_register(Lua, "LoadMap", CclLoadMap);
 
 //    lua_register(Lua, "Units", CclUnits);
 
