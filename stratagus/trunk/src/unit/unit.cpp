@@ -171,6 +171,7 @@ global void RefsDecrease(Unit* unit)
 */
 global void ReleaseUnit(Unit* unit)
 {
+	Unit* temp;
 	DebugLevel2Fn("%lu:Unit %p %d `%s'\n" _C_ GameCycle _C_
 		unit _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
@@ -182,17 +183,8 @@ global void ReleaseUnit(Unit* unit)
 	//		First release, remove from lists/tables.
 	//
 	if (!unit->Destroyed) {
-		Unit* temp;
 		DebugLevel0Fn("First release %d\n" _C_ unit->Slot);
 
-		//
-		//		Remove the unit from the global units table.
-		//
-		DebugCheck(*unit->UnitSlot != unit);
-		temp = Units[--NumUnits];
-		temp->UnitSlot = unit->UnitSlot;
-		*unit->UnitSlot = temp;
-		Units[NumUnits] = NULL;
 		//
 		//		Are more references remaining?
 		//
@@ -213,9 +205,16 @@ global void ReleaseUnit(Unit* unit)
 	//		memory.
 	//
 	*ReleasedTail = unit;
-	if (!EditorRunning) {
-		UnitCacheRemove(unit);
-	}
+	UnitCacheRemove(unit);
+	//
+	//		Remove the unit from the global units table.
+	//
+	DebugCheck(*unit->UnitSlot != unit);
+	temp = Units[--NumUnits];
+	temp->UnitSlot = unit->UnitSlot;
+	*unit->UnitSlot = temp;
+	Units[NumUnits] = NULL;
+
 	unit->Next = 0;
 	ReleasedTail = &unit->Next;
 	unit->Refs = GameCycle + NetworkMaxLag;		// could be reuse after this time
@@ -450,7 +449,7 @@ global void PlaceUnit(Unit* unit, int x, int y)
 	int w;
 	unsigned flags;
 
-	DebugCheck(!unit->Removed || unit->Destroyed);
+	DebugCheck(!unit->Removed);
 
 	type = unit->Type;
 
@@ -3524,6 +3523,7 @@ global void SaveUnit(const Unit* unit, CLFile* file)
 	}
 
 	CLprintf(file, "\"tile\", {%d, %d}, ", unit->X, unit->Y);
+	CLprintf(file, "\"refs\", %d, ", unit->Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
