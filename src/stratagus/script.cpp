@@ -438,19 +438,19 @@ global void CclCommand(char* command)
 global void InitCcl(void)
 {
     char* sargv[5];
-    char buf[1024];
+    char* buf;
 
     sargv[0] = "FreeCraft";
     sargv[1] = "-v1";
     sargv[2] = "-g0";
-    sargv[3] = "-h400000:10";
+    sargv[3] = "-h200000:20";
+    buf=malloc(strlen(FreeCraftLibPath)+4);
 #ifdef __MINGW32__
     sprintf(buf,"-l%s\\",FreeCraftLibPath);
 #else
-    snprintf(buf,sizeof(buf),"-l%s",FreeCraftLibPath);
+    sprintf(buf,"-l%s",FreeCraftLibPath);
 #endif
-    buf[sizeof(buf)-1]='\0';
-    sargv[4] = strdup(buf);		// never freed
+    sargv[4] = buf;			// never freed
     siod_init(5,sargv);
 
     init_subr_0("library-path",CclFreeCraftLibraryPath);
