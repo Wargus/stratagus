@@ -52,11 +52,11 @@
 **    stop others how far to goal.
 */
 enum _move_return_ {
-	PF_FAILED=-3,       /// This Pathfinder failed, try another
-	PF_UNREACHABLE=-2,  /// Unreachable stop
-	PF_REACHED=-1,      /// Reached goal stop
-	PF_WAIT=0,          /// Wait, no time or blocked
-	PF_MOVE=1,          /// On the way moving
+	PF_FAILED=-3,       ///< This Pathfinder failed, try another
+	PF_UNREACHABLE=-2,  ///< Unreachable stop
+	PF_REACHED=-1,      ///< Reached goal stop
+	PF_WAIT=0,          ///< Wait, no time or blocked
+	PF_MOVE=1,          ///< On the way moving
 };
 
 /**

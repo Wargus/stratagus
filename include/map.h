@@ -197,8 +197,8 @@
 // 1024x1024:   8 MB  12 MB
 // 2048*2048:  32 MB  48 MB
 // 4096*4096: 128 MB 192 MB
-#define MaxMapWidth  256  ///  maximal map width supported
-#define MaxMapHeight 256  /// maximal map height supported
+#define MaxMapWidth  256  ///<  maximal map width supported
+#define MaxMapHeight 256  ///< maximal map height supported
 
 /*----------------------------------------------------------------------------
 --  Map - field
@@ -206,42 +206,42 @@
 
 	/// Describes a field of the map
 typedef struct _map_field_ {
-	unsigned short Tile;      /// graphic tile number
-	unsigned short SeenTile;  /// last seen tile (FOW)
-	unsigned short Flags;     /// field flags
+	unsigned short Tile;      ///< graphic tile number
+	unsigned short SeenTile;  ///< last seen tile (FOW)
+	unsigned short Flags;     ///< field flags
 	// FIXME: Value can be removed, walls and regeneration can be handled
 	//        different.
-	unsigned char  Value;     /// HP for walls/ Wood Regeneration
-	unsigned char Visible[PlayerMax];  /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax];  /// Visiblity for cloaking.
+	unsigned char Value;               ///< HP for walls/ Wood Regeneration
+	unsigned char Visible[PlayerMax];  ///< Seen counter 0 unexplored
+	unsigned char VisCloak[PlayerMax]; ///< Visiblity for cloaking.
 #ifndef NEW_UNIT_CACHE
-	Unit*      UnitCache;  /// An unit on the map field
+	Unit*      UnitCache;  ///< An unit on the map field
 #else
-	UnitListItem*      UnitCache;  /// An unit on the map field
+	UnitListItem*      UnitCache;  ///< An unit on the map field
 #endif
 } MapField;
 
 // Not used until now:
 #if 0
-#define MapFieldArray 0x0004  /// More than one unit on the field
+#define MapFieldArray 0x0004  ///< More than one unit on the field
 #endif
 
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
+#define MapFieldHuman 0x0008  ///< Human is owner of the field (walls)
 
-#define MapFieldLandAllowed  0x0010  /// Land units allowed
-#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
+#define MapFieldLandAllowed  0x0010  ///< Land units allowed
+#define MapFieldCoastAllowed 0x0020  ///< Coast (transporter) units allowed
+#define MapFieldWaterAllowed 0x0040  ///< Water units allowed
+#define MapFieldNoBuilding   0x0080  ///< No buildings allowed
 
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest
+#define MapFieldUnpassable 0x0100  ///< Field is movement blocked
+#define MapFieldWall       0x0200  ///< Field contains wall
+#define MapFieldRocks      0x0400  ///< Field contains rocks
+#define MapFieldForest     0x0800  ///< Field contains forest
 
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
+#define MapFieldLandUnit 0x1000  ///< Land unit on field
+#define MapFieldAirUnit  0x2000  ///< Air unit on field
+#define MapFieldSeaUnit  0x4000  ///< Water unit on field
+#define MapFieldBuilding 0x8000  ///< Building on field
 
 /*----------------------------------------------------------------------------
 --  Map info structure
@@ -251,18 +251,18 @@ typedef struct _map_field_ {
 **  Get info about a map.
 */
 typedef struct _map_info_ {
-	char*  Description;     /// Map description
-	char*  MapTerrainName;  /// Map terrain name
-	char*  Filename;        /// Map filename
-	// FIXME: Map Terrain Nr. should be removed.
-	int MapTerrain;  /// Map terrain
-	int MapWidth;    /// Map width
-	int MapHeight;   /// Map height
-	int PlayerType[PlayerMax];  /// Same player->Type
-	int PlayerSide[PlayerMax];  /// Same player->Side
-	int PlayerResources[PlayerMax][MaxCosts];  /// Same player->Gold
-	int PlayerAi[PlayerMax];  /// Same player->Ai
-	unsigned int MapUID;  /// Unique Map ID (hash)
+	char*  Description;     ///< Map description
+	char*  MapTerrainName;  ///< Map terrain name
+	char*  Filename;        ///< Map filename
+	/// @fixme Map Terrain Nr. should be removed.
+	int MapTerrain;  ///< Map terrain
+	int MapWidth;    ///< Map width
+	int MapHeight;   ///< Map height
+	int PlayerType[PlayerMax];  ///< Same player->Type
+	int PlayerSide[PlayerMax];  ///< Same player->Side
+	int PlayerResources[PlayerMax][MaxCosts];  ///< Same player->Gold
+	int PlayerAi[PlayerMax];  ///< Same player->Ai
+	unsigned int MapUID;  ///< Unique Map ID (hash)
 } MapInfo;
 
 /*----------------------------------------------------------------------------
@@ -271,33 +271,33 @@ typedef struct _map_info_ {
 
 	/// Describes the wold map
 typedef struct _world_map_ {
-	int Width;   /// the map width
-	int Height;  /// the map height
+	int Width;   ///< the map width
+	int Height;  ///< the map height
 
-	MapField* Fields;              /// fields on map
-	unsigned* Visible[PlayerMax];  /// visible bit-field
+	MapField* Fields;              ///< fields on map
+	unsigned* Visible[PlayerMax];  ///< visible bit-field
 
-	unsigned char NoFogOfWar;  /// fog of war disabled
+	unsigned char NoFogOfWar;  ///< fog of war disabled
 
-	char* TerrainName;  /// terrain as name
-	// FIXME: terrain nr. should be removed?
-	int      Terrain; /// terrain type (summer,winter,...)
-	Tileset* Tileset; /// tileset data
+	char* TerrainName;  ///< terrain as name
+	/// @fixme terrain nr. should be removed?
+	int      Terrain; ///< terrain type (summer,winter,...)
+	Tileset* Tileset; ///< tileset data
 
-	unsigned TileCount; /// how many tiles,
-	/// == TileGraphic->NFrames
-	Graphic* TileGraphic; /// graphic for all the tiles
+	unsigned TileCount; ///< how many tiles, (== TileGraphic->NFrames)
+	Graphic* TileGraphic; ///< graphic for all the tiles
 
-	char Description[32];/// map description short
+	char Description[32];///< map description short
 
-	MapInfo* Info;  /// descriptive information (FIXME: DUPLICATES!)
+	MapInfo* Info;  ///< descriptive information
+	/// @fixme (MapInfo* Info DUPLICATES!)
 } WorldMap;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern WorldMap TheMap;  /// The current map
+extern WorldMap TheMap;  ///< The current map
 
 	/// Fast draw tile, display and video mode independ
 extern void VideoDrawTile(const int, int, int);
@@ -309,7 +309,7 @@ extern unsigned char *VisionTable[3];
 extern int *VisionLookup;
 
 #ifdef NEW_DECODRAW
-	/// FIXME: docu
+	/// @fixme docu
 extern void InitMapDecoration(void);
 	/// Decoration for the map.
 extern Deco* MapDecoration;

@@ -33,8 +33,8 @@
 
 //@{
 
-// FIXME: this only the start of the new user interface
-// FIXME: all user interface variables should go here and be configurable
+/// @fixme this only the start of the new user interface
+/// @fixme all user interface variables should go here and be configurable
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -51,17 +51,17 @@
 
 	/// buttons on screen themselves
 typedef struct _button_ {
-	int X;                          /// x coordinate on the screen
-	int Y;                          /// y coordinate on the screen
-	int Width;                      /// width of the button on the screen
-	int Height;                     /// height of the button on the screen
+	int X;                          ///< x coordinate on the screen
+	int Y;                          ///< y coordinate on the screen
+	int Width;                      ///< width of the button on the screen
+	int Height;                     ///< height of the button on the screen
 } Button;
 
-#define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
+#define MAX_NUM_VIEWPORTS 8         ///< Number of supported viewports
 
 #if !defined(__STRUCT_VIEWPORT__)
-#define __STRUCT_VIEWPORT__         /// protect duplicate viewport typedef
-typedef struct _viewport_ Viewport; /// Viewport typedef
+#define __STRUCT_VIEWPORT__         ///< protect duplicate viewport typedef
+typedef struct _viewport_ Viewport; ///< Viewport typedef
 #endif
 
 /**
@@ -91,24 +91,24 @@ typedef struct _viewport_ Viewport; /// Viewport typedef
 **    @todo binding to a group.
 */
 struct _viewport_ {
-	int X;                      /// Screen pixel left corner x coordinate
-	int Y;                      /// Screen pixel upper corner y coordinate
-	int EndX;                   /// Screen pixel right x coordinate
-	int EndY;                   /// Screen pixel bottom y coordinate
+	int X;                      ///< Screen pixel left corner x coordinate
+	int Y;                      ///< Screen pixel upper corner y coordinate
+	int EndX;                   ///< Screen pixel right x coordinate
+	int EndY;                   ///< Screen pixel bottom y coordinate
 
-	int MapX;                   /// Map tile left corner x coordinate
-	int MapY;                   /// Map tile upper corner y coordinate
-	int OffsetX;                /// Map tile offset
-	int OffsetY;                /// Map tile offset
-	int MapWidth;               /// Width in map tiles
-	int MapHeight;              /// Height in map tiles
+	int MapX;                   ///< Map tile left corner x coordinate
+	int MapY;                   ///< Map tile upper corner y coordinate
+	int OffsetX;                ///< Map tile offset
+	int OffsetY;                ///< Map tile offset
+	int MapWidth;               ///< Width in map tiles
+	int MapHeight;              ///< Height in map tiles
 
 #ifdef NEW_MAPDRAW
-    char MustRedrawTile[MAXMAP_W * MAXMAP_H];   /// Must redraw tile
-    char MustRedrawRow[MAXMAP_W];               /// Must redraw row
+    char MustRedrawTile[MAXMAP_W * MAXMAP_H];   ///< Must redraw tile
+    char MustRedrawRow[MAXMAP_W];               ///< Must redraw row
 #endif
 
-	Unit* Unit;                 /// Bound to this unit
+	Unit* Unit;                 ///< Bound to this unit
 };
 
 /**
@@ -117,240 +117,240 @@ struct _viewport_ {
 **  @todo this should be later user configurable
 */
 typedef enum {
-	VIEWPORT_SINGLE,                /// Old single viewport
-	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
-	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
-	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
-	VIEWPORT_QUAD,                  /// Four viewports split symmetric
-	NUM_VIEWPORT_MODES,             /// Number of different viewports.
+	VIEWPORT_SINGLE,                ///< Old single viewport
+	VIEWPORT_SPLIT_HORIZ,           ///< Two viewports split horizontal
+	VIEWPORT_SPLIT_HORIZ3,          ///< Three viewports split horiontal
+	VIEWPORT_SPLIT_VERT,            ///< Two viewports split vertical
+	VIEWPORT_QUAD,                  ///< Four viewports split symmetric
+	NUM_VIEWPORT_MODES,             ///< Number of different viewports.
 } ViewportMode;
 
-#define ScPanel "sc-panel"          /// hack for transparency
+#define ScPanel "sc-panel"          ///< hack for transparency
 
 /**
 **  Menu panels
 */
 typedef struct _menu_panel_ {
-	char*                Ident;     /// Unique identifier
-	GraphicConfig        Panel;     /// Panel
-	struct _menu_panel_* Next;      /// Next pointer
+	char*                Ident;     ///< Unique identifier
+	GraphicConfig        Panel;     ///< Panel
+	struct _menu_panel_* Next;      ///< Next pointer
 } MenuPanel;
 
 /**
 **  Defines the user interface.
 */
 typedef struct _ui_ {
-	char* Name;                         /// interface name to select
-	int Width;                          /// useable for this width
-	int Height;                         /// useable for this height
+	char* Name;                         ///< interface name to select
+	int Width;                          ///< useable for this width
+	int Height;                         ///< useable for this height
 
-	int MouseScroll;                    /// Enable mouse scrolling
-	int KeyScroll;                      /// Enable keyboard scrolling
+	int MouseScroll;                    ///< Enable mouse scrolling
+	int KeyScroll;                      ///< Enable keyboard scrolling
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault;
 		/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl;
 
-	int MouseWarpX;                     /// Cursor warp X position
-	int MouseWarpY;                     /// Cursor warp Y position
+	int MouseWarpX;                     ///< Cursor warp X position
+	int MouseWarpY;                     ///< Cursor warp Y position
 
-	char* NormalFontColor;              /// Color for normal text displayed
-	char* ReverseFontColor;             /// Color for reverse text displayed
+	char* NormalFontColor;              ///< Color for normal text displayed
+	char* ReverseFontColor;             ///< Color for reverse text displayed
 
 	// Fillers
-	GraphicConfig* Filler;              /// Filler graphics
-	int* FillerX;                       /// Filler X positions
-	int* FillerY;                       /// Filler Y positions
-	int  NumFillers;                    /// Number of fillers
+	GraphicConfig* Filler;              ///< Filler graphics
+	int* FillerX;                       ///< Filler X positions
+	int* FillerY;                       ///< Filler Y positions
+	int  NumFillers;                    ///< Number of fillers
 
 	// Resource line
-	GraphicConfig Resource;             /// Resource background
-	int ResourceX;                      /// Resource X position
-	int ResourceY;                      /// Resource Y position
+	GraphicConfig Resource;             ///< Resource background
+	int ResourceX;                      ///< Resource X position
+	int ResourceY;                      ///< Resource Y position
 
 	struct {
-		GraphicConfig Icon;             /// icon image
-		int IconFrame;                  /// icon frame
-		int IconX;                      /// icon X position
-		int IconY;                      /// icon Y position
-		int IconW;                      /// icon W position
-		int IconH;                      /// icon H position
-		int TextX;                      /// text X position
-		int TextY;                      /// text Y position
-	} Resources[MaxCosts + 2];          /// Icon+Text of all resources
-                                        /// +2 for food and score
+		GraphicConfig Icon;             ///< icon image
+		int IconFrame;                  ///< icon frame
+		int IconX;                      ///< icon X position
+		int IconY;                      ///< icon Y position
+		int IconW;                      ///< icon W position
+		int IconH;                      ///< icon H position
+		int TextX;                      ///< text X position
+		int TextY;                      ///< text Y position
+	} Resources[MaxCosts + 2];          ///< Icon+Text of all resources
+                                        ///< +2 for food and score
 
 	// Info panel
-	GraphicConfig InfoPanel;            /// Info panel background
-	int InfoPanelX;                     /// Info panel screen X position
-	int InfoPanelY;                     /// Info panel screen Y position
-	int InfoPanelW;                     /// Info panel width
-	int InfoPanelH;                     /// Info panel height
+	GraphicConfig InfoPanel;            ///< Info panel background
+	int InfoPanelX;                     ///< Info panel screen X position
+	int InfoPanelY;                     ///< Info panel screen Y position
+	int InfoPanelW;                     ///< Info panel width
+	int InfoPanelH;                     ///< Info panel height
 
-	Button* SingleSelectedButton;       /// FIXME: docu
-	char*   SingleSelectedText;         /// FIXME: docu
-	int     SingleSelectedFont;         /// FIXME: docu
-	int     SingleSelectedTextX;        /// FIXME: docu
-	int     SingleSelectedTextY;        /// FIXME: docu
-	Button* SelectedButtons;            /// Selected buttons
-	int     NumSelectedButtons;         /// Number of selected buttons
-	char*   SelectedText;               /// FIXME: docu
-	int     SelectedFont;               /// FIXME: docu
-	int     SelectedTextX;              /// FIXME: docu
-	int     SelectedTextY;              /// FIXME: docu
-	int     MaxSelectedFont;            /// FIXME: docu
-	int     MaxSelectedTextX;           /// position to place '+#' text
-	int     MaxSelectedTextY;           /// if > maximum units selected
+	Button* SingleSelectedButton;       ///< FIXME: docu
+	char*   SingleSelectedText;         ///< FIXME: docu
+	int     SingleSelectedFont;         ///< FIXME: docu
+	int     SingleSelectedTextX;        ///< FIXME: docu
+	int     SingleSelectedTextY;        ///< FIXME: docu
+	Button* SelectedButtons;            ///< Selected buttons
+	int     NumSelectedButtons;         ///< Number of selected buttons
+	char*   SelectedText;               ///< FIXME: docu
+	int     SelectedFont;               ///< FIXME: docu
+	int     SelectedTextX;              ///< FIXME: docu
+	int     SelectedTextY;              ///< FIXME: docu
+	int     MaxSelectedFont;            ///< FIXME: docu
+	int     MaxSelectedTextX;           ///< position to place '+#' text
+	int     MaxSelectedTextY;           ///< if > maximum units selected
 
-	Button* SingleTrainingButton;       /// FIXME: docu
-	char*   SingleTrainingText;         /// FIXME: docu
-	int     SingleTrainingFont;         /// FIXME: docu
-	int     SingleTrainingTextX;        /// FIXME: docu
-	int     SingleTrainingTextY;        /// FIXME: docu
-	Button* TrainingButtons;            /// Training buttons
-	int     NumTrainingButtons;         /// Number of training buttons
-	char*   TrainingText;               /// FIXME: docu
-	int     TrainingFont;               /// FIXME: docu
-	int     TrainingTextX;              /// FIXME: docu
-	int     TrainingTextY;              /// FIXME: docu
+	Button* SingleTrainingButton;       ///< FIXME: docu
+	char*   SingleTrainingText;         ///< FIXME: docu
+	int     SingleTrainingFont;         ///< FIXME: docu
+	int     SingleTrainingTextX;        ///< FIXME: docu
+	int     SingleTrainingTextY;        ///< FIXME: docu
+	Button* TrainingButtons;            ///< Training buttons
+	int     NumTrainingButtons;         ///< Number of training buttons
+	char*   TrainingText;               ///< FIXME: docu
+	int     TrainingFont;               ///< FIXME: docu
+	int     TrainingTextX;              ///< FIXME: docu
+	int     TrainingTextY;              ///< FIXME: docu
 
-	Button* UpgradingButton;
-	char*   UpgradingText;
-	int     UpgradingFont;
-	int     UpgradingTextX;
-	int     UpgradingTextY;
+	Button* UpgradingButton; ///< FIXME: docu
+	char*   UpgradingText; ///< FIXME: docu
+	int     UpgradingFont; ///< FIXME: docu
+	int     UpgradingTextX; ///< FIXME: docu
+	int     UpgradingTextY; ///< FIXME: docu
 
-	Button* ResearchingButton;
-	char*   ResearchingText;
-	int     ResearchingFont;
-	int     ResearchingTextX;
-	int     ResearchingTextY;
+	Button* ResearchingButton; ///< FIXME: docu
+	char*   ResearchingText; ///< FIXME: docu
+	int     ResearchingFont; ///< FIXME: docu
+	int     ResearchingTextX; ///< FIXME: docu
+	int     ResearchingTextY; ///< FIXME: docu
 
-	Button* TransportingButtons;
-	int     NumTransportingButtons;     /// Number of transporting buttons
-	char*   TransportingText;
-	int     TransportingFont;
-	int     TransportingTextX;
-	int     TransportingTextY;
+	Button* TransportingButtons; ///< FIXME: docu
+	int     NumTransportingButtons;     ///< Number of transporting buttons
+	char*   TransportingText; ///< FIXME: docu
+	int     TransportingFont; ///< FIXME: docu
+	int     TransportingTextX; ///< FIXME: docu
+	int     TransportingTextY; ///< FIXME: docu
 
 	// Completed bar
-	SDL_Color CompletedBarColorRGB;     /// color for completed bar
-	Uint32    CompletedBarColor;        /// color for completed bar
-	int       CompletedBarShadow;       /// should complete bar have shadow
-	int       CompletedBarX;            /// completed bar X position
-	int       CompletedBarY;            /// completed bar Y position
-	int       CompletedBarW;            /// completed bar width
-	int       CompletedBarH;            /// completed bar height
-	char*     CompletedBarText;         /// completed bar text
-	int       CompletedBarFont;         /// completed bar font
-	int       CompletedBarTextX;        /// completed bar text X position
-	int       CompletedBarTextY;        /// completed bar text Y position
+	SDL_Color CompletedBarColorRGB;     ///< color for completed bar
+	Uint32    CompletedBarColor;        ///< color for completed bar
+	int       CompletedBarShadow;       ///< should complete bar have shadow
+	int       CompletedBarX;            ///< completed bar X position
+	int       CompletedBarY;            ///< completed bar Y position
+	int       CompletedBarW;            ///< completed bar width
+	int       CompletedBarH;            ///< completed bar height
+	char*     CompletedBarText;         ///< completed bar text
+	int       CompletedBarFont;         ///< completed bar font
+	int       CompletedBarTextX;        ///< completed bar text X position
+	int       CompletedBarTextY;        ///< completed bar text Y position
 
 	// Button panel
-	GraphicConfig ButtonPanel;          /// Button panel background
-	Button*       ButtonButtons;        /// Button panel buttons
-	int           NumButtonButtons;     /// Number of button panel buttons
-	int           ButtonPanelX;         /// Button panel screen X position
-	int           ButtonPanelY;         /// Button panel screen Y position
-	int           CommandKeyFont;       /// Command key font
+	GraphicConfig ButtonPanel;          ///< Button panel background
+	Button*       ButtonButtons;        ///< Button panel buttons
+	int           NumButtonButtons;     ///< Number of button panel buttons
+	int           ButtonPanelX;         ///< Button panel screen X position
+	int           ButtonPanelY;         ///< Button panel screen Y position
+	int           CommandKeyFont;       ///< Command key font
 
 	// Map area
-	ViewportMode ViewportMode;          /// Current viewport mode
-	Viewport*    MouseViewport;         /// Viewport containing mouse
-	Viewport*    SelectedViewport;      /// Current selected active viewport
-	int          NumViewports;          /// # Viewports currently used
-	Viewport     Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
+	ViewportMode ViewportMode;          ///< Current viewport mode
+	Viewport*    MouseViewport;         ///< Viewport containing mouse
+	Viewport*    SelectedViewport;      ///< Current selected active viewport
+	int          NumViewports;          ///< # Viewports currently used
+	Viewport     Viewports[MAX_NUM_VIEWPORTS]; ///< Parameters of all viewports
 	// Map* attributes of Viewport are unused here:
-	Viewport     MapArea;               /// geometry of the whole map area
+	Viewport     MapArea;               ///< geometry of the whole map area
 
 	// The menu panel
-	GraphicConfig MenuPanel;            /// menu panel background
-	int           MenuPanelX;           /// menu panel screen X position
-	int           MenuPanelY;           /// menu panel screen Y position
+	GraphicConfig MenuPanel;            ///< menu panel background
+	int           MenuPanelX;           ///< menu panel screen X position
+	int           MenuPanelY;           ///< menu panel screen Y position
 
 	/// Menu buttons
 	struct {
-		int   X;                        /// button screen X position
-		int   Y;                        /// button screen Y position
-		char* Text;                     /// button caption
-		int   Font;                     /// button caption font
-		int   Width;                    /// button width
-		int   Height;                   /// button height
-		int   Button;                   /// button style
+		int   X;                        ///< button screen X position
+		int   Y;                        ///< button screen Y position
+		char* Text;                     ///< button caption
+		int   Font;                     ///< button caption font
+		int   Width;                    ///< button width
+		int   Height;                   ///< button height
+		int   Button;                   ///< button style
 	} MenuButton,
 	  NetworkMenuButton,
 	  NetworkDiplomacyButton;
 
 	// The minimap
-	GraphicConfig MinimapPanel;         /// minimap panel background
-	int           MinimapPanelX;        /// minimap panel screen X position
-	int           MinimapPanelY;        /// minimap panel screen Y position
-	int           MinimapW;             /// minimap screen Width
-	int           MinimapH;             /// minimap screen Height
-	int           MinimapPosX;          /// minimap screen X position
-	int           MinimapPosY;          /// minimap screen Y position
-	int           MinimapTransparent;   /// unexplored areas are transparent
-	Uint32        ViewportCursorColor;  /// minimap cursor color
+	GraphicConfig MinimapPanel;         ///< minimap panel background
+	int           MinimapPanelX;        ///< minimap panel screen X position
+	int           MinimapPanelY;        ///< minimap panel screen Y position
+	int           MinimapW;             ///< minimap screen Width
+	int           MinimapH;             ///< minimap screen Height
+	int           MinimapPosX;          ///< minimap screen X position
+	int           MinimapPosY;          ///< minimap screen Y position
+	int           MinimapTransparent;   ///< unexplored areas are transparent
+	Uint32        ViewportCursorColor;  ///< minimap cursor color
 
 	// The status line
-	GraphicConfig StatusLine;           /// Status line background
-	int           StatusLineX;          /// status line screen X position
-	int           StatusLineY;          /// status line screen Y position
-	int           StatusLineTextX;      /// status line screen text X position
-	int           StatusLineTextY;      /// status line screen text Y position
-	int           StatusLineFont;       /// Status line font
+	GraphicConfig StatusLine;           ///< Status line background
+	int           StatusLineX;          ///< status line screen X position
+	int           StatusLineY;          ///< status line screen Y position
+	int           StatusLineTextX;      ///< status line screen text X position
+	int           StatusLineTextY;      ///< status line screen text Y position
+	int           StatusLineFont;       ///< Status line font
 
 	// Offsets for 640x480 center used by menus
-	int Offset640X;                     /// Offset for 640x480 X position
-	int Offset480Y;                     /// Offset for 640x480 Y position
+	int Offset640X;                     ///< Offset for 640x480 X position
+	int Offset480Y;                     ///< Offset for 640x480 Y position
 
 	//
 	//  Cursors used.
 	//
-	CursorConfig Point;                 /// General pointing cursor
-	CursorConfig Glass;                 /// HourGlass, system is waiting
-	CursorConfig Cross;                 /// Multi-select cursor.
-	CursorConfig YellowHair;            /// Yellow action,attack cursor.
-	CursorConfig GreenHair;             /// Green action,attack cursor.
-	CursorConfig RedHair;               /// Red action,attack cursor.
-	CursorConfig Scroll;                /// Cursor for scrolling map around.
+	CursorConfig Point;                 ///< General pointing cursor
+	CursorConfig Glass;                 ///< HourGlass, system is waiting
+	CursorConfig Cross;                 ///< Multi-select cursor.
+	CursorConfig YellowHair;            ///< Yellow action,attack cursor.
+	CursorConfig GreenHair;             ///< Green action,attack cursor.
+	CursorConfig RedHair;               ///< Red action,attack cursor.
+	CursorConfig Scroll;                ///< Cursor for scrolling map around.
 
-	CursorConfig ArrowE;                /// Cursor pointing east
-	CursorConfig ArrowNE;               /// Cursor pointing north east
-	CursorConfig ArrowN;                /// Cursor pointing north
-	CursorConfig ArrowNW;               /// Cursor pointing north west
-	CursorConfig ArrowW;                /// Cursor pointing west
-	CursorConfig ArrowSW;               /// Cursor pointing south west
-	CursorConfig ArrowS;                /// Cursor pointing south
-	CursorConfig ArrowSE;               /// Cursor pointing south east
+	CursorConfig ArrowE;                ///< Cursor pointing east
+	CursorConfig ArrowNE;               ///< Cursor pointing north east
+	CursorConfig ArrowN;                ///< Cursor pointing north
+	CursorConfig ArrowNW;               ///< Cursor pointing north west
+	CursorConfig ArrowW;                ///< Cursor pointing west
+	CursorConfig ArrowSW;               ///< Cursor pointing south west
+	CursorConfig ArrowS;                ///< Cursor pointing south
+	CursorConfig ArrowSE;               ///< Cursor pointing south east
 
-// FIXME: could use different sounds/speech for the errors
-// Is in gamesounds?
-//	SoundConfig PlacementError;         /// played on placements errors
-//	SoundConfig PlacementSuccess;       /// played on placements success
-//	SoundConfig Click;                  /// click noice used often
+/// @fixme could use different sounds/speech for the errors
+/// Is in gamesounds?
+///	SoundConfig PlacementError;         ///< played on placements errors
+///	SoundConfig PlacementSuccess;       ///< played on placements success
+///	SoundConfig Click;                  ///< click noice used often
 
-	MenuPanel* MenuPanels;              /// Menu panels
+	MenuPanel* MenuPanels;              ///< Menu panels
 
-	GraphicConfig VictoryBackground;    /// FIXME: docu
-	GraphicConfig DefeatBackground;     /// FIXME: docu
+	GraphicConfig VictoryBackground;    ///< FIXME: docu
+	GraphicConfig DefeatBackground;     ///< FIXME: docu
 } UI;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern UI TheUI;                        /// The user interface
-extern UI** UI_Table;                   /// All available user interfaces
+extern UI TheUI;                        ///< The user interface
+extern UI** UI_Table;                   ///< All available user interfaces
 
-extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
-extern ButtonAction* CurrentButtons;    /// Current Selected Buttons
-extern char FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
+extern char RightButtonAttacks;         ///< right button 0 move, 1 attack.
+extern ButtonAction* CurrentButtons;    ///< Current Selected Buttons
+extern char FancyBuildings;             ///< Mirror buildings 1 yes, 0 now.
 
-extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
-extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames
+extern int SpeedKeyScroll;              ///< Keyboard Scrolling Speed, in Frames
+extern int SpeedMouseScroll;            ///< Mouse Scrolling Speed, in Frames
 
-extern char* UiGroupKeys;               /// up to 11 keys used for group selection
+extern char* UiGroupKeys;               ///< up to 11 keys used for group selection
 
 // only exported to save them
 

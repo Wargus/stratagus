@@ -45,13 +45,13 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void SoundCclRegister(void);  /// register ccl features
+extern void SoundCclRegister(void);  ///< register ccl features
 
 #else  // }{ defined(WITH_SOUND)
 
 //-----------------------------------------------------------------------------
 
-extern void SoundCclRegister(void);  /// register ccl features
+extern void SoundCclRegister(void);  ///< register ccl features
 
 #endif // } !defined(WITH_SOUND)
 

@@ -60,27 +60,27 @@ typedef struct _settings_ Settings;
 **
 */
 struct _settings_ {
-	int NetGameType;   /// Multiplayer or single player
+	int NetGameType;   ///< Multiplayer or single player
 
 //  Individual presets:
 //  For single-player game only Presets[0] will be used..
 	struct {
-		int Race;  /// Race of the player
-		int Team;  /// Team of player -- NOT SELECTABLE YET
-		int Type;  /// Type of player (for network games)
+		int Race;  ///< Race of the player
+		int Team;  ///< Team of player -- NOT SELECTABLE YET
+		int Type;  ///< Type of player (for network games)
 	} Presets[PlayerMax];
 
 //  Common settings:
-	int Resources;   /// Preset resource factor
-	int NumUnits;    /// Preset # of units
-	int Opponents;   /// Preset # of ai-opponents
-	int Terrain;     /// Terrain type (summer,winter,...)
-	int GameType;    /// Game type (melee, free for all,...)
-	int NoFogOfWar;  /// No fog of war
-	int RevealMap;   /// Reveal map
+	int Resources;   ///< Preset resource factor
+	int NumUnits;    ///< Preset # of units
+	int Opponents;   ///< Preset # of ai-opponents
+	int Terrain;     ///< Terrain type (summer,winter,...)
+	int GameType;    ///< Game type (melee, free for all,...)
+	int NoFogOfWar;  ///< No fog of war
+	int RevealMap;   ///< Reveal map
 };
 
-#define SettingsPresetMapDefault  -1  /// Special: Use pud/cm supplied
+#define SettingsPresetMapDefault  -1  ///< Special: Use pud/cm supplied
 
 /**
 **  Single or multiplayer settings
@@ -129,40 +129,40 @@ enum _game_types_ {
 
 // ----------------------------------------------------------------------------
 
-#define MAX_BRIEFING_VOICES 20  /// How many intro voices supported
-#define MAX_OBJECTIVES 9  /// How many objectives supported
+#define MAX_BRIEFING_VOICES 20  ///< How many intro voices supported
+#define MAX_OBJECTIVES 9  ///< How many objectives supported
 
 typedef struct _intro_ {
-	char* Title;                           /// Intro title
-	char* Background;                      /// Background picture
-	char* TextFile;                        /// Intro text file
-	char* VoiceFile[MAX_BRIEFING_VOICES];  /// Intro voice file
-	char* Objectives[MAX_OBJECTIVES];      /// Objectives text
-} Intro;  /// Intro definition
+	char* Title;                           ///< Intro title
+	char* Background;                      ///< Background picture
+	char* TextFile;                        ///< Intro text file
+	char* VoiceFile[MAX_BRIEFING_VOICES];  ///< Intro voice file
+	char* Objectives[MAX_OBJECTIVES];      ///< Objectives text
+} Intro;  ///< Intro definition
 
 
 // ----------------------------------------------------------------------------
 
 typedef struct _credits_ {
-	char* Background;  /// Background picture
-	char* Names;       /// Names
+	char* Background;  ///< Background picture
+	char* Names;       ///< Names
 } Credits;
 
 // ----------------------------------------------------------------------------
 
-#define MAX_TIPS 50    /// How many tips supported
+#define MAX_TIPS 50    ///< How many tips supported
 
-extern char* Tips[MAX_TIPS+1];  /// Array of tips
-extern int   ShowTips;          /// Show tips at start of level
-extern int   CurrentTip;        /// Current tip to display
+extern char* Tips[MAX_TIPS+1];  ///< Array of tips
+extern int   ShowTips;          ///< Show tips at start of level
+extern int   CurrentTip;        ///< Current tip to display
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern Settings GameSettings;  /// Game settings
-extern Intro    GameIntro;     /// Game intro
-extern Credits  GameCredits;   /// Game credits
+extern Settings GameSettings;  ///< Game settings
+extern Intro    GameIntro;     ///< Game intro
+extern Credits  GameCredits;   ///< Game credits
 
 /*----------------------------------------------------------------------------
 --  Functions

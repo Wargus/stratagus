@@ -38,20 +38,15 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**
+** @fixme docu
 **/
 typedef struct DecorationSingle {
-  // next single-tile decoration belonging to the same decoration
-  struct DecorationSingle *nxt;
-  // exact 2x2 tile area
-  unsigned short *tiles;
-  // 16bit bitmask to and in order to *mark* the small deco
-  unsigned short bitmask;
-  // The coordinates of the upper-left corner of the 64*64 square
-  int cornerx, cornery;
+  struct DecorationSingle *nxt; ///< next single-tile decoration belonging to the same decoration
+  unsigned short *tiles;        ///< exact 2x2 tile area
+  unsigned short bitmask;       ///< 16bit bitmask to and in order to *mark* the small deco
+  int cornerx, cornery;         ///< The coordinates of the upper-left corner of the 64*64 square
 #ifdef DEBUG
-  // coordinates of the small deco on screen. mostly debug purposes.
-  int x, y, w, h;
+  int x, y, w, h;  ///< coordinates of the small deco on screen. mostly debug purposes.
 #endif
 } DecorationSingle;
 
@@ -61,29 +56,22 @@ typedef struct DecorationSingle {
 **  structu, so the mechanism can use it and automaticly update any other
 **  decoration overlapping it.
 **
-**  draw = an user given function that draws the decoration using
-**         some vidoe functions based on the clip rectangle ClipX1,..
-**  data = an user given data-type given to above function, to be able
-**         to provide a generic draw-function independent of its data.
-**  x,y,w,h = dimension as given to DecorationAdd..
-**            @note now needed outside, but might be removed in the future
-**  l = decoration level as given to DecorationAdd (internal use only)
-**  singles = The sub-decoration type, as this decoration might be split
-**            into multiple small/fixed-sized data-type (internal use only)
-**  prv = prev decoration based on depth-level (internal use only)
-**  nxt = next decoration based on depth-level (internal use only)
+**  @note x, y, w, h now needed outside, but might be removed in the future
 **/
 typedef struct Deco {
-  void* data;
-  void (*drawclip)(void* data);
-  struct DecorationSingle* singles;
-  struct Deco* prv;
-  struct Deco* nxt;
-  int x;
-  int y;
-  int w;
-  int h;
-  int level;
+  void* data; ///< an user given data-type given to above function, to be able
+			  ///< to provide a generic draw-function independent of its data.
+  void (*drawclip)(void* data); ///< an user given function that draws the decoration using
+								///< some vidoe functions based on the clip rectangle ClipX1,..
+  struct DecorationSingle* singles; ///< The sub-decoration type, as this decoration might be split
+									///< into multiple small/fixed-sized data-type (internal use only)
+  struct Deco* prv; ///< prev decoration based on depth-level (internal use only)
+  struct Deco* nxt; ///< next decoration based on depth-level (internal use only)
+  int x; ///< dimension as given to DecorationAdd..
+  int y; ///< dimension as given to DecorationAdd..
+  int w; ///< dimension as given to DecorationAdd..
+  int h; ///< dimension as given to DecorationAdd..
+  int level; ///< decoration level as given to DecorationAdd (internal use only)
 } Deco;
 
 /*----------------------------------------------------------------------------

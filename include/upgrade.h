@@ -85,10 +85,10 @@ extern int UpgradeIdByIdent(const char* sid);
 	/// Upgrade will be acquired
 extern void UpgradeAcquire(Player* player, const Upgrade* upgrade);
 
-// for now it will be empty?
-// perhaps acquired upgrade can be lost if (for example) a building is lost
-// (lumber mill? stronghold?)
-// this function will apply all modifiers in reverse way
+/// for now it will be empty?
+/// perhaps acquired upgrade can be lost if (for example) a building is lost
+/// (lumber mill? stronghold?)
+/// this function will apply all modifiers in reverse way
 extern void UpgradeLost(Player* player, int id);
 
 /*----------------------------------------------------------------------------

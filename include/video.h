@@ -50,12 +50,12 @@ typedef struct _graphic_ {
 	int Height;
 	int NumFrames;
 #ifdef USE_OPENGL
-	int GraphicWidth;       /// Original graphic width
-	int GraphicHeight;      /// Original graphic height
-	GLfloat TextureWidth;   /// Width of the texture
-	GLfloat TextureHeight;  /// Height of the texture
-	int NumTextureNames;    /// Number of textures
-	GLuint* TextureNames;   /// Texture names
+	int GraphicWidth;       ///< Original graphic width
+	int GraphicHeight;      ///< Original graphic height
+	GLfloat TextureWidth;   ///< Width of the texture
+	GLfloat TextureHeight;  ///< Height of the texture
+	int NumTextureNames;    ///< Number of textures
+	GLuint* TextureNames;   ///< Texture names
 #endif
 } Graphic;
 
@@ -96,8 +96,8 @@ typedef struct _event_callback_ {
 
 	/// Graphic reference used during config/setup
 typedef struct _graphic_config_ {
-	char*		File;						/// config graphic name or file
-	Graphic*		Graphic;				/// graphic pointer to use to run time
+	char*    File;      ///< config graphic name or file
+	Graphic* Graphic;   ///< graphic pointer to use to run time
 } GraphicConfig;
 
 	/// Creates a shared hardware palette from an independent Palette struct.
@@ -106,7 +106,7 @@ extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
 	/// Free a shared hardware palette.
 extern void VideoFreeSharedPalette(SDL_Palette* palette);
 
-extern int ColorCycleAll;				/// Flag color cycle palettes
+extern int ColorCycleAll; ///< Flag color cycle palettes
 
 /**
 **  Typedef for palette links.
@@ -117,11 +117,11 @@ typedef struct _palette_link_ PaletteLink;
 **  Links all palettes together to join the same palettes.
 */
 struct _palette_link_ {
-	SDL_Surface* Surface;               /// Surface that contains palette
-	PaletteLink* Next;                  /// Previous palette
+	SDL_Surface* Surface;               ///< Surface that contains palette
+	PaletteLink* Next;                  ///< Previous palette
 };
 
-extern PaletteLink* PaletteList;		/// List of all used palettes loaded
+extern PaletteLink* PaletteList; ///< List of all used palettes loaded
 
 extern void VideoPaletteListAdd(SDL_Surface* surface);
 extern void VideoPaletteListRemove(SDL_Surface* surface);
@@ -275,9 +275,9 @@ extern unsigned long GetTicks(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
-extern EventCallback* Callbacks;		/// Current callbacks
-extern EventCallback GameCallbacks;		/// Game callbacks
-extern EventCallback MenuCallbacks;		/// Menu callbacks
+extern EventCallback* Callbacks;    ///< Current callbacks
+extern EventCallback GameCallbacks; ///< Game callbacks
+extern EventCallback MenuCallbacks; ///< Menu callbacks
 
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;
@@ -289,12 +289,12 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-extern int ColorWaterCycleStart;		/// color # start for color cycling
-extern int ColorWaterCycleEnd;				/// color # end   for color cycling
-extern int ColorIconCycleStart;				/// color # start for color cycling
-extern int ColorIconCycleEnd;				/// color # end   for color cycling
-extern int ColorBuildingCycleStart;		/// color # start for color cycling
-extern int ColorBuildingCycleEnd;		/// color # end   for color cycling
+extern int ColorWaterCycleStart;    ///< color # start for color cycling
+extern int ColorWaterCycleEnd;      ///< color # end   for color cycling
+extern int ColorIconCycleStart;     ///< color # start for color cycling
+extern int ColorIconCycleEnd;       ///< color # end   for color cycling
+extern int ColorBuildingCycleStart; ///< color # start for color cycling
+extern int ColorBuildingCycleEnd;   ///< color # end   for color cycling
 
 #ifndef USE_OPENGL
 #define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))

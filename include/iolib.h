@@ -58,9 +58,9 @@
 **  FileList struct used by directory access routine
 */
 typedef struct _filelist_ {
-	char* name;   /// Name of the file
-	int   type;   /// Type of the file
-	void* xdata;  /// Extra data attached by high level
+	char* name;   ///< Name of the file
+	int   type;   ///< Type of the file
+	void* xdata;  ///< Extra data attached by high level
 } FileList;
 
 
@@ -85,21 +85,21 @@ typedef struct _filelist_ {
 **  @todo  zip archive support
 */
 typedef struct _CL_File_ {
-	int   cl_type;   /// type of CLFile
-	FILE* cl_plain;  /// standard file pointer
+	int   cl_type;   ///< type of CLFile
+	FILE* cl_plain;  ///< standard file pointer
 #ifdef USE_ZLIB
-	gzFile *cl_gz;  /// gzip file pointer
+	gzFile *cl_gz;  ///< gzip file pointer
 #endif // !USE_ZLIB
 #ifdef USE_BZ2LIB
-	BZFILE* cl_bz;  /// bzip2 file pointer
+	BZFILE* cl_bz;  ///< bzip2 file pointer
 #endif // !USE_BZ2LIB
 } CLFile;
 
 enum {
-	CLF_TYPE_INVALID,  /// invalid file handle
-	CLF_TYPE_PLAIN,    /// plain text file handle
-	CLF_TYPE_GZIP,     /// gzip file handle
-	CLF_TYPE_BZIP2,    /// bzip2 file handle
+	CLF_TYPE_INVALID,  ///< invalid file handle
+	CLF_TYPE_PLAIN,    ///< plain text file handle
+	CLF_TYPE_GZIP,     ///< gzip file handle
+	CLF_TYPE_BZIP2,    ///< bzip2 file handle
 };
 
 #define CL_OPEN_READ 0x1

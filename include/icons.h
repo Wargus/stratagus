@@ -136,10 +136,10 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define IconActive   1  /// cursor on icon
-#define IconClicked  2  /// mouse button down on icon
-#define IconSelected 4  /// this the selected icon
-#define IconAutoCast 8  /// auto cast icon
+#define IconActive   1  ///< cursor on icon
+#define IconClicked  2  ///< mouse button down on icon
+#define IconSelected 4  ///< this the selected icon
+#define IconAutoCast 8  ///< auto cast icon
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -153,55 +153,55 @@
 **    IconFile::Icons member isn't setup and used.
 */
 typedef struct _icon_file_ {
-	char* FileName;  /// Icon file name/path
+	char* FileName;  ///< Icon file name/path
 #if 0
-	unsigned Width;   /// Icon width
-	unsigned Height;  /// Icon height
+	unsigned Width;   ///< Icon width
+	unsigned Height;  ///< Icon height
 
 	/** FIXME: unsed */
-	unsigned Icons;  /// Number of icons in this file
+	unsigned Icons;  ///< Number of icons in this file
 #endif
 
 // --- FILLED UP ---
-	Graphic* Sprite;  /// Graphic data loaded
+	Graphic* Sprite;  ///< Graphic data loaded
 } IconFile;
 
 	/// Icon: rectangle image used in menus
 typedef struct _icon_ {
-	char* Ident;    /// Icon identifier
-	char* Tileset;  /// Tileset identifier
+	char* Ident;    ///< Icon identifier
+	char* Tileset;  ///< Tileset identifier
 
-	IconFile* File;   /// File containing the data
-	unsigned  Index;  /// Index into file
+	IconFile* File;   ///< File containing the data
+	unsigned  Index;  ///< Index into file
 
-	int Width;   /// Icon width
-	int Height;  /// Icon height
+	int Width;   ///< Icon width
+	int Height;  ///< Icon height
 
 // --- FILLED UP ---
-	Graphic* Sprite;  /// Graphic data loaded
+	Graphic* Sprite;  ///< Graphic data loaded
 } Icon;
 
-#define NoIcon NULL  /// used for errors == no valid icon
+#define NoIcon NULL  ///< used for errors == no valid icon
 
 	/// Icon reference (used in config tables)
 typedef struct _icon_config_ {
-	char* Name;  /// config icon name
-	Icon* Icon;  /// icon pointer to use to run time
+	char* Name;  ///< config icon name
+	Icon* Icon;  ///< icon pointer to use to run time
 } IconConfig;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern char** IconWcNames;  /// pud original -> internal
+extern char** IconWcNames;  ///< pud original -> internal
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitIcons(void);   /// Init icons
-extern void LoadIcons(void);   /// Load icons
-extern void CleanIcons(void);  /// Cleanup icons
+extern void InitIcons(void);   ///< Init icons
+extern void LoadIcons(void);   ///< Load icons
+extern void CleanIcons(void);  ///< Cleanup icons
 
 	/// Name -> icon
 extern Icon* IconByIdent(const char* ident);

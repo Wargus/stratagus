@@ -48,10 +48,10 @@
 #define MI_DISABLED -1
 #define MI_ENABLED  0
 
-#define MenuButtonActive   1  /// cursor on button
-#define MenuButtonClicked  2  /// mouse button down on button
-#define MenuButtonSelected 4  /// selected button
-#define MenuButtonDisabled 8  /// button cannot be depressed
+#define MenuButtonActive   1  ///< cursor on button
+#define MenuButtonClicked  2  ///< mouse button down on button
+#define MenuButtonSelected 4  ///< selected button
+#define MenuButtonDisabled 8  ///< button cannot be depressed
 
 /**
 **  Menu button referencing
@@ -62,9 +62,9 @@
 */
 typedef int MenuButtonId;
 
-/// FIXME: FILL IN THIS TABLE!!!!
+/// @fixme FILL IN THIS TABLE!!!!
 
-#define MBUTTON_MAIN    4 /// FIXME: write docu
+#define MBUTTON_MAIN    4 /// @fixme write docu
 #define MBUTTON_NETWORK 7
 #define MBUTTON_GM_HALF 10
 #define MBUTTON_132     13
@@ -114,6 +114,7 @@ typedef int MenuButtonId;
 
 /**
 **  Menuitem definition.
+**  @fixme docu.
 */
 struct _menuitem_;
 typedef struct _menuitem_text_ {
@@ -168,27 +169,27 @@ typedef struct _menuitem_listbox_ {
 } MenuitemListbox;
 typedef struct _menuitem_vslider_ {
 	unsigned cflags;
-	int xsize;  // x-size of slider, not including buttons
-	int ysize;  // y-size of slider, not including buttons
+	int xsize;  ///< x-size of slider, not including buttons
+	int ysize;  ///< y-size of slider, not including buttons
 	void (*action)(struct _menuitem_ *, int);
 	int defper;
-	int percent;  // percent of the way to bottom (0 to 100)
-	int curper;   /* used in mouse-move state */
-	int cursel;   /* used in mouse-over state */
+	int percent;  ///< percent of the way to bottom (0 to 100)
+	int curper;   ///< used in mouse-move state
+	int cursel;   ///< used in mouse-over state
 	int style;
-	void (*handler)(void);  /* for return key */
+	void (*handler)(void); ///< for return key
 } MenuitemVslider;
 typedef struct _menuitem_hslider_ {
 	unsigned cflags;
-	int xsize;  // x-size of slider, not including buttons
-	int ysize;  // y-size of slider, not including buttons
+	int xsize;  ///< x-size of slider, not including buttons
+	int ysize;  ///< y-size of slider, not including buttons
 	void (*action)(struct _menuitem_ *);
 	int defper;
-	int percent;  // percent of the way to right (0 to 100)
-	int curper;   /* used in mouse-move state */
-	int cursel;   /* used in mouse-over state */
+	int percent;  ///< percent of the way to right (0 to 100)
+	int curper;   ///< used in mouse-move state
+	int cursel;   ///< used in mouse-over state
 	int style;
-	void (*handler)(void);  /* for return key */
+	void (*handler)(void); ///< for return key
 } MenuitemHslider;
 typedef struct _menuitem_drawfunc_ {
 	void (*draw)(struct _menuitem_ *);
@@ -198,7 +199,7 @@ typedef struct _menuitem_input_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_ *, int);  /* for key */
+	void (*action)(struct _menuitem_ *, int);  ///< for key
 	int nch;
 	int maxch;
 	char *normalcolor;
@@ -217,15 +218,15 @@ typedef struct _menuitem_gem_ {
 
 struct _menus_;
 typedef struct _menuitem_ {
-	int mitype;  /// FIXME: write docu
+	int mitype;  ///< @fixme write docu
 	int xofs;
 	int yofs;
 	unsigned flags;
 	int font;
-		int transparent;  /// Add the transparent flag to draw a translucide menu
-	void (*initfunc)(struct _menuitem_ *);  /// constructor
-	void (*exitfunc)(struct _menuitem_ *);  /// destructor
-	struct _menus_ *menu;  /// backpointer for speedups
+		int transparent;  ///< Add the transparent flag to draw a translucide menu
+	void (*initfunc)(struct _menuitem_ *);  ///< constructor
+	void (*exitfunc)(struct _menuitem_ *);  ///< destructor
+	struct _menus_ *menu;  ///< backpointer for speedups
 	union {
 		MenuitemText text;
 		MenuitemButton button;
@@ -236,12 +237,12 @@ typedef struct _menuitem_ {
 		MenuitemDrawfunc drawfunc;
 		MenuitemInput input;
 		MenuitemGem gem;
-		/// ... add here ...
+		///< ... add here ...
 
 	} d;
 } Menuitem;
 
-#define MI_TYPE_TEXT 1  /// FIXME: write docu
+#define MI_TYPE_TEXT 1  ///< @fixme write docu
 #define MI_TYPE_BUTTON 2
 #define MI_TYPE_PULLDOWN 3
 #define MI_TYPE_LISTBOX 4
@@ -265,13 +266,13 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_CONT 8
 
 	/// for MI_TYPE_PULLDOWN
-#define MI_PSTATE_PASSIVE 1  /// Pulldown is passive (grey) drawn
+#define MI_PSTATE_PASSIVE 1  ///< Pulldown is passive (grey) drawn
 
 	/// for MI_TYPE_GEM
-#define MI_GSTATE_UNCHECKED 0  /// Gem has no check mark
-#define MI_GSTATE_PASSIVE 1    /// Gem is passive (grey) drawn
-#define MI_GSTATE_INVISIBLE 2  /// Gem is not drawn
-#define MI_GSTATE_CHECKED 4    /// Gem is with check mark drawn
+#define MI_GSTATE_UNCHECKED 0  ///< Gem has no check mark
+#define MI_GSTATE_PASSIVE 1    ///< Gem is passive (grey) drawn
+#define MI_GSTATE_INVISIBLE 2  ///< Gem is not drawn
+#define MI_GSTATE_CHECKED 4    ///< Gem is with check mark drawn
 
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2
@@ -280,44 +281,44 @@ typedef struct _menuitem_ {
 **  Menu definition.
 */
 typedef struct _menus_ {
-	// FIXME: char* Name; /// menu name
-	int       X;         /// menu area x pos
-	int       Y;         /// menu area y pos
-	int       Width;     /// menu area width
-	int       Height;    /// menu area height
-	char*     Panel;     /// optional background panel
-	int       DefSel;    /// initial selected item number (or -1)
-	int       NumItems;  /// number of items to follow
-	Menuitem* Items;     /// buttons, etc
-	void (*NetAction)(void);   /// network action callback
+	/// @fixme char* Name; ///< menu name
+	int       X;         ///< menu area x pos
+	int       Y;         ///< menu area y pos
+	int       Width;     ///< menu area width
+	int       Height;    ///< menu area height
+	char*     Panel;     ///< optional background panel
+	int       DefSel;    ///< initial selected item number (or -1)
+	int       NumItems;  ///< number of items to follow
+	Menuitem* Items;     ///< buttons, etc
+	void (*NetAction)(void);   ///< network action callback
 } Menu;
 
 /**
 **  Struct which specifies the buttons gfx
 */
 typedef struct _menu_graphics_ {
-	char* File[MAX_RACES];    /// resource filename one for each race
-	int   Width[MAX_RACES];   /// Width of button
-	int   Height[MAX_RACES];  /// Height of button
-	Graphic* Sprite;          /// sprite : FILLED
+	char* File[MAX_RACES];    ///< resource filename one for each race
+	int   Width[MAX_RACES];   ///< Width of button
+	int   Height[MAX_RACES];  ///< Height of button
+	Graphic* Sprite;          ///< sprite : FILLED
 } MenuGraphics;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int GuiGameStarted;          /// Game Started?
-extern Menu *CurrentMenu;           /// Currently processed menu
-extern MenuGraphics MenuButtonGfx;  /// Menu button graphics
+extern int GuiGameStarted;          ///< Game Started?
+extern Menu *CurrentMenu;           ///< Currently processed menu
+extern MenuGraphics MenuButtonGfx;  ///< Menu button graphics
 
-extern MapInfo *MenuMapInfo;        /// MapInfo of map used in gui menus
-extern char MenuMapFullPath[1024];  /// Full path to currently selected map
+extern MapInfo *MenuMapInfo;        ///< MapInfo of map used in gui menus
+extern char MenuMapFullPath[1024];  ///< Full path to currently selected map
 
-extern int nKeyStrokeHelps;    /// Number of loaded keystroke helps
-extern char **KeyStrokeHelps;  /// Keystroke help pairs
+extern int nKeyStrokeHelps;    ///< Number of loaded keystroke helps
+extern char **KeyStrokeHelps;  ///< Keystroke help pairs
 
-#define MENUS_MAXMENU 128  /// FIXME: wrong place, docu
-#define MENUS_MAXFUNC 128  /// FIXME: wrong place, docu
+#define MENUS_MAXMENU 128  ///< @fixme wrong place, docu
+#define MENUS_MAXFUNC 128  ///< @fixme wrong place, docu
 
 #ifdef DOXYGEN  // no real code, only for document
 

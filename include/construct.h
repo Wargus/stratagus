@@ -119,34 +119,34 @@
 
 	/// Construction frame
 typedef struct _construction_frame_ {
-	int Percent;  /// Percent complete
+	int Percent;  ///< Percent complete
 	enum {
 		ConstructionFileConstruction,
 		ConstructionFileMain,
-	} File;  /// Graphic to use
-	int Frame;  /// Frame number
-	struct _construction_frame_* Next;  /// Next pointer
+	} File;  ///< Graphic to use
+	int Frame;  ///< Frame number
+	struct _construction_frame_* Next;  ///< Next pointer
 } ConstructionFrame;
 
 	/// Construction shown during construction of a building
 typedef struct _construction_ {
-	const void* OType;  /// Object type (future extensions)
-	char*       Ident;  /// construction identifier
+	const void* OType;  ///< Object type (future extensions)
+	char*       Ident;  ///< construction identifier
 	struct {
-		char* File;    /// sprite file
-		int   Width;   /// sprite width
-		int   Height;  /// sprite height
+		char* File;    ///< sprite file
+		int   Width;   ///< sprite width
+		int   Height;  ///< sprite height
 	} File[TilesetMax], ShadowFile[TilesetMax];
-	ConstructionFrame* Frames;  /// construction frames
+	ConstructionFrame* Frames;  ///< construction frames
 
 // --- FILLED UP ---
 
-	Graphic* Sprite;        /// construction sprite image
-	int      Width;         /// sprite width
-	int      Height;        /// sprite height
-	Graphic* ShadowSprite;  /// construction shadow sprite image
-	int      ShadowWidth;   /// shadow sprite width
-	int      ShadowHeight;  /// shadow sprite height
+	Graphic* Sprite;        ///< construction sprite image
+	int      Width;         ///< sprite width
+	int      Height;        ///< sprite height
+	Graphic* ShadowSprite;  ///< construction shadow sprite image
+	int      ShadowWidth;   ///< shadow sprite width
+	int      ShadowHeight;  ///< shadow sprite height
 } Construction;
 
 /*----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ typedef struct _construction_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern const char ConstructionType[];  /// Construction type
+extern const char ConstructionType[];  ///< Construction type
 
 /*----------------------------------------------------------------------------
 --  Functions

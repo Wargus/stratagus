@@ -91,29 +91,29 @@
 
 	/// Color font definition
 typedef struct _color_font_ {
-	char* File;            /// File containing font data
-	int   Width;           /// Max width of characters in file
-	int   Height;          /// Max height of characters in file
-	char  CharWidth[208];  /// Real font width (starting with ' ')
+	char* File;            ///< File containing font data
+	int   Width;           ///< Max width of characters in file
+	int   Height;          ///< Max height of characters in file
+	char  CharWidth[208];  ///< Real font width (starting with ' ')
 
 // --- FILLED UP ---
 
-	Graphic* Graphic;  /// Graphic object used to draw
+	Graphic* Graphic;  ///< Graphic object used to draw
 } ColorFont;
 
 /**
 **  Font selector for the font functions.
-**  FIXME: should be removed
+**  @fixme should be removed
 */
 enum _game_font_ {
-	SmallFont,       /// Small font used in stats
-	GameFont,        /// Normal font used in game
-	LargeFont,       /// Large font used in menus
-	SmallTitleFont,  /// Small font used in episoden titles
-	LargeTitleFont,  /// Large font used in episoden titles
+	SmallFont,       ///< Small font used in stats
+	GameFont,        ///< Normal font used in game
+	LargeFont,       ///< Large font used in menus
+	SmallTitleFont,  ///< Small font used in episoden titles
+	LargeTitleFont,  ///< Large font used in episoden titles
 };
 
-#define MaxFonts 10  /// Number of fonts supported
+#define MaxFonts 10  ///< Number of fonts supported
 
 /**
 **  Color selector for the font functions.
@@ -130,7 +130,7 @@ enum _game_font_ {
 
 /**
 **  Font names
-**  FIXME: should use the names of the real fonts.
+**  @fixme should use the names of the real fonts.
 */
 extern char *FontNames[];
 
