@@ -10,7 +10,7 @@
 //
 /**@name icons.c	-	The icons. */
 //
-//	(c) Copyright 1998-2002 by Lutz Sammer
+//	(c) Copyright 1998-2003 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -213,6 +213,11 @@ global void LoadIcons(void)
 #endif
 	    }
 	    icon->Sprite = icon->File->Sprite;
+	    if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
+		DebugLevel0Fn("Invalid icon index: %s - %d\n"
+			_C_ icon->Ident _C_ icon->Index);
+		icon->Index = 0;
+	    }
 	}
     }
 }
