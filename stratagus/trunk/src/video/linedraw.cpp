@@ -37,11 +37,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "video.h"
 
 #include "intern_video.h"
+
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -452,8 +454,19 @@ global void InitLineDraw()
 
 global void VideoDrawPixel(SDL_Color color, int x, int y)
 {
-    DebugCheck(1);
+    int bpp;
+    int ofs;
+    unsigned int c;
+
+    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
+    bpp = TheScreen->format->BytesPerPixel;
+    ofs = TheScreen->pitch * y + x * bpp;
+
+    SDL_LockSurface(TheScreen);
+    memcpy(TheScreen->pixels + ofs, &c, bpp);
+    SDL_UnlockSurface(TheScreen);
 }
+
 global void VideoDrawTransPixel(SDL_Color color, int x, int y, unsigned char alpha)
 {
     DebugCheck(1);
@@ -505,53 +518,44 @@ global void VideoDrawTransLine(SDL_Color color, int sx, int sy,
 {
     DebugCheck(1);
 }
+
 global void VideoDrawRectangle(SDL_Color color, int x, int y,
     int w, int h)
 {
-    DebugCheck(1);
+    int i;
+
+    // FIXME: should be able to optimize this
+
+    for (i = 0; i <= w; ++i) {
+	VideoDrawPixel(color, x + i, y);
+	VideoDrawPixel(color, x + i, y + h);
+    }
+
+    for (i = 1; i < h; ++i) {
+	VideoDrawPixel(color, x, y + i);
+	VideoDrawPixel(color, x + w, y + i);
+
+    }
 }
+
 global void VideoDrawRectangleClip(SDL_Color color, int x, int y,
     int w, int h)
 {
-/*
     int i;
-//    int j;
-//    int bpp;
-    Uint32 c;
-    SDL_Rect drect;
 
-    SDL_Surface* rec;
+    // FIXME: should be able to optimize this
+    // FIXME: do clipping
 
-    rec = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, RMASK, GMASK, BMASK, AMASK);
-    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-
-    SDL_LockSurface(rec);
-    for (i = 0; i < w; ++i) {
-//	((Uint32*)(rec->pixels))[(x + i)] = c;
-//	((Uint32*)(rec->pixels))[(x + i) + (y) * rec->w] = c;
+    for (i = 0; i <= w; ++i) {
+	VideoDrawPixel(color, x + i, y);
+	VideoDrawPixel(color, x + i, y + h);
     }
-    SDL_UnlockSurface(rec);
 
-    drect.x = x;
-    drect.y = y;
+    for (i = 1; i < h; ++i) {
+	VideoDrawPixel(color, x, y + i);
+	VideoDrawPixel(color, x + w, y + i);
 
-    SDL_BlitSurface(rec, NULL, TheScreen, &drect);
-//    SDL_FreeSurface(rec);
-*/
-/*
-    c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
-    bpp = TheScreen->format->BytesPerPixel;
-*/
-/*
-    for (i = 0; i < h; ++i) {
-	// FIXME: why w*2?
-	for (j = 0; j < w*2; ++j) {
-	    ((char*)(TheScreen->pixels))[(x + j) + (y + i) * TheScreen->pitch] = 
-		c;
-	}
     }
-*/
-//    Invalidate();
 }
 
 global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
@@ -563,8 +567,6 @@ global void VideoDrawTransRectangle(SDL_Color color, int x, int y,
 global void VideoFillRectangle(SDL_Color color, int x, int y,
     int w, int h)
 {
-//    int i;
-//    int j;
     SDL_Rect drect;
     Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
 
@@ -574,27 +576,22 @@ global void VideoFillRectangle(SDL_Color color, int x, int y,
     drect.h = h;
 
     SDL_FillRect(TheScreen, &drect, c);
-/*
-    VideoLockScreen();
-
-    for (i = 0; i < h; ++i) {
-	// FIXME: why w*2?
-	for (j = 0; j < w*2; ++j) {
-	    ((char*)(TheScreen->pixels))[(x + j) + (y + i) * TheScreen->pitch] = 
-		c;
-//c = 0;
-	}
-    }
-
-    VideoUnlockScreen();
-    Invalidate();
-*/
 }
 
 global void VideoFillTransRectangle(SDL_Color color, int x, int y,
     int w, int h, unsigned char alpha)
 {
-    DebugCheck(1);
+    // FIXME: do clipping
+
+    SDL_Rect drect;
+    Uint32 c = SDL_MapRGB(TheScreen->format, color.r, color.g, color.b);
+
+    drect.x = x;
+    drect.y = y;
+    drect.w = w;
+    drect.h = h;
+
+    SDL_FillRect(TheScreen, &drect, c);
 }
 
 global void VideoFillRectangleClip(SDL_Color color, int x, int y,
