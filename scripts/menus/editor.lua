@@ -119,11 +119,12 @@ DefineMenuItem("pos", { 320 + 23, 328}, "font", "large",
 -- menu-editor-main-load-map
 --
 DefineMenu("name", "menu-editor-main-load-map", "geometry", {144, 64, 352, 352},
+  "init", "editor-main-load-init",
   "panel", "panel5", "background", MenuBackground, "default", 4)
-DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  "init", "editor-main-load-init",
+DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  
   "text", {"caption", "Select map", "align", "center"},
   "menu", "menu-editor-main-load-map")
-DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",  "init", "editor-main-load-lb-init", "exit", "editor-main-load-lb-exit",
+DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",
   "listbox", {"size", {288, 108},
     "style", "pulldown",
     "func", "editor-main-load-lb-action",
@@ -163,11 +164,12 @@ DefineMenuItem("pos", { ((352 - 18 - 288) / 2) - 2, (11 + 98) - 28}, "font", "ga
 -- menu-editor-load
 --
 DefineMenu("name", "menu-editor-load", "geometry", {224, 64, 352, 352},
+  "init", "editor-load-init",
   "panel", "panel5", "default", 4)
-DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  "init", "editor-load-init",
+DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  
   "text", {"caption", "Select map", "align", "center"},
   "menu", "menu-editor-load")
-DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",  "init", "editor-load-lb-init", "exit", "editor-load-lb-exit",
+DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",
   "listbox", {"size", {288, 108},
     "style", "pulldown",
     "func", "editor-load-lb-action",
@@ -618,7 +620,7 @@ DefineMenu("name", "menu-editor-save", "geometry", {224, 64, 352, 352},
 DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",
   "text", {"caption", "Save map", "align", "center"},
   "menu", "menu-editor-save")
-DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",  "init", "editor-save-lb-init", "exit", "editor-save-lb-exit",
+DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",
   "listbox", {"size", {288, 108},
     "style", "pulldown",
     "func", "editor-save-lb-action",
@@ -663,8 +665,9 @@ DefineMenuItem("pos", { ((352 - 18 - 288) / 2) - 2, (11 + 98) - 28}, "font", "ga
 -- menu-editor-save-confirm
 --
 DefineMenu("name", "menu-editor-save-confirm", "geometry", {256, 112, 288, 128},
+  "init", "editor-save-confirm-init",
   "panel", "panel4", "default", 1)
-DefineMenuItem("pos", { 288 / 2, 11}, "font", "large",  "init", "editor-save-confirm-init",
+DefineMenuItem("pos", { 288 / 2, 11}, "font", "large",  
   "text", {"caption", "Overwrite File", "align", "center"},
   "menu", "menu-editor-save-confirm")
 DefineMenuItem("pos", { 16, 11 + (20 * 1.5)}, "font", "game",

@@ -2,6 +2,8 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 CVS version:
+- Moved init and exit functions from DefineMenuItem 
+  to DefineMenu. (François Beerten)
 - Use GetNumOpponents instead of IfOpponents. (François Beerten)
 - Removed attack sound entry in unit definitions. (François Beerten)
 - Conversion of all animations to the new format. (Loïs Taulelle)

@@ -52,8 +52,8 @@ DefineMenuGraphics({
 -- menu-program-start
 --
 DefineMenu("name", "menu-program-start", "geometry", {0, 0, 640, 480},
-  "panel", "none", "background", MenuBackground, "default", 1)
-DefineMenuItem("pos", { 0, 0}, "font", "game", "init", "program-start",
+  "panel", "none", "background", MenuBackground, "default", 1, "init", "program-start")
+DefineMenuItem("pos", { 0, 0}, "font", "game",
   "drawfunc", "name-line-draw",
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 0)}, "font", "large",
@@ -124,11 +124,12 @@ DefineMenuItem("pos", { 208, 109 + (36 * 8)}, "font", "large",
 -- menu-select-scenario
 --
 DefineMenu("name", "menu-select-scenario", "geometry", {144, 64, 352, 352},
+  "init", "scen-select-init", "exit", "scen-select-exit",
   "panel", "panel5", "background", MenuBackground, "default", 4)
-DefineMenuItem("pos", { 176, 8}, "font", "large", "init", "scen-select-init",
+DefineMenuItem("pos", { 176, 8}, "font", "large",
   "text", {"caption", "Select map", "align", "center"},
   "menu", "menu-select-scenario")
-DefineMenuItem("pos", { 24, 140}, "font", "game", "init", "scen-select-lb-init", "exit", "scen-select-lb-exit",
+DefineMenuItem("pos", { 24, 140}, "font", "game",
   "listbox", {"size", {288, 108},
     "style", "pulldown",
     "func", "scen-select-lb-action",
@@ -189,8 +190,9 @@ DefineMenuItem("pos", { 22, 112}, "font", "game",
 -- menu-global-options
 --
 DefineMenu("name", "menu-global-options", "geometry", {144, 64, 352, 352},
-  "panel", "panel5", "background", MenuBackground, "default", 7)
-DefineMenuItem("pos", { 176, 11}, "font", "large", "init", "global-options-init", "exit", "global-options-exit",
+  "panel", "panel5", "background", MenuBackground, "default", 7, 
+  "init", "global-options-init", "exit", "global-options-exit")
+DefineMenuItem("pos", { 176, 11}, "font", "large",
   "text", {"caption", "Global Options", "align", "center"},
   "menu", "menu-global-options")
 DefineMenuItem("pos", { 16, 44}, "font", "game",
@@ -277,8 +279,8 @@ DefineMenuItem("pos", { 123, 309}, "font", "large",
 -- menu-custom-game (Single player)
 --
 DefineMenu("name", "menu-custom-game", "geometry", {0, 0, 640, 480},
-  "panel", "none", "background", MenuBackground, "default", 3)
-DefineMenuItem("pos", { 0, 0}, "font", "game", "init", "game-setup-init",
+  "panel", "none", "background", MenuBackground, "default", 3, "init", "game-setup-init")
+DefineMenuItem("pos", { 0, 0}, "font", "game", 
   "drawfunc", "game-draw-func",
   "menu", "menu-custom-game")
 DefineMenuItem("pos", { (640 / 2) + 12, 192}, "font", "large",
@@ -503,11 +505,12 @@ DefineMenuItem("pos", { 92, 80}, "font", "large",
 -- menu-replay-game
 --
 DefineMenu("name", "menu-replay-game", "geometry", {144, 64, 352, 352},
-  "panel", "panel5", "background", MenuBackground, "default", 4)
-DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  "init", "replay-game-init",
+  "panel", "panel5", "background", MenuBackground, "default", 4, 
+  "init", "replay-game-init", "exit", "replay-game-exit")
+DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",  
   "text", {"caption", "Select game", "align", "center"},
   "menu", "menu-replay-game")
-DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game",  "init", "replay-game-lb-init", "exit", "replay-game-lb-exit",
+DefineMenuItem("pos", { (352 - 18 - 288) / 2, 11 + 98}, "font", "game", 
   "listbox", {"size", {288, 108},
     "style", "pulldown",
     "func", "replay-game-lb-action",

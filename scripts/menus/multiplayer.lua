@@ -63,8 +63,9 @@ DefineMenuItem("pos", { 154, 80}, "font", "large",
 -- menu-multi-setup
 --
 DefineMenu("name", "menu-multi-setup", "geometry", {0, 0, 640, 480},
+  "init", "multi-game-setup-init", "exit", "multi-game-setup-exit",
   "panel", "none", "background", MenuBackground, "default", 3)
-DefineMenuItem("pos", { 0, 0}, "font", "game", "init", "multi-game-setup-init", "exit", "multi-game-setup-exit",
+DefineMenuItem("pos", { 0, 0}, "font", "game", 
   "drawfunc", "multi-game-draw-func",
   "menu", "menu-multi-setup")
 DefineMenuItem("pos", { (640 / 2) + 12, 8}, "font", "large",
@@ -473,8 +474,9 @@ DefineMenuItem("pos", { 154, 80}, "font", "large",
 -- menu-net-multi-client
 --
 DefineMenu("name", "menu-net-multi-client", "geometry", {0, 0, 640, 480},
+  "init", "multi-game-client-init", "exit", "multi-game-client-exit",
   "panel", "none", "background", MenuBackground, "default", 4, "netaction", "terminate-net-connect")
-DefineMenuItem("pos", { 0, 0}, "font", "game", "init", "multi-game-client-init", "exit", "multi-game-client-exit",
+DefineMenuItem("pos", { 0, 0}, "font", "game", 
   "drawfunc", "multi-client-draw-func",
   "menu", "menu-net-multi-client")
 DefineMenuItem("pos", { (640 / 2) + 12, 8}, "font", "large",
@@ -776,8 +778,9 @@ DefineMenuItem("pos", { 330, 32 + (22 * 6)}, "font", "large",
 -- menu-net-connecting
 --
 DefineMenu("name", "menu-net-connecting", "geometry", {176, 260, 288, 128},
+  "init", "net-connecting-init", "exit", "net-connecting-exit",
   "panel", "panel4", "background", MenuBackground, "default", 2, "netaction", "terminate-net-connect")
-DefineMenuItem("pos", { 144, 11}, "font", "large", "init", "net-connecting-init", "exit", "net-connecting-exit",
+DefineMenuItem("pos", { 144, 11}, "font", "large", 
   "text", {"caption", "Connecting to server", "align", "center"},
   "menu", "menu-net-connecting")
 DefineMenuItem("pos", { 144, 32}, "font", "large",
