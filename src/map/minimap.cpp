@@ -229,6 +229,17 @@ void UpdateMinimapTerrain(void)
 					((Uint8*)TheMap.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						TheMap.TileGraphic->Surface->pitch];
+			} else if (bpp == 3) {
+				char* d;
+				char* s;
+
+				d = &((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+				s = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
+						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+						TheMap.TileGraphic->Surface->pitch];
+				*d++ = *s++;
+				*d++ = *s++;
+				*d++ = *s++;
 			} else {
 				*(Uint32*)&((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 					*(Uint32*)&((Uint8*)TheMap.TileGraphic->Surface->pixels)[
@@ -345,6 +356,17 @@ void UpdateMinimapXY(int tx, int ty)
 					((Uint8*)TheMap.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						TheMap.TileGraphic->Surface->pitch];
+			} else if (bpp == 3) {
+				char* d;
+				char* s;
+
+				d = &((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+				s = &((Uint8*)TheMap.TileGraphic->Surface->pixels)[
+						(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
+						TheMap.TileGraphic->Surface->pitch];
+				*d++ = *s++;
+				*d++ = *s++;
+				*d++ = *s++;
 			} else {
 				*(Uint32*)&((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch] =
 					*(Uint32*)&((Uint8*)TheMap.TileGraphic->Surface->pixels)[
@@ -450,6 +472,13 @@ static void DrawUnitOnMinimap(Unit* unit, int red_phase)
 			if (bpp == 1) {
 				((Uint8*)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
 					VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
+			} else if (bpp == 3) {
+				char* d;
+
+				d = &((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch];
+				*(d + MinimapSurface->format->Rshift / 8) = c.r;
+				*(d + MinimapSurface->format->Gshift / 8) = c.g;
+				*(d + MinimapSurface->format->Bshift / 8) = c.b;
 			} else {
 				*(Uint32*)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
 					VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
@@ -503,6 +532,15 @@ void UpdateMinimap(void)
 				if (bpp == 1) {
 					((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 						((Uint8*)MinimapTerrainSurface->pixels)[mx + my * MinimapTerrainSurface->pitch];
+				} else if (bpp == 3) {
+					char* d;
+					char* s;
+
+					d = &((Uint8*)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch];
+					s = &((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
+					*d++ = *s++;
+					*d++ = *s++;
+					*d++ = *s++;
 				} else {
 					*(Uint32*)&((Uint8*)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
 						*(Uint32*)&((Uint8*)MinimapTerrainSurface->pixels)[mx * bpp + my * MinimapTerrainSurface->pitch];
@@ -516,6 +554,13 @@ void UpdateMinimap(void)
 				if (bpp == 1) {
 					((Uint8*)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
 						VideoMapRGB(MinimapSurface->format, 0, 0, 0);
+				} else if (bpp == 3) {
+					char* d;
+
+					d = &((Uint8*)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch];
+					*(d + MinimapSurface->format->Rshift / 8) = 0;
+					*(d + MinimapSurface->format->Gshift / 8) = 0;
+					*(d + MinimapSurface->format->Bshift / 8) = 0;
 				} else {
 					*(Uint32*)&((Uint8*)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
 						VideoMapRGB(MinimapSurface->format, 0, 0, 0);
