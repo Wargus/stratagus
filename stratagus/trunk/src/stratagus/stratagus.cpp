@@ -1293,6 +1293,10 @@ global int main1(int argc __attribute__ ((unused)),
 	char** argv __attribute__ ((unused)))
 {
 	int i;
+	int j;
+	int x;
+	int y;
+	float ratio;
 
 	PrintHeader();
 	printf(
@@ -1323,6 +1327,8 @@ Use it at your own risk.\n\n");
 	//
 	//		Show title screen.
 	//
+	SetDefaultTextColors(FontYellow, FontWhite);
+	LoadFonts();
 	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 	if (TitleScreens) {
 		for (i = 0; TitleScreens[i]; ++i) {
@@ -1335,9 +1341,39 @@ Use it at your own risk.\n\n");
 			if (PlayMovie(TitleScreens[i]->File,
 					PlayMovieZoomScreen | PlayMovieKeepAspect)) {
 				DisplayPicture(TitleScreens[i]->File);
+				if (TitleScreens[i]->Labels) {
+					if (VideoDepth && IsFontLoaded(SmallFont) &&
+						IsFontLoaded(GameFont) && IsFontLoaded(LargeFont)) {
+#ifndef USE_SDL_SURFACE
+						VideoLockScreen();
+#endif
+						for (j = 0; TitleScreens[i]->Labels[j]; ++j) {
+							if (VideoWidth == 640) {
+								x = TitleScreens[i]->Labels[j]->xofs;
+								y = TitleScreens[i]->Labels[j]->yofs;
+							} else {
+								ratio = (float) VideoWidth / 640.0;
+								x = ratio * TitleScreens[i]->Labels[j]->xofs;
+								y = ratio * TitleScreens[i]->Labels[j]->yofs;
+							}
+							if (TitleScreens[i]->Labels[j]->flags & TitleFlagCenter) {
+								x += VideoWidth/2;
+							}
+							if (VideoWidth == 640) {
+								VideoDrawTextCentered(x, y, GameFont, TitleScreens[i]->Labels[j]->Text);
+							} else if (VideoWidth == 800) {
+								VideoDrawTextCentered(x, y, GameFont, TitleScreens[i]->Labels[j]->Text);
+							} else {
+								VideoDrawTextCentered(x, y, LargeFont, TitleScreens[i]->Labels[j]->Text);
+							}
+						}
+#ifndef USE_SDL_SURFACE
+						VideoUnlockScreen();
+#endif
+					}
+				}
 				Invalidate();
-				// FIXME: make the time configurable
-				WaitForInput(20);
+				WaitForInput(TitleScreens[i]->Timeout);
 			}
 		}
 	}

@@ -1339,10 +1339,11 @@ Set all speeds.
 <a href="../../data/ccl/stratagus.ccl"> $LIBARYPATH/ccl/stratagus.ccl </a>
 
 <a name="set-title-screens!"></a>
-<h3>(set-title-screens! (image music) ...)</h3>
+<h3>(set-title-screens! '(tag1 value1 tag2 value ...) ...)</h3>
 
-Change the default title screens.
-
+Change the default title screens.<br>
+<br>
+Possible tags:
 
 <dl>
 <dt>image</dt>
@@ -1353,6 +1354,22 @@ displayed. The image should be a png file with 640x480 8-bit indexed colormap.
 <dd>Optional music to be played with the image or video.  Use "none" to stop
 previously playing music.
 </dd>
+<dt>timeout</dt>
+<dd>The number of seconds we should show this title-screen.</dd>
+<dt>label</dt>
+<dd>Optional text to be displayed. It's a list of elements with three tags:
+<dl>
+<dt>text</dt>
+<dd>The text string to render
+</dd>
+<dt>pos</dt>
+<dd>The text coords to render
+</dd>
+<dt>flags</dt>
+<dd>The flags that tell us how should be interpretated the pos coords. Possible values is center
+</dd>
+</dl>
+</dd>
 </dl>
 
 <h4>Example</h4>
@@ -1360,7 +1377,11 @@ previously playing music.
 <pre>
     ;; This is the default title displayed.
     (set-title-screens!
-      '("graphics/ui/stratagus.png" "music/default.mod"))
+      '(image "graphics/ui/title.png"
+        music "music/title.wav.gz"
+        label
+         ((text "~white~Copyright © 1998-2003 The Stratagus Project. All rights reserved."
+           pos (0 45) flags (bottom center)))))
 </pre>
 
 <h4>Used</h4>
