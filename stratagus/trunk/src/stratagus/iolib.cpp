@@ -339,8 +339,7 @@ global int CLseek(CLFile *file, long offset, int whence)
 **	Generate a filename into library.
 **
 **	Try current directory, user home directory, global directory.
-**
-**	FIXME: I also want to support files stored in tar/zip archives.
+**	This supports .gz, .bz2 and .zip.
 **
 **	@param file	Filename to open.
 **	@param buffer	Allocated buffer for generated filename.
