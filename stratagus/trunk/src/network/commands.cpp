@@ -1354,6 +1354,7 @@ global void ParseCommand(unsigned char msgnr,UnitRef unum,
 		dest=UnitSlots[dstnr];
 		DebugCheck( !dest || !dest->Type );
 	    }
+	    CommandLog("spell-cast",unit,status,x,y,dest,NULL,id);
 	    CommandSpellCast(unit,x,y,dest,SpellTypeById(id),status);
 	    break;
     }
