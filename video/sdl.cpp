@@ -82,11 +82,7 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_SDL_SURFACE
 global SDL_Surface* TheScreen;		/// Internal screen
-#else
-global SDL_Surface* Screen;		/// Internal screen
-#endif
 global int InMainWindow = 1;		/// Cursor inside stratagus window
 
 local int FrameTicks;			/// Frame length in ms
@@ -207,46 +203,30 @@ global void InitVideoSdl(void)
     flags |= SDL_OPENGL;
 #endif
 
-#ifdef USE_SDL_SURFACE
     TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
-#else
-    Screen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
-
-    if (Screen == NULL) {
+    if (TheScreen == NULL) {
 	fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 	    VideoWidth, VideoHeight, VideoDepth, SDL_GetError());
 	exit(1);
     }
-#endif
 
 #ifdef USE_SDL_SURFACE
-//    TheScreen = TheScreen;
-    if (VideoDepth == 8)
-    TheScreen->format->palette = &GlobalPalette;
+    if (VideoDepth == 8) {
+	TheScreen->format->palette = &GlobalPalette;
+    }
 #endif
 
 #ifdef DEBUG
-#ifdef USE_SDL_SURFACE
     if (SDL_MUSTLOCK(TheScreen)) {
 	DebugLevel0Fn("Must locksurface!\n");
     }
-#else
-    if (SDL_MUSTLOCK(Screen)) {
-	DebugLevel0Fn("Must locksurface!\n");
-    }
-#endif
 #endif
 
     // Turn cursor off, we use our own.
     SDL_ShowCursor(0);
 
-#ifdef USE_SDL_SURFACE
     VideoBpp = TheScreen->format->BitsPerPixel;
     VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
-#else
-    VideoBpp = Screen->format->BitsPerPixel;
-    VideoFullScreen = (Screen->flags & SDL_FULLSCREEN) ? 1 : 0;
-#endif
 
     //
     //	I need the used bits per pixel.
@@ -261,19 +241,19 @@ global void InitVideoSdl(void)
 	int j;
 
 	DebugLevel3Fn("Mask R%x G%x B%x\n" _C_
-	    Screen->format->Rmask _C_
-	    Screen->format->Gmask _C_
-	    Screen->format->Bmask);
+	    TheScreen->format->Rmask _C_
+	    TheScreen->format->Gmask _C_
+	    TheScreen->format->Bmask);
 
-	if (Screen->format->BitsPerPixel > 8) {
-	    j = Screen->format->Rmask | Screen->format->Gmask |
-		Screen->format->Bmask;
+	if (TheScreen->format->BitsPerPixel > 8) {
+	    j = TheScreen->format->Rmask | TheScreen->format->Gmask |
+		TheScreen->format->Bmask;
 
 	    for (i = 0; j & (1 << i); ++i) {
 	    }
 	    VideoDepth = i;
 	} else {
-	    VideoDepth = Screen->format->BitsPerPixel;
+	    VideoDepth = TheScreen->format->BitsPerPixel;
 	}
     }
 #endif
@@ -310,9 +290,6 @@ global void InitVideoSdl(void)
 */
 global void InvalidateArea(int x, int y, int w, int h)
 {
-#ifdef USE_SDL_SURFACE
-    SDL_UpdateRect(TheScreen, x, y, w, h);
-#else
 #ifndef USE_OPENGL
     // FIXME: This checks should be done at higher level
     // FIXME: did SDL version >1.1, check this now also?
@@ -336,8 +313,7 @@ global void InvalidateArea(int x, int y, int w, int h)
     if (h <= 0) {
 	return;
     }
-    SDL_UpdateRect(Screen, x, y, w, h);
-#endif
+    SDL_UpdateRect(TheScreen, x, y, w, h);
 #endif
 }
 
@@ -347,11 +323,7 @@ global void InvalidateArea(int x, int y, int w, int h)
 global void Invalidate(void)
 {
 #ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
     SDL_UpdateRect(TheScreen, 0, 0, VideoWidth, VideoHeight);
-#else
-    SDL_UpdateRect(Screen, 0, 0, VideoWidth, VideoHeight);
-#endif
 #endif
 }
 
@@ -638,8 +610,7 @@ local void CheckScreenVisible()
     if (IsVisible && !(state & SDL_APPACTIVE)) {
 	IsVisible = 0;
 	UiTogglePause();
-    }
-    else if (!IsVisible && (state & SDL_APPACTIVE)) {
+    } else if (!IsVisible && (state & SDL_APPACTIVE)) {
 	IsVisible = 1;
 	UiTogglePause();
 	MustRedraw = RedrawEverything & ~RedrawMinimap;
@@ -801,7 +772,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
     //	Prepare return, time for one frame is over.
     //
     VideoInterrupts = 0;
-    
+
     if (!SkipGameCycle--) {
 	SkipGameCycle = SkipFrames;
     }
@@ -837,13 +808,8 @@ global VMemType VideoMapRGB(int r, int g, int b)
     VMemType c;
     unsigned long map;
 
-#ifdef USE_SDL_SURFACE
     DebugCheck(!TheScreen);
     map = SDL_MapRGB(TheScreen->format, r, g, b);
-#else
-    DebugCheck(!Screen);
-    map = SDL_MapRGB(Screen->format, r, g, b);
-#endif
 
     memcpy(&c, &map, sizeof(c));
     return c;
@@ -872,7 +838,7 @@ global VMemType* VideoCreateNewPalette(const Palette* palette)
     int i;
     void* pixels;
 
-    if (!Screen) {			// no init
+    if (!TheScreen) {			// no init
 	return NULL;
     }
 
@@ -929,24 +895,24 @@ global VMemType* VideoCreateNewPalette(const Palette* palette)
 	// -> Video
 	switch (VideoBpp) {
 	    case 8:
-		((VMemType8 *) pixels)[i] =
-		    SDL_MapRGB(Screen->format, r, g, b);
+		((VMemType8*)pixels)[i] =
+		    SDL_MapRGB(TheScreen->format, r, g, b);
 		break;
 	    case 15:
 	    case 16:
-		((VMemType16 *) pixels)[i] =
-		    SDL_MapRGB(Screen->format, r, g, b);
+		((VMemType16*)pixels)[i] =
+		    SDL_MapRGB(TheScreen->format, r, g, b);
 		break;
 	    case 24:
-		v = SDL_MapRGB(Screen->format, r, g, b);
+		v = SDL_MapRGB(TheScreen->format, r, g, b);
 		vp = (char *)(&v);
-		((VMemType24 *) pixels)[i].a = vp[0];	// endian safe ?
-		((VMemType24 *) pixels)[i].b = vp[1];
-		((VMemType24 *) pixels)[i].c = vp[2];
+		((VMemType24*)pixels)[i].a = vp[0];	// endian safe ?
+		((VMemType24*)pixels)[i].b = vp[1];
+		((VMemType24*)pixels)[i].c = vp[2];
 		break;
 	    case 32:
-		((VMemType32 *) pixels)[i] =
-		    SDL_MapRGB(Screen->format, r, g, b);
+		((VMemType32*)pixels)[i] =
+		    SDL_MapRGB(TheScreen->format, r, g, b);
 		break;
 	}
     }
@@ -982,11 +948,9 @@ global void RealizeVideoMemory(void)
 global void SdlLockScreen(void)
 {
 #ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
     SDL_LockSurface(TheScreen);
-#else
-    SDL_LockSurface(Screen);
-    VideoMemory = Screen->pixels;
+#ifndef USE_SDL_SURFACE
+    VideoMemory = TheScreen->pixels;
 #endif
 #endif
 }
@@ -997,14 +961,12 @@ global void SdlLockScreen(void)
 global void SdlUnlockScreen(void)
 {
 #ifndef USE_OPENGL
-#ifdef USE_SDL_SURFACE
     SDL_UnlockSurface(TheScreen);
-#else
-    SDL_UnlockSurface(Screen);
+#ifndef USE_SDL_SURFACE
 #ifdef DEBUG
     VideoMemory = NULL;			// Catch errors!
 #else
-    VideoMemory = Screen->pixels;	// Be kind
+    VideoMemory = TheScreen->pixels;	// Be kind
 #endif
 #endif
 #endif
@@ -1050,58 +1012,32 @@ global void ToggleFullScreen(void)
     int ncolors;
 #endif
 
-#ifdef USE_SDL_SURFACE
     if (!TheScreen) {			// don't bother if there's no surface.
 	return;
     }
-#else
-    if (!Screen) {			// don't bother if there's no surface.
-	return;
-    }
-#endif
 
-#ifdef USE_SDL_SURFACE
     flags = TheScreen->flags;
     w = TheScreen->w;
     h = TheScreen->h;
     bpp = TheScreen->format->BitsPerPixel;
 
     SDL_GetClipRect(TheScreen, &clip);
-#else
-    flags = Screen->flags;
-    w = Screen->w;
-    h = Screen->h;
-    bpp = Screen->format->BitsPerPixel;
-
-    SDL_GetClipRect(Screen, &clip);
-#endif
 
     // save the contents of the screen.
-#ifdef USE_SDL_SURFACE
     framesize = w * h * TheScreen->format->BytesPerPixel;
-#else
-    framesize = w * h * Screen->format->BytesPerPixel;
-#endif
 
 #ifndef USE_OPENGL
     if (!(pixels = malloc(framesize))) {	// out of memory
 	return;
     }
-#ifdef USE_SDL_SURFACE
     SDL_LockSurface(TheScreen);
     memcpy(pixels, TheScreen->pixels, framesize);
-#else
-    SDL_LockSurface(Screen);
-    memcpy(pixels, Screen->pixels, framesize);
-#endif
-#else
 
 #ifdef DEBUG
     // shut up compiler
     palette = NULL;
     ncolors=0;
 #endif
-#ifdef USE_SDL_SURFACE
     if (TheScreen->format->palette) {
 	ncolors = TheScreen->format->palette->ncolors;
 	if (!(palette = malloc(ncolors * sizeof(SDL_Color)))) {
@@ -1112,21 +1048,8 @@ global void ToggleFullScreen(void)
 	    ncolors * sizeof(SDL_Color));
     }
     SDL_UnlockSurface(TheScreen);
-#else
-    if (Screen->format->palette) {
-	ncolors = Screen->format->palette->ncolors;
-	if (!(palette = malloc(ncolors * sizeof(SDL_Color)))) {
-	    free(pixels);
-	    return;
-	}
-	memcpy(palette, Screen->format->palette->colors,
-	    ncolors * sizeof(SDL_Color));
-    }
-    SDL_UnlockSurface(Screen);
-#endif
 #endif
 
-#ifdef USE_SDL_SURFACE
     TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
     if (!TheScreen) {
 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
@@ -1141,22 +1064,6 @@ global void ToggleFullScreen(void)
 	    Exit(-1);
 	}
     }
-#else
-    Screen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
-    if (!Screen) {
-	Screen = SDL_SetVideoMode(w, h, bpp, flags);
-	if (!Screen) {		// completely screwed.
-#ifndef USE_OPENGL
-	    free(pixels);
-	    if (Screen->format->palette) {
-		free(palette);
-	    }
-#endif
-	    fprintf(stderr, "Toggle to fullscreen, crashed all\n");
-	    Exit(-1);
-	}
-    }
-#endif
 
     // Windows shows the SDL cursor when starting in fullscreen mode
     // then switching to window mode.  This hides the cursor again.
@@ -1166,7 +1073,6 @@ global void ToggleFullScreen(void)
 #ifdef USE_OPENGL
     InitOpenGL();
 #else
-#ifdef USE_SDL_SURFACE
     SDL_LockSurface(TheScreen);
     memcpy(TheScreen->pixels, pixels, framesize);
     free(pixels);
@@ -1177,42 +1083,16 @@ global void ToggleFullScreen(void)
 	free(palette);
     }
     SDL_UnlockSurface(TheScreen);
-#else
-    SDL_LockSurface(Screen);
-    memcpy(Screen->pixels, pixels, framesize);
-    free(pixels);
-
-    if (Screen->format->palette) {
-	// !!! FIXME : No idea if that flags param is right.
-	SDL_SetPalette(Screen, SDL_LOGPAL, palette, 0, ncolors);
-	free(palette);
-    }
-    SDL_UnlockSurface(Screen);
-#endif
 #endif
 
-#ifdef USE_SDL_SURFACE
     SDL_SetClipRect(TheScreen, &clip);
-#else
-    SDL_SetClipRect(Screen, &clip);
-#endif
 
     Invalidate();			// Update display
-#else
-#ifdef USE_SDL_SURFACE
+#else	// !USE_WIN32
     SDL_WM_ToggleFullScreen(TheScreen);
-#else
-    SDL_WM_ToggleFullScreen(Screen);
 #endif
 
-#endif
-#ifdef USE_SDL_SURFACE
     VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
-#else
-    VideoFullScreen = (Screen->flags & SDL_FULLSCREEN) ? 1 : 0;
-#endif
-
-
 }
 
 #endif // } USE_SDL
