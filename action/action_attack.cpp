@@ -353,15 +353,17 @@ local void MoveToTarget(Unit* unit)
 	    unit->State=unit->SubAction=0;
 	    // Return to old task?
 	    if( err==PF_UNREACHABLE ) {
-		DebugLevel0Fn("Target not reachable, unit: %d" _C_ UnitNumber(unit));
+		DebugLevel3Fn("Target not reachable, unit: %d" _C_ UnitNumber(unit));
 		if( goal ) {
-		    DebugLevel0(", target %d\n" _C_ UnitNumber(goal));
+		    DebugLevel3(", target %d range %d\n" _C_ UnitNumber(goal) _C_ unit->Orders[0].RangeX);
 		} else {
-		    DebugLevel0(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
+		    DebugLevel3(", (%d,%d) Tring with more range...\n" _C_ unit->Orders[0].X _C_ unit->Orders[0].Y);
 		}
 		if( unit->Orders[0].RangeX < TheMap.Width 
 		    || unit->Orders[0].RangeY < TheMap.Height ) {
-		    // Try again with more range
+		    // Try again later and with a bigger range.
+		    // FIXME: does the range ever decrease?
+		    unit->Wait=10;
 		    unit->Orders[0].RangeX++;
 		    unit->Orders[0].RangeY++;
 		    return;
@@ -605,16 +607,16 @@ global void HandleActionAttack(Unit* unit)
 	//
 	//	Move near to the target.
 	//
-	case 4:
-	case 4+WEAK_TARGET:
+	case MOVE_TO_TARGET:
+	case MOVE_TO_TARGET+WEAK_TARGET:
 	    MoveToTarget(unit);
 	    break;
 
 	//
 	//	Attack the target.
 	//
-	case 5:
-	case 5+WEAK_TARGET:
+	case ATTACK_TARGET:
+	case ATTACK_TARGET+WEAK_TARGET:
 	    AttackTarget(unit);
 	    break;
 

@@ -187,11 +187,12 @@ global void DrawUnitInfo(const Unit* unit)
 
     type=unit->Type;
     stats=unit->Stats;
-    IfDebug(
+#ifdef DEBUG
 	if( !type ) {
 	    DebugLevel1Fn(" FIXME: free unit selected\n");
 	    return;
-	} );
+	}
+#endif
 
     //
     //	Draw icon in upper left corner
@@ -293,7 +294,7 @@ global void DrawUnitInfo(const Unit* unit)
 	//	Building under constuction.
 	//
 	if( unit->Orders[0].Action==UnitActionBuilded ) {
-	    if( !OriginalBuilding ) {
+	    if( !OriginalBuilding && unit->Data.Builded.Worker ) {
 		// FIXME: Position must be configured!
 		DrawUnitIcon(unit->Data.Builded.Worker->Player
 			,unit->Data.Builded.Worker->Type->Icon.Icon

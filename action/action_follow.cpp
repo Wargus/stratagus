@@ -61,10 +61,6 @@ global void HandleActionFollow(Unit* unit)
 {
     Unit* goal;
 
-    DebugLevel3Fn("%d: %d %d,%d \n" _C_ UnitNumber(unit) _C_
-	    unit->Orders[0].Goal ? UnitNumber(unit->Orders[0].Goal) : -1 _C_
-	    unit->Orders[0].X _C_ unit->Orders[0].Y);
-
     //
     //	Reached target
     //
@@ -88,11 +84,32 @@ global void HandleActionFollow(Unit* unit)
 	    }
 	    return;
 	}
-	if( goal->X==unit->Orders[0].X && goal->Y==unit->Orders[0].Y ) {
-	    unit->Reset=1;
-	    unit->Wait=10;
+
+	// Two posibilities, both broken. maybe we should change the animation system?
+	// FIXME: Unit doesn't decrease range
+#if 0
+	if( (goal->X==unit->Orders[0].X && goal->Y==unit->Orders[0].Y)||unit->State ) {
+	    UnitShowAnimation(unit,unit->Type->Animations->Still);
+	    //
+	    //	Sea and air units are floating up/down.
+	    //	
+	    if( unit->Type->SeaUnit||unit->Type->AirUnit ) {
+		unit->IY=(MyRand()>>15)&1;
+	    }
 	    return;
 	}
+#else
+	// FIXME:Unit doesn't animate.
+	if( (goal->X==unit->Orders[0].X && goal->Y==unit->Orders[0].Y) ) {
+	    unit->Reset=1;
+	    unit->Wait=10;
+	    if ((unit->Orders[0].RangeX>1)||(unit->Orders[0].RangeY>1)) {
+	        unit->Orders[0].RangeX=unit->Orders[0].RangeY=1;
+		unit->SubAction=0;
+	    }
+	    return;
+	}
+#endif
 	unit->SubAction=0;
     }
 
@@ -189,7 +206,7 @@ global void HandleActionFollow(Unit* unit)
 		}
 		return;
 	    }
-	
+
 	    if( !(goal=unit->Orders[0].Goal) ) {// goal has died
 		unit->Wait=1;
 		unit->SubAction=0;

@@ -88,7 +88,7 @@ global int UnitShowAnimation(Unit* unit,const Animation* animation)
 	    _C_ animation[state].Flags _C_ animation[state].Pixel
 	    _C_ animation[state].Frame _C_ animation[state].Sleep);
     DebugLevel3("Heading %d +%d,%d\n" _C_ unit->Direction _C_ unit->IX _C_ unit->IY);
-
+    
     if( unit->Frame<0 ) {
 	unit->Frame+=-animation[state].Frame;
     } else {
@@ -398,7 +398,7 @@ global void UnitActions(void)
 	HandleUnitAction(unit);
 	DebugCheck( *tpos!=unit );	// Removed is evil.
 
-#ifdef DEBUG
+#ifdef DEBUG_wastes_disk_space
 	//
 	//	Dump the unit to find the network unsyncron bug.
 	//

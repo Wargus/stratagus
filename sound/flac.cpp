@@ -360,7 +360,7 @@ global Sample* LoadFlac(const char* name, int flags)
     FLAC__StreamDecoder* stream;
     FlacData *data;
 
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }
@@ -374,7 +374,7 @@ global Sample* LoadFlac(const char* name, int flags)
 
     // FIXME: ugly way to seek to start of file
     CLclose(f);
-    if (!(f = CLopen(name))) {
+    if (!(f = CLopen(name,CL_OPEN_READ))) {
 	fprintf(stderr, "Can't open file `%s'\n", name);
 	return NULL;
     }

@@ -115,6 +115,7 @@ local int ActionMoveGeneric(Unit* unit,const Animation* anim)
 	//
 	//	Transporter (un)docking?
 	//
+	//	FIXME: This is an ugly hack
 	if( unit->Type->Transporter
 		&& ( (WaterOnMap(unit->X,unit->Y)
 		    && CoastOnMap(unit->X+xd,unit->Y+yd))
@@ -282,7 +283,7 @@ global void HandleActionMove(Unit* unit)
 	DebugCheck( unit->State!=0 );
     }
 
-    // FIXME: (mr-russ) Make a reachable goal here with GoalReachable...
+    // FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 
     switch( DoActionMove(unit) ) {	// reached end-point?
 	case PF_UNREACHABLE:

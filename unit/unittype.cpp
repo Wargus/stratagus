@@ -840,7 +840,16 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
 
     if( type->Building ) {
-	CLprintf(file,"  'building\n");
+	CLprintf(file,"  'building");
+    }
+    if( type->BuilderInside ) {
+	CLprintf(file,"  'builder-inside");
+    }
+    if( type->BuilderLost ) {
+	CLprintf(file,"  'builder-lost");
+    }
+    if( type->AutoBuildRate ) {
+	CLprintf(file,"  'auto-build-rate");
     }
     if( type->ShoreBuilding ) {
 	CLprintf(file,"  'shore-building\n");
@@ -869,6 +878,9 @@ local void SaveUnitType(CLFile* file,const UnitType* type,int all)
     }
     if( type->Transporter ) {
 	CLprintf(file,"  'transporter\n");
+    }
+    if( type->Transporter ) {
+	CLprintf(file,"  'max-on-board %d\n",type->MaxOnBoard);
     }
 
     if( type->CowerWorker ) {
