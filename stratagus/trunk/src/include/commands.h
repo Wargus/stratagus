@@ -67,6 +67,8 @@ extern int LoadReplay(char*);
 extern void EndReplayLog(void);
     /// Clean replay
 extern void CleanReplayLog(void);
+    /// Save the replay list to file
+extern void SaveReplayList(CLFile* file);
 
 /*
 **	The send command functions sends a command, if needed over the
