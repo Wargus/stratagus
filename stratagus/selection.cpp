@@ -127,7 +127,7 @@ void ChangeSelectedUnits(Unit** units,int count)
 	Assert(count <= MaxSelectable);
 
 	if (count == 1 && units[0]->Type->ClicksToExplode &&
-		!units[0]->Type->Decoration) {
+		!units[0]->Type->IsNotSelectable) {
 		HandleSuicideClick(units[0]);
 		if (units[0]->Orders[0].Action == UnitActionDie) {
 			NetworkSendSelection(units, count);
@@ -137,7 +137,7 @@ void ChangeSelectedUnits(Unit** units,int count)
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (n = i = 0; i < count; ++i) {
-		if (!units[i]->Removed && !units[i]->TeamSelected && !units[i]->Type->Decoration) {
+		if (!units[i]->Removed && !units[i]->TeamSelected && !units[i]->Type->IsNotSelectable) {
 			Selected[n++] = unit = units[i];
 			unit->Selected = 1;
 			if (count > 1) {
@@ -173,7 +173,8 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 			// FALL THROUGH
 		case 2:
 			for (i = 0; i < count; ++i) {
-				if (!units[i]->Removed && !units[i]->Type->Decoration) {
+				Assert(!units[i]->Removed);
+				if (!units[i]->Type->IsNotSelectable) {
 					TeamSelected[player->Player][TeamNumSelected[player->Player]++] = units[i];
 					units[i]->TeamSelected |= 1 << player->Player;
 				}
@@ -224,7 +225,7 @@ int SelectUnit(Unit* unit)
 		return 0;
 	}
 
-	if (unit->Type->Decoration && GameRunning) {
+	if (unit->Type->IsNotSelectable && GameRunning) {
 		return 0;
 	}
 
@@ -358,7 +359,7 @@ int SelectUnitsByType(Unit* base)
 		return 0;
 	}
 
-	if (base->Type->Decoration && GameRunning) {
+	if (base->Type->IsNotSelectable && GameRunning) {
 		return 0;
 	}
 	if (base->TeamSelected) { // Somebody else onteam has this unit

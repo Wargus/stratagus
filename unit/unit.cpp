@@ -3009,9 +3009,8 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 
 	Assert(damage != 0 && target->HP != 0 && !target->Type->Vanishes);
 
-	if (target->UnholyArmor > 0 || target->Type->Decoration) {
+	if (target->UnholyArmor > 0 || target->Type->Indestructible) {
 		// vladi: units with active UnholyArmour are invulnerable
-		// mr-russ: as are decorations
 		return;
 	}
 

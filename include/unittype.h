@@ -652,8 +652,11 @@ typedef struct _variable_type_ {
 #define BUILDERLOST_INDEX            17
 #define CANHARVEST_INDEX             18
 #define HARVESTER_INDEX              19
-
-#define NBOOLALREADYDEFINED HARVESTER_INDEX + 1 // Hardcoded boolflag
+#define SELECTABLEBYRECTANGLE_INDEX  20
+#define ISNOTSELECTABLE_INDEX        21
+#define DECORATION_INDEX             22
+#define INDESTRUCTIBLE_INDEX         23
+#define TELEPORTER_INDEX             24
 
 // Index for variable already defined.
 #define HP_INDEX              0
@@ -918,7 +921,9 @@ struct _unit_type_ {
 	unsigned char* CanTargetFlag;   ///< Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; ///< Selectable with mouse rectangle.
-	unsigned Decoration : 1;            ///< Unit Is a decoration.
+	unsigned IsNotSelectable : 1;       ///< Unit should not be selected during game.
+	unsigned Decoration : 1;            ///< Unit is a decoration (act as tile).
+	unsigned Indestructible : 1;        ///< Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            ///< Can teleport other units.
 
 	int CanStore[MaxCosts];             ///< Resources that we can store here.

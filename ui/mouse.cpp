@@ -980,30 +980,33 @@ static int SendMove(int sx, int sy)
 **  @param sx  X screen map position.
 **  @param sy  Y screen map position.
 **
+**  @return 1 if any unit have a new order, 0 else.
+**
 **  @see Selected, @see NumSelected
 */
 static int SendAttack(int sx, int sy)
 {
-	int i;
-	Unit* unit;
-	Unit* dest;
-	int x;
-	int y;
-	int ret;
+	int i;       // iterator for selected unit.
+	Unit* unit;  // selected unit.
+	Unit* dest;  // unit under cursor if any.
+	int x;       // X tile.
+	int y;       // Y tile.
+	int ret;     // result.
 
 	ret = 0;
 	x = sx / TileSizeX;
 	y = sy / TileSizeY;
+	dest = UnitUnderCursor;
+	if (dest && dest->Type->Decoration) {
+		dest = NULL;
+	}
 	for (i = 0; i < NumSelected; ++i) {
 		unit = Selected[i];
 		if (unit->Type->CanAttack) {
-			if ((dest = UnitUnderCursor) && CanTarget(unit->Type, dest->Type)) {
-				dest->Blink = 4;
-			} else {
-				dest = NoUnitP;
-			}
-			// don't let an unit self destruct
-			if (dest != unit) {
+			if (!dest || (dest != unit && CanTarget(unit->Type, dest->Type))) {
+				if (dest) {
+					dest->Blink = 4;
+				}
 				SendCommandAttack(unit, x, y, dest, !(KeyModifiers & ModifierShift));
 				ret = 1;
 			}
