@@ -1519,13 +1519,14 @@ local void SetRes640(Menuitem *mi __attribute__((unused)))
 	VideoHeight=480;
 	InitVideo();
 #ifdef USE_SDL
-    if (flags & SDL_FULLSCREEN)
-	ToggleFullScreen();
+	if (flags & SDL_FULLSCREEN)
+	    ToggleFullScreen();
 #endif
+        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+        LoadCcl();
+        EndMenu();
+        GlobalOptions();
     }
-    LoadCcl();
-    EndMenu();
-    GlobalOptions();
 }
 
 local void SetRes800(Menuitem *mi __attribute__((unused)))
@@ -1545,14 +1546,14 @@ local void SetRes800(Menuitem *mi __attribute__((unused)))
 	VideoHeight=600;
 	InitVideo();
 #ifdef USE_SDL
-    if (flags & SDL_FULLSCREEN)
-	ToggleFullScreen();
+        if (flags & SDL_FULLSCREEN)
+	    ToggleFullScreen();
 #endif
+        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	LoadCcl();
+        EndMenu();
+        GlobalOptions();
     }
-    SetClipping(0,0,VideoWidth-1,VideoHeight-1);
-    LoadCcl();
-    EndMenu();
-    GlobalOptions();
 }
 
 local void SetRes1024(Menuitem *mi __attribute__((unused)))
@@ -1572,13 +1573,14 @@ local void SetRes1024(Menuitem *mi __attribute__((unused)))
 	VideoHeight=768;
 	InitVideo();
 #ifdef USE_SDL
-    if (flags & SDL_FULLSCREEN)
-	ToggleFullScreen();
+        if (flags & SDL_FULLSCREEN)
+	    ToggleFullScreen();
 #endif
+        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+	LoadCcl();
+        EndMenu();
+        GlobalOptions();
     }
-    LoadCcl();
-    EndMenu();
-    GlobalOptions();
 }
 
 local void SetRes1280(Menuitem *mi __attribute__((unused)))
@@ -1598,13 +1600,14 @@ local void SetRes1280(Menuitem *mi __attribute__((unused)))
 	VideoHeight=960;
 	InitVideo();
 #ifdef USE_SDL
-    if (flags & SDL_FULLSCREEN)
-	ToggleFullScreen();
+        if (flags & SDL_FULLSCREEN)
+	    ToggleFullScreen();
 #endif
+        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+        LoadCcl();
+        EndMenu();
+        GlobalOptions();
     }
-    LoadCcl();
-    EndMenu();
-    GlobalOptions();
 }
 
 local void SetRes1600(Menuitem *mi __attribute__((unused)))
@@ -1624,13 +1627,14 @@ local void SetRes1600(Menuitem *mi __attribute__((unused)))
 	VideoHeight=1200;
 	InitVideo();
 #ifdef USE_SDL
-    if (flags & SDL_FULLSCREEN)
-	ToggleFullScreen();
+        if (flags & SDL_FULLSCREEN)
+	    ToggleFullScreen();
 #endif
+        SetClipping(0,0,VideoWidth-1,VideoHeight-1);
+        LoadCcl();
+        EndMenu();
+        GlobalOptions();
     }
-    LoadCcl();
-    EndMenu();
-    GlobalOptions();
 }
 
 local void SetFullscreen(Menuitem *mi __attribute__((unused)))
