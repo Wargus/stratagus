@@ -839,8 +839,8 @@ static void AddMessage(const char* msg)
 		next = ptr = message + strlen(message);
 	}
 
-	// FIXME: 440+(VideoWidth-640) is the wrong value.
-	while (VideoTextLength(GameFont, message) >= 440 + (VideoWidth - 640)) {
+	while (VideoTextLength(GameFont, message) + 8 >=
+			TheUI.MapArea.EndX - TheUI.MapArea.X) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -854,7 +854,8 @@ static void AddMessage(const char* msg)
 		// No space found, wrap in the middle of a word
 		if (ptr == message) {
 			ptr = next - 1;
-			while (VideoTextLength(GameFont, message) >= 440 + (VideoWidth - 640)) {
+			while (VideoTextLength(GameFont, message) + 8 >=
+					TheUI.MapArea.EndX - TheUI.MapArea.X) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;

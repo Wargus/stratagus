@@ -224,7 +224,11 @@ int VideoTextLength(unsigned font, const unsigned char* text)
 			if (!*++s) {  // bad formated string
 				break;
 			}
-			if (*s == '<' || *s == '>' || *s == '!') {
+			if (*s == '<' || *s == '>') {
+				isformat = 0;
+				continue;
+			}
+			if (*s == '!') {
 				continue;
 			}
 			if (*s != '~') { // ~~ -> ~
