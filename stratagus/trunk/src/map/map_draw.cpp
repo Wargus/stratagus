@@ -200,12 +200,12 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+0]=Pixels32[sp[x+0]];	\
-	dp[x+1]=Pixels32[sp[x+1]]
+	dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
 #if GRID==1
-	dp[31]=Pixels32[0];
+	dp[31]=((VMemType32*)TheMap.TileData->Pixels)[0];
 #endif
 	sp+=TileSizeX;
 	dp+=da;
@@ -213,7 +213,7 @@ global void VideoDraw32Tile32(const unsigned char* data,int x,int y)
 
 #if GRID==1
     for( da=TileSizeX; da--; ) {	// with grid no need to be fast
-	dp[da]=Pixels32[0];
+	dp[da]=((VMemType32*)TheMap.TileData->Pixels)[0];
     }
 #endif
 }
@@ -300,12 +300,12 @@ global void VideoDraw8Tile32(const unsigned char* data,int x,int y)
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
 #define UNROLL2(x)		\
-	dp[x+0]=Pixels8[sp[x+0]];	\
-	dp[x+1]=Pixels8[sp[x+1]]
+	dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
 #if GRID==1
-	dp[31]=Pixels8[0];
+	dp[31]=((VMemType8*)TheMap.TileData->Pixels)[0];
 #endif
 	sp+=TileSizeX;
 	dp+=da;
@@ -313,7 +313,7 @@ global void VideoDraw8Tile32(const unsigned char* data,int x,int y)
 
 #if GRID==1
     for( da=TileSizeX; da--; ) {	// with grid no need to be fast
-	dp[da]=Pixels8[0];
+	dp[da]=((VMemType8*)TheMap.TileData->Pixels)[0];
     }
 #endif
 }
@@ -477,12 +477,12 @@ local void FillCache32AndDraw32(const unsigned char* data,VMemType32* cache
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
 #define UNROLL2(x)	\
-	vp[x+0]=dp[x+0]=Pixels32[sp[x+0]];	\
-	vp[x+0]=dp[x+1]=Pixels32[sp[x+1]]
+	vp[x+0]=dp[x+0]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	vp[x+0]=dp[x+1]=((VMemType32*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
 #if GRID==1
-	vp[31]=dp[31]=Pixels32[0];
+	vp[31]=dp[31]=((VMemType32*)TheMap.TileData->Pixels)[0];
 #endif
 	vp+=va;
 	sp+=TileSizeX;
@@ -491,7 +491,7 @@ local void FillCache32AndDraw32(const unsigned char* data,VMemType32* cache
 
 #if GRID==1
     for( va=TileSizeX; va--; ) {	// no need to be fast with grid
-	vp[va]=dp[va]=Pixels32[0];
+	vp[va]=dp[va]=((VMemType32*)TheMap.TileData->Pixels)[0];
     }
 #endif
 }
@@ -599,12 +599,12 @@ local void FillCache8AndDraw32(const unsigned char* data,VMemType8* cache
     while( sp<ep ) {			// loop unrolled
 #undef UNROLL2
 #define UNROLL2(x)	\
-	vp[x+0]=dp[x+0]=Pixels8[sp[x+0]];	\
-	vp[x+0]=dp[x+1]=Pixels8[sp[x+1]]
+	vp[x+0]=dp[x+0]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+0]];	\
+	vp[x+0]=dp[x+1]=((VMemType8*)TheMap.TileData->Pixels)[sp[x+1]]
 
 	UNROLL32(0);
 #if GRID==1
-	vp[31]=dp[31]=Pixels8[0];
+	vp[31]=dp[31]=((VMemType8*)TheMap.TileData->Pixels)[0];
 #endif
 	vp+=va;
 	sp+=TileSizeX;
@@ -613,7 +613,7 @@ local void FillCache8AndDraw32(const unsigned char* data,VMemType8* cache
 
 #if GRID==1
     for( va=TileSizeX; va--; ) {	// no need to be fast with grid
-	vp[va]=dp[va]=Pixels8[0];
+	vp[va]=dp[va]=((VMemType8*)TheMap.TileData->Pixels)[0];
     }
 #endif
 }
@@ -1043,8 +1043,8 @@ global void MapColorCycle(void)
     //	Convert 16 bit pixel table into two 32 bit tables.
     //
     for( i=0; i<256; ++i ) {
-	PixelsLow[i]=Pixels16[i]&0xFFFF;
-	PixelsHigh[i]=(Pixels16[i]&0xFFFF)<<16;
+	PixelsLow[i]=((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF;
+	PixelsHigh[i]=(((VMemType16*)TheMap.TileData->Pixels)[i]&0xFFFF)<<16;
     }
 }
 

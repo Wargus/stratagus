@@ -59,9 +59,9 @@ global void* VideoMemory;
 */
 global int VideoDepth;
 
-global VMemType8 Pixels8[256];
-global VMemType16 Pixels16[256];
-global VMemType32 Pixels32[256];
+global VMemType8 * Pixels8;
+global VMemType16 * Pixels16;
+global VMemType32 * Pixels32;
 global struct Palette GlobalPalette[256];
 
 /*----------------------------------------------------------------------------
@@ -571,17 +571,37 @@ global void WaitEventsAndKeepSync(void)
 	}
     }
 }
-
-/**
-**	Create palette.
-*/
-global void VideoCreatePalette(const struct Palette* palette)
-{
+    
+global GraphicData * VideoCreateNewPalette(const struct Palette *palette){
     int i;
+    VMemType8 *  LocalPixels8 = NULL;
+    VMemType16 * LocalPixels16 = NULL;
+    VMemType32 * LocalPixels32 =  NULL;
 
     if( !Screen ) {			// no init
-	return;
+      return NULL;
     }
+
+    
+
+
+    switch( VideoDepth ) {
+    case 8:
+      LocalPixels8=calloc(256,sizeof(VMemType8));
+      break;
+    case 15:
+    case 16:
+      LocalPixels16=calloc(256,sizeof(VMemType16));
+      break;
+    case 24:
+    case 32:
+      LocalPixels32=calloc(256,sizeof(VMemType32));
+      break;
+    default:
+      DebugLevel0(__FUNCTION__": Unknown depth\n");
+      break;
+    }
+
 
     for( i=0; i<256; ++i ) {
 	int r;
@@ -589,9 +609,9 @@ global void VideoCreatePalette(const struct Palette* palette)
 	int b;
 	int v;
 
-	r=(palette[i].r<<2)&0xFF;
-	g=(palette[i].g<<2)&0xFF;
-	b=(palette[i].b<<2)&0xFF;
+	r=(palette[i].r)&0xFF;
+	g=(palette[i].g)&0xFF;
+	b=(palette[i].b)&0xFF;
 	v=r+g+b;
 
 	r= ((((r*3-v)*TheUI.Saturation + v*100)
@@ -612,23 +632,44 @@ global void VideoCreatePalette(const struct Palette* palette)
 	// -> Video
 	switch( VideoDepth ) {
 	case 8:
-	    Pixels8[i]=SDL_MapRGB(Screen->format,r,g,b);
+	    LocalPixels8[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	case 15:
 	case 16:
-	    Pixels16[i]=SDL_MapRGB(Screen->format,r,g,b);
+	    LocalPixels16[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	case 24:
 	case 32:
-	    Pixels32[i]=SDL_MapRGB(Screen->format,r,g,b);
+	    LocalPixels32[i]=SDL_MapRGB(Screen->format,r,g,b);
 	    break;
 	default:
 	    DebugLevel0(__FUNCTION__": Unknown depth\n");
 	    break;
 	}
     }
-    SetPlayersPalette();
+
+    // -> Video
+    switch( VideoDepth ) {
+    case 8:
+      return (GraphicData *)LocalPixels8;
+      break;
+    case 15:
+    case 16:
+      return (GraphicData *)LocalPixels16;
+      break;
+    case 24:
+    case 32:
+      return (GraphicData *)LocalPixels32;
+      break;
+    default:
+      DebugLevel0(__FUNCTION__": Unknown depth\n");
+      break;
+    }
+    
+    return (GraphicData *)NULL;
+
 }
+
 
 /**
 **	Color cycle.

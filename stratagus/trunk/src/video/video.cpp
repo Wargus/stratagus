@@ -103,11 +103,11 @@ global void DrawRleSprite8(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp-1+*sp++;		// non-transparent
 	    while( dp<pp ) {
-		*dp++=Pixels8[*sp++];
-		*dp++=Pixels8[*sp++];
+		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
+		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp<=pp ) {
-		*dp++=Pixels8[*sp++];
+		*dp++=((VMemType8*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp<lp );
 	IfDebug( 
@@ -196,11 +196,11 @@ global void DrawRleSpriteClipped8(RleSprite* sprite,unsigned frame,int x,int y)
 		}
 		pp=dp-1+*sp++;		// non-transparent
 		while( dp<pp ) {
-		    *dp++=Pixels8[*sp++];
-		    *dp++=Pixels8[*sp++];
+		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
+		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 		if( dp<=pp ) {
-		    *dp++=Pixels8[*sp++];
+		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp<lp );
 	    IfDebug( 
@@ -256,12 +256,12 @@ middle_pixel:
 		//printf("%p, %p, %p\n",dp,pp,lp);
 		if( pp<lp ) {
 		    while( dp<pp ) {
-			*dp++=Pixels8[*sp++];
+			*dp++=((VMemType8*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		while( dp<lp ) {
-		    *dp++=Pixels8[*sp++];
+		    *dp++=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 		sp+=pp-dp;
 		dp=pp;
@@ -320,11 +320,11 @@ global void DrawRleSpriteX8(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp+1-*sp++;		// non-transparent
 	    while( dp>pp ) {
-		*dp--=Pixels8[*sp++];
-		*dp--=Pixels8[*sp++];
+		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
+		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp>=pp ) {
-		*dp--=Pixels8[*sp++];
+		*dp--=((VMemType8*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp>lp );
 	IfDebug( 
@@ -413,11 +413,11 @@ global void DrawRleSpriteClippedX8(RleSprite* sprite,unsigned frame,int x,int y)
 		}
 		pp=dp+1-*sp++;		// non-transparent
 		while( dp>pp ) {
-		    *dp--=Pixels8[*sp++];
-		    *dp--=Pixels8[*sp++];
+		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
+		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 		if( dp>=pp ) {
-		    *dp--=Pixels8[*sp++];
+		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp>lp );
 	    IfDebug( 
@@ -470,13 +470,13 @@ middle_trans:
 middle_pixel:
 		if( pp>lp ) {
 		    while( dp>pp ) {
-			*dp--=Pixels8[*sp++];
+			*dp--=((VMemType8*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		//printf("%d ",sp[-1]);
 		while( dp>lp ) {
-		    *dp--=Pixels8[*sp++];
+		    *dp--=((VMemType8*)sprite->Pixels)[*sp++];
 		}
 		//printf("%d: ",dp-pp);
 		sp+=dp-pp;
@@ -539,11 +539,11 @@ global void DrawRleSprite16(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp-1+*sp++;		// non-transparent
 	    while( dp<pp ) {
-		*dp++=Pixels16[*sp++];
-		*dp++=Pixels16[*sp++];
+		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
+		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp<=pp ) {
-		*dp++=Pixels16[*sp++];
+		*dp++=((VMemType16*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp<lp );
 	IfDebug( 
@@ -632,11 +632,11 @@ global void DrawRleSpriteClipped16(RleSprite* sprite,unsigned frame,int x,int y)
 		}
 		pp=dp-1+*sp++;		// non-transparent
 		while( dp<pp ) {
-		    *dp++=Pixels16[*sp++];
-		    *dp++=Pixels16[*sp++];
+		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
+		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 		if( dp<=pp ) {
-		    *dp++=Pixels16[*sp++];
+		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp<lp );
 	    IfDebug( 
@@ -692,12 +692,12 @@ middle_pixel:
 		//printf("%p, %p, %p\n",dp,pp,lp);
 		if( pp<lp ) {
 		    while( dp<pp ) {
-			*dp++=Pixels16[*sp++];
+			*dp++=((VMemType16*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		while( dp<lp ) {
-		    *dp++=Pixels16[*sp++];
+		    *dp++=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 		sp+=pp-dp;
 		dp=pp;
@@ -756,11 +756,11 @@ global void DrawRleSpriteX16(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp+1-*sp++;		// non-transparent
 	    while( dp>pp ) {
-		*dp--=Pixels16[*sp++];
-		*dp--=Pixels16[*sp++];
+		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
+		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp>=pp ) {
-		*dp--=Pixels16[*sp++];
+		*dp--=((VMemType16*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp>lp );
 	IfDebug( 
@@ -849,11 +849,11 @@ global void DrawRleSpriteClippedX16(RleSprite* sprite,unsigned frame,int x,int y
 		}
 		pp=dp+1-*sp++;		// non-transparent
 		while( dp>pp ) {
-		    *dp--=Pixels16[*sp++];
-		    *dp--=Pixels16[*sp++];
+		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
+		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 		if( dp>=pp ) {
-		    *dp--=Pixels16[*sp++];
+		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp>lp );
 	    IfDebug( 
@@ -906,13 +906,13 @@ middle_trans:
 middle_pixel:
 		if( pp>lp ) {
 		    while( dp>pp ) {
-			*dp--=Pixels16[*sp++];
+			*dp--=((VMemType16*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		//printf("%d ",sp[-1]);
 		while( dp>lp ) {
-		    *dp--=Pixels16[*sp++];
+		    *dp--=((VMemType16*)sprite->Pixels)[*sp++];
 		}
 		//printf("%d: ",dp-pp);
 		sp+=dp-pp;
@@ -975,11 +975,11 @@ global void DrawRleSprite32(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp-1+*sp++;		// non-transparent
 	    while( dp<pp ) {
-		*dp++=Pixels32[*sp++];
-		*dp++=Pixels32[*sp++];
+		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
+		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp<=pp ) {
-		*dp++=Pixels32[*sp++];
+		*dp++=((VMemType32*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp<lp );
 	IfDebug( 
@@ -1068,11 +1068,11 @@ global void DrawRleSpriteClipped32(RleSprite* sprite,unsigned frame,int x,int y)
 		}
 		pp=dp-1+*sp++;		// non-transparent
 		while( dp<pp ) {
-		    *dp++=Pixels32[*sp++];
-		    *dp++=Pixels32[*sp++];
+		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
+		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 		if( dp<=pp ) {
-		    *dp++=Pixels32[*sp++];
+		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp<lp );
 	    IfDebug( 
@@ -1128,12 +1128,12 @@ middle_pixel:
 		//printf("%p, %p, %p\n",dp,pp,lp);
 		if( pp<lp ) {
 		    while( dp<pp ) {
-			*dp++=Pixels32[*sp++];
+			*dp++=((VMemType32*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		while( dp<lp ) {
-		    *dp++=Pixels32[*sp++];
+		    *dp++=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 		sp+=pp-dp;
 		dp=pp;
@@ -1192,11 +1192,11 @@ global void DrawRleSpriteX32(RleSprite* sprite,unsigned frame,int x,int y)
 	    }
 	    pp=dp+1-*sp++;		// non-transparent
 	    while( dp>pp ) {
-		*dp--=Pixels32[*sp++];
-		*dp--=Pixels32[*sp++];
+		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
+		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
 	    }
 	    if( dp>=pp ) {
-		*dp--=Pixels32[*sp++];
+		*dp--=((VMemType32*)sprite->Pixels)[*sp++];
 	    }
 	} while( dp>lp );
 	IfDebug( 
@@ -1285,11 +1285,11 @@ global void DrawRleSpriteClippedX32(RleSprite* sprite,unsigned frame,int x,int y
 		}
 		pp=dp+1-*sp++;		// non-transparent
 		while( dp>pp ) {
-		    *dp--=Pixels32[*sp++];
-		    *dp--=Pixels32[*sp++];
+		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
+		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 		if( dp>=pp ) {
-		    *dp--=Pixels32[*sp++];
+		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 	    } while( dp>lp );
 	    IfDebug( 
@@ -1342,13 +1342,13 @@ middle_trans:
 middle_pixel:
 		if( pp>lp ) {
 		    while( dp>pp ) {
-			*dp--=Pixels32[*sp++];
+			*dp--=((VMemType32*)sprite->Pixels)[*sp++];
 		    }
 		    continue;
 		}
 		//printf("%d ",sp[-1]);
 		while( dp>lp ) {
-		    *dp--=Pixels32[*sp++];
+		    *dp--=((VMemType32*)sprite->Pixels)[*sp++];
 		}
 		//printf("%d: ",dp-pp);
 		sp+=dp-pp;
@@ -1450,6 +1450,7 @@ global void DrawRleSpriteClippedX(RleSprite* sprite,unsigned frame,int x,int y)
 	    break;
     }
 }
+
 
 /*
 **	Load rle sprite from file.
@@ -1560,7 +1561,23 @@ global RleSprite* LoadRleSprite(const char* name,unsigned width,unsigned height)
 
     sprite->Width=width;
     sprite->Height=height;
-    sprite->Pixels=NULL;		// FIXME: future extensions
+
+    
+    sprite->Pixels = graphic->Pixels;
+    /*switch( VideoDepth ){
+    case 8:
+      sprite->Pixels=(GraphicData*)Pixels8;
+      break;
+    case 15:
+    case 16:
+      sprite->Pixels=(GraphicData*)Pixels16;
+      break;
+    case 24:
+    case 32:
+      sprite->Pixels=(GraphicData*)Pixels32;
+      break;
+    } */
+    //sprite->Pixels=NULL;		// FIXME: future extensions
     sprite->NumFrames=n;
 
     VideoFree(graphic);
@@ -1594,12 +1611,39 @@ global void LoadRGB(Palette *pal, const char *name)
     }
 
     for(i=0;i<256;i++){
-	pal[i].r=fgetc(fp);
-	pal[i].g=fgetc(fp);
-	pal[i].b=fgetc(fp);
+	pal[i].r=fgetc(fp)<<2;
+	pal[i].g=fgetc(fp)<<2;
+	pal[i].b=fgetc(fp)<<2;
     }
     
     fclose(fp);
+}
+
+/**
+**	Create palette.
+*/
+global void VideoCreatePalette(const struct Palette* palette)
+{
+  GraphicData * temp = VideoCreateNewPalette(palette);
+  // -> Video
+  switch( VideoDepth ) {
+  case 8:
+    Pixels8  = (VMemType8 *)temp;
+    break;
+  case 15:
+  case 16:
+    Pixels16=(VMemType16 *)temp;
+    break;
+  case 24:
+  case 32:
+    Pixels32=(VMemType32 *)temp;
+    break;
+  default:
+    DebugLevel0(__FUNCTION__": Unknown depth\n");
+    break;
+  }
+
+  SetPlayersPalette();
 }
 
 //@}

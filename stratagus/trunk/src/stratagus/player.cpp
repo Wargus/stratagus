@@ -461,6 +461,35 @@ global void PlayersEachSecond(void)
 **
 **	@param player	Pointer to player.
 */
+global void RLEPlayerPixels(const Player* player, const RleSprite * sprite){
+  switch(VideoDepth){
+  case 8:
+    ((VMemType8*)sprite->Pixels)[208]=player->UnitColor1;
+    ((VMemType8*)sprite->Pixels)[209]=player->UnitColor2;
+    ((VMemType8*)sprite->Pixels)[210]=player->UnitColor3;
+    ((VMemType8*)sprite->Pixels)[211]=player->UnitColor4;
+    break;
+  case 15:
+  case 16:
+    ((VMemType16*)sprite->Pixels)[208]=player->UnitColor1;
+    ((VMemType16*)sprite->Pixels)[209]=player->UnitColor2;
+    ((VMemType16*)sprite->Pixels)[210]=player->UnitColor3;
+    ((VMemType16*)sprite->Pixels)[211]=player->UnitColor4;
+    break;
+  case 32:
+    ((VMemType32*)sprite->Pixels)[208]=player->UnitColor1;
+    ((VMemType32*)sprite->Pixels)[209]=player->UnitColor2;
+    ((VMemType32*)sprite->Pixels)[210]=player->UnitColor3;
+    ((VMemType32*)sprite->Pixels)[211]=player->UnitColor4;
+    break;
+  }
+}
+
+/**
+**	Change current color set to new player.
+**
+**	@param player	Pointer to player.
+*/
 global void PlayerPixels(const Player* player)
 {
     // FIXME: use function pointer

@@ -97,13 +97,13 @@ global void DisplayPicture(const char *name)
 {
     //Palette palette[256];
     Graphic* title;
-    extern unsigned char PalettePNG[];
+    //unsigned char PalettePNG[256*3];
 
     title=LoadGraphic(name);
     //GetCurrentImagePalette(palette);
     //SetPalette(palette);
     // FIXME: use palette from image
-    memcpy(GlobalPalette,PalettePNG,sizeof(GlobalPalette));
+    memcpy(GlobalPalette,title->Palette,sizeof(GlobalPalette));
     VideoCreatePalette(GlobalPalette);
 
     // FIXME: bigger window ?

@@ -33,6 +33,19 @@
 --	Declarations
 ----------------------------------------------------------------------------*/
 
+struct lnode *PalettePointer;
+
+struct lnode {
+  struct lnode * next;
+  GraphicData * Palette;
+  long checksum;
+};
+
+typedef struct lnode PaletteLink;
+
+PaletteLink * palette_list = NULL;
+
+
 /*----------------------------------------------------------------------------
 --	Externals
 ----------------------------------------------------------------------------*/
@@ -475,6 +488,24 @@ global char* LibraryFileName(const char* file,char* buffer)
     return buffer;
 }
 
+/*
+**  creates a checksum used to compare palettes.
+**  change the method if you have better ideas.
+*/
+local long GetPaletteChecksum(Palette * palette){
+  long retVal = 0;
+  int i;
+  for(i = 0; i < 256; i++){
+    //This is designed to return different values if
+    // the pixels are in a different order.
+    retVal = ((palette[i].r+i)&0xff)+retVal;
+    retVal = ((palette[i].g+i)&0xff)+retVal;
+    retVal = ((palette[i].b+i)&0xff)+retVal;
+  }
+  return retVal;
+}
+
+
 /**
 **	Load graphic from file.
 **
@@ -484,7 +515,10 @@ global char* LibraryFileName(const char* file,char* buffer)
 */
 global Graphic* LoadGraphic(const char* name)
 {
+    PaletteLink * current_link = palette_list, * prev_link = NULL;
+    GraphicData * Pixels;
     Graphic* graphic;
+    long checksum;
     char buf[1024];
 
     // FIXME: I want also support JPG file format!
@@ -493,6 +527,35 @@ global Graphic* LoadGraphic(const char* name)
 	printf("Can't load the graphic `%s'\n",name);
 	exit(-1);
     }
+
+    checksum = GetPaletteChecksum(graphic->Palette);
+    while(current_link != NULL){
+      if(current_link->checksum == checksum)
+	break;
+      prev_link = current_link;
+      current_link = current_link->next;
+    }
+    //Palette Not found
+    if(current_link == NULL){
+      Pixels = VideoCreateNewPalette(graphic->Palette);
+      printf("loading new palette with %s\n",name);
+      if(prev_link == NULL){
+	palette_list = (PaletteLink *)malloc(sizeof(PaletteLink));
+	palette_list->checksum = checksum;
+	palette_list->next = NULL;
+	palette_list->Palette = Pixels;
+      } else {
+	prev_link->next = (PaletteLink *)malloc(sizeof(PaletteLink));
+	prev_link->next->checksum = checksum;
+	prev_link->next->next = NULL;
+	prev_link->next->Palette = Pixels;
+      }
+    } else {
+      Pixels = current_link->Palette;
+    }
+    graphic->Pixels = Pixels;
+    free(graphic->Palette);
+    
     return graphic;
 }
 
