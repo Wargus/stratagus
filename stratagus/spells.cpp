@@ -313,8 +313,13 @@ global void InitSpells()
   while( SpellTypeTable[z].Id != -1 )
     {
     SpellTypeTable[z].Id = z;
+#ifdef WITH_SOUND	// FIXME: no ifdef orgie
     //FIXME: vladi: this won't work 'cos sound init is called after InitSpells()
     SpellTypeTable[z].SoundId = SoundIdForName(SpellTypeTable[z].SoundIdent);
+#else
+    SpellTypeTable[z].SoundId = NULL;
+#endif
+
     if( SpellTypeTable[z].SoundId == NULL )
       {
       DebugLevel0Fn( "cannot get SoundId for `%s'\n", SpellTypeTable[z].SoundIdent ); //FIXME: vladi: some log level func instead of printf?
