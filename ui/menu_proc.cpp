@@ -2568,10 +2568,8 @@ void ProcessMenu(const char* menu_id, int loop)
 	}
 
 	// FIXME: should ExitMenus() be called instead?!?
-	if (Menusbgnd) {
-		VideoFree(Menusbgnd);
-		Menusbgnd = NULL;
-	}
+	FreeGraphic(Menusbgnd);
+	Menusbgnd = NULL;
 }
 
 /**
@@ -2620,10 +2618,7 @@ void InitMenus(int race)
 */
 void ExitMenus(void)
 {
-	if (Menusbgnd) {
-		VideoFree(Menusbgnd);
-		Menusbgnd = NULL;
-	}
+	FreeGraphic(Menusbgnd);
 }
 
 //@}

@@ -204,38 +204,6 @@ void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	VideoDrawSubTrans(graphic, gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
 }
 
-/**
-**  Free graphic object.
-*/
-void VideoFree(Graphic* graphic)
-{
-#ifdef USE_OPENGL
-	if (graphic->Textures) {
-		glDeleteTextures(graphic->NumFrames, graphic->Textures);
-		free(graphic->Textures);
-	}
-#endif
-
-	if (graphic->Surface) {
-		if (graphic->Surface->format->BytesPerPixel == 1) {
-			VideoPaletteListRemove(graphic->Surface);
-		}
-		SDL_FreeSurface(graphic->Surface);
-	}
-#ifndef USE_OPENGL
-	if (graphic->SurfaceFlip) {
-		if (graphic->SurfaceFlip->format->BytesPerPixel == 1) {
-			VideoPaletteListRemove(graphic->SurfaceFlip);
-		}
-		SDL_FreeSurface(graphic->SurfaceFlip);
-	}
-#endif
-	if (graphic->File) {
-		free(graphic->File);
-	}
-	free(graphic);
-}
-
 /*----------------------------------------------------------------------------
 --  Global functions
 ----------------------------------------------------------------------------*/
@@ -670,6 +638,7 @@ void ResizeGraphic(Graphic* g, int w, int h)
 #ifdef USE_OPENGL
 	glDeleteTextures(g->NumFrames, g->Textures);
 	free(g->Textures);
+	g->Textures = NULL;
 	MakeTexture(g);
 #endif
 }

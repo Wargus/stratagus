@@ -2434,7 +2434,7 @@ static int CclDefineMenu(lua_State* l)
 
 			free(menu->Panel);
 			free(menu->Background);
-			VideoSafeFree(menu->BackgroundG);
+			FreeGraphic(menu->BackgroundG);
 			for (i = 0; i < menu->NumItems; ++i) {
 				mitype = menu->Items[i].MiType;
 				if (mitype == MI_TYPE_TEXT) {
