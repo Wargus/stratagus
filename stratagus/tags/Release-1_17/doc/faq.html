@@ -1,0 +1,199 @@
+<HTML><HEAD>
+<!--
+----	$Id$
+
+----	(c) Copyright 2001,2002 by Lutz Sammer
+
+----    FreeCraft is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+
+----    FreeCraft is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+-->
+    <TITLE>FAQ for FreeCraft (fka ALE Clone) Version 1.17</TITLE>
+</HEAD>
+<BODY>
+    <H1>FAQ for FreeCraft (fka ALE Clone) Version 1.17</H1>
+<HR><PRE WIDTH=80>
+     ___________		     _________		      _____  __
+     \_	  _____/______   ____   ____ \_   ___ \____________ _/ ____\/  |_
+      |    __) \_  __ \_/ __ \_/ __ \/    \  \/\_  __ \__  \\   __\\   __\ 
+      |     \   |  | \/\  ___/\  ___/\     \____|  | \// __ \|  |   |  |
+      \___  /   |__|    \___  >\___  >\______  /|__|  (____  /__|   |__|
+	  \/		    \/	   \/	     \/		   \/
+    ______________________                           ______________________
+			  T H E   W A R   B E G I N S
+	   FreeCraft - A free fantasy real time strategy game engine
+</PRE>
+<P><B>(C) Copyright 1998-2002 by The FreeCraft Project. Distributed under the
+<A HREF="gpl.html">"GNU General Public License"</A></B>
+<HR>
+
+For any questions not mentioned here, please contact
+<A HREF="mailto:aleclone@FreeCraft.org"> aleclone@FreeCraft.org</A>.<P>
+
+<DL>
+<P>
+<DT><FONT COLOR="#FF0000">Q: I was playing in 800x600 mode, and the graphics around the edge didn't paint the full screen?</FONT>
+<DD>A: The original graphics aren't designed for this resolutions, you could
+    design your own user interface, see "data/ccl/ui.ccl".
+<P>
+<DT><FONT COLOR="#FF0000">Q: The graphics didn't fit on 800x600 or higher resolution?</FONT>
+<DD>A: The original graphics aren't designed for this resolutions, you could
+    design your own user interface, see "data/ccl/ui.ccl".
+<P>
+<DT><FONT COLOR="#FF0000">Q: I get the error "gzseek already defined or undefined!", what should I do?</FONT>
+<DD>A: You have an incompatible libpng version, better you install the latest
+libpng1.0.X. You get it here:
+    <A HREF="ftp://swrinde.nde.swri.edu/pub/png/">SwRI</A>
+<P>
+<DT><FONT COLOR="#FF0000">Q: The software cursor is too slow, how can I get it quicker?</FONT>
+
+<DD>A: I will improve the speed later, but I was told:<BR>
+Using Accelerated X on a Pentium 75 FreeCraft is now playable.
+<P>
+<DT><FONT COLOR="#FF0000">Q: Did FreeCraft work with ALSA?</FONT>
+
+<DD>A: Yes, FreeCraft works with the Advanced Linux Sound Architecture (ALSA) - Driver.
+I have tested it with version 0.3.2 - 0.9.0.<P>
+More informations <A HREF="http://www.alsa-project.org">
+http://www.alsa-project.org</A><P>
+<P>
+<DT><FONT COLOR="#FF0000">Q: How did I get big maps?</FONT>
+
+<DD>A: If you want a map of the size 256 x 256.
+Create and edit 4 maps (128 x 128) in the original editor.
+Save them as bigmap1.pud, bigmap2.pud, bigmap3.pud and bigmap4.pud.
+Now create a file bigmap.cm containing:
+<P><PRE>
+	(define-map 256 256)
+	(load-pud "bigmap1.pud")
+	(load-pud "bigmap2.pud")
+	(load-pud "bigmap3.pud")
+	(load-pud "bigmap4.pud")
+</PRE><P>
+If you now load this file as map (freecraft bigmap.cm), you see this big map.
+bigmap1.pud is in the upper left corner.
+bigmap2.pud is in the upper right corner.
+bigmap3.pud is in the lower left corner.
+bigmap4.pud is in the lower right corner.
+<P>
+CraftED - The FreeCraft map editor, also supports the creation of big maps.
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I use the original without expansion?</FONT>
+
+<DD>A: There are only more graphics and sounds in the expansion CD version.
+Me was told, it works without problems with the german version. Just try it.
+With the new versions this should work without problems.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I have tried to start a level with
+    './freecraft data/puds/internal/internal01.pud.gz' and I only get this
+    error message 'pud: fopen,gzopen,bzopen(): No such file or directory'.
+    What do I wrong?
+    </FONT>
+<DD>A: We have changed the loading syntax:
+    <UL>
+    <LI>file.pud loads relative from $CLONE_LIB_PATH (in my source "data").
+    <LI>./file.pud loads relative from the current directory.
+    <LI>/file.pud loads absolute from the root directory.
+    </UL>
+    This means you must type './freecraft ./data/puds/internal/internal01.pud.gz'!
+<P>
+<DT><FONT COLOR="#FF0000">
+    Q: Why did the mouse react after seconds on my moves?</FONT>
+<DD>A: I didn't found the real problem. Currently use the threaded sound
+    support and enable it (in data/ccl/sound.ccl) or and add to the line
+<P>
+DFLAGS= $(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) \
+	$(DEBUG)
+<P>
+"-DSLOW_INPUT" in Rules.make.
+<P>
+<DT><FONT COLOR="#FF0000">Q: I want play but do not want use CD...  can i copy files from cd to hdd ?
+    What i have to copy ?</FONT>
+<DD>A: After running 'build.bat' (WINDOWS) or 'build.sh' (UNIX) the CD isn't
+    longer needed. This script converts the data on CD into our own format.
+    <BR>
+    A: You didn't need to copy, the installation did it for you.
+<P>
+<DT><FONT COLOR="#FF0000">
+    Q: Why did the game becomes very slow under X11?</FONT>
+<DD>A: Give your X11 server a higher priority than the clients.<P>
+    renice -5 &lt;pid-of-your-x11-server&gt;<P>
+    newer linux distributions (debian) does this automatic.<P>
+    or start freecraft with<P>
+    nice -n 5 ./freecraft
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I use FreeCraft to join in an original network game?</FONT>
+<DD>A: Sorry, FreeCraft use its own network protocol. You can only play
+    with FreeCraft against other FreeCrafts.
+<P>
+<DT><FONT COLOR="#FF0000">Q: It is planned to support playing against the original in network game?</FONT>
+<DD>A: The both network protocols are that way, that this is impossible.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I only have the original BNE version, can I use it?</FONT>
+<DD>A: No. Until now nobody has written a converter for this, if you want to
+	write it, please contact me. It is only a question of time and you
+	must understand writting C.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: I get only a black window, after I have installed
+	it on windows. What have I done wrong?</FONT>
+<DD>A: Try installing FreeCraft to C:\.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with VC++?</FONT>
+<DD>A: Yes. Follow the instructions in <A HREF="development.html">
+development.html</A>. But mingw32 is better supported and regular tested.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I compile FreeCraft with Borland C++?</FONT>
+<DD>A: This C compiler isn't support yet, you can build a project and
+write the instrutions and than mail it to us.<P>
+
+But you can use <A HREF="http://sources.redhat.com/cygwin/">cygwin</A> or
+<A HREF="http://www.mingw.org">MinGW</A> both are GNU C compilers for windows.
+<P>
+
+<A HREF="http://www.libsdl.org/Xmingw32/">
+http://www.libsdl.org/Xmingw32/</A><P>
+Informations how to use MingGW and libSDL for cross development and native
+development.<P>
+<A HREF="http://www.libsdl.org/Xmingw32/mingw32.zip">
+http://www.libsdl.org/Xmingw32/mingw32.zip</A><P>
+Compiler packet for windows, build by Sam Lantinga.<P>
+
+<A HREF="http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip">
+http://prdownloads.sourceforge.net/freecraft/freecraft-compiler-020322.zip</A><P>
+
+Based on above this is my build. Contains SDL 1.2.4, libpng, zlib and zziplib.
+Install this and download the newest FreeCraft source and start FreeCraft
+development with windows.<P>
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: What port or ports did FreeCraft use for network play?</FONT>
+<DD>A: As default is only the port 6660 UDP used on client and server side.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: When I start FreeCraft there are some fields gray, did I something wrong?</FONT>
+<DD>A: No. The gray menu entries are planned features, which aren't finished yet. You are welcome to write it.
+
+<P>
+<DT><FONT COLOR="#FF0000">Q: Can I save and load a game?</FONT>
+<DD>A: No. Sorry Load+Save aren't yet written.
+
+<P>
+
+
+</DL>
+
+<HR>
+Last changed: $Id$<BR>
+All trademarks and copyrights on this page are owned by their respective owners.
+<ADDRESS><A HREF="mailto:aleclone@FreeCraft.org">The FreeCraft Project</A>
+</ADDRESS></BODY></HTML>
