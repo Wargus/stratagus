@@ -192,6 +192,8 @@ global void SaveAll(void)
     SaveUpgrades(file);
     SaveDependencies(file);
     SaveButtons(file);
+    SaveMissileTypes(file);
+    SaveMissiles(file);
     SaveTileset(file);
     SaveMap(file);
 

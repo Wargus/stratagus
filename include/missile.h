@@ -43,7 +43,7 @@
 typedef struct _missile_type_ MissileType;
 
 /**
-**	Base structure of missile types
+**	Base structure of missile-types
 */
 struct _missile_type_ {
     const void*	OType;			/// Object type (future extensions)
@@ -54,21 +54,19 @@ struct _missile_type_ {
     unsigned	Width;			/// missile width in pixels
     unsigned	Height;			/// missile height in pixels
 
-//  SoundConfig FiredSound;		/// fired sound (FIXME: must write this)
-    SoundConfig	ImpactSound;		/// impact sound for this missile type
+	// FIXME: FireSound defined but not used!
+    SoundConfig FiredSound;		/// fired sound
+    SoundConfig	ImpactSound;		/// impact sound for this missile-type
 
     int		Class;			/// missile class
     int		Speed;			/// missile speed
 
-    char*	ImpactName;		/// Impact missile type name
+    char*	ImpactName;		/// Impact missile-type name
     MissileType*ImpactMissile;		/// Missile produces an impact
 
 // --- FILLED UP ---
     Graphic*	Sprite;			/// missile sprite image
 };
-
-    /// how many missile type are maximal supported
-#define MissileTypeMax			0x22
 
     /// mark a free missile slot
 #define MissileFree			(MissileType*)0
@@ -91,7 +89,7 @@ struct _missile_ {
     int		Y;			/// missile pixel position
     int		DX;			/// missile pixel destination
     int		DY;			/// missile pixel destination
-    MissileType*Type;			/// missile type pointer
+    MissileType*Type;			/// missile-type pointer
     int		Frame;			/// frame counter
     int		State;			/// state
     int		Wait;			/// delay
@@ -115,23 +113,31 @@ struct _missile_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern MissileType MissileTypes[];	/// all missile types
-extern MissileType* MissileTypeSmallFire;	/// Small fire missile type
-extern MissileType* MissileTypeBigFire;		/// Big fire missile type
-extern MissileType* MissileTypeGreenCross;	/// Green cross missile type
-
 extern char** MissileTypeWcNames;	/// Mapping wc-number 2 symbol
+
+extern MissileType* MissileTypes;		/// all missile-types
+extern MissileType* MissileTypeSmallFire;	/// Small fire missile-type
+extern MissileType* MissileTypeBigFire;		/// Big fire missile-type
+extern MissileType* MissileTypeGreenCross;	/// Green cross missile-type
+
+extern const char* MissileClassNames[];		/// Missile class names
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
+// 	In ccl_missile.c
+
     /// register ccl features
 extern void MissileCclRegister(void);
 
+// 	In missile.c
+
     /// load the graphics for the missiles
 extern void LoadMissileSprites(void);
-    /// Get missile type by ident.
+    /// allocate an empty missile-type slot
+extern MissileType* NewMissileTypeSlot(char*);
+    /// Get missile-type by ident.
 extern MissileType* MissileTypeByIdent(const char*);
     /// create a missile
 extern Missile* MakeMissile(MissileType*,int,int,int,int);
@@ -143,6 +149,11 @@ extern void DrawMissiles(void);
 extern void MissileActions(void);
     /// distance from view point to missile
 extern int ViewPointDistanceToMissile(const Missile*);
+
+    /// Save missile-types
+extern void SaveMissileTypes(FILE*);
+    /// Save missiles
+extern void SaveMissiles(FILE*);
 
 //@}
 
