@@ -1621,6 +1621,7 @@ local SCM CclDefineMenuItem(SCM list)
 		}
 	    }
 	} else if( gh_eq_p(value,gh_symbol2scm("font")) ) {
+	    // FIXME: should use the names of the real fonts.
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    if( gh_eq_p(value,gh_symbol2scm("small")) ) {
@@ -1629,9 +1630,9 @@ local SCM CclDefineMenuItem(SCM list)
 		item->font=GameFont;
 	    } else if( gh_eq_p(value,gh_symbol2scm("large")) ) {
 		item->font=LargeFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("smallTitle")) ) {
+	    } else if( gh_eq_p(value,gh_symbol2scm("small-title")) ) {
 		item->font=SmallTitleFont;
-	    } else if( gh_eq_p(value,gh_symbol2scm("largeTitle")) ) {
+	    } else if( gh_eq_p(value,gh_symbol2scm("large-title")) ) {
 		item->font=LargeTitleFont;
 	    } else {
 		s1=gh_scm2newstr(value,NULL);
