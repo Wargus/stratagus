@@ -475,7 +475,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //
     if( x>TheUI.MapX && x<TheUI.MapEndX &&
 		y+8>TheUI.MapY && y+8<TheUI.MapEndY ) {
-	DrawNumber(x+1,y+1,GameFont,unit->Refs);
+	VideoDrawNumber(x+1,y+1,GameFont,unit->Refs);
     }
 #endif
 
@@ -764,7 +764,7 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	// FIXME: should use FontHeight(GameFont);
 	if( x>TheUI.MapX && x+f<TheUI.MapEndX && y>TheUI.MapY
 		&& y+14<TheUI.MapEndY ) {
-	    DrawNumber(x,y,GameFont,unit->GroupId);
+	    VideoDrawNumber(x,y,GameFont,unit->GroupId);
 	}
     }
 }

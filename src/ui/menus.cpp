@@ -836,10 +836,10 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
     }
     if (text) {
 	if (button != MBUTTON_FOLDER) {
-	    DrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
+	    VideoDrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
 	} else {
 	    SetDefaultTextColors(nc,rc);
-	    DrawText(x+44,y+6,font,text);
+	    VideoDrawText(x+44,y+6,font,text);
 	}
     }
     if (flags&MenuButtonSelected) {
@@ -887,7 +887,7 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 		    SetDefaultTextColors(rc,rc);
 		else
 		    SetDefaultTextColors(nc,rc);
-		DrawText(x+2,y+2 + oh*i ,mi->font,text);
+		VideoDrawText(x+2,y+2 + oh*i ,mi->font,text);
 	    }
 	}
 	w += 2;
@@ -916,7 +916,7 @@ local void DrawPulldown(Menuitem *mi, unsigned mx, unsigned my)
 	}
 	text = mi->d.pulldown.options[mi->d.pulldown.curopt];
 	if (text) {
-	    DrawText(x+2,y+2,mi->font,text);
+	    VideoDrawText(x+2,y+2,mi->font,text);
 	}
     }
     if (flags&MenuButtonSelected) {
@@ -969,7 +969,7 @@ local void DrawListbox(Menuitem *mi, unsigned mx, unsigned my)
 			SetDefaultTextColors(rc,rc);
 		    else
 			SetDefaultTextColors(nc,rc);
-		    DrawText(x+2,y+2 + 18*i ,mi->font,text);
+		    VideoDrawText(x+2,y+2 + 18*i ,mi->font,text);
 		}
 	    }
 	}
@@ -1099,7 +1099,7 @@ local void DrawInput(Menuitem *mi, unsigned mx, unsigned my)
     PopClipping();
     text = mi->d.input.buffer;
     if (text) {
-	DrawText(x+2,y+2,mi->font,text);
+	VideoDrawText(x+2,y+2,mi->font,text);
     }
     if (flags&MenuButtonSelected) {
 	if (flags&MenuButtonDisabled) {
@@ -1168,14 +1168,14 @@ global void DrawMenu(int MenuId)
 	switch (mi->mitype) {
 	    case MI_TYPE_TEXT:
 		if (mi->d.text.tflags&MI_TFLAGS_CENTERED)
-		    DrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
+		    VideoDrawTextCentered(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		else if (mi->d.text.tflags&MI_TFLAGS_RALIGN) {
 		    l = TextLength(mi->font,mi->d.text.text);
-		    DrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
+		    VideoDrawText(menu->x+mi->xofs-l,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		} else
-		    DrawText(menu->x+mi->xofs,menu->y+mi->yofs,
+		    VideoDrawText(menu->x+mi->xofs,menu->y+mi->yofs,
 			    mi->font,mi->d.text.text);
 		break;
 	    case MI_TYPE_BUTTON:
@@ -1257,8 +1257,8 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     GetDefaultTextColors(&nc, &rc);
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
-    DrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
-    DrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
+    VideoDrawTextCentered(VideoWidth/2, OffsetY + 440, GameFont, NameLine);
+    VideoDrawTextCentered(VideoWidth/2, OffsetY + 456, GameFont,
 	"Distributed under the terms of the GNU General Public License.");
     SetDefaultTextColors(nc, rc);
 }
@@ -1648,20 +1648,20 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 		if ((info = fl[i].xdata)) {
 		    menu = Menus + MENU_SCEN_SELECT;
 		    if (info->Description) {
-			DrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
+			VideoDrawText(menu->x+8,menu->y+254,LargeFont,info->Description);
 		    }
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
-		    DrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
+		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
 		    for (n = j = 0; j < 16; j++) {
 			if (info->PlayerType[j] == PlayerHuman) {
 			    n++;
 			}
 		    }
 		    if (n == 1) {
-			DrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
 		    } else {
 			sprintf(buffer, "%d players", n);
-			DrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+			VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
 		    }
 		}
 	    }
@@ -1878,14 +1878,14 @@ local void GameDrawFunc(Menuitem *mi)
     StartMenusSetBackground(mi);
     SetDefaultTextColors(rc, rc);
     l = TextLength(GameFont, "Scenario:");
-    DrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
-    DrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
+    VideoDrawText(OffsetX + 16, OffsetY + 360, GameFont, "Scenario:");
+    VideoDrawText(OffsetX + 16, OffsetY + 360+24 , GameFont, ScenSelectFileName);
     if (ScenSelectPudInfo) {
 	if (ScenSelectPudInfo->Description) {
-	    DrawText(OffsetX + 16 + l + 8, OffsetY + 360, GameFont, ScenSelectPudInfo->Description);
+	    VideoDrawText(OffsetX + 16 + l + 8, OffsetY + 360, GameFont, ScenSelectPudInfo->Description);
 	}
 	sprintf(buffer, " (%d x %d)", ScenSelectPudInfo->MapWidth, ScenSelectPudInfo->MapHeight);
-	DrawText(OffsetX + 16+l+8+TextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
+	VideoDrawText(OffsetX + 16+l+8+TextLength(GameFont, ScenSelectFileName), OffsetY + 360+24, GameFont, buffer);
     }
 #if 0
     for (n = j = 0; j < 16; j++) {
@@ -1894,10 +1894,10 @@ local void GameDrawFunc(Menuitem *mi)
 	}
     }
     if (n == 1) {
-	DrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
+	VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,"1 player");
     } else {
 	sprintf(buffer, "%d players", n);
-	DrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
+	VideoDrawText(menu->x+8,menu->y+254+40,LargeFont,buffer);
     }
 #endif
     SetDefaultTextColors(nc, rc);
@@ -2157,7 +2157,7 @@ local void NetMultiPlayerDrawFunc(Menuitem *mi)
     GetDefaultTextColors(&nc, &rc);
     SetDefaultTextColors(rc, rc);
     DebugLevel3Fn("Hosts[%d].PlyName = %s\n", i, Hosts[i].PlyName);
-    DrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
+    VideoDrawText(mi->xofs, mi->yofs, GameFont, Hosts[i].PlyName);
     
     SetDefaultTextColors(nc, rc);
 }

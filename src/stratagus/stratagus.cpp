@@ -155,7 +155,7 @@ extern int optind;
 #endif
 
 #ifdef __MINGW32__
-#include <SDL/SDL.h>
+#include <SDL.h>
 extern int opterr;
 extern int optind;
 extern int optopt;
@@ -353,13 +353,13 @@ local void WaitForInput(int timeout)
     //
     //	FIXME: more work needed, scrolling credits, animations, ...
     VideoLockScreen();
-    //DrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
-    DrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
+    //VideoDrawTextCentered(VideoWidth/2,5,LargeTitleFont,"Press SPACE to continue.");
+    VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"Press SPACE to continue.");
 #ifdef linux
     ddfile=popen("`which ddate`","r");
     fgets(ddate,72,ddfile);
     pclose(ddfile);
-    DrawTextCentered(VideoWidth/2,20,LargeFont,ddate);
+    VideoDrawTextCentered(VideoWidth/2,20,LargeFont,ddate);
 #endif
     VideoUnlockScreen();
     Invalidate();
@@ -372,7 +372,7 @@ local void WaitForInput(int timeout)
     }
 
     VideoLockScreen();
-    DrawTextCentered(VideoWidth/2,5,LargeFont,"----------------------------");
+    VideoDrawTextCentered(VideoWidth/2,5,LargeFont,"----------------------------");
     VideoUnlockScreen();
     Invalidate();
     RealizeVideoMemory();

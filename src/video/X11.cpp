@@ -1410,7 +1410,7 @@ global void CheckVideoInterrupts(void)
     if( VideoInterrupts ) {
         //DebugLevel1("Slow frame\n");
 	IfDebug(
-	    DrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+	    VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
 	    XClearArea(TheDisplay,TheMainWindow
 		,TheUI.MapX+10,TheUI.MapX+10,13*13,13
 		,False);
