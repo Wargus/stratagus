@@ -402,11 +402,11 @@ global void CleanAi(void)
 		AiUnitType* aut;
 		AiUnit* aiunit;
 
-		for( aut=AiPlayer->Force[i].UnitTypes; aut; aut=temp ) {
+		for( aut=pai->Force[i].UnitTypes; aut; aut=temp ) {
 		    temp=aut->Next;
 		    free(aut);
 		}
-		for( aiunit=AiPlayer->Force[i].Units; aiunit; aiunit=temp ) {
+		for( aiunit=pai->Force[i].Units; aiunit; aiunit=temp ) {
 		    temp=aiunit->Next;
 		    free(aiunit);
 		}
