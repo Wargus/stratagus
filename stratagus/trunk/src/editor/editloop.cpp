@@ -1564,7 +1564,7 @@ local void CreateEditor(void)
     if (!*CurrentMapPath) {		// new map!
 	InitUnitTypes();
 	UpdateStats();
-
+#if 0
 	//
 	//      Inititialize TheMap / Players.
 	//
@@ -1573,10 +1573,10 @@ local void CreateEditor(void)
 	TheMap.Info = calloc(1, sizeof(MapInfo));
 	TheMap.Info->Description = strdup("http://FreeCraft.Org");
 	TheMap.Info->MapTerrain = 0;
+	TheMap.Info->MapWidth = TheMap.Info->MapHeight = 256;
+#endif
 	TheMap.Info->MapTerrainName =
 	    strdup(Tilesets[TheMap.Info->MapTerrain]->Ident);
-	TheMap.Info->MapWidth = TheMap.Info->MapHeight = 256;
-
 	for (i = 0; i < PlayerMax; ++i) {
 	    if (i == PlayerNumNeutral) {
 		CreatePlayer(PlayerNeutral);
