@@ -300,6 +300,7 @@ local void HandleUnitAction(Unit* unit)
 	    for ( z = 0; z < unit->OrderCount; z++ ) {
 		unit->Orders[z] = unit->Orders[z+1];
 	    }
+	    memset(unit->Orders+z,0,sizeof(*unit->Orders));
 
 	    //
 	    //	Note subaction 0 should reset.
