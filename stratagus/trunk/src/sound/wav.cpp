@@ -294,11 +294,8 @@ global Sample* LoadWav(const char* name, int flags __attribute__((unused)))
 	    DebugLevel3("Magic: $%x\n" _C_ chunk.Magic);
 	    DebugLevel3("Length: %d\n" _C_ chunk.Length);
 	    if (chunk.Magic != DATA) {
-		// FIXME: cleanup the wav files, remove this junk, and don't support
-		// FIXME: this!!
-		DebugLevel3("Wrong magic %x (not %x)\n" _C_ chunk.Magic _C_ DATA);
-		DebugLevel3("Junk at end of file\n");
-		break;
+		CLseek(f, chunk.Length, SEEK_CUR);
+		continue;
 	    }
 
 	    i = chunk.Length;
