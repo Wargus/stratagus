@@ -172,7 +172,6 @@ void UpdateStats(int reset)
 				stats->Armor = type->_Armor;
 				stats->BasicDamage = type->_BasicDamage;
 				stats->PiercingDamage = type->_PiercingDamage;
-				stats->Speed = type->_Speed;
 				stats->HitPoints = type->_HitPoints;
 				for (i = 0; i < MaxCosts; ++i) {
 					stats->Costs[i] = type->_Costs[i];
@@ -557,7 +556,6 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	Assert(plynr < PlayerMax);
 	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
 	CLprintf(file, "\"level\", %d, ", stats->Level);
-	CLprintf(file, "\"speed\", %d, ", stats->Speed);
 	CLprintf(file, "\"attack-range\", %d, ", stats->AttackRange);
 	CLprintf(file, "\"sight-range\", %d,\n  ", stats->SightRange);
 	CLprintf(file, "\"armor\", %d, ", stats->Armor);

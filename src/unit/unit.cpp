@@ -3184,7 +3184,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	// Attack units in range (which or the attacker?)
 	//
 	if (attacker && !type->Coward) {
-		if (type->CanAttack && target->Stats->Speed) {
+		if (type->CanAttack && !target->Type->Building) {
 			if (RevealAttacker && CanTarget(target->Type, attacker->Type)) {
 				// Reveal Unit that is attacking
 				goal = attacker;

@@ -271,7 +271,7 @@ static void MoveToTarget(Unit* unit)
 					unit->Stats->AttackRange) {
 				// Reached another unit, now attacking it
 				unit->State = 0;
-				if (unit->Stats->Speed) {
+				if (!unit->Type->Building) {
 					UnitHeadingFromDeltaXY(unit,
 						goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 						goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);
@@ -288,7 +288,7 @@ static void MoveToTarget(Unit* unit)
 						unit->Stats->AttackRange) {
 				// Reached wall or ground, now attacking it
 				unit->State = 0;
-				if (unit->Stats->Speed) {
+				if (!unit->Type->Building) {
 					UnitHeadingFromDeltaXY(unit, unit->Orders[0].X - unit->X,
 						unit->Orders[0].Y - unit->Y);
 				}
@@ -485,7 +485,7 @@ static void AttackTarget(Unit* unit)
 		//
 		// Turn always to target
 		//
-		if (unit->Stats->Speed && goal) {
+		if (!unit->Type->Building && goal) {
 			UnitHeadingFromDeltaXY(unit,
 				goal->X + (goal->Type->TileWidth - 1) / 2 - unit->X,
 				goal->Y + (goal->Type->TileHeight - 1) / 2 - unit->Y);

@@ -231,7 +231,7 @@ void HandleActionFollow(Unit* unit)
 		// If don't set the goal, the unit can than choose a
 		//  better goal if moving nearer to enemy.
 		//
-		if (unit->Type->CanAttack && unit->Stats->Speed &&
+		if (unit->Type->CanAttack &&
 				(!goal || goal->Orders[0].Action == UnitActionAttack ||
 					goal->Orders[0].Action == UnitActionStill)) {
 			goal = AttackUnitsInReactRange(unit);

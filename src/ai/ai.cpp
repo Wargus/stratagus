@@ -1392,8 +1392,8 @@ static void AiMoveUnitInTheWay(Unit* unit)
 			continue;
 		}
 
-
-		if (!blockertype->_Speed || blockertype->Building) {
+		// FIXME : check movement from animation
+		if (blockertype->Building) {
 			continue;
 		}
 

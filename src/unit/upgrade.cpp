@@ -59,7 +59,7 @@
 
 struct _unit_type_;
 
-static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int, int,
+static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int,
 	int*, const int[UnitTypeMax], const char*, const char*, struct _unit_type_*);
 
 static void AllowUnitId(Player* player, int id, int units);
@@ -597,7 +597,6 @@ static int CclDefineModifier(lua_State* l)
 	int basic_damage;
 	int piercing_damage;
 	int armor;
-	int speed;
 	int regeneration_rate;
 	int hit_points;
 	int costs[MaxCosts];
@@ -616,7 +615,6 @@ static int CclDefineModifier(lua_State* l)
 	basic_damage = 0;
 	piercing_damage = 0;
 	armor = 0;
-	speed = 0;
 	hit_points = 0;
 	regeneration_rate = 0;
 	memset(costs, 0, sizeof(costs));
@@ -655,10 +653,6 @@ static int CclDefineModifier(lua_State* l)
 		} else if (!strcmp(temp, "armor")) {
 			lua_rawgeti(l, j + 1, 2);
 			armor = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(temp, "speed")) {
-			lua_rawgeti(l, j + 1, 2);
-			speed = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(temp, "hit-points")) {
 			lua_rawgeti(l, j + 1, 2);
@@ -726,7 +720,7 @@ static int CclDefineModifier(lua_State* l)
 	}
 
 	AddUpgradeModifierBase(uid, attack_range, sight_range, basic_damage,
-		piercing_damage, armor, speed, hit_points, regeneration_rate, costs,
+		piercing_damage, armor, hit_points, regeneration_rate, costs,
 		units, upgrades, apply_to,convert_to);
 
 	return 0;
@@ -932,7 +926,6 @@ void UpgradesCclRegister(void)
 **  @param basic_damage       Basic damage modification.
 **  @param piercing_damage    Piercing damage modification.
 **  @param armor              Armor modification.
-**  @param speed              Speed modification (Currently not possible).
 **  @param hit_points         Hitpoint modification.
 **  @param regeneration_rate  Regenerations modification.
 **  @param costs              Costs modification.
@@ -945,7 +938,7 @@ void UpgradesCclRegister(void)
 **                          (actually this id is useless, just error checking)
 */
 static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
-	int basic_damage, int piercing_damage, int armor, int speed,
+	int basic_damage, int piercing_damage, int armor,
 	int hit_points, int regeneration_rate, int* costs,
 	const int units[UnitTypeMax],
 	const char* af_upgrades, const char* apply_to, UnitType* convert_to)
@@ -966,7 +959,6 @@ static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	um->Modifier.BasicDamage      = basic_damage;
 	um->Modifier.PiercingDamage   = piercing_damage;
 	um->Modifier.Armor            = armor;
-	um->Modifier.Speed            = speed;
 	um->Modifier.HitPoints        = hit_points;
 	um->Modifier.RegenerationRate = regeneration_rate;
 
@@ -991,7 +983,7 @@ static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 ** useless, just error checking)
 */
 static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
-	int basic_damage, int piercing_damage, int armor, int speed,
+	int basic_damage, int piercing_damage, int armor,
 	int hit_points, int* costs,
 	const int units[UnitTypeMax],
 	// following are comma separated list of required string id's
@@ -1017,7 +1009,6 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 	um->Modifier.BasicDamage    = basic_damage;
 	um->Modifier.PiercingDamage = piercing_damage;
 	um->Modifier.Armor          = armor;
-	um->Modifier.Speed          = speed;
 	um->Modifier.HitPoints      = hit_points;
 
 	for (i = 0; i < MaxCosts; ++i) {
@@ -1258,7 +1249,6 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			UnitTypes[z]->Stats[pn].BasicDamage += um->Modifier.BasicDamage;
 			UnitTypes[z]->Stats[pn].PiercingDamage += um->Modifier.PiercingDamage;
 			UnitTypes[z]->Stats[pn].Armor += um->Modifier.Armor;
-			UnitTypes[z]->Stats[pn].Speed += um->Modifier.Speed;
 			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.HitPoints;
 			UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.RegenerationRate;
 
