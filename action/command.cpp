@@ -956,7 +956,7 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
 #ifdef NEW_ORDERS
     Order* order;
 
-    DebugLevel0Fn("FIXME: must support order queing!!");
+    DebugLevel0Fn("FIXME: must support order queing!!\n");
     order=GetNextOrder(unit,1);		// Flush them.
 
     order->Action=UnitActionResearch;
@@ -969,7 +969,7 @@ global void CommandResearch(Unit* unit,Upgrade* what,int flush)
     unit->NextCount=1;
     unit->NextFlush=1;
 
-    DebugLevel0Fn("FIXME: must support command queing!!");
+    DebugLevel0Fn("FIXME: must support command queing!!\n");
     unit->NextCommand[0].Action=UnitActionResearch;
     unit->NextCommand[0].Data.Research.Ticks=0;
     unit->NextCommand[0].Data.Research.What=what;
