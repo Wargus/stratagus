@@ -169,8 +169,10 @@ global void HandleActionSpellCast(Unit * unit)
 	    unit->Wait = 1;
 	    if (unit->Orders[0].Goal) {
 		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		unit->Orders[0].Goal->Refs--;
-		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
+		if (!--unit->Orders[0].Goal->Refs) {
+		    RefsDebugCheck(!unit->Orders[0].Goal->Destroyed);
+		    ReleaseUnit(unit->Orders[0].Goal);
+		}
 		unit->Orders[0].Goal=NoUnitP;
 	    }
 	}
