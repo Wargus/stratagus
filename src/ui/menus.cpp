@@ -1742,12 +1742,7 @@ local void GameMenuLoad(void)
 global void SoundOptions(void)
 {
     int i = 17;
-#if !defined(USE_SDLCD) && !defined(USE_LIBCDA)
-    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
-#else
-    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
-	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
-#endif
+    
     if (SoundFildes != -1)
 	SoundOptionsMenuItems[5].d.gem.state = MI_GSTATE_CHECKED;
     else
@@ -1763,6 +1758,10 @@ global void SoundOptions(void)
 #if defined(USE_LIBCDA) || defined(USE_SDLCD)
     cd_get_volume(&i, &i);
     SoundOptionsMenuItems[14].d.hslider.percent = (i * 100) / 255;
+    if (strcmp(":off", CDMode) && strcmp(":stopped", CDMode))
+	SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_CHECKED;
+#else
+    SoundOptionsMenuItems[i].d.gem.state = MI_GSTATE_UNCHECKED;
 #endif
 
     ProcessMenu(MENU_SOUND_OPTIONS, 1);    
@@ -2762,28 +2761,26 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing master volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2804,28 +2801,26 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing music volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2847,28 +2842,26 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent += 10;
 		if (mi[1].d.hslider.percent > 100)
 		    mi[1].d.hslider.percent = 100;
-		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 	    } else if (mi[1].d.hslider.cflags&MI_CFLAGS_LEFT) {
 		DebugLevel0Fn("Decreasing cd volume\n");
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
 	    }
+	    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 	    break;
 	case 1:		// mouse - move
 	    if (mi[1].d.hslider.cflags&MI_CFLAGS_KNOB && (mi[1].flags&MenuButtonClicked)) {
 		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		}
 		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		cd_set_volume((mi[1].d.hslider.percent * 255) / 100,(mi[1].d.hslider.percent * 255) / 100);
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
