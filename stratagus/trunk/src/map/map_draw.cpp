@@ -1630,7 +1630,11 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 		//
 		if( *redraw_tile++ ) {
 		    // FIXME: unexplored fields could be drawn faster
-		    MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
+		    if( ReplayRevealMap ) {
+			MapDrawTile(TheMap.Fields[sx].Tile,dx,dy);
+		    } else {
+			MapDrawTile(TheMap.Fields[sx].SeenTile,dx,dy);
+		    }
 
 		// StephanR: debug-mode denote tiles that are redrawn
 #if NEW_MAPDRAW > 1

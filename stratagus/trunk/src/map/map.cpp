@@ -51,6 +51,7 @@
 
 global WorldMap TheMap;			/// The current map
 global int FlagRevealMap;		/// Flag must reveal the map
+global int ReplayRevealMap;		/// Reveal Map is replay
 
 /*----------------------------------------------------------------------------
 --	Visibile and explored handling
@@ -656,6 +657,7 @@ global void CleanMap(void)
     FreeMapInfo(TheMap.Info);
     memset(&TheMap, 0, sizeof(TheMap));
     FlagRevealMap = 0;
+    ReplayRevealMap = 0;
 
     DestroyMinimap();
 
