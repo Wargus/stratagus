@@ -628,12 +628,32 @@ global int AStarNextPathElement(Unit* unit,int* pxd,int *pyd)
 */
 global int NextPathElement(Unit* unit,int* pxd,int *pyd)
 {
+    static int LastFrameCounter;
+    static int UnreachableCounter;
+    int result;
+
+    //
+    //	Reduce the load, stop handling pathes if too many UNREACHABLE results.
+    //
+    if( FrameCounter!=LastFrameCounter ) {
+	LastFrameCounter=FrameCounter;
+	UnreachableCounter=3;
+    }
+    if( !UnreachableCounter ) {
+	DebugLevel0Fn("Done too much %d.\n",UnitNumber(unit));
+	return PF_WAIT;
+    }
+
     // Convert old version to new version
     if(AStarOn) {
-	return AStarNextPathElement(unit,pxd,pyd);
+	result=AStarNextPathElement(unit,pxd,pyd);
     } else {
-	return NewPath(unit,pxd,pyd);
+	result=NewPath(unit,pxd,pyd);
     }
+    if( result==PF_UNREACHABLE ) {
+	--UnreachableCounter;
+    }
+    return result;
 }
 
 //@}
