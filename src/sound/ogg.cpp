@@ -34,12 +34,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
 #include "stratagus.h"
 
 #ifdef USE_OGG		// {
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #ifdef BSD
 #include <inttypes.h>
@@ -87,7 +87,6 @@ typedef struct _ogg_data_ {
 */
 local size_t OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
-DebugCheck(1);
 	return CLread(user, ptr, size * nmemb) / size;
 }
 
@@ -98,57 +97,45 @@ DebugCheck(1);
 **  @param offset  Seek offset.
 **  @param whence  How to seek.
 **
-**  @return        Seek position, -1 if failure.
+**  @return        Seek position, -1 if non-seeking.
 */
 local int OGG_seek(void* user, int64_t offset, int whence)
 {
-DebugCheck(1);
 	return CLseek(user, offset, whence);
 }
 
 /**
-**		OGG vorbis close callback.
+**  OGG vorbis close callback.
 **
-**		@param user				User argument.
+**  @param user  User argument.
 **
-**		@return						Success status.
+**  @return      Success status.
 */
 local int OGG_close(void* user)
 {
-DebugCheck(1);
 	return CLclose(user);
 }
 
-/**
-**		OGG vorbis tell callback.
-** 
-**		@param user				User argument.
-**
-**		@return						Current seek postition.
-*/
-local long OGG_tell(void* user)
+static long OGG_tell(void* user)
 {
-DebugCheck(1);
-	return CLseek(user, 0, SEEK_CUR);
+	return CLtell(user);
 }
 
-
 /**
-**		Type member function to read from the ogg file
+**  Type member function to read from the ogg file
 **
-**		@param sample			Sample reading from
-**		@param buf			Buffer to write data to
-**		@param len			Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return					Number of bytes read
+**  @return        Number of bytes read
 */
-local int OggReadStream(Sample* sample, void* buf, int len)
+local int OggStreamRead(Sample* sample, void* buf, int len)
 {
 	OggData* data;
 	int i;
 	int n;
 	int bitstream;
-
 	int divide;
 	char sndbuf[SOUND_BUFFER_SIZE];
 
@@ -159,36 +146,34 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 		sample->Pos = 0;
 	}
 
-	if (sample->Len < SOUND_BUFFER_SIZE / 4) {
+	divide = 176400 / (sample->Frequency * 2 * sample->Channels);
+
+	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
 		// read more data
-		n = SOUND_BUFFER_SIZE - sample->Length;
+		n = (SOUND_BUFFER_SIZE - sample->Len) / divide;
 
-		divide = 176400 / (sample->Frequency * (sample->SampleSize/8) * sample->Channels);
-//		 / chanratio;
-
-//		for (;n > 0;) {
 #ifdef STRATAGUS_BIG_ENDIAN
-			i = ov_read(&data->VorbisFile, sndbuf, n / divide, 1, 2, 1,
-				&bitstream);
+		i = ov_read(&data->VorbisFile, sndbuf, n, 1, 2, 1,
+			&bitstream);
 #else
-			i = ov_read(&data->VorbisFile, sndbuf, n / divide, 0, 2, 1,
-				&bitstream);
+		i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
+			&bitstream);
 #endif
-			DebugCheck(i <= 0);
+		DebugCheck(i < 0);
 
-			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos,
-				sample->Frequency, sample->SampleSize / 8, sample->Channels, i);
+		if (!i) {
+			// EOF
+			break;
+		}
 
-			sample->Len += i;
-			n -= i;
-//			if (n < 4096) {
-//				break;
-//			}
-//		}
+		i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
+			sample->Frequency, 2, sample->Channels, i);
+
+		sample->Len += i;
 	}
 
-	if (sample->Length < len) {
-		len = sample->Length;
+	if (sample->Len < len) {
+		len = sample->Len;
 	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
@@ -199,15 +184,15 @@ local int OggReadStream(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free an ogg file
+**  Type member function to free an ogg file
 **
-**		@param sample			Sample to free
+**  @param sample  Sample to free
 */
-local void OggFreeStream(Sample* sample)
+local void OggStreamFree(Sample* sample)
 {
 	OggData* data;
 
-	data = (OggData*)sample->User;
+	data = sample->User;
 
 	ov_clear(&data->VorbisFile);
 	free(data);
@@ -219,23 +204,23 @@ local void OggFreeStream(Sample* sample)
 **		Ogg stream type structure.
 */
 local const SampleType OggStreamSampleType = {
-	OggReadStream,
-	OggFreeStream,
+	OggStreamRead,
+	OggStreamFree,
 };
 
 /**
-**		Type member function to read from the ogg file
+**  Type member function to read from the ogg file
 **
-**		@param sample			Sample reading from
-**		@param buf			Buffer to write data to
-**		@param len			Length of the buffer
+**  @param sample  Sample reading from
+**  @param buf     Buffer to write data to
+**  @param len     Length of the buffer
 **
-**		@return					Number of bytes read
+**  @return        Number of bytes read
 */
 local int OggRead(Sample* sample, void* buf, int len)
 {
-	if (len > sample->Length) {
-		len = sample->Length;
+	if (len > sample->Len) {
+		len = sample->Len;
 	}
 
 	memcpy(buf, sample->Buffer + sample->Pos, len);
@@ -246,9 +231,9 @@ local int OggRead(Sample* sample, void* buf, int len)
 }
 
 /**
-**		Type member function to free an ogg file
+**  Type member function to free an ogg file
 **
-**		@param sample			Sample to free
+**  @param sample  Sample to free
 */
 local void OggFree(Sample* sample)
 {
@@ -258,7 +243,7 @@ local void OggFree(Sample* sample)
 }
 
 /**
-**		Ogg object type structure.
+**  Ogg object type structure.
 */
 local const SampleType OggSampleType = {
 	OggRead,
@@ -266,26 +251,21 @@ local const SampleType OggSampleType = {
 };
 
 /**
-**		Load ogg.
+**  Load ogg.
 **
-**		@param name		File name.
-**		@param flags		Load flags.
+**  @param name   File name.
+**  @param flags  Load flags.
 **
-**		@return				Returns the loaded sample.
-**
-**		@todo				Support more flags, LoadOnDemand.
+**  @return       Returns the loaded sample.
 */
 global Sample* LoadOgg(const char* name,int flags)
 {
-	static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, NULL };
 	Sample* sample;
 	OggData *data;
 	CLFile* f;
-	OggVorbis_File vf[1];
 	unsigned int magic[1];
 	vorbis_info* info;
-	// FIXME: null???
-
+	static const ov_callbacks vc = { OGG_read, OGG_seek, OGG_close, OGG_tell };
 
 	if (!(f = CLopen(name, CL_OPEN_READ))) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
@@ -302,20 +282,19 @@ global Sample* LoadOgg(const char* name,int flags)
 
 	data = malloc(sizeof(OggData));
 
-//	CLseek(f, 0, SEEK_SET);
-	if (ov_open_callbacks(f, &data->VorbisFile, (char*)&magic, sizeof(magic), vc)) {
-//	if (ov_open_callbacks(f, &data->VorbisFile, NULL, 0, vc)) {
+	CLseek(f, 0, SEEK_SET);
+	if (ov_open_callbacks(f, &data->VorbisFile, NULL, 0, vc)) {
 		fprintf(stderr, "Can't initialize ogg decoder\n");
 		free(data);
 		CLclose(f);
 		return NULL;
 	}
 
-	info = ov_info(vf, -1);
+	info = ov_info(&data->VorbisFile, -1);
 	if (!info) {
 		fprintf(stderr, "no ogg stream\n");
 		free(data);
-		ov_clear(vf);
+		ov_clear(&data->VorbisFile);
 		return NULL;
 	}
 
@@ -328,82 +307,65 @@ global Sample* LoadOgg(const char* name,int flags)
 	sample->User = data;
 
 	if (flags & PlayAudioStream) {
+		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &OggStreamSampleType;
 	} else {
-	DebugCheck(1);
+		int total;
+		int divide;
+		int i;
 		int n;
-		char* p;
+		int bitstream;
+		char sndbuf[SOUND_BUFFER_SIZE];
+		
+		total = ov_pcm_total(&data->VorbisFile, -1) * 2;
 
+		sample->Buffer = malloc(total);
 		sample->Type = &OggSampleType;
-		sample->User = 0;
 
-		n = SOUND_BUFFER_SIZE;
-		p = sample->Data;
+		divide = 176400 / (sample->Frequency * 2 * sample->Channels);
 
-		// CLread is not seekable and ov_pcm_total(vf,-1) not supported :(
+		while (sample->Len < total) {
+			n = (total - sample->Len > SOUND_BUFFER_SIZE ? SOUND_BUFFER_SIZE : total - sample->Len) / divide;
 
-		for (;;) {
-			int bitstream;
-			int i;
+#ifdef STRATAGUS_BIG_ENDIAN
+			i = ov_read(&data->VorbisFile, sndbuf, n, 1, 2, 1,
+				&bitstream);
+#else
+			i = ov_read(&data->VorbisFile, sndbuf, n, 0, 2, 1,
+				&bitstream);
+#endif
+			DebugCheck(i < 0);
 
-			if (n < 4096) {
-				Sample* s;
-
-				if( sample->Length < 1024 * 1024 ) {
-					n = sample->Length << 1;
-				} else {
-					n = 2 * 1024 * 1024;		// Big junks needed for windows
-				}
-				s = realloc(sample, sizeof(*sample) + sample->Length + n);
-				if (!s) {
-					fprintf(stderr, "out of memory\n");
-					free(sample);
-					ov_clear(vf);
-					return NULL;
-				}
-				sample = s;
-				p = sample->Data + sample->Length;
-			}
-
-			#ifdef STRATAGUS_BIG_ENDIAN
-			i = ov_read(vf, p, 4096, 1, 2, 1, &bitstream);
-			#else
-			i = ov_read(vf, p, 4096, 0, 2, 1, &bitstream);
-			#endif
-			if (i <= 0) {
+			if (!i) {
+				// EOF
 				break;
 			}
-			p += i;
-			sample->Length += i;
-			n -= i;
+
+			i = ConvertToStereo32(sndbuf, sample->Buffer + sample->Pos + sample->Len,
+				sample->Frequency, 2, sample->Channels, i);
+
+			sample->Len += i;
 		}
-		// Shrink to real size
-		sample = realloc(sample, sizeof(*sample) + sample->Length);
 
-		ov_clear(vf);
-
-		DebugLevel0Fn(" %d\n" _C_ sample->Length);
-#ifdef DEBUG
-		AllocatedSoundMemory += sample->Length;
-#endif
+		DebugCheck(sample->Len != total);
 	}
 
 	return sample;
 }
 
 /*----------------------------------------------------------------------------
---		Avi support
+--  Avi support
 ----------------------------------------------------------------------------*/
 
 /**
-**		OGG vorbis read callback.
+**  OGG vorbis read callback.
 **
-**		@param ptr				Pointer to memory to fill.
-**		@param size				Size of the element.
-**		@param nmemb				Number of elements to fill.
-**		@param user				User argument.
+**  @param ptr    Pointer to memory to fill.
+**  @param size   Size of the element.
+**  @param nmemb  Number of elements to fill.
+**  @param user   User argument.
 **
-**		@return						The number of elements loaded.
+**  @return       The number of elements loaded.
 */
 local size_t AVI_OGG_read(void* ptr, size_t size, size_t nmemb, void* user)
 {
@@ -461,49 +423,34 @@ local int AVI_OGG_close(void* user __attribute__((unused)))
 */
 global void PlayAviOgg(AviFile* avi)
 {
-	static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close,
-		NULL };
 	Sample* sample;
-	OggVorbis_File vf[1];
-	vorbis_info* info;
 	OggData* data;
+	vorbis_info* info;
+	static const ov_callbacks vc = { AVI_OGG_read, OGG_seek, AVI_OGG_close,	NULL };
 
-	if (ov_open_callbacks(avi, vf, 0, 0, vc)) {
+	data = malloc(sizeof(OggData));
+
+	if (ov_open_callbacks(avi, &data->VorbisFile, 0, 0, vc)) {
 		fprintf(stderr, "Can't initialize ogg decoder\n");
+		free(data);
 		return;
 	}
-	info = ov_info(vf, -1);
+
+	info = ov_info(&data->VorbisFile, -1);
 	if (!info) {
 		fprintf(stderr, "no ogg stream\n");
-		ov_clear(vf);
+		ov_clear(&data->VorbisFile);
+		free(data);
 		return;
 	}
 
-	//
-	//		We have now a correct OGG stream
-	//
-
-	sample = malloc(sizeof(*sample) + SOUND_BUFFER_SIZE);
-	if (!sample) {
-		fprintf(stderr, "Out of memory\n");
-		ov_clear(vf);
-		return;
-	}
+	sample = malloc(sizeof(Sample));
 	sample->Channels = info->channels;
 	sample->SampleSize = 16;
 	sample->Frequency = info->rate;
-	sample->Length = 0;
-
-	data = malloc(sizeof(OggData));
-	if (!data) {
-		fprintf(stderr, "Out of memory\n");
-		free(sample);
-		ov_clear(vf);
-		return;
-	}
-//	data->VorbisFile[0] = vf[0];
-//	data->PointerInBuffer = sample->Data;
-
+	sample->Buffer = malloc(sizeof(SOUND_BUFFER_SIZE));
+	sample->Len = 0;
+	sample->Pos = 0;
 	sample->Type = &OggStreamSampleType;
 	sample->User = data;
 
