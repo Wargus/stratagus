@@ -260,7 +260,8 @@ global void HandleActionRepair(Unit* unit)
 		    unit->State=0;
 		    unit->SubAction=2;
 		    UnitHeadingFromDeltaXY(unit,
-			    goal->X-unit->X,goal->Y-unit->Y);
+			goal->X+(goal->Type->TileWidth-1)/2-unit->X,
+			goal->Y+(goal->Type->TileHeight-1)/2-unit->Y);
 		    // FIXME: only if heading changes
 		    CheckUnitToBeDrawn(unit);
 		} else if( err<0 ) {
