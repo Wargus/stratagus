@@ -124,10 +124,6 @@ extern void PathfinderCclRegister(void);
 
 //@}
 
-#ifdef HIERARCHIC_PATHFINDER
-#include "../pathfinder/hierarchical.h"
-#endif /* HIERARCHIC_PATHFINDER */
-
 #ifdef MAP_REGIONS
 #include "../pathfinder/splitter.h"
 #endif /* MAP_REGIONS */

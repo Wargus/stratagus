@@ -220,21 +220,6 @@ typedef struct _map_field_ {
 #ifdef NEW_UNIT_CACHE
 	UnitListItem*      UnitCache;  /// An unit on the map field
 #endif
-#ifdef HIERARCHIC_PATHFINDER
-	unsigned short RegId;  /// Region to which the field belongs
-	// FIXME: Johns: this values can't be placed in the map field,
-	//			  this needs too much memory.
-	unsigned short f, g;  /// A* parameters (no need to store h)
-	unsigned short h;     ///stored only for BestSoFar computation
-#define HIER_LOW_OPEN   0
-#define HIER_LOW_CLOSED 1
-	unsigned int Set:1;  /// Open/Closed
-	unsigned int Goal:1;
-	// FIXME perhaps the previous 2 one-bit fields should be crammed into e.g.
-	// g? There's potentially a *lot* of MapFields in this game and every byte
-	// saved here could translate into 1 MB saved overall for max sized map.
-	char Traceback;  /// The field through which we arrived to this one
-#endif
 } MapField;
 
 // Not used until now:
@@ -501,15 +486,6 @@ extern int ForestOnMap(int x, int y);
 
 	/// Returns true, if rock on the map tile field
 extern int RockOnMap(int x, int y);
-
-#ifdef HIERARCHIC_PATHFINDER
-	/// FIXME: docu
-extern inline unsigned short MapFieldGetRegId(int, int);
-	/// FIXME: docu
-extern inline void MapFieldSetRegId(int, int, unsigned short);
-	/// FIXME: docu
-extern inline int MapFieldPassable(int, int, int);
-#endif
 
 	/// Returns true, if the unit-type(mask can enter field with bounds check
 extern int CheckedCanMoveToMask(int x, int y, int mask);

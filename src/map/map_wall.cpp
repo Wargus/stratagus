@@ -40,9 +40,9 @@
 #include "map.h"
 #include "minimap.h"
 #include "player.h"
-#if defined(HIERARCHIC_PATHFINDER) || defined(MAP_REGIONS)
+#if defined(MAP_REGIONS)
 #include "pathfinder.h"
-#endif // HIERARCHIC_PATHFINDER
+#endif
 
 /*----------------------------------------------------------------------------
 --		Declarations
@@ -367,9 +367,6 @@ global void HitWall(unsigned x, unsigned y, unsigned damage)
 	if( v <= damage ) {
 		TheMap.Fields[x + y * TheMap.Width].Value = 0;
 		MapRemoveWall(x, y);
-#ifdef HIERARCHIC_PATHFINDER
-		PfHierMapChangedCallback (x, y, x, y);
-#endif
 #ifdef MAP_REGIONS
 		MapSplitterTilesCleared(x, y, x, y);
 #endif

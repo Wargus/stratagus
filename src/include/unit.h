@@ -638,14 +638,6 @@ struct _unit_ {
 
 	Unit*		Goal;						/// Generic goal pointer
 
-#ifdef HIERARCHIC_PATHFINDER
-#define UNIT_CLEAN				0		/// FIXME: comment missing
-#define UNIT_RETREATING				1		/// FIXME: comment missing
-#define UNIT_WINNING				2		/// FIXME: comment missing
-	unsigned		Retreating:2;				/// FIXME: comment what is this?
-	void *PfHierData;
-#endif		// HIERARCHIC_PATHFINDER
-
 #ifdef NEW_DECODRAW
 	Deco*  Decoration;		   /// Decoration when visible on screen
 #endif
@@ -811,10 +803,6 @@ extern int CheckUnitToBeDrawn(Unit* unit);
 	/// FIXME: more docu
 extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
 	int *ex, int *ey);
-#ifdef HIERARCHIC_PATHFINDER
-	/// FIXME: more docu
-extern int UnitGetNextPathSegment(const Unit*, int*, int*);
-#endif
 	/// Check for rescue each second
 extern void RescueUnits(void);
 	/// Change owner of unit

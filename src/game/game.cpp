@@ -512,9 +512,6 @@ global void CreateGame(char* filename, WorldMap* map)
 	//
 	// FIXME: must be done after map is loaded
 	InitAStar();
-#ifdef HIERARCHIC_PATHFINDER
-	PfHierInitialize();
-#endif // HIERARCHIC_PATHFINDER
 #ifdef MAP_REGIONS
 	MapSplitterInit();
 #endif

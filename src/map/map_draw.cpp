@@ -1893,30 +1893,6 @@ global void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 		dy += TileSizeY;
 	}
 
-#if defined(HIERARCHIC_PATHFINDER) && defined(GRID)
-	{
-	int xmax = x + (vp->EndX - vp->X) / TileSizeX;
-	int xmin = x;
-	int ymax = y + (vp->EndY - vp->Y) / TileSizeY;
-	int ymin = y;
-	int AreaWidth = AreaGetWidth();
-	int AreaHeight = AreaGetHeight();
-	for (; x <= xmax; ++x)  {
-		if (x % AreaWidth == 0) {
-			int		xx = vp->X + TileSizeX * (x - xmin) - 1;
-			VideoDrawLineClip(ColorRed, xx, vp->Y, xx, vp->EndY);
-		}
-	}
-	for (; y <= ymax; ++y)  {
-		if (y % AreaHeight == 0) {
-			int		yy = vp->Y + TileSizeY * (y - ymin) - 1;
-			VideoDrawLineClip(ColorRed, vp->X, yy, vp->EndX, yy);
-		}
-	}
-
-	}
-#endif
-
 #ifdef TIMEIT
 	ev = rdtsc();
 	sx = (ev - sv);

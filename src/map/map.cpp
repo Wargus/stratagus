@@ -366,35 +366,6 @@ global int RockOnMap(int tx, int ty)
 	return TheMap.Fields[tx + ty * TheMap.Width].Flags & MapFieldRocks;
 }
 
-#ifdef HIERARCHIC_PATHFINDER
-
-/**
-**		FIXME: write the description of this function.
-*/
-global inline unsigned short MapFieldGetRegId(int tx, int ty)
-{
-	return TheMap.Fields[ty * TheMap.Width + tx].RegId;
-}
-
-/**
-**		FIXME: write the description of this function.
-*/
-global inline void MapFieldSetRegId(int tx, int ty, unsigned short regid)
-{
-	TheMap.Fields[ty * TheMap.Width + tx].RegId = regid;
-}
-
-/**
-**		FIXME: write the description of this function.
-** 		@todo FIXME: convert to a macro
-*/
-global inline int MapFieldPassable(int tx, int ty, int mask)
-{
-	return !(TheMap.Fields[ty * TheMap.Width + tx].Flags & mask);
-}
-
-#endif // HIERARCHIC_PATHFINDER
-
 /**
 **		Can move to this point, applying mask.
 **

@@ -37,7 +37,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
+#if defined(DEBUG)
 #include <setjmp.h>
 #endif
 
@@ -84,7 +84,7 @@ global enum _scroll_state_ KeyScrollState = ScrollNone;
 	/// variable set when we are scrolling via mouse
 global enum _scroll_state_ MouseScrollState = ScrollNone;
 
-#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
+#if defined(DEBUG)
 global jmp_buf MainLoopJmpBuf;				/// Hierarchic pathfinder error exit.
 #endif
 
@@ -787,7 +787,7 @@ global void GameMainLoop(void)
 
 	while (GameRunning) {
 
-#if defined(DEBUG) && defined(HIERARCHIC_PATHFINDER)
+#if defined(DEBUG)
 		if (setjmp(MainLoopJmpBuf)) {
 			GamePaused = 1;
 		}

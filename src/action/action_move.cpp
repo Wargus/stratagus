@@ -84,23 +84,7 @@ local int ActionMoveGeneric(Unit* unit, const Animation* anim)
 		// FIXME: So units flying up and down are not affected.
 		unit->IX = unit->IY = 0;
 
-#ifdef HIERARCHIC_PATHFINDER
-		d = PfHierComputePath(unit, &xd, &yd);
-
-#if 0
-		{
-		int ts0;
-		int ts1;
-		ts0 = rdtsc();
-		NextPathElement(unit, &xd, &yd);
-		ts1 = rdtsc();
-		printf("old pathfinder: %d cycles\n", ts1 - ts0);
-		}
-#endif
-		switch (d) {
-#else /* HIERARCHIC_PATHFINDER */
 		switch (d = NextPathElement(unit, &xd, &yd)) {
-#endif /* HIERARCHIC_PATHFINDER */
 			case PF_UNREACHABLE: // Can't reach, stop
 					if (unit->Player->AiEnabled) {
 					AiCanNotMove(unit);
