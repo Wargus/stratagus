@@ -226,7 +226,7 @@ static void DrawMapViewport(Viewport* vp)
 					}
 #endif
 					GraphicPlayerPixels(missiletable[j]->SourceUnit->Player,
-							missiletable[j]->Type->Sprite);
+						missiletable[j]->Type->Sprite);
 				}
 				switch (missiletable[j]->Type->Class) {
 					case MissileClassHit:

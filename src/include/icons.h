@@ -164,6 +164,9 @@ typedef struct _icon_file_ {
 
 // --- FILLED UP ---
 	Graphic* Sprite;  ///< Graphic data loaded
+#ifdef USE_OPENGL
+	Graphic* PlayerColorSprite[PlayerMax];  ///< Sprites with player colors
+#endif
 } IconFile;
 
 	/// Icon: rectangle image used in menus
@@ -179,6 +182,9 @@ typedef struct _icon_ {
 
 // --- FILLED UP ---
 	Graphic* Sprite;  ///< Graphic data loaded
+#ifdef USE_OPENGL
+	Graphic** PlayerColorSprite;  ///< Sprites with player colors
+#endif
 } Icon;
 
 #define NoIcon NULL  ///< used for errors == no valid icon

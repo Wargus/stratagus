@@ -110,6 +110,7 @@ static void AddIcon(const char* ident, const char* tileset,
 		iconfile = malloc(sizeof(IconFile));
 		iconfile->FileName = strdup(file);
 		iconfile->Sprite = NULL;
+		memset(iconfile->PlayerColorSprite, 0, sizeof(iconfile->PlayerColorSprite));
 		*(IconFile**)hash_add(IconFileHash, iconfile->FileName) = iconfile;
 	}
 
@@ -139,6 +140,7 @@ static void AddIcon(const char* ident, const char* tileset,
 		icon->Height = height;
 
 		icon->Sprite = NULL;
+		icon->PlayerColorSprite = NULL;
 
 		*(Icon**)hash_add(IconHash, str) = icon;
 		free(str);
@@ -208,6 +210,7 @@ void LoadIcons(void)
 				icon->File->Sprite = LoadSprite(file, icon->Width, icon->Height);
 			}
 			icon->Sprite = icon->File->Sprite;
+			icon->PlayerColorSprite = icon->File->PlayerColorSprite;
 			if (icon->Index >= (unsigned)icon->Sprite->NumFrames) {
 				DebugPrint("Invalid icon index: %s - %d\n" _C_
 					icon->Ident _C_ icon->Index);
@@ -278,9 +281,19 @@ void CleanIcons(void)
 		//  Handle the icon files.
 		//
 		for (i = 0; i < n; ++i) {
+#ifdef USE_OPENGL
+			int j;
+#endif
+
 			hash_del(IconFileHash, table[i]->FileName);
 			free(table[i]->FileName);
 			VideoSafeFree(table[i]->Sprite);
+#ifdef USE_OPENGL
+			for (j = 0; j < PlayerMax; ++j) {
+				VideoSafeFree(table[i]->PlayerColorSprite[j]);
+			}
+#endif
+
 			free(table[i]);
 		}
 	}
@@ -336,6 +349,29 @@ const char* IdentOfIcon(const Icon* icon)
 	return icon->Ident;
 }
 
+#ifdef USE_OPENGL
+/**
+**  Draw the sprite with the player colors
+**
+**  @param sprite    Original sprite
+**  @param glsprite  Array of player color sprites
+**  @param player    Player number
+**  @param frame     Frame number to draw.
+**  @param x         X position.
+**  @param y         Y position.
+*/
+static void DrawIconPlayerColor(Graphic* sprite, Graphic** glsprite,
+	int player, int frame, int x, int y)
+{
+	if (!glsprite[player] || !glsprite[player]->TextureNames[frame]) {
+		MakePlayerColorTexture(&glsprite[player],
+			sprite, frame, &Players[player].UnitColors);
+	}
+
+	VideoDrawClip(glsprite[player], frame, x, y);
+}
+#endif
+
 /**
 **  Draw icon on x,y.
 **
@@ -348,6 +384,10 @@ void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
 	GraphicPlayerPixels(player, icon->Sprite);
 	VideoDrawClip(icon->Sprite, icon->Index, x, y);
+#ifdef USE_OPENGL
+	DrawIconPlayerColor(icon->Sprite, icon->PlayerColorSprite,
+		player->Player, icon->Index, x, y);
+#endif
 }
 
 /**
