@@ -437,7 +437,7 @@ local void VideoDrawSubOpenGLClip(const Graphic* graphic, int gx, int gy,
 **		Free graphic object.
 */
 #ifdef USE_SDL_SURFACE
-local void VideoFree(Graphic* graphic)
+global void VideoFree(Graphic* graphic)
 {
 #ifdef DEBUG
 	AllocatedGraphicMemory -=
