@@ -27,7 +27,7 @@
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_NETMENUS -DSPLIT_SCREEN_SUPPORT"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DSPLIT_SCREEN_SUPPORT"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
@@ -43,7 +43,6 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DNEW_NETM
 ## USE_TILECACHE	Faster tile drawing, costs memory.
 ## USE_SMART_TILECACHE	Faster tile drawing, slow with hardware video memory.
 ## USE_HP_FOR_XP	Use hit-points for XP calculations.
-## NEW_NETMENUS		Include new menu driven network set-up.
 ## USE_LIBMODPLUG	Use modplug audio player support.
 ## USE_FLAC		Use flac audio player support (asked by setup).
 ## USE_OGG		Use ogg audio player support (asked by setup).

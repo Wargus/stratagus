@@ -42,30 +42,25 @@
 #ifdef USE_SDL_NET
 #include <SDLnet.h>
 #else
+
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32)
 
 #define USE_WINSOCK
 
-#ifdef NEW_NETMENUS
 #if !defined(_MSC_VER) || defined(_WIN32_WCE)
 #define _WIN32_WINNT 0x0400
 #define WINVER 0x0400
 #endif
 #include <winsock2.h>
-#endif
 
 #include <windows.h>
-#if defined(_MSC_VER) || defined(__CYGWIN__)
 #include <winsock.h>
-#endif
-
-#ifdef NEW_NETMENUS
 //#include <ws2tcpip.h>
+
+// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 #define SIO_GET_INTERFACE_LIST 0x4004747F
 #define IFF_UP	1
 #define IFF_LOOPBACK 4
-#include <winsock.h>
-// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 typedef struct _OLD_INTERFACE_INFO
 {
   unsigned long iiFlags;      /* Interface flags */
@@ -74,7 +69,7 @@ typedef struct _OLD_INTERFACE_INFO
   SOCKADDR   iiNetmask;      /* Network mask */
 } OLD_INTERFACE_INFO;
 #define INTERFACE_INFO OLD_INTERFACE_INFO
-#endif
+
 #else	// UNIX
 #    include <sys/time.h>
 #    include <unistd.h>
