@@ -136,10 +136,10 @@ typedef struct _menuitem_text_ {
 	void (*action)(struct _menuitem_*);
 } MenuitemText;
 typedef struct _menuitem_button_ {
-	unsigned char* text;
-	struct _button_style_* style;
-	void (*handler)(void);
-	unsigned hotkey;
+	unsigned char* Text;
+	struct _button_style_* Style;
+	void (*Handler)(void);
+	unsigned HotKey;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
 	unsigned char** options;
@@ -207,34 +207,34 @@ typedef struct _menuitem_input_ {
 	char* reversecolor;
 } MenuitemInput;
 typedef struct _menuitem_checkbox_ {
-	unsigned char* text;
-	unsigned int state;
-	struct _checkbox_style_* style;
-	void (*action)(struct _menuitem_*);
+	unsigned char* Text;
+	unsigned int State;
+	struct _checkbox_style_* Style;
+	void (*Action)(struct _menuitem_*);
 } MenuitemCheckbox;
 
-struct _menus_;
+struct _menu_;
 typedef struct _menuitem_ {
-	int mitype;  ///< @todo write docu
-	int xofs;
-	int yofs;
-	unsigned flags;
-	int font;
-	void (*initfunc)(struct _menuitem_*);  ///< constructor
-	void (*exitfunc)(struct _menuitem_*);  ///< destructor
-	struct _menus_ *menu;  ///< backpointer for speedups
+	int MiType;  ///< @todo write docu
+	int XOfs;
+	int YOfs;
+	unsigned Flags;
+	int Font;
+	void (*InitFunc)(struct _menuitem_*);  ///< constructor
+	void (*ExitFunc)(struct _menuitem_*);  ///< destructor
+	struct _menu_* Menu;  ///< backpointer for speedups
 	union {
-		MenuitemText text;
-		MenuitemButton button;
-		MenuitemPulldown pulldown;
-		MenuitemListbox listbox;
-		MenuitemVslider vslider;
-		MenuitemHslider hslider;
-		MenuitemDrawfunc drawfunc;
-		MenuitemInput input;
-		MenuitemCheckbox checkbox;
+		MenuitemText Text;
+		MenuitemButton Button;
+		MenuitemPulldown Pulldown;
+		MenuitemListbox Listbox;
+		MenuitemVslider VSlider;
+		MenuitemHslider HSlider;
+		MenuitemDrawfunc DrawFunc;
+		MenuitemInput Input;
+		MenuitemCheckbox Checkbox;
 		// ... add here ...
-	} d;
+	} D;
 } Menuitem;
 
 #define MI_TYPE_TEXT     1 ///< @todo write docu
@@ -275,7 +275,7 @@ typedef struct _menuitem_ {
 /**
 **  Menu definition.
 */
-typedef struct _menus_ {
+typedef struct _menu_ {
 	/// @todo char* Name; ///< menu name
 	int       X;          ///< menu area x pos
 	int       Y;          ///< menu area y pos

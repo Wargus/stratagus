@@ -278,25 +278,25 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 	int y;
 	int oh;
 
-	x = mx + mi->xofs;
-	y = my + mi->yofs;
-	w = mi->d.pulldown.xsize;
-	flags = mi->flags;
-	rb = mi->d.pulldown.button;
+	x = mx + mi->XOfs;
+	y = my + mi->YOfs;
+	w = mi->D.Pulldown.xsize;
+	flags = mi->Flags;
+	rb = mi->D.Pulldown.button;
 
 	GetDefaultTextColors(&oldnc, &oldrc);
 	nc = oldnc;
 	rc = oldrc;
 	if (rb == MBUTTON_SC_PULLDOWN) {
-		h = mi->d.pulldown.ysize;
+		h = mi->D.Pulldown.ysize;
 		if (flags & MenuButtonClicked) {
 			int usetop;
 			int option;
 			int max;
 
 			// Check if the pulldown goes below the bottom
-			if (mi->yofs + (h + 1) * mi->d.pulldown.noptions >= mi->menu->Height) {
-				y -= h * mi->d.pulldown.noptions;
+			if (mi->YOfs + (h + 1) * mi->D.Pulldown.noptions >= mi->Menu->Height) {
+				y -= h * mi->D.Pulldown.noptions;
 				usetop = 0;
 			} else {
 				usetop = 1;
@@ -317,30 +317,30 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			if (usetop) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_PULLDOWN_DOWN_ARROW,
 					x + w - 1 - 16 - 3, y + 4);
-				text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+				text = mi->D.Pulldown.options[mi->D.Pulldown.curopt];
 				if (text) {
-					VideoDrawText(x + 4, y + 2, mi->font, text);
+					VideoDrawText(x + 4, y + 2, mi->Font, text);
 				}
 			} else {
-				if (option == mi->d.pulldown.cursel) {
+				if (option == mi->D.Pulldown.cursel) {
 					SetDefaultTextColors(rc, rc);
 				} else {
 					SetDefaultTextColors(nc, rc);
 				}
-				text = mi->d.pulldown.options[option];
+				text = mi->D.Pulldown.options[option];
 				if (text) {
-					VideoDrawText(x + 4, y + 2, mi->font, text);
+					VideoDrawText(x + 4, y + 2, mi->Font, text);
 				}
 				option = 1;
 			}
 
 			// Middle
-			y += mi->d.pulldown.ysize;
+			y += mi->D.Pulldown.ysize;
 			rb = MBUTTON_SC_PULLDOWN_MIDDLE;
 			if (usetop) {
-				max = mi->d.pulldown.noptions - 1;
+				max = mi->D.Pulldown.noptions - 1;
 			} else {
-				max = mi->d.pulldown.noptions;
+				max = mi->D.Pulldown.noptions;
 			}
 			for (; option < max; ++option) {
 				VideoDraw(MenuButtonGfx.Sprite, rb - 1, x, y);
@@ -348,16 +348,16 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 					VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
 				}
 				VideoDraw(MenuButtonGfx.Sprite, rb + 1, x + w - 1 - 16, y);
-				if (option == mi->d.pulldown.cursel) {
+				if (option == mi->D.Pulldown.cursel) {
 					SetDefaultTextColors(rc, rc);
 				} else {
 					SetDefaultTextColors(nc, rc);
 				}
-				text = mi->d.pulldown.options[option];
+				text = mi->D.Pulldown.options[option];
 				if (text) {
-					VideoDrawText(x + 4, y + 2, mi->font, text);
+					VideoDrawText(x + 4, y + 2, mi->Font, text);
 				}
-				y += mi->d.pulldown.ysize;
+				y += mi->D.Pulldown.ysize;
 			}
 
 			// Bottom
@@ -373,28 +373,28 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			}
 			VideoDraw(MenuButtonGfx.Sprite, rb + 1, x + w - 1 - 16, y);
 			if (usetop) {
-				if (option == mi->d.pulldown.cursel) {
+				if (option == mi->D.Pulldown.cursel) {
 					SetDefaultTextColors(rc, rc);
 				} else {
 					SetDefaultTextColors(nc, rc);
 				}
-				text = mi->d.pulldown.options[option];
+				text = mi->D.Pulldown.options[option];
 				if (text) {
-					VideoDrawText(x + 4, y + 2, mi->font, text);
+					VideoDrawText(x + 4, y + 2, mi->Font, text);
 				}
 				option = 0;
 			} else {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_PULLDOWN_DOWN_ARROW,
 					x + w - 1 - 16 - 3, y + 4);
-				text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+				text = mi->D.Pulldown.options[mi->D.Pulldown.curopt];
 				if (text) {
-					VideoDrawText(x + 4, y + 2, mi->font, text);
+					VideoDrawText(x + 4, y + 2, mi->Font, text);
 				}
 				option = 1;
 			}
 		} else {
-			h = mi->d.pulldown.ysize;
-			y = my + mi->yofs;
+			h = mi->D.Pulldown.ysize;
+			y = my + mi->YOfs;
 			db = MBUTTON_SC_PULLDOWN_DOWN_ARROW;
 			if (flags & MenuButtonDisabled) {
 				rb = MBUTTON_SC_PULLDOWN_DISABLED;
@@ -410,29 +410,29 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 				VideoDraw(MenuButtonGfx.Sprite, rb, i, y);
 			}
 			VideoDraw(MenuButtonGfx.Sprite, rb + 1, x + w - 1 - 16, y);
-			if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 				VideoDraw(MenuButtonGfx.Sprite, db, x + w - 1 - 16 - 3, y + 4);
 			}
-			text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+			text = mi->D.Pulldown.options[mi->D.Pulldown.curopt];
 			if (text) {
-				VideoDrawText(x + 4, y + 2, mi->font, text);
+				VideoDrawText(x + 4, y + 2, mi->Font, text);
 			}
 		}
 	} else {
-		oh = h = mi->d.pulldown.ysize - 2;
+		oh = h = mi->D.Pulldown.ysize - 2;
 		if (flags & MenuButtonClicked) {
 			// Make the menu inside of the screen (TOP)
-			if (y + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->Y) {
+			if (y + 1 <= mi->D.Pulldown.curopt * h + CurrentMenu->Y) {
 				y = 2 + CurrentMenu->Y;
 			} else {
-				y -= mi->d.pulldown.curopt * h;
+				y -= mi->D.Pulldown.curopt * h;
 				// Make the menu inside the bottom of the screen
 				// FIXME: can't assume bottom is always 480
-				if (y + h * mi->d.pulldown.noptions >= 480 + CurrentMenu->Y) {
-					y -= y + h * mi->d.pulldown.noptions - (480 + CurrentMenu->Y);
+				if (y + h * mi->D.Pulldown.noptions >= 480 + CurrentMenu->Y) {
+					y -= y + h * mi->D.Pulldown.noptions - (480 + CurrentMenu->Y);
 				}
 			}
-			i = mi->d.pulldown.noptions;
+			i = mi->D.Pulldown.noptions;
 			h *= i;
 			while (i--) {
 				PushClipping();
@@ -443,21 +443,21 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 					VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1 + oh * i);
 //				}
 				PopClipping();
-				text = mi->d.pulldown.options[i];
+				text = mi->D.Pulldown.options[i];
 				if (text) {
-					if (i == mi->d.pulldown.cursel) {
+					if (i == mi->D.Pulldown.cursel) {
 						SetDefaultTextColors(rc, rc);
 					} else {
 						SetDefaultTextColors(nc, rc);
 					}
-					VideoDrawText(x + 2, y + 2 + oh * i, mi->font, text);
+					VideoDrawText(x + 2, y + 2 + oh * i, mi->Font, text);
 				}
 			}
 			w += 2;
 			h += 2;
 		} else {
-			h = mi->d.pulldown.ysize;
-			y = my + mi->yofs;
+			h = mi->D.Pulldown.ysize;
+			y = my + mi->YOfs;
 			if (flags & MenuButtonDisabled) {
 				rb--;
 				SetDefaultTextColors(FontGrey, FontGrey);
@@ -468,7 +468,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			}
 
 			PushClipping();
-			if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 				SetClipping(0, 0, x + w - 20, VideoHeight - 1);
 			} else {
 				SetClipping(0, 0, x + w - 1, VideoHeight - 1);
@@ -479,13 +479,13 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 				VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
 //			}
 			PopClipping();
-			if (!(mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN,
 					x - 1 + w - 20, y - 2);
 			}
-			text = mi->d.pulldown.options[mi->d.pulldown.curopt];
+			text = mi->D.Pulldown.options[mi->D.Pulldown.curopt];
 			if (text) {
-				VideoDrawText(x + 2, y + 2, mi->font, text);
+				VideoDrawText(x + 2, y + 2, mi->Font, text);
 			}
 		}
 		if (flags & MenuButtonSelected) {
@@ -522,12 +522,12 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	int x;
 	int y;
 
-	rb = mi->d.listbox.button;
-	flags = mi->flags;
-	w = mi->d.listbox.xsize;
-	h = mi->d.listbox.ysize;
-	x = mx + mi->xofs;
-	y = my + mi->yofs;
+	rb = mi->D.Listbox.button;
+	flags = mi->Flags;
+	w = mi->D.Listbox.xsize;
+	h = mi->D.Listbox.ysize;
+	x = mx + mi->XOfs;
+	y = my + mi->YOfs;
 
 	GetDefaultTextColors(&oldnc, &oldrc);
 	nc = oldnc;
@@ -536,8 +536,8 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	if (flags & MenuButtonDisabled) {
 		rb--;
 	}
-	i = mi->d.listbox.nlines;
-	s = mi->d.listbox.startline;
+	i = mi->D.Listbox.nlines;
+	s = mi->D.Listbox.startline;
 	while (i--) {
 		PushClipping();
 		SetClipping(0, 0, x + w, VideoHeight - 1);
@@ -548,24 +548,24 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 //		}
 		PopClipping();
 		if (!(flags & MenuButtonDisabled)) {
-			if (i < mi->d.listbox.noptions) {
+			if (i < mi->D.Listbox.noptions) {
 				SetDefaultTextColors(nc, rc);
-				text = (*mi->d.listbox.retrieveopt)(mi, i + s);
+				text = (*mi->D.Listbox.retrieveopt)(mi, i + s);
 				if (text) {
-					if (i + s == mi->d.listbox.curopt) {
+					if (i + s == mi->D.Listbox.curopt) {
 						SetDefaultTextColors(rc, rc);
 					} else {
 						SetDefaultTextColors(nc, rc);
 					}
-					VideoDrawText(x + 2, y + 2 + 18 * i, mi->font,text);
+					VideoDrawText(x + 2, y + 2 + 18 * i, mi->Font,text);
 				}
 			}
 		}
 	}
-	if (mi->d.listbox.curopt != -1 &&
-			(mi->d.listbox.curopt < mi->d.listbox.startline ||
-				mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines)) {
-		(*mi->d.listbox.retrieveopt)(mi, mi->d.listbox.curopt);
+	if (mi->D.Listbox.curopt != -1 &&
+			(mi->D.Listbox.curopt < mi->D.Listbox.startline ||
+				mi->D.Listbox.curopt >= mi->D.Listbox.startline + mi->D.Listbox.nlines)) {
+		(*mi->D.Listbox.retrieveopt)(mi, mi->D.Listbox.curopt);
 	}
 
 	if (flags & MenuButtonSelected) {
@@ -594,13 +594,13 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 	int x;
 	int y;
 
-	flags = mi->flags;
-	w = mi->d.vslider.xsize;
-	h = mi->d.vslider.ysize;
-	x = mx + mi->xofs;
-	y = my + mi->yofs;
+	flags = mi->Flags;
+	w = mi->D.VSlider.xsize;
+	h = mi->D.VSlider.ysize;
+	x = mx + mi->XOfs;
+	y = my + mi->YOfs;
 
-	if (mi->d.vslider.style == MI_STYLE_SC_VSLIDER) {
+	if (mi->D.VSlider.style == MI_STYLE_SC_VSLIDER) {
 		int upb;
 		int downb;
 
@@ -608,10 +608,10 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 			upb = MBUTTON_SC_UP_ARROW - 1;
 			downb = MBUTTON_SC_DOWN_ARROW - 1;
 		} else if (flags & MenuButtonClicked) {
-			if (mi->d.vslider.cflags&MI_CFLAGS_UP) {
+			if (mi->D.VSlider.cflags&MI_CFLAGS_UP) {
 				upb = MBUTTON_SC_UP_ARROW + 1;
 				downb = MBUTTON_SC_DOWN_ARROW;
-			} else if (mi->d.vslider.cflags&MI_CFLAGS_DOWN) {
+			} else if (mi->D.VSlider.cflags&MI_CFLAGS_DOWN) {
 				upb = MBUTTON_SC_UP_ARROW;
 				downb = MBUTTON_SC_DOWN_ARROW + 1;
 			} else {
@@ -630,7 +630,7 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_VCONT, x, p);
 		}
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_VCONT + 1, x, y + h - 1 - 16 - 2 - 8);
-		p = (mi->d.vslider.percent * (h - 54)) / 100;
+		p = (mi->D.VSlider.percent * (h - 54)) / 100;
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_KNOB, x, y + 16 + 2 + p);
 	} else {
 		if (flags & MenuButtonDisabled) {
@@ -657,17 +657,17 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_VCONT, x, y + h / 2);
 //			}
 			PopClipping();
-			if (mi->d.vslider.cflags & MI_CFLAGS_UP) {
+			if (mi->D.VSlider.cflags & MI_CFLAGS_UP) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW + 1, x, y - 2);
 			} else {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_UP_ARROW, x, y - 2);
 			}
-			if (mi->d.vslider.cflags & MI_CFLAGS_DOWN) {
+			if (mi->D.VSlider.cflags & MI_CFLAGS_DOWN) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW + 1, x, y + h - 20);
 			} else {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_DOWN_ARROW, x, y + h - 20);
 			}
-			p = (mi->d.vslider.percent * (h - 54)) / 100;
+			p = (mi->D.VSlider.percent * (h - 54)) / 100;
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 1, y + 18 + p);
 		}
 
@@ -697,13 +697,13 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 	int x;
 	int y;
 
-	flags = mi->flags;
-	w = mi->d.hslider.xsize;
-	h = mi->d.hslider.ysize;
-	x = mx + mi->xofs;
-	y = my + mi->yofs;
+	flags = mi->Flags;
+	w = mi->D.HSlider.xsize;
+	h = mi->D.HSlider.ysize;
+	x = mx + mi->XOfs;
+	y = my + mi->YOfs;
 
-	if (mi->d.hslider.style == MI_STYLE_SC_HSLIDER) {
+	if (mi->D.HSlider.style == MI_STYLE_SC_HSLIDER) {
 		int leftb;
 		int rightb;
 
@@ -711,10 +711,10 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 			leftb = MBUTTON_SC_LEFT_ARROW - 1;
 			rightb = MBUTTON_SC_RIGHT_ARROW - 1;
 		} else if (flags & MenuButtonClicked) {
-			if (mi->d.vslider.cflags & MI_CFLAGS_LEFT) {
+			if (mi->D.VSlider.cflags & MI_CFLAGS_LEFT) {
 				leftb = MBUTTON_SC_LEFT_ARROW + 1;
 				rightb = MBUTTON_SC_RIGHT_ARROW;
-			} else if (mi->d.vslider.cflags & MI_CFLAGS_RIGHT) {
+			} else if (mi->D.VSlider.cflags & MI_CFLAGS_RIGHT) {
 				leftb = MBUTTON_SC_LEFT_ARROW;
 				rightb = MBUTTON_SC_RIGHT_ARROW + 1;
 			} else {
@@ -733,7 +733,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_HCONT, p, y);
 		}
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_HCONT + 1, x + w - 1 - 16 - 2 - 8, y);
-		p = (mi->d.vslider.percent * (w - 54)) / 100;
+		p = (mi->D.VSlider.percent * (w - 54)) / 100;
 		VideoDraw(MenuButtonGfx.Sprite, MBUTTON_SC_S_KNOB, x + 16 + 2 + p, y);
 	} else {
 		if (flags & MenuButtonDisabled) {
@@ -760,17 +760,17 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 				VideoDrawClip(MenuButtonGfx.Sprite, MBUTTON_S_HCONT, x + w / 2, y);
 //			}
 			PopClipping();
-			if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
+			if (mi->D.HSlider.cflags & MI_CFLAGS_LEFT) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW + 1, x - 2, y);
 			} else {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_LEFT_ARROW, x - 2, y);
 			}
-			if (mi->d.hslider.cflags & MI_CFLAGS_RIGHT) {
+			if (mi->D.HSlider.cflags & MI_CFLAGS_RIGHT) {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW + 1, x + w - 20, y);
 			} else {
 				VideoDraw(MenuButtonGfx.Sprite, MBUTTON_RIGHT_ARROW, x + w - 20, y);
 			}
-			p = (mi->d.hslider.percent * (w - 54)) / 100;
+			p = (mi->D.HSlider.percent * (w - 54)) / 100;
 			VideoDraw(MenuButtonGfx.Sprite, MBUTTON_S_KNOB, x + 18 + p, y + 1);
 		}
 
@@ -933,23 +933,23 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 	int y;
 	int p;
 
-	flags = mi->flags;
-	rb = mi->d.input.button;
-	x = mx+mi->xofs;
-	y = my+mi->yofs;
-	w = mi->d.input.xsize;
-	h = mi->d.input.ysize;
+	flags = mi->Flags;
+	rb = mi->D.Input.button;
+	x = mx+mi->XOfs;
+	y = my+mi->YOfs;
+	w = mi->D.Input.xsize;
+	h = mi->D.Input.ysize;
 
 	GetDefaultTextColors(&oldnc,&oldrc);
-	if (mi->d.input.normalcolor || mi->d.input.reversecolor) {
-		nc = mi->d.input.normalcolor ? mi->d.input.normalcolor : oldnc;
-		rc = mi->d.input.reversecolor ? mi->d.input.reversecolor : oldrc;
+	if (mi->D.Input.normalcolor || mi->D.Input.reversecolor) {
+		nc = mi->D.Input.normalcolor ? mi->D.Input.normalcolor : oldnc;
+		rc = mi->D.Input.reversecolor ? mi->D.Input.reversecolor : oldrc;
 		SetDefaultTextColors(nc, rc);
 	} else {
 		nc = oldnc;
 		rc = oldrc;
 	}
-	if (mi->d.input.button == MBUTTON_SC_PULLDOWN) {
+	if (mi->D.Input.button == MBUTTON_SC_PULLDOWN) {
 		rb = MBUTTON_SC_INPUT;
 		if (flags & MenuButtonDisabled) {
 			rb -= 3;
@@ -960,9 +960,9 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 			VideoDraw(MenuButtonGfx.Sprite, rb, p, y);
 		}
 		VideoDraw(MenuButtonGfx.Sprite, rb + 1, x + w - 1 - 16, y);
-		text = mi->d.input.buffer;
+		text = mi->D.Input.buffer;
 		if (text) {
-			VideoDrawText(x + 4, y + 2, mi->font, text);
+			VideoDrawText(x + 4, y + 2, mi->Font, text);
 		}
 	} else {
 		if (flags & MenuButtonDisabled) {
@@ -978,9 +978,9 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 			VideoDrawClip(MenuButtonGfx.Sprite, rb, x - 1, y - 1);
 //		}
 		PopClipping();
-		text = mi->d.input.buffer;
+		text = mi->D.Input.buffer;
 		if (text) {
-			VideoDrawText(x + 2, y + 2, mi->font, text);
+			VideoDrawText(x + 2, y + 2, mi->Font, text);
 		}
 		if (flags & MenuButtonSelected) {
 			if (flags & MenuButtonDisabled) {
@@ -1069,46 +1069,46 @@ void DrawMenu(Menu* menu)
 	mi = menu->Items;
 	mip = NULL;
 	for (i = 0; i < n; ++i) {
-		switch (mi->mitype) {
+		switch (mi->MiType) {
 			case MI_TYPE_TEXT:
-				if (!mi->d.text.text) {
+				if (!mi->D.Text.text) {
 					break;
 				}
 				GetDefaultTextColors(&oldnc, &oldrc);
-				if (mi->d.text.normalcolor || mi->d.text.reversecolor) {
-					nc = mi->d.text.normalcolor ? mi->d.text.normalcolor : oldnc;
-					rc = mi->d.text.reversecolor ? mi->d.text.reversecolor : oldrc;
+				if (mi->D.Text.normalcolor || mi->D.Text.reversecolor) {
+					nc = mi->D.Text.normalcolor ? mi->D.Text.normalcolor : oldnc;
+					rc = mi->D.Text.reversecolor ? mi->D.Text.reversecolor : oldrc;
 					SetDefaultTextColors(nc, rc);
 				} else {
 					nc = oldnc;
 					rc = oldrc;
 				}
-				if (mi->flags & MenuButtonActive && mi->d.text.action) {
-					VideoDrawRectangleClip(ColorGray, menu->X + mi->xofs - 4, menu->Y + mi->yofs - 4,
-											VideoTextLength(mi->font, mi->d.text.text) + 5,
-											VideoTextHeight(mi->font) + 5);
+				if (mi->Flags & MenuButtonActive && mi->D.Text.action) {
+					VideoDrawRectangleClip(ColorGray, menu->X + mi->XOfs - 4, menu->Y + mi->YOfs - 4,
+											VideoTextLength(mi->Font, mi->D.Text.text) + 5,
+											VideoTextHeight(mi->Font) + 5);
 					SetDefaultTextColors(rc, rc);
 				}
-				if (mi->d.text.align & MI_TFLAGS_CENTERED) {
-					VideoDrawTextCentered(menu->X + mi->xofs, menu->Y + mi->yofs,
-							mi->font, mi->d.text.text);
-				} else if (mi->d.text.align & MI_TFLAGS_RALIGN) {
-					l = VideoTextLength(mi->font, mi->d.text.text);
-					VideoDrawText(menu->X + mi->xofs-l,menu->Y + mi->yofs,
-							mi->font, mi->d.text.text);
+				if (mi->D.Text.align & MI_TFLAGS_CENTERED) {
+					VideoDrawTextCentered(menu->X + mi->XOfs, menu->Y + mi->YOfs,
+							mi->Font, mi->D.Text.text);
+				} else if (mi->D.Text.align & MI_TFLAGS_RALIGN) {
+					l = VideoTextLength(mi->Font, mi->D.Text.text);
+					VideoDrawText(menu->X + mi->XOfs-l,menu->Y + mi->YOfs,
+							mi->Font, mi->D.Text.text);
 				} else {
-					VideoDrawText(menu->X + mi->xofs, menu->Y + mi->yofs,
-							mi->font, mi->d.text.text);
+					VideoDrawText(menu->X + mi->XOfs, menu->Y + mi->YOfs,
+							mi->Font, mi->D.Text.text);
 				}
 				SetDefaultTextColors(oldnc, oldrc);
 				break;
 			case MI_TYPE_BUTTON:
-				DrawMenuButton(mi->d.button.style, mi->flags,
-					menu->X + mi->xofs, menu->Y + mi->yofs,
-					mi->d.button.text);
+				DrawMenuButton(mi->D.Button.Style, mi->Flags,
+					menu->X + mi->XOfs, menu->Y + mi->YOfs,
+					mi->D.Button.Text);
 				break;
 			case MI_TYPE_PULLDOWN:
-				if (mi->flags & MenuButtonClicked) {
+				if (mi->Flags & MenuButtonClicked) {
 					mip = mi; // Delay, due to possible overlaying!
 				} else {
 					DrawPulldown(mi, menu->X, menu->Y);
@@ -1124,17 +1124,17 @@ void DrawMenu(Menu* menu)
 				DrawHSlider(mi, menu->X, menu->Y);
 				break;
 			case MI_TYPE_DRAWFUNC:
-				if (mi->d.drawfunc.draw) {
-					(*mi->d.drawfunc.draw)(mi);
+				if (mi->D.DrawFunc.draw) {
+					(*mi->D.DrawFunc.draw)(mi);
 				}
 				break;
 			case MI_TYPE_INPUT:
 				DrawInput(mi, menu->X, menu->Y);
 				break;
 			case MI_TYPE_CHECKBOX:
-				DrawCheckbox(mi->d.checkbox.style, mi->flags, mi->d.checkbox.state,
-					menu->X + mi->xofs, menu->Y + mi->yofs,
-					mi->d.checkbox.text);
+				DrawCheckbox(mi->D.Checkbox.Style, mi->Flags, mi->D.Checkbox.State,
+					menu->X + mi->XOfs, menu->Y + mi->YOfs,
+					mi->D.Checkbox.Text);
 				break;
 			default:
 				break;
@@ -1219,14 +1219,14 @@ static void PasteFromClipboard(Menuitem* mi)
 		return;
 	}
 #endif
-	for (i = 0; mi->d.input.nch < mi->d.input.maxch && clipboard[i] &&
-			VideoTextLength(mi->font, mi->d.input.buffer) + 8 < mi->d.input.xsize; ++i) {
+	for (i = 0; mi->D.Input.nch < mi->D.Input.maxch && clipboard[i] &&
+			VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize; ++i) {
 		if (clipboard[i] >= 32 && clipboard[i] != '~') {
-			mi->d.input.buffer[mi->d.input.nch] = clipboard[i];
-			++mi->d.input.nch;
+			mi->D.Input.buffer[mi->D.Input.nch] = clipboard[i];
+			++mi->D.Input.nch;
 		}
 	}
-	strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+	strcpy(mi->D.Input.buffer + mi->D.Input.nch, "~!_");
 #ifdef USE_WIN32
 	GlobalUnlock(handle);
 	CloseClipboard();
@@ -1267,9 +1267,9 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 	}
 
 	menu = CurrentMenu;
-	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].mitype == MI_TYPE_INPUT) {
+	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].MiType == MI_TYPE_INPUT) {
 		mi = menu->Items + MenuButtonCurSel;
-		if (!(mi->flags & MenuButtonDisabled)) {
+		if (!(mi->Flags & MenuButtonDisabled)) {
 inkey:
 			if (key >= 0x80 && key < 0x100) {
 				// FIXME ARI: ISO->WC2 Translation here!
@@ -1277,8 +1277,8 @@ inkey:
 			}
 			switch(key) {
 				case '\b': case '\177':
-					if (mi->d.input.nch > 0) {
-						strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
+					if (mi->D.Input.nch > 0) {
+						strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
 					}
 					break;
 				case 9:
@@ -1286,8 +1286,8 @@ inkey:
 				case '~': // ~ are quotes
 					return; // Just ignore them
 				case KeyCodeDelete:
-					mi->d.input.nch = 0;
-					strcpy(mi->d.input.buffer, "~!_");
+					mi->D.Input.nch = 0;
+					strcpy(mi->D.Input.buffer, "~!_");
 					break;
 				default:
 					if (KeyModifiers&ModifierAlt) {
@@ -1298,20 +1298,20 @@ inkey:
 						if (key == 'v' || key == 'V') {
 							PasteFromClipboard(mi);
 						} else if (key == 'u' || key == 'U') {
-							mi->d.input.nch = 0;
-							strcpy(mi->d.input.buffer, "~!_");
+							mi->D.Input.nch = 0;
+							strcpy(mi->D.Input.buffer, "~!_");
 						}
 					} else if (key >= 32 && key < 0x100) {
-						if (mi->d.input.nch < mi->d.input.maxch &&
-							VideoTextLength(mi->font, mi->d.input.buffer) + 8 < mi->d.input.xsize) {
-							mi->d.input.buffer[mi->d.input.nch++] = keychar;
-							strcpy(mi->d.input.buffer + mi->d.input.nch, "~!_");
+						if (mi->D.Input.nch < mi->D.Input.maxch &&
+							VideoTextLength(mi->Font, mi->D.Input.buffer) + 8 < mi->D.Input.xsize) {
+							mi->D.Input.buffer[mi->D.Input.nch++] = keychar;
+							strcpy(mi->D.Input.buffer + mi->D.Input.nch, "~!_");
 						}
 					}
 					break;
 			}
-			if (mi->d.input.action) {
-				(*mi->d.input.action)(mi, key);
+			if (mi->D.Input.action) {
+				(*mi->D.Input.action)(mi, key);
 			}
 			return;
 		}
@@ -1322,11 +1322,11 @@ normkey:
 		mi = menu->Items;
 		i = menu->NumItems;
 		while (i--) {
-			switch (mi->mitype) {
+			switch (mi->MiType) {
 				case MI_TYPE_BUTTON:
-					if (key == mi->d.button.hotkey) {
-						if (!(mi->flags & MenuButtonDisabled) && mi->d.button.handler) {
-							(*mi->d.button.handler)();
+					if (key == mi->D.Button.HotKey) {
+						if (!(mi->Flags & MenuButtonDisabled) && mi->D.Button.Handler) {
+							(*mi->D.Button.Handler)();
 						}
 						return;
 					}
@@ -1340,30 +1340,30 @@ normkey:
 		case 10: case 13: // RETURN
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
-				switch (mi->mitype) {
+				switch (mi->MiType) {
 					case MI_TYPE_BUTTON:
-						if (mi->d.button.handler) {
-							(*mi->d.button.handler)();
+						if (mi->D.Button.Handler) {
+							(*mi->D.Button.Handler)();
 						}
 						return;
 					case MI_TYPE_LISTBOX:
-						if (mi->d.listbox.handler) {
-							(*mi->d.listbox.handler)();
+						if (mi->D.Listbox.handler) {
+							(*mi->D.Listbox.handler)();
 						}
 						return;
 					case MI_TYPE_VSLIDER:
-						if (mi->d.vslider.handler) {
-							(*mi->d.vslider.handler)();
+						if (mi->D.VSlider.handler) {
+							(*mi->D.VSlider.handler)();
 						}
 						return;
 					case MI_TYPE_HSLIDER:
-						if (mi->d.hslider.handler) {
-							(*mi->d.hslider.handler)();
+						if (mi->D.HSlider.handler) {
+							(*mi->D.HSlider.handler)();
 						}
 						return;
 					case MI_TYPE_CHECKBOX:
-						if (mi->d.checkbox.action) {
-							(*mi->d.checkbox.action)(mi);
+						if (mi->D.Checkbox.Action) {
+							(*mi->D.Checkbox.Action)(mi);
 						}
 						return;
 					default:
@@ -1374,76 +1374,76 @@ normkey:
 		case KeyCodeUp: case KeyCodeDown:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
-				if (!(mi->flags & MenuButtonClicked)) {
-					switch (mi->mitype) {
+				if (!(mi->Flags & MenuButtonClicked)) {
+					switch (mi->MiType) {
 						case MI_TYPE_PULLDOWN:
 							if (key == KeyCodeDown) {
-								if (mi->d.pulldown.curopt + 1 < mi->d.pulldown.noptions) {
-									mi->d.pulldown.curopt++;
+								if (mi->D.Pulldown.curopt + 1 < mi->D.Pulldown.noptions) {
+									mi->D.Pulldown.curopt++;
 								} else {
 									break;
 								}
 							} else {
-								if (mi->d.pulldown.curopt > 0) {
-									mi->d.pulldown.curopt--;
+								if (mi->D.Pulldown.curopt > 0) {
+									mi->D.Pulldown.curopt--;
 								} else {
 									break;
 								}
 							}
-							if (mi->d.pulldown.action) {
-								(*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+							if (mi->D.Pulldown.action) {
+								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
 							}
 							break;
 						case MI_TYPE_LISTBOX:
 							if (key == KeyCodeDown) {
-								if (mi->d.listbox.curopt < mi->d.listbox.noptions - 1) {
-									mi->d.listbox.curopt++;
-									if (mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines) {
-										mi->d.listbox.startline = mi->d.listbox.curopt - mi->d.listbox.nlines + 1;
-									} else if (mi->d.listbox.curopt < mi->d.listbox.startline) {
-										mi->d.listbox.startline = mi->d.listbox.curopt;
+								if (mi->D.Listbox.curopt < mi->D.Listbox.noptions - 1) {
+									mi->D.Listbox.curopt++;
+									if (mi->D.Listbox.curopt >= mi->D.Listbox.startline + mi->D.Listbox.nlines) {
+										mi->D.Listbox.startline = mi->D.Listbox.curopt - mi->D.Listbox.nlines + 1;
+									} else if (mi->D.Listbox.curopt < mi->D.Listbox.startline) {
+										mi->D.Listbox.startline = mi->D.Listbox.curopt;
 									}
 								}
 							} else {
-								if (mi->d.listbox.curopt > 0) {
-									mi->d.listbox.curopt--;
-									if (mi->d.listbox.curopt >= mi->d.listbox.startline + mi->d.listbox.nlines) {
-										mi->d.listbox.startline = mi->d.listbox.curopt - mi->d.listbox.nlines + 1;
-									} else if (mi->d.listbox.curopt < mi->d.listbox.startline) {
-										mi->d.listbox.startline = mi->d.listbox.curopt;
+								if (mi->D.Listbox.curopt > 0) {
+									mi->D.Listbox.curopt--;
+									if (mi->D.Listbox.curopt >= mi->D.Listbox.startline + mi->D.Listbox.nlines) {
+										mi->D.Listbox.startline = mi->D.Listbox.curopt - mi->D.Listbox.nlines + 1;
+									} else if (mi->D.Listbox.curopt < mi->D.Listbox.startline) {
+										mi->D.Listbox.startline = mi->D.Listbox.curopt;
 									}
 								}
 							}
-							if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-								mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) / (mi->d.listbox.noptions - mi->d.listbox.nlines);
+							if (mi->D.Listbox.noptions > mi->D.Listbox.nlines) {
+								mi[1].D.VSlider.percent = (mi->D.Listbox.startline * 100) / (mi->D.Listbox.noptions - mi->D.Listbox.nlines);
 							}
-							if (mi[1].d.vslider.action) {
-								(*mi[1].d.vslider.action)(mi);
+							if (mi[1].D.VSlider.action) {
+								(*mi[1].D.VSlider.action)(mi);
 							}
 							break;
 						case MI_TYPE_VSLIDER:
 							if (key == KeyCodeDown) {
-								mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
+								mi->D.VSlider.cflags |= MI_CFLAGS_DOWN;
 								// Update listbox
-								if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-									if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
-										mi[-1].d.listbox.startline++;
+								if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+									if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
+										mi[-1].D.Listbox.startline++;
 									}
 								}
 							} else {
-								mi->d.vslider.cflags |= MI_CFLAGS_UP;
+								mi->D.VSlider.cflags |= MI_CFLAGS_UP;
 								// Update listbox
-								if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-									if (mi[-1].d.listbox.startline > 0) {
-										mi[-1].d.listbox.startline--;
+								if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+									if (mi[-1].D.Listbox.startline > 0) {
+										mi[-1].D.Listbox.startline--;
 									}
 								}
 							}
-							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-								mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+							if (mi[-1].D.Listbox.noptions > mi[-1].D.Listbox.nlines) {
+								mi->D.VSlider.percent = (mi[-1].D.Listbox.startline * 100) / (mi[-1].D.Listbox.noptions - mi[-1].D.Listbox.nlines);
 							}
-							if (mi->d.vslider.action) {
-								(*mi->d.vslider.action)(mi);
+							if (mi->D.VSlider.action) {
+								(*mi->D.VSlider.action)(mi);
 							}
 							break;
 						default:
@@ -1456,22 +1456,22 @@ normkey:
 		case KeyCodeRight:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
-				if (!(mi->flags & MenuButtonClicked)) {
-					switch (mi->mitype) {
+				if (!(mi->Flags & MenuButtonClicked)) {
+					switch (mi->MiType) {
 						case MI_TYPE_HSLIDER:
 							if (key == KeyCodeLeft) {
-								mi->d.hslider.percent -= 10;
-								if (mi->d.hslider.percent < 0) {
-									mi->d.hslider.percent = 0;
+								mi->D.HSlider.percent -= 10;
+								if (mi->D.HSlider.percent < 0) {
+									mi->D.HSlider.percent = 0;
 								}
 							} else {
-								mi->d.hslider.percent += 10;
-								if (mi->d.hslider.percent > 100) {
-									mi->d.hslider.percent = 100;
+								mi->D.HSlider.percent += 10;
+								if (mi->D.HSlider.percent > 100) {
+									mi->D.HSlider.percent = 100;
 								}
 							}
-							if (mi->d.hslider.action) {
-								(*mi->d.hslider.action)(mi);
+							if (mi->D.HSlider.action) {
+								(*mi->D.HSlider.action)(mi);
 							}
 							break;
 						default:
@@ -1484,13 +1484,13 @@ normkey:
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
-			if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].flags & MenuButtonClicked)) {
+			if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].Flags & MenuButtonClicked)) {
 				n = menu->NumItems;
 				for (i = 0; i < n; ++i) {
 					mi = menu->Items + ((MenuButtonCurSel + i + 1) % n);
-					switch (mi->mitype) {
+					switch (mi->MiType) {
 						case MI_TYPE_PULLDOWN:
-							if ((mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+							if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 								continue;
 							}
 							/* FALL THROUGH */
@@ -1500,11 +1500,11 @@ normkey:
 						case MI_TYPE_HSLIDER:
 						case MI_TYPE_INPUT:
 						case MI_TYPE_CHECKBOX:
-							if (mi->flags & MenuButtonDisabled) {
+							if (mi->Flags & MenuButtonDisabled) {
 								break;
 							}
-							menu->Items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
-							mi->flags |= MenuButtonSelected;
+							menu->Items[MenuButtonCurSel].Flags &= ~MenuButtonSelected;
+							mi->Flags |= MenuButtonSelected;
 							MenuButtonCurSel = mi - menu->Items;
 							return;
 						default:
@@ -1522,14 +1522,14 @@ normkey:
 			mi = menu->Items;
 			i = menu->NumItems;
 			while (i--) {
-				switch (mi->mitype) {
+				switch (mi->MiType) {
 					case MI_TYPE_INPUT:
-						if (!(mi->flags & MenuButtonDisabled)) {
+						if (!(mi->Flags & MenuButtonDisabled)) {
 							if (MenuButtonCurSel != -1) {
-								menu->Items[MenuButtonCurSel].flags &=
+								menu->Items[MenuButtonCurSel].Flags &=
 									~MenuButtonSelected;
 							}
-							mi->flags |= MenuButtonSelected;
+							mi->Flags |= MenuButtonSelected;
 							MenuButtonCurSel = mi - menu->Items;
 							goto inkey;
 						}
@@ -1564,11 +1564,11 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	if (key == KeyCodeUp || key == KeyCodeDown) {
 		if (MenuButtonCurSel != -1) {
 			mi = menu->Items + MenuButtonCurSel;
-			if (mi->mitype == MI_TYPE_VSLIDER) {
+			if (mi->MiType == MI_TYPE_VSLIDER) {
 				if (key == KeyCodeDown) {
-					mi->d.vslider.cflags &= ~MI_CFLAGS_DOWN;
+					mi->D.VSlider.cflags &= ~MI_CFLAGS_DOWN;
 				} else {
-					mi->d.vslider.cflags &= ~MI_CFLAGS_UP;
+					mi->D.VSlider.cflags &= ~MI_CFLAGS_UP;
 				}
 			}
 		}
@@ -1595,9 +1595,9 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 	menu = CurrentMenu;
 	mi = menu->Items + MenuButtonCurSel;
 	if (MenuButtonCurSel != -1) {
-		if (mi->mitype == MI_TYPE_INPUT) {
+		if (mi->MiType == MI_TYPE_INPUT) {
 			MenuHandleKeyDown(key, keychar);
-		} else if (mi->mitype == MI_TYPE_VSLIDER || mi->mitype == MI_TYPE_LISTBOX) {
+		} else if (mi->MiType == MI_TYPE_VSLIDER || mi->MiType == MI_TYPE_LISTBOX) {
 			if (key == KeyCodeDown || key == KeyCodeUp) {
 				MenuHandleKeyDown(key, keychar);
 			}
@@ -1641,55 +1641,55 @@ static void MenuHandleMouseMove(int x, int y)
 	// check active (popped-up) pulldown first, as it may overlay other menus!
 	mi = menu->Items;
 	for (i = 0; i < n; ++i) {
-		if (!(mi->flags & MenuButtonDisabled)) {
-			if (mi->mitype == MI_TYPE_PULLDOWN && (mi->flags & MenuButtonClicked)) {
-				xs = menu->X + mi->xofs;
-				ys = menu->Y + mi->yofs;
-				if (mi->d.pulldown.button == MBUTTON_SC_PULLDOWN) {
+		if (!(mi->Flags & MenuButtonDisabled)) {
+			if (mi->MiType == MI_TYPE_PULLDOWN && (mi->Flags & MenuButtonClicked)) {
+				xs = menu->X + mi->XOfs;
+				ys = menu->Y + mi->YOfs;
+				if (mi->D.Pulldown.button == MBUTTON_SC_PULLDOWN) {
 					int usetop;
 
-					h = mi->d.pulldown.ysize;
-					if (mi->yofs + (h + 1) * mi->d.pulldown.noptions >= mi->menu->Height) {
-						ys -= h * mi->d.pulldown.noptions;
+					h = mi->D.Pulldown.ysize;
+					if (mi->YOfs + (h + 1) * mi->D.Pulldown.noptions >= mi->Menu->Height) {
+						ys -= h * mi->D.Pulldown.noptions;
 						usetop = 0;
 					} else {
 						usetop = 1;
 					}
-					if (!(x < xs || x > xs + mi->d.pulldown.xsize || y < ys ||
-							y > ys + (h + 1) * mi->d.pulldown.noptions)) {
+					if (!(x < xs || x > xs + mi->D.Pulldown.xsize || y < ys ||
+							y > ys + (h + 1) * mi->D.Pulldown.noptions)) {
 						j = (y - ys) / h;
 						if (usetop) {
 							--j;
 						} else {
-							if (j == mi->d.pulldown.noptions) {
+							if (j == mi->D.Pulldown.noptions) {
 								j = -1;
 							}
 						}
-						if (j >= -1 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
-							mi->d.pulldown.cursel = j;
-							if (mi->d.pulldown.action) {
-								(*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+						if (j >= -1 && j < mi->D.Pulldown.noptions && j != mi->D.Pulldown.cursel) {
+							mi->D.Pulldown.cursel = j;
+							if (mi->D.Pulldown.action) {
+								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.cursel);
 							}
 						}
 					}
 					MenuButtonUnderCursor = i;
 				} else {
-					h = mi->d.pulldown.ysize - 2;
-					if (ys + 1 <= mi->d.pulldown.curopt * h + CurrentMenu->Y) {
+					h = mi->D.Pulldown.ysize - 2;
+					if (ys + 1 <= mi->D.Pulldown.curopt * h + CurrentMenu->Y) {
 						ys = 2 + CurrentMenu->Y;
 					} else {
-						ys -= mi->d.pulldown.curopt * h;
-						if (ys + h * mi->d.pulldown.noptions >= 480 + CurrentMenu->Y) {
-							ys -= ys + h * mi->d.pulldown.noptions - (480 + CurrentMenu->Y);
+						ys -= mi->D.Pulldown.curopt * h;
+						if (ys + h * mi->D.Pulldown.noptions >= 480 + CurrentMenu->Y) {
+							ys -= ys + h * mi->D.Pulldown.noptions - (480 + CurrentMenu->Y);
 						}
 					}
-					if (!(x < xs || x > xs + mi->d.pulldown.xsize || y < ys ||
-							y > ys + h * mi->d.pulldown.noptions)) {
+					if (!(x < xs || x > xs + mi->D.Pulldown.xsize || y < ys ||
+							y > ys + h * mi->D.Pulldown.noptions)) {
 						j = (y - ys) / h;
-						if (j >= 0 && j < mi->d.pulldown.noptions && j != mi->d.pulldown.cursel) {
-							mi->d.pulldown.cursel = j;
-							if (mi->d.pulldown.action) {
-								(*mi->d.pulldown.action)(mi, mi->d.pulldown.cursel);
+						if (j >= 0 && j < mi->D.Pulldown.noptions && j != mi->D.Pulldown.cursel) {
+							mi->D.Pulldown.cursel = j;
+							if (mi->D.Pulldown.action) {
+								(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.cursel);
 							}
 						}
 					}
@@ -1703,104 +1703,104 @@ static void MenuHandleMouseMove(int x, int y)
 	if (MenuButtonUnderCursor == -1) {
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
-			if (!(mi->flags & MenuButtonDisabled)) {
-				switch (mi->mitype) {
+			if (!(mi->Flags & MenuButtonDisabled)) {
+				switch (mi->MiType) {
 					case MI_TYPE_TEXT:
-						if (!mi->d.text.text || !mi->d.text.action)
+						if (!mi->D.Text.text || !mi->D.Text.action)
 							continue;
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs - 4 || x > xs + VideoTextLength(mi->font, mi->d.text.text) + 5 ||
-								y < ys - 4 || y > ys + VideoTextHeight(mi->font) + 5) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs - 4 || x > xs + VideoTextLength(mi->Font, mi->D.Text.text) + 5 ||
+								y < ys - 4 || y > ys + VideoTextHeight(mi->Font) + 5) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						break;
 					case MI_TYPE_CHECKBOX:
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if ((!mi->d.checkbox.text || x < xs - 1 || x > xs +
-								VideoTextLength(GameFont, mi->d.checkbox.text) + 28 ||
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if ((!mi->D.Checkbox.Text || x < xs - 1 || x > xs +
+								VideoTextLength(GameFont, mi->D.Checkbox.Text) + 28 ||
 								y < ys - 2 ||  y > ys + VideoTextHeight(GameFont) + 9) &&
-								(x < xs ||  x > xs + mi->d.checkbox.style->Width || y < ys ||
-								y > ys + mi->d.checkbox.style->Height)) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+								(x < xs ||  x > xs + mi->D.Checkbox.Style->Width || y < ys ||
+								y > ys + mi->D.Checkbox.Style->Height)) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						break;
 					case MI_TYPE_BUTTON:
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.button.style->Width || y < ys ||
-								y > ys + mi->d.button.style->Height) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.Button.Style->Width || y < ys ||
+								y > ys + mi->D.Button.Style->Height) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						break;
 					case MI_TYPE_INPUT:
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.input.xsize
-								|| y < ys || y > ys + mi->d.input.ysize) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.Input.xsize
+								|| y < ys || y > ys + mi->D.Input.ysize) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						break;
 					case MI_TYPE_PULLDOWN:
-						if ((mi->d.pulldown.state & MI_PSTATE_PASSIVE)) {
+						if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
 							continue;
 						}
 						// Clicked-state already checked above - there can only be one!
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.pulldown.xsize || y<ys ||
-								y > ys + mi->d.pulldown.ysize) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.Pulldown.xsize || y<ys ||
+								y > ys + mi->D.Pulldown.ysize) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						break;
 					case MI_TYPE_LISTBOX:
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.listbox.xsize || y < ys ||
-								y > ys + mi->d.listbox.ysize) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.Listbox.xsize || y < ys ||
+								y > ys + mi->D.Listbox.ysize) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
 							continue;
 						}
 						j = (y - ys) / 18;
-						if (j + mi->d.listbox.startline != mi->d.listbox.cursel) {
-							mi->d.listbox.cursel = j + mi->d.listbox.startline; // just store for click
+						if (j + mi->D.Listbox.startline != mi->D.Listbox.cursel) {
+							mi->D.Listbox.cursel = j + mi->D.Listbox.startline; // just store for click
 						}
-						if (mi->flags & MenuButtonClicked && mi->flags & MenuButtonActive) {
-							if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
-								mi->d.listbox.dohandler = 0;
-								mi->d.listbox.curopt = mi->d.listbox.cursel;
-								if (mi->d.listbox.action) {
-									(*mi->d.listbox.action)(mi, mi->d.listbox.curopt);
+						if (mi->Flags & MenuButtonClicked && mi->Flags & MenuButtonActive) {
+							if (mi->D.Listbox.cursel != mi->D.Listbox.curopt) {
+								mi->D.Listbox.dohandler = 0;
+								mi->D.Listbox.curopt = mi->D.Listbox.cursel;
+								if (mi->D.Listbox.action) {
+									(*mi->D.Listbox.action)(mi, mi->D.Listbox.curopt);
 								}
 							}
 						}
@@ -1810,46 +1810,46 @@ static void MenuHandleMouseMove(int x, int y)
 						int arrowsize;
 						int curper;
 
-						curper = mi->d.vslider.percent;
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.vslider.xsize || y < ys ||
-								y > ys + mi->d.vslider.ysize) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						curper = mi->D.VSlider.percent;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.VSlider.xsize || y < ys ||
+								y > ys + mi->D.VSlider.ysize) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
-							if (y < ys || y > ys + mi->d.vslider.ysize ||
-									!(mi->flags & MenuButtonClicked)) {
-								mi->d.vslider.cursel = 0;
+							if (y < ys || y > ys + mi->D.VSlider.ysize ||
+									!(mi->Flags & MenuButtonClicked)) {
+								mi->D.VSlider.cursel = 0;
 								continue;
 							}
 						}
 						j = y - ys;
-						mi->d.vslider.cursel = 0;
+						mi->D.VSlider.cursel = 0;
 
-						if (mi->d.vslider.style == MI_STYLE_SC_VSLIDER) {
+						if (mi->D.VSlider.style == MI_STYLE_SC_VSLIDER) {
 							arrowsize = 16;
 						} else {
 							arrowsize = 20;
 						}
 
 						if (j < arrowsize) {
-							mi->d.vslider.cursel |= MI_CFLAGS_UP;
-						} else if (j >= mi->d.vslider.ysize - arrowsize - 1) {
-							mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
+							mi->D.VSlider.cursel |= MI_CFLAGS_UP;
+						} else if (j >= mi->D.VSlider.ysize - arrowsize - 1) {
+							mi->D.VSlider.cursel |= MI_CFLAGS_DOWN;
 						} else {
-							mi->d.vslider.cursel &= ~(MI_CFLAGS_UP | MI_CFLAGS_DOWN);
-							h = (mi->d.vslider.percent * (mi->d.vslider.ysize - 54)) / 100 + 18;
+							mi->D.VSlider.cursel &= ~(MI_CFLAGS_UP | MI_CFLAGS_DOWN);
+							h = (mi->D.VSlider.percent * (mi->D.VSlider.ysize - 54)) / 100 + 18;
 							if (j > h && j < h + 16) {
-								mi->d.vslider.cursel |= MI_CFLAGS_KNOB;
+								mi->D.VSlider.cursel |= MI_CFLAGS_KNOB;
 							} else {
-								mi->d.vslider.cursel |= MI_CFLAGS_CONT;
+								mi->D.VSlider.cursel |= MI_CFLAGS_CONT;
 								if (j <= h) {
-									mi->d.vslider.cursel |= MI_CFLAGS_UP;
+									mi->D.VSlider.cursel |= MI_CFLAGS_UP;
 								} else {
-									mi->d.vslider.cursel |= MI_CFLAGS_DOWN;
+									mi->D.VSlider.cursel |= MI_CFLAGS_DOWN;
 								}
 							}
 							j -= 8;
@@ -1857,31 +1857,31 @@ static void MenuHandleMouseMove(int x, int y)
 								j = arrowsize;
 							}
 
-							curper = ((j - arrowsize) * 100) / (mi->d.vslider.ysize - 54);
+							curper = ((j - arrowsize) * 100) / (mi->D.VSlider.ysize - 54);
 							if (curper > 100) {
 								curper = 100;
 							}
 						}
 
 						// Update listbox
-						if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-							if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
-								if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-									mi[-1].d.listbox.startline = (curper *
-										(mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines) + 50) / 100;
+						if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+								if (mi[-1].D.Listbox.noptions > mi[-1].D.Listbox.nlines) {
+									mi[-1].D.Listbox.startline = (curper *
+										(mi[-1].D.Listbox.noptions - mi[-1].D.Listbox.nlines) + 50) / 100;
 								}
 							}
-							if (mi[-1].d.listbox.noptions > mi[-1].d.listbox.nlines) {
-								mi->d.vslider.percent = (mi[-1].d.listbox.startline * 100) / (mi[-1].d.listbox.noptions - mi[-1].d.listbox.nlines);
+							if (mi[-1].D.Listbox.noptions > mi[-1].D.Listbox.nlines) {
+								mi->D.VSlider.percent = (mi[-1].D.Listbox.startline * 100) / (mi[-1].D.Listbox.noptions - mi[-1].D.Listbox.nlines);
 							}
 						} else {
-							if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
-								mi->d.vslider.percent = curper;
+							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+								mi->D.VSlider.percent = curper;
 							}
 						}
-						if ((mi->d.vslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
-							if (mi->d.vslider.action) {
-								(*mi->d.vslider.action)(mi);
+						if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+							if (mi->D.VSlider.action) {
+								(*mi->D.VSlider.action)(mi);
 							}
 						}
 						break;
@@ -1890,44 +1890,44 @@ static void MenuHandleMouseMove(int x, int y)
 					{
 						int arrowsize;
 
-						xs = menu->X + mi->xofs;
-						ys = menu->Y + mi->yofs;
-						if (x < xs || x > xs + mi->d.hslider.xsize || y < ys ||
-								y > ys + mi->d.hslider.ysize) {
-							if (!(mi->flags & MenuButtonClicked)) {
-								if (mi->flags & MenuButtonActive) {
-									mi->flags &= ~MenuButtonActive;
+						xs = menu->X + mi->XOfs;
+						ys = menu->Y + mi->YOfs;
+						if (x < xs || x > xs + mi->D.HSlider.xsize || y < ys ||
+								y > ys + mi->D.HSlider.ysize) {
+							if (!(mi->Flags & MenuButtonClicked)) {
+								if (mi->Flags & MenuButtonActive) {
+									mi->Flags &= ~MenuButtonActive;
 								}
 							}
-							if (x < xs || x > xs + mi->d.hslider.xsize || !(mi->flags & MenuButtonClicked)) {
-								mi->d.hslider.cursel = 0;
+							if (x < xs || x > xs + mi->D.HSlider.xsize || !(mi->Flags & MenuButtonClicked)) {
+								mi->D.HSlider.cursel = 0;
 								continue;
 							}
 						}
 						j = x - xs;
-						mi->d.hslider.cursel = 0;
+						mi->D.HSlider.cursel = 0;
 
-						if (mi->d.hslider.style == MI_STYLE_SC_HSLIDER) {
+						if (mi->D.HSlider.style == MI_STYLE_SC_HSLIDER) {
 							arrowsize = 16;
 						} else {
 							arrowsize = 20;
 						}
 
 						if (j < arrowsize) {
-							mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
-						} else if (j >= mi->d.hslider.xsize - arrowsize-1) {
-							mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
+							mi->D.HSlider.cursel |= MI_CFLAGS_LEFT;
+						} else if (j >= mi->D.HSlider.xsize - arrowsize-1) {
+							mi->D.HSlider.cursel |= MI_CFLAGS_RIGHT;
 						} else {
-							mi->d.hslider.cursel &= ~(MI_CFLAGS_LEFT | MI_CFLAGS_RIGHT);
-							w = (mi->d.hslider.percent * (mi->d.hslider.xsize - 54)) / 100 + 18;
+							mi->D.HSlider.cursel &= ~(MI_CFLAGS_LEFT | MI_CFLAGS_RIGHT);
+							w = (mi->D.HSlider.percent * (mi->D.HSlider.xsize - 54)) / 100 + 18;
 							if (j > w && j < w + 16) {
-								mi->d.hslider.cursel |= MI_CFLAGS_KNOB;
+								mi->D.HSlider.cursel |= MI_CFLAGS_KNOB;
 							} else {
-								mi->d.hslider.cursel |= MI_CFLAGS_CONT;
+								mi->D.HSlider.cursel |= MI_CFLAGS_CONT;
 								if (j <= w) {
-									mi->d.hslider.cursel |= MI_CFLAGS_LEFT;
+									mi->D.HSlider.cursel |= MI_CFLAGS_LEFT;
 								} else {
-									mi->d.hslider.cursel |= MI_CFLAGS_RIGHT;
+									mi->D.HSlider.cursel |= MI_CFLAGS_RIGHT;
 								}
 							}
 							j -= 8;
@@ -1935,15 +1935,15 @@ static void MenuHandleMouseMove(int x, int y)
 								j = arrowsize;
 							}
 
-							mi->d.hslider.curper = ((j - arrowsize) * 100) / (mi->d.hslider.xsize - 54);
-							if (mi->d.hslider.curper > 100) {
-								mi->d.hslider.curper = 100;
+							mi->D.HSlider.curper = ((j - arrowsize) * 100) / (mi->D.HSlider.xsize - 54);
+							if (mi->D.HSlider.curper > 100) {
+								mi->D.HSlider.curper = 100;
 							}
 						}
-						if ((mi->d.hslider.cflags & MI_CFLAGS_KNOB) && (mi->flags & MenuButtonClicked)) {
-							mi->d.hslider.percent = mi->d.hslider.curper;
-							if (mi->d.hslider.action) {
-								(*mi->d.hslider.action)(mi);
+						if ((mi->D.HSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+							mi->D.HSlider.percent = mi->D.HSlider.curper;
+							if (mi->D.HSlider.action) {
+								(*mi->D.HSlider.action)(mi);
 							}
 						}
 						break;
@@ -1952,9 +1952,9 @@ static void MenuHandleMouseMove(int x, int y)
 						continue;
 						// break;
 				}
-				switch (mi->mitype) {
+				switch (mi->MiType) {
 					case MI_TYPE_CHECKBOX:
-						if ((mi->d.checkbox.state & (MI_CSTATE_PASSIVE | MI_CSTATE_INVISIBLE))) {
+						if ((mi->D.Checkbox.State & (MI_CSTATE_PASSIVE | MI_CSTATE_INVISIBLE))) {
 							break;
 						}
 						/* FALL THROUGH */
@@ -1964,35 +1964,35 @@ static void MenuHandleMouseMove(int x, int y)
 					case MI_TYPE_VSLIDER:
 					case MI_TYPE_HSLIDER:
 					case MI_TYPE_TEXT:
-						if (!(mi->flags & MenuButtonActive)) {
-							mi->flags |= MenuButtonActive;
+						if (!(mi->Flags & MenuButtonActive)) {
+							mi->Flags |= MenuButtonActive;
 						}
 						MenuButtonUnderCursor = i;
 					default:
 						break;
 					case MI_TYPE_INPUT:
-						if (!(mi->flags & MenuButtonActive)) {
-							mi->flags |= MenuButtonActive;
+						if (!(mi->Flags & MenuButtonActive)) {
+							mi->Flags |= MenuButtonActive;
 						}
 						if (MouseButtons & LeftButton
-								&& mi->flags & MenuButtonSelected) {
-							if (mi->d.input.buffer && *mi->d.input.buffer) {
+								&& mi->Flags & MenuButtonSelected) {
+							if (mi->D.Input.buffer && *mi->D.Input.buffer) {
 								char* s;
 
-								j = strtol(mi->d.input.buffer, &s, 0);
-								if ((!*s || s[0] == '~') && (j != 0 || *mi->d.input.buffer == '0')) {
+								j = strtol(mi->D.Input.buffer, &s, 0);
+								if ((!*s || s[0] == '~') && (j != 0 || *mi->D.Input.buffer == '0')) {
 									int num;
 									num = j + x - ox + (y - oy) * 1000;
 									if (num < 0) {
 										num = 0;
 									}
-									if ((mi->d.input.maxch == 3 && num < 1000) ||
-										(mi->d.input.maxch == 4 && num < 10000) ||
-										(mi->d.input.maxch == 5 && num < 100000) ||
-										(mi->d.input.maxch == 6 && num < 1000000) ||
-										(mi->d.input.maxch >= 7)) {
-										mi->d.input.nch =
-											sprintf(mi->d.input.buffer, "%d~!_", num) - 3;
+									if ((mi->D.Input.maxch == 3 && num < 1000) ||
+										(mi->D.Input.maxch == 4 && num < 10000) ||
+										(mi->D.Input.maxch == 5 && num < 100000) ||
+										(mi->D.Input.maxch == 6 && num < 1000000) ||
+										(mi->D.Input.maxch >= 7)) {
+										mi->D.Input.nch =
+											sprintf(mi->D.Input.buffer, "%d~!_", num) - 3;
 									}
 								}
 							}
@@ -2028,8 +2028,8 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & LeftButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			if (!(mi->flags & MenuButtonClicked)) {
-				switch (mi->mitype) {
+			if (!(mi->Flags & MenuButtonClicked)) {
+				switch (mi->MiType) {
 					case MI_TYPE_CHECKBOX:
 					case MI_TYPE_BUTTON:
 					case MI_TYPE_PULLDOWN:
@@ -2039,66 +2039,66 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					case MI_TYPE_INPUT:
 					case MI_TYPE_TEXT:
 						if (MenuButtonCurSel != -1) {
-							menu->Items[MenuButtonCurSel].flags &= ~MenuButtonSelected;
+							menu->Items[MenuButtonCurSel].Flags &= ~MenuButtonSelected;
 						}
 						MenuButtonCurSel = MenuButtonUnderCursor;
-						mi->flags |= MenuButtonClicked | MenuButtonSelected;
+						mi->Flags |= MenuButtonClicked | MenuButtonSelected;
 					default:
 						break;
 				}
 			}
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-			switch (mi->mitype) {
+			switch (mi->MiType) {
 				case MI_TYPE_VSLIDER:
-					mi->d.vslider.cflags = mi->d.vslider.cursel;
+					mi->D.VSlider.cflags = mi->D.VSlider.cursel;
 
 					// Update listbox
-					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-						if (mi->d.vslider.cflags & MI_CFLAGS_DOWN) {
-							if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
-								mi[-1].d.listbox.startline++;
+					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+						if (mi->D.VSlider.cflags & MI_CFLAGS_DOWN) {
+							if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
+								mi[-1].D.Listbox.startline++;
 							}
-						} else if (mi->d.vslider.cflags & MI_CFLAGS_UP) {
-							if (mi[-1].d.listbox.startline > 0) {
-								mi[-1].d.listbox.startline--;
+						} else if (mi->D.VSlider.cflags & MI_CFLAGS_UP) {
+							if (mi[-1].D.Listbox.startline > 0) {
+								mi[-1].D.Listbox.startline--;
 							}
 						}
 					}
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi);
+					if (mi->D.VSlider.action) {
+						(*mi->D.VSlider.action)(mi);
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_HSLIDER:
-					mi->d.hslider.cflags = mi->d.hslider.cursel;
-					if (mi->d.hslider.cflags & MI_CFLAGS_RIGHT) {
-						mi->d.hslider.percent += 10;
-						if (mi->d.hslider.percent > 100)
-							mi->d.hslider.percent = 100;
-					} else if (mi->d.hslider.cflags & MI_CFLAGS_LEFT) {
-						mi->d.hslider.percent -= 10;
-						if (mi->d.hslider.percent < 0)
-							mi->d.hslider.percent = 0;
+					mi->D.HSlider.cflags = mi->D.HSlider.cursel;
+					if (mi->D.HSlider.cflags & MI_CFLAGS_RIGHT) {
+						mi->D.HSlider.percent += 10;
+						if (mi->D.HSlider.percent > 100)
+							mi->D.HSlider.percent = 100;
+					} else if (mi->D.HSlider.cflags & MI_CFLAGS_LEFT) {
+						mi->D.HSlider.percent -= 10;
+						if (mi->D.HSlider.percent < 0)
+							mi->D.HSlider.percent = 0;
 					}
-					if (mi->d.hslider.action) {
-						(*mi->d.hslider.action)(mi);
+					if (mi->D.HSlider.action) {
+						(*mi->D.HSlider.action)(mi);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
-					if (mi->d.pulldown.curopt >= 0 &&
-							mi->d.pulldown.curopt < mi->d.pulldown.noptions) {
-						mi->d.pulldown.cursel = mi->d.pulldown.curopt;
+					if (mi->D.Pulldown.curopt >= 0 &&
+							mi->D.Pulldown.curopt < mi->D.Pulldown.noptions) {
+						mi->D.Pulldown.cursel = mi->D.Pulldown.curopt;
 					}
 					break;
 				case MI_TYPE_LISTBOX:
-					if (mi->d.listbox.cursel != mi->d.listbox.curopt) {
-						mi->d.listbox.dohandler = 0;
-						mi->d.listbox.curopt = mi->d.listbox.cursel;
-						if (mi->d.listbox.action) {
-							(*mi->d.listbox.action)(mi, mi->d.listbox.curopt);
+					if (mi->D.Listbox.cursel != mi->D.Listbox.curopt) {
+						mi->D.Listbox.dohandler = 0;
+						mi->D.Listbox.curopt = mi->D.Listbox.cursel;
+						if (mi->D.Listbox.action) {
+							(*mi->D.Listbox.action)(mi, mi->D.Listbox.curopt);
 						}
 					} else {
-						mi->d.listbox.dohandler = 1;
+						mi->D.Listbox.dohandler = 1;
 					}
 					break;
 				default:
@@ -2110,12 +2110,12 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & MiddleButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			if (!(mi->flags & MenuButtonClicked)) {
-				switch (mi->mitype) {
+			if (!(mi->Flags & MenuButtonClicked)) {
+				switch (mi->MiType) {
 					case MI_TYPE_INPUT:
 						PasteFromClipboard(mi);
-						if (mi->d.input.action) {
-							(*mi->d.input.action)(mi, 'x');
+						if (mi->D.Input.action) {
+							(*mi->D.Input.action)(mi, 'x');
 						}
 						break;
 					default:
@@ -2129,48 +2129,48 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & UpButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			switch (mi->mitype) {
+			switch (mi->MiType) {
 				case MI_TYPE_LISTBOX:
-					if (mi->d.listbox.startline > 0) {
-						mi->d.listbox.startline--;
+					if (mi->D.Listbox.startline > 0) {
+						mi->D.Listbox.startline--;
 					}
-					if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-						mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
-							(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					if (mi->D.Listbox.noptions > mi->D.Listbox.nlines) {
+						mi[1].D.VSlider.percent = (mi->D.Listbox.startline * 100) /
+							(mi->D.Listbox.noptions - mi->D.Listbox.nlines);
 					}
-					if (mi[1].d.vslider.action) {
-						(*mi[1].d.vslider.action)(mi);
+					if (mi[1].D.VSlider.action) {
+						(*mi[1].D.VSlider.action)(mi);
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
-					mi->d.vslider.cflags |= MI_CFLAGS_UP;
+					mi->D.VSlider.cflags |= MI_CFLAGS_UP;
 
 					// Update listbox
-					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-						if (mi[-1].d.listbox.startline > 0) {
-							mi[-1].d.listbox.startline--;
+					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+						if (mi[-1].D.Listbox.startline > 0) {
+							mi[-1].D.Listbox.startline--;
 						}
 					}
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi);
+					if (mi->D.VSlider.action) {
+						(*mi->D.VSlider.action)(mi);
 					}
-					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
+					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
 				case MI_TYPE_HSLIDER:
-					mi->d.hslider.percent -= 10;
-					if (mi->d.hslider.percent < 0) {
-						mi->d.hslider.percent = 0;
+					mi->D.HSlider.percent -= 10;
+					if (mi->D.HSlider.percent < 0) {
+						mi->D.HSlider.percent = 0;
 					}
-					if (mi->d.hslider.action) {
-						(*mi->d.hslider.action)(mi);
+					if (mi->D.HSlider.action) {
+						(*mi->D.HSlider.action)(mi);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
-					if (mi->d.pulldown.curopt) {
-						--mi->d.pulldown.curopt;
-						if (mi->d.pulldown.action) {
-							(*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+					if (mi->D.Pulldown.curopt) {
+						--mi->D.Pulldown.curopt;
+						if (mi->D.Pulldown.action) {
+							(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
 						}
 					}
 					break;
@@ -2184,45 +2184,45 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & DownButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			switch (mi->mitype) {
+			switch (mi->MiType) {
 				case MI_TYPE_LISTBOX:
-					if (mi->d.listbox.startline + mi->d.listbox.nlines < mi->d.listbox.noptions) {
-						mi->d.listbox.startline++;
+					if (mi->D.Listbox.startline + mi->D.Listbox.nlines < mi->D.Listbox.noptions) {
+						mi->D.Listbox.startline++;
 					}
-					if (mi->d.listbox.noptions > mi->d.listbox.nlines) {
-						mi[1].d.vslider.percent = (mi->d.listbox.startline * 100) /
-							(mi->d.listbox.noptions - mi->d.listbox.nlines);
+					if (mi->D.Listbox.noptions > mi->D.Listbox.nlines) {
+						mi[1].D.VSlider.percent = (mi->D.Listbox.startline * 100) /
+							(mi->D.Listbox.noptions - mi->D.Listbox.nlines);
 					}
 					MenuHandleMouseMove(CursorX, CursorY);
 					break;
 				case MI_TYPE_VSLIDER:
-					mi->d.vslider.cflags |= MI_CFLAGS_DOWN;
+					mi->D.VSlider.cflags |= MI_CFLAGS_DOWN;
 
 					// Update listbox
-					if (mi > mi->menu->Items && mi[-1].mitype == MI_TYPE_LISTBOX) {
-						if (mi[-1].d.listbox.startline + mi[-1].d.listbox.nlines < mi[-1].d.listbox.noptions) {
-							mi[-1].d.listbox.startline++;
+					if (mi > mi->Menu->Items && mi[-1].MiType == MI_TYPE_LISTBOX) {
+						if (mi[-1].D.Listbox.startline + mi[-1].D.Listbox.nlines < mi[-1].D.Listbox.noptions) {
+							mi[-1].D.Listbox.startline++;
 						}
 					}
-					if (mi->d.vslider.action) {
-						(*mi->d.vslider.action)(mi);
+					if (mi->D.VSlider.action) {
+						(*mi->D.VSlider.action)(mi);
 					}
-					mi->d.vslider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
+					mi->D.VSlider.cflags &= ~(MI_CFLAGS_DOWN | MI_CFLAGS_UP);
 					break;
 				case MI_TYPE_HSLIDER:
-					mi->d.hslider.percent += 10;
-					if (mi->d.hslider.percent > 100) {
-						mi->d.hslider.percent = 100;
+					mi->D.HSlider.percent += 10;
+					if (mi->D.HSlider.percent > 100) {
+						mi->D.HSlider.percent = 100;
 					}
-					if (mi->d.hslider.action) {
-						(*mi->d.hslider.action)(mi);
+					if (mi->D.HSlider.action) {
+						(*mi->D.HSlider.action)(mi);
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
-					if (mi->d.pulldown.curopt < mi->d.pulldown.noptions - 1) {
-						++mi->d.pulldown.curopt;
-						if (mi->d.pulldown.action) {
-							(*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+					if (mi->D.Pulldown.curopt < mi->D.Pulldown.noptions - 1) {
+						++mi->D.Pulldown.curopt;
+						if (mi->D.Pulldown.action) {
+							(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
 						}
 					}
 					break;
@@ -2257,97 +2257,97 @@ static void MenuHandleButtonUp(unsigned b)
 		n = menu->NumItems;
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
-			switch (mi->mitype) {
+			switch (mi->MiType) {
 				case MI_TYPE_CHECKBOX:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if ((mi->d.checkbox.state & MI_CSTATE_CHECKED)) {
-								mi->d.checkbox.state &= ~MI_CSTATE_CHECKED;
+							if ((mi->D.Checkbox.State & MI_CSTATE_CHECKED)) {
+								mi->D.Checkbox.State &= ~MI_CSTATE_CHECKED;
 							} else {
-								mi->d.checkbox.state |= MI_CSTATE_CHECKED;
+								mi->D.Checkbox.State |= MI_CSTATE_CHECKED;
 							}
-							if (mi->d.checkbox.action) {
-								(*mi->d.checkbox.action)(mi);
+							if (mi->D.Checkbox.Action) {
+								(*mi->D.Checkbox.Action)(mi);
 							}
 						}
 					}
 					break;
 				case MI_TYPE_TEXT:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if (mi->d.text.action) {
-								(*mi->d.text.action)(mi);
+							if (mi->D.Text.action) {
+								(*mi->D.Text.action)(mi);
 							}
 						}
 					}
 					break;
 				case MI_TYPE_BUTTON:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if (mi->d.button.handler) {
-								(*mi->d.button.handler)();
+							if (mi->D.Button.Handler) {
+								(*mi->D.Button.Handler)();
 							}
 						}
 					}
 					break;
 				case MI_TYPE_PULLDOWN:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if (mi->d.pulldown.cursel != mi->d.pulldown.curopt &&
-									mi->d.pulldown.cursel >= 0 &&
-									mi->d.pulldown.cursel < mi->d.pulldown.noptions) {
-								mi->d.pulldown.curopt = mi->d.pulldown.cursel;
-								if (mi->d.pulldown.action) {
-									(*mi->d.pulldown.action)(mi, mi->d.pulldown.curopt);
+							if (mi->D.Pulldown.cursel != mi->D.Pulldown.curopt &&
+									mi->D.Pulldown.cursel >= 0 &&
+									mi->D.Pulldown.cursel < mi->D.Pulldown.noptions) {
+								mi->D.Pulldown.curopt = mi->D.Pulldown.cursel;
+								if (mi->D.Pulldown.action) {
+									(*mi->D.Pulldown.action)(mi, mi->D.Pulldown.curopt);
 								}
 							}
 						}
-						mi->d.pulldown.cursel = 0;
+						mi->D.Pulldown.cursel = 0;
 					}
 					break;
 				case MI_TYPE_LISTBOX:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if (mi->d.listbox.dohandler && mi->d.listbox.handler) {
-								(*mi->d.listbox.handler)();
+							if (mi->D.Listbox.dohandler && mi->D.Listbox.handler) {
+								(*mi->D.Listbox.handler)();
 							}
 						}
 					}
 					break;
 				case MI_TYPE_INPUT:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MenuButtonClicked;
 						// MAYBE ADD HERE
 					}
 					break;
 				case MI_TYPE_VSLIDER:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
-						mi->d.vslider.cflags = 0;
+						mi->Flags &= ~MenuButtonClicked;
+						mi->D.VSlider.cflags = 0;
 					}
 					break;
 				case MI_TYPE_HSLIDER:
-					if (mi->flags & MenuButtonClicked) {
+					if (mi->Flags & MenuButtonClicked) {
 						redraw_flag = 1;
-						mi->flags &= ~MenuButtonClicked;
-						mi->d.hslider.cflags = 0;
+						mi->Flags &= ~MenuButtonClicked;
+						mi->D.HSlider.cflags = 0;
 					}
 					break;
 				default:
@@ -2394,8 +2394,8 @@ static void PopMenu(void)
 	if (Menus && Menus->Menu == CurrentMenu) {
 		for (i = 0; i < CurrentMenu->NumItems; ++i) {
 			mi = CurrentMenu->Items + i;
-			if (mi->exitfunc) {
-				(*mi->exitfunc)(mi); // action/destructor
+			if (mi->ExitFunc) {
+				(*mi->ExitFunc)(mi); // action/destructor
 			}
 		}
 
@@ -2481,51 +2481,51 @@ void ProcessMenu(const char* menu_id, int loop)
 	MenuButtonCurSel = -1;
 	for (i = 0; i < menu->NumItems; ++i) {
 		mi = menu->Items + i;
-		switch (mi->mitype) {
+		switch (mi->MiType) {
 			case MI_TYPE_BUTTON:
 			case MI_TYPE_PULLDOWN:
 			case MI_TYPE_LISTBOX:
 			case MI_TYPE_VSLIDER:
 			case MI_TYPE_HSLIDER:
 			case MI_TYPE_INPUT:
-				mi->flags &= ~(MenuButtonClicked | MenuButtonActive | MenuButtonSelected);
+				mi->Flags &= ~(MenuButtonClicked | MenuButtonActive | MenuButtonSelected);
 				if (i == menu->DefSel) {
-					mi->flags |= MenuButtonSelected;
+					mi->Flags |= MenuButtonSelected;
 					MenuButtonCurSel = i;
 				}
 				break;
 		}
-		switch (mi->mitype) {
+		switch (mi->MiType) {
 			case MI_TYPE_PULLDOWN:
-				mi->d.pulldown.cursel = 0;
-				if (mi->d.pulldown.defopt != -1) {
-					mi->d.pulldown.curopt = mi->d.pulldown.defopt;
+				mi->D.Pulldown.cursel = 0;
+				if (mi->D.Pulldown.defopt != -1) {
+					mi->D.Pulldown.curopt = mi->D.Pulldown.defopt;
 				}
 				break;
 			case MI_TYPE_LISTBOX:
-				mi->d.listbox.cursel = -1;
-				mi->d.listbox.startline = 0;
-				if (mi->d.listbox.defopt != -1) {
-					mi->d.listbox.curopt = mi->d.listbox.defopt;
+				mi->D.Listbox.cursel = -1;
+				mi->D.Listbox.startline = 0;
+				if (mi->D.Listbox.defopt != -1) {
+					mi->D.Listbox.curopt = mi->D.Listbox.defopt;
 				}
 				break;
 			case MI_TYPE_VSLIDER:
-				mi->d.vslider.cflags = 0;
-				if (mi->d.vslider.defper != -1) {
-					mi->d.vslider.percent = mi->d.vslider.defper;
+				mi->D.VSlider.cflags = 0;
+				if (mi->D.VSlider.defper != -1) {
+					mi->D.VSlider.percent = mi->D.VSlider.defper;
 				}
 				break;
 			case MI_TYPE_HSLIDER:
-				mi->d.hslider.cflags = 0;
-				if (mi->d.hslider.defper != -1) {
-					mi->d.hslider.percent = mi->d.hslider.defper;
+				mi->D.HSlider.cflags = 0;
+				if (mi->D.HSlider.defper != -1) {
+					mi->D.HSlider.percent = mi->D.HSlider.defper;
 				}
 				break;
 			default:
 				break;
 		}
-		if (mi->initfunc) {
-			(*mi->initfunc)(mi);
+		if (mi->InitFunc) {
+			(*mi->InitFunc)(mi);
 		}
 	}
 	MenuButtonUnderCursor = -1;
@@ -2567,8 +2567,8 @@ void ProcessMenu(const char* menu_id, int loop)
 	if (loop) {
 		for (i = 0; i < menu->NumItems; ++i) {
 			mi = menu->Items + i;
-			if (mi->exitfunc) {
-				(*mi->exitfunc)(mi); // action/destructor
+			if (mi->ExitFunc) {
+				(*mi->ExitFunc)(mi); // action/destructor
 			}
 		}
 		CurrentMenu = CurrentMenuSave;
