@@ -149,12 +149,12 @@ local void ScenSelectCancel(void);
 
 local void KeystrokeHelpVSAction(Menuitem *mi, int i);
 
-local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i);
-local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i);
-local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i);
-local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i);
-local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i);
-local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i);
+local void GameSpeedHSAction(Menuitem *mi, int i);
+local void MouseScrollHSAction(Menuitem *mi, int i);
+local void KeyboardScrollHSAction(Menuitem *mi, int i);
+local void MasterVolumeHSAction(Menuitem *mi, int i);
+local void MusicVolumeHSAction(Menuitem *mi, int i);
+local void CdVolumeHSAction(Menuitem *mi, int i);
 
 local void GameSetupInit(Menuitem *mi);		// master init
 local void GameDrawFunc(Menuitem *mi);
@@ -1196,21 +1196,21 @@ local void InitSoundOptionsMenuItems() {
     MenuitemText    i0  = { "Sound Options", MI_TFLAGS_CENTERED};
 
     MenuitemText    i1  = { "Master Volume", MI_TFLAGS_LALIGN};
-    MenuitemHslider i2  = { 0, 11*18, 18, ScenSelectHSMasterVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i2  = { 0, 11*18, 18, MasterVolumeHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i3  = { "min", MI_TFLAGS_CENTERED};
     MenuitemText    i4  = { "max", MI_TFLAGS_CENTERED};
     MenuitemGem     i5  = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMasterPower};
     MenuitemText    i6  = { "Enabled", MI_TFLAGS_LALIGN};
 
     MenuitemText    i7  = { "Music Volume", MI_TFLAGS_LALIGN};
-    MenuitemHslider i8  = { 0, 11*18, 18, ScenSelectHSMusicVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i8  = { 0, 11*18, 18, MusicVolumeHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i9  = { "min", MI_TFLAGS_CENTERED};
     MenuitemText    i10 = { "max", MI_TFLAGS_CENTERED};
     MenuitemGem     i11 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetMusicPower};
     MenuitemText    i12 = { "Enabled", MI_TFLAGS_LALIGN};
 
     MenuitemText    i13 = { "CD Volume", MI_TFLAGS_LALIGN};
-    MenuitemHslider i14 = { 0, 11*18, 18, ScenSelectHSCdVolumeAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i14 = { 0, 11*18, 18, CdVolumeHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i15 = { "min", MI_TFLAGS_CENTERED};
     MenuitemText    i16 = { "max", MI_TFLAGS_CENTERED};
     MenuitemGem     i17 = { MI_GSTATE_UNCHECKED, 18, 18, MBUTTON_GEM_SQUARE, SetCdPower};
@@ -1285,15 +1285,15 @@ local Menuitem SpeedSettingsMenuItems[] = {
 local void InitSpeedSettingsMenuItems() {
     MenuitemText    i0  = { "Speed Settings", MI_TFLAGS_CENTERED};
     MenuitemText    i1  = { "Game Speed", MI_TFLAGS_LALIGN};
-    MenuitemHslider i2  = { 0, 11*18, 18, ScenSelectHSGameSpeedAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i2  = { 0, 11*18, 18, GameSpeedHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i3  = { "slow", MI_TFLAGS_LALIGN};
     MenuitemText    i4  = { "fast", MI_TFLAGS_RALIGN};
     MenuitemText    i5  = { "Mouse Scroll", MI_TFLAGS_LALIGN};
-    MenuitemHslider i6  = { 0, 11*18, 18, ScenSelectHSMouseScrollAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i6  = { 0, 11*18, 18, MouseScrollHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i7  = { "off", MI_TFLAGS_LALIGN};
     MenuitemText    i8  = { "fast", MI_TFLAGS_RALIGN};
     MenuitemText    i9  = { "Keyboard Scroll", MI_TFLAGS_LALIGN};
-    MenuitemHslider i10 = { 0, 11*18, 18, ScenSelectHSKeyboardScrollAction, -1, 0, 0, 0, ScenSelectOk};
+    MenuitemHslider i10 = { 0, 11*18, 18, KeyboardScrollHSAction, -1, 0, 0, 0, ScenSelectOk};
     MenuitemText    i11 = { "off", MI_TFLAGS_LALIGN};
     MenuitemText    i12 = { "fast", MI_TFLAGS_RALIGN};
     MenuitemButton  i13 = { "~!OK", 106, 27, MBUTTON_GM_HALF, EndMenu, 'o'};
@@ -3753,7 +3753,7 @@ local void KeystrokeHelpVSAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
+local void GameSpeedHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -3795,7 +3795,7 @@ local void ScenSelectHSGameSpeedAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
+local void MouseScrollHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -3841,7 +3841,7 @@ local void ScenSelectHSMouseScrollAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
+local void KeyboardScrollHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -3887,7 +3887,7 @@ local void ScenSelectHSKeyboardScrollAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
+local void MasterVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -3927,7 +3927,7 @@ local void ScenSelectHSMasterVolumeAction(Menuitem *mi, int i)
     }
 }
 
-local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
+local void MusicVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -3968,7 +3968,7 @@ local void ScenSelectHSMusicVolumeAction(Menuitem *mi, int i)
 }
 
 #ifdef USE_LIBCDA
-local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
+local void CdVolumeHSAction(Menuitem *mi, int i)
 {
     mi--;
 
@@ -4008,7 +4008,7 @@ local void ScenSelectHSCdVolumeAction(Menuitem *mi, int i)
     }
 }
 #else
-local void ScenSelectHSCdVolumeAction(Menuitem *mi __attribute__((unused)),
+local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
 	int i __attribute__((unused)))
 {
 }
