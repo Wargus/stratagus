@@ -38,6 +38,8 @@ extern char EditorRunning;
     /// Editor CCL start file
 extern const char* EditorStartFile;
 
+extern char** EditorUnitTypes;		/// Sorted editor unit-type table
+
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
