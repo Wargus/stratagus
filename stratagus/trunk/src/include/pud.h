@@ -10,12 +10,11 @@
 //
 /**@name pud.h		-	The pud headerfile. */
 //
-//	(c) Copyright 1998-2001 by Lutz Sammer
+//	(c) Copyright 1998-2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,7 +39,7 @@
 ----------------------------------------------------------------------------*/
 
 //
-//	Used to read puds.
+//	Used for reading puds.
 //
 #define MapMoveOnlyLand		0x01	/// only land units
 #define MapMoveCoast		0x02	/// only water transporters
@@ -53,15 +52,15 @@
 #define MapMoveOnlyWater	0x40	/// only water units
 #define MapMoveUnpassable	0x80	/// blocked
 
-#define MapMoveForestOrRock	0x81	/// Forest or Rock on map
+#define MapMoveForestOrRock	0x81	/// forest or rock on map
 #define MapMoveCoast2		0x82	/// unknown
-#define MapMoveWall		0x8D	/// Wall on map
+#define MapMoveWall		0x8D	/// wall on map
 
-#define MapMoveLandUnit		0x100	/// Land unit
-#define MapMoveAirUnit		0x200	/// Air unit
-#define MapMoveSeaUnit		0x400	/// Water unit
-#define MapMoveBuildingUnit	0x800	/// Building unit
-#define MapMoveBlocked		0xF00	/// No unit allowed
+#define MapMoveLandUnit		0x100	/// land unit
+#define MapMoveAirUnit		0x200	/// air unit
+#define MapMoveSeaUnit		0x400	/// water unit
+#define MapMoveBuildingUnit	0x800	/// building unit
+#define MapMoveBlocked		0xF00	/// no unit allowed
 
 // LOW BITS: Area connected!
 #define MapActionWater		0x0000	/// water on map
@@ -72,12 +71,13 @@
 #define MapActionForest		0xFFFE	/// forest on map
 
 // These are hard-coded PUD internals (and, as such, belong here!)
-#define WC_UnitPeasant		0x02	/// Human Peasant
-#define WC_UnitPeon		0x03	/// Orc Peon
-#define WC_UnitGoldMine		0x5C	/// Goldmine
-#define WC_UnitOilPatch		0x5D	/// Oilpatch
-#define WC_StartLocationHuman	0x5E	/// Start location Human
-#define WC_StartLocationOrc	0x5F	/// Start location Orc
+// FIXME: for our own maps this should become configurable
+#define WC_UnitPeasant		0x02	/// human peasant
+#define WC_UnitPeon		0x03	/// orc peon
+#define WC_UnitGoldMine		0x5C	/// goldmine
+#define WC_UnitOilPatch		0x5D	/// oilpatch
+#define WC_StartLocationHuman	0x5E	/// start location human
+#define WC_StartLocationOrc	0x5F	/// start location orc
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -87,11 +87,14 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
-    /// Return info for pud.
+    /// Return info for pud
 extern MapInfo* GetPudInfo(const char*);
 
-    /// Load a pud file.
+    /// Load a pud file
 extern void LoadPud(const char* pud,WorldMap* map);
+
+    /// Clean the pud module
+extern void CleanPud(void);
 
 //@}
 
