@@ -976,7 +976,7 @@ global int main(int argc, char** argv)
 #ifdef USE_WIN32
 	strcpy(LocalPlayerName, "Anonymous");
 #else
-	if (getenv("USERNAME")) {
+	if (getenv("USER")) {
 		strncpy(LocalPlayerName, getenv("USERNAME"), 14);
 	} else {
 		strcpy(LocalPlayerName, "Anonymous");
