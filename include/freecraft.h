@@ -316,7 +316,7 @@
 --	Some limits
 ----------------------------------------------------------------------------*/
 
-#define TilesetMax	4		/// How many tilesets are supported
+#define TilesetMax	8		/// How many tilesets are supported
 #define PlayerMax	16		/// How many players are supported
 #define UnitTypeMax	0xFF		/// How many unit types supported
 #define UpgradeMax	256		/// How many upgrades supported
