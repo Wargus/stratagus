@@ -1086,7 +1086,13 @@ global void MenuLoop(char* filename, WorldMap* map)
 	    NetPlayers = 0;
 
 	    // Start new music for menus
+	    if (PlayingMusic && strcmp(CurrentMusicFile, MenuMusic)) {
+		StopMusic();
+	    }
 	    PlaySectionMusic(PlaySectionMainMenu);
+	    if (!PlayingMusic && MenuMusic) {
+		PlayMusic(MenuMusic);
+	    }
 
 	    EnableRedraw = RedrawMenu;
 
@@ -1274,6 +1280,9 @@ Use it at your own risk.\n\n");
 	for (i = 0; TitleScreen[i]; ++i) {
 	    if (PlayMovie(TitleScreen[i],
 		    PlayMovieZoomScreen | PlayMovieKeepAspect)) {
+		if (!PlayingMusic && TitleMusic) {
+		    PlayMusic(TitleMusic);
+		}
 		DisplayPicture(TitleScreen[i]);
 		Invalidate();
 		// FIXME: make the time configurable
