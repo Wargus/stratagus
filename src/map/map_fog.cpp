@@ -1521,7 +1521,7 @@ global void DrawMapFogOfWar(int x,int y)
     dy=TheUI.MapY;
     ey=TheUI.MapEndY;
 
-    while( dy<=ey ) {
+    while( dy<ey ) {
 	if( *redraw_row ) {		// row must be redrawn
             #if NEW_MAPDRAW > 1
               (*redraw_row)--;
@@ -1531,7 +1531,7 @@ global void DrawMapFogOfWar(int x,int y)
 
 	    sx=x+sy;
 	    dx=TheUI.MapX;
-	    while( dx<=ex ) {
+	    while( dx<ex ) {
 		if( *redraw_tile ) {
 #if NEW_MAPDRAW > 1
                   (*redraw_tile)--;
