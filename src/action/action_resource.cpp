@@ -240,6 +240,9 @@ local int WaitInResource(Unit* unit,const Resource* resource)
 	}
 	unit->Player->UnitTypesCount[unit->Type->Type]++;
 
+	//	Store gold mine position
+	unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
+
 	//
 	//	Find and send to resource deposit.
 	//
@@ -409,8 +412,10 @@ local int MoveToDepot(Unit* unit,const Resource* resource)
 */
 local int WaitInDepot(Unit* unit,const Resource* resource)
 {
-    Unit* depot;
+    const Unit* depot;
     Unit* goal;
+    int x;
+    int y;
 
     DebugLevel3Fn("Waiting\n");
     if( !unit->Value ) {
@@ -418,10 +423,16 @@ local int WaitInDepot(Unit* unit,const Resource* resource)
 	DebugCheck( !depot );
 	// Could be destroyed, but than we couldn't be in?
 
-	// FIXME: return to last position!
-	if( !(goal=resource->FindResource(unit->Player,unit->X,unit->Y)) ) {
-	    DropOutOnSide(unit,LookingW
-		,depot->Type->TileWidth,depot->Type->TileHeight);
+	if( unit->Orders[0].Arg1==(void*)-1 ) {
+	    x=unit->X;
+	    y=unit->Y;
+	} else {
+	    x=(int)unit->Orders[0].Arg1>>16;
+	    y=(int)unit->Orders[0].Arg1&0xFFFF;
+	}
+	if( !(goal=resource->FindResource(unit->Player,x,y)) ) {
+	    DropOutOnSide(unit,LookingW,
+		    depot->Type->TileWidth,depot->Type->TileHeight);
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
 	} else {

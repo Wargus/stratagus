@@ -99,6 +99,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	DebugLevel3("Return to %d=%d,%d\n"
 		,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHarvest;
+	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=128;		// FIXME: Hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
@@ -120,6 +121,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	DebugLevel3("Return to %d=%d,%d\n"
 	    ,UnitNumber(destu),unit->Orders[0].X,unit->Orders[0].Y);
 	unit->Orders[0].Action=UnitActionHaulOil;
+	unit->Orders[0].Arg1=(void*)-1;
 	NewResetPath(unit);
 	unit->SubAction=65;		// FIXME: Hardcoded
 	DebugLevel3("Wait: %d\n",unit->Wait);
