@@ -100,7 +100,7 @@
 
 #ifndef __GNUC__	// { disable GNU C Compiler features
 
-#define __attribute__()			// does nothing
+#define __attribute__(args)		// does nothing
 
 #endif	// }
 
