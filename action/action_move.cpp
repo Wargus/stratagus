@@ -289,11 +289,7 @@ global void HandleActionMove(Unit* unit)
 	    unit->SubAction = 0;
 	    // Release target, if any.
 	    if ((goal = unit->Orders[0].Goal)) {
-		RefsDebugCheck(!goal->Refs);
-		if (!--goal->Refs) {
-		    DebugCheck(!goal->Destroyed);
-		    ReleaseUnit(goal);
-		}
+		RefsDecrease(goal);
 		unit->Orders[0].Goal = NoUnitP;
 	    }
 	    unit->Orders[0].Action = UnitActionStill;
@@ -314,10 +310,7 @@ global void HandleActionMove(Unit* unit)
 	unit->Orders[0].X = goal->X + goal->Type->TileWidth / 2;
 	unit->Orders[0].Y = goal->Y + goal->Type->TileHeight / 2;
 	unit->Orders[0].Goal = NoUnitP;
-	RefsDebugCheck(!goal->Refs);
-	if (!--goal->Refs) {
-	    ReleaseUnit(goal);
-	}
+	RefsDecrease(goal);
 	NewResetPath(unit);
     }
 }

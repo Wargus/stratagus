@@ -306,7 +306,7 @@
 **
 **		Unit is a Building
 **
-**	UnitType::VisibileUnderFog
+**	UnitType::VisibleUnderFog
 **
 **		Unit is visible under fog of war.
 **

@@ -164,8 +164,7 @@ global void HandleActionTrain(Unit* unit)
 	    nunit->Orders[0] = unit->NewOrder;
 	    nunit->Orders[0].Action = UnitActionMove;
 	    if (nunit->Orders[0].Goal) {
-		RefsDebugCheck(!nunit->Orders[0].Goal->Refs);
-		nunit->Orders[0].Goal->Refs++;
+		RefsIncrease(nunit->Orders->Goal);
 	    }
             
 	} else {
@@ -173,10 +172,7 @@ global void HandleActionTrain(Unit* unit)
 		if (unit->NewOrder.Goal->Destroyed) {
 		    // FIXME: perhaps we should use another goal?
 		    DebugLevel0Fn("Destroyed unit in train unit\n");
-		    RefsDebugCheck(!unit->NewOrder.Goal->Refs);
-		    if (!--unit->NewOrder.Goal->Refs) {
-			ReleaseUnit(unit->NewOrder.Goal);
-		    }
+		    RefsDecrease(unit->NewOrder.Goal);
 		    unit->NewOrder.Goal = NoUnitP;
 		    unit->NewOrder.Action = UnitActionStill;
 		}
@@ -188,8 +184,7 @@ global void HandleActionTrain(Unit* unit)
 	    // FIXME: Pending command uses any references?
 	    //
 	    if (nunit->Orders[0].Goal) {
-		RefsDebugCheck(!nunit->Orders[0].Goal->Refs);
-		nunit->Orders[0].Goal->Refs++;
+		RefsIncrease(nunit->Orders->Goal);
 	    }
 	}
 

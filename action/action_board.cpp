@@ -97,20 +97,9 @@ local int WaitForTransporter(Unit* unit)
         return 0;
     }
 
-    if (trans->Destroyed) {
-	DebugLevel0Fn("Destroyed transporter\n");
-	RefsDebugCheck(!trans->Refs);
-	if (!--trans->Refs) {
-	    ReleaseUnit(trans);
-	}
-	unit->Orders[0].Goal = NoUnitP;
-	return 0;
-    } else if (trans->Removed ||
-	    !trans->HP || trans->Orders[0].Action == UnitActionDie) {
-	DebugLevel0Fn("Unusable transporter\n");
-	RefsDebugCheck(!trans->Refs);
-	--trans->Refs;
-	RefsDebugCheck(!trans->Refs);
+    if (GoalGone(unit, trans)) {
+	DebugLevel0Fn("Transporter Gone\n");
+	RefsDecrease(trans);
 	unit->Orders[0].Goal = NoUnitP;
 	return 0;
     }
@@ -152,27 +141,14 @@ local void EnterTransporter(Unit* unit)
     unit->SubAction = 0;
 
     transporter = unit->Orders[0].Goal;
-    if (transporter->Destroyed) {
-	DebugLevel0Fn("Destroyed transporter\n");
-	RefsDebugCheck( !transporter->Refs );
-	if (!--transporter->Refs) {
-	    ReleaseUnit(transporter);
-	}
-	unit->Orders[0].Goal = NoUnitP;
-	return;
-    } else if (transporter->Removed ||
-	    !transporter->HP || transporter->Orders[0].Action == UnitActionDie) {
-	DebugLevel0Fn("Unuseable transporter\n");
-	RefsDebugCheck(!transporter->Refs);
-	--transporter->Refs;
-	RefsDebugCheck(!transporter->Refs);
+    if (GoalGone(unit,transporter)) {
+	DebugLevel0Fn("Transporter gone\n");
+	RefsDecrease(transporter);
 	unit->Orders[0].Goal = NoUnitP;
 	return;
     }
 
-    RefsDebugCheck(!transporter->Refs);
-    --transporter->Refs;
-    RefsDebugCheck(!transporter->Refs);
+    RefsDecrease(transporter);
     unit->Orders[0].Goal = NoUnitP;
 
     //
@@ -242,13 +218,7 @@ global void HandleActionBoard(Unit* unit)
 			if (++unit->SubAction == 200) {
 			    unit->Orders[0].Action = UnitActionStill;
 			    if ((goal = unit->Orders[0].Goal)) {
-				RefsDebugCheck(!goal->Refs);
-				if (!--goal->Refs) {
-				    RefsDebugCheck(!goal->Destroyed);
-				    if (goal->Destroyed) {
-					ReleaseUnit(goal);
-				    }
-				}
+				RefsDecrease(goal);
 				unit->Orders[0].Goal = NoUnitP;
 			    }
 			    unit->SubAction = 0;

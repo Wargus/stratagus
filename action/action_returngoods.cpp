@@ -79,8 +79,7 @@ global void HandleActionReturnGoods(Unit* unit)
 	    return;
 	}
 	unit->Orders[0].Goal = destu;
-	RefsDebugCheck(!destu->Refs);
-	++destu->Refs;
+	RefsIncrease(destu);
     }
     DebugLevel3("Return to %d=%d,%d\n" _C_
 	UnitNumber(unit->Orders[0].Goal) _C_

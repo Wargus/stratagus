@@ -390,26 +390,10 @@ local void FreeMissile(Missile* missile)
     //	Release all unit references.
     //
     if ((unit = missile->SourceUnit)) {
-	RefsDebugCheck(!unit->Refs);
-	if (unit->Destroyed) {
-	    if (!--unit->Refs) {
-		ReleaseUnit(unit);
-	    }
-	} else {
-	    --unit->Refs;
-	    RefsDebugCheck(!unit->Refs);
-	}
+	RefsDecrease(unit);
     }
     if((unit = missile->TargetUnit)) {
-	RefsDebugCheck(!unit->Refs);
-	if (unit->Destroyed) {
-	    if (!--unit->Refs) {
-		ReleaseUnit(unit);
-	    }
-	} else {
-	    --unit->Refs;
-	    RefsDebugCheck(!unit->Refs);
-	}
+	RefsDecrease(unit);
     }
 
     //
@@ -603,12 +587,10 @@ global void FireMissile(Unit* unit)
     //
     if (goal) {
 	missile->TargetUnit = goal;
-	RefsDebugCheck(!goal->Refs || goal->Destroyed);
-	goal->Refs++;
+	RefsIncrease(goal);
     }
     missile->SourceUnit = unit;
-    RefsDebugCheck(!unit->Refs || unit->Destroyed);
-    unit->Refs++;
+    RefsIncrease(unit);
 }
 
 /**
@@ -1038,8 +1020,7 @@ global void MissileHit(Missile* missile)
 	mis->SourceUnit = missile->SourceUnit;
 	// FIXME: should copy target also?
 	if (mis->SourceUnit) {
-	    RefsDebugCheck(!mis->SourceUnit->Refs);
-	    mis->SourceUnit->Refs++;
+	    RefsIncrease(mis->SourceUnit);
 	}
 #endif
     }
@@ -1068,10 +1049,7 @@ global void MissileHit(Missile* missile)
 	    //
 	    goal = missile->TargetUnit;
 	    if (goal->Destroyed) {			// Destroyed
-		RefsDebugCheck(!goal->Refs);
-		if (!--goal->Refs) {
-		    ReleaseUnit(goal);
-		}
+		RefsDecrease(goal);
 		missile->TargetUnit = NoUnitP;
 		return;
 	    }

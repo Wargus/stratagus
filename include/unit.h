@@ -729,6 +729,10 @@ extern int NumSelected;			/// how many units selected
 extern void InitUnitsMemory(void);
     /// Free memory used by unit
 //extern void FreeUnitMemory(Unit* unit);
+    /// Increase an unit's reference count
+extern void RefsIncrease(Unit* unit);
+    /// Decrease an unit's reference count
+extern void RefsDecrease(Unit* unit);
     /// Release an unit
 extern void ReleaseUnit(Unit* unit);
     /// Initialize unit structure with default values

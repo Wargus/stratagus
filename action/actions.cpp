@@ -58,6 +58,64 @@ global unsigned SyncHash;	    /// Hash calculated to find sync failures
 --	Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**	Check if the unit can still *see* the goal or not
+**	This first of all checks dead/dying units, and then
+**	Invisibility, cloaking, going under fow and the like.
+**
+**
+**
+*/
+global int GoalGone(const Unit* unit, const Unit* goal)
+{
+    //
+    //  Check for dead/removed goals.
+    //
+    if (    //  Unit is marked destroyed
+	    goal->Destroyed ||
+	    //  Unit has 0 hp, dying
+	    !goal->HP ||
+	    //  Unit has action die, doesn't really live?
+	    goal->Orders[0].Action == UnitActionDie ||
+	    //  Unit is removed (inside something.)
+	    goal->Removed) {
+	return 1;
+    }
+    //
+    //	Check if we have an unit for this goal.
+    //
+    if (unit) {
+	//	SharedVision makes all the rest of the checks meaningless
+	if (IsSharedVision(unit->Player, goal) || unit->Player==goal->Player) {
+	    return 0;
+	} else {
+	    int x;
+	    int y;
+	    //  Goal is invisible (by spell)
+	    if (goal->Invisible) {
+		return 1;
+	    }
+	    //  Goal is cloaked for this player
+	    if (!(goal->Visible & (1 << unit->Player->Player))) {
+		return 1;
+	    }
+	    //
+	    //	Check if under fog of war.
+	    //
+	    for (x = goal->X; x < goal->X + goal->Type->TileWidth; x++) {
+		for (y = goal->Y; y < goal->Y + goal->Type->TileHeight; y++) {
+		    if (IsMapFieldVisible(unit->Player, x, y)) {
+			return 0;
+		    }
+		}
+	    }
+	    return 1;
+	}
+    } else {
+	return 0;
+    }
+}
+
 /*----------------------------------------------------------------------------
 --	Animation
 ----------------------------------------------------------------------------*/
@@ -437,10 +495,7 @@ local void HandleUnitAction(Unit* unit)
 		}
 		//  Still shouldn't have a reference
 		DebugCheck(unit->Orders[0].Action == UnitActionStill);
-		RefsDebugCheck(!unit->Orders[0].Goal->Refs);
-		if (!--unit->Orders[0].Goal->Refs) {
-		    ReleaseUnit(unit->Orders[0].Goal);
-		}
+		RefsDecrease(unit->Orders->Goal);
 	    }
 	    if (unit->CurrentResource) {
 		if (unit->Type->ResInfo[unit->CurrentResource]->LoseResources &&
