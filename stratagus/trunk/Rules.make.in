@@ -33,7 +33,7 @@ VERSION=	'-DVERSION="1.18"'
 
 TOOLLIBS=$(XLDFLAGS) -lpng -lz -lm @THREAD_LIBS@ -L/usr/local/lib @STATIC_LDFLAGS@
 
-FREECRAFT_LIBS= -lpng -lz -lm \
+STRATAGUS_LIBS= -lpng -lz -lm \
 	@VIDEO_LIBS@ @THREAD_LIBS@ $(CCLLIB) $(COMP_LIBS) \
 	$(ARTSCLIB) @FLAC_LIBS@ @OGG_LIBS@ @MAD_LIBS@ @CDAUDIO_LIBS@ \
 	@STATIC_LDFLAGS@ -lz -lm -L/usr/local/lib

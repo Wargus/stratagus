@@ -923,7 +923,7 @@ local void CreateSaveDir(void)
 #else
     strcpy(TempPathBuf,getenv("HOME"));
     strcat(TempPathBuf,"/");
-    strcat(TempPathBuf,FREECRAFT_HOME_PATH);
+    strcat(TempPathBuf,STRATAGUS_HOME_PATH);
     mkdir(TempPathBuf,0777);
     strcat(TempPathBuf,"/");
     strcat(TempPathBuf,GameName);
@@ -2352,7 +2352,7 @@ local void SaveReplayOk(void)
 #ifdef WIN32
     sprintf(TempPathBuf, "%s/logs/",GameName);
 #else
-    sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), FREECRAFT_HOME_PATH,GameName);
+    sprintf(TempPathBuf, "%s/%s/%s", getenv("HOME"), STRATAGUS_HOME_PATH,GameName);
     strcat(TempPathBuf, "/logs/");
 #endif
     ptr = TempPathBuf + strlen(TempPathBuf);
@@ -6609,7 +6609,7 @@ local void ReplayGameMenu(void)
 
     sprintf(ScenSelectPath, "%s/logs",GameName);
 #else
-    sprintf(TempPathBuf,"%s/%s",getenv("HOME"),FREECRAFT_HOME_PATH);
+    sprintf(TempPathBuf,"%s/%s",getenv("HOME"),STRATAGUS_HOME_PATH);
     mkdir(TempPathBuf,0777);
     strcat(TempPathBuf,"/");
     strcat(TempPathBuf,GameName);
@@ -6617,7 +6617,7 @@ local void ReplayGameMenu(void)
     strcat(TempPathBuf,"/logs");
     mkdir(TempPathBuf,0777);
 
-    sprintf(ScenSelectPath,"%s/%s/%s/logs", getenv("HOME"), FREECRAFT_HOME_PATH,GameName);
+    sprintf(ScenSelectPath,"%s/%s/%s/logs", getenv("HOME"), STRATAGUS_HOME_PATH,GameName);
 #endif
     *ScenSelectDisplayPath = '\0';
 
