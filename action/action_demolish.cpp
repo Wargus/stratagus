@@ -50,7 +50,7 @@ global void HandleActionDemolish(Unit* unit)
     Unit* goal;
     int err;
 
-    DebugLevel3Fn("Demolish %d\n",unit-Units);
+    DebugLevel3Fn("Demolish %Zd\n",UnitNumber(unit));
 
     switch( unit->SubAction ) {
 	//
@@ -138,7 +138,7 @@ global void HandleActionDemolish(Unit* unit)
             n=SelectUnits(x-2,y-2, x+2, y+2,table);
 	    // FIXME: Don't hit flying units!
             for( i=0; i<n; ++i ) {
-	   	if ( table[i]->Type->LandUnit )
+		if ( table[i]->Type->LandUnit )
                    HitUnit(table[i],DEMOLISH_DAMAGE);
             }
 
