@@ -205,6 +205,16 @@
 #define DEMOLISH_DAMAGE		400	/// damage for demolish attack
 
 /*----------------------------------------------------------------------------
+--	Some limits
+----------------------------------------------------------------------------*/
+
+#define TilesetMax	4		/// How many tilesets are supported
+#define PlayerMax	16		/// How many players are supported
+#define UnitTypeMax	0xFF		/// How many unit types supported
+#define UpgradeMax	256		/// How many upgrades supported
+#define UnitMax		2048		/// How many units supported
+
+/*----------------------------------------------------------------------------
 --	MacOS X fixes
 ----------------------------------------------------------------------------*/
 

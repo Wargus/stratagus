@@ -29,17 +29,6 @@
 --	Defines
 ----------------------------------------------------------------------------*/
 
-    /// max upgrade/allow item/types count
-#define MAXUACOUNT	256
-
-// should keep with the same count ( even in reserve ) just to keep
-// compatibility if new units added.
-
-    /// max unit-types count
-#define MAXUNITTYPES	MAXUACOUNT
-    /// max upgrades count
-#define MAXUPGRADES	MAXUACOUNT
-
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -154,9 +143,9 @@ typedef struct _upgrade_modifier_ {
   // `?' -- leave as is, `F' -- forbid, `A' -- allow
   // FIXME: see below allow more semantics?
   // FIXME: pointers or ids would be faster and less memory use
-  char	ChangeUnits[MAXUNITTYPES];	/// allow/forbid units
-  char	ChangeUpgrades[MAXUPGRADES];	/// allow/forbid upgrades
-  char	ApplyTo[MAXUNITTYPES];		/// which unit types are affected
+  char	ChangeUnits[UnitTypeMax];	/// allow/forbid units
+  char	ChangeUpgrades[UpgradeMax];	/// allow/forbid upgrades
+  char	ApplyTo[UnitTypeMax];		/// which unit types are affected
 
   // FIXME: UnitType*
   void*		ConvertTo;		/// convert to this unit-type.
@@ -176,8 +165,8 @@ typedef struct _upgrade_modifier_ {
 **		`E' -- enabled, allowed by level but currently forbidden
 */
 typedef struct _allow_ {
-    char	Units[MAXUNITTYPES];	/// Units allowed/disallowed
-    char	Upgrades[MAXUPGRADES];	/// Upgrades allowed/disallowed
+    char	Units[UnitTypeMax];	/// Units allowed/disallowed
+    char	Upgrades[UpgradeMax];	/// Upgrades allowed/disallowed
 } Allow;
 
 /**
@@ -190,7 +179,7 @@ typedef struct _upgrade_timers_ {
     **	all 0 at the beginning, all upgrade actions do increment values in
     **	this struct.
     */
-    int	Upgrades[MAXUPGRADES];		/// Counter for each upgrade
+    int	Upgrades[UpgradeMax];		/// Counter for each upgrade
 
 } UpgradeTimers;
 
@@ -199,7 +188,7 @@ typedef struct _upgrade_timers_ {
 ----------------------------------------------------------------------------*/
 
 extern const char UpgradeType[];	/// upgrade type
-extern Upgrade Upgrades[MAXUACOUNT];	/// The main user useable upgrades
+extern Upgrade Upgrades[UpgradeMax];	/// The main user useable upgrades
 
 //@}
 
