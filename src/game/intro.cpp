@@ -1251,7 +1251,11 @@ global void ShowStats(void)
     callbacks.NetworkEvent=NetworkEvent;
     callbacks.SoundReady=WriteSound;
 
-    background=LoadGraphic(MenuBackground);
+    if (GameResult==GameVictory) {
+	background=LoadGraphic(TheUI.VictoryBackground.File);
+    } else {
+	background=LoadGraphic(TheUI.DefeatBackground.File);
+    }
     ResizeGraphic(background,VideoWidth,VideoHeight);
 #ifdef USE_OPENGL
     MakeTexture(background,background->Width,background->Height);

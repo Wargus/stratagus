@@ -303,6 +303,9 @@ typedef struct _ui_ {
     GraphicConfig	Menue2Panel;	/// Panel 384 x 256
     GraphicConfig	VictoryPanel;	/// Panel 288 x 128
     GraphicConfig	ScenarioPanel;	/// Panel 352 x 352
+
+    GraphicConfig	VictoryBackground;
+    GraphicConfig	DefeatBackground;
 } UI;
 
 /*----------------------------------------------------------------------------
