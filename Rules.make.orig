@@ -46,9 +46,9 @@
 #------------------------------------------------------------------------------
 # SDL - Simple DirectMedia Layer configuration (any >=1.0.0)
 
-SDL_CFLAGS	= $(shell sdl-config --cflags)
-SDLLIB		= $(shell sdl-config --static-libs)
-#SDLLIB		= $(shell sdl-config --libs)
+SDL_CFLAGS	:= $(shell sdl-config --cflags)
+SDLLIB		:= $(shell sdl-config --static-libs)
+#SDLLIB		:= $(shell sdl-config --libs)
 
 # Without SDL Sound (only not win32)
 #SDL		= -DUSE_SDL $(SDL_CFLAGS)
@@ -232,7 +232,6 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS) -I$(TOPDIR)/src/movie/vp31/include
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(VIDEO) $(ZDEFS) $(DSOUND) $(DEBUG) \
 	-DHAVE_EXPANSION -DUNIT_ON_MAP -DNEW_AI -DUSE_FLAC -DUSE_OGG -DUSE_MAD \
 	-DUSE_HP_FOR_XP # -DNEW_MAPDRAW=1 -DNEW_FOW -DNEW_SHIPS
-
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wcast-align -Wall -Werror $(IFLAGS) $(DFLAGS)
