@@ -32,11 +32,8 @@ Load("scripts/elites/constructions.lua")
 
 DefineConstruction("construction-none", {
 	Files = {{
-		Tileset = "desert",
+		Tileset = "default",
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}},{
-		Tileset = "winter",
-		File = "tilesets/winter/neutral/buildings/land_construction_site.png",
 		Size = {64, 64}}},
 	Constructions = {{
 		Percent = 0,
