@@ -42,7 +42,6 @@
 #include "interface.h"
 #include "ui.h"
 #include "image.h"
-#include "missile.h"
 #include "sound.h"
 #include "actions.h"
 #include "cursor.h"
@@ -187,7 +186,7 @@ int AddButton(int pos, int level, const char *IconIdent,
     ba->UMask = strdup(buf);
     UnitButtonTable[UnitButtonCount++] = ba;
 
-    DebugCheck(ba->Icon.Icon == -1);	// just checks, that's why at the end
+    DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
     return 1;
 }
 
