@@ -1574,7 +1574,8 @@ global void UIHandleButtonDown(unsigned button)
 			//		clicked on training button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused &&
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor < Selected[0]->Data.Train.Count) {
 						DebugLevel0Fn("Cancel slot %d %s\n" _C_
 							ButtonUnderCursor _C_
@@ -1588,7 +1589,8 @@ global void UIHandleButtonDown(unsigned button)
 			//		clicked on upgrading button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused &&
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugLevel0Fn("Cancel upgrade %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1599,7 +1601,8 @@ global void UIHandleButtonDown(unsigned button)
 			//		clicked on researching button
 			//
 			} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused && 
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (ButtonUnderCursor == 0 && NumSelected == 1) {
 						DebugLevel0Fn("Cancel research %s\n" _C_
 							Selected[0]->Type->Ident);
@@ -1613,7 +1616,8 @@ global void UIHandleButtonDown(unsigned button)
 				//
 				//  for transporter
 				//
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused &&
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					if (Selected[0]->InsideCount >= ButtonUnderCursor) {
 						// FIXME: should check if valid here.
 						// n0b0dy: check WHAT?
@@ -1627,7 +1631,8 @@ global void UIHandleButtonDown(unsigned button)
 					}
 				}
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused &&
+					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
 					DoButtonButtonClicked(ButtonUnderCursor);
 				}
 			}
