@@ -472,7 +472,7 @@ local SCM CclDefineUnitType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("submarine")) ) {
 	    type->Submarine=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("can-see-submarine")) ) {
-	    type->CanSeeSubmarine=0;
+	    type->CanSeeSubmarine=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("cower-worker")) ) {
 	    type->CowerWorker=1;
 	} else if( gh_eq_p(value,gh_symbol2scm("tanker")) ) {
