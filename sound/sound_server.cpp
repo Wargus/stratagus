@@ -190,7 +190,7 @@ local void MixMusicToStereo32(int* buffer, int size)
 	    // FIXME: we are inside the SDL callback!
 	    if (CallbackMusic) {
 		cb = gh_symbol2scm("music-stopped");
-		if (!gh_null_p(symbol_boundp(cb, NIL))) {
+		if (symbol_boundp(cb, NIL)) {
 		    SCM value;
 
 		    value = symbol_value(cb, NIL);

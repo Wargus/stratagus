@@ -238,7 +238,7 @@ local void ParseShowPicture(CampaignChapter *chapter,SCM list)
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("align")) ) {
 		    char* str;
-		    str=gh_scm2newstr(gh_car(sublist),NIL);
+		    str=gh_scm2newstr(gh_car(sublist), 0);
 		    if( !strcmp(str,"left") ) {
 			(*text)->Align=PictureTextAlignLeft;
 		    } else if( !strcmp(str,"center") ) {
@@ -249,7 +249,7 @@ local void ParseShowPicture(CampaignChapter *chapter,SCM list)
 		    free(str);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("text")) ) {
-		    (*text)->Text=gh_scm2newstr(gh_car(sublist),NIL);
+                  (*text)->Text = gh_scm2newstr(gh_car(sublist), 0);
 		    sublist=gh_cdr(sublist);
 		}
 	    }

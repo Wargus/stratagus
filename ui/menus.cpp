@@ -1812,7 +1812,7 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
 	MusicOff = 0;
 	if (CallbackMusic) {
 	    cb = gh_symbol2scm("music-stopped");
-	    if (!gh_null_p(symbol_boundp(cb, NIL))) {
+	    if (symbol_boundp(cb, NIL)) {
 		SCM value;
 
 		value = symbol_value(cb, NIL);

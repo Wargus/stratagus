@@ -215,7 +215,6 @@ global void LoadModules(void)
 global void LoadGame(char* filename)
 {
     int old_siod_verbose_level;
-    extern int siod_verbose_level;
     unsigned long game_cycle;
 
     CleanModules();
@@ -224,7 +223,7 @@ global void LoadGame(char* filename)
     siod_verbose_level=4;
     user_gc(SCM_BOOL_F);
     siod_verbose_level=old_siod_verbose_level;
-    gh_eval_file(filename);
+    gh_load(filename);
     user_gc(SCM_BOOL_F);
 
     game_cycle=GameCycle;

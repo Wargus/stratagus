@@ -34,6 +34,7 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
+#include <string.h>
 #include <stdio.h>
 
 #include "stratagus.h"
@@ -56,10 +57,10 @@
 ** C representation for the siod sound type
 ** ALPHA VERSION!!!!!!!!!
 */
-local long SiodSoundTag;
+local ccl_smob_type_t SiodSoundTag;
 
-#define CCL_SOUNDP(x)	TYPEP(x,SiodSoundTag)
-#define CCL_SOUND_ID(x) ( (SoundId)CDR(x) )
+#define CCL_SOUNDP(x)	(CclGetSmobType(x) == SiodSoundTag)
+#define CCL_SOUND_ID(x) ((SoundId)CclGetSmobData(x))
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -74,13 +75,9 @@ local long SiodSoundTag;
 */
 local SCM sound_id_ccl(SoundId id)
 {
-     SCM sound_id;
-
-     sound_id=cons(NIL,NIL);
-     sound_id->type=SiodSoundTag;
-     sound_id->storage_as.cons.cdr=(SCM)id;
-
-     return sound_id;
+    SCM sound_id;
+    sound_id = CclMakeSmobObj(SiodSoundTag, id);
+    return sound_id;
 }
 
 /**
@@ -669,7 +666,7 @@ local SCM CclStopMusic(void)
 */
 global void SoundCclRegister(void)
 {
-    SiodSoundTag=allocate_user_tc();
+    SiodSoundTag = CclMakeSmobType("Sound");
 
     gh_new_procedure1_0("set-sound-volume!",CclSetSoundVolume);
     gh_new_procedure1_0("set-music-volume!",CclSetMusicVolume);

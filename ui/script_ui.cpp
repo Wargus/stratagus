@@ -2524,7 +2524,7 @@ local SCM CclDefineButton(SCM list)
 	    value=gh_car(list);
 	    list=gh_cdr(list);
 	    if( gh_exact_p(value) ) {
-		sprintf(buf,"%ld",gh_scm2int(value));
+		sprintf(buf,"%ld",gh_scm2long(value));
 		s1=strdup(buf);
 	    } else {
 		s1=gh_scm2newstr(value,NULL);
@@ -2875,7 +2875,8 @@ local SCM CclResetKeystrokeHelp(void)
 local SCM CclAddKeystrokeHelp(SCM list)
 {
     SCM value;
-    char *s1, *s2;
+    char *s1 = 0;
+    char *s2 = 0;
     int n;
 
     if (!gh_null_p(list)) {

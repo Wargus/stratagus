@@ -46,7 +46,6 @@
 #include "trigger.h"
 #include "campaign.h"
 #include "interface.h"
-#include "siodp.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -912,15 +911,18 @@ local SCM CclAddTrigger(SCM condition,SCM action)
     //	Make a list of all triggers.
     //		A trigger is a pair of condition and action
     //
-    var=gh_symbol2scm("*triggers*");
+    var = gh_symbol2scm("*triggers*");
+
     if( gh_null_p(symbol_value(var,NIL)) ) {
+         puts("Trigger not set, defining trigger");
 	setvar(var, cons(cons(condition,action),NIL), NIL);
     } else {
+        // Search for the last element in the list
 	var=symbol_value(var,NIL);
 	while( !gh_null_p(gh_cdr(var)) ) {
 	    var=gh_cdr(var);
 	}
-	setcdr(var,cons(cons(condition,action),NIL));
+	gh_set_cdr_x(var, cons(cons(condition,action),NIL));
     }
 
     return SCM_UNSPECIFIED;
@@ -972,7 +974,7 @@ local int TriggerExecuteAction(SCM script)
     value=NULL;
 
     while( !gh_null_p(script) ) {
-	value=gh_eval(gh_car(script),NIL);
+	value = gh_eval(gh_car(script), NIL);
 	script=gh_cdr(script);
 	if( WaitFrame>FrameCounter ) {
 	    WaitScript=script;
@@ -995,11 +997,11 @@ local int TriggerExecuteAction(SCM script)
 local void TriggerRemoveTrigger(SCM trig)
 {
     if( !gh_null_p(Trigger) ) {
-	setcar(trig,gh_car(Trigger));
-	setcdr(trig,gh_cdr(Trigger));
+	gh_set_car_x(trig,gh_car(Trigger));
+	gh_set_cdr_x(trig,gh_cdr(Trigger));
     } else {
-	setcar(trig,NIL);
-	setcdr(trig,NIL);
+	gh_set_car_x(trig, NIL);
+	gh_set_cdr_x(trig, NIL);
     }
     Trigger=trig;
 }
@@ -1047,7 +1049,7 @@ global void TriggersEachCycle(void)
 		script=gh_cdr(script);
 	    }
 	    // If condition is true execute action
-	    if( !gh_null_p(value) ) {
+	    if( value != SCM_BOOL_F ) {
 		if( TriggerExecuteAction(gh_cdr(pair)) ) {
 		    TriggerRemoveTrigger(trig);
 		}
@@ -1098,9 +1100,11 @@ global void TriggerCclRegister(void)
 **	@param exp	Expression
 **	@param f	File to print to
 */
-local void PrintTrigger(LISP exp,FILE *f)
+local void PrintTrigger(SCM exp, FILE *f)
 {
-    LISP tmp;
+#ifdef USE_GUILE
+#else
+    SCM tmp;
     long n;
 //    struct user_type_hooks *p;
     extern char *subr_kind_str(long);
@@ -1176,6 +1180,7 @@ local void PrintTrigger(LISP exp,FILE *f)
 	}
 #endif
     }
+#endif
 }
 
 /**

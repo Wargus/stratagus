@@ -246,7 +246,7 @@ local SCM CclLog(SCM list)
 	while( !gh_null_p(gh_cdr(tmp)) ) {
 	    tmp=gh_cdr(tmp);
 	}
-	setcdr(tmp,cons(list,NIL));
+	gh_set_cdr_x(tmp,cons(list,NIL));
     }
 
     return SCM_UNSPECIFIED;
@@ -360,7 +360,7 @@ local SCM CclReplayLog(SCM list)
 		    num=gh_scm2int(gh_car(sublist));
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("name")) ) {
-		    name=gh_scm2newstr(gh_car(sublist),NIL);
+		    name=gh_scm2newstr(gh_car(sublist), 0);
 		    sublist=gh_cdr(sublist);
 		} else if( gh_eq_p(value,gh_symbol2scm("race")) ) {
 		    race=gh_scm2int(gh_car(sublist));

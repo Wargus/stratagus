@@ -33,7 +33,7 @@
 /*----------------------------------------------------------------------------
 --	Includes
 ----------------------------------------------------------------------------*/
-
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -59,7 +59,7 @@ extern int NoWarningUnitType;		/// quiet ident lookup.
 
 global _AnimationsHash AnimationsHash;	/// Animations hash table
 
-local long SiodUnitTypeTag;		/// siod unit-type object
+local ccl_smob_type_t SiodUnitTypeTag;		/// siod unit-type object
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -594,16 +594,20 @@ local SCM CclDefineUnitStats(SCM list)
 */
 global UnitType* CclGetUnitType(SCM ptr)
 {
-    const char* str;
+    char* str;
 
     // Be kind allow also strings or symbols
-    if( (str=try_get_c_string(ptr)) ) {
-	return UnitTypeByIdent(str);
+    if( (str = CclConvertToString(ptr)) != NULL )  {
+        printf("CclGetUnitType: %s\n", str);
+        UnitType* type = UnitTypeByIdent(str);
+        free(str);
+        return type;
+    } else if (CclGetSmobType(ptr) == SiodUnitTypeTag)  {
+        return CclGetSmobData(ptr);
+    } else {
+        errl("CclGetUnitType: not an unit-type", ptr);
+        return 0;
     }
-    if( NTYPEP(ptr,SiodUnitTypeTag) ) {
-	errl("not an unit-type",ptr);
-    }
-    return (UnitType*)CAR(ptr);
 }
 
 /**
@@ -612,14 +616,26 @@ global UnitType* CclGetUnitType(SCM ptr)
 **	@param ptr	Scheme object.
 **	@param f	Output structure.
 */
-local void CclUnitTypePrin1(SCM ptr,struct gen_printio* f)
+local void CclUnitTypePrin1(SCM ptr, struct gen_printio* f)
 {
+#ifndef USE_GUILE
     char buf[1024];
     const UnitType* type;
 
-    type=CclGetUnitType(ptr);
-    sprintf(buf,"#<UnitType %p %s>",type,type->Ident);
+    type = CclGetUnitType(ptr);
+
+    if (type) {
+        if (type->Ident) {
+            sprintf(buf, "#<UnitType %p '%s'>", type, type->Ident);
+        } else {
+            sprintf(buf, "#<UnitType %p '(null)'>", type);
+        }
+    } else {
+        sprintf(buf, "#<UnitType NULL>");
+    }
+
     gput_st(f,buf);
+#endif
 }
 
 /**
@@ -631,19 +647,22 @@ local void CclUnitTypePrin1(SCM ptr,struct gen_printio* f)
 */
 local SCM CclUnitType(SCM ident)
 {
-    const char* str;
-    const UnitType* type;
-    SCM value;
-
-    str=get_c_string(ident);
-
-    type=UnitTypeByIdent(str);
-
-    value=cons(NIL,NIL);
-    value->type=SiodUnitTypeTag;
-    CAR(value)=(SCM)type;
-
-    return value;
+    char* str;
+    UnitType* type;
+    
+    str = CclConvertToString(ident);
+    if (str)
+      {
+        type = UnitTypeByIdent(str);
+        printf("CclUnitType: '%s' -> '%ld'\n", str, (long)type);
+        free(str);
+        return CclMakeSmobObj(SiodUnitTypeTag, type);
+      }
+    else
+      {
+        errl("CclUnitType: no unittype by ident: ", ident);
+        return SCM_BOOL_F;
+      }
 }
 
 /**
@@ -657,13 +676,11 @@ local SCM CclUnitTypeArray(void)
     SCM value;
     int i;
 
-    array=cons_array(flocons(UnitTypeMax),NIL);
+    array = cons_array(gh_int2scm(UnitTypeMax), NIL);
 
     for( i=0; i<UnitTypeMax; ++i ) {
-	value=cons(NIL,NIL);
-	value->type=SiodUnitTypeTag;
-	CAR(value)=(SCM)&UnitTypes[i];
-	array->storage_as.lisp_array.data[i]=value;
+      value = CclMakeSmobObj(SiodUnitTypeTag, &UnitTypes[i]);
+      gh_vector_set_x(array, gh_int2scm(i), value);
     }
     return array;
 }
@@ -881,8 +898,11 @@ global void UnitTypeCclRegister(void)
     gh_new_procedureN("define-unit-type",CclDefineUnitType);
     gh_new_procedureN("define-unit-stats",CclDefineUnitStats);
 
-    SiodUnitTypeTag=allocate_user_tc();
+    SiodUnitTypeTag = CclMakeSmobType("UnitType");
+
+#ifndef USE_GUILE
     set_print_hooks(SiodUnitTypeTag,CclUnitTypePrin1);
+#endif 
 
     gh_new_procedure1_0("unit-type",CclUnitType);
     gh_new_procedure0_0("unit-type-array",CclUnitTypeArray);
