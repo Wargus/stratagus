@@ -330,8 +330,8 @@ global int PlaceReachable(Unit* src,int x,int y,int range)
     int y1;
     int y2;
     int reachable;
-    static int LastGameCycle;
-    static int mask;
+    static unsigned long LastGameCycle;
+    static unsigned mask;
 
     DebugLevel3Fn("%p -> %d,%d\n" _C_ src _C_ x _C_ y);
 
@@ -673,8 +673,8 @@ local int ComplexNewPath(Unit* unit,int x1,int y1,int x2,int y2,char* path)
 #ifdef USE_BEST
     bestx=x;
     besty=y;
-    //xd=abs(gx+ox/2-x);
-    //yd=abs(gy+oy/2-y);
+    xd=abs(x1+x2)/2;
+    yd=abs(y1+y2)/2;
     bestd=xd>yd ? xd : yd;
     bestn=0;					// needed if goal not reachable
 #endif
