@@ -2539,12 +2539,8 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		if (mi[1].d.hslider.percent == 0) {
-		    TheUI.MouseScroll = 0;
-		} else {
-		    TheUI.MouseScroll = 1;
-		    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		}
+		TheUI.MouseScroll = 1;
+		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
@@ -2558,14 +2554,12 @@ local void ScenSelectHSMouseSpeedAction(Menuitem *mi, int i)
 		    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    if (mi[1].d.hslider.percent == 0) {
-			TheUI.MouseScroll = 0;
-		    } else {
-			TheUI.MouseScroll = 1;
-			SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		    }
+		    TheUI.MouseScroll = 1;
+		    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		if (mi[1].d.hslider.percent == 0)
+		    TheUI.MouseScroll = 0;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
@@ -2592,12 +2586,8 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 		mi[1].d.hslider.percent -= 10;
 		if (mi[1].d.hslider.percent < 0)
 		    mi[1].d.hslider.percent = 0;
-		if (mi[1].d.hslider.percent == 0) {
-		    TheUI.KeyScroll = 0;
-		} else {
-		    TheUI.KeyScroll = 1;
-		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		}
+		TheUI.KeyScroll = 1;
+		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 	    }
 	    if (i == 2) {
 		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
@@ -2611,14 +2601,12 @@ local void ScenSelectHSKeyboardSpeedAction(Menuitem *mi, int i)
 		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
 		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		    if (mi[1].d.hslider.percent == 0) {
-			TheUI.KeyScroll = 0;
-		    } else {
-			TheUI.KeyScroll = 1;
-			SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		    }
+		    TheUI.KeyScroll = 1;
+		    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
 		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
+		mi[1].d.hslider.percent = mi[1].d.hslider.curper / 10 * 10;
+		if (mi[1].d.hslider.percent == 0)
+		    TheUI.KeyScroll = 0;
 		MustRedraw |= RedrawMenu;
 	    }
 	    break;
