@@ -143,9 +143,8 @@ static int TilesetParseName(lua_State* l, Tileset* tileset)
 **
 **  @param l     Lua state.
 **  @param back  pointer for the flags (return).
-**  @param j     FIXME: docu
+**  @param j     pointer for the location in the array. in and out
 **
-**  @return      remaining list
 */
 static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 {
