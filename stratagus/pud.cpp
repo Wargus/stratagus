@@ -48,6 +48,7 @@
 #include "iolib.h"
 #include "settings.h"
 #include "network.h"
+#include "commands.h"
 
 #include "myendian.h"
 
@@ -1263,7 +1264,9 @@ global void LoadPud(const char* pud,WorldMap* map)
 			t == WC_UnitGoldMine || t == WC_UnitOilPatch) {
 pawn:
 			if (t != WC_UnitGoldMine && t != WC_UnitOilPatch) {
-			    if (NetworkFildes == -1 && o == ThisPlayer->Player) {
+			    if (NetworkFildes == -1
+				    && ReplayGameType != ReplayMultiPlayer
+				    && o == ThisPlayer->Player) {
 				s = GameSettings.Presets[0].Race;
 			    } else {
 				s = GameSettings.Presets[o].Race;
