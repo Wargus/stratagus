@@ -4003,6 +4003,9 @@ global void MenuHandleMouseMove(int x,int y)
     Menu *menu = Menus + CurrentMenu;
     int RedrawFlag = 0;
 
+    if (CurrentMenu == -1)
+	return;
+
     n = menu->nitems;
     MenuButtonUnderCursor = -1;
 
@@ -4232,6 +4235,9 @@ global void MenuHandleButtonDown(int b __attribute__((unused)))
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
 
+    if (CurrentMenu == -1)
+	return;
+
     if (MouseButtons&LeftButton) {
 	if (MenuButtonUnderCursor != -1) {
 	    mi = menu->items + MenuButtonUnderCursor;
@@ -4302,6 +4308,9 @@ global void MenuHandleButtonUp(int b)
     Menuitem *mi;
     Menu *menu = Menus + CurrentMenu;
     int RedrawFlag = 0;
+
+    if (CurrentMenu == -1)
+	return;
 
     if ((1<<b) == LeftButton) {
 	n = menu->nitems;
