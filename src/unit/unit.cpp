@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unit.c		-	The units. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 //@{
 
@@ -30,7 +29,6 @@
 #include "freecraft.h"
 
 #include "video.h"
-#include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
 #include "player.h"
@@ -480,6 +478,10 @@ global void RemoveUnit(Unit* unit)
     int w;
     const UnitType* type;
 
+    if( unit->Removed ) {		// could happen!
+	// If unit is removed (inside) and building is destroyed.
+	return;
+    }
     unit->Removed=1;
 
     //  Remove unit from the current selection
