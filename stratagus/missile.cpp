@@ -235,9 +235,9 @@ global void LoadMissileSprites(void)
 
 	    // Correct the number of frames in graphic
 	    DebugCheck( MissileTypes[i].Sprite->NumFrames
-			<MissileTypes[i].Frames );
+			<MissileTypes[i].SpriteFrames );
 	    // FIXME: is this still needed?
-	    // MissileTypes[i].Sprite->NumFrames=MissileTypes[i].Frames;
+	    // MissileTypes[i].Sprite->NumFrames=MissileTypes[i].SpriteFrames;
 	}
     }
 }
@@ -408,10 +408,10 @@ local Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
     missile->DX = dx - mtype->Width / 2;
     missile->DY = dy - mtype->Height / 2;
     missile->Type = mtype;
-    missile->Frame = 0;
+    missile->SpriteFrame = 0;
     missile->State = 0;
     missile->Wait = mtype->Sleep;	// initial wait = sleep
-    missile->Delay = mtype->Delay;	// initial delay
+    missile->Delay = mtype->StartDelay;	// initial delay
 
     missile->SourceUnit = NULL;
 
@@ -849,7 +849,7 @@ global void DrawMissiles(void)
 		    GraphicPlayerPixels(missile->SourceUnit->Player
 			    ,missile->Type->Sprite);
 		}
-		DrawMissile(missile->Type,missile->Frame,x,y);
+		DrawMissile(missile->Type,missile->SpriteFrame,x,y);
 	    }
 	}
 	missiles=LocalMissiles;
@@ -890,7 +890,7 @@ global void DrawMissiles(void)
 		GraphicPlayerPixels(missile->SourceUnit->Player
 			,missile->Type->Sprite);
 	    }
-	    DrawMissile(missile->Type,missile->Frame,x,y);
+	    DrawMissile(missile->Type,missile->SpriteFrame,x,y);
 	}
     }
 }
@@ -909,16 +909,16 @@ local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
     int dir;
 
     // FIXME: depends on the missile directions wc 8, sc 32
-    missile->Frame&=127;
-    missile->Frame/=5;
-    missile->Frame*=5;
+    missile->SpriteFrame&=127;
+    missile->SpriteFrame/=5;
+    missile->SpriteFrame*=5;
 
     dir=((DirectionToHeading(dx,dy)+NextDirection/2)&0xFF)/NextDirection;
     if( dir<=LookingS/NextDirection ) {	// north->east->south
-	missile->Frame+=dir;
+	missile->SpriteFrame+=dir;
     } else {
 	// Note: 128 is the flag for flip graphic in X.
-	missile->Frame+=128+256/NextDirection-dir;
+	missile->SpriteFrame+=128+256/NextDirection-dir;
     }
 }
 
@@ -953,7 +953,7 @@ local int PointToPointMissile(Missile* missile)
 		|| missile->Type->Class == MissileClassFlameShield ) {
 	    // must not call MissileNewHeading nor frame change
 	} else if( missile->Type->Class == MissileClassBlizzard ) {
-	    missile->Frame = 0;
+	    missile->SpriteFrame = 0;
 	} else {
 	    MissileNewHeadingFromXY(missile,dx*xstep,dy*ystep);
 	}
@@ -1257,14 +1257,14 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate missile, cycle through frames
 		//
-		missile->Frame+=5;		// FIXME: frames pro row
-		if( (missile->Frame&127)
+		missile->SpriteFrame+=5;		// FIXME: frames pro row
+		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->Frame-=
+		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
-			,missile->Frame
+			,missile->SpriteFrame
 			,VideoGraphicFrames(missile->Type->Sprite));
 	    }
 	    break;
@@ -1309,14 +1309,14 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate missile, cycle through frames
 		//
-		missile->Frame+=5;		// FIXME: frames pro row
-		if( (missile->Frame&127)
+		missile->SpriteFrame+=5;		// FIXME: frames pro row
+		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->Frame-=
+		    missile->SpriteFrame-=
 			    VideoGraphicFrames(missile->Type->Sprite);
 		}
 		DebugLevel3Fn("Frame %d of %d\n"
-			,missile->Frame
+			,missile->SpriteFrame
 			,VideoGraphicFrames(missile->Type->Sprite));
 	    }
 	    break;
@@ -1327,8 +1327,8 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate hit
 		//
-		missile->Frame+=5;	// FIXME: frames pro row
-		if( (missile->Frame&127)
+		missile->SpriteFrame+=5;	// FIXME: frames pro row
+		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1340,9 +1340,9 @@ local void MissileAction(Missile* missile)
 #if 0	// FIXME: is done by the mythic controller
 	case MissileClassFlameShield:
 	    missile->Wait=missile->Type->Sleep;
-	    if( ++missile->Frame
+	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
-		missile->Frame = 0;
+		missile->SpriteFrame = 0;
 		if( PointToPointMissile(missile) ) {
 		    // Must set new goal.
 		}
@@ -1356,8 +1356,8 @@ local void MissileAction(Missile* missile)
 		//
 		//	Animate hit
 		//
-		missile->Frame+=4;	// FIXME: frames pro row
-		if( (missile->Frame&127)
+		missile->SpriteFrame+=4;	// FIXME: frames pro row
+		if( (missile->SpriteFrame&127)
 			>=VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1370,7 +1370,7 @@ local void MissileAction(Missile* missile)
 	    //NOTE: vladi: this is exact copy of MissileClassStayWithDelay
 	    // but with check for blizzard-type hit (friendly fire:))
 	    missile->Wait=missile->Type->Sleep;
-	    if( ++missile->Frame
+	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
 		MissileHit(missile);
 		FreeMissile(missile);
@@ -1380,16 +1380,16 @@ local void MissileAction(Missile* missile)
 
 	case MissileClassWhirlwind:
 	    missile->Wait=missile->Type->Sleep;
-	    if( ++missile->Frame
+	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
-		missile->Frame = 0;
+		missile->SpriteFrame = 0;
 		PointToPointMissile(missile);
 	    }
 	    break;
 
 	case MissileClassStayWithDelay:
 	    missile->Wait=missile->Type->Sleep;
-	    if( ++missile->Frame
+	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
 		MissileHit(missile);
 		FreeMissile(missile);
@@ -1406,14 +1406,14 @@ local void MissileAction(Missile* missile)
 		    ++missile->State;
 		    break;
 		case 1:
-		    if( ++missile->Frame
+		    if( ++missile->SpriteFrame
 			    ==VideoGraphicFrames(missile->Type->Sprite) ) {
-			--missile->Frame;
+			--missile->SpriteFrame;
 			++missile->State;
 		    }
 		    break;
 		case 3:
-		    if( !missile->Frame-- ) {
+		    if( !missile->SpriteFrame-- ) {
 			MissileHit(missile);
 			FreeMissile(missile);
 			missile=NULL;
@@ -1432,11 +1432,11 @@ local void MissileAction(Missile* missile)
 		break;
 	    }
 	    missile->Wait=missile->Type->Sleep;
-	    if( ++missile->Frame
+	    if( ++missile->SpriteFrame
 		    ==VideoGraphicFrames(missile->Type->Sprite) ) {
 		int f;
 
-		missile->Frame=0;
+		missile->SpriteFrame=0;
 		f=(100*unit->HP)/unit->Stats->HitPoints;
 		if( f>75) {
 		    FreeMissile(missile);
@@ -1590,14 +1590,14 @@ global void MissileActions(void)
 		    //
 		    //	Animate missile, cycle through frames
 		    //
-		    missile->Frame+=5;		// FIXME: frames pro row
-		    if( (missile->Frame&127)
+		    missile->SpriteFrame+=5;		// FIXME: frames pro row
+		    if( (missile->SpriteFrame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			missile->Frame-=
+			missile->SpriteFrame-=
 				VideoGraphicFrames(missile->Type->Sprite);
 		    }
 		    DebugLevel3Fn("Frame %d of %d\n"
-			    ,missile->Frame
+			    ,missile->SpriteFrame
 			    ,VideoGraphicFrames(missile->Type->Sprite));
 		}
 		break;
@@ -1640,14 +1640,14 @@ global void MissileActions(void)
 		    //
 		    //	Animate missile, cycle through frames
 		    //
-		    missile->Frame+=5;		// FIXME: frames pro row
-		    if( (missile->Frame&127)
+		    missile->SpriteFrame+=5;		// FIXME: frames pro row
+		    if( (missile->SpriteFrame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
-			missile->Frame-=
+			missile->SpriteFrame-=
 				VideoGraphicFrames(missile->Type->Sprite);
 		    }
 		    DebugLevel3Fn("Frame %d of %d\n"
-			    ,missile->Frame
+			    ,missile->SpriteFrame
 			    ,VideoGraphicFrames(missile->Type->Sprite));
 		}
 		break;
@@ -1658,8 +1658,8 @@ global void MissileActions(void)
 		    //
 		    //	Animate hit
 		    //
-		    missile->Frame+=5;	// FIXME: frames pro row
-		    if( (missile->Frame&127)
+		    missile->SpriteFrame+=5;	// FIXME: frames pro row
+		    if( (missile->SpriteFrame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
 			MissileHit(missile);
 			FreeMissile(missile);
@@ -1669,9 +1669,9 @@ global void MissileActions(void)
 
 	    case MissileClassFlameShield:
 		missile->Wait=missile->Type->Sleep;
-		if( ++missile->Frame
+		if( ++missile->SpriteFrame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->Frame = 0;
+		    missile->SpriteFrame = 0;
 		    if( PointToPointMissile(missile) ) {
 			// Must set new goal.
 		    }
@@ -1685,8 +1685,8 @@ global void MissileActions(void)
 		    //
 		    //	Animate hit
 		    //
-		    missile->Frame+=4;	// FIXME: frames pro row
-		    if( (missile->Frame&127)
+		    missile->SpriteFrame+=4;	// FIXME: frames pro row
+		    if( (missile->SpriteFrame&127)
 			    >=VideoGraphicFrames(missile->Type->Sprite) ) {
 			MissileHit(missile);
 			FreeMissile(missile);
@@ -1698,7 +1698,7 @@ global void MissileActions(void)
 		//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
 		// but with check for blizzard-type hit (friendly fire:))
 		missile->Wait=missile->Type->Sleep;
-		if( ++missile->Frame
+		if( ++missile->SpriteFrame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1707,16 +1707,16 @@ global void MissileActions(void)
 
 	    case MissileClassWhirlwind:
 		missile->Wait=missile->Type->Sleep;
-		if( ++missile->Frame
+		if( ++missile->SpriteFrame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
-		    missile->Frame = 0;
+		    missile->SpriteFrame = 0;
 		    PointToPointMissile(missile);
 		}
 		break;
 
 	    case MissileClassStayWithDelay:
 		missile->Wait=missile->Type->Sleep;
-		if( ++missile->Frame
+		if( ++missile->SpriteFrame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1732,14 +1732,14 @@ global void MissileActions(void)
 			++missile->State;
 			break;
 		    case 1:
-			if( ++missile->Frame
+			if( ++missile->SpriteFrame
 				==VideoGraphicFrames(missile->Type->Sprite) ) {
-			    --missile->Frame;
+			    --missile->SpriteFrame;
 			    ++missile->State;
 			}
 			break;
 		    case 3:
-			if( !missile->Frame-- ) {
+			if( !missile->SpriteFrame-- ) {
 			    MissileHit(missile);
 			    FreeMissile(missile);
 			}
@@ -1756,11 +1756,11 @@ global void MissileActions(void)
 		    break;
 		}
 		missile->Wait=missile->Type->Sleep;
-		if( ++missile->Frame
+		if( ++missile->SpriteFrame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    int f;
 
-		    missile->Frame=0;
+		    missile->SpriteFrame=0;
 		    f=(100*unit->HP)/unit->Stats->HitPoints;
 		    if( f>75) {
 			FreeMissile(missile);
@@ -1852,7 +1852,7 @@ global void SaveMissileTypes(FILE* file)
 	}
 	fprintf(file," 'size '(%d %d)",mtype->Width,mtype->Height);
 	if( mtype->Sprite ) {
-	    fprintf(file," 'frames %d",mtype->Frames);
+	    fprintf(file," 'frames %d",mtype->SpriteFrames);
 	}
 	fprintf(file,"\n ");
 	if( mtype->FiredSound.Name ) {
@@ -1865,8 +1865,8 @@ global void SaveMissileTypes(FILE* file)
 	    fprintf(file,"\n ");
 	}
 	fprintf(file," 'class '%s",MissileClassNames[mtype->Class]);
-	if( mtype->Delay ) {
-	    fprintf(file," 'delay %d",mtype->Delay);
+	if( mtype->StartDelay ) {
+	    fprintf(file," 'delay %d",mtype->StartDelay);
 	}
 	fprintf(file," 'sleep %d",mtype->Sleep);
 	fprintf(file," 'speed %d",mtype->Speed);
@@ -1889,7 +1889,7 @@ local void SaveMissile(const Missile* missile,FILE* file)
     fprintf(file," 'pos '(%d %d) 'goal '(%d %d)",
 	missile->X,missile->Y,missile->DX,missile->DY);
     fprintf(file,"\n  'frame %d 'state %d 'wait %d 'delay %d\n ",
-	missile->Frame,missile->State,missile->Wait,missile->Delay);
+	missile->SpriteFrame,missile->State,missile->Wait,missile->Delay);
     if( missile->SourceUnit ) {
 	fprintf(file," 'source %s",s1=UnitReference(missile->SourceUnit));
 	free(s1);
