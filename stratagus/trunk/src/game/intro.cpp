@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name intro.c	-	The game intros. */
+/**@name intro.c - The game intros. */
 //
-//	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon.
+//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,17 +26,18 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "stratagus.h"
 #include "iolib.h"
 #include "video.h"
@@ -53,54 +54,54 @@
 #include "ui.h"
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 /**
-**		Linked list struct used to split text up into lines
+**  Linked list struct used to split text up into lines
 */
 typedef struct TextLines {
-	char* Text;								/// Line of text
-	struct TextLines* Next;				/// Pointer to next line
+	char* Text;              /// Line of text
+	struct TextLines* Next;  /// Pointer to next line
 } TextLines;
 
 /**
-**		Player ranks
+**  Player ranks
 */
 typedef struct PlayerRanks {
-	char** Ranks;						/// Array of ranks
-	int* Scores;						/// Array of scores
+	char** Ranks;  /// Array of ranks
+	int* Scores;   /// Array of scores
 } PlayerRanks;
 
 /**
-**		Linked list of TextLines
+**  Linked list of TextLines
 */
 typedef struct ChapterTextLines {
-	struct TextLines* Text;				/// TextLines struct
-	struct ChapterTextLines* Next;		/// Pointer to next TextLines
+	struct TextLines* Text;         /// TextLines struct
+	struct ChapterTextLines* Next;  /// Pointer to next TextLines
 } ChapterTextLines;
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global Intro GameIntro;						/// Game intro
-global Credits		GameCredits;				/// Game credits
-local PlayerRanks Ranks[PlayerMax];		/// Ranks
+global Intro GameIntro;              /// Game intro
+global Credits GameCredits;          /// Game credits
+local PlayerRanks Ranks[PlayerMax];  /// Ranks
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
-local int IntroNoEvent;						/// Flag got an event
-local int IntroButtonPressed;				/// Button pressed
-local int UseContinueButton;				/// Handle continue button
-local int ContinueButtonX;				/// Continue button position X
-local int ContinueButtonY;				/// Continue button position Y
-local int ContinueButtonFlags;				/// Flags for continue button
+local int IntroNoEvent;         /// Flag got an event
+local int IntroButtonPressed;   /// Button pressed
+local int UseContinueButton;    /// Handle continue button
+local int ContinueButtonX;      /// Continue button position X
+local int ContinueButtonY;      /// Continue button position Y
+local int ContinueButtonFlags;  /// Flags for continue button
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackButton1(unsigned button)
 {
@@ -118,7 +119,7 @@ local void IntroCallbackButton1(unsigned button)
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackButton2(unsigned button)
 {
@@ -135,7 +136,7 @@ local void IntroCallbackButton2(unsigned button)
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackKey1(unsigned key, unsigned keychar)
 {
@@ -152,7 +153,7 @@ local void IntroCallbackKey1(unsigned key, unsigned keychar)
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
@@ -168,7 +169,7 @@ local void IntroCallbackKey2(unsigned key, unsigned keychar)
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackKey3(unsigned key __attribute__((unused)),
 	unsigned keychar __attribute__((unused)))
@@ -176,7 +177,7 @@ local void IntroCallbackKey3(unsigned key __attribute__((unused)),
 }
 
 /**
-**		Callback for input.
+**  Callback for input.
 */
 local void IntroCallbackMouse(int x, int y)
 {
@@ -195,7 +196,7 @@ local void IntroCallbackMouse(int x, int y)
 }
 
 /**
-**		Callback for exit.
+**  Callback for exit.
 */
 local void IntroCallbackExit(void)
 {
@@ -203,7 +204,7 @@ local void IntroCallbackExit(void)
 }
 
 /**
-**		Draws a continue button at x,y
+**  Draws a continue button at x,y
 */
 local void DrawContinueButton(void)
 {
@@ -214,10 +215,10 @@ local void DrawContinueButton(void)
 }
 
 /**
-**		Init continue button.
+**  Init continue button.
 **
-**		@param x		X screen pixel position of continue button.
-**		@param y		Y screen pixel position of continue button.
+**  @param x  X screen pixel position of continue button.
+**  @param y  Y screen pixel position of continue button.
 */
 local void InitContinueButton(int x, int y)
 {
@@ -227,11 +228,11 @@ local void InitContinueButton(int x, int y)
 }
 
 /**
-**		Splits text up into a linked list of lines less than a given width.
+**  Splits text up into a linked list of lines less than a given width.
 **
-**		@param text		The text to be split up.
-**		@param w		Maximum width of a line.
-**		@param lines		Pointer to linked list structure.
+**  @param text   The text to be split up.
+**  @param w      Maximum width of a line.
+**  @param lines  Pointer to linked list structure.
 */
 local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 {
@@ -302,9 +303,9 @@ local void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 }
 
 /**
-**		Frees memory in a TextLines struct
+**  Frees memory in a TextLines struct
 **
-**		@param lines		Address of the pointer to free
+**  @param lines  Address of the pointer to free
 */
 local void FreeTextLines(TextLines** lines)
 {
@@ -319,16 +320,16 @@ local void FreeTextLines(TextLines** lines)
 }
 
 /**
-**		Scroll text.
+**  Scroll text.
 **
-**		@param x		x start pixel screen position.
-**		@param y		y start pixel screen position.
-**		@param w		width of text area
-**		@param h		height of text area
-**		@param i		scroll index.
-**		@param lines		Lines of the text to display.
+**  @param x      x start pixel screen position.
+**  @param y      y start pixel screen position.
+**  @param w      width of text area
+**  @param h      height of text area
+**  @param i      scroll index.
+**  @param lines  Lines of the text to display.
 **
-**		@return				1 if there is more to scroll, 0 if it is done
+**  @return       1 if there is more to scroll, 0 if it is done
 */
 local int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 {
@@ -370,9 +371,9 @@ local int ScrollText(int x, int y, int w, int h, int i, TextLines* lines)
 }
 
 /**
-**		Show level intro.
+**  Show level intro.
 **
-**		@param intro		Intro struct
+**  @param intro  Intro struct
 */
 global void ShowIntro(const Intro* intro)
 {
@@ -496,26 +497,26 @@ global void ShowIntro(const Intro* intro)
 #endif
 		HideAnyCursor();
 		//
-		//		Draw background
+		// Draw background
 		//
 		VideoDrawSubClip(background, 0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
 		//
-		//		Draw title
+		// Draw title
 		//
 		SetDefaultTextColors(FontWhite, FontYellow);
 		VideoDrawTextCentered((70 + 340) / 2 * VideoWidth / 640,
 			28 * VideoHeight / 480, LargeFont, intro->Title);
 		//
-		//		Draw scrolling text
+		// Draw scrolling text
 		//
 		ScrollText(70 * VideoWidth / 640, 80 * VideoHeight / 480,
 			70 * VideoWidth / 640 + 320, 170 * VideoHeight / 480, line, scrolling_text);
 
 		//
-		//		Draw objectives
+		// Draw objectives
 		//
 		y = 306 * VideoHeight / 480;
 		VideoDrawText(372 * VideoWidth / 640, y, LargeFont, "Objectives:");
@@ -592,9 +593,9 @@ global void ShowIntro(const Intro* intro)
 }
 
 /**
-**		Show the credits
+**  Show the credits
 **
-**		@param credits		Credits structure
+**  @param credits  Credits structure
 */
 global void ShowCredits(Credits* credits)
 {
@@ -664,7 +665,7 @@ global void ShowCredits(Credits* credits)
 		HideAnyCursor();
 
 		//
-		//		Draw background
+		// Draw background
 		//
 		if (background) {
 			VideoDrawSubClip(background, 0, 0,
@@ -674,7 +675,7 @@ global void ShowCredits(Credits* credits)
 		}
 
 		//
-		//		Draw scrolling text
+		// Draw scrolling text
 		//
 		if (scrolling_credits) {
 			scrolling = ScrollText(x + 140, y + 80, 320, 275, line, scrolling_credits);
@@ -727,13 +728,15 @@ global void ShowCredits(Credits* credits)
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
 
-	// CallbackMusicOn();
+#if 0
+	CallbackMusicOn();
 	// FIXME: should this be GameMusic?
-	// PlayMusic(MenuMusic);
+	PlayMusic(MenuMusic);
+#endif
 }
 
 /**
-**		Draw text
+**  Draw text
 */
 local void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 {
@@ -764,9 +767,9 @@ local void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 }
 
 /**
-**		Show picture.
+**  Show picture.
 **
-**		@param chapter		Pointer to CampaignChapter to show
+**  @param chapter  Pointer to CampaignChapter to show
 */
 global void ShowPicture(CampaignChapter* chapter)
 {
@@ -814,7 +817,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	}
 
 	//
-	//		Fade in background and title
+	// Fade in background and title
 	//
 	i = 0;
 	max = chapter->Data.Picture.FadeIn;
@@ -847,7 +850,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	i = chapter->Data.Picture.FadeOut * i / max;
 
 	//
-	//		Draw background and title
+	// Draw background and title
 	//
 	j = 0;
 	max = chapter->Data.Picture.DisplayTime;
@@ -876,7 +879,7 @@ global void ShowPicture(CampaignChapter* chapter)
 	}
 
 	//
-	//		Fade out background and title
+	// Fade out background and title
 	//
 	max = chapter->Data.Picture.FadeOut;
 	while (i >= 0) {
@@ -931,7 +934,7 @@ global void ShowPicture(CampaignChapter* chapter)
 
 
 /**
-**		Draw a box with the text inside
+**  Draw a box with the text inside
 */
 #ifdef USE_SDL_SURFACE
 local void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
@@ -946,7 +949,7 @@ local void DrawStatBox(int x, int y, char* text, VMemType color, int percent)
 }
 
 /**
-**		Draw the game stats
+**  Draw the game stats
 */
 local int GameStatsDrawFunc(int frame)
 {
@@ -1315,7 +1318,7 @@ local int GameStatsDrawFunc(int frame)
 }
 
 /**
-**		Show the game stats
+**  Show the game stats
 */
 global void ShowStats(void)
 {
@@ -1421,7 +1424,7 @@ global void ShowStats(void)
 }
 
 /**
-**		Free Ccl Credits Memory
+**  Free Ccl Credits Memory
 */
 global void CleanCclCredits()
 {
@@ -1436,11 +1439,11 @@ global void CleanCclCredits()
 }
 
 /**
-**		Parse the credits configuration.
+**  Parse the credits configuration.
 **
-**		@param list		Scheme list containing the credits.
+**  @param list  Scheme list containing the credits.
 **
-**		@todo		'comment and 'title are only parsed, but not used.
+**  @todo  'comment and 'title are only parsed, but not used.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclCredits(SCM list)
@@ -1531,7 +1534,7 @@ local int CclCredits(lua_State* l)
 #endif
 
 /**
-**		Register CCL features for credits.
+**  Register CCL features for credits.
 */
 global void CreditsCclRegister(void)
 {
@@ -1545,11 +1548,11 @@ global void CreditsCclRegister(void)
 }
 
 /**
-**		Parse the add objective ccl function
+**  Parse the add objective ccl function
 **
-**		The list contains the objective text followed by an optional number
-**		specifying where in the list it should be added.  If no number is
-**		given it is added at the end.
+**  The list contains the objective text followed by an optional number
+**  specifying where in the list it should be added.  If no number is
+**  given it is added at the end.
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclAddObjective(SCM list)
@@ -1660,7 +1663,7 @@ local int CclAddObjective(lua_State* l)
 #endif
 
 /**
-**		Parse the remove objective ccl function
+**  Parse the remove objective ccl function
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclRemoveObjective(SCM objective)
@@ -1722,7 +1725,7 @@ local int CclRemoveObjective(lua_State* l)
 #endif
 
 /**
-**		Set the objectives
+**  Set the objectives
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetObjectives(SCM list)
@@ -1767,7 +1770,7 @@ local int CclSetObjectives(lua_State* l)
 #endif
 
 /**
-**		Parse the define-ranks ccl function
+**  Parse the define-ranks ccl function
 */
 #if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineRanks(SCM list)
@@ -1875,7 +1878,7 @@ local int CclDefineRanks(lua_State* l)
 #endif
 
 /**
-**		Register CCL functions for objectives
+**  Register CCL functions for objectives
 */
 global void ObjectivesCclRegister(void)
 {
@@ -1893,7 +1896,7 @@ global void ObjectivesCclRegister(void)
 }
 
 /**
-**		Save the objectives.
+**  Save the objectives.
 */
 global void SaveObjectives(CLFile* file)
 {

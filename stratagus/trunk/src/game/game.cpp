@@ -5,13 +5,13 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name game.c		-	The game set-up and creation. */
+/**@name game.c - The game set-up and creation. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer, Andreas Arens, and
-//	                           Jimmy Salmon
+//      (c) Copyright 1998-2004 by Lutz Sammer, Andreas Arens and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 //@{
 
 /*----------------------------------------------------------------------------
---		Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -67,25 +67,25 @@
 #include "ccl.h"
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-global Settings GameSettings;				/// Game Settings
-local int LcmPreventRecurse;				/// prevent recursion through LoadGameMap
+global Settings GameSettings;  /// Game Settings
+local int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
---		Map loading/saving
+--  Map loading/saving
 ----------------------------------------------------------------------------*/
 
 /**
-**		Load a Stratagus map.
+**  Load a Stratagus map.
 **
-**		@param filename		map filename
-**		@param map		map loaded
+**  @param filename  map filename
+**  @param map       map loaded
 */
 local void LoadStratagusMap(const char* filename,
 	WorldMap* map __attribute__((unused)))
@@ -107,7 +107,7 @@ local void LoadStratagusMap(const char* filename,
 
 #if 0
 	// Not true if multiplayer levels!
-	if (!ThisPlayer) {				/// ARI: bomb if nothing was loaded!
+	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
 		fprintf(stderr, "%s: invalid Stratagus map\n", filename);
 		ExitFatal(-1);
 	}
@@ -120,10 +120,10 @@ local void LoadStratagusMap(const char* filename,
 }
 
 /**
-**		Load any map.
+**  Load any map.
 **
-**		@param filename		map filename
-**		@param map		map loaded
+**  @param filename  map filename
+**  @param map       map loaded
 */
 local void LoadMap(const char* filename, WorldMap* map)
 {
@@ -162,11 +162,11 @@ local void LoadMap(const char* filename, WorldMap* map)
 }
 
 /*----------------------------------------------------------------------------
---		Game creation
+--  Game creation
 ----------------------------------------------------------------------------*/
 
 /**
-**		Free for all
+**  Free for all
 */
 local void GameTypeFreeForAll(void)
 {
@@ -183,7 +183,7 @@ local void GameTypeFreeForAll(void)
 }
 
 /**
-**		Top vs Bottom
+**  Top vs Bottom
 */
 local void GameTypeTopVsBottom(void)
 {
@@ -210,7 +210,7 @@ local void GameTypeTopVsBottom(void)
 }
 
 /**
-**		Left vs Right
+**  Left vs Right
 */
 local void GameTypeLeftVsRight(void)
 {
@@ -237,7 +237,7 @@ local void GameTypeLeftVsRight(void)
 }
 
 /**
-**		Man vs Machine
+**  Man vs Machine
 */
 local void GameTypeManVsMachine(void)
 {
@@ -262,14 +262,14 @@ local void GameTypeManVsMachine(void)
 }
 
 /**
-**		CreateGame.
+**  CreateGame.
 **
-**		Load map, graphics, sounds, etc
+**  Load map, graphics, sounds, etc
 **
-**		@param filename		map filename
-**		@param map		map loaded
+**  @param filename  map filename
+**  @param map       map loaded
 **
-**		@todo 		FIXME: use in this function InitModules / LoadModules!!!
+**  @todo FIXME: use in this function InitModules / LoadModules!!!
 */
 global void CreateGame(char* filename, WorldMap* map)
 {
@@ -282,7 +282,7 @@ global void CreateGame(char* filename, WorldMap* map)
 		return;
 	}
 
-	InitVisionTable();						// build vision table for fog of war
+	InitVisionTable(); // build vision table for fog of war
 	InitPlayers();
 
 	if (filename) {
@@ -294,7 +294,7 @@ global void CreateGame(char* filename, WorldMap* map)
 		}
 
 		//
-		//		Load the map.
+		// Load the map.
 		//
 		InitUnitTypes(1);
 		LoadMap(filename, map);
@@ -309,7 +309,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	SyncHash = 0;
 	InitSyncRand();
 
-	if (NetworkFildes != (Socket)-1) {				// Prepare network play
+	if (NetworkFildes != (Socket)-1) { // Prepare network play
 		DebugLevel0Fn("Client setup: Calling InitNetwork2\n");
 		InitNetwork2();
 	} else {
@@ -323,7 +323,9 @@ global void CreateGame(char* filename, WorldMap* map)
 	} else {
 		CallbackMusicOn();
 	}
-	//GamePaused = 1;
+#if 0
+	GamePaused = 1;
+#endif
 
 	if (FlagRevealMap) {
 		RevealMap();
@@ -353,7 +355,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
 
 	//
-	//		Setup game types
+	// Setup game types
 	//
 	// FIXME: implement more game types
 	if (GameSettings.GameType != SettingsGameTypeMapDefault) {
@@ -394,7 +396,7 @@ global void CreateGame(char* filename, WorldMap* map)
 	}
 
 	//
-	//		Graphic part
+	// Graphic part
 	//
 #ifdef USE_SDL_SURFACE
 	GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath, "/graphics/",
@@ -433,19 +435,19 @@ global void CreateGame(char* filename, WorldMap* map)
 		CompressedGraphicMemory / 1024 _C_
 		CompressedGraphicMemory / 1024 / 1024);
 
-	CreateMinimap();						// create minimap for pud
-	InitMap();								// setup draw functions
-	InitMapFogOfWar();						// build tables for fog of war
-	PreprocessMap();						// Adjust map for use
-	MapColorCycle();						// Setup color cycle
+	CreateMinimap();   // create minimap for pud
+	InitMap();         // setup draw functions
+	InitMapFogOfWar(); // build tables for fog of war
+	PreprocessMap();   // Adjust map for use
+	MapColorCycle();   // Setup color cycle
 
-	InitUserInterface(ThisPlayer->RaceName);		// Setup the user interface
-	LoadUserInterface();				// Load the user interface grafics
+	InitUserInterface(ThisPlayer->RaceName); // Setup the user interface
+	LoadUserInterface(); // Load the user interface grafics
 
 	//
-	//		Sound part
+	// Sound part
 	//
-	//FIXME: check if everything is really loaded
+	// FIXME: check if everything is really loaded
 	LoadUnitSounds();
 	MapUnitSounds();
 
@@ -457,44 +459,44 @@ global void CreateGame(char* filename, WorldMap* map)
 #endif
 
 	//
-	//		Spells
+	// Spells
 	//
 	InitSpells();
 
 	//
-	//  Init units' groups
+	// Init units' groups
 	//
 	InitGroups();
 
 	//
-	//		Init players?
+	// Init players?
 	//
 	DebugPlayers();
 	PlayersInitAi();
 
 	//
-	//  Upgrades
+	// Upgrades
 	//
 	InitUpgrades();
 
 	//
-	//  Dependencies
+	// Dependencies
 	//
 	InitDependencies();
 
 	//
-	//  Buttons (botpanel)
+	// Buttons (botpanel)
 	//
 	InitButtons();
 
 	//
-	//		Triggers
+	// Triggers
 	//
 	InitTriggers();
 
 #ifdef WITH_SOUND
 	if (SoundFildes != -1) {
-		//FIXME: must be done after map is loaded
+		// FIXME: must be done after map is loaded
 		if (InitSoundServer()) {
 			SoundOff = 1;
 			SoundFildes = -1;
@@ -516,9 +518,9 @@ global void CreateGame(char* filename, WorldMap* map)
 		ThisPlayer->StartX, ThisPlayer->StartY);
 
 	//
-	//		Various hacks wich must be done after the map is loaded.
+	// Various hacks wich must be done after the map is loaded.
 	//
-	//FIXME: must be done after map is loaded
+	// FIXME: must be done after map is loaded
 	InitAStar();
 #ifdef HIERARCHIC_PATHFINDER
 	PfHierInitialize();
@@ -527,12 +529,12 @@ global void CreateGame(char* filename, WorldMap* map)
 	MapSplitterInit();
 #endif
 	//
-	//		FIXME: The palette is loaded after the units are created.
-	//		FIXME: This loops fixes the colors of the units.
+	// FIXME: The palette is loaded after the units are created.
+	// FIXME: This loops fixes the colors of the units.
 	//
 	for (i = 0; i < NumUnits; ++i) {
-		//  I don't really think that there can be any rescued
-		//  units at this point.
+		// I don't really think that there can be any rescued
+		// units at this point.
 		if (Units[i]->RescuedFrom) {
 			Units[i]->Colors = &Units[i]->RescuedFrom->UnitColors;
 		} else {
@@ -554,9 +556,9 @@ global void CreateGame(char* filename, WorldMap* map)
 }
 
 /**
-**		Init Game Setting to default values
+**  Init Game Setting to default values
 **
-**		@todo FIXME: this should not be executed for restart levels!
+**  @todo  FIXME: this should not be executed for restart levels!
 */
 global void InitSettings(void)
 {
