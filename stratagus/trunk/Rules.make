@@ -204,7 +204,7 @@ IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)
 ## define flags
 DEBUG=	-DDEBUG #-DNEW_AI # -DFLAG_DEBUG
 DFLAGS=	$(THREAD) $(CCL) $(VERSION) $(GLIB) $(VIDEO) $(ZDEFS) $(DSOUND) \
-	$(DEBUG) -DNEW_UNIT -DNEW_NETWORK -DUNIT_ON_MAP # -DNEW_NAMES
+	$(DEBUG) -DNEW_NETWORK -DUNIT_ON_MAP # -DNEW_NAMES
 
 ## choose optimise level
 #CFLAGS=-g -O0 $(PROFILE) -pipe -Wall -Werror $(IFLAGS) $(DFLAGS)

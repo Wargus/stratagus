@@ -169,7 +169,6 @@ local SoundId ChooseUnitVoiceSoundId(Unit *unit,UnitVoiceGroup voice) {
 */
 global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 {
-#ifdef NEW_UNIT
     DebugLevel3("FIXME: fabrice please look\n");
     InsertSoundRequest(unit,
 		       unit->Slot,
@@ -179,17 +178,6 @@ global void PlayUnitSound(Unit* unit,UnitVoiceGroup unit_voice_group)
 		       (unit_voice_group==VoiceSelected
 			||unit_voice_group==VoiceBuilding),
 		       0);
-#else
-    InsertSoundRequest(unit,
-		       unit->Id,
-		       ViewPointDistanceToUnit(unit),
-		       ChooseUnitVoiceSoundId(unit,unit_voice_group),
-		       unit_voice_group==VoiceAttacking,
-		       (unit_voice_group==VoiceSelected
-			||unit_voice_group==VoiceBuilding),
-		       0);
-    DebugLevel3("Playing %d\n",unit_voice_group);
-#endif
 }
 
 /**

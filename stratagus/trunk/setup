@@ -23,9 +23,9 @@ cat << .. > $RULESFILE
 #------------------------------------------------------------------------------
 # HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DSLOW_INPUT -DNEW_UNIT -DUNIT_ON_MAP -DNEW_NETWORK"
+EXTRA_CFLAGS="-DSLOW_INPUT -DUNIT_ON_MAP -DNEW_NETWORK"
 # This could be used for experimental versions
-# -DNEW_UNIT -DNEW_NETWORK -DNEW_FOW -DUNIT_ON_MAP -DNEW_NAMES
+# -DNEW_NETWORK -DNEW_FOW -DUNIT_ON_MAP -DNEW_NAMES
 
 # Compile commands
 CC=gcc

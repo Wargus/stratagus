@@ -9,11 +9,10 @@
 //	   FreeCraft - A free fantasy real time strategy game engine
 //
 /**@name unit.h		-	The unit headerfile. */
-/*
-**	(c) Copyright 1998-2000 by Lutz Sammer
-**
-**	$Id$
-*/
+//
+//	(c) Copyright 1998-2000 by Lutz Sammer
+//
+//	$Id$
 
 #ifndef __UNIT_H__
 #define __UNIT_H__
@@ -196,16 +195,12 @@ enum _directions_ {
 **	Everything belonging to an unit. FIXME: rearrange vor less memory.
 */
 struct _unit_ {
-#ifdef NEW_UNIT
     // int is faster than shorts.
     unsigned	Refs;			/// Reference counter
     unsigned	Slot;			/// Assignd slot number
     Unit**	UnitSlot;		/// slot pointer of Units
     Unit**	PlayerSlot;		/// slot pointer of Player->Units
     Unit*	Next;			/// generic link pointer
-#else
-    unsigned	Id;			/// unique unit id
-#endif
 
     int		X;			/// Map position X
     int		Y;			/// Map position Y
@@ -306,11 +301,7 @@ struct _unit_ {
 /**
 **	Returns unit number (unique to this unit)
 */
-#ifdef NEW_UNIT
 #define UnitNumber(unit)	((unit)->Slot)
-#else
-#define UnitNumber(unit)	((unit)-UnitsPool)
-#endif
 
 /**
 **	How many units could be selected
@@ -331,17 +322,11 @@ struct _unit_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef NEW_UNIT
 extern Unit* UnitSlots[MAX_UNIT_SLOTS];	/// All possible units
 extern Unit** UnitSlotFree; 		/// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS];	/// Units used
 extern int NumUnits;			/// Number of units used
-#else
-extern int NumUnits;			/// Number of units used
-extern Unit** Units;			/// Units used
-extern Unit* UnitsPool;			/// Units memory pool
-#endif
 
 //	in unit_draw.c (FIXME: could be moved into the user interface?)
 extern int ShowHealthBar;		/// Flag: show health bar

@@ -489,22 +489,22 @@ global void GameMainLoop(void)
 		case 1:
 		    UnitIncrementHealth();	// berserker healing
 		    break;
-		case 2:
+		case 2:				// fog of war calculations
 		    MapUpdateVisible();
 		    break;
-		case 3:
+		case 3:				// minimap update
 		    MustRedraw|=RedrawMinimap;
 		    break;
-		case 4:
+		case 4:				// computer players
 		    PlayersEachSecond();
 		    break;
-		case 5:
+		case 5:				// game goals
 		    CheckGoals();
 		    break;
-		case 6:
+		case 6:				// forest grow
 		    RegenerateForest();
 		    break;
-		case 7:
+		case 7:				// overtaking units
 		    RescueUnits();
 		    break;
 	    }

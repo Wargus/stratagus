@@ -852,7 +852,6 @@ global void DrawUnits(void)
     //
     //	2a) corpse aren't in the cache.
     //
-#ifdef NEW_UNIT
     for( i=0; i<NumUnits; ++i ) {
 	unit=Units[i];
 	// FIXME: this tries to draw all corps, ohje
@@ -860,14 +859,6 @@ global void DrawUnits(void)
 	    DrawUnit(unit);
 	}
     }
-#else
-    for( i=0; i<NumUnits; ++i ) {
-	unit=Units[i];
-	if( unit->Type->Vanishes || unit->Command.Action==UnitActionDie ) {
-	    DrawUnit(unit);
-	}
-    }
-#endif
     //
     //	2b) buildings
     //
