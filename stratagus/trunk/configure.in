@@ -26,6 +26,7 @@ elif test "`uname -a | grep -is beos`"; then
     PLATFORM="-DUSE_BEOS"
 elif test "`uname -a | grep -is darwin`"; then
     ARCH=macosx
+    PLATFORM="-DUSE_MAC"
 else
     ARCH=linux
 fi
