@@ -57,7 +57,7 @@ EXE=
 OUTFILE=$(TOPDIR)/freecraft
 ARCH=linux
 OE=o
-OBJDIR=obj/
+OBJDIR=obj
 
 #ARCHOBJS=stdmman.$(OE) svgalib.$(OE) unix_lib.$(OE) bitm_lnx.$(OE)
 IFLAGS=	-I$(TOPDIR)/src/include $(XIFLAGS)

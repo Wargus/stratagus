@@ -39,6 +39,6 @@ else
 	SRCS	= pathfinder.c astar.c ccl_pathfinder.c
 endif
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

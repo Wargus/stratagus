@@ -88,44 +88,44 @@ doc++::
 src::
 	@$(MAKE) -C src RULESFILE=$(RULESFILE) all
 
-etlib/$(OBJDIR)hash.$(OE): etlib/hash.c
+etlib/$(OBJDIR)/hash.$(OE): etlib/hash.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
 
-etlib/$(OBJDIR)getopt.$(OE): etlib/getopt.c
+etlib/$(OBJDIR)/getopt.$(OE): etlib/getopt.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
 
-etlib/$(OBJDIR)prgname.$(OE): etlib/prgname.c
+etlib/$(OBJDIR)/prgname.$(OE): etlib/prgname.c
 	@if [ ! -d etlib/$(OBJDIR) ]; then mkdir etlib/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
 
-src/$(OBJDIR)main.$(OE): src/main.c
+src/$(OBJDIR)/main.$(OE): src/main.c
 	@if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
 	$(CC) -c $(CFLAGS) $< -o $@
 
-src/$(OBJDIR)libclone.a: ;
+src/$(OBJDIR)/libclone.a: ;
 
 # UNIX-TARGET
-freecraft:	src etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)libclone.a
-	$(CCLD) -o freecraft src/$(OBJDIR)libclone.a etlib/$(OBJDIR)hash.$(OE) $(CLONELIBS) -I. $(CFLAGS)
+freecraft:	src etlib/$(OBJDIR)/hash.$(OE) src/$(OBJDIR)/libclone.a
+	$(CCLD) -o freecraft src/$(OBJDIR)/libclone.a etlib/$(OBJDIR)/hash.$(OE) $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
-freecraft.exe:	src etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
-		etlib/$(OBJDIR)hash.$(OE) src/$(OBJDIR)freecraftrc.$(OE) \
-		src/$(OBJDIR)libclone.a src/$(OBJDIR)main.$(OE)
-	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)main.$(OE) \
-		src/$(OBJDIR)libclone.a src/$(OBJDIR)freecraftrc.$(OE) \
-		etlib/$(OBJDIR)prgname.$(OE) etlib/$(OBJDIR)getopt.$(OE) \
-		etlib/$(OBJDIR)hash.$(OE) \
+freecraft.exe:	src etlib/$(OBJDIR)/prgname.$(OE) etlib/$(OBJDIR)/getopt.$(OE) \
+		etlib/$(OBJDIR)/hash.$(OE) src/$(OBJDIR)/freecraftrc.$(OE) \
+		src/$(OBJDIR)/libclone.a src/$(OBJDIR)/main.$(OE)
+	$(CCLD) -o freecraft$(EXE) src/$(OBJDIR)/main.$(OE) \
+		src/$(OBJDIR)/libclone.a src/$(OBJDIR)/freecraftrc.$(OE) \
+		etlib/$(OBJDIR)/prgname.$(OE) etlib/$(OBJDIR)/getopt.$(OE) \
+		etlib/$(OBJDIR)/hash.$(OE) \
 		-lSDLmain $(CLONELIBS) -I. $(CFLAGS)
 
 strip:
 	@if [ -f freecraft ]; then strip freecraft; fi
 	@if [ -f freecraft.exe ]; then $(CROSSDIR)/i386-mingw32msvc/bin/strip freecraft.exe; fi
 
-src/$(OBJDIR)freecraftrc.$(OE): src/freecraft.rc
-	windres --include-dir contrib -osrc/$(OBJDIR)freecraftrc.$(OE) src/freecraft.rc
+src/$(OBJDIR)/freecraftrc.$(OE): src/freecraft.rc
+	windres --include-dir contrib -osrc/$(OBJDIR)/freecraftrc.$(OE) src/freecraft.rc
 
 # -L. -lefence
 # -Lccmalloc-0.2.3/src -lccmalloc -ldl
@@ -139,7 +139,7 @@ tools::
 
 clean::
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clean ; done
-	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)*.$(OE) .#*
+	$(RM) core gmon.out cscope.out *.doc etlib/$(OBJDIR)/*.$(OE) .#*
 
 clobber:	clean
 	@set -e; for i in $(MODULES) ; do $(MAKE) -C $$i RULESFILE=$(RULESFILE) clobber ; done

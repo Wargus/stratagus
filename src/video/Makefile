@@ -38,6 +38,6 @@ SRCS	= video.c cursor.c sprite.c \
 	  sdl.c new_X11.c X11.c svgalib.c wince.c \
           sweepline.c deco.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk

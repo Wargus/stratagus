@@ -33,6 +33,6 @@ MODULE	= network
 
 SRCS	= network.c lowlevel.c netconnect.c commands.c
 
-OBJS	= $(addprefix $(OBJDIR), $(SRCS:.c=.$(OE)))
+OBJS	= $(addprefix $(OBJDIR)/, $(SRCS:.c=.$(OE)))
 
 include $(TOPDIR)/Common.mk
