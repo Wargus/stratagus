@@ -10,7 +10,7 @@
 //
 /**@name script.c - The configuration language. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -534,6 +534,39 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 				}
 			}
 			lua_pop(l, 1); // pop the table.
+		} else if (!strcmp(key, "VideoTextLength")) {
+			Assert(lua_istable(l, -1));
+			res->e = ENumber_VideoTextLength;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				key = LuaToString(l, -2);
+				if (!strcmp(key, "Text")) {
+					res->D.VideoTextLength.String = CclParseStringDesc(l);
+					lua_pushnil(l);
+				} else if (!strcmp(key, "Font")) {
+					res->D.VideoTextLength.Font = FontByIdent(LuaToString(l, -1));
+					if (res->D.VideoTextLength.Font == -1) {
+						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
+					}
+				} else {
+					LuaError(l, "Bad param %s for VideoTextLength" _C_ key);
+				}
+			}
+			lua_pop(l, 1); // pop the table.
+		} else if (!strcmp(key, "StringFind")) {
+			Assert(lua_istable(l, -1));
+			res->e = ENumber_StringFind;
+			if (luaL_getn(l, -1) != 2) {
+				LuaError(l, "Bad param for StringFind");
+			}
+			lua_rawgeti(l, -1, 1); // left
+			res->D.StringFind.String = CclParseStringDesc(l);
+
+			lua_rawgeti(l, -1, 2); // right
+			res->D.StringFind.C = *LuaToString(l, -1);
+			lua_pop(l, 1); // pop the char
+
+			lua_pop(l, 1); // pop the table.
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -608,6 +641,20 @@ StringDesc* CclParseStringDesc(lua_State* l)
 				res->D.If.False = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "SubString")) {
+			res->e = EString_SubString;
+			if (luaL_getn(l, -1) != 2 && luaL_getn(l, -1) != 3) {
+				LuaError(l, "Bad number of args in SubString\n");
+			}
+			lua_rawgeti(l, -1, 1); // String.
+			res->D.SubString.String = CclParseStringDesc(l);
+			lua_rawgeti(l, -1, 2); // Begin.
+			res->D.SubString.Begin = CclParseNumberDesc(l);
+			if (luaL_getn(l, -1) == 3) {
+				lua_rawgeti(l, -1, 3); // End.
+				res->D.SubString.End = CclParseNumberDesc(l);
+			}
+			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -638,10 +685,8 @@ Unit* EvalUnit(const UnitDesc* unitdesc)
 	switch (unitdesc->e) {
 		case EUnit_Ref :
 			return *unitdesc->D.AUnit;
-		default :
-			abort();
-			return 0;
 	}
+	return NULL;
 }
 
 /**
@@ -656,6 +701,8 @@ Unit* EvalUnit(const UnitDesc* unitdesc)
 int EvalNumber(const NumberDesc* number)
 {
 	Unit* unit;
+	char* s;
+	char* s2;
 	int a;
 	int b;
 
@@ -719,10 +766,27 @@ int EvalNumber(const NumberDesc* number)
 			} else { // ERROR.
 				return 0;
 			}
-		default :
-			abort();
-			return 0;
+		case ENumber_VideoTextLength : // VideoTextLength(font, s)
+			if (number->D.VideoTextLength.String != NULL
+				&& (s = EvalString(number->D.VideoTextLength.String)) != NULL) {
+				a = VideoTextLength(number->D.VideoTextLength.Font, s);
+				free(s);
+				return a;
+			} else { // ERROR.
+				return 0;
+			}
+		case ENumber_StringFind : // strchr(s, c) - s
+			if (number->D.StringFind.String != NULL
+				&& (s = EvalString(number->D.StringFind.String)) != NULL) {
+				s2 = strchr(s, number->D.StringFind.C);
+				a = s2 ? s2 - s : -1;
+				free(s);
+				return a;
+			} else { // ERROR.
+				return 0;
+			}
 	}
+	return 0;
 }
 
 /**
@@ -787,10 +851,33 @@ char* EvalString(const StringDesc* s)
 			} else {
 				return strdup("");
 			}
-		default :
-			abort();
-			return 0;
+		case EString_SubString : // substring(s, begin, end)
+			if (s->D.SubString.String != NULL
+				&& (tmp1 = EvalString(s->D.SubString.String)) != NULL) {
+				int begin;
+				int end;
+
+				begin = EvalNumber(s->D.SubString.Begin);
+				if ((unsigned) begin > strlen(tmp1) && begin > 0) {
+					free(tmp1);
+					return strdup("");
+				}
+				res = strdup(tmp1 + begin);
+				free(tmp1);
+				if (s->D.SubString.End) {
+					end = EvalNumber(s->D.SubString.End);
+				} else {
+					end = -1;
+				}
+				if ((unsigned) end < strlen(res) && end >= 0) {
+					res[end] = '\0';
+				}
+				return res;
+			} else { // ERROR.
+				return strdup("");
+			}
 	}
+	return NULL;
 }
 
 
@@ -846,9 +933,16 @@ void FreeNumberDesc(NumberDesc* number)
 			break;
 		case ENumber_UnitStat : // property of unit.
 			FreeUnitDesc(number->D.UnitStat.Unit);
+			free(number->D.UnitStat.Unit);
 			break;
-		default :
-			abort();
+		case ENumber_VideoTextLength : // VideoTextLength(font, s)
+			FreeStringDesc(number->D.VideoTextLength.String);
+			free(number->D.VideoTextLength.String);
+			break;
+		case ENumber_StringFind : // strchr(s, c) - s.
+			FreeStringDesc(number->D.StringFind.String);
+			free(number->D.StringFind.String);
+			break;
 	}
 }
 
@@ -897,14 +991,14 @@ void FreeStringDesc(StringDesc* s)
 			FreeStringDesc(s->D.If.False);
 			free(s->D.If.False);
 			break;
-#if 0
-		case EString_Extract :
-			FreeStringDesc(s->D.Extract.s);
-			free(s->D.Extract.s);
+		case EString_SubString : // substring(s, begin, end)
+			FreeStringDesc(s->D.SubString.String);
+			free(s->D.SubString.String);
+			FreeNumberDesc(s->D.SubString.Begin);
+			free(s->D.SubString.Begin);
+			FreeNumberDesc(s->D.SubString.End);
+			free(s->D.SubString.End);
 			break;
-#endif
-		default :
-			abort();
 	}
 }
 
@@ -1310,6 +1404,70 @@ static int CclIf(lua_State* l)
 	return Alias(l, "If");
 }
 
+/**
+**  Return equivalent lua table for SubString.
+**  {"SubString", {arg1, arg2, arg3}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclSubString(lua_State* l)
+{
+	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
+		LuaError(l, "Bad number of arg for SubString()\n");
+	}
+	return Alias(l, "SubString");
+}
+
+/**
+**  Return equivalent lua table for VideoTextLength.
+**  {"VideoTextLength", {Text = arg1, Font = arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclVideoTextLength(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for VideoTextLength()\n");
+	}
+	lua_newtable (l);
+	lua_pushnumber(l, 1);
+	lua_pushstring(l, "VideoTextLength");
+	lua_rawset(l, -3);
+	lua_pushnumber(l, 2);
+
+	lua_newtable (l);
+	lua_pushstring(l, "Font");
+	lua_pushvalue(l, 1);
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Text");
+	lua_pushvalue(l, 2);
+	lua_rawset(l, -3);
+
+	lua_rawset(l, -3);
+	return 1;
+}
+
+/**
+**  Return equivalent lua table for StringFind.
+**  {"StringFind", {arg1, arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclStringFind(lua_State* l)
+{
+	if (lua_gettop(l) != 2) {
+		LuaError(l, "Bad number of arg for StringFind()\n");
+	}
+	return Alias(l, "StringFind");
+}
+
+
 static void AliasRegister()
 {
 	// Number.
@@ -1327,6 +1485,9 @@ static void AliasRegister()
 	lua_register(Lua, "GreaterThanOrEq", CclGreaterThanOrEq);
 	lua_register(Lua, "LessThanOrEq", CclLessThanOrEq);
 	lua_register(Lua, "NotEqual", CclNotEqual);
+	lua_register(Lua, "VideoTextLength", CclVideoTextLength);
+	lua_register(Lua, "StringFind", CclStringFind);
+
 
 	// Unit
 	lua_register(Lua, "AttackerVar", CclUnitAttackerVar);
@@ -1339,6 +1500,7 @@ static void AliasRegister()
 	lua_register(Lua, "String", CclString);
 	lua_register(Lua, "InverseVideo", CclInverseVideo);
 	lua_register(Lua, "UnitName", CclUnitName);
+	lua_register(Lua, "SubString", CclSubString);
 
 
 	lua_register(Lua, "If", CclIf);

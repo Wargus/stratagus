@@ -114,7 +114,10 @@ and how to use it.
 	<dd>It is 1 if NumberDesc1 == NumberDesc2 else 0.</dd>
 	<dt>NotEqual(NumberDesc1, NumberDesc2)</dt>
 	<dd>It is 1 if NumberDesc1 &lt;&gt; NumberDesc2 else 0.</dd>
-
+	<dt>VideoTextLength(Font, StringDesc)</dt>
+	<dd>Size in pixel of the text with the given font.</dd>
+	<dt>StringFind(StringDesc, 'c')</dt>
+	<dd>First occurance of the character 'c' in the text. (Pos begin at 0). return -1 in 'c' is not in the string.</dd>
 	<dt>Rand(NumberDesc)</dt>
 	<dd>It is a random value in [0..Number - 1].</dd>
 	<dt>AttackerVar("Variable" [, Component])</dt>
@@ -136,7 +139,7 @@ and how to use it.
 	<dd>Like of  Attacker but for the Active unit.</dd>
   </dl></dd>
   <dt><b>StringDesc</b></dt>
-  <dd>Represent a number. it could be :
+  <dd>Represent a string. it could be :
   <dl>
 	<dt>"string"</dt>
 	<dd>direct value. Or value which are not recompute during the game.</dd>
@@ -148,6 +151,9 @@ and how to use it.
 	<dd>Set string in InverseVideo mode.</dd>
 	<dt>UnitName(UnitDesc)</dt>
 	<dd>Name of the Unit</dd>
+	<dt>SubString(StringDesc, NumberDesc begin[, NumberDesc end])</dt>
+	<dd>Return the substring which begin at the 'begin' character ([0-lenght(s)])
+		and end at the 'end' character of the given string. default value for 'end' is the end of the initial string.</dd>
   </dl></dd>
   <dt><b>UnitDesc</b></dt>
   <dd>Represent a unit. It could be :
