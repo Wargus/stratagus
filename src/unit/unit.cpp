@@ -162,6 +162,9 @@ global void ReleaseUnit(Unit* unit)
 		    ,UnitNumber(unit),unit->Refs);
 	    return;
 	}
+#ifdef HIERARCHIC_PATHFINDER
+	PfHierReleaseData (unit);
+#endif
     }
 
     RefsDebugCheck( unit->Refs );
@@ -549,6 +552,11 @@ global void RemoveUnit(Unit* unit)
 		}
 	    }
 	}
+#ifdef HIERARCHIC_PATHFINDER
+	PfHierMapChangedCallback (unit->X, unit->Y,
+		    unit->X + unit->Type->TileWidth - 1,
+		    unit->Y + unit->Type->TileHeight - 1);
+#endif
     } else {
 	unsigned flags;
 
