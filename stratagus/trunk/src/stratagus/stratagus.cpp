@@ -451,6 +451,10 @@ Use it at your own risk.\n\n");
     LoadCursors(RaceWcNames ? RaceWcNames[1] : "oops");
     InitSettings();
 
+    InitUserInterface(RaceWcNames ? RaceWcNames[1] : "oops");
+    InitSettings();
+    LoadUserInterface();
+
     WaitForInput(15);
 
     //

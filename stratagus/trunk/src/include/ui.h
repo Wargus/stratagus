@@ -227,7 +227,7 @@ extern char FancyBuildings;		/// Mirror buildings 1 yes, 0 now.
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitUserInterface(void);		/// initialize the ui
+extern void InitUserInterface(char*);		/// initialize the ui
 extern void LoadUserInterface(void);		/// load ui graphics
 extern void SaveUserInterface(FILE*);		/// save the ui state
 extern void CleanUserInterface(void);		/// clean up the ui
