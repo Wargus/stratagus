@@ -15,6 +15,9 @@ CCLD=g++
 RM=rm -f
 MAKE=make
 
+# Prefix for 'make install'
+PREFIX=/usr/local
+
 # Use SIOD support
 CCL		= -DUSE_CCL
 CCLLIB		= -lm
