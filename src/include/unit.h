@@ -294,7 +294,7 @@
 **
 **  This values hold the amount of resources in a resource or in
 **  in a harvester.
-**  @fixme continue documentation
+**  @todo continue documentation
 **
 **  Unit::SubAction
 **
@@ -315,7 +315,7 @@
 **
 **  Unit::Reset
 **
-**  @fixme continue documentation
+**  @todo continue documentation
 **
 **  Unit::Blink
 **
@@ -361,7 +361,7 @@
 **
 **  Unit::Data
 **
-**  @fixme continue documentation
+**  @todo continue documentation
 **
 **  Unit::Goal
 **
@@ -369,7 +369,7 @@
 **
 **  Unit::Retreating
 **
-** @fixme continue documentation
+** @todo continue documentation
 **
 */
 
@@ -638,7 +638,7 @@ struct _unit_ {
 	struct _order_train_ {
 		int Ticks;                      ///< Ticks to complete
 		int Count;                      ///< Units in training queue
-		/// @fixme vladi: later we should train more units or automatic
+		/// @todo vladi: later we should train more units or automatic
 #define MAX_UNIT_TRAIN 6 ///< max number of units in queue
 		UnitType* What[MAX_UNIT_TRAIN]; ///< Unit trained
 	} Train; ///< Train units action
@@ -660,7 +660,7 @@ struct _unit_ {
 
 /**
 **  Returns true, if unit is unusable. (for attacking,...)
-**  @fixme look if correct used (UnitActionBuilded is no problem if attacked)?
+**  @todo look if correct used (UnitActionBuilded is no problem if attacked)?
 */
 #define UnitUnusable(unit) \
 	((unit)->Removed || (unit)->Orders[0].Action == UnitActionDie || \
@@ -715,7 +715,7 @@ extern Unit* Units[MAX_UNIT_SLOTS]; ///< Units used
 extern int NumUnits;                ///< Number of units used
 
 //		in unit_draw.c
-/// @fixme could be moved into the user interface ?
+/// @todo could be moved into the user interface ?
 extern int ShowHealthBar;               ///< Flag: show health bar
 extern int ShowHealthDot;               ///< Flag: show health dot
 extern int ShowManaBar;                 ///< Flag: show mana bar
@@ -783,9 +783,9 @@ extern void RemoveUnit(Unit* unit, Unit* host);
 extern void UnitLost(Unit* unit);
 	/// Remove the Orders of a Unit
 extern void UnitClearOrders(Unit* unit);
-	/// @fixme more docu
+	/// @todo more docu
 extern void UpdateForNewUnit(const Unit* unit, int upgrade);
-	/// @fixme more docu
+	/// @todo more docu
 extern void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy);
 
 	/// Call when an Unit goes under fog.
@@ -812,7 +812,7 @@ extern int UnitVisibleInViewport(const Unit* unit, const Viewport* vp);
 
 	/// To be called when the look of the unit changes.
 extern int CheckUnitToBeDrawn(Unit* unit);
-	/// @fixme more docu
+	/// @todo more docu
 extern void GetUnitMapArea(const Unit* unit, int *sx, int *sy,
 	int *ex, int *ey);
 	/// Check for rescue each second
@@ -827,16 +827,16 @@ extern void UnitUpdateHeading(Unit* unit);
 	/// Heading and frame from delta direction x,y
 extern void UnitHeadingFromDeltaXY(Unit* unit, int x, int y);
 
-	/// @fixme more docu
+	/// @todo more docu
 extern void DropOutOnSide(Unit* unit, int heading, int addx, int addy);
-	/// @fixme more docu
+	/// @todo more docu
 extern void DropOutNearest(Unit* unit, int x, int y, int addx, int addy);
 	/// Drop out all units in the unit
 extern void DropOutAll(const Unit* unit);
 
-	/// @fixme more docu
+	/// @todo more docu
 extern int CanBuildHere(const UnitType* type, int x, int y);
-	/// @fixme more docu
+	/// @todo more docu
 extern int CanBuildOn(int x, int y, int mask);
 	/// FIXME: more docu
 extern int CanBuildUnitType(const Unit* unit,const UnitType* type, int x, int y, int real);
@@ -854,7 +854,7 @@ extern int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	/// Find the nearest piece of wood in sight range
 extern int FindWoodInSight(const Unit* unit, int* x, int* y);
 
-	/// @fixme more docu
+	/// @todo more docu
 extern Unit* UnitOnScreen(Unit* unit, int x, int y);
 
 	/// Let an unit die

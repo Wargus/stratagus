@@ -33,8 +33,8 @@
 
 //@{
 
-/// @fixme this only the start of the new user interface
-/// @fixme all user interface variables should go here and be configurable
+/// @todo this only the start of the new user interface
+/// @todo all user interface variables should go here and be configurable
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -324,7 +324,7 @@ typedef struct _ui_ {
 	CursorConfig ArrowS;                ///< Cursor pointing south
 	CursorConfig ArrowSE;               ///< Cursor pointing south east
 
-/// @fixme could use different sounds/speech for the errors
+/// @todo could use different sounds/speech for the errors
 /// Is in gamesounds?
 ///	SoundConfig PlacementError;         ///< played on placements errors
 ///	SoundConfig PlacementSuccess;       ///< played on placements success

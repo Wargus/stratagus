@@ -60,7 +60,7 @@ typedef struct _game_sound_ {
 	SoundConfig Docking;               ///< ship reaches coast
 	SoundConfig BuildingConstruction;  ///< building under construction
 
-	/// @fixme (Fabrice) I don't think it's the correct place to put this
+	/// @todo (Fabrice) I don't think it's the correct place to put this
 	SoundConfig WorkComplete[MAX_RACES];  ///< building ready
 
 	SoundConfig Rescue[MAX_RACES];  ///< rescue units

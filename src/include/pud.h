@@ -76,7 +76,7 @@
 #define MapActionForest  0xFFFE  ///< forest on map
 
 /// @note These are hard-coded PUD internals (and, as such, belong here!)
-/// @fixme for our own maps this should become configurable
+/// @todo for our own maps this should become configurable
 #define WC_UnitPeasant        0x02  ///< human peasant
 #define WC_UnitPeon           0x03  ///< orc peon
 #define WC_UnitGoldMine       0x5C  ///< goldmine
