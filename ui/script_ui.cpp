@@ -1462,12 +1462,10 @@ local SCM CclDefineMenu(SCM list)
 	memcpy(menu, &item, sizeof(Menu));
 	menu->nitems = 0; // reset to zero
 	//move the buttons for different resolutions..
-#if 0
 	if (VideoWidth != 640) {
 	    menu->x += (VideoWidth - 640) / 2;
 	    menu->y += (VideoHeight - 480) / 2;
 	}
-#endif
 	//printf("Me:%s\n", name);
 	*(Menu **)hash_add(MenuHash,name) = menu;
     } else {
