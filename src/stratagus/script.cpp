@@ -80,7 +80,7 @@ global void CclGcProtect(SCM obj)
     SCM var;
 
     var=gh_symbol2scm("*ccl-protect*");
-    setvar(var,cons(symbol_value(var,NIL),obj),NIL);
+    setvar(var,cons(obj,symbol_value(var,NIL)),NIL);
 }
 
 /*............................................................................
@@ -761,6 +761,39 @@ global void LoadCcl(void)
     }
     CclInConfigFile=0;
     user_gc(SCM_BOOL_F);		// Cleanup memory after load
+}
+
+/**
+**	Save CCL Module.
+**
+**	@param file	Save file.
+*/
+global void SaveCcl(FILE* file)
+{
+    SCM list;
+    extern SCM oblistvar;
+
+    fprintf(file,"\n;;; -----------------------------------------\n");
+    fprintf(file,";;; MODULE: CCL $Id$\n\n");
+
+    for( list=oblistvar; CONSP(list); list=CDR(list) ) {
+	SCM sym;
+
+	sym=CAR(list);
+	if( !gh_null_p(symbol_boundp(sym, NIL)) ) {
+	    SCM value;
+
+	    fprintf(file,";;(define %s\n",get_c_string(sym));
+	    value = symbol_value(sym, NIL);
+	    fprintf(file,";;");
+	    lprin1f(value,file);
+	    fprintf(file,"\n");
+#ifdef DEBUG
+	} else {
+	    fprintf(file,";;%s unbound\n",get_c_string(sym));
+#endif
+	}
+    }
 }
 
 //@}
