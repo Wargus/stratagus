@@ -514,7 +514,7 @@ void RegionSplit(RegionId regid, int updateConnections)
 
 	tileleft -= 2;
 
-	while (tileleft) {
+	while (tileleft > 0) {
 		// Search with the two
 		done = 0;
 		blocker = -1;
