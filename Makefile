@@ -91,8 +91,6 @@ help:
 	@-echo "make tags			create ctags"
 	@-echo "make depend			create dependencies"
 	@-echo "make dist			create distribution"
-	@-echo "make buildit			create data files from original data"
-	@-echo "make buildclean			cleanup build data files"
 	@-echo "make win32new			(CROSS-COMPILER ONLY) start new win32"
 	@-echo "make win32			(CROSS-COMPILER ONLY) build the win32 version"
 	@-echo "make win32distclean		(CROSS-COMPILER ONLY) clean all files of win32"
@@ -192,13 +190,10 @@ endif
 #	TOOLS
 ##############################################################################
 
-tools: tools/aledoc$(EXE) tools/wartool$(EXE) tools/war1tool$(EXE) \
+tools: tools/aledoc$(EXE) tools/war1tool$(EXE) \
 	tools/startool$(EXE)
 
 tools/aledoc$(EXE): tools/aledoc.c
-	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
-
-tools/wartool$(EXE): tools/wartool.c
 	$(CC) $(CFLAGS) -o $@ $< $(TOOLLIBS)
 
 tools/war1tool$(EXE): tools/war1tool.c
@@ -304,15 +299,12 @@ bin-dist: all
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	echo stratagus$(EXE) >>$(DISTLIST)
-	echo tools/wartool$(EXE) >>$(DISTLIST)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	cp tools/build.sh $(distdir)
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/stratagus$(EXE)
-	strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	tar czhf stratagus-$(mydate)-linux.tar.gz $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
@@ -328,15 +320,12 @@ win32-bin-dist2: win32
 	@echo $(DOCS) >>$(DISTLIST)
 	@echo doc/README-SDL.txt >>$(DISTLIST)
 	@echo stratagus$(EXE) >>$(DISTLIST)
-	@echo tools/wartool$(EXE) >>$(DISTLIST)
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
 	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
-	@cp tools/build.bat $(distdir)
 	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/stratagus$(EXE)
-	@strip -s -R .comment $(distdir)/tools/wartool$(EXE)
 	@echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
 	zip -zq9r stratagus-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
@@ -359,15 +348,6 @@ diff:
 	echo $(CCLS) >>$(DISTLIST)
 	echo $(DOCS) >>$(DISTLIST)
 	rcsdiff -u `cat $(DISTLIST)` > $(difffile)
-
-buildit:	tools
-	. tools/build.sh
-
-buildclean:
-	rm -rf data/*.rgb data/*.gimp data/puds data/sound data/graphic \
-	data/interface data/campaigns data/text data/health.png data/mana.png \
-	data/default.pud.gz data/stratagus.png
-	rm -rf data/graphics data/sounds data/texts data/music data/videos
 
 release:
 	$(MAKE) distclean
@@ -423,8 +403,6 @@ install-stratagus:
 install-tools:	all
 	@echo installing stratagus tools
 	mkdir -p $(PREFIX)/lib/games/stratagus/tools
-	install -m 755 tools/wartool  $(PREFIX)/lib/games/stratagus/tools
-	install -m 755 tools/build.sh $(PREFIX)/lib/games/stratagus/tools
 	@echo installation of stratagus tools complete
 
 uninstall:
