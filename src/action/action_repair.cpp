@@ -67,7 +67,7 @@ local void RepairUnit(Unit* unit,Unit* goal)
     int costs[MaxCosts];
     int i;
     int hp;
-#define GIVES_HP	16
+#define GIVES_HP	8
 #define MUL		2
 #define DIVISOR		2
 
@@ -118,8 +118,9 @@ local void RepairUnit(Unit* unit,Unit* goal)
     //
     PlayerSubCosts(player,costs);
 
-    // FIXME: if visibile on map must redraw map area.
-
+    if( UnitVisible(goal) ) {
+        MustRedraw|=RedrawMaps;
+    }
     if( IsSelected(goal) ) {		// Update panel if unit is selected
 	MustRedraw|=RedrawInfoPanel;
     }
@@ -182,7 +183,8 @@ global int HandleActionRepair(Unit* unit)
 			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
-		    } else if( goal->Command.Action==UnitActionDie ) {
+		    } else if( !goal->HP ||
+				goal->Command.Action==UnitActionDie ) {
 			// FIXME: should I clear this here?
 			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
@@ -196,10 +198,6 @@ global int HandleActionRepair(Unit* unit)
 		if( goal && MapDistanceToUnit(unit->X,unit->Y,goal)
 			<=REPAIR_RANGE ) {
 		    unit->State=0;
-		    if( !unit->Type->Tower ) {
-			UnitHeadingFromDeltaXY(unit
-			    ,goal->X-unit->X,goal->Y-unit->Y);
-		    }
 		    unit->SubAction=1;
 		} else if( err ) {
 		    DebugCheck( unit->Command.Action!=UnitActionStill );
@@ -238,7 +236,8 @@ global int HandleActionRepair(Unit* unit)
 			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
 			unit->Command.Data.Move.DY=goal->Y;
-		    } else if( goal->Command.Action==UnitActionDie ) {
+		    } else if( !goal->HP
+				|| goal->Command.Action==UnitActionDie ) {
 			// FIXME: should I clear this here?
 			unit->Command.Data.Move.Goal=goal=NULL;
 			unit->Command.Data.Move.DX=goal->X;
