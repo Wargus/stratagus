@@ -2892,6 +2892,7 @@ global void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
+	DebugLevel0Fn("%s\n" _C_ unit->Type->Name);
 	MapMarkUnitSight(unit);
 }
 
