@@ -41,9 +41,6 @@
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int WoodTable[16];		/// Table for wood removable.
-extern int RockTable[20];		/// Table for rock removable.
-
 /**
 **	Mapping of wc numbers to our internal tileset symbols.
 **	The numbers are used in puds.
@@ -254,22 +251,22 @@ global void LoadTileset(void)
 	    i += 16;
 	}
     }
-    WoodTable[ 0] = -1;
-    WoodTable[ 1] = TheMap.Tileset->BotOneTree;
-    WoodTable[ 2] = -1;
-    WoodTable[ 3] = table[mixed + 0x10];
-    WoodTable[ 4] = TheMap.Tileset->TopOneTree;
-    WoodTable[ 5] = TheMap.Tileset->MidOneTree;
-    WoodTable[ 6] = table[mixed + 0x70];
-    WoodTable[ 7] = table[mixed + 0x90];
-    WoodTable[ 8] = -1;
-    WoodTable[ 9] = table[mixed + 0x00];
-    WoodTable[10] = -1;
-    WoodTable[11] = table[mixed + 0x20];
-    WoodTable[12] = table[mixed + 0x30];
-    WoodTable[13] = table[mixed + 0x40];
-    WoodTable[14] = table[mixed + 0xB0];
-    WoodTable[15] = table[mixed + 0xD0];
+    TheMap.Tileset->WoodTable[ 0] = -1;
+    TheMap.Tileset->WoodTable[ 1] = TheMap.Tileset->BotOneTree;
+    TheMap.Tileset->WoodTable[ 2] = -1;
+    TheMap.Tileset->WoodTable[ 3] = table[mixed + 0x10];
+    TheMap.Tileset->WoodTable[ 4] = TheMap.Tileset->TopOneTree;
+    TheMap.Tileset->WoodTable[ 5] = TheMap.Tileset->MidOneTree;
+    TheMap.Tileset->WoodTable[ 6] = table[mixed + 0x70];
+    TheMap.Tileset->WoodTable[ 7] = table[mixed + 0x90];
+    TheMap.Tileset->WoodTable[ 8] = -1;
+    TheMap.Tileset->WoodTable[ 9] = table[mixed + 0x00];
+    TheMap.Tileset->WoodTable[10] = -1;
+    TheMap.Tileset->WoodTable[11] = table[mixed + 0x20];
+    TheMap.Tileset->WoodTable[12] = table[mixed + 0x30];
+    TheMap.Tileset->WoodTable[13] = table[mixed + 0x40];
+    TheMap.Tileset->WoodTable[14] = table[mixed + 0xB0];
+    TheMap.Tileset->WoodTable[15] = table[mixed + 0xD0];
 
     //
     //  Build rock removement table.
@@ -288,27 +285,27 @@ global void LoadTileset(void)
 	    i += 16;
 	}
     }
-    RockTable[ 0] = -1;
-    RockTable[ 1] = TheMap.Tileset->BotOneRock;
-    RockTable[ 2] = -1;
-    RockTable[ 3] = table[mixed + 0x10];
-    RockTable[ 4] = TheMap.Tileset->TopOneRock;
-    RockTable[ 5] = TheMap.Tileset->MidOneRock;
-    RockTable[ 6] = table[mixed + 0x70];
-    RockTable[ 7] = table[mixed + 0x90];
-    RockTable[ 8] = -1;
-    RockTable[ 9] = table[mixed + 0x00];
-    RockTable[10] = -1;
-    RockTable[11] = table[mixed + 0x20];
-    RockTable[12] = table[mixed + 0x30];
-    RockTable[13] = table[mixed + 0x40];
-    RockTable[14] = table[mixed + 0xB0];
-    RockTable[15] = table[mixed + 0x80];
+    TheMap.Tileset->RockTable[ 0] = -1;
+    TheMap.Tileset->RockTable[ 1] = TheMap.Tileset->BotOneRock;
+    TheMap.Tileset->RockTable[ 2] = -1;
+    TheMap.Tileset->RockTable[ 3] = table[mixed + 0x10];
+    TheMap.Tileset->RockTable[ 4] = TheMap.Tileset->TopOneRock;
+    TheMap.Tileset->RockTable[ 5] = TheMap.Tileset->MidOneRock;
+    TheMap.Tileset->RockTable[ 6] = table[mixed + 0x70];
+    TheMap.Tileset->RockTable[ 7] = table[mixed + 0x90];
+    TheMap.Tileset->RockTable[ 8] = -1;
+    TheMap.Tileset->RockTable[ 9] = table[mixed + 0x00];
+    TheMap.Tileset->RockTable[10] = -1;
+    TheMap.Tileset->RockTable[11] = table[mixed + 0x20];
+    TheMap.Tileset->RockTable[12] = table[mixed + 0x30];
+    TheMap.Tileset->RockTable[13] = table[mixed + 0x40];
+    TheMap.Tileset->RockTable[14] = table[mixed + 0xB0];
+    TheMap.Tileset->RockTable[15] = table[mixed + 0x80];
 
-    RockTable[16] = table[mixed + 0xC0];
-    RockTable[17] = table[mixed + 0x60];
-    RockTable[18] = table[mixed + 0xA0];
-    RockTable[19] = table[mixed + 0xD0];
+    TheMap.Tileset->RockTable[16] = table[mixed + 0xC0];
+    TheMap.Tileset->RockTable[17] = table[mixed + 0x60];
+    TheMap.Tileset->RockTable[18] = table[mixed + 0xA0];
+    TheMap.Tileset->RockTable[19] = table[mixed + 0xD0];
 
     //
     //	FIXME: Build wall replacement tables
