@@ -114,10 +114,11 @@ local SCM CclDefineUnitType(SCM list)
 
 		// FIXME: use a general get tileset function here!
 		i=0;
-		if( gh_eq_p(value,gh_symbol2scm("default")) ) {
+		if( !gh_eq_p(value,gh_symbol2scm("default")) ) {
 		    for( ; i<TilesetMax; ++i ) {
 			if( gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Ident)) ||
-				gh_eq_p(value,gh_symbol2scm(Tilesets[i]->Class)) ) {
+				gh_eq_p(value,
+				    gh_symbol2scm(Tilesets[i]->Class)) ) {
 			    break;
 			}
 		    }
