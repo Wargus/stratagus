@@ -118,7 +118,9 @@ global void CommandFollow(Unit* unit,Unit* dest,int flush)
     command->Action=UnitActionFollow;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=dest;
+#ifdef NEW_UNIT
     dest->Refs++;
+#endif
     command->Data.Move.Range=1;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
@@ -195,7 +197,9 @@ global void CommandRepair(Unit* unit,int x,int y,Unit* dest,int flush)
     command->Action=UnitActionRepair;
     command->Data.Move.Fast=1;
     command->Data.Move.Goal=RepairableOnMapTile(x,y);
+#ifdef NEW_UNIT
     command->Data.Move.Goal->Refs++;
+#endif
     command->Data.Move.Range=REPAIR_RANGE;
     command->Data.Move.SX=unit->X;
     command->Data.Move.SY=unit->Y;
