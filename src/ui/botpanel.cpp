@@ -635,9 +635,11 @@ global void DoButtonButtonClicked(int button)
 		if( Selected[0]->Command.Action == UnitActionUpgradeTo ) {
 		    type=Selected[0]->Command.Data.UpgradeTo.What;
 		    stats=&type->Stats[ThisPlayer->Player];
+		    // FIXME: should this be added on command execution?
 		    PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
 		    SendCommandCancelUpgradeTo(Selected[0]);
 		} else if( Selected[0]->Command.Action == UnitActionResearch ) {
+		    // FIXME: should this be added on command execution?
 		    PlayerAddCostsFactor(ThisPlayer
 			    ,Selected[0]->Command.Data.Research.What->Costs
 			    ,75);
@@ -679,6 +681,7 @@ global void DoButtonButtonClicked(int button)
 	    if( NumSelected==1 && Selected[0]->Type->Building) {
 	        stats=Selected[0]->Stats;
 		// Player gets back 75% of the original cost for a building.
+		// FIXME: should this be added on command execution?
 		PlayerAddCostsFactor(ThisPlayer,stats->Costs,75);
 		SendCommandCancelBuilding(Selected[0],
 		        Selected[0]->Command.Data.Builded.Worker);
