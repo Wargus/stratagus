@@ -6418,8 +6418,11 @@ local void EditorMapPropertiesCancel(void)
 
 local void EditorPlayerProperties(void)
 {
+    VideoLockScreen();
     StartMenusSetBackground(NULL);
+    VideoUnlockScreen();
     ProcessMenu("menu-editor-player-properties", 1);
+    VideoCreatePalette(GlobalPalette);
 }
 
 local void EditorQuitMenu(void)
