@@ -138,8 +138,10 @@ global void CreateMinimap(void)
 	srect.y = TheUI.MinimapPosY - TheUI.MinimapPanelY;
 	srect.w = TheUI.MinimapW;
 	srect.h = TheUI.MinimapH;
-	SDL_BlitSurface(TheUI.MinimapPanel.Graphic->Surface, &srect,
-		MinimapSurface, NULL);
+	if (TheUI.MinimapPanel.Graphic) {
+		SDL_BlitSurface(TheUI.MinimapPanel.Graphic->Surface, &srect,
+			MinimapSurface, NULL);
+	}
 
 	if (!TheUI.MinimapTransparent) {
 		VideoFillRectangle(ColorBlack, MinimapX, MinimapY,

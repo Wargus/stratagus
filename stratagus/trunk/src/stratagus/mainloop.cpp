@@ -535,6 +535,27 @@ global void UpdateDisplay(void)
 
 	if (MustRedraw & RedrawMap) {
 		DrawMapArea();
+
+		//
+		// Force Redraw Items that are ontop of map, they don't have a panel
+		//
+		if (!TheUI.MinimapPanel.Graphic) {
+			MustRedraw |= RedrawMinimapBorder;
+			MustRedraw |= RedrawMinimap;
+		}
+		if (!TheUI.InfoPanel.Graphic) {
+			MustRedraw |= RedrawInfoPanel;
+		}
+		if (!TheUI.ButtonPanel.Graphic) {
+			MustRedraw |= RedrawButtonPanel;
+		}
+		if (!TheUI.Resource.Graphic) {
+			MustRedraw |= RedrawResources;
+		}
+		if (!TheUI.StatusLine.Graphic) {
+			MustRedraw |= RedrawStatusLine;
+		}
+		
 	}
 
 	if (MustRedraw & (RedrawMessage | RedrawMap)) {
@@ -556,10 +577,16 @@ global void UpdateDisplay(void)
 		DrawMenuButtonArea();
 	}
 	if (MustRedraw & RedrawMinimapBorder) {
-		VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
-			TheUI.MinimapPanel.Graphic->Width,
-			TheUI.MinimapPanel.Graphic->Height,
-			TheUI.MinimapPanelX, TheUI.MinimapPanelY);
+		if (TheUI.MinimapPanel.Graphic) {
+			VideoDrawSubClip(TheUI.MinimapPanel.Graphic, 0, 0,
+				TheUI.MinimapPanel.Graphic->Width,
+				TheUI.MinimapPanel.Graphic->Height,
+				TheUI.MinimapPanelX, TheUI.MinimapPanelY);
+		} else {
+			VideoDrawRectangle(TheUI.CompletedBarColor,
+				TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
+				TheUI.MinimapW + 2, TheUI.MinimapH + 2);
+		}
 	}
 
 	if (MustRedraw & RedrawMinimap) {
@@ -654,10 +681,12 @@ global void UpdateDisplay(void)
 			}
 		}
 		if (MustRedraw & RedrawMinimapBorder) {
-			InvalidateAreaAndCheckCursor(
-				TheUI.MinimapPanelX, TheUI.MinimapPanelY,
-				TheUI.MinimapPanel.Graphic->Width,
-				TheUI.MinimapPanel.Graphic->Height);
+			if (TheUI.MinimapPanel.Graphic) {
+				InvalidateAreaAndCheckCursor(
+					TheUI.MinimapPanelX, TheUI.MinimapPanelY,
+					TheUI.MinimapPanel.Graphic->Width,
+					TheUI.MinimapPanel.Graphic->Height);
+			}
 		} else if ((MustRedraw & RedrawMinimap) ||
 				(MustRedraw & RedrawMinimapCursor)) {
 			// FIXME: Redraws too much of the minimap
