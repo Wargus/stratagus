@@ -353,12 +353,11 @@ void UpdateDisplay(void)
 			}
 			DrawMenuButtonArea();
 
-			// FIXME: make a border configurable
-			if (0) {
-				VideoDrawRectangle(TheUI.CompletedBarColor,
-					TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
-					TheUI.MinimapW + 2, TheUI.MinimapH + 2);
-			}
+#if 0  // FIXME: make a border configurable
+			VideoDrawRectangle(TheUI.CompletedBarColor,
+				TheUI.MinimapPosX - 1, TheUI.MinimapPosY - 1,
+				TheUI.MinimapW + 2, TheUI.MinimapH + 2);
+#endif
 
 			DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
 			DrawMinimapCursor(TheUI.SelectedViewport->MapX,

@@ -142,17 +142,16 @@ void RevealMap(void)
 {
 	int x;
 	int y;
-	int p;
+	int p;  // iterator on player.
 
 	//
 	//  Mark every explored tile as visible. 1 turns into 2.
 	//
 	for (x = 0; x < TheMap.Info.MapWidth; ++x) {
 		for (y = 0; y < TheMap.Info.MapHeight; ++y) {
-			int i;
-			for (i = 0; i < PlayerMax; ++i) {
-				if (!TheMap.Fields[x+y*TheMap.Info.MapWidth].Visible[i]) {
-					TheMap.Fields[x+y*TheMap.Info.MapWidth].Visible[i] = 1;
+			for (p = 0; p < PlayerMax; ++p) {
+				if (!TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[p]) {
+					TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[p] = 1;
 				}
 			}
 			MapMarkSeenTile(x, y);
@@ -169,10 +168,8 @@ void RevealMap(void)
 			for (p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Type != PlayerNobody &&
 						(!(Units[x]->Seen.ByPlayer & (1 << p)))) {
-					if (1) {
-						UnitGoesOutOfFog(Units[x], Players + p);
-						UnitGoesUnderFog(Units[x], Players + p);
-					}
+					UnitGoesOutOfFog(Units[x], Players + p);
+					UnitGoesUnderFog(Units[x], Players + p);
 				}
 			}
 		}
