@@ -4306,13 +4306,19 @@ local void EditorNewDrawFunc(Menuitem *mi __attribute__((unused)))
     MenusSetBackground();
 }
 
-local void EditorNewMapDescriptionEnterAction(Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
+local void EditorNewMapDescriptionEnterAction(
+	Menuitem *mi __attribute__((unused)), int key __attribute__((unused)))
 {
 }
 
-local void EditorNewMapSizeEnterAction(Menuitem *mi, int key)
+/**
+**	FIXME: docu
+*/
+local void EditorNewMapSizeEnterAction(Menuitem * mi,
+	int key __attribute__((unused)))
 {
-    if (mi->d.input.nch > 0 && !isdigit(mi->d.input.buffer[mi->d.input.nch-1])) {
+    if (mi->d.input.nch > 0
+	    && !isdigit(mi->d.input.buffer[mi->d.input.nch - 1])) {
 	strcpy(mi->d.input.buffer + (--mi->d.input.nch), "~!_");
     }
 }
