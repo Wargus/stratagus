@@ -82,6 +82,8 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
 	return;
     }
 
+    abort();
+
     //
     //	Create and write header of log file.
     //
