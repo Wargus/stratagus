@@ -85,6 +85,7 @@ local void GameMenuObjectives(void);
 local void GameMenuEndScenario(void);
 local void GameOptions(void);
 
+local void HelpMenu(void);
 local void InitTips(Menuitem *mi);
 local void TipsMenuEnd(void);
 local void SetTips(Menuitem *mi);
@@ -247,8 +248,8 @@ local Menuitem GameMenuItems[] = {
 	{ button:{ "Load (~<F12~>)", 106, 27, MBUTTON_GM_HALF, GameMenuLoad, KeyCodeF12} } },
     { MI_TYPE_BUTTON, 16, 40 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Options (~<F5~>)", 224, 27, MBUTTON_GM_FULL, GameOptions, KeyCodeF5} } },
-    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonDisabled, LargeFont, NULL, NULL,
-	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, NULL, KeyCodeF1} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36 + 36, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Help (~<F1~>)", 224, 27, MBUTTON_GM_FULL, HelpMenu, KeyCodeF1} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
 	{ button:{ "Scenario ~!Objectives", 224, 27, MBUTTON_GM_FULL, GameMenuObjectives, 'o'} } },
     { MI_TYPE_BUTTON, 16, 40 + 36 + 36 + 36 + 36, 0, LargeFont, NULL, NULL,
@@ -990,6 +991,22 @@ local Menuitem GameOptionsMenuItems[] = {
 #endif
 };
 
+local Menuitem HelpMenuItems[] = {
+#ifdef __GNUC__
+    { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
+	{ text:{ "Help Menu", MI_TFLAGS_CENTERED} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Keystroke ~!Help", 224, 27, MBUTTON_GM_FULL, NULL, 'h'} } },
+    { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
+	{ button:{ "Warcraft ~!Tips", 224, 27, MBUTTON_GM_FULL, ShowNextTip, 't'} } },
+    { MI_TYPE_BUTTON, 128 - (224 / 2), 288-40, MenuButtonSelected, LargeFont, ShowNextTip, NULL,
+	{ button:{ "Previous (~!E~!s~!c)", 224, 27, MBUTTON_GM_FULL, EndMenu, '\033'} } },
+#else
+    { 0 }
+#endif
+};
+
+
 /**
 **	FIXME: Ari please look, this is now in TheUI.
 */
@@ -1224,6 +1241,16 @@ global Menu Menus[] = {
 	ImagePanel2,
 	4, 13,
 	TipsMenuItems,
+	NULL,
+    },
+    {
+	// Help Menu
+	176+(14*TileSizeX-256)/2,
+	16+(14*TileSizeY-288)/2,
+	256, 288,
+	ImagePanel1,
+	4, 4,
+	HelpMenuItems,
 	NULL,
     },
     
@@ -2091,6 +2118,10 @@ local void GameMenuEnd(void)
     EndMenu();
 }
 
+local void HelpMenu(void)
+{
+    ProcessMenu(MENU_HELP, 1);
+}
 
 /**
 **	Free the tips from the menu
