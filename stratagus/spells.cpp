@@ -451,10 +451,10 @@ global int CastSpawnPortal(Unit *caster, const SpellType *spell __attribute__((u
     
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
-    DebugCheck(!spell->SpellAction->SpawnPortal.PortalType);
+    DebugCheck(!spell->Action);
+    DebugCheck(!spell->Action->Data.SpawnPortal.PortalType);
 
-    ptype = spell->SpellAction->SpawnPortal.PortalType;
+    ptype = spell->Action->Data.SpawnPortal.PortalType;
 
     portal = caster->Goal;
     if (portal) {
@@ -505,16 +505,16 @@ global int CastAreaBombardment(Unit *caster, const SpellType *spell,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     //assert(x in range, y in range);
 
     mis = NULL;
 
-    fields = spell->SpellAction->AreaBombardment.Fields;
-    shards = spell->SpellAction->AreaBombardment.Shards;
-    damage = spell->SpellAction->AreaBombardment.Damage;
-    offsetx = spell->SpellAction->AreaBombardment.StartOffsetX;
-    offsety = spell->SpellAction->AreaBombardment.StartOffsetY;
+    fields = spell->Action->Data.AreaBombardment.Fields;
+    shards = spell->Action->Data.AreaBombardment.Shards;
+    damage = spell->Action->Data.AreaBombardment.Damage;
+    offsetx = spell->Action->Data.AreaBombardment.StartOffsetX;
+    offsety = spell->Action->Data.AreaBombardment.StartOffsetY;
     while (fields--) {
     	// FIXME : radius configurable...
 	do {
@@ -568,7 +568,7 @@ global int CastDeathCoil(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
 // assert(target);
 // assert(x in range, y in range);
 
@@ -615,7 +615,7 @@ global int CastFireball(Unit *caster, const SpellType *spell,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     DebugCheck(!spell->Missile);
 
     missile = NULL;
@@ -634,8 +634,8 @@ global int CastFireball(Unit *caster, const SpellType *spell,
     caster->Mana -= spell->ManaCost;
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     missile = MakeMissile(spell->Missile, sx, sy, x, y);
-    missile->State = spell->SpellAction->Fireball.TTL - (dist - 1) * 2;
-    missile->TTL = spell->SpellAction->Fireball.TTL;
+    missile->State = spell->Action->Data.Fireball.TTL - (dist - 1) * 2;
+    missile->TTL = spell->Action->Data.Fireball.TTL;
     missile->Controller = SpellFireballController;
     missile->SourceUnit = caster;
     RefsDebugCheck(!caster->Refs || caster->Destroyed);
@@ -662,7 +662,7 @@ global int CastFlameShield(Unit* caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     DebugCheck(!target);
 //  assert(x in range, y in range);
     DebugCheck(!spell->Missile);
@@ -671,11 +671,11 @@ global int CastFlameShield(Unit* caster, const SpellType *spell, Unit *target,
 
     // get mana cost
     caster->Mana -= spell->ManaCost;
-    target->FlameShield = spell->SpellAction->FlameShield.TTL;
+    target->FlameShield = spell->Action->Data.FlameShield.TTL;
     PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
     for (i = 0; i < 5; i++) {
 	mis = MakeMissile(spell->Missile, 0, 0, 0, 0);
-	mis->TTL = spell->SpellAction->FlameShield.TTL + i * 7;
+	mis->TTL = spell->Action->Data.FlameShield.TTL + i * 7;
 	mis->TargetUnit = target;
 	mis->Controller = SpellFlameShieldController;
 	RefsDebugCheck(!target->Refs || target->Destroyed);
@@ -700,26 +700,26 @@ global int CastAdjustBuffs(Unit *caster, const SpellType *spell, Unit *target,
 {
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     DebugCheck(!target);
 
     // get mana cost
     caster->Mana -= spell->ManaCost;
 
-    if (spell->SpellAction->AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
-	target->Haste=spell->SpellAction->AdjustBuffs.HasteTicks;
+    if (spell->Action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+	target->Haste=spell->Action->Data.AdjustBuffs.HasteTicks;
     }
-    if (spell->SpellAction->AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
-	target->Slow=spell->SpellAction->AdjustBuffs.SlowTicks;
+    if (spell->Action->Data.AdjustBuffs.SlowTicks!=BUFF_NOT_AFFECTED) {
+	target->Slow=spell->Action->Data.AdjustBuffs.SlowTicks;
     }
-    if (spell->SpellAction->AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
-	target->Bloodlust=spell->SpellAction->AdjustBuffs.BloodlustTicks;
+    if (spell->Action->Data.AdjustBuffs.BloodlustTicks!=BUFF_NOT_AFFECTED) {
+	target->Bloodlust=spell->Action->Data.AdjustBuffs.BloodlustTicks;
     }
-    if (spell->SpellAction->AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
-	target->Invisible=spell->SpellAction->AdjustBuffs.InvisibilityTicks;
+    if (spell->Action->Data.AdjustBuffs.InvisibilityTicks!=BUFF_NOT_AFFECTED) {
+	target->Invisible=spell->Action->Data.AdjustBuffs.InvisibilityTicks;
     }
-    if (spell->SpellAction->AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
-	target->UnholyArmor=spell->SpellAction->AdjustBuffs.InvincibilityTicks;
+    if (spell->Action->Data.AdjustBuffs.InvincibilityTicks!=BUFF_NOT_AFFECTED) {
+	target->UnholyArmor=spell->Action->Data.AdjustBuffs.InvincibilityTicks;
     }
     CheckUnitToBeDrawn(target);
     PlayGameSound(spell->SoundWhenCast.Sound,MaxSampleVolume);
@@ -752,11 +752,11 @@ global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     DebugCheck(!target);
 
-    hp = spell->SpellAction->AdjustVitals.HP;
-    mana = spell->SpellAction->AdjustVitals.Mana;
+    hp = spell->Action->Data.AdjustVitals.HP;
+    mana = spell->Action->Data.AdjustVitals.Mana;
     manacost = spell->ManaCost;
 
     //  Healing and harming
@@ -784,8 +784,8 @@ global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
     if (manacost) {
 	castcount=min(castcount,caster->Mana/manacost);
     }
-    if (spell->SpellAction->AdjustVitals.MaxMultiCast) {
-	castcount=min(castcount,spell->SpellAction->AdjustVitals.MaxMultiCast);
+    if (spell->Action->Data.AdjustVitals.MaxMultiCast) {
+	castcount=min(castcount,spell->Action->Data.AdjustVitals.MaxMultiCast);
     }
 
     DebugCheck(castcount<0);
@@ -818,43 +818,6 @@ global int CastAdjustVitals(Unit *caster, const SpellType *spell, Unit *target,
 }
 
 /**
-**	Cast holy vision.
-**
-**	@param caster	Unit that casts the spell
-**	@param spell	Spell-type pointer
-**	@param target	Target unit that spell is addressed to
-**	@param x	X coord of target spot when/if target does not exist
-**	@param y	Y coord of target spot when/if target does not exist
-**
-**	@return		=!0 if spell should be repeated, 0 if not
-*/
-global int CastHolyVision(Unit *caster, const SpellType *spell, Unit *target,
-    int x, int y)
-{
-    DebugCheck(!caster);
-    DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
-//  assert(x in range, y in range);
-
-    caster->Mana -= spell->ManaCost;	// get mana cost
-    // FIXME: compact with summon.
-    target = MakeUnit(spell->SpellAction->HolyVision.revealer, caster->Player);
-    target->Orders[0].Action = UnitActionStill;
-    target->HP = 0;
-    target->X = x;
-    target->Y = y;
-//    target->TTL = GameCycle + CYCLES_PER_SECOND + CYCLES_PER_SECOND / 2;
-    target->CurrentSightRange = target->Stats->SightRange;
-    target->Removed = 1;
-    target->CurrentSightRange = target->Stats->SightRange;
-    MapMarkUnitSight(target);
-    target->TTL = GameCycle + target->Type->DecayRate * 6 * CYCLES_PER_SECOND;
-    CheckUnitToBeDrawn(target);
-    PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-    return 0;
-}
-
-/**
 **	Cast polymorph.
 **
 **	@param caster	Unit that casts the spell
@@ -872,10 +835,10 @@ global int CastPolymorph(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
     DebugCheck(!target);
 
-    type = spell->SpellAction->Polymorph.NewForm;
+    type = spell->Action->Data.Polymorph.NewForm;
     DebugCheck(!type);
 
     caster->Player->Score += target->Type->Points;
@@ -926,10 +889,10 @@ global int CastRaiseDead(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
 //  assert(x in range, y in range);
 
-    skeleton = spell->SpellAction->RaiseDead.UnitRaised;
+    skeleton = spell->Action->Data.RaiseDead.UnitRaised;
     DebugCheck(!skeleton);
 
     corpses = &CorpseList;
@@ -992,7 +955,7 @@ global int CastRunes(Unit *caster, const SpellType *spell,
 
     DebugCheck(!caster);
     DebugCheck(spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
 //  assert(x in range, y in range);
 
     mis = NULL;
@@ -1010,7 +973,7 @@ global int CastRunes(Unit *caster, const SpellType *spell,
 		    y * TileSizeY + TileSizeY / 2,
 		    x * TileSizeX + TileSizeX / 2,
 		    y * TileSizeY + TileSizeY / 2);
-	    mis->TTL = spell->SpellAction->Runes.TTL;
+	    mis->TTL = spell->Action->Data.Runes.TTL;
 	    mis->Controller = SpellRunesController;
 	    caster->Mana -= spell->ManaCost / 5;
 	}
@@ -1036,14 +999,14 @@ global int CastSummon(Unit *caster, const SpellType *spell, Unit *target,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
-    DebugCheck(!spell->SpellAction->Summon.UnitType);
+    DebugCheck(!spell->Action);
+    DebugCheck(!spell->Action->Data.Summon.UnitType);
 
     DebugLevel0("Summoning\n");
-    ttl=spell->SpellAction->Summon.TTL;
+    ttl=spell->Action->Data.Summon.TTL;
     caster->Mana -= spell->ManaCost;
     // FIXME: johns: the unit is placed on the wrong position
-    target = MakeUnit(spell->SpellAction->Summon.UnitType, caster->Player);
+    target = MakeUnit(spell->Action->Data.Summon.UnitType, caster->Player);
     target->X = x;
     target->Y = y;
     // set life span
@@ -1090,7 +1053,7 @@ global int CastWhirlwind(Unit *caster, const SpellType *spell,
 
     DebugCheck(!caster);
     DebugCheck(!spell);
-    DebugCheck(!spell->SpellAction);
+    DebugCheck(!spell->Action);
 //  assert(x in range, y in range);
 
     mis = NULL;
@@ -1100,7 +1063,7 @@ global int CastWhirlwind(Unit *caster, const SpellType *spell,
     mis = MakeMissile(spell->Missile,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2,
 	    x * TileSizeX + TileSizeX / 2, y * TileSizeY + TileSizeY / 2);
-    mis->TTL = spell->SpellAction->Whirlwind.TTL;
+    mis->TTL = spell->Action->Data.Whirlwind.TTL;
     mis->Controller = SpellWhirlwindController;
     return 0;
 }
@@ -1208,7 +1171,6 @@ local int PassCondition(const Unit* caster,const SpellType* spell,const Unit* ta
 	}
 	if (condition->Building!=CONDITION_TRUE) {
 	    if ((condition->Building==CONDITION_ONLY)^(target->Type->Building)) {
-		DebugLevel0("QQQ\n");
 		return 0;
 	    }
 	}
@@ -1541,7 +1503,7 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
     int x, int y)
 {
     DebugCheck(!spell);
-    DebugCheck(!spell->CastFunction);
+    DebugCheck(!spell->Action->CastFunction);
     DebugCheck(!caster);
     DebugCheck(!SpellIsAvailable(caster->Player, spell->Ident));
 
@@ -1555,7 +1517,7 @@ global int SpellCast(Unit *caster, const SpellType *spell, Unit *target,
     }
     DebugLevel3Fn("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->IdentName _C_
 	    unit->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
-    return CanCastSpell(caster, spell, target, x, y) && spell->CastFunction(caster, spell, target, x, y);
+    return CanCastSpell(caster, spell, target, x, y) && spell->Action->CastFunction(caster, spell, target, x, y);
 }
 
 
