@@ -111,7 +111,7 @@ global void ResumeCD(void)
 #ifdef USE_WIN32
     SDL_CDResume(CDRom);
 #endif
-    PlayCDRom(CDModeRandom);
+    PlayCDRom(CDModeDefined);
 }
 
 /**
@@ -120,6 +120,7 @@ global void ResumeCD(void)
 global void PauseCD(void)
 {
     SDL_CDPause(CDRom);
+    CDTrack = 0;
     CDMode = CDModeStopped;
 }
 
@@ -204,7 +205,7 @@ global int PlayCDTrack(int track)
 */
 global void ResumeCD(void)
 {
-    PlayCDRom(CDModeRandom);
+    PlayCDRom(CDModeDefined);
 }
 
 /**
@@ -213,6 +214,7 @@ global void ResumeCD(void)
 global void PauseCD(void)
 {
     cd_pause();
+    CDTrack = 0;
     CDMode = CDModeStopped;
 }
 
@@ -314,7 +316,7 @@ global int PlayCDTrack(int track)
 */
 global void ResumeCD(void)
 {
-    PlayCDRom(CDModeRandom);
+    PlayCDRom(CDModeDefined);
 }
 
 /**
@@ -323,6 +325,7 @@ global void ResumeCD(void)
 global void PauseCD(void)
 {
     StopMusic();
+    CDTrack = 0;
     CDMode = CDModeStopped;
 }
 
