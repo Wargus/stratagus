@@ -63,7 +63,7 @@ extern void MapSound(const char* sound_name,const SoundId id);
 
 /** Register two sound groups together to make a special sound (for
     selection). Return the corresponding id after registering it under a given
-    name. 
+    name.
     @param group_name the name of the group. MUST BE A PERMANENT STRING.
     @param first id of the first group.
     @param second id of the second group.

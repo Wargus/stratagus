@@ -132,6 +132,7 @@ struct _unit_type_ {
 #define UnitTypeFly	1			/// Unit lives in air
 #define UnitTypeNaval	2			/// Unit lives on water
     int		DecayRate;		/// Decay rate in 1/6 seconds
+    // FIXME: not used
     int		AnnoyComputerFactor;	/// How much this annoys the computer
     int		MouseAction;		/// Right click action
 #define MouseActionNone		0		/// Nothing

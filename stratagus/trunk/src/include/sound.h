@@ -75,7 +75,7 @@ extern GameSound GameSounds;		/// Game sound configuration
 
 /** Ask to the sound server to play a sound attached to an unit. The
     sound server may discard the sound if needed (e.g., when the same
-    unit is already speaking). 
+    unit is already speaking).
     @param unit the unit speaking
     @param unit_voice_group the sound to play
 */
