@@ -135,10 +135,6 @@ struct lua_State;
 **    Index into corpse animation script. Used if unit-types share
 **    the same corpse but have different animations.
 **
-**  UnitType::_Speed
-**
-**    Non upgraded movement speed.
-**  @note Until now we didn't support speed upgrades.
 **
 **  @todo continue this documentation
 **
@@ -651,16 +647,15 @@ typedef struct _variable_type_ {
 #define SUPPLY_INDEX         12
 #define DEMAND_INDEX         13
 #define ARMOR_INDEX          14
-#define SPEED_INDEX          15
-#define SIGHTRANGE_INDEX     16
-#define ATTACKRANGE_INDEX    17
-#define PIERCINGDAMAGE_INDEX 18
-#define BASICDAMAGE_INDEX    19
-#define DAMAGE_INDEX         20
-#define EXTRADAMAGE_INDEX    21
-#define POSX_INDEX           22
-#define POSY_INDEX           23
-#define SLOT_INDEX           24
+#define SIGHTRANGE_INDEX     15
+#define ATTACKRANGE_INDEX    16
+#define PIERCINGDAMAGE_INDEX 17
+#define BASICDAMAGE_INDEX    18
+#define DAMAGE_INDEX         19
+#define EXTRADAMAGE_INDEX    20
+#define POSX_INDEX           21
+#define POSY_INDEX           22
+#define SLOT_INDEX           23
 
 #define NVARALREADYDEFINED SLOT_INDEX + 1 // Hardcoded variables
 
@@ -816,8 +811,6 @@ struct _unit_type_ {
 	char* CorpseName;               ///< Corpse type name
 	UnitType* CorpseType;           ///< Corpse unit-type
 	int CorpseScript;               ///< Corpse script start
-
-	int _Speed;                     ///< Movement speed
 
 	// this is taken from the UDTA section
 	struct _construction_* Construction; ///< What is shown in construction phase
