@@ -41,6 +41,7 @@
 #include "sound_id.h"
 #include "sound.h"
 #include "sound_server.h"
+#include "cdaudio.h"
 
 /*----------------------------------------------------------------------------
 --	Variables

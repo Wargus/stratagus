@@ -52,6 +52,8 @@
 #include "interface.h"
 #include "campaign.h"
 
+#include "cdaudio.h"
+
 /*----------------------------------------------------------------------------
 --	Declaration
 ----------------------------------------------------------------------------*/
@@ -63,28 +65,14 @@
 ----------------------------------------------------------------------------*/
 
 #if defined(USE_OGG) || defined(USE_FLAC) || defined(USE_MAD) || defined(USE_LIBMODPLUG)
-global Sample* MusicSample;		/// Music samples
+global Sample* MusicSample;             /// Music samples
 #endif
 
 global char* CurrentMusicFile = NULL;
 
-#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
-global int CDTrack = 0;			/// Current cd track
-#endif
-
-#if defined(USE_SDLCD)
-global SDL_CD *CDRom;			/// SDL cdrom device
-#elif defined(USE_LIBCDA)
-global int NumCDTracks;			/// Number of tracks on the cd
-#elif defined(USE_CDDA)
-global int NumCDTracks;
-global int CDDrive;
-global struct cdrom_tochdr CDchdr;
-global struct cdrom_tocentry CDtocentry[64];
-global struct cdrom_read_audio CDdata;
-#endif
-
-global PlaySectionType CurrentPlaySection;
+global PlaySection *PlaySections;		// Play Sections
+global int NumPlaySections;			// Number of Play Sections
+global PlaySectionType CurrentPlaySection;	// Current Play Section
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -234,213 +222,12 @@ local Sample* LoadMod(const char* name,int flags __attribute__((unused)))
 }
 #endif
 
-#ifdef USE_SDLCD
-/**
-**	Play music from cdrom.
-**
-**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
-**
-**	@return		True if name is handled by the cdrom module.
-*/
-global int PlayCDRom(int name)
-{
-    if (name == CDModeOff) {
-	CDMode = CDModeOff;
-	return 1;
-    }
-
-    // Old mode off, starting cdrom play.
-    if (CDMode == CDModeOff) {
-        if (SDL_Init(SDL_INIT_CDROM) < 0) {
-    	    return 1;
-	}
-	CDRom = SDL_CDOpen(0);
-	if (!SDL_CDStatus(CDRom)) {
-	    CDMode = CDModeOff;
-	    return 1;
-	}
-    }
-
-    StopMusic();
-
-    if (!CDRom) {
-        fprintf(stderr, "Couldn't open cdrom drive: %s\n", SDL_GetError());
-        CDMode = CDModeStopped;
-        return 1;
-    }
-    // if mode is play all tracks
-    if (name == CDModeAll) {
-        CDMode = CDModeAll;
-        if (SDL_CDPlayTracks(CDRom, 0, 0, 0, 0) < 0) {
-    	    CDMode = CDModeStopped;
-	}
-	return 1;
-    }
-    // if mode is play random tracks
-    if (name == CDModeRandom) {
-        CDMode = CDModeRandom;
-        CDTrack = MyRand() % CDRom->numtracks;
-        if (SDL_CDPlayTracks(CDRom, CDTrack, 0, 0, 0) < 0) {
-	    CDMode = CDModeStopped;
-	}
-	return 1;
-    }
-    // if mode is defined (not supported with USE_SDLCD)
-    if (name == CDModeDefined) {
-	CDMode = CDModeRandom;
-	return 1;
-    }
-    return 0;
-}
-#elif defined(USE_LIBCDA)
-/**
-**	Play music from cdrom.
-**
-**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
-**
-**	@return		True if name is handled by the cdrom module.
-*/
-global int PlayCDRom(int name)
-{
-    int i;
-    int data_cd;
-
-    if (name == CDModeOff) {
-	CDMode = CDModeOff;
-	return 1;
-    }
-
-    if (CDMode == CDModeOff) {
-        if (cd_init()) {
-	    fprintf(stderr, "Error initialising libcda \n");
-	    CDMode = CDModeOff;
-	    return 1;
-	}
-	if (cd_get_tracks(&CDTrack, &NumCDTracks)) {
-	    CDMode = CDModeOff;
-	    return 1;
-	}
-	data_cd = 1;
-	for (i = 1; i <= NumCDTracks; ++i) {
-	    if (cd_is_audio(i) > 0) {
-	        data_cd = 0;
-	        break;
-	    }
-	}
-	if (data_cd || !NumCDTracks) {
-	    CDMode = CDModeOff;
-	    return 1;
-	}
-    }
-    --CDTrack;
-
-    StopMusic();
-
-    if (cd_get_tracks(NULL, NULL) == -1) {
-        return 1;
-    }
-
-    // if mode is play all tracks
-    if (name == CDModeAll) {
-        CDMode = CDModeAll;
-	do {
-	    if (CDTrack >= NumCDTracks) {
-	        CDTrack = 0;
-	    }
-	} while (cd_is_audio(++CDTrack) < 1);
-	if (cd_play(CDTrack)) {
-	    CDMode = CDModeStopped;
-	}
-	return 1;
-    }
-    // if mode is play random tracks
-    if (name == CDModeRandom) {
-        CDMode = CDModeRandom;
-        do {
-	    CDTrack = MyRand() % NumCDTracks;
-	} while (cd_is_audio(CDTrack) < 1);
-	if (cd_play(CDTrack)) {
-	    CDMode = CDModeStopped;
-	}
-	return 1;
-    }
-
-    if (name == CDModeDefined) {
-        CDMode = CDModeDefined;
-	return 1;
-    }
-
-    return 0;
-}
-#elif defined(USE_CDDA)
-/**
-**	Play music from cdrom.
-**
-**	@param name	CDModeAll CDModeRandom CDModeDefined CDModeOff.
-**
-**	@return		True if name is handled by the cdrom module.
-*/
-global int PlayCDRom(int name)
-{
-    int i;
-    Sample *sample;
-
-    if (name == CDModeOff) {
-	CDMode = CDModeOff;
-	return 1;
-    }
-
-    if (CDMode == CDModeOff) {
-	CDDrive = open("/dev/cdrom", O_RDONLY | O_NONBLOCK);
-	ioctl(CDDrive, CDROMRESET);
-
-	ioctl(CDDrive, CDROMREADTOCHDR, &CDchdr);
-
-	for (i = CDchdr.cdth_trk0; i <= CDchdr.cdth_trk1; ++i){
-	    CDtocentry[i].cdte_format = CDROM_LBA;
-	    CDtocentry[i].cdte_track = i;
-	    ioctl(CDDrive, CDROMREADTOCENTRY, &CDtocentry[i]);
-	}
-	NumCDTracks = i - 1;
-
-	if (NumCDTracks == 0) {
-	    CDMode = CDModeOff;
-	    return 1;
-	}
-    }
-
-    StopMusic();
-
-    // if mode is play all tracks
-    if (name == CDModeAll) {
-        CDMode = CDModeAll;
-        do {
-	    if (CDTrack >= NumCDTracks) {
-		CDTrack = 0;
-	    }
-	} while (CDtocentry[++CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
-    }
-    // if mode is play random tracks
-    if (name == CDModeRandom) {
-	CDMode = CDModeRandom;
-	do {
-	    CDTrack = MyRand() % NumCDTracks;
-	} while (CDtocentry[CDTrack].cdte_ctrl&CDROM_DATA_TRACK);
-    }
-
-    sample = LoadCD(NULL, CDTrack);
-    MusicSample = sample;
-    PlayingMusic = 1;
-    return 1;
-}
-#endif
-
 /**
 **	FIXME: docu
 */
 global void PlaySectionMusic(PlaySectionType section)
 {
-#ifdef USE_LIBCDA
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     int track;
     int newtrack;
 #endif
@@ -473,9 +260,9 @@ global void PlaySectionMusic(PlaySectionType section)
     }
     CurrentPlaySection = PlaySections[i].Type;
 
-#ifdef USE_LIBCDA
+#if defined(USE_SDLCD) || defined(USE_LIBCDA) || defined(USE_CDDA)
     if (CDMode == CDModeDefined) {
-	track = cd_current_track();
+	track = CDTrack;
 	newtrack = 0;
 	if ( (1 << track) & PlaySections[i].CDTracks ) {
 	    newtrack = 0;
@@ -496,11 +283,11 @@ global void PlaySectionMusic(PlaySectionType section)
     		do {
 		    newtrack = MyRand() % NumCDTracks;
 		} while ( !((1 << newtrack) & PlaySections[i].CDTracks) || 
-		    (cd_is_audio(newtrack) < 1) );
+		    (!IsAudioTrack(newtrack)) );
 	    }
 	}
 	if (newtrack) {
-	    cd_play(newtrack);
+	    PlayCDTrack(newtrack);
 	    CDTrack = newtrack;
 	}
     } else if (PlaySections[i].Files && (CDMode == CDModeOff || CDMode == CDModeStopped)) {
