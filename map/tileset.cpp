@@ -126,9 +126,6 @@ global void LoadTileset(void)
 	strcat(strcpy(buf, "graphics/"), Tilesets[i]->ImageFile);
 	ShowLoadProgress("Tileset `%s'", Tilesets[i]->ImageFile);
 	TheMap.TileGraphic = LoadGraphic(buf);
-#ifdef USE_OPENGL
-	MakeTexture(TheMap.TileGraphic, TheMap.TileGraphic->Width, TheMap.TileGraphic->Height);
-#endif
 
 	TileSizeX = Tilesets[i]->TileSizeX;
 	TileSizeY = Tilesets[i]->TileSizeY;

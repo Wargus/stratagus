@@ -69,10 +69,10 @@ extern unsigned AllocatedGraphicMemory;		/// Allocated memory for objects
 #endif
 
 /**
-**		Event call back.
+**  Event call back.
 **
-**		This is placed in the video part, because it depends on the video
-**		hardware driver.
+**  This is placed in the video part, because it depends on the video
+**  hardware driver.
 */
 typedef struct _event_callback_ {
 
@@ -99,22 +99,22 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
-	///		Graphic reference used during config/setup
+	/// Graphic reference used during config/setup
 typedef struct _graphic_config_ {
 	char*		File;						/// config graphic name or file
 	Graphic*		Graphic;				/// graphic pointer to use to run time
 } GraphicConfig;
 
-	///		Creates a shared hardware palette from an independent Palette struct.
+	/// Creates a shared hardware palette from an independent Palette struct.
 extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
 
-	///		Free a shared hardware palette.
+	/// Free a shared hardware palette.
 extern void VideoFreeSharedPalette(SDL_Palette* palette);
 
 extern int ColorCycleAll;				/// Flag color cycle palettes
 
 /**
-**		Typedef for palette links.
+**  Typedef for palette links.
 */
 typedef struct _palette_link_ PaletteLink;
 
@@ -132,48 +132,48 @@ extern void VideoPaletteListAdd(SDL_Surface* surface);
 extern void VideoPaletteListRemove(SDL_Surface* surface);
 
 	/**
-	**		Video synchronization speed. Synchronization time in percent.
-	**		If =0, video framerate is not synchronized. 100 is exact
-	**		CYCLES_PER_SECOND (30). Game will try to redraw screen within
-	**		intervals of VideoSyncSpeed, not more, not less.
-	**		@see CYCLES_PER_SECOND @see VideoInterrupts
+	**  Video synchronization speed. Synchronization time in percent.
+	**  If =0, video framerate is not synchronized. 100 is exact
+	**  CYCLES_PER_SECOND (30). Game will try to redraw screen within
+	**  intervals of VideoSyncSpeed, not more, not less.
+	**  @see CYCLES_PER_SECOND @see VideoInterrupts
 	*/
 extern int VideoSyncSpeed;
 
 extern volatile int VideoInterrupts;
 
-	///		Wanted videomode, fullscreen or windowed.
+	/// Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
-	///		Fullscreen or windowed set from commandline.
+	/// Fullscreen or windowed set from commandline.
 extern char VideoForceFullScreen;
 
-	///		Initialize Pixels[] for all players.
-	///		(bring Players[] in sync with Pixels[])
+	/// Initialize Pixels[] for all players.
+	/// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
 
-	///		Lock the screen for display
+	/// Lock the screen for display
 extern void VideoLockScreen(void);
 
-	///		Unlock the screen for display
+	/// Unlock the screen for display
 extern void VideoUnlockScreen(void);
 
-	///		Wanted videomode, fullscreen or windowed.
+	/// Wanted videomode, fullscreen or windowed.
 extern char VideoFullScreen;
 
 	/**
-	**		Architecture-dependant video depth. Set by InitVideoXXX, if 0.
-	**		(8,15,16,24,32)
-	**		@see InitVideo @see InitVideoSdl
-	**		@see main
+	**  Architecture-dependent video depth. Set by InitVideoXXX, if 0.
+	**  (8,15,16,24,32)
+	**  @see InitVideo @see InitVideoSdl
+	**  @see main
 	*/
 extern int VideoDepth;
 
 	/**
-	**		Architecture-dependant videomemory. Set by InitVideoXXX.
-	**		FIXME: need a new function to set it, see #ifdef SDL code
-	**		@see InitVideo @see InitVideoSdl
-	**		@see VMemType
+	**  Architecture-dependant videomemory. Set by InitVideoXXX.
+	**  FIXME: need a new function to set it, see #ifdef SDL code
+	**  @see InitVideo @see InitVideoSdl
+	**  @see VMemType
 	*/
 extern SDL_Surface* TheScreen;
 
@@ -195,7 +195,7 @@ extern void InitVideo(void);
 	/// Resize a graphic
 extern void ResizeGraphic(Graphic* g, int w, int h);
 
-	///		Load graphic from PNG file
+	/// Load graphic from PNG file
 extern Graphic* LoadGraphicPNG(const char* name);
 
 #ifdef USE_OPENGL
@@ -212,20 +212,17 @@ extern Graphic* LoadGraphic(const char* file);
 	/// Flip graphic and store in graphic->SurfaceFlip
 extern void FlipGraphic(Graphic* graphic);
 
-	/// New graphic
-extern Graphic* NewGraphic(unsigned d, int w, int h);
-
-	///		Initializes video synchronization.
+	/// Initializes video synchronization.
 extern void SetVideoSync(void);
 
-	///		Clear video screen
+	/// Clear video screen
 extern void VideoClearScreen(void);
 
 	/// Make graphic
 extern Graphic* MakeGraphic(unsigned, int, int, void*, unsigned);
 
-	///		Load a picture and display it on the screen (full screen),
-	///		changing the colormap and so on..
+	/// Load a picture and display it on the screen (full screen),
+	/// changing the colormap and so on..
 extern void DisplayPicture(const char *name);
 
 	/// Init graphic
@@ -240,15 +237,15 @@ extern void InitLineDraw(void);
 	/// Simply invalidates whole window or screen.
 extern void Invalidate(void);
 
-	///		Invalidates selected area on window or screen. Use for accurate
-	///		redrawing. in so
+	/// Invalidates selected area on window or screen. Use for accurate
+	/// redrawing. in so
 extern void InvalidateArea(int x, int y, int w, int h);
 
-	///		Set clipping for nearly all vector primitives. Functions which support
-	///		clipping will be marked Clip. Set the system-wide clipping rectangle.
+	/// Set clipping for nearly all vector primitives. Functions which support
+	/// clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
 
-	///		Realize video memory.
+	/// Realize video memory.
 extern void RealizeVideoMemory(void);
 
 	/// Load sprite
@@ -257,33 +254,33 @@ extern Graphic* LoadSprite(const char* file, int w, int h);
 	/// Make shadow sprite
 extern void MakeShadowSprite(Graphic* graphic);
 
-	///		Draw a graphic clipped and with alpha.
+	/// Draw a graphic clipped and with alpha.
 extern void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha);
 
-	///		Draw part of a graphic clipped and with alpha.
+	/// Draw part of a graphic clipped and with alpha.
 extern void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	int w, int h, int x, int y, unsigned char alpha);
 
-	///		Save a screenshot to a PNG file
+	/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char* name);
 
-	///		Creates a hardware palette from an independent Palette struct.
+	/// Creates a hardware palette from an independent Palette struct.
 extern SDL_Palette* VideoCreateNewPalette(const SDL_Palette* palette);
 
 	/// Prints warning if video is too slow..
 extern void CheckVideoInterrupts(void);
 
-	///		Process all system events. Returns if the time for a frame is over
+	/// Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame(const EventCallback* callbacks);
 
 	/// Toggle full screen mode
 extern void ToggleFullScreen(void);
 
-	///		Push current clipping.
+	/// Push current clipping.
 extern void PushClipping(void);
 
-	///		Pop current clipping.
+	/// Pop current clipping.
 extern void PopClipping(void);
 
 	/// Returns the ticks in ms since start
@@ -320,191 +317,191 @@ extern int ColorBuildingCycleEnd;		/// color # end   for color cycling
 #endif
 
 #ifndef USE_OPENGL
-	///		Draw pixel unclipped.
+	/// Draw pixel unclipped.
 extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
 
-	///		Draw translucent pixel unclipped.
+	/// Draw translucent pixel unclipped.
 extern void (*VideoDrawTransPixel)(Uint32 color, int x, int y,
 	unsigned char alpha);
 #else
-	///		Draw pixel unclipped.
+	/// Draw pixel unclipped.
 extern void VideoDrawPixel(Uint32 color, int x, int y);
 
-	///		Draw translucent pixel unclipped.
+	/// Draw translucent pixel unclipped.
 extern void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha);
 #endif
 
-	///		Draw pixel clipped to current clip setting.
+	/// Draw pixel clipped to current clip setting.
 extern void VideoDrawPixelClip(Uint32 color, int x, int y);
 
-	///		Draw translucent pixel clipped to current clip setting.
+	/// Draw translucent pixel clipped to current clip setting.
 extern void VideoDrawTransPixelClip(Uint32 color, int x, int y,
 	unsigned char alpha);
 
-	///		Draw vertical line unclipped.
+	/// Draw vertical line unclipped.
 extern void VideoDrawVLine(Uint32 color, int x, int y,
 	int height);
 
-	///		Draw translucent vertical line unclipped.
+	/// Draw translucent vertical line unclipped.
 extern void VideoDrawTransVLine(Uint32 color, int x, int y,
 	int height, unsigned char alpha);
 
-	///		Draw vertical line clipped to current clip setting
+	/// Draw vertical line clipped to current clip setting
 extern void VideoDrawVLineClip(Uint32 color, int x, int y,
 	int height);
 
-	///		Draw translucent vertical line clipped to current clip setting
+	/// Draw translucent vertical line clipped to current clip setting
 extern void VideoDrawTransVLineClip(Uint32 color, int x, int y,
 	int height, unsigned char alpha);
 
-	///		Draw horizontal line unclipped.
+	/// Draw horizontal line unclipped.
 extern void VideoDrawHLine(Uint32 color, int x, int y,
 	int width);
 
-	///		Draw translucent horizontal line unclipped.
+	/// Draw translucent horizontal line unclipped.
 extern void VideoDrawTransHLine(Uint32 color, int x, int y,
 	int width, unsigned char alpha);
 
-	///		Draw horizontal line clipped to current clip setting
+	/// Draw horizontal line clipped to current clip setting
 extern void VideoDrawHLineClip(Uint32 color, int x, int y,
 	int width);
 
-	///		Draw translucent horizontal line clipped to current clip setting
+	/// Draw translucent horizontal line clipped to current clip setting
 extern void VideoDrawTransHLineClip(Uint32 color, int x, int y,
 	int width, unsigned char alpha);
 
-	///		Draw line unclipped.
+	/// Draw line unclipped.
 extern void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy);
 
-	///		Draw translucent line unclipped.
+	/// Draw translucent line unclipped.
 extern void VideoDrawTransLine(Uint32 color, int sx, int sy, int dx, int dy,
 	unsigned char alpha);
 
-	///		Draw line clipped to current clip setting
+	/// Draw line clipped to current clip setting
 extern void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy);
 
-	///		Draw translucent line clipped to current clip setting
+	/// Draw translucent line clipped to current clip setting
 extern void VideoDrawTransLineClip(Uint32 color, int sx, int sy,
 	int dx, int dy, unsigned char alpha);
 
-	///		Draw rectangle.
+	/// Draw rectangle.
 extern void VideoDrawRectangle(Uint32 color, int x, int y,
 	int w, int h);
 
-	///		Draw translucent rectangle.
+	/// Draw translucent rectangle.
 extern void VideoDrawTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha);
 
-	///		Draw rectangle clipped.
+	/// Draw rectangle clipped.
 extern void VideoDrawRectangleClip(Uint32 color, int x, int y,
 	int w, int h);
 
-	///		Draw translucent rectangle clipped.
+	/// Draw translucent rectangle clipped.
 extern void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha);
 
-	///		Draw 8bit raw graphic data clipped, using given pixel pallette
+	/// Draw 8bit raw graphic data clipped, using given pixel pallette
 extern void VideoDrawRawClip(SDL_Surface *surface, int x, int y, int w, int h);
 
 	/// Does ColorCycling..
 extern void ColorCycle(void);
 
-	///		Draw circle.
+	/// Draw circle.
 extern void VideoDrawCircle(Uint32 color, int x, int y, int r);
 
-	///		Draw translucent circle.
+	/// Draw translucent circle.
 extern void VideoDrawTransCircle(Uint32 color, int x, int y, int r,
 	unsigned char alpha);
 
-	///		Draw circle clipped.
+	/// Draw circle clipped.
 extern void VideoDrawCircleClip(Uint32 color, int x, int y, int r);
 
-	///		Draw translucent circle clipped.
+	/// Draw translucent circle clipped.
 extern void VideoDrawTransCircleClip(Uint32 color, int x, int y, int r,
 	unsigned char alpha);
 
-	///		Fill rectangle.
+	/// Fill rectangle.
 extern void VideoFillRectangle(Uint32 color, int x, int y,
 	int w, int h);
 
-	///		Fill translucent rectangle.
+	/// Fill translucent rectangle.
 extern void VideoFillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha);
 
-	///		Fill rectangle clipped.
+	/// Fill rectangle clipped.
 extern void VideoFillRectangleClip(Uint32 color, int x, int y,
 	int w, int h);
 
-	///		Fill translucent rectangle clipped.
+	/// Fill translucent rectangle clipped.
 extern void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha);
 
-	///		Fill circle.
+	/// Fill circle.
 extern void VideoFillCircle(Uint32 color, int x, int y, int r);
 
-	///		Fill translucent circle.
+	/// Fill translucent circle.
 extern void VideoFillTransCircle(Uint32 color, int x, int y, int r,
 	unsigned char alpha);
 
-	///		Fill circle clipped.
+	/// Fill circle clipped.
 extern void VideoFillCircleClip(Uint32 color, int x, int y, int r);
 
-	///		Fill translucent circle clipped.
+	/// Fill translucent circle clipped.
 extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int r,
 	unsigned char alpha);
 
-	///		Draw a graphic object unclipped.
+	/// Draw a graphic object unclipped.
 extern void VideoDraw(const Graphic*, unsigned, int, int);
 
-	///		Draw a graphic object clipped to the current clipping.
+	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawSub(const Graphic*, int, int, int, int, int, int);
 
-	///		Draw a graphic object clipped to the current clipping.
+	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawClip(const Graphic*, unsigned frame, int x, int y);
 
-	///		Draw a graphic object clipped to the current clipping.
+	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawSubClip(const Graphic*, int ix, int iy, int w,
 	int h, int x, int y);
 
-	///		Draw a graphic object unclipped and flipped in X direction.
+	/// Draw a graphic object unclipped and flipped in X direction.
 extern void VideoDrawX(const Graphic*, unsigned frame, int x, int y);
 
-	///		Draw a graphic object clipped and flipped in X direction.
+	/// Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipX(const Graphic*, unsigned frame, int x, int y);
 
 	/// Translucent Functions
-	///		Draw a graphic object unclipped.
+	/// Draw a graphic object unclipped.
 extern void VideoDrawTrans(const Graphic*, unsigned, int, int, int);
-	///		Draw a graphic object clipped to the current clipping.
+	/// Draw a graphic object clipped to the current clipping.
 extern void VideoDrawClipTrans(const Graphic*, unsigned frame, int x, int y, int);
-	///		Draw a graphic object unclipped and flipped in X direction.
+	/// Draw a graphic object unclipped and flipped in X direction.
 extern void VideoDrawTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
-	///		Draw a graphic object clipped and flipped in X direction.
+	/// Draw a graphic object clipped and flipped in X direction.
 extern void VideoDrawClipTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
 
-	///		Draw a graphic object unclipped.
-#define VideoDrawTrans50(o, f, x, y)		VideoDrawTrans((o), (f), (x), (y), 128)
-	///		Draw a graphic object unclipped and flipped in X direction.
-#define VideoDrawXTrans50(o, f, x, y)		VideoDrawTransX((o), (f), (x), (y), 128)
-	///		Draw a graphic object clipped to the current clipping.
-#define VideoDrawClipTrans50(o, f, x, y)		VideoDrawClipTrans((o), (f), (x), (y), 128)
-	///		Draw a graphic object clipped and flipped in X direction.
-#define VideoDrawClipXTrans50(o, f, x, y)		VideoDrawClipTransX((o), (f), (x), (y), 128)
+	/// Draw a graphic object unclipped.
+#define VideoDrawTrans50(o, f, x, y)      VideoDrawTrans((o), (f), (x), (y), 128)
+	/// Draw a graphic object unclipped and flipped in X direction.
+#define VideoDrawXTrans50(o, f, x, y)     VideoDrawTransX((o), (f), (x), (y), 128)
+	/// Draw a graphic object clipped to the current clipping.
+#define VideoDrawClipTrans50(o, f, x, y)  VideoDrawClipTrans((o), (f), (x), (y), 128)
+	/// Draw a graphic object clipped and flipped in X direction.
+#define VideoDrawClipXTrans50(o, f, x, y) VideoDrawClipTransX((o), (f), (x), (y), 128)
 
-	///		Free a graphic object.
+	/// Free a graphic object.
 extern void VideoFree(Graphic* o);
-	///		Safely (NULL) frees a graphic object.
+	/// Safely (NULL) frees a graphic object.
 #define VideoSafeFree(o) do { if ((o)) { VideoFree((o)); } } while (0)
 
 	/// Get the width of a single frame of a graphic object
-#define VideoGraphicWidth(o)		((o)->Width)
+#define VideoGraphicWidth(o)   ((o)->Width)
 	/// Get the height of a single frame of a graphic object
-#define VideoGraphicHeight(o)		((o)->Height)
-#define VideoGraphicFrames(o) ((o)->NumFrames)
+#define VideoGraphicHeight(o)  ((o)->Height)
+#define VideoGraphicFrames(o)  ((o)->NumFrames)
 
 	/// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED		(CYCLES_PER_SECOND/4)
+#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
 
 //@}
 

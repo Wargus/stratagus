@@ -41,6 +41,8 @@
 
 #include "stratagus.h"
 #include "video.h"
+#include "iocompat.h"
+#include "iolib.h"
 
 #include "intern_video.h"
 
@@ -408,8 +410,14 @@ local void FreeSprite(Graphic* graphic)
 global Graphic* LoadSprite(const char* name, int width, int height)
 {
 	Graphic* g;
+	char buf[PATH_MAX];
 
-	g = LoadGraphic(name);
+	// TODO: More formats?
+	if (!(g = LoadGraphicPNG(LibraryFileName(name, buf)))) {
+		fprintf(stderr, "Can't load the graphic `%s'\n", name);
+		ExitFatal(-1);
+	}
+	VideoPaletteListAdd(g->Surface);
 
 	if (!width) {
 		width = g->Width;
