@@ -31,11 +31,10 @@ function create
   mmv "tmp??.png" "tmp0#1#2.png"
   convert -append tmp???.png $2
   rm tmp???.png
-  rm $1*
 }
 
-export BLENDER_SCRIPT_FILE_TO_RENDER="camera.blend"
-blender -P blender.py
+#export BLENDER_SCRIPT_FILE_TO_RENDER="camera.blend"
+#blender -P blender.py
 
 for i in `seq -w 1 24`; do
   convert -crop 32x64 normal00$i.png cropped.png

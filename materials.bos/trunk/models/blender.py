@@ -23,9 +23,11 @@ import os
 import Blender
 
 # open the requested blender file via environment variable
-Blender.Load(os.environ["BLENDER_SCRIPT_FILE_TO_RENDER"])
+Blender.Load(os.environ["BLENDER_RELATIVE_FILE_PATH"]+
+             os.environ["BLENDER_SCRIPT_FILE_TO_RENDER"])
 
 # after the 'Blender.Load' we have to import again
+import os
 import Blender
 from Blender import *
 from Blender.Scene import Render
@@ -35,14 +37,14 @@ scn = Scene.GetCurrent()
 context = scn.getRenderingContext()
 
 # render the shadow part
-context.setRenderPath("shadow")
+context.setRenderPath(os.environ["BLENDER_RELATIVE_FILE_PATH"]+"shadow")
 context.renderAnim()
 
 #remove the ground (the object has to have the name 'ground')
 scn.unlink(Blender.Object.Get("ground"))
 
 # render the normal part
-context.setRenderPath("normal")
+context.setRenderPath(os.environ["BLENDER_RELATIVE_FILE_PATH"]+"normal")
 context.renderAnim()
 
 # finally quit blender

@@ -1,0 +1,17 @@
+MODEL_NAME := $(shell pwd | sed -e "s/.*\///g")
+
+unit_$(MODEL_NAME).png: normal0001.png shadow0001.png
+	./compose
+	echo $(TEST)
+
+normal0001.png shadow0001.png: $(MODEL_NAME).blend
+	bash -c "cd ..;\
+		     export BLENDER_RELATIVE_FILE_PATH=\"$(MODEL_NAME)/\";\
+	         export BLENDER_SCRIPT_FILE_TO_RENDER=\"$(MODEL_NAME).blend\";\
+             blender -P blender.py;\
+	         cd -;"
+
+.PHONY: clean
+clean:
+	rm -f *.png
+	rm Makefile

@@ -31,11 +31,7 @@ function create
   mmv "tmp??.png" "tmp0#1#2.png"
   convert -append tmp???.png $2
   rm tmp???.png
-  rm $1*
 }
-
-export BLENDER_SCRIPT_FILE_TO_RENDER="radar.blend"
-blender -P blender.py
 
 create normal unit_radar.png
 create shadow unit_radar_s.png
