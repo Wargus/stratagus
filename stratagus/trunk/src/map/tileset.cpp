@@ -258,9 +258,12 @@ global void LoadTileset(void)
 	    }
 	    i += 256;
 	} else {
-	    if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
-		solid = i;
+	    if (TheMap.Tileset->BasicNameTable[i] != 0 &&
+		TheMap.Tileset->MixedNameTable[i] == 0)	{
+	    	if (TheMap.Tileset->FlagsTable[i] & MapFieldForest) {
+			solid = i;
 	    }
+	}
 	    i += 16;
 	}
     }
@@ -279,7 +282,7 @@ global void LoadTileset(void)
     TheMap.Tileset->WoodTable[12] = table[mixed + 0x30];
     TheMap.Tileset->WoodTable[13] = table[mixed + 0x40];
     TheMap.Tileset->WoodTable[14] = table[mixed + 0xB0];
-    TheMap.Tileset->WoodTable[15] = table[mixed + 0xD0];
+    TheMap.Tileset->WoodTable[15] = table[solid];
 
     //
     //  Build rock removement table.
@@ -292,8 +295,11 @@ global void LoadTileset(void)
 	    }
 	    i += 256;
 	} else {
-	    if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
-		solid = i;
+	    if (TheMap.Tileset->BasicNameTable[i] != 0 &&
+		TheMap.Tileset->MixedNameTable[i] == 0) {
+	    	  if (TheMap.Tileset->FlagsTable[i] & MapFieldRocks) {
+		    solid = i;
+	    	  }
 	    }
 	    i += 16;
 	}
@@ -313,13 +319,12 @@ global void LoadTileset(void)
     TheMap.Tileset->RockTable[12] = table[mixed + 0x30];
     TheMap.Tileset->RockTable[13] = table[mixed + 0x40];
     TheMap.Tileset->RockTable[14] = table[mixed + 0xB0];
-    TheMap.Tileset->RockTable[15] = table[mixed + 0x80];
+    TheMap.Tileset->RockTable[15] = table[solid];
 
     TheMap.Tileset->RockTable[16] = table[mixed + 0xC0];
     TheMap.Tileset->RockTable[17] = table[mixed + 0x60];
     TheMap.Tileset->RockTable[18] = table[mixed + 0xA0];
     TheMap.Tileset->RockTable[19] = table[mixed + 0xD0];
-
     //
     //	FIXME: Build wall replacement tables
     //
