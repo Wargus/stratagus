@@ -137,7 +137,9 @@ void LoadMissileSprite(MissileType* mtype)
 {
 	if (mtype->G && !GraphicLoaded(mtype->G)) {
 		LoadGraphic(mtype->G);
-		FlipGraphic(mtype->G);
+		if (mtype->Flip) {
+			FlipGraphic(mtype->G);
+		}
 
 		// Correct the number of frames in graphic
 		Assert(mtype->G->NumFrames >= mtype->SpriteFrames);
