@@ -1591,8 +1591,10 @@ local void MenuHandleMouseMove(int x,int y)
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
-			    mi->d.vslider.cursel = 0;
-			    continue;
+			    if (y < ys || y > ys + mi->d.vslider.ysize || !(mi->flags&MenuButtonClicked)) {
+				mi->d.vslider.cursel = 0;
+				continue;
+			    }
 			}
 			j = y - ys;
 			mi->d.vslider.cursel = 0;
@@ -1648,8 +1650,10 @@ local void MenuHandleMouseMove(int x,int y)
 				    mi->flags &= ~MenuButtonActive;
 				}
 			    }
-			    mi->d.hslider.cursel = 0;
-			    continue;
+			    if (x < xs || x > xs + mi->d.hslider.xsize || !(mi->flags&MenuButtonClicked)) {
+				mi->d.hslider.cursel = 0;
+				continue;
+			    }
 			}
 			j = x - xs;
 			mi->d.hslider.cursel = 0;
