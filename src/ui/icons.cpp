@@ -57,10 +57,6 @@
 */
 global char** IconWcNames;
 
-// FIXME: Can be removed:
-global int IconWidth;                       /// Icon width in panels
-global int IconHeight;                      /// Icon height in panels
-
 local Icon** Icons;                         /// Table of all icons.
 local int NumIcons;                         /// Number of icons in Icons.
 
@@ -578,20 +574,6 @@ local int CclDefineIconWcNames(lua_State* l)
 	return 0;
 }
 
-/**
-**  Set icon size
-**  FIXME: can be removed:
-*/
-local int CclSetIconSize(lua_State* l)
-{
-	if (lua_gettop(l) != 2) {
-		lua_pushstring(l, "incorrect argument");
-		lua_error(l);
-	}
-	IconWidth = LuaToNumber(l, 1);
-	IconHeight = LuaToNumber(l, 2);
-	return 0;
-}
 
 /**
 **  Register CCL features for icons.
@@ -604,9 +586,6 @@ global void IconCclRegister(void)
 	lua_register(Lua, "DefineIconAlias", CclDefineIconAlias);
 
 	lua_register(Lua, "DefineIconWcNames", CclDefineIconWcNames);
-
-	// FIXME: can be removed:
-	lua_register(Lua, "SetIconSize", CclSetIconSize);
 }
 
 //@}
