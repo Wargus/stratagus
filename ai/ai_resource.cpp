@@ -722,11 +722,10 @@ local void AiCheckingWork(void)
 ----------------------------------------------------------------------------*/
 
 /**
-**	Find the nearest gold mine for unit from x,y.
+**	Find the nearest gold mine for unit.
 **
 **	@param source	Pointer for source unit.
-**	@param x	X tile position to start (Unused).
-**	@param y	Y tile position to start (Unused).
+**	@param used_mine Used mine (tries to find a better mine?)
 **
 **	@return		Pointer to the nearest reachable gold mine.
 **
@@ -738,7 +737,7 @@ local void AiCheckingWork(void)
 **		Or we could do a flood fill search starting from x.y. The
 **		first found gold mine is it.
 */
-local Unit* AiFindGoldMine(const Unit* source, Unit* used_mine)
+local Unit* AiFindGoldMine(const Unit* source,const Unit* used_mine)
 {
     Unit** table;
     Unit* unit;
@@ -777,10 +776,12 @@ local Unit* AiFindGoldMine(const Unit* source, Unit* used_mine)
 /**
 **      Assign worker to mine gold.
 **
+**	@todo FIXME: JOHNS: docu What does used_mine do, for what is it good?
+**
 **      IDEA: If no way to goldmine, we must dig the way.
 **      IDEA: If goldmine is on an other island, we must transport the workers.
 */
-local int AiMineGold(Unit* unit, Unit* used_mine)
+local int AiMineGold(Unit* unit, const Unit* used_mine)
 {
     Unit* dest;
 
