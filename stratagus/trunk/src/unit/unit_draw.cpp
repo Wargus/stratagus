@@ -1586,11 +1586,10 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 	if (NumSelected == 1 && unit->Selected) {
 		if (ShowSightRange) {
 			if (ShowSightRange == 1) {
-				VideoFillTransRectangleClip(ColorGreen,
-					x + type->TileWidth * TileSizeX / 2 - stats->SightRange * TileSizeX,
-					y + type->TileHeight * TileSizeY / 2 - stats->SightRange * TileSizeY,
-					stats->SightRange * TileSizeX * 2,
-					stats->SightRange * TileSizeY * 2, 75);
+				VideoFillTransCircleClip(ColorGreen,
+					x + type->TileWidth * TileSizeX / 2,
+					y + type->TileHeight * TileSizeY / 2,
+					((stats->SightRange + (type->TileWidth - 1)) * TileSizeX), 75);
 			} else if (ShowSightRange == 2) {
 				VideoFillTransCircleClip(ColorGreen,
 					x + type->TileWidth * TileSizeX / 2,
@@ -1601,7 +1600,7 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 				VideoDrawCircleClip(ColorGreen,
 					x + type->TileWidth * TileSizeX / 2,
 					y + type->TileHeight * TileSizeY / 2,
-					(stats->SightRange + (type->TileWidth - 1) / 2) * TileSizeX * 2);
+					((stats->SightRange + (type->TileWidth - 1)) * TileSizeX));
 			}
 		}
 		if (type->CanAttack) {
@@ -1612,14 +1611,14 @@ local void DrawInformations(const Unit* unit, const UnitType* type, int x, int y
 					VideoDrawCircleClip(ColorBlue,
 						x + type->TileWidth * TileSizeX / 2,
 						y + type->TileHeight * TileSizeY / 2,
-						r * TileSizeX);
+						(r + (type->TileWidth - 1)) * TileSizeX);
 				}
 			}
 			if (ShowAttackRange && stats->AttackRange) {
 				VideoDrawCircleClip(ColorRed,
 					x + type->TileWidth * TileSizeX / 2,
 					y + type->TileHeight * TileSizeY / 2,
-					stats->AttackRange * TileSizeX);
+					(stats->AttackRange + (type->TileWidth - 1)) * TileSizeX);
 			}
 		}
 	}
