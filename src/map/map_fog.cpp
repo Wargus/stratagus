@@ -486,13 +486,22 @@ global void MapUpdateVisible(void)
 	        continue;
 	    }
 	}
+
+	if( unit->Orders[0].Action==UnitActionBuilded ) {
 #ifdef NEW_FOW
-	MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+	    MapMarkSight(unit->Player,x,y,3);
 #else
-	MapMarkSight(x,y,unit->Stats->SightRange);
+	    MapMarkSight(x,y,3);
 #endif
-	if( unit->Type->CanSeeSubmarine ) {
-	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	} else {
+#ifdef NEW_FOW
+	    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+#else
+	    MapMarkSight(x,y,unit->Stats->SightRange);
+#endif
+	    if( unit->Type->CanSeeSubmarine ) {
+		MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	    }
 	}
     }
 

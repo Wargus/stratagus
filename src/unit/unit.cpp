@@ -395,21 +395,27 @@ global void PlaceUnit(Unit* unit,int x,int y)
 
     x+=unit->Type->TileWidth/2;
     y+=unit->Type->TileHeight/2;
+
+    //
+    //	Units under construction have no sight range.
+    //
+    if( !unit->Constructed ) {
 #ifdef NEW_FOW
-    //
-    //	Update fog of war.
-    //
-    MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
+	//
+	//	Update fog of war.
+	//
+	MapMarkSight(unit->Player,x,y,unit->Stats->SightRange);
 #else
-    //
-    //	Update fog of war, if unit belongs to player on this computer
-    //
-    if( unit->Player==ThisPlayer ) {
-	MapMarkSight(x,y,unit->Stats->SightRange);
-    }
+	//
+	//	Update fog of war, if unit belongs to player on this computer
+	//
+	if( unit->Player==ThisPlayer ) {
+	    MapMarkSight(x,y,unit->Stats->SightRange);
+	}
 #endif
-    if( type->CanSeeSubmarine ) {
-	MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	if( type->CanSeeSubmarine ) {
+	    MarkSubmarineSeen(unit->Player,x,y,unit->Stats->SightRange);
+	}
     }
 
     unit->Removed=0;

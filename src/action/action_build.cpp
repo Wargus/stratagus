@@ -183,12 +183,15 @@ global void HandleActionBuild(Unit* unit)
     }
     PlayerSubUnitType(unit->Player,type);
 
-    build=MakeUnitAndPlace(x,y,type,unit->Player);
-    stats=build->Stats;
+    build=MakeUnit(type,unit->Player);
+    build->Constructed=1;
+    PlaceUnit(build,x,y);
+
     // HACK: the building is not ready yet
     build->Player->UnitTypesCount[type->Type]--;
-    build->Constructed=1;
     build->HP=0;
+
+    stats=build->Stats;
 
     build->Orders[0].Action=UnitActionBuilded;
     build->Data.Builded.Sum=0;  // FIXME: Is it necessary?
