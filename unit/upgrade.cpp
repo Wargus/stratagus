@@ -60,7 +60,7 @@
 struct _unit_type_;
 
 static int AddUpgradeModifierBase(int, int, int, int, int, int, int, int,
-	int*, const int[UnitTypeMax], const char*, const char*, struct _unit_type_*);
+	int*, const int[UnitTypeMax], const char*, const char*, UnitType*);
 
 static void AllowUnitId(Player* player, int id, int units);
 static void AllowUpgradeId(Player* player, int id, char af);
@@ -68,11 +68,6 @@ static void AllowUpgradeId(Player* player, int id, char af);
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-
-/**
-**  upgrade type definition
-*/
-const char UpgradeType[] = "upgrade";
 
 Upgrade Upgrades[UpgradeMax];                ///< The main user useable upgrades
 static int NumUpgrades;                      ///< Number of upgrades used
@@ -132,7 +127,6 @@ static Upgrade* AddUpgrade(const char* ident, const char* icon,
 		free(upgrade->Icon.Name);
 	} else {
 		upgrade = Upgrades + NumUpgrades++;
-		upgrade->OType = UpgradeType;
 		upgrade->Ident = strdup(ident);
 		*(Upgrade**)hash_add(UpgradeHash, upgrade->Ident) = upgrade;
 	}
@@ -235,6 +229,8 @@ void CleanUpgrades(void)
 		UpgradeWcNames = NULL;
 	}
 }
+
+#if 1 // must be removed when new format available : pud functions
 
 /**
 ** Parse ALOW area from puds.
@@ -537,6 +533,8 @@ void ParsePudUGRD(const char* ugrd, int length __attribute__((unused)))
 		// group+flags are to mystic to be implemented
 	}
 }
+
+#endif // Pud functions.
 
 /**
 **  Save state of the dependencies to file.
@@ -977,7 +975,7 @@ static int AddUpgradeModifierBase(int uid, int attack_range, int sight_range,
 	return NumUpgradeModifiers++;
 }
 
-#if 0
+#if 0  // Not used.
 /**
 ** returns upgrade modifier id or -1 for error (actually this id is
 ** useless, just error checking)
@@ -1078,7 +1076,7 @@ static int AddUpgradeModifier(int uid, int attack_range, int sight_range,
 */
 int UnitTypeIdByIdent(const char* ident)
 {
-	UnitType* type;
+	const UnitType* type;
 
 	if ((type = UnitTypeByIdent(ident))) {
 		return type->Slot;
@@ -1095,7 +1093,7 @@ int UnitTypeIdByIdent(const char* ident)
 */
 int UpgradeIdByIdent(const char* ident)
 {
-	Upgrade* upgrade;
+	const Upgrade* upgrade;
 
 	upgrade = UpgradeByIdent(ident);
 	if (upgrade) {
@@ -1260,7 +1258,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			UnitTypes[z]->Stats[pn].Level++;
 
 			if (um->ConvertTo) {
-				((UnitType*)um->ConvertTo)->Stats[pn].Level++;
+				um->ConvertTo->Stats[pn].Level++;
 				ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);
 			}
 		}
@@ -1278,7 +1276,7 @@ void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 	int z;
 	int id;
 
-	id = upgrade-Upgrades;
+	id = upgrade - Upgrades;
 	player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	AllowUpgradeId(player, id, 'R');  // research done
 
@@ -1296,6 +1294,7 @@ void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 	}
 }
 
+#if 0 // UpgradeLost not implemented.
 /**
 **  for now it will be empty?
 **  perhaps acquired upgrade can be lost if (for example) a building is lost
@@ -1304,12 +1303,11 @@ void UpgradeAcquire(Player* player, const Upgrade* upgrade)
 */
 void UpgradeLost(Player* player, int id)
 {
-	return; // FIXME: remove this if implemented below
-
 	player->UpgradeTimers.Upgrades[id] = 0;
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
 	// FIXME: here we should reverse apply upgrade...
 }
+#endif
 
 /*----------------------------------------------------------------------------
 --  Allow(s)
@@ -1343,24 +1341,29 @@ static void AllowUpgradeId(Player* player, int id, char af)
 }
 
 /**
-**  FIXME: docu
+**  Return the allow state of the unit.
+**
+**  @param player   Check state of this player.
+**  @param id       Unit identifier.
+**
+**  @return the allow state of the unit.
 */
 int UnitIdAllowed(const Player* player, int id)
 {
-	// JOHNS: Don't be kind, the people should code correct!
 	Assert(id >= 0 && id < UnitTypeMax);
-	if (id < 0 || id >= UnitTypeMax) {
-		return 0;
-	}
 	return player->Allow.Units[id];
 }
 
 /**
-**  FIXME: docu
+**  Return the allow state of an upgrade.
+**
+**  @param player  Check state for this player.
+**  @param id      Upgrade identifier.
+**
+**  @return the allow state of the upgrade.
 */
 char UpgradeIdAllowed(const Player* player, int id)
 {
-	// JOHNS: Don't be kind, the people should code correct!
 	Assert(id >= 0 && id < UpgradeMax);
 	return player->Allow.Upgrades[id];
 }
