@@ -76,129 +76,92 @@ _CheckboxStyleHash CheckboxStyleHash;
 **  Enable/disable the global color cycling.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of color cylce all.
 */
 static int CclSetColorCycleAll(lua_State* l)
 {
-	lua_Number old;
-
 	if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
 		LuaError(l, "incorrect argument");
 	}
-	old = ColorCycleAll;
+
 	if (lua_isnumber(l, 1)) {
 		ColorCycleAll = lua_tonumber(l, 1);
 	} else {
 		ColorCycleAll = lua_toboolean(l, 1);
 	}
 
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set speed of middle-mouse scroll
 **
 **  @param l  Lua state.
-**
-**  @return   The old value.
 */
 static int CclSetMouseScrollSpeedDefault(lua_State* l)
 {
-	lua_Number old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = TheUI.MouseScrollSpeedDefault;
 	TheUI.MouseScrollSpeedDefault = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set speed of ctrl-middle-mouse scroll
 **
 **  @param l  Lua state.
-**
-**  @return   The old value.
 */
 static int CclSetMouseScrollSpeedControl(lua_State* l)
 {
-	lua_Number old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = TheUI.MouseScrollSpeedControl;
 	TheUI.MouseScrollSpeedControl = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set which missile is used for right click
 **
 **  @param l  Lua state.
-**
-**  @return   old value
 */
 static int CclSetClickMissile(lua_State* l)
 {
-	char* old;
 	int args;
 
 	args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
-	old = NULL;
-	if (ClickMissile) {
-		old = strdup(ClickMissile);
-		free(ClickMissile);
-		ClickMissile = NULL;
-	}
+	free(ClickMissile);
+	ClickMissile = NULL;
 	if (args == 1 && !lua_isnil(l, 1)) {
 		ClickMissile = strdup(lua_tostring(l, 1));
 	}
 
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set which missile shows Damage
 **
 **  @param l  Lua state.
-**
-**  @return   old value
 */
 static int CclSetDamageMissile(lua_State* l)
 {
-	char* old;
 	int args;
 
 	args = lua_gettop(l);
 	if (args > 1 || (args == 1 && (!lua_isnil(l, 1) && !lua_isstring(l, 1)))) {
 		LuaError(l, "incorrect argument");
 	}
-	old = NULL;
-	if (DamageMissile) {
-		old = strdup(DamageMissile);
-		free(DamageMissile);
-		DamageMissile = NULL;
-	}
+	free(DamageMissile);
+	DamageMissile = NULL;
 	if (args == 1 && !lua_isnil(l, 1)) {
 		DamageMissile = strdup(lua_tostring(l, 1));
 	}
 
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -225,34 +188,25 @@ static int CclSetVideoResolution(lua_State* l)
 **  Set the video fullscreen mode.
 **
 **  @param l  Lua state.
-**
-**  @return   Old fullscreen mode
 */
 static int CclSetVideoFullScreen(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = VideoFullScreen;
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		if (!VideoForceFullScreen) {
 			VideoFullScreen = LuaToBoolean(l, 1);
 		}
 	}
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Default title screens.
 **
 **  @param l  Lua state.
-**
-**  @return   None
 */
 static int CclSetTitleScreens(lua_State* l)
 {
@@ -368,29 +322,15 @@ static int CclSetTitleScreens(lua_State* l)
 **  Default menu music.
 **
 **  @param l  Lua state.
-**
-**  @return   Old menu music.
 */
 static int CclSetMenuMusic(lua_State* l)
 {
-	char* old;
-
-	old = NULL;
-	if (MenuMusic) {
-		old = strdup(MenuMusic);
-	}
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	if (MenuMusic) {
-		free(MenuMusic);
-		MenuMusic = NULL;
-	}
+	free(MenuMusic);
 	MenuMusic = strdup(LuaToString(l, 1));
-
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -1165,7 +1105,6 @@ static int CclDefineUI(lua_State* l)
 	}
 	//
 	// Parse the arguments, already the new tagged format.
-	//  maxy: this could be much simpler
 	//
 
 	for (; j < args; ++j) {
@@ -1186,9 +1125,9 @@ static int CclDefineUI(lua_State* l)
 			lua_pushnil(l);
 			while (lua_next(l, j + 1)) {
 				value = LuaToString(l, -2);
-				if (!strcmp(value, "file")) {
+				if (!strcmp(value, "File")) {
 					ui->Filler[ui->NumFillers - 1].File = strdup(LuaToString(l, -1));
-				} else if (!strcmp(value, "pos")) {
+				} else if (!strcmp(value, "Pos")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
@@ -1201,6 +1140,7 @@ static int CclDefineUI(lua_State* l)
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
@@ -1815,56 +1755,41 @@ static int CclDefineViewports(lua_State* l)
 **  Enable/disable scrolling with the mouse.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of scrolling.
 */
 static int CclSetMouseScroll(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = TheUI.MouseScroll;
 	TheUI.MouseScroll = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set speed of mouse scrolling
 **
 **  @param l  Lua state.
-**
-**  @return   old scroll speed.
 */
 static int CclSetMouseScrollSpeed(lua_State* l)
 {
 	int speed;
-	lua_Number old;
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = SpeedMouseScroll;
 	speed = LuaToNumber(l, 1);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedMouseScroll = MOUSE_SCROLL_SPEED;
 	} else {
 		SpeedMouseScroll = speed;
 	}
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Enable/disable grabbing the mouse.
 **
 **  @param l  Lua state.
-**
-**  @return   FIXME: not supported: The old state of grabbing.
 */
 static int CclSetGrabMouse(lua_State* l)
 {
@@ -1876,7 +1801,6 @@ static int CclSetGrabMouse(lua_State* l)
 	} else {
 		ToggleGrabMouse(-1);
 	}
-
 	return 0;
 }
 
@@ -1884,91 +1808,64 @@ static int CclSetGrabMouse(lua_State* l)
 **  Enable/disable leaving the window stops scrolling.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of stopping.
 */
 static int CclSetLeaveStops(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = LeaveStops;
 	LeaveStops = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Enable/disable scrolling with the keyboard.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of scrolling.
 */
 static int CclSetKeyScroll(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = TheUI.KeyScroll;
 	TheUI.KeyScroll = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set speed of keyboard scrolling
 **
 **  @param l  Lua state.
-**
-**  @return   old scroll speed.
 */
 static int CclSetKeyScrollSpeed(lua_State* l)
 {
 	int speed;
-	lua_Number old;
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = SpeedKeyScroll;
 	speed = LuaToNumber(l, 1);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedKeyScroll = KEY_SCROLL_SPEED;
 	} else {
 		SpeedKeyScroll = speed;
 	}
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Enable/disable display of command keys in panels.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of scrolling.
 */
 static int CclSetShowCommandKey(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = ShowCommandKey;
 	ShowCommandKey = LuaToBoolean(l, 1);
 	UpdateButtonPanel();
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -1982,7 +1879,6 @@ static int CclRightButtonAttacks(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	RightButtonAttacks = 1;
-
 	return 0;
 }
 
@@ -1997,7 +1893,6 @@ static int CclRightButtonMoves(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	RightButtonAttacks = 0;
-
 	return 0;
 }
 
@@ -2005,21 +1900,14 @@ static int CclRightButtonMoves(lua_State* l)
 **  Enable/disable the fancy buildings.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of fancy buildings flag.
 */
 static int CclSetFancyBuildings(lua_State* l)
 {
-	int old;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = FancyBuildings;
 	FancyBuildings = LuaToBoolean(l, 1);
-
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3762,9 +3650,7 @@ static int CclSetColorWaterCycleStart(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorWaterCycleStart = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorWaterCycleStart);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3778,9 +3664,7 @@ static int CclSetColorWaterCycleEnd(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorWaterCycleEnd = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorWaterCycleEnd);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3794,9 +3678,7 @@ static int CclSetColorIconCycleStart(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorIconCycleStart = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorIconCycleStart);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3810,9 +3692,7 @@ static int CclSetColorIconCycleEnd(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorIconCycleEnd = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorIconCycleEnd);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3826,9 +3706,7 @@ static int CclSetColorBuildingCycleStart(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorBuildingCycleStart = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorBuildingCycleStart);
-	return 1;
+	return 0;
 }
 
 /**
@@ -3842,68 +3720,49 @@ static int CclSetColorBuildingCycleEnd(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	ColorBuildingCycleEnd = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, ColorBuildingCycleEnd);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set double-click delay.
 **
 **  @param l  Lua state.
-**  @return   Old delay
 */
 static int CclSetDoubleClickDelay(lua_State* l)
 {
-	lua_Number i;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	i = DoubleClickDelay;
 	DoubleClickDelay = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, i);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set hold-click delay.
 **
 **  @param l  Lua state.
-**
-**  @return   Old delay
 */
 static int CclSetHoldClickDelay(lua_State* l)
 {
-	lua_Number i;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	i = HoldClickDelay;
 	HoldClickDelay = LuaToNumber(l, 1);
-
-	lua_pushnumber(l, i);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set selection style.
 **
 **  @param l  Lua state.
-**
-**  @return   Old style
 */
 static int CclSetSelectionStyle(lua_State* l)
 {
-	char* old;
 	const char* style;
 
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	old = NULL;
 
 	style = LuaToString(l, 1);
 	if (!strcmp(style, "rectangle")) {
@@ -3920,21 +3779,16 @@ static int CclSetSelectionStyle(lua_State* l)
 		LuaError(l, "Unsupported selection style");
 	}
 
-	lua_pushstring(l, old);
-	free(old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set display of sight range.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of display of sight.
 */
 static int CclSetShowSightRange(lua_State* l)
 {
-	lua_Number old;
 	int args;
 
 	args = lua_gettop(l);
@@ -3943,7 +3797,6 @@ static int CclSetShowSightRange(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	old = ShowSightRange;
 	if (args == 1 && !lua_isnil(l, 1)) {
 		if (lua_isstring(l, 1)) {
 			const char* flag;
@@ -3957,10 +3810,7 @@ static int CclSetShowSightRange(lua_State* l)
 				LuaError(l, "Unsupported selection style");
 			}
 		} else {
-			int flag;
-
-			flag = lua_toboolean(l, 1);
-			if (flag) {
+			if (lua_toboolean(l, 1)) {
 				ShowSightRange = 3;
 			} else {
 				ShowSightRange = 0;
@@ -3970,26 +3820,20 @@ static int CclSetShowSightRange(lua_State* l)
 		ShowSightRange = 0;
 	}
 
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set display of reaction range.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of display of reaction.
 */
 static int CclSetShowReactionRange(lua_State* l)
 {
-	lua_Number old;
-
-	old = ShowReactionRange;
-
 	if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isstring(l, 1))) {
 		LuaError(l, "incorrect argument");
 	}
+
 	if (lua_isstring(l, 1)) {
 		const char* flag;
 
@@ -4002,56 +3846,41 @@ static int CclSetShowReactionRange(lua_State* l)
 			LuaError(l, "Unsupported selection style");
 		}
 	} else {
-		int flag;
-
-		flag = lua_toboolean(l, 1);
-		if (flag) {
+		if (lua_toboolean(l, 1)) {
 			ShowReactionRange = 3;
 		} else {
 			ShowReactionRange = 0;
 		}
 	}
 
-	lua_pushnumber(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set display of attack range.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of display of attack.
 */
 static int CclSetShowAttackRange(lua_State* l)
 {
-	int old;
-
-	old = ShowAttackRange;
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
 	ShowAttackRange = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
 **  Set display of orders.
 **
 **  @param l  Lua state.
-**
-**  @return   The old state of display of orders.
 */
 static int CclSetShowOrders(lua_State* l)
 {
-	int old;
-
-	old = ShowOrders;
 	if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
 		LuaError(l, "incorrect argument");
 	}
+
 	if (lua_isboolean(l, 1)) {
 		ShowOrders = lua_toboolean(l, 1);
 		if (ShowOrders) {
@@ -4061,8 +3890,7 @@ static int CclSetShowOrders(lua_State* l)
 		ShowOrders = lua_tonumber(l, 1);
 	}
 
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -4072,14 +3900,10 @@ static int CclSetShowOrders(lua_State* l)
 */
 static int CclAddMessage(lua_State* l)
 {
-	const char* str;
-
 	if (lua_gettop(l) != 1) {
 		LuaError(l, "incorrect argument");
 	}
-	str = LuaToString(l, 1);
-	SetMessage("%s", str);
-
+	SetMessage("%s", LuaToString(l, 1));
 	return 0;
 }
 
