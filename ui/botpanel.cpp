@@ -554,8 +554,8 @@ global void DrawButtonPanel(void)
 		    // FIXME: real DrawChar would be useful
 		    buf[0] = toupper(CurrentButtons[i].Key);
 		    buf[1] = '\0';
-		    VideoDrawText(b->X + 4 + b->Width - VideoTextLength(GameFont, buf),
-			b->Y + 5 + b->Height - VideoTextHeight(GameFont), GameFont, buf);
+		    VideoDrawText(b->X + 3 + b->Width - VideoTextLength(GameFont, buf),
+			b->Y + 3 + b->Height - VideoTextHeight(GameFont), GameFont, buf);
 		}
 	    }
 	}
