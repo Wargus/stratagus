@@ -628,19 +628,35 @@ local SCM CclSetColorCycleAll(SCM flag)
 }
 
 /**
-**	Enable/disable the reverse map move.
+**	Set speed of middle-mouse scroll
 **
-**	@param flag	True = turn on, false = off.
-**	@return		The old state of scrolling.
+**	@param speed	number of screen pixels per mouse pixel
+**	@return		The old value.
 */
-local SCM CclSetReverseMapMove(SCM flag)
+local SCM CclSetMouseScrollSpeedDefault(SCM speed)
 {
     int old;
 
-    old=TheUI.ReverseMouseMove;
-    TheUI.ReverseMouseMove=gh_scm2bool(flag);
+    old=TheUI.MouseScrollSpeedDefault;
+    TheUI.MouseScrollSpeedDefault=gh_scm2int(speed);
 
-    return gh_bool2scm(old);
+    return gh_int2scm(old);
+}
+
+/**
+**	Set speed of ctrl-middle-mouse scroll
+**
+**	@param speed	number of screen pixels per mouse pixel
+**	@return		The old value.
+*/
+local SCM CclSetMouseScrollSpeedControl(SCM speed)
+{
+    int old;
+
+    old=TheUI.MouseScrollSpeedControl;
+    TheUI.MouseScrollSpeedControl=gh_scm2int(speed);
+
+    return gh_int2scm(old);
 }
 
 /**
@@ -1258,10 +1274,11 @@ local SCM CclDefineUI(SCM list)
 
     ui->MouseScroll=TheUI.MouseScroll;
     ui->KeyScroll=TheUI.KeyScroll;
-    ui->ReverseMouseMove=TheUI.ReverseMouseMove;
+    ui->MouseScrollSpeedDefault=TheUI.MouseScrollSpeedDefault;
+    ui->MouseScrollSpeedControl=TheUI.MouseScrollSpeedControl;
 
-    ui->WarpX=-1;
-    ui->WarpY=-1;
+    ui->MouseWarpX=-1;
+    ui->MouseWarpY=-1;
 
     ui->MouseAdjust=TheUI.MouseAdjust;
     ui->MouseScale=TheUI.MouseScale;
@@ -3576,7 +3593,8 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure1_0("add-message", CclAddMessage);
 
     gh_new_procedure1_0("set-color-cycle-all!",CclSetColorCycleAll);
-    gh_new_procedure1_0("set-reverse-map-move!",CclSetReverseMapMove);
+    gh_new_procedure1_0("set-mouse-scroll-speed-default!",CclSetMouseScrollSpeedDefault);
+    gh_new_procedure1_0("set-mouse-scroll-speed-control!",CclSetMouseScrollSpeedControl);
 
     gh_new_procedure1_0("set-mouse-adjust!",CclSetMouseAdjust);
     gh_new_procedure1_0("set-mouse-scale!",CclSetMouseScale);

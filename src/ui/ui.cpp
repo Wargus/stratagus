@@ -516,8 +516,8 @@ global void SaveUserInterface(FILE* file)
     fprintf(file,"(set-mouse-scroll-speed! %d)\n",SpeedMouseScroll);
     fprintf(file,"(set-key-scroll! %s)\n",TheUI.KeyScroll ? "#t" : "#f");
     fprintf(file,"(set-key-scroll-speed! %d)\n",SpeedKeyScroll);
-    fprintf(file,"(set-reverse-map-move! %s)\n\n",
-	    TheUI.ReverseMouseMove ? "#t" : "#f");
+    fprintf(file,"(set-mouse-scroll-speed-default! %d)\n",TheUI.MouseScrollSpeedDefault);
+    fprintf(file,"(set-mouse-scroll-speed-control! %d)\n",TheUI.MouseScrollSpeedControl);
 
     fprintf(file,"(set-mouse-adjust! %d)\n",TheUI.MouseAdjust);
     fprintf(file,"(set-mouse-scale! %d)\n\n",TheUI.MouseScale);

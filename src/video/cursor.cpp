@@ -87,6 +87,9 @@ global int CursorY;		/// cursor position on screen Y
 global int CursorStartX;	/// rectangle started on screen X
 global int CursorStartY;	/// rectangle started on screen Y
 
+global int SubScrollX;          /// pixels the mouse moved while scrolling
+global int SubScrollY;          /// pixels the mouse moved while scrolling
+
     /// X position of starting point of selection rectangle, in screen pixels.
 global int CursorStartScrMapX;
     /// Y position of starting point of selection rectangle, in screen pixels.
