@@ -10,7 +10,7 @@
 //
 /**@name ui.h - The user interface header file. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

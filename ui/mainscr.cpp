@@ -582,13 +582,13 @@ void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
 **
 **  @param unit  Pointer to unit.
 */
-static void DrawUnitInfo(const Unit* unit)
+static void DrawUnitInfo(Unit* unit)
 {
 	int i; // iterator on panel. And some other things.
 	int j; // iterator on panel content.
 	ContentType* content;      // content of current panel.
 	int index;  // Index of the Panel.
-	const UnitType* type;
+	UnitType* type;
 	const UnitStats* stats;
 	int x;
 	int y;
@@ -613,6 +613,23 @@ static void DrawUnitInfo(const Unit* unit)
 	Assert(type);
 	Assert(stats);
 	// Draw IconUnit
+#ifdef USE_MNG
+	if (type->Portrait.Num) {
+		DisplayMNG(type->Portrait.Mngs[type->Portrait.CurrMng],
+			TheUI.SingleSelectedButton->X, TheUI.SingleSelectedButton->Y);
+		if (type->Portrait.Mngs[type->Portrait.CurrMng]->Iteration == type->Portrait.NumIterations) {
+			ResetMNG(type->Portrait.Mngs[type->Portrait.CurrMng]);
+			// FIXME: should be configurable
+			if (type->Portrait.CurrMng == 0) {
+				type->Portrait.CurrMng = (SyncRand() % (type->Portrait.Num - 1)) + 1;
+				type->Portrait.NumIterations = 1;
+			} else {
+				type->Portrait.CurrMng = 0;
+				type->Portrait.NumIterations = SyncRand() % 16 + 1;
+			}
+		}
+	} else
+#endif
 	if (TheUI.SingleSelectedButton) {
 		x = TheUI.SingleSelectedButton->X;
 		y = TheUI.SingleSelectedButton->Y;
