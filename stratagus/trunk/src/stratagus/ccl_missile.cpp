@@ -43,6 +43,7 @@
 --	Functions
 ----------------------------------------------------------------------------*/
 
+#if 0
 /**
 **	Parse missile-type. FIXME: not up to date!
 **
@@ -52,6 +53,9 @@ local SCM CclMissileType(SCM list)
 {
     SCM value;
     int type;
+
+    /// how many missile type are maximal supported
+#define MissileTypeMax			0x22
 
     //	Slot
     value=gh_car(list);
@@ -97,6 +101,81 @@ local SCM CclMissileType(SCM list)
 
     return list;
 }
+#endif
+
+/**
+**	Parse missile-type.
+**
+**	@param list	List describing missile-type.
+*/
+local SCM CclDefineMissileType(SCM list)
+{
+    SCM value;
+    char* str;
+    MissileType* type;
+    unsigned i;
+
+    //	Slot identifier
+
+    str=gh_scm2newstr(gh_car(list),NULL);
+    list=gh_cdr(list);
+    type=MissileTypeByIdent(str);
+    if( type ) {
+	CclFree(str);
+    } else {
+	type=NewMissileTypeSlot(str);
+    }
+
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("file")) ) {
+	    CclFree(type->File);
+	    type->File=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("size")) ) {
+	    value=gh_car(list);
+	    type->Width=gh_scm2int(gh_car(value));
+	    value=gh_cdr(value);
+	    type->Height=gh_scm2int(gh_car(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("frames")) ) {
+	    //gh_scm2int(gh_car(list));
+	    // FIXME: not used now
+	} else if( gh_eq_p(value,gh_symbol2scm("fired-sound")) ) {
+	    CclFree(type->FiredSound.Name);
+	    type->FiredSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("impact-sound")) ) {
+	    CclFree(type->ImpactSound.Name);
+	    type->ImpactSound.Name=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("class")) ) {
+	    value=gh_car(list);
+	    for( i=0; MissileClassNames[i]; ++i ) {
+		if( gh_eq_p(value,
+			    gh_symbol2scm((char*)MissileClassNames[i])) ) {
+		    type->Class=i;
+		    break;
+		}
+	    }
+	    if( !MissileClassNames[i] ) {
+		// FIXME: this leaves a half initialized missile-type
+		errl("Unsupported class",value);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("speed")) ) {
+	    type->Speed=gh_scm2int(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {
+	    CclFree(type->ImpactName);
+	    type->ImpactName=gh_scm2newstr(gh_car(list),NULL);
+	} else {
+	    // FIXME: this leaves a half initialized missile-type
+	    errl("Unsupported tag",value);
+	}
+	list=gh_cdr(list);
+    }
+
+    return SCM_UNSPECIFIED;
+}
 
 /**
 **	Define missile type mapping from original number to internal symbol
@@ -134,10 +213,9 @@ local SCM CclDefineMissileTypeWcNames(SCM list)
 */
 global void MissileCclRegister(void)
 {
-    gh_new_procedureN("missile-type",CclMissileType);
-
     gh_new_procedureN("define-missiletype-wc-names",
 	    CclDefineMissileTypeWcNames);
+    gh_new_procedureN("define-missile-type",CclDefineMissileType);
 }
 
 #endif	// } USE_CCL
