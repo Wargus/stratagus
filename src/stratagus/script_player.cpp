@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -91,8 +90,8 @@ local SCM CclPlayer(SCM list)
 		player->Type=PlayerNobody;
 	    } else if( gh_eq_p(value,gh_symbol2scm("computer")) ) {
 		player->Type=PlayerComputer;
-	    } else if( gh_eq_p(value,gh_symbol2scm("human")) ) {
-		player->Type=PlayerHuman;
+	    } else if( gh_eq_p(value,gh_symbol2scm("person")) ) {
+		player->Type=PlayerPerson;
 	    } else if( gh_eq_p(value,gh_symbol2scm("rescue-passive")) ) {
 		player->Type=PlayerRescuePassive;
 	    } else if( gh_eq_p(value,gh_symbol2scm("rescue-active")) ) {

@@ -47,8 +47,10 @@
 **
 **		This is the unique slot number. It is not possible that two
 **		players have the same slot number at the same time. The slot
-**		numbers are reused in the future. Currently #PlayerMax (16)
-**		players are supported. This member is used to access bit fields.
+**		numbers are reused in the future. This means if a player is
+**		defeated, a new player can join using this slot. Currently
+**		#PlayerMax (16) players are supported. This member is used to
+**		access bit fields.
 **		Slot #PlayerNumNeutral (15) is reserved for the neutral units
 **		like gold-mines or critters.
 **
@@ -57,13 +59,16 @@
 **	Player::Name
 **
 **		Name of the player used for displays and network game.
+**		It is restricted to 15 characters plus final zero.
 **
 **	Player::Type
 **
-**		Type of the player (See #PlayerTypes). This field is setup
-**		from the level (PUD). We support currently #PlayerNeutral,
-**		#PlayerNobody, #PlayerComputer, #PlayerHuman,
+**		Type of the player. This field is setup from the level (PUD).
+**		We support currently #PlayerNeutral,
+**		#PlayerNobody, #PlayerComputer, #PlayerPerson,
 **		#PlayerRescuePassive and #PlayerRescueActive.
+**		@see #PlayerTypes
+**
 **
 **	Player::RaceName
 **
@@ -114,20 +119,24 @@
 **		The tile map coordinates of the player start position. 0,0 is
 **		the upper left on the map. This members are setup from the
 **		level (PUD) and only important for the game start.
+**		Ignored if game starts with level settings. Used to place
+**		the initial workers if you play with 1 or 3 workers.
 **
-**	Player::Resources[MaxCosts]
+**	Player::Resources[::MaxCosts]
 **
 **		How many resources the player owns. Needed for building
 **		units and structures.
 **
-**	Player::Incomes[MaxCosts]
+**	Player::Incomes[::MaxCosts]
 **
 **		Income of the resources, when they are delivered at a store.
 **
-**	Player::UnitTypesCount[UnitTypeMax]
+**	Player::UnitTypesCount[::UnitTypeMax]
 **
 **		Total count for each different unit type. Used by the AI and
 **		for dependencies checks.
+**		@note Should not use the maximum number of unit-types here,
+**		only the real number of unit-types used.
 **
 **	Player::AiEnabled
 **
@@ -152,6 +161,9 @@
 **		Total number of units that need food, used to check food limit.
 **		A player can only build up to Player::Food units and not more
 **		than Player::FoodUnitLimit units.
+**
+**		@note that Player::NumFoodUnits > Player::Food, when farms are
+**		destroyed upon Player::NumFoodUnits==Player::Food.
 **
 **	Player::NumBuildings
 **
@@ -202,11 +214,11 @@
 **
 **		Contains which unit-types and upgrades are allowed for the
 **		player. Possible values are:
-**			`A' -- allowed,
-**			`F' -- forbidden,
-**			`R' -- acquired, perhaps other values
-**			`Q' -- acquired but forbidden (does it make sense?:))
-**			`E' -- enabled, allowed by level but currently forbidden
+**		@li	`A' -- allowed,
+**		@li	`F' -- forbidden,
+**		@li	`R' -- acquired, perhaps other values
+**		@li	`Q' -- acquired but forbidden (does it make sense?:))
+**		@li	`E' -- enabled, allowed by level but currently forbidden
 **
 **	Player::UpgradeTimers
 **
@@ -317,18 +329,44 @@ enum PlayerRaces {
 
 /**
 **	Types for the player (must fit to PUD!)
+**
+**	#PlayerNeutral
+**
+**		FIXME: please write documentation.
+**
+**	#PlayerNobody
+**
+**		FIXME: please write documentation.
+**
+**	#PlayerComputer
+**
+**		FIXME: please write documentation.
+**
+**	#PlayerPerson
+**
+**		FIXME: please write documentation.
+**
+**	#PlayerRescuePassive
+**
+**		FIXME: please write documentation.
+**
+**	#PlayerRescueActive
+**
+**		FIXME: please write documentation.
 */
 enum PlayerTypes {
     PlayerNeutral	=2,		/// neutral
     PlayerNobody	=3,		/// unused slot
     PlayerComputer	=4,		/// computer player
-    PlayerHuman		=5,		/// human player
+    PlayerPerson	=5,		/// human player
     PlayerRescuePassive	=6,		/// rescued passive
     PlayerRescueActive	=7,		/// rescued  active
 };
 
 /**
 **	Ai types for the player (must fit to PUD!)
+**
+**	Mapped with #AiTypeWcNames to internal symbols.
 */
 enum PlayerAis {
     PlayerAiLand	=0x00,		/// attack at land
@@ -354,7 +392,7 @@ enum _notify_type_ {
 --	Variables
 ----------------------------------------------------------------------------*/
 
-extern int NumPlayers;			/// Player in play
+extern int NumPlayers;			/// How many player slots used
 extern Player Players[PlayerMax];	/// All players
 extern Player* ThisPlayer;		/// Player on local computer
 

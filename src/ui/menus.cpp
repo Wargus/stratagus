@@ -10,12 +10,11 @@
 //
 /**@name menus.c	-	The menu buttons. */
 //
-//	(c) Copyright 1999-2001 by Andreas Arens
+//	(c) Copyright 1999-2002 by Andreas Arens
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1653,7 +1652,7 @@ local unsigned char *ScenSelectLBRetrieve(Menuitem *mi, int i)
 		    sprintf(buffer, "%d x %d", info->MapWidth, info->MapHeight);
 		    VideoDrawText(menu->x+8,menu->y+254+20,LargeFont,buffer);
 		    for (n = j = 0; j < 16; j++) {
-			if (info->PlayerType[j] == PlayerHuman) {
+			if (info->PlayerType[j] == PlayerPerson) {
 			    n++;
 			}
 		    }
@@ -1889,7 +1888,7 @@ local void GameDrawFunc(Menuitem *mi)
     }
 #if 0
     for (n = j = 0; j < 16; j++) {
-	if (info->PlayerType[j] == PlayerHuman) {
+	if (info->PlayerType[j] == PlayerPerson) {
 	    n++;
 	}
     }
@@ -1994,15 +1993,15 @@ local void MultiGamePlayerSelectorsUpdate(int initial)
     	announce changes by the game creator to connected clients
     */
     for (c = h = i = 0; i < 16; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerHuman) {
-	    h++;	// available human player slots
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    h++;	// available person player slots
 	}
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
 	    c++;	// available computer player slots
 	}
     }
 
-    /// Tell connect state machines how many human player we can have
+    /// Tell connect state machines how many person player we can have
     NetPlayers = h;
 
     if (initial) {
@@ -2055,8 +2054,8 @@ local void MultiClientUpdate(int initial)
 	analyze pudinfo for available slots, disable additional buttons - partially done
     */
     for (c = h = i = 0; i < 16; i++) {
-	if (ScenSelectPudInfo->PlayerType[i] == PlayerHuman) {
-	    h++;	// available human player slots
+	if (ScenSelectPudInfo->PlayerType[i] == PlayerPerson) {
+	    h++;	// available person player slots
 	}
 	if (ScenSelectPudInfo->PlayerType[i] == PlayerComputer) {
 	    c++;	// available computer player slots

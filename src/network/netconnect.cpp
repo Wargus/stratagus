@@ -10,12 +10,11 @@
 //
 /**@name netconnect.c	-	The network high level connection code. */
 //
-//	(c) Copyright 2001 by Lutz Sammer, Andreas Arens.
+//	(c) Copyright 2001,2002 by Lutz Sammer, Andreas Arens.
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -269,14 +268,14 @@ global void NetworkServerSetup(WorldMap *map)
     // FIXME: ARI: selectable by 'Position' selector in Network setup menus!
 
     for (n = i = 0; i < NumPlayers && n < NetPlayers; ++i) {
-	if (Players[i].Type == PlayerHuman) {
+	if (Players[i].Type == PlayerPerson) {
 	    Hosts[n].PlyNr = num[n] = i;
 	    DebugLevel3Fn("Assigning player slots: %d -> %d\n", i, n);
 	    n++;
 	}
     }
     if (n < NetPlayers) {
-	fprintf(stderr, "Not enough human slots\n");
+	fprintf(stderr, "Not enough person slots\n");
 	exit(-1);
     }
 

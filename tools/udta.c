@@ -12,12 +12,11 @@
 //
 //	udta.c	-	Converts udta section (old,not working for new version).
 //
-//	(c) Copyright 1998,2000 by Lutz Sammer
+//	(c) Copyright 1998,2000,2002 by Lutz Sammer
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -244,7 +243,7 @@ typedef struct _unit_type_  {
     int		BoxHeight;
     int		AttackRange;
     int		ReactRangeComputer;
-    int		ReactRangeHuman;
+    int		ReactRangePerson;
     int		Armor;
     int		Priority;
     int		BasicDamage;
@@ -1433,7 +1432,7 @@ void DumpUdtaAsScm(void)
 	printf("  %2d %2d %2d\t\t\t;;; Ranges\n"
 	    ,UnitTypes[i].AttackRange
 	    ,UnitTypes[i].ReactRangeComputer
-	    ,UnitTypes[i].ReactRangeHuman);
+	    ,UnitTypes[i].ReactRangePerson);
 
 	printf("  %d\t\t\t\t;;; Armor\n",UnitTypes[i].Armor);
 	printf("  %d\t\t\t\t;;; Priority\n",UnitTypes[i].Priority);
@@ -1658,7 +1657,7 @@ int main(int argc,char** argv)
     }
     for( i=0; i<110; ++i ) {		// React range
 	v=PudReadByte(stdin);
-	UnitTypes[i].ReactRangeHuman=v;
+	UnitTypes[i].ReactRangePerson=v;
     }
     for( i=0; i<110; ++i ) {		// Armor
 	v=PudReadByte(stdin);
@@ -1775,7 +1774,7 @@ if( 0 )
 	printf("\tBoxHeight\t%d\n",UnitTypes[i].BoxHeight);
     	printf("\tAttackRange\t%d\n",UnitTypes[i].AttackRange);
     	printf("\tReactRangeComputer\t%d\n",UnitTypes[i].ReactRangeComputer);
-    	printf("\tReactRangeHuman\t%d\n",UnitTypes[i].ReactRangeHuman);
+    	printf("\tReactRangePerson\t%d\n",UnitTypes[i].ReactRangePerson);
     	printf("\tArmor\t\t%d\n",UnitTypes[i].Armor);
     	printf("\tSelectableByRectangle\t%d\n",UnitTypes[i].SelectableByRectangle);
     	printf("\tPriority\t%d\n",UnitTypes[i].Priority);
@@ -1887,7 +1886,7 @@ if( 0 )
 	printf("\t,%2d,%2d,%2d"
 	    ,UnitTypes[i].AttackRange
 	    ,UnitTypes[i].ReactRangeComputer
-	    ,UnitTypes[i].ReactRangeHuman);
+	    ,UnitTypes[i].ReactRangePerson);
 
 	printf(",%2d,%3d,%2d,%d,%d,%d"
 	    ,UnitTypes[i].Armor
