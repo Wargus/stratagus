@@ -166,6 +166,52 @@ local void GameTypeFreeForAll(void)
     }
 }
 
+local void GameTypeTopVsBottom(void)
+{
+    int i;
+    int j;
+    int top;
+    int middle;
+
+    middle = TheMap.Height/2;
+    for (i=0; i<15; i++) {
+	top = Players[i].StartY <= middle;
+	for (j=0; j<15; j++) {
+	    if (i != j) {
+		if ((top && Players[j].StartY <= middle) ||
+		    (!top && Players[j].StartY > middle)) {
+		    SendCommandDiplomacy(i,DiplomacyAllied,j);
+		} else {
+		    SendCommandDiplomacy(i,DiplomacyEnemy,j);
+		}
+	    }
+	}
+    }
+}
+
+local void GameTypeLeftVsRight(void)
+{
+    int i;
+    int j;
+    int top;
+    int middle;
+
+    middle = TheMap.Width/2;
+    for (i=0; i<15; i++) {
+	top = Players[i].StartX <= middle;
+	for (j=0; j<15; j++) {
+	    if (i != j) {
+		if ((top && Players[j].StartX <= middle) ||
+		    (!top && Players[j].StartX > middle)) {
+		    SendCommandDiplomacy(i,DiplomacyAllied,j);
+		} else {
+		    SendCommandDiplomacy(i,DiplomacyEnemy,j);
+		}
+	    }
+	}
+    }
+}
+
 /**
 **	CreateGame.
 **
@@ -267,8 +313,10 @@ global void CreateGame(char* filename, WorldMap* map)
 	    case SettingsGameTypeTeamCaptureTheFlag:
 		break;
 	    case SettingsGameTypeTopVsBottom:
+		GameTypeTopVsBottom();
 		break;
 	    case SettingsGameTypeLeftVsRight:
+		GameTypeLeftVsRight();
 		break;
 	}
     }
