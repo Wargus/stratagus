@@ -60,10 +60,6 @@
 --	Declaration
 ----------------------------------------------------------------------------*/
 
-local enum _key_state_ {
-    KeyStateCommand = 0,	/// keys -> commands
-    KeyStateInput		/// keys -> line editor
-} KeyState;			/// current keyboard state
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -101,8 +97,10 @@ local void ShowInput(void)
     while( VideoTextLength(GameFont,input)>448 ) {
 	++input;
     }
+    KeyState=KeyStateCommand;
     ClearStatusLine();
     SetStatusLine(input);
+    KeyState=KeyStateInput;
 }
 
 /**
@@ -1093,21 +1091,21 @@ local int InputKey(int key)
 		    CclCommand(Input);
 		}
 	    } else if (NetworkFildes==-1) {
-//		if (!GameObserve) {
+		if (!GameObserve) {
 		    int ret;
 		    ret = HandleCheats(Input);
 		    if (ret) {
 			CommandLog("input", NoUnitP,FlushCommands,-1,-1,NoUnitP,Input,-1);
 		    }
-//		}
+		}
 	    }
 	    // FIXME: only to selected players ...
 	    sprintf(ChatMessage, "<%s> %s", ThisPlayer->Name, Input);
 	    NetworkChatMessage(ChatMessage);
-
+	    // FALL THROUGH
 	case '\033':
-	    ClearStatusLine();
 	    KeyState = KeyStateCommand;
+	    ClearStatusLine();
 	    return 1;
 	case '\b':
 	    DebugLevel3("Key <-\n");
