@@ -738,7 +738,7 @@ local int MixChannelsToStereo32(int* buffer,int size)
 		    buffer,size);
 	    Channels[channel].Point+=i;
 
-	    if( (unsigned)Channels[channel].Point>=Channels[channel].Sample->Length ) {
+	    if( Channels[channel].Point>=Channels[channel].Sample->Length ) {
 		// free channel as soon as possible (before playing)
 		// useful in multithreading
 		DebugLevel3("End playing request from %p\n" _C_
