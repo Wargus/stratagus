@@ -448,7 +448,7 @@ local SCM CclSetSharedVision(SCM player,SCM state,SCM opponent)
     int shared;
 
     base=gh_scm2int(player);
-    shared=gh_scm2int(state);
+    shared=gh_scm2bool(state);
     plynr=gh_scm2int(opponent);
 
     SendCommandSharedVision(base,shared,plynr);
