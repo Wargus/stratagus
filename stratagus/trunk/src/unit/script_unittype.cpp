@@ -55,13 +55,13 @@
 ----------------------------------------------------------------------------*/
 
 #ifdef DEBUG
-extern int NoWarningUnitType;               /// quiet ident lookup.
+extern int NoWarningUnitType;        ///< quiet ident lookup.
 #endif
 
-_AnimationsHash AnimationsHash;      /// Animations hash table
+_AnimationsHash AnimationsHash;      ///< Animations hash table
 
-char** BoolFlagName;                 /// Name of user defined flag
-int NumberBoolFlag;                  /// Number of defined flags.
+char** BoolFlagName;                 ///< Name of user defined flag
+int NumberBoolFlag;                  ///< Number of defined flags.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -598,8 +598,8 @@ static int CclDefineUnitType(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			//
-			//	Warning: can-cast-spell should only be used AFTER all spells
-			//	have been defined. FIXME: MaxSpellType=500 or something?
+			// Warning: can-cast-spell should only be used AFTER all spells
+			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
 			if (!type->CanCastSpell) {
 				type->CanCastSpell = malloc(SpellTypeCount);
@@ -658,8 +658,8 @@ static int CclDefineUnitType(lua_State* l)
 			}
 		} else if (!strcmp(value, "CanTargetFlag")) {
 			//
-			//	Warning: can-target-flag should only be used AFTER all bool flags
-			//	have been defined.
+			// Warning: can-target-flag should only be used AFTER all bool flags
+			// have been defined.
 			//
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -826,7 +826,7 @@ static int CclDefineUnitStats(lua_State* l)
 	stats = &type->Stats[i];
 
 	//
-	//		Parse the list:		(still everything could be changed!)
+	// Parse the list: (still everything could be changed!)
 	//
 	for (; j < args; ++j) {
 
@@ -1046,7 +1046,7 @@ static int CclDefineUnitTypeWcNames(lua_State* l)
 	int j;
 	char** cp;
 
-	if ((cp = UnitTypeWcNames)) {		// Free all old names
+	if ((cp = UnitTypeWcNames)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
 		}
@@ -1054,7 +1054,7 @@ static int CclDefineUnitTypeWcNames(lua_State* l)
 	}
 
 	//
-	//		Get new table.
+	// Get new table.
 	//
 	i = lua_gettop(l);
 	UnitTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
@@ -1140,7 +1140,7 @@ static int CclDefineAnimations(lua_State* l)
 			++t;
 			lua_pop(l, 1);
 		}
-		t[-1].Flags |= 0x80;				// Marks end of list
+		t[-1].Flags |= 0x80; // Marks end of list
 
 		if (!strcmp(id, "still")) {
 			if (anims->Still) {

@@ -31,7 +31,7 @@
 //@{
 
 /*----------------------------------------------------------------------------
-  --		Includes
+  -- Includes
   ----------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -62,36 +62,36 @@
 #include "editor.h"
 
 /*----------------------------------------------------------------------------
-  --		Variables
+  -- Variables
   ----------------------------------------------------------------------------*/
 
 #ifndef LimitSearch
-#define LimitSearch 1						/// Limit the search
+#define LimitSearch 1                     ///< Limit the search
 #endif
 
-Unit* UnitSlots[MAX_UNIT_SLOTS];		/// All possible units
-Unit** UnitSlotFree;				/// First free unit slot
-Unit* ReleasedHead;				/// List of released units.
-Unit* ReleasedTail;				/// List tail of released units.
+Unit* UnitSlots[MAX_UNIT_SLOTS];          ///< All possible units
+Unit** UnitSlotFree;                      ///< First free unit slot
+Unit* ReleasedHead;                       ///< List of released units.
+Unit* ReleasedTail;                       ///< List tail of released units.
 
-Unit* Units[MAX_UNIT_SLOTS];		/// Array of used slots
-int NumUnits;						/// Number of slots used
+Unit* Units[MAX_UNIT_SLOTS];              ///< Array of used slots
+int NumUnits;                             ///< Number of slots used
 
-int XpDamage;						/// Hit point regeneration for all units
-char EnableTrainingQueue;		/// Config: training queues enabled
-char EnableBuildingCapture;		/// Config: capture buildings enabled
-char RevealAttacker;				/// Config: reveal attacker enabled
+int XpDamage;                             ///< Hit point regeneration for all units
+char EnableTrainingQueue;                 ///< Config: training queues enabled
+char EnableBuildingCapture;               ///< Config: capture buildings enabled
+char RevealAttacker;                      ///< Config: reveal attacker enabled
 
-static unsigned long HelpMeLastCycle;		/// Last cycle HelpMe sound played
-static int HelpMeLastX;						/// Last X coordinate HelpMe sound played
-static int HelpMeLastY;						/// Last Y coordinate HelpMe sound played
+static unsigned long HelpMeLastCycle;     ///< Last cycle HelpMe sound played
+static int HelpMeLastX;                   ///< Last X coordinate HelpMe sound played
+static int HelpMeLastY;                   ///< Last Y coordinate HelpMe sound played
 
 /*----------------------------------------------------------------------------
-  --		Functions
-  ----------------------------------------------------------------------------*/
+-- Functions
+----------------------------------------------------------------------------*/
 
 /**
-**		Initial memory allocation for units.
+** Initial memory allocation for units.
 */
 void InitUnitsMemory(void)
 {
@@ -100,7 +100,7 @@ void InitUnitsMemory(void)
 	// Initialize the "list" of free unit slots
 
 	slot = UnitSlots + MAX_UNIT_SLOTS;
-	*--slot = NULL;						// leave last slot free as no marker
+	*--slot = NULL; // leave last slot free as no marker
 	*--slot = NULL;
 	do {
 		slot[-1] = (void*)slot;
@@ -113,17 +113,17 @@ void InitUnitsMemory(void)
 
 #if 0
 /**
-**		Free the memory for an unit slot. Update the global slot table.
-**		The memory should only be freed, if all references are dropped.
+** Free the memory for an unit slot. Update the global slot table.
+** The memory should only be freed, if all references are dropped.
 **
-**		@param unit		Pointer to unit.
+** @param unit Pointer to unit.
 */
 void FreeUnitMemory(Unit* unit)
 {
 	Unit** slot;
 
 	//
-	//		Remove from slot table
+	// Remove from slot table
 	//
 	slot = UnitSlots + unit->Slot;
 	Assert(*slot == unit);
@@ -134,9 +134,9 @@ void FreeUnitMemory(Unit* unit)
 #endif
 
 /**
-**		Increase an unit's reference count.
+** Increase an unit's reference count.
 **
-**		@param unit		The unit
+** @param unit The unit
 */
 void RefsIncrease(Unit* unit)
 {
@@ -147,9 +147,9 @@ void RefsIncrease(Unit* unit)
 }
 
 /**
-**		Decrease an unit's reference count.
+** Decrease an unit's reference count.
 **
-**		@param unit		The unit
+** @param unit The unit
 */
 void RefsDecrease(Unit* unit)
 {
@@ -167,30 +167,30 @@ void RefsDecrease(Unit* unit)
 }
 
 /**
-**		Release an unit.
+** Release an unit.
 **
-**		The unit is only released, if all references are dropped.
+** The unit is only released, if all references are dropped.
 **
-**		@param unit		Pointer to unit.
+** @param unit Pointer to unit.
 */
 void ReleaseUnit(Unit* unit)
 {
 	Unit* temp;
 
-	Assert(unit->Type);				// already free.
+	Assert(unit->Type); // already free.
 	Assert(unit->OrderCount == 1);
 	Assert(!unit->Orders[0].Goal);
 
 	//
-	//		First release, remove from lists/tables.
+	// First release, remove from lists/tables.
 	//
 	if (!unit->Destroyed) {
 		DebugPrint("First release %d\n" _C_ unit->Slot);
 
 		//
-		//		Are more references remaining?
+		// Are more references remaining?
 		//
-		unit->Destroyed = 1;				// mark as destroyed
+		unit->Destroyed = 1; // mark as destroyed
 
 		if (--unit->Refs > 0) {
 			return;
@@ -200,13 +200,13 @@ void ReleaseUnit(Unit* unit)
 	RefsAssert(!unit->Refs);
 
 	//
-	//		No more references remaining, but the network could have an order
-	//		on the way. We must wait a little time before we could free the
-	//		memory.
+	// No more references remaining, but the network could have an order
+	// on the way. We must wait a little time before we could free the
+	// memory.
 	//
 	UnitCacheRemove(unit);
 	//
-	//		Remove the unit from the global units table.
+	// Remove the unit from the global units table.
 	//
 	Assert(*unit->UnitSlot == unit);
 	temp = Units[--NumUnits];
@@ -222,8 +222,8 @@ void ReleaseUnit(Unit* unit)
 		ReleasedHead = ReleasedTail = unit;
 		unit->Next = 0;
 	}
-	unit->Refs = GameCycle + (NetworkMaxLag << 1);	// could be reuse after this time
-	unit->Type = 0; 						// for debugging.
+	unit->Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
+	unit->Type = 0;  // for debugging.
 	free(unit->CacheLinks);
 }
 
@@ -235,7 +235,7 @@ static Unit* AllocUnit(void)
 	Unit* unit;
 	Unit** slot;
 	//
-	//		Game unit limit reached.
+	// Game unit limit reached.
 	//
 	if (NumUnits >= UnitMax) {
 		DebugPrint("Over all unit limit (%d) reached.\n" _C_ UnitMax);
@@ -244,12 +244,12 @@ static Unit* AllocUnit(void)
 	}
 
 	//
-	//		Can use released unit?
+	// Can use released unit?
 	//
 	if (ReleasedHead && (unsigned)ReleasedHead->Refs < GameCycle) {
 		unit = ReleasedHead;
 		ReleasedHead = unit->Next;
-		if (ReleasedHead == 0) {		// last element
+		if (ReleasedHead == 0) { // last element
 			DebugPrint("Released unit queue emptied\n");
 			ReleasedTail = ReleasedHead = 0;
 		}
@@ -259,24 +259,24 @@ static Unit* AllocUnit(void)
 		// FIXME: can release here more slots, reducing memory needs.
 	} else {
 		//
-		//		Allocate structure
+		// Allocate structure
 		//
-		if (!(slot = UnitSlotFree)) {		// should not happen!
+		if (!(slot = UnitSlotFree)) { // should not happen!
 			DebugPrint("Maximum of units reached\n");
 			return NoUnitP;
 		}
 		UnitSlotFree = (void*)*slot;
 		*slot = unit = calloc(1, sizeof(*unit));
 	}
-	unit->Slot = slot - UnitSlots;				// back index
+	unit->Slot = slot - UnitSlots; // back index
 	return unit;
 }
 
 /**
-**		Initialize the unit slot with default values.
+** Initialize the unit slot with default values.
 **
-**		@param unit		Unit pointer (allocated zero filled)
-**		@param type		Unit-type
+** @param unit    Unit pointer (allocated zero filled)
+** @param type    Unit-type
 */
 void InitUnit(Unit* unit, UnitType* type)
 {
@@ -290,7 +290,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	//
 	//  Build all unit table
 	//
-	unit->UnitSlot = &Units[NumUnits];		// back pointer
+	unit->UnitSlot = &Units[NumUnits]; // back pointer
 	Units[NumUnits++] = unit;
 
 	//
@@ -303,7 +303,7 @@ void InitUnit(Unit* unit, UnitType* type)
 		unit->CacheLinks[i].Unit = unit;
 	}
 
-	unit->Seen.Frame = UnitNotSeen;				// Unit isn't yet seen
+	unit->Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
 	// On Load, Some units don't have Still animation, eg Deadbody
 	if (unit->Type->Animations->Still) {
@@ -313,7 +313,7 @@ void InitUnit(Unit* unit, UnitType* type)
 
 	if (!type->Building && type->Sprite &&
 			VideoGraphicFrames(type->Sprite) > 5) {
-		unit->Direction = (MyRand() >> 8) & 0xFF;		// random heading
+		unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(unit);
 	}
 
@@ -332,9 +332,9 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->Reset = 1;
 	unit->Removed = 1;
 
-	unit->Rs = MyRand() % 100;				// used for fancy buildings and others
+	unit->Rs = MyRand() % 100; // used for fancy buildings and others
 
-	unit->OrderCount = 1;				// No orders
+	unit->OrderCount = 1; // No orders
 	unit->Orders[0].Action = UnitActionStill;
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
 	Assert(!unit->Orders[0].Goal);
@@ -347,7 +347,7 @@ void InitUnit(Unit* unit, UnitType* type)
 }
 
 /**
-**		FIXME: Docu
+** FIXME: Docu
 */
 void AssignUnitToPlayer(Unit* unit, Player* player)
 {
@@ -356,7 +356,7 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	type = unit->Type;
 
 	//
-	//		Build player unit table
+	// Build player unit table
 	//
 	if (player && !type->Vanishes && unit->Orders[0].Action != UnitActionDie) {
 		unit->PlayerSlot = player->Units + player->TotalNumUnits++;
@@ -380,7 +380,7 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	}
 
 	if (type->Demand) {
-		player->Demand += type->Demand;		// food needed
+		player->Demand += type->Demand; // food needed
 	}
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
@@ -397,18 +397,18 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 }
 
 /**
-**		Create a new unit.
+** Create a new unit.
 **
-**		@param type		Pointer to unit-type.
-**		@param player		Pointer to owning player.
+** @param type      Pointer to unit-type.
+** @param player    Pointer to owning player.
 **
-**		@return				Pointer to created unit.
+** @return          Pointer to created unit.
 */
 Unit* MakeUnit(UnitType* type, Player* player)
 {
 	Unit* unit;
 
-	//Assert(player);				// Current code didn't support no player
+	//Assert(player); // Current code didn't support no player
 
 	unit = AllocUnit();
 	InitUnit(unit, type);
@@ -432,11 +432,11 @@ Unit* MakeUnit(UnitType* type, Player* player)
 }
 
 /**
-**		Place unit on map.
+** Place unit on map.
 **
-**		@param unit		Unit to be placed.
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
+** @param unit    Unit to be placed.
+** @param x       X map tile position.
+** @param y       Y map tile position.
 */
 void PlaceUnit(Unit* unit, int x, int y)
 {
@@ -454,7 +454,7 @@ void PlaceUnit(Unit* unit, int x, int y)
 	unit->Y = y;
 
 	//
-	//		Place unit on the map, mark the field with the FieldFlags.
+	// Place unit on the map, mark the field with the FieldFlags.
 	//
 	flags = type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
@@ -476,11 +476,11 @@ void PlaceUnit(Unit* unit, int x, int y)
 	y += unit->Type->TileHeight / 2;
 
 	//
-	//		Units under construction have no sight range.
+	// Units under construction have no sight range.
 	//
 	if (!unit->Constructed) {
 		//
-		//		Update fog of war, if unit belongs to player on this computer
+		// Update fog of war, if unit belongs to player on this computer
 		//
 		if (unit->Container && unit->Removed) {
 			MapUnmarkUnitOnBoardSight(unit, unit->Container);
@@ -503,14 +503,14 @@ void PlaceUnit(Unit* unit, int x, int y)
 }
 
 /**
-**		Create new unit and place on map.
+** Create new unit and place on map.
 **
-**		@param x		X map tile position.
-**		@param y		Y map tile position.
-**		@param type		Pointer to unit-type.
-**		@param player		Pointer to owning player.
+** @param x         X map tile position.
+** @param y         Y map tile position.
+** @param type      Pointer to unit-type.
+** @param player    Pointer to owning player.
 **
-**		@return				Pointer to created unit.
+** @return          Pointer to created unit.
 */
 Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 {
@@ -523,10 +523,10 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 }
 
 /**
-**		Add unit to a container. It only updates linked list stuff
+** Add unit to a container. It only updates linked list stuff
 **
-**		@param unit		Pointer to unit.
-**		@param host		Pointer to container.
+** @param unit    Pointer to unit.
+** @param host    Pointer to container.
 */
 void AddUnitInContainer(Unit* unit, Unit* host)
 {
@@ -548,9 +548,9 @@ void AddUnitInContainer(Unit* unit, Unit* host)
 }
 
 /**
-**		Remove unit from a container. It only updates linked list stuff
+** Remove unit from a container. It only updates linked list stuff
 **
-**		@param unit		Pointer to unit.
+** @param unit    Pointer to unit.
 */
 void RemoveUnitFromContainer(Unit* unit)
 {
@@ -578,14 +578,14 @@ void RemoveUnitFromContainer(Unit* unit)
 }
 
 /**
-**		Remove unit from map.
+** Remove unit from map.
 **
-**		Update selection.
-**		Update panels.
-**		Update map.
+** Update selection.
+** Update panels.
+** Update map.
 **
-**		@param unit		Pointer to unit.
-**		@param host		Pointer to housing unit.
+** @param unit    Pointer to unit.
+** @param host    Pointer to housing unit.
 */
 void RemoveUnit(Unit* unit, Unit* host)
 {
@@ -605,14 +605,14 @@ void RemoveUnit(Unit* unit, Unit* host)
 		AddUnitInContainer(unit, host);
 	}
 
-	if (unit->Removed) {				// could happen!
+	if (unit->Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
 		return;
 	}
 	unit->Removed = 1;
 	//  Remove unit from the current selection
 	if (unit->Selected) {
-		if (NumSelected == 1) {				//  Remove building cursor
+		if (NumSelected == 1) { //  Remove building cursor
 			CancelBuildingMode();
 		}
 		UnSelectUnit(unit);
@@ -631,7 +631,7 @@ void RemoveUnit(Unit* unit, Unit* host)
 	type = unit->Type;
 
 	//
-	//		Update map
+	// Update map
 	//
 	flags = ~type->FieldFlags;
 	for (h = type->TileHeight; h--;) {
@@ -642,7 +642,7 @@ void RemoveUnit(Unit* unit, Unit* host)
 
 #ifdef MAP_REGIONS
 	//
-	//		Update map splitting.
+	// Update map splitting.
 	//
 	if (type->Building &&
 			(type->FieldFlags &
@@ -664,7 +664,7 @@ void RemoveUnit(Unit* unit, Unit* host)
 /**
 **  Update information for lost units.
 **
-**  @param unit  Pointer to unit.
+**  @param unit    Pointer to unit.
 **
 **  @note Also called by ChangeUnitOwner
 */
@@ -820,15 +820,15 @@ void UpdateForNewUnit(const Unit* unit, int upgrade)
 	type = unit->Type;
 
 	//
-	//		Handle unit supply. (Currently only food supported.)
-	//				Note an upgraded unit can't give more supply.
+	// Handle unit supply. (Currently only food supported.)
+	// Note an upgraded unit can't give more supply.
 	//
 	if (type->Supply && !upgrade) {
 		player->Supply += type->Supply;
 	}
 
 	//
-	//		Update resources
+	// Update resources
 	//
 	for (u = 1; u < MaxCosts; ++u) {
 		if (player->Incomes[u] < unit->Type->ImproveIncomes[u]) {
@@ -874,11 +874,11 @@ void NearestOfUnit(const Unit* unit, int tx, int ty, int *dx, int *dy)
 **  Copy the unit look in Seen variables. This should be called when
 **  buildings go under fog of war for ThisPlayer.
 **
-**  @param unit  The unit to work on
+**  @param unit    The unit to work on
 */
 static void UnitFillSeenValues(Unit* unit)
 {
-	//	Seen values are undefined for visible units.
+	// Seen values are undefined for visible units.
 	unit->Seen.IY = unit->IY;
 	unit->Seen.IX = unit->IX;
 	unit->Seen.Frame = unit->Frame;
@@ -905,17 +905,17 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 			RefsIncrease(unit);
 		}
 		//
-		//	Icky yucky icky Seen.Destroyed trickery.
-		//	We track for each player if he's seen the unit as destroyed.
-		//	Remember, an unit is marked Destroyed when it's gone as in
-		//	completely gone, the corpses vanishes. In that case the unit
-		//	only survives since some players did NOT see the unit destroyed.
-		//	Keeping trackof that is hard, mostly due to complex shared vision
-		//	configurations.
-		//	A unit does NOT get a reference when it goes under fog if it's
-		//	Destroyed. Furthermore, it shouldn't lose a reference if it was
-		//	Seen destroyed. That only happend with complex shared vision, and
-		//	it's sort of the whole point of this tracking.
+		// Icky yucky icky Seen.Destroyed trickery.
+		// We track for each player if he's seen the unit as destroyed.
+		// Remember, an unit is marked Destroyed when it's gone as in
+		// completely gone, the corpses vanishes. In that case the unit
+		// only survives since some players did NOT see the unit destroyed.
+		// Keeping trackof that is hard, mostly due to complex shared vision
+		// configurations.
+		// A unit does NOT get a reference when it goes under fog if it's
+		// Destroyed. Furthermore, it shouldn't lose a reference if it was
+		// Seen destroyed. That only happend with complex shared vision, and
+		// it's sort of the whole point of this tracking.
 		//
 		if (unit->Destroyed) {
 			unit->Seen.Destroyed |= (1 << player->Player);
@@ -932,12 +932,12 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 **  @param unit    The unit that goes out of fog.
 **  @param player  The player the unit goes out of fog for.
 **
-**	@note For units that are visible under fog (mostly buildings)
-**	we use reference counts, from the players that know about
-**	the building. When an building goes under fog it gets a refs
-**	increase, and when it shows up it gets a decrease. It must
-**	not get an decrease the first time it's seen, so we have to
-**	keep track of what player saw what units, with SeenByPlayer.
+** @note For units that are visible under fog (mostly buildings)
+** we use reference counts, from the players that know about
+** the building. When an building goes under fog it gets a refs
+** increase, and when it shows up it gets a decrease. It must
+** not get an decrease the first time it's seen, so we have to
+** keep track of what player saw what units, with SeenByPlayer.
 */
 void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
@@ -991,12 +991,12 @@ void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 }
 
 /**
-**	This function unmarks units on x, y as seen. It uses a reference count.
+** This function unmarks units on x, y as seen. It uses a reference count.
 **
-**	@param player	The player to mark for.
-**	@param x        x location to check if building is on, and mark as seen
-**	@param y        y location to check if building is on, and mark as seen
-**	@param cloak	If this is for cloaked units.
+** @param player    The player to mark for.
+** @param x         x location to check if building is on, and mark as seen
+** @param y         y location to check if building is on, and mark as seen
+** @param cloak     If this is for cloaked units.
 */
 void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 {
@@ -1039,11 +1039,11 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 }
 
 /**
-**	Recalculates an units visiblity count. This happens really often,
-**	Like every time an unit moves. It's really fast though, since we
-**	have per-tile counts.
+** Recalculates an units visiblity count. This happens really often,
+** Like every time an unit moves. It's really fast though, since we
+** have per-tile counts.
 **
-**	@param unit	pointer to the unit to check if seen
+** @param unit    pointer to the unit to check if seen
 */
 void UnitCountSeen(Unit* unit)
 {
@@ -1055,13 +1055,13 @@ void UnitCountSeen(Unit* unit)
 
 	Assert(unit->Type);
 
-	//	FIXME: optimize, only work on certain players?
-	//	This is for instance good for updating shared vision...
+	// FIXME: optimize, only work on certain players?
+	// This is for instance good for updating shared vision...
 
 	//
-	//  Store old values in oldv[p]. This store if the player could see the 
+	//  Store old values in oldv[p]. This store if the player could see the
 	//  unit before this calc.
-	// 
+	//
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
 			oldv[p] = UnitVisible(unit, &Players[p]);
@@ -1091,8 +1091,8 @@ void UnitCountSeen(Unit* unit)
 	}
 
 	//
-	//	Now here comes the tricky part. We have to go in and out of fog
-	//	for players. Hopefully this works with shared vision just great.
+	// Now here comes the tricky part. We have to go in and out of fog
+	// for players. Hopefully this works with shared vision just great.
 	//
 	for (p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody) {
@@ -1110,9 +1110,9 @@ void UnitCountSeen(Unit* unit)
 /**
 **  Returns true, if the unit is visible. It check the Viscount of
 **  the player and everyone who shares vision with him.
-**  FIXME: optimize this a lot.
+**  @todo FIXME: optimize this a lot.
 **
-**  @note	This understands shared vision, and should be used all around.
+**  @note This understands shared vision, and should be used all around.
 **
 **  @param unit    The unit to check.
 **  @param player  The player to check.
@@ -1122,7 +1122,7 @@ int UnitVisible(const Unit* unit, const Player* player)
 	int p;
 	int cp;
 
-	//	Current player.
+	// Current player.
 	cp = player->Player;
 	if (unit->VisCount[cp]) {
 		return 1;
@@ -1149,7 +1149,7 @@ int UnitVisible(const Unit* unit, const Player* player)
 int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 {
 	//
-	//	Invisibility
+	// Invisibility
 	//
 	if (unit->Invisible && (player != unit->Player) &&
 			(!PlayersShareVision(player->Player, unit->Player->Player))) {
@@ -1178,7 +1178,7 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 int UnitVisibleOnMap(const Unit* unit, const Player* player)
 {
 	//
-	//	Invisible units.
+	// Invisible units.
 	//
 	if (unit->Invisible && player != unit->Player &&
 			!PlayersShareVision(player->Player, unit->Player->Player)) {
@@ -1193,30 +1193,30 @@ int UnitVisibleOnMap(const Unit* unit, const Player* player)
 **  Returns true, if unit is shown on minimap.
 **
 **  @warning This is for ::ThisPlayer only.
-**  @todo	radar support
+**  @todo radar support
 **
 **  @param unit  Unit to be checked.
 **
-**  @return      True if wisible, false otherwise.
+**  @return      True if visible, false otherwise.
 */
 int UnitVisibleOnMinimap(const Unit* unit)
 {
 	//
-	//	Invisible units.
+	// Invisible units.
 	//
 	if (unit->Invisible && (ThisPlayer != unit->Player) &&
 			(!PlayersShareVision(ThisPlayer->Player, unit->Player->Player))) {
 		return 0;
 	}
 	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
-		return  (!unit->Removed) &&
+		return (!unit->Removed) &&
 				(!unit->Destroyed) &&
 				(unit->Orders->Action != UnitActionDie);
 	} else {
 		if (!unit->Type->VisibleUnderFog) {
 			return 0;
 		}
-		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Player)) && 
+		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Player)) &&
 			unit->Seen.State != 3 &&
 			!(unit->Seen.Destroyed & (1 << ThisPlayer->Player)));
 	}
@@ -1235,7 +1235,7 @@ int UnitVisibleOnMinimap(const Unit* unit)
 int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 {
 	//
-	//	Check if it's at least inside the damn viewport.
+	// Check if it's at least inside the damn viewport.
 	//
 	if ((unit->X + unit->Type->TileWidth < vp->MapX) ||
 			(unit->X > vp->MapX + vp->MapWidth) ||
@@ -1246,13 +1246,13 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 
 	if (!ThisPlayer) {
 		//FIXME: ARI: Added here for early game setup state by
-		//		MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
-		//		so don't show anything until first real map-draw.
+		// MakeAndPlaceUnit() from LoadMap(). ThisPlayer not yet set,
+		// so don't show anything until first real map-draw.
 		DebugPrint("Fix ME ThisPlayer not set yet?!\n");
 		return 0;
 	}
 
-	//	Those are never ever visible.
+	// Those are never ever visible.
 	if (unit->Invisible && ThisPlayer != unit->Player &&
 			!PlayersShareVision(ThisPlayer->Player, unit->Player->Player)) {
 		return 0;
@@ -1261,8 +1261,8 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
 		return !unit->Destroyed;
 	} else {
-		//	Unit has to be 'discovered'
-		//	Destroyed units ARE visible under fog of war, if we haven't seen them like that.
+		// Unit has to be 'discovered'
+		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
 		if (!unit->Destroyed || !(unit->Seen.Destroyed & (1 << ThisPlayer->Player))) {
 			return (unit->Type->VisibleUnderFog && (unit->Seen.ByPlayer & (1 << ThisPlayer->Player)));
 		} else {
@@ -1293,7 +1293,7 @@ int UnitVisibleOnScreen(const Unit* unit)
 /**
 **  Get area of map tiles covered by unit, including its displacement.
 **
-**  @param unit	 Unit to be checked and set.
+**  @param unit  Unit to be checked and set.
 **  @param sx    Out: Top left X tile map postion.
 **  @param sy    Out: Top left Y tile map postion.
 **  @param ex    Out: Bottom right X tile map postion.
@@ -1387,8 +1387,8 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 /**
 **  Change the owner of all units of a player.
 **
-**  @param oldplayer  Old owning player.
-**  @param newplayer  New owning player.
+**  @param oldplayer    Old owning player.
+**  @param newplayer    New owning player.
 */
 static void ChangePlayerOwner(Player* oldplayer, Player* newplayer)
 {
@@ -1536,16 +1536,16 @@ int DirectionToHeading(int delta_x, int delta_y)
 	//  Check which quadrant.
 	//
 	if (delta_x > 0) {
-		if (delta_y < 0) {		// Quadrant 1?
+		if (delta_y < 0) { // Quadrant 1?
 			return myatan((delta_x * 64) / -delta_y);
 		}
 		// Quadrant 2?
 		return myatan((delta_y * 64) / delta_x) + 64;
 	}
-	if (delta_y>0) {				// Quadrant 3?
+	if (delta_y>0) { // Quadrant 3?
 		return myatan((delta_x * -64) / delta_y) + 64 * 2;
 	}
-	if (delta_x) {				// Quadrant 4.
+	if (delta_x) { // Quadrant 4.
 		return myatan((delta_y * -64) / -delta_x) + 64 * 3;
 	}
 	return 0;
@@ -1572,7 +1572,7 @@ void UnitUpdateHeading(Unit* unit)
 
 	nextdir = 256 / unit->Type->NumDirections;
 	dir = ((unit->Direction + nextdir / 2) & 0xFF) / nextdir;
-	if (dir <= LookingS / nextdir) {		// north->east->south
+	if (dir <= LookingS / nextdir) { // north->east->south
 		unit->Frame += dir;
 	} else {
 		unit->Frame += 256 / nextdir - dir;
@@ -1597,16 +1597,16 @@ void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
 }
 
 /*----------------------------------------------------------------------------
-  --		Drop out units
+  -- Drop out units
   ----------------------------------------------------------------------------*/
 
 /**
-**		Reappear unit on map.
+** Reappear unit on map.
 **
-**		@param unit		Unit to drop out.
-**		@param heading		Direction in which the unit should appear.
-**		@param addx		Tile size in x.
-**		@param addy		Tile size in y.
+** @param unit       Unit to drop out.
+** @param heading    Direction in which the unit should appear.
+** @param addx       Tile size in x.
+** @param addy       Tile size in y.
 */
 void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 {
@@ -1677,19 +1677,19 @@ startn:
 	}
 
 found:
-	unit->Wait = 1;				// should be correct unit has still action
+	unit->Wait = 1; // should be correct unit has still action
 
 	PlaceUnit(unit, x, y);
 }
 
 /**
-**		Reappear unit on map nearest to x, y.
+** Reappear unit on map nearest to x, y.
 **
-**		@param unit		Unit to drop out.
-**		@param gx		Goal X map tile position.
-**		@param gy		Goal Y map tile position.
-**		@param addx		Tile size in x.
-**		@param addy		Tile size in y.
+** @param unit    Unit to drop out.
+** @param gx      Goal X map tile position.
+** @param gy      Goal Y map tile position.
+** @param addx    Tile size in x.
+** @param addy    Tile size in y.
 */
 void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 {
@@ -1718,13 +1718,13 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 
 	bestd = 99999;
 #ifdef DEBUG
-	bestx = besty = 0;				// keep the compiler happy
+	bestx = besty = 0; // keep the compiler happy
 #endif
 
 	// FIXME: if we reach the map borders we can go fast up, left, ...
 	--x;
 	for (;;) {
-		for (i = addy; i--; ++y) {		// go down
+		for (i = addy; i--; ++y) { // go down
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
@@ -1735,7 +1735,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		++addx;
-		for (i = addx; i--; ++x) {		// go right
+		for (i = addx; i--; ++x) { // go right
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
@@ -1746,7 +1746,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		++addy;
-		for (i = addy; i--; --y) {		// go up
+		for (i = addy; i--; --y) { // go up
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
@@ -1757,7 +1757,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		++addx;
-		for (i = addx; i--; --x) {		// go left
+		for (i = addx; i--; --x) { // go left
 			if (CheckedCanMoveToMask(x, y, mask)) {
 				n = MapDistance(gx, gy, x, y);
 				if (n < bestd) {
@@ -1768,7 +1768,7 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 			}
 		}
 		if (bestd != 99999) {
-			unit->Wait = 1;				// unit should have action still
+			unit->Wait = 1; // unit should have action still
 			PlaceUnit(unit, bestx, besty);
 			return;
 		}
@@ -1777,9 +1777,9 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 }
 
 /**
-**		Drop out all units inside unit.
+** Drop out all units inside unit.
 **
-**		@param source		All units inside source are dropped out.
+** @param source    All units inside source are dropped out.
 */
 void DropOutAll(const Unit* source)
 {
@@ -1971,21 +1971,21 @@ int CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int r
 	}
 
 	//
-	//		We can build here: check distance to gold mine/oil patch!
+	// We can build here: check distance to gold mine/oil patch!
 	//
 	return CanBuildHere(unit, type, x, y);
 }
 
 /*----------------------------------------------------------------------------
-  --		Finding units
+  -- Finding units
   ----------------------------------------------------------------------------*/
 
 /**
-**		Find the closest piece of wood for an unit.
+** Find the closest piece of wood for an unit.
 **
-**		@param unit		The unit.
-**		@param x		OUT: Map X position of tile.
-**		@param y		OUT: Map Y position of tile.
+** @param unit    The unit.
+** @param x       OUT: Map X position of tile.
+** @param y       OUT: Map Y position of tile.
 */
 int FindWoodInSight(const Unit* unit, int* x, int* y)
 {
@@ -1994,27 +1994,27 @@ int FindWoodInSight(const Unit* unit, int* x, int* y)
 }
 
 /**
-**		Find the closest piece of terrain with the given flags.
+** Find the closest piece of terrain with the given flags.
 **
-**		@param movemask		The movement mask to reach that location.
-**		@param resmask		Result tile mask.
-**		@param rvresult Return a tile that doesn't match.
-**		@param range		Maximum distance for the search.
-**		@param player		Only search fields explored by player
-**		@param x		Map X start position for the search.
-**		@param y		Map Y start position for the search.
+** @param movemask    The movement mask to reach that location.
+** @param resmask     Result tile mask.
+** @param rvresult    Return a tile that doesn't match.
+** @param range       Maximum distance for the search.
+** @param player      Only search fields explored by player
+** @param x           Map X start position for the search.
+** @param y           Map Y start position for the search.
 **
-**		@param px		OUT: Map X position of tile.
-**		@param py		OUT: Map Y position of tile.
+** @param px          OUT: Map X position of tile.
+** @param py          OUT: Map Y position of tile.
 **
-**		@note				Movement mask can be 0xFFFFFFFF to have no effect
-**						Range is not circular, but square.
-**						Player is ignored if nil(search the entire map)
-**						Use rvresult if you search for a til;e that doesn't
-**						match resmask. Like for a tile where an unit can go
-**						with it's movement mask.
+** @note Movement mask can be 0xFFFFFFFF to have no effect
+** Range is not circular, but square.
+** Player is ignored if nil(search the entire map)
+** Use rvresult if you search for a til;e that doesn't
+** match resmask. Like for a tile where an unit can go
+** with it's movement mask.
 **
-**		@return				True if wood was found.
+** @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	const Player* player, int x, int y, int* px, int* py)
@@ -2045,25 +2045,25 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
-	//		Make movement matrix. FIXME: can create smaller matrix.
+	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = TheMap.Width + 2;
 	matrix += w + w + 2;
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	matrix[x + y * w] = 1;				// mark start point
-	ep = wp = 1;						// start with one point
-	cdist = 0;								// current distance is 0
+	matrix[x + y * w] = 1; // mark start point
+	ep = wp = 1; // start with one point
+	cdist = 0; // current distance is 0
 
 	//
-	//		Pop a point from stack, push all neighbors which could be entered.
+	// Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) {				// mark all neighbors
+			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				//  Make sure we don't leave the map.
@@ -2075,18 +2075,18 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 				if (*m || (player && !IsMapFieldExplored(player, x, y))) {
 					continue;
 				}
-				//		Look if found what was required.
+				// Look if found what was required.
 				if (rvresult ? CanMoveToMask(x, y, resmask) : !CanMoveToMask(x, y, resmask)) {
 					*px = x;
 					*py = y;
 					free(points);
 					return 1;
 				}
-				if (CanMoveToMask(x, y, movemask)) {		// reachable
+				if (CanMoveToMask(x, y, movemask)) { // reachable
 					*m = 1;
-					points[wp].X = x;				// push the point
+					points[wp].X = x; // push the point
 					points[wp].Y = y;
-					if (++wp >= size) {				// round about
+					if (++wp >= size) { // round about
 						wp = 0;
 					}
 					if (wp == ep) {
@@ -2094,19 +2094,19 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 						DebugPrint("Ran out of points the hard way, beware.\n");
 						break;
 					}
-				} else {						// unreachable
+				} else { // unreachable
 					*m = 99;
 				}
 			}
-			if (++rp >= size) {						// round about
+			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
 		++cdist;
-		if (rp == wp || cdist >= range) {		// unreachable, no more points available
+		if (rp == wp || cdist >= range) { // unreachable, no more points available
 			break;
 		}
-		//		Continue with next set.
+		// Continue with next set.
 		ep = wp;
 	}
 	free(points);
@@ -2114,18 +2114,18 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 }
 
 /**
-**		Find Resource.
+** Find Resource.
 **
-**		@param unit		The unit that wants to find a resource.
-**		@param x		Closest to x
-**		@param y		Closest to y
-**		@param range	Maximum distance to the resource.
-**		@param resource The resource id.
+** @param unit        The unit that wants to find a resource.
+** @param x           Closest to x
+** @param y           Closest to y
+** @param range       Maximum distance to the resource.
+** @param resource    The resource id.
 **
-**		@note				This will return an usable resource building that
-**						belongs to "player" or is neutral.
+** @note This will return an usable resource building that
+** belongs to "player" or is neutral.
 **
-**		@return				NoUnitP or resource unit
+** @return            NoUnitP or resource unit
 */
 Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 {
@@ -2161,12 +2161,12 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
-	//		Find the nearest gold depot
+	// Find the nearest gold depot
 	if ((destu = FindDeposit(unit, x, y,range,resource))) {
 		NearestOfUnit(destu, x, y, &destx, &desty);
 	}
 	bestd = 99999;
-	//		Make movement matrix. FIXME: can create smaller matrix.
+	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = TheMap.Width + 2;
 	matrix += w + w + 2;
@@ -2178,23 +2178,23 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	matrix[x + y * w] = 1;				// mark start point
-	ep = wp = 1;						// start with one point
-	cdist = 0;								// current distance is 0
+	matrix[x + y * w] = 1; // mark start point
+	ep = wp = 1; // start with one point
+	cdist = 0; // current distance is 0
 	bestmine = NoUnitP;
 
 	//
-	//		Pop a point from stack, push all neighbors which could be entered.
+	// Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) {				// mark all neighbors
+			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				m = matrix + x + y * w;
-				if (*m) {						// already checked
+				if (*m) { // already checked
 					continue;
 				}
 
@@ -2203,7 +2203,7 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 				}
 
 				//
-				//		Look if there is a mine
+				// Look if there is a mine
 				//
 				if ((mine = ResourceOnMap(x, y, resource)) &&
 						mine->Type->CanHarvest &&
@@ -2217,41 +2217,41 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 							bestmine = mine;
 						}
 						*m = 99;
-					} else {						// no goal take the first
+					} else { // no goal take the first
 						free(points);
 						return mine;
 					}
 				}
 
-				if (CanMoveToMask(x, y, mask)) {		// reachable
+				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x;				// push the point
+					points[wp].X = x; // push the point
 					points[wp].Y = y;
-					if (++wp >= size) {				// round about
+					if (++wp >= size) { // round about
 						wp = 0;
 					}
 					if (wp == ep) {
 						//  We are out of points, give up!
 						break;
 					}
-				} else {						// unreachable
+				} else { // unreachable
 					*m = 99;
 				}
 			}
-			if (++rp >= size) {						// round about
+			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
-		//		Take best of this frame, if any.
+		// Take best of this frame, if any.
 		if (bestd != 99999) {
 			free(points);
 			return bestmine;
 		}
 		++cdist;
-		if (rp == wp || cdist >= range) {		// unreachable, no more points available
+		if (rp == wp || cdist >= range) { // unreachable, no more points available
 			break;
 		}
-		//		Continue with next set.
+		// Continue with next set.
 		ep = wp;
 	}
 	free(points);
@@ -2259,17 +2259,17 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 }
 
 /**
-**		Find deposit. This will find a deposit for a resource
+** Find deposit. This will find a deposit for a resource
 **
-**		@param unit		The unit that wants to find a resource.
-**		@param x		Closest to x
-**		@param y		Closest to y
-**		@param range	Maximum distance to the deposit.
-**		@param resource		Resource to find deposit from.
+** @param unit        The unit that wants to find a resource.
+** @param x           Closest to x
+** @param y           Closest to y
+** @param range       Maximum distance to the deposit.
+** @param resource    Resource to find deposit from.
 **
-**		@note				This will return a reachable allied depot.
+** @note This will return a reachable allied depot.
 **
-**		@return				NoUnitP or deposit unit
+** @return            NoUnitP or deposit unit
 */
 Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 {
@@ -2304,7 +2304,7 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 		TheMap.Width * TheMap.Height / 4 : range * range * 5;
 	points = malloc(size * sizeof(*points));
 
-	//		Make movement matrix. FIXME: can create smaller matrix.
+	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
 	w = TheMap.Width + 2;
 	matrix += w + w + 2;
@@ -2316,18 +2316,18 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 	points[0].X = x;
 	points[0].Y = y;
 	rp = 0;
-	matrix[x + y * w] = 1;				// mark start point
-	ep = wp = 1;						// start with one point
-	cdist = 0;								// current distance is 0
+	matrix[x + y * w] = 1; // mark start point
+	ep = wp = 1; // start with one point
+	cdist = 0; // current distance is 0
 
 	//
-	//		Pop a point from stack, push all neighbors which could be entered.
+	// Pop a point from stack, push all neighbors which could be entered.
 	//
 	for (;;) {
 		while (rp != ep) {
 			rx = points[rp].X;
 			ry = points[rp].Y;
-			for (i = 0; i < 8; ++i) {				// mark all neighbors
+			for (i = 0; i < 8; ++i) { // mark all neighbors
 				x = rx + xoffset[i];
 				y = ry + yoffset[i];
 				++nodes_searched;
@@ -2341,7 +2341,7 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 					continue;
 				}
 				//
-				//		Look if there is a deposit
+				// Look if there is a deposit
 				//
 				if ((depot = ResourceDepositOnMap(x, y, resource)) &&
 						((IsAllied(unit->Player, depot)) ||
@@ -2349,11 +2349,11 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 					free(points);
 					return depot;
 				}
-				if (CanMoveToMask(x, y, mask)) {		// reachable
+				if (CanMoveToMask(x, y, mask)) { // reachable
 					*m = 1;
-					points[wp].X = x;				// push the point
+					points[wp].X = x; // push the point
 					points[wp].Y = y;
-					if (++wp >= size) {				// round about
+					if (++wp >= size) { // round about
 						wp = 0;
 					}
 					if (wp == ep) {
@@ -2361,19 +2361,19 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 						DebugPrint("Ran out of points the hard way, beware.\n");
 						break;
 					}
-				} else {						// unreachable
+				} else { // unreachable
 					*m = 99;
 				}
 			}
-			if (++rp >= size) {						// round about
+			if (++rp >= size) { // round about
 				rp = 0;
 			}
 		}
 		++cdist;
-		if (rp == wp || cdist >= range) {		// unreachable, no more points available
+		if (rp == wp || cdist >= range) { // unreachable, no more points available
 			break;
 		}
-		//		Continue with next set.
+		// Continue with next set.
 		ep = wp;
 	}
 	free(points);
@@ -2381,12 +2381,12 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 }
 
 /**
-**		Find the next idle worker
+** Find the next idle worker
 **
-**		@param player		Player's units to search through
-**		@param last		Previous idle worker selected
+** @param player    Player's units to search through
+** @param last      Previous idle worker selected
 **
-**		@return				NoUnitP or next idle worker
+** @return NoUnitP or next idle worker
 */
 Unit* FindIdleWorker(const Player* player, const Unit* last)
 {
@@ -2432,7 +2432,7 @@ Unit* FindIdleWorker(const Player* player, const Unit* last)
 }
 
 /*----------------------------------------------------------------------------
-  --		Select units
+  -- Select units
   ----------------------------------------------------------------------------*/
 
 /**
@@ -2445,7 +2445,7 @@ Unit* FindIdleWorker(const Player* player, const Unit* last)
 **    Cycle through units. ounit is the old one.
 **    First take highest unit.
 **
-**  FIXME: If no unit, we could select near units?
+**  @todo FIXME: If no unit, we could select near units?
 **
 **  @param ounit  Old selected unit.
 **  @param x      X pixel position.
@@ -2458,16 +2458,16 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 	Unit** table;
 	Unit* unit;
 	Unit* nunit;
-	Unit* funit;						// first possible unit
+	Unit* funit; // first possible unit
 	UnitType* type;
-	int flag;								// flag take next unit
+	int flag; // flag take next unit
 	int gx;
 	int gy;
 
 	funit = NULL;
 	nunit = NULL;
 	flag = 0;
-	if (!ounit) {						// no old on this position
+	if (!ounit) { // no old on this position
 		flag = 1;
 	}
 	for (table = Units; table < Units + NumUnits; ++table) {
@@ -2478,7 +2478,7 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 		type = unit->Type;
 
 		//
-		//		Check if mouse is over the unit.
+		// Check if mouse is over the unit.
 		//
 		gx = unit->X * TileSizeX + unit->IX;
 		if (x + (type->BoxWidth - type->TileWidth * TileSizeX) / 2 < gx) {
@@ -2497,7 +2497,7 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 		}
 
 		//
-		//		This could be taken.
+		// This could be taken.
 		//
 		if (flag) {
 			return unit;
@@ -2517,9 +2517,9 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 }
 
 /**
-**		Let an unit die.
+** Let an unit die.
 **
-**		@param unit		Unit to be destroyed.
+** @param unit    Unit to be destroyed.
 */
 void LetUnitDie(Unit* unit)
 {
@@ -2531,7 +2531,7 @@ void LetUnitDie(Unit* unit)
 
 	type = unit->Type;
 
-	//		removed units,  just remove.
+	// removed units,  just remove.
 	if (unit->Removed) {
 		DebugPrint("Killing a removed unit?\n");
 		RemoveUnit(unit, NULL);
@@ -2544,7 +2544,7 @@ void LetUnitDie(Unit* unit)
 	PlayUnitSound(unit, VoiceDying);
 
 	//
-	//		Catapults,... explodes.
+	// Catapults,... explodes.
 	//
 	if (type->ExplodeWhenKilled) {
 		MakeMissile(type->Explosion.Missile,
@@ -2564,16 +2564,16 @@ void LetUnitDie(Unit* unit)
 	}
 
 	//
-	//		Building,...
+	// Building,...
 	//
 	if (type->Building) {
 		//
-		//		Building with units inside?
+		// Building with units inside?
 		//
 		//
-		//		During resource build, the worker holds the resource amount,
-		//		but if canceling building the platform, the worker is already
-		//		outside.
+		// During resource build, the worker holds the resource amount,
+		// but if canceling building the platform, the worker is already
+		// outside.
 		if (type->GivesResource &&
 				unit->Orders[0].Action == UnitActionBuilded &&
 				unit->Data.Builded.Worker) {
@@ -2634,7 +2634,7 @@ void LetUnitDie(Unit* unit)
 	UnitClearOrders(unit);
 
 	//
-	//		Unit has death animation.
+	// Unit has death animation.
 	//
 
 	// Not good: UnitUpdateHeading(unit);
@@ -2654,7 +2654,7 @@ void LetUnitDie(Unit* unit)
 }
 
 /**
-**		Destroy all units inside unit.
+** Destroy all units inside unit.
 */
 void DestroyAllInside(Unit* source)
 {
@@ -2673,15 +2673,15 @@ void DestroyAllInside(Unit* source)
 
 
 /*----------------------------------------------------------------------------
-  --		Unit AI
+  -- Unit AI
   ----------------------------------------------------------------------------*/
 
 /**
-**		Unit is hit by missile or other damage.
+** Unit is hit by missile or other damage.
 **
-**		@param attacker		Unit that attacks.
-**		@param target		Unit that is hit.
-**		@param damage		How many damage to take.
+** @param attacker    Unit that attacks.
+** @param target      Unit that is hit.
+** @param damage      How many damage to take.
 */
 void HitUnit(Unit* attacker, Unit* target, int damage)
 {
@@ -2689,7 +2689,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	Unit* goal;
 	unsigned long lastattack;
 
-	if (!damage) {						// Can now happen by splash damage
+	if (!damage) { // Can now happen by splash damage
 #ifdef DEBUG
 		if (!GodMode) {
 			DebugPrint("Warning no damage, try to fix by caller?\n");
@@ -2731,8 +2731,8 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 			// FIXME: Problem with load+save.
 
 			//
-			//		One help cry each 2 second is enough
-			//		If on same area ignore it for 2 minutes.
+			// One help cry each 2 second is enough
+			// If on same area ignore it for 2 minutes.
 			//
 			if (HelpMeLastCycle < GameCycle) {
 				if (!HelpMeLastCycle ||
@@ -2755,7 +2755,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		}
 	}
 
-	if (target->HP <= damage) {		// unit is killed or destroyed
+	if (target->HP <= damage) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
 		if (attacker && IsEnemy(target->Player, attacker)) {
@@ -2789,7 +2789,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 			IsEnemy(attacker->Player, target) &&
 			attacker->Type->RepairRange) {
 		ChangeUnitOwner(target, attacker->Player);
-		CommandStopUnit(attacker);		// Attacker shouldn't continue attack!
+		CommandStopUnit(attacker); // Attacker shouldn't continue attack!
 	}
 
 	if ((UnitVisibleOnMap(target, ThisPlayer) || ReplayRevealMap) && DamageMissile) {
@@ -2834,14 +2834,14 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 
 	//
-	//		Unit is working?
+	// Unit is working?
 	//
 	if (target->Orders[0].Action != UnitActionStill) {
 		return;
 	}
 
 	//
-	//		Attack units in range (which or the attacker?)
+	// Attack units in range (which or the attacker?)
 	//
 	if (attacker && !type->Coward) {
 		if (type->CanAttack && target->Stats->Speed) {
@@ -2865,7 +2865,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 
 	//
-	//		FIXME: Can't attack run away.
+	// FIXME: Can't attack run away.
 	//
 	if (!type->Building) {
 		int x;
@@ -2902,12 +2902,12 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 /**
 **  Returns the map distance between two points.
 **
-**  @param x1  X map tile position.
-**  @param y1  Y map tile position.
-**  @param x2  X map tile position.
-**  @param y2  Y map tile position.
+**  @param x1    X map tile position.
+**  @param y1    Y map tile position.
+**  @param x2    X map tile position.
+**  @param y2    Y map tile position.
 **
-**  @return    The distance between in tiles.
+**  @return      The distance between in tiles.
 */
 int MapDistance(int x1, int y1, int x2, int y2)
 {
@@ -2917,13 +2917,13 @@ int MapDistance(int x1, int y1, int x2, int y2)
 /**
 **  Returns the map distance between two points with unit type.
 **
-**  @param x1    X map tile position.
-**  @param y1    Y map tile position.
-**  @param type  Unit type to take into account.
-**  @param x2    X map tile position.
-**  @param y2    Y map tile position.
+**  @param x1      X map tile position.
+**  @param y1      Y map tile position.
+**  @param type    Unit type to take into account.
+**  @param x2      X map tile position.
+**  @param y2      Y map tile position.
 **
-**  @return      The distance between in tiles.
+**  @return        The distance between in tiles.
 */
 int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
 {
@@ -2954,11 +2954,11 @@ int MapDistanceToType(int x1, int y1, const UnitType* type, int x2, int y2)
 /**
 **  Returns the map distance to unit.
 **
-**  @param x     X map tile position.
-**  @param y     Y map tile position.
-**  @param dest  Distance to this unit.
+**  @param x       X map tile position.
+**  @param y       Y map tile position.
+**  @param dest    Distance to this unit.
 **
-**  @return      The distance between in tiles.
+**  @return        The distance between in tiles.
 */
 int MapDistanceToUnit(int x, int y, const Unit* dest)
 {
@@ -2968,10 +2968,10 @@ int MapDistanceToUnit(int x, int y, const Unit* dest)
 /**
 **  Returns the map distance between two units.
 **
-**  @param src  Distance from this unit.
-**  @param dst  Distance  to  this unit.
+**  @param src    Distance from this unit.
+**  @param dst    Distance  to  this unit.
 **
-**  @return     The distance between in tiles.
+**  @return       The distance between in tiles.
 */
 int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 {
@@ -3014,8 +3014,8 @@ int MapDistanceBetweenUnits(const Unit* src, const Unit* dst)
 /**
 **  Compute the distance from the view point to a given point.
 **
-**  @param x  X map tile position.
-**  @param y  Y map tile position.
+**  @param x    X map tile position.
+**  @param y    Y map tile position.
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
@@ -3034,7 +3034,7 @@ int ViewPointDistance(int x, int y)
 /**
 **  Compute the distance from the view point to a given unit.
 **
-**  @param dest  Distance to this unit.
+**  @param dest    Distance to this unit.
 **
 **  @todo FIXME: is it the correct place to put this function in?
 */
@@ -3052,8 +3052,8 @@ int ViewPointDistanceToUnit(const Unit* dest)
 /**
 **  Can the source unit attack the destination unit.
 **
-**  @param source  Unit type pointer of the attacker.
-**  @param dest    Unit type pointer of the target.
+**  @param source    Unit type pointer of the attacker.
+**  @param dest      Unit type pointer of the target.
 */
 int CanTarget(const UnitType* source, const UnitType* dest)
 {
@@ -3100,8 +3100,8 @@ char* UnitReference(const Unit* unit)
 /**
 **  Save an order.
 **
-**  @param order  Order who should be saved.
-**  @param file   Output file.
+**  @param order    Order who should be saved.
+**  @param file     Output file.
 */
 void SaveOrder(const Order* order, CLFile* file)
 {
@@ -3220,8 +3220,8 @@ void SaveOrder(const Order* order, CLFile* file)
 /**
 **  Save the state of an unit to file.
 **
-**  @param unit  Unit pointer to be saved.
-**  @param file  Output file.
+**  @param unit    Unit pointer to be saved.
+**  @param file    Output file.
 */
 void SaveUnit(const Unit* unit, CLFile* file)
 {
@@ -3371,7 +3371,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"order-flush\", %d,\n  ", unit->OrderFlush);
 	CLprintf(file, "\"orders\", {");
 	for (i = 0; i < MAX_ORDERS; ++i) {
-		CLprintf(file, "\n	");
+		CLprintf(file, "\n ");
 		SaveOrder(&unit->Orders[i], file);
 		CLprintf(file, ",");
 	}
@@ -3481,7 +3481,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 /**
 **  Save state of units to file.
 **
-**  @param file  Output file.
+**  @param file    Output file.
 */
 void SaveUnits(CLFile* file)
 {
@@ -3521,12 +3521,12 @@ void SaveUnits(CLFile* file)
 	/* the old way */
 	for (i = 0; i < MAX_UNIT_SLOTS / 8 + 1; ++i) {
 		CLprintf(file, " %d", SlotUsage[i]);
-		if ((i + 1) % 16 == 0)				// 16 numbers per line
+		if ((i + 1) % 16 == 0) // 16 numbers per line
 			CLprintf(file, "\n");
 	}
 
 #else
-#define SlotUsed(slot)		(SlotUsage[(slot) / 8] & (1 << ((slot) % 8)))
+#define SlotUsed(slot) (SlotUsage[(slot) / 8] & (1 << ((slot) % 8)))
 	RunStart = InRun = 0;
 	j = 0;
 	for (i = 0; i < MAX_UNIT_SLOTS; ++i) {
