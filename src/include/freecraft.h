@@ -100,9 +100,10 @@
 
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) && defined(DEBUG)
+// GDB + MINGW doesn't like free(0)
 #include <stdlib.h>
-#define free(x) do { if( (x) ) free(x); } while(0)
+#define free(x) do { void* __x; __x=(x); if( __x ) free( __x ); } while(0)
 #endif
 
 #endif	// } __GNUC__
