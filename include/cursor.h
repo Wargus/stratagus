@@ -168,11 +168,6 @@ extern int CursorY;			/// cursor position on screen Y
 extern int CursorStartX;		/// rectangle started on screen X
 extern int CursorStartY;		/// rectangle started on screen Y
 
-extern int OldCursorX;			/// saved cursor position on screen X
-extern int OldCursorY;			/// saved cursor position on screen Y
-extern int OldCursorW;			/// saved cursor width in pixel
-extern int OldCursorH;			/// saved cursor height in pixel
-
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
@@ -183,20 +178,14 @@ extern void LoadCursors(const char* racename);
     /// Cursor-type by identifier
 extern CursorType* CursorTypeByIdent(const char* ident);
 
-    /// Draw cursor on screen in position x,y
-extern void DrawCursor(const CursorType* type,int x,int y,int frame);
-
-    /// Destroy the cursor background (for menu use!)
-extern void DestroyCursorBackground(void);
-
-    /// Hide the cursor
-extern void HideCursor(void);
-
     /// Draw any cursor
 extern void DrawAnyCursor(void);
-
     /// Hide any cursor
-extern int HideAnyCursor(void);
+extern void HideAnyCursor(void);
+    /// Invalidate given area and check if cursor won't need any
+extern void InvalidateAreaAndCheckCursor( int x, int y, int w, int h );
+    /// Invalidate (remaining) cursor areas 
+extern void InvalidateCursorAreas(void);
 
     /// Initialize the cursor module
 extern void InitCursors(void);

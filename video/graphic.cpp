@@ -36,6 +36,7 @@
 #include "freecraft.h"
 #include "video.h"
 #include "iolib.h"
+#include "intern_video.h"
 
 /*----------------------------------------------------------------------------
 --	Declarations
@@ -242,49 +243,6 @@ local void VideoDrawSub8to32(
 }
 
 /**
-**	Clip to clipping rectangle.
-**
-**	@param w	width to display
-**	@param h	height to display
-**	@param x	X screen position
-**	@param y	Y screen position
-*/
-#define DO_CLIPPING(w,h,x,y) \
-    do {						\
-	int f;						\
-							\
-	if( x<ClipX1 ) {				\
-	    f=ClipX1-x;					\
-	    x=ClipX1;					\
-	    if( w<f ) {			/* outside */	\
-		return;					\
-	    }						\
-	    w-=f;					\
-	}						\
-	if( (x+w)>ClipX2 ) {				\
-	    if( w<ClipX2-x ) {		/* outside */	\
-		return;					\
-	    }						\
-	    w=ClipX2-x;					\
-	}						\
-							\
-	if( y<ClipY1 ) {				\
-	    f=ClipY1-y;					\
-	    y=ClipY1;					\
-	    if( h<f ) {			/* outside */	\
-		return;					\
-	    }						\
-	    h-=f;					\
-	}						\
-	if( (y+h)>ClipY2 ) {				\
-	    if( h<ClipY2-y ) {		/* outside */	\
-		return;					\
-	    }						\
-	    h=ClipY2-y;					\
-	}						\
-    } while( 0 )
-
-/**
 **	Video draw part of 8bit graphic clipped into 8 bit framebuffer.
 **
 **	@param graphic	Pointer to object
@@ -299,7 +257,7 @@ local void VideoDrawSub8to8Clip(
 	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    DO_CLIPPING(w,h,x,y);
+    CLIP_RECTANGLE(x,y,w,h);
     VideoDrawSub8to8(graphic,gx,gy,w,h,x,y);
 }
 
@@ -318,7 +276,7 @@ local void VideoDrawSub8to16Clip(
 	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    DO_CLIPPING(w,h,x,y);
+    CLIP_RECTANGLE(x,y,w,h);
     VideoDrawSub8to16(graphic,gx,gy,w,h,x,y);
 }
 
@@ -337,7 +295,7 @@ local void VideoDrawSub8to24Clip(
 	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    DO_CLIPPING(w,h,x,y);
+    CLIP_RECTANGLE(x,y,w,h);
     VideoDrawSub8to24(graphic,gx,gy,w,h,x,y);
 }
 
@@ -356,7 +314,7 @@ local void VideoDrawSub8to32Clip(
 	const Graphic* graphic,int gx,int gy,unsigned w,unsigned h,
 	int x,int y)
 {
-    DO_CLIPPING(w,h,x,y);
+    CLIP_RECTANGLE(x,y,w,h);
     VideoDrawSub8to32(graphic,gx,gy,w,h,x,y);
 }
 

@@ -36,6 +36,8 @@
 #include "freecraft.h"
 #include "video.h"
 
+#include "intern_video.h"
+
 /*----------------------------------------------------------------------------
 --	Declarations
 ----------------------------------------------------------------------------*/
@@ -50,15 +52,6 @@ typedef enum {
    ClipCodeLeft   = 4,
    ClipCodeRight  = 8
 } ClipCode;
-
-/*----------------------------------------------------------------------------
---	Externals
-----------------------------------------------------------------------------*/
-
-extern int ClipX1;			/// current clipping top left
-extern int ClipY1;			/// current clipping top left
-extern int ClipX2;			/// current clipping bottom right
-extern int ClipY2;			/// current clipping bottom right
 
 /*----------------------------------------------------------------------------
 --	Variables
@@ -4511,38 +4504,6 @@ local void DrawTransRectangle32(SysColors color,int x,int y
       } while( ofs-- );
     }
   }
-}
-
-#define CLIP_RECTANGLE(x,y,width,height) { \
-  unsigned f; \
-  if( x<ClipX1 ) { \
-    f=ClipX1-x; \
-    if( width<=f ) { \
-       return; \
-    } \
-    width-=f; \
-    x=ClipX1; \
-  } \
-  if( (x+width)>ClipX2+1 ) { \
-    if( x>ClipX2 ) { \
-      return; \
-    } \
-    width=ClipX2-x+1; \
-  } \
-  if( y<ClipY1 ) { \
-    f=ClipY1-y; \
-    if( height<=f ) { \
-      return; \
-    } \
-    height-=f; \
-    y=ClipY1; \
-  } \
-  if( (y+height)>ClipY2+1 ) { \
-    if( y>ClipY2 ) { \
-        return; \
-    } \
-    height=ClipY2-y+1; \
-  } \
 }
 
 /**

@@ -1160,8 +1160,9 @@ global void DrawMenu(int MenuId)
 */
 local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 {
-    HideCursor();
-    DestroyCursorBackground();
+    //Doesn't seem to be needed
+    //HideAnyCursor();
+
     // FIXME: make this configurable from CCL.
     DisplayPicture("graphics/ui/Menu background without title.png");
 }
@@ -1256,7 +1257,6 @@ local void MultiScenSelectMenu(void)
 
 local void SinglePlayerGameMenu(void)
 {
-    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_CUSTOM_GAME_SETUP, 1);
     if (GuiGameStarted) {
@@ -1312,7 +1312,6 @@ local void JoinNetGameMenu(void)
     EnterServerIPMenuItems[1].d.input.maxch = 24;
     EnterServerIPMenuItems[2].flags |= MenuButtonDisabled;
     ProcessMenu(MENU_NET_ENTER_SERVER_IP, 1);
-    DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     if (EnterServerIPMenuItems[1].d.input.nch == 0) {
 	return;
@@ -1330,7 +1329,6 @@ local void JoinNetGameMenu(void)
 
 local void NetConnectingCancel(void)
 {
-    DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     NetworkExitClientConnect();
     NetLocalState = ccs_unreachable;	// Trigger TerminateNetConnect() to call us again and end the menu
@@ -1345,7 +1343,6 @@ local void TerminateNetConnect(void)
     }
     DebugLevel1Fn("NetLocalState %d\n", NetLocalState);
     NetConnectRunning = 2;
-    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_CLIENT, 1);
     if (GuiGameStarted) {
@@ -1357,7 +1354,6 @@ local void TerminateNetConnect(void)
 
 local void CreateNetGameMenu(void)
 {
-    DestroyCursorBackground();
     GuiGameStarted = 0;
     ProcessMenu(MENU_NET_MULTI_SETUP, 1);
     if (GuiGameStarted) {
@@ -1377,7 +1373,6 @@ local void MultiPlayerGameMenu(void)
     EnterNameMenuItems[1].d.input.maxch = 15;
     EnterNameMenuItems[2].flags &= ~MenuButtonDisabled;
     ProcessMenu(MENU_ENTER_NAME, 1);
-    DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     if (EnterNameMenuItems[1].d.input.nch == 0) {
 	return;
@@ -1735,7 +1730,6 @@ local void ScenSelectCancel(void)
 
 local void GameCancel(void)
 {
-    DestroyCursorBackground();
     StartMenusSetBackground(NULL);
     FreeMapInfo(ScenSelectPudInfo);
     ScenSelectPudInfo = NULL;
@@ -2750,8 +2744,7 @@ global void ProcessMenu(int MenuId, int Loop)
     }
 
     InterfaceState = IfaceStateMenu;
-    HideCursor();
-    DestroyCursorBackground();
+    HideAnyCursor();
     MustRedraw |= RedrawCursor;
     CursorState = CursorStatePoint;
     GameCursor = TheUI.Point.Cursor;
