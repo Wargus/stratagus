@@ -49,13 +49,22 @@ local void GameMenuReturn(void);
 --	Variables
 ----------------------------------------------------------------------------*/
 
+// FIXME: Johns: this must be all be configured from ccl some time.
+
     /// private struct which specifies the buttons gfx
 local struct {
 	/// resource filename one for each race
     const char*	File[PlayerMaxRaces];
+	/// Width of button
     int		Width, Height;
+
+#ifdef NEW_VIDEO
+	/// sprite : FILLED
+    Graphic*	Sprite;
+#else
 	/// sprite : FILLED
     RleSprite*	RleSprite;
+#endif
 } MenuButtonGfx = {
     { "interface/buttons 1.png" ,"interface/buttons 2.png" },
     300, 7632
@@ -89,6 +98,7 @@ local Menuitem GameMenuItems[] = {
     { MI_TYPE_BUTTON, { button:{ 16, 288-40, MenuButtonSelected, LargeFont,
 	 "Return to Game (~<Esc~>)", 224, 27, MBUTTON_GM_FULL, '\033', GameMenuReturn} } },
 };
+
 /**
 **	Items for the Victory Menu
 */
@@ -202,7 +212,11 @@ global void DrawMenuButton(MenuButtonId button,unsigned flags,unsigned w,unsigne
 	    SetDefaultTextColors(rc,rc);
 	}
     }
+#ifdef NEW_VIDEO
+    VideoDraw(MenuButtonGfx.Sprite, rb, x, y);
+#else
     DrawRleSprite(MenuButtonGfx.RleSprite, rb, x, y);
+#endif
     if (text) {
 	DrawTextCentered(s+x+w/2,s+y+(font == GameFont ? 4 : 7),font,text);
     }
@@ -540,13 +554,21 @@ global void InitMenus(unsigned int race)
     if (race == last_race)	// same race? already loaded!
 	return;
     if (last_race != -1) {	// free previous sprites for different race
+#ifdef NEW_VIDEO
+	VideoFree(MenuButtonGfx.Sprite);
+#else
 	FreeRleSprite(MenuButtonGfx.RleSprite);
+#endif
     }
     last_race = race;
     file = MenuButtonGfx.File[race];
     buf = alloca(strlen(file) + 9 + 1);
     file = strcat(strcpy(buf, "graphic/"), file);
+#ifdef NEW_VIDEO
+    MenuButtonGfx.Sprite = LoadSprite(file, 0, 144);
+#else
     MenuButtonGfx.RleSprite = LoadRleSprite(file, 0, 144);
+#endif
 }
 
 //@}
