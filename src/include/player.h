@@ -383,7 +383,7 @@ enum PlayerRaces {
 **	#PlayerRescueActive
 **
 **		This player is controlled by the computer. Player::AiNum
-**		selects the AI strategy. Unit it is rescued it plays like
+**		selects the AI strategy. Until it is rescued it plays like
 **		an ally. The first person which reaches units of this player,
 **		can rescue them. If the city center is rescued, than all units
 **		of this player are rescued.
