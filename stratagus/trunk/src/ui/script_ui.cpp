@@ -958,30 +958,30 @@ local SCM CclDefineUI(SCM list)
 */
 local SCM CclMouseScrollSpeed(SCM num)
 {
-	int speed;
+    int speed;
 
-	speed=gh_scm2int(num);
-	if (speed < 1 || speed > FRAMES_PER_SECOND) {
-		SpeedMouseScroll=MOUSE_SCROLL_SPEED;
-	} else {
-		SpeedMouseScroll=speed;
-	}
-	return num;
+    speed=gh_scm2int(num);
+    if (speed < 1 || speed > FRAMES_PER_SECOND) {
+	SpeedMouseScroll=MOUSE_SCROLL_SPEED;
+    } else {
+	SpeedMouseScroll=speed;
+    }
+    return num;
 }
 /**
  **	Set Speed of Key Scrolling
  */
 local SCM CclKeyScrollSpeed(SCM num)
 {
-	int speed;
+    int speed;
 
-	speed=gh_scm2int(num);
-	if (speed < 1 || speed > FRAMES_PER_SECOND) {
-		SpeedKeyScroll=KEY_SCROLL_SPEED;
-	} else {
-		SpeedKeyScroll=speed;
-	}
-	return num;
+    speed=gh_scm2int(num);
+    if (speed < 1 || speed > FRAMES_PER_SECOND) {
+	SpeedKeyScroll=KEY_SCROLL_SPEED;
+    } else {
+	SpeedKeyScroll=speed;
+    }
+    return num;
 }
 
 /**
@@ -1025,6 +1025,184 @@ local SCM CclFancyBuildings(void)
 }
 
 /**
+**	Define a button.
+**
+**	FIXME: need some general data structure to make this parsing easier.
+**
+**	@param list	List describing the button.
+*/
+local SCM CclDefineButton(SCM list)
+{
+    char buf[64];
+    SCM value;
+    char* s1;
+    char* s2;
+    ButtonAction ba;
+
+    DebugLevel3Fn("Define button\n");
+
+    memset(&ba,0,sizeof(ba));
+    //
+    //	Parse the arguments, already the new tagged format.
+    //
+    while( !gh_null_p(list) ) {
+	value=gh_car(list);
+	list=gh_cdr(list);
+	if( gh_eq_p(value,gh_symbol2scm("pos")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Pos=gh_scm2int(value);
+	} else if( gh_eq_p(value,gh_symbol2scm("level")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Level=gh_scm2int(value);
+	} else if( gh_eq_p(value,gh_symbol2scm("icon")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Icon.Name=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("action")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_eq_p(value,gh_symbol2scm("move")) ) {
+		ba.Action=ButtonMove;
+	    } else if( gh_eq_p(value,gh_symbol2scm("stop")) ) {
+		ba.Action=ButtonStop;
+	    } else if( gh_eq_p(value,gh_symbol2scm("attack")) ) {
+		ba.Action=ButtonAttack;
+	    } else if( gh_eq_p(value,gh_symbol2scm("repair")) ) {
+		ba.Action=ButtonRepair;
+	    } else if( gh_eq_p(value,gh_symbol2scm("harvest")) ) {
+		ba.Action=ButtonHarvest;
+	    } else if( gh_eq_p(value,gh_symbol2scm("button")) ) {
+		ba.Action=ButtonButton;
+	    } else if( gh_eq_p(value,gh_symbol2scm("build")) ) {
+		ba.Action=ButtonBuild;
+	    } else if( gh_eq_p(value,gh_symbol2scm("train-unit")) ) {
+		ba.Action=ButtonTrain;
+	    } else if( gh_eq_p(value,gh_symbol2scm("patrol")) ) {
+		ba.Action=ButtonPatrol;
+	    } else if( gh_eq_p(value,gh_symbol2scm("stand-ground")) ) {
+		ba.Action=ButtonStandGround;
+	    } else if( gh_eq_p(value,gh_symbol2scm("attack-ground")) ) {
+		ba.Action=ButtonAttackGround;
+	    } else if( gh_eq_p(value,gh_symbol2scm("return-goods")) ) {
+		ba.Action=ButtonReturn;
+	    } else if( gh_eq_p(value,gh_symbol2scm("demolish")) ) {
+		ba.Action=ButtonDemolish;
+	    } else if( gh_eq_p(value,gh_symbol2scm("cast-spell")) ) {
+		ba.Action=ButtonSpellCast;
+	    } else if( gh_eq_p(value,gh_symbol2scm("research")) ) {
+		ba.Action=ButtonResearch;
+	    } else if( gh_eq_p(value,gh_symbol2scm("upgrade-to")) ) {
+		ba.Action=ButtonUpgradeTo;
+	    } else if( gh_eq_p(value,gh_symbol2scm("unload")) ) {
+		ba.Action=ButtonUnload;
+	    } else if( gh_eq_p(value,gh_symbol2scm("cancel")) ) {
+		ba.Action=ButtonCancel;
+	    } else if( gh_eq_p(value,gh_symbol2scm("cancel-upgrade")) ) {
+		ba.Action=ButtonCancelUpgrade;
+	    } else if( gh_eq_p(value,gh_symbol2scm("cancel-train-unit")) ) {
+		ba.Action=ButtonCancelTrain;
+	    } else if( gh_eq_p(value,gh_symbol2scm("cancel-build")) ) {
+		ba.Action=ButtonCancelBuild;
+	    } else {
+		s1=gh_scm2newstr(value,NULL);
+		fprintf(stderr,"Unsupported action %s\n",s1);
+		free(s1);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("value")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_exact_p(value) ) {
+		sprintf(buf,"%ld",gh_scm2int(value));
+		s1=strdup(buf);
+	    } else {
+		s1=gh_scm2newstr(value,NULL);
+	    }
+	    ba.ValueStr=s1;
+	} else if( gh_eq_p(value,gh_symbol2scm("allowed")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    if( gh_eq_p(value,gh_symbol2scm("check-true")) ) {
+		ba.Allowed=ButtonCheckTrue;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-false")) ) {
+		ba.Allowed=ButtonCheckFalse;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-upgrade")) ) {
+		ba.Allowed=ButtonCheckUpgrade;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-unit")) ) {
+		ba.Allowed=ButtonCheckUnit;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-units")) ) {
+		ba.Allowed=ButtonCheckUnits;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-network")) ) {
+		ba.Allowed=ButtonCheckNetwork;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-work")) ) {
+		ba.Allowed=ButtonCheckNoWork;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-no-research")) ) {
+		ba.Allowed=ButtonCheckNoResearch;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-attack")) ) {
+		ba.Allowed=ButtonCheckAttack;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-upgrade-to")) ) {
+		ba.Allowed=ButtonCheckUpgradeTo;
+	    } else if( gh_eq_p(value,gh_symbol2scm("check-research")) ) {
+		ba.Allowed=ButtonCheckResearch;
+	    } else {
+		s1=gh_scm2newstr(value,NULL);
+		fprintf(stderr,"Unsupported action %s\n",s1);
+		free(s1);
+	    }
+	} else if( gh_eq_p(value,gh_symbol2scm("allow-arg")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    s1=strdup("");
+	    while( !gh_null_p(value) ) {
+		s2=gh_scm2newstr(gh_car(value),NULL);
+		s1=realloc(s1,strlen(s1)+strlen(s2)+2);
+		strcat(s1,s2);
+		value=gh_cdr(value);
+		if( !gh_null_p(value) ) {
+		    strcat(s1,",");
+		}
+	    }
+	    ba.AllowStr=s1;
+	} else if( gh_eq_p(value,gh_symbol2scm("key")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    s1=gh_scm2newstr(value,NULL);
+	    ba.Key=*s1;
+	    free(s1);
+	} else if( gh_eq_p(value,gh_symbol2scm("hint")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    ba.Hint=gh_scm2newstr(value,NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("for-unit")) ) {
+	    value=gh_car(list);
+	    list=gh_cdr(list);
+	    s1=strdup(",");
+	    while( !gh_null_p(value) ) {
+		s2=gh_scm2newstr(gh_car(value),NULL);
+		s1=realloc(s1,strlen(s1)+strlen(s2)+2);
+		strcat(s1,s2);
+		strcat(s1,",");
+		value=gh_cdr(value);
+	    }
+	    ba.UnitMask=s1;
+	} else {
+	    s1=gh_scm2newstr(value,NULL);
+	    fprintf(stderr,"Unsupported tag %s\n",s1);
+	    free(s1);
+	}
+    }
+    AddButton(ba.Pos,ba.Level,ba.Icon.Name,ba.Action,ba.ValueStr,
+	    ba.Allowed,ba.AllowStr,ba.Key,ba.Hint,ba.UnitMask);
+    free(ba.ValueStr);
+    free(ba.AllowStr);
+    free(ba.Hint);
+    free(ba.UnitMask);
+
+    return SCM_UNSPECIFIED;
+}
+
+/**
 **	Register CCL features for UI.
 */
 global void UserInterfaceCclRegister(void)
@@ -1055,6 +1233,7 @@ global void UserInterfaceCclRegister(void)
     gh_new_procedure0_0("right-button-moves",CclRightButtonMoves);
     gh_new_procedure0_0("fancy-buildings",CclFancyBuildings);
 
+    gh_new_procedureN("define-button",CclDefineButton);
 }
 
 #endif	// } USE_CCL

@@ -76,7 +76,7 @@ local int UnitButtonCount;
 --      Functions
 ----------------------------------------------------------------------------*/
 
-#ifndef laterUSE_CCL
+#ifndef USE_CCL
 
 /**
 **	Add buttons table.
@@ -99,13 +99,22 @@ local void AddButtonTable(const ButtonAction* button)
 */
 global void InitButtons(void)
 {
-#ifndef laterUSE_CCL
+    int z;
+
+#ifndef USE_CCL
     //
     //	Add all pre-defined buttons.
     //
     AddButtonTable(AllButtons);
     // FIXME: AddButtonTable(ExtensionButtons);
 #endif
+    //
+    //	Resolve the icon names.
+    //
+    for (z = 0; z < UnitButtonCount; z++) {
+	UnitButtonTable[z]->Icon.Icon 
+		= IconByIdent(UnitButtonTable[z]->Icon.Name);
+    }
 }
 
 /**
@@ -207,12 +216,12 @@ global void SaveButtons(FILE* file)
 		fprintf(file,"%p",UnitButtonTable[i]->Allowed);
 	    }
 	    if( UnitButtonTable[i]->AllowStr ) {
-		fprintf(file," (");
+		fprintf(file," 'allow-arg '(");
 		cp=alloca(strlen(UnitButtonTable[i]->AllowStr));
 		strcpy(cp,UnitButtonTable[i]->AllowStr);
 		cp=strtok(cp,",");
 		while( cp ) {
-		    fprintf(file,"'%s",cp);
+		    fprintf(file,"%s",cp);
 		    cp=strtok(NULL,",");
 		    if( cp ) {
 			fprintf(file," ");
@@ -232,7 +241,7 @@ global void SaveButtons(FILE* file)
 		break;
 	}
 	fprintf(file,"\" 'hint \"%s\"\n",UnitButtonTable[i]->Hint);
-	n=fprintf(file,"  'for-unit (");
+	n=fprintf(file,"  'for-unit '(");
 	cp=alloca(strlen(UnitButtonTable[i]->UnitMask));
 	strcpy(cp,UnitButtonTable[i]->UnitMask);
 	cp=strtok(cp,",");
@@ -240,7 +249,7 @@ global void SaveButtons(FILE* file)
 	    if( n+strlen(cp)>78 ) {
 		n=fprintf(file,"\n    ");
 	    }
-	    n+=fprintf(file,"'%s",cp);
+	    n+=fprintf(file,"%s",cp);
 	    cp=strtok(NULL,",");
 	    if( cp ) {
 		n+=fprintf(file," ");
@@ -272,7 +281,7 @@ global ButtonAction* CurrentButtons;
 global ButtonAction  _current_buttons[9]; //FIXME: this is just for test
 
 /// FIXME: docu
-int AddButton(int pos, int level, const char *IconIdent,
+int AddButton(int pos, int level, const char *icon_ident,
 	enum _button_cmd_ action, const char *value, const void *func,
 	const void *allow, int key, const char *hint, const char *umask)
 {
@@ -284,8 +293,9 @@ int AddButton(int pos, int level, const char *IconIdent,
 
     ba->Pos = pos;
     ba->Level = level;
-    ba->Icon.Name = (char *)IconIdent;
-    ba->Icon.Icon = IconByIdent(IconIdent);
+    ba->Icon.Name = (char *)icon_ident;
+    // FIXME: check if already initited
+    //ba->Icon.Icon = IconByIdent(icon_ident);
     ba->Action = action;
     if (value) {
 	ba->ValueStr = strdup(value);
@@ -333,7 +343,8 @@ int AddButton(int pos, int level, const char *IconIdent,
     ba->UnitMask = strdup(buf);
     UnitButtonTable[UnitButtonCount++] = ba;
 
-    DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
+    // FIXME: check if already initited
+    //DebugCheck(ba->Icon.Icon == NoIcon);// just checks, that's why at the end
     return 1;
 }
 
