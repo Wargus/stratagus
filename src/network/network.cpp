@@ -539,16 +539,14 @@ global void NetworkChatMessage(const char *msg)
     NetworkChat *ncm;
     const char *cp;
     int n;
-    int t;
 
     if (NetworkFildes != -1) {
-	t = MessageChat;
 	cp = msg;
 	n = strlen(msg);
 	while (n >= sizeof(ncm->Text)) {
 	    ncq = malloc(sizeof(NetworkCommandQueue));
 	    dl_insert_last(CommandsIn, ncq->List);
-	    ncq->Data.Type = t;
+	    ncq->Data.Type = MessageChat;
 	    ncm = (NetworkChat *)(&ncq->Data);
 	    ncm->Player = ThisPlayer->Player;
 	    memcpy(ncm->Text, cp, sizeof(ncm->Text));
@@ -673,12 +671,16 @@ local void NetworkSendCommands(void)
 	ncq = (NetworkCommandQueue *)CommandsIn->first;
 	// ncq = BASE_OF(NetworkCommandQueue,List[0], CommandsIn->first);
 
-	dl_remove_first(CommandsIn);
-	// FIXME: we can send destoyed units over network :(
-	if( UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed ) {
-	    DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
-		    ntohs(ncq->Data.Unit));
+	IfDebug(
+	if (ncq->Data.Type != MessageChat && ncq->Data.Type != MessageChatTerm) {
+	    // FIXME: we can send destoyed units over network :(
+	    if( UnitSlots[ntohs(ncq->Data.Unit)]->Destroyed ) {
+		DebugLevel0Fn("Sending destroyed unit %d over network!!!!!!\n",
+			ntohs(ncq->Data.Unit));
+	    }
 	}
+	);
+	dl_remove_first(CommandsIn);
     }
 
     //	Insert in output queue.
