@@ -2877,6 +2877,9 @@ local void MultiPlayerGameMenu(void)
 local void MultiPlayerLANGame(void)
 {
     ProcessMenu("menu-create-join-menu", 1);
+    if (GuiGameStarted) {
+	GameMenuReturn();
+    }
 }
 
 /**
