@@ -734,7 +734,7 @@ local SCM CclFreeCraftMap(SCM list)
 		}
 		for( i=0; i<l; ++i ) {
 		    TheMap.Fields[i].Tile=
-			    Tilesets[TilesetSummer].Table[
+			    Tilesets[0].Table[
 				gh_scm2int(gh_vector_ref(value,gh_int2scm(i)))
 			    ];
 		}
@@ -859,6 +859,7 @@ local void gh_main_prog(int argc,char* argv[])
 
     gh_new_procedureN("missile-type",CclMissileType);
 
+    TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();
     UnitButtonCclRegister();
@@ -979,6 +980,7 @@ global void CclInit(void)
 
     init_lsubr("missile-type",CclMissileType);
 
+    TilesetCclRegister();
     MapCclRegister();
     PathfinderCclRegister();
     UnitButtonCclRegister();

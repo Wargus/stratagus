@@ -23,6 +23,6 @@ MODULE  = map
 
 OBJS	= map.$(OE) map_draw.$(OE) ccl_map.$(OE) \
 	  map_fog.$(OE) map_rock.$(OE) map_wood.$(OE) map_wall.$(OE) \
-	  minimap.$(OE) tileset.$(OE)
+	  minimap.$(OE) tileset.$(OE) ccl_tileset.$(OE)
 
 include $(TOPDIR)/Common.mk
