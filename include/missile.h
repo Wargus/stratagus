@@ -560,7 +560,7 @@ FuncController MissileActionDeathCoil;
 
 #ifdef META_LUA
 	/// Initialize Spell scripting.
-extern void ScriptSpellInit(void);
+extern void ScriptMissileTypesInit(void);
 #endif
 
 //@}

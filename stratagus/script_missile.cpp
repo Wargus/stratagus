@@ -449,9 +449,16 @@ local int ScriptMissileTypesCreate(lua_State* l)
 
 	mtype = MissileTypeByIdent(name);
 	if (mtype != NULL) {
-		LuaError(l, "Spell allready exists");
+		LuaError(l, "Missile allready exists");
 	} else {
-		ScriptCreateUserdata(l, NewMissileTypeSlot(strdup(name)),
+		mtype = NewMissileTypeSlot(strdup(name));
+
+		//  Defaults.
+		mtype->NumDirections = 1;
+		mtype->Flip = 1;
+		mtype->SplashFactor = 100;
+
+		ScriptCreateUserdata(l, mtype,
 				ScriptMissileTypeGet, ScriptMissileTypeSet);
 		return 1;
 	}
@@ -463,9 +470,34 @@ local int ScriptMissileTypesCreate(lua_State* l)
 **	@param missiletype	Pointer to the missile type.
 **	@param key      Key string.
 */
-local int ScriptMissileTypeGet(MissileType* missiletype, const char* key, lua_State* l)
+local int ScriptMissileTypeGet(MissileType* mtype, const char* key, lua_State* l)
 {
-	LuaError(l, "Function not implemented.\n");
+	META_GET_STRING("Ident", mtype->Ident);
+	META_GET_STRING("File", mtype->File);
+
+	META_GET_INT("Transparency", mtype->Transparency);
+	META_GET_INT("Width", mtype->Width);
+	META_GET_INT("Height", mtype->Height);
+	META_GET_INT("DrawLevel", mtype->DrawLevel);
+	META_GET_INT("SpriteFrames", mtype->SpriteFrames);
+	META_GET_INT("NumDirections", mtype->NumDirections);
+
+	META_GET_INT("NumBounces", mtype->NumBounces);
+	META_GET_INT("Sleep", mtype->Sleep);
+	META_GET_INT("Speed", mtype->Speed);
+	META_GET_INT("Range", mtype->Range);
+	META_GET_INT("SplashFactor", mtype->SplashFactor);
+	META_GET_BOOL("CanHitOwner", mtype->CanHitOwner);
+	META_GET_BOOL("FriendlyFire", mtype->FriendlyFire);
+
+	META_GET_STRING("ImpactMissile", mtype->ImpactName);
+	META_GET_STRING("SmokeMissile", mtype->SmokeName);
+
+	META_GET_STRING("FiredSound", mtype->FiredSound.Name);
+	META_GET_STRING("ImpactSound", mtype->ImpactSound.Name);
+	META_GET_STRING("Class", MissileClassNames[mtype->Class]);
+
+	LuaError(l, "Field \"%s\" is innexistent or write-only (yes, we have those).\n" _C_ key);
 }
 
 /**
@@ -474,9 +506,46 @@ local int ScriptMissileTypeGet(MissileType* missiletype, const char* key, lua_St
 **	@param missiletype	Pointer to the missile type.
 **	@param key      Key string.
 */
-local int ScriptMissileTypeSet(MissileType* missiletype, const char* key, lua_State* l)
+local int ScriptMissileTypeSet(MissileType* mtype, const char* key, lua_State* l)
 {
-	LuaError(l, "Function not implemented.\n");
+	META_SET_STRING("File", mtype->File);
+
+	META_SET_INT("Transparency", mtype->Transparency);
+	META_SET_INT("Width", mtype->Width);
+	META_SET_INT("Height", mtype->Height);
+	META_SET_INT("DrawLevel", mtype->DrawLevel);
+	META_SET_INT("SpriteFrames", mtype->SpriteFrames);
+	META_SET_INT("NumDirections", mtype->NumDirections);
+
+	META_SET_INT("NumBounces", mtype->NumBounces);
+	META_SET_INT("Sleep", mtype->Sleep);
+	META_SET_INT("Speed", mtype->Speed);
+	META_SET_INT("Range", mtype->Range);
+	META_SET_INT("SplashFactor", mtype->SplashFactor);
+	META_SET_BOOL("CanHitOwner", mtype->CanHitOwner);
+	META_SET_BOOL("FriendlyFire", mtype->FriendlyFire);
+
+	META_SET_STRING("ImpactMissile", mtype->ImpactName);
+	META_SET_STRING("SmokeMissile", mtype->SmokeName);
+
+	META_SET_STRING("FiredSound", mtype->FiredSound.Name);
+	META_SET_STRING("ImpactSound", mtype->ImpactSound.Name);
+
+	if (!strcmp(key, "Class")) {
+		const char* value;
+		int i;
+
+		value = LuaToString(l, -1);
+		for (i = 0; MissileClassNames[i]; ++i) {
+			if (!strcmp(value, MissileClassNames[i])) {
+				mtype->Class = i;
+				return 0;
+			}
+		}
+		LuaError(l, "Unsupported missile class: %s" _C_ value);
+	}
+
+	LuaError(l, "Field \"%s\" is innexistent or read-only.\n" _C_ key);
 }
 
 /**
@@ -517,7 +586,7 @@ local int ScriptMissileTypesNamespaceGet(lua_State* l)
 **
 **	@param l   The lua state.
 */
-global void ScriptMissileInit(void)
+global void ScriptMissileTypesInit(void)
 {
 	// Create Stratagus.Missiles namespace.
 	// No userdata, there's no data. And no finalizer
