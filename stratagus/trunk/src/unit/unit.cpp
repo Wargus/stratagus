@@ -1386,7 +1386,7 @@ int UnitVisible(const Unit* unit, const Player* player)
 }
 
 /**
-**  Returns ture, if unit is visible as an action goal for a player
+**  Returns true, if unit is visible as an action goal for a player
 **  on the map.
 **
 **  @param unit    Unit to be checked.
@@ -1404,10 +1404,9 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 		return 0;
 	}
 	if (UnitVisible(unit, player) || player->Type == PlayerComputer ||
-		UnitVisibleOnRadar(player, unit)) {
-		return  (!unit->Removed) &&
-				(!unit->Destroyed) &&
-				(unit->Orders->Action != UnitActionDie);
+			UnitVisibleOnRadar(player, unit)) {
+		return !unit->Removed && !unit->Destroyed &&
+			unit->Orders->Action != UnitActionDie;
 	} else {
 		return unit->Type->VisibleUnderFog &&
 			(unit->Seen.ByPlayer & (1 << player->Player)) &&
