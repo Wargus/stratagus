@@ -138,16 +138,16 @@ local struct {
     int		Width, Height;
 	/// sprite : FILLED
     Graphic*	Sprite;
-} MenuButtonGfx = {
-#ifdef NEW_NAMES
+} MenuButtonGfx
+#ifndef laterUSE_CCL
+= {
     { "ui/buttons 1.png" ,"ui/buttons 2.png" },
-#else
-    { "interface/buttons 1.png" ,"interface/buttons 2.png" },
-#endif
     300, 7632,
 
     NULL
-};
+}
+#endif
+    ;
 
 /**
 **	The currently processed menu
@@ -1157,11 +1157,7 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
     HideCursor();
     DestroyCursorBackground();
     // FIXME: make this configurable from CCL.
-#ifdef NEW_NAMES
     DisplayPicture("graphics/ui/Menu background without title.png");
-#else
-    DisplayPicture("graphic/interface/Menu background without title.png");
-#endif
 }
 
 /**
@@ -1181,6 +1177,9 @@ local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
     SetDefaultTextColors(nc, rc);
 }
 
+/**
+**	FIXME: docu
+*/
 local void PrgStartInit(Menuitem *mi)	// Start menu master init
 {
 #ifdef NEW_NETMENUS
@@ -2815,19 +2814,15 @@ global void InitMenus(unsigned int race)
     last_race = race;
     file = MenuButtonGfx.File[race];
     buf = alloca(strlen(file) + 9 + 1);
-#ifdef NEW_NAMES
     file = strcat(strcpy(buf, "graphics/"), file);
-#else
-    file = strcat(strcpy(buf, "graphic/"), file);
-#endif
     MenuButtonGfx.Sprite = LoadSprite(file, 300, 144);	// 50/53 images!
 
     strcpy(ScenSelectPath, FreeCraftLibPath);
     if (ScenSelectPath[0]) {
-	strcat(ScenSelectPath, "/");
+	strcat(ScenSelectPath, "/graphics/tilesets/");
     }
 #ifdef HAVE_EXPANSION
-    strcat(ScenSelectPath, "swamp.rgb");
+    strcat(ScenSelectPath, "swamp");
     if (access(ScenSelectPath, F_OK) != 0) {
 	// ARI FIXME: Hack to disable Expansion Gfx..
 	// also shows how to add new tilesets....

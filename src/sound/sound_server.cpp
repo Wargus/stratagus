@@ -808,14 +808,11 @@ local Sample* LoadSample(const char* name)
     Sample* sample;
     char* buf;
 
-#ifdef NEW_NAMES
     buf = strdcat3(FreeCraftLibPath, "/sounds/", name);
-#else
-    buf = strdcat3(FreeCraftLibPath, "/sound/", name);
-#endif
     if( !(sample=LoadWav(buf)) ) {
-	printf("Can't load the sound `%s'\n",name);
+	fprintf(stderr,"Can't load the sound `%s'\n",name);
     }
+    // FIXME: should support more sample formats, ogg and flac.
     free(buf);
     return sample;
 }

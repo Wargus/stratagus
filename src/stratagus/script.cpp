@@ -735,9 +735,6 @@ global void CclInit(void)
 #ifdef NEW_MAPDRAW
     gh_define("freecraft-feature-new-mapdraw",SCM_BOOL_T);
 #endif
-#ifdef NEW_NAMES
-    gh_define("freecraft-feature-new-names",SCM_BOOL_T);
-#endif
 #ifdef NEW_FOW
     gh_define("freecraft-feature-new-fow",SCM_BOOL_T);
 #endif

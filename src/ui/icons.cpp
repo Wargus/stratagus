@@ -194,11 +194,7 @@ global void LoadIcons(void)
 
 		file=Icons[i]->File->FileName;
 		buf=alloca(strlen(file)+9+1);
-#ifdef NEW_NAMES
 		file=strcat(strcpy(buf,"graphics/"),file);
-#else
-		file=strcat(strcpy(buf,"graphic/"),file);
-#endif
 		ShowLoadProgress("\tIcons %s\n",file);
 		Icons[i]->File->Graphic=LoadGraphic(file);
 	    }
