@@ -198,6 +198,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassPointToPointWithHit,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-griffon-hammer",
@@ -217,6 +219,8 @@ global MissileType DefaultMissileTypes[] = {
     { "fireball hit" },
     MissileClassPointToPoint3Bounces,
     1,
+    16,
+    1,
     "missile-explosion",	NULL,
     },
 { MissileTypeType,
@@ -227,6 +231,8 @@ global MissileType DefaultMissileTypes[] = {
     { "fireball hit" },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-flame-shield",
@@ -236,6 +242,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassFlameShield,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-blizzard",
@@ -244,6 +252,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassBlizzard,
+    1,
+    16,
     1,
     "missile-blizzard-hit", NULL
     },
@@ -255,6 +265,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassDeathDecay,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-big-cannon",
@@ -263,6 +275,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    1,
+    16,
     1,
     "missile-cannon-tower-explosion",	NULL,
     },
@@ -274,6 +288,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-heal-effect",
@@ -282,6 +298,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    1,
+    16,
     1,
     },
 { MissileTypeType,
@@ -292,6 +310,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassPointToPointWithHit,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-rune",
@@ -301,6 +321,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassStayWithDelay,
     5,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-whirlwind",
@@ -310,6 +332,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassWhirlwind,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-catapult-rock",
@@ -318,6 +342,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
+    1,
+    16,
     1,
     "missile-impact",	NULL,
     },
@@ -329,6 +355,8 @@ global MissileType DefaultMissileTypes[] = {
     { "explosion" },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     "missile-impact",	NULL,
     },
 { MissileTypeType,
@@ -339,6 +367,8 @@ global MissileType DefaultMissileTypes[] = {
     { "bow hit" },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-axe",
@@ -348,6 +378,8 @@ global MissileType DefaultMissileTypes[] = {
     { "bow hit" },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-submarine-missile",
@@ -356,6 +388,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPoint,
+    1,
+    16,
     1,
     "missile-impact",	NULL,
     },
@@ -367,6 +401,8 @@ global MissileType DefaultMissileTypes[] = {
     { "explosion" },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     "missile-impact",	NULL,
     },
 { MissileTypeType,
@@ -377,6 +413,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassFire,
     8,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-big-fire",
@@ -386,6 +424,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassFire,
     8,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-impact",
@@ -394,6 +434,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    1,
+    16,
     1,
     },
 { MissileTypeType,
@@ -404,6 +446,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassStayWithDelay,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-explosion",
@@ -413,6 +457,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassStayWithDelay,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-small-cannon",
@@ -421,6 +467,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { "explosion" },
     MissileClassPointToPointWithDelay,
+    1,
+    16,
     1,
     "missile-cannon-explosion",	NULL,
     },
@@ -432,6 +480,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassStayWithDelay,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-cannon-tower-explosion",
@@ -440,6 +490,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassStayWithDelay,
+    1,
+    16,
     1,
     },
 { MissileTypeType,
@@ -450,6 +502,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-green-cross",
@@ -459,6 +513,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassCycleOnce,
     FRAMES_PER_SECOND/30
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-none",
@@ -467,6 +523,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassNone,
+    1,
+    16,
     1,
     },
 { MissileTypeType,
@@ -477,6 +535,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassStayWithDelay,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-death-coil",
@@ -486,6 +546,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     MissileClassPointToPoint,
     1,
+    16,
+    1,
     },
 { MissileTypeType,
     "missile-custom",
@@ -494,6 +556,8 @@ global MissileType DefaultMissileTypes[] = {
     { NULL },
     { NULL },
     MissileClassCustom,
+    1,
+    16,
     1,
     },
 { }
@@ -1035,8 +1099,6 @@ local void MissileNewHeadingFromXY(Missile* missile,int dx,int dy)
     }
 }
 
-#define MISSILE_STEPS	16		// How much did a missile move??
-
 /**
 **	Handle point to point missile.
 */
@@ -1107,7 +1169,7 @@ local int PointToPointMissile(Missile* missile)
     //	Move missile
     //
     if( dy==0 ) {		// horizontal line
-	for( i=0; i<MISSILE_STEPS; ++i ) {
+	for( i=0; i<missile->Type->Speed; ++i ) {
 	    if( missile->X==missile->DX ) {
 		return 1;
 	    }
@@ -1117,7 +1179,7 @@ local int PointToPointMissile(Missile* missile)
     }
 
     if( dx==0 ) {		// vertical line
-	for( i=0; i<MISSILE_STEPS; ++i ) {
+	for( i=0; i<missile->Type->Speed; ++i ) {
 	    if( missile->Y==missile->DY ) {
 		return 1;
 	    }
@@ -1127,7 +1189,7 @@ local int PointToPointMissile(Missile* missile)
     }
 
     if( dx<dy ) {		// step in vertical direction
-	for( i=0; i<MISSILE_STEPS; ++i ) {
+	for( i=0; i<missile->Type->Speed; ++i ) {
 	    if( missile->Y==missile->DY ) {
 		return 1;
 	    }
@@ -1142,7 +1204,7 @@ local int PointToPointMissile(Missile* missile)
     }
 
     if( dx>dy ) {		// step in horizontal direction
-	for( i=0; i<MISSILE_STEPS; ++i ) {
+	for( i=0; i<missile->Type->Speed; ++i ) {
 	    if( missile->X==missile->DX ) {
 		return 1;
 	    }
@@ -1156,7 +1218,7 @@ local int PointToPointMissile(Missile* missile)
 	return 0;
     }
 				// diagonal line
-    for( i=0; i<MISSILE_STEPS; ++i ) {
+    for( i=0; i<missile->Type->Speed; ++i ) {
 	if( missile->Y==missile->DY ) {
 	    return 1;
 	}
@@ -1285,7 +1347,7 @@ global void MissileActions(void)
 	}
 
 	if ( missile->Type->Class == MissileClassCustom ) {
-	    missile->Wait=missile->Type->Speed;
+	    missile->Wait=missile->Type->Sleep;
 	    continue;	// custom missiles are handled by Controller() only
 	}
 
@@ -1296,7 +1358,7 @@ global void MissileActions(void)
 	    //	Missile flies from x,y to x1,y1
 	    //
 	    case MissileClassPointToPoint:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1317,7 +1379,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassPointToPointWithDelay:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
 		    MissileHit(missile);
 		    FreeMissile(missile);
@@ -1330,7 +1392,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassPointToPoint3Bounces:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
 		    //
 		    //	3 Bounces.
@@ -1367,7 +1429,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassPointToPointWithHit:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
 		    //
 		    //	Animate hit
@@ -1382,7 +1444,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassBlizzard:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( PointToPointMissile(missile) ) {
 		    //
 		    //	Animate hit
@@ -1401,7 +1463,7 @@ global void MissileActions(void)
 	    case MissileClassDeathDecay:
 		//NOTE: vladi: this is exact copy of MissileClassStayWithDelay
 		// but with check for blizzard-type hit (friendly fire:))
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    BlizzardMissileHit = 1;
@@ -1411,7 +1473,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassWhirlwind:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		missile->Frame++;
 		if ( missile->Frame > 3 )
 		  missile->Frame = 0;
@@ -1422,7 +1484,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassStayWithDelay:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    MissileHit(missile);
@@ -1432,7 +1494,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassCycleOnce:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		switch( missile->State ) {
 		    case 0:
 		    case 2:
@@ -1455,7 +1517,7 @@ global void MissileActions(void)
 		break;
 
 	    case MissileClassFire:
-		missile->Wait=missile->Type->Speed;
+		missile->Wait=missile->Type->Sleep;
 		if( ++missile->Frame
 			==VideoGraphicFrames(missile->Type->Sprite) ) {
 		    int f;
@@ -1567,7 +1629,9 @@ global void SaveMissileTypes(FILE* file)
 	    fprintf(file,"\n ");
 	}
 	fprintf(file," 'class '%s",MissileClassNames[mt->Class]);
+	fprintf(file," 'sleep %d",mt->Sleep);
 	fprintf(file," 'speed %d",mt->Speed);
+	fprintf(file," 'range %d",mt->Range);
 	if( mt->ImpactMissile ) {
 	    fprintf(file,"\n  'impact-missile '%s",mt->ImpactMissile->Ident);
 	}
