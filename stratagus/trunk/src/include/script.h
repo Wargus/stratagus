@@ -119,6 +119,7 @@ extern int CclInConfigFile;		/// True while config file parsing
 ----------------------------------------------------------------------------*/
 
 extern void CclGcProtect(SCM obj);	/// Protect scm object for GC
+extern void CclGcUnprotect(SCM obj);	/// Unprotect scm object for GC
 extern void InitCcl(void);		/// Initialise ccl
 extern void LoadCcl(void);		/// Load ccl config file
 extern void SaveCcl(FILE* file);	/// Save CCL module
