@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//			  T H E   W A R   B E G I N S
-//	   Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name commands.h	-	The commands header file. */
+/**@name commands.h - The commands header file. */
 //
-//	(c) Copyright 1998-2003 by Lutz Sammer
+//      (c) Copyright 1998-2004 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-//	$Id$
+//      $Id$
 
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
@@ -34,24 +34,24 @@
 //@{
 
 /*----------------------------------------------------------------------------
---		Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 typedef enum _replay_type_ {
-	ReplayNone,								/// No replay
-	ReplaySinglePlayer,						/// Single player replay
-	ReplayMultiPlayer,						/// Multi player replay
-} ReplayType;								/// Replay types
+	ReplayNone,          /// No replay
+	ReplaySinglePlayer,  /// Single player replay
+	ReplayMultiPlayer,   /// Multi player replay
+} ReplayType;            /// Replay types
 
 /*----------------------------------------------------------------------------
---		Variables
+--  Variables
 ----------------------------------------------------------------------------*/
 
-extern int CommandLogDisabled;				/// True, if command log is off
-extern ReplayType ReplayGameType;		/// Replay game type
+extern int CommandLogDisabled;     /// True, if command log is off
+extern ReplayType ReplayGameType;  /// Replay game type
 
 /*----------------------------------------------------------------------------
---		Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Log commands into file
@@ -71,9 +71,9 @@ extern void CleanReplayLog(void);
 extern void SaveReplayList(CLFile* file);
 
 /*
-**		The send command functions sends a command, if needed over the
-**		Network, this is only for user commands. Automatic reactions which
-**		are on all computers equal, should use the functions without Send.
+**  The send command functions sends a command, if needed over the
+**  Network, this is only for user commands. Automatic reactions which
+**  are on all computers equal, should use the functions without Send.
 */
 
 	/// Send stop command
@@ -138,4 +138,4 @@ extern void ParseExtendedCommand(unsigned char type,int status,
 
 //@}
 
-#endif		// !__COMMANDS_H__
+#endif // !__COMMANDS_H__
