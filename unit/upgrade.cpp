@@ -809,7 +809,7 @@ local SCM CclDefineModifier(SCM list)
 	    DebugLevel3Fn("%s\n" _C_ str);
 	    if (!strncmp(str, "upgrade-", 8)) {
 		upgrades[UpgradeIdByIdent(str)] = gh_scm2int(gh_car(value));
-	    }else {
+	    } else {
 		free(str);
 		errl("upgrade expected", NIL);
 	    }
@@ -851,7 +851,7 @@ local int CclDefineModifier(lua_State* l)
     int regeneration_rate;
     int hit_points;
     int costs[MaxCosts];
-    char units[UnitTypeMax];
+    int units[UnitTypeMax];
     char upgrades[UpgradeMax];
     char apply_to[UnitTypeMax];
     UnitType* convert_to;
@@ -870,7 +870,7 @@ local int CclDefineModifier(lua_State* l)
     hit_points = 0;
     regeneration_rate = 0;
     memset(costs, 0, sizeof(costs));
-    memset(units, '?', sizeof(units));
+    memset(units, 0, sizeof(units));
     memset(upgrades, '?', sizeof(upgrades));
     memset(apply_to, '?', sizeof(apply_to));
     convert_to = NULL;
@@ -941,6 +941,19 @@ local int CclDefineModifier(lua_State* l)
 	    lua_rawgeti(l, j + 1, 2);
 	    costs[i] = LuaToNumber(l, -1);
 	    lua_pop(l, 1);
+	} else if (!strcmp(temp, "allow-unit")) {
+	    lua_rawgeti(l, j + 1, 2);
+	    value = LuaToString(l, -1);
+	    lua_pop(l, 1);
+	    DebugLevel3Fn("%s\n" _C_ value);
+	    if (!strncmp(value, "unit-", 5)) {
+		lua_rawgeti(l, j + 1, 3);
+		units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+	    } else {
+		lua_pushfstring(l, "unit expected");
+		lua_error(l);
+	    }
 	} else if (!strcmp(temp, "allow")) {
 	    lua_rawgeti(l, j + 1, 2);
 	    value = LuaToString(l, -1);
@@ -950,12 +963,8 @@ local int CclDefineModifier(lua_State* l)
 		lua_rawgeti(l, j + 1, 3);
 		upgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
-	    } else if (!strncmp(value, "unit-", 5)) {
-		lua_rawgeti(l, j + 1, 3);
-		units[UnitTypeIdByIdent(value)] = LuaToNumber(l, -1);
-		lua_pop(l, 1);
 	    } else {
-		lua_pushfstring(l, "upgrade or unit expected");
+		lua_pushfstring(l, "upgrade expected");
 		lua_error(l);
 	    }
 	} else if (!strcmp(temp, "apply-to")) {
@@ -1111,6 +1120,7 @@ local int CclDefineUpgrade(lua_State* l)
 /**
 **	Define which units are allowed and how much.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineUnitAllow(SCM list)
 {
     SCM value;
@@ -1123,13 +1133,13 @@ local SCM CclDefineUnitAllow(SCM list)
 	ident = gh_scm2newstr(value, NULL);
 
 	if (strncmp(ident, "unit-", 5)) {
-	     DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
-	     free(ident);
-	     return SCM_UNSPECIFIED;
+	    DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+	    free(ident);
+	    return SCM_UNSPECIFIED;
 	}
 
-	i=0;
-	while (!gh_null_p(list) && i<16) {
+	i = 0;
+	while (!gh_null_p(list) && i < 16) {
 	    value = gh_car(list);
 	    list = gh_cdr(list);
 	    AllowUnitByIdent(&Players[i], ident, gh_scm2int(value));
@@ -1141,7 +1151,33 @@ local SCM CclDefineUnitAllow(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDefineUnitAllow(lua_State* l)
+{
+    const char* ident;
+    int i;
+    int args;
+    int j;
 
+    args = lua_gettop(l);
+    j = 0;
+    ident = LuaToString(l, j + 1);
+    ++j;
+
+    if (strncmp(ident, "unit-", 5)) {
+	DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+	return 0;
+    }
+
+    i = 0;
+    for (; j < args && i < 16; ++j) {
+	AllowUnitByIdent(&Players[i], ident, LuaToNumber(l, j + 1));
+	++i;
+    }
+
+    return 0;
+}
+#endif
 
 /**
 **	Define which units/upgrades are allowed.
@@ -1171,15 +1207,18 @@ local SCM CclDefineAllow(SCM list)
 
 	if (!strncmp(ident, "unit-", 5)) {
 	    for (i = 0; i < n; ++i) {
-	    	if(ids[i]=='A') AllowUnitByIdent(&Players[i], ident, UnitMax);
-		if(ids[i]=='F') AllowUnitByIdent(&Players[i], ident, 0);
+		if (ids[i] == 'A') {
+		    AllowUnitByIdent(&Players[i], ident, UnitMax);
+		} else if (ids[i] == 'F') {
+		    AllowUnitByIdent(&Players[i], ident, 0);
+		}
 	    }
 	} else if (!strncmp(ident, "upgrade-", 8)) {
 	    for (i = 0; i < n; ++i) {
 		AllowUpgradeByIdent(&Players[i], ident, ids[i]);
 	    }
 	} else {
-		DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
+	    DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
 	}
 
 	free(ident);
@@ -1191,7 +1230,7 @@ local SCM CclDefineAllow(SCM list)
 #elif defined(USE_LUA)
 local int CclDefineAllow(lua_State* l)
 {
-    const char* str;
+    const char* ident;
     const char* ids;
     int i;
     int n;
@@ -1200,18 +1239,30 @@ local int CclDefineAllow(lua_State* l)
 
     args = lua_gettop(l);
     for (j = 0; j < args; ++j) {
-	str = LuaToString(l, j + 1);
+	ident = LuaToString(l, j + 1);
 	++j;
 	ids = LuaToString(l, j + 1);
 
 	n = strlen(ids);
 	if (n > 16) {
-	    fprintf(stderr, "%s: Allow string too long %d\n", str, n);
+	    fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
 	    n = 16;
 	}
 
-	for (i = 0; i < n; ++i) {
-	    AllowByIdent(&Players[i], str, ids[i]);
+	if (!strncmp(ident, "unit-", 5)) {
+	    for (i = 0; i < n; ++i) {
+		if (ids[i] == 'A') {
+		    AllowUnitByIdent(&Players[i], ident, UnitMax);
+		} else if (ids[i] == 'F') {
+		    AllowUnitByIdent(&Players[i], ident, 0);
+		}
+	    }
+	} else if (!strncmp(ident, "upgrade-", 8)) {
+	    for (i = 0; i < n; ++i) {
+		AllowUpgradeByIdent(&Players[i], ident, ids[i]);
+	    }
+	} else {
+	    DebugLevel0Fn(" wrong ident %s\n" _C_ ident);
 	}
     }
 
@@ -1299,6 +1350,7 @@ global void UpgradesCclRegister(void)
     lua_register(Lua, "DefineModifier", CclDefineModifier);
     lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
     lua_register(Lua, "DefineAllow", CclDefineAllow);
+    lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
 
     lua_register(Lua, "DefineUpgradeWcNames", CclDefineUpgradeWcNames);
 #endif
