@@ -667,7 +667,7 @@ global void CommandBuildBuilding(Unit* unit, int x, int y,
 	    order->Range = unit->Type->RepairRange;
 	} else {
 	    // If building inside, but be next to stop
-	    order->Range = 1;
+	    order->Range = 0;
 	}
 	order->Type = what;
 	if (what->BuilderOutside) {
