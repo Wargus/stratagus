@@ -10,7 +10,7 @@
 //
 /**@name ccl_sound.c	-	The sound ccl functions. */
 //
-//	(c) Copyright 1999-2003 by Lutz Sammer and Fabrice Rossi
+//	(c) Copyright 1999-2003 by Lutz Sammer, Fabrice Rossi, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -84,6 +84,8 @@ local SCM sound_id_ccl(SoundId id)
     sound_id = CclMakeSmobObj(SiodSoundTag, id);
     return sound_id;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask the sound system to associate a
@@ -91,6 +93,7 @@ local SCM sound_id_ccl(SoundId id)
 **
 **	@param name	name
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundForName(SCM name)
 {
     SoundId id;
@@ -102,6 +105,8 @@ local SCM CclSoundForName(SCM name)
 
     return sound_id_ccl(id);
 }
+#elif defined(USE_LUA)
+#endif
 
 
 /**
@@ -110,6 +115,7 @@ local SCM CclSoundForName(SCM name)
 **	@param sound	Lisp cell, SoundID or string or symbol.
 **	@return		The C sound id.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SoundId CclGetSoundId(SCM sound)
 {
     if (CCL_SOUNDP(sound)) {	// if we've got the sound id
@@ -118,6 +124,8 @@ local SoundId CclGetSoundId(SCM sound)
 	return CCL_SOUND_ID(CclSoundForName(sound));
     }
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Create a sound.
@@ -131,6 +139,7 @@ local SoundId CclGetSoundId(SCM sound)
 **
 **	@return		the sound id of the created sound
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMakeSound(SCM name, SCM file)
 {
     SoundId id;
@@ -186,6 +195,8 @@ local SCM CclMakeSound(SCM name, SCM file)
     }
     return sound_id_ccl(id);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. This function asks the sound system to
@@ -197,6 +208,7 @@ local SCM CclMakeSound(SCM name, SCM file)
 **
 **	@return		The sound id of the created sound
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
 {
     SoundId id;
@@ -213,6 +225,8 @@ local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
     free(c_name);
     return sound_id_ccl(id);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask to the sound system to remap a sound id
@@ -223,6 +237,7 @@ local SCM CclMakeSoundGroup(SCM name, SCM first, SCM second)
 **
 **	@return		the sound object
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMapSound(SCM name, SCM sound)
 {
     char* sound_name;
@@ -232,6 +247,8 @@ local SCM CclMapSound(SCM name, SCM sound)
     free(sound_name);
     return sound;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Ask the sound system to play the specified sound.
@@ -240,13 +257,17 @@ local SCM CclMapSound(SCM name, SCM sound)
 **
 **	@return		SCM_UNSPECIFIED
 */
-local SCM CclPlaySound(SCM sound) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclPlaySound(SCM sound)
+{
     SoundId id;
 
     id = CclGetSoundId(sound);
     PlayGameSound(id, MaxSampleVolume);
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Test whether a scheme object is a clone sound id
@@ -255,10 +276,13 @@ local SCM CclPlaySound(SCM sound) {
 **
 **	@return		true is sound is a clone sound id
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global int ccl_sound_p(SCM sound)
 {
     return CCL_SOUNDP(sound);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Cast a scheme object to a clone sound id
@@ -267,24 +291,42 @@ global int ccl_sound_p(SCM sound)
 **
 **	@return		the clone sound id
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 global SoundId ccl_sound_id(SCM sound)
 {
     return CCL_SOUND_ID(sound);
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask the sound system to dump on the
 **	standard output the mapping between sound names and sound id.
 */
-local SCM CclDisplaySounds(void) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclDisplaySounds(void)
+{
     DisplaySoundHashTable();
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclDisplaySounds(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    DisplaySoundHashTable();
+    return 0;
+}
+#endif
 
 /**
 **	Glue between c and scheme. Allows to specify some global game sounds
 **	in a ccl file.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineGameSounds(SCM list)
 {
     //FIXME: should allow to define ALL the game sounds
@@ -379,34 +421,65 @@ local SCM CclDefineGameSounds(SCM list)
     }
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Global volume support
 **
 **	@param volume	new global sound volume
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSoundVolume(SCM volume)
 {
     SetGlobalVolume(gh_scm2int(volume));
     return volume;
 }
+#elif defined(USE_LUA)
+local int CclSetSoundVolume(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    SetGlobalVolume(LuaToNumber(l, 1));
+    lua_pushvalue(l, 1);
+    return 1;
+}
+#endif
 
 /**
 **	Music volume support
 **
 **	@param volume	new global music volume
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMusicVolume(SCM volume)
 {
     SetMusicVolume(gh_scm2int(volume));
     return volume;
 }
+#elif defined(USE_LUA)
+local int CclSetMusicVolume(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    SetMusicVolume(LuaToNumber(l, 1));
+    lua_pushvalue(l, 1);
+    return 1;
+}
+#endif
 
 /**
 **	Set cd mode
 **
 **	@param mode	cd mode
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetCdMode(SCM mode)
 {
 #ifdef USE_CDAUDIO
@@ -429,10 +502,44 @@ local SCM CclSetCdMode(SCM mode)
 #endif
     return mode;
 }
+#elif defined(USE_LUA)
+local int CclSetCdMode(lua_State* l)
+{
+#ifdef USE_CDAUDIO
+    CDModes cdmode;
+    const char* mode;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    mode = LuaToString(l, 1);
+
+    if (!strcmp(mode, "all")) {
+	cdmode = CDModeAll;
+    } else if (!strcmp(mode, "random")) {
+	cdmode = CDModeRandom;
+    } else if (!strcmp(mode, "defined")) {
+	cdmode = CDModeDefined;
+    } else if (!strcmp(mode, "off")) {
+	cdmode = CDModeOff;
+    } else {
+	cdmode = CDModeOff;
+	lua_pushfstring(l, "Unsupported tag: %s", mode);
+	lua_error(l);
+    }
+
+    PlayCDRom(cdmode);
+#endif
+    lua_pushvalue(l, 1);
+    return 1;
+}
+#endif
 
 /**
 **	Define play sections
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefinePlaySections(SCM list)
 {
     SCM value;
@@ -538,15 +645,30 @@ local SCM CclDefinePlaySections(SCM list)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Turn Off Sound (client side)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundOff(void)
 {
     SoundOff = 1;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSoundOff(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    SoundOff = 1;
+    return 0;
+}
+#endif
 
 /**
 **	Turn On Sound (client side)
@@ -554,6 +676,7 @@ local SCM CclSoundOff(void)
 **	@return true if and only if the sound is REALLY turned on
 **		(uses SoundFildes)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundOn(void)
 {
     if (SoundFildes != -1) {
@@ -562,16 +685,47 @@ local SCM CclSoundOn(void)
     SoundOff = 0;
     return SCM_BOOL_F;
 }
+#elif defined(USE_LUA)
+local int CclSoundOn(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    if (SoundFildes != -1) {
+	lua_pushboolean(l, 1);
+	return 1;
+    }
+    SoundOff = 0;
+    lua_pushboolean(l, 0);
+    return 1;
+}
+#endif
 
 /**
 **	Turn Off Music (client side)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMusicOff(void)
 {
     StopMusic();
     MusicOff = 1;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclMusicOff(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    StopMusic();
+    MusicOff = 1;
+    return 0;
+}
+#endif
 
 /**
 **	Turn On Music (client side)
@@ -579,31 +733,66 @@ local SCM CclMusicOff(void)
 **	@return true if and only if the sound is REALLY turned on
 **		(uses SoundFildes)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMusicOn(void)
 {
     MusicOff = 0;
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclMusicOn(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    MusicOff = 0;
+    return 0;
+}
+#endif
 
 /**
 **	Set the cut off distance.
 **
 **	@param distance new cut off distance for sounds
 */
-local SCM CclSetGlobalSoundRange(SCM distance) {
+#if defined(USE_GUILE) || defined(USE_SIOD)
+local SCM CclSetGlobalSoundRange(SCM distance)
+{
     int d;
 
-    //FIXME check for errors
+    // FIXME: check for errors
     d = gh_scm2int(distance);
     if (d > 0) {
 	DistanceSilent = d;
     }
     return distance;
 }
+#elif defined(USE_LUA)
+local int CclSetGlobalSoundRange(lua_State* l)
+{
+    int d;
+
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    // FIXME: check for errors
+    d = LuaToNumber(l, 1);
+    if (d > 0) {
+	DistanceSilent = d;
+    }
+    lua_pushvalue(l, 1);
+    return 1;
+}
+#endif
 
 /**
 **	Ask clone to use a sound thread
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundThread(void)
 {
 #ifdef USE_THREAD
@@ -611,6 +800,20 @@ local SCM CclSoundThread(void)
 #endif
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclSoundThread(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+#ifdef USE_THREAD
+    WithSoundThread = 1;
+#endif
+    return 0;
+}
+#endif
 
 /**
 **	Set the range of a given sound.
@@ -618,6 +821,7 @@ local SCM CclSoundThread(void)
 **	@param sound	the sound id or name of the sound
 **	@param range	the new range for this sound
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSoundRange(SCM sound, SCM range) {
     //FIXME check for errors
     unsigned char theRange;
@@ -637,12 +841,39 @@ local SCM CclSetSoundRange(SCM sound, SCM range) {
     SetSoundRange(id, theRange);
     return sound;
 }
+#elif defined(USE_LUA)
+local int CclSetSoundRange(lua_State* l) {
+    unsigned char theRange;
+    int tmp;
+//    SoundId id;
+
+    if (lua_gettop(l) != 2) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    tmp = LuaToNumber(l, 2);
+    if (tmp < 0) {
+	theRange = 0;
+    } else if (tmp > 255) {
+	theRange = 255;
+    } else {
+	theRange = (unsigned char)tmp;
+    }
+    DebugLevel3("Range: %u (%d)\n" _C_ TheRange _C_ tmp);
+//    id = CclGetSoundId(sound);
+//    SetSoundRange(id, theRange);
+//    return sound;
+    return 0;
+}
+#endif
 
 /**
 **	Play a music file.
 **
 **	@param name	Name of the music file to play.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPlayMusic(SCM name)
 {
     char* music_name;
@@ -653,12 +884,26 @@ local SCM CclPlayMusic(SCM name)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclPlayMusic(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    PlayMusic(LuaToString(l, 1));
+
+    return 0;
+}
+#endif
 
 /**
 **	Play a sound file.
 **
 **	@param name	Name of the sound file to play.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPlayFile(SCM name)
 {
     char* filename;
@@ -669,10 +914,24 @@ local SCM CclPlayFile(SCM name)
 
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+local int CclPlayFile(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    PlayFile(LuaToString(l, 1));
+
+    return 0;
+}
+#endif
 
 /**
 **	Stop playing music.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclStopMusic(void)
 {
     StopMusic();
@@ -680,6 +939,17 @@ local SCM CclStopMusic(void)
     return SCM_UNSPECIFIED;
 }
 #elif defined(USE_LUA)
+local int CclStopMusic(lua_State* l)
+{
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+
+    StopMusic();
+
+    return 0;
+}
 #endif
 
 /**
@@ -714,6 +984,33 @@ global void SoundCclRegister(void)
     gh_new_procedure1_0("play-music", CclPlayMusic);
     gh_new_procedure1_0("play-file", CclPlayFile);
     gh_new_procedure0_0("stop-music", CclStopMusic);
+#elif defined(USE_LUA)
+//    SiodSoundTag = CclMakeSmobType("Sound");
+
+    lua_register(Lua, "SetSoundVolume", CclSetSoundVolume);
+    lua_register(Lua, "SetMusicVolume", CclSetMusicVolume);
+    lua_register(Lua, "SetCdMode", CclSetCdMode);
+
+//    lua_register(Lua, "DefinePlaySections", CclDefinePlaySections);
+
+    lua_register(Lua, "SoundOff", CclSoundOff);
+    lua_register(Lua, "SoundOn", CclSoundOn);
+    lua_register(Lua, "MusicOff", CclMusicOff);
+    lua_register(Lua, "MusicOn", CclMusicOn);
+    lua_register(Lua, "SoundThread", CclSoundThread);
+    lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
+//    lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
+    lua_register(Lua, "DisplaySounds", CclDisplaySounds);
+//    lua_register(Lua, "MapSound", CclMapSound);
+//    lua_register(Lua, "SoundForName", CclSoundForName);
+    lua_register(Lua, "SetSoundRange", CclSetSoundRange);
+//    lua_register(Lua, "MakeSound", CclMakeSound);
+//    lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
+//    lua_register(Lua, "PlaySound", CclPlaySound);
+
+    lua_register(Lua, "PlayMusic", CclPlayMusic);
+    lua_register(Lua, "PlayFile", CclPlayFile);
+    lua_register(Lua, "StopMusic", CclStopMusic);
 #endif
 }
 
@@ -726,38 +1023,50 @@ global void SoundCclRegister(void)
 **
 **	@param volume	new global sound volume
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSoundVolume(SCM volume)
 {
     return volume;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Music volume support
 **
 **	@param volume	new global music volume
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetMusicVolume(SCM volume)
 {
     return volume;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set cd mode
 **
 **	@param mode	cd mode
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetCdMode(SCM mode)
 {
     return mode;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Turn Off Sound (client side)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundOff(void)
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Turn On Sound (client side)
@@ -765,18 +1074,24 @@ local SCM CclSoundOff(void)
 **	@return true if and only if the sound is REALLY turned on
 **		(uses SoundFildes)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundOn(void)
 {
     return SCM_BOOL_T;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Turn Off Music (client side)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMusicOff(void)
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Turn On Music (client side)
@@ -784,20 +1099,26 @@ local SCM CclMusicOff(void)
 **	@return true if and only if the sound is REALLY turned on
 **		(uses SoundFildes)
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMusicOn(void)
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the cut off distance.
 **
 **	@param distance new cut off distance for sounds
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetGlobalSoundRange(SCM distance)
 {
     return distance;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Set the range of a given sound.
@@ -805,45 +1126,60 @@ local SCM CclSetGlobalSoundRange(SCM distance)
 **	@param sound	the sound id or name of the sound
 **	@param range	the new range for this sound
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSetSoundRange(SCM sound, SCM range __attribute__((unused)))
 {
     return sound;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Ask clone to use a sound thread
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundThread(void)
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask the sound system to dump on the
 **	standard output the mapping between sound names and sound id.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDisplaySounds(void)
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask the sound system to associate a sound
 **	id to a sound name.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclSoundForName(SCM name __attribute__((unused)))
 {
     return NIL;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Allows to specify some global game sounds
 **	in a ccl file.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclDefineGameSounds(SCM list __attribute__((unused)))
 {
     return NIL;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Glue between c and scheme. Ask to the sound system to remap a sound id
@@ -854,36 +1190,46 @@ local SCM CclDefineGameSounds(SCM list __attribute__((unused)))
 **
 **	@return		the sound object
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclMapSound(SCM name __attribute__((unused)), SCM sound)
 {
     return sound;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Play a music file.
 **
 **	@param name	Name of the music file to play.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPlayMusic(SCM name __attribute__((unused)))
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Play a sound file.
 **
 **	@param name	Name of the sound file to play.
 */
+#if defined(USE_GUILE) || defined(USE_SIOD)
 local SCM CclPlayFile(SCM name __attribute__((unused)))
 {
     return SCM_UNSPECIFIED;
 }
+#elif defined(USE_LUA)
+#endif
 
 /**
 **	Register CCL features for sound. Dummy version.
 */
 global void SoundCclRegister(void)
 {
+#if defined(USE_GUILE) || defined(USE_SIOD)
     gh_new_procedure1_0("set-sound-volume!", CclSetSoundVolume);
     gh_new_procedure1_0("set-music-volume!", CclSetMusicVolume);
     gh_new_procedure1_0("set-cd-mode!", CclSetCdMode);
@@ -901,6 +1247,7 @@ global void SoundCclRegister(void)
 
     gh_new_procedure1_0("play-music", CclPlayMusic);
     gh_new_procedure1_0("play-file", CclPlayFile);
+#endif
 }
 
 #endif	// } !WITH_SOUND
