@@ -79,7 +79,7 @@ etlib/prgname.o: etlib/prgname.c
 
 # UNIX-TARGET
 freecraft:	src etlib/hash.o src/libclone.a 
-	$(CC) -o freecraft src/libclone.a $(CLONELIBS) -I. $(CFLAGS)
+	$(CC) -o freecraft src/libclone.a -lefence $(CLONELIBS) -I. $(CFLAGS)
 
 # WIN32-TARGET
 freecraft.exe:	src etlib/prgname.o etlib/getopt.o etlib/hash.o \
@@ -218,6 +218,8 @@ bin-dist:: all
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
 
+#----------------------------------------------------------------------------
+
 win32-bin-dist2:: win32
 	@$(RM) $(DISTLIST)
 	@echo $(PICS) >>$(DISTLIST)
@@ -250,8 +252,51 @@ win32-bin-dist: win32
 win32-exe-dist:	win32-bin-dist
 	cat tools/SFXWiz32-gcc.exe freecraft-$(mydate)-win32bin.zip \
 		> freecraft-$(mydate)-win32bin.exe
-	
 
+#----------------------------------------------------------------------------
+
+PCRAFT= ../archive/clone-000402.tar.bz2
+LCRAFT= ../archive/clone-000402-bin.tar.bz2
+WCRAFT= ../archive/clone-000402-win32bin.zip
+FCRAFT=	../fcraft-0.13.tar.gz
+SCRAFT= ../sclone-0.01.tar.bz2
+
+linux-complete:
+	tar xzf $(FCRAFT)
+	tar xIf $(SCRAFT)
+	tar xIf $(PCRAFT)
+	tar xIf $(LCRAFT)
+	mkdir clone-complete
+	cp -a clone-000402/* clone-complete
+	cp -a fcraft/* clone-complete
+	cp -a fclone/* clone-complete
+	rm -rf clone-000402
+	rm -rf fcraft
+	rm -rf fclone
+	tar chzf clone-000402-complete-linux.tar.gz clone-complete
+	tar chIf clone-000402-complete-linux.tar.bz2 clone-complete
+	rm -rf clone-complete
+
+win32-complete:
+	tar xzf $(FCRAFT)
+	tar xIf $(SCRAFT)
+	tar xIf $(PCRAFT)
+	unzip -oq $(WCRAFT)
+	mkdir clone-complete
+	cp -a clone-000402/* clone-complete
+	cp -a fcraft/* clone-complete
+	cp -a fclone/* clone-complete
+	rm -rf clone-000402
+	rm -rf fcraft
+	rm -rf fclone
+	mv clone-complete/CONTRIB clone-complete/CONTRIB.txt
+	echo "(c) 2000 by the FreeCraft Project http://FreeCraft.Org" | \
+	zip -zq9r clone-000402-complete-win32.zip clone-complete
+	cat tools/SFXWiz32-gcc.exe clone-000402-complete-win32.zip \
+		> clone-000402-complete-win32.exe
+	rm -rf clone-complete
+
+#----------------------------------------------------------------------------
 difffile=	freecraft-`date +%y%m%d`.diff
 diff:	
 	@$(RM) $(difffile)
@@ -278,8 +323,9 @@ release:
 	$(MAKE) bin-dist "ZDEFS=-DUSE_ZLIB -DUSE_BZ2LIB" "ZLIBS=-lz -lbz2"
 	$(MAKE) win32new
 	$(MAKE) win32-bin-dist
-	$(MAKE) dist
+	$(MAKE) win32-exe-dist
 	$(MAKE) win32distclean
+	$(MAKE) dist
 
 ##############################################################################
 #	WIN32 Crosscompiler Build
