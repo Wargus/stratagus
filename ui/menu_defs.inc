@@ -1779,6 +1779,17 @@ local void InitOldMenuData(void)
 
 
 #ifdef SAVE_MENU_CCL
+
+typedef char char30[30];
+global hashtable(char30,MENUS_MAXFUNC) MenuFuncHash2;
+
+#undef HASHADD
+#define HASHADD(x,y) { \
+    *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
+    sprintf(buf,"%p",(x)); \
+    strcpy((char*)hash_add(MenuFuncHash2,buf), (y)); \
+}
+
 char *menu_names[] = {
     "menu-game",
     "menu-victory",
