@@ -150,6 +150,77 @@ local int MapVisibleMask(void)
 }
 
 /**
+**	Find the Number of Units that can see this square using a long
+**	lookup. So when a 225 Viewed square can be calculated properly.
+**
+**	@param player	Player to mark sight.
+**	@param tx	X center position.
+**	@param ty	Y center position.
+*/
+#define MAX_SIGHT_RANGE 9
+local int LookupSight(const Player* player, int tx, int ty)
+{
+    int numunits;
+    int visiblecount=0;
+    int x;
+    int y;
+    int range;
+    Unit* unitrange[UnitMax];
+    //Lookup all units that could possibly see this square.
+    //And see how many there are.
+    numunits=SelectUnits(tx-MAX_SIGHT_RANGE-1,
+			    ty-MAX_SIGHT_RANGE-1,
+			    tx+MAX_SIGHT_RANGE+1,
+			    ty+MAX_SIGHT_RANGE+1,unitrange);
+    numunits--;
+    range=(unitrange[numunits]->Stats->SightRange+1)*
+	    (unitrange[numunits]->Stats->SightRange+1);
+    printf("Number of Lookup Units: %d\n",numunits);
+    while(numunits >= 0) {
+	if (unitrange[numunits]->Player->Player == player->Player) {
+	    x = unitrange[numunits]->X;
+	    y = unitrange[numunits]->Y;
+	    if (((x-tx)*(x-tx)+(y-ty)*(y-ty)) <= range) {
+		visiblecount++;
+	    }
+	}
+	if (visiblecount >= 255) return 255;
+	numunits--;
+    }
+    return visiblecount;
+}
+
+/**
+**	Find out if a field is seen (By me, or by shared vision)
+**	@param player,	Player to check for
+**	@param x,	X tile to check
+**	@param y,	Y tile to check
+*/
+global int IsTileVisible(const Player* player, int x, int y)
+{
+    int visiontype=0;
+    int i;
+    if (TheMap.Fields[y*TheMap.Width+x].Visible[player->Player] > 1) {
+      return 2;
+    }
+    visiontype=TheMap.Fields[y*TheMap.Width+x].Visible[player->Player];
+    for (i=0;i<PlayerMax;i++) {
+	if ( player->SharedVision&(1<<i) &&
+		   (Players[i].SharedVision&(1<<player->Player)) ) {
+            if (visiontype < TheMap.Fields[y*TheMap.Width+x].
+					Visible[player->Player]) {
+		visiontype=TheMap.Fields[y*TheMap.Width+x].
+					Visible[player->Player];
+	    }
+	}
+	if (visiontype > 1) {
+	    return 2;
+	}
+    }
+    return visiontype;
+}
+
+/**
 **	Mark the sight of unit. (Explore and make visible.)
 **
 **	@param player	Player to mark sight.
@@ -167,6 +238,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
     int v;
     int p;
 
+    //Mark as Seen
     if( !range ) {			// zero sight range is zero sight range
 	DebugLevel0Fn("Zero sight range\n");
 	return;
@@ -203,16 +275,14 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 		switch( v ) {
 		    case 0:		// Unexplored
 		    case 1:		// Unseen
-			if( player==ThisPlayer ||
-			    ( (ThisPlayer->SharedVision&(1<<p)) &&
-			      (player->SharedVision&(1<<ThisPlayer->Player)) ) ) {
-			    MapMarkSeenTile(i,y);
-			}
+			//if( IsTileVisible(ThisPlayer,i,y) > 1) {
+			//    MapMarkSeenTile(i,y);
+			//}
 			// FIXME: mark for screen update
 			TheMap.Fields[i+y*TheMap.Width].Visible[p]=2;
 			break;
 		    case 255:		// Overflow
-			DebugLevel0Fn("Visible overflow\n");
+			DebugLevel0Fn("Visible overflow: Slow Lookup Needed\n");
 			break;
 
 		    default:		// seen -> seen
@@ -226,6 +296,93 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 }
 
 /**
+**	Unmark the sight of unit. (Dies, Boards A unit.)
+**
+**	@param player	Player to mark sight.
+**	@param tx	X center position.
+**	@param ty	Y center position.
+**	@param range	Radius to unmark.
+*/
+global void MapUnmarkSight(const Player* player,int tx,int ty,int range)
+{
+    int i;
+    int x;
+    int y;
+    int height;
+    int width;
+    int v;
+    int p;
+
+        if( !range ) {			// zero sight range is zero sight range
+	DebugLevel0Fn("Zero sight range\n");
+	return;
+    }
+
+    x=tx-range;
+    y=ty-range;
+    width=height=range+range;
+
+    //	Clipping
+    if( y<0 ) {
+	height+=y;
+	y=0;
+    }
+    if( x<0 ) {
+	width+=x;
+	x=0;
+    }
+    if( y+height>=TheMap.Height ) {
+	height=TheMap.Height-y-1;
+    }
+    if( x+width>=TheMap.Width ) {
+	width=TheMap.Width-x-1;
+    }
+
+    p=player->Player;
+    ++range;
+    // FIXME: Can be speed optimized, no * += ...
+    while( height-->=0 ) {
+	for( i=x; i<=x+width; ++i ) {
+	    // FIXME: Can use quadrat table!
+	    if( ((i-tx)*(i-tx)+(y-ty)*(y-ty))<=range*range ) {
+		v=TheMap.Fields[i+y*TheMap.Width].Visible[p];
+		switch( v ) {
+		    case 255:
+			TheMap.Fields[i+y*TheMap.Width].Visible[p] =
+			    LookupSight(player,i,y);
+			if (FlagRevealMap == 1 &&
+			    TheMap.Fields[i+y*TheMap.Width].Visible[p] == 0) {
+				TheMap.Fields[i+y*TheMap.Width].Visible[p] = 1;
+			}
+			if (TheMap.NoFogOfWar == 1 &&
+			    TheMap.Fields[i+y*TheMap.Width].Visible[p] < 2) {
+				TheMap.Fields[i+y*TheMap.Width].Visible[p] = 2;
+			}
+			if (FlagRevealMap &&
+			    TheMap.Fields[i+y*TheMap.Width].Visible[p] < 255) {
+				TheMap.Fields[i+y*TheMap.Width].Visible[p] += 1;
+			}
+		    case 0:		// Unexplored
+		    case 1:
+			//We are at minimum, don't do anything.
+			break;
+		    case 2:
+		        //We don't want to do fow, when we don't want it.
+			if ( TheMap.NoFogOfWar ) {
+			  break;
+			}
+		    default:		// seen -> seen
+			TheMap.Fields[i+y*TheMap.Width].Visible[p]=v-1;
+			break;
+		}
+	    }
+	}
+	++y;
+    }
+}
+
+    
+/**
 **	Mark the new sight of unit. (Explore and make visible.)
 **
 **	@param player	Player to mark sight.
@@ -236,7 +393,7 @@ global void MapMarkSight(const Player* player,int tx,int ty,int range)
 global void MapMarkNewSight(const Player* player,int tx,int ty,int range
 	,int dx __attribute__((unused)),int dy __attribute__((unused)))
 {
-    // FIXME: must write this
+    MapUnmarkSight(player,tx-dx,ty-dy,range);
     MapMarkSight(player,tx,ty,range);
 }
 
@@ -373,11 +530,12 @@ global void MapUpdateFogOfWar(int x,int y)
 	while( dx<=ex ) {
 	    last=TheMap.Fields[sx].VisibleLastFrame;
 #ifdef NEW_FOW
-	    vis=TheMap.Fields[sx].Visible&(1<<ThisPlayer->Player);
+	    vis=IsTileVisible(ThisPlayer->Player,x,y);
+	    if( vis > 1 && (!last || last&MapFieldPartiallyVisible) ) {
 #else
 	    vis=TheMap.Fields[sx].Flags&MapFieldVisible;
+	    if( vis  && (!last || last&MapFieldPartiallyVisible) ) {
 #endif
-	    if( vis && (!last || last&MapFieldPartiallyVisible) ) {
 #ifdef NEW_MAPDRAW
 		*redraw_row=NEW_MAPDRAW;
 		*redraw_tile=NEW_MAPDRAW;
@@ -425,17 +583,19 @@ global void UpdateFogOfWarChange(void)
 	w=TheMap.Width;
 	for( y=0; y<TheMap.Height; y++ ) {
 	    for( x=0; x<TheMap.Width; ++x ) {
-		if ( IsMapFieldExplored(x,y) ) {
 #ifdef NEW_FOW
+	if ( IsTileVisible(ThisPlayer,x,y) ) {
 		    int p;
 
-		    for( p=0; p<PlayerMax; ++p ) {
-			if( TheMap.Fields[x+y*w].Visible[p] ) {
-			    DebugLevel0Fn("Don't work look\n");
+		   for( p=0; p<PlayerMax; ++p ) {
+			if (TheMap.Fields[x+y*w].Visible[p] < 2) {
+			    TheMap.Fields[x+y*w].Visible[p]=2;
+			} else {
+			    TheMap.Fields[x+y*w].Visible[p]++;
 			}
-			TheMap.Fields[x+y*w].Visible[p]=2;
 		    }
 #else
+	if ( IsMapFieldExplored(x,y) ) {
 		    TheMap.Visible[0][(x+y*w)/32] |= 1<<((x+y*w)%32);
 #endif
 		    MapMarkSeenTile( x,y );
@@ -443,7 +603,38 @@ global void UpdateFogOfWarChange(void)
 	    }
 	}
     }
-
+#ifdef NEW_FOW
+    else {
+	int p;
+	int numunits;
+	Unit* units[UnitMax];
+	for( y=0; y<TheMap.Height; y++ ) {
+	    for( x=0; x<TheMap.Width; ++x ) {
+		for( p=0; p<PlayerMax; ++p ) {
+		    if( TheMap.Fields[x+y*TheMap.Width].Visible[p] ) {
+			    TheMap.Fields[x+y*TheMap.Width].Visible[p]=1;
+		    }
+		}
+	    }
+	}
+	for( y=0; y<TheMap.Height; y++ ) {
+	    for( x=0; x<TheMap.Width; ++x ) {
+		    //Find and Mark each unit
+		    numunits = SelectUnitsOnTile(x,y,units);
+		    numunits--;
+		    while(numunits >= 0) {
+			int tx;
+			int ty;
+			tx=units[numunits]->X+units[numunits]->Type->TileWidth/2;
+			ty=units[numunits]->Y+units[numunits]->Type->TileHeight/2;
+			MapMarkSight(units[numunits]->Player,tx,ty,
+					units[numunits]->Stats->SightRange);
+			numunits--;
+		    }
+	    }
+	}
+    }
+#endif
     MarkDrawEntireMap();
 }
 
@@ -1637,32 +1828,110 @@ global void VideoDrawOnlyFogAlphaOpenGL(
 local void DrawFogOfWarTile(int sx,int sy,int dx,int dy)
 {
 #ifdef NEW_FOW
-    sx=sy=dx=dy=0;
-#if 0
-    int m;
-    MapField* mf;
+    int w;
+    int tile;
+    int tile2;
+    int x;
+    int y;
 
-    m=1<<ThisPlayer->Player;
-    mf=TheMap.Fields+sx;
+    w=TheMap.Width;
+    tile=tile2=0;
+    x = sx - sy;
+    y = sy / TheMap.Width;
 
     //
-    //	Draw unexplored area
+    //	Which Tile to draw for fog
     //
-    if( mf->Explored && mf->ExploredMask ) {
-	VideoDrawUnexplored(TheMap.Tiles[mf->ExploredMask],dx,dy);
-	// Don't need to draw the same tiles.
-	if( mf->Visible && mf->ExploredMask==mf->VisibleMask ) {
-	    return;
+    if( sy ) {
+	if( sx!=sy ) {
+	    if( IsTileVisible(ThisPlayer,x-1,y-1) == 0 ) {
+		tile2|=2;
+		tile|=2;
+	    } else if( IsTileVisible(ThisPlayer,x-1,y-1) == 1) {
+		tile|=2;
+	    }
+	}
+	if( !(IsTileVisible(ThisPlayer,x,y-1)) ) {
+	    tile2|=3;
+	    tile|=3;
+	} else if( (IsTileVisible(ThisPlayer,x,y-1)) == 1) {
+	    tile|=3;
+	}
+	if( sx!=sy+w-1 ) {
+	    if( !(IsTileVisible(ThisPlayer,x+1,y-1)) ) {
+		tile2|=1;
+		tile|=1;
+	    } else if( (IsTileVisible(ThisPlayer,x+1,y-1) == 1)) {
+		tile|=1;
+	    }
 	}
     }
-    if( mf->Visible ) {
-	if( mf->VisibleMask ) {
-	    VideoDrawFog(TheMap.Tiles[mf->VisibleMask],dx,dy);
+
+    if( sx!=sy ) {
+	if( !(IsTileVisible(ThisPlayer,x-1,y)) ) {
+	    tile2|=10;
+	    tile|=10;
+	} else if( (IsTileVisible(ThisPlayer,x-1,y) == 1)) {
+	    tile|=10;
+	}
+    }
+    if( sx!=sy+w-1 ) {
+	if( !(IsTileVisible(ThisPlayer,x+1,y)) ) {
+	    tile2|=5;
+	    tile|=5;
+	} else if( (IsTileVisible(ThisPlayer,x+1,y) == 1 ) ) {
+	    tile|=5;
+	}
+    }
+
+    if( sy+w<TheMap.Height*w ) {
+	if( sx!=sy ) {
+	    if( !(IsTileVisible(ThisPlayer,x-1,y+1)) ) {
+		tile2|=8;
+		tile|=8;
+	    } else if( (IsTileVisible(ThisPlayer,x-1,y+1) == 1) ) {
+		tile|=8;
+	    }
+	}
+	if( !(IsTileVisible(ThisPlayer,x,y+1)) ) {
+	    tile2|=12;
+	    tile|=12;
+	} else if( (IsTileVisible(ThisPlayer,x,y+1) == 1) ) {
+	    tile|=12;
+	}
+	if( sx!=sy+w-1 ) {
+	    if( !(IsTileVisible(ThisPlayer,x+1,y+1)) ) {
+		tile2|=4;
+		tile|=4;
+	    } else if( (IsTileVisible(ThisPlayer,x+1,y+1) == 1) ) {
+		tile|=4;
+	    }
+	}
+    }
+
+    tile=FogTable[tile];
+    tile2=FogTable[tile2];
+
+    if( tile2) {
+	VideoDrawUnexplored(TheMap.Tiles[tile2],dx,dy);
+	if( tile2==tile ) {		// no same fog over unexplored
+//	    if( tile != 0xf ) {
+//		TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
+//	    }
+	    tile=0;
+	}
+    }
+    if( IsTileVisible(ThisPlayer,x,y) > 1 ) {
+	if( tile ) {
+	    VideoDrawFog(TheMap.Tiles[tile],dx,dy);
+//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldPartiallyVisible;
+//	} else {
+//	    TheMap.Fields[sx].VisibleLastFrame|=MapFieldCompletelyVisible;
 	}
     } else {
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE],dx,dy);
     }
-#endif
+    
 #else
     int w;
     int tile;
@@ -1851,6 +2120,18 @@ global void DrawMapFogOfWar(const Viewport* vp, int x,int y)
 #endif
 #endif
 
+#if defined(NEW_FOW) && defined(DEBUG) && !defined(HIERARCHIC_PATHFINDER) && 0
+extern int VideoDrawText(int x,int y,unsigned font,const unsigned char* text);
+#define GameFont 1
+	{
+	char seen[4];
+	int x=(dx-vp->X)/TileSizeX + vp->MapX;
+	int y=(dy-vp->Y)/TileSizeY + vp->MapY;
+	sprintf(seen,"%d",TheMap.Fields[y*TheMap.Width+x].Visible[
+		ThisPlayer->Player]);
+	VideoDrawText(dx,dy, GameFont,seen);
+	}
+#endif 
 #if defined(HIERARCHIC_PATHFINDER) && defined(DEBUG)
 		    {
 			char regidstr[8];

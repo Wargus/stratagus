@@ -240,6 +240,12 @@ global void HandleActionBuild(Unit* unit)
 #endif
     unit->Value=build->Value;		// worker holding value while building
 
+#ifdef NEW_FOW
+	MapMarkSight(build->Player,build->X+build->Type->TileWidth/2
+				     ,build->Y+build->Type->TileHeight/2
+			,build->Type->TileWidth > build->Type->TileHeight ?
+			    build->Type->TileWidth : build->Type->TileHeight);
+#endif
     RemoveUnit(unit);		// automaticly: CheckUnitToBeDrawn(unit)
     // FIXME: Johns: should connect it to the building with ->Next?
     unit->X=x;
@@ -280,6 +286,16 @@ global void HandleActionBuilded(Unit* unit)
 	PlayerAddCostsFactor(unit->Player,unit->Stats->Costs,
 		CancelBuildingCostsFactor);
 	// Cancel building
+#ifdef NEW_FOW
+	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				     ,unit->Y+unit->Type->TileHeight/2
+			,unit->Type->TileWidth > unit->Type->TileHeight ?
+			    unit->Type->TileWidth : unit->Type->TileHeight);
+	//Hack since RemoveUnit will UnmarkUnitSite, so We'll temp mark it.
+	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				     ,unit->Y+unit->Type->TileHeight/2
+			,unit->Stats->SightRange);
+#endif
 	LetUnitDie(unit);
 	return;
     }
@@ -310,13 +326,20 @@ global void HandleActionBuilded(Unit* unit)
 	unit->Constructed=0;
 	unit->Frame=0;
 	unit->Reset=unit->Wait=1;
-
 	worker=unit->Data.Builded.Worker;
 	worker->Orders[0].Action=UnitActionStill;
 	worker->SubAction=0;
 	worker->Reset=worker->Wait=1;
 	DropOutOnSide(worker,LookingW,type->TileWidth,type->TileHeight);
-
+#ifdef NEW_FOW
+	MapUnmarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				     ,unit->Y+unit->Type->TileHeight/2
+			,unit->Type->TileWidth > unit->Type->TileHeight ?
+			    unit->Type->TileWidth : unit->Type->TileHeight);
+	MapMarkSight(unit->Player,unit->X+unit->Type->TileWidth/2
+				     ,unit->Y+unit->Type->TileHeight/2
+				     ,unit->Stats->SightRange);
+#endif
 	//
 	//	Building oil-platform, must update oil.
 	//

@@ -403,6 +403,10 @@ extern  void MarkDrawEntireMap(void);
 extern void MapMarkSight(const Player*,int,int,int);
     /// Mark the new sight in range
 extern void MapMarkNewSight(const Player*,int,int,int,int,int);
+    /// Unmark the sight in range
+extern void MapUnmarkSight(const Player*,int,int,int);
+    /// Find if a tile is visible (With shared vision)
+extern int IsTileVisible(const Player* player, int x, int y);
 #else
     /// Mark the sight in range
 extern void MapMarkSight(int tx,int ty,int range);

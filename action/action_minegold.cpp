@@ -125,6 +125,12 @@ local int MoveToGoldMine(Unit* unit)
     }
 
     RemoveUnit(unit);
+#ifdef NEW_FOW
+    MapMarkSight(unit->Player,destu->X+destu->Type->TileWidth/2,
+    				destu->Y+destu->Type->TileHeight/2,
+        			destu->Stats->SightRange);
+#endif
+
 #if 0
     // This breaks the drop out code
     // FIXME: this is a hack, but solves the problem, a better solution is
@@ -230,6 +236,12 @@ local int MineInGoldmine(Unit* unit)
 	    if( mine ) {
 		DropOutOnSide(unit,LookingW
 			,mine->Type->TileWidth,mine->Type->TileHeight);
+#ifdef NEW_FOW
+	//Worker is back on map, unmark sight
+	    MapUnmarkSight(unit->Player,mine->X+mine->Type->TileWidth/2,
+				mine->Y+mine->Type->TileHeight/2,
+				mine->Stats->SightRange);
+#endif
 	    }
 	    unit->Orders[0].Action=UnitActionStill;
 	    unit->SubAction=0;
@@ -239,6 +251,12 @@ local int MineInGoldmine(Unit* unit)
 		DropOutNearest(unit,destu->X+destu->Type->TileWidth/2
 			,destu->Y+destu->Type->TileHeight/2
 			,mine->Type->TileWidth,mine->Type->TileHeight);
+#ifdef NEW_FOW
+	//Worker is back on map, unmark sight
+	    MapUnmarkSight(unit->Player,mine->X+mine->Type->TileWidth/2,
+				mine->Y+mine->Type->TileHeight/2,
+				mine->Stats->SightRange);
+#endif
 	    }
 	    unit->Orders[0].Goal=destu;
 	    NewResetPath(unit);
