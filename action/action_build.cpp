@@ -354,6 +354,9 @@ global void HandleActionBuilded(Unit* unit)
 	if ( unit->Type == UnitTypeOrcWall
 		    || unit->Type == UnitTypeHumanWall ) {
 	    MapSetWall(unit->X, unit->Y, unit->Type == UnitTypeHumanWall);
+#ifdef NEW_FOW
+	    unit->CurrentSightRange=0;
+#endif
             RemoveUnit(unit,NULL);
 	    UnitLost(unit);
 	    UnitClearOrders(unit);
