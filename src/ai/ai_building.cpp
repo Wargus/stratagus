@@ -179,7 +179,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 	//
 	// Look if we can build at current place.
 	//
-	if (CanBuildUnitType(worker, type, x, y) &&
+	if (CanBuildUnitType(worker, type, x, y, 1) &&
 		(/*!flag || */AiCheckSurrounding(worker, type, x, y, flag))) {
 		*dx = x;
 		*dy = y;
@@ -232,7 +232,7 @@ local int AiFindBuildingPlace2(const Unit * worker, const UnitType * type,
 				//
 				// Look if we can build here.
 				//
-				if (CanBuildUnitType(worker, type, x, y) &&
+				if (CanBuildUnitType(worker, type, x, y, 1) &&
 					(/*!flag ||*/ AiCheckSurrounding(worker, type, x, y, flag))) {
 					*dx = x;
 					*dy = y;
