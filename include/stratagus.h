@@ -43,6 +43,9 @@
 // New unit cache
 #define NEW_UNIT_CACHE
 
+// New Lua scripting.
+// #define META_LUA
+
 	//
 	//		Default speed for many things, set it higher for faster actions.
 	//
