@@ -1659,18 +1659,26 @@ void MissileActionPointToPointBounce(Missile* missile)
     DebugCheck(missile == NULL);
     missile->Wait = missile->Type->Sleep;
     if (PointToPointMissile(missile)) {
-	if (missile->State < 2 * missile->Type->NumBounces) {
-	    int sign;
-	    int tmp;
-	    missile->State += 2;
-	    sign = (tmp = missile->DX - missile->SourceX) ? tmp > 0 ? 1 : -1 : 0;
-	    missile->DX += sign * TileSizeX * 3 / 2;
-	    sign = (tmp = missile->DY - missile->SourceY) ? tmp > 0 ? 1 : -1 : 0;
-	    missile->DY += sign * TileSizeY * 3 / 2;
+	if (missile->State < 2 * missile->Type->NumBounces - 1) {
+	    int xstep;
+	    int ystep;
+
+	    xstep = (missile->DX - missile->SourceX) * 1024 / missile->TotalStep;
+	    ystep = (missile->DY - missile->SourceY) * 1024 / missile->TotalStep;
+	    missile->DX += xstep * (TileSizeX + TileSizeY) * 3 / 4 / 1024;
+	    missile->DY += ystep * (TileSizeX + TileSizeY) * 3 / 4 / 1024;
+
+	    missile->State++; // !(State & 1) to initialise
+	    missile->SourceX = missile->X;
+	    missile->SourceY = missile->Y;
+	    PointToPointMissile(missile);
+	    //missile->State++;
+	    DebugLevel0("HIT %d!\n" _C_ missile->State);
 	    MissileHit(missile);
 	    // FIXME: hits to left and right
 	    // FIXME: reduce damage effects on later impacts
 	} else {
+	    MissileHit(missile);
 	    missile->TTL = 0;
 	}
     } else {
