@@ -968,6 +968,7 @@ global void VideoSetPalette(const VMemType* palette)
 	free(Pixels);//FIXME: free unsufficient, XFreeColors needed for X11
     }
 #endif
+
     Pixels=(VMemType*)palette;
     SetPlayersPalette();
 }
