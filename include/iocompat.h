@@ -49,9 +49,6 @@
 
 #else // _MSC_VER
 
-#ifdef _WIN32_WCE
-#define R_OK	1	// FIXME: correct?
-#else
 #define R_OK	4
 #define F_OK	0
 #include <sys/types.h>
@@ -64,7 +61,6 @@
 #define PATH_MAX _MAX_PATH
 #define S_ISDIR(x) ((x) & _S_IFDIR)
 #define S_ISREG(x) ((x) & _S_IFREG)
-#endif
 
 #endif // _MSC_VER
 
