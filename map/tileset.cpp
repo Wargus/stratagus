@@ -92,7 +92,6 @@ void LoadTileset(void)
 	int i;
 	int n;
 	int tile;
-	int tiles_per_row;
 	int solid;
 	int mixed;
 	const unsigned short* table;
@@ -132,6 +131,7 @@ void LoadTileset(void)
 	//
 	//  Calculate number of tiles in graphic tile
 	//
+	n = TheMap.Tileset->NumTiles;
 
 	if (n > MaxTilesInTileset) {
 		fprintf(stderr,
@@ -146,7 +146,6 @@ void LoadTileset(void)
 		calloc(n, sizeof(*TheMap.Tileset->TileTypeTable));
 
 	table = TheMap.Tileset->Table;
-	n = TheMap.Tileset->NumTiles;
 	for (i = 0; i < n; ++i) {
 		if ((tile = table[i])) {
 			unsigned flags;
