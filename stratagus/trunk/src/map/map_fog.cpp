@@ -2770,9 +2770,6 @@ local void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	// Tile is fully FOW
 	SDL_BlitSurface(SolidFog, NULL, TheScreen, &drect);
 #else
-	VideoFillTransRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY, 128);
-#endif
-#else
 	VideoDrawOnlyFog(TheMap.Tiles[UNEXPLORED_TILE], dx, dy);
 #endif
     }   
