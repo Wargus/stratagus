@@ -649,9 +649,10 @@ extern int ShowReactionRange;		/// Flag: show reaction range
 extern int ShowAttackRange;		/// Flag: show attack range
 extern int ShowOrders;			/// Flag: show orders of unit on map
 extern int ShowOrdersCount;		/// Show orders for some time
-extern int HitPointRegeneration;	/// Enable hit point regeneration for all units
-extern int EnableTrainingQueue;		/// Config: training queues enabled
-extern int EnableBuildingCapture;	/// Config: building capture enabled
+extern int HitPointRegeneration;	/// Hit point regeneration for all units
+extern char EnableTrainingQueue;	/// Config: training queues enabled
+extern char EnableBuildingCapture;	/// Config: building capture enabled
+extern char RevealAttacker;		/// Config: reveal attacker enabled
    /// Draw the selection
 extern void (*DrawSelection)(const Unit*,const UnitType*,int,int);
 
