@@ -27,7 +27,7 @@
 ##-----------------------------------------------------------------------------
 ##	HERE ARE SOME USER-CONFIGURABLE VARIABLES
 
-EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DSPLIT_SCREEN_SUPPORT"
+EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP"
 
 ## These could be used for experimental versions
 ## ---------------------------------------------
@@ -53,7 +53,6 @@ EXTRA_CFLAGS="-DUNIT_ON_MAP -DNEW_AI -DUSE_LIBMODPLUG -DUSE_HP_FOR_XP -DSPLIT_SC
 ## NEW_FOW		New fog of war code, should work correct
 ## NEW_SHIPS		New correct ship movement.
 ## HIERARCHIC_PATHFINDER	Use hierarchic pathfinder
-## SPLIT_SCREEN_SUPPORT:    Use multiple map viewports
 ## USE_LUA		Lua scripting support
 
 ##-----------------------------------------------------------------------------
