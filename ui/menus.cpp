@@ -224,11 +224,11 @@ local void EndScenarioQuitMenu(void);
 // Sound options
 local void SoundOptionsInit(Menuitem *mi);
 local void SoundOptionsExit(Menuitem *mi);
-local void MasterVolumeHSAction(Menuitem *mi, int i);
+local void MasterVolumeHSAction(Menuitem *mi);
 local void SetMasterPower(Menuitem *mi);
-local void MusicVolumeHSAction(Menuitem *mi, int i);
+local void MusicVolumeHSAction(Menuitem *mi);
 local void SetMusicPower(Menuitem *mi);
-local void CdVolumeHSAction(Menuitem *mi, int i);
+local void CdVolumeHSAction(Menuitem *mi);
 local void SetCdPower(Menuitem *mi);
 local void SetCdModeDefined(Menuitem *mi);
 local void SetCdModeRandom(Menuitem *mi);
@@ -242,9 +242,9 @@ local void SetCommandKey(Menuitem *mi);
 // Speed options
 local void SpeedOptionsInit(Menuitem *mi);
 local void SpeedOptionsExit(Menuitem *mi);
-local void GameSpeedHSAction(Menuitem *mi, int i);
-local void MouseScrollHSAction(Menuitem *mi, int i);
-local void KeyboardScrollHSAction(Menuitem *mi, int i);
+local void GameSpeedHSAction(Menuitem *mi);
+local void MouseScrollHSAction(Menuitem *mi);
+local void KeyboardScrollHSAction(Menuitem *mi);
 
 // Game options
 
@@ -3704,281 +3704,65 @@ local void KeystrokeHelpDrawFunc(Menuitem *mi)
 /**
 **	Game speed horizontal slider action callback
 */
-local void GameSpeedHSAction(Menuitem *mi, int i)
+local void GameSpeedHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing game speed by 10%s\n" _C_ "%");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing game speed by 10%s\n" _C_ "%");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT|MI_CFLAGS_LEFT);
-	    }
-	    VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-	    SetVideoSync();
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		VideoSyncSpeed = (mi[1].d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
-		SetVideoSync();
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
-    }
+    VideoSyncSpeed = (mi->d.hslider.percent * (MAX_GAME_SPEED - MIN_GAME_SPEED)) / 100 + MIN_GAME_SPEED;
+    SetVideoSync();
 }
 
 /**
 **	Mouse scroll horizontal slider action callback
 */
-local void MouseScrollHSAction(Menuitem *mi, int i)
+local void MouseScrollHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing mouse speed\n");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing mouse speed\n");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
-	    }
-	    TheUI.MouseScroll = 1;
-	    SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-	    if (mi[1].d.hslider.percent == 0)
-		TheUI.MouseScroll = 0;
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-		TheUI.MouseScroll = 1;
-		SpeedMouseScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		if (mi[1].d.hslider.percent == 0)
-		    TheUI.MouseScroll = 0;
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
+    TheUI.MouseScroll = 1;
+    SpeedMouseScroll = 10 - (mi->d.hslider.percent * 9) / 100;
+    if (mi->d.hslider.percent == 0) {
+	TheUI.MouseScroll = 0;
     }
 }
 
 /**
 **	Keyboard scroll horizontal slider action callback
 */
-local void KeyboardScrollHSAction(Menuitem *mi, int i)
+local void KeyboardScrollHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags  &MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing keyboard speed\n");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing keyboard speed\n");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
-	    }
-	    TheUI.KeyScroll = 1;
-	    SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-	    if (mi[1].d.hslider.percent == 0)
-		TheUI.KeyScroll = 0;
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-		TheUI.KeyScroll = 1;
-		SpeedKeyScroll = 10 - (mi[1].d.hslider.percent * 9) / 100;
-		if (mi[1].d.hslider.percent == 0)
-		    TheUI.KeyScroll = 0;
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
+    TheUI.KeyScroll = 1;
+    SpeedKeyScroll = 10 - (mi->d.hslider.percent * 9) / 100;
+    if (mi->d.hslider.percent == 0) {
+	TheUI.KeyScroll = 0;
     }
 }
 
 /**
 **	Master volume horizontal slider action callback
 */
-local void MasterVolumeHSAction(Menuitem *mi, int i)
+local void MasterVolumeHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing master volume\n");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing master volume\n");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
-	    }
-	    SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-		SetGlobalVolume((mi[1].d.hslider.percent * 255) / 100);
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
-    }
+    SetGlobalVolume((mi->d.hslider.percent * 255) / 100);
 }
 
 /**
 **	Music volume horizontal slider action callback
 */
-local void MusicVolumeHSAction(Menuitem *mi, int i)
+local void MusicVolumeHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing music volume\n");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing music volume\n");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
-	    }
-	    SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-		SetMusicVolume((mi[1].d.hslider.percent * 255) / 100);
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
-    }
+    SetMusicVolume((mi->d.hslider.percent * 255) / 100);
 }
 
 #ifdef USE_CDAUDIO
 /**
 **	CD volume horizontal slider action callback
 */
-local void CdVolumeHSAction(Menuitem *mi, int i)
+local void CdVolumeHSAction(Menuitem *mi)
 {
-    mi--;
-
-    switch (i) {
-	case 0:		// click - down
-	case 2:		// key - down
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_RIGHT) {
-		DebugLevel0Fn("Increasing cd volume\n");
-		mi[1].d.hslider.percent += 10;
-		if (mi[1].d.hslider.percent > 100)
-		    mi[1].d.hslider.percent = 100;
-	    } else if (mi[1].d.hslider.cflags & MI_CFLAGS_LEFT) {
-		DebugLevel0Fn("Decreasing cd volume\n");
-		mi[1].d.hslider.percent -= 10;
-		if (mi[1].d.hslider.percent < 0)
-		    mi[1].d.hslider.percent = 0;
-	    }
-	    if (i == 2) {
-		mi[1].d.hslider.cflags &= ~(MI_CFLAGS_RIGHT | MI_CFLAGS_LEFT);
-	    }
-	    SetCDVolume((mi[1].d.hslider.percent * 255) / 100);
-	    break;
-	case 1:		// mouse - move
-	    if (mi[1].d.hslider.cflags & MI_CFLAGS_KNOB && (mi[1].flags & MenuButtonClicked)) {
-		if (mi[1].d.hslider.curper > mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		} else if (mi[1].d.hslider.curper < mi[1].d.hslider.percent) {
-		    mi[1].d.hslider.percent = mi[1].d.hslider.curper;
-		}
-		mi[1].d.hslider.percent = (mi[1].d.hslider.curper + 8) / 10 * 10;
-		SetCDVolume((mi[1].d.hslider.percent * 255) / 100);
-		MustRedraw |= RedrawMenu;
-	    }
-	    break;
-	default:
-	    break;
-    }
+    SetCDVolume((mi->d.hslider.percent * 255) / 100);
 }
 #else
 /**
 **	CD volume horizontal slider action callback
 */
-local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)),
-	int i __attribute__((unused)))
+local void CdVolumeHSAction(Menuitem *mi __attribute__((unused)))
 {
 }
 #endif
