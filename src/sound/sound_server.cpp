@@ -204,7 +204,7 @@ static int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	unsigned char left;
 	unsigned char right;
 	int i;
-	int buf[SOUND_BUFFER_SIZE/2];
+	static int buf[SOUND_BUFFER_SIZE/2];
 	int div;
 
 	div = 176400 / (sample->Frequency * (sample->SampleSize / 8)
