@@ -912,7 +912,9 @@ global void EditorUpdateDisplay(void)
 {
     int i;
 
+#ifndef USE_SDL_SURFACE
     VideoLockScreen();			// { prepare video write
+#endif
 
     HideAnyCursor();			// remove cursor (when available)
 
@@ -1003,7 +1005,9 @@ global void EditorUpdateDisplay(void)
 
     DrawAnyCursor();
 
+#ifdef USE_SDL_SURFACE
     VideoUnlockScreen();		// } end write access
+#endif
 
     // FIXME: For now update everything each frame
 

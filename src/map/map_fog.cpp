@@ -511,13 +511,13 @@ global void VideoDrawFogSolid(const int tile, int x, int y)
 
     srect.x = TileSizeX * (tile % tilepitch);
     srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.h = TileSizeY;
 
     drect.x = x;
     drect.y = y;
 
-    SDL_LockSurface(TheScreen);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-    SDL_UnlockSurface(TheScreen);
 }
 
 global void VideoDrawUnexploredSolid(const int tile, int x, int y)
@@ -1542,13 +1542,13 @@ global void VideoDrawFogAlpha(const int tile, int x, int y)
 
     srect.x = TileSizeX * (tile % tilepitch);
     srect.y = TileSizeY * (tile / tilepitch);
+    srect.w = TileSizeX;
+    srect.y = TileSizeY;
 
     drect.x = x;
     drect.y = y;
 
-    SDL_LockSurface(TheScreen);
     SDL_BlitSurface(TheMap.TileGraphic->Surface, &srect, TheScreen, &drect);
-    SDL_UnlockSurface(TheScreen);
 }
 
 #else
