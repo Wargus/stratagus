@@ -155,6 +155,40 @@ local void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y)
 
     SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
 }
+
+local void VideoDrawShadowClip(const Graphic* sprite, unsigned frame,
+    int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->Surface, &srect, TheScreen, &drect);
+}
+
+local void VideoDrawShadowClipX(const Graphic* sprite, unsigned frame,
+    int x, int y)
+{
+    SDL_Rect srect;
+    SDL_Rect drect;
+
+    srect.x = (frame % (sprite->Surface->w / sprite->Width)) * sprite->Width;
+    srect.y = (frame / (sprite->Surface->w / sprite->Width)) * sprite->Height;
+    srect.w = sprite->Width;
+    srect.h = sprite->Height;
+
+    drect.x = x;
+    drect.y = y;
+
+    SDL_BlitSurface(sprite->SurfaceFlip, &srect, TheScreen, &drect);
+}
 #else
 //
 //	The current implementation uses RLE encoded sprites.
