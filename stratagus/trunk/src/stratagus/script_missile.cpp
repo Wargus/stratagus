@@ -282,16 +282,6 @@ local int CclMissile(lua_State* l)
 		} else if (!strcmp(value, "local")) {
 			DebugCheck(!type);
 			missile = MakeLocalMissile(type, x, y, dx, dy);
-			// we need to reinitialize position parameters - that's because of
-			// the way InitMissile() (called from MakeLocalMissile()) computes
-			// them - it works for creating a missile during a game but breaks
-			// loading the missile from a file.
-			missile->X = x;
-			missile->Y = y;
-			missile->SourceX = sx;
-			missile->SourceY = sy;
-			missile->DX = dx;
-			missile->DY = dy;
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
@@ -354,6 +344,16 @@ local int CclMissile(lua_State* l)
 			lua_pop(l, 1);
 		}
 	}
+	// we need to reinitialize position parameters - that's because of
+	// the way InitMissile() (called from MakeLocalMissile()) computes
+	// them - it works for creating a missile during a game but breaks
+	// loading the missile from a file.
+	missile->X = x;
+	missile->Y = y;
+	missile->SourceX = sx;
+	missile->SourceY = sy;
+	missile->DX = dx;
+	missile->DY = dy;
 	return 0;
 }
 
