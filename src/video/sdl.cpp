@@ -35,7 +35,9 @@
 #ifdef USE_SDL	// {
 
 #include <stdlib.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <SDL/SDL.h>
 
 #ifdef USE_BEOS

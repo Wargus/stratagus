@@ -35,7 +35,6 @@
 #ifdef USE_WINCE	// {
 
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include "video.h"
 #include "font.h"
