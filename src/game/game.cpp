@@ -90,6 +90,7 @@ local void LoadFreeCraftMap(const char* filename,
 	fprintf(stderr,"recursive use of load FreeCraft map!\n");
 	ExitFatal(-1);
     }
+    InitPlayers();
     lcm_prevent_recurse = 1;
     gh_eval_file((char*)filename);
     lcm_prevent_recurse = 0;
