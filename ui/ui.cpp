@@ -215,22 +215,13 @@ global void LoadUserInterface(void)
 		TheUI.Resource.Graphic = LoadGraphic(TheUI.Resource.File);
 	}
 
-	for (i = 0; i < MaxCosts; ++i) {
+	for (i = 0; i <= ScoreCost; ++i) {
 		// FIXME: reuse same graphics?
 		if (TheUI.Resources[i].Icon.File) {
 			TheUI.Resources[i].Icon.Graphic =
 				LoadSprite(TheUI.Resources[i].Icon.File,
 					TheUI.Resources[i].IconW, TheUI.Resources[i].IconH);
 		}
-	}
-
-	// FIXME: reuse same graphics?
-	if (TheUI.Resources[FoodCost].Icon.File) {
-		TheUI.Resources[FoodCost].Icon.Graphic = LoadGraphic(TheUI.Resources[FoodCost].Icon.File);
-	}
-	// FIXME: reuse same graphics?
-	if (TheUI.Resources[ScoreCost].Icon.File) {
-		TheUI.Resources[ScoreCost].Icon.Graphic = LoadGraphic(TheUI.Resources[ScoreCost].Icon.File);
 	}
 
 	if (TheUI.InfoPanel.File) {
