@@ -888,7 +888,6 @@ local void DrawBuildingCursor(void)
 		color = ColorRed;
 	    }
 #ifdef USE_SDL_SURFACE
-	    printf("w = %d\n", w);
 	    VideoFillTransRectangle(color, x + w * TileSizeX, y + h * 
 		TileSizeY, TileSizeX, TileSizeY, 95);
 #else
