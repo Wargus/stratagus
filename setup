@@ -548,10 +548,44 @@ case $ANSWER in
 		else
 		  echo "THREADLIB   = -lpthread" >> $RULESFILE
 		fi
-	      ;;
 	    esac
 	  fi
 	fi
+	
+	echo
+	echo -n "Would you like FLAC support? (n) "
+	read ANSWER
+	case $ANSWER in 
+	    [yY])
+		echo "FLAC		= -DUSE_FLAC" >> $RULESFILE
+		;;
+	    *)
+		;;
+	esac
+	echo
+	
+	echo -n "Would you like OGG support? (n) "
+	read ANSWER
+	case $ANSWER in 
+	    [yY])
+		echo "OGG		= -DUSE_OGG" >> $RULESFILE
+		;;
+	    *)
+		;;
+	esac
+	echo
+	
+	echo -n "Would you like MP3 support? (n) "
+	read ANSWER
+	case $ANSWER in 
+	    [yY])
+		echo "MAD		= -DUSE_MAD" >> $RULESFILE
+		;;
+	    *)
+		;;
+	esac
+	
+  ;;
 esac
 
 echo >> $RULESFILE
