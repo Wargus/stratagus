@@ -812,6 +812,8 @@ global void GameMainLoop(void)
     }
 
     if( GameResult==GameVictory || GameResult==GameDefeat ) {
+	CDPlaySection = "showstats";
+	CDRomCheck(NULL);
 	ShowStats();
     }
 
@@ -819,6 +821,7 @@ global void GameMainLoop(void)
     ReplayRevealMap=0;
     GamePaused=0;
     GodMode=0;
+    CDPlaySection = "menu";
 }
 
 //@}
