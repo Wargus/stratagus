@@ -583,6 +583,10 @@ local void AiCheckingWork(void)
 	    DebugLevel3Fn("Must build: %s " _C_ type->Ident);
 
 	    //
+	    //	FIXME: must check if requirements are fulfilled.
+	    //		Buildings can be destructed.
+
+	    //
 	    //	Check limits, AI should be broken if reached.
 	    //
 	    if( !PlayerCheckLimits(AiPlayer->Player,type) ) {
@@ -615,7 +619,7 @@ local void AiCheckingWork(void)
 		//
 		//	NOTE: we can continue and build things with lesser
 		//		resource or other resource need!
-		return;
+		continue;
 	    } else {
 		DebugLevel3("- enough resources\n");
 		if( AiMakeUnit(type) ) {
@@ -1146,7 +1150,8 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
 
     IfDebug( unit=NoUnitP; );
     //
-    //  Remove all workers not mining. //on the way building something
+    //  Remove all workers not mining. on the way building something
+    //	FIXME: It is not clever to use workers with gold
     //  Idea: Antonis: Put the rest of the workers in a table in case
     //  miners can't reach but others can. This will be useful if AI becomes
     //  more flexible (e.g.: transports workers to an island)
@@ -1158,7 +1163,7 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     for (num = i = 0; i < nunits; i++) {
 	unit = table[i];
     //if (unit->Orders[0].Action != UnitActionBuild && unit->OrderCount==1 ) {
-	if (unit->Orders[0].Action == UnitActionMineGold
+	if ( unit->Orders[0].Action == UnitActionMineGold
 		&& unit->OrderCount==1 ) {
 	    table[num++] = unit;
 	}
@@ -1168,8 +1173,8 @@ local int AiRepairBuilding(const UnitType* type,Unit* building)
     for (i=0; i<num; ++i) {
 	unit = table[i];
 	//	FIXME: Probably calculated from top left corner of building
-	if ((rX = unit->X - building->X) < 0) rX = -rX;
-	if ((rY = unit->Y - building->Y) < 0) rY = -rY;	// I don't trust fabs()
+	if ((rX = unit->X - building->X) < 0) { rX = -rX; }
+	if ((rY = unit->Y - building->Y) < 0) { rY = -rY; }
 	if (rX<rY) {
 	    distance[i] = rX;
 	}
