@@ -349,8 +349,6 @@ extern char NameLine[];
 
     // FIXME: this values should go into a general ui structure
 
-#define noGRID		1		/// Map is shown with a grid, if 1
-
 #define DEFAULT_VIDEO_WIDTH	640	/// Default video width
 #define DEFAULT_VIDEO_HEIGHT	480	/// Default video height
 

@@ -68,8 +68,11 @@ global void HandleActionReturnGoods(Unit* unit)
     //	Select target to return goods. 
     // 
     DebugCheck(!type->Harvester );
+    if ((!unit->CurrentResource)&&(!unit->Value)) {
+	DebugLevel0("Unit can't return resources, it doesn't carry any.\n");
+    }
     if( !unit->Orders[0].Goal ) {
-	if( !(destu=FindDeposit(unit,unit->X,unit->Y,1000)) ) {
+	if( !(destu=FindDeposit(unit,unit->X,unit->Y,1000,unit->CurrentResource)) ) {
 	    DebugLevel3Fn("No deposit -> can't return\n");
 	    unit->Orders[0].Action=UnitActionStill;
 	    return;

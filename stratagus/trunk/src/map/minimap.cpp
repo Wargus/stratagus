@@ -342,7 +342,7 @@ global void UpdateMinimap(void)
 	    continue;
 	}
 	if( !(unit->Visible&(1<<ThisPlayer->Player)) ) {
-	    continue;			// Submarine not visible
+	    continue;			// Cloaked unit not visible
 	}
 
 	if( !UnitKnownOnMap(unit) && !ReplayRevealMap ) {

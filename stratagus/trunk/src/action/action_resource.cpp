@@ -373,7 +373,7 @@ local int GatherResource(Unit* unit)
 		// FIXME: empty harvesters should find another resource.
 		// 
 		for( i=source->InsideCount; i; --i,uins=uins->NextContained ) {
-		    if (uins->Value && (depot=FindDeposit(uins,uins->X,uins->Y,1000))) {
+		    if (uins->Value && (depot=FindDeposit(uins,uins->X,uins->Y,1000,unit->CurrentResource))) {
 			DropOutNearest(uins,depot->X+depot->Type->TileWidth/2
 				,depot->Y+depot->Type->TileHeight/2
 				,source->Type->TileWidth,source->Type->TileHeight);
@@ -471,9 +471,14 @@ local int StopGathering(Unit* unit)
     //	Store resource position.
     //	FIXME: is this the best way?
     unit->Orders[0].Arg1=(void*)((unit->X<<16)|unit->Y);
-   
+ 
+    if (!unit->Value) {
+	DebugLevel0Fn("Unit is empty???\n");
+    } else {
+	DebugLevel3Fn("Unit is fine, search for a depot.\n");
+    }
     // Find and send to resource deposit.
-    if( (!(depot=FindDeposit(unit,unit->X,unit->Y,1000)))
+    if( (!(depot=FindDeposit(unit,unit->X,unit->Y,1000,unit->CurrentResource)))
 	    || (!unit->Value)) {
 	if (!(resinfo->HarvestFromOutside||resinfo->TerrainHarvester)) {
 	    DebugCheck(!unit->Container);

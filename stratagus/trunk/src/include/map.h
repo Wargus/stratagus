@@ -401,10 +401,14 @@ extern  void MarkDrawEntireMap(void);
 //
 //	in map_fog.c
 //
-extern void MapUnmarkTileSight(const Player* player,int x,int y,unsigned char *v);
-extern void MapMarkTileSight(const Player* player,int x,int y,unsigned char *v);
+    /// Mark a tile for normal sight
+extern void MapMarkTileSight(const Player* player,int x,int y);
+    /// Unmark a tile for normal sight
+extern void MapUnmarkTileSight(const Player* player,int x,int y);
+    /// Mark Cloaked units on a tile as detected.
+extern void MapDetectUnitsOnTile(const Player* player,int x,int y);
     /// Mark sight changes
-extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int,unsigned char*));
+extern void MapSight(const Player* player, int x, int y, int w, int h, int range, void (*marker)(const Player*,int,int));
     /// Find if a tile is visible (With shared vision)
 extern int IsTileVisible(const Player* player, int x, int y);
     /// Mark tiles with fog of war to be redrawn
@@ -550,6 +554,8 @@ extern void MapSetWall(unsigned x,unsigned y,int humanwall);
 #define CanMoveToMask(x,y,mask) \
 	!(TheMap.Fields[(x)+(y)*TheMap.Width].Flags&(mask))
 
+#define MapDetectCloakedUnits(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
+	(unit)->Type->TileWidth,(unit)->Type->TileHeight,(unit)->CurrentSightRange,MapDetectUnitsOnTile)
 #define MapMarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapMarkTileSight)
 #define MapUnmarkSight(player,x,y,w,h,range) MapSight((player),(x),(y),(w),(h),(range),MapUnmarkTileSight)
 #define MapMarkUnitSight(unit) MapSight((unit)->Player,(unit)->X,(unit)->Y, \
