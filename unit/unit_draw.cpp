@@ -97,7 +97,7 @@ local void DrawSelectionRectangleWithTrans(const Unit* unit,const UnitType* type
 **	@param y	Screen Y position of the unit.
 */
 local void (*DrawSelection)(const Unit*,const UnitType*,int,int)
-	=DrawSelectionRectangle;
+	=DrawSelectionRectangleWithTrans;
 
 /*----------------------------------------------------------------------------
 --	Functions
@@ -372,13 +372,65 @@ global void LoadDecorations(void)
 }
 
 /**
+**	Draw mana/working sprite.
+**
+**	@param x	X screen pixel position
+**	@param y	Y screen pixel position
+**	@param type	Unit type pointer
+**	@param full	Full value
+**	@param ready	Ready value
+*/
+local void DrawManaSprite(int x,int y,const UnitType* type,int full,int ready)
+{
+    int n;
+
+    n=VideoGraphicFrames(ManaSprite.Sprite)-1;
+    n-=(n*ready)/full;
+#if 0
+    f=(100*ready)/full;
+    if( f>75) {
+	n=0;
+    } else if( f>50 ) {
+	n=1;
+    } else if( f>25 ) {
+	n=2;
+		// FIXME: v--- compatibility hack
+    } else if( f
+	&& ManaSprite.Width*4<VideoGraphicWidth(ManaSprite.Sprite) ) {
+	n=3;
+    } else {
+	n=4;
+    }
+#endif
+    if( ManaSprite.HotX<0 ) {
+	x+=ManaSprite.HotX
+		+(type->TileWidth*TileSizeX+type->BoxWidth+1)/2;
+    } else if( ManaSprite.HotX>0 ) {
+	x+=1-ManaSprite.HotX
+		+(type->TileWidth*TileSizeX-type->BoxWidth)/2;
+    } else {
+	x+=(type->TileWidth*TileSizeX-ManaSprite.Width+1)/2;
+    }
+    if( ManaSprite.HotY<0 ) {
+	y+=ManaSprite.HotY
+		+(type->TileHeight*TileSizeY+type->BoxHeight+1)/2;
+    } else if( ManaSprite.HotY>0 ) {
+	y+=1-ManaSprite.HotY
+		+(type->TileHeight*TileSizeY-type->BoxHeight)/2;
+    } else {
+	y+=(type->TileHeight*TileSizeY-ManaSprite.Height+1)/2;
+    }
+    VideoDrawClip(ManaSprite.Sprite,n,x,y);
+}
+
+/**
 **	Draw mana/working bar.
 **
-**	@param x	X screen pixel position.
-**	@param y	Y screen pixel position.
-**	@param type	Unit type pointer.
-**	@param full	full value
-**	@param ready	ready value
+**	@param x	X screen pixel position
+**	@param y	Y screen pixel position
+**	@param type	Unit type pointer
+**	@param full	Full value
+**	@param ready	Ready value
 */
 local void DrawManaBar(int x,int y,const UnitType* type,int full,int ready)
 {
@@ -457,7 +509,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //	Health bar on left side of unit.
     //
     stats=unit->Stats;
-    if( !type->Critter && ShowHealthBar ) {
+    if( (!type->Critter || unit->Player->Type!=PlayerRaceNeutral)
+		&& ShowHealthBar ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
 	    f=(100*unit->HP)/stats->HitPoints;
@@ -522,7 +575,8 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     //
     //	Health dot on left side of unit.
     //
-    if( !type->Critter && ShowHealthDot ) {
+    if( (!type->Critter || unit->Player->Type!=PlayerRaceNeutral)
+		&& ShowHealthDot ) {
 	if( stats->HitPoints
 		&& !(ShowNoFull && unit->HP==stats->HitPoints) ) {
 	    int x1;
@@ -546,28 +600,28 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	    DebugCheck( n<0 );
 	    if( HealthSprite.HotX<0 ) {
 		x1=x+HealthSprite.HotX
-			+(type->TileWidth*TileSizeX
-			+type->BoxWidth+1)/2;
+			+(type->TileWidth*TileSizeX+type->BoxWidth+1)/2;
+	    } else if( HealthSprite.HotX>0 ) {
+		x1=x+1-HealthSprite.HotX
+			+(type->TileWidth*TileSizeX-type->BoxWidth)/2;
 	    } else {
-		x1=x-HealthSprite.HotX
-			+(type->TileWidth*TileSizeX
-			-type->BoxWidth+1)/2;
+		x1=x+(type->TileWidth*TileSizeX-HealthSprite.Width+1)/2;
 	    }
 	    if( HealthSprite.HotY<0 ) {
 		y1=y+HealthSprite.HotY
-			+(type->TileHeight*TileSizeY
-			+type->BoxHeight+1)/2;
+			+(type->TileHeight*TileSizeY+type->BoxHeight+1)/2;
+	    } else if( HealthSprite.HotY>0 ) {
+		y1=y+1-HealthSprite.HotY
+			+(type->TileHeight*TileSizeY-type->BoxHeight)/2;
 	    } else {
-		y1=y-HealthSprite.HotY
-			+(type->TileHeight*TileSizeY
-			-type->BoxHeight+1)/2;
+		y1=y+(type->TileHeight*TileSizeY-HealthSprite.Height+1)/2;
 	    }
 	    VideoDrawClip(HealthSprite.Sprite,n,x1,y1);
 	}
     }
 
     //
-    //	Mana bar on right side of unit.
+    //	Mana bar on right side of unit. FIXME: combine bar and sprite
     //
     if( ShowManaBar ) {
 	if( type->CanCastSpell && !(ShowNoFull && unit->Mana==255) ) {
@@ -610,6 +664,18 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 		DrawManaBar(x,y,type,unit->Data.Research.Upgrade
 			    ->Costs[TimeCost]
 			,unit->Data.Research.Ticks);
+	    //
+	    //	Transporter with units on board.
+	    //
+	    } else if( unit->Type->Transporter ) {
+		// Count units on board.
+		// FIXME: We can do this nicer?
+		for( w=f=0; f<MAX_UNITS_ONBOARD; ++f ) {
+		    if( unit->OnBoard[f] ) {
+			++w;
+		    }
+		}
+		DrawManaBar(x,y,type,MAX_UNITS_ONBOARD,w);
 	    }
 	}
     }
@@ -620,47 +686,58 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
     if( ShowManaDot ) {
 	if( type->CanCastSpell
 		&& !(ShowNoFull && unit->Mana==255) ) {
-	    int x1;
-	    int y1;
-	    int n;
+	    DrawManaSprite(x,y,type,255,unit->Mana);
+	}
+	//
+	//	Show working of units.
+	//
+	if( unit->Player==ThisPlayer ) {
 
-	    n=VideoGraphicFrames(ManaSprite.Sprite)-1;
-	    n-=(n*unit->Mana)/255;
-#if 0
-	    f=(100*unit->Mana)/255;
-	    if( f>75) {
-		n=0;
-	    } else if( f>50 ) {
-		n=1;
-	    } else if( f>25 ) {
-		n=2;
-			// FIXME: v--- compatibility hack
-	    } else if( f
-		&& ManaSprite.Width*4<VideoGraphicWidth(ManaSprite.Sprite) ) {
-		n=3;
-	    } else {
-		n=4;
+	    //
+	    //	Building under constuction.
+	    //
+	    /*
+	    if( unit->Orders[0].Action==UnitActionBuilded ) {
+		DrawManaSprite(x,y,type,stats->HitPoints,unit->HP);
+	    } else
+	    */
+
+	    //
+	    //	Building training units.
+	    //
+	    if( unit->Orders[0].Action==UnitActionTrain ) {
+		DrawManaSprite(x,y,type,unit->Data.Train.What[0]
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
+			,unit->Data.Train.Ticks);
+
+	    //
+	    //	Building upgrading to better type.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionUpgradeTo ) {
+		DrawManaSprite(x,y,type,unit->Orders[0].Type
+			    ->Stats[unit->Player->Player].Costs[TimeCost]
+			,unit->Data.UpgradeTo.Ticks);
+
+	    //
+	    //	Building research new technologie.
+	    //
+	    } else if( unit->Orders[0].Action==UnitActionResearch ) {
+		DrawManaSprite(x,y,type,unit->Data.Research.Upgrade
+			    ->Costs[TimeCost]
+			,unit->Data.Research.Ticks);
+	    //
+	    //	Transporter with units on board.
+	    //
+	    } else if( unit->Type->Transporter ) {
+		// Count units on board.
+		// FIXME: We can do this nicer?
+		for( w=f=0; f<MAX_UNITS_ONBOARD; ++f ) {
+		    if( unit->OnBoard[f] ) {
+			++w;
+		    }
+		}
+		DrawManaSprite(x,y,type,MAX_UNITS_ONBOARD,w);
 	    }
-#endif
-	    if( ManaSprite.HotX<0 ) {
-		x1=x+ManaSprite.HotX
-			+(type->TileWidth*TileSizeX
-			+type->BoxWidth+1)/2;
-	    } else {
-		x1=x-ManaSprite.HotX
-			+(type->TileWidth*TileSizeX
-			-type->BoxWidth+1)/2;
-	    }
-	    if( ManaSprite.HotY<0 ) {
-		y1=y+ManaSprite.HotY
-			+(type->TileHeight*TileSizeY
-			+type->BoxHeight+1)/2;
-	    } else {
-		y1=y-ManaSprite.HotY
-			+(type->TileHeight*TileSizeY
-			-type->BoxHeight+1)/2;
-	    }
-	    VideoDrawClip(ManaSprite.Sprite,n,x1,y1);
 	}
     }
 
@@ -975,22 +1052,22 @@ local void ShowOrder(const Unit* unit)
 	    break;
 
 	case UnitActionHarvest:
-	    e_color=color=ColorGreen;
+	    e_color=color=ColorYellow;
 	    dest=1;
 	    break;
 
 	case UnitActionMineGold:
-	    e_color=color=ColorGreen;
+	    e_color=color=ColorYellow;
 	    dest=1;
 	    break;
 
 	case UnitActionHaulOil:
-	    e_color=color=ColorGreen;
+	    e_color=color=ColorYellow;
 	    dest=1;
 	    break;
 
 	case UnitActionReturnGoods:
-	    e_color=color=ColorGreen;
+	    e_color=color=ColorYellow;
 	    dest=1;
 	    break;
 
