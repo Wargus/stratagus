@@ -70,7 +70,7 @@ extern void EditorMainLoop(void);
 extern void EditorUpdateDisplay(void);
 
 	/// Save a pud from editor
-extern int EditorSavePud(const char *file);
+extern int EditorSavePud(const char* file);
 
 	/// Register ccl features
 extern void EditorCclRegister(void);

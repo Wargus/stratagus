@@ -300,7 +300,7 @@ extern void VideoDrawTile(const int, int, int);
 	/// Draws tiles display and video mode independ
 extern void MapDrawTile(int, int, int);
 	/// Vision Table to see where to locate goals and vision
-extern unsigned char *VisionTable[3];
+extern unsigned char* VisionTable[3];
 	/// Companion table for fast lookups
 extern int *VisionLookup;
 

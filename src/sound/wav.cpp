@@ -66,7 +66,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 {
 	WavData* data;
 	WavChunk chunk;
-	char *sndbuf;
+	char* sndbuf;
 	int comp;		// number of compressed bytes actually read
 	int i;
 	int read;

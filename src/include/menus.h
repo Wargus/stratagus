@@ -364,18 +364,18 @@ extern void InitMenuFuncHash(void);
 extern void InitMenus(int race);
 
 	/// Draw menu
-extern void DrawMenu(Menu *menu);
+extern void DrawMenu(Menu* menu);
 	/// Draw menu button
 extern void DrawMenuButton(MenuButtonId button, unsigned flags, int transparent, int w, int h,
-	int x, int y, const int font, const unsigned char *text, char *normalcolor, char *reversecolor);
+	int x, int y, const int font, const unsigned char* text, char* normalcolor, char* reversecolor);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
 	/// Draw and process a menu
-extern void ProcessMenu(const char *MenuId, int Loop);
+extern void ProcessMenu(const char* MenuId, int Loop);
 	/// End the current menu
 extern void EndMenu(void);
 	/// Find a menu by id
-extern Menu *FindMenu(const char *MenuId);
+extern Menu *FindMenu(const char* MenuId);
 
 	/// The scenario path received from server, Update the client menu
 extern int NetClientSelectScenario(void);
@@ -423,10 +423,10 @@ extern void EditorLoadMenu(void);
 extern void SetupEditor(void);
 
 	/// Error menu
-extern void ErrorMenu(char *);
+extern void ErrorMenu(char*);
 
 	/// Menu Loop
-extern void MenuLoop(char *filename, WorldMap *map);
+extern void MenuLoop(char* filename, WorldMap* map);
 
 	/// Pre menu setup
 extern void PreMenuSetup(void);

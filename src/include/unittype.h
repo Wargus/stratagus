@@ -693,8 +693,8 @@ struct _unit_type_ {
 	int BurnPercent;                ///< Burning percent.
 	int BurnDamageRate;             ///< HP burn rate per sec
 	int RepairRange;                ///< Units repair range.
-	char *CanCastSpell;             ///< Unit is able to use spells.
-	char *AutoCastActive;           ///< Default value for autocast.
+	char* CanCastSpell;             ///< Unit is able to use spells.
+	char* AutoCastActive;           ///< Default value for autocast.
 	int AutoBuildRate;              ///< The rate at which the building builds itself
 	int RandomMovementProbability;  ///< Probability to move randomly.
 	int ClicksToExplode;            ///< Number of consecutive clicks until unit suicides.
@@ -743,8 +743,8 @@ struct _unit_type_ {
 	unsigned BuilderLost : 1;       ///< The builder is lost after the build.
 	unsigned CanHarvest : 1;        ///< Resource can be harvested.
 	unsigned Harvester : 1;         ///< unit is a resource harvester.
-	unsigned char *BoolFlag;        ///< User defined flag. Used for (dis)allow target.
-	unsigned char *CanTargetFlag;   ///< Flag needed to target with missile.
+	unsigned char* BoolFlag;        ///< User defined flag. Used for (dis)allow target.
+	unsigned char* CanTargetFlag;   ///< Flag needed to target with missile.
 
 	unsigned SelectableByRectangle : 1; ///< Selectable with mouse rectangle.
 	unsigned Decoration : 1;            ///< Unit Is a decoration.
@@ -797,7 +797,7 @@ extern UnitType*UnitTypeOrcWall;            ///< Orc wall
 
 extern char** UnitTypeWcNames;              ///< Mapping wc-number 2 symbol
 
-extern char **BoolFlagName;                 ///< Array of name of user defined bool flag.
+extern char** BoolFlagName;                 ///< Array of name of user defined bool flag.
 extern int NumberBoolFlag;                  ///< Number of user defined bool flag.
 
 /*----------------------------------------------------------------------------
