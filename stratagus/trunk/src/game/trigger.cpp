@@ -822,7 +822,7 @@ local int TriggerExecuteAction(SCM script)
 {
     SCM value;
 
-    value=NIL;
+    value=NULL;
 
     while( !gh_null_p(script) ) {
 	value=gh_eval(gh_car(script),NIL);
@@ -894,6 +894,7 @@ global void TriggersEachCycle(void)
 	// Pair is condition action
 	if( !gh_null_p(pair) ) {
 	    script=gh_car(pair);
+	    value=NULL;
 	    while( !gh_null_p(script) ) {
 		value=gh_eval(gh_car(script),NIL);
 		script=gh_cdr(script);
