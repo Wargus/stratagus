@@ -171,6 +171,18 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				Assert(unit->Anim.Unbreakable ^ unit->Anim.Anim->D.Unbreakable.Begin);
 				unit->Anim.Unbreakable = unit->Anim.Anim->D.Unbreakable.Begin;
 				break;
+
+			case NewAnimationLabel:
+				break;
+
+			case NewAnimationGoto:
+				unit->Anim.Anim = unit->Anim.Anim->D.Goto.Goto;
+				break;
+			case NewAnimationRandomGoto:
+				if (SyncRand() % 100 < unit->Anim.Anim->D.RandomGoto.Random) {
+					unit->Anim.Anim = unit->Anim.Anim->D.RandomGoto.Goto;
+				}
+				break;
 		}
 
 		if (!unit->Anim.Wait) {
