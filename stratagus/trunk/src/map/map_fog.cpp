@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -501,7 +500,9 @@ global void MapUpdateVisible(void)
     Unit** units;
     Unit* mine;
     int nunits,i;
+#ifdef DEBUG
     unsigned long t;
+#endif
 
     if ( TheMap.NoFogOfWar ) {		// No fog - no work
 	return;
@@ -521,11 +522,11 @@ global void MapUpdateVisible(void)
     //
     memset(TheMap.Visible[0],0,(TheMap.Width*TheMap.Height)/8);
 
-    DebugLevel0Fn("Ticks Clear %lu\n",GetTicks()-t);
+    DebugLevel3Fn("Ticks Clear %lu\n",GetTicks()-t);
 
     MarkDrawEntireMap();
 
-    DebugLevel0Fn("Ticks Mark  %lu\n",GetTicks()-t);
+    DebugLevel3Fn("Ticks Mark  %lu\n",GetTicks()-t);
 
     //
     //	Mark all units visible range.
@@ -584,7 +585,7 @@ global void MapUpdateVisible(void)
 	}
     }
 
-    DebugLevel0Fn("Ticks Total %lu\n",GetTicks()-t);
+    DebugLevel3Fn("Ticks Total %lu\n",GetTicks()-t);
 }
 
 /*----------------------------------------------------------------------------
