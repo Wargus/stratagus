@@ -501,8 +501,6 @@ struct _unit_ {
 	Unit*		NextContained;				/// Next unit in the container.
 	Unit*		PrevContained;				/// Previous unit in the container.
 
-	char*		Name;						/// Unit own name
-
 	int				X;						/// Map position X
 	int				Y;						/// Map position Y
 

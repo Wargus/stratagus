@@ -661,8 +661,6 @@ local int CclUnit(lua_State* l)
 			type = UnitTypeByIdent(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "seen-type")) {
 			seentype = UnitTypeByIdent(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "name")) {
-			unit->Name = strdup(LuaToString(l, j + 1));
 		} else if (!strcmp(value, "player")) {
 			player = &Players[(int)LuaToNumber(l, j + 1)];
 
