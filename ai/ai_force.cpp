@@ -42,6 +42,7 @@
 #include "unit.h"
 #include "ai_local.h"
 #include "actions.h"
+#include "map.h"
 
 /*----------------------------------------------------------------------------
 --	Variables
