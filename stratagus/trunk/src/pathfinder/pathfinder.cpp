@@ -67,7 +67,7 @@
 **		88:	Marks the possible goal fields.
 **		98:	Marks map border, for faster limits checks.
 */
-global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)];	/// Path matrix
+global unsigned char Matrix[(MaxMapWidth+2)*(MaxMapHeight+3)+2];	/// Path matrix
 
 IfDebug(
 global unsigned PfCounterFail;
@@ -133,7 +133,7 @@ global unsigned char* MakeMatrix(void)
 {
     unsigned char* matrix;
 
-    matrix=malloc((TheMap.Width+2)*(TheMap.Height+3));
+    matrix=malloc((TheMap.Width+2)*(TheMap.Height+3)+2);
     InitMatrix(matrix);
 
     return matrix;
