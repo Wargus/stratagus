@@ -780,28 +780,104 @@ global void VideoFillTransRectangleClip(SDL_Color color, int x, int y,
     VideoFillRectangle(color, x, y, w, h);
 }
 
-global void VideoDrawCircleClip(SDL_Color color, int x, int y,
-    int w)
+global void VideoDrawCircle(SDL_Color color, int x, int y, int r)
 {
-//    DebugCheck(1);
+    int p;
+    int px;
+    int py;
+
+    p = 1 - r;
+    py = r;
+
+    for (px = 0; px <= py + 1; ++px) {
+	VideoDrawPixel(color, x + px, y + py);
+	VideoDrawPixel(color, x + px, y - py);
+	VideoDrawPixel(color, x - px, y + py);
+	VideoDrawPixel(color, x - px, y - py);
+
+	VideoDrawPixel(color, x + py, y + px);
+	VideoDrawPixel(color, x + py, y - px);
+	VideoDrawPixel(color, x - py, y + px);
+	VideoDrawPixel(color, x - py, y - px);
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+	}
+    }
+}
+
+global void VideoDrawCircleClip(SDL_Color color, int x, int y, int r)
+{
+    // FIXME: clip
+    VideoDrawCircle(color, x, y, r);
 }
 
 global void VideoDrawTransCircleClip(SDL_Color color, int x, int y,
-    int w, unsigned char alpha)
+    int r, unsigned char alpha)
 {
-//    DebugCheck(1);
+    // FIXME: clip, trans
+    VideoDrawCircle(color, x, y, r);
 }
 
-global void VideoFillCircleClip(SDL_Color color, int x, int y,
-    int w)
+global void VideoFillCircle(SDL_Color color, int x, int y, int r)
 {
-//    DebugCheck(1);
+    int p;
+    int px;
+    int py;
+    int f;
+
+    p = 1 - r;
+    py = r;
+
+    for (px = 0; px <= py + 1; ++px) {
+	VideoDrawPixel(color, x + px, y + py);
+	VideoDrawPixel(color, x + px, y - py);
+	VideoDrawPixel(color, x - px, y + py);
+	VideoDrawPixel(color, x - px, y - py);
+
+	VideoDrawPixel(color, x + py, y + px);
+	VideoDrawPixel(color, x + py, y - px);
+	VideoDrawPixel(color, x - py, y + px);
+	VideoDrawPixel(color, x - py, y - px);
+
+	// Fill It
+	for (f = 0; f < py; ++f) {
+	    VideoDrawPixel(color, x + px, y + f);
+	    VideoDrawPixel(color, x + px, y - f);
+	    VideoDrawPixel(color, x - px, y + f);
+	    VideoDrawPixel(color, x - px, y - f);
+	}
+	for (f = 0; f < px; ++f) {
+	    VideoDrawPixel(color, x + py, y + f);
+	    VideoDrawPixel(color, x + py, y - f);
+	    VideoDrawPixel(color, x - py, y + f);
+	    VideoDrawPixel(color, x - py, y - f);
+	}
+
+
+	if (p < 0) {
+	    p += 2 * px + 3;
+	} else {
+	    p += 2 * (px - py) + 5;
+	    py -= 1;
+	}
+    }
+}
+
+global void VideoFillCircleClip(SDL_Color color, int x, int y, int r)
+{
+    // FIXME: clip
+    VideoFillCircle(color, x, y, r);
 }
 
 global void VideoFillTransCircleClip(SDL_Color color, int x, int y,
-    int w, unsigned char alpha)
+    int r, unsigned char alpha)
 {
-//    DebugCheck(1);
+    // FIXME: clip, trans
+    VideoFillCircle(color, x, y, r);
 }
 
 global void DebugTestDisplayLines(void)
