@@ -86,16 +86,19 @@ global int MetaInit(void)
     for (i = 1234; i < 1244; ++i) {
 	MetaServerFildes = NetOpenTCP(i);	//FIXME: need to make a dynamic port allocation there...if (!MetaServerFildes) {...}
 	if (MetaServerFildes != (Socket)-1) {
-	    break;
+	    if (NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT) != -1) {
+		break;
+	    }
 	}
     }
-    
+    //TODO: clean up and check for full i>1244.
+
     // FIXME: Configurable Meta Server
-    i = NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT);
-    if (i == -1) {
+    //i = NetConnectTCP(MetaServerFildes, NetResolveHost(MASTER_HOST), MASTER_PORT);
+    //if (i == -1) {
 	//TODO: Notify player that connection was aborted...
-	return -1; 
-    }
+    //	return -1; 
+    //}
 	
     if (SendMetaCommand("Login", "") == -1) {
 	//TODO: Notify player that connection was aborted...
