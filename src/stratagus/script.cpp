@@ -575,7 +575,11 @@ local SCM CclDefineMap(SCM width,SCM height)
     TheMap.Height=gh_scm2int(height);
 
     TheMap.Fields=calloc(TheMap.Width*TheMap.Height,sizeof(*TheMap.Fields));
+#ifdef NEW_FOW2
+    TheMap.Visible[0]=calloc(TheMap.Width*TheMap.Height/8,1);
+#endif
     InitUnitCache();
+    // FIXME: this should be CreateMap or InitMap?
 
     MapX=MapY=0;
 

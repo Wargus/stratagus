@@ -141,9 +141,13 @@ global void MapFixSeenRockTile(int x, int y)
 
     // FIXME: can this only happen if seen?
 #ifdef NEW_FOW
-    if (mf->Visible & (1 << ThisPlayer->Player)) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MarkDrawPosMap(x, y);
@@ -212,9 +216,13 @@ global void MapFixRockTile(int x, int y)
 	mf->Tile = tile;
 	UpdateMinimapXY(x, y);
 #ifdef NEW_FOW
-	if (mf->Visible & (1 << ThisPlayer->Player)) {
+	if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+	if ( IsMapFieldVisible(x,y) ) {
 #else
 	if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	    UpdateMinimapSeenXY(x, y);
 	    MapMarkSeenTile(x, y);
@@ -258,9 +266,13 @@ global void MapRemoveRock(unsigned x, unsigned y)
     MapFixRockNeighbors(x, y);
 
 #ifdef NEW_FOW
-    if (mf->Visible & (1 << ThisPlayer->Player)) {
+    if (mf->Visible[ThisPlayer->Player]>1) {
+#else
+#ifdef NEW_FOW2
+    if ( IsMapFieldVisible(x,y) ) {
 #else
     if (mf->Flags & MapFieldVisible) {
+#endif
 #endif
 	UpdateMinimapSeenXY(x, y);
 	MapMarkSeenTile(x, y);
