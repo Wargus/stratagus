@@ -43,7 +43,7 @@
 #include "sound_server.h"
 
 //
-//	Use this if you have still an old flac version.
+//	Use this if you have still an older flac version.
 //
 #ifdef FLAC_IDIOTIC
 
@@ -55,6 +55,15 @@
     FLAC__StreamMetaData
 #define FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE \
     FLAC__STREAM_DECODER_WRITE_CONTINUE
+
+#endif
+//
+//	Use this if you have still an old flac version.
+//
+#ifdef FLAC_IDIOTIC2
+
+#define FLAC__stream_decoder_process_until_end_of_stream \
+    FLAC__stream_decoder_process_whole_stream
 
 #endif
 
@@ -322,7 +331,7 @@ global Sample* LoadFlac(const char* name, int flags)
     }
 #endif
 
-    FLAC__stream_decoder_process_whole_stream(stream);
+    FLAC__stream_decoder_process_until_end_of_stream(stream);
 
     FLAC__stream_decoder_finish(stream);
     FLAC__stream_decoder_delete(stream);
