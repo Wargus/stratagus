@@ -10,7 +10,7 @@
 //
 /**@name editloop.c - The editor main loop. */
 //
-//     (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -956,9 +956,9 @@ void EditorUpdateDisplay(void)
 	//
 	// Info panel
 	//
-	if (TheUI.InfoPanel.Graphic) {
-		VideoDrawSub(TheUI.InfoPanel.Graphic, 0, 0,
-			TheUI.InfoPanel.Graphic->Width, TheUI.InfoPanel.Graphic->Height / 4,
+	if (TheUI.InfoPanelG) {
+		VideoDrawSub(TheUI.InfoPanelG, 0, 0,
+			TheUI.InfoPanelG->Width, TheUI.InfoPanelG->Height,
 			TheUI.InfoPanelX, TheUI.InfoPanelY);
 	}
 	//
