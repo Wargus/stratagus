@@ -556,6 +556,8 @@ global void RemoveUnit(Unit* unit)
 **	Update informations for lost units.
 **
 **	@param unit	Pointer to unit.
+**
+**	@note Also called by ChangeUnitOwner
 */
 global void UnitLost(Unit* unit)
 {
@@ -566,7 +568,6 @@ global void UnitLost(Unit* unit)
 
     DebugCheck( !unit );
 
-    type=unit->Type;
     player=unit->Player;
 
     //
@@ -590,6 +591,7 @@ global void UnitLost(Unit* unit)
     //
     //	Handle unit demand. (Currently only food supported.)
     //
+    type=unit->Type;
     if( type->Demand ) {
 	player->NumFoodUnits-=type->Demand;
 	if( player==ThisPlayer ) {
@@ -705,6 +707,7 @@ global void UnitLost(Unit* unit)
 	}
 	unit->SavedOrder.Goal=NoUnitP;
     }
+    unit->Orders[0].Action=UnitActionStill;
 
     DebugCheck( player->NumFoodUnits > UnitMax);
     DebugCheck( player->NumBuildings > UnitMax);
