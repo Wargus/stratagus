@@ -46,15 +46,59 @@ typedef struct _open_ {
 #define AStarCosts(sx,sy,ex,ey)	max(abs(sx-ex),abs(sy-ey))
 
 /// cost matrix
-local Node AStarMatrix[(MaxMapWidth+1)*(MaxMapHeight+1)];
+local Node *AStarMatrix;
 /// a list of close nodes, helps to speed up the matrix cleaning
-local int CloseSet[(MaxMapWidth+1)*(MaxMapHeight+1)];
-local int Threshold=(MaxMapWidth+1)*(MaxMapHeight+1)/4;
+local int *CloseSet;
+local int Threshold;
+#define MAX_CLOSE_SET_RATIO 4 
+#define MAX_OPEN_SET_RATIO 64 
 
 /// see pathfinder.h
 global int AStarFixedUnitCrossingCost=MaxMapWidth*MaxMapHeight;
 global int AStarMovingUnitCrossingCost=2;
 global int AStarOn=0;
+
+/**
+ ** The Open set is handled by a Heap stored in a table
+ ** 0 is the root
+ ** node i left son is at 2*i+1 and right son is at 2*i+2
+ */
+
+/// The set of Open nodes
+local Open *OpenSet;
+/// The size of the open node set
+local int OpenSetSize;
+
+/**
+ ** Init A* data structures
+ */
+global void InitAStar(void)
+{
+    if(AStarOn) {
+	if(!AStarMatrix) {
+	    AStarMatrix
+		=(Node *)malloc(sizeof(Node)*TheMap.Width*TheMap.Height);
+	    CloseSet
+		=(int *)malloc(sizeof(int)*TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO);
+	    Threshold=TheMap.Width*TheMap.Height/MAX_CLOSE_SET_RATIO;
+	    OpenSet
+		=(Open *)malloc(sizeof(int)*TheMap.Width*TheMap.Height/MAX_OPEN_SET_RATIO);
+	}
+    }
+}
+
+/**
+ ** Free A* data structure
+ */
+global void FreeAStar(void)
+{
+    if(AStarMatrix) {
+	free(AStarMatrix);
+	AStarMatrix=0;
+	free(CloseSet);
+	free(OpenSet);
+    }
+}
 
 /**
 **	Prepare path finder.
@@ -79,17 +123,6 @@ local void AStarCleanUp(int num_in_close)
 	}
     }
 }
-
-/**
- ** The Open set is handled by a Heap stored in a table
- ** 0 is the root
- ** node i has left son is at 2*i+1 and right son is at 2*i+2
- */
-
-/// The set of Open nodes
-local Open OpenSet[MaxMapWidth*MaxMapHeight/64];
-/// The size of the open node set
-local int OpenSetSize;
 
 /**
  ** Find the best node in the current open node set
@@ -184,7 +217,7 @@ local void AStarReplaceNode(int pos,int costs)
 
 /**
  ** Check if a node is already in the open set.
- ** Return -1 if not found and the position of the node in the table is found.
+ ** Return -1 if not found and the position of the node in the table if found.
  */
 local int AStarFindNode(int eo)
 {
@@ -302,8 +335,10 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	    if(CostMoveTo(dx,dy,mask,AStarFixedUnitCrossingCost)>=0) {
 		eo=dx*TheMap.Width+dy;
 		AStarMatrix[eo].InGoal=1;
-		CloseSet[num_in_close]=eo;
-		num_in_close++;
+		if(num_in_close<Threshold) {
+		    CloseSet[num_in_close]=eo;
+		    num_in_close++;
+		}
 		i=1;
 	    }
 	}
@@ -316,8 +351,10 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 	AStarMatrix[eo].CostFromStart=1;
 	// place start point in open
 	AStarAddNode(x,y,eo,AStarMatrix[eo].CostFromStart+1);
-	CloseSet[num_in_close]=OpenSet[0].O;
-	num_in_close++;
+	if(num_in_close<Threshold) {
+	    CloseSet[num_in_close]=OpenSet[0].O;
+	    num_in_close++;
+	}
 	b_c=1;
 	b_d=AStarMatrix[eo].CostToGoal;
 	b_x=x;
@@ -404,7 +441,9 @@ local int AStarFindPath(Unit* unit,int* pxd,int* pyd)
 			     AStarMatrix[eo].CostFromStart+
 			     AStarMatrix[eo].CostToGoal);
 		// we add the point to the close set
-		CloseSet[num_in_close++]=eo;		
+		if(num_in_close<Threshold) {
+		    CloseSet[num_in_close++]=eo;		
+		}
 	    } else if(new_cost<AStarMatrix[eo].CostFromStart) {
 		// Already visited node, but we have here a better path
 		// I know, it's redundant (but simpler like this)
