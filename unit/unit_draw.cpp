@@ -603,7 +603,20 @@ local void DrawDecoration(const Unit* unit,const UnitType* type,int x,int y)
 	VideoDrawClip( SpellSprites, 4, x+16+16+16, y );
     }
 
-    // FIXME: group number could also be shown
+    //
+    //	Draw group number
+    //
+    if( unit->Selected && unit->GroupId!=-1 ) {
+	char buf[2];
+
+	buf[0]=unit->GroupId+'0';
+	buf[1]='\0';
+	f=TextLength(GameFont,buf);
+	// FIXME: should use FontHeight(GameFont);
+	DrawNumber(x-f+(type->TileWidth*TileSizeX+type->BoxWidth)/2
+		,y-14+(type->TileHeight*TileSizeY+type->BoxHeight)/2
+		,GameFont,unit->GroupId);
+    }
 }
 
 /**
