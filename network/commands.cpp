@@ -101,7 +101,7 @@ local void CommandLog(const char* name,const Unit* unit,int flag,
     //	Coordinates given.
     //
     if( x!=-1 || y!=-1 ) {
-	fprintf(logf," (%d %d)",x,y);
+	fprintf(logf," '(%d %d)",x,y);
     }
     //
     //	Destination given.
