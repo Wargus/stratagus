@@ -1978,8 +1978,8 @@ global Menu Menus[] = {
 
 #define HASHADD(x,y) { \
     *(void **)hash_add(MenuFuncHash,(y)) = (void *)(x); \
-    sprintf(buf,"%x",(x)); \
-    strcpy(hash_add(MenuFuncHash2,buf), (y)); \
+    sprintf(buf,"%p",(x)); \
+    strcpy((char*)hash_add(MenuFuncHash2,buf), (y)); \
 }
 
 global void InitMenuFuncHash(void) {
@@ -7625,14 +7625,14 @@ global void SaveMenus(FILE* file)
 		     menu->defsel);
 	for (j=0; j<menu->nitems; ++j) {
 	    if (menu->items[j].initfunc) {
-		sprintf(func,"%x",menu->items[j].initfunc);
-		sprintf(initfunc," 'init '%s",hash_find(MenuFuncHash2,func));
+		sprintf(func,"%p",menu->items[j].initfunc);
+		sprintf(initfunc," 'init '%s",(char*)hash_find(MenuFuncHash2,func));
 	    } else {
 		initfunc[0] = '\0';
 	    }
 	    if (menu->items[j].exitfunc) {
-		sprintf(func,"%x",menu->items[j].exitfunc);
-		sprintf(exitfunc," 'exit '%s",hash_find(MenuFuncHash2,func));
+		sprintf(func,"%p",menu->items[j].exitfunc);
+		sprintf(exitfunc," 'exit '%s",(char*)hash_find(MenuFuncHash2,func));
 	    } else {
 		exitfunc[0] = '\0';
 	    }
@@ -7646,11 +7646,11 @@ global void SaveMenus(FILE* file)
 	    switch (menu->items[j].mitype) {
 		case MI_TYPE_TEXT:
 		    fprintf(file,"    'text '(\"%s\" %s)\n",
-			    menu->items[j].d.text.text ? menu->items[j].d.text.text : "null",
+			    menu->items[j].d.text.text ? (char*)menu->items[j].d.text.text : "null",
 			    text_flags[menu->items[j].d.text.tflags]);
 		    break;
 		case MI_TYPE_BUTTON:
-		    sprintf(func,"%x",menu->items[j].d.button.handler);
+		    sprintf(func,"%p",menu->items[j].d.button.handler);
 		    fprintf(file,"    'button '(size (%d %d)\n"
 			         "            caption \"%s\"\n"
 				 "            hotkey \"%s\"\n"
@@ -7660,18 +7660,18 @@ global void SaveMenus(FILE* file)
 				 menu->items[j].d.button.ysize,
 				 menu->items[j].d.button.text,
 				 hotkey2str(menu->items[j].d.button.hotkey,hotkey),
-				 hash_find(MenuFuncHash2,func),
+				 (char*)hash_find(MenuFuncHash2,func),
 				 menu->items[j].d.button.button==MBUTTON_GM_FULL ? "gm-full" : "gm-half");
 
 		    break;
 		case MI_TYPE_PULLDOWN:
-		    sprintf(func,"%x",menu->items[j].d.pulldown.action);
+		    sprintf(func,"%p",menu->items[j].d.pulldown.action);
 		    fprintf(file,"    'pulldown '(size (%d %d)\n"
 			         "              style pulldown\n"
 				 "              func %s\n",
 				 menu->items[j].d.pulldown.xsize,
 				 menu->items[j].d.pulldown.ysize,
-				 hash_find(MenuFuncHash2,func));
+				 (char*)hash_find(MenuFuncHash2,func));
 		    fprintf(file,"              options (");
 		    for (n=0; n<menu->items[j].d.pulldown.noptions; ++n) {
 			fprintf(file,"\"%s\" ", menu->items[j].d.pulldown.options[n]);
@@ -7684,9 +7684,9 @@ global void SaveMenus(FILE* file)
 				 menu->items[j].d.pulldown.curopt);
 		    break;
 		case MI_TYPE_LISTBOX:
-		    sprintf(func,"%x",menu->items[j].d.listbox.action);
-		    sprintf(func2,"%x",menu->items[j].d.listbox.retrieveopt);
-		    sprintf(func3,"%x",menu->items[j].d.listbox.handler);
+		    sprintf(func,"%p",menu->items[j].d.listbox.action);
+		    sprintf(func2,"%p",menu->items[j].d.listbox.retrieveopt);
+		    sprintf(func3,"%p",menu->items[j].d.listbox.handler);
 		    fprintf(file,"    'listbox '(size (%d %d)\n"
 				 "             style pulldown\n"
 				 "             func %s\n"
@@ -7695,57 +7695,57 @@ global void SaveMenus(FILE* file)
 				 "             nlines %d)\n",
 				 menu->items[j].d.listbox.xsize,
 				 menu->items[j].d.listbox.ysize,
-				 hash_find(MenuFuncHash2,func),
-				 hash_find(MenuFuncHash2,func2),
-				 hash_find(MenuFuncHash2,func3),
+				 (char*)hash_find(MenuFuncHash2,func),
+				 (char*)hash_find(MenuFuncHash2,func2),
+				 (char*)hash_find(MenuFuncHash2,func3),
 				 menu->items[j].d.listbox.nlines);
 		    break;
 		case MI_TYPE_VSLIDER:
-		    sprintf(func,"%x",menu->items[j].d.vslider.action);
-		    sprintf(func2,"%x",menu->items[j].d.vslider.handler);
+		    sprintf(func,"%p",menu->items[j].d.vslider.action);
+		    sprintf(func2,"%p",menu->items[j].d.vslider.handler);
 		    fprintf(file,"    'vslider '(size (%d %d)\n"
 			         "             func %s\n"
 				 "             handler %s)\n",
 				 menu->items[j].d.vslider.xsize,
 				 menu->items[j].d.vslider.ysize,
-				 hash_find(MenuFuncHash2,func),
-				 hash_find(MenuFuncHash2,func2));
+				 (char*)hash_find(MenuFuncHash2,func),
+				 (char*)hash_find(MenuFuncHash2,func2));
 		    break;
 		case MI_TYPE_DRAWFUNC:
-		    sprintf(func,"%x",menu->items[j].d.drawfunc.draw);
+		    sprintf(func,"%p",menu->items[j].d.drawfunc.draw);
 		    fprintf(file,"    'drawfunc '%s\n",
-			         hash_find(MenuFuncHash2,func));
+			         (char*)hash_find(MenuFuncHash2,func));
 		    break;
 		case MI_TYPE_INPUT:
-		    sprintf(func,"%x",menu->items[j].d.input.action);
+		    sprintf(func,"%p",menu->items[j].d.input.action);
 		    fprintf(file,"    'input '(size (%d %d)\n"
 			         "           func %s\n"
 				 "           style pulldown)\n",
 				 menu->items[j].d.input.xsize,
 				 menu->items[j].d.input.ysize,
-				 hash_find(MenuFuncHash2,func));
+				 (char*)hash_find(MenuFuncHash2,func));
 		    break;
 		case MI_TYPE_GEM:
-		    sprintf(func,"%x",menu->items[j].d.gem.action);
+		    sprintf(func,"%p",menu->items[j].d.gem.action);
 		    fprintf(file,"    'gem '(size (%d %d)\n"
 			         "         state checked\n"
 				 "         func %s\n"
 				 "         style %s)\n",
 				 menu->items[j].d.gem.xsize,
 				 menu->items[j].d.gem.ysize,
-				 hash_find(MenuFuncHash2,func),
+				 (char*)hash_find(MenuFuncHash2,func),
 				 menu->items[j].d.gem.button==MBUTTON_GEM_ROUND ? "gem-round" : "gem-square");
 		    break;
 		case MI_TYPE_HSLIDER:
-		    sprintf(func,"%x",menu->items[j].d.hslider.action);
-		    sprintf(func2,"%x",menu->items[j].d.hslider.handler);
+		    sprintf(func,"%p",menu->items[j].d.hslider.action);
+		    sprintf(func2,"%p",menu->items[j].d.hslider.handler);
 		    fprintf(file,"    'hslider '(size (%d %d)\n"
 			         "             func %s\n"
 				 "             handler %s)\n",
 				 menu->items[j].d.hslider.xsize,
 				 menu->items[j].d.hslider.ysize,
-				 hash_find(MenuFuncHash2,func),
-				 hash_find(MenuFuncHash2,func2));
+				 (char*)hash_find(MenuFuncHash2,func),
+				 (char*)hash_find(MenuFuncHash2,func2));
 		    break;
 		default:
 		    abort();
