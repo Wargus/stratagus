@@ -911,8 +911,13 @@ local Menuitem GameOptionsMenuItems[] = {
 #ifdef __GNUC__
     { MI_TYPE_TEXT, 128, 11, 0, LargeFont, NULL, NULL,
 	{ text:{ "Game Options", MI_TFLAGS_CENTERED} } },
+#ifdef WITH_SOUND
     { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
+#else
+    { MI_TYPE_BUTTON, 16, 40 + 36*0, MenuButtonDisabled, LargeFont, NULL, NULL,
+	{ button:{ "Sound (~!F~!7)", 224, 27, MBUTTON_GM_FULL, SoundOptions, KeyCodeF7} } },
+#endif
     { MI_TYPE_BUTTON, 16, 40 + 36*1, MenuButtonSelected, LargeFont, NULL, NULL,
 	{ button:{ "Speeds (~!F~!8)", 224, 27, MBUTTON_GM_FULL, SpeedSettings, KeyCodeF8} } },
     { MI_TYPE_BUTTON, 16, 40 + 36*2, MenuButtonSelected, LargeFont, NULL, NULL,
