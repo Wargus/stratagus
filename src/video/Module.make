@@ -26,9 +26,8 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/video
-MSRC =   cursor.c deco.c font.c graphic.c linedraw.c png.c sdl.c sprite.c \
-         sweepline.c video.c
-MHDRS =  intern_video.h sweepline.h
+MSRC =   cursor.c font.c graphic.c linedraw.c png.c sdl.c sprite.c video.c
+MHDRS =  intern_video.h
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
 HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))

@@ -1847,11 +1847,6 @@ global void DrawUnit(const Unit* unit)
 		return;
 	}
 
-#ifdef NEW_DECODRAW
-	if (!CurrentViewport) {
-		CurrentViewport = TheUI.SelectedViewport;
-	}
-#endif
 	x += Map2ViewportX(CurrentViewport, unit->X);
 	y += Map2ViewportY(CurrentViewport, unit->Y);
 
@@ -1915,10 +1910,8 @@ global void DrawUnit(const Unit* unit)
 #endif
 	}
 
-#ifndef NEW_DECODRAW
 	// Unit's extras not fully supported.. need to be decorations themselves.
 	DrawInformations(unit, type, x, y);
-#endif
 }
 
 /**

@@ -1364,39 +1364,6 @@ global void GetUnitMapArea(const Unit* unit, int* sx, int* sy, int* ex, int* ey)
 	*ey = *sy + unit->Type->TileHeight - !unit->IY;
 }
 
-#ifdef NEW_DECODRAW
-/**
-**		Decoration redraw function that will redraw an unit (no building) for
-**		set clip rectangle by decoration mechanism.
-**
-**		@param data		Unit pointer to be drawn
-*/
-local void DecoUnitDraw(void* data)
-{
-	Unit* unit;
-
-	unit = (Unit*)data;
-	DebugCheck(unit->Removed);
-	//DebugCheck(!UnitVisibleOnScreen(unit));
-
-	DrawUnit(unit);
-}
-
-/**
-**		Create decoration for any unit-type
-**
-**		@param u		an unit which is visible on screen
-**	  @param x		x pixel position on screen of left-top
-**	  @param y		y pixel position on screen of left-top
-**	  @param w		width in pixels of area to be drawn from (x, y)
-**	  @param h		height in pixels of area to be drawn from (x, y)
-*/
-local void AddUnitDeco(Unit* u, int x, int y, int w, int h)
-{
-	u->Decoration = DecorationAdd(u, DecoUnitDraw, 1, x, y, w, h);
-}
-#endif
-
 /**
 **	  Check and sets if unit must be drawn on screen-map
 **
@@ -1433,42 +1400,10 @@ global int CheckUnitToBeDrawn(Unit* unit)
 		return 1;
 	}
 #else
-#ifdef NEW_DECODRAW
-	if (!unit->Removed && UnitVisibleOnScreen(unit)) {
-		int x;
-		int y;
-		int w;
-		int h;
-
-		// FIXME: Inaccurate dimension to take unit's extras into account..
-		//		Should be solved by adding each unit extra as separate decoration
-		x = Map2ViewportX(TheUI.SelectedViewport, unit->X) + unit->IX
-				+ unit->Type->TileWidth * TileSizeX / 2 - unit->Type->Width / 2 - 10;
-		y = Map2ViewportY(TheUI.SelectedViewport, unit->Y) + unit->IY
-				+ unit->Type->TileHeight * TileSizeY / 2 - unit->Type->Height / 2 - 10;
-		w = unit->Type->Width + 20;
-		h = unit->Type->Height + 20;
-
-		if (unit->Decoration) {
-			unit->Decoration = DecorationMove(unit->Decoration, x, y, w, h);
-		} else {
-			DebugLevel3Fn("Adding Decoration for %d(%s)\n" _C_ unit->Slot _C_ unit->Type->Name);
-			AddUnitDeco((Unit*)unit, x, y, w, h);
-		}
-
-		return 1;
-	} else if (unit->Decoration) {
-		// not longer visible: so remove from auto Decorationration redraw
-		DebugLevel3Fn("Removing Decoration for %d(%s)\n" _C_ unit->Slot _C_ unit->Type->Name);
-		DecorationRemove(unit->Decoration);
-		unit->Decoration = NULL;
-	}
-#else
 	if (UnitVisibleOnScreen(unit)) {
 		MustRedraw |= RedrawMap;
 		return 1;
 	}
-#endif
 #endif
 	return 0;
 }
