@@ -216,16 +216,10 @@ global Unit* TargetOnMapTile(Unit* source,unsigned tx,unsigned ty)
 	unit=table[i];
 	// unusable unit ?
 	// if( UnitUnusable(unit) ) can't attack constructions
-#ifdef NEW_ORDERS
 	// FIXME: did SelectUnitsOnTile already filter this.
 	if( unit->Removed || unit->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
-#else
-	if( unit->Removed || unit->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-#endif
 	type=unit->Type;
 	if( tx<unit->X || tx>=unit->X+type->TileWidth
 		|| ty<unit->Y || ty>=unit->Y+type->TileHeight ) {
@@ -455,16 +449,10 @@ global Unit* AttackUnitsInDistance(const Unit* unit,unsigned range)
 	//
 	//	unusable unit
 	//
-#ifdef NEW_ORDERS
 	// FIXME: did SelectUnits already filter this.
 	if( dest->Removed || dest->Orders[0].Action==UnitActionDie ) {
 	    continue;
 	}
-#else
-	if( dest->Removed || dest->Command.Action==UnitActionDie ) {
-	    continue;
-	}
-#endif
 
 	if( !IsEnemy(player,dest) ) {	// a friend or neutral
 	    continue;
