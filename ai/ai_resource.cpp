@@ -1071,7 +1071,7 @@ local void AiCollectResources(void)
 		    src_c = priority_resource[j];
 
 		    // Don't complete with lower priority ones...
-		    if (wanted[src_c] <= wanted[c]) {
+		    if (wanted[src_c] >= wanted[c]) {
 			continue;
 		    }
 
