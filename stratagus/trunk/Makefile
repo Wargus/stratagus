@@ -35,16 +35,20 @@ OBJDIR ?= .
 
 CROSSDIR = /usr/local/cross-tools
 
+INCLUDE_DIRS = src/include src/movie/vp31/include
+
 MODULES = src/action src/ai src/beos src/clone src/editor src/freecraft src/game src/libmodplug src/map \
           src/missile src/movie src/movie/vp31 src/network src/pathfinder src/siod src/sound src/ui src/unit \
-          src/video src/include src/movie/vp31/include etlib
+          src/video etlib src
 
 MODULES_TOOLS = tools
 
-MODULES_ALL = $(MODULES) $(MODULES2) $(MODULES_TOOLS) src
+MODULES_ALL = $(MODULES) $(MODULES_TOOLS)
+
+MISC :=
 
 HDRS :=
-MISC :=
+include $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
 SRC := 
 include $(patsubst %, %/Module.make, $(MODULES))
@@ -66,7 +70,7 @@ OBJ_ALL = $(OBJ) $(OBJ_TOOLS)
 all:	all-src freecraft$(EXE) tools
 
 make-objdir:
-	@for i in $(MODULES_ALL); do \
+	@for i in $(MODULES); do \
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
 %.o: $(@D)../%.c
