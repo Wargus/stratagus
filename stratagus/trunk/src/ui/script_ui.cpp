@@ -458,6 +458,9 @@ local SCM CclDefineCursor(SCM list)
 	    ct->Width=gh_scm2int(gh_car(value));
 	    value=gh_cdr(value);
 	    ct->Height=gh_scm2int(gh_car(value));
+	} else if( gh_eq_p(value,gh_symbol2scm("rate")) ) {
+	    value=gh_car(list);
+	    ct->FrameRate=gh_scm2int(value);
 	} else {
 	    s1=gh_scm2newstr(value,NULL);
 	    fprintf(stderr,"Unsupported tag %s\n",s1);

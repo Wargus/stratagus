@@ -120,34 +120,37 @@ typedef struct _cursor_type_ CursorType;
 
     ///	Private type which specifies the cursor-type
 struct _cursor_type_ {
-    const void*	OType;			/// object type (future extensions)
+    const void*	OType;			/// Object type (future extensions)
 
-    char*	Ident;			/// identifier to reference it
-    char*	Race;			/// race name
+    char*	Ident;			/// Identifier to reference it
+    char*	Race;			/// Race name
 
-    char*	File;			/// graphic file of the cursor
+    char*	File;			/// Graphic file of the cursor
 
-    int		HotX;			/// hot point x
-    int		HotY;			/// hot point y
-    int		Width;			/// width of cursor
-    int		Height;			/// height of cursor
+    int		HotX;			/// Hot point x
+    int		HotY;			/// Hot point y
+    int		Width;			/// Width of cursor
+    int		Height;			/// Height of cursor
+
+    int		SpriteFrame;		/// Current displayed cursor frame
+    int		FrameRate;		/// Rate of changing the frames
 
 // --- FILLED UP ---
 
-    Graphic*	Sprite;			/// cursor sprite image
+    Graphic*	Sprite;			/// Cursor sprite image
 };
 
     /// Cursor config reference
 typedef struct _cursor_config_ {
-    char*	Name;			/// config cursor-type name
-    CursorType*	Cursor;			/// cursor-type pointer
+    char*	Name;			/// Config cursor-type name
+    CursorType*	Cursor;			/// Cursor-type pointer
 } CursorConfig;
 
     /// Cursor state
 typedef enum _cursor_states_ {
-    CursorStatePoint,			/// normal cursor
-    CursorStateSelect,			/// select position
-    CursorStateRectangle,		/// rectangle selecting
+    CursorStatePoint,			/// Normal cursor
+    CursorStateSelect,			/// Select position
+    CursorStateRectangle,		/// Rectangle selecting
 } CursorStates;
 
 /*----------------------------------------------------------------------------

@@ -1087,6 +1087,7 @@ global void WaitEventsOneFrame(const EventCallback* callbacks)
 
     InputMouseTimeout(callbacks,SVGAGetTicks());
     InputKeyTimeout(callbacks,SVGAGetTicks());
+    CursorAnimate(ticks);
 
     for(;;) {
 	//
