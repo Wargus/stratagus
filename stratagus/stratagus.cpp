@@ -250,12 +250,8 @@ global int OptionUseDepletedMines;	/// Use depleted mines or destroy them
 --	Speedups FIXME: Move to some other more logic place
 ----------------------------------------------------------------------------*/
 
-global int SpeedMine=SPEED_MINE;	/// speed factor for mine gold
-global int SpeedGold=SPEED_GOLD;	/// speed factor for getting gold
-global int SpeedChop=SPEED_CHOP;	/// speed factor for chop
-global int SpeedWood=SPEED_WOOD;	/// speed factor for getting wood
-global int SpeedHaul=SPEED_HAUL;	/// speed factor for haul oil
-global int SpeedOil=SPEED_OIL;		/// speed factor for getting oil
+global int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
+global int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
 global int SpeedBuild=SPEED_BUILD;	/// speed factor for building
 global int SpeedTrain=SPEED_TRAIN;	/// speed factor for training
 global int SpeedUpgrade=SPEED_UPGRADE;	/// speed factor for upgrading
