@@ -591,6 +591,7 @@ global void PlayerPixels(const Player* player)
 **	Setup the player colors for the current palette.
 **
 **	FIXME: need better colors for the player 8-16.
+**	FIXME: could be called before PixelsXX is setup.
 */
 global void SetPlayersPalette(void)
 {
@@ -598,32 +599,11 @@ global void SetPlayersPalette(void)
 
     switch( VideoDepth ) {
     case 8:
-#if 0
-	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColor1=Pixels8[i*4+208];
-	    Players[i].UnitColor2=Pixels8[i*4+209];
-	    Players[i].UnitColor3=Pixels8[i*4+210];
-	    Players[i].UnitColor4=Pixels8[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels8[12];
-	Players[i].UnitColor2=Pixels8[13];
-	Players[i].UnitColor3=Pixels8[14];
-	Players[i].UnitColor4=Pixels8[15];
-
-	// FIXME: nice colors for this players
-	for( ++i; i<15; ++i ) {
-	    Players[i].UnitColor1=Pixels8[i*4+208];
-	    Players[i].UnitColor2=Pixels8[i*4+209];
-	    Players[i].UnitColor3=Pixels8[i*4+210];
-	    Players[i].UnitColor4=Pixels8[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels8[12];
-	Players[i].UnitColor2=Pixels8[13];
-	Players[i].UnitColor3=Pixels8[14];
-	Players[i].UnitColor4=Pixels8[15];
-#endif
-
 	// New player colors setup
+	if( !Pixels8 ) {
+	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    return;
+	}
 
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColors.Depth8.Pixels[0]=Pixels8[i*4+208];
@@ -650,32 +630,11 @@ global void SetPlayersPalette(void)
 
     case 15:
     case 16:
-#if 0
-	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColor1=Pixels16[i*4+208];
-	    Players[i].UnitColor2=Pixels16[i*4+209];
-	    Players[i].UnitColor3=Pixels16[i*4+210];
-	    Players[i].UnitColor4=Pixels16[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels16[12];
-	Players[i].UnitColor2=Pixels16[13];
-	Players[i].UnitColor3=Pixels16[14];
-	Players[i].UnitColor4=Pixels16[15];
-
-	// FIXME: nice colors for this players
-	for( ++i; i<15; ++i ) {
-	    Players[i].UnitColor1=Pixels16[i*4+208];
-	    Players[i].UnitColor2=Pixels16[i*4+209];
-	    Players[i].UnitColor3=Pixels16[i*4+210];
-	    Players[i].UnitColor4=Pixels16[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels16[12];
-	Players[i].UnitColor2=Pixels16[13];
-	Players[i].UnitColor3=Pixels16[14];
-	Players[i].UnitColor4=Pixels16[15];
-#endif
-
 	// New player colors setup
+	if( !Pixels16 ) {
+	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    return;
+	}
 
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColors.Depth16.Pixels[0]=Pixels16[i*4+208];
@@ -701,32 +660,11 @@ global void SetPlayersPalette(void)
 	break;
     case 24:
     case 32:
-#if 0
-	for( i=0; i<7; ++i ) {
-	    Players[i].UnitColor1=Pixels32[i*4+208];
-	    Players[i].UnitColor2=Pixels32[i*4+209];
-	    Players[i].UnitColor3=Pixels32[i*4+210];
-	    Players[i].UnitColor4=Pixels32[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels32[12];
-	Players[i].UnitColor2=Pixels32[13];
-	Players[i].UnitColor3=Pixels32[14];
-	Players[i].UnitColor4=Pixels32[15];
-
-	// FIXME: nice colors for this players
-	for( ++i; i<15; ++i ) {
-	    Players[i].UnitColor1=Pixels32[i*4+208];
-	    Players[i].UnitColor2=Pixels32[i*4+209];
-	    Players[i].UnitColor3=Pixels32[i*4+210];
-	    Players[i].UnitColor4=Pixels32[i*4+211];
-	}
-	Players[i].UnitColor1=Pixels32[12];
-	Players[i].UnitColor2=Pixels32[13];
-	Players[i].UnitColor3=Pixels32[14];
-	Players[i].UnitColor4=Pixels32[15];
-#endif
-
 	// New player colors setup
+	if( !Pixels32 ) {
+	    DebugLevel0(__FUNCTION__": Wrong setup order\n");
+	    return;
+	}
 
 	for( i=0; i<7; ++i ) {
 	    Players[i].UnitColors.Depth32.Pixels[0]=Pixels32[i*4+208];
