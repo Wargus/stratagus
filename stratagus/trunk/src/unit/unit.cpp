@@ -2033,8 +2033,8 @@ global void DropOutAll(const Unit* source)
 	    DropOutOnSide(unit,LookingW
 		,source->Type->TileWidth,source->Type->TileHeight);
 #ifdef NEW_FOW
-	//Worker is back on map, unmark sight
-    MapUnmarkSight(unit->Player,source->X+source->Type->TileWidth/2,
+	    // Worker is back on map, unmark sight
+	    MapUnmarkSight(unit->Player,source->X+source->Type->TileWidth/2,
 			source->Y+source->Type->TileHeight/2,
 			source->Stats->SightRange);
 #endif
@@ -3882,7 +3882,6 @@ global void SaveUnit(const Unit* unit,FILE* file)
     if( unit->Active ) {
 	fprintf(file," 'active");
     }
-    fprintf(file," 'resource-active %d",unit->Data.Resource.Active);
     fprintf(file," 'mana %d",unit->Mana);
     fprintf(file," 'hp %d",unit->HP);
     fprintf(file," 'xp %d",unit->XP);
@@ -3945,6 +3944,10 @@ global void SaveUnit(const Unit* unit,FILE* file)
     //
     switch( unit->Orders[0].Action ) {
 	case UnitActionStill:
+	    // FIXME: support other resource types
+	    if( unit->Type->GoldMine || unit->Type->GivesOil ) {
+		fprintf(file," 'resource-active %d",unit->Data.Resource.Active);
+	    }
 	    break;
 	case UnitActionBuilded:
 	    fprintf(file,"\n  'data-builded '(worker %s",
