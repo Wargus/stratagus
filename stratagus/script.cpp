@@ -1466,6 +1466,51 @@ local SCM CclUnits(void)
     return gh_int2scm(destroyed);
 }
 #elif defined(USE_LUA)
+local int CclUnits(lua_State* l)
+{
+    Unit** slot;
+    int freeslots;
+    int destroyed;
+    int nullrefs;
+    int i;
+    static char buf[80];
+
+    if (lua_gettop(l) != 0) {
+	lua_pushstring(l, "incorrect argument");
+	lua_error(l);
+    }
+    i = 0;
+    slot = UnitSlotFree;
+    while (slot) {			// count the free slots
+	++i;
+	slot = (void*)*slot;
+    }
+    freeslots = i;
+
+    //
+    //	Look how many slots are used
+    //
+    destroyed = nullrefs = 0;
+    for (slot = UnitSlots; slot < UnitSlots + MAX_UNIT_SLOTS; ++slot) {
+	if (*slot && (*slot < (Unit*)UnitSlots ||
+		*slot > (Unit*)(UnitSlots + MAX_UNIT_SLOTS))) {
+	    if ((*slot)->Destroyed) {
+		++destroyed;
+	    } else if (!(*slot)->Refs) {
+		++nullrefs;
+	    }
+	}
+    }
+
+    sprintf(buf, "%d free, %d(%d) used, %d, destroyed, %d null",
+	freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
+    SetStatusLine(buf);
+    fprintf(stderr, "%d free, %d(%d) used, %d destroyed, %d null\n",
+	freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
+
+    lua_pushnumber(l, destroyed);
+    return 1;
+}
 #endif
 
 /**
@@ -1887,7 +1932,7 @@ global void InitCcl(void)
     lua_register(Lua, "LoadPud", CclLoadPud);
     lua_register(Lua, "LoadMap", CclLoadMap);
 
-//    lua_register(Lua, "Units", CclUnits);
+    lua_register(Lua, "Units", CclUnits);
 
     lua_register(Lua, "WithSound", CclWithSound);
     lua_register(Lua, "GetStratagusHomePath", CclGetStratagusHomePath);
