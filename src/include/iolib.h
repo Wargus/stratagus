@@ -37,7 +37,6 @@
 --	Includes
 ----------------------------------------------------------------------------*/
 
-#define FindResource WinFindResource
 #define DrawIcon WinDrawIcon
 #define EndMenu WinEndMenu
 #ifdef USE_ZLIB
