@@ -342,6 +342,7 @@ static inline void DebugLevel3Fn(const char* fmt,...) {};
 // FIXME: this values should go into a general ui structure
 
 #define noGRID		1		/// Map is shown with a grid, if 1
+#define noGRID		1		/// Map is shown with a grid, if 1
 
 #define DEFAULT_VIDEO_WIDTH	640	/// Default video width
 #define DEFAULT_VIDEO_HEIGHT	480	/// Default video height
@@ -503,6 +504,11 @@ extern int OptionUseDepletedMines;      /// use depleted mines or destroy them
 extern unsigned SyncRandSeed;		/// sync random seed value.
 
 extern unsigned long GameCycle;		/// Game simulation cycle counter
+
+#if DEBUG
+#include <setjmp.h>
+extern jmp_buf main_loop;
+#endif
 
 extern void LoadGame(char*);		/// Load saved game back
 extern void SaveGame(const char*);	/// Save game for later load

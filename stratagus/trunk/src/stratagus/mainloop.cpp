@@ -30,6 +30,10 @@
 //----------------------------------------------------------------------------
 
 #include <stdio.h>
+#if DEBUG
+#include <stdlib.h>
+#include <setjmp.h>
+#endif /* DEBUG */
 
 #include "freecraft.h"
 #include "video.h"
@@ -73,6 +77,10 @@ global enum _scroll_state_ KeyScrollState=ScrollNone;
 
     /// variable set when we are scrolling via mouse
 global enum _scroll_state_ MouseScrollState=ScrollNone;
+
+#if DEBUG
+global jmp_buf main_loop;
+#endif
 
 //----------------------------------------------------------------------------
 //	Functions
@@ -521,6 +529,10 @@ global void GameMainLoop(void)
     showtip=ShowTips;
 
     for( ; GameRunning; ) {
+#if DEBUG
+	if (setjmp (main_loop))
+	    GamePaused = 1;
+#endif
 	//
 	//	Game logic part
 	//
