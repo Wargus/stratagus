@@ -625,7 +625,7 @@ local void DrawPixelOpenGL(SysColors color,int x,int y)
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -755,7 +755,7 @@ local void Draw25TransPixelOpenGL(SysColors color,int x,int y)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 192);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -882,7 +882,7 @@ local void Draw50TransPixelOpenGL(SysColors color,int x,int y)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 128);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1009,7 +1009,7 @@ local void Draw75TransPixelOpenGL(SysColors color,int x,int y)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 64);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1215,7 +1215,7 @@ local void DrawTransPixelOpenGL(SysColors color,int x,int y,unsigned char alpha)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 255-alpha);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1310,7 +1310,7 @@ local void DrawPixelClipOpenGL(SysColors color,int x,int y)
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_POINTS);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1511,8 +1511,8 @@ local void DrawHLineOpenGL(SysColors color,int x,int y,int width)
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+width, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1675,8 +1675,8 @@ local void Draw25TransHLineOpenGL(SysColors color,int x,int y,int width)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 192);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+width, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1836,8 +1836,8 @@ local void Draw50TransHLineOpenGL(SysColors color,int x,int y,int width)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 128);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+width, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -1997,8 +1997,8 @@ local void Draw75TransHLineOpenGL(SysColors color,int x,int y,int width)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 64);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+width, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -2269,8 +2269,8 @@ local void DrawTransHLineOpenGL(SysColors color,int x,int y,int width,unsigned c
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 255-alpha);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+width)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+width, VideoHeight-y);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -2472,8 +2472,8 @@ local void DrawVLineOpenGL(SysColors color,int x,int y,int height)
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+height));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -2635,8 +2635,8 @@ local void Draw25TransVLineOpenGL(SysColors color,int x,int y,int height)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 192);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+height));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -2796,8 +2796,8 @@ local void Draw50TransVLineOpenGL(SysColors color,int x,int y,int height)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 128);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+height));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -2958,8 +2958,8 @@ local void Draw75TransVLineOpenGL(SysColors color,int x,int y,int height)
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 64);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+height));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -3197,8 +3197,8 @@ local void DrawTransVLineOpenGL(SysColors color,int x,int y,int height,unsigned 
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 255-alpha);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+height)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+height));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -3705,8 +3705,8 @@ local void DrawLineOpenGL(SysColors color,int x1,int y1,int x2,int y2)
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_LINES);
-    glVertex3f((GLfloat)x1/VideoWidth, 1.0f-(GLfloat)y1/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x2/VideoWidth, 1.0f-(GLfloat)y2/VideoHeight, 0.0f);
+    glVertex2i(x1, VideoHeight-y1);
+    glVertex2i(x2, VideoHeight-y2);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -3999,10 +3999,10 @@ local void DrawRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_LINE_LOOP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-(y+h));
+    glVertex2i(x, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -4311,10 +4311,10 @@ local void Draw25TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 192);
     glBegin(GL_LINE_LOOP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-(y+h));
+    glVertex2i(x, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -4621,10 +4621,10 @@ local void Draw50TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 128);
     glBegin(GL_LINE_LOOP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-(y+h));
+    glVertex2i(x, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -4931,10 +4931,10 @@ local void Draw75TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 64);
     glBegin(GL_LINE_LOOP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-(y+h));
+    glVertex2i(x, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -5249,10 +5249,10 @@ local void DrawTransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 255-alpha);
     glBegin(GL_LINE_LOOP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-(y+h));
+    glVertex2i(x, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -5684,10 +5684,10 @@ local void DrawFillRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor3ub(r, g, b);
     glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+h));
+    glVertex2i(x+w, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -5891,10 +5891,10 @@ local void DrawFill25TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 192);
     glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+h));
+    glVertex2i(x+w, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -6095,10 +6095,10 @@ local void DrawFill50TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 128);
     glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+h));
+    glVertex2i(x+w, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -6299,10 +6299,10 @@ local void DrawFill75TransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 64);
     glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+h));
+    glVertex2i(x+w, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
@@ -6567,10 +6567,10 @@ local void DrawFillTransRectangleOpenGL(SysColors color,int x,int y
     glDisable(GL_TEXTURE_2D);
     glColor4ub(r, g, b, 255-alpha);
     glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)y/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)x/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
-    glVertex3f((GLfloat)(x+w)/VideoWidth, 1.0f-(GLfloat)(y+h)/VideoHeight, 0.0f);
+    glVertex2i(x, VideoHeight-y);
+    glVertex2i(x+w, VideoHeight-y);
+    glVertex2i(x, VideoHeight-(y+h));
+    glVertex2i(x+w, VideoHeight-(y+h));
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }

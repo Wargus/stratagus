@@ -323,19 +323,15 @@ local void VideoDrawChar32(const Graphic* sprite,
 local void VideoDrawCharOpenGL(const Graphic* sprite,
 	int gx,int gy,int w,int h,int x,int y)
 {
-    GLfloat sx,sy;
     Palette c;
     int i;
-
-    sx=(GLfloat)x/VideoWidth;
-    sy=1.0f-(GLfloat)y/VideoHeight-(GLfloat)h/VideoHeight;
 
     glDisable(GL_TEXTURE_2D);
 
     for( i=0; i<NumFontColors; ++i ) {
 	c=GlobalPalette[TextColor[i]];
 	glColor3ub(c.r,c.g,c.b);
-	glRasterPos2f(sx,sy);
+	glRasterPos2i(x,VideoHeight-y-h);
 	glBitmap(FontBitmapWidths[CurrentFont]*8,h,
 	    0.0f,0.0f,0.0f,0.0f,
 	    FontBitmaps[CurrentFont][i]+(gy+Fonts[CurrentFont].Height-h)*FontBitmapWidths[CurrentFont]);

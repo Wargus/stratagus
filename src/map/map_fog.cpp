@@ -1601,22 +1601,22 @@ global void VideoDrawOnlyFogAlphaOpenGL(
     const GraphicData* data __attribute__((unused)),
     int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
+    GLint sx,ex,sy,ey;
     Graphic *g;
 
     g=TheMap.TileData;
-    sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)TileSizeX/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)TileSizeY/VideoHeight;
+    sx=x;
+    ex=sx+TileSizeX;
+    ey=VideoHeight-y;
+    sy=ey-TileSizeY;
 
     glDisable(GL_TEXTURE_2D);
     glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
     glBegin(GL_QUADS);
-    glVertex3f(sx, sy, 0.0f);
-    glVertex3f(sx, ey, 0.0f);
-    glVertex3f(ex, ey, 0.0f);
-    glVertex3f(ex, sy, 0.0f);
+    glVertex2i(sx, sy);
+    glVertex2i(sx, ey);
+    glVertex2i(ex, ey);
+    glVertex2i(ex, sy);
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }

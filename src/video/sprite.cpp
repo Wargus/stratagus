@@ -192,23 +192,23 @@ local void VideoDraw8to32(const Graphic* sprite,unsigned frame,int x,int y)
 #ifdef USE_OPENGL
 local void VideoDrawOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
+    GLint sx,ex,sy,ey;
 
-    sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)sprite->Width/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)sprite->Height/VideoHeight;
+    sx=x;
+    ex=sx+sprite->Width;
+    ey=VideoHeight-y;
+    sy=ey-sprite->Height;
 
     glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f-sprite->TextureHeight);
-    glVertex3f(sx, sy, 0.0f);
+    glVertex2i(sx, sy);
     glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(sx, ey, 0.0f);
+    glVertex2i(sx, ey);
     glTexCoord2f(sprite->TextureWidth, 1.0f);
-    glVertex3f(ex, ey, 0.0f);
+    glVertex2i(ex, ey);
     glTexCoord2f(sprite->TextureWidth, 1.0f-sprite->TextureHeight);
-    glVertex3f(ex, sy, 0.0f);
+    glVertex2i(ex, sy);
     glEnd();
 }
 #endif
@@ -399,23 +399,23 @@ local void VideoDraw8to32X(const Graphic* sprite,unsigned frame,int x,int y)
 #ifdef USE_OPENGL
 local void VideoDrawXOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
 {
-    GLfloat sx,ex,sy,ey;
+    GLint sx,ex,sy,ey;
 
-    sx=(GLfloat)x/VideoWidth;
-    ex=sx+(GLfloat)sprite->Width/VideoWidth;
-    ey=1.0f-(GLfloat)y/VideoHeight;
-    sy=ey-(GLfloat)sprite->Height/VideoHeight;
+    sx=x;
+    ex=sx+sprite->Width;
+    ey=VideoHeight-y;
+    sy=ey-sprite->Height;
 
     glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f-sprite->TextureHeight);
-    glVertex3f(sx, sy, 0.0f);
+    glVertex2i(sx, sy);
     glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(sx, ey, 0.0f);
+    glVertex2i(sx, ey);
     glTexCoord2f(sprite->TextureWidth, 1.0f);
-    glVertex3f(ex, ey, 0.0f);
+    glVertex2i(ex, ey);
     glTexCoord2f(sprite->TextureWidth, 1.0f-sprite->TextureHeight);
-    glVertex3f(ex, sy, 0.0f);
+    glVertex2i(ex, sy);
     glEnd();
 }
 #endif
@@ -976,7 +976,7 @@ right_trans:
 #ifdef USE_OPENGL
 local void VideoDrawClipOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
 {
-    GLfloat svx,evx,svy,evy;
+    GLint svx,evx,svy,evy;
     GLfloat stx,etx,sty,ety;
     int ox;
     int oy;
@@ -988,10 +988,10 @@ local void VideoDrawClipOpenGL(const Graphic* sprite,unsigned frame,int x,int y)
     h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
-    svx=(GLfloat)x/VideoWidth;
-    evx=svx+(GLfloat)w/VideoWidth;
-    evy=1.0f-(GLfloat)y/VideoHeight;
-    svy=evy-(GLfloat)h/VideoHeight;
+    svx=x;
+    evx=svx+w;
+    evy=VideoHeight-y;
+    svy=evy-h;
 
     stx=(GLfloat)ox/sprite->Width*sprite->TextureWidth;
     etx=(GLfloat)(ox+w)/sprite->Width*sprite->TextureWidth;
@@ -1576,7 +1576,7 @@ right_trans:
 local void VideoDrawClipXOpenGL(const Graphic* sprite,unsigned frame
 	,int x,int y)
 {
-    GLfloat svx,evx,svy,evy;
+    GLint svx,evx,svy,evy;
     GLfloat stx,etx,sty,ety;
     int ox;
     int oy;
@@ -1588,10 +1588,10 @@ local void VideoDrawClipXOpenGL(const Graphic* sprite,unsigned frame
     h=sprite->Height;
     CLIP_RECTANGLE_OFS(x,y,w,h,ox,oy,ex);
 
-    svx=(GLfloat)x/VideoWidth;
-    evx=svx+(GLfloat)w/VideoWidth;
-    evy=1.0f-(GLfloat)y/VideoHeight;
-    svy=evy-(GLfloat)h/VideoHeight;
+    svx=x;
+    evx=svx+w;
+    evy=VideoHeight-y;
+    svy=evy-h;
 
     if( w<sprite->Width ) {
 	if( ox==0 ) {
@@ -1608,13 +1608,13 @@ local void VideoDrawClipXOpenGL(const Graphic* sprite,unsigned frame
     glBindTexture(GL_TEXTURE_2D, sprite->TextureNames[frame]);
     glBegin(GL_QUADS);
     glTexCoord2f(stx, sty);
-    glVertex3f(evx, svy, 0.0f);
+    glVertex2i(evx, svy);
     glTexCoord2f(stx, ety);
-    glVertex3f(evx, evy, 0.0f);
+    glVertex2i(evx, evy);
     glTexCoord2f(etx, ety);
-    glVertex3f(svx, evy, 0.0f);
+    glVertex2i(svx, evy);
     glTexCoord2f(etx, sty);
-    glVertex3f(svx, svy, 0.0f);
+    glVertex2i(svx, svy);
     glEnd();
 }
 #endif
