@@ -30,4 +30,3 @@ MSRC =   botpanel.c button_checks.c script_ui.c icons.c interface.c \
          mainscr.c menu_proc.c menus.c mouse.c ui.c
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
-MISC +=  menu_defs.inc

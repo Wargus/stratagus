@@ -104,6 +104,21 @@ typedef int MenuButtonId;
 #define MBUTTON_SC_BUTTON 116
 #define MBUTTON_SC_BUTTON_RIGHT 125
 
+    /// Offsets into NetMultiSetupMenuItems
+#define SERVER_PLAYER_STATE	5
+#define SERVER_PLAYER_READY	32
+#define SERVER_PLAYER_LAG	46
+
+    /// Offsets into NetMultiClientMenuItems
+#define CLIENT_PLAYER_STATE	5
+#define CLIENT_RACE		21
+#define CLIENT_RESOURCE		23
+#define CLIENT_UNITS		25
+#define CLIENT_FOG_OF_WAR	27
+#define CLIENT_TILESET		29
+#define CLIENT_GAMETYPE		31
+#define CLIENT_PLAYER_READY	32
+
 // For the game speed slider in the speed settings screen.
 #define MIN_GAME_SPEED 50
 #define MAX_GAME_SPEED 250
@@ -392,8 +407,6 @@ extern void ExitConfirmMenu(void);
 
 	/// Initialize the (ccl-loaded) menus data
 extern void InitMenuData(void);
-	/// Post-Initialize the (ccl-loaded) menus
-extern void InitMenuFunctions(void);
 
 	/// Edit resource properties
 extern void EditorEditResource(void);

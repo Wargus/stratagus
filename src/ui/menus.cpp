@@ -77,8 +77,6 @@
 #include "master.h"
 
 
-//#define SAVE_MENU_CCL				/// SAVE (REWRITE!) the menus.ccl file
-
 /*----------------------------------------------------------------------------
 --		Prototypes for local functions
 ----------------------------------------------------------------------------*/
@@ -457,8 +455,6 @@ local void InitNetMultiButtonStorage(void) {
 	NetMultiButtonStorage[0].d.pulldown = i0;
 	NetMultiButtonStorage[1].d.drawfunc = i1;
 }
-
-#include "menu_defs.inc"
 
 /*----------------------------------------------------------------------------
 --		Functions
@@ -6802,22 +6798,6 @@ global void InitMenuData(void)
 	menu = FindMenu("menu-editor-map-properties");
 	InitTilesets(&menu->Items[6], 0);
 }
-
-/**
-**  Post-Initialize the loaded menu functions
-*/
-global void InitMenuFunctions(void)
-{
-#ifdef SAVE_MENU_CCL
-	{
-		FILE* fd;
-		fd = fopen("menus.ccl", "wb");
-		SaveMenus(fd);
-		fclose(fd);
-	}
-#endif
-}
-
 
 /**
 **  FIXME: docu
