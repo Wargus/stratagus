@@ -256,7 +256,6 @@ global char* CclConvertToString(SCM scm)
     }
 #endif
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -279,7 +278,6 @@ global ccl_smob_type_t CclGetSmobType(SCM smob)
     return TYPE(smob);
 #endif
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -298,7 +296,6 @@ global void* CclGetSmobData(SCM smob)
     return smob->storage_as.cons.cdr;
 #endif
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -322,7 +319,6 @@ global SCM CclMakeSmobObj(ccl_smob_type_t tag, void* ptr)
     return value;
 #endif
 }
-#elif defined(USE_LUA)
 #endif
 
 /**
@@ -345,7 +341,6 @@ global ccl_smob_type_t CclMakeSmobType(const char* name)
 
   return new_type;
 }
-#elif defined(USE_LUA)
 #endif
 
 
