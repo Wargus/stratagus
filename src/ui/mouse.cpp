@@ -698,7 +698,7 @@ global void UIHandleMouseMove(int x,int y)
 
 	vp = TheUI.MouseViewport;
 	if (IsMapFieldVisible(ThisPlayer, Viewport2MapX(vp, x),
-		    Viewport2MapY(vp, y))  || ReplayRevealMap ) {
+		    Viewport2MapY(vp, y)) || ReplayRevealMap ) {
 	    UnitUnderCursor = UnitOnScreen(NULL ,x-vp->X + vp->MapX*TileSizeX
 		,y-vp->Y + vp->MapY*TileSizeY);
 	}
@@ -713,8 +713,9 @@ global void UIHandleMouseMove(int x,int y)
     //NOTE: vladi: if unit is invisible, no cursor hint should be allowed
     // FIXME: johns: not corrrect? Should I get informations about
     // buildings under fog of war?
-    if ( UnitUnderCursor && !(UnitVisibleOnMap(UnitUnderCursor) && !ReplayRevealMap) ) {
-	UnitUnderCursor = NULL;
+    if ( UnitUnderCursor && !UnitVisibleOnMap(UnitUnderCursor)
+	    && !ReplayRevealMap ) {
+	UnitUnderCursor=NULL;
     }
 
     //
