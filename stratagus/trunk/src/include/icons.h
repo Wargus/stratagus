@@ -14,8 +14,7 @@
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
-//	by the Free Software Foundation; either version 2 of the License,
-//	or (at your option) any later version.
+//	by the Free Software Foundation; only version 2 of the License.
 //
 //	FreeCraft is distributed in the hope that it will be useful,
 //	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -156,11 +155,11 @@ typedef struct _player_ Player;
 typedef struct _icon_file_ {
     char*	FileName;		/// Icon file name/path
 
-    unsigned	Width;			/// Icon width
-    unsigned	Height;			/// Icon height
+    //unsigned	Width;			/// Icon width
+    //unsigned	Height;			/// Icon height
 
 	/** FIXME: unsed */
-    unsigned	Icons;			/// Number of icons in this file
+    //unsigned	Icons;			/// Number of icons in this file
 
 // --- FILLED UP ---
     Graphic*	Graphic;		/// Graphic data loaded
@@ -198,17 +197,20 @@ typedef struct _icon_config_ {
 
 extern char** IconWcNames;		/// pud original -> internal
 
+	/** FIXME: Not needed */
 extern int IconWidth;			/// icon width in panels
+	/** FIXME: Not needed */
 extern int IconHeight;	    		/// icon height in panels
+	/** FIXME: Not needed */
 extern int IconsPerRow;			/// icons per row
 
 /*----------------------------------------------------------------------------
 --	Functions
 ----------------------------------------------------------------------------*/
 
-extern void InitIcons(void);		/// init icons
-extern void LoadIcons(void);		/// load icons
-extern void CleanIcons(void);		/// cleanup icons
+extern void InitIcons(void);		/// Init icons
+extern void LoadIcons(void);		/// Load icons
+extern void CleanIcons(void);		/// Cleanup icons
 
     /// Name -> icon
 extern Icon* IconByIdent(const char* ident);
@@ -220,7 +222,7 @@ extern void DrawIcon(const Player*,Icon*,int,int);
 extern void DrawUnitIcon(const Player*,Icon*,unsigned,int,int);
 
 extern void SaveIcons(FILE*);		/// Save icons
-extern void IconCclRegister(void);	/// register CCL features
+extern void IconCclRegister(void);	/// Register CCL features
 
 //@}
 
