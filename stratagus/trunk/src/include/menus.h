@@ -343,6 +343,8 @@ extern void EditorEditAiProperties(void);
 
     /// Save map from the editor
 extern int EditorSaveMenu(void);
+    /// Load map from the editor
+extern void EditorLoadMenu(void);
 
     /// Error menu
 extern void ErrorMenu(char *);

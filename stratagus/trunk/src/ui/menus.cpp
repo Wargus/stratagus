@@ -300,7 +300,6 @@ local void EditorLoadOk(void);
 local void EditorLoadCancel(void);
 
 // Editor menu
-local void EditorLoadMenu(void);
 local void EditorMapPropertiesMenu(void);
 local void EditorPlayerPropertiesMenu(void);
 local void EditorQuitToMenu(void);
