@@ -49,6 +49,7 @@
 #include "unit.h"
 #include "sound_server.h"
 #include "missile.h"
+#include "map.h"
 
 #include "sound.h"
 
@@ -100,7 +101,8 @@ global GameSound GameSounds
 */
 local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 			      SoundId sound,unsigned char fight,
-			      unsigned char selection,unsigned char volume) 
+			      unsigned char selection,unsigned char volume,
+			      float stereo) 
 {
 #ifdef USE_SDLA
     SDL_LockAudio();
@@ -118,6 +120,7 @@ local void InsertSoundRequest(const Unit* unit,unsigned id,unsigned char power,
 	    SoundRequests[NextSoundRequestIn].Fight=(fight)?1:0;
 	    SoundRequests[NextSoundRequestIn].Selection=(selection)?1:0;
 	    SoundRequests[NextSoundRequestIn].IsVolume=(volume)?1:0;
+	    SoundRequests[NextSoundRequestIn].Stereo=stereo;
 	    DebugLevel3("Source[%p,%s]: registering request %p at slot %d=%d\n",
 			unit,unit ? unit->Type->Ident : ""
 			,sound,NextSoundRequestIn,power);
@@ -196,13 +199,21 @@ local SoundId ChooseUnitVoiceSoundId(const Unit *unit,UnitVoiceGroup voice)
 */
 global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 {
+    float stereo;
+
+    stereo = (unit->X + ((float)unit->IX / TileSizeX) - MapX) / MapWidth;
+    stereo = (stereo * 2.0) - 1.0;
+    if (stereo < -1.0) stereo=-1.0;
+    else if (stereo > 1.0) stereo=1.0;
+
     InsertSoundRequest(unit,
 		       unit->Slot,
 		       ViewPointDistanceToUnit(unit),
 		       ChooseUnitVoiceSoundId(unit,voice),
 		       voice==VoiceAttacking,
 		       (voice==VoiceSelected ||voice==VoiceBuilding),
-		       0);
+		       0,
+		       stereo);
 }
 
 /**
@@ -210,6 +221,13 @@ global void PlayUnitSound(const Unit* unit,UnitVoiceGroup voice)
 */
 global void PlayMissileSound(const Missile* missile,SoundId sound)
 {
+    float stereo;
+
+    stereo = (((float)missile->X / TileSizeX) - MapX) / MapWidth;
+    stereo = (stereo * 2.0) - 1.0;
+    if (stereo < -1.0) stereo=-1.0;
+    else if (stereo > 1.0) stereo=1.0;
+
     DebugLevel3("Playing %p\n",sound);
     InsertSoundRequest(NULL,
 		       0,
@@ -217,7 +235,8 @@ global void PlayMissileSound(const Missile* missile,SoundId sound)
 		       sound,
 		       1,
 		       0,
-		       0);
+		       0,
+		       stereo);
 }
 
 /**
@@ -232,7 +251,8 @@ global void PlayGameSound(SoundId sound,unsigned char volume)
 		       sound,
 		       0,
 		       0,
-		       1);
+		       1,
+		       0.0);
 }
 
 /**

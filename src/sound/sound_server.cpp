@@ -309,16 +309,25 @@ global void CDRomCheck(void)
 **	@todo		Can mix faster if signed 8 bit buffers are used.
 */
 local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
-			      int* buffer,int size)
+			      float stereo,int* buffer,int size)
 {
     int ri;				// read index
     int wi;				// write index
     int length;
     int v;
     int local_volume;
+    float left,right;
 
     local_volume=((int)volume+1)*2*GlobalVolume/MaxVolume;
     length=sample->Length-index;
+    if( stereo < 0.0 ) {
+	left=1.0;
+	right=1.0+stereo;
+    }
+    else {
+	left=1.0-stereo;
+	right=1.0;
+    }
     DebugLevel3("Length %d\n",length);
 
     // FIXME: support other formats, stereo or 32 bit ...
@@ -339,8 +348,8 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	    // FIXME: must interpolate samples!
 	    v=(rp[ri]-127)*local_volume;
 
-	    buffer[wi++]+=v;
-	    buffer[wi++]+=v;		// left+right channel
+	    buffer[wi++]+=v*left;
+	    buffer[wi++]+=v*right;	// left+right channel
 	}
 	ri=(wi*sample->Frequency)/SoundFrequency;
 	ri/=2;				// adjust for mono
@@ -363,8 +372,8 @@ local int MixSampleToStereo32(Sample* sample,int index,unsigned char volume,
 	    // FIXME: must interpolate samples!
 	    v=rp[ri]*local_volume/256;
 
-	    buffer[wi++]+=v;
-	    buffer[wi++]+=v;
+	    buffer[wi++]+=v*left;
+	    buffer[wi++]+=v*right;
 	}
 	ri=(wi*sample->Frequency)/SoundFrequency;
     }
@@ -385,6 +394,7 @@ typedef struct _sound_channel_ {
     Origin              Source;         // unit playing
     unsigned char       Volume;         // Volume of this channel
     SoundId             Sound;          // The sound currently played
+    float               Stereo;         // stereo value (-1.0 to 1.0)
 } SoundChannel;
 
 #define ChannelFree	0		// channel is free
@@ -674,6 +684,7 @@ local int FillOneChannel(SoundRequest* sr)
 	Channels[NextFreeChannel].Volume=ComputeVolume(sr);
 	Channels[NextFreeChannel].Command=ChannelPlay;
 	Channels[NextFreeChannel].Sample=ChooseSample(sr);
+	Channels[NextFreeChannel].Stereo=sr->Stereo;
 	NextFreeChannel=next_free;
     } else {
 	// should not happen
@@ -744,7 +755,8 @@ local int MixChannelsToStereo32(int* buffer,int size)
 		&& Channels[channel].Sample) {
 	    i=MixSampleToStereo32(
 		    Channels[channel].Sample,Channels[channel].Point,
-		    Channels[channel].Volume,buffer,size);
+		    Channels[channel].Volume,Channels[channel].Stereo,
+		    buffer,size);
 	    Channels[channel].Point+=i;
 
 	    if( Channels[channel].Point>=Channels[channel].Sample->Length ) {
