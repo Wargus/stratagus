@@ -155,14 +155,6 @@ local int HaulInOilWell(Unit* unit)
 	    unit->Removed=0;
 	    DropOutAll(well);
 	    DestroyUnit(well);
-#if 0
-	    // Also remove oil-patch  FIXME: didn't work?
-	    well=OilPatchOnMap(unit->X,unit->Y);
-	    if( well ) {
-		DebugLevel0Fn("removing oil patch\n");
-		DestroyUnit(well);
-	    }
-#endif
 	    well=NULL;
 	}
 
@@ -286,7 +278,7 @@ local int MoveToOilDepot(Unit* unit)
     DebugCheck( !depot->Refs );
     --depot->Refs;
     DebugCheck( !depot->Refs );
-    unit->Command.Data.Move.Goal=NoUnitP;
+    // FIXME: don't work unit->Command.Data.Move.Goal=NoUnitP;
 
     RemoveUnit(unit);
     unit->X=depot->X;
