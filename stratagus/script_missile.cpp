@@ -56,8 +56,6 @@ extern int NoWarningMissileType;		/// quiet ident lookup.
 **	Parse missile-type.
 **
 **	@param list	List describing missile-type.
-**
-**	@todo FIXME: CanHitOwner and FriendlyFire not supported!
 */
 local SCM CclDefineMissileType(SCM list)
 {
@@ -129,6 +127,10 @@ local SCM CclDefineMissileType(SCM list)
 	} else if( gh_eq_p(value,gh_symbol2scm("impact-missile")) ) {
 	    free(mtype->ImpactName);
 	    mtype->ImpactName=gh_scm2newstr(gh_car(list),NULL);
+	} else if( gh_eq_p(value,gh_symbol2scm("can-hit-owner")) ) {
+	    mtype->CanHitOwner=gh_scm2bool(gh_car(list));
+	} else if( gh_eq_p(value,gh_symbol2scm("friendly-fire")) ) {
+	    mtype->FriendlyFire=gh_scm2bool(gh_car(list));
 	} else {
 	    // FIXME: this leaves a half initialized missile-type
 	    errl("Unsupported tag",value);
