@@ -482,7 +482,7 @@ local void EditorTileChanged2(int x, int y, int d)
 	MapField* mf;
 
 	quad = QuadFromTile(x, y);
-	DebugLevel0Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
+	DebugLevel3Fn("%d,%d %08x %d\n" _C_ x _C_ y _C_ quad _C_
 		TheMap.Fields[y * TheMap.Width + x].Tile);
 
 	//
