@@ -2364,7 +2364,7 @@ local void StartMenusSetBackground(Menuitem *mi __attribute__((unused)))
 **	Draw the version and copyright at bottom of the screen.
 **	Also include now the license.
 */
-local void NameLineDrawFunc(Menuitem *mi __attribute__((unused)))
+local void NameLineDrawFunc(Menuitem *mi)
 {
     int nc, rc;
 
@@ -3222,17 +3222,17 @@ local void SetMusicPower(Menuitem *mi __attribute__((unused)))
     if (PlayingMusic == 1) {
 	StopMusic();
     } else {
-            if (CallbackMusic) {
-                cb = gh_symbol2scm("music-stopped");
-                if (!gh_null_p(symbol_boundp(cb, NIL))) {
-                    SCM value;
+	if (CallbackMusic) {
+	    cb = gh_symbol2scm("music-stopped");
+	    if (!gh_null_p(symbol_boundp(cb, NIL))) {
+		SCM value;
 
-                    value = symbol_value(cb, NIL);
-                    if (!gh_null_p(value)) {
-                        gh_apply(value, NIL);
-                    }
-                }
-            }
+		value = symbol_value(cb, NIL);
+		if (!gh_null_p(value)) {
+		    gh_apply(value, NIL);
+		}
+	    }
+	}
     }
 #endif // with sound
     CurrentMenu=-1;
@@ -5458,7 +5458,7 @@ local void MultiGameClientInit(Menuitem *mi __attribute__((unused)))
 /**
 **	Multiplayer client gem action. Toggles ready flag.
 */
-local void MultiClientGemAction(Menuitem *mi __attribute__((unused)))
+local void MultiClientGemAction(Menuitem *mi)
 {
     int i;
 
