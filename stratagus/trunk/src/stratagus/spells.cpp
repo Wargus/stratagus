@@ -10,7 +10,8 @@
 //
 /**@name spells.c	-	The spell cast action. */
 //
-//	(c) Copyright 1998-2003 by Vladi Belperchinov-Shabanski and Lutz Sammer
+//	(c) Copyright 1998-2003 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//	                           and Jimmy Salmon
 //
 //	FreeCraft is free software; you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published
@@ -1176,6 +1177,60 @@ local int AutoCastBloodlust(Unit* unit, SpellType* spell)
 }
 
 /**
+**	Auto cast death coil if possible.
+**
+**	@param unit	Unit that casts the spell
+**	@param spell	Spell-type pointer
+**
+**	@return		=!0 if spell can be cast, 0 if not
+*/
+local int AutoCastDeathCoil(Unit* unit, SpellType* spell)
+{
+    Unit* table[UnitMax];
+    int r;
+    int i;
+    int j;
+    int n;
+
+    if (unit->Player->Type == PlayerPerson) {
+	r = unit->Type->ReactRangePerson;
+    } else {
+	r = unit->Type->ReactRangeComputer;
+    }
+    if (spell->Range < r) {
+	r = spell->Range;
+    }
+    n = SelectUnits(unit->X - r, unit->Y - r, unit->X + r + 1,
+	unit->Y + r + 1, table);
+
+    for (i = 0, j = 0; i < n; ++i) {
+	// Only cast on an enemy
+	if (table[i] == unit || (unit->Player == table[i]->Player
+		|| IsAllied(unit->Player, table[i]))) {
+	    continue;
+	}
+
+	if (!CanCastDeathCoil(table[i], spell)) {
+	    continue;
+	}
+
+	// Skip units that can't attack
+	if (!table[i]->Type->CanAttack) {
+	    continue;
+	}
+
+	table[j++] = table[i];
+    }
+
+    if (j) {
+	j = SyncRand() % j;
+	CommandSpellCast(unit, 0, 0, table[j], spell, FlushCommands);
+	return 1;
+    }
+    return 0;
+}
+
+/**
 **	Auto cast haste if possible.
 **
 **	@param unit	Unit that casts the spell
@@ -1354,7 +1409,7 @@ global int AutoCastSpell(Unit* unit, SpellType* spell)
 
 //  ---orc death knights---
 	case SpellActionDeathCoil:
-	    return 0;
+	    return AutoCastDeathCoil(unit, spell);
 
 	case SpellActionHaste:
 	    return AutoCastHaste(unit, spell);
