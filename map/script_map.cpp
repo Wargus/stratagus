@@ -457,7 +457,7 @@ static int CclDefinePlayerTypes(lua_State* l)
 		LuaError(l, "Not enough players");
 	}
 
-	for (i = 0; i < numplayers; i++) {
+	for (i = 0; i < numplayers && i < PlayerMax; i++) {
 		type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
 			TheMap.Info.PlayerType[i] = PlayerNeutral;
@@ -474,6 +474,9 @@ static int CclDefinePlayerTypes(lua_State* l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
+	}
+	for (i = numplayers; i < PlayerMax; i++) {
+		TheMap.Info.PlayerType[i] = PlayerNobody;
 	}
 	return 0;
 }
