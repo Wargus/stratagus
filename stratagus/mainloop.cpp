@@ -163,12 +163,12 @@ local void MoveMapViewPointRight(int step)
 **	@param state	Scroll direction/state.
 **	@param fast	Flag scroll faster.
 **
-**	@TODO	Support dynamic acceleration of scroll speed.
+**	@todo	Support dynamic acceleration of scroll speed.
 **		If the scroll key is longer pressed the area is scrolled faster.
 **
-**             StephanR: above needs one row+column of tiles extra to be
-**                       drawn (clipped), which also needs to be supported
-**                       by various functions using MustRedrawTile,..
+**	StephanR: above needs one row+column of tiles extra to be
+**		drawn (clipped), which also needs to be supported
+**		by various functions using MustRedrawTile,..
 */
 global void DoScrollArea(enum _scroll_state_ state, int fast)
 {
@@ -224,8 +224,8 @@ global void DoScrollArea(enum _scroll_state_ state, int fast)
 /**
 **	FOR DEBUG PURPOSE ONLY, BUT DON'T REMOVE PLEASE !!!
 **
-**      Will try all kinds of possible linedraw routines (only one time) upon
-**      current display, making the job of debugging them more eassier..
+**	Will try all kinds of possible linedraw routines (only one time) upon
+**	current display, making the job of debugging them more eassier..
 */
 global void DebugTestDisplay(void)
 {
@@ -351,8 +351,8 @@ local void DrawMapViewport(int v)
 	//	An unit is tracked, center viewport on this unit.
 	//
 	if (TheUI.VP[v].Unit) {
-	    if (TheUI.VP[v].Unit->Destroyed || 
-		TheUI.VP[v].Unit->Orders[0].Action == UnitActionDie) {
+	    if (TheUI.VP[v].Unit->Destroyed ||
+		    TheUI.VP[v].Unit->Orders[0].Action == UnitActionDie) {
 		TheUI.VP[v].Unit = NoUnitP;
 	    } else {
 		MapViewportCenter(v, TheUI.VP[v].Unit->X, TheUI.VP[v].Unit->Y);
@@ -557,7 +557,7 @@ global void UpdateDisplay(void)
 	}
 	if( MustRedraw&RedrawStatusLine || MustRedraw&RedrawCosts ) {
 	    InvalidateAreaAndCheckCursor(
-                     TheUI.StatusLineX,TheUI.StatusLineY
+		     TheUI.StatusLineX,TheUI.StatusLineY
 		    ,TheUI.StatusLine.Graphic->Width
 		    ,TheUI.StatusLine.Graphic->Height);
 	}
@@ -568,14 +568,14 @@ global void UpdateDisplay(void)
 	    InvalidateMenuAreas();
 	}
 
-        // And now as very last.. checking if the cursor needs a refresh
-        InvalidateCursorAreas();
+	// And now as very last.. checking if the cursor needs a refresh
+	InvalidateCursorAreas();
     }
 }
 
 /**
-**      Enable everything to be drawn for next display update.
-**      Used at start of mainloop (and possible refresh as user option)
+**	Enable everything to be drawn for next display update.
+**	Used at start of mainloop (and possible refresh as user option)
 */
 local void EnableDrawRefresh(void)
 {
@@ -654,7 +654,7 @@ global void GameMainLoop(void)
 	    UpdateTimer();		// update game timer
 
 	    // FIXME: We don't do redraw if needed, costs to much cpu time
-	    MustRedraw&=~RedrawMinimap;	// FIXME: this a little hack!
+	    MustRedraw&=~RedrawMinimap; // FIXME: this a little hack!
 
 	    //
 	    //	Work todo each second.
@@ -736,11 +736,11 @@ global void GameMainLoop(void)
 #endif
 
 	if( MustRedraw /* && !VideoInterrupts */ ) {
-            //For debuggin only: replace UpdateDisplay by DebugTestDisplay when
-            //                   debugging linedraw routines..
-            //FIXME: this might be better placed somewhere at front of the
-            //       program, as we now still have a game on the background and
-            //       need to go through hte game-menu or supply a pud-file
+	    //For debuggin only: replace UpdateDisplay by DebugTestDisplay when
+	    //			 debugging linedraw routines..
+	    //FIXME: this might be better placed somewhere at front of the
+	    //	     program, as we now still have a game on the background and
+	    //	     need to go through hte game-menu or supply a pud-file
 	    UpdateDisplay();
 	    //DebugTestDisplay();
 
