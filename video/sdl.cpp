@@ -211,9 +211,9 @@ global void InitVideoSdl(void)
     }
 
 #ifdef USE_SDL_SURFACE
-    if (VideoDepth == 8) {
-	TheScreen->format->palette = &GlobalPalette;
-    }
+//    if (VideoDepth == 8) {
+//	TheScreen->format->palette = &GlobalPalette;
+//    }
 #endif
 
 #ifdef DEBUG

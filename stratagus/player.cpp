@@ -880,8 +880,13 @@ global void PlayersEachSecond(int player)
 global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 {
 #ifdef USE_SDL_SURFACE
-    memcpy(&sprite->Surface->format->palette->colors[208], 
-	player->UnitColors.Colors, sizeof(SDL_Color) * 4);
+    SDL_LockSurface(sprite->Surface);
+    SDL_SetColors(sprite->Surface, ((Player*)player)->UnitColors.Colors, 208, 4);
+    if (sprite->SurfaceFlip) {
+        SDL_SetColors(sprite->SurfaceFlip,
+	    ((Player*)player)->UnitColors.Colors, 208, 4);
+    }
+    SDL_UnlockSurface(sprite->Surface);
 #else
     switch (VideoBpp) {
 	case 8:
@@ -913,8 +918,9 @@ global void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
 global void PlayerPixels(const Player* player)
 {
 #ifdef USE_SDL_SURFACE
-    memcpy(&GlobalPalette.colors[208], player->UnitColors.Colors, 
-	sizeof(Pixels) * 4);
+    // FIXME:
+    memcpy(&GlobalPalette->colors[208], player->UnitColors.Colors, 
+	sizeof(SDL_Color) * 4);
 #else
     // FIXME: use function pointer
     switch (VideoBpp) {
@@ -947,32 +953,22 @@ global void SetPlayersPalette(void)
     int i;
     int o;
 
-//    Pixels->colors = calloc(256, sizeof(SDL_Color));
-
     //o = rand() & 0x7;			// FIXME: random colors didn't work
     o = 0;
 #ifdef USE_SDL_SURFACE
     for (i = 0; i < 7; ++i) {
-	Players[o].UnitColors.Colors[0] = GlobalPalette.colors[208];
-	Players[o].UnitColors.Colors[1] = GlobalPalette.colors[209];
-	Players[o].UnitColors.Colors[2] = GlobalPalette.colors[210];
-	Players[o].UnitColors.Colors[3] = GlobalPalette.colors[211];
-
-	Players[o + 8].UnitColors.Colors[0] = GlobalPalette.colors[208];
-	Players[o + 8].UnitColors.Colors[1] = GlobalPalette.colors[209];
-	Players[o + 8].UnitColors.Colors[2] = GlobalPalette.colors[210];
-	Players[o + 8].UnitColors.Colors[3] = GlobalPalette.colors[211];
+	memcpy(Players[o].UnitColors.Colors, &GlobalPalette->colors[208 + i * 4],
+	    sizeof(SDL_Color) * 4);
+	memcpy(Players[o + 8].UnitColors.Colors, &GlobalPalette->colors[208 + i * 4],
+	    sizeof(SDL_Color) * 4);
 	o = (o + 1) & 0x7;
     }
 
-    Players[o].UnitColors.Colors[0] = GlobalPalette.colors[12];
-    Players[o].UnitColors.Colors[1] = GlobalPalette.colors[13];
-    Players[o].UnitColors.Colors[2] = GlobalPalette.colors[14];
-    Players[o].UnitColors.Colors[3] = GlobalPalette.colors[15];
-    Players[o+8].UnitColors.Colors[0] = GlobalPalette.colors[12];
-    Players[o+8].UnitColors.Colors[1] = GlobalPalette.colors[13];
-    Players[o+8].UnitColors.Colors[2] = GlobalPalette.colors[14];
-    Players[o+8].UnitColors.Colors[3] = GlobalPalette.colors[15];
+    memcpy(Players[o].UnitColors.Colors, &GlobalPalette->colors[12],
+        sizeof(SDL_Color) * 4);
+    memcpy(Players[o + 8].UnitColors.Colors, &GlobalPalette->colors[12],
+        sizeof(SDL_Color) * 4);
+
 #else
     switch (VideoBpp) {
     case 8:

@@ -1046,11 +1046,10 @@ global void PreMenuSetup(void)
     TheMap.TerrainName = Tilesets[0]->Ident;
     LoadTileset();
 #ifdef USE_SDL_SURFACE
-    LoadRGB(&GlobalPalette, s = strdcat3(StratagusLibPath,
+    GlobalPalette = LoadRGB(s = strdcat3(StratagusLibPath,
 	"/graphics/", Tilesets[0]->PaletteFile));
     TheMap.TerrainName = NULL;
     free(s);
-    VideoCreatePalette(&GlobalPalette);
 #else
     LoadRGB(GlobalPalette, s = strdcat3(StratagusLibPath,
 	"/graphics/", Tilesets[0]->PaletteFile));
