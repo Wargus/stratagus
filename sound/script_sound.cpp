@@ -112,58 +112,68 @@ local SoundId CclGetSoundId(SCM sound)
 }
 
 /**
+**	Create a sound.
+**
 **	Glue between c and scheme. This function asks the sound system to
-**	register a sound under a given name, with an associated list of
-**	files (the list can be replaced by only one file).
+**	register a sound under a given name, wiht an associated list of files
+**	(the list can be replaced by only one file).
 **
 **	@param name	the name of the sound
 **	@param file	a list of sound file names (or a file name)
 **
 **	@return		the sound id of the created sound
 */
-local SCM CclMakeSound(SCM name,SCM file) {
+local SCM CclMakeSound(SCM name, SCM file)
+{
     SoundId id;
     char* c_name;
     char* c_file;
     char** c_files;
-    int nb,i;
+    int nb;
+    int i;
     SCM a_file;
 
-    if( !gh_string_p(name) ) {
-	fprintf(stderr,"string expected\n");
+    if (!gh_string_p(name)) {
+	fprintf(stderr, "string expected\n");
 	return SCM_UNSPECIFIED;
     }
-    if ( gh_string_p(file)) {
+    if (gh_string_p(file)) {
 	// only one file
-	c_name=gh_scm2newstr(name,NULL);
-	c_file=gh_scm2newstr(file,NULL);
-	id=MakeSound(c_name,&c_file,1);
-	DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_ c_file _C_ id);
+	c_name = gh_scm2newstr(name, NULL);
+	c_file = gh_scm2newstr(file, NULL);
+	id = MakeSound(c_name, &c_file, 1);
+	DebugLevel3("Making sound `%s' from `%s' with id %p\n" _C_ c_name _C_
+	    c_file _C_ id);
 	// the sound name (c_name) must be kept but the file name can be freed
+	// JOHNS: wrong!
 	free(c_file);
+	free(c_name);
     } else if (gh_list_p(file)) {
 	// several files
-	c_name=gh_scm2newstr(name,NULL);
+	c_name = gh_scm2newstr(name, NULL);
 	DebugLevel3("Making sound `%s'\n" _C_ c_name);
-	nb=gh_length(file);
-	c_files=(char **)malloc(sizeof(char*)*nb);
-	for(i=0;i<nb;i++) {
-	    a_file=gh_car(file);
-	    if( !gh_string_p(name) ) {
-		fprintf(stderr,"string expected\n");
+	nb = gh_length(file);
+	c_files = (char **)malloc(sizeof(char *) * nb);
+	for (i = 0; i < nb; i++) {
+	    a_file = gh_car(file);
+	    if (!gh_string_p(name)) {
+		fprintf(stderr, "string expected\n");
+		// FIXME: memory leak!
 		return SCM_UNSPECIFIED;
 	    }
-	    c_files[i]=gh_scm2newstr(a_file,NULL);
+	    c_files[i] = gh_scm2newstr(a_file, NULL);
 	    DebugLevel3("\tComponent %d: `%s'\n" _C_ i _C_ c_files[i]);
-	    file=gh_cdr(file);
+	    file = gh_cdr(file);
 	}
 	//FIXME: check size before casting
-	id=MakeSound(c_name,c_files,(unsigned char)nb);
-	for(i=0;i<nb;i++)
+	id = MakeSound(c_name, c_files, (unsigned char)nb);
+	for (i = 0; i < nb; i++) {
 	    free(c_files[i]);
+	}
+	free(c_name);
 	free(c_files);
     } else {
-	fprintf(stderr,"string or list expected\n");
+	fprintf(stderr, "string or list expected\n");
 	return SCM_UNSPECIFIED;
     }
     return sound_id_ccl(id);
@@ -195,19 +205,21 @@ local SCM CclMakeSoundGroup(SCM name,SCM first,SCM second)
 }
 
 /**
-**	Glue between c and scheme. Ask the sound system to remap a sound
-**	id to a given name.
+**	Glue between c and scheme. Ask to the sound system to remap a sound id
+**	to a given name.
 **
 **	@param name	the new name for the sound
 **	@param sound	the sound object
 **
 **	@return		the sound object
 */
-local SCM CclMapSound(SCM name,SCM sound) {
+local SCM CclMapSound(SCM name, SCM sound)
+{
     char* sound_name;
 
-    sound_name=gh_scm2newstr(name,NULL);
-    MapSound(sound_name,CclGetSoundId(sound));
+    sound_name = gh_scm2newstr(name, NULL);
+    MapSound(sound_name, CclGetSoundId(sound));
+    free(sound_name);
     return sound;
 }
 

@@ -78,7 +78,7 @@ global void DisplaySoundHashTable(void)
     struct hash_st st;
 
     fprintf(stderr,"Sound HashTable Begin\n");
-    fprintf(stderr,__FUNCTION__": not written\n");
+    fprintf(stderr,__FUNCTION__": FIXME: not written\n");
     fprintf(stderr,"Sound HashTable End\n");
 
     hash_stat(SoundIdHash, &st); 
@@ -86,12 +86,14 @@ global void DisplaySoundHashTable(void)
     printf("hashsize: %d\n", st.hashsize);
     printf("maxdepth: %d\n", st.maxdepth);
     printf("middepth: %d.%03d\n", st.middepth / 1000, st.middepth % 1000);
+
 }
 
 /**
 **	Add a new mapping (sound name to sound id) in the hash table
+**	Create a new mapping between a name and an already valid sound id.
 **
-**	@param name	Name of the sound (constant or malloced).
+**	@param name	Name of the sound (now freed by caller!).
 **	@param id	Sound identifier.
 */
 global void MapSound(const char* name,const SoundId id)
@@ -125,16 +127,18 @@ global SoundId SoundIdForName(const char* name)
 **	Register a sound group (or an unique sound if nb==1) and get the
 **	corresponding sound id.
 **
-**	@param name	name of this sound group. MUST BE A PERMAMNENT STRING.
+**	@param name	name of this sound group (Freed by caller).
 **	@param file	list of sound file names
 **	@param nb	number of sounds
 **
 **	@return the sound id of the created group
 */
-global SoundId MakeSound(char* name,char* file[],unsigned char nb)
+global SoundId MakeSound(const char* name,char* file[],int nb)
 {
     SoundId id;
     const SoundId* result;
+
+    DebugCheck( nb>255 );
 
     if ( (result=(const SoundId*)hash_find(SoundIdHash,(char*)name)) ) {
 	DebugLevel0Fn("re-register sound `%s'\n" _C_ name);
@@ -154,7 +158,7 @@ global SoundId MakeSound(char* name,char* file[],unsigned char nb)
 **	selection). Return the corresponding id after registering it under a
 **	given name.
 **
-**	@param name	the name of the group. MUST BE A PERMANENT STRING.
+**	@param name	the name of the group (handled by caller).
 **	@param first	id of the first group
 **	@param second	id of the second group
 **

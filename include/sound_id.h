@@ -48,44 +48,16 @@ typedef void* SoundId;			/// sound identifier
 --	Functions
 ----------------------------------------------------------------------------*/
 
-/** Register a sound group (or an unique sound if nb==1) and get the
-    corresponding sound id.
-    @param sound_name name of this sound group. MUST BE A PERMAMNENT STRING.
-    @param file list of sound file names
-    @param nb number of sounds
-    @return the sound id of the created group
-*/
-extern SoundId MakeSound(char* sound_name,char* file[],unsigned char nb);
-
-/** Get a sound id for a given sound name. Returns NULL when no sound is
-    found.
-    @param sound_name name of the sound.
-    @return the corresponding sound id
-*/
+    /// Make a sound bound to identifier
+extern SoundId MakeSound(const char* sound_name,char* file[], int nb);
+    /// Get the sound id bound to an identifier
 extern SoundId SoundIdForName(const char* sound_name);
-
-/** Create a new mapping between a name and an already valid sound id
-    @param sound_name the name. MUST BE A PERMANENT STRING.
-    @param id the sound id.
- */
+    /// Map sound to identifier
 extern void MapSound(const char* sound_name,const SoundId id);
-
-    /**
-    **	Register two sound groups together to make a special sound (for
-    **	selection). Return the corresponding id after registering it under a
-    **	given name.
-    **
-    **	@param name	the name of the group. MUST BE A PERMANENT STRING.
-    **	@param first	id of the first group.
-    **	@param second	id of the second group.
-    **	@return		id of the created group.
-    */
+    /// Make a sound group bound to identifier
 extern SoundId MakeSoundGroup(const char* name,SoundId first,SoundId second);
-
-/** Helper function, displays the mapping between sound names and sound ids
- */
+    /// Helper function, displays the mapping between sound names and sound ids
 extern void DisplaySoundHashTable(void);
-
 
 #ifndef WITH_SOUND	// {
 
