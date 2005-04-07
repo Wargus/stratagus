@@ -74,8 +74,8 @@ void DrawMenuButtonArea(void)
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.MenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
-					ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0),
+					ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
+				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				TheUI.MenuButton.X, TheUI.MenuButton.Y,
 				TheUI.MenuButton.Text);
 		}
@@ -84,8 +84,8 @@ void DrawMenuButtonArea(void)
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.NetworkMenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
-					ButtonUnderCursor == ButtonUnderNetworkMenu ? MenuButtonActive : 0) |
-				(GameMenuButtonClicked ? MenuButtonClicked : 0),
+					ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
+				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
 				TheUI.NetworkMenuButton.Text);
 		}
@@ -93,8 +93,8 @@ void DrawMenuButtonArea(void)
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
 			DrawMenuButton(TheUI.NetworkDiplomacyButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
-					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MenuButtonActive : 0) |
-				(GameDiplomacyButtonClicked ? MenuButtonClicked : 0),
+					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
+				(GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
 				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
 				TheUI.NetworkDiplomacyButton.Text);
 		}
