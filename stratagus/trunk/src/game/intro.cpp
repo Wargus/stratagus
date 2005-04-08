@@ -110,7 +110,7 @@ static void IntroCallbackButton1(unsigned button)
 				CursorX <= ContinueButtonX + 106 &&
 				ContinueButtonY <= CursorY &&
 				CursorY <= ContinueButtonY + 27) {
-			ContinueButtonFlags |= MenuButtonClicked;
+			ContinueButtonFlags |= MI_FLAGS_CLICKED;
 		}
 	} else {
 		IntroNoEvent = 0;
@@ -128,10 +128,10 @@ static void IntroCallbackButton2(unsigned button)
 				CursorX <= ContinueButtonX + 106 &&
 				ContinueButtonY <= CursorY &&
 				CursorY <= ContinueButtonY + 27 &&
-				(ContinueButtonFlags & MenuButtonClicked)) {
+				(ContinueButtonFlags & MI_FLAGS_CLICKED)) {
 			IntroNoEvent = 0;
 		}
-		ContinueButtonFlags &= ~MenuButtonClicked;
+		ContinueButtonFlags &= ~MI_FLAGS_CLICKED;
 	}
 }
 
@@ -144,7 +144,7 @@ static void IntroCallbackKey1(unsigned key, unsigned keychar)
 
 	if (UseContinueButton) {
 		if (keychar == 'c' || keychar == '\r') {
-			ContinueButtonFlags |= MenuButtonClicked;
+			ContinueButtonFlags |= MI_FLAGS_CLICKED;
 		}
 	} else {
 		IntroNoEvent = 0;
@@ -161,9 +161,9 @@ static void IntroCallbackKey2(unsigned key, unsigned keychar)
 
 	if (UseContinueButton) {
 		if ((key == 'c' || key == '\r') &&
-				(ContinueButtonFlags & MenuButtonClicked)) {
+				(ContinueButtonFlags & MI_FLAGS_CLICKED)) {
 			IntroNoEvent = 0;
-			ContinueButtonFlags &= ~MenuButtonClicked;
+			ContinueButtonFlags &= ~MI_FLAGS_CLICKED;
 		}
 	}
 }
@@ -187,10 +187,10 @@ static void IntroCallbackMouse(int x, int y)
 	if (UseContinueButton) {
 		if (ContinueButtonX <= CursorX && CursorX <= ContinueButtonX + 106 &&
 				ContinueButtonY <= CursorY && CursorY <= ContinueButtonY + 27) {
-			ContinueButtonFlags |= MenuButtonActive;
+			ContinueButtonFlags |= MI_FLAGS_ACTIVE;
 		}
 		else {
-			ContinueButtonFlags &= ~MenuButtonActive;
+			ContinueButtonFlags &= ~MI_FLAGS_ACTIVE;
 		}
 	}
 }
@@ -221,7 +221,7 @@ static void InitContinueButton(int x, int y)
 {
 	ContinueButtonX = x;
 	ContinueButtonY = y;
-	ContinueButtonFlags = MenuButtonSelected;
+	ContinueButtonFlags = MI_FLAGS_SELECTED;
 }
 
 /**

@@ -48,10 +48,11 @@
 #define MI_DISABLED -1
 #define MI_ENABLED  0
 
-#define MenuButtonActive   1  /// cursor on button
-#define MenuButtonClicked  2  /// mouse button down on button
-#define MenuButtonSelected 4  /// selected button
-#define MenuButtonDisabled 8  /// button cannot be depressed
+#define MI_FLAGS_ACTIVE     1  /// cursor on item
+#define MI_FLAGS_CLICKED    2  /// mouse button pressed down on item
+#define MI_FLAGS_SELECTED   4  /// selected item
+#define MI_FLAGS_DISABLED   8  /// grayed out item
+#define MI_FLAGS_INVISIBLE 16  /// invisible item
 
 /**
 **  Menu button referencing
@@ -155,7 +156,6 @@ typedef struct _menuitem_pulldown_ {
 	int defopt;
 	int curopt;
 	int cursel;  /* used in popup state */
-	unsigned int state;
 } MenuitemPulldown;
 typedef struct _menuitem_listbox_ {
 	void* options;
@@ -213,7 +213,7 @@ typedef struct _menuitem_input_ {
 } MenuitemInput;
 typedef struct _menuitem_checkbox_ {
 	unsigned char* Text;
-	unsigned int State;
+	unsigned int Checked : 1;
 	struct _checkbox_style_* Style;
 	void (*Action)(struct _menuitem_*);
 } MenuitemCheckbox;
@@ -259,15 +259,6 @@ typedef struct _menuitem_ {
 #define MI_CFLAGS_CONT  8
 
 #define MI_IFLAGS_PASSWORD 1 /// Input is a password
-
-	/// for MI_TYPE_PULLDOWN
-#define MI_PSTATE_PASSIVE 1  /// Pulldown is passive (grey) drawn
-
-	/// for MI_TYPE_CHECKBOX
-#define MI_CSTATE_UNCHECKED 0 /// Checkbox has no check mark
-#define MI_CSTATE_PASSIVE   1 /// Checkbox is passive (grey) drawn
-#define MI_CSTATE_INVISIBLE 2 /// Checkbox is not drawn
-#define MI_CSTATE_CHECKED   4 /// Checkbox is with check mark drawn
 
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2

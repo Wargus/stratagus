@@ -143,7 +143,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 		nc = oldnc;
 		rc = oldrc;
 	}
-	if (flag & MenuButtonActive && mit->action) {
+	if (flag & MI_FLAGS_ACTIVE && mit->action) {
 		VideoDrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
 		SetDefaultTextColors(nc, rc);
 	}
@@ -178,13 +178,13 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	ButtonStyleProperties* p;
 	ButtonStyleProperties* pimage;
 
-	if (flags & MenuButtonDisabled) {
+	if (flags & MI_FLAGS_DISABLED) {
 		p = &style->Disabled;
-	} else if (flags & MenuButtonClicked) {
+	} else if (flags & MI_FLAGS_CLICKED) {
 		p = &style->Clicked;
-	} else if (flags & MenuButtonActive) {
+	} else if (flags & MI_FLAGS_ACTIVE) {
 		p = &style->Hover;
-	} else if (flags & MenuButtonSelected) {
+	} else if (flags & MI_FLAGS_SELECTED) {
 		p = &style->Selected;
 	} else {
 		p = &style->Default;
@@ -194,11 +194,11 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	//  Image
 	//
 	pimage = p;
-	if (!p->Sprite && !(flags & MenuButtonDisabled)) {
+	if (!p->Sprite && !(flags & MI_FLAGS_INVISIBLE)) {
 		// No image.  Try hover, selected, then default
-		if ((flags & MenuButtonActive) && style->Hover.Sprite) {
+		if ((flags & MI_FLAGS_ACTIVE) && style->Hover.Sprite) {
 			pimage = &style->Hover;
-		} else if ((flags & MenuButtonSelected) && style->Selected.Sprite) {
+		} else if ((flags & MI_FLAGS_SELECTED) && style->Selected.Sprite) {
 			pimage = &style->Selected;
 		} else if (style->Default.Sprite) {
 			pimage = &style->Default;
@@ -240,7 +240,7 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	//
 	if (!p->BorderSize) {
 		// No border, check if there's a Selected border
-		if ((flags & MenuButtonSelected) && style->Selected.BorderSize) {
+		if ((flags & MI_FLAGS_SELECTED) && style->Selected.BorderSize) {
 			p = &style->Selected;
 		}
 	}
@@ -258,15 +258,15 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 #if 0
 	if (button == MBUTTON_SC_BUTTON || button == MBUTTON_SC_BUTTON_LEFT ||
 			button == MBUTTON_SC_BUTTON_RIGHT) {
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			rb = button - 3;
 			SetDefaultTextColors(FontGrey, FontGrey);
-		} else if (flags & MenuButtonClicked) {
+		} else if (flags & MI_FLAGS_CLICKED) {
 			rb = button + 3;
 			SetDefaultTextColors(rc, rc);
 		} else {
 			rb = button;
-			if (flags & MenuButtonActive) {
+			if (flags & MI_FLAGS_ACTIVE) {
 				SetDefaultTextColors(rc, rc);
 			}
 		}
@@ -279,8 +279,8 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 			VideoDrawTextCentered(x + w / 2, y + (h - VideoTextHeight(font)) / 2,
 				font, text);
 		}
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_SELECTED) {
+			if (flags & MI_FLAGS_DISABLED) {
 				VideoDrawRectangleClip(ColorGray, x, y, w - 1, h);
 			} else {
 				// FIXME: wrong color
@@ -327,7 +327,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 	rc = oldrc;
 	if (rb == MBUTTON_SC_PULLDOWN) {
 		h = mi->D.Pulldown.ysize;
-		if (flags & MenuButtonClicked) {
+		if (flags & MI_FLAGS_CLICKED) {
 			int usetop;
 			int option;
 			int max;
@@ -434,11 +434,11 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			h = mi->D.Pulldown.ysize;
 			y = my + mi->YOfs;
 			db = MBUTTON_SC_PULLDOWN_DOWN_ARROW;
-			if (flags & MenuButtonDisabled) {
+			if (flags & MI_FLAGS_DISABLED) {
 				rb = MBUTTON_SC_PULLDOWN_DISABLED;
 				SetDefaultTextColors(FontGrey, FontGrey);
 			} else {
-				if (flags & MenuButtonActive) {
+				if (flags & MI_FLAGS_ACTIVE) {
 					SetDefaultTextColors(rc, rc);
 					++db;
 				}
@@ -448,7 +448,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 				VideoDraw(MenuButtonG, rb, i, y);
 			}
 			VideoDraw(MenuButtonG, rb + 1, x + w - 1 - 16, y);
-			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 				VideoDraw(MenuButtonG, db, x + w - 1 - 16 - 3, y + 4);
 			}
 			text = mi->D.Pulldown.options[mi->D.Pulldown.curopt];
@@ -458,7 +458,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 		}
 	} else {
 		oh = h = mi->D.Pulldown.ysize - 2;
-		if (flags & MenuButtonClicked) {
+		if (flags & MI_FLAGS_CLICKED) {
 			// Make the menu inside of the screen (TOP)
 			if (y + 1 <= mi->D.Pulldown.curopt * h + CurrentMenu->Y) {
 				y = 2 + CurrentMenu->Y;
@@ -496,17 +496,17 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 		} else {
 			h = mi->D.Pulldown.ysize;
 			y = my + mi->YOfs;
-			if (flags & MenuButtonDisabled) {
+			if (flags & MI_FLAGS_DISABLED) {
 				rb--;
 				SetDefaultTextColors(FontGrey, FontGrey);
 			} else {
-				if (flags & MenuButtonActive) {
+				if (flags & MI_FLAGS_ACTIVE) {
 					SetDefaultTextColors(rc, rc);
 				}
 			}
 
 			PushClipping();
-			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 				SetClipping(0, 0, x + w - 20, VideoHeight - 1);
 			} else {
 				SetClipping(0, 0, x + w - 1, VideoHeight - 1);
@@ -517,7 +517,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 				VideoDrawClip(MenuButtonG, rb, x - 1, y - 1);
 //			}
 			PopClipping();
-			if (!(mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
+			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 				VideoDraw(MenuButtonG, MBUTTON_DOWN_ARROW + rb - MBUTTON_PULLDOWN,
 					x - 1 + w - 20, y - 2);
 			}
@@ -526,8 +526,8 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 				VideoDrawText(x + 2, y + 2, mi->Font, text);
 			}
 		}
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_SELECTED) {
+			if (flags & MI_FLAGS_DISABLED) {
 				VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w, h);
 			} else {
 				VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w, h);
@@ -571,7 +571,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	nc = oldnc;
 	rc = oldrc;
 
-	if (flags & MenuButtonDisabled) {
+	if (flags & MI_FLAGS_DISABLED) {
 		rb--;
 	}
 	i = mi->D.Listbox.nlines;
@@ -585,7 +585,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 			VideoDrawClip(MenuButtonG, rb, x - 1, y - 1 + 18 * i);
 //		}
 		PopClipping();
-		if (!(flags & MenuButtonDisabled)) {
+		if (!(flags & MI_FLAGS_DISABLED)) {
 			if (i < mi->D.Listbox.noptions) {
 				SetDefaultTextColors(nc, rc);
 				text = (*mi->D.Listbox.retrieveopt)(mi, i + s);
@@ -606,8 +606,8 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 		(*mi->D.Listbox.retrieveopt)(mi, mi->D.Listbox.curopt);
 	}
 
-	if (flags & MenuButtonSelected) {
-		if (flags & MenuButtonDisabled) {
+	if (flags & MI_FLAGS_SELECTED) {
+		if (flags & MI_FLAGS_DISABLED) {
 			VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w + 1, h + 2);
 		} else {
 			VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w + 1, h + 2);
@@ -642,10 +642,10 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 		int upb;
 		int downb;
 
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			upb = MBUTTON_SC_UP_ARROW - 1;
 			downb = MBUTTON_SC_DOWN_ARROW - 1;
-		} else if (flags & MenuButtonClicked) {
+		} else if (flags & MI_FLAGS_CLICKED) {
 			if (mi->D.VSlider.cflags&MI_CFLAGS_UP) {
 				upb = MBUTTON_SC_UP_ARROW + 1;
 				downb = MBUTTON_SC_DOWN_ARROW;
@@ -671,7 +671,7 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 		p = (mi->D.VSlider.percent * (h - 54)) / 100;
 		VideoDraw(MenuButtonG, MBUTTON_SC_S_KNOB, x, y + 16 + 2 + p);
 	} else {
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			PushClipping();
 			SetClipping(0, 0, VideoWidth - 1, y + h - 20);
 //			if (mi->transparent) {
@@ -709,8 +709,8 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 			VideoDraw(MenuButtonG, MBUTTON_S_KNOB, x + 1, y + 18 + p);
 		}
 
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_SELECTED) {
+			if (flags & MI_FLAGS_DISABLED) {
 				VideoDrawRectangleClip(ColorGray, x, y - 2, w, h + 2);
 			} else {
 				VideoDrawRectangleClip(ColorYellow, x, y - 2, w, h + 2);
@@ -745,10 +745,10 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 		int leftb;
 		int rightb;
 
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			leftb = MBUTTON_SC_LEFT_ARROW - 1;
 			rightb = MBUTTON_SC_RIGHT_ARROW - 1;
-		} else if (flags & MenuButtonClicked) {
+		} else if (flags & MI_FLAGS_CLICKED) {
 			if (mi->D.VSlider.cflags & MI_CFLAGS_LEFT) {
 				leftb = MBUTTON_SC_LEFT_ARROW + 1;
 				rightb = MBUTTON_SC_RIGHT_ARROW;
@@ -774,7 +774,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 		p = (mi->D.VSlider.percent * (w - 54)) / 100;
 		VideoDraw(MenuButtonG, MBUTTON_SC_S_KNOB, x + 16 + 2 + p, y);
 	} else {
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			PushClipping();
 			SetClipping(0, 0, x + w - 20, VideoHeight - 1);
 //			if (mi->transparent) {
@@ -812,8 +812,8 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 			VideoDraw(MenuButtonG, MBUTTON_S_KNOB, x + 18 + p, y + 1);
 		}
 
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_SELECTED) {
+			if (flags & MI_FLAGS_DISABLED) {
 				VideoDrawRectangleClip(ColorGray, x - 2, y, w + 2, h);
 			} else {
 				VideoDrawRectangleClip(ColorYellow, x - 2, y, w + 2, h);
@@ -832,7 +832,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 **  @param y      Y display position
 **  @param text   text to print on button
 */
-static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
+static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 	int x, int y, const unsigned char* text)
 {
 	char* nc;
@@ -842,16 +842,14 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 	int i;
 	ButtonStyleProperties* p;
 	ButtonStyleProperties* pimage;
-	int checked;
 
-	checked = state & MI_CSTATE_CHECKED;
-	if (flags & MenuButtonDisabled) {
+	if (flags & MI_FLAGS_DISABLED) {
 		p = checked ? &style->CheckedDisabled : &style->Disabled;
-	} else if (flags & MenuButtonClicked) {
+	} else if (flags & MI_FLAGS_CLICKED) {
 		p = checked ? &style->CheckedClicked : &style->Clicked;
-	} else if (flags & MenuButtonActive) {
+	} else if (flags & MI_FLAGS_ACTIVE) {
 		p = checked ? &style->CheckedHover : &style->Hover;
-	} else if (flags & MenuButtonSelected) {
+	} else if (flags & MI_FLAGS_SELECTED) {
 		p = checked ? &style->CheckedSelected : &style->Selected;
 	} else {
 		p = checked ? &style->Checked : &style->Default;
@@ -863,7 +861,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 	pimage = p;
 	if (!p->Sprite) {
 		// No image
-		if ((flags & MenuButtonDisabled)) {
+		if ((flags & MI_FLAGS_DISABLED)) {
 			// Try unchecked disabled
 			if (checked && style->Disabled.Sprite) {
 				pimage = &style->Disabled;
@@ -871,17 +869,17 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 		} else {
 			// Try hover, selected, then default
 			if (checked) {
-				if ((flags & MenuButtonActive) && style->CheckedHover.Sprite) {
+				if ((flags & MI_FLAGS_ACTIVE) && style->CheckedHover.Sprite) {
 					pimage = &style->CheckedHover;
-				} else if ((flags & MenuButtonSelected) && style->CheckedSelected.Sprite) {
+				} else if ((flags & MI_FLAGS_SELECTED) && style->CheckedSelected.Sprite) {
 					pimage = &style->CheckedSelected;
 				} else if (style->Checked.Sprite) {
 					pimage = &style->Checked;
 				}
 			} else {
-				if ((flags & MenuButtonActive) && style->Hover.Sprite) {
+				if ((flags & MI_FLAGS_ACTIVE) && style->Hover.Sprite) {
 					pimage = &style->Hover;
-				} else if ((flags & MenuButtonSelected) && style->Selected.Sprite) {
+				} else if ((flags & MI_FLAGS_SELECTED) && style->Selected.Sprite) {
 					pimage = &style->Selected;
 				} else if (style->Default.Sprite) {
 					pimage = &style->Default;
@@ -925,7 +923,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned state,
 	//
 	if (!p->BorderSize) {
 		// No border, check if there's a Selected border
-		if ((flags & MenuButtonSelected)) {
+		if ((flags & MI_FLAGS_SELECTED)) {
 			if (checked && style->CheckedSelected.BorderSize) {
 				p = &style->CheckedSelected;
 			}
@@ -986,7 +984,7 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 	}
 	if (mi->D.Input.button == MBUTTON_SC_PULLDOWN) {
 		rb = MBUTTON_SC_INPUT;
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			rb -= 3;
 			SetDefaultTextColors(FontGrey, FontGrey);
 		}
@@ -1000,7 +998,7 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 			VideoDrawText(x + 4, y + 2, mi->Font, text);
 		}
 	} else {
-		if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_DISABLED) {
 			--rb;
 			SetDefaultTextColors(FontGrey, FontGrey);
 		}
@@ -1027,8 +1025,8 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 				free(text);
 			}
 		}
-		if (flags & MenuButtonSelected) {
-			if (flags & MenuButtonDisabled) {
+		if (flags & MI_FLAGS_SELECTED) {
+			if (flags & MI_FLAGS_DISABLED) {
 				VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w + 4, h);
 			} else {
 				VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w + 4, h);
@@ -1109,53 +1107,55 @@ void DrawMenu(Menu* menu)
 	mi = menu->Items;
 	mip = NULL;
 	for (i = 0; i < n; ++i) {
-		switch (mi->MiType) {
+		if (mi[i].Flags & MI_FLAGS_INVISIBLE) {
+			continue;
+		}
+		switch (mi[i].MiType) {
 			case MiTypeText:
-				if (!mi->D.Text.text) {
+				if (!mi[i].D.Text.text) {
 					break;
 				}
-				DrawMenuText(&mi->D.Text, menu->X + mi->XOfs, menu->Y + mi->YOfs,
-					mi->Font, mi->Flags);
+				DrawMenuText(&mi[i].D.Text, menu->X + mi[i].XOfs, menu->Y + mi[i].YOfs,
+					mi[i].Font, mi[i].Flags);
 				break;
 			case MiTypeButton:
-				UpdateMenuItemButton(mi);
-				DrawMenuButton(mi->D.Button.Style, mi->Flags,
-					menu->X + mi->XOfs, menu->Y + mi->YOfs,
-					mi->D.Button.Text);
+				UpdateMenuItemButton(&mi[i]);
+				DrawMenuButton(mi[i].D.Button.Style, mi[i].Flags,
+					menu->X + mi[i].XOfs, menu->Y + mi[i].YOfs,
+					mi[i].D.Button.Text);
 				break;
 			case MiTypePulldown:
-				if (mi->Flags & MenuButtonClicked) {
-					mip = mi; // Delay, due to possible overlaying!
+				if (mi[i].Flags & MI_FLAGS_CLICKED) {
+					mip = &mi[i]; // Delay, due to possible overlaying!
 				} else {
-					DrawPulldown(mi, menu->X, menu->Y);
+					DrawPulldown(&mi[i], menu->X, menu->Y);
 				}
 				break;
 			case MiTypeListbox:
-				DrawListbox(mi, menu->X, menu->Y);
+				DrawListbox(&mi[i], menu->X, menu->Y);
 				break;
 			case MiTypeVslider:
-				DrawVSlider(mi, menu->X, menu->Y);
+				DrawVSlider(&mi[i], menu->X, menu->Y);
 				break;
 			case MiTypeHslider:
-				DrawHSlider(mi, menu->X, menu->Y);
+				DrawHSlider(&mi[i], menu->X, menu->Y);
 				break;
 			case MiTypeDrawfunc:
-				if (mi->D.DrawFunc.draw) {
-					(*mi->D.DrawFunc.draw)(mi);
+				if (mi[i].D.DrawFunc.draw) {
+					(*mi[i].D.DrawFunc.draw)(&mi[i]);
 				}
 				break;
 			case MiTypeInput:
-				DrawInput(mi, menu->X, menu->Y);
+				DrawInput(&mi[i], menu->X, menu->Y);
 				break;
 			case MiTypeCheckbox:
-				DrawCheckbox(mi->D.Checkbox.Style, mi->Flags, mi->D.Checkbox.State,
-					menu->X + mi->XOfs, menu->Y + mi->YOfs,
-					mi->D.Checkbox.Text);
+				DrawCheckbox(mi[i].D.Checkbox.Style, mi[i].Flags, mi[i].D.Checkbox.Checked,
+					menu->X + mi[i].XOfs, menu->Y + mi[i].YOfs,
+					mi[i].D.Checkbox.Text);
 				break;
 			default:
 				break;
 		}
-		++mi;
 	}
 	if (mip) {
 		DrawPulldown(mip, menu->X, menu->Y);
@@ -1285,7 +1285,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 	menu = CurrentMenu;
 	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].MiType == MiTypeInput) {
 		mi = menu->Items + MenuButtonCurSel;
-		if (!(mi->Flags & MenuButtonDisabled)) {
+		if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 inkey:
 			if (key >= 0x80 && key < 0x100) {
 				// FIXME ARI: ISO->WC2 Translation here!
@@ -1343,7 +1343,7 @@ normkey:
 			switch (mi->MiType) {
 				case MiTypeButton:
 					if (key == mi->D.Button.HotKey) {
-						if (!(mi->Flags & MenuButtonDisabled)) {
+						if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 							if (mi->D.Button.Handler) {
 								(*mi->D.Button.Handler)();
 							} else if (mi->LuaHandle) {
@@ -1389,7 +1389,7 @@ normkey:
 						if (mi->D.Checkbox.Action) {
 							(*mi->D.Checkbox.Action)(mi);
 						} else if (mi->LuaHandle) {
-							CallHandler(mi->LuaHandle, mi->D.Checkbox.State);
+							CallHandler(mi->LuaHandle, mi->D.Checkbox.Checked);
 						}
 						return;
 					default:
@@ -1400,7 +1400,7 @@ normkey:
 		case KeyCodeUp: case KeyCodeDown:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
-				if (!(mi->Flags & MenuButtonClicked)) {
+				if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 					switch (mi->MiType) {
 						case MiTypePulldown:
 							if (key == KeyCodeDown) {
@@ -1488,7 +1488,7 @@ normkey:
 		case KeyCodeRight:
 			if (MenuButtonCurSel != -1) {
 				mi = menu->Items + MenuButtonCurSel;
-				if (!(mi->Flags & MenuButtonClicked)) {
+				if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 					switch (mi->MiType) {
 						case MiTypeHslider:
 							if (key == KeyCodeLeft) {
@@ -1518,27 +1518,23 @@ normkey:
 			if (KeyModifiers & ModifierAlt) {
 				break;
 			}
-			if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].Flags & MenuButtonClicked)) {
+			if (MenuButtonCurSel != -1 && !(menu->Items[MenuButtonCurSel].Flags & MI_FLAGS_CLICKED)) {
 				n = menu->NumItems;
 				for (i = 0; i < n; ++i) {
 					mi = menu->Items + ((MenuButtonCurSel + i + 1) % n);
 					switch (mi->MiType) {
-						case MiTypePulldown:
-							if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
-								continue;
-							}
-							/* FALL THROUGH */
 						case MiTypeButton:
+						case MiTypePulldown:
 						case MiTypeListbox:
 						case MiTypeVslider:
 						case MiTypeHslider:
 						case MiTypeInput:
 						case MiTypeCheckbox:
-							if (mi->Flags & MenuButtonDisabled) {
+							if (mi->Flags & MI_FLAGS_DISABLED) {
 								break;
 							}
-							menu->Items[MenuButtonCurSel].Flags &= ~MenuButtonSelected;
-							mi->Flags |= MenuButtonSelected;
+							menu->Items[MenuButtonCurSel].Flags &= ~MI_FLAGS_SELECTED;
+							mi->Flags |= MI_FLAGS_SELECTED;
 							MenuButtonCurSel = mi - menu->Items;
 							return;
 						default:
@@ -1558,12 +1554,12 @@ normkey:
 			while (i--) {
 				switch (mi->MiType) {
 					case MiTypeInput:
-						if (!(mi->Flags & MenuButtonDisabled)) {
+						if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 							if (MenuButtonCurSel != -1) {
 								menu->Items[MenuButtonCurSel].Flags &=
-									~MenuButtonSelected;
+									~MI_FLAGS_SELECTED;
 							}
-							mi->Flags |= MenuButtonSelected;
+							mi->Flags |= MI_FLAGS_SELECTED;
 							MenuButtonCurSel = mi - menu->Items;
 							goto inkey;
 						}
@@ -1676,8 +1672,8 @@ static void MenuHandleMouseMove(int x, int y)
 	// check active (popped-up) pulldown first, as it may overlay other menus!
 	mi = menu->Items;
 	for (i = 0; i < n; ++i) {
-		if (!(mi->Flags & MenuButtonDisabled)) {
-			if (mi->MiType == MiTypePulldown && (mi->Flags & MenuButtonClicked)) {
+		if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+			if (mi->MiType == MiTypePulldown && (mi->Flags & MI_FLAGS_CLICKED)) {
 				xs = menu->X + mi->XOfs;
 				ys = menu->Y + mi->YOfs;
 				if (mi->D.Pulldown.button == MBUTTON_SC_PULLDOWN) {
@@ -1742,7 +1738,7 @@ static void MenuHandleMouseMove(int x, int y)
 	if (MenuButtonUnderCursor == -1) {
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
-			if (!(mi->Flags & MenuButtonDisabled)) {
+			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
 				switch (mi->MiType) {
 					case MiTypeText:
 						if (!mi->D.Text.text || !mi->D.Text.action)
@@ -1752,9 +1748,9 @@ static void MenuHandleMouseMove(int x, int y)
 						tmp = EvalString(mi->D.Text.text);
 						if (x < xs - 4 || x > xs + VideoTextLength(mi->Font, tmp) + 5 ||
 								y < ys - 4 || y > ys + VideoTextHeight(mi->Font) + 5) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							free(tmp);
@@ -1770,9 +1766,9 @@ static void MenuHandleMouseMove(int x, int y)
 								y < ys - 2 ||  y > ys + VideoTextHeight(GameFont) + 9) &&
 								(x < xs ||  x > xs + mi->D.Checkbox.Style->Width || y < ys ||
 								y > ys + mi->D.Checkbox.Style->Height)) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							continue;
@@ -1783,9 +1779,9 @@ static void MenuHandleMouseMove(int x, int y)
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Button.Style->Width || y < ys ||
 								y > ys + mi->D.Button.Style->Height) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							continue;
@@ -1796,26 +1792,23 @@ static void MenuHandleMouseMove(int x, int y)
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Input.xsize
 								|| y < ys || y > ys + mi->D.Input.ysize) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							continue;
 						}
 						break;
 					case MiTypePulldown:
-						if ((mi->D.Pulldown.state & MI_PSTATE_PASSIVE)) {
-							continue;
-						}
 						// Clicked-state already checked above - there can only be one!
 						xs = menu->X + mi->XOfs;
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Pulldown.xsize || y<ys ||
 								y > ys + mi->D.Pulldown.ysize) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							continue;
@@ -1826,9 +1819,9 @@ static void MenuHandleMouseMove(int x, int y)
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.Listbox.xsize || y < ys ||
 								y > ys + mi->D.Listbox.ysize) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							continue;
@@ -1837,7 +1830,7 @@ static void MenuHandleMouseMove(int x, int y)
 						if (j + mi->D.Listbox.startline != mi->D.Listbox.cursel) {
 							mi->D.Listbox.cursel = j + mi->D.Listbox.startline; // just store for click
 						}
-						if (mi->Flags & MenuButtonClicked && mi->Flags & MenuButtonActive) {
+						if (mi->Flags & MI_FLAGS_CLICKED && mi->Flags & MI_FLAGS_ACTIVE) {
 							if (mi->D.Listbox.cursel != mi->D.Listbox.curopt) {
 								mi->D.Listbox.dohandler = 0;
 								mi->D.Listbox.curopt = mi->D.Listbox.cursel;
@@ -1859,13 +1852,13 @@ static void MenuHandleMouseMove(int x, int y)
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.VSlider.xsize || y < ys ||
 								y > ys + mi->D.VSlider.ysize) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
 							if (y < ys || y > ys + mi->D.VSlider.ysize ||
-									!(mi->Flags & MenuButtonClicked)) {
+									!(mi->Flags & MI_FLAGS_CLICKED)) {
 								mi->D.VSlider.cursel = 0;
 								continue;
 							}
@@ -1909,7 +1902,7 @@ static void MenuHandleMouseMove(int x, int y)
 
 						// Update listbox
 						if (mi > mi->Menu->Items && mi[-1].MiType == MiTypeListbox) {
-							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MI_FLAGS_CLICKED)) {
 								if (mi[-1].D.Listbox.noptions > mi[-1].D.Listbox.nlines) {
 									mi[-1].D.Listbox.startline = (curper *
 										(mi[-1].D.Listbox.noptions - mi[-1].D.Listbox.nlines) + 50) / 100;
@@ -1919,11 +1912,11 @@ static void MenuHandleMouseMove(int x, int y)
 								mi->D.VSlider.percent = (mi[-1].D.Listbox.startline * 100) / (mi[-1].D.Listbox.noptions - mi[-1].D.Listbox.nlines);
 							}
 						} else {
-							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+							if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MI_FLAGS_CLICKED)) {
 								mi->D.VSlider.percent = curper;
 							}
 						}
-						if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+						if ((mi->D.VSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MI_FLAGS_CLICKED)) {
 							if (mi->D.VSlider.action) {
 								(*mi->D.VSlider.action)(mi);
 							} else if (mi->LuaHandle) {
@@ -1940,12 +1933,12 @@ static void MenuHandleMouseMove(int x, int y)
 						ys = menu->Y + mi->YOfs;
 						if (x < xs || x > xs + mi->D.HSlider.xsize || y < ys ||
 								y > ys + mi->D.HSlider.ysize) {
-							if (!(mi->Flags & MenuButtonClicked)) {
-								if (mi->Flags & MenuButtonActive) {
-									mi->Flags &= ~MenuButtonActive;
+							if (!(mi->Flags & MI_FLAGS_CLICKED)) {
+								if (mi->Flags & MI_FLAGS_ACTIVE) {
+									mi->Flags &= ~MI_FLAGS_ACTIVE;
 								}
 							}
-							if (x < xs || x > xs + mi->D.HSlider.xsize || !(mi->Flags & MenuButtonClicked)) {
+							if (x < xs || x > xs + mi->D.HSlider.xsize || !(mi->Flags & MI_FLAGS_CLICKED)) {
 								mi->D.HSlider.cursel = 0;
 								continue;
 							}
@@ -1986,7 +1979,7 @@ static void MenuHandleMouseMove(int x, int y)
 								mi->D.HSlider.curper = 100;
 							}
 						}
-						if ((mi->D.HSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MenuButtonClicked)) {
+						if ((mi->D.HSlider.cflags & MI_CFLAGS_KNOB) && (mi->Flags & MI_FLAGS_CLICKED)) {
 							mi->D.HSlider.percent = mi->D.HSlider.curper;
 							if (mi->D.HSlider.action) {
 								(*mi->D.HSlider.action)(mi);
@@ -2002,28 +1995,24 @@ static void MenuHandleMouseMove(int x, int y)
 				}
 				switch (mi->MiType) {
 					case MiTypeCheckbox:
-						if ((mi->D.Checkbox.State & (MI_CSTATE_PASSIVE | MI_CSTATE_INVISIBLE))) {
-							break;
-						}
-						/* FALL THROUGH */
 					case MiTypeButton:
 					case MiTypePulldown:
 					case MiTypeListbox:
 					case MiTypeVslider:
 					case MiTypeHslider:
 					case MiTypeText:
-						if (!(mi->Flags & MenuButtonActive)) {
-							mi->Flags |= MenuButtonActive;
+						if (!(mi->Flags & MI_FLAGS_ACTIVE)) {
+							mi->Flags |= MI_FLAGS_ACTIVE;
 						}
 						MenuButtonUnderCursor = i;
 					default:
 						break;
 					case MiTypeInput:
-						if (!(mi->Flags & MenuButtonActive)) {
-							mi->Flags |= MenuButtonActive;
+						if (!(mi->Flags & MI_FLAGS_ACTIVE)) {
+							mi->Flags |= MI_FLAGS_ACTIVE;
 						}
 						if (MouseButtons & LeftButton
-								&& mi->Flags & MenuButtonSelected) {
+								&& mi->Flags & MI_FLAGS_SELECTED) {
 							if (mi->D.Input.buffer && *mi->D.Input.buffer) {
 								char* s;
 
@@ -2076,7 +2065,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & LeftButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			if (!(mi->Flags & MenuButtonClicked)) {
+			if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 				switch (mi->MiType) {
 					case MiTypeCheckbox:
 					case MiTypeButton:
@@ -2087,10 +2076,10 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 					case MiTypeInput:
 					case MiTypeText:
 						if (MenuButtonCurSel != -1) {
-							menu->Items[MenuButtonCurSel].Flags &= ~MenuButtonSelected;
+							menu->Items[MenuButtonCurSel].Flags &= ~MI_FLAGS_SELECTED;
 						}
 						MenuButtonCurSel = MenuButtonUnderCursor;
-						mi->Flags |= MenuButtonClicked | MenuButtonSelected;
+						mi->Flags |= MI_FLAGS_CLICKED | MI_FLAGS_SELECTED;
 					default:
 						break;
 				}
@@ -2164,7 +2153,7 @@ static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
 	if (MouseButtons & MiddleButton) {
 		if (MenuButtonUnderCursor != -1) {
 			mi = menu->Items + MenuButtonUnderCursor;
-			if (!(mi->Flags & MenuButtonClicked)) {
+			if (!(mi->Flags & MI_FLAGS_CLICKED)) {
 				switch (mi->MiType) {
 					case MiTypeInput:
 						PasteFromClipboard(mi);
@@ -2329,28 +2318,24 @@ static void MenuHandleButtonUp(unsigned b)
 			mi = menu->Items + i;
 			switch (mi->MiType) {
 				case MiTypeCheckbox:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
-							if ((mi->D.Checkbox.State & MI_CSTATE_CHECKED)) {
-								mi->D.Checkbox.State &= ~MI_CSTATE_CHECKED;
-							} else {
-								mi->D.Checkbox.State |= MI_CSTATE_CHECKED;
-							}
+							mi->D.Checkbox.Checked = !mi->D.Checkbox.Checked;
 							if (mi->D.Checkbox.Action) {
 								(*mi->D.Checkbox.Action)(mi);
 							} else if (mi->LuaHandle) {
-								CallHandler(mi->LuaHandle, mi->D.Checkbox.State);
+								CallHandler(mi->LuaHandle, mi->D.Checkbox.Checked);
 							}
 						}
 					}
 					break;
 				case MiTypeText:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Text.action) {
@@ -2360,9 +2345,9 @@ static void MenuHandleButtonUp(unsigned b)
 					}
 					break;
 				case MiTypeButton:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Button.Handler) {
@@ -2374,9 +2359,9 @@ static void MenuHandleButtonUp(unsigned b)
 					}
 					break;
 				case MiTypePulldown:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Pulldown.cursel != mi->D.Pulldown.curopt &&
@@ -2394,9 +2379,9 @@ static void MenuHandleButtonUp(unsigned b)
 					}
 					break;
 				case MiTypeListbox:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						if (MenuButtonUnderCursor == i) {
 							MenuButtonUnderCursor = -1;
 							if (mi->D.Listbox.dohandler && mi->D.Listbox.handler) {
@@ -2406,23 +2391,23 @@ static void MenuHandleButtonUp(unsigned b)
 					}
 					break;
 				case MiTypeInput:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						// MAYBE ADD HERE
 					}
 					break;
 				case MiTypeVslider:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						mi->D.VSlider.cflags = 0;
 					}
 					break;
 				case MiTypeHslider:
-					if (mi->Flags & MenuButtonClicked) {
+					if (mi->Flags & MI_FLAGS_CLICKED) {
 						redraw_flag = 1;
-						mi->Flags &= ~MenuButtonClicked;
+						mi->Flags &= ~MI_FLAGS_CLICKED;
 						mi->D.HSlider.cflags = 0;
 					}
 					break;
@@ -2559,9 +2544,9 @@ void ProcessMenu(const char* menu_id, int loop)
 			case MiTypeVslider:
 			case MiTypeHslider:
 			case MiTypeInput:
-				mi->Flags &= ~(MenuButtonClicked | MenuButtonActive | MenuButtonSelected);
+				mi->Flags &= ~(MI_FLAGS_CLICKED | MI_FLAGS_ACTIVE | MI_FLAGS_SELECTED);
 				if (i == menu->DefSel) {
-					mi->Flags |= MenuButtonSelected;
+					mi->Flags |= MI_FLAGS_SELECTED;
 					MenuButtonCurSel = i;
 				}
 				break;
