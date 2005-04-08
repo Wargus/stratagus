@@ -3004,11 +3004,11 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (!strcmp(value, "left")) {
-				item->D.Text.align = MI_TFLAGS_LALIGN;
+				item->D.Text.Align = TextAlignLeft;
 			} else if (!strcmp(value, "right")) {
-				item->D.Text.align = MI_TFLAGS_RALIGN;
+				item->D.Text.Align = TextAlignRight;
 			} else if (!strcmp(value, "center")) {
-				item->D.Text.align = MI_TFLAGS_CENTERED;
+				item->D.Text.Align = TextAlignCenter;
 			}
 		} else if (!strcmp(value, "caption")) {
 			lua_rawgeti(l, j + 1, k + 1);

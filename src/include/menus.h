@@ -37,6 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "ui.h"
 #include "util.h"
 #include "script.h"
 
@@ -131,10 +132,9 @@ struct _graphic_;
 struct _menuitem_;
 typedef struct _menuitem_text_ {
 	StringDesc* text;
-	unsigned int tflags;
+	TextAlignment Align;
 	char* normalcolor;
 	char* reversecolor;
-	int align;
 	void (*action)(struct _menuitem_*);
 } MenuitemText;
 typedef struct _menuitem_button_ {
@@ -217,7 +217,8 @@ typedef struct _menuitem_checkbox_ {
 
 struct _menu_;
 typedef struct _menuitem_ {
-	enum { MiTypeText = 1, MiTypeButton, MiTypePulldown, MiTypeListbox,
+	enum {
+		MiTypeText, MiTypeButton, MiTypePulldown, MiTypeListbox,
 		MiTypeVslider, MiTypeHslider, MiTypeDrawfunc, MiTypeInput,
 		MiTypeCheckbox
 	} MiType;
@@ -241,11 +242,6 @@ typedef struct _menuitem_ {
 		// ... add here ...
 	} D;
 } Menuitem;
-
-	/// for MI_TYPE_TEXT
-#define MI_TFLAGS_CENTERED 1
-#define MI_TFLAGS_RALIGN   2
-#define MI_TFLAGS_LALIGN   4
 
 	/// for MI_TYPE_xSLIDER
 #define MI_CFLAGS_UP    1
