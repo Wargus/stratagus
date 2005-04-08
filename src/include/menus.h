@@ -44,10 +44,7 @@
 --  Defines/Declarations
 ----------------------------------------------------------------------------*/
 
-// DISABLED grays out the menu item
-#define MI_DISABLED -1
-#define MI_ENABLED  0
-
+#define MI_FLAGS_NONE       0  /// no flags
 #define MI_FLAGS_ACTIVE     1  /// cursor on item
 #define MI_FLAGS_CLICKED    2  /// mouse button pressed down on item
 #define MI_FLAGS_SELECTED   4  /// selected item
