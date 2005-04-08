@@ -845,7 +845,7 @@ static void LBExit(Menuitem* mi)
 	free(fl);
 	mi->D.Listbox.options = NULL;
 	mi->D.Listbox.noptions = 0;
-	mi[1].Flags |= MenuButtonDisabled;
+	mi[1].Flags |= MI_FLAGS_DISABLED;
 }
 
 /**
@@ -878,9 +878,9 @@ static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList
 	mi[1].D.HSlider.percent = 0;
 	PathLBAction(mi, 0);
 	if (noptions > mi->D.Listbox.nlines) {
-		mi[1].Flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 	} else {
-		mi[1].Flags |= MenuButtonDisabled;
+		mi[1].Flags |= MI_FLAGS_DISABLED;
 	}
 }
 
@@ -1347,7 +1347,7 @@ static void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
 static void PrgStartInit(Menu* menu)
 {
 	if (NetworkNumInterfaces == 0) {
-		menu->Items[2].Flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[2].Flags = 0;
 	}
@@ -1379,8 +1379,8 @@ static void SaveGameInit(Menu* menu)
 	menu->Items[1].D.Input.nch = 0;
 	menu->Items[1].D.Input.maxch = 60;
 
-	menu->Items[4].Flags = MenuButtonDisabled;
-	menu->Items[5].Flags = MenuButtonDisabled;
+	menu->Items[4].Flags = MI_FLAGS_DISABLED;
+	menu->Items[5].Flags = MI_FLAGS_DISABLED;
 	CreateSaveDir();
 	SaveGameLBInit(menu->Items + 2);
 }
@@ -1683,16 +1683,16 @@ static void GameMenuInit(Menu* menu)
 {
 	// Disable save menu in multiplayer and replays
 	if (IsNetworkGame() || ReplayGameType != ReplayNone) {
-		menu->Items[1].Flags |= MenuButtonDisabled;
+		menu->Items[1].Flags |= MI_FLAGS_DISABLED;
 	} else {
-		menu->Items[1].Flags &= ~MenuButtonDisabled;
+		menu->Items[1].Flags &= ~MI_FLAGS_DISABLED;
 	}
 
 	// Disable load menu in multiplayer
 	if (IsNetworkGame()) {
-		menu->Items[2].Flags |= MenuButtonDisabled;
+		menu->Items[2].Flags |= MI_FLAGS_DISABLED;
 	} else {
-		menu->Items[2].Flags &= ~MenuButtonDisabled;
+		menu->Items[2].Flags &= ~MI_FLAGS_DISABLED;
 	}
 }
 
@@ -1715,7 +1715,7 @@ static void SoundOptionsInit(Menu* menu __attribute__((unused)))
 
 	// master volume slider
 	if (SoundOff || !SoundEnabled()) {
-		menu->Items[2].Flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[2].Flags = 0;
 		menu->Items[2].D.HSlider.percent = (GlobalVolume * 100) / 255;
@@ -1723,14 +1723,14 @@ static void SoundOptionsInit(Menu* menu __attribute__((unused)))
 
 	// master power
 	if (SoundOff || !SoundEnabled()) {
-		menu->Items[5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[5].D.Checkbox.Checked = 0;
 	} else {
-		menu->Items[5].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[5].D.Checkbox.Checked = 1;
 	}
 
 	// music volume slider
 	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
-		menu->Items[7].Flags = MenuButtonDisabled;
+		menu->Items[7].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[7].Flags = 0;
 		menu->Items[7].D.HSlider.percent = (MusicVolume * 100) / 255;
@@ -1738,27 +1738,27 @@ static void SoundOptionsInit(Menu* menu __attribute__((unused)))
 
 	// music power
 	if (SoundOff || !SoundEnabled()) {
-		menu->Items[10].Flags = MenuButtonDisabled;
+		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	} else {
 		menu->Items[10].Flags = 0;
 	}
 #ifdef USE_CDAUDIO
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
-		menu->Items[7].Flags = MenuButtonDisabled;
-		menu->Items[10].Flags = MenuButtonDisabled;
+		menu->Items[7].Flags = MI_FLAGS_DISABLED;
+		menu->Items[10].Flags = MI_FLAGS_DISABLED;
 	}
 #endif
 	if (SoundOff || PlayingMusic != 1 || !SoundEnabled()) {
-		menu->Items[10].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[10].D.Checkbox.Checked = 0;
 	} else {
-		menu->Items[10].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[10].D.Checkbox.Checked = 1;
 	}
 
-	menu->Items[12].Flags = MenuButtonDisabled; // cd volume slider
-	menu->Items[15].Flags = MenuButtonDisabled; // cd power
-	menu->Items[15].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[16].Flags = MenuButtonDisabled; // all tracks button
-	menu->Items[17].Flags = MenuButtonDisabled; // random tracks button
+	menu->Items[12].Flags = MI_FLAGS_DISABLED; // cd volume slider
+	menu->Items[15].Flags = MI_FLAGS_DISABLED; // cd power
+	menu->Items[15].D.Checkbox.Checked = 0;
+	menu->Items[16].Flags = MI_FLAGS_DISABLED; // all tracks button
+	menu->Items[17].Flags = MI_FLAGS_DISABLED; // random tracks button
 #ifdef USE_CDAUDIO
 	menu->Items[15].Flags = 0; // cd power
 	if (CDMode != CDModeStopped && CDMode != CDModeOff) {
@@ -1769,16 +1769,16 @@ static void SoundOptionsInit(Menu* menu __attribute__((unused)))
 		menu->Items[12].Flags = 0;
 		menu->Items[12].D.HSlider.percent = (i * 100) / 255;
 #endif
-		menu->Items[15].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[15].D.Checkbox.Checked = 1;
 		menu->Items[16].Flags = 0;
 		menu->Items[17].Flags = 0;
 
 		if (CDMode == CDModeDefined) {
-			menu->Items[16].D.Checkbox.State = MI_CSTATE_CHECKED;
-			menu->Items[17].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+			menu->Items[16].D.Checkbox.Checked = 1;
+			menu->Items[17].D.Checkbox.Checked = 0;
 		} else if (CDMode == CDModeRandom) {
-			menu->Items[16].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-			menu->Items[17].D.Checkbox.State = MI_CSTATE_CHECKED;
+			menu->Items[16].D.Checkbox.Checked = 0;
+			menu->Items[17].D.Checkbox.Checked = 1;
 		}
 	}
 #endif // cd
@@ -1806,27 +1806,27 @@ static void GlobalOptionsMenu(void)
 */
 static void GlobalOptionsInit(Menu* menu)
 {
-	menu->Items[2].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[4].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-	menu->Items[7].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[2].D.Checkbox.Checked = 0;
+	menu->Items[3].D.Checkbox.Checked = 0;
+	menu->Items[4].D.Checkbox.Checked = 0;
+	menu->Items[5].D.Checkbox.Checked = 0;
+	menu->Items[6].D.Checkbox.Checked = 0;
+	menu->Items[7].D.Checkbox.Checked = 0;
 
 	if (VideoWidth == 640) {
-		menu->Items[2].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[2].D.Checkbox.Checked = 1;
 	} else if (VideoWidth == 800) {
-		menu->Items[3].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[3].D.Checkbox.Checked = 1;
 	} else if (VideoWidth == 1024) {
-		menu->Items[4].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[4].D.Checkbox.Checked = 1;
 	} else if (VideoWidth == 1280) {
-		menu->Items[5].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[5].D.Checkbox.Checked = 1;
 	} else if (VideoWidth == 1600) {
-		menu->Items[6].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[6].D.Checkbox.Checked = 1;
 	}
 
 	if (VideoFullScreen) {
-		menu->Items[7].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[7].D.Checkbox.Checked = 1;
 	}
 }
 
@@ -2077,29 +2077,29 @@ static void DiplomacyInit(Menu* menu __attribute__ ((unused)))
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			menu->Items[4 * j + 4].D.Text.text = NewStringDesc(Players[i].Name);
 			if (ThisPlayer->Allied&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 5].D.Checkbox.Checked = 1;
 			} else {
-				menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 5].D.Checkbox.Checked = 0;
 			}
 			if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 6].D.Checkbox.Checked = 1;
 			} else {
-				menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 6].D.Checkbox.Checked = 0;
 			}
 			if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
-				menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_CHECKED;
+				menu->Items[4 * j + 7].D.Checkbox.Checked = 1;
 			} else {
-				menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+				menu->Items[4 * j + 7].D.Checkbox.Checked = 0;
 			}
 
 			if (ReplayGameType != ReplayNone || ThisPlayer->Team == Players[i].Team) {
-				menu->Items[4 * j + 5].D.Checkbox.State |= MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 6].D.Checkbox.State |= MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 7].D.Checkbox.State |= MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 5].Flags |= MI_FLAGS_DISABLED;
+				menu->Items[4 * j + 6].Flags |= MI_FLAGS_DISABLED;
+				menu->Items[4 * j + 7].Flags |= MI_FLAGS_DISABLED;
 			} else {
-				menu->Items[4 * j + 5].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 6].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
-				menu->Items[4 * j + 7].D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
+				menu->Items[4 * j + 5].Flags &= ~MI_FLAGS_DISABLED;
+				menu->Items[4 * j + 6].Flags &= ~MI_FLAGS_DISABLED;
+				menu->Items[4 * j + 7].Flags &= ~MI_FLAGS_DISABLED;
 			}
 
 			++j;
@@ -2107,9 +2107,9 @@ static void DiplomacyInit(Menu* menu __attribute__ ((unused)))
 	}
 	for (; j <= PlayerMax - 3; ++j) {
 		menu->Items[4 * j + 4].D.Text.text = NULL;
-		menu->Items[4 * j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
-		menu->Items[4 * j + 6].D.Checkbox.State = MI_CSTATE_INVISIBLE;
-		menu->Items[4 * j + 7].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+		menu->Items[4 * j + 5].Flags |= MI_FLAGS_INVISIBLE;
+		menu->Items[4 * j + 6].Flags |= MI_FLAGS_INVISIBLE;
+		menu->Items[4 * j + 7].Flags |= MI_FLAGS_INVISIBLE;
 	}
 }
 
@@ -2140,11 +2140,11 @@ static void DiplomacyWait(Menuitem* mi)
 
 	// Don't allow allies and enemies at the same time
 	if (item == 4 * player + 5) {
-		mi->Menu->Items[4 * player + 5].D.Checkbox.State |= MI_CSTATE_CHECKED;
-		mi->Menu->Items[4 * player + 6].D.Checkbox.State &= ~MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 5].D.Checkbox.Checked = 1;
+		mi->Menu->Items[4 * player + 6].D.Checkbox.Checked = 0;
 	} else if (item == 4 * player + 6) {
-		mi->Menu->Items[4 * player + 5].D.Checkbox.State &= ~MI_CSTATE_CHECKED;
-		mi->Menu->Items[4 * player + 6].D.Checkbox.State |= MI_CSTATE_CHECKED;
+		mi->Menu->Items[4 * player + 5].D.Checkbox.Checked = 0;
+		mi->Menu->Items[4 * player + 6].D.Checkbox.Checked = 1;
 	}
 
 	// Don't set diplomacy until clicking ok
@@ -2165,8 +2165,8 @@ static void DiplomacyOk(void)
 	for (i=0; i<=PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			// Menu says to ally
-			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_CHECKED &&
-				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
+				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they allied?
 				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
 						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
@@ -2175,8 +2175,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be enemies
-			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_CHECKED) {
+			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
+				menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they enemies?
 				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
 						ThisPlayer->Enemy & (1 << Players[i].Player))) {
@@ -2185,8 +2185,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be neutral
-			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_UNCHECKED &&
-				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
+			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
+				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they neutral?
 				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
 						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
@@ -2195,8 +2195,8 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Menu says to be crazy
-			if (menu->Items[4 * j + 5].D.Checkbox.State == MI_CSTATE_CHECKED &&
-				menu->Items[4 * j + 6].D.Checkbox.State == MI_CSTATE_CHECKED) {
+			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
+				menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they crazy?
 				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
 						ThisPlayer->Enemy & (1 << Players[i].Player))) {
@@ -2205,7 +2205,7 @@ static void DiplomacyOk(void)
 				}
 			}
 			// Shared vision
-			if (menu->Items[4 * j + 7].D.Checkbox.State == MI_CSTATE_CHECKED) {
+			if (menu->Items[4 * j + 7].D.Checkbox.Checked) {
 				if (!(ThisPlayer->SharedVision & (1 << Players[i].Player))) {
 					SendCommandSharedVision(ThisPlayer->Player, 1,
 						Players[i].Player);
@@ -2239,9 +2239,9 @@ void PreferencesMenu(void)
 static void PreferencesInit(Menu* menu)
 {
 	if (!TheMap.NoFogOfWar) {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[1].D.Checkbox.Checked = 1;
 	} else {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[1].D.Checkbox.Checked = 0;
 	}
 
 	// Not available in net games or replays
@@ -2252,9 +2252,9 @@ static void PreferencesInit(Menu* menu)
 	}
 
 	if (ShowCommandKey) {
-		menu->Items[2].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[2].D.Checkbox.Checked = 1;
 	} else {
-		menu->Items[2].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[2].D.Checkbox.Checked = 0;
 	}
 }
 
@@ -2571,7 +2571,7 @@ static void TipsExit(Menu* menu __attribute__((unused)))
 */
 static void TipsShowTipsCheckbox(Menuitem* mi)
 {
-	if (mi->Menu->Items[1].D.Checkbox.State == MI_CSTATE_CHECKED) {
+	if (mi->Menu->Items[1].D.Checkbox.Checked) {
 		ShowTips = 1;
 	} else {
 		ShowTips = 0;
@@ -2583,12 +2583,12 @@ static void TipsShowTipsCheckbox(Menuitem* mi)
 */
 static void TipsShowTipsText(Menuitem* mi)
 {
-	if (mi->Menu->Items[1].D.Checkbox.State == MI_CSTATE_UNCHECKED) {
+	if (!mi->Menu->Items[1].D.Checkbox.Checked) {
 		ShowTips = 1;
-		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
+		mi->Menu->Items[1].D.Checkbox.Checked = 1;
 	} else {
 		ShowTips = 0;
-		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		mi->Menu->Items[1].D.Checkbox.Checked = 0;
 	}
 }
 
@@ -2689,7 +2689,7 @@ static void MultiScenSelectMenu(void)
 	// FIXME: remove when cm works with multiplayer
 	menu = FindMenu("menu-select-scenario");
 	flags = menu->Items[6].Flags;
-	menu->Items[6].Flags = MenuButtonDisabled;
+	menu->Items[6].Flags = MI_FLAGS_DISABLED;
 
 	ScenSelectMenu();
 	MultiGamePlayerSelectorsUpdate(1);
@@ -2828,9 +2828,9 @@ static void EnterNameCancel(void)
 static void EnterNameAction(Menuitem* mi, int key)
 {
 	if (mi->D.Input.nch == 0) {
-		mi[1].Flags = MenuButtonDisabled;
+		mi[1].Flags = MI_FLAGS_DISABLED;
 	} else {
-		mi[1].Flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
 			EndMenu();
 		}
@@ -2852,9 +2852,9 @@ static void EnterServerIPCancel(void)
 static void EnterServerIPAction(Menuitem* mi, int key)
 {
 	if (mi->D.Input.nch == 0) {
-		mi[1].Flags = MenuButtonDisabled;
+		mi[1].Flags = MI_FLAGS_DISABLED;
 	} else {
-		mi[1].Flags &= ~MenuButtonDisabled;
+		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
 			EndMenu();
 		}
@@ -2892,9 +2892,9 @@ static void JoinNetGameMenu(void)
 	menu->Items[1].D.Input.nch = strlen(server_host_buffer) - 3;
 	menu->Items[1].D.Input.maxch = 60;
 	if (menu->Items[1].D.Input.nch) {
-		menu->Items[2].Flags &= ~MenuButtonDisabled;
+		menu->Items[2].Flags &= ~MI_FLAGS_DISABLED;
 	} else {
-		menu->Items[2].Flags |= MenuButtonDisabled;
+		menu->Items[2].Flags |= MI_FLAGS_DISABLED;
 	}
 
 	ProcessMenu("menu-enter-server", 1);
@@ -3076,7 +3076,7 @@ static void MultiPlayerGameMenu(void)
 	strcat(NameBuf, "~!_");
 	menu->Items[1].D.Input.nch = strlen(NameBuf) - 3;
 	menu->Items[1].D.Input.maxch = 15;
-	menu->Items[2].Flags &= ~MenuButtonDisabled;
+	menu->Items[2].Flags &= ~MI_FLAGS_DISABLED;
 
 	ProcessMenu("menu-enter-name", 1);
 
@@ -3755,11 +3755,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			if (i < h) {
 				ServerSetupState.CompOpt[i] = 0;
 			}
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
-
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
 
 			// FIXME: don't forget to throw out additional players
 			//   without available slots here!
@@ -3769,25 +3766,22 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			menu->Items[SERVER_PLAYER_STATE + i].MiType = 0;
 			menu->Items[SERVER_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = 0;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
 			++plyrs;
 			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State |= MI_CSTATE_CHECKED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 1;
 				++ready;
 			}
 
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = 0;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_PASSIVE;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
 		} else {
 			// don't allow network and button events to intercept server player's action on pulldown buttons!
-			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MenuButtonClicked)) {
+			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MI_FLAGS_CLICKED)) {
 				if (initial == 1 ||
 					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MiTypePulldown)) {
 					menu->Items[SERVER_PLAYER_STATE + i].MiType = MiTypePulldown;
 					menu->Items[SERVER_PLAYER_TEXT + i].MiType = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].Flags = 0;
-					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
 					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i];
 				}
 			}
@@ -3795,11 +3789,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 				avail--;
 			}
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
-
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
 		}
 
 
@@ -3807,7 +3798,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			// Allow to switch off (close) preset ai-computer slots
 			// FIXME: evaluate game type...
 			if (initial == 1 && i < h + c) {
-				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = 0;
+				menu->Items[SERVER_PLAYER_STATE + i].Flags &= ~MI_FLAGS_DISABLED;
 				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.noptions = 2;
 				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.options = mgptsoptions + 1;
 				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 0;
@@ -3815,18 +3806,14 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 				menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i] - 1;
 			}
 
-			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
-
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MenuButtonDisabled;
-			menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
+			menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags = MI_FLAGS_DISABLED;
 		}
 
 		if (i >= h + c) {
-			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.state = MI_PSTATE_PASSIVE;
 			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.defopt = 2;
 			menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = 2;
-			menu->Items[SERVER_PLAYER_STATE + i].Flags = MenuButtonDisabled;
+			menu->Items[SERVER_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
 		}
 	}
 
@@ -3840,19 +3827,19 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 	// Disable the select scenario after players have joined.
 	if (plyrs) {
 		// disable Select Scenario button
-		menu->Items[2].Flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MI_FLAGS_DISABLED;
 	} else {
 		// enable Select Scenario button
 		menu->Items[2].Flags = 0;
 	}
 	if (ready == avail) {
-		if (menu->Items[3].Flags == MenuButtonDisabled) {
+		if (menu->Items[3].Flags == MI_FLAGS_DISABLED) {
 			// enable start game button
 			menu->Items[3].Flags = 0;
 		}
 	} else {
 		// disable start game button
-		menu->Items[3].Flags = MenuButtonDisabled;
+		menu->Items[3].Flags = MI_FLAGS_DISABLED;
 	}
 
 	if (MetaServerInUse) {
@@ -3899,30 +3886,20 @@ static void MultiClientUpdate(int initial)
 			menu->Items[CLIENT_PLAYER_STATE + i].MiType = 0;
 			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
 			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State = 0;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
 			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
-					MI_CSTATE_PASSIVE;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = 0;
 			}
 		} else {
 			menu->Items[CLIENT_PLAYER_STATE + i].MiType = MiTypePulldown;
 			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = 0;
-			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.state =
-				MI_PSTATE_PASSIVE;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
 				ServerSetupState.CompOpt[i];
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
-				MI_CSTATE_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_INVISIBLE;
 		}
-		menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = 0;
 
-		if (ServerSetupState.Ready[i]) {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State |=
-				MI_CSTATE_CHECKED;
-		} else {
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State &=
-				~MI_CSTATE_CHECKED;
-		}
+		menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.Checked = !!ServerSetupState.Ready[i];
 
 #if 0
 		if (i != NetLocalHostsSlot) {
@@ -3935,12 +3912,10 @@ static void MultiClientUpdate(int initial)
 		// Unused slots are always disabled.
 		if (i >= h + c) {
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags =
-				MenuButtonDisabled;
-			menu->Items[CLIENT_PLAYER_READY - 1 + i].D.Checkbox.State =
-				MI_CSTATE_INVISIBLE;
+				MI_FLAGS_INVISIBLE;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.defopt =
 				menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt = 2;
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MenuButtonDisabled;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
 		}
 	}
 }
@@ -4018,26 +3993,21 @@ static void NetMultiPlayerDrawFunc(Menuitem* mi)
 	if (i >= 0 && i < PlayerMax - 1) { // Ugly test to detect server
 		if (i > 0) {
 			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags &=
-				~MenuButtonDisabled;
+				~MI_FLAGS_DISABLED;
 			// Note: re-disabled in MultiGamePlayerSelectorsUpdate()
 			// for kicked out clients!!
 			if (ServerSetupState.Ready[i]) {
-				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.D.Checkbox.State = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 1;
 			} else {
-				menu->Items[SERVER_PLAYER_READY - 1 + i]
-						.D.Checkbox.State = MI_CSTATE_PASSIVE;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
+				menu->Items[SERVER_PLAYER_READY - 1 + i].D.Checkbox.Checked = 0;
 			}
 			if (ServerSetupState.LastFrame[i] + 30 > FrameCounter) {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags &=
-					~MenuButtonDisabled;
-				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.D.Checkbox.State = MI_CSTATE_PASSIVE|MI_CSTATE_CHECKED;
+				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |= MI_FLAGS_DISABLED;
+				menu->Items[SERVER_PLAYER_LAG - 1 + i].D.Checkbox.Checked = 1;
 			} else {
-				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |=
-					MenuButtonDisabled;
-				menu->Items[SERVER_PLAYER_LAG - 1 + i]
-						.D.Checkbox.State = MI_CSTATE_PASSIVE;
+				menu->Items[SERVER_PLAYER_LAG - 1 + i].Flags |= MI_FLAGS_DISABLED;
 			}
 
 		}
@@ -4046,13 +4016,11 @@ static void NetMultiPlayerDrawFunc(Menuitem* mi)
 		i = mi - menu->Items - CLIENT_PLAYER_TEXT;
 		if (i > 0) {
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &=
-				~MenuButtonDisabled;
+				~MI_FLAGS_DISABLED;
 			if (i == NetLocalHostsSlot) {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						D.Checkbox.State &= ~MI_CSTATE_PASSIVE;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags &= ~MI_FLAGS_DISABLED;
 			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].
-						D.Checkbox.State |= MI_CSTATE_PASSIVE;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags |= MI_FLAGS_DISABLED;
 			}
 		}
 	}
@@ -4081,11 +4049,11 @@ static void MultiGameClientInit(Menu* menu)
 	// GameSetupInit(mi);
 	MultiClientUpdate(1);
 	if (LocalSetupState.Ready[NetLocalHostsSlot]) {
-		menu->Items[2].Flags = MenuButtonDisabled;
+		menu->Items[2].Flags = MI_FLAGS_DISABLED;
 		menu->Items[3].Flags = 0;
-		menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
+		menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
 	} else {
-		menu->Items[3].Flags = MenuButtonDisabled;
+		menu->Items[3].Flags = MI_FLAGS_DISABLED;
 		menu->Items[2].Flags = 0;
 		menu->Items[CLIENT_RACE].Flags = 0;
 	}
@@ -4109,11 +4077,11 @@ static void MultiClientCheckboxAction(Menuitem* mi)
 	if (i == NetLocalHostsSlot) {
 		LocalSetupState.Ready[i] = !LocalSetupState.Ready[i];
 		if (LocalSetupState.Ready[i]) {
-			mi->Menu->Items[2].Flags = MenuButtonDisabled;
+			mi->Menu->Items[2].Flags = MI_FLAGS_DISABLED;
 			mi->Menu->Items[3].Flags = 0;
-			mi->Menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
+			mi->Menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
 		} else {
-			mi->Menu->Items[3].Flags = MenuButtonDisabled;
+			mi->Menu->Items[3].Flags = MI_FLAGS_DISABLED;
 			mi->Menu->Items[2].Flags = 0;
 			mi->Menu->Items[CLIENT_RACE].Flags = 0;
 		}
@@ -4140,9 +4108,9 @@ static void MultiClientReady(void)
 	Menu* menu;
 
 	menu = FindMenu("menu-net-multi-client");
-	menu->Items[2].Flags = MenuButtonDisabled;
+	menu->Items[2].Flags = MI_FLAGS_DISABLED;
 	menu->Items[3].Flags = 0;
-	menu->Items[CLIENT_RACE].Flags = MenuButtonDisabled;
+	menu->Items[CLIENT_RACE].Flags = MI_FLAGS_DISABLED;
 	LocalSetupState.Ready[NetLocalHostsSlot] = 1;
 	MultiClientUpdate(0);
 }
@@ -4155,7 +4123,7 @@ static void MultiClientNotReady(void)
 	Menu* menu;
 
 	menu = FindMenu("menu-net-multi-client");
-	menu->Items[3].Flags = MenuButtonDisabled;
+	menu->Items[3].Flags = MI_FLAGS_DISABLED;
 	menu->Items[2].Flags = 0;
 	menu->Items[CLIENT_RACE].Flags = 0;
 	LocalSetupState.Ready[NetLocalHostsSlot] = 0;
@@ -4939,11 +4907,11 @@ void EditorEditAiProperties(void)
 
 	menu = FindMenu("menu-editor-edit-ai-properties");
 	if (UnitUnderCursor->Active) {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_CHECKED;
-		menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		menu->Items[1].D.Checkbox.Checked = 1;
+		menu->Items[3].D.Checkbox.Checked = 0;
 	} else {
-		menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
-		menu->Items[3].D.Checkbox.State = MI_CSTATE_CHECKED;
+		menu->Items[1].D.Checkbox.Checked = 0;
+		menu->Items[3].D.Checkbox.Checked = 1;
 	}
 
 	ProcessMenu("menu-editor-edit-ai-properties", 1);
@@ -4955,11 +4923,11 @@ void EditorEditAiProperties(void)
 static void EditorEditAiPropertiesCheckbox(Menuitem* mi)
 {
 	if (&mi->Menu->Items[1] == mi) {
-		mi->D.Checkbox.State = MI_CSTATE_CHECKED;
-		mi->Menu->Items[3].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		mi->D.Checkbox.Checked = 1;
+		mi->Menu->Items[3].D.Checkbox.Checked = 0;
 	} else {
-		mi->D.Checkbox.State = MI_CSTATE_CHECKED;
-		mi->Menu->Items[1].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+		mi->D.Checkbox.Checked = 1;
+		mi->Menu->Items[1].D.Checkbox.Checked = 0;
 	}
 }
 
@@ -4971,7 +4939,7 @@ static void EditorEditAiPropertiesOk(void)
 	Menu* menu;
 
 	menu = CurrentMenu;
-	if (menu->Items[1].D.Checkbox.State == MI_CSTATE_CHECKED) {
+	if (menu->Items[1].D.Checkbox.Checked) {
 		UnitUnderCursor->Active = 1;
 	} else {
 		UnitUnderCursor->Active = 0;
@@ -5216,7 +5184,7 @@ static void ReplayGameInit(Menu* menu)
 {
 	Assert(*ScenSelectPath);
 
-	menu->Items[6].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	menu->Items[6].D.Checkbox.Checked = 0;
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 	ReplayGameLBInit(menu->Items + 1);
 }
@@ -5281,7 +5249,7 @@ static void ReplayGameOk(void)
 		GuiGameStarted = 1;
 		EndMenu();
 
-		if (menu->Items[6].D.Checkbox.State == MI_CSTATE_CHECKED) {
+		if (menu->Items[6].D.Checkbox.Checked) {
 			ReplayRevealMap = 1;
 		} else {
 			ReplayRevealMap = 0;
@@ -5535,7 +5503,7 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 			menu->Items[j + 2].D.Text.text = NULL;
 			menu->Items[j + 3].D.Text.text = NULL;
 			menu->Items[j + 4].D.Text.text = NULL;
-			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+			menu->Items[j + 5].Flags = MI_FLAGS_INVISIBLE;
 		} else {
 			GetMetaParameter(reply, 0, &parameter);       // Player Name
 			menu->Items[j].D.Text.text = NewStringDesc(parameter);
@@ -5549,7 +5517,7 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 			menu->Items[j + 3].D.Text.text = NewStringDesc(parameter);
 			GetMetaParameter(reply, 8, &parameter);
 			menu->Items[j + 4].D.Text.text = NewStringDesc(parameter);
-			menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+			menu->Items[j + 5].D.Checkbox.Checked = 0;
 		}
 		++k;
 	}
@@ -5564,7 +5532,7 @@ static void MultiMetaServerGameSetupInit(Menu* menu)
 		menu->Items[j + 2].D.Text.text = NULL;
 		menu->Items[j + 3].D.Text.text = NULL;
 		menu->Items[j + 4].D.Text.text = NULL;
-		menu->Items[j + 5].D.Checkbox.State = MI_CSTATE_INVISIBLE;
+		menu->Items[j + 5].Flags = MI_FLAGS_DISABLED;
 	}
 }
 
@@ -5602,7 +5570,7 @@ static void SelectGameServer(Menuitem* mi)
 	char* tmp;
 
 	j = mi - mi->Menu->Items;
-	mi->Menu->Items[j].D.Checkbox.State = MI_CSTATE_UNCHECKED;
+	mi->Menu->Items[j].D.Checkbox.Checked = 0;
 	EndMenu();
 
 	tmp = EvalString(mi->Menu->Items[j - 4].D.Text.text);
@@ -5716,7 +5684,7 @@ void UpdateMenuItemButton(Menuitem* items)
 	Assert(items->MiType == MiTypeButton);
 
 	// Enable by default.
-	items->Flags &= ~MenuButtonDisabled;
+	items->Flags &= ~MI_FLAGS_DISABLED;
 	handler = items->D.Button.Handler;
 	// restrict then
 	if (((handler == LoadGameOk || handler == SaveConfirmOk || handler == SaveGameOk) &&
@@ -5754,7 +5722,7 @@ void UpdateMenuItemButton(Menuitem* items)
 			handler == ScenSelectOk || handler == EditorSaveOk) &&
 			(!ScenSelectFileName[0] && !ScenSelectPathName[0]))
 		) {
-		items->Flags = MenuButtonDisabled;
+		items->Flags = MI_FLAGS_DISABLED;
 	}
 
 	//
@@ -5786,10 +5754,10 @@ void UpdateMenuItemButton(Menuitem* items)
 			}
 		}
 		if (handler == MultiScenSelectMenu && plyrs) {
-			items->Flags = MenuButtonDisabled;
+			items->Flags = MI_FLAGS_DISABLED;
 		}
 		if (handler == MultiGameStart && !ready) {
-			items->Flags = MenuButtonDisabled;
+			items->Flags = MI_FLAGS_DISABLED;
 		}
 	}
 

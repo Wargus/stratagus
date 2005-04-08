@@ -947,8 +947,8 @@ void EditorUpdateDisplay(void)
 	//
 	DrawMenuButton(TheUI.MenuButton.Style,
 		(ButtonAreaUnderCursor == ButtonAreaMenu
-			&& ButtonUnderCursor == ButtonUnderMenu ? MenuButtonActive : 0) |
-		(GameMenuButtonClicked ? MenuButtonClicked : 0),
+			&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
+		(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
 		TheUI.MenuButton.X,TheUI.MenuButton.Y,
 		TheUI.MenuButton.Text);
 

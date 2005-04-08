@@ -3259,11 +3259,12 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 			lua_pop(l, 1);
 			item->D.Pulldown.button = scm2buttonid(l, value);
 		} else if (!strcmp(value, "state")) {
+			// FIXME: need generic way to set menuitem as disabled
 			lua_rawgeti(l, j + 1, k + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (!strcmp(value, "passive")) {
-				item->D.Pulldown.state = MI_PSTATE_PASSIVE;
+				item->Flags |= MI_FLAGS_DISABLED;
 			} else {
 				LuaError(l, "Unsupported property: %s" _C_ value);
 			}
@@ -3792,13 +3793,9 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			if (!strcmp(value, "unchecked")) {
-				item->D.Checkbox.State = MI_CSTATE_UNCHECKED;
-			} else if (!strcmp(value, "passive")) {
-				item->D.Checkbox.State = MI_CSTATE_PASSIVE;
-			} else if (!strcmp(value, "invisible")) {
-				item->D.Checkbox.State = MI_CSTATE_INVISIBLE;
+				item->D.Checkbox.Checked = 0;
 			} else if (!strcmp(value, "checked")) {
-				item->D.Checkbox.State = MI_CSTATE_CHECKED;
+				item->D.Checkbox.Checked = 1;
 			}
 		} else if (!strcmp(value, "func")) {
 			lua_rawgeti(l, j + 1, k + 1);
@@ -3889,13 +3886,15 @@ static int CclDefineMenuItem(lua_State* l)
 				lua_pop(l, 1);
 
 				if (!strcmp(value, "active")) {
-					item->Flags |= MenuButtonActive;
+					item->Flags |= MI_FLAGS_ACTIVE;
 				} else if (!strcmp(value, "clicked")) {
-					item->Flags |= MenuButtonClicked;
+					item->Flags |= MI_FLAGS_CLICKED;
 				} else if (!strcmp(value, "selected")) {
-					item->Flags |= MenuButtonSelected;
+					item->Flags |= MI_FLAGS_SELECTED;
 				} else if (!strcmp(value, "disabled")) {
-					item->Flags |= MenuButtonDisabled;
+					item->Flags |= MI_FLAGS_DISABLED;
+				} else if (!strcmp(value, "invisible")) {
+					item->Flags |= MI_FLAGS_INVISIBLE;
 				} else {
 					LuaError(l, "Unknown flag: %s" _C_ value);
 				}
