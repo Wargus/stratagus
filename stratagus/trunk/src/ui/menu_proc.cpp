@@ -147,9 +147,9 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 		VideoDrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
 		SetDefaultTextColors(nc, rc);
 	}
-	if (mit->align & MI_TFLAGS_CENTERED) {
+	if (mit->Align == TextAlignCenter) {
 		VideoDrawTextCentered(x, y,	font, text);
-	} else if (mit->align & MI_TFLAGS_RALIGN) {
+	} else if (mit->Align == TextAlignRight) {
 		VideoDrawText(x - l, y,	font, text);
 	} else {
 		VideoDrawText(x, y,	font, text);

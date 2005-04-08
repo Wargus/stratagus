@@ -3763,8 +3763,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 
 		}
 		if (Hosts[i].PlyNr) {
-			menu->Items[SERVER_PLAYER_STATE + i].MiType = 0;
-			menu->Items[SERVER_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
+			menu->Items[SERVER_PLAYER_STATE + i].Flags |= MI_FLAGS_INVISIBLE;
+			menu->Items[SERVER_PLAYER_TEXT + i].Flags &= ~MI_FLAGS_INVISIBLE;
 
 			menu->Items[SERVER_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
 			++plyrs;
@@ -3779,9 +3779,8 @@ static void MultiGamePlayerSelectorsUpdate(int initial)
 			if (!(menu->Items[SERVER_PLAYER_STATE + i].Flags & MI_FLAGS_CLICKED)) {
 				if (initial == 1 ||
 					(initial == 2 && menu->Items[SERVER_PLAYER_STATE + i].MiType != MiTypePulldown)) {
-					menu->Items[SERVER_PLAYER_STATE + i].MiType = MiTypePulldown;
-					menu->Items[SERVER_PLAYER_TEXT + i].MiType = 0;
-					menu->Items[SERVER_PLAYER_STATE + i].Flags = 0;
+					menu->Items[SERVER_PLAYER_STATE + i].Flags = MI_FLAGS_NONE;
+					menu->Items[SERVER_PLAYER_TEXT + i].Flags |= MI_FLAGS_INVISIBLE;
 					menu->Items[SERVER_PLAYER_STATE + i].D.Pulldown.curopt = ServerSetupState.CompOpt[i];
 				}
 			}
@@ -3873,8 +3872,8 @@ static void MultiClientUpdate(int initial)
 	// Setup defaults, reset values.
 	//
 	if (initial) {
-		menu->Items[CLIENT_PLAYER_STATE].MiType = 0;
-		menu->Items[CLIENT_PLAYER_TEXT].MiType = MiTypeDrawfunc;
+		menu->Items[CLIENT_PLAYER_STATE].Flags |= MI_FLAGS_INVISIBLE;
+		menu->Items[CLIENT_PLAYER_TEXT].Flags &= ~MI_FLAGS_INVISIBLE;
 		memset(&ServerSetupState, 0, sizeof(ServerSetup));
 		memset(&LocalSetupState, 0, sizeof(ServerSetup));
 	}
@@ -3883,17 +3882,17 @@ static void MultiClientUpdate(int initial)
 		// Johns: This works only if initial. Hosts[i].PlyNr is later lost.
 		//
 		if (Hosts[i].PlyNr || i == NetLocalHostsSlot) {
-			menu->Items[CLIENT_PLAYER_STATE + i].MiType = 0;
-			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = MiTypeDrawfunc;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags |= MI_FLAGS_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_TEXT + i].Flags &= ~MI_FLAGS_INVISIBLE;
 			if (i == NetLocalHostsSlot) {
 				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_DISABLED;
 			} else {
-				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = 0;
+				menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_NONE;
 			}
 		} else {
-			menu->Items[CLIENT_PLAYER_STATE + i].MiType = MiTypePulldown;
-			menu->Items[CLIENT_PLAYER_TEXT + i].MiType = 0;
-			menu->Items[CLIENT_PLAYER_STATE + i].Flags = MI_FLAGS_DISABLED;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags &= ~MI_FLAGS_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_TEXT + i].Flags |= MI_FLAGS_INVISIBLE;
+			menu->Items[CLIENT_PLAYER_STATE + i].Flags |= MI_FLAGS_DISABLED;
 			menu->Items[CLIENT_PLAYER_STATE + i].D.Pulldown.curopt =
 				ServerSetupState.CompOpt[i];
 			menu->Items[CLIENT_PLAYER_READY - 1 + i].Flags = MI_FLAGS_INVISIBLE;
@@ -3935,7 +3934,7 @@ static void MultiGameSetupInit(Menu* menu)
 
 	GameSetupInit(menu);
 	NetworkInitServerConnect();
-	menu->Items[SERVER_PLAYER_STATE].MiType = 0;
+	menu->Items[SERVER_PLAYER_STATE].Flags |= MI_FLAGS_INVISIBLE;
 	MultiGameFWSAction(NULL, menu->Items[27].D.Pulldown.defopt);
 
 	memset(&ServerSetupState, 0, sizeof(ServerSetup));
