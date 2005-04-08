@@ -1285,7 +1285,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 	menu = CurrentMenu;
 	if (MenuButtonCurSel != -1 && menu->Items[MenuButtonCurSel].MiType == MiTypeInput) {
 		mi = menu->Items + MenuButtonCurSel;
-		if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+		if (!(mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE))) {
 inkey:
 			if (key >= 0x80 && key < 0x100) {
 				// FIXME ARI: ISO->WC2 Translation here!
@@ -1343,7 +1343,7 @@ normkey:
 			switch (mi->MiType) {
 				case MiTypeButton:
 					if (key == mi->D.Button.HotKey) {
-						if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+						if (!(mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE))) {
 							if (mi->D.Button.Handler) {
 								(*mi->D.Button.Handler)();
 							} else if (mi->LuaHandle) {
@@ -1530,7 +1530,7 @@ normkey:
 						case MiTypeHslider:
 						case MiTypeInput:
 						case MiTypeCheckbox:
-							if (mi->Flags & MI_FLAGS_DISABLED) {
+							if (mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE)) {
 								break;
 							}
 							menu->Items[MenuButtonCurSel].Flags &= ~MI_FLAGS_SELECTED;
@@ -1554,7 +1554,7 @@ normkey:
 			while (i--) {
 				switch (mi->MiType) {
 					case MiTypeInput:
-						if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+						if (!(mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE))) {
 							if (MenuButtonCurSel != -1) {
 								menu->Items[MenuButtonCurSel].Flags &=
 									~MI_FLAGS_SELECTED;
@@ -1672,7 +1672,7 @@ static void MenuHandleMouseMove(int x, int y)
 	// check active (popped-up) pulldown first, as it may overlay other menus!
 	mi = menu->Items;
 	for (i = 0; i < n; ++i) {
-		if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+		if (!(mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE))) {
 			if (mi->MiType == MiTypePulldown && (mi->Flags & MI_FLAGS_CLICKED)) {
 				xs = menu->X + mi->XOfs;
 				ys = menu->Y + mi->YOfs;
@@ -1738,7 +1738,7 @@ static void MenuHandleMouseMove(int x, int y)
 	if (MenuButtonUnderCursor == -1) {
 		for (i = 0; i < n; ++i) {
 			mi = menu->Items + i;
-			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
+			if (!(mi->Flags & (MI_FLAGS_DISABLED | MI_FLAGS_INVISIBLE))) {
 				switch (mi->MiType) {
 					case MiTypeText:
 						if (!mi->D.Text.text || !mi->D.Text.action)
