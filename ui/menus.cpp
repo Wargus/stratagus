@@ -1500,7 +1500,7 @@ static void SaveGameVSAction(Menuitem* mi)
 */
 static void LoadGameInit(Menu* menu)
 {
-	menu->Items[3].Flags = MI_DISABLED;
+	menu->Items[3].Flags = MI_FLAGS_DISABLED;
 	CreateSaveDir();
 	LoadGameLBInit(menu->Items + 1);
 }
@@ -2246,9 +2246,9 @@ static void PreferencesInit(Menu* menu)
 
 	// Not available in net games or replays
 	if (!IsNetworkGame() && ReplayGameType == ReplayNone) {
-		menu->Items[1].Flags = MI_ENABLED;
+		menu->Items[1].Flags = MI_FLAGS_NONE;
 	} else {
-		menu->Items[1].Flags = MI_DISABLED;
+		menu->Items[1].Flags = MI_FLAGS_DISABLED;
 	}
 
 	if (ShowCommandKey) {
@@ -2324,9 +2324,9 @@ static void EndScenarioMenu(void)
 
 	menu = FindMenu("menu-end-scenario");
 	if (!IsNetworkGame()) {
-		menu->Items[1].Flags = MI_ENABLED;
+		menu->Items[1].Flags = MI_FLAGS_NONE;
 	} else {
-		menu->Items[1].Flags = MI_DISABLED;
+		menu->Items[1].Flags = MI_FLAGS_DISABLED;
 	}
 
 	ProcessMenu("menu-end-scenario", 0);
@@ -2379,7 +2379,7 @@ static void GameMenuEnd(void)
 static void VictoryInit(Menu* menu)
 {
 	if (CommandLogDisabled) {
-		menu->Items[3].Flags = MI_DISABLED;
+		menu->Items[3].Flags = MI_FLAGS_DISABLED;
 	}
 }
 
@@ -2389,7 +2389,7 @@ static void VictoryInit(Menu* menu)
 static void DefeatedInit(Menu* menu)
 {
 	if (CommandLogDisabled) {
-		menu->Items[3].Flags = MI_DISABLED;
+		menu->Items[3].Flags = MI_FLAGS_DISABLED;
 	}
 }
 
@@ -2694,7 +2694,7 @@ static void MultiScenSelectMenu(void)
 	ScenSelectMenu();
 	MultiGamePlayerSelectorsUpdate(1);
 
-	menu->Items[6].Flags = MI_DISABLED;
+	menu->Items[6].Flags = MI_FLAGS_DISABLED;
 }
 
 /**
