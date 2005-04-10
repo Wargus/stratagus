@@ -2760,6 +2760,50 @@ static int CclDefineCheckboxStyle(lua_State* l)
 }
 
 /**
+**  Free Menu content.
+**
+**  @param menu  menu to free.
+*/
+static void FreeMenu(Menu *menu)
+{
+	int i;
+
+	if (menu == NULL) {
+		return;
+	}
+	free(menu->Panel);
+	FreeGraphic(menu->BackgroundG);
+	for (i = 0; i < menu->NumItems; ++i) {
+		switch (menu->Items[i].MiType) {
+			case MiTypeText:
+				FreeStringDesc(menu->Items[i].D.Text.text);
+				free(menu->Items[i].D.Text.text);
+				free(menu->Items[i].D.Text.normalcolor);
+				free(menu->Items[i].D.Text.normalcolor);
+				break;
+			case MiTypeButton:
+				free(menu->Items[i].D.Button.Text);
+				break;
+			case MiTypePulldown: {
+				int j;
+
+				j = menu->Items[i].D.Pulldown.noptions - 1;
+				for (; j >= 0; --j) {
+					free(menu->Items[i].D.Pulldown.options[j]);
+				}
+				free(menu->Items[i].D.Pulldown.options);
+				break;
+			}
+			default:
+				break;
+		}
+		free(menu->Items[i].Id);
+	}
+	free(menu->Items);
+	memset(menu, 0, sizeof(*menu));
+}
+
+/**
 **  Define a menu
 **
 **  @param l  Lua state.
@@ -2769,7 +2813,7 @@ static int CclDefineMenu(lua_State* l)
 	const char* value;
 	Menu* menu;
 	Menu item;
-	char* name;
+	const char* name;
 	void** func;
 	int args;
 	int j;
@@ -2805,7 +2849,7 @@ static int CclDefineMenu(lua_State* l)
 			lua_pop(l, 1);
 
 		} else if (!strcmp(value, "name")) {
-			name = strdup(LuaToString(l, j + 1));
+			name = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "panel")) {
 			if (strcmp(LuaToString(l, j + 1), "none")) {
 				item.Panel = strdup(LuaToString(l, j + 1));
@@ -2853,45 +2897,8 @@ static int CclDefineMenu(lua_State* l)
 			menu = malloc(sizeof(Menu));
 			*(Menu**)hash_add(MenuHash, name) = menu;
 		} else {
-			int i;
-
-			free(menu->Panel);
-			FreeGraphic(menu->BackgroundG);
-			for (i = 0; i < menu->NumItems; ++i) {
-				switch (menu->Items[i].MiType) {
-					case MiTypeText:
-						if (menu->Items[i].D.Text.text) {
-							free(menu->Items[i].D.Text.text);
-						}
-						if (menu->Items[i].D.Text.normalcolor) {
-							free(menu->Items[i].D.Text.normalcolor);
-						}
-						if (menu->Items[i].D.Text.reversecolor) {
-							free(menu->Items[i].D.Text.normalcolor);
-						}
-						break;
-					case MiTypeButton:
-						if (menu->Items[i].D.Button.Text) {
-							free(menu->Items[i].D.Button.Text);
-						}
-						break;
-					case MiTypePulldown: {
-						int j;
-						j = menu->Items[i].D.Pulldown.noptions-1;
-						for (; j >= 0; --j) {
-							free(menu->Items[i].D.Pulldown.options[j]);
-						}
-						free(menu->Items[i].D.Pulldown.options);
-						break;
-					}
-					default:
-						break;
-				}
-			}
-			free(menu->Items);
-			menu->Items = NULL;
+			FreeMenu(menu);
 		}
-		menu->NumItems = 0; // reset to zero
 		memcpy(menu, &item, sizeof(Menu));
 		//move the buttons for different resolutions..
 		if (VideoWidth != 640) {
@@ -2908,8 +2915,6 @@ static int CclDefineMenu(lua_State* l)
 				menu->Y += TheUI.Offset480Y;
 			}
 		}
-		//printf("Me:%s\n", name);
-		free(name);
 	} else {
 		fprintf(stderr, "Name of menu is missed, skip definition\n");
 	}
@@ -3215,9 +3220,7 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 
 				subsubargs = luaL_getn(l, -1);
 				item->D.Pulldown.noptions = subsubargs;
-				if (item->D.Pulldown.options) {
-					free(item->D.Pulldown.options);
-				}
+				free(item->D.Pulldown.options);
 				item->D.Pulldown.options = malloc(sizeof(unsigned char*) * subsubargs);
 				for (subk = 0; subk < subsubargs; ++subk) {
 					lua_rawgeti(l, -1, subk + 1);
@@ -4186,18 +4189,10 @@ static int CclDefineButton(lua_State* l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
 		ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.UnitMask);
-	if (ba.ValueStr) {
-		free(ba.ValueStr);
-	}
-	if (ba.AllowStr) {
-		free(ba.AllowStr);
-	}
-	if (ba.Hint) {
-		free(ba.Hint);
-	}
-	if (ba.UnitMask) {
-		free(ba.UnitMask);
-	}
+	free(ba.ValueStr);
+	free(ba.AllowStr);
+	free(ba.Hint);
+	free(ba.UnitMask);
 
 	return 0;
 }
@@ -4503,10 +4498,8 @@ static int CclResetKeystrokeHelp(lua_State* l)
 	while (n--) {
 		free(KeyStrokeHelps[n]);
 	}
-	if (KeyStrokeHelps) {
-		free(KeyStrokeHelps);
-		KeyStrokeHelps = NULL;
-	}
+	free(KeyStrokeHelps);
+	KeyStrokeHelps = NULL;
 	nKeyStrokeHelps = 0;
 
 	return 0;
