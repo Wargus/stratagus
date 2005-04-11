@@ -82,12 +82,23 @@ static void ExtendTilesetTables(Tileset* tileset, int tiles)
 */
 static int TilesetParseName(lua_State* l, Tileset* tileset)
 {
+	char* ident;
+	int i;
+	
+	ident = strdup(LuaToString(l, -1));
+	for (i = 0; i < tileset->NumTerrainTypes; ++i) {
+		if (!strcmp(ident, tileset->SolidTerrainTypes[i].TerrainName)) {
+			free(ident);
+			return i;
+		}
+	}
+
 	// Can't find it, then we add another solid terrain type.
 	tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
 		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
-	tileset->SolidTerrainTypes[0].TerrainName = strdup("");
-
-	return 0;
+	tileset->SolidTerrainTypes[i].TerrainName = ident;
+	
+	return i;
 }
 
 /**
