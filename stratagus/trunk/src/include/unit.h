@@ -755,7 +755,7 @@ extern int MaxSelectable;                  /// How many units could be selected
 extern Unit** Selected;                    /// currently selected units
 extern Unit** TeamSelected[PlayerMax];     /// teams currently selected units
 extern int    NumSelected;                 /// how many units selected
-extern int    NumTeamSelected[PlayerMax];  /// Number of Units a team member has selected
+extern int    TeamNumSelected[PlayerMax];  /// Number of Units a team member has selected
 
 extern Unit* ReleasedHead;                 /// Head of the released unit list.
 extern Unit* ReleasedTail;                 /// Tail of the released unit list.
@@ -1039,6 +1039,10 @@ extern void GroupCclRegister(void);
 	/// Check if unit is the currently only selected
 #define IsOnlySelected(unit) (NumSelected == 1 && Selected[0] == (unit))
 
+	///  Save selection to restore after.
+extern void SaveSelection(void);
+	///  Restore selection.
+extern void RestoreSelection(void);
 	/// Clear current selection
 extern void UnSelectAll(void);
 	/// Select group as selection
