@@ -424,9 +424,8 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 		player->UnitTypesCount[type->Slot]++;
 	}
 
-	if (type->Demand) {
-		player->Demand += type->Demand; // food needed
-	}
+	player->Demand += type->Demand; // food needed
+
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
 		// FIXME: support more races
@@ -971,17 +970,13 @@ void UnitLost(Unit* unit)
 	//
 	//  Handle unit demand. (Currently only food supported.)
 	//
-	if (type->Demand) {
-		player->Demand -= type->Demand;
-	}
+	player->Demand -= type->Demand;
 
 	//
 	//  Update information.
 	//
 	if (unit->Orders[0].Action != UnitActionBuilt) {
-		if (type->Supply) {
-			player->Supply -= type->Supply;
-		}
+		player->Supply -= type->Supply;
 
 		//
 		//  Handle income improvements, look if a player loses a building
@@ -1079,7 +1074,7 @@ void UpdateForNewUnit(const Unit* unit, int upgrade)
 	// Handle unit supply. (Currently only food supported.)
 	// Note an upgraded unit can't give more supply.
 	//
-	if (type->Supply && !upgrade) {
+	if (!upgrade) {
 		player->Supply += type->Supply;
 	}
 
