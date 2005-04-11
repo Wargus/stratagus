@@ -61,12 +61,59 @@ int MaxSelectable;               /// Maximum number of selected units
 Unit** Selected;                 /// All selected units
 Unit** TeamSelected[PlayerMax];  /// teams currently selected units
 
+static int _NumSelected;                 /// save of NumSelected
+static int _TeamNumSelected[PlayerMax];  /// save of TeamNumSelected
+static Unit** _Selected;                 /// save of Selected
+static Unit** _TeamSelected[PlayerMax];  /// save of TeamSelected
 
 static unsigned GroupId;         /// Unique group # for automatic groups
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
+
+/**
+**  Save selection to restore after.
+*/
+void SaveSelection(void)
+{
+	int i;
+	int j;
+
+	for (i = 0; i < PlayerMax; ++i) {
+		_TeamNumSelected[i] = TeamNumSelected[i];
+		for (j = 0; j < TeamNumSelected[i]; ++j) {
+			_TeamSelected[i][j] = TeamSelected[i][j];
+		}
+	}
+	_NumSelected = NumSelected;
+	for (j = 0; j < NumSelected; ++j) {
+		_Selected[j] = Selected[j];
+	}
+}
+
+/**
+**  Restore selection.
+*/
+void RestoreSelection(void)
+{
+	int i;
+	int j;
+
+	UnSelectAll();
+	for (i = 0; i < PlayerMax; ++i) {
+		TeamNumSelected[i] = _TeamNumSelected[i];
+		for (j = 0; j < _TeamNumSelected[i]; ++j) {
+			TeamSelected[i][j] = _TeamSelected[i][j];
+			TeamSelected[i][j]->TeamSelected |= (1 << i);
+		}
+	}
+	NumSelected = _NumSelected;
+	for (j = 0; j < _NumSelected; ++j) {
+		Selected[j] = _Selected[j];
+		Selected[j]->Selected = 1;
+	}
+}
 
 /**
 ** Unselect all the units in the current selection
@@ -1058,14 +1105,12 @@ void InitSelections(void)
 {
 	int i;
 
-	if (!Selected) {
-		Selected = malloc(MaxSelectable * sizeof(Unit*));
-	}
-
+	CleanSelections();
+	Selected = malloc(MaxSelectable * sizeof(Unit*));
+	_Selected = malloc(MaxSelectable * sizeof(Unit*));
 	for (i = 0; i < PlayerMax; ++i) {
-		if (!TeamSelected[i]) {
-			TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
-		}
+		TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+		_TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
 	}
 }
 
@@ -1101,15 +1146,19 @@ void CleanSelections(void)
 
 	GroupId = 0;
 	NumSelected = 0;
-	Assert(!NoUnitP); // Code fails if none zero
 	free(Selected);
+	free(_Selected);
 	Selected = NULL;
+	_Selected = NULL;
 
 	for (i = 0; i < PlayerMax; ++i) {
 		free(TeamSelected[i]);
-		TeamSelected[i] = NULL;
-		TeamNumSelected[i] = 0;
+		free(_TeamSelected[i]);
 	}
+	memset(TeamSelected, 0, PlayerMax * sizeof(*TeamSelected));
+	memset(_TeamSelected, 0, PlayerMax * sizeof(*_TeamSelected));
+	memset(TeamNumSelected, 0, PlayerMax * sizeof(*TeamNumSelected));
+	memset(_TeamNumSelected, 0, PlayerMax * sizeof(*_TeamNumSelected));
 }
 
 // ----------------------------------------------------------------------------
