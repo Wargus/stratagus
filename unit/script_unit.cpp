@@ -1350,9 +1350,9 @@ static int CclSetUnitMana(lua_State* l)
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	mana = LuaToNumber(l, 2);
-	if (unit->Type->CanCastSpell && unit->Stats->Mana) {
-		if (mana > unit->Stats->Mana) {
-			unit->Mana = unit->Stats->Mana;
+	if (unit->Type->CanCastSpell) {
+		if (mana > unit->Stats->Variables[MANA_INDEX].Max) {
+			unit->Mana = unit->Stats->Variables[MANA_INDEX].Max;
 		} else {
 			unit->Mana = mana;
 		}

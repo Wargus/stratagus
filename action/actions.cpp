@@ -365,11 +365,11 @@ static void HandleRegenerations(Unit* unit)
 	int f;
 
 	// Mana
-	if (unit->Type->CanCastSpell && unit->Mana != unit->Stats->Mana) {
+	if (unit->Type->CanCastSpell) {
 		unit->Mana++;
 
-		if (unit->Mana > unit->Stats->Mana) {
-			unit->Mana = unit->Stats->Mana;
+		if (unit->Mana > unit->Stats->Variables[MANA_INDEX].Max) {
+			unit->Mana = unit->Stats->Variables[MANA_INDEX].Max;
 		}
 	}
 

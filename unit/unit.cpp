@@ -438,7 +438,7 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
 		unit->HP = unit->Stats->HitPoints;
-		unit->Mana = (unit->Stats->Mana * MAGIC_FOR_NEW_UNITS) / 100;
+		unit->Mana = (unit->Stats->Variables[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
 		if (UnitTypeVar.NumberVariable) {
 			Assert(unit->Variable);
 			Assert(unit->Stats->Variables);

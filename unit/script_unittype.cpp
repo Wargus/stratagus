@@ -1119,7 +1119,6 @@ static int CclDefineUnitStats(lua_State* l)
 		}
 	}
 
-	stats->Mana = stats->Variables[MANA_INDEX].Max;
 	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
 	stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
 	stats->HitPoints = stats->Variables[HP_INDEX].Max;
@@ -1948,7 +1947,7 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// Mana.
 	unit->Variable[MANA_INDEX].Value = unit->Mana;
-	unit->Variable[MANA_INDEX].Max = unit->Stats->Mana;
+	unit->Variable[MANA_INDEX].Max = unit->Stats->Variables[MANA_INDEX].Max;
 
 	// Transport
 	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;

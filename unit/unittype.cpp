@@ -177,7 +177,6 @@ void UpdateStats(int reset)
 				stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
 				stats->HitPoints = type->_HitPoints;
 				stats->RegenerationRate = stats->Variables[HP_INDEX].Increase;
-				stats->Mana = stats->Variables[MANA_INDEX].Max;
 
 				stats->Variables[SIGHTRANGE_INDEX].Max = stats->SightRange;
 				stats->Variables[HP_INDEX].Max = stats->HitPoints;
