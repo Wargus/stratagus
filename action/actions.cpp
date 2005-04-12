@@ -391,8 +391,11 @@ static void HandleRegenerations(Unit* unit)
 	// Health doesn't regenerate while burning.
 	if (!f && unit->Stats) {
 		// Unit may not have stats assigned to it
-		if (unit->Stats->RegenerationRate && unit->HP < unit->Stats->HitPoints) {
-			unit->HP += unit->Stats->RegenerationRate;
+		if (unit->Stats->Variables[HP_INDEX].Increase) {
+			unit->HP += unit->Stats->Variables[HP_INDEX].Increase;
+			if (unit->HP <= 0) { // FIXME ? kill it ?
+				unit->HP = 1;
+			}
 			if (unit->HP > unit->Stats->HitPoints) {
 				unit->HP = unit->Stats->HitPoints;
 			}
