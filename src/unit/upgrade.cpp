@@ -1074,7 +1074,6 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 				}
 			}
 			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.Variables[HP_INDEX].Max;
-			UnitTypes[z]->Stats[pn].RegenerationRate += um->Modifier.Variables[HP_INDEX].Increase;
 
 			// upgrade costs :)
 			for (j = 0; j < MaxCosts; ++j) {

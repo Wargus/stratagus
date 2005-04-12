@@ -128,7 +128,6 @@ typedef struct _unit_stats_ {
 	int AttackRange;                /// how far can the unit attack
 	int SightRange;                 /// how far can the unit see
 	int HitPoints;                  /// hit points
-	int RegenerationRate;           /// HP regeration rate in HP
 	int Costs[MaxCosts];            /// current costs of the unit
 } UnitStats;
 
