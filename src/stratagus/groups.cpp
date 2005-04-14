@@ -41,6 +41,7 @@
 
 #include "stratagus.h"
 #include "unit.h"
+#include "unittype.h"
 #include "script.h"
 
 /*----------------------------------------------------------------------------
@@ -174,9 +175,22 @@ void AddToGroup(Unit** units, int nunits, int num)
 	Assert(num <= NUM_GROUPS);
 
 	group = &Groups[num];
+	// Check to make sure we don't have a building as the only group member
+	// If so, we are unable to add these units to the group.
+	if (group->NumUnits == 1 && !group->Units[0]->Type->SelectableByRectangle) {
+		return;
+	}
 	for (i = 0; group->NumUnits < MaxSelectable && i < nunits; ++i) {
-		group->Units[group->NumUnits++] = units[i];
-		units[i]->GroupId |= (1 << num);
+		// Add to group only if they are on our team, and are rectangle
+		// selectable.  Otherwise buildings and units can be in a group.
+		// or enemy units and my units. Exceptions is when there is only
+		// one unit in the group, then we can group a buildings.
+		if (PlayersTeamed(ThisPlayer->Player, units[i]->Player->Player) &&
+			(units[i]->Type->SelectableByRectangle ||
+			 (nunits == 1 && group->NumUnits == 0))) {
+			group->Units[group->NumUnits++] = units[i];
+			units[i]->GroupId |= (1 << num);
+		}
 	}
 }
 

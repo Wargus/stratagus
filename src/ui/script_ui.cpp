@@ -4202,6 +4202,14 @@ static int CclDefineButton(lua_State* l)
 */
 void SelectionChanged(void)
 {
+	// We Changed out selection, anything pending buttonwise must be cleared
+	ClearStatusLine();
+	ClearCosts();
+	CurrentButtonLevel = 0;
+	UpdateButtonPanel();
+	GameCursor = TheUI.Point.Cursor;
+	CursorBuilding = NULL;
+	CursorState = CursorStatePoint;
 	UpdateButtonPanel();
 }
 
