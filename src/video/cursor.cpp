@@ -59,7 +59,7 @@
 /**
 **  Cursor-type type definition
 */
-int CursorMax = 0; /// Number of cursor.
+int CursorMax; /// Number of cursor.
 
 /**
 **  Define cursor-types.
@@ -89,17 +89,6 @@ int CursorStartScrMapY;
 
 
 /*--- DRAW BUILDING  CURSOR ------------------------------------------------*/
-static int BuildingCursor;           /// Flag (0/1): last cursor was building
-
-	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-static int BuildingCursorSX;
-	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-static int BuildingCursorSY;
-	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-static int BuildingCursorEX;
-	/// area of tiles covered by building cursor (SX,SY;EX,EY)
-static int BuildingCursorEY;
-
 UnitType* CursorBuilding;           /// building cursor
 
 
@@ -138,7 +127,7 @@ void LoadCursors(const char* race)
 }
 
 /**
-**  Find the cursor-type of with this identifier.
+**  Find the cursor-type of this identifier.
 **
 **  @param ident  Identifier for the cursor (from config files).
 **
@@ -161,10 +150,6 @@ CursorType* CursorTypeByIdent(const char* ident)
 	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident);
 	return NULL;
 }
-
-/*----------------------------------------------------------------------------
---  DRAW RECTANGLE CURSOR
-----------------------------------------------------------------------------*/
 
 /**
 **  Draw rectangle cursor when visible
@@ -214,25 +199,6 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	}
 }
 
-/*----------------------------------------------------------------------------
---  DRAW SPRITE CURSOR
-----------------------------------------------------------------------------*/
-/**
-**  Draw (sprite) cursor
-**
-**  @param type   Cursor-type of the cursor to draw.
-**  @param x      Screen x pixel position.
-**  @param y      Screen y pixel position.
-**  @param frame  Animation frame # of the cursor.
-*/
-static void DrawCursor(const CursorType* type, int x, int y, int frame)
-{
-	VideoDrawClip(type->G, frame, x - type->HotX, y - type->HotY);
-}
-
-/*----------------------------------------------------------------------------
---  DRAW BUILDING CURSOR
-----------------------------------------------------------------------------*/
 /**
 **  Draw cursor for selecting building position.
 */
@@ -257,8 +223,8 @@ static void DrawBuildingCursor(void)
 	vp = TheUI.MouseViewport;
 	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
 	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
-	BuildingCursorSX = mx = Viewport2MapX(vp, x);
-	BuildingCursorSY = my = Viewport2MapY(vp, y);
+	mx = Viewport2MapX(vp, x);
+	my = Viewport2MapY(vp, y);
 	ontop = NULL;
 
 	//
@@ -293,13 +259,11 @@ static void DrawBuildingCursor(void)
 
 	mask = CursorBuilding->MovementMask;
 	h = CursorBuilding->TileHeight;
-	BuildingCursorEY = my + h - 1;
 	// reduce to view limits
 	if (my + h > vp->MapY + vp->MapHeight) {
 		h = vp->MapY + vp->MapHeight - my;
 	}
 	w0 = CursorBuilding->TileWidth;
-	BuildingCursorEX = mx + w0 - 1;
 	if (mx + w0 > vp->MapX + vp->MapWidth) {
 		w0 = vp->MapX + vp->MapWidth - mx;
 	}
@@ -324,46 +288,28 @@ static void DrawBuildingCursor(void)
 }
 
 
-/*----------------------------------------------------------------------------
---  DRAW/HIDE CURSOR (interface for the outside world)
-----------------------------------------------------------------------------*/
 /**
-**  Draw the cursor and prepare to be restored by HideAnyCursor again.
-**  Note: This function can be called, without calling HideAnyCursor first,
-**        which means that this function should re-use/free memory of the
-**        last call.
-**  When calling multiple times, the old cursor is expected to be
-**  overdrawn by something else (else HideAnyCursor is needed!)
-**  Also the cursors are not invalidated (refresh on real screen)
-**  here, but this is done by InvalidateCursorAreas.
-**
-**  FIXME: event handler should be temporary stopped while copying
-**         CursorX, CursorY,.. because between two copy commands another
-**         event can occure, which let invalid mouse position be delivered.
+**  Draw the cursor.
 */
-void DrawAnyCursor(void)
+void DrawCursor(void)
 {
-	//
-	//  First, Selecting rectangle
-	//
+	// Selecting rectangle
 	if (CursorState == CursorStateRectangle &&
 			(CursorStartX != CursorX || CursorStartY != CursorY)) {
 		DrawVisibleRectangleCursor(CursorStartX, CursorStartY, CursorX, CursorY);
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
-		//
-		//  Or Selecting position for building
-		//
+		// Selecting position for building
 		DrawBuildingCursor();
-		BuildingCursor = 1;
 	}
 
 	//
 	//  Last, Normal cursor.
-	//  Cursor May not Exist if we are loading a game or something. Only
+	//  Cursor may not exist if we are loading a game or something. Only
 	//  draw it if it exists
 	//
 	if (GameCursor) {
-		DrawCursor(GameCursor, CursorX, CursorY, GameCursor->SpriteFrame);
+		VideoDrawClip(GameCursor->G, GameCursor->SpriteFrame,
+			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
 	}
 }
 

@@ -10,7 +10,7 @@
 //
 /**@name editloop.c - The editor main loop. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -988,7 +988,7 @@ void EditorUpdateDisplay(void)
 	//
 	DrawStatusLine();
 
-	DrawAnyCursor();
+	DrawCursor();
 
 	// FIXME: For now update everything each frame
 
