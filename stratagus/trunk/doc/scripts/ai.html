@@ -75,9 +75,14 @@
 
 Everything around the control of the Stratagus AI.
 
+<p>
+Warning: The AI documentation is slightly outdated. This documentation hasn't 
+been fully converted to the lua API yet.
+<p>
+
 <h2>How does it work</h2>
 
-AI in Stratagus is script based. Each AI player keeps executing scheme-like scripts.
+AI in Stratagus is script based. Each AI player keeps executing scripts.
 There are two kinds of scripts : 
 <ul>
   <li>The main script. It starts buildings, upgrades, ...</li>
@@ -96,12 +101,11 @@ Attack forces will only be created using units available in those forces.<br>
 <br>
 The main script is responsible for setting minimums for the forces 0 and 1. This will influence the balance
 between defend and attack for an AI player.<br>
-
 <br>
 
 <h2>Functions</h2>
 <a name="DefineAi"></a>
-<h3>(DefineAi name race class script)</h3>
+<h3>DefineAi(name, race, class, script)</h3>
 
 This defines how a special AI works. Each level can use his own AI definition.
 
@@ -137,7 +141,7 @@ time the next statement is executed. No statement should use more than 3 ms.
 </pre>
 
 <a name="DefineAiHelper"></a>
-<h3>(DefineAiHelper (list))</h3>
+<h3>DefineAiHelper(list)</h3>
 
 The AI is complete configurable, nothing is hardcoded. The AI knows nothing
 about any units without this table. This table defines F.E. what unit can build
@@ -252,7 +256,7 @@ A minimal AI helper definition:
 <p>For the AI is a keep equivalent to a town hall.
 
 <a name="DefineAiPlayer"></a>
-<h3>(DefineAiPlayer (list ...))</h3>
+<h3>DefineAiPlayer(list, ...)</h3>
 
 Define an AI player. (NOT SUPPORTED)
 
@@ -325,7 +329,7 @@ supported.
 </pre>
 
 <a name="AiDebug"></a>
-<h3>(AiDebug flag)</h3>
+<h3>AiDebug(flag)</h3>
 
 Enable or disable the debug output of the AI script execution.
 
@@ -344,7 +348,7 @@ Enable or disable the debug output of the AI script execution.
 </pre>
 
 <a name="AiDebugPlayer"></a>
-<h3>(AiDebugPlayer 1 2 3 ...)</h3>
+<h3>AiDebugPlayer(1, 2, 3, ...)</h3>
 
 Activate dump of AI forces and strategy on stdout.<br>
 Parameters are player number, or 'self, for thisplayer.<br>
@@ -357,7 +361,7 @@ Parameters are player number, or 'self, for thisplayer.<br>
 </pre>
 
 <a name="AiDump"></a>
-<h3>(AiDump)</h3>
+<h3>AiDump()</h3>
 
 Dump some AI debug information.
 
@@ -370,7 +374,7 @@ Dump some AI debug information.
 </pre>
 
 <a name="AiForce"></a>
-<h3>(AiForce force unit-type-1 count-1 ... unit-type-N count-N)</h3>
+<h3>AiForce(force, unit-type-1, count-1, ... ,unit-type-N, count-N)</h3>
 
 Define a force, what and how many units should belong to a force. Up to 10
 forces are currently supported.
@@ -414,14 +418,14 @@ each unit-type one after the other?</i>
 </pre>
 
 <a name="AiForceRole"></a>
-<h3>(AiForceRole force role)</h3>
+<h3>AiForceRole(force, role)</h3>
 
 Define the role of a force.
 
 
 <dl>
 <dt>force</dt>
-<dd>Number of the force to which the units should belong. 0 - 9 is currently
+<dd>Number of the force to which the units belong. 0 - 9 is currently
 supported.
 </dd>
 <dt>role</dt>
@@ -433,11 +437,11 @@ supported.
 
 <pre>
     ;; Sets the role of force 0 to attack.
-    (AiForceRole 0 'attack)
+    AiForceRole(0, 'attack)
 </pre>
 
 <a name="AiGetRace"></a>
-<h3>(AiGetRace)</h3>
+<h3>AiGetRace()</h3>
 
 Get the race of the current AI player.
 
@@ -445,12 +449,12 @@ Get the race of the current AI player.
 <h4>Example</h4>
 
 <pre>
-    ;; Returns the race name of the current AI player.
-    (AiGetRace)
+    -- Returns the race name of the current AI player.
+    AiGetRace()
 </pre>
 
 <a name="AiGetSleepCycles"></a>
-<h3>(AiGetSleepCycles)</h3>
+<h3>AiGetSleepCycles()</h3>
 
 Get the number of cycles to sleep.
 
@@ -458,11 +462,11 @@ Get the number of cycles to sleep.
 <h4>Example</h4>
 
 <pre>
-    ;; Returns the number of cycles to sleep.
-    (AiGetSleepCycles)
+    -- Returns the number of cycles to sleep.
+    AiGetSleepCycles()
 </pre>
 
-<h3>(AiNeed unit-type)</h3>
+<h3>AiNeed(unit-type)</h3>
 
 Tells the AI that it should have an unit of this unit-type. The AI builds or
 trains units in this order of the AiSet/AiNeed commands. If the unit or an
@@ -487,7 +491,7 @@ additional could be requested.
 </pre>
 
 <a name="AiPlayer"></a>
-<h3>(AiPlayer)</h3>
+<h3>AiPlayer()</h3>
 
 Return the player of the running AI.
 
@@ -495,12 +499,12 @@ Return the player of the running AI.
 <h4>Example</h4>
 
 <pre>
-    ;; Returns the player of the running AI.
-    (AiPlayer)
+    -- Returns the player of the running AI.
+    player = AiPlayer()
 </pre>
 
 <a name="AiResearch"></a>
-<h3>(AiResearch upgrade)</h3>
+<h3>AiResearch(upgrade)</h3>
 
 Let the AI research an upgrade, upgrades are reseached in command order.
 And automatic researched if lost. Building orders have a higher priority.
@@ -517,12 +521,12 @@ AI could hang up.
 <h4>Example</h4>
 
 <pre>
-    ;; Research a better armor for land units.
-    (AiResearch 'upgrade-shield1)
+    -- Research a better armor for land units.
+    AiResearch("upgrade-shield1")
 </pre>
 
 <a name="AiSet"></a>
-<h3>(AiSet unit-type count)</h3>
+<h3>AiSet(unit-type, count)</h3>
 
 This AiNeed with a number. Tells the AI that it should have a specified number
 of an unit of this unit-type. The AI builds or trains units in this order of
@@ -546,12 +550,12 @@ modifies the last request to the new number.
 <h4>Example</h4>
 
 <pre>
-    ;; Request two peons.
-    (AiSet 'unit-peon 2)
+    --  Request two assault units.
+    AiSet("unit-assault", 2)
 </pre>
 
 <a name="AiSetCollect"></a>
-<h3>(AiSetCollect #(time gold wood oil ore stone coal))</h3>
+<h3>AiSetCollect(time, resource1, resource2, ...)</h3>
 
 Set AI player resource collect percent.
 
@@ -560,23 +564,8 @@ Set AI player resource collect percent.
 <dt>time</dt>
 <dd>Time in game cycles.
 </dd>
-<dt>gold</dt>
-<dd>Gold resource.
-</dd>
-<dt>wood</dt>
-<dd>Wood resource.
-</dd>
-<dt>oil</dt>
-<dd>Oil resource.
-</dd>
-<dt>ore</dt>
-<dd>Ore resource.
-</dd>
-<dt>stone</dt>
-<dd>Stone resource.
-</dd>
-<dt>coal</dt>
-<dd>Coal resource.
+<dt>resource1</dt>
+<dd>Percentage needed for the first resource.
 </dd>
 </dl>
 
@@ -584,11 +573,11 @@ Set AI player resource collect percent.
 
 <pre>
     ;; Set the collect percent to 50% gold and 50% wood.
-    (AiSetCollect #(0  50 50 0  0 0 0))
+    AiSetCollect(0, 50, 50, 0, 0, 0, 0)
 </pre>
 
 <a name="AiSetReserve"></a>
-<h3>(AiSetReserve #( time gold wood oil ore stone coal))</h3>
+<h3>AiSetReserve(time, resource1, ...)</h3>
 
 Set AI player resource reserve.
 
@@ -597,35 +586,20 @@ Set AI player resource reserve.
 <dt>time</dt>
 <dd>Time in game cycles.
 </dd>
-<dt>gold</dt>
-<dd>Gold resource.
-</dd>
-<dt>wood</dt>
-<dd>Wood resource.
-</dd>
-<dt>oil</dt>
-<dd>Oil resource.
-</dd>
-<dt>ore</dt>
-<dd>Ore resource.
-</dd>
-<dt>stone</dt>
-<dd>Stone resource.
-</dd>
-<dt>coal</dt>
-<dd>Coal resource.
+<dt>reource1</dt>
+<dd>first resource.
 </dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    ;; Set all of the reserves to 0.
-    (AiSetReserve #( 0  0 0 0  0 0 0))
+    -- Set all of the reserves to 0.
+    AiSetReserve(0, 0, 0, 0, 0, 0, 0)
 </pre>
 
 <a name="AiSleep"></a>
-<h3>(AiSleep frames)</h3>
+<h3>AiSleep(frames)</h3>
 
 Wait some frames, to let the opponent (you) recover.
 
@@ -639,12 +613,14 @@ Wait some frames, to let the opponent (you) recover.
 <h4>Example</h4>
 
 <pre>
-    ;; Wait 500 frames ~16s.
-    (AiSleep 500)
+    {
+      -- Wait 500 frames ~16s.
+      function() return AiSleep(500) end,
+    }
 </pre>
 
 <a name="AiUpgradeTo"></a>
-<h3>(AiUpgradeTo unit-type)</h3>
+<h3>AiUpgradeTo(unit-type)</h3>
 
 Upgrade units to an improved type. You must give for each unit you want to
 upgrade an upgrade command. The computer automatic searches which unit it
@@ -660,16 +636,15 @@ upgrades.
 <h4>Example</h4>
 
 <pre>
-    ;; Upgrade a town-hall to keep.
-    (AiUpgradeTo 'unit-keep)
+    -- Upgrade a town-hall to keep.
+    AiUpgradeTo("unit-keep")
 </pre>
 
 <a name="AiWait"></a>
-<h3>(AiWait type)</h3>
+<h3>AiWait(type)</h3>
 
 Waits until the *first* request of this unit-type is completed.
 Don't forget to request an unit-type, before you wait on it.
-
 
 <dl>
 <dt>type</dt>
@@ -686,7 +661,7 @@ Don't forget to request an unit-type, before you wait on it.
 </pre>
 
 <a name="AiWaitForce"></a>
-<h3>(AiWaitForce force)</h3>
+<h3>AiWaitForce(force)</h3>
 
 Wait until a force is complete, the forces are build in force number order.
 First 0, than 1, last 9.
