@@ -320,7 +320,7 @@ void UpdateDisplay(void)
 	DrawPieMenu(); // draw pie menu only if needed
 	DrawMenu(CurrentMenu);
 
-	DrawAnyCursor();
+	DrawCursor();
 
 	//
 	// Update changes to display.

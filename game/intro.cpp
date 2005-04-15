@@ -10,7 +10,7 @@
 //
 /**@name intro.c - The game intros. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon.
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -513,7 +513,7 @@ void ShowIntro(const Intro* intro)
 
 		SetDefaultTextColors(FontYellow, FontWhite);
 		DrawContinueButton();
-		DrawAnyCursor();
+		DrawCursor();
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -625,7 +625,7 @@ void ShowCredits(Credits* credits)
 		}
 
 		DrawContinueButton();
-		DrawAnyCursor();
+		DrawCursor();
 
 		Invalidate();
 		RealizeVideoMemory();
@@ -1238,7 +1238,7 @@ void ShowStats(void)
 		}
 		GameStatsDrawFunc(frame);
 		DrawContinueButton();
-		DrawAnyCursor();
+		DrawCursor();
 
 		Invalidate();
 		RealizeVideoMemory();

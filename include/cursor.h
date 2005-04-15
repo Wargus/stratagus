@@ -10,7 +10,7 @@
 //
 /**@name cursor.h - The cursors header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ extern void LoadCursors(const char* racename);
 extern CursorType* CursorTypeByIdent(const char* ident);
 
 	/// Draw any cursor
-extern void DrawAnyCursor(void);
+extern void DrawCursor(void);
 	/// Animate the cursor
 extern void CursorAnimate(unsigned ticks);
 
