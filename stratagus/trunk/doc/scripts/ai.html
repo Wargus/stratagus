@@ -54,6 +54,7 @@
 <a href="#AiDebug">AiDebug</a>
 <a href="#AiDebugPlayer">AiDebugPlayer</a>
 <a href="#AiDump">AiDump</a>
+<a href="#AiAttackWithForce">AiAttackWithForce</a>
 <a href="#AiForce">AiForce</a>
 <a href="#AiForceRole">AiForceRole</a>
 <a href="#AiGetRace">AiGetRace</a>
@@ -270,8 +271,39 @@ FIXME:
     (DefineAiPlayer (list ...))
 </pre>
 
+
+<a name="AiAttackWithForce"></a>
+<h3>AiAttackWithForce(force)</h3>
+ 
+Attack the opponent with the given force. The place is choosen by the AI. If there 	 
+are flyers, ships and land units in the force they could attack different 	 
+goals.
+
+<dl> 	 
+<dt>force</dt>
+<dd>Id of the force to which the attacking units belong. THe force ids 0 to 9 are currently
+supported.
+</dd>
+</dl>
+ 
+<i>The force isn't moved as a single unit: faster units attacks first, than later the
+slower units will attack.</i>
+
+<h4>Example</h4>
+
+<pre>
+   -- Force 0 is built with one assault unit. The script continues processing, when
+   -- the assault unit is ready. When ready, the script attacks the opponent
+   -- with force 0.
+   {
+     function() return AiForce(0, "unit-assault", 1) end,
+     function() return AiWaitForce(0) end,
+     function() return AiAttackWithForce(0) end
+   }
+</pre>
+
 <a name="AiCheckForce"></a>
-<h3>(AiCheckForce force)</h3>
+<h3>AiCheckForce(force)</h3>
 
 Check if a force is ready.
 
