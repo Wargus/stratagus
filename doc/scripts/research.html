@@ -78,8 +78,7 @@ NOT WRITTEN YET.
 <a name="DefineUnitAllow"></a>
 <h3>DefineUnitAllow(name, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N)</h3>
 
-Define how many units of each type a players can have during
-a level.
+Define how many units of a given type each player can have.
 
 <dl>
 <dt>name</dt>
@@ -102,7 +101,7 @@ a level.
 
 
 <a name="DefineAllow"></a>
-<h3>DefineAllow(name str16)</h3>
+<h3>DefineAllow(name, str16)</h3>
 
 Define what upgrades are enabled for each player during
 a level.
@@ -130,8 +129,8 @@ a level.
 
 <pre>
     -- Allow the metal upgrade for all 16 players.
-    DefineAallow("upgrade-metal", "AAAAAAAAAAAAAAAA")
-    --                             ^- player 0    ^- player 15
+    DefineAllow("upgrade-metal", "AAAAAAAAAAAAAAAA")
+    --                            ^- player 0    ^- player 15
 </pre>
 
 
@@ -304,13 +303,6 @@ DefineUpgrade("upgrade-sword1", "icon", "icon-sword2",
 <h3>GetDependency()</h3>
 
 NOT WRITTEN YET.
-
-
-<dl>
-<dt>.</dt>
-<dd>.
-</dd>
-</dl>
 
 <h4>Example</h4>
 
