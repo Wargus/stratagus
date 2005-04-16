@@ -61,6 +61,7 @@ typedef struct _graphic_ {
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint* Textures;          /// Texture names
 	GLuint* PlayerColorTextures[PlayerMax];/// Textures with player colors
+	int NumTextures;
 #endif
 } Graphic;
 
@@ -200,6 +201,11 @@ extern int VideoDepth;
 	**  @see VMemType
 	*/
 extern SDL_Surface* TheScreen;
+
+#ifdef USE_OPENGL
+	/// Max texture size supported on the video card
+extern int GLMaxTextureSize;
+#endif
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define RMASK 0xff000000
@@ -362,6 +368,11 @@ extern int ColorBuildingCycleEnd;   /// color # end   for color cycling
 	*(a) = ((c) >> 24) & 0xff; }
 #endif
 
+#ifdef USE_OPENGL
+void DrawTexture(const Graphic* g, GLuint* textures, int sx, int sy,
+	int ex, int ey, int x, int y, int flip);
+#endif
+
 #ifndef USE_OPENGL
 	/// Draw pixel unclipped.
 extern void (*VideoDrawPixel)(Uint32 color, int x, int y);
@@ -498,59 +509,59 @@ extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int r,
 	unsigned char alpha);
 
 	/// Draw a graphic object unclipped.
-extern void VideoDraw(const Graphic*, unsigned, int, int);
+extern void VideoDraw(const Graphic* g, unsigned, int, int);
 
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawSub(const Graphic*, int, int, int, int, int, int);
+extern void VideoDrawSub(const Graphic* g, int, int, int, int, int, int);
 
 #ifdef USE_OPENGL
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDoDrawClip(const Graphic* s, GLuint* textures, unsigned frame,
+extern void VideoDoDrawClip(const Graphic* g, GLuint* textures, unsigned frame,
 	int x, int y);
 
-#define VideoDrawClip(s, frame, x, y) \
-	VideoDoDrawClip((s), (s)->Textures, (frame), (x), (y))
+#define VideoDrawClip(g, frame, x, y) \
+	VideoDoDrawClip((g), (g)->Textures, (frame), (x), (y))
 #else
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawClip(const Graphic* s, unsigned frame, int x, int y);
+extern void VideoDrawClip(const Graphic* g, unsigned frame, int x, int y);
 #endif
 
 	/// Draw graphic object clipped and with player colors.
-extern void VideoDrawPlayerColorClip(Graphic* sprite, int player,
+extern void VideoDrawPlayerColorClip(Graphic* g, int player,
 	unsigned frame, int x, int y);
 
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawSubClip(const Graphic* sprite, int ix, int iy, int w,
+extern void VideoDrawSubClip(const Graphic* g, int ix, int iy, int w,
 	int h, int x, int y);
 
 	/// Draw a graphic object unclipped and flipped in X direction.
-extern void VideoDrawX(const Graphic* sprite, unsigned frame, int x, int y);
+extern void VideoDrawX(const Graphic* g, unsigned frame, int x, int y);
 
 #ifdef USE_OPENGL
 	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDoDrawClipX(const Graphic* sprite, GLuint* textures, unsigned frame,
+extern void VideoDoDrawClipX(const Graphic* g, GLuint* textures, unsigned frame,
 	int x, int y);
 
-#define VideoDrawClipX(s, frame, x, y) \
-	VideoDoDrawClipX((s), (s)->Textures, (frame), (x), (y))
+#define VideoDrawClipX(g, frame, x, y) \
+	VideoDoDrawClipX((g), (g)->Textures, (frame), (x), (y))
 #else
 	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDrawClipX(const Graphic* sprite, unsigned frame, int x, int y);
+extern void VideoDrawClipX(const Graphic* g, unsigned frame, int x, int y);
 #endif
 
 	/// Draw graphic object clipped, flipped, and with player colors.
-extern void VideoDrawPlayerColorClipX(Graphic* sprite, int player,
+extern void VideoDrawPlayerColorClipX(Graphic* g, int player,
 	unsigned frame, int x, int y);
 
 	/// Translucent Functions
 	/// Draw a graphic object unclipped.
-extern void VideoDrawTrans(const Graphic*, unsigned, int, int, int);
+extern void VideoDrawTrans(const Graphic* g, unsigned, int, int, int);
 	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawClipTrans(const Graphic*, unsigned frame, int x, int y, int);
+extern void VideoDrawClipTrans(const Graphic* g, unsigned frame, int x, int y, int);
 	/// Draw a graphic object unclipped and flipped in X direction.
-extern void VideoDrawTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
+extern void VideoDrawTransX(const Graphic* g, unsigned frame, int x, int y, int alpha);
 	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDrawClipTransX(const Graphic*, unsigned frame, int x, int y, int alpha);
+extern void VideoDrawClipTransX(const Graphic* g, unsigned frame, int x, int y, int alpha);
 
 	/// Draw a graphic object unclipped.
 #define VideoDrawTrans50(o, f, x, y)      VideoDrawTrans((o), (f), (x), (y), 128)
