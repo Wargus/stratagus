@@ -1600,7 +1600,7 @@ void MissileActionFire(Missile* missile)
 		MissileType* fire;
 
 		missile->SpriteFrame = 0;
-		f = (100 * unit->HP) / unit->Stats->HitPoints;
+		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
 		fire = MissileBurningBuilding(f);
 		if (!fire) {
 			missile->TTL = 0;
@@ -1879,8 +1879,8 @@ void MissileActionDeathCoil(Missile* missile)
 			HitUnit(source, missile->TargetUnit, missile->Damage);
 			if (source->Orders[0].Action != UnitActionDie) {
 				source->HP += missile->Damage;
-				if (source->HP > source->Stats->HitPoints) {
-					source->HP = source->Stats->HitPoints;
+				if (source->HP > source->Stats->Variables[HP_INDEX].Max) {
+					source->HP = source->Stats->Variables[HP_INDEX].Max;
 				}
 			}
 		} else {
@@ -1915,8 +1915,8 @@ void MissileActionDeathCoil(Missile* missile)
 				}
 				if (source->Orders[0].Action != UnitActionDie) {
 					source->HP += missile->Damage;
-					if (source->HP > source->Stats->HitPoints) {
-						source->HP = source->Stats->HitPoints;
+					if (source->HP > source->Stats->Variables[HP_INDEX].Max) {
+						source->HP = source->Stats->Variables[HP_INDEX].Max;
 					}
 				}
 			}

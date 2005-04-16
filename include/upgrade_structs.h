@@ -125,7 +125,6 @@ extern int DefaultResourceAmounts[MaxCosts];
 */
 typedef struct _unit_stats_ {
 	struct _variable_type_* Variables;  /// userdefined variable.
-	int HitPoints;                  /// hit points
 	int Costs[MaxCosts];            /// current costs of the unit
 } UnitStats;
 

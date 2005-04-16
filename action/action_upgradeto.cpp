@@ -102,7 +102,7 @@ static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	newstats = &newtype->Stats[player->Player];
 	oldstats = &oldtype->Stats[player->Player];
 
-	unit->HP = newstats->HitPoints * unit->HP / oldstats->HitPoints;
+	unit->HP = newstats->Variables[HP_INDEX].Max * unit->HP / oldstats->Variables[HP_INDEX].Max;
 	if (oldstats->Variables[MANA_INDEX].Max) {
 		unit->Mana = newstats->Variables[MANA_INDEX].Max *
 			unit->Mana / oldstats->Variables[MANA_INDEX].Max;
