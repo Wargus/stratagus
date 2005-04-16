@@ -84,7 +84,7 @@ void HandleActionDie(Unit* unit)
 		// Always do that, since types can have different vision properties.
 		MapUnmarkUnitSight(unit);
 		unit->Type = unit->Type->CorpseType;
-		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Player].SightRange;
+		unit->CurrentSightRange = unit->Type->Stats[unit->Player->Player].Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 
 		CommandStopUnit(unit); // This clears all order queues

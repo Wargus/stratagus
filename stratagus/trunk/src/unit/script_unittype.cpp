@@ -1120,7 +1120,6 @@ static int CclDefineUnitStats(lua_State* l)
 	}
 
 	stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
-	stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
 	stats->HitPoints = stats->Variables[HP_INDEX].Max;
 
 	return 0;
@@ -2006,7 +2005,7 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// SightRange
 	unit->Variable[SIGHTRANGE_INDEX].Value = type->Variable[SIGHTRANGE_INDEX].Value;
-	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->SightRange;
+	unit->Variable[SIGHTRANGE_INDEX].Max = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	// AttackRange
 	unit->Variable[ATTACKRANGE_INDEX].Value = type->Variable[ATTACKRANGE_INDEX].Max;

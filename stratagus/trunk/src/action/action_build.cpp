@@ -542,7 +542,7 @@ void HandleActionBuilt(Unit* unit)
 		} else if (unit->Player == ThisPlayer) {
 			SelectedUnitChanged();
 		}
-		unit->CurrentSightRange = unit->Stats->SightRange;
+		unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 		MapMarkUnitSight(unit);
 		return;
 	}

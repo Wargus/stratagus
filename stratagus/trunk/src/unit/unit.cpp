@@ -627,7 +627,7 @@ static void UpdateUnitSightRange(Unit* unit)
 	if (unit->Constructed) { // Units under construction have no sight range.
 		unit->CurrentSightRange = 0;
 	} else if (!unit->Container) { // proper value.
-		unit->CurrentSightRange = unit->Stats->SightRange;
+		unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 	} else { // value of it container.
 		unit->CurrentSightRange = unit->Container->CurrentSightRange;
 	}
@@ -2976,7 +2976,7 @@ void LetUnitDie(Unit* unit)
 		unit->IX = (type->CorpseType->Width - VideoGraphicWidth(type->CorpseType->Sprite)) / 2;
 		unit->IY = (type->CorpseType->Height - VideoGraphicHeight(type->CorpseType->Sprite)) / 2;
 
-		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Player].SightRange;
+		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Player].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
 		unit->CurrentSightRange = 0;
 	}
