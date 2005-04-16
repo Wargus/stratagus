@@ -22,14 +22,11 @@
 ##      $Id$
 ##
 
-cdefines = "-DUSE_ZLIB -DUSE_BZ2LIB -DUSE_SDL -DUSE_VORBIS -D_REENTRANT -DUSE_THEORA -DUSE_HP_FOR_XP -DMAP_REGIONS"
-ccflags = "-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
-ccflags += cdefines
+ccflags = "-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math "
 
-stratagusLibs = Split('png z m SDL pthread vorbis ogg theora dl lua lualib bz2')
-
-libs = []
-libs += stratagusLibs
+env = Environment()
+env.Append(CCFLAGS = ccflags)
+env.Append(CPPDEFINES = Split("USE_HP_FOR_XP MAP_REGIONS"))
 
 sources = Split("""
 src/ai/ai.c
@@ -145,14 +142,11 @@ src/pathfinder/splitter_lowlevel.c
 src/pathfinder/splitter.c
 src/pathfinder/astar.c
 src/pathfinder/script_pathfinder.c
-""")
-
-sourcesNetwork = Split("""
-  src/network/master.c
-  src/network/netconnect.c
-  src/network/network.c
-  src/network/commands.c
-  src/network/lowlevel.c
+src/network/commands.c
+src/network/master.c
+src/network/network.c
+src/network/lowlevel.c
+src/network/netconnect.c
 """)
 
 sourcesMetaserver = Split("""
@@ -160,18 +154,64 @@ sourcesMetaserver = Split("""
  src/metaserver/netdriver.c
  src/metaserver/main.c  
  src/metaserver/query.c
+ src/network/lowlevel.c
 """)
 
-Program('stratagus', sources + sourcesNetwork, 
-    LIBS = libs, 
-    LIBPATH = ['/usr/lib', '/usr/local/lib'],
-    CPPPATH = ['src/include', '/usr/include/SDL'],
-    CCFLAGS = ccflags)
-Default('stratagus')
 
-Program('metaserver', sourcesMetaserver + ['src/network/lowlevel.c'],
-    LIBS = libs, 
-    LIBPATH = ['/usr/lib', '/usr/local/lib'],
-    CPPPATH = ['src/include', '/usr/include/SDL'],
-    CCFLAGS = ccflags)
-   
+# determine compiler and linker flags for SDL
+env.ParseConfig('sdl-config --cflags')
+env.ParseConfig('sdl-config --libs')
+
+
+conf = Configure(env)
+
+## check for required libs ##
+if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
+    print 'Did not find SDL libraryor headers, exiting!'
+    Exit(1)
+if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
+    print 'Did not find png library or headers, exiting!'
+    Exit(1)
+if not conf.CheckLibWithHeader('z', 'zlib.h', 'c'):
+    print 'Did not find the zlib library or headers, exiting!'
+    Exit(1)
+if not conf.CheckLib('dl'):
+    print 'Did not find dl library which is needed on some systems for lua. Exiting!'
+    Exit(1)
+if not conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
+    print 'Did not find lua library or headers, exiting!'
+    Exit(1)
+if not conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
+    print 'Did not find lualib library of headers, exiting!'
+    Exit(1)
+# stratagus defines for required libraries
+env.Append(CPPDEFINES = Split("USE_ZLIB USE_SDL"))
+
+# Check for optional libraries #
+if conf.CheckLib('bz2'):
+    env.Append(CPPDEFINES = 'USE_BZLIB2')
+if conf.CheckLib('ogg'):
+    env.Append(CPPDEFINES = 'USE_OGG')
+if conf.CheckLib('vorbis'):
+    env.Append(CPPDEFINES = 'USE_VORBIS')
+if conf.CheckLib('theora'):
+    env.Append(CPPDEFINES = 'USE_THEORA')
+if conf.CheckLib('mikmod'):
+    env.Append(CPPDEFINES = 'USE_MIKMOD')
+if conf.CheckLib('mad'):
+    env.Append(CPPDEFINES = 'USE_MAD')
+if conf.CheckLib('flac'):
+    env.Append(CPPDEFINES = 'USE_FLAC')
+env = conf.Finish()
+
+
+# Stratagus build 
+env.Append(CPPPATH='src/include')
+
+# Targets
+env.Program('stratagus', sources)
+env.Default('stratagus')
+
+env.Program('metaserver', sourcesMetaserver)
+
+
