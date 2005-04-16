@@ -742,10 +742,14 @@ static void MakeFontColorTextures(Graphic* g, int font)
 	int j;
 	SDL_Surface* s;
 
+	if (FontColorGraphics[font]) {
+		return;
+	}
+
 	FontColorGraphics[font] = malloc(NumFontColorMappings * sizeof(Graphic*));
 	s = g->Surface;
 	for (i = 0; i < NumFontColorMappings; ++i) {
-		FontColorGraphics[font][i] = calloc(1, sizeof(Graphic));
+		FontColorGraphics[font][i] = malloc(sizeof(Graphic));
 		memcpy(FontColorGraphics[font][i], g, sizeof(Graphic));
 		FontColorGraphics[font][i]->Textures = NULL;
 		SDL_LockSurface(s);
