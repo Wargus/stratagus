@@ -51,6 +51,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+#ifdef USE_OPENGL
 void DrawTexture(const Graphic* g, GLuint* textures, int sx, int sy,
 	int ex, int ey, int x, int y, int flip)
 {
@@ -164,6 +165,7 @@ void DrawTexture(const Graphic* g, GLuint* textures, int sx, int sy,
 		sy2 = nextsy2;
 	}
 }
+#endif
 
 /**
 **  Draw graphic object unclipped.
