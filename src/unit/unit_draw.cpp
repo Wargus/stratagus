@@ -1596,7 +1596,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 			VideoDrawCircleClip(ColorGreen,
 				x + type->TileWidth * TileSizeX / 2,
 				y + type->TileHeight * TileSizeY / 2,
-				((stats->SightRange + (type->TileWidth - 1)) * TileSizeX) - 1);
+				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX) - 1);
 		}
 		if (type->CanAttack) {
 			if (ShowReactionRange) {

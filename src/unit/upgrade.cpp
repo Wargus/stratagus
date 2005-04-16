@@ -960,7 +960,7 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 			// don't have such unit now
 			player->UnitTypesCount[src->Slot]--;
 			// UnMark the Unit sight for conversion if on map
-			if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+			if ((unit->CurrentSightRange != dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max ||
 					src->TileWidth != dst->TileWidth ||
 					src->TileHeight != dst->TileHeight) && !unit->Removed) {
 				MapUnmarkUnitSight(unit);
@@ -975,10 +975,10 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 				unit->AutoCastSpell = malloc(SpellTypeCount);
 				memset(unit->AutoCastSpell, 0, SpellTypeCount);
 			}
-			if ((unit->CurrentSightRange != dst->Stats[player->Player].SightRange ||
+			if ((unit->CurrentSightRange != dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max ||
 					src->TileWidth != dst->TileWidth ||
 					src->TileHeight != dst->TileHeight) && !unit->Removed) {
-				unit->CurrentSightRange = dst->Stats[player->Player].SightRange;
+				unit->CurrentSightRange = dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max;
 				MapMarkUnitSight(unit);
 			}
 			player->UnitTypesCount[dst->Slot]++;
@@ -1062,13 +1062,13 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				UnitTypes[z]->Stats[pn].SightRange += um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
 				for (numunits--; numunits >= 0; --numunits) {
 					unit = unitupgrade[numunits];
 					if (unit->Player->Player == pn && !unit->Removed) {
 						MapUnmarkUnitSight(unit);
-						unit->CurrentSightRange = UnitTypes[z]->Stats[pn].SightRange;
+						unit->CurrentSightRange = UnitTypes[z]->Stats[pn].Variables[SIGHTRANGE_INDEX].Max +
+							um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 						MapMarkUnitSight(unit);
 					}
 				}
