@@ -170,7 +170,7 @@ static int CheckForTargetInRange(Unit* unit)
 			RefsIncrease(goal);
 			unit->Orders[0].Goal = goal;
 			unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-			unit->Orders[0].Range = unit->Stats->AttackRange;
+			unit->Orders[0].Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 			unit->Orders[0].X = unit->Orders[0].Y = -1;
 			unit->SubAction |= WEAK_TARGET; // weak target
 			NewResetPath(unit);
@@ -248,7 +248,7 @@ static void MoveToTarget(Unit* unit)
 		// Have reached target? FIXME: could use the new return code?
 		//
 		if (goal && MapDistanceBetweenUnits(unit, goal) <=
-				unit->Stats->AttackRange) {
+				unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached another unit, now attacking it
 			unit->State = 0;
 			UnitHeadingFromDeltaXY(unit,
@@ -263,7 +263,7 @@ static void MoveToTarget(Unit* unit)
 		if (!goal && (WallOnMap(unit->Orders[0].X, unit->Orders[0].Y) ||
 					unit->Orders[0].Action == UnitActionAttackGround) &&
 				MapDistanceToUnit(unit->Orders[0].X, unit->Orders[0].Y, unit) <=
-					unit->Stats->AttackRange) {
+					unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			// Reached wall or ground, now attacking it
 			unit->State = 0;
 			UnitHeadingFromDeltaXY(unit, unit->Orders[0].X - unit->X,
@@ -378,7 +378,7 @@ static void AttackTarget(Unit* unit)
 		unit->Orders[0].Goal = goal;
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
 		unit->Orders[0].MinRange = unit->Type->MinAttackRange;
-		unit->Orders[0].Range = unit->Stats->AttackRange;
+		unit->Orders[0].Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 		NewResetPath(unit);
 		unit->SubAction |= WEAK_TARGET;
 
@@ -416,7 +416,7 @@ static void AttackTarget(Unit* unit)
 	//
 	// Still near to target, if not goto target.
 	//
-	if (MapDistanceBetweenUnits(unit, goal) > unit->Stats->AttackRange) {
+	if (MapDistanceBetweenUnits(unit, goal) > unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		if (unit->SavedOrder.Action == UnitActionStill) {
 			// Save current order to come back or to continue it.
 			unit->SavedOrder = unit->Orders[0];
@@ -483,7 +483,7 @@ void HandleActionAttack(Unit* unit)
 			// Can we already attack ?
 			if (unit->Orders[0].Goal) {
 				dist = MapDistanceBetweenUnits(unit, unit->Orders[0].Goal);
-				if (unit->Type->MinAttackRange < dist && dist <= unit->Stats->AttackRange) {
+				if (unit->Type->MinAttackRange < dist && dist <= unit->Stats->Variables[ATTACKRANGE_INDEX].Max) {
 					UnitHeadingFromDeltaXY(unit,
 						unit->Orders[0].Goal->X + (unit->Orders[0].Goal->Type->TileWidth - 1) / 2 - unit->X,
 						unit->Orders[0].Goal->Y + (unit->Orders[0].Goal->Type->TileHeight - 1) / 2 - unit->Y);
