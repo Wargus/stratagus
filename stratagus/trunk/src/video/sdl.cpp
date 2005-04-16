@@ -91,6 +91,8 @@ SDL_Surface* TheScreen; /// Internal screen
 #ifndef USE_OPENGL
 static SDL_Rect Rects[100];
 static int NumRects;
+#else
+int GLMaxTextureSize;   /// Max texture size supported on the video card
 #endif
 
 static int FrameTicks; /// Frame length in ms
@@ -157,6 +159,8 @@ static void InitOpenGL(void)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
 }
 #endif
 
