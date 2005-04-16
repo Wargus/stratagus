@@ -941,8 +941,6 @@ extern void UnitCacheRemove(Unit* unit);
 extern int UnitCacheSelect(int x1, int y1, int x2, int y2, Unit** table);
 	/// Select units on tile
 extern int UnitCacheOnTile(int x, int y, Unit** table);
-	/// Select unit on X,Y of type naval,fly,land
-extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
 	/// Initialize unit-cache
 extern void InitUnitCache(void);
 
@@ -979,23 +977,17 @@ extern int FindAndSortUnits(const Viewport* vp, Unit** table);
 extern void ShowOrder(const Unit* unit);
 
 // in unit_find.c
+	/// Select unit on X,Y of type naval,fly,land
+extern Unit* UnitCacheOnXY(int x, int y, unsigned type);
 	/// Find all units of this type
 extern int FindUnitsByType(const struct _unit_type_* type, Unit** table);
 	/// Find all units of this type of the player
 extern int FindPlayerUnitsByType(const Player*, const struct _unit_type_*, Unit**);
 	/// Return any unit on that map tile
 extern Unit* UnitOnMapTile(int tx, int ty);
-	/// Return repairable unit on that map tile
-extern Unit* RepairableOnMapTile(int tx, int ty);
-	/// Return possible attack target on a tile
-extern Unit* TargetOnMapTile(const Unit* soruce, int tx, int ty);
 	/// Return possible attack target on that map area
 extern Unit* TargetOnMap(const Unit* unit, int x1, int y1, int x2, int y2);
-	/// Return transporter unit on that map tile
-extern Unit* TransporterOnMapTile(int tx, int ty);
 
-	/// Return unit of a fixed type on a map tile.
-extern Unit* UnitTypeOnMap(int tx, int ty, struct _unit_type_* type);
 	/// Return resource, if on map tile
 extern Unit* ResourceOnMap(int tx, int ty, int resource);
 	/// Return resource deposit, if on map tile
