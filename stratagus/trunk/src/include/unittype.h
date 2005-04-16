@@ -899,7 +899,6 @@ struct _unit_type_ {
 	struct _construction_* Construction; /// What is shown in construction phase
 	int RadarRange;                 /// Range of radar if any
 	int RadarJammerRange;           /// Range of radar jamming if any
-	int _HitPoints;                 /// Maximum hit points
 
 	int _Costs[MaxCosts];           /// How many resources needed
 	int RepairHP;                   /// Amount of HP per repair

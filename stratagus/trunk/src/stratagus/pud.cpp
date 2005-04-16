@@ -128,8 +128,8 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 	int h;
 	int w;
 
-	Assert(UnitTypeOrcWall->_HitPoints < 256
-			&& UnitTypeHumanWall->_HitPoints < 256);
+	Assert(UnitTypeOrcWall->Variable[HP_INDEX].Max < 256
+			&& UnitTypeHumanWall->Variable[HP_INDEX].Max < 256);
 
 	if(map->Terrain < TilesetMax) {
 		// FIXME: should use terrain name or better map->Tileset!!
@@ -161,12 +161,12 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 					|| (v&0xFFF0)==0x00C0
 					|| (v&0xFF00)==0x0900 ) {
 				map->Fields[w+h*TheMap.Info.MapWidth].Value=
-						UnitTypeOrcWall->_HitPoints;
+						UnitTypeOrcWall->Variable[HP_INDEX].Max;
 			} else if( (v&0x00F0)==0x0090
 					|| (v&0xFFF0)==0x00B0
 					|| (v&0xFF00)==0x0800 ) {
 				map->Fields[w+h*TheMap.Info.MapWidth].Value=
-						UnitTypeHumanWall->_HitPoints;
+						UnitTypeHumanWall->Variable[HP_INDEX].Max;
 			}
 		}
 	}
