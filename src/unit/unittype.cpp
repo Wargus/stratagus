@@ -173,7 +173,6 @@ void UpdateStats(int reset)
 					stats->Variables[LEVEL_INDEX].Value = 1;
 					stats->Variables[LEVEL_INDEX].Max = 1;
 				}
-				stats->Variables[HP_INDEX].Max = type->_HitPoints;
 			}
 		}
 
@@ -231,7 +230,7 @@ void UpdateStats(int reset)
 			// A little chaos, buildings without HP can be entered.
 			// The oil-patch is a very special case.
 			//
-			if (type->_HitPoints) {
+			if (type->Variable[HP_INDEX].Max) {
 				type->FieldFlags = MapFieldBuilding;
 			} else {
 				type->FieldFlags = MapFieldNoBuilding;

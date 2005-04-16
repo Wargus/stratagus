@@ -1596,13 +1596,11 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	// Insert into new player table.
 
 	unit->PlayerSlot = newplayer->Units + newplayer->TotalNumUnits++;
-	if (unit->Type->_HitPoints != 0) {
-		if (unit->Type->Building) {
-			newplayer->TotalBuildings++;
-		}
-		else {
-			newplayer->TotalUnits++;
-		}
+	if (unit->Type->Building) {
+		newplayer->TotalBuildings++;
+	}
+	else {
+		newplayer->TotalUnits++;
 	}
 	*unit->PlayerSlot = unit;
 
