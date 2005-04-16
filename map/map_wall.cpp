@@ -132,7 +132,7 @@ void MapFixSeenWallTile(int x, int y)
 
 	if (t == TileTypeHumanWall) {
 		tile = TheMap.Tileset->HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
 			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -142,7 +142,7 @@ void MapFixSeenWallTile(int x, int y)
 		}
 	} else {
 		tile = TheMap.Tileset->OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
 			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -230,7 +230,7 @@ void MapFixWallTile(int x, int y)
 
 	if (t & MapFieldHuman) {
 		tile = TheMap.Tileset->HumanWallTable[tile];
-		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->_HitPoints / 2) {
+		if (UnitTypeHumanWall && mf->Value <= UnitTypeHumanWall->Variable[HP_INDEX].Max / 2) {
 			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -240,7 +240,7 @@ void MapFixWallTile(int x, int y)
 		}
 	} else {
 		tile = TheMap.Tileset->OrcWallTable[tile];
-		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->_HitPoints / 2) {
+		if (UnitTypeOrcWall && mf->Value <= UnitTypeOrcWall->Variable[HP_INDEX].Max / 2) {
 			while (TheMap.Tileset->Table[tile]) { // Skip good tiles
 				++tile;
 			}
@@ -331,12 +331,12 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 		// FIXME: Set random walls
 		mf->Tile = TheMap.Tileset->Table[TheMap.Tileset->HumanWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable | MapFieldHuman;
-		mf->Value = UnitTypeHumanWall->_HitPoints;
+		mf->Value = UnitTypeHumanWall->Variable[HP_INDEX].Max;
 	} else {
 		// FIXME: Set random walls
 		mf->Tile = TheMap.Tileset->Table[TheMap.Tileset->OrcWallTable[0]];
 		mf->Flags |= MapFieldWall | MapFieldUnpassable;
-		mf->Value = UnitTypeOrcWall->_HitPoints;
+		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
 
 	UpdateMinimapXY(x, y);

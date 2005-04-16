@@ -451,8 +451,6 @@ static int CclDefineUnitType(lua_State* l)
 			type->MaxOnBoard = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartingResources")) {
 			type->StartingResources = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "HitPoints")) {
-			type->_HitPoints = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {
 			type->Variable[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {

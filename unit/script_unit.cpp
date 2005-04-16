@@ -905,7 +905,7 @@ static int CclUnit(lua_State* l)
 	if (!unit->Player) {
 		AssignUnitToPlayer(unit, player);
 		UpdateForNewUnit(unit, 0);
-		unit->HP = unit->Type->_HitPoints;
+		unit->HP = unit->Type->Variable[HP_INDEX].Max;
 	}
 
 	//  Revealers are units that can see while removed
