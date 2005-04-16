@@ -1118,9 +1118,6 @@ static int CclDefineUnitStats(lua_State* l)
 		   LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-
-	stats->HitPoints = stats->Variables[HP_INDEX].Max;
-
 	return 0;
 }
 
@@ -1926,7 +1923,7 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// HP.
 	unit->Variable[HP_INDEX].Value = unit->HP;
-	unit->Variable[HP_INDEX].Max = unit->Stats->HitPoints;
+	unit->Variable[HP_INDEX].Max = unit->Stats->Variables[HP_INDEX].Max;
 
 	// Build
 	if (unit->Orders[0].Action == UnitActionBuilt) {

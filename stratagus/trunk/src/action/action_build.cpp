@@ -346,7 +346,7 @@ static void BuildBuilding(Unit* unit)
 		goal = unit->Orders[0].Goal;
 
 		// hp is the current damage taken by the unit.
-		hp = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
+		hp = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
 			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - goal->HP;
 		//
 		// Calculate the length of the attack (repair) anim.
@@ -358,16 +358,16 @@ static void BuildBuilding(Unit* unit)
 		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
-		goal->HP = (goal->Data.Built.Progress * goal->Stats->HitPoints) /
+		goal->HP = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
 			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - hp;
-		if (goal->HP > goal->Stats->HitPoints) {
-			goal->HP = goal->Stats->HitPoints;
+		if (goal->HP > goal->Stats->Variables[HP_INDEX].Max) {
+			goal->HP = goal->Stats->Variables[HP_INDEX].Max;
 		}
 
 		//
 		// Building is gone or finished
 		//
-		if (!goal || goal->HP >= goal->Stats->HitPoints) {
+		if (!goal || goal->HP >= goal->Stats->Variables[HP_INDEX].Max) {
 			if (goal) { // release reference
 				RefsDecrease(goal);
 				unit->Orders[0].Goal = NULL;
@@ -419,7 +419,7 @@ void HandleActionBuilt(Unit* unit)
 	type = unit->Type;
 
 	// n is the current damage taken by the unit.
-	n = (unit->Data.Built.Progress * unit->Stats->HitPoints) /
+	n = (unit->Data.Built.Progress * unit->Stats->Variables[HP_INDEX].Max) /
 		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - unit->HP;
 	// This below is most often 0
 	if (type->BuilderOutside) {
@@ -433,10 +433,10 @@ void HandleActionBuilt(Unit* unit)
 	progress *= SpeedBuild;
 	unit->Data.Built.Progress += progress;
 	// Keep the same level of damage while increasing HP.
-	unit->HP = (unit->Data.Built.Progress * unit->Stats->HitPoints) /
+	unit->HP = (unit->Data.Built.Progress * unit->Stats->Variables[HP_INDEX].Max) /
 		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - n;
-	if (unit->HP > unit->Stats->HitPoints) {
-		unit->HP = unit->Stats->HitPoints;
+	if (unit->HP > unit->Stats->Variables[HP_INDEX].Max) {
+		unit->HP = unit->Stats->Variables[HP_INDEX].Max;
 	}
 
 	//
@@ -464,10 +464,10 @@ void HandleActionBuilt(Unit* unit)
 	// Check if building ready. Note we can both build and repair.
 	//
 	if (unit->Data.Built.Progress >= unit->Stats->Costs[TimeCost] * 600 ||
-			unit->HP >= unit->Stats->HitPoints) {
+			unit->HP >= unit->Stats->Variables[HP_INDEX].Max) {
 		DebugPrint("Building ready.\n");
-		if (unit->HP > unit->Stats->HitPoints) {
-			unit->HP = unit->Stats->HitPoints;
+		if (unit->HP > unit->Stats->Variables[HP_INDEX].Max) {
+			unit->HP = unit->Stats->Variables[HP_INDEX].Max;
 		}
 		unit->Orders[0].Action = UnitActionStill;
 		// HACK: the building is ready now

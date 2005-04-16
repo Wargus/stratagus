@@ -203,7 +203,7 @@ Unit* RepairableOnMapTile(int tx, int ty)
 	n = UnitCacheOnTile(tx, ty, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->RepairHP && table[i]->HP &&
-			table[i]->HP < table[i]->Stats->HitPoints) {
+			table[i]->HP < table[i]->Stats->Variables[HP_INDEX].Max) {
 			return table[i];
 		}
 	}

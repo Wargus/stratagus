@@ -375,11 +375,11 @@ static void HandleRegenerations(Unit* unit)
 
 	f = 0;
 	// Burn
-	if (!unit->Removed && !unit->Destroyed && unit->Stats->HitPoints &&
+	if (!unit->Removed && !unit->Destroyed && unit->Stats->Variables[HP_INDEX].Max &&
 			unit->Orders[0].Action != UnitActionBuilt && 
 			unit->Orders[0].Action != UnitActionDie &&
 			unit->HP != 0) {
-		f = (100 * unit->HP) / unit->Stats->HitPoints;
+		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
 		if (f <= unit->Type->BurnPercent && unit->Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
 			f = 1;
@@ -396,8 +396,8 @@ static void HandleRegenerations(Unit* unit)
 			if (unit->HP <= 0) { // FIXME ? kill it ?
 				unit->HP = 1;
 			}
-			if (unit->HP > unit->Stats->HitPoints) {
-				unit->HP = unit->Stats->HitPoints;
+			if (unit->HP > unit->Stats->Variables[HP_INDEX].Max) {
+				unit->HP = unit->Stats->Variables[HP_INDEX].Max;
 			}
 		}
 	}

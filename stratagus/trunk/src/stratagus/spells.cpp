@@ -260,8 +260,8 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 			HitUnit(caster, target, -hp);
 		} else {
 			target->HP += hp;
-			if (target->HP > target->Stats->HitPoints) {
-				target->HP = target->Stats->HitPoints;
+			if (target->HP > target->Stats->Variables[HP_INDEX].Max) {
+				target->HP = target->Stats->Variables[HP_INDEX].Max;
 			}
 		}
 		target->Mana += mana;
@@ -548,7 +548,7 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 
 	//  Healing and harming
 	if (hp > 0) {
-		diffHP = target->Stats->HitPoints - target->HP;
+		diffHP = target->Stats->Variables[HP_INDEX].Max - target->HP;
 	} else {
 		diffHP = target->HP;
 	}
@@ -582,8 +582,8 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		HitUnit(caster, target, -(castcount * hp));
 	} else {
 		target->HP += castcount * hp;
-		if (target->HP > target->Stats->HitPoints) {
-			target->HP = target->Stats->HitPoints;
+		if (target->HP > target->Stats->Variables[HP_INDEX].Max) {
+			target->HP = target->Stats->Variables[HP_INDEX].Max;
 		}
 	}
 	target->Mana += castcount*mana;
@@ -883,10 +883,10 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 	//
 	// Check vitals now.
 	//
-	if (condition->MinHpPercent * target->Stats->HitPoints / 100 > target->HP) {
+	if (condition->MinHpPercent * target->Stats->Variables[HP_INDEX].Max / 100 > target->HP) {
 		return 0;
 	}
-	if (condition->MaxHpPercent * target->Stats->HitPoints / 100 <= target->HP) {
+	if (condition->MaxHpPercent * target->Stats->Variables[HP_INDEX].Max / 100 <= target->HP) {
 		return 0;
 	}
 	if (target->Type->CanCastSpell) {

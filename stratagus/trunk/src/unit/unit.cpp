@@ -437,7 +437,7 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Stats = &type->Stats[unit->Player->Player];
 	unit->Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
-		unit->HP = unit->Stats->HitPoints;
+		unit->HP = unit->Stats->Variables[HP_INDEX].Max;
 		unit->Mana = (unit->Stats->Variables[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
 		if (UnitTypeVar.NumberVariable) {
 			Assert(unit->Variable);
@@ -3156,7 +3156,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		Missile* missile;
 		MissileType* fire;
 
-		f = (100 * target->HP) / target->Stats->HitPoints;
+		f = (100 * target->HP) / target->Stats->Variables[HP_INDEX].Max;
 		fire = MissileBurningBuilding(f);
 		if (fire) {
 			missile = MakeMissile(fire,
