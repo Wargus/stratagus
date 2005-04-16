@@ -123,7 +123,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 	VideoFillRectangleClip(ColorBlack, x, y,
 		unit->Type->Icon.Icon->Sprite->Width, 7);
 	if (unit->HP) {
-		f = (100 * unit->HP) / unit->Stats->HitPoints;
+		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
 		if (f > 75) {
 			color = ColorDarkGreen;
 		} else if (f > 50) {

@@ -955,8 +955,8 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 		//  Convert already existing units to this type.
 		//
 		if (unit->Type == src) {
-			unit->HP += dst->Stats[player->Player].HitPoints -
-				unit->Stats->HitPoints;
+			unit->HP += dst->Stats[player->Player].Variables[HP_INDEX].Max -
+				unit->Stats->Variables[HP_INDEX].Max;
 			// don't have such unit now
 			player->UnitTypesCount[src->Slot]--;
 			// UnMark the Unit sight for conversion if on map
@@ -1071,8 +1071,6 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-			UnitTypes[z]->Stats[pn].HitPoints += um->Modifier.Variables[HP_INDEX].Max;
-
 			// upgrade costs :)
 			for (j = 0; j < MaxCosts; ++j) {
 				UnitTypes[z]->Stats[pn].Costs[j] += um->Modifier.Costs[j];

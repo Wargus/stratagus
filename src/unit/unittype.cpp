@@ -173,9 +173,7 @@ void UpdateStats(int reset)
 					stats->Variables[LEVEL_INDEX].Value = 1;
 					stats->Variables[LEVEL_INDEX].Max = 1;
 				}
-				stats->HitPoints = type->_HitPoints;
-
-				stats->Variables[HP_INDEX].Max = stats->HitPoints;
+				stats->Variables[HP_INDEX].Max = type->_HitPoints;
 			}
 		}
 
