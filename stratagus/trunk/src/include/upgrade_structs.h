@@ -143,16 +143,6 @@ typedef struct _upgrade_ {
 ----------------------------------------------------------------------------*/
 
 /**
-**  Modifiers of the unit stats.
-**  All the following are modifiers not values!
-**  @see UnitStats
-*/
-typedef struct _modifiers_ {
-	struct _variable_type_* Variables;  /// userdefined variable modifier.
-	int Costs[MaxCosts];                /// costs modifier
-} Modifiers;
-
-/**
 **  This is the modifier of an upgrade.
 **  This do the real action of an upgrade, an upgrade can have multiple
 **  modifiers.
@@ -161,7 +151,7 @@ typedef struct _upgrade_modifier_ {
 
 	int UpgradeId;                      /// used to filter required modifier
 
-	Modifiers Modifier;                 /// modifier of unit stats
+	UnitStats Modifier;                 /// modifier of unit stats.
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
