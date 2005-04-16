@@ -1606,9 +1606,10 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 
 	MapUnmarkUnitSight(unit);
 	unit->Player = newplayer;
+	unit->Stats = &unit->Type->Stats[newplayer->Player];
+	UpdateUnitSightRange(unit);
 	MapMarkUnitSight(unit);
 
-	unit->Stats = &unit->Type->Stats[newplayer->Player];
 	//
 	//  Must change food/gold and other.
 	//
