@@ -10,7 +10,7 @@
 //
 /**@name png.c - The png graphic file loader. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -100,8 +100,10 @@ int LoadGraphicPNG(Graphic* g)
 	volatile int ckey;
 	png_color_16* transv;
 	char name[PATH_MAX];
+	int ret;
 
 	ckey = -1;
+	ret = 0;
 
 	if (!g->File) {
 		return -1;
@@ -125,6 +127,7 @@ int LoadGraphicPNG(Graphic* g)
 		NULL, NULL, NULL);
 	if (png_ptr == NULL) {
 		fprintf(stderr, "Couldn't allocate memory for PNG file");
+		ret = -1;
 		goto done;
 	}
 
@@ -132,6 +135,7 @@ int LoadGraphicPNG(Graphic* g)
 	info_ptr = png_create_info_struct(png_ptr);
 	if (info_ptr == NULL) {
 		fprintf(stderr, "Couldn't create image information for PNG file");
+		ret = -1;
 		goto done;
 	}
 
@@ -140,7 +144,8 @@ int LoadGraphicPNG(Graphic* g)
 	 * set up your own error handlers in png_create_read_struct() earlier.
 	 */
 	if (setjmp(png_ptr->jmpbuf)) {
-		fprintf(stderr, "Error reading the PNG file.");
+		fprintf(stderr, "Error reading the PNG file.\n");
+		ret = -1;
 		goto done;
 	}
 
@@ -297,7 +302,7 @@ done:   /* Clean up and return */
 		free(row_pointers);
 	}
 	CLclose(fp);
-	return 0;
+	return ret;
 }
 
 /**
