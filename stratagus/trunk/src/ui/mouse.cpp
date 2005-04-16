@@ -10,7 +10,7 @@
 //
 /**@name mouse.c - The mouse handling. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1557,9 +1557,9 @@ void UIHandleButtonDown(unsigned button)
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			CursorStartScrMapX = CursorStartX - TheUI.MouseViewport->X +
-				TileSizeX * TheUI.MouseViewport->MapX;
+				TileSizeX * TheUI.MouseViewport->MapX + TheUI.MouseViewport->OffsetX;
 			CursorStartScrMapY = CursorStartY - TheUI.MouseViewport->Y +
-				TileSizeY * TheUI.MouseViewport->MapY;
+				TileSizeY * TheUI.MouseViewport->MapY + TheUI.MouseViewport->OffsetY;
 			GameCursor = TheUI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
