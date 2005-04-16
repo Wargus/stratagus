@@ -174,10 +174,8 @@ void UpdateStats(int reset)
 					stats->Variables[LEVEL_INDEX].Max = 1;
 				}
 				stats->AttackRange = stats->Variables[ATTACKRANGE_INDEX].Max;
-				stats->SightRange = stats->Variables[SIGHTRANGE_INDEX].Value;
 				stats->HitPoints = type->_HitPoints;
 
-				stats->Variables[SIGHTRANGE_INDEX].Max = stats->SightRange;
 				stats->Variables[HP_INDEX].Max = stats->HitPoints;
 			}
 		}

@@ -93,7 +93,7 @@ static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	player->Supply += newtype->Supply - oldtype->Supply;
 
 	//  Update Possible sight range change
-	unit->CurrentSightRange = unit->Stats->SightRange;
+	unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	unit->Orders[0].Action = UnitActionStill;
 	unit->SubAction = 0;

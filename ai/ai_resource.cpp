@@ -1248,7 +1248,7 @@ static void AiCheckRepair(void)
 			//
 			// FIXME: Repair only buildings under control
 			//
-			if (EnemyUnitsInDistance(unit, unit->Stats->SightRange)) {
+			if (EnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
 				continue;
 			}
 			//
