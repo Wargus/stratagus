@@ -1057,8 +1057,6 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 		// this modifier should be applied to unittype id == z
 		if (um->ApplyTo[z] == 'X') {
 
-			// upgrade stats
-			UnitTypes[z]->Stats[pn].AttackRange += um->Modifier.Variables[ATTACKRANGE_INDEX].Value;
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {

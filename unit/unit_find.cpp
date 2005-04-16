@@ -495,7 +495,7 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 	//
 
 	missile_range = type->Missile.Missile->Range + range - 1;
-	attackrange = u->Stats->AttackRange;
+	attackrange = u->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	// Evaluation of possible damage...
 	hp_damage_evaluate = u->Stats->Variables[BASICDAMAGE_INDEX].Value
 						+ u->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
@@ -773,7 +773,7 @@ Unit* AttackUnitsInDistance(const Unit* unit, int range)
 	best_cost = INT_MAX;
 
 	player = unit->Player;
-	attackrange = unit->Stats->AttackRange;
+	attackrange = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	//
 	// Find the best unit to attack
@@ -853,7 +853,7 @@ Unit* AttackUnitsInDistance(const Unit* unit, int range)
 Unit* AttackUnitsInRange(const Unit* unit)
 {
 	Assert(unit->Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit->Stats->AttackRange);
+	return AttackUnitsInDistance(unit, unit->Stats->Variables[ATTACKRANGE_INDEX].Max);
 }
 
 /**

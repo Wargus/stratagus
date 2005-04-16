@@ -1609,12 +1609,12 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 						(r + (type->TileWidth - 1)) * TileSizeX);
 				}
 			}
-			if (ShowAttackRange && stats->AttackRange) {
+			if (ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
 				// Radius + 1 so you can see all ranges
 				VideoDrawCircleClip(ColorRed,
 					x + type->TileWidth * TileSizeX / 2,
 					y + type->TileHeight * TileSizeY / 2,
-					(stats->AttackRange + (type->TileWidth - 1)) * TileSizeX + 1);
+					(stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX + 1);
 			}
 		}
 	}
