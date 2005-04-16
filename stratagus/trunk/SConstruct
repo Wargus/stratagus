@@ -22,11 +22,23 @@
 ##      $Id$
 ##
 
-ccflags = "-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math "
+import os
+from stat import *
 
-env = Environment()
+ccflags = "-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math "
+customDefines = "USE_HP_FOR_XP MAP_REGIONS"
+
+opts = Options("build_config.py", ARGUMENTS)
+opts.Add('CPPPATH', 'Additional preprocessor paths')
+opts.Add('CPPFLAGS', 'Additional preprocessor flags')
+opts.Add('CPPDEFINES', 'defined constants')
+opts.Add('LIBPATH', 'Additional library paths')
+opts.Add('LIBS', 'Additional libraries')
+opts.Add('CCFLAGS', 'C Compiler flags')
+env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
+
 env.Append(CCFLAGS = ccflags)
-env.Append(CPPDEFINES = Split("USE_HP_FOR_XP MAP_REGIONS"))
+env.Append(CPPDEFINES = Split(customDefines))
 
 sources = Split("""
 src/ai/ai.c
@@ -157,60 +169,67 @@ sourcesMetaserver = Split("""
  src/network/lowlevel.c
 """)
 
+def AutoConfigure(env):
 
-# determine compiler and linker flags for SDL
-env.ParseConfig('sdl-config --cflags')
-env.ParseConfig('sdl-config --libs')
+  # determine compiler and linker flags for SDL
+  env.ParseConfig('sdl-config --cflags')
+  env.ParseConfig('sdl-config --libs')
+  print env['CCFLAGS']
+  conf = Configure(env)
 
+  ## check for required libs ##
+  if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
+     print 'Did not find SDL libraryor headers, exiting!'
+     Exit(1)
+  if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
+     print 'Did not find png library or headers, exiting!'
+     Exit(1)
+  if not conf.CheckLibWithHeader('z', 'zlib.h', 'c'):
+     print 'Did not find the zlib library or headers, exiting!'
+     Exit(1)
+  if not conf.CheckLib('dl'):
+     print 'Did not find dl library which is needed on some systems for lua. Exiting!'
+     Exit(1)
+  if not conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
+     print 'Did not find lua library or headers, exiting!'
+     Exit(1)
+  if not conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
+     print 'Did not find lualib library of headers, exiting!'
+     Exit(1)
+  # stratagus defines for required libraries
+  env.Append(CPPDEFINES = Split("USE_ZLIB USE_SDL"))
 
-conf = Configure(env)
+  # Check for optional libraries #
+  if conf.CheckLib('bz2'):
+     env.Append(CPPDEFINES = 'USE_BZLIB2')
+  if conf.CheckLib('ogg'):
+     env.Append(CPPDEFINES = 'USE_OGG')
+  if conf.CheckLib('vorbis'):
+     env.Append(CPPDEFINES = 'USE_VORBIS')
+  if conf.CheckLib('theora'):
+     env.Append(CPPDEFINES = 'USE_THEORA')
+  if conf.CheckLib('mikmod'):
+     env.Append(CPPDEFINES = 'USE_MIKMOD')
+  if conf.CheckLib('mad'):
+     env.Append(CPPDEFINES = 'USE_MAD')
+  if conf.CheckLib('flac'):
+     env.Append(CPPDEFINES = 'USE_FLAC')
+  env = conf.Finish()
 
-## check for required libs ##
-if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
-    print 'Did not find SDL libraryor headers, exiting!'
-    Exit(1)
-if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
-    print 'Did not find png library or headers, exiting!'
-    Exit(1)
-if not conf.CheckLibWithHeader('z', 'zlib.h', 'c'):
-    print 'Did not find the zlib library or headers, exiting!'
-    Exit(1)
-if not conf.CheckLib('dl'):
-    print 'Did not find dl library which is needed on some systems for lua. Exiting!'
-    Exit(1)
-if not conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
-    print 'Did not find lua library or headers, exiting!'
-    Exit(1)
-if not conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
-    print 'Did not find lualib library of headers, exiting!'
-    Exit(1)
-# stratagus defines for required libraries
-env.Append(CPPDEFINES = Split("USE_ZLIB USE_SDL"))
+if not os.path.exists("build_config.py")  \
+     or os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
+    print "build_config.py doesn't exist - Generating new build config..."
+    AutoConfigure(env)
+    opts.Save("build_config.py", env)
+else:
+    print "Using build_config.py"
+    opts.Update(env) # for an unknown reason Environment(options=opts) doesnt work
 
-# Check for optional libraries #
-if conf.CheckLib('bz2'):
-    env.Append(CPPDEFINES = 'USE_BZLIB2')
-if conf.CheckLib('ogg'):
-    env.Append(CPPDEFINES = 'USE_OGG')
-if conf.CheckLib('vorbis'):
-    env.Append(CPPDEFINES = 'USE_VORBIS')
-if conf.CheckLib('theora'):
-    env.Append(CPPDEFINES = 'USE_THEORA')
-if conf.CheckLib('mikmod'):
-    env.Append(CPPDEFINES = 'USE_MIKMOD')
-if conf.CheckLib('mad'):
-    env.Append(CPPDEFINES = 'USE_MAD')
-if conf.CheckLib('flac'):
-    env.Append(CPPDEFINES = 'USE_FLAC')
-env = conf.Finish()
-
-
-# Stratagus build 
+# Stratagus build specifics
 env.Append(CPPPATH='src/include')
 
 # Targets
-env.Program('stratagus', sources)
-env.Default('stratagus')
+Default(env.Program('stratagus', sources))
 
 env.Program('metaserver', sourcesMetaserver)
 
