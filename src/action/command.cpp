@@ -460,14 +460,14 @@ void CommandAttack(Unit* unit, int x, int y, Unit* attack, int flush)
 				order->X = order->Y = -1;
 				order->Goal = attack;
 				RefsIncrease(attack);
-				order->Range = unit->Stats->AttackRange;
+				order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				order->MinRange = unit->Type->MinAttackRange;
 			}
 		} else if (WallOnMap(x,y)) {
 			// FIXME: look into action_attack.c about this ugly problem
 			order->X = x;
 			order->Y = y;
-			order->Range = unit->Stats->AttackRange;
+			order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 			order->MinRange = unit->Type->MinAttackRange;
 		} else {
 			order->X = x;
@@ -509,7 +509,7 @@ void CommandAttackGround(Unit* unit, int x, int y, int flush)
 		order->Action = UnitActionAttackGround;
 		order->X = x;
 		order->Y = y;
-		order->Range = unit->Stats->AttackRange;
+		order->Range = unit->Stats->Variables[ATTACKRANGE_INDEX].Max;
 		order->MinRange = unit->Type->MinAttackRange;
 
 		DebugPrint("FIXME this next\n");
