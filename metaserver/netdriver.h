@@ -49,15 +49,17 @@
 #define DEFAULT_SESSION_TIMEOUT		900			// 15 miniutes
 #define DEFAULT_POLLING_DELAY		250			// MS (1000 = 1s)
 
-#define XSB			4		// eXtra Small Buffer
-#define SB			8		// Small Buffer
-#define	MB			64		// Medium Buffer
-#define LB			256		// Large Buffer
-#define XLB			512		// eXtra Large Buffer.
+#define MAX_USERNAME_LENGTH 32
+#define MAX_PASSWORD_LENGTH 32
+
+#define MAX_GAMENAME_LENGTH 32
+#define MAX_VERSION_LENGTH 8
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+
+struct _game_data_;
 
 /**
 ** Global server variables.
@@ -72,14 +74,6 @@ typedef struct _server_struct_ {
 extern ServerStruct Server;
 
 /**
-**  Basic Query
-*/
-typedef struct _query_ {
-	char** List;
-	int Count;
-} Query;
-
-/**
 **  Session data
 **
 **  One per connection.
@@ -88,7 +82,7 @@ typedef struct _session_ {
 	struct _session_* Next;
 	struct _session_* Prev;
 
-	char Buffer[XLB];
+	char Buffer[1024];
 	time_t Idle;
 
 	Socket Socket;
@@ -100,23 +94,13 @@ typedef struct _session_ {
 	} AddrData;               /// Remote address data.
 
 	struct {
-		char Name[MB];
-		char Service[MB];
-		char Version[SB];
+		char Name[MAX_USERNAME_LENGTH + 1];
+		char GameName[MAX_GAMENAME_LENGTH + 1];
+		char Version[MAX_VERSION_LENGTH + 1];
+		int LoggedIn;
 	} UserData;               /// Specific user data.
 
-	struct {
-		char Port[SB];
-		char Name[MB];
-   		char Map[MB];
- 
-		struct {
-			char Max[XSB];
-			char Open[XSB];
-		} Slots;              /// Game slots. (Max Players & Open Slots)
-	} GameData;               /// Hosting data. (Used for game creation)
-
-	Query QueryData;          /// Link to basic query data.
+	struct _game_data_* GameData;
 } Session;
 
 /**
@@ -137,8 +121,10 @@ extern SessionPool* Pool;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int InitServer(int port);
-extern int TermServer(void);
+extern void Send(Session* session, char* msg);
+
+extern int ServerInit(int port);
+extern void ServerQuit(void);
 extern int UpdateSessions(void);
 
 //@}

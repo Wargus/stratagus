@@ -26,6 +26,6 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/metaserver
-MSRC =   cmd.c main.c netdriver.c query.c
+MSRC =   cmd.c db.c games.c main.c netdriver.c
 
 METASERVER_SRC +=   $(addprefix $(MODULE)/,$(MSRC))
