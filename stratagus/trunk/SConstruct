@@ -31,14 +31,14 @@ customDefines = "USE_HP_FOR_XP MAP_REGIONS"
 opts = Options("build_config.py", ARGUMENTS)
 opts.Add('CPPPATH', 'Additional preprocessor paths')
 opts.Add('CPPFLAGS', 'Additional preprocessor flags')
-opts.Add('CPPDEFINES', 'defined constants')
+opts.Add('CPPDEFINES', 'defined constants', Split(customDefines))
 opts.Add('LIBPATH', 'Additional library paths')
 opts.Add('LIBS', 'Additional libraries')
-opts.Add('CCFLAGS', 'C Compiler flags')
+opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
+opts.Add('CC', 'C Compiler')
 env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
-
-env.Append(CCFLAGS = ccflags)
-env.Append(CPPDEFINES = Split(customDefines))
+opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
+Help(opts.GenerateHelpText(env))
 
 sources = Split("""
 build/ai/ai.c
@@ -170,11 +170,9 @@ sourcesMetaserver = Split("""
 """)
 
 def AutoConfigure(env):
-
   # determine compiler and linker flags for SDL
   env.ParseConfig('sdl-config --cflags')
   env.ParseConfig('sdl-config --libs')
-  print env['CCFLAGS']
   conf = Configure(env)
 
   ## check for required libs ##
@@ -223,7 +221,6 @@ if not os.path.exists("build_config.py")  \
     opts.Save("build_config.py", env)
 else:
     print "Using build_config.py"
-    opts.Update(env) # for an unknown reason Environment(options=opts) doesnt work
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
