@@ -41,132 +41,132 @@ env.Append(CCFLAGS = ccflags)
 env.Append(CPPDEFINES = Split(customDefines))
 
 sources = Split("""
-src/ai/ai.c
-src/ai/ai_magic.c
-src/ai/ai_plan.c
-src/ai/ai_force.c
-src/ai/ai_resource.c
-src/ai/script_ai.c
-src/ai/ai_building.c
-src/ui/ui.c
-src/ui/interface.c
-src/ui/botpanel.c
-src/ui/menu_proc.c
-src/ui/menus.c
-src/ui/mouse.c
-src/ui/button_checks.c
-src/ui/script_ui.c
-src/ui/icons.c
-src/ui/mainscr.c
-src/map/tileset.c
-src/map/map.c
-src/map/map_draw.c
-src/map/map_save.c
-src/map/minimap.c
-src/map/script_map.c
-src/map/map_wall.c
-src/map/map_radar.c
-src/map/map_fog.c
-src/map/script_tileset.c
-src/beos/beos.c
-src/game/trigger.c
-src/game/savegame.c
-src/game/campaign.c
-src/game/game.c
-src/game/loadgame.c
-src/game/intro.c
-src/unit/script_unit.c
-src/unit/upgrade.c
-src/unit/unittype.c
-src/unit/depend.c
-src/unit/unit_draw.c
-src/unit/unit_find.c
-src/unit/unit.c
-src/unit/script_unittype.c
-src/unit/unit_cache.c
-src/stratagus/script_missile.c
-src/stratagus/pud.c
-src/stratagus/script_spell.c
-src/stratagus/spells.c
-src/stratagus/mainloop.c
-src/stratagus/missile.c
-src/stratagus/construct.c
-src/stratagus/groups.c
-src/stratagus/script_player.c
-src/stratagus/selection.c
-src/stratagus/script.c
-src/stratagus/stratagus.c
-src/stratagus/util.c
-src/stratagus/player.c
-src/stratagus/iolib.c
-src/sound/sound_server.c
-src/sound/mad.c
-src/sound/ogg.c
-src/sound/wav.c
-src/sound/script_sound.c
-src/sound/sdl_audio.c
-src/sound/sound.c
-src/sound/cdda.c
-src/sound/flac.c
-src/sound/mikmod.c
-src/sound/music.c
-src/sound/unitsound.c
-src/sound/libcda.c
-src/sound/sound_id.c
-src/sound/cdaudio.c
-src/video/linedraw.c
-src/video/mng.c
-src/video/png.c
-src/video/sdl.c
-src/video/sprite.c
-src/video/cursor.c
-src/video/font.c
-src/video/movie.c
-src/video/graphic.c
-src/video/video.c
-src/action/action_build.c
-src/action/action_research.c
-src/action/command.c
-src/action/action_attack.c
-src/action/action_repair.c
-src/action/action_returngoods.c
-src/action/action_stand.c
-src/action/action_still.c
-src/action/action_unload.c
-src/action/action_upgradeto.c
-src/action/action_follow.c
-src/action/action_train.c
-src/action/action_patrol.c
-src/action/action_spellcast.c
-src/action/action_die.c
-src/action/actions.c
-src/action/action_resource.c
-src/action/action_board.c
-src/action/action_move.c
-src/editor/editor.c
-src/editor/edmap.c
-src/editor/script_editor.c
-src/editor/editloop.c
-src/pathfinder/pathfinder.c
-src/pathfinder/splitter_debug.c
-src/pathfinder/splitter_zoneset.c
-src/pathfinder/splitter_lowlevel.c
-src/pathfinder/splitter.c
-src/pathfinder/astar.c
-src/pathfinder/script_pathfinder.c
-src/network/commands.c
-src/network/master.c
-src/network/network.c
-src/network/lowlevel.c
-src/network/netconnect.c
+build/ai/ai.c
+build/ai/ai_magic.c
+build/ai/ai_plan.c
+build/ai/ai_force.c
+build/ai/ai_resource.c
+build/ai/script_ai.c
+build/ai/ai_building.c
+build/ui/ui.c
+build/ui/interface.c
+build/ui/botpanel.c
+build/ui/menu_proc.c
+build/ui/menus.c
+build/ui/mouse.c
+build/ui/button_checks.c
+build/ui/script_ui.c
+build/ui/icons.c
+build/ui/mainscr.c
+build/map/tileset.c
+build/map/map.c
+build/map/map_draw.c
+build/map/map_save.c
+build/map/minimap.c
+build/map/script_map.c
+build/map/map_wall.c
+build/map/map_radar.c
+build/map/map_fog.c
+build/map/script_tileset.c
+build/beos/beos.c
+build/game/trigger.c
+build/game/savegame.c
+build/game/campaign.c
+build/game/game.c
+build/game/loadgame.c
+build/game/intro.c
+build/unit/script_unit.c
+build/unit/upgrade.c
+build/unit/unittype.c
+build/unit/depend.c
+build/unit/unit_draw.c
+build/unit/unit_find.c
+build/unit/unit.c
+build/unit/script_unittype.c
+build/unit/unit_cache.c
+build/stratagus/script_missile.c
+build/stratagus/pud.c
+build/stratagus/script_spell.c
+build/stratagus/spells.c
+build/stratagus/mainloop.c
+build/stratagus/missile.c
+build/stratagus/construct.c
+build/stratagus/groups.c
+build/stratagus/script_player.c
+build/stratagus/selection.c
+build/stratagus/script.c
+build/stratagus/stratagus.c
+build/stratagus/util.c
+build/stratagus/player.c
+build/stratagus/iolib.c
+build/sound/sound_server.c
+build/sound/mad.c
+build/sound/ogg.c
+build/sound/wav.c
+build/sound/script_sound.c
+build/sound/sdl_audio.c
+build/sound/sound.c
+build/sound/cdda.c
+build/sound/flac.c
+build/sound/mikmod.c
+build/sound/music.c
+build/sound/unitsound.c
+build/sound/libcda.c
+build/sound/sound_id.c
+build/sound/cdaudio.c
+build/video/linedraw.c
+build/video/mng.c
+build/video/png.c
+build/video/sdl.c
+build/video/sprite.c
+build/video/cursor.c
+build/video/font.c
+build/video/movie.c
+build/video/graphic.c
+build/video/video.c
+build/action/action_build.c
+build/action/action_research.c
+build/action/command.c
+build/action/action_attack.c
+build/action/action_repair.c
+build/action/action_returngoods.c
+build/action/action_stand.c
+build/action/action_still.c
+build/action/action_unload.c
+build/action/action_upgradeto.c
+build/action/action_follow.c
+build/action/action_train.c
+build/action/action_patrol.c
+build/action/action_spellcast.c
+build/action/action_die.c
+build/action/actions.c
+build/action/action_resource.c
+build/action/action_board.c
+build/action/action_move.c
+build/editor/editor.c
+build/editor/edmap.c
+build/editor/script_editor.c
+build/editor/editloop.c
+build/pathfinder/pathfinder.c
+build/pathfinder/splitter_debug.c
+build/pathfinder/splitter_zoneset.c
+build/pathfinder/splitter_lowlevel.c
+build/pathfinder/splitter.c
+build/pathfinder/astar.c
+build/pathfinder/script_pathfinder.c
+build/network/commands.c
+build/network/master.c
+build/network/network.c
+build/network/lowlevel.c
+build/network/netconnect.c
 """)
 
 sourcesMetaserver = Split("""
- src/metaserver/cmd.c   
- src/metaserver/netdriver.c
- src/metaserver/main.c  
- src/metaserver/query.c
- src/network/lowlevel.c
+ build/metaserver/cmd.c   
+ build/metaserver/netdriver.c
+ build/metaserver/main.c  
+ build/metaserver/query.c
+ build/network/lowlevel.c
 """)
 
 def AutoConfigure(env):
@@ -227,10 +227,10 @@ else:
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
+BuildDir('build', 'src', duplicate = 0)
 
 # Targets
 Default(env.Program('stratagus', sources))
-
 env.Program('metaserver', sourcesMetaserver)
 
 
