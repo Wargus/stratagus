@@ -44,6 +44,7 @@
 #include "util.h"
 #include "netdriver.h"
 #include "cmd.h"
+#include "db.h"
 
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -160,12 +161,19 @@ int main(int argc, char** argv)
 		}
     }
 
+	// Initialize the database
+	if (DBInit()) {
+		fprintf(stderr, "DBInit failed\n");
+		exit(1);
+	}
+	atexit(DBQuit);
+
 	//
 	// Initialize server.
 	//
 	// Open the server to connections.
 	//
-	if ((status = InitServer(Server.Port)) != 0) {
+	if ((status = ServerInit(Server.Port)) != 0) {
 		if (status > 0) {
 			fprintf(stderr, "ERROR %d: %s\n", errno, strerror(errno));		// > 0
 		} else {
@@ -173,7 +181,7 @@ int main(int argc, char** argv)
 		}
 		exit(status);
 	}
-	atexit(((void*)TermServer));
+	atexit(ServerQuit);
 
 	printf("Stratagus Metaserver Initialized on port %d.\n", Server.Port);
 

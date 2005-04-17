@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name session.h - Session mangement structures. */
+/**@name db.h - Database routines. */
 //
-//      (c) Copyright 2005 by Edward Haase
+//      (c) Copyright 2005 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,22 +25,24 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
+//
+//      $Id$
 
-#ifndef __SESSION_H__
-#define __SESSION_H__
+#ifndef __DB_H__
+#define __DB_H__
 
 //@{
-
-/*----------------------------------------------------------------------------
---  Includes
-----------------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+extern int DBInit(void);
+extern void DBQuit(void);
+extern int DBFindUser(char* username, char* password);
+extern int DBAddUser(char* username, char* password);
+extern int DBUpdateLoginDate(char* username);
 
 //@}
 
-#endif // __SESSION_H__
+#endif // __DB_H__
