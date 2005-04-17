@@ -134,7 +134,7 @@ src/metaserver/$(OBJDIR):
 	mkdir $@
 
 metaserver: src/metaserver/$(OBJDIR) $(METASERVER_OBJ)
-	$(CCLD) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS)
+	$(CCLD) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS) -lsqlite3
 
 src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
