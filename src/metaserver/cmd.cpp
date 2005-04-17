@@ -55,6 +55,7 @@
 			while (*buf != '\"' && *buf) ++buf; \
 			if (*buf != '\"') return 1; \
 			*buf++ = '\0'; \
+			if (*arg == '\0') return 1; \
 			if (*buf != ' ') return 1; \
 		} else { \
 			*arg = buf; \
@@ -71,6 +72,7 @@
 			while (*buf != '\"' && *buf) ++buf; \
 			if (*buf != '\"') return 1; \
 			*buf++ = '\0'; \
+			if (*arg == '\0') return 1; \
 			if (*buf != ' ' && *buf) return 1; \
 		} else { \
 			*arg = buf; \
@@ -438,7 +440,7 @@ static void ParseBuffer(Session* session)
 		} else if (!strcmp(buf, "PARTGAME") || !strncmp(buf, "PARTGAME ", 9)) {
 			ParsePartGame(session, buf + 8);
 		} else if (!strncmp(buf, "ENDGAME ", 8)) {
-			ParseEndGame(session, buf + 7);
+			ParseEndGame(session, buf + 8);
 		} else if (!strncmp(buf, "MSG ", 4)) {
 			ParseMsg(session, buf + 4);
 		} else {
