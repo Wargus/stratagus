@@ -237,6 +237,9 @@ if env['debug']:
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Werror -Wall'))
 else:
     env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
+if not os.path.exists('config.h'):
+    # create a dummy config.h needed by stratagus
+    open('config.h', 'wt').close()
 
 # Targets
 Default(env.Program('stratagus', sources))
