@@ -264,8 +264,12 @@ static void LoseResource(Unit* unit, const Unit* source)
 	ResourceInfo* resinfo;
 	resinfo = unit->Type->ResInfo[unit->CurrentResource];
 
-	if (unit->Container) {
-		Assert(!resinfo->HarvestFromOutside);
+	Assert((unit->Container && !resinfo->HarvestFromOutside) ||
+		(!unit->Container && resinfo->HarvestFromOutside));
+
+	if (resinfo->HarvestFromOutside) {
+		RefsDecrease(unit->Orders[0].Goal);
+		unit->Orders[0].Goal = NoUnitP;
 	}
 
 	//
@@ -475,6 +479,8 @@ static int StopGathering(Unit* unit)
 	if (!resinfo->TerrainHarvester) {
 		if (resinfo->HarvestFromOutside) {
 			source = unit->Orders[0].Goal;
+			RefsDecrease(source);
+			unit->Orders[0].Goal = NoUnitP;
 		} else {
 			source = unit->Container;
 		}
