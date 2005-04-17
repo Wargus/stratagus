@@ -228,6 +228,7 @@ int PlayMovie(const char* name)
 		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
+		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 		OggFree(data);
 		free(data);
 		CLclose(f);
