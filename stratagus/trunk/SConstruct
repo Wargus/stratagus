@@ -8,6 +8,7 @@
 ##                        T H E   W A R   B E G I N S
 ##         Stratagus - A free fantasy real time strategy game engine
 ##
+##      SConstruct build file. See http://www.scons.org for info about scons.
 ##      (c) Copyright 2005 by Francois Beerten
 ##
 ##      Stratagus is free software; you can redistribute it and/or modify
@@ -25,9 +26,13 @@
 import os
 from stat import *
 
-ccflags = "-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math "
+ccflags = "-fsigned-char"
 customDefines = "USE_HP_FOR_XP MAP_REGIONS"
 
+if os.path.exists("build_config.py")  \
+     and os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
+   # Remove outdated build_config.py
+   os.remove("build_config.py")
 opts = Options("build_config.py", ARGUMENTS)
 opts.Add('CPPPATH', 'Additional preprocessor paths')
 opts.Add('CPPFLAGS', 'Additional preprocessor flags')
@@ -36,6 +41,7 @@ opts.Add('LIBPATH', 'Additional library paths')
 opts.Add('LIBS', 'Additional libraries')
 opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
 opts.Add('CC', 'C Compiler')
+opts.Add('debug', 'Build with debugging options', '0')
 env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
@@ -216,7 +222,8 @@ def AutoConfigure(env):
 
 if not os.path.exists("build_config.py")  \
      or os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
-    print "build_config.py doesn't exist - Generating new build config..."
+    print "build_config.py doesn't exist or out of date."
+    print "Generating new build config..."
     AutoConfigure(env)
     opts.Save("build_config.py", env)
 else:
@@ -225,6 +232,11 @@ else:
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
 BuildDir('build', 'src', duplicate = 0)
+if env['debug']:
+    env.Append(CPPDEFINES = 'DEBUG')
+    env.Append(CCFLAGS = Split('-g -Wsign-compare -Werror -Wall'))
+else:
+    env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
 
 # Targets
 Default(env.Program('stratagus', sources))
