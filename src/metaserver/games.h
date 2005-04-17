@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name query.h - Query header. */
+/**@name optargs.h - Command line parser header. */
 //
-//      (c) Copyright 2005 by Edward Haase
+//      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -28,10 +28,17 @@
 //
 //      $Id$
 
-#ifndef __QUERY_H__
-#define __QUERY_H__
+#ifndef __GAMES_H__
+#define __GAMES_H__
 
 //@{
+
+/*----------------------------------------------------------------------------
+--  Defines
+----------------------------------------------------------------------------*/
+
+#define MAX_DESCRIPTION_LENGTH 64
+#define MAX_MAP_LENGTH 64
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -39,14 +46,41 @@
 
 struct _session_;
 
+typedef struct _game_data_
+{
+	char IP[16];
+	char Port[6];
+	char Description[MAX_DESCRIPTION_LENGTH + 1];
+   	char Map[MAX_MAP_LENGTH + 1];
+	int OpenSlots;
+	int MaxSlots;
+
+	char* GameName;
+	char* Version;
+
+	struct _session_* Sessions[16];
+	int NumSessions;
+	int ID;
+	int Started;
+
+	struct _game_data_* Next;
+	struct _game_data_* Prev;
+} GameData;
+
+extern int GameID;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int StartQuery(struct _session_* ptr);
-extern int QueryGame(struct _session_* ptr, int n);
-extern int CleanUpQuery(struct _session_* ptr);
+extern void CreateGame(struct _session_* session, char* description, char* map,
+	char* players, char* ip, char* port);
+extern int CancelGame(struct _session_* session);
+extern int StartGame(struct _session_* session);
+extern int JoinGame(struct _session_* session, int id);
+extern int PartGame(struct _session_* session);
+extern void ListGames(struct _session_* session);
 
 //@}
 
-#endif // !__QUERY_H__
+#endif // __GAMES_H__

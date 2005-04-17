@@ -41,160 +41,471 @@
 #include "stratagus.h"
 #include "cmd.h"
 #include "netdriver.h"
-#include "query.h"
+#include "db.h"
+#include "games.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+#define GetNextArg(buf, arg) \
+	do { \
+		if (*buf == '\"') { \
+			*arg = ++buf; \
+			while (*buf != '\"' && *buf) ++buf; \
+			if (*buf != '\"') return 1; \
+			*buf++ = '\0'; \
+			if (*buf != ' ') return 1; \
+		} else { \
+			*arg = buf; \
+			while (*buf != ' ' && *buf) ++buf; \
+			if (!*buf) return 1; \
+		} \
+		*buf++ = '\0'; \
+	} while (0)
+
+#define GetLastArg(buf, arg) \
+	do { \
+		if (*buf == '\"') { \
+			*arg = ++buf; \
+			while (*buf != '\"' && *buf) ++buf; \
+			if (*buf != '\"') return 1; \
+			*buf++ = '\0'; \
+			if (*buf != ' ' && *buf) return 1; \
+		} else { \
+			*arg = buf; \
+			while (*buf != ' ' && *buf) ++buf; \
+		} \
+	} while (0)
+
+#define SkipSpaces(buf) \
+	do { \
+		while (*buf == ' ') ++buf; \
+		if (!*buf) return 1; \
+	} while (0)
+
+
+static int Parse1Arg(char* buf, char** arg1)
+{
+	SkipSpaces(buf);
+
+	GetLastArg(buf, arg1);
+	// Extra parameter?
+	if (*buf) {
+		*buf++ = '\0';
+		// Skip trailing spaces
+		while (*buf == ' ') ++buf;
+		if (*buf) return 1;
+	}
+
+	return 0;
+}
+
+static int Parse2Args(char* buf, char** arg1, char** arg2)
+{
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg1);
+	SkipSpaces(buf);
+
+	GetLastArg(buf, arg2);
+	// Extra parameter?
+	if (*buf) {
+		*buf++ = '\0';
+		// Skip trailing spaces
+		while (*buf == ' ') ++buf;
+		if (*buf) return 1;
+	}
+
+	return 0;
+}
+
+static int Parse4Args(char* buf, char** arg1, char** arg2, char** arg3,
+	char** arg4)
+{
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg1);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg2);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg3);
+	SkipSpaces(buf);
+
+	GetLastArg(buf, arg4);
+	// Extra parameter?
+	if (*buf) {
+		*buf++ = '\0';
+		// Skip trailing spaces
+		while (*buf == ' ') ++buf;
+		if (*buf) return 1;
+	}
+
+	return 0;
+}
+
+static int Parse5Args(char* buf, char** arg1, char** arg2, char** arg3,
+	char** arg4, char** arg5)
+{
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg1);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg2);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg3);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg4);
+	SkipSpaces(buf);
+
+	GetLastArg(buf, arg5);
+	// Extra parameter?
+	if (*buf) {
+		*buf++ = '\0';
+		// Skip trailing spaces
+		while (*buf == ' ') ++buf;
+		if (*buf) return 1;
+	}
+
+	return 0;
+}
+
+/**
+**  Parse USER
+*/
+static void ParseUser(Session* session, char* buf)
+{
+	char* username;
+	char* password;
+	char* gamename;
+	char* gamever;
+	char pw[MAX_PASSWORD_LENGTH + 1];
+
+	if (Parse4Args(buf, &username, &password, &gamename, &gamever)) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (strlen(username) > MAX_USERNAME_LENGTH ||
+			strlen(password) > MAX_PASSWORD_LENGTH ||
+			strlen(gamename) > MAX_GAMENAME_LENGTH ||
+			strlen(gamever) > MAX_VERSION_LENGTH) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (!DBFindUser(username, pw)) {
+		DebugPrint("Username doesn't exist: %s\n" _C_ username);
+		Send(session, "ERR_NOUSER\n");
+		return;
+	}
+	if (strcmp(pw, password)) {
+		DebugPrint("Bad password for user %s\n" _C_ username);
+		Send(session, "ERR_BADPASSWORD\n");
+		return;
+	}
+
+	DebugPrint("User logged in: %s\n" _C_ username);
+	strcpy(session->UserData.Name, username);
+	strcpy(session->UserData.GameName, gamename);
+	strcpy(session->UserData.Version, gamever);
+	session->UserData.LoggedIn = 1;
+	DBUpdateLoginDate(username);
+	Send(session, "USER_OK\n");
+}
+
+/**
+**  Parse REGISTER
+*/
+static void ParseRegister(Session* session, char* buf)
+{
+	char* username;
+	char* password;
+	char* gamename;
+	char* gamever;
+	char pw[MAX_PASSWORD_LENGTH + 1];
+
+	if (Parse4Args(buf, &username, &password, &gamename, &gamever)) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (strlen(username) > MAX_USERNAME_LENGTH ||
+			strlen(password) > MAX_PASSWORD_LENGTH ||
+			strlen(gamename) > MAX_GAMENAME_LENGTH ||
+			strlen(gamever) > MAX_VERSION_LENGTH) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (DBFindUser(username, pw)) {
+		DebugPrint("Tried to register existing user: %s\n" _C_ username);
+		Send(session, "ERR_USEREXISTS\n");
+		return;
+	}
+
+	DebugPrint("New user registered: %s\n" _C_ username);
+	session->UserData.LoggedIn = 1;
+	strcpy(session->UserData.Name, username);
+	strcpy(session->UserData.GameName, gamename);
+	strcpy(session->UserData.Version, gamever);
+	DBAddUser(username, password); // FIXME: if this fails?
+	Send(session, "REGISTER_OK\n");
+}
+
+/**
+**  Parse CREATEGAME
+*/
+static void ParseCreateGame(Session* session, char* buf)
+{
+	char* description;
+	char* map;
+	char* players;
+	char* ip;
+	char* port;
+	int players_int;
+	int port_int;
+
+
+	if (Parse5Args(buf, &description, &map, &players, &ip, &port)) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	players_int = atoi(players);
+	port_int = atoi(port);
+	// FIXME: check ip
+	if (strlen(description) > MAX_DESCRIPTION_LENGTH ||
+			strlen(map) > MAX_MAP_LENGTH ||
+			players_int < 1 || players_int > 16 ||
+			port_int < 1 || port_int > 66535) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	CreateGame(session, description, map, players, ip, port);
+
+	DebugPrint("%s created a game\n" _C_ session->UserData.Name);
+	Send(session, "CREATEGAME_OK\n");
+}
+
+/**
+**  Parse CANCELGAME
+*/
+static void ParseCancelGame(Session* session, char* buf)
+{
+	// No args
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (CancelGame(session)) {
+		Send(session, "ERR_NOGAMECREATED\n");
+		return;
+	}
+
+	DebugPrint("%s canceled a game\n" _C_ session->UserData.Name);
+	Send(session, "CANCELGAME_OK\n");
+}
+
+/**
+**  Parse STARTGAME
+*/
+static void ParseStartGame(Session* session, char* buf)
+{
+	// No args
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	if (StartGame(session)) {
+		Send(session, "ERR_NOGAMECREATED\n");
+		return;
+	}
+
+	DebugPrint("%s started a game\n" _C_ session->UserData.Name);
+	Send(session, "STARTGAME_OK\n");
+}
+
+/**
+**  Parse LISTGAMES
+*/
+static void ParseListGames(Session* session, char* buf)
+{
+	// No args
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	ListGames(session);
+
+	Send(session, "LISTGAMES_OK\n");
+}
+
+/**
+**  Parse JOINGAME
+*/
+static void ParseJoinGame(Session* session, char* buf)
+{
+	char* id;
+	int ret;
+
+	if (Parse1Arg(buf, &id)) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	ret = JoinGame(session, atoi(id));
+	if (ret == -1) {
+		Send(session, "ERR_ALREADYINGAME\n");
+		return;
+	} else if (ret == -2) { // ID not found
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	} else if (ret == -3) {
+		Send(session, "ERR_GAMEFULL\n");
+		return;
+	}
+
+	DebugPrint("%s joined game %d\n" _C_ session->UserData.Name _C_ atoi(id));
+	Send(session, "JOINGAME_OK\n");
+}
+
+/**
+**  Parse PARTGAME
+*/
+static void ParsePartGame(Session* session, char* buf)
+{
+	int ret;
+
+	// No args
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Send(session, "ERR_BADPARAMETER\n");
+		return;
+	}
+
+	ret = PartGame(session);
+	if (ret == -1) {
+		Send(session, "ERR_NOTINGAME\n");
+		return;
+	} else if (ret == -2) {
+		Send(session, "ERR_GAMESTARTED\n");
+		return;
+	}
+
+	DebugPrint("%s left a game\n" _C_ session->UserData.Name);
+	Send(session, "PARTGAME_OK\n");
+}
+
+/**
+**  Parse ENDGAME
+*/
+static void ParseEndGame(Session* session, char* buf)
+{
+	char* result;
+
+	Parse1Arg(buf, &result);
+
+	Send(session, "ENDGAME_OK\n");
+}
+
+/**
+**  Parse MSG
+*/
+static void ParseMsg(Session* session, char* buf)
+{
+}
 
 /**
 **  ParseBuffer: Handler client/server interaction.
 **
 **  @param ptr  Current session.
 */
-static int ParseBuffer(Session* ptr)
+static void ParseBuffer(Session* session)
 {
-	static char cmd[128];
-	static char dump[128];
+	char* buf;
 
-	if (!ptr) {
-		return -1;
+	if (!session || session->Buffer[0] == '\0') {
+		return;
 	}
 
-	if (ptr->Buffer[0] == '\0') {
-		return 0;
+	buf = session->Buffer;
+
+	if (!session->UserData.LoggedIn) {
+		if (!strncmp(buf, "USER ", 5)) {
+			ParseUser(session, buf + 5);
+		} else if (!strncmp(buf, "REGISTER ", 9)) {
+			ParseRegister(session, buf + 9);
+		} else {
+			fprintf(stderr, "Unknown command: %s\n", session->Buffer);
+			Send(session, "ERR_BADCOMMAND\n");
+		}
+	} else {
+		if (!strncmp(buf, "USER ", 5) || !strncmp(buf, "REGISTER ", 9)) {
+			Send(session, "ERR_ALREADYLOGGEDIN\n");
+		} else if (!strncmp(buf, "CREATEGAME ", 11)) {
+			ParseCreateGame(session, buf + 11);
+		} else if (!strcmp(buf, "CANCELGAME") || !strncmp(buf, "CANCELGAME ", 11)) {
+			ParseCancelGame(session, buf + 10);
+		} else if (!strcmp(buf, "STARTGAME") || !strncmp(buf, "STARTGAME ", 10)) {
+			ParseStartGame(session, buf + 9);
+		} else if (!strcmp(buf, "LISTGAMES") || !strncmp(buf, "LISTGAMES ", 10)) {
+			ParseListGames(session, buf + 9);
+		} else if (!strncmp(buf, "JOINGAME ", 9)) {
+			ParseJoinGame(session, buf + 9);
+		} else if (!strcmp(buf, "PARTGAME") || !strncmp(buf, "PARTGAME ", 9)) {
+			ParsePartGame(session, buf + 8);
+		} else if (!strncmp(buf, "ENDGAME ", 8)) {
+			ParseEndGame(session, buf + 7);
+		} else if (!strncmp(buf, "MSG ", 4)) {
+			ParseMsg(session, buf + 4);
+		} else {
+			fprintf(stderr, "Unknown command: %s\n", session->Buffer);
+			Send(session, "ERR_BADCOMMAND\n");
+		}
 	}
-
-	//
-	// Read message header.
-	//
-	sscanf(ptr->Buffer, "<Stratagus>\n%s\n%s\n%s\n%s\n",
-		ptr->UserData.Name, ptr->UserData.Service,
-	    ptr->UserData.Version, cmd);
-
-	//
-	// Take command-specific action.
-	//
-	if (!strcmp(cmd, "Login")) {
-		NetSendTCP(ptr->Socket, "OK\r\n", 4);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "AbandonGame")) {
-		printf("Cancel game: [%s:%d] [%s(%s):%s] [%s] [%s/%s]\n",
-			ptr->AddrData.IPStr, atoi(ptr->GameData.Port),
-			ptr->UserData.Service, ptr->UserData.Version, ptr->GameData.Name,
-			ptr->GameData.Map,
-			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
-
-		memset(&ptr->GameData, 0, sizeof(ptr->GameData));
-		NetSendTCP(ptr->Socket, "OK\r\n", 4);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "AddGame")) {
-		sscanf(ptr->Buffer, "<Stratagus>\n%s\n%s\n%s\n%s\nIP\n%s\n%s\n%s\n%s\n%s\n",
-			dump, dump, dump, dump,
-			ptr->GameData.Port, ptr->GameData.Name, ptr->GameData.Map,
-			ptr->GameData.Slots.Max, ptr->GameData.Slots.Open);
-
-
-		// creation note
-		printf("New game: [%s:%d] [%s(%s):%s] [%s] [%s/%s]\n",
-			ptr->AddrData.IPStr, atoi(ptr->GameData.Port),
-			ptr->UserData.Service, ptr->UserData.Version, ptr->GameData.Name,
-			ptr->GameData.Map,
-			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
-
-		NetSendTCP(ptr->Socket, "OK\r\n", 4);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "StartGame")) {
-		printf("Start game: [%s:%d] [%s(%s):%s] [%s] [%s/%s]\n",
-			ptr->AddrData.IPStr, atoi(ptr->GameData.Port),
-			ptr->UserData.Service, ptr->UserData.Version, ptr->GameData.Name,
-			ptr->GameData.Map,
-			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
-
-		memset(&ptr->GameData, 0, sizeof(ptr->GameData));
-		NetSendTCP(ptr->Socket, "OK\r\n", 4);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "ChangeGame")) {
-		sscanf(ptr->Buffer, "<Stratagus>\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
-			dump, dump, dump, dump,
-			ptr->GameData.Name, ptr->GameData.Map,
-			ptr->GameData.Slots.Max, ptr->GameData.Slots.Open);
-
-		printf("Change game: [%s:%d] [%s(%s):%s] [%s] [%s/%s]\n",
-			ptr->AddrData.IPStr, atoi(ptr->GameData.Port),
-			ptr->UserData.Service, ptr->UserData.Version, ptr->GameData.Name,
-			ptr->GameData.Map,
-			ptr->GameData.Slots.Open, ptr->GameData.Slots.Max);
-
-		NetSendTCP(ptr->Socket, "OK\r\n", 4);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "NumberOfGames")) {
-		StartQuery(ptr);
-		return 0;
-	}
-
-	if (!strcmp(cmd, "GameNumber")) {
-		char val[8];
-
-		memset(val, '\0', sizeof(val));
-
-		sscanf(ptr->Buffer, "<Stratagus>\n%s\n%s\n%s\n%s\n%s",
-			dump, dump, dump, dump,	val);
-
-		QueryGame(ptr, atoi(val));
-		return 0;
-	}
-
-	//
-	// Default Action?
-	//
-	printf("Unknown Command: [%s]\n", cmd);
-
-	return 0;
 }
 
 /**
-**  UpdateParser: iterate sessions, push to parser.
+**  Parse all session buffers
 */
 int UpdateParser(void)
 {
-	Session* ptr;
+	Session* session;
 	int len;
 	char* next;
 
 	if (!Pool || !Pool->First) {
+		// No connections
 		return 0;
 	}
 
-	//
-	// iterations.
-	//
-	for (ptr = Pool->First; ptr; ptr = ptr->Next) {
-		//
+	for (session = Pool->First; session; session = session->Next) {
 		// Confirm full message.
-		//
-		if ((next = strstr(ptr->Buffer, "\n\n"))) {
-			//
-			// Parse message.
-			//
-			ParseBuffer(ptr);
+		while ((next = strpbrk(session->Buffer, "\r\n"))) {
+			*next++ = '\0';
+			if (*next == '\r' || *next == '\n') {
+				++next;
+			}
 
-			//
-			// Terminate message.
-			//
-			len = next - ptr->Buffer + 2;
-			memmove(ptr->Buffer, ptr->Buffer + len, sizeof(ptr->Buffer) - len);
-			memset(ptr->Buffer + (sizeof(ptr->Buffer) - len), 0, len);
+			ParseBuffer(session);
+
+			// Remove parsed message
+			len = next - session->Buffer;
+			memmove(session->Buffer, next, sizeof(session->Buffer) - len);
+			session->Buffer[sizeof(session->Buffer) - len] = '\0';
 		}
 
 	}

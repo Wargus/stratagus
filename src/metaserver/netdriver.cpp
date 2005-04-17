@@ -102,11 +102,24 @@ ServerStruct Server;
 ----------------------------------------------------------------------------*/
 
 /**
-**  InitServer: Starts the SDL_Net process, allowing the gaming to commence.
+**  Send a message to a session
+**
+**  @param session  Session to send the message to
+**  @param msg      Message to send
+*/
+void Send(Session* session, char* msg)
+{
+	NetSendTCP(session->Socket, msg, strlen(msg));
+}
+
+/**
+**  Initialize the server
 **
 **  @param port  Defines the port to which the server will bind.
+**
+**  @return      0 for success, non-zero for failure
 */
-int InitServer(int port)
+int ServerInit(int port)
 {
 	Pool = NULL;
 
@@ -154,9 +167,9 @@ int InitServer(int port)
 }
 
 /**
-**  TermServer: Releases the server socket.
+**  ServerQuit: Releases the server socket.
 */
-int TermServer(void)
+void ServerQuit(void)
 {
 	NetCloseTCP(MasterSocket);
 	// begin clean up of any remaining sockets
@@ -175,31 +188,30 @@ int TermServer(void)
 	}
 
 	NetExit();
-	return 0;
 }
 
 /**
-**  IdleSeconds: Returns time (in seconds) that a session has been idle.
+**  Returns time (in seconds) that a session has been idle.
 **
 **  @param ptr  This is the session we are checking.
 */
-static int IdleSeconds(Session* ptr)
+static int IdleSeconds(Session* session)
 {
-	return (int)(time(0) - ptr->Idle);
+	return (int)(time(0) - session->Idle);
 }
 
 /**
-**  KillSession: Destroys and cleans up session data.
+**  Destroys and cleans up session data.
 **
 **  @param ptr  Reference to the session to be killed.
 */
-static int KillSession(Session* ptr)
+static int KillSession(Session* session)
 {
-	DebugPrint("Closing connection from '%s'\n" _C_ ptr->AddrData.IPStr);
-	NetCloseTCP(ptr->Socket);
-	NetDelSocket(Pool->SocketSet, ptr->Socket);
-	UNLINK(Pool->First, ptr, Pool->Last, Pool->Count);
-	free(ptr);
+	DebugPrint("Closing connection from '%s'\n" _C_ session->AddrData.IPStr);
+	NetCloseTCP(session->Socket);
+	NetDelSocket(Pool->SocketSet, session->Socket);
+	UNLINK(Pool->First, session, Pool->Last, Pool->Count);
+	free(session);
 	return 0;
 }
 
@@ -245,16 +257,16 @@ static void AcceptConnections(void)
 */
 static void KickIdlers(void)
 {
-	Session* ptr;
+	Session* session;
 	Session* next;
 
-	for (ptr = Pool->First; ptr; ) {
-		next = ptr->Next;
-		if (IdleSeconds(ptr) > Server.IdleTimeout) {
-			DebugPrint("Kicking idler '%s'\n" _C_ ptr->AddrData.IPStr);
-			KillSession(ptr);
+	for (session = Pool->First; session; ) {
+		next = session->Next;
+		if (IdleSeconds(session) > Server.IdleTimeout) {
+			DebugPrint("Kicking idler '%s'\n" _C_ session->AddrData.IPStr);
+			KillSession(session);
 		}
-		ptr = next;
+		session = next;
 	}
 }
 
@@ -263,7 +275,7 @@ static void KickIdlers(void)
 */
 static int ReadData(void)
 {
-	Session* ptr;
+	Session* session;
 	Session* next;
 	int result;
 
@@ -278,30 +290,30 @@ static int ReadData(void)
 	}
 
 	// ready sockets
-	for (ptr = Pool->First; ptr; ) {
-		next = ptr->Next;
-		if (NetSocketSetSocketReady(Pool->SocketSet, ptr->Socket)) {
+	for (session = Pool->First; session; ) {
+		next = session->Next;
+		if (NetSocketSetSocketReady(Pool->SocketSet, session->Socket)) {
 			int clen;
 
 			// socket ready
-			ptr->Idle = time(0);
-			clen = strlen(ptr->Buffer);
-			result = NetRecvTCP(ptr->Socket, ptr->Buffer + clen,
-				sizeof(ptr->Buffer) - clen);
+			session->Idle = time(0);
+			clen = strlen(session->Buffer);
+			result = NetRecvTCP(session->Socket, session->Buffer + clen,
+				sizeof(session->Buffer) - clen);
 			if (result <= 0) {
-				KillSession(ptr);
+				KillSession(session);
 			} else {
-				ptr->Buffer[clen + result] = '\0';
+				session->Buffer[clen + result] = '\0';
 			}
 		}
-		ptr = next;
+		session = next;
 	}
 
 	return 0;
 }
 
 /**
-**  UpdateSessions: Accepts new connections, receives data, manages buffers,
+**  Accepts new connections, receives data, manages buffers,
 */
 int UpdateSessions(void)
 {
