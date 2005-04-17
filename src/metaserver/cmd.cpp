@@ -84,38 +84,20 @@
 		if (!*buf) return 1; \
 	} while (0)
 
+#define CheckExtraParameter(buf) \
+	do { \
+		if (*buf) { \
+			while (*buf == ' ') ++buf; \
+			if (*buf) return 1; \
+		} \
+	} while (0)
 
 static int Parse1Arg(char* buf, char** arg1)
 {
 	SkipSpaces(buf);
 
 	GetLastArg(buf, arg1);
-	// Extra parameter?
-	if (*buf) {
-		*buf++ = '\0';
-		// Skip trailing spaces
-		while (*buf == ' ') ++buf;
-		if (*buf) return 1;
-	}
-
-	return 0;
-}
-
-static int Parse2Args(char* buf, char** arg1, char** arg2)
-{
-	SkipSpaces(buf);
-
-	GetNextArg(buf, arg1);
-	SkipSpaces(buf);
-
-	GetLastArg(buf, arg2);
-	// Extra parameter?
-	if (*buf) {
-		*buf++ = '\0';
-		// Skip trailing spaces
-		while (*buf == ' ') ++buf;
-		if (*buf) return 1;
-	}
+	CheckExtraParameter(buf);
 
 	return 0;
 }
@@ -135,13 +117,7 @@ static int Parse4Args(char* buf, char** arg1, char** arg2, char** arg3,
 	SkipSpaces(buf);
 
 	GetLastArg(buf, arg4);
-	// Extra parameter?
-	if (*buf) {
-		*buf++ = '\0';
-		// Skip trailing spaces
-		while (*buf == ' ') ++buf;
-		if (*buf) return 1;
-	}
+	CheckExtraParameter(buf);
 
 	return 0;
 }
@@ -164,13 +140,7 @@ static int Parse5Args(char* buf, char** arg1, char** arg2, char** arg3,
 	SkipSpaces(buf);
 
 	GetLastArg(buf, arg5);
-	// Extra parameter?
-	if (*buf) {
-		*buf++ = '\0';
-		// Skip trailing spaces
-		while (*buf == ' ') ++buf;
-		if (*buf) return 1;
-	}
+	CheckExtraParameter(buf);
 
 	return 0;
 }
