@@ -745,8 +745,6 @@ static int CclUnit(lua_State* l)
 			--j;
 		} else if (!strcmp(value, "resource-active")) {
 			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "mana")) {
-			unit->Mana = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "hp")) {
 			unit->HP = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "xp")) {
@@ -1326,7 +1324,7 @@ static int CclGetUnitMana(lua_State* l)
 	}
 
 	unit = CclGetUnit(l);
-	lua_pushnumber(l, unit->Mana);
+	lua_pushnumber(l, unit->Variable[MANA_INDEX].Value);
 	return 1;
 }
 
@@ -1351,10 +1349,10 @@ static int CclSetUnitMana(lua_State* l)
 	lua_pop(l, 1);
 	mana = LuaToNumber(l, 2);
 	if (unit->Type->CanCastSpell) {
-		if (mana > unit->Stats->Variables[MANA_INDEX].Max) {
-			unit->Mana = unit->Stats->Variables[MANA_INDEX].Max;
+		if (mana > unit->Variable[MANA_INDEX].Max) {
+			unit->Variable[MANA_INDEX].Value = unit->Variable[MANA_INDEX].Max;
 		} else {
-			unit->Mana = mana;
+			unit->Variable[MANA_INDEX].Value = mana;
 		}
 	}
 

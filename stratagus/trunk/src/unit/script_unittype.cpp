@@ -459,6 +459,9 @@ static int CclDefineUnitType(lua_State* l)
 			type->BurnDamageRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxMana")) {
 			type->Variable[MANA_INDEX].Max = LuaToNumber(l, -1);
+			type->Variable[MANA_INDEX].Value = (type->Variable[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
+			type->Variable[MANA_INDEX].Increase = 1;
+			type->Variable[MANA_INDEX].Enable = 1;
 		} else if (!strcmp(value, "TileSize")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -1907,7 +1910,7 @@ void UpdateUnitVariables(const Unit* unit)
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == LEVEL_INDEX) {
+			|| i == LEVEL_INDEX || i == MANA_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
@@ -1932,10 +1935,6 @@ void UpdateUnitVariables(const Unit* unit)
 			unit->Variable[BUILD_INDEX].Value = unit->Variable[BUILD_INDEX].Max;
 		}
 	}
-
-	// Mana.
-	unit->Variable[MANA_INDEX].Value = unit->Mana;
-	unit->Variable[MANA_INDEX].Max = unit->Stats->Variables[MANA_INDEX].Max;
 
 	// Transport
 	unit->Variable[TRANSPORT_INDEX].Value = unit->BoardCount;

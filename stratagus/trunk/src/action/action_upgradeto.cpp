@@ -104,10 +104,10 @@ static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 
 	unit->HP = newstats->Variables[HP_INDEX].Max * unit->HP / oldstats->Variables[HP_INDEX].Max;
 	if (oldstats->Variables[MANA_INDEX].Max) {
-		unit->Mana = newstats->Variables[MANA_INDEX].Max *
-			unit->Mana / oldstats->Variables[MANA_INDEX].Max;
+		unit->Variable[MANA_INDEX].Value = newstats->Variables[MANA_INDEX].Max *
+			unit->Variable[MANA_INDEX].Value / oldstats->Variables[MANA_INDEX].Max;
 	} else {
-		unit->Mana = newstats->Variables[MANA_INDEX].Max;
+		unit->Variable[MANA_INDEX].Value = newstats->Variables[MANA_INDEX].Max;
 	}
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		if (unit->Variable[i].Max) {

@@ -155,7 +155,7 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
 		unit->Type->Icon.Icon->Sprite->Width, 4);
 	if (unit->HP && unit->Stats->Variables[MANA_INDEX].Max) {
-		f = (100 * unit->Mana) / unit->Stats->Variables[MANA_INDEX].Max;
+		f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
 		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
@@ -729,7 +729,7 @@ static void DrawUnitInfo(Unit* unit)
 						(IconActive | (MouseButtons & LeftButton)) : 0,
 					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y, NULL);
 				UiDrawLifeBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
-				if (uins->Type->CanCastSpell && unit->Stats->Variables[MANA_INDEX].Max) {
+				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
