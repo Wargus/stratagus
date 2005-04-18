@@ -249,7 +249,7 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 		units);
 	hp = action->Data.AreaAdjustVitals.HP;
 	mana = action->Data.AreaAdjustVitals.Mana;
-	caster->Mana -= spell->ManaCost;
+	caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
 	for (j = 0; j < nunits; ++j) {
 		target = units[j];
 // if (!PassCondition(caster, spell, target, x, y) {
@@ -264,12 +264,12 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 				target->HP = target->Stats->Variables[HP_INDEX].Max;
 			}
 		}
-		target->Mana += mana;
-		if (target->Mana < 0) {
-			target->Mana = 0;
+		target->Variable[MANA_INDEX].Value += mana;
+		if (target->Variable[MANA_INDEX].Value < 0) {
+			target->Variable[MANA_INDEX].Value = 0;
 		}
-		if (target->Mana > target->Stats->Variables[MANA_INDEX].Max) {
-			target->Mana = target->Stats->Variables[MANA_INDEX].Max;
+		if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
+			target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
 		}
 	}
 	return 0;
@@ -553,9 +553,9 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 		diffHP = target->HP;
 	}
 	if (mana > 0) {
-		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Mana;
+		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
 	} else {
-		diffMana = target->Mana;
+		diffMana = target->Variable[MANA_INDEX].Value;
 	}
 
 	//  When harming cast again to send the hp to negative values.
@@ -571,13 +571,13 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 			(diffMana % (-mana) > 0)) ? 1 : 0));
 	}
 	if (manacost) {
-		castcount = min(castcount, caster->Mana / manacost);
+		castcount = min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
 	if (action->Data.AdjustVitals.MaxMultiCast) {
 		castcount = min(castcount, action->Data.AdjustVitals.MaxMultiCast);
 	}
 
-	caster->Mana -= castcount * manacost;
+	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
 	if (hp < 0) {
 		HitUnit(caster, target, -(castcount * hp));
 	} else {
@@ -586,12 +586,12 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 			target->HP = target->Stats->Variables[HP_INDEX].Max;
 		}
 	}
-	target->Mana += castcount*mana;
-	if (target->Mana < 0) {
-		target->Mana = 0;
+	target->Variable[MANA_INDEX].Value += castcount * mana;
+	if (target->Variable[MANA_INDEX].Value < 0) {
+		target->Variable[MANA_INDEX].Value = 0;
 	}
-	if (target->Mana > target->Stats->Variables[MANA_INDEX].Max) {
-		target->Mana = target->Stats->Variables[MANA_INDEX].Max;
+	if (target->Variable[MANA_INDEX].Value > target->Variable[MANA_INDEX].Max) {
+		target->Variable[MANA_INDEX].Value = target->Variable[MANA_INDEX].Max;
 	}
 
 	return 0;
@@ -649,7 +649,7 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 			}
 		}
 	}
-	caster->Mana -= spell->ManaCost;
+	caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
 	if (action->Data.Polymorph.PlayerNeutral) {
 		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
 	} else {
@@ -727,7 +727,7 @@ int CastSummon(Unit* caster, const SpellType* spell,
 				target->TTL = GameCycle + ttl;
 			}
 
-			caster->Mana -= spell->ManaCost;
+			caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
 		} else {
 			DebugPrint("Unable to allocate Unit");
 		}
@@ -810,7 +810,7 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 {
 	int i;
 
-	if (caster->Mana < spell->ManaCost) { // Check caster mana.
+	if (caster->Variable[MANA_INDEX].Value < spell->ManaCost) { // Check caster mana.
 		return 0;
 	}
 	if (spell->Target == TargetUnit) { // Casting an unit spell without a target.
@@ -890,10 +890,10 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		return 0;
 	}
 	if (target->Type->CanCastSpell) {
-		if (condition->MinManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 > target->Mana) {
+		if (condition->MinManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 > target->Variable[MANA_INDEX].Value) {
 			return 0;
 		}
-		if (condition->MaxManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 < target->Mana) {
+		if (condition->MaxManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 < target->Variable[MANA_INDEX].Value) {
 			return 0;
 		}
 	}
@@ -1136,7 +1136,7 @@ int AutoCastSpell(Unit* caster, const SpellType* spell)
 
 	//  Check for mana, trivial optimization.
 	if (!SpellIsAvailable(caster->Player, spell->Slot)
-		|| caster->Mana < spell->ManaCost) {
+		|| caster->Variable[MANA_INDEX].Value < spell->ManaCost) {
 		return 0;
 	}
 	target = SelectTargetUnitsOfAutoCast(caster, spell);
@@ -1204,7 +1204,7 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 			act = act->Next;
 		}
 		if (mustSubtractMana) {
-			caster->Mana -= spell->ManaCost;
+			caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
 		}
 		//
 		// Spells like blizzard are casted again.

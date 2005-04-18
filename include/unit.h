@@ -249,8 +249,6 @@
 **
 **  This is 1 if the unit is on board a transporter.
 **
-**  Unit::Mana
-**
 **
 **  Unit::HP
 **
@@ -585,7 +583,6 @@ struct _unit_ {
 		struct _construction_frame_* CFrame;         /// Seen construction frame
 	} Seen;
 
-	int Mana;               /// mana points
 	int HP;                 /// hit points
 	int XP;                 /// experience points
 	int Kills;              /// how many unit has this unit killed

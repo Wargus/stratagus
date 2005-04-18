@@ -971,7 +971,8 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 
 			UpdateForNewUnit(unit, 1);
 			if (dst->CanCastSpell) {
-				unit->Mana = MAGIC_FOR_NEW_UNITS;
+				unit->Variable[MANA_INDEX].Max = unit->Stats->Variables[MANA_INDEX].Max;
+				unit->Variable[MANA_INDEX].Value = MAGIC_FOR_NEW_UNITS * unit->Variable[MANA_INDEX].Max / 100;
 				unit->AutoCastSpell = malloc(SpellTypeCount);
 				memset(unit->AutoCastSpell, 0, SpellTypeCount);
 			}

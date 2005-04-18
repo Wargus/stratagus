@@ -364,15 +364,6 @@ static void HandleRegenerations(Unit* unit)
 {
 	int f;
 
-	// Mana
-	if (unit->Type->CanCastSpell) {
-		unit->Mana++;
-
-		if (unit->Mana > unit->Stats->Variables[MANA_INDEX].Max) {
-			unit->Mana = unit->Stats->Variables[MANA_INDEX].Max;
-		}
-	}
-
 	f = 0;
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Stats->Variables[HP_INDEX].Max &&

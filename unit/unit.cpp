@@ -438,7 +438,6 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
 		unit->HP = unit->Stats->Variables[HP_INDEX].Max;
-		unit->Mana = (unit->Stats->Variables[MANA_INDEX].Max * MAGIC_FOR_NEW_UNITS) / 100;
 		if (UnitTypeVar.NumberVariable) {
 			Assert(unit->Variable);
 			Assert(unit->Stats->Variables);
@@ -497,7 +496,7 @@ Unit* MakeUnit(UnitType* type, Player* player)
 **  @param f         Function to (un)mark for normal vision.
 **  @param f2        Function to (un)mark for cloaking vision.
 */
-static void MapMarkUnitSightRec(Unit* unit, int x, int y, int width, int height,
+static void MapMarkUnitSightRec(const Unit* unit, int x, int y, int width, int height,
 	MapMarkerFunc* f, MapMarkerFunc* f2)
 {
 	Unit* unit_inside; // iterator on units inside unit.
@@ -3712,7 +3711,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	if (unit->Active) {
 		CLprintf(file, " \"active\",");
 	}
-	CLprintf(file, " \"mana\", %d,", unit->Mana);
 	CLprintf(file, " \"hp\", %d,", unit->HP);
 	CLprintf(file, " \"xp\", %d,", unit->XP);
 	CLprintf(file, " \"kills\", %d,\n  ", unit->Kills);
@@ -3725,7 +3723,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
 	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
 
-	for (i = NVARALREADYDEFINED; i < UnitTypeVar.NumberVariable; i++) {
+	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
 				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
