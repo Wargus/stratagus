@@ -555,13 +555,13 @@ void MapMarkUnitSight(Unit* unit)
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (unit == container && !UnitUnusable(unit)) {
-		if (unit->Type->RadarRange) {
+		if (unit->Stats->Variables[RADAR_INDEX].Value) {
 			MapMarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
-				unit->Type->TileHeight, unit->Type->RadarRange);
+				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
 		}
-		if (unit->Type->RadarJammerRange) {
+		if (unit->Stats->Variables[RADARJAMMER_INDEX].Value) {
 			MapMarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
-				unit->Type->TileHeight, unit->Type->RadarJammerRange);
+				unit->Type->TileHeight, unit->Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
 }
@@ -588,13 +588,13 @@ void MapUnmarkUnitSight(Unit* unit)
 
 	// Never mark radar, except if the top unit?
 	if (unit == container && !UnitUnusable(unit)) {
-		if (unit->Type->RadarRange) {
+		if (unit->Stats->Variables[RADAR_INDEX].Value) {
 			MapUnmarkRadar(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
-				unit->Type->TileHeight, unit->Type->RadarRange);
+				unit->Type->TileHeight, unit->Stats->Variables[RADAR_INDEX].Value);
 		}
-		if (unit->Type->RadarJammerRange) {
+		if (unit->Stats->Variables[RADARJAMMER_INDEX].Value) {
 			MapUnmarkRadarJammer(unit->Player, unit->X, unit->Y, unit->Type->TileWidth,
-				unit->Type->TileHeight, unit->Type->RadarJammerRange);
+				unit->Type->TileHeight, unit->Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
 }
