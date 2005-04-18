@@ -498,10 +498,6 @@ static int CclDefineUnitType(lua_State* l)
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Revealer")) {
 			type->Revealer = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "RadarRange")) {
-			type->RadarRange = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "RadarJammerRange")) {
-			type->RadarJammerRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ComputerReactionRange")) {
 			type->ReactRangeComputer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PersonReactionRange")) {
@@ -2012,12 +2008,12 @@ void UpdateUnitVariables(const Unit* unit)
 	unit->Variable[POSY_INDEX].Max = TheMap.Info.MapHeight;
 
 	// RadarRange
-	unit->Variable[RADAR_INDEX].Value = type->RadarRange;
-	unit->Variable[RADAR_INDEX].Max = type->RadarRange;
+	unit->Variable[RADAR_INDEX].Value = unit->Stats->Variables[RADAR_INDEX].Value;
+	unit->Variable[RADAR_INDEX].Max = unit->Stats->Variables[RADAR_INDEX].Value;
 
 	// RadarJammerRange
-	unit->Variable[RADARJAMMER_INDEX].Value = type->RadarJammerRange;
-	unit->Variable[RADARJAMMER_INDEX].Max = type->RadarJammerRange;
+	unit->Variable[RADARJAMMER_INDEX].Value = unit->Stats->Variables[RADARJAMMER_INDEX].Value;
+	unit->Variable[RADARJAMMER_INDEX].Max = unit->Stats->Variables[RADARJAMMER_INDEX].Value;
 
 	// SlotNumber
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;
