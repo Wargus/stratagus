@@ -10,7 +10,7 @@
 //
 /**@name font.h - The font headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -174,6 +174,10 @@ extern int VideoDrawReverseNumberClip(int x, int y, unsigned font,
 
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
+#ifdef USE_OPENGL
+	/// Reload OpenGL fonts
+extern void ReloadFonts(void);
+#endif
 	/// Register ccl features
 extern void FontsCclRegister(void);
 	/// Cleanup the font module

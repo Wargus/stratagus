@@ -857,6 +857,8 @@ void ToggleFullScreen(void)
 
 #ifdef USE_OPENGL
 	InitOpenGL();
+	ReloadGraphics();
+	ReloadFonts();
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
