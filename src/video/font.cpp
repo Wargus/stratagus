@@ -782,6 +782,28 @@ void LoadFonts(void)
 	}
 }
 
+#ifdef USE_OPENGL
+/**
+**  Reload OpenGL fonts
+*/
+void ReloadFonts(void)
+{
+	unsigned i;
+	int j;
+
+	for (i = 0; i < sizeof(Fonts) / sizeof(*Fonts); ++i) {
+		if (Fonts[i].G) {
+			for (j = 0; j < NumFontColorMappings; ++j) {
+				free(FontColorGraphics[i][j]);
+			}
+			free(FontColorGraphics[i]);
+			FontColorGraphics[i] = NULL;
+			MakeFontColorTextures(Fonts[i].G, i);
+		}
+	}
+}
+#endif
+
 /**
 **  Find font by identifier.
 **

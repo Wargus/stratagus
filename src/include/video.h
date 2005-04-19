@@ -254,6 +254,11 @@ extern void LoadGraphic(Graphic* g);
 
 #define GraphicLoaded(g) ((g)->Surface != NULL)
 
+#ifdef USE_OPENGL
+	/// Reload OpenGL graphics
+extern void ReloadGraphics(void);
+#endif
+
 	/// Flip graphic and store in graphic->SurfaceFlip
 extern void FlipGraphic(Graphic* graphic);
 

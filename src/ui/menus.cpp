@@ -1877,6 +1877,9 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 			// Force Update Background Size
 			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
 			CleanModules();
+#ifdef USE_OPENGL
+			ReloadGraphics();
+#endif
 			LoadCcl();
 			PreMenuSetup();
 			GameCursor = TheUI.Point.Cursor;
