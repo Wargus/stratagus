@@ -55,6 +55,10 @@ PaletteLink* PaletteList;        /// List of all used palettes.
 
 static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
 
+#ifdef USE_OPENGL
+static Graphic** Graphics;
+static int NumGraphics;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -258,6 +262,14 @@ void LoadGraphic(Graphic* g)
 
 #ifdef USE_OPENGL
 	MakeTexture(g);
+
+	++NumGraphics;
+	Graphics = realloc(Graphics, NumGraphics * sizeof(*Graphics));
+	if (!Graphics) {
+		fprintf(stderr, "Out of memory\n");
+		exit(1);
+	}
+	Graphics[NumGraphics - 1] = g;
 #endif
 }
 
@@ -290,6 +302,13 @@ void FreeGraphic(Graphic* g)
 		for (i = 0; i < PlayerMax; ++i) {
 			if (g->PlayerColorTextures[i]) {
 				glDeleteTextures(g->NumTextures, g->PlayerColorTextures[i]);
+			}
+		}
+
+		for (i = 0; i < NumGraphics; ++i) {
+			if (Graphics[i] == g) {
+				Graphics[i] = Graphics[--NumGraphics];
+				break;
 			}
 		}
 #endif
@@ -327,6 +346,32 @@ void FreeGraphic(Graphic* g)
 		free(g);
 	}
 }
+
+#ifdef USE_OPENGL
+/**
+**  Reload OpenGL graphics
+*/
+void ReloadGraphics(void)
+{
+	int i;
+	int j;
+
+	for (i = 0; i < NumGraphics; ++i) {
+		if (Graphics[i]->Textures) {
+			free(Graphics[i]->Textures);
+			Graphics[i]->Textures = NULL;
+			MakeTexture(Graphics[i]);
+		}
+		for (j = 0; j < PlayerMax; ++j) {
+			if (Graphics[i]->PlayerColorTextures[j]) {
+				free(Graphics[i]->PlayerColorTextures[j]);
+				Graphics[i]->PlayerColorTextures[j] = NULL;
+				MakePlayerColorTexture(Graphics[j], j);
+			}
+		}
+	}
+}
+#endif
 
 /**
 **  Flip graphic and store in graphic->SurfaceFlip
