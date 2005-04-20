@@ -77,6 +77,7 @@
 #include "sound_server.h"
 #include "sound.h"
 #include "interface.h"
+#include "minimap.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -859,6 +860,7 @@ void ToggleFullScreen(void)
 	InitOpenGL();
 	ReloadGraphics();
 	ReloadFonts();
+	ReloadMinimap();
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
