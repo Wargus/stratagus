@@ -797,3 +797,31 @@ DefineMenuItem("pos", { 32, 90}, "font", "large",
     "style", "gm-full"},
   "menu", "menu-net-connecting")
 
+
+--
+-- menu-create-join-menu
+--
+DefineMenu("name", "menu-create-join-menu", "geometry", {0, 0, 640, 480},
+  "panel", "none", "background", MenuBackground, "default", 2)
+DefineMenuItem("pos", { 208, 320 + (36 * 0)}, "font", "large",
+  "button", {
+    "caption", "~!Join LAN Game",
+    "hotkey", "j",
+    "func", "net-join-game",
+    "style", "gm-full"},
+  "menu", "menu-create-join-menu")
+DefineMenuItem("pos", { 208, 320 + (36 * 1)}, "font", "large",
+  "button", {
+    "caption", "~!Create LAN Game",
+    "hotkey", "c",
+    "func", "net-create-game",
+    "style", "gm-full"},
+  "menu", "menu-create-join-menu")
+DefineMenuItem("pos", { 208, 320 + (36 * 2)}, "font", "large",
+  "button", {
+    "caption", "~!Previous Menu",
+    "hotkey", "p",
+    "func", "end-menu",
+    "style", "gm-full"},
+  "menu", "menu-create-join-menu")
+
