@@ -4984,13 +4984,15 @@ int EditorSaveMenu(void)
 		sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
 		if (EditorSavePud(path) == -1) {
 			ret = -1;
+		} else {
+			// Only change map path if we were able to save the map
+			s = ScenSelectPath + strlen(ScenSelectPath);
+			*s = '/';
+			strcpy(s + 1, ScenSelectFileName); // Final map name with path
+			p = ScenSelectPath + strlen(StratagusLibPath) + 1;
+			strcpy(CurrentMapPath, p);
+			*s = '\0';
 		}
-		s = ScenSelectPath + strlen(ScenSelectPath);
-		*s = '/';
-		strcpy(s + 1, ScenSelectFileName); // Final map name with path
-		p = ScenSelectPath + strlen(StratagusLibPath) + 1;
-		strcpy(CurrentMapPath, p);
-		*s = '\0';
 	}
 	return ret;
 }
