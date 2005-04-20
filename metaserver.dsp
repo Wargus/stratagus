@@ -48,8 +48,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib /nologo /subsystem:console /machine:I386 /libpath:"lib"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib SDL.lib SDLmain.lib sqlite.lib /nologo /subsystem:console /machine:I386 /libpath:"lib"
 
 !ELSEIF  "$(CFG)" == "metaserver - Win32 Debug"
 
@@ -63,16 +63,16 @@ LINK32=link.exe
 # PROP Output_Dir "metaserver___Win32_Debug"
 # PROP Intermediate_Dir "metaserver___Win32_Debug"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ  /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "USE_WIN32" /FR /YX /FD /GZ  /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "USE_WIN32" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib SDL.lib SDLmain.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept /libpath:"lib"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib SDL.lib SDLmain.lib sqlite.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept /libpath:"lib"
 
 !ENDIF 
 
@@ -95,15 +95,19 @@ SOURCE=.\src\metaserver\cmd.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\metaserver\db.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\metaserver\games.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\metaserver\main.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\metaserver\netdriver.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\metaserver\query.c
 # End Source File
 # End Group
 # Begin Group "network"
@@ -149,11 +153,15 @@ SOURCE=.\src\metaserver\cmd.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\netdriver.h
+SOURCE=.\src\metaserver\db.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\query.h
+SOURCE=.\src\metaserver\games.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\metaserver\netdriver.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
