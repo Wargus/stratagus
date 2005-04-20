@@ -10,7 +10,7 @@
 //
 /**@name minimap.h - The minimap headerfile. */
 //
-//      (c) Copyright 1998,2000-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -70,6 +70,10 @@ extern void UpdateMinimapTerrain(void);
 extern void UpdateMinimap(void);
 	/// Create new minimap
 extern void CreateMinimap(void);
+#ifdef USE_OPENGL
+	/// Reload OpenGL minimap
+extern void ReloadMinimap(void);
+#endif
 	/// Destroy minimap
 extern void DestroyMinimap(void);
 	/// Draw minimap with viewpoint
