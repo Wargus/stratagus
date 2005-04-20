@@ -10,7 +10,7 @@
 //
 /**@name minimap.c - The minimap. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -80,6 +80,25 @@ int MinimapWithTerrain = 1;                /// display minimap with terrain
 int MinimapFriendly = 1;                   /// switch colors of friendly units
 int MinimapShowSelected = 1;               /// highlight selected units
 
+#ifdef USE_OPENGL
+/**
+**  Create the minimap texture
+*/
+static void CreateMinimapTexture(void)
+{
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &MinimapTexture);
+	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
+		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		MinimapSurface);
+}
+#endif
+
 /**
 **  Create a mini-map from the tiles of the map.
 **
@@ -145,18 +164,8 @@ void CreateMinimap(void)
 	for (MinimapTextureHeight = 1; MinimapTextureHeight < TheUI.MinimapH; MinimapTextureHeight <<= 1) {
 	}
 	MinimapTerrainSurface = malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
-	MinimapSurface = malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &MinimapTexture);
-	glBindTexture(GL_TEXTURE_2D, MinimapTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	memset(MinimapSurface, 0, MinimapTextureWidth * MinimapTextureHeight * 4);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MinimapTextureWidth,
-		MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		MinimapSurface);
+	MinimapSurface = calloc(MinimapTextureWidth * MinimapTextureHeight * 4, sizeof(*MinimapSurface));
+	CreateMinimapTexture();
 #endif
 
 #ifndef USE_OPENGL
@@ -168,6 +177,16 @@ void CreateMinimap(void)
 
 	UpdateMinimapTerrain();
 }
+
+#ifdef USE_OPENGL
+/**
+**  Reload OpenGL minimap
+*/
+void ReloadMinimap(void)
+{
+	CreateMinimapTexture();
+}
+#endif
 
 /**
 **  Update a mini-map from the tiles of the map.
