@@ -3473,7 +3473,7 @@ static void GameRCSAction(Menuitem* mi, int i)
 		} else {
 			GameSettings.Presets[0].Race = SettingsPresetMapDefault;
 		}
-		ServerSetupState.Race[0] = mi->D.Pulldown.noptions - 1 - i;
+		ServerSetupState.Race[0] = i;
 		NetworkServerResyncClients();
 	}
 }
@@ -3641,8 +3641,6 @@ static void NetworkGamePrepareGameSettings(void)
 	int i;
 	int num[PlayerMax];
 	int comp[PlayerMax];
-	int n;
-	int x;
 	int v;
 
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
@@ -3676,22 +3674,22 @@ static void NetworkGamePrepareGameSettings(void)
 		switch(ServerSetupState.CompOpt[num[i]]) {
 			case 0:
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				for (n = 0, v = 0; n < PlayerRaces.Count; ++n) {
-					if (PlayerRaces.Visible[n]) {
-						++v;
-					}
-				}
-				v -= ServerSetupState.Race[num[i]];
-				for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
-					if (PlayerRaces.Visible[n]) {
-						if (x + 1 == v) {
-							break;
-						}
-						++x;
-					}
-				}
+				v = ServerSetupState.Race[num[i]];
 				if (v != 0) {
+					int n;
+					int x;
+
+					for (n = 0, x = 0; n < PlayerRaces.Count; ++n) {
+						if (PlayerRaces.Visible[n]) {
+							if (x + 1 == v) {
+								break;
+							}
+							++x;
+						}
+					}
 					GameSettings.Presets[num[i]].Race = PlayerRaces.Race[x];
+				} else {
+					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}
 				break;
 			case 1:
