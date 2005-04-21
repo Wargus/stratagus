@@ -24,6 +24,7 @@
 ##
 
 import os
+import sys
 from stat import *
 
 ccflags = "-fsigned-char"
@@ -41,7 +42,8 @@ opts.Add('LIBPATH', 'Additional library paths')
 opts.Add('LIBS', 'Additional libraries')
 opts.Add('CCFLAGS', 'C Compiler flags', Split(ccflags))
 opts.Add('CC', 'C Compiler')
-opts.Add('debug', 'Build with debugging options', '0')
+opts.Add('debug', 'Build with debugging options', 0)
+opts.Add('opengl', 'Build with opengl support', 0)
 env = Environment() # for an unknown reason Environment(options=opts) doesnt work well
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
@@ -175,6 +177,27 @@ sourcesMetaserver = Split("""
  build/network/lowlevel.c
 """)
 
+def CheckOpenGL(env, conf):
+  opengl = {}
+  opengl['linux'] = { 
+      'LIBS': ['GL'], 
+      'LIBPATH': ['/usr/lib', '/usr/X11R6/lib'],
+      'CPPPATH': ['/usr/include']}
+  opengl['cygwin'] = {
+      'LIBS': ['opengl3']}
+  platform = sys.platform
+  if sys.platform[:5] == 'linux':
+     platform = 'linux'
+  for key in opengl[platform].keys():
+      if key != 'LIBS':
+         for i in opengl[platform][key]:
+            env[key].append(i)
+  for lib in opengl[platform]['LIBS']:
+     if not conf.CheckLib('GL'):
+         print("Can't find OpenGL libs. Exiting")
+         sys.exit(1)
+  env.Append(CPPDEFINES = 'USE_OPENGL')
+
 def AutoConfigure(env):
   # determine compiler and linker flags for SDL
   env.ParseConfig('sdl-config --cflags')
@@ -218,6 +241,9 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'USE_MAD')
   if conf.CheckLib('flac'):
      env.Append(CPPDEFINES = 'USE_FLAC')
+  if env['opengl']:
+     CheckOpenGL(env, conf)
+  
   env = conf.Finish()
 
 if not os.path.exists("build_config.py")  \
