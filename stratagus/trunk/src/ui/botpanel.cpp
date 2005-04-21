@@ -952,7 +952,7 @@ int DoButtonPanelKey(int key)
 
 	if (CurrentButtons) {
 		// This is required for action queues SHIFT+M should be `m'
-		if (isupper(key)) {
+		if (isascii(key) && isupper(key)) {
 			key = tolower(key);
 		}
 
