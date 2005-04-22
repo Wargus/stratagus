@@ -10,7 +10,7 @@
 //
 /**@name astar.c - The a* path finder routines. */
 //
-// (c) Copyright 1999-2003 by Lutz Sammer,Fabrice Rossi, Russell Smith
+//      (c) Copyright 1999-2005 by Lutz Sammer,Fabrice Rossi, Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -353,7 +353,7 @@ static int CostMoveTo(const Unit* unit, int ex, int ey, int mask, int current_co
 /**
 ** MarkAStarGoal
 */
-static int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
+static int AStarMarkGoal(const Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange,
 				int mask, int* num_in_close)
 {
 	int cx[4];
@@ -527,7 +527,7 @@ static int AStarMarkGoal(Unit* unit, int gx, int gy, int gw, int gh, int minrang
 /**
 ** Find path.
 */
-int AStarFindPath(Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
+int AStarFindPath(const Unit* unit, int gx, int gy, int gw, int gh, int minrange, int maxrange, char* path)
 {
 	int i;
 	int j;
