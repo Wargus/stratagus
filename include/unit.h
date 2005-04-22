@@ -584,7 +584,6 @@ struct _unit_ {
 	} Seen;
 
 	int HP;                 /// hit points
-	int XP;                 /// experience points
 	struct _variable_type_* Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live

@@ -427,7 +427,7 @@ static int CalculateDamage(const Unit* attacker, const Unit* goal)
 
 	if (!Damage) { // Use old method.
 		return CalculateDamageStats(attacker->Stats, goal->Stats,
-			attacker->XP, attacker->Bloodlust);
+			attacker->Variable[XP_INDEX].Value, attacker->Bloodlust);
 	}
 	Assert(Damage);
 
@@ -490,11 +490,11 @@ void FireMissile(Unit* unit)
 				if (HumanWallOnMap(dx, dy)) {
 					HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
-							UnitTypeHumanWall->Stats, unit->Bloodlust, unit->XP));
+							UnitTypeHumanWall->Stats, unit->Bloodlust, unit->Variable[XP_INDEX].Value));
 				} else {
 					HitWall(dx, dy,
 						CalculateDamageStats(unit->Stats,
-							UnitTypeOrcWall->Stats, unit->Bloodlust, unit->XP));
+							UnitTypeOrcWall->Stats, unit->Bloodlust, unit->Variable[XP_INDEX].Value));
 				}
 				return;
 			}

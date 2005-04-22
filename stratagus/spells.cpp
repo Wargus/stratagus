@@ -632,10 +632,11 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 			caster->Player->TotalKills++;
 		}
 		if (UseHPForXp) {
-			caster->XP += target->HP;
+			caster->Variable[XP_INDEX].Max += target->HP;
 		} else {
-			caster->XP += target->Type->Points;
+			caster->Variable[XP_INDEX].Max += target->Type->Points;
 		}
+		caster->Variable[XP_INDEX].Value = caster->Variable[XP_INDEX].Max;
 		caster->Variable[KILL_INDEX].Value++;
 		caster->Variable[KILL_INDEX].Max++;
 		caster->Variable[KILL_INDEX].Enable = 1;
