@@ -1910,7 +1910,7 @@ void UpdateUnitVariables(const Unit* unit)
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX) {
+			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
@@ -1970,10 +1970,6 @@ void UpdateUnitVariables(const Unit* unit)
 		unit->Variable[CARRYRESOURCE_INDEX].Value = unit->ResourcesHeld;
 		unit->Variable[CARRYRESOURCE_INDEX].Max = unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity;
 	}
-
-	// XP
-	unit->Variable[XP_INDEX].Value = unit->XP;
-	unit->Variable[XP_INDEX].Max = unit->XP;
 
 	// Supply
 	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;

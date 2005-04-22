@@ -3100,10 +3100,11 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 				attacker->Player->TotalKills++;
 			}
 			if (UseHPForXp) {
-				attacker->XP += target->HP;
+				attacker->Variable[XP_INDEX].Max += target->HP;
 			} else {
-				attacker->XP += target->Type->Points;
+				attacker->Variable[XP_INDEX].Max += target->Type->Points;
 			}
+			attacker->Variable[XP_INDEX].Value = attacker->Variable[XP_INDEX].Max;
 			attacker->Variable[KILL_INDEX].Value++;
 			attacker->Variable[KILL_INDEX].Max++;
 			attacker->Variable[KILL_INDEX].Enable = 1;
@@ -3113,7 +3114,8 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	}
 	target->HP -= damage;
 	if (UseHPForXp && attacker && IsEnemy(target->Player, attacker)) {
-		attacker->XP += damage;
+		attacker->Variable[XP_INDEX].Value += damage;
+		attacker->Variable[XP_INDEX].Max += damage;
 	}
 
 	// FIXME: this is dumb. I made repairers capture. crap.
@@ -3714,7 +3716,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, " \"active\",");
 	}
 	CLprintf(file, " \"hp\", %d,", unit->HP);
-	CLprintf(file, " \"xp\", %d,", unit->XP);
 
 	CLprintf(file, "\"ttl\", %lu, ", unit->TTL);
 	CLprintf(file, "\"bloodlust\", %d, ", unit->Bloodlust);
