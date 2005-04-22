@@ -749,8 +749,6 @@ static int CclUnit(lua_State* l)
 			unit->HP = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "xp")) {
 			unit->XP = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "kills")) {
-			unit->Kills = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);
