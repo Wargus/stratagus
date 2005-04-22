@@ -3104,7 +3104,9 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 			} else {
 				attacker->XP += target->Type->Points;
 			}
-			attacker->Kills++;
+			attacker->Variable[KILL_INDEX].Value++;
+			attacker->Variable[KILL_INDEX].Max++;
+			attacker->Variable[KILL_INDEX].Enable = 1;
 		}
 		LetUnitDie(target);
 		return;
@@ -3713,7 +3715,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	}
 	CLprintf(file, " \"hp\", %d,", unit->HP);
 	CLprintf(file, " \"xp\", %d,", unit->XP);
-	CLprintf(file, " \"kills\", %d,\n  ", unit->Kills);
 
 	CLprintf(file, "\"ttl\", %lu, ", unit->TTL);
 	CLprintf(file, "\"bloodlust\", %d, ", unit->Bloodlust);

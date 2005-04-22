@@ -636,7 +636,9 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 		} else {
 			caster->XP += target->Type->Points;
 		}
-		caster->Kills++;
+		caster->Variable[KILL_INDEX].Value++;
+		caster->Variable[KILL_INDEX].Max++;
+		caster->Variable[KILL_INDEX].Enable = 1;
 	}
 
 	// as said somewhere else -- no corpses :)
