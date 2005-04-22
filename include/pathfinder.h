@@ -10,7 +10,7 @@
 //
 /**@name pathfinder.h - The path finder headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ extern void InitAStar(void);
 extern void FreeAStar(void);
 
 	/// Find and a* path for a unit
-extern int AStarFindPath(struct _unit_* unit, int gx, int gy, int gw, int gh,
+extern int AStarFindPath(const struct _unit_* unit, int gx, int gy, int gw, int gh,
 	int minrange, int maxrange, char* path);
 //
 // in ccl_pathfinder.c
