@@ -166,8 +166,6 @@ void DoScrollArea(enum _scroll_state_ state, int fast)
 **  Draw a map viewport.
 **
 **  @param vp  Viewport pointer.
-**
-**  @note  Johns: I think parsing the viewport pointer is faster.
 */
 static void DrawMapViewport(Viewport* vp)
 {
@@ -193,8 +191,9 @@ static void DrawMapViewport(Viewport* vp)
 			}
 		}
 
+		PushClipping();
 		SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-		DrawMapBackgroundInViewport(vp, vp->MapX, vp->MapY);
+		DrawMapBackgroundInViewport(vp);
 
 		//
 		// We find and sort units after draw level.
@@ -220,7 +219,7 @@ static void DrawMapViewport(Viewport* vp)
 		for (; j < nmissiles; ++j) {
 			DrawMissile(missiletable[j]);
 		}
-		DrawMapFogOfWar(vp, vp->MapX, vp->MapY);
+		DrawMapFogOfWar(vp);
 		//
 		// Draw orders of selected units.
 		// Drawn here so that they are shown even when the unit is out of the screen.
@@ -231,7 +230,7 @@ static void DrawMapViewport(Viewport* vp)
 				ShowOrder(Selected[i]);
 			}
 		}
-		SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+		PopClipping();
 	}
 }
 

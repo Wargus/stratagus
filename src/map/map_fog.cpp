@@ -10,7 +10,7 @@
 //
 /**@name map_fog.c - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1999-2005 by Lutz Sammer, Vladi Shabanski,
 //                                 Russell Smith, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -460,8 +460,8 @@ void UpdateFogOfWarChange(void)
 /**
 **  Draw only fog of war
 **
-**  @param x     X position into video memory
-**  @param y     Y position into video memory
+**  @param x  X position into video memory
+**  @param y  Y position into video memory
 */
 void VideoDrawOnlyFog(int x, int y)
 {
@@ -646,10 +646,8 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 **  Draw the map fog of war.
 **
 **  @param vp  Viewport pointer.
-**  @param x   Map viewpoint x position.
-**  @param y   Map viewpoint y position.
 */
-void DrawMapFogOfWar(Viewport* vp, int x, int y)
+void DrawMapFogOfWar(Viewport* vp)
 {
 	int sx;
 	int sy;
@@ -691,12 +689,12 @@ void DrawMapFogOfWar(Viewport* vp, int x, int y)
 		}
 	}
 	ex = vp->EndX;
-	sy = y * TheMap.Info.MapWidth;
+	sy = vp->MapY * TheMap.Info.MapWidth;
 	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
 	while (dy <= ey) {
-		sx = x + sy;
+		sx = vp->MapX + sy;
 		dx = vp->X - vp->OffsetX;
 		while (dx <= ex) {
 			mx = (dx - vp->X + vp->OffsetX) / TileSizeX + vp->MapX;

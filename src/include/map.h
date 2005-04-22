@@ -10,7 +10,7 @@
 //
 /**@name map.h - The map headerfile. */
 //
-//      (c) Copyright 1998-2003 by Vladi Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2005 by Vladi Shabanski, Lutz Sammer,
 //                              and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -314,7 +314,7 @@ extern int ReplayRevealMap;
 extern void MapColorCycle(void);
 
 	/// Draw the map background
-extern void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y);
+extern void DrawMapBackgroundInViewport(const Viewport* vp);
 	/// Build tables for map
 extern void InitMap(void);
 
@@ -354,7 +354,7 @@ extern void MapUpdateFogOfWar(int x, int y);
 extern void UpdateFogOfWarChange(void);
 
 	/// Draw the map fog of war
-extern void DrawMapFogOfWar(Viewport* vp, int x, int y);
+extern void DrawMapFogOfWar(Viewport* vp);
 	/// Build tables for fog of war
 extern void InitMapFogOfWar(void);
 	/// Cleanup memory for fog of war tables

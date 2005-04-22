@@ -216,8 +216,6 @@ void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offset
 **  Draw the map backgrounds.
 **
 **  @param vp  Viewport pointer.
-**  @param x   Map viewpoint x position.
-**  @param y   Map viewpoint y position.
 **
 ** StephanR: variables explained below for screen:<PRE>
 ** *---------------------------------------*
@@ -241,7 +239,7 @@ void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offset
 ** (in pixels)
 ** </PRE>
 */
-void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
+void DrawMapBackgroundInViewport(const Viewport* vp)
 {
 	int sx;
 	int sy;
@@ -251,12 +249,12 @@ void DrawMapBackgroundInViewport(const Viewport* vp, int x, int y)
 	int ey;
 
 	ex = vp->EndX;
-	sy = y * TheMap.Info.MapWidth;
+	sy = vp->MapY * TheMap.Info.MapWidth;
 	dy = vp->Y - vp->OffsetY;
 	ey = vp->EndY;
 
 	while (dy <= ey) {
-		sx = x + sy;
+		sx = vp->MapX + sy;
 		dx = vp->X - vp->OffsetX;
 		while (dx <= ex) {
 			if (ReplayRevealMap) {
