@@ -1910,7 +1910,7 @@ void UpdateUnitVariables(const Unit* unit)
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == LEVEL_INDEX || i == MANA_INDEX) {
+			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
@@ -1974,10 +1974,6 @@ void UpdateUnitVariables(const Unit* unit)
 	// XP
 	unit->Variable[XP_INDEX].Value = unit->XP;
 	unit->Variable[XP_INDEX].Max = unit->XP;
-
-	// Kill
-	unit->Variable[KILL_INDEX].Value = unit->Kills;
-	unit->Variable[KILL_INDEX].Max = unit->Kills;
 
 	// Supply
 	unit->Variable[SUPPLY_INDEX].Value = unit->Type->Supply;

@@ -585,7 +585,6 @@ struct _unit_ {
 
 	int HP;                 /// hit points
 	int XP;                 /// experience points
-	int Kills;              /// how many unit has this unit killed
 	struct _variable_type_* Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
