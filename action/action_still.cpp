@@ -126,7 +126,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 		//
 		// Still animation
 		//
-		UnitShowNewAnimation(unit, type->NewAnimations->Still);
+		UnitShowAnimation(unit, type->Animations->Still);
 	}
 
 	if (unit->Anim.Unbreakable) { // animation can't be aborted here

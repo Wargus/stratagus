@@ -10,7 +10,7 @@
 //
 /**@name actions.h - The actions headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ extern void HandleActionSpellCast(struct _unit_* unit);
 ----------------------------------------------------------------------------*/
 
 	/// Handle the animation of a unit
-extern int UnitShowNewAnimation(struct _unit_* unit, const struct _new_animation_* anim);
+extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* anim);
 	/// Handle the animation of a unit
 extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* animation);
 	/// Handle the actions of all units each game cycle

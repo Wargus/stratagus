@@ -332,7 +332,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 
 	// On Load, Some units don't have Still animation, eg Deadbody
-	if (unit->Type->NewAnimations && !unit->Type->NewAnimations->Still) {
+	if (unit->Type->Animations && !unit->Type->Animations->Still) {
 		// FIXME: wrong frame
 		unit->Frame = type->NumDirections / 2 + 1 - 1;
 	}
@@ -2978,7 +2978,7 @@ void LetUnitDie(Unit* unit)
 	} else {
 		unit->CurrentSightRange = 0;
 	}
-	if (type->CorpseType || (type->NewAnimations && type->NewAnimations->Death)) {
+	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
 		unit->Removed = 0;
 		UnitCacheInsert(unit);
 	}
@@ -3744,8 +3744,8 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, "\"wait\", %d, ", unit->Wait);
 	CLprintf(file, "\"state\", %d,", unit->State);
 	CLprintf(file, "\"anim-wait\", %d,", unit->Anim.Wait);
-	for (i = 0; i < NumNewAnimations; ++i) {
-		if (NewAnimationsArray[i] == unit->Anim.CurrAnim) {
+	for (i = 0; i < NumAnimations; ++i) {
+		if (AnimationsArray[i] == unit->Anim.CurrAnim) {
 			CLprintf(file, "\"curr-anim\", %d,", i);
 			CLprintf(file, "\"anim\", %d,", unit->Anim.Anim - unit->Anim.CurrAnim);
 			break;

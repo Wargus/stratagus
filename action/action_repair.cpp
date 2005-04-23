@@ -135,7 +135,7 @@ static void RepairUnit(Unit* unit, Unit* goal)
 */
 static int AnimateActionRepair(Unit* unit)
 {
-	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Repair);
+	UnitShowAnimation(unit, unit->Type->Animations->Repair);
 	return 0;
 }
 

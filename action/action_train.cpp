@@ -104,9 +104,9 @@ void HandleActionTrain(Unit* unit)
 		unit->SubAction = 1;
 	}
 
-	unit->Type->NewAnimations->Train ?
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Train) :
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	unit->Type->Animations->Train ?
+		UnitShowAnimation(unit, unit->Type->Animations->Train) :
+		UnitShowAnimation(unit, unit->Type->Animations->Still);
 	if (unit->Wait) {
 		unit->Wait--;
 		return;

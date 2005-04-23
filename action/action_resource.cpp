@@ -247,8 +247,8 @@ static int StartGathering(Unit* unit)
 */
 static void AnimateActionHarvest(Unit* unit)
 {
-	Assert(unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
-	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Harvest[unit->CurrentResource]);
+	Assert(unit->Type->Animations->Harvest[unit->CurrentResource]);
+	UnitShowAnimation(unit, unit->Type->Animations->Harvest[unit->CurrentResource]);
 }
 
 /**

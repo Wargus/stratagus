@@ -57,10 +57,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-NewAnimation* NewAnimationsArray[ANIMATIONS_MAXANIM];
-int NumNewAnimations;
+Animation* AnimationsArray[ANIMATIONS_MAXANIM];
+int NumAnimations;
 
-_NewAnimationsHash NewAnimationsHash;/// NewAnimations hash table
+_AnimationsHash AnimationsHash;/// Animations hash table
 
 struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
 
@@ -68,13 +68,13 @@ struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
 #define MAX_LABEL_LENGTH 256
 
 static struct {
-	NewAnimation* Anim;
+	Animation* Anim;
 	char Name[MAX_LABEL_LENGTH];
 } Labels[MAX_LABELS];
 static int NumLabels;
 
 static struct {
-	NewAnimation** Anim;
+	Animation** Anim;
 	char Name[MAX_LABEL_LENGTH];
 } LabelsLater[MAX_LABELS];
 static int NumLabelsLater;
@@ -384,9 +384,9 @@ static int CclDefineUnitType(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "Flip")) {
 			type->Flip = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NewAnimations")) {
-			type->NewAnimations = NewAnimationsByIdent(LuaToString(l, -1));
-			if (!type->NewAnimations) {
+		} else if (!strcmp(value, "Animations")) {
+			type->Animations = AnimationsByIdent(LuaToString(l, -1));
+			if (!type->Animations) {
 				DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1));
 			}
 		} else if (!strcmp(value, "Icon")) {
@@ -1306,7 +1306,7 @@ static int CclDefineUnitTypeWcNames(lua_State* l)
 /**
 **  Add a label
 */
-static void AddLabel(lua_State* l, NewAnimation* anim, char* label)
+static void AddLabel(lua_State* l, Animation* anim, char* label)
 {
 	if (NumLabels == MAX_LABELS) {
 		LuaError(l, "Too many labels: %s" _C_ label);
@@ -1319,7 +1319,7 @@ static void AddLabel(lua_State* l, NewAnimation* anim, char* label)
 /**
 **  Find a label
 */
-static NewAnimation* FindLabel(lua_State* l, char* label)
+static Animation* FindLabel(lua_State* l, char* label)
 {
 	int i;
 
@@ -1335,7 +1335,7 @@ static NewAnimation* FindLabel(lua_State* l, char* label)
 /**
 **  Find a label later
 */
-static void FindLabelLater(lua_State* l, NewAnimation** anim, char* label)
+static void FindLabelLater(lua_State* l, Animation** anim, char* label)
 {
 	if (NumLabelsLater == MAX_LABELS) {
 		LuaError(l, "Too many gotos: %s" _C_ label);
@@ -1361,7 +1361,7 @@ static void FixLabels(lua_State* l)
 **  Parse an animation frame
 */
 static void ParseAnimationFrame(lua_State* l, const char* str,
-	NewAnimation* anim)
+	Animation* anim)
 {
 	char* op1;
 	char* op2;
@@ -1375,16 +1375,16 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 	}
 
 	if (!strcmp(op1, "frame")) {
-		anim->Type = NewAnimationFrame;
+		anim->Type = AnimationFrame;
 		anim->D.Frame.Frame = atoi(op2);
 	} else if (!strcmp(op1, "exact-frame")) {
-		anim->Type = NewAnimationExactFrame;
+		anim->Type = AnimationExactFrame;
 		anim->D.Frame.Frame = atoi(op2);
 	} else if (!strcmp(op1, "wait")) {
-		anim->Type = NewAnimationWait;
+		anim->Type = AnimationWait;
 		anim->D.Wait.Wait = atoi(op2);
 	} else if (!strcmp(op1, "random-wait")) {
-		anim->Type = NewAnimationRandomWait;
+		anim->Type = AnimationRandomWait;
 		anim->D.RandomWait.MinWait = atoi(op2);
 		op2 = strchr(op2, ' ');
 		while (*op2 == ' ') {
@@ -1392,13 +1392,13 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 		}
 		anim->D.RandomWait.MaxWait = atoi(op2);
 	} else if (!strcmp(op1, "sound")) {
-		anim->Type = NewAnimationSound;
+		anim->Type = AnimationSound;
 		anim->D.Sound.Name = strdup(op2);
 	} else if (!strcmp(op1, "random-sound")) {
 		int count;
 		char* next;
 
-		anim->Type = NewAnimationRandomSound;
+		anim->Type = AnimationRandomSound;
 		count = 0;
 		while (op2 && *op2) {
 			next = strchr(op2, ' ');
@@ -1415,18 +1415,18 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 		anim->D.RandomSound.NumSounds = count;
 		anim->D.RandomSound.Sound = calloc(count, sizeof(SoundId));
 	} else if (!strcmp(op1, "attack")) {
-		anim->Type = NewAnimationAttack;
+		anim->Type = AnimationAttack;
 	} else if (!strcmp(op1, "rotate")) {
-		anim->Type = NewAnimationRotate;
+		anim->Type = AnimationRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
 	} else if (!strcmp(op1, "random-rotate")) {
-		anim->Type = NewAnimationRandomRotate;
+		anim->Type = AnimationRandomRotate;
 		anim->D.Rotate.Rotate = atoi(op2);
 	} else if (!strcmp(op1, "move")) {
-		anim->Type = NewAnimationMove;
+		anim->Type = AnimationMove;
 		anim->D.Move.Move = atoi(op2);
 	} else if (!strcmp(op1, "unbreakable")) {
-		anim->Type = NewAnimationUnbreakable;
+		anim->Type = AnimationUnbreakable;
 		if (!strcmp(op2, "begin")) {
 			anim->D.Unbreakable.Begin = 1;
 		} else if (!strcmp(op2, "end")) {
@@ -1435,15 +1435,15 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 			LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s" _C_ op2);
 		}
 	} else if (!strcmp(op1, "label")) {
-		anim->Type = NewAnimationLabel;
+		anim->Type = AnimationLabel;
 		AddLabel(l, anim, op2);
 	} else if (!strcmp(op1, "goto")) {
-		anim->Type = NewAnimationGoto;
+		anim->Type = AnimationGoto;
 		FindLabelLater(l, &anim->D.Goto.Goto, op2);
 	} else if (!strcmp(op1, "random-goto")) {
 		char* label;
 
-		anim->Type = NewAnimationRandomGoto;
+		anim->Type = AnimationRandomGoto;
 		label = strchr(op2, ' ');
 		if (!label) {
 			LuaError(l, "Missing random-goto label");
@@ -1464,10 +1464,10 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 /**
 **  Parse an animation
 */
-static NewAnimation* ParseAnimation(lua_State* l, int idx)
+static Animation* ParseAnimation(lua_State* l, int idx)
 {
-	NewAnimation* anim;
-	NewAnimation* tail;
+	Animation* anim;
+	Animation* tail;
 	int args;
 	int j;
 	const char* str;
@@ -1494,8 +1494,8 @@ static NewAnimation* ParseAnimation(lua_State* l, int idx)
 	}
 	FixLabels(l);
 
-	NewAnimationsArray[NumNewAnimations++] = anim;
-	Assert(NumNewAnimations != ANIMATIONS_MAXANIM);
+	AnimationsArray[NumAnimations++] = anim;
+	Assert(NumAnimations != ANIMATIONS_MAXANIM);
 
 	return anim;
 }
@@ -1521,11 +1521,11 @@ static int ResourceIndex(lua_State* l, const char* resource)
 **
 **  @param l  Lua state.
 */
-static int CclDefineNewAnimations(lua_State* l)
+static int CclDefineAnimations(lua_State* l)
 {
 	const char* name;
 	const char* value;
-	NewAnimations* anims;
+	Animations* anims;
 	int res;
 
 	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
@@ -1533,10 +1533,10 @@ static int CclDefineNewAnimations(lua_State* l)
 	}
 
 	name = LuaToString(l, 1);
-	anims = NewAnimationsByIdent(name);
+	anims = AnimationsByIdent(name);
 	if (!anims) {
 		anims = calloc(1, sizeof(*anims));
-		*(NewAnimations**)hash_add(NewAnimationsHash, name) = anims;
+		*(Animations**)hash_add(AnimationsHash, name) = anims;
 	}
 
 	lua_pushnil(l);
@@ -2106,7 +2106,7 @@ void UnitTypeCclRegister(void)
 
 	lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
-	lua_register(Lua, "DefineNewAnimations", CclDefineNewAnimations);
+	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 }
 
 //@}
