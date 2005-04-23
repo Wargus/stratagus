@@ -133,7 +133,7 @@ void LoadTileset(void)
 	//
 	n = TheMap.Tileset->NumTiles;
 
-	TheMap.Tileset->MixedLookupTable = malloc(n * sizeof(int));
+	TheMap.Tileset->MixedLookupTable = calloc(n, sizeof(int));
 
 	//
 	//  Build the TileTypeTable
