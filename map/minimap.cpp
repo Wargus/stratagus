@@ -80,6 +80,17 @@ int MinimapWithTerrain = 1;                /// display minimap with terrain
 int MinimapFriendly = 1;                   /// switch colors of friendly units
 int MinimapShowSelected = 1;               /// highlight selected units
 
+
+#define MAX_MINIMAP_EVENTS 8
+
+struct _minimap_events_ {
+	int X;
+	int Y;
+	int Size;
+} MinimapEvents[MAX_MINIMAP_EVENTS];
+int NumMinimapEvents;
+
+
 #ifdef USE_OPENGL
 /**
 **  Create the minimap texture
@@ -624,6 +635,25 @@ void UpdateMinimap(void)
 }
 
 /**
+**  Draw the minimap events
+*/
+static void DrawMinimapEvents(void)
+{
+	int i;
+
+	for (i = 0; i < NumMinimapEvents; ++i) {
+		VideoDrawTransCircleClip(ColorWhite,
+			MinimapEvents[i].X, MinimapEvents[i].Y,
+			MinimapEvents[i].Size, 192);
+		MinimapEvents[i].Size -= 1;
+		if (MinimapEvents[i].Size < 2) {
+			MinimapEvents[i] = MinimapEvents[--NumMinimapEvents];
+			--i;
+		}
+	}
+}
+
+/**
 **  Draw the minimap on the screen
 */
 void DrawMinimap(int vx __attribute__((unused)),
@@ -652,6 +682,8 @@ void DrawMinimap(int vx __attribute__((unused)),
 	glVertex2i(TheUI.MinimapPosX + TheUI.MinimapW, TheUI.MinimapPosY);
 	glEnd();
 #endif
+
+	DrawMinimapEvents();
 }
 
 
@@ -741,6 +773,26 @@ void DrawMinimapCursor(int vx, int vy)
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
 	VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 128);
+}
+
+/**
+**  Add a minimap event
+**
+**  @param x  Map X tile position
+**  @param y  Map Y tile position
+*/
+void AddMinimapEvent(int x, int y)
+{
+	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
+		return;
+	}
+
+	MinimapEvents[NumMinimapEvents].X = TheUI.MinimapPosX + MinimapX + (x * MinimapScaleX) / MINIMAP_FAC;
+	MinimapEvents[NumMinimapEvents].Y = TheUI.MinimapPosY + MinimapY + (y * MinimapScaleY) / MINIMAP_FAC;
+	MinimapEvents[NumMinimapEvents].Size =
+		(TheUI.MinimapW < TheUI.MinimapH) ? TheUI.MinimapW / 3 : TheUI.MinimapH / 3;
+
+	++NumMinimapEvents;
 }
 
 //@}
