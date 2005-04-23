@@ -71,7 +71,7 @@ int CanMove(const Unit* unit)
 {
 	Assert(unit);
 	Assert(unit->Type);
-	return unit->Type->NewAnimations && unit->Type->NewAnimations->Move;
+	return unit->Type->Animations && unit->Type->Animations->Move;
 }
 
 
@@ -156,7 +156,7 @@ int DoActionMove(Unit* unit)
 		d = 0;
 	}
 
-	move = UnitShowNewAnimation(unit, unit->Type->NewAnimations->Move);
+	move = UnitShowAnimation(unit, unit->Type->Animations->Move);
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;

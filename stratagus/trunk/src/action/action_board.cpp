@@ -196,7 +196,7 @@ void HandleActionBoard(Unit* unit)
 			if (WaitForTransporter(unit)) {
 				unit->SubAction = 202;
 			} else {
-				UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+				UnitShowAnimation(unit, unit->Type->Animations->Still);
 			}
 			break;
 		//

@@ -211,8 +211,8 @@ void HandleActionSpellCast(Unit* unit)
 			// FALL THROUGH
 		case 2:                         // Cast spell on the target.
 			// FIXME: should use AnimateActionSpellCast here
-			if (unit->Type->NewAnimations->Attack) {
-				flags = UnitShowNewAnimation(unit, unit->Type->NewAnimations->Attack);
+			if (unit->Type->Animations->Attack) {
+				flags = UnitShowAnimation(unit, unit->Type->Animations->Attack);
 				if (unit->Anim.Unbreakable) { // end of animation
 					return;
 				}

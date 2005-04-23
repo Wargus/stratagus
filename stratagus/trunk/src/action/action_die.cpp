@@ -58,8 +58,8 @@ void HandleActionDie(Unit* unit)
 	//
 	// Show death animation
 	//
-	if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
+	if (unit->Type->Animations && unit->Type->Animations->Death) {
+		UnitShowAnimation(unit, unit->Type->Animations->Death);
 	} else {
 		// some units has no death animation
 		unit->Anim.Unbreakable = 0;
@@ -98,8 +98,8 @@ void HandleActionDie(Unit* unit)
 		unit->SubAction = 0;
 		unit->Frame = 0;
 		UnitUpdateHeading(unit);
-		if (unit->Type->NewAnimations && unit->Type->NewAnimations->Death) {
-			UnitShowNewAnimation(unit, unit->Type->NewAnimations->Death);
+		if (unit->Type->Animations && unit->Type->Animations->Death) {
+			UnitShowAnimation(unit, unit->Type->Animations->Death);
 		}
 
 		// FIXME: perhaps later or never is better

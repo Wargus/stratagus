@@ -115,14 +115,14 @@ void LoadUnitSounds(void)
 /**
 **  Map animation sounds
 */
-static void MapAnimSounds2(NewAnimation* anim)
+static void MapAnimSounds2(Animation* anim)
 {
 	int i;
 
 	while (anim) {
-		if (anim->Type == NewAnimationSound) {
+		if (anim->Type == AnimationSound) {
 			anim->D.Sound.Sound = SoundIdForName(anim->D.Sound.Name);
-		} else if (anim->Type == NewAnimationRandomSound) {
+		} else if (anim->Type == AnimationRandomSound) {
 			for (i = 0; i < anim->D.RandomSound.NumSounds; ++i) {
 				anim->D.RandomSound.Sound[i] = SoundIdForName(anim->D.RandomSound.Name[i]);
 			}
@@ -138,38 +138,38 @@ static void MapAnimSounds(UnitType* type)
 {
 	int i;
 
-	if (!type->NewAnimations) {
+	if (!type->Animations) {
 		return;
 	}
 
-	MapAnimSounds2(type->NewAnimations->Start);
-	MapAnimSounds2(type->NewAnimations->Still);
-	MapAnimSounds2(type->NewAnimations->Death);
-	MapAnimSounds2(type->NewAnimations->StartAttack);
-	MapAnimSounds2(type->NewAnimations->Attack);
-	MapAnimSounds2(type->NewAnimations->EndAttack);
-	MapAnimSounds2(type->NewAnimations->StartMove);
-	MapAnimSounds2(type->NewAnimations->Move);
-	MapAnimSounds2(type->NewAnimations->EndMove);
-	MapAnimSounds2(type->NewAnimations->StartRepair);
-	MapAnimSounds2(type->NewAnimations->Repair);
-	MapAnimSounds2(type->NewAnimations->EndRepair);
-	MapAnimSounds2(type->NewAnimations->StartTrain);
-	MapAnimSounds2(type->NewAnimations->Train);
-	MapAnimSounds2(type->NewAnimations->EndTrain);
-	MapAnimSounds2(type->NewAnimations->StartResearch);
-	MapAnimSounds2(type->NewAnimations->Research);
-	MapAnimSounds2(type->NewAnimations->EndResearch);
-	MapAnimSounds2(type->NewAnimations->StartUpgrade);
-	MapAnimSounds2(type->NewAnimations->Upgrade);
-	MapAnimSounds2(type->NewAnimations->EndUpgrade);
-	MapAnimSounds2(type->NewAnimations->StartBuild);
-	MapAnimSounds2(type->NewAnimations->Build);
-	MapAnimSounds2(type->NewAnimations->EndBuild);
+	MapAnimSounds2(type->Animations->Start);
+	MapAnimSounds2(type->Animations->Still);
+	MapAnimSounds2(type->Animations->Death);
+	MapAnimSounds2(type->Animations->StartAttack);
+	MapAnimSounds2(type->Animations->Attack);
+	MapAnimSounds2(type->Animations->EndAttack);
+	MapAnimSounds2(type->Animations->StartMove);
+	MapAnimSounds2(type->Animations->Move);
+	MapAnimSounds2(type->Animations->EndMove);
+	MapAnimSounds2(type->Animations->StartRepair);
+	MapAnimSounds2(type->Animations->Repair);
+	MapAnimSounds2(type->Animations->EndRepair);
+	MapAnimSounds2(type->Animations->StartTrain);
+	MapAnimSounds2(type->Animations->Train);
+	MapAnimSounds2(type->Animations->EndTrain);
+	MapAnimSounds2(type->Animations->StartResearch);
+	MapAnimSounds2(type->Animations->Research);
+	MapAnimSounds2(type->Animations->EndResearch);
+	MapAnimSounds2(type->Animations->StartUpgrade);
+	MapAnimSounds2(type->Animations->Upgrade);
+	MapAnimSounds2(type->Animations->EndUpgrade);
+	MapAnimSounds2(type->Animations->StartBuild);
+	MapAnimSounds2(type->Animations->Build);
+	MapAnimSounds2(type->Animations->EndBuild);
 	for (i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type->NewAnimations->StartHarvest[i]);
-		MapAnimSounds2(type->NewAnimations->Harvest[i]);
-		MapAnimSounds2(type->NewAnimations->EndHarvest[i]);
+		MapAnimSounds2(type->Animations->StartHarvest[i]);
+		MapAnimSounds2(type->Animations->Harvest[i]);
+		MapAnimSounds2(type->Animations->EndHarvest[i]);
 	}
 }
 
