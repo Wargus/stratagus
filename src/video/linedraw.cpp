@@ -605,6 +605,26 @@ void VideoDrawTransRectangle(Uint32 color, int x, int y,
 }
 
 /**
+**  Draw translucent rectangle clipped.
+**
+**  @param color  color
+**  @param x      x coordinate on the screen
+**  @param y      y coordinate on the screen
+**  @param h      height of rectangle (0=don't draw).
+**  @param w      width of rectangle (0=don't draw).
+**  @param alpha  alpha value of pixels.
+*/
+void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
+	int w, int h, unsigned char alpha)
+{
+	VideoDrawTransHLineClip(color, x, y, w, alpha);
+	VideoDrawTransHLineClip(color, x, y + h - 1, w, alpha);
+
+	VideoDrawTransVLineClip(color, x, y + 1, h - 2, alpha);
+	VideoDrawTransVLineClip(color, x + w - 1, y + 1, h - 2, alpha);
+}
+
+/**
 **  FIXME: docu
 */
 void VideoFillRectangle(Uint32 color, int x, int y,
@@ -1545,6 +1565,23 @@ void VideoDrawTransRectangle(Uint32 color, int x, int y,
 }
 
 /**
+**  Draw translucent rectangle clipped.
+**
+**  @param color  color
+**  @param x      x coordinate on the screen
+**  @param y      y coordinate on the screen
+**  @param h      height of rectangle (0=don't draw).
+**  @param w      width of rectangle (0=don't draw).
+**  @param alpha  alpha value of pixels.
+*/
+void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
+	int w, int h, unsigned char alpha)
+{
+	CLIP_RECTANGLE(x, y, w, h);
+	VideoDrawTransRectangle(color, x, y, w, h, alpha);
+}
+
+/**
 **  Fill rectangle.
 **
 **  @param color  color
@@ -1687,6 +1724,25 @@ void VideoDrawCircleClip(Uint32 color, int x, int y, int r)
 		d_e += 2;
 		++cx;
 	} while (cx <= cy);
+}
+
+/**
+**  Draw circle clipped.
+**
+**  @param color   color
+**  @param x       Center x coordinate on the screen
+**  @param y       Center y coordinate on the screen
+**  @param radius  radius of circle
+**  @param alpha   alpha value of pixels.
+*/
+void VideoDrawTransCircleClip(Uint32 color, int x, int y, int radius,
+	unsigned char alpha)
+{
+	GLubyte r, g, b, a;
+	
+	VideoGetRGBA(color, &r, &g, &b, &a);
+	color = VideoMapRGBA(0, r, g, b, alpha);
+	VideoDrawCircleClip(color, x, y, radius);
 }
 
 /**

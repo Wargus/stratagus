@@ -52,6 +52,7 @@
 #include "netconnect.h"
 #include "interface.h"
 #include "iolib.h"
+#include "minimap.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -591,7 +592,7 @@ int PlayerCheckLimits(const Player* player, const UnitType* type)
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
 **
-**  @return        False if all enought, otherwise a bit mask.
+**  @return        False if all enough, otherwise a bit mask.
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
@@ -619,7 +620,7 @@ int PlayerCheckCosts(const Player* player, const int* costs)
 **  @param player  Pointer to player, which resources are checked.
 **  @param type    Type of unit.
 **
-**  @return        False if all enought, otherwise a bit mask.
+**  @return        False if all enough, otherwise a bit mask.
 */
 int PlayerCheckUnitType(const Player* player, const UnitType* type)
 {
@@ -670,7 +671,7 @@ void PlayerAddCostsFactor(Player* player, const int* costs, int factor)
 }
 
 /**
-**  Substract costs from the resources
+**  Subtract costs from the resources
 **
 **  @param player  Pointer to player.
 **  @param costs   How many costs.
@@ -907,12 +908,11 @@ void NotifyPlayer(const Player* player,
 	}
 
 	va_start(va, fmt);
-	vsprintf(temp, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
 
-	//
-	//  FIXME: show minimap animation for the event.
-	//
+	AddMinimapEvent(x, y);
 	if (player == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);
 	} else {
