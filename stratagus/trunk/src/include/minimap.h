@@ -86,6 +86,9 @@ extern int ScreenMinimap2MapX(int x);
 	/// Convert minimap cursor Y position to tile map coordinate
 extern int ScreenMinimap2MapY(int y);
 
+	/// Add a minimap event
+extern void AddMinimapEvent(int x, int y);
+
 //@}
 
 #endif // !__MINIMAP_H__
