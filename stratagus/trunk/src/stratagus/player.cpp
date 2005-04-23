@@ -912,7 +912,9 @@ void NotifyPlayer(const Player* player,
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
 
-	AddMinimapEvent(x, y);
+	if (x || y) {
+		AddMinimapEvent(x, y);
+	}
 	if (player == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);
 	} else {
