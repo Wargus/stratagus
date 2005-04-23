@@ -532,26 +532,26 @@ struct _mng_;
 struct _graphic_;
 struct _construction_;
 
-typedef enum _new_animation_type_ {
-	NewAnimationNone,
-	NewAnimationFrame,
-	NewAnimationExactFrame,
-	NewAnimationWait,
-	NewAnimationRandomWait,
-	NewAnimationSound,
-	NewAnimationRandomSound,
-	NewAnimationAttack,
-	NewAnimationRotate,
-	NewAnimationRandomRotate,
-	NewAnimationMove,
-	NewAnimationUnbreakable,
-	NewAnimationLabel,
-	NewAnimationGoto,
-	NewAnimationRandomGoto,
-} NewAnimationType;
+typedef enum _animation_type_ {
+	AnimationNone,
+	AnimationFrame,
+	AnimationExactFrame,
+	AnimationWait,
+	AnimationRandomWait,
+	AnimationSound,
+	AnimationRandomSound,
+	AnimationAttack,
+	AnimationRotate,
+	AnimationRandomRotate,
+	AnimationMove,
+	AnimationUnbreakable,
+	AnimationLabel,
+	AnimationGoto,
+	AnimationRandomGoto,
+} AnimationType;
 
-typedef struct _new_animation_ {
-	NewAnimationType Type;
+typedef struct _animation_ {
+	AnimationType Type;
 	union {
 		struct {
 			int Frame;
@@ -582,54 +582,54 @@ typedef struct _new_animation_ {
 			int Begin;
 		} Unbreakable;
 		struct {
-			struct _new_animation_* Goto;
+			struct _animation_* Goto;
 		} Goto;
 		struct {
 			int Random;
-			struct _new_animation_* Goto;
+			struct _animation_* Goto;
 		} RandomGoto;
 	} D;
-	struct _new_animation_* Next;
-} NewAnimation;
+	struct _animation_* Next;
+} Animation;
 
 typedef struct _new_animations_ {
-	NewAnimation* Start;
-	NewAnimation* Still;
-	NewAnimation* Death;
-	NewAnimation* StartAttack;
-	NewAnimation* Attack;
-	NewAnimation* EndAttack;
-	NewAnimation* StartMove;
-	NewAnimation* Move;
-	NewAnimation* EndMove;
-	NewAnimation* StartRepair;
-	NewAnimation* Repair;
-	NewAnimation* EndRepair;
-	NewAnimation* StartTrain;
-	NewAnimation* Train;
-	NewAnimation* EndTrain;
-	NewAnimation* StartResearch;
-	NewAnimation* Research;
-	NewAnimation* EndResearch;
-	NewAnimation* StartUpgrade;
-	NewAnimation* Upgrade;
-	NewAnimation* EndUpgrade;
-	NewAnimation* StartBuild;
-	NewAnimation* Build;
-	NewAnimation* EndBuild;
-	NewAnimation* StartHarvest[MaxCosts];
-	NewAnimation* Harvest[MaxCosts];
-	NewAnimation* EndHarvest[MaxCosts];
-} NewAnimations;
+	Animation* Start;
+	Animation* Still;
+	Animation* Death;
+	Animation* StartAttack;
+	Animation* Attack;
+	Animation* EndAttack;
+	Animation* StartMove;
+	Animation* Move;
+	Animation* EndMove;
+	Animation* StartRepair;
+	Animation* Repair;
+	Animation* EndRepair;
+	Animation* StartTrain;
+	Animation* Train;
+	Animation* EndTrain;
+	Animation* StartResearch;
+	Animation* Research;
+	Animation* EndResearch;
+	Animation* StartUpgrade;
+	Animation* Upgrade;
+	Animation* EndUpgrade;
+	Animation* StartBuild;
+	Animation* Build;
+	Animation* EndBuild;
+	Animation* StartHarvest[MaxCosts];
+	Animation* Harvest[MaxCosts];
+	Animation* EndHarvest[MaxCosts];
+} Animations;
 
 #define ANIMATIONS_MAXANIM 1024
 
-extern NewAnimation* NewAnimationsArray[ANIMATIONS_MAXANIM];
-extern int NumNewAnimations;
+extern Animation* AnimationsArray[ANIMATIONS_MAXANIM];
+extern int NumAnimations;
 
 	/// Hash table of all the newanimations
-typedef hashtable(NewAnimations*, ANIMATIONS_MAXANIM) _NewAnimationsHash;
-extern _NewAnimationsHash NewAnimationsHash;
+typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
+extern _AnimationsHash AnimationsHash;
 
 /**
 **  Missile type definition (used in config tables)
@@ -876,7 +876,7 @@ struct _unit_type_ {
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	NewAnimations* NewAnimations;   /// NewAnimation scripts
+	Animations* Animations;   /// Animation scripts
 
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
@@ -1044,7 +1044,7 @@ extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
 	/// Get the animations structure by ident
-extern NewAnimations* NewAnimationsByIdent(const char* ident);
+extern Animations* AnimationsByIdent(const char* ident);
 
 extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot

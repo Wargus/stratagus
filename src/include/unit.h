@@ -607,8 +607,8 @@ struct _unit_ {
 	unsigned ReCast : 1;    /// Recast again next cycle
 
 	struct _unit_anim_ {
-		const struct _new_animation_* Anim;         /// Anim
-		const struct _new_animation_* CurrAnim;     /// CurrAnim
+		const struct _animation_* Anim;         /// Anim
+		const struct _animation_* CurrAnim;     /// CurrAnim
 		int Wait;                                   /// Wait
 		int Unbreakable;                            /// Unbreakable
 	} Anim;

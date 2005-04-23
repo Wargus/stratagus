@@ -86,9 +86,9 @@ void HandleActionResearch(Unit* unit)
 		upgrade = unit->Data.Research.Upgrade;
 	}
 
-	unit->Type->NewAnimations->Research ?
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Research) :
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	unit->Type->Animations->Research ?
+		UnitShowAnimation(unit, unit->Type->Animations->Research) :
+		UnitShowAnimation(unit, unit->Type->Animations->Still);
 	if (unit->Wait) {
 		unit->Wait--;
 		return;

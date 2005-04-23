@@ -153,9 +153,9 @@ void HandleActionUpgradeTo(Unit* unit)
 		unit->SubAction = 1;
 	}
 
-	unit->Type->NewAnimations->Upgrade ?
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Upgrade) :
-		UnitShowNewAnimation(unit, unit->Type->NewAnimations->Still);
+	unit->Type->Animations->Upgrade ?
+		UnitShowAnimation(unit, unit->Type->Animations->Upgrade) :
+		UnitShowAnimation(unit, unit->Type->Animations->Still);
 	if (unit->Wait) {
 		unit->Wait--;
 		return;

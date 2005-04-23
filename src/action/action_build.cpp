@@ -340,7 +340,7 @@ static void BuildBuilding(Unit* unit)
 	int hp;
 	int animlength;
 
-	UnitShowNewAnimation(unit, unit->Type->NewAnimations->Build);
+	UnitShowAnimation(unit, unit->Type->Animations->Build);
 	unit->Data.Build.Cycles++;
 	if (!unit->Anim.Unbreakable) {
 		goal = unit->Orders[0].Goal;

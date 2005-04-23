@@ -85,7 +85,7 @@ static void UnitRotate(Unit* unit, int rotate)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
+int UnitShowAnimation(Unit* unit, const Animation* anim)
 {
 	int move;
 
@@ -112,15 +112,15 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 	move = 0;
 	while (!unit->Anim.Wait) {
 		switch (unit->Anim.Anim->Type) {
-			case NewAnimationFrame:
+			case AnimationFrame:
 				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
 				UnitUpdateHeading(unit);
 				break;
-			case NewAnimationExactFrame:
+			case AnimationExactFrame:
 				unit->Frame = unit->Anim.Anim->D.Frame.Frame;
 				break;
 
-			case NewAnimationWait:
+			case AnimationWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait;
 				if (unit->Slow) { // unit is slowed down
 					unit->Anim.Wait <<= 1;
@@ -129,17 +129,17 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 					unit->Anim.Wait >>= 1;
 				}
 				break;
-			case NewAnimationRandomWait:
+			case AnimationRandomWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.RandomWait.MinWait +
 					SyncRand() % (unit->Anim.Anim->D.RandomWait.MaxWait - unit->Anim.Anim->D.RandomWait.MinWait + 1);
 				break;
 
-			case NewAnimationSound:
+			case AnimationSound:
 				if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
 					PlayUnitSoundId(unit, unit->Anim.Anim->D.Sound.Sound);
 				}
 				break;
-			case NewAnimationRandomSound:
+			case AnimationRandomSound:
 				if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap) {
 					int sound;
 					sound = SyncRand() % unit->Anim.Anim->D.RandomSound.NumSounds;
@@ -147,7 +147,7 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				}
 				break;
 
-			case NewAnimationAttack:
+			case AnimationAttack:
 				if (unit->Orders[0].Action == UnitActionSpellCast) {
 					if (unit->Orders[0].Goal &&
 							!UnitVisibleAsGoal(unit->Orders->Goal, unit->Player)) {
@@ -162,10 +162,10 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				unit->Invisible = 0; // unit is invisible until attacks
 				break;
 
-			case NewAnimationRotate:
+			case AnimationRotate:
 				UnitRotate(unit, unit->Anim.Anim->D.Rotate.Rotate);
 				break;
-			case NewAnimationRandomRotate:
+			case AnimationRandomRotate:
 				if ((SyncRand() >> 8) & 1) {
 					UnitRotate(unit, -unit->Anim.Anim->D.Rotate.Rotate);
 				} else {
@@ -173,24 +173,24 @@ int UnitShowNewAnimation(Unit* unit, const NewAnimation* anim)
 				}
 				break;
 
-			case NewAnimationMove:
+			case AnimationMove:
 				Assert(!move);
 				move = unit->Anim.Anim->D.Move.Move;
 				break;
 
-			case NewAnimationUnbreakable:
+			case AnimationUnbreakable:
 				Assert(unit->Anim.Unbreakable ^ unit->Anim.Anim->D.Unbreakable.Begin);
 				unit->Anim.Unbreakable = unit->Anim.Anim->D.Unbreakable.Begin;
 				break;
 
-			case NewAnimationNone:
-			case NewAnimationLabel:
+			case AnimationNone:
+			case AnimationLabel:
 				break;
 
-			case NewAnimationGoto:
+			case AnimationGoto:
 				unit->Anim.Anim = unit->Anim.Anim->D.Goto.Goto;
 				break;
-			case NewAnimationRandomGoto:
+			case AnimationRandomGoto:
 				if (SyncRand() % 100 < unit->Anim.Anim->D.RandomGoto.Random) {
 					unit->Anim.Anim = unit->Anim.Anim->D.RandomGoto.Goto;
 				}

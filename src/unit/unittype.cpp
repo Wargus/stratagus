@@ -260,11 +260,11 @@ void UpdateStats(int reset)
 **
 **  @return  Pointer to the animation structure.
 */
-NewAnimations* NewAnimationsByIdent(const char* ident)
+Animations* AnimationsByIdent(const char* ident)
 {
-	NewAnimations** tmp;
+	Animations** tmp;
 
-	tmp = (NewAnimations**)hash_find(NewAnimationsHash, ident);
+	tmp = (Animations**)hash_find(AnimationsHash, ident);
 	if (tmp) {
 		return *tmp;
 	}
@@ -618,16 +618,16 @@ void LoadUnitTypes(void)
 /**
 **  Clean animation
 */
-static void CleanAnimation(NewAnimation* anim)
+static void CleanAnimation(Animation* anim)
 {
 	int i;
-	NewAnimation* ptr;
+	Animation* ptr;
 
 	ptr = anim;
 	while (ptr->Type) {
-		if (ptr->Type == NewAnimationSound) {
+		if (ptr->Type == AnimationSound) {
 			free(ptr->D.Sound.Name);
-		} else if (ptr->Type == NewAnimationRandomSound) {
+		} else if (ptr->Type == AnimationRandomSound) {
 			for (i = 0; i < ptr->D.RandomSound.NumSounds; ++i) {
 				free(ptr->D.RandomSound.Name[i]);
 			}
@@ -666,10 +666,10 @@ void CleanUnitTypes(void)
 
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
-	for (i = 0; i < NumNewAnimations; ++i) {
-		CleanAnimation(NewAnimationsArray[i]);
+	for (i = 0; i < NumAnimations; ++i) {
+		CleanAnimation(AnimationsArray[i]);
 	}
-	NumNewAnimations = 0;
+	NumAnimations = 0;
 
 	for (i = 0; i < NumUnitTypes; ++i) {
 		type = UnitTypes[i];
