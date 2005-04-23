@@ -198,6 +198,27 @@ def CheckOpenGL(env, conf):
          sys.exit(1)
   env.Append(CPPDEFINES = 'USE_OPENGL')
 
+def CheckLuaLib(env, conf):
+  if env.WhereIs('lua-config'):
+    env.ParseConfig('lua-config --include --libs')
+  found = 0
+  if conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
+    found = 1
+  if not found and conf.CheckLibWithHeader('lua50', 'lua.h', 'c'):
+    found =1
+  if not found and conf.CheckLibWithHeader('lua5.0', 'lua.h', 'c'):
+    found =1
+  if not found:
+    return 0
+
+  if conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
+     return 1
+  if conf.CheckLibWithHeader('lualib50', 'lualib.h', 'c'):
+     return 1
+  if conf.CheckLibWithHeader('lualib5.0', 'lualib.h', 'c'):
+     return 1
+  return 0
+
 def AutoConfigure(env):
   # determine compiler and linker flags for SDL
   env.ParseConfig('sdl-config --cflags')
@@ -206,7 +227,7 @@ def AutoConfigure(env):
 
   ## check for required libs ##
   if not conf.CheckLibWithHeader('SDL', 'SDL.h', 'c'):
-     print 'Did not find SDL libraryor headers, exiting!'
+     print 'Did not find SDL library or headers, exiting!'
      Exit(1)
   if not conf.CheckLibWithHeader('png', 'png.h', 'c'):
      print 'Did not find png library or headers, exiting!'
@@ -215,13 +236,10 @@ def AutoConfigure(env):
      print 'Did not find the zlib library or headers, exiting!'
      Exit(1)
   if not conf.CheckLib('dl'):
-     print 'Did not find dl library which is needed on some systems for lua. Exiting!'
+     print 'Did not find dl library or header which is needed on some systems for lua. Exiting!'
      Exit(1)
-  if not conf.CheckLibWithHeader('lua', 'lua.h', 'c'):
-     print 'Did not find lua library or headers, exiting!'
-     Exit(1)
-  if not conf.CheckLibWithHeader('lualib', 'lualib.h', 'c'):
-     print 'Did not find lualib library of headers, exiting!'
+  if not CheckLuaLib(env, conf):
+     print 'Did not find required lua library. Exiting!'
      Exit(1)
   # stratagus defines for required libraries
   env.Append(CPPDEFINES = Split("USE_ZLIB USE_SDL"))
