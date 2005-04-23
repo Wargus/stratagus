@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-rtank", {
+DefineAnimations("animations-rtank", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
         "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
@@ -57,7 +57,7 @@ DefineUnitType("unit-rtank", {
         Name = "Rocket Tank",
         Files = {"default", "elites/units/unit_rtank.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {96, 96}},
-        NewAnimations = "animations-rtank", Icon = "icon-rtank",
+        Animations = "animations-rtank", Icon = "icon-rtank",
         Flip = false,
         Costs = {"time", 100, "titanium", 100, "crystal", 150},
         RepairHp = 1, RepairCosts = {"crystal", 6},

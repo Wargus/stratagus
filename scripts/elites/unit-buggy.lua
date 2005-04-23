@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-dead_buggy", {
+DefineAnimations("animations-dead_buggy", {
     Death = {"unbreakable begin", "frame 30", "wait 50", 
         "frame 35", "sound grenade-impact", "wait 1", "frame 40", "wait 1", 
         "frame 45", "wait 1", "frame 50", "wait 1", "frame 55", "wait 1", 
@@ -36,7 +36,7 @@ DefineNewAnimations("animations-dead_buggy", {
         "unbreakable end", "wait 1", },
     })
  
-DefineNewAnimations("animations-buggy", {
+DefineAnimations("animations-buggy", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
         "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
@@ -70,7 +70,7 @@ DefineUnitType("buggy_destroyed", {
         Files = {"tileset-desert", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
-        NewAnimations = "animations-dead_buggy", Icon = "icon-cancel",
+        Animations = "animations-dead_buggy", Icon = "icon-cancel",
         Flip = false,
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {62, 62}, SightRange = 2,
@@ -86,7 +86,7 @@ DefineUnitType("unit-buggy", {
         Files = {"tileset-desert", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
-        NewAnimations = "animations-buggy", Icon = "icon-buggy",
+        Animations = "animations-buggy", Icon = "icon-buggy",
         Flip = false,
         Costs = {"time", 100, "titanium", 100, "crystal", 200},
         RepairHp = 1, RepairCosts = {"crystal", 3},

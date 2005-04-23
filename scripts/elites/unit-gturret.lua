@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-gturret", {
+DefineAnimations("animations-gturret", {
     Still = {"frame 4", "wait 1", },
     Attack = {"unbreakable begin", "frame 0", "wait 1", "frame 5", "wait 1",
         "frame 0", "wait 1", "frame 5", "wait 1", "frame 0", "wait 1", 
@@ -63,7 +63,7 @@ DefineUnitType("unit-gturret", {
         Name = "Gun Turret",
         Files = {"tileset-desert", "elites/build/gturret.png"}, Size = {64, 64},
         Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
-        NewAnimations = "animations-gturret", Icon = "icon-gturret",
+        Animations = "animations-gturret", Icon = "icon-gturret",
         Costs = {"time", 130, "titanium", 250, "crystal", 50},
         RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gturret",
         Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},

@@ -32,7 +32,7 @@
 -------- Elite Units ------
 ---------------------------
 
-DefineNewAnimations("animations-apcs", {
+DefineAnimations("animations-apcs", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 4", "wait 2", 
         "frame 0", "move 4", "wait 2", "frame 0", "move 4", "wait 2", 
@@ -51,7 +51,7 @@ DefineNewAnimations("animations-apcs", {
         "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
     })
 
-DefineNewAnimations("animations-medic", {
+DefineAnimations("animations-medic", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
         "frame 5", "move 4", "wait 2", "frame 10", "move 4", "wait 2", 
@@ -65,7 +65,7 @@ DefineNewAnimations("animations-medic", {
         "wait 2", "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
     })
 
-DefineNewAnimations("animations-bazoo", {
+DefineAnimations("animations-bazoo", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 2", "wait 2", 
         "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 2", 
@@ -84,7 +84,7 @@ DefineNewAnimations("animations-bazoo", {
         "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
     })
 
-DefineNewAnimations("animations-assault", {
+DefineAnimations("animations-assault", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 2", "wait 1", 
         "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
@@ -106,7 +106,7 @@ DefineNewAnimations("animations-assault", {
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
     })
 
-DefineNewAnimations("animations-grenadier", {
+DefineAnimations("animations-grenadier", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 2", "wait 1", 
         "frame 5", "move 2", "wait 1", "frame 10", "move 2", "wait 1", 
@@ -125,7 +125,7 @@ DefineNewAnimations("animations-grenadier", {
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
     })
 
-DefineNewAnimations("animations-engineer", {
+DefineAnimations("animations-engineer", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 2", "wait 2", 
         "frame 5", "move 2", "wait 1", "frame 5", "move 2", "wait 2", 
@@ -152,7 +152,7 @@ DefineNewAnimations("animations-engineer", {
         "frame 55", "wait 5", "frame 50", "unbreakable end", "wait 5", },
     })
 
-DefineNewAnimations("animations-harvester", {
+DefineAnimations("animations-harvester", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 1", "wait 1", 
         "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
@@ -187,11 +187,11 @@ DefineNewAnimations("animations-harvester", {
 -------- Elite Buildings ------
 -------------------------------
 
-DefineNewAnimations("animations-plate", {
+DefineAnimations("animations-plate", {
     Still = {"frame 0", "wait 1", },
     })
 
-DefineNewAnimations("animations-msilo", {
+DefineAnimations("animations-msilo", {
     Still = {"frame 0", "wait 1", },
     Attack = {"unbreakable begin", "frame 1", "wait 1", 
         "frame 2", "sound msilo-attack", "attack", "wait 1", 
@@ -200,22 +200,22 @@ DefineNewAnimations("animations-msilo", {
         "frame 6", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-gen", {
+DefineAnimations("animations-gen", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
         "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
     })
 
-DefineNewAnimations("animations-dev-yard", {
+DefineAnimations("animations-dev-yard", {
     Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
         "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
     })
 
-DefineNewAnimations("animations-rfac", {
+DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
 
-DefineNewAnimations("animations-vault", {
+DefineAnimations("animations-vault", {
     Still = {"frame 0", "wait 5", "frame 1", "wait 5", "frame 2", "wait 5", 
         "frame 3", "wait 5", "frame 4", "wait 5", "frame 5", "wait 5", 
         "frame 5", "wait 5", "frame 5", "wait 5", "frame 4", "wait 5", 
@@ -224,16 +224,16 @@ DefineNewAnimations("animations-vault", {
     Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
     })
 
-DefineNewAnimations("animations-camp", {
+DefineAnimations("animations-camp", {
     Still = {"frame 0", "wait 3", },
     })
 
-DefineNewAnimations("animations-hosp", {
+DefineAnimations("animations-hosp", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", },
     })
 
-DefineNewAnimations("animations-vfac", {
+DefineAnimations("animations-vfac", {
     Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
         "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
         "frame 6", "wait 3", "frame 7", "wait 3", "frame 8", "wait 3", },
@@ -243,103 +243,103 @@ DefineNewAnimations("animations-vfac", {
 -------- Nature ------
 ----------------------
 
-DefineNewAnimations("animations-elitecorpse1", {
+DefineAnimations("animations-elitecorpse1", {
     Death = {"unbreakable begin", "wait 1", "frame 20", "wait 2000", 
         "frame 0", "wait 200", "frame 5", "wait 200", "frame 10", "wait 200", 
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     }) 
 
-DefineNewAnimations("animations-elitebuild1", {
+DefineAnimations("animations-elitebuild1", {
     Death = {"unbreakable begin", "wait 1", "frame 16", "wait 2000", 
         "frame 16", "wait 200", "frame 16", "wait 200", "frame 17", "wait 200",
         "frame 17", "wait 200", "frame 17", "wait 1", "unbreakable end", "wait 1", },
     }) 
 
-DefineNewAnimations("animations-elitebuild2", {
+DefineAnimations("animations-elitebuild2", {
     Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
         "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
         "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-elitebuild3", {
+DefineAnimations("animations-elitebuild3", {
     Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
         "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
         "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-elitebuild4", {
+DefineAnimations("animations-elitebuild4", {
     Death = {"unbreakable begin", "wait 1", "frame 12", "wait 2000", 
         "frame 12", "wait 200", "frame 12", "wait 200", "frame 13", "wait 200",
         "frame 13", "wait 200", "frame 13", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-elitebuild5", {
+DefineAnimations("animations-elitebuild5", {
     Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
         "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
         "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-elitebuild6", {
+DefineAnimations("animations-elitebuild6", {
     Death = {"unbreakable begin", "wait 1", "frame 30", "wait 2000", 
         "frame 30", "wait 200", "frame 30", "wait 200", "frame 31", "wait 200",
         "frame 31", "wait 200", "frame 31", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-elitebuild7", {
+DefineAnimations("animations-elitebuild7", {
     Death = {"unbreakable begin", "wait 1", "frame 14", "wait 2000", 
         "frame 14", "wait 200", "frame 14", "wait 200", "frame 15", "wait 200",
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field1", {
+DefineAnimations("animations-crystal-field1", {
     Still = {"frame 6", "wait 4", "frame 6", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field2", {
+DefineAnimations("animations-crystal-field2", {
     Still = {"frame 10", "wait 4", "frame 10", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field3", {
+DefineAnimations("animations-crystal-field3", {
     Still = {"frame 12", "wait 4", "frame 12", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field4", {
+DefineAnimations("animations-crystal-field4", {
     Still = {"frame 4", "wait 4", "frame 4", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field5", {
+DefineAnimations("animations-crystal-field5", {
     Still = {"frame 0", "wait 4", "frame 0", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field6", {
+DefineAnimations("animations-crystal-field6", {
     Still = {"frame 1", "wait 4", "frame 1", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field7", {
+DefineAnimations("animations-crystal-field7", {
     Still = {"frame 5", "wait 4", "frame 5", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field8", {
+DefineAnimations("animations-crystal-field8", {
     Still = {"frame 7", "wait 4", "frame 7", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field9", {
+DefineAnimations("animations-crystal-field9", {
     Still = {"frame 2", "wait 4", "frame 2", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field10", {
+DefineAnimations("animations-crystal-field10", {
     Still = {"frame 3", "wait 4", "frame 3", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field11", {
+DefineAnimations("animations-crystal-field11", {
     Still = {"frame 11", "wait 4", "frame 11", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field12", {
+DefineAnimations("animations-crystal-field12", {
     Still = {"frame 8", "wait 4", "frame 8", "wait 1", },
     })
 
-DefineNewAnimations("animations-crystal-field13", {
+DefineAnimations("animations-crystal-field13", {
     Still = {"frame 9", "wait 4", "frame 9", "wait 1", },
     })
 
@@ -347,7 +347,7 @@ DefineNewAnimations("animations-crystal-field13", {
 -------- Terras Units ------
 ----------------------------
 
-DefineNewAnimations("animations-dorcoz", {
+DefineAnimations("animations-dorcoz", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
         "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
@@ -364,14 +364,14 @@ DefineNewAnimations("animations-dorcoz", {
 ---------------------------------------
 -- Misc.
 
-DefineNewAnimations("animations-building", {
+DefineAnimations("animations-building", {
     Still = {"frame 0", "wait 4", "frame 0", "wait 1"},
     })
 
 ---------------------------------------
 --        Dead Body
 
-DefineNewAnimations("animations-dead-body", {
+DefineAnimations("animations-dead-body", {
     Death = {"unbreakable begin", "frame 5", "wait 200", "frame 10", "wait 200",
         "frame 15", "wait 200", "frame 20", "wait 200", "frame 25", "wait 200",
         "frame 25", "unbreakable end", "wait 1", },
@@ -380,7 +380,7 @@ DefineNewAnimations("animations-dead-body", {
 ---------------------------------------
 --        Destroyed *x* Place
 
-DefineNewAnimations("animations-destroyed-place", {
+DefineAnimations("animations-destroyed-place", {
     Death = {"unbreakable begin", "frame 0", "wait 200", "frame 1", "wait 200",
         "frame 1", "unbreakable end", "wait 1", },
     })
