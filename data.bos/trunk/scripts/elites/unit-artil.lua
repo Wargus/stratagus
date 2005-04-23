@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-artil", {
+DefineAnimations("animations-artil", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 1", "wait 1", 
         "frame 0", "move 1", "wait 1", "frame 0", "move 1", "wait 1", 
@@ -64,7 +64,7 @@ DefineUnitType("unit-artil", {
         Name = "Artil",
         Files = {"default", "elites/units/unit_artil.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
-        NewAnimations = "animations-artil", Icon = "icon-artil",
+        Animations = "animations-artil", Icon = "icon-artil",
         Flip = false,
         Costs = {"time", 200, "titanium", 300, "crystal", 300},
         RepairHp = 1, RepairCosts = {"crystal", 6},

@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-tank", {
+DefineAnimations("animations-tank", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 0", "move 2", "wait 1", 
         "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
@@ -57,7 +57,7 @@ DefineUnitType("unit-tank", {
         Name = "Tank",
         Files = {"tileset-desert", "elites/units/unit_tank.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
-        NewAnimations = "animations-tank", Icon = "icon-tank",
+        Animations = "animations-tank", Icon = "icon-tank",
         Flip = false,
         Costs = {"time", 150, "titanium", 200, "crystal", 100},
         RepairHp = 1, RepairCosts = {"crystal", 6},

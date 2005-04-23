@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-cam", {
+DefineAnimations("animations-cam", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2",
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
         "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", 
@@ -39,7 +39,7 @@ DefineNewAnimations("animations-cam", {
     })
 
 
-DefineNewAnimations("animations-dead_cam", {
+DefineAnimations("animations-dead_cam", {
     Death = {"unbreakable begin", "frame 0", "wait 2000",
         "frame 1", "unbreakable end", "wait 200", },
     })
@@ -76,7 +76,7 @@ DefineUnitType("unit-cam", {
         Files = {"tileset-desert", "elites/build/camera.png"}, Size = {32, 64},
         Offset = {0, -16},
         Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
-        NewAnimations = "animations-cam", Icon = "icon-cam",
+        Animations = "animations-cam", Icon = "icon-cam",
         Costs = {"time", 20, "titanium", 7, "crystal", 35},
         RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-cam",
         Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
@@ -92,7 +92,7 @@ DefineUnitType("unit-cam", {
 DefineUnitType("camera_destroyed", {
         Name = "CameraCrater",
         Files = {"tileset-desert", "elites/build/camera_c.png"}, Size = {32, 64},
-        NewAnimations = "animations-dead_cam", Icon = "icon-cancel",
+        Animations = "animations-dead_cam", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
         BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",

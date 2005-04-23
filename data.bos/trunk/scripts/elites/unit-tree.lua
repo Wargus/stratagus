@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-tree", {
+DefineAnimations("animations-tree", {
     Still = {"frame 0", "random-wait 255 5000", "frame 1", "wait 6", 
         "frame 2", "wait 6", "frame 3", "wait 6", "frame 2", "wait 6", 
         "frame 1", "wait 6", },
@@ -52,7 +52,7 @@ DefineUnitType("unit-tree", {
         Files = {"default", "nature/tree01.png"}, Size = {105, 105},
 	Offset = {16, -24},
         Shadow = {"file", "nature/tree01_s.png", "size", {105, 105}},
-        NewAnimations = "animations-tree", Icon = "icon-tree",
+        Animations = "animations-tree", Icon = "icon-tree",
         Costs = {"time", 1},
         Construction = "construction-tree",
         Speed = 0, HitPoints = 50, DrawLevel = 2, 

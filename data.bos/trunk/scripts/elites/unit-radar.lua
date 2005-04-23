@@ -28,7 +28,7 @@
 --
 --	$Id$
 
-DefineNewAnimations("animations-radar", {
+DefineAnimations("animations-radar", {
     Still = {"frame 0", "wait 4", "frame 1", "wait 4", "frame 2", "wait 4",
         "frame 3", "wait 4", "frame 4", "wait 4", "frame 5", "wait 4", 
         "frame 6", "wait 4", "frame 7", "wait 4", },
@@ -62,7 +62,7 @@ DefineUnitType("unit-radar", {
         Files = {"tileset-desert", "elites/build/radar.png"}, Size = {64, 64},
 	Offset = {12, -16},
         Shadow = {"file", "elites/build/radar_s.png", "size", {64, 64}},
-        NewAnimations = "animations-radar", Icon = "icon-radar",
+        Animations = "animations-radar", Icon = "icon-radar",
         Costs = {"time", 20, "titanium", 7, "crystal", 35},
         RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-radar",
         Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {32, 28},
@@ -80,7 +80,7 @@ DefineUnitType("unit-radar", {
 DefineUnitType("radar_destroyed", {
         Name = "RadarWreck",
         Files = {"tileset-desert", "elites/build/radar.png"}, Size = {64, 64},
-        NewAnimations = "animations-radar", Icon = "icon-cancel",
+        Animations = "animations-radar", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
         BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
