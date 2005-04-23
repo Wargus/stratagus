@@ -187,6 +187,8 @@ void CreateMinimap(void)
 #endif
 
 	UpdateMinimapTerrain();
+
+	NumMinimapEvents = 0;
 }
 
 #ifdef USE_OPENGL
