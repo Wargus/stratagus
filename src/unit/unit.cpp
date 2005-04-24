@@ -1398,7 +1398,7 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 	//
 	// Invisibility
 	//
-	if (unit->Invisible && (player != unit->Player) &&
+	if (unit->Variable[INVISIBLE_INDEX].Value && (player != unit->Player) &&
 			(!PlayersShareVision(player->Player, unit->Player->Player))) {
 		return 0;
 	}
@@ -1427,7 +1427,7 @@ int UnitVisibleOnMap(const Unit* unit, const Player* player)
 	//
 	// Invisible units.
 	//
-	if (unit->Invisible && player != unit->Player &&
+	if (unit->Variable[INVISIBLE_INDEX].Value && player != unit->Player &&
 			!PlayersShareVision(player->Player, unit->Player->Player)) {
 		return 0;
 	}
@@ -1451,7 +1451,7 @@ int UnitVisibleOnMinimap(const Unit* unit)
 	//
 	// Invisible units.
 	//
-	if (unit->Invisible && (ThisPlayer != unit->Player) &&
+	if (unit->Variable[INVISIBLE_INDEX].Value && (ThisPlayer != unit->Player) &&
 			(!PlayersShareVision(ThisPlayer->Player, unit->Player->Player))) {
 		return 0;
 	}
@@ -1501,7 +1501,7 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 	}
 
 	// Those are never ever visible.
-	if (unit->Invisible && ThisPlayer != unit->Player &&
+	if (unit->Variable[INVISIBLE_INDEX].Value && ThisPlayer != unit->Player &&
 			!PlayersShareVision(ThisPlayer->Player, unit->Player->Player)) {
 		return 0;
 	}
@@ -3035,7 +3035,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 
 	Assert(damage != 0 && target->HP != 0 && !target->Type->Vanishes);
 
-	if (target->UnholyArmor > 0 || target->Type->Indestructible) {
+	if (target->Variable[UNHOLYARMOR_INDEX].Value > 0 || target->Type->Indestructible) {
 		// vladi: units with active UnholyArmour are invulnerable
 		return;
 	}
@@ -3718,12 +3718,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	CLprintf(file, " \"hp\", %d,", unit->HP);
 
 	CLprintf(file, "\"ttl\", %lu, ", unit->TTL);
-	CLprintf(file, "\"bloodlust\", %d, ", unit->Bloodlust);
-	CLprintf(file, "\"haste\", %d, ", unit->Haste);
-	CLprintf(file, "\"slow\", %d,\n  ", unit->Slow);
-	CLprintf(file, "\"invisible\", %d, ", unit->Invisible);
-	CLprintf(file, "\"flame-shield\", %d, ", unit->FlameShield);
-	CLprintf(file, "\"unholy-armor\", %d,\n  ", unit->UnholyArmor);
 
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",

@@ -1115,19 +1115,19 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 	//
 	// Draw spells decoration
 	//
-	if (unit->Bloodlust) {
+	if (unit->Variable[BLOODLUST_INDEX].Value) {
 		VideoDrawClip(SpellSprite.Sprite, 0, x1, y1);
 	}
-	if (unit->Haste) { // same slot as slow
+	if (unit->Variable[HASTE_INDEX].Value) { // same slot as slow
 		VideoDrawClip(SpellSprite.Sprite, 1, x1 + 16, y1);
 	}
-	if (unit->Slow) { // same slot as haste
+	if (unit->Variable[SLOW_INDEX].Value) { // same slot as haste
 		VideoDrawClip(SpellSprite.Sprite, 2, x1 + 16, y1);
 	}
-	if (unit->Invisible) {
+	if (unit->Variable[INVISIBLE_INDEX].Value) {
 		VideoDrawClip(SpellSprite.Sprite, 3, x1 + 16 + 16, y1);
 	}
-	if (unit->UnholyArmor) {
+	if (unit->Variable[UNHOLYARMOR_INDEX].Value) {
 		VideoDrawClip(SpellSprite.Sprite, 4, x1 + 16 + 16 + 16, y1);
 	}
 

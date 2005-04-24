@@ -750,18 +750,6 @@ static int CclUnit(lua_State* l)
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "bloodlust")) {
-			unit->Bloodlust = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "haste")) {
-			unit->Haste = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "slow")) {
-			unit->Slow = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "invisible")) {
-			unit->Invisible = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "flame-shield")) {
-			unit->FlameShield = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "unholy-armor")) {
-			unit->UnholyArmor = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "group-id")) {
 			unit->GroupId = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "last-group")) {
@@ -1372,7 +1360,7 @@ static int CclGetUnitUnholyArmor(lua_State* l)
 	}
 
 	unit = CclGetUnit(l);
-	lua_pushnumber(l, unit->UnholyArmor);
+	lua_pushnumber(l, unit->Variable[UNHOLYARMOR_INDEX].Value);
 	return 1;
 }
 
@@ -1394,7 +1382,7 @@ static int CclSetUnitUnholyArmor(lua_State* l)
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	unit->UnholyArmor = LuaToNumber(l, 2);
+	unit->Variable[UNHOLYARMOR_INDEX].Value = LuaToNumber(l, 2);
 
 	lua_pushvalue(l, 2);
 	return 1;
