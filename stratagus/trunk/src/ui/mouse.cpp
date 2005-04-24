@@ -1203,7 +1203,7 @@ static int SendSpellCast(int sx, int sy)
 		unit = Selected[i];
 		if (!unit->Type->CanCastSpell) {
 			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-				unit->Slow _C_ unit->Type->Name);
+				unit->Slot _C_ unit->Type->Name);
 			// this unit cannot cast spell
 			continue;
 		}
