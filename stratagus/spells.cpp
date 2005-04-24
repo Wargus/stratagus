@@ -436,19 +436,29 @@ int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 		return 0;
 	}
 	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
-		target->Haste = action->Data.AdjustBuffs.HasteTicks;
+		target->Variable[HASTE_INDEX].Max = action->Data.AdjustBuffs.HasteTicks;
+		target->Variable[HASTE_INDEX].Value = action->Data.AdjustBuffs.HasteTicks;
+		target->Variable[HASTE_INDEX].Enable = (action->Data.AdjustBuffs.HasteTicks > 0);
 	}
 	if (action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
-		target->Slow = action->Data.AdjustBuffs.SlowTicks;
+		target->Variable[SLOW_INDEX].Max = action->Data.AdjustBuffs.SlowTicks;
+		target->Variable[SLOW_INDEX].Value = action->Data.AdjustBuffs.SlowTicks;
+		target->Variable[SLOW_INDEX].Enable = (action->Data.AdjustBuffs.SlowTicks > 0);
 	}
 	if (action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
-		target->Bloodlust = action->Data.AdjustBuffs.BloodlustTicks;
+		target->Variable[BLOODLUST_INDEX].Max = action->Data.AdjustBuffs.BloodlustTicks;
+		target->Variable[BLOODLUST_INDEX].Value = action->Data.AdjustBuffs.BloodlustTicks;
+		target->Variable[BLOODLUST_INDEX].Enable = (action->Data.AdjustBuffs.BloodlustTicks > 0);
 	}
 	if (action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
-		target->Invisible = action->Data.AdjustBuffs.InvisibilityTicks;
+		target->Variable[INVISIBLE_INDEX].Max = action->Data.AdjustBuffs.InvisibilityTicks;
+		target->Variable[INVISIBLE_INDEX].Value = action->Data.AdjustBuffs.InvisibilityTicks;
+		target->Variable[INVISIBLE_INDEX].Enable = (action->Data.AdjustBuffs.InvisibilityTicks > 0);
 	}
 	if (action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
-		target->UnholyArmor = action->Data.AdjustBuffs.InvincibilityTicks;
+		target->Variable[UNHOLYARMOR_INDEX].Max = action->Data.AdjustBuffs.InvincibilityTicks;
+		target->Variable[UNHOLYARMOR_INDEX].Value = action->Data.AdjustBuffs.InvincibilityTicks;
+		target->Variable[UNHOLYARMOR_INDEX].Enable = (action->Data.AdjustBuffs.InvincibilityTicks > 0);
 	}
 	return 0;
 }
@@ -903,19 +913,19 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 	// Check for slow/haste stuff
 	// This should be used mostly for ai, if you want to keep casting
 	// slow to no effect I can't see why should we stop you.
-	if (condition->MaxSlowTicks < target->Slow) {
+	if (condition->MaxSlowTicks < target->Variable[SLOW_INDEX].Value) {
 		return 0;
 	}
-	if (condition->MaxHasteTicks < target->Haste) {
+	if (condition->MaxHasteTicks < target->Variable[HASTE_INDEX].Value) {
 		return 0;
 	}
-	if (condition->MaxBloodlustTicks < target->Bloodlust) {
+	if (condition->MaxBloodlustTicks < target->Variable[BLOODLUST_INDEX].Value) {
 		return 0;
 	}
-	if (condition->MaxInvisibilityTicks < target->Invisible) {
+	if (condition->MaxInvisibilityTicks < target->Variable[INVISIBLE_INDEX].Value) {
 		return 0;
 	}
-	if (condition->MaxInvincibilityTicks < target->UnholyArmor) {
+	if (condition->MaxInvincibilityTicks < target->Variable[UNHOLYARMOR_INDEX].Value) {
 		return 0;
 	}
 	return 1;
@@ -1173,7 +1183,7 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	SpellActionType* act; // action to do.
 	int mustSubtractMana; // false if action which have their own calculation is present.
 
-	caster->Invisible = 0;// unit is invisible until attacks // FIXME: Must be configurable
+	caster->Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		x = target->X;
 		y = target->Y;

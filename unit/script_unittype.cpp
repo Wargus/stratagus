@@ -1910,7 +1910,9 @@ void UpdateUnitVariables(const Unit* unit)
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX) {
+			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
+			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
@@ -2061,7 +2063,8 @@ void InitDefinedVariables()
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
 		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
-		"RadarJammerRange", "AutoRepairRange", "Slot"
+		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
+		"UnholyArmor", "Slot"
 		}; // names of the variable.
 	const char* boolflag = "DefineBoolFlags(\"Coward\", \"Building\", \"Flip\","
 		"\"Revealer\", \"LandUnit\", \"AirUnit\", \"SeaUnit\", \"ExplodeWhenKilled\","

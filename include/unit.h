@@ -587,12 +587,6 @@ struct _unit_ {
 	struct _variable_type_* Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
-	int Bloodlust;      /// ticks bloodlust
-	int Haste;          /// ticks haste (disables slow)
-	int Slow;           /// ticks slow (disables haste)
-	int Invisible;      /// ticks invisible
-	int FlameShield;    /// ticks flame shield
-	int UnholyArmor;    /// ticks unholy armor
 
 	int GroupId;        /// unit belongs to this group id
 	int LastGroup;      /// unit belongs to this last group
