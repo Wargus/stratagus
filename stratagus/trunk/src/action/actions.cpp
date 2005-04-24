@@ -122,10 +122,10 @@ int UnitShowAnimation(Unit* unit, const Animation* anim)
 
 			case AnimationWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait;
-				if (unit->Slow) { // unit is slowed down
+				if (unit->Variable[SLOW_INDEX].Value) { // unit is slowed down
 					unit->Anim.Wait <<= 1;
 				}
-				if (unit->Haste && unit->Anim.Wait > 1) { // unit is accelerated
+				if (unit->Variable[HASTE_INDEX].Value && unit->Anim.Wait > 1) { // unit is accelerated
 					unit->Anim.Wait >>= 1;
 				}
 				break;
@@ -159,7 +159,7 @@ int UnitShowAnimation(Unit* unit, const Animation* anim)
 				} else {
 					FireMissile(unit);
 				}
-				unit->Invisible = 0; // unit is invisible until attacks
+				unit->Variable[INVISIBLE_INDEX].Value = 0; // unit is invisible until attacks
 				break;
 
 			case AnimationRotate:
@@ -423,44 +423,14 @@ static void HandleBuffs(Unit* unit, int amount)
 	}
 
 	//
-	// decrease spells effects time, if end redraw unit.
+	//  decrease spells effects time.
 	//
 
-	// Bloodlust
-	if (unit->Bloodlust) {
-		unit->Bloodlust -= amount;
-		if (unit->Bloodlust < 0) {
-			unit->Bloodlust = 0 ;
-		}
-	}
-	// Haste
-	if (unit->Haste) {
-		unit->Haste -= amount;
-		if (unit->Haste < 0) {
-			unit->Haste = 0;
-		}
-	}
-	// Slow
-	if (unit->Slow) {
-		unit->Slow -= amount;
-		if (unit->Slow < 0) {
-			unit->Slow = 0;
-		}
-	}
-	// Invisible
-	if (unit->Invisible) {
-		unit->Invisible -= amount;
-		if (unit->Invisible < 0) {
-			unit->Invisible = 0;
-		}
-	}
-	// Unholy armor
-	if (unit->UnholyArmor) {
-		unit->UnholyArmor -= amount;
-		if (unit->UnholyArmor < 0) {
-			unit->UnholyArmor = 0;
-		}
-	}
+	unit->Variable[BLOODLUST_INDEX].Increase = -amount;
+	unit->Variable[HASTE_INDEX].Increase = -amount;
+	unit->Variable[SLOW_INDEX].Increase = -amount;
+	unit->Variable[INVISIBLE_INDEX].Increase = -amount;
+	unit->Variable[UNHOLYARMOR_INDEX].Increase = -amount;
 
 	// User defined variables
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {

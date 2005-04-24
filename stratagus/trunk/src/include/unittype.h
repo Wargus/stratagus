@@ -727,7 +727,12 @@ typedef struct _variable_type_ {
 #define RADAR_INDEX          21
 #define RADARJAMMER_INDEX    22
 #define AUTOREPAIRRANGE_INDEX 23
-#define SLOT_INDEX           24
+#define BLOODLUST_INDEX      24
+#define HASTE_INDEX          25
+#define SLOW_INDEX           26
+#define INVISIBLE_INDEX      27
+#define UNHOLYARMOR_INDEX    28
+#define SLOT_INDEX           29
 
 #define NVARALREADYDEFINED SLOT_INDEX + 1 // Hardcoded variables
 
