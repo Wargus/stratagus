@@ -556,29 +556,29 @@ int PlayerCheckLimits(const Player* player, const UnitType* type)
 	//
 	if (NumUnits < UnitMax) {
 		if (type->Building && player->NumBuildings >= player->BuildingLimit) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Building Limit Reached");
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Building Limit Reached");
 			return -1;
 		}
 		if (!type->Building && (player->TotalNumUnits - player->NumBuildings) >= player->UnitLimit) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Unit Limit Reached");
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Unit Limit Reached");
 			return -2;
 		}
 		if (player->Demand + type->Demand > player->Supply && type->Demand) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Insufficient Supply, increase Supply.");
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Insufficient Supply, increase Supply.");
 			return -3;
 		}
 		if (player->TotalNumUnits >= player->TotalUnitLimit) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Total Unit Limit Reached");
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Total Unit Limit Reached");
 			return -4;
 		}
 		if (player->UnitTypesCount[type->Slot] >=  player->Allow.Units[type->Slot]) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Limit of %d Reached for this unit type",
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Limit of %d Reached for this unit type",
 					player->Allow.Units[type->Slot]);
 			return -6;
 		}
 		return 1;
 	} else {
-		NotifyPlayer(player, NotifyYellow, 0, 0, "Cannot create more units.");
+		NotifyPlayer(player, NotifyYellow, -1, -1, "Cannot create more units.");
 		if (player->AiEnabled) {
 			// AiNoMoreUnits(player, type);
 		}
@@ -604,7 +604,7 @@ int PlayerCheckCosts(const Player* player, const int* costs)
 	err = 0;
 	for (i = 1; i < MaxCosts; ++i) {
 		if (player->Resources[i] < costs[i]) {
-			NotifyPlayer(player, NotifyYellow, 0, 0, "Not enough %s...%s more %s.",
+			NotifyPlayer(player, NotifyYellow, -1, -1, "Not enough %s...%s more %s.",
 				DefaultResourceNames[i], DefaultActions[i], DefaultResourceNames[i]);
 
 			err |= 1 << i;
@@ -912,7 +912,7 @@ void NotifyPlayer(const Player* player,
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
 
-	if (x || y) {
+	if (x != -1) {
 		AddMinimapEvent(x, y);
 	}
 	if (player == ThisPlayer) {

@@ -1081,11 +1081,13 @@ void SetMessageEvent(int x, int y, const char* fmt, ...)
 		ShiftMessagesEvent();
 	}
 
-	strcpy(MessagesEvent[MessagesEventCount], temp);
-	MessagesEventX[MessagesEventCount] = x;
-	MessagesEventY[MessagesEventCount] = y;
-	MessagesEventIndex = MessagesEventCount;
-	++MessagesEventCount;
+	if (x != -1) {
+		strcpy(MessagesEvent[MessagesEventCount], temp);
+		MessagesEventX[MessagesEventCount] = x;
+		MessagesEventY[MessagesEventCount] = y;
+		MessagesEventIndex = MessagesEventCount;
+		++MessagesEventCount;
+	}
 }
 
 /**
