@@ -47,12 +47,13 @@ HOSTING GAMES
 ----------------------------------------------------------------------
 
 
-CREATEGAME description map players ip port
+CREATEGAME description map players ip port [password]
 
 Create a new game.  A user may only have one created game at a time.  If the 
 description or map includes spaces it must be enclosed in quotation marks.  
 Players is the number of player slots (human or computer), ip is the user's 
 ip address, and port is the udp port number that the engine is listening on.
+An optional password may be used.
 
 Replies:
 ERR_GAMECREATED   The user already has an open created game
@@ -118,13 +119,16 @@ ERR_BADPARAMETER     Too many parameters, not enough parameters, or a badly
 LISTGAMESEND_OK      Message received
 
 
-JOINGAME id
+JOINGAME id [password]
 
-Join a game.  The id is obtained from LISTGAMES.
+Join a game.  The id is obtained from LISTGAMES.  The password must be sent
+when joining games created with a password.
 
 Replies:
 ERR_GAMEFULL       There are no empty player slots
 ERR_ALREADYINGAME  The user is already in a game 
+ERR_NEEDPASSWORD   The game requires a password to join
+ERR_BADPASSWORD    The password is incorrect
 ERR_BADPARAMETER   Too many parameters, not enough parameters, or a badly 
                    formed parameter was sent
 JOINGAME_OK        The player joined the game
