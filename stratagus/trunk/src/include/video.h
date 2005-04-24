@@ -312,9 +312,6 @@ extern void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
 	/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char* name);
 
-	/// Creates a hardware palette from an independent Palette struct.
-extern SDL_Palette* VideoCreateNewPalette(const SDL_Palette* palette);
-
 	/// Process all system events. Returns if the time for a frame is over
 extern void WaitEventsOneFrame(const EventCallback* callbacks);
 
@@ -500,17 +497,17 @@ extern void VideoFillTransRectangleClip(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha);
 
 	/// Fill circle.
-extern void VideoFillCircle(Uint32 color, int x, int y, int r);
+extern void VideoFillCircle(Uint32 color, int x, int y, int radius);
 
 	/// Fill translucent circle.
-extern void VideoFillTransCircle(Uint32 color, int x, int y, int r,
+extern void VideoFillTransCircle(Uint32 color, int x, int y, int radius,
 	unsigned char alpha);
 
 	/// Fill circle clipped.
-extern void VideoFillCircleClip(Uint32 color, int x, int y, int r);
+extern void VideoFillCircleClip(Uint32 color, int x, int y, int radius);
 
 	/// Fill translucent circle clipped.
-extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int r,
+extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int radius,
 	unsigned char alpha);
 
 	/// Draw a graphic object unclipped.
