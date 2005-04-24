@@ -4973,6 +4973,7 @@ int EditorSaveMenu(void)
 
 	EditorCancelled = 0;
 
+	strcpy(path, "~!_");
 	menu->Items[3].D.Input.buffer = path;
 	menu->Items[3].D.Input.maxch = PATH_MAX - 4;
 
