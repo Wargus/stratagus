@@ -98,14 +98,14 @@ Get a list of all created games.  The server will send a series of LISTGAMES
 responses for all currently open games and as new games are created.  The 
 LISTGAMES parameters are a unique game id used by JOINGAME, the game 
 description, map, number of open player slots, total number of players (human 
-and computer), ip address, and the udp port number the engine is listening on. 
-The server will continue sending LISTGAMES until LISTGAMESEND is called or the 
-user joins a game.
+and computer), game creator user name, ip address, and the udp port number the 
+engine is listening on.  The server will continue sending LISTGAMES until 
+LISTGAMESEND is called or the user joins a game.
 
 Replies:
 ERR_BADPARAMETER   Too many parameters, not enough parameters, or a badly 
                    formed parameter was sent
-LISTGAMES id "description" "map" open_players players ip port
+LISTGAMES id "description" "map" open_players players creator ip port
 
 
 LISTGAMESEND
