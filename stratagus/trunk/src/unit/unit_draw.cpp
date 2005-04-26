@@ -1050,9 +1050,6 @@ extern void UpdateUnitVariables(const Unit* unit);
 */
 static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 {
-	int f;
-	int x1;
-	int y1;
 	int i;
 
 #ifdef REFS_DEBUG
@@ -1089,54 +1086,13 @@ static void DrawDecoration(const Unit* unit, const UnitType* type, int x, int y)
 				unit, Deco);
 		}
 	}
-
-	// FIXME: Johns there is 100% a way to remove this calculation from runtime.
-	x1 = x;
-	y1 = y;
-	if (SpellSprite.HotX < 0) {
-		x1 += SpellSprite.HotX +
-			(type->TileWidth * TileSizeX + type->BoxWidth + 1) / 2;
-	} else if (SpellSprite.HotX > 0) {
-		x1 += 1 - SpellSprite.HotX +
-			(type->TileWidth * TileSizeX - type->BoxWidth) / 2;
-	} else {
-		x1 += (type->TileWidth * TileSizeX - SpellSprite.Width + 1) / 2;
-	}
-	if (SpellSprite.HotY < 0) {
-		y1 += SpellSprite.HotY +
-			(type->TileHeight * TileSizeY + type->BoxHeight + 1) / 2;
-	} else if (SpellSprite.HotY > 0) {
-		y1 += 1 - SpellSprite.HotY +
-			(type->TileHeight * TileSizeY - type->BoxHeight) / 2;
-	} else {
-		y1 += (type->TileHeight * TileSizeY - SpellSprite.Height + 1) / 2;
-	}
-
-	//
-	// Draw spells decoration
-	//
-	if (unit->Variable[BLOODLUST_INDEX].Value) {
-		VideoDrawClip(SpellSprite.Sprite, 0, x1, y1);
-	}
-	if (unit->Variable[HASTE_INDEX].Value) { // same slot as slow
-		VideoDrawClip(SpellSprite.Sprite, 1, x1 + 16, y1);
-	}
-	if (unit->Variable[SLOW_INDEX].Value) { // same slot as haste
-		VideoDrawClip(SpellSprite.Sprite, 2, x1 + 16, y1);
-	}
-	if (unit->Variable[INVISIBLE_INDEX].Value) {
-		VideoDrawClip(SpellSprite.Sprite, 3, x1 + 16 + 16, y1);
-	}
-	if (unit->Variable[UNHOLYARMOR_INDEX].Value) {
-		VideoDrawClip(SpellSprite.Sprite, 4, x1 + 16 + 16 + 16, y1);
-	}
-
 	//
 	// Draw group number
 	//
 	if (unit->Selected && unit->GroupId != 0) {
 		char buf[2];
 		int num;
+		int f;
 
 		for (num = 0; !(unit->GroupId & (1 << num)); ++num) {
 			;
