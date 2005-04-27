@@ -616,7 +616,7 @@ DefineMenuItem("pos", { 154, 88}, "font", "large",
 -- menu-editor-save
 --
 DefineMenu("name", "menu-editor-save", "geometry", {224, 64, 352, 352},
-  "panel", "panel5", "default", 5)
+  "panel", "panel5", "default", 5, "init", "editor-save-init", "exit", "editor-save-exit")
 DefineMenuItem("pos", { 352 / 2, 11}, "font", "large",
   "text", {"caption", "Save map", "align", "center"},
   "menu", "menu-editor-save")
