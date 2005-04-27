@@ -109,7 +109,14 @@ DefineUnitTypeWcNames(
 	"unit-cam",
 	"unit-plate1",
 	"unit-radar",
-        "unit-tree")
+	"unit-tree",
+	"unit-rock-1",
+	"unit-rock-2",
+	"unit-rock-3",
+	"unit-rock-4",
+	"unit-rock-5",
+	"unit-rock-6")
+	
 
 DefineIconWcNames(
 	"icon-assault", "icon-apcs", "icon-grenadier", "icon-bazoo",
