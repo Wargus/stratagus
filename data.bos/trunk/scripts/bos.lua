@@ -126,7 +126,7 @@ DefineIconWcNames(
 	"icon-vfac_b", "icon-msilo", "icon-msilo_b", "icon-plate1", "icon-expl",
 	"icon-expl2", "icon-tdril", "icon-ddril", "icon-pdril", "icon-void",
 	"icon-heal", "icon-build-lvl1", "icon-build-lvl2", "icon-build-lvl3",
-	"icon-dorcoz", "icon-crystal-field", "icon-tita", "icon-cancel",
+	"icon-dorcoz", "icon-crystal-field", "icon-rocks_field", "icon-cancel",
 	"icon-stop", "icon-move", "icon-attack", "icon-patrol", "icon-attack-ground",
 	"icon-repair", "icon-harvest", "icon-build-advanced",
 	"icon-return-goods-peasant", "icon-return-goods-peon", "icon-stand-ground")

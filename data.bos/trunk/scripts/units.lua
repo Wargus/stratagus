@@ -47,10 +47,10 @@ for i = 1, 13 do
 end
 
 DefineUnitType("unit-gold-mine", {
-	Name = "Titanium Spike",
-	Files = {"default", "nature/res/spike_1.png"}, Size = {128, 128},
-	Shadow = {"file", "nature/res/spike_1_s.png", "size", {128, 128}, "offset", {0, 0}},
-	Animations = "animations-building", Icon = "icon-tita",
+	Name = "Titanium Field",
+	Files = {"default", "nature/res/rocks_field.png"}, Size = {128, 128},
+	Shadow = {"file", "nature/res/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
+	Animations = "animations-building", Icon = "icon-rocks_field",
 	Costs = {"time", 150}, VisibleUnderFog = true,
 	Construction = "construction-land2",
 	NeutralMinimapColor = {196, 196, 196},
