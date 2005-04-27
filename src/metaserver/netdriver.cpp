@@ -300,7 +300,7 @@ static int ReadData(void)
 			clen = strlen(session->Buffer);
 			result = NetRecvTCP(session->Socket, session->Buffer + clen,
 				sizeof(session->Buffer) - clen);
-			if (result <= 0) {
+			if (result < 0) {
 				KillSession(session);
 			} else {
 				session->Buffer[clen + result] = '\0';
