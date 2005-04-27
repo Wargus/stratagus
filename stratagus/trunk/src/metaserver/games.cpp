@@ -57,7 +57,7 @@ int GameID;
 **  Create a game
 */
 void CreateGame(Session* session, char* description, char* map,
-	char* players, char* ip, char* port)
+	char* players, char* ip, char* port, char* password)
 {
 	GameData* game;
 
@@ -69,6 +69,11 @@ void CreateGame(Session* session, char* description, char* map,
 	strcpy(game->Map, map);
 	game->MaxSlots = atoi(players);
 	game->OpenSlots = game->MaxSlots - 1;
+	if (password) {
+		strcpy(game->Password, password);
+	} else {
+		game->Password[0] = '\0';
+	}
 
 	game->NumSessions = 1;
 	game->Sessions[0] = session;
@@ -136,7 +141,7 @@ int StartGame(Session* session)
 /**
 **  Join a game
 */
-int JoinGame(Session* session, int id)
+int JoinGame(Session* session, int id, char* password)
 {
 	GameData* game;
 
@@ -155,8 +160,13 @@ int JoinGame(Session* session, int id)
 		return -2; // ID not found
 	}
 
+	if (game->Password[0]) {
+		if (!password || strcmp(game->Password, password)) {
+			return -3; // Wrong password
+		}
+	}
 	if (!game->OpenSlots) {
-		return -3; // Game full
+		return -4; // Game full
 	}
 	game->Sessions[game->NumSessions++] = session;
 	session->GameData = game;
