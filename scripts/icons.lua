@@ -251,10 +251,10 @@ DefineIcon({
 	File = "nature/res/ico_crys.png"})
 
 DefineIcon({
-	Name = "icon-tita",
+	Name = "icon-rocks_field",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/res/ico_spike.png"})
+	File = "nature/res/ico_rocks_field.png"})
 
 --
 --  MISC
