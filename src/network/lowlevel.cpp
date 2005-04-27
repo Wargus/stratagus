@@ -39,6 +39,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #ifndef _MSC_VER
 #include <signal.h>
@@ -623,8 +624,24 @@ int NetRecvUDP(Socket sockfd, void* buf, int len)
 */
 int NetRecvTCP(Socket sockfd, void* buf, int len)
 {
+	int ret;
+
 	NetLastSocket = sockfd;
-	return recv(sockfd, buf, len, 0);
+	ret = recv(sockfd, buf, len, 0);
+	if (ret > 0) {
+		return ret;
+	}
+	if (ret == 0) {
+		return -1;
+	}
+#ifdef USE_WINSOCK
+	if (WSAGetLastError() == WSAEWOULDBLOCK) {
+#else
+	if (errno == EWOULDBLOCK || errno == EAGAIN) {
+#endif
+		return 0;
+	}
+	return ret;
 }
 
 /**
