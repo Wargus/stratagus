@@ -37,6 +37,7 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
+#define MAX_GAME_PASSWORD_LENGTH 16
 #define MAX_DESCRIPTION_LENGTH 64
 #define MAX_MAP_LENGTH 64
 
@@ -50,6 +51,7 @@ typedef struct _game_data_
 {
 	char IP[16];
 	char Port[6];
+	char Password[MAX_GAME_PASSWORD_LENGTH + 1];
 	char Description[MAX_DESCRIPTION_LENGTH + 1];
    	char Map[MAX_MAP_LENGTH + 1];
 	int OpenSlots;
@@ -74,10 +76,10 @@ extern int GameID;
 ----------------------------------------------------------------------------*/
 
 extern void CreateGame(struct _session_* session, char* description, char* map,
-	char* players, char* ip, char* port);
+	char* players, char* ip, char* port, char* password);
 extern int CancelGame(struct _session_* session);
 extern int StartGame(struct _session_* session);
-extern int JoinGame(struct _session_* session, int id);
+extern int JoinGame(struct _session_* session, int id, char* password);
 extern int PartGame(struct _session_* session);
 extern void ListGames(struct _session_* session);
 

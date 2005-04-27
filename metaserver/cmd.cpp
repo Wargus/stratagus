@@ -55,7 +55,7 @@
 			while (*buf != '\"' && *buf) ++buf; \
 			if (*buf != '\"') return 1; \
 			*buf++ = '\0'; \
-			if (*arg == '\0') return 1; \
+			if (**arg == '\0') return 1; \
 			if (*buf != ' ') return 1; \
 		} else { \
 			*arg = buf; \
@@ -72,12 +72,34 @@
 			while (*buf != '\"' && *buf) ++buf; \
 			if (*buf != '\"') return 1; \
 			*buf++ = '\0'; \
-			if (*arg == '\0') return 1; \
+			if (**arg == '\0') return 1; \
 			if (*buf != ' ' && *buf) return 1; \
 		} else { \
 			*arg = buf; \
 			while (*buf != ' ' && *buf) ++buf; \
 		} \
+	} while (0)
+
+#define GetNextAndOptionalArg(buf, arg1, arg2) \
+	do { \
+		if (*buf == '\"') { \
+			*arg1 = ++buf; \
+			while (*buf != '\"' && *buf) ++buf; \
+			if (*buf != '\"') return 1; \
+			*buf++ = '\0'; \
+			if (**arg1 == '\0') return 1; \
+			if (*buf != ' ' && *buf) return 1; \
+		} else { \
+			*arg1 = buf; \
+			while (*buf != ' ' && *buf) ++buf; \
+		} \
+		if (*buf == ' ') *buf++ = '\0'; \
+ \
+		*arg2 = NULL; \
+		while (*buf == ' ') ++buf; \
+		if (!*buf) return 0; \
+ \
+		GetLastArg(buf, arg2); \
 	} while (0)
 
 #define SkipSpaces(buf) \
@@ -99,6 +121,16 @@ static int Parse1Arg(char* buf, char** arg1)
 	SkipSpaces(buf);
 
 	GetLastArg(buf, arg1);
+	CheckExtraParameter(buf);
+
+	return 0;
+}
+
+static int Parse1or2Args(char* buf, char** arg1, char** arg2)
+{
+	SkipSpaces(buf);
+
+	GetNextAndOptionalArg(buf, arg1, arg2);
 	CheckExtraParameter(buf);
 
 	return 0;
@@ -142,6 +174,29 @@ static int Parse5Args(char* buf, char** arg1, char** arg2, char** arg3,
 	SkipSpaces(buf);
 
 	GetLastArg(buf, arg5);
+	CheckExtraParameter(buf);
+
+	return 0;
+}
+
+static int Parse5or6Args(char* buf, char** arg1, char** arg2, char** arg3,
+	char** arg4, char** arg5, char** arg6)
+{
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg1);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg2);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg3);
+	SkipSpaces(buf);
+
+	GetNextArg(buf, arg4);
+	SkipSpaces(buf);
+
+	GetNextAndOptionalArg(buf, arg5, arg6);
 	CheckExtraParameter(buf);
 
 	return 0;
@@ -240,11 +295,12 @@ static void ParseCreateGame(Session* session, char* buf)
 	char* players;
 	char* ip;
 	char* port;
+	char* password;
 	int players_int;
 	int port_int;
 
 
-	if (Parse5Args(buf, &description, &map, &players, &ip, &port)) {
+	if (Parse5or6Args(buf, &description, &map, &players, &ip, &port, &password)) {
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	}
@@ -255,12 +311,13 @@ static void ParseCreateGame(Session* session, char* buf)
 	if (strlen(description) > MAX_DESCRIPTION_LENGTH ||
 			strlen(map) > MAX_MAP_LENGTH ||
 			players_int < 1 || players_int > 16 ||
-			port_int < 1 || port_int > 66535) {
+			port_int < 1 || port_int > 66535 ||
+			(password && strlen(password) > MAX_GAME_PASSWORD_LENGTH)) {
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	}
 
-	CreateGame(session, description, map, players, ip, port);
+	CreateGame(session, description, map, players, ip, port, password);
 
 	DebugPrint("%s created a game\n" _C_ session->UserData.Name);
 	Send(session, "CREATEGAME_OK\n");
@@ -331,14 +388,15 @@ static void ParseListGames(Session* session, char* buf)
 static void ParseJoinGame(Session* session, char* buf)
 {
 	char* id;
+	char* password;
 	int ret;
 
-	if (Parse1Arg(buf, &id)) {
+	if (Parse1or2Args(buf, &id, &password)) {
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	}
 
-	ret = JoinGame(session, atoi(id));
+	ret = JoinGame(session, atoi(id), password);
 	if (ret == -1) {
 		Send(session, "ERR_ALREADYINGAME\n");
 		return;
@@ -346,6 +404,13 @@ static void ParseJoinGame(Session* session, char* buf)
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	} else if (ret == -3) {
+		if (!password) {
+			Send(session, "ERR_NEEDPASSWORD\n");
+		} else {
+			Send(session, "ERR_BADPASSWORD\n");
+		}
+		return;
+	} else if (ret == -4) {
 		Send(session, "ERR_GAMEFULL\n");
 		return;
 	}
