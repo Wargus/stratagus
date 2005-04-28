@@ -107,8 +107,6 @@ typedef struct {
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
 
-static Decoration SpellSprite;    /// Sprite to display the active spells on an unit.
-
 /**
 **  Sprite to display as the shadow of flying units.
 **
@@ -477,27 +475,6 @@ static int CclShadowSprite(lua_State* l)
 	return 0;
 }
 
-/**
-**  Define spell sprite.
-**
-**  @param l  Lua state
-*/
-static int CclSpellSprite(lua_State* l)
-{
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
-	free(SpellSprite.File);
-
-	SpellSprite.File = strdup(LuaToString(l, 1));
-	SpellSprite.HotX = LuaToNumber(l, 2);
-	SpellSprite.HotY = LuaToNumber(l, 3);
-	SpellSprite.Width = LuaToNumber(l, 4);
-	SpellSprite.Height = LuaToNumber(l, 5);
-
-	return 0;
-}
-
 #if 1 // To be deleted ? DefineDecoration do that.
 
 /**
@@ -798,7 +775,6 @@ void DecorationCclRegister(void)
 	lua_register(Lua, "HealthSprite", CclHealthSprite);
 #endif
 	lua_register(Lua, "ShadowSprite", CclShadowSprite);
-	lua_register(Lua, "SpellSprite", CclSpellSprite);
 
 #if 1 // To be deleted ? alredy Replaced by DefineDecoration
 	// These fonctions ara aliases to DefineDecorations
@@ -842,12 +818,6 @@ void LoadDecorations(void)
 		LoadGraphic(ShadowSprite.Sprite);
 		MakeShadowSprite(ShadowSprite.Sprite);
 	}
-	if (SpellSprite.File) {
-		ShowLoadProgress("Decorations `%s'", SpellSprite.File);
-		SpellSprite.Sprite = NewGraphic(SpellSprite.File,
-			SpellSprite.Width, SpellSprite.Height);
-		LoadGraphic(SpellSprite.Sprite);
-	}
 }
 
 /**
@@ -873,11 +843,6 @@ void CleanDecorations(void)
 	FreeGraphic(ShadowSprite.Sprite);
 	ShadowSprite.File = NULL;
 	ShadowSprite.Sprite = NULL;
-
-	free(SpellSprite.File);
-	FreeGraphic(SpellSprite.Sprite);
-	SpellSprite.File = NULL;
-	SpellSprite.Sprite = NULL;
 }
 
 /**
@@ -1024,9 +989,13 @@ void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 */
 void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 {
-	Graphic* sprite;
+	Graphic* sprite;         // the sprite to show.
+	Decoration* decosprite;  // Info on the sprite.
 
-	sprite = SpellSprite.Sprite;
+	decosprite = &DecoSprite.SpriteArray[(int) Deco->Data.StaticSprite.NSprite];
+	sprite = decosprite->Sprite;
+	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
+	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
 	if (Deco->IsCenteredInX) {
 		x -= sprite->Width / 2;
 	}

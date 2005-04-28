@@ -796,6 +796,7 @@ typedef struct _decovartype_ {
 
 		struct {
 // FIXME Sprite info. and Replace n with more appropriate var.
+			char NSprite;               /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
 			int n;                      /// identifiant in SpellSprite
 		} StaticSprite; /// use to show specific frame in a sprite.
 // FIXME : other method here.
