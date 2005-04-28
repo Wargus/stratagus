@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -138,7 +138,6 @@
 <a href="#ShowManaHorizontal">ShowManaHorizontal</a>
 <a href="#ShowManaVertical">ShowManaVertical</a>
 <a href="#ShowNoFull">ShowNoFull</a>
-<a href="#SpellSprite">SpellSprite</a>
 
 <hr>
 <h2>Intro - Introduction to config functions and variables</h2>
@@ -356,8 +355,7 @@ Defines the default amount of starting resources when you begin a game by select
 <h3>DefineSprite({tag = value}, ...)</h3>
 
 Define sprite to be shown for variables.
-The sprite consists in a image which show status
-from full (left) to empty (right of th image).
+
 
 
 <dl>
@@ -507,16 +505,18 @@ Define how to show variables.
   <dd>if true, don't show for allied unit (but show your :) ).</dd>
   <dt>ShowOpponent = boolean</dt>
   <dd>if true, show also for opponent unit.</dd>
-  
+
   <dt>Method = {method-name, {tag = value}}</dt>
     <dd>Which method we use to show variable. It could be a bar, a sprite, a number...</dd>
     <dl>
       <dt>"text", {}</dt>
       <dd>Show the value with a number</dd>
-      <dt>"static-sprite", {number}</dt>
-      <dd>Use the number icon of the SpellSprite</dd>
+      <dt>"static-sprite", {"sprite-name", number}</dt>
+      <dd>Use the number icon of the sprite (defined by <a href="#DefineSprites">DefineSprites()</a>)</dd>
       <dt>"sprite", {"sprite-name"}</dt>
-      <dd>Name of the sprite defined by <a href="#DefineSprites">DefineSprites()</a></dd>
+      <dd>Show the p-th icon of the sprite
+		(p depands of variable percent value: from full (left) to empty (right of th image)).
+		The sprite is defined by <a href="#DefineSprites">DefineSprites()</a>.</dd>
       <dt>"bar", {tag, value}</dt>
       <dd>Show like a rectangular bar.</dd>
       <dl>
@@ -1484,25 +1484,6 @@ Show mana bars vertical.
 <h3>ShowNoFull()</h3>
 Hide decorations when value is full.
 <br>Adjust options for<a href="#DefineDecorations">DefineDecorations()</a>.
-
-<a name="SpellSprite"></a>
-<h3>SpellSprite("file", hotx, hoty, width, height)</h3>
-Define spell-sprite.
-with bloodlust, haste, slow, invisible and shield
-
-<dl>
-  <dt>file</dt>
-  <dd>file where is the image.</dd>
-  <dt>hotx, hoty</dt>
-  <dd>offset when it is drawn.</dd>
-  <dt>width, height</dt>
-  <dd>Size of the image.</dd>
-</dl>
-<h4>Example</h4>
-<pre>
-SpellSprite("graphics/ui/bloodlust,haste,slow,invisible,shield.png",
-  1, 1, 16, 16)
-</pre>
 
 <a name="SetGroupKeys"></a>
 <h3>SetGroupKeys("0123456789~")</h3>
