@@ -80,10 +80,6 @@ ShowHealthDot()
 ShowManaDot()
 ShowNoFull()
 
---	Define shadow-sprite.
---ShadowSprite("missiles/unit_shadow.png",3, 42, 32, 32)
-SpellSprite("general/spells1.png", 1, 1, 16, 16)
-
 --	Enable fancy building (random mirroring buildings)
 SetFancyBuildings(false)
 
