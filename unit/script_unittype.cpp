@@ -1867,9 +1867,11 @@ static int CclDefineDecorations(lua_State* l)
 					// FIXME : More arguments ?
 				} else if (!strcmp(key, "static-sprite")) {
 					decovar.f = DrawStaticSprite;
-					lua_rawgeti(l, -1, 1);
+					lua_rawgeti(l, -1, 1); // sprite
+					lua_rawgeti(l, -2, 2); // frame
+					decovar.Data.StaticSprite.NSprite = GetSpriteIndex(LuaToString(l, -2));
 					decovar.Data.StaticSprite.n = LuaToNumber(l, -1);
-					lua_pop(l, 1);
+					lua_pop(l, 2);
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}
