@@ -107,13 +107,6 @@ typedef struct {
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
 
-/**
-**  Sprite to display as the shadow of flying units.
-**
-**  @todo  Made this configurable with CCL.
-*/
-static Decoration ShadowSprite;
-
 int ShowSightRange;              /// Flag: show right range
 int ShowReactionRange;           /// Flag: show reaction range
 int ShowAttackRange;             /// Flag: show attack range
@@ -454,27 +447,6 @@ static int CclHealthSprite(lua_State* l)
 	return 0;
 }
 
-/**
-**  Define shadow sprite.
-**
-**  @param l  Lua state
-*/
-static int CclShadowSprite(lua_State* l)
-{
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
-	free(ShadowSprite.File);
-
-	ShadowSprite.File = strdup(LuaToString(l, 1));
-	ShadowSprite.HotX = LuaToNumber(l, 2);
-	ShadowSprite.HotY = LuaToNumber(l, 3);
-	ShadowSprite.Width = LuaToNumber(l, 4);
-	ShadowSprite.Height = LuaToNumber(l, 5);
-
-	return 0;
-}
-
 #if 1 // To be deleted ? DefineDecoration do that.
 
 /**
@@ -774,7 +746,6 @@ void DecorationCclRegister(void)
 	lua_register(Lua, "ManaSprite", CclManaSprite);
 	lua_register(Lua, "HealthSprite", CclHealthSprite);
 #endif
-	lua_register(Lua, "ShadowSprite", CclShadowSprite);
 
 #if 1 // To be deleted ? alredy Replaced by DefineDecoration
 	// These fonctions ara aliases to DefineDecorations
@@ -810,14 +781,6 @@ void LoadDecorations(void)
 		deco->Sprite = NewGraphic(deco->File, deco->Width, deco->Height);
 		LoadGraphic(deco->Sprite);
 	}
-
-	if (ShadowSprite.File) {
-		ShowLoadProgress("Decorations `%s'", ShadowSprite.File);
-		ShadowSprite.Sprite = NewGraphic(ShadowSprite.File,
-			ShadowSprite.Width, ShadowSprite.Height);
-		LoadGraphic(ShadowSprite.Sprite);
-		MakeShadowSprite(ShadowSprite.Sprite);
-	}
 }
 
 /**
@@ -838,11 +801,6 @@ void CleanDecorations(void)
 	free(DecoSprite.SpriteArray);
 	free(DecoSprite.Name);
 	memset(&DecoSprite, 0, sizeof(DecoSprite));
-
-	free(ShadowSprite.File);
-	FreeGraphic(ShadowSprite.Sprite);
-	ShadowSprite.File = NULL;
-	ShadowSprite.Sprite = NULL;
 }
 
 /**
@@ -1128,24 +1086,6 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			}
 			VideoDrawClip(type->ShadowSprite, frame, x, y);
 		}
-		return;
-	}
-
-	// Use ShadowSprite if the unit flies
-	if (type->UnitType == UnitTypeFly) {
-		int i;
-
-		// Shadow size depends on box-size
-		if (type->BoxHeight > 63) {
-			i = 2;
-		} else if (type->BoxHeight > 32) {
-			i = 1;
-		} else {
-			i = 0;
-		}
-
-		VideoDrawClip(ShadowSprite.Sprite, i, x + ShadowSprite.HotX,
-			y + ShadowSprite.HotY);
 	}
 }
 
