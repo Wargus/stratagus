@@ -467,10 +467,7 @@ void FireMissile(Unit* unit)
 			DebugPrint("destroyed unit\n");
 			return;
 		}
-		if (goal->Removed) {
-			return;
-		}
-		if (!goal->HP || goal->Orders[0].Action == UnitActionDie) {
+		if (goal->Removed || goal->Orders[0].Action == UnitActionDie) {
 			return;
 		}
 
@@ -927,7 +924,7 @@ static void MissileHitsGoal(const Missile* missile, Unit* goal, int splash)
 		return;
 	}
 
-	if (goal->HP && goal->Orders[0].Action != UnitActionDie) {
+	if (goal->Orders[0].Action != UnitActionDie) {
 		if (missile->Damage) {  // direct damage, spells mostly
 			HitUnit(missile->SourceUnit, goal, missile->Damage / splash);
 		} else {
@@ -1714,7 +1711,7 @@ void MissileActionFlameShield(Missile* missile)
 			// cannot hit target unit
 			continue;
 		}
-		if (table[i]->HP) {
+		if (table[i]->Orders[0].Action != UnitActionDie) {
 			HitUnit(missile->SourceUnit, table[i], missile->Damage);
 		}
 	}
@@ -1741,7 +1738,7 @@ void MissileActionLandMine(Missile* missile)
 	n = UnitCacheOnTile(x, y, table);
 	for (i = 0; i < n; ++i) {
 		if (table[i]->Type->UnitType != UnitTypeFly &&
-				table[i]->HP &&
+				table[i]->Orders[0].Action != UnitActionDie &&
 				!(table[i] == missile->SourceUnit && !missile->Type->CanHitOwner)) {
 			DebugPrint("Landmine explosion at %d,%d.\n" _C_ x _C_ y);
 			MissileHit(missile);
@@ -1797,7 +1794,7 @@ void MissileActionWhirlwind(Missile* missile)
 	if (!(missile->TTL % 4)) {
 		n = SelectUnitsOnTile(x, y, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->HP) {
+			if (table[i]->Orders[0].Action != UnitActionDie) {
 				// should be missile damage ?
 				HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE1);
 			}
@@ -1810,7 +1807,7 @@ void MissileActionWhirlwind(Missile* missile)
 		// we should parameter this
 		n = SelectUnits(x - 1, y - 1, x + 1, y + 1, table);
 		for (i = 0; i < n; ++i) {
-			if ((table[i]->X != x || table[i]->Y != y) && table[i]->HP) {
+			if ((table[i]->X != x || table[i]->Y != y) && table[i]->Orders[0].Action != UnitActionDie) {
 				// should be in missile
 				HitUnit(missile->SourceUnit, table[i], WHIRLWIND_DAMAGE2);
 			}
