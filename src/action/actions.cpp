@@ -368,8 +368,7 @@ static void HandleRegenerations(Unit* unit)
 	// Burn
 	if (!unit->Removed && !unit->Destroyed && unit->Stats->Variables[HP_INDEX].Max &&
 			unit->Orders[0].Action != UnitActionBuilt && 
-			unit->Orders[0].Action != UnitActionDie &&
-			unit->HP != 0) {
+			unit->Orders[0].Action != UnitActionDie) {
 		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
 		if (f <= unit->Type->BurnPercent && unit->Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);

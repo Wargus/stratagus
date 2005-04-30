@@ -213,8 +213,8 @@ int EnemyUnitsInDistance(const Unit* unit, unsigned range)
 		//
 		// Those can't attack anyway.
 		//
-		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value || !unit->HP
-				|| dest->Orders[0].Action == UnitActionDie) {
+		if (dest->Removed || dest->Variable[INVISIBLE_INDEX].Value ||
+			dest->Orders[0].Action == UnitActionDie) {
 			continue;
 		}
 

@@ -154,7 +154,7 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 	y += unit->Type->Icon.Icon->Sprite->Height;
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
 		unit->Type->Icon.Icon->Sprite->Width, 4);
-	if (unit->HP && unit->Stats->Variables[MANA_INDEX].Max) {
+	if (unit->Stats->Variables[MANA_INDEX].Max) {
 		f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
 		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
