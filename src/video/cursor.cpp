@@ -216,7 +216,6 @@ static void DrawBuildingCursor(void)
 	int h;
 	int mask;
 	const Viewport* vp;
-	int frame;
 	Unit* ontop;
 
 	// Align to grid
@@ -235,12 +234,11 @@ static void DrawBuildingCursor(void)
 		LoadUnitTypeSprite(CursorBuilding);
 	}
 #endif
-	// FIXME: wrong frame
-	frame = CursorBuilding->NumDirections / 2;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
-	DrawShadow(NULL, CursorBuilding, frame, x, y);
-	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Player, frame, x, y);
+	DrawShadow(NULL, CursorBuilding, CursorBuilding->StillFrame, x, y);
+	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Player,
+		CursorBuilding->StillFrame, x, y);
 
 	//
 	//  Draw the allow overlay

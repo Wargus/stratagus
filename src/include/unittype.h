@@ -882,7 +882,8 @@ struct _unit_type_ {
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	Animations* Animations;   /// Animation scripts
+	Animations* Animations;         /// Animation scripts
+	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG

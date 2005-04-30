@@ -450,6 +450,26 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 }
 
 /**
+**  Get the still animation frame
+*/
+static int GetStillFrame(UnitType* type)
+{
+	Animation* anim;
+
+	anim = type->Animations->Still;
+	while (anim) {
+		if (anim->Type == AnimationFrame) {
+			// Use the frame facing down
+			return anim->D.Frame.Frame + type->NumDirections / 2;
+		} else if (anim->Type == AnimationExactFrame) {
+			return anim->D.Frame.Frame;
+		}
+		anim = anim->Next;
+	}
+	return type->NumDirections / 2;
+}
+
+/**
 **  Init unit types.
 */
 void InitUnitTypes(int reset_player_stats)
@@ -457,15 +477,14 @@ void InitUnitTypes(int reset_player_stats)
 	int type;
 
 	for (type = 0; type < NumUnitTypes; ++type) {
-		//
-		//  Initialize:
-		//
 		Assert(UnitTypes[type]->Slot == type);
-		//
+
 		//  Add idents to hash.
-		//
 		*(UnitType**)hash_add(UnitTypeHash, UnitTypes[type]->Ident) =
 			UnitTypes[type];
+
+		// Determine still frame
+		UnitTypes[type]->StillFrame = GetStillFrame(UnitTypes[type]);
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
