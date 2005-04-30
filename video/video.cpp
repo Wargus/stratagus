@@ -237,10 +237,11 @@ void PopClipping(void)
 		clip->Next = ClipsGarbage;
 		ClipsGarbage = clip;
 	} else {
+		Assert(0);
 		ClipX1 = 0;
 		ClipY1 = 0;
-		ClipX2 = VideoWidth;
-		ClipY2 = VideoHeight;
+		ClipX2 = VideoWidth - 1;
+		ClipY2 = VideoHeight - 1;
 	}
 }
 
