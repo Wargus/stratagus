@@ -74,8 +74,8 @@ static void RemapSounds(void)
 	// FIXME: move to config CCL
 	MapSound("gold-mine-help", SoundIdForName("basic orc voices help 1"));
 
-	// critter mapping FIXME: must support more terrains.
-
+#if 0
+	// critter mapping FIXME: move this to CCL
 	switch (TheMap.Terrain) {
 		case TilesetSummer:
 			MakeSoundGroup("critter-selected",
@@ -100,6 +100,7 @@ static void RemapSounds(void)
 		default:
 			break;
 	}
+#endif
 }
 
 /**
