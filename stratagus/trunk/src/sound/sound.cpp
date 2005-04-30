@@ -171,14 +171,9 @@ static SoundId ChooseUnitVoiceSoundId(const Unit* unit, UnitVoiceGroup voice)
 }
 
 /**
-**  Ask to the sound server to play a sound attached to an unit. The
-**  sound server may discard the sound if needed (e.g., when the same
-**  unit is already speaking).
-**
-**  @param unit   Sound initiator, unit speaking
-**  @param voice  Type of sound wanted (Ready,Die,Yes,...)
+**  Calculate the stereo value for a unit
 */
-void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
+static char CalculateStereo(const Unit* unit)
 {
 	int stereo;
 
@@ -191,9 +186,22 @@ void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 		stereo = 127;
 	}
 
+	return stereo;
+}
+
+/**
+**  Ask to the sound server to play a sound attached to an unit. The
+**  sound server may discard the sound if needed (e.g., when the same
+**  unit is already speaking).
+**
+**  @param unit   Sound initiator, unit speaking
+**  @param voice  Type of sound wanted (Ready,Die,Yes,...)
+*/
+void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
+{
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
 		ChooseUnitVoiceSoundId(unit, voice),
-		(voice == VoiceSelected || voice == VoiceBuilding), 0, stereo);
+		(voice == VoiceSelected || voice == VoiceBuilding), 0, CalculateStereo(unit));
 }
 
 /**
@@ -206,19 +214,8 @@ void PlayUnitSound(const Unit* unit, UnitVoiceGroup voice)
 */
 void PlayUnitSoundId(const Unit* unit, SoundId id)
 {
-	int stereo;
-
-	stereo = ((unit->X * TileSizeX + unit->Type->TileWidth * TileSizeX / 2 +
-		unit->IX - TheUI.SelectedViewport->MapX * TileSizeX) * 256 /
-		((TheUI.SelectedViewport->MapWidth - 1) * TileSizeX)) - 128;
-	if (stereo < -128) {
-		stereo = -128;
-	} else if (stereo > 127) {
-		stereo = 127;
-	}
-
 	InsertSoundRequest(unit, unit->Slot, ViewPointDistanceToUnit(unit),
-		id, 0, 0, stereo);
+		id, 0, 0, CalculateStereo(unit));
 }
 
 /**
