@@ -361,7 +361,8 @@ static int CclChangeUnitsOwner(lua_State* l)
 	int x2;
 	int y2;
 
-	if (lua_gettop(l) != 4 || !lua_istable(l, 1) || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 4);
+	if (!lua_istable(l, 1) || !lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 	if (luaL_getn(l, 1) != 2) {
