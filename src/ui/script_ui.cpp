@@ -84,9 +84,7 @@ static int HandleCount = 1;     /// Lua handler count
 */
 static int CclSetMouseScrollSpeedDefault(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheUI.MouseScrollSpeedDefault = LuaToNumber(l, 1);
 	return 0;
 }
@@ -98,9 +96,7 @@ static int CclSetMouseScrollSpeedDefault(lua_State* l)
 */
 static int CclSetMouseScrollSpeedControl(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheUI.MouseScrollSpeedControl = LuaToNumber(l, 1);
 	return 0;
 }
@@ -156,9 +152,7 @@ static int CclSetDamageMissile(lua_State* l)
 */
 static int CclSetVideoResolution(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		if (!VideoWidth || !VideoHeight) {
@@ -176,9 +170,7 @@ static int CclSetVideoResolution(lua_State* l)
 */
 static int CclGetVideoResolution(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, VideoWidth);
 	lua_pushnumber(l, VideoHeight);
 	return 2;
@@ -191,9 +183,7 @@ static int CclGetVideoResolution(lua_State* l)
 */
 static int CclSetVideoFullScreen(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		if (!VideoForceFullScreen) {
@@ -210,9 +200,7 @@ static int CclSetVideoFullScreen(lua_State* l)
 */
 static int CclGetVideoFullScreen(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	lua_pushboolean(l, VideoFullScreen);
 	return 1;
 }
@@ -339,9 +327,7 @@ static int CclSetTitleScreens(lua_State* l)
 */
 static int CclSetMenuMusic(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	free(MenuMusic);
 	MenuMusic = strdup(LuaToString(l, 1));
 	return 0;
@@ -395,7 +381,8 @@ static int CclDefineCursor(lua_State* l)
 	int i;
 	CursorType* ct;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	name = race = file = NULL;
@@ -493,9 +480,7 @@ static int CclDefineCursor(lua_State* l)
 */
 static int CclSetGameCursor(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	GameCursor = CursorTypeByIdent(LuaToString(l, 1));
 	return 0;
 }
@@ -2125,9 +2110,7 @@ static int CclDefineViewports(lua_State* l)
 */
 static int CclSetMouseScroll(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheUI.MouseScroll = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -2141,9 +2124,7 @@ static int CclSetMouseScrollSpeed(lua_State* l)
 {
 	int speed;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	speed = LuaToNumber(l, 1);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedMouseScroll = MOUSE_SCROLL_SPEED;
@@ -2160,7 +2141,8 @@ static int CclSetMouseScrollSpeed(lua_State* l)
 */
 static int CclSetGrabMouse(lua_State* l)
 {
-	if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_isboolean(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	if (lua_toboolean(l, 1)) {
@@ -2178,9 +2160,7 @@ static int CclSetGrabMouse(lua_State* l)
 */
 static int CclSetLeaveStops(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	LeaveStops = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -2192,9 +2172,7 @@ static int CclSetLeaveStops(lua_State* l)
 */
 static int CclSetKeyScroll(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheUI.KeyScroll = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -2208,9 +2186,7 @@ static int CclSetKeyScrollSpeed(lua_State* l)
 {
 	int speed;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	speed = LuaToNumber(l, 1);
 	if (speed < 1 || speed > FRAMES_PER_SECOND) {
 		SpeedKeyScroll = KEY_SCROLL_SPEED;
@@ -2227,9 +2203,7 @@ static int CclSetKeyScrollSpeed(lua_State* l)
 */
 static int CclSetShowCommandKey(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	ShowCommandKey = LuaToBoolean(l, 1);
 	UpdateButtonPanel();
 	return 0;
@@ -2242,9 +2216,7 @@ static int CclSetShowCommandKey(lua_State* l)
 */
 static int CclRightButtonAttacks(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	RightButtonAttacks = 1;
 	return 0;
 }
@@ -2256,9 +2228,7 @@ static int CclRightButtonAttacks(lua_State* l)
 */
 static int CclRightButtonMoves(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	RightButtonAttacks = 0;
 	return 0;
 }
@@ -2270,9 +2240,7 @@ static int CclRightButtonMoves(lua_State* l)
 */
 static int CclSetFancyBuildings(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	FancyBuildings = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -2430,7 +2398,8 @@ static int CclDefineButtonStyle(lua_State* l)
 	ButtonStyle* b;
 	ButtonStyle** bp;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -2556,7 +2525,8 @@ static int CclDefineCheckboxStyle(lua_State* l)
 	CheckboxStyle* c;
 	CheckboxStyle** cp;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -3926,7 +3896,8 @@ static int CclDefineMenuGraphics(lua_State* l)
 	int w;
 	int h;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -3989,7 +3960,8 @@ static int CclDefineButton(lua_State* l)
 	const char* s2;
 	ButtonAction ba;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -4186,9 +4158,7 @@ void SelectedUnitChanged(void)
 */
 static int CclSetDoubleClickDelay(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	DoubleClickDelay = LuaToNumber(l, 1);
 	return 0;
 }
@@ -4200,9 +4170,7 @@ static int CclSetDoubleClickDelay(lua_State* l)
 */
 static int CclSetHoldClickDelay(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	HoldClickDelay = LuaToNumber(l, 1);
 	return 0;
 }
@@ -4216,9 +4184,7 @@ static int CclSetSelectionStyle(lua_State* l)
 {
 	const char* style;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	style = LuaToString(l, 1);
 	if (!strcmp(style, "rectangle")) {
@@ -4286,7 +4252,8 @@ static int CclSetShowSightRange(lua_State* l)
 */
 static int CclSetShowReactionRange(lua_State* l)
 {
-	if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isstring(l, 1))) {
+	LuaCheckArgs(l, 1);
+	if (!lua_isboolean(l, 1) && !lua_isstring(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -4319,9 +4286,7 @@ static int CclSetShowReactionRange(lua_State* l)
 */
 static int CclSetShowAttackRange(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	ShowAttackRange = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -4333,7 +4298,8 @@ static int CclSetShowAttackRange(lua_State* l)
 */
 static int CclSetShowOrders(lua_State* l)
 {
-	if (lua_gettop(l) != 1 || (!lua_isboolean(l, 1) && !lua_isnumber(l, 1))) {
+	LuaCheckArgs(l, 1);
+	if (!lua_isboolean(l, 1) && !lua_isnumber(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -4356,9 +4322,7 @@ static int CclSetShowOrders(lua_State* l)
 */
 static int CclAddMessage(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	SetMessage("%s", LuaToString(l, 1));
 	return 0;
 }
@@ -4372,9 +4336,7 @@ static int CclResetKeystrokeHelp(lua_State* l)
 {
 	int n;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	n = nKeyStrokeHelps * 2;
 	while (n--) {
@@ -4394,9 +4356,7 @@ static int CclResetKeystrokeHelp(lua_State* l)
 */
 static int CclSetGroupKeys(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	if (UiGroupKeys != DefaultGroupKeys) {
 		free(UiGroupKeys);
 	}
@@ -4411,9 +4371,7 @@ static int CclSetGroupKeys(lua_State* l)
 */
 static int CclPresentMap(lua_State* l)
 {
-	if (lua_gettop(l) != 4) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 4);
 	TheMap.Info.Description = strdup(LuaToString(l, 1));
 	// Number of players in LuaToNumber(l, 3); // Not used yet.
 	TheMap.Info.MapWidth = LuaToNumber(l, 3);
@@ -4429,9 +4387,7 @@ static int CclPresentMap(lua_State* l)
 */
 static int CclDefineMapSetup(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheMap.Info.Filename = strdup(LuaToString(l, 1));
 	return 0;
 }
@@ -4447,9 +4403,7 @@ static int CclAddKeystrokeHelp(lua_State* l)
 	char* s2;
 	int n;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	s1 = strdup(LuaToString(l, 1));
 	s2 = strdup(LuaToString(l, 2));

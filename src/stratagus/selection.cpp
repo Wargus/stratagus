@@ -1178,9 +1178,7 @@ static int CclSetGroupId(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = GroupId;
 	GroupId = LuaToNumber(l, 1);
 
@@ -1199,7 +1197,8 @@ static int CclSelection(lua_State* l)
 	int args;
 	int j;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 	InitSelections();

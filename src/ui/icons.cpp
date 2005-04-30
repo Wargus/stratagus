@@ -292,7 +292,8 @@ static int CclDefineIcon(lua_State* l)
 	int height;
 	int frame;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	width = height = frame = 0;
