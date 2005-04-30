@@ -10,7 +10,7 @@
 //
 /**@name groups.c - The units' groups handling. */
 //
-//      (c) Copyright 1999-2004 by Patrice Fortier, Lutz Sammer,
+//      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -256,9 +256,7 @@ static int CclGroup(lua_State* l)
 	int args;
 	int j;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 
 	InitGroups();
 	grp = &Groups[(int)LuaToNumber(l, 1)];
