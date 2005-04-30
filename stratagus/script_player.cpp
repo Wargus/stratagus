@@ -404,9 +404,7 @@ static int CclChangeUnitsOwner(lua_State* l)
 */
 static int CclGetThisPlayer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	if (ThisPlayer) {
 		lua_pushnumber(l, ThisPlayer - Players);
 	} else {
@@ -424,9 +422,7 @@ static int CclSetThisPlayer(lua_State* l)
 {
 	int plynr;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	plynr = LuaToNumber(l, 1);
 	ThisPlayer = &Players[plynr];
 
@@ -441,9 +437,7 @@ static int CclSetThisPlayer(lua_State* l)
 */
 static int CclSetMaxSelectable(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	MaxSelectable = LuaToNumber(l, 1);
 
 	lua_pushnumber(l, MaxSelectable);
@@ -459,9 +453,7 @@ static int CclSetAllPlayersUnitLimit(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].UnitLimit = LuaToNumber(l, 1);
 	}
@@ -479,9 +471,7 @@ static int CclSetAllPlayersBuildingLimit(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].BuildingLimit = LuaToNumber(l, 1);
 	}
@@ -499,9 +489,7 @@ static int CclSetAllPlayersTotalUnitLimit(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	for (i = 0; i < PlayerMax; ++i) {
 		Players[i].TotalUnitLimit = LuaToNumber(l, 1);
 	}
@@ -523,9 +511,7 @@ static int CclSetDiplomacy(lua_State* l)
 	int base;
 	const char* state;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 	base = LuaToNumber(l, 1);
 	plynr = LuaToNumber(l, 3);
 	state = LuaToString(l, 2);
@@ -568,9 +554,7 @@ static int CclSetSharedVision(lua_State* l)
 	int base;
 	int shared;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 
 	base = LuaToNumber(l, 1);
 	shared = LuaToBoolean(l, 2);
@@ -666,7 +650,8 @@ static int CclDefinePlayerColors(lua_State* l)
 	int args;
 	int j;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -709,9 +694,7 @@ static int CclDefinePlayerColors(lua_State* l)
 */
 static int CclNewPlayerColors(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	SetPlayersPalette();
 
 	return 0;
@@ -747,9 +730,7 @@ static int CclGetPlayerData(lua_State* l)
 		const char* res;
 		int i;
 
-		if (lua_gettop(l) != 3) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
 			if (!strcmp(res, DefaultResourceNames[i])) {
@@ -764,9 +745,7 @@ static int CclGetPlayerData(lua_State* l)
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		UnitType* type;
 
-		if (lua_gettop(l) != 3) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckArgs(l, 3);
 		type = CclGetUnitType(l);
 		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
 		return 1;
@@ -807,9 +786,7 @@ static int CclGetPlayerData(lua_State* l)
 		const char* res;
 		int i;
 
-		if (lua_gettop(l) != 3) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
 			if (!strcmp(res, DefaultResourceNames[i])) {
@@ -874,9 +851,7 @@ static int CclSetPlayerData(lua_State* l)
 		const char* res;
 		int i;
 
-		if (lua_gettop(l) != 4) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckArgs(l, 4);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
 			if (!strcmp(res, DefaultResourceNames[i])) {
@@ -909,9 +884,7 @@ static int CclSetPlayerData(lua_State* l)
 		const char* res;
 		int i;
 
-		if (lua_gettop(l) != 3) {
-			LuaError(l, "incorrect argument");
-		}
+		LuaCheckArgs(l, 3);
 		res = LuaToString(l, 3);
 		for (i = 0; i < MaxCosts; ++i) {
 			if (!strcmp(res, DefaultResourceNames[i])) {
