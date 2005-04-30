@@ -251,10 +251,6 @@ extern void FreeGraphic(Graphic* g);
 	/// Check if a pixel is transparent
 extern int GraphicTransparentPixel(Graphic* g, int x, int y);
 
-	/// Load a picture and display it on the screen (full screen),
-	/// changing the colormap and so on..
-extern void DisplayPicture(const char* name);
-
 	/// Init line draw
 extern void InitLineDraw(void);
 

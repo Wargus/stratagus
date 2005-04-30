@@ -348,27 +348,6 @@ static int CclSetMenuMusic(lua_State* l)
 }
 
 /**
-**  Display a picture.
-**
-**  @param l  Lua state.
-*/
-static int CclDisplayPicture(lua_State* l)
-{
-	char* name;
-
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	name = strdup(LuaToString(l, 1));
-	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
-	DisplayPicture(name);
-	Invalidate();
-	free(name);
-
-	return 0;
-}
-
-/**
 **  Process a menu.
 **
 **  @param l  Lua state.
@@ -4514,7 +4493,6 @@ void UserInterfaceCclRegister(void)
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "SetMenuMusic", CclSetMenuMusic);
 
-	lua_register(Lua, "DisplayPicture", CclDisplayPicture);
 	lua_register(Lua, "ProcessMenu", CclProcessMenu);
 
 	lua_register(Lua, "DefineCursor", CclDefineCursor);
