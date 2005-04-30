@@ -65,6 +65,13 @@ extern int LuaCall(int narg, int clear);
 		lua_pushfstring(l, args); lua_error(l); \
 	} while (0)
 
+#define LuaCheckArgs(l, args) \
+	do { \
+		if (lua_gettop(l) != args) { \
+			LuaError(l, "incorrect argument"); \
+		} \
+	} while (0)
+
 
 #include "iolib.h"
 
