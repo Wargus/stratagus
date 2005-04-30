@@ -10,7 +10,7 @@
 //
 /**@name script_editor.c - Editor CCL functions. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -96,9 +96,7 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 */
 static int CclSetEditorSelectIcon(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	free(EditorSelectIcon);
 	EditorSelectIcon = strdup(LuaToString(l, 1));
 	return 0;
@@ -111,9 +109,7 @@ static int CclSetEditorSelectIcon(lua_State* l)
 */
 static int CclSetEditorUnitsIcon(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	free(EditorUnitsIcon);
 	EditorUnitsIcon = strdup(LuaToString(l, 1));
 	return 0;

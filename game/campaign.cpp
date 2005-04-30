@@ -10,7 +10,7 @@
 //
 /**@name campaign.c - The campaign control. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -443,10 +443,7 @@ static int CclSetCurrentChapter(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	for (i = 0; i < NumCampaigns; ++i) {
 		if (!strcmp(Campaigns[i].Ident, "current")) {
 			CurrentCampaign = Campaigns + i;

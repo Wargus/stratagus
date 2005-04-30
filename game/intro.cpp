@@ -1399,9 +1399,7 @@ static int CclRemoveObjective(lua_State* l)
 {
 	int num;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	num = LuaToNumber(l, 1);
 	if (num < 0 || num >= MAX_OBJECTIVES) {
