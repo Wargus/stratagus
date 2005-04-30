@@ -188,14 +188,6 @@ static Unit* CheckCanBuild(Unit* unit)
 	}
 
 	//
-	// FIXME: got bug report about unit->Type==NULL in building
-	//
-	Assert(unit->Type && unit->HP);
-	if (!unit->Type || !unit->HP) {
-		return NULL;
-	}
-
-	//
 	// Check if enough resources for the building.
 	//
 	if (PlayerCheckUnitType(unit->Player, type)) {

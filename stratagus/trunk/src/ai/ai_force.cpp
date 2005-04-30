@@ -10,7 +10,7 @@
 //
 /**@name ai_force.c - AI force functions. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer
+//      (c) Copyright 2001-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -208,8 +208,7 @@ static void AiCleanForce(int force)
 			*prev = aiunit->Next;
 			free(aiunit);
 			continue;
-		} else if (!aiunit->Unit->HP ||
-				aiunit->Unit->Orders[0].Action == UnitActionDie) {
+		} else if (aiunit->Unit->Orders[0].Action == UnitActionDie) {
 			RefsDecrease(aiunit->Unit);
 			*prev = aiunit->Next;
 			free(aiunit);
