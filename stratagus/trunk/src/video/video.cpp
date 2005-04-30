@@ -244,29 +244,6 @@ void PopClipping(void)
 	}
 }
 
-/**
-**  Load a picture and display it on the screen (full screen),
-**  changing the colormap and so on..
-**
-**  @param name  Name of the picture (file) to display.
-*/
-void DisplayPicture(const char* name)
-{
-	Graphic* g;
-
-	g = NewGraphic(name, 0, 0);
-	LoadGraphic(g);
-	// FIXME: make resizing optional?
-	// FIXME: keep aspect ratio?
-	ResizeGraphic(g, VideoWidth, VideoHeight);
-
-	// FIXME: should be able to specify a location
-	VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
-		(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
-
-	FreeGraphic(g);
-}
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
