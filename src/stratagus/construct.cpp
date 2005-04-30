@@ -10,7 +10,7 @@
 //
 /**@name construct.c - The constructions. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -269,7 +269,8 @@ static int CclDefineConstruction(lua_State* l)
 	int subargs;
 	int k;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 

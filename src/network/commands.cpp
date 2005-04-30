@@ -519,7 +519,8 @@ static int CclLog(lua_State* l)
 	LogEntry** last;
 	const char* value;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -583,7 +584,8 @@ static int CclReplayLog(lua_State* l)
 	const char* value;
 	int j;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
