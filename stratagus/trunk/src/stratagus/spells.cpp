@@ -156,7 +156,7 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 	if (action->Data.Demolish.Damage) {
 		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
-			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->HP &&
+			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0].Action != UnitActionDie &&
 					MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {
 				// Don't hit flying units!
 				HitUnit(caster, table[i], action->Data.Demolish.Damage);
