@@ -200,9 +200,7 @@ static int CclGetNumUnitsAt(lua_State* l)
 	int j;
 	int s;
 
-	if (lua_gettop(l) != 4) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 4);
 
 	plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
@@ -274,9 +272,7 @@ static int CclIfNearUnit(lua_State* l)
 	Unit* table[UnitMax];
 	CompareFunction compare;
 
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
 	plynr = TriggerGetPlayer(l);
@@ -370,9 +366,7 @@ static int CclIfRescuedNearUnit(lua_State* l)
 	Unit* table[UnitMax];
 	CompareFunction compare;
 
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
 	plynr = TriggerGetPlayer(l);
@@ -462,9 +456,7 @@ static int CclGetNumOpponents(lua_State* l)
 	int n;
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	plynr = LuaToNumber(l, 1);
 
@@ -486,9 +478,7 @@ static int CclGetNumOpponents(lua_State* l)
 */
 static int CclGetTimer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	if (!GameTimer.Init) {
 		lua_pushnumber(l, 0);
@@ -507,9 +497,7 @@ static int CclGetTimer(lua_State* l)
 */
 static int CclActionVictory(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	GameResult = GameVictory;
 	GamePaused = 1;
@@ -522,9 +510,7 @@ static int CclActionVictory(lua_State* l)
 */
 static int CclActionDefeat(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	GameResult = GameDefeat;
 	GamePaused = 1;
@@ -537,9 +523,7 @@ static int CclActionDefeat(lua_State* l)
 */
 static int CclActionDraw(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	GameResult = GameDraw;
 	GamePaused = 1;
@@ -552,9 +536,7 @@ static int CclActionDraw(lua_State* l)
 */
 static int CclActionSetTimer(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	GameTimer.Cycles = LuaToNumber(l, 1);
 	GameTimer.Increasing = LuaToNumber(l, 2);
@@ -569,9 +551,7 @@ static int CclActionSetTimer(lua_State* l)
 */
 static int CclActionStartTimer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	GameTimer.Running = 1;
 	GameTimer.Init = 1;
@@ -583,9 +563,7 @@ static int CclActionStartTimer(lua_State* l)
 */
 static int CclActionStopTimer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	GameTimer.Running = 0;
 	return 0;
@@ -596,9 +574,7 @@ static int CclActionStopTimer(lua_State* l)
 */
 static int CclActionWait(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	WaitFrame = FrameCounter +
 		(FRAMES_PER_SECOND * VideoSyncSpeed / 100 * (int)LuaToNumber(l, 1) + 999) / 1000;
@@ -612,7 +588,8 @@ static int CclAddTrigger(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 2 || !lua_isfunction(l, 1) ||
+	LuaCheckArgs(l, 2);
+	if (!lua_isfunction(l, 1) ||
 			(!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
 		LuaError(l, "incorrect argument");
 	}
@@ -658,9 +635,7 @@ static int CclAddTrigger(lua_State* l)
 */
 static int CclSetTriggers(lua_State* l)
 {
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 	Trigger = LuaToNumber(l, 1);
 	WaitTrigger = LuaToNumber(l, 2);
 	WaitFrame = LuaToNumber(l, 3);
