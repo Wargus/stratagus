@@ -259,9 +259,9 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 		if (hp < 0) {
 			HitUnit(caster, target, -hp);
 		} else {
-			target->HP += hp;
-			if (target->HP > target->Stats->Variables[HP_INDEX].Max) {
-				target->HP = target->Stats->Variables[HP_INDEX].Max;
+			target->Variable[HP_INDEX].Value += hp;
+			if (target->Variable[HP_INDEX].Value > target->Variable[HP_INDEX].Max) {
+				target->Variable[HP_INDEX].Value = target->Variable[HP_INDEX].Max;
 			}
 		}
 		target->Variable[MANA_INDEX].Value += mana;
@@ -558,9 +558,9 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 
 	//  Healing and harming
 	if (hp > 0) {
-		diffHP = target->Stats->Variables[HP_INDEX].Max - target->HP;
+		diffHP = target->Variable[HP_INDEX].Max - target->Variable[HP_INDEX].Value;
 	} else {
-		diffHP = target->HP;
+		diffHP = target->Variable[HP_INDEX].Value;
 	}
 	if (mana > 0) {
 		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
@@ -591,9 +591,9 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	if (hp < 0) {
 		HitUnit(caster, target, -(castcount * hp));
 	} else {
-		target->HP += castcount * hp;
-		if (target->HP > target->Stats->Variables[HP_INDEX].Max) {
-			target->HP = target->Stats->Variables[HP_INDEX].Max;
+		target->Variable[HP_INDEX].Value += castcount * hp;
+		if (target->Variable[HP_INDEX].Value > target->Variable[HP_INDEX].Max) {
+			target->Variable[HP_INDEX].Value = target->Variable[HP_INDEX].Max;
 		}
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
@@ -642,7 +642,7 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 			caster->Player->TotalKills++;
 		}
 		if (UseHPForXp) {
-			caster->Variable[XP_INDEX].Max += target->HP;
+			caster->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
 		} else {
 			caster->Variable[XP_INDEX].Max += target->Type->Points;
 		}
@@ -896,10 +896,10 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 	//
 	// Check vitals now.
 	//
-	if (condition->MinHpPercent * target->Stats->Variables[HP_INDEX].Max / 100 > target->HP) {
+	if (condition->MinHpPercent * target->Variable[HP_INDEX].Max / 100 > target->Variable[HP_INDEX].Value) {
 		return 0;
 	}
-	if (condition->MaxHpPercent * target->Stats->Variables[HP_INDEX].Max / 100 <= target->HP) {
+	if (condition->MaxHpPercent * target->Variable[HP_INDEX].Max / 100 <= target->Variable[HP_INDEX].Value) {
 		return 0;
 	}
 	if (target->Type->CanCastSpell) {

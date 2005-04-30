@@ -955,8 +955,8 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 		//  Convert already existing units to this type.
 		//
 		if (unit->Type == src) {
-			unit->HP += dst->Stats[player->Player].Variables[HP_INDEX].Max -
-				unit->Stats->Variables[HP_INDEX].Max;
+			unit->Variable[HP_INDEX].Value += dst->Stats[player->Player].Variables[HP_INDEX].Max -
+				unit->Variable[HP_INDEX].Max;
 			// don't have such unit now
 			player->UnitTypesCount[src->Slot]--;
 			// UnMark the Unit sight for conversion if on map

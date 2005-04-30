@@ -10,7 +10,7 @@
 //
 /**@name unit_find.c - The find/select for units. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -406,7 +406,7 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 
 			// It costs (is positive) if hp_damage_evaluate>dest->HP ...)
 			// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
-			cost = HEALTH_FACTOR * (2 * hp_damage_evaluate - dest->HP) /
+			cost = HEALTH_FACTOR * (2 * hp_damage_evaluate - dest->Variable[HP_INDEX].Value) /
 				(dtype->TileWidth * dtype->TileWidth);
 			if (cost < 1) {
 				cost = 1;
@@ -430,7 +430,7 @@ static Unit* FindRangeAttack(const Unit* u, int range)
 			//
 			// calculate HP which will remain in the enemy unit, after hit
 			//
-			effective_hp = (dest->HP - 2 * hp_damage_evaluate);
+			effective_hp = (dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
 
 			//
 			// Unit we won't kill are evaluated the same
@@ -659,7 +659,7 @@ Unit* AttackUnitsInDistance(const Unit* unit, int range)
 		//
 		// Remaining HP (Health) 0-65535
 		//
-		cost += dest->HP * HEALTH_FACTOR;
+		cost += dest->Variable[HP_INDEX].Value * HEALTH_FACTOR;
 		//
 		// Unit in attack range?
 		//

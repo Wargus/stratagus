@@ -1242,7 +1242,7 @@ static void AiCheckRepair(void)
 		if (unit->Type->Building
 			&& unit->Orders[0].Action != UnitActionBuilt
 			&& unit->Orders[0].Action != UnitActionUpgradeTo
-			&& unit->HP < unit->Stats->Variables[HP_INDEX].Max
+			&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
 			&& unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
 			//

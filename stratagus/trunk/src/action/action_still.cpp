@@ -76,7 +76,8 @@ static Unit* UnitToRepairInRange(Unit* unit, int range)
 		table);
 	for (i = 0; i < n; ++i) {
 		if (PlayersTeamed(table[i]->Player->Player, unit->Player->Player) &&
-				table[i]->Type->RepairHP && table[i]->HP < table[i]->Stats->Variables[HP_INDEX].Max &&
+				table[i]->Type->RepairHP &&
+				table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max &&
 				UnitVisibleAsGoal(table[i], unit->Player)) {
 			return table[i];
 		}

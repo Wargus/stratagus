@@ -745,8 +745,6 @@ static int CclUnit(lua_State* l)
 			--j;
 		} else if (!strcmp(value, "resource-active")) {
 			unit->Data.Resource.Active = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "hp")) {
-			unit->HP = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, j + 1);
@@ -887,7 +885,6 @@ static int CclUnit(lua_State* l)
 	if (!unit->Player) {
 		AssignUnitToPlayer(unit, player);
 		UpdateForNewUnit(unit, 0);
-		unit->HP = unit->Type->Variable[HP_INDEX].Max;
 	}
 
 	//  Revealers are units that can see while removed
