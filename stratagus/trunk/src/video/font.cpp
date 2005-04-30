@@ -867,7 +867,8 @@ static int CclDefineFont(lua_State* l)
 	FontMapping** fm;
 	const char* str;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	i = -1;
@@ -929,9 +930,7 @@ static int CclDefineFontColor(lua_State* l)
 	int i;
 	FontColorMapping* fcm;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	color = strdup(LuaToString(l, 1));
 	fcm = NULL;
 
