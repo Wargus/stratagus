@@ -310,9 +310,6 @@ extern int ReplayRevealMap;
 //
 // in map_draw.c
 //
-	/// Called when the color cycles
-extern void MapColorCycle(void);
-
 	/// Draw the map background
 extern void DrawMapBackgroundInViewport(const Viewport* vp);
 	/// Build tables for map

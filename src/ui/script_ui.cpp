@@ -77,27 +77,6 @@ static int HandleCount = 1;     /// Lua handler count
 --  Functions
 ----------------------------------------------------------------------------*/
 
-
-/**
-**  Enable/disable the global color cycling.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorCycleAll(lua_State* l)
-{
-	if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
-		LuaError(l, "incorrect argument");
-	}
-
-	if (lua_isnumber(l, 1)) {
-		ColorCycleAll = lua_tonumber(l, 1);
-	} else {
-		ColorCycleAll = lua_toboolean(l, 1);
-	}
-
-	return 0;
-}
-
 /**
 **  Set speed of middle-mouse scroll
 **
@@ -4222,90 +4201,6 @@ void SelectedUnitChanged(void)
 }
 
 /**
-**  The next 6 functions set color cycling index
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorWaterCycleStart(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorWaterCycleStart = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the palette location at which the Water color cycling ends.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorWaterCycleEnd(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorWaterCycleEnd = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the palette location at which the Icon color cycling starts.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorIconCycleStart(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorIconCycleStart = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the palette location at which the Icon color cycling ends.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorIconCycleEnd(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorIconCycleEnd = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the palette location at which the building color cycling starts.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorBuildingCycleStart(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorBuildingCycleStart = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
-**  Set the palette location at which the building color cycling ends.
-**
-**  @param l  Lua state.
-*/
-static int CclSetColorBuildingCycleEnd(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	ColorBuildingCycleEnd = LuaToNumber(l, 1);
-	return 0;
-}
-
-/**
 **  Set double-click delay.
 **
 **  @param l  Lua state.
@@ -4605,7 +4500,6 @@ void UserInterfaceCclRegister(void)
 {
 	lua_register(Lua, "AddMessage", CclAddMessage);
 
-	lua_register(Lua, "SetColorCycleAll", CclSetColorCycleAll);
 	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
 	lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);
 
@@ -4652,16 +4546,6 @@ void UserInterfaceCclRegister(void)
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
-
-	//
-	// Color cycling
-	//
-	lua_register(Lua, "SetColorWaterCycleStart", CclSetColorWaterCycleStart);
-	lua_register(Lua, "SetColorWaterCycleEnd", CclSetColorWaterCycleEnd);
-	lua_register(Lua, "SetColorIconCycleStart", CclSetColorIconCycleStart);
-	lua_register(Lua, "SetColorIconCycleEnd", CclSetColorIconCycleEnd);
-	lua_register(Lua, "SetColorBuildingCycleStart", CclSetColorBuildingCycleStart);
-	lua_register(Lua, "SetColorBuildingCycleEnd", CclSetColorBuildingCycleEnd);
 
 	//
 	// Correct named functions
