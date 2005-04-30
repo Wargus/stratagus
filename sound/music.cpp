@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name music.c - Background music support */
 //
-// (c) Copyright 2002-2004 by Lutz Sammer, Nehal Mistry
+//      (c) Copyright 2002-2005 by Lutz Sammer, Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -50,6 +50,7 @@
 #include "sound_server.h"
 #include "interface.h"
 #include "campaign.h"
+#include "util.h"
 
 #include "cdaudio.h"
 

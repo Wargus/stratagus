@@ -10,7 +10,7 @@
 //
 /**@name stratagus.h - The main header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 //@{
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
@@ -228,10 +228,6 @@ extern char NameLine[];
 #define DEFAULT_VIDEO_WIDTH   640       /// Default video width
 #define DEFAULT_VIDEO_HEIGHT  480       /// Default video height
 
-	// This is for 1600x1200
-#define MAXMAP_W  50                    /// Maximum map width in tiles on screen
-#define MAXMAP_H  40                    /// Maximum map height in tiles
-
 	/// Scrolling area (<= 15 y)
 #define SCROLL_UP     15
 	/// Scrolling area (>= VideoHeight - 16 y)
@@ -253,39 +249,10 @@ extern char NameLine[];
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
 
 #define DEFAULT_START_ORDERS 4  // The number of Orders allocated on unit creation
-	/// Must redraw flags
-enum _must_redraw_flags_ {
-	RedrawNothing   = 1 << 0,           /// Nothing to do
-	RedrawMinimap   = 1 << 1,           /// Minimap area
-	RedrawMap       = 1 << 2,           /// Map area
-	RedrawCursor    = 1 << 3,           /// Cursor changed
-	RedrawResources = 1 << 4,           /// Resources
-
-	RedrawMessage       = 1 << 13,      /// Message
-	RedrawStatusLine    = 1 << 14,      /// Statusline
-	RedrawInfoPanel     = 1 << 15,      /// Unit description
-	RedrawButtonPanel   = 1 << 16,      /// Unit buttons
-	RedrawFillers       = 1 << 17,      /// Fillers
-	RedrawMinimapBorder = 1 << 18,      /// Area around minimap
-
-	RedrawCosts         = 1 << 19,      /// Costs in status line
-	RedrawMenuButton    = 1 << 20,      /// Area above minimap
-	RedrawMinimapCursor = 1 << 21,      /// Minimap cursor changed
-	RedrawMenu          = 1 << 22,      /// Menu
-	RedrawTimer         = 1 << 23,      /// Timer
-
-	// Bits 24-29 are unused.
-
-	RedrawAll           = 1 << 30,      /// All flag set by RedrawEverything
-	RedrawEverything    = -1,           /// Must redraw everything
-};
 
 /*----------------------------------------------------------------------------
---  clone.c
+--  stratagus.c
 ----------------------------------------------------------------------------*/
-
-	///  rand only used on this computer.
-#define MyRand()  rand()
 
 enum {
 	TitleFlagCenter = 1 << 0,  /// Center Text
@@ -321,8 +288,6 @@ extern int SpeedResearch;                   /// Speed factor for researching
 
 extern char UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
 
-extern unsigned SyncRandSeed;               /// Sync random seed value
-
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
 
@@ -331,9 +296,6 @@ extern void SaveGame(const char* filename); /// Save game for later load
 extern int SaveGameLoading;                 /// Save game is in progress of loading
 
 extern void LoadAll(void);                  /// Load all data back
-
-extern void InitSyncRand(void);             /// Initialize the syncron rand
-extern int SyncRand(void);                  /// Syncron rand
 
 extern void Exit(int err);                  /// Exit stratagus
 extern void ExitFatal(int err);             /// Exit stratagus with fatal error
@@ -347,19 +309,6 @@ extern void GameMainLoop(void);             /// Game main loop
 
 	/// Show load progress
 extern void ShowLoadProgress(const char* fmt,...);
-
-	/// strdup + strcat
-extern char* strdcat(const char* l, const char* r);
-	/// strdup + strcat + strcat
-extern char* strdcat3(const char* l, const char* m, const char* r);
-
-#if !HAVE_STRCASESTR
-	/// case insensitive strstr
-extern char* strcasestr(const char* str, const char* substr);
-#endif // !HAVE_STRCASESTR
-
-	/// Compute a square root using ints
-extern long isqrt(long num);
 
 /*============================================================================
 ==  Misc
