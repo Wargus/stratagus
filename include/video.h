@@ -115,32 +115,6 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
-	/// Creates a shared hardware palette from an independent Palette struct.
-extern SDL_Palette* VideoCreateSharedPalette(const SDL_Palette* palette);
-
-	/// Free a shared hardware palette.
-extern void VideoFreeSharedPalette(SDL_Palette* palette);
-
-extern int ColorCycleAll; /// Flag color cycle palettes
-
-/**
-**  Typedef for palette links.
-*/
-typedef struct _palette_link_ PaletteLink;
-
-/**
-**  Links all palettes together to join the same palettes.
-*/
-struct _palette_link_ {
-	SDL_Surface* Surface;               /// Surface that contains palette
-	PaletteLink* Next;                  /// Previous palette
-};
-
-extern PaletteLink* PaletteList; /// List of all used palettes loaded
-
-extern void VideoPaletteListAdd(SDL_Surface* surface);
-extern void VideoPaletteListRemove(SDL_Surface* surface);
-
 	/**
 	**  Video synchronization speed. Synchronization time in percent.
 	**  If =0, video framerate is not synchronized. 100 is exact
@@ -344,13 +318,6 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-extern int ColorWaterCycleStart;    /// color # start for color cycling
-extern int ColorWaterCycleEnd;      /// color # end   for color cycling
-extern int ColorIconCycleStart;     /// color # start for color cycling
-extern int ColorIconCycleEnd;       /// color # end   for color cycling
-extern int ColorBuildingCycleStart; /// color # start for color cycling
-extern int ColorBuildingCycleEnd;   /// color # end   for color cycling
-
 #ifndef USE_OPENGL
 #define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))
 #define VideoMapRGBA(f, r, g, b, a) SDL_MapRGBA((f), (r), (g), (b), (a))
@@ -462,9 +429,6 @@ extern void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
 
 	/// Draw 8bit raw graphic data clipped, using given pixel pallette
 extern void VideoDrawRawClip(SDL_Surface *surface, int x, int y, int w, int h);
-
-	/// Does ColorCycling..
-extern void ColorCycle(void);
 
 	/// Draw circle.
 extern void VideoDrawCircle(Uint32 color, int x, int y, int r);
@@ -579,9 +543,6 @@ extern void VideoDrawClipTransX(const Graphic* g, unsigned frame, int x, int y, 
 	/// Get the height of a single frame of a graphic object
 #define VideoGraphicHeight(o)  ((o)->Height)
 #define VideoGraphicFrames(o)  ((o)->NumFrames)
-
-	/// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
 
 //@}
 

@@ -51,8 +51,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-PaletteLink* PaletteList;        /// List of all used palettes.
-
 static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
 
 #ifdef USE_OPENGL
@@ -237,9 +235,6 @@ void LoadGraphic(Graphic* g)
 		fprintf(stderr, "Can't load the graphic `%s'\n", g->File);
 		ExitFatal(-1);
 	}
-	if (g->Surface->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(g->Surface);
-	}
 
 	if (!g->Width) {
 		g->Width = g->GraphicWidth;
@@ -314,9 +309,6 @@ void FreeGraphic(Graphic* g)
 #endif
 
 		if (g->Surface) {
-			if (g->Surface->format->BytesPerPixel == 1) {
-				VideoPaletteListRemove(g->Surface);
-			}
 			if (g->Surface->flags & SDL_PREALLOC) {
 				pixels = g->Surface->pixels;
 			} else {
@@ -327,9 +319,6 @@ void FreeGraphic(Graphic* g)
 		}
 #ifndef USE_OPENGL
 		if (g->SurfaceFlip) {
-			if (g->SurfaceFlip->format->BytesPerPixel == 1) {
-				VideoPaletteListRemove(g->SurfaceFlip);
-			}
 			if (g->SurfaceFlip->flags & SDL_PREALLOC) {
 				pixels = g->SurfaceFlip->pixels;
 			} else {
@@ -396,9 +385,6 @@ void FlipGraphic(Graphic* g)
 	if (g->Surface->flags & SDL_SRCCOLORKEY) {
 		SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			g->Surface->format->colorkey);
-	}
-	if (g->SurfaceFlip->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(g->SurfaceFlip);
 	}
 
 	SDL_LockSurface(g->Surface);
@@ -688,17 +674,11 @@ void ResizeGraphic(Graphic* g, int w, int h)
 
 	SDL_UnlockSurface(g->Surface);
 	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-	if (g->Surface->format->BytesPerPixel == 1) {
-		VideoPaletteListRemove(g->Surface);
-	}
 	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
 	ckey = g->Surface->format->colorkey;
 	SDL_FreeSurface(g->Surface);
 
 	g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-	if (g->Surface->format->BytesPerPixel == 1) {
-		VideoPaletteListAdd(g->Surface);
-	}
 	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 	if (useckey) {
 		SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);

@@ -467,12 +467,6 @@ void GameMainLoop(void)
 		//
 		DoScrollArea(MouseScrollState | KeyScrollState, KeyModifiers & ModifierControl);
 
-		if (!(FrameCounter % COLOR_CYCLE_SPEED)) {
-			if (ColorCycleAll >= 0) {
-				ColorCycle();
-			}
-		}
-
 		if (FastForwardCycle > GameCycle &&
 				RealVideoSyncSpeed != VideoSyncSpeed) {
 			RealVideoSyncSpeed = VideoSyncSpeed;
