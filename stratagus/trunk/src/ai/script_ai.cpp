@@ -10,7 +10,7 @@
 //
 /**@name script_ai.c - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer, Ludovic Pollet,
+//      (c) Copyright 2000-2005 by Lutz Sammer, Ludovic Pollet,
 //                                 and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -281,7 +281,8 @@ static int CclDefineAi(lua_State* l)
 	const AiType* ait;
 #endif
 
-	if (lua_gettop(l) != 4 || !lua_isfunction(l, 4)) {
+	LuaCheckArgs(l, 4);
+	if (!lua_isfunction(l, 4)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -474,9 +475,7 @@ static void InsertResearchRequests(Upgrade* upgrade)
 */
 static int CclAiGetRace(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	lua_pushstring(l, AiPlayer->Player->RaceName);
 	return 1;
 }
@@ -490,9 +489,7 @@ static int CclAiGetRace(lua_State* l)
 */
 static int CclAiGetSleepCycles(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, AiSleepCycles);
 	return 1;
 }
@@ -508,9 +505,7 @@ static int CclAiGetSleepCycles(lua_State* l)
 */
 static int CclAiDebug(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	if (!LuaToBoolean(l, 1)) {
 		AiPlayer->ScriptDebug = 0;
 	} else {
@@ -580,9 +575,7 @@ static int CclAiDebugPlayer(lua_State* l)
 */
 static int CclAiNeed(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	InsertUnitTypeRequests(CclGetUnitType(l), 1);
 
 	lua_pushboolean(l, 0);
@@ -601,9 +594,7 @@ static int CclAiSet(lua_State* l)
 	AiUnitTypeTable* autt;
 	UnitType* type;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	lua_pushvalue(l, 1);
 	type = CclGetUnitType(l);
 	lua_pop(l, 1);
@@ -633,9 +624,7 @@ static int CclAiWait(lua_State* l)
 	int j;
 	int n;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	type = CclGetUnitType(l);
 	unit_types_count = AiPlayer->Player->UnitTypesCount;
 	if (!(autt = FindInUnitTypeRequests(type))) {
@@ -704,7 +693,8 @@ static int CclAiForce(lua_State* l)
 	int args;
 	int j;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 	force = LuaToNumber(l, 1);
@@ -772,9 +762,7 @@ static int CclAiForceRole(lua_State* l)
 	int force;
 	const char* flag;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force %i out of range" _C_ force);
@@ -801,9 +789,7 @@ static int CclAiCheckForce(lua_State* l)
 {
 	int force;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		lua_pushfstring(l, "Force out of range: %d", force);
@@ -825,9 +811,7 @@ static int CclAiWaitForce(lua_State* l)
 {
 	int force;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force out of range: %d" _C_ force);
@@ -856,9 +840,7 @@ static int CclAiAttackWithForce(lua_State* l)
 {
 	int force;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCES) {
 		LuaError(l, "Force out of range: %d" _C_ force);
@@ -879,10 +861,7 @@ static int CclAiSleep(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	if (AiPlayer->SleepCycles) {
 		if (AiPlayer->SleepCycles < GameCycle) {
 			AiPlayer->SleepCycles = 0;
@@ -908,9 +887,7 @@ static int CclAiResearch(lua_State* l)
 	const char* str;
 	Upgrade* upgrade;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	if ((str = LuaToString(l, 1))) {
 		upgrade = UpgradeByIdent(str);
 	} else {
@@ -933,9 +910,7 @@ static int CclAiUpgradeTo(lua_State* l)
 {
 	UnitType* type;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	type = CclGetUnitType(l);
 	InsertUpgradeToRequests(type);
 
@@ -952,9 +927,7 @@ static int CclAiUpgradeTo(lua_State* l)
 */
 static int CclAiPlayer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	lua_pushnumber(l, AiPlayer->Player->Player);
 	return 1;
 }
@@ -970,7 +943,8 @@ static int CclAiSetReserve(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_newtable(l);
@@ -997,7 +971,8 @@ static int CclAiSetCollect(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	// FIXME: use key/value pairs
@@ -1026,9 +1001,7 @@ static int CclAiDump(lua_State* l)
 	const AiUnitType* aut;
 	const AiBuildQueue* queue;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	//
 	// Script
 	//
