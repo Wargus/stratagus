@@ -583,7 +583,6 @@ void MenuLoop(const char* filename, WorldMap* map)
 		}
 
 		CleanModules();
-		CleanFonts();
 
 		// Reload the main config file
 		LoadCcl();
@@ -607,14 +606,10 @@ void MenuLoop(const char* filename, WorldMap* map)
 */
 static void PrintHeader(void)
 {
-	// vvv---- looks weird, but is needed for GNU brain damage
-	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon and others.\n"
-	"\t(http://Stratagus.Org)"
-	"\n  VP3 codec Copyright by On2 Technologies Inc."
-#ifdef USE_SDL
-	"\n  SDL Copyright by Sam Lantinga."
-#endif
-	"\nCompile options %s", NameLine, CompileOptions);
+	fprintf(stdout, "%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
+		"Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, and others.\n"
+		"\t(http://stratagus.org)"
+		"\nCompile options %s", NameLine, CompileOptions);
 }
 
 /**
@@ -628,16 +623,16 @@ static int main1(int argc __attribute__ ((unused)),
 {
 	PrintHeader();
 	printf(
-	"\n\nStratagus may be copied only under the terms of the GNU General Public License\
-\nwhich may be found in the Stratagus source kit."
-	"\n\nDISCLAIMER:\n\
-This software is provided as-is.  The author(s) can not be held liable for any\
-\ndamage that might arise from the use of this software.\n\
-Use it at your own risk.\n\n");
-
-	//
-	//  Hardware drivers setup
-	//
+	"\n"
+	"\n"
+	"Stratagus may be copied only under the terms of the GNU General Public License\n"
+	"which may be found in the Stratagus source kit.\n"
+	"\n"
+	"DISCLAIMER:\n"
+	"This software is provided as-is.  The author(s) can not be held liable for any\n"
+	"damage that might arise from the use of this software.\n"
+	"Use it at your own risk.\n"
+	"\n");
 
 	// Setup video display
 	InitVideo();
@@ -671,7 +666,7 @@ Use it at your own risk.\n\n");
 /**
 **  Exit the game.
 **
-**  @param err  Error code to parse to shell.
+**  @param err  Error code to pass to shell.
 */
 void Exit(int err)
 {
@@ -699,7 +694,7 @@ void Exit(int err)
 **  Do a fatal exit.
 **  Called on out of memory or crash.
 **
-**  @param err  Error code to parse to shell.
+**  @param err  Error code to pass to shell.
 */
 void ExitFatal(int err)
 {
