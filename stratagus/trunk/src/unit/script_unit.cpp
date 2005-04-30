@@ -72,9 +72,7 @@ static int CclSetXpDamage(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = XpDamage;
 	XpDamage = LuaToBoolean(l, 1);
 
@@ -93,9 +91,7 @@ static int CclSetTrainingQueue(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = EnableTrainingQueue;
 	EnableTrainingQueue = LuaToBoolean(l, 1);
 
@@ -114,9 +110,7 @@ static int CclSetBuildingCapture(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = EnableBuildingCapture;
 	EnableBuildingCapture = LuaToBoolean(l, 1);
 
@@ -135,9 +129,7 @@ static int CclSetRevealAttacker(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = RevealAttacker;
 	RevealAttacker = LuaToBoolean(l, 1);
 
@@ -921,9 +913,7 @@ static int CclMoveUnit(lua_State* l)
 	int ix;
 	int iy;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
@@ -968,10 +958,7 @@ static int CclCreateUnit(lua_State* l)
 	int ix;
 	int iy;
 
-	if (lua_gettop(l) != 3) {
-	    printf("%d\n", lua_gettop(l));
-		LuaError(l, "incorrect argument aa");
-	}
+	LuaCheckArgs(l, 3);
 
 	lua_pushvalue(l, 1);
 	unittype = CclGetUnitType(l);
@@ -1024,10 +1011,7 @@ static int CclSetResourcesHeld(lua_State* l)
 	Unit* unit;
 	int value;
 
-	if (lua_gettop(l) != 2) {
-	    printf("%d\n", lua_gettop(l));
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
@@ -1063,9 +1047,7 @@ static int CclOrderUnit(lua_State* l)
 	int j;
 	const char* order;
 
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
 	plynr = TriggerGetPlayer(l);
@@ -1157,9 +1139,7 @@ static int CclKillUnit(lua_State* l)
 	Unit* unit;
 	Unit** table;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	unittype = TriggerGetUnitType(l);
@@ -1211,9 +1191,7 @@ static int CclKillUnitAt(lua_State* l)
 	int j;
 	int s;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 2);
 	plynr = TriggerGetPlayer(l);
@@ -1268,9 +1246,7 @@ static int CclGetUnits(lua_State* l)
 	int plynr;
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	plynr = TriggerGetPlayer(l);
 
@@ -1300,9 +1276,7 @@ static int CclGetUnitMana(lua_State* l)
 {
 	const Unit* unit;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	unit = CclGetUnit(l);
 	lua_pushnumber(l, unit->Variable[MANA_INDEX].Value);
@@ -1321,9 +1295,7 @@ static int CclSetUnitMana(lua_State* l)
 	Unit* unit;
 	int mana;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
@@ -1352,9 +1324,7 @@ static int CclGetUnitUnholyArmor(lua_State* l)
 {
 	const Unit* unit;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	unit = CclGetUnit(l);
 	lua_pushnumber(l, unit->Variable[UNHOLYARMOR_INDEX].Value);
@@ -1372,9 +1342,7 @@ static int CclSetUnitUnholyArmor(lua_State* l)
 {
 	Unit* unit;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);

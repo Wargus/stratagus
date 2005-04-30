@@ -256,7 +256,8 @@ static int CclDefineUnitType(lua_State* l)
 	int subargs;
 	int k;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -1157,9 +1158,7 @@ static int CclUnitType(lua_State* l)
 	UnitType* type;
 	LuaUserData* data;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
@@ -1181,9 +1180,7 @@ static int CclUnitTypeArray(lua_State* l)
 	int i;
 	LuaUserData* data;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	lua_newtable(l);
 
@@ -1207,9 +1204,7 @@ static int CclGetUnitTypeIdent(lua_State* l)
 {
 	const UnitType* type;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	type = CclGetUnitType(l);
 	if (type) {
@@ -1231,9 +1226,7 @@ static int CclGetUnitTypeName(lua_State* l)
 {
 	const UnitType* type;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	type = CclGetUnitType(l);
 	lua_pushstring(l, type->Name);
@@ -1251,9 +1244,7 @@ static int CclSetUnitTypeName(lua_State* l)
 {
 	UnitType* type;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
 	type = CclGetUnitType(l);
@@ -1528,7 +1519,8 @@ static int CclDefineAnimations(lua_State* l)
 	Animations* anims;
 	int res;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 
