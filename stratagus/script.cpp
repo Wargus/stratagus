@@ -241,9 +241,7 @@ int LuaLoadFile(const char* file)
 */
 static int CclSavePreferences(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	SavePreferences();
 	return 0;
 }
@@ -259,9 +257,7 @@ static int CclLoad(lua_State* l)
 {
 	char buf[1024];
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	LibraryFileName(LuaToString(l, 1), buf);
 	if (LuaLoadFile(buf) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
@@ -279,7 +275,8 @@ static int CclSaveGame(lua_State* l)
 	const char* value;
 	char buf[1024];
 
-	if (lua_gettop(l) != 1 || !lua_istable(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 
@@ -1299,9 +1296,7 @@ static int Alias(lua_State* l, const char* s)
 */
 static int CclAdd(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Add()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Add");
 }
 
@@ -1315,9 +1310,7 @@ static int CclAdd(lua_State* l)
 */
 static int CclSub(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Sub()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Sub");
 }
 /**
@@ -1330,9 +1323,7 @@ static int CclSub(lua_State* l)
 */
 static int CclMul(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Mul()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Mul");
 }
 /**
@@ -1345,9 +1336,7 @@ static int CclMul(lua_State* l)
 */
 static int CclDiv(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Div()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Div");
 }
 /**
@@ -1360,9 +1349,7 @@ static int CclDiv(lua_State* l)
 */
 static int CclMin(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Min()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Min");
 }
 /**
@@ -1375,9 +1362,7 @@ static int CclMin(lua_State* l)
 */
 static int CclMax(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Max()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Max");
 }
 /**
@@ -1390,9 +1375,7 @@ static int CclMax(lua_State* l)
 */
 static int CclRand(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Bad number of arg for Rand()\n");
-	}
+	LuaCheckArgs(l, 1);
 	return Alias(l, "Rand");
 }
 /**
@@ -1405,9 +1388,7 @@ static int CclRand(lua_State* l)
 */
 static int CclGreaterThan(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for GreaterThan()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "GreaterThan");
 }
 /**
@@ -1420,9 +1401,7 @@ static int CclGreaterThan(lua_State* l)
 */
 static int CclGreaterThanOrEq(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for GreaterThanOrEq()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "GreaterThanOrEq");
 }
 /**
@@ -1435,9 +1414,7 @@ static int CclGreaterThanOrEq(lua_State* l)
 */
 static int CclLessThan(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for LessThan()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "LessThan");
 }
 /**
@@ -1450,9 +1427,7 @@ static int CclLessThan(lua_State* l)
 */
 static int CclLessThanOrEq(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for LessThanOrEq()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "LessThanOrEq");
 }
 /**
@@ -1465,9 +1440,7 @@ static int CclLessThanOrEq(lua_State* l)
 */
 static int CclEqual(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for Equal()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "Equal");
 }
 /**
@@ -1480,9 +1453,7 @@ static int CclEqual(lua_State* l)
 */
 static int CclNotEqual(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for NotEqual()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "NotEqual");
 }
 
@@ -1514,9 +1485,7 @@ static int CclConcat(lua_State* l)
 */
 static int CclString(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Bad number of arg for String()\n");
-	}
+	LuaCheckArgs(l, 1);
 	return Alias(l, "String");
 }
 /**
@@ -1529,9 +1498,7 @@ static int CclString(lua_State* l)
 */
 static int CclInverseVideo(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Bad number of arg for InverseVideo()\n");
-	}
+	LuaCheckArgs(l, 1);
 	return Alias(l, "InverseVideo");
 }
 /**
@@ -1544,9 +1511,7 @@ static int CclInverseVideo(lua_State* l)
 */
 static int CclUnitName(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Bad number of arg for UnitName()\n");
-	}
+	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitName");
 }
 /**
@@ -1607,9 +1572,7 @@ static int CclLine(lua_State* l)
 */
 static int CclGameInfo(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "Bad number of arg for GameInfo()\n");
-	}
+	LuaCheckArgs(l, 1);
 	return Alias(l, "GameInfo");
 }
 
@@ -1623,9 +1586,7 @@ static int CclGameInfo(lua_State* l)
 */
 static int CclVideoTextLength(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for VideoTextLength()\n");
-	}
+	LuaCheckArgs(l, 2);
 	lua_newtable (l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "VideoTextLength");
@@ -1654,9 +1615,7 @@ static int CclVideoTextLength(lua_State* l)
 */
 static int CclStringFind(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "Bad number of arg for StringFind()\n");
-	}
+	LuaCheckArgs(l, 2);
 	return Alias(l, "StringFind");
 }
 
@@ -1728,9 +1687,7 @@ static int CclListDirectory(lua_State* l)
 	int n;
 	int i;
 
-	if (lua_gettop(l)!=1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	
 	// security: disallow all special characters
 	userdir = lua_tostring(l, 1);
@@ -1809,9 +1766,7 @@ static int CclSetGameName(lua_State* l)
 */
 static int CclSetGameCycle(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	GameCycle = LuaToNumber(l, 1);
 	return 0;
 }
@@ -1823,7 +1778,8 @@ static int CclSetGameCycle(lua_State* l)
 */
 static int CclSetGamePaused(lua_State* l)
 {
-	if (lua_gettop(l) != 1 || (!lua_isnumber(l, 1) && !lua_isboolean(l, 1))) {
+	LuaCheckArgs(l, 1);
+	if (!lua_isnumber(l, 1) && !lua_isboolean(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	if (lua_isboolean(l, 1)) {
@@ -1841,9 +1797,7 @@ static int CclSetGamePaused(lua_State* l)
 */
 static int CclSetVideoSyncSpeed(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	VideoSyncSpeed = LuaToNumber(l, 1);
 	return 0;
 }
@@ -1857,9 +1811,7 @@ static int CclSetLocalPlayerName(lua_State* l)
 {
 	const char* str;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
 	strncpy(LocalPlayerName, str, sizeof(LocalPlayerName) - 1);
 	LocalPlayerName[sizeof(LocalPlayerName) - 1] = '\0';
@@ -1876,7 +1828,8 @@ static int CclSetLocalPlayerName(lua_State* l)
 */
 static int ScriptSetUseHPForXp(lua_State* l)
 {
-	if (lua_gettop(l) != 1 || !lua_isboolean(l, 1)) {
+	LuaCheckArgs(l, 1);
+	if (!lua_isboolean(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
 	UseHPForXp = lua_toboolean(l, 1);
@@ -1891,9 +1844,7 @@ static int ScriptSetUseHPForXp(lua_State* l)
 */
 static int CclNoRandomPlacementMultiplayer(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	NoRandomPlacementMultiplayer = 1;
 
 	return 0;
@@ -1924,9 +1875,7 @@ static int CclSetDamageFormula(lua_State* l)
 */
 static int CclSetGodMode(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	lua_pushboolean(l, GodMode);
 	GodMode = LuaToBoolean(l, 1);
 	return 0;
@@ -1943,9 +1892,7 @@ static int CclSetShowTips(lua_State* l)
 {
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = ShowTips;
 	ShowTips = LuaToBoolean(l, 1);
 
@@ -1964,9 +1911,7 @@ static int CclSetCurrentTip(lua_State* l)
 {
 	lua_Number old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	old = CurrentTip;
 	CurrentTip = LuaToNumber(l, 1);
 	if (CurrentTip >= MAX_TIPS || Tips[CurrentTip] == NULL) {
@@ -1990,9 +1935,7 @@ static int CclAddTip(lua_State* l)
 	int i;
 	const char* str;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	str = LuaToString(l, 1);
 	for (i = 0; i < MAX_TIPS; ++i) {
 		if (Tips[i] && !strcmp(str, Tips[i])) {
@@ -2018,9 +1961,7 @@ static int CclSetSpeedResourcesHarvest(lua_State* l)
 	int i;
 	const char* resource;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
 		if (!strcmp(resource, DefaultResourceNames[i])) {
@@ -2043,9 +1984,7 @@ static int CclSetSpeedResourcesReturn(lua_State* l)
 	int i;
 	const char* resource;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	resource = LuaToString(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
 		if (!strcmp(resource, DefaultResourceNames[i])) {
@@ -2065,9 +2004,7 @@ static int CclSetSpeedResourcesReturn(lua_State* l)
 */
 static int CclSetSpeedBuild(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	SpeedBuild = LuaToNumber(l, 1);
 
 	lua_pushnumber(l, SpeedBuild);
@@ -2081,9 +2018,7 @@ static int CclSetSpeedBuild(lua_State* l)
 */
 static int CclSetSpeedTrain(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	SpeedTrain = LuaToNumber(l, 1);
 
 	lua_pushnumber(l, SpeedTrain);
@@ -2097,9 +2032,7 @@ static int CclSetSpeedTrain(lua_State* l)
 */
 static int CclSetSpeedUpgrade(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	SpeedUpgrade = LuaToNumber(l, 1);
 
 	lua_pushnumber(l, SpeedUpgrade);
@@ -2113,9 +2046,7 @@ static int CclSetSpeedUpgrade(lua_State* l)
 */
 static int CclSetSpeedResearch(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	SpeedResearch = LuaToNumber(l, 1);
 
 	lua_pushnumber(l, SpeedResearch);
@@ -2132,9 +2063,7 @@ static int CclSetSpeeds(lua_State* l)
 	int i;
 	lua_Number s;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	s = LuaToNumber(l, 1);
 	for (i = 0; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = s;
@@ -2317,9 +2246,7 @@ int CclUnits(lua_State* l)
 	int i;
 	static char buf[80];
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	i = 0;
 	slot = UnitSlotFree;
 	while (slot) {  // count the free slots
@@ -2362,9 +2289,7 @@ static int CclGetCompileFeature(lua_State* l)
 {
 	const char* str;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	str = LuaToString(l, 1);
 	if (strstr(CompileOptions, str)) {
@@ -2385,9 +2310,7 @@ static int CclGetCompileFeature(lua_State* l)
 */
 static int CclSyncRand(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	lua_pushnumber(l, SyncRand() % (int)LuaToNumber(l, -1));
 	return 1;
@@ -2411,9 +2334,7 @@ static int CclLoadPud(lua_State* l)
 		return 0;
 	}
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	name = LuaToString(l, 1);
 
 	GetPudInfo(name, &TheMap.Info);
@@ -2467,9 +2388,7 @@ static int CclLoadMap(lua_State* l)
 {
 	const char* name;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	name = LuaToString(l, 1);
 
 	// TODO Check if there a map has already been loaded. 
