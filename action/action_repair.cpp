@@ -102,14 +102,14 @@ static void RepairUnit(Unit* unit, Unit* goal)
 		//
 		PlayerSubCosts(player, goal->Type->RepairCosts);
 
-		goal->HP += goal->Type->RepairHP;
-		if (goal->HP > goal->Stats->Variables[HP_INDEX].Max) {
-			goal->HP = goal->Stats->Variables[HP_INDEX].Max;
+		goal->Variable[HP_INDEX].Value += goal->Type->RepairHP;
+		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 		}
 	} else {
 		// hp is the current damage taken by the unit.
-		hp = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
-			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - goal->HP;
+		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
+			(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
 		//
 		// Calculate the length of the attack (repair) anim.
 		//
@@ -120,10 +120,10 @@ static void RepairUnit(Unit* unit, Unit* goal)
 		//unit->Data.Built.Worker->Type->BuilderSpeedFactor;
 		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
 		// Keep the same level of damage while increasing HP.
-		goal->HP = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
-			(goal->Type->Stats[goal->Player->Player].Costs[TimeCost] * 600) - hp;
-		if (goal->HP > goal->Stats->Variables[HP_INDEX].Max) {
-			goal->HP = goal->Stats->Variables[HP_INDEX].Max;
+		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Stats->Variables[HP_INDEX].Max) /
+			(goal->Stats->Costs[TimeCost] * 600) - hp;
+		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
 		}
 	}
 }
@@ -190,7 +190,7 @@ void HandleActionRepair(Unit* unit)
 				// Have reached target? FIXME: could use return value
 				//
 				if (goal && MapDistanceBetweenUnits(unit, goal) <= unit->Type->RepairRange &&
-						goal->HP < goal->Type->Stats[goal->Player->Player].Variables[HP_INDEX].Max) {
+						goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					unit->State = 0;
 					unit->SubAction = 2;
 					unit->Data.Repair.Cycles = 0;
@@ -253,7 +253,7 @@ void HandleActionRepair(Unit* unit)
 				//
 				// Target is fine, choose new one.
 				//
-				if (!goal || goal->HP >= goal->Stats->Variables[HP_INDEX].Max) {
+				if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
 					if (goal) { // release reference
 						RefsDecrease(goal);
 						unit->Orders[0].Goal = NULL;

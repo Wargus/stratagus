@@ -10,7 +10,7 @@
 //
 /**@name script_map.c - The map ccl functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -325,7 +325,7 @@ static int CclShowMapLocation(lua_State* l)
 	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
 	if (target != NoUnitP) {
 		target->Orders[0].Action = UnitActionStill;
-		target->HP = 0;
+		target->Variable[HP_INDEX].Value = 0;
 		target->X = LuaToNumber(l, 1);
 		target->Y = LuaToNumber(l, 2);
 		target->TTL = GameCycle + LuaToNumber(l, 4);

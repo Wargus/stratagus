@@ -366,10 +366,10 @@ static void HandleRegenerations(Unit* unit)
 
 	f = 0;
 	// Burn
-	if (!unit->Removed && !unit->Destroyed && unit->Stats->Variables[HP_INDEX].Max &&
-			unit->Orders[0].Action != UnitActionBuilt && 
+	if (!unit->Removed && !unit->Destroyed && unit->Variable[HP_INDEX].Max &&
+			unit->Orders[0].Action != UnitActionBuilt &&
 			unit->Orders[0].Action != UnitActionDie) {
-		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
+		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
 		if (f <= unit->Type->BurnPercent && unit->Type->BurnDamageRate) {
 			HitUnit(NoUnitP, unit, unit->Type->BurnDamageRate);
 			f = 1;
@@ -379,20 +379,7 @@ static void HandleRegenerations(Unit* unit)
 	}
 
 	// Health doesn't regenerate while burning.
-	if (!f && unit->Stats) {
-		// Unit may not have stats assigned to it
-		if (unit->Stats->Variables[HP_INDEX].Increase) {
-			unit->HP += unit->Stats->Variables[HP_INDEX].Increase;
-			if (unit->HP <= 0) { // FIXME ? kill it ?
-				unit->HP = 1;
-			}
-			if (unit->HP > unit->Stats->Variables[HP_INDEX].Max) {
-				unit->HP = unit->Stats->Variables[HP_INDEX].Max;
-			}
-		}
-	}
-
-	// Shields and stuff?
+	unit->Variable[HP_INDEX].Increase = f ? 0 : unit->Stats->Variables[HP_INDEX].Increase;
 }
 
 /**
@@ -410,13 +397,13 @@ static void HandleBuffs(Unit* unit, int amount)
 	//
 	// Look if the time to live is over.
 	//
-	if (unit->TTL && unit->TTL < (GameCycle - unit->HP)) {
+	if (unit->TTL && unit->TTL < (GameCycle - unit->Variable[HP_INDEX].Value)) {
 		DebugPrint("Unit must die %lu %lu!\n" _C_ unit->TTL _C_ GameCycle);
 		//
 		// Hit unit does some funky stuff...
 		//
-		unit->HP -= amount;
-		if (unit->HP < 0) {
+		unit->Variable[HP_INDEX].Value -= amount;
+		if (unit->Variable[HP_INDEX].Value <= 0) {
 			LetUnitDie(unit);
 		}
 	}

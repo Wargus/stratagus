@@ -283,7 +283,7 @@ void DoRightButton(int sx, int sy)
 			// Go and repair
 			if (type->RepairRange && dest &&
 					dest->Type->RepairHP &&
-					dest->HP < dest->Stats->Variables[HP_INDEX].Max &&
+					dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 					(dest->Player == unit->Player || IsAllied(dest->Player, dest))) {
 				dest->Blink = 4;
 				SendCommandRepair(unit, x, y, dest, flush);
@@ -900,7 +900,7 @@ static int SendRepair(int sx, int sy)
 	y = sy / TileSizeY;
 
 	// Check if the dest is repairable!
-	if ((dest = UnitUnderCursor) && dest->HP < dest->Stats->Variables[HP_INDEX].Max &&
+	if ((dest = UnitUnderCursor) && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
 			dest->Type->RepairHP &&
 			(dest->Player == ThisPlayer || IsAllied(ThisPlayer, dest))) {
 		for (i = 0; i < NumSelected; ++i) {

@@ -250,9 +250,6 @@
 **  This is 1 if the unit is on board a transporter.
 **
 **
-**  Unit::HP
-**
-**
 **  Unit::XP
 **
 **
@@ -583,7 +580,6 @@ struct _unit_ {
 		struct _construction_frame_* CFrame;         /// Seen construction frame
 	} Seen;
 
-	int HP;                 /// hit points
 	struct _variable_type_* Variable; /// array of User Defined variables.
 
 	unsigned long TTL;  /// time to live
