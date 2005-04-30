@@ -10,7 +10,7 @@
 //
 /**@name video.c - The universal video functions. */
 //
-//      (c) Copyright 1999-2004 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -136,8 +136,6 @@ unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
 unsigned long FrameCounter;          /// Current frame number
 int SlowFrameCounter;                /// Profile, frames out of sync
 
-int ColorCycleAll;               /// Flag Color Cycle with all palettes
-
 int ClipX1;                      /// current clipping top left
 int ClipY1;                      /// current clipping top left
 int ClipX2;                      /// current clipping bottom right
@@ -164,16 +162,6 @@ SDL_Surface* TheScreen;
 
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
 int SkipFrames; /// Skip this frames
-
-int ColorWaterCycleStart;
-int ColorWaterCycleEnd;
-int ColorIconCycleStart;
-int ColorIconCycleEnd;
-int ColorBuildingCycleStart;
-int ColorBuildingCycleEnd;
-
-	/// Does ColorCycling..
-void ColorCycle(void);
 
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
@@ -257,52 +245,6 @@ void PopClipping(void)
 }
 
 /**
-**  Add a surface to the palette list, used for color cycling
-**
-**  @param surface  The SDL surface to add to the list to cycle.
-*/
-void VideoPaletteListAdd(SDL_Surface* surface)
-{
-	PaletteLink* curlink;
-
-	curlink = malloc(sizeof(PaletteLink));
-
-	curlink->Surface = surface;
-	curlink->Next = PaletteList;
-
-	PaletteList = curlink;
-}
-
-/**
-**  Remove a surface to the palette list, used for color cycling
-**
-**  @param surface  The SDL surface to add to the list to cycle.
-*/
-void VideoPaletteListRemove(SDL_Surface* surface)
-{
-	PaletteLink** curlink;
-	PaletteLink* tmp;
-
-	curlink = &PaletteList;
-	while (*curlink) {
-		if ((*curlink)->Surface == surface) {
-			break;
-		}
-		curlink = &((*curlink)->Next);
-	}
-	Assert(*curlink);
-	if (*curlink == PaletteList) {
-		tmp = PaletteList->Next;
-		free(PaletteList);
-		PaletteList = tmp;
-	} else {
-		tmp = *curlink;
-		*curlink = tmp->Next;
-		free(tmp);
-	}
-}
-
-/**
 **  Load a picture and display it on the screen (full screen),
 **  changing the colormap and so on..
 **
@@ -323,72 +265,6 @@ void DisplayPicture(const char* name)
 		(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
 
 	FreeGraphic(g);
-}
-
-/**
-**  Color cycle.
-*/
-// FIXME: cpu intensive to go through the whole PaletteList
-void ColorCycle(void)
-{
-	SDL_Color* palcolors;
-	SDL_Color colors[256];
-	int waterlen;
-	int iconlen;
-	int buildinglen;
-
-	waterlen = (ColorWaterCycleEnd - ColorWaterCycleStart) * sizeof(SDL_Color);
-	iconlen = (ColorIconCycleEnd - ColorIconCycleStart) * sizeof(SDL_Color);
-	buildinglen = (ColorBuildingCycleEnd - ColorBuildingCycleStart) * sizeof(SDL_Color);
-
-	if (ColorCycleAll) {
-		PaletteLink* curlink;
-
-		curlink = PaletteList;
-		while (curlink != NULL) {
-			palcolors = curlink->Surface->format->palette->colors;
-
-			memcpy(colors, palcolors, sizeof(colors));
-
-			memcpy(colors + ColorWaterCycleStart,
-				palcolors + ColorWaterCycleStart + 1, waterlen);
-			colors[ColorWaterCycleEnd] = palcolors[ColorWaterCycleStart];
-
-			memcpy(colors + ColorIconCycleStart,
-				palcolors + ColorIconCycleStart + 1, iconlen);
-			colors[ColorIconCycleEnd] = palcolors[ColorIconCycleStart];
-
-			memcpy(colors + ColorBuildingCycleStart,
-				palcolors + ColorBuildingCycleStart + 1, buildinglen);
-			colors[ColorBuildingCycleEnd] = palcolors[ColorBuildingCycleStart];
-
-			SDL_SetPalette(curlink->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-				colors, 0, 256);
-			curlink = curlink->Next;
-		}
-	} else if (TheMap.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		//
-		//  Color cycle tileset palette
-		//
-		palcolors = TheMap.TileGraphic->Surface->format->palette->colors;
-
-		memcpy(colors, palcolors, sizeof(colors));
-
-		memcpy(colors + ColorWaterCycleStart,
-			palcolors + ColorWaterCycleStart + 1, waterlen);
-		colors[ColorWaterCycleEnd] = palcolors[ColorWaterCycleStart];
-
-		memcpy(colors + ColorIconCycleStart,
-			palcolors + ColorIconCycleStart + 1, iconlen);
-		colors[ColorIconCycleEnd] = palcolors[ColorIconCycleStart];
-
-		memcpy(colors + ColorBuildingCycleStart,
-			palcolors + ColorBuildingCycleStart + 1, buildinglen);
-		colors[ColorBuildingCycleEnd] = palcolors[ColorBuildingCycleStart];
-
-		SDL_SetPalette(TheMap.TileGraphic->Surface, SDL_LOGPAL | SDL_PHYSPAL,
-			colors, 0, 256);
-	}
 }
 
 /*----------------------------------------------------------------------------
