@@ -333,8 +333,7 @@ void InitUnit(Unit* unit, UnitType* type)
 
 	// On Load, Some units don't have Still animation, eg Deadbody
 	if (unit->Type->Animations && !unit->Type->Animations->Still) {
-		// FIXME: wrong frame
-		unit->Frame = type->NumDirections / 2 + 1 - 1;
+		unit->Frame = type->StillFrame;
 	}
 
 	if (UnitTypeVar.NumberVariable) {

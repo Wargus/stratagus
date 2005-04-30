@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include "stratagus.h"
 #include "cdaudio.h"
+#include "util.h"
 
 #ifdef USE_CDAUDIO
 
