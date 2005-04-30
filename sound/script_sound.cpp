@@ -128,9 +128,7 @@ static int CclMakeSound(lua_State* l)
 	int j;
 	LuaUserData* data;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	c_name = LuaToString(l, 1);
 	if (lua_isstring(l, 2)) {
@@ -178,9 +176,7 @@ static int CclMakeSoundGroup(lua_State* l)
 	SoundId second;
 	LuaUserData* data;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 
 	c_name = LuaToString(l, 1);
 
@@ -207,9 +203,7 @@ static int CclMapSound(lua_State* l)
 {
 	const char* sound_name;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	sound_name = LuaToString(l, 1);
 	MapSound(sound_name, CclGetSoundId(l));
 	lua_pushvalue(l, 2);
@@ -225,9 +219,7 @@ static int CclPlaySound(lua_State* l)
 {
 	SoundId id;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	id = CclGetSoundId(l);
 	PlayGameSound(id, MaxSampleVolume);
@@ -332,9 +324,7 @@ static int CclDefineGameSounds(lua_State* l)
 */
 static int CclSetSoundVolume(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	SetGlobalVolume(LuaToNumber(l, 1));
 	return 0;
@@ -347,9 +337,7 @@ static int CclSetSoundVolume(lua_State* l)
 */
 static int CclSetMusicVolume(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	SetMusicVolume(LuaToNumber(l, 1));
 	return 0;
@@ -366,9 +354,7 @@ static int CclSetCdMode(lua_State* l)
 	CDModes cdmode;
 	const char* mode;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	mode = LuaToString(l, 1);
 
 	if (!strcmp(mode, "all")) {
@@ -525,10 +511,7 @@ static int CclDefinePlaySections(lua_State* l)
 */
 static int CclSoundOff(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 0);
 	SoundOff = 1;
 	return 0;
 }
@@ -542,9 +525,7 @@ static int CclSoundOff(lua_State* l)
 */
 static int CclSoundOn(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	if (SoundEnabled() && !SoundOff) {
 		lua_pushboolean(l, 1);
@@ -562,10 +543,7 @@ static int CclSoundOn(lua_State* l)
 */
 static int CclMusicOff(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 0);
 	StopMusic();
 	MusicOff = 1;
 	return 0;
@@ -580,10 +558,7 @@ static int CclMusicOff(lua_State* l)
 */
 static int CclMusicOn(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 0);
 	MusicOff = 0;
 	return 0;
 }
@@ -597,9 +572,7 @@ static int CclSetGlobalSoundRange(lua_State* l)
 {
 	int d;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 
 	// FIXME: check for errors
 	d = LuaToNumber(l, 1);
@@ -619,9 +592,7 @@ static int CclSetSoundRange(lua_State* l) {
 	int tmp;
 	SoundId id;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 
 	tmp = LuaToNumber(l, 2);
 	if (tmp < 0) {
@@ -644,12 +615,8 @@ static int CclSetSoundRange(lua_State* l) {
 */
 static int CclPlayMusic(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	PlayMusic(LuaToString(l, 1));
-
 	return 0;
 }
 
@@ -660,12 +627,8 @@ static int CclPlayMusic(lua_State* l)
 */
 static int CclPlayFile(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	PlaySoundFile(LuaToString(l, 1));
-
 	return 0;
 }
 
@@ -676,12 +639,8 @@ static int CclPlayFile(lua_State* l)
 */
 static int CclStopMusic(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 0);
 	StopMusic();
-
 	return 0;
 }
 

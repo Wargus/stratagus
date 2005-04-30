@@ -258,9 +258,7 @@ static int CclStratagusMap(lua_State* l)
 */
 static int CclRevealMap(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	if (CclInConfigFile) {
 		FlagRevealMap = 1;
 	} else {
@@ -277,9 +275,7 @@ static int CclRevealMap(lua_State* l)
 */
 static int CclCenterMap(lua_State* l)
 {
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	ViewportCenterViewpoint(TheUI.SelectedViewport,
 		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
 
@@ -295,9 +291,7 @@ static int CclSetStartView(lua_State* l)
 {
 	int p;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect arguments");
-	}
+	LuaCheckArgs(l, 3);
 	p = LuaToNumber(l, 1);
 	Players[p].StartX = LuaToNumber(l, 2);
 	Players[p].StartY = LuaToNumber(l, 3);
@@ -318,9 +312,7 @@ static int CclShowMapLocation(lua_State* l)
 	// Put a unit on map, use its properties, except for
 	// what is listed below
 
-	if (lua_gettop(l) != 4) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 4);
 	unitname = LuaToString(l, 5);
 	target = MakeUnit(UnitTypeByIdent(unitname), ThisPlayer);
 	if (target != NoUnitP) {
@@ -345,9 +337,7 @@ static int CclShowMapLocation(lua_State* l)
 */
 static int CclSetDefaultMap(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	strncpy(DefaultMap, LuaToString(l, 1), sizeof(DefaultMap) - 1);
 	return 0;
 }
@@ -359,9 +349,7 @@ static int CclSetDefaultMap(lua_State* l)
 */
 static int CclSetFogOfWar(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	TheMap.NoFogOfWar = !LuaToBoolean(l, 1);
 	if (!CclInConfigFile) {
 		UpdateFogOfWarChange();
@@ -376,9 +364,7 @@ static int CclSetFogOfWar(lua_State* l)
 */
 static int CclSetMinimapTerrain(lua_State* l)
 {
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	MinimapWithTerrain = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -392,9 +378,7 @@ static int CclSetFogOfWarOpacity(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
 		PrintFunction();
@@ -422,9 +406,7 @@ static int CclSetForestRegeneration(lua_State* l)
 	int i;
 	int old;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 1);
 	i = LuaToNumber(l, 1);
 	if (i < 0 || i > 255) {
 		PrintFunction();
@@ -451,10 +433,7 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 {
 	const char* FogGraphicFile;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
 	if (TheMap.FogGraphic) {
 		FreeGraphic(TheMap.FogGraphic);
@@ -474,10 +453,7 @@ static int CclSelectTileset(lua_State* l)
 	const char* tileset;
 	int i;
 
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-
+	LuaCheckArgs(l, 1);
 	tileset = LuaToString(l, 1);
 
 	free(TheMap.TerrainName);
@@ -506,9 +482,7 @@ static int CclSetTile(lua_State* l)
 	int h;
 	Tileset *tileset;
 
-	if (lua_gettop(l) != 3) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 3);
 	
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);

@@ -1456,9 +1456,7 @@ static int CclDefineRanks(lua_State* l)
 	int len;
 	int args;
 
-	if (lua_gettop(l) != 2) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 2);
 	rank = NULL;
 	race = LuaToString(l, 1);
 	for (i = 0; i < PlayerRaces.Count; ++i) {
