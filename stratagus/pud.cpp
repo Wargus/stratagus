@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name pud.c - The pud. */
 //
-// (c) Copyright 1998-2003 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -139,8 +139,7 @@ static void ConvertMTXM(const unsigned short* mtxm,int width,int height
 				map->TerrainName);
 	} else {
 		DebugPrint("Unknown terrain!\n");
-		// FIXME: don't use TilesetSummer
-		tileset = Tilesets[TilesetSummer];
+		tileset = Tilesets[0];
 	}
 	ctab = tileset->Table;
 

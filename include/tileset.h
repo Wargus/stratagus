@@ -320,15 +320,6 @@ typedef struct _tileset_ {
 	hashtable(char*, 128) ItemsHash;/// Items hash table
 } Tileset;
 
-/// @todo this #define's should be removed
-
-enum _tileset_nr_ {
-	TilesetSummer,      /// Reference number for summer
-	TilesetWinter,      /// Reference number for winter
-	TilesetWasteland,   /// Reference number for wasteland
-	TilesetSwamp,       /// Reference number for swamp
-};
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
