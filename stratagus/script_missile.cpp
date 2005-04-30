@@ -10,7 +10,7 @@
 //
 /**@name script_missile.c - The missile-type ccl functions. */
 //
-//      (c) Copyright 2002-2003 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -68,7 +68,8 @@ static int CclDefineMissileType(lua_State* l)
 	unsigned i;
 	char* file;
 
-	if (lua_gettop(l) != 2 || !lua_istable(l, 2)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
 

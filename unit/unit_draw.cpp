@@ -406,9 +406,7 @@ static int CclManaSprite(lua_State* l)
 {
 	char buffer[1024]; // lua equivalent.
 
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 5);
 
 	sprintf(buffer, "DefineSprites({Name = \"%s\", File = \"%s\", "
 		"Offset = {%i, %i}, Size = {%i, %i}})",
@@ -431,9 +429,7 @@ static int CclHealthSprite(lua_State* l)
 {
 	char buffer[1024]; // lua equivalent.
 
-	if (lua_gettop(l) != 5) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 5);
 
 	sprintf(buffer, "DefineSprites({Name = \"%s\", File = \"%s\", "
 		"Offset = {%i, %i}, Size = {%i, %i}})",
@@ -463,9 +459,7 @@ static int CclShowHealthDot(lua_State* l)
 	const char* lua_equiv = "DefineDecorations({Index = \"HitPoints\", HideNeutral = true, CenterX = true,"
 		"OffsetPercent = {50, 100}, Method = {\"sprite\", {\"sprite-health\"}}})";
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowHealthDot, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -488,9 +482,7 @@ static int CclShowHealthHorizontal(lua_State* l)
 		"OffsetPercent = {50, 100}, Offset = {0, -7},"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1}}})";
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowHealthHorizontal, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -513,9 +505,7 @@ static int CclShowHealthVertical(lua_State* l)
 		"Offset = {-7, 0},"
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})";
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowHealthVertical, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -565,9 +555,7 @@ static int CclShowManaDot(lua_State* l)
 		"OffsetPercent = {50, 100},Method = {\"sprite\", {\"sprite-mana\"}}})\n";
 
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowManaDot, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -604,9 +592,7 @@ static int CclShowManaHorizontal(lua_State* l)
 		"OffsetPercent = {50, 100}, Method = {\"bar\", {Width = 3, BorderSize = 1}}})\n";
 
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowManaHorizontal, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -642,9 +628,7 @@ static int CclShowManaVertical(lua_State* l)
 		"Method = {\"bar\", {Width = 3, BorderSize = 1, Orientation = \"vertical\"}}})\n";
 
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 
 	DebugPrint("instead of ShowManaVertical, you should write instead :\n%s\n" _C_ lua_equiv);
 
@@ -673,9 +657,7 @@ static int CclShowEnergySelected(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
 		UnitTypeVar.DecoVar[i].ShowOnlySelected = 1;
 	}
@@ -691,9 +673,7 @@ static int CclShowFull(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 1;
 	}
@@ -709,9 +689,7 @@ static int CclShowNoFull(lua_State* l)
 {
 	int i;
 
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
 		UnitTypeVar.DecoVar[i].ShowWhenMax = 0;
 	}
@@ -725,9 +703,7 @@ static int CclShowNoFull(lua_State* l)
 */
 static int CclDecorationOnTop(lua_State* l)
 {
-	if (lua_gettop(l) != 0) {
-		LuaError(l, "incorrect argument");
-	}
+	LuaCheckArgs(l, 0);
 	// FIXME: not implemented
 	return 0;
 }
