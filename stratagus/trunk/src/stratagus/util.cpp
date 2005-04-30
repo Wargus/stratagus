@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "stratagus.h"
 #include "util.h"
