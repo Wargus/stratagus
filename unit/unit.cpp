@@ -1432,7 +1432,7 @@ int UnitVisibleOnMap(const Unit* unit, const Player* player)
 		return 0;
 	}
 
-	return !unit->Removed && !unit->Destroyed && unit->HP &&
+	return !unit->Removed && !unit->Destroyed &&
 		unit->Orders->Action != UnitActionDie && UnitVisible(unit, player);
 }
 
@@ -2901,7 +2901,6 @@ void LetUnitDie(Unit* unit)
 {
 	UnitType* type;
 
-	unit->HP = 0;
 	unit->Moving = 0;
 	unit->TTL = 0;
 	unit->Anim.Unbreakable = 0;

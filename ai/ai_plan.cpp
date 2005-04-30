@@ -10,7 +10,7 @@
 //
 /**@name ai_plan.c - AI planning functions. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ static Unit* EnemyOnMapTile(const Unit* source, int tx, int ty)
 		// if (UnitUnusable(unit)) can't attack constructions
 		// FIXME: did SelectUnitsOnTile already filter this?
 		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value || !unit->HP ||
+		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value ||
 				//(!UnitVisible(unit, source->Player)) ||
 				unit->Orders[0].Action == UnitActionDie) {
 			continue;
