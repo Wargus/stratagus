@@ -1597,7 +1597,7 @@ void MissileActionFire(Missile* missile)
 		MissileType* fire;
 
 		missile->SpriteFrame = 0;
-		f = (100 * unit->HP) / unit->Stats->Variables[HP_INDEX].Max;
+		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
 		fire = MissileBurningBuilding(f);
 		if (!fire) {
 			missile->TTL = 0;
@@ -1871,9 +1871,9 @@ void MissileActionDeathCoil(Missile* missile)
 		if (missile->TargetUnit && missile->TargetUnit->Orders[0].Action == UnitActionDie)  {
 			HitUnit(source, missile->TargetUnit, missile->Damage);
 			if (source->Orders[0].Action != UnitActionDie) {
-				source->HP += missile->Damage;
-				if (source->HP > source->Stats->Variables[HP_INDEX].Max) {
-					source->HP = source->Stats->Variables[HP_INDEX].Max;
+				source->Variable[HP_INDEX].Value += missile->Damage;
+				if (source->Variable[HP_INDEX].Value > source->Variable[HP_INDEX].Max) {
+					source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max;
 				}
 			}
 		} else {
@@ -1907,9 +1907,9 @@ void MissileActionDeathCoil(Missile* missile)
 					}
 				}
 				if (source->Orders[0].Action != UnitActionDie) {
-					source->HP += missile->Damage;
-					if (source->HP > source->Stats->Variables[HP_INDEX].Max) {
-						source->HP = source->Stats->Variables[HP_INDEX].Max;
+					source->Variable[HP_INDEX].Value += missile->Damage;
+					if (source->Variable[HP_INDEX].Value > source->Variable[HP_INDEX].Max) {
+						source->Variable[HP_INDEX].Value = source->Variable[HP_INDEX].Max;
 					}
 				}
 			}

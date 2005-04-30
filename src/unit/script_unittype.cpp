@@ -1914,17 +1914,13 @@ void UpdateUnitVariables(const Unit* unit)
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX) {
 			continue;
 		}
 		unit->Variable[i].Value = 0;
 		unit->Variable[i].Max = 0;
 		unit->Variable[i].Enable = 1;
 	}
-
-	// HP.
-	unit->Variable[HP_INDEX].Value = unit->HP;
-	unit->Variable[HP_INDEX].Max = unit->Stats->Variables[HP_INDEX].Max;
 
 	// Build
 	if (unit->Orders[0].Action == UnitActionBuilt) {

@@ -437,7 +437,6 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 	unit->Stats = &type->Stats[unit->Player->Player];
 	unit->Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
-		unit->HP = unit->Stats->Variables[HP_INDEX].Max;
 		if (UnitTypeVar.NumberVariable) {
 			Assert(unit->Variable);
 			Assert(unit->Stats->Variables);
@@ -3032,7 +3031,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		return;
 	}
 
-	Assert(damage != 0 && target->HP != 0 && !target->Type->Vanishes);
+	Assert(damage != 0 && target->Orders[0].Action != UnitActionDie && !target->Type->Vanishes);
 
 	if (target->Variable[UNHOLYARMOR_INDEX].Value > 0 || target->Type->Indestructible) {
 		// vladi: units with active UnholyArmour are invulnerable
@@ -3046,7 +3045,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {
-			damage = target->HP;
+			damage = target->Variable[HP_INDEX].Value;
 		}
 		if (target->Player == ThisPlayer) {
 			damage = 0;
@@ -3088,7 +3087,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		}
 	}
 
-	if (target->HP <= damage) { // unit is killed or destroyed
+	if (target->Variable[HP_INDEX].Value <= damage) { // unit is killed or destroyed
 		//  increase scores of the attacker, but not if attacking it's own units.
 		//  prevents cheating by killing your own units.
 		if (attacker && IsEnemy(target->Player, attacker)) {
@@ -3099,7 +3098,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 				attacker->Player->TotalKills++;
 			}
 			if (UseHPForXp) {
-				attacker->Variable[XP_INDEX].Max += target->HP;
+				attacker->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
 			} else {
 				attacker->Variable[XP_INDEX].Max += target->Type->Points;
 			}
@@ -3111,7 +3110,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		LetUnitDie(target);
 		return;
 	}
-	target->HP -= damage;
+	target->Variable[HP_INDEX].Value -= damage;
 	if (UseHPForXp && attacker && IsEnemy(target->Player, attacker)) {
 		attacker->Variable[XP_INDEX].Value += damage;
 		attacker->Variable[XP_INDEX].Max += damage;
@@ -3122,7 +3121,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 	// Only worker types can capture.
 	// Still possible to destroy building if not careful (too many attackers)
 	if (EnableBuildingCapture && attacker &&
-			type->Building && target->HP <= damage * 3 &&
+			type->Building && target->Variable[HP_INDEX].Value <= damage * 3 &&
 			IsEnemy(attacker->Player, target) &&
 			attacker->Type->RepairRange) {
 		ChangeUnitOwner(target, attacker->Player);
@@ -3157,7 +3156,7 @@ void HitUnit(Unit* attacker, Unit* target, int damage)
 		Missile* missile;
 		MissileType* fire;
 
-		f = (100 * target->HP) / target->Stats->Variables[HP_INDEX].Max;
+		f = (100 * target->Variable[HP_INDEX].Value) / target->Variable[HP_INDEX].Max;
 		fire = MissileBurningBuilding(f);
 		if (fire) {
 			missile = MakeMissile(fire,
@@ -3714,8 +3713,6 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	if (unit->Active) {
 		CLprintf(file, " \"active\",");
 	}
-	CLprintf(file, " \"hp\", %d,", unit->HP);
-
 	CLprintf(file, "\"ttl\", %lu, ", unit->TTL);
 
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
