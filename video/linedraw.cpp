@@ -11,7 +11,7 @@
 /**@name linedraw.c - The general linedraw functions. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
-//                              Jimmy Salmon, Nehal Mistry
+//                                 Jimmy Salmon, and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1435,11 +1435,18 @@ void VideoDrawRectangle(Uint32 color, int x, int y, int w, int h)
 	VideoGetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
-	glBegin(GL_LINE_LOOP);
+	glBegin(GL_LINES);
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
-	glVertex2i(x + w, y + h);
+
+	glVertex2i(x + w - 1, y);
+	glVertex2i(x + w - 1, y + h);
+
+	glVertex2i(x + w, y + h - 1);
+	glVertex2i(x, y + h - 1);
+
 	glVertex2i(x, y + h);
+	glVertex2i(x, y);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }

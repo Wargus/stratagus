@@ -268,14 +268,8 @@ void DrawMapArea(void)
 			color = ColorBlack;
 		}
 
-		// -
-		VideoDrawLine(color, vp->X, vp->Y, vp->EndX, vp->Y);
-		// |
-		VideoDrawLine(color, vp->X, vp->Y + 1, vp->X, vp->EndY);
-		// -
-		VideoDrawLine(color, vp->X + 1, vp->EndY, vp->EndX - 1, vp->EndY);
-		// |
-		VideoDrawLine(color, vp->EndX, vp->Y + 1, vp->EndX, vp->EndY);
+		VideoDrawRectangle(color, vp->X, vp->Y, vp->EndX - vp->X + 1,
+			vp->EndY - vp->Y + 1);
 	}
 }
 
