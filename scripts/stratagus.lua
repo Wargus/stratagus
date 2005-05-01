@@ -45,9 +45,6 @@ SetTitleScreens(
 --	Enter your menu music.
 -- SetMenuMusic("music/title.ogg")
 
---  Enable color cyclings.
-SetColorCycleAll(false)
-
 --	Set the game name
 SetGameName("bos")
 
