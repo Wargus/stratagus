@@ -136,10 +136,3 @@ DefineUpgradeWcNames(
 	"upgrade-ddril", "upgrade-pdril", "upgrade-void")
 
 DefineAiWcNames("ai-rush", "ai-passive")
-
-SetColorWaterCycleStart(254)
-SetColorWaterCycleEnd(254)
-SetColorIconCycleStart(254)
-SetColorIconCycleEnd(254)
-SetColorBuildingCycleStart(254)
-SetColorBuildingCycleEnd(254)
