@@ -101,7 +101,7 @@ if test "x$SDLCONFIG" = "x"; then
     echo "*** sdl-config not found";
     exit 1;
 fi
-VIDEO_CFLAGS="-DUSE_SDL `$SDLCONFIG --cflags`"
+VIDEO_CFLAGS="`$SDLCONFIG --cflags`"
 if test "$enable_static" != "yes"; then
     VIDEO_LIBS="`$SDLCONFIG --libs`"
 else
