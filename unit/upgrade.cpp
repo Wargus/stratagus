@@ -59,6 +59,7 @@
 
 static void AllowUnitId(Player* player, int id, int units);
 static void AllowUpgradeId(Player* player, int id, char af);
+int TransformUnitIntoType(Unit* unit, UnitType* newtype);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -955,34 +956,7 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 		//  Convert already existing units to this type.
 		//
 		if (unit->Type == src) {
-			unit->Variable[HP_INDEX].Value += dst->Stats[player->Player].Variables[HP_INDEX].Max -
-				unit->Variable[HP_INDEX].Max;
-			// don't have such unit now
-			player->UnitTypesCount[src->Slot]--;
-			// UnMark the Unit sight for conversion if on map
-			if ((unit->CurrentSightRange != dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max ||
-					src->TileWidth != dst->TileWidth ||
-					src->TileHeight != dst->TileHeight) && !unit->Removed) {
-				MapUnmarkUnitSight(unit);
-			}
-			unit->Type = dst;
-			unit->Stats = &dst->Stats[player->Player];
-			// and we have new one...
-
-			UpdateForNewUnit(unit, 1);
-			if (dst->CanCastSpell) {
-				unit->Variable[MANA_INDEX].Max = unit->Stats->Variables[MANA_INDEX].Max;
-				unit->Variable[MANA_INDEX].Value = MAGIC_FOR_NEW_UNITS * unit->Variable[MANA_INDEX].Max / 100;
-				unit->AutoCastSpell = malloc(SpellTypeCount);
-				memset(unit->AutoCastSpell, 0, SpellTypeCount);
-			}
-			if ((unit->CurrentSightRange != dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max ||
-					src->TileWidth != dst->TileWidth ||
-					src->TileHeight != dst->TileHeight) && !unit->Removed) {
-				unit->CurrentSightRange = dst->Stats[player->Player].Variables[SIGHTRANGE_INDEX].Max;
-				MapMarkUnitSight(unit);
-			}
-			player->UnitTypesCount[dst->Slot]++;
+			TransformUnitIntoType(unit, dst);
 		//
 		//  Convert trained units to this type.
 		//  FIXME: what about buildings?

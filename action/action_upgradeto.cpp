@@ -45,6 +45,7 @@
 #include "ai.h"
 #include "interface.h"
 #include "map.h"
+#include "spells.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -58,12 +59,11 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
+int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 {
 	Player* player;
 	UnitType* oldtype;
 	const UnitStats* newstats;
-	const UnitStats* oldstats;
 	int x;
 	int y;
 	int i;
@@ -95,21 +95,9 @@ static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	//  Update Possible sight range change
 	unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 
-	unit->Orders[0].Action = UnitActionStill;
-	unit->SubAction = 0;
-
 	//  adjust Variables with percent.
 	newstats = &newtype->Stats[player->Player];
-	oldstats = &oldtype->Stats[player->Player];
 
-	unit->Variable[HP_INDEX].Value = newstats->Variables[HP_INDEX].Max *
-		unit->Variable[HP_INDEX].Value / oldstats->Variables[HP_INDEX].Max;
-	if (oldstats->Variables[MANA_INDEX].Max) {
-		unit->Variable[MANA_INDEX].Value = newstats->Variables[MANA_INDEX].Max *
-			unit->Variable[MANA_INDEX].Value / oldstats->Variables[MANA_INDEX].Max;
-	} else {
-		unit->Variable[MANA_INDEX].Value = newstats->Variables[MANA_INDEX].Max;
-	}
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		if (unit->Variable[i].Max) {
 			unit->Variable[i].Value = newstats->Variables[i].Max *
@@ -119,10 +107,16 @@ static int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 		}
 		unit->Variable[i].Max = newstats->Variables[i].Max;
 		unit->Variable[i].Increase = newstats->Variables[i].Increase;
+		unit->Variable[i].Enable = newstats->Variables[i].Enable;
 	}
 
 	unit->Type = newtype;
 	unit->Stats = &newtype->Stats[player->Player];
+
+	if (newtype->CanCastSpell && !unit->AutoCastSpell) {
+		unit->AutoCastSpell = calloc(SpellTypeCount, sizeof(*unit->AutoCastSpell));
+	}
+
 	UpdateForNewUnit(unit, 1);
 	PlaceUnit(unit, x, y);
 	RestoreSelection();
@@ -173,10 +167,12 @@ void HandleActionUpgradeTo(Unit* unit)
 		return;
 	}
 
+	unit->Orders[0].Action = UnitActionStill;
+	unit->SubAction = unit->State = 0;
+
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		NotifyPlayer(player, NotifyGreen, unit->X, unit->Y,
 			"Upgrade to %s canceled", newtype->Name);
-		// FIXME :
 		return ;
 	}
 	//  Warn AI.
