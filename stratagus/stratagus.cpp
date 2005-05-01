@@ -197,9 +197,7 @@ extern int getopt(int argc, char* const* argv, const char* opt);
 #undef Button
 #endif
 
-#ifdef USE_SDL
 #include "SDL.h"
-#endif
 
 #include "stratagus.h"
 #include "video.h"
@@ -750,9 +748,6 @@ int main(int argc, char** argv)
 #endif
 #ifdef USE_BZ2LIB
 		"BZ2LIB "
-#endif
-#ifdef USE_SDL
-		"SDL "
 #endif
 #ifdef USE_SDLCD
 		"SDL-CD "

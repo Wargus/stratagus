@@ -36,8 +36,6 @@
 
 #include "stratagus.h"
 
-#ifdef USE_SDL // {
-
 #ifdef DEBUG
 #include <signal.h>
 #endif
@@ -883,7 +881,5 @@ void ToggleFullScreen(void)
 
 	VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 }
-
-#endif // } USE_SDL
 
 //@}
