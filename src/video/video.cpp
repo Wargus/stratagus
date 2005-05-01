@@ -94,9 +94,7 @@
 
 #include "intern_video.h"
 
-#ifdef USE_SDL
 #include "SDL.h"
-#endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -254,9 +252,7 @@ void PopClipping(void)
 */
 void VideoLockScreen(void)
 {
-#ifdef USE_SDL
 	SdlLockScreen();
-#endif
 }
 
 /**
@@ -264,9 +260,7 @@ void VideoLockScreen(void)
 */
 void VideoUnlockScreen(void)
 {
-#ifdef USE_SDL
 	SdlUnlockScreen();
-#endif
 }
 
 /**
@@ -282,9 +276,7 @@ void VideoClearScreen(void)
 */
 unsigned long GetTicks(void)
 {
-#ifdef USE_SDL
 	return SDL_GetTicks();
-#endif
 }
 
 /**
@@ -292,10 +284,7 @@ unsigned long GetTicks(void)
 */
 void InitVideo(void)
 {
-#ifdef USE_SDL
 	InitVideoSdl();
-#endif
-
 	InitLineDraw();
 }
 

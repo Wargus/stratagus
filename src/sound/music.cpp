@@ -40,9 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef USE_SDL
 #include "SDL.h"
-#endif
 
 #include "iolib.h"
 #include "iocompat.h"
@@ -86,14 +84,10 @@ void StopMusic(void)
 	if (PlayingMusic) {
 		PlayingMusic = 0; // Callback!
 		if (MusicSample) {
-#ifdef USE_SDL
 			SDL_LockAudio();
-#endif
 			SoundFree(MusicSample);
 			MusicSample = NULL;
-#ifdef USE_SDL
 			SDL_UnlockAudio();
-#endif
 			return;
 		}
 	}

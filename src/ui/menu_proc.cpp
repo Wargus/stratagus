@@ -65,10 +65,8 @@
 #include "script.h"
 #include "campaign.h"
 
-#ifdef USE_SDL
 #include "SDL.h"
 #include "SDL_syswm.h"
-#endif
 
 /*----------------------------------------------------------------------------
 -- Variables
