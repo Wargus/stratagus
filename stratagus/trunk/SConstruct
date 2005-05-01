@@ -242,7 +242,7 @@ def AutoConfigure(env):
      print 'Did not find required lua library. Exiting!'
      Exit(1)
   # stratagus defines for required libraries
-  env.Append(CPPDEFINES = Split("USE_ZLIB USE_SDL"))
+  env.Append(CPPDEFINES = Split("USE_ZLIB"))
 
   # Check for optional libraries #
   if conf.CheckLib('bz2'):
