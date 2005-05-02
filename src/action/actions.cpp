@@ -92,10 +92,9 @@ int UnitShowAnimation(Unit* unit, const Animation* anim)
 	// Changing animations
 	if (unit->Anim.CurrAnim != anim) {
 	// Assert fails when transforming unit (upgrade-to).
-	//	Assert(!unit->Anim.Unbreakable);
+		Assert(!unit->Anim.Unbreakable);
 		unit->Anim.Anim = unit->Anim.CurrAnim = anim;
 		unit->Anim.Wait = 0;
-		unit->Anim.Unbreakable = 0;
 	}
 
 	// Currently waiting
