@@ -1588,7 +1588,7 @@ void MissileActionFire(Missile* missile)
 
 	unit = missile->SourceUnit;
 	missile->Wait = missile->Type->Sleep;
-	if (unit->Destoryed || unit->Orders[0].Action == UnitActionDie) {
+	if (unit->Destroyed || unit->Orders[0].Action == UnitActionDie) {
 		missile->TTL = 0;
 		return;
 	}
