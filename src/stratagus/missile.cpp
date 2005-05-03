@@ -1588,7 +1588,7 @@ void MissileActionFire(Missile* missile)
 
 	unit = missile->SourceUnit;
 	missile->Wait = missile->Type->Sleep;
-	if (unit->Orders[0].Action == UnitActionDie) {
+	if (unit->Destoryed || unit->Orders[0].Action == UnitActionDie) {
 		missile->TTL = 0;
 		return;
 	}
@@ -1868,7 +1868,8 @@ void MissileActionDeathCoil(Missile* missile)
 		//
 		// Target unit still exists and casted on a special target
 		//
-		if (missile->TargetUnit && missile->TargetUnit->Orders[0].Action == UnitActionDie)  {
+		if (missile->TargetUnit && !missile->TargetUnit->Destroyed &&
+			missile->TargetUnit->Orders[0].Action == UnitActionDie)  {
 			HitUnit(source, missile->TargetUnit, missile->Damage);
 			if (source->Orders[0].Action != UnitActionDie) {
 				source->Variable[HP_INDEX].Value += missile->Damage;
