@@ -104,12 +104,12 @@ void CancelBuildingMode(void)
 */
 void DoRightButton(int sx, int sy)
 {
-	int i;                  // iterator for selected units.
-	int x;                  // coordonate in tile.
-	int y;                  // coordonate in tile.
+	int i;
+	int x;                  // coordinate in tile.
+	int y;                  // coordinate in tile.
 	Unit* dest;             // unit under the cursor if any.
 	Unit* unit;             // one of the selected unit.
-	UnitType* type;         // type of unit.
+	UnitType* type;
 	int action;             // default action for unit.
 	int acknowledged;       // to play sound
 	int flush;              // append command to old command.
@@ -271,7 +271,7 @@ void DoRightButton(int sx, int sy)
 								ForestOnMap(x, y) &&
 								((unit->CurrentResource != res) ||
 									(unit->ResourcesHeld < type->ResInfo[res]->ResourceCapacity))) {
-							SendCommandResourceLoc(unit, x, y,flush);
+							SendCommandResourceLoc(unit, x, y, flush);
 							break;
 						}
 					}
@@ -397,7 +397,7 @@ void DoRightButton(int sx, int sy)
 			}
 		}
 
-		// Manaage new order.
+		// Manage new order.
 		if (!CanMove(unit)) {
 			// Go and harvest from a unit
 			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest &&
@@ -408,7 +408,7 @@ void DoRightButton(int sx, int sy)
 			}
 			// FIXME: support harvesting more types of terrain.
 			if (IsMapFieldExplored(unit->Player, x, y) && ForestOnMap(x, y)) {
-				SendCommandResourceLoc(unit, x, y,flush);
+				SendCommandResourceLoc(unit, x, y, flush);
 				break;
 			}
 		}
@@ -891,13 +891,9 @@ static int SendRepair(int sx, int sy)
 	int i;
 	Unit* unit;
 	Unit* dest;
-	int x;
-	int y;
 	int ret;
 
 	ret = 0;
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
 
 	// Check if the dest is repairable!
 	if ((dest = UnitUnderCursor) && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max &&
@@ -906,7 +902,8 @@ static int SendRepair(int sx, int sy)
 		for (i = 0; i < NumSelected; ++i) {
 			unit = Selected[i];
 			if (unit->Type->RepairRange) {
-				SendCommandRepair(unit, x, y, dest, !(KeyModifiers & ModifierShift));
+				SendCommandRepair(unit, sx / TileSizeX, sy / TileSizeY, dest,
+					!(KeyModifiers & ModifierShift));
 				ret = 1;
 			} else {
 				DebugPrint("Non-worker repairs\n");
@@ -985,16 +982,12 @@ static int SendMove(int sx, int sy)
 */
 static int SendAttack(int sx, int sy)
 {
-	int i;       // iterator for selected unit.
+	int i;
 	Unit* unit;  // selected unit.
 	Unit* dest;  // unit under cursor if any.
-	int x;       // X tile.
-	int y;       // Y tile.
-	int ret;     // result.
+	int ret;
 
 	ret = 0;
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
 	dest = UnitUnderCursor;
 	if (dest && dest->Type->Decoration) {
 		dest = NULL;
@@ -1006,12 +999,14 @@ static int SendAttack(int sx, int sy)
 				if (dest) {
 					dest->Blink = 4;
 				}
-				SendCommandAttack(unit, x, y, dest, !(KeyModifiers & ModifierShift));
+				SendCommandAttack(unit, sx / TileSizeX, sy / TileSizeY, dest,
+					!(KeyModifiers & ModifierShift));
 				ret = 1;
 			}
 		} else {
 			if (CanMove(unit)) {
-				SendCommandMove(unit, x, y, !(KeyModifiers & ModifierShift));
+				SendCommandMove(unit, sx / TileSizeX, sy / TileSizeY,
+					!(KeyModifiers & ModifierShift));
 				ret = 1;
 			}
 		}
@@ -1184,14 +1179,9 @@ static int SendSpellCast(int sx, int sy)
 	int i;
 	Unit* unit;
 	Unit* dest;
-	int x;
-	int y;
 	int ret;
 
 	ret = 0;
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
-
 	dest = UnitUnderCursor;
 
 	/* NOTE: Vladi:
@@ -1213,8 +1203,8 @@ static int SendSpellCast(int sx, int sy)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		SendCommandSpellCast(unit, x, y, dest, CursorValue,
-			!(KeyModifiers & ModifierShift));
+		SendCommandSpellCast(unit, sx / TileSizeX, sy / TileSizeY, dest,
+			CursorValue, !(KeyModifiers & ModifierShift));
 		ret = 1;
 	}
 	return ret;
@@ -1229,13 +1219,9 @@ static int SendSpellCast(int sx, int sy)
 static void SendCommand(int sx, int sy)
 {
 	int i;
-	int x;
-	int y;
 	int ret;
 
 	ret = 0;
-	x = sx / TileSizeX;
-	y = sy / TileSizeY;
 	CurrentButtonLevel = 0;
 	UpdateButtonPanel();
 	switch (CursorAction) {
@@ -1954,6 +1940,8 @@ void UIHandleButtonUp(unsigned button)
 
 /**
 **  Get pie menu under the cursor
+**
+**  @return  Index of the pie menu under the cursor or -1 for none
 */
 static int GetPieUnderCursor(void)
 {
