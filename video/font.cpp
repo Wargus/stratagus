@@ -84,9 +84,6 @@ static FontColorMapping* ReverseTextColor; /// Reverse text color
 static char* DefaultNormalColorIndex;      /// Default normal color index
 static char* DefaultReverseColorIndex;     /// Default reverse color index
 
-	/// Draw character with current video depth.
-static void VideoDrawChar(const Graphic*, int, int, int, int, int, int);
-
 #ifdef USE_OPENGL
 static Graphic** FontColorGraphics[MaxFonts];   /// Font color graphics
 #endif
