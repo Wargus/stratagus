@@ -25,6 +25,7 @@
 
 import os
 import sys
+import glob
 from stat import *
 
 ccflags = "-fsigned-char"
@@ -48,126 +49,14 @@ env = Environment() # for an unknown reason Environment(options=opts) doesnt wor
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
 
-sources = Split("""
-build/ai/ai.c
-build/ai/ai_magic.c
-build/ai/ai_plan.c
-build/ai/ai_force.c
-build/ai/ai_resource.c
-build/ai/script_ai.c
-build/ai/ai_building.c
-build/ui/ui.c
-build/ui/interface.c
-build/ui/botpanel.c
-build/ui/menu_proc.c
-build/ui/menus.c
-build/ui/mouse.c
-build/ui/button_checks.c
-build/ui/script_ui.c
-build/ui/icons.c
-build/ui/mainscr.c
-build/map/tileset.c
-build/map/map.c
-build/map/map_draw.c
-build/map/map_save.c
-build/map/minimap.c
-build/map/script_map.c
-build/map/map_wall.c
-build/map/map_radar.c
-build/map/map_fog.c
-build/map/script_tileset.c
-build/beos/beos.c
-build/game/trigger.c
-build/game/savegame.c
-build/game/campaign.c
-build/game/game.c
-build/game/loadgame.c
-build/game/intro.c
-build/unit/script_unit.c
-build/unit/upgrade.c
-build/unit/unittype.c
-build/unit/depend.c
-build/unit/unit_draw.c
-build/unit/unit_find.c
-build/unit/unit.c
-build/unit/script_unittype.c
-build/unit/unit_cache.c
-build/stratagus/script_missile.c
-build/stratagus/pud.c
-build/stratagus/script_spell.c
-build/stratagus/spells.c
-build/stratagus/mainloop.c
-build/stratagus/missile.c
-build/stratagus/construct.c
-build/stratagus/groups.c
-build/stratagus/script_player.c
-build/stratagus/selection.c
-build/stratagus/script.c
-build/stratagus/stratagus.c
-build/stratagus/util.c
-build/stratagus/player.c
-build/stratagus/iolib.c
-build/sound/sound_server.c
-build/sound/mad.c
-build/sound/ogg.c
-build/sound/wav.c
-build/sound/script_sound.c
-build/sound/sdl_audio.c
-build/sound/sound.c
-build/sound/cdda.c
-build/sound/flac.c
-build/sound/mikmod.c
-build/sound/music.c
-build/sound/unitsound.c
-build/sound/libcda.c
-build/sound/sound_id.c
-build/sound/cdaudio.c
-build/video/linedraw.c
-build/video/mng.c
-build/video/png.c
-build/video/sdl.c
-build/video/sprite.c
-build/video/cursor.c
-build/video/font.c
-build/video/movie.c
-build/video/graphic.c
-build/video/video.c
-build/action/action_build.c
-build/action/action_research.c
-build/action/command.c
-build/action/action_attack.c
-build/action/action_repair.c
-build/action/action_returngoods.c
-build/action/action_stand.c
-build/action/action_still.c
-build/action/action_unload.c
-build/action/action_upgradeto.c
-build/action/action_follow.c
-build/action/action_train.c
-build/action/action_patrol.c
-build/action/action_spellcast.c
-build/action/action_die.c
-build/action/actions.c
-build/action/action_resource.c
-build/action/action_board.c
-build/action/action_move.c
-build/editor/editor.c
-build/editor/edmap.c
-build/editor/script_editor.c
-build/editor/editloop.c
-build/pathfinder/pathfinder.c
-build/pathfinder/splitter_debug.c
-build/pathfinder/splitter_zoneset.c
-build/pathfinder/splitter_lowlevel.c
-build/pathfinder/splitter.c
-build/pathfinder/astar.c
-build/pathfinder/script_pathfinder.c
-build/network/commands.c
-build/network/master.c
-build/network/network.c
-build/network/lowlevel.c
-build/network/netconnect.c
-""")
+sources = []
+sourceDirs = Split("action ai editor game map network pathfinder sound stratagus ui unit video")
+for d in sourceDirs:
+  sources.append(glob.glob('src/' + d + '/*.c'))
+sources = Flatten(sources)
+targetsources = []
+for s in sources:
+  targetsources.append('build' + s[3:])
 
 sourcesMetaserver = Split("""
  build/metaserver/cmd.c   
@@ -286,7 +175,7 @@ if not os.path.exists('config.h'):
     open('config.h', 'wt').close()
 
 # Targets
-Default(env.Program('stratagus', sources))
+Default(env.Program('stratagus', targetsources))
 env.Program('metaserver', sourcesMetaserver)
 
 
