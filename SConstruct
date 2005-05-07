@@ -49,22 +49,20 @@ env = Environment() # for an unknown reason Environment(options=opts) doesnt wor
 opts.Update(env) # Needed as Environment(options=opts) doesnt seem to work
 Help(opts.GenerateHelpText(env))
 
-sources = []
-sourceDirs = Split("action ai editor game map network pathfinder sound stratagus ui unit video")
-for d in sourceDirs:
-  sources.append(glob.glob('src/' + d + '/*.c'))
-sources = Flatten(sources)
-targetsources = []
-for s in sources:
-  targetsources.append('build' + s[3:])
+def globSources(sourceDirs):
+  sources = []
+  sourceDirs = Split(sourceDirs)
+  for d in sourceDirs:
+    sources.append(glob.glob('src/' + d + '/*.c'))
+  sources = Flatten(sources)
+  targetsources = []
+  for s in sources:
+    targetsources.append('build' + s[3:])
+  return targetsources
 
-sourcesMetaserver = Split("""
- build/metaserver/cmd.c   
- build/metaserver/netdriver.c
- build/metaserver/main.c  
- build/metaserver/query.c
- build/network/lowlevel.c
-""")
+sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video")
+sourcesMetaserver = globSources("metaserver")
+sourcesMetaserver.append("build/network/lowlevel.c")
 
 def CheckOpenGL(env, conf):
   opengl = {}
@@ -146,7 +144,7 @@ def AutoConfigure(env):
      env.Append(CPPDEFINES = 'USE_MIKMOD')
   if conf.CheckLib('mad'):
      env.Append(CPPDEFINES = 'USE_MAD')
-  if conf.CheckLib('flac'):
+  if conf.CheckLib('FLAC'):
      env.Append(CPPDEFINES = 'USE_FLAC')
   if env['opengl']:
      CheckOpenGL(env, conf)
@@ -175,7 +173,7 @@ if not os.path.exists('config.h'):
     open('config.h', 'wt').close()
 
 # Targets
-Default(env.Program('stratagus', targetsources))
+Default(env.Program('stratagus', sourcesEngine))
 env.Program('metaserver', sourcesMetaserver)
 
 
