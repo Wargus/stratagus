@@ -150,14 +150,6 @@ static Clip* ClipsGarbage;               /// garbage-list of available clips
 	*/
 int VideoDepth;
 
-	/**
-	**  Architecture-dependant videomemory. Set by InitVideoXXX.
-	**  FIXME: need a new function to set it, see #ifdef SDL code
-	**  @see InitVideo @see InitVideoSdl
-	**  @see VMemType
-	*/
-SDL_Surface* TheScreen;
-
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
 int SkipFrames; /// Skip this frames
 
