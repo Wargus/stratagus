@@ -1904,7 +1904,7 @@ void UpdateUnitVariables(const Unit* unit)
 	type = unit->Type;
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == LEVEL_INDEX || i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
+			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX) {
 			continue;
@@ -2051,7 +2051,7 @@ void InitDefinedVariables()
 {
 	const char* var[NVARALREADYDEFINED] = {"HitPoints", "Build", "Mana", "Transport",
 		"Research", "Training", "UpgradeTo", "GiveResource", "CarryResource",
-		"Xp", "Level", "Kill", "Supply", "Demand", "Armor", "SightRange",
+		"Xp", "Kill", "Supply", "Demand", "Armor", "SightRange",
 		"AttackRange", "PiercingDamage", "BasicDamage", "PosX", "PosY", "RadarRange",
 		"RadarJammerRange", "AutoRepairRange", "Bloodlust", "Haste", "Slow", "Invisible",
 		"UnholyArmor", "Slot"

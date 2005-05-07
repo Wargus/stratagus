@@ -167,12 +167,6 @@ void UpdateStats(int reset)
 				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
 				}
-				if (type->Building) {
-					stats->Variables[LEVEL_INDEX].Value = 0; // Disables level display
-				} else {
-					stats->Variables[LEVEL_INDEX].Value = 1;
-					stats->Variables[LEVEL_INDEX].Max = 1;
-				}
 			}
 		}
 
