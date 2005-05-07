@@ -103,7 +103,7 @@ static int LookupSight(const Player* player, int tx, int ty)
 	for (i = 0; i < player->TotalNumUnits; ++i) {
 		unit = player->Units[i];
 		range = unit->CurrentSightRange;
-		mapdistance = MapDistanceToUnit(tx,ty,unit);
+		mapdistance = MapDistanceToUnit(tx, ty, unit);
 		if (mapdistance <= range) {
 			++visiblecount;
 		}
@@ -456,13 +456,13 @@ void UpdateFogOfWarChange(void)
 --  Draw fog solid
 ----------------------------------------------------------------------------*/
 
-#ifndef USE_OPENGL
 /**
 **  Draw only fog of war
 **
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
+#ifndef USE_OPENGL
 void VideoDrawOnlyFog(int x, int y)
 {
 	int oldx;
@@ -486,27 +486,11 @@ void VideoDrawOnlyFog(int x, int y)
 
 	SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
 }
-
 #else
-/**
-**  Draw only fog of war
-**
-**  @param x  X position into video memory
-**  @param y  Y position into video memory
-*/
 void VideoDrawOnlyFog(int x, int y)
 {
-	int oldx;
-	int oldy;
-	int w;
-	int h;
-
-	oldx = x;
-	oldy = y;
-	w = TileSizeX;
-	h = TileSizeY;
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoFillRectangle(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity), x, y, w, h);
+	VideoFillRectangleClip(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity),
+		x, y, TileSizeX, TileSizeY);
 }
 #endif
 
