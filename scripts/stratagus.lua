@@ -90,10 +90,6 @@ SetShowTips(true)
 --	Enable XP to add more damage to attacks?
 SetXPDamage(true)
 
---	Edit this to enable/disable extended features???
---	We should remove this junk.
-extensions = true
-
 --	Edit this to enable/disable the training queues.
 SetTrainingQueue(true)
 
