@@ -264,22 +264,6 @@ int OrcWallOnMap(int tx, int ty)
 }
 
 /**
-**  Forest on map tile. Checking version.
-**
-**  @param tx  X map tile position.
-**  @param ty  Y map tile position.
-**
-**  @return    True if forest, false otherwise.
-*/
-int CheckedForestOnMap(int tx, int ty)
-{
-	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
-		return 0;
-	}
-	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldForest;
-}
-
-/**
 **  Forest on map tile.
 **
 **  @param tx  X map tile position.
@@ -289,14 +273,8 @@ int CheckedForestOnMap(int tx, int ty)
 */
 int ForestOnMap(int tx, int ty)
 {
-#ifdef DEBUG
-	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
-		// FIXME: must cleanup calling function !
-		fprintf(stderr, "Used x %d, y %d\n", tx, ty);
-		abort();
-		return 0;
-	}
-#endif
+	Assert(tx >= 0 && ty >= 0 && tx < TheMap.Info.MapWidth &&
+		ty < TheMap.Info.MapHeight);
 
 	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldForest;
 }
@@ -311,14 +289,8 @@ int ForestOnMap(int tx, int ty)
 */
 int RockOnMap(int tx, int ty)
 {
-#ifdef DEBUG
-	if (tx < 0 || ty < 0 || tx >= TheMap.Info.MapWidth || ty >= TheMap.Info.MapHeight) {
-		// FIXME: must cleanup calling function !
-		fprintf(stderr, "Used x %d, y %d\n", tx, ty);
-		abort();
-		return 0;
-	}
-#endif
+	Assert(tx >= 0 && ty >= 0 && tx < TheMap.Info.MapWidth &&
+		ty < TheMap.Info.MapHeight);
 
 	return TheMap.Fields[tx + ty * TheMap.Info.MapWidth].Flags & MapFieldRocks;
 }
@@ -425,16 +397,16 @@ void FreeMapInfo(MapInfo* info)
 
 /**
 **  Alocate and initialise map table
-**/
+*/
 void CreateMap(int width, int height) 
 {
 	if (!TheMap.Fields) {
-		TheMap.Fields=calloc(width * height, sizeof(*TheMap.Fields));
+		TheMap.Fields = calloc(width * height, sizeof(*TheMap.Fields));
 		if (!TheMap.Fields) {
 			perror("calloc()");
 			ExitFatal(-1);
 		}
-		TheMap.Visible[0]=calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		if (!TheMap.Visible[0]) {
 			perror("calloc()");
 			ExitFatal(-1);
@@ -495,12 +467,12 @@ int MapIsSeenTile(unsigned short type, int x, int y)
 }
 
 /**
-** Correct the seen wood field, depending on the surrounding.
+**  Correct the seen wood field, depending on the surrounding.
 **
-** @param type  type fo tile to update
-** @param seen  1 if updating seen value, 0 for real
-** @param x     Map X tile-position.
-** @param y     Map Y tile-position.
+**  @param type  type fo tile to update
+**  @param seen  1 if updating seen value, 0 for real
+**  @param x     Map X tile-position.
+**  @param y     Map Y tile-position.
 */
 void MapFixTile(unsigned short type, int seen, int x, int y)
 {
@@ -684,11 +656,11 @@ void MapFixNeighbors(unsigned short type, int seen, int x, int y)
 }
 
 /**
-** Remove wood from the map.
+**  Remove wood from the map.
 **
-** @param type  TileType to clear
-** @param x     Map X tile-position.
-** @param y     Map Y tile-position.
+**  @param type  TileType to clear
+**  @param x     Map X tile-position.
+**  @param y     Map Y tile-position.
 */
 void MapClearTile(unsigned short type, unsigned x, unsigned y)
 {
@@ -729,12 +701,61 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 }
 
 /**
-** Regenerate forest.
+**  Regenerate forest.
+**
+**  @param x  X tile
+**  @param y  Y tile
 */
-void RegenerateForest(void)
+static void RegenerateForestTile(int x, int y)
 {
 	MapField* mf;
 	MapField* tmp;
+
+	mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
+	if (mf->Tile != TheMap.Tileset->RemovedTree) {
+		return;
+	}
+
+	//
+	//  Increment each value of no wood.
+	//  If grown up, place new wood.
+	//  FIXME: a better looking result would be fine
+	//    Allow general updates to any tiletype that regrows
+	//
+
+	if (mf->Value >= ForestRegeneration ||
+			++mf->Value == ForestRegeneration) {
+		if (y && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
+				  MapFieldLandUnit | MapFieldBuilding))) {
+			tmp = mf - TheMap.Info.MapWidth;
+			if (tmp->Tile == TheMap.Tileset->RemovedTree &&
+					tmp->Value >= ForestRegeneration &&
+					!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
+						  MapFieldLandUnit | MapFieldBuilding))) {
+				DebugPrint("Real place wood\n");
+				tmp->Tile = TheMap.Tileset->TopOneTree;
+				tmp->Value = 0;
+				tmp->Flags |= MapFieldForest | MapFieldUnpassable;
+
+				mf->Tile = TheMap.Tileset->BotOneTree;
+				mf->Value = 0;
+				mf->Flags |= MapFieldForest | MapFieldUnpassable;
+				if (IsMapFieldVisible(ThisPlayer, x, y)) {
+					MapMarkSeenTile(x, y);
+				}
+				if (IsMapFieldVisible(ThisPlayer, x, y - 1)) {
+					MapMarkSeenTile(x, y - 1);
+				}
+			}
+		}
+	}
+}
+
+/**
+**  Regenerate forest.
+*/
+void RegenerateForest(void)
+{
 	int x;
 	int y;
 
@@ -742,42 +763,9 @@ void RegenerateForest(void)
 		return;
 	}
 
-	//
-	//  Increment each value of no wood.
-	//  If gown up, place new wood.
-	//  FIXME: a better looking result would be fine
-	//    Allow general updates to any tiletype that regrows
-	for (x = 0; x < TheMap.Info.MapWidth; ++x) {
-		for (y = 0; y < TheMap.Info.MapHeight; ++y) {
-			mf = TheMap.Fields + x + y * TheMap.Info.MapWidth;
-			if (mf->Tile == TheMap.Tileset->RemovedTree) {
-				if (mf->Value >= ForestRegeneration ||
-						++mf->Value == ForestRegeneration) {
-					if (x && !(mf->Flags & (MapFieldWall | MapFieldUnpassable |
-							  MapFieldLandUnit | MapFieldBuilding))) {
-						tmp = mf - TheMap.Info.MapWidth;
-						if (tmp->Tile == TheMap.Tileset->RemovedTree &&
-								tmp->Value >= ForestRegeneration &&
-								!(tmp->Flags & (MapFieldWall | MapFieldUnpassable |
-									  MapFieldLandUnit | MapFieldBuilding))) {
-							DebugPrint("Real place wood\n");
-							tmp->Tile = TheMap.Tileset->TopOneTree;
-							tmp->Value = 0;
-							tmp->Flags |= MapFieldForest | MapFieldUnpassable;
-
-							mf->Tile = TheMap.Tileset->BotOneTree;
-							mf->Value = 0;
-							mf->Flags |= MapFieldForest | MapFieldUnpassable;
-							if (IsMapFieldVisible(ThisPlayer, x, y)) {
-								MapMarkSeenTile(x, y);
-							}
-							if (IsMapFieldVisible(ThisPlayer, x, y - 1)) {
-								MapMarkSeenTile(x, y - 1);
-							}
-						}
-					}
-				}
-			}
+	for (y = 0; y < TheMap.Info.MapHeight; ++y) {
+		for (x = 0; x < TheMap.Info.MapWidth; ++x) {
+			RegenerateForestTile(x, y);
 		}
 	}
 }

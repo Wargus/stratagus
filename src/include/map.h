@@ -431,8 +431,6 @@ extern int HumanWallOnMap(int x, int y);
 	/// Returns true, if orc wall on the map tile field
 extern int OrcWallOnMap(int x, int y);
 
-	/// Returns true, if forest on the map tile field with bounds check
-extern int CheckedForestOnMap(int x, int y);
 	/// Returns true, if forest on the map tile field
 extern int ForestOnMap(int x, int y);
 
