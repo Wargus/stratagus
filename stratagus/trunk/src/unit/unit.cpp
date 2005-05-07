@@ -608,7 +608,7 @@ void MapUnmarkUnitSight(Unit* unit)
 **  FIXME @todo manage differently unit inside with option.
 **  (no vision, min, host value, own value, bonus value, ...)
 */
-static void UpdateUnitSightRange(Unit* unit)
+void UpdateUnitSightRange(Unit* unit)
 {
 	Unit* unit_inside; // iterator on units inside unit.
 	int i;             // number of units inside to process.

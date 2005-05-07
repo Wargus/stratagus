@@ -58,6 +58,7 @@
 **  @param newtype  new type of the unit.
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
+**  @bug  Animation is not managed. (new (type) animation, unbreakable section).
 */
 int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 {
@@ -67,6 +68,7 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	int x;
 	int y;
 	int i;
+	Unit* container;
 
 	Assert(unit);
 	Assert(newtype);
@@ -78,12 +80,18 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	x = unit->X + (oldtype->TileWidth - newtype->TileWidth) / 2;
 	y = unit->Y + (oldtype->TileHeight - newtype->TileHeight) / 2;
 
-	SaveSelection();
-	RemoveUnit(unit, NULL);
-	if (!UnitTypeCanBeAt(newtype, x, y)) {
-		PlaceUnit(unit, unit->X, unit->Y);
-		RestoreSelection();
-		return 0;
+	container = unit->Container;
+	if (container) {
+		MapUnmarkUnitSight(unit);
+	} else {
+		SaveSelection();
+		RemoveUnit(unit, NULL);
+		if (!UnitTypeCanBeAt(newtype, x, y)) {
+			PlaceUnit(unit, unit->X, unit->Y);
+			RestoreSelection();
+			// FIXME unit is not modified, try later ?
+			return 0;
+		}
 	}
 	player = unit->Player;
 	player->UnitTypesCount[oldtype->Slot]--;
@@ -91,9 +99,6 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 
 	player->Demand += newtype->Demand - oldtype->Demand;
 	player->Supply += newtype->Supply - oldtype->Supply;
-
-	//  Update Possible sight range change
-	unit->CurrentSightRange = unit->Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	//  adjust Variables with percent.
 	newstats = &newtype->Stats[player->Player];
@@ -118,8 +123,14 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	}
 
 	UpdateForNewUnit(unit, 1);
-	PlaceUnit(unit, x, y);
-	RestoreSelection();
+	//  Update Possible sight range change
+	UpdateUnitSightRange(unit);
+	if (!container) {
+		PlaceUnit(unit, x, y);
+		RestoreSelection();
+	} else {
+		MapMarkUnitSight(unit);
+	}
 	//
 	// Update possible changed buttons.
 	//
