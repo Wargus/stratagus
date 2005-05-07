@@ -766,6 +766,8 @@ extern void RefsDecrease(Unit* unit);
 void MarkUnitFieldFlags(const Unit* unit);
 	///  Unmark the field with the FieldFlags.
 void UnmarkUnitFieldFlags(const Unit* unit);
+	/// Update unit->CurrentSightRange.
+void UpdateUnitSightRange(Unit* unit);
 	/// Release an unit
 extern void ReleaseUnit(Unit* unit);
 	/// Initialize unit structure with default values
