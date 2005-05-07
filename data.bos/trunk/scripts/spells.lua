@@ -30,6 +30,7 @@
 
 DefineBoolFlags("organic")
 DefineVariables("Speed")
+DefineVariables("Level")
 
 DefineSpell("spell-healing",
 	"showname", "Bandage",

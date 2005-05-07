@@ -64,22 +64,27 @@ DefineUpgrade("upgrade-void", "icon", "icon-void",
 
 
 DefineModifier("upgrade-expl2",
+	{"Level", 1},
 	{"piercing-damage", 5},
 	{"apply-to", "unit-grenadier"})
 
 DefineModifier("upgrade-tdril",
+	{"Level", 1},
 --	{"harvesting", 10}
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 DefineModifier("upgrade-ddril",
+	{"Level", 1},
 --	{"harvesting", 20}
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 DefineModifier("upgrade-pdril",
+	{"Level", 1},
 --	{"harvesting", 30}
 	{"apply-to", "unit-engineer"}, {"apply-to", "unit-harvester"})
 
 DefineModifier("upgrade-void",
+	{"Level",1},
 	{"piercing-damage", 10},
 	{"apply-to", "unit-bazoo"}, {"apply-to", "unit-assault"})
 
