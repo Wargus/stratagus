@@ -1095,11 +1095,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 					}
 				}
 			}
-			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Value++;
-			UnitTypes[z]->Stats[pn].Variables[LEVEL_INDEX].Max++;
 			if (um->ConvertTo) {
-				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Value++;
-				um->ConvertTo->Stats[pn].Variables[LEVEL_INDEX].Max++;
 				ConvertUnitTypeTo(player,UnitTypes[z], um->ConvertTo);
 			}
 		}
