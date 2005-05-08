@@ -43,11 +43,12 @@ DefineSpell("spell-healing",
 		"organic", "only",
 		"Building", "false",
 		"self", "false",
-		"max-hp-percent", 100},
+		"HitPoints", {MaxValuePercent = 100}},
 	"sound-when-cast", "medic-attack",
 	"autocast", {
 		"range", 6,
-		"condition", {"alliance", "only", "max-hp-percent", 90 }}
+		"condition", {"alliance", "only", 
+		"HitPoints", {MaxValuePercent = 90}}}
 )
 
 DefineSpell("spell-nuke",
