@@ -849,17 +849,25 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		if (condition->Variable[i].MinValue >= unit->Variable[i].Value) {
 			return 0;
 		}
+		if (condition->Variable[i].MaxValue != -1 &&
+			condition->Variable[i].MaxValue <= unit->Variable[i].Value) {
+			return 0;
+		}
+
 		if (condition->Variable[i].MinMax >= unit->Variable[i].Max) {
 			return 0;
 		}
 
+		if (!unit->Variable[i].Max) {
+			continue;
+		}
 	// Percent
 		if (condition->Variable[i].MinValuePercent * unit->Variable[i].Max
-			> 100 * unit->Variable[i].Value) {
+			>= 100 * unit->Variable[i].Value) {
 			return 0;
 		}
 		if (condition->Variable[i].MaxValuePercent * unit->Variable[i].Max
-			< 100 * unit->Variable[i].Value) {
+			<= 100 * unit->Variable[i].Value) {
 			return 0;
 		}
 	}
@@ -892,41 +900,6 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		if ((condition->TargetSelf == CONDITION_ONLY) ^ (caster == target)) {
 			return 0;
 		}
-	}
-	//
-	// Check vitals now.
-	//
-	if (condition->MinHpPercent * target->Variable[HP_INDEX].Max / 100 > target->Variable[HP_INDEX].Value) {
-		return 0;
-	}
-	if (condition->MaxHpPercent * target->Variable[HP_INDEX].Max / 100 <= target->Variable[HP_INDEX].Value) {
-		return 0;
-	}
-	if (target->Type->CanCastSpell) {
-		if (condition->MinManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 > target->Variable[MANA_INDEX].Value) {
-			return 0;
-		}
-		if (condition->MaxManaPercent * target->Stats->Variables[MANA_INDEX].Max / 100 < target->Variable[MANA_INDEX].Value) {
-			return 0;
-		}
-	}
-	// Check for slow/haste stuff
-	// This should be used mostly for ai, if you want to keep casting
-	// slow to no effect I can't see why should we stop you.
-	if (condition->MaxSlowTicks < target->Variable[SLOW_INDEX].Value) {
-		return 0;
-	}
-	if (condition->MaxHasteTicks < target->Variable[HASTE_INDEX].Value) {
-		return 0;
-	}
-	if (condition->MaxBloodlustTicks < target->Variable[BLOODLUST_INDEX].Value) {
-		return 0;
-	}
-	if (condition->MaxInvisibilityTicks < target->Variable[INVISIBLE_INDEX].Value) {
-		return 0;
-	}
-	if (condition->MaxInvincibilityTicks < target->Variable[UNHOLYARMOR_INDEX].Value) {
-		return 0;
 	}
 	return 1;
 }
