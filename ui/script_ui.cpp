@@ -1769,17 +1769,13 @@ static ConditionPanel *ParseConditionPanel(lua_State* l)
 			if (i != UnitTypeVar.NumberBoolFlag) { // key is a flag
 				continue;
 			}
-			for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
-				if (!strcmp(key, UnitTypeVar.VariableName[i])) {
-					if (!condition->Variables) {
-						condition->Variables = calloc(UnitTypeVar.NumberVariable,
-								sizeof(*condition->Variables));
-					}
-					condition->Variables[i] = Ccl2Condition(l, LuaToString(l, -1));
-					break;
+			i = GetVariableIndex(key);
+			if (i != -1) {
+				if (!condition->Variables) {
+					condition->Variables = calloc(UnitTypeVar.NumberVariable,
+							sizeof(*condition->Variables));
 				}
-			}
-			if (i != UnitTypeVar.NumberVariable) { // key is a variable.
+				condition->Variables[i] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
 			LuaError(l, "'%s' invalid for Condition in DefinePanels" _C_ key);
