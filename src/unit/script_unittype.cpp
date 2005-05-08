@@ -1669,13 +1669,9 @@ static int CclDefineVariables(lua_State* l)
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		str = LuaToString(l, j + 1);
-		for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-			if (!strcmp(str, UnitTypeVar.VariableName[i])) {
-				DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
-				break;
-			}
-		}
-		if (i == UnitTypeVar.NumberVariable) { // new variable.
+		i = GetVariableIndex(str);
+		if (i == -1) { // new variable.
+			i = UnitTypeVar.NumberVariable;
 			UnitTypeVar.VariableName = realloc(UnitTypeVar.VariableName,
 				(i + 1) * sizeof(*UnitTypeVar.VariableName));
 			UnitTypeVar.VariableName[i] = strdup(str);
@@ -1683,6 +1679,8 @@ static int CclDefineVariables(lua_State* l)
 				(i + 1) * sizeof(*UnitTypeVar.Variable));
 			memset(UnitTypeVar.Variable + i, 0, sizeof (*UnitTypeVar.Variable));
 			UnitTypeVar.NumberVariable++;
+		} else {
+			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
 		}
 		if (!lua_istable(l, j + 2)) { // No change => default value.
 			continue;
