@@ -10,7 +10,7 @@
 //
 /**@name spells.h - The Spells. */
 //
-//      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
+//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -219,32 +219,17 @@ typedef struct ConditionInfo {
 	char TargetSelf;        /// Target is the same as the caster.
 	char* BoolFlag;         /// User defined boolean flag.
 
-	//
-	//  Conditions related to vitals:
-	//
-	int MinHpPercent;       /// Target must have more hp than that.
-	int MaxHpPercent;       /// Target must have less hp than that. Used for heal-like spells.
-	int MinManaPercent;     /// Target must have more mana than that. Mana drain spells?
-	int MaxManaPercent;     /// Target must have less mana than that. Mana fountains?
-	//
-	//  Conditions related to buffs:
-	//
-	int MaxHasteTicks;          /// Target must less haste ticks left.
-	int MaxSlowTicks;           /// Target must less slow ticks left.
-	int MaxBloodlustTicks;      /// Target must less bloodlust ticks left.
-	int MaxInvisibilityTicks;   /// Target must less bloodlust ticks left.
-	int MaxInvincibilityTicks;  /// Target must less bloodlust ticks left.
-
 	struct {
 		char Enable;                /// Target is 'user defined variable'.
 
 		int MinValue;               /// Target must have more Value than that.
+		int MaxValue;               /// Target must have less Value than that.
 		int MinMax;                 /// Target must have more Max than that.
 		int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
 		int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
 
 		char ConditionApplyOnCaster; /// true if these condition are for caster.
-		// FIXME : More (increase, MaxValue, MaxMax) ?
+		// FIXME : More (increase, MaxMax) ?
 
 	} *Variable;
 	//

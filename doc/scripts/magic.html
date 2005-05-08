@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2004 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -278,50 +278,21 @@ Here are the supported parameters:
     <dd>There is no parameter called variable. You can however use variables defined
     by <a href="unittype.html#DefineVariables">DefineVariables()</a>
     <dl>
-      <dt>Enable, "true" or "false" or "only" </dt>
+      <dt>Enable = "true" or "false" or "only"</dt>
       <dd>variable is enable ?</dd>
-      <dt>MinValue, number </dt>
-      <dd>minimal value allowed</dd>
-      <dt>MinMax, number </dt>
-      <dd>minimal maximum-value (the field Max of the variable) allowed</dd>
-      <dt>MinValuePercent, number </dt>
-      <dd>minimal value allowed in percent with Max value</dd>
-      <dt>MaxValuePercent, number </dt>
-      <dd>maximal value allowed in percent with Max value</dd>
-      <dt>ConditionApplyOnCaster, boolean </dt>
-      <dd>if true, check caster instead of target</dd>
+      <dt>MinValue = number </dt>
+      <dd>minimal value allowed.</dd>
+      <dt>MaxValue = number </dt>
+      <dd>maximal value allowed.</dd>
+      <dt>MinMax = number</dt>
+      <dd>minimal maximum-value (the field Max of the variable) allowed.</dd>
+      <dt>MinValuePercent = number</dt>
+      <dd>minimal value allowed in percent with Max value.</dd>
+      <dt>MaxValuePercent = number</dt>
+      <dd>maximal value allowed in percent with Max value.</dd>
+      <dt>ConditionApplyOnCaster = boolean</dt>
+      <dd>if true, check caster instead of target.</dd>
     </dl></dd>
-    <dt>"min-hp-percent", number</dt>
-    <dd>Minimum hp percent of the target. If not specified the minimum is around -10
-    You can use this to avoid casting damage spells on enemies that are dying anyway.
-    </dd>
-    <dt>"max-hp-percent", number</dt>
-    <dd>Maximum hp percent of the target. If not specified the maximum is around 1000.
-    For instance you can use this to avoid healing units that are not injured.
-    </dd>
-    <dt>"min-mana-percent", number</dt>
-    <dd>Minimum mana percent of the target. If not specified the minimum is around -10
-    You can use this to avoid spells like mana drain on units that are empty.
-    </dd>
-    <dt>"max-mana-percent", number</dt>
-    <dd>Maximum mana percent of the target. If not specified the maximum is around 1000
-    For instance you can use this to avoid restoring mana to units that are full.
-    </dd>
-    <dt>"max-slow-ticks", number</dt>
-    <dd>Followed by a number, to avoid casting slow on an unit that is already slowed down.
-    </dd>
-    <dt>"max-haste-ticks", number</dt>
-    <dd>Followed by a number, to avoid casting haste on an unit that is already hasted.
-    </dd>
-    <dt>"max-bloodlust-ticks", number</dt>
-    <dd>Followed by a number, to avoid casting bloodlust on an unit that already has it.
-    </dd>
-    <dt>"max-invisibility-ticks", number</dt>
-    <dd>Followed by a number, to avoid casting invisibility on an unit that already has it.
-    </dd>
-    <dt>"max-invincibility-ticks", number</dt>
-    <dd>Followed by a number, to avoid casting invincibility on an unit that already has it.
-    </dd>
 </dl>
 </dd>
 <dt>"autocast", {flag, value}</dt>
@@ -542,16 +513,17 @@ DefineSpell("spell-healing",
 	"manacost", 6,
 	"range", 6,
 	"target", "unit",
-	"action", {{"adjust-vitals", "hit-points", 1}},
+	"action", {{"adjust-vitals", "hit-points", 1},
+		{"spawn-missile", "missile", "missile-heal-effect",
+			"start-point", {"base", "target"}}},
 	"condition", {
-	    "organic", "only",  -- it is a defined-flag
-	    "building", "false",
-	    "max-hp-percent", 100
+		"organic", "only",  -- it is a defined-flag
+		"Building", "false",
+		"HitPoints", {MaxValuePercent = 100}
 	},
 	"depend-upgrade", "upgrade-healing",
 	"sound-when-cast", "healing",
-	"missile-when-cast", "missile-heal-effect",
-	"autocast", {"range", 6, "condition", {"alliance", "only", "max-hp-percent", 100}}
+	"autocast", {"range", 6, "condition", {"alliance", "only", "HitPoints", {MaxValuePercent = 90}}}
 )
 </pre>
 
