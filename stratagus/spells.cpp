@@ -487,7 +487,7 @@ int CastAdjustVariable(Unit* caster, const SpellType* spell,
 	index = action->Data.AdjustVariable.Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
 	unit = (action->Data.AdjustVariable.TargetIsCaster) ? caster : target;
-	if (unit) {
+	if (!unit) {
 		return 0;
 	}
 	// Enable flag.
