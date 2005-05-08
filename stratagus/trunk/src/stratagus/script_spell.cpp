@@ -515,18 +515,9 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	condition->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof (*condition->BoolFlag));
 	condition->Variable = calloc(UnitTypeVar.NumberVariable, sizeof (*condition->Variable));
 	// Initialize min/max stuff to values with no effect.
-	condition->MinHpPercent = -10;
-	condition->MaxHpPercent = 1000;
-	condition->MinManaPercent = -10;
-	condition->MaxManaPercent = 1000;
-	//  Buffs too.
-	condition->MaxHasteTicks = 0xFFFFFFF;
-	condition->MaxSlowTicks = 0xFFFFFFF;
-	condition->MaxBloodlustTicks = 0xFFFFFFF;
-	condition->MaxInvisibilityTicks = 0xFFFFFFF;
-	condition->MaxInvincibilityTicks = 0xFFFFFFF;
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		condition->Variable[i].MinValue = -1;
+		condition->Variable[i].MaxValue = -1;
 		condition->Variable[i].MinMax = -1;
 		condition->Variable[i].MinValuePercent = -8;
 		condition->Variable[i].MaxValuePercent = 1024;
@@ -553,42 +544,6 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 			lua_rawgeti(l, -1, j + 1);
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1));
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "min-hp-percent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MinHpPercent = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-hp-percent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxHpPercent = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "min-mana-percent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MinManaPercent = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-mana-percent")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxManaPercent = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-slow-ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxSlowTicks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-haste-ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxHasteTicks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-bloodlust-ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxBloodlustTicks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-invisibility-ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxInvisibilityTicks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-		} else if (!strcmp(value, "max-invincibility-ticks")) {
-			lua_rawgeti(l, -1, j + 1);
-			condition->MaxInvincibilityTicks = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else {
 			for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 				if (!strcmp(value, UnitTypeVar.BoolFlagName[i])) {
@@ -614,6 +569,8 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 								condition->Variable[i].Enable = Ccl2Condition(l, LuaToString(l, -1));
 							} else if (!strcmp(key, "MinValue")) {
 								condition->Variable[i].MinValue = LuaToNumber(l, -1);
+							} else if (!strcmp(key, "MaxValue")) {
+								condition->Variable[i].MaxValue = LuaToNumber(l, -1);
 							} else if (!strcmp(key, "MinMax")) {
 								condition->Variable[i].MinMax = LuaToNumber(l, -1);
 							} else if (!strcmp(key, "MinValuePercent")) {
