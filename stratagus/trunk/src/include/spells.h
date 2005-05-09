@@ -130,15 +130,6 @@ struct _spell_action_type_ {
 		} SpawnPortal;
 
 		struct {
-			int HasteTicks;          /// Number of ticks to set Haste to.
-			int SlowTicks;           /// Number of ticks to set Slow to.
-			int BloodlustTicks;      /// Number of ticks to set Bloodlust to.
-			int InvisibilityTicks;   /// Number of ticks to set Invisibility to.
-			int InvincibilityTicks;  /// Number of ticks to set UnholyArmor to.
-#define BUFF_NOT_AFFECTED 0xC0FF33   /// Don't like the value? The value doesn't like you!
-		} AdjustBuffs;
-
-		struct {
 			int Enable;                 /// Value to affect to this field.
 			int Value;                  /// Value to affect to this field.
 			int Max;                    /// Value to affect to this field.
@@ -338,7 +329,6 @@ extern char Ccl2Condition(struct lua_State* l, const char* value);
 
 SpellFunc CastAreaAdjustVitals;
 SpellFunc CastAdjustVitals;
-SpellFunc CastAdjustBuffs;
 SpellFunc CastAdjustVariable;
 SpellFunc CastPolymorph;
 SpellFunc CastAreaBombardment;
