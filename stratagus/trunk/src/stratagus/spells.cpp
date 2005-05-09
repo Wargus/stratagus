@@ -479,47 +479,47 @@ int CastAdjustBuffs(Unit* caster, const SpellType* spell,
 int CastAdjustVariable(Unit* caster, const SpellType* spell,
 	const SpellActionType* action, Unit* target, int x, int y)
 {
-	int index;     // index of the variable.
+	int i;
 	Unit* unit;    // unit to modify.
 
 	Assert(action);
 
-	index = action->Data.AdjustVariable.Index;
-	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	unit = (action->Data.AdjustVariable.TargetIsCaster) ? caster : target;
-	if (!unit) {
-		return 0;
-	}
-	// Enable flag.
-	if (action->Data.AdjustVariable.ModifEnable) {
-		unit->Variable[index].Enable = action->Data.AdjustVariable.Enable;
-	}
-	unit->Variable[index].Enable ^= action->Data.AdjustVariable.InvertEnable;
+	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
+		unit = (action->Data.AdjustVariable[i].TargetIsCaster) ? caster : target;
+		if (!unit) {
+			continue;
+		}
+		// Enable flag.
+		if (action->Data.AdjustVariable[i].ModifEnable) {
+			unit->Variable[i].Enable = action->Data.AdjustVariable[i].Enable;
+		}
+		unit->Variable[i].Enable ^= action->Data.AdjustVariable[i].InvertEnable;
 
-	// Max field
-	if (action->Data.AdjustVariable.ModifMax) {
-		unit->Variable[index].Max = action->Data.AdjustVariable.Max;
-	}
-	unit->Variable[index].Max += action->Data.AdjustVariable.AddMax;
+		// Max field
+		if (action->Data.AdjustVariable[i].ModifMax) {
+			unit->Variable[i].Max = action->Data.AdjustVariable[i].Max;
+		}
+		unit->Variable[i].Max += action->Data.AdjustVariable[i].AddMax;
 
-	// Increase field
-	if (action->Data.AdjustVariable.ModifIncrease) {
-		unit->Variable[index].Increase = action->Data.AdjustVariable.Increase;
-	}
-	unit->Variable[index].Increase += action->Data.AdjustVariable.AddIncrease;
+		// Increase field
+		if (action->Data.AdjustVariable[i].ModifIncrease) {
+			unit->Variable[i].Increase = action->Data.AdjustVariable[i].Increase;
+		}
+		unit->Variable[i].Increase += action->Data.AdjustVariable[i].AddIncrease;
 
-	// Value field
-	if (action->Data.AdjustVariable.ModifValue) {
-		unit->Variable[index].Value = action->Data.AdjustVariable.Value;
-	}
-	unit->Variable[index].Value += action->Data.AdjustVariable.AddValue;
-	unit->Variable[index].Value += action->Data.AdjustVariable.IncreaseTime
-		* unit->Variable[index].Increase;
+		// Value field
+		if (action->Data.AdjustVariable[i].ModifValue) {
+			unit->Variable[i].Value = action->Data.AdjustVariable[i].Value;
+		}
+		unit->Variable[i].Value += action->Data.AdjustVariable[i].AddValue;
+		unit->Variable[i].Value += action->Data.AdjustVariable[i].IncreaseTime
+			* unit->Variable[i].Increase;
 
-	if (unit->Variable[index].Value <= 0) {
-		unit->Variable[index].Value = 0;
-	} else if (unit->Variable[index].Value > unit->Variable[index].Max) {
-		unit->Variable[index].Value = unit->Variable[index].Max;
+		if (unit->Variable[i].Value <= 0) {
+			unit->Variable[i].Value = 0;
+		} else if (unit->Variable[i].Value > unit->Variable[i].Max) {
+			unit->Variable[i].Value = unit->Variable[i].Max;
+		}
 	}
 	return 0;
 }
@@ -1231,6 +1231,9 @@ void CleanSpells(void)
 		act = spell->Action;
 		while (act) {
 			nextact = act->Next;
+			if (act->CastFunction == CastAdjustVariable) {
+				free(act->Data.AdjustVariable);
+			}
 			free(act);
 			act = nextact;
 		}

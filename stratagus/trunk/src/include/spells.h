@@ -139,8 +139,6 @@ struct _spell_action_type_ {
 		} AdjustBuffs;
 
 		struct {
-			int Index;                  /// index of the variable to modify.
-
 			int Enable;                 /// Value to affect to this field.
 			int Value;                  /// Value to affect to this field.
 			int Max;                    /// Value to affect to this field.
@@ -157,7 +155,7 @@ struct _spell_action_type_ {
 			int AddIncrease;            /// Add this value to this field.
 			int IncreaseTime;           /// How many time increase the Value field.
 			char TargetIsCaster;        /// true if the target is the caster.
-		} AdjustVariable;
+		} *AdjustVariable;
 
 		struct {
 			int HP;         /// Target HP gain.(can be negative)

@@ -264,56 +264,70 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 		}
 	} else if (!strcmp(value, "adjust-variable")) {
 		spellaction->CastFunction = CastAdjustVariable;
-		spellaction->Data.AdjustVariable.Index = -1; // Invalid index
 		lua_rawgeti(l, -1, j + 1);
-		lua_pushnil(l);
-		Assert(lua_istable(l, -2));
-		while (lua_next(l, -2)) {
-			const char *key;
-
-			key = LuaToString(l, -2);
-			if (!strcmp(key, "Index")) {
-				spellaction->Data.AdjustVariable.Index = GetVariableIndex(LuaToString(l, -1));
-				if (spellaction->Data.AdjustVariable.Index == -1) {
-					LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -1));
-				}
-			} else if (!strcmp(key, "Enable")) {
-				spellaction->Data.AdjustVariable.Enable = LuaToBoolean(l, -1);
-				spellaction->Data.AdjustVariable.ModifEnable = 1;
-			} else if (!strcmp(key, "Value")) {
-				spellaction->Data.AdjustVariable.Value = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifValue = 1;
-			} else if (!strcmp(key, "Max")) {
-				spellaction->Data.AdjustVariable.Max = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifMax = 1;
-			} else if (!strcmp(key, "Increase")) {
-				spellaction->Data.AdjustVariable.Increase = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable.ModifIncrease = 1;
-			} else if (!strcmp(key, "InvertEnable")) {
-				spellaction->Data.AdjustVariable.InvertEnable = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "AddValue")) {
-				spellaction->Data.AdjustVariable.AddValue = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "AddMax")) {
-				spellaction->Data.AdjustVariable.AddMax = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "AddIncrease")) {
-				spellaction->Data.AdjustVariable.AddIncrease = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "IncreaseTime")) {
-				spellaction->Data.AdjustVariable.IncreaseTime = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "TargetIsCaster")) {
-				value = LuaToString(l, -1);
-				if (!strcmp(value, "caster")) {
-					spellaction->Data.AdjustVariable.TargetIsCaster = 1;
-				} else if (!strcmp(value, "target")) {
-					spellaction->Data.AdjustVariable.TargetIsCaster = 0;
-				} else { // Error
-					LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
-				}
-			} else { // Error
-				LuaError(l, "key '%s' not valid for adjustvariable" _C_ key);
-			}
-			lua_pop(l, 1); // Pop the value.
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "Table expected for adjust-variable.");
 		}
-		lua_pop(l, 1);
+		spellaction->Data.AdjustVariable = calloc(UnitTypeVar.NumberVariable, sizeof (*spellaction->Data.AdjustVariable));
+		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+			int i;
+
+			i = GetVariableIndex(LuaToString(l, -2));
+			if (i == -1) {
+				LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -2));
+			}
+			if (lua_isnumber(l, -1)) {
+				spellaction->Data.AdjustVariable[i].Enable = (LuaToNumber(l, -1) != 0);
+				spellaction->Data.AdjustVariable[i].ModifEnable = 1;
+				spellaction->Data.AdjustVariable[i].Value = LuaToNumber(l, -1);
+				spellaction->Data.AdjustVariable[i].ModifValue = 1;
+				spellaction->Data.AdjustVariable[i].Max = LuaToNumber(l, -1);
+				spellaction->Data.AdjustVariable[i].ModifMax = 1;
+			} else if (lua_istable(l, -1)) {
+				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+					const char *key;
+
+					key = LuaToString(l, -2);
+					if (!strcmp(key, "Enable")) {
+						spellaction->Data.AdjustVariable[i].Enable = LuaToBoolean(l, -1);
+						spellaction->Data.AdjustVariable[i].ModifEnable = 1;
+					} else if (!strcmp(key, "Value")) {
+						spellaction->Data.AdjustVariable[i].Value = LuaToNumber(l, -1);
+						spellaction->Data.AdjustVariable[i].ModifValue = 1;
+					} else if (!strcmp(key, "Max")) {
+						spellaction->Data.AdjustVariable[i].Max = LuaToNumber(l, -1);
+						spellaction->Data.AdjustVariable[i].ModifMax = 1;
+					} else if (!strcmp(key, "Increase")) {
+						spellaction->Data.AdjustVariable[i].Increase = LuaToNumber(l, -1);
+						spellaction->Data.AdjustVariable[i].ModifIncrease = 1;
+					} else if (!strcmp(key, "InvertEnable")) {
+						spellaction->Data.AdjustVariable[i].InvertEnable = LuaToBoolean(l, -1);
+					} else if (!strcmp(key, "AddValue")) {
+						spellaction->Data.AdjustVariable[i].AddValue = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "AddMax")) {
+						spellaction->Data.AdjustVariable[i].AddMax = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "AddIncrease")) {
+						spellaction->Data.AdjustVariable[i].AddIncrease = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "IncreaseTime")) {
+						spellaction->Data.AdjustVariable[i].IncreaseTime = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "TargetIsCaster")) {
+						value = LuaToString(l, -1);
+						if (!strcmp(value, "caster")) {
+							spellaction->Data.AdjustVariable[i].TargetIsCaster = 1;
+						} else if (!strcmp(value, "target")) {
+							spellaction->Data.AdjustVariable[i].TargetIsCaster = 0;
+						} else { // Error
+							LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
+						}
+					} else { // Error
+						LuaError(l, "key '%s' not valid for adjustvariable" _C_ key);
+					}
+				}
+			} else {
+				LuaError(l, "in adjust-variable : Bad variable value");
+			}
+		}
+		lua_pop(l, 1); // pop table
 	} else if (!strcmp(value, "adjust-buffs")) {
 		spellaction->CastFunction = CastAdjustBuffs;
 		spellaction->Data.AdjustBuffs.HasteTicks = BUFF_NOT_AFFECTED;
