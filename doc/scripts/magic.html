@@ -379,11 +379,11 @@ Here are the supported operations, their paramenters, and what they do.
 	to all forms of damage. Try using very low values for this :).
 	</dd>
     </dl></dd>
-    <dt>"adjust-variable", {tag, ...}</dt>
-    <dd>This will adjust variable of the unit
-      (defined by <a href="unittype.html#DefineVariables">DefineVariables()</a>)
-      <dl><dt>Index = variable-name</dt>
-      <dd>Variable to modify.</dd>
+    <dt>"adjust-variable", {VariableName = {tag = value, ...} or number, ...}</dt>
+    <dd>This will adjust variable "VariableName" of the unit
+      (defined by <a href="unittype.html#DefineVariables">DefineVariables().</a>)<br>
+      Using number n is equivalent to {Value = n, Max = n, Enable = (n == 0)}
+      <dl>
       <dt>Enable = boolean</dt>
       <dd>Set Enable value.</dd>
       <dt>Value = number</dt>
