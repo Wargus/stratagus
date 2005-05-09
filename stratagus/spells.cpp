@@ -418,53 +418,6 @@ int CastSpawnMissile(Unit* caster, const SpellType* spell,
 }
 
 /**
-** Cast haste.
-**
-**  @param caster       Unit that casts the spell
-**  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
-**  @param target       Target unit that spell is addressed to
-**  @param x            X coord of target spot when/if target does not exist
-**  @param y            Y coord of target spot when/if target does not exist
-**
-**  @return             =!0 if spell should be repeated, 0 if not
-*/
-int CastAdjustBuffs(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
-{
-	if (!target) {
-		return 0;
-	}
-	if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
-		target->Variable[HASTE_INDEX].Max = action->Data.AdjustBuffs.HasteTicks;
-		target->Variable[HASTE_INDEX].Value = action->Data.AdjustBuffs.HasteTicks;
-		target->Variable[HASTE_INDEX].Enable = (action->Data.AdjustBuffs.HasteTicks > 0);
-	}
-	if (action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
-		target->Variable[SLOW_INDEX].Max = action->Data.AdjustBuffs.SlowTicks;
-		target->Variable[SLOW_INDEX].Value = action->Data.AdjustBuffs.SlowTicks;
-		target->Variable[SLOW_INDEX].Enable = (action->Data.AdjustBuffs.SlowTicks > 0);
-	}
-	if (action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
-		target->Variable[BLOODLUST_INDEX].Max = action->Data.AdjustBuffs.BloodlustTicks;
-		target->Variable[BLOODLUST_INDEX].Value = action->Data.AdjustBuffs.BloodlustTicks;
-		target->Variable[BLOODLUST_INDEX].Enable = (action->Data.AdjustBuffs.BloodlustTicks > 0);
-	}
-	if (action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
-		target->Variable[INVISIBLE_INDEX].Max = action->Data.AdjustBuffs.InvisibilityTicks;
-		target->Variable[INVISIBLE_INDEX].Value = action->Data.AdjustBuffs.InvisibilityTicks;
-		target->Variable[INVISIBLE_INDEX].Enable = (action->Data.AdjustBuffs.InvisibilityTicks > 0);
-	}
-	if (action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
-		target->Variable[UNHOLYARMOR_INDEX].Max = action->Data.AdjustBuffs.InvincibilityTicks;
-		target->Variable[UNHOLYARMOR_INDEX].Value = action->Data.AdjustBuffs.InvincibilityTicks;
-		target->Variable[UNHOLYARMOR_INDEX].Enable = (action->Data.AdjustBuffs.InvincibilityTicks > 0);
-	}
-	return 0;
-}
-
-
-/**
 **  Adjust User Variables.
 **
 **  @param caster  Unit that casts the spell
