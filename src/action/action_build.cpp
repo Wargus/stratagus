@@ -324,6 +324,8 @@ static void StartBuilding(Unit* unit, Unit* ontop)
 
 /**
 **  Build the building
+**
+**  @param unit  worker which build.
 */
 static void BuildBuilding(Unit* unit)
 {
@@ -333,42 +335,52 @@ static void BuildBuilding(Unit* unit)
 
 	UnitShowAnimation(unit, unit->Type->Animations->Build);
 	unit->Data.Build.Cycles++;
-	if (!unit->Anim.Unbreakable) {
-		goal = unit->Orders[0].Goal;
+	if (unit->Anim.Unbreakable) {
+		return ;
+	}
+	goal = unit->Orders[0].Goal;
+	Assert(goal);
 
-		// hp is the current damage taken by the unit.
-		hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
-		//
-		// Calculate the length of the attack (repair) anim.
-		//
-		animlength = unit->Data.Build.Cycles;
-		unit->Data.Build.Cycles = 0;
-
-		// FIXME: implement this below:
-		// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
-		goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
-		// Keep the same level of damage while increasing HP.
-		goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
-			(goal->Stats->Costs[TimeCost] * 600) - hp;
-		if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
-			goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
+	if (goal->Orders[0].Action == UnitActionDie) {
+		RefsDecrease(goal);
+		unit->Orders[0].Goal = NULL;
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = unit->State = 0;
+		if (unit->Selected) { // update display for new action
+			SelectedUnitChanged();
 		}
+		return;
+	}
 
-		//
-		// Building is gone or finished
-		//
-		if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
-			if (goal) { // release reference
-				RefsDecrease(goal);
-				unit->Orders[0].Goal = NULL;
-			}
-			unit->Orders[0].Action = UnitActionStill;
-			unit->SubAction = unit->State = 0;
-			if (unit->Selected) { // update display for new action
-				SelectedUnitChanged();
-			}
-			return;
+	// hp is the current damage taken by the unit.
+	hp = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
+		(goal->Stats->Costs[TimeCost] * 600) - goal->Variable[HP_INDEX].Value;
+	//
+	// Calculate the length of the attack (repair) anim.
+	//
+	animlength = unit->Data.Build.Cycles;
+	unit->Data.Build.Cycles = 0;
+
+	// FIXME: implement this below:
+	// unit->Data.Built.Worker->Type->BuilderSpeedFactor;
+	goal->Data.Built.Progress += 100 * animlength * SpeedBuild;
+	// Keep the same level of damage while increasing HP.
+	goal->Variable[HP_INDEX].Value = (goal->Data.Built.Progress * goal->Variable[HP_INDEX].Max) /
+		(goal->Stats->Costs[TimeCost] * 600) - hp;
+	if (goal->Variable[HP_INDEX].Value > goal->Variable[HP_INDEX].Max) {
+		goal->Variable[HP_INDEX].Value = goal->Variable[HP_INDEX].Max;
+	}
+
+	//
+	// Building is gone or finished
+	//
+	if (goal->Variable[HP_INDEX].Value == goal->Variable[HP_INDEX].Max) {
+		RefsDecrease(goal);
+		unit->Orders[0].Goal = NULL;
+		unit->Orders[0].Action = UnitActionStill;
+		unit->SubAction = unit->State = 0;
+		if (unit->Selected) { // update display for new action
+			SelectedUnitChanged();
 		}
 	}
 }
