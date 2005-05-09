@@ -800,6 +800,8 @@ void MoveUnitToXY(Unit* unit, int x, int y)
 
 	UnitCacheInsert(unit);
 	MarkUnitFieldFlags(unit);
+	//  Recalculate the seen count.
+	UnitCountSeen(unit);
 	MapMarkUnitSight(unit);
 }
 
@@ -828,10 +830,10 @@ void PlaceUnit(Unit* unit, int x, int y)
 	MarkUnitFieldFlags(unit);
 	// Tha cache list.
 	UnitCacheInsert(unit);
+	//  Calculate the seen count.
+	UnitCountSeen(unit);
 	// Vision
 	MapMarkUnitSight(unit);
-
-	UnitCountSeen(unit);
 }
 
 /**

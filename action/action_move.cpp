@@ -148,8 +148,6 @@ int DoActionMove(Unit* unit)
 		unit->IY = -yd * TileSizeY;
 		unit->Frame = 0;
 		UnitHeadingFromDeltaXY(unit, xd, yd);
-		//  Recalculate the seen count.
-		UnitCountSeen(unit);
 	} else {
 		xd = Heading2X[unit->Direction / NextDirection];
 		yd = Heading2Y[unit->Direction / NextDirection];
