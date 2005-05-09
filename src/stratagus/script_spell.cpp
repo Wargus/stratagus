@@ -328,42 +328,6 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			}
 		}
 		lua_pop(l, 1); // pop table
-	} else if (!strcmp(value, "adjust-buffs")) {
-		spellaction->CastFunction = CastAdjustBuffs;
-		spellaction->Data.AdjustBuffs.HasteTicks = BUFF_NOT_AFFECTED;
-		spellaction->Data.AdjustBuffs.SlowTicks = BUFF_NOT_AFFECTED;
-		spellaction->Data.AdjustBuffs.BloodlustTicks = BUFF_NOT_AFFECTED;
-		spellaction->Data.AdjustBuffs.InvisibilityTicks = BUFF_NOT_AFFECTED;
-		spellaction->Data.AdjustBuffs.InvincibilityTicks = BUFF_NOT_AFFECTED;
-		for (; j < args; ++j) {
-			lua_rawgeti(l, -1, j + 1);
-			value = LuaToString(l, -1);
-			lua_pop(l, 1);
-			++j;
-			if (!strcmp(value, "haste-ticks")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustBuffs.HasteTicks = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			} else if (!strcmp(value, "slow-ticks")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustBuffs.SlowTicks = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			} else if (!strcmp(value, "bloodlust-ticks")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustBuffs.BloodlustTicks = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			} else if (!strcmp(value, "invisibility-ticks")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustBuffs.InvisibilityTicks = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			} else if (!strcmp(value, "invincibility-ticks")) {
-				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustBuffs.InvincibilityTicks = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-			} else {
-				LuaError(l, "Unsupported adjust-buffs tag: %s" _C_ value);
-			}
-		}
 	} else if (!strcmp(value, "summon")) {
 		spellaction->CastFunction = CastSummon;
 		for (; j < args; ++j) {
@@ -882,24 +846,6 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 		CLprintf(file, "(demolish range %d damage %d)\n",
 				action->Data.Demolish.Range,
 				action->Data.Demolish.Damage);
-	} else if (action->CastFunction == CastAdjustBuffs) {
-		CLprintf(file, "(adjust-buffs");
-		if (action->Data.AdjustBuffs.HasteTicks != BUFF_NOT_AFFECTED) {
-			CLprintf(file, " haste-ticks %d", action->Data.AdjustBuffs.HasteTicks);
-		}
-		if (action->Data.AdjustBuffs.SlowTicks != BUFF_NOT_AFFECTED) {
-			CLprintf(file, " slow-ticks %d", action->Data.AdjustBuffs.SlowTicks);
-		}
-		if (action->Data.AdjustBuffs.BloodlustTicks != BUFF_NOT_AFFECTED) {
-			CLprintf(file, " bloodlust-ticks %d", action->Data.AdjustBuffs.BloodlustTicks);
-		}
-		if (action->Data.AdjustBuffs.InvisibilityTicks != BUFF_NOT_AFFECTED) {
-			CLprintf(file, " invisibility-ticks %d", action->Data.AdjustBuffs.InvisibilityTicks);
-		}
-		if (action->Data.AdjustBuffs.InvincibilityTicks != BUFF_NOT_AFFECTED) {
-			CLprintf(file, " invincibility-ticks %d", action->Data.AdjustBuffs.InvincibilityTicks);
-		}
-		CLprintf(file, ")");
 	} else if (action->CastFunction == CastPolymorph) {
 		CLprintf(file, "(polymorph new-form %s)",
 				action->Data.Polymorph.NewForm->Ident);
@@ -943,21 +889,6 @@ static void SaveSpellCondition(CLFile* file, ConditionInfo* condition)
 				UnitTypeVar.BoolFlagName[i], condstrings[(int)condition->BoolFlag[i]]);
 		}
 	}
-	//
-	// Min/Max vital percents
-	//
-	CLprintf(file, "min-hp-percent %d ", condition->MinHpPercent);
-	CLprintf(file, "max-hp-percent %d ", condition->MaxHpPercent);
-	CLprintf(file, "min-mana-percent %d ", condition->MinManaPercent);
-	CLprintf(file, "max-mana-percent %d ", condition->MaxManaPercent);
-	//
-	// Max buff ticks stuff
-	//
-	CLprintf(file, "max-slow-ticks %d ", condition->MaxSlowTicks);
-	CLprintf(file, "max-haste-ticks %d ", condition->MaxHasteTicks);
-	CLprintf(file, "max-bloodlust-ticks %d ", condition->MaxBloodlustTicks);
-	CLprintf(file, "max-invisibility-ticks %d ", condition->MaxInvisibilityTicks);
-	CLprintf(file, "max-invincibility-ticks %d ", condition->MaxInvincibilityTicks);
 	//
 	// The end.
 	//

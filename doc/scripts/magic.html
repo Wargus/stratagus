@@ -350,35 +350,6 @@ Here are the supported operations, their paramenters, and what they do.
 	This value is in pixels, for better precision.
 	</dd>
     </dl></dd>
-    <dt>"adjust-buffs", "buff-name", number</dt>
-    <dd>This spell with set the time left for every buff. Buffs are temporary
-	bonuses or penalties for units, like better damage or reduced speed(on enemies)
-	when setting buff-1-ticks 567 the unit will have 567 ticks of buff-1 left. 0 is
-	also a value, in fact acting like some sort of dispel magic. Unfortunately
-	this is quite limited at the moment, here are the buffs provided and what they do.
-    	<dl><dt>"haste-ticks"</dt>
-	<dd>The number of haste ticks. Haste gives the unit almost double speed
-	for any activity.
-	</dd>
-    	<dt>"haste-ticks"</dt>
-	<dd>The number of slow ticks. Slow gives the unit double speed for all
-	activities.
-	</dd>
-    	<dt>"bloodlust-ticks"</dt>
-	<dd>The number of bloodlust ticks. Bloodlust gives the unit double damage
-	(both piercing and basic)
-	</dd>
-    	<dt>"invisibility-ticks"</dt>
-	<dd>The number of Invisibility ticks. Invisibility makes the unit completely
-	dissapear for other players. It can still be affected by area effect spells
-	though. The unit will appear when the time is gone or when it will try to do
-	anything except move. This has nothing to do with cloaking.
-	</dd>
-	<dt>"invincibility-ticks"</dt>
-	<dd>The number of invincibility ticks. This makes the unit completely imune
-	to all forms of damage. Try using very low values for this :).
-	</dd>
-    </dl></dd>
     <dt>"adjust-variable", {VariableName = {tag = value, ...} or number, ...}</dt>
     <dd>This will adjust variable "VariableName" of the unit
       (defined by <a href="unittype.html#DefineVariables">DefineVariables().</a>)<br>
@@ -610,5 +581,5 @@ controlling function. No parameters.
 <hr>
 Last changed: $Id$<br>
 All trademarks and copyrights on this page are owned by their respective owners.
-<address>(c) 2002-2003 by <a href="http://stratagus.org">
+<address>(c) 2002-2005 by <a href="http://stratagus.org">
 The Stratagus Project</a></address></body></html>
