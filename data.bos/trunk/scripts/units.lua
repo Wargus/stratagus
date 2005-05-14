@@ -54,7 +54,7 @@ DefineUnitType("unit-gold-mine", {
 	Costs = {"time", 150}, VisibleUnderFog = true,
 	Construction = "construction-land2",
 	NeutralMinimapColor = {196, 196, 196},
-	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {127, 127},
+	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
 	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
 	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Corpse = {"unit-destroyed-4x4-place", 0}, ExplodeWhenKilled = "missile-explosion",
