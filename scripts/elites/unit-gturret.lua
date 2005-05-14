@@ -32,7 +32,7 @@ DefineAnimations("animations-gturret", {
     Still = {"frame 4", "wait 1", },
     Attack = {"unbreakable begin", "frame 0", "wait 1", "frame 5", "wait 1",
         "frame 0", "wait 1", "frame 5", "wait 1", "frame 0", "wait 1", 
-        "frame 5", "sound assault-attack", "attack", "wait 1", 
+        "frame 5", "sound gturret-attack", "attack", "wait 1", 
         "frame 0", "unbreakable end", "wait 1", },
     Death = {"unbreakable begin", "frame 10", "unbreakable end", "wait 50", },
     })
@@ -76,11 +76,14 @@ DefineUnitType("unit-gturret", {
         --[[MustBuildOnTop = "unit-plate1", --]] Building = true, BuilderOutside = true,
         VisibleUnderFog = true,
         Sounds = {
-                "selected", "gen-selected",
+                "selected", "gturret-selected",
                 "ready", "gen-ready",
                 "help", "gen-help",
                 "dead", "gen-dead"}
         })
+
+MakeSound("gturret-selected", "elites/units/gturret_select.wav")
+MakeSound("gturret-attack", "elites/units/gturret_attack.wav")
 
 DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-gturret", {"unit-vault"})
