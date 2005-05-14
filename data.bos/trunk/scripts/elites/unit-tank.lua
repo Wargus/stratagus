@@ -71,7 +71,10 @@ DefineUnitType("unit-tank", {
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 6,
-        Sounds = {}
+        Sounds = {
+            "selected", "assault-selected",
+            "acknowledge", "assault-acknowledge"
+            }
         })
 
 DefineAllow("unit-tank", "AAAAAAAAAAAAAAAA")
