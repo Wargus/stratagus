@@ -71,7 +71,10 @@ DefineUnitType("unit-rtank", {
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 7,
-        Sounds = {}
+        Sounds = {
+            "selected", "grenadier-selected",
+            "acknowledge", "grenadier-acknowledge"
+            }
         })
 
 DefineAllow("unit-rtank", "AAAAAAAAAAAAAAAA")
