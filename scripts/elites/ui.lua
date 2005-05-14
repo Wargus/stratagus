@@ -206,22 +206,15 @@ end
 
 function DefineEliteScreen(screen_width, screen_height)
 	info_panel_x = screen_width - 200
-	info_panel_y = 160
+	info_panel_y = 160 - 8
 
 	DefineElitePanels(info_panel_x, info_panel_y)
 	ui = {"elites", screen_width, screen_height,
-		"normal-font-color", "light-green",
+		"normal-font-color", "light-blue",
 		"reverse-font-color", "yellow"}
-	AddFiller(ui, "elites/ui/ui_" .. screen_width .. "_filler.png", {0, 0})
-	-- resource line
-	AddFiller(ui, "elites/ui/ui_" .. screen_width .. "_respanel.png", {0, 0})
 	-- no menu panel ?
 	-- minimap
-	AddFiller(ui, "elites/ui/ui_minimap.png", 
-			{screen_width - 200, 24})
-	-- status line
-	AddFiller(ui, "elites/ui/ui_" .. screen_width .. "_stat.png",
-			{0, screen_height - 16})
+	AddFiller(ui, "elites/ui/ui_minimap.png", {screen_width - 200, 24-8})
 
 	ui2 = {
 		"resources", {
@@ -235,9 +228,6 @@ function DefineEliteScreen(screen_width, screen_height)
 				Pos = {67 +  75, 0},
 				Size = {14, 14},
 				TextPos =  {85 +  75, 1}},
---			"gas", {
---				File = "elites/ui/ui_res_icons.png", Frame = 1,
---				Pos = {67 + 150, 0}, "size", {14, 14}, "text-pos", {85 + 150, 1}},
 			"food", {
 				File = "elites/ui/ui_res_icons.png", Frame = 3,
 				Pos =  {67 + 150, 0}, 
@@ -260,75 +250,75 @@ function DefineEliteScreen(screen_width, screen_height)
 			"selected", {
 				"single", {
 					"icon", {
-					   "pos", {screen_width - 187, 176}, "style", "icon"}
+					   "pos", {info_panel_x + 13, info_panel_y+16}, "style", "icon"}
 				},
 				"multiple", {
 					"icons", {
-						{"pos", {screen_width - 187, 176}, "style", "icon"},
-						{"pos", {screen_width - 172, 176}, "style", "icon"},
-						{"pos", {screen_width - 157, 176}, "style", "icon"},
-						{"pos", {screen_width - 142, 176}, "style", "icon"},
-						{"pos", {screen_width - 112, 176}, "style", "icon"},
-						{"pos", {screen_width -  97, 176}, "style", "icon"},
-						{"pos", {screen_width -  82, 176}, "style", "icon"},
-						{"pos", {screen_width -  67, 176}, "style", "icon"}},
+						{"pos", {info_panel_x + 13, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 18, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 43, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 58, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 88, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 103, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 118, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 133, info_panel_y+16}, "style", "icon"}},
 					"max-text", {
 						"font", "game",
 						"pos", {info_panel_x + 10, info_panel_y + 10}}}},
 			"training", {
 				"single", {
 					"text", {"text", "", "font", "game", "pos", {screen_width - 187, 204}},
-					"icon", {"pos", {screen_width - 187, 243}, "style", "icon"}},
+					"icon", {"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"}},
 				"multiple", {
 					"icons", {
-						{"pos", {screen_width - 187, 243}, "style", "icon"},
-						{"pos", {screen_width - 172, 243}, "style", "icon"},
-						{"pos", {screen_width - 157, 243}, "style", "icon"},
-						{"pos", {screen_width - 142, 243}, "style", "icon"},
-						{"pos", {screen_width - 127, 243}, "style", "icon"},
-						{"pos", {screen_width - 112, 243}, "style", "icon"}}}},
+						{"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"},
+						{"pos", {info_panel_x + 28, info_panel_y + 91}, "style", "icon"},
+						{"pos", {info_panel_x + 43, info_panel_y + 91}, "style", "icon"},
+						{"pos", {info_panel_x + 58, info_panel_y + 91}, "style", "icon"},
+						{"pos", {info_panel_x + 73, info_panel_y + 91}, "style", "icon"},
+						{"pos", {info_panel_x + 88, info_panel_y + 91}, "style", "icon"}}}},
 			"upgrading", {
-				"icon", {"pos", {screen_width - 187, 243}, "style", "icon"}},
+				"icon", {"pos", {info_panel_x + 3, 243}, "style", "icon"}},
 			"researching", {
-				"icon", {"pos", {screen_width - 187, 243}, "style", "icon"}},
+				"icon", {"pos", {info_panel_x + 3, 243}, "style", "icon"}},
 			"transporting", {"icons", {
-					{"pos", {screen_width - 187, 243}, "style", "icon"},
-					{"pos", {screen_width - 172, 243}, "style", "icon"},
-					{"pos", {screen_width - 157, 243}, "style", "icon"},
-					{"pos", {screen_width - 142, 243}, "style", "icon"},
-					{"pos", {screen_width - 127, 243}, "style", "icon"},
-					{"pos", {screen_width - 112, 243}, "style", "icon"}}},
+					{"pos", {info_panel_x + 3, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 28, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 43, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 58, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 73, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 88, info_panel_y + 91}, "style", "icon"}}},
 			"completed-bar", {
 				"color", {50, 50, 80}}},
 		"button-panel", {
 			"panel", {
 				"file", "elites/ui/ui_" .. screen_width .. "_bpanel.png",
-				"pos", {screen_width - 200, 336}},
+				"pos", {screen_width - 200, 336-8-8}},
 			"icons", {
-				{"pos", {screen_width - 177+4, 340+4}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 340+4}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 340+4},  "style", "icon"},
-				{"pos", {screen_width - 177+4, 385+4}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 385+4}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 385+4},  "style", "icon"},
-				{"pos", {screen_width - 177+4, 430+4}, "style", "icon"},
-				{"pos", {screen_width - 122+4, 430+4}, "style", "icon"},
-				{"pos", {screen_width - 67+4, 430+4},  "style", "icon"}},
+				{"pos", {screen_width - 177+4, 340-12}, "style", "icon"},
+				{"pos", {screen_width - 122+4, 340-12}, "style", "icon"},
+				{"pos", {screen_width - 67+4, 340-12},  "style", "icon"},
+				{"pos", {screen_width - 177+4, 385-12}, "style", "icon"},
+				{"pos", {screen_width - 122+4, 385-12}, "style", "icon"},
+				{"pos", {screen_width - 67+4, 385-12},  "style", "icon"},
+				{"pos", {screen_width - 177+4, 430-12}, "style", "icon"},
+				{"pos", {screen_width - 122+4, 430-12}, "style", "icon"},
+				{"pos", {screen_width - 67+4, 430-12},  "style", "icon"}},
 		        "auto-cast-border-color", {0, 0, 252}},
 		"piemenu", {
 			"radius", 70,
 			"file", "ui/rosace1.png",
 			"mouse-button", "middle"},
 		"map-area", {
-			Pos = {24, 16},
+			Pos = {0, 16},
 			Size = {
-				screen_width - 200 - 24,
+				screen_width - 200,
 				screen_height - 32}},
 		"menu-panel", {
 			"menu-button", {
 				Pos = {screen_width - 200, 0},
 				Caption = "Menu (~<F10~>)",
-				Style = "main"},
+				Style = "black"},
 			"network-menu-button", {
 				Pos = {screen_width - 200, 0},
 				Caption = "Menu", 
@@ -338,8 +328,8 @@ function DefineEliteScreen(screen_width, screen_height)
 				Caption = "Diplomacy",
 				Style = "network"}},
 		"minimap", {
-			Pos = {screen_width - 200 + 46, 24 + 17},
-			Size = {121, 105}},
+                       Pos = {screen_width - 200 + 46, 24 + 17-8},
+                       Size = {121, 105}},
 		"status-line", {
 			TextPos = {2 + 36, screen_height - 14},
 			Font = "game",

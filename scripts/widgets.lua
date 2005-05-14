@@ -26,7 +26,7 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---      $Id: widgets.lua,v 1.2 2004/07/27 19:19:26 feb Exp $
+--      $Id$
 
 DefineButtonStyle("main", {
   Size = {200, 20},
@@ -58,15 +58,15 @@ DefineButtonStyle("main", {
   },
 })
 
-DefineButtonStyle("network", {
-  Size = {80, 19},
+DefineButtonStyle("black", {
+  Size = {200, 12},
   Font = "game",
   TextNormalColor = "yellow",
   TextReverseColor = "white",
   TextAlign = "Center",
-  TextPos = {40, 4},
+  TextPos = {100, 0},
   Default = {
-    File = "general/ui_buttons.png", Size = {300, 144}, Frame = 7,
+      Size = {300, 144},
   },
   Hover = {
     TextNormalColor = "white",
@@ -77,12 +77,43 @@ DefineButtonStyle("network", {
     },
   },
   Clicked = {
-    File = "general/ui_buttons.png", Size = {300, 144}, Frame = 8,
+    Size = {300, 144},
     TextNormalColor = "white",
-    TextPos = {42, 6},
+    TextPos = {102, 2},
   },
   Disabled = {
-    File = "general/ui_buttons.png", Size = {300, 144}, Frame = 6,
+    Size = {300, 144}, 
+    TextNormalColor = "grey",
+    TextReverseColor = "grey",
+  },
+})
+
+
+DefineButtonStyle("network", {
+  Size = {80, 19},
+  Font = "game",
+  TextNormalColor = "yellow",
+  TextReverseColor = "white",
+  TextAlign = "Center",
+  TextPos = {40, 4},
+  Default = {
+    Size = {300, 144},
+  },
+  Hover = {
+    TextNormalColor = "white",
+  },
+  Selected = {
+    Border = {
+      Color = {252, 252, 0}, Size = 1,
+    },
+  },
+  Clicked = {
+    Size = {300, 144},
+    TextNormalColor = "white",
+    TextPos = {42, 2},
+  },
+  Disabled = {
+    Size = {300, 144},
     TextNormalColor = "grey",
     TextReverseColor = "grey",
   },

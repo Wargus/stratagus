@@ -1,7 +1,8 @@
 Change log for Invasion - Battle of Survival
 --------------------------------------------
 
-CVS version:
+Development version:
+- Improved the graphical look of the in-game interface. (François Beerten)
 - Moved init and exit functions from DefineMenuItem 
   to DefineMenu. (François Beerten)
 - Use GetNumOpponents instead of IfOpponents. (François Beerten)
