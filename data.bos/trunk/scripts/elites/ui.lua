@@ -81,7 +81,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
    local damage_bonus = Sub(ActiveUnitVar("PiercingDamage", "Value", "Type"),
                             ActiveUnitVar("PiercingDamage", "Value", "Initial"))
 
-	DefinePanelContents(
+   DefinePanelContents(
 -- Default presentation. ------------------------
   {
   Ident = "panel-general-contents"..info_panel_x,
@@ -96,11 +96,11 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 			Component1 = "Value", Component2 = "Max", Centered = true}}
 	},
 	{ Pos = {114, 25}, More = {"Text", {ShowName = true}} }, -- FIXME:split for long name
-	{ Pos = {10, 158}, More = {"Text", {Variable = "Slot"}},
-		Condition = {Slot = "only"} }, -- DEBUG ONLY.
+	--{ Pos = {10, 158}, More = {"Text", {Variable = "Slot"}},
+	--	Condition = {Slot = "only"} }, -- DEBUG ONLY.
 -- Ressource Left
-	{ Pos = {88, 86}, Condition = {ShowOpponent = false, GiveResource = "only"},
-		More = {"FormattedText2", {Format = "%s Left:%d", Variable = "GiveResource",
+	{ Pos = {76, 86}, Condition = {ShowOpponent = false, GiveResource = "only"},
+		More = {"FormattedText2", {Format = "%s: %d", Variable = "GiveResource",
 					Component1 = "Name", Component2 = "Value", Centered = true}}
 	}
 
@@ -171,7 +171,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	},
 	{ Pos = {86, 141}, More = {"Text", {Variable = "Mana"}}, Condition = {Mana = "only"} },
 -- Ressource Carry
-	{ Pos = {16, 97}, Condition = {CarryResource = "only"},
+	{ Pos = {16, 138}, Condition = {CarryResource = "only"},
 		More = {"FormattedText2", {Format = "Carry: %d %s", Variable = "CarryResource",
 				Component1 = "Value", Component2 = "Name"}}
 	}
@@ -186,7 +186,8 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   Contents = {
 -- Unit caracteristics
 	{ Pos = {114, 37},
-		More = {"FormattedText", {Variable = "Level", Format = "Level ~<%d~>"}}
+		More = {"FormattedText", {Centered = true, 
+			Variable = "Level", Format = "Level ~<%d~>"}}
 	},
 	{ Pos = {114, 52},
 		More = {"FormattedText2", {Centered = true,
@@ -198,7 +199,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
 	{ Pos = {16, 125}, Condition = {SightRange = "only"},
 		More = {"Text", {Text = "Sight: ", Variable = "SightRange", Stat = true}}
 	},
-	{ Pos = {16, 138}, Condition = {Speed = "only"},
+	{ Pos = {16, 97}, Condition = {Speed = "only"},
 		More = {"Text", {Text = "Speed: ", Variable = "Speed", Stat = true}}
 	} } })
 end
