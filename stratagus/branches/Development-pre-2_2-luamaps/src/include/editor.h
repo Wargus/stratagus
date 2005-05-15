@@ -54,6 +54,7 @@ typedef enum _editor_state_type_ {
 	EditorSelecting,  ///< Select
 	EditorEditTile,   ///< Edit tiles
 	EditorEditUnit,   ///< Edit units
+	EditorSetStartLocation ///< Set the start location
 } EditorStateType;    ///< Current editor state
 	/// Current editor state.
 extern EditorStateType EditorState;
@@ -67,6 +68,7 @@ extern int MaxUnitIndex;  ///< Max unit icon draw index
 
 extern char* EditorSelectIcon;  ///< Editor's select icon
 extern char* EditorUnitsIcon;   ///< Editor's units icon
+extern char* EditorStartUnit;   ///< Unit used to display the start location
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -69,6 +69,8 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 #define UNIT_ICON_Y (0)                   /// Unit mode icon
 #define TILE_ICON_X (IconWidth * 2 + 16)  /// Tile mode icon
 #define TILE_ICON_Y (2)                   /// Tile mode icon
+#define START_ICON_X (IconWidth * 3 + 16)  /// Start mode icon
+#define START_ICON_Y (2)                   /// Start mode icon
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -95,6 +97,7 @@ enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
 	UnitButton,          /// Unit mode button
 	TileButton,          /// Tile mode button
+	StartButton
 };
 
 char** EditorUnitTypes;  /// Sorted editor unit-type table
@@ -513,17 +516,14 @@ static void DrawTileIcons(void)
 }
 
 /**
-**  Draw unit icons.
-*/
-static void DrawUnitIcons(void)
+* Draw a table with the players
+**/
+static void DrawPlayers(void) 
 {
 	int x;
 	int y;
 	int i;
-	int j;
-	int percent;
 	char buf[256];
-	Icon *icon;
 
 	x = TheUI.InfoPanelX + 8;
 	y = TheUI.InfoPanelY + 4 + IconHeight + 10;
@@ -549,8 +549,8 @@ static void DrawUnitIcons(void)
 		sprintf(buf, "%d", i);
 		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
 	}
-
-	x = TheUI.InfoPanelX + 4;
+	
+		x = TheUI.InfoPanelX + 4;
 	y += 18 * 1 + 4;
 	if (SelectedPlayer != -1) {
 		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
@@ -577,6 +577,20 @@ static void DrawUnitIcons(void)
 
 		VideoDrawText(x, y, GameFont, buf);
 	}
+}
+
+
+/**
+**  Draw unit icons.
+*/
+static void DrawUnitIcons(void)
+{
+	int x;
+	int y;
+	int i;
+	int j;
+	int percent;
+	Icon *icon;
 
 	//
 	// Draw the unit selection buttons.
@@ -752,13 +766,24 @@ static void DrawEditorPanel(void)
 		(ButtonUnderCursor == TileButton ? IconActive : 0) |
 			(EditorState == EditorEditTile ? IconSelected : 0));
 
+	icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
+	Assert(icon);
+	DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
+		(ButtonUnderCursor == StartButton ? IconActive : 0) |
+			(EditorState == EditorSetStartLocation ? IconSelected : 0),
+		x + START_ICON_X, y + START_ICON_Y, NULL);
+
 	switch (EditorState) {
 		case EditorSelecting:
 			break;
 		case EditorEditTile:
 			DrawTileIcons();
 			break;
+		case EditorSetStartLocation:
+			DrawPlayers();
+			break;
 		case EditorEditUnit:
+			DrawPlayers();
 			DrawUnitIcons();
 			break;
 	}
@@ -822,6 +847,26 @@ static void DrawMapCursor(void)
 				VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
 				PopClipping();
 			}
+		}
+	}
+}
+
+/**
+**  Draw the start locations of all active players on the map
+*/
+static void DrawStartLocations(void)
+{
+	int i;
+	int x, y;
+	UnitType *type;
+	
+	type = UnitTypeByIdent(EditorStartUnit);
+	
+	for (i = 0; i < PlayerMax; i++) {
+		if (Players[i].Type != PlayerNobody && Players[i].Type != PlayerNeutral) {
+			x = Map2ViewportX(CurrentViewport, Players[i].StartX);
+			y = Map2ViewportY(CurrentViewport, Players[i].StartY);
+			DrawUnitType(type, type->Sprite, i, 0, x, y); 
 		}
 	}
 }
@@ -922,6 +967,8 @@ void EditorUpdateDisplay(void)
 	int i;
 
 	DrawMapArea(); // draw the map area
+
+	DrawStartLocations();
 
 	//
 	// Fillers
@@ -1065,6 +1112,10 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			EditorState = EditorEditTile;
 			return;
 		}
+		if (ButtonUnderCursor == StartButton) {
+			EditorState = EditorSetStartLocation;
+			return;
+		}
 	}
 	//
 	// Click on tile area
@@ -1096,6 +1147,19 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		}
 		return;
 	}
+	
+	// Click on player area
+	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
+		// Cursor on player icons
+		if (CursorPlayer != -1) {
+			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
+				SelectedPlayer = CursorPlayer;
+				ThisPlayer = Players + SelectedPlayer;
+			}
+			return;
+		}
+	}
+
 	//
 	// Click on unit area
 	//
@@ -1134,14 +1198,6 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		if (CursorUnitIndex != -1) {
 			SelectedUnitIndex = CursorUnitIndex;
 			CursorBuilding = UnitTypeByIdent(ShownUnitTypes[CursorUnitIndex]);
-			return;
-		}
-		// Cursor on player icons
-		if (CursorPlayer != -1) {
-			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
-				SelectedPlayer = CursorPlayer;
-				ThisPlayer = Players + SelectedPlayer;
-			}
 			return;
 		}
 		// Cursor on unit selection icons
@@ -1248,6 +1304,10 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 							MaxSampleVolume);
 					}
 				}
+			}
+			if (EditorState == EditorSetStartLocation) {
+				Players[SelectedPlayer].StartX = Viewport2MapX(TheUI.MouseViewport, CursorX);
+				Players[SelectedPlayer].StartY = Viewport2MapY(TheUI.MouseViewport, CursorY);
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1575,7 +1635,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Handle edit unit area
 	//
-	if (EditorState == EditorEditUnit) {
+	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
 		// Scrollbar
 		if (TheUI.ButtonPanelX + 4 < CursorX
 				&& CursorX < TheUI.ButtonPanelX + 176 - 4
@@ -1716,6 +1776,16 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonUnderCursor = TileButton;
 		CursorOn = CursorOnButton;
 		SetStatusLine("Tile mode");
+		return;
+	}
+	if (TheUI.InfoPanelX + 4 + START_ICON_X < CursorX &&
+			CursorX < TheUI.InfoPanelX + 4 + START_ICON_X + TileSizeX + 7 &&
+			TheUI.InfoPanelY + 4 + START_ICON_Y < CursorY &&
+			CursorY < TheUI.InfoPanelY + 4 + START_ICON_Y + TileSizeY + 7) {
+		ButtonAreaUnderCursor = -1;
+		ButtonUnderCursor = StartButton;
+		CursorOn = CursorOnButton;
+		SetStatusLine("Set start location mode");
 		return;
 	}
 	if (TheUI.MenuButton.X != -1) {
