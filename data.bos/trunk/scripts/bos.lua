@@ -118,7 +118,8 @@ DefineUnitTypeWcNames(
 	"unit-rock-6",
         "unit-artil", 
 	"unit-tank",
-	"unit-rtank")
+	"unit-rtank",
+        "unit-buggy")
 	
 
 DefineIconWcNames(
