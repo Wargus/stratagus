@@ -26,13 +26,13 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---	$Id: editor.lua,v 1.8 2004/12/12 14:53:11 feb Exp $
+--	$Id$
 
 
 --	Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")
-
+SetEditorStartUnit("unit-start-location")
 
 --
 --	editor-unit-types a sorted list of unit-types for the editor.
@@ -74,7 +74,6 @@ DefineEditorUnitTypes(
    "unit-crystal-field10",
    "unit-crystal-field11",   
    "unit-crystal-field12",
-   "unit-crystal-field13",
-
-   "unit-elites-start-location"
+   "unit-crystal-field13"
 )
+

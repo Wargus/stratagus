@@ -524,19 +524,12 @@ DefineUnitType("build-dead-body7", {
 	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
 	Type = "land" , Building = true, Vanishes = true})
 
-DefineUnitType("unit-elites-start-location", {
+DefineUnitType("unit-start-location", {
 	Name = "Start Location",
 	Files = {"default", "elites/x_startpoint.png"}, Size = {32, 32},
-	Animations = "animations-building", Icon = "icon-cancel",
+	Animations = "animations-building", Icon = "icon-start-location",
 	Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
 	BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, Demand = 0, Type = "land",
-	Sounds = {
-		"selected", "elites-start-location-selected",
-		"acknowledge", "elites-start-location-acknowledge",
-		"ready", "elites-start-location-ready",
-		"help", "basic elites voices help 2",
-		"dead", "building destroyed",
-		"attack", "elites-start-location-attack"}
 	})
 
