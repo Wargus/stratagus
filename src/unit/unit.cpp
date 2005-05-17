@@ -67,10 +67,6 @@
   -- Variables
   ----------------------------------------------------------------------------*/
 
-#ifndef LimitSearch
-#define LimitSearch 1                     /// Limit the search
-#endif
-
 Unit* UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
 Unit** UnitSlotFree;                      /// First free unit slot
 Unit* ReleasedHead;                       /// List of released units.
@@ -92,13 +88,13 @@ static int HelpMeLastX;                   /// Last X coordinate HelpMe sound pla
 static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
 
 /*----------------------------------------------------------------------------
--- Functions
+--  Functions
 ----------------------------------------------------------------------------*/
 
 static void RemoveUnitFromContainer(Unit* unit);
 
 /**
-** Initial memory allocation for units.
+**  Initial memory allocation for units.
 */
 void InitUnitsMemory(void)
 {
@@ -118,32 +114,10 @@ void InitUnitsMemory(void)
 	NumUnits = 0;
 }
 
-#if 0
 /**
-** Free the memory for an unit slot. Update the global slot table.
-** The memory should only be freed, if all references are dropped.
+**  Increase an unit's reference count.
 **
-** @param unit Pointer to unit.
-*/
-void FreeUnitMemory(Unit* unit)
-{
-	Unit** slot;
-
-	//
-	// Remove from slot table
-	//
-	slot = UnitSlots + unit->Slot;
-	Assert(*slot == unit);
-
-	*slot = (void*)UnitSlotFree;
-	free(unit);
-}
-#endif
-
-/**
-** Increase an unit's reference count.
-**
-** @param unit The unit
+**  @param unit The unit
 */
 void RefsIncrease(Unit* unit)
 {
@@ -154,9 +128,9 @@ void RefsIncrease(Unit* unit)
 }
 
 /**
-** Decrease an unit's reference count.
+**  Decrease an unit's reference count.
 **
-** @param unit The unit
+**  @param unit The unit
 */
 void RefsDecrease(Unit* unit)
 {
@@ -174,11 +148,11 @@ void RefsDecrease(Unit* unit)
 }
 
 /**
-** Release an unit.
+**  Release an unit.
 **
-** The unit is only released, if all references are dropped.
+**  The unit is only released, if all references are dropped.
 **
-** @param unit Pointer to unit.
+**  @param unit Pointer to unit.
 */
 void ReleaseUnit(Unit* unit)
 {
@@ -300,10 +274,10 @@ static Unit* AllocUnit(void)
 }
 
 /**
-** Initialize the unit slot with default values.
+**  Initialize the unit slot with default values.
 **
-** @param unit    Unit pointer (allocated zero filled)
-** @param type    Unit-type
+**  @param unit    Unit pointer (allocated zero filled)
+**  @param type    Unit-type
 */
 void InitUnit(Unit* unit, UnitType* type)
 {
@@ -446,12 +420,12 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 }
 
 /**
-** Create a new unit.
+**  Create a new unit.
 **
-** @param type      Pointer to unit-type.
-** @param player    Pointer to owning player.
+**  @param type      Pointer to unit-type.
+**  @param player    Pointer to owning player.
 **
-** @return          Pointer to created unit.
+**  @return          Pointer to created unit.
 */
 Unit* MakeUnit(UnitType* type, Player* player)
 {
@@ -704,10 +678,10 @@ void UnmarkUnitFieldFlags(const Unit* unit)
 }
 
 /**
-** Add unit to a container. It only updates linked list stuff
+**  Add unit to a container. It only updates linked list stuff.
 **
-** @param unit    Pointer to unit.
-** @param host    Pointer to container.
+**  @param unit    Pointer to unit.
+**  @param host    Pointer to container.
 */
 void AddUnitInContainer(Unit* unit, Unit* host)
 {
@@ -726,9 +700,9 @@ void AddUnitInContainer(Unit* unit, Unit* host)
 }
 
 /**
-** Remove unit from a container. It only updates linked list stuff
+**  Remove unit from a container. It only updates linked list stuff.
 **
-** @param unit    Pointer to unit.
+**  @param unit    Pointer to unit.
 */
 static void RemoveUnitFromContainer(Unit* unit)
 {
@@ -806,11 +780,11 @@ void MoveUnitToXY(Unit* unit, int x, int y)
 }
 
 /**
-** Place unit on map.
+**  Place unit on map.
 **
-** @param unit    Unit to be placed.
-** @param x       X map tile position.
-** @param y       Y map tile position.
+**  @param unit    Unit to be placed.
+**  @param x       X map tile position.
+**  @param y       Y map tile position.
 */
 void PlaceUnit(Unit* unit, int x, int y)
 {
@@ -837,14 +811,14 @@ void PlaceUnit(Unit* unit, int x, int y)
 }
 
 /**
-** Create new unit and place on map.
+**  Create new unit and place on map.
 **
-** @param x         X map tile position.
-** @param y         Y map tile position.
-** @param type      Pointer to unit-type.
-** @param player    Pointer to owning player.
+**  @param x         X map tile position.
+**  @param y         Y map tile position.
+**  @param type      Pointer to unit-type.
+**  @param player    Pointer to owning player.
 **
-** @return          Pointer to created unit.
+**  @return          Pointer to created unit.
 */
 Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 {
@@ -860,14 +834,14 @@ Unit* MakeUnitAndPlace(int x, int y, UnitType* type, Player* player)
 }
 
 /**
-** Remove unit from map.
+**  Remove unit from map.
 **
-** Update selection.
-** Update panels.
-** Update map.
+**  Update selection.
+**  Update panels.
+**  Update map.
 **
-** @param unit    Pointer to unit.
-** @param host    Pointer to housing unit.
+**  @param unit    Pointer to unit.
+**  @param host    Pointer to housing unit.
 */
 void RemoveUnit(Unit* unit, Unit* host)
 {
@@ -1184,12 +1158,12 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 **  @param unit    The unit that goes out of fog.
 **  @param player  The player the unit goes out of fog for.
 **
-** @note For units that are visible under fog (mostly buildings)
-** we use reference counts, from the players that know about
-** the building. When an building goes under fog it gets a refs
-** increase, and when it shows up it gets a decrease. It must
-** not get an decrease the first time it's seen, so we have to
-** keep track of what player saw what units, with SeenByPlayer.
+**  @note For units that are visible under fog (mostly buildings)
+**  we use reference counts, from the players that know about
+**  the building. When an building goes under fog it gets a refs
+**  increase, and when it shows up it gets a decrease. It must
+**  not get an decrease the first time it's seen, so we have to
+**  keep track of what player saw what units, with SeenByPlayer.
 */
 void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
@@ -1243,12 +1217,12 @@ void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 }
 
 /**
-** This function unmarks units on x, y as seen. It uses a reference count.
+**  This function unmarks units on x, y as seen. It uses a reference count.
 **
-** @param player    The player to mark for.
-** @param x         x location to check if building is on, and mark as seen
-** @param y         y location to check if building is on, and mark as seen
-** @param cloak     If this is for cloaked units.
+**  @param player    The player to mark for.
+**  @param x         x location to check if building is on, and mark as seen
+**  @param y         y location to check if building is on, and mark as seen
+**  @param cloak     If this is for cloaked units.
 */
 void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 {
@@ -1287,11 +1261,11 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 }
 
 /**
-** Recalculates an units visiblity count. This happens really often,
-** Like every time an unit moves. It's really fast though, since we
-** have per-tile counts.
+**  Recalculates an units visiblity count. This happens really often,
+**  Like every time an unit moves. It's really fast though, since we
+**  have per-tile counts.
 **
-** @param unit    pointer to the unit to check if seen
+**  @param unit    pointer to the unit to check if seen
 */
 void UnitCountSeen(Unit* unit)
 {
@@ -1840,12 +1814,12 @@ void UnitHeadingFromDeltaXY(Unit* unit, int dx, int dy)
   ----------------------------------------------------------------------------*/
 
 /**
-** Reappear unit on map.
+**  Reappear unit on map.
 **
-** @param unit       Unit to drop out.
-** @param heading    Direction in which the unit should appear.
-** @param addx       Tile size in x.
-** @param addy       Tile size in y.
+**  @param unit       Unit to drop out.
+**  @param heading    Direction in which the unit should appear.
+**  @param addx       Tile size in x.
+**  @param addy       Tile size in y.
 */
 void DropOutOnSide(Unit* unit, int heading, int addx, int addy)
 {
@@ -1920,13 +1894,13 @@ found:
 }
 
 /**
-** Reappear unit on map nearest to x, y.
+**  Reappear unit on map nearest to x, y.
 **
-** @param unit    Unit to drop out.
-** @param gx      Goal X map tile position.
-** @param gy      Goal Y map tile position.
-** @param addx    Tile size in x.
-** @param addy    Tile size in y.
+**  @param unit    Unit to drop out.
+**  @param gx      Goal X map tile position.
+**  @param gy      Goal Y map tile position.
+**  @param addx    Tile size in x.
+**  @param addy    Tile size in y.
 */
 void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 {
@@ -2013,9 +1987,9 @@ void DropOutNearest(Unit* unit, int gx, int gy, int addx, int addy)
 }
 
 /**
-** Drop out all units inside unit.
+**  Drop out all units inside unit.
 **
-** @param source    All units inside source are dropped out.
+**  @param source    All units inside source are dropped out.
 */
 void DropOutAll(const Unit* source)
 {
@@ -2264,6 +2238,12 @@ Unit* CanBuildHere(const Unit* unit, const UnitType* type, int x, int y)
 
 /**
 **  Can build on this point.
+**
+**  @param x     X tile map position.
+**  @param y     Y tile map position.
+**  @param  mask terrain mask
+**
+**  @return 1 if we can build on this point.
 */
 int CanBuildOn(int x, int y, int mask)
 {
@@ -2359,11 +2339,11 @@ Unit* CanBuildUnitType(const Unit* unit, const UnitType* type, int x, int y, int
   ----------------------------------------------------------------------------*/
 
 /**
-** Find the closest piece of wood for an unit.
+**  Find the closest piece of wood for an unit.
 **
-** @param unit    The unit.
-** @param x       OUT: Map X position of tile.
-** @param y       OUT: Map Y position of tile.
+**  @param unit    The unit.
+**  @param x       OUT: Map X position of tile.
+**  @param y       OUT: Map Y position of tile.
 */
 int FindWoodInSight(const Unit* unit, int* x, int* y)
 {
@@ -2372,27 +2352,27 @@ int FindWoodInSight(const Unit* unit, int* x, int* y)
 }
 
 /**
-** Find the closest piece of terrain with the given flags.
+**  Find the closest piece of terrain with the given flags.
 **
-** @param movemask    The movement mask to reach that location.
-** @param resmask     Result tile mask.
-** @param rvresult    Return a tile that doesn't match.
-** @param range       Maximum distance for the search.
-** @param player      Only search fields explored by player
-** @param x           Map X start position for the search.
-** @param y           Map Y start position for the search.
+**  @param movemask    The movement mask to reach that location.
+**  @param resmask     Result tile mask.
+**  @param rvresult    Return a tile that doesn't match.
+**  @param range       Maximum distance for the search.
+**  @param player      Only search fields explored by player
+**  @param x           Map X start position for the search.
+**  @param y           Map Y start position for the search.
 **
-** @param px          OUT: Map X position of tile.
-** @param py          OUT: Map Y position of tile.
+**  @param px          OUT: Map X position of tile.
+**  @param py          OUT: Map Y position of tile.
 **
-** @note Movement mask can be 0xFFFFFFFF to have no effect
-** Range is not circular, but square.
-** Player is ignored if nil(search the entire map)
-** Use rvresult if you search for a til;e that doesn't
-** match resmask. Like for a tile where an unit can go
-** with it's movement mask.
+**  @note Movement mask can be 0xFFFFFFFF to have no effect
+**  Range is not circular, but square.
+**  Player is ignored if nil(search the entire map)
+**  Use rvresult if you search for a tile that doesn't
+**  match resmask. Like for a tile where an unit can go
+**  with it's movement mask.
 **
-** @return            True if wood was found.
+**  @return            True if wood was found.
 */
 int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	const Player* player, int x, int y, int* px, int* py)
@@ -2492,18 +2472,18 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 }
 
 /**
-** Find Resource.
+**  Find Resource.
 **
-** @param unit        The unit that wants to find a resource.
-** @param x           Closest to x
-** @param y           Closest to y
-** @param range       Maximum distance to the resource.
-** @param resource    The resource id.
+**  @param unit        The unit that wants to find a resource.
+**  @param x           Closest to x
+**  @param y           Closest to y
+**  @param range       Maximum distance to the resource.
+**  @param resource    The resource id.
 **
-** @note This will return an usable resource building that
-** belongs to "player" or is neutral.
+**  @note This will return an usable resource building that
+**  belongs to "player" or is neutral.
 **
-** @return            NoUnitP or resource unit
+**  @return            NoUnitP or resource unit
 */
 Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 {
@@ -2637,17 +2617,17 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 }
 
 /**
-** Find deposit. This will find a deposit for a resource
+**  Find deposit. This will find a deposit for a resource
 **
-** @param unit        The unit that wants to find a resource.
-** @param x           Closest to x
-** @param y           Closest to y
-** @param range       Maximum distance to the deposit.
-** @param resource    Resource to find deposit from.
+**  @param unit        The unit that wants to find a resource.
+**  @param x           Closest to x
+**  @param y           Closest to y
+**  @param range       Maximum distance to the deposit.
+**  @param resource    Resource to find deposit from.
 **
-** @note This will return a reachable allied depot.
+**  @note This will return a reachable allied depot.
 **
-** @return            NoUnitP or deposit unit
+**  @return            NoUnitP or deposit unit
 */
 Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 {
@@ -2759,12 +2739,12 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 }
 
 /**
-** Find the next idle worker
+**  Find the next idle worker
 **
-** @param player    Player's units to search through
-** @param last      Previous idle worker selected
+**  @param player    Player's units to search through
+**  @param last      Previous idle worker selected
 **
-** @return NoUnitP or next idle worker
+**  @return NoUnitP or next idle worker
 */
 Unit* FindIdleWorker(const Player* player, const Unit* last)
 {
@@ -2893,9 +2873,9 @@ Unit* UnitOnScreen(Unit* ounit, int x, int y)
 }
 
 /**
-** Let an unit die.
+**  Let an unit die.
 **
-** @param unit    Unit to be destroyed.
+**  @param unit    Unit to be destroyed.
 */
 void LetUnitDie(Unit* unit)
 {
@@ -2985,7 +2965,9 @@ void LetUnitDie(Unit* unit)
 }
 
 /**
-** Destroy all units inside unit.
+**  Destroy all units inside unit.
+**
+**  @param source  container.
 */
 void DestroyAllInside(Unit* source)
 {
@@ -3011,11 +2993,11 @@ void DestroyAllInside(Unit* source)
   ----------------------------------------------------------------------------*/
 
 /**
-** Unit is hit by missile or other damage.
+**  Unit is hit by missile or other damage.
 **
-** @param attacker    Unit that attacks.
-** @param target      Unit that is hit.
-** @param damage      How many damage to take.
+**  @param attacker    Unit that attacks.
+**  @param target      Unit that is hit.
+**  @param damage      How many damage to take.
 */
 void HitUnit(Unit* attacker, Unit* target, int damage)
 {

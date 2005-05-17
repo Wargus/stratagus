@@ -118,10 +118,6 @@
 **  does not include for instance stuff like harvesters returning
 **  cargo.
 **
-**  Unit::Name
-**
-**  Name of the unit.
-**
 **  Unit::X Unit::Y
 **
 **  The tile map coordinates of the unit. 0,0 is the upper left on
@@ -211,7 +207,7 @@
 **              We keep track of visilibty for each player, and combine with
 **              Shared vision ONLY when querying and such.
 **
-**      Unit::SeenByPlayer
+**  Unit::SeenByPlayer
 **
 **              This is a bitmask of 1 and 0 values. SeenByPlayer & (1<<p) is 0
 **              If p never saw the unit and 1 if it did. This is important for
@@ -231,6 +227,7 @@
 **
 **  Unit::Selected
 **
+**  Unit is selected. (So you can give it orders)
 **
 **  Unit::Constructed
 **  Set when a building is under construction, and still using the
@@ -252,27 +249,11 @@
 **
 **  Unit::XP
 **
+**  Number of XP of the unit.
 **
 **  Unit::Kills
 **
-**
-**  Unit::Bloodlust
-**
-**
-**  Unit::Haste
-**
-**
-**  Unit::Slow
-**
-**
-**  Unit::Invisible
-**
-**
-**  Unit::FlameShield
-**
-**
-**  Unit::UnholyArmor
-**
+**  How many units have been killed by the unit.
 **
 **  Unit::GroupId
 **
@@ -367,21 +348,20 @@
 **
 **  Generic goal pointer. Used by teleporters to point to circle of power.
 **
-**  Unit::Retreating
 **
 ** @todo continue documentation
 **
 */
 
 /*----------------------------------------------------------------------------
--- Includes
+--  Includes
 ----------------------------------------------------------------------------*/
 
 #include "SDL.h"
 #include "player.h"
 
 /*----------------------------------------------------------------------------
--- Declarations
+--  Declarations
 ----------------------------------------------------------------------------*/
 
 typedef struct _unit_ Unit;            /// unit itself
@@ -754,10 +734,6 @@ extern Order* ReleasedOrderTail;           /// Tail of the released unit list.
 
 	/// Prepare unit memory allocator
 extern void InitUnitsMemory(void);
-#if 0
-	/// Free memory used by unit
-extern void FreeUnitMemory(Unit* unit);
-#endif
 	/// Increase an unit's reference count
 extern void RefsIncrease(Unit* unit);
 	/// Decrease an unit's reference count
