@@ -10,7 +10,7 @@
 //
 /**@name ai_force.c - AI force functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer
+//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -513,9 +513,9 @@ void AiAttackWithForce(int force)
 		aiunit = AiPlayer->Force[force].Units;
 		while (aiunit) {
 			if (aiunit->Unit->Type->CanAttack) {
-				CommandAttack(aiunit->Unit, x, y, NULL, FlushCommands);
+				CommandAttack(aiunit->Unit, enemy->X, enemy->Y, NULL, FlushCommands);
 			} else {
-				CommandMove(aiunit->Unit, x, y, FlushCommands);
+				CommandMove(aiunit->Unit, enemy->X, enemy->Y, FlushCommands);
 			}
 			aiunit = aiunit->Next;
 		}
@@ -530,22 +530,75 @@ void AiAttackWithForce(int force)
 static void AiForceAttacks(AiForce* force)
 {
 	const AiUnit* aiunit;
+	int x;
+	int y;
+	const Unit* unit;
 
-	if ((aiunit = force->Units)) {
+	if (!(aiunit = force->Units)) {
+		force->Attacking = 0;
+		return;
+	}
+
+	unit = NULL;
+	while (aiunit) {
+		// Still some action
+		if (!UnitIdle(aiunit->Unit)) {
+			unit = aiunit->Unit;
+			break;
+		}
+		aiunit = aiunit->Next;
+	}
+	if (aiunit) {
+		// Give idle units a new goal
+		// FIXME: may not be a good goal
+		aiunit = force->Units;
 		while (aiunit) {
-			// Still some action
-			if (!UnitIdle(aiunit->Unit)) {
+			if (UnitIdle(aiunit->Unit)) {
+				if (unit->Orders[0].Goal) {
+					x = unit->Orders[0].Goal->X;
+					y = unit->Orders[0].Goal->Y;
+				} else if (unit->Orders[0].X != -1 && unit->Orders[0].Y != -1) {
+					x = unit->Orders[0].X;
+					y = unit->Orders[0].Y;
+				} else {
+					x = unit->X;
+					y = unit->Y;
+				}
+				if (aiunit->Unit->Type->CanAttack) {
+					CommandAttack(aiunit->Unit, x, y, NULL, FlushCommands);
+				} else {
+					CommandMove(aiunit->Unit, x, y, FlushCommands);
+				}
+			}
+			aiunit = aiunit->Next;
+		}
+	} else {
+		// Everyone is idle, find a new target
+		aiunit = force->Units;
+		unit = NULL;
+		while (aiunit) {
+			if (aiunit->Unit->Type->CanAttack) {
+				unit = AttackUnitsInDistance(aiunit->Unit, MaxMapWidth);
 				break;
 			}
 			aiunit = aiunit->Next;
 		}
-		// Must mark the attack as terminated
-		if (!aiunit) {
+		if (!unit) {
+			// No enemy found, give up
+			// FIXME: should the force go home or keep trying to attack?
+			DebugPrint("Attack force can't find a target, giving up\n");
 			force->Attacking = 0;
-			// AiAttackWithForce(force-AiPlayer->Force);
+			return;
 		}
-	} else {
-		force->Attacking = 0;
+		aiunit = force->Units;
+		while (aiunit) {
+			if (aiunit->Unit->Type->CanAttack) {
+				CommandAttack(aiunit->Unit, unit->X, unit->Y, NULL, FlushCommands);
+			} else {
+				CommandMove(aiunit->Unit, unit->X, unit->Y, FlushCommands);
+			}
+			aiunit = aiunit->Next;
+		}
 	}
 }
 
