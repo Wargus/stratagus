@@ -636,52 +636,105 @@ void MakePlayerColorTexture(Graphic* g, int player)
 **  @param g  Graphic object.
 **  @param w  New width of graphic.
 **  @param h  New height of graphic.
-**
-**  @todo FIXME: Higher quality resizing.
-**        FIXME: Works only with 8bit indexed graphic objects.
 */
 void ResizeGraphic(Graphic* g, int w, int h)
 {
 	int i;
 	int j;
 	unsigned char* data;
+	unsigned char* pixels;
 	int x;
-	SDL_Color pal[256];
-	Uint32 ckey;
-	int useckey;
-
-	// FIXME: Support more formats
-	if (g->Surface->format->BytesPerPixel != 1) {
-		return;
-	}
+	int bpp;
 
 	if (g->GraphicWidth == w && g->GraphicHeight == h) {
 		return;
 	}
 
-	SDL_LockSurface(g->Surface);
+	bpp = g->Surface->format->BytesPerPixel;
+	if (bpp == 1) {
+		SDL_Color pal[256];
+		Uint32 ckey;
+		int useckey;
 
-	data = malloc(w * h);
-	x = 0;
+		SDL_LockSurface(g->Surface);
 
-	for (i = 0; i < h; ++i) {
-		for (j = 0; j < w; ++j) {
-			data[x] = ((unsigned char*)g->Surface->pixels)[
-				(i * g->Height / h) * g->Surface->pitch + j * g->Width / w];
-			++x;
+		pixels = (unsigned char*)g->Surface->pixels;
+		data = malloc(w * h);
+		x = 0;
+
+		for (i = 0; i < h; ++i) {
+			for (j = 0; j < w; ++j) {
+				data[x] = pixels[(i * g->Height / h) * g->Surface->pitch + j * g->Width / w];
+				++x;
+			}
 		}
-	}
 
-	SDL_UnlockSurface(g->Surface);
-	memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-	useckey = g->Surface->flags & SDL_SRCCOLORKEY;
-	ckey = g->Surface->format->colorkey;
-	SDL_FreeSurface(g->Surface);
+		SDL_UnlockSurface(g->Surface);
+		memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
+		useckey = g->Surface->flags & SDL_SRCCOLORKEY;
+		ckey = g->Surface->format->colorkey;
+		SDL_FreeSurface(g->Surface);
 
-	g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-	SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
-	if (useckey) {
-		SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+		g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
+		SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
+		if (useckey) {
+			SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+		}
+	} else {
+		int ix, iy;
+		float fx, fy, fz;
+		unsigned char *p1, *p2, *p3, *p4;
+
+		SDL_LockSurface(g->Surface);
+
+		pixels = (unsigned char*)g->Surface->pixels;
+		data = malloc(w * h * bpp);
+		x = 0;
+
+		for (i = 0; i < h; ++i) {
+			fy = (float)i * g->Height / h;
+			iy = (int)fy;
+			fy -= iy;
+			fz = (fx + fy) / 2;
+			for (j = 0; j < w; ++j) {
+				fx = (float)j * g->Width / w;
+				ix = (int)fx;
+				fx -= ix;
+
+				p1 = &pixels[iy * g->Surface->pitch + ix * bpp];
+				p2 = (iy != g->Surface->h - 1) ?
+					&pixels[(iy + 1) * g->Surface->pitch + ix * bpp] :
+					p1;
+				p3 = (ix != g->Surface->w - 1) ?
+					&pixels[iy * g->Surface->pitch + (ix + 1) * bpp] :
+					p1;
+				p4 = (iy != g->Surface->h - 1 && ix != g->Surface->w - 1) ?
+					&pixels[(iy + 1) * g->Surface->pitch + (ix + 1) * bpp] :
+					p1;
+
+				data[x * bpp + 0] = (p1[0] * (1 - fy) + p2[0] * fy +
+					p1[0] * (1 - fx) + p3[0] * fx +
+					p1[0] * (1 - fz) + p4[0] * fz) / 3 + .5;
+				data[x * bpp + 1] = (p1[1] * (1 - fy) + p2[1] * fy +
+					p1[1] * (1 - fx) + p3[1] * fx +
+					p1[1] * (1 - fz) + p4[1] * fz) / 3 + .5;
+				data[x * bpp + 2] = (p1[2] * (1 - fy) + p2[2] * fy +
+					p1[2] * (1 - fx) + p3[2] * fx +
+					p1[2] * (1 - fz) + p4[2] * fz) / 3 + .5;
+				if (bpp == 4) {
+					data[x * bpp + 3] = (p1[3] * (1 - fy) + p2[3] * fy +
+						p1[3] * (1 - fx) + p3[3] * fx +
+						p1[3] * (1 - fz) + p4[3] * fz) / 3 + .5;
+				}
+				++x;
+			}
+		}
+
+		SDL_UnlockSurface(g->Surface);
+		SDL_FreeSurface(g->Surface);
+
+		g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
+			RMASK, GMASK, BMASK, (bpp == 3 ? 0 : AMASK));
 	}
 
 	g->Width = g->GraphicWidth = w;
