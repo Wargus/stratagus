@@ -695,11 +695,11 @@ void ResizeGraphic(Graphic* g, int w, int h)
 			fy = (float)i * g->Height / h;
 			iy = (int)fy;
 			fy -= iy;
-			fz = (fx + fy) / 2;
 			for (j = 0; j < w; ++j) {
 				fx = (float)j * g->Width / w;
 				ix = (int)fx;
 				fx -= ix;
+				fz = (fx + fy) / 2;
 
 				p1 = &pixels[iy * g->Surface->pitch + ix * bpp];
 				p2 = (iy != g->Surface->h - 1) ?
