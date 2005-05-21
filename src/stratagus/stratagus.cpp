@@ -636,7 +636,7 @@ static int main1(int argc __attribute__ ((unused)),
 	InitVideo();
 
 	// Setup sound card
-	if (!SoundOff && InitSound()) {
+	if (InitSound()) {
 		SoundOff = 1;
 	}
 
