@@ -1111,12 +1111,16 @@ void InitSelections(void)
 {
 	int i;
 
-	CleanSelections();
-	Selected = malloc(MaxSelectable * sizeof(Unit*));
-	_Selected = malloc(MaxSelectable * sizeof(Unit*));
+	// This could have been initialized already when loading a game
+	if (!Selected) {
+		Selected = malloc(MaxSelectable * sizeof(Unit*));
+		_Selected = malloc(MaxSelectable * sizeof(Unit*));
+	}
 	for (i = 0; i < PlayerMax; ++i) {
-		TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
-		_TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+		if (!TeamSelected[i]) {
+			TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+			_TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+		}
 	}
 }
 
