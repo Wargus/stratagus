@@ -220,6 +220,7 @@ Load("scripts/upgrade.lua")
 Load("scripts/fonts.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ui.lua")
+Load("scripts/campaigns.lua")
 
 -- Load extra units
 list = ListDirectory("scripts/elites/")
