@@ -512,6 +512,9 @@ void HandleActionAttack(Unit* unit)
 				unit->Orders[0] = unit->SavedOrder;
 				unit->SavedOrder.Action = UnitActionStill;
 				unit->SavedOrder.Goal = NoUnitP;
+				unit->State = 0;
+				unit->SubAction = 0;
+				NewResetPath(unit);
 				return;
 			}
 			MoveToTarget(unit);
