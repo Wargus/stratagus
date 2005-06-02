@@ -183,7 +183,6 @@ DefineUnitType("unit-engineer", {
 	MaxAttackRange = 1, Priority = 50, Points = 30, Corpse = {"unit-dead-body2", 0},
 	Type = "land", Demand = 0, RightMouseAction = "harvest", RepairRange = 1,
 	CanTargetLand = true, LandUnit = true, Coward = true,
-        CanCastSpell={"spell-minefield"},
 	CanGatherResources = {{
 		"file-when-loaded", "elites/units/unit_engineer.png",
 		"resource-id", "titanium",
