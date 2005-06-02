@@ -158,7 +158,6 @@ DefineUnitType("unit-orc-wall", {
 	Type = "land", Building = true})
 
 -- Load the different races
-Load("scripts/minefield.lua")
 Load("scripts/elites/units.lua")
 
 
