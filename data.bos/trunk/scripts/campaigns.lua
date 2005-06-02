@@ -8,9 +8,9 @@
 --                        T H E   W A R   B E G I N S
 --         Stratagus - A free fantasy real time strategy game engine
 --
---      campaigns.lua - Define the used campaigns.
+--      campaigns.lua - List all available campaigns.
 --
---      (c) Copyright 2005 by Loïs Taulelle
+--      (c) Copyright 2005 by François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -28,8 +28,22 @@
 --
 --      $Id:  $
 --=============================================================================
---  Define all campaigns.
+-- List all available campaigns automatically and declare them to the engine
 
-DefineCampaign("elites", "name", "~!Elites",
-  "file", "campaigns/elites/campaign1.lua")
+local list
+local i
+local f
+local ff
 
+list = ListDirectory("campaigns/")
+for i,f in list do
+  if not(string.find(f, "^%.")) then
+     subdirlist = ListDirectory("campaigns/" .. f)
+     for i, ff in subdirlist do
+        if(string.find(ff, "^campaign.*%.lua$")) then
+          print("Found a campaign: " .. ff)
+          DefineCampaign(f, "name", f, "file", "campaigns/"..f.."/"..ff)
+        end
+     end
+  end
+end
