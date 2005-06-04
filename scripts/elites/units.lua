@@ -35,7 +35,7 @@
 --
 DefineUnitType("unit-plate1", {
 	Name = "1x1 Ground Plate",
-	Files = {"tileset-desert", "elites/buildings/plate.png"}, Size = {32, 32},
+	Files = {"default", "elites/buildings/plate.png"}, Size = {32, 32},
 	Animations = "animations-plate", Icon = "icon-plate1",
 	Costs = {"time", 10, "titanium", 150, "crystal", 0},
 	RepairHp = 1, RepairCosts = {"titanium", 1},
@@ -53,7 +53,7 @@ DefineUnitType("unit-plate1", {
 
 DefineUnitType("unit-apcs", {
 	Name = "APC Smolder",
-	Files = {"tileset-desert", "elites/units/unit_apcs.png"}, Size = {96, 96},
+	Files = {"default", "elites/units/unit_apcs.png"}, Size = {96, 96},
 	Shadow = {"file", "elites/units/unit_apcs_s.png", "size", {96, 96}},
 	Animations = "animations-apcs", Icon = "icon-apcs",
 	Costs = {"time", 100, "titanium", 200, "crystal", 50},
@@ -78,7 +78,7 @@ DefineUnitType("unit-apcs", {
 
 DefineUnitType("unit-medic", {
 	Name = "Medic",
-	Files = {"tileset-desert", "elites/units/unit_medic.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_medic.png"}, Size = {64, 64},
 	Shadow = {"file", "elites/units/unit_medic_s.png", "size", {64, 64}},
 	Animations = "animations-medic", Icon = "icon-medic",
 	Costs = {"time", 50, "titanium", 25, "crystal", 150},
@@ -103,7 +103,7 @@ DefineUnitType("unit-medic", {
 
 DefineUnitType("unit-bazoo", {
 	Name = "Bazoo",
-	Files = {"tileset-desert", "elites/units/unit_bazoo.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_bazoo.png"}, Size = {64, 64},
 	Shadow = {"file", "elites/units/unit_bazoo_s.png", "size", {64, 64}},
 	Animations = "animations-bazoo", Icon = "icon-bazoo",
 	Costs = {"time", 40, "titanium", 50, "crystal", 100},
@@ -127,7 +127,7 @@ DefineUnitType("unit-bazoo", {
 
 DefineUnitType("unit-assault", {
 	Name = "Assault Unit",
-	Files = {"tileset-desert", "elites/units/unit_assault.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_assault.png"}, Size = {64, 64},
 	Shadow = {"file", "elites/units/unit_assault_s.png", "size", {64, 64}},
 	Animations = "animations-assault", Icon = "icon-assault",
 	Costs = {"time", 30, "titanium", 25, "crystal", 50},
@@ -150,7 +150,7 @@ DefineUnitType("unit-assault", {
 
 DefineUnitType("unit-grenadier", {
 	Name = "Grenadier",
-	Files = {"tileset-desert", "elites/units/unit_grenadier.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_grenadier.png"}, Size = {64, 64},
 	Shadow  = {"file", "elites/units/unit_grenadier_s.png", "size", {64, 64}},
 	Animations = "animations-grenadier", Icon = "icon-grenadier",
 	Costs = {"time", 40, "titanium", 25, "crystal", 100},
@@ -172,7 +172,7 @@ DefineUnitType("unit-grenadier", {
 
 DefineUnitType("unit-engineer", {
 	Name = "Engineer",
-	Files = {"tileset-desert", "elites/units/unit_engineer.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_engineer.png"}, Size = {64, 64},
 	Shadow = {"file", "elites/units/unit_engineer_s.png", "size", {64, 64}},
 	DrawLevel = 19, Animations = "animations-engineer", Icon = "icon-engineer",
 	Costs = {"time", 50, "titanium", 50, "crystal", 100},
@@ -212,7 +212,7 @@ DefineUnitType("unit-engineer", {
 
 DefineUnitType("unit-harvester", {
 	Name = "Harvester",
-	Files = {"tileset-desert", "elites/units/unit_harv.png"}, Size = {96, 96},
+	Files = {"default", "elites/units/unit_harv.png"}, Size = {96, 96},
 	Shadow = {"file", "elites/units/unit_harv_s.png", "size", {96, 96}},
 	DrawLevel = 25, Animations = "animations-harvester", Icon = "icon-harvester",
 	Costs = {'time', 75, 'titanium', 250, 'crystal', 100},
@@ -252,7 +252,7 @@ DefineUnitType("unit-harvester", {
 
 DefineUnitType("unit-dorcoz", {
 	Name = "Dorcoz",
-	Files = {"tileset-desert", "elites/units/unit_dorcoz.png"}, Size = {64, 64},
+	Files = {"default", "elites/units/unit_dorcoz.png"}, Size = {64, 64},
 	Animations = "animations-dorcoz", Icon = "icon-dorcoz",
 	Costs = {"time", 100, "titanium", 50, "crystal", 300}, Speed = 10,
 	HitPoints = 100, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {31, 31},
@@ -273,7 +273,7 @@ DefineUnitType("unit-dorcoz", {
 
 DefineUnitType("unit-msilo", {
 	Name = "Missile Silo",
-	Files = {"tileset-desert", "elites/build/missile_silo.png"}, Size = {128, 128},
+	Files = {"default", "elites/build/missile_silo.png"}, Size = {128, 128},
 	Shadow = {"file", "elites/build/missile_silo_s.png", "size", {128, 128}},
 	Animations = "animations-msilo", Icon = "icon-msilo",
 	Costs = {"time", 2000, "titanium", 10000, "crystal", 10000},
@@ -297,7 +297,7 @@ DefineUnitType("unit-msilo", {
 
 DefineUnitType("unit-gen", {
 	Name = "Generator",
-	Files = {"tileset-desert", "elites/build/generator.png"}, Size = {64, 64},
+	Files = {"default", "elites/build/generator.png"}, Size = {64, 64},
 	Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
 	Animations = "animations-gen", Icon = "icon-gen",
 	Costs = {"time", 75, "titanium", 250, "crystal", 50},
@@ -318,7 +318,7 @@ DefineUnitType("unit-gen", {
 
 DefineUnitType("unit-camp", {
 	Name = "Training Camp",
-	Files = {"tileset-desert", "elites/build/training_camp.png"}, Size = {160, 128},
+	Files = {"default", "elites/build/training_camp.png"}, Size = {160, 128},
 	Shadow = {"file", "elites/build/training_camp_s.png", "size", {160, 128}},
 	Animations = "animations-camp", Icon = "icon-camp",
 	Costs = {"time", 100, "titanium", 300, "crystal", 150},
@@ -339,7 +339,7 @@ DefineUnitType("unit-camp", {
 
 DefineUnitType("unit-vault", {
 	Name = "Vault",
-	Files = {"tileset-desert", "elites/buildings/vault.png"}, Size = {160, 220},
+	Files = {"default", "elites/buildings/vault.png"}, Size = {160, 220},
 	Animations = "animations-vault", Icon = "icon-vault",
 	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
@@ -359,7 +359,7 @@ DefineUnitType("unit-vault", {
 
 DefineUnitType("unit-dev-yard", {
 	Name = "Development yard",
-	Files = {"tileset-desert", "elites/build/development_yard.png"}, Size = {224, 196},
+	Files = {"default", "elites/build/development_yard.png"}, Size = {224, 196},
 	Animations = "animations-dev-yard", Icon = "icon-dev",
 	Costs = {"time", 150, "titanium", 300, "crystal", 300},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-dev-yard",
@@ -378,7 +378,7 @@ DefineUnitType("unit-dev-yard", {
 
 DefineUnitType("unit-rfac", {
 	Name = "Research Facility",
-	Files = {"tileset-desert", "elites/build/research_facility.png"}, Size = {128, 128},
+	Files = {"default", "elites/build/research_facility.png"}, Size = {128, 128},
 	Shadow = {"file", "elites/build/research_facility_s.png", "size", {128, 128}},
 	Animations = "animations-rfac", Icon = "icon-rfac",
 	Costs = {"time", 125, "titanium", 300, "crystal", 300},
@@ -398,7 +398,7 @@ DefineUnitType("unit-rfac", {
 
 DefineUnitType("unit-hosp", {
 	Name = "Hospital",
-	Files = {"tileset-desert", "elites/build/hospital.png"}, Size = {128, 96},
+	Files = {"default", "elites/build/hospital.png"}, Size = {128, 96},
 	Shadow = {"file", "elites/build/hospital_s.png", "size", {128, 96}},
 	Animations = "animations-hosp", Icon = "icon-hosp",
 	Costs = {"time", 125, "titanium", 500, "crystal", 100},
@@ -418,7 +418,7 @@ DefineUnitType("unit-hosp", {
 
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
-	Files = {"tileset-desert", "elites/build/vehicle_factory.png"}, Size = {224, 160},
+	Files = {"default", "elites/build/vehicle_factory.png"}, Size = {224, 160},
 	Shadow = {"file", "elites/build/vehicle_factory_s.png", "size", {224, 160}},
 	Animations = "animations-vfac", Icon = "icon-vfac",
 	Costs = {"time", 200, "titanium", 750, "crystal", 100},
@@ -440,7 +440,7 @@ CorpseTable = {"assault", "engineer", "grenadier", "bazoo", "medic"}
 for i = 1, table.getn(CorpseTable) do
 	DefineUnitType("unit-dead-body" .. i, {
 		Name = CorpseTable[i] .. "body",
-		Files = {"tileset-desert", "elites/units/unit_" .. CorpseTable[i] .. "_c.png"},
+		Files = {"default", "elites/units/unit_" .. CorpseTable[i] .. "_c.png"},
 		Size = {64, 64},
 		Animations = "animations-elitecorpse1", Icon = "icon-cancel",
 		Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {1, 1},
@@ -451,7 +451,7 @@ end
 
 DefineUnitType("build-dead-body1", {
 	Name = "DevelopmentyardCrater",
-	Files = {"tileset-desert", "elites/build/development_yard.png"}, Size = {224, 196},
+	Files = {"default", "elites/build/development_yard.png"}, Size = {224, 196},
 	Animations = "animations-elitebuild1", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {7, 6}, BoxSize = {220, 192},
@@ -461,7 +461,7 @@ DefineUnitType("build-dead-body1", {
 
 DefineUnitType("build-dead-body2", {
 	Name = "GeneratorCrater",
-	Files = {"tileset-desert", "elites/build/generator.png"}, Size = {64, 64},
+	Files = {"default", "elites/build/generator.png"}, Size = {64, 64},
 	Animations = "animations-elitebuild2", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
@@ -471,7 +471,7 @@ DefineUnitType("build-dead-body2", {
 
 DefineUnitType("build-dead-body3", {
 	Name = "CampCrater",
-	Files = {"tileset-desert", "elites/build/training_camp.png"}, Size = {160, 128},
+	Files = {"default", "elites/build/training_camp.png"}, Size = {160, 128},
 	Animations = "animations-elitebuild3", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {5, 4}, BoxSize = {156, 124}, SightRange = 1,
@@ -481,7 +481,7 @@ DefineUnitType("build-dead-body3", {
 
 DefineUnitType("build-dead-body4", {
 	Name = "RfacCrater",
-	Files = {"tileset-desert", "elites/build/research_facility.png"}, Size = {128, 128},
+	Files = {"default", "elites/build/research_facility.png"}, Size = {128, 128},
 	Animations = "animations-elitebuild4", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {4, 4}, BoxSize = {124, 124}, SightRange = 1,
@@ -491,7 +491,7 @@ DefineUnitType("build-dead-body4", {
 
 DefineUnitType("build-dead-body5", {
 	Name = "HospCrater",
-	Files = {"tileset-desert", "elites/build/hospital.png"}, Size = {128, 96},
+	Files = {"default", "elites/build/hospital.png"}, Size = {128, 96},
 	Animations = "animations-elitebuild5", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {4, 3},
 	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
@@ -501,7 +501,7 @@ DefineUnitType("build-dead-body5", {
 
 DefineUnitType("build-dead-body6", {
 	Name = "FactoryCrater",
-	Files = {"tileset-desert", "elites/build/vehicle_factory.png"}, Size = {224, 160},
+	Files = {"default", "elites/build/vehicle_factory.png"}, Size = {224, 160},
 	Animations = "animations-elitebuild6", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
 	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,
@@ -511,25 +511,19 @@ DefineUnitType("build-dead-body6", {
 
 DefineUnitType("build-dead-body7", {
 	Name = "SiloCrater",
-	Files = {"tileset-desert", "elites/build/missile_silo.png"}, Size = {128, 128},
+	Files = {"default", "elites/build/missile_silo.png"}, Size = {128, 128},
 	Animations = "animations-elitebuild7", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,	TileSize = {4, 4},
 	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
 	Type = "land" , Building = true, Vanishes = true})
 
-DefineUnitType("unit-elites-start-location", {
+DefineUnitType("unit-start-location", {
 	Name = "Start Location",
-	Files = {"tileset-desert", "elites/x_startpoint.png"}, Size = {32, 32},
-	Animations = "animations-building", Icon = "icon-cancel",
+	Files = {"default", "elites/x_startpoint.png"}, Size = {32, 32},
+	Animations = "animations-building", Icon = "icon-start-location",
 	Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
 	BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, Demand = 0, Type = "land",
-	Sounds = {
-		"selected", "elites-start-location-selected",
-		"acknowledge", "elites-start-location-acknowledge",
-		"ready", "elites-start-location-ready",
-		"help", "basic elites voices help 2",
-		"dead", "building destroyed"}
 	})
 

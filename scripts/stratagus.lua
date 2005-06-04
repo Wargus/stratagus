@@ -49,7 +49,7 @@ SetTitleScreens(
 SetGameName("bos")
 
 --	set the default map file.
-SetDefaultMap="puds/default.pud"
+SetDefaultMap="puds/default.smp"
 
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here
@@ -202,9 +202,6 @@ end
 --	Tables-Part
 -------------------------------------------------------------------------------
 SetFogOfWarGraphics("general/fog.png")
-DefineTileset("tileset-desert", "class", "desert", "name", "Desert", "file", "scripts/tilesets/desert.lua")
--- FIXME: todo winter
-DefineTileset("tileset-winter", "class", "winter", "name", "Winter (incomplete)", "file", "scripts/tilesets/winter.lua")
 
 Load("preferences1.lua")
 

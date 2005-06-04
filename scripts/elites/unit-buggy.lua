@@ -67,7 +67,7 @@ MakeSound("buggy-die",         "elites/units/buggy_die.wav")
 
 DefineUnitType("buggy_destroyed", {
         Name = "DestroyedBuggy",
-        Files = {"tileset-desert", "elites/units/unit_buggy.png"},
+        Files = {"default", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
         Animations = "animations-dead_buggy", Icon = "icon-cancel",
@@ -83,7 +83,7 @@ DefineUnitType("buggy_destroyed", {
 
 DefineUnitType("unit-buggy", {
         Name = "Buggy",
-        Files = {"tileset-desert", "elites/units/unit_buggy.png"},
+        Files = {"default", "elites/units/unit_buggy.png"},
         Size = {64, 64},
         Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
         Animations = "animations-buggy", Icon = "icon-buggy",
