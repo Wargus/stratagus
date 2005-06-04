@@ -50,13 +50,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Mapping of wc numbers to our internal tileset symbols.
-** The numbers are used in puds.
-** 0 = summer, 1 = winter, 2 = wasteland, 3 = swamp.
-*/
-char** TilesetWcNames;
-
-/**
 ** Number of available Tilesets.
 */
 int NumTilesets;
@@ -96,19 +89,13 @@ void LoadTileset(void)
 	int mixed;
 	const unsigned short* table;
 
-	//
 	//  Find the tileset.
-	//
-	for (i = 0; i < NumTilesets; ++i) {
-		if (!strcmp(TheMap.TerrainName, Tilesets[i]->Ident)) {
-			break;
-		}
-	}
+	i=0;
+
 	if (i == NumTilesets) {
-		fprintf(stderr, "Tileset `%s' not available\n", TheMap.TerrainName);
+		fprintf(stderr, "No tileset available\n");
 		ExitFatal(-1);
 	}
-	Assert(i == TheMap.Terrain);
 
 	if (!Tilesets[i]->Table) {
 		char buf[1024];
@@ -483,12 +470,8 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	int i;
-	int j;
-	char** ptr;
 
-	//
 	// Free the tilesets
-	//
 	for (i = 0; i < NumTilesets; ++i) {
 		free(Tilesets[i]->Ident);
 		free(Tilesets[i]->File);
@@ -501,9 +484,7 @@ void CleanTilesets(void)
 		free(Tilesets[i]->MixedLookupTable);
 		free(Tilesets[i]->TileTypeTable);
 		free(Tilesets[i]->AnimationTable);
-		for (j = 0; j < Tilesets[i]->NumTerrainTypes; ++j) {
-			free(Tilesets[i]->SolidTerrainTypes[j].TerrainName);
-		}
+		free(Tilesets[i]->SolidTerrainTypes[0].TerrainName);
 		free(Tilesets[i]->SolidTerrainTypes);
 
 		free(Tilesets[i]);
@@ -517,18 +498,6 @@ void CleanTilesets(void)
 	//
 	FreeGraphic(TheMap.TileGraphic);
 	TheMap.TileGraphic = NULL;
-
-	//
-	// Mapping the original tileset numbers in puds to our internal strings
-	//
-	if ((ptr = TilesetWcNames)) { // Free all old names
-		while (*ptr) {
-			free(*ptr++);
-		}
-		free(TilesetWcNames);
-
-		TilesetWcNames = NULL;
-	}
 }
 
 //@}

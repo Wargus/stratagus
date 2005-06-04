@@ -75,7 +75,7 @@ typedef struct _settings_ {
 	int RevealMap;   /// Reveal map
 } Settings;
 
-#define SettingsPresetMapDefault  -1  /// Special: Use pud/cm supplied
+#define SettingsPresetMapDefault  -1  /// Special: Use map supplied
 
 /**
 **  Single or multiplayer settings

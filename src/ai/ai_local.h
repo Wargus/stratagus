@@ -275,7 +275,6 @@ extern AiHelper AiHelpers; /// AI helper variables
 
 extern int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 extern PlayerAi* AiPlayer; /// Current AI player
-extern char** AiTypeWcNames; /// pud num to internal string mapping
 
 /*----------------------------------------------------------------------------
 --  Functions

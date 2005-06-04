@@ -100,29 +100,7 @@ static int CclStratagusMap(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 
-				if (!strcmp(value, "terrain")) {
-					int i;
-
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
-					}
-					lua_rawgeti(l, -1, 1);
-					value = LuaToString(l, -1);
-					lua_pop(l, 1);
-					// ignore (l, -1, 2)
-					lua_pop(l, 1);
-
-					free(TheMap.TerrainName);
-					TheMap.TerrainName = strdup(value);
-
-					// Lookup the index of this tileset.
-					for (i = 0; TilesetWcNames[i] &&
-						strcmp(value, TilesetWcNames[i]); ++i) {
-					}
-					TheMap.Terrain = i;
-					LoadTileset();
-				} else if (!strcmp(value, "size")) {
+				if (!strcmp(value, "size")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -450,21 +428,9 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 */
 static int CclSelectTileset(lua_State* l)
 {
-	const char* tileset;
-	int i;
-
-	LuaCheckArgs(l, 1);
-	tileset = LuaToString(l, 1);
-
-	free(TheMap.TerrainName);
-	TheMap.TerrainName = strdup(tileset);
-
-	printf("%s\n", TilesetWcNames[0]);
-	// Lookup the index of this tileset.
-	for (i = 0; TilesetWcNames[i] &&
-		strcmp(tileset, TilesetWcNames[i]); ++i) {
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
 	}
-	TheMap.Terrain = i;
 	LoadTileset();
 
 	return 0;
@@ -487,7 +453,7 @@ static int CclSetTile(lua_State* l)
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
-	tileset = Tilesets[TheMap.Terrain];
+	tileset = Tilesets[0];
 
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = tileset->Table[tile];
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
@@ -530,8 +496,30 @@ static int CclDefinePlayerTypes(lua_State* l)
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
-	for (i = numplayers; i < PlayerMax; i++) {
+	for (i = numplayers; i < PlayerMax - 1; i++) {
 		TheMap.Info.PlayerType[i] = PlayerNobody;
+	}
+	if (numplayers < PlayerMax)
+		TheMap.Info.PlayerType[PlayerMax-1] = PlayerNeutral;
+	return 0;
+}
+
+/**
+** Load the lua file which will define the tile models
+**
+**  @param l  Lua state.
+*/
+static int CclLoadTileModels(lua_State* l)
+{
+	char buf[1024];
+
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	strcpy(TheMap.TileModelsFileName, LuaToString(l, 1));  
+	LibraryFileName(TheMap.TileModelsFileName, buf);
+	if (LuaLoadFile(buf) == -1) {
+		DebugPrint("Load failed: %s\n" _C_ LuaToString(l, 1));
 	}
 	return 0;
 }
@@ -557,6 +545,7 @@ void MapCclRegister(void)
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
 	lua_register(Lua, "SelectTileset", CclSelectTileset);
+	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "SetTile", CclSetTile);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 }

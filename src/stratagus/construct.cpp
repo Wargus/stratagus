@@ -54,12 +54,6 @@
 */
 static Construction** Constructions;
 
-/**
-**  Table mapping the original construction numbers in puds to
-**  our internal string.
-*/
-char** ConstructionWcNames;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -87,15 +81,9 @@ void LoadConstructions(void)
 			if (!(*cop)->Ident) {
 				continue;
 			}
-			file = (*cop)->File[TheMap.Terrain].File;
-			if (file) { // default one
-				(*cop)->Width = (*cop)->File[TheMap.Terrain].Width;
-				(*cop)->Height = (*cop)->File[TheMap.Terrain].Height;
-			} else {
-				file = (*cop)->File[0].File;
-				(*cop)->Width = (*cop)->File[0].Width;
-				(*cop)->Height = (*cop)->File[0].Height;
-			}
+			file = (*cop)->File[0].File;
+			(*cop)->Width = (*cop)->File[0].Width;
+			(*cop)->Height = (*cop)->File[0].Height;
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->Sprite = NewGraphic(file,
@@ -103,15 +91,9 @@ void LoadConstructions(void)
 				LoadGraphic((*cop)->Sprite);
 				FlipGraphic((*cop)->Sprite);
 			}
-			file = (*cop)->ShadowFile[TheMap.Terrain].File;
-			if (file) {
-				(*cop)->ShadowWidth = (*cop)->ShadowFile[TheMap.Terrain].Width;
-				(*cop)->ShadowHeight = (*cop)->ShadowFile[TheMap.Terrain].Height;
-			} else {
-				file = (*cop)->ShadowFile[0].File;
-				(*cop)->ShadowWidth = (*cop)->ShadowFile[0].Width;
-				(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
-			}
+			file = (*cop)->ShadowFile[0].File;
+			(*cop)->ShadowWidth = (*cop)->ShadowFile[0].Width;
+			(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->ShadowSprite = NewGraphic(file,
@@ -130,22 +112,10 @@ void LoadConstructions(void)
 */
 void CleanConstructions(void)
 {
-	char** cp;
 	int j;
 	Construction** cop;
 	ConstructionFrame* cframe;
 	ConstructionFrame* tmp;
-
-	//
-	//  Mapping original construction numbers in puds to our internal strings
-	//
-	if ((cp = ConstructionWcNames)) {
-		while (*cp) {
-			free(*cp++);
-		}
-		free(ConstructionWcNames);
-		ConstructionWcNames = NULL;
-	}
 
 	//
 	//  Free the construction table.
@@ -204,53 +174,7 @@ Construction* ConstructionByIdent(const char* ident)
 	return NULL;
 }
 
-/**
-**  Get construction by original wc number.
-**
-**  @param num  Original number used in puds.
-*/
-Construction* ConstructionByWcNum(int num)
-{
-	return ConstructionByIdent(ConstructionWcNames[num]);
-}
-
 // ----------------------------------------------------------------------------
-
-/**
-**  Define construction mapping from original number to internal symbol
-**
-**  @param l  Lua state.
-*/
-static int CclDefineConstructionWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	if ((cp = ConstructionWcNames)) { // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(ConstructionWcNames);
-	}
-
-	//
-	// Get new table.
-	//
-	i = lua_gettop(l);
-	ConstructionWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
 
 /**
 **  Parse the construction.
@@ -439,8 +363,6 @@ static int CclDefineConstruction(lua_State* l)
 */
 void ConstructionCclRegister(void)
 {
-	lua_register(Lua, "DefineConstructionWcNames",
-		CclDefineConstructionWcNames);
 	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
 }
 

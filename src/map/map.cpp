@@ -46,7 +46,6 @@
 #include "player.h"
 #include "unit.h"
 #include "pathfinder.h"
-#include "pud.h"
 #include "ui.h"
 #include "editor.h"
 #if defined(MAP_REGIONS)
@@ -90,7 +89,7 @@ void MapMarkSeenTile(int x, int y)
 	mf->SeenTile = tile;
 
 	// FIXME: this is needed, because tileset is loaded after this function
-	//        is needed LoadPud, PlaceUnit, ... MapMarkSeenTile
+	//        is needed LoadMap, PlaceUnit, ... MapMarkSeenTile
 	if (!TheMap.Tileset) {
 		return;
 	}
@@ -389,7 +388,6 @@ void FreeMapInfo(MapInfo* info)
 {
 	if (info) {
 		free(info->Description);
-		free(info->MapTerrainName);
 		free(info->Filename);
 		memset(info, 0, sizeof(MapInfo));
 	}
@@ -423,7 +421,6 @@ void CreateMap(int width, int height)
 void CleanMap(void)
 {
 	free(TheMap.Fields);
-	free(TheMap.TerrainName);
 	free(TheMap.Visible[0]);
 
 	// Tileset freed by Tileset?
@@ -436,8 +433,6 @@ void CleanMap(void)
 	DestroyMinimap();
 
 	CleanMapFogOfWar();
-
-	CleanPud();
 }
 
 

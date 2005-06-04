@@ -53,7 +53,6 @@
 #include "campaign.h"
 #include "menus.h"
 #include "sound.h"
-#include "pud.h"
 #include "iolib.h"
 #include "iocompat.h"
 #include "commands.h"
@@ -70,6 +69,8 @@ extern void DoScrollArea(enum _scroll_state_ state, int fast);
 #define UNIT_ICON_Y (0)                   /// Unit mode icon
 #define TILE_ICON_X (IconWidth * 2 + 16)  /// Tile mode icon
 #define TILE_ICON_Y (2)                   /// Tile mode icon
+#define START_ICON_X (IconWidth * 3 + 16)  /// Start mode icon
+#define START_ICON_Y (2)                   /// Start mode icon
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -96,6 +97,7 @@ enum _mode_buttons_ {
 	SelectButton = 201,  /// Select mode button
 	UnitButton,          /// Unit mode button
 	TileButton,          /// Tile mode button
+	StartButton
 };
 
 char** EditorUnitTypes;  /// Sorted editor unit-type table
@@ -518,17 +520,14 @@ static void DrawTileIcons(void)
 }
 
 /**
-**  Draw unit icons.
-*/
-static void DrawUnitIcons(void)
+* Draw a table with the players
+**/
+static void DrawPlayers(void) 
 {
 	int x;
 	int y;
 	int i;
-	int j;
-	int percent;
 	char buf[256];
-	Icon *icon;
 
 	x = TheUI.InfoPanelX + 8;
 	y = TheUI.InfoPanelY + 4 + IconHeight + 10;
@@ -554,8 +553,8 @@ static void DrawUnitIcons(void)
 		sprintf(buf, "%d", i);
 		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
 	}
-
-	x = TheUI.InfoPanelX + 4;
+	
+		x = TheUI.InfoPanelX + 4;
 	y += 18 * 1 + 4;
 	if (SelectedPlayer != -1) {
 		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
@@ -582,6 +581,20 @@ static void DrawUnitIcons(void)
 
 		VideoDrawText(x, y, GameFont, buf);
 	}
+}
+
+
+/**
+**  Draw unit icons.
+*/
+static void DrawUnitIcons(void)
+{
+	int x;
+	int y;
+	int i;
+	int j;
+	int percent;
+	Icon *icon;
 
 	//
 	// Draw the unit selection buttons.
@@ -757,13 +770,24 @@ static void DrawEditorPanel(void)
 		(ButtonUnderCursor == TileButton ? IconActive : 0) |
 			(EditorState == EditorEditTile ? IconSelected : 0));
 
+	icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
+	Assert(icon);
+	DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
+		(ButtonUnderCursor == StartButton ? IconActive : 0) |
+			(EditorState == EditorSetStartLocation ? IconSelected : 0),
+		x + START_ICON_X, y + START_ICON_Y, NULL);
+
 	switch (EditorState) {
 		case EditorSelecting:
 			break;
 		case EditorEditTile:
 			DrawTileIcons();
 			break;
+		case EditorSetStartLocation:
+			DrawPlayers();
+			break;
 		case EditorEditUnit:
+			DrawPlayers();
 			DrawUnitIcons();
 			break;
 	}
@@ -827,6 +851,26 @@ static void DrawMapCursor(void)
 				VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
 				PopClipping();
 			}
+		}
+	}
+}
+
+/**
+**  Draw the start locations of all active players on the map
+*/
+static void DrawStartLocations(void)
+{
+	int i;
+	int x, y;
+	UnitType *type;
+	
+	type = UnitTypeByIdent(EditorStartUnit);
+	
+	for (i = 0; i < PlayerMax; i++) {
+		if (Players[i].Type != PlayerNobody && Players[i].Type != PlayerNeutral) {
+			x = Map2ViewportX(CurrentViewport, Players[i].StartX);
+			y = Map2ViewportY(CurrentViewport, Players[i].StartY);
+			DrawUnitType(type, type->Sprite, i, 0, x, y); 
 		}
 	}
 }
@@ -927,6 +971,8 @@ void EditorUpdateDisplay(void)
 	int i;
 
 	DrawMapArea(); // draw the map area
+
+	DrawStartLocations();
 
 	//
 	// Fillers
@@ -1070,6 +1116,10 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 			EditorState = EditorEditTile;
 			return;
 		}
+		if (ButtonUnderCursor == StartButton) {
+			EditorState = EditorSetStartLocation;
+			return;
+		}
 	}
 	//
 	// Click on tile area
@@ -1101,6 +1151,19 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		}
 		return;
 	}
+	
+	// Click on player area
+	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
+		// Cursor on player icons
+		if (CursorPlayer != -1) {
+			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
+				SelectedPlayer = CursorPlayer;
+				ThisPlayer = Players + SelectedPlayer;
+			}
+			return;
+		}
+	}
+
 	//
 	// Click on unit area
 	//
@@ -1139,14 +1202,6 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 		if (CursorUnitIndex != -1) {
 			SelectedUnitIndex = CursorUnitIndex;
 			CursorBuilding = UnitTypeByIdent(ShownUnitTypes[CursorUnitIndex]);
-			return;
-		}
-		// Cursor on player icons
-		if (CursorPlayer != -1) {
-			if (TheMap.Info.PlayerType[CursorPlayer] != PlayerNobody) {
-				SelectedPlayer = CursorPlayer;
-				ThisPlayer = Players + SelectedPlayer;
-			}
 			return;
 		}
 		// Cursor on unit selection icons
@@ -1254,6 +1309,10 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 					}
 				}
 			}
+			if (EditorState == EditorSetStartLocation) {
+				Players[SelectedPlayer].StartX = Viewport2MapX(TheUI.MouseViewport, CursorX);
+				Players[SelectedPlayer].StartY = Viewport2MapY(TheUI.MouseViewport, CursorY);
+			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
 			CursorStartX = CursorX;
@@ -1285,11 +1344,11 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			ToggleFullScreen();
 			break;
 
-		case 's': // ALT s F11 save pud menu
+		case 's': // ALT s F11 save map menu
 		case 'S':
 		case KeyCodeF11:
 			if (EditorSaveMenu() != -1) {
-				SetStatusLine("Pud saved");
+				SetStatusLine("Map saved");
 			}
 			InterfaceState = IfaceStateNormal;
 			break;
@@ -1580,7 +1639,7 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Handle edit unit area
 	//
-	if (EditorState == EditorEditUnit) {
+	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
 		// Scrollbar
 		if (TheUI.ButtonPanelX + 4 < CursorX
 				&& CursorX < TheUI.ButtonPanelX + 176 - 4
@@ -1677,7 +1736,7 @@ static void EditorCallbackMouse(int x, int y)
 
 					// FIXME: i is wrong, must find the solid type
 					j = TheMap.Tileset->Tiles[i * 16 + 16].BaseTerrain;
-					SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
+					//MAPTODO SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
 					return;
@@ -1721,6 +1780,16 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonUnderCursor = TileButton;
 		CursorOn = CursorOnButton;
 		SetStatusLine("Tile mode");
+		return;
+	}
+	if (TheUI.InfoPanelX + 4 + START_ICON_X < CursorX &&
+			CursorX < TheUI.InfoPanelX + 4 + START_ICON_X + TileSizeX + 7 &&
+			TheUI.InfoPanelY + 4 + START_ICON_Y < CursorY &&
+			CursorY < TheUI.InfoPanelY + 4 + START_ICON_Y + TileSizeY + 7) {
+		ButtonAreaUnderCursor = -1;
+		ButtonUnderCursor = StartButton;
+		CursorOn = CursorOnButton;
+		SetStatusLine("Set start location mode");
 		return;
 	}
 	if (TheUI.MenuButton.X != -1) {
@@ -1800,7 +1869,6 @@ static void EditorCallbackExit(void)
 static void CreateEditor(void)
 {
 	int i;
-	int n;
 	char* file;
 	char buf[PATH_MAX];
 	CLFile* clf;
@@ -1827,12 +1895,8 @@ static void CreateEditor(void)
 		//
 		// Inititialize TheMap / Players.
 		//
-		TheMap.Info.MapTerrainName =
-			strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
 		InitPlayers();
 		for (i = 0; i < PlayerMax; ++i) {
-			int j;
-
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
 				TheMap.Info.PlayerType[i] = PlayerNeutral;
@@ -1841,18 +1905,13 @@ static void CreateEditor(void)
 				CreatePlayer(PlayerNobody);
 				TheMap.Info.PlayerType[i] = PlayerNobody;
 			}
-			for (j = 1; j < MaxCosts; ++j) {
-				TheMap.Info.PlayerResources[i][j] = Players[i].Resources[j];
-			}
 		}
 
 		TheMap.Fields = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
-		TheMap.Terrain = TheMap.Info.MapTerrain;
-		TheMap.TerrainName = strdup(Tilesets[TheMap.Info.MapTerrain]->Ident);
-		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
+		TheMap.Tileset = Tilesets[0];
 		LoadTileset();
 
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
@@ -1880,41 +1939,17 @@ static void CreateEditor(void)
 			if (SelectedPlayer == PlayerNumNeutral) {
 				SelectedPlayer = i;
 			}
-#if 0
-			// FIXME: must support more races
-			switch (TheMap.Info.PlayerSide[i]) {
-				case PlayerRaceHuman:
-					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(WC_StartLocationHuman),
-						Players + i);
-					break;
-				case PlayerRaceOrc:
-					MakeUnitAndPlace(Players[i].StartX, Players[i].StartY,
-						UnitTypeByWcNum(WC_StartLocationOrc),
-						Players + i);
-					break;
-			}
-#endif
 		} else if (Players[i].StartX | Players[i].StartY) {
 			DebugPrint("Player nobody has a start position\n");
 		}
 	}
 
 	if (!EditorUnitTypes) {
-		//
-		// Build editor unit-type tables.
-		//
-		i = 0;
-		while (UnitTypeWcNames[i]) {
-			++i;
-		}
-		n = i + 1;
-		EditorUnitTypes = malloc(sizeof(char*) * n);
-		for (i = 0; i < n; ++i) {
-			EditorUnitTypes[i] = UnitTypeWcNames[i];
-		}
-		MaxUnitIndex = n - 1;
+		// Build empty editor unit-type tables.
+		EditorUnitTypes = malloc(sizeof(char*) * 2);
+		MaxUnitIndex = 0;
 	}
+
 	CalculateMaxIconSize();
 	ShowUnitsToSelect = 1; // Show all units as default
 	ShowBuildingsToSelect = 1;
@@ -1933,49 +1968,26 @@ static void CreateEditor(void)
 }
 
 /**
-**  Save a pud from editor.
+**  Save a map from editor.
 **
 **  @param file  Save the level to this file.
 **
 **  @return      0 for success, -1 for error
 **
-**  @todo  FIXME: Check if the pud is valid, contains no failures.
+**  @todo  FIXME: Check if the map is valid, contains no failures.
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-int EditorSavePud(const char* file)
+int EditorSaveMap(const char* file)
 {
-	int i;
-
-	for (i = 0; i < NumUnits; ++i) {
-		const UnitType* type;
-
-		type = Units[i]->Type;
-		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
-				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
-			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags &=
-				~MapFieldLandUnit;
-		}
-	}
-	if (SavePud(file, &TheMap) == -1) {
+	if (SaveStratagusMap(file, &TheMap) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();
 		InterfaceState = IfaceStateMenu;
 		return -1;
 	}
-	for (i = 0; i < NumUnits; ++i) {
-		const UnitType* type;
 
-		type = Units[i]->Type;
-		if (type == UnitTypeByWcNum(WC_StartLocationHuman) ||
-				type == UnitTypeByWcNum(WC_StartLocationOrc)) {
-			// FIXME: Startpoints sets the land-unit flag.
-			TheMap.Fields[Units[i]->X + Units[i]->Y * TheMap.Info.MapWidth].Flags |=
-				MapFieldLandUnit;
-		}
-	}
 	return 0;
 }
 

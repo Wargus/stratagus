@@ -63,7 +63,7 @@
 ** ::AiInit(::Player)
 **
 ** Called for each player, to setup the AI structures
-** Player::Aiin the player structure. It can use Player::AiNum to
+** Player::Aiin the player structure. It can use Player::AiName to
 ** select different AI's.
 **
 ** ::CleanAi(void)
@@ -163,10 +163,6 @@ AiType* AiTypes; /// List of all AI types.
 AiHelper AiHelpers; /// AI helper variables
 
 PlayerAi* AiPlayer; /// Current AI player
-/**
-**  W*rCr*ft number to internal ai-type name.
-*/
-char** AiTypeWcNames;
 
 /*----------------------------------------------------------------------------
 -- Lowlevel functions
@@ -329,37 +325,6 @@ static void AiCheckUnits(void)
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
-#if 0
-/**
-**  Save the mapping of pud numbers of the AI to internal symbols.
-**
-**  @param file  Output file.
-*/
-static void SaveAiTypesWcName(CLFile* file)
-{
-	char** cp;
-	int i;
-
-	//
-	//  Dump table wc2 race numbers -> internal symbol.
-	//
-	if ((cp = AiTypeWcNames)) {
-		CLprintf(file, "DefineAiWcNames(");
-
-		if (*cp) {
-			i = CLprintf(file, "\n \"%s\"", *cp++);
-		}
-		while (*cp) {
-			if (i + strlen(*cp) > 79) {
-				i = CLprintf(file, "\n ");
-			}
-			i += CLprintf(file, ", \"%s\"", *cp++);
-		}
-		CLprintf(file, ")\n\n");
-	}
-}
-#endif
 
 #if 0
 /**
@@ -810,7 +775,6 @@ void SaveAi(CLFile* file)
 		"--- MODULE: AI $Id$\n\n");
 
 #if 0
-	SaveAiTypesWcName(file);
 	SaveAiHelper(file);
 	SaveAiTypes(file);
 #endif
@@ -838,9 +802,10 @@ void AiInit(Player* player)
 	pai->Player = player;
 	ait = AiTypes;
 
-	ainame = AiTypeWcNames[player->AiNum];
-	DebugPrint("%d - %s - looking for class %s\n" _C_
-		player->Player _C_ player->Name _C_ ainame);
+	ainame = player->AiName;
+	DebugPrint("%d - %p - looking for class %s\n" _C_
+		player->Player _C_ player _C_ ainame);
+	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//
 	//  Search correct AI type.
@@ -883,8 +848,8 @@ void AiInit(Player* player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ ait->Race
-		_C_ ainame _C_ ait->Class);
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ 
+		ait->Race ? ait->Race : "All" _C_ ainame _C_ ait->Class);
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;
@@ -916,7 +881,6 @@ void CleanAi(void)
 	AiType* aitype;
 	AiBuildQueue* queue;
 	AiExplorationRequest* request;
-	char** cp;
 
 	for (p = 0; p < PlayerMax; ++p) {
 		if ((pai = Players[p].Ai)) {
@@ -1025,17 +989,6 @@ void CleanAi(void)
 	free(AiHelpers.Equiv);
 
 	memset(&AiHelpers, 0, sizeof (AiHelpers));
-
-	//
-	//  Mapping original AI numbers in puds to our internal strings
-	//
-	if ((cp = AiTypeWcNames)) { // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(AiTypeWcNames);
-		AiTypeWcNames = NULL;
-	}
 
 	AiResetUnitTypeEquiv();
 }
