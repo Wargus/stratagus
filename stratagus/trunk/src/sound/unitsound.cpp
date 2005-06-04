@@ -74,33 +74,6 @@ static void RemapSounds(void)
 	// FIXME: move to config CCL
 	MapSound("gold-mine-help", SoundIdForName("basic orc voices help 1"));
 
-#if 0
-	// critter mapping FIXME: move this to CCL
-	switch (TheMap.Terrain) {
-		case TilesetSummer:
-			MakeSoundGroup("critter-selected",
-			   SoundIdForName("sheep selected"),
-			   SoundIdForName("sheep annoyed"));
-			break;
-		case TilesetWinter:
-			MakeSoundGroup("critter-selected",
-			   SoundIdForName("seal selected"),
-			   SoundIdForName("seal annoyed"));
-			break;
-		case TilesetWasteland:
-			MakeSoundGroup("critter-selected",
-			   SoundIdForName("pig selected"),
-			   SoundIdForName("pig annoyed"));
-			break;
-		case TilesetSwamp:
-			MakeSoundGroup("critter-selected",
-			   SoundIdForName("warthog selected"),
-			   SoundIdForName("warthog annoyed"));
-			break;
-		default:
-			break;
-	}
-#endif
 }
 
 /**

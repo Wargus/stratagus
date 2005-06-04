@@ -59,7 +59,6 @@
 #include "campaign.h"
 #include "video.h"
 #include "iolib.h"
-#include "pud.h"
 #include "commands.h"
 #include "ai.h"
 

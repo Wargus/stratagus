@@ -1008,7 +1008,7 @@ struct _unit_type_ {
 	struct _graphic_* ShadowSprite;          /// Shadow sprite image
 };
 
-	/// @todo ARI: should be dynamic (lua..), JOHNS: Pud only supports 255.
+	/// @todo ARI: should be dynamic (lua..).
 	/// How many unit-types are currently supported
 #define UnitTypeMax 257
 
@@ -1022,8 +1022,6 @@ extern int NumUnitTypes;                    /// Number of unit-types made
 /// @todo this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeHumanWall;          /// Human wall
 extern UnitType*UnitTypeOrcWall;            /// Orc wall
-
-extern char** UnitTypeWcNames;              /// Mapping wc-number 2 symbol
 
 /**
 **  Variable info for unit and unittype.
@@ -1049,7 +1047,6 @@ extern void UnitTypeCclRegister(void);          /// Register ccl features
 
 extern void UpdateStats(int reset_to_default);  /// Update unit stats
 extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
-extern UnitType* UnitTypeByWcNum(unsigned);     /// Get unit-type by wc number
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
 	/// Get the animations structure by ident

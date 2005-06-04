@@ -469,7 +469,7 @@ void GameMainLoop(void)
 		if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
 			//FIXME: this might be better placed somewhere at front of the
 			// program, as we now still have a game on the background and
-			// need to go through hte game-menu or supply a pud-file
+			// need to go through the game-menu or supply a map file
 			UpdateDisplay();
 
 			//

@@ -32,6 +32,8 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
+#include "iocompat.h"
+
 //@{
 
 /*----------------------------------------------------------------------------
@@ -136,16 +138,6 @@
 **
 **    Flag if true, the fog of war is disabled.
 **
-**  WorldMap::TerrainName
-**
-**    Terrain as name. Used for unit-type look changes depending on
-**    the current terrain type. In the future we want to support
-**    multiple terrains pro map.
-**
-**  WorldMap::Terrain
-**
-**    The terrain as number, this should be removed.
-**
 **  WorldMap::Tileset
 **
 **    Tileset data for the map. See ::Tileset. This contains all
@@ -248,16 +240,11 @@ typedef struct _map_field_ {
 */
 typedef struct _map_info_ {
 	char*  Description;     /// Map description
-	char*  MapTerrainName;  /// Map terrain name
 	char*  Filename;        /// Map filename
-	// TODO: Map Terrain Nr. should be removed.
-	int MapTerrain;  /// Map terrain
 	int MapWidth;    /// Map width
 	int MapHeight;   /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
-	int PlayerResources[PlayerMax][MaxCosts];  /// Same player->Gold
-	int PlayerAi[PlayerMax];  /// Same player->Ai
 	unsigned int MapUID;  /// Unique Map ID (hash)
 } MapInfo;
 
@@ -272,11 +259,8 @@ typedef struct _world_map_ {
 
 	unsigned char NoFogOfWar;  /// fog of war disabled
 
-	char* TerrainName;         /// terrain as name
-	// TODO: terrain nr. should be removed?
-	int      Terrain;          /// terrain type (summer,winter,...)
 	struct _tileset_* Tileset; /// tileset data
-
+	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
 	struct _graphic_* TileGraphic; /// graphic for all the tiles
 	struct _graphic_* FogGraphic; /// graphic for fog of war
 
@@ -406,6 +390,8 @@ extern void MapCclRegister(void);
 extern void CreateMap(int width, int height);
 	/// Save the map
 extern void SaveMap(struct _CL_File_* file);
+	/// Save a stratagus map (smp format)
+extern int SaveStratagusMap(const char* filename, WorldMap* map);
 	/// Clean the map
 extern void CleanMap(void);
 

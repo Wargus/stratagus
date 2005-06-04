@@ -67,18 +67,20 @@ This page documents map presentation functions.
 <p>
 Note: This is for the new map format. Not implented yet.
 
-<h2>Functions</h2>
 
 <a name="PresentMap"></a>
-<h3>PresentMap(description, numplayers, mapwidth, mapheight)</h3>
+<h3>PresentMap(description, numplayers, mapwidth, mapheight, mapuid)</h3>
 
 <dl>
-<dt>Description</dt>
+<dt>description</dt>
 <dd>A textual description of the map that can be displayed to the user.</dd>
 <dt>numplayers</dt>
 <dd>The maximum number of players for this map.</dd>
 <dt>mapwidth and mapheight</dt>
 <dd>The sizes of the map.</dd>
+<dt>mapuid</dt>
+<dd>Random number to distinguish maps with the same file name. Be sure to change 
+    this number when changing the map.</dd>
 </dl>
 
 <h4>Example</h4>

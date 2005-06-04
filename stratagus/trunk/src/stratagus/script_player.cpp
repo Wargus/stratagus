@@ -134,8 +134,8 @@ static int CclPlayer(lua_State* l)
 			if (i == PlayerRaces.Count) {
 				LuaError(l, "Unsupported race: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "ai")) {
-			player->AiNum = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "ai-name")) {
+			strcpy(player->AiName, LuaToString(l, j + 1));
 		} else if (!strcmp(value, "team")) {
 			player->Team = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "enemy")) {
@@ -835,18 +835,19 @@ static int CclSetPlayerData(lua_State* l)
 		p->Name = strdup(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		int i;
+		const char* racename;
 
-		free(p->Name);
-		p->RaceName = strdup(LuaToString(l, 3));
+		racename = LuaToString(l, 3);
 		p->Race = PlayerRaceNeutral;
-		for (i = 0; i < MAX_RACES && PlayerRaces.Name[i]; ++i) {
-			if (!strcmp(p->RaceName, PlayerRaces.Name[i])) {
+		for (i = 0; i < PlayerRaces.Count; ++i) {
+			if(!strcmp(racename, PlayerRaces.Name[i])) {
+				p->RaceName = PlayerRaces.Name[i];
 				p->Race = i;
 				break;
 			}
 		}
-		if (i == MAX_RACES || !PlayerRaces.Name[i]) {
-			LuaError(l, "Invalid race : '%s'" _C_ p->RaceName);
+		if (i == PlayerRaces.Count)	{
+			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
 	} else if (!strcmp(data, "Resources")) {
 		const char* res;
@@ -907,7 +908,6 @@ static int CclSetPlayerData(lua_State* l)
 	return 0;
 }
 
-extern char** AiTypeWcNames;
 /**
 **  Set ai player algo.
 **
@@ -916,9 +916,6 @@ extern char** AiTypeWcNames;
 static int CclSetAiType(lua_State* l)
 {
 	Player* p;
-	const char* ai;
-	char** cp;
-	int ainum = 0;
 
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
@@ -927,16 +924,7 @@ static int CclSetAiType(lua_State* l)
 	p = CclGetPlayer(l);
 	lua_pop(l, 1);
 
-	ai = LuaToString(l, 2);
-	cp = AiTypeWcNames;
-	while (*cp) {
-		if (!strcmp(ai, *cp)) {
-			PlayerSetAiNum(p, ainum);
-			return 0;
-		}
-		cp++;
-		ainum++;
-	}
+	strcpy(p->AiName, LuaToString(l, 2));
 
 	return 0;
 }
