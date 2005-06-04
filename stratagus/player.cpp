@@ -137,9 +137,6 @@ void CleanPlayers(void)
 	memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
-	//
-	// Mapping the original race numbers in puds to our internal strings
-	//
 	for (p = 0; p < PlayerRaces.Count; ++p) {
 		free(PlayerRaces.Name[p]);
 		free(PlayerRaces.Display[p]);
@@ -184,7 +181,7 @@ void SavePlayers(CLFile* file)
 			default:                  CLprintf(file, "%d,",Players[i].Type);break;
 		}
 		CLprintf(file, " \"race\", \"%s\",", Players[i].RaceName);
-		CLprintf(file, " \"ai\", %d,\n", Players[i].AiNum);
+		CLprintf(file, " \"ai-name\", \"%s\",\n", Players[i].AiName);
 		CLprintf(file, "  \"team\", %d,", Players[i].Team);
 
 		CLprintf(file, " \"enemy\", \"");
@@ -386,6 +383,7 @@ void CreatePlayer(int type)
 			team = 2 + NumPlayers;
 			break;
 	}
+	printf("CreatePlayer name %s\n", player->Name);
 
 	player->Type = type;
 	player->Race = PlayerRaces.Race[0];
@@ -393,7 +391,7 @@ void CreatePlayer(int type)
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
-	player->AiNum = PlayerAiUniversal;
+	strcpy(player->AiName, "ai-passive");
 
 	//
 	//  Calculate enemy/allied mask.
@@ -446,15 +444,6 @@ void CreatePlayer(int type)
 				break;
 		}
 	}
-
-	//
-	//  Initial default resources.
-	//
-	#ifndef LUA_MAP_API
-	for (i = 0; i < MaxCosts; ++i) {
-		player->Resources[i] = DefaultResources[i];
-	}
-	#endif
 
 	//
 	//  Initial default incomes.
@@ -510,17 +499,6 @@ void PlayerSetName(Player* player, const char* name)
 		free(player->Name);
 	}
 	player->Name = strdup(name);
-}
-
-/**
-**  Change player ai.
-**
-**  @param player  Pointer to player.
-**  @param ai      AI type.
-*/
-void PlayerSetAiNum(Player* player, int ai)
-{
-	player->AiNum = ai;
 }
 
 /*----------------------------------------------------------------------------
@@ -847,10 +825,9 @@ void DebugPlayers(void)
 		"yellow"
 	};
 	const char* playertype;
-	const char* playerainum;
 
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
-	DebugPrint("--  -------- - -------- ------------ ------- -- ---\n");
+	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (Players[i].Type == PlayerNobody) {
 			continue;
@@ -866,19 +843,12 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		switch (Players[i].AiNum) {
-			case PlayerAiLand: playerainum = "(land)"; break;
-			case PlayerAiPassive: playerainum = "(passive)"; break;
-			case PlayerAiAir: playerainum = "(air)"; break;
-			case PlayerAiSea: playerainum = "(sea)"; break;
-			default: playerainum = "?unknown?"; break;
-		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %2d %s\n" _C_ i _C_ colors[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ colors[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name _C_ playertype _C_
 			PlayerRaces.Name[PlayerRacesIndex(Players[i].Race)] _C_
-			Players[i].AiNum _C_ playerainum);
+			Players[i].AiName);
 	}
 #endif
 }

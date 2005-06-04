@@ -60,7 +60,6 @@
 #include "interface.h"
 #include "menus.h"
 #include "cursor.h"
-#include "pud.h"
 #include "iolib.h"
 #include "network.h"
 #include "netconnect.h"
@@ -445,9 +444,6 @@ static MapInfo* DuplicateMapInfo(const MapInfo *orig)
 	if (orig->Description) {
 		dest->Description = strdup(orig->Description);
 	}
-	if (orig->MapTerrainName) {
-		dest->MapTerrainName = strdup(orig->MapTerrainName);
-	}
 	if (orig->Filename) {
 		dest->Filename = strdup(orig->Filename);
 	}
@@ -493,8 +489,7 @@ static void FreeMapInfos(FileList *fl, int n)
 **
 **  @return 1 if it is a valid file, else 0.
 **
-**  @note suffixe supported : ".pud", ".scm", ".chk", ".log", ".sav", ".smp"
-**  @todo remove pud support.
+**  @note suffixe supported : ".scm", ".chk", ".log", ".sav", ".smp"
 */
 static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int width, int height)
 {
@@ -581,23 +576,6 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	} else if (strcasestr(filename, ".sav")) {
 		fl->type = type;
 		fl->name = strdup(filename);
-#if 1 // FIXME : remove it when remove pud format.
-	} else if (strcasestr(filename, ".pud")) {
-		MapInfo info;
-
-		if (!GetPudInfo(pathbuf, &info)) {
-			return 0;
-		}
-		if ((width != -1 && info.MapWidth != width) ||
-			(height != -1 && info.MapHeight != height)) {
-			FreeMapInfo(&info);
-			return 0;
-		}
-		fl->type = 1;
-		fl->name = strdup(filename);
-		fl->xdata = malloc(sizeof(*fl->xdata));
-		*fl->xdata = info;
-#endif
 	} else {
 		DebugPrint("file '%s' unsupported with this extension\n" _C_ filename);
 		return 0;
@@ -630,7 +608,7 @@ static int SaveGameRDFilter(char *pathbuf, FileList *fl)
 */
 static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
-	const char* suf[] = {".pud", ".scm", ".chk", 0};
+	const char* suf[] = {".smp", 0};
 
 	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
@@ -640,7 +618,7 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 */
 static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 {
-	const char* suf[] = {".pud", 0};
+	const char* suf[] = {".smp", 0};
 
 	return GenericRDFilter(pathbuf, fl, suf, -1, -1);
 }
@@ -663,17 +641,10 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 	menu = FindMenu("menu-select-scenario");
 	sz = szl[menu->Items[8].D.Pulldown.curopt];
 
-#if 1 // Remove hardcoded value.
-	curopt = menu->Items[6].D.Pulldown.curopt;
-	if (curopt == 0) {
-		suf[0] = ".smp";
-	} else if (curopt == 1) {
-		suf[0] = ".pud";
-	} else {
-		suf[0] = ".scm";
-		suf[1] = ".chk";
-	}
-#endif
+	//MAPTODO simplify
+	curopt = 0;
+	suf[0] = ".smp";
+
 	return GenericRDFilter(pathbuf, fl, suf, sz, sz);
 }
 
@@ -2645,10 +2616,7 @@ static void GetInfoFromSelectPath(void)
 		i = 0;
 	}
 	strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
-	if (strcasestr(ScenSelectFileName, ".pud")) {
-		GetPudInfo(ScenSelectPath, &TheMap.Info);
-		strcpy(MenuMapFullPath, ScenSelectPath);
-	} else if(strcasestr(ScenSelectFileName, ".smp")) {
+	if (strcasestr(ScenSelectFileName, ".smp")) {
 		LuaLoadFile(ScenSelectPath);
 	}
 	ScenSelectPath[i] = '\0'; // Remove appended part
@@ -4167,11 +4135,7 @@ int NetClientSelectScenario(void)
 	}
 
 	FreeMapInfo(&TheMap.Info);
-	if (strcasestr(ScenSelectFileName, ".pud")) {
-		GetPudInfo(MenuMapFullPath, &TheMap.Info);
-	} else {
-		LuaLoadFile(MenuMapFullPath);
-	}
+	LuaLoadFile(MenuMapFullPath);
 	return 0;
 }
 
@@ -4297,7 +4261,6 @@ static void EditorNewMap(void)
 	strcpy(height, "128~!_");
 	menu->Items[5].D.Input.nch = strlen(width) - 3;
 	menu->Items[5].D.Input.maxch = 4;
-	menu->Items[7].D.Pulldown.noptions = NumTilesets;
 	ProcessMenu("menu-editor-new", 1);
 
 	if (EditorCancelled) {
@@ -4306,7 +4269,6 @@ static void EditorNewMap(void)
 
 	description[strlen(description) - 3] = '\0';
 	TheMap.Info.Description = strdup(description);
-	TheMap.Info.MapTerrain = menu->Items[7].D.Pulldown.curopt;
 	TheMap.Info.MapWidth = atoi(width);
 	TheMap.Info.MapHeight = atoi(height);
 
@@ -4390,6 +4352,13 @@ static void EditorNewOk(void)
 		ErrorMenu("Size must be a multiple of 32");
 	}
 	else {
+		char tilemodel[PATH_MAX];
+
+		sprintf(TheMap.TileModelsFileName, "scripts/tilesets/%s.lua",
+				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
+		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
+				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
+		LuaLoadFile(tilemodel);
 		EndMenu();
 	}
 }
@@ -4626,10 +4595,9 @@ static void EditorMapPropertiesMenu(void)
 
 	sprintf(size, "%d x %d", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
 	menu->Items[4].D.Text.text = NewStringDesc(size);
+	menu->Items[6].D.Pulldown.defopt = 0;
 
-	menu->Items[6].D.Pulldown.defopt = TheMap.Terrain;
-
-	// FIXME: Set the correct pud version
+	// FIXME: Remove the version pulldown
 	menu->Items[8].D.Pulldown.defopt = 1;
 	menu->Items[8].Flags = -1;
 
@@ -4654,7 +4622,6 @@ static void EditorMapPropertiesOk(void)
 {
 	Menu* menu;
 	char *description;
-	int old;
 
 	menu = CurrentMenu;
 
@@ -4663,19 +4630,19 @@ static void EditorMapPropertiesOk(void)
 	free(TheMap.Info.Description);
 	TheMap.Info.Description = strdup(description);
 
+	#if 0
+	// MAPTODO
 	// Change the terrain
 	old = TheMap.Info.MapTerrain;
 	if (old != menu->Items[6].D.Pulldown.curopt) {
 		TheMap.Info.MapTerrain = menu->Items[6].D.Pulldown.curopt;
 		free(TheMap.Info.MapTerrainName);
 		TheMap.Info.MapTerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
-		TheMap.Terrain = TheMap.Info.MapTerrain;
 		free(TheMap.TerrainName);
 		TheMap.TerrainName = strdup(TilesetWcNames[TheMap.Info.MapTerrain]);
 		TheMap.Tileset = Tilesets[TheMap.Info.MapTerrain];
 
 		LoadTileset();
-		ChangeTilesetPud(old, &TheMap);
 		SetPlayersPalette();
 		PreprocessMap();
 		LoadConstructions();
@@ -4683,6 +4650,7 @@ static void EditorMapPropertiesOk(void)
 		LoadIcons();
 		UpdateMinimapTerrain();
 	}
+	#endif
 
 
 	EditorEndMenu();
@@ -4733,39 +4701,28 @@ static int PlayerTypesMenuToFc[] = {
 **
 ** @param num Ai number
 */
-static int PlayerAiFcToMenu(int num)
+static int PlayerSetAiToMenu(char *ainame, MenuitemPulldown* menu)
 {
-	if (num == PlayerAiLand) {
-		return 0;
-	} else if (num == PlayerAiPassive) {
-		return 1;
-	} else if (num == PlayerAiSea) {
-		return 2;
-	} else if (num == PlayerAiAir) {
-		return 3;
+	int i;
+
+	menu->defopt = 0;
+	for (i = 0; i < menu->noptions; ++i) {
+		if(!strcmp(menu->options[i], ainame)) {
+			menu->defopt = i;
+		}
 	}
-	DebugPrint("Invalid Ai number: %d\n" _C_ num);
-	return -1;
+	DebugPrint("Invalid Ai number: %s\n" _C_ ainame);
+	return i;
 }
 
 /**
-** Convert player ai from menu number to internal fc number
+** Get the ai ident from the pulldown menu
 **
 ** @param num Ai number
 */
-static int PlayerAiMenuToFc(int num)
+static char* PlayerGetAiFromMenu(MenuitemPulldown* menu)
 {
-	if (num == 0) {
-		return PlayerAiLand;
-	} else if (num == 1) {
-		return PlayerAiPassive;
-	} else if (num == 2) {
-		return PlayerAiSea;
-	} else if (num == 3) {
-		return PlayerAiAir;
-	}
-	DebugPrint("Invalid Ai number: %d\n" _C_ num);
-	return -1;
+	return menu->options[menu->curopt];
 }
 
 /**
@@ -4791,10 +4748,10 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		menu->Items[RACE_POSITION + i].D.Pulldown.defopt = TheMap.Info.PlayerSide[i];
 		menu->Items[TYPE_POSITION + i].D.Pulldown.defopt = PlayerTypesFcToMenu[TheMap.Info.PlayerType[i]];
-		menu->Items[AI_POSITION + i].D.Pulldown.defopt = PlayerAiFcToMenu(TheMap.Info.PlayerAi[i]);
-		sprintf(gold[i], "%d~!_", TheMap.Info.PlayerResources[i][GoldCost]);
-		sprintf(lumber[i], "%d~!_", TheMap.Info.PlayerResources[i][WoodCost]);
-		sprintf(oil[i], "%d~!_", TheMap.Info.PlayerResources[i][OilCost]);
+		PlayerSetAiToMenu(Players[i].AiName, &menu->Items[AI_POSITION + i].D.Pulldown);
+		sprintf(gold[i], "%d~!_", Players[i].Resources[GoldCost]);
+		sprintf(lumber[i], "%d~!_", Players[i].Resources[WoodCost]);
+		sprintf(oil[i], "%d~!_", Players[i].Resources[OilCost]);
 		menu->Items[GOLD_POSITION + i].D.Input.buffer = gold[i];
 		menu->Items[GOLD_POSITION + i].D.Input.nch = strlen(gold[i]) - 3;
 		menu->Items[GOLD_POSITION + i].D.Input.maxch = 7;
@@ -4811,10 +4768,11 @@ static void EditorPlayerPropertiesMenu(void)
 	for (i = 0; i < PlayerMax; ++i) {
 		TheMap.Info.PlayerSide[i] = menu->Items[RACE_POSITION + i].D.Pulldown.curopt;
 		TheMap.Info.PlayerType[i] = PlayerTypesMenuToFc[menu->Items[TYPE_POSITION + i].D.Pulldown.curopt];
-		TheMap.Info.PlayerAi[i] = PlayerAiMenuToFc(menu->Items[AI_POSITION + i].D.Pulldown.curopt);
-		TheMap.Info.PlayerResources[i][GoldCost] = atoi(gold[i]);
-		TheMap.Info.PlayerResources[i][WoodCost] = atoi(lumber[i]);
-		TheMap.Info.PlayerResources[i][OilCost] = atoi(oil[i]);
+		strcpy(Players[i].AiName, 
+				PlayerGetAiFromMenu(&menu->Items[AI_POSITION + i].D.Pulldown));
+		Players[i].Resources[GoldCost] = atoi(gold[i]);
+		Players[i].Resources[WoodCost] = atoi(lumber[i]);
+		Players[i].Resources[OilCost] = atoi(oil[i]);
 	}
 }
 
@@ -4981,7 +4939,7 @@ int EditorSaveMenu(void)
 
 	if (!EditorCancelled) {
 		sprintf(path, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
-		if (EditorSavePud(path) == -1) {
+		if (EditorSaveMap(path) == -1) {
 			ret = -1;
 		} else {
 			// Only change map path if we were able to save the map
@@ -5036,8 +4994,8 @@ static void EditorSaveOk(void)
 		} else {
 			strcpy(ScenSelectFileName, menu->Items[3].D.Input.buffer); // Final map name
 			ScenSelectFileName[strlen(ScenSelectFileName) - 3] = '\0';
-			if (!strcasestr(ScenSelectFileName, ".pud")) {
-				strcat(ScenSelectFileName, ".pud");
+			if (!strcasestr(ScenSelectFileName, ".smp")) {
+				strcat(ScenSelectFileName, ".smp");
 			}
 			sprintf(TempPathBuf, "%s/%s.gz", ScenSelectPath, ScenSelectFileName);
 			if (!access(TempPathBuf, F_OK)) {
@@ -5372,6 +5330,7 @@ static void InitPlayerRaces(Menuitem* mi)
 */
 static void InitTilesets(Menuitem* mi, int mapdefault)
 {
+#if 0
 	int i;
 	int n;
 
@@ -5390,6 +5349,7 @@ static void InitTilesets(Menuitem* mi, int mapdefault)
 	}
 	mi->D.Pulldown.noptions = n;
 	mi->D.Pulldown.defopt = 0;
+#endif
 }
 
 /**
@@ -5740,7 +5700,7 @@ void UpdateMenuItemButton(Menuitem* items)
 		ready = 1;
 
 
-		// Calculate available slots from pudinfo
+		// Calculate available slots from map info
 		for (i = 1; i < PlayerMax; i++) {
 			if (TheMap.Info.PlayerType[i] == PlayerPerson) {
 				if (Hosts[i].PlyNr) {

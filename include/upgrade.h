@@ -63,10 +63,6 @@ extern void SaveUpgrades(struct _CL_File_*);
 	/// cleanup upgrade module
 extern void CleanUpgrades(void);
 
-	/// parse pud alow (upgrade/spell/units allow) table
-extern void ParsePudALOW(const char* alow, int length);
-	/// parse pud ugrd (upgrade cost) table
-extern void ParsePudUGRD(const char* ugrd, int length);
 	/// Register CCL features for upgrades
 extern void UpgradesCclRegister(void);
 

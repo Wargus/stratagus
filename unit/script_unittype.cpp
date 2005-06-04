@@ -1256,42 +1256,6 @@ static int CclSetUnitTypeName(lua_State* l)
 	return 1;
 }
 
-/**
-**  Define unit type mapping from original number to internal symbol
-**
-**  @param l  Lua state.
-*/
-static int CclDefineUnitTypeWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	if ((cp = UnitTypeWcNames)) { // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(UnitTypeWcNames);
-	}
-
-	//
-	// Get new table.
-	//
-	i = lua_gettop(l);
-	UnitTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
-
 // ----------------------------------------------------------------------------
 
 /**
@@ -2094,8 +2058,6 @@ void UnitTypeCclRegister(void)
 	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
-
-	lua_register(Lua, "DefineUnitTypeWcNames", CclDefineUnitTypeWcNames);
 
 	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
 }

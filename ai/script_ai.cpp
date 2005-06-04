@@ -1063,42 +1063,6 @@ static int CclAiDump(lua_State* l)
 }
 
 /**
-**  Define AI mapping from original number to internal symbol
-**
-**  @param l  Lua state.
-*/
-static int CclDefineAiWcNames(lua_State* l)
-{
-	int i;
-	int j;
-	char** cp;
-
-	if ((cp = AiTypeWcNames)) { // Free all old names
-		while (*cp) {
-			free(*cp++);
-		}
-		free(AiTypeWcNames);
-	}
-
-	//
-	// Get new table.
-	//
-	i = lua_gettop(l);
-	AiTypeWcNames = cp = malloc((i + 1) * sizeof(char*));
-	if (!cp) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-
-	for (j = 0; j < i; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
-	}
-	*cp = NULL;
-
-	return 0;
-}
-
-/**
 **  Get the default resource number
 **
 **  @param name  Resource name.
@@ -1584,8 +1548,6 @@ void AiCclRegister(void)
 	lua_register(Lua, "AiSetCollect", CclAiSetCollect);
 
 	lua_register(Lua, "AiDump", CclAiDump);
-
-	lua_register(Lua, "DefineAiWcNames", CclDefineAiWcNames);
 
 	lua_register(Lua, "DefineAiPlayer", CclDefineAiPlayer);
 }

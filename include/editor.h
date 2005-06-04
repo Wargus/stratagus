@@ -51,10 +51,11 @@ extern EditorRunningType EditorRunning;
 extern char EditorMapLoaded;
 	/// Current editor state type.
 typedef enum _editor_state_type_ {
-	EditorSelecting,  /// Select
-	EditorEditTile,   /// Edit tiles
-	EditorEditUnit,   /// Edit units
-} EditorStateType;    /// Current editor state
+	EditorSelecting,  ///< Select
+	EditorEditTile,   ///< Edit tiles
+	EditorEditUnit,   ///< Edit units
+	EditorSetStartLocation ///< Set the start location
+} EditorStateType;    ///< Current editor state
 	/// Current editor state.
 extern EditorStateType EditorState;
 
@@ -67,6 +68,9 @@ extern int MaxUnitIndex;  /// Max unit icon draw index
 
 extern char* EditorSelectIcon;  /// Editor's select icon
 extern char* EditorUnitsIcon;   /// Editor's units icon
+extern char* EditorSelectIcon;  ///< Editor's select icon
+extern char* EditorUnitsIcon;   ///< Editor's units icon
+extern char* EditorStartUnit;   ///< Unit used to display the start location
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -77,8 +81,8 @@ extern void EditorMainLoop(void);
 	/// Update editor display
 extern void EditorUpdateDisplay(void);
 
-	/// Save a pud from editor
-extern int EditorSavePud(const char* file);
+	/// Save a map from editor
+extern int EditorSaveMap(const char* file);
 
 	/// Register ccl features
 extern void EditorCclRegister(void);

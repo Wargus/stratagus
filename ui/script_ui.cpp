@@ -4367,17 +4367,19 @@ static int CclSetGroupKeys(lua_State* l)
 */
 static int CclPresentMap(lua_State* l)
 {
-	LuaCheckArgs(l, 4);
+	LuaCheckArgs(l, 5);
+
 	TheMap.Info.Description = strdup(LuaToString(l, 1));
 	// Number of players in LuaToNumber(l, 3); // Not used yet.
 	TheMap.Info.MapWidth = LuaToNumber(l, 3);
 	TheMap.Info.MapHeight = LuaToNumber(l, 4);
+	TheMap.Info.MapUID = LuaToNumber(l, 5);
 
 	return 0;
 }
 
 /**
-** Define the lua file that will be build the map
+** Define the lua file that will build the map
 **
 **  @param l  Lua state.
 */

@@ -52,6 +52,7 @@
 
 char* EditorSelectIcon;
 char* EditorUnitsIcon;
+char* EditorStartUnit;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -116,6 +117,21 @@ static int CclSetEditorUnitsIcon(lua_State* l)
 }
 
 /**
+**  Set the editor's start location unit
+**
+**  @param l  Lua state.
+*/
+static int CclSetEditorStartUnit(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	free(EditorStartUnit);
+	EditorStartUnit = strdup(LuaToString(l, 1));
+	return 0;
+}
+
+/**
 **  Register CCL features for the editor.
 */
 void EditorCclRegister(void)
@@ -123,6 +139,7 @@ void EditorCclRegister(void)
 	lua_register(Lua, "DefineEditorUnitTypes", CclDefineEditorUnitTypes);
 	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
+	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
 }
 
 //@}

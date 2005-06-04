@@ -653,6 +653,12 @@ static int main1(int argc __attribute__ ((unused)),
 	VideoClearScreen();
 	ShowTitleScreens();
 
+	// Init player data
+	ThisPlayer = NULL;
+	//Don't clear the Players strucure as it would erase the allowed units.
+	// memset(Players, 0, sizeof(Players));
+	NumPlayers = 0;
+
 	InitUnitsMemory();  // Units memory management
 	PreMenuSetup();     // Load everything needed for menus
 
@@ -707,7 +713,7 @@ static void Usage(void)
 {
 	PrintHeader();
 	printf(
-"\n\nUsage: stratagus [OPTIONS] [map.pud|map.pud.gz|map.cm|map.cm.gz]\n\
+"\n\nUsage: stratagus [OPTIONS] [map.smp|map.smp.gz]\n\
 \t-c file.lua\tconfiguration start file (default stratagus.lua)\n\
 \t-d datapath\tpath to stratagus data\n\
 \t-e\t\tStart editor\n\
