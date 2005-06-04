@@ -61,7 +61,7 @@ DefineConstruction("construction-gturret", {
 
 DefineUnitType("unit-gturret", {
         Name = "Gun Turret",
-        Files = {"tileset-desert", "elites/build/gturret.png"}, Size = {64, 64},
+        Files = {"default", "elites/build/gturret.png"}, Size = {64, 64},
         Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
         Animations = "animations-gturret", Icon = "icon-gturret",
         Costs = {"time", 130, "titanium", 250, "crystal", 50},

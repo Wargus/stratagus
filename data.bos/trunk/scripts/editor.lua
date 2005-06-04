@@ -32,7 +32,7 @@
 --	Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")
-
+SetEditorStartUnit("unit-start-location")
 
 --
 --	editor-unit-types a sorted list of unit-types for the editor.
@@ -83,7 +83,6 @@ DefineEditorUnitTypes(
    "unit-crystal-field10",
    "unit-crystal-field11",   
    "unit-crystal-field12",
-   "unit-crystal-field13",
-
-   "unit-elites-start-location"
+   "unit-crystal-field13"
 )
+

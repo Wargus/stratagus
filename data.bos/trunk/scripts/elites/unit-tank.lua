@@ -55,7 +55,7 @@ DefineIcon({
 
 DefineUnitType("unit-tank", {
         Name = "Tank",
-        Files = {"tileset-desert", "elites/units/unit_tank.png"}, Size = {96, 96},
+        Files = {"default", "elites/units/unit_tank.png"}, Size = {96, 96},
         Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
         Animations = "animations-tank", Icon = "icon-tank",
         Flip = false,

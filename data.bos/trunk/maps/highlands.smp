@@ -1,0 +1,8 @@
+-- Stratagus Map Presentation
+-- File generated automatically from highlands.pud.
+-- Copyright 2005 François Beerten
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("computer","person")
+PresentMap("test", 2, 128, 128, -1212264749)
+DefineMapSetup("maps/highlands.sms")

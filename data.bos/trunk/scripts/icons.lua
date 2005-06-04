@@ -332,3 +332,9 @@ DefineIcon({
 	Size = {46, 38},
 	Frame = 10,
 	File = "general/commands.png"})
+
+DefineIcon({
+        Name = "icon-start-location",
+        Size = {32, 32},
+        Frame = 0,
+        File = "elites/x_startpoint.png"})

@@ -73,7 +73,7 @@ DefineConstruction("construction-cam", {
 
 DefineUnitType("unit-cam", {
         Name = "Camera",
-        Files = {"tileset-desert", "elites/build/camera.png"}, Size = {32, 64},
+        Files = {"default", "elites/build/camera.png"}, Size = {32, 64},
         Offset = {0, -16},
         Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
         Animations = "animations-cam", Icon = "icon-cam",
@@ -91,7 +91,7 @@ DefineUnitType("unit-cam", {
 
 DefineUnitType("camera_destroyed", {
         Name = "CameraCrater",
-        Files = {"tileset-desert", "elites/build/camera_c.png"}, Size = {32, 64},
+        Files = {"default", "elites/build/camera_c.png"}, Size = {32, 64},
         Animations = "animations-dead_cam", Icon = "icon-cancel",
         Speed = 0, HitPoints = 999, DrawLevel = 10,
         TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
