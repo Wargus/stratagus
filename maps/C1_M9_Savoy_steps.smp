@@ -1,0 +1,8 @@
+-- Stratagus Map Presentation
+-- File generated automatically from C1_M9_Savoy_steps.pud.
+-- Copyright 2005 François Beerten
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("person","person")
+PresentMap("Campaign_one_Map_nine", 2, 128, 128, 611876385)
+DefineMapSetup("maps/C1_M9_Savoy_steps.sms")

@@ -1,0 +1,8 @@
+-- Stratagus Map Presentation
+-- File generated automatically from C1_M6_Aiglier.pud.
+-- Copyright 2005 François Beerten
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("person","person")
+PresentMap("Campaign_one_Map_six", 2, 128, 128, 1921809143)
+DefineMapSetup("maps/C1_M6_Aiglier.sms")

@@ -1,0 +1,8 @@
+-- Stratagus Map Presentation
+-- File generated automatically from C1_M3_Buffy_forrest.pud.
+-- Copyright 2005 François Beerten
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("person","person")
+PresentMap("Campaign_one_Map_three", 2, 128, 128, -982777137)
+DefineMapSetup("maps/C1_M3_Buffy_forrest.sms")
