@@ -10,7 +10,7 @@
 --
 --	editor.lua	-	Editor configuration and functions.
 --
---	(c) Copyright 2002-2003 by Lutz Sammer and Jimmy Salmon
+--	(c) Copyright 2002-2005 by Lutz Sammer, François Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -29,15 +29,28 @@
 --	$Id$
 
 
---	Set which icons to display
+-- Set which icons to display
 SetEditorSelectIcon("icon-patrol")
 SetEditorUnitsIcon("icon-assault")
+
+-- Start location unit
+DefineIcon({
+    Name = "icon-start-location",
+    Size = {32, 32},
+    Frame = 0,
+    File = "elites/x_startpoint.png"})
+DefineUnitType("unit-start-location", {
+    Name = "Start Location",
+    Files = {"default", "elites/x_startpoint.png"}, Size = {32, 32},
+    Animations = "animations-building", Icon = "icon-start-location",
+    Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
+    BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
+    Missile = "missile-none", Priority = 0, Demand = 0, Type = "land",
+   })
 SetEditorStartUnit("unit-start-location")
 
---
---	editor-unit-types a sorted list of unit-types for the editor.
---	FIXME: this is only a temporary hack, for better sorted units.
---
+-- editor-unit-types a sorted list of unit-types for the editor.
+-- FIXME: this is only a temporary hack, for better sorted units.
 DefineEditorUnitTypes(
    "unit-vault",
 

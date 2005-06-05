@@ -10,7 +10,7 @@
 --
 --	icons.lua	-	Define the icons.
 --
---	(c) Copyright 2003-2004 by Jimmy Salmon and Crestez Leonard.
+--	(c) Copyright 2003-2005 by Jimmy Salmon and Crestez Leonard.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -333,8 +333,3 @@ DefineIcon({
 	Frame = 10,
 	File = "general/commands.png"})
 
-DefineIcon({
-        Name = "icon-start-location",
-        Size = {32, 32},
-        Frame = 0,
-        File = "elites/x_startpoint.png"})
