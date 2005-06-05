@@ -33,13 +33,13 @@
 --
 DefineCampaign("elites", "name", "~!Elites",
     "campaign", {
-    "play-level", "campaigns/elites/level01.cm",
-    "play-level", "campaigns/elites/level02.cm",
-    "play-level", "campaigns/elites/level03.cm",
-    "play-level", "campaigns/elites/level04.cm",
-    "play-level", "campaigns/elites/level05.cm",
-    "play-level", "campaigns/elites/level06.cm",
-    "play-level", "campaigns/elites/level07.cm",
-    "play-level", "campaigns/elites/level08.cm",
-    "play-level", "campaigns/elites/level09.cm",
-    "play-level", "campaigns/elites/level10.cm" })
+    "play-level", "campaigns/elites/level01.smp",
+    "play-level", "campaigns/elites/level02.smp",
+    "play-level", "campaigns/elites/level03.smp",
+    "play-level", "campaigns/elites/level04.smp",
+    "play-level", "campaigns/elites/level05.smp",
+    "play-level", "campaigns/elites/level06.smp",
+    "play-level", "campaigns/elites/level07.smp",
+    "play-level", "campaigns/elites/level08.smp",
+    "play-level", "campaigns/elites/level09.smp",
+    "play-level", "campaigns/elites/level10.smp" })

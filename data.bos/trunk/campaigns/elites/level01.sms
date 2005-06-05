@@ -8,7 +8,7 @@
 --        T H E   W A R   B E G I N S
 --     Stratagus - A free fantasy real time strategy game engine
 --
---  level02.cm  -  Define the Elites campaign 1, map 2.
+--  level01.cm  -  Define the Elites campaign 1, map 1.
 --
 --  (c) Copyright 2005 by Loïs Taulelle
 --
@@ -29,14 +29,15 @@
 --  $Id: campaign1.lua,v 1.3 2004/08/04 09:36:07 gulldarek Exp $
 
 --=============================================================================
---  Define level 02 Map Setup
+--  Define level 01 Map Setup
 --
 
 Briefing("type", "wc2",
-  "title", "Green Valley",
-  "objective", "Gain an ally and drive the enemy out. Kill all enemy units",
+  "title", "The river",
+  "objective", "Build your base. Drive the enemy out. Kill all enemy units",
   "background", "campaigns/elites/menu.png",
-  "text", "campaigns/elites/level02.txt")
+--  "background", "campaigns/elites/level01.png",
+  "text", "campaigns/elites/level01.txt")
 
 -- AI
 --SetAiType(1, "ai-rush")
@@ -46,4 +47,4 @@ DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
 
 -- Map
-LoadPud("maps/C1_M2_green_valley.pud.gz")
+Load("maps/C1_M1_the_river.sms")
