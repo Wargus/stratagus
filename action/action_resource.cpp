@@ -601,7 +601,10 @@ static int MoveToDepot(Unit* unit)
 		(unit->ResourcesHeld * unit->Player->Incomes[resinfo->FinalResource]) / 100;
 	unit->ResourcesHeld = 0;
 
-	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId] - 1;
+	unit->Wait = resinfo->WaitAtDepot / SpeedResourcesReturn[resinfo->ResourceId];
+	if (unit->Wait) {
+		unit->Wait--;
+	}
 
 	return 1;
 }
