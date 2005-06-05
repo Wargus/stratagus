@@ -8,9 +8,9 @@
 --        T H E   W A R   B E G I N S
 --     Stratagus - A free fantasy real time strategy game engine
 --
---  level04.cm  -  Define the Elites campaign 1, map 4.
+--  level07.sms  -  Define the Elites campaign 1, map 7.
 --
---  (c) Copyright 2005 by Loïs Taulelle
+--  (c) Copyright 2005 by Loïs Taulelle, François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -26,21 +26,19 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---  $Id: campaign1.lua,v 1.3 2004/08/04 09:36:07 gulldarek Exp $
-
 --=============================================================================
---  Define level 04 Map Setup
+--  Define level 07 Map Setup
 --
 
 Briefing("type", "wc2",
-  "title", "Shield of Wasteland",
+  "title", "Bellegarde",
   "objective", "Drive the enemy out. Kill all enemy units",
   "background", "campaigns/elites/menu.png",
-  "text", "campaigns/elites/level04.txt")
+  "text", "campaigns/elites/level07.txt")
 
 -- Units
 DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
 
 -- Map
-LoadPud("maps/C1_M4_shield_of_wasteland.pud.gz")
+Load("maps/C1_M7_Bellegarde.sms")
