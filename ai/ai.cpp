@@ -1207,7 +1207,9 @@ void AiUnitKilled(Unit* unit)
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 				unit->Player->Player _C_ UnitNumber(unit) _C_
 				unit->Type->Ident _C_ unit->Orders[0].Type->Ident);
-			AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0].Type);
+			if (!unit->Orders[0].Goal) {
+				AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0].Type);
+			}
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
