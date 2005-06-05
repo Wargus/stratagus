@@ -1,0 +1,8 @@
+-- Bos elites campaign, level 2
+-- File generated automatically from C1_M2_green_valley.pud.
+-- Copyright 2005 Loïs Taulelle
+-- File licensed under the GNU GPL version 2 or higher.
+
+DefinePlayerTypes("person","person")
+PresentMap("Campaign_one_map_two", 2, 128, 128, -182366288)
+DefineMapSetup("campaigns/elites/level02.sms")
