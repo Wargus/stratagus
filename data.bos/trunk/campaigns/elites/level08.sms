@@ -8,7 +8,7 @@
 --        T H E   W A R   B E G I N S
 --     Stratagus - A free fantasy real time strategy game engine
 --
---  level02.sms  -  Define the Elites campaign 1, map 2.
+--  level08.sms -  Define the Elites campaign 1, map 8.
 --
 --  (c) Copyright 2005 by Loïs Taulelle, François Beerten
 --
@@ -27,21 +27,18 @@
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
 --=============================================================================
---  Define level 02 Map Setup
+--  Define level 08 Map Setup
 --
 
 Briefing("type", "wc2",
-  "title", "Green Valley",
-  "objective", "Gain an ally and drive the enemy out. Kill all enemy units",
+  "title", "Savoy lake",
+  "objective", "Drive the enemy out. Kill all enemy units",
   "background", "campaigns/elites/menu.png",
-  "text", "campaigns/elites/level02.txt")
-
--- AI
---SetAiType(1, "ai-rush")
+  "text", "campaigns/elites/level08.txt")
 
 -- Units
 DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
 
 -- Map
-Load("maps/C1_M2_green_valley.sms")
+Load("maps/C1_M8_Savoy_lake.sms")

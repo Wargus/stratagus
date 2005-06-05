@@ -8,7 +8,7 @@
 --        T H E   W A R   B E G I N S
 --     Stratagus - A free fantasy real time strategy game engine
 --
---  campaign.lua  -  Define the Survival campaign 1.
+--  campaign.lua  -  Define the Elite campaign 1.
 --
 --  (c) Copyright 2005 by Loïs Taulelle
 --
@@ -26,8 +26,6 @@
 --      along with this program; if not, write to the Free Software
 --      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --
---  $Id: campaign1.lua,v 1.3 2004/08/04 09:36:07 gulldarek Exp $
-
 --=============================================================================
 --  Define the campaign
 --
