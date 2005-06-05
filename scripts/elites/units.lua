@@ -10,7 +10,7 @@
 --
 --	units.lua	-	Define the used elites unit-types.
 --
---	(c) Copyright 2001 - 2004 by Lutz Sammer and Crestez Leonard
+--	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -517,13 +517,4 @@ DefineUnitType("build-dead-body7", {
 	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
 	Type = "land" , Building = true, Vanishes = true})
-
-DefineUnitType("unit-start-location", {
-	Name = "Start Location",
-	Files = {"default", "elites/x_startpoint.png"}, Size = {32, 32},
-	Animations = "animations-building", Icon = "icon-start-location",
-	Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
-	BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 0, Demand = 0, Type = "land",
-	})
 
