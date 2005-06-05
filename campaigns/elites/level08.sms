@@ -31,7 +31,7 @@
 --
 
 Briefing("type", "wc2",
-  "title", "Savoy lake",
+  "title", "Savoy steps",
   "objective", "Drive the enemy out. Kill all enemy units",
   "background", "campaigns/elites/menu.png",
   "text", "campaigns/elites/level08.txt")
@@ -41,4 +41,4 @@ DefineAllow("unit-engineer",                    "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-vault",                       "AAAAAAAAAAAAAAAA")
 
 -- Map
-Load("maps/C1_M8_Savoy_lake.sms")
+Load("maps/C1_M8_Savoy_steps.sms")
