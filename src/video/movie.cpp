@@ -10,7 +10,7 @@
 //
 /**@name movie.c - Movie playback functions. */
 //
-//      (c) Copyright 2005 by Nehal Mistry
+//      (c) Copyright 2005 by Nehal Mistry and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ static int TheoraProcessData(OggData* data)
 */
 int PlayMovie(const char* name)
 {
-	OggData* data;
+	OggData data;
 	CLFile* f;
 	SDL_Rect rect;
 	SDL_Overlay* yuv_overlay;
@@ -197,55 +197,46 @@ int PlayMovie(const char* name)
 		return -1;
 	}
 
-	data = calloc(1, sizeof(OggData));
-	if (!data) {
-		fprintf(stderr, "Out of memory\n");
-		return -1;
-	}
-
-	if (OggInit(f, data) || !data->video) {
-		OggFree(data);
-		free(data);
+	if (OggInit(f, &data) || !data.video) {
+		OggFree(&data);
 		CLclose(f);
 		return -1;
 	}
 
-	data->File = f;
+	data.File = f;
 
-	if (data->tinfo.frame_width * 300 / 4 > data->tinfo.frame_height * 100) {
+	if (data.tinfo.frame_width * 300 / 4 > data.tinfo.frame_height * 100) {
 		rect.w = VideoWidth;
-		rect.h = VideoWidth * data->tinfo.frame_height / data->tinfo.frame_width;
+		rect.h = VideoWidth * data.tinfo.frame_height / data.tinfo.frame_width;
 		rect.x = 0;
 		rect.y = (VideoHeight - rect.h) / 2;
 	} else {
-		rect.w = VideoHeight * data->tinfo.frame_width / data->tinfo.frame_height;
+		rect.w = VideoHeight * data.tinfo.frame_width / data.tinfo.frame_height;
 		rect.h = VideoHeight;
 		rect.x = (VideoWidth - rect.w) / 2;
 		rect.y = 0;
 	}
 
-	yuv_overlay = SDL_CreateYUVOverlay(data->tinfo.frame_width,
-		data->tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
+	yuv_overlay = SDL_CreateYUVOverlay(data.tinfo.frame_width,
+		data.tinfo.frame_height, SDL_YV12_OVERLAY, TheScreen);
 
 	if (yuv_overlay == NULL) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
-		OggFree(data);
-		free(data);
+		OggFree(&data);
 		CLclose(f);
-		return -1;
+		return 0;
 	}
 
 	StopMusic();
 	if ((sample = LoadVorbis(name, PlayAudioStream))) {
 		if ((sample->Channels != 1 && sample->Channels != 2) ||
 				sample->SampleSize != 16) {
-			DebugPrint("Not supported music format\n");
+			fprintf(stderr, "Unsupported sound format in movie\n");
 			SoundFree(sample);
 			SDL_FreeYUVOverlay(yuv_overlay);
-			OggFree(data);
-			free(data);
+			OggFree(&data);
 			CLclose(f);
-			return -1;
+			return 0;
 		}
 		MusicSample = sample;
 		PlayingMusic = 1;
@@ -268,14 +259,14 @@ int PlayMovie(const char* name)
 	need_data = 1;
 	while (!MovieStop) {
 		if (need_data) {
-			if (TheoraProcessData(data)) {
+			if (TheoraProcessData(&data)) {
 				break;
 			}
 			need_data = 0;
 		}
 
-		diff = SDL_GetTicks() - start_ticks - theora_granule_time(&data->tstate,
-			data->tstate.granulepos) * 1000;
+		diff = SDL_GetTicks() - start_ticks - theora_granule_time(&data.tstate,
+			data.tstate.granulepos) * 1000;
 
 		if (diff > 100) {
 			// too far behind, skip some frames
@@ -283,7 +274,7 @@ int PlayMovie(const char* name)
 			continue;
 		}
 		if (diff > 0) {
-			OutputTheora(data, yuv_overlay, &rect);
+			OutputTheora(&data, yuv_overlay, &rect);
 			need_data = 1;
 		}
 		
@@ -293,8 +284,7 @@ int PlayMovie(const char* name)
 	StopMusic();
 	SDL_FreeYUVOverlay(yuv_overlay);
 
-	OggFree(data);
-	free(data);
+	OggFree(&data);
 	CLclose(f);
 
 	return 0;
