@@ -447,10 +447,6 @@ SOURCE=.\src\stratagus\player.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\pud.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\stratagus\script.c
 # End Source File
 # Begin Source File
@@ -725,10 +721,6 @@ SOURCE=.\src\include\pathfinder.h
 # Begin Source File
 
 SOURCE=.\src\include\player.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\include\pud.h
 # End Source File
 # Begin Source File
 
