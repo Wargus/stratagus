@@ -197,6 +197,7 @@ int PlayMovie(const char* name)
 		return -1;
 	}
 
+	memset(&data, 0, sizeof(data));
 	if (OggInit(f, &data) || !data.video) {
 		OggFree(&data);
 		CLclose(f);
