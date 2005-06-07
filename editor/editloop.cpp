@@ -218,7 +218,6 @@ void EditTile(int x, int y, int tile)
 **  @param size  Size of rectangle
 **
 **  @bug  This function does not support mirror editing!
-**
 */
 void EditTilesInternal(int x, int y, int tile, int size)
 {
@@ -227,10 +226,16 @@ void EditTilesInternal(int x, int y, int tile, int size)
 	int i;
 
 	ex = x + size;
+	if (x < 0) {
+		x = 0;
+	}
 	if (ex > TheMap.Info.MapWidth) {
 		ex = TheMap.Info.MapWidth;
 	}
 	ey = y + size;
+	if (y < 0) {
+		y = 0;
+	}
 	if (ey > TheMap.Info.MapHeight) {
 		ey = TheMap.Info.MapHeight;
 	}
@@ -249,7 +254,6 @@ void EditTilesInternal(int x, int y, int tile, int size)
 **  @param y     Y map tile coordinate.
 **  @param tile  Tile type to edit.
 **  @param size  Size of rectangle
-**
 */
 void EditTiles(int x, int y, int tile, int size)
 {
@@ -285,7 +289,6 @@ void EditTiles(int x, int y, int tile, int size)
 **
 **  @todo  FIXME: Check if the player has already a start-point.
 **  @bug   This function does not support mirror editing!
-**
 */
 static void EditUnitInternal(int x, int y, UnitType* type, Player* player)
 {
@@ -363,8 +366,8 @@ static int CalculateUnitIcons(void)
 }
 
 /**
-** Calculate the max height and the max widht of icons,
-** and assign them to IconHeight and IconWidth
+**  Calculate the max height and the max widht of icons,
+**  and assign them to IconHeight and IconWidth
 */
 static void CalculateMaxIconSize(void)
 {
@@ -520,8 +523,8 @@ static void DrawTileIcons(void)
 }
 
 /**
-* Draw a table with the players
-**/
+**  Draw a table with the players
+*/
 static void DrawPlayers(void) 
 {
 	int x;
@@ -879,7 +882,6 @@ static void DrawStartLocations(void)
 **  Draw editor info.
 **
 **  If cursor is on map or minimap show information about the current tile.
-**
 */
 static void DrawEditorInfo(void)
 {
