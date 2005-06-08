@@ -1267,90 +1267,59 @@ static int CclGetUnits(lua_State* l)
 }
 
 /**
-**  Get the mana of the unit structure.
+**  Get the value of the unit variable.
 **
 **  @param l  Lua state.
 **
-**  @return   The mana of the unit.
+**  @return   The value of the variable of the unit.
 */
-static int CclGetUnitMana(lua_State* l)
+static int CclGetUnitVariable(lua_State* l)
 {
 	const Unit* unit;
-
-	LuaCheckArgs(l, 1);
-
-	unit = CclGetUnit(l);
-	lua_pushnumber(l, unit->Variable[MANA_INDEX].Value);
-	return 1;
-}
-
-/**
-**  Set the mana of the unit structure.
-**
-**  @param l  Lua state.
-**
-**  @return The new mana of the unit.
-*/
-static int CclSetUnitMana(lua_State* l)
-{
-	Unit* unit;
-	int mana;
-
-	LuaCheckArgs(l, 2);
+	int index;
 
 	lua_pushvalue(l, 1);
-	unit = CclGetUnit(l);
+	LuaCheckArgs(l, 2);
 	lua_pop(l, 1);
-	mana = LuaToNumber(l, 2);
-	if (unit->Type->CanCastSpell) {
-		if (mana > unit->Variable[MANA_INDEX].Max) {
-			unit->Variable[MANA_INDEX].Value = unit->Variable[MANA_INDEX].Max;
-		} else {
-			unit->Variable[MANA_INDEX].Value = mana;
-		}
+
+	unit = CclGetUnit(l);
+	index = GetVariableIndex(LuaToString(l, 2));
+	if (index == -1) {
+		LuaError(l, "Bad variable name '%s'\n" _C_ LuaToString(l, 2));
 	}
-
-	lua_pushnumber(l, mana);
+	lua_pushnumber(l, unit->Variable[index].Value);
 	return 1;
 }
 
 /**
-**  Get the unholy-armor of the unit structure.
+**  Set the value of the unit variable.
 **
 **  @param l  Lua state.
 **
-**  @return   The unholy-armor of the unit.
+**  @return The new value of the unit.
 */
-static int CclGetUnitUnholyArmor(lua_State* l)
-{
-	const Unit* unit;
-
-	LuaCheckArgs(l, 1);
-
-	unit = CclGetUnit(l);
-	lua_pushnumber(l, unit->Variable[UNHOLYARMOR_INDEX].Value);
-	return 1;
-}
-
-/**
-**  Set the unholy-armor of the unit structure.
-**
-**  @param l  Lua state.
-**
-**  @return   The value of the unit.
-*/
-static int CclSetUnitUnholyArmor(lua_State* l)
+static int CclSetUnitVariable(lua_State* l)
 {
 	Unit* unit;
+	int index;
+	int value;
 
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 3);
 
 	lua_pushvalue(l, 1);
 	unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	unit->Variable[UNHOLYARMOR_INDEX].Value = LuaToNumber(l, 2);
-
-	lua_pushvalue(l, 2);
+	index = GetVariableIndex(LuaToString(l, 2));
+	if (index == -1) {
+		LuaError(l, "Bad variable name '%s'\n" _C_ LuaToString(l, 2));
+	}
+	value = LuaToNumber(l, 3);
+	if (value > unit->Variable[index].Max) {
+		unit->Variable[index].Value = unit->Variable[index].Max;
+	} else {
+		unit->Variable[index].Value = value;
+	}
+	lua_pushnumber(l, value);
 	return 1;
 }
 
@@ -1474,10 +1443,8 @@ void UnitCclRegister(void)
 	lua_register(Lua, "GetUnits", CclGetUnits);
 
 	// unit member access functions
-	lua_register(Lua, "GetUnitMana", CclGetUnitMana);
-	lua_register(Lua, "SetUnitMana", CclSetUnitMana);
-	lua_register(Lua, "GetUnitUnholyArmor", CclGetUnitUnholyArmor);
-	lua_register(Lua, "SetUnitUnholyArmor", CclSetUnitUnholyArmor);
+	lua_register(Lua, "GetUnitVariable", CclGetUnitVariable);
+	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 	lua_register(Lua, "UnitAllocQueue", CclUnitAllocQueue);
