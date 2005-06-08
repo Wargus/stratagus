@@ -995,6 +995,7 @@ static int CclCreateUnit(lua_State* l)
 			unit->Y = iy;
 			DropOutOnSide(unit, heading, unittype->TileWidth, unittype->TileHeight);
 		}
+		UpdateForNewUnit(unit, 0);
 
 		lua_pushnumber(l, unit->Slot);
 		return 1;
