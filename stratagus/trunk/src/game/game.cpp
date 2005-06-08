@@ -183,9 +183,9 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d, %d)\n",
 			map->Info.Description, numplayers, map->Info.MapWidth, map->Info.MapHeight,
 			map->Info.MapUID + 1);
-			
+
 	// MAPTODO : BUG when path is relative (-d option) => mapsetup wrong here.
-	gzprintf(f, "DefineMapSetup(\"%s\")", mapsetup);
+	gzprintf(f, "DefineMapSetup(\"%s\")\n", mapsetup);
 	gzclose(f);
 
 	// Write the map setup file
