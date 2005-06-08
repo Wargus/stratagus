@@ -66,8 +66,7 @@
 <a href="#GameCycle">GameCycle</a>
 <a href="#GetPlayerData">GetPlayerData</a>
 <a href="#GetThisPlayer">GetThisPlayer</a>
-<a href="#GetUnitMana">GetUnitMana</a>
-<a href="#GetUnitUnholyArmor">GetUnitUnholyArmor</a>
+<a href="#GetUnitVariable">GetUnitVariable</a>
 <a href="#Group">Group</a>
 <a href="#KillUnit">KillUnit</a>
 <a href="#KillUnitAt">KillUnitAt</a>
@@ -94,8 +93,7 @@
 <a href="#SetResourcesHeld">SetResourcesHeld</a>
 <a href="#SetSharedVision">SetSharedVision</a>
 <a href="#SetThisPlayer">SetThisPlayer</a>
-<a href="#SetUnitMana">SetUnitMana</a>
-<a href="#SetUnitUnholyArmor">SetUnitUnholyArmor</a>
+<a href="#SetUnitVariable">SetUnitVariable</a>
 <a href="#ShowMapLocation">ShowMapLocation</a>
 <a href="#SharedVision">SharedVision</a>
 <a href="#SlotUsage">SlotUsage</a>
@@ -715,39 +713,23 @@ Returns the current player. Usefull mostly in for AI scripts.
     player = GetThisPlayer()
 </pre>
 
-<a name="GetUnitMana"></a>
-<h3>GetUnitMana(unit)</h3>
+<a name="GetUnitVariable"></a>
+<h3>GetUnitVariable(unit, VariableName)</h3>
 
 Get a unit's mana.
 
-
 <dl>
 <dt>unit</dt>
-<dd>Unit to get mana for.
-</dd>
+<dd>Unit to get info for.</dd>
+<dt>VariableName</dt>
+<dd>Name of the variable to get info for.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    GetUnitMana("unit-shooter");
-</pre>
-
-<a name="GetUnitUnholyArmor"></a>
-<h3>GetUnitUnholyArmor(unit-slot)</h3>
-
-Get the unholy armor of a unit. A unit with unholy armor is invulnerable.
-
-<dl>
-<dt>unit-slot</dt>
-<dd>unit slot number
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    armor = GetUnitUnholyArmor(0)
+-- Get mana of the unit (slot #11).
+GetUnitMana(11, "Mana");
 </pre>
 
 <a name="Group"></a>
@@ -1382,43 +1364,23 @@ Set ThisPlayer.
     SetThisPlayer(0)
 </pre>
 
-<a name="SetUnitMana"></a>
-<h3>SetUnitMana(unit, amount)</h3>
-
-Set the amount of mana for a unit.
+<a name="SetUnitVariable"></a>
+<h3>SetUnitVariable(unit, VariableName, amount)</h3>
+Set the amount of VariableName of the unit.
 <dl>
 <dt>unit</dt>
-<dd>Unit to set the mana for.
-</dd>
+<dd>Unit to set the info for.</dd>
+<dt>VariableName</dt>
+<dd>Variable to set.</dd>
 <dt>amount</dt>
-<dd>New amount of mana for the unit.
-</dd>
+<dd>New amount of VariableName for the unit.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
-    SetUnitMana("unit-magic", 255)
-</pre>
-
-<a name="SetUnitUnholyArmor"></a>
-<h3>SetUnitUnholyArmor(uni-slot, level)</h3>
-
-Set the unholy armor level for a unit.
-
-
-<dl>
-<dt>unit-slot</dt>
-<dd>unit slot number
-</dd>
-<dt>level</dt>
-<dd>new unholy armor level
-</dd></dl>
-
-<h4>Example</h4>
-
-<pre>
-    SetUnitUnholyArmor(0, 1)
+--  Set mana of the unit (slot 11)
+SetUnitVariable(12, "Mana", 255)
 </pre>
 
 <a name="SharedVision"></a>
