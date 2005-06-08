@@ -143,14 +143,15 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 		"computer", "person", "rescue-passive", "rescue-active"};
 	char mapsetup[PATH_MAX];
 	char *extension;
-
-	printf("SaveStratagusMap %s\n", mapname);
+	int numplayers, topplayer;
 
 	if (!map->Info.MapWidth || !map->Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapname);
 		ExitFatal(-1);
 	}
-	
+
+	numplayers = 0;
+	topplayer = PlayerMax - 2;
 	strcpy(mapsetup, mapname);
 	extension = strstr(mapsetup, ".smp");
 	if (!extension) {
@@ -170,13 +171,17 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 
 	gzprintf(f, "DefinePlayerTypes(");
 	gzprintf(f, "\"%s\"", type[map->Info.PlayerType[0]]);
-	for(i = 1; i < PlayerMax && map->Info.PlayerType[i] != PlayerNobody; ++i) {
+	while (topplayer > 0 && map->Info.PlayerType[topplayer] == PlayerNobody) {
+		--topplayer;
+	}
+	for (i = 1; i <= topplayer; ++i) {
 		gzprintf(f, ", \"%s\"", type[map->Info.PlayerType[i]]);
+		++numplayers;
 	}
 	gzprintf(f, ")\n");
 	
 	gzprintf(f, "PresentMap(\"%s\", %d, %d, %d, %d)\n",
-			map->Info.Description, i, map->Info.MapWidth, map->Info.MapHeight,
+			map->Info.Description, numplayers, map->Info.MapWidth, map->Info.MapHeight,
 			map->Info.MapUID + 1);
 			
 	// MAPTODO : BUG when path is relative (-d option) => mapsetup wrong here.
@@ -184,7 +189,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzclose(f);
 
 	// Write the map setup file
-	if( !(f = gzopen(mapsetup, strcasestr(mapsetup,".gz") ? "wb9" : "wb0")) ) {
+	if ( !(f = gzopen(mapsetup, strcasestr(mapsetup,".gz") ? "wb9" : "wb0")) ) {
 		fprintf(stderr,"Can't save map `%s' (no .smp extension)\n", mapname);
 		return -1;
 	}
