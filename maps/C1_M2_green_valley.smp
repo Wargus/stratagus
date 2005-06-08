@@ -3,6 +3,6 @@
 -- Copyright 2005 François Beerten
 -- File licensed under the GNU GPL version 2.
 
-DefinePlayerTypes("person","person")
-PresentMap("Campaign_one_map_two", 2, 128, 128, -1829366288)
+DefinePlayerTypes("person","person","nobody","rescue-passive")
+PresentMap("Campaign_one_map_two", 4, 128, 128, -1839366288)
 DefineMapSetup("maps/C1_M2_green_valley.sms")
