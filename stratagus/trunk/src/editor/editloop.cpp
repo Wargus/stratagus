@@ -773,12 +773,27 @@ static void DrawEditorPanel(void)
 		(ButtonUnderCursor == TileButton ? IconActive : 0) |
 			(EditorState == EditorEditTile ? IconSelected : 0));
 
-	icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
-	Assert(icon);
-	DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
-		(ButtonUnderCursor == StartButton ? IconActive : 0) |
-			(EditorState == EditorSetStartLocation ? IconSelected : 0),
-		x + START_ICON_X, y + START_ICON_Y, NULL);
+	if (EditorStartUnit) {
+		icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
+		Assert(icon);
+		DrawUnitIcon(Players, TheUI.SingleSelectedButton->Style, icon,
+			(ButtonUnderCursor == StartButton ? IconActive : 0) |
+				(EditorState == EditorSetStartLocation ? IconSelected : 0),
+			x + START_ICON_X, y + START_ICON_Y, NULL);
+	} else {
+		//  No unit specified.
+		//  Todo : FIXME Should we just warn user to define Start unit ?
+		PushClipping();
+		x += START_ICON_X + 1;
+		y += START_ICON_Y + 1;
+		if (ButtonUnderCursor == StartButton) {
+			VideoDrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
+		}
+		VideoFillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
+		VideoDrawLineClip(PlayerColors[SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
+		VideoDrawLineClip(PlayerColors[SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
+		PopClipping();
+	}
 
 	switch (EditorState) {
 		case EditorSelecting:
@@ -805,6 +820,28 @@ static void DrawMapCursor(void)
 {
 	int x;
 	int y;
+
+	//
+	//  Affect CursorBuilding if necessary.
+	//  (Menu reset CursorBuilding)
+	//
+	if (!CursorBuilding) {
+		switch (EditorState) {
+			case EditorSelecting:
+			case EditorEditTile:
+				break;
+			case EditorEditUnit:
+				if (SelectedUnitIndex != -1) {
+					CursorBuilding = UnitTypeByIdent(ShownUnitTypes[SelectedUnitIndex]);
+				}
+				break;
+			case EditorSetStartLocation:
+				if (EditorStartUnit) {
+					CursorBuilding = UnitTypeByIdent(EditorStartUnit);
+				}
+				break;
+		}
+	}
 
 	//
 	// Draw map cursor
@@ -835,7 +872,7 @@ static void DrawMapCursor(void)
 					if (tx >= TheUI.MouseViewport->EndX) {
 						break;
 					}
-					VideoDrawClip(TheMap.TileGraphic, 
+					VideoDrawClip(TheMap.TileGraphic,
 						TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
@@ -866,14 +903,24 @@ static void DrawStartLocations(void)
 	int i;
 	int x, y;
 	UnitType *type;
-	
-	type = UnitTypeByIdent(EditorStartUnit);
-	
+
+	type = NULL;
+	if (EditorStartUnit) {
+		type = UnitTypeByIdent(EditorStartUnit);
+	}
+
 	for (i = 0; i < PlayerMax; i++) {
-		if (Players[i].Type != PlayerNobody && Players[i].Type != PlayerNeutral) {
+		if (TheMap.Info.PlayerType[i] != PlayerNobody && TheMap.Info.PlayerType[i] != PlayerNeutral) {
 			x = Map2ViewportX(CurrentViewport, Players[i].StartX);
 			y = Map2ViewportY(CurrentViewport, Players[i].StartY);
-			DrawUnitType(type, type->Sprite, i, 0, x, y); 
+			if (type) {
+				DrawUnitType(type, type->Sprite, i, 0, x, y);
+			} else {
+				PushClipping();
+				VideoDrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
+				VideoDrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
+				PopClipping();
+			}
 		}
 	}
 }
@@ -1104,23 +1151,22 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 	// Click on mode area
 	//
 	if (CursorOn == CursorOnButton) {
-		if (ButtonUnderCursor == SelectButton) {
-			CursorBuilding = NULL;
-			EditorState = EditorSelecting;
-			return;
-		}
-		if (ButtonUnderCursor == UnitButton) {
-			EditorState = EditorEditUnit;
-			return;
-		}
-		if (ButtonUnderCursor == TileButton) {
-			CursorBuilding = NULL;
-			EditorState = EditorEditTile;
-			return;
-		}
-		if (ButtonUnderCursor == StartButton) {
-			EditorState = EditorSetStartLocation;
-			return;
+		CursorBuilding = NULL;
+		switch (ButtonUnderCursor) {
+			case SelectButton :
+				EditorState = EditorSelecting;
+				return;
+			case UnitButton:
+				EditorState = EditorEditUnit;
+				return;
+			case TileButton :
+				EditorState = EditorEditTile;
+				return;
+			case StartButton:
+				EditorState = EditorSetStartLocation;
+				return;
+			default:
+				break;
 		}
 	}
 	//
