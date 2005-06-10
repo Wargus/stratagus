@@ -40,10 +40,6 @@
 #include <ctype.h>
 #include <limits.h>
 
-#ifndef _MSC_VER
-#include <fcntl.h>
-#endif
-
 #include "stratagus.h"
 
 #include "SDL.h"
@@ -479,7 +475,7 @@ static void FreeMapInfos(FileList *fl, int n)
 //////////////
 
 /**
-** Editor main load read directory filter
+**  Editor main load read directory filter
 **
 **  @param pathbuf    Pathname and filename of current file (or directory) to check.
 **  @param fl         OUT : Filelist to update.
@@ -489,13 +485,13 @@ static void FreeMapInfos(FileList *fl, int n)
 **
 **  @return 1 if it is a valid file, else 0.
 **
-**  @note suffixe supported : ".scm", ".chk", ".log", ".sav", ".smp"
+**  @note suffixes supported : ".log", ".sav", ".smp"
 */
 static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int width, int height)
 {
 	unsigned int i;
 	char type;      // type of compression =>  'b':bzip2 'z':gzip 'n':none
-	char *filename; // filename
+	char *filename;
 	char *cp;
 
 	Assert(pathbuf && *pathbuf);
@@ -504,7 +500,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 	memset(fl, 0, sizeof (*fl));
 	filename = strrchr(pathbuf, '/');
 	if (filename) {
-		filename++;
+		++filename;
 	} else {
 		filename = pathbuf;
 	}
@@ -544,8 +540,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 		return 0;
 	}
 
-	if (strcasestr(filename, ".scm") || strcasestr(filename, ".chk") ||
-			strcasestr(filename, ".smp")) {
+	if (strcasestr(filename, ".smp")) {
 		MapInfo* info;
 
 		info = DuplicateMapInfo(&TheMap.Info);
@@ -584,7 +579,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 }
 
 /**
-** Replay game read directory filter
+**  Replay game read directory filter
 */
 static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 {
@@ -594,7 +589,7 @@ static int ReplayGameRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-** Save game read directory filter
+**  Save game read directory filter
 */
 static int SaveGameRDFilter(char *pathbuf, FileList *fl)
 {
@@ -604,7 +599,7 @@ static int SaveGameRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-** Editor main load read directory filter
+**  Editor main load read directory filter
 */
 static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 {
@@ -614,7 +609,7 @@ static int EditorMainLoadRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-** Editor save read directory filter
+**  Editor save read directory filter
 */
 static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 {
@@ -624,26 +619,21 @@ static int EditorSaveRDFilter(char *pathbuf, FileList *fl)
 }
 
 /**
-** Scenario select read directory filter
+**  Scenario select read directory filter
 */
 static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 {
-	const char *suf[3];
+	const char *suf[3] = {".smp", 0};
 	static int szl[] = {-1, 32, 64, 96, 128, 256, 512, 1024};
 	int sz;
 	Menu* menu;
 	int curopt;
-
-	suf[0] = ".smp";
-	suf[1] = NULL;
-	suf[2] = NULL;
 
 	menu = FindMenu("menu-select-scenario");
 	sz = szl[menu->Items[8].D.Pulldown.curopt];
 
 	//MAPTODO simplify
 	curopt = 0;
-	suf[0] = ".smp";
 
 	return GenericRDFilter(pathbuf, fl, suf, sz, sz);
 }
