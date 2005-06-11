@@ -315,7 +315,7 @@ static int CclDefineUnitType(lua_State* l)
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 				} else {
-					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
+					LuaError(l, "Unsupported image tag: %s" _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Shadow")) {
