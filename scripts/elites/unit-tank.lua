@@ -54,36 +54,36 @@ DefineIcon({
 	File = "elites/units/ico_tank.png"})
 
 DefineUnitType("unit-tank", {
-        Name = "Tank",
-        Files = {"default", "elites/units/unit_tank.png"}, Size = {96, 96},
-        Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
-        Animations = "animations-tank", Icon = "icon-tank",
-        Flip = false,
-        Costs = {"time", 150, "titanium", 200, "crystal", 100},
-        RepairHp = 1, RepairCosts = {"crystal", 6},
-        Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-        SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
-        Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Type = "land",
+	Name = "Tank",
+	Image = {"file", "elites/units/unit_tank.png", "size", {96, 96}},
+	Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
+	Animations = "animations-tank", Icon = "icon-tank",
+	Flip = false,
+	Costs = {"time", 150, "titanium", 200, "crystal", 100},
+	RepairHp = 1, RepairCosts = {"crystal", 6},
+	Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+	SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
+	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
+	Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 6,
-        Sounds = {
-            "selected", "assault-selected",
-            "acknowledge", "assault-acknowledge"
-            }
-        })
+	Sounds = {
+		"selected", "assault-selected",
+		"acknowledge", "assault-acknowledge"
+	}
+})
 
 DefineAllow("unit-tank", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-tank", {"unit-vfac"})
 
 DefineButton({
-        Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
-        Value = "unit-tank", Key = "t", Hint = "BUILD ~!TANK",
-        ForUnit = {"unit-vfac"}})
+	Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
+	Value = "unit-tank", Key = "t", Hint = "BUILD ~!TANK",
+	ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-tank"})
 

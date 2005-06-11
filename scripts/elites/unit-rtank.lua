@@ -54,36 +54,36 @@ DefineIcon({
 	File = "elites/units/ico_rtank.png"})
 
 DefineUnitType("unit-rtank", {
-        Name = "Rocket Tank",
-        Files = {"default", "elites/units/unit_rtank.png"}, Size = {96, 96},
-        Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {96, 96}},
-        Animations = "animations-rtank", Icon = "icon-rtank",
-        Flip = false,
-        Costs = {"time", 100, "titanium", 100, "crystal", 150},
-        RepairHp = 1, RepairCosts = {"crystal", 6},
-        Speed = 20, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-        SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
-        Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Type = "land",
+	Name = "Rocket Tank",
+	Image = {"file", "elites/units/unit_rtank.png", "size", {96, 96}},
+	Shadow = {"file", "elites/units/unit_rtank_s.png", "size", {96, 96}},
+	Animations = "animations-rtank", Icon = "icon-rtank",
+	Flip = false,
+	Costs = {"time", 100, "titanium", 100, "crystal", 150},
+	RepairHp = 1, RepairCosts = {"crystal", 6},
+	Speed = 20, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
+	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
+	Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 7,
-        Sounds = {
-            "selected", "grenadier-selected",
-            "acknowledge", "grenadier-acknowledge"
-            }
-        })
+	Sounds = {
+		"selected", "grenadier-selected",
+		"acknowledge", "grenadier-acknowledge"
+	}
+})
 
 DefineAllow("unit-rtank", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-rtank", {"unit-vfac"})
 
 DefineButton({
-        Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
-        Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
-        ForUnit = {"unit-vfac"}})
+	Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
+	Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
+	ForUnit = {"unit-vfac"}})
 
 DefineCommonButtons({"unit-rtank"})
 

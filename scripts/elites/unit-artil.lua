@@ -61,25 +61,25 @@ DefineIcon({
 	File = "elites/units/ico_artil.png"})
 
 DefineUnitType("unit-artil", {
-        Name = "Artil",
-        Files = {"default", "elites/units/unit_artil.png"}, Size = {96, 96},
-        Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
-        Animations = "animations-artil", Icon = "icon-artil",
-        Flip = false,
-        Costs = {"time", 200, "titanium", 300, "crystal", 300},
-        RepairHp = 1, RepairCosts = {"crystal", 6},
-        Speed = 10, HitPoints = 250, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-        SightRange = 5, Armor = 25, BasicDamage = 10, PiercingDamage = 50,
-        Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 25, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Type = "land",
+	Name = "Artil",
+	Image = {"file", "elites/units/unit_artil.png", "size", {96, 96}},
+	Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
+	Animations = "animations-artil", Icon = "icon-artil",
+	Flip = false,
+	Costs = {"time", 200, "titanium", 300, "crystal", 300},
+	RepairHp = 1, RepairCosts = {"crystal", 6},
+	Speed = 10, HitPoints = 250, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+	SightRange = 5, Armor = 25, BasicDamage = 10, PiercingDamage = 50,
+	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
+	Points = 25, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Type = "land",
 	ComputerReactionRange = 10, PersonReactionRange = 10,
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 50, CanAttack = true, CanTargetLand = true,
 	NumDirections = 8, MaxAttackRange = 8,
-        Sounds = {}
-        })
+	Sounds = {}
+})
 
 DefineAllow("unit-artil", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-artil", {"unit-vfac"})
@@ -87,8 +87,8 @@ DefineDependency("unit-artil", {"unit-vfac"})
 DefineCommonButtons({"unit-artil"})
 
 DefineButton({
-        Pos = 6, Level = 0, Icon = "icon-artil", Action = "train-unit",
-        Value = "unit-artil", Key = "l", Hint = "BUILD ARTI~!L",
-        ForUnit = {"unit-vfac"}})
+	Pos = 6, Level = 0, Icon = "icon-artil", Action = "train-unit",
+	Value = "unit-artil", Key = "l", Hint = "BUILD ARTI~!L",
+	ForUnit = {"unit-vfac"}})
 
 
