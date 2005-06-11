@@ -10,7 +10,7 @@
 //
 /**@name icons.h - The icons headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -145,11 +145,9 @@ struct _button_style_;
 
 	/// Icon: rectangle image used in menus
 typedef struct _icon_ {
-	char* Ident;    /// Icon identifier
-	char* Tileset;  /// Tileset identifier
-
+	char* Ident;              /// Icon identifier
 	struct _graphic_* Sprite; /// Graphic data
-	int Frame;      /// Frame number in graphic
+	int Frame;                /// Frame number in graphic
 } Icon;
 
 #define NoIcon NULL  /// used for errors == no valid icon

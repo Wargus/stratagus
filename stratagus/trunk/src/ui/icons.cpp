@@ -72,46 +72,42 @@ static hashtable(Icon*, 257) IconHash;       /// lookup table for icon names
 **  @bug Redefining an icon isn't supported.
 **
 **  @param ident    Icon identifier.
-**  @param tileset  Optional tileset identifier.
 **  @param width    Icon width.
 **  @param height   Icon height.
 **  @param frame    Frame number in graphic.
 **  @param file     Graphic file containing the icons.
 */
-static void AddIcon(const char* ident, const char* tileset,
-	int frame, int width, int height, const char* file)
+static void AddIcon(const char* ident, int frame, int width,
+	int height, const char* file)
 {
-	char* str;
 	Icon** ptr;
 	Icon* icon;
 
-	//
-	//  Look up icon
-	//
-	if (tileset) {
-		str = strdcat(ident, tileset);
-	} else {
-		str = strdup(ident);
-	}
-	ptr = (Icon**)hash_find(IconHash, str);
+	// Look up icon
+	ptr = (Icon**)hash_find(IconHash, ident);
 	if (ptr && *ptr) {
-		DebugPrint("FIXME: Icon already defined `%s,%s'\n" _C_
-			ident _C_ tileset);
-		// This is more a config error
-		free(str);
-		return;
+		// Redefine icon
+		icon = *ptr;
+		if (file) {
+			if (icon->Sprite) {
+				FreeGraphic(icon->Sprite);
+			}
+			icon->Sprite = NewGraphic(file, width, height);
+		}
+		icon->Frame = frame;
 	} else {
-		icon = malloc(sizeof(Icon));
+		icon = calloc(1, sizeof(Icon));
 		icon->Ident = strdup(ident);
-		icon->Tileset = tileset ? strdup(tileset) : NULL;
-		icon->Sprite = NewGraphic(file, width, height);
+		if (file) {
+			icon->Sprite = NewGraphic(file, width, height);
+		}
 		icon->Frame = frame;
 
-		*(Icon**)hash_add(IconHash, str) = icon;
-		free(str);
+		*(Icon**)hash_add(IconHash, ident) = icon;
+
+		Icons = realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
+		Icons[NumIcons++] = icon;
 	}
-	Icons = realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
-	Icons[NumIcons++] = icon;
 }
 
 /**
@@ -121,8 +117,6 @@ static void AddIcon(const char* ident, const char* tileset,
 */
 void InitIcons(void)
 {
-	//  Add icons of the current tileset, with shortcut to hash.
-	*(Icon**)hash_add(IconHash, Icons[0]->Ident) = Icons[0];
 }
 
 /**
@@ -154,22 +148,8 @@ void CleanIcons(void)
 {
 	int i;
 
-	//
-	//  Icons
-	//
 	if (Icons) {
-		char* str;
-
-		str = alloca(1024);
 		for (i = 0; i < NumIcons; ++i) {
-			//
-			//  Remove long hash and short hash
-			//
-			if (Icons[i]->Tileset) {
-				strcat(strcpy(str, Icons[i]->Ident), Icons[i]->Tileset);
-				hash_del(IconHash, str);
-				free(Icons[i]->Tileset);
-			}
 			hash_del(IconHash, Icons[i]->Ident);
 
 			free(Icons[i]->Ident);
@@ -255,7 +235,6 @@ static int CclDefineIcon(lua_State* l)
 {
 	const char* value;
 	const char* ident;
-	const char* tileset;
 	const char* filename;
 	int width;
 	int height;
@@ -266,15 +245,13 @@ static int CclDefineIcon(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 	width = height = frame = 0;
-	ident = tileset = filename = NULL;
+	ident = filename = NULL;
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			ident = LuaToString(l, -1);
-		} else if (!strcmp(value, "Tileset")) {
-			tileset = LuaToString(l, -1);
 		} else if (!strcmp(value, "Size")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -295,9 +272,10 @@ static int CclDefineIcon(lua_State* l)
 		lua_pop(l, 1);
 	}
 
-	Assert(ident && filename && width && height);
+	Assert(ident);
+	Assert(!filename || (width && height));
 
-	AddIcon(ident, tileset, frame, width, height, filename);
+	AddIcon(ident, frame, width, height, filename);
 
 	return 0;
 }
