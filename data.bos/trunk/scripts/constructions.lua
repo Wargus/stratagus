@@ -31,10 +31,9 @@
 Load("scripts/elites/constructions.lua")
 
 DefineConstruction("construction-none", {
-	Files = {{
-		Tileset = "default",
+	Files = {
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}}},
+		Size = {64, 64}},
 	Constructions = {{
 		Percent = 0,
 		File = "construction",
@@ -48,10 +47,9 @@ DefineConstruction("construction-none", {
 })
 
 DefineConstruction("construction-land", {
-	Files= {{
-		Tileset = "default",
+	Files= {
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}}},
+		Size = {64, 64}},
 	Constructions = {{
 		Percent = 0,
 		File = "construction",
@@ -65,10 +63,9 @@ DefineConstruction("construction-land", {
 })
 
 DefineConstruction("construction-land2", {
-	Files = {{
-		Tileset = "default",
+	Files = {
 		File = "neutral/buildings/land_construction_site.png",
-		Size = {64, 64}}},
+		Size = {64, 64}},
 	Constructions = {{
 		Percent = 0,
 		File = "construction",
@@ -79,10 +76,9 @@ DefineConstruction("construction-land2", {
 })
 
 DefineConstruction("construction-wall", {
-	Files = {{
-		Tileset = "default",
+	Files = {
 		File = "tilesets/desert/neutral/buildings/wall_construction_site.png",
-		Size = {32, 32}}},
+		Size = {32, 32}},
 	Constructions = {{
 		Percent = 0,
 		File = "construction",
