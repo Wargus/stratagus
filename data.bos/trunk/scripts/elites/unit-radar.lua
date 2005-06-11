@@ -51,49 +51,49 @@ DefineIcon({
 MakeSound("radar-selected", "elites/buildings/sfx_rdar.select.wav")
 
 DefineConstruction("construction-radar", {
-        Constructions = {
-                {Percent = 0, File = "main", Frame = 11},
-                {Percent = 50, File = "main", Frame = 10},
-        }
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 11},
+		{Percent = 50, File = "main", Frame = 10},
+	}
 })
 
 DefineUnitType("unit-radar", {
-        Name = "Radar",
-        Files = {"default", "elites/build/radar.png"}, Size = {64, 64},
+	Name = "Radar",
+	Image = {"file", "elites/build/radar.png", "size", {64, 64}},
 	Offset = {12, -16},
-        Shadow = {"file", "elites/build/radar_s.png", "size", {64, 64}},
-        Animations = "animations-radar", Icon = "icon-radar",
-        Costs = {"time", 20, "titanium", 7, "crystal", 35},
-        RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-radar",
-        Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {32, 28},
-        SightRange = 3, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
-        Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Corpse = {"radar_destroyed", 0}, Type = "land",
+	Shadow = {"file", "elites/build/radar_s.png", "size", {64, 64}},
+	Animations = "animations-radar", Icon = "icon-radar",
+	Costs = {"time", 20, "titanium", 7, "crystal", 35},
+	RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-radar",
+	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {32, 28},
+	SightRange = 3, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
+	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
+	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Corpse = {"radar_destroyed", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
-        VisibleUnderFog = true,
+	VisibleUnderFog = true,
 	NumDirections = 1,
 	RadarRange = 40,
-        Sounds = {"selected", "radar-selected"}
-        })
+	Sounds = {"selected", "radar-selected"}
+})
 
 DefineUnitType("radar_destroyed", {
-        Name = "RadarWreck",
-        Files = {"default", "elites/build/radar.png"}, Size = {64, 64},
-        Animations = "animations-radar", Icon = "icon-cancel",
-        Speed = 0, HitPoints = 999, DrawLevel = 10,
-        TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
-        BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-        Priority = 0, Type = "land", Building = true, Vanishes = true
-        })
+	Name = "RadarWreck",
+	Image = {"file", "elites/build/radar.png", "size", {64, 64}},
+	Animations = "animations-radar", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
+})
 
 DefineAllow("unit-radar", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-radar", {"unit-vault"})
 
 DefineButton({
-        Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",
-        Value = "unit-radar", Key = "r", Hint = "BUILD ~!RADAR",
-        ForUnit = {"unit-engineer"}})
+	Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",
+	Value = "unit-radar", Key = "r", Hint = "BUILD ~!RADAR",
+	ForUnit = {"unit-engineer"}})
 
 
 

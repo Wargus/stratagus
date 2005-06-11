@@ -36,37 +36,37 @@ DefineAnimations("animations-tree", {
     })
 
 DefineIcon({
-        Name = "icon-tree",
-        Size = {46, 38},
-        Frame = 0,
-        File = "nature/tree01_i.png"})
+	Name = "icon-tree",
+	Size = {46, 38},
+	Frame = 0,
+	File = "nature/tree01_i.png"})
 
 DefineConstruction("construction-tree", {
-        Constructions = {
-                {Percent = 0, File = "main", Frame = 0},
-        }
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 0},
+	}
 })
 
 DefineUnitType("unit-tree", {
-        Name = "Tree",
-        Files = {"default", "nature/tree01.png"}, Size = {105, 105},
+	Name = "Tree",
+	Image = {"file", "nature/tree01.png", "size", {105, 105}},
 	Offset = {16, -24},
-        Shadow = {"file", "nature/tree01_s.png", "size", {105, 105}},
-        Animations = "animations-tree", Icon = "icon-tree",
-        Costs = {"time", 1},
-        Construction = "construction-tree",
-        Speed = 0, HitPoints = 50, DrawLevel = 2, 
-        TileSize  = {1, 1}, BoxSize = {32, 32},
-        SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
-        Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
-        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Corpse = {"unit-destroyed-1x1-place", 0}, 
-        Type = "land",
+	Shadow = {"file", "nature/tree01_s.png", "size", {105, 105}},
+	Animations = "animations-tree", Icon = "icon-tree",
+	Costs = {"time", 1},
+	Construction = "construction-tree",
+	Speed = 0, HitPoints = 50, DrawLevel = 2, 
+	TileSize  = {1, 1}, BoxSize = {32, 32},
+	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
+	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
+	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Corpse = {"unit-destroyed-1x1-place", 0}, 
+	Type = "land",
 	Building = true, BuilderOutside = true,
-        VisibleUnderFog = false,
+	VisibleUnderFog = false,
 	NumDirections = 1,
-        Sounds = {}
-        })
+	Sounds = {}
+})
 
 DefineAllow("unit-tree", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-tree", {})

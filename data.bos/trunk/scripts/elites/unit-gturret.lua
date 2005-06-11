@@ -38,49 +38,49 @@ DefineAnimations("animations-gturret", {
     })
 
 DefineIcon({
-        Name = "icon-gturret",
-        Size = {46, 38},
-        Frame = 0,
-        File = "elites/build/gturret_i.png"})
+	Name = "icon-gturret",
+	Size = {46, 38},
+	Frame = 0,
+	File = "elites/build/gturret_i.png"})
 
 DefineIcon({
-        Name = "icon-gturret_b",
-        Size = {46, 38},
-        Frame = 10,
-        File = "elites/units/engineer_icons.png"})
+	Name = "icon-gturret_b",
+	Size = {46, 38},
+	Frame = 10,
+	File = "elites/units/engineer_icons.png"})
 
 DefineConstruction("construction-gturret", {
-        Constructions = {
-                {Percent = 0, File = "main", Frame = 10},
-                {Percent = 20, File = "main", Frame = 11},
-                {Percent = 40, File = "main", Frame = 12},
-                {Percent = 60, File = "main", Frame = 13},
-                {Percent = 80, File = "main", Frame = 14}
-       }
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 10},
+		{Percent = 20, File = "main", Frame = 11},
+		{Percent = 40, File = "main", Frame = 12},
+		{Percent = 60, File = "main", Frame = 13},
+		{Percent = 80, File = "main", Frame = 14}
+	}
 })
 
 DefineUnitType("unit-gturret", {
-        Name = "Gun Turret",
-        Files = {"default", "elites/build/gturret.png"}, Size = {64, 64},
-        Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
-        Animations = "animations-gturret", Icon = "icon-gturret",
-        Costs = {"time", 130, "titanium", 250, "crystal", 50},
-        RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gturret",
-        Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
-        SightRange = 6, ComputerReactionRange = 6, PersonReactionRange = 6, Armor = 10,
-        BasicDamage = 4, PiercingDamage = 0, MaxAttackRange = 6, Missile = "missile-none",
-        Priority = 20, AnnoyComputerFactor = 45, Points = 100,
-        ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
-        CanAttack = true, CanTargetLand = true, NumDirections = 8,
-        Corpse = {"build-dead-body2", 0}, Type = "land",
-        --[[MustBuildOnTop = "unit-plate1", --]] Building = true, BuilderOutside = true,
-        VisibleUnderFog = true,
-        Sounds = {
-                "selected", "gturret-selected",
-                "ready", "gen-ready",
-                "help", "gen-help",
-                "dead", "gen-dead"}
-        })
+	Name = "Gun Turret",
+	Image = {"file", "elites/build/gturret.png", "size", {64, 64}},
+	Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
+	Animations = "animations-gturret", Icon = "icon-gturret",
+	Costs = {"time", 130, "titanium", 250, "crystal", 50},
+	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gturret",
+	Speed = 0, HitPoints = 160, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
+	SightRange = 6, ComputerReactionRange = 6, PersonReactionRange = 6, Armor = 10,
+	BasicDamage = 4, PiercingDamage = 0, MaxAttackRange = 6, Missile = "missile-none",
+	Priority = 20, AnnoyComputerFactor = 45, Points = 100,
+	ExplodeWhenKilled = "missile-160x128-explosion", RightMouseAction = "attack",
+	CanAttack = true, CanTargetLand = true, NumDirections = 8,
+	Corpse = {"build-dead-body2", 0}, Type = "land",
+	--[[MustBuildOnTop = "unit-plate1", --]] Building = true, BuilderOutside = true,
+	VisibleUnderFog = true,
+	Sounds = {
+		"selected", "gturret-selected",
+		"ready", "gen-ready",
+		"help", "gen-help",
+		"dead", "gen-dead"}
+})
 
 MakeSound("gturret-selected", "elites/units/gturret_select.wav")
 MakeSound("gturret-attack", "elites/units/gturret_attack.wav")
@@ -89,9 +89,9 @@ DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-gturret", {"unit-vault"})
 
 DefineButton({
-        Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
-        Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
-        ForUnit = {"unit-engineer"}})
+	Pos = 2, Level = 3, Icon = "icon-gturret_b", Action = "build",
+	Value = "unit-gturret", Key = "g", Hint = "BUILD ~!GUN TURRET",
+	ForUnit = {"unit-engineer"}})
 -- DefineButton for the 'stop' and 'attack' actions are defined in buttons.lua.
 
 

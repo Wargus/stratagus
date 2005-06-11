@@ -59,56 +59,53 @@ DefineIcon({
 MakeSound("camera-selected", "elites/buildings/sfx_camera.select.wav")
 
 DefineConstruction("construction-cam", {
-        Constructions = {
-                {Percent = 0, File = "main", Frame = 16},
-                {Percent = 20, File = "main", Frame = 17},
-                {Percent = 30, File = "main", Frame = 18},
-                {Percent = 40, File = "main", Frame = 19},
-                {Percent = 50, File = "main", Frame = 20},
-                {Percent = 60, File = "main", Frame = 21},
-                {Percent = 80, File = "main", Frame = 22},
-                {Percent = 90, File = "main", Frame = 23}
-        }
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 16},
+		{Percent = 20, File = "main", Frame = 17},
+		{Percent = 30, File = "main", Frame = 18},
+		{Percent = 40, File = "main", Frame = 19},
+		{Percent = 50, File = "main", Frame = 20},
+		{Percent = 60, File = "main", Frame = 21},
+		{Percent = 80, File = "main", Frame = 22},
+		{Percent = 90, File = "main", Frame = 23}
+	}
 })
 
 DefineUnitType("unit-cam", {
-        Name = "Camera",
-        Files = {"default", "elites/build/camera.png"}, Size = {32, 64},
-        Offset = {0, -16},
-        Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
-        Animations = "animations-cam", Icon = "icon-cam",
-        Costs = {"time", 20, "titanium", 7, "crystal", 35},
-        RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-cam",
-        Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
-        SightRange = 15, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
-        Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
-        Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
-        Corpse = {"camera_destroyed", 0}, Type = "land",
+	Name = "Camera",
+	Image = {"file", "elites/build/camera.png", "size", {32, 64}},
+	Offset = {0, -16},
+	Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
+	Animations = "animations-cam", Icon = "icon-cam",
+	Costs = {"time", 20, "titanium", 7, "crystal", 35},
+	RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-cam",
+	Speed = 0, HitPoints = 5, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {28, 28},
+	SightRange = 15, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
+	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 65,
+	Points = 10, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
+	Corpse = {"camera_destroyed", 0}, Type = "land",
 	Building = true, BuilderOutside = true,
-        VisibleUnderFog = true,
-        Sounds = {"selected", "camera-selected"}
-        })
+	VisibleUnderFog = true,
+	Sounds = {"selected", "camera-selected"}
+})
 
 DefineUnitType("camera_destroyed", {
-        Name = "CameraCrater",
-        Files = {"default", "elites/build/camera_c.png"}, Size = {32, 64},
-        Animations = "animations-dead_cam", Icon = "icon-cancel",
-        Speed = 0, HitPoints = 999, DrawLevel = 10,
-        TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
-        BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-        Priority = 0, Type = "land", Building = true, Vanishes = true
-        })
+	Name = "CameraCrater",
+	Image = {"file", "elites/build/camera_c.png", "size", {32, 64}},
+	Animations = "animations-dead_cam", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
+})
 
 DefineAllow("unit-cam", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-cam", {"unit-vault"})
 
 DefineButton({
-        Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",
-        Value = "unit-cam", Key = "c", Hint = "BUILD ~!CAMERA",
-        ForUnit = {"unit-engineer"}})
-
-
-
+	Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",
+	Value = "unit-cam", Key = "c", Hint = "BUILD ~!CAMERA",
+	ForUnit = {"unit-engineer"}})
 
 
 

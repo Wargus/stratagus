@@ -35,7 +35,7 @@ Load("scripts/anim.lua")
 for i = 1, 13 do
 	DefineUnitType("unit-crystal-field" .. i, {
 		Name = "Crystal Field" .. i,
-		Files = {"default", "nature/res/res_crys.png"}, Size = {32, 32},
+		Image = {"file", "nature/res/res_crys.png", "size", {32, 32}},
 		Shadow = {"file", "nature/res/res_crys_s.png", "size", {32, 32}, "offset", {5, 5}},
 		Animations = "animations-crystal-field" .. i, Icon = "icon-crystal-field",
 		HitPoints = 50,	TileSize= {1, 1}, BoxSize = {31, 31},
@@ -48,7 +48,7 @@ end
 
 DefineUnitType("unit-gold-mine", {
 	Name = "Titanium Field",
-	Files = {"default", "nature/res/rocks_field.png"}, Size = {128, 128},
+	Image = {"file", "nature/res/rocks_field.png", "size", {128, 128}},
 	Shadow = {"file", "nature/res/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
 	Costs = {"time", 150}, VisibleUnderFog = true,
@@ -68,7 +68,7 @@ DefineUnitType("unit-gold-mine", {
 
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
-	Files = {"default", "neutral/units/corpses.png"}, Size = {72, 72},
+	Image = {"file", "neutral/units/corpses.png", "size", {72, 72}},
 	Animations = "animations-dead-body", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 30, Priority = 0,
 	TileSize = {1, 1}, BoxSize = {31, 31}, SightRange = 1,
@@ -76,9 +76,7 @@ DefineUnitType("unit-dead-body", {
 	Type = "land", Vanishes = true})
 
 DefineUnitType("unit-destroyed-1x1-place", { Name = "Destroyed 1x1 Place",
-	Files = {
-		"default", "tilesets/desert/neutral/buildings/small_destroyed_site.png",},
-	Size = {32, 32},
+	Image = {"file", "tilesets/desert/neutral/buildings/small_destroyed_site.png", "size", {32, 32}},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
 	TileSize = {1, 1}, BoxSize = {31, 31}, SightRange = 2,
@@ -87,8 +85,7 @@ DefineUnitType("unit-destroyed-1x1-place", { Name = "Destroyed 1x1 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-2x2-place", { Name = "Destroyed 2x2 Place",
-	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
-	Size = {64, 64},
+	Image = {"file", "tilesets/desert/neutral/buildings/destroyed_site.png", "size", {64, 64}},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
 	TileSize = {2, 2}, BoxSize = {63, 63}, SightRange = 2,
@@ -97,8 +94,7 @@ DefineUnitType("unit-destroyed-2x2-place", { Name = "Destroyed 2x2 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-3x3-place", { Name = "Destroyed 3x3 Place",
-	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
-	Size = {64, 64},
+	Image = {"file", "tilesets/desert/neutral/buildings/destroyed_site.png", "size", {64, 64}},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
 	TileSize = {3, 3}, BoxSize = {95, 95}, SightRange = 3,
@@ -107,8 +103,7 @@ DefineUnitType("unit-destroyed-3x3-place", { Name = "Destroyed 3x3 Place",
 	Building = true, VisibleUnderFog = true, Vanishes = true})
 
 DefineUnitType("unit-destroyed-4x4-place", { Name = "Destroyed 4x4 Place",
-	Files = {"default", "tilesets/desert/neutral/buildings/destroyed_site.png"},
-	Size = {64, 64},
+	Image = {"file", "tilesets/desert/neutral/buildings/destroyed_site.png", "size", {64, 64}},
 	Animations = "animations-destroyed-place", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 255, DrawLevel = 10,
 	TileSize = {4, 4}, BoxSize = {127, 127}, SightRange = 3,
@@ -118,7 +113,6 @@ DefineUnitType("unit-destroyed-4x4-place", { Name = "Destroyed 4x4 Place",
 
 DefineUnitType("unit-revealer", {
 	Name = "Dummy unit",
-	Size = {0, 0},
 	Animations = "animations-building", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 0,
 	TileSize = {1, 1}, BoxSize = {1, 1},
@@ -130,8 +124,8 @@ DefineUnitType("unit-revealer", {
 -- Needed for stratagus otherwise it crashes
 DefineUnitType("unit-human-wall", {
 	Name = "Wall",
-	Files = {"default", "tilesets/desert/neutral/buildings/wall.png"},
-	Size = {32, 32}, Costs = {"time", 30},
+	Image = {"file", "tilesets/desert/neutral/buildings/wall.png", "size", {32, 32}},
+	Costs = {"time", 30},
 	Animations = "animations-building", Icon = "icon-cancel",
 	Construction = "construction-wall",
 	Speed = 0, HitPoints = 40, DrawLevel = 39,
@@ -145,8 +139,8 @@ DefineUnitType("unit-human-wall", {
 -- Needed to avoid a stratagus crash
 DefineUnitType("unit-orc-wall", {
 	Name = "Wall", 
-	Files = {"default", "tilesets/desert/neutral/buildings/wall.png"},
-	Size = {32, 32}, Costs = {"time", 30},
+	Image = {"file", "tilesets/desert/neutral/buildings/wall.png", "size", {32, 32}},
+	Costs = {"time", 30},
 	Animations = "animations-building", Icon = "icon-cancel",
 	Construction = "construction-wall",
 	Speed = 0, HitPoints = 40, DrawLevel = 39,
