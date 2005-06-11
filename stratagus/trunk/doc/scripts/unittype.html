@@ -297,7 +297,7 @@ Possible tags:
 <dd>The unit-type name shown in the game. F.E: "Knight", "Gold Mine".
 If the name is too long, it is split at space.
 </dd>
-<dt>File = {"default" or tileset-name, "file", ...}</dt>
+<dt>Image = {"file", filename, "size", {x, y}}</dt>
 <dd>Defines the graphics used to display the unit-type in game.</dd>
 <dt>Offset = {x, y}</dt>
 <dd>Defines the offset for the graphics in pixels used to display the unit-type</dd>
@@ -712,8 +712,7 @@ for the minimap color, and will force this. It takes a number from the palette h
 Sorry, but due to the huge number of available flags we can only show a limited example.
 <pre>
 DefineUnitType("unit-footman", { Name = "Footman",
-  Files = {"tileset-summer", "alliance/units/footman.png"},
-  Size = {72, 72},
+  Image = {"file", "alliance/units/footman.png", "size", {72, 72}},
   Animations = "animations-footman", Icon = "icon-footman",
   Costs = {"time", 60, "gold", 600},
   Speed = 10, -- Variable Defined
