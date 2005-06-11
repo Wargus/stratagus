@@ -10,7 +10,7 @@
 //
 /**@name construct.h - The constructions headerfile. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ typedef struct _construction_ {
 		char* File;    /// sprite file
 		int   Width;   /// sprite width
 		int   Height;  /// sprite height
-	} File[TilesetMax], ShadowFile[TilesetMax];
+	} File, ShadowFile;
 	ConstructionFrame* Frames;  /// construction frames
 
 // --- FILLED UP ---
