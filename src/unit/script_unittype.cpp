@@ -284,7 +284,7 @@ static int CclDefineUnitType(lua_State* l)
 				free(type->Name);
 			}
 			type->Name = strdup(LuaToString(l, -1));
-		} else if (!strcmp(value, "Files")) {
+		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -295,26 +295,28 @@ static int CclDefineUnitType(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 
-				// FIXME: use a general get tileset function here!
-				i = 0;
-				if (strcmp(value, "default")) {
-					for (; i < NumTilesets; ++i) {
-						if (!strcmp(value, Tilesets[i]->Ident) ||
-								!strcmp(value, Tilesets[i]->Class)) {
-							break;
-						}
+				if (!strcmp(value, "file")) {
+					if (redefine) {
+						free(type->File);
 					}
-					if (i == NumTilesets) {
-					   // This leaves half initialized unit-type
-					   LuaError(l, "Unsupported tileset tag '%s'" _C_ value);
+					lua_rawgeti(l, -1, k + 1);
+					type->File = strdup(LuaToString(l, -1));
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "size")) {
+					lua_rawgeti(l, -1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument");
 					}
+					lua_rawgeti(l, -1, 1);
+					type->Width = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					type->Height = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+					lua_pop(l, 1);
+				} else {
+					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}
-				if (redefine) {
-					free(type->File[i]);
-				}
-				lua_rawgeti(l, -1, k + 1);
-				type->File[i] = strdup(LuaToString(l, -1));
-				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "Shadow")) {
 			if (!lua_istable(l, -1)) {
@@ -346,7 +348,6 @@ static int CclDefineUnitType(lua_State* l)
 					type->ShadowHeight = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_pop(l, 1);
-				} else if (!strcmp(value, "height")) {
 				} else if (!strcmp(value, "offset")) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -363,16 +364,6 @@ static int CclDefineUnitType(lua_State* l)
 					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}
 			}
-		} else if (!strcmp(value, "Size")) {
-			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-				LuaError(l, "incorrect argument");
-			}
-			lua_rawgeti(l, -1, 1);
-			type->Width = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			type->Height = LuaToNumber(l, -1);
-			lua_pop(l, 1);
 		} else if (!strcmp(value, "Offset")) {
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
