@@ -545,7 +545,7 @@ void ShowIntro(const Intro* intro)
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
 
-	if (Channels[soundfree].Command) {
+	if (soundfree != -1 && Channels[soundfree].Command) {
 		FreeOneChannel(soundfree);
 	}
 
