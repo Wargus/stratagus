@@ -112,7 +112,7 @@ static void InsertSoundRequest(const Unit* unit, unsigned id,
 	//FIXME: valid only in a shared memory context...
 	if (!SoundOff && sound != NO_SOUND) {
 		if (SoundRequests[NextSoundRequestIn].Used) {
-			DebugPrint("***** NO FREE SLOT IN SOUND FIFO *****\n");
+			DebugPrint("sound FIFO is full\n");
 		} else {
 			SoundRequests[NextSoundRequestIn].Used = 1;
 			SoundRequests[NextSoundRequestIn].Source.Base = unit;
