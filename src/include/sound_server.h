@@ -177,7 +177,7 @@ typedef struct _sound_request {
 							///-128 left, 0 center, 127 right)
 } SoundRequest;
 
-#define MAX_SOUND_REQUESTS 256  /// maximal number of sound requests
+#define MAX_SOUND_REQUESTS 64  /// maximal number of sound requests
 
 #define MaxChannels 32  /// How many channels are supported
 
