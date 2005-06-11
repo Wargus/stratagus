@@ -379,18 +379,17 @@ Define the campaign.
 <h3>DefineConstruction(ident ...)</h3>
 Defines a construction.<br>
 <br>
-Constructions can specify multiple files and shadow files for use with
-different tilesets.  Shadows are optional.<br>
+Constructions can specify multiple files and shadow files.  Shadows are 
+optional.<br>
 <br>
 The construction frames should be ordered by increasing percentages and the
 first frame should be 0.
 
 <pre>
 DefineConstruction( ident
-  Files = {{
-    Tileset = tileset,
+  Files = {
     File = filename,
-    Size = {x, y}}},
+    Size = {x, y}},
   ShadowFile = {{
     Tileset = tileset,
     File = filename,
