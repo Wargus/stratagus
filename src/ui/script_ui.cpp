@@ -355,7 +355,9 @@ static int CclProcessMenu(lua_State* l)
 		loop = 0;
 	}
 
-	if (FindMenu(mid)) {
+	if (!FindMenu(mid)) {
+		LuaError(l, "menu not found: %s" _C_ mid);
+	} else {
 		ProcessMenu(mid, loop);
 	}
 
