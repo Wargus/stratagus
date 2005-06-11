@@ -81,9 +81,9 @@ void LoadConstructions(void)
 			if (!(*cop)->Ident) {
 				continue;
 			}
-			file = (*cop)->File[0].File;
-			(*cop)->Width = (*cop)->File[0].Width;
-			(*cop)->Height = (*cop)->File[0].Height;
+			file = (*cop)->File.File;
+			(*cop)->Width = (*cop)->File.Width;
+			(*cop)->Height = (*cop)->File.Height;
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->Sprite = NewGraphic(file,
@@ -91,9 +91,9 @@ void LoadConstructions(void)
 				LoadGraphic((*cop)->Sprite);
 				FlipGraphic((*cop)->Sprite);
 			}
-			file = (*cop)->ShadowFile[0].File;
-			(*cop)->ShadowWidth = (*cop)->ShadowFile[0].Width;
-			(*cop)->ShadowHeight = (*cop)->ShadowFile[0].Height;
+			file = (*cop)->ShadowFile.File;
+			(*cop)->ShadowWidth = (*cop)->ShadowFile.Width;
+			(*cop)->ShadowHeight = (*cop)->ShadowFile.Height;
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->ShadowSprite = NewGraphic(file,
@@ -112,7 +112,6 @@ void LoadConstructions(void)
 */
 void CleanConstructions(void)
 {
-	int j;
 	Construction** cop;
 	ConstructionFrame* cframe;
 	ConstructionFrame* tmp;
@@ -125,16 +124,12 @@ void CleanConstructions(void)
 			if ((*cop)->Ident) {
 				free((*cop)->Ident);
 			}
-			for (j = 0; j < TilesetMax; ++j) {
-				if ((*cop)->File[j].File) {
-					free((*cop)->File[j].File);
-				}
+			if ((*cop)->File.File) {
+				free((*cop)->File.File);
 			}
 			FreeGraphic((*cop)->Sprite);
-			for (j = 0; j < TilesetMax; ++j) {
-				if ((*cop)->ShadowFile[j].File) {
-					free((*cop)->ShadowFile[j].File);
-				}
+			if ((*cop)->ShadowFile.File) {
+				free((*cop)->ShadowFile.File);
 			}
 			FreeGraphic((*cop)->ShadowSprite);
 			cframe = (*cop)->Frames;
@@ -209,11 +204,19 @@ static int CclDefineConstruction(lua_State* l)
 		construction = Constructions[0];
 	} else {
 		for (i = 0; *cop; ++i, ++cop) {
+			if (!strcmp((*cop)->Ident, str)) {
+				// Redefine
+				construction = *cop;
+				free(construction->Ident);
+				break;
+			}
 		}
-		Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
-		Constructions[i] = calloc(1, sizeof(Construction));
-		Constructions[i + 1] = NULL;
-		construction = Constructions[i];
+		if (!*cop) {
+			Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
+			Constructions[i] = calloc(1, sizeof(Construction));
+			Constructions[i + 1] = NULL;
+			construction = Constructions[i];
+		}
 	}
 	construction->Ident = str;
 
@@ -228,75 +231,48 @@ static int CclDefineConstruction(lua_State* l)
 
 		if ((files = !strcmp(value, "Files")) ||
 				!strcmp(value, "ShadowFiles")) {
-			subargs = luaL_getn(l, -1);
-			for (k = 0; k < subargs; ++k) {
-				int tileset;
-				char* file;
-				int w;
-				int h;
+			char* file;
+			int w;
+			int h;
 
-				tileset = 0;
-				file = NULL;
-				w = 0;
-				h = 0;
+			file = NULL;
+			w = 0;
+			h = 0;
 
-				lua_rawgeti(l, -1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				lua_pushnil(l);
-				while (lua_next(l, -2)) {
-					value = LuaToString(l, -2);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			lua_pushnil(l);
+			while (lua_next(l, -2)) {
+				value = LuaToString(l, -2);
 
-					if (!strcmp(value, "Tileset")) {
-						value = LuaToString(l, -1);
-
-						// FIXME: use a general get tileset function here!
-						i = 0;
-						if (strcmp(value, "default")) {
-							for (; i < NumTilesets; ++i) {
-								if (!strcmp(value, Tilesets[i]->Ident)) {
-									break;
-								}
-								if (!strcmp(value, Tilesets[i]->Class)) {
-									break;
-								}
-							}
-							if (i == NumTilesets) {
-								fprintf(stderr, "Tileset `%s' not available\n", value);
-								LuaError(l, "tileset not available: %s" _C_ value);
-							}
-						}
-						tileset = i;
-					} else if (!strcmp(value, "File")) {
-						file = strdup(LuaToString(l, -1));
-					} else if (!strcmp(value, "Size")) {
-						if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
-							LuaError(l, "incorrect argument");
-						}
-						lua_rawgeti(l, -1, 1);
-						w = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-						lua_rawgeti(l, -1, 2);
-						h = LuaToNumber(l, -1);
-						lua_pop(l, 1);
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
+				if (!strcmp(value, "File")) {
+					file = strdup(LuaToString(l, -1));
+				} else if (!strcmp(value, "Size")) {
+					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
+						LuaError(l, "incorrect argument");
 					}
+					lua_rawgeti(l, -1, 1);
+					w = LuaToNumber(l, -1);
 					lua_pop(l, 1);
+					lua_rawgeti(l, -1, 2);
+					h = LuaToNumber(l, -1);
+					lua_pop(l, 1);
+				} else {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
 				lua_pop(l, 1);
-				if (files) {
-					free(construction->File[tileset].File);
-					construction->File[tileset].File = file;
-					construction->File[tileset].Width = w;
-					construction->File[tileset].Height = h;
-				} else {
-					free(construction->ShadowFile[tileset].File);
-					construction->ShadowFile[tileset].File = file;
-					construction->ShadowFile[tileset].Width = w;
-					construction->ShadowFile[tileset].Height = h;
-				}
+			}
+			if (files) {
+				free(construction->File.File);
+				construction->File.File = file;
+				construction->File.Width = w;
+				construction->File.Height = h;
+			} else {
+				free(construction->ShadowFile.File);
+				construction->ShadowFile.File = file;
+				construction->ShadowFile.Width = w;
+				construction->ShadowFile.Height = h;
 			}
 		} else if (!strcmp(value, "Constructions")) {
 			subargs = luaL_getn(l, -1);
