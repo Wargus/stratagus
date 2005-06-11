@@ -454,7 +454,6 @@ void InitUnitTypes(int reset_player_stats)
 */
 void LoadUnitTypeSprite(UnitType* type)
 {
-	const char* file;
 	ResourceInfo* resinfo;
 	int i;
 
@@ -491,10 +490,8 @@ void LoadUnitTypeSprite(UnitType* type)
 		}
 	}
 
-	file = type->File[0];
-
-	if (file) {
-		type->Sprite = NewGraphic(file, type->Width, type->Height);
+	if (type->File) {
+		type->Sprite = NewGraphic(type->File, type->Width, type->Height);
 		LoadGraphic(type->Sprite);
 		if (type->Flip) {
 			FlipGraphic(type->Sprite);
@@ -675,10 +672,8 @@ void CleanUnitTypes(void)
 			}
 			free(type->BuildingRules);
 		}
-		for (j = 0; j < TilesetMax; ++j) {
-			if (type->File[j]) {
-				free(type->File[j]);
-			}
+		if (type->File) {
+			free(type->File);
 		}
 		if (type->ShadowFile) {
 			free(type->ShadowFile);

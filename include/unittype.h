@@ -871,7 +871,7 @@ struct _unit_type_ {
 	char* Ident;                    /// Identifier
 	char* Name;                     /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
-	char* File[TilesetMax];         /// Sprite files
+	char* File;                     /// Sprite files
 	char* ShadowFile;               /// Shadow file
 
 	int Width;                      /// Sprite width
