@@ -10,8 +10,8 @@
 //
 /**@name mainscr.c - The main screen. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Valery Shchedrin,
-//                              and Jimmy Salmon
+//      (c) Copyright 1998-2005 by Lutz Sammer, Valery Shchedrin, and
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 **  @param condition   condition to verify.
 **  @param unit        unit that certain condition can refer.
 **
-**  @return 0 if we can't show the content, else 1.
+**  @return            0 if we can't show the content, else 1.
 */
 static int CanShowContent(const ConditionPanel* condition, const Unit* unit)
 {
@@ -217,7 +217,7 @@ typedef struct {
 **
 **  @param unit   Unit.
 **  @param index  Index of the variable.
-**  @param e      Componant of the variable.
+**  @param e      Component of the variable.
 **  @param t      Which var use (0:unit, 1:Type, 2:Stats)
 **
 **  @return       Value corresponding
@@ -286,10 +286,10 @@ UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t)
 /**
 **  Get unit from an unit depending of the relation.
 **
-**  @param unit    unit reference.
-**  @param e       relation with unit.
+**  @param unit  unit reference.
+**  @param e     relation with unit.
 **
-**  @return The desirated unit.
+**  @return      The desired unit.
 */
 const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
 {
@@ -325,11 +325,11 @@ const Unit* GetUnitRef(const Unit* unit, EnumUnit e)
 */
 void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 {
-	char* text;             // Optionnal text to display.
+	char* text;             // Optional text to display.
 	int font;               // Font to use.
 	int index;              // Index of optionnal variable.
-	int x;                  // X coordonate to display.
-	int y;                  // Y coordonate to display.
+	int x;                  // X coordinate to display.
+	int y;                  // Y coordinate to display.
 	EnumVariable component; // Component of the optional variable to use.
 	int value;              // Value of variable.
 	int diff;               // Max - value of the variable.
@@ -366,18 +366,18 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 		if (!content->Data.SimpleText.Stat) {
 			component = content->Data.SimpleText.Component;
 			switch (component) {
-			case VariableValue :
-			case VariableMax :
-			case VariableIncrease :
-			case VariableDiff :
-			case VariablePercent :
-			VideoDrawNumber(x, y, font, GetComponent(unit, index, component, 0).i);
-			break;
+			case VariableValue:
+			case VariableMax:
+			case VariableIncrease:
+			case VariableDiff:
+			case VariablePercent:
+				VideoDrawNumber(x, y, font, GetComponent(unit, index, component, 0).i);
+				break;
 			case VariableName :
-			VideoDrawText(x, y, font, GetComponent(unit, index, component, 0).s);
-			break;
+				VideoDrawText(x, y, font, GetComponent(unit, index, component, 0).s);
+				break;
 			default :
-			Assert(0);
+				Assert(0);
 			}
 		} else {
 			value = unit->Type->Variable[index].Value;
@@ -400,16 +400,17 @@ void DrawSimpleText(const Unit* unit, ContentType* content, int defaultfont)
 **  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 **
-**  @note text is limited to 256 char. (is enought ?)
+**  @note text is limited to 256 chars. (enough?)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
 void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 {
-	const char* text;  // Format of the Text to display.
-	int font;          // Font to use.
-	int index;         // Index of variable.
-	char buf[256];     // Text to display.
+	const char* text;
+	int font;
+	int index;
+	char buf[256];
+	UStrInt usi1;
 
 	Assert(content);
 	Assert(unit);
@@ -421,7 +422,12 @@ void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(font != -1);
 	index = content->Data.FormattedText.Index;
 	Assert(0 <= index && index < UnitTypeVar.NumberVariable);
-	sprintf(buf, text, GetComponent(unit, index, content->Data.FormattedText.Component, 0));
+	usi1 = GetComponent(unit, index, content->Data.FormattedText.Component, 0);
+	if (usi1.type == USTRINT_STR) {
+		sprintf(buf, text, usi1.s);
+	} else {
+		sprintf(buf, text, usi1.i);
+	}
 	if (content->Data.FormattedText.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
@@ -437,7 +443,7 @@ void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 **  @param defaultfont  default font if no specific font in extra data.
 **
 **  @note text is limited to 256 chars. (enough?)
-**  @note text must have exactly 1 %d.
+**  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
 void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
@@ -853,12 +859,12 @@ void DrawResources(void)
 --  MESSAGE
 ----------------------------------------------------------------------------*/
 
-#define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5)/// Message timeout 5 seconds
+#define MESSAGES_TIMEOUT (FRAMES_PER_SECOND * 5) /// Message timeout 5 seconds
 
 static unsigned long MessagesFrameTimeout;       /// Frame to expire message
 
 
-#define MESSAGES_MAX  10                        /// How many can be displayed
+#define MESSAGES_MAX  10                         /// How many can be displayed
 
 static char Messages[MESSAGES_MAX][128];         /// Array of messages
 static int  MessagesCount;                       /// Number of messages
