@@ -207,7 +207,10 @@ static int CanShowContent(const ConditionPanel* condition, const Unit* unit)
 }
 
 
-typedef union {const char *s; int i;} UStrInt;
+typedef struct {
+	union {const char *s; int i;};
+	enum { USTRINT_STR, USTRINT_INT } type;
+} UStrInt;
 
 /**
 **  Return the value corresponding.
@@ -244,27 +247,35 @@ UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t)
 	}
 	switch (e) {
 		case VariableValue :
+			val.type = USTRINT_INT;
 			val.i = var->Value;
 			break;
 		case VariableMax :
+			val.type = USTRINT_INT;
 			val.i = var->Max;
 			break;
 		case VariableIncrease :
+			val.type = USTRINT_INT;
 			val.i = var->Increase;
 			break;
 		case VariableDiff :
+			val.type = USTRINT_INT;
 			val.i = var->Max - var->Value;
 			break;
 		case VariablePercent :
 			Assert(unit->Variable[index].Max != 0);
+			val.type = USTRINT_INT;
 			val.i = 100 * var->Value / var->Max;
 			break;
 		case VariableName :
 			if (index == GIVERESOURCE_INDEX) {
+				val.type = USTRINT_STR;
 				val.s = DefaultResourceNames[unit->Type->GivesResource];
 			} else if (index == CARRYRESOURCE_INDEX) {
+				val.type = USTRINT_STR;
 				val.s = DefaultResourceNames[unit->CurrentResource];
 			} else {
+				val.type = USTRINT_STR;
 				val.s = UnitTypeVar.VariableName[index];
 			}
 			break;
@@ -425,18 +436,17 @@ void DrawFormattedText(const Unit* unit, ContentType* content, int defaultfont)
 **  @param content      extra data.
 **  @param defaultfont  default font if no specific font in extra data.
 **
-**  @note text is limited to 256 char. (is enought ?)
+**  @note text is limited to 256 chars. (enough?)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
-**  @bug if sizeof(int) != sizeof(char*) for sprintf.
 */
 void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
 {
-	const char* text;  // Format of the Text to display.
-	int font;          // Font to use.
-	int index1;        // Index of variable 1.
-	int index2;        // Index of variable 2.
-	char buf[256];     // Text to display.
+	const char* text;
+	int font;
+	int index1, index2;
+	char buf[256];
+	UStrInt usi1, usi2;
 
 	Assert(content);
 	Assert(unit);
@@ -448,8 +458,21 @@ void DrawFormattedText2(const Unit* unit, ContentType* content, int defaultfont)
 	Assert(font != -1);
 	index1 = content->Data.FormattedText2.Index1;
 	index2 = content->Data.FormattedText2.Index2;
-	sprintf(buf, text, GetComponent(unit, index1, content->Data.FormattedText2.Component1, 0),
-		GetComponent(unit, index2, content->Data.FormattedText2.Component2, 0));
+	usi1 = GetComponent(unit, index1, content->Data.FormattedText2.Component1, 0);
+	usi2 = GetComponent(unit, index2, content->Data.FormattedText2.Component2, 0);
+	if (usi1.type == USTRINT_STR) {
+		if (usi2.type == USTRINT_STR) {
+			sprintf(buf, text, usi1.s, usi2.s);
+		} else {
+			sprintf(buf, text, usi1.s, usi2.i);
+		}
+	} else {
+		if (usi2.type == USTRINT_STR) {
+			sprintf(buf, text, usi1.i, usi2.s);
+		} else {
+			sprintf(buf, text, usi1.i, usi2.i);
+		}
+	}
 	if (content->Data.FormattedText2.Centered) {
 		VideoDrawTextCentered(content->PosX, content->PosY, font, buf);
 	} else {
