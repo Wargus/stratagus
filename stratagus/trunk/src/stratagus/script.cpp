@@ -2242,25 +2242,17 @@ int CclUnits(lua_State* l)
 	int freeslots;
 	int destroyed;
 	int nullrefs;
-	int i;
 	static char buf[80];
 
 	LuaCheckArgs(l, 0);
-	i = 0;
-	slot = UnitSlotFree;
-	while (slot) {  // count the free slots
-		++i;
-		slot = (void*)*slot;
-	}
-	freeslots = i;
+	freeslots = MAX_UNIT_SLOTS - UnitSlotFree - 1;
 
 	//
 	//  Look how many slots are used
 	//
 	destroyed = nullrefs = 0;
-	for (slot = UnitSlots; slot < UnitSlots + MAX_UNIT_SLOTS; ++slot) {
-		if (*slot && (*slot < (Unit*)UnitSlots ||
-				*slot > (Unit*)(UnitSlots + MAX_UNIT_SLOTS))) {
+	for (slot = UnitSlots; slot < UnitSlots + UnitSlotFree; ++slot) {
+		if (*slot) {
 			if ((*slot)->Destroyed) {
 				++destroyed;
 			} else if (!(*slot)->Refs) {
@@ -2269,11 +2261,10 @@ int CclUnits(lua_State* l)
 		}
 	}
 
-	sprintf(buf, "%d free, %d(%d) used, %d, destroyed, %d null",
-		freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
+	sprintf(buf, "%d free, %d(%d) used, %d destroyed, %d null",
+		freeslots, UnitSlotFree, NumUnits, destroyed, nullrefs);
 	SetStatusLine(buf);
-	fprintf(stderr, "%d free, %d(%d) used, %d destroyed, %d null\n",
-		freeslots, MAX_UNIT_SLOTS - 1 - freeslots, NumUnits, destroyed, nullrefs);
+	fprintf(stderr, "%s\n", buf);
 
 	lua_pushnumber(l, destroyed);
 	return 1;
