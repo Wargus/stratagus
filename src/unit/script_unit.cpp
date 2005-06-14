@@ -1330,92 +1330,40 @@ static int CclSetUnitVariable(lua_State* l)
 */
 static int CclSlotUsage(lua_State* l)
 {
-#define SLOT_LEN MAX_UNIT_SLOTS / 8 + 1
-	unsigned char SlotUsage[SLOT_LEN];
-	int i;
-	int prev;
-	const char* value;
-	int args;
-	int j;
-
-	memset(SlotUsage, 0, SLOT_LEN);
-	prev = -1;
-	args = lua_gettop(l);
-	for (j = 0; j < args; ++j) {
-		if (lua_type(l, j + 1) == LUA_TSTRING &&
-				!strcmp((value = LuaToString(l, j + 1)), "-")) {
-			int range_end;
-
-			++j;
-			range_end = LuaToNumber(l, j + 1);
-			for (i = prev; i <= range_end; ++i) {
-				SlotUsage[i / 8] |= 1 << (i % 8);
-			}
-			prev = -1;
-		} else {
-			if (prev >= 0) {
-				SlotUsage[prev / 8] |= 1 << (prev % 8);
-			}
-			prev = LuaToNumber(l, j + 1);
-		}
-	}
-	if (prev >= 0) {
-		SlotUsage[prev / 8] |= 1 << (prev % 8);
-	}
-
-	/* now walk through the bitfield and create the needed unit slots */
-	for (i = 0; i < SLOT_LEN * 8; ++i) {
-		if (SlotUsage[i / 8] & (1 << i % 8)) {
-			Unit* new_unit = calloc(1, sizeof(Unit));
-			UnitSlotFree = (void*)UnitSlots[i];
-			UnitSlots[i] = new_unit;
-			new_unit->Slot = i;
-		}
-	}
-	return 0;
-#undef SLOT_LEN
-}
-
-/**
-** Load the unit allocator state.
-** We need to do this in order to make sure that the game allocates units
-**  in the exact same way.
-**
-**  @param l  Lua state.
-*/
-static int CclUnitAllocQueue(lua_State* l)
-{
-	int i;
-	int args;
+	unsigned int args;
+	unsigned int i;
 	const char* key;
-	Unit* unit;
+	int unit_index;
 
-	ReleasedHead = ReleasedTail = 0;
 	args = lua_gettop(l);
-	for (i = 1; i <= args; ++i) {
-		unit = malloc(sizeof(Unit));
-
-		lua_pushnil(l);
-		while (lua_next(l, i)) {
+	if (args == 0) {
+		UnitSlotFree = 0;
+		return 0;
+	}
+	UnitSlotFree = LuaToNumber(l, 1);
+	for (i = 0; i < UnitSlotFree; i++) {
+		UnitSlots[i] = calloc(1, sizeof(Unit));
+		UnitSlots[i]->Slot = i;
+	}
+	for (i = 2; i <= args; i++) {
+		unit_index = -1;
+		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
 			key = LuaToString(l, -2);
 			if (!strcmp(key, "Slot")) {
-				unit->Slot = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				unit_index = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "FreeCycle")) {
-				unit->Refs = LuaToNumber(l, -1);
-				lua_pop(l, 1);
+				if (unit_index != -1) {
+					UnitSlots[unit_index]->Refs = LuaToNumber(l, -1);
+				}
 			} else {
 				LuaError(l, "Wrong key %s" _C_ key);
-				return 0;
 			}
 		}
-
-		unit->Next = 0;
 		if (ReleasedHead) {
-			ReleasedTail->Next = unit;
-			ReleasedTail = unit;
+			ReleasedTail->Next = UnitSlots[unit_index];
+			ReleasedTail = UnitSlots[unit_index];
 		} else {
-			ReleasedHead = ReleasedTail = unit;
+			ReleasedHead = ReleasedTail = UnitSlots[unit_index];
 		}
 	}
 	return 0;
@@ -1447,7 +1395,6 @@ void UnitCclRegister(void)
 	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
-	lua_register(Lua, "UnitAllocQueue", CclUnitAllocQueue);
 }
 
 //@}

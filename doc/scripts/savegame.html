@@ -46,7 +46,7 @@
 <a href="index.html">LUA Index</a>
 <hr>
 <a href="#SaveGame">SaveGame</a>
-<a href="#UnitAllocQueue">UnitAllocQueue</a>
+<a href="#SlotUsage">SlotUsage</a>
 <hr>
 <h2>Intro - Introduction to savegame functions and variables</h2>
 
@@ -89,24 +89,23 @@ SaveGame({
 } )
 </pre>
 
-<a name="UnitAllocQueue"></a>
-<h3>UnitAllowQueue([Slot, x, FreeCycle, y]... )</h3>
+<a name="SlotUsage"></a>
+<h3>SlotUsage(MaxSlot, [{Slot = Slot1, FreeCycle = Freecycle1}, ..])</h3>
 
 Allows reloaded Save games to be replayed in sync by reloading the released
 units back into the queue they were in when a game was saved.
 <dl>
-<dt>x</dt>
+<dt>MaxSlot</dt>
+<dd>The total Number of slot used.</dd>
+<dt>Slot</dt>
 <dd>The Slot Number for the unit that was in the release Queue</dd>
-<dt>y</dt>
+<dt>FreecCycle</dt>
 <dd>The Cycle that this unit is/was released in</dd>
-</dd>
 </dl>
 
 <h4>Example</h4>
-
 <pre>
-    -- No Units in the Released Tail queue when saving
-    UnitAllowQueue();
+    SlotUsage(5, {2, 855})
 </pre>
 
 <hr>

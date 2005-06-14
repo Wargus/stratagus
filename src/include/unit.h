@@ -696,7 +696,7 @@ struct _unit_ {
 ----------------------------------------------------------------------------*/
 
 extern Unit* UnitSlots[MAX_UNIT_SLOTS]; /// All possible units
-extern Unit** UnitSlotFree;             /// First free unit slot
+unsigned int UnitSlotFree;              /// First free unit slot
 
 extern Unit* Units[MAX_UNIT_SLOTS]; /// Units used
 extern int NumUnits;                /// Number of units used
