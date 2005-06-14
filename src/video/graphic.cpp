@@ -205,16 +205,47 @@ Graphic* NewGraphic(const char* file, int w, int h)
 			ExitFatal(-1);
 		}
 		g->File = strdup(file);
+		g->HashFile = strdup(g->File);
 		g->Width = w;
 		g->Height = h;
 		g->NumFrames = 1;
 		g->Refs = 1;
-		*(Graphic**)hash_add(GraphicHash, file) = g;
+		*(Graphic**)hash_add(GraphicHash, g->HashFile) = g;
 	} else {
 		g = *ptr;
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
+
+	return g;
+}
+
+/**
+**  Make a new graphic object.  Don't reuse a graphic from the hash table.
+**
+**  @param file  Filename
+**  @param w     Width of a frame (optional)
+**  @param h     Height of a frame (optional)
+**
+**  @return      New graphic object (malloced).
+*/
+Graphic* ForceNewGraphic(const char* file, int w, int h)
+{
+	Graphic* g;
+
+	g = calloc(1, sizeof(Graphic));
+	if (!g) {
+		fprintf(stderr, "Out of memory\n");
+		ExitFatal(-1);
+	}
+	g->File = strdup(file);
+	g->HashFile = malloc(strlen(file) + 2 * sizeof(g->File) + 1);
+	sprintf(g->HashFile, "%s%p", g->File, g->File);
+	g->Width = w;
+	g->Height = h;
+	g->NumFrames = 1;
+	g->Refs = 1;
+	*(Graphic**)hash_add(GraphicHash, g->HashFile) = g;
 
 	return g;
 }
@@ -330,8 +361,9 @@ void FreeGraphic(Graphic* g)
 #endif
 		Assert(g->File);
 
-		hash_del(GraphicHash, g->File);
+		hash_del(GraphicHash, g->HashFile);
 		free(g->File);
+		free(g->HashFile);
 		free(g);
 	}
 }

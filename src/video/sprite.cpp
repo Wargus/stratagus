@@ -514,6 +514,11 @@ void MakeShadowSprite(Graphic* g)
 	}
 #endif
 #ifdef USE_OPENGL
+	if (g->Textures) {
+		glDeleteTextures(g->NumTextures, g->Textures);
+		free(g->Textures);
+		g->Textures = NULL;
+	}
 	MakeTexture(g);
 #endif
 }
