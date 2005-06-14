@@ -387,9 +387,9 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 		*unit->PlayerSlot = unit;
 
 		player->UnitTypesCount[type->Slot]++;
+		player->Demand += type->Demand; // food needed
 	}
 
-	player->Demand += type->Demand; // food needed
 
 	// Don't Add the building if it's dieing, used to load a save game
 	if (type->Building && unit->Orders[0].Action != UnitActionDie) {
