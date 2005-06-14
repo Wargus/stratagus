@@ -68,12 +68,12 @@
   ----------------------------------------------------------------------------*/
 
 Unit* UnitSlots[MAX_UNIT_SLOTS];          /// All possible units
-Unit** UnitSlotFree;                      /// First free unit slot
+unsigned int UnitSlotFree;                /// First free unit slot
 Unit* ReleasedHead;                       /// List of released units.
 Unit* ReleasedTail;                       /// List tail of released units.
 
-Order* ReleasedOrderHead;                 /// List of released Orders.
-Order* ReleasedOrderTail;                 /// List tail of released orders.
+static Order* ReleasedOrderHead;          /// List of released Orders.
+static Order* ReleasedOrderTail;          /// List tail of released orders.
 
 Unit* Units[MAX_UNIT_SLOTS];              /// Array of used slots
 int NumUnits;                             /// Number of slots used
@@ -98,19 +98,10 @@ static void RemoveUnitFromContainer(Unit* unit);
 */
 void InitUnitsMemory(void)
 {
-	Unit** slot;
-
 	// Initialize the "list" of free unit slots
-
-	slot = UnitSlots + MAX_UNIT_SLOTS;
-	*--slot = NULL; // leave last slot free as no marker
-	*--slot = NULL;
-	do {
-		slot[-1] = (void*)slot;
-	} while (--slot > UnitSlots);
-	UnitSlotFree = slot;
-
-	ReleasedTail = ReleasedHead = 0; // list of unfreed units.
+	memset(UnitSlots, 0, MAX_UNIT_SLOTS * sizeof(*UnitSlots));
+	UnitSlotFree = 0;
+	ReleasedTail = ReleasedHead = NULL; // list of unfreed units.
 	NumUnits = 0;
 }
 
@@ -262,11 +253,12 @@ static Unit* AllocUnit(void)
 		//
 		// Allocate structure
 		//
-		if (!(slot = UnitSlotFree)) { // should not happen!
+		if (MAX_UNIT_SLOTS <= UnitSlotFree) { // should not happen!
 			DebugPrint("Maximum of units reached\n");
 			return NoUnitP;
 		}
-		UnitSlotFree = (void*)*slot;
+		slot = UnitSlots + UnitSlotFree;
+		UnitSlotFree++;
 		*slot = unit = calloc(1, sizeof(*unit));
 	}
 	unit->Slot = slot - UnitSlots; // back index
@@ -3867,83 +3859,23 @@ void SaveUnits(CLFile* file)
 {
 	Unit** table;
 	Unit* unit;
-	int i;
-	unsigned char SlotUsage[MAX_UNIT_SLOTS / 8 + 1];
-	int InRun;
-	int RunStart;
-	int j;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: units $Id$\n\n");
 
-#if 0
-	//
-	//  Local variables
-	//
-	CLprintf(file, "(set-xp-damage! #%s)\n",
-		XpDamage ? "t" : "f");
-	CLprintf(file, "(set-fancy-buildings! #%s)\n",
-		FancyBuildings ? "t" : "f");
-	CLprintf(file, "(set-training-queue! #%s)\n",
-		EnableTrainingQueue ? "t" : "f");
-#endif
-
 	CLprintf(file, "-- Unit slot usage bitmap\n");
-	CLprintf(file, "SlotUsage(");
-
-	memset(SlotUsage, 0, MAX_UNIT_SLOTS / 8 + 1);
-	for (i = 0; i < NumUnits; ++i) {
-		int slot;
-		slot = Units[i]->Slot;
-		SlotUsage[slot / 8] |= 1 << (slot % 8);
+	CLprintf(file, "SlotUsage(%d", UnitSlotFree);
+	//  Save the Unit allocator state, sadly. I don't want to do this!
+	for (unit = ReleasedHead; unit; unit = unit->Next) {
+		CLprintf(file, ", {Slot = %d, FreeCycle = %d}", unit->Slot, unit->Refs);
+		DebugPrint("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
 	}
-#if 0
-	/* the old way */
-	for (i = 0; i < MAX_UNIT_SLOTS / 8 + 1; ++i) {
-		CLprintf(file, " %d", SlotUsage[i]);
-		if ((i + 1) % 16 == 0) // 16 numbers per line
-			CLprintf(file, "\n");
-	}
-
-#else
-#define SlotUsed(slot) (SlotUsage[(slot) / 8] & (1 << ((slot) % 8)))
-	RunStart = InRun = 0;
-	j = 0;
-	for (i = 0; i < MAX_UNIT_SLOTS; ++i) {
-		if (!InRun && SlotUsed(i)) {
-			InRun = 1;
-			RunStart = i;
-		}
-		if (!SlotUsed(i) && InRun) {
-			InRun = 0;
-			if (!j) {
-				j = 1;
-			} else {
-				CLprintf(file, ", ");
-			}
-			if (i - 1 == RunStart) {
-				CLprintf(file, "%d", i - 1);
-			} else {
-				CLprintf(file, "%d, \"-\", %d", RunStart, i - 1);
-			}
-		}
-	}
-#endif
-
 	CLprintf(file, ")\n");
 
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);
 	}
 
-	//  Save the Unit allocator state, sadly. I don't want to do this!
-	CLprintf(file, "\nUnitAllocQueue(\n");
-	for (unit = ReleasedHead; unit; unit = unit->Next) {
-		CLprintf(file, "\t{Slot = %d, FreeCycle = %d}%c \n", unit->Slot, unit->Refs,
-				(unit->Next ? ',' : ' '));
-		DebugPrint("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
-	}
-	CLprintf(file, ")\n");
 }
 
 /*----------------------------------------------------------------------------

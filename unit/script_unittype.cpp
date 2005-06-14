@@ -1953,7 +1953,7 @@ void UpdateUnitVariables(const Unit* unit)
 
 	// SlotNumber
 	unit->Variable[SLOT_INDEX].Value = unit->Slot;
-	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - UnitSlots - 1;
+	unit->Variable[SLOT_INDEX].Max = UnitSlotFree - 1;
 
 	for (i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit->Variable[i].Enable &= unit->Variable[i].Max > 0;
