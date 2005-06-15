@@ -239,7 +239,7 @@ Graphic* ForceNewGraphic(const char* file, int w, int h)
 		ExitFatal(-1);
 	}
 	g->File = strdup(file);
-	g->HashFile = malloc(strlen(file) + 2 * sizeof(g->File) + 1);
+	g->HashFile = malloc(strlen(file) + 2 * sizeof(g->File) + 3);
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
 	g->Width = w;
 	g->Height = h;
