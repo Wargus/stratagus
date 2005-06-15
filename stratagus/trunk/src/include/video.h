@@ -46,6 +46,7 @@
 
 typedef struct _graphic_ {
 	char* File;                /// Filename
+	char* HashFile;            /// Filename used in hash
 	SDL_Surface* Surface;      /// Surface
 #ifndef USE_OPENGL
 	SDL_Surface* SurfaceFlip;  /// Flipped surface
@@ -244,6 +245,9 @@ extern void VideoClearScreen(void);
 
 	/// Make graphic
 extern Graphic* NewGraphic(const char* file, int w, int h);
+
+	/// Make graphic
+extern Graphic* ForceNewGraphic(const char* file, int w, int h);
 
 	/// Free Graphic taking into account the number of uses.
 extern void FreeGraphic(Graphic* g);

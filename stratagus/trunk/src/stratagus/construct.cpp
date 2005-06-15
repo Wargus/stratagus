@@ -96,7 +96,7 @@ void LoadConstructions(void)
 			(*cop)->ShadowHeight = (*cop)->ShadowFile.Height;
 			if (file && *file) {
 				ShowLoadProgress("Construction %s", file);
-				(*cop)->ShadowSprite = NewGraphic(file,
+				(*cop)->ShadowSprite = ForceNewGraphic(file,
 					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
 				LoadGraphic((*cop)->ShadowSprite);
 				FlipGraphic((*cop)->ShadowSprite);
