@@ -458,7 +458,7 @@ void LoadUnitTypeSprite(UnitType* type)
 	int i;
 
 	if (type->ShadowFile) {
-		type->ShadowSprite = NewGraphic(type->ShadowFile, type->ShadowWidth,
+		type->ShadowSprite = ForceNewGraphic(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
 		LoadGraphic(type->ShadowSprite);
 		if (type->Flip) {
