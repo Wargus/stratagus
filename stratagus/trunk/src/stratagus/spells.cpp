@@ -792,7 +792,10 @@ static int PassCondition(const Unit* caster, const SpellType* spell, const Unit*
 		const Unit *unit;
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? caster : target;
-		Assert(unit);
+		//  Spell should target location and have unit condition.
+		if (unit == NULL) {
+			continue;
+		}
 		if (condition->Variable[i].Enable != CONDITION_TRUE) {
 			if ((condition->Variable[i].Enable == CONDITION_ONLY) ^ (unit->Variable[i].Enable)) {
 				return 0;
