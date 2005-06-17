@@ -458,8 +458,8 @@ extern PlayerRace PlayerRaces;  /// Player races
 /**
 **  Which indexes to replace with player color
 */
-extern int PlayerShadeStart;
-extern int PlayerShadeCount;
+extern int PlayerColorIndexStart;
+extern int PlayerColorIndexCount;
 
 /*----------------------------------------------------------------------------
 --  Functions
