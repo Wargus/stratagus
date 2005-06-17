@@ -68,8 +68,8 @@ int NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-SDL_Color PlayerColorsRGB[PlayerMax][4];
-Uint32 PlayerColors[PlayerMax][4];
+SDL_Color PlayerColorsRGB[PlayerMax][8];
+Uint32 PlayerColors[PlayerMax][8];
 
 char* PlayerColorNames[PlayerMax];
 
@@ -117,7 +117,7 @@ void InitPlayers(void)
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
-		for (x = 0; x < 4; ++x) {
+		for (x = 0; x < 8; ++x) {
 			PlayerColors[p][x] = VideoMapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
@@ -816,7 +816,7 @@ void SetPlayersPalette(void)
 	o = 0;
 	for (i = 0; i < PlayerMax; ++i) {
 		memcpy(Players[o].UnitColors.Colors, PlayerColorsRGB[i],
-			sizeof(SDL_Color) * 4);
+			sizeof(SDL_Color) * 8);
 		o = (o + 1) % PlayerMax;
 	}
 }
