@@ -537,8 +537,8 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 					tp[3] = alpha;
 				}
 				if (colors) {
-					for (z = 0; z < 4; ++z) {
-						if (*sp == 208 + z) {
+					for (z = 0; z < PlayerShadeCount; ++z) {
+						if (*sp == PlayerShadeStart + z) {
 							p = colors->Colors[z];
 							tp[0] = p.r;
 							tp[1] = p.g;

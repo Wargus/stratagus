@@ -73,6 +73,12 @@ Uint32 PlayerColors[PlayerMax][4];
 
 char* PlayerColorNames[PlayerMax];
 
+/**
+**  Which indexes to replace with player color
+*/
+int PlayerShadeStart;
+int PlayerShadeCount;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -779,13 +785,15 @@ void PlayersEachSecond(int player)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(const Player* player, const Graphic* sprite)
+void GraphicPlayerPixels(Player* player, const Graphic* sprite)
 {
+	Assert(PlayerShadeCount);
+
 	SDL_LockSurface(sprite->Surface);
-	SDL_SetColors(sprite->Surface, ((Player*)player)->UnitColors.Colors, 208, 4);
+	SDL_SetColors(sprite->Surface, player->UnitColors.Colors, PlayerShadeStart, PlayerShadeCount);
 	if (sprite->SurfaceFlip) {
 		SDL_SetColors(sprite->SurfaceFlip,
-			((Player*)player)->UnitColors.Colors, 208, 4);
+			player->UnitColors.Colors, PlayerShadeStart, PlayerShadeCount);
 	}
 	SDL_UnlockSurface(sprite->Surface);
 }

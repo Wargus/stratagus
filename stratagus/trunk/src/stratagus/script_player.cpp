@@ -701,6 +701,18 @@ static int CclNewPlayerColors(lua_State* l)
 	return 0;
 }
 
+/**
+**  Define player shades
+**
+**  @param l  Lua state.
+*/
+static int CclDefinePlayerShades(lua_State* l)
+{
+	PlayerShadeStart = LuaToNumber(l, 1);
+	PlayerShadeCount = LuaToNumber(l, 2);
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -957,6 +969,7 @@ void PlayerCclRegister(void)
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
+	lua_register(Lua, "DefinePlayerShades", CclDefinePlayerShades);
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
