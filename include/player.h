@@ -449,8 +449,8 @@ extern int NumPlayers;             /// How many player slots used
 extern Player Players[PlayerMax];  /// All players
 extern Player* ThisPlayer;         /// Player on local computer
 extern int NoRescueCheck;          /// Disable rescue check
-extern SDL_Color PlayerColorsRGB[PlayerMax][4]; /// Player colors
-extern Uint32 PlayerColors[PlayerMax][4];  /// Player colors
+extern SDL_Color PlayerColorsRGB[PlayerMax][8]; /// Player colors
+extern Uint32 PlayerColors[PlayerMax][8];  /// Player colors
 extern char* PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races

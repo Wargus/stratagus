@@ -650,6 +650,7 @@ static int CclDefinePlayerColors(lua_State* l)
 	int i;
 	int args;
 	int j;
+	int numcolors;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -664,10 +665,14 @@ static int CclDefinePlayerColors(lua_State* l)
 		lua_pop(l, 1);
 		++i;
 		lua_rawgeti(l, 1, i + 1);
-		if (!lua_istable(l, -1) || luaL_getn(l, -1) != 4) {
+		if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
-		for (j = 0; j < 4; ++j) {
+		numcolors = luaL_getn(l, -1);
+		if (numcolors > 8) {
+			LuaError(l, "Only 8 colors supported");
+		}
+		for (j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || luaL_getn(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
