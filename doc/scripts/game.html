@@ -58,8 +58,8 @@
 <a href="#DefineCampaign">DefineCampaign</a>
 <a href="#DefineConstruction">DefineConstruction</a>
 <a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
+<a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
 <a href="#DefinePlayerColors">DefinePlayerColors</a>
-<a href="#DefinePlayerShades">DefinePlayerShades</a>
 <a href="#DefineRaceNames">DefineRaceNames</a>
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
@@ -477,6 +477,27 @@ DefineEditorUnitTypes(
 )
 </pre>
 
+<a name="DefinePlayerColorIndex"></a>
+<h3>DefinePlayerColorIndex(colorstart, numcolors)</h3>
+
+Define the graphic color indexes to be replaced by the player color.
+
+<dl>
+<dt>colorstart</dt>
+<dd>Index of the first color
+</dd>
+<dt>numcolors</dt>
+<dd>Total number of colors
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerColorIndex(10, 5) -- for indexes 10-14
+</pre>
+
 <a name="DefinePlayerColors"></a>
 <h3>DefinePlayerColors({"color", {{R, G, B}, {R, G, B}, {R, G, B}, {R, G, B}}, ...})</h3>
 
@@ -500,27 +521,6 @@ Define the player colors.  There should be 16 colors defined and 4 shades of eac
       "blue", {...},
       ...
     )
-</pre>
-
-<a name="DefinePlayerShades"></a>
-<h3>DefinePlayerShades(shadestart, numshades)</h3>
-
-Define the graphic color indexes to be replaced by the player color.
-
-<dl>
-<dt>shadestart</dt>
-<dd>Index of the first shade
-</dd>
-<dt>numshades</dt>
-<dd>Total number of shades
-</dd>
-</dd>
-</dl>
-
-<h4>Example</h4>
-
-<pre>
-    DefinePlayerShades(10, 5) -- for indexes 10-14
 </pre>
 
 <a name="DefineRaceNames"></a>
