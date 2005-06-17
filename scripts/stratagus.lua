@@ -170,6 +170,8 @@ DefinePlayerColors({
   "yellow", {{252, 252, 72}, {228, 204, 40}, {204, 160, 16}, {180, 116, 0}},
 })
 
+DefinePlayerColorIndex(208, 4)
+
 --	Chittin
 SetSpeeds(1)
 
