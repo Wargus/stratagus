@@ -59,6 +59,7 @@
 <a href="#DefineConstruction">DefineConstruction</a>
 <a href="#DefineEditorUnitTypes">DefineEditorUnitTypes</a>
 <a href="#DefinePlayerColors">DefinePlayerColors</a>
+<a href="#DefinePlayerShades">DefinePlayerShades</a>
 <a href="#DefineRaceNames">DefineRaceNames</a>
 <a href="#DefineRanks">DefineRanks</a>
 <a href="#Diplomacy">Diplomacy</a>
@@ -499,6 +500,27 @@ Define the player colors.  There should be 16 colors defined and 4 shades of eac
       "blue", {...},
       ...
     )
+</pre>
+
+<a name="DefinePlayerShades"></a>
+<h3>DefinePlayerShades(shadestart, numshades)</h3>
+
+Define the graphic color indexes to be replaced by the player color.
+
+<dl>
+<dt>shadestart</dt>
+<dd>Index of the first shade
+</dd>
+<dt>numshades</dt>
+<dd>Total number of shades
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre>
+    DefinePlayerShades(10, 5) -- for indexes 10-14
 </pre>
 
 <a name="DefineRaceNames"></a>

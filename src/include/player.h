@@ -455,6 +455,12 @@ extern char* PlayerColorNames[PlayerMax];  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
 
+/**
+**  Which indexes to replace with player color
+*/
+extern int PlayerShadeStart;
+extern int PlayerShadeCount;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -523,7 +529,7 @@ extern void PlayersEachSecond(int player);
 
 #ifndef USE_OPENGL
 	/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(const struct _player_* player,
+extern void GraphicPlayerPixels(struct _player_* player,
 	const Graphic* sprite);
 #endif
 
