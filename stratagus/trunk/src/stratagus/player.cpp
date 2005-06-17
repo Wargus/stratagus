@@ -76,8 +76,8 @@ char* PlayerColorNames[PlayerMax];
 /**
 **  Which indexes to replace with player color
 */
-int PlayerShadeStart;
-int PlayerShadeCount;
+int PlayerColorIndexStart;
+int PlayerColorIndexCount;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -787,13 +787,14 @@ void PlayersEachSecond(int player)
 */
 void GraphicPlayerPixels(Player* player, const Graphic* sprite)
 {
-	Assert(PlayerShadeCount);
+	Assert(PlayerColorIndexCount);
 
 	SDL_LockSurface(sprite->Surface);
-	SDL_SetColors(sprite->Surface, player->UnitColors.Colors, PlayerShadeStart, PlayerShadeCount);
+	SDL_SetColors(sprite->Surface, player->UnitColors.Colors,
+		PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite->SurfaceFlip) {
 		SDL_SetColors(sprite->SurfaceFlip,
-			player->UnitColors.Colors, PlayerShadeStart, PlayerShadeCount);
+			player->UnitColors.Colors, PlayerColorIndexStart, PlayerColorIndexCount);
 	}
 	SDL_UnlockSurface(sprite->Surface);
 }
