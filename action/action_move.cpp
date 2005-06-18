@@ -146,7 +146,7 @@ int DoActionMove(Unit* unit)
 
 		unit->IX = -xd * TileSizeX;
 		unit->IY = -yd * TileSizeY;
-		unit->Frame = 0;
+		unit->Frame = unit->Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, xd, yd);
 	} else {
 		xd = Heading2X[unit->Direction / NextDirection];
@@ -161,7 +161,8 @@ int DoActionMove(Unit* unit)
 
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
-	if (unit->Anim.Anim == unit->Anim.CurrAnim) {
+	// FIXME: this is broken for subtile movement
+	if (!unit->IX && !unit->IY) {
 		unit->Moving = 0;
 	}
 
