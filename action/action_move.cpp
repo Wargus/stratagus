@@ -162,7 +162,7 @@ int DoActionMove(Unit* unit)
 	// Finished move animation, set Moving to 0 so we recalculate the path
 	// next frame
 	// FIXME: this is broken for subtile movement
-	if (!unit->IX && !unit->IY) {
+	if (!unit->Anim.Unbreakable && !unit->IX && !unit->IY) {
 		unit->Moving = 0;
 	}
 
