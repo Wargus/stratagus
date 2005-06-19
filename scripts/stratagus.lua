@@ -151,6 +151,8 @@ DefineDefaultResourceNames("time", "titanium", "crystal", "gas", "ore", "stone",
 
 DefineDefaultResourceAmounts("titanium", 150, "crystal", 150, "gas", 150)
 
+DefinePlayerColorIndex(208, 4)
+
 DefinePlayerColors({
   "red", {{164, 0, 0}, {124, 0, 0}, {92, 4, 0}, {68, 4, 0}},
   "blue", {{12, 72, 204}, {4, 40, 160}, {0, 20, 116}, {0, 4, 76}},
@@ -169,8 +171,6 @@ DefinePlayerColors({
   "white", {{224, 224, 224}, {152, 152, 180}, {84, 84, 128}, {36, 40, 76}},
   "yellow", {{252, 252, 72}, {228, 204, 40}, {204, 160, 16}, {180, 116, 0}},
 })
-
-DefinePlayerColorIndex(208, 4)
 
 --	Chittin
 SetSpeeds(1)
