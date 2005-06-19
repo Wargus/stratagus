@@ -84,7 +84,7 @@ typedef struct _mng_ {
 #endif
 
 typedef struct _unit_colors_ {
-	SDL_Color Colors[8];
+	SDL_Color* Colors;
 } UnitColors;
 
 /**

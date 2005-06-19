@@ -669,8 +669,8 @@ static int CclDefinePlayerColors(lua_State* l)
 			LuaError(l, "incorrect argument");
 		}
 		numcolors = luaL_getn(l, -1);
-		if (numcolors > 8) {
-			LuaError(l, "Only 8 colors supported");
+		if (numcolors != PlayerColorIndexCount) {
+			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
 		for (j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
@@ -678,15 +678,12 @@ static int CclDefinePlayerColors(lua_State* l)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 2);
-			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_rawgeti(l, -1, 3);
+			lua_rawgeti(l, -2, 2);
+			lua_rawgeti(l, -3, 3);
+			PlayerColorsRGB[i / 2][j].r = LuaToNumber(l, -3);
+			PlayerColorsRGB[i / 2][j].g = LuaToNumber(l, -2);
 			PlayerColorsRGB[i / 2][j].b = LuaToNumber(l, -1);
-			lua_pop(l, 1);
-			lua_pop(l, 1);
+			lua_pop(l, 3 + 1);
 		}
 	}
 
@@ -713,8 +710,18 @@ static int CclNewPlayerColors(lua_State* l)
 */
 static int CclDefinePlayerColorIndex(lua_State* l)
 {
+	int i;
+
+	LuaCheckArgs(l, 2);
 	PlayerColorIndexStart = LuaToNumber(l, 1);
 	PlayerColorIndexCount = LuaToNumber(l, 2);
+
+	for (i = 0; i < PlayerMax; ++i) {
+		free(PlayerColorsRGB[i]);
+		PlayerColorsRGB[i] = calloc(PlayerColorIndexCount, sizeof(*PlayerColorsRGB[i]));
+		free(PlayerColors[i]);
+		PlayerColors[i] = calloc(PlayerColorIndexCount, sizeof(*PlayerColors[i]));
+	}
 	return 0;
 }
 
