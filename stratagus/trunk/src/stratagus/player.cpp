@@ -68,8 +68,8 @@ int NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-SDL_Color PlayerColorsRGB[PlayerMax][8];
-Uint32 PlayerColors[PlayerMax][8];
+SDL_Color* PlayerColorsRGB[PlayerMax];
+Uint32* PlayerColors[PlayerMax];
 
 char* PlayerColorNames[PlayerMax];
 
@@ -117,7 +117,7 @@ void InitPlayers(void)
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
-		for (x = 0; x < 8; ++x) {
+		for (x = 0; x < PlayerColorIndexCount; ++x) {
 			PlayerColors[p][x] = VideoMapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
@@ -803,21 +803,17 @@ void GraphicPlayerPixels(Player* player, const Graphic* sprite)
 /**
 **  Setup the player colors for the current palette.
 **
-**  @todo
-**    FIXME: need better colors for the player 8-16.
-**    FIXME: could be called before PixelsXX is setup.
+**  @todo  FIXME: could be called before PixelsXX is setup.
 */
 void SetPlayersPalette(void)
 {
 	int i;
-	int o;
 
-	//o = rand() & 0x7; // FIXME: random colors didn't work
-	o = 0;
 	for (i = 0; i < PlayerMax; ++i) {
-		memcpy(Players[o].UnitColors.Colors, PlayerColorsRGB[i],
-			sizeof(SDL_Color) * 8);
-		o = (o + 1) % PlayerMax;
+		free(Players[i].UnitColors.Colors);
+		Players[i].UnitColors.Colors = malloc(PlayerColorIndexCount * sizeof(SDL_Color));
+		memcpy(Players[i].UnitColors.Colors, PlayerColorsRGB[i],
+			sizeof(SDL_Color) * PlayerColorIndexCount);
 	}
 }
 
@@ -828,11 +824,6 @@ void DebugPlayers(void)
 {
 #ifdef DEBUG
 	int i;
-	const char* colors[16] = {
-		"red", "blue", "green", "violet", "orange", "black", "white", "yellow",
-		"yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow",
-		"yellow"
-	};
 	const char* playertype;
 
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
@@ -852,7 +843,7 @@ void DebugPlayers(void)
 			case 7: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ colors[i] _C_
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i] _C_
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name _C_ playertype _C_
