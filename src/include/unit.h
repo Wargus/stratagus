@@ -725,9 +725,6 @@ extern int    TeamNumSelected[PlayerMax];  /// Number of Units a team member has
 extern Unit* ReleasedHead;                 /// Head of the released unit list.
 extern Unit* ReleasedTail;                 /// Tail of the released unit list.
 
-extern Order* ReleasedOrderHead;           /// Head of the released orders list.
-extern Order* ReleasedOrderTail;           /// Tail of the released unit list.
-
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
