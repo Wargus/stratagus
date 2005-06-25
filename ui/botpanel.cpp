@@ -463,12 +463,12 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 		case ButtonStop:
 		case ButtonStandGround:
 		case ButtonButton:
+		case ButtonMove:
 			res = 1;
 			break;
 		case ButtonRepair:
 			res = unit->Type->RepairRange > 0;
 			break;
-		case ButtonMove:
 		case ButtonPatrol:
 			res = CanMove(unit);
 			break;
