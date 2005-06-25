@@ -8,9 +8,9 @@
 --  T H E   W A R   B E G I N S
 --   Stratagus - A free fantasy real time strategy game engine
 --
---tile_desert.lua-Define the desert tileset.
+--   desert.lua-Define the desert tileset.
 --
---(c) Copyright 2000-2004 by Lutz Sammer and Crestez Leonard.
+-- (c) Copyright 2000-2005 by Lutz Sammer, Crestez Leonard, François Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by

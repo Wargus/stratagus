@@ -31,7 +31,7 @@
 DefineTileset("tileset-winter",
  "class", "winter",
  "name",  "Winter",
- "image", "tilesets/winter/terrain/winter.png",
+ "image", "tiles/winter.png",
  -- Slots descriptions
  "slots", {
   "special", {-- Can't be in pud

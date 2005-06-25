@@ -77,7 +77,7 @@ DefineConstruction("construction-land2", {
 
 DefineConstruction("construction-wall", {
 	Files = {
-		File = "tilesets/desert/neutral/buildings/wall_construction_site.png",
+		File = "neutral/wall_construction_site.png",
 		Size = {32, 32}},
 	Constructions = {{
 		Percent = 0,
