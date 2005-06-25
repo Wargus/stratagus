@@ -49,7 +49,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#define NumFontColors 7
+#define NumFontColors 9
 
 	/// Font color mapping
 typedef struct _font_color_mapping_ {
@@ -925,6 +925,7 @@ static int CclDefineFontColor(lua_State* l)
 {
 	char* color;
 	int i;
+	int args;
 	FontColorMapping* fcm;
 
 	LuaCheckArgs(l, 2);
@@ -953,10 +954,9 @@ static int CclDefineFontColor(lua_State* l)
 	}
 	fcm->ColorName = color;
 
-	if (luaL_getn(l, 2) != NumFontColors * 3) {
-		fprintf(stderr, "Wrong vector length\n");
-	}
-	for (i = 0; i < NumFontColors; ++i) {
+	args = luaL_getn(l, 2) / 3;
+	Assert(args <= NumFontColors);
+	for (i = 0; i < args; ++i) {
 		lua_rawgeti(l, 2, i * 3 + 1);
 		fcm->Color[i].r = LuaToNumber(l, -1);
 		lua_pop(l, 1);
@@ -966,6 +966,9 @@ static int CclDefineFontColor(lua_State* l)
 		lua_rawgeti(l, 2, i * 3 + 3);
 		fcm->Color[i].b = LuaToNumber(l, -1);
 		lua_pop(l, 1);
+	}
+	for (; i < NumFontColors; ++i) {
+		fcm->Color[i].r = fcm->Color[i].g = fcm->Color[i].b = 0;
 	}
 
 	return 0;
