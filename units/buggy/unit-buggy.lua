@@ -8,9 +8,9 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	camera.lua	-	Define the camera unit.
+--	unit-buggy.lua	-	Define the buggy unit.
 --
---	(c) Copyright 2004 by gorm.
+--	(c) Copyright 2004-2005 by gorm.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ DefineIcon({
 	Name = "icon-buggy",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/units/ico_buggy.png"})
+	File = "units/buggy/ico_buggy.png"})
 
 MakeSound("buggy-selected", "units/buggy/buggy_select.wav")
 MakeSound("buggy-acknowledge", "units/buggy/buggy_action.wav")
@@ -67,8 +67,8 @@ MakeSound("buggy-die", "units/buggy/buggy_die.wav")
 
 DefineUnitType("buggy_destroyed", {
 	Name = "DestroyedBuggy",
-	Image = {"file", "units/unit_buggy.png", "size", {64, 64}},
-	Shadow = {"file", "units/unit_buggy_s.png", "size", {64, 64}},
+	Image = {"file", "units/buggy/unit_buggy.png", "size", {64, 64}},
+	Shadow = {"file", "units/buggy/unit_buggy_s.png", "size", {64, 64}},
 	Animations = "animations-dead_buggy", Icon = "icon-cancel",
 	Flip = false,
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
@@ -82,8 +82,8 @@ DefineUnitType("buggy_destroyed", {
 
 DefineUnitType("unit-buggy", {
 	Name = "Buggy",
-	Image = {"file", "units/unit_buggy.png", "size", {64, 64}},
-	Shadow = {"file", "units/unit_buggy_s.png", "size", {64, 64}},
+	Image = {"file", "units/buggy/unit_buggy.png", "size", {64, 64}},
+	Shadow = {"file", "units/buggy/unit_buggy_s.png", "size", {64, 64}},
 	Animations = "animations-buggy", Icon = "icon-buggy",
 	Flip = false,
 	Costs = {"time", 100, "titanium", 100, "crystal", 200},

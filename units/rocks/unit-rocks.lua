@@ -44,8 +44,8 @@ DefineConstruction("construction-rocks", {
 
 DefineUnitType("unit-rock-1", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_1.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_1s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_1.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_1s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-1",
 	Construction = "construction-rocks",
@@ -81,8 +81,8 @@ DefineAllow("unit-rock-1", "AAAAAAAAAAAAAAAA")
 
 DefineUnitType("unit-rock-2", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_2.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_2s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_2.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_2s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-2",
 	Construction = "construction-rocks",
@@ -110,7 +110,7 @@ DefineIcon({
 	Name = "icon-rock-2",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_2i.png"})
+	File = "units/rocks/rock_2i.png"})
 
 DefineAllow("unit-rock-2", "AAAAAAAAAAAAAAAA")
 
@@ -118,8 +118,8 @@ DefineAllow("unit-rock-2", "AAAAAAAAAAAAAAAA")
 
 DefineUnitType("unit-rock-3", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_3.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_3s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_3.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_3s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-3",
 	Construction = "construction-rocks",
@@ -147,7 +147,7 @@ DefineIcon({
 	Name = "icon-rock-3",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_3i.png"})
+	File = "units/rocks/rock_3i.png"})
 
 DefineAllow("unit-rock-3", "AAAAAAAAAAAAAAAA")
 
@@ -155,8 +155,8 @@ DefineAllow("unit-rock-3", "AAAAAAAAAAAAAAAA")
 
 DefineUnitType("unit-rock-4", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_4.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_4s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_4.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_4s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-4",
 	Construction = "construction-rocks",
@@ -184,7 +184,7 @@ DefineIcon({
 	Name = "icon-rock-4",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_4i.png"})
+	File = "units/rocks/rock_4i.png"})
 
 DefineAllow("unit-rock-4", "AAAAAAAAAAAAAAAA")
 
@@ -192,8 +192,8 @@ DefineAllow("unit-rock-4", "AAAAAAAAAAAAAAAA")
 
 DefineUnitType("unit-rock-5", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_5.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_5s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_5.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_5s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-5",
 	Construction = "construction-rocks",
@@ -221,7 +221,7 @@ DefineIcon({
 	Name = "icon-rock-5",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_5i.png"})
+	File = "units/rocks/rock_5i.png"})
 
 DefineAllow("unit-rock-5", "AAAAAAAAAAAAAAAA")
 
@@ -229,8 +229,8 @@ DefineAllow("unit-rock-5", "AAAAAAAAAAAAAAAA")
 
 DefineUnitType("unit-rock-6", {
 	Name = "rocks",
-	Image = {"file", "nature/rock_6.png", "size", {96, 96}},
-	Shadow = {"file", "nature/rock_6s.png", "size", {96, 96}},
+	Image = {"file", "units/rocks/rock_6.png", "size", {96, 96}},
+	Shadow = {"file", "units/rocks/rock_6s.png", "size", {96, 96}},
 	Animations = "animations-rocks", 
 	Icon = "icon-rock-6",
 	Construction = "construction-rocks",
@@ -258,7 +258,7 @@ DefineIcon({
 	Name = "icon-rock-6",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_6i.png"})
+	File = "units/rocks/rock_6i.png"})
 
 DefineAllow("unit-rock-6", "AAAAAAAAAAAAAAAA")
 
