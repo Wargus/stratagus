@@ -10,7 +10,7 @@
 --
 --	radar.lua	-	Define the radar unit.
 --
---	(c) Copyright 2004 by François Beerten.
+--	(c) Copyright 2004-2005 by François Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -40,13 +40,13 @@ DefineIcon({
 	Name = "icon-radar",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/build/radar_i.png"})
+	File = "units/radar/radar_i.png"})
 
 DefineIcon({
 	Name = "icon-radar_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/build/radar_b.png"})
+	File = "units/radar/radar_b.png"})
 
 MakeSound("radar-selected", "elites/buildings/sfx_rdar.select.wav")
 
@@ -59,9 +59,9 @@ DefineConstruction("construction-radar", {
 
 DefineUnitType("unit-radar", {
 	Name = "Radar",
-	Image = {"file", "elites/build/radar.png", "size", {64, 64}},
+	Image = {"file", "units/radar/radar.png", "size", {64, 64}},
 	Offset = {12, -16},
-	Shadow = {"file", "elites/build/radar_s.png", "size", {64, 64}},
+	Shadow = {"file", "units/radar/radar_s.png", "size", {64, 64}},
 	Animations = "animations-radar", Icon = "icon-radar",
 	Costs = {"time", 20, "titanium", 7, "crystal", 35},
 	RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-radar",
@@ -79,7 +79,7 @@ DefineUnitType("unit-radar", {
 
 DefineUnitType("radar_destroyed", {
 	Name = "RadarWreck",
-	Image = {"file", "elites/build/radar.png", "size", {64, 64}},
+	Image = {"file", "units/radar/radar.png", "size", {64, 64}},
 	Animations = "animations-radar", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,

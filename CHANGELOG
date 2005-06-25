@@ -2,6 +2,7 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 Development version:
+- New units directory with automatic loading of the units. (François Beerten)
 - Added new map Antarticum. (François Beerten)
 - List all available campaigns in the campaigns directory automatically. (François Beerten)
 - Added the elites campaign. (Loïs Taulelle)

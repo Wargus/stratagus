@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	unit-tank.lua	-	Define the tank unit.
+--	unit-rtank.lua	-	Define the rocket tank unit.
 --
 --	(c) Copyright 2005 by François Beerten.
 --
@@ -28,41 +28,41 @@
 --
 --	$Id$
 
-DefineAnimations("animations-tank", {
+DefineAnimations("animations-rtank", {
     Still = {"frame 0", "wait 1", },
-    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
-        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1", 
+    Move = {"unbreakable begin", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
+        "frame 0", "move 2", "wait 1", "frame 0", "move 2", "wait 1",
         "frame 0", "move 2", "unbreakable end", "wait 1", },
-    Attack = {"unbreakable begin", "frame 0", "wait 10", 
-        "frame 5", "sound bazoo-attack", "attack", "wait 2", 
-        "frame 10", "wait 4", "frame 0", "unbreakable end", "wait 50", },
-    Death = {"unbreakable begin", "frame 15", "wait 4", 
-        "frame 20", "wait 2", "frame 25", "wait 2", "frame 30", "wait 2", 
-        "frame 35", "unbreakable end", "wait 2", },
+    Attack = {"unbreakable begin", "frame 0", "wait 4", 
+        "frame 5", "sound bazoo-attack", "attack", "wait 1", 
+        "frame 0", "wait 2", 
+        "frame 5", "attack", "wait 1", 
+        "frame 0", "unbreakable end", "wait 60", },
+    Death = {"unbreakable begin", "frame 10", "wait 5", "frame 15", "wait 5", "frame 20", "unbreakable end", "wait 20", },
     })
 
 DefineIcon({
-	Name = "icon-tank",
-	Size = {48, 39},
+	Name = "icon-rtank",
+	Size = {46, 38},
 	Frame = 0,
-	File = "elites/units/ico_tank.png"})
+	File = "units/rtank/ico_rtank.png"})
 
-DefineUnitType("unit-tank", {
-	Name = "Tank",
-	Image = {"file", "elites/units/unit_tank.png", "size", {96, 96}},
-	Shadow = {"file", "elites/units/unit_tank_s.png", "size", {96, 96}},
-	Animations = "animations-tank", Icon = "icon-tank",
+DefineUnitType("unit-rtank", {
+	Name = "Rocket Tank",
+	Image = {"file", "units/rtank/unit_rtank.png", "size", {96, 96}},
+	Shadow = {"file", "units/rtank/unit_rtank_s.png", "size", {96, 96}},
+	Animations = "animations-rtank", Icon = "icon-rtank",
 	Flip = false,
-	Costs = {"time", 150, "titanium", 200, "crystal", 100},
+	Costs = {"time", 100, "titanium", 100, "crystal", 150},
 	RepairHp = 1, RepairCosts = {"crystal", 6},
-	Speed = 12, HitPoints = 200, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
-	SightRange = 6, Armor = 20, BasicDamage = 10, PiercingDamage = 40,
+	Speed = 20, HitPoints = 50, DrawLevel = 25, TileSize  = {1, 1}, BoxSize = {64, 64},
+	SightRange = 7, Armor = 20, BasicDamage = 5, PiercingDamage = 30,
 	Missile = "missile-bazoo", Priority = 20, AnnoyComputerFactor = 65,
 	Points = 15, Supply = 0, ExplodeWhenKilled = "missile-64x64-explosion",
 	Type = "land",
@@ -70,23 +70,22 @@ DefineUnitType("unit-tank", {
 	RightMouseAction = "attack",
 	LandUnit = true, SelectableByRectangle = true, 
 	Demand = 0, CanAttack = true, CanTargetLand = true,
-	NumDirections = 8, MaxAttackRange = 6,
+	NumDirections = 8, MaxAttackRange = 7,
 	Sounds = {
-		"selected", "assault-selected",
-		"acknowledge", "assault-acknowledge"
+		"selected", "grenadier-selected",
+		"acknowledge", "grenadier-acknowledge"
 	}
 })
 
-DefineAllow("unit-tank", "AAAAAAAAAAAAAAAA")
-DefineDependency("unit-tank", {"unit-vfac"})
+DefineAllow("unit-rtank", "AAAAAAAAAAAAAAAA")
+DefineDependency("unit-rtank", {"unit-vfac"})
 
 DefineButton({
-	Pos = 4, Level = 0, Icon = "icon-tank", Action = "train-unit",
-	Value = "unit-tank", Key = "t", Hint = "BUILD ~!TANK",
+	Pos = 5, Level = 0, Icon = "icon-rtank", Action = "train-unit",
+	Value = "unit-rtank", Key = "r", Hint = "BUILD ~!ROCKET TANK",
 	ForUnit = {"unit-vfac"}})
 
-DefineCommonButtons({"unit-tank"})
-
+DefineCommonButtons({"unit-rtank"})
 
 
 

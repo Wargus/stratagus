@@ -10,7 +10,7 @@
 --
 --	unit-gturret.lua	-	Define the gun turret unit.
 --
---	(c) Copyright 2004 by François Beerten.
+--	(c) Copyright 2004-2005 by François Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ DefineIcon({
 	Name = "icon-gturret",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/build/gturret_i.png"})
+	File = "units/gturret/gturret_i.png"})
 
 DefineIcon({
 	Name = "icon-gturret_b",
@@ -82,8 +82,8 @@ DefineUnitType("unit-gturret", {
 		"dead", "gen-dead"}
 })
 
-MakeSound("gturret-selected", "elites/units/gturret_select.wav")
-MakeSound("gturret-attack", "elites/units/gturret_attack.wav")
+MakeSound("gturret-selected", "units/gturret/gturret_select.wav")
+MakeSound("gturret-attack", "units/gturret/gturret_attack.wav")
 
 DefineAllow("unit-gturret", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-gturret", {"unit-vault"})

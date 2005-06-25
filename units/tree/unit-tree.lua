@@ -39,7 +39,7 @@ DefineIcon({
 	Name = "icon-tree",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/tree01_i.png"})
+	File = "units/tree/tree01_i.png"})
 
 DefineConstruction("construction-tree", {
 	Constructions = {
@@ -49,9 +49,9 @@ DefineConstruction("construction-tree", {
 
 DefineUnitType("unit-tree", {
 	Name = "Tree",
-	Image = {"file", "nature/tree01.png", "size", {105, 105}},
+	Image = {"file", "units/tree/tree01.png", "size", {105, 105}},
 	Offset = {16, -24},
-	Shadow = {"file", "nature/tree01_s.png", "size", {105, 105}},
+	Shadow = {"file", "units/tree/tree01_s.png", "size", {105, 105}},
 	Animations = "animations-tree", Icon = "icon-tree",
 	Costs = {"time", 1},
 	Construction = "construction-tree",

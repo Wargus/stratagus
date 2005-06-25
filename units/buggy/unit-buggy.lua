@@ -59,16 +59,16 @@ DefineIcon({
 	Frame = 0,
 	File = "elites/units/ico_buggy.png"})
 
-MakeSound("buggy-selected",    "elites/units/buggy_select.wav")
-MakeSound("buggy-acknowledge", "elites/units/buggy_action.wav")
-MakeSound("buggy-ready",       "elites/units/buggy_ready.wav")
-MakeSound("buggy-help",        "elites/units/buggy_attacked.wav")
-MakeSound("buggy-die",         "elites/units/buggy_die.wav")
+MakeSound("buggy-selected", "units/buggy/buggy_select.wav")
+MakeSound("buggy-acknowledge", "units/buggy/buggy_action.wav")
+MakeSound("buggy-ready", "units/buggy/buggy_ready.wav")
+MakeSound("buggy-help", "units/buggy/buggy_attacked.wav")
+MakeSound("buggy-die", "units/buggy/buggy_die.wav")
 
 DefineUnitType("buggy_destroyed", {
 	Name = "DestroyedBuggy",
-	Image = {"file", "elites/units/unit_buggy.png", "size", {64, 64}},
-	Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
+	Image = {"file", "units/unit_buggy.png", "size", {64, 64}},
+	Shadow = {"file", "units/unit_buggy_s.png", "size", {64, 64}},
 	Animations = "animations-dead_buggy", Icon = "icon-cancel",
 	Flip = false,
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
@@ -82,8 +82,8 @@ DefineUnitType("buggy_destroyed", {
 
 DefineUnitType("unit-buggy", {
 	Name = "Buggy",
-	Image = {"file", "elites/units/unit_buggy.png", "size", {64, 64}},
-	Shadow = {"file", "elites/units/unit_buggy_s.png", "size", {64, 64}},
+	Image = {"file", "units/unit_buggy.png", "size", {64, 64}},
+	Shadow = {"file", "units/unit_buggy_s.png", "size", {64, 64}},
 	Animations = "animations-buggy", Icon = "icon-buggy",
 	Flip = false,
 	Costs = {"time", 100, "titanium", 100, "crystal", 200},

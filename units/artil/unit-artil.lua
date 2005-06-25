@@ -58,12 +58,12 @@ DefineIcon({
 	Name = "icon-artil",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/units/ico_artil.png"})
+	File = "units/artil/ico_artil.png"})
 
 DefineUnitType("unit-artil", {
 	Name = "Artil",
-	Image = {"file", "elites/units/unit_artil.png", "size", {96, 96}},
-	Shadow = {"file", "elites/units/unit_artil_s.png", "size", {96, 96}},
+	Image = {"file", "units/artil/unit_artil.png", "size", {96, 96}},
+	Shadow = {"file", "units/artil/unit_artil_s.png", "size", {96, 96}},
 	Animations = "animations-artil", Icon = "icon-artil",
 	Flip = false,
 	Costs = {"time", 200, "titanium", 300, "crystal", 300},
