@@ -291,20 +291,6 @@ DefineAnimations("animations-elitebuild7", {
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineAnimations("animations-dorcoz", {
-    Still = {"frame 0", "wait 1", },
-    Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
-        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
-        "frame 20", "move 4", "wait 2", "frame 5", "move 4", "wait 2", 
-        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
-        "frame 20", "move 4", "unbreakable end", "wait 2", },
-    Attack = {"unbreakable begin", 
-        "frame 25", "sound dorcoz-attack", "attack", "wait 1", 
-        "frame 0", "unbreakable end", "wait 49", },
-    Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
-        "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
-    })
-
 ---------------------------------------
 -- Misc.
 

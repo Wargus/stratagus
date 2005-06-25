@@ -211,12 +211,6 @@ DefineButton({
 	ForUnit = {"unit-camp"}})
 
 DefineButton({
-	Pos = 4, Level = 0, Icon = "icon-dorcoz",
-	Action = "train-unit", Value = "unit-dorcoz",
-	Key = "d", Hint = "TRAIN ~!DORCOZ",
-	ForUnit = {"unit-camp"}})
-
-DefineButton({
 	Pos = 1, Level = 0, Icon = "icon-medic",
 	Action = "train-unit", Value = "unit-medic",
 	Key = "m", Hint = "TRAIN ~!MEDIC",

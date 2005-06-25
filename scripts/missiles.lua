@@ -53,12 +53,6 @@ DefineMissileType("missile-bazoo", {
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 2,
 	ImpactMissile = "missile-64x64-explosion"})
 
-DefineMissileType("missile-dorcoz", {
-	File = "elites/missile/mis_plasma_sml.png",
-	Size = {32, 32}, Frames = 5, NumDirections = 5,
-	ImpactSound = "fireball hit", DrawLevel = 50,
-	Class = "missile-class-point-to-point", Sleep = 1, Speed = 32, Range = 1})
-
 DefineMissileType("missile-heal", {
 	File = "elites/special/heal.png",
 	Size = {32, 32}, Frames = 5, NumDirections = 1, DrawLevel = 50,

@@ -230,12 +230,6 @@ DefineIcon({
 	Frame = 5,
 	File = "elites/units/engineer_icons.png"})
 
-DefineIcon({
-	Name = "icon-dorcoz",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_dorcoz.png"})
-
 --
 --  MISC
 --  
