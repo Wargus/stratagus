@@ -215,7 +215,6 @@ Load("scripts/missiles.lua")
 Load("scripts/constructions.lua")
 Load("scripts/spells.lua")
 Load("scripts/units.lua")
-Load("scripts/upgrade.lua")
 Load("scripts/fonts.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ui.lua")
@@ -239,6 +238,7 @@ for i,f in list do
   end
 end
 
+Load("scripts/upgrade.lua")
 Load("scripts/ai.lua")
 Load("scripts/campaigns.lua")
 Load("scripts/credits.lua")
