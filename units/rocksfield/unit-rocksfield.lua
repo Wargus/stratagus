@@ -32,13 +32,13 @@ DefineIcon({
         Name = "icon-rocks_field",
         Size = {46, 38},
         Frame = 0,
-        File = "units/rocks-field/ico_rocks_field.png"})
+        File = "units/rocksfield/ico_rocks_field.png"})
 
 -- Note: the name of the unit is hardcoded as unit-gold-mine in the editor.
 DefineUnitType("unit-gold-mine", {
 	Name = "Titanium Field",
-	Image = {"file", "units/rocks-field/rocks_field.png", "size", {128, 128}},
-	Shadow = {"file", "units/rocks-field/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
+	Image = {"file", "units/rocksfield/rocks_field.png", "size", {128, 128}},
+	Shadow = {"file", "units/rocksfield/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
 	Animations = "animations-building", Icon = "icon-rocks_field",
 	Costs = {"time", 150}, VisibleUnderFog = true,
 	Construction = "construction-land2",
