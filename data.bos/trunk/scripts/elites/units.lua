@@ -250,27 +250,6 @@ DefineUnitType("unit-harvester", {
 		"dead", "harvester-die"}
 	})
 
-DefineUnitType("unit-dorcoz", {
-	Name = "Dorcoz",
-	Image = {"file", "elites/units/unit_dorcoz.png", "size", {64, 64}},
-	Animations = "animations-dorcoz", Icon = "icon-dorcoz",
-	Costs = {"time", 100, "titanium", 50, "crystal", 300}, Speed = 10,
-	HitPoints = 100, DrawLevel = 40, TileSize = {1, 1}, BoxSize = {31, 31},
-	SightRange = 7, ComputerReactionRange = 7, PersonReactionRange = 7,
-	Armor = 2, BasicDamage = 6, PiercingDamage = 3, Missile = "missile-dorcoz",
-	MaxAttackRange = 7, Priority = 60, Points = 50, Demand = 1,
-	Corpse = {"unit-dead-body", 0}, Type = "land", RightMouseAction = "attack",
-	CanAttack = true, CanTargetLand = true, LandUnit = true, organic = true,
-	SelectableByRectangle = true, DetectCloak = true,
-	RightMouseAction = "attack",
-	Sounds = {
-		"selected", "dorcoz-selected",
-		"acknowledge", "dorcoz-acknowledge",
-		"ready", "dorcoz-ready",
-		"help", "basic terras voices help 1",
-		"dead", "basic terras voices dead"}
-	})
-
 DefineUnitType("unit-msilo", {
 	Name = "Missile Silo",
 	Image = {"file", "elites/build/missile_silo.png", "size", {128, 128}},

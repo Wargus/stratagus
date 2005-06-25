@@ -31,21 +31,6 @@
 -- Load the animations for the units.
 Load("scripts/anim.lua")
 
--- Define all of the crystal fields. Only Ident and animations differ.
-for i = 1, 13 do
-	DefineUnitType("unit-crystal-field" .. i, {
-		Name = "Crystal Field" .. i,
-		Image = {"file", "nature/res/res_crys.png", "size", {32, 32}},
-		Shadow = {"file", "nature/res/res_crys_s.png", "size", {32, 32}, "offset", {5, 5}},
-		Animations = "animations-crystal-field" .. i, Icon = "icon-crystal-field",
-		HitPoints = 50,	TileSize= {1, 1}, BoxSize = {31, 31},
-		NeutralMinimapColor = {81, 200, 234},
-		Armor = 999, Missile = "missile-none",
-		Priority = 0, Corpse = {"unit-destroyed-1x1-place", 0},
-		Type = "land", Building = true, VisibleUnderFog = true,
-		GivesResource = "crystal", CanHarvest = true})
-end
-
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
 	Image = {"file", "neutral/units/corpses.png", "size", {72, 72}},
