@@ -45,8 +45,8 @@
 **  typedef struct _color_font_ ColorFont;
 **
 **  Defines the fonts used in the Stratagus engine. We support
-**  proportional multicolor fonts of 7 colors. The eighth color is
-**  transparent. (Currently the fonts aren't packed)
+**  proportional multicolor fonts of 9 colors.
+**  (Currently the fonts aren't packed)
 **
 **  ColorFont::File
 **
@@ -68,15 +68,7 @@
 **  ColorFont::Graphic
 **
 **    Contains the graphics of the font, loaded from ColorFont::File.
-**    Only 7 colors are supported.
-**    @li #0   is background color
-**    @li #1   is the light font color
-**    @li #2   is the middle = main font color
-**    @li #3   is the dark font color
-**    @li #4   is the font/shadow antialias color
-**    @li #5   is the dark shadow color
-**    @li #6   is the light shadow color
-**    @li #255 is transparent
+**    Only 9 colors are supported.
 */
 
 /*----------------------------------------------------------------------------
@@ -112,7 +104,7 @@ enum _game_font_ {
 	LargeTitleFont,  /// Large font used in episoden titles
 };
 
-#define MaxFonts 10  /// Number of fonts supported
+#define MaxFonts 15  /// Number of fonts supported
 
 /**
 **  Color selector for the font functions.
