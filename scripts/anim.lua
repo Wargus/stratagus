@@ -291,62 +291,6 @@ DefineAnimations("animations-elitebuild7", {
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineAnimations("animations-crystal-field1", {
-    Still = {"frame 6", "wait 4", "frame 6", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field2", {
-    Still = {"frame 10", "wait 4", "frame 10", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field3", {
-    Still = {"frame 12", "wait 4", "frame 12", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field4", {
-    Still = {"frame 4", "wait 4", "frame 4", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field5", {
-    Still = {"frame 0", "wait 4", "frame 0", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field6", {
-    Still = {"frame 1", "wait 4", "frame 1", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field7", {
-    Still = {"frame 5", "wait 4", "frame 5", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field8", {
-    Still = {"frame 7", "wait 4", "frame 7", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field9", {
-    Still = {"frame 2", "wait 4", "frame 2", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field10", {
-    Still = {"frame 3", "wait 4", "frame 3", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field11", {
-    Still = {"frame 11", "wait 4", "frame 11", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field12", {
-    Still = {"frame 8", "wait 4", "frame 8", "wait 1", },
-    })
-
-DefineAnimations("animations-crystal-field13", {
-    Still = {"frame 9", "wait 4", "frame 9", "wait 1", },
-    })
-
-----------------------------
--------- Terras Units ------
-----------------------------
-
 DefineAnimations("animations-dorcoz", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
