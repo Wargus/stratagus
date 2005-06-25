@@ -230,25 +230,11 @@ DefineIcon({
 	Frame = 5,
 	File = "elites/units/engineer_icons.png"})
 
---
--- TERRAS
---
-
 DefineIcon({
 	Name = "icon-dorcoz",
 	Size = {46, 38},
 	Frame = 0,
 	File = "elites/units/ico_dorcoz.png"})
-
---
--- NEUTRAL
---
-
-DefineIcon({
-	Name = "icon-crystal-field",
-	Size = {46, 38},
-	Frame = 0,
-	File = "nature/res/ico_crys.png"})
 
 --
 --  MISC
