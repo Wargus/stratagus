@@ -10,7 +10,7 @@
 --
 --	stratagus.lua	-	The craft configuration language.
 --
---	(c) Copyright 1998-2004 by Crestez Leonard and François Beerten
+--	(c) Copyright 1998-2005 by Crestez Leonard and François Beerten
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ SetTitleScreens(
 SetGameName("bos")
 
 --	set the default map file.
-SetDefaultMap="puds/default.smp"
+SetDefaultMap="maps/default.smp"
 
 -------------------------------------------------------------------------------
 --	Music play list -	Insert your titles here
@@ -222,11 +222,21 @@ Load("scripts/ui.lua")
 Load("scripts/campaigns.lua")
 
 -- Load extra units
-list = ListDirectory("scripts/elites/")
+local list
+local i
+local f
+local ff
+
+list = ListDirectory("units/")
 for i,f in list do
-  if(string.find(f, "^unit%-.*%.lua$")) then 
-    print("Loading unit: " .. f) 
-    Load("scripts/elites/"..f)
+  if not(string.find(f, "^%.")) then
+     subdirlist = ListDirectory("units/" .. f)
+     for i, ff in subdirlist do
+        if(string.find(ff, "^unit-.*%.lua$")) then
+          print("Loading unit: " .. ff)
+          Load("units/"..f.."/"..ff)
+        end
+     end
   end
 end
 

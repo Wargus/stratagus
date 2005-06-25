@@ -48,15 +48,15 @@ DefineIcon({
 	Name = "icon-cam",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/build/camera_i.png"})
+	File = "units/camera/camera_i.png"})
 
 DefineIcon({
 	Name = "icon-cam_b",
 	Size = {46, 38},
 	Frame = 0,
-	File = "elites/build/camera_b.png"})
+	File = "units/camera/camera_b.png"})
 
-MakeSound("camera-selected", "elites/buildings/sfx_camera.select.wav")
+MakeSound("camera-selected", "units/camera/sfx_camera.select.wav")
 
 DefineConstruction("construction-cam", {
 	Constructions = {
@@ -73,9 +73,9 @@ DefineConstruction("construction-cam", {
 
 DefineUnitType("unit-cam", {
 	Name = "Camera",
-	Image = {"file", "elites/build/camera.png", "size", {32, 64}},
+	Image = {"file", "units/camera/camera.png", "size", {32, 64}},
 	Offset = {0, -16},
-	Shadow = {"file", "elites/build/camera_s.png", "size", {64, 64}, "offset", {16,0}},
+	Shadow = {"file", "units/camera/camera_s.png", "size", {64, 64}, "offset", {16,0}},
 	Animations = "animations-cam", Icon = "icon-cam",
 	Costs = {"time", 20, "titanium", 7, "crystal", 35},
 	RepairHp = 1, RepairCosts = {"crystal", 3}, Construction = "construction-cam",
@@ -91,7 +91,7 @@ DefineUnitType("unit-cam", {
 
 DefineUnitType("camera_destroyed", {
 	Name = "CameraCrater",
-	Image = {"file", "elites/build/camera_c.png", "size", {32, 64}},
+	Image = {"file", "units/camera/camera_c.png", "size", {32, 64}},
 	Animations = "animations-dead_cam", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {1, 1}, BoxSize = {28, 28}, SightRange = 1,

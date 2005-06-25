@@ -73,7 +73,7 @@ DefineIcon({
 	Name = "icon-rock-1",
 	Size = {46, 38},
 	Frame = 0,
-	File = "nature/rock_1i.png"})
+	File = "units/rocks/rock_1i.png"})
 
 DefineAllow("unit-rock-1", "AAAAAAAAAAAAAAAA")
 
