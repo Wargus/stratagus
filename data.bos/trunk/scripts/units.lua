@@ -46,26 +46,6 @@ for i = 1, 13 do
 		GivesResource = "crystal", CanHarvest = true})
 end
 
-DefineUnitType("unit-gold-mine", {
-	Name = "Titanium Field",
-	Image = {"file", "nature/res/rocks_field.png", "size", {128, 128}},
-	Shadow = {"file", "nature/res/rocks_field_s.png", "size", {128, 128}, "offset", {0, 0}},
-	Animations = "animations-building", Icon = "icon-rocks_field",
-	Costs = {"time", 150}, VisibleUnderFog = true,
-	Construction = "construction-land2",
-	NeutralMinimapColor = {196, 196, 196},
-	DrawLevel = 40, TileSize = {4, 4}, BoxSize = {96, 96},
-	SightRange = 1, Speed = 0, HitPoints = 25500, Priority = 0,
-	Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Corpse = {"unit-destroyed-4x4-place", 0}, ExplodeWhenKilled = "missile-explosion",
-	Type = "land", Building = true, GivesResource = "titanium", CanHarvest = true,
-	Sounds = {
-		"selected", "gold-mine-selected",
-		"acknowledge", "gold-mine-acknowledge",
-		"ready", "gold-mine-ready",
-		"help", "gold-mine-help",
-		"dead", "building destroyed"}})
-
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
 	Image = {"file", "neutral/units/corpses.png", "size", {72, 72}},
