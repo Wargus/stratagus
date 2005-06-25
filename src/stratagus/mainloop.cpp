@@ -287,6 +287,10 @@ void UpdateDisplay(void)
 		DrawMapArea();
 		DrawMessages();
 
+		if (CursorState == CursorStateRectangle) {
+			DrawCursor();
+		}
+
 		if (!BigMapMode) {
 			for (i = 0; i < TheUI.NumFillers; ++i) {
 				VideoDrawSubClip(TheUI.Filler[i], 0, 0,
@@ -313,7 +317,9 @@ void UpdateDisplay(void)
 	DrawPieMenu(); // draw pie menu only if needed
 	DrawMenu(CurrentMenu);
 
-	DrawCursor();
+	if (CursorState != CursorStateRectangle) {
+		DrawCursor();
+	}
 
 	//
 	// Update changes to display.
