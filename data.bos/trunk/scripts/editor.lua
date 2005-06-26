@@ -38,10 +38,10 @@ DefineIcon({
     Name = "icon-start-location",
     Size = {32, 32},
     Frame = 0,
-    File = "elites/x_startpoint.png"})
+    File = "ui/x_startpoint.png"})
 DefineUnitType("unit-start-location", {
     Name = "Start Location",
-    Image = {"file", "elites/x_startpoint.png", "size", {32, 32}},
+    Image = {"file", "ui/x_startpoint.png", "size", {32, 32}},
     Animations = "animations-building", Icon = "icon-start-location",
     Speed = 0, HitPoints = 0, DrawLevel = 0, TileSize = {1, 1},
     BoxSize = {31, 31}, SightRange = 0, BasicDamage = 0, PiercingDamage = 0,
