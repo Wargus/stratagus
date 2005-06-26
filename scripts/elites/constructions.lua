@@ -28,12 +28,6 @@
 --
 --	$Id$
 
-DefineConstruction("construction-plate", {
-	Constructions = {
-		{Percent = 0, File = "main", Frame = 0}
-	}
-})
-
 DefineConstruction("construction-msilo", {
 	Constructions = {
 		{Percent = 0, File = "main", Frame = 7},
@@ -61,21 +55,6 @@ DefineConstruction("construction-gen", {
 		{Percent = 70, File = "main", Frame = 16},
 		{Percent = 80, File = "main", Frame = 17},
 		{Percent = 90, File = "main", Frame = 0}
-	}
-})
-
-DefineConstruction("construction-vault", {
-	Constructions = {
-		{Percent = 0, File = "main", Frame = 6},
-		{Percent = 1, File = "main", Frame = 7},
-		{Percent = 2, File = "main", Frame = 8},
-		{Percent = 3, File = "main", Frame = 9},
-		{Percent = 4, File = "main", Frame = 10},
-		{Percent = 5, File = "main", Frame = 11},
-		{Percent = 6, File = "main", Frame = 12},
-		{Percent = 7, File = "main", Frame = 13},
-		{Percent = 8, File = "main", Frame = 14},
-		{Percent = 9, File = "main", Frame = 15}
 	}
 })
 

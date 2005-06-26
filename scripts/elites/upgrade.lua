@@ -38,14 +38,12 @@ DefineAllow("unit-harvester", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-gen", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-camp", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-dev-yard", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-vault", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-rfac", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-hosp", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-vfac", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-apcs", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-human-wall", "AAAAAAAAAAAAAAAA")
 DefineAllow("unit-msilo", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-plate1", "AAAAAAAAAAAAAAAA")
 
 --	- upgrades
 

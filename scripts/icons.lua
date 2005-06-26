@@ -99,12 +99,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-vault",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/buildings/vault-i.png"})
-
-DefineIcon({
 	Name = "icon-dev",
 	Size = {46, 38},
 	Frame = 0,
@@ -163,12 +157,6 @@ DefineIcon({
 	Size = {46, 38},
 	Frame = 9,
 	File = "elites/units/engineer_icons.png"})
-
-DefineIcon({
-	Name = "icon-plate1",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/buildings/plate-i.png"})
 
 DefineIcon({
 	Name = "icon-expl",
