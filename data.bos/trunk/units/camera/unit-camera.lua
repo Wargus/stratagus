@@ -100,7 +100,7 @@ DefineUnitType("camera_destroyed", {
 })
 
 DefineAllow("unit-cam", "AAAAAAAAAAAAAAAA")
-DefineDependency("unit-cam", {"unit-vault"})
+DefineDependency("unit-cam", {})
 
 DefineButton({
 	Pos = 5, Level = 1, Icon = "icon-cam_b", Action = "build",

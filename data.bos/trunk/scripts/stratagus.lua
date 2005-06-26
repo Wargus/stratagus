@@ -101,7 +101,7 @@ SetRevealAttacker(true)
 --  Fighters move by default.
 RightButtonMoves();
 
---	Set the name of the missile to use when clicking
+--	Set the name of the missile to use when clicking (move order)
 SetClickMissile("missile-green-cross")
 
 --	Set the name of the missile to use when displaying damage
@@ -218,6 +218,7 @@ Load("scripts/units.lua")
 Load("scripts/fonts.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ui.lua")
+Load("units/vault/unit-vault.lua")
 
 -- Load extra units
 local list

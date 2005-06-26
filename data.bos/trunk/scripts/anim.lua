@@ -187,10 +187,6 @@ DefineAnimations("animations-harvester", {
 -------- Elite Buildings ------
 -------------------------------
 
-DefineAnimations("animations-plate", {
-    Still = {"frame 0", "wait 1", },
-    })
-
 DefineAnimations("animations-msilo", {
     Still = {"frame 0", "wait 1", },
     Attack = {"unbreakable begin", "frame 1", "wait 1", 
@@ -213,15 +209,6 @@ DefineAnimations("animations-dev-yard", {
 
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
-    })
-
-DefineAnimations("animations-vault", {
-    Still = {"frame 0", "wait 5", "frame 1", "wait 5", "frame 2", "wait 5", 
-        "frame 3", "wait 5", "frame 4", "wait 5", "frame 5", "wait 5", 
-        "frame 5", "wait 5", "frame 5", "wait 5", "frame 4", "wait 5", 
-        "frame 3", "wait 5", "frame 2", "wait 5", "frame 1", "wait 5", 
-        "frame 0", "wait 5", "frame 0", "wait 5", },
-    Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
     })
 
 DefineAnimations("animations-camp", {

@@ -33,23 +33,7 @@
 --
 --	NOTE: Save can generate this table.
 --
-DefineUnitType("unit-plate1", {
-	Name = "1x1 Ground Plate",
-	Image = {"file", "elites/buildings/plate.png", "size", {32, 32}},
-	Animations = "animations-plate", Icon = "icon-plate1",
-	Costs = {"time", 10, "titanium", 150, "crystal", 0},
-	RepairHp = 1, RepairCosts = {"titanium", 1},
-	Construction = "construction-plate",
-	Speed = 0, HitPoints = 100, DrawLevel = 1, TileSize = {1, 1}, BoxSize = {36, 36},
-	SightRange = 0, Armor = 20, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 20, AnnoyComputerFactor = 45, VisibleUnderFog = true,
-	Points = 15, Type = "land", Building = true, BuilderOutside = true,
-	Sounds = {
-		"selected", "gen-selected",
-		"ready", "gen-ready",
-		"help", "gen-help",
-		"dead", "gen-dead"}
-	})
+
 
 DefineUnitType("unit-apcs", {
 	Name = "APC Smolder",
@@ -286,7 +270,7 @@ DefineUnitType("unit-gen", {
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
 	Points = 100, Supply = 125, ExplodeWhenKilled = "missile-160x128-explosion",
 	Corpse = {"build-dead-body2", 0}, Type = "land",
-	--[[MustBuildOnTop = "unit-plate1", --]] Building = true, BuilderOutside = true,
+	Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	Sounds = {
 		"selected", "gen-selected",
@@ -314,26 +298,6 @@ DefineUnitType("unit-camp", {
 		"ready", "camp-ready",
 		"help", "camp-help",
 		"dead", "camp-dead"}
-	})
-
-DefineUnitType("unit-vault", {
-	Name = "Vault",
-	Image = {"file", "elites/buildings/vault.png", "size", {160, 220}},
-	Animations = "animations-vault", Icon = "icon-vault",
-	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
-	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
-	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {5, 4}, BoxSize = {164, 132},
-	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
-	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
-	Corpse = {"build-dead-body3", 0}, Type = "land",
-	Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	CanStore = {"crystal", "titanium"},
-	Sounds = {
-		"selected", "dev-selected",
-		"ready", "dev-ready",
-		"help", "dev-help",
-		"dead", "dev-dead"}
 	})
 
 DefineUnitType("unit-dev-yard", {
