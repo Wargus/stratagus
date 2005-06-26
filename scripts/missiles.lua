@@ -54,17 +54,17 @@ DefineMissileType("missile-bazoo", {
 	ImpactMissile = "missile-64x64-explosion"})
 
 DefineMissileType("missile-64x64-explosion", {
-	File = "nature/effects/expl_64x64x1.png",
+	File = "missiles/expl_64x64x1.png",
 	Size = {64, 64}, Frames = 7, NumDirections = 1, DrawLevel = 50,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 1})
 
 DefineMissileType("missile-160x128-explosion", {
-	File = "nature/effects/expl_160x128x1.png",
+	File = "missiles/expl_160x128x1.png",
 	Size = {160, 128}, Frames = 20, NumDirections = 1, DrawLevel = 50,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 1})
 
 DefineMissileType("missile-288x288-explosion", {
-	File = "nature/effects/expl_288x288x1.png",
+	File = "missiles/expl_288x288x1.png",
 	Size = {288, 288}, Frames = 20, NumDirections = 1, DrawLevel = 300,
 	Class = "missile-class-stay", Sleep = 1, Speed = 16, Range = 15})
 
