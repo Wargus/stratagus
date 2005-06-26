@@ -51,20 +51,6 @@ DefineAnimations("animations-apcs", {
         "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
     })
 
-DefineAnimations("animations-medic", {
-    Still = {"frame 0", "wait 1", },
-    Move = {"unbreakable begin", "frame 5", "move 4", "wait 2", 
-        "frame 5", "move 4", "wait 2", "frame 10", "move 4", "wait 2", 
-        "frame 10", "move 4", "wait 2", "frame 15", "move 4", "wait 2", 
-        "frame 15", "move 4", "wait 2", "frame 20", "move 4", "wait 2", 
-        "frame 20", "move 4", "wait 2", "frame 20", "unbreakable end", "wait 1", },
-    Attack = {"unbreakable begin", "frame 25", "wait 4", 
-        "frame 30", "sound medic-attack", "attack", "wait 4", 
-        "frame 0", "unbreakable end", "wait 1", },
-    Death = {"unbreakable begin", "frame 40", "wait 2", "frame 45", 
-        "wait 2", "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
-    })
-
 DefineAnimations("animations-bazoo", {
     Still = {"frame 0", "wait 1", },
     Move = {"unbreakable begin", "frame 5", "move 2", "wait 2", 

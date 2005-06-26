@@ -211,12 +211,6 @@ DefineButton({
 	ForUnit = {"unit-camp"}})
 
 DefineButton({
-	Pos = 1, Level = 0, Icon = "icon-medic",
-	Action = "train-unit", Value = "unit-medic",
-	Key = "m", Hint = "TRAIN ~!MEDIC",
-	ForUnit = {"unit-hosp"}})
-
-DefineButton({
 	Pos = 1, Level = 0, Icon = "icon-apcs",
 	Action = "train-unit", Value = "unit-apcs",
 	Key = "a", Hint = "BUILD ~!APC SMOLDER",
@@ -297,11 +291,6 @@ DefineButton({
 	ForUnit = {"unit-vault", "unit-camp"}})
 
 -- spells ----------------------------------------------------------
-DefineButton({
-	Pos = 3, Level = 0, Icon = "icon-heal",
-	Action = "cast-spell", Value = "spell-healing",
-	Allowed = "check-true", Key = "b", Hint = "~!BANDAGE",
-	ForUnit = {"unit-medic"}})
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-expl2",

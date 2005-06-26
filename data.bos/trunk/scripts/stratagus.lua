@@ -214,11 +214,11 @@ Load("scripts/sound.lua")
 Load("scripts/missiles.lua")
 Load("scripts/constructions.lua")
 Load("scripts/spells.lua")
+Load("units/vault/vault.lua")
 Load("scripts/units.lua")
 Load("scripts/fonts.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ui.lua")
-Load("units/vault/unit-vault.lua")
 
 -- Load extra units
 local list

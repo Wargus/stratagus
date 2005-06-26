@@ -60,31 +60,6 @@ DefineUnitType("unit-apcs", {
 		"dead", "apcs-die"}
 	})
 
-DefineUnitType("unit-medic", {
-	Name = "Medic",
-	Image = {"file", "elites/units/unit_medic.png", "size", {64, 64}},
-	Shadow = {"file", "elites/units/unit_medic_s.png", "size", {64, 64}},
-	Animations = "animations-medic", Icon = "icon-medic",
-	Costs = {"time", 50, "titanium", 25, "crystal", 150},
-	Speed = 15, HitPoints = 100, MaxMana = 100, CanCastSpell = {SpellHealing},
-	DrawLevel = 25, TileSize = {1, 1}, BoxSize = {17, 28},
-	SightRange = 3, ComputerReactionRange = 6, PersonReactionRange = 6,
-	Armor = 1, BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	MaxAttackRange = 1, Priority = 60, Points = 50,
-	Corpse = {"unit-dead-body5", 0},
-	Type = "land", CanTargetLand = true,
-	LandUnit = true, Demand = 0, organic = true,
-	SelectableByRectangle = true,
-	CanCastSpell = {"spell-healing"},
-	AutoCastActive = {"spell-healing"},
-	Sounds = {
-		"selected", "medic-selected",
-		"acknowledge", "medic-acknowledge",
-		"ready", "medic-ready",
-		"help", "medic-help",
-		"dead", "medic-die"}
-	})
-
 DefineUnitType("unit-bazoo", {
 	Name = "Bazoo",
 	Image = {"file", "elites/units/unit_bazoo.png", "size", {64, 64}},
@@ -379,7 +354,7 @@ DefineUnitType("unit-vfac", {
 		"dead", "vfac-dead"}
 	})
 
-CorpseTable = {"assault", "engineer", "grenadier", "bazoo", "medic"}
+CorpseTable = {"assault", "engineer", "grenadier", "bazoo"}
 for i = 1, table.getn(CorpseTable) do
 	DefineUnitType("unit-dead-body" .. i, {
 		Name = CorpseTable[i] .. "body",

@@ -100,13 +100,6 @@ MakeSound("apcs-help", "elites/computer_voice/smolder.underattack.wav")
 MakeSound("apcs-die", "elites/units/smolder_die.wav")
 MakeSound("apcs-attack", "elites/units/smolder_attack.wav")
 
-MakeSound("medic-selected", "elites/units/medic_select.wav")
-MakeSound("medic-acknowledge", "elites/units/medic_action.wav")
-MakeSound("medic-ready", "elites/computer_voice/medic.ready.wav")
-MakeSound("medic-help", "elites/computer_voice/medic.underattack.wav")
-MakeSound("medic-die", "elites/units/medic_die.wav")
-MakeSound("medic-attack", "elites/units/medic_attack.wav")
-
 -- BUILDINGS
 MakeSound("gen-selected", "elites/buildings/sfx_pplnt.select.wav")
 MakeSound("gen-ready", "elites/computer_voice/power.plant.completed.wav")
