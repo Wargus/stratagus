@@ -32,25 +32,6 @@ DefineBoolFlags("organic")
 DefineVariables("Speed")
 DefineVariables("Level")
 
-DefineSpell("spell-healing",
-	"showname", "Bandage",
-	"manacost", 3,
-	"range",  1,
-	"target", "unit",
-	"action", {	{"spawn-missile", "missile", "missile-heal", "start-point", {"base", "target"} }, 
-				{"adjust-vitals", "hit-points", 1}},
-	"condition", {
-		"organic", "only",
-		"Building", "false",
-		"self", "false",
-		"HitPoints", {MaxValuePercent = 100}},
-	"sound-when-cast", "medic-attack",
-	"autocast", {
-		"range", 6,
-		"condition", {"alliance", "only", 
-		"HitPoints", {MaxValuePercent = 90}}}
-)
-
 DefineSpell("spell-nuke",
 	"showname", "Nuclear Attack",
 	"manacost", 300,

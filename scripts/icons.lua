@@ -57,12 +57,6 @@ DefineIcon({
 	File = "elites/units/ico_bazoo.png"})
 
 DefineIcon({
-	Name = "icon-medic",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_medic.png"})
-
-DefineIcon({
 	Name = "icon-engineer",
 	Size = {46, 38},
 	Frame = 0,
@@ -193,12 +187,6 @@ DefineIcon({
 	Size = {46, 38},
 	Frame = 0,
 	File = "elites/research/res_avoid.png"})
-
-DefineIcon({
-	Name = "icon-heal",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/special/ico_heal.png"})
 
 DefineIcon({
 	Name = "icon-build-lvl1",
