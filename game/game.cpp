@@ -266,8 +266,7 @@ static void LoadMap(const char* filename, WorldMap* map)
 		if (!strcmp(tmp, ".gz")) {
 			while (tmp - 1 > filename && *--tmp != '.') {
 			}
-		} else
-		//MAPTODO this "else" looks buggy. check.
+		}
 #endif
 #ifdef USE_BZ2LIB
 		if (!strcmp(tmp, ".bz2")) {
