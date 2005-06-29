@@ -574,6 +574,7 @@ DefineMenuItem("pos", { 220, (10 + 300) - 20}, "font", "game",
 DefineMenuItem("pos", { 220, 10 + 300}, "font", "game",
   "pulldown",  {"size", {152, 20},
     "style", "pulldown",
+    "options", {"default"},
     "func", "game-tss-action",
     "state", "passive"},
   "menu", "menu-net-multi-client")
