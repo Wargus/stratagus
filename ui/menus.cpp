@@ -545,7 +545,7 @@ static int GenericRDFilter(char *pathbuf, FileList *fl, const char *suf[], int w
 
 		info = DuplicateMapInfo(&TheMap.Info);
 		FreeMapInfo(&TheMap.Info);
-		LuaLoadFile(pathbuf);
+		LoadStratagusMapInfo(pathbuf);
 
 		if ((width != -1 && TheMap.Info.MapWidth != width) ||
 			(height != -1 && TheMap.Info.MapHeight != height)) {
@@ -2607,7 +2607,7 @@ static void GetInfoFromSelectPath(void)
 	}
 	strcat(ScenSelectPath, ScenSelectFileName); // Final map name with path
 	if (strcasestr(ScenSelectFileName, ".smp")) {
-		LuaLoadFile(ScenSelectPath);
+		LoadStratagusMapInfo(ScenSelectPath);
 	}
 	ScenSelectPath[i] = '\0'; // Remove appended part
 }
@@ -3248,7 +3248,7 @@ static void ScenSelectOk(void)
 		strcat(ScenSelectDisplayPath, ScenSelectPathName);
 		ScenSelectLBInit(mi);
 	} else if (ScenSelectFileName[0]){
-		strcpy(CurrentMapPath, ScenSelectPath);
+		strcpy(CurrentMapPath, ScenSelectDisplayPath);
 		if (CurrentMapPath[0]) {
 			strcat(CurrentMapPath, "/");
 		}
@@ -4125,7 +4125,7 @@ int NetClientSelectScenario(void)
 	}
 
 	FreeMapInfo(&TheMap.Info);
-	LuaLoadFile(MenuMapFullPath);
+	LoadStratagusMapInfo(MenuMapFullPath);
 	return 0;
 }
 
@@ -4390,7 +4390,7 @@ static void EditorMainLoadMap(void)
 	} else {
 		strcpy(CurrentMapPath, ScenSelectFileName);
 	}
-
+	
 	GuiGameStarted = 1;
 	EndMenu();
 }

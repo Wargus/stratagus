@@ -50,7 +50,6 @@
 #include "unit.h"
 #include "unittype.h"
 #include "spells.h"
-#include "campaign.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -4389,10 +4388,9 @@ static int CclPresentMap(lua_State* l)
 static int CclDefineMapSetup(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheMap.Info.Filename = strdup(CurrentMapPath);
-	// FIXME: until we combine to 1 file
-	TheMap.Info.Filename[strlen(TheMap.Info.Filename) - 1] = 's';
-	printf("filename = %s\n", TheMap.Info.Filename);
+	free(TheMap.Info.Filename);
+	TheMap.Info.Filename = strdup(LuaToString(l, 1));
+
 	return 0;
 }
 
