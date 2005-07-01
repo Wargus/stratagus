@@ -277,7 +277,7 @@ static void LoadMap(const char* filename, WorldMap* map)
 		if (!strcmp(tmp, ".smp")) {
 			if (!TheMap.Info.Filename) {
 				// The map info hasn't been loaded yet => do it now
-				LuaLoadFile(filename);
+				LoadStratagusMapInfo(filename);
 			}
 			Assert(TheMap.Info.Filename);
 			CreateMap(TheMap.Info.MapWidth, TheMap.Info.MapHeight);

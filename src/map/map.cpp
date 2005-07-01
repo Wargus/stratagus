@@ -765,4 +765,20 @@ void RegenerateForest(void)
 	}
 }
 
+
+/**
+**  Load the map presentation
+**
+**  @param mapname    map filename
+**/
+void LoadStratagusMapInfo(const char* mapname) 
+{
+	// Set the default map setup by replacing .smp with .sms
+	free(TheMap.Info.Filename);
+	TheMap.Info.Filename = strdup(mapname);
+	memcpy(strstr(TheMap.Info.Filename, ".smp"), ".sms", 4);
+	
+	LuaLoadFile(mapname);
+}
+
 //@}

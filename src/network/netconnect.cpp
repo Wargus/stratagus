@@ -1312,6 +1312,7 @@ static void ServerParseResync(const int h)
 	}
 }
 
+
 /**
 ** Parse client heart beat waiting message
 **
@@ -1322,7 +1323,6 @@ static void ServerParseWaiting(const int h)
 	int i;
 	int n;
 	InitMessage message;
-	int pathlen;
 
 	ServerSetupState.LastFrame[h] = FrameCounter;
 	NetConnectForceDisplayUpdate();
@@ -1337,8 +1337,7 @@ static void ServerParseWaiting(const int h)
 			// this code path happens until client acknoledges the map
 			message.Type = MessageInitReply;
 			message.SubType = ICMMap; // Send Map info to the client
-			pathlen = strlen(StratagusLibPath) + 1;
-			memcpy(message.u.MapPath, MenuMapFullPath + pathlen, 256);
+			strncpy(message.u.MapPath, CurrentMapPath, 256);
 			message.MapUID = htonl(TheMap.Info.MapUID);
 			n = NetworkSendICMessage(NetLastHost, NetLastPort, &message);
 			DebugPrint("Sending InitReply Message Map: (%d) to %d.%d.%d.%d:%d\n" _C_
