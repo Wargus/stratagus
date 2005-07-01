@@ -48,7 +48,6 @@
 #include "player.h"
 #include "network.h"
 #include "netconnect.h"
-#include "campaign.h" // for CurrentMapPath
 #include "script.h"
 #include "commands.h"
 #include "interface.h"

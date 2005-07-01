@@ -272,6 +272,7 @@ typedef struct _world_map_ {
 ----------------------------------------------------------------------------*/
 
 extern WorldMap TheMap;  /// The current map
+extern char CurrentMapPath[]; /// Path to the current map
 
 	/// Vision Table to see where to locate goals and vision
 extern unsigned char* VisionTable[3];
@@ -395,6 +396,8 @@ extern int SaveStratagusMap(const char* filename, WorldMap* map);
 	/// Clean the map
 extern void CleanMap(void);
 
+	/// Load map presentation
+extern void LoadStratagusMapInfo(const char* mapname);
 	/// Release info for a map
 extern void FreeMapInfo(MapInfo* info);
 

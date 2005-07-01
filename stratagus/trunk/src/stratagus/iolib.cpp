@@ -45,7 +45,7 @@
 #include "stratagus.h"
 #include "iocompat.h"
 
-#include "campaign.h" // for CurrentMapPath
+#include "map.h" // for CurrentMapPath
 
 #include "iolib.h"
 
