@@ -68,6 +68,7 @@
 <a href="#GetPlayerData">GetPlayerData</a>
 <a href="#GetThisPlayer">GetThisPlayer</a>
 <a href="#GetUnitVariable">GetUnitVariable</a>
+<a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
 <a href="#Group">Group</a>
 <a href="#KillUnit">KillUnit</a>
 <a href="#KillUnitAt">KillUnitAt</a>
@@ -648,6 +649,16 @@ Returns the current game cycle.
     cycle = GameCycle()
 </pre>
 
+<a name="GetCurrentLuaPath">
+<h3>GetCurrentLuaPath()</h3>
+
+Returns the path of the currenly interpreted lua script.
+
+<h4>Examples</h4>
+<pre>
+    print(GetCurrentLuaPath())
+    Load(GetCurrentLuaPath().."unit.lua")
+</pre>
 
 <a name="GetPlayerData"></a>
 <h3>GetPlayerData(player, property)</h3>

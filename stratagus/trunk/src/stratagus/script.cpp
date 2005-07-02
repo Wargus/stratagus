@@ -85,6 +85,7 @@ char* CclStartFile;                   /// CCL start file
 char* GameName;                       /// Game Preferences
 int CclInConfigFile;                  /// True while config file parsing
 int SaveGameLoading;                  /// If a Saved Game is Loading
+const char* CurrentLuaFile;                 /// Lua file currently being interpreted
 
 char* Tips[MAX_TIPS + 1];             /// Array of tips
 int ShowTips;                         /// Show tips at start of level
@@ -203,6 +204,10 @@ int LuaLoadFile(const char* file)
 	int location;
 	char* buf;
 	CLFile* fp;
+	const char *PreviousLuaFile;
+
+	PreviousLuaFile = CurrentLuaFile;
+	CurrentLuaFile = file;
 
 	if (!(fp = CLopen(file, CL_OPEN_READ))) {
 		fprintf(stderr,"Can't open file '%s': %s\n",
@@ -230,7 +235,22 @@ int LuaLoadFile(const char* file)
 		report(status);
 	}
 	free(buf);
+	CurrentLuaFile = PreviousLuaFile;
+
 	return status;
+}
+
+static int CclGetCurrentLuaPath(lua_State* l)
+{
+	char *path;
+
+	LuaCheckArgs(l, 0);
+	path = strdup(CurrentLuaFile);
+	Assert(path);
+	*strrchr(path, '/') = 0;
+	lua_pushstring(l, path);
+	free(path);
+	return 1;
 }
 
 /**
@@ -2408,6 +2428,7 @@ void InitCcl(void)
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
+	lua_register(Lua, "GetCurrentLuaPath", CclGetCurrentLuaPath);
 	lua_register(Lua, "SaveGame", CclSaveGame);
 
 	AliasRegister();
