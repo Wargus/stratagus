@@ -31,6 +31,8 @@ from stat import *
 ccflags = "-fsigned-char"
 customDefines = "USE_HP_FOR_XP MAP_REGIONS"
 
+SConsignFile()
+
 if os.path.exists("build_config.py")  \
      and os.stat("build_config.py")[ST_MTIME] < os.stat("SConstruct")[ST_MTIME]:
    # Remove outdated build_config.py
