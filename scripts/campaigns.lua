@@ -38,7 +38,7 @@ local ff
 list = ListDirectory("campaigns/")
 for i,f in list do
   if not(string.find(f, "^%.")) then
-     subdirlist = ListDirectory("campaigns/" .. f)
+     local subdirlist = ListDirectory("campaigns/" .. f)
      for i, ff in subdirlist do
         if(string.find(ff, "^campaign.*%.lua$")) then
           print("Found a campaign: " .. ff)

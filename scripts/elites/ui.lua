@@ -10,7 +10,7 @@
 --
 --      ui.lua - Define the elites user interface
 --
---      (c) Copyright 2001-2004 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
+--      (c) Copyright 2001-2005 by Lutz Sammer, Jimmy Salmon, Crestez Leonard,
 --                                 and François Beerten.
 --
 --      This program is free software; you can redistribute it and/or modify
@@ -206,18 +206,18 @@ end
 
 
 function DefineEliteScreen(screen_width, screen_height)
-	info_panel_x = screen_width - 200
-	info_panel_y = 160 - 8
+	local info_panel_x = screen_width - 200
+	local info_panel_y = 160 - 8
 
 	DefineElitePanels(info_panel_x, info_panel_y)
-	ui = {"elites", screen_width, screen_height,
+	local ui = {"elites", screen_width, screen_height,
 		"normal-font-color", "light-blue",
 		"reverse-font-color", "yellow"}
 	-- no menu panel ?
 	-- minimap
 	AddFiller(ui, "elites/ui/ui_minimap.png", {screen_width - 200, 24-8})
 
-	ui2 = {
+	local ui2 = {
 		"resources", {
 			"titanium", {
 				File = "elites/ui/ui_res_icons.png", Frame = 0,

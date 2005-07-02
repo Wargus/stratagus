@@ -354,7 +354,7 @@ DefineUnitType("unit-vfac", {
 		"dead", "vfac-dead"}
 	})
 
-CorpseTable = {"assault", "engineer", "grenadier", "bazoo"}
+local CorpseTable = {"assault", "engineer", "grenadier", "bazoo"}
 for i = 1, table.getn(CorpseTable) do
 	DefineUnitType("unit-dead-body" .. i, {
 		Name = CorpseTable[i] .. "body",
