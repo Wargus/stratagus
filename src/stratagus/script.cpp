@@ -243,12 +243,18 @@ int LuaLoadFile(const char* file)
 static int CclGetCurrentLuaPath(lua_State* l)
 {
 	char *path;
+	char *seperator;
 
 	LuaCheckArgs(l, 0);
 	path = strdup(CurrentLuaFile);
 	Assert(path);
-	*strrchr(path, '/') = 0;
-	lua_pushstring(l, path);
+	seperator = strrchr(path, '/');
+	if (seperator) {
+		*seperator = 0;
+		lua_pushstring(l, path);
+	} else {
+		lua_pushstring(l, "");
+	}
 	free(path);
 	return 1;
 }
