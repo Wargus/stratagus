@@ -55,7 +55,7 @@ SetDefaultMap="maps/default.smp"
 --	Music play list -	Insert your titles here
 -------------------------------------------------------------------------------
 playlist = {}
-musiclist = ListDirectory("music/")
+local musiclist = ListDirectory("music/")
 for i,f in musiclist do
   if(string.find(f, ".ogg$") or string.find(f, ".wav$") or string.find(f, ".mp3$")) then 
     print("Added music file:" .. f) 
@@ -229,7 +229,7 @@ local ff
 list = ListDirectory("units/")
 for i,f in list do
   if not(string.find(f, "^%.")) then
-     subdirlist = ListDirectory("units/" .. f)
+     local subdirlist = ListDirectory("units/" .. f)
      for i, ff in subdirlist do
         if(string.find(ff, "^unit-.*%.lua$")) then
           print("Loading unit: " .. ff)
