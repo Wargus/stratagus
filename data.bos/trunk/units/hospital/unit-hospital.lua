@@ -28,16 +28,30 @@
 --
 --	$Id$
 
-DefineAnimations("animations-hosp", {
-    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
-        "frame 3", "wait 2", },
-    })
 DefineIcon({
 	Name = "icon-hosp",
 	Size = {46, 38},
 	Frame = 0,
 	File = GetCurrentLuaPath().."/hospital_i.png"})
 
+DefineConstruction("construction-hosp", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 4},
+		{Percent = 10, File = "main", Frame = 5},
+		{Percent = 20, File = "main", Frame = 6},
+		{Percent = 30, File = "main", Frame = 7},
+		{Percent = 40, File = "main", Frame = 8},
+		{Percent = 50, File = "main", Frame = 9},
+		{Percent = 60, File = "main", Frame = 10},
+		{Percent = 70, File = "main", Frame = 11},
+		{Percent = 80, File = "main", Frame = 12},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+})
+DefineAnimations("animations-hosp", {
+    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
+        "frame 3", "wait 2", },
+    })
 DefineUnitType("unit-hosp", {
 	Name = "Hospital",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {128, 96}},

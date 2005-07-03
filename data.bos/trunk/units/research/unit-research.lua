@@ -34,6 +34,20 @@ DefineIcon({
 	Frame = 0,
 	File = GetCurrentLuaPath().."/research_facility_i.png"})
 
+DefineConstruction("construction-rfac", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 2},
+		{Percent = 10, File = "main", Frame = 3},
+		{Percent = 20, File = "main", Frame = 4},
+		{Percent = 30, File = "main", Frame = 5},
+		{Percent = 40, File = "main", Frame = 6},
+		{Percent = 50, File = "main", Frame = 7},
+		{Percent = 60, File = "main", Frame = 8},
+		{Percent = 70, File = "main", Frame = 9},
+		{Percent = 80, File = "main", Frame = 10},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+    })
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })

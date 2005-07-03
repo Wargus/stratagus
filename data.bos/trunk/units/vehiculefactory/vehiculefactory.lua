@@ -34,6 +34,20 @@ DefineIcon({
 	Frame = 0,
 	File = GetCurrentLuaPath().."/vehicle_factory_i.png"})
 
+DefineConstruction("construction-vfac", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 20},
+		{Percent = 10, File = "main", Frame = 21},
+		{Percent = 20, File = "main", Frame = 22},
+		{Percent = 30, File = "main", Frame = 23},
+		{Percent = 40, File = "main", Frame = 24},
+		{Percent = 50, File = "main", Frame = 25},
+		{Percent = 60, File = "main", Frame = 26},
+		{Percent = 70, File = "main", Frame = 27},
+		{Percent = 80, File = "main", Frame = 28},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+    })
 DefineAnimations("animations-vfac", {
     Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
         "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 

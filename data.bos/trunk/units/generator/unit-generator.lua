@@ -28,26 +28,31 @@
 --
 --	$Id$
 
-DefineAnimations("animations-gen", {
-    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
-        "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
-        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
-    })
 DefineIcon({
 	Name = "icon-gen",
 	Size = {46, 38},
 	Frame = 0,
 	File = GetCurrentLuaPath().."/generator_i.png"})
 
-DefineUnitType("build-dead-body2", {
-	Name = "GeneratorCrater",
-	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
-	Animations = "animations-elitebuild2", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
-	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
-	})
+DefineConstruction("construction-gen", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 9},
+		{Percent = 10, File = "main", Frame = 10},
+		{Percent = 20, File = "main", Frame = 11},
+		{Percent = 30, File = "main", Frame = 12},
+		{Percent = 40, File = "main", Frame = 13},
+		{Percent = 50, File = "main", Frame = 14},
+		{Percent = 60, File = "main", Frame = 15},
+		{Percent = 70, File = "main", Frame = 16},
+		{Percent = 80, File = "main", Frame = 17},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+    })
+DefineAnimations("animations-gen", {
+    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
+        "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
+        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
+    })
 DefineUnitType("unit-gen", {
 	Name = "Generator",
 	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
@@ -67,4 +72,13 @@ DefineUnitType("unit-gen", {
 		"ready", "gen-ready",
 		"help", "gen-help",
 		"dead", "gen-dead"}
+	})
+DefineUnitType("build-dead-body2", {
+	Name = "GeneratorCrater",
+	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
+	Animations = "animations-elitebuild2", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
+	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})

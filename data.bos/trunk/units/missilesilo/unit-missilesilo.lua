@@ -8,7 +8,7 @@
 --			  T H E   W A R   B E G I N S
 --	   Stratagus - A free fantasy real time strategy game engine
 --
---	unit-missilesilor.lua	-	Define the missile silo unit
+--	unit-missilesilo.lua	-	Define the missile silo unit
 --
 --	(c) Copyright 2001 - 2005 by François Beerten, Lutz Sammer and Crestez Leonard
 --
@@ -28,6 +28,26 @@
 --
 --	$Id$
 
+DefineIcon({
+	Name = "icon-msilo",
+	Size = {46, 38},
+	Frame = 0,
+	File = GetCurrentLuaPath().."/missile_silo_i.png"})
+
+DefineConstruction("construction-msilo", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 7},
+		{Percent = 10, File = "main", Frame = 7},
+		{Percent = 20, File = "main", Frame = 8},
+		{Percent = 30, File = "main", Frame = 9},
+		{Percent = 40, File = "main", Frame = 10},
+		{Percent = 50, File = "main", Frame = 11},
+		{Percent = 60, File = "main", Frame = 11},
+		{Percent = 70, File = "main", Frame = 12},
+		{Percent = 80, File = "main", Frame = 13},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+})
 DefineAnimations("animations-msilo", {
     Still = {"frame 0", "wait 1", },
     Attack = {"unbreakable begin", "frame 1", "wait 1", 
@@ -36,11 +56,6 @@ DefineAnimations("animations-msilo", {
         "frame 6", "sound msilo-attack", "attack", "wait 25", 
         "frame 6", "unbreakable end", "wait 1", },
     })
-DefineIcon({
-	Name = "icon-msilo",
-	Size = {46, 38},
-	Frame = 0,
-	File = GetCurrentLuaPath().."/missile_silo_i.png"})
 DefineUnitType("unit-msilo", {
 	Name = "Missile Silo",
 	Image = {"file", GetCurrentLuaPath().."/missile_silo.png", "size", {128, 128}},

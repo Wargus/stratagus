@@ -28,26 +28,30 @@
 --
 --	$Id$
 
-DefineAnimations("animations-dev-yard", {
-    Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
-        "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
-    })
-
 DefineIcon({
 	Name = "icon-dev",
 	Size = {46, 38},
 	Frame = 0,
 	File = GetCurrentLuaPath() .. "/development_yard_i.png"})
 
-DefineUnitType("build-dead-body1", {
-	Name = "DevelopmentyardCrater",
-	Image = {"file", GetCurrentLuaPath().."/development_yard.png", "size", {224, 196}},
-	Animations = "animations-elitebuild1", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {7, 6}, BoxSize = {220, 192},
-	SightRange = 1, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 0, Type = "land",
-	Building = true, Vanishes = true, Sounds = {}})
+DefineConstruction("construction-gen", {
+	Constructions = {
+		{Percent = 0, File = "main", Frame = 9},
+		{Percent = 10, File = "main", Frame = 10},
+		{Percent = 20, File = "main", Frame = 11},
+		{Percent = 30, File = "main", Frame = 12},
+		{Percent = 40, File = "main", Frame = 13},
+		{Percent = 50, File = "main", Frame = 14},
+		{Percent = 60, File = "main", Frame = 15},
+		{Percent = 70, File = "main", Frame = 16},
+		{Percent = 80, File = "main", Frame = 17},
+		{Percent = 90, File = "main", Frame = 0}
+	}
+    })
+DefineAnimations("animations-dev-yard", {
+    Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
+        "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
+    })
 DefineUnitType("unit-dev-yard", {
 	Name = "Development yard",
 	Image = {"file", GetCurrentLuaPath() .. "/development_yard.png", "size", {224, 196}},
@@ -66,3 +70,12 @@ DefineUnitType("unit-dev-yard", {
 		"help", "dev-help",
 		"dead", "dev-dead"}
 	})
+DefineUnitType("build-dead-body1", {
+	Name = "DevelopmentyardCrater",
+	Image = {"file", GetCurrentLuaPath().."/development_yard.png", "size", {224, 196}},
+	Animations = "animations-elitebuild1", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,
+	TileSize = {7, 6}, BoxSize = {220, 192},
+	SightRange = 1, BasicDamage = 0, PiercingDamage = 0,
+	Missile = "missile-none", Priority = 0, Type = "land",
+	Building = true, Vanishes = true, Sounds = {}})
