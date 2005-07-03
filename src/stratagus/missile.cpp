@@ -767,28 +767,29 @@ static void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
 {
 	int dir;
 	int nextdir;
+	int neg;
 
 	if (missile->Type->NumDirections == 1 || (dx == 0 && dy == 0)) {
 		return;
 	}
-	// reinitialise the direction but with skipping Animation step.
+
 	if (missile->SpriteFrame < 0) {
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
+		neg = 1;
+	} else {
+		neg = 0;
 	}
 	missile->SpriteFrame /= missile->Type->NumDirections / 2 + 1;
 	missile->SpriteFrame *= missile->Type->NumDirections / 2 + 1;
 
-	nextdir = 128 / (missile->Type->NumDirections - 1);
+	nextdir = 256 / missile->Type->NumDirections;
 	Assert(nextdir != 0);
 	dir = ((DirectionToHeading(10 * dx, 10 * dy) + nextdir / 2) & 0xFF) / nextdir;
-	if (dir >= missile->Type->NumDirections) {
-		dir -= (missile->Type->NumDirections - 1) * 2;
-	}
-	Assert(dir < missile->Type->NumDirections);
-	Assert(dir >= -missile->Type->NumDirections + 1);
-	missile->SpriteFrame = dir;
-	if (missile->SpriteFrame < 0) {
-		missile->SpriteFrame--;
+	if (dir <= LookingS / nextdir) { // north->east->south
+		missile->SpriteFrame += dir;
+	} else {
+		missile->SpriteFrame += 256 / nextdir - dir;
+		missile->SpriteFrame = -missile->SpriteFrame - 1;
 	}
 }
 
@@ -1093,7 +1094,7 @@ static int NextMissileFrame(Missile* missile, char sign, char longAnimation)
 	//
 	neg = 0;
 	animationIsFinished = 0;
-	numDirections = missile->Type->NumDirections;
+	numDirections = missile->Type->NumDirections / 2 + 1;
 	if (missile->SpriteFrame < 0) {
 		neg = 1;
 		missile->SpriteFrame = -missile->SpriteFrame - 1;
@@ -1154,7 +1155,7 @@ static void NextMissileFrameCycle(Missile* missile)
 	}
 	totalx = abs(missile->DX - missile->SourceX);
 	dx = abs(missile->X - missile->SourceX);
-	f = missile->Type->SpriteFrames / missile->Type->NumDirections;
+	f = missile->Type->SpriteFrames / (missile->Type->NumDirections / 2 + 1);
 	f = 2 * f - 1;
 	for (i = 1, j = 1; i <= f; ++i) {
 		if (dx * f / i < totalx) {
@@ -1163,8 +1164,8 @@ static void NextMissileFrameCycle(Missile* missile)
 			} else {
 				j = f - i;
 			}
-			missile->SpriteFrame = missile->SpriteFrame % missile->Type->NumDirections +
-				j * missile->Type->NumDirections;
+			missile->SpriteFrame = missile->SpriteFrame % (missile->Type->NumDirections / 2 + 1) +
+				j * (missile->Type->NumDirections / 2 + 1);
 			break;
 		}
 	}
