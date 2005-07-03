@@ -92,3 +92,5 @@ DefineUnitType("build-dead-body7", {
 	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
 	Type = "land" , Building = true, Vanishes = true})
+
+DefineAllow("unit-msilo", "AAAAAAAAAAAAAAAA")

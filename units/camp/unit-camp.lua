@@ -87,3 +87,6 @@ DefineUnitType("build-dead-body3", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
+DefineAllow("unit-camp", "AAAAAAAAAAAAAAAA")
+
+

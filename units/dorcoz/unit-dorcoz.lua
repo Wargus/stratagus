@@ -75,6 +75,8 @@ DefineUnitType("unit-dorcoz", {
                 "dead", "basic terras voices dead"}
         })
 
+DefineAllow("unit-dorcoz", "AAAAAAAAAAAAAAAA")
+
 DefineButton({
         Pos = 4, Level = 0, Icon = "icon-dorcoz",
         Action = "train-unit", Value = "unit-dorcoz",

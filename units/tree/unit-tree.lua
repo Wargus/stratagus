@@ -69,7 +69,6 @@ DefineUnitType("unit-tree", {
 })
 
 DefineAllow("unit-tree", "AAAAAAAAAAAAAAAA")
-DefineDependency("unit-tree", {})
 
 
 
