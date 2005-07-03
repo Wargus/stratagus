@@ -188,11 +188,6 @@ DefineAnimations("animations-gen", {
         "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
     })
 
-DefineAnimations("animations-dev-yard", {
-    Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
-        "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
-    })
-
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
