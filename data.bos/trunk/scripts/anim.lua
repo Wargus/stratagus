@@ -207,12 +207,6 @@ DefineAnimations("animations-elitebuild5", {
         "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
 
-DefineAnimations("animations-elitebuild6", {
-    Death = {"unbreakable begin", "wait 1", "frame 30", "wait 2000", 
-        "frame 30", "wait 200", "frame 30", "wait 200", "frame 31", "wait 200",
-        "frame 31", "wait 200", "frame 31", "wait 1", "unbreakable end", "wait 1", },
-    })
-
 DefineAnimations("animations-elitebuild7", {
     Death = {"unbreakable begin", "wait 1", "frame 14", "wait 2000", 
         "frame 14", "wait 200", "frame 14", "wait 200", "frame 15", "wait 200",
