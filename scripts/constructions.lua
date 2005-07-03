@@ -28,8 +28,6 @@
 --
 --	$Id$
 
-Load("scripts/elites/constructions.lua")
-
 DefineConstruction("construction-none", {
 	Files = {
 		File = "neutral/buildings/land_construction_site.png",
