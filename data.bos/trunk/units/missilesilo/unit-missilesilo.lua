@@ -79,6 +79,11 @@ DefineUnitType("unit-msilo", {
 		"help", "gen-help",
 		"dead", "gen-dead"}
 	})
+DefineAnimations("animations-elitebuild7", {
+    Death = {"unbreakable begin", "wait 1", "frame 14", "wait 2000", 
+        "frame 14", "wait 200", "frame 14", "wait 200", "frame 15", "wait 200",
+        "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
+    })
 DefineUnitType("build-dead-body7", {
 	Name = "SiloCrater",
 	Image = {"file", GetCurrentLuaPath().."/missile_silo.png", "size", {128, 128}},

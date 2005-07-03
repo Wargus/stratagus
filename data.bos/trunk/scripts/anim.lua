@@ -168,17 +168,6 @@ DefineAnimations("animations-harvester", {
     Death = {"unbreakable begin", "frame 0", "wait 5", "frame 0", "wait 5", 
         "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
         })
-
--------------------------------
--------- Elite Buildings ------
--------------------------------
-
-DefineAnimations("animations-vfac", {
-    Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
-        "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
-        "frame 6", "wait 3", "frame 7", "wait 3", "frame 8", "wait 3", },
-    })
-
 ----------------------
 -------- Nature ------
 ----------------------
@@ -188,30 +177,6 @@ DefineAnimations("animations-elitecorpse1", {
         "frame 0", "wait 200", "frame 5", "wait 200", "frame 10", "wait 200", 
         "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
     }) 
-
-DefineAnimations("animations-elitebuild1", {
-    Death = {"unbreakable begin", "wait 1", "frame 16", "wait 2000", 
-        "frame 16", "wait 200", "frame 16", "wait 200", "frame 17", "wait 200",
-        "frame 17", "wait 200", "frame 17", "wait 1", "unbreakable end", "wait 1", },
-    }) 
-
-DefineAnimations("animations-elitebuild2", {
-    Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
-        "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
-        "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
-    })
-
-DefineAnimations("animations-elitebuild5", {
-    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
-        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
-        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
-    })
-
-DefineAnimations("animations-elitebuild7", {
-    Death = {"unbreakable begin", "wait 1", "frame 14", "wait 2000", 
-        "frame 14", "wait 200", "frame 14", "wait 200", "frame 15", "wait 200",
-        "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
-    })
 
 ---------------------------------------
 -- Misc.

@@ -34,20 +34,19 @@ DefineIcon({
 	Frame = 0,
 	File = GetCurrentLuaPath() .. "/development_yard_i.png"})
 
-DefineConstruction("construction-gen", {
-	Constructions = {
-		{Percent = 0, File = "main", Frame = 9},
-		{Percent = 10, File = "main", Frame = 10},
-		{Percent = 20, File = "main", Frame = 11},
-		{Percent = 30, File = "main", Frame = 12},
-		{Percent = 40, File = "main", Frame = 13},
-		{Percent = 50, File = "main", Frame = 14},
-		{Percent = 60, File = "main", Frame = 15},
-		{Percent = 70, File = "main", Frame = 16},
-		{Percent = 80, File = "main", Frame = 17},
-		{Percent = 90, File = "main", Frame = 0}
-	}
-    })
+DefineConstruction("construction-dev-yard", {
+        Constructions = {
+                {Percent = 0, File = "main", Frame = 7},
+                {Percent = 11, File = "main", Frame = 8},
+                {Percent = 22, File = "main", Frame = 9},
+                {Percent = 33, File = "main", Frame = 10},
+                {Percent = 44, File = "main", Frame = 11},
+                {Percent = 55, File = "main", Frame = 12},
+                {Percent = 66, File = "main", Frame = 13},
+                {Percent = 77, File = "main", Frame = 14},
+                {Percent = 88, File = "main", Frame = 14}
+       }
+   })
 DefineAnimations("animations-dev-yard", {
     Still = {"frame 1", "wait 20", "frame 2", "wait 20", "frame 3", "wait 20", 
         "frame 4", "wait 50", "frame 5", "wait 20", "frame 6", "wait 50", },
@@ -70,6 +69,11 @@ DefineUnitType("unit-dev-yard", {
 		"help", "dev-help",
 		"dead", "dev-dead"}
 	})
+DefineAnimations("animations-elitebuild1", {
+    Death = {"unbreakable begin", "wait 1", "frame 16", "wait 2000", 
+        "frame 16", "wait 200", "frame 16", "wait 200", "frame 17", "wait 200",
+        "frame 17", "wait 200", "frame 17", "wait 1", "unbreakable end", "wait 1", },
+    }) 
 DefineUnitType("build-dead-body1", {
 	Name = "DevelopmentyardCrater",
 	Image = {"file", GetCurrentLuaPath().."/development_yard.png", "size", {224, 196}},
