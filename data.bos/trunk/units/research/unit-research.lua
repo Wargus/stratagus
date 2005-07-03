@@ -84,3 +84,7 @@ DefineUnitType("build-dead-body4", {
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
+
+DefineAllow("unit-rfac", "AAAAAAAAAAAAAAAA")
+
+

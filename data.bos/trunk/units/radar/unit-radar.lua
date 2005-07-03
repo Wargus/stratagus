@@ -88,7 +88,6 @@ DefineUnitType("radar_destroyed", {
 })
 
 DefineAllow("unit-radar", "AAAAAAAAAAAAAAAA")
-DefineDependency("unit-radar", {"unit-vault"})
 
 DefineButton({
 	Pos = 4, Level = 1, Icon = "icon-radar_b", Action = "build",

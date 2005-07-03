@@ -108,7 +108,6 @@ DefineUnitType("unit-buggy", {
 })
 
 DefineAllow("unit-buggy", "AAAAAAAAAAAAAAAA")
-DefineDependency("unit-buggy", {"unit-vault"})
 
 DefineButton({
 	Pos = 3, Level = 0, Icon = "icon-buggy", Action = "train-unit",
