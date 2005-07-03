@@ -177,11 +177,6 @@ DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
 
-DefineAnimations("animations-hosp", {
-    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
-        "frame 3", "wait 2", },
-    })
-
 DefineAnimations("animations-vfac", {
     Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
         "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
