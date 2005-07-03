@@ -186,10 +186,6 @@ DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
 
-DefineAnimations("animations-camp", {
-    Still = {"frame 0", "wait 3", },
-    })
-
 DefineAnimations("animations-hosp", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", },
@@ -221,12 +217,6 @@ DefineAnimations("animations-elitebuild2", {
     Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
         "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
         "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
-    })
-
-DefineAnimations("animations-elitebuild3", {
-    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
-        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
-        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
 
 DefineAnimations("animations-elitebuild4", {
