@@ -217,7 +217,6 @@ Load("scripts/spells.lua")
 Load("units/vault/vault.lua")
 Load("scripts/units.lua")
 Load("scripts/fonts.lua")
-Load("scripts/buttons.lua")
 Load("scripts/ui.lua")
 
 -- Load extra units
@@ -240,6 +239,7 @@ for i,f in list do
 end
 
 Load("scripts/upgrade.lua")
+Load("scripts/buttons.lua")
 Load("scripts/ai.lua")
 Load("scripts/campaigns.lua")
 Load("scripts/credits.lua")
