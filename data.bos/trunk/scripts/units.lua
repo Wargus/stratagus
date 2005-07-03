@@ -137,8 +137,29 @@ DefineUnitType("unit-orc-wall", {
 	ExplodeWhenKilled = "missile-explosion",
 	Type = "land", Building = true})
 
--- Load other units
-Load("scripts/elites/units.lua")
+-- Load production buildings
+Load("units/vault/vault.lua")
 Load("units/vehiculefactory/vehiculefactory.lua")
 
+-- Load old units
+Load("scripts/elites/units.lua")
+
+-- Find and load all other units
+local list
+local i
+local f
+local ff
+
+list = ListDirectory("units/")
+for i,f in list do
+  if not(string.find(f, "^%.")) then
+     local subdirlist = ListDirectory("units/" .. f)
+     for i, ff in subdirlist do
+        if(string.find(ff, "^unit-.*%.lua$")) then
+          print("Loading unit: " .. ff)
+          Load("units/"..f.."/"..ff)
+        end
+     end
+  end
+end
 
