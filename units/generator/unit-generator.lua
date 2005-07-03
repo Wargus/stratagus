@@ -73,6 +73,11 @@ DefineUnitType("unit-gen", {
 		"help", "gen-help",
 		"dead", "gen-dead"}
 	})
+DefineAnimations("animations-elitebuild2", {
+    Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
+        "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
+        "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
+    })
 DefineUnitType("build-dead-body2", {
 	Name = "GeneratorCrater",
 	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},

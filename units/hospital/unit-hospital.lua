@@ -71,6 +71,11 @@ DefineUnitType("unit-hosp", {
 		"help", "hosp-help",
 		"dead", "hosp-dead"}
 	})
+DefineAnimations("animations-elitebuild5", {
+    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
+        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
+        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
+    })
 DefineUnitType("build-dead-body5", {
 	Name = "HospCrater",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {128, 96}},
