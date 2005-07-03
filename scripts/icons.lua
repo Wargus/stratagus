@@ -99,12 +99,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-hosp",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/hospital_i.png"})
-
-DefineIcon({
 	Name = "icon-hosp_b",
 	Size = {46, 38},
 	Frame = 7,

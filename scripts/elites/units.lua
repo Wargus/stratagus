@@ -229,26 +229,6 @@ DefineUnitType("unit-rfac", {
 		"dead", "rfac-dead"}
 	})
 
-DefineUnitType("unit-hosp", {
-	Name = "Hospital",
-	Image = {"file", "elites/build/hospital.png", "size", {128, 96}},
-	Shadow = {"file", "elites/build/hospital_s.png", "size", {128, 96}},
-	Animations = "animations-hosp", Icon = "icon-hosp",
-	Costs = {"time", 125, "titanium", 500, "crystal", 100},
-	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-hosp",
-	Speed = 0, HitPoints = 350, DrawLevel = 25, TileSize = {4, 3},
-	BoxSize = {124, 92}, SightRange = 2, Armor = 30, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
-	AnnoyComputerFactor = 45, Demand = 200, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-body5", 0},
-	Type = "land", Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	Sounds = {
-		"selected", "hosp-selected",
-		"ready", "hosp-ready",
-		"help", "hosp-help",
-		"dead", "hosp-dead"}
-	})
-
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
 	Image = {"file", "elites/build/vehicle_factory.png", "size", {224, 160}},
@@ -288,16 +268,6 @@ DefineUnitType("build-dead-body4", {
 	Speed = 0, HitPoints = 999, DrawLevel = 10,
 	TileSize = {4, 4}, BoxSize = {124, 124}, SightRange = 1,
 	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
-	})
-
-DefineUnitType("build-dead-body5", {
-	Name = "HospCrater",
-	Image = {"file", "elites/build/hospital.png", "size", {128, 96}},
-	Animations = "animations-elitebuild5", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {4, 3},
-	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
