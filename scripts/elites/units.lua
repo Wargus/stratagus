@@ -275,25 +275,6 @@ DefineUnitType("unit-camp", {
 		"dead", "camp-dead"}
 	})
 
-DefineUnitType("unit-dev-yard", {
-	Name = "Development yard",
-	Image = {"file", "elites/build/development_yard.png", "size", {224, 196}},
-	Animations = "animations-dev-yard", Icon = "icon-dev",
-	Costs = {"time", 150, "titanium", 300, "crystal", 300},
-	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-dev-yard",
-	Speed = 0, HitPoints = 1800, DrawLevel = 25, TileSize = {7, 6}, BoxSize = {224, 196},
-	SightRange = 4, Armor = 30, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 35, AnnoyComputerFactor = 45,
-	Points = 200, Supply = 200, ExplodeWhenKilled = "missile-288x288-explosion",
-	Corpse = {"build-dead-body1", 0}, Type = "land",
-	VisibleUnderFog = true,	Building = true, BuilderOutside = true,
-	Sounds = {
-		"selected", "dev-selected",
-		"ready", "dev-ready",
-		"help", "dev-help",
-		"dead", "dev-dead"}
-	})
-
 DefineUnitType("unit-rfac", {
 	Name = "Research Facility",
 	Image = {"file", "elites/build/research_facility.png", "size", {128, 128}},
@@ -366,15 +347,7 @@ for i = 1, table.getn(CorpseTable) do
 		Priority = 0, Type = "land", Vanishes = true})
 end
 
-DefineUnitType("build-dead-body1", {
-	Name = "DevelopmentyardCrater",
-	Image = {"file", "elites/build/development_yard.png", "size", {224, 196}},
-	Animations = "animations-elitebuild1", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {7, 6}, BoxSize = {220, 192},
-	SightRange = 1, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 0, Type = "land",
-	Building = true, Vanishes = true, Sounds = {}})
+
 
 DefineUnitType("build-dead-body2", {
 	Name = "GeneratorCrater",

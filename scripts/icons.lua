@@ -93,12 +93,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-dev",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/development_yard_i.png"})
-
-DefineIcon({
 	Name = "icon-dev_b",
 	Size = {46, 38},
 	Frame = 0,
