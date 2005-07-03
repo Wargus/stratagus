@@ -209,30 +209,6 @@ DefineUnitType("unit-harvester", {
 		"dead", "harvester-die"}
 	})
 
-DefineUnitType("unit-msilo", {
-	Name = "Missile Silo",
-	Image = {"file", "elites/build/missile_silo.png", "size", {128, 128}},
-	Shadow = {"file", "elites/build/missile_silo_s.png", "size", {128, 128}},
-	Animations = "animations-msilo", Icon = "icon-msilo",
-	Costs = {"time", 2000, "titanium", 10000, "crystal", 10000},
-	RepairHp = 2, RepairCosts = {"titanium", 2},
-	Construction = "construction-msilo",
-	Speed = 0, HitPoints = 450, DrawLevel = 25, 
-	TileSize = {4, 4}, BoxSize = {124, 124},
-	SightRange = 1, Armor = 10, BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
-	Points = 100, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-body4", 0}, Type = land,
-	MaxMana = 1000, CanCastSpell = {"spell-nuke"},
-	Demand = 400, Building = true, BuilderOutside = true,
-	VisibleUnderFog = true,
-	Sounds = {
-		"selected", "gen-selected",
-		"ready", "gen-ready",
-		"help", "gen-help",
-		"dead", "gen-dead"}
-	})
-
 DefineUnitType("unit-rfac", {
 	Name = "Research Facility",
 	Image = {"file", "elites/build/research_facility.png", "size", {128, 128}},
@@ -335,12 +311,5 @@ DefineUnitType("build-dead-body6", {
 	Priority = 0, Type = "land", Building = true, Vanishes = true
 	})
 
-DefineUnitType("build-dead-body7", {
-	Name = "SiloCrater",
-	Image = {"file", "elites/build/missile_silo.png", "size", {128, 128}},
-	Animations = "animations-elitebuild7", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,	TileSize = {4, 4},
-	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
-	Type = "land" , Building = true, Vanishes = true})
+
 

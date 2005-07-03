@@ -123,12 +123,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-msilo",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/missile_silo_i.png"})
-
-DefineIcon({
 	Name = "icon-msilo_b",
 	Size = {46, 38},
 	Frame = 9,

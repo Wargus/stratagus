@@ -173,15 +173,6 @@ DefineAnimations("animations-harvester", {
 -------- Elite Buildings ------
 -------------------------------
 
-DefineAnimations("animations-msilo", {
-    Still = {"frame 0", "wait 1", },
-    Attack = {"unbreakable begin", "frame 1", "wait 1", 
-        "frame 2", "sound msilo-attack", "attack", "wait 1", 
-        "frame 3", "wait 1", "frame 4", "wait 1", "frame 5", "wait 25", 
-        "frame 6", "sound msilo-attack", "attack", "wait 25", 
-        "frame 6", "unbreakable end", "wait 1", },
-    })
-
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
