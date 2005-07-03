@@ -233,27 +233,6 @@ DefineUnitType("unit-msilo", {
 		"dead", "gen-dead"}
 	})
 
-DefineUnitType("unit-gen", {
-	Name = "Generator",
-	Image = {"file", "elites/build/generator.png", "size", {64, 64}},
-	Shadow = {"file", "elites/build/generator_s.png", "size", {64, 64}},
-	Animations = "animations-gen", Icon = "icon-gen",
-	Costs = {"time", 75, "titanium", 250, "crystal", 50},
-	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gen",
-	Speed = 0, HitPoints = 250, DrawLevel = 25, TileSize  = {2, 2}, BoxSize = {60, 60},
-	SightRange = 1, Armor = 10 , BasicDamage = 0, PiercingDamage = 0,
-	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
-	Points = 100, Supply = 125, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-body2", 0}, Type = "land",
-	Building = true, BuilderOutside = true,
-	VisibleUnderFog = true,
-	Sounds = {
-		"selected", "gen-selected",
-		"ready", "gen-ready",
-		"help", "gen-help",
-		"dead", "gen-dead"}
-	})
-
 DefineUnitType("unit-camp", {
 	Name = "Training Camp",
 	Image = {"file", "elites/build/training_camp.png", "size", {160, 128}},
@@ -346,18 +325,6 @@ for i = 1, table.getn(CorpseTable) do
 		PiercingDamage = 0, Missile = "missile-none",
 		Priority = 0, Type = "land", Vanishes = true})
 end
-
-
-
-DefineUnitType("build-dead-body2", {
-	Name = "GeneratorCrater",
-	Image = {"file", "elites/build/generator.png", "size", {64, 64}},
-	Animations = "animations-elitebuild2", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,
-	TileSize = {2, 2}, BoxSize = {60, 60}, SightRange = 1,
-	BasicDamage = 0, PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
-	})
 
 DefineUnitType("build-dead-body3", {
 	Name = "CampCrater",

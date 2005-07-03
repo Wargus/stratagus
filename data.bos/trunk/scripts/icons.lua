@@ -69,12 +69,6 @@ DefineIcon({
 	File = "elites/units/ico_harv.png"})
 
 DefineIcon({
-	Name = "icon-gen",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/generator_i.png"})
-
-DefineIcon({
 	Name = "icon-gen_b",
 	Size = {46, 38},
 	Frame = 1,

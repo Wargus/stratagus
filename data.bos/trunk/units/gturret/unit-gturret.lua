@@ -62,7 +62,6 @@ DefineConstruction("construction-gturret", {
 DefineUnitType("unit-gturret", {
 	Name = "Gun Turret",
 	Image = {"file", "units/gturret/gturret.png", "size", {64, 64}},
-	Shadow = {"file", "graphics/elites/build/generator_s.png", "size", {64, 64}},
 	Animations = "animations-gturret", Icon = "icon-gturret",
 	Costs = {"time", 130, "titanium", 250, "crystal", 50},
 	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-gturret",

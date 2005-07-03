@@ -182,12 +182,6 @@ DefineAnimations("animations-msilo", {
         "frame 6", "unbreakable end", "wait 1", },
     })
 
-DefineAnimations("animations-gen", {
-    Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
-        "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
-        "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
-    })
-
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
