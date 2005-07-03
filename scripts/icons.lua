@@ -87,12 +87,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-rfac",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/research_facility_i.png"})
-
-DefineIcon({
 	Name = "icon-rfac_b",
 	Size = {46, 38},
 	Frame = 6,

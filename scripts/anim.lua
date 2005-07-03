@@ -173,10 +173,6 @@ DefineAnimations("animations-harvester", {
 -------- Elite Buildings ------
 -------------------------------
 
-DefineAnimations("animations-rfac", {
-    Still = {"frame 0", "wait 3", },
-    })
-
 DefineAnimations("animations-vfac", {
     Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
         "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
@@ -203,12 +199,6 @@ DefineAnimations("animations-elitebuild2", {
     Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
         "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
         "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
-    })
-
-DefineAnimations("animations-elitebuild4", {
-    Death = {"unbreakable begin", "wait 1", "frame 12", "wait 2000", 
-        "frame 12", "wait 200", "frame 12", "wait 200", "frame 13", "wait 200",
-        "frame 13", "wait 200", "frame 13", "wait 1", "unbreakable end", "wait 1", },
     })
 
 DefineAnimations("animations-elitebuild5", {
