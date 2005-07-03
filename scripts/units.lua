@@ -137,8 +137,8 @@ DefineUnitType("unit-orc-wall", {
 	ExplodeWhenKilled = "missile-explosion",
 	Type = "land", Building = true})
 
--- Load the different races
+-- Load other units
 Load("scripts/elites/units.lua")
-
+Load("units/vehiculefactory/vehiculefactory.lua")
 
 

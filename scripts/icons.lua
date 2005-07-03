@@ -99,12 +99,6 @@ DefineIcon({
 	File = "elites/units/engineer_icons.png"})
 
 DefineIcon({
-	Name = "icon-vfac",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/build/vehicle_factory_i.png"})
-
-DefineIcon({
 	Name = "icon-vfac_b",
 	Size = {46, 38},
 	Frame = 8,

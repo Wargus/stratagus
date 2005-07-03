@@ -209,26 +209,6 @@ DefineUnitType("unit-harvester", {
 		"dead", "harvester-die"}
 	})
 
-DefineUnitType("unit-vfac", {
-	Name = "Vehicle Factory",
-	Image = {"file", "elites/build/vehicle_factory.png", "size", {224, 160}},
-	Shadow = {"file", "elites/build/vehicle_factory_s.png", "size", {224, 160}},
-	Animations = "animations-vfac", Icon = "icon-vfac",
-	Costs = {"time", 200, "titanium", 750, "crystal", 100},
-	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-vfac",
-	Speed = 0, HitPoints = 550, DrawLevel = 25, TileSize = {7, 5},
-	BoxSize = {220, 156}, SightRange = 2, Armor = 30, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none", Priority = 35,
-	AnnoyComputerFactor = 45, Demand = 400, Points = 200,
-	ExplodeWhenKilled = "missile-160x128-explosion", Corpse = {"build-dead-body6", 0},
-	Type = "land",  Building = true, BuilderOutside = true, VisibleUnderFog = true,
-	Sounds = {
-		"selected", "vfac-selected",
-		"ready", "vfac-ready",
-		"help", "vfac-help",
-		"dead", "vfac-dead"}
-	})
-
 local CorpseTable = {"assault", "engineer", "grenadier", "bazoo"}
 for i = 1, table.getn(CorpseTable) do
 	DefineUnitType("unit-dead-body" .. i, {
@@ -240,16 +220,6 @@ for i = 1, table.getn(CorpseTable) do
 		PiercingDamage = 0, Missile = "missile-none",
 		Priority = 0, Type = "land", Vanishes = true})
 end
-
-DefineUnitType("build-dead-body6", {
-	Name = "FactoryCrater",
-	Image = {"file", "elites/build/vehicle_factory.png", "size", {224, 160}},
-	Animations = "animations-elitebuild6", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
-	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,
-	PiercingDamage = 0, Missile = "missile-none",
-	Priority = 0, Type = "land", Building = true, Vanishes = true
-	})
 
 
 
