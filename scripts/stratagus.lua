@@ -214,30 +214,9 @@ Load("scripts/sound.lua")
 Load("scripts/missiles.lua")
 Load("scripts/constructions.lua")
 Load("scripts/spells.lua")
-Load("units/vault/vault.lua")
 Load("scripts/units.lua")
 Load("scripts/fonts.lua")
 Load("scripts/ui.lua")
-
--- Load extra units
-local list
-local i
-local f
-local ff
-
-list = ListDirectory("units/")
-for i,f in list do
-  if not(string.find(f, "^%.")) then
-     local subdirlist = ListDirectory("units/" .. f)
-     for i, ff in subdirlist do
-        if(string.find(ff, "^unit-.*%.lua$")) then
-          print("Loading unit: " .. ff)
-          Load("units/"..f.."/"..ff)
-        end
-     end
-  end
-end
-
 Load("scripts/upgrade.lua")
 Load("scripts/buttons.lua")
 Load("scripts/ai.lua")
