@@ -34,21 +34,21 @@
 
 DefineMissileType("missile-nuke", {
 	File = "elites/missile/nuke.png",
-	Size = {128, 128}, Frames = 5, NumDirections = 5,
+	Size = {128, 128}, Frames = 5, NumDirections = 8,
 	ImpactSound = "dev-dead", DrawLevel = 300,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 64, Range = 1,
 	ImpactMissile = "missile-288x288-explosion"})
 
 DefineMissileType("missile-grenadier", {
 	File =  "elites/missile/grenade.png",
-	Size = {32, 32}, Frames = 5, NumDirections = 5,
+	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "grenade-impact", DrawLevel = 50,
 	Class = "missile-class-parabolic", Sleep = 1, Speed = 16, Range = 2,
 	ImpactMissile = "missile-64x64-explosion"})
 
 DefineMissileType("missile-bazoo", {
 	File = "elites/missile/rocket.png",
-	Size = {32, 32}, Frames = 5, NumDirections = 5,
+	Size = {32, 32}, Frames = 5, NumDirections = 8,
 	ImpactSound = "rocket-impact", DrawLevel = 50,
 	Class = "missile-class-point-to-point", Sleep = 1, Speed = 16, Range = 2,
 	ImpactMissile = "missile-64x64-explosion"})
