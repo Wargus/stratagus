@@ -69,6 +69,8 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 	int args;
 	int j;
 
+	LuaCheckArgs(l, 1);
+
 	if ((cp = EditorUnitTypes)) { // Free all old names
 		while (*cp) {
 			free(*cp++);
@@ -79,11 +81,13 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 	//
 	// Get new table.
 	//
-	args = lua_gettop(l);
+	args = luaL_getn(l, 1);
 	EditorUnitTypes = cp = malloc((args + 1) * sizeof(char*));
 	MaxUnitIndex = args;
 	for (j = 0; j < args; ++j) {
-		*cp++ = strdup(LuaToString(l, j + 1));
+		lua_rawgeti(l, 1, j + 1);
+		*cp++ = strdup(LuaToString(l, -1));
+		lua_pop(l, 1);
 	}
 	*cp = NULL;
 
