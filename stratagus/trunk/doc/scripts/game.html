@@ -452,7 +452,7 @@ DefineConstruction( ident
 </pre>
 
 <a name="DefineEditorUnitTypes"></a>
-<h3>DefineEditorUnitTypes(unit1, unit2, ...)</h3>
+<h3>DefineEditorUnitTypes({unit1, unit2, ...})</h3>
 
 Creates a sorted list of unit-types for the editor. 
 This is only a temporary hack for better sorted units.
@@ -466,7 +466,7 @@ This is only a temporary hack for better sorted units.
 <h4>Example</h4>
 
 <pre>
-DefineEditorUnitTypes(
+DefineEditorUnitTypes({
    "unit-vault",
    "unit-apcs",
    "unit-medic",
@@ -475,7 +475,7 @@ DefineEditorUnitTypes(
    "unit-grenadier",
    "unit-camp",
    "unit-hosp"
-)
+})
 </pre>
 
 <a name="DefinePlayerColorIndex"></a>
