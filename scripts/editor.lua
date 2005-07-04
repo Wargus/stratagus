@@ -51,7 +51,7 @@ SetEditorStartUnit("unit-start-location")
 
 -- editor-unit-types a sorted list of unit-types for the editor.
 -- FIXME: this is only a temporary hack, for better sorted units.
-DefineEditorUnitTypes(
+DefineEditorUnitTypes({
    "unit-vault",
 
    "unit-apcs",
@@ -97,5 +97,5 @@ DefineEditorUnitTypes(
    "unit-crystal-field11",   
    "unit-crystal-field12",
    "unit-crystal-field13"
-)
+})
 
