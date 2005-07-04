@@ -538,6 +538,7 @@ int UnitTypeIdByIdent(const char* ident)
 		return type->Slot;
 	}
 	DebugPrint(" fix this %s\n" _C_ ident);
+	Assert(0);
 	return -1;
 }
 
