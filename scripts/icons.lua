@@ -28,46 +28,7 @@
 --
 --	$Id$
 
---
---  ELITES
--- 
-
-DefineIcon({
-	Name = "icon-assault", 
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_assault.png"})
-
-DefineIcon({
-	Name = "icon-apcs",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_apcs.png"})
-
-DefineIcon({
-	Name = "icon-grenadier",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_grenadier.png"})
-
-DefineIcon({
-	Name = "icon-bazoo",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_bazoo.png"})
-
-DefineIcon({
-	Name = "icon-engineer",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_engineer.png"})
-
-DefineIcon({
-	Name = "icon-harvester",
-	Size = {46, 38},
-	Frame = 0,
-	File = "elites/units/ico_harv.png"})
-
+-- Build buttons
 DefineIcon({
 	Name = "icon-gen_b",
 	Size = {46, 38},
@@ -110,6 +71,7 @@ DefineIcon({
 	Frame = 9,
 	File = "elites/units/engineer_icons.png"})
 
+-- upgrades
 DefineIcon({
 	Name = "icon-expl",
 	Size = {46, 38},

@@ -52,6 +52,23 @@ function DefineCommonButtons(forUnits)
         ForUnit = forUnits})
 end
 
+DefineAnimations("animations-elitecorpse1", {
+    Death = {"unbreakable begin", "wait 1", "frame 20", "wait 2000", 
+        "frame 0", "wait 200", "frame 5", "wait 200", "frame 10", "wait 200", 
+        "frame 15", "wait 200", "frame 15", "wait 1", "unbreakable end", "wait 1", },
+    })
+function DefineHumanCorpse(livingunit)
+   DefineUnitType("unit-dead-" .. livingunit, {
+	Name = livingunit .. "body",
+	Image = {"file", GetCurrentLuaPath().."/unit_" .. livingunit .. "_c.png", "size", {64, 64}},
+	Animations = "animations-elitecorpse1", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {1, 1},
+	BoxSize = {31, 31}, SightRange = 1, BasicDamage = 0,
+	PiercingDamage = 0, Missile = "missile-none",
+	Priority = 0, Type = "land", Vanishes = true})
+end
+
+
 DefineUnitType("unit-dead-body", {
 	Name= "Dead Body",
 	Image = {"file", "neutral/units/corpses.png", "size", {72, 72}},
@@ -139,10 +156,8 @@ DefineUnitType("unit-orc-wall", {
 
 -- Load production buildings
 Load("units/vault/vault.lua")
+Load("units/engineer/engineer.lua")
 Load("units/vehiculefactory/vehiculefactory.lua")
-
--- Load old units
-Load("scripts/elites/units.lua")
 
 -- Find and load all other units
 local list

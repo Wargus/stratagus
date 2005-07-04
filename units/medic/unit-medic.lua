@@ -108,6 +108,7 @@ DefineUnitType("unit-medic", {
 		"help", "medic-help",
 		"dead", "medic-die"}
 	})
+DefineHumanCorpse("medic")
 
 DefineAllow("unit-medic", "AAAAAAAAAAAAAAAA")
 DefineDependency("unit-medic", {"unit-hosp"})

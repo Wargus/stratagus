@@ -28,13 +28,6 @@
 --
 --	$Id$
 
-DefineAllow("unit-assault", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-grenadier", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-bazoo", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-engineer", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-harvester", "AAAAAAAAAAAAAAAA")
-DefineAllow("unit-apcs", "AAAAAAAAAAAAAAAA")
-
 --	- upgrades
 
 DefineUpgrade("upgrade-expl", "icon", "icon-expl",
