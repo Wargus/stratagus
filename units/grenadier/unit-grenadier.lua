@@ -52,6 +52,14 @@ DefineAnimations("animations-grenadier", {
     Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
     })
+
+MakeSound("grenadier-selected", GetCurrentLuaPath().."/grenadier_select.wav")
+MakeSound("grenadier-acknowledge", GetCurrentLuaPath().."/grenadier_action.wav")
+MakeSound("grenadier-ready", GetCurrentLuaPath().."/grenadier.ready.wav")
+MakeSound("grenadier-help", GetCurrentLuaPath().."/grenadier.underattack.wav")
+MakeSound("grenadier-die", GetCurrentLuaPath().."/grenadier_die.wav")
+MakeSound("grenadier-attack", GetCurrentLuaPath().."/grenadier_attack.wav")
+
 DefineUnitType("unit-grenadier", {
 	Name = "Grenadier",
 	Image = {"file", GetCurrentLuaPath().."/unit_grenadier.png", "size", {64, 64}},
