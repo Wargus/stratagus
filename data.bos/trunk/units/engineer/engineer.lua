@@ -60,6 +60,15 @@ DefineAnimations("animations-engineer", {
     Death = {"unbreakable begin", "frame 45", "wait 5", "frame 50", "wait 5", 
         "frame 55", "wait 5", "frame 50", "unbreakable end", "wait 5", },
     })
+
+MakeSound("engineer-selected", GetCurrentLuaPath().."/engineer_select.wav")
+MakeSound("engineer-acknowledge", GetCurrentLuaPath().."/engineer_action.wav")
+MakeSound("engineer-ready", GetCurrentLuaPath().."/engineer.ready.wav")
+MakeSound("engineer-help", GetCurrentLuaPath().."/engineer.underattack.wav")
+MakeSound("engineer-die", GetCurrentLuaPath().."/engineer_die.wav")
+MakeSound("engineer-repair", GetCurrentLuaPath().."/engineer_attack.wav")
+MakeSound("engineer-harvest", GetCurrentLuaPath().."/engineer_attack.wav")
+
 DefineUnitType("unit-engineer", {
 	Name = "Engineer",
 	Image = {"file", GetCurrentLuaPath().."/unit_engineer.png", "size", {64, 64}},
