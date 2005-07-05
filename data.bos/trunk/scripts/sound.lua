@@ -56,14 +56,6 @@ sound_click = MakeSound("click", "ui/click.wav")
 --	ELITES
 --
 
--- UNITS
-MakeSound("apcs-selected", "elites/units/smolder_select.wav")
-MakeSound("apcs-acknowledge", "elites/units/smolder_action.wav")
-MakeSound("apcs-ready", "elites/computer_voice/smolder.completed.wav")
-MakeSound("apcs-help", "elites/computer_voice/smolder.underattack.wav")
-MakeSound("apcs-die", "elites/units/smolder_die.wav")
-MakeSound("apcs-attack", "elites/units/smolder_attack.wav")
-
 -- BUILDINGS
 MakeSound("gen-selected", "elites/buildings/sfx_pplnt.select.wav")
 MakeSound("gen-ready", "elites/computer_voice/power.plant.completed.wav")

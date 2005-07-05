@@ -52,6 +52,14 @@ DefineAnimations("animations-apcs", {
     Death = {"unbreakable begin", "frame 0", "wait 5", "frame 0", "wait 5", 
         "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
     })
+
+MakeSound("apcs-selected", GetCurrentLuaPath().."/smolder_select.wav")
+MakeSound("apcs-acknowledge", GetCurrentLuaPath().."/smolder_action.wav")
+MakeSound("apcs-ready", GetCurrentLuaPath().."/smolder.completed.wav")
+MakeSound("apcs-help", GetCurrentLuaPath().."/smolder.underattack.wav")
+MakeSound("apcs-die", GetCurrentLuaPath().."/smolder_die.wav")
+MakeSound("apcs-attack", GetCurrentLuaPath().."/smolder_attack.wav")
+
 DefineUnitType("unit-apcs", {
 	Name = "APC Smolder",
 	Image = {"file", GetCurrentLuaPath().."/unit_apcs.png", "size", {96, 96}},
