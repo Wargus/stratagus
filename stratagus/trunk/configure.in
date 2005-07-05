@@ -85,7 +85,7 @@ AC_ARG_ENABLE(debug,
 if test "$enable_debug" != "yes" -a "$enable_profile" != "yes"; then
     STRATAGUS_CFLAGS="-O2 -pipe -fsigned-char -fomit-frame-pointer -fexpensive-optimizations -ffast-math"
 else
-    STRATAGUS_CFLAGS="-g -fsigned-char -Wdeclaration-after-statement -Wsign-compare -Werror -Wall -DDEBUG"
+    STRATAGUS_CFLAGS="-g -fsigned-char -Wsign-compare -Werror -Wall -DDEBUG"
 fi
 AC_SUBST(STRATAGUS_CFLAGS)
 
