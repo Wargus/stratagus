@@ -226,7 +226,7 @@ void HandleActionSpellCast(Unit* unit)
 						unit->Orders[0].X, unit->Orders[0].Y);
 				}
 			}
-			if (!unit->ReCast) {
+			if (!unit->ReCast && unit->Orders[0].Action != UnitActionDie) {
 				unit->Orders[0].Action = UnitActionStill;
 				unit->SubAction = 0;
 				if (unit->Orders[0].Goal) {
