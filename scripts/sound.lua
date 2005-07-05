@@ -87,8 +87,8 @@ MakeSound("vfac-ready", "elites/computer_voice/vehicle.factory.completed.wav")
 MakeSound("vfac-help", "elites/computer_voice/vehicle.factory.underattack.wav")
 MakeSound("vfac-dead", "elites/buildings/sfx_vfac.die.wav")
 
-MakeSound("grenade-impact", "elites/units/grenadier_g_hit.wav")
-MakeSound("rocket-impact", "elites/units/booza_g_hit.wav")
+MakeSound("grenade-impact", "sounds/grenadier_g_hit.wav")
+MakeSound("rocket-impact", "sounds/bazoo_g_hit.wav")
 
 
 
