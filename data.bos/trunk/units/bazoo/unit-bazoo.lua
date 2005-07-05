@@ -52,6 +52,14 @@ DefineAnimations("animations-bazoo", {
     Death = {"unbreakable begin", "frame 40", "wait 2", "frame 45", "wait 2", 
         "frame 50", "wait 2", "frame 55", "unbreakable end", "wait 2", },
     })
+
+MakeSound("bazoo-selected", GetCurrentLuaPath().."/bazoo_select.wav")
+MakeSound("bazoo-acknowledge", GetCurrentLuaPath().."/bazoo_action.wav")
+MakeSound("bazoo-ready", GetCurrentLuaPath().."/bazoo.ready.wav")
+MakeSound("bazoo-help", GetCurrentLuaPath().."/bazoo.underattack.wav")
+MakeSound("bazoo-die", GetCurrentLuaPath().."/bazoo_die.wav")
+MakeSound("bazoo-attack", GetCurrentLuaPath().."/bazoo_attack.wav")
+
 DefineUnitType("unit-bazoo", {
 	Name = "Bazoo",
 	Image = {"file", GetCurrentLuaPath().."/unit_bazoo.png", "size", {64, 64}},

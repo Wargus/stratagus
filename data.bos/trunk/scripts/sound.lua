@@ -64,13 +64,6 @@ MakeSound("grenadier-help", "elites/computer_voice/grenadier.underattack.wav")
 MakeSound("grenadier-die", "elites/units/grenadier_die.wav")
 MakeSound("grenadier-attack", "elites/units/grenadier_attack.wav")
 
-MakeSound("bazoo-selected", "elites/units/booza_select.wav")
-MakeSound("bazoo-acknowledge", "elites/units/booza_action.wav")
-MakeSound("bazoo-ready", "elites/computer_voice/bazoo.ready.wav")
-MakeSound("bazoo-help", "elites/computer_voice/bazoo.underattack.wav")
-MakeSound("bazoo-die", "elites/units/booza_die.wav")
-MakeSound("bazoo-attack", "elites/units/booza_attack.wav")
-
 MakeSound("engineer-selected", "elites/units/engineer_select.wav")
 MakeSound("engineer-acknowledge", "elites/units/engineer_action.wav")
 MakeSound("engineer-ready", "elites/computer_voice/engineer.ready.wav")
