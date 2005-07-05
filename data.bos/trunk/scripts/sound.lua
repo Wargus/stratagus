@@ -57,13 +57,6 @@ sound_click = MakeSound("click", "ui/click.wav")
 --
 
 -- UNITS
-MakeSound("grenadier-selected", "elites/units/grenadier_select.wav")
-MakeSound("grenadier-acknowledge", "elites/units/grenadier_action.wav")
-MakeSound("grenadier-ready", "elites/computer_voice/grenadier.ready.wav")
-MakeSound("grenadier-help", "elites/computer_voice/grenadier.underattack.wav")
-MakeSound("grenadier-die", "elites/units/grenadier_die.wav")
-MakeSound("grenadier-attack", "elites/units/grenadier_attack.wav")
-
 MakeSound("harvester-selected", "elites/units/harvester_select.wav")
 MakeSound("harvester-acknowledge", "elites/units/harvester_action.wav")
 MakeSound("harvester-ready", "elites/computer_voice/harvester.completed.wav")
