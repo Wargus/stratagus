@@ -57,13 +57,6 @@ sound_click = MakeSound("click", "ui/click.wav")
 --
 
 -- UNITS
-MakeSound("harvester-selected", "elites/units/harvester_select.wav")
-MakeSound("harvester-acknowledge", "elites/units/harvester_action.wav")
-MakeSound("harvester-ready", "elites/computer_voice/harvester.completed.wav")
-MakeSound("harvester-help", "elites/computer_voice/harvester.underattack.wav")
-MakeSound("harvester-die", "elites/units/harvester_die.wav")
-MakeSound("harvester-harvest", "elites/units/harvester_attack.wav")
-
 MakeSound("apcs-selected", "elites/units/smolder_select.wav")
 MakeSound("apcs-acknowledge", "elites/units/smolder_action.wav")
 MakeSound("apcs-ready", "elites/computer_voice/smolder.completed.wav")

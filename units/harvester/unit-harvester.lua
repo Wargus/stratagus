@@ -64,6 +64,14 @@ DefineAnimations("animations-harvester", {
     Death = {"unbreakable begin", "frame 0", "wait 5", "frame 0", "wait 5", 
         "frame 0", "wait 5", "frame 0", "unbreakable end", "wait 5", },
         })
+
+MakeSound("harvester-selected", GetCurrentLuaPath().."/harvester_select.wav")
+MakeSound("harvester-acknowledge", GetCurrentLuaPath().."/harvester_action.wav")
+MakeSound("harvester-ready", GetCurrentLuaPath().."/harvester.completed.wav")
+MakeSound("harvester-help", GetCurrentLuaPath().."/harvester.underattack.wav")
+MakeSound("harvester-die", GetCurrentLuaPath().."/harvester_die.wav")
+MakeSound("harvester-harvest", GetCurrentLuaPath().."/harvester_attack.wav")
+
 DefineUnitType("unit-harvester", {
 	Name = "Harvester",
 	Image = {"file", GetCurrentLuaPath().."/unit_harv.png", "size", {96, 96}},
