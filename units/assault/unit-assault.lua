@@ -55,6 +55,14 @@ DefineAnimations("animations-assault", {
     Death = {"unbreakable begin", "frame 30", "wait 5", "frame 35", "wait 5", 
         "frame 40", "wait 5", "frame 45", "unbreakable end", "wait 5", },
     })
+
+MakeSound("assault-selected", GetCurrentLuaPath().."/assault_select.wav")
+MakeSound("assault-acknowledge", GetCurrentLuaPath().."/assault_action.wav")
+MakeSound("assault-ready", GetCurrentLuaPath().."/assault.unit.ready.wav")
+MakeSound("assault-help", GetCurrentLuaPath().."/assault.unit.underattack.wav")
+MakeSound("assault-die", GetCurrentLuaPath().."/assault_die.wav")
+MakeSound("assault-attack", GetCurrentLuaPath().."/assault_attack.wav")
+
 DefineUnitType("unit-assault", {
 	Name = "Assault Unit",
 	Image = {"file", GetCurrentLuaPath().."/unit_assault.png", "size", {64, 64}},
