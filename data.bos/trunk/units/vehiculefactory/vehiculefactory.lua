@@ -48,11 +48,18 @@ DefineConstruction("construction-vfac", {
 		{Percent = 90, File = "main", Frame = 0}
 	}
     })
+
 DefineAnimations("animations-vfac", {
     Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
         "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
         "frame 6", "wait 3", "frame 7", "wait 3", "frame 8", "wait 3", },
     })
+
+MakeSound("vfac-selected", GetCurrentLuaPath().."/sfx_vfac.select.wav")
+MakeSound("vfac-ready", GetCurrentLuaPath().."/vehicle.factory.completed.wav")
+MakeSound("vfac-help", GetCurrentLuaPath().."/vehicle.factory.underattack.wav")
+MakeSound("vfac-dead", GetCurrentLuaPath().."/sfx_vfac.die.wav")
+
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
 	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {224, 160}},
@@ -72,11 +79,13 @@ DefineUnitType("unit-vfac", {
 		"help", "vfac-help",
 		"dead", "vfac-dead"}
 	})
+
 DefineAnimations("animations-elitebuild6", {
     Death = {"unbreakable begin", "wait 1", "frame 30", "wait 2000", 
         "frame 30", "wait 200", "frame 30", "wait 200", "frame 31", "wait 200",
         "frame 31", "wait 200", "frame 31", "wait 1", "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-body6", {
 	Name = "FactoryCrater",
 	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {224, 160}},
