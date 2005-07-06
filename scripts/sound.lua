@@ -57,11 +57,6 @@ sound_click = MakeSound("click", "ui/click.wav")
 --
 
 -- BUILDINGS
-MakeSound("gen-selected", "elites/buildings/sfx_pplnt.select.wav")
-MakeSound("gen-ready", "elites/computer_voice/power.plant.completed.wav")
-MakeSound("gen-help", "elites/computer_voice/power.plant.underattack.wav")
-MakeSound("gen-dead", "elites/buildings/sfx_pplnt.die.wav")
-
 MakeSound("dev-selected", "elites/buildings/sfx_fort.select.wav")
 MakeSound("dev-ready", "elites/computer_voice/elite.fort.completed.wav")
 MakeSound("dev-help", "elites/computer_voice/elite.fort.underattack.wav")
