@@ -57,6 +57,12 @@ DefineConstruction("construction-vault", {
                 {Percent = 9, File = "main", Frame = 15}
         }
 })
+
+MakeSound("dev-selected", GetCurrentLuaPath().."/sfx_fort.select.wav")
+MakeSound("dev-ready", GetCurrentLuaPath().."/elite.fort.completed.wav")
+MakeSound("dev-help", GetCurrentLuaPath().."/elite.fort.underattack.wav")
+MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
+
 DefineUnitType("unit-vault", {
 	Name = "Vault",
 	Image = {"file", "units/vault/vault.png", "size", {160, 220}},
