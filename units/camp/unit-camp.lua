@@ -49,9 +49,16 @@ DefineConstruction("construction-camp", {
 		{Percent = 90, File = "main", Frame = 14}
 	}
     })
+
 DefineAnimations("animations-camp", {
     Still = {"frame 0", "wait 3", },
     })
+
+MakeSound("camp-selected", GetCurrentLuaPath().."/sfx_camp.select.wav")
+MakeSound("camp-ready", GetCurrentLuaPath().."/training.camp.completed.wav")
+MakeSound("camp-help", GetCurrentLuaPath().."/training.camp.underattack.wav")
+MakeSound("camp-dead", GetCurrentLuaPath().."/sfx_camp.die.wav")
+
 DefineUnitType("unit-camp", {
 	Name = "Training Camp",
 	Image = {"file", GetCurrentLuaPath().."/training_camp.png", "size", {160, 128}},
@@ -72,11 +79,13 @@ DefineUnitType("unit-camp", {
 		"help", "camp-help",
 		"dead", "camp-dead"}
 	})
+
 DefineAnimations("animations-elitebuild3", {
     Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
         "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
         "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-body3", {
 	Name = "CampCrater",
 	Image = {"file", GetCurrentLuaPath().."/training_camp.png", "size", {160, 128}},
