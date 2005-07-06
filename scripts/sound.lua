@@ -56,12 +56,7 @@ sound_click = MakeSound("click", "ui/click.wav")
 --	ELITES
 --
 
--- BUILDINGS
-MakeSound("dev-selected", "elites/buildings/sfx_fort.select.wav")
-MakeSound("dev-ready", "elites/computer_voice/elite.fort.completed.wav")
-MakeSound("dev-help", "elites/computer_voice/elite.fort.underattack.wav")
-MakeSound("dev-dead", "elites/buildings/sfx_fort.die.wav")
-
+-- MISSILE
 MakeSound("grenade-impact", "sounds/grenadier_g_hit.wav")
 MakeSound("rocket-impact", "sounds/bazoo_g_hit.wav")
 
