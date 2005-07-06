@@ -48,7 +48,7 @@ DefineIcon({
 	Frame = 0,
 	File = "units/radar/radar_b.png"})
 
-MakeSound("radar-selected", "elites/buildings/sfx_rdar.select.wav")
+MakeSound("radar-selected", GetCurrentLuaPath().."/sfx_rdar.select.wav")
 
 DefineConstruction("construction-radar", {
 	Constructions = {
