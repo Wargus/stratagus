@@ -185,7 +185,7 @@ void AddToGroup(Unit** units, int nunits, int num)
 		// selectable.  Otherwise buildings and units can be in a group.
 		// or enemy units and my units. Exceptions is when there is only
 		// one unit in the group, then we can group a buildings.
-		if (PlayersTeamed(ThisPlayer->Player, units[i]->Player->Player) &&
+		if (PlayersTeamed(ThisPlayer->Index, units[i]->Player->Index) &&
 			(units[i]->Type->SelectableByRectangle ||
 			 (nunits == 1 && group->NumUnits == 0))) {
 			group->Units[group->NumUnits++] = units[i];

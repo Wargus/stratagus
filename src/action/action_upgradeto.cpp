@@ -101,7 +101,7 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	player->Supply += newtype->Supply - oldtype->Supply;
 
 	//  adjust Variables with percent.
-	newstats = &newtype->Stats[player->Player];
+	newstats = &newtype->Stats[player->Index];
 
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		if (unit->Variable[i].Max) {
@@ -116,7 +116,7 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	}
 
 	unit->Type = newtype;
-	unit->Stats = &newtype->Stats[player->Player];
+	unit->Stats = &newtype->Stats[player->Index];
 
 	if (newtype->CanCastSpell && !unit->AutoCastSpell) {
 		unit->AutoCastSpell = calloc(SpellTypeCount, sizeof(*unit->AutoCastSpell));
@@ -169,7 +169,7 @@ void HandleActionUpgradeTo(Unit* unit)
 
 	player = unit->Player;
 	newtype = unit->Orders[0].Type;
-	newstats = &newtype->Stats[player->Player];
+	newstats = &newtype->Stats[player->Index];
 
 	// FIXME: Should count down here
 	unit->Data.UpgradeTo.Ticks += SpeedUpgrade;

@@ -137,7 +137,7 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 	unsigned char* visible;
 
 	visible = TheMap.Fields[y * TheMap.Info.MapWidth + x].Visible;
-	visiontype = visible[player->Player];
+	visiontype = visible[player->Index];
 
 	if (visiontype > 1) {
 		return visiontype;
@@ -151,7 +151,7 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 
 	for (i = 0; i < PlayerMax ; ++i) {
 		if (player->SharedVision & (1 << i) &&
-				(Players[i].SharedVision & (1 << player->Player))) {
+				(Players[i].SharedVision & (1 << player->Index))) {
 			if (visible[i] > 1) {
 				return 2;
 			}
@@ -211,7 +211,7 @@ void MapMarkTileSight(const Player* player, int x, int y)
 
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
-	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Index];
 	switch (v) {
 		case 0:  // Unexplored
 		case 1:  // Unseen
@@ -220,19 +220,19 @@ void MapMarkTileSight(const Player* player, int x, int y)
 				UnitsOnTileMarkSeen(player, x, y, 0);
 			}
 			v = 2;
-			TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
+			TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Index] = v;
 			if (IsTileVisible(ThisPlayer, x, y) > 1) {
 				MapMarkSeenTile(x, y);
 			}
 			return;
 		case 255:  // Overflow
-			DebugPrint("Visible overflow (Player): %d\n" _C_ player->Player);
+			DebugPrint("Visible overflow (Player): %d\n" _C_ player->Index);
 			break;
 		default:  // seen -> seen
 			++v;
 			break;
 	}
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Index] = v;
 }
 
 /**
@@ -248,7 +248,7 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
-	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Index];
 	switch (v) {
 		case 255:
 			// FIXME: (mr-russ) Lookupsight is broken :(
@@ -274,7 +274,7 @@ void MapUnmarkTileSight(const Player* player, int x, int y)
 			v--;
 			break;
 	}
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].Visible[player->Index] = v;
 }
 
 /**
@@ -288,13 +288,13 @@ void MapMarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Index];
 	if (v == 0) {
 		UnitsOnTileMarkSeen(player, x, y, 1);
 	}
 	Assert(v != 255);
 	++v;
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Index] = v;
 }
 
 /**
@@ -308,13 +308,13 @@ void MapUnmarkTileDetectCloak(const Player* player, int x, int y)
 {
 	unsigned char v;
 
-	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player];
+	v = TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Index];
 	Assert(v != 0);
 	if (v == 1) {
 		UnitsOnTileUnmarkSeen(player, x, y, 1);
 	}
 	--v;
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Player] = v;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].VisCloak[player->Index] = v;
 }
 
 /**
@@ -345,7 +345,7 @@ void MapSight(const Player* player, int x, int y, int w, int h, int range,
 		return;
 	}
 
-	p = player->Player;
+	p = player->Index;
 
 	// Mark Horizontal sight for unit
 	for (mx = x - range; mx < x + range + w; ++mx) {
@@ -647,7 +647,7 @@ void DrawMapFogOfWar(Viewport* vp)
 	if (ReplayRevealMap) {
 		return;
 	}
-	p = ThisPlayer->Player;
+	p = ThisPlayer->Index;
 
 	sx = vp->MapX - 1;
 	if (sx < 0) {

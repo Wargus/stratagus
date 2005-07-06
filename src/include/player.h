@@ -307,13 +307,12 @@ typedef struct _player_ Player;    /// player typedef
 
 	///  Player structure
 struct _player_ {
-	int   Player;    /// player as number
-	char* Name;      /// name of non computer
+	int   Index;       /// player as number
+	char* Name;         /// name of non computer
 
-	int   Type;      /// type of player (human,computer,...)
-	const char* RaceName;  /// name of race : pointer on PlayerRaces.Name[Race]
-	int   Race;      /// race of player (orc,human,...)
-	char  AiName[128];     /// AI for computer
+	int   Type;         /// type of player (human,computer,...)
+	int   Race;         /// race of player (orc,human,...)
+	char  AiName[128];  /// AI for computer
 
 	// friend enemy detection
 	int      Team;          /// team of player
@@ -554,7 +553,7 @@ extern void PlayerCclRegister(void);
 	((Players[a].Allied & (1 << (b))) && (Players[b].Allied & (1 << (a))))
 	/// Allowed to select multiple units, maybe not mine
 #define CanSelectMultipleUnits(player) \
-	((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Player, (player)->Player))
+	((player) == ThisPlayer || PlayersTeamed(ThisPlayer->Index, (player)->Index))
 
 //@}
 

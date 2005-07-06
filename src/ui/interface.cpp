@@ -989,7 +989,7 @@ static int InputKey(int key)
 					}
 				}
 				sprintf(ChatMessage, "~%s~<%s>~> %s",
-					PlayerColorNames[ThisPlayer->Player],
+					PlayerColorNames[ThisPlayer->Index],
 					ThisPlayer->Name, Input);
 				// FIXME: only to selected players ...
 				NetworkChatMessage(ChatMessage);

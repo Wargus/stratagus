@@ -164,7 +164,7 @@ int AiFindAvailableUnitTypeEquiv(const UnitType* unittype, int* usableTypes)
 	}
 
 	// 3 - Sort by level
-	playerid = AiPlayer->Player->Player;
+	playerid = AiPlayer->Player->Index;
 
 	// We won't have usableTypesCount>4, so simple sort should do it
 	for (i = 0; i < usableTypesCount - 1; ++i) {

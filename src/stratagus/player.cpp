@@ -113,7 +113,7 @@ void InitPlayers(void)
 	int x;
 
 	for (p = 0; p < PlayerMax; ++p) {
-		Players[p].Player = p;
+		Players[p].Index = p;
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
@@ -186,7 +186,7 @@ void SavePlayers(CLFile* file)
 			case PlayerRescueActive:  CLprintf(file, "\"rescue-active\","); break;
 			default:                  CLprintf(file, "%d,",Players[i].Type);break;
 		}
-		CLprintf(file, " \"race\", \"%s\",", Players[i].RaceName);
+		CLprintf(file, " \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
 		CLprintf(file, " \"ai-name\", \"%s\",\n", Players[i].AiName);
 		CLprintf(file, "  \"team\", %d,", Players[i].Team);
 
@@ -309,7 +309,7 @@ void SavePlayers(CLFile* file)
 	//
 	//  Dump local variables
 	//
-	CLprintf(file, "SetThisPlayer(%d)\n\n", ThisPlayer->Player);
+	CLprintf(file, "SetThisPlayer(%d)\n\n", ThisPlayer->Index);
 }
 
 /**
@@ -327,7 +327,7 @@ void CreatePlayer(int type)
 		return;
 	}
 	player = &Players[NumPlayers];
-	player->Player = NumPlayers;
+	player->Index = NumPlayers;
 
 	//  Allocate memory for the "list" of this player's units.
 	//  FIXME: brutal way, as we won't need UnitMax for this player...
@@ -393,7 +393,6 @@ void CreatePlayer(int type)
 
 	player->Type = type;
 	player->Race = PlayerRaces.Race[0];
-	player->RaceName = PlayerRaces.Name[0];
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
@@ -490,7 +489,6 @@ void PlayerSetSide(Player* player, int side)
 	Assert(PlayerRaces.Name[side]);
 
 	player->Race = side;
-	player->RaceName = PlayerRaces.Name[side];
 }
 
 /**
@@ -608,7 +606,7 @@ int PlayerCheckCosts(const Player* player, const int* costs)
 */
 int PlayerCheckUnitType(const Player* player, const UnitType* type)
 {
-	return PlayerCheckCosts(player, type->Stats[player->Player].Costs);
+	return PlayerCheckCosts(player, type->Stats[player->Index].Costs);
 }
 
 /**
@@ -635,7 +633,7 @@ void PlayerAddCosts(Player* player, const int* costs)
 void PlayerAddUnitType(Player* player, const UnitType* type)
 {
 	// FIXME: a player could make money by upgrading and than cancel
-	PlayerAddCosts(player, type->Stats[player->Player].Costs);
+	PlayerAddCosts(player, type->Stats[player->Index].Costs);
 }
 
 /**
@@ -677,7 +675,7 @@ void PlayerSubCosts(Player* player, const int* costs)
 */
 void PlayerSubUnitType(Player* player, const UnitType* type)
 {
-	PlayerSubCosts(player, type->Stats[player->Player].Costs);
+	PlayerSubCosts(player, type->Stats[player->Index].Costs);
 }
 
 /**
@@ -873,7 +871,7 @@ void NotifyPlayer(const Player* player,
 	va_list va;
 
 	// Notify me, and my TEAM members
-	if (player != ThisPlayer && !PlayersTeamed(ThisPlayer->Player, player->Player)) {
+	if (player != ThisPlayer && !PlayersTeamed(ThisPlayer->Index, player->Index)) {
 		return;
 	}
 

@@ -116,13 +116,13 @@ void HandleActionTrain(Unit* unit)
 	unit->Data.Train.Ticks += SpeedTrain;
 	// FIXME: Should count down
 	if (unit->Data.Train.Ticks >=
-			unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost]) {
+			unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost]) {
 		//
 		// Check if there are still unit slots.
 		//
 		if (NumUnits >= UnitMax) {
 			unit->Data.Train.Ticks =
-				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
+				unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost];
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}
@@ -137,7 +137,7 @@ void HandleActionTrain(Unit* unit)
 			}
 
 			unit->Data.Train.Ticks =
-				unit->Orders[0].Type->Stats[player->Player].Costs[TimeCost];
+				unit->Orders[0].Type->Stats[player->Index].Costs[TimeCost];
 			unit->Wait = CYCLES_PER_SECOND / 6;
 			return;
 		}

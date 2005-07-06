@@ -66,7 +66,7 @@ static void UpdateConstructionFrame(Unit* unit)
 	int percent;
 
 	percent = unit->Data.Built.Progress /
-		(unit->Type->Stats[unit->Player->Player].Costs[TimeCost] * 6);
+		(unit->Type->Stats[unit->Player->Index].Costs[TimeCost] * 6);
 	cframe = tmp = unit->Type->Construction->Frames;
 	while (tmp) {
 		if (percent < tmp->Percent) {
@@ -437,7 +437,7 @@ void HandleActionBuilt(Unit* unit)
 	unit->Data.Built.Progress += progress;
 	// Keep the same level of damage while increasing HP.
 	unit->Variable[HP_INDEX].Value = (unit->Data.Built.Progress * unit->Variable[HP_INDEX].Max) /
-		(type->Stats[unit->Player->Player].Costs[TimeCost] * 600) - n;
+		(type->Stats[unit->Player->Index].Costs[TimeCost] * 600) - n;
 	if (unit->Variable[HP_INDEX].Value > unit->Stats->Variables[HP_INDEX].Max) {
 		unit->Variable[HP_INDEX].Value = unit->Stats->Variables[HP_INDEX].Max;
 	}
