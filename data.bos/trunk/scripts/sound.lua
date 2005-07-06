@@ -62,11 +62,6 @@ MakeSound("gen-ready", "elites/computer_voice/power.plant.completed.wav")
 MakeSound("gen-help", "elites/computer_voice/power.plant.underattack.wav")
 MakeSound("gen-dead", "elites/buildings/sfx_pplnt.die.wav")
 
-MakeSound("camp-selected", "elites/buildings/sfx_camp.select.wav")
-MakeSound("camp-ready", "elites/computer_voice/training.camp.completed.wav")
-MakeSound("camp-help", "elites/computer_voice/training.camp.underattack.wav")
-MakeSound("camp-dead", "elites/buildings/sfx_camp.die.wav")
-
 MakeSound("dev-selected", "elites/buildings/sfx_fort.select.wav")
 MakeSound("dev-ready", "elites/computer_voice/elite.fort.completed.wav")
 MakeSound("dev-help", "elites/computer_voice/elite.fort.underattack.wav")
