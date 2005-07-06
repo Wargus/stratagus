@@ -62,11 +62,6 @@ MakeSound("dev-ready", "elites/computer_voice/elite.fort.completed.wav")
 MakeSound("dev-help", "elites/computer_voice/elite.fort.underattack.wav")
 MakeSound("dev-dead", "elites/buildings/sfx_fort.die.wav")
 
-MakeSound("vfac-selected", "elites/buildings/sfx_vfac.select.wav")
-MakeSound("vfac-ready", "elites/computer_voice/vehicle.factory.completed.wav")
-MakeSound("vfac-help", "elites/computer_voice/vehicle.factory.underattack.wav")
-MakeSound("vfac-dead", "elites/buildings/sfx_vfac.die.wav")
-
 MakeSound("grenade-impact", "sounds/grenadier_g_hit.wav")
 MakeSound("rocket-impact", "sounds/bazoo_g_hit.wav")
 
