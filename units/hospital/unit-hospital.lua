@@ -48,10 +48,17 @@ DefineConstruction("construction-hosp", {
 		{Percent = 90, File = "main", Frame = 0}
 	}
 })
+
 DefineAnimations("animations-hosp", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", },
     })
+
+MakeSound("hosp-selected", GetCurrentLuaPath().."/sfx_hosp.select.wav")
+MakeSound("hosp-ready", GetCurrentLuaPath().."/hospital.completed.wav")
+MakeSound("hosp-help", GetCurrentLuaPath().."/hospital.underattack.wav")
+MakeSound("hosp-dead", GetCurrentLuaPath().."/sfx_hosp.die.wav")
+
 DefineUnitType("unit-hosp", {
 	Name = "Hospital",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {128, 96}},
@@ -71,11 +78,13 @@ DefineUnitType("unit-hosp", {
 		"help", "hosp-help",
 		"dead", "hosp-dead"}
 	})
+
 DefineAnimations("animations-elitebuild5", {
     Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
         "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
         "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-body5", {
 	Name = "HospCrater",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {128, 96}},

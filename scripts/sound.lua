@@ -72,11 +72,6 @@ MakeSound("rfac-ready", "elites/computer_voice/research.facility.completed.wav")
 MakeSound("rfac-help", "elites/computer_voice/research.facility.underattack.wav")
 MakeSound("rfac-dead", "elites/buildings/sfx_rfac.die.wav")
 
-MakeSound("hosp-selected", "elites/buildings/sfx_hosp.select.wav")
-MakeSound("hosp-ready", "elites/computer_voice/hospital.completed.wav")
-MakeSound("hosp-help", "elites/computer_voice/hospital.underattack.wav")
-MakeSound("hosp-dead", "elites/buildings/sfx_hosp.die.wav")
-
 MakeSound("vfac-selected", "elites/buildings/sfx_vfac.select.wav")
 MakeSound("vfac-ready", "elites/computer_voice/vehicle.factory.completed.wav")
 MakeSound("vfac-help", "elites/computer_voice/vehicle.factory.underattack.wav")
