@@ -48,11 +48,18 @@ DefineConstruction("construction-gen", {
 		{Percent = 90, File = "main", Frame = 0}
 	}
     })
+
 DefineAnimations("animations-gen", {
     Still = {"frame 0", "wait 2", "frame 1", "wait 2", "frame 2", "wait 2", 
         "frame 3", "wait 2", "frame 4", "wait 2", "frame 5", "wait 2", 
         "frame 6", "wait 2", "frame 7", "wait 2", "frame 8", "wait 2", },
     })
+
+MakeSound("gen-selected", GetCurrentLuaPath().."/sfx_pplnt.select.wav")
+MakeSound("gen-ready", GetCurrentLuaPath().."/power.plant.completed.wav")
+MakeSound("gen-help", GetCurrentLuaPath().."/power.plant.underattack.wav")
+MakeSound("gen-dead", GetCurrentLuaPath().."/sfx_pplnt.die.wav")
+
 DefineUnitType("unit-gen", {
 	Name = "Generator",
 	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
@@ -73,11 +80,13 @@ DefineUnitType("unit-gen", {
 		"help", "gen-help",
 		"dead", "gen-dead"}
 	})
+
 DefineAnimations("animations-elitebuild2", {
     Death = {"unbreakable begin", "wait 1", "frame 19", "wait 2000", 
         "frame 19", "wait 200", "frame 19", "wait 200", "frame 20", "wait 200",
         "frame 20", "wait 200", "frame 20", "wait 1", "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-body2", {
 	Name = "GeneratorCrater",
 	Image = {"file", GetCurrentLuaPath().."/generator.png", "size", {64, 64}},
