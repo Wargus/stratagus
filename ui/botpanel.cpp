@@ -412,7 +412,7 @@ void UpdateStatusLineForButton(const ButtonAction* button)
 		case ButtonTrain:
 		case ButtonUpgradeTo:
 			// FIXME: store pointer in button table!
-			stats = &UnitTypes[v]->Stats[ThisPlayer->Player];
+			stats = &UnitTypes[v]->Stats[ThisPlayer->Index];
 			SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
 			break;
 		case ButtonResearch:
@@ -685,7 +685,7 @@ void UpdateButtonPanel(void)
 	unit = Selected[0];
 	// foreign unit
 	if (unit->Player != ThisPlayer &&
-		!PlayersTeamed(ThisPlayer->Player, unit->Player->Player)) {
+		!PlayersTeamed(ThisPlayer->Index, unit->Player->Index)) {
 		return;
 	}
 
@@ -728,7 +728,7 @@ void DoButtonButtonClicked(int button)
 	//  or Not Teamed
 	//
 	if (CurrentButtons[button].Pos == -1 ||
-			!PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player)) {
+			!PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
 		return;
 	}
 

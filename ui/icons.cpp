@@ -194,7 +194,7 @@ Icon* IconByIdent(const char* ident)
 */
 void DrawIcon(const Player* player, Icon* icon, int x, int y)
 {
-	VideoDrawPlayerColorClip(icon->Sprite, player->Player, icon->Frame, x, y);
+	VideoDrawPlayerColorClip(icon->Sprite, player->Index, icon->Frame, x, y);
 }
 
 /**

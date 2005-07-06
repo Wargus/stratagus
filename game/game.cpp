@@ -238,7 +238,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	for (i = 0; i < NumUnits; ++i) {
 		gzprintf(f, "unit= CreateUnit(\"%s\", %d, {%d, %d})\n",
 			Units[i]->Type->Ident,
-			Units[i]->Player->Player,
+			Units[i]->Player->Index,
 			Units[i]->X, Units[i]->Y);
 		if (Units[i]->Type->GivesResource) {
 			gzprintf(f, "SetResourcesHeld(unit, %d)\n", Units[i]->ResourcesHeld);
@@ -597,7 +597,7 @@ void CreateGame(const char* filename, WorldMap* map)
 
 	// FIXME: Race only known in single player game:
 	InitMenus(ThisPlayer->Race);
-	LoadCursors(ThisPlayer->RaceName);
+	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD
@@ -615,7 +615,7 @@ void CreateGame(const char* filename, WorldMap* map)
 	InitMapFogOfWar(); // build tables for fog of war
 	PreprocessMap();   // Adjust map for use
 
-	InitUserInterface(ThisPlayer->RaceName); // Setup the user interface
+	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]); // Setup the user interface
 	LoadUserInterface(); // Load the user interface grafics
 
 	//

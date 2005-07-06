@@ -804,7 +804,7 @@ void AiInit(Player* player)
 
 	ainame = player->AiName;
 	DebugPrint("%d - %p - looking for class %s\n" _C_
-		player->Player _C_ player _C_ ainame);
+		player->Index _C_ player _C_ ainame);
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
 	//
@@ -816,7 +816,7 @@ void AiInit(Player* player)
 		Exit(0);
 	}
 	for (;;) {
-		if (ait->Race && strcmp(ait->Race, player->RaceName)) {
+		if (ait->Race && strcmp(ait->Race, PlayerRaces.Name[player->Race])) {
 			ait = ait->Next;
 			if (!ait && ainame) {
 				ainame = NULL;
@@ -848,7 +848,7 @@ void AiInit(Player* player)
 		DebugPrint("AI: not found!!!!!!!!!!\n");
 		DebugPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ player->RaceName _C_ 
+	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player->Race] _C_ 
 		ait->Race ? ait->Race : "All" _C_ ainame _C_ ait->Class);
 
 	pai->AiType = ait;
@@ -1129,7 +1129,7 @@ void AiHelpMe(const Unit* attacker, Unit* defender)
 	int force;
 
 	DebugPrint("%d: %d(%s) attacked at %d,%d\n" _C_
-		defender->Player->Player _C_ UnitNumber(defender) _C_
+		defender->Player->Index _C_ UnitNumber(defender) _C_
 		defender->Type->Ident _C_ defender->X _C_ defender->Y);
 
 	//
@@ -1188,7 +1188,7 @@ void AiHelpMe(const Unit* attacker, Unit* defender)
 void AiUnitKilled(Unit* unit)
 {
 	DebugPrint("%d: %d(%s) killed\n" _C_
-		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1200,12 +1200,12 @@ void AiUnitKilled(Unit* unit)
 			break;
 		case UnitActionBuilt:
 			DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-				unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident);
+				unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident);
 			AiReduceMadeInBuilt(unit->Player->Ai, unit->Type);
 			break;
 		case UnitActionBuild:
 			DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-				unit->Player->Player _C_ UnitNumber(unit) _C_
+				unit->Player->Index _C_ UnitNumber(unit) _C_
 				unit->Type->Ident _C_ unit->Orders[0].Type->Ident);
 			if (!unit->Orders[0].Goal) {
 				AiReduceMadeInBuilt(unit->Player->Ai, unit->Orders[0].Type);
@@ -1213,7 +1213,7 @@ void AiUnitKilled(Unit* unit)
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
-				unit->Player->Player _C_ UnitNumber(unit) _C_
+				unit->Player->Index _C_ UnitNumber(unit) _C_
 				unit->Type->Ident _C_ unit->Orders[0].Action);
 			break;
 	}
@@ -1229,11 +1229,11 @@ void AiWorkComplete(Unit* unit, Unit* what)
 {
 	if (unit) {
 		DebugPrint("%d: %d(%s) build %s at %d,%d completed\n" _C_
-			what->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+			what->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 			what->Type->Ident _C_ unit->X _C_ unit->Y);
 	} else {
 		DebugPrint("%d: building %s at %d,%d completed\n" _C_
-			what->Player->Player _C_ what->Type->Ident _C_ what->X _C_ what->Y);
+			what->Player->Index _C_ what->Type->Ident _C_ what->X _C_ what->Y);
 	}
 
 	Assert(what->Player->Type != PlayerPerson);
@@ -1250,7 +1250,7 @@ void AiWorkComplete(Unit* unit, Unit* what)
 void AiCanNotBuild(Unit* unit, const UnitType* what)
 {
 	DebugPrint("%d: %d(%s) Can't build %s at %d,%d\n" _C_
-		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
@@ -1326,7 +1326,7 @@ static void AiMoveUnitInTheWay(Unit* unit)
 
 		if (blocker->Player != unit->Player) {
 			// Not allied
-			if (!(blocker->Player->Allied & (1 << unit->Player->Player))) {
+			if (!(blocker->Player->Allied & (1 << unit->Player->Index))) {
 				continue;
 			}
 		}
@@ -1691,7 +1691,7 @@ void AiNeedMoreSupply(Unit* unit, const UnitType* what __attribute__((unused)))
 void AiTrainingComplete(Unit* unit, Unit* what)
 {
 	DebugPrint("%d: %d(%s) training %s at %d,%d completed\n" _C_
-		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Type->Ident _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
@@ -1713,7 +1713,7 @@ void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
 	const UnitType* what __attribute__((unused)))
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
-		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);
@@ -1729,7 +1729,7 @@ void AiResearchComplete(Unit* unit __attribute__((unused)),
 	const Upgrade* what __attribute__((unused)))
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
-		unit->Player->Player _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
+		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
 		what->Ident _C_ unit->X _C_ unit->Y);
 
 	Assert(unit->Player->Type != PlayerPerson);

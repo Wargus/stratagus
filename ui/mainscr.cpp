@@ -1329,8 +1329,8 @@ void DrawInfoPanel(void)
 		} else {
 			// FIXME: not correct for enemy's units
 			if (Selected[0]->Player == ThisPlayer ||
-					PlayersTeamed(ThisPlayer->Player, Selected[0]->Player->Player) ||
-					PlayersAllied(ThisPlayer->Player, Selected[0]->Player->Player) ||
+					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index) ||
+					PlayersAllied(ThisPlayer->Index, Selected[0]->Player->Index) ||
 					ReplayRevealMap) {
 				if (Selected[0]->Orders[0].Action == UnitActionBuilt ||
 					Selected[0]->Orders[0].Action == UnitActionResearch ||
@@ -1381,9 +1381,9 @@ void DrawInfoPanel(void)
 		GetDefaultTextColors(&nc, &rc);
 		for (i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
-				if (ThisPlayer->Allied & (1 << Players[i].Player)) {
+				if (ThisPlayer->Allied & (1 << Players[i].Index)) {
 					SetDefaultTextColors(FontGreen, rc);
-				} else if (ThisPlayer->Enemy & (1 << Players[i].Player)) {
+				} else if (ThisPlayer->Enemy & (1 << Players[i].Index)) {
 					SetDefaultTextColors(FontRed, rc);
 				} else {
 					SetDefaultTextColors(nc, rc);

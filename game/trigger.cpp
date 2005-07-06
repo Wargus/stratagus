@@ -90,7 +90,7 @@ int TriggerGetPlayer(lua_State* l)
 	if (!strcmp(player, "any")) {
 		return -1;
 	} else if (!strcmp(player, "this")) {
-		return ThisPlayer->Player;
+		return ThisPlayer->Index;
 	}
 	LuaError(l, "bad player: %s" _C_ player);
 
@@ -248,7 +248,7 @@ static int CclGetNumUnitsAt(lua_State* l)
 			//
 			// Check the player
 			//
-			if (plynr == -1 || plynr == unit->Player->Player) {
+			if (plynr == -1 || plynr == unit->Player->Index) {
 				++s;
 			}
 		}
@@ -330,7 +330,7 @@ static int CclIfNearUnit(lua_State* l)
 				//
 				// Check the player
 				//
-				if (plynr == -1 || plynr == unit->Player->Player) {
+				if (plynr == -1 || plynr == unit->Player->Index) {
 					++s;
 				}
 			}
@@ -425,7 +425,7 @@ static int CclIfRescuedNearUnit(lua_State* l)
 					//
 					// Check the player
 					//
-					if (plynr == -1 || plynr == unit->Player->Player) {
+					if (plynr == -1 || plynr == unit->Player->Index) {
 						++s;
 					}
 				}

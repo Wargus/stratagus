@@ -133,7 +133,7 @@ void InitModules(void)
 	InitSyncRand();
 	InitIcons();
 	InitVideoCursors();
-	InitUserInterface(ThisPlayer->RaceName);
+	InitUserInterface(PlayerRaces.Name[ThisPlayer->Race]);
 	InitMenus(ThisPlayer->Race);
 	InitPlayers();
 	InitMissileTypes();
@@ -171,7 +171,7 @@ void LoadModules(void)
 {
 	LoadFonts();
 	LoadIcons();
-	LoadCursors(ThisPlayer->RaceName);
+	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
 	LoadUserInterface();
 #if 0
 	LoadPlayers();

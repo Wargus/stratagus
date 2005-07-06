@@ -213,32 +213,32 @@ void ChangeTeamSelectedUnits(Player* player, Unit** units, int adjust, int count
 	switch (adjust) {
 		case 0:
 			// UnSelectAllTeam(player);
-			while (TeamNumSelected[player->Player]) {
-				unit = TeamSelected[player->Player][--TeamNumSelected[player->Player]];
-				unit->TeamSelected &= ~(1 << player->Player);
-				TeamSelected[player->Player][TeamNumSelected[player->Player]] = NoUnitP; // FIXME: only needed for old code
+			while (TeamNumSelected[player->Index]) {
+				unit = TeamSelected[player->Index][--TeamNumSelected[player->Index]];
+				unit->TeamSelected &= ~(1 << player->Index);
+				TeamSelected[player->Index][TeamNumSelected[player->Index]] = NoUnitP; // FIXME: only needed for old code
 			}
 			// FALL THROUGH
 		case 2:
 			for (i = 0; i < count; ++i) {
 				Assert(!units[i]->Removed);
 				if (!units[i]->Type->IsNotSelectable) {
-					TeamSelected[player->Player][TeamNumSelected[player->Player]++] = units[i];
-					units[i]->TeamSelected |= 1 << player->Player;
+					TeamSelected[player->Index][TeamNumSelected[player->Index]++] = units[i];
+					units[i]->TeamSelected |= 1 << player->Index;
 				}
 			}
-			Assert(TeamNumSelected[player->Player] <= MaxSelectable);
+			Assert(TeamNumSelected[player->Index] <= MaxSelectable);
 			break;
 		case 1:
-			for (n = 0; n < TeamNumSelected[player->Player]; ++n) {
+			for (n = 0; n < TeamNumSelected[player->Index]; ++n) {
 				for (i = 0; i < count; ++i) {
-					if (units[i] == TeamSelected[player->Player][n]) {
-						TeamSelected[player->Player][n] =
-							TeamSelected[player->Player][TeamNumSelected[player->Player]--];
+					if (units[i] == TeamSelected[player->Index][n]) {
+						TeamSelected[player->Index][n] =
+							TeamSelected[player->Index][TeamNumSelected[player->Index]--];
 					}
 				}
 			}
-			Assert(TeamNumSelected[player->Player] >= 0);
+			Assert(TeamNumSelected[player->Index] >= 0);
 			break;
 		default:
 			Assert(0);

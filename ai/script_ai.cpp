@@ -476,7 +476,7 @@ static void InsertResearchRequests(Upgrade* upgrade)
 static int CclAiGetRace(lua_State* l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushstring(l, AiPlayer->Player->RaceName);
+	lua_pushstring(l, PlayerRaces.Name[AiPlayer->Player->Race]);
 	return 1;
 }
 
@@ -552,7 +552,7 @@ static int CclAiDebugPlayer(lua_State* l)
 				if (!ThisPlayer) {
 					continue;
 				}
-				playerid = ThisPlayer->Player;
+				playerid = ThisPlayer->Index;
 			} else {
 				playerid = LuaToNumber(l, j + 1);
 			}
@@ -928,7 +928,7 @@ static int CclAiUpgradeTo(lua_State* l)
 static int CclAiPlayer(lua_State* l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, AiPlayer->Player->Player);
+	lua_pushnumber(l, AiPlayer->Player->Index);
 	return 1;
 }
 
@@ -1010,7 +1010,7 @@ static int CclAiDump(lua_State* l)
 		printf("%s(%4d) ", DefaultResourceNames[i], AiPlayer->Player->Resources[i]);
 	}
 	printf("\n");
-	printf("%d:", AiPlayer->Player->Player);
+	printf("%d:", AiPlayer->Player->Index);
 #if 0
 	gh_display(gh_car(AiPlayer->Script));
 #endif

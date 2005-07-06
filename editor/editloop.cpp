@@ -1004,7 +1004,7 @@ static void ShowUnitInfo(const Unit* unit)
 	int i;
 
 	i = sprintf(buf, "#%d '%s' Player:#%d %s", UnitNumber(unit),
-		unit->Type->Name, unit->Player->Player,
+		unit->Type->Name, unit->Player->Index,
 		unit->Active ? "active" : "passive");
 	if (unit->Type->GivesResource) {
 		sprintf(buf + i," Amount %d", unit->ResourcesHeld);

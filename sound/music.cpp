@@ -125,7 +125,7 @@ void PlaySectionMusic(PlaySectionType section)
 
 	for (i = 0; i < NumPlaySections; ++i) {
 		if (PlaySections[i].Type == section && (!PlaySections[i].Race ||
-				!(strcmp(PlaySections[i].Race, ThisPlayer->RaceName)))) {
+				!(strcmp(PlaySections[i].Race, PlayerRaces.Name[ThisPlayer->Race])))) {
 			break;
 		}
 	}

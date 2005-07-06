@@ -189,7 +189,7 @@ static FullReplay* StartReplay(void)
 			replay->Players[i].Type = GameSettings.Presets[i].Type;
 		}
 
-		replay->LocalPlayer = ThisPlayer->Player;
+		replay->LocalPlayer = ThisPlayer->Index;
 	}
 
 	replay->Date = strdup(s);
@@ -446,7 +446,7 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 		mkdir(buf, 0777);
 #endif
 
-		sprintf(buf, "%s/log_of_stratagus_%d.log", buf, ThisPlayer->Player);
+		sprintf(buf, "%s/log_of_stratagus_%d.log", buf, ThisPlayer->Index);
 		LogFile = CLopen(buf, CL_OPEN_WRITE);
 		if (!LogFile) {
 			// don't retry for each command
