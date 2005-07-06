@@ -596,8 +596,8 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 							// Must Adjust Ticks to the fraction that was trained
 							unit->Data.Train.Ticks = 
 								unit->Data.Train.Ticks *
-								dst->Stats[player->Player].Costs[TimeCost] /
-								src->Stats[player->Player].Costs[TimeCost];
+								dst->Stats[player->Index].Costs[TimeCost] /
+								src->Stats[player->Index].Costs[TimeCost];
 						}
 					unit->Orders[j].Type = dst;
 				}
@@ -627,7 +627,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 
 	Assert(player);
 	Assert(um);
-	pn = player->Player;
+	pn = player->Index;
 	for (z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
 
@@ -665,7 +665,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 				numunits = FindUnitsByType(UnitTypes[z], unitupgrade);
 				for (numunits--; numunits >= 0; --numunits) {
 					unit = unitupgrade[numunits];
-					if (unit->Player->Player == pn && !unit->Removed) {
+					if (unit->Player->Index == pn && !unit->Removed) {
 						MapUnmarkUnitSight(unit);
 						unit->CurrentSightRange = UnitTypes[z]->Stats[pn].Variables[SIGHTRANGE_INDEX].Max +
 							um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
@@ -703,7 +703,7 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 				numunits--; // Change to 0 Start not 1 start
 				for (; numunits >= 0; --numunits) {
 					unit = unitupgrade[numunits];
-					if (unit->Player->Player != player->Player) {
+					if (unit->Player->Index != player->Index) {
 						continue;
 					}
 					for (j = 0; j < UnitTypeVar.NumberVariable; j++) {

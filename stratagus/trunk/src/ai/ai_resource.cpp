@@ -93,7 +93,7 @@ static int AiCheckCosts(const int* costs)
 		for (k = 0; k < units[i]->OrderCount; ++k) {
 			if (units[i]->Orders[k].Action == UnitActionBuild) {
 				building_costs =
-					units[i]->Orders[k].Type->Stats[AiPlayer->Player->Player].Costs;
+					units[i]->Orders[k].Type->Stats[AiPlayer->Player->Index].Costs;
 				for (j = 1; j < MaxCosts; ++j) {
 					used[j] += building_costs[j];
 				}
@@ -171,7 +171,7 @@ static int AiCheckSupply(const PlayerAi* pai, const UnitType* type)
 */
 static int AiCheckUnitTypeCosts(const UnitType* type)
 {
-	return AiCheckCosts(type->Stats[AiPlayer->Player->Player].Costs);
+	return AiCheckCosts(type->Stats[AiPlayer->Player->Index].Costs);
 }
 
 /**

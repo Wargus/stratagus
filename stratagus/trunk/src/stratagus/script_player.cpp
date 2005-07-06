@@ -90,7 +90,7 @@ static int CclPlayer(lua_State* l)
 	if (NumPlayers <= i) {
 		NumPlayers = i + 1;
 	}
-	player->Player = i;
+	player->Index = i;
 	if (!(player->Units = calloc(UnitMax, sizeof(Unit*)))) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
@@ -126,7 +126,6 @@ static int CclPlayer(lua_State* l)
 			value = LuaToString(l, j + 1);
 			for (i = 0; i < PlayerRaces.Count; ++i) {
 				if (!strcmp(value, PlayerRaces.Name[i])) {
-					player->RaceName = PlayerRaces.Name[i];
 					player->Race = i;
 					break;
 				}
@@ -389,7 +388,7 @@ static int CclChangeUnitsOwner(lua_State* l)
 	oldp = LuaToNumber(l, 3);
 	newp = LuaToNumber(l, 4);
 	while (n) {
-		if (table[n - 1]->Player->Player == oldp) {
+		if (table[n - 1]->Player->Index == oldp) {
 			ChangeUnitOwner(table[n - 1], &Players[newp]);
 		}
 		--n;
@@ -537,7 +536,7 @@ static int CclSetDiplomacy(lua_State* l)
 */
 static int CclDiplomacy(lua_State* l)
 {
-	lua_pushnumber(l, ThisPlayer->Player);
+	lua_pushnumber(l, ThisPlayer->Index);
 	lua_insert(l, 1);
 	return CclSetDiplomacy(l);
 }
@@ -573,7 +572,7 @@ static int CclSetSharedVision(lua_State* l)
 */
 static int CclSharedVision(lua_State* l)
 {
-	lua_pushnumber(l, ThisPlayer->Player);
+	lua_pushnumber(l, ThisPlayer->Index);
 	lua_insert(l, 1);
 	return CclSetSharedVision(l);
 }
@@ -749,7 +748,7 @@ static int CclGetPlayerData(lua_State* l)
 		lua_pushstring(l, p->Name);
 		return 1;
 	} else if (!strcmp(data, "RaceName")) {
-		lua_pushstring(l, p->RaceName);
+		lua_pushstring(l, PlayerRaces.Name[p->Race]);
 		return 1;
 	} else if (!strcmp(data, "Resources")) {
 		const char* res;
@@ -865,7 +864,6 @@ static int CclSetPlayerData(lua_State* l)
 		p->Race = PlayerRaceNeutral;
 		for (i = 0; i < PlayerRaces.Count; ++i) {
 			if(!strcmp(racename, PlayerRaces.Name[i])) {
-				p->RaceName = PlayerRaces.Name[i];
 				p->Race = i;
 				break;
 			}

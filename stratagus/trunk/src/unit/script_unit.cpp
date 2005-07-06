@@ -1105,7 +1105,7 @@ static int CclOrderUnit(lua_State* l)
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				unittype == unit->Type) {
-			if (plynr == -1 || plynr == unit->Player->Player) {
+			if (plynr == -1 || plynr == unit->Player->Index) {
 				if (!strcmp(order,"move")) {
 					CommandMove(unit, (dx1 + dx2) / 2, (dy1 + dy2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
@@ -1224,7 +1224,7 @@ static int CclKillUnitAt(lua_State* l)
 				(unittype == ALL_FOODUNITS && !unit->Type->Building) ||
 				(unittype == ALL_BUILDINGS && unit->Type->Building) ||
 				unittype==unit->Type) {
-			if (plynr == -1 || plynr == unit->Player->Player) {
+			if (plynr == -1 || plynr == unit->Player->Index) {
 				LetUnitDie(unit);
 				++s;
 			}

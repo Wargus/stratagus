@@ -2040,17 +2040,17 @@ static void DiplomacyInit(Menu* menu __attribute__ ((unused)))
 	for (i = 0; i <= PlayerMax - 2; ++i) {
 		if (Players[i].Type != PlayerNobody && &Players[i] != ThisPlayer) {
 			menu->Items[4 * j + 4].D.Text.text = NewStringDesc(Players[i].Name);
-			if (ThisPlayer->Allied&(1<<Players[i].Player)) {
+			if (ThisPlayer->Allied&(1<<Players[i].Index)) {
 				menu->Items[4 * j + 5].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 5].D.Checkbox.Checked = 0;
 			}
-			if (ThisPlayer->Enemy&(1<<Players[i].Player)) {
+			if (ThisPlayer->Enemy&(1<<Players[i].Index)) {
 				menu->Items[4 * j + 6].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 6].D.Checkbox.Checked = 0;
 			}
-			if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
+			if (ThisPlayer->SharedVision&(1<<Players[i].Index)) {
 				menu->Items[4 * j + 7].D.Checkbox.Checked = 1;
 			} else {
 				menu->Items[4 * j + 7].D.Checkbox.Checked = 0;
@@ -2132,53 +2132,53 @@ static void DiplomacyOk(void)
 			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
 				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they allied?
-				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
-						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
-					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyAllied,
-						Players[i].Player);
+				if (!(ThisPlayer->Allied & (1 << Players[i].Index) &&
+						!(ThisPlayer->Enemy & (1 << Players[i].Index)))) {
+					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyAllied,
+						Players[i].Index);
 				}
 			}
 			// Menu says to be enemies
 			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
 				menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they enemies?
-				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
-						ThisPlayer->Enemy & (1 << Players[i].Player))) {
-					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyEnemy,
-						Players[i].Player);
+				if (!(!(ThisPlayer->Allied & (1 << Players[i].Index)) &&
+						ThisPlayer->Enemy & (1 << Players[i].Index))) {
+					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyEnemy,
+						Players[i].Index);
 				}
 			}
 			// Menu says to be neutral
 			if (!menu->Items[4 * j + 5].D.Checkbox.Checked &&
 				!menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they neutral?
-				if (!(!(ThisPlayer->Allied & (1 << Players[i].Player)) &&
-						!(ThisPlayer->Enemy & (1 << Players[i].Player)))) {
-					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyNeutral,
-						Players[i].Player);
+				if (!(!(ThisPlayer->Allied & (1 << Players[i].Index)) &&
+						!(ThisPlayer->Enemy & (1 << Players[i].Index)))) {
+					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyNeutral,
+						Players[i].Index);
 				}
 			}
 			// Menu says to be crazy
 			if (menu->Items[4 * j + 5].D.Checkbox.Checked &&
 				menu->Items[4 * j + 6].D.Checkbox.Checked) {
 				// Are they crazy?
-				if (!(ThisPlayer->Allied & (1 << Players[i].Player) &&
-						ThisPlayer->Enemy & (1 << Players[i].Player))) {
-					SendCommandDiplomacy(ThisPlayer->Player, DiplomacyCrazy,
-						Players[i].Player);
+				if (!(ThisPlayer->Allied & (1 << Players[i].Index) &&
+						ThisPlayer->Enemy & (1 << Players[i].Index))) {
+					SendCommandDiplomacy(ThisPlayer->Index, DiplomacyCrazy,
+						Players[i].Index);
 				}
 			}
 			// Shared vision
 			if (menu->Items[4 * j + 7].D.Checkbox.Checked) {
-				if (!(ThisPlayer->SharedVision & (1 << Players[i].Player))) {
-					SendCommandSharedVision(ThisPlayer->Player, 1,
-						Players[i].Player);
+				if (!(ThisPlayer->SharedVision & (1 << Players[i].Index))) {
+					SendCommandSharedVision(ThisPlayer->Index, 1,
+						Players[i].Index);
 				}
 			}
 			else {
-				if (ThisPlayer->SharedVision&(1<<Players[i].Player)) {
-					SendCommandSharedVision(ThisPlayer->Player,0,
-						Players[i].Player);
+				if (ThisPlayer->SharedVision&(1<<Players[i].Index)) {
+					SendCommandSharedVision(ThisPlayer->Index,0,
+						Players[i].Index);
 				}
 			}
 
@@ -2435,7 +2435,7 @@ static void SaveReplayOk(void)
 	strcat(TempPathBuf, "/logs/");
 #endif
 	ptr = TempPathBuf + strlen(TempPathBuf);
-	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Player);
+	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Index);
 
 	stat(TempPathBuf, &s);
 	buf = malloc(s.st_size);

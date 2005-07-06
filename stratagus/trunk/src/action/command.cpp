@@ -913,7 +913,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 		// Cancel All training
 		while (unit->Orders[0].Action == UnitActionTrain) {
 			PlayerAddCostsFactor(unit->Player,
-				unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
+				unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
 				CancelTrainingCostsFactor);
 			RemoveOrder(unit, 0);
 		}
@@ -937,7 +937,7 @@ void CommandCancelTraining(Unit* unit, int slot, const UnitType* type)
 		DebugPrint("Cancel training\n");
 
 		PlayerAddCostsFactor(unit->Player,
-			unit->Orders[slot].Type->Stats[unit->Player->Player].Costs,
+			unit->Orders[slot].Type->Stats[unit->Player->Index].Costs,
 			CancelTrainingCostsFactor);
 
 	
@@ -1010,7 +1010,7 @@ void CommandCancelUpgradeTo(Unit* unit)
 	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 
 		PlayerAddCostsFactor(unit->Player,
-			unit->Orders[0].Type->Stats[unit->Player->Player].Costs,
+			unit->Orders[0].Type->Stats[unit->Player->Index].Costs,
 			CancelUpgradeCostsFactor);
 
 		memset(unit->Orders, 0, sizeof(*unit->Orders));
@@ -1271,13 +1271,13 @@ void CommandSharedVision(int player, int state, int opponent)
 				i = x + y * TheMap.Info.MapWidth;
 				if (TheMap.Fields[i].Visible[player] && !TheMap.Fields[i].Visible[opponent]) {
 					TheMap.Fields[i].Visible[opponent] = 1;
-					if (opponent == ThisPlayer->Player) {
+					if (opponent == ThisPlayer->Index) {
 						MapMarkSeenTile(x, y);
 					}
 				}
 				if (TheMap.Fields[i].Visible[opponent] && !TheMap.Fields[i].Visible[player]) {
 					TheMap.Fields[i].Visible[player] = 1;
-					if (player == ThisPlayer->Player) {
+					if (player == ThisPlayer->Index) {
 						MapMarkSeenTile(x, y);
 					}
 				}

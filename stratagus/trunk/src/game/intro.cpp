@@ -905,7 +905,7 @@ static int GameStatsDrawFunc(int frame)
 		ranks = NULL;
 		scores = NULL;
 		for (i = 0; i < PlayerRaces.Count; ++i) {
-			if (!strcmp(PlayerRaces.Name[i], ThisPlayer->RaceName)) {
+			if (!strcmp(PlayerRaces.Name[i], PlayerRaces.Name[ThisPlayer->Race])) {
 				ranks = Ranks[i].Ranks;
 				scores = Ranks[i].Scores;
 				break;

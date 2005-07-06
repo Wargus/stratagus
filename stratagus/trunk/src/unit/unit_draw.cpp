@@ -164,11 +164,11 @@ void DrawUnitSelection(const Unit* unit)
 			EditorState == EditorSelecting) {
 		color = ColorWhite;
 	} else if (unit->Selected || unit->TeamSelected || (unit->Blink & 1)) {
-		if (unit->Player->Player == PlayerNumNeutral) {
+		if (unit->Player->Index == PlayerNumNeutral) {
 			color = ColorYellow;
 		} else if ((unit->Selected || (unit->Blink & 1)) &&
 				(unit->Player == ThisPlayer ||
-					PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
+					PlayersTeamed(ThisPlayer->Index, unit->Player->Index))) {
 			color = ColorGreen;
 		} else if (IsEnemy(ThisPlayer, unit)) {
 			color = ColorRed;
@@ -189,7 +189,7 @@ void DrawUnitSelection(const Unit* unit)
 	} else if (CursorBuilding && unit->Type->Building &&
 			unit->Orders[0].Action != UnitActionDie &&
 			(unit->Player == ThisPlayer ||
-				PlayersTeamed(ThisPlayer->Player, unit->Player->Player))) {
+				PlayersTeamed(ThisPlayer->Index, unit->Player->Index))) {
 		// If building mark all own buildings
 		color = ColorGray;
 	} else {
@@ -1286,9 +1286,9 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 
 #if 0 && DEBUG // This is for showing vis counts and refs.
 	char buf[10];
-	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Player],
-		unit->Seen.ByPlayer & (1 << ThisPlayer->Player) ? 'Y' : 'N',
-		unit->Seen.Destroyed & (1 << ThisPlayer->Player) ? 'Y' : 'N',
+	sprintf(buf, "%d%c%c%d", unit->VisCount[ThisPlayer->Index],
+		unit->Seen.ByPlayer & (1 << ThisPlayer->Index) ? 'Y' : 'N',
+		unit->Seen.Destroyed & (1 << ThisPlayer->Index) ? 'Y' : 'N',
 		unit->Refs);
 	VideoDrawTextClip(x + 10, y + 10, 1, buf);
 #endif
@@ -1479,7 +1479,7 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 {
 	int player;
 
-	player = unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player;
+	player = unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index;
 	if (cframe->File == ConstructionFileConstruction) {
 		const Construction* construction;
 
@@ -1613,11 +1613,11 @@ void DrawUnit(const Unit* unit)
 	} else if (state == 2) {
 		// FIXME: this frame is hardcoded!!!
 		DrawUnitType(type, sprite,
-			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+			unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index,
 			frame < 0 ? -1 - 1 : 1, x, y);
 	} else {
 		DrawUnitType(type, sprite,
-			unit->RescuedFrom ? unit->RescuedFrom->Player : unit->Player->Player,
+			unit->RescuedFrom ? unit->RescuedFrom->Index : unit->Player->Index,
 			frame, x, y);
 	}
 

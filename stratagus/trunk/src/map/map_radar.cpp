@@ -95,12 +95,12 @@ unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int 
 	unsigned char* jamming;
 
 	jamming = TheMap.Fields[y * TheMap.Info.MapWidth + x].RadarJammer;
-	if (jamming[punit->Player]) {
+	if (jamming[punit->Index]) {
 		return 0;
 	}
 
 	radar = TheMap.Fields[y * TheMap.Info.MapWidth + x].Radar;
-	radarvision = radar[pradar->Player];
+	radarvision = radar[pradar->Index];
 
 	if (!pradar->SharedVision) {
 		return radarvision;
@@ -109,12 +109,12 @@ unsigned char IsTileRadarVisible(const Player* pradar, const Player* punit, int 
 	// Check jamming first, if we are jammed, exit
 	for (i = 0; i < PlayerMax ; ++i) {
 		if (jamming[i] > 0 && (punit->SharedVision & (1 << i)) &&
-				(Players[i].SharedVision & (1 << punit->Player))) {
+				(Players[i].SharedVision & (1 << punit->Index))) {
 			// We are jammed, return nothing
 			return 0;
 		}
 		if (pradar->SharedVision & (1 << i) &&
-				(Players[i].SharedVision & (1 << pradar->Player))) {
+				(Players[i].SharedVision & (1 << pradar->Index))) {
 			radarvision |= radar[i];
 		}
 	}
@@ -134,9 +134,9 @@ void MapMarkTileRadar(const Player* player, int x, int y)
 {
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
-	Assert(TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player] != 255);
+	Assert(TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Index] != 255);
 
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player]++;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Index]++;
 }
 
 /**
@@ -154,7 +154,7 @@ void MapUnmarkTileRadar(const Player* player, int x, int y)
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
 
 	// Reduce radar coverage if it exists.
-	v = &TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Player];
+	v = &TheMap.Fields[x + y * TheMap.Info.MapWidth].Radar[player->Index];
 	if (*v) {
 		--*v;
 	}
@@ -171,9 +171,9 @@ void MapMarkTileRadarJammer(const Player* player, int x, int y)
 {
 	Assert(0 <= x && x < TheMap.Info.MapWidth);
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
-	Assert(TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player] != 255);
+	Assert(TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Index] != 255);
 
-	TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player]++;
+	TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Index]++;
 }
 
 /**
@@ -191,7 +191,7 @@ void MapUnmarkTileRadarJammer(const Player* player, int x, int y)
 	Assert(0 <= y && y < TheMap.Info.MapHeight);
 
 	// Reduce radar coverage if it exists.
-	v = &TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Player];
+	v = &TheMap.Fields[x + y * TheMap.Info.MapWidth].RadarJammer[player->Index];
 	if (*v) {
 		--*v;
 	}

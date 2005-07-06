@@ -399,7 +399,7 @@ void AssignUnitToPlayer(Unit* unit, Player* player)
 		}
 	}
 	unit->Player = player;
-	unit->Stats = &type->Stats[unit->Player->Player];
+	unit->Stats = &type->Stats[unit->Player->Index];
 	unit->Colors = &player->UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.NumberVariable) {
@@ -1136,7 +1136,7 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 		// it's sort of the whole point of this tracking.
 		//
 		if (unit->Destroyed) {
-			unit->Seen.Destroyed |= (1 << player->Player);
+			unit->Seen.Destroyed |= (1 << player->Index);
 		}
 		if (player == ThisPlayer) {
 			UnitFillSeenValues(unit);
@@ -1160,13 +1160,13 @@ void UnitGoesUnderFog(Unit* unit, const Player* player)
 void UnitGoesOutOfFog(Unit* unit, const Player* player)
 {
 	if (unit->Type->VisibleUnderFog) {
-		if (unit->Seen.ByPlayer & (1 << (player->Player))) {
+		if (unit->Seen.ByPlayer & (1 << (player->Index))) {
 			if ((player->Type == PlayerPerson) &&
-					(!(   unit->Seen.Destroyed & (1 << player->Player)   )) ) {
+					(!(   unit->Seen.Destroyed & (1 << player->Index)   )) ) {
 				RefsDecrease(unit);
 			}
 		} else {
-			unit->Seen.ByPlayer |= (1 << (player->Player));
+			unit->Seen.ByPlayer |= (1 << (player->Index));
 		}
 	}
 }
@@ -1198,13 +1198,13 @@ void UnitsOnTileMarkSeen(const Player* player, int x, int y, int cloak)
 		//  It will be able to see the unit after the Unit->VisCount ++
 		//
 		for (p = 0; p < PlayerMax; ++p) {
-			if (PlayersShareVision(player->Player, p) || (p == player->Player)) {
+			if (PlayersShareVision(player->Index, p) || (p == player->Index)) {
 				if (!UnitVisible(unit, Players + p)) {
 					UnitGoesOutOfFog(unit, Players + p);
 				}
 			}
 		}
-		unit->VisCount[player->Player]++;
+		unit->VisCount[player->Index]++;
 	}
 }
 
@@ -1231,7 +1231,7 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 		if (cloak != (int)unit->Type->PermanentCloak) {
 			continue;
 		}
-		p = player->Player;
+		p = player->Index;
 		Assert(unit->VisCount[p]);
 		unit->VisCount[p]--;
 		//
@@ -1242,7 +1242,7 @@ void UnitsOnTileUnmarkSeen(const Player* player, int x, int y, int cloak)
 		//
 		if (!unit->VisCount[p]) {
 			for (p = 0; p < PlayerMax; ++p) {
-				if (PlayersShareVision(player->Player, p) || p == player->Player) {
+				if (PlayersShareVision(player->Index, p) || p == player->Index) {
 					if (!UnitVisible(unit, Players + p)) {
 						UnitGoesUnderFog(unit, Players + p);
 					}
@@ -1336,7 +1336,7 @@ int UnitVisible(const Unit* unit, const Player* player)
 	int cp;
 
 	// Current player.
-	cp = player->Player;
+	cp = player->Index;
 	if (unit->VisCount[cp]) {
 		return 1;
 	}
@@ -1365,7 +1365,7 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 	// Invisibility
 	//
 	if (unit->Variable[INVISIBLE_INDEX].Value && (player != unit->Player) &&
-			(!PlayersShareVision(player->Player, unit->Player->Player))) {
+			(!PlayersShareVision(player->Index, unit->Player->Index))) {
 		return 0;
 	}
 	if (UnitVisible(unit, player) || player->Type == PlayerComputer ||
@@ -1374,8 +1374,8 @@ int UnitVisibleAsGoal(const Unit* unit, const Player* player)
 			unit->Orders->Action != UnitActionDie;
 	} else {
 		return unit->Type->VisibleUnderFog &&
-			(unit->Seen.ByPlayer & (1 << player->Player)) &&
-			!(unit->Seen.Destroyed & (1 << player->Player));
+			(unit->Seen.ByPlayer & (1 << player->Index)) &&
+			!(unit->Seen.Destroyed & (1 << player->Index));
 	}
 }
 
@@ -1394,7 +1394,7 @@ int UnitVisibleOnMap(const Unit* unit, const Player* player)
 	// Invisible units.
 	//
 	if (unit->Variable[INVISIBLE_INDEX].Value && player != unit->Player &&
-			!PlayersShareVision(player->Player, unit->Player->Player)) {
+			!PlayersShareVision(player->Index, unit->Player->Index)) {
 		return 0;
 	}
 
@@ -1418,7 +1418,7 @@ int UnitVisibleOnMinimap(const Unit* unit)
 	// Invisible units.
 	//
 	if (unit->Variable[INVISIBLE_INDEX].Value && (ThisPlayer != unit->Player) &&
-			(!PlayersShareVision(ThisPlayer->Player, unit->Player->Player))) {
+			(!PlayersShareVision(ThisPlayer->Index, unit->Player->Index))) {
 		return 0;
 	}
 	if (UnitVisible(unit, ThisPlayer) || ReplayRevealMap ||
@@ -1430,9 +1430,9 @@ int UnitVisibleOnMinimap(const Unit* unit)
 		if (!unit->Type->VisibleUnderFog) {
 			return 0;
 		}
-		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Player)) &&
+		return ((unit->Seen.ByPlayer & (1 << ThisPlayer->Index)) &&
 			unit->Seen.State != 3 &&
-			!(unit->Seen.Destroyed & (1 << ThisPlayer->Player)));
+			!(unit->Seen.Destroyed & (1 << ThisPlayer->Index)));
 	}
 }
 
@@ -1468,7 +1468,7 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 
 	// Those are never ever visible.
 	if (unit->Variable[INVISIBLE_INDEX].Value && ThisPlayer != unit->Player &&
-			!PlayersShareVision(ThisPlayer->Player, unit->Player->Player)) {
+			!PlayersShareVision(ThisPlayer->Index, unit->Player->Index)) {
 		return 0;
 	}
 
@@ -1477,8 +1477,8 @@ int UnitVisibleInViewport(const Unit* unit, const Viewport* vp)
 	} else {
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
-		if (!unit->Destroyed || !(unit->Seen.Destroyed & (1 << ThisPlayer->Player))) {
-			return (unit->Type->VisibleUnderFog && (unit->Seen.ByPlayer & (1 << ThisPlayer->Player)));
+		if (!unit->Destroyed || !(unit->Seen.Destroyed & (1 << ThisPlayer->Index))) {
+			return (unit->Type->VisibleUnderFog && (unit->Seen.ByPlayer & (1 << ThisPlayer->Index)));
 		} else {
 			return 0;
 		}
@@ -1571,7 +1571,7 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 
 	MapUnmarkUnitSight(unit);
 	unit->Player = newplayer;
-	unit->Stats = &unit->Type->Stats[newplayer->Player];
+	unit->Stats = &unit->Type->Stats[newplayer->Index];
 	UpdateUnitSightRange(unit);
 	MapMarkUnitSight(unit);
 
@@ -2557,7 +2557,7 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 				//
 				if ((mine = ResourceOnMap(x, y, resource)) &&
 						mine->Type->CanHarvest &&
-						(mine->Player->Player == PlayerMax - 1 ||
+						(mine->Player->Index == PlayerMax - 1 ||
 							mine->Player == unit->Player ||
 							IsAllied(unit->Player, mine))) {
 					if (destu) {
@@ -2945,7 +2945,7 @@ void LetUnitDie(Unit* unit)
 		unit->IX = (type->CorpseType->Width - VideoGraphicWidth(type->CorpseType->Sprite)) / 2;
 		unit->IY = (type->CorpseType->Height - VideoGraphicHeight(type->CorpseType->Sprite)) / 2;
 
-		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Player].Variables[SIGHTRANGE_INDEX].Max;
+		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {
 		unit->CurrentSightRange = 0;
 	}
@@ -3433,7 +3433,7 @@ int CanTransport(const Unit* transporter, const Unit* unit)
 	}
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
-	if (!PlayersTeamed(transporter->Player->Player, unit->Player->Player)) {
+	if (!PlayersTeamed(transporter->Player->Index, unit->Player->Index)) {
 		return 0;
 	}
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) {
@@ -3608,7 +3608,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, "\"seen-type\", \"%s\", ", unit->Seen.Type->Ident);
 	}
 
-	CLprintf(file, "\"player\", %d,\n  ", unit->Player->Player);
+	CLprintf(file, "\"player\", %d,\n  ", unit->Player->Index);
 
 	if (unit->Next) {
 		CLprintf(file, "\"next\", %d, ", UnitNumber(unit->Next));
@@ -3630,7 +3630,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, "\"stats\", \"S%08X\",\n  ", (int)unit->Stats);
 	}
 #else
-	CLprintf(file, "\"stats\", %d,\n  ", unit->Player->Player);
+	CLprintf(file, "\"stats\", %d,\n  ", unit->Player->Index);
 #endif
 	CLprintf(file, "\"pixel\", {%d, %d}, ", unit->IX, unit->IY);
 	CLprintf(file, "\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
@@ -3656,7 +3656,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		CLprintf(file, " \"selected\",");
 	}
 	if (unit->RescuedFrom) {
-		CLprintf(file, " \"rescued-from\", %d,", unit->RescuedFrom->Player);
+		CLprintf(file, " \"rescued-from\", %d,", unit->RescuedFrom->Index);
 	}
 	// n0b0dy: How is this usefull?
 	// mr-russ: You can't always load units in order, it saved the information

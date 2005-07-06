@@ -237,7 +237,7 @@ static void DrawBuildingCursor(void)
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 	DrawShadow(NULL, CursorBuilding, CursorBuilding->StillFrame, x, y);
-	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Player,
+	DrawUnitType(CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 		CursorBuilding->StillFrame, x, y);
 
 	//

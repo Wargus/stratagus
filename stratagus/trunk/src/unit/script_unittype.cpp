@@ -1870,7 +1870,7 @@ void UpdateUnitVariables(const Unit* unit)
 	// Build
 	if (unit->Orders[0].Action == UnitActionBuilt) {
 		unit->Variable[BUILD_INDEX].Value = unit->Data.Built.Progress;
-		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Player].Costs[TimeCost] * 600;
+		unit->Variable[BUILD_INDEX].Max = type->Stats[unit->Player->Index].Costs[TimeCost] * 600;
 
 		// This should happen when building unit with several peons
 		// Maybe also with only one.
@@ -1896,14 +1896,14 @@ void UpdateUnitVariables(const Unit* unit)
 	if (unit->Orders[0].Action == UnitActionTrain) {
 		unit->Variable[TRAINING_INDEX].Value = unit->Data.Train.Ticks;
 		unit->Variable[TRAINING_INDEX].Max =
-			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
+			unit->Orders[0].Type->Stats[unit->Player->Index].Costs[TimeCost];
 	}
 
 	// UpgradeTo
 	if (unit->Orders[0].Action == UnitActionUpgradeTo) {
 		unit->Variable[UPGRADINGTO_INDEX].Value = unit->Data.UpgradeTo.Ticks;
 		unit->Variable[UPGRADINGTO_INDEX].Max =
-			unit->Orders[0].Type->Stats[unit->Player->Player].Costs[TimeCost];
+			unit->Orders[0].Type->Stats[unit->Player->Index].Costs[TimeCost];
 	}
 
 	// Resources.

@@ -878,12 +878,12 @@ void NetworkEvent(void)
 			// FIXME: not neccessary to send this packet multiple times!!!!
 			// other side sends re-send until it gets an answer.
 
-			if (n != NetworkIn[n & 0xFF][ThisPlayer->Player][0].Time) {
+			if (n != NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time) {
 				// Asking for a cycle we haven't gotten to yet, ignore for now
 				return;
 			}
 
-			NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Player]);
+			NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Index]);
 
 			// Check if a player quit this cycle
 			for (j = 0; j < HostsCount; ++j) {
@@ -940,15 +940,15 @@ void NetworkEvent(void)
 				break;
 			case MessageCommandDismiss:
 				// Allow to explode critters.
-				if ((UnitSlots[ntohs(nc->Unit)]->Player->Player == PlayerNumNeutral) &&
+				if ((UnitSlots[ntohs(nc->Unit)]->Player->Index == PlayerNumNeutral) &&
 					UnitSlots[ntohs(nc->Unit)]->Type->ClicksToExplode) {
 					allowed = 1;
 					break;
 				}
 				// Fall through!
 			default:
-				if (UnitSlots[ntohs(nc->Unit)]->Player->Player == player ||
-					PlayersTeamed(player, UnitSlots[ntohs(nc->Unit)]->Player->Player)) {
+				if (UnitSlots[ntohs(nc->Unit)]->Player->Index == player ||
+					PlayersTeamed(player, UnitSlots[ntohs(nc->Unit)]->Player->Index)) {
 					allowed = 1;
 				} else {
 					allowed = 0;
@@ -996,15 +996,15 @@ void NetworkQuit(void)
 	}
 
 	n = (GameCycle + NetworkUpdates) / NetworkUpdates * NetworkUpdates + NetworkLag;
-	NetworkIn[n & 0xFF][ThisPlayer->Player][0].Type = MessageQuit;
-	NetworkIn[n & 0xFF][ThisPlayer->Player][0].Time = n;
-	NetworkIn[n & 0xFF][ThisPlayer->Player][0].Data.X = ThisPlayer->Player;
+	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Type = MessageQuit;
+	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Time = n;
+	NetworkIn[n & 0xFF][ThisPlayer->Index][0].Data.X = ThisPlayer->Index;
 
 	for (i = 1; i < MaxNetworkCommands; ++i) {
-		NetworkIn[n & 0xFF][ThisPlayer->Player][i].Type = MessageNone;
+		NetworkIn[n & 0xFF][ThisPlayer->Index][i].Type = MessageNone;
 	}
 
-	NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Player]);
+	NetworkSendPacket(NetworkIn[n & 0xFF][ThisPlayer->Index]);
 }
 
 /**
@@ -1027,7 +1027,7 @@ void NetworkChatMessage(const char* msg)
 			dl_insert_first(MsgCommandsIn, ncq->List);
 			ncq->Type = MessageChat;
 			ncm = (NetworkChat *)(&ncq->Data);
-			ncm->Player = ThisPlayer->Player;
+			ncm->Player = ThisPlayer->Index;
 			memcpy(ncm->Text, cp, sizeof(ncm->Text));
 			cp += sizeof(ncm->Text);
 			n -= sizeof(ncm->Text);
@@ -1036,7 +1036,7 @@ void NetworkChatMessage(const char* msg)
 		dl_insert_first(MsgCommandsIn, ncq->List);
 		ncq->Type = MessageChatTerm;
 		ncm = (NetworkChat*)(&ncq->Data);
-		ncm->Player = ThisPlayer->Player;
+		ncm->Player = ThisPlayer->Index;
 		memcpy(ncm->Text, cp, n + 1); // see >= above :)
 	}
 }
@@ -1148,7 +1148,7 @@ static void NetworkSendCommands(void)
 	//
 	numcommands = 0;
 	incommand = NULL;
-	ncq = NetworkIn[(GameCycle + NetworkLag) & 0xFF][ThisPlayer->Player];
+	ncq = NetworkIn[(GameCycle + NetworkLag) & 0xFF][ThisPlayer->Index];
 	memset(ncq, 0, sizeof(NetworkCommandQueue) * MaxNetworkCommands);
 	if (dl_empty(CommandsIn) && dl_empty(MsgCommandsIn)) {
 		ncq[0].Type = MessageSync;
