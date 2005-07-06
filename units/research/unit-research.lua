@@ -48,9 +48,16 @@ DefineConstruction("construction-rfac", {
 		{Percent = 90, File = "main", Frame = 0}
 	}
     })
+
 DefineAnimations("animations-rfac", {
     Still = {"frame 0", "wait 3", },
     })
+
+MakeSound("rfac-selected", GetCurrentLuaPath().."/sfx_rfac.select.wav")
+MakeSound("rfac-ready", GetCurrentLuaPath().."/research.facility.completed.wav")
+MakeSound("rfac-help", GetCurrentLuaPath().."/research.facility.underattack.wav")
+MakeSound("rfac-dead", GetCurrentLuaPath().."/sfx_rfac.die.wav")
+
 DefineUnitType("unit-rfac", {
 	Name = "Research Facility",
 	Image = {"file", GetCurrentLuaPath().."/research_facility.png", "size", {128, 128}},
@@ -70,11 +77,13 @@ DefineUnitType("unit-rfac", {
 		"help", "rfac-help",
 		"dead", "rfac-dead"}
 	})
+
 DefineAnimations("animations-elitebuild4", {
     Death = {"unbreakable begin", "wait 1", "frame 12", "wait 2000", 
         "frame 12", "wait 200", "frame 12", "wait 200", "frame 13", "wait 200",
         "frame 13", "wait 200", "frame 13", "wait 1", "unbreakable end", "wait 1", },
     })
+
 DefineUnitType("build-dead-body4", {
 	Name = "RfacCrater",
 	Image = {"file", GetCurrentLuaPath().."/research_facility.png", "size", {128, 128}},
