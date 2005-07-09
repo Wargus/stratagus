@@ -471,7 +471,7 @@ void PreMenuSetup(void)
 	InitVideoCursors();
 
 	// FIXME: make the race ui configurable
-	InitMenus(PlayerRaces.Race[0]);
+	InitMenus(0);
 	LoadCursors(PlayerRaces.Name[0]);
 	InitSettings();
 

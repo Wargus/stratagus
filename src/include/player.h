@@ -363,12 +363,10 @@ struct _player_ {
 
 /**
 **  Races for the player
-**  Mapped with #PlayerRaces to a symbolic name, which will be used in
-**  the future.
+**  Mapped with #PlayerRaces to a symbolic name.
 */
 #define MAX_RACES 8
 typedef struct _player_race_ {
-	int   Race[MAX_RACES];     /// race number
 	char  Visible[MAX_RACES];  /// race should be visible in pulldown
 	char* Name[MAX_RACES];     /// race names
 	char* Display[MAX_RACES];  /// text to display in pulldown
@@ -462,9 +460,6 @@ extern int PlayerColorIndexCount;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-	/// Get race array index by race type
-extern int PlayerRacesIndex(int race);
 
 	/// Init players
 extern void InitPlayers(void);
