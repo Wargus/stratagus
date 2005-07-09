@@ -380,7 +380,6 @@ enum PlayerRacesOld {
 	PlayerRaceHuman = 0,  /// belongs to human
 	PlayerRaceOrc  = 1,   /// belongs to orc
 };
-#define PlayerRaceNeutral (PlayerRaces.Count-1)
 
 /**
 **  Types for the player

@@ -1911,7 +1911,7 @@ printf("Race = %d\n", Selected[0]->Player->Race);
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundIdForName("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == ThisPlayer || PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index) ||
-						Selected[0]->Player->Race == PlayerRaceNeutral) {
+						Selected[0]->Player->Type == PlayerNeutral) {
 					PlayUnitSound(Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
