@@ -84,27 +84,6 @@ int PlayerColorIndexCount;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Get race array index by race type
-**
-**  @param race  Race
-**
-**  @return      Index to race in PlayerRaces
-*/
-int PlayerRacesIndex(int race)
-{
-	int i;
-
-	for (i = 0; i < PlayerRaces.Count; ++i) {
-		if (PlayerRaces.Race[i] == race) {
-			return i;
-		}
-	}
-	fprintf(stderr, "Invalid race: %d\n", race);
-	Assert(0);
-	return 0;
-}
-
-/**
 **  Init players.
 */
 void InitPlayers(void)
@@ -392,7 +371,7 @@ void CreatePlayer(int type)
 	printf("CreatePlayer name %s\n", player->Name);
 
 	player->Type = type;
-	player->Race = PlayerRaces.Race[0];
+	player->Race = 0;
 	player->Team = team;
 	player->Enemy = 0;
 	player->Allied = 0;
@@ -845,7 +824,7 @@ void DebugPlayers(void)
 			ThisPlayer == &Players[i] ? '*' :
 				Players[i].AiEnabled ? '+' : ' ' _C_
 			Players[i].Name _C_ playertype _C_
-			PlayerRaces.Name[PlayerRacesIndex(Players[i].Race)] _C_
+			PlayerRaces.Name[Players[i].Race] _C_
 			Players[i].AiName);
 	}
 #endif

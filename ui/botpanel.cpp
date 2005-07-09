@@ -562,7 +562,7 @@ static ButtonAction* UpdateButtonPanelMultipleUnits(void)
 	}
 
 	sprintf(unit_ident,	",%s-group,",
-			PlayerRaces.Name[PlayerRacesIndex(ThisPlayer->Race)]);
+			PlayerRaces.Name[ThisPlayer->Race]);
 
 	for (z = 0; z < NumUnitButtons; ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
