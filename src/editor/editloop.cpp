@@ -1948,7 +1948,7 @@ static void CreateEditor(void)
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
 				TheMap.Info.PlayerType[i] = PlayerNeutral;
-				TheMap.Info.PlayerSide[i] = Players[i].Race = PlayerRaceNeutral;
+				TheMap.Info.PlayerSide[i] = Players[i].Race = 0;
 			} else {
 				CreatePlayer(PlayerNobody);
 				TheMap.Info.PlayerType[i] = PlayerNobody;

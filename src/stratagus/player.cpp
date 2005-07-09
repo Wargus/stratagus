@@ -101,7 +101,7 @@ int PlayerRacesIndex(int race)
 	}
 	fprintf(stderr, "Invalid race: %d\n", race);
 	Assert(0);
-	return PlayerRaceNeutral;
+	return 0;
 }
 
 /**
