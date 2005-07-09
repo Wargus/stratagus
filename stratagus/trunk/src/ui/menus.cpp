@@ -3427,7 +3427,7 @@ static void GameRCSAction(Menuitem* mi, int i)
 			}
 		}
 		if (i != 0) {
-			GameSettings.Presets[0].Race = PlayerRaces.Race[x];
+			GameSettings.Presets[0].Race = x;
 		} else {
 			GameSettings.Presets[0].Race = SettingsPresetMapDefault;
 		}
@@ -3645,7 +3645,7 @@ static void NetworkGamePrepareGameSettings(void)
 							++x;
 						}
 					}
-					GameSettings.Presets[num[i]].Race = PlayerRaces.Race[x];
+					GameSettings.Presets[num[i]].Race = x;
 				} else {
 					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}

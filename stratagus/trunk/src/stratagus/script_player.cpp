@@ -602,7 +602,6 @@ static int CclDefineRaceNames(lua_State* l)
 			}
 			subargs = luaL_getn(l, j + 1);
 			i = PlayerRaces.Count++;
-			PlayerRaces.Race[i] = 0;
 			PlayerRaces.Name[i] = NULL;
 			PlayerRaces.Display[i] = NULL;
 			PlayerRaces.Visible[i] = 0;
@@ -610,12 +609,7 @@ static int CclDefineRaceNames(lua_State* l)
 				lua_rawgeti(l, j + 1, k + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
-				if (!strcmp(value, "race")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					PlayerRaces.Race[i] = LuaToNumber(l, -1);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "name")) {
+				if (!strcmp(value, "name")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					PlayerRaces.Name[i] = strdup(LuaToString(l, -1));
