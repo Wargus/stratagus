@@ -95,6 +95,9 @@ int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of player
 char UseHPForXp = 0;                  /// true if gain XP by dealing damage, false if by killing.
 NumberDesc* Damage;                   /// Damage calculation for missile.
 
+static int NumberCounter = 0; /// Counter for lua function.
+static int StringCounter = 0; /// Counter for lua function.
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -472,6 +475,83 @@ UnitDesc* CclParseUnitDesc(lua_State* l)
 
 
 /**
+**  Add a Lua handler
+**
+**  @param l          lua state.
+**  @param tablename  name of the lua table.
+**  @param counter    Counter for the handler
+**
+**  @return handle of the function.
+*/
+static int ParseLuaFunction(lua_State* l, const char* tablename, int* counter)
+{
+	lua_pushstring(l, tablename);
+	lua_gettable(l, LUA_GLOBALSINDEX);
+	if (lua_isnil(l, -1)) {
+		lua_pop(l, 1);
+		lua_pushstring(l, tablename);
+		lua_newtable(l);
+		lua_settable(l, LUA_GLOBALSINDEX);
+		lua_pushstring(l, tablename);
+		lua_gettable(l, LUA_GLOBALSINDEX);
+	}
+	lua_pushvalue(l, -2);
+	lua_rawseti(l, -2, *counter);
+	lua_pop(l, 1);
+	return (*counter)++;
+}
+
+/**
+**  Call a Lua handler
+**
+**  @param handler  handler of the lua function to call.
+**
+**  @return  lua function result.
+*/
+static int CallLuaNumberFunction(unsigned int handler)
+{
+	int narg;
+	int res;
+
+	narg = lua_gettop(Lua);
+	lua_pushstring(Lua, "_numberfunction_");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_rawgeti(Lua, -1, handler);
+	LuaCall(0, 0);
+	if (lua_gettop(Lua) - narg != 2) {
+		LuaError(Lua, "Function must return one value.");
+	}
+	res = LuaToNumber(Lua, -1);
+	lua_pop(Lua, 2);
+	return res;
+}
+
+/**
+**  Call a Lua handler
+**
+**  @param handler  handler of the lua function to call.
+**
+**  @return  lua function result.
+*/
+static char* CallLuaStringFunction(unsigned int handler)
+{
+	int narg;
+	char* res;
+
+	narg = lua_gettop(Lua);
+	lua_pushstring(Lua, "_stringfunction_");
+	lua_gettable(Lua, LUA_GLOBALSINDEX);
+	lua_rawgeti(Lua, -1, handler);
+	LuaCall(0, 0);
+	if (lua_gettop(Lua) - narg != 2) {
+		LuaError(Lua, "Function must return one value.");
+	}
+	res = strdup(LuaToString(Lua, -1));
+	lua_pop(Lua, 2);
+	return res;
+}
+
+/**
 **  Return number.
 **
 **  @param l    lua state.
@@ -488,6 +568,9 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
 		res->D.Val = LuaToNumber(l, -1);
+	} else if (lua_isfunction(l, -1)) {
+		res->e = ENumber_Lua;
+		res->D.Index = ParseLuaFunction(l, "_numberfunction_", &NumberCounter);
 	} else if (lua_istable(l, -1)) {
 		nargs = luaL_getn(l, -1);
 		if (nargs != 2) {
@@ -663,6 +746,9 @@ StringDesc* CclParseStringDesc(lua_State* l)
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
 		res->D.Val = strdup(LuaToString(l, -1));
+	} else if (lua_isfunction(l, -1)) {
+		res->e = EString_Lua;
+		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
 	} else if (lua_istable(l, -1)) {
 		nargs = luaL_getn(l, -1);
 		if (nargs != 2) {
@@ -809,6 +895,8 @@ int EvalNumber(const NumberDesc* number)
 
 	Assert(number);
 	switch (number->e) {
+		case ENumber_Lua :     // a lua function.
+			return CallLuaNumberFunction(number->D.Index);
 		case ENumber_Dir :     // directly a number.
 			return number->D.Val;
 		case ENumber_Add :     // a + b.
@@ -910,6 +998,8 @@ char* EvalString(const StringDesc* s)
 
 	Assert(s);
 	switch (s->e) {
+		case EString_Lua :     // a lua function.
+			return CallLuaStringFunction(s->D.Index);
 		case EString_Dir :     // directly a string.
 			return strdup(s->D.Val);
 		case EString_Concat :     // a + b -> "ab"
@@ -1058,6 +1148,8 @@ void FreeNumberDesc(NumberDesc* number)
 		return;
 	}
 	switch (number->e) {
+		case ENumber_Lua :     // a lua function.
+			// FIXME: when lua table should be freed ?
 		case ENumber_Dir :     // directly a number.
 			break;
 		case ENumber_Add :     // a + b.
@@ -1110,6 +1202,9 @@ void FreeStringDesc(StringDesc* s)
 		return;
 	}
 	switch (s->e) {
+		case EString_Lua :     // a lua function.
+			// FIXME: when lua table should be freed ?
+			break;
 		case EString_Dir :     // directly a string.
 			free(s->D.Val);
 			break;

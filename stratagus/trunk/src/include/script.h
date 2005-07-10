@@ -76,6 +76,7 @@ extern int LuaCall(int narg, int clear);
 #include "iolib.h"
 
 typedef enum {
+	ENumber_Lua,         /// a lua function.
 	ENumber_Dir,         /// directly a number.
 	ENumber_Add,         /// a + b.
 	ENumber_Sub,         /// a - b.
@@ -107,6 +108,7 @@ typedef enum {
 } EUnit; /// All possible value for a unit.
 
 typedef enum {
+	EString_Lua,          /// a lua function.
 	EString_Dir,          /// directly a string.
 	EString_Concat,       /// a + b [+ c ...].
 	EString_String,       /// Convert number in string.
@@ -180,6 +182,7 @@ typedef struct {
 struct _NumberDesc_ {
 	ENumber e;       /// which number.
 	union {
+		unsigned int Index; /// index of the lua function.
 		int Val;       /// Direct value.
 		NumberDesc* N; /// Other number.
 		BinOp BinOp;   /// For binary operand.
@@ -217,6 +220,7 @@ struct _UnitDesc_ {
 struct _StringDesc_ {
 	EString e;       /// which number.
 	union {
+		unsigned int Index; /// index of the lua function.
 		char *Val;       /// Direct value.
 		struct {
 			StringDesc** Strings;  /// Array of operands.
