@@ -77,6 +77,8 @@ and how to use it.
   <dl>
 	<dt>number</dt>
 	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>a lua function</dt>
+	<dd>A Lua function (which take no argument) which returns the value.</dd>
 	<dt>Add(NumberDesc, NumberDesc)</dt>
 	<dd>the sum of two numbers.<br>
 	Note: prefer do (5 + 9) if you can.
@@ -145,6 +147,8 @@ and how to use it.
   <dl>
 	<dt>"string"</dt>
 	<dd>direct value. Or value which are not recompute during the game.</dd>
+	<dt>a lua function</dt>
+	<dd>A Lua function (which take no argument) which returns the value.</dd>
 	<dt>Concat(StringDesc, StringDesc[, StringDesc, ...])</dt>
 	<dd>Concatenation of several strings.</dd>
 	<dt>String(NumberDesc)</dt>
