@@ -628,6 +628,68 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 }
 
 /**
+** Cast capture.
+**
+**  @param caster       Unit that casts the spell
+**  @param spell        Spell-type pointer
+**  @param action       Parameters of the spell.
+**  @param target       Target unit that spell is addressed to
+**  @param x            X coord of target spot when/if target does not exist
+**  @param y            Y coord of target spot when/if target does not exist
+**
+**  @return             =!0 if spell should be repeated, 0 if not
+*/
+int CastCapture(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
+{
+	if (!target || caster->Player == target->Player) {
+		return 0;
+	}
+	if (action->Data.Capture.DamagePercent) {
+		if ((100 * target->Variable[HP_INDEX].Value) /
+			target->Variable[HP_INDEX].Max > action->Data.Capture.DamagePercent &&
+			target->Variable[HP_INDEX].Value > action->Data.Capture.Damage) {
+				HitUnit(caster, target, action->Data.Capture.Damage);
+				if (action->Data.Capture.SacrificeEnable) {
+					// No corpse.
+					RemoveUnit(caster, NULL);
+					UnitLost(caster);
+					UnitClearOrders(caster);
+				}
+				return 1;
+			}
+		}
+	caster->Player->Score += target->Type->Points;
+	if (IsEnemy(caster->Player, target)) {
+		if (target->Type->Building) {
+			caster->Player->TotalRazings++;
+		} else {
+			caster->Player->TotalKills++;
+		}
+		if (UseHPForXp) {
+			caster->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
+		} else {
+			caster->Variable[XP_INDEX].Max += target->Type->Points;
+		}
+		caster->Variable[XP_INDEX].Value = caster->Variable[XP_INDEX].Max;
+		caster->Variable[KILL_INDEX].Value++;
+		caster->Variable[KILL_INDEX].Max++;
+		caster->Variable[KILL_INDEX].Enable = 1;
+	}
+	ChangeUnitOwner(target, caster->Player);
+	if (action->Data.Capture.SacrificeEnable) {
+		// No corpse.
+		RemoveUnit(caster, NULL);
+		UnitLost(caster);
+		UnitClearOrders(caster);
+	} else {
+		caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
+	}
+	UnitClearOrders(target);
+	return 0;
+}
+
+/**
 ** Cast summon spell.
 **
 **  @param caster       Unit that casts the spell

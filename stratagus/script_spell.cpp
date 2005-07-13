@@ -383,6 +383,27 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 		if (spellaction->Data.SpawnPortal.PortalType == NULL) {
 			LuaError(l, "Use a unittype for spawn-portal (with portal-type)");
 		}
+	} else if (!strcmp(value, "capture")) {
+		spellaction->CastFunction = CastCapture;
+		for (; j < args; ++j) {
+			lua_rawgeti(l, -1, j + 1);
+			value = LuaToString(l, -1);
+			lua_pop(l, 1);
+			++j;
+			if (!strcmp(value, "sacrifice")) {
+				spellaction->Data.Capture.SacrificeEnable = 1;
+			} else if (!strcmp(value, "damage")) {
+				lua_rawgeti(l, -1, j + 1);
+				spellaction->Data.Capture.Damage = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			} else if (!strcmp(value, "percent")) {
+				lua_rawgeti(l, -1, j + 1);
+				spellaction->Data.Capture.DamagePercent = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+			} else {
+				LuaError(l, "Unsupported Capture tag: %s" _C_ value);
+			}
+		}
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction->CastFunction = CastPolymorph;
 		for (; j < args; ++j) {
@@ -849,6 +870,14 @@ static void SaveSpellAction(CLFile* file, SpellActionType* action)
 	} else if (action->CastFunction == CastPolymorph) {
 		CLprintf(file, "(polymorph new-form %s)",
 				action->Data.Polymorph.NewForm->Ident);
+	} else if (action->CastFunction == CastCapture) {
+		CLprintf(file, "(capture damage %d percent %d",
+				action->Data.Capture.Damage,
+				action->Data.Capture.DamagePercent);
+		if (action->Data.Capture.SacrificeEnable) {
+			CLprintf(file, " sacrifice");
+		}
+		CLprintf(file, ")\n");
 	} else if (action->CastFunction == CastSpawnPortal) {
 		CLprintf(file, "(spawn-portal portal-type %s)",
 				action->Data.SpawnPortal.PortalType->Ident);

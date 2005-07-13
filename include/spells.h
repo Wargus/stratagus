@@ -167,6 +167,14 @@ struct _spell_action_type_ {
 			int TTL;                /// Time to live for summoned unit. 0 means infinite
 			int RequireCorpse;      /// Corpse consumed while summoning.
 		} Summon;
+		
+		struct {
+			char SacrificeEnable; /// true if the caster dies after casting.
+			int Damage;           /// damage the spell does if unable to caputre
+			int DamagePercent;    /// percent the target must be damaged for a
+								  /// capture to suceed.
+		} Capture;
+
 		//  What about a resurection spell?
 	} Data;
 	SpellActionType* Next; /// Next action.
@@ -337,7 +345,7 @@ SpellFunc CastDemolish;
 SpellFunc CastDeathCoil;
 SpellFunc CastSpawnPortal;
 SpellFunc CastSpawnMissile;
-
+SpellFunc CastCapture;
 //@}
 
 #endif // !__SPELLS_H__
