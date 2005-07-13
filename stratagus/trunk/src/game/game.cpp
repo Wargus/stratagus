@@ -142,6 +142,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	const char *type[] = {"", "", "neutral", "nobody", 
 		"computer", "person", "rescue-passive", "rescue-active"};
 	char mapsetup[PATH_MAX];
+	char *mapsetupname;
 	char *extension;
 	int numplayers, topplayer;
 
@@ -184,7 +185,10 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 			map->Info.Description, numplayers, map->Info.MapWidth, map->Info.MapHeight,
 			map->Info.MapUID + 1);
 
-	gzprintf(f, "DefineMapSetup(\"%s\")\n", mapsetup);
+	mapsetupname = strrchr(mapsetup, '/');
+	if (!mapsetupname)
+		mapsetupname = mapsetup;
+	gzprintf(f, "DefineMapSetup(GetCurrentLuaPath()..\"%s\")\n", mapsetupname);
 	gzclose(f);
 
 	// Write the map setup file
