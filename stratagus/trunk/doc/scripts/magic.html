@@ -470,6 +470,18 @@ Here are the supported operations, their paramenters, and what they do.
 	    </dd>
 	</dl></dd>
     </dl></dd>
+	<dt>"capture", tag, ...</dt>
+	<dd>This will convert the target unit to the casters side. 
+	Very useful for capturing enemy buildings and controling enemy units.
+	None of these tags need to be specified.
+	<dl><dt>"damage", number</dt>
+	<dd>The amount of damage the unit takes before it is converted.
+	Usually used with percent below</dd>
+	<dt>"percent", number</dt>
+	<dd>The precent of the target's total HP it has to be reduced below before
+	it will be converted.</dd>
+	<dt>"sacrifice"</dt>
+	<dd>If this tag is given the caster will die after casting the spell.</dd></dl></dd>
 </dl>
 </dd>
 <dt>"depend-upgrade", "upgrade-name"</dt>
