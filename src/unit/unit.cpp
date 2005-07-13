@@ -1588,7 +1588,7 @@ void ChangeUnitOwner(Unit* unit, Player* newplayer)
 	}
 	newplayer->UnitTypesCount[unit->Type->Slot]++;
 
-	UpdateForNewUnit(unit, 0);
+	UpdateForNewUnit(unit, 1);
 }
 
 /**
