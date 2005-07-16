@@ -2,6 +2,8 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 Development version:
+- Added Battlefield image-based map. (François Beerten)
+- Added a helper function for image-based maps. (François Beerten)
 - New units directory with automatic loading of the units. (François Beerten)
 - Added new map Antarticum. (François Beerten)
 - List all available campaigns in the campaigns directory automatically. (François Beerten)

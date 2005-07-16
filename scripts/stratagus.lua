@@ -226,6 +226,7 @@ Load("scripts/tips.lua")
 Load("scripts/ranks.lua")
 Load("scripts/menus.lua")
 Load("scripts/cheats.lua")
+Load("scripts/maps.lua")
 
 Load("preferences2.lua")
 
