@@ -4,12 +4,17 @@
       <h2>Screenshots</h2>
       <h3>BOS development version</h3>
       <p>To give you an idea of the coming changes:</p>
-      <center><a href="images/pre-2.2.png"><img src="images/pre-2.2s.png"></a></center>
+      <center>
+      <a href="images/screen18.png"><img src="images/screen18s.png"></a>
+      <a href="images/screen23.png"><img src="images/screen23s.png"></a>
+      <a href="images/pre-2.2.png"><img src="images/pre-2.2s.png"></a>
+      </center>
       <p>Among the new features you will get:
 	<ul>
 	<li>New units</li>
 	<li>More detailed maps based on full image. 
 	    This uses the new lua map format in stratagus 2.2</li>
+        <li>Improved UI</li>
 	</ul>
 	</p> 
       <h3>BOS 1.0</h3>
