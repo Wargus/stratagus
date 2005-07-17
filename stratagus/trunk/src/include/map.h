@@ -392,7 +392,7 @@ extern void CreateMap(int width, int height);
 	/// Save the map
 extern void SaveMap(struct _CL_File_* file);
 	/// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const char* filename, WorldMap* map);
+extern int SaveStratagusMap(const char* filename, WorldMap* map, int writeTerrain);
 	/// Clean the map
 extern void CleanMap(void);
 

@@ -134,8 +134,9 @@ static void LoadStratagusMap(const char* mapname,
 **
 **  @param mapname   map filename
 **  @param map       map to save
+**  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const char* mapname, WorldMap* map)
+int SaveStratagusMap(const char* mapname, WorldMap* map, int writeTerrain)
 {
 	gzFile f;
 	int i, j;
@@ -223,15 +224,18 @@ int SaveStratagusMap(const char* mapname, WorldMap* map)
 	gzprintf(f, "-- load tilesets\n");
 	gzprintf(f, "LoadTileModels(\"%s\")\n\n", map->TileModelsFileName);
 	
-	for (i = 0; i < map->Info.MapHeight; ++i) {
-		for (j = 0; j < map->Info.MapWidth; ++j) {
-			int tile;
-			int n;
+	if (writeTerrain) {
+		gzprintf(f, "-- Tiles Map\n");
+		for (i = 0; i < map->Info.MapHeight; ++i) {
+			for (j = 0; j < map->Info.MapWidth; ++j) {
+				int tile;
+				int n;
 			
-			tile = map->Fields[j+i*map->Info.MapWidth].Tile;
-			for (n=0; n < map->Tileset->NumTiles && tile != map->Tileset->Table[n]; ++n) {
+				tile = map->Fields[j+i*map->Info.MapWidth].Tile;
+				for (n=0; n < map->Tileset->NumTiles && tile != map->Tileset->Table[n]; ++n) {
+				}
+				gzprintf(f, "SetTile(%3d, %d, %d)\n", n, j, i);
 			}
-			gzprintf(f, "SetTile(%3d, %d, %d)\n", n, j, i);
 		}
 	}
 

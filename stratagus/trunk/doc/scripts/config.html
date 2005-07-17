@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head>
 <!--
-----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith
+----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith, François Beerten
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -112,6 +112,7 @@
 <a href="#SetSpeedTrain">SetSpeedTrain</a>
 <a href="#SetSpeedUpgrade">SetSpeedUpgrade</a>
 <a href="#SetSpeeds">SetSpeeds</a>
+<a href="#SetTerrainEditable">SetTerrainEditable</a>
 <a href="#SetTitleScreens">SetTitleScreens</a>
 <a href="#SetTrainingQueue">SetTrainingQueue</a>
 <a href="#SetXpDamage">SetXpDamage</a>
@@ -1139,6 +1140,14 @@ This is equivalent to
   SetSpeedUpgrade(number)
   SetSpeedResearch(number)
 </pre>
+
+<a name="SetTerrainEditable"></a>
+<h3>SetTerrainEditable(flag)</h3>
+
+A flag at 1 marks the terrain as editable by the Stratagus editor.
+With flag at 0, the terrain wont be editable in the Stratagus editor and
+the tiles map wont be written in the map setup file.
+
 
 <a name="SetTitleScreens"></a>
 <h3>SetTitleScreens({tag = value, ...}, ...)</h3>
