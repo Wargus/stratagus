@@ -136,6 +136,20 @@ static int CclSetEditorStartUnit(lua_State* l)
 }
 
 /**
+**  Allow/Disallow the stratagus editor to change the tiles in the map
+**
+**  @param l  Lua state.
+*/
+static int CclSetTerrainEditable(lua_State* l)
+{
+	if (lua_gettop(l) != 1) {
+		LuaError(l, "incorrect argument");
+	}
+	TerrainEditable = LuaToNumber(l, 1);
+	return 0;
+}
+
+/**
 **  Register CCL features for the editor.
 */
 void EditorCclRegister(void)
@@ -144,6 +158,7 @@ void EditorCclRegister(void)
 	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
+	lua_register(Lua, "SetTerrainEditable", CclSetTerrainEditable);
 }
 
 //@}

@@ -81,6 +81,7 @@ static int IconHeight;                      /// Icon height in panels
 
 
 char EditorMapLoaded;  /// Map loaded in editor
+int TerrainEditable = 1;  /// Is the terrain editable ?  Defaults to yes.
 
 EditorStateType EditorState;                /// Current editor state.
 EditorRunningType EditorRunning;  /// Running State of editor.
@@ -769,9 +770,11 @@ static void DrawEditorPanel(void)
 			(EditorState == EditorEditUnit ? IconSelected : 0),
 		x + UNIT_ICON_X, y + UNIT_ICON_Y, NULL);
 
-	DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
-		(ButtonUnderCursor == TileButton ? IconActive : 0) |
-			(EditorState == EditorEditTile ? IconSelected : 0));
+	if (TerrainEditable) {
+		DrawTileIcon(0x10 + 4 * 16, x + TILE_ICON_X, y + TILE_ICON_Y,
+			(ButtonUnderCursor == TileButton ? IconActive : 0) |
+				(EditorState == EditorEditTile ? IconSelected : 0));
+	}
 
 	if (EditorStartUnit) {
 		icon = UnitTypeByIdent(EditorStartUnit)->Icon.Icon;
@@ -1160,7 +1163,8 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 				EditorState = EditorEditUnit;
 				return;
 			case TileButton :
-				EditorState = EditorEditTile;
+				if (EditorEditTile)
+					EditorState = EditorEditTile;
 				return;
 			case StartButton:
 				EditorState = EditorSetStartLocation;
@@ -2028,7 +2032,7 @@ static void CreateEditor(void)
 */
 int EditorSaveMap(const char* file)
 {
-	if (SaveStratagusMap(file, &TheMap) == -1) {
+	if (SaveStratagusMap(file, &TheMap, TerrainEditable) == -1) {
 		ErrorMenu("Cannot save map");
 		InterfaceState = IfaceStateNormal;
 		EditorUpdateDisplay();

@@ -47,8 +47,9 @@ typedef enum _editor_running_state_ {
 
 extern EditorRunningType EditorRunning;
 
-	/// Map loaded in editor
-extern char EditorMapLoaded;
+extern char EditorMapLoaded;  /// Map loaded in editor
+extern int TerrainEditable;  /// Is the terrain editable ?
+
 	/// Current editor state type.
 typedef enum _editor_state_type_ {
 	EditorSelecting,  ///< Select
@@ -59,11 +60,8 @@ typedef enum _editor_state_type_ {
 	/// Current editor state.
 extern EditorStateType EditorState;
 
-	/// Editor CCL start file
-extern const char* EditorStartFile;
-
+extern const char* EditorStartFile;  /// Editor CCL start file
 extern char** EditorUnitTypes;  /// Sorted editor unit-type table
-
 extern int MaxUnitIndex;  /// Max unit icon draw index
 
 extern char* EditorSelectIcon;  /// Editor's select icon
