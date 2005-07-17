@@ -100,14 +100,7 @@ SetPlayerData(15, "RaceName", "elites")
 SetAiType(15, "ai-rush")
 
 -- load tilemodels
-LoadTileModels("maps/antarticum/tilemodels.lua")
-
--- Tile map
-for x = 0,63 do
-  for y = 0,63 do
-    SetTile( math.mod(y, 16) + math.mod(x,16)*16, y, x)
-  end
-end
+LoadTileModels("maps/antarticum/terrain.lua")
 
 -- place units
 unit= CreateUnit("unit-vault", 0, {11, 12})
