@@ -8,7 +8,7 @@
 --  T H E   W A R   B E G I N S
 --   Stratagus - A free fantasy real time strategy game engine
 --
---	tilemodels.lua - Define tilemodels
+--	terrain.lua - Define terrrain
 --
 --      (c) Copyright 2005 by François Beerten.
 --
@@ -28,21 +28,5 @@
 --
 -- $Id$
 
-local til
-til = {}
-for i = 0, 255 do
-    til[i+1] = i
-end
+DefineImageTerrain(GetCurrentLuaPath().."/terrain.png", 64, 64, 16, 16)
 
-DefineTileset("atileset",
- "class", "desert",
- "name",  "atileset",
- "image", "maps/antarticum/texture.png",
- -- Slots descriptions
- "slots", {
-  "solid", { "light-grass", "land",
-    til}
- }
-)
-
-SelectTileset("atileset")
