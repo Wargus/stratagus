@@ -10,7 +10,7 @@
 //
 /**@name script_tileset.c - The tileset ccl functions. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2000-2005 by Lutz Sammer, François Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -280,7 +280,6 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	int f;
 	int len;
 	int basic_name;
-	SolidTerrainInfo* tt; // short for terrain type.
 	int j;
 
 	ExtendTilesetTables(tileset, index + 16);
@@ -293,7 +292,6 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	++j;
 	basic_name = TilesetParseName(l, tileset);
 	lua_pop(l, 1);
-	tt = tileset->SolidTerrainTypes + basic_name;
 
 	ParseTilesetTileFlags(l, &f, &j);
 
@@ -304,7 +302,7 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	tt->NumSolidTiles = len = luaL_getn(l, -1);
+	len = luaL_getn(l, -1);
 
 	// hack for sc tilesets, remove when fixed
 	if (len > 16) {
@@ -314,7 +312,6 @@ static int DefineTilesetParseSolid(lua_State* l, Tileset* tileset, int index)
 	for (i = 0; i < len; ++i) {
 		lua_rawgeti(l, -1, i + 1);
 		tileset->Table[index + i] = LuaToNumber(l, -1);
-// tt->SolidTiles[i] = tileset->Table[index + i] = LuaToNumber(l, -1);
 		lua_pop(l, 1);
 		tileset->FlagsTable[index + i] = f;
 		tileset->Tiles[index + i].BaseTerrain = basic_name;
