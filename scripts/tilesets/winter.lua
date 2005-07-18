@@ -251,5 +251,3 @@ DefineTileset("tileset-winter",
  -- Object tiles
  "objects", {{}}
 )
-
-SelectTileset("tileset-winter")
