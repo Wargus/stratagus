@@ -48,7 +48,6 @@ function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
       til}
      }
    )
-   SelectTileset("atileset")
 
    -- Tile map
    for x = 0,mapx-1 do
@@ -56,5 +55,9 @@ function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
        SetTile( math.mod(y, imgx) + math.mod(x,imgx)*imgx, y, x)
      end
    end
+
+   -- The terrain of image based maps shouldnt be editable by the stratagus 
+   -- builtin editor and the editor shouldn't try to write the tiles map
+   SetTerrainEditable(0) 
 end
 

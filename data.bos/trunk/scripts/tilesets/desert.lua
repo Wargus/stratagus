@@ -251,5 +251,3 @@ DefineTileset("tileset-desert",
  -- Object tiles
  "objects", {{}}
 )
-
-SelectTileset("tileset-desert")
