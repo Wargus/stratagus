@@ -422,21 +422,6 @@ static int CclSetFogOfWarGraphics(lua_State* l)
 }
 
 /**
-**  Select the tileset when loading a map
-**
-**  @param l  Lua state.
-*/
-static int CclSelectTileset(lua_State* l)
-{
-	if (lua_gettop(l) != 1) {
-		LuaError(l, "incorrect argument");
-	}
-	LoadTileset();
-
-	return 0;
-}
-	
-/**
 **  Define Fog graphics
 **
 **  @param l  Lua state.
@@ -542,7 +527,6 @@ void MapCclRegister(void)
 
 	lua_register(Lua, "SetForestRegeneration",CclSetForestRegeneration);
 
-	lua_register(Lua, "SelectTileset", CclSelectTileset);
 	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
 	lua_register(Lua, "SetTile", CclSetTile);
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
