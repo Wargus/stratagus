@@ -232,7 +232,7 @@ int SaveStratagusMap(const char* mapname, WorldMap* map, int writeTerrain)
 				int n;
 			
 				tile = map->Fields[j+i*map->Info.MapWidth].Tile;
-				for (n=0; n < map->Tileset->NumTiles && tile != map->Tileset->Table[n]; ++n) {
+				for (n=0; n < map->Tileset.NumTiles && tile != map->Tileset.Table[n]; ++n) {
 				}
 				gzprintf(f, "SetTile(%3d, %d, %d)\n", n, j, i);
 			}

@@ -446,18 +446,16 @@ static int CclSetTile(lua_State* l)
 	int tile;
 	int w;
 	int h;
-	Tileset *tileset;
 
 	LuaCheckArgs(l, 3);
 	
 	tile = LuaToNumber(l, 1);
 	w = LuaToNumber(l, 2);
 	h = LuaToNumber(l, 3);
-	tileset = Tilesets[0];
 
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = tileset->Table[tile];
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = TheMap.Tileset.Table[tile];
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
-	TheMap.Fields[w + h * TheMap.Info.MapWidth].Flags = tileset->FlagsTable[tile];
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Flags = TheMap.Tileset.FlagsTable[tile];
 
 	return 0;
 }

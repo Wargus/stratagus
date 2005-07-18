@@ -213,7 +213,6 @@ extern char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define TilesetMax   8                  /// How many tilesets are supported
 #define PlayerMax    16                 /// How many players are supported
 #define UnitTypeMax  257                /// How many unit types supported
 #define UpgradeMax   256                /// How many upgrades supported

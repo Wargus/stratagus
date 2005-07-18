@@ -69,15 +69,13 @@ struct _mng_;
 **    Pretty name shown by the engine. The name should be shorter
 **    than 17 characters and no word can be longer than 8 characters.
 **
-**  UnitType::File[::TilesetMax]
+**  UnitType::File
 **
-**    Path file name of sprite files for the different tilesets.
-**  @note It is planned to change this to support more and
-**  better tilesets.
+**    Path file name of the sprite file.
 **
 **  UnitType::SpriteFile
 **
-**    Path file name of shadow sprite file for the different tilesets.
+**    Path file name of shadow sprite file.
 **
 **  UnitType::DrawLevel
 **
