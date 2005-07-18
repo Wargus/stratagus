@@ -322,7 +322,6 @@ typedef struct _tileset_ {
 ----------------------------------------------------------------------------*/
 
 extern int NumTilesets;     ///< Number of available tilesets
-extern Tileset** Tilesets;  ///< Tileset information
 
 /*----------------------------------------------------------------------------
 --  Functions
