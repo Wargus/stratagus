@@ -28,8 +28,7 @@
 --
 --$Id$
 
-DefineTileset("tileset-desert",
- "class", "desert",
+DefineTileset(
  "name",  "Desert",
  "image", "tiles/desert.png",
  -- Slots descriptions
@@ -245,9 +244,5 @@ DefineTileset("tileset-desert",
 --    { 491,},-- AD0
 --    {},-- AE0
 --    {}},-- AF0
- },
- -- Animated tiles
- "animations", {{}},
- -- Object tiles
- "objects", {{}}
+ }
 )

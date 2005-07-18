@@ -28,8 +28,7 @@
 --
 --$Id$
 
-DefineTileset("tileset-winter",
- "class", "winter",
+DefineTileset(
  "name",  "Winter",
  "image", "tiles/winter.png",
  -- Slots descriptions
@@ -245,9 +244,5 @@ DefineTileset("tileset-winter",
 --    { 491,},-- AD0
 --    {},-- AE0
 --    {}},-- AF0
- },
- -- Animated tiles
- "animations", {{}},
- -- Object tiles
- "objects", {{}}
+ }
 )
