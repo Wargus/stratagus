@@ -38,9 +38,8 @@ function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
       til[i+1] = i
    end
 
-   DefineTileset("atileset",
-     "class", "desert",
-     "name",  "atileset",
+   DefineTileset(
+     "name",  "Image terrain",
      "image", terrain,
      -- Slots descriptions
      "slots", {
