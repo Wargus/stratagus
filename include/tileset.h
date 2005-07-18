@@ -60,29 +60,13 @@
 **
 **  The tileset structure members:
 **
-**  Tileset::Ident
-**
-**      Unique identifier (FE.: tileset-summer, tileset-winter) for the
-**      tileset. Used by the map to define which tileset should be used.
-**      Like always the identifier should only be used during
-**      configuration and not during runtime!
-**
-**  Tileset::Class
-**
-**      Identifier for the tileset class. All exchangable tilesets
-**      should have the same class. Can be used by the level editor.
-**
 **  Tileset::Name
 **
 **      Long name of the tileset. Can be used by the level editor.
 **
-**  Tileset::File
+**  Tileset::ImageFile
 **
-**      Name of the graphic file, containing all tiles. Following
-**      widths are supported:
-**      @li 512 pixel: 16 tiles pro row
-**      @li 527 pixel: 16 tiles pro row with 1 pixel gap
-**      @li 626 pixel: 19 tiles pro row with 1 pixel gap
+**      Name of the graphic file, containing all tiles.
 **
 **  Tileset::NumTiles
 **
@@ -125,12 +109,6 @@
 **      @note I'm not sure if this table is needed in the future.
 **
 **      @see TileType.
-**
-**  Tileset::AnimationTable
-**
-**      Contains the animation of tiles.
-**
-**      @note This is currently not used.
 **
 **  Tileset::NumNames
 **
@@ -212,10 +190,6 @@
 **
 **      Table of orc wall tiles, index depends on the surroundings.
 **
-**  Tileset::ItemsHash
-**
-**      Hash table of item numbers to unit names.
-**
 **  @struct _tile_info_ tileset.h
 **
 **  \#include "tileset.h"
@@ -275,9 +249,6 @@ typedef struct _solid_terrain_info_ {
 
 	/// Tileset definition
 typedef struct _tileset_ {
-	char* Ident;     /// Tileset identifier
-	char* File;      /// CCL file containing tileset data
-	char* Class;     /// Class for future extensions
 	char* Name;      /// Nice name to display
 	char* ImageFile; /// File containing image data
 
@@ -289,11 +260,8 @@ typedef struct _tileset_ {
 
 	TileInfo* Tiles; /// Tile descriptions
 
-
 	// TODO: currently hardcoded
 	unsigned char* TileTypeTable;   /// For fast lookup of tile type
-	// TODO: currently unsupported
-	unsigned short* AnimationTable; /// Tile animation sequences
 
 	int NumTerrainTypes;                 /// Number of different terrain types
 	SolidTerrainInfo* SolidTerrainTypes; /// Information about solid terrains.
@@ -313,8 +281,6 @@ typedef struct _tileset_ {
 
 	unsigned HumanWallTable[16];    /// Human wall placement table
 	unsigned OrcWallTable[16];      /// Orc wall placement table
-
-	hashtable(char*, 128) ItemsHash;/// Items hash table
 } Tileset;
 
 /*----------------------------------------------------------------------------

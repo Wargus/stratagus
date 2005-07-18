@@ -487,39 +487,6 @@ static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 }
 
 /**
-**  Parse the item mapping part of a tileset definition
-**
-**  @param l        Lua state.
-**  @param tileset  Tileset to be filled.
-**  @param t        FIXME: docu
-*/
-static void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
-{
-	int num;
-	char* unit;
-	char buf[30];
-	char** h;
-	int args;
-	int j;
-
-	args = luaL_getn(l, t);
-	for (j = 0; j < args; ++j) {
-		lua_rawgeti(l, -1, j + 1);
-		num = LuaToNumber(l, -1);
-		lua_pop(l, 1);
-		++j;
-		lua_rawgeti(l, -1, j + 1);
-		unit = strdup(LuaToString(l, -1));
-		lua_pop(l, 1);
-		sprintf(buf, "%d", num);
-		if ((h = (char**)hash_find(tileset->ItemsHash, buf)) != NULL) {
-			free(*h);
-		}
-		*(char**)hash_add(tileset->ItemsHash, buf) = unit;
-	}
-}
-
-/**
 **  Define tileset
 **
 **  @param l  Lua state.
@@ -530,18 +497,13 @@ static int CclDefineTileset(lua_State* l)
 	int args;
 	int j;
 
-	free(TheMap.Tileset.Ident);
-	free(TheMap.Tileset.File);
-	free(TheMap.Tileset.Class);
 	free(TheMap.Tileset.Name);
 	free(TheMap.Tileset.ImageFile);
 	free(TheMap.Tileset.Table);
 	free(TheMap.Tileset.Tiles);
 	free(TheMap.Tileset.TileTypeTable);
-	free(TheMap.Tileset.AnimationTable);
 	memset(&TheMap.Tileset, 0, sizeof(Tileset));
-	
-	TheMap.Tileset.Ident = strdup(LuaToString(l, 1));
+
 	TheMap.Tileset.TileSizeX = 32;
 	TheMap.Tileset.TileSizeY = 32;
 
@@ -550,41 +512,28 @@ static int CclDefineTileset(lua_State* l)
 	//
 	args = lua_gettop(l);
 	for (j = 1; j < args; ++j) {
-		value = LuaToString(l, j + 1);
+		value = LuaToString(l, j);
 		++j;
 
-		if (!strcmp(value, "file")) {
-			TheMap.Tileset.File = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "class")) {
-			TheMap.Tileset.Class = strdup(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "name")) {
-			TheMap.Tileset.Name = strdup(LuaToString(l, j + 1));
+		if (!strcmp(value, "name")) {
+			TheMap.Tileset.Name = strdup(LuaToString(l, j));
 		} else if (!strcmp(value, "image")) {
-			TheMap.Tileset.ImageFile = strdup(LuaToString(l, j + 1));
+			TheMap.Tileset.ImageFile = strdup(LuaToString(l, j));
 		} else if (!strcmp(value, "size")) {
-			if (!lua_istable(l, j + 1)) {
+			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
-			lua_rawgeti(l, j + 1, 1);
+			lua_rawgeti(l, j, 1);
 			TheMap.Tileset.TileSizeX = LuaToNumber(l, -1);
 			lua_pop(l, 1);
-			lua_rawgeti(l, j + 1, 2);
+			lua_rawgeti(l, j, 2);
 			TheMap.Tileset.TileSizeY = LuaToNumber(l, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "slots")) {
-			if (!lua_istable(l, j + 1)) {
+			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
-			DefineTilesetParseSlot(l, &TheMap.Tileset, j + 1);
-		} else if (!strcmp(value, "animations")) {
-			DebugPrint("Animations not supported.\n");
-		} else if (!strcmp(value, "objects")) {
-			DebugPrint("Objects not supported.\n");
-		} else if (!strcmp(value, "item-mapping")) {
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			DefineTilesetParseItemMapping(l, &TheMap.Tileset, j + 1);
+			DefineTilesetParseSlot(l, &TheMap.Tileset, j);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
