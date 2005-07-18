@@ -50,11 +50,6 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Number of available TheMap.Tileset.
-*/
-int NumTilesets;
-
-/**
 ** Size of a tile in X
 */
 int TileSizeX = 32;
@@ -81,11 +76,6 @@ void LoadTileset(void)
 	int mixed;
 	const unsigned short* table;
 	int i;
-
-	if (!NumTilesets) {
-		fprintf(stderr, "No tileset available\n");
-		ExitFatal(-1);
-	}
 
 	if (!TheMap.Tileset.Table) {
 		char buf[1024];
@@ -459,22 +449,21 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	// Free the tileset data
-	if (NumTilesets) {
-		free(TheMap.Tileset.Ident);
-		free(TheMap.Tileset.File);
-		free(TheMap.Tileset.Class);
-		free(TheMap.Tileset.Name);
-		free(TheMap.Tileset.ImageFile);
-		free(TheMap.Tileset.Table);
-		free(TheMap.Tileset.FlagsTable);
-		free(TheMap.Tileset.Tiles);
-		free(TheMap.Tileset.MixedLookupTable);
-		free(TheMap.Tileset.TileTypeTable);
-		free(TheMap.Tileset.AnimationTable);
+	free(TheMap.Tileset.Ident);
+	free(TheMap.Tileset.File);
+	free(TheMap.Tileset.Class);
+	free(TheMap.Tileset.Name);
+	free(TheMap.Tileset.ImageFile);
+	free(TheMap.Tileset.Table);
+	free(TheMap.Tileset.FlagsTable);
+	free(TheMap.Tileset.Tiles);
+	free(TheMap.Tileset.MixedLookupTable);
+	free(TheMap.Tileset.TileTypeTable);
+	free(TheMap.Tileset.AnimationTable);
+	if (TheMap.Tileset.SolidTerrainTypes)
 		free(TheMap.Tileset.SolidTerrainTypes[0].TerrainName);
-		free(TheMap.Tileset.SolidTerrainTypes);
-	}
-	NumTilesets = 0;
+	free(TheMap.Tileset.SolidTerrainTypes);
+	memset(&TheMap.Tileset, 0, sizeof(Tileset));
 
 	//
 	// Should this be done by the map?
