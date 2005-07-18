@@ -59,15 +59,13 @@
 **    @note Don't use this member in game, use instead the pointer
 **      to this structure. See ConstructionByIdent().
 **
-**  Construction::File[::TilesetMax]
+**  Construction::File
 **
-**    Path file name of sprite files for the different tilesets.
-**    @note It is planned to change this to support more and
-**      better tilesets.
+**    Path file name of the sprite file.
 **
-**  Construction::File[::TilesetMax]
+**  Construction::ShadowFile
 **
-**    Path file name of shadow sprite file for the different tilesets.
+**    Path file name of shadow sprite file.
 **
 **  Construction::Nr
 **

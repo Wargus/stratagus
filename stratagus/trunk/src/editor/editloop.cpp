@@ -150,7 +150,7 @@ int GetTileNumber(int basic, int random, int filler)
 	tile = 16 + basic * 16;
 	if (random) {
 		for (n = i = 0; i < 16; ++i) {
-			if (!TheMap.Tileset->Table[tile + i]) {
+			if (!TheMap.Tileset.Table[tile + i]) {
 				if (!filler) {
 					break;
 				}
@@ -161,16 +161,16 @@ int GetTileNumber(int basic, int random, int filler)
 		n = MyRand() % n;
 		i = -1;
 		do {
-			while (++i < 16 && !TheMap.Tileset->Table[tile + i]) {
+			while (++i < 16 && !TheMap.Tileset.Table[tile + i]) {
 			}
 		} while (i < 16 && n--);
 		Assert(i != 16);
 		return tile + i;
 	}
 	if (filler) {
-		for (i = 0; i < 16 && TheMap.Tileset->Table[tile + i]; ++i) {
+		for (i = 0; i < 16 && TheMap.Tileset.Table[tile + i]; ++i) {
 		}
-		for (; i < 16 && !TheMap.Tileset->Table[tile + i]; ++i) {
+		for (; i < 16 && !TheMap.Tileset.Table[tile + i]; ++i) {
 		}
 		if (i != 16) {
 			return tile + i;
@@ -202,7 +202,7 @@ void EditTile(int x, int y, int tile)
 		MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 		MapFieldWall | MapFieldRocks | MapFieldForest);
 
-	mf->Flags |= TheMap.Tileset->FlagsTable[16 + tile * 16];
+	mf->Flags |= TheMap.Tileset.FlagsTable[16 + tile * 16];
 
 	UpdateMinimapSeenXY(x, y);
 	UpdateMinimapXY(x, y);
@@ -503,11 +503,11 @@ static void DrawTileIcons(void)
 	while (y < TheUI.ButtonPanelY + 100) {
 		x = TheUI.ButtonPanelX + 4;
 		while (x < TheUI.ButtonPanelX + 144) {
-			if (!TheMap.Tileset->Tiles[0x10 + i * 16].BaseTerrain) {
+			if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
 				y = TheUI.ButtonPanelY + 100;
 				break;
 			}
-			VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset->Table[0x10 + i * 16], x, y);
+			VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset.Table[0x10 + i * 16], x, y);
 			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
 				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
@@ -733,7 +733,7 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
 	x += 4;
 	y += 4;
-	VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset->Table[tilenum], x, y);
+	VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		VideoDrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
@@ -876,7 +876,7 @@ static void DrawMapCursor(void)
 						break;
 					}
 					VideoDrawClip(TheMap.TileGraphic,
-						TheMap.Tileset->Table[0x10 + TileCursor * 16], tx, ty);
+						TheMap.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
 			VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
@@ -978,18 +978,18 @@ static void DrawEditorInfo(void)
 	//
 	tile = TheMap.Fields[x + y * TheMap.Info.MapWidth].Tile;
 
-	for (i = 0; i < TheMap.Tileset->NumTiles; ++i) {
-		if (tile == TheMap.Tileset->Table[i]) {
+	for (i = 0; i < TheMap.Tileset.NumTiles; ++i) {
+		if (tile == TheMap.Tileset.Table[i]) {
 			break;
 		}
 	}
 
-	Assert(i != TheMap.Tileset->NumTiles);
+	Assert(i != TheMap.Tileset.NumTiles);
 
 	sprintf(buf, "%d %s %s", tile,
-		TheMap.Tileset->SolidTerrainTypes[TheMap.Tileset->Tiles[i].BaseTerrain].TerrainName,
-		TheMap.Tileset->Tiles[i].MixTerrain
-			? TheMap.Tileset->SolidTerrainTypes[TheMap.Tileset->Tiles[i].MixTerrain].TerrainName
+		TheMap.Tileset.SolidTerrainTypes[TheMap.Tileset.Tiles[i].BaseTerrain].TerrainName,
+		TheMap.Tileset.Tiles[i].MixTerrain
+			? TheMap.Tileset.SolidTerrainTypes[TheMap.Tileset.Tiles[i].MixTerrain].TerrainName
 			: "");
 
 	VideoDrawText(TheUI.ResourceX + 252, TheUI.ResourceY + 2, GameFont, buf);
@@ -1198,7 +1198,7 @@ static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
 				TileToolDecoration ^= 1;
 				return;
 		}
-		if (TheMap.Tileset->Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
+		if (TheMap.Tileset.Tiles[16 + (ButtonUnderCursor - 100) * 16].BaseTerrain) {
 			TileCursor = ButtonUnderCursor - 100;
 		}
 		return;
@@ -1778,7 +1778,7 @@ static void EditorCallbackMouse(int x, int y)
 		while (by < TheUI.ButtonPanelY + 100) {
 			bx = TheUI.ButtonPanelX + 4;
 			while (bx < TheUI.ButtonPanelX + 144) {
-				if (!TheMap.Tileset->Tiles[0x10 + i * 16].BaseTerrain) {
+				if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
 					by = TheUI.ButtonPanelY + 100;
 					break;
 				}
@@ -1787,8 +1787,8 @@ static void EditorCallbackMouse(int x, int y)
 					int j;
 
 					// FIXME: i is wrong, must find the solid type
-					j = TheMap.Tileset->Tiles[i * 16 + 16].BaseTerrain;
-					//MAPTODO SetStatusLine(TheMap.Tileset->SolidTerrainTypes[j].TerrainName);
+					j = TheMap.Tileset.Tiles[i * 16 + 16].BaseTerrain;
+					//MAPTODO SetStatusLine(TheMap.Tileset.SolidTerrainTypes[j].TerrainName);
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
 					return;
@@ -1963,14 +1963,13 @@ static void CreateEditor(void)
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
-		TheMap.Tileset = Tilesets[0];
 		LoadTileset();
 
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
-				TheMap.Tileset->Table[0x50];
-			TheMap.Fields[i].Flags = TheMap.Tileset->FlagsTable[0x50];
+				TheMap.Tileset.Table[0x50];
+			TheMap.Fields[i].Flags = TheMap.Tileset.FlagsTable[0x50];
 		}
 		GameSettings.Resources = SettingsResourcesMapDefault;
 		CreateGame(NULL, &TheMap);

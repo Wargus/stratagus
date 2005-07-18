@@ -527,7 +527,6 @@ static void DefineTilesetParseItemMapping(lua_State* l, Tileset* tileset, int t)
 static int CclDefineTileset(lua_State* l)
 {
 	const char* value;
-	int type;
 	Tileset* tileset;
 	char* ident;
 	int args;
@@ -535,45 +534,22 @@ static int CclDefineTileset(lua_State* l)
 
 	ident = strdup(LuaToString(l, 1));
 
-	//
-	//  Find the tile set.
-	//
-	if (Tilesets) {
-		for (type = 0; type < NumTilesets; ++type) {
-			if (!strcmp(Tilesets[type]->Ident, ident)) {
-				free(Tilesets[type]->Ident);
-				free(Tilesets[type]->File);
-				free(Tilesets[type]->Class);
-				free(Tilesets[type]->Name);
-				free(Tilesets[type]->ImageFile);
-				free(Tilesets[type]->Table);
-				free(Tilesets[type]->Tiles);
-				free(Tilesets[type]->TileTypeTable);
-				free(Tilesets[type]->AnimationTable);
-				free(Tilesets[type]);
-				break;
-			}
-		}
-		if (type == NumTilesets) {
-			Tilesets = realloc(Tilesets, ++NumTilesets * sizeof(*Tilesets));
-		}
-	} else {
-		Tilesets = malloc(sizeof(*Tilesets));
-		type = 0;
-		++NumTilesets;
-	}
-	if (!Tilesets) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	Tilesets[type] = tileset = calloc(sizeof(Tileset), 1);
-	if (!tileset) {
-		fprintf(stderr, "out of memory.\n");
-		ExitFatal(-1);
-	}
-	Tilesets[type]->Ident = ident;
-	Tilesets[type]->TileSizeX = 32;
-	Tilesets[type]->TileSizeY = 32;
+	free(TheMap.Tileset.Ident);
+	free(TheMap.Tileset.File);
+	free(TheMap.Tileset.Class);
+	free(TheMap.Tileset.Name);
+	free(TheMap.Tileset.ImageFile);
+	free(TheMap.Tileset.Table);
+	free(TheMap.Tileset.Tiles);
+	free(TheMap.Tileset.TileTypeTable);
+	free(TheMap.Tileset.AnimationTable);
+
+	memset(&TheMap.Tileset, 0, sizeof(Tileset));
+	TheMap.Tileset.Ident = ident;
+	TheMap.Tileset.TileSizeX = 32;
+	TheMap.Tileset.TileSizeY = 32;
+	tileset = &TheMap.Tileset;
+	NumTilesets = 1;
 
 	//
 	//  Parse the list: (still everything could be changed!)
