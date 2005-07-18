@@ -270,9 +270,7 @@ typedef struct _tile_info_ {
 	/// Definition for a terrain type
 typedef struct _solid_terrain_info_ {
 	char* TerrainName;  /// Name of the terrain
-	int NumSolidTiles;  /// How many solid tile variants
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
-	unsigned short* SolidTiles; /// Solid tile IDs
 } SolidTerrainInfo;
 
 	/// Tileset definition
