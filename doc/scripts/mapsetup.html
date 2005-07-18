@@ -45,7 +45,6 @@
 <a href="#SetStartView">SetStartView</a>
 <a href="#SetAiType">SetAiType</a>
 <a href="#SetHeightMap">SetHeightMap</a>
-<a href="#SelectTileset">SelectTileset</a>
 <a href="#SetTile">SetTile</a>
 <a href="#SetTileMap">SetTileMap</a>
 <hr>
@@ -69,9 +68,9 @@ Note: This is for the new map format. Not implemented yet.
 
 <a name="SetStartView"></a>
 <h3>SetStartView(player, x, y)</h3>
-Set the location of the map where stratagus will show to the given
-player when starting. A little bit like a different CenterMap for each
-player.
+Set the location of the map stratagus will show to the given
+player when starting. This works a little bit like a special 
+CenterMap for each player.
 <dl>
 <dt>player</dt>
 <dd>number of the player</dd>
@@ -132,26 +131,12 @@ Note: This is for the new map format. Not implemented yet.
     SetHeightMap("doomworld/doomworldheights.png")
 </pre>
 
-<a name="SelectTileset"></a>
-<h3>SelectTileset(tileset)</h3>
-
-Select the Tileset to use for this map.
-<p>
-Note: This is for the new map format. Not implemented yet. 
-
-<h4>Example</h4>
-
-<pre>
-   SelectTileset("desert") 
-</pre>
 
 <a name="SetTile"></a>
 <h3>SetTile(tilemodel, x, y)</h3>
 
 Set a tile of the tilemodel given by tilename at the position defined
 by the x,y coordinates. SetTile can be called ingame for special effects.
-<p>
-Note: This is for the new map format. Not implemented yet. 
 
 <h4>Example</h4>
 

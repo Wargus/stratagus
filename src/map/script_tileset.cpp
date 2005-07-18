@@ -589,6 +589,7 @@ static int CclDefineTileset(lua_State* l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+	LoadTileset();
 	return 0;
 }
 

@@ -1963,8 +1963,6 @@ static void CreateEditor(void)
 		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
-		LoadTileset();
-
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile = 0;
 			TheMap.Fields[i].Tile = TheMap.Fields[i].SeenTile =
