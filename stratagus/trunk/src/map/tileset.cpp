@@ -77,12 +77,6 @@ void LoadTileset(void)
 	const unsigned short* table;
 	int i;
 
-	if (!TheMap.Tileset.Table) {
-		char buf[1024];
-		LibraryFileName(TheMap.Tileset.File, buf);
-		LuaLoadFile(buf);
-	}
-
 	//
 	//  Load and prepare the tileset
 	//
@@ -449,9 +443,6 @@ void LoadTileset(void)
 void CleanTilesets(void)
 {
 	// Free the tileset data
-	free(TheMap.Tileset.Ident);
-	free(TheMap.Tileset.File);
-	free(TheMap.Tileset.Class);
 	free(TheMap.Tileset.Name);
 	free(TheMap.Tileset.ImageFile);
 	free(TheMap.Tileset.Table);
@@ -459,7 +450,6 @@ void CleanTilesets(void)
 	free(TheMap.Tileset.Tiles);
 	free(TheMap.Tileset.MixedLookupTable);
 	free(TheMap.Tileset.TileTypeTable);
-	free(TheMap.Tileset.AnimationTable);
 	if (TheMap.Tileset.SolidTerrainTypes)
 		free(TheMap.Tileset.SolidTerrainTypes[0].TerrainName);
 	free(TheMap.Tileset.SolidTerrainTypes);
