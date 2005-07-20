@@ -81,7 +81,7 @@ DefineMenuItem("pos", { 208, 109 + (36 * 3)}, "font", "large",
   "button", {
     "caption", "~!Load Game",
     "hotkey", "l",
-    "func", "load-game-menu",
+    "func", function() ProcessMenu("menu-load-game") end,
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 4)}, "font", "large",
@@ -95,7 +95,7 @@ DefineMenuItem("pos", { 208, 109 + (36 * 5)}, "font", "large",
   "button", {
     "caption", "~!Options",
     "hotkey", "o",
-    "func", "global-options-menu",
+    "func", function() ProcessMenu("menu-global-options", 1) end,
     "style", "gm-full"},
   "menu", "menu-program-start")
 DefineMenuItem("pos", { 208, 109 + (36 * 6)}, "font", "large",
@@ -449,28 +449,28 @@ DefineMenuItem("pos", { 16, 40 + (36 * 0)}, "font", "large",
   "button", {
     "caption", "~!Restart Scenario",
     "hotkey", "r",
-    "func", "restart-confirm-menu",
+    "func", function() ProcessMenu("menu-restart-confirm") end,
     "style", "gm-full"},
   "menu", "menu-end-scenario")
 DefineMenuItem("pos", { 16, 40 + (36 * 1)}, "font", "large",
   "button", {
     "caption", "~!Surrender",
     "hotkey", "s",
-    "func", "surrender-confirm-menu",
+    "func", function() ProcessMenu("menu-surrender-confirm") end,
     "style", "gm-full"},
   "menu", "menu-end-scenario")
 DefineMenuItem("pos", { 16, 40 + (36 * 2)}, "font", "large",
   "button", {
     "caption", "~!Quit to Menu",
     "hotkey", "q",
-    "func", "quit-to-menu-confirm-menu",
+    "func", function() ProcessMenu("menu-quit-to-menu-confirm") end,
     "style", "gm-full"},
   "menu", "menu-end-scenario")
 DefineMenuItem("pos", { 16, 40 + (36 * 3)}, "font", "large",
   "button", {
     "caption", "E~!xit Program",
     "hotkey", "x",
-    "func", "exit-confirm-menu",
+    "func", function() ProcessMenu("menu-exit-confirm") end,
     "style", "gm-full"},
   "menu", "menu-end-scenario")
 DefineMenuItem("pos", { 16, 288 - 40}, "font", "large",
