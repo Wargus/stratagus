@@ -42,35 +42,35 @@ DefineMenuItem("pos", { 16, 40}, "font", "large",
   "button", {
     "caption", "Save (~<F11~>)",
     "hotkey", "f11",
-    "func", "save-game-menu",
+    "func",  function() ProcessMenu("menu-save-game") end,
     "style", "gm-half"},
   "menu", "menu-game")
 DefineMenuItem("pos", { 16 + 12 + 106, 40}, "font", "large",
   "button", {
     "caption", "Load (~<F12~>)",
     "hotkey", "f12",
-    "func", "load-game-menu",
+    "func", function() ProcessMenu("menu-load-game") end,
     "style", "gm-half"},
   "menu", "menu-game")
 DefineMenuItem("pos", { 16, 40 + (36 * 1)}, "font", "large",
   "button", {
     "caption", "Options (~<F5~>)",
     "hotkey", "f5",
-    "func", "game-options-menu",
+    "func", function() ProcessMenu("menu-game-options") end,
     "style", "gm-full"},
   "menu", "menu-game")
 DefineMenuItem("pos", { 16, 40 + (36 * 2)}, "font", "large",
   "button", {
     "caption", "Help (~<F1~>)",
     "hotkey", "f1",
-    "func", "help-menu",
+    "func", function() ProcessMenu("menu-keystroke-help") end,
     "style", "gm-full"},
   "menu", "menu-game")
 DefineMenuItem("pos", { 16, 40 + (36 * 3)}, "font", "large",
   "button", {
     "caption", "~!Objectives",
     "hotkey", "o",
-    "func", "objectives-menu",
+    "func", function() ProcessMenu("menu-objectives") end,
     "style", "gm-full"},
   "menu", "menu-game")
 DefineMenuItem("pos", { 16, 40 + (36 * 4)}, "font", "large",
@@ -111,7 +111,7 @@ DefineMenuItem("pos", { 32, 90}, "font", "large",
   "button", {
     "caption", "Save ~!Replay",
     "hotkey", "r",
-    "func", "save-replay",
+    "func", function() ProcessMenu("menu-save-replay") end,
     "style", "gm-full"},
   "menu", "menu-victory")
 
@@ -735,28 +735,28 @@ DefineMenuItem("pos", { 16, 40 + (36 * 0)}, "font", "large",
   "button", {
     "caption", "Sound (~<F7~>)",
     "hotkey", "f7",
-    "func", "sound-options-menu",
+    "func", function() ProcessMenu("menu-sound-options") end,
     "style", "gm-full"},
   "menu", "menu-game-options")
 DefineMenuItem("pos", { 16, 40 + (36 * 1)}, "font", "large",
   "button", {
     "caption", "Speeds (~<F8~>)",
     "hotkey", "f8",
-    "func", "speed-options-menu",
+    "func", function() ProcessMenu("menu-speed-options") end,
     "style", "gm-full"},
   "menu", "menu-game-options")
 DefineMenuItem("pos", { 16, 40 + (36 * 2)}, "font", "large",
   "button", {
     "caption", "Preferences (~<F9~>)",
     "hotkey", "f9",
-    "func", "preferences-menu",
+    "func", function() ProcessMenu("menu-preferences") end,
     "style", "gm-full"},
   "menu", "menu-game-options")
 DefineMenuItem("pos", { 16, 40 + (36 * 3)}, "font", "large",
   "button", {
     "caption", "~!Diplomacy",
     "hotkey", "d",
-    "func", "diplomacy-menu",
+    "func", function() ProcessMenu("menu-diplomacy") end,
     "style", "gm-full"},
   "menu", "menu-game-options")
 DefineMenuItem("pos", { 128 - (224 / 2), 245}, "font", "large",
@@ -816,14 +816,14 @@ DefineMenuItem("pos", { 16, 40 + (36 * 0)}, "font", "large",
   "button", {
     "caption", "Keystroke ~!Help",
     "hotkey", "h",
-    "func", "keystroke-help-menu",
+    "func", function() ProcessMenu("menu-keystroke-help") end,
     "style", "gm-full"},
   "menu", "menu-help")
 DefineMenuItem("pos", { 16, 40 + (36 * 1)}, "font", "large",
   "button", {
     "caption", "Stratagus ~!Tips",
     "hotkey", "t",
-    "func", "tips-menu",
+    "func", function() ProcessMenu("menu-tips") end,
     "style", "gm-full"},
   "menu", "menu-help")
 DefineMenuItem("pos", { 128 - (224 / 2), 248}, "font", "large",
@@ -899,7 +899,7 @@ DefineMenuItem("pos", { (2 * (384 / 3)) - 106 - 10, 256 - 16 - 27}, "font", "lar
   "button", {
     "caption", "~!Delete",
     "hotkey", "d",
-    "func", "delete-confirm-menu",
+    "func", function() ProcessMenu("menu-delete-confirm") end,
     "style", "gm-half"},
   "menu", "menu-save-game")
 DefineMenuItem("pos", { (3 * (384 / 3)) - 106 - 10, 256 - 16 - 27}, "font", "large",
