@@ -520,7 +520,9 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
 			Selected[0]->BoardCount) {
-		for (i = Selected[0]->BoardCount - 1; i >= 0; --i) {
+		i = Selected[0]->BoardCount < TheUI.NumTransportingButtons ?
+			Selected[0]->BoardCount - 1 : TheUI.NumTransportingButtons - 1;
+		for (; i >= 0; --i) {
 			if (OnButton(x, y, &TheUI.TransportingButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
 				ButtonUnderCursor = i;
@@ -539,8 +541,9 @@ static void HandleMouseOn(int x, int y)
 					return;
 				}
 			} else {
-				for (i = 0; i < Selected[0]->OrderCount &&
-					i < TheUI.NumTrainingButtons; ++i) {
+				i = Selected[0]->OrderCount < TheUI.NumTrainingButtons ?
+					Selected[0]->OrderCount - 1 : TheUI.NumTrainingButtons - 1;
+				for (; i >= 0; --i) {
 					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
 							OnButton(x, y, &TheUI.TrainingButtons[i])) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
@@ -602,6 +605,7 @@ static void HandleMouseOn(int x, int y)
 	for (i = 0; i < TheUI.NumFillers; ++i) {
 		if (OnGraphic(x, y, TheUI.Filler[i], TheUI.FillerX[i], TheUI.FillerY[i])) {
 			on_ui = 1;
+			break;
 		}
 	}
 
