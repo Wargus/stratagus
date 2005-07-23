@@ -1570,6 +1570,10 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			CommandLog("repair", unit, status, x, y, dest, NULL, -1);
 			CommandRepair(unit, x, y, dest, status);
 			break;
+		case MessageCommandAutoRepair:
+			CommandLog("auto-repair", unit, status, x, y, NoUnitP, NULL, 0);
+			CommandAutoRepair(unit, x);
+			break;
 		case MessageCommandAttack:
 			dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
