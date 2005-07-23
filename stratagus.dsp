@@ -624,6 +624,10 @@ SOURCE=.\src\include\ai.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\include\animation.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\include\campaign.h
 # End Source File
 # Begin Source File
