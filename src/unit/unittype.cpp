@@ -47,6 +47,7 @@
 #include "unitsound.h"
 #include "construct.h"
 #include "unittype.h"
+#include "animation.h"
 #include "player.h"
 #include "missile.h"
 #include "script.h"

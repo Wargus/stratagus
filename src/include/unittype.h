@@ -529,105 +529,7 @@ struct _mng_;
 
 struct _graphic_;
 struct _construction_;
-
-typedef enum _animation_type_ {
-	AnimationNone,
-	AnimationFrame,
-	AnimationExactFrame,
-	AnimationWait,
-	AnimationRandomWait,
-	AnimationSound,
-	AnimationRandomSound,
-	AnimationAttack,
-	AnimationRotate,
-	AnimationRandomRotate,
-	AnimationMove,
-	AnimationUnbreakable,
-	AnimationLabel,
-	AnimationGoto,
-	AnimationRandomGoto,
-} AnimationType;
-
-typedef struct _animation_ {
-	AnimationType Type;
-	union {
-		struct {
-			int Frame;
-		} Frame;
-		struct {
-			int Wait;
-		} Wait;
-		struct {
-			int MinWait;
-			int MaxWait;
-		} RandomWait;
-		struct {
-			char* Name;
-			SoundId Sound;
-		} Sound;
-		struct {
-			char** Name;
-			SoundId* Sound;
-			int NumSounds;
-		} RandomSound;
-		struct {
-			int Rotate;
-		} Rotate;
-		struct {
-			int Move;
-		} Move;
-		struct {
-			int Begin;
-		} Unbreakable;
-		struct {
-			struct _animation_* Goto;
-		} Goto;
-		struct {
-			int Random;
-			struct _animation_* Goto;
-		} RandomGoto;
-	} D;
-	struct _animation_* Next;
-} Animation;
-
-typedef struct _new_animations_ {
-	Animation* Start;
-	Animation* Still;
-	Animation* Death;
-	Animation* StartAttack;
-	Animation* Attack;
-	Animation* EndAttack;
-	Animation* StartMove;
-	Animation* Move;
-	Animation* EndMove;
-	Animation* StartRepair;
-	Animation* Repair;
-	Animation* EndRepair;
-	Animation* StartTrain;
-	Animation* Train;
-	Animation* EndTrain;
-	Animation* StartResearch;
-	Animation* Research;
-	Animation* EndResearch;
-	Animation* StartUpgrade;
-	Animation* Upgrade;
-	Animation* EndUpgrade;
-	Animation* StartBuild;
-	Animation* Build;
-	Animation* EndBuild;
-	Animation* StartHarvest[MaxCosts];
-	Animation* Harvest[MaxCosts];
-	Animation* EndHarvest[MaxCosts];
-} Animations;
-
-#define ANIMATIONS_MAXANIM 1024
-
-extern Animation* AnimationsArray[ANIMATIONS_MAXANIM];
-extern int NumAnimations;
-
-	/// Hash table of all the newanimations
-typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
-extern _AnimationsHash AnimationsHash;
+struct _animations_;
 
 /**
 **  Missile type definition (used in config tables)
@@ -882,7 +784,7 @@ struct _unit_type_ {
 	int ShadowOffsetX;              /// Shadow horizontal offset
 	int ShadowOffsetY;              /// Shadow vertical offset
 
-	Animations* Animations;         /// Animation scripts
+	struct _animations_* Animations;/// Animation scripts
 	int StillFrame;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
@@ -1036,6 +938,7 @@ extern struct _UnitTypeVar_{
 	DecoVarType *DecoVar;               /// Array to describe how showing variable.
 	int NumberDeco;                     /// Size of DecoVar.
 } UnitTypeVar;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1046,9 +949,6 @@ extern void UnitTypeCclRegister(void);          /// Register ccl features
 extern void UpdateStats(int reset_to_default);  /// Update unit stats
 extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
-
-	/// Get the animations structure by ident
-extern Animations* AnimationsByIdent(const char* ident);
 
 extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot
