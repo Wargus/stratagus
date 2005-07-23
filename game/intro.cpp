@@ -157,7 +157,7 @@ static void IntroCallbackKey1(unsigned key, unsigned keychar)
 */
 static void IntroCallbackKey2(unsigned key, unsigned keychar)
 {
-	HandleKeyModifiersDown(key, keychar);
+	HandleKeyModifiersUp(key, keychar);
 
 	if (UseContinueButton) {
 		if ((key == 'c' || key == '\r') &&
