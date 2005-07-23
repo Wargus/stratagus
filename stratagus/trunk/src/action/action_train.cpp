@@ -42,6 +42,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "animation.h"
 #include "player.h"
 #include "unit.h"
 #include "actions.h"

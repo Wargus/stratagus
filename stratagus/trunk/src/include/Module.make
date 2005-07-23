@@ -26,7 +26,7 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/include
-MHDRS =  actions.h ai.h campaign.h script.h ccl_sound.h cdaudio.h \
+MHDRS =  actions.h ai.h animation.h campaign.h script.h ccl_sound.h cdaudio.h \
          commands.h construct.h cursor.h depend.h editor.h font.h \
          stratagus.h icons.h interface.h iocompat.h iolib.h libcda.h map.h \
          master.h menus.h minimap.h missile.h movie.h myendian.h net_lowlevel.h \

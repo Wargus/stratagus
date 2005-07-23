@@ -40,6 +40,7 @@
 
 #include "stratagus.h"
 #include "unittype.h"
+#include "animation.h"
 #include "player.h"
 #include "unit.h"
 #include "sound.h"

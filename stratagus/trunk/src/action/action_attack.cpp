@@ -41,9 +41,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stratagus.h"
 #include "unittype.h"
+#include "animation.h"
 #include "player.h"
 #include "unit.h"
 #include "missile.h"
@@ -51,7 +53,6 @@
 #include "sound.h"
 #include "map.h"
 #include "pathfinder.h"
-#include <string.h>
 
 /*----------------------------------------------------------------------------
 --  Defines

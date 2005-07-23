@@ -44,6 +44,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "animation.h"
 #include "icons.h"
 #include "missile.h"
 #include "script.h"
@@ -1496,57 +1497,23 @@ static int CclDefineAnimations(lua_State* l)
 			anims->Still = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Death")) {
 			anims->Death = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartAttack")) {
-			anims->StartAttack = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Attack")) {
 			anims->Attack = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndAttack")) {
-			anims->EndAttack = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartMove")) {
-			anims->StartMove = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Move")) {
 			anims->Move = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndMove")) {
-			anims->EndMove = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartRepair")) {
-			anims->StartRepair = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Repair")) {
 			anims->Repair = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndRepair")) {
-			anims->EndRepair = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartTrain")) {
-			anims->StartTrain = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Train")) {
 			anims->Train = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndTrain")) {
-			anims->EndTrain = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartResearch")) {
-			anims->StartResearch = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Research")) {
 			anims->Research = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndResearch")) {
-			anims->EndResearch = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartUpgrade")) {
-			anims->StartUpgrade = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Upgrade")) {
 			anims->Upgrade = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndUpgrade")) {
-			anims->EndUpgrade = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "StartBuild")) {
-			anims->StartBuild = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Build")) {
 			anims->Build = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "EndBuild")) {
-			anims->EndBuild = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "StartHarvest_", 12)) {
-			res = ResourceIndex(l, value + 12);
-			anims->StartHarvest[res] = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Harvest_", 8)) {
 			res = ResourceIndex(l, value + 8);
 			anims->Harvest[res] = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "EndHarvest_", 11)) {
-			res = ResourceIndex(l, value + 11);
-			anims->EndHarvest[res] = ParseAnimation(l, -1);
 		} else {
 			LuaError(l, "Unsupported animation: %s" _C_ value);
 		}
