@@ -40,6 +40,7 @@
 #include "stratagus.h"
 #include "missile.h"
 #include "unittype.h"
+#include "animation.h"
 #include "actions.h"
 #include "unit.h"
 #include "tileset.h"

@@ -42,6 +42,7 @@
 #include "player.h"
 #include "unit.h"
 #include "unittype.h"
+#include "animation.h"
 #include "actions.h"
 #include "pathfinder.h"
 #include "interface.h"

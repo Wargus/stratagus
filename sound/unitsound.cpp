@@ -44,6 +44,7 @@
 #include "sound_id.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "animation.h"
 #include "player.h"
 #include "unit.h"
 #include "sound_server.h"
@@ -119,31 +120,15 @@ static void MapAnimSounds(UnitType* type)
 	MapAnimSounds2(type->Animations->Start);
 	MapAnimSounds2(type->Animations->Still);
 	MapAnimSounds2(type->Animations->Death);
-	MapAnimSounds2(type->Animations->StartAttack);
 	MapAnimSounds2(type->Animations->Attack);
-	MapAnimSounds2(type->Animations->EndAttack);
-	MapAnimSounds2(type->Animations->StartMove);
 	MapAnimSounds2(type->Animations->Move);
-	MapAnimSounds2(type->Animations->EndMove);
-	MapAnimSounds2(type->Animations->StartRepair);
 	MapAnimSounds2(type->Animations->Repair);
-	MapAnimSounds2(type->Animations->EndRepair);
-	MapAnimSounds2(type->Animations->StartTrain);
 	MapAnimSounds2(type->Animations->Train);
-	MapAnimSounds2(type->Animations->EndTrain);
-	MapAnimSounds2(type->Animations->StartResearch);
 	MapAnimSounds2(type->Animations->Research);
-	MapAnimSounds2(type->Animations->EndResearch);
-	MapAnimSounds2(type->Animations->StartUpgrade);
 	MapAnimSounds2(type->Animations->Upgrade);
-	MapAnimSounds2(type->Animations->EndUpgrade);
-	MapAnimSounds2(type->Animations->StartBuild);
 	MapAnimSounds2(type->Animations->Build);
-	MapAnimSounds2(type->Animations->EndBuild);
 	for (i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type->Animations->StartHarvest[i]);
 		MapAnimSounds2(type->Animations->Harvest[i]);
-		MapAnimSounds2(type->Animations->EndHarvest[i]);
 	}
 }
 
