@@ -256,9 +256,10 @@ function DefineEliteScreen(screen_width, screen_height)
 				"multiple", {
 					"icons", {
 						{"pos", {info_panel_x + 13, info_panel_y+16}, "style", "icon"},
-						{"pos", {info_panel_x + 18, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 28, info_panel_y+16}, "style", "icon"},
 						{"pos", {info_panel_x + 43, info_panel_y+16}, "style", "icon"},
 						{"pos", {info_panel_x + 58, info_panel_y+16}, "style", "icon"},
+						{"pos", {info_panel_x + 73, info_panel_y+16}, "style", "icon"},
 						{"pos", {info_panel_x + 88, info_panel_y+16}, "style", "icon"},
 						{"pos", {info_panel_x + 103, info_panel_y+16}, "style", "icon"},
 						{"pos", {info_panel_x + 118, info_panel_y+16}, "style", "icon"},
