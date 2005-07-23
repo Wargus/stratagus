@@ -280,11 +280,11 @@ function DefineEliteScreen(screen_width, screen_height)
 						{"pos", {info_panel_x + 73, info_panel_y + 91}, "style", "icon"},
 						{"pos", {info_panel_x + 88, info_panel_y + 91}, "style", "icon"}}}},
 			"upgrading", {
-				"icon", {"pos", {info_panel_x + 3, 243}, "style", "icon"}},
+				"icon", {"pos", {info_panel_x + 13, 243}, "style", "icon"}},
 			"researching", {
-				"icon", {"pos", {info_panel_x + 3, 243}, "style", "icon"}},
+				"icon", {"pos", {info_panel_x + 13, 243}, "style", "icon"}},
 			"transporting", {"icons", {
-					{"pos", {info_panel_x + 3, info_panel_y + 91}, "style", "icon"},
+					{"pos", {info_panel_x + 13, info_panel_y + 91}, "style", "icon"},
 					{"pos", {info_panel_x + 28, info_panel_y + 91}, "style", "icon"},
 					{"pos", {info_panel_x + 43, info_panel_y + 91}, "style", "icon"},
 					{"pos", {info_panel_x + 58, info_panel_y + 91}, "style", "icon"},
