@@ -10,7 +10,7 @@
 //
 /**@name campaign.h - The campaign headerfile. */
 //
-//      (c) Copyright 2002 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ typedef enum _game_results_ {
 **  Type of the chapters.
 */
 typedef enum _chapter_types_ {
-	ChapterPlayVideo,    /// Play a video
+	ChapterPlayMovie,    /// Play a movie
 	ChapterShowPicture,  /// Show a picture
 	ChapterPlayLevel,    /// Play a level
 	ChapterDefeat,       /// Levels played on defeat
@@ -106,7 +106,7 @@ struct _campaign_chapter_ {
 			ChapterPictureText* Text;  /// Linked list of text data
 		} Picture;                     /// Data for a picture
 		struct {
-			char* PathName;  /// File name of video
+			char* File;      /// File name of video
 			int Flags;       /// Playback flags
 		} Movie;             /// Data for a movie
 	} Data;                  /// Data of the different chapter types
