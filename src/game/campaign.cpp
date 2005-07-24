@@ -46,6 +46,7 @@
 #include "settings.h"
 #include "iolib.h"
 #include "font.h"
+#include "movie.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -109,6 +110,9 @@ char* NextChapter(void)
 		while (CurrentChapter) {
 			if (CurrentChapter->Type == ChapterShowPicture) {
 				ShowPicture(CurrentChapter);
+			} else if (CurrentChapter->Type == ChapterPlayMovie) {
+				VideoClearScreen();
+				PlayMovie(CurrentChapter->Data.Movie.File);
 			} else if (CurrentChapter->Type == ChapterPlayLevel) {
 				break;
 			}
@@ -303,8 +307,8 @@ static void FreeChapters(CampaignChapter** chapters)
 			}
 		} else if (ch->Type == ChapterPlayLevel) {
 			free(ch->Data.Level.Name);
-		} else if (ch->Type == ChapterPlayVideo) {
-			free(ch->Data.Movie.PathName);
+		} else if (ch->Type == ChapterPlayMovie) {
+			free(ch->Data.Movie.File);
 		}
 		chptr = ch;
 		ch = ch->Next;
@@ -412,7 +416,10 @@ static int CclDefineCampaign(lua_State* l)
 					ParseShowPicture(l, chapter);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "play-movie")) {
-					DebugPrint("FIXME: not supported\n");
+					chapter->Type = ChapterPlayMovie;
+					lua_rawgeti(l, j + 1, k + 1);
+					chapter->Data.Movie.File = strdup(LuaToString(l, -1));
+					lua_pop(l, 1);
 				} else if (!strcmp(value, "play-level")) {
 					chapter->Type = ChapterPlayLevel;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -590,9 +597,8 @@ void SaveCampaign(CLFile* file)
 			CLprintf(file,"}, \n");
 		} else if (ch->Type == ChapterPlayLevel) {
 			CLprintf(file, "    \"play-level\", \"%s\",\n", ch->Data.Level.Name);
-		} else if (ch->Type == ChapterPlayVideo) {
-			CLprintf(file, "    \"play-movie\", \"%s\", %d\n",
-				ch->Data.Movie.PathName, ch->Data.Movie.Flags);
+		} else if (ch->Type == ChapterPlayMovie) {
+			CLprintf(file, "    \"play-movie\", \"%s\",\n", ch->Data.Movie.File);
 		}
 	}
 	CLprintf(file, "  }\n");
