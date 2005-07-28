@@ -58,14 +58,9 @@
 */
 void HandleActionReturnGoods(Unit* unit)
 {
-	const UnitType* type;
-	Unit* destu;
+	Assert(unit->Type->Harvester);
 
-	type = unit->Type;
-	//
 	// Select target to return goods.
-	//
-	Assert(type->Harvester);
 	if (!unit->CurrentResource || unit->ResourcesHeld == 0 ||
 			(unit->ResourcesHeld != unit->Type->ResInfo[unit->CurrentResource]->ResourceCapacity &&
 				unit->Type->ResInfo[unit->CurrentResource]->LoseResources)) {
@@ -79,9 +74,11 @@ void HandleActionReturnGoods(Unit* unit)
 		unit->Orders[0].Action = UnitActionStill;
 		return;
 	}
-	// If depot was destroyed.
-	// Search for an another one.
+
+	// If depot was destroyed search for another one.
 	if (!unit->Orders[0].Goal) {
+		Unit* destu;
+
 		if (!(destu = FindDeposit(unit, unit->X, unit->Y, 1000,
 				unit->CurrentResource))) {
 			memset(unit->Orders, 0, sizeof(*unit->Orders));
@@ -98,7 +95,6 @@ void HandleActionReturnGoods(Unit* unit)
 	unit->Orders[0].Arg1.ResourcePos = -1;
 	NewResetPath(unit);
 	unit->SubAction = 70; // FIXME : Define value.
-	return;
 }
 
 //@}
