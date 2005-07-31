@@ -29,7 +29,7 @@
 --	$Id$
 --
 
-function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
+function DefineImageTilemodels(terrain, imgx, imgy)
    local til
    local imgsize
    til = {}
@@ -47,7 +47,9 @@ function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
       til}
      }
    )
+end
 
+function RepeatMap(mapx, mapy, imgx, imgy)
    -- Tile map
    for x = 0,mapx-1 do
      for y = 0,mapy-1 do
@@ -58,5 +60,12 @@ function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
    -- The terrain of image based maps shouldnt be editable by the stratagus 
    -- builtin editor and the editor shouldn't try to write the tiles map
    SetTerrainEditable(0) 
+end
+
+
+
+function DefineImageTerrain(terrain, mapx, mapy, imgx, imgy)
+   DefineImageTilemodels(terrain, imgx, imgy)
+   RepeatMap(mapx, mapy, imgx, imgy)
 end
 
