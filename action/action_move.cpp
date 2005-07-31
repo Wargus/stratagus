@@ -155,7 +155,8 @@ int DoActionMove(Unit* unit)
 		d = 0;
 	}
 
-	move = UnitShowAnimation(unit, unit->Type->Animations->Move);
+	move = UnitShowAnimationScaled(unit, unit->Type->Animations->Move,
+			TheMap.Fields[unit->X + unit->Y*TheMap.Info.MapWidth].Cost);
 
 	unit->IX += xd * move;
 	unit->IY += yd * move;

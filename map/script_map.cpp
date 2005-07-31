@@ -441,6 +441,8 @@ static int CclSetTile(lua_State* l)
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Tile = TheMap.Tileset.Table[tile];
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Value = 0;
 	TheMap.Fields[w + h * TheMap.Info.MapWidth].Flags = TheMap.Tileset.FlagsTable[tile];
+	TheMap.Fields[w + h * TheMap.Info.MapWidth].Cost = 
+		1 << (TheMap.Tileset.FlagsTable[tile] & MapFieldSpeedMask);
 
 	return 0;
 }
