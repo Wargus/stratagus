@@ -29,7 +29,7 @@ import glob
 from stat import *
 
 ccflags = "-fsigned-char"
-customDefines = "USE_HP_FOR_XP MAP_REGIONS"
+customDefines = "USE_HP_FOR_XP"
 
 SConsignFile()
 
