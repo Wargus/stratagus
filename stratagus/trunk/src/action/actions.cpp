@@ -86,7 +86,21 @@ static void UnitRotate(Unit* unit, int rotate)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimation(Unit* unit, const Animation* anim)
+int UnitShowAnimation(Unit* unit, const Animation* anim) 
+{
+	return UnitShowAnimationScaled(unit, anim, 8);
+}
+
+/**
+**  Show unit animation.
+**
+**  @param unit  Unit of the animation.
+**  @param anim  Animation script to handle.
+**  @param scale scaling factor of the wait times in animation (8 means no scaling).
+**
+**  @return      The flags of the current script step.
+*/
+int UnitShowAnimationScaled(Unit* unit, const Animation* anim, int scale)
 {
 	int move;
 
@@ -123,13 +137,15 @@ int UnitShowAnimation(Unit* unit, const Animation* anim)
 				break;
 
 			case AnimationWait:
-				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait;
+				unit->Anim.Wait = unit->Anim.Anim->D.Wait.Wait << scale >> 8;
 				if (unit->Variable[SLOW_INDEX].Value) { // unit is slowed down
 					unit->Anim.Wait <<= 1;
 				}
 				if (unit->Variable[HASTE_INDEX].Value && unit->Anim.Wait > 1) { // unit is accelerated
 					unit->Anim.Wait >>= 1;
 				}
+				if (unit->Anim.Wait <= 0)
+					unit->Anim.Wait = 1;
 				break;
 			case AnimationRandomWait:
 				unit->Anim.Wait = unit->Anim.Anim->D.RandomWait.MinWait +

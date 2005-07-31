@@ -117,7 +117,7 @@ static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 	//
 	//  Parse the list: flags of the slot
 	//
-	flags = 0;
+	flags = 3;
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
 		if (!lua_isstring(l, -1)) {
@@ -157,6 +157,16 @@ static void ParseTilesetTileFlags(lua_State* l, int* back, int* j)
 			flags |= MapFieldBuilding;
 		} else if (!strcmp(value, "human")) {
 			flags |= MapFieldHuman;
+		} else if (!strcmp(value, "fastest")) {
+			flags = (flags & ~MapFieldSpeedMask);
+		} else if (!strcmp(value, "fast")) {
+			flags = (flags & ~MapFieldSpeedMask) | 1;
+		} else if (!strcmp(value, "slow")) {
+			flags = (flags & ~MapFieldSpeedMask) | 4;
+		} else if (!strcmp(value, "slower")) {
+			flags = (flags & ~MapFieldSpeedMask) | 5;
+		} else if (!strcmp(value, "slowest")) {
+			flags = (flags & ~MapFieldSpeedMask) | 7;
 		} else {
 			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}

@@ -199,6 +199,7 @@ typedef struct _map_field_ {
 	unsigned short Tile;      /// graphic tile number
 	unsigned short SeenTile;  /// last seen tile (FOW)
 	unsigned short Flags;     /// field flags
+	unsigned char Cost; /// Unit cost to move in this tile
 	// FIXME: Value can be removed, walls and regeneration can be handled
 	//        different.
 	unsigned char Value;               /// HP for walls/ Wood Regeneration
@@ -210,9 +211,7 @@ typedef struct _map_field_ {
 } MapField;
 
 // Not used until now:
-#if 0
-#define MapFieldArray 0x0004  /// More than one unit on the field
-#endif
+#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
 
 #define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
 

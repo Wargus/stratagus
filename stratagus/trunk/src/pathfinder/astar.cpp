@@ -345,6 +345,8 @@ static int CostMoveTo(const Unit* unit, int ex, int ey, int mask, int current_co
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
+			// Add tile movement cost
+			cost += TheMap.Fields[i + j * TheMap.Info.MapWidth].Cost;
 		}
 	}
 	return cost;
