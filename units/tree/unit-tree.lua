@@ -55,7 +55,7 @@ DefineUnitType("unit-tree", {
 	Animations = "animations-tree", Icon = "icon-tree",
 	Costs = {"time", 1},
 	Construction = "construction-tree",
-	Speed = 0, HitPoints = 50, DrawLevel = 2, 
+	Speed = 0, HitPoints = 50, DrawLevel = 25, 
 	TileSize  = {1, 1}, BoxSize = {32, 32},
 	SightRange = 1, Armor = 0 , BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 0, AnnoyComputerFactor = 0,
