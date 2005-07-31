@@ -553,11 +553,36 @@ static int CclDefineTileset(lua_State* l)
 }
 
 /**
+**  Set the flags like "water" for a tile of a tileset
+**
+**  @param l  Lua state.
+*/
+static int CclSetTileFlags(lua_State* l)
+{
+	int j;
+	int tilenumber;
+	int flags;
+
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "No flags defined");
+	}
+
+	tilenumber = LuaToNumber(l, 1);
+	j = 0;
+	flags = 0;
+	ParseTilesetTileFlags(l, &flags, &j);
+	TheMap.Tileset.FlagsTable[tilenumber] = flags;
+
+	return 0;
+}
+
+/**
 **  Register CCL features for tileset.
 */
 void TilesetCclRegister(void)
 {
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
+	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 }
 
 //@}
