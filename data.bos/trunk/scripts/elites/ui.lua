@@ -131,7 +131,7 @@ function DefineElitePanels(info_panel_x, info_panel_y)
   DefaultFont = "game",
   Condition = {ShowOpponent = false, HideNeutral = true, Build = "false"},
   Contents = {
-         { Pos = {16, 97}, Condition = {BasicDamage = "only"},
+         { Pos = {16, 138}, Condition = {BasicDamage = "only"},
             More = {"Text", {Text = Concat("Damage: ", String(min_damage), 
                                            "-", String(max_damage),
                                            If(Equal(0, damage_bonus), "",
