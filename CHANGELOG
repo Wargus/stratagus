@@ -2,6 +2,7 @@ Change log for Invasion - Battle of Survival
 --------------------------------------------
 
 Development version:
+- Added Island map with roads and of course water (TimberDragon, François Beerten)
 - Added River image-based map. (TimberDragon, François Beerten)
 - Added Battlefield image-based map. (François Beerten)
 - Added a helper function for image-based maps. (François Beerten)
