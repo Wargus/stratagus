@@ -80,16 +80,15 @@ DefineUnitType("unit-hosp", {
 	})
 
 DefineAnimations("animations-elitebuild5", {
-    Death = {"unbreakable begin", "wait 1", "frame 15", "wait 2000", 
-        "frame 15", "wait 200", "frame 15", "wait 200", "frame 16", "wait 200",
-        "frame 16", "wait 200", "frame 16", "wait 1", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "wait 1", "frame 1", "wait 2000", 
+        "frame 0", "wait 200", "unbreakable end", "wait 1", },
     })
 
 DefineUnitType("build-dead-body5", {
 	Name = "HospCrater",
 	Image = {"file", GetCurrentLuaPath().."/hospital.png", "size", {200, 200}},
 	Animations = "animations-elitebuild5", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {4, 3},
+	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {5, 4},
 	BoxSize = {124, 92}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none",
 	Priority = 0, Type = "land", Building = true, Vanishes = true
