@@ -1494,9 +1494,12 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 				player, frame, x, y);
 		}
 	} else {
-		x -= type->TileWidth * TileSizeX / 2;
-		y -= type->TileHeight * TileSizeY / 2;
-		DrawUnitType(type, type->Sprite, player, frame, x, y);
+		x += type->OffsetX - type->Width / 2;
+		y += type->OffsetY - type->Height / 2;
+		if (frame < 0) {
+			frame = -frame - 1;
+		}
+		VideoDrawPlayerColorClip(type->Sprite, player, frame, x, y);
 	}
 }
 
