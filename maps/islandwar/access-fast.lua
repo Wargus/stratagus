@@ -1,3 +1,12 @@
+--            ____            
+--           / __ )____  _____
+--          / __  / __ \/ ___/
+--         / /_/ / /_/ (__  ) 
+--        /_____/\____/____/  
+--
+--  Invasion - Battle of Survival                  
+--   A GPL'd futuristic RTS game
+--
 SetTileFlags(453, {"fast"})
 SetTileFlags(517, {"fast"})
 SetTileFlags(580, {"fast"})
