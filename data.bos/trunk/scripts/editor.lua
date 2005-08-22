@@ -77,6 +77,9 @@ DefineEditorUnitTypes({
 
    "unit-gold-mine",
    "unit-tree",
+   "unit-tree02",
+   "unit-tree03",
+   "unit-tree04",
    "unit-rock-1",
    "unit-rock-2",
    "unit-rock-3",
@@ -95,6 +98,6 @@ DefineEditorUnitTypes({
    "unit-crystal-field10",
    "unit-crystal-field11",   
    "unit-crystal-field12",
-   "unit-crystal-field13"
+   "unit-crystal-field13",
 })
 
