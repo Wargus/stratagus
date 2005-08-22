@@ -35,21 +35,26 @@ DefineIcon({
 
 DefineConstruction("construction-rfac", {
 	Constructions = {
-		{Percent = 0, File = "main", Frame = 2},
-		{Percent = 10, File = "main", Frame = 3},
-		{Percent = 20, File = "main", Frame = 4},
-		{Percent = 30, File = "main", Frame = 5},
-		{Percent = 40, File = "main", Frame = 6},
-		{Percent = 50, File = "main", Frame = 7},
-		{Percent = 60, File = "main", Frame = 8},
-		{Percent = 70, File = "main", Frame = 9},
-		{Percent = 80, File = "main", Frame = 10},
-		{Percent = 90, File = "main", Frame = 0}
+		{Percent = 0, File = "main", Frame = 0},
+		{Percent = 10, File = "main", Frame = 1},
+		{Percent = 20, File = "main", Frame = 2},
+		{Percent = 30, File = "main", Frame = 3},
+		{Percent = 40, File = "main", Frame = 4},
+		{Percent = 50, File = "main", Frame = 5},
+		{Percent = 60, File = "main", Frame = 6},
+		{Percent = 70, File = "main", Frame = 7},
+		{Percent = 80, File = "main", Frame = 8},
+		{Percent = 90, File = "main", Frame = 9}
 	}
     })
 
 DefineAnimations("animations-rfac", {
-    Still = {"frame 0", "wait 3", },
+    Still = {"frame 10", "wait 3", "frame 11", "wait 3", "frame 12", "wait 3",
+            "frame 13", "wait 3", "frame 14", "wait 3", "frame 13", "wait 3",
+            "frame 12", "wait 3", "frame 11", "wait 3", "frame 10", "wait 3", },
+    Train = {"frame 15", "wait 3", "frame 16", "wait 3", "frame 17", "wait 3",
+             "frame 18", "wait 3", "frame 19", "wait 3", "frame 18", "wait 3", 
+             "frame 17", "wait 3", "frame 16", "wait 3", "frame 15", "wait 3", },
     })
 
 MakeSound("rfac-selected", GetCurrentLuaPath().."/sfx_rfac.select.wav")
@@ -78,9 +83,8 @@ DefineUnitType("unit-rfac", {
 	})
 
 DefineAnimations("animations-elitebuild4", {
-    Death = {"unbreakable begin", "wait 1", "frame 12", "wait 2000", 
-        "frame 12", "wait 200", "frame 12", "wait 200", "frame 13", "wait 200",
-        "frame 13", "wait 200", "frame 13", "wait 1", "unbreakable end", "wait 1", },
+    Death = {"unbreakable begin", "wait 1", "frame 0", "wait 2000", 
+             "unbreakable end", "wait 1", },
     })
 
 DefineUnitType("build-dead-body4", {
