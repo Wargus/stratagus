@@ -320,11 +320,11 @@ static void LoseResource(Unit* unit, const Unit* source)
 }
 
 /**
-**  Wait in resource, for collecting the resource.
+**  Gather the resource
 **
 **  @param unit  Pointer to unit.
 **
-**  @return      TRUE if ready, otherwise FALSE.
+**  @return      non-zero if ready, otherwise zero.
 */
 static int GatherResource(Unit* unit)
 {
@@ -339,11 +339,11 @@ static int GatherResource(Unit* unit)
 
 	if (resinfo->HarvestFromOutside || resinfo->TerrainHarvester) {
 		AnimateActionHarvest(unit);
-		unit->Data.ResWorker.TimeToHarvest--;
 	} else {
 		unit->Anim.CurrAnim = NULL;
-		unit->Data.ResWorker.TimeToHarvest--;
 	}
+
+	unit->Data.ResWorker.TimeToHarvest--;
 
 	if (unit->Data.ResWorker.DoneHarvesting) {
 		Assert(resinfo->HarvestFromOutside || resinfo->TerrainHarvester);
@@ -355,7 +355,7 @@ static int GatherResource(Unit* unit)
 		if (!unit->Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			unit->SubAction = SUB_MOVE_TO_RESOURCE;
-			// Give it some reasonable look while serching.
+			// Give it some reasonable look while searching.
 			// FIXME: which frame?
 			unit->Frame = 0;
 		}
@@ -415,6 +415,9 @@ static int GatherResource(Unit* unit)
 			// FIXME: implement depleted resources.
 			//
 			if ((!UnitVisibleAsGoal(source, unit->Player)) || (source->ResourcesHeld == 0)) {
+				if (unit->Anim.Unbreakable) {
+					return 0;
+				}
 				DebugPrint("Resource is destroyed for unit %d\n" _C_ unit->Slot);
 				uins = source->UnitInside;
 				//
