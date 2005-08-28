@@ -52,7 +52,7 @@ DefineAiHelper(
   --
   {"repair", "unit-engineer",
    "unit-msilo", "unit-dev-yard", "unit-gen", "unit-camp", "unit-apcs",
-   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault"},
+   "unit-rfac", "unit-hosp", "unit-vfac", "unit-vault", "unit-gturret"},
   --
   -- Reduce unit limits.
   --
