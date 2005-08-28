@@ -245,3 +245,5 @@ DefineTileset(
 --    {}},-- AF0
  }
 )
+
+BuildTilesetTables()
