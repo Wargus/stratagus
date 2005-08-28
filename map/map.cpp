@@ -88,41 +88,37 @@ void MapMarkSeenTile(int x, int y)
 	}
 	mf->SeenTile = tile;
 
-	//
-	//  Handle wood changes. FIXME: check if for growing wood correct?
-	//
-	if (seentile != TheMap.Tileset.RemovedTree &&
-			tile == TheMap.Tileset.RemovedTree) {
-		MapFixNeighbors(MapFieldForest, 1, x, y);
-	} else if (seentile == TheMap.Tileset.RemovedTree &&
-			tile != TheMap.Tileset.RemovedTree) {
-		MapFixTile(MapFieldForest, 1, x, y);
-	} else if (ForestOnMap(x, y)) {
-		MapFixTile(MapFieldForest, 1, x, y);
-		MapFixNeighbors(MapFieldForest, 1, x, y);
+	if (TheMap.Tileset.TileTypeTable) {
+		//  Handle wood changes. FIXME: check if for growing wood correct?
+		if (seentile != TheMap.Tileset.RemovedTree &&
+				tile == TheMap.Tileset.RemovedTree) {
+			MapFixNeighbors(MapFieldForest, 1, x, y);
+		} else if (seentile == TheMap.Tileset.RemovedTree &&
+				tile != TheMap.Tileset.RemovedTree) {
+			MapFixTile(MapFieldForest, 1, x, y);
+		} else if (ForestOnMap(x, y)) {
+			MapFixTile(MapFieldForest, 1, x, y);
+			MapFixNeighbors(MapFieldForest, 1, x, y);
 
-	//
-	// Handle rock changes.
-	//
-	} else if (seentile != TheMap.Tileset.RemovedRock &&
-			tile == TheMap.Tileset.RemovedRock) {
-		MapFixNeighbors(MapFieldRocks, 1, x, y);
-	} else if (seentile == TheMap.Tileset.RemovedRock &&
-			tile != TheMap.Tileset.RemovedRock) {
-		MapFixTile(MapFieldRocks, 1, x, y);
-	} else if (RockOnMap(x, y)) {
-		MapFixTile(MapFieldRocks, 1, x, y);
-		MapFixNeighbors(MapFieldRocks, 1, x, y);
+		// Handle rock changes.
+		} else if (seentile != TheMap.Tileset.RemovedRock &&
+				tile == TheMap.Tileset.RemovedRock) {
+			MapFixNeighbors(MapFieldRocks, 1, x, y);
+		} else if (seentile == TheMap.Tileset.RemovedRock &&
+				tile != TheMap.Tileset.RemovedRock) {
+			MapFixTile(MapFieldRocks, 1, x, y);
+		} else if (RockOnMap(x, y)) {
+			MapFixTile(MapFieldRocks, 1, x, y);
+			MapFixNeighbors(MapFieldRocks, 1, x, y);
 
-	//
-	//  Handle Walls changes.
-	//
-	} else if (TheMap.Tileset.TileTypeTable[tile] == TileTypeHumanWall ||
-			TheMap.Tileset.TileTypeTable[tile] == TileTypeOrcWall ||
-			TheMap.Tileset.TileTypeTable[seentile] == TileTypeHumanWall ||
-			TheMap.Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
-		MapFixSeenWallTile(x, y);
-		MapFixSeenWallNeighbors(x, y);
+		//  Handle Walls changes.
+		} else if (TheMap.Tileset.TileTypeTable[tile] == TileTypeHumanWall ||
+				TheMap.Tileset.TileTypeTable[tile] == TileTypeOrcWall ||
+				TheMap.Tileset.TileTypeTable[seentile] == TileTypeHumanWall ||
+				TheMap.Tileset.TileTypeTable[seentile] == TileTypeOrcWall) {
+			MapFixSeenWallTile(x, y);
+			MapFixSeenWallNeighbors(x, y);
+		}
 	}
 
 	UpdateMinimapXY(x, y);
@@ -365,10 +361,12 @@ void PreprocessMap(void)
 	}
 
 	// it is required for fixing the wood that all tiles are marked as seen!
-	for (ix = 0; ix < TheMap.Info.MapWidth; ++ix) {
-		for (iy = 0; iy < TheMap.Info.MapHeight; ++iy) {
-			MapFixWallTile(ix, iy);
-			MapFixSeenWallTile(ix, iy);
+	if (TheMap.Tileset.TileTypeTable) {
+		for (ix = 0; ix < TheMap.Info.MapWidth; ++ix) {
+			for (iy = 0; iy < TheMap.Info.MapHeight; ++iy) {
+				MapFixWallTile(ix, iy);
+				MapFixSeenWallTile(ix, iy);
+			}
 		}
 	}
 }
