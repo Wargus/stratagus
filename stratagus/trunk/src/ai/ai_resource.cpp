@@ -1239,14 +1239,14 @@ static void AiCheckRepair(void)
 		repair_flag = 1;
 		// Unit damaged?
 		// Don't repair attacked unit ( wait 5 sec before repairing )
-		if (unit->Type->Building
-			&& unit->Orders[0].Action != UnitActionBuilt
-			&& unit->Orders[0].Action != UnitActionUpgradeTo
-			&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
-			&& unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+		if (unit->Type->RepairHP &&
+				unit->Orders[0].Action != UnitActionBuilt &&
+				unit->Orders[0].Action != UnitActionUpgradeTo &&
+				unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max &&
+				unit->Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 
 			//
-			// FIXME: Repair only buildings under control
+			// FIXME: Repair only units under control
 			//
 			if (EnemyUnitsInDistance(unit, unit->Stats->Variables[SIGHTRANGE_INDEX].Max)) {
 				continue;
@@ -1255,8 +1255,8 @@ static void AiCheckRepair(void)
 			// Must check, if there are enough resources
 			//
 			for (j = 1; j < MaxCosts; ++j) {
-				if (unit->Stats->Costs[j]
-					&& AiPlayer->Player->Resources[j] < 99) {
+				if (unit->Stats->Costs[j] &&
+						AiPlayer->Player->Resources[j] < 99) {
 					repair_flag = 0;
 				}
 			}
