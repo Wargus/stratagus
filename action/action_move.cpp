@@ -94,7 +94,10 @@ int DoActionMove(Unit* unit)
 	int move;
 
 	Assert(CanMove(unit));
-	if (!unit->Moving && !unit->Anim.Wait) {
+	if (!unit->Moving &&
+			(unit->Type->Animations->Move != unit->Anim.CurrAnim || !unit->Anim.Wait)) {
+		Assert(!unit->Anim.Unbreakable);
+
 		// FIXME: So units flying up and down are not affected.
 		unit->IX = unit->IY = 0;
 
