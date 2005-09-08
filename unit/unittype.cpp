@@ -276,9 +276,10 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	Assert(plynr < PlayerMax);
 	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
 	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
-		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d},\n  ",
+		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
-			stats->Variables[j].Max, stats->Variables[j].Increase);
+			stats->Variables[j].Max, stats->Variables[j].Increase,
+			stats->Variables[j].Enable ? ", Enable = true" : "");
 	}
 	CLprintf(file, "\"costs\", {");
 	for (j = 0; j < MaxCosts; ++j) {
