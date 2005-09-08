@@ -996,6 +996,26 @@ void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 }
 
 /**
+**  Immediate transforming unit into type.
+**
+**  @param unit   pointer to unit.
+**  @param type   upgrade to type
+**  @param flush  if true, flush command queue.
+*/
+void CommandTransformIntoType(Unit* unit, UnitType* type)
+{
+	Order* order;
+
+	Assert(unit->CriticalOrder.Action == UnitActionStill);
+	order = &unit->CriticalOrder;
+	memset(order, 0, sizeof(*order));
+
+	order->Action = UnitActionTransformInto;
+	order->X = order->Y = -1;
+	order->Type = type;
+}
+
+/**
 **  Cancel building upgrading to.
 **
 **  @param unit  pointer to unit.
