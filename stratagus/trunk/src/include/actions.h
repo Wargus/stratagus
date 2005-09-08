@@ -120,6 +120,8 @@ extern void CommandCancelTraining(struct _unit_* unit, int slot,
 	/// Prepare command upgrade to
 extern void CommandUpgradeTo(struct _unit_* unit, struct _unit_type_* what,
 	int flush);
+	/// immediate transforming into type.
+extern void CommandTransformIntoType(struct _unit_* unit, struct _unit_type_* type);
 	/// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(struct _unit_* unit);
 	/// Prepare command research
@@ -183,6 +185,8 @@ extern void HandleActionBuilt(struct _unit_* unit);
 extern void HandleActionTrain(struct _unit_* unit);
 	/// Handle command upgrade to
 extern void HandleActionUpgradeTo(struct _unit_* unit);
+	/// Handle command transform into
+extern void HandleActionTransformInto(struct _unit_* unit);
 	/// Handle command upgrade
 extern void HandleActionUpgrade(struct _unit_* unit);
 	/// Handle command research

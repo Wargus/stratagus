@@ -210,7 +210,8 @@ void CclParseOrder(lua_State* l, Order* order)
 			order->Action = UnitActionResource;
 		} else if (!strcmp(value, "action-return-goods")) {
 			order->Action = UnitActionReturnGoods;
-
+		} else if (!strcmp(value, "action-transform-into")) {
+			order->Action = UnitActionTransformInto;
 		} else if (!strcmp(value, "flags")) {
 			++j;
 			lua_rawgeti(l, -1, j + 1);
@@ -818,6 +819,10 @@ static int CclUnit(lua_State* l)
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
 			}
+		} else if (!strcmp(value, "critical-order")) {
+			lua_pushvalue(l, j + 1);
+			CclParseOrder(l, &unit->CriticalOrder);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "saved-order")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrder(l, &unit->SavedOrder);

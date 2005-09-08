@@ -59,7 +59,6 @@
 **  @param newtype  new type of the unit.
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
-**  @bug  Animation is not managed. (new (type) animation, unbreakable section).
 */
 int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 {
@@ -140,6 +139,18 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 		SelectedUnitChanged();
 	}
 	return 1;
+}
+
+/**
+**  Unit transform into unit.
+**
+**  @param unit  Pointer to unit.
+*/
+void HandleActionTransformInto(Unit* unit)
+{
+	// What to do if an error occurs ?
+	TransformUnitIntoType(unit, unit->CriticalOrder.Type);
+	unit->CriticalOrder.Action = UnitActionStill;
 }
 
 /**

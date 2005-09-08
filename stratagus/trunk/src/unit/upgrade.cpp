@@ -48,6 +48,7 @@
 #include "spells.h"
 #include "unit.h"
 #include "unittype.h"
+#include "actions.h"
 
 #include "myendian.h"
 
@@ -59,7 +60,6 @@
 
 static void AllowUnitId(Player* player, int id, int units);
 static void AllowUpgradeId(Player* player, int id, char af);
-int TransformUnitIntoType(Unit* unit, UnitType* newtype);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -583,7 +583,7 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 		//  Convert already existing units to this type.
 		//
 		if (unit->Type == src) {
-			TransformUnitIntoType(unit, dst);
+			CommandTransformIntoType(unit, dst);
 		//
 		//  Convert trained units to this type.
 		//  FIXME: what about buildings?
