@@ -418,7 +418,8 @@ typedef enum _unit_action_ {
 
 	UnitActionRepair,       /// unit repairing
 	UnitActionResource,     /// unit harvesting resources
-	UnitActionReturnGoods   /// unit returning any resource
+	UnitActionReturnGoods,  /// unit returning any resource
+	UnitActionTransformInto /// unit transform into type.
 } UnitAction;
 
 /**
@@ -595,6 +596,7 @@ struct _unit_ {
 	Order* Orders;              /// orders to process
 	Order SavedOrder;           /// order to continue after current
 	Order NewOrder;             /// order for new trained units
+	Order CriticalOrder;        /// order to do as possible in breakable animation.
 	char* AutoCastSpell;        /// spells to auto cast
 	unsigned AutoRepair : 1;    /// True if unit tries to repair on still action.
 

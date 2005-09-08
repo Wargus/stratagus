@@ -289,7 +289,7 @@ static void (*HandleActionTable[256])(Unit*) = {
 	HandleActionRepair,
 	HandleActionResource,
 	HandleActionReturnGoods,
-	HandleActionNotWritten,
+	HandleActionTransformInto,
 	HandleActionNotWritten,
 
 	// Enough for the future ?
@@ -462,6 +462,11 @@ static void HandleUnitAction(Unit* unit)
 	// If current action is breakable proceed with next one.
 	//
 	if (!unit->Anim.Unbreakable) {
+		if (unit->CriticalOrder.Action != UnitActionStill) {
+			HandleActionTable[unit->CriticalOrder.Action](unit);
+			unit->CriticalOrder.Action = UnitActionStill;
+		}
+
 		//
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.

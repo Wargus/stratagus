@@ -3541,7 +3541,9 @@ void SaveOrder(const Order* order, CLFile* file)
 		case UnitActionReturnGoods:
 			CLprintf(file, "\"action-return-goods\",");
 			break;
-
+		case UnitActionTransformInto:
+			CLprintf(file, "\"action-transform-into\",");
+			break;
 		default:
 			DebugPrint("Unknown action in order\n");
 	}
@@ -3760,6 +3762,8 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	}
 	CLprintf(file, "},\n  \"saved-order\", ");
 	SaveOrder(&unit->SavedOrder, file);
+	CLprintf(file, ",\n  \"critical-order\", ");
+	SaveOrder(&unit->CriticalOrder, file);
 	CLprintf(file, ",\n  \"new-order\", ");
 	SaveOrder(&unit->NewOrder, file);
 
