@@ -352,6 +352,9 @@ void InitUnit(Unit* unit, UnitType* type)
 	unit->SavedOrder.Action = UnitActionStill;
 	unit->SavedOrder.X = unit->SavedOrder.Y = -1;
 	Assert(!unit->SavedOrder.Goal);
+	unit->CriticalOrder.Action = UnitActionStill;
+	unit->CriticalOrder.X = unit->CriticalOrder.Y = -1;
+	Assert(!unit->CriticalOrder.Goal);
 }
 
 /**
