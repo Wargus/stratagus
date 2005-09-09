@@ -28,11 +28,12 @@
 --	$Id$
 
 DefineAnimations("animations-vault", {
-    Still = {"frame 0", "wait 5", "frame 1", "wait 5", "frame 2", "wait 5",
-        "frame 3", "wait 5", "frame 4", "wait 5", "frame 5", "wait 5",
-        "frame 5", "wait 5", "frame 5", "wait 5", "frame 4", "wait 5",
-        "frame 3", "wait 5", "frame 2", "wait 5", "frame 1", "wait 5",
-        "frame 0", "wait 5", "frame 0", "wait 5", },
+    Train = {"frame 10", "wait 5", "frame 11", "wait 5", "frame 12", "wait 5",
+        "frame 13", "wait 5", "frame 14", "wait 5", "frame 13", "wait 5",
+        "frame 12", "wait 5", "frame 11", "wait 5", "frame 10", "wait 30", },
+    Still = {"frame 15", "wait 5", "frame 16", "wait 5", "frame 17", "wait 5",
+        "frame 18", "wait 5", "frame 19", "wait 5", "frame 18", "wait 5",
+        "frame 17", "wait 5", "frame 16", "wait 5", "frame 15", "wait 10", },
     Death = {"unbreakable begin", "frame 0", "unbreakable end", "wait 3", },
     })
 
@@ -44,16 +45,16 @@ DefineIcon({
 
 DefineConstruction("construction-vault", {
         Constructions = {
-                {Percent = 0, File = "main", Frame = 6},
-                {Percent = 1, File = "main", Frame = 7},
-                {Percent = 2, File = "main", Frame = 8},
-                {Percent = 3, File = "main", Frame = 9},
-                {Percent = 4, File = "main", Frame = 10},
-                {Percent = 5, File = "main", Frame = 11},
-                {Percent = 6, File = "main", Frame = 12},
-                {Percent = 7, File = "main", Frame = 13},
-                {Percent = 8, File = "main", Frame = 14},
-                {Percent = 9, File = "main", Frame = 15}
+                {Percent = 0, File = "main", Frame = 0},
+                {Percent = 10, File = "main", Frame = 1},
+                {Percent = 20, File = "main", Frame = 2},
+                {Percent = 30, File = "main", Frame = 3},
+                {Percent = 40, File = "main", Frame = 4},
+                {Percent = 50, File = "main", Frame = 5},
+                {Percent = 60, File = "main", Frame = 6},
+                {Percent = 70, File = "main", Frame = 7},
+                {Percent = 80, File = "main", Frame = 8},
+                {Percent = 90, File = "main", Frame = 9}
         }
 })
 
@@ -64,7 +65,8 @@ MakeSound("dev-dead", GetCurrentLuaPath().."/sfx_fort.die.wav")
 
 DefineUnitType("unit-vault", {
 	Name = "Vault",
-	Image = {"file", "units/vault/vault.png", "size", {160, 220}},
+	Image = {"file", "units/vault/vault.png", "size", {200, 200}},
+	Shadow = {"file", GetCurrentLuaPath().."/vault_s.png", "size", {200, 200}},
 	Animations = "animations-vault", Icon = "icon-vault",
 	Costs = {"time", 150, "titanium", 1000, "crystal", 1000},
 	RepairHp = 4, RepairCosts = {"titanium", 4}, Construction = "construction-vault",
