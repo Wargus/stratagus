@@ -5,8 +5,8 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name astar.c - The a* path finder routines. */
 //
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -110,11 +110,11 @@ void InitAStar(void)
 {
 	if (!AStarMatrix) {
 		AStarMatrixSize = sizeof(Node) * TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-		AStarMatrix = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(Node));
+		AStarMatrix = (Node*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(Node));
 		Threshold = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_CLOSE_SET_RATIO;
-		CloseSet = malloc(sizeof(int) * Threshold);
+		CloseSet = (int*)malloc(sizeof(int) * Threshold);
 		OpenSetMaxSize = TheMap.Info.MapWidth * TheMap.Info.MapHeight / MAX_OPEN_SET_RATIO;
-		OpenSet = malloc(sizeof(Open) * OpenSetMaxSize);
+		OpenSet = (Open*)malloc(sizeof(Open) * OpenSetMaxSize);
 	}
 }
 

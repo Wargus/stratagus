@@ -71,7 +71,7 @@ static int CclSoundForName(lua_State* l)
 	sound_name = LuaToString(l, -1);
 	id = SoundIdForName(sound_name);
 
-	data = lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -95,7 +95,7 @@ static SoundId CclGetSoundId(lua_State* l)
 		pop = 1;
 	}
 	if (lua_isuserdata(l, -1)) {
-		data = lua_touserdata(l, -1);
+		data = (LuaUserData*)lua_touserdata(l, -1);
 		if (data->Type == LuaSoundType) {
 			if (pop) {
 				lua_pop(l, 1);
@@ -138,7 +138,7 @@ static int CclMakeSound(lua_State* l)
 	} else if (lua_istable(l, 2)) {
 		// several files
 		args = luaL_getn(l, 2);
-		c_files = malloc(args * sizeof(char*));
+		c_files = (char**)malloc(args * sizeof(char*));
 		for (j = 0; j < args; ++j) {
 			lua_rawgeti(l, 2, j + 1);
 			c_files[j] = strdup(LuaToString(l, -1));
@@ -154,7 +154,7 @@ static int CclMakeSound(lua_State* l)
 		LuaError(l, "string or table expected");
 		return 0;
 	}
-	data = lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -185,7 +185,7 @@ static int CclMakeSoundGroup(lua_State* l)
 	lua_pop(l, 1);
 	second = CclGetSoundId(l);
 	id = MakeSoundGroup(c_name, first, second);
-	data = lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -250,19 +250,19 @@ static int CclDefineGameSounds(lua_State* l)
 		// let's handle now the different cases
 		if (!strcmp(value, "click")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Click.Sound = data->Data;
 		} else if (!strcmp(value, "placement-error")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementError.Sound = data->Data;
 		} else if (!strcmp(value, "placement-success")) {
 			if (!lua_isuserdata(l, j + 1) ||
-					(data = lua_touserdata(l, j + 1))->Type != LuaSoundType) {
+					(data = (LuaUserData*)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.PlacementSuccess.Sound = data->Data;
@@ -283,7 +283,7 @@ static int CclDefineGameSounds(lua_State* l)
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
-					(data = lua_touserdata(l, -1))->Type != LuaSoundType) {
+					(data = (LuaUserData*)lua_touserdata(l, -1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
@@ -305,7 +305,7 @@ static int CclDefineGameSounds(lua_State* l)
 			}
 			lua_rawgeti(l, j + 1, 2);
 			if (!lua_isuserdata(l, -1) ||
-					(data = lua_touserdata(l, -1))->Type != LuaSoundType) {
+					(data = (LuaUserData*)lua_touserdata(l, -1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
@@ -390,7 +390,7 @@ static int CclDefinePlaySections(lua_State* l)
 	int k;
 
 	++NumPlaySections;
-	PlaySections = realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
+	PlaySections = (PlaySection*)realloc(PlaySections, NumPlaySections * sizeof(PlaySection));
 	p = PlaySections + NumPlaySections - 1;
 	memset(p, 0, sizeof(PlaySection));
 
@@ -485,7 +485,7 @@ static int CclDefinePlaySections(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					subsubargs = luaL_getn(l, -1);
-					p->Files = malloc((subsubargs + 1) * sizeof(char*));
+					p->Files = (char**)malloc((subsubargs + 1) * sizeof(char*));
 					p->Files[subsubargs] = NULL;
 					for (subk = 0; subk < subsubargs; ++subk) {
 						lua_rawgeti(l, -1, subk + 1);
