@@ -789,7 +789,7 @@ void CycleViewportMode(int step)
 	if (new_mode < 0) {
 		new_mode = NUM_VIEWPORT_MODES - 1;
 	}
-	SetViewportMode(new_mode);
+	SetViewportMode((ViewportMode)new_mode);
 }
 
 //@}

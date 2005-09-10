@@ -91,7 +91,7 @@ static int CclPlayer(lua_State* l)
 		NumPlayers = i + 1;
 	}
 	player->Index = i;
-	if (!(player->Units = calloc(UnitMax, sizeof(Unit*)))) {
+	if (!(player->Units = (Unit**)calloc(UnitMax, sizeof(Unit*)))) {
 		DebugPrint("Not enough memory to create player %d.\n" _C_ i);
 		return 0;
 	}
@@ -711,9 +711,9 @@ static int CclDefinePlayerColorIndex(lua_State* l)
 
 	for (i = 0; i < PlayerMax; ++i) {
 		free(PlayerColorsRGB[i]);
-		PlayerColorsRGB[i] = calloc(PlayerColorIndexCount, sizeof(*PlayerColorsRGB[i]));
+		PlayerColorsRGB[i] = (SDL_Color*)calloc(PlayerColorIndexCount, sizeof(*PlayerColorsRGB[i]));
 		free(PlayerColors[i]);
-		PlayerColors[i] = calloc(PlayerColorIndexCount, sizeof(*PlayerColors[i]));
+		PlayerColors[i] = (Uint32*)calloc(PlayerColorIndexCount, sizeof(*PlayerColors[i]));
 	}
 	return 0;
 }

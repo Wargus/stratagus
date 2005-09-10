@@ -96,7 +96,7 @@ static void AddIcon(const char* ident, int frame, int width,
 		}
 		icon->Frame = frame;
 	} else {
-		icon = calloc(1, sizeof(Icon));
+		icon = (Icon*)calloc(1, sizeof(Icon));
 		icon->Ident = strdup(ident);
 		if (file) {
 			icon->Sprite = NewGraphic(file, width, height);
@@ -105,7 +105,7 @@ static void AddIcon(const char* ident, int frame, int width,
 
 		*(Icon**)hash_add(IconHash, ident) = icon;
 
-		Icons = realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
+		Icons = (Icon**)realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
 		Icons[NumIcons++] = icon;
 	}
 }
