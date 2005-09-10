@@ -223,10 +223,10 @@ int SendMetaCommand(char* command, char* format, ...)
 
 	size = strlen(GameName) + strlen(LocalPlayerName) + strlen(command) + 100;
 	ret = -1;
-	if ((p = malloc(size)) == NULL) {
+	if ((p = (char*)malloc(size)) == NULL) {
 		return -1;
 	}
-	if ((s = malloc(size)) == NULL) {
+	if ((s = (char*)malloc(size)) == NULL) {
 		return -1;
 	}
 
@@ -263,12 +263,12 @@ int SendMetaCommand(char* command, char* format, ...)
 		} else {              /* glibc 2.0 */
 			size *= 2;    /* twice the old size */
 		}
-		if ((p = realloc(p, size + 1)) == NULL) {
+		if ((p = (char*)realloc(p, size + 1)) == NULL) {
 			return -1;
 		}
 	}
 	// Allocate the correct size
-	if ((s = realloc(s, size + strlen(s) + 1)) == NULL ) {
+	if ((s = (char*)realloc(s, size + strlen(s) + 1)) == NULL ) {
 		free(p);
 		return -1;
 	}
@@ -302,7 +302,7 @@ int RecvMetaReply(char** reply)
 
 	// FIXME: Allow for large packets
 	n = NetRecvTCP(MetaServerFildes, &buf, 1024);
-	if (!(p = malloc(n + 1))) {
+	if (!(p = (char*)malloc(n + 1))) {
 		return -1;
 	}
 

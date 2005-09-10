@@ -130,7 +130,7 @@ typedef struct _campaign_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int GameResult;           /// Outcome of the game
+extern GameResults GameResult;   /// Outcome of the game
 extern int RestartScenario;      /// Restart the scenario
 extern int QuitToMenu;           /// Quit to menu
 extern char DefaultMap[1024];    /// Default map path

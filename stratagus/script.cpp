@@ -219,12 +219,12 @@ int LuaLoadFile(const char* file)
 	}
 
 	size = 10000;
-	buf = malloc(size);
+	buf = (char*)malloc(size);
 	location = 0;
 	while ((read = CLread(fp, &buf[location], size - location))) {
 		location += read;
 		size = size * 2;
-		buf = realloc(buf, size);
+		buf = (char*)realloc(buf, size);
 		if (!buf) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -462,7 +462,7 @@ UnitDesc* CclParseUnitDesc(lua_State* l)
 {
 	UnitDesc* res;  // Result
 
-	res = calloc(1, sizeof(*res));
+	res = (UnitDesc*)calloc(1, sizeof(*res));
 	if (lua_isstring(l, -1)) {
 		res->e = EUnit_Ref;
 		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
@@ -564,7 +564,7 @@ NumberDesc* CclParseNumberDesc(lua_State* l)
 	int nargs;            // Size of table.
 	const char* key;      // Key.
 
-	res = calloc(1, sizeof (*res));
+	res = (NumberDesc*)calloc(1, sizeof (*res));
 	if (lua_isnumber(l, -1)) {
 		res->e = ENumber_Dir;
 		res->D.Val = LuaToNumber(l, -1);
@@ -703,7 +703,7 @@ StringDesc* NewStringDesc(const char* s)
 	if (!s) {
 		return NULL;
 	}
-	res = calloc(1, sizeof (*res));
+	res = (StringDesc*)calloc(1, sizeof (*res));
 	res->e = EString_Dir;
 	res->D.Val = strdup(s);
 	return res;
@@ -723,10 +723,11 @@ static ES_GameInfo StringToGameInfo(const char* s)
 
 	for (i = 0; sgameinfo[i]; ++i) {
 		if (!strcmp(s, sgameinfo[i])) {
-			return i;
+			return (ES_GameInfo)i;
 		}
 	}
-	return -1; // Error.
+	Assert(0);
+	return (ES_GameInfo)-1; // Error.
 }
 
 /**
@@ -742,7 +743,7 @@ StringDesc* CclParseStringDesc(lua_State* l)
 	int nargs;            // Size of table.
 	const char* key;      // Key.
 
-	res = calloc(1, sizeof (*res));
+	res = (StringDesc*)calloc(1, sizeof (*res));
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
 		res->D.Val = strdup(LuaToString(l, -1));
@@ -766,7 +767,7 @@ StringDesc* CclParseStringDesc(lua_State* l)
 			if (res->D.Concat.n < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
-			res->D.Concat.Strings = calloc(res->D.Concat.n, sizeof (*res->D.Concat.Strings));
+			res->D.Concat.Strings = (StringDesc**)calloc(res->D.Concat.n, sizeof(*res->D.Concat.Strings));
 			for (i = 0; i < res->D.Concat.n; i++) {
 				lua_rawgeti(l, -1, 1 + i);
 				res->D.Concat.Strings[i] = CclParseStringDesc(l);
@@ -1019,7 +1020,7 @@ char* EvalString(const StringDesc* s)
 			}
 			return res;
 		case EString_String :     // 42 -> "42".
-			res = malloc(10); // Should be enought ?
+			res = (char*)malloc(10); // Should be enought ?
 			sprintf(res, "%d", EvalNumber(s->D.Number));
 			return res;
 		case EString_InverseVideo : // "a" -> "~<a~>"

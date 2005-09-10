@@ -108,13 +108,15 @@ int ButtonCheckUnitsOr(const Unit* unit, const ButtonAction* button)
 	Player* player;
 
 	player = unit->Player;
-	buf = alloca(strlen(button->AllowStr) + 1);
+	buf = (char*)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (HaveUnitTypeByIdent(player, s)) {
+			free(buf);
 			return 1;
 		}
 	}
+	free(buf);
 	return 0;
 }
 
@@ -133,13 +135,15 @@ int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 	Player* player;
 
 	player = unit->Player;
-	buf = alloca(strlen(button->AllowStr) + 1);
+	buf = (char*)malloc(strlen(button->AllowStr) + 1);
 	strcpy(buf, button->AllowStr);
 	for (s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
 		if (!HaveUnitTypeByIdent(player, s)) {
+			free(buf);
 			return 0;
 		}
 	}
+	free(buf);
 	return 1;
 }
 

@@ -506,7 +506,7 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	// Set everything to 0:
 	memset(condition, 0, sizeof(ConditionInfo));
 	// Flags are defaulted to 0(CONDITION_TRUE)
-	condition->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof (*condition->BoolFlag));
+	condition->BoolFlag = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof (*condition->BoolFlag));
 	condition->Variable = calloc(UnitTypeVar.NumberVariable, sizeof (*condition->Variable));
 	// Initialize min/max stuff to values with no effect.
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
@@ -619,7 +619,7 @@ static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
-				autocast->Condition = malloc(sizeof(ConditionInfo));
+				autocast->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
 			}
 			lua_rawgeti(l, -1, j + 1);
 			CclSpellCondition(l, autocast->Condition);
@@ -650,20 +650,20 @@ static int CclDefineSpell(lua_State* l)
 	if (spell != NULL) {
 		DebugPrint("Redefining spell-type `%s'\n" _C_ identname);
 	} else {
-		SpellTypeTable = realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
-		spell = SpellTypeTable[SpellTypeCount] = malloc(sizeof(SpellType));
+		SpellTypeTable = (SpellType**)realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
+		spell = SpellTypeTable[SpellTypeCount] = (SpellType*)malloc(sizeof(SpellType));
 		memset(spell, 0, sizeof(SpellType));
 		spell->Slot = SpellTypeCount;
 		spell->Ident = strdup(identname);
 		spell->DependencyId = -1;
 		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
-				UnitTypes[i]->CanCastSpell = realloc(UnitTypes[i]->CanCastSpell,
+				UnitTypes[i]->CanCastSpell = (char*)realloc(UnitTypes[i]->CanCastSpell,
 					SpellTypeCount * sizeof((*UnitTypes)->CanCastSpell));
 				UnitTypes[i]->CanCastSpell[SpellTypeCount] = 0;
 			}
 			if (UnitTypes[i]->AutoCastActive) {
-				UnitTypes[i]->AutoCastActive = realloc(UnitTypes[i]->AutoCastActive,
+				UnitTypes[i]->AutoCastActive = (char*)realloc(UnitTypes[i]->AutoCastActive,
 					SpellTypeCount * sizeof((*UnitTypes)->AutoCastActive));
 				UnitTypes[i]->AutoCastActive[SpellTypeCount] = 0;
 			}
@@ -709,7 +709,7 @@ static int CclDefineSpell(lua_State* l)
 			int subargs;
 			int k;
 
-			spell->Action = malloc(sizeof(SpellActionType));
+			spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
 			act = spell->Action;
 			memset(act, 0, sizeof(SpellActionType));
 			if (!lua_istable(l, i + 1)) {
@@ -722,7 +722,7 @@ static int CclDefineSpell(lua_State* l)
 			lua_pop(l, 1);
 			++k;
 			for (; k < subargs; ++k) {
-				act->Next = malloc(sizeof(SpellActionType));
+				act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
 				act = act->Next;
 				memset(act, 0, sizeof(SpellActionType));
 				lua_rawgeti(l, i + 1, k + 1);
@@ -731,14 +731,14 @@ static int CclDefineSpell(lua_State* l)
 			}
 		} else if (!strcmp(value, "condition")) {
 			if (!spell->Condition) {
-				spell->Condition = malloc(sizeof(ConditionInfo));
+				spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellCondition(l, spell->Condition);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "autocast")) {
 			if (!spell->AutoCast) {
-				spell->AutoCast = malloc(sizeof(AutoCastInfo));
+				spell->AutoCast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
 				memset(spell->AutoCast, 0, sizeof(AutoCastInfo));
 			}
 			lua_pushvalue(l, i + 1);
@@ -746,7 +746,7 @@ static int CclDefineSpell(lua_State* l)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ai-cast")) {
 			if (!spell->AICast) {
-				spell->AICast = malloc(sizeof(AutoCastInfo));
+				spell->AICast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
 				memset(spell->AICast, 0, sizeof(AutoCastInfo));
 			}
 			lua_pushvalue(l, i + 1);
