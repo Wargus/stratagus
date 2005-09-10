@@ -260,7 +260,7 @@ static Unit* AllocUnit(void)
 		}
 		slot = UnitSlots + UnitSlotFree;
 		UnitSlotFree++;
-		*slot = unit = calloc(1, sizeof(*unit));
+		*slot = unit = (Unit*)calloc(1, sizeof(*unit));
 	}
 	unit->Slot = slot - UnitSlots; // back index
 	return unit;
@@ -291,7 +291,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	//  Initialise unit structure (must be zero filled!)
 	//
 	unit->Type = type;
-	unit->CacheLinks = calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
+	unit->CacheLinks = (UnitListItem*)calloc(type->TileWidth * type->TileHeight, sizeof(UnitListItem));
 	for (i = 0; i < type->TileWidth * type->TileHeight; ++i) {
 		unit->CacheLinks[i].Unit = unit;
 	}
@@ -305,7 +305,7 @@ void InitUnit(Unit* unit, UnitType* type)
 
 	if (UnitTypeVar.NumberVariable) {
 		Assert(!unit->Variable);
-		unit->Variable = malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
+		unit->Variable = (VariableType*)malloc(UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 		memcpy(unit->Variable, unit->Type->Variable,
 			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 	}
@@ -317,7 +317,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	}
 
 	if (type->CanCastSpell) {
-		unit->AutoCastSpell = malloc(SpellTypeCount);
+		unit->AutoCastSpell = (char*)malloc(SpellTypeCount);
 		if (unit->Type->AutoCastActive) {
 			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeCount);
 		} else {
@@ -338,7 +338,7 @@ void InitUnit(Unit* unit, UnitType* type)
 	} else {
 		// No Available Orders in Memory, create new ones
 		unit->TotalOrders = DEFAULT_START_ORDERS;
-		unit->Orders = calloc(unit->TotalOrders, sizeof(Order));
+		unit->Orders = (Order*)calloc(unit->TotalOrders, sizeof(Order));
 	}
 
 
@@ -3462,7 +3462,7 @@ char* UnitReference(const Unit* unit)
 {
 	char* ref;
 
-	ref = malloc(10);
+	ref = (char*)malloc(10);
 	sprintf(ref, "U%04X", UnitNumber(unit));
 	return ref;
 }

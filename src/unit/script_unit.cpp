@@ -807,7 +807,7 @@ static int CclUnit(lua_State* l)
 			unit->TotalOrders = LuaToNumber(l, j + 1);
 			free(unit->Orders);
 			// Allocate the space for orders
-			unit->Orders = calloc(unit->TotalOrders, sizeof(Order));
+			unit->Orders = (Order*)calloc(unit->TotalOrders, sizeof(Order));
 		} else if (!strcmp(value, "orders")) {
 			lua_pushvalue(l, j + 1);
 			CclParseOrders(l, unit);
@@ -861,7 +861,7 @@ static int CclUnit(lua_State* l)
 			s = LuaToString(l, j + 1);
 			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = malloc(SpellTypeCount);
+				unit->AutoCastSpell = (char*)malloc(SpellTypeCount);
 				memset(unit->AutoCastSpell, 0, SpellTypeCount);
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
@@ -1348,7 +1348,7 @@ static int CclSlotUsage(lua_State* l)
 	}
 	UnitSlotFree = LuaToNumber(l, 1);
 	for (i = 0; i < UnitSlotFree; i++) {
-		UnitSlots[i] = calloc(1, sizeof(Unit));
+		UnitSlots[i] = (Unit*)calloc(1, sizeof(Unit));
 		UnitSlots[i]->Slot = i;
 	}
 	for (i = 2; i <= args; i++) {
