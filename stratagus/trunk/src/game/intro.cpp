@@ -284,7 +284,7 @@ static void SplitTextIntoLines(const char* text, int w, TextLines** lines)
 			*space = '\0';
 		}
 
-		*ptr = malloc(sizeof(TextLines));
+		*ptr = (TextLines*)malloc(sizeof(TextLines));
 		(*ptr)->Text = strdup(s);
 		(*ptr)->Next = NULL;
 		ptr = &((*ptr)->Next);
@@ -422,14 +422,14 @@ void ShowIntro(const Intro* intro)
 		ExitFatal(-1);
 	}
 	l = 0;
-	text = malloc(8192);
+	text = (char*)malloc(8192);
 	while ((i = CLread(file, text + l, 8192)) == 8192) {
 		l += 8192;
-		text = realloc(text, l + 8192);
+		text = (char*)realloc(text, l + 8192);
 	}
 	text[l + i] = '\0';
 	l += i + 1;
-	text = realloc(text, l);
+	text = (char*)realloc(text, l);
 	CLclose(file);
 
 	CallbackMusicOff();
@@ -733,7 +733,7 @@ void ShowPicture(CampaignChapter* chapter)
 	text = chapter->Data.Picture.Text;
 	linesptr = &lines;
 	while (text) {
-		(*linesptr) = calloc(sizeof(ChapterTextLines), 1);
+		*linesptr = (ChapterTextLines*)calloc(sizeof(ChapterTextLines), 1);
 		SplitTextIntoLines(text->Text, text->Width, &(*linesptr)->Text);
 		linesptr = &((*linesptr)->Next);
 		text = text->Next;
@@ -1292,7 +1292,7 @@ static int CclCredits(lua_State* l)
 	GameCredits.Background = NULL;
 	if (GameCredits.Names) {
 		free(GameCredits.Names);
-		GameCredits.Names = malloc(1);
+		GameCredits.Names = (char*)malloc(1);
 		GameCredits.Names[0] = '\0';
 	}
 	len = 0;
@@ -1308,7 +1308,7 @@ static int CclCredits(lua_State* l)
 				!strcmp(value, "comment")) {
 			n = LuaToString(l, j + 1);
 			nlen = strlen(n);
-			GameCredits.Names = realloc(GameCredits.Names, len + nlen + 2);
+			GameCredits.Names = (char*)realloc(GameCredits.Names, len + nlen + 2);
 			if (len != 0) {
 				GameCredits.Names[len++] = '\n';
 			}
@@ -1480,9 +1480,9 @@ static int CclDefineRanks(lua_State* l)
 	args = luaL_getn(l, 2);
 	len = args / 2;
 
-	rank->Ranks = malloc((len + 1) * sizeof(char*));
+	rank->Ranks = (char**)malloc((len + 1) * sizeof(char*));
 	rank->Ranks[len] = NULL;
-	rank->Scores = malloc(len * sizeof(int));
+	rank->Scores = (int*)malloc(len * sizeof(int));
 
 	i = 0;
 	for (j = 0; j < args; ++j) {

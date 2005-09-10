@@ -706,6 +706,12 @@ typedef struct _decovartype_ {
 
 } DecoVarType;
 
+typedef enum {
+	UnitTypeLand,               /// Unit lives on land
+	UnitTypeFly,                /// Unit lives in air
+	UnitTypeNaval,              /// Unit lives on water
+} UnitTypeType;
+
 /**
 **  Typedef of base structure of unit-type
 */
@@ -832,11 +838,7 @@ struct _unit_type_ {
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
-	enum {
-		UnitTypeLand,               /// Unit lives on land
-		UnitTypeFly,                /// Unit lives in air
-		UnitTypeNaval,              /// Unit lives on water
-	} UnitType;                     /// Land / fly / naval
+	UnitTypeType UnitType;          /// Land / fly / naval
 	int DecayRate;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor;        /// How much this annoys the computer
