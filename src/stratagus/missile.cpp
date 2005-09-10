@@ -188,8 +188,8 @@ MissileType* NewMissileTypeSlot(char* ident)
 	MissileType* mtype;
 	int i;
 
-	MissileTypes = realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
-	mtype = MissileTypes[NumMissileTypes++] = calloc(1, sizeof(MissileType));
+	MissileTypes = (MissileType**)realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
+	mtype = MissileTypes[NumMissileTypes++] = (MissileType*)calloc(1, sizeof(MissileType));
 	mtype->Ident = ident;
 
 	// Rehash.
@@ -216,7 +216,7 @@ static Missile* NewGlobalMissile(void)
 		return NULL;
 	}
 
-	missile = calloc(1, sizeof(Missile));
+	missile = (Missile*)calloc(1, sizeof(Missile));
 	missile->MissileSlot = GlobalMissiles + NumGlobalMissiles;
 	GlobalMissiles[NumGlobalMissiles++] = missile;
 
@@ -239,7 +239,7 @@ static Missile* NewLocalMissile(void)
 		return NULL;
 	}
 
-	missile = calloc(1, sizeof(Missile));
+	missile = (Missile*)calloc(1, sizeof(Missile));
 	missile->MissileSlot = LocalMissiles + NumLocalMissiles;
 	LocalMissiles[NumLocalMissiles++] = missile;
 	missile->Local = 1;

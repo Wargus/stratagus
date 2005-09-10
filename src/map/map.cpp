@@ -391,12 +391,12 @@ void FreeMapInfo(MapInfo* info)
 void CreateMap(int width, int height) 
 {
 	if (!TheMap.Fields) {
-		TheMap.Fields = calloc(width * height, sizeof(*TheMap.Fields));
+		TheMap.Fields = (MapField*)calloc(width * height, sizeof(*TheMap.Fields));
 		if (!TheMap.Fields) {
 			perror("calloc()");
 			ExitFatal(-1);
 		}
-		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		TheMap.Visible[0] = (unsigned*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		if (!TheMap.Visible[0]) {
 			perror("calloc()");
 			ExitFatal(-1);

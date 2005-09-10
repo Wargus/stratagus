@@ -167,7 +167,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 **  @param text   text to print on button
 */
 void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
-	const unsigned char* text)
+	const char* text)
 {
 	char* nc;
 	char* rc;
@@ -587,7 +587,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 		if (!(flags & MI_FLAGS_DISABLED)) {
 			if (i < mi->D.Listbox.noptions) {
 				SetDefaultTextColors(nc, rc);
-				text = (*mi->D.Listbox.retrieveopt)(mi, i + s);
+				text = (char*)(*mi->D.Listbox.retrieveopt)(mi, i + s);
 				if (text) {
 					if (i + s == mi->D.Listbox.curopt) {
 						SetDefaultTextColors(rc, rc);
@@ -832,7 +832,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 **  @param text   text to print on button
 */
 static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
-	int x, int y, const unsigned char* text)
+	int x, int y, const char* text)
 {
 	char* nc;
 	char* rc;
@@ -1168,7 +1168,7 @@ static void PasteFromClipboard(Menuitem* mi)
 {
 #if defined(USE_WIN32) || defined(_XLIB_H_)
 	int i;
-	unsigned char* clipboard;
+	char* clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
 #elif defined(_XLIB_H_)
@@ -1190,7 +1190,7 @@ static void PasteFromClipboard(Menuitem* mi)
 		CloseClipboard();
 		return;
 	}
-	clipboard = GlobalLock(handle);
+	clipboard = (char*)GlobalLock(handle);
 	if (!clipboard) {
 		CloseClipboard();
 		return;
@@ -2435,7 +2435,7 @@ static void PushMenu(void)
 {
 	MenuStack* menu;
 
-	menu = malloc(sizeof(MenuStack));
+	menu = (MenuStack*)malloc(sizeof(MenuStack));
 	menu->Menu = CurrentMenu;
 	menu->CurSel = MenuButtonCurSel;
 	menu->Next = Menus;

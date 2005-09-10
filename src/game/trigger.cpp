@@ -652,7 +652,7 @@ static int CclSetActiveTriggers(lua_State* l)
 	int j;
 
 	args = lua_gettop(l);
-	ActiveTriggers = malloc(args * sizeof(*ActiveTriggers));
+	ActiveTriggers = (int*)malloc(args * sizeof(*ActiveTriggers));
 	for (j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
