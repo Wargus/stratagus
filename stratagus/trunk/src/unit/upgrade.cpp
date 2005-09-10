@@ -124,7 +124,7 @@ static Upgrade* AddUpgrade(const char* ident, const char* icon,
 	if (icon) {
 		upgrade->Icon.Name = strdup(icon);
 	} else {  // automatically generated icon-name
-		upgrade->Icon.Name = malloc(strlen(ident) + 5 - 8 + 1);
+		upgrade->Icon.Name = (char*)malloc(strlen(ident) + 5 - 8 + 1);
 		strcpy(upgrade->Icon.Name, "icon-");
 		strcpy(upgrade->Icon.Name + 5, ident + 8);
 	}
@@ -256,11 +256,11 @@ static int CclDefineModifier(lua_State* l)
 
 	args = lua_gettop(l);
 
-	um = calloc(1, sizeof(*um));
+	um = (UpgradeModifier*)calloc(1, sizeof(*um));
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-	um->Modifier.Variables = calloc(UnitTypeVar.NumberVariable, sizeof(*um->Modifier.Variables));
+	um->Modifier.Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof(*um->Modifier.Variables));
 
 	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
 
