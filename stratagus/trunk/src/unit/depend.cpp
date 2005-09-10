@@ -99,7 +99,7 @@ void AddDependency(const char* target, const char* required, int count,
 		while (node->Type != rule.Type ||
 				node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
-				temp = malloc(sizeof(DependRule));
+				temp = (DependRule*)malloc(sizeof(DependRule));
 				temp->Next = NULL;
 				temp->Rule = NULL;
 				temp->Type = rule.Type;
@@ -111,7 +111,7 @@ void AddDependency(const char* target, const char* required, int count,
 			node = node->Next;
 		}
 	} else {  // create new slow
-		node = malloc(sizeof(DependRule));
+		node = (DependRule*)malloc(sizeof(DependRule));
 		node->Next = NULL;
 		node->Rule = NULL;
 		node->Type = rule.Type;
@@ -127,7 +127,7 @@ void AddDependency(const char* target, const char* required, int count,
 		count = 255;
 	}
 
-	temp = malloc(sizeof(DependRule));
+	temp = (DependRule*)malloc(sizeof(DependRule));
 	temp->Rule = NULL;
 	temp->Next = NULL;
 	temp->Count = count;
