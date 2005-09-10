@@ -671,7 +671,7 @@ static void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 	TextLines* lines;
 	int x;
 	int y;
-	int (*draw)(int, int, unsigned, const unsigned char*);
+	int (*draw)(int, int, unsigned, const char*);
 
 	text = chapter->Data.Picture.Text;
 	while (text) {
