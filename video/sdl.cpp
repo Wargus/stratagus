@@ -824,7 +824,7 @@ void ToggleFullScreen(void)
 #endif
 	if (TheScreen->format->palette) {
 		ncolors = TheScreen->format->palette->ncolors;
-		if (!(palette = malloc(ncolors * sizeof(SDL_Color)))) {
+		if (!(palette = (SDL_Color*)malloc(ncolors * sizeof(SDL_Color)))) {
 			free(pixels);
 			return;
 		}
