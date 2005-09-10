@@ -402,7 +402,7 @@ static void RecalculateShownUnits(void)
 	const UnitType* type;
 
 	if (!ShownUnitTypes) {
-		ShownUnitTypes = malloc(sizeof(char*) * MaxUnitIndex);
+		ShownUnitTypes = (char**)malloc(sizeof(char*) * MaxUnitIndex);
 	}
 
 	for (n = i = 0; i < MaxUnitIndex; ++i) {

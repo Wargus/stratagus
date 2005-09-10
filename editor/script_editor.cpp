@@ -82,7 +82,7 @@ static int CclDefineEditorUnitTypes(lua_State* l)
 	// Get new table.
 	//
 	args = luaL_getn(l, 1);
-	EditorUnitTypes = cp = malloc((args + 1) * sizeof(char*));
+	EditorUnitTypes = cp = (char**)malloc((args + 1) * sizeof(char*));
 	MaxUnitIndex = args;
 	for (j = 0; j < args; ++j) {
 		lua_rawgeti(l, 1, j + 1);
