@@ -198,7 +198,7 @@ void PushClipping(void)
 	if ((clip = ClipsGarbage)) {
 		ClipsGarbage = ClipsGarbage->Next;
 	} else {
-		clip = malloc(sizeof(Clip));
+		clip = (Clip*)malloc(sizeof(Clip));
 	}
 
 	clip->Next = Clips;
