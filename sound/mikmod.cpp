@@ -10,7 +10,7 @@
 //
 /**@name mikmod.c - MikMod support */
 //
-//      (c) Copyright 2004 by Nehal Mistry
+//      (c) Copyright 2004-2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ static int MikModStreamRead(Sample* sample, void* buf, int len)
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
 		sample->Pos = 0;
 		CurrentFile = data->MikModFile;
-		read = VC_WriteBytes(sample->Buffer + sample->Pos,
+		read = VC_WriteBytes((SBYTE*)sample->Buffer + sample->Pos,
 			SOUND_BUFFER_SIZE - (sample->Pos + sample->Len));
 		sample->Len += read;
 	}
@@ -219,7 +219,7 @@ Sample* LoadMikMod(const char* name, int flags)
 	char s[256];
 	static int registered = 0;
 
-	data = malloc(sizeof(MikModData));
+	data = (MikModData*)malloc(sizeof(MikModData));
 
 	md_mode |= DMODE_STEREO | DMODE_INTERP | DMODE_SURROUND | DMODE_HQMIXER;
 	MikMod_RegisterDriver(&drv_nos);
@@ -245,7 +245,7 @@ Sample* LoadMikMod(const char* name, int flags)
 		return NULL;
 	}
 
-	sample = malloc(sizeof(*sample));
+	sample = (Sample*)malloc(sizeof(*sample));
 	sample->Channels = 2;
 	sample->SampleSize = 16;
 	sample->Frequency = 44100;
@@ -254,7 +254,7 @@ Sample* LoadMikMod(const char* name, int flags)
 
 	if (flags & PlayAudioStream) {
 		sample->Len = 0;
-		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
+		sample->Buffer = (unsigned char*)malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &MikModStreamSampleType;
 
 		Player_Start(data->MikModModule);
@@ -264,13 +264,13 @@ Sample* LoadMikMod(const char* name, int flags)
 
 		// FIXME: need to find the correct length
 		sample->Len = 55000000;
-		sample->Buffer = malloc(sample->Len);
+		sample->Buffer = (unsigned char*)malloc(sample->Len);
 		sample->Type = &MikModSampleType;
 
 		pos = 0;
 		Player_Start(data->MikModModule);
 		while (Player_Active()) {
-			read = VC_WriteBytes(sample->Buffer + pos,
+			read = VC_WriteBytes((SBYTE*)sample->Buffer + pos,
 				 sample->Len - pos);
 			pos += read;
 		}

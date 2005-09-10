@@ -10,7 +10,7 @@
 //
 /**@name flac.c - flac support */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//      (c) Copyright 2002-2005 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	FlacData* data;
 	unsigned int i;
 
-	sample = user;
-	data = sample->User;
+	sample = (Sample*)user;
+	data = (FlacData*)sample->User;
 
 	if ((i = CLread(data->FlacFile, buffer, *bytes)) != *bytes) {
 		*bytes = i;
@@ -119,7 +119,7 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 	Sample* sample;
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
-		sample = user;
+		sample = (Sample*)user;
 
 		sample->Channels = metadata->data.stream_info.channels;
 		sample->Frequency = metadata->data.stream_info.sample_rate;
@@ -127,7 +127,7 @@ static void FLAC_metadata_callback(const FLAC__StreamDecoder* stream,
 
 		if (!sample->Buffer) {
 			Assert(metadata->data.stream_info.total_samples);
-			sample->Buffer = malloc(metadata->data.stream_info.total_samples * 4);
+			sample->Buffer = (unsigned char*)malloc(metadata->data.stream_info.total_samples * 4);
 		}
 	}
 }
@@ -153,14 +153,14 @@ static FLAC__StreamDecoderWriteStatus FLAC_write_callback(
 	char* buf;
 	int ssize;
 
-	sample = user;
-	data = sample->User;
+	sample = (Sample*)user;
+	data = (FlacData*)sample->User;
 
 	Assert(sample->Buffer);
 	Assert(frame->header.bits_per_sample == sample->SampleSize);
 
 	ssize = (frame->header.bits_per_sample / 8);
-	buf = malloc(frame->header.blocksize * sample->Channels * ssize);
+	buf = (char*)malloc(frame->header.blocksize * sample->Channels * ssize);
 
 	// FIXME: mono flac files don't play correctly
 
@@ -199,7 +199,7 @@ static int FlacStreamRead(Sample* sample, void* buf, int len)
 {
 	FlacData* data;
 
-	data = sample->User;
+	data = (FlacData*)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -232,7 +232,7 @@ static void FlacStreamFree(Sample* sample)
 {
 	FlacData* data;
 
-	data = sample->User;
+	data = (FlacData*)sample->User;
 
 	CLclose(data->FlacFile);
 	FLAC__stream_decoder_finish(data->FlacStream);
@@ -330,11 +330,11 @@ Sample* LoadFlac(const char* name, int flags)
 		return NULL;
 	}
 
-	data = malloc(sizeof(FlacData));
+	data = (FlacData*)malloc(sizeof(FlacData));
 	data->FlacFile = f;
 	data->FlacStream = stream;
 
-	sample = malloc(sizeof(Sample));
+	sample = (Sample*)malloc(sizeof(Sample));
 	sample->Len = 0;
 	sample->Pos = 0;
 	sample->User = data;
@@ -347,7 +347,7 @@ Sample* LoadFlac(const char* name, int flags)
 	FLAC__stream_decoder_init(stream);
 
 	if (flags & PlayAudioStream) {
-		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
+		sample->Buffer = (unsigned char*)malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &FlacStreamSampleType;
 
 		FLAC__stream_decoder_process_until_end_of_metadata(stream);

@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//      Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name mad.c - mp3 support with libmad */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -81,8 +81,8 @@ static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 	MadData *data;
 	int i;
 
-	sample = user;
-	data = sample->User;
+	sample = (Sample*)user;
+	data = (MadData*)sample->User;
 
 	if (stream->next_frame) {
 		memmove(data->Buffer, stream->next_frame, data->BufferLen =
@@ -110,8 +110,7 @@ static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 **  @param pcm     MAD pcm data struture.
 */
 static enum mad_flow MAD_write(void* user,
-	struct mad_header const* header,
-	struct mad_pcm* pcm)
+	struct mad_header const* header, struct mad_pcm* pcm)
 {
 	Sample* sample;
 	int i;
@@ -121,7 +120,7 @@ static enum mad_flow MAD_write(void* user,
 	int s;
 	int comp;
 
-	sample = user;
+	sample = (Sample*)user;
 
 	n = pcm->length;
 
@@ -282,11 +281,11 @@ static int Mp3ReadStream(Sample* sample, void* buf, int len)
 	int i;
 	int n;
 	int divide;
-	char sndbuf[SOUND_BUFFER_SIZE];
+	unsigned char sndbuf[SOUND_BUFFER_SIZE];
 
 	DebugPrint("%p %d\n" _C_ buf _C_ len);
 
-	data = sample->User;
+	data = (MadData*)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -328,7 +327,7 @@ static void Mp3FreeStream(Sample* sample)
 {
 	MadData* data;
 
-	data = sample->User;
+	data = (MadData*)sample->User;
 
 	// release the decoder
 	mad_synth_finish(data->MadDecoder.sync->synth);
@@ -423,11 +422,11 @@ Sample* LoadMp3(const char* name, int flags)
 
 	CLseek(f, 0, SEEK_SET);
 
-	data = malloc(sizeof(MadData));
+	data = (MadData*)malloc(sizeof(MadData));
 	data->MadFile = f;
 	data->BufferLen = 0;
 
-	sample = malloc(sizeof(Sample));
+	sample = (Sample*)malloc(sizeof(Sample));
 	sample->User = data;
 	sample->Len = 0;
 	sample->Pos = 0;
@@ -455,7 +454,7 @@ Sample* LoadMp3(const char* name, int flags)
 		MadRead(sample, sample->Buffer, SOUND_BUFFER_SIZE);
 
 	} else {
-		sample->Buffer = malloc(55000000);
+		sample->Buffer = (unsigned char*)malloc(55000000);
 		Assert(sample->Buffer);
 
 		// configure input, output, and error functions
