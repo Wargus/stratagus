@@ -138,13 +138,13 @@ typedef struct _menuitem_text_ {
 	void (*action)(struct _menuitem_*);
 } MenuitemText;
 typedef struct _menuitem_button_ {
-	unsigned char* Text;
+	char* Text;
 	struct _button_style_* Style;
 	void (*Handler)(void);
 	unsigned HotKey;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
-	unsigned char** options;
+	char** options;
 	int xsize;
 	int ysize;
 	MenuButtonId button;
@@ -197,7 +197,7 @@ typedef struct _menuitem_drawfunc_ {
 	void (*draw)(struct _menuitem_*);
 } MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
-	unsigned char *buffer;
+	char *buffer;
 	unsigned int iflags;
 	int xsize;
 	int ysize;
@@ -209,19 +209,21 @@ typedef struct _menuitem_input_ {
 	char* reversecolor;
 } MenuitemInput;
 typedef struct _menuitem_checkbox_ {
-	unsigned char* Text;
+	char* Text;
 	unsigned int Checked : 1;
 	struct _checkbox_style_* Style;
 	void (*Action)(struct _menuitem_*);
 } MenuitemCheckbox;
 
 struct _menu_;
+typedef enum {
+	MiTypeText, MiTypeButton, MiTypePulldown, MiTypeListbox,
+	MiTypeVslider, MiTypeHslider, MiTypeDrawfunc, MiTypeInput,
+	MiTypeCheckbox
+} MiTypeType;
+
 typedef struct _menuitem_ {
-	enum {
-		MiTypeText, MiTypeButton, MiTypePulldown, MiTypeListbox,
-		MiTypeVslider, MiTypeHslider, MiTypeDrawfunc, MiTypeInput,
-		MiTypeCheckbox
-	} MiType;
+	MiTypeType MiType;
 	int XOfs;
 	int YOfs;
 	unsigned Flags;

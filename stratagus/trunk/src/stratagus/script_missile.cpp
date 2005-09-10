@@ -340,7 +340,7 @@ static int CclDefineBurningBuilding(lua_State* l)
 			LuaError(l, "incorrect argument");
 		}
 
-		*frame = calloc(1, sizeof(BurningBuildingFrame));
+		*frame = (BurningBuildingFrame*)calloc(1, sizeof(BurningBuildingFrame));
 		subargs = luaL_getn(l, j + 1);
 		for (k = 0; k < subargs; ++k) {
 			lua_rawgeti(l, j + 1, k + 1);
