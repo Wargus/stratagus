@@ -206,10 +206,12 @@ static int CanShowContent(const ConditionPanel* condition, const Unit* unit)
 	return 1;
 }
 
-
+typedef enum {
+	USTRINT_STR, USTRINT_INT
+} UStrIntType;
 typedef struct {
 	union {const char *s; int i;};
-	enum { USTRINT_STR, USTRINT_INT } type;
+	UStrIntType type;
 } UStrInt;
 
 /**

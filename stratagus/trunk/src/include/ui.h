@@ -185,7 +185,7 @@ typedef enum {
 	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
 	VIEWPORT_QUAD,                  /// Four viewports split symmetric
 	NUM_VIEWPORT_MODES,             /// Number of different viewports.
-} ViewportMode;
+} ViewportModeType;
 
 #define ScPanel "sc-panel"          /// hack for transparency
 
@@ -394,7 +394,7 @@ typedef struct _ui_ {
 	int PieY[8];                        /// Y position of the pies
 
 	// Map area
-	ViewportMode ViewportMode;          /// Current viewport mode
+	ViewportModeType ViewportMode;      /// Current viewport mode
 	Viewport*    MouseViewport;         /// Viewport containing mouse
 	Viewport*    SelectedViewport;      /// Current selected active viewport
 	int          NumViewports;          /// # Viewports currently used
@@ -527,7 +527,7 @@ extern Viewport* MapTileGetViewport(int, int);
 	/// Cycle through all available viewport modes
 extern void CycleViewportMode(int);
 	/// Select viewport mode
-extern void SetViewportMode(ViewportMode mode);
+extern void SetViewportMode(ViewportModeType mode);
 
 	/// Convert screen X pixel to map tile
 extern int Viewport2MapX(const Viewport* vp, int x);
