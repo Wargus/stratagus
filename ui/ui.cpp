@@ -93,7 +93,7 @@ void InitUserInterface(const char* race_name)
 	int i;
 	int best;
 	int num_vps;
-	ViewportMode vp_mode;
+	ViewportModeType vp_mode;
 	Viewport vps[MAX_NUM_VIEWPORTS];
 
 	// select the correct slot
@@ -746,7 +746,7 @@ static void SetViewportModeQuad(void)
 **
 **  @param new_mode  New mode's number.
 */
-void SetViewportMode(ViewportMode new_mode)
+void SetViewportMode(ViewportModeType new_mode)
 {
 	switch (TheUI.ViewportMode = new_mode) {
 		case VIEWPORT_SINGLE:
@@ -789,7 +789,7 @@ void CycleViewportMode(int step)
 	if (new_mode < 0) {
 		new_mode = NUM_VIEWPORT_MODES - 1;
 	}
-	SetViewportMode((ViewportMode)new_mode);
+	SetViewportMode((ViewportModeType)new_mode);
 }
 
 //@}
