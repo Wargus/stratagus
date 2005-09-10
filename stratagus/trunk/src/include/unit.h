@@ -520,7 +520,7 @@ struct _unit_ {
 	int Y; /// Map position Y
 
 	struct _unit_type_*  Type;    /// Pointer to unit-type (peon,...)
-	Player*    Player;            /// Owner of this unit
+	struct _player_* Player;      /// Owner of this unit
 	struct _unit_stats_* Stats;   /// Current unit stats
 	int        CurrentSightRange; /// Unit's Current Sight Range
 
@@ -540,11 +540,11 @@ struct _unit_ {
 	unsigned Selected : 1;  /// unit is selected
 	unsigned TeamSelected;  /// unit is selected by a team member.
 
-	unsigned Constructed : 1; /// Unit is in construction
-	unsigned Active : 1;      /// Unit is active for AI
-	unsigned Boarded : 1;     /// Unit is on board a transporter.
-	Player*  RescuedFrom;     /// The original owner of a rescued unit.
-							  /// NULL if the unit was not rescued.
+	unsigned Constructed : 1;    /// Unit is in construction
+	unsigned Active : 1;         /// Unit is active for AI
+	unsigned Boarded : 1;        /// Unit is on board a transporter.
+	struct _player_* RescuedFrom;/// The original owner of a rescued unit.
+							     /// NULL if the unit was not rescued.
 	/* Seen stuff. */
 	char VisCount[PlayerMax]; /// Unit visibility counts
 	struct _seen_stuff_ {
