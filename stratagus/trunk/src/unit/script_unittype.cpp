@@ -129,7 +129,7 @@ static void ParseBuildingRules(lua_State* l, BuildRestriction** b)
 	Assert(!(args & 1)); // must be even
 
 	for (i = 0; i < args; ++i) {
-		*b = calloc(1, sizeof(BuildRestriction));
+		*b = (BuildRestriction*)calloc(1, sizeof(BuildRestriction));
 		lua_rawgeti(l, -1, i + 1);
 		value = LuaToString(l, -1);
 		lua_pop(l, 1);
@@ -395,8 +395,8 @@ static int CclDefineUnitType(lua_State* l)
 			}
 			subargs = luaL_getn(l, -1);
 			type->Portrait.Num = subargs;
-			type->Portrait.Files = malloc(type->Portrait.Num * sizeof(*type->Portrait.Files));
-			type->Portrait.Mngs = calloc(type->Portrait.Num, sizeof(*type->Portrait.Mngs));
+			type->Portrait.Files = (char**)malloc(type->Portrait.Num * sizeof(*type->Portrait.Files));
+			type->Portrait.Mngs = (Mng**)calloc(type->Portrait.Num, sizeof(*type->Portrait.Mngs));
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				type->Portrait.Files[k] = strdup(LuaToString(l, -1));
@@ -643,7 +643,7 @@ static int CclDefineUnitType(lua_State* l)
 				}
 				free(type->BuildingRules);
 			}
-			type->BuildingRules = malloc((subargs + 1) * sizeof(BuildRestriction*));
+			type->BuildingRules = (BuildRestriction**)malloc((subargs + 1) * sizeof(BuildRestriction*));
 			type->BuildingRules[subargs] = NULL;
 			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
@@ -687,7 +687,7 @@ static int CclDefineUnitType(lua_State* l)
 				type->MaxOnBoard = 1;
 			}
 			if (!type->CanTransport) {
-				type->CanTransport = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTransport));
+				type->CanTransport = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTransport));
 			}
 			// FIXME : add flag for kill/unload units inside.
 			subargs = luaL_getn(l, -1);
@@ -721,7 +721,7 @@ static int CclDefineUnitType(lua_State* l)
 			args = luaL_getn(l, -1);
 			for (j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				res = calloc(1, sizeof(ResourceInfo));
+				res = (ResourceInfo*)calloc(1, sizeof(ResourceInfo));
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
@@ -812,7 +812,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
 			if (!type->CanCastSpell) {
-				type->CanCastSpell = calloc(SpellTypeCount, sizeof(char));
+				type->CanCastSpell = (char*)calloc(SpellTypeCount, sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
@@ -841,7 +841,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = calloc(SpellTypeCount, sizeof(char));
+				type->AutoCastActive = (char*)calloc(SpellTypeCount, sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
@@ -1049,7 +1049,7 @@ static int CclDefineUnitStats(lua_State* l)
 
 	stats = &type->Stats[i];
 	if (!stats->Variables) {
-		stats->Variables = calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+		stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
 	}
 
 	//
@@ -1128,9 +1128,9 @@ UnitType* CclGetUnitType(lua_State* l)
 		return UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData* data;
-		data = lua_touserdata(l, -1);
+		data = (LuaUserData*)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
-			return data->Data;
+			return (UnitType*)data->Data;
 		}
 	}
 	LuaError(l, "CclGetUnitType: not a unit-type");
@@ -1154,7 +1154,7 @@ static int CclUnitType(lua_State* l)
 
 	str = LuaToString(l, 1);
 	type = UnitTypeByIdent(str);
-	data = lua_newuserdata(l, sizeof(LuaUserData));
+	data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
 	data->Data = type;
 	return 1;
@@ -1177,7 +1177,7 @@ static int CclUnitTypeArray(lua_State* l)
 	lua_newtable(l);
 
 	for (i = 0; i < NumUnitTypes; ++i) {
-		data = lua_newuserdata(l, sizeof(LuaUserData));
+		data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
 		data->Data = UnitTypes[i];
 		lua_rawseti(l, 1, i + 1);
@@ -1355,12 +1355,12 @@ static void ParseAnimationFrame(lua_State* l, const char* str,
 				}
 			}
 			++count;
-			anim->D.RandomSound.Name = realloc(anim->D.RandomSound.Name, count * sizeof(char*));
+			anim->D.RandomSound.Name = (char**)realloc(anim->D.RandomSound.Name, count * sizeof(char*));
 			anim->D.RandomSound.Name[count - 1] = strdup(op2);
 			op2 = next;
 		}
 		anim->D.RandomSound.NumSounds = count;
-		anim->D.RandomSound.Sound = calloc(count, sizeof(SoundId));
+		anim->D.RandomSound.Sound = (SoundId*)calloc(count, sizeof(SoundId));
 	} else if (!strcmp(op1, "attack")) {
 		anim->Type = AnimationAttack;
 	} else if (!strcmp(op1, "rotate")) {
@@ -1423,7 +1423,7 @@ static Animation* ParseAnimation(lua_State* l, int idx)
 		LuaError(l, "incorrect argument");
 	}
 	args = luaL_getn(l, idx);
-	anim = calloc(args + 1, sizeof(*anim));
+	anim = (Animation*)calloc(args + 1, sizeof(*anim));
 	tail = NULL;
 	NumLabels = NumLabelsLater = 0;
 
@@ -1483,7 +1483,7 @@ static int CclDefineAnimations(lua_State* l)
 	name = LuaToString(l, 1);
 	anims = AnimationsByIdent(name);
 	if (!anims) {
-		anims = calloc(1, sizeof(*anims));
+		anims = (Animations*)calloc(1, sizeof(*anims));
 		*(Animations**)hash_add(AnimationsHash, name) = anims;
 	}
 
@@ -1594,10 +1594,10 @@ static int CclDefineVariables(lua_State* l)
 		i = GetVariableIndex(str);
 		if (i == -1) { // new variable.
 			i = UnitTypeVar.NumberVariable;
-			UnitTypeVar.VariableName = realloc(UnitTypeVar.VariableName,
+			UnitTypeVar.VariableName = (char**)realloc(UnitTypeVar.VariableName,
 				(i + 1) * sizeof(*UnitTypeVar.VariableName));
 			UnitTypeVar.VariableName[i] = strdup(str);
-			UnitTypeVar.Variable = realloc(UnitTypeVar.Variable,
+			UnitTypeVar.Variable = (VariableType*)realloc(UnitTypeVar.Variable,
 				(i + 1) * sizeof(*UnitTypeVar.Variable));
 			memset(UnitTypeVar.Variable + i, 0, sizeof (*UnitTypeVar.Variable));
 			UnitTypeVar.NumberVariable++;
@@ -1640,15 +1640,15 @@ static int CclDefineBoolFlags(lua_State* l)
 			DebugPrint("Warning, Bool flags '%s' already defined\n" _C_ UnitTypeVar.BoolFlagName[i]);
 			continue;
 		}
-		UnitTypeVar.BoolFlagName = realloc(UnitTypeVar.BoolFlagName,
+		UnitTypeVar.BoolFlagName = (char**)realloc(UnitTypeVar.BoolFlagName,
 			(UnitTypeVar.NumberBoolFlag + 1) * sizeof(*UnitTypeVar.BoolFlagName));
 		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
 		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for unit already defined
-			UnitTypes[i]->BoolFlag = realloc(UnitTypes[i]->BoolFlag,
+			UnitTypes[i]->BoolFlag = (unsigned char*)realloc(UnitTypes[i]->BoolFlag,
 				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
-			UnitTypes[i]->CanTargetFlag = realloc(UnitTypes[i]->CanTargetFlag,
+			UnitTypes[i]->CanTargetFlag = (unsigned char*)realloc(UnitTypes[i]->CanTargetFlag,
 				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->CanTargetFlag));
 			memset(UnitTypes[i]->BoolFlag + old, 0,
 				(UnitTypeVar.NumberBoolFlag - old) * sizeof((*UnitTypes)->BoolFlag));
@@ -1800,7 +1800,7 @@ static int CclDefineDecorations(lua_State* l)
 		}
 		if (j == UnitTypeVar.NumberDeco) {
 			UnitTypeVar.NumberDeco++;
-			UnitTypeVar.DecoVar = realloc(UnitTypeVar.DecoVar,
+			UnitTypeVar.DecoVar = (DecoVarType*)realloc(UnitTypeVar.DecoVar,
 				UnitTypeVar.NumberDeco * sizeof(*UnitTypeVar.DecoVar));
 		}
 		UnitTypeVar.DecoVar[j] = decovar;
@@ -1986,11 +1986,11 @@ void InitDefinedVariables()
 	int i; // iterator for var and boolflag.
 
 	// Variables.
-	UnitTypeVar.VariableName = calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
+	UnitTypeVar.VariableName = (char**)calloc(NVARALREADYDEFINED, sizeof(*UnitTypeVar.VariableName));
 	for (i = 0; i < NVARALREADYDEFINED; i++) {
 		UnitTypeVar.VariableName[i] = strdup(var[i]);
 	}
-	UnitTypeVar.Variable = calloc(i, sizeof(*UnitTypeVar.Variable));
+	UnitTypeVar.Variable = (VariableType*)calloc(i, sizeof(*UnitTypeVar.Variable));
 	UnitTypeVar.NumberVariable = i;
 
 	// Boolflags.
