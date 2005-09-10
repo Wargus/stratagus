@@ -294,6 +294,7 @@
 struct _unit_;
 struct _unit_type_;
 struct _player_;
+struct _player_ai_;
 struct _CL_File_;
 
 /*----------------------------------------------------------------------------
@@ -331,8 +332,8 @@ struct _player_ {
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 
-	int   AiEnabled;  /// handle AI on local computer
-	void* Ai;         /// Ai structure pointer
+	int   AiEnabled;       /// handle AI on local computer
+	struct _player_ai_* Ai; /// Ai structure pointer
 
 	struct _unit_** Units;          /// units of this player
 	int    TotalNumUnits;  /// total # units for units' list

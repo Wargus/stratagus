@@ -509,7 +509,7 @@ int AiFindWall(AiForce* force)
 */
 int AiPlanAttack(AiForce* force)
 {
-	char* watermatrix;
+	unsigned char* watermatrix;
 	const AiUnit* aiunit;
 	int x;
 	int y;
@@ -583,7 +583,7 @@ int AiPlanAttack(AiForce* force)
 		AiUnit* aiunit;
 
 		if (transporter) {
-			aiunit = malloc(sizeof (*aiunit));
+			aiunit = (AiUnit*)malloc(sizeof (*aiunit));
 			aiunit->Next = force->Units;
 			force->Units = aiunit;
 			aiunit->Unit = transporter;

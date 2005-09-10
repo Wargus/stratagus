@@ -10,7 +10,7 @@
 //
 /**@name iolib.c - Compression-IO helper functions. */
 //
-//      (c) Copyright 2000-2004 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
+//      (c) Copyright 2000-2005 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ CLFile* CLopen(const char* fn, long openflags)
 #endif
 #ifdef USE_ZLIB
 		if ((openflags & CL_WRITE_GZ) &&
-					(clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), openstring))) {
+				(clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), openstring))) {
 			clf.cl_type = CLF_TYPE_GZIP;
 		} else
 #endif
@@ -221,7 +221,7 @@ CLFile* CLopen(const char* fn, long openflags)
 	}
 
 	// ok, here we go
-	result = malloc(sizeof(CLFile));
+	result = (CLFile*)malloc(sizeof(CLFile));
 	if (result) {
 		*result = clf;
 	}
@@ -323,7 +323,7 @@ int CLprintf(CLFile* file, char* format, ...)
 
 	size = 500;
 	ret = -1;
-	if ((p = malloc(size)) == NULL) {
+	if ((p = (char*)malloc(size)) == NULL) {
 		return -1;
 	}
 	while (1) {
@@ -342,7 +342,7 @@ int CLprintf(CLFile* file, char* format, ...)
 			DebugPrint("Something could be wrong in CLprintf.\n");
 			size *= 2;  /* twice the old size */
 		}
-		if ((p = realloc(p, size)) == NULL) {
+		if ((p = (char*)realloc(p, size)) == NULL) {
 			return -1;
 		}
 	}
@@ -579,8 +579,8 @@ static int flqcmp(const void* v1, const void* v2)
 	const FileList* c1;
 	const FileList* c2;
 
-	c1 = v1;
-	c2 = v2;
+	c1 = (FileList*)v1;
+	c2 = (FileList*)v2;
 
 	if (c1->type == c2->type) {
 		return strcmp(c1->name, c2->name);
@@ -654,13 +654,13 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 				isdir = S_ISDIR(st.st_mode);
 				if (isdir || S_ISREG(st.st_mode)) {
 					if (n) {
-						nfl = realloc(fl, sizeof(FileList) * (n + 1));
+						nfl = (FileList*)realloc(fl, sizeof(FileList) * (n + 1));
 						if (nfl) {
 							fl = nfl;
 							nfl = fl + n;
 						}
 					} else {
-						fl = nfl = malloc(sizeof(FileList));
+						fl = nfl = (FileList*)malloc(sizeof(FileList));
 					}
 					if (nfl) {
 						memset(nfl, 0, sizeof(*nfl));
@@ -676,7 +676,7 @@ int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), File
 									free(fl);
 									fl = NULL;
 								} else {
-									fl = realloc(fl, sizeof(FileList) * n);
+									fl = (FileList*)realloc(fl, sizeof(FileList) * n);
 								}
 								continue;
 							}

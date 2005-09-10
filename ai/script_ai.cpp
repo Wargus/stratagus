@@ -65,10 +65,10 @@ static void AiHelperSetupTable(int* count, AiUnitTypeTable*** table, int n)
 	++n;
 	if (n > (i = *count)) {
 		if (*table) {
-			*table = realloc(*table, n * sizeof(AiUnitTypeTable*));
+			*table = (AiUnitTypeTable**)realloc(*table, n * sizeof(AiUnitTypeTable*));
 			memset((*table) + i, 0, (n - i) * sizeof(AiUnitTypeTable*));
 		} else {
-			*table = malloc(n * sizeof(AiUnitTypeTable*));
+			*table = (AiUnitTypeTable**)malloc(n * sizeof(AiUnitTypeTable*));
 			memset(*table, 0, n * sizeof(AiUnitTypeTable*));
 		}
 		*count = n;
@@ -91,7 +91,7 @@ static void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
 	// New unit-type
 	//
 	if (!(table = *tablep)) {
-		table = *tablep = malloc(sizeof(AiUnitTypeTable));
+		table = *tablep = (AiUnitTypeTable*)malloc(sizeof(AiUnitTypeTable));
 		table->Count = 1;
 		table->Table[0] = base;
 		return;
@@ -109,7 +109,7 @@ static void AiHelperInsert(AiUnitTypeTable** tablep, UnitType* base)
 	//
 	// Append new base unit-type to units.
 	//
-	table = *tablep = realloc(table, sizeof(AiUnitTypeTable) + sizeof(UnitType*) * n);
+	table = *tablep = (AiUnitTypeTable*)realloc(table, sizeof(AiUnitTypeTable) + sizeof(UnitType*) * n);
 	table->Count = n + 1;
 	table->Table[n] = base;
 }
@@ -286,7 +286,7 @@ static int CclDefineAi(lua_State* l)
 		LuaError(l, "incorrect argument");
 	}
 
-	aitype = malloc(sizeof(AiType));
+	aitype = (AiType*)malloc(sizeof(AiType));
 	aitype->Next = AiTypes;
 	AiTypes = aitype;
 
@@ -331,7 +331,7 @@ static int CclDefineAi(lua_State* l)
 		lua_pushstring(l, "_ai_scripts_");
 		lua_gettable(l, LUA_GLOBALSINDEX);
 	}
-	aitype->Script = malloc(strlen(aitype->Name) +
+	aitype->Script = (char*)malloc(strlen(aitype->Name) +
 		(aitype->Race ? strlen(aitype->Race) : 0) +
 		strlen(aitype->Class) + 1);
 	sprintf(aitype->Script, "%s%s%s", aitype->Name,
@@ -375,10 +375,10 @@ static void InsertUnitTypeRequests(UnitType* type, int count)
 
 	if (AiPlayer->UnitTypeRequests) {
 		n = AiPlayer->UnitTypeRequestsCount;
-		AiPlayer->UnitTypeRequests = realloc(AiPlayer->UnitTypeRequests,
+		AiPlayer->UnitTypeRequests = (AiUnitTypeTable*)realloc(AiPlayer->UnitTypeRequests,
 			(n + 1) * sizeof(*AiPlayer->UnitTypeRequests));
 	} else {
-		AiPlayer->UnitTypeRequests = malloc(sizeof(*AiPlayer->UnitTypeRequests));
+		AiPlayer->UnitTypeRequests = (AiUnitTypeTable*)malloc(sizeof(*AiPlayer->UnitTypeRequests));
 		n = 0;
 	}
 	AiPlayer->UnitTypeRequests[n].Table[0] = type;
@@ -435,10 +435,10 @@ static void InsertUpgradeToRequests(UnitType* type)
 
 	if (AiPlayer->UpgradeToRequests) {
 		n = AiPlayer->UpgradeToRequestsCount;
-		AiPlayer->UpgradeToRequests = realloc(AiPlayer->UpgradeToRequests,
+		AiPlayer->UpgradeToRequests = (UnitType**)realloc(AiPlayer->UpgradeToRequests,
 			(n + 1) * sizeof(*AiPlayer->UpgradeToRequests));
 	} else {
-		AiPlayer->UpgradeToRequests = malloc(sizeof(*AiPlayer->UpgradeToRequests));
+		AiPlayer->UpgradeToRequests = (UnitType**)malloc(sizeof(*AiPlayer->UpgradeToRequests));
 		n = 0;
 	}
 	AiPlayer->UpgradeToRequests[n] = type;
@@ -456,10 +456,10 @@ static void InsertResearchRequests(Upgrade* upgrade)
 
 	if (AiPlayer->ResearchRequests) {
 		n = AiPlayer->ResearchRequestsCount;
-		AiPlayer->ResearchRequests = realloc(AiPlayer->ResearchRequests,
+		AiPlayer->ResearchRequests = (Upgrade**)realloc(AiPlayer->ResearchRequests,
 			(n + 1) * sizeof(*AiPlayer->ResearchRequests));
 	} else {
-		AiPlayer->ResearchRequests = malloc(sizeof(*AiPlayer->ResearchRequests));
+		AiPlayer->ResearchRequests = (Upgrade**)malloc(sizeof(*AiPlayer->ResearchRequests));
 		n = 0;
 	}
 	AiPlayer->ResearchRequests[n] = upgrade;
@@ -739,7 +739,7 @@ static int CclAiForce(lua_State* l)
 		// New type append it.
 		//
 		if (!aiut) {
-			*prev = aiut = malloc(sizeof(*aiut));
+			*prev = aiut = (AiUnitType*)malloc(sizeof(*aiut));
 			aiut->Next = NULL;
 			aiut->Want = count;
 			aiut->Type = type;
@@ -1109,7 +1109,7 @@ static int CclDefineAiPlayer(lua_State* l)
 	// FIXME: lose this:
 	// Assert(!Players[i].Ai && Players[i].AiEnabled);
 
-	ai = Players[i].Ai = calloc(1, sizeof(PlayerAi));
+	ai = Players[i].Ai = (PlayerAi*)calloc(1, sizeof(PlayerAi));
 	ai->Player = &Players[i];
 
 	//
@@ -1199,7 +1199,7 @@ static int CclDefineAiPlayer(lua_State* l)
 						lua_rawgeti(l, -1, subk + 1);
 						ident = LuaToString(l, -1);
 						lua_pop(l, 1);
-						*queue = malloc(sizeof(AiUnitType));
+						*queue = (AiUnitType*)malloc(sizeof(AiUnitType));
 						(*queue)->Next = NULL;
 						(*queue)->Want = num;
 						(*queue)->Type = UnitTypeByIdent(ident);
@@ -1228,7 +1228,7 @@ static int CclDefineAiPlayer(lua_State* l)
 						lua_rawgeti(l, -1, subk + 1);
 						ident = LuaToString(l, -1);
 						lua_pop(l, 1);
-						*queue = malloc(sizeof(AiUnit));
+						*queue = (AiUnit*)malloc(sizeof(AiUnit));
 						(*queue)->Next = NULL;
 						(*queue)->Unit = UnitSlots[num];
 						queue = &(*queue)->Next;
@@ -1351,7 +1351,7 @@ static int CclDefineAiPlayer(lua_State* l)
 				mask = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 				lua_pop(l, 1);
-				*queue = malloc(sizeof(AiExplorationRequest));
+				*queue = (AiExplorationRequest*)malloc(sizeof(AiExplorationRequest));
 				(*queue)->Next = NULL;
 				(*queue)->X = x;
 				(*queue)->Y = y;
@@ -1378,7 +1378,7 @@ static int CclDefineAiPlayer(lua_State* l)
 				lua_rawgeti(l, -1, 1);
 				unit = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				*queue = malloc(sizeof(AiTransportRequest));
+				*queue = (AiTransportRequest*)malloc(sizeof(AiTransportRequest));
 				(*queue)->Next = NULL;
 				(*queue)->Unit = UnitSlots[unit];
 				lua_rawgeti(l, -1, 2);
@@ -1396,7 +1396,7 @@ static int CclDefineAiPlayer(lua_State* l)
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
 			if (subargs) {
-				ai->UnitTypeRequests = malloc(subargs / 2 * sizeof(AiUnitTypeTable));
+				ai->UnitTypeRequests = (AiUnitTypeTable*)malloc(subargs / 2 * sizeof(AiUnitTypeTable));
 			}
 			for (k = 0; k < subargs; ++k) {
 				const char* ident;
@@ -1421,7 +1421,7 @@ static int CclDefineAiPlayer(lua_State* l)
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
 			if (subargs) {
-				ai->UpgradeToRequests = malloc(subargs * sizeof(UnitType*));
+				ai->UpgradeToRequests = (UnitType**)malloc(subargs * sizeof(UnitType*));
 			}
 			for (k = 0; k < subargs; ++k) {
 				const char* ident;
@@ -1440,7 +1440,7 @@ static int CclDefineAiPlayer(lua_State* l)
 			subargs = luaL_getn(l, j + 1);
 			i = 0;
 			if (subargs) {
-				ai->ResearchRequests = malloc(subargs * sizeof(Upgrade*));
+				ai->ResearchRequests = (Upgrade**)malloc(subargs * sizeof(Upgrade*));
 			}
 			for (k = 0; k < subargs; ++k) {
 				const char* ident;
@@ -1476,7 +1476,7 @@ static int CclDefineAiPlayer(lua_State* l)
 				lua_rawgeti(l, j + 1, k + 1);
 				want = LuaToNumber(l, -1);
 				lua_pop(l, 1);
-				*queue = malloc(sizeof(AiBuildQueue));
+				*queue = (AiBuildQueue*)malloc(sizeof(AiBuildQueue));
 				(*queue)->Next = NULL;
 				(*queue)->Type = UnitTypeByIdent(ident);
 				(*queue)->Want = want;

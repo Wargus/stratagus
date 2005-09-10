@@ -198,8 +198,8 @@ static int CclDefineConstruction(lua_State* l)
 	str = strdup(LuaToString(l, 1));
 
 	if ((cop = Constructions) == NULL) {
-		Constructions = malloc(2 * sizeof(Construction*));
-		Constructions[0] = calloc(1, sizeof(Construction));
+		Constructions = (Construction**)malloc(2 * sizeof(Construction*));
+		Constructions[0] = (Construction*)calloc(1, sizeof(Construction));
 		Constructions[1] = NULL;
 		construction = Constructions[0];
 	} else {
@@ -212,8 +212,8 @@ static int CclDefineConstruction(lua_State* l)
 			}
 		}
 		if (!*cop) {
-			Constructions = realloc(Constructions, (i + 2) * sizeof(Construction*));
-			Constructions[i] = calloc(1, sizeof(Construction));
+			Constructions = (Construction**)realloc(Constructions, (i + 2) * sizeof(Construction*));
+			Constructions[i] = (Construction*)calloc(1, sizeof(Construction));
 			Constructions[i + 1] = NULL;
 			construction = Constructions[i];
 		}
@@ -278,12 +278,12 @@ static int CclDefineConstruction(lua_State* l)
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
 				int percent;
-				int file;
+				ConstructionFileType file;
 				int frame;
 				ConstructionFrame** cframe;
 
 				percent = 0;
-				file = 0;
+				file = ConstructionFileConstruction;
 				frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
@@ -317,7 +317,7 @@ static int CclDefineConstruction(lua_State* l)
 				while (*cframe) {
 					cframe = &((*cframe)->Next);
 				}
-				(*cframe) = malloc(sizeof(ConstructionFrame));
+				(*cframe) = (ConstructionFrame*)malloc(sizeof(ConstructionFrame));
 				(*cframe)->Percent = percent;
 				(*cframe)->File = file;
 				(*cframe)->Frame = frame;
