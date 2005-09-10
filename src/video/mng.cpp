@@ -141,7 +141,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Bmask = 0x0000FF00 >> 8;
 #endif
 
-	mng->Buffer = calloc(width * height * 3, 1);
+	mng->Buffer = (unsigned char*)calloc(width * height * 3, 1);
 
 	mng->Surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 		8 * 3, Rmask, Gmask, Bmask, 0);
@@ -282,7 +282,7 @@ Mng* LoadMNG(const char* name)
 
 	LibraryFileName(name, buf);
 
-	mng = calloc(1, sizeof(Mng));
+	mng = (Mng*)calloc(1, sizeof(Mng));
 	mng->Name = strdup(buf);
 	mng->Handle = mng_initialize(mng, my_alloc, my_free, MNG_NULL);
 	if ((mng_handle)mng->Handle == MNG_NULL) {

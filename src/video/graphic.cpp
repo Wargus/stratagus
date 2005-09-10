@@ -199,7 +199,7 @@ Graphic* NewGraphic(const char* file, int w, int h)
 
 	ptr = (Graphic**)hash_find(GraphicHash, file);
 	if (!ptr || !*ptr) {
-		g = calloc(1, sizeof(Graphic));
+		g = (Graphic*)calloc(1, sizeof(Graphic));
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -233,13 +233,13 @@ Graphic* ForceNewGraphic(const char* file, int w, int h)
 {
 	Graphic* g;
 
-	g = calloc(1, sizeof(Graphic));
+	g = (Graphic*)calloc(1, sizeof(Graphic));
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
 	g->File = strdup(file);
-	g->HashFile = malloc(strlen(file) + 2 * sizeof(g->File) + 3);
+	g->HashFile = (char*)malloc(strlen(file) + 2 * sizeof(g->File) + 3);
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
 	g->Width = w;
 	g->Height = h;
@@ -691,7 +691,7 @@ void ResizeGraphic(Graphic* g, int w, int h)
 		SDL_LockSurface(g->Surface);
 
 		pixels = (unsigned char*)g->Surface->pixels;
-		data = malloc(w * h);
+		data = (unsigned char*)malloc(w * h);
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
@@ -720,7 +720,7 @@ void ResizeGraphic(Graphic* g, int w, int h)
 		SDL_LockSurface(g->Surface);
 
 		pixels = (unsigned char*)g->Surface->pixels;
-		data = malloc(w * h * bpp);
+		data = (unsigned char*)malloc(w * h * bpp);
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
