@@ -185,7 +185,7 @@ void GetDefaultTextColors(char** normalp, char** reversep)
 **
 **  @return      The length in pixels of the text.
 */
-int VideoTextLength(unsigned font, const unsigned char* text)
+int VideoTextLength(unsigned font, const char* text)
 {
 	int width;
 	const unsigned char* s;
@@ -268,7 +268,7 @@ static void VideoDrawCharClip(const Graphic* g, int gx, int gy, int w, int h,
 **
 **  @return      The length of the printed text.
 */
-static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
+static int DoDrawText(int x, int y, unsigned font, const char* text,
 	int clip)
 {
 	int w;
@@ -392,7 +392,7 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 **  @return      The length of the printed text.
 */
 int VideoDrawText(int x, int y, unsigned font,
-	const unsigned char* text)
+	const char* text)
 {
 	return DoDrawText(x, y, font, text, 0);
 }
@@ -410,7 +410,7 @@ int VideoDrawText(int x, int y, unsigned font,
 **  @return      The length of the printed text.
 */
 int VideoDrawTextClip(int x, int y, unsigned font,
-	const unsigned char* text)
+	const char* text)
 {
 	return DoDrawText(x, y, font, text, 1);
 }
@@ -428,7 +428,7 @@ int VideoDrawTextClip(int x, int y, unsigned font,
 **  @return      The length of the printed text.
 */
 int VideoDrawReverseText(int x, int y, unsigned font,
-	const unsigned char* text)
+	const char* text)
 {
 	int w;
 
@@ -452,7 +452,7 @@ int VideoDrawReverseText(int x, int y, unsigned font,
 **  @return      The length of the printed text.
 */
 int VideoDrawReverseTextClip(int x, int y, unsigned font,
-	const unsigned char* text)
+	const char* text)
 {
 	int w;
 
@@ -476,7 +476,7 @@ int VideoDrawReverseTextClip(int x, int y, unsigned font,
 **  @return      The length of the printed text.
 */
 int VideoDrawTextCentered(int x, int y, unsigned font,
-	const unsigned char* text)
+	const char* text)
 {
 	int dx;
 
