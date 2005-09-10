@@ -335,7 +335,7 @@ static int DoDrawText(int x, int y, unsigned font, const unsigned char* text,
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
-					color = malloc(p - text + 1);
+					color = (char*)malloc(p - text + 1);
 					memcpy(color, text, p - text);
 					color[p - text] = '\0';
 					text = p;
