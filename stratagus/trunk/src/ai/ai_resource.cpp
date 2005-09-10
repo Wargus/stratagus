@@ -331,7 +331,7 @@ static void AiRequestSupply(void)
 			return;
 		} else {
 			if (AiMakeUnit(type)) {
-				queue = malloc(sizeof (*AiPlayer->UnitTypeBuilt));
+				queue = (AiBuildQueue*)malloc(sizeof (*AiPlayer->UnitTypeBuilt));
 				queue->Next = AiPlayer->UnitTypeBuilt;
 				queue->Type = type;
 				queue->Want = 1;
@@ -1292,7 +1292,7 @@ void AiAddUnitTypeRequest(UnitType* type, int count)
 	for (queue = &AiPlayer->UnitTypeBuilt; *queue; queue = &(*queue)->Next) {
 	}
 
-	*queue = malloc(sizeof (*AiPlayer->UnitTypeBuilt));
+	*queue = (AiBuildQueue*)malloc(sizeof (*AiPlayer->UnitTypeBuilt));
 	(*queue)->Next = NULL;
 	(*queue)->Type = type;
 	(*queue)->Want = count;
@@ -1311,7 +1311,7 @@ void AiExplore(int x, int y, int mask)
 	AiExplorationRequest* req;
 
 	// Alloc a new struct,
-	req = malloc(sizeof(AiExplorationRequest));
+	req = (AiExplorationRequest*)malloc(sizeof(AiExplorationRequest));
 
 	// Link into the exploration requests list
 	req->X = x;

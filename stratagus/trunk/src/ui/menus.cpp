@@ -435,7 +435,7 @@ static MapInfo* DuplicateMapInfo(const MapInfo *orig)
 
 	Assert(orig);
 
-	dest = malloc(sizeof(MapInfo));
+	dest = (MapInfo*)malloc(sizeof(MapInfo));
 	memcpy(dest, orig, sizeof(MapInfo));
 	if (orig->Description) {
 		dest->Description = strdup(orig->Description);
@@ -661,7 +661,7 @@ static char* LBRetrieve(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return NULL;
 	}
-	fl = mi->D.Listbox.options;
+	fl = (FileList*)mi->D.Listbox.options;
 	if (fl[i].type) {
 		strcpy(buffer, "   ");
 	} else {
@@ -679,7 +679,7 @@ static char* LBRetrieve(const Menuitem* mi, int i)
 **
 **  @return string to display in listbox.
 */
-static unsigned char* LBRetrieveAndInfo(const Menuitem* mi, int i)
+static char* LBRetrieveAndInfo(const Menuitem* mi, int i)
 {
 	FileList* fl;
 	MapInfo* info;
@@ -690,7 +690,7 @@ static unsigned char* LBRetrieveAndInfo(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return NULL;
 	}
-	fl = mi->D.Listbox.options;
+	fl = (FileList*)mi->D.Listbox.options;
 	info = fl[i].xdata;
 	if (fl[i].type && i == mi->D.Listbox.curopt && info) {
 		static char buffer[1024];
@@ -746,7 +746,7 @@ static int PathLBAction(const Menuitem* mi, int i)
 	if (i >= mi->D.Listbox.noptions) {
 		return 0;
 	}
-	fl = mi->D.Listbox.options;
+	fl = (FileList*)mi->D.Listbox.options;
 	if (fl[i].type) {
 		Assert(strlen(fl[i].name) < sizeof(ScenSelectFileName));
 		strcpy(ScenSelectFileName, fl[i].name);
@@ -794,14 +794,14 @@ static void EditorSaveLBAction(Menuitem* mi, int i)
 */
 static void LBExit(Menuitem* mi)
 {
-	FileList *fl;
+	FileList* fl;
 
 	Assert(mi->MiType == MiTypeListbox);
 
 	if (!mi->D.Listbox.noptions) {
 		return ;
 	}
-	fl = mi->D.Listbox.options;
+	fl = (FileList*)mi->D.Listbox.options;
 	FreeMapInfos(fl, mi->D.Listbox.noptions);
 	free(fl);
 	mi->D.Listbox.options = NULL;

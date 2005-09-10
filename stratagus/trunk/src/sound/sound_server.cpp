@@ -147,8 +147,8 @@ static void MixMusicToStereo32(int* buffer, int size)
 		Assert(MusicSample && MusicSample->Type);
 
 		len = size * sizeof(*buf);
-		tmp = malloc(len);
-		buf = malloc(len);
+		tmp = (char*)malloc(len);
+		buf = (short*)malloc(len);
 
 		div = 176400 / (MusicSample->Frequency * (MusicSample->SampleSize / 8)
 				* MusicSample->Channels);
@@ -273,7 +273,7 @@ int ConvertToStereo32(const char* src, char* dest, int frequency,
 	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16,
 		2, 44100);
 
-	acvt.buf = dest;
+	acvt.buf = (unsigned char*)dest;
 	memcpy(dest, src, bytes);
 	acvt.len = bytes;
 
@@ -670,9 +670,9 @@ SoundId RegisterSound(const char* files[], unsigned number)
 	unsigned i;
 	ServerSoundId id;
 
-	id = malloc(sizeof(*id));
+	id = (ServerSoundId)malloc(sizeof(*id));
 	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = malloc(sizeof(Sample*) * number);
+		id->Sound.OneGroup = (Sample**)malloc(sizeof(Sample*) * number);
 		for (i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
@@ -709,11 +709,11 @@ SoundId RegisterTwoGroups(SoundId first, SoundId second)
 	if (first == NO_SOUND || second == NO_SOUND) {
 		return NO_SOUND;
 	}
-	id = malloc(sizeof(*id));
+	id = (ServerSoundId)malloc(sizeof(*id));
 	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups = malloc(sizeof(TwoGroups));
-	id->Sound.TwoGroups->First = first;
-	id->Sound.TwoGroups->Second = second;
+	id->Sound.TwoGroups = (TwoGroups*)malloc(sizeof(TwoGroups));
+	id->Sound.TwoGroups->First = (Sound*)first;
+	id->Sound.TwoGroups->Second = (Sound*)second;
 	id->Range = MAX_SOUND_RANGE;
 
 	return (SoundId) id;
@@ -749,7 +749,7 @@ void MixIntoBuffer(void* buffer, int samples)
 	FillChannels(free_channels, &dummy1, &dummy2);
 
 	// Create empty mixer buffer
-	mixer_buffer = alloca(samples * sizeof(*mixer_buffer));
+	mixer_buffer = (int*)malloc(samples * sizeof(*mixer_buffer));
 	// FIXME: can save the memset here, if first channel sets the values
 	memset(mixer_buffer, 0, samples * sizeof(*mixer_buffer));
 
@@ -758,7 +758,9 @@ void MixIntoBuffer(void* buffer, int samples)
 	// Add music to mixer buffer
 	MixMusicToStereo32(mixer_buffer, samples);
 
-	ClipMixToStereo16(mixer_buffer, samples, buffer);
+	ClipMixToStereo16(mixer_buffer, samples, (short*)buffer);
+
+	free(mixer_buffer);
 }
 
 /**

@@ -58,7 +58,7 @@
 
 char DefaultObjective[] = "-Destroy your enemies";
 
-int GameResult;                              /// Outcome of the game
+GameResults GameResult;                      /// Outcome of the game
 char CurrentMapPath[1024];                   /// Path of the current map
 char DefaultMap[1024] = "maps/default.smp";  /// Default map path
 int RestartScenario;                         /// Restart the scenario
@@ -230,7 +230,7 @@ static void ParseShowPicture(lua_State* l, CampaignChapter* chapter)
 			while (*text) {
 				text = &((*text)->Next);
 			}
-			*text = calloc(sizeof(ChapterPictureText), 1);
+			*text = (ChapterPictureText*)calloc(sizeof(ChapterPictureText), 1);
 
 			subargs = luaL_getn(l, -1);
 			for (k = 0; k < subargs; ++k) {
@@ -365,12 +365,12 @@ static int CclDefineCampaign(lua_State* l)
 			}
 		}
 		if (i == NumCampaigns) {
-			Campaigns = realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
+			Campaigns = (Campaign*)realloc(Campaigns, sizeof(Campaign) * (NumCampaigns + 1));
 			campaign = Campaigns + NumCampaigns;
 			++NumCampaigns;
 		}
 	} else {
-		campaign = Campaigns = malloc(sizeof(Campaign));
+		campaign = Campaigns = (Campaign*)malloc(sizeof(Campaign));
 		++NumCampaigns;
 	}
 
@@ -406,7 +406,7 @@ static int CclDefineCampaign(lua_State* l)
 				lua_pop(l, 1);
 				++k;
 
-				chapter = calloc(sizeof(CampaignChapter), 1);
+				chapter = (CampaignChapter*)calloc(sizeof(CampaignChapter), 1);
 				chapter->Next = *tail;
 				*tail = chapter;
 				tail = &chapter->Next;

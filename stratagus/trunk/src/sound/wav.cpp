@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name wav.c - wav support */
 //
-// (c) Copyright 2003-2004 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
+//      (c) Copyright 2003-2005 by Lutz Sammer, Fabrice Rossi and Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -66,13 +66,13 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 {
 	WavData* data;
 	WavChunk chunk;
-	char* sndbuf;
+	unsigned char* sndbuf;
 	int comp; // number of compressed bytes actually read
 	int i;
 	int read;
 	int bufrem;
 
-	data = sample->User;
+	data = (WavData*)sample->User;
 
 	if (sample->Pos > SOUND_BUFFER_SIZE / 2) {
 		memcpy(sample->Buffer, sample->Buffer + sample->Pos, sample->Len);
@@ -137,7 +137,7 @@ static void WavStreamFree(Sample* sample)
 {
 	WavData* data;
 
-	data = sample->User;
+	data = (WavData*)sample->User;
 
 	CLclose(data->WavFile);
 	free(data);
@@ -280,13 +280,13 @@ Sample* LoadWav(const char* name, int flags)
 	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
 		wavfmt.Frequency == 11025);
 
-	data = malloc(sizeof(WavData));
+	data = (WavData*)malloc(sizeof(WavData));
 	data->WavFile = f;
 
 	//
 	//  Read sample
 	//
-	sample = malloc(sizeof(Sample));
+	sample = (Sample*)malloc(sizeof(Sample));
 	sample->Channels = wavfmt.Channels;
 	sample->SampleSize = wavfmt.SampleSize * 8 / sample->Channels;
 	sample->Frequency = wavfmt.Frequency;
@@ -297,7 +297,7 @@ Sample* LoadWav(const char* name, int flags)
 
 	if (flags & PlayAudioStream) {
 		data->ChunkRem = 0;
-		sample->Buffer = malloc(SOUND_BUFFER_SIZE);
+		sample->Buffer = (unsigned char*)malloc(SOUND_BUFFER_SIZE);
 		sample->Type = &WavStreamSampleType;
 	} else {
 		int comp; // number of compressed bytes actually read
@@ -339,7 +339,7 @@ Sample* LoadWav(const char* name, int flags)
 			}
 			rem -= read;
 
-			sample->Buffer = realloc(sample->Buffer, sample->Len + read);
+			sample->Buffer = (unsigned char*)realloc(sample->Buffer, sample->Len + read);
 			Assert(sample->Buffer);
 
 			comp = CLread(data->WavFile, sndbuf, read);
