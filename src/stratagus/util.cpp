@@ -134,7 +134,7 @@ char* strdcat(const char* l, const char* r)
 {
 	char* res;
 
-	res = malloc(strlen(l) + strlen(r) + 1);
+	res = (char*)malloc(strlen(l) + strlen(r) + 1);
 	if (res) {
 		strcpy(res, l);
 		strcat(res, r);
@@ -155,7 +155,7 @@ char* strdcat3(const char* l, const char* m, const char* r)
 {
 	char* res;
 
-	res = malloc(strlen(l) + strlen(m) + strlen(r) + 1);
+	res = (char*)malloc(strlen(l) + strlen(m) + strlen(r) + 1);
 	if (res) {
 		strcpy(res, l);
 		strcat(res, m);
@@ -276,7 +276,7 @@ const void* _hash_find(const Uint8* id, const void* tab, int size, int usize)
 	while (s) {
 		i = (Uint8)h - s->misc[usize];
 		if (i == 0) {
-			i = strcmp(id, s->misc + usize + 1);
+			i = strcmp((char*)id, (char*)s->misc + usize + 1);
 			if (i == 0) {
 				return s->misc;
 			}
@@ -302,7 +302,7 @@ void* _hash_get(const Uint8* id, void* tab, int size, int usize)
 	while ((s = *ss)) {
 		i = (Uint8)h - s->misc[usize];
 		if (i == 0) {
-			i = strcmp(id, s->misc + usize + 1);
+			i = strcmp((char*)id, (char*)s->misc + usize + 1);
 			if (i == 0) {
 				return s->misc;
 			}
@@ -310,13 +310,13 @@ void* _hash_get(const Uint8* id, void* tab, int size, int usize)
 		ss = i < 0 ? &s->left : &s->right;
 	}
 
-	*ss = s = malloc(sizeof(*s) + usize + strlen(id));
+	*ss = s = (struct symbol*)malloc(sizeof(*s) + usize + strlen((char*)id));
 
 	s->left = 0;
 	s->right = 0;
 	memset(s->misc, 0, usize);
 	s->misc[usize] = (Uint8)h;
-	strcpy(s->misc + usize + 1, id);
+	strcpy((char*)s->misc + usize + 1, (char*)id);
 
 	return s->misc;
 }
@@ -337,7 +337,7 @@ void _hash_del(const Uint8* id, void* tab, int size, int usize)
 	while ((s = *ss)) {
 		i = (Uint8)h - s->misc[usize];
 		if (i == 0) {
-			i = strcmp(id, s->misc + usize + 1);
+			i = strcmp((char*)id, (char*)s->misc + usize + 1);
 			if (i == 0) {
 				/* found, now remove it */
 				if (s->left == 0) {

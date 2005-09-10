@@ -1113,13 +1113,13 @@ void InitSelections(void)
 
 	// This could have been initialized already when loading a game
 	if (!Selected) {
-		Selected = malloc(MaxSelectable * sizeof(Unit*));
-		_Selected = malloc(MaxSelectable * sizeof(Unit*));
+		Selected = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
+		_Selected = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
 	}
 	for (i = 0; i < PlayerMax; ++i) {
 		if (!TeamSelected[i]) {
-			TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
-			_TeamSelected[i] = malloc(MaxSelectable * sizeof(Unit*));
+			TeamSelected[i] = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
+			_TeamSelected[i] = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
 		}
 	}
 }

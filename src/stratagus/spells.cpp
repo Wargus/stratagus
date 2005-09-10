@@ -781,7 +781,7 @@ static Target* NewTarget(TargetType t, const Unit* unit, int x, int y)
 {
 	Target* target;
 
-	target = malloc(sizeof(*target));
+	target = (Target*)malloc(sizeof(*target));
 
 	target->which_sort_of_target = t;
 	target->unit = (Unit*)unit;

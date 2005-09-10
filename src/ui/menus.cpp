@@ -405,7 +405,7 @@ static char *SaveDir;                    /// Save game directory
 static char TempPathBuf[PATH_MAX];       /// Temporary buffer for paths
 
 int nKeyStrokeHelps;                     /// Number of keystroke help lines
-char **KeyStrokeHelps;                   /// Array of keystroke help lines
+char** KeyStrokeHelps;                   /// Array of keystroke help lines
 
 /// FIXME: -> ccl...
 static char *mgptsoptions[] = {
@@ -650,7 +650,7 @@ static int ScenSelectRDFilter(char *pathbuf, FileList *fl)
 **
 **  @return string to display in listbox.
 */
-static unsigned char* LBRetrieve(const Menuitem* mi, int i)
+static char* LBRetrieve(const Menuitem* mi, int i)
 {
 	FileList* fl;
 	static char buffer[1024];
@@ -1334,7 +1334,7 @@ static void SaveGameInit(Menu* menu)
 {
 	char* buf;
 
-	buf = malloc(64);
+	buf = (char*)malloc(64);
 	strcpy(buf, "~!_");
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = 0;
@@ -2372,7 +2372,7 @@ static void SaveReplayInit(Menu* menu)
 {
 	char* buf;
 
-	buf = malloc(32);
+	buf = (char*)malloc(32);
 	strcpy(buf, "~!_");
 	menu->Items[1].D.Input.buffer = buf;
 	menu->Items[1].D.Input.nch = 0;
@@ -2438,7 +2438,7 @@ static void SaveReplayOk(void)
 	sprintf(ptr, "log_of_stratagus_%d.log", ThisPlayer->Index);
 
 	stat(TempPathBuf, &s);
-	buf = malloc(s.st_size);
+	buf = (char*)malloc(s.st_size);
 	fd = fopen(TempPathBuf, "rb");
 	fread(buf, s.st_size, 1, fd);
 	fclose(fd);
@@ -2839,7 +2839,7 @@ static void JoinNetGameMenu(void)
 		server_host_buffer[24] = 0;
 		if (NetworkPort != NetworkDefaultPort) {
 			strcat(server_host_buffer, ":");
-			port = malloc(10);
+			port = (char*)malloc(10);
 			sprintf(port, "%d", NetworkPort);
 			strcat(server_host_buffer, port);
 			free(port);
@@ -5304,7 +5304,7 @@ static void InitPlayerRaces(Menuitem* mi)
 	if (mi->D.Pulldown.options) {
 		free(mi->D.Pulldown.options);
 	}
-	mi->D.Pulldown.options = malloc(n * sizeof(unsigned char*));
+	mi->D.Pulldown.options = (char**)malloc(n * sizeof(unsigned char*));
 	mi->D.Pulldown.options[0] = strdup("Map Default");
 	for (i = 0, n = 1; i < PlayerRaces.Count; ++i) {
 		if (PlayerRaces.Visible[i]) {
