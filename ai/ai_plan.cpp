@@ -118,7 +118,7 @@ static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -144,7 +144,7 @@ static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 		return;
 	}
 
-	points = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	points = (p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof(*points);
 
 	//
@@ -222,7 +222,7 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 		unsigned char State;
@@ -246,7 +246,7 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 	unsigned char* m;
 
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
-	points = malloc(size * sizeof(*points));
+	points = (p*)malloc(size * sizeof(*points));
 
 	x = unit->X;
 	y = unit->Y;
@@ -371,7 +371,7 @@ int AiFindWall(AiForce* force)
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -410,7 +410,7 @@ int AiFindWall(AiForce* force)
 	x = unit->X;
 	y = unit->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = malloc(size * sizeof(*points));
+	points = (p*)malloc(size * sizeof(*points));
 
 	destx = -1;
 	desty = -1;
