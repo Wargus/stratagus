@@ -343,7 +343,7 @@ void AiAssignToForce(Unit* unit)
 		if (AiCheckBelongsToForce(force, unit->Type)) {
 			AiUnit* aiunit;
 
-			aiunit = malloc(sizeof (*aiunit));
+			aiunit = (AiUnit*)malloc(sizeof (*aiunit));
 			aiunit->Next = AiPlayer->Force[force].Units;
 			AiPlayer->Force[force].Units = aiunit;
 			aiunit->Unit = unit;
@@ -466,7 +466,7 @@ void AiAttackWithForce(int force)
 			aiut = AiPlayer->Force[force].UnitTypes;
 			aiut2 = &AiPlayer->Force[force].UnitTypes;
 			while (aiut) {
-				*aiut2 = malloc(sizeof(**aiut2));
+				*aiut2 = (AiUnitType*)malloc(sizeof(**aiut2));
 				(*aiut2)->Next = NULL;
 				(*aiut2)->Want = aiut->Want;
 				(*aiut2)->Type = aiut->Type;

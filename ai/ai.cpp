@@ -794,7 +794,7 @@ void AiInit(Player* player)
 	AiType* ait;
 	char* ainame;
 
-	pai = calloc(1, sizeof (PlayerAi));
+	pai = (PlayerAi*)calloc(1, sizeof (PlayerAi));
 	if (!pai) {
 		fprintf(stderr, "Out of memory.\n");
 		exit(0);
@@ -883,7 +883,7 @@ void CleanAi(void)
 	AiExplorationRequest* request;
 
 	for (p = 0; p < PlayerMax; ++p) {
-		if ((pai = Players[p].Ai)) {
+		if ((pai = (PlayerAi*)Players[p].Ai)) {
 			//
 			//  Free forces
 			//

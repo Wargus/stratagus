@@ -105,7 +105,7 @@ static Order* GetNextOrder(Unit* unit, int flush)
 	} else if (unit->OrderCount == unit->TotalOrders) {
 		// Expand Order Queue if filled
 		old_orders = unit->Orders;
-		unit->Orders = realloc(unit->Orders, sizeof(Order) * unit->TotalOrders * 2);
+		unit->Orders = (Order*)realloc(unit->Orders, sizeof(Order) * unit->TotalOrders * 2);
 		// Realloc failed, fail gracefully
 		if (!unit->Orders) {
 			unit->Orders = old_orders;

@@ -188,7 +188,7 @@ void GetDefaultTextColors(char** normalp, char** reversep)
 int VideoTextLength(unsigned font, const char* text)
 {
 	int width;
-	const unsigned char* s;
+	const char* s;
 	const char* widths;
 	int isformat;
 
@@ -276,7 +276,7 @@ static int DoDrawText(int x, int y, unsigned font, const char* text,
 	const ColorFont* fp;
 	FontColorMapping* rev;
 	char* color;
-	const unsigned char* p;
+	const char* p;
 	void (*DrawChar)(const Graphic*, int, int, int, int, int, int);
 	int ipr;
 	int c;
@@ -886,7 +886,7 @@ static int CclDefineFont(lua_State* l)
 				++i;
 			}
 			if (!*fm) {
-				*fm = malloc(sizeof(**fm));
+				*fm = (FontMapping*)malloc(sizeof(**fm));
 				(*fm)->Ident = strdup(str);
 				(*fm)->Font = i;
 				(*fm)->Next = NULL;
@@ -933,7 +933,7 @@ static int CclDefineFontColor(lua_State* l)
 	fcm = NULL;
 
 	if (!NumFontColorMappings) {
-		FontColorMappings = calloc(sizeof(*FontColorMappings), 1);
+		FontColorMappings = (FontColorMapping*)calloc(sizeof(*FontColorMappings), 1);
 		fcm = FontColorMappings;
 		++NumFontColorMappings;
 	} else {
@@ -947,7 +947,7 @@ static int CclDefineFontColor(lua_State* l)
 		}
 		if (i == NumFontColorMappings) {
 			++NumFontColorMappings;
-			FontColorMappings = realloc(FontColorMappings,
+			FontColorMappings = (FontColorMapping*)realloc(FontColorMappings,
 				NumFontColorMappings * sizeof(FontColorMapping));
 			fcm = &FontColorMappings[NumFontColorMappings - 1];
 		}

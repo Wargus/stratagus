@@ -376,10 +376,10 @@ static int CclDefineSprites(lua_State* l)
 		index = GetSpriteIndex(name);
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteNumber++;
-			DecoSprite.Name = realloc(DecoSprite.Name,
+			DecoSprite.Name = (char**)realloc(DecoSprite.Name,
 				DecoSprite.SpriteNumber * sizeof(*DecoSprite.Name));
 			DecoSprite.Name[index] = strdup(name);
-			DecoSprite.SpriteArray = realloc(DecoSprite.SpriteArray,
+			DecoSprite.SpriteArray = (Decoration*)realloc(DecoSprite.SpriteArray,
 				DecoSprite.SpriteNumber * sizeof(*DecoSprite.SpriteArray));
 			memset(DecoSprite.SpriteArray + index, 0, sizeof(*DecoSprite.SpriteArray));
 		}
