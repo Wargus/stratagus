@@ -322,7 +322,7 @@ extern void UpdateMenuItemButton(Menuitem* items);
 extern void DrawMenu(Menu* menu);
 	/// Draw menu button
 extern void DrawMenuButton(struct _button_style_* style, unsigned flags,
-	int x, int y, const unsigned char* text);
+	int x, int y, const char* text);
 	/// Set menu backgound and draw it
 extern void MenusSetBackground(void);
 	/// Draw and process a menu
