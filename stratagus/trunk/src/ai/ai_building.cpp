@@ -10,7 +10,7 @@
 //
 /**@name ai_building.c - AI building functions. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer
+//      (c) Copyright 2001-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -173,7 +173,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	unsigned char* m;
 	unsigned char* matrix;
 
-	points = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	points = (p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof (*points);
 
 	x = ox;
@@ -295,7 +295,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -320,7 +320,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 	destx = x = worker->X;
 	desty = y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = malloc(size * sizeof (*points));
+	points = (p*)malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -463,7 +463,7 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 {
 	static const int xoffset[] = { 0, -1, +1, 0, -1, +1, -1, +1 };
 	static const int yoffset[] = { -1, 0, 0, +1, -1, -1, +1, +1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -485,7 +485,7 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 	x = worker->X;
 	y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = malloc(size * sizeof (*points));
+	points = (p*)malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix.

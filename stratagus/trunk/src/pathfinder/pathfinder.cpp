@@ -284,7 +284,7 @@ static int CheckPlaceInMatrix(int gx, int gy, int gw, int gh, int range, unsigne
 */
 static void FillMatrix(const Unit* unit, unsigned int* matrix)
 {
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 		int depth;
@@ -304,7 +304,7 @@ static void FillMatrix(const Unit* unit, unsigned int* matrix)
 	unsigned int* m;
 
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight) * sizeof(*points);
-	points = malloc(size);
+	points = (p*)malloc(size);
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight);
 
 	mask = UnitMovementMask(unit);

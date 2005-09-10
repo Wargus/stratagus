@@ -2375,7 +2375,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -2397,7 +2397,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = malloc(size * sizeof(*points));
+	points = (p*)malloc(size * sizeof(*points));
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
@@ -2485,7 +2485,7 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -2513,7 +2513,7 @@ Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = malloc(size * sizeof(*points));
+	points = (p*)malloc(size * sizeof(*points));
 
 	// Find the nearest gold depot
 	if ((destu = FindDeposit(unit, x, y,range,resource))) {
@@ -2629,7 +2629,7 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
-	struct {
+	struct p {
 		unsigned short X;
 		unsigned short Y;
 	} *points;
@@ -2656,7 +2656,7 @@ Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource)
 	desty = y;
 	size = (TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 < range * range * 5) ?
 		TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4 : range * range * 5;
-	points = malloc(size * sizeof(*points));
+	points = (p*)malloc(size * sizeof(*points));
 
 	// Make movement matrix. FIXME: can create smaller matrix.
 	matrix = CreateMatrix();
