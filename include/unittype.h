@@ -727,6 +727,15 @@ typedef struct _unit_type_ UnitType;
 
 typedef struct _building_restrictions_ BuildRestriction;
 
+typedef enum {
+	Equal,
+	NotEqual,
+	LessThan,
+	LessThanEqual,
+	GreaterThan,
+	GreaterThanEqual,
+} DistanceTypeType;
+
 struct _building_restrictions_ {
 	RestrictTypeType RestrictType;
 	union {
@@ -746,14 +755,7 @@ struct _building_restrictions_ {
 		
 		struct {
 			int Distance;        /// distance to build (circle)
-			enum {
-				Equal,
-				NotEqual,
-				LessThan,
-				LessThanEqual,
-				GreaterThan,
-				GreaterThanEqual,
-			} DistanceType;
+			DistanceTypeType DistanceType;
 			int Except;          /// all except this building type.
 			char* RestrictTypeName; 
 			UnitType* RestrictType; 
