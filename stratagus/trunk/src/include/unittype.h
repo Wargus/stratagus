@@ -712,6 +712,14 @@ typedef enum {
 	UnitTypeNaval,              /// Unit lives on water
 } UnitTypeType;
 
+typedef enum {
+	RestrictAddOn,          /// We are refereing to the following restriction
+	RestrictOnTop,
+	RestrictDistance,
+	RestrictDirection,
+	RestrictTiles,
+} RestrictTypeType;
+
 /**
 **  Typedef of base structure of unit-type
 */
@@ -720,14 +728,7 @@ typedef struct _unit_type_ UnitType;
 typedef struct _building_restrictions_ BuildRestriction;
 
 struct _building_restrictions_ {
-	enum {
-		RestrictAddOn,          /// We are refereing to the following restriction
-		RestrictOnTop,
-		RestrictDistance,
-		RestrictDirection,
-		RestrictTiles,
-	} RestrictType;
-
+	RestrictTypeType RestrictType;
 	union {
 		struct {
 			int OffsetX;         /// offset from the main building to place this
