@@ -93,7 +93,7 @@ void InitUserInterface(const char* race_name)
 	int i;
 	int best;
 	int num_vps;
-	int vp_mode;
+	ViewportMode vp_mode;
 	Viewport vps[MAX_NUM_VIEWPORTS];
 
 	// select the correct slot
