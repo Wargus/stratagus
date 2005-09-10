@@ -66,9 +66,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-enum _mouse_buttons_ MouseButtons;           /// Current pressed mouse buttons
+int MouseButtons;                            /// Current pressed mouse buttons
 
-enum _key_modifiers_ KeyModifiers;           /// Current keyboard modifiers
+int KeyModifiers;                            /// Current keyboard modifiers
 
 Unit* UnitUnderCursor;                       /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor

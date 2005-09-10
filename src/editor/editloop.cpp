@@ -59,7 +59,7 @@
 
 #include "script.h"
 
-extern void DoScrollArea(enum _scroll_state_ state, int fast);
+extern void DoScrollArea(int state, int fast);
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -1675,7 +1675,7 @@ static void EditorCallbackMouse(int x, int y)
 
 	MouseScrollState = ScrollNone;
 	GameCursor = TheUI.Point.Cursor;
-	CursorOn = -1;
+	CursorOn = CursorOnUnknown;
 	CursorPlayer = -1;
 	CursorUnitIndex = -1;
 	ButtonUnderCursor = -1;
@@ -1959,8 +1959,8 @@ static void CreateEditor(void)
 			}
 		}
 
-		TheMap.Fields = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
-		TheMap.Visible[0] = calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
+		TheMap.Fields = (MapField*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight, sizeof(MapField));
+		TheMap.Visible[0] = (unsigned*)calloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight / 8, 1);
 		InitUnitCache();
 
 		for (i = 0; i < TheMap.Info.MapWidth * TheMap.Info.MapHeight; ++i) {
@@ -1995,7 +1995,7 @@ static void CreateEditor(void)
 
 	if (!EditorUnitTypes) {
 		// Build empty editor unit-type tables.
-		EditorUnitTypes = malloc(sizeof(char*) * 2);
+		EditorUnitTypes = (char**)malloc(sizeof(char*) * 2);
 		MaxUnitIndex = 0;
 	}
 
