@@ -157,7 +157,7 @@ void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
-					stats->Variables = calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+					stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
 				}
 				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
@@ -342,16 +342,16 @@ UnitType* NewUnitTypeSlot(char* ident)
 {
 	UnitType* type;
 
-	type = calloc(1, sizeof(UnitType));
+	type = (UnitType*)calloc(1, sizeof(UnitType));
 	if (!type) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
 	type->Slot = NumUnitTypes;
 	type->Ident = ident;
-	type->BoolFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
-	type->CanTargetFlag = calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
-	type->Variable = calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
+	type->BoolFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
+	type->CanTargetFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
+	type->Variable = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof(*type->Variable));
 	memcpy(type->Variable, UnitTypeVar.Variable,
 		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
 
