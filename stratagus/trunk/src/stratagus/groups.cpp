@@ -73,7 +73,7 @@ void InitGroups(void)
 
 	for (i = 0; i < NUM_GROUPS; ++i) {
 		if (!Groups[i].Units) {
-			Groups[i].Units = malloc(MaxSelectable * sizeof(Unit*));
+			Groups[i].Units = (Unit**)malloc(MaxSelectable * sizeof(Unit*));
 		}
 	}
 }

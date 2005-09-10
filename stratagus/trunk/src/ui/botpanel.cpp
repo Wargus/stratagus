@@ -108,12 +108,12 @@ void InitButtons(void)
 */
 int AddButton(int pos, int level, const char* icon_ident,
 	enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
-	const void* allow, int key, const char* hint, const char* umask)
+	const char* allow, int key, const char* hint, const char* umask)
 {
 	char buf[2048];
 	ButtonAction* ba;
 
-	ba = malloc(sizeof(ButtonAction));
+	ba = (ButtonAction*)malloc(sizeof(ButtonAction));
 	Assert(ba);
 
 	ba->Pos = pos;
@@ -556,7 +556,7 @@ static ButtonAction* UpdateButtonPanelMultipleUnits(void)
 	ButtonAction* res; // result.
 	int allow;         // button is available for at least 1 unit.
 
-	res = calloc(TheUI.NumButtonButtons, sizeof (*res));
+	res = (ButtonAction*)calloc(TheUI.NumButtonButtons, sizeof (*res));
 	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
 		res[z].Pos = -1;
 	}
@@ -613,7 +613,7 @@ static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
 
 	Assert(unit);
 
-	res = calloc(TheUI.NumButtonButtons, sizeof (*res));
+	res = (ButtonAction*)calloc(TheUI.NumButtonButtons, sizeof (*res));
 	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
 		res[z].Pos = -1;
 	}

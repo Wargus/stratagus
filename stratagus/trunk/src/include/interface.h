@@ -296,7 +296,7 @@ extern void CleanButtons(void);
 	/// Make a new button
 extern int AddButton(int pos, int level, const char* IconIdent,
 	enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
-	const void* arg, int key, const char* hint, const char* umask);
+	const char* arg, int key, const char* hint, const char* umask);
 
 //
 // in mouse.c

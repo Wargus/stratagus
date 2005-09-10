@@ -55,18 +55,18 @@
 */
 static void ExtendTilesetTables(Tileset* tileset, int tiles)
 {
-	tileset->Table = realloc(tileset->Table, tiles * sizeof(*tileset->Table));
+	tileset->Table = (unsigned short*)realloc(tileset->Table, tiles * sizeof(*tileset->Table));
 	if (!tileset->Table) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
 	tileset->FlagsTable =
-		realloc(tileset->FlagsTable, tiles * sizeof(*tileset->FlagsTable));
+		(unsigned short*)realloc(tileset->FlagsTable, tiles * sizeof(*tileset->FlagsTable));
 	if (!tileset->FlagsTable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->Tiles = realloc(tileset->Tiles,
+	tileset->Tiles = (TileInfo*)realloc(tileset->Tiles,
 		tiles * sizeof(*tileset->Tiles));
 	if (!tileset->Tiles) {
 		fprintf(stderr, "out of memory.\n");
@@ -94,7 +94,7 @@ static int TilesetParseName(lua_State* l, Tileset* tileset)
 	}
 
 	// Can't find it, then we add another solid terrain type.
-	tileset->SolidTerrainTypes = realloc(tileset->SolidTerrainTypes,
+	tileset->SolidTerrainTypes = (SolidTerrainInfo*)realloc(tileset->SolidTerrainTypes,
 		++tileset->NumTerrainTypes * sizeof(*tileset->SolidTerrainTypes));
 	tileset->SolidTerrainTypes[i].TerrainName = ident;
 	
@@ -434,23 +434,23 @@ static void DefineTilesetParseSlot(lua_State* l, Tileset* tileset, int t)
 	int j;
 
 	index = 0;
-	tileset->Table = malloc(16 * sizeof(*tileset->Table));
+	tileset->Table = (unsigned short*)malloc(16 * sizeof(*tileset->Table));
 	if (!tileset->Table) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
 	tileset->FlagsTable =
-		malloc(16 * sizeof(*tileset->FlagsTable));
+		(unsigned short*)malloc(16 * sizeof(*tileset->FlagsTable));
 	if (!tileset->FlagsTable) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->Tiles = malloc(16 * sizeof(TileInfo));
+	tileset->Tiles = (TileInfo*)malloc(16 * sizeof(TileInfo));
 	if (!tileset->Tiles) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
 	}
-	tileset->SolidTerrainTypes = malloc(sizeof(SolidTerrainInfo));
+	tileset->SolidTerrainTypes = (SolidTerrainInfo*)malloc(sizeof(SolidTerrainInfo));
 	if (!tileset->SolidTerrainTypes) {
 		fprintf(stderr, "out of memory.\n");
 		ExitFatal(-1);
@@ -573,11 +573,11 @@ static int CclBuildTilesetTables(lua_State* l)
 	//  Calculate number of tiles in graphic tile
 	n = TheMap.Tileset.NumTiles;
 
-	TheMap.Tileset.MixedLookupTable = calloc(n, sizeof(int));
+	TheMap.Tileset.MixedLookupTable = (int*)calloc(n, sizeof(int));
 
 	//  Build the TileTypeTable
 	TheMap.Tileset.TileTypeTable =
-		calloc(n, sizeof(*TheMap.Tileset.TileTypeTable));
+		(unsigned char*)calloc(n, sizeof(*TheMap.Tileset.TileTypeTable));
 
 	table = TheMap.Tileset.Table;
 	for (i = 0; i < n; ++i) {

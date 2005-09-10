@@ -778,7 +778,7 @@ void InitMapFogOfWar(void)
 	AlphaFogG.NumFrames = 1;
 #endif
 
-	VisibleTable = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(*VisibleTable));
+	VisibleTable = (unsigned char*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(*VisibleTable));
 }
 
 /**
@@ -825,13 +825,13 @@ void InitVisionTable(void)
 	int repeat;
 
 	// Initialize Visiontable to large size, can't be more entries than tiles.
-	VisionTable[0] = malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[1] = malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
-	VisionTable[2] = malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[0] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[1] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	VisionTable[2] = (unsigned char*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
 
-	VisionLookup = malloc((MaxMapWidth + 2) * sizeof(int));
+	VisionLookup = (int*)malloc((MaxMapWidth + 2) * sizeof(int));
 #ifndef SQUAREVISION
-	visionlist = malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
+	visionlist = (int*)malloc(MaxMapWidth * MaxMapWidth * sizeof(int));
 	//*2 as diagonal distance is longer
 
 	maxsize = MaxMapWidth;

@@ -1168,7 +1168,7 @@ static void PasteFromClipboard(Menuitem* mi)
 {
 #if defined(USE_WIN32) || defined(_XLIB_H_)
 	int i;
-	char* clipboard;
+	unsigned char* clipboard;
 #ifdef USE_WIN32
 	HGLOBAL handle;
 #elif defined(_XLIB_H_)
@@ -1190,7 +1190,7 @@ static void PasteFromClipboard(Menuitem* mi)
 		CloseClipboard();
 		return;
 	}
-	clipboard = (char*)GlobalLock(handle);
+	clipboard = (unsigned char*)GlobalLock(handle);
 	if (!clipboard) {
 		CloseClipboard();
 		return;
