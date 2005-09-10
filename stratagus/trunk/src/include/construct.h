@@ -106,13 +106,15 @@
 
 struct _graphic_;
 
+typedef enum {
+	ConstructionFileConstruction,
+	ConstructionFileMain,
+} ConstructionFileType;
+
 	/// Construction frame
 typedef struct _construction_frame_ {
 	int Percent;  /// Percent complete
-	enum {
-		ConstructionFileConstruction,
-		ConstructionFileMain,
-	} File;  /// Graphic to use
+	ConstructionFileType File;  /// Graphic to use
 	int Frame;  /// Frame number
 	struct _construction_frame_* Next;  /// Next pointer
 } ConstructionFrame;

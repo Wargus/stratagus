@@ -10,7 +10,7 @@
 //
 /**@name edmap.c - Editor map functions. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer
+//      (c) Copyright 2002-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -263,7 +263,7 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 			fixed >>= 8;
 		}
 		if (type1 == type2) { // Oooh a solid tile.
-		  find_solid:
+find_solid:
 			//
 			// Find the solid tile
 			//
@@ -285,7 +285,7 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 	} else {
 		char* marks;
 
-		marks = alloca(TheMap.Tileset.NumTerrainTypes);
+		marks = (char*)malloc(TheMap.Tileset.NumTerrainTypes);
 		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		marks[type2] = type2;
@@ -334,6 +334,8 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 				quad |= type2 << 24;
 			}
 		}
+
+		free(marks);
 	}
 
 	//
@@ -366,11 +368,12 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 		//
 		// Find the best tile path.
 		//
-		marks = alloca(TheMap.Tileset.NumTerrainTypes);
+		marks = (char*)malloc(TheMap.Tileset.NumTerrainTypes);
 		memset(marks, 0, TheMap.Tileset.NumTerrainTypes);
 		marks[type1] = type1;
 		if (FindTilePath(type1, type2, 0, marks, &i) == INT_MAX) {
 			DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
+			free(marks);
 			goto find_solid;
 		}
 		if (type1 == TheMap.Tileset.Tiles[i].MixTerrain) {
@@ -379,6 +382,8 @@ static int TileFromQuad(unsigned fixed, unsigned quad)
 			type2 ^= type1;
 			type1 ^= type2;
 		}
+
+		free(marks);
 	}
 
 	base = i;

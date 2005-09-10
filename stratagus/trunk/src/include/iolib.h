@@ -88,7 +88,7 @@ typedef struct _CL_File_ {
 	int   cl_type;   /// type of CLFile
 	FILE* cl_plain;  /// standard file pointer
 #ifdef USE_ZLIB
-	gzFile* cl_gz;   /// gzip file pointer
+	gzFile cl_gz;    /// gzip file pointer
 #endif // !USE_ZLIB
 #ifdef USE_BZ2LIB
 	BZFILE* cl_bz;   /// bzip2 file pointer

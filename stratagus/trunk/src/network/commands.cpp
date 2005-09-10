@@ -162,7 +162,7 @@ static FullReplay* StartReplay(void)
 	time_t now;
 	char* s1;
 
-	replay = calloc(1, sizeof(FullReplay));
+	replay = (FullReplay*)calloc(1, sizeof(FullReplay));
 
 	time(&now);
 	s = ctime(&now);
@@ -469,7 +469,7 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 		return;
 	}
 
-	log = malloc(sizeof(LogEntry));
+	log = (LogEntry*)malloc(sizeof(LogEntry));
 
 	//
 	// Frame, unit, (type-ident only to be better readable).
@@ -525,7 +525,7 @@ static int CclLog(lua_State* l)
 
 	Assert(CurrentReplay);
 
-	log = calloc(1, sizeof(LogEntry));
+	log = (LogEntry*)calloc(1, sizeof(LogEntry));
 	log->UnitNumber = -1;
 	log->PosX = -1;
 	log->PosY = -1;
@@ -590,7 +590,7 @@ static int CclReplayLog(lua_State* l)
 
 	Assert(CurrentReplay == NULL);
 
-	replay = calloc(1, sizeof(FullReplay));
+	replay = (FullReplay*)calloc(1, sizeof(FullReplay));
 
 	lua_pushnil(l);
 	while (lua_next(l, 1) != 0) {
