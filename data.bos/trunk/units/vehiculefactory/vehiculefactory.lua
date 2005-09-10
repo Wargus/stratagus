@@ -35,23 +35,24 @@ DefineIcon({
 
 DefineConstruction("construction-vfac", {
 	Constructions = {
-		{Percent = 0, File = "main", Frame = 20},
-		{Percent = 10, File = "main", Frame = 21},
-		{Percent = 20, File = "main", Frame = 22},
-		{Percent = 30, File = "main", Frame = 23},
-		{Percent = 40, File = "main", Frame = 24},
-		{Percent = 50, File = "main", Frame = 25},
-		{Percent = 60, File = "main", Frame = 26},
-		{Percent = 70, File = "main", Frame = 27},
-		{Percent = 80, File = "main", Frame = 28},
-		{Percent = 90, File = "main", Frame = 0}
+		{Percent = 0, File = "main", Frame = 1},
+		{Percent = 10, File = "main", Frame = 2},
+		{Percent = 20, File = "main", Frame = 3},
+		{Percent = 30, File = "main", Frame = 4},
+		{Percent = 40, File = "main", Frame = 5},
+		{Percent = 50, File = "main", Frame = 6},
+		{Percent = 60, File = "main", Frame = 7},
+		{Percent = 70, File = "main", Frame = 8},
+		{Percent = 80, File = "main", Frame = 9},
+		{Percent = 90, File = "main", Frame = 9},
 	}
     })
 
 DefineAnimations("animations-vfac", {
-    Still = {"frame 0", "wait 3", "frame 1", "wait 3", "frame 2", "wait 3", 
-        "frame 3", "wait 3", "frame 4", "wait 3", "frame 5", "wait 3", 
-        "frame 6", "wait 3", "frame 7", "wait 3", "frame 8", "wait 3", },
+    Still = {"frame 15", "wait 5", "frame 16", "wait 5", "frame 17", "wait 5", "frame 18", "wait 5", "frame 19", 
+        "wait 100", "frame 18", "wait 5", "frame 17", "wait 5", "frame 16", "wait 5", "frame 15", "wait 300", },
+    Train = {"frame 10", "wait 5", "frame 11", "wait 5", "frame 12", "wait 5", "frame 13", "wait 5", "frame 14", 
+        "wait 15", },
     })
 
 MakeSound("vfac-selected", GetCurrentLuaPath().."/sfx_vfac.select.wav")
@@ -61,8 +62,8 @@ MakeSound("vfac-dead", GetCurrentLuaPath().."/sfx_vfac.die.wav")
 
 DefineUnitType("unit-vfac", {
 	Name = "Vehicle Factory",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {224, 160}},
-	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {224, 160}},
+	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 256}},
+	Shadow = {"file", GetCurrentLuaPath().."/vehicle_factory_s.png", "size", {256, 256}},
 	Animations = "animations-vfac", Icon = "icon-vfac",
 	Costs = {"time", 200, "titanium", 750, "crystal", 100},
 	RepairHp = 2, RepairCosts = {"titanium", 2}, Construction = "construction-vfac",
@@ -87,7 +88,7 @@ DefineAnimations("animations-elitebuild6", {
 
 DefineUnitType("build-dead-body6", {
 	Name = "FactoryCrater",
-	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {224, 160}},
+	Image = {"file", GetCurrentLuaPath().."/vehicle_factory.png", "size", {256, 256}},
 	Animations = "animations-elitebuild6", Icon = "icon-cancel",
 	Speed = 0, HitPoints = 999, DrawLevel = 10, TileSize = {7, 5},
 	BoxSize = {220, 156}, SightRange = 1, BasicDamage = 0,
