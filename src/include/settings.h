@@ -166,7 +166,7 @@ extern Credits  GameCredits;   /// Game credits
 	/// Show level intro
 extern void ShowIntro(const Intro* intro);
 	/// Show game credits
-extern void ShowCredits();
+extern void ShowCredits(Credits* credits);
 	/// Show picture
 extern void ShowPicture(struct _campaign_chapter_* chapter);
 	/// Show stats
