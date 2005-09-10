@@ -246,6 +246,7 @@ DefineMenuItem("pos", { 17, 195},
     "style", "square"},
   "menu", "menu-global-options")
 
+--[[
 DefineMenuItem("pos", { 192, 44}, "font", "game",
   "text", {"caption", "Shadow Fog", "align", "left"},
   "menu", "menu-global-options")
@@ -265,6 +266,7 @@ DefineMenuItem("pos", { 192, 91},
     "func", "global-options-fog-alpha-checkbox",
     "style", "round"},
   "menu", "menu-global-options")
+]]
 
 DefineMenuItem("pos", { 123, 309}, "font", "large",
   "button", {
