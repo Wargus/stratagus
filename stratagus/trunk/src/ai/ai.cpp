@@ -891,11 +891,11 @@ void CleanAi(void)
 				AiUnitType* aut;
 				AiUnit* aiunit;
 
-				for (aut = pai->Force[i].UnitTypes; aut; aut = temp) {
+				for (aut = pai->Force[i].UnitTypes; aut; aut = (AiUnitType*)temp) {
 					temp = aut->Next;
 					free(aut);
 				}
-				for (aiunit = pai->Force[i].Units; aiunit; aiunit = temp) {
+				for (aiunit = pai->Force[i].Units; aiunit; aiunit = (AiUnit*)temp) {
 					temp = aiunit->Next;
 					free(aiunit);
 				}
@@ -916,7 +916,7 @@ void CleanAi(void)
 			//
 			//  Free UnitTypeBuilt
 			//
-			for (queue = pai->UnitTypeBuilt; queue; queue = temp) {
+			for (queue = pai->UnitTypeBuilt; queue; queue = (AiBuildQueue*)temp) {
 				temp = queue->Next;
 				free(queue);
 			}
@@ -938,7 +938,7 @@ void CleanAi(void)
 	//
 	//  Free AiTypes.
 	//
-	for (aitype = AiTypes; aitype; aitype = temp) {
+	for (aitype = AiTypes; aitype; aitype = (AiType*)temp) {
 		free(aitype->Name);
 		free(aitype->Race);
 		free(aitype->Class);

@@ -170,33 +170,29 @@ enum _key_codes_ {
 };
 
 	/// Key modifier
-enum _key_modifiers_ {
-	ModifierShift = 1,        /// any shift key pressed
-	ModifierControl = 2,      /// any control key pressed
-	ModifierAlt = 4,          /// any alt key pressed
-	ModifierSuper = 8,        /// super key (reserved for WM)
-	ModifierHyper = 16,       /// any hyper key pressed
-	ModifierDoublePress = 32, /// key double pressed
-};
+#define ModifierShift 1        /// any shift key pressed
+#define ModifierControl 2      /// any control key pressed
+#define ModifierAlt 4          /// any alt key pressed
+#define ModifierSuper 8        /// super key (reserved for WM)
+#define ModifierHyper 16       /// any hyper key pressed
+#define ModifierDoublePress 32 /// key double pressed
 
 #define MouseDoubleShift 8   /// shift for double click button
 #define MouseDragShift   16  /// shift for drag button
 #define MouseHoldShift   24  /// shift for hold button
 
 	/// pressed mouse button flags
-enum _mouse_buttons_ {
-	NoButton = 0,      /// No button
-	LeftButton = 2,    /// Left button on mouse
-	MiddleButton = 4,  /// Middle button on mouse
-	RightButton = 8,   /// Right button on mouse
+#define NoButton 0      /// No button
+#define LeftButton 2    /// Left button on mouse
+#define MiddleButton 4  /// Middle button on mouse
+#define RightButton 8   /// Right button on mouse
 
-	UpButton = 16,    /// Scroll up button on mouse
-	DownButton = 32,  /// Scroll down button on mouse
+#define UpButton 16    /// Scroll up button on mouse
+#define DownButton 32  /// Scroll down button on mouse
 
-	LeftAndMiddleButton = LeftButton | MiddleButton,  /// Left + Middle button on mouse
-	LeftAndRightButton = LeftButton | RightButton,    /// Left + Right button on mouse
-	MiddleAndRightButton= MiddleButton | RightButton, /// Middle + Right button on mouse
-};
+#define LeftAndMiddleButton  (LeftButton | MiddleButton)  /// Left + Middle button on mouse
+#define LeftAndRightButton   (LeftButton | RightButton)   /// Left + Right button on mouse
+#define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
 
 	/// Where is our cursor ?
 enum _cursor_on_ {
@@ -215,17 +211,15 @@ enum _cursor_on_ {
 };
 
 	/// Are We Scrolling With the Keyboard ?
-enum _scroll_state_ {
-	ScrollNone = 0,        /// not scrolling
-	ScrollUp = 1,          /// scroll up only
-	ScrollDown = 2,        /// scroll down only
-	ScrollLeft = 4,        /// scroll left only
-	ScrollRight = 8,       /// scroll right only
-	ScrollLeftUp = 5,      /// scroll left + up
-	ScrollLeftDown = 6,    /// scroll left + down
-	ScrollRightUp = 9,     /// scroll right + up
-	ScrollRightDown = 10,  /// scroll right + down
-};
+#define ScrollNone 0        /// not scrolling
+#define ScrollUp 1          /// scroll up only
+#define ScrollDown 2        /// scroll down only
+#define ScrollLeft 4        /// scroll left only
+#define ScrollRight 8       /// scroll right only
+#define ScrollLeftUp 5      /// scroll left + up
+#define ScrollLeftDown 6    /// scroll left + down
+#define ScrollRightUp 9     /// scroll right + up
+#define ScrollRightDown 10  /// scroll right + down
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -245,15 +239,15 @@ extern int GodMode;
 extern char BigMapMode;
 
 	/// pressed mouse buttons (normal,double,dragged,long)
-extern enum _mouse_buttons_ MouseButtons;
+extern int MouseButtons;
 	/// current active modifiers
-extern enum _key_modifiers_ KeyModifiers;
+extern int KeyModifiers;
 	/// current interface state
 extern enum _iface_state_ InterfaceState;
 	/// current scroll state of keyboard
-extern enum _scroll_state_ KeyScrollState;
+extern int KeyScrollState;
 	/// current scroll state of mouse
-extern enum _scroll_state_ MouseScrollState;
+extern int MouseScrollState;
 	/// current key state
 extern enum _key_state_ KeyState;
 	/// pointer to unit under the cursor

@@ -389,7 +389,7 @@ typedef struct _ui_ {
 
 	// Pie Menu
 	Graphic* PieMenuBackgroundG;        /// Optional background image for the piemenu
-	enum _mouse_buttons_ PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
+	int PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
 	int PieX[8];                        /// X position of the pies
 	int PieY[8];                        /// Y position of the pies
 

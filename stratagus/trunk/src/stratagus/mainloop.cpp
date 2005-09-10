@@ -80,10 +80,10 @@
 //----------------------------------------------------------------------------
 
 	/// variable set when we are scrolling via keyboard
-enum _scroll_state_ KeyScrollState = ScrollNone;
+int KeyScrollState = ScrollNone;
 
 	/// variable set when we are scrolling via mouse
-enum _scroll_state_ MouseScrollState = ScrollNone;
+int MouseScrollState = ScrollNone;
 
 EventCallback* Callbacks;    /// Current callbacks
 EventCallback GameCallbacks; /// Game callbacks
@@ -102,7 +102,7 @@ EventCallback MenuCallbacks; /// Menu callbacks
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
 */
-void DoScrollArea(enum _scroll_state_ state, int fast)
+void DoScrollArea(int state, int fast)
 {
 	Viewport* vp;
 	int stepx;
