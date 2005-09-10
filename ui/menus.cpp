@@ -408,7 +408,7 @@ int nKeyStrokeHelps;                     /// Number of keystroke help lines
 char **KeyStrokeHelps;                   /// Array of keystroke help lines
 
 /// FIXME: -> ccl...
-static unsigned char *mgptsoptions[] = {
+static char *mgptsoptions[] = {
 	"Available",
 	"Computer",
 	"Closed",
