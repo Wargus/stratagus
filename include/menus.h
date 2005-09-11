@@ -120,6 +120,7 @@ struct _button_style_;
 struct _map_info_;
 struct _world_map_;
 struct _graphic_;
+struct _menuitem_;
 
 /*----------------------------------------------------------------------------
 --  Menus
@@ -143,7 +144,6 @@ typedef void (*MenuitemCheckboxActionType)(struct _menuitem_*);
 **  Menuitem definition.
 **  @todo docu.
 */
-struct _menuitem_;
 typedef struct _menuitem_text_ {
 	StringDesc* text;
 	TextAlignment Align;
