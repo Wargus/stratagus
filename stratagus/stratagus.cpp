@@ -767,6 +767,9 @@ int main(int argc, char** argv)
 #ifdef USE_VORBIS
 		"VORBIS "
 #endif
+#ifdef USE_THEORA
+		"THEORA "
+#endif
 #ifdef USE_MAD
 		"MP3 "
 #endif
