@@ -452,7 +452,7 @@ static void getopt_err(char* argv0, char* str, char opt)
 	}
 }
 
-int getopt(int argc, char** argv, char* opts)
+int getopt(int argc, char* const* argv, const char* opts)
 {
 	static int sp = 1;
 	register int c;

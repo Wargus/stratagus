@@ -1675,7 +1675,7 @@ static void HandleTransportRequests(AiTransportRequest* aitr)
 **  @param unit  Point to unit.
 **  @param what  Pointer to unit-type.
 */
-void AiNeedMoreSupply(Unit* unit, const UnitType* what __attribute__((unused)))
+void AiNeedMoreSupply(const Unit* unit, const UnitType* what __attribute__((unused)))
 {
 	Assert(unit->Player->Type != PlayerPerson);
 

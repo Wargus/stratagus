@@ -55,6 +55,20 @@
 
 #define MAX_LOC_IP 10
 
+#ifdef _MSC_VER
+typedef const char* setsockopttype;
+typedef char* recvfrombuftype;
+typedef char* recvbuftype;
+typedef const char* sendtobuftype;
+typedef const char* sendbuftype;
+#else
+typedef const void* setsockopttype;
+typedef void* recvfrombuftype;
+typedef void* recvbuftype;
+typedef const void* sendtobuftype;
+typedef const void* sendbuftype;
+#endif
+
 //----------------------------------------------------------------------------
 //  Variables
 //----------------------------------------------------------------------------
@@ -431,7 +445,7 @@ Socket NetOpenTCP(int port)
 		sock_addr.sin_port = htons(port);
 
 		opt = 1;
-		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*)&opt, sizeof(opt));
+		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
 
 		if (bind(sockfd,(struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
@@ -461,9 +475,9 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 	int opt;
 
 	opt = 1;
-	setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void*)&opt, sizeof(opt));
+	setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (setsockopttype)&opt, sizeof(opt));
 	opt = 0;
-	setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (void*)&opt, sizeof(opt));
+	setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (setsockopttype)&opt, sizeof(opt));
 #endif
 
 	if (addr == INADDR_NONE) {
@@ -598,7 +612,7 @@ int NetRecvUDP(Socket sockfd, void* buf, int len)
 	struct sockaddr_in sock_addr;
 
 	n = sizeof(struct sockaddr_in);
-	if ((l = recvfrom(sockfd, buf, len, 0, (struct sockaddr*)&sock_addr, &n)) < 0) {
+	if ((l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr*)&sock_addr, &n)) < 0) {
 		PrintFunction();
 		fprintf(stdout, "Could not read from UDP socket\n");
 		return -1;
@@ -627,7 +641,7 @@ int NetRecvTCP(Socket sockfd, void* buf, int len)
 	int ret;
 
 	NetLastSocket = sockfd;
-	ret = recv(sockfd, buf, len, 0);
+	ret = recv(sockfd, (recvbuftype)buf, len, 0);
 	if (ret > 0) {
 		return ret;
 	}
@@ -668,7 +682,7 @@ int NetSendUDP(Socket sockfd,unsigned long host, int port,
 
 	// if (MyRand() % 7) { return 0; }
 
-	return sendto(sockfd, buf, len, 0, (struct sockaddr*)&sock_addr, n);
+	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr*)&sock_addr, n);
 }
 
 /**
@@ -682,7 +696,7 @@ int NetSendUDP(Socket sockfd,unsigned long host, int port,
 */
 int NetSendTCP(Socket sockfd, const void* buf, int len)
 {
-	return send(sockfd, buf, len, 0);
+	return send(sockfd, (sendbuftype)buf, len, 0);
 }
 
 /**
@@ -723,10 +737,10 @@ SocketSet* NetAllocSocketSet(void)
 {
 	SocketSet* set;
 
-	set = calloc(1, sizeof(*set));
+	set = (SocketSet*)calloc(1, sizeof(*set));
 	set->MaxSockets = 5;
-	set->Sockets = calloc(set->MaxSockets, sizeof(*set->Sockets));
-	set->SocketReady = calloc(set->MaxSockets, sizeof(*set->SocketReady));
+	set->Sockets = (Socket*)calloc(set->MaxSockets, sizeof(*set->Sockets));
+	set->SocketReady = (int*)calloc(set->MaxSockets, sizeof(*set->SocketReady));
 
 	return set;
 }
@@ -741,9 +755,9 @@ void NetAddSocket(SocketSet* set, Socket socket)
 {
 	if (set->NumSockets == set->MaxSockets) {
 		set->MaxSockets += 5;
-		set->Sockets = realloc(set->Sockets,
+		set->Sockets = (Socket*)realloc(set->Sockets,
 			set->MaxSockets * sizeof(*set->Sockets));
-		set->SocketReady = realloc(set->SocketReady,
+		set->SocketReady = (int*)realloc(set->SocketReady,
 			set->MaxSockets * sizeof(*set->SocketReady));
 	}
 	set->Sockets[set->NumSockets] = socket;

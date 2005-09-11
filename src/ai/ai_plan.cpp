@@ -242,7 +242,8 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 		OnWater,
 		OnLand,
 		OnIsle
-	} state;
+	};
+	unsigned char state;
 	unsigned char* m;
 
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
