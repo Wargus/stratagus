@@ -39,6 +39,11 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include <string>
+#include <vector>
+#include <map>
+
 #include "map.h"
 #include "video.h"
 #include "icons.h"
@@ -47,20 +52,14 @@
 #include "ui.h"
 #include "menus.h"
 
-#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static Icon** Icons;                         ///< Table of all icons.
-static int NumIcons;                         ///< Number of icons in Icons.
+static std::vector<Icon *> AllIcons;          /// Vector of all icons.
+static std::map<std::string, Icon *> Icons;   /// Map of ident to icon.
 
-#ifdef DOXYGEN // no real code, only for docs
-static Icon* IconHash[257];                  /// lookup table for icon names
-#else
-static hashtable(Icon*, 257) IconHash;       /// lookup table for icon names
-#endif
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -69,25 +68,18 @@ static hashtable(Icon*, 257) IconHash;       /// lookup table for icon names
 /**
 **  Add an icon definition.
 **
-**  @bug Redefining an icon isn't supported.
-**
 **  @param ident    Icon identifier.
 **  @param width    Icon width.
 **  @param height   Icon height.
 **  @param frame    Frame number in graphic.
 **  @param file     Graphic file containing the icons.
 */
-static void AddIcon(const char* ident, int frame, int width,
-	int height, const char* file)
+static void AddIcon(const char *ident, int frame, int width,
+	int height, const char *file)
 {
-	Icon** ptr;
-	Icon* icon;
-
-	// Look up icon
-	ptr = (Icon**)hash_find(IconHash, ident);
-	if (ptr && *ptr) {
+	Icon *icon = Icons[ident];
+	if (icon) {
 		// Redefine icon
-		icon = *ptr;
 		if (file) {
 			if (icon->Sprite) {
 				FreeGraphic(icon->Sprite);
@@ -96,17 +88,18 @@ static void AddIcon(const char* ident, int frame, int width,
 		}
 		icon->Frame = frame;
 	} else {
-		icon = (Icon*)calloc(1, sizeof(Icon));
-		icon->Ident = strdup(ident);
+		icon = new Icon;
+		icon->Ident = new char[strlen(ident) + 1];
+		strcpy(icon->Ident, ident);
 		if (file) {
 			icon->Sprite = NewGraphic(file, width, height);
+		} else {
+			icon->Sprite = NULL;
 		}
 		icon->Frame = frame;
 
-		*(Icon**)hash_add(IconHash, ident) = icon;
-
-		Icons = (Icon**)realloc(Icons, sizeof(Icon*) * (NumIcons + 1));
-		Icons[NumIcons++] = icon;
+		Icons[ident] = icon;
+		AllIcons.push_back(icon);
 	}
 }
 
@@ -124,13 +117,8 @@ void InitIcons(void)
 */
 void LoadIcons(void)
 {
-	int i;
-
-	//  Load all icon files.
-	for (i = 0; i < NumIcons; ++i) {
-		Icon* icon;
-
-		icon = Icons[i];
+	for (std::vector<Icon *>::size_type i = 0; i < AllIcons.size(); ++i) {
+		Icon *icon = AllIcons[i];
 		LoadGraphic(icon->Sprite);
 		ShowLoadProgress("Icons %s", icon->Sprite->File);
 		if (icon->Frame >= icon->Sprite->NumFrames) {
@@ -146,21 +134,16 @@ void LoadIcons(void)
 */
 void CleanIcons(void)
 {
-	int i;
-
-	if (Icons) {
-		for (i = 0; i < NumIcons; ++i) {
-			hash_del(IconHash, Icons[i]->Ident);
-
-			free(Icons[i]->Ident);
-			FreeGraphic(Icons[i]->Sprite);
-			free(Icons[i]);
-		}
-
-		free(Icons);
-		Icons = NULL;
-		NumIcons = 0;
+	while (AllIcons.size()) {
+		Icon *icon = AllIcons.back();
+		AllIcons.pop_back();
+		delete[] icon->Ident;
+		FreeGraphic(icon->Sprite);
+		delete icon;
 	}
+
+	AllIcons.clear();
+	Icons.clear();
 }
 
 /**
@@ -168,20 +151,15 @@ void CleanIcons(void)
 **
 **  @param ident  The icon identifier.
 **
-**  @return       Icon pointer or NoIcon == NULL if not found.
+**  @return       Icon pointer or NULL if not found.
 */
-Icon* IconByIdent(const char* ident)
+Icon *IconByIdent(const char *ident)
 {
-	Icon* const* icon;
-
-	icon = (Icon* const*)hash_find(IconHash, ident);
-
-	if (icon) {
-		return *icon;
+	Icon *icon = Icons[ident];
+	if (!icon) {
+		DebugPrint("Icon %s not found\n" _C_ ident);
 	}
-
-	DebugPrint("Icon %s not found\n" _C_ ident);
-	return NoIcon;
+	return icon;
 }
 
 /**
@@ -192,7 +170,7 @@ Icon* IconByIdent(const char* ident)
 **  @param x       X display pixel position
 **  @param y       Y display pixel position
 */
-void DrawIcon(const Player* player, Icon* icon, int x, int y)
+void DrawIcon(const Player *player, Icon *icon, int x, int y)
 {
 	VideoDrawPlayerColorClip(icon->Sprite, player->Index, icon->Frame, x, y);
 }
@@ -208,8 +186,8 @@ void DrawIcon(const Player* player, Icon* icon, int x, int y)
 **  @param y       Y display pixel position
 **  @param text    Optional text to display
 */
-void DrawUnitIcon(const Player* player, ButtonStyle* style, Icon* icon,
-	unsigned flags, int x, int y, const char* text)
+void DrawUnitIcon(const Player *player, ButtonStyle *style, Icon *icon,
+	unsigned flags, int x, int y, const char *text)
 {
 	ButtonStyle s;
 
@@ -231,11 +209,11 @@ void DrawUnitIcon(const Player* player, ButtonStyle* style, Icon* icon,
 **
 **  @param l  Lua state.
 */
-static int CclDefineIcon(lua_State* l)
+static int CclDefineIcon(lua_State *l)
 {
-	const char* value;
-	const char* ident;
-	const char* filename;
+	const char *value;
+	const char *ident;
+	const char *filename;
 	int width;
 	int height;
 	int frame;
