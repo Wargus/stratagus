@@ -489,9 +489,9 @@ enum _directions_ {
 	/// A linked list element.
 typedef struct _unit_list_item_ UnitListItem;
 struct _unit_list_item_ {
-	Unit*         Unit; /// Points to the unit it links
-	UnitListItem* Prev; /// Previous item.
-	UnitListItem* Next; /// Next item.
+	struct _unit_* Unit; /// Points to the unit it links
+	UnitListItem* Prev;  /// Previous item.
+	UnitListItem* Next;  /// Next item.
 };
 
 #define NextDirection 32        /// Next direction N->NE->E...

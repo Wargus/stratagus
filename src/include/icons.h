@@ -154,8 +154,8 @@ typedef struct _icon_ {
 
 	/// Icon reference (used in config tables)
 typedef struct _icon_config_ {
-	char* Name;  /// config icon name
-	Icon* Icon;  /// icon pointer to use to run time
+	char* Name;          /// config icon name
+	struct _icon_* Icon; /// icon pointer to use to run time
 } IconConfig;
 
 /*----------------------------------------------------------------------------

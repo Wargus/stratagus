@@ -720,11 +720,6 @@ typedef enum {
 	RestrictTiles,
 } RestrictTypeType;
 
-/**
-**  Typedef of base structure of unit-type
-*/
-typedef struct _unit_type_ UnitType;
-
 typedef struct _building_restrictions_ BuildRestriction;
 
 typedef enum {
@@ -743,11 +738,11 @@ struct _building_restrictions_ {
 			int OffsetX;         /// offset from the main building to place this
 			int OffsetY;         /// offset from the main building to place this
 			char* ParentName;    /// building that is unit is an addon too.
-			UnitType* Parent;    /// building that is unit is an addon too.
+			struct _unit_type_* Parent;    /// building that is unit is an addon too.
 		} AddOn;
 
 		struct {
-			UnitType* Parent;
+			struct _unit_type_* Parent;
 			char* ParentName;    /// building that is unit is an addon too.
 			int ReplaceOnDie;    /// recreate the parent on destruction
 			int ReplaceOnBuild;  /// remove the parent, or just build over it.
@@ -758,7 +753,7 @@ struct _building_restrictions_ {
 			DistanceTypeType DistanceType;
 			int Except;          /// all except this building type.
 			char* RestrictTypeName; 
-			UnitType* RestrictType; 
+			struct _unit_type_* RestrictType; 
 		} Distance;
 
 		int Direction;           /// Direction mask up,down,left,right,up-left...
@@ -776,7 +771,7 @@ struct _building_restrictions_ {
 ** Base structure of unit-type
 ** @todo n0body: AutoBuildRate not implemented.
 */
-struct _unit_type_ {
+typedef struct _unit_type_ {
 	char* Ident;                    /// Identifier
 	char* Name;                     /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
@@ -810,7 +805,7 @@ struct _unit_type_ {
 	MissileConfig Explosion;        /// Missile for unit explosion
 
 	char* CorpseName;               /// Corpse type name
-	UnitType* CorpseType;           /// Corpse unit-type
+	struct _unit_type_* CorpseType; /// Corpse unit-type
 	int CorpseScript;               /// Corpse script start
 
 	// this is taken from the UDTA section
@@ -911,7 +906,7 @@ struct _unit_type_ {
 
 	struct _graphic_* Sprite;                /// Sprite images
 	struct _graphic_* ShadowSprite;          /// Shadow sprite image
-};
+} UnitType;
 
 	/// @todo ARI: should be dynamic (lua..).
 	/// How many unit-types are currently supported
