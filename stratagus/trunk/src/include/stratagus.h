@@ -70,7 +70,9 @@
 
 #endif  // } __GNUC__
 
+#ifndef __GNUC__
 #define __attribute__(args)                 /// Does nothing for non GNU CC
+#endif
 
 #ifdef _MSC_VER
 
