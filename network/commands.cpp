@@ -1361,7 +1361,7 @@ void SendCommandResearch(Unit* unit, Upgrade* what, int flush)
 		CommandResearch(unit, what, flush);
 	} else {
 		NetworkSendCommand(MessageCommandResearch, unit,
-			what-Upgrades, 0, NoUnitP, NULL, flush);
+			what->ID, 0, NoUnitP, NULL, flush);
 	}
 }
 
@@ -1669,8 +1669,8 @@ void ParseCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResearch:
 			CommandLog("research", unit, status, -1, -1, NoUnitP,
-				Upgrades[x].Ident, -1);
-			CommandResearch(unit, Upgrades + x, status);
+				AllUpgrades[x]->Ident, -1);
+			CommandResearch(unit, AllUpgrades[x], status);
 			break;
 		case MessageCommandCancelResearch:
 			CommandLog("cancel-research", unit, FlushCommands, -1, -1, NoUnitP,

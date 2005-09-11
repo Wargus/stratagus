@@ -316,7 +316,7 @@ static void AiCheckUnits(void)
 	n = AiPlayer->ResearchRequestsCount;
 	for (i = 0; i < n; ++i) {
 		if (UpgradeIdAllowed(AiPlayer->Player,
-				AiPlayer->ResearchRequests[i] - Upgrades) == 'A') {
+				AiPlayer->ResearchRequests[i]->ID) == 'A') {
 			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
 		}
 	}

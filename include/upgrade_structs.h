@@ -11,7 +11,7 @@
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
 //      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and
-// Jimmy Salmon
+//                                 Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@
 
 #include "stratagus.h"
 #include "icons.h"
+
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -133,9 +135,10 @@ typedef struct _unit_stats_ {
 */
 typedef struct _upgrade_ {
 	char*       Ident;                      /// identifier
+	int         ID;                         /// numerical id
 	int         Costs[MaxCosts];            /// costs for the upgrade
 		// TODO: not used by buttons
-	IconConfig Icon;                        /// icon to display to the user
+	IconConfig  Icon;                       /// icon to display to the user
 } Upgrade;
 
 /*----------------------------------------------------------------------------
@@ -201,7 +204,7 @@ typedef struct _upgrade_timers_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern Upgrade Upgrades[UpgradeMax];        /// the main user usable upgrades
+extern std::vector<Upgrade *> AllUpgrades;  /// the main user usable upgrades
 
 //@}
 

@@ -491,4 +491,4 @@ int getopt(int argc, char* const* argv, const char* opts)
 	return c;
 }
 
-#endif /* _MSVC */
+#endif /* _MSC_VER */
