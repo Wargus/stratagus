@@ -2792,7 +2792,7 @@ static int CclDefineMenu(lua_State* l)
 			value = LuaToString(l, j + 1);
 			func = (void**)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
-				item.InitFunc = (void*)*func;
+				item.InitFunc = (InitFuncType)*func;
 			} else {
 				LuaError(l, "Can't find function: %s" _C_ value);
 			}
@@ -2800,7 +2800,7 @@ static int CclDefineMenu(lua_State* l)
 			value = LuaToString(l, j + 1);
 			func = (void**)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
-				item.ExitFunc = (void*)*func;
+				item.ExitFunc = (ExitFuncType)*func;
 			} else {
 				LuaError(l, "Can't find function: %s" _C_ value);
 			}
@@ -2808,7 +2808,7 @@ static int CclDefineMenu(lua_State* l)
 			value = LuaToString(l, j + 1);
 			func = (void**)hash_find(MenuFuncHash, value);
 			if (func != NULL) {
-				item.NetAction = (void*)*func;
+				item.NetAction = (NetActionType)*func;
 			} else {
 				LuaError(l, "Can't find function: %s" _C_ value);
 			}
@@ -2958,7 +2958,7 @@ static void ParseMenuItemText(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Text.action = (void*)*func;
+					item->D.Text.action = (MenuitemTextActionType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3073,7 +3073,7 @@ static void ParseMenuItemButton(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Button.Handler = (void*)*func;
+					item->D.Button.Handler = (MenuitemButtonHandlerType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3169,7 +3169,7 @@ static void ParseMenuItemPulldown(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Pulldown.action = (void*)*func;
+					item->D.Pulldown.action = (MenuitemPulldownActionType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3253,7 +3253,7 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Listbox.action = (void*)*func;
+					item->D.Listbox.action = (MenuitemListboxActionType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3275,7 +3275,7 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Listbox.handler = (void*)*func;
+					item->D.Listbox.handler = (MenuitemListboxHandlerType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3295,7 +3295,7 @@ static void ParseMenuItemListbox(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Listbox.retrieveopt = (void*)(*func);
+					item->D.Listbox.retrieveopt = (MenuitemListboxRetrieveType)(*func);
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3407,7 +3407,7 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.VSlider.action = (void*)*func;
+					item->D.VSlider.action = (MenuitemVSliderActionType)*func;
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}
@@ -3429,7 +3429,7 @@ static void ParseMenuItemVSlider(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.VSlider.handler = (void*)*func;
+					item->D.VSlider.handler = (MenuitemVSliderHandlerType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3533,7 +3533,7 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.HSlider.action = (void*)*func;
+					item->D.HSlider.action = (MenuitemHSliderActionType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3555,7 +3555,7 @@ static void ParseMenuItemHSlider(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.HSlider.handler = (void*)*func;
+					item->D.HSlider.handler = (MenuitemHSliderHandlerType)*func;
 				} else {
 					LuaError(l, "Can't find function: %s" _C_ value);
 				}
@@ -3602,7 +3602,7 @@ static void ParseMenuItemDrawFunc(lua_State* l, Menuitem* item, int j)
 		value = lua_tostring(l, j + 1);
 		func = (void**)hash_find(MenuFuncHash, value);
 		if (func != NULL) {
-			item->D.DrawFunc.draw = (void*)*func;
+			item->D.DrawFunc.draw = (MenuitemDrawfuncDrawType)*func;
 		} else {
 			LuaError(l, "Can't find function: %s" _C_ value);
 		}
@@ -3654,7 +3654,7 @@ static void ParseMenuItemInput(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Input.action = (void*)*func;
+					item->D.Input.action = (MenuitemInputActionType)*func;
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}
@@ -3735,7 +3735,7 @@ static void ParseMenuItemCheckbox(lua_State* l, Menuitem* item, int j)
 				value = lua_tostring(l, -1);
 				func = (void**)hash_find(MenuFuncHash, value);
 				if (func != NULL) {
-					item->D.Checkbox.Action = (void*)*func;
+					item->D.Checkbox.Action = (MenuitemCheckboxActionType)*func;
 				} else {
 					lua_pushfstring(l, "Can't find function: %s", value);
 				}

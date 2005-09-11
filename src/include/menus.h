@@ -125,6 +125,20 @@ struct _graphic_;
 --  Menus
 ----------------------------------------------------------------------------*/
 
+typedef void (*MenuitemTextActionType)(struct _menuitem_*);
+typedef void (*MenuitemButtonHandlerType)(void);
+typedef void (*MenuitemPulldownActionType)(struct _menuitem_*, int);
+typedef void (*MenuitemListboxActionType)(struct _menuitem_*, int);
+typedef void* (*MenuitemListboxRetrieveType)(struct _menuitem_*, int);
+typedef void (*MenuitemListboxHandlerType)(void);
+typedef void (*MenuitemVSliderActionType)(struct _menuitem_*);
+typedef void (*MenuitemVSliderHandlerType)(void);
+typedef void (*MenuitemHSliderActionType)(struct _menuitem_*);
+typedef void (*MenuitemHSliderHandlerType)(void);
+typedef void (*MenuitemDrawfuncDrawType)(struct _menuitem_*);
+typedef void (*MenuitemInputActionType)(struct _menuitem_*, int);
+typedef void (*MenuitemCheckboxActionType)(struct _menuitem_*);
+
 /**
 **  Menuitem definition.
 **  @todo docu.
@@ -135,12 +149,12 @@ typedef struct _menuitem_text_ {
 	TextAlignment Align;
 	char* normalcolor;
 	char* reversecolor;
-	void (*action)(struct _menuitem_*);
+	MenuitemTextActionType action;
 } MenuitemText;
 typedef struct _menuitem_button_ {
 	char* Text;
 	struct _button_style_* Style;
-	void (*Handler)(void);
+	MenuitemButtonHandlerType Handler;
 	unsigned HotKey;
 } MenuitemButton;
 typedef struct _menuitem_pulldown_ {
@@ -148,7 +162,7 @@ typedef struct _menuitem_pulldown_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_*, int);
+	MenuitemPulldownActionType action;
 	int noptions;
 	int defopt;
 	int curopt;
@@ -159,7 +173,7 @@ typedef struct _menuitem_listbox_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_*, int);
+	MenuitemListboxActionType action;
 	int noptions;
 	int defopt;
 	int curopt;
@@ -167,34 +181,34 @@ typedef struct _menuitem_listbox_ {
 	int nlines;
 	int startline;
 	int dohandler;
-	void* (*retrieveopt)(struct _menuitem_*, int);
-	void (*handler)(void);  /* for return key */
+	MenuitemListboxRetrieveType retrieveopt;
+	MenuitemListboxHandlerType handler;  /* for return key */
 } MenuitemListbox;
 typedef struct _menuitem_vslider_ {
 	unsigned cflags;
 	int xsize;  /// x-size of slider, not including buttons
 	int ysize;  /// y-size of slider, not including buttons
-	void (*action)(struct _menuitem_*);
+	MenuitemVSliderActionType action;
 	int defper;
 	int percent;  /// percent of the way to bottom (0 to 100)
 	int cursel;   /// used in mouse-over state
 	int style;
-	void (*handler)(void); /// for return key
+	MenuitemVSliderHandlerType handler; /// for return key
 } MenuitemVslider;
 typedef struct _menuitem_hslider_ {
 	unsigned cflags;
 	int xsize;  /// x-size of slider, not including buttons
 	int ysize;  /// y-size of slider, not including buttons
-	void (*action)(struct _menuitem_*);
+	MenuitemHSliderActionType action;
 	int defper;
 	int percent;  /// percent of the way to right (0 to 100)
 	int curper;   /// used in mouse-move state
 	int cursel;   /// used in mouse-over state
 	int style;
-	void (*handler)(void); /// for return key
+	MenuitemHSliderHandlerType handler; /// for return key
 } MenuitemHslider;
 typedef struct _menuitem_drawfunc_ {
-	void (*draw)(struct _menuitem_*);
+	MenuitemDrawfuncDrawType draw;
 } MenuitemDrawfunc;
 typedef struct _menuitem_input_ {
 	char *buffer;
@@ -202,7 +216,7 @@ typedef struct _menuitem_input_ {
 	int xsize;
 	int ysize;
 	MenuButtonId button;
-	void (*action)(struct _menuitem_*, int);  /// for key
+	MenuitemInputActionType action;  /// for key
 	int nch;
 	int maxch;
 	char* normalcolor;
@@ -212,7 +226,7 @@ typedef struct _menuitem_checkbox_ {
 	char* Text;
 	unsigned int Checked : 1;
 	struct _checkbox_style_* Style;
-	void (*Action)(struct _menuitem_*);
+	MenuitemCheckboxActionType Action;
 } MenuitemCheckbox;
 
 struct _menu_;
@@ -258,6 +272,10 @@ typedef struct _menuitem_ {
 #define MI_STYLE_SC_VSLIDER 1
 #define MI_STYLE_SC_HSLIDER 2
 
+typedef void (*InitFuncType)(struct _menu_*);
+typedef void (*ExitFuncType)(struct _menu_*);
+typedef void (*NetActionType)(void);
+
 /**
 **  Menu definition.
 */
@@ -272,9 +290,9 @@ typedef struct _menu_ {
 	int       DefSel;     /// initial selected item number (or -1)
 	int       NumItems;   /// number of items to follow
 	Menuitem* Items;      /// buttons, etc
-	void (*InitFunc)(struct _menu_*);  /// constructor
-	void (*ExitFunc)(struct _menu_*);  /// destructor
-	void (*NetAction)(void);   /// network action callback
+	InitFuncType InitFunc;  /// constructor
+	ExitFuncType ExitFunc;  /// destructor
+	NetActionType NetAction;/// network action callback
 } Menu;
 
 /*----------------------------------------------------------------------------
