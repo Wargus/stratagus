@@ -390,7 +390,7 @@ static int CclDefineDependency(lua_State* l)
 **
 **  @param l  Lua state.
 */
-static int CclGetDependency(lua_State* l __attribute__((unused)))
+static int CclGetDependency(lua_State* l)
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 
@@ -404,7 +404,7 @@ static int CclGetDependency(lua_State* l __attribute__((unused)))
 **
 **  @param l  Lua state.
 */
-static int CclCheckDependency(lua_State* l __attribute__((unused)))
+static int CclCheckDependency(lua_State* l)
 {
 	DebugPrint("FIXME: write this %p\n" _C_ l);
 

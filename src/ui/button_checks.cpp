@@ -59,8 +59,7 @@
 **
 **  @return        True if enabled.
 */
-int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckTrue(const Unit* unit, const ButtonAction* button)
 {
 	return 1;
 }
@@ -74,8 +73,7 @@ int ButtonCheckTrue(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if enabled.
 */
-int ButtonCheckFalse(const Unit* unit __attribute__((unused)),
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckFalse(const Unit* unit, const ButtonAction* button)
 {
 	return 0;
 }
@@ -157,8 +155,7 @@ int ButtonCheckUnitsAnd(const Unit* unit, const ButtonAction* button)
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckNetwork(const Unit* unit, const ButtonAction* button)
 {
 	return IsNetworkGame();
 }
@@ -173,8 +170,7 @@ int ButtonCheckNetwork(const Unit* unit __attribute__((unused)),
 **
 **  @note: this check could also be moved into intialisation.
 */
-int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckNoNetwork(const Unit* unit, const ButtonAction* button)
 {
 	return !IsNetworkGame();
 }
@@ -188,8 +184,7 @@ int ButtonCheckNoNetwork(const Unit* unit __attribute__((unused)),
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoWork(const Unit* unit,
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckNoWork(const Unit* unit, const ButtonAction* button)
 {
 	return
 		unit->Orders[0].Action != UnitActionTrain &&
@@ -205,8 +200,7 @@ int ButtonCheckNoWork(const Unit* unit,
 **
 **  @return        True if enabled.
 */
-int ButtonCheckNoResearch(const Unit* unit,
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckNoResearch(const Unit* unit, const ButtonAction* button)
 {
 	return
 		unit->Orders[0].Action != UnitActionUpgradeTo &&
@@ -238,8 +232,7 @@ int ButtonCheckUpgradeTo(const Unit* unit, const ButtonAction* button)
 **
 **  @return        True if enabled.
 */
-int ButtonCheckAttack(const Unit* unit,
-	const ButtonAction* button __attribute__((unused)))
+int ButtonCheckAttack(const Unit* unit, const ButtonAction* button)
 {
 	return unit->Type->CanAttack;
 }

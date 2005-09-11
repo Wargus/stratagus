@@ -772,7 +772,7 @@ void MixIntoBuffer(void* buffer, int samples)
 **  @param stream  pointer to buffer you want to fill with information.
 **  @param len     is length of audio buffer in bytes.
 */
-void FillAudio(void* udata __attribute__((unused)), Uint8* stream, int len)
+void FillAudio(void* udata, Uint8* stream, int len)
 {
 	if (SoundOff) {
 		return;

@@ -423,7 +423,7 @@ void _hash_stat(void* tab, int size, struct hash_st* st)
 **  an 'argument required' error.
 */
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER)
 
 #include <io.h>
 #include <string.h>

@@ -1080,8 +1080,7 @@ static void Screenshot(void)
 **
 **  @return         1 if modifier found, 0 otherwise
 */
-int HandleKeyModifiersDown(unsigned key, unsigned keychar
-	__attribute__ ((unused)))
+int HandleKeyModifiersDown(unsigned key, unsigned keychar)
 {
 	switch (key) {
 		case KeyCodeShift:
@@ -1123,8 +1122,7 @@ int HandleKeyModifiersDown(unsigned key, unsigned keychar
 **
 **  @return         1 if modifier found, 0 otherwise
 */
-int HandleKeyModifiersUp(unsigned key,
-	unsigned keychar __attribute__((unused)))
+int HandleKeyModifiersUp(unsigned key, unsigned keychar)
 {
 	switch (key) {
 		case KeyCodeShift:
@@ -1221,8 +1219,7 @@ void HandleKeyUp(unsigned key, unsigned keychar)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 */
-void HandleKeyRepeat(unsigned key __attribute__((unused)),
-	unsigned keychar)
+void HandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	if (KeyState == KeyStateInput && keychar) {
 		InputKey(keychar);
@@ -1463,8 +1460,7 @@ void InputMouseMove(const EventCallback* callbacks,
 **  @param ticks      Denotes time-stamp of video-system
 **
 */
-void InputMouseExit(const EventCallback* callbacks,
-	unsigned ticks __attribute__((unused)))
+void InputMouseExit(const EventCallback* callbacks, unsigned ticks)
 {
 	// FIXME: should we do anything here with ticks? don't know, but conform others
 	// JOHNS: called by callback HandleMouseExit();

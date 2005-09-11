@@ -91,8 +91,7 @@ static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 **  @param mapname   map filename
 **  @param map       map loaded
 */
-static void LoadStratagusMap(const char* mapname,
-	WorldMap* map __attribute__((unused)))
+static void LoadStratagusMap(const char* mapname, WorldMap* map)
 {
 	char mapfull[PATH_MAX];
 	CLFile* file;
