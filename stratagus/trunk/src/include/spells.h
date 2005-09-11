@@ -92,6 +92,25 @@ typedef struct {
 	int AddRandY;       /// Random add to the X coordinate
 } SpellActionMissileLocation;
 
+typedef struct {
+	int Enable;                 /// Value to affect to this field.
+	int Value;                  /// Value to affect to this field.
+	int Max;                    /// Value to affect to this field.
+	int Increase;               /// Value to affect to this field.
+
+	char ModifEnable;           /// true if we modify this field.
+	char ModifValue;            /// true if we modify this field.
+	char ModifMax;              /// true if we modify this field.
+	char ModifIncrease;         /// true if we modify this field.
+
+	char InvertEnable;          /// true if we invert this field.
+	int AddValue;               /// Add this value to this field.
+	int AddMax;                 /// Add this value to this field.
+	int AddIncrease;            /// Add this value to this field.
+	int IncreaseTime;           /// How many time increase the Value field.
+	char TargetIsCaster;        /// true if the target is the caster.
+} SpellActionTypeAdjustVariable;
+
 struct _spell_action_type_ {
 	SpellFunc* CastFunction;
 
@@ -129,24 +148,7 @@ struct _spell_action_type_ {
 			struct _unit_type_* PortalType;   /// The unit type spawned
 		} SpawnPortal;
 
-		struct {
-			int Enable;                 /// Value to affect to this field.
-			int Value;                  /// Value to affect to this field.
-			int Max;                    /// Value to affect to this field.
-			int Increase;               /// Value to affect to this field.
-
-			char ModifEnable;           /// true if we modify this field.
-			char ModifValue;            /// true if we modify this field.
-			char ModifMax;              /// true if we modify this field.
-			char ModifIncrease;         /// true if we modify this field.
-
-			char InvertEnable;          /// true if we invert this field.
-			int AddValue;               /// Add this value to this field.
-			int AddMax;                 /// Add this value to this field.
-			int AddIncrease;            /// Add this value to this field.
-			int IncreaseTime;           /// How many time increase the Value field.
-			char TargetIsCaster;        /// true if the target is the caster.
-		} *AdjustVariable;
+		SpellActionTypeAdjustVariable *AdjustVariable;
 
 		struct {
 			int HP;         /// Target HP gain.(can be negative)
@@ -199,12 +201,25 @@ typedef struct {
 ** *******************
 */
 
+typedef struct _condition_info_variable_ {
+	char Enable;                /// Target is 'user defined variable'.
+
+	int MinValue;               /// Target must have more Value than that.
+	int MaxValue;               /// Target must have less Value than that.
+	int MinMax;                 /// Target must have more Max than that.
+	int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
+	int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
+
+	char ConditionApplyOnCaster; /// true if these condition are for caster.
+	// FIXME : More (increase, MaxMax) ?
+} ConditionInfoVariable;
+
 /**
 **  Conditions for a spell.
 **
 **  @todo  Move more parameters into this structure.
 */
-typedef struct ConditionInfo {
+typedef struct _condition_info_ {
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
@@ -216,19 +231,7 @@ typedef struct ConditionInfo {
 	char TargetSelf;        /// Target is the same as the caster.
 	char* BoolFlag;         /// User defined boolean flag.
 
-	struct {
-		char Enable;                /// Target is 'user defined variable'.
-
-		int MinValue;               /// Target must have more Value than that.
-		int MaxValue;               /// Target must have less Value than that.
-		int MinMax;                 /// Target must have more Max than that.
-		int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
-		int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
-
-		char ConditionApplyOnCaster; /// true if these condition are for caster.
-		// FIXME : More (increase, MaxMax) ?
-
-	} *Variable;
+	ConditionInfoVariable* Variable;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells

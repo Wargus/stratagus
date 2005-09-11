@@ -434,6 +434,7 @@ Sample* LoadMp3(const char* name, int flags)
 
 	// streaming currently broken
 	if (0 && flags & PlayAudioStream) {
+#if 0
 		sample->SampleSize = 0;
 
 		sample->Type = &Mp3StreamSampleType;
@@ -452,7 +453,7 @@ Sample* LoadMp3(const char* name, int flags)
 			data->MadDecoder.options);
 
 		MadRead(sample, sample->Buffer, SOUND_BUFFER_SIZE);
-
+#endif
 	} else {
 		sample->Buffer = (unsigned char*)malloc(55000000);
 		Assert(sample->Buffer);
