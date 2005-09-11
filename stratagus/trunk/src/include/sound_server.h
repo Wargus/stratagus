@@ -145,7 +145,7 @@ typedef struct _sound_ {
 	union {
 		Sample* OneSound;       /// if it's only a simple sound
 		Sample** OneGroup;      /// when it's a simple group
-		TwoGroups* TwoGroups;   /// when it's a double group
+		struct _two_groups_* TwoGroups; /// when it's a double group
 	} Sound;
 } Sound;
 
@@ -186,7 +186,7 @@ typedef struct _sound_channel_
 {
 	unsigned char Command; /// channel command
 	int Point;             /// point into sample
-	Sample* Sample;        /// sample to play
+	struct _sample_* Sample;/// sample to play
 	Origin Source;         /// unit playing
 	unsigned char Volume;  /// Volume of this channel
 	SoundId Sound;         /// The sound currently played

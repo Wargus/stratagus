@@ -10,7 +10,7 @@
 //
 /**@name ai_local.h - The local AI header file. */
 //
-//      (c) Copyright 2000-2004 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2005 by Lutz Sammer and Antonis Chaniotis.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ typedef struct _ai_transport_request_ AiTransportRequest;
 
 struct _ai_transport_request_ {
 	struct _unit_*      Unit;
-	Order               Order;
+	struct _order_      Order;
 	AiTransportRequest* Next;
 };
 
@@ -180,7 +180,7 @@ struct _ai_transport_request_ {
 */
 typedef struct _player_ai_ {
 	struct _player_* Player; /// Engine player structure
-	AiType* AiType;          /// AI type of this player AI
+	struct _ai_type_* AiType;/// AI type of this player AI
 	// controller
 	char*               Script;          /// Script executed
 	int                 ScriptDebug;     /// Flag script debuging on/off
