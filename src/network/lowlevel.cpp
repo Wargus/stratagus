@@ -55,7 +55,7 @@
 
 #define MAX_LOC_IP 10
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 typedef const char* setsockopttype;
 typedef char* recvfrombuftype;
 typedef char* recvbuftype;

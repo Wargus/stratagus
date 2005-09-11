@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name splitter.c - Map splitter into regions.  */
 //
-// (c) Copyright 1999-2003 by Ludovic Pollet
+//      (c) Copyright 1999-2005 by Ludovic Pollet
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 #ifdef MAP_REGIONS
 
@@ -313,8 +313,8 @@ void RegionSplitUsingTemp(RegionId reg, int nbarea, int updateConnections)
 	int i;
 	int* tempptr;
 
-	newregions = malloc(nbarea * sizeof(RegionDefinition*));
-	newregionsid = malloc(nbarea * sizeof(RegionId));
+	newregions = (RegionDefinition**)malloc(nbarea * sizeof(RegionDefinition*));
+	newregionsid = (RegionId*)malloc(nbarea * sizeof(RegionId));
 
 	oldsegs = Regions[reg].FirstSegment;
 
@@ -1066,7 +1066,7 @@ static void RefreshZones(void)
 	int zoneid;
 
 	Assert(RegionCount);
-	regions_stack = malloc(RegionCount * sizeof(int));
+	regions_stack = (int*)malloc(RegionCount * sizeof(int));
 
 	for (i = 0; i < RegionMax; ++i) {
 		Regions[i].Zone = -1;
@@ -1078,7 +1078,7 @@ static void RefreshZones(void)
 	do {
 		while (i < RegionMax && ((!Regions[i].TileCount) || Regions[i].Zone != -1)) {
 			++i;
-			}
+		}
 
 		if (i == RegionMax) {
 			free(regions_stack);
@@ -1122,7 +1122,7 @@ static void AllocateMapping(void)
 	int total;
 
 	total = TheMap.Info.MapWidth * TheMap.Info.MapHeight;
-	RegionMappingStorage = malloc(sizeof(RegionId) * total);
+	RegionMappingStorage = (RegionId*)malloc(sizeof(RegionId) * total);
 	NextFreeRegion = 0;
 	RegionCount = 0;
 	RegionMax = 0;

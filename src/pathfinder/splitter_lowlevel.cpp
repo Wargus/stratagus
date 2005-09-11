@@ -79,10 +79,10 @@ void RegionDelSegment(RegionDefinition* def, RegionSegment* seg)
 ** @param def    The RegionDefinition structure
 ** @param seg    The segment to add
 */
-void RegionAddSegment(RegionDefinition* def,int x0,int x1,int y)
+void RegionAddSegment(RegionDefinition* def, int x0, int x1, int y)
 {
 	RegionSegment* seg;
-	seg = malloc(sizeof(RegionSegment));
+	seg = (RegionSegment*)malloc(sizeof(RegionSegment));
 
 	seg->Y = y;
 	seg->MinX = x0;
@@ -267,7 +267,7 @@ void RegionFindPointOnY(RegionDefinition* def,int y,int * vx,int * vy)
 */
 void RegionTempStorageAllocate(void)
 {
-	RegionTempStorage = malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int));
+	RegionTempStorage = (int*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight * sizeof(int));
 }
 
 /**
@@ -287,7 +287,7 @@ void RegionTempStorageFree(void)
 void RegionTempStorageFillRegion(RegionDefinition* adef,int value)
 {
 	RegionSegment* cur;
-	int * segstart;
+	int* segstart;
 	int i;
 
 	cur = adef->FirstSegment;
@@ -381,10 +381,10 @@ static int RegionTempStorageMarkPoints(RegionId regid, MapPoint* points, int nbp
 ** @param maxmak     Maximum number of point to mark
 ** @param markvalue  Points get marked with this value
 */
-int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
+int RegionTempStorageMarkObstacle(RegionId regid, int maxmark, int markvalue)
 {
-	RegionDefinition * adef;
-	RegionSegment * seg;
+	RegionDefinition* adef;
+	RegionSegment* seg;
 	RegionId oppregion;
 	int x, y, i, tx, ty;
 	int region_ok[8];
@@ -392,7 +392,7 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 	int obstacle;
 
 	int markednb;
-	MapPoint * marked;
+	MapPoint* marked;
 
 
 	if (maxmark <= 0) {
@@ -401,7 +401,7 @@ int RegionTempStorageMarkObstacle(RegionId regid, int maxmark,int markvalue)
 
 	adef = Regions + regid;
 
-	marked = malloc(sizeof(MapPoint) * adef->TileCount);
+	marked = (MapPoint*)malloc(sizeof(MapPoint) * adef->TileCount);
 	markednb = 0;
 
 	seg = adef->FirstSegment;
@@ -495,7 +495,7 @@ int RegionTempStorageEmbossObstacle(RegionId regid, int maxmark,int markvalue)
 	adef = Regions + regid;
 	seg = adef->FirstSegment;
 
-	marked = malloc(sizeof(MapPoint) * adef->TileCount);
+	marked = (MapPoint*)malloc(sizeof(MapPoint) * adef->TileCount);
 	markednb = 0;
 
 	while (seg) {
@@ -561,8 +561,8 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
 				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
 
-				adef->Connections = realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
-				adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
+				adef->Connections = (int*)realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
+				adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
 			}
 			return;
 		}
@@ -575,8 +575,8 @@ void RegionSetConnection(RegionId rega, RegionId regb, int value)
 	ZoneNeedRefresh = 1;
 
 	adef->ConnectionsNumber++;
-	adef->Connections = realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
-	adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
+	adef->Connections = (int*)realloc(adef->Connections, sizeof(int) * adef->ConnectionsNumber);
+	adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount, sizeof(int) * adef->ConnectionsNumber);
 
 	adef->Connections[adef->ConnectionsNumber - 1] = regb;
 	adef->ConnectionsCount[adef->ConnectionsNumber - 1] = value;
@@ -607,9 +607,9 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 				adef->ConnectionsNumber--;
 				adef->Connections[j] = adef->Connections[adef->ConnectionsNumber];
 				adef->ConnectionsCount[j] = adef->ConnectionsCount[adef->ConnectionsNumber];
-				adef->Connections = realloc(adef->Connections,
+				adef->Connections = (int*)realloc(adef->Connections,
 					sizeof(int) * (adef->ConnectionsNumber + 1));
-				adef->ConnectionsCount = realloc(adef->ConnectionsCount,
+				adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount,
 					sizeof(int) * (adef->ConnectionsNumber + 1));
 			}
 			return;
@@ -618,8 +618,8 @@ void RegionAddConnection(RegionId rega, RegionId regb,int value)
 
 	Assert(value > 0);
 
-	adef->Connections = realloc(adef->Connections, sizeof(int) * (adef->ConnectionsNumber + 1));
-	adef->ConnectionsCount = realloc(adef->ConnectionsCount, sizeof(int) * (adef->ConnectionsNumber + 1));
+	adef->Connections = (int*)realloc(adef->Connections, sizeof(int) * (adef->ConnectionsNumber + 1));
+	adef->ConnectionsCount = (int*)realloc(adef->ConnectionsCount, sizeof(int) * (adef->ConnectionsNumber + 1));
 	adef->Connections[adef->ConnectionsNumber] = regb;
 	adef->ConnectionsCount[adef->ConnectionsNumber] = value;
 	adef->ConnectionsNumber++;
@@ -653,7 +653,7 @@ void CircularFillerInit(CircularFiller* filler, RegionId region, int startx, int
 {
 	filler->NextOne = 0;
 	filler->LastOne = 0;
-	filler->Points = malloc(sizeof(MapPoint) * Regions[region].TileCount);
+	filler->Points = (MapPoint*)malloc(sizeof(MapPoint) * Regions[region].TileCount);
 	filler->Points[0].X = startx;
 	filler->Points[0].Y = starty;
 	filler->FillValue = value;
@@ -683,7 +683,7 @@ int CircularFillerStep(CircularFiller * filler)
 {
 	int fillx,filly;
 	int adjx,adjy;
-	int ptid, try;
+	int ptid, itry;
 
 	while (filler->LastOne >= filler->NextOne) {
 		ptid = filler->NextOne;
@@ -691,13 +691,13 @@ int CircularFillerStep(CircularFiller * filler)
 		fillx = filler->Points[ptid].X;
 		filly = filler->Points[ptid].Y;
 
-		try = 0;
-		while (try < 8) {
+		itry = 0;
+		while (itry < 8) {
 			adjx = fillx + adjacents[filler->Direction & 7][0];
 			adjy = filly + adjacents[filler->Direction & 7][1];
 
 			filler->Direction++;
-			try++;
+			itry++;
 
 			if (!InMap(adjx, adjy)) {
 				continue;
