@@ -61,6 +61,7 @@ typedef char* recvfrombuftype;
 typedef char* recvbuftype;
 typedef const char* sendtobuftype;
 typedef const char* sendbuftype;
+typedef int socklen_t;
 #else
 typedef const void* setsockopttype;
 typedef void* recvfrombuftype;
@@ -607,7 +608,7 @@ int NetSocketSetSocketReady(SocketSet* set, Socket socket)
 */
 int NetRecvUDP(Socket sockfd, void* buf, int len)
 {
-	int n;
+	socklen_t n;
 	int l;
 	struct sockaddr_in sock_addr;
 
