@@ -355,11 +355,11 @@ struct _player_ {
 // Display video
 	Uint32 Color;  /// color of units on minimap
 
-	UnitColors UnitColors;  /// Unit colors for new units
+	struct _unit_colors_ UnitColors;  /// Unit colors for new units
 
 	// Upgrades/Allows:
-	Allow          Allow;          /// Allowed for player
-	UpgradeTimers  UpgradeTimers;  /// Timer for the upgrades
+	struct _allow_ Allow;                  /// Allowed for player
+	struct _upgrade_timers_ UpgradeTimers; /// Timer for the upgrades
 };
 
 /**
