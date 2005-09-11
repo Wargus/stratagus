@@ -138,8 +138,7 @@ static const SampleType CDStreamSampleType = {
 ** @return Returns the loaded sample.
 **
 */
-Sample* LoadCD(const char* name __attribute__((unused)),
-		int flags __attribute__((unused)))
+Sample* LoadCD(const char* name, int flags)
 {
 	Sample* sample;
 	CddaData* data;

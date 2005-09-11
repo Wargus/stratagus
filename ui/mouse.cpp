@@ -1278,7 +1278,7 @@ static void SendCommand(int sx, int sy)
 **  @param num     Button number.
 **  @param button  Mouse Button pressed.
 */
-static void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
+static void DoSelectionButtons(int num, unsigned button)
 {
 	Unit* unit;
 
@@ -1325,7 +1325,7 @@ static void DoSelectionButtons(int num, unsigned button __attribute__((unused)))
 **
 **  @param button  Button pressed down.
 */
-static void UISelectStateButtonDown(unsigned button __attribute__((unused)))
+static void UISelectStateButtonDown(unsigned button)
 {
 	int sx;
 	int sy;

@@ -840,8 +840,7 @@ void NetworkProcessServerRequest(void)
 **
 ** @param msg message received
 */
-static void ClientParseDisconnected(
-	const InitMessage* msg __attribute__((unused)))
+static void ClientParseDisconnected(const InitMessage* msg)
 {
 	DebugPrint("ccs_disconnected: Server sending GoodBye dups %d\n" _C_
 		msg->SubType);
@@ -1153,7 +1152,7 @@ static void ClientParseStarted(const InitMessage* msg)
 **
 ** @param msg message received
 */
-static void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)))
+static void ClientParseAreYouThere(const InitMessage* msg)
 {
 	InitMessage message;
 
@@ -1167,7 +1166,7 @@ static void ClientParseAreYouThere(const InitMessage* msg __attribute__((unused)
 **
 ** @param msg message received
 */
-static void ClientParseBadMap(const InitMessage* msg __attribute__((unused)))
+static void ClientParseBadMap(const InitMessage* msg)
 {
 	int i;
 	InitMessage message;

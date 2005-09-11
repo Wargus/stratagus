@@ -1126,7 +1126,7 @@ static void EditorCallbackButtonUp(unsigned button)
 **
 **  @param button  Mouse button number (0 left, 1 middle, 2 right)
 */
-static void EditorCallbackButtonDown(unsigned button __attribute__ ((unused)))
+static void EditorCallbackButtonDown(unsigned button)
 {
 	//
 	// Click on menu button
@@ -1530,8 +1530,7 @@ static void EditorCallbackKeyUp(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void EditorCallbackKey3(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+static void EditorCallbackKey3(unsigned dummy1, unsigned dummy2)
 {
 }
 

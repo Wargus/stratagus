@@ -844,7 +844,7 @@ void DebugPlayers(void)
 **  @todo FIXME: We must also notfiy allied players.
 */
 void NotifyPlayer(const Player* player,
-	int type __attribute__((unused)), int x, int y, const char* fmt, ...)
+	int type, int x, int y, const char* fmt, ...)
 {
 	char temp[128];
 	va_list va;

@@ -658,8 +658,7 @@ static void DrawMinimapEvents(void)
 /**
 **  Draw the minimap on the screen
 */
-void DrawMinimap(int vx __attribute__((unused)),
-	int vy __attribute__((unused)))
+void DrawMinimap(int vx, int vy)
 {
 #ifndef USE_OPENGL
 	SDL_Rect drect;

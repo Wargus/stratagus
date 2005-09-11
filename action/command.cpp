@@ -851,8 +851,7 @@ void CommandReturnGoods(Unit* unit, Unit* goal, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(Unit* unit, UnitType* type,
-	int flush __attribute__((unused)))
+void CommandTrainUnit(Unit* unit, UnitType* type, int flush)
 {
 	Order* order;
 

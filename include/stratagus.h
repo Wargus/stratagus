@@ -64,15 +64,7 @@
 #define free(x) do { void* __x; __x = (x); if (__x) { free(__x); } } while (0)
 #endif
 
-#ifdef __cplusplus
-#define __attribute__(args)
-#endif
-
 #endif  // } __GNUC__
-
-#ifndef __GNUC__
-#define __attribute__(args)                 /// Does nothing for non GNU CC
-#endif
 
 #ifdef _MSC_VER
 

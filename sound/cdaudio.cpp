@@ -380,7 +380,7 @@ void QuitCD(void)
 **
 **   Perodic called from the main loop.
 */
-int CDRomCheck(void* unused __attribute__ ((unused)))
+int CDRomCheck(void* unused)
 {
 	if (CDMode != CDModeOff && CDMode != CDModeStopped &&
 			!IsCDPlaying() && CDMode != CDModeDefined) {

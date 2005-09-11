@@ -117,8 +117,8 @@ int SpellTypeCount;
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
-	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
+int CastDemolish(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
 {
 	int xmin;
 	int ymin;
@@ -197,8 +197,8 @@ int CastDemolish(Unit* caster, const SpellType* spell __attribute__((unused)),
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused)),
-	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
+int CastSpawnPortal(Unit* caster, const SpellType* spell,
+	const SpellActionType* action, Unit* target, int x, int y)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	Unit* portal;
@@ -233,7 +233,7 @@ int CastSpawnPortal(Unit* caster, const SpellType* spell __attribute__((unused))
 **  @return             =!0 if spell should be repeated, 0 if not
 */
 int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
+	const SpellActionType* action, Unit* target, int x, int y)
 {
 	Unit* units[UnitMax];
 	int nunits;
@@ -290,7 +290,7 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
 int CastAreaBombardment(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target __attribute__((unused)), int x, int y)
+	const SpellActionType* action, Unit* target, int x, int y)
 {
 	int fields;
 	int shards;
