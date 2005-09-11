@@ -293,6 +293,8 @@ int PlayMovie(const char* name)
 
 #else
 
+#include <string.h>
+
 /**
 **  FIXME: docu
 */
