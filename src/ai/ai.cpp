@@ -1575,7 +1575,7 @@ void AiCanNotMove(Unit* unit)
 		aitr = aitr->Next;
 	}
 
-	aitr = malloc(sizeof(AiTransportRequest));
+	aitr = (AiTransportRequest*)malloc(sizeof(AiTransportRequest));
 	aitr->Next = AiPlayer->TransportRequests;
 	aitr->Unit = unit;
 	aitr->Order = unit->Orders[0];
