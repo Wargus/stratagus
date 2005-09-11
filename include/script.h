@@ -178,7 +178,7 @@ typedef struct _UnitDesc_ UnitDesc;
 typedef struct _StringDesc_ StringDesc;
 
 
-typedef struct {
+typedef struct _binop_ {
 	NumberDesc* Left;           /// Left operand.
 	NumberDesc* Right;          /// Right operand.
 } BinOp;  /// for Bin operand  a ?? b
@@ -192,7 +192,7 @@ struct _NumberDesc_ {
 		unsigned int Index; /// index of the lua function.
 		int Val;       /// Direct value.
 		NumberDesc* N; /// Other number.
-		BinOp BinOp;   /// For binary operand.
+		struct _binop_ BinOp;   /// For binary operand.
 		struct {
 			UnitDesc* Unit;            /// Which unit.
 			int Index;                 /// Which index variable.
