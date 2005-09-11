@@ -173,7 +173,7 @@ static int AiFindBuildingPlace2(const Unit* worker, const UnitType* type,
 	unsigned char* m;
 	unsigned char* matrix;
 
-	points = (p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	points = (struct p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof (*points);
 
 	x = ox;
@@ -320,7 +320,7 @@ static int AiFindHallPlace(const Unit* worker, const UnitType* type, int* dx, in
 	destx = x = worker->X;
 	desty = y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (p*)malloc(size * sizeof (*points));
+	points = (struct p*)malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix. FIXME: can create smaller matrix.
@@ -485,7 +485,7 @@ static int AiFindLumberMillPlace(const Unit* worker, const UnitType* type, int* 
 	x = worker->X;
 	y = worker->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (p*)malloc(size * sizeof (*points));
+	points = (struct p*)malloc(size * sizeof (*points));
 
 	//
 	// Make movement matrix.

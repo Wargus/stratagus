@@ -144,7 +144,7 @@ static void AiMarkWaterTransporter(const Unit* unit, unsigned char* matrix)
 		return;
 	}
 
-	points = (p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
+	points = (struct p*)malloc(TheMap.Info.MapWidth * TheMap.Info.MapHeight);
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / sizeof(*points);
 
 	//
@@ -247,7 +247,7 @@ static int AiFindTarget(const Unit* unit, unsigned char* matrix, int* dx, int* d
 	unsigned char* m;
 
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 2;
-	points = (p*)malloc(size * sizeof(*points));
+	points = (struct p*)malloc(size * sizeof(*points));
 
 	x = unit->X;
 	y = unit->Y;
@@ -411,7 +411,7 @@ int AiFindWall(AiForce* force)
 	x = unit->X;
 	y = unit->Y;
 	size = TheMap.Info.MapWidth * TheMap.Info.MapHeight / 4;
-	points = (p*)malloc(size * sizeof(*points));
+	points = (struct p*)malloc(size * sizeof(*points));
 
 	destx = -1;
 	desty = -1;
