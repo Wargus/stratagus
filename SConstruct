@@ -135,7 +135,7 @@ def AutoConfigure(env):
 
   # Check for optional libraries #
   if conf.CheckLib('bz2'):
-     env.Append(CPPDEFINES = 'USE_BZLIB2')
+     env.Append(CPPDEFINES = 'USE_BZ2LIB')
   if conf.CheckLib('ogg'):
      env.Append(CPPDEFINES = 'USE_OGG')
   if conf.CheckLib('vorbis'):
