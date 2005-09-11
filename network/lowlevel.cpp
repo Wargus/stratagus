@@ -722,7 +722,7 @@ int NetListenTCP(Socket sockfd)
 Socket NetAcceptTCP(Socket sockfd)
 {
 	struct sockaddr_in sa;
-	int len;
+	socklen_t len;
 
 	len = sizeof(struct sockaddr_in);
 	NetLastSocket = accept(sockfd, (struct sockaddr*)&sa, &len);
