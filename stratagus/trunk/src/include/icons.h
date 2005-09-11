@@ -45,9 +45,6 @@
 **  typedef struct _icon_ Icon;
 **
 **  This structure contains all informations about an icon.
-**  Currently only rectangular static icons of 46x38 pixels are supported.
-**  In the future it is planned to support animated and not rectangular
-**  icons and icons of different sizes.
 **
 **  The icon structure members:
 **
@@ -57,45 +54,15 @@
 **    files and during startup.  Don't use this in game, use instead
 **    the pointer to this structure.
 **
-**  Icon::Tileset
+**  Icon::Sprite
 **
-**    Unique identifier of the tileset, used to allow different
-**    graphics for the same icons depending on the tileset. Resolved
-**    during startup in InitIcons().
-**    @see Tileset::Ident
-**
-**  Icon::File
-**
-**    Pointer to icon file (file containing the graphics), each icon
-**    could have an own icon file or some up to all icons could share
-**    the same icon file.
-**
-**  Icon::Index
-**
-**    Index into the icon file. You know one up to all icons could
-**    be in the same file. This index distinguishes them.
-**
-**  Icon::X
-**
-**    X pixel index into the graphic image.
-**
-**  Icon::Y
-**
-**    Y pixel index into the graphic image.
-**
-**  Icon::Width
-**
-**    Icon width in pixels.
-**
-**  Icon::Height
-**
-**    Icon height in pixels.
-**
-**  Icon::Graphic
-**
-**    Graphic image containing the loaded graphics. Loaded by
+**    Sprite image containing the loaded graphics. Loaded by
 **    LoadIcons(). All icons belonging to the same icon file shares
 **    this structure.
+**
+**  Icon::Frame
+**
+**    Frame number in the sprite to display.
 */
 
 /**
@@ -145,17 +112,15 @@ struct _button_style_;
 
 	/// Icon: rectangle image used in menus
 typedef struct _icon_ {
-	char* Ident;              /// Icon identifier
-	struct _graphic_* Sprite; /// Graphic data
+	char *Ident;              /// Icon identifier
+	struct _graphic_ *Sprite; /// Graphic data
 	int Frame;                /// Frame number in graphic
 } Icon;
 
-#define NoIcon NULL  /// used for errors == no valid icon
-
 	/// Icon reference (used in config tables)
 typedef struct _icon_config_ {
-	char* Name;          /// config icon name
-	struct _icon_* Icon; /// icon pointer to use to run time
+	char *Name;          /// config icon name
+	struct _icon_ *Icon; /// icon pointer to use to run time
 } IconConfig;
 
 /*----------------------------------------------------------------------------
@@ -167,13 +132,13 @@ extern void LoadIcons(void);   /// Load icons
 extern void CleanIcons(void);  /// Cleanup icons
 
 	/// Name -> icon
-extern Icon* IconByIdent(const char* ident);
+extern Icon *IconByIdent(const char *ident);
 	/// Draw icon
-extern void DrawIcon(const struct _player_* player, Icon* icon, int x, int y);
+extern void DrawIcon(const struct _player_ *player, Icon *icon, int x, int y);
 	/// Draw icon of an unit
-extern void DrawUnitIcon(const struct _player_* player,
-	struct _button_style_* style, Icon* icon, unsigned flags, int x, int y,
-	const char* text);
+extern void DrawUnitIcon(const struct _player_ *player,
+	struct _button_style_ *style, Icon *icon, unsigned flags, int x, int y,
+	const char *text);
 
 	/// Register CCL features
 extern void IconCclRegister(void);
