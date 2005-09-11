@@ -304,7 +304,7 @@ static void FillMatrix(const Unit* unit, unsigned int* matrix)
 	unsigned int* m;
 
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight) * sizeof(*points);
-	points = (p*)malloc(size);
+	points = (struct p*)malloc(size);
 	size = 4 * (TheMap.Info.MapWidth + TheMap.Info.MapHeight);
 
 	mask = UnitMovementMask(unit);
