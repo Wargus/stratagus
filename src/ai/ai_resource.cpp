@@ -575,11 +575,11 @@ void AiAddResearchRequest(Upgrade* upgrade)
 	n = AiHelpers.ResearchCount;
 	tablep = AiHelpers.Research;
 
-	if (upgrade - Upgrades > n) { // Oops not known.
+	if (upgrade->ID > n) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;
 	}
-	table = tablep[upgrade - Upgrades];
+	table = tablep[upgrade->ID];
 	if (!table) { // Oops not known.
 		DebugPrint("Nothing known about `%s'\n" _C_ upgrade->Ident);
 		return;

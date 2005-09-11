@@ -972,7 +972,7 @@ void UnitLost(Unit* unit)
 	//  Handle research cancels.
 	//
 	if (unit->Orders[0].Action == UnitActionResearch) {
-		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades] = 0;
+		unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID] = 0;
 	}
 
 	DebugPrint("Lost %s(%d)\n" _C_ unit->Type->Ident _C_ UnitNumber(unit));

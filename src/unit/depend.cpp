@@ -209,7 +209,7 @@ int CheckDependByIdent(const Player* player, const char* target)
 	} else if (!strncmp(target, "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = UpgradeByIdent(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade - Upgrades) != 'A') {
+		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
 			return 0;
 		}
 		rule.Type = DependRuleUpgrade;
@@ -251,7 +251,7 @@ int CheckDependByIdent(const Player* player, const char* target)
 					}
 					break;
 				case DependRuleUpgrade:
-					i = UpgradeIdAllowed(player, temp->Kind.Upgrade - Upgrades) != 'R';
+					i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
 					if (temp->Count ? i : !i) {
 						goto try_or;
 					}

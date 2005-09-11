@@ -1079,7 +1079,7 @@ void CommandResearch(Unit* unit, Upgrade* what, int flush)
 
 				// Cancel current research
 				upgrade = unit->Data.Research.Upgrade;
-				unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] = 0;
+				unit->Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
 				PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 					CancelResearchCostsFactor);
 				unit->SubAction = 0;
@@ -1117,7 +1117,7 @@ void CommandCancelResearch(Unit* unit)
 		const Upgrade* upgrade;
 
 		upgrade = unit->Data.Research.Upgrade;
-		unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] = 0;
+		unit->Player->UpgradeTimers.Upgrades[upgrade->ID] = 0;
 
 		PlayerAddCostsFactor(unit->Player,upgrade->Costs,
 			CancelResearchCostsFactor);
