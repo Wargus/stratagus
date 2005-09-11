@@ -2421,7 +2421,7 @@ static void MenuHandleButtonUp(unsigned b)
 }
 
 typedef struct _menu_stack_ {
-	Menu* Menu;
+	struct _menu_* Menu;
 	int CurSel;
 	struct _menu_stack_* Next;
 } MenuStack;
