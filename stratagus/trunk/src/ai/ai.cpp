@@ -1675,7 +1675,7 @@ static void HandleTransportRequests(AiTransportRequest* aitr)
 **  @param unit  Point to unit.
 **  @param what  Pointer to unit-type.
 */
-void AiNeedMoreSupply(const Unit* unit, const UnitType* what __attribute__((unused)))
+void AiNeedMoreSupply(const Unit* unit, const UnitType* what)
 {
 	Assert(unit->Player->Type != PlayerPerson);
 
@@ -1709,8 +1709,7 @@ void AiTrainingComplete(Unit* unit, Unit* what)
 **  @param unit Pointer to unit working.
 **  @param what Pointer to the new unit-type.
 */
-void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
-	const UnitType* what __attribute__((unused)))
+void AiUpgradeToComplete(Unit* unit, const UnitType* what)
 {
 	DebugPrint("%d: %d(%s) upgrade-to %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1725,8 +1724,7 @@ void AiUpgradeToComplete(Unit* unit __attribute__((unused)),
 **  @param unit  Pointer to unit working.
 **  @param what  Pointer to the new upgrade.
 */
-void AiResearchComplete(Unit* unit __attribute__((unused)),
-	const Upgrade* what __attribute__((unused)))
+void AiResearchComplete(Unit* unit, const Upgrade* what)
 {
 	DebugPrint("%d: %d(%s) research %s at %d,%d completed\n" _C_
 		unit->Player->Index _C_ UnitNumber(unit) _C_ unit->Type->Ident _C_
@@ -1742,7 +1740,7 @@ void AiResearchComplete(Unit* unit __attribute__((unused)),
 **
 **  @param player  The player structure pointer.
 */
-void AiEachCycle(Player* player __attribute__((unused)))
+void AiEachCycle(Player* player)
 {
 	AiTransportRequest* aitr;
 	AiTransportRequest* next;

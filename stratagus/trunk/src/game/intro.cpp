@@ -171,8 +171,7 @@ static void IntroCallbackKey2(unsigned key, unsigned keychar)
 /**
 **  Callback for input.
 */
-static void IntroCallbackKey3(unsigned key __attribute__((unused)),
-	unsigned keychar __attribute__((unused)))
+static void IntroCallbackKey3(unsigned key, unsigned keychar)
 {
 }
 

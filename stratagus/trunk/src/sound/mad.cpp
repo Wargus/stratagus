@@ -162,9 +162,8 @@ static enum mad_flow MAD_write(void* user,
 **  possible MAD_ERROR_* errors can be found in the mad.h (or
 **  libmad/stream.h) header file.
 */
-static enum mad_flow MAD_error(void* user __attribute__((unused)),
-	struct mad_stream* stream,
-	struct mad_frame* frame __attribute__((unused)))
+static enum mad_flow MAD_error(void* user,
+	struct mad_stream* stream, struct mad_frame* frame)
 {
 	fprintf(stderr, "decoding error 0x%04x (%s)\n",
 		stream->error, mad_stream_errorstr(stream));

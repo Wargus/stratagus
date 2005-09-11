@@ -1282,7 +1282,7 @@ void InitMenuFuncHash(void)
 /**
 **  Draw the version, copyright, and license at bottom of the screen.
 */
-static void NameLineDrawFunc(Menuitem* mi __attribute__ ((unused)))
+static void NameLineDrawFunc(Menuitem* mi)
 {
 	char* nc;
 	char* rc;
@@ -1668,7 +1668,7 @@ void SoundOptionsMenu(void)
 /**
 ** Init callback for sound options menu
 */
-static void SoundOptionsInit(Menu* menu __attribute__((unused)))
+static void SoundOptionsInit(Menu* menu)
 {
 	if (!menu) {
 		menu = FindMenu("menu-sound-options");
@@ -1748,7 +1748,7 @@ static void SoundOptionsInit(Menu* menu __attribute__((unused)))
 /**
 **  Exit callback for sound options menu
 */
-static void SoundOptionsExit(Menu* menu __attribute__((unused)))
+static void SoundOptionsExit(Menu* menu)
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1794,7 +1794,7 @@ static void GlobalOptionsInit(Menu* menu)
 /**
 **  Exit callback for global options menu
 */
-static void GlobalOptionsExit(Menu* menu __attribute__((unused)))
+static void GlobalOptionsExit(Menu* menu)
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -1863,7 +1863,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 /**
 ** Global options fullscreen gem callback
 */
-static void GlobalOptionsFullscreenCheckbox(Menuitem* mi __attribute__((unused)))
+static void GlobalOptionsFullscreenCheckbox(Menuitem* mi)
 {
 	ToggleFullScreen();
 	GlobalOptionsInit(CurrentMenu);
@@ -1872,7 +1872,7 @@ static void GlobalOptionsFullscreenCheckbox(Menuitem* mi __attribute__((unused))
 /**
 ** Master volume gem callback
 */
-static void SetMasterPower(Menuitem* mi __attribute__((unused)))
+static void SetMasterPower(Menuitem* mi)
 {
 	if (SoundEnabled()) {
 		SoundOff ^= 1;
@@ -1883,7 +1883,7 @@ static void SetMasterPower(Menuitem* mi __attribute__((unused)))
 /**
 ** Music volume gem callback
 */
-static void SetMusicPower(Menuitem* mi __attribute__((unused)))
+static void SetMusicPower(Menuitem* mi)
 {
 	if (PlayingMusic) {
 		MusicOff = 1;
@@ -1909,7 +1909,7 @@ static void SetMusicPower(Menuitem* mi __attribute__((unused)))
 /**
 ** CD volume gem callback
 */
-static void SetCdPower(Menuitem* mi __attribute__((unused)))
+static void SetCdPower(Menuitem* mi)
 {
 #ifdef USE_CDAUDIO
 	// Start Playing CD
@@ -1929,7 +1929,7 @@ static void SetCdPower(Menuitem* mi __attribute__((unused)))
 **
 ** @param mi Menu item (not used).
 */
-static void SetFogOfWar(Menuitem* mi __attribute__((unused)))
+static void SetFogOfWar(Menuitem* mi)
 {
 	if (!TheMap.NoFogOfWar) {
 		TheMap.NoFogOfWar = 1;
@@ -1948,7 +1948,7 @@ static void SetFogOfWar(Menuitem* mi __attribute__((unused)))
 **
 ** @param mi Menu item (not used).
 */
-static void SetCommandKey(Menuitem* mi __attribute__((unused)))
+static void SetCommandKey(Menuitem* mi)
 {
 	ShowCommandKey ^= 1;
 }
@@ -1956,7 +1956,7 @@ static void SetCommandKey(Menuitem* mi __attribute__((unused)))
 /**
 ** CD play all tracks gem callback
 */
-static void SetCdModeDefined(Menuitem* mi __attribute__((unused)))
+static void SetCdModeDefined(Menuitem* mi)
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeDefined;
@@ -1967,7 +1967,7 @@ static void SetCdModeDefined(Menuitem* mi __attribute__((unused)))
 /**
 ** CD play random tracks gem callback
 */
-static void SetCdModeRandom(Menuitem* mi __attribute__((unused)))
+static void SetCdModeRandom(Menuitem* mi)
 {
 #ifdef USE_CDAUDIO
 	CDMode = CDModeRandom;
@@ -2013,7 +2013,7 @@ void SpeedOptionsInit(Menu* menu)
 /**
 **  Exit callback for speed settings menu
 */
-void SpeedOptionsExit(Menu* menu __attribute__((unused)))
+void SpeedOptionsExit(Menu* menu)
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -2030,7 +2030,7 @@ void DiplomacyMenu(void)
 /**
 **  Diplomacy init callback
 */
-static void DiplomacyInit(Menu* menu __attribute__ ((unused)))
+static void DiplomacyInit(Menu* menu)
 {
 	int i;
 	int j;
@@ -2225,7 +2225,7 @@ static void PreferencesInit(Menu* menu)
 /**
 **  Preferences menu init callback
 */
-static void PreferencesExit(Menu* menu __attribute__((unused)))
+static void PreferencesExit(Menu* menu)
 {
 	// FIXME: Only save if something changed
 	SavePreferences();
@@ -2517,14 +2517,14 @@ static void TipsCyclePreviousTip(void)
 /**
 **  Tips menu init callback
 */
-static void TipsInit(Menu* menu __attribute__((unused)))
+static void TipsInit(Menu* menu)
 {
 }
 
 /**
 **  Tips menu exit callback
 */
-static void TipsExit(Menu* menu __attribute__((unused)))
+static void TipsExit(Menu* menu)
 {
 	TipsCycleNextTip();
 	SavePreferences();
@@ -3116,7 +3116,7 @@ static void ScenSelectExit(Menu* menu)
 /**
 **  Scenario select map type action callback
 */
-static void ScenSelectTPMSAction(Menuitem* mi, int i __attribute__((unused)))
+static void ScenSelectTPMSAction(Menuitem* mi, int i)
 {
 	mi = mi->Menu->Items + 1;
 	ScenSelectLBInit(mi);
@@ -3224,7 +3224,7 @@ static void CdVolumeHSAction(Menuitem* mi)
 /**
 ** CD volume horizontal slider action callback
 */
-static void CdVolumeHSAction(Menuitem* mi __attribute__((unused)))
+static void CdVolumeHSAction(Menuitem* mi)
 {
 }
 #endif
@@ -3322,7 +3322,7 @@ static void CustomGameStart(void)
 /**
 ** Single player custom game menu entered.
 */
-static void GameSetupInit(Menu* menu __attribute__ ((unused)))
+static void GameSetupInit(Menu* menu)
 {
 	Menu* custom_menu;
 	int n;
@@ -3373,7 +3373,7 @@ static void GameSetupInit(Menu* menu __attribute__ ((unused)))
 /**
 ** FIXME: docu
 */
-static void GameDrawFunc(Menuitem* mi __attribute__((unused)))
+static void GameDrawFunc(Menuitem* mi)
 {
 	char* nc;
 	char* rc;
@@ -3499,7 +3499,7 @@ static void GameGATAction(Menuitem* mi, int i)
 /**
 ** Game opponents action callback
 */
-static void CustomGameOPSAction(Menuitem* mi __attribute__((unused)), int i)
+static void CustomGameOPSAction(Menuitem* mi, int i)
 {
 	GameSettings.Opponents = i ? i : SettingsPresetMapDefault;
 }
@@ -3917,7 +3917,7 @@ static void MultiGameSetupInit(Menu* menu)
 /**
 **  Multiplayer server menu exit callback
 */
-static void MultiGameSetupExit(Menu* menu __attribute__((unused)))
+static void MultiGameSetupExit(Menu* menu)
 {
 }
 
@@ -4020,7 +4020,7 @@ static void MultiGameClientInit(Menu* menu)
 /**
 **  Multiplayer client menu exit callback
 */
-static void MultiGameClientExit(Menu* menu __attribute__((unused)))
+static void MultiGameClientExit(Menu* menu)
 {
 }
 
@@ -4273,23 +4273,21 @@ static void EditorNewMap(void)
 /**
 ** Editor new map draw func
 */
-static void EditorNewDrawFunc(Menuitem* mi __attribute__((unused)))
+static void EditorNewDrawFunc(Menuitem* mi)
 {
 }
 
 /**
 ** Editor new map, map description input box callback
 */
-static void EditorNewMapDescriptionEnterAction(
-		Menuitem* mi __attribute__((unused)), int key __attribute__((unused)))
+static void EditorNewMapDescriptionEnterAction(Menuitem* mi, int key)
 {
 }
 
 /**
 ** Editor new map, size input box callback
 */
-static void EditorNewMapSizeEnterAction(Menuitem * mi,
-		int key __attribute__((unused)))
+static void EditorNewMapSizeEnterAction(Menuitem * mi, int key)
 {
 	if (mi->D.Input.nch > 0
 			&& !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
@@ -4600,8 +4598,7 @@ static void EditorMapPropertiesMenu(void)
 /**
 ** Editor map properties input box callback
 */
-static void EditorMapPropertiesEnterAction(
-		Menuitem* mi __attribute__((unused)), int key __attribute__((unused)))
+static void EditorMapPropertiesEnterAction(Menuitem* mi, int key)
 {
 }
 
@@ -4649,15 +4646,14 @@ static void EditorMapPropertiesOk(void)
 /**
 ** Editor player properties draw func
 */
-static void EditorPlayerPropertiesDrawFunc(Menuitem* mi __attribute__((unused)))
+static void EditorPlayerPropertiesDrawFunc(Menuitem* mi)
 {
 }
 
 /**
 ** Editor player properties input box callback
 */
-static void EditorPlayerPropertiesEnterAction(Menuitem* mi,
-		int key __attribute__((unused)))
+static void EditorPlayerPropertiesEnterAction(Menuitem* mi, int key)
 {
 	if (mi->D.Input.nch > 0 && !isdigit(mi->D.Input.buffer[mi->D.Input.nch - 1])) {
 		strcpy(mi->D.Input.buffer + (--mi->D.Input.nch), "~!_");
@@ -5158,7 +5154,7 @@ static void ReplayGameVSAction(Menuitem* mi)
 /**
 ** Replay game disable fog gem callback
 */
-static void ReplayGameDisableFog(Menuitem* mi __attribute__((unused)))
+static void ReplayGameDisableFog(Menuitem* mi)
 {
 }
 

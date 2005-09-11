@@ -389,7 +389,7 @@ static void FillMatrix(const Unit* unit, unsigned int* matrix)
 **
 **  @return         Distance to place.
 */
-int PlaceReachable(const Unit* src, int x, int y, int w, int h, int minrange __attribute__((unused)), int range)
+int PlaceReachable(const Unit* src, int x, int y, int w, int h, int minrange, int range)
 {
 	int depth;
 	static unsigned long LastGameCycle;

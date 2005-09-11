@@ -244,7 +244,7 @@ int UnitShowAnimationScaled(Unit* unit, const Animation* anim, int scale)
 **
 **  @param unit  Unit pointer for none action.
 */
-static void HandleActionNone(Unit* unit __attribute__((unused)))
+static void HandleActionNone(Unit* unit)
 {
 	DebugPrint("FIXME: Should not happen!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action none.!\n" _C_
@@ -256,7 +256,7 @@ static void HandleActionNone(Unit* unit __attribute__((unused)))
 **
 **  @param unit  Unit pointer for not written action.
 */
-static void HandleActionNotWritten(Unit* unit __attribute__((unused)))
+static void HandleActionNotWritten(Unit* unit)
 {
 	DebugPrint("FIXME: Not written!\n");
 	DebugPrint("FIXME: Unit (%d) %s has action %d.!\n" _C_

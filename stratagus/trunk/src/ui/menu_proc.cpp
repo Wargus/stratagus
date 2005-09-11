@@ -2046,7 +2046,7 @@ static void MenuHandleMouseMove(int x, int y)
 **
 ** @param b    button code
 */
-static void MenuHandleButtonDown(unsigned b __attribute__((unused)))
+static void MenuHandleButtonDown(unsigned b)
 {
 	Menuitem* mi;
 	Menu* menu;

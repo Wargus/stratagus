@@ -269,7 +269,7 @@ static int WaitMouseY;                       /// Mouse Y position
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey(unsigned dummy __attribute__((unused)))
+static void WaitCallbackKey(unsigned dummy)
 {
 	WaitNoEvent = 0;
 }
@@ -277,15 +277,14 @@ static void WaitCallbackKey(unsigned dummy __attribute__((unused)))
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey1(unsigned dummy __attribute__((unused)))
+static void WaitCallbackKey1(unsigned dummy)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+static void WaitCallbackKey2(unsigned dummy1, unsigned dummy2)
 {
 	WaitNoEvent = 0;
 }
@@ -293,16 +292,14 @@ static void WaitCallbackKey2(unsigned dummy1 __attribute__((unused)),
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey3(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+static void WaitCallbackKey3(unsigned dummy1, unsigned dummy2)
 {
 }
 
 /**
 **  Callback for input.
 */
-static void WaitCallbackKey4(unsigned dummy1 __attribute__((unused)),
-	unsigned dummy2 __attribute__((unused)))
+static void WaitCallbackKey4(unsigned dummy1, unsigned dummy2)
 {
 }
 
@@ -616,8 +613,7 @@ static void PrintHeader(void)
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-static int main1(int argc __attribute__ ((unused)),
-	char** argv __attribute__ ((unused)))
+static int main1(int argc, char** argv)
 {
 	PrintHeader();
 	printf(
