@@ -298,6 +298,9 @@ int PlayMovie(const char* name)
 */
 int PlayMovie(const char* name)
 {
+	if (strstr(name, ".ogg\0") || strstr(name, ".avi\0")) {
+		return 0;
+	}
 	return -1;
 }
 
