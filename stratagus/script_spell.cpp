@@ -268,7 +268,8 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "Table expected for adjust-variable.");
 		}
-		spellaction->Data.AdjustVariable = calloc(UnitTypeVar.NumberVariable, sizeof (*spellaction->Data.AdjustVariable));
+		spellaction->Data.AdjustVariable = (SpellActionTypeAdjustVariable*)calloc(
+			UnitTypeVar.NumberVariable, sizeof(*spellaction->Data.AdjustVariable));
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			int i;
 
@@ -506,8 +507,8 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	// Set everything to 0:
 	memset(condition, 0, sizeof(ConditionInfo));
 	// Flags are defaulted to 0(CONDITION_TRUE)
-	condition->BoolFlag = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof (*condition->BoolFlag));
-	condition->Variable = calloc(UnitTypeVar.NumberVariable, sizeof (*condition->Variable));
+	condition->BoolFlag = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*condition->BoolFlag));
+	condition->Variable = (ConditionInfoVariable*)calloc(UnitTypeVar.NumberVariable, sizeof(*condition->Variable));
 	// Initialize min/max stuff to values with no effect.
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		condition->Variable[i].MinValue = -1;

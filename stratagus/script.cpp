@@ -104,7 +104,13 @@ static int StringCounter = 0; /// Counter for lua function.
 
 
 /// Usefull for getComponent.
-typedef union {const char *s; int i;} UStrInt;
+typedef enum {
+	USTRINT_STR, USTRINT_INT
+} UStrIntType;
+typedef struct {
+	union {const char *s; int i;};
+	UStrIntType type;
+} UStrInt;
 /// Get component for unit variable.
 extern UStrInt GetComponent(const Unit* unit, int index, EnumVariable e, int t);
 

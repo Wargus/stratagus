@@ -37,9 +37,16 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+#ifdef __cplusplus
+}
+#endif
+
 #include "unit.h"
 
 typedef struct _lua_user_data_ {
