@@ -1855,7 +1855,7 @@ void UpdateUnitVariables(const Unit* unit)
 	// Research.
 	if (unit->Orders[0].Action == UnitActionResearch) {
 		unit->Variable[RESEARCH_INDEX].Value =
-			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade - Upgrades];
+			unit->Player->UpgradeTimers.Upgrades[unit->Data.Research.Upgrade->ID];
 		unit->Variable[RESEARCH_INDEX].Max = unit->Data.Research.Upgrade->Costs[TimeCost];
 	}
 

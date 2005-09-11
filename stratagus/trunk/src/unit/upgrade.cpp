@@ -39,6 +39,11 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include <string>
+#include <vector>
+#include <map>
+
 #include "upgrade.h"
 #include "player.h"
 #include "depend.h"
@@ -58,15 +63,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-static void AllowUnitId(Player* player, int id, int units);
-static void AllowUpgradeId(Player* player, int id, char af);
+static void AllowUnitId(Player *player, int id, int units);
+static void AllowUpgradeId(Player *player, int id, char af);
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-Upgrade Upgrades[UpgradeMax];                /// The main user useable upgrades
-static int NumUpgrades;                      /// Number of upgrades used
+std::vector<Upgrade *> AllUpgrades;           /// The main user useable upgrades
 
 	/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
@@ -75,11 +79,7 @@ static UpgradeModifier* UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 	/// Number of upgrades modifiers used
 static int NumUpgradeModifiers;
 
-#ifdef DOXYGEN  // no real code, only for documentation
-static Upgrade* UpgradeHash[61];             /// lookup table for upgrade names
-#else
-static hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
-#endif
+std::map<std::string, Upgrade *> Upgrades;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -96,40 +96,33 @@ static hashtable(Upgrade*, 61) UpgradeHash;  /// lookup table for upgrade names
 **
 **  @return       upgrade id or -1 for error
 */
-static Upgrade* AddUpgrade(const char* ident, const char* icon,
-	const int* costs)
+static Upgrade *AddUpgrade(const char *ident, const char *icon,
+	const int *costs)
 {
-	Upgrade* upgrade;
-	Upgrade** tmp;
-	int i;
+	Upgrade *upgrade = Upgrades[ident];
 
-	// Check for free slot.
-
-	if (NumUpgrades == UpgradeMax) {
-		DebugPrint("Upgrades limit reached.\n");
-		return NULL;
-	}
-	// Fill upgrade structure
-
-	if ((tmp = (Upgrade**)hash_find(UpgradeHash, (char*)ident)) && *tmp) {
+	if (upgrade) {
 		DebugPrint("Already defined upgrade `%s'\n" _C_ ident);
-		upgrade = *tmp;
-		free(upgrade->Icon.Name);
+		delete[] upgrade->Icon.Name;
 	} else {
-		upgrade = Upgrades + NumUpgrades++;
-		upgrade->Ident = strdup(ident);
-		*(Upgrade**)hash_add(UpgradeHash, upgrade->Ident) = upgrade;
+		upgrade = new Upgrade;
+		upgrade->Ident = new char[strlen(ident) + 1];
+		strcpy(upgrade->Ident, ident);
+		upgrade->ID = AllUpgrades.size();
+		Upgrades[ident] = upgrade;
+		AllUpgrades.push_back(upgrade);
 	}
 
 	if (icon) {
-		upgrade->Icon.Name = strdup(icon);
+		upgrade->Icon.Name = new char[strlen(icon) + 1];
+		strcpy(upgrade->Icon.Name, icon);
 	} else {  // automatically generated icon-name
-		upgrade->Icon.Name = (char*)malloc(strlen(ident) + 5 - 8 + 1);
+		upgrade->Icon.Name = new char[strlen(ident) + 5 - 8 + 1];
 		strcpy(upgrade->Icon.Name, "icon-");
 		strcpy(upgrade->Icon.Name + 5, ident + 8);
 	}
 
-	for (i = 0; i < MaxCosts; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		upgrade->Costs[i] = costs[i];
 	}
 
@@ -142,17 +135,13 @@ static Upgrade* AddUpgrade(const char* ident, const char* icon,
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade pointer or NULL if not found.
 */
-Upgrade* UpgradeByIdent(const char* ident)
+Upgrade *UpgradeByIdent(const char *ident)
 {
-	Upgrade** upgrade;
-
-	if ((upgrade = (Upgrade**)hash_find(UpgradeHash, (char*)ident))) {
-		return *upgrade;
+	Upgrade* upgrade = Upgrades[ident];
+	if (!upgrade) {
+		DebugPrint("Upgrade %s not found\n" _C_ ident);
 	}
-
-	DebugPrint(" upgrade %s not found\n" _C_ ident);
-
-	return NULL;
+	return upgrade;
 }
 
 /**
@@ -160,13 +149,9 @@ Upgrade* UpgradeByIdent(const char* ident)
 */
 void InitUpgrades(void)
 {
-	int i;
-
-	//
-	//  Resolve the icons.
-	//
-	for (i = 0; i < NumUpgrades; ++i) {
-		Upgrades[i].Icon.Icon = IconByIdent(Upgrades[i].Icon.Name);
+	// Resolve the icons.
+	for (std::vector<Upgrade *>::size_type i = 0; i < AllUpgrades.size(); ++i) {
+		AllUpgrades[i]->Icon.Icon = IconByIdent(AllUpgrades[i]->Icon.Name);
 	}
 }
 
@@ -175,22 +160,22 @@ void InitUpgrades(void)
 */
 void CleanUpgrades(void)
 {
-	int i;
-
 	//
 	//  Free the upgrades.
 	//
-	for (i = 0; i < NumUpgrades; ++i) {
-		hash_del(UpgradeHash, Upgrades[i].Ident);
-		free(Upgrades[i].Ident);
-		free(Upgrades[i].Icon.Name);
+	while (AllUpgrades.size()) {
+		Upgrade *upgrade = AllUpgrades.back();
+		AllUpgrades.pop_back();
+		delete[] upgrade->Ident;
+		delete[] upgrade->Icon.Name;
+		delete upgrade;
 	}
-	NumUpgrades = 0;
+	Upgrades.clear();
 
 	//
 	//  Free the upgrade modifiers.
 	//
-	for (i = 0; i < NumUpgradeModifiers; ++i) {
+	for (int i = 0; i < NumUpgradeModifiers; ++i) {
 		free(UpgradeModifiers[i]->Modifier.Variables);
 		free(UpgradeModifiers[i]);
 	}
@@ -202,9 +187,8 @@ void CleanUpgrades(void)
 **
 **  @param file  Output file.
 */
-void SaveUpgrades(CLFile* file)
+void SaveUpgrades(CLFile *file)
 {
-	int i;
 	int p;
 
 	CLprintf(file, "\n-- -----------------------------------------\n");
@@ -213,7 +197,7 @@ void SaveUpgrades(CLFile* file)
 	//
 	//  Save the allow
 	//
-	for (i = 0; i < NumUnitTypes; ++i) {
+	for (int i = 0; i < NumUnitTypes; ++i) {
 		CLprintf(file, "DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			if (p) {
@@ -228,10 +212,10 @@ void SaveUpgrades(CLFile* file)
 	//
 	//  Save the upgrades
 	//
-	for (i = 0; i < NumUpgrades; ++i) {
-		CLprintf(file, "DefineAllow(\"%s\", \"", Upgrades[i].Ident);
+	for (std::vector<Upgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
+		CLprintf(file, "DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
-			CLprintf(file, "%c", Players[p].Allow.Upgrades[i]);
+			CLprintf(file, "%c", Players[p].Allow.Upgrades[j]);
 		}
 		CLprintf(file, "\")\n");
 	}
@@ -246,17 +230,17 @@ void SaveUpgrades(CLFile* file)
 **
 **  @param l  List of modifiers.
 */
-static int CclDefineModifier(lua_State* l)
+static int CclDefineModifier(lua_State *l)
 {
-	const char* key;
-	const char* value;
-	UpgradeModifier* um;
+	const char *key;
+	const char *value;
+	UpgradeModifier *um;
 	int args;
 	int j;
 
 	args = lua_gettop(l);
 
-	um = (UpgradeModifier*)calloc(1, sizeof(*um));
+	um = (UpgradeModifier *)calloc(1, sizeof(*um));
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
@@ -374,11 +358,11 @@ static int CclDefineModifier(lua_State* l)
 **
 **  @param l  List defining the upgrade.
 */
-static int CclDefineUpgrade(lua_State* l)
+static int CclDefineUpgrade(lua_State *l)
 {
-	const char* value;
-	const char* icon;
-	const char* ident;
+	const char *value;
+	const char *icon;
+	const char *ident;
 	int costs[MaxCosts];
 	int n;
 	int j;
@@ -431,9 +415,9 @@ static int CclDefineUpgrade(lua_State* l)
 /**
 **  Define which units are allowed and how much.
 */
-static int CclDefineUnitAllow(lua_State* l)
+static int CclDefineUnitAllow(lua_State *l)
 {
-	const char* ident;
+	const char *ident;
 	int i;
 	int args;
 	int j;
@@ -462,10 +446,10 @@ static int CclDefineUnitAllow(lua_State* l)
 /**
 **  Define which units/upgrades are allowed.
 */
-static int CclDefineAllow(lua_State* l)
+static int CclDefineAllow(lua_State *l)
 {
-	const char* ident;
-	const char* ids;
+	const char *ident;
+	const char *ids;
 	int i;
 	int n;
 	int args;
@@ -530,9 +514,9 @@ void UpgradesCclRegister(void)
 **  @param ident  The unit-type identifier.
 **  @return       Unit-type ID (int) or -1 if not found.
 */
-int UnitTypeIdByIdent(const char* ident)
+int UnitTypeIdByIdent(const char *ident)
 {
-	const UnitType* type;
+	const UnitType *type;
 
 	if ((type = UnitTypeByIdent(ident))) {
 		return type->Slot;
@@ -548,13 +532,12 @@ int UnitTypeIdByIdent(const char* ident)
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade ID (int) or -1 if not found.
 */
-int UpgradeIdByIdent(const char* ident)
+int UpgradeIdByIdent(const char *ident)
 {
-	const Upgrade* upgrade;
+	const Upgrade *upgrade;
 
-	upgrade = UpgradeByIdent(ident);
-	if (upgrade) {
-		return upgrade - Upgrades;
+	if ((upgrade = UpgradeByIdent(ident))) {
+		return upgrade->ID;
 	}
 	DebugPrint(" fix this %s\n" _C_ ident);
 	return -1;
@@ -571,9 +554,9 @@ int UpgradeIdByIdent(const char* ident)
 **  @param src     From this unit-type.
 **  @param dst     To this unit-type.
 */
-static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst)
+static void ConvertUnitTypeTo(Player *player, const UnitType *src, UnitType *dst)
 {
-	Unit* unit;
+	Unit *unit;
 	int i;
 	int j;
 
@@ -615,15 +598,15 @@ static void ConvertUnitTypeTo(Player* player, const UnitType* src, UnitType* dst
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
+static void ApplyUpgradeModifier(Player *player, const UpgradeModifier *um)
 {
 	int z;                      // iterator on upgrade or unittype.
 	int j;                      // iterator on cost or variable.
 	int pn;                     // player number.
 	int varModified;            // 0 if variable is not modified.
 	int numunits;               // number of unit of the current type.
-	Unit* unitupgrade[UnitMax]; // array of unit of the current type
-	Unit* unit;                 // current unit.
+	Unit *unitupgrade[UnitMax]; // array of unit of the current type
+	Unit *unit;                 // current unit.
 
 	Assert(player);
 	Assert(um);
@@ -735,12 +718,12 @@ static void ApplyUpgradeModifier(Player* player, const UpgradeModifier* um)
 **  @param player   Player researching the upgrade.
 **  @param upgrade  Upgrade ready researched.
 */
-void UpgradeAcquire(Player* player, const Upgrade* upgrade)
+void UpgradeAcquire(Player *player, const Upgrade *upgrade)
 {
 	int z;
 	int id;
 
-	id = upgrade - Upgrades;
+	id = upgrade->ID;
 	player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	AllowUpgradeId(player, id, 'R');  // research done
 
@@ -786,7 +769,7 @@ void UpgradeLost(Player* player, int id)
 **  @param id      unit type id
 **  @param units   maximum amount of units allowed
 */
-static void AllowUnitId(Player* player, int id, int units)
+static void AllowUnitId(Player *player, int id, int units)
 {
 	player->Allow.Units[id] = units;
 }
@@ -798,7 +781,7 @@ static void AllowUnitId(Player* player, int id, int units)
 **  @param id      upgrade id
 **  @param af      `A'llow/`F'orbid/`R'eseached
 */
-static void AllowUpgradeId(Player* player, int id, char af)
+static void AllowUpgradeId(Player *player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player->Allow.Upgrades[id] = af;
@@ -812,7 +795,7 @@ static void AllowUpgradeId(Player* player, int id, char af)
 **
 **  @return the allow state of the unit.
 */
-int UnitIdAllowed(const Player* player, int id)
+int UnitIdAllowed(const Player *player, int id)
 {
 	Assert(id >= 0 && id < UnitTypeMax);
 	return player->Allow.Units[id];
@@ -826,7 +809,7 @@ int UnitIdAllowed(const Player* player, int id)
 **
 **  @return the allow state of the upgrade.
 */
-char UpgradeIdAllowed(const Player* player, int id)
+char UpgradeIdAllowed(const Player *player, int id)
 {
 	Assert(id >= 0 && id < UpgradeMax);
 	return player->Allow.Upgrades[id];
@@ -842,7 +825,7 @@ char UpgradeIdAllowed(const Player* player, int id)
 **
 **  @note This function shouldn't be used during runtime, it is only for setup.
 */
-char UpgradeIdentAllowed(const Player* player, const char* ident)
+char UpgradeIdentAllowed(const Player *player, const char *ident)
 {
 	int id;
 
@@ -863,7 +846,7 @@ char UpgradeIdentAllowed(const Player* player, const char* ident)
 **  @param player  Player pointer.
 **  @param ident   Upgrade ident.
 */
-int UpgradeIdentAvailable(const Player* player, const char* ident)
+int UpgradeIdentAvailable(const Player *player, const char *ident)
 {
 	int allow;
 

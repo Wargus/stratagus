@@ -95,8 +95,8 @@ void HandleActionResearch(Unit* unit)
 		return;
 	}
 
-	unit->Player->UpgradeTimers.Upgrades[upgrade - Upgrades] += SpeedResearch;
-	if (unit->Player->UpgradeTimers.Upgrades[upgrade-Upgrades] >=
+	unit->Player->UpgradeTimers.Upgrades[upgrade->ID] += SpeedResearch;
+	if (unit->Player->UpgradeTimers.Upgrades[upgrade->ID] >=
 			upgrade->Costs[TimeCost]) {
 
 		NotifyPlayer(unit->Player, NotifyGreen, unit->X, unit->Y,

@@ -239,8 +239,8 @@ static int CclDefineAiHelper(lua_State* l)
 					break;
 				case 3: // research
 					AiHelperSetupTable(&AiHelpers.ResearchCount, &AiHelpers.Research,
-						upgrade - Upgrades);
-					AiHelperInsert(AiHelpers.Research + (upgrade - Upgrades), base);
+						upgrade->ID);
+					AiHelperInsert(AiHelpers.Research + (upgrade->ID), base);
 					break;
 				case 4: // unit-limit
 					AiHelperSetupTable(&AiHelpers.UnitLimitCount, &AiHelpers.UnitLimit,

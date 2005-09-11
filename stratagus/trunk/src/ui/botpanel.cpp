@@ -173,7 +173,7 @@ int AddButton(int pos, int level, const char* icon_ident,
 	ba->UnitMask = strdup(buf);
 	UnitButtonTable[NumUnitButtons++] = ba;
 	// FIXME: check if already initited
-	//Assert(ba->Icon.Icon != NoIcon);// just checks, that's why at the end
+	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
 	return 1;
 }
 
@@ -416,7 +416,7 @@ void UpdateStatusLineForButton(const ButtonAction* button)
 			SetCosts(0, UnitTypes[v]->Demand, stats->Costs);
 			break;
 		case ButtonResearch:
-			SetCosts(0, 0, Upgrades[v].Costs);
+			SetCosts(0, 0, AllUpgrades[v]->Costs);
 			break;
 		case ButtonSpellCast:
 			SetCosts(SpellTypeTable[v]->ManaCost, 0, NULL);
@@ -927,9 +927,9 @@ void DoButtonButtonClicked(int button)
 			break;
 		case ButtonResearch:
 			i = CurrentButtons[button].Value;
-			if (!PlayerCheckCosts(Selected[0]->Player, Upgrades[i]. Costs)) {
+			if (!PlayerCheckCosts(Selected[0]->Player, AllUpgrades[i]->Costs)) {
 				//PlayerSubCosts(player,Upgrades[i].Costs);
-				SendCommandResearch(Selected[0],&Upgrades[i],
+				SendCommandResearch(Selected[0], AllUpgrades[i],
 					!(KeyModifiers & ModifierShift));
 				ClearStatusLine();
 				ClearCosts();
