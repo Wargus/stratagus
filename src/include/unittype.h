@@ -40,7 +40,7 @@
 struct _CL_File_;
 struct lua_State;
 #ifdef USE_MNG
-struct _mng_;
+class Mng;
 #endif
 
 /**
@@ -519,6 +519,7 @@ struct _mng_;
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
 #include "upgrade_structs.h"
 #include "util.h"
 #include "unitsound.h"
@@ -796,7 +797,7 @@ typedef struct _unit_type_ {
 	struct _portrait_ {
 		char** Files;
 		int Num;
-		struct _mng_** Mngs;
+		Mng** Mngs;
 		int CurrMng;
 		int NumIterations;
 	} Portrait;
@@ -916,8 +917,7 @@ typedef struct _unit_type_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern UnitType* UnitTypes[UnitTypeMax];    /// All unit-types
-extern int NumUnitTypes;                    /// Number of unit-types made
+extern std::vector<UnitType *> UnitTypes;   /// All unit-types
 
 /// @todo this hardcoded unit-types must be removed!!
 extern UnitType*UnitTypeHumanWall;          /// Human wall

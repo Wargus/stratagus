@@ -53,21 +53,23 @@
 
 static mng_ptr MNG_DECL my_alloc(mng_size_t len)
 {
-	return calloc(1, len);
+	char *ptr = new char[len];
+	memset(ptr, 0, len);
+	return (mng_ptr)ptr;
 }
 
 static void MNG_DECL my_free(mng_ptr ptr, mng_size_t len)
 {
-	free(ptr);
+	delete[] ptr;
 }
 
 static mng_bool MNG_DECL my_openstream(mng_handle handle)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	mng->FD = fopen(mng->Name, "rb");
-	if (!mng->FD) {
+	mng = (Mng *)mng_get_userdata(handle);
+	mng->fd = fopen(mng->name, "rb");
+	if (!mng->fd) {
 		return MNG_FALSE;
 	}
 	return MNG_TRUE;
@@ -75,11 +77,11 @@ static mng_bool MNG_DECL my_openstream(mng_handle handle)
 
 static mng_bool MNG_DECL my_closestream(mng_handle handle)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	if (mng->FD) {
-		fclose(mng->FD);
+	mng = (Mng *)mng_get_userdata(handle);
+	if (mng->fd) {
+		fclose(mng->fd);
 	}
 	return MNG_TRUE;
 }
@@ -87,10 +89,10 @@ static mng_bool MNG_DECL my_closestream(mng_handle handle)
 static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 buflen,
 	mng_uint32p read)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	*read = fread(buf, 1, buflen, mng->FD);
+	mng = (Mng *)mng_get_userdata(handle);
+	*read = fread(buf, 1, buflen, mng->fd);
 	return MNG_TRUE;
 }
 
@@ -101,7 +103,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Uint32 Gmask;
 	Uint32 Bmask;
 	mng_imgtype type;
-	Mng* mng;
+	Mng *mng;
 #ifdef USE_OPENGL
 	unsigned w;
 	unsigned h;
@@ -112,17 +114,17 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 		return TRUE;
 	}
 
-	mng = (Mng*)mng_get_userdata(handle);
+	mng = (Mng *)mng_get_userdata(handle);
 
 #ifdef USE_OPENGL
 	for (w = 1; w < width; w <<= 1) {
 	}
 	for (h = 1; h < height; h <<= 1) {
 	}
-	mng->TextureWidth = (float)width / w;
-	mng->TextureHeight = (float)height / h;
-	glGenTextures(1, &mng->TextureName);
-	glBindTexture(GL_TEXTURE_2D, mng->TextureName);
+	mng->texture_width = (float)width / w;
+	mng->texture_height = (float)height / h;
+	glGenTextures(1, &mng->texture_name);
+	glBindTexture(GL_TEXTURE_2D, mng->texture_name);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -141,11 +143,12 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	Bmask = 0x0000FF00 >> 8;
 #endif
 
-	mng->Buffer = (unsigned char*)calloc(width * height * 3, 1);
+	mng->buffer = new unsigned char[width * height * 3];
+	memset(mng->buffer, width * height * 3, sizeof(unsigned char));
 
-	mng->Surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
+	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 		8 * 3, Rmask, Gmask, Bmask, 0);
-	if (mng->Surface == NULL) {
+	if (mng->surface == NULL) {
 		fprintf(stderr, "Out of memory");
 		exit(1);
 	}
@@ -155,30 +158,30 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 
 static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	return mng->Buffer + linenr * mng->Surface->w * 3;
+	mng = (Mng *)mng_get_userdata(handle);
+	return mng->buffer + linenr * mng->surface->w * 3;
 }
 
 static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32 x, mng_uint32 y,
 	mng_uint32 width, mng_uint32 height)
 {
-	Mng* mng;
+	Mng *mng;
 	int i;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	SDL_LockSurface(mng->Surface);
-	for (i = 0; i < mng->Surface->h; ++i) {
-		memcpy((char*)mng->Surface->pixels + i * mng->Surface->pitch,
-			mng->Buffer + i * mng->Surface->w * 3, mng->Surface->w * 3);
+	mng = (Mng *)mng_get_userdata(handle);
+	SDL_LockSurface(mng->surface);
+	for (i = 0; i < mng->surface->h; ++i) {
+		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
+			mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
 	}
 #ifdef USE_OPENGL
-	glBindTexture(GL_TEXTURE_2D, mng->TextureName);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->Surface->w, mng->Surface->h,
-		GL_RGB, GL_UNSIGNED_BYTE, mng->Surface->pixels);
+	glBindTexture(GL_TEXTURE_2D, mng->texture_name);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mng->surface->w, mng->surface->h,
+		GL_RGB, GL_UNSIGNED_BYTE, mng->surface->pixels);
 #endif
-	SDL_UnlockSurface(mng->Surface);
+	SDL_UnlockSurface(mng->surface);
 
 	return MNG_TRUE;
 }
@@ -190,10 +193,10 @@ static mng_uint32 MNG_DECL my_gettickcount(mng_handle handle)
 
 static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	mng->Ticks = GetTicks() + msecs;
+	mng = (Mng *)mng_get_userdata(handle);
+	mng->ticks = GetTicks() + msecs;
 
 	return MNG_TRUE;
 }
@@ -201,10 +204,10 @@ static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterationsdone,
 	mng_uint32 iterationsleft)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	mng->Iteration = iterationsdone;
+	mng = (Mng *)mng_get_userdata(handle);
+	mng->iteration = iterationsdone;
 
 	return MNG_TRUE;
 }
@@ -213,14 +216,42 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32 errorcode,
 	mng_int8 severity, mng_chunkid chunkname, mng_uint32 chunkseq,
 	mng_int32 extra1, mng_int32 extra2, mng_pchar errortext)
 {
-	Mng* mng;
+	Mng *mng;
 
-	mng = (Mng*)mng_get_userdata(handle);
-	mng->Iteration = 0x7fffffff;
+	mng = (Mng *)mng_get_userdata(handle);
+	mng->iteration = 0x7fffffff;
 	if (errortext) {
 		DebugPrint("MNG error: %s\n" _C_ errortext);
 	}
 	return TRUE;
+}
+
+
+Mng::Mng() :
+	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
+	ticks(0), iteration(0)
+{
+#ifdef USE_OPENGL
+	texture_width = texture_height = texture_name = 0;
+#endif
+}
+
+
+Mng::~Mng()
+{
+	delete[] name;
+	if (handle) {
+		mng_cleanup(&handle);
+	}
+	if (surface) {
+		SDL_FreeSurface(surface);
+	}
+	delete[] buffer;
+#ifdef USE_OPENGL
+	if (texture_width) {
+		glDeleteTextures(1, &texture_name);
+	}
+#endif
 }
 
 
@@ -229,37 +260,25 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32 errorcode,
 **
 **  @param mng  Mng file to display
 */
-void DisplayMNG(Mng* mng, int x, int y)
+void Mng::Draw(int x, int y)
 {
-#ifndef USE_OPENGL
-	SDL_Rect rect;
-#else
-	GLint sx;
-	GLint ex;
-	GLint sy;
-	GLint ey;
-#endif
-
-	if (mng->Ticks <= GetTicks()) {
-		mng_display_resume((mng_handle)mng->Handle);
+	if (ticks <= GetTicks()) {
+		mng_display_resume(handle);
 	}
 
 #ifndef USE_OPENGL
-	rect.x = x;
-	rect.y = y;
-	rect.w = mng->Surface->w;
-	rect.h = mng->Surface->h;
-	SDL_BlitSurface(mng->Surface, NULL, TheScreen, &rect);
+	SDL_Rect rect = {x, y, surface->w, surface->h};
+	SDL_BlitSurface(surface, NULL, TheScreen, &rect);
 #else
-	sx = x;
-	ex = sx + mng->Surface->w;
-	sy = y;
-	ey = sy + mng->Surface->h;
+	GLint sx = x;
+	GLint ex = sx + mng->Surface->w;
+	GLint sy = y;
+	GLint ey = sy + mng->Surface->h;
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, mng->TextureHeight);
+	glTexCoord2f(0.0f, textureHeight);
 	glVertex2i(sx, ey);
 	glTexCoord2f(mng->TextureWidth, mng->TextureHeight);
 	glVertex2i(ex, ey);
@@ -274,46 +293,39 @@ void DisplayMNG(Mng* mng, int x, int y)
 **
 **  @param name  Name of the MNG file
 */
-Mng* LoadMNG(const char* name)
+int Mng::Load(const char *name)
 {
-	Mng* mng;
 	mng_retcode myretcode;
 	char buf[PATH_MAX];
 
 	LibraryFileName(name, buf);
 
-	mng = (Mng*)calloc(1, sizeof(Mng));
-	mng->Name = strdup(buf);
-	mng->Handle = mng_initialize(mng, my_alloc, my_free, MNG_NULL);
-	if ((mng_handle)mng->Handle == MNG_NULL) {
-		free(mng->Name);
-		free(mng);
-		return NULL;
+	this->name = new char[strlen(buf) + 1];
+	strcpy(this->name, buf);
+	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
+	if (handle == MNG_NULL) {
+		return -1;
 	}
-	mng_setcb_openstream(mng->Handle, my_openstream);
-	mng_setcb_closestream(mng->Handle, my_closestream);
-	mng_setcb_readdata(mng->Handle, my_readdata);
-	mng_setcb_processheader(mng->Handle, my_processheader);
-	mng_setcb_processmend(mng->Handle, my_processmend);
-	mng_setcb_getcanvasline(mng->Handle, my_getcanvasline);
-	mng_setcb_refresh(mng->Handle, my_refresh);
-	mng_setcb_gettickcount(mng->Handle, my_gettickcount);
-	mng_setcb_settimer(mng->Handle, my_settimer);
-	mng_setcb_errorproc(mng->Handle, my_errorproc);
+	mng_setcb_openstream(handle, my_openstream);
+	mng_setcb_closestream(handle, my_closestream);
+	mng_setcb_readdata(handle, my_readdata);
+	mng_setcb_processheader(handle, my_processheader);
+	mng_setcb_processmend(handle, my_processmend);
+	mng_setcb_getcanvasline(handle, my_getcanvasline);
+	mng_setcb_refresh(handle, my_refresh);
+	mng_setcb_gettickcount(handle, my_gettickcount);
+	mng_setcb_settimer(handle, my_settimer);
+	mng_setcb_errorproc(handle, my_errorproc);
 
-	mng_read(mng->Handle);
-	if (mng->Surface && mng->Iteration != 0x7fffffff) {
-		myretcode = mng_display(mng->Handle);
+	mng_read(handle);
+	if (surface && iteration != 0x7fffffff) {
+		myretcode = mng_display(handle);
 	}
 
-	if (!mng->Surface || mng->Iteration == 0x7fffffff) {
-		mng_cleanup(&(mng_handle)mng->Handle);
-		free(mng->Buffer);
-		free(mng->Name);
-		free(mng);
-		return NULL;
+	if (!surface || iteration == 0x7fffffff) {
+		return -1;
 	}
-	return mng;
+	return 0;
 }
 
 /**
@@ -321,31 +333,11 @@ Mng* LoadMNG(const char* name)
 **
 **  @param mng  Mng file to reset
 */
-void ResetMNG(Mng* mng)
+void Mng::Reset()
 {
-	mng_display_reset(mng->Handle);
-	mng->Iteration = 0;
-	mng_display(mng->Handle);
-}
-
-/**
-**  Free a MNG
-**
-**  @param mng  Mng file to free
-*/
-void FreeMNG(Mng* mng)
-{
-	if (!mng) {
-		return;
-	}
-	mng_cleanup(&(mng_handle)mng->Handle);
-	SDL_FreeSurface(mng->Surface);
-	free(mng->Buffer);
-#ifdef USE_OPENGL
-	glDeleteTextures(1, &mng->TextureName);
-#endif
-	free(mng->Name);
-	free(mng);
+	mng_display_reset(handle);
+	iteration = 0;
+	mng_display(handle);
 }
 
 #endif // USE_MNG
