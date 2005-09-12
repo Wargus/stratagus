@@ -363,9 +363,12 @@ static void ShowTitleScreens(void)
 			TitleScreenLabel** labels;
 			Graphic* g;
 #ifdef USE_MNG
-			Mng* mng;
+			Mng *mng = new Mng;
 
-			mng = LoadMNG(TitleScreens[i]->File);
+			if (mng->Load(TitleScreens[i]->File) == -1) {
+				delete mng;
+				mng = NULL;
+			}
 			g = NULL;
 			if (!mng) {
 #endif
@@ -379,9 +382,9 @@ static void ShowTitleScreens(void)
 			while (timeout-- && WaitNoEvent) {
 #ifdef USE_MNG
 				if (mng) {
-					DisplayMNG(mng, (VideoWidth - mng->Surface->w) / 2,
-						(VideoHeight - mng->Surface->h) / 2);
-					if (mng->Iteration == TitleScreens[i]->Iterations) {
+					mng->Draw((VideoWidth - mng->surface->w) / 2,
+						(VideoHeight - mng->surface->h) / 2);
+					if (mng->iteration == TitleScreens[i]->Iterations) {
 						WaitNoEvent = 0;
 					}
 				} else {
@@ -408,9 +411,7 @@ static void ShowTitleScreens(void)
 				WaitEventsOneFrame(&callbacks);
 			}
 #ifdef USE_MNG
-			if (mng) {
-				FreeMNG(mng);
-			}
+			delete mng;
 #endif
 			FreeGraphic(g);
 		}

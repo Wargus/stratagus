@@ -40,6 +40,10 @@
 #include <ctype.h>
 
 #include "stratagus.h"
+
+#include <string>
+#include <map>
+
 #include "video.h"
 #include "tileset.h"
 #include "map.h"
@@ -61,8 +65,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-UnitType* UnitTypes[UnitTypeMax];   /// unit-types definition
-int NumUnitTypes;                   /// number of unit-types made
+std::vector<UnitType *> UnitTypes;   /// unit-types definition
+std::map<std::string, UnitType *> UnitTypeMap;
 
 /**
 **  Next unit type are used hardcoded in the source.
@@ -71,22 +75,6 @@ int NumUnitTypes;                   /// number of unit-types made
 */
 UnitType* UnitTypeHumanWall;       /// Human wall
 UnitType* UnitTypeOrcWall;         /// Orc wall
-
-#ifdef DOXYGEN // no real code, only for document
-
-/**
-**  Lookup table for unit-type names
-*/
-static UnitType* UnitTypeHash[UnitTypeMax];
-
-#else
-
-/**
-**  Lookup table for unit-type names
-*/
-static hashtable(UnitType*, UnitTypeMax) UnitTypeHash;
-
-#endif
 
 /**
 **  Default resources for a new player.
@@ -142,12 +130,11 @@ void UpdateStats(int reset)
 	UnitStats* stats;
 	int player;
 	unsigned i;
-	int j;
 
 	//
 	//  Update players stats
 	//
-	for (j = 0; j < NumUnitTypes; ++j) {
+	for (std::vector<UnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
 		type = UnitTypes[j];
 		if (reset) {
 			// LUDO : FIXME : reset loading of player stats !
@@ -157,7 +144,7 @@ void UpdateStats(int reset)
 					stats->Costs[i] = type->_Costs[i];
 				}
 				if (!stats->Variables) {
-					stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof (*stats->Variables));
+					stats->Variables = (VariableType*)calloc(UnitTypeVar.NumberVariable, sizeof(*stats->Variables));
 				}
 				for (i = 0; (int) i < UnitTypeVar.NumberVariable; i++) {
 					stats->Variables[i] = type->Variable[i];
@@ -249,15 +236,9 @@ void UpdateStats(int reset)
 **
 **  @return  Pointer to the animation structure.
 */
-Animations* AnimationsByIdent(const char* ident)
+Animations *AnimationsByIdent(const char *ident)
 {
-	Animations** tmp;
-
-	tmp = (Animations**)hash_find(AnimationsHash, ident);
-	if (tmp) {
-		return *tmp;
-	}
-	return NULL;
+	return AnimationMap[ident];
 }
 
 /**
@@ -299,14 +280,13 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 */
 void SaveUnitTypes(CLFile* file)
 {
-	int i;
 	int j;
 
 	CLprintf(file, "\n--- -----------------------------------------\n");
 	CLprintf(file, "--- MODULE: unittypes $Id$\n\n");
 
 	// Save all stats
-	for (i = 0; i < NumUnitTypes; ++i) {
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CLprintf(file, "\n");
 		for (j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerNobody) {
@@ -323,12 +303,9 @@ void SaveUnitTypes(CLFile* file)
 **
 **  @return       Unit-type pointer.
 */
-UnitType* UnitTypeByIdent(const char* ident)
+UnitType *UnitTypeByIdent(const char *ident)
 {
-	UnitType* const* type;
-
-	type = (UnitType* const*)hash_find(UnitTypeHash, ident);
-	return type ? *type : 0;
+	return UnitTypeMap[ident];
 }
 
 /**
@@ -338,16 +315,17 @@ UnitType* UnitTypeByIdent(const char* ident)
 **
 **  @return       New allocated (zeroed) unit-type pointer.
 */
-UnitType* NewUnitTypeSlot(char* ident)
+UnitType *NewUnitTypeSlot(char *ident)
 {
-	UnitType* type;
+	UnitType *type;
 
-	type = (UnitType*)calloc(1, sizeof(UnitType));
+	type = new UnitType;
 	if (!type) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
-	type->Slot = NumUnitTypes;
+	memset(type, 0, sizeof(*type));
+	type->Slot = UnitTypes.size();
 	type->Ident = ident;
 	type->BoolFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->BoolFlag));
 	type->CanTargetFlag = (unsigned char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*type->CanTargetFlag));
@@ -355,8 +333,8 @@ UnitType* NewUnitTypeSlot(char* ident)
 	memcpy(type->Variable, UnitTypeVar.Variable,
 		UnitTypeVar.NumberVariable * sizeof(*type->Variable));
 
-	UnitTypes[NumUnitTypes++] = type;
-	*(UnitType**)hash_add(UnitTypeHash, type->Ident) = type;
+	UnitTypes.push_back(type);
+	UnitTypeMap[type->Ident] = type;
 	return type;
 }
 
@@ -426,17 +404,14 @@ static int GetStillFrame(UnitType* type)
 */
 void InitUnitTypes(int reset_player_stats)
 {
-	int type;
-
-	for (type = 0; type < NumUnitTypes; ++type) {
-		Assert(UnitTypes[type]->Slot == type);
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+		Assert(UnitTypes[i]->Slot == i);
 
 		//  Add idents to hash.
-		*(UnitType**)hash_add(UnitTypeHash, UnitTypes[type]->Ident) =
-			UnitTypes[type];
+		UnitTypeMap[UnitTypes[i]->Ident] = UnitTypes[i];
 
 		// Determine still frame
-		UnitTypes[type]->StillFrame = GetStillFrame(UnitTypes[type]);
+		UnitTypes[i]->StillFrame = GetStillFrame(UnitTypes[i]);
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
@@ -503,7 +478,8 @@ void LoadUnitTypeSprite(UnitType* type)
 #ifdef USE_MNG
 	if (type->Portrait.Num) {
 		for (i = 0; i < type->Portrait.Num; ++i) {
-			type->Portrait.Mngs[i] = LoadMNG(type->Portrait.Files[i]);
+			type->Portrait.Mngs[i] = new Mng;
+			type->Portrait.Mngs[i]->Load(type->Portrait.Files[i]);
 		}
 		// FIXME: should be configurable
 		type->Portrait.CurrMng = 0;
@@ -518,9 +494,8 @@ void LoadUnitTypeSprite(UnitType* type)
 void LoadUnitTypes(void)
 {
 	UnitType* type;
-	int i;
 
-	for (i = 0; i < NumUnitTypes; ++i) {
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
 
 		//
@@ -610,8 +585,7 @@ static void CleanAnimation(Animation* anim)
 */
 void CleanUnitTypes(void)
 {
-	UnitType* type;
-	int i;
+	UnitType *type;
 	int j;
 	int res;
 
@@ -619,21 +593,15 @@ void CleanUnitTypes(void)
 
 	// FIXME: scheme contains references on this structure.
 	// Clean all animations.
-	for (i = 0; i < NumAnimations; ++i) {
-		CleanAnimation(AnimationsArray[i]);
+	for (j = 0; j < NumAnimations; ++j) {
+		CleanAnimation(AnimationsArray[j]);
 	}
 	NumAnimations = 0;
 
-	for (i = 0; i < NumUnitTypes; ++i) {
-		type = UnitTypes[i];
-		// FIXME: clean animations
-	}
-
 	// Clean all unit-types
 
-	for (i = 0; i < NumUnitTypes; ++i) {
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		type = UnitTypes[i];
-		hash_del(UnitTypeHash, type->Ident);
 
 		Assert(type->Ident);
 		free(type->Ident);
@@ -746,7 +714,7 @@ void CleanUnitTypes(void)
 #ifdef USE_MNG
 		if (type->Portrait.Num) {
 			for (j = 0; j < type->Portrait.Num; ++j) {
-				FreeMNG(type->Portrait.Mngs[j]);
+				delete type->Portrait.Mngs[j];
 				free(type->Portrait.Files[j]);
 			}
 			free(type->Portrait.Mngs);
@@ -754,10 +722,10 @@ void CleanUnitTypes(void)
 		}
 #endif
 
-		free(UnitTypes[i]);
-		UnitTypes[i] = 0;
+		delete UnitTypes[i];
 	}
-	NumUnitTypes = 0;
+	UnitTypes.clear();
+	UnitTypeMap.clear();
 
 	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
 		free(UnitTypeVar.BoolFlagName[i]);

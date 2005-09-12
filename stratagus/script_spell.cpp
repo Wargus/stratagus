@@ -657,15 +657,15 @@ static int CclDefineSpell(lua_State* l)
 		spell->Slot = SpellTypeCount;
 		spell->Ident = strdup(identname);
 		spell->DependencyId = -1;
-		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for caster already defined
+		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
-				UnitTypes[i]->CanCastSpell = (char*)realloc(UnitTypes[i]->CanCastSpell,
-					SpellTypeCount * sizeof((*UnitTypes)->CanCastSpell));
+				UnitTypes[i]->CanCastSpell = (char *)realloc(UnitTypes[i]->CanCastSpell,
+					SpellTypeCount * sizeof(UnitTypes[i]->CanCastSpell));
 				UnitTypes[i]->CanCastSpell[SpellTypeCount] = 0;
 			}
 			if (UnitTypes[i]->AutoCastActive) {
 				UnitTypes[i]->AutoCastActive = (char*)realloc(UnitTypes[i]->AutoCastActive,
-					SpellTypeCount * sizeof((*UnitTypes)->AutoCastActive));
+					SpellTypeCount * sizeof(UnitTypes[i]->AutoCastActive));
 				UnitTypes[i]->AutoCastActive[SpellTypeCount] = 0;
 			}
 		}

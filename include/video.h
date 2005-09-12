@@ -68,20 +68,28 @@ typedef struct _graphic_ {
 
 #ifdef USE_MNG
 #include <libmng.h>
-typedef struct _mng_ {
-	char* Name;
-	FILE* FD;
-	mng_handle Handle;
-	SDL_Surface* Surface;
-	unsigned char* Buffer;
-	unsigned long Ticks;
-	int Iteration;
+
+class Mng {
+public:
+	Mng();
+	~Mng();
+	int Load(const char *name);
+	void Reset();
+	void Draw(int x, int y);
+
+	char *name;
+	FILE *fd;
+	mng_handle handle;
+	SDL_Surface *surface;
+	unsigned char *buffer;
+	unsigned long ticks;
+	int iteration;
 #ifdef USE_OPENGL
-	GLfloat TextureWidth;   /// Width of the texture
-	GLfloat TextureHeight;  /// Height of the texture
-	GLuint TextureName;     /// Texture name
+	GLfloat texture_width;   /// Width of the texture
+	GLfloat texture_height;  /// Height of the texture
+	GLuint texture_name;     /// Texture name
 #endif
-} Mng;
+};
 #endif
 
 typedef struct _unit_colors_ {
@@ -206,17 +214,6 @@ extern void ResizeGraphic(Graphic* g, int w, int h);
 
 	/// Load graphic from PNG file
 extern int LoadGraphicPNG(Graphic* g);
-
-#ifdef USE_MNG
-	/// Load a MNG file
-extern Mng* LoadMNG(const char* name);
-	/// Display a MNG file
-extern void DisplayMNG(Mng* mng, int x, int y);
-	/// Reset a MNG file
-extern void ResetMNG(Mng* mng);
-	/// Free a MNG file
-extern void FreeMNG(Mng* mng);
-#endif
 
 #ifdef USE_OPENGL
 	/// Make an OpenGL texture

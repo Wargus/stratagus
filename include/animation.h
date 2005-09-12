@@ -33,6 +33,9 @@
 
 //@{
 
+#include <string>
+#include <map>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -118,8 +121,7 @@ extern Animation* AnimationsArray[ANIMATIONS_MAXANIM];
 extern int NumAnimations;
 
 	/// Hash table of all the animations
-typedef hashtable(Animations*, ANIMATIONS_MAXANIM) _AnimationsHash;
-extern _AnimationsHash AnimationsHash;
+extern std::map<std::string, Animations *> AnimationMap;
 
 
 /*----------------------------------------------------------------------------

@@ -197,7 +197,7 @@ void SaveUpgrades(CLFile *file)
 	//
 	//  Save the allow
 	//
-	for (int i = 0; i < NumUnitTypes; ++i) {
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CLprintf(file, "DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			if (p) {
