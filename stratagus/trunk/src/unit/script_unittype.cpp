@@ -61,7 +61,7 @@
 Animation* AnimationsArray[ANIMATIONS_MAXANIM];
 int NumAnimations;
 
-_AnimationsHash AnimationsHash;/// Animations hash table
+std::map<std::string, Animations *> AnimationMap;/// Animation map
 
 struct _UnitTypeVar_ UnitTypeVar;    /// Variables for UnitType and unit.
 
@@ -1169,15 +1169,12 @@ static int CclUnitType(lua_State* l)
 */
 static int CclUnitTypeArray(lua_State* l)
 {
-	int i;
-	LuaUserData* data;
-
 	LuaCheckArgs(l, 0);
 
 	lua_newtable(l);
 
-	for (i = 0; i < NumUnitTypes; ++i) {
-		data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
+	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+		LuaUserData *data = (LuaUserData*)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
 		data->Data = UnitTypes[i];
 		lua_rawseti(l, 1, i + 1);
@@ -1484,7 +1481,7 @@ static int CclDefineAnimations(lua_State* l)
 	anims = AnimationsByIdent(name);
 	if (!anims) {
 		anims = (Animations*)calloc(1, sizeof(*anims));
-		*(Animations**)hash_add(AnimationsHash, name) = anims;
+		AnimationMap[name] = anims;
 	}
 
 	lua_pushnil(l);
@@ -1645,15 +1642,15 @@ static int CclDefineBoolFlags(lua_State* l)
 		UnitTypeVar.BoolFlagName[UnitTypeVar.NumberBoolFlag++] = strdup(str);
 	}
 	if (0 < old && old != UnitTypeVar.NumberBoolFlag) {
-		for (i = 0; i < NumUnitTypes; ++i) { // adjust array for unit already defined
+		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
 			UnitTypes[i]->BoolFlag = (unsigned char*)realloc(UnitTypes[i]->BoolFlag,
-				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->BoolFlag));
+				UnitTypeVar.NumberBoolFlag * sizeof(UnitTypes[i]->BoolFlag));
 			UnitTypes[i]->CanTargetFlag = (unsigned char*)realloc(UnitTypes[i]->CanTargetFlag,
-				UnitTypeVar.NumberBoolFlag * sizeof((*UnitTypes)->CanTargetFlag));
+				UnitTypeVar.NumberBoolFlag * sizeof(UnitTypes[i]->CanTargetFlag));
 			memset(UnitTypes[i]->BoolFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof((*UnitTypes)->BoolFlag));
+				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->BoolFlag));
 			memset(UnitTypes[i]->CanTargetFlag + old, 0,
-				(UnitTypeVar.NumberBoolFlag - old) * sizeof((*UnitTypes)->CanTargetFlag));
+				(UnitTypeVar.NumberBoolFlag - old) * sizeof(UnitTypes[i]->CanTargetFlag));
 		}
 	}
 	return 0;

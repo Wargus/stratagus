@@ -140,14 +140,13 @@ static void MapAnimSounds(UnitType* type)
 void MapUnitSounds(void)
 {
 	UnitType* type;
-	int i;
 	int j;
 
 	if (SoundEnabled()) {
 		//
 		// Parse all units sounds.
 		//
-		for (i = 0; i < NumUnitTypes; ++i) {
+		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			type = UnitTypes[i];
 
 			MapAnimSounds(type);
