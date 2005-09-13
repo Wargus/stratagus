@@ -10,7 +10,7 @@
 //
 /**@name commands.h - The commands header file. */
 //
-//      (c) Copyright 1998-2004 by Lutz Sammer
+//      (c) Copyright 1998-2005 by Lutz Sammer
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ typedef enum _replay_type_ {
 	ReplayMultiPlayer,   /// Multi player replay
 } ReplayType;            /// Replay types
 
-struct _CL_File_;
+class CLFile;
 struct _unit_;
 struct _unit_type_;
 struct _upgrade_;
@@ -79,7 +79,7 @@ extern void EndReplayLog(void);
 	/// Clean replay
 extern void CleanReplayLog(void);
 	/// Save the replay list to file
-extern void SaveReplayList(struct _CL_File_* file);
+extern void SaveReplayList(CLFile *file);
 
 /*
 **  The send command functions sends a command, if needed over the

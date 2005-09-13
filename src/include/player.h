@@ -295,7 +295,7 @@ struct _unit_;
 struct _unit_type_;
 struct _player_;
 struct _player_ai_;
-struct _CL_File_;
+class CLFile;
 
 /*----------------------------------------------------------------------------
 --  Player type
@@ -467,7 +467,7 @@ extern void InitPlayers(void);
 	/// Clean up players
 extern void CleanPlayers(void);
 	/// Save players
-extern void SavePlayers(struct _CL_File_* file);
+extern void SavePlayers(CLFile *file);
 
 	/// Create a new player
 extern void CreatePlayer(int type);

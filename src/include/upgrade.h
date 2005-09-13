@@ -10,7 +10,7 @@
 //
 /**@name upgrade.h - The upgrades headerfile. */
 //
-//      (c) Copyright 1999-2004 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _CL_File_;
+class CLFile;
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -59,7 +59,7 @@ extern Upgrade* UpgradeByIdent(const char* ident);
 	/// init upgrade/allow structures
 extern void InitUpgrades(void);
 	/// save the upgrades
-extern void SaveUpgrades(struct _CL_File_*);
+extern void SaveUpgrades(CLFile *);
 	/// cleanup upgrade module
 extern void CleanUpgrades(void);
 

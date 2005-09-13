@@ -84,7 +84,20 @@ typedef struct _filelist_ {
 **
 **  @todo  zip archive support
 */
-typedef struct _CL_File_ {
+class CLFile {
+public:
+	CLFile();
+	~CLFile();
+
+	int open(const char *name, long flags);
+	int close();
+	void flush();
+	int read(void *buf, size_t len);
+	int seek(long offset, int whence);
+	long tell();
+	int printf(char *format, ...);
+
+private:
 	int   cl_type;   /// type of CLFile
 	FILE* cl_plain;  /// standard file pointer
 #ifdef USE_ZLIB
@@ -93,7 +106,7 @@ typedef struct _CL_File_ {
 #ifdef USE_BZ2LIB
 	BZFILE* cl_bz;   /// bzip2 file pointer
 #endif // !USE_BZ2LIB
-} CLFile;
+};
 
 enum {
 	CLF_TYPE_INVALID,  /// invalid file handle
@@ -110,22 +123,6 @@ enum {
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-	///  Library file open
-extern CLFile* CLopen(const char* fn, long flags);
-	///  Library file close
-extern int CLclose(CLFile* file);
-	///  Library file flush
-extern void CLflush(CLFile* file);
-	///  Library file read
-extern int CLread(CLFile* file, void* buf, size_t len);
-	///  Library file seek
-extern int CLseek(CLFile* file, long offset, int whence);
-	///  Library file tell
-extern long CLtell(CLFile* file);
-	///  Library file write
-extern int CLprintf(CLFile* file, char* format, ...);
-
 
 #endif // USE_ZLIB || USE_BZ2LIB
 

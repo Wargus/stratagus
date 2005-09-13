@@ -146,100 +146,100 @@ void SavePlayers(CLFile* file)
 	unsigned char g;
 	unsigned char b;
 
-	CLprintf(file, "\n--------------------------------------------\n");
-	CLprintf(file, "--- MODULE: players $Id$\n\n");
+	file->printf("\n--------------------------------------------\n");
+	file->printf("--- MODULE: players $Id$\n\n");
 
 	//
 	//  Dump all players
 	//
 	for (i = 0; i < NumPlayers; ++i) {
-		CLprintf(file, "Player(%d,\n", i);
-		CLprintf(file, "  \"name\", \"%s\",\n", Players[i].Name);
-		CLprintf(file, "  \"type\", ");
+		file->printf("Player(%d,\n", i);
+		file->printf("  \"name\", \"%s\",\n", Players[i].Name);
+		file->printf("  \"type\", ");
 		switch (Players[i].Type) {
-			case PlayerNeutral:       CLprintf(file, "\"neutral\",");         break;
-			case PlayerNobody:        CLprintf(file, "\"nobody\",");          break;
-			case PlayerComputer:      CLprintf(file, "\"computer\",");        break;
-			case PlayerPerson:        CLprintf(file, "\"person\",");          break;
-			case PlayerRescuePassive: CLprintf(file, "\"rescue-passive\",");break;
-			case PlayerRescueActive:  CLprintf(file, "\"rescue-active\","); break;
-			default:                  CLprintf(file, "%d,",Players[i].Type);break;
+			case PlayerNeutral:       file->printf("\"neutral\",");         break;
+			case PlayerNobody:        file->printf("\"nobody\",");          break;
+			case PlayerComputer:      file->printf("\"computer\",");        break;
+			case PlayerPerson:        file->printf("\"person\",");          break;
+			case PlayerRescuePassive: file->printf("\"rescue-passive\",");break;
+			case PlayerRescueActive:  file->printf("\"rescue-active\","); break;
+			default:                  file->printf("%d,",Players[i].Type);break;
 		}
-		CLprintf(file, " \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
-		CLprintf(file, " \"ai-name\", \"%s\",\n", Players[i].AiName);
-		CLprintf(file, "  \"team\", %d,", Players[i].Team);
+		file->printf(" \"race\", \"%s\",", PlayerRaces.Name[Players[i].Race]);
+		file->printf(" \"ai-name\", \"%s\",\n", Players[i].AiName);
+		file->printf("  \"team\", %d,", Players[i].Team);
 
-		CLprintf(file, " \"enemy\", \"");
+		file->printf(" \"enemy\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			CLprintf(file, "%c",(Players[i].Enemy & (1 << j)) ? 'X' : '_');
+			file->printf("%c",(Players[i].Enemy & (1 << j)) ? 'X' : '_');
 		}
-		CLprintf(file, "\", \"allied\", \"");
+		file->printf("\", \"allied\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			CLprintf(file, "%c", (Players[i].Allied & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (Players[i].Allied & (1 << j)) ? 'X' : '_');
 		}
-		CLprintf(file, "\", \"shared-vision\", \"");
+		file->printf("\", \"shared-vision\", \"");
 		for (j = 0; j < PlayerMax; ++j) {
-			CLprintf(file, "%c", (Players[i].SharedVision & (1 << j)) ? 'X' : '_');
+			file->printf("%c", (Players[i].SharedVision & (1 << j)) ? 'X' : '_');
 		}
-		CLprintf(file, "\",\n  \"start\", {%d, %d},\n", Players[i].StartX,
+		file->printf("\",\n  \"start\", {%d, %d},\n", Players[i].StartX,
 			Players[i].StartY);
 
 		// Resources
-		CLprintf(file, "  \"resources\", {");
+		file->printf("  \"resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n ");
+					file->printf("\n ");
 				} else {
-					CLprintf(file, " ");
+					file->printf(" ");
 				}
 			}
-			CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
 				Players[i].Resources[j]);
 		}
 		// Last Resources
-		CLprintf(file, "},\n  \"last-resources\", {");
+		file->printf("},\n  \"last-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n ");
+					file->printf("\n ");
 				} else {
-					CLprintf(file, " ");
+					file->printf(" ");
 				}
 			}
-			CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
 				Players[i].LastResources[j]);
 		}
 		// Incomes
-		CLprintf(file, "},\n  \"incomes\", {");
+		file->printf("},\n  \"incomes\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n ");
+					file->printf("\n ");
 				} else {
-					CLprintf(file, " ");
+					file->printf(" ");
 				}
 			}
-			CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
 				Players[i].Incomes[j]);
 		}
 		// Revenue
-		CLprintf(file, "},\n  \"revenue\", {");
+		file->printf("},\n  \"revenue\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
 				if (j == MaxCosts / 2) {
-					CLprintf(file, "\n ");
+					file->printf("\n ");
 				} else {
-					CLprintf(file, " ");
+					file->printf(" ");
 				}
 			}
-			CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j],
+			file->printf("\"%s\", %d,", DefaultResourceNames[j],
 				Players[i].Revenue[j]);
 		}
 
 		// UnitTypesCount done by load units.
 
-		CLprintf(file, "},\n  \"%s\",\n", Players[i].AiEnabled ?
+		file->printf("},\n  \"%s\",\n", Players[i].AiEnabled ?
 			"ai-enabled" : "ai-disabled");
 
 		// Ai done by load ais.
@@ -247,40 +247,40 @@ void SavePlayers(CLFile* file)
 		// TotalNumUnits done by load units.
 		// NumBuildings done by load units.
 
-		CLprintf(file, " \"supply\", %d,", Players[i].Supply);
-		CLprintf(file, " \"unit-limit\", %d,", Players[i].UnitLimit);
-		CLprintf(file, " \"building-limit\", %d,", Players[i].BuildingLimit);
-		CLprintf(file, " \"total-unit-limit\", %d,", Players[i].TotalUnitLimit);
+		file->printf(" \"supply\", %d,", Players[i].Supply);
+		file->printf(" \"unit-limit\", %d,", Players[i].UnitLimit);
+		file->printf(" \"building-limit\", %d,", Players[i].BuildingLimit);
+		file->printf(" \"total-unit-limit\", %d,", Players[i].TotalUnitLimit);
 
-		CLprintf(file, "\n  \"score\", %d,", Players[i].Score);
-		CLprintf(file, "\n  \"total-units\", %d,", Players[i].TotalUnits);
-		CLprintf(file, "\n  \"total-buildings\", %d,", Players[i].TotalBuildings);
-		CLprintf(file, "\n  \"total-resources\", {");
+		file->printf("\n  \"score\", %d,", Players[i].Score);
+		file->printf("\n  \"total-units\", %d,", Players[i].TotalUnits);
+		file->printf("\n  \"total-buildings\", %d,", Players[i].TotalBuildings);
+		file->printf("\n  \"total-resources\", {");
 		for (j = 0; j < MaxCosts; ++j) {
 			if (j) {
-				CLprintf(file, " ");
+				file->printf(" ");
 			}
-			CLprintf(file, "%d,", Players[i].TotalResources[j]);
+			file->printf("%d,", Players[i].TotalResources[j]);
 		}
-		CLprintf(file, "},");
-		CLprintf(file, "\n  \"total-razings\", %d,", Players[i].TotalRazings);
-		CLprintf(file, "\n  \"total-kills\", %d,", Players[i].TotalKills);
+		file->printf("},");
+		file->printf("\n  \"total-razings\", %d,", Players[i].TotalRazings);
+		file->printf("\n  \"total-kills\", %d,", Players[i].TotalKills);
 
 		SDL_GetRGB(Players[i].Color, TheScreen->format, &r, &g, &b);
-		CLprintf(file, "\n  \"color\", { %d, %d, %d },", r, g, b);
+		file->printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 
 		// UnitColors done by init code.
 
 		// Allow saved by allow.
 
-		CLprintf(file, "\n  \"timers\", {");
+		file->printf("\n  \"timers\", {");
 		for (j = 0; j < UpgradeMax; ++j) {
 			if (j) {
-				CLprintf(file, " ");
+				file->printf(" ");
 			}
-			CLprintf(file, "%d,", Players[i].UpgradeTimers.Upgrades[j]);
+			file->printf("%d,", Players[i].UpgradeTimers.Upgrades[j]);
 		}
-		CLprintf(file, "})\n\n");
+		file->printf("})\n\n");
 	}
 
 	DebugPrint("FIXME: must save unit-stats?\n");
@@ -288,7 +288,7 @@ void SavePlayers(CLFile* file)
 	//
 	//  Dump local variables
 	//
-	CLprintf(file, "SetThisPlayer(%d)\n\n", ThisPlayer->Index);
+	file->printf("SetThisPlayer(%d)\n\n", ThisPlayer->Index);
 }
 
 /**

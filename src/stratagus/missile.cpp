@@ -1282,35 +1282,35 @@ static void SaveMissile(const Missile* missile, CLFile* file)
 {
 	char* s1;
 
-	CLprintf(file, "Missile(\"type\", \"%s\",", missile->Type->Ident);
-	CLprintf(file, " \"%s\",", missile->Local ? "local" : "global");
-	CLprintf(file, " \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
+	file->printf("Missile(\"type\", \"%s\",", missile->Type->Ident);
+	file->printf(" \"%s\",", missile->Local ? "local" : "global");
+	file->printf(" \"pos\", {%d, %d}, \"origin-pos\", {%d, %d}, \"goal\", {%d, %d},",
 		missile->X, missile->Y, missile->SourceX, missile->SourceY, missile->DX, missile->DY);
-	CLprintf(file, "\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
+	file->printf("\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 		missile->SpriteFrame, missile->State, missile->AnimWait, missile->Wait, missile->Delay);
 
 	if (missile->SourceUnit) {
-		CLprintf(file, " \"source\", \"%s\",", s1 = UnitReference(missile->SourceUnit));
+		file->printf(" \"source\", \"%s\",", s1 = UnitReference(missile->SourceUnit));
 		free(s1);
 	}
 	if (missile->TargetUnit) {
-		CLprintf(file, " \"target\", \"%s\",", s1 = UnitReference(missile->TargetUnit));
+		file->printf(" \"target\", \"%s\",", s1 = UnitReference(missile->TargetUnit));
 		free(s1);
 	}
 
-	CLprintf(file, " \"damage\", %d,", missile->Damage);
+	file->printf(" \"damage\", %d,", missile->Damage);
 
-	CLprintf(file, " \"ttl\", %d,", missile->TTL);
+	file->printf(" \"ttl\", %d,", missile->TTL);
 	if (missile->Hidden) {
-		CLprintf(file, " \"hidden\", ");
+		file->printf(" \"hidden\", ");
 	}
 
-	CLprintf(file, " \"step\", {%d, %d}",
+	file->printf(" \"step\", {%d, %d}",
 		missile->CurrentStep, missile->TotalStep);
 
 	// MissileSlot filled in during init
 
-	CLprintf(file, ")\n");
+	file->printf(")\n");
 }
 
 /**
@@ -1322,8 +1322,8 @@ void SaveMissiles(CLFile* file)
 {
 	Missile* const* missiles;
 
-	CLprintf(file,"\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: missiles $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: missiles $Id$\n\n");
 
 	for (missiles = GlobalMissiles; *missiles; ++missiles) {
 		SaveMissile(*missiles, file);

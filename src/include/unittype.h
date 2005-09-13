@@ -37,7 +37,7 @@
 -- Documentation
 ----------------------------------------------------------------------------*/
 
-struct _CL_File_;
+class CLFile;
 struct lua_State;
 #ifdef USE_MNG
 class Mng;
@@ -950,7 +950,7 @@ extern void UpdateStats(int reset_to_default);  /// Update unit stats
 extern UnitType* UnitTypeByIdent(const char*);  /// Get unit-type by ident
 extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 
-extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
+extern void SaveUnitTypes(CLFile *file);            /// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
 extern void DrawUnitType(const UnitType *type, Graphic *sprite, int player,

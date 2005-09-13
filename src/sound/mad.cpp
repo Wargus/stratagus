@@ -89,7 +89,7 @@ static enum mad_flow MAD_read(void* user, struct mad_stream* stream)
 			&data->Buffer[data->BufferLen] - stream->next_frame);
 	}
 
-	i = CLread(data->MadFile, data->Buffer + data->BufferLen, MAD_INBUF_SIZE - data->BufferLen);
+	i = data->MadFile->read(data->Buffer + data->BufferLen, MAD_INBUF_SIZE - data->BufferLen);
 	if (!i) {
 		return MAD_FLOW_STOP;
 	}
@@ -336,7 +336,8 @@ static void Mp3FreeStream(Sample* sample)
 // free(data->MadDecoder.sync);
 	mad_decoder_finish(&data->MadDecoder);
 
-	CLclose(data->MadFile);
+	data->MadFile->close();
+	delete data->MadFile;
 
 	free(data->Buffer);
 	free(data);
@@ -403,23 +404,26 @@ static const SampleType Mp3SampleType = {
 */
 Sample* LoadMp3(const char* name, int flags)
 {
-	CLFile* f;
+	CLFile *f;
 	unsigned char magic[2];
 	Sample* sample;
 	MadData *data;
 
-	if (!(f = CLopen(name,CL_OPEN_READ))) {
+	f = new CLFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
+		delete f;
 		return NULL;
 	}
-	CLread(f, magic, sizeof(magic));
+	f->read(magic, sizeof(magic));
 	// 0xFF 0xE? for mp3 stream
 	if (magic[0] != 0xFF || (magic[1]&0xE0) != 0xE0) {
-		CLclose(f);
+		f->close();
+		delete f;
 		return NULL;
 	}
 
-	CLseek(f, 0, SEEK_SET);
+	f->seek(0, SEEK_SET);
 
 	data = (MadData*)malloc(sizeof(MadData));
 	data->MadFile = f;
@@ -467,7 +471,8 @@ Sample* LoadMp3(const char* name, int flags)
 
 		// release the decoder
 		mad_decoder_finish(&data->MadDecoder);
-		CLclose(f);
+		f->close();
+		delete f;
 
 		sample->Type = &Mp3SampleType;
 

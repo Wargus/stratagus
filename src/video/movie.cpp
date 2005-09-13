@@ -180,7 +180,7 @@ static int TheoraProcessData(OggData* data)
 int PlayMovie(const char* name)
 {
 	OggData data;
-	CLFile* f;
+	CLFile f;
 	SDL_Rect rect;
 	SDL_Overlay* yuv_overlay;
 	Sample* sample;
@@ -192,19 +192,19 @@ int PlayMovie(const char* name)
 
 	name = LibraryFileName(name, buffer);
 
-	if (!(f = CLopen(name, CL_OPEN_READ))) {
+	if (f.open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
 		return -1;
 	}
 
 	memset(&data, 0, sizeof(data));
-	if (OggInit(f, &data) || !data.video) {
+	if (OggInit(&f, &data) || !data.video) {
 		OggFree(&data);
-		CLclose(f);
+		f.close();
 		return -1;
 	}
 
-	data.File = f;
+	data.File = &f;
 
 	if (data.tinfo.frame_width * 300 / 4 > data.tinfo.frame_height * 100) {
 		rect.w = VideoWidth;
@@ -224,7 +224,7 @@ int PlayMovie(const char* name)
 	if (yuv_overlay == NULL) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 		OggFree(&data);
-		CLclose(f);
+		f.close();
 		return 0;
 	}
 
@@ -236,7 +236,7 @@ int PlayMovie(const char* name)
 			SoundFree(sample);
 			SDL_FreeYUVOverlay(yuv_overlay);
 			OggFree(&data);
-			CLclose(f);
+			f.close();
 			return 0;
 		}
 		MusicSample = sample;
@@ -286,7 +286,7 @@ int PlayMovie(const char* name)
 	SDL_FreeYUVOverlay(yuv_overlay);
 
 	OggFree(&data);
-	CLclose(f);
+	f.close();
 
 	return 0;
 }

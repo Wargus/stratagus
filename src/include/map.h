@@ -172,7 +172,7 @@
 
 class Graphic;
 struct _player_;
-struct _CL_File_;
+class CLFile;
 struct _unit_;
 struct _unit_type_;
 struct _unit_list_item_;
@@ -389,7 +389,7 @@ extern void MapCclRegister(void);
 	/// Alocate and initialise map table
 extern void CreateMap(int width, int height);
 	/// Save the map
-extern void SaveMap(struct _CL_File_* file);
+extern void SaveMap(CLFile *file);
 	/// Save a stratagus map (smp format)
 extern int SaveStratagusMap(const char* filename, WorldMap* map, int writeTerrain);
 	/// Clean the map

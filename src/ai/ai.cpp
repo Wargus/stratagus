@@ -353,27 +353,27 @@ static void SaveAiHelperTable(CLFile* file, const char* name, int upgrade, int n
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name,
+							file->printf("\n  {\"%s\", \"%s\"\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (upgrade) {
 							if (f + strlen(Upgrades[i].Ident) > 78) {
-								f = CLprintf(file, "\n\t");
+								f = file->printf("\n\t");
 							}
-							f += CLprintf(file, ", \"%s\"", Upgrades[i].Ident);
+							f += file->printf(", \"%s\"", Upgrades[i].Ident);
 						} else {
 							if (f + strlen(UnitTypes[i]->Ident) > 78) {
-								f = CLprintf(file, "\n\t");
+								f = file->printf("\n\t");
 							}
-							f += CLprintf(file, ", \"%s\"", UnitTypes[i]->Ident);
+							f += file->printf(", \"%s\"", UnitTypes[i]->Ident);
 						}
 					}
 				}
 			}
 		}
 		if (f) {
-			CLprintf(file, "},");
+			file->printf("},");
 		}
 	}
 }
@@ -397,18 +397,18 @@ static void SaveAiEquivTable(CLFile* file, const char* name, int n,
 
 	for (i = 0; i < n; ++i) {
 		if (table[i]) {
-			CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name, UnitTypes[i]->Ident);
+			file->printf("\n  {\"%s\", \"%s\"\n\t", name, UnitTypes[i]->Ident);
 			f = 4;
 			for (j = 0; j < table[i]->Count; ++j) {
 				if (f + strlen(table[i]->Table[j]->Ident) > 78) {
-					f = CLprintf(file, "\n\t");
+					f = file->printf("\n\t");
 				}
-				f += CLprintf(file, ", \"%s\"", table[i]->Table[j]->Ident);
+				f += file->printf(", \"%s\"", table[i]->Table[j]->Ident);
 			}
 			if (i == n - 1) {
-				CLprintf(file, "}");
+				file->printf("}");
 			} else {
-				CLprintf(file, "},");
+				file->printf("},");
 			}
 		}
 	}
@@ -440,20 +440,20 @@ static void SaveAiCostTable(CLFile* file, const char* name, int n,
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  (list '%s '%s\n\t", name,
+							file->printf("\n  (list '%s '%s\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (f + strlen(DefaultResourceNames[i]) > 78) {
-							f = CLprintf(file, "\n\t");
+							f = file->printf("\n\t");
 						}
-						f += CLprintf(file, "'%s ", DefaultResourceNames[i]);
+						f += file->printf("'%s ", DefaultResourceNames[i]);
 					}
 				}
 			}
 		}
 		if (f) {
-			CLprintf(file, ")");
+			file->printf(")");
 		}
 	}
 }
@@ -484,20 +484,20 @@ static void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 				for (j = 0; j < table[i]->Count; ++j) {
 					if (table[i]->Table[j]->Slot == t) {
 						if (!f) {
-							CLprintf(file, "\n  {\"%s\", \"%s\"\n\t", name,
+							file->printf("\n  {\"%s\", \"%s\"\n\t", name,
 								UnitTypes[t]->Ident);
 							f = 4;
 						}
 						if (f + strlen("food") > 78) {
-							f = CLprintf(file, "\n\t");
+							f = file->printf("\n\t");
 						}
-						f += CLprintf(file, ",\"%s\" ", "food");
+						f += file->printf(",\"%s\" ", "food");
 					}
 				}
 			}
 		}
 		if (f) {
-			CLprintf(file, "},");
+			file->printf("},");
 		}
 	}
 }
@@ -512,7 +512,7 @@ static void SaveAiUnitLimitTable(CLFile* file, const char* name, int n,
 */
 static void SaveAiHelper(CLFile* file)
 {
-	CLprintf(file, "DefineAiHelper(");
+	file->printf("DefineAiHelper(");
 	//
 	//  Save build table
 	//
@@ -549,7 +549,7 @@ static void SaveAiHelper(CLFile* file)
 	//
 	SaveAiEquivTable(file, "unit-equiv", AiHelpers.EquivCount, AiHelpers.Equiv);
 
-	CLprintf(file, " )\n\n");
+	file->printf(" )\n\n");
 }
 #endif
 
@@ -559,13 +559,13 @@ static void SaveAiHelper(CLFile* file)
 **  @param file    Output file.
 **  @param aitype  AI type to save.
 */
-static void SaveAiType(CLFile* file, const AiType* aitype)
+static void SaveAiType(CLFile *file, const AiType *aitype)
 {
 	return;
 	if (aitype->Next) {
 		SaveAiType(file, aitype->Next);
 	}
-	CLprintf(file, "DefineAi(\"%s\", \"%s\", \"%s\", %s)\n\n",
+	file->printf("DefineAi(\"%s\", \"%s\", \"%s\", %s)\n\n",
 		aitype->Name, aitype->Race ? aitype->Race : "*",
 		aitype->Class, aitype->FunctionName);
 }
@@ -597,12 +597,12 @@ static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 	int i;
 	const AiBuildQueue* queue;
 
-	CLprintf(file, "DefineAiPlayer(%d,\n", plynr);
-	CLprintf(file, "  \"ai-type\", \"%s\",\n",ai->AiType->Name);
+	file->printf("DefineAiPlayer(%d,\n", plynr);
+	file->printf("  \"ai-type\", \"%s\",\n",ai->AiType->Name);
 
-	CLprintf(file, "  \"script\", \"%s\",\n", ai->Script);
-	CLprintf(file, "  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
-	CLprintf(file, "  \"sleep-cycles\", %lu,\n", ai->SleepCycles);
+	file->printf("  \"script\", \"%s\",\n", ai->Script);
+	file->printf("  \"script-debug\", %s,\n", ai->ScriptDebug ? "true" : "false");
+	file->printf("  \"sleep-cycles\", %lu,\n", ai->SleepCycles);
 
 	//
 	//  All forces
@@ -611,71 +611,71 @@ static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 		const AiUnitType* aut;
 		const AiUnit* aiunit;
 
-		CLprintf(file, "  \"force\", {%d, %s%s%s", i,
+		file->printf("  \"force\", {%d, %s%s%s", i,
 			ai->Force[i].Completed ? "\"complete\"," : "\"recruit\",",
 			ai->Force[i].Attacking ? " \"attack\"," : "",
 			ai->Force[i].Defending ? " \"defend\"," : "");
 
-		CLprintf(file, " \"role\", ");
+		file->printf(" \"role\", ");
 		switch (ai->Force[i].Role) {
 			case AiForceRoleAttack:
-				CLprintf(file, "\"attack\",");
+				file->printf("\"attack\",");
 				break;
 			case AiForceRoleDefend:
-				CLprintf(file, "\"defend\",");
+				file->printf("\"defend\",");
 				break;
 			default:
-				CLprintf(file, "\"unknown-%d\",", ai->Force[i].Role);
+				file->printf("\"unknown-%d\",", ai->Force[i].Role);
 				break;
 		}
 
-		CLprintf(file, "\n    \"types\", { ");
+		file->printf("\n    \"types\", { ");
 		for (aut = ai->Force[i].UnitTypes; aut; aut = aut->Next) {
-			CLprintf(file, "%d, \"%s\", ", aut->Want, aut->Type->Ident);
+			file->printf("%d, \"%s\", ", aut->Want, aut->Type->Ident);
 		}
-		CLprintf(file, "},\n    \"units\", {");
+		file->printf("},\n    \"units\", {");
 		for (aiunit = ai->Force[i].Units; aiunit; aiunit = aiunit->Next) {
-			CLprintf(file, " %d, \"%s\",", UnitNumber(aiunit->Unit),
+			file->printf(" %d, \"%s\",", UnitNumber(aiunit->Unit),
 				aiunit->Unit->Type->Ident);
 		}
-		CLprintf(file, "},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
+		file->printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d, \"must-transport\", %d,",
 			ai->Force[i].State, ai->Force[i].GoalX, ai->Force[i].GoalY, ai->Force[i].MustTransport);
-		CLprintf(file, "},\n");
+		file->printf("},\n");
 	}
 
-	CLprintf(file, "  \"reserve\", {");
+	file->printf("  \"reserve\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Reserve[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Reserve[i]);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"used\", {");
+	file->printf("  \"used\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Used[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Used[i]);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"needed\", {");
+	file->printf("  \"needed\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Needed[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Needed[i]);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"collect\", {");
+	file->printf("  \"collect\", {");
 	for (i = 0; i < MaxCosts; ++i) {
-		CLprintf(file, "\"%s\", %d, ", DefaultResourceNames[i], ai->Collect[i]);
+		file->printf("\"%s\", %d, ", DefaultResourceNames[i], ai->Collect[i]);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file,"  \"need-mask\", {");
+	file->printf("  \"need-mask\", {");
 	for (i = 0; i < MaxCosts; ++i) {
 		if (ai->NeededMask & (1 << i)) {
-			CLprintf(file, "\"%s\", ", DefaultResourceNames[i]);
+			file->printf("\"%s\", ", DefaultResourceNames[i]);
 		}
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 	if (ai->NeedSupply) {
-		CLprintf(file, "  \"need-supply\",\n");
+		file->printf("  \"need-supply\",\n");
 	}
 
 	//
@@ -684,67 +684,67 @@ static void SaveAiPlayer(CLFile* file, int plynr, PlayerAi* ai)
 	if (ai->FirstExplorationRequest) {
 		AiExplorationRequest* ptr;
 
-		CLprintf(file, "  \"exploration\", {");
+		file->printf("  \"exploration\", {");
 		ptr = ai->FirstExplorationRequest;
 		while (ptr) {
-			CLprintf(file, "{%d, %d, %d}, ",
+			file->printf("{%d, %d, %d}, ",
 				ptr->X, ptr->Y, ptr->Mask);
 			ptr = ptr->Next;
 		}
-		CLprintf(file, "},\n");
+		file->printf("},\n");
 	}
-	CLprintf(file, "  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
+	file->printf("  \"last-exploration-cycle\", %lu,\n", ai->LastExplorationGameCycle);
 	if (ai->TransportRequests) {
 		AiTransportRequest* ptr;
 
-		CLprintf(file, "  \"transport\", {");
+		file->printf("  \"transport\", {");
 		ptr = ai->TransportRequests;
 		while (ptr) {
-			CLprintf(file, "{%d, ", UnitNumber(ptr->Unit));
+			file->printf("{%d, ", UnitNumber(ptr->Unit));
 			SaveOrder(&ptr->Order, file);
-			CLprintf(file, "}, ");
+			file->printf("}, ");
 			ptr = ptr->Next;
 		}
-		CLprintf(file, "},\n");
+		file->printf("},\n");
 	}
-	CLprintf(file, "  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
-	CLprintf(file, "  \"unit-type\", {");
+	file->printf("  \"last-can-not-move-cycle\", %lu,\n", ai->LastCanNotMoveGameCycle);
+	file->printf("  \"unit-type\", {");
 	for (i = 0; i < ai->UnitTypeRequestsCount; ++i) {
-		CLprintf(file, "\"%s\", ", ai->UnitTypeRequests[i].Table[0]->Ident);
-		CLprintf(file, "%d, ", ai->UnitTypeRequests[i].Count);
+		file->printf("\"%s\", ", ai->UnitTypeRequests[i].Table[0]->Ident);
+		file->printf("%d, ", ai->UnitTypeRequests[i].Count);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"upgrade\", {");
+	file->printf("  \"upgrade\", {");
 	for (i = 0; i < ai->UpgradeToRequestsCount; ++i) {
-		CLprintf(file, "\"%s\", ", ai->UpgradeToRequests[i]->Ident);
+		file->printf("\"%s\", ", ai->UpgradeToRequests[i]->Ident);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"research\", {");
+	file->printf("  \"research\", {");
 	for (i = 0; i < ai->ResearchRequestsCount; ++i) {
-		CLprintf(file, "\"%s\", ", ai->ResearchRequests[i]->Ident);
+		file->printf("\"%s\", ", ai->ResearchRequests[i]->Ident);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
 	//
 	//  Building queue
 	//
-	CLprintf(file, "  \"building\", {");
+	file->printf("  \"building\", {");
 	for (queue = ai->UnitTypeBuilt; queue; queue = queue->Next) {
-		CLprintf(file, "\"%s\", %d, %d, ", queue->Type->Ident, queue->Made, queue->Want);
+		file->printf("\"%s\", %d, %d, ", queue->Type->Ident, queue->Made, queue->Want);
 	}
-	CLprintf(file, "},\n");
+	file->printf("},\n");
 
-	CLprintf(file, "  \"repair-building\", %u,\n", ai->LastRepairBuilding);
+	file->printf("  \"repair-building\", %u,\n", ai->LastRepairBuilding);
 
-	CLprintf(file, "  \"repair-workers\", {");
+	file->printf("  \"repair-workers\", {");
 	for (i = 0; i < UnitMax; ++i) {
 		if (ai->TriedRepairWorkers[i]) {
-			CLprintf(file, "%d, %d, ", i, ai->TriedRepairWorkers[i]);
+			file->printf("%d, %d, ", i, ai->TriedRepairWorkers[i]);
 		}
 	}
-	CLprintf(file,"})\n\n");
+	file->printf("})\n\n");
 }
 
 /**
@@ -770,9 +770,8 @@ static void SaveAiPlayers(CLFile* file)
 */
 void SaveAi(CLFile* file)
 {
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file,
-		"--- MODULE: AI $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: AI $Id$\n\n");
 
 #if 0
 	SaveAiHelper(file);
