@@ -77,7 +77,7 @@ void LoadTileset(void)
 	ShowLoadProgress("Tileset `%s'", TheMap.Tileset.ImageFile);
 	//TheMap.TileGraphic = NewGraphic(TheMap.Tileset.ImageFile, 0, 0);
 	TheMap.TileGraphic = NewGraphic(TheMap.Tileset.ImageFile, TileSizeX, TileSizeY);
-	LoadGraphic(TheMap.TileGraphic);
+	TheMap.TileGraphic->Load();
 }
 
 

@@ -610,16 +610,16 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	if (IsMapFieldVisibleTable(x, y) || ReplayRevealMap) {
 		if (tile && tile != tile2) {
 #ifdef USE_OPENGL
-			VideoDrawClipTrans(TheMap.TileGraphic, tile, dx, dy, FogOfWarOpacity);
+			TheMap.TileGraphic->DrawFrameClipTrans(tile, dx, dy, FogOfWarOpacity);
 #else
-			VideoDrawClip(&AlphaFogG, tile, dx, dy);
+			AlphaFogG.DrawFrameClip(tile, dx, dy);
 #endif
 		}
 	} else {
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (tile2) {
-		VideoDrawClip(TheMap.FogGraphic, tile2, dx, dy);
+		TheMap.FogGraphic->DrawFrameClip(tile2, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
@@ -710,7 +710,7 @@ void InitMapFogOfWar(void)
 	SDL_Surface* s;
 #endif
 
-	LoadGraphic(TheMap.FogGraphic);
+	TheMap.FogGraphic->Load();
 
 #ifndef USE_OPENGL
 	//

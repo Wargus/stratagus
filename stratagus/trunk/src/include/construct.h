@@ -104,7 +104,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 
 typedef enum {
 	ConstructionFileConstruction,
@@ -131,10 +131,10 @@ typedef struct _construction_ {
 
 // --- FILLED UP ---
 
-	struct _graphic_* Sprite;        /// construction sprite image
+	Graphic*          Sprite;        /// construction sprite image
 	int               Width;         /// sprite width
 	int               Height;        /// sprite height
-	struct _graphic_* ShadowSprite;  /// construction shadow sprite image
+	Graphic*          ShadowSprite;  /// construction shadow sprite image
 	int               ShadowWidth;   /// shadow sprite width
 	int               ShadowHeight;  /// shadow sprite height
 } Construction;

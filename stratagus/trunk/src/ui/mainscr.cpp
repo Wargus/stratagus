@@ -119,9 +119,9 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 	Uint32 color;
 
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->Sprite->Height;
+	y += unit->Type->Icon.Icon->G->Height;
 	VideoFillRectangleClip(ColorBlack, x, y,
-		unit->Type->Icon.Icon->Sprite->Width, 7);
+		unit->Type->Icon.Icon->G->Width, 7);
 	if (unit->Variable[HP_INDEX].Value) {
 		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
 		if (f > 75) {
@@ -133,7 +133,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 		} else {
 			color = ColorRed;
 		}
-		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
+		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
 		VideoFillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
 }
@@ -151,12 +151,12 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 	int f;
 
 	// FIXME: add icon borders
-	y += unit->Type->Icon.Icon->Sprite->Height;
+	y += unit->Type->Icon.Icon->G->Height;
 	VideoFillRectangleClip(ColorBlack, x, y + 3,
-		unit->Type->Icon.Icon->Sprite->Width, 4);
+		unit->Type->Icon.Icon->G->Width, 4);
 	if (unit->Stats->Variables[MANA_INDEX].Max) {
 		f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
-		f = (f * (unit->Type->Icon.Icon->Sprite->Width)) / 100;
+		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
 		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
@@ -826,8 +826,7 @@ void DrawResources(void)
 	// Draw all icons of resource.
 	for (i = 0; i <= ScoreCost; ++i) {
 		if (TheUI.Resources[i].G) {
-			VideoDrawClip(TheUI.Resources[i].G,
-				TheUI.Resources[i].IconFrame,
+			TheUI.Resources[i].G->DrawFrameClip(TheUI.Resources[i].IconFrame,
 				TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
 		}
 	}
@@ -1219,9 +1218,7 @@ void DrawCosts(void)
 	x = TheUI.StatusLineTextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
-		VideoDrawClip(TheUI.Resources[GoldCost].G,
-			3,
-			x, TheUI.StatusLineTextY);
+		TheUI.Resources[GoldCost].G->DrawFrameClip(3, x, TheUI.StatusLineTextY);
 
 		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsMana);
 		x += 45;
@@ -1230,8 +1227,7 @@ void DrawCosts(void)
 	for (i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			if (TheUI.Resources[i].G) {
-				VideoDrawClip(TheUI.Resources[i].G,
-					TheUI.Resources[i].IconFrame,
+				TheUI.Resources[i].G->DrawFrameClip(TheUI.Resources[i].IconFrame,
 					x, TheUI.StatusLineTextY);
 			}
 			VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont,Costs[i]);
@@ -1281,7 +1277,7 @@ void ClearCosts(void)
 static void DrawInfoPanelBackground(unsigned frame)
 {
 	if (TheUI.InfoPanelG) {
-		VideoDrawClip(TheUI.InfoPanelG, frame,
+		TheUI.InfoPanelG->DrawFrameClip(frame,
 			TheUI.InfoPanelX, TheUI.InfoPanelY);
 	}
 }

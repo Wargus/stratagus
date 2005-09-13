@@ -382,11 +382,11 @@ static void CalculateMaxIconSize(void)
 		type = UnitTypeByIdent(EditorUnitTypes[i]);
 		Assert(type && type->Icon.Icon);
 		icon = type->Icon.Icon;
-		if (IconWidth < icon->Sprite->Width) {
-			IconWidth = icon->Sprite->Width;
+		if (IconWidth < icon->G->Width) {
+			IconWidth = icon->G->Width;
 		}
-		if (IconHeight < icon->Sprite->Height) {
-			IconHeight = icon->Sprite->Height;
+		if (IconHeight < icon->G->Height) {
+			IconHeight = icon->G->Height;
 		}
 	}
 }
@@ -473,28 +473,22 @@ static void DrawTileIcons(void)
 	}
 
 	VideoDrawTextCentered(x, y, GameFont, "1x1");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 1 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "2x2");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 2 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "3x3");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 3 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "4x4");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileCursorSize == 4 ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Random");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolRandom ? 2 : 0), x + 40, y - 3);
 	y += 20;
 	VideoDrawTextCentered(x, y, GameFont, "Filler");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
 	y += 20;
 
 	y = TheUI.ButtonPanelY + 4;
@@ -507,7 +501,7 @@ static void DrawTileIcons(void)
 				y = TheUI.ButtonPanelY + 100;
 				break;
 			}
-			VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset.Table[0x10 + i * 16], x, y);
+			TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[0x10 + i * 16], x, y);
 			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
 				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
@@ -607,26 +601,25 @@ static void DrawUnitIcons(void)
 	y = TheUI.InfoPanelY + 140;
 
 	VideoDrawText(x + 28 * 0, y, GameFont, "Un");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowUnitsToSelect ? 2 : 0), x + 28 * 0, y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowUnitsToSelect ? 2 : 0),
+		x + 28 * 0, y + 16);
 	VideoDrawText(x + 28 * 1, y, GameFont, "Bu");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0), x + 28 * 1,
-		y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowBuildingsToSelect ? 2 : 0),
+		x + 28 * 1, y + 16);
 #if 0
 	VideoDrawText(x + 28 * 2, y, GameFont, "He");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0), x + 28 * 2, y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowHeroesToSelect ? 2 : 0),
+		x + 28 * 2, y + 16);
 #endif
 	VideoDrawText(x + 28 * 3, y, GameFont, "La");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0), x + 28 * 3, y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowLandToSelect ? 2 : 0),
+		x + 28 * 3, y + 16);
 	VideoDrawText(x + 28 * 4, y, GameFont, "Wa");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowWaterToSelect ? 2 : 0), x + 28 * 4, y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowWaterToSelect ? 2 : 0),
+		x + 28 * 4, y + 16);
 	VideoDrawText(x + 28 * 5, y, GameFont, "Ai");
-	VideoDraw(MenuButtonG,
-		MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0), x + 28 * 5, y + 16);
+	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowAirToSelect ? 2 : 0),
+		x + 28 * 5, y + 16);
 
 	//
 	// Scroll bar for units. FIXME: drag not supported.
@@ -637,30 +630,30 @@ static void DrawUnitIcons(void)
 
 	PushClipping();
 	SetClipping(0, 0, x + j - 20, VideoHeight - 1);
-	VideoDrawClip(MenuButtonG, MBUTTON_S_HCONT, x - 2, y);
+	MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
 	PopClipping();
 	if (TheUI.ButtonPanelX + 4 < CursorX
 			&& CursorX < TheUI.ButtonPanelX + 24
 			&& TheUI.ButtonPanelY + 4 < CursorY
 			&& CursorY < TheUI.ButtonPanelY + 24
 			&& MouseButtons & LeftButton) {
-		VideoDraw(MenuButtonG, MBUTTON_LEFT_ARROW + 1, x - 2, y);
+		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
 	} else {
-		VideoDraw(MenuButtonG, MBUTTON_LEFT_ARROW, x - 2, y);
+		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
 	}
 	if (TheUI.ButtonPanelX + 176 - 24 < CursorX
 			&& CursorX < TheUI.ButtonPanelX + 176 - 4
 			&& TheUI.ButtonPanelY + 4 < CursorY
 			&& CursorY < TheUI.ButtonPanelY + 24
 			&& MouseButtons & LeftButton) {
-		VideoDraw(MenuButtonG, MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
+		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
 	} else {
-		VideoDraw(MenuButtonG, MBUTTON_RIGHT_ARROW, x + j - 20, y);
+		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW, x + j - 20, y);
 	}
 
 	percent = UnitIndex * 100 / (MaxShownUnits ? MaxShownUnits : 1);
 	i = (percent * (j - 54)) / 100;
-	VideoDraw(MenuButtonG, MBUTTON_S_KNOB, x + 18 + i, y + 1);
+	MenuButtonG->DrawFrame(MBUTTON_S_KNOB, x + 18 + i, y + 1);
 
 	//
 	//  Draw the unit icons.
@@ -681,14 +674,14 @@ static void DrawUnitIcons(void)
 			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 			DrawIcon(Players + SelectedPlayer, icon, x, y);
 
-			VideoDrawRectangleClip(ColorGray, x, y, icon->Sprite->Width, icon->Sprite->Height);
+			VideoDrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
 			if (i == SelectedUnitIndex) {
 				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1,
-					icon->Sprite->Width - 2, icon->Sprite->Height - 2);
+					icon->G->Width - 2, icon->G->Height - 2);
 			}
 			if (i == CursorUnitIndex) {
 				VideoDrawRectangleClip(ColorWhite,x - 1, y - 1,
-					icon->Sprite->Width + 2, icon->Sprite->Height + 2);
+					icon->G->Width + 2, icon->G->Height + 2);
 			}
 
 			x += IconWidth + 8;
@@ -733,7 +726,7 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
 	x += 4;
 	y += 4;
-	VideoDrawClip(TheMap.TileGraphic, TheMap.Tileset.Table[tilenum], x, y);
+	TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
 		VideoDrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
@@ -875,7 +868,7 @@ static void DrawMapCursor(void)
 					if (tx >= TheUI.MouseViewport->EndX) {
 						break;
 					}
-					VideoDrawClip(TheMap.TileGraphic,
+					TheMap.TileGraphic->DrawFrameClip(
 						TheMap.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
@@ -1030,7 +1023,7 @@ void EditorUpdateDisplay(void)
 	// Fillers
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
-		VideoDrawSub(TheUI.Filler[i], 0, 0,
+		TheUI.Filler[i]->DrawSub(0, 0,
 			TheUI.Filler[i]->Width,
 			TheUI.Filler[i]->Height,
 			TheUI.FillerX[i], TheUI.FillerY[i]);
@@ -1062,7 +1055,7 @@ void EditorUpdateDisplay(void)
 	// Info panel
 	//
 	if (TheUI.InfoPanelG) {
-		VideoDrawSub(TheUI.InfoPanelG, 0, 0,
+		TheUI.InfoPanelG->DrawSub(0, 0,
 			TheUI.InfoPanelG->Width, TheUI.InfoPanelG->Height,
 			TheUI.InfoPanelX, TheUI.InfoPanelY);
 	}
@@ -1070,7 +1063,7 @@ void EditorUpdateDisplay(void)
 	// Button panel
 	//
 	if (TheUI.ButtonPanelG) {
-		VideoDrawSub(TheUI.ButtonPanelG, 0, 0,
+		TheUI.ButtonPanelG->DrawSub(0, 0,
 			TheUI.ButtonPanelG->Width,
 			TheUI.ButtonPanelG->Height, TheUI.ButtonPanelX,
 			TheUI.ButtonPanelY);

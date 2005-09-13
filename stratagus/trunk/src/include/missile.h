@@ -330,7 +330,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 struct _unit_;
 struct _viewport_;
 struct _CL_File_;
@@ -424,7 +424,7 @@ struct _missile_type_ {
 	MissileType* SmokeMissile;   /// Trailling missile
 
 // --- FILLED UP ---
-	struct _graphic_* G;         /// missile graphic
+	Graphic *G;         /// missile graphic
 };
 
 /*----------------------------------------------------------------------------

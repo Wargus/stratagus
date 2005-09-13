@@ -1849,7 +1849,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 				menu->InitFunc(menu);
 			}
 			if (menu->BackgroundG) {
-				ResizeGraphic(menu->BackgroundG, VideoWidth, VideoHeight);
+				menu->BackgroundG->Resize(VideoWidth, VideoHeight);
 			}
 			DrawMenu(menu);
 			CurrentMenu = FindMenu("menu-global-options");

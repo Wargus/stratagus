@@ -373,8 +373,8 @@ static void ShowTitleScreens(void)
 			if (!mng) {
 #endif
 				g = NewGraphic(TitleScreens[i]->File, 0, 0);
-				LoadGraphic(g);
-				ResizeGraphic(g, VideoWidth, VideoHeight);
+				g->Load();
+				g->Resize(VideoWidth, VideoHeight);
 #ifdef USE_MNG
 			}
 #endif
@@ -389,7 +389,7 @@ static void ShowTitleScreens(void)
 					}
 				} else {
 #endif
-					VideoDrawSubClip(g, 0, 0, g->Width, g->Height,
+					g->DrawSubClip(0, 0, g->Width, g->Height,
 						(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
 #ifdef USE_MNG
 				}
