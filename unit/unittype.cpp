@@ -405,7 +405,7 @@ static int GetStillFrame(UnitType* type)
 void InitUnitTypes(int reset_player_stats)
 {
 	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		Assert(UnitTypes[i]->Slot == i);
+		Assert(UnitTypes[i]->Slot == (int)i);
 
 		//  Add idents to hash.
 		UnitTypeMap[UnitTypes[i]->Ident] = UnitTypes[i];
@@ -727,11 +727,11 @@ void CleanUnitTypes(void)
 	UnitTypes.clear();
 	UnitTypeMap.clear();
 
-	for (i = 0; i < UnitTypeVar.NumberBoolFlag; i++) { // User defined flags
-		free(UnitTypeVar.BoolFlagName[i]);
+	for (j = 0; j < UnitTypeVar.NumberBoolFlag; ++j) { // User defined flags
+		free(UnitTypeVar.BoolFlagName[j]);
 	}
-	for (i = 0; i < UnitTypeVar.NumberVariable; i++) { // User defined variables
-		free(UnitTypeVar.VariableName[i]);
+	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) { // User defined variables
+		free(UnitTypeVar.VariableName[j]);
 	}
 	free(UnitTypeVar.BoolFlagName);
 	free(UnitTypeVar.VariableName);
