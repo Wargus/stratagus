@@ -126,7 +126,7 @@ static void VideoDrawChar(const Graphic* g,
 static void VideoDrawChar(const Graphic* g,
 	int gx, int gy, int w, int h, int x, int y)
 {
-	VideoDrawSub(g, gx, gy, w, h, x, y);
+	g->DrawSub(gx, gy, w, h, x, y);
 }
 #endif
 
@@ -743,10 +743,10 @@ static void MakeFontColorTextures(Graphic* g, int font)
 		return;
 	}
 
-	FontColorGraphics[font] = malloc(NumFontColorMappings * sizeof(Graphic*));
+	FontColorGraphics[font] = (Graphic **)malloc(NumFontColorMappings * sizeof(Graphic*));
 	s = g->Surface;
 	for (i = 0; i < NumFontColorMappings; ++i) {
-		FontColorGraphics[font][i] = malloc(sizeof(Graphic));
+		FontColorGraphics[font][i] = (Graphic *)malloc(sizeof(Graphic));
 		memcpy(FontColorGraphics[font][i], g, sizeof(Graphic));
 		FontColorGraphics[font][i]->Textures = NULL;
 		SDL_LockSurface(s);
@@ -770,7 +770,7 @@ void LoadFonts(void)
 		if (Fonts[i].G) {
 			ShowLoadProgress("Fonts %s", Fonts[i].G->File);
 			DebugPrint("Font %s\n" _C_ Fonts[i].G->File);
-			LoadGraphic(Fonts[i].G);
+			Fonts[i].G->Load();
 			FontMeasureWidths(Fonts + i);
 #ifdef USE_OPENGL
 			MakeFontColorTextures(Fonts[i].G, i);
@@ -1028,7 +1028,7 @@ void CleanFonts(void)
 */
 int IsFontLoaded(unsigned font)
 {
-	return Fonts[font].G && GraphicLoaded(Fonts[font].G);
+	return Fonts[font].G && Fonts[font].G->Loaded();
 }
 
 //@}

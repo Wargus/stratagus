@@ -365,9 +365,6 @@
 ----------------------------------------------------------------------------*/
 
 typedef struct _unit_ Unit;            /// unit itself
-#ifdef USE_OPENGL
-struct _graphic_;
-#endif
 struct _unit_type_;
 struct _unit_stats_;
 struct _new_animation;

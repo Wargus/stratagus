@@ -271,18 +271,18 @@ void Mng::Draw(int x, int y)
 	SDL_BlitSurface(surface, NULL, TheScreen, &rect);
 #else
 	GLint sx = x;
-	GLint ex = sx + mng->Surface->w;
+	GLint ex = sx + surface->w;
 	GLint sy = y;
-	GLint ey = sy + mng->Surface->h;
+	GLint ey = sy + surface->h;
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex2i(sx, sy);
-	glTexCoord2f(0.0f, textureHeight);
+	glTexCoord2f(0.0f, texture_height);
 	glVertex2i(sx, ey);
-	glTexCoord2f(mng->TextureWidth, mng->TextureHeight);
+	glTexCoord2f(texture_width, texture_height);
 	glVertex2i(ex, ey);
-	glTexCoord2f(mng->TextureWidth, 0.0f);
+	glTexCoord2f(texture_width, 0.0f);
 	glVertex2i(ex, sy);
 	glEnd();
 #endif

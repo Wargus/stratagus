@@ -173,23 +173,23 @@ void LoadUserInterface(void)
 	//  Load graphics
 	//
 	for (i = 0; i < TheUI.NumFillers; ++i) {
-		LoadGraphic(TheUI.Filler[i]);
+		TheUI.Filler[i]->Load();
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
 		if (TheUI.Resources[i].G) {
-			LoadGraphic(TheUI.Resources[i].G);
+			TheUI.Resources[i].G->Load();
 		}
 	}
 
 	if (TheUI.InfoPanelG) {
-		LoadGraphic(TheUI.InfoPanelG);
+		TheUI.InfoPanelG->Load();
 	}
 	if (TheUI.ButtonPanelG) {
-		LoadGraphic(TheUI.ButtonPanelG);
+		TheUI.ButtonPanelG->Load();
 	}
 	if (TheUI.PieMenuBackgroundG) {
-		LoadGraphic(TheUI.PieMenuBackgroundG);
+		TheUI.PieMenuBackgroundG->Load();
 	}
 
 	//
@@ -214,7 +214,7 @@ void LoadUserInterface(void)
 
 	menupanel = TheUI.MenuPanels;
 	while (menupanel) {
-		LoadGraphic(menupanel->G);
+		menupanel->G->Load();
 		menupanel = menupanel->Next;
 	}
 }

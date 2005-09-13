@@ -329,7 +329,7 @@ int CastAreaBombardment(Unit* caster, const SpellType* spell,
 			if (mis->Type->Speed) {
 				mis->Delay = i * mis->Type->Sleep * 2 * TileSizeX / mis->Type->Speed;
 			} else {
-				mis->Delay = i * mis->Type->Sleep * VideoGraphicFrames(mis->Type->G);
+				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;
 			}
 			mis->Damage = damage;
 			// FIXME: not correct -- blizzard should continue even if mage is

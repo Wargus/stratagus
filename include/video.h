@@ -44,12 +44,51 @@
 #undef DrawIcon
 #endif
 
-typedef struct _graphic_ {
-	char* File;                /// Filename
-	char* HashFile;            /// Filename used in hash
-	SDL_Surface* Surface;      /// Surface
+class Graphic {
+public:
+	// Draw
+	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+		unsigned char alpha) const;
+	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+		unsigned char alpha) const;
+
+	// Draw frame
+	void DrawFrame(unsigned frame, int x, int y) const;
+#ifdef USE_OPENGL
+	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y) const;
+#endif
+	void DrawFrameClip(unsigned frame, int x, int y) const;
+	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y) const;
+
+	// Draw frame flipped horizontally
+	void DrawFrameX(unsigned frame, int x, int y) const;
+#ifdef USE_OPENGL
+	void DoDrawFrameClipX(GLuint* textures, unsigned frame, int x, int y) const;
+#endif
+	void DrawFrameClipX(unsigned frame, int x, int y) const;
+	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y) const;
+
+
+	void Load();
+	void Flip();
+	void Resize(int w, int h);
+	int TransparentPixel(int x, int y);
+	void MakeShadow();
+
+	inline bool Loaded() { return Surface != NULL; }
+
+
+	char *File;                /// Filename
+	char *HashFile;            /// Filename used in hash
+	SDL_Surface *Surface;      /// Surface
 #ifndef USE_OPENGL
-	SDL_Surface* SurfaceFlip;  /// Flipped surface
+	SDL_Surface *SurfaceFlip;  /// Flipped surface
 #endif
 	int Width;                 /// Width of a frame
 	int Height;                /// Height of a frame
@@ -60,11 +99,11 @@ typedef struct _graphic_ {
 #ifdef USE_OPENGL
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
-	GLuint* Textures;          /// Texture names
-	GLuint* PlayerColorTextures[PlayerMax];/// Textures with player colors
+	GLuint *Textures;          /// Texture names
+	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 	int NumTextures;
 #endif
-} Graphic;
+};
 
 #ifdef USE_MNG
 #include <libmng.h>
@@ -93,7 +132,7 @@ public:
 #endif
 
 typedef struct _unit_colors_ {
-	SDL_Color* Colors;
+	SDL_Color *Colors;
 } UnitColors;
 
 /**
@@ -184,7 +223,7 @@ extern int VideoDepth;
 	**  @see InitVideo @see InitVideoSdl
 	**  @see VMemType
 	*/
-extern SDL_Surface* TheScreen;
+extern SDL_Surface *TheScreen;
 
 #ifdef USE_OPENGL
 	/// Max texture size supported on the video card
@@ -209,31 +248,20 @@ extern void InitVideo(void);
 	/// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
 
-	/// Resize a graphic
-extern void ResizeGraphic(Graphic* g, int w, int h);
-
 	/// Load graphic from PNG file
-extern int LoadGraphicPNG(Graphic* g);
+extern int LoadGraphicPNG(Graphic *g);
 
 #ifdef USE_OPENGL
 	/// Make an OpenGL texture
-extern void MakeTexture(Graphic* graphic);
+extern void MakeTexture(Graphic *graphic);
 	/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(Graphic* graphic, int player);
+extern void MakePlayerColorTexture(Graphic *graphic, int player);
 #endif
-
-	/// Load graphic
-extern void LoadGraphic(Graphic* g);
-
-#define GraphicLoaded(g) ((g)->Surface != NULL)
 
 #ifdef USE_OPENGL
 	/// Reload OpenGL graphics
 extern void ReloadGraphics(void);
 #endif
-
-	/// Flip graphic and store in graphic->SurfaceFlip
-extern void FlipGraphic(Graphic* graphic);
 
 	/// Initializes video synchronization.
 extern void SetVideoSync(void);
@@ -242,16 +270,13 @@ extern void SetVideoSync(void);
 extern void VideoClearScreen(void);
 
 	/// Make graphic
-extern Graphic* NewGraphic(const char* file, int w, int h);
+extern Graphic *NewGraphic(const char *file, int w, int h);
 
 	/// Make graphic
-extern Graphic* ForceNewGraphic(const char* file, int w, int h);
+extern Graphic *ForceNewGraphic(const char *file, int w, int h);
 
 	/// Free Graphic taking into account the number of uses.
-extern void FreeGraphic(Graphic* g);
-
-	/// Check if a pixel is transparent
-extern int GraphicTransparentPixel(Graphic* g, int x, int y);
+extern void FreeGraphic(Graphic *g);
 
 	/// Init line draw
 extern void InitLineDraw(void);
@@ -270,22 +295,11 @@ extern void SetClipping(int left, int top, int right, int bottom);
 	/// Realize video memory.
 extern void RealizeVideoMemory(void);
 
-	/// Make shadow sprite
-extern void MakeShadowSprite(Graphic* g);
-
-	/// Draw a graphic clipped and with alpha.
-extern void VideoDrawSubTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char alpha);
-
-	/// Draw part of a graphic clipped and with alpha.
-extern void VideoDrawSubClipTrans(const Graphic* graphic, int gx, int gy,
-	int w, int h, int x, int y, unsigned char alpha);
-
 	/// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char* name);
 
 	/// Process all system events. Returns if the time for a frame is over
-extern void WaitEventsOneFrame(const EventCallback* callbacks);
+extern void WaitEventsOneFrame(const EventCallback *callbacks);
 
 	/// Toggle full screen mode
 extern void ToggleFullScreen(void);
@@ -302,7 +316,7 @@ extern unsigned long GetTicks(void);
 	/// Toggle mouse grab mode
 extern void ToggleGrabMouse(int mode);
 
-extern EventCallback* Callbacks;    /// Current callbacks
+extern EventCallback *Callbacks;    /// Current callbacks
 extern EventCallback GameCallbacks; /// Game callbacks
 extern EventCallback MenuCallbacks; /// Menu callbacks
 
@@ -336,7 +350,7 @@ extern Uint32 ColorYellow;
 #endif
 
 #ifdef USE_OPENGL
-void DrawTexture(const Graphic* g, GLuint* textures, int sx, int sy,
+void DrawTexture(const Graphic *g, GLuint *textures, int sx, int sy,
 	int ex, int ey, int x, int y, int flip);
 #endif
 
@@ -471,76 +485,6 @@ extern void VideoFillCircleClip(Uint32 color, int x, int y, int radius);
 	/// Fill translucent circle clipped.
 extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int radius,
 	unsigned char alpha);
-
-	/// Draw a graphic object unclipped.
-extern void VideoDraw(const Graphic* g, unsigned, int, int);
-
-	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawSub(const Graphic* g, int, int, int, int, int, int);
-
-#ifdef USE_OPENGL
-	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDoDrawClip(const Graphic* g, GLuint* textures, unsigned frame,
-	int x, int y);
-
-#define VideoDrawClip(g, frame, x, y) \
-	VideoDoDrawClip((g), (g)->Textures, (frame), (x), (y))
-#else
-	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawClip(const Graphic* g, unsigned frame, int x, int y);
-#endif
-
-	/// Draw graphic object clipped and with player colors.
-extern void VideoDrawPlayerColorClip(Graphic* g, int player,
-	unsigned frame, int x, int y);
-
-	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawSubClip(const Graphic* g, int ix, int iy, int w,
-	int h, int x, int y);
-
-	/// Draw a graphic object unclipped and flipped in X direction.
-extern void VideoDrawX(const Graphic* g, unsigned frame, int x, int y);
-
-#ifdef USE_OPENGL
-	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDoDrawClipX(const Graphic* g, GLuint* textures, unsigned frame,
-	int x, int y);
-
-#define VideoDrawClipX(g, frame, x, y) \
-	VideoDoDrawClipX((g), (g)->Textures, (frame), (x), (y))
-#else
-	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDrawClipX(const Graphic* g, unsigned frame, int x, int y);
-#endif
-
-	/// Draw graphic object clipped, flipped, and with player colors.
-extern void VideoDrawPlayerColorClipX(Graphic* g, int player,
-	unsigned frame, int x, int y);
-
-	/// Translucent Functions
-	/// Draw a graphic object unclipped.
-extern void VideoDrawTrans(const Graphic* g, unsigned, int, int, int);
-	/// Draw a graphic object clipped to the current clipping.
-extern void VideoDrawClipTrans(const Graphic* g, unsigned frame, int x, int y, int);
-	/// Draw a graphic object unclipped and flipped in X direction.
-extern void VideoDrawTransX(const Graphic* g, unsigned frame, int x, int y, int alpha);
-	/// Draw a graphic object clipped and flipped in X direction.
-extern void VideoDrawClipTransX(const Graphic* g, unsigned frame, int x, int y, int alpha);
-
-	/// Draw a graphic object unclipped.
-#define VideoDrawTrans50(o, f, x, y)      VideoDrawTrans((o), (f), (x), (y), 128)
-	/// Draw a graphic object unclipped and flipped in X direction.
-#define VideoDrawXTrans50(o, f, x, y)     VideoDrawTransX((o), (f), (x), (y), 128)
-	/// Draw a graphic object clipped to the current clipping.
-#define VideoDrawClipTrans50(o, f, x, y)  VideoDrawClipTrans((o), (f), (x), (y), 128)
-	/// Draw a graphic object clipped and flipped in X direction.
-#define VideoDrawClipXTrans50(o, f, x, y) VideoDrawClipTransX((o), (f), (x), (y), 128)
-
-	/// Get the width of a single frame of a graphic object
-#define VideoGraphicWidth(o)   ((o)->Width)
-	/// Get the height of a single frame of a graphic object
-#define VideoGraphicHeight(o)  ((o)->Height)
-#define VideoGraphicFrames(o)  ((o)->NumFrames)
 
 //@}
 

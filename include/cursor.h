@@ -121,7 +121,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 struct _unit_type_;
 
 /*----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ struct _cursor_type_ {
 
 // --- FILLED UP ---
 
-	struct _graphic_* G; /// Cursor sprite image
+	Graphic *G; /// Cursor sprite image
 };
 
 	/// Cursor config reference

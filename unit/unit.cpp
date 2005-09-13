@@ -310,8 +310,7 @@ void InitUnit(Unit* unit, UnitType* type)
 			UnitTypeVar.NumberVariable * sizeof(*unit->Variable));
 	}
 
-	if (type->NumDirections > 1 && type->Sprite &&
-			VideoGraphicFrames(type->Sprite) > 5) {
+	if (type->NumDirections > 1 && type->Sprite && type->Sprite->NumFrames > 5) {
 		unit->Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(unit);
 	}
@@ -2946,8 +2945,8 @@ void LetUnitDie(Unit* unit)
 			LoadUnitTypeSprite(type);
 		}
 #endif
-		unit->IX = (type->CorpseType->Width - VideoGraphicWidth(type->CorpseType->Sprite)) / 2;
-		unit->IY = (type->CorpseType->Height - VideoGraphicHeight(type->CorpseType->Sprite)) / 2;
+		unit->IX = (type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2;
+		unit->IY = (type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2;
 
 		unit->CurrentSightRange = type->CorpseType->Stats[unit->Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {

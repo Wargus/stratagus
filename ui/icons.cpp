@@ -81,10 +81,10 @@ static void AddIcon(const char *ident, int frame, int width,
 	if (icon) {
 		// Redefine icon
 		if (file) {
-			if (icon->Sprite) {
-				FreeGraphic(icon->Sprite);
+			if (icon->G) {
+				FreeGraphic(icon->G);
 			}
-			icon->Sprite = NewGraphic(file, width, height);
+			icon->G = NewGraphic(file, width, height);
 		}
 		icon->Frame = frame;
 	} else {
@@ -92,9 +92,9 @@ static void AddIcon(const char *ident, int frame, int width,
 		icon->Ident = new char[strlen(ident) + 1];
 		strcpy(icon->Ident, ident);
 		if (file) {
-			icon->Sprite = NewGraphic(file, width, height);
+			icon->G = NewGraphic(file, width, height);
 		} else {
-			icon->Sprite = NULL;
+			icon->G = NULL;
 		}
 		icon->Frame = frame;
 
@@ -119,9 +119,9 @@ void LoadIcons(void)
 {
 	for (std::vector<Icon *>::size_type i = 0; i < AllIcons.size(); ++i) {
 		Icon *icon = AllIcons[i];
-		LoadGraphic(icon->Sprite);
-		ShowLoadProgress("Icons %s", icon->Sprite->File);
-		if (icon->Frame >= icon->Sprite->NumFrames) {
+		icon->G->Load();
+		ShowLoadProgress("Icons %s", icon->G->File);
+		if (icon->Frame >= icon->G->NumFrames) {
 			DebugPrint("Invalid icon frame: %s - %d\n" _C_
 				icon->Ident _C_ icon->Frame);
 			icon->Frame = 0;
@@ -138,7 +138,7 @@ void CleanIcons(void)
 		Icon *icon = AllIcons.back();
 		AllIcons.pop_back();
 		delete[] icon->Ident;
-		FreeGraphic(icon->Sprite);
+		FreeGraphic(icon->G);
 		delete icon;
 	}
 
@@ -172,7 +172,7 @@ Icon *IconByIdent(const char *ident)
 */
 void DrawIcon(const Player *player, Icon *icon, int x, int y)
 {
-	VideoDrawPlayerColorClip(icon->Sprite, player->Index, icon->Frame, x, y);
+	icon->G->DrawPlayerColorFrameClip(player->Index, icon->Frame, x, y);
 }
 
 /**
@@ -193,7 +193,7 @@ void DrawUnitIcon(const Player *player, ButtonStyle *style, Icon *icon,
 
 	memcpy(&s, style, sizeof(ButtonStyle));
 	s.Default.Sprite = s.Hover.Sprite = s.Selected.Sprite =
-		s.Clicked.Sprite = s.Disabled.Sprite = icon->Sprite;
+		s.Clicked.Sprite = s.Disabled.Sprite = icon->G;
 	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
 		s.Clicked.Frame = s.Disabled.Frame = icon->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {

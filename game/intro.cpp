@@ -412,8 +412,8 @@ void ShowIntro(const Intro* intro)
 	callbacks.NetworkEvent = NetworkEvent;
 
 	background = NewGraphic(intro->Background, 0, 0);
-	LoadGraphic(background);
-	ResizeGraphic(background, VideoWidth, VideoHeight);
+	background->Load();
+	background->Resize(VideoWidth, VideoHeight);
 
 	LibraryFileName(intro->TextFile, buf);
 	if (!(file = CLopen(buf, CL_OPEN_READ))) {
@@ -477,7 +477,7 @@ void ShowIntro(const Intro* intro)
 		//
 		// Draw background
 		//
-		VideoDrawSubClip(background, 0, 0,
+		background->DrawSubClip(0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
@@ -585,8 +585,8 @@ void ShowCredits(Credits* credits)
 	background = NULL;
 	if (credits->Background) {
 		background = NewGraphic(credits->Background, 0, 0);
-		LoadGraphic(background);
-		ResizeGraphic(background, VideoWidth, VideoHeight);
+		background->Load();
+		background->Resize(VideoWidth, VideoHeight);
 	}
 
 	// play different music?
@@ -610,7 +610,7 @@ void ShowCredits(Credits* credits)
 		// Draw background
 		//
 		if (background) {
-			VideoDrawSubClip(background, 0, 0,
+			background->DrawSubClip(0, 0,
 				background->Width, background->Height,
 				(VideoWidth - background->Width) / 2,
 				(VideoHeight - background->Height) / 2);
@@ -725,8 +725,8 @@ void ShowPicture(CampaignChapter* chapter)
 	callbacks.NetworkEvent = NetworkEvent;
 
 	background = NewGraphic(chapter->Data.Picture.Image, 0, 0);
-	LoadGraphic(background);
-	ResizeGraphic(background, VideoWidth, VideoHeight);
+	background->Load();
+	background->Resize(VideoWidth, VideoHeight);
 	IntroNoEvent = 1;
 
 	text = chapter->Data.Picture.Text;
@@ -745,7 +745,7 @@ void ShowPicture(CampaignChapter* chapter)
 	max = chapter->Data.Picture.FadeIn;
 	while (IntroNoEvent && i < max) {
 		VideoClearScreen();
-		VideoDrawSubClipTrans(background, 0, 0,
+		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
@@ -766,7 +766,7 @@ void ShowPicture(CampaignChapter* chapter)
 	j = 0;
 	max = chapter->Data.Picture.DisplayTime;
 	while (IntroNoEvent && j < max) {
-		VideoDrawSubClip(background, 0, 0,
+		background->DrawSubClip(0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2);
@@ -785,7 +785,7 @@ void ShowPicture(CampaignChapter* chapter)
 	max = chapter->Data.Picture.FadeOut;
 	while (i >= 0) {
 		VideoClearScreen();
-		VideoDrawSubClipTrans(background, 0, 0,
+		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
 			(VideoWidth - background->Width) / 2,
 			(VideoHeight - background->Height) / 2,
@@ -1216,8 +1216,8 @@ void ShowStats(void)
 		}
 	}
 	if (g) {
-		LoadGraphic(g);
-		ResizeGraphic(g, VideoWidth, VideoHeight);
+		g->Load();
+		g->Resize(VideoWidth, VideoHeight);
 	}
 
 	UseContinueButton = 1;
@@ -1230,10 +1230,8 @@ void ShowStats(void)
 	IntroButtonPressed = 0;
 	while (1) {
 		if (g) {
-			VideoDrawSubClip(g, 0, 0,
-				g->Width, g->Height,
-				(VideoWidth - g->Width) / 2,
-				(VideoHeight - g->Height) / 2);
+			g->DrawSubClip(0, 0, g->Width, g->Height,
+				(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
 		}
 		GameStatsDrawFunc(frame);
 		DrawContinueButton();

@@ -39,11 +39,14 @@
 #include <string.h>
 
 #include "stratagus.h"
+
+#include <string>
+#include <map>
+
 #include "video.h"
 #include "map.h"
 #include "player.h"
 #include "intern_video.h"
-#include "util.h"
 #include "iocompat.h"
 #include "iolib.h"
 
@@ -51,7 +54,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static hashtable(Graphic*, 4099) GraphicHash;/// lookup table for graphic data
+static std::map<std::string, Graphic *> GraphicHash;
 
 #ifdef USE_OPENGL
 static Graphic** Graphics;
@@ -65,7 +68,6 @@ static int NumGraphics;
 /**
 **  Video draw part of graphic.
 **
-**  @param g   Pointer to object
 **  @param gx  X offset into object
 **  @param gy  Y offset into object
 **  @param w   width to display
@@ -73,35 +75,21 @@ static int NumGraphics;
 **  @param x   X screen position
 **  @param y   Y screen position
 */
+void Graphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
+{
 #ifndef USE_OPENGL
-void VideoDrawSub(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	SDL_Rect srect;
-	SDL_Rect drect;
+	SDL_Rect srect = {gx, gy, w, h};
+	SDL_Rect drect = {x, y};
 
-	srect.x = gx;
-	srect.y = gy;
-	srect.w = w;
-	srect.h = h;
-
-	drect.x = x;
-	drect.y = y;
-
-	SDL_BlitSurface(g->Surface, &srect, TheScreen, &drect);
-}
+	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 #else
-void VideoDrawSub(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y)
-{
-	DrawTexture(g, g->Textures, gx, gy, gx + w, gy + h, x, y, 0);
-}
+	DrawTexture(this, Textures, gx, gy, gx + w, gy + h, x, y, 0);
 #endif
+}
 
 /**
 **  Video draw part of graphic clipped.
 **
-**  @param g   Pointer to object
 **  @param gx  X offset into object
 **  @param gy  Y offset into object
 **  @param w   width to display
@@ -109,22 +97,17 @@ void VideoDrawSub(const Graphic* g, int gx, int gy,
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void VideoDrawSubClip(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y)
+void Graphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 {
-	int oldx;
-	int oldy;
-
-	oldx = x;
-	oldy = y;
+	int oldx = x;
+	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSub(g, gx + x - oldx, gy + y - oldy, w, h, x, y);
+	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
 
 /**
 **  Video draw part of graphic with alpha.
 **
-**  @param g      Pointer to object
 **  @param gx     X offset into object
 **  @param gy     Y offset into object
 **  @param w      width to display
@@ -133,32 +116,25 @@ void VideoDrawSubClip(const Graphic* g, int gx, int gy,
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
+void Graphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+	unsigned char alpha) const
+{
 #ifndef USE_OPENGL
-void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y, unsigned char alpha)
-{
-	int oldalpha;
-
-	oldalpha = g->Surface->format->alpha;
-	SDL_SetAlpha(g->Surface, SDL_SRCALPHA, alpha);
-	VideoDrawSub(g, gx, gy, w, h, x, y);
-	SDL_SetAlpha(g->Surface, SDL_SRCALPHA, oldalpha);
-}
+	int oldalpha = Surface->format->alpha;
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+	DrawSub(gx, gy, w, h, x, y);
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
 #else
-void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y, unsigned char alpha)
-{
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4ub(255, 255, 255, alpha);
-	VideoDrawSub(g, gx, gy, w, h, x, y);
+	DrawSub(gx, gy, w, h, x, y);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
 #endif
+}
 
 /**
 **  Video draw part of graphic with alpha and clipped.
 **
-**  @param g      Pointer to object
 **  @param gx     X offset into object
 **  @param gy     Y offset into object
 **  @param w      width to display
@@ -167,16 +143,326 @@ void VideoDrawSubTrans(const Graphic* g, int gx, int gy,
 **  @param y      Y screen position
 **  @param alpha  Alpha
 */
-void VideoDrawSubClipTrans(const Graphic* g, int gx, int gy,
-	int w, int h, int x, int y, unsigned char alpha)
+void Graphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+	unsigned char alpha) const
 {
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+}
+
+/**
+**  Draw graphic object unclipped.
+**
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawFrame(unsigned frame, int x, int y) const
+{
+#ifndef USE_OPENGL
+	DrawSub((frame % (Surface->w / Width)) * Width,
+		(frame / (Surface->w / Width)) * Height,
+		Width, Height, x, y);
+#else
+	int sx, sy, ex, ey, n;
+
+	n = GraphicWidth / Width;
+	sx = (frame % n) * Width;
+	ex = sx + Width;
+	sy = (frame / n) * Height;
+	ey = sy + Height;
+	DrawTexture(this, Textures, sx, sy, ex, ey, x, y, 0);
+#endif
+}
+
+#ifdef USE_OPENGL
+void Graphic::DoDrawFrameClip(GLuint *textures,
+	unsigned frame, int x, int y) const
+{
+	int ox;
+	int oy;
+	int skip;
+	int w;
+	int h;
+	int sx, sy, ex, ey, n;
+
+	n = GraphicWidth / Width;
+	sx = (frame % n) * Width;
+	ex = sx + Width;
+	sy = (frame / n) * Height;
+	ey = sy + Height;
+
+	w = Width;
+	h = Height;
+	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
+
+	DrawTexture(this, textures, sx + ox, sy + oy, sx + ox + w, sy + oy + h, x, y, 0);
+}
+#endif
+
+/**
+**  Draw graphic object clipped.
+**
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawFrameClip(unsigned frame, int x, int y) const
+{
+#ifndef USE_OPENGL
+	DrawSubClip((frame % (Surface->w / Width)) * Width,
+		(frame / (Surface->w / Width)) * Height,
+		Width, Height, x, y);
+#else
+	DoDrawFrameClip(Textures, frame, x, y);
+#endif
+}
+
+void Graphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
+{
+#ifndef USE_OPENGL
+	DrawSubTrans((frame % (Surface->w / Width)) * Width,
+		(frame / (Surface->w / Width)) * Height,
+		Width, Height, x, y, alpha);
+#else
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrame(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+}
+
+void Graphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
+{
+#ifndef USE_OPENGL
+	DrawSubClipTrans((frame % (Surface->w / Width)) * Width,
+		(frame / (Surface->w / Width)) * Height,
+		Width, Height, x, y, alpha);
+#else
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrameClip(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+}
+
+
+/**
+**  Draw graphic object clipped and with player colors.
+**
+**  @param player  player number
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawPlayerColorFrameClip(int player, unsigned frame,
+	int x, int y) const
+{
+#ifndef USE_OPENGL
+	GraphicPlayerPixels(&Players[player], this);
+	DrawFrameClip(frame, x, y);
+#else
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
+	}
+	DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
+#endif
+}
+
+
+
+/**
+**  Draw graphic object unclipped and flipped in X direction.
+**
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawFrameX(unsigned frame, int x, int y) const
+{
+#ifndef USE_OPENGL
+	SDL_Rect srect;
+	SDL_Rect drect;
+
+	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
+		Width)) * Width) - Width;
+	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.w = Width;
+	srect.h = Height;
+
+	drect.x = x;
+	drect.y = y;
+
+	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+#else
+	int sx, sy, ex, ey, n;
+
+	n = GraphicWidth / Width;
+	sx = (frame % n) * Width;
+	ex = sx + Width;
+	sy = (frame / n) * Height;
+	ey = sy + Height;
+	DrawTexture(this, Textures, sx, sy, ex, ey, x, y, 1);
+#endif
+}
+
+#ifdef USE_OPENGL
+void Graphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
+	int x, int y) const
+{
+	int ox;
+	int oy;
+	int skip;
+	int w;
+	int h;
+	int sx, sy, ex, ey, n;
+
+	n = GraphicWidth / Width;
+	sx = (frame % n) * Width;
+	ex = sx + Width;
+	sy = (frame / n) * Height;
+	ey = sy + Height;
+
+	w = Width;
+	h = Height;
+	CLIP_RECTANGLE_OFS(x, y, w, h, ox, oy, skip);
+
+	if (w < Width) {
+		if (ox == 0) {
+			ox += Width - w;
+		} else {
+			ox = 0;
+		}
+	}
+
+	DrawTexture(this, textures, sx + ox, sy + oy, sx + ox + w, sy + oy + h, x, y, 1);
+}
+#endif
+
+/**
+**  Draw graphic object clipped and flipped in X direction.
+**
+**  @param g       pointer to object
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawFrameClipX(unsigned frame, int x, int y) const
+{
+#ifndef USE_OPENGL
+	SDL_Rect srect;
+	SDL_Rect drect;
 	int oldx;
 	int oldy;
 
+	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
+			Width)) * Width) - Width;
+	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.w = Width;
+	srect.h = Height;
+
 	oldx = x;
 	oldy = y;
-	CLIP_RECTANGLE(x, y, w, h);
-	VideoDrawSubTrans(g, gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	drect.x = x;
+	drect.y = y;
+
+	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+#else
+	DoDrawFrameClipX(Textures, frame, x, y);
+#endif
+}
+
+void Graphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
+{
+#ifndef USE_OPENGL
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldalpha;
+
+	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
+		Width)) * Width) - Width;
+	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.w = Width;
+	srect.h = Height;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = Surface->format->alpha;
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+#else
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrameX(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+}
+
+void Graphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
+{
+#ifndef USE_OPENGL
+	SDL_Rect srect;
+	SDL_Rect drect;
+	int oldx;
+	int oldy;
+	int oldalpha;
+
+	srect.x = (SurfaceFlip->w - (frame % (SurfaceFlip->w /
+		Width)) * Width) - Width;
+	srect.y = (frame / (SurfaceFlip->w / Width)) * Height;
+	srect.w = Width;
+	srect.h = Height;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	drect.x = x;
+	drect.y = y;
+
+	oldalpha = Surface->format->alpha;
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+#else
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4ub(255, 255, 255, alpha);
+	DrawFrameClipX(frame, x, y);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+#endif
+}
+
+/**
+**  Draw graphic object clipped, flipped, and with player colors.
+**
+**  @param g       pointer to object
+**  @param player  player number
+**  @param frame   number of frame (object index)
+**  @param x       x coordinate on the screen
+**  @param y       y coordinate on the screen
+*/
+void Graphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
+	int x, int y) const
+{
+#ifndef USE_OPENGL
+	GraphicPlayerPixels(&Players[player], this);
+	DrawFrameClipX(frame, x, y);
+#else
+	if (!PlayerColorTextures[player]) {
+		MakePlayerColorTexture(this, player);
+	}
+	DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -192,14 +478,11 @@ void VideoDrawSubClipTrans(const Graphic* g, int gx, int gy,
 **
 **  @return      New graphic object (malloced).
 */
-Graphic* NewGraphic(const char* file, int w, int h)
+Graphic *NewGraphic(const char *file, int w, int h)
 {
-	Graphic* g;
-	Graphic** ptr;
-
-	ptr = (Graphic**)hash_find(GraphicHash, file);
-	if (!ptr || !*ptr) {
-		g = (Graphic*)calloc(1, sizeof(Graphic));
+	Graphic *g = GraphicHash[file];
+	if (!g) {
+		g = (Graphic *)calloc(1, sizeof(Graphic));
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
 			ExitFatal(-1);
@@ -210,9 +493,8 @@ Graphic* NewGraphic(const char* file, int w, int h)
 		g->Height = h;
 		g->NumFrames = 1;
 		g->Refs = 1;
-		*(Graphic**)hash_add(GraphicHash, g->HashFile) = g;
+		GraphicHash[g->HashFile] = g;
 	} else {
-		g = *ptr;
 		++g->Refs;
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
@@ -229,23 +511,21 @@ Graphic* NewGraphic(const char* file, int w, int h)
 **
 **  @return      New graphic object (malloced).
 */
-Graphic* ForceNewGraphic(const char* file, int w, int h)
+Graphic *ForceNewGraphic(const char *file, int w, int h)
 {
-	Graphic* g;
-
-	g = (Graphic*)calloc(1, sizeof(Graphic));
+	Graphic *g = (Graphic *)calloc(1, sizeof(Graphic));
 	if (!g) {
 		fprintf(stderr, "Out of memory\n");
 		ExitFatal(-1);
 	}
 	g->File = strdup(file);
-	g->HashFile = (char*)malloc(strlen(file) + 2 * sizeof(g->File) + 3);
+	g->HashFile = (char *)malloc(strlen(file) + 2 * sizeof(g->File) + 3);
 	sprintf(g->HashFile, "%s%p", g->File, g->File);
 	g->Width = w;
 	g->Height = h;
 	g->NumFrames = 1;
 	g->Refs = 1;
-	*(Graphic**)hash_add(GraphicHash, g->HashFile) = g;
+	GraphicHash[g->HashFile] = g;
 
 	return g;
 }
@@ -255,47 +535,47 @@ Graphic* ForceNewGraphic(const char* file, int w, int h)
 **
 **  @param g  Graphic object to load
 */
-void LoadGraphic(Graphic* g)
+void Graphic::Load()
 {
-	if (g->Surface) {
+	if (Surface) {
 		return;
 	}
 
 	// TODO: More formats?
-	if (LoadGraphicPNG(g) == -1) {
-		fprintf(stderr, "Can't load the graphic `%s'\n", g->File);
+	if (LoadGraphicPNG(this) == -1) {
+		fprintf(stderr, "Can't load the graphic `%s'\n", File);
 		ExitFatal(-1);
 	}
 
-	if (!g->Width) {
-		g->Width = g->GraphicWidth;
+	if (!Width) {
+		Width = GraphicWidth;
 	}
-	if (!g->Height) {
-		g->Height = g->GraphicHeight;
+	if (!Height) {
+		Height = GraphicHeight;
 	}
 
-	Assert(g->Width <= g->GraphicWidth && g->Height <= g->GraphicHeight);
+	Assert(Width <= GraphicWidth && Height <= GraphicHeight);
 
-	if ((g->GraphicWidth / g->Width) * g->Width != g->GraphicWidth ||
-			(g->GraphicHeight / g->Height) * g->Height != g->GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", g->File);
+	if ((GraphicWidth / Width) * Width != GraphicWidth ||
+			(GraphicHeight / Height) * Height != GraphicHeight) {
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", File);
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-			g->Width, g->Height, g->GraphicWidth, g->GraphicHeight);
+			Width, Height, GraphicWidth, GraphicHeight);
 		ExitFatal(1);
 	}
 
-	g->NumFrames = g->GraphicWidth / g->Width * g->GraphicHeight / g->Height;
+	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
 #ifdef USE_OPENGL
-	MakeTexture(g);
+	MakeTexture(this);
 
 	++NumGraphics;
-	Graphics = realloc(Graphics, NumGraphics * sizeof(*Graphics));
+	Graphics = (Graphic **)realloc(Graphics, NumGraphics * sizeof(*Graphics));
 	if (!Graphics) {
 		fprintf(stderr, "Out of memory\n");
 		exit(1);
 	}
-	Graphics[NumGraphics - 1] = g;
+	Graphics[NumGraphics - 1] = this;
 #endif
 }
 
@@ -304,12 +584,12 @@ void LoadGraphic(Graphic* g)
 **
 **  @param g  Pointer to the graphic
 */
-void FreeGraphic(Graphic* g)
+void FreeGraphic(Graphic *g)
 {
 #ifdef USE_OPENGL
 	int i;
 #endif
-	void* pixels;
+	void *pixels;
 
 	if (!g) {
 		return;
@@ -361,7 +641,7 @@ void FreeGraphic(Graphic* g)
 #endif
 		Assert(g->File);
 
-		hash_del(GraphicHash, g->HashFile);
+		GraphicHash.erase(g->HashFile);
 		free(g->File);
 		free(g->HashFile);
 		free(g);
@@ -374,16 +654,13 @@ void FreeGraphic(Graphic* g)
 */
 void ReloadGraphics(void)
 {
-	int i;
-	int j;
-
-	for (i = 0; i < NumGraphics; ++i) {
+	for (int i = 0; i < NumGraphics; ++i) {
 		if (Graphics[i]->Textures) {
 			free(Graphics[i]->Textures);
 			Graphics[i]->Textures = NULL;
 			MakeTexture(Graphics[i]);
 		}
-		for (j = 0; j < PlayerMax; ++j) {
+		for (int j = 0; j < PlayerMax; ++j) {
 			if (Graphics[i]->PlayerColorTextures[j]) {
 				free(Graphics[i]->PlayerColorTextures[j]);
 				Graphics[i]->PlayerColorTextures[j] = NULL;
@@ -399,55 +676,54 @@ void ReloadGraphics(void)
 **
 **  @param g  Pointer to object
 */
-void FlipGraphic(Graphic* g)
+void Graphic::Flip()
 {
 #ifdef USE_OPENGL
 	return;
 #else
 	int i;
 	int j;
-	SDL_Surface* s;
+	SDL_Surface *s;
 
-	if (g->SurfaceFlip) {
+	if (SurfaceFlip) {
 		return;
 	}
 
-	s = g->SurfaceFlip = SDL_ConvertSurface(g->Surface,
-		g->Surface->format, SDL_SWSURFACE);
-	if (g->Surface->flags & SDL_SRCCOLORKEY) {
-		SDL_SetColorKey(g->SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			g->Surface->format->colorkey);
+	s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
+	if (Surface->flags & SDL_SRCCOLORKEY) {
+		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+			Surface->format->colorkey);
 	}
 
-	SDL_LockSurface(g->Surface);
+	SDL_LockSurface(Surface);
 	SDL_LockSurface(s);
 	switch (s->format->BytesPerPixel) {
 		case 1:
 			for (i = 0; i < s->h; ++i) {
 				for (j = 0; j < s->w; ++j) {
-					((char*)s->pixels)[j + i * s->pitch] =
-						((char*)g->Surface->pixels)[s->w - j - 1 + i * g->Surface->pitch];
+					((char *)s->pixels)[j + i * s->pitch] =
+						((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
 				}
 			}
 			break;
 		case 3:
 			for (i = 0; i < s->h; ++i) {
 				for (j = 0; j < s->w; ++j) {
-					memcpy(&((char*)s->pixels)[j + i * s->pitch],
-						&((char*)g->Surface->pixels)[(s->w - j - 1) * 3 + i * g->Surface->pitch], 3);
+					memcpy(&((char *)s->pixels)[j + i * s->pitch],
+						&((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
 				}
 			}
 			break;
 		case 4:
 			for (i = 0; i < s->h; ++i) {
 				for (j = 0; j < s->w; ++j) {
-					*(Uint32*)&((char*)s->pixels)[j * 4 + i * s->pitch] =
-						*(Uint32*)&((char*)g->Surface->pixels)[(s->w - j - 1) * 4 + i * g->Surface->pitch];
+					*(Uint32 *)&((char *)s->pixels)[j * 4 + i * s->pitch] =
+						*(Uint32 *)&((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch];
 				}
 			}
 			break;
 	}
-	SDL_UnlockSurface(g->Surface);
+	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 #endif
 }
@@ -470,16 +746,16 @@ static int PowerOf2(int x)
 **  @param width   Graphic width.
 **  @param height  Graphic height.
 */
-static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
+static void MakeTextures2(Graphic *g, GLuint texture, UnitColors *colors,
 	int ow, int oh)
 {
 	int i;
 	int j;
 	int h;
 	int w;
-	unsigned char* tex;
-	unsigned char* tp;
-	const unsigned char* sp;
+	unsigned char *tex;
+	unsigned char *tp;
+	const unsigned char *sp;
 	int fl;
 	Uint32 ckey;
 	int useckey;
@@ -488,7 +764,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 	Uint32 b;
 	Uint32 c;
 	Uint32 pc;
-	SDL_PixelFormat* f;
+	SDL_PixelFormat *f;
 	int maxw;
 	int maxh;
 
@@ -505,7 +781,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 		GLMaxTextureSize : g->GraphicHeight - oh;
 	w = PowerOf2(maxw);
 	h = PowerOf2(maxh);
-	tex = malloc(w * h * 4);
+	tex = (unsigned char *)malloc(w * h * 4);
 	if (g->Surface->flags & SDL_SRCALPHA) {
 		alpha = f->alpha;
 	} else {
@@ -519,7 +795,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	for (i = 0; i < maxh; ++i) {
-		sp = (const unsigned char*)g->Surface->pixels + ow * bpp +
+		sp = (const unsigned char *)g->Surface->pixels + ow * bpp +
 			(oh + i) * g->Surface->pitch;
 		tp = tex + i * w * 4;
 		for (j = 0; j < maxw; ++j) {
@@ -551,7 +827,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 				++sp;
 			} else {
 				if (bpp == 4) {
-					c = *(Uint32*)sp;
+					c = *(Uint32 *)sp;
 				} else {
 					c = (sp[f->Rshift >> 3] << f->Rshift) |
 						(sp[f->Gshift >> 3] << f->Gshift) |
@@ -559,7 +835,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 					c |= ((alpha | (alpha << 8) | (alpha << 16) | (alpha << 24)) ^
 						(f->Rmask | f->Gmask | f->Bmask));
 				}
-				*(Uint32*)tp = c;
+				*(Uint32 *)tp = c;
 				if (colors) {
 					b = (c & f->Bmask) >> f->Bshift;
 					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
@@ -572,7 +848,7 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 						} else {
 							pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
 						}
-						*(Uint32*)tp = pc;
+						*(Uint32 *)tp = pc;
 					}
 				}
 				sp += bpp;
@@ -597,13 +873,13 @@ static void MakeTextures2(Graphic* g, GLuint texture, UnitColors* colors,
 **  @param width   Graphic width.
 **  @param height  Graphic height.
 */
-static void MakeTextures(Graphic* g, int player, UnitColors* colors)
+static void MakeTextures(Graphic *g, int player, UnitColors *colors)
 {
 	int i;
 	int j;
 	int tw;
 	int th;
-	GLuint* textures;
+	GLuint *textures;
 
 	tw = g->GraphicWidth / (GLMaxTextureSize + 1) + 1;
 	th = g->GraphicHeight / (GLMaxTextureSize + 1) + 1;
@@ -618,10 +894,10 @@ static void MakeTextures(Graphic* g, int player, UnitColors* colors)
 		tw = tw;
 	}
 	if (!colors) {
-		textures = g->Textures = malloc(g->NumTextures * sizeof(*g->Textures));
+		textures = g->Textures = (GLuint *)malloc(g->NumTextures * sizeof(*g->Textures));
 		glGenTextures(g->NumTextures, g->Textures);
 	} else {
-		textures = g->PlayerColorTextures[player] = malloc(g->NumTextures * sizeof(GLuint));
+		textures = g->PlayerColorTextures[player] = (GLuint *)malloc(g->NumTextures * sizeof(GLuint));
 		glGenTextures(g->NumTextures, g->PlayerColorTextures[player]);
 	}
 
@@ -637,7 +913,7 @@ static void MakeTextures(Graphic* g, int player, UnitColors* colors)
 **
 **  @param g  The graphic object.
 */
-void MakeTexture(Graphic* g)
+void MakeTexture(Graphic *g)
 {
 	if (g->Textures) {
 		return;
@@ -652,7 +928,7 @@ void MakeTexture(Graphic* g)
 **  @param g       The graphic to texture with player colors.
 **  @param player  Player number to make textures for.
 */
-void MakePlayerColorTexture(Graphic* g, int player)
+void MakePlayerColorTexture(Graphic *g, int player)
 {
 	if (g->PlayerColorTextures[player]) {
 		return;
@@ -669,79 +945,79 @@ void MakePlayerColorTexture(Graphic* g, int player)
 **  @param w  New width of graphic.
 **  @param h  New height of graphic.
 */
-void ResizeGraphic(Graphic* g, int w, int h)
+void Graphic::Resize(int w, int h)
 {
 	int i;
 	int j;
-	unsigned char* data;
-	unsigned char* pixels;
+	unsigned char *data;
+	unsigned char *pixels;
 	int x;
 	int bpp;
 
-	if (g->GraphicWidth == w && g->GraphicHeight == h) {
+	if (GraphicWidth == w && GraphicHeight == h) {
 		return;
 	}
 
-	bpp = g->Surface->format->BytesPerPixel;
+	bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
 		SDL_Color pal[256];
 		Uint32 ckey;
 		int useckey;
 
-		SDL_LockSurface(g->Surface);
+		SDL_LockSurface(Surface);
 
-		pixels = (unsigned char*)g->Surface->pixels;
-		data = (unsigned char*)malloc(w * h);
+		pixels = (unsigned char *)Surface->pixels;
+		data = (unsigned char *)malloc(w * h);
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
 			for (j = 0; j < w; ++j) {
-				data[x] = pixels[(i * g->Height / h) * g->Surface->pitch + j * g->Width / w];
+				data[x] = pixels[(i * Height / h) * Surface->pitch + j * Width / w];
 				++x;
 			}
 		}
 
-		SDL_UnlockSurface(g->Surface);
-		memcpy(pal, g->Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-		useckey = g->Surface->flags & SDL_SRCCOLORKEY;
-		ckey = g->Surface->format->colorkey;
-		SDL_FreeSurface(g->Surface);
+		SDL_UnlockSurface(Surface);
+		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
+		useckey = Surface->flags & SDL_SRCCOLORKEY;
+		ckey = Surface->format->colorkey;
+		SDL_FreeSurface(Surface);
 
-		g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-		SDL_SetPalette(g->Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
+		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
+		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
 		if (useckey) {
-			SDL_SetColorKey(g->Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+			SDL_SetColorKey(Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
 		}
 	} else {
 		int ix, iy;
 		float fx, fy, fz;
 		unsigned char *p1, *p2, *p3, *p4;
 
-		SDL_LockSurface(g->Surface);
+		SDL_LockSurface(Surface);
 
-		pixels = (unsigned char*)g->Surface->pixels;
+		pixels = (unsigned char*)Surface->pixels;
 		data = (unsigned char*)malloc(w * h * bpp);
 		x = 0;
 
 		for (i = 0; i < h; ++i) {
-			fy = (float)i * g->Height / h;
+			fy = (float)i * Height / h;
 			iy = (int)fy;
 			fy -= iy;
 			for (j = 0; j < w; ++j) {
-				fx = (float)j * g->Width / w;
+				fx = (float)j * Width / w;
 				ix = (int)fx;
 				fx -= ix;
 				fz = (fx + fy) / 2;
 
-				p1 = &pixels[iy * g->Surface->pitch + ix * bpp];
-				p2 = (iy != g->Surface->h - 1) ?
-					&pixels[(iy + 1) * g->Surface->pitch + ix * bpp] :
+				p1 = &pixels[iy * Surface->pitch + ix * bpp];
+				p2 = (iy != Surface->h - 1) ?
+					&pixels[(iy + 1) * Surface->pitch + ix * bpp] :
 					p1;
-				p3 = (ix != g->Surface->w - 1) ?
-					&pixels[iy * g->Surface->pitch + (ix + 1) * bpp] :
+				p3 = (ix != Surface->w - 1) ?
+					&pixels[iy * Surface->pitch + (ix + 1) * bpp] :
 					p1;
-				p4 = (iy != g->Surface->h - 1 && ix != g->Surface->w - 1) ?
-					&pixels[(iy + 1) * g->Surface->pitch + (ix + 1) * bpp] :
+				p4 = (iy != Surface->h - 1 && ix != Surface->w - 1) ?
+					&pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
 					p1;
 
 				data[x * bpp + 0] = (p1[0] * (1 - fy) + p2[0] * fy +
@@ -762,59 +1038,91 @@ void ResizeGraphic(Graphic* g, int w, int h)
 			}
 		}
 
-		SDL_UnlockSurface(g->Surface);
-		SDL_FreeSurface(g->Surface);
+		SDL_UnlockSurface(Surface);
+		SDL_FreeSurface(Surface);
 
-		g->Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
+		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 			RMASK, GMASK, BMASK, (bpp == 3 ? 0 : AMASK));
 	}
 
-	g->Width = g->GraphicWidth = w;
-	g->Height = g->GraphicHeight = h;
+	Width = GraphicWidth = w;
+	Height = GraphicHeight = h;
 
 #ifdef USE_OPENGL
-	glDeleteTextures(g->NumTextures, g->Textures);
-	free(g->Textures);
-	g->Textures = NULL;
-	MakeTexture(g);
+	glDeleteTextures(NumTextures, Textures);
+	free(Textures);
+	Textures = NULL;
+	MakeTexture(this);
 #endif
 }
 
 /**
 **  Check if a pixel is transparent
 **
-**  @param g  Graphic to check
 **  @param x  X coordinate
 **  @param y  Y coordinate
 **
 **  @return   True if the pixel is transparent, False otherwise
 */
-int GraphicTransparentPixel(Graphic* g, int x, int y)
+int Graphic::TransparentPixel(int x, int y)
 {
-	unsigned char* p;
+	unsigned char *p;
 	int bpp;
 	int ret;
 
-	bpp = g->Surface->format->BytesPerPixel;
-	if ((bpp == 1 && !(g->Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
+	bpp = Surface->format->BytesPerPixel;
+	if ((bpp == 1 && !(Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
 		return 0;
 	}
 
 	ret = 0;
-	SDL_LockSurface(g->Surface);
-	p = (unsigned char*)g->Surface->pixels + y * g->Surface->pitch + x * bpp;
+	SDL_LockSurface(Surface);
+	p = (unsigned char *)Surface->pixels + y * Surface->pitch + x * bpp;
 	if (bpp == 1) {
-		if (*p == g->Surface->format->colorkey) {
+		if (*p == Surface->format->colorkey) {
 			ret = 1;
 		}
 	} else {
-		if (p[g->Surface->format->Ashift >> 3] == 255) {
+		if (p[Surface->format->Ashift >> 3] == 255) {
 			ret = 1;
 		}
 	}
-	SDL_UnlockSurface(g->Surface);
+	SDL_UnlockSurface(Surface);
 
 	return ret;
+}
+
+/**
+**  Make shadow sprite
+**
+**  @param g  pointer to object
+**
+**  @todo FIXME: 32bpp
+*/
+void Graphic::MakeShadow()
+{
+	SDL_Color colors[256];
+
+	// Set all colors in the palette to black and use 50% alpha
+	memset(colors, 0, sizeof(colors));
+
+	SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+
+#ifndef USE_OPENGL
+	if (SurfaceFlip) {
+		SDL_SetPalette(SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	}
+#endif
+#ifdef USE_OPENGL
+	if (Textures) {
+		glDeleteTextures(NumTextures, Textures);
+		free(g->Textures);
+		Textures = NULL;
+	}
+	MakeTexture(this);
+#endif
 }
 
 //@}

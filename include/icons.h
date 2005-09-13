@@ -106,14 +106,14 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 struct _player_;
 struct _button_style_;
 
 	/// Icon: rectangle image used in menus
 typedef struct _icon_ {
 	char *Ident;              /// Icon identifier
-	struct _graphic_ *Sprite; /// Graphic data
+	Graphic *G;               /// Graphic data
 	int Frame;                /// Frame number in graphic
 } Icon;
 

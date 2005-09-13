@@ -528,7 +528,7 @@ class Mng;
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 struct _construction_;
 struct _animations_;
 
@@ -555,11 +555,11 @@ typedef struct _resource_info_ {
 	unsigned TerrainHarvester;      /// Unit will harvest terrain(wood only for now).
 	unsigned LoseResources;         /// The unit will lose it's resource when distracted.
 	//  Runtime info:
-	struct _graphic_* SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	struct _graphic_* SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
+	Graphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	Graphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 #ifdef USE_OPENGL
-	struct _graphic_* PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
-	struct _graphic_* PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
+	Graphic *PlayerColorSpriteWhenLoaded[PlayerMax]; /// Sprites with player colors
+	Graphic *PlayerColorSpriteWhenEmpty[PlayerMax];  /// Sprites with player colors
 #endif
 } ResourceInfo;
 
@@ -905,8 +905,8 @@ typedef struct _unit_type_ {
 	/// @todo This stats should? be moved into the player struct
 	UnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	struct _graphic_* Sprite;                /// Sprite images
-	struct _graphic_* ShadowSprite;          /// Shadow sprite image
+	Graphic *Sprite;                /// Sprite images
+	Graphic *ShadowSprite;          /// Shadow sprite image
 } UnitType;
 
 	/// @todo ARI: should be dynamic (lua..).
@@ -953,7 +953,7 @@ extern int GetVariableIndex(const char *VarName); /// Get index of the variable
 extern void SaveUnitTypes(struct _CL_File_* file);  /// Save the unit-type table
 extern UnitType* NewUnitTypeSlot(char*);            /// Allocate an empty unit-type slot
 	/// Draw the sprite frame of unit-type
-extern void DrawUnitType(const UnitType* type, struct _graphic_* sprite, int player,
+extern void DrawUnitType(const UnitType *type, Graphic *sprite, int player,
 	int frame, int x, int y);
 
 extern void InitUnitTypes(int reset_player_stats);  /// Init unit-type table

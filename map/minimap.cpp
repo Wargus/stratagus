@@ -174,8 +174,8 @@ void CreateMinimap(void)
 	}
 	for (MinimapTextureHeight = 1; MinimapTextureHeight < TheUI.MinimapH; MinimapTextureHeight <<= 1) {
 	}
-	MinimapTerrainSurface = malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
-	MinimapSurface = calloc(MinimapTextureWidth * MinimapTextureHeight * 4, sizeof(*MinimapSurface));
+	MinimapTerrainSurface = (unsigned char *)malloc(MinimapTextureWidth * MinimapTextureHeight * 4);
+	MinimapSurface = (unsigned char *)calloc(MinimapTextureWidth * MinimapTextureHeight * 4, sizeof(*MinimapSurface));
 	CreateMinimapTexture();
 #endif
 

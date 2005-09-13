@@ -119,9 +119,9 @@ void LoadCursors(const char* race)
 			continue;
 		}
 
-		if (Cursors[i].G && !GraphicLoaded(Cursors[i].G)) {
+		if (Cursors[i].G && !Cursors[i].G->Loaded()) {
 			ShowLoadProgress("Cursor %s", Cursors[i].G->File);
-			LoadGraphic(Cursors[i].G);
+			Cursors[i].G->Load();
 		}
 	}
 }
@@ -143,7 +143,7 @@ CursorType* CursorTypeByIdent(const char* ident)
 		if (strcmp(Cursors[i].Ident, ident)) {
 			continue;
 		}
-		if (!Cursors[i].Race || GraphicLoaded(Cursors[i].G)) {
+		if (!Cursors[i].Race || Cursors[i].G->Loaded()) {
 			return Cursors + i;
 		}
 	}
@@ -306,7 +306,7 @@ void DrawCursor(void)
 	//  draw it if it exists
 	//
 	if (GameCursor) {
-		VideoDrawClip(GameCursor->G, GameCursor->SpriteFrame,
+		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame,
 			CursorX - GameCursor->HotX, CursorY - GameCursor->HotY);
 	}
 }
@@ -326,8 +326,7 @@ void CursorAnimate(unsigned ticks)
 	if (ticks > last + GameCursor->FrameRate) {
 		last = ticks + GameCursor->FrameRate;
 		GameCursor->SpriteFrame++;
-		if ((GameCursor->SpriteFrame & 127) >=
-				VideoGraphicFrames(GameCursor->G)) {
+		if ((GameCursor->SpriteFrame & 127) >= GameCursor->G->NumFrames) {
 			GameCursor->SpriteFrame = 0;
 		}
 	}

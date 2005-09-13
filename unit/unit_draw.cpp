@@ -198,10 +198,10 @@ void DrawUnitSelection(const Unit* unit)
 
 	x = Map2ViewportX(CurrentViewport, unit->X) + unit->IX +
 		type->TileWidth * TileSizeX / 2 - type->BoxWidth / 2 -
-		(type->Width - VideoGraphicWidth(type->Sprite)) / 2;
+		(type->Width - type->Sprite->Width) / 2;
 	y = Map2ViewportY(CurrentViewport, unit->Y) + unit->IY +
 		type->TileHeight * TileSizeY / 2 - type->BoxHeight/2 -
-		(type->Height - VideoGraphicHeight(type->Sprite)) / 2;
+		(type->Height - type->Sprite->Height) / 2;
 	DrawSelection(color, x, y, x + type->BoxWidth, y + type->BoxHeight);
 }
 
@@ -755,7 +755,7 @@ void LoadDecorations(void)
 		deco = &DecoSprite.SpriteArray[i];
 		ShowLoadProgress("Decorations `%s'", deco->File);
 		deco->Sprite = NewGraphic(deco->File, deco->Width, deco->Height);
-		LoadGraphic(deco->Sprite);
+		deco->Sprite->Load();
 	}
 }
 
@@ -899,7 +899,7 @@ void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 	x += decosprite->HotX; // in addition of OffsetX... Usefull ?
 	y += decosprite->HotY; // in addition of OffsetY... Usefull ?
 
-	n = VideoGraphicFrames(sprite) - 1;
+	n = sprite->NumFrames - 1;
 	n -= (n * unit->Variable[Deco->Index].Value) / unit->Variable[Deco->Index].Max;
 
 	if (Deco->IsCenteredInX) {
@@ -908,7 +908,7 @@ void DrawSpriteBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 	if (Deco->IsCenteredInY) {
 		y -= sprite->Height / 2;
 	}
-	VideoDrawClip(sprite, n, x, y);
+	sprite->DrawFrameClip(n, x, y);
 }
 
 /**
@@ -936,7 +936,7 @@ void DrawStaticSprite(int x, int y, const Unit* unit, const DecoVarType* Deco)
 	if (Deco->IsCenteredInY) {
 		y -= sprite->Height / 2;
 	}
-	VideoDrawClip(sprite, Deco->Data.StaticSprite.n, x, y);
+	sprite->DrawFrameClip(Deco->Data.StaticSprite.n, x, y);
 }
 
 
@@ -1047,9 +1047,9 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 
 		if (type->Flip) {
 			if (frame < 0) {
-				VideoDrawClipX(type->ShadowSprite, -frame - 1, x, y);
+				type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 			} else {
-				VideoDrawClip(type->ShadowSprite, frame, x, y);
+				type->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		} else {
 			int row;
@@ -1060,7 +1060,7 @@ void DrawShadow(const Unit* unit, const UnitType* type, int frame,
 			} else {
 				frame = (frame / row) * type->NumDirections + frame % row;
 			}
-			VideoDrawClip(type->ShadowSprite, frame, x, y);
+			type->ShadowSprite->DrawFrameClip(frame, x, y);
 		}
 	}
 }
@@ -1416,10 +1416,10 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y += unit->Type->OffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
-					VideoDrawClipX(unit->Type->Construction->ShadowSprite,
+					unit->Type->Construction->ShadowSprite->DrawFrameClipX(
 						-frame - 1, x, y);
 				} else {
-					VideoDrawClip(unit->Type->Construction->ShadowSprite,
+					unit->Type->Construction->ShadowSprite->DrawFrameClip(
 						frame, x, y);
 				}
 			} else {
@@ -1431,7 +1431,7 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
-				VideoDrawClip(unit->Type->Construction->ShadowSprite, frame,
+				unit->Type->Construction->ShadowSprite->DrawFrameClip(frame,
 					x, y);
 			}
 		}
@@ -1445,9 +1445,9 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 			y += unit->Type->OffsetY;
 			if (unit->Type->Flip) {
 				if (frame < 0) {
-					VideoDrawClipX(unit->Type->ShadowSprite, -frame - 1, x, y);
+					unit->Type->ShadowSprite->DrawFrameClipX(-frame - 1, x, y);
 				} else {
-					VideoDrawClip(unit->Type->ShadowSprite, frame, x, y);
+					unit->Type->ShadowSprite->DrawFrameClip(frame, x, y);
 				}
 			} else {
 				int row;
@@ -1458,7 +1458,7 @@ static void DrawConstructionShadow(const Unit* unit, int frame, int x, int y)
 				} else {
 					frame = (frame / row) * unit->Type->NumDirections + frame % row;
 				}
-				VideoDrawClip(unit->Type->ShadowSprite, frame, x, y);
+				unit->Type->ShadowSprite->DrawFrameClip(frame, x, y);
 			}
 		}
 	}
@@ -1487,11 +1487,9 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		x -= construction->Width / 2;
 		y -= construction->Height / 2;
 		if (frame < 0) {
-			VideoDrawPlayerColorClipX(construction->Sprite,
-				player, -frame - 1, x, y);
+			construction->Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
 		} else {
-			VideoDrawPlayerColorClip(construction->Sprite,
-				player, frame, x, y);
+			construction->Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 		}
 	} else {
 		x += type->OffsetX - type->Width / 2;
@@ -1499,7 +1497,7 @@ static void DrawConstruction(const Unit* unit, const ConstructionFrame* cframe,
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
-		VideoDrawPlayerColorClip(type->Sprite, player, frame, x, y);
+		type->Sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 	}
 }
 

@@ -293,7 +293,7 @@ void UpdateDisplay(void)
 
 		if (!BigMapMode) {
 			for (i = 0; i < TheUI.NumFillers; ++i) {
-				VideoDrawSubClip(TheUI.Filler[i], 0, 0,
+				TheUI.Filler[i]->DrawSubClip(0, 0,
 					TheUI.Filler[i]->Width,
 					TheUI.Filler[i]->Height,
 					TheUI.FillerX[i], TheUI.FillerY[i]);
