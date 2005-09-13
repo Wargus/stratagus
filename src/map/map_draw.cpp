@@ -258,9 +258,9 @@ void DrawMapBackgroundInViewport(const Viewport* vp)
 		dx = vp->X - vp->OffsetX;
 		while (dx <= ex) {
 			if (ReplayRevealMap) {
-				VideoDrawClip(TheMap.TileGraphic, TheMap.Fields[sx].Tile, dx, dy);
+				TheMap.TileGraphic->DrawFrameClip(TheMap.Fields[sx].Tile, dx, dy);
 			} else {
-				VideoDrawClip(TheMap.TileGraphic, TheMap.Fields[sx].SeenTile, dx, dy);
+				TheMap.TileGraphic->DrawFrameClip(TheMap.Fields[sx].SeenTile, dx, dy);
 			}
 
 			++sx;

@@ -75,7 +75,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -89,7 +89,7 @@ typedef struct _color_font_ {
 
 // --- FILLED UP ---
 
-	struct _graphic_* G;  /// Graphic object used to draw
+	Graphic *G;  /// Graphic object used to draw
 } ColorFont;
 
 /**

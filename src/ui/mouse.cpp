@@ -449,7 +449,7 @@ static inline int OnGraphic(int x, int y, Graphic* g, int gx, int gy)
 	x -= gx;
 	y -= gy;
 	if (x >= 0 && x < g->Width && y >= 0 && y < g->Height) {
-		return !GraphicTransparentPixel(g, x, y);
+		return !g->TransparentPixel(x, y);
 	}
 	return 0;
 }
@@ -1990,7 +1990,7 @@ void DrawPieMenu(void)
 
 	// Draw background
 	if (TheUI.PieMenuBackgroundG) {
-		VideoDrawClip(TheUI.PieMenuBackgroundG, 0,
+		TheUI.PieMenuBackgroundG->DrawFrameClip(0,
 			CursorStartX - TheUI.PieMenuBackgroundG->Width / 2,
 			CursorStartY - TheUI.PieMenuBackgroundG->Height / 2);
 	}

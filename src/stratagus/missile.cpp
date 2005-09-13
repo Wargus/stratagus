@@ -135,10 +135,10 @@ extern NumberDesc* Damage;                   /// Damage calculation for missile.
 */
 void LoadMissileSprite(MissileType* mtype)
 {
-	if (mtype->G && !GraphicLoaded(mtype->G)) {
-		LoadGraphic(mtype->G);
+	if (mtype->G && !mtype->G->Loaded()) {
+		mtype->G->Load();
 		if (mtype->Flip) {
-			FlipGraphic(mtype->G);
+			mtype->G->Flip();
 		}
 
 		// Correct the number of frames in graphic
@@ -626,15 +626,15 @@ static void DrawMissileType(MissileType* mtype, int frame, int x, int y)
 	if (mtype->Flip) {
 		if (frame < 0) {
 			if (mtype->Transparency == 50) {
-				VideoDrawClipXTrans50(mtype->G, -frame - 1, x, y);
+				mtype->G->DrawFrameClipTransX(-frame - 1, x, y, 128);
 			} else {
-				VideoDrawClipX(mtype->G, -frame - 1, x, y);
+				mtype->G->DrawFrameClipX(-frame - 1, x, y);
 			}
 		} else {
 			if (mtype->Transparency == 50) {
-				VideoDrawClipTrans50(mtype->G, frame, x, y);
+				mtype->G->DrawFrameClipTrans(frame, x, y, 128);
 			} else {
-				VideoDrawClip(mtype->G, frame, x, y);
+				mtype->G->DrawFrameClip(frame, x, y);
 			}
 		}
 	} else {
@@ -647,9 +647,9 @@ static void DrawMissileType(MissileType* mtype, int frame, int x, int y)
 			frame = (frame / row) * mtype->NumDirections + frame % row;
 		}
 		if (mtype->Transparency == 50) {
-			VideoDrawClipTrans50(mtype->G, frame, x, y);
+			mtype->G->DrawFrameClipTrans(frame, x, y, 128);
 		} else {
-			VideoDrawClip(mtype->G, frame, x, y);
+			mtype->G->DrawFrameClip(frame, x, y);
 		}
 	}
 }

@@ -362,9 +362,9 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 
 	if (type->Flip) {
 		if (frame < 0) {
-			VideoDrawPlayerColorClipX(sprite, player, -frame - 1, x, y);
+			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, x, y);
 		} else {
-			VideoDrawPlayerColorClip(sprite, player, frame, x, y);
+			sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 		}
 	} else {
 		int row;
@@ -375,7 +375,7 @@ void DrawUnitType(const UnitType* type, Graphic* sprite, int player, int frame,
 		} else {
 			frame = (frame / row) * type->NumDirections + frame % row;
 		}
-		VideoDrawPlayerColorClip(sprite, player, frame, x, y);
+		sprite->DrawPlayerColorFrameClip(player, frame, x, y);
 	}
 }
 
@@ -437,11 +437,11 @@ void LoadUnitTypeSprite(UnitType* type)
 	if (type->ShadowFile) {
 		type->ShadowSprite = ForceNewGraphic(type->ShadowFile, type->ShadowWidth,
 			type->ShadowHeight);
-		LoadGraphic(type->ShadowSprite);
+		type->ShadowSprite->Load();
 		if (type->Flip) {
-			FlipGraphic(type->ShadowSprite);
+			type->ShadowSprite->Flip();
 		}
-		MakeShadowSprite(type->ShadowSprite);
+		type->ShadowSprite->MakeShadow();
 	}
 
 	if (type->Harvester) {
@@ -450,17 +450,17 @@ void LoadUnitTypeSprite(UnitType* type)
 				if (resinfo->FileWhenLoaded) {
 					resinfo->SpriteWhenLoaded = NewGraphic(resinfo->FileWhenLoaded,
 						type->Width, type->Height);
-					LoadGraphic(resinfo->SpriteWhenLoaded);
+					resinfo->SpriteWhenLoaded->Load();
 					if (type->Flip) {
-						FlipGraphic(resinfo->SpriteWhenLoaded);
+						resinfo->SpriteWhenLoaded->Flip();
 					}
 				}
 				if (resinfo->FileWhenEmpty) {
 					resinfo->SpriteWhenEmpty = NewGraphic(resinfo->FileWhenEmpty,
 						type->Width, type->Height);
-					LoadGraphic(resinfo->SpriteWhenEmpty);
+					resinfo->SpriteWhenEmpty->Load();
 					if (type->Flip) {
-						FlipGraphic(resinfo->SpriteWhenEmpty);
+						resinfo->SpriteWhenEmpty->Flip();
 					}
 				}
 			}
@@ -469,9 +469,9 @@ void LoadUnitTypeSprite(UnitType* type)
 
 	if (type->File) {
 		type->Sprite = NewGraphic(type->File, type->Width, type->Height);
-		LoadGraphic(type->Sprite);
+		type->Sprite->Load();
 		if (type->Flip) {
-			FlipGraphic(type->Sprite);
+			type->Sprite->Flip();
 		}
 	}
 

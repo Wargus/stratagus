@@ -170,7 +170,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-struct _graphic_;
+class Graphic;
 struct _player_;
 struct _CL_File_;
 struct _unit_;
@@ -260,10 +260,10 @@ typedef struct _world_map_ {
 
 	struct _tileset_ Tileset; /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels
-	struct _graphic_* TileGraphic; /// graphic for all the tiles
-	struct _graphic_* FogGraphic; /// graphic for fog of war
+	Graphic *TileGraphic;     /// graphic for all the tiles
+	Graphic *FogGraphic;      /// graphic for fog of war
 
-	MapInfo Info;  /// descriptive information
+	MapInfo Info;             /// descriptive information
 } WorldMap;
 
 /*----------------------------------------------------------------------------

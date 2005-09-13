@@ -88,8 +88,8 @@ void LoadConstructions(void)
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->Sprite = NewGraphic(file,
 					(*cop)->Width, (*cop)->Height);
-				LoadGraphic((*cop)->Sprite);
-				FlipGraphic((*cop)->Sprite);
+				(*cop)->Sprite->Load();
+				(*cop)->Sprite->Flip();
 			}
 			file = (*cop)->ShadowFile.File;
 			(*cop)->ShadowWidth = (*cop)->ShadowFile.Width;
@@ -98,9 +98,9 @@ void LoadConstructions(void)
 				ShowLoadProgress("Construction %s", file);
 				(*cop)->ShadowSprite = ForceNewGraphic(file,
 					(*cop)->ShadowWidth, (*cop)->ShadowHeight);
-				LoadGraphic((*cop)->ShadowSprite);
-				FlipGraphic((*cop)->ShadowSprite);
-				MakeShadowSprite((*cop)->ShadowSprite);
+				(*cop)->ShadowSprite->Load();
+				(*cop)->ShadowSprite->Flip();
+				(*cop)->ShadowSprite->MakeShadow();
 			}
 			++cop;
 		}
