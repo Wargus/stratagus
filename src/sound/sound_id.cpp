@@ -40,6 +40,9 @@
 
 #include "stratagus.h"
 
+#include <string>
+#include <map>
+
 #include "sound_id.h"
 #include "sound_server.h"
 #include "util.h"
@@ -48,21 +51,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef DOXYGEN // no real code, only for document
-
-/**
-**  hash table used to store the mapping between sound name and sound id
-*/
-static int SoundIdHash[61];
-
-#else
-
-/**
-**  hash table used to store the mapping between sound name and sound id
-*/
-static hashtable(int, 61) SoundIdHash;
-
-#endif
+static std::map<std::string, SoundId> SoundIdMap;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -75,9 +64,9 @@ static hashtable(int, 61) SoundIdHash;
 **  @param name  Name of the sound (now freed by caller!).
 **  @param id    Sound identifier.
 */
-void MapSound(const char* name, const SoundId id)
+void MapSound(const char *name, const SoundId id)
 {
-	*((SoundId*)hash_add(SoundIdHash, (char*)name)) = id;
+	SoundIdMap[name] = id;
 }
 
 /**
@@ -85,19 +74,17 @@ void MapSound(const char* name, const SoundId id)
 **
 **  @param name  Sound name.
 **
-**  @return      Sound idenfier for this name.
+**  @return      Sound identifier for this name.
 */
-SoundId SoundIdForName(const char* name)
+SoundId SoundIdForName(const char *name)
 {
-	const SoundId* result;
-
 	Assert(name);
 
-	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
-		return *result;
+	SoundId result = SoundIdMap[name];
+	if (!result) {
+		DebugPrint("Can't find sound `%s' in sound table\n" _C_ name);
 	}
-	DebugPrint("Can't find sound `%s' in sound table\n" _C_ name);
-	return NULL;
+	return result;
 }
 
 /**
@@ -112,23 +99,21 @@ SoundId SoundIdForName(const char* name)
 **
 **  @return      the sound id of the created group
 */
-SoundId MakeSound(const char* name, const char* file[], int nb)
+SoundId MakeSound(const char *name, const char *file[], int nb)
 {
-	SoundId id;
-	const SoundId* result;
+	SoundId sound;
 
 	Assert(nb <= 255);
 
-	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
+	if ((sound = SoundIdMap[name])) {
 		DebugPrint("re-register sound `%s'\n" _C_ name);
-		return *result;
+		return sound;
 	}
 
-	// ask the server to register the sound
-	id = RegisterSound(file, nb);
-	// save the mapping from name to id in the hash table.
-	MapSound(name, id);
-	return id;
+	sound = RegisterSound(file, nb);
+	MapSound(name, sound);
+
+	return sound;
 }
 
 /**
@@ -144,14 +129,13 @@ SoundId MakeSound(const char* name, const char* file[], int nb)
 **
 **  @return        Registered sound identifier.
 */
-SoundId MakeSoundGroup(const char* name, SoundId first, SoundId second)
+SoundId MakeSoundGroup(const char *name, SoundId first, SoundId second)
 {
 	SoundId sound;
-	const SoundId* result;
 
-	if ((result = (const SoundId*)hash_find(SoundIdHash, (char*)name))) {
+	if ((sound = SoundIdMap[name])) {
 		DebugPrint("re-register sound `%s'\n" _C_ name);
-		return *result;
+		return sound;
 	}
 
 	sound = RegisterTwoGroups(first, second);
