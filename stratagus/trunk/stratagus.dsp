@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "include" /D "NDEBUG" /D "USE_OPENGL" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "src\include" /I "include" /D "NDEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_OPENGL" /D "USE_WIN32" /D "MAP_REGIONS" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "src\include" /I "include" /D "_DEBUG" /D "DEBUG" /D "USE_WIN32" /D "USE_MNG" /D "USE_LIBCDA" /D "USE_ZLIB" /D "USE_BZ2LIB" /D "USE_MIKMOD" /D "USE_VORBIS" /D "USE_THEORA" /D "USE_MAD" /D "USE_FLAC" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -99,79 +99,79 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\action\action_attack.c
+SOURCE=.\src\action\action_attack.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_board.c
+SOURCE=.\src\action\action_board.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_build.c
+SOURCE=.\src\action\action_build.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_die.c
+SOURCE=.\src\action\action_die.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_follow.c
+SOURCE=.\src\action\action_follow.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_move.c
+SOURCE=.\src\action\action_move.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_patrol.c
+SOURCE=.\src\action\action_patrol.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_repair.c
+SOURCE=.\src\action\action_repair.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_research.c
+SOURCE=.\src\action\action_research.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_resource.c
+SOURCE=.\src\action\action_resource.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_returngoods.c
+SOURCE=.\src\action\action_returngoods.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_spellcast.c
+SOURCE=.\src\action\action_spellcast.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_stand.c
+SOURCE=.\src\action\action_stand.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_still.c
+SOURCE=.\src\action\action_still.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_train.c
+SOURCE=.\src\action\action_train.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_unload.c
+SOURCE=.\src\action\action_unload.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\action_upgradeto.c
+SOURCE=.\src\action\action_upgradeto.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\actions.c
+SOURCE=.\src\action\actions.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\action\command.c
+SOURCE=.\src\action\command.cpp
 # End Source File
 # End Group
 # Begin Group "ai"
@@ -179,31 +179,31 @@ SOURCE=.\src\action\command.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\ai\ai.c
+SOURCE=.\src\ai\ai.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\ai_building.c
+SOURCE=.\src\ai\ai_building.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\ai_force.c
+SOURCE=.\src\ai\ai_force.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\ai_magic.c
+SOURCE=.\src\ai\ai_magic.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\ai_plan.c
+SOURCE=.\src\ai\ai_plan.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\ai_resource.c
+SOURCE=.\src\ai\ai_resource.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ai\script_ai.c
+SOURCE=.\src\ai\script_ai.cpp
 # End Source File
 # End Group
 # Begin Group "editor"
@@ -211,19 +211,19 @@ SOURCE=.\src\ai\script_ai.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\editor\editloop.c
+SOURCE=.\src\editor\editloop.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\editor\editor.c
+SOURCE=.\src\editor\editor.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\editor\edmap.c
+SOURCE=.\src\editor\edmap.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\editor\script_editor.c
+SOURCE=.\src\editor\script_editor.cpp
 # End Source File
 # End Group
 # Begin Group "game"
@@ -231,27 +231,27 @@ SOURCE=.\src\editor\script_editor.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\game\campaign.c
+SOURCE=.\src\game\campaign.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\game\game.c
+SOURCE=.\src\game\game.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\game\intro.c
+SOURCE=.\src\game\intro.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\game\loadgame.c
+SOURCE=.\src\game\loadgame.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\game\savegame.c
+SOURCE=.\src\game\savegame.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\game\trigger.c
+SOURCE=.\src\game\trigger.cpp
 # End Source File
 # End Group
 # Begin Group "map"
@@ -259,43 +259,43 @@ SOURCE=.\src\game\trigger.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\map\map.c
+SOURCE=.\src\map\map.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_draw.c
+SOURCE=.\src\map\map_draw.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_fog.c
+SOURCE=.\src\map\map_fog.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_radar.c
+SOURCE=.\src\map\map_radar.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_save.c
+SOURCE=.\src\map\map_save.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\map_wall.c
+SOURCE=.\src\map\map_wall.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\minimap.c
+SOURCE=.\src\map\minimap.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\script_map.c
+SOURCE=.\src\map\script_map.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\script_tileset.c
+SOURCE=.\src\map\script_tileset.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\map\tileset.c
+SOURCE=.\src\map\tileset.cpp
 # End Source File
 # End Group
 # Begin Group "network"
@@ -303,23 +303,23 @@ SOURCE=.\src\map\tileset.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\network\commands.c
+SOURCE=.\src\network\commands.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\network\lowlevel.c
+SOURCE=.\src\network\lowlevel.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\network\master.c
+SOURCE=.\src\network\master.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\network\netconnect.c
+SOURCE=.\src\network\netconnect.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\network\network.c
+SOURCE=.\src\network\network.cpp
 # End Source File
 # End Group
 # Begin Group "pathfinder"
@@ -327,31 +327,31 @@ SOURCE=.\src\network\network.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\pathfinder\astar.c
+SOURCE=.\src\pathfinder\astar.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\pathfinder.c
+SOURCE=.\src\pathfinder\pathfinder.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\script_pathfinder.c
+SOURCE=.\src\pathfinder\script_pathfinder.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\splitter.c
+SOURCE=.\src\pathfinder\splitter.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\splitter_debug.c
+SOURCE=.\src\pathfinder\splitter_debug.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\splitter_lowlevel.c
+SOURCE=.\src\pathfinder\splitter_lowlevel.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\pathfinder\splitter_zoneset.c
+SOURCE=.\src\pathfinder\splitter_zoneset.cpp
 # End Source File
 # End Group
 # Begin Group "sound"
@@ -359,63 +359,63 @@ SOURCE=.\src\pathfinder\splitter_zoneset.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\sound\cdaudio.c
+SOURCE=.\src\sound\cdaudio.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\cdda.c
+SOURCE=.\src\sound\cdda.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\flac.c
+SOURCE=.\src\sound\flac.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\libcda.c
+SOURCE=.\src\sound\libcda.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\mad.c
+SOURCE=.\src\sound\mad.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\mikmod.c
+SOURCE=.\src\sound\mikmod.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\music.c
+SOURCE=.\src\sound\music.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\ogg.c
+SOURCE=.\src\sound\ogg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\script_sound.c
+SOURCE=.\src\sound\script_sound.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\sdl_audio.c
+SOURCE=.\src\sound\sdl_audio.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\sound.c
+SOURCE=.\src\sound\sound.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\sound_id.c
+SOURCE=.\src\sound\sound_id.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\sound_server.c
+SOURCE=.\src\sound\sound_server.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\unitsound.c
+SOURCE=.\src\sound\unitsound.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\sound\wav.c
+SOURCE=.\src\sound\wav.cpp
 # End Source File
 # End Group
 # Begin Group "stratagus"
@@ -423,59 +423,59 @@ SOURCE=.\src\sound\wav.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\stratagus\construct.c
+SOURCE=.\src\stratagus\construct.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\groups.c
+SOURCE=.\src\stratagus\groups.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\iolib.c
+SOURCE=.\src\stratagus\iolib.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\mainloop.c
+SOURCE=.\src\stratagus\mainloop.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\missile.c
+SOURCE=.\src\stratagus\missile.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\player.c
+SOURCE=.\src\stratagus\player.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\script.c
+SOURCE=.\src\stratagus\script.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\script_missile.c
+SOURCE=.\src\stratagus\script_missile.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\script_player.c
+SOURCE=.\src\stratagus\script_player.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\script_spell.c
+SOURCE=.\src\stratagus\script_spell.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\selection.c
+SOURCE=.\src\stratagus\selection.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\spells.c
+SOURCE=.\src\stratagus\spells.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\stratagus.c
+SOURCE=.\src\stratagus\stratagus.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\stratagus\util.c
+SOURCE=.\src\stratagus\util.cpp
 # End Source File
 # End Group
 # Begin Group "ui"
@@ -483,43 +483,43 @@ SOURCE=.\src\stratagus\util.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\ui\botpanel.c
+SOURCE=.\src\ui\botpanel.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\button_checks.c
+SOURCE=.\src\ui\button_checks.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\icons.c
+SOURCE=.\src\ui\icons.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\interface.c
+SOURCE=.\src\ui\interface.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\mainscr.c
+SOURCE=.\src\ui\mainscr.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\menu_proc.c
+SOURCE=.\src\ui\menu_proc.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\menus.c
+SOURCE=.\src\ui\menus.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\mouse.c
+SOURCE=.\src\ui\mouse.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\script_ui.c
+SOURCE=.\src\ui\script_ui.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\ui\ui.c
+SOURCE=.\src\ui\ui.cpp
 # End Source File
 # End Group
 # Begin Group "unit"
@@ -527,39 +527,39 @@ SOURCE=.\src\ui\ui.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\unit\depend.c
+SOURCE=.\src\unit\depend.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\script_unit.c
+SOURCE=.\src\unit\script_unit.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\script_unittype.c
+SOURCE=.\src\unit\script_unittype.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unit.c
+SOURCE=.\src\unit\unit.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unit_cache.c
+SOURCE=.\src\unit\unit_cache.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unit_draw.c
+SOURCE=.\src\unit\unit_draw.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unit_find.c
+SOURCE=.\src\unit\unit_find.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\unittype.c
+SOURCE=.\src\unit\unittype.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unit\upgrade.c
+SOURCE=.\src\unit\upgrade.cpp
 # End Source File
 # End Group
 # Begin Group "video"
@@ -567,43 +567,43 @@ SOURCE=.\src\unit\upgrade.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\video\cursor.c
+SOURCE=.\src\video\cursor.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\font.c
+SOURCE=.\src\video\font.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\graphic.c
+SOURCE=.\src\video\graphic.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\linedraw.c
+SOURCE=.\src\video\linedraw.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\mng.c
+SOURCE=.\src\video\mng.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\movie.c
+SOURCE=.\src\video\movie.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\png.c
+SOURCE=.\src\video\png.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\sdl.c
+SOURCE=.\src\video\sdl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\sprite.c
+SOURCE=.\src\video\sprite.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\video\video.c
+SOURCE=.\src\video\video.cpp
 # End Source File
 # End Group
 # End Group

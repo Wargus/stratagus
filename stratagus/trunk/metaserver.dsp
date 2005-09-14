@@ -91,23 +91,23 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\metaserver\cmd.c
+SOURCE=.\src\metaserver\cmd.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\db.c
+SOURCE=.\src\metaserver\db.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\games.c
+SOURCE=.\src\metaserver\games.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\main.c
+SOURCE=.\src\metaserver\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\metaserver\netdriver.c
+SOURCE=.\src\metaserver\netdriver.cpp
 # End Source File
 # End Group
 # Begin Group "network"
@@ -115,7 +115,7 @@ SOURCE=.\src\metaserver\netdriver.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\network\lowlevel.c
+SOURCE=.\src\network\lowlevel.cpp
 # End Source File
 # End Group
 # Begin Group "stratagus"
@@ -123,7 +123,7 @@ SOURCE=.\src\network\lowlevel.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\stratagus\util.c
+SOURCE=.\src\stratagus\util.cpp
 # End Source File
 # End Group
 # End Group
