@@ -860,7 +860,7 @@ void NotifyPlayer(const Player* player,
 	va_end(va);
 
 	if (x != -1) {
-		AddMinimapEvent(x, y);
+		Minimap::AddEvent(x, y);
 	}
 	if (player == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);

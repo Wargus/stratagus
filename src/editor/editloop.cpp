@@ -204,8 +204,8 @@ void EditTile(int x, int y, int tile)
 
 	mf->Flags |= TheMap.Tileset.FlagsTable[16 + tile * 16];
 
-	UpdateMinimapSeenXY(x, y);
-	UpdateMinimapXY(x, y);
+	Minimap::UpdateSeenXY(x, y);
+	Minimap::UpdateXY(x, y);
 
 	EditorTileChanged(x, y);
 }
@@ -1047,8 +1047,8 @@ void EditorUpdateDisplay(void)
 	// Minimap
 	//
 	if (TheUI.SelectedViewport) {
-		DrawMinimap(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-		DrawMinimapCursor(TheUI.SelectedViewport->MapX,
+		Minimap::Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
+		Minimap::DrawCursor(TheUI.SelectedViewport->MapX,
 			TheUI.SelectedViewport->MapY);
 	}
 	//
@@ -1136,9 +1136,9 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportSetViewpoint(TheUI.SelectedViewport,
-				ScreenMinimap2MapX(CursorX) -
+				Minimap::Screen2MapX(CursorX) -
 					TheUI.SelectedViewport->MapWidth / 2,
-				ScreenMinimap2MapY(CursorY) -
+				Minimap::Screen2MapY(CursorY) -
 					TheUI.SelectedViewport->MapHeight / 2, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
@@ -1656,9 +1656,9 @@ static void EditorCallbackMouse(int x, int y)
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportSetViewpoint(TheUI.SelectedViewport,
-			ScreenMinimap2MapX(CursorX)
+			Minimap::Screen2MapX(CursorX)
 				- TheUI.SelectedViewport->MapWidth / 2,
-			ScreenMinimap2MapY(CursorY)
+			Minimap::Screen2MapY(CursorY)
 				- TheUI.SelectedViewport->MapHeight / 2, 0, 0);
 		return;
 	}
@@ -2002,7 +2002,7 @@ static void CreateEditor(void)
 	ShowWaterToSelect = 1;
 
 	RecalculateShownUnits();
-	UpdateMinimap();
+	Minimap::Update();
 
 	ProcessMenu("menu-editor-tips", 1);
 	InterfaceState = IfaceStateNormal;
@@ -2073,7 +2073,7 @@ void EditorMainLoop(void)
 		while (EditorRunning) {
 			PlayListAdvance();
 
-			UpdateMinimap();
+			Minimap::Update();
 
 			EditorUpdateDisplay();
 

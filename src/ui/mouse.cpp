@@ -793,7 +793,7 @@ void UIHandleMouseMove(int x, int y)
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+			Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
 
@@ -816,8 +816,8 @@ void UIHandleMouseMove(int x, int y)
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
-		mx = ScreenMinimap2MapX(x);
-		my = ScreenMinimap2MapY(y);
+		mx = Minimap::Screen2MapX(x);
+		my = Minimap::Screen2MapY(y);
 		if (IsMapFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(mx, my);
 		}
@@ -847,8 +847,8 @@ void UIHandleMouseMove(int x, int y)
 				//  Minimap move viewpoint
 				//
 				ViewportCenterViewpoint(TheUI.SelectedViewport,
-					ScreenMinimap2MapX(CursorX),
-					ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+					Minimap::Screen2MapX(CursorX),
+					Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -875,7 +875,7 @@ void UIHandleMouseMove(int x, int y)
 		//  Minimap move viewpoint
 		//
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+			Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
 		return;
@@ -1372,8 +1372,8 @@ static void UISelectStateButtonDown(unsigned button)
 		int mx;
 		int my;
 
-		mx = ScreenMinimap2MapX(CursorX);
-		my = ScreenMinimap2MapY(CursorY);
+		mx = Minimap::Screen2MapX(CursorX);
+		my = Minimap::Screen2MapY(CursorY);
 		if (MouseButtons & LeftButton) {
 			sx = mx * TileSizeX;
 			sy = my * TileSizeY;
@@ -1590,17 +1590,17 @@ void UIHandleButtonDown(unsigned button)
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportCenterViewpoint(TheUI.SelectedViewport,
-				ScreenMinimap2MapX(CursorX), ScreenMinimap2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+				Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				if (ClickMissile) {
 					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-						ScreenMinimap2MapX(CursorX) * TileSizeX + TileSizeX / 2,
-						ScreenMinimap2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
+						Minimap::Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
+						Minimap::Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
 				}
 				// DoRightButton() takes screen map coordinates
-				DoRightButton(ScreenMinimap2MapX(CursorX) * TileSizeX,
-					ScreenMinimap2MapY(CursorY) * TileSizeY);
+				DoRightButton(Minimap::Screen2MapX(CursorX) * TileSizeX,
+					Minimap::Screen2MapY(CursorY) * TileSizeY);
 			}
 		}
 	//
