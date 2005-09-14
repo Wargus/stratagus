@@ -55,7 +55,7 @@ def globSources(sourceDirs):
   sources = []
   sourceDirs = Split(sourceDirs)
   for d in sourceDirs:
-    sources.append(glob.glob('src/' + d + '/*.c'))
+    sources.append(glob.glob('src/' + d + '/*.cpp'))
   sources = Flatten(sources)
   targetsources = []
   for s in sources:
@@ -64,7 +64,7 @@ def globSources(sourceDirs):
 
 sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video")
 sourcesMetaserver = globSources("metaserver")
-sourcesMetaserver.append("build/network/lowlevel.c")
+sourcesMetaserver.append("build/network/lowlevel.cpp")
 
 def CheckOpenGL(env, conf):
   opengl = {}
@@ -164,6 +164,8 @@ else:
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
+env.Append(CPPDEFINES = 'HAVE_CONFIG_H')
+env.Append(CPPPATH='.') # for config.h
 BuildDir('build', 'src', duplicate = 0)
 if env['debug']:
     env.Append(CPPDEFINES = 'DEBUG')
@@ -173,6 +175,7 @@ else:
 if not os.path.exists('config.h'):
     # create a dummy config.h needed by stratagus
     open('config.h', 'wt').close()
+
 
 # Targets
 Default(env.Program('stratagus', sourcesEngine))
