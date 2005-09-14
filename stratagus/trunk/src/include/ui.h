@@ -53,7 +53,7 @@
 
 struct _unit_;
 struct _button_action_;
-struct _CL_File_;
+class CLFile;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -493,7 +493,7 @@ extern void InitUserInterface(const char* race_name);
 	/// Load ui graphics
 extern void LoadUserInterface(void);
 	/// Save the ui state
-extern void SaveUserInterface(struct _CL_File_* file);
+extern void SaveUserInterface(CLFile *file);
 	/// Clean up the Panel.
 extern void CleanPanel(InfoPanel* panel);
 	/// Clean up a ui

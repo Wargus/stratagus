@@ -97,7 +97,7 @@ static FLAC__StreamDecoderReadStatus FLAC_read_callback(
 	sample = (Sample*)user;
 	data = (FlacData*)sample->User;
 
-	if ((i = CLread(data->FlacFile, buffer, *bytes)) != *bytes) {
+	if ((i = data->FlacFile->read(buffer, *bytes)) != *bytes) {
 		*bytes = i;
 		if (!i) {
 			return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
@@ -234,7 +234,8 @@ static void FlacStreamFree(Sample* sample)
 
 	data = (FlacData*)sample->User;
 
-	CLclose(data->FlacFile);
+	data->FlacFile->close();
+	delete data->FlacFile;
 	FLAC__stream_decoder_finish(data->FlacStream);
 	FLAC__stream_decoder_delete(data->FlacStream);
 	free(data);
@@ -306,27 +307,30 @@ Sample* LoadFlac(const char* name, int flags)
 {
 	Sample* sample;
 	FlacData* data;
-	CLFile* f;
+	CLFile *f;
 	unsigned int magic[1];
 	FLAC__StreamDecoder* stream;
 
-
-	if (!(f = CLopen(name, CL_OPEN_READ))) {
+	f = new CLFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
+		delete f;
 		return NULL;
 	}
 
-	CLread(f, magic, sizeof(magic));
+	f->read(magic, sizeof(magic));
 	if (AccessLE32(magic) != 0x43614C66) { // "fLaC" in ASCII
-		CLclose(f);
+		f->close();
+		delete f;
 		return NULL;
 	}
 
-	CLseek(f, 0, SEEK_SET);
+	f->seek(0, SEEK_SET);
 
 	if (!(stream = FLAC__stream_decoder_new())) {
 		fprintf(stderr, "Can't initialize flac decoder\n");
-		CLclose(f);
+		f->close();
+		delete f;
 		return NULL;
 	}
 
@@ -364,7 +368,8 @@ Sample* LoadFlac(const char* name, int flags)
 
 		FLAC__stream_decoder_finish(stream);
 		FLAC__stream_decoder_delete(stream);
-		CLclose(f);
+		f->close();
+		delete f;
 	}
 	return sample;
 }

@@ -1057,17 +1057,17 @@ static int InputKey(int key)
 */
 static void Screenshot(void)
 {
-	CLFile* fd;
+	CLFile fd;
 	char filename[30];
 	int i;
 
 	for (i = 1; i <= 99; ++i) {
 		// FIXME: what if we can't write to this directory?
 		sprintf(filename, "screen%02d.png", i);
-		if (!(fd = CLopen(filename, CL_OPEN_READ))) {
+		if (fd.open(filename, CL_OPEN_READ) == -1) {
 			break;
 		}
-		CLclose(fd);
+		fd.close();
 	}
 	SaveScreenshotPNG(filename);
 }

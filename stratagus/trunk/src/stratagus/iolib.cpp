@@ -63,18 +63,32 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+
+CLFile::CLFile()
+{
+	cl_type = CLF_TYPE_INVALID;
+}
+
+CLFile::~CLFile()
+{
+	if (cl_type == CLF_TYPE_INVALID) {
+		DebugPrint("File wasn't closed\n");
+		close();
+	}
+}
+
+
 #ifdef USE_ZLIB
 
 #ifndef z_off_t // { ZLIB_VERSION<="1.0.4"
 
 /**
-** Seek on compressed input. (Newer libs support it directly)
+**  Seek on compressed input. (Newer libs support it directly)
 **
-** @param file     File handle
-** @param offset   Seek position
-** @param whence   How to seek
+**  @param offset  Seek position
+**  @param whence  How to seek
 */
-static int gzseek(CLFile* file, unsigned offset, int whence)
+static int gzseek(CLFile *file, unsigned offset, int whence)
 {
 	char buf[32];
 
@@ -91,30 +105,22 @@ static int gzseek(CLFile* file, unsigned offset, int whence)
 
 #ifdef USE_BZ2LIB
 
-/* libbzip2 version 1.0 has a naming change in the API - how bright! */
-#ifdef BZ_CONFIG_ERROR // { defined only if LIBBZIP2_VERSION >= "1.0"
-#define bzread BZ2_bzread
-#define bzopen BZ2_bzopen
-#define bzclose BZ2_bzclose
-#define bzwrite BZ2_bzwrite
-#endif // } LIBBZIP2_VERSION >= "1.0"
-
 /**
-** Seek on compressed input. (I hope newer libs support it directly)
+**  Seek on compressed input. (I hope newer libs support it directly)
 **
-** @param file      File handle
-** @param offset    Seek position
-** @param whence    How to seek
+**  @param file    File handle
+**  @param offset  Seek position
+**  @param whence  How to seek
 */
-static void bzseek(BZFILE* file, unsigned offset, int whence)
+static void bzseek(BZFILE *file, unsigned offset, int whence)
 {
 	char buf[32];
 
 	while (offset > sizeof(buf)) {
-		bzread(file, buf, sizeof(buf));
+		BZ2_bzread(file, buf, sizeof(buf));
 		offset -= sizeof(buf);
 	}
-	bzread(file, buf, offset);
+	BZ2_bzread(file, buf, offset);
 }
 
 #endif // USE_BZ2LIB
@@ -122,17 +128,15 @@ static void bzseek(BZFILE* file, unsigned offset, int whence)
 #if defined(USE_ZLIB) || defined(USE_BZ2LIB)
 
 /**
-** CLopen Library file open
+**  CLopen Library file open
 **
-** @param fn           File name.
-** @param openflags    Open read, or write and compression options
+**  @param name       File name.
+**  @param openflags  Open read, or write and compression options
 **
-** @return File Pointer
+**  @return File Pointer
 */
-CLFile* CLopen(const char* fn, long openflags)
+int CLFile::open(const char *name, long openflags)
 {
-	CLFile clf;
-	CLFile* result;
 	char buf[512];
 	char openstring[5];
 
@@ -145,149 +149,140 @@ CLFile* CLopen(const char* fn, long openflags)
 	} else {
 		DebugPrint("Bad CLopen flags");
 		Assert(0);
-		return NULL;
+		return -1;
 	}
 
-	clf.cl_type = CLF_TYPE_INVALID;
+	cl_type = CLF_TYPE_INVALID;
 
 	if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_BZ2LIB
 		if ((openflags & CL_WRITE_BZ2) &&
-				(clf.cl_bz = bzopen(strcat(strcpy(buf, fn), ".bz2"), openstring))) {
-			clf.cl_type = CLF_TYPE_BZIP2;
+				(cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
+			cl_type = CLF_TYPE_BZIP2;
 		} else
 #endif
 #ifdef USE_ZLIB
 		if ((openflags & CL_WRITE_GZ) &&
-				(clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), openstring))) {
-			clf.cl_type = CLF_TYPE_GZIP;
+				(cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
+			cl_type = CLF_TYPE_GZIP;
 		} else
 #endif
-		if ((clf.cl_plain = fopen(fn, openstring))) {
-			clf.cl_type = CLF_TYPE_PLAIN;
+		if ((cl_plain = fopen(name, openstring))) {
+			cl_type = CLF_TYPE_PLAIN;
 		}
 	} else {
-		if (!(clf.cl_plain = fopen(fn, openstring))) { // try plain first
+		if (!(cl_plain = fopen(name, openstring))) { // try plain first
 #ifdef USE_ZLIB
-			if ((clf.cl_gz = gzopen(strcat(strcpy(buf, fn), ".gz"), "rb"))) {
-				clf.cl_type = CLF_TYPE_GZIP;
+			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
+				cl_type = CLF_TYPE_GZIP;
 			} else
 #endif
 #ifdef USE_BZ2LIB
-			if ((clf.cl_bz = bzopen(strcat(strcpy(buf, fn), ".bz2"), "rb"))) {
-				clf.cl_type = CLF_TYPE_BZIP2;
+			if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
+				cl_type = CLF_TYPE_BZIP2;
 			} else
 #endif
 			{ }
 
 		} else {
-			clf.cl_type = CLF_TYPE_PLAIN;
+			cl_type = CLF_TYPE_PLAIN;
 			// Hmm, plain worked, but nevertheless the file may be compressed!
-			if (fread(buf, 2, 1, clf.cl_plain) == 1) {
+			if (fread(buf, 2, 1, cl_plain) == 1) {
 #ifdef USE_BZ2LIB
 				if (buf[0] == 'B' && buf[1] == 'Z') {
-					fclose(clf.cl_plain);
-					if ((clf.cl_bz = bzopen(fn, "rb"))) {
-						clf.cl_type = CLF_TYPE_BZIP2;
+					fclose(cl_plain);
+					if ((cl_bz = BZ2_bzopen(name, "rb"))) {
+						cl_type = CLF_TYPE_BZIP2;
 					} else {
-						if (!(clf.cl_plain = fopen(fn, "rb"))) {
-							clf.cl_type = CLF_TYPE_INVALID;
+						if (!(cl_plain = fopen(name, "rb"))) {
+							cl_type = CLF_TYPE_INVALID;
 						}
 					}
 				}
 #endif // USE_BZ2LIB
 #ifdef USE_ZLIB
 				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
-					fclose(clf.cl_plain);
-					if ((clf.cl_gz = gzopen(fn, "rb"))) {
-						clf.cl_type = CLF_TYPE_GZIP;
+					fclose(cl_plain);
+					if ((cl_gz = gzopen(name, "rb"))) {
+						cl_type = CLF_TYPE_GZIP;
 					} else {
-						if (!(clf.cl_plain = fopen(fn, "rb"))) {
-							clf.cl_type = CLF_TYPE_INVALID;
+						if (!(cl_plain = fopen(name, "rb"))) {
+							cl_type = CLF_TYPE_INVALID;
 						}
 					}
 				}
 #endif // USE_ZLIB
 			}
-			if (clf.cl_type == CLF_TYPE_PLAIN) { // ok, it is not compressed
-				rewind(clf.cl_plain);
+			if (cl_type == CLF_TYPE_PLAIN) { // ok, it is not compressed
+				rewind(cl_plain);
 			}
 		}
 	}
 
-	if (clf.cl_type == CLF_TYPE_INVALID) {
+	if (cl_type == CLF_TYPE_INVALID) {
 		//fprintf(stderr, "%s in ", buf);
-		return NULL;
+		return -1;
 	}
 
-	// ok, here we go
-	result = (CLFile*)malloc(sizeof(CLFile));
-	if (result) {
-		*result = clf;
-	}
-	return result;
+	return 0;
 }
 
 /**
-** CLclose Library file close
-**
-** @param file CLFile pointer.
+**  CLclose Library file close
 */
-int CLclose(CLFile* file)
+int CLFile::close()
 {
 	int tp;
 	int ret;
 
 	ret = EOF;
 
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+	if ((tp = cl_type) != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = fclose(file->cl_plain);
+			ret = fclose(cl_plain);
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gzclose(file->cl_gz);
+			ret = gzclose(cl_gz);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
-			bzclose(file->cl_bz);
+			BZ2_bzclose(cl_bz);
 			ret = 0;
 		}
 #endif // USE_BZ2LIB
-		free(file);
 	} else {
 		errno = EBADF;
 	}
+	cl_type = CLF_TYPE_INVALID;
 	return ret;
 }
 
 /**
-** CLread Library file read
+**  CLread Library file read
 **
-** @param file     CLFile pointer.
-** @param buf      Pointer to read the data to.
-** @param len      number of bytes to read.
+**  @param buf  Pointer to read the data to.
+**  @param len  number of bytes to read.
 */
-int CLread(CLFile* file, void* buf, size_t len)
+int CLFile::read(void *buf, size_t len)
 {
-	int tp;
 	int ret;
 
 	ret = 0;
 
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
-		if (tp == CLF_TYPE_PLAIN) {
-			ret = fread(buf, 1, len, file->cl_plain);
+	if (cl_type != CLF_TYPE_INVALID) {
+		if (cl_type == CLF_TYPE_PLAIN) {
+			ret = fread(buf, 1, len, cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (tp == CLF_TYPE_GZIP) {
-			ret = gzread(file->cl_gz, buf, len);
+		if (cl_type == CLF_TYPE_GZIP) {
+			ret = gzread(cl_gz, buf, len);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
-			ret = bzread(file->cl_bz, buf, len);
+		if (cl_type == CLF_TYPE_BZIP2) {
+			ret = BZ2_bzread(cl_bz, buf, len);
 		}
 #endif // USE_BZ2LIB
 	} else {
@@ -296,29 +291,41 @@ int CLread(CLFile* file, void* buf, size_t len)
 	return ret;
 }
 
-void CLflush(CLFile* file)
+void CLFile::flush()
 {
-	int tp;
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID && tp == CLF_TYPE_PLAIN) {
-		fflush(file->cl_plain);
+	if (cl_type != CLF_TYPE_INVALID) {
+		if (cl_type == CLF_TYPE_PLAIN) {
+			fflush(cl_plain);
+		}
+#ifdef USE_ZLIB
+		if (cl_type == CLF_TYPE_GZIP) {
+			gzflush(cl_gz, Z_SYNC_FLUSH);
+		}
+#endif // USE_ZLIB
+#ifdef USE_BZ2LIB
+		if (cl_type == CLF_TYPE_BZIP2) {
+			BZ2_bzflush(cl_bz);
+		}
+#endif // USE_BZ2LIB
+	} else {
+		errno = EBADF;
 	}
 }
 
 
 /**
-** CLprintf Library file write
+**  CLprintf Library file write
 **
-** @param file      CLFile pointer.
-** @param format    String Format.
-** @param ...       Parameter List.
+**  @param format  String Format.
+**  @param ...     Parameter List.
 */
-int CLprintf(CLFile* file, char* format, ...)
+int CLFile::printf(char *format, ...)
 {
 	int n;
 	int size;
 	int ret;
 	int tp;
-	char* p;
+	char *p;
 	va_list ap;
 
 	size = 500;
@@ -350,18 +357,18 @@ int CLprintf(CLFile* file, char* format, ...)
 	// Allocate the correct size
 	size = strlen(p);
 
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+	if ((tp = cl_type) != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = fwrite(p, size, 1, file->cl_plain);
+			ret = fwrite(p, size, 1, cl_plain);
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gzwrite(file->cl_gz, p, size);
+			ret = gzwrite(cl_gz, p, size);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
-			ret = bzwrite(file->cl_bz, p, size);
+			ret = BZ2_bzwrite(cl_bz, p, size);
 		}
 #endif // USE_BZ2LIB
 	} else {
@@ -372,31 +379,30 @@ int CLprintf(CLFile* file, char* format, ...)
 }
 
 /**
-** CLseek Library file seek
+**  CLseek Library file seek
 **
-** @param file     CLFile pointer.
-** @param offset   Seek position
-** @param whence   How to seek
+**  @param offset  Seek position
+**  @param whence  How to seek
 */
-int CLseek(CLFile* file, long offset, int whence)
+int CLFile::seek(long offset, int whence)
 {
 	int tp;
 	int ret;
 
 	ret = -1;
 
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+	if ((tp = cl_type) != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = fseek(file->cl_plain, offset, whence);
+			ret = fseek(cl_plain, offset, whence);
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gzseek(file->cl_gz, offset, whence);
+			ret = gzseek(cl_gz, offset, whence);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
 		if (tp == CLF_TYPE_BZIP2) {
-			bzseek(file->cl_bz, offset, whence);
+			bzseek(cl_bz, offset, whence);
 			ret = 0;
 		}
 #endif // USE_BZ2LIB
@@ -407,24 +413,22 @@ int CLseek(CLFile* file, long offset, int whence)
 }
 
 /**
-** CLtell Library file tell
-**
-** @param file CLFile pointer.
+**  CLtell Library file tell
 */
-long CLtell(CLFile* file)
+long CLFile::tell()
 {
 	int tp;
 	int ret;
 
 	ret = -1;
 
-	if (file && (tp = file->cl_type) != CLF_TYPE_INVALID) {
+	if ((tp = cl_type) != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = ftell(file->cl_plain);
+			ret = ftell(cl_plain);
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gztell(file->cl_gz);
+			ret = gztell(cl_gz);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
@@ -442,11 +446,11 @@ long CLtell(CLFile* file)
 #endif // USE_ZLIB || USE_BZ2LIB
 
 /**
-** Find a file with its correct extension ("", ".gz" or ".bz2")
+**  Find a file with its correct extension ("", ".gz" or ".bz2")
 **
-** @param file The string with the file path. Upon success, the string 
-**      is replaced by the full filename witht he correct extension.
-** @return 1 if the file has been found.
+**  @param file The string with the file path. Upon success, the string 
+**              is replaced by the full filename witht he correct extension.
+**  @return 1 if the file has been found.
 **/
 static int FindFileWithExtension(char* file)
 {
@@ -474,15 +478,15 @@ static int FindFileWithExtension(char* file)
 }
 
 /**
-** Generate a filename into library.
+**  Generate a filename into library.
 **
-** Try current directory, user home directory, global directory.
-** This supports .gz, .bz2 and .zip.
+**  Try current directory, user home directory, global directory.
+**  This supports .gz, .bz2 and .zip.
 **
-** @param file     Filename to open.
-** @param buffer   Allocated buffer for generated filename.
+**  @param file    Filename to open.
+**  @param buffer  Allocated buffer for generated filename.
 **
-** @return Pointer to buffer.
+**  @return Pointer to buffer.
 */
 char* LibraryFileName(const char* file, char* buffer)
 {
@@ -567,20 +571,17 @@ char* LibraryFileName(const char* file, char* buffer)
 }
 
 /**
-** Compare two directory structures.
+**  Compare two directory structures.
 **
-** @param v1    First structure
-** @param v2    Second structure
+**  @param v1  First structure
+**  @param v2  Second structure
 **
-** @return v1-v2
+**  @return    v1-v2
 */
 static int flqcmp(const void* v1, const void* v2)
 {
-	const FileList* c1;
-	const FileList* c2;
-
-	c1 = (FileList*)v1;
-	c2 = (FileList*)v2;
+	const FileList* c1 = (FileList *)v1;
+	const FileList* c2 = (FileList *)v2;
 
 	if (c1->type == c2->type) {
 		return strcmp(c1->name, c2->name);
@@ -590,13 +591,13 @@ static int flqcmp(const void* v1, const void* v2)
 }
 
 /**
-** Generate a list of files within a specified directory
+**  Generate a list of files within a specified directory
 **
-** @param dirname    Directory to read.
-** @param filter     Optional xdata-filter function.
-** @param flp        Filelist pointer.
+**  @param dirname  Directory to read.
+**  @param filter   Optional xdata-filter function.
+**  @param flp      Filelist pointer.
 **
-** @return the number of entries added to FileList.
+**  @return the number of entries added to FileList.
 */
 int ReadDataDirectory(const char* dirname, int (*filter)(char*, FileList*), FileList** flp)
 {

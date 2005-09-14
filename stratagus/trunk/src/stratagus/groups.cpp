@@ -89,17 +89,17 @@ void SaveGroups(CLFile* file)
 	int g;
 	char* ref;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: groups $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: groups $Id$\n\n");
 
 	for (g = 0; g < NUM_GROUPS; ++g) {
-		CLprintf(file, "Group(%d, %d, {", g, Groups[g].NumUnits);
+		file->printf("Group(%d, %d, {", g, Groups[g].NumUnits);
 		for (i = 0; i < Groups[g].NumUnits; ++i) {
 			ref = UnitReference(Groups[g].Units[i]);
-			CLprintf(file, "\"%s\", ", ref);
+			file->printf("\"%s\", ", ref);
 			free(ref);
 		}
-		CLprintf(file, "})\n");
+		file->printf("})\n");
 	}
 }
 

@@ -10,7 +10,7 @@
 //
 /**@name map_save.c - Saving the map. */
 //
-//      (c) Copyright 2001-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -67,91 +67,91 @@ void SaveMap(CLFile* file)
 	int h;
 	int i;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: map $Id$\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: map $Id$\n");
 
-	CLprintf(file, "LoadTileModels(\"%s\")\n\n", TheMap.TileModelsFileName);
+	file->printf("LoadTileModels(\"%s\")\n\n", TheMap.TileModelsFileName);
 	
-	CLprintf(file, "StratagusMap(\n");
+	file->printf("StratagusMap(\n");
 
-	CLprintf(file, "  \"version\", \"" StratagusFormatString "\",\n",
+	file->printf("  \"version\", \"" StratagusFormatString "\",\n",
 		StratagusFormatArgs(StratagusVersion));
-	CLprintf(file, "  \"description\", \"%s\",\n", TheMap.Info.Description);
+	file->printf("  \"description\", \"%s\",\n", TheMap.Info.Description);
 
-	CLprintf(file, "  \"the-map\", {\n");
+	file->printf("  \"the-map\", {\n");
 
-	CLprintf(file, "  \"size\", {%d, %d},\n", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	CLprintf(file, "  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
-	CLprintf(file, "  \"filename\", \"%s\",\n", TheMap.Info.Filename);
+	file->printf("  \"size\", {%d, %d},\n", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
+	file->printf("  \"%s\",\n", TheMap.NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
+	file->printf("  \"filename\", \"%s\",\n", TheMap.Info.Filename);
 
-	CLprintf(file, "  \"map-fields\", {\n");
+	file->printf("  \"map-fields\", {\n");
 	for (h = 0; h < TheMap.Info.MapHeight; ++h) {
-		CLprintf(file, "  -- %d\n", h);
+		file->printf("  -- %d\n", h);
 		for (w = 0; w < TheMap.Info.MapWidth; ++w) {
 			MapField* mf;
 
 			mf = &TheMap.Fields[h * TheMap.Info.MapWidth + w];
-			CLprintf(file, "  {%3d, %3d,", mf->Tile, mf->SeenTile);
+			file->printf("  {%3d, %3d,", mf->Tile, mf->SeenTile);
 			if (mf->Value) {
-				CLprintf(file, " %d,", mf->Value);
+				file->printf(" %d,", mf->Value);
 			}
 			for (i = 0; i < PlayerMax; ++i) {
 				if (mf->Visible[i] == 1) {
-					CLprintf(file, " \"explored\", %d,", i);
+					file->printf(" \"explored\", %d,", i);
 				}
 			}
 			if (mf->Flags & MapFieldHuman) {
-				CLprintf(file, " \"human\",");
+				file->printf(" \"human\",");
 			}
 			if (mf->Flags & MapFieldLandAllowed) {
-				CLprintf(file, " \"land\",");
+				file->printf(" \"land\",");
 			}
 			if (mf->Flags & MapFieldCoastAllowed) {
-				CLprintf(file, " \"coast\",");
+				file->printf(" \"coast\",");
 			}
 			if (mf->Flags & MapFieldWaterAllowed) {
-				CLprintf(file, " \"water\",");
+				file->printf(" \"water\",");
 			}
 			if (mf->Flags & MapFieldNoBuilding) {
-				CLprintf(file, " \"mud\",");
+				file->printf(" \"mud\",");
 			}
 			if (mf->Flags & MapFieldUnpassable) {
-				CLprintf(file, " \"block\",");
+				file->printf(" \"block\",");
 			}
 			if (mf->Flags & MapFieldWall) {
-				CLprintf(file, " \"wall\",");
+				file->printf(" \"wall\",");
 			}
 			if (mf->Flags & MapFieldRocks) {
-				CLprintf(file, " \"rock\",");
+				file->printf(" \"rock\",");
 			}
 			if (mf->Flags & MapFieldForest) {
-				CLprintf(file, " \"wood\",");
+				file->printf(" \"wood\",");
 			}
 #if 1
 			// Not Required for save
 			// These are required for now, UnitType::FieldFlags is 0 until
 			// UpdateStats is called which is after the game is loaded
 			if (mf->Flags & MapFieldLandUnit) {
-				CLprintf(file, " \"ground\",");
+				file->printf(" \"ground\",");
 			}
 			if (mf->Flags & MapFieldAirUnit) {
-				CLprintf(file, " \"air\",");
+				file->printf(" \"air\",");
 			}
 			if (mf->Flags & MapFieldSeaUnit) {
-				CLprintf(file, " \"sea\",");
+				file->printf(" \"sea\",");
 			}
 			if (mf->Flags & MapFieldBuilding) {
-				CLprintf(file, " \"building\",");
+				file->printf(" \"building\",");
 			}
 #endif
 			if (w & 1) {
-				CLprintf(file, "},\n");
+				file->printf("},\n");
 			} else {
-				CLprintf(file, "}, ");
+				file->printf("}, ");
 			}
 		}
 	}
-	CLprintf(file, "}})\n");
+	file->printf("}})\n");
 }
 
 //@}

@@ -255,22 +255,22 @@ static void SaveUnitStats(const UnitStats* stats, const char* ident, int plynr,
 	int j;
 
 	Assert(plynr < PlayerMax);
-	CLprintf(file, "DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
+	file->printf("DefineUnitStats(\"%s\", %d,\n  ", ident, plynr);
 	for (j = 0; j < UnitTypeVar.NumberVariable; ++j) {
-		CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
+		file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
 			UnitTypeVar.VariableName[j], stats->Variables[j].Value,
 			stats->Variables[j].Max, stats->Variables[j].Increase,
 			stats->Variables[j].Enable ? ", Enable = true" : "");
 	}
-	CLprintf(file, "\"costs\", {");
+	file->printf("\"costs\", {");
 	for (j = 0; j < MaxCosts; ++j) {
 		if (j) {
-			CLprintf(file, " ");
+			file->printf(" ");
 		}
-		CLprintf(file, "\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
+		file->printf("\"%s\", %d,", DefaultResourceNames[j], stats->Costs[j]);
 	}
 
-	CLprintf(file, "})\n");
+	file->printf("})\n");
 }
 
 /**
@@ -282,12 +282,12 @@ void SaveUnitTypes(CLFile* file)
 {
 	int j;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: unittypes $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: unittypes $Id$\n\n");
 
 	// Save all stats
 	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CLprintf(file, "\n");
+		file->printf("\n");
 		for (j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerNobody) {
 				SaveUnitStats(&UnitTypes[i]->Stats[j], UnitTypes[i]->Ident, j, file);

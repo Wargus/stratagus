@@ -295,29 +295,29 @@ static void DeleteReplay(FullReplay* replay)
 
 static void PrintLogCommand(LogEntry* log, CLFile* dest)
 {
-	CLprintf(dest, "Log( { ");
-	CLprintf(dest, "GameCycle = %lu, ", log->GameCycle);
+	dest->printf("Log( { ");
+	dest->printf("GameCycle = %lu, ", log->GameCycle);
 	if (log->UnitNumber != -1) {
-		CLprintf(dest, "UnitNumber = %d, ", log->UnitNumber);
+		dest->printf("UnitNumber = %d, ", log->UnitNumber);
 	}
 	if (log->UnitIdent) {
-		CLprintf(dest, "UnitIdent = \"%s\", ", log->UnitIdent);
+		dest->printf("UnitIdent = \"%s\", ", log->UnitIdent);
 	}
-	CLprintf(dest, "Action = \"%s\", ", log->Action);
-	CLprintf(dest, "Flush = %d, ", log->Flush);
+	dest->printf("Action = \"%s\", ", log->Action);
+	dest->printf("Flush = %d, ", log->Flush);
 	if (log->PosX != -1 || log->PosY != -1) {
-		CLprintf(dest, "PosX = %d, PosY = %d, ", log->PosX, log->PosY);
+		dest->printf("PosX = %d, PosY = %d, ", log->PosX, log->PosY);
 	}
 	if (log->DestUnitNumber != -1) {
-		CLprintf(dest, "DestUnitNumber = %d, ", log->DestUnitNumber);
+		dest->printf("DestUnitNumber = %d, ", log->DestUnitNumber);
 	}
 	if (log->Value) {
-		CLprintf(dest, "Value = [[%s]], ", log->Value);
+		dest->printf("Value = [[%s]], ", log->Value);
 	}
 	if (log->Num != -1) {
-		CLprintf(dest, "Num = %d, ", log->Num);
+		dest->printf("Num = %d, ", log->Num);
 	}
-	CLprintf(dest, "SyncRandSeed = %u } )\n", log->SyncRandSeed);
+	dest->printf("SyncRandSeed = %u } )\n", log->SyncRandSeed);
 }
 
 /**
@@ -330,42 +330,42 @@ static void SaveFullLog(CLFile* dest)
 	LogEntry* log;
 	int i;
 
-	CLprintf(dest, "ReplayLog( {\n");
-	CLprintf(dest, "  Comment1 = \"%s\",\n", CurrentReplay->Comment1);
-	CLprintf(dest, "  Comment2 = \"%s\",\n", CurrentReplay->Comment2);
-	CLprintf(dest, "  Comment3 = \"%s\",\n", CurrentReplay->Comment3);
-	CLprintf(dest, "  Date = \"%s\",\n", CurrentReplay->Date);
-	CLprintf(dest, "  Map = \"%s\",\n", CurrentReplay->Map);
-	CLprintf(dest, "  MapPath = \"%s\",\n", CurrentReplay->MapPath);
-	CLprintf(dest, "  MapId = %u,\n", CurrentReplay->MapId);
-	CLprintf(dest, "  Type = %d,\n", CurrentReplay->Type);
-	CLprintf(dest, "  Race = %d,\n", CurrentReplay->Race);
-	CLprintf(dest, "  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
-	CLprintf(dest, "  Players = {\n");
+	dest->printf("ReplayLog( {\n");
+	dest->printf("  Comment1 = \"%s\",\n", CurrentReplay->Comment1);
+	dest->printf("  Comment2 = \"%s\",\n", CurrentReplay->Comment2);
+	dest->printf("  Comment3 = \"%s\",\n", CurrentReplay->Comment3);
+	dest->printf("  Date = \"%s\",\n", CurrentReplay->Date);
+	dest->printf("  Map = \"%s\",\n", CurrentReplay->Map);
+	dest->printf("  MapPath = \"%s\",\n", CurrentReplay->MapPath);
+	dest->printf("  MapId = %u,\n", CurrentReplay->MapId);
+	dest->printf("  Type = %d,\n", CurrentReplay->Type);
+	dest->printf("  Race = %d,\n", CurrentReplay->Race);
+	dest->printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
+	dest->printf("  Players = {\n");
 	for (i = 0; i < PlayerMax; ++i) {
 		if (CurrentReplay->Players[i].Name) {
-			CLprintf(dest, "\t{ Name = \"%s\",", CurrentReplay->Players[i].Name);
+			dest->printf("\t{ Name = \"%s\",", CurrentReplay->Players[i].Name);
 		} else {
-			CLprintf(dest, "\t{");
+			dest->printf("\t{");
 		}
-		CLprintf(dest, " Race = %d,", CurrentReplay->Players[i].Race);
-		CLprintf(dest, " Team = %d,", CurrentReplay->Players[i].Team);
-		CLprintf(dest, " Type = %d }%s", CurrentReplay->Players[i].Type,
+		dest->printf(" Race = %d,", CurrentReplay->Players[i].Race);
+		dest->printf(" Team = %d,", CurrentReplay->Players[i].Team);
+		dest->printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
 			i != PlayerMax - 1 ? ",\n" : "\n");
 	}
-	CLprintf(dest, "  },\n");
-	CLprintf(dest, "  Resource = %d,\n", CurrentReplay->Resource);
-	CLprintf(dest, "  NumUnits = %d,\n", CurrentReplay->NumUnits);
-	CLprintf(dest, "  TileSet = %d,\n", CurrentReplay->TileSet);
-	CLprintf(dest, "  NoFow = %d,\n", CurrentReplay->NoFow);
-	CLprintf(dest, "  RevealMap = %d,\n", CurrentReplay->RevealMap);
-	CLprintf(dest, "  GameType = %d,\n", CurrentReplay->GameType);
-	CLprintf(dest, "  Opponents = %d,\n", CurrentReplay->Opponents);
-	CLprintf(dest, "  Engine = { %d, %d, %d },\n",
+	dest->printf("  },\n");
+	dest->printf("  Resource = %d,\n", CurrentReplay->Resource);
+	dest->printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
+	dest->printf("  TileSet = %d,\n", CurrentReplay->TileSet);
+	dest->printf("  NoFow = %d,\n", CurrentReplay->NoFow);
+	dest->printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
+	dest->printf("  GameType = %d,\n", CurrentReplay->GameType);
+	dest->printf("  Opponents = %d,\n", CurrentReplay->Opponents);
+	dest->printf("  Engine = { %d, %d, %d },\n",
 		CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
-	CLprintf(dest, "  Network = { %d, %d, %d }\n",
+	dest->printf("  Network = { %d, %d, %d }\n",
 		CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
-	CLprintf(dest, "} )\n");
+	dest->printf("} )\n");
 	log = CurrentReplay->Commands;
 	while (log) {
 		PrintLogCommand(log, dest);
@@ -379,9 +379,9 @@ static void SaveFullLog(CLFile* dest)
 **  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
-static void AppendLog(LogEntry* log, CLFile* dest)
+static void AppendLog(LogEntry *log, CLFile *dest)
 {
-	LogEntry** last;
+	LogEntry **last;
 
 	// Append to linked list
 	last = &CurrentReplay->Commands;
@@ -398,7 +398,7 @@ static void AppendLog(LogEntry* log, CLFile* dest)
 	}
 
 	PrintLogCommand(log, dest);
-	CLflush(dest);
+	dest->flush();
 }
 
 /**
@@ -447,10 +447,12 @@ void CommandLog(const char* action, const Unit* unit, int flush,
 #endif
 
 		sprintf(buf, "%s/log_of_stratagus_%d.log", buf, ThisPlayer->Index);
-		LogFile = CLopen(buf, CL_OPEN_WRITE);
-		if (!LogFile) {
+		LogFile = new CLFile;
+		if (LogFile->open(buf, CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = 0;
+			delete LogFile;
+			LogFile = NULL;
 			return;
 		}
 
@@ -748,7 +750,8 @@ int LoadReplay(char* name)
 void EndReplayLog(void)
 {
 	if (LogFile) {
-		CLclose(LogFile);
+		LogFile->close();
+		delete LogFile;
 		LogFile = NULL;
 	}
 	if (CurrentReplay) {

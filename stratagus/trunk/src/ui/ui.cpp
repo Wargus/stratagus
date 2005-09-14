@@ -231,13 +231,13 @@ static void SaveViewports(CLFile* file, const UI* ui)
 	const Viewport* vp;
 
 	// FIXME: don't save the number
-	CLprintf(file, "DefineViewports(\"mode\", %d", ui->ViewportMode);
+	file->printf("DefineViewports(\"mode\", %d", ui->ViewportMode);
 	for (i = 0; i < ui->NumViewports; ++i) {
 		vp = &ui->Viewports[i];
-		CLprintf(file, ",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY, 
+		file->printf(",\n  \"viewport\", {%d, %d, %d}", vp->MapX, vp->MapY, 
 			vp->Unit ? UnitNumber(vp->Unit) : -1);
 	}
-	CLprintf(file, ")\n\n");
+	file->printf(")\n\n");
 }
 
 /**

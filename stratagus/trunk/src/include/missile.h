@@ -333,7 +333,7 @@
 class Graphic;
 struct _unit_;
 struct _viewport_;
-struct _CL_File_;
+class CLFile;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -526,7 +526,7 @@ extern int ViewPointDistanceToMissile(const Missile* missile);
 extern MissileType* MissileBurningBuilding(int percent);
 
 	/// Save missiles
-extern void SaveMissiles(struct _CL_File_* file);
+extern void SaveMissiles(CLFile *file);
 
 	/// Initialize missile-types
 extern void InitMissileTypes(void);

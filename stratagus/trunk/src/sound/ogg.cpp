@@ -70,7 +70,7 @@ int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CLFile *f)
 	while (ogg_sync_pageout(sync, page) != 1) {
 		// need more bytes
 		buf = ogg_sync_buffer(sync, 4096);
-		bytes = CLread(f, buf, 4096);
+		bytes = f->read(buf, 4096);
 		if (!bytes || ogg_sync_wrote(sync, bytes)) {
 			return -1;
 		}
@@ -143,11 +143,11 @@ int OggInit(CLFile *f, OggData *data)
 	int ret;
 
 	int magic[1];
-	CLread(f, magic, sizeof(magic));
+	f->read(magic, sizeof(magic));
 	if (AccessLE32(magic) != 0x5367674F) { // "OggS" in ASCII
 		return -1;
 	}
-	CLseek(f, 0, SEEK_SET);
+	f->seek(0, SEEK_SET);
 
 	ogg_sync_init(&data->sync);
 
@@ -336,7 +336,8 @@ static void VorbisStreamFree(Sample* sample)
 
 	data = (OggData*)sample->User;
 
-	CLclose(data->File);
+	data->File->close();
+	delete data->File;
 	OggFree(data);
 
 	free(data);
@@ -392,11 +393,13 @@ Sample* LoadVorbis(const char* name,int flags)
 {
 	Sample* sample;
 	OggData* data;
-	CLFile* f;
+	CLFile *f;
 	vorbis_info* info;
 
-	if (!(f = CLopen(name, CL_OPEN_READ))) {
+	f = new CLFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", name);
+		delete f;
 		return NULL;
 	}
 
@@ -404,7 +407,8 @@ Sample* LoadVorbis(const char* name,int flags)
 
 	if (OggInit(f, data) || !data->audio) {
 		free(data);
-		CLclose(f);
+		f->close();
+		delete f;
 		return NULL;
 	}
 
@@ -433,19 +437,19 @@ Sample* LoadVorbis(const char* name,int flags)
 		int i;
 
 		// find total size
-		pos = CLtell(f);
+		pos = f->tell();
 		ogg_sync_init(&sync);
 		for (i = 0; ; ++i) {
-			CLseek(f, -1 * i * 4096, SEEK_END);
+			f->seek(-1 * i * 4096, SEEK_END);
 			buf = (unsigned char*)ogg_sync_buffer(&sync, 4096);
-			CLread(f, buf, 8192);
+			f->read(buf, 8192);
 			ogg_sync_wrote(&sync, 8192);
 			if (ogg_sync_pageout(&sync, &pg) == 1 && ogg_page_eos(&pg)) {
 				total = ogg_page_granulepos(&pg) * 2 * sample->Channels;
 				break;
 			}
 		}
-		CLseek(f, pos, SEEK_SET);
+		f->seek(pos, SEEK_SET);
 
 		buf = (unsigned char*)malloc(total);
 		pos = 0;
@@ -460,7 +464,8 @@ Sample* LoadVorbis(const char* name,int flags)
 		sample->Buffer = buf;
 		sample->Type = &VorbisSampleType;
 
-		CLclose(f);
+		f->close();
+		delete f;
 		OggFree(data);
 	}
 

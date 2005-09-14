@@ -1134,17 +1134,17 @@ void SaveSelections(CLFile* file)
 	int i;
 	char* ref;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: selection $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: selection $Id$\n\n");
 
-	CLprintf(file, "SetGroupId(%d)\n", GroupId);
-	CLprintf(file, "Selection(%d, {", NumSelected);
+	file->printf("SetGroupId(%d)\n", GroupId);
+	file->printf("Selection(%d, {", NumSelected);
 	for (i = 0; i < NumSelected; ++i) {
 		ref = UnitReference(Selected[i]);
-		CLprintf(file, "\"%s\", ", ref);
+		file->printf("\"%s\", ", ref);
 		free(ref);
 	}
-	CLprintf(file, "})\n");
+	file->printf("})\n");
 }
 
 /**

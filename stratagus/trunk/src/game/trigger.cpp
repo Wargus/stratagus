@@ -807,28 +807,28 @@ void SaveTriggers(CLFile* file)
 	lua_gettable(Lua, LUA_GLOBALSINDEX);
 	triggers = luaL_getn(Lua, -1);
 
-	CLprintf(file, "SetActiveTriggers(");
+	file->printf("SetActiveTriggers(");
 	for (i = 0; i < triggers; i += 2) {
 		lua_rawgeti(Lua, -1, i + 1);
 		if (i) {
-			CLprintf(file, ", ");
+			file->printf(", ");
 		}
 		if (!lua_isnil(Lua, -1)) {
-			CLprintf(file, "true");
+			file->printf("true");
 		} else {
-			CLprintf(file, "false");
+			file->printf("false");
 		}
 		lua_pop(Lua, 1);
 	}
-	CLprintf(file, ")\n");
+	file->printf(")\n");
 
-	CLprintf(file, "SetTriggers(%d, %d, %d)\n", Trigger, WaitTrigger, WaitFrame);
+	file->printf("SetTriggers(%d, %d, %d)\n", Trigger, WaitTrigger, WaitFrame);
 
 	if (GameTimer.Init) {
-		CLprintf(file, "ActionSetTimer(%ld, %d)\n",
+		file->printf("ActionSetTimer(%ld, %d)\n",
 			GameTimer.Cycles, GameTimer.Increasing);
 		if (GameTimer.Running) {
-			CLprintf(file, "ActionStartTimer()\n");
+			file->printf("ActionStartTimer()\n");
 		}
 	}
 }

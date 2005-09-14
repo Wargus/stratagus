@@ -82,7 +82,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 	while (sample->Len < SOUND_BUFFER_SIZE / 4) {
 		if (!data->ChunkRem) {
 			// read next chunk
-			comp = CLread(data->WavFile, &chunk, sizeof(chunk));
+			comp = data->WavFile->read(&chunk, sizeof(chunk));
 
 			if (!comp) {
 				// EOF
@@ -93,7 +93,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 			chunk.Magic = ConvertLE32(chunk.Magic);
 			chunk.Length = ConvertLE32(chunk.Length);
 			if (chunk.Magic != DATA) {
-				CLseek(data->WavFile, chunk.Length, SEEK_CUR);
+				data->WavFile->seek(chunk.Length, SEEK_CUR);
 				continue;
 			}
 			data->ChunkRem = chunk.Length;
@@ -109,7 +109,7 @@ static int WavStreamRead(Sample* sample, void* buf, int len)
 
 		sndbuf = sample->Buffer + sample->Pos + sample->Len;
 
-		comp = CLread(data->WavFile, sndbuf, read);
+		comp = data->WavFile->read(sndbuf, read);
 		if (!comp) {
 			break;
 		}
@@ -139,7 +139,8 @@ static void WavStreamFree(Sample* sample)
 
 	data = (WavData*)sample->User;
 
-	CLclose(data->WavFile);
+	data->WavFile->close();
+	delete data->WavFile;
 	free(data);
 	free(sample);
 }
@@ -195,16 +196,18 @@ Sample* LoadWav(const char* name, int flags)
 {
 	Sample* sample;
 	WavData* data;
-	CLFile* f;
+	CLFile *f;
 	WavChunk chunk;
 	WavFMT wavfmt;
 	unsigned int t;
 
-	if (!(f = CLopen(name,CL_OPEN_READ))) {
+	f = new CLFile;
+	if (f->open(name,CL_OPEN_READ) == -1) {
 		printf("Can't open file `%s'\n", name);
+		delete f;
 		return NULL;
 	}
-	CLread(f, &chunk, sizeof(chunk));
+	f->read(&chunk, sizeof(chunk));
 
 	// Convert to native format
 
@@ -212,19 +215,21 @@ Sample* LoadWav(const char* name, int flags)
 	chunk.Length = ConvertLE32(chunk.Length);
 
 	if (chunk.Magic != RIFF) {
-		CLclose(f);
+		f->close();
+		delete f;
 		return NULL;
 	}
 
-	CLread(f, &t, sizeof(t));
+	f->read(&t, sizeof(t));
 	t = ConvertLE32(t);
 	if (t != WAVE) {
 		printf("Wrong magic %x (not %x)\n", t, WAVE);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 
-	CLread(f, &wavfmt, sizeof(wavfmt));
+	f->read(&wavfmt, sizeof(wavfmt));
 
 	// Convert to native format
 
@@ -239,18 +244,22 @@ Sample* LoadWav(const char* name, int flags)
 
 	if (wavfmt.FMTchunk != FMT) {
 		printf("Wrong magic %x (not %x)\n", wavfmt.FMTchunk, FMT);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 	if (wavfmt.FMTlength != 16 && wavfmt.FMTlength != 18) {
 		printf("Wrong length %d (not %d)\n", wavfmt.FMTlength, 16);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 
 	if (wavfmt.FMTlength == 18) {
-		if (CLread(f, &chunk, 2) != 2) {
-			abort();
+		if (f->read(&chunk, 2) != 2) {
+			f->close();
+			delete f;
+			return NULL;
 		}
 	}
 
@@ -259,23 +268,27 @@ Sample* LoadWav(const char* name, int flags)
 	//
 	if (wavfmt.Encoding != WAV_PCM_CODE) {
 		printf("Unsupported encoding %d\n", wavfmt.Encoding);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 	if (wavfmt.Channels != WAV_MONO && wavfmt.Channels != WAV_STEREO) {
 		printf("Unsupported channels %d\n", wavfmt.Channels);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 	if (wavfmt.SampleSize != 1 && wavfmt.SampleSize != 2 && wavfmt.SampleSize != 4) {
 		printf("Unsupported sample size %d\n", wavfmt.SampleSize);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 	if (wavfmt.BitsPerSample != 8 && wavfmt.BitsPerSample != 16) {
 		printf("Unsupported bits per sample %d\n", wavfmt.BitsPerSample);
-		CLclose(f);
-		ExitFatal(-1);
+		f->close();
+		delete f;
+		return NULL;
 	}
 	Assert(wavfmt.Frequency == 44100 || wavfmt.Frequency == 22050 ||
 		wavfmt.Frequency == 11025);
@@ -315,7 +328,7 @@ Sample* LoadWav(const char* name, int flags)
 		while (1) {
 			if (!rem) {
 				// read next chunk
-				comp = CLread(f, &chunk, sizeof(chunk));
+				comp = f->read(&chunk, sizeof(chunk));
 
 				if (!comp) {
 					// EOF
@@ -325,7 +338,7 @@ Sample* LoadWav(const char* name, int flags)
 				chunk.Magic = ConvertLE32(chunk.Magic);
 				chunk.Length = ConvertLE32(chunk.Length);
 				if (chunk.Magic != DATA) {
-					CLseek(f, chunk.Length, SEEK_CUR);
+					f->seek(chunk.Length, SEEK_CUR);
 					continue;
 				}
 				rem = chunk.Length;
@@ -342,7 +355,7 @@ Sample* LoadWav(const char* name, int flags)
 			sample->Buffer = (unsigned char*)realloc(sample->Buffer, sample->Len + read);
 			Assert(sample->Buffer);
 
-			comp = CLread(data->WavFile, sndbuf, read);
+			comp = data->WavFile->read(sndbuf, read);
 			Assert(comp == read);
 
 			if (sample->SampleSize == 16) {
@@ -357,7 +370,8 @@ Sample* LoadWav(const char* name, int flags)
 			sample->Len += comp;
 		}
 
-		CLclose(data->WavFile);
+		data->WavFile->close();
+		delete data->WavFile;
 	}
 
 	return sample;

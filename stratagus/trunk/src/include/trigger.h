@@ -10,7 +10,7 @@
 //
 /**@name trigger.h - The game trigger headerfile. */
 //
-//      (c) Copyright 2002-2004 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@
 
 struct _unit_type_;
 struct lua_State;
-struct _CL_File_;
+class CLFile;
 
 /**
 **  Timer structure
@@ -86,7 +86,7 @@ extern const struct _unit_type_* TriggerGetUnitType(struct lua_State* l); /// ge
 extern void TriggersEachCycle(void);    /// test triggers
 
 extern void TriggerCclRegister(void);   /// Register ccl features
-extern void SaveTriggers(struct _CL_File_* file); /// Save the trigger module
+extern void SaveTriggers(CLFile *file); /// Save the trigger module
 extern void InitTriggers(void);         /// Setup triggers
 extern void CleanTriggers(void);        /// Cleanup the trigger module
 
