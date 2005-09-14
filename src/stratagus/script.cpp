@@ -368,10 +368,10 @@ const char* LuaToString(lua_State* l, int narg)
 **
 **  @return    C number from lua.
 */
-lua_Number LuaToNumber(lua_State* l, int narg)
+int LuaToNumber(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TNUMBER);
-	return lua_tonumber(l, narg);
+	return static_cast<int>(lua_tonumber(l, narg));
 }
 
 /**
@@ -1912,7 +1912,7 @@ static int CclSetGamePaused(lua_State* l)
 	if (lua_isboolean(l, 1)) {
 		GamePaused = lua_toboolean(l, 1);
 	} else {
-		GamePaused = lua_tonumber(l, 1);
+		GamePaused = static_cast<char>(lua_tonumber(l, 1));
 	}
 	return 0;
 }
@@ -2036,7 +2036,7 @@ static int CclSetShowTips(lua_State* l)
 */
 static int CclSetCurrentTip(lua_State* l)
 {
-	lua_Number old;
+	int old;
 
 	LuaCheckArgs(l, 1);
 	old = CurrentTip;
@@ -2188,7 +2188,7 @@ static int CclSetSpeedResearch(lua_State* l)
 static int CclSetSpeeds(lua_State* l)
 {
 	int i;
-	lua_Number s;
+	int s;
 
 	LuaCheckArgs(l, 1);
 	s = LuaToNumber(l, 1);

@@ -592,7 +592,7 @@ void NetworkSendCommand(int command, const Unit* unit, int x, int y,
 	} else if (type) {
 		ncq->Data.Dest = htons(type->Slot);
 	} else {
-		ncq->Data.Dest = htons(-1);
+		ncq->Data.Dest = htons(0xFFFF); // -1
 	}
 
 }

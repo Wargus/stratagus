@@ -4587,7 +4587,7 @@ static void EditorMapPropertiesMenu(void)
 
 	// FIXME: Remove the version pulldown
 	menu->Items[8].D.Pulldown.defopt = 1;
-	menu->Items[8].Flags = -1;
+	menu->Items[8].Flags = static_cast<unsigned int>(-1);
 
 	ProcessMenu("menu-editor-map-properties", 1);
 	FreeStringDesc(menu->Items[4].D.Text.text);

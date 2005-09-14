@@ -688,7 +688,7 @@ static int CclDefineSpell(lua_State* l)
 			if (lua_isstring(l, i + 1) && !strcmp(lua_tostring(l, i + 1), "infinite")) {
 				spell->Range = INFINITE_RANGE;
 			} else if (lua_isnumber(l, i + 1)) {
-				spell->Range = lua_tonumber(l, i + 1);
+				spell->Range = static_cast<int>(lua_tonumber(l, i + 1));
 			} else {
 				LuaError(l, "Invalid range");
 			}

@@ -266,8 +266,8 @@ int PlayMovie(const char* name)
 			need_data = 0;
 		}
 
-		diff = SDL_GetTicks() - start_ticks - theora_granule_time(&data.tstate,
-			data.tstate.granulepos) * 1000;
+		diff = SDL_GetTicks() - start_ticks - static_cast<int>(
+			theora_granule_time(&data.tstate, data.tstate.granulepos) * 1000);
 
 		if (diff > 100) {
 			// too far behind, skip some frames

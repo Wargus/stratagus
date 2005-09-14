@@ -110,7 +110,7 @@ int VorbisProcessData(OggData *data, char *buffer)
 				for (i = 0; i < data->vinfo.channels; ++i) {
 					chan = pcm[i];
 					for (j = 0; j < num_samples; ++j) {
-						val = chan[j] * 32767.f;
+						val = static_cast<int>(chan[j] * 32767.f);
 						if (val > 32767) {
 							val = 32767;
 						} else if (val < -32768) {
