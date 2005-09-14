@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 struct _player_;
-struct _CL_File_;
+class CLFile;
 struct _unit_;
 struct _unit_type_;
 struct _upgrade_;
@@ -59,7 +59,7 @@ extern void AiEachSecond(struct _player_* player);  /// Called each second
 extern void InitAiModule(void);       /// Init AI global structures
 extern void AiInit(struct _player_* player);   /// Init AI for this player
 extern void CleanAi(void);            /// Cleanup the AI module
-extern void SaveAi(struct _CL_File_* file);     /// Save the AI state
+extern void SaveAi(CLFile *file);     /// Save the AI state
 
 extern void AiCclRegister(void);      /// Register ccl features
 

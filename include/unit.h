@@ -374,7 +374,7 @@ struct _construction_frame_;
 struct _variable_type_;
 struct _upgrade_;
 struct _building_restrictions_;
-struct _CL_File_;
+class CLFile;
 struct lua_State;
 
 /**
@@ -880,11 +880,11 @@ extern int CanMove(const Unit*);
 	/// Generate a unit reference, a printable unique string for unit
 extern char* UnitReference(const Unit*);
 	/// Save an order
-extern void SaveOrder(const Order* order, struct _CL_File_* file);
+extern void SaveOrder(const Order* order, CLFile *file);
 	/// save unit-structure
-extern void SaveUnit(const Unit* unit, struct _CL_File_* file);
+extern void SaveUnit(const Unit* unit, CLFile *file);
 	/// save all units
-extern void SaveUnits(struct _CL_File_* file);
+extern void SaveUnits(CLFile *file);
 
 	/// Initialize unit module
 extern void InitUnits(void);
@@ -964,7 +964,7 @@ extern Unit* AttackUnitsInReactRange(const Unit* unit);
 	/// Initialize data structures for groups
 extern void InitGroups(void);
 	/// Save groups
-extern void SaveGroups(struct _CL_File_* file);
+extern void SaveGroups(CLFile *file);
 	/// Cleanup groups
 extern void CleanGroups(void);
 
@@ -1034,7 +1034,7 @@ extern int AddSelectedAirUnitsInRectangle(int tx, int ty, int w, int h);
 	/// Init selections
 extern void InitSelections(void);
 	/// Save current selection state
-extern void SaveSelections(struct _CL_File_* file);
+extern void SaveSelections(CLFile *file);
 	/// Clean up selections
 extern void CleanSelections(void);
 	/// Register CCL selection features

@@ -382,7 +382,7 @@ void ShowIntro(const Intro* intro)
 	int l;
 	int y;
 	int c;
-	CLFile* file;
+	CLFile file;
 	char buf[1024];
 	int stage;
 	TextLines* scrolling_text;
@@ -416,20 +416,20 @@ void ShowIntro(const Intro* intro)
 	background->Resize(VideoWidth, VideoHeight);
 
 	LibraryFileName(intro->TextFile, buf);
-	if (!(file = CLopen(buf, CL_OPEN_READ))) {
+	if (file.open(buf, CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file `%s'\n", intro->TextFile);
 		ExitFatal(-1);
 	}
 	l = 0;
 	text = (char*)malloc(8192);
-	while ((i = CLread(file, text + l, 8192)) == 8192) {
+	while ((i = file.read(text + l, 8192)) == 8192) {
 		l += 8192;
 		text = (char*)realloc(text, l + 8192);
 	}
 	text[l + i] = '\0';
 	l += i + 1;
 	text = (char*)realloc(text, l);
-	CLclose(file);
+	file.close();
 
 	CallbackMusicOff();
 	PlaySectionMusic(PlaySectionBriefing);
@@ -1517,14 +1517,14 @@ void SaveObjectives(CLFile* file)
 	int i;
 
 	if (GameIntro.Objectives[0]) {
-		CLprintf(file, "SetObjectives(");
+		file->printf("SetObjectives(");
 		for (i = 0; i < MAX_OBJECTIVES && GameIntro.Objectives[i]; ++i) {
 			if (i) {
-				CLprintf(file, ",");
+				file->printf(",");
 			}
-			CLprintf(file, "\n  \"%s\"", GameIntro.Objectives[i]);
+			file->printf("\n  \"%s\"", GameIntro.Objectives[i]);
 		}
-		CLprintf(file, ")\n");
+		file->printf(")\n");
 	}
 }
 

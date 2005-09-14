@@ -191,33 +191,33 @@ void SaveUpgrades(CLFile *file)
 {
 	int p;
 
-	CLprintf(file, "\n-- -----------------------------------------\n");
-	CLprintf(file, "-- MODULE: upgrades $Id$\n\n");
+	file->printf("\n-- -----------------------------------------\n");
+	file->printf("-- MODULE: upgrades $Id$\n\n");
 
 	//
 	//  Save the allow
 	//
 	for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CLprintf(file, "DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
+		file->printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
 			if (p) {
-				CLprintf(file, ", ");
+				file->printf(", ");
 			}
-			CLprintf(file, "%d", Players[p].Allow.Units[i]);
+			file->printf("%d", Players[p].Allow.Units[i]);
 		}
-		CLprintf(file, ")\n");
+		file->printf(")\n");
 	}
-	CLprintf(file, "\n");
+	file->printf("\n");
 
 	//
 	//  Save the upgrades
 	//
 	for (std::vector<Upgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
-		CLprintf(file, "DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident);
+		file->printf("DefineAllow(\"%s\", \"", AllUpgrades[j]->Ident);
 		for (p = 0; p < PlayerMax; ++p) {
-			CLprintf(file, "%c", Players[p].Allow.Upgrades[j]);
+			file->printf("%c", Players[p].Allow.Upgrades[j]);
 		}
-		CLprintf(file, "\")\n");
+		file->printf("\")\n");
 	}
 }
 

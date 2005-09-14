@@ -62,8 +62,10 @@
 static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	png_size_t check;
+	CLFile *f;
 
-	check = (png_size_t)CLread((CLFile*)png_get_io_ptr(png_ptr), data,
+	f = (CLFile*)png_get_io_ptr(png_ptr);
+	check = (png_size_t)f->read(data,
 		(size_t)length);
 	if (check != length) {
 		png_error(png_ptr, "Read Error");
@@ -80,7 +82,7 @@ static void CL_png_read_data(png_structp png_ptr, png_bytep data, png_size_t len
 */
 int LoadGraphicPNG(Graphic* g)
 {
-	CLFile* fp;
+	CLFile fp;
 	SDL_Surface* volatile surface;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -114,7 +116,7 @@ int LoadGraphicPNG(Graphic* g)
 		return -1;
 	}
 
-	if (!(fp = CLopen(name, CL_OPEN_READ))) {
+	if (fp.open(name, CL_OPEN_READ) == -1) {
 		perror("Can't open file");
 		return -1;
 	}
@@ -150,7 +152,7 @@ int LoadGraphicPNG(Graphic* g)
 	}
 
 	/* Set up the input control */
-	png_set_read_fn(png_ptr, fp, CL_png_read_data);
+	png_set_read_fn(png_ptr, &fp, CL_png_read_data);
 
 	/* Read PNG header info */
 	png_read_info(png_ptr, info_ptr);
@@ -301,7 +303,7 @@ done:   /* Clean up and return */
 	if (row_pointers) {
 		free(row_pointers);
 	}
-	CLclose(fp);
+	fp.close();
 	return ret;
 }
 

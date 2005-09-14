@@ -3476,121 +3476,121 @@ void SaveOrder(const Order* order, CLFile* file)
 {
 	char* ref;
 
-	CLprintf(file, "{");
+	file->printf("{");
 	switch (order->Action) {
 		case UnitActionNone:
-			CLprintf(file, "\"action-none\",");
+			file->printf("\"action-none\",");
 			break;
 
 		case UnitActionStill:
-			CLprintf(file, "\"action-still\",");
+			file->printf("\"action-still\",");
 			break;
 		case UnitActionStandGround:
-			CLprintf(file, "\"action-stand-ground\",");
+			file->printf("\"action-stand-ground\",");
 			break;
 		case UnitActionFollow:
-			CLprintf(file, "\"action-follow\",");
+			file->printf("\"action-follow\",");
 			break;
 		case UnitActionMove:
-			CLprintf(file, "\"action-move\",");
+			file->printf("\"action-move\",");
 			break;
 		case UnitActionAttack:
-			CLprintf(file, "\"action-attack\",");
+			file->printf("\"action-attack\",");
 			break;
 		case UnitActionAttackGround:
-			CLprintf(file, "\"action-attack-ground\",");
+			file->printf("\"action-attack-ground\",");
 			break;
 		case UnitActionDie:
-			CLprintf(file, "\"action-die\",");
+			file->printf("\"action-die\",");
 			break;
 
 		case UnitActionSpellCast:
-			CLprintf(file, "\"action-spell-cast\",");
+			file->printf("\"action-spell-cast\",");
 			break;
 
 		case UnitActionTrain:
-			CLprintf(file, "\"action-train\",");
+			file->printf("\"action-train\",");
 			break;
 		case UnitActionUpgradeTo:
-			CLprintf(file, "\"action-upgrade-to\",");
+			file->printf("\"action-upgrade-to\",");
 			break;
 		case UnitActionResearch:
-			CLprintf(file, "\"action-research\",");
+			file->printf("\"action-research\",");
 			break;
 		case UnitActionBuilt:
-			CLprintf(file, "\"action-built\",");
+			file->printf("\"action-built\",");
 			break;
 
 		case UnitActionBoard:
-			CLprintf(file, "\"action-board\",");
+			file->printf("\"action-board\",");
 			break;
 		case UnitActionUnload:
-			CLprintf(file, "\"action-unload\",");
+			file->printf("\"action-unload\",");
 			break;
 		case UnitActionPatrol:
-			CLprintf(file, "\"action-patrol\",");
+			file->printf("\"action-patrol\",");
 			break;
 		case UnitActionBuild:
-			CLprintf(file, "\"action-build\",");
+			file->printf("\"action-build\",");
 			break;
 
 		case UnitActionRepair:
-			CLprintf(file, "\"action-repair\",");
+			file->printf("\"action-repair\",");
 			break;
 		case UnitActionResource:
-			CLprintf(file, "\"action-resource\",");
+			file->printf("\"action-resource\",");
 			break;
 		case UnitActionReturnGoods:
-			CLprintf(file, "\"action-return-goods\",");
+			file->printf("\"action-return-goods\",");
 			break;
 		case UnitActionTransformInto:
-			CLprintf(file, "\"action-transform-into\",");
+			file->printf("\"action-transform-into\",");
 			break;
 		default:
 			DebugPrint("Unknown action in order\n");
 	}
-	CLprintf(file, " \"flags\", %d,", order->Flags);
-	CLprintf(file, " \"range\", %d,", order->Range);
-	CLprintf(file, " \"width\", %d,", order->Width);
-	CLprintf(file, " \"height\", %d,", order->Height);
-	CLprintf(file, " \"min-range\", %d,", order->MinRange);
+	file->printf(" \"flags\", %d,", order->Flags);
+	file->printf(" \"range\", %d,", order->Range);
+	file->printf(" \"width\", %d,", order->Width);
+	file->printf(" \"height\", %d,", order->Height);
+	file->printf(" \"min-range\", %d,", order->MinRange);
 	if (order->Goal) {
 		if (order->Goal->Destroyed) {
 			/* this unit is destroyed so it's not in the global unit
 			 * array - this means it won't be saved!!! */
 			printf ("FIXME: storing destroyed Goal - loading will fail.\n");
 		}
-		CLprintf(file, " \"goal\", \"%s\",", ref = UnitReference(order->Goal));
+		file->printf(" \"goal\", \"%s\",", ref = UnitReference(order->Goal));
 		free(ref);
 	}
-	CLprintf(file, " \"tile\", {%d, %d},", order->X, order->Y);
+	file->printf(" \"tile\", {%d, %d},", order->X, order->Y);
 	if (order->Type) {
-		CLprintf(file, " \"type\", \"%s\",", order->Type->Ident);
+		file->printf(" \"type\", \"%s\",", order->Type->Ident);
 	}
 	// Extra arg.
 	switch (order->Action) {
 		case UnitActionPatrol:
-			CLprintf(file, " \"patrol\", {%d, %d},",
+			file->printf(" \"patrol\", {%d, %d},",
 				order->Arg1.Patrol.X, order->Arg1.Patrol.Y);
 			break;
 		case UnitActionSpellCast:
 			if (order->Arg1.Spell) {
-				CLprintf(file, " \"spell\", \"%s\",", order->Arg1.Spell->Ident);
+				file->printf(" \"spell\", \"%s\",", order->Arg1.Spell->Ident);
 			}
 			break;
 		case UnitActionResearch:
 			if (order->Arg1.Upgrade) {
-				CLprintf(file, " \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident);
+				file->printf(" \"upgrade\", \"%s\",", order->Arg1.Upgrade->Ident);
 			}
 			break;
 		case UnitActionResource :
 		case UnitActionReturnGoods :
-			CLprintf(file, " \"mine\", %d,", order->Arg1.ResourcePos);
+			file->printf(" \"mine\", %d,", order->Arg1.ResourcePos);
 			break;
 		default:
 			break;
 	}
-	CLprintf(file, "}");
+	file->printf("}");
 }
 
 /**
@@ -3605,168 +3605,168 @@ void SaveUnit(const Unit* unit, CLFile* file)
 	Unit* uins;
 	int i;
 
-	CLprintf(file, "\nUnit(%d, ", UnitNumber(unit));
+	file->printf("\nUnit(%d, ", UnitNumber(unit));
 
 	// 'type and 'player must be first, needed to create the unit slot
-	CLprintf(file, "\"type\", \"%s\", ", unit->Type->Ident);
+	file->printf("\"type\", \"%s\", ", unit->Type->Ident);
 	if (unit->Seen.Type) {
-		CLprintf(file, "\"seen-type\", \"%s\", ", unit->Seen.Type->Ident);
+		file->printf("\"seen-type\", \"%s\", ", unit->Seen.Type->Ident);
 	}
 
-	CLprintf(file, "\"player\", %d,\n  ", unit->Player->Index);
+	file->printf("\"player\", %d,\n  ", unit->Player->Index);
 
 	if (unit->Next) {
-		CLprintf(file, "\"next\", %d, ", UnitNumber(unit->Next));
+		file->printf("\"next\", %d, ", UnitNumber(unit->Next));
 	}
 
-	CLprintf(file, "\"tile\", {%d, %d}, ", unit->X, unit->Y);
-	CLprintf(file, "\"refs\", %d, ", unit->Refs);
+	file->printf("\"tile\", {%d, %d}, ", unit->X, unit->Y);
+	file->printf("\"refs\", %d, ", unit->Refs);
 #if 0
 	// latimerius: why is this so complex?
 	// JOHNS: An unit can be owned by a new player and have still the old stats
 	for (i = 0; i < PlayerMax; ++i) {
 		if (&unit->Type->Stats[i] == unit->Stats) {
-			CLprintf(file, "\"stats\", %d,\n  ", i);
+			file->printf("\"stats\", %d,\n  ", i);
 			break;
 		}
 	}
 	// latimerius: what's the point of storing a pointer value anyway?
 	if (i == PlayerMax) {
-		CLprintf(file, "\"stats\", \"S%08X\",\n  ", (int)unit->Stats);
+		file->printf("\"stats\", \"S%08X\",\n  ", (int)unit->Stats);
 	}
 #else
-	CLprintf(file, "\"stats\", %d,\n  ", unit->Player->Index);
+	file->printf("\"stats\", %d,\n  ", unit->Player->Index);
 #endif
-	CLprintf(file, "\"pixel\", {%d, %d}, ", unit->IX, unit->IY);
-	CLprintf(file, "\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
-	CLprintf(file, "\"frame\", %d, ", unit->Frame);
+	file->printf("\"pixel\", {%d, %d}, ", unit->IX, unit->IY);
+	file->printf("\"seen-pixel\", {%d, %d}, ", unit->Seen.IX, unit->Seen.IY);
+	file->printf("\"frame\", %d, ", unit->Frame);
 	if (unit->Seen.Frame != UnitNotSeen) {
-		CLprintf(file, "\"seen\", %d, ", unit->Seen.Frame);
+		file->printf("\"seen\", %d, ", unit->Seen.Frame);
 	} else {
-		CLprintf(file, "\"not-seen\", ");
+		file->printf("\"not-seen\", ");
 	}
-	CLprintf(file, "\"direction\", %d,\n  ", unit->Direction);
-	CLprintf(file, "\"attacked\", %lu,\n ", unit->Attacked);
-	CLprintf(file, " \"current-sight-range\", %d,", unit->CurrentSightRange);
+	file->printf("\"direction\", %d,\n  ", unit->Direction);
+	file->printf("\"attacked\", %lu,\n ", unit->Attacked);
+	file->printf(" \"current-sight-range\", %d,", unit->CurrentSightRange);
 	if (unit->Burning) {
-		CLprintf(file, " \"burning\",");
+		file->printf(" \"burning\",");
 	}
 	if (unit->Destroyed) {
-		CLprintf(file, " \"destroyed\",");
+		file->printf(" \"destroyed\",");
 	}
 	if (unit->Removed) {
-		CLprintf(file, " \"removed\",");
+		file->printf(" \"removed\",");
 	}
 	if (unit->Selected) {
-		CLprintf(file, " \"selected\",");
+		file->printf(" \"selected\",");
 	}
 	if (unit->RescuedFrom) {
-		CLprintf(file, " \"rescued-from\", %d,", unit->RescuedFrom->Index);
+		file->printf(" \"rescued-from\", %d,", unit->RescuedFrom->Index);
 	}
 	// n0b0dy: How is this usefull?
 	// mr-russ: You can't always load units in order, it saved the information
 	// so you can load a unit who's Container hasn't been loaded yet.
 	// SEE unit loading code.
 	if (unit->Container && unit->Removed) {
-		CLprintf(file, " \"host-info\", {%d, %d, %d, %d}, ",
+		file->printf(" \"host-info\", {%d, %d, %d, %d}, ",
 			unit->Container->X, unit->Container->Y,
 			unit->Container->Type->TileWidth,
 			unit->Container->Type->TileHeight);
 	}
-	CLprintf(file, " \"seen-by-player\", \"");
+	file->printf(" \"seen-by-player\", \"");
 	for (i = 0; i < PlayerMax; ++i) {
-		CLprintf(file, "%c", (unit->Seen.ByPlayer & (1 << i)) ? 'X' : '_');
+		file->printf("%c", (unit->Seen.ByPlayer & (1 << i)) ? 'X' : '_');
 	}
-	CLprintf(file, "\",\n ");
-	CLprintf(file, " \"seen-destroyed\", \"");
+	file->printf("\",\n ");
+	file->printf(" \"seen-destroyed\", \"");
 	for (i = 0; i < PlayerMax; ++i) {
-		CLprintf(file, "%c", (unit->Seen.Destroyed & (1 << i)) ? 'X' : '_');
+		file->printf("%c", (unit->Seen.Destroyed & (1 << i)) ? 'X' : '_');
 	}
-	CLprintf(file, "\",\n ");
+	file->printf("\",\n ");
 	if (unit->Constructed) {
-		CLprintf(file, " \"constructed\",");
+		file->printf(" \"constructed\",");
 	}
 	if (unit->Seen.Constructed) {
-		CLprintf(file, " \"seen-constructed\",");
+		file->printf(" \"seen-constructed\",");
 	}
-	CLprintf(file, " \"seen-state\", %d, ", unit->Seen.State);
+	file->printf(" \"seen-state\", %d, ", unit->Seen.State);
 	if (unit->Active) {
-		CLprintf(file, " \"active\",");
+		file->printf(" \"active\",");
 	}
-	CLprintf(file, "\"ttl\", %lu, ", unit->TTL);
+	file->printf("\"ttl\", %lu, ", unit->TTL);
 
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
-			CLprintf(file, "\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+			file->printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
 				UnitTypeVar.VariableName[i], unit->Variable[i].Value, unit->Variable[i].Max,
 				unit->Variable[i].Increase, unit->Variable[i].Enable ? "true" : "false");
 	}
 
-	CLprintf(file, "\"group-id\", %d,\n  ", unit->GroupId);
-	CLprintf(file, "\"last-group\", %d,\n  ", unit->LastGroup);
+	file->printf("\"group-id\", %d,\n  ", unit->GroupId);
+	file->printf("\"last-group\", %d,\n  ", unit->LastGroup);
 
-	CLprintf(file, "\"resources-held\", %d,\n  ", unit->ResourcesHeld);
+	file->printf("\"resources-held\", %d,\n  ", unit->ResourcesHeld);
 	if (unit->CurrentResource) {
-		CLprintf(file, "\"current-resource\", \"%s\",\n  ",
+		file->printf("\"current-resource\", \"%s\",\n  ",
 			DefaultResourceNames[unit->CurrentResource]);
 	}
 
-	CLprintf(file, "\"sub-action\", %d, ", unit->SubAction);
-	CLprintf(file, "\"wait\", %d, ", unit->Wait);
-	CLprintf(file, "\"state\", %d,", unit->State);
-	CLprintf(file, "\"anim-wait\", %d,", unit->Anim.Wait);
+	file->printf("\"sub-action\", %d, ", unit->SubAction);
+	file->printf("\"wait\", %d, ", unit->Wait);
+	file->printf("\"state\", %d,", unit->State);
+	file->printf("\"anim-wait\", %d,", unit->Anim.Wait);
 	for (i = 0; i < NumAnimations; ++i) {
 		if (AnimationsArray[i] == unit->Anim.CurrAnim) {
-			CLprintf(file, "\"curr-anim\", %d,", i);
-			CLprintf(file, "\"anim\", %d,", unit->Anim.Anim - unit->Anim.CurrAnim);
+			file->printf("\"curr-anim\", %d,", i);
+			file->printf("\"anim\", %d,", unit->Anim.Anim - unit->Anim.CurrAnim);
 			break;
 		}
 	}
 	if (unit->Anim.Unbreakable) {
-		CLprintf(file, " \"unbreakable\",");
+		file->printf(" \"unbreakable\",");
 	}
-	CLprintf(file, "\n  \"blink\", %d,", unit->Blink);
+	file->printf("\n  \"blink\", %d,", unit->Blink);
 	if (unit->Moving) {
-		CLprintf(file, " \"moving\",");
+		file->printf(" \"moving\",");
 	}
 	if (unit->ReCast) {
-		CLprintf(file, " \"re-cast\",");
+		file->printf(" \"re-cast\",");
 	}
 	if (unit->Boarded) {
-		CLprintf(file, " \"boarded\",");
+		file->printf(" \"boarded\",");
 	}
 	if (unit->AutoRepair) {
-		CLprintf(file, " \"auto-repair\",");
+		file->printf(" \"auto-repair\",");
 	}
 
-	CLprintf(file, " \"rs\", %d,", unit->Rs);
-	CLprintf(file, " \"units-boarded-count\", %d,", unit->BoardCount);
+	file->printf(" \"rs\", %d,", unit->Rs);
+	file->printf(" \"units-boarded-count\", %d,", unit->BoardCount);
 
 	if (unit->UnitInside) {
-		CLprintf(file, "\n  \"units-contained\", {");
+		file->printf("\n  \"units-contained\", {");
 		uins = unit->UnitInside->PrevContained;
 		for (i = unit->InsideCount; i; --i, uins = uins->PrevContained) {
-			CLprintf(file, "\"%s\"", ref = UnitReference(uins));
+			file->printf("\"%s\"", ref = UnitReference(uins));
 			free(ref);
 			if (i > 1) {
-				CLprintf(file, ", ");
+				file->printf(", ");
 			}
 		}
-		CLprintf(file, "},\n  ");
+		file->printf("},\n  ");
 	}
-	CLprintf(file, "\"order-count\", %d,\n  ", unit->OrderCount);
-	CLprintf(file, "\"order-flush\", %d,\n  ", unit->OrderFlush);
-	CLprintf(file, "\"order-total\", %d,\n	", unit->TotalOrders);
-	CLprintf(file, "\"orders\", {");
+	file->printf("\"order-count\", %d,\n  ", unit->OrderCount);
+	file->printf("\"order-flush\", %d,\n  ", unit->OrderFlush);
+	file->printf("\"order-total\", %d,\n	", unit->TotalOrders);
+	file->printf("\"orders\", {");
 	for (i = 0; i < unit->TotalOrders; ++i) {
-		CLprintf(file, "\n ");
+		file->printf("\n ");
 		SaveOrder(&unit->Orders[i], file);
-		CLprintf(file, ",");
+		file->printf(",");
 	}
-	CLprintf(file, "},\n  \"saved-order\", ");
+	file->printf("},\n  \"saved-order\", ");
 	SaveOrder(&unit->SavedOrder, file);
-	CLprintf(file, ",\n  \"critical-order\", ");
+	file->printf(",\n  \"critical-order\", ");
 	SaveOrder(&unit->CriticalOrder, file);
-	CLprintf(file, ",\n  \"new-order\", ");
+	file->printf(",\n  \"new-order\", ");
 	SaveOrder(&unit->NewOrder, file);
 
 	//
@@ -3776,15 +3776,15 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		case UnitActionStill:
 			// FIXME: support other resource types
 			if (unit->Type->GivesResource) {
-				CLprintf(file, ", \"resource-active\", %d", unit->Data.Resource.Active);
+				file->printf(", \"resource-active\", %d", unit->Data.Resource.Active);
 			}
 			break;
 		case UnitActionResource:
-			CLprintf(file, ", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
+			file->printf(", \"data-res-worker\", {\"time-to-harvest\", %d,", unit->Data.ResWorker.TimeToHarvest);
 			if (unit->Data.ResWorker.DoneHarvesting) {
-				CLprintf(file, " \"done-harvesting\",");
+				file->printf(" \"done-harvesting\",");
 			}
-			CLprintf(file, "}");
+			file->printf("}");
 			break;
 		case UnitActionBuilt:
 			{
@@ -3797,64 +3797,64 @@ void SaveUnit(const Unit* unit, CLFile* file)
 					cframe = cframe->Next;
 					++frame;
 				}
-				CLprintf(file, ",\n  \"data-built\", {");
+				file->printf(",\n  \"data-built\", {");
 
 				if (unit->Data.Built.Worker) {
-					CLprintf(file, "\"worker\", \"%s\", ",
+					file->printf("\"worker\", \"%s\", ",
 					ref = UnitReference(unit->Data.Built.Worker));
 					free(ref);
 				}
-				CLprintf(file, "\"progress\", %d, \"frame\", %d,",
+				file->printf("\"progress\", %d, \"frame\", %d,",
 					unit->Data.Built.Progress, frame);
 				if (unit->Data.Built.Cancel) {
-					CLprintf(file, " \"cancel\",");
+					file->printf(" \"cancel\",");
 				}
-				CLprintf(file, "}");
+				file->printf("}");
 				break;
 			}
 		case UnitActionResearch:
-			CLprintf(file, ",\n  \"data-research\", {");
-			CLprintf(file, "\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident);
-			CLprintf(file, "}");
+			file->printf(",\n  \"data-research\", {");
+			file->printf("\"ident\", \"%s\",", unit->Data.Research.Upgrade->Ident);
+			file->printf("}");
 			break;
 		case UnitActionUpgradeTo:
-			CLprintf(file, ",\n  \"data-upgrade-to\", {");
-			CLprintf(file, "\"ticks\", %d,", unit->Data.UpgradeTo.Ticks);
-			CLprintf(file, "}");
+			file->printf(",\n  \"data-upgrade-to\", {");
+			file->printf("\"ticks\", %d,", unit->Data.UpgradeTo.Ticks);
+			file->printf("}");
 			break;
 		case UnitActionTrain:
-			CLprintf(file, ",\n  \"data-train\", {");
-			CLprintf(file, "\"ticks\", %d, ", unit->Data.Train.Ticks);
-			CLprintf(file, "}");
+			file->printf(",\n  \"data-train\", {");
+			file->printf("\"ticks\", %d, ", unit->Data.Train.Ticks);
+			file->printf("}");
 			break;
 		default:
-			CLprintf(file, ",\n  \"data-move\", {");
+			file->printf(",\n  \"data-move\", {");
 			if (unit->Data.Move.Fast) {
-				CLprintf(file, "\"fast\", ");
+				file->printf("\"fast\", ");
 			}
 			if (unit->Data.Move.Length > 0) {
-				CLprintf(file, "\"path\", {");
+				file->printf("\"path\", {");
 				for (i = 0; i < unit->Data.Move.Length; ++i) {
-					CLprintf(file, "%d, ", unit->Data.Move.Path[i]);
+					file->printf("%d, ", unit->Data.Move.Path[i]);
 				}
-				CLprintf(file, "},");
+				file->printf("},");
 			}
-			CLprintf(file, "}");
+			file->printf("}");
 			break;
 	}
 
 	if (unit->Goal) {
-		CLprintf(file, ",\n  \"goal\", %d", UnitNumber(unit->Goal));
+		file->printf(",\n  \"goal\", %d", UnitNumber(unit->Goal));
 	}
 	if (unit->AutoCastSpell) {
 		for (i = 0; i < SpellTypeCount; ++i) {
 			if (unit->AutoCastSpell[i]) {
-				CLprintf(file, ",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
+				file->printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
 			}
 		}
 	}
 
-	CLprintf(file, ")\n");
+	file->printf(")\n");
 }
 
 /**
@@ -3867,17 +3867,17 @@ void SaveUnits(CLFile* file)
 	Unit** table;
 	Unit* unit;
 
-	CLprintf(file, "\n--- -----------------------------------------\n");
-	CLprintf(file, "--- MODULE: units $Id$\n\n");
+	file->printf("\n--- -----------------------------------------\n");
+	file->printf("--- MODULE: units $Id$\n\n");
 
-	CLprintf(file, "-- Unit slot usage bitmap\n");
-	CLprintf(file, "SlotUsage(%d", UnitSlotFree);
+	file->printf("-- Unit slot usage bitmap\n");
+	file->printf("SlotUsage(%d", UnitSlotFree);
 	//  Save the Unit allocator state, sadly. I don't want to do this!
 	for (unit = ReleasedHead; unit; unit = unit->Next) {
-		CLprintf(file, ", {Slot = %d, FreeCycle = %d}", unit->Slot, unit->Refs);
+		file->printf(", {Slot = %d, FreeCycle = %d}", unit->Slot, unit->Refs);
 		DebugPrint("{Slot = %d, FreeCycle = %d}\n" _C_ unit->Slot _C_ unit->Refs);
 	}
-	CLprintf(file, ")\n");
+	file->printf(")\n");
 
 	for (table = Units; table < &Units[NumUnits]; ++table) {
 		SaveUnit(*table, file);

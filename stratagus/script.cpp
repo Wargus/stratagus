@@ -212,14 +212,14 @@ int LuaLoadFile(const char* file)
 	int read;
 	int location;
 	char* buf;
-	CLFile* fp;
+	CLFile fp;
 	const char *PreviousLuaFile;
 
 	PreviousLuaFile = CurrentLuaFile;
 	CurrentLuaFile = file;
 
-	if (!(fp = CLopen(file, CL_OPEN_READ))) {
-		fprintf(stderr,"Can't open file '%s': %s\n",
+	if (fp.open(file, CL_OPEN_READ) == -1) {
+		fprintf(stderr, "Can't open file '%s': %s\n",
 			file, strerror(errno));
 		return -1;
 	}
@@ -227,7 +227,7 @@ int LuaLoadFile(const char* file)
 	size = 10000;
 	buf = (char*)malloc(size);
 	location = 0;
-	while ((read = CLread(fp, &buf[location], size - location))) {
+	while ((read = fp.read(&buf[location], size - location))) {
 		location += read;
 		size = size * 2;
 		buf = (char*)realloc(buf, size);
@@ -236,7 +236,7 @@ int LuaLoadFile(const char* file)
 			ExitFatal(-1);
 		}
 	}
-	CLclose(fp);
+	fp.close();
 
 	if (!(status = luaL_loadbuffer(Lua, buf, location, file))) {
 		LuaCall(0, 1);

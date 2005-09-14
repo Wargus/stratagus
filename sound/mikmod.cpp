@@ -66,23 +66,23 @@ static CLFile *CurrentFile;
 
 static BOOL Seek(struct MREADER* mreader, long off, int whence)
 {
-	return CLseek(CurrentFile, off, whence);
+	return CurrentFile->seek(off, whence);
 }
 
 static long Tell(struct MREADER* mreader)
 {
-	return CLtell(CurrentFile);
+	return CurrentFile->tell();
 }
 
 static BOOL Read(struct MREADER* mreader, void *buf, size_t len)
 {
-	return CLread(CurrentFile, buf, len);
+	return CurrentFile->read(buf, len);
 }
 
 static int Get(struct MREADER* mreader)
 {
 	char c;
-	CLread(CurrentFile, &c, 1);
+	CurrentFile->read(&c, 1);
 	return c;
 }
 
@@ -147,7 +147,8 @@ static void MikModStreamFree(Sample* sample)
 	Player_Stop();
 	Player_Free(data->MikModModule);
 	MikMod_Exit();
-	CLclose(data->MikModFile);
+	data->MikModFile->close();
+	delete data->MikModFile;
 	free(sample->User);
 	free(sample->Buffer);
 	free(sample);
@@ -230,10 +231,11 @@ Sample* LoadMikMod(const char* name, int flags)
 	MikMod_Init("");
 
 	strcpy(s, name);
-	data->MikModFile = CLopen(name, CL_OPEN_READ);
-	if (!data->MikModFile) {
+	data->MikModFile = new CLFile;
+	if (data->MikModFile->open(name, CL_OPEN_READ) == -1) {
 		MikMod_Exit();
 		free(data);
+		delete data->MikModFile;
 		return NULL;
 	}
 	CurrentFile = data->MikModFile;
@@ -242,6 +244,8 @@ Sample* LoadMikMod(const char* name, int flags)
 	if (!data->MikModModule) {
 		MikMod_Exit();
 		free(data);
+		data->MikModFile->close();
+		delete data->MikModFile;
 		return NULL;
 	}
 
@@ -279,7 +283,8 @@ Sample* LoadMikMod(const char* name, int flags)
 		Player_Free(data->MikModModule);
 		MikMod_Exit();
 
-		CLclose(data->MikModFile);
+		data->MikModFile->close();
+		delete data->MikModFile;
 	}
 
 	return sample;

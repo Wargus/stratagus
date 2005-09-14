@@ -1915,15 +1915,15 @@ static void CreateEditor(void)
 	int i;
 	char* file;
 	char buf[PATH_MAX];
-	CLFile* clf;
+	CLFile clf;
 
 	//
 	// Load and evaluate the editor configuration file
 	// FIXME: the CLopen is very slow and repeats the work of LibraryFileName.
 	//
 	file = LibraryFileName(EditorStartFile, buf);
-	if ((clf = CLopen(file, CL_OPEN_READ))) {
-		CLclose(clf);
+	if (clf.open(file, CL_OPEN_READ) != -1) {
+		clf.close();
 		ShowLoadProgress("Script %s", file);
 		LuaLoadFile(file);
 		CclGarbageCollect(0); // Cleanup memory after load
