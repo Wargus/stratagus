@@ -771,7 +771,7 @@ static int AiAssignHarvester(Unit* unit, int resource)
 	// These will hold the coordinates of the forest.
 	int forestx;
 	int foresty;
-	int i;
+	std::vector<UnitType *>::iterator i;
 	int exploremask;
 	//  This will hold the resulting gather destination.
 	Unit* dest;
@@ -803,9 +803,9 @@ static int AiAssignHarvester(Unit* unit, int resource)
 			return 1;
 		}
 		exploremask = 0;
-		for (i = 0; i < UnitTypeMax; ++i) {
-			if (UnitTypes[i] && UnitTypes[i]->GivesResource == resource) {
-				switch (UnitTypes[i]->UnitType) {
+		for (i = UnitTypes.begin(); i != UnitTypes.end(); i++) {
+			if (*i && (*i)->GivesResource == resource) {
+				switch ((*i)->UnitType) {
 				case UnitTypeLand:
 					exploremask |= MapFieldLandUnit;
 					break;
