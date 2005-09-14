@@ -4307,7 +4307,7 @@ static int CclSetShowOrders(lua_State* l)
 			ShowOrders = SHOW_ORDERS_ALWAYS;
 		}
 	} else {
-		ShowOrders = lua_tonumber(l, 1);
+		ShowOrders = LuaToNumber(l, 1);
 	}
 
 	return 0;

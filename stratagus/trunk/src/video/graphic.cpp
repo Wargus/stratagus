@@ -1020,19 +1020,23 @@ void Graphic::Resize(int w, int h)
 					&pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
 					p1;
 
-				data[x * bpp + 0] = (p1[0] * (1 - fy) + p2[0] * fy +
+				data[x * bpp + 0] = static_cast<unsigned char>(
+					(p1[0] * (1 - fy) + p2[0] * fy +
 					p1[0] * (1 - fx) + p3[0] * fx +
-					p1[0] * (1 - fz) + p4[0] * fz) / 3 + .5;
-				data[x * bpp + 1] = (p1[1] * (1 - fy) + p2[1] * fy +
+					p1[0] * (1 - fz) + p4[0] * fz) / 3.0 + .5);
+				data[x * bpp + 1] = static_cast<unsigned char>(
+					(p1[1] * (1 - fy) + p2[1] * fy +
 					p1[1] * (1 - fx) + p3[1] * fx +
-					p1[1] * (1 - fz) + p4[1] * fz) / 3 + .5;
-				data[x * bpp + 2] = (p1[2] * (1 - fy) + p2[2] * fy +
+					p1[1] * (1 - fz) + p4[1] * fz) / 3.0 + .5);
+				data[x * bpp + 2] = static_cast<unsigned char>(
+					(p1[2] * (1 - fy) + p2[2] * fy +
 					p1[2] * (1 - fx) + p3[2] * fx +
-					p1[2] * (1 - fz) + p4[2] * fz) / 3 + .5;
+					p1[2] * (1 - fz) + p4[2] * fz) / 3.0 + .5);
 				if (bpp == 4) {
-					data[x * bpp + 3] = (p1[3] * (1 - fy) + p2[3] * fy +
+					data[x * bpp + 3] = static_cast<unsigned char>(
+						(p1[3] * (1 - fy) + p2[3] * fy +
 						p1[3] * (1 - fx) + p3[3] * fx +
-						p1[3] * (1 - fz) + p4[3] * fz) / 3 + .5;
+						p1[3] * (1 - fz) + p4[3] * fz) / 3.0 + .5);
 				}
 				++x;
 			}
