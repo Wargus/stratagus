@@ -530,8 +530,8 @@ static void UiRecallMapPosition(unsigned position)
 */
 static void UiToggleTerrain(void)
 {
-	MinimapWithTerrain ^= 1;
-	if (MinimapWithTerrain) {
+	Minimap::WithTerrain ^= 1;
+	if (Minimap::WithTerrain) {
 		SetStatusLine("Terrain displayed.");
 	} else {
 		SetStatusLine("Terrain hidden.");

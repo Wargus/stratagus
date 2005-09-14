@@ -37,57 +37,31 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16 * 3)  /// integer scale factor
-
-	/// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION (1 * CYCLES_PER_SECOND)
-	/// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
-
-	/// Update seen tile change in minimap
-#define UpdateMinimapSeenXY(tx, ty)
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-extern int MinimapX;  /// Minimap drawing position x offset
-extern int MinimapY;  /// Minimap drawing position y offset
-
-extern int MinimapWithTerrain;   /// display minimap with terrain
-extern int MinimapFriendly;      /// switch colors of friendly units
-extern int MinimapShowSelected;  /// highlight selected units
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-	/// Update tile change in minimap
-extern void UpdateMinimapXY(int tx, int ty);
-	/// Update minimap terrain
-extern void UpdateMinimapTerrain(void);
-	/// Update complete minimap
-extern void UpdateMinimap(void);
-	/// Create new minimap
-extern void CreateMinimap(void);
+class Minimap
+{
+public:
+	static void UpdateXY(int tx, int ty);
+	static void UpdateSeenXY(int tx, int ty) {}
+	static void UpdateTerrain(void);
+	static void Update(void);
+	static void Create(void);
 #ifdef USE_OPENGL
-	/// Reload OpenGL minimap
-extern void ReloadMinimap(void);
+	static void Reload(void);
 #endif
-	/// Destroy minimap
-extern void DestroyMinimap(void);
-	/// Draw minimap with viewpoint
-extern void DrawMinimap(int vx, int vy);
-	/// Draw minimap viewpoint cursor
-extern void DrawMinimapCursor(int vx, int vy);
+	static void Destroy(void);
+	static void Draw(int vx, int vy);
+	static void DrawCursor(int vx, int vy);
+	static void AddEvent(int x, int y);
 
-	/// Convert minimap cursor X position to tile map coordinate
-extern int ScreenMinimap2MapX(int x);
-	/// Convert minimap cursor Y position to tile map coordinate
-extern int ScreenMinimap2MapY(int y);
+	static int Screen2MapX(int x);
+	static int Screen2MapY(int y);
 
-	/// Add a minimap event
-extern void AddMinimapEvent(int x, int y);
+	static int X;
+	static int Y;
+	static int WithTerrain;
+	static int Friendly;
+	static int ShowSelected;
+};
 
 //@}
 
