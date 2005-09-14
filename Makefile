@@ -49,18 +49,18 @@ include $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
 SRC := 
 include $(patsubst %, %/Module.make, $(MODULES))
-OBJ := $(patsubst %.c, %.o, $(SRC))
+OBJ := $(patsubst %.cpp, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
 SRC_ALL = $(SRC)
 OBJ_ALL = $(OBJ)
 
-METASERVER_SRC := src/network/lowlevel.c
+METASERVER_SRC := src/network/lowlevel.cpp
 include src/metaserver/Module.make
-METASERVER_OBJ := $(patsubst %.c, %.o, $(METASERVER_SRC))
+METASERVER_OBJ := $(patsubst %.cpp, %.o, $(METASERVER_SRC))
 METASERVER_OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(METASERVER_OBJ))),$(notdir $(METASERVER_OBJ)))
 
-.SUFFIXES: .c .o
+.SUFFIXES: .cpp .o
 
 .PHONY:	make-objdir all-src
 
@@ -70,7 +70,7 @@ make-objdir:
 	@for i in $(MODULES); do \
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
-%.o: $(@D)../%.c
+%.o: $(@D)../%.cpp
 	$(CC) -c $(CFLAGS) $< -o $@
 
 help:
@@ -182,7 +182,7 @@ depend:
 	@echo
 	@for i in $(SRC) ; do\
 	echo -e "\rMaking dependencies for $$i";\
-	$(CC) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.c/\.o/g'`\
+	$(CC) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'`\
 	-MM $(CFLAGS) $$i >>.depend; done
 	@echo
 

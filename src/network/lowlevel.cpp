@@ -398,7 +398,7 @@ Socket NetOpenUDP(int port)
 	// open the socket
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sockfd == INVALID_SOCKET) {
-		return -1;
+		return (Socket)-1;
 	}
 	// bind local port
 	if (port) {
@@ -412,7 +412,7 @@ Socket NetOpenUDP(int port)
 		if (bind(sockfd, (struct sockaddr*)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseUDP(sockfd);
-			return -1;
+			return (Socket)-1;
 		}
 		NetLastHost = sock_addr.sin_addr.s_addr;
 		NetLastPort = sock_addr.sin_port;

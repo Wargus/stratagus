@@ -26,8 +26,8 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/pathfinder
-MSRC =   astar.c script_pathfinder.c pathfinder.c splitter.c splitter_debug.c \
-         splitter_lowlevel.c splitter_zoneset.c
+MSRC =   astar.cpp script_pathfinder.cpp pathfinder.cpp splitter.cpp splitter_debug.cpp \
+         splitter_lowlevel.cpp splitter_zoneset.cpp
 MHDRS =  splitter.h splitter_local.h
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

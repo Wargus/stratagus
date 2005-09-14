@@ -254,7 +254,7 @@ typedef struct _network_command_queue_ {
 //----------------------------------------------------------------------------
 
 int NetworkNumInterfaces;                  /// Network number of interfaces
-Socket NetworkFildes = -1;                 /// Network file descriptor
+Socket NetworkFildes = (Socket)-1;         /// Network file descriptor
 int NetworkInSync = 1;                     /// Network is in sync
 int NetworkUpdates = 5;                    /// Network update each # game cycles
 int NetworkLag = 10;                       /// Network lag in # game cycles
@@ -380,7 +380,7 @@ void InitNetwork1(void)
 
 	DebugPrint("\n");
 
-	NetworkFildes = -1;
+	NetworkFildes = (Socket)-1;
 	NetworkInSync = 1;
 	NetworkNumInterfaces = 0;
 
@@ -466,7 +466,7 @@ void ExitNetwork1(void)
 	NetCloseUDP(NetworkFildes);
 
 	NetExit(); // machine dependent setup
-	NetworkFildes = -1;
+	NetworkFildes = (Socket)-1;
 	NetworkInSync = 1;
 	NetPlayers = 0;
 	HostsCount = 0;
