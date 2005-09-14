@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-// T H E   W A R   B E G I N S
-// Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
 /**@name map_wall.c - The map wall handling. */
 //
-// (c) Copyright 1999-2002 by Vladi Shabanski
+//      (c) Copyright 1999-2005 by Vladi Shabanski
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id$
+//      $Id$
 
 //@{
 
@@ -166,7 +166,7 @@ void MapFixSeenWallTile(int x, int y)
 
 		// FIXME: can this only happen if seen?
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
-			UpdateMinimapSeenXY(x, y);
+			Minimap::UpdateSeenXY(x, y);
 		}
 	}
 }
@@ -261,10 +261,10 @@ void MapFixWallTile(int x, int y)
 
 	if (mf->Tile != tile) {
 		mf->Tile = tile;
-		UpdateMinimapXY(x, y);
+		Minimap::UpdateXY(x, y);
 
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
-			UpdateMinimapSeenXY(x, y);
+			Minimap::UpdateSeenXY(x, y);
 			MapMarkSeenTile(x, y);
 		}
 	}
@@ -298,12 +298,12 @@ void MapRemoveWall(unsigned x, unsigned y)
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
-	UpdateMinimapXY(x, y);
+	Minimap::UpdateXY(x, y);
 	MapFixWallTile(x, y);
 	MapFixWallNeighbors(x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		UpdateMinimapSeenXY(x, y);
+		Minimap::UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
 #ifdef MAP_REGIONS
@@ -339,12 +339,12 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
 
-	UpdateMinimapXY(x, y);
+	Minimap::UpdateXY(x, y);
 	MapFixWallTile(x, y);
 	MapFixWallNeighbors(x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		UpdateMinimapSeenXY(x, y);
+		Minimap::UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
 #ifdef MAP_REGIONS

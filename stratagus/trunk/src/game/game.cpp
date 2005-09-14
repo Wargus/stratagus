@@ -616,7 +616,7 @@ void CreateGame(const char* filename, WorldMap* map)
 
 	InitSelections();
 
-	CreateMinimap();   // create minimap for pud
+	Minimap::Create();   // create minimap for pud
 	InitMap();         // setup draw functions
 	InitMapFogOfWar(); // build tables for fog of war
 	PreprocessMap();   // Adjust map for use

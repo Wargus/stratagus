@@ -121,7 +121,7 @@ void MapMarkSeenTile(int x, int y)
 		}
 	}
 
-	UpdateMinimapXY(x, y);
+	Minimap::UpdateXY(x, y);
 }
 
 /**
@@ -422,7 +422,7 @@ void CleanMap(void)
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 
-	DestroyMinimap();
+	Minimap::Destroy();
 
 	CleanMapFogOfWar();
 }
@@ -601,7 +601,7 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 #ifdef MAP_REGIONS
 			MapSplitterTilesCleared(x, y, x, y);
 #endif
-			UpdateMinimapXY(x, y);
+			Minimap::UpdateXY(x, y);
 		}
 	} else if (seen && TheMap.Tileset.MixedLookupTable[mf->SeenTile] ==
 				TheMap.Tileset.MixedLookupTable[tile]) { //Same Type
@@ -615,7 +615,7 @@ void MapFixTile(unsigned short type, int seen, int x, int y)
 	}
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		UpdateMinimapSeenXY(x, y);
+		Minimap::UpdateSeenXY(x, y);
 		if (!seen) {
 			MapMarkSeenTile(x, y);
 		}
@@ -675,14 +675,14 @@ void MapClearTile(unsigned short type, unsigned x, unsigned y)
 	mf->Flags &= ~flags;
 	mf->Value = 0;
 
-	UpdateMinimapXY(x, y);
+	Minimap::UpdateXY(x, y);
 #ifdef MAP_REGIONS
 	MapSplitterTilesCleared(x, y, x, y);
 #endif
 	MapFixNeighbors(type, 0, x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		UpdateMinimapSeenXY(x, y);
+		Minimap::UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
 }
