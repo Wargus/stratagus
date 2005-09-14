@@ -26,8 +26,8 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/ai
-MSRC =   ai.c ai_building.c ai_force.c ai_magic.c ai_plan.c ai_resource.c \
-         script_ai.c
+MSRC =   ai.cpp ai_building.cpp ai_force.cpp ai_magic.cpp ai_plan.cpp ai_resource.cpp \
+         script_ai.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
 HDRS +=  src/ai/ai_local.h

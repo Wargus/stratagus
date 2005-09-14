@@ -26,6 +26,6 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/network
-MSRC =   commands.c lowlevel.c master.c netconnect.c network.c
+MSRC =   commands.cpp lowlevel.cpp master.cpp netconnect.cpp network.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

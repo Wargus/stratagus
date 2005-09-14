@@ -26,7 +26,7 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/unit
-MSRC =   depend.c script_unit.c script_unittype.c \
-         unit.c unit_cache.c unit_draw.c unit_find.c unittype.c upgrade.c
+MSRC =   depend.cpp script_unit.cpp script_unittype.cpp \
+         unit.cpp unit_cache.cpp unit_draw.cpp unit_find.cpp unittype.cpp upgrade.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

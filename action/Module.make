@@ -26,11 +26,11 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/action
-MSRC =   action_attack.c action_board.c action_build.c \
-         action_die.c action_follow.c action_move.c action_patrol.c \
-         action_repair.c action_research.c action_resource.c \
-         action_returngoods.c action_spellcast.c action_stand.c \
-         action_still.c action_train.c action_unload.c action_upgradeto.c \
-         actions.c command.c
+MSRC =   action_attack.cpp action_board.cpp action_build.cpp \
+         action_die.cpp action_follow.cpp action_move.cpp action_patrol.cpp \
+         action_repair.cpp action_research.cpp action_resource.cpp \
+         action_returngoods.cpp action_spellcast.cpp action_stand.cpp \
+         action_still.cpp action_train.cpp action_unload.cpp action_upgradeto.cpp \
+         actions.cpp command.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
