@@ -26,7 +26,7 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/map
-MSRC =   script_map.c script_tileset.c map.c map_draw.c map_fog.c \
-         map_radar.c map_save.c map_wall.c minimap.c tileset.c
+MSRC =   script_map.cpp script_tileset.cpp map.cpp map_draw.cpp map_fog.cpp \
+         map_radar.cpp map_save.cpp map_wall.cpp minimap.cpp tileset.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))

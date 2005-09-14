@@ -26,6 +26,6 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/editor
-MSRC =   script_editor.c editloop.c editor.c edmap.c
+MSRC =   script_editor.cpp editloop.cpp editor.cpp edmap.cpp
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
