@@ -46,11 +46,8 @@
 #undef NOUSER
 #endif
 #define DrawIcon WinDrawIcon
-#define EndMenu WinEndMenu
 #include <windows.h>
-#undef EndMenu
 #undef DrawIcon
-#undef FindResource
 #endif
 
 #include "video.h"
@@ -2472,7 +2469,7 @@ static void PopMenu(void)
 /**
 **  End process menu
 */
-void EndMenu(void)
+void CloseMenu(void)
 {
 	CursorOn = CursorOnUnknown;
 	PopMenu();

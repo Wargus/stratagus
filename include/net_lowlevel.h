@@ -49,7 +49,6 @@
 
 #ifdef __MINGW32__
 #define DrawIcon WinDrawIcon
-#define EndMenu WinEndMenu
 #endif
 
 #include <winsock2.h>
@@ -60,9 +59,7 @@
 
 #ifdef __MINGW32__
 #undef DrawIcon
-#undef EndMenu
 #endif
-#undef FindResource
 
 // MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
 #define SIO_GET_INTERFACE_LIST 0x4004747F

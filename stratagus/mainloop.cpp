@@ -505,7 +505,7 @@ void GameMainLoop(void)
 
 	if (Callbacks == &MenuCallbacks) {
 		while (CurrentMenu) {
-			EndMenu();
+			CloseMenu();
 		}
 	}
 

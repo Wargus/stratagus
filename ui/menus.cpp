@@ -994,7 +994,7 @@ void InitMenuFuncHash(void)
 	HASHADD(ObjectivesMenu,"objectives-menu");
 	HASHADD(EndScenarioMenu,"end-scenario-menu");
 	HASHADD(GameMenuReturn,"game-menu-return");
-	HASHADD(EndMenu,"end-menu");
+	HASHADD(CloseMenu,"end-menu");
 
 // Victory, lost
 	HASHADD(GameMenuEnd,"game-menu-end");
@@ -1320,7 +1320,7 @@ static void PrgStartInit(Menu* menu)
 static void GameMenuReturn(void)
 {
 	while (CurrentMenu) {
-		EndMenu();
+		CloseMenu();
 	}
 	InterfaceState = IfaceStateNormal;
 	TheUI.StatusLine.Clear();
@@ -1405,7 +1405,7 @@ static void SaveGameOk(void)
 		if (access(TempPathBuf,F_OK)) {
 			SaveGame(TempPathBuf);
 			SetMessage("Saved game to: %s", TempPathBuf);
-			EndMenu();
+			CloseMenu();
 		} else {
 			ProcessMenu("menu-save-confirm", 0);
 		}
@@ -1561,7 +1561,7 @@ static void SaveConfirmOk(void)
 */
 static void SaveConfirmCancel(void)
 {
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -1610,7 +1610,7 @@ static void DeleteConfirmOk(void)
 	strcat(TempPathBuf, menu->Items[1].D.Input.buffer);
 	TempPathBuf[strlen(TempPathBuf) - 3] = '\0';
 	unlink(TempPathBuf);
-	EndMenu();
+	CloseMenu();
 
 	// Update list of files and clear input
 	SaveGameLBInit(&CurrentMenu->Items[2]);
@@ -1626,7 +1626,7 @@ static void DeleteConfirmOk(void)
 */
 static void DeleteConfirmCancel(void)
 {
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -2185,7 +2185,7 @@ static void DiplomacyOk(void)
 			++j;
 		}
 	}
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -2459,7 +2459,7 @@ static void SaveReplayOk(void)
 	fclose(fd);
 
 	free(buf);
-	EndMenu();
+	CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
@@ -2720,7 +2720,7 @@ static void StartCampaignFromMenu(int number)
 	GuiGameStarted = 1;
 
 	// FIXME: johns otherwise crash in UpdateDisplay -> DrawMinimapCursor
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -2780,7 +2780,7 @@ static void EnterNameCancel(void)
 
 	menu = CurrentMenu;
 	menu->Items[1].D.Input.nch = 0;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -2793,7 +2793,7 @@ static void EnterNameAction(Menuitem* mi, int key)
 	} else {
 		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
-			EndMenu();
+			CloseMenu();
 		}
 	}
 }
@@ -2804,7 +2804,7 @@ static void EnterNameAction(Menuitem* mi, int key)
 static void EnterServerIPCancel(void)
 {
 	CurrentMenu->Items[1].D.Input.nch = 0;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -2817,7 +2817,7 @@ static void EnterServerIPAction(Menuitem* mi, int key)
 	} else {
 		mi[1].Flags &= ~MI_FLAGS_DISABLED;
 		if (key == 10 || key == 13) {
-			EndMenu();
+			CloseMenu();
 		}
 	}
 }
@@ -2890,7 +2890,7 @@ static void JoinNetGameMenu(void)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -2924,7 +2924,7 @@ static void NetConnectingCancel(void)
 	NetworkExitClientConnect();
 	// Trigger TerminateNetConnect() to call us again and end the menu
 	NetLocalState = ccs_usercanceled;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -3253,7 +3253,7 @@ static void ScenSelectOk(void)
 			strcat(CurrentMapPath, "/");
 		}
 		strcat(CurrentMapPath, ScenSelectFileName);
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -3278,7 +3278,7 @@ static void ScenSelectCancel(void)
 		*s = '\0';
 	}
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -3286,7 +3286,7 @@ static void ScenSelectCancel(void)
 */
 static void GameCancel(void)
 {
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -3316,7 +3316,7 @@ static void CustomGameStart(void)
 	GameIntro.Objectives[0] = strdup(DefaultObjective);
 
 	GuiGameStarted = 1;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4178,7 +4178,7 @@ static void StartEditor(void)
 	SetupEditor();
 
 	EditorRunning = EditorStarted;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4223,7 +4223,7 @@ static void EditorSelectCancel(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4267,7 +4267,7 @@ static void EditorNewMap(void)
 	*CurrentMapPath = '\0';
 
 	GuiGameStarted = 1;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4347,7 +4347,7 @@ static void EditorNewOk(void)
 		sprintf(tilemodel, "%s/scripts/tilesets/%s.lua", StratagusLibPath,
 				menu->Items[7].D.Pulldown.options[menu->Items[7].D.Pulldown.curopt]);
 		LuaLoadFile(tilemodel);
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -4357,7 +4357,7 @@ static void EditorNewOk(void)
 static void EditorNewCancel(void)
 {
 	EditorCancelled = 1;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4390,7 +4390,7 @@ static void EditorMainLoadMap(void)
 	}
 	
 	GuiGameStarted = 1;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4428,7 +4428,7 @@ static void EditorMainLoadOk(void)
 		strcat(ScenSelectDisplayPath, ScenSelectPathName);
 		EditorMainLoadLBInit(mi);
 	} else if (ScenSelectFileName[0]) {
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -4463,7 +4463,7 @@ static void EditorMainLoadCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4504,7 +4504,7 @@ void EditorLoadMenu(void)
 
 	EditorMapLoaded = 1;
 	EditorRunning = EditorNotRunning;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -4526,7 +4526,7 @@ static void EditorLoadOk(void)
 		strcat(ScenSelectDisplayPath, ScenSelectPathName);
 		EditorMainLoadLBInit(mi);
 	} else if (ScenSelectFileName[0]) {
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -5073,7 +5073,7 @@ static void EditorQuitToMenu(void)
 {
 	QuitToMenu = 1;
 	EditorRunning = EditorNotRunning;
-	EndMenu();
+	CloseMenu();
 	SelectedFileExist = 0;
 	ScenSelectFileName[0] = '\0';
 	ScenSelectPathName[0] = '\0';
@@ -5194,7 +5194,7 @@ static void ReplayGameOk(void)
 		GameIntro.Objectives[0] = strdup(DefaultObjective);
 
 		GuiGameStarted = 1;
-		EndMenu();
+		CloseMenu();
 
 		if (menu->Items[6].D.Checkbox.Checked) {
 			ReplayRevealMap = 1;
@@ -5233,7 +5233,7 @@ static void ReplayGameCancel(void)
 
 	DebugPrint("Start path: %s\n" _C_ ScenSelectPath);
 
-	EndMenu();
+	CloseMenu();
 }
 
 /**
@@ -5366,7 +5366,7 @@ void InitMenuData(void)
 */
 static void MultiGameMasterReport(void)
 {
-// EndMenu();
+// CloseMenu();
 
 	ProcessMenu("metaserver-list", 1);
 	if (GuiGameStarted) {
@@ -5381,7 +5381,7 @@ static void MultiGameMasterReport(void)
 */
 static void ShowMetaServerList(void)
 {
-	EndMenu();
+	CloseMenu();
 
 	GuiGameStarted = 0;
 	ProcessMenu("metaserver-list", 1);
@@ -5504,8 +5504,8 @@ static void MultiMetaServerGameSetupExit(Menu* menu)
 			menu->Items[i + j].D.Text.text = NULL;
 		}
 	}
-// EndMenu();
-// EndMenu();
+// CloseMenu();
+// CloseMenu();
 }
 
 /**
@@ -5520,7 +5520,7 @@ static void SelectGameServer(Menuitem* mi)
 
 	j = mi - mi->Menu->Items;
 	mi->Menu->Items[j].D.Checkbox.Checked = 0;
-	EndMenu();
+	CloseMenu();
 
 	tmp = EvalString(mi->Menu->Items[j - 4].D.Text.text);
 	strcpy(server_host_buffer, tmp);
@@ -5554,7 +5554,7 @@ static void SelectGameServer(Menuitem* mi)
 	ProcessMenu("menu-net-connecting", 1);
 
 	if (GuiGameStarted) {
-		EndMenu();
+		CloseMenu();
 	}
 }
 
@@ -5617,7 +5617,7 @@ static void MultiMetaServerClose(void)
 {
 	MetaClose();
 	MetaServerInUse = 0;
-	EndMenu();
+	CloseMenu();
 }
 
 /**
