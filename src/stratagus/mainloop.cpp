@@ -305,7 +305,7 @@ void UpdateDisplay(void)
 				TheUI.SelectedViewport->MapY);
 
 			DrawInfoPanel();
-			DrawButtonPanel();
+			TheUI.ButtonPanel.Draw();
 			DrawResources();
 			DrawStatusLine();
 		}

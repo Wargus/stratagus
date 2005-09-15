@@ -301,6 +301,22 @@ extern int NbAllPanels;       /// Number of panel
 extern InfoPanel* AllPanels;  /// Array of panels.
 
 
+class CButtonPanel
+{
+public:
+	void Draw();
+	void Update();
+	void DoClicked(int button);
+	int DoKey(int key);
+
+	Graphic *G;
+	int X;
+	int Y;
+	Button *Buttons;
+	int NumButtons;
+	SDL_Color AutoCastBorderColorRGB;
+};
+
 /**
 **  Defines the user interface.
 */
@@ -380,12 +396,7 @@ typedef struct _ui_ {
 	int       CompletedBarShadow;       /// should complete bar have shadow
 
 	// Button panel
-	Graphic*      ButtonPanelG;         /// Button panel background
-	int           ButtonPanelX;         /// Button panel screen X position
-	int           ButtonPanelY;         /// Button panel screen Y position
-	Button*       ButtonButtons;        /// Button panel buttons
-	int           NumButtonButtons;     /// Number of button panel buttons
-	SDL_Color     ButtonAutoCastBorderColorRGB; /// Auto cast border color
+	CButtonPanel  ButtonPanel;
 
 	// Pie Menu
 	Graphic* PieMenuBackgroundG;        /// Optional background image for the piemenu

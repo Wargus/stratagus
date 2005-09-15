@@ -50,6 +50,7 @@
 #include "sound.h"
 #include "ai.h"
 #include "interface.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -208,7 +209,7 @@ void HandleActionTrain(Unit* unit)
 			}
 
 			if (IsOnlySelected(unit)) {
-				UpdateButtonPanel();
+				TheUI.ButtonPanel.Update();
 			}
 			return;
 		} else {
