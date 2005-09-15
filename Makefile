@@ -71,7 +71,7 @@ make-objdir:
 	if [ ! -d $$i/$(OBJDIR) ]; then mkdir $$i/$(OBJDIR); fi; done
 
 %.o: $(@D)../%.cpp
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
 
 help:
 	@-echo "make cycle			clean,depend,tags,all"
@@ -119,12 +119,12 @@ all-src: make-objdir $(OBJ)
 
 # UNIX-TARGET
 stratagus: $(OBJ) 
-	$(CCLD) -o stratagus $^ $(STRATAGUS_LIBS)
+	$(CXX) -o stratagus $^ $(STRATAGUS_LIBS)
 
 # WIN32-TARGET
 stratagus.exe:	$(OBJ) \
 	    src/$(OBJDIR)/stratagusrc.$(OE)
-	$(CCLD) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS)
+	$(CXX) -o stratagus$(EXE) $^ -lSDLmain $(STRATAGUS_LIBS)
 
 strip:
 	@if [ -f stratagus ]; then strip stratagus; fi
@@ -134,7 +134,7 @@ src/metaserver/$(OBJDIR):
 	mkdir $@
 
 metaserver: src/metaserver/$(OBJDIR) $(METASERVER_OBJ)
-	$(CCLD) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS) -lsqlite3
+	$(CXX) -o $@ $(METASERVER_OBJ) $(STRATAGUS_LIBS) -lsqlite3
 
 src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
@@ -182,7 +182,7 @@ depend:
 	@echo
 	@for i in $(SRC) ; do\
 	echo -e "\rMaking dependencies for $$i";\
-	$(CC) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'`\
+	$(CXX) -MT `dirname $$i`/$(OBJDIR)/`basename $$i | sed 's/\.cpp/\.o/g'`\
 	-MM $(CFLAGS) $$i >>.depend; done
 	@echo
 

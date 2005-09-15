@@ -2,6 +2,7 @@
 AC_INIT(configure.in)
 AC_PREREQ([2.50])
 
+AC_PROG_CXX
 AM_CONFIG_HEADER(config.h)
 
 AC_CHECK_FUNCS(strcasestr)
