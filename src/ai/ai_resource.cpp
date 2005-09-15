@@ -798,7 +798,7 @@ static int AiAssignHarvester(Unit* unit, int resource)
 		//
 		// Find a resource to harvest from.
 		//
-		if ((dest = FindResource(unit, unit->X, unit->Y, 1000, resource))) {
+		if ((dest = UnitFindResource(unit, unit->X, unit->Y, 1000, resource))) {
 			CommandResource(unit, dest, FlushCommands);
 			return 1;
 		}

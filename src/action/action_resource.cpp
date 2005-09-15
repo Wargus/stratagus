@@ -182,7 +182,7 @@ static int StartGathering(Unit* unit)
 		RefsDecrease(goal);
 		// Find an alternative, but don't look too far.
 		unit->Orders[0].X = unit->Orders[0].Y = -1;
-		if ((goal = FindResource(unit, unit->X, unit->Y, 10, unit->CurrentResource))) {
+		if ((goal = UnitFindResource(unit, unit->X, unit->Y, 10, unit->CurrentResource))) {
 			unit->SubAction = SUB_START_RESOURCE;
 			unit->Orders[0].Goal = goal;
 			RefsIncrease(goal);
@@ -305,7 +305,7 @@ static void LoseResource(Unit* unit, const Unit* source)
 			source->Type->TileHeight);
 	}
 	unit->Orders[0].X = unit->Orders[0].Y = -1;
-	if ((unit->Orders[0].Goal = FindResource(unit, unit->X, unit->Y,
+	if ((unit->Orders[0].Goal = UnitFindResource(unit, unit->X, unit->Y,
 			10, unit->CurrentResource))) {
 		DebugPrint("Unit %d found another resource.\n" _C_ unit->Slot);
 		unit->SubAction = SUB_START_RESOURCE;
@@ -654,7 +654,7 @@ static int WaitInDepot(Unit* unit)
 			unit->SubAction = 0;
 		}
 	} else {
-		if ((goal = FindResource(unit, x, y, 10, unit->CurrentResource))) {
+		if ((goal = UnitFindResource(unit, x, y, 10, unit->CurrentResource))) {
 			DropOutNearest(unit, goal->X + goal->Type->TileWidth / 2,
 				goal->Y + goal->Type->TileHeight / 2,
 				depot->Type->TileWidth, depot->Type->TileHeight);
