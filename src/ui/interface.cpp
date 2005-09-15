@@ -530,8 +530,8 @@ static void UiRecallMapPosition(unsigned position)
 */
 static void UiToggleTerrain(void)
 {
-	Minimap::WithTerrain ^= 1;
-	if (Minimap::WithTerrain) {
+	TheUI.Minimap.WithTerrain ^= 1;
+	if (TheUI.Minimap.WithTerrain) {
 		TheUI.StatusLine.Set("Terrain displayed.");
 	} else {
 		TheUI.StatusLine.Set("Terrain hidden.");

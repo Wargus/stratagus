@@ -43,7 +43,7 @@
 #include "editor.h"
 #include "map.h"
 #include "tileset.h"
-#include "minimap.h"
+#include "ui.h"
 #include "player.h"
 #include "unit.h"
 #include "unittype.h"
@@ -456,8 +456,8 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 
 	mf->Flags |= TheMap.Tileset.FlagsTable[tile];
 
-	Minimap::UpdateSeenXY(x, y);
-	Minimap::UpdateXY(x, y);
+	TheUI.Minimap.UpdateSeenXY(x, y);
+	TheUI.Minimap.UpdateXY(x, y);
 
 	EditorTileChanged2(x, y, d);
 }

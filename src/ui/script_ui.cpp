@@ -1048,16 +1048,18 @@ static int CclDefineUI(lua_State* l)
 	ui->MouseWarpX = -1;
 	ui->MouseWarpY = -1;
 
-	ui->InfoPanelX = -1;
-	ui->InfoPanelY = -1;
+	ui->InfoPanel.X = -1;
+	ui->InfoPanel.Y = -1;
 
 	ui->ButtonPanel.X = -1;
 	ui->ButtonPanel.Y = -1;
 
-	ui->MinimapTransparent = 0;
+	ui->Minimap.Transparent = 0;
+	ui->Minimap.WithTerrain = 1;
+	ui->Minimap.ShowSelected = 1;
 
-	ui->MinimapPosX = -1;
-	ui->MinimapPosY = -1;
+	ui->Minimap.X = -1;
+	ui->Minimap.Y = -1;
 	for (i = 0; i < MaxCosts + 2; ++i) {
 		ui->Resources[i].TextX = -1;
 	}
@@ -1222,10 +1224,10 @@ static int CclDefineUI(lua_State* l)
 								LuaError(l, "incorrect argument");
 							}
 							lua_rawgeti(l, -1, 1);
-							ui->InfoPanelX = LuaToNumber(l, -1);
+							ui->InfoPanel.X = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_rawgeti(l, -1, 2);
-							ui->InfoPanelY = LuaToNumber(l, -1);
+							ui->InfoPanel.Y = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "size")) {
@@ -1245,7 +1247,7 @@ static int CclDefineUI(lua_State* l)
 						}
 					}
 					if (file) {
-						ui->InfoPanelG = NewGraphic(file, w, h);
+						ui->InfoPanel.G = NewGraphic(file, w, h);
 						free(file);
 					}
 					lua_pop(l, 1);
@@ -1546,23 +1548,23 @@ static int CclDefineUI(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->MinimapPosX = LuaToNumber(l, -1);
+					ui->Minimap.X = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->MinimapPosY = LuaToNumber(l, -1);
+					ui->Minimap.Y = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "Size")) {
 					if (!lua_istable(l, -1) || luaL_getn(l, -1) != 2) {
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->MinimapW = LuaToNumber(l, -1);
+					ui->Minimap.W = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->MinimapH = LuaToNumber(l, -1);
+					ui->Minimap.H = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "Transparent")) {
-					ui->MinimapTransparent = LuaToBoolean(l, -1);
+					ui->Minimap.Transparent = LuaToBoolean(l, -1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}

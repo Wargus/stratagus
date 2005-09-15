@@ -300,11 +300,11 @@ void UpdateDisplay(void)
 			}
 			DrawMenuButtonArea();
 
-			Minimap::Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-			Minimap::DrawCursor(TheUI.SelectedViewport->MapX,
+			TheUI.Minimap.Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
+			TheUI.Minimap.DrawCursor(TheUI.SelectedViewport->MapX,
 				TheUI.SelectedViewport->MapY);
 
-			DrawInfoPanel();
+			TheUI.InfoPanel.Draw();
 			TheUI.ButtonPanel.Draw();
 			DrawResources();
 			TheUI.StatusLine.Draw();
@@ -415,7 +415,7 @@ void GameMainLoop(void)
 				case 2:
 					break;
 				case 3: // minimap update
-					Minimap::Update();
+					TheUI.Minimap.Update();
 					break;
 				case 4:
 					break;

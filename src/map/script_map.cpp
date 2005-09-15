@@ -343,7 +343,7 @@ static int CclSetFogOfWar(lua_State* l)
 static int CclSetMinimapTerrain(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	Minimap::WithTerrain = LuaToBoolean(l, 1);
+	TheUI.Minimap.WithTerrain = LuaToBoolean(l, 1);
 	return 0;
 }
 
