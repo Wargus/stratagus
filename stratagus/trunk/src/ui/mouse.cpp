@@ -30,8 +30,8 @@
 
 //@{
 
-#define ICON_SIZE_X (TheUI.ButtonButtons[0].Style->Width)
-#define ICON_SIZE_Y (TheUI.ButtonButtons[0].Style->Height)
+#define ICON_SIZE_X (TheUI.ButtonPanel.Buttons[0].Style->Width)
+#define ICON_SIZE_Y (TheUI.ButtonPanel.Buttons[0].Style->Height)
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -93,7 +93,7 @@ void CancelBuildingMode(void)
 	ClearStatusLine();
 	ClearCosts();
 	CurrentButtonLevel = 0;
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 }
 
 /**
@@ -508,8 +508,8 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
-		if (OnButton(x, y, &TheUI.ButtonButtons[i])) {
+	for (i = 0; i < TheUI.ButtonPanel.NumButtons; ++i) {
+		if (OnButton(x, y, &TheUI.ButtonPanel.Buttons[i])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
 				ButtonUnderCursor = i;
@@ -1227,7 +1227,7 @@ static void SendCommand(int sx, int sy)
 
 	ret = 0;
 	CurrentButtonLevel = 0;
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 	switch (CursorAction) {
 		case ButtonMove:
 			ret = SendMove(sx, sy);
@@ -1343,7 +1343,7 @@ static void UISelectStateButtonDown(unsigned button)
 		CursorState = CursorStatePoint;
 		GameCursor = TheUI.Point.Cursor;
 		CurrentButtonLevel = 0;
-		UpdateButtonPanel();
+		TheUI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
 			const Viewport* vp;
@@ -1382,7 +1382,7 @@ static void UISelectStateButtonDown(unsigned button)
 			CursorState = CursorStatePoint;
 			GameCursor = TheUI.Point.Cursor;
 			CurrentButtonLevel = 0;
-			UpdateButtonPanel();
+			TheUI.ButtonPanel.Update();
 			if (ClickMissile) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					sx + TileSizeX / 2, sy + TileSizeY / 2, 0, 0);
@@ -1397,7 +1397,7 @@ static void UISelectStateButtonDown(unsigned button)
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			DoButtonButtonClicked(ButtonUnderCursor);
+			TheUI.ButtonPanel.DoClicked(ButtonUnderCursor);
 			return;
 		}
 	}
@@ -1407,7 +1407,7 @@ static void UISelectStateButtonDown(unsigned button)
 	CursorState = CursorStatePoint;
 	GameCursor = TheUI.Point.Cursor;
 	CurrentButtonLevel = 0;
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 }
 
 
@@ -1705,7 +1705,7 @@ void UIHandleButtonDown(unsigned button)
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
-					DoButtonButtonClicked(ButtonUnderCursor);
+					TheUI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				}
 			}
 		} else if ((MouseButtons & MiddleButton)) {
@@ -1996,7 +1996,7 @@ void DrawPieMenu(void)
 	}
 	player = Selected[0]->Player;
 
-	for (i = 0; i < TheUI.NumButtonButtons && i < 8; ++i) {
+	for (i = 0; i < TheUI.ButtonPanel.NumButtons && i < 8; ++i) {
 		if (buttons[i].Pos != -1) {
 			int x;
 			int y;
@@ -2042,7 +2042,7 @@ static void HandlePieMenuMouseSelection(void)
 
 	pie = GetPieUnderCursor();
 	if (pie != -1) {
-		DoButtonButtonClicked(pie);
+		TheUI.ButtonPanel.DoClicked(pie);
 		if (CurrentButtons[pie].Action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor

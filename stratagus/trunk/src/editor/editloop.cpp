@@ -353,13 +353,13 @@ static int CalculateUnitIcons(void)
 
 	i = 0;
 	count = 0;
-	x = TheUI.ButtonPanelY + 24;
-	while (x < TheUI.ButtonPanelY + TheUI.ButtonPanelG->Height - IconHeight) {
+	x = TheUI.ButtonPanel.Y + 24;
+	while (x < TheUI.ButtonPanel.Y + TheUI.ButtonPanel.G->Height - IconHeight) {
 		++i;
 		x += IconHeight + 2;
 	}
-	x = TheUI.ButtonPanelX + 10;
-	while (x < TheUI.ButtonPanelX + TheUI.ButtonPanelG->Width - IconWidth) {
+	x = TheUI.ButtonPanel.X + 10;
+	while (x < TheUI.ButtonPanel.X + TheUI.ButtonPanel.G->Width - IconWidth) {
 		count += i;
 		x += IconWidth + 8;
 	}
@@ -491,14 +491,14 @@ static void DrawTileIcons(void)
 	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (TileToolDecoration ? 2 : 0), x + 40, y - 3);
 	y += 20;
 
-	y = TheUI.ButtonPanelY + 4;
+	y = TheUI.ButtonPanel.Y + 4;
 	i = 0;
 
-	while (y < TheUI.ButtonPanelY + 100) {
-		x = TheUI.ButtonPanelX + 4;
-		while (x < TheUI.ButtonPanelX + 144) {
+	while (y < TheUI.ButtonPanel.Y + 100) {
+		x = TheUI.ButtonPanel.X + 4;
+		while (x < TheUI.ButtonPanel.X + 144) {
 			if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
-				y = TheUI.ButtonPanelY + 100;
+				y = TheUI.ButtonPanel.Y + 100;
 				break;
 			}
 			TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[0x10 + i * 16], x, y);
@@ -624,27 +624,27 @@ static void DrawUnitIcons(void)
 	//
 	// Scroll bar for units. FIXME: drag not supported.
 	//
-	x = TheUI.ButtonPanelX + 4;
-	y = TheUI.ButtonPanelY + 4;
+	x = TheUI.ButtonPanel.X + 4;
+	y = TheUI.ButtonPanel.Y + 4;
 	j = 176 - 8;
 
 	PushClipping();
 	SetClipping(0, 0, x + j - 20, VideoHeight - 1);
 	MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
 	PopClipping();
-	if (TheUI.ButtonPanelX + 4 < CursorX
-			&& CursorX < TheUI.ButtonPanelX + 24
-			&& TheUI.ButtonPanelY + 4 < CursorY
-			&& CursorY < TheUI.ButtonPanelY + 24
+	if (TheUI.ButtonPanel.X + 4 < CursorX
+			&& CursorX < TheUI.ButtonPanel.X + 24
+			&& TheUI.ButtonPanel.Y + 4 < CursorY
+			&& CursorY < TheUI.ButtonPanel.Y + 24
 			&& MouseButtons & LeftButton) {
 		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW + 1, x - 2, y);
 	} else {
 		MenuButtonG->DrawFrame(MBUTTON_LEFT_ARROW, x - 2, y);
 	}
-	if (TheUI.ButtonPanelX + 176 - 24 < CursorX
-			&& CursorX < TheUI.ButtonPanelX + 176 - 4
-			&& TheUI.ButtonPanelY + 4 < CursorY
-			&& CursorY < TheUI.ButtonPanelY + 24
+	if (TheUI.ButtonPanel.X + 176 - 24 < CursorX
+			&& CursorX < TheUI.ButtonPanel.X + 176 - 4
+			&& TheUI.ButtonPanel.Y + 4 < CursorY
+			&& CursorY < TheUI.ButtonPanel.Y + 24
 			&& MouseButtons & LeftButton) {
 		MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW + 1, x + j - 20, y);
 	} else {
@@ -658,15 +658,15 @@ static void DrawUnitIcons(void)
 	//
 	//  Draw the unit icons.
 	//
-	y = TheUI.ButtonPanelY + 24;
+	y = TheUI.ButtonPanel.Y + 24;
 	i = UnitIndex;
-	while (y < TheUI.ButtonPanelY + TheUI.ButtonPanelG->Height
+	while (y < TheUI.ButtonPanel.Y + TheUI.ButtonPanel.G->Height
 			- IconHeight) {
 		if (i >= MaxShownUnits) {
 			break;
 		}
-		x = TheUI.ButtonPanelX + 10;
-		while (x < TheUI.ButtonPanelX + TheUI.ButtonPanelG->Width
+		x = TheUI.ButtonPanel.X + 10;
+		while (x < TheUI.ButtonPanel.X + TheUI.ButtonPanel.G->Width
 				- IconWidth) {
 			if (i >= MaxShownUnits) {
 				break;
@@ -1062,11 +1062,11 @@ void EditorUpdateDisplay(void)
 	//
 	// Button panel
 	//
-	if (TheUI.ButtonPanelG) {
-		TheUI.ButtonPanelG->DrawSub(0, 0,
-			TheUI.ButtonPanelG->Width,
-			TheUI.ButtonPanelG->Height, TheUI.ButtonPanelX,
-			TheUI.ButtonPanelY);
+	if (TheUI.ButtonPanel.G) {
+		TheUI.ButtonPanel.G->DrawSub(0, 0,
+			TheUI.ButtonPanel.G->Width,
+			TheUI.ButtonPanel.G->Height, TheUI.ButtonPanel.X,
+			TheUI.ButtonPanel.Y);
 	}
 	DrawEditorPanel();
 
@@ -1222,10 +1222,10 @@ static void EditorCallbackButtonDown(unsigned button)
 		count = CalculateUnitIcons();
 
 		// Unit icons scroll left area
-		if (TheUI.ButtonPanelX + 4 < CursorX &&
-				CursorX < TheUI.ButtonPanelX + 4 + 18 + j &&
-				TheUI.ButtonPanelY + 4 < CursorY &&
-				CursorY < TheUI.ButtonPanelY + 24) {
+		if (TheUI.ButtonPanel.X + 4 < CursorX &&
+				CursorX < TheUI.ButtonPanel.X + 4 + 18 + j &&
+				TheUI.ButtonPanel.Y + 4 < CursorY &&
+				CursorY < TheUI.ButtonPanel.Y + 24) {
 			if (UnitIndex - count >= 0) {
 				UnitIndex -= count;
 			} else {
@@ -1234,10 +1234,10 @@ static void EditorCallbackButtonDown(unsigned button)
 			return;
 		}
 		// Unit icons scroll right area
-		if (TheUI.ButtonPanelX + 4 + 18 + j + 18 < CursorX &&
-				CursorX < TheUI.ButtonPanelX + 176 - 4 &&
-				TheUI.ButtonPanelY + 4 < CursorY &&
-				CursorY < TheUI.ButtonPanelY + 24) {
+		if (TheUI.ButtonPanel.X + 4 + 18 + j + 18 < CursorX &&
+				CursorX < TheUI.ButtonPanel.X + 176 - 4 &&
+				TheUI.ButtonPanel.Y + 4 < CursorY &&
+				CursorY < TheUI.ButtonPanel.Y + 24) {
 			if (UnitIndex + count <= MaxShownUnits) {
 				UnitIndex += count;
 			}
@@ -1685,10 +1685,10 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (EditorState == EditorEditUnit || EditorState == EditorSetStartLocation) {
 		// Scrollbar
-		if (TheUI.ButtonPanelX + 4 < CursorX
-				&& CursorX < TheUI.ButtonPanelX + 176 - 4
-				&& TheUI.ButtonPanelY + 4 < CursorY
-				&& CursorY < TheUI.ButtonPanelY + 24) {
+		if (TheUI.ButtonPanel.X + 4 < CursorX
+				&& CursorX < TheUI.ButtonPanel.X + 176 - 4
+				&& TheUI.ButtonPanel.Y + 4 < CursorY
+				&& CursorY < TheUI.ButtonPanel.Y + 24) {
 			return;
 		}
 		bx = TheUI.InfoPanelX + 8;
@@ -1716,14 +1716,14 @@ static void EditorCallbackMouse(int x, int y)
 		}
 
 		i = UnitIndex;
-		by = TheUI.ButtonPanelY + 24;
-		while (by < TheUI.ButtonPanelY +
-				TheUI.ButtonPanelG->Height - IconHeight) {
+		by = TheUI.ButtonPanel.Y + 24;
+		while (by < TheUI.ButtonPanel.Y +
+				TheUI.ButtonPanel.G->Height - IconHeight) {
 			if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 				break;
 			}
-			bx = TheUI.ButtonPanelX + 10;
-			while (bx < TheUI.ButtonPanelX + 146) {
+			bx = TheUI.ButtonPanel.X + 10;
+			while (bx < TheUI.ButtonPanel.X + 146) {
 				if (i >= MaxShownUnits || !ShownUnitTypes[i]) {
 					break;
 				}
@@ -1766,12 +1766,12 @@ static void EditorCallbackMouse(int x, int y)
 		}
 
 		i = 0;
-		by = TheUI.ButtonPanelY + 4;
-		while (by < TheUI.ButtonPanelY + 100) {
-			bx = TheUI.ButtonPanelX + 4;
-			while (bx < TheUI.ButtonPanelX + 144) {
+		by = TheUI.ButtonPanel.Y + 4;
+		while (by < TheUI.ButtonPanel.Y + 100) {
+			bx = TheUI.ButtonPanel.X + 4;
+			while (bx < TheUI.ButtonPanel.X + 144) {
 				if (!TheMap.Tileset.Tiles[0x10 + i * 16].BaseTerrain) {
-					by = TheUI.ButtonPanelY + 100;
+					by = TheUI.ButtonPanel.Y + 100;
 					break;
 				}
 				if (bx < x && x < bx + TileSizeX &&
