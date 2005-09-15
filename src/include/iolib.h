@@ -38,7 +38,6 @@
 ----------------------------------------------------------------------------*/
 
 #define DrawIcon WinDrawIcon
-#define EndMenu WinEndMenu
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
@@ -47,8 +46,6 @@
 #include <bzlib.h>
 #endif
 #undef DrawIcon
-#undef EndMenu
-#undef FindResource
 
 /*----------------------------------------------------------------------------
 --  Definitons

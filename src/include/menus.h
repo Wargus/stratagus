@@ -346,7 +346,7 @@ extern void MenusSetBackground(void);
 	/// Draw and process a menu
 extern void ProcessMenu(const char* menu_id, int loop);
 	/// End the current menu
-extern void EndMenu(void);
+extern void CloseMenu(void);
 	/// Find a menu by id
 extern Menu* FindMenu(const char* menu_id);
 
