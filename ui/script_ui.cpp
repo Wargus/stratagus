@@ -946,11 +946,11 @@ static void CclParseButtonIcons(lua_State* l, UI* ui)
 {
 	int i;
 
-	ui->NumButtonButtons = luaL_getn(l, -1);
-	ui->ButtonButtons = (Button*)calloc(ui->NumButtonButtons, sizeof(Button));
-	for (i = 0; i < ui->NumButtonButtons; ++i) {
+	ui->ButtonPanel.NumButtons = luaL_getn(l, -1);
+	ui->ButtonPanel.Buttons = (Button*)calloc(ui->ButtonPanel.NumButtons, sizeof(Button));
+	for (i = 0; i < ui->ButtonPanel.NumButtons; ++i) {
 		lua_rawgeti(l, -1, i + 1);
-		CclParseIcon(l, &ui->ButtonButtons[i]);
+		CclParseIcon(l, &ui->ButtonPanel.Buttons[i]);
 		lua_pop(l, 1);
 	}
 }
@@ -1051,8 +1051,8 @@ static int CclDefineUI(lua_State* l)
 	ui->InfoPanelX = -1;
 	ui->InfoPanelY = -1;
 
-	ui->ButtonPanelX = -1;
-	ui->ButtonPanelY = -1;
+	ui->ButtonPanel.X = -1;
+	ui->ButtonPanel.Y = -1;
 
 	ui->MinimapTransparent = 0;
 
@@ -1347,7 +1347,7 @@ static int CclDefineUI(lua_State* l)
 						++subk;
 						if (!strcmp(value, "file")) {
 							lua_rawgeti(l, -1, subk + 1);
-							ui->ButtonPanelG = NewGraphic(LuaToString(l, -1), 0, 0);
+							ui->ButtonPanel.G = NewGraphic(LuaToString(l, -1), 0, 0);
 							lua_pop(l, 1);
 						} else if (!strcmp(value, "pos")) {
 							lua_rawgeti(l, -1, subk + 1);
@@ -1355,10 +1355,10 @@ static int CclDefineUI(lua_State* l)
 								LuaError(l, "incorrect argument");
 							}
 							lua_rawgeti(l, -1, 1);
-							ui->ButtonPanelX = LuaToNumber(l, -1);
+							ui->ButtonPanel.X = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_rawgeti(l, -1, 2);
-							ui->ButtonPanelY = LuaToNumber(l, -1);
+							ui->ButtonPanel.Y = LuaToNumber(l, -1);
 							lua_pop(l, 1);
 							lua_pop(l, 1);
 						} else {
@@ -1379,13 +1379,13 @@ static int CclDefineUI(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->ButtonAutoCastBorderColorRGB.r = LuaToNumber(l, -1);
+					ui->ButtonPanel.AutoCastBorderColorRGB.r = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->ButtonAutoCastBorderColorRGB.g = LuaToNumber(l, -1);
+					ui->ButtonPanel.AutoCastBorderColorRGB.g = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 3);
-					ui->ButtonAutoCastBorderColorRGB.b = LuaToNumber(l, -1);
+					ui->ButtonPanel.AutoCastBorderColorRGB.b = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_pop(l, 1);
 				} else {
@@ -2203,7 +2203,7 @@ static int CclSetShowCommandKey(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
 	ShowCommandKey = LuaToBoolean(l, 1);
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 	return 0;
 }
 
@@ -4134,11 +4134,11 @@ void SelectionChanged(void)
 	ClearStatusLine();
 	ClearCosts();
 	CurrentButtonLevel = 0;
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 	GameCursor = TheUI.Point.Cursor;
 	CursorBuilding = NULL;
 	CursorState = CursorStatePoint;
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 }
 
 /**
@@ -4146,7 +4146,7 @@ void SelectionChanged(void)
 */
 void SelectedUnitChanged(void)
 {
-	UpdateButtonPanel();
+	TheUI.ButtonPanel.Update();
 }
 
 /**

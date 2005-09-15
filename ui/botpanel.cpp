@@ -72,11 +72,11 @@ char ShowCommandKey;
 	/// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 	/// All buttons for units
-static ButtonAction* UnitButtonTable[MAX_BUTTONS];
+static ButtonAction *UnitButtonTable[MAX_BUTTONS];
 	/// buttons in UnitButtonTable
 static int NumUnitButtons;
 
-ButtonAction* CurrentButtons;             /// Pointer to current buttons
+ButtonAction *CurrentButtons;             /// Pointer to current buttons
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -87,12 +87,8 @@ ButtonAction* CurrentButtons;             /// Pointer to current buttons
 */
 void InitButtons(void)
 {
-	int z;
-
-	//
-	//  Resolve the icon names.
-	//
-	for (z = 0; z < NumUnitButtons; ++z) {
+	// Resolve the icon names.
+	for (int z = 0; z < NumUnitButtons; ++z) {
 		UnitButtonTable[z]->Icon.Icon =
 			IconByIdent(UnitButtonTable[z]->Icon.Name);
 	}
@@ -106,14 +102,14 @@ void InitButtons(void)
 /**
 **  FIXME: docu
 */
-int AddButton(int pos, int level, const char* icon_ident,
-	enum _button_cmd_ action, const char* value, const ButtonCheckFunc func,
-	const char* allow, int key, const char* hint, const char* umask)
+int AddButton(int pos, int level, const char *icon_ident,
+	enum _button_cmd_ action, const char *value, const ButtonCheckFunc func,
+	const char *allow, int key, const char *hint, const char *umask)
 {
 	char buf[2048];
 	ButtonAction* ba;
 
-	ba = (ButtonAction*)malloc(sizeof(ButtonAction));
+	ba = (ButtonAction *)malloc(sizeof(ButtonAction));
 	Assert(ba);
 
 	ba->Pos = pos;
@@ -183,12 +179,8 @@ int AddButton(int pos, int level, const char* icon_ident,
 */
 void CleanButtons(void)
 {
-	int z;
-
-	//
-	//  Free the allocated buttons.
-	//
-	for (z = 0; z < NumUnitButtons; ++z) {
+	// Free the allocated buttons.
+	for (int z = 0; z < NumUnitButtons; ++z) {
 		Assert(UnitButtonTable[z]);
 		free(UnitButtonTable[z]->Icon.Name);
 		free(UnitButtonTable[z]->ValueStr);
@@ -217,9 +209,9 @@ void CleanButtons(void)
 */
 static int GetButtonStatus(const ButtonAction* button)
 {
-	int res;    // result value.
-	int action; // action done with button.
-	int i;      // Iterator
+	int res;
+	int action;
+	int i;
 
 	Assert(button);
 	Assert(NumSelected);
@@ -260,7 +252,7 @@ static int GetButtonStatus(const ButtonAction* button)
 	}
 	// Simple case.
 	if (action != UnitActionNone) {
-		for (i = 0; i < NumSelected; i++) {
+		for (i = 0; i < NumSelected; ++i) {
 			if (Selected[i]->Orders[0].Action != action) {
 				break;
 			}
@@ -273,7 +265,7 @@ static int GetButtonStatus(const ButtonAction* button)
 	// other cases : manage AutoCast and different possible action.
 	switch (button->Action) {
 		case ButtonMove:
-			for (i = 0; i < NumSelected; i++) {
+			for (i = 0; i < NumSelected; ++i) {
 				if (Selected[i]->Orders[0].Action != UnitActionMove &&
 						Selected[i]->Orders[0].Action != UnitActionBuild &&
 						Selected[i]->Orders[0].Action != UnitActionFollow) {
@@ -288,7 +280,7 @@ static int GetButtonStatus(const ButtonAction* button)
 			// FIXME : and IconSelected ?
 
 			// Autocast
-			for (i = 0; i < NumSelected; i++) {
+			for (i = 0; i < NumSelected; ++i) {
 				Assert(Selected[i]->AutoCastSpell);
 				if (Selected[i]->AutoCastSpell[button->Value] != 1) {
 					break;
@@ -299,7 +291,7 @@ static int GetButtonStatus(const ButtonAction* button)
 			}
 			break;
 		case ButtonRepair:
-			for (i = 0; i < NumSelected; i++) {
+			for (i = 0; i < NumSelected; ++i) {
 				if (Selected[i]->Orders[0].Action != UnitActionRepair) {
 					break;
 				}
@@ -308,7 +300,7 @@ static int GetButtonStatus(const ButtonAction* button)
 				res |= IconSelected;
 			}
 			// Auto repair
-			for (i = 0; i < NumSelected; i++) {
+			for (i = 0; i < NumSelected; ++i) {
 				if (Selected[i]->AutoRepair != 1) {
 					break;
 				}
@@ -317,7 +309,6 @@ static int GetButtonStatus(const ButtonAction* button)
 				res |= IconAutoCast;
 			}
 			break;
-		break;
 		// FIXME: must handle more actions
 		default:
 			break;
@@ -330,20 +321,19 @@ static int GetButtonStatus(const ButtonAction* button)
 **
 **  Draw all action buttons.
 */
-void DrawButtonPanel(void)
+void CButtonPanel::Draw(void)
 {
-	int i;                       // Iterator.
-	Player* player;              // Selected[0]->Player.
-	const ButtonAction* buttons; // button which are displayed (== CurrentButtons).
+	Player *player;
+	const ButtonAction* buttons;
 	char buf[8];
 
 	//
 	//  Draw background
 	//
-	if (TheUI.ButtonPanelG) {
-		TheUI.ButtonPanelG->DrawSubClip(0, 0,
-			TheUI.ButtonPanelG->Width, TheUI.ButtonPanelG->Height,
-			TheUI.ButtonPanelX, TheUI.ButtonPanelY);
+	if (TheUI.ButtonPanel.G) {
+		TheUI.ButtonPanel.G->DrawSubClip(0, 0,
+			TheUI.ButtonPanel.G->Width, TheUI.ButtonPanel.G->Height,
+			TheUI.ButtonPanel.X, TheUI.ButtonPanel.Y);
 	}
 
 	// No buttons
@@ -357,7 +347,7 @@ void DrawButtonPanel(void)
 	//
 	//  Draw all buttons.
 	//
-	for (i = 0; i < TheUI.NumButtonButtons; ++i) {
+	for (int i = 0; i < TheUI.ButtonPanel.NumButtons; ++i) {
 		if (buttons[i].Pos == -1) {
 			continue;
 		}
@@ -379,9 +369,9 @@ void DrawButtonPanel(void)
 		//
 		// Draw main Icon.
 		//
-		DrawUnitIcon(player, TheUI.ButtonButtons[i].Style, buttons[i].Icon.Icon,
+		DrawUnitIcon(player, TheUI.ButtonPanel.Buttons[i].Style, buttons[i].Icon.Icon,
 			GetButtonStatus(&buttons[i]),
-			TheUI.ButtonButtons[i].X, TheUI.ButtonButtons[i].Y, buf);
+			TheUI.ButtonPanel.Buttons[i].X, TheUI.ButtonPanel.Buttons[i].Y, buf);
 
 		//
 		//  Update status line for this button
@@ -398,10 +388,10 @@ void DrawButtonPanel(void)
 **
 **  @param button  Button
 */
-void UpdateStatusLineForButton(const ButtonAction* button)
+void UpdateStatusLineForButton(const ButtonAction *button)
 {
 	int v;  // button->Value.
-	const UnitStats* stats;
+	const UnitStats *stats;
 
 	Assert(button);
 	SetStatusLine(button->Hint);
@@ -442,10 +432,9 @@ void UpdateStatusLineForButton(const ButtonAction* button)
 **  @todo FIXME : better check. (dependancy, resource, ...)
 **  @todo FIXME : make difference with impossible and not yet researched.
 */
-static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
+static int IsButtonAllowed(const Unit *unit, const ButtonAction *buttonaction)
 {
-	int res;              // result.
-	const Player* player; // unit->Player.
+	int res;
 
 	Assert(unit);
 	Assert(buttonaction);
@@ -455,7 +444,6 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 	}
 
 	res = 0;
-	player = unit->Player;
 	// FIXME: we have to check and if these unit buttons are available
 	//    i.e. if button action is ButtonTrain for example check if
 	// required unit is not restricted etc...
@@ -506,13 +494,13 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(player, buttonaction->ValueStr);
+			res = CheckDependByIdent(unit->Player, buttonaction->ValueStr);
 			if (res && !strncmp(buttonaction->ValueStr, "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(player, buttonaction->ValueStr) == 'A';
+				res = UpgradeIdentAllowed(unit->Player, buttonaction->ValueStr) == 'A';
 			}
 			break;
 		case ButtonSpellCast:
-			res = SpellIsAvailable(player, buttonaction->Value);
+			res = SpellIsAvailable(unit->Player, buttonaction->Value);
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport && Selected[0]->BoardCount);
@@ -543,21 +531,21 @@ static int IsButtonAllowed(const Unit* unit, const ButtonAction* buttonaction)
 /**
 **  Update bottom panel for multiple units.
 **
-**  @return array of TheUI.NumButtonButtons buttons to show.
+**  @return array of TheUI.ButtonPanel.NumButtons buttons to show.
 **
 **  @todo FIXME : make UpdateButtonPanelMultipleUnits more configurable.
 **  @todo show all possible buttons or just same button...
 */
-static ButtonAction* UpdateButtonPanelMultipleUnits(void)
+static ButtonAction *UpdateButtonPanelMultipleUnits(void)
 {
 	char unit_ident[128];
-	int z;             // Iterator.
-	int i;             // Iterator.
-	ButtonAction* res; // result.
+	int z;
+	int i;
+	ButtonAction *res;
 	int allow;         // button is available for at least 1 unit.
 
-	res = (ButtonAction*)calloc(TheUI.NumButtonButtons, sizeof (*res));
-	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
+	res = (ButtonAction*)calloc(TheUI.ButtonPanel.NumButtons, sizeof (*res));
+	for (z = 0; z < TheUI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -582,7 +570,7 @@ static ButtonAction* UpdateButtonPanelMultipleUnits(void)
 			}
 		}
 		Assert(1 <= UnitButtonTable[z]->Pos);
-		Assert(UnitButtonTable[z]->Pos <= TheUI.NumButtonButtons);
+		Assert(UnitButtonTable[z]->Pos <= TheUI.ButtonPanel.NumButtons);
 
 		// is button allowed after all?
 		if (allow) {
@@ -599,22 +587,22 @@ static ButtonAction* UpdateButtonPanelMultipleUnits(void)
 **
 **  @param unit  unit which has actions shown with buttons.
 **
-**  @return array of TheUI.NumButtonButtons buttons to show.
+**  @return array of TheUI.ButtonPanel.NumButtons buttons to show.
 **
 **  @todo FIXME : Remove Hack for cancel button.
 */
-static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
+static ButtonAction *UpdateButtonPanelSingleUnit(const Unit *unit)
 {
 	int allow;
 	char unit_ident[128];
-	ButtonAction* buttonaction; // Current button.
-	int z;              // Iterator
-	ButtonAction* res;  // Result.
+	ButtonAction *buttonaction;
+	ButtonAction *res;
+	int z;
 
 	Assert(unit);
 
-	res = (ButtonAction*)calloc(TheUI.NumButtonButtons, sizeof (*res));
-	for (z = 0; z < TheUI.NumButtonButtons; ++z) {
+	res = (ButtonAction*)calloc(TheUI.ButtonPanel.NumButtons, sizeof (*res));
+	for (z = 0; z < TheUI.ButtonPanel.NumButtons; ++z) {
 		res[z].Pos = -1;
 	}
 
@@ -638,7 +626,7 @@ static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
 		int pos; // keep position, modified if alt-buttons required
 
 		buttonaction = UnitButtonTable[z];
-		Assert(0 < buttonaction->Pos && buttonaction->Pos <= TheUI.NumButtonButtons);
+		Assert(0 < buttonaction->Pos && buttonaction->Pos <= TheUI.ButtonPanel.NumButtons);
 
 		// Same level
 		if (buttonaction->Level != CurrentButtonLevel) {
@@ -668,10 +656,9 @@ static ButtonAction* UpdateButtonPanelSingleUnit(const Unit* unit)
 **
 **  @internal Affect CurrentButtons with buttons to show.
 */
-void UpdateButtonPanel(void)
+void CButtonPanel::Update(void)
 {
-	Unit* unit;     // SelectedUnit[0].
-	int i;          // iterator.
+	Unit *unit;
 	int sameType;   // 1 if all selected units are same type, 0 else.
 
 	// Default is no button.
@@ -685,13 +672,13 @@ void UpdateButtonPanel(void)
 	unit = Selected[0];
 	// foreign unit
 	if (unit->Player != ThisPlayer &&
-		!PlayersTeamed(ThisPlayer->Index, unit->Player->Index)) {
+			!PlayersTeamed(ThisPlayer->Index, unit->Player->Index)) {
 		return;
 	}
 
 	sameType = 1;
 	// multiple selected
-	for (i = 1; i < NumSelected; ++i) {
+	for (int i = 1; i < NumSelected; ++i) {
 		if (Selected[i]->Type != unit->Type) {
 			sameType = 0;
 			break;
@@ -713,12 +700,12 @@ void UpdateButtonPanel(void)
 **
 **  @param button  Button that was clicked.
 */
-void DoButtonButtonClicked(int button)
+void CButtonPanel::DoClicked(int button)
 {
 	int i;
-	UnitType* type;
+	UnitType *type;
 
-	Assert(0 <= button && button < TheUI.NumButtonButtons);
+	Assert(0 <= button && button < TheUI.ButtonPanel.NumButtons);
 	// no buttons
 	if (!CurrentButtons) {
 		return;
@@ -755,7 +742,7 @@ void DoButtonButtonClicked(int button)
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
-			UpdateButtonPanel();
+			TheUI.ButtonPanel.Update();
 			SetStatusLine("Select Target");
 			break;
 		case ButtonSpellCast:
@@ -820,7 +807,7 @@ void DoButtonButtonClicked(int button)
 			CursorAction = CurrentButtons[button].Action;
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
-			UpdateButtonPanel();
+			TheUI.ButtonPanel.Update();
 			SetStatusLine("Select Target");
 			break;
 		case ButtonReturn:
@@ -842,7 +829,7 @@ void DoButtonButtonClicked(int button)
 			break;
 		case ButtonButton:
 			CurrentButtonLevel = CurrentButtons[button].Value;
-			UpdateButtonPanel();
+			TheUI.ButtonPanel.Update();
 			break;
 
 		case ButtonCancel:
@@ -857,7 +844,7 @@ void DoButtonButtonClicked(int button)
 			ClearStatusLine();
 			ClearCosts();
 			CurrentButtonLevel = 0;
-			UpdateButtonPanel();
+			TheUI.ButtonPanel.Update();
 			GameCursor = TheUI.Point.Cursor;
 			CursorBuilding = NULL;
 			CursorState = CursorStatePoint;
@@ -889,7 +876,7 @@ void DoButtonButtonClicked(int button)
 				CursorBuilding = type;
 				// FIXME: check is this =9 necessary?
 				CurrentButtonLevel = 9; // level 9 is cancel-only
-				UpdateButtonPanel();
+				TheUI.ButtonPanel.Update();
 			}
 			break;
 
@@ -946,19 +933,17 @@ void DoButtonButtonClicked(int button)
 **
 **  @return     True, if button is handled (consumed).
 */
-int DoButtonPanelKey(int key)
+int CButtonPanel::DoKey(int key)
 {
-	int i;
-
 	if (CurrentButtons) {
 		// This is required for action queues SHIFT+M should be `m'
 		if (isascii(key) && isupper(key)) {
 			key = tolower(key);
 		}
 
-		for (i = 0; i < TheUI.NumButtonButtons; ++i) {
+		for (int i = 0; i < TheUI.ButtonPanel.NumButtons; ++i) {
 			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
-				DoButtonButtonClicked(i);
+				TheUI.ButtonPanel.DoClicked(i);
 				return 1;
 			}
 		}

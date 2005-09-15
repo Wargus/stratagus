@@ -396,18 +396,10 @@ extern void DrawInfoPanel(void);
 extern void DrawTimer(void);
 	/// Update the timer
 extern void UpdateTimer(void);
-	/// Draw the unit button panel
-extern void DrawButtonPanel(void);
 	/// Update the status line with hints from the button
 extern void UpdateStatusLineForButton(const ButtonAction* button);
 	/// Draw the Pie Menu
 extern void DrawPieMenu(void);
-	/// Update the content of the unit button panel
-extern void UpdateButtonPanel(void);
-	/// Handle button click in button panel area
-extern void DoButtonButtonClicked(int button);
-	/// Lookup key for bottom panel buttons
-extern int DoButtonPanelKey(int key);
 
 	/// Handle the mouse in scroll area
 extern int HandleMouseScrollArea(int x, int y);

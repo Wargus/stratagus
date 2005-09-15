@@ -185,8 +185,8 @@ void LoadUserInterface(void)
 	if (TheUI.InfoPanelG) {
 		TheUI.InfoPanelG->Load();
 	}
-	if (TheUI.ButtonPanelG) {
-		TheUI.ButtonPanelG->Load();
+	if (TheUI.ButtonPanel.G) {
+		TheUI.ButtonPanel.G->Load();
 	}
 	if (TheUI.PieMenuBackgroundG) {
 		TheUI.PieMenuBackgroundG->Load();
@@ -344,7 +344,7 @@ void CleanUI(UI* ui)
 	free(ui->TransportingButtons);
 
 	// Button Panel
-	FreeGraphic(ui->ButtonPanelG);
+	FreeGraphic(ui->ButtonPanel.G);
 
 	// Pie Menu
 	FreeGraphic(ui->PieMenuBackgroundG);
@@ -353,7 +353,7 @@ void CleanUI(UI* ui)
 	free(ui->MenuButton.Text);
 	free(ui->NetworkMenuButton.Text);
 	free(ui->NetworkDiplomacyButton.Text);
-	free(ui->ButtonButtons);
+	free(ui->ButtonPanel.Buttons);
 
 	// Cursors
 	free(ui->Point.Name);
