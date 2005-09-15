@@ -377,12 +377,6 @@ extern void CenterOnMessage(void);
 	/// Cleanup all messages
 extern void CleanMessages(void);
 
-	/// Set status line to show this information
-extern void SetStatusLine(char* status);
-	/// Clear the content of the message line
-extern void ClearStatusLine(void);
-	/// Draw status line
-extern void DrawStatusLine(void);
 	/// Draw costs in status line
 extern void DrawCosts(void);
 	/// Set costs to be displayed in status line
