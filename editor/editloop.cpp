@@ -994,7 +994,7 @@ static void DrawEditorInfo(void)
 **
 **  @param unit  Unit pointer.
 */
-static void ShowUnitInfo(const Unit* unit)
+static void ShowUnitInfo(const Unit *unit)
 {
 	char buf[256];
 	int i;
@@ -1005,7 +1005,7 @@ static void ShowUnitInfo(const Unit* unit)
 	if (unit->Type->GivesResource) {
 		sprintf(buf + i," Amount %d", unit->ResourcesHeld);
 	}
-	SetStatusLine(buf);
+	TheUI.StatusLine.Set(buf);
 }
 
 /**
@@ -1077,7 +1077,7 @@ void EditorUpdateDisplay(void)
 	//
 	// Status line
 	//
-	DrawStatusLine();
+	TheUI.StatusLine.Draw();
 
 	DrawCursor();
 
@@ -1346,9 +1346,9 @@ static void EditorCallbackButtonDown(unsigned button)
 							Viewport2MapY(TheUI.MouseViewport, CursorY),
 							CursorBuilding, Players + SelectedPlayer);
 						UnitPlacedThisPress = 1;
-						ClearStatusLine();
+						TheUI.StatusLine.Clear();
 					} else {
-						SetStatusLine("Unit can't be placed here.");
+						TheUI.StatusLine.Set("Unit can't be placed here.");
 						PlayGameSound(GameSounds.PlacementError.Sound,
 							MaxSampleVolume);
 					}
@@ -1393,7 +1393,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case 'S':
 		case KeyCodeF11:
 			if (EditorSaveMenu() != -1) {
-				SetStatusLine("Map saved");
+				TheUI.StatusLine.Set("Map saved");
 			}
 			InterfaceState = IfaceStateNormal;
 			break;
@@ -1427,13 +1427,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				}
 				switch (MirrorEdit) {
 					case 1:
-						SetStatusLine("Mirror editing enabled: 2-side");
+						TheUI.StatusLine.Set("Mirror editing enabled: 2-side");
 						break;
 					case 2:
-						SetStatusLine("Mirror editing enabled: 4-side");
+						TheUI.StatusLine.Set("Mirror editing enabled: 4-side");
 						break;
 					default:
-						SetStatusLine("Mirror editing disabled");
+						TheUI.StatusLine.Set("Mirror editing disabled");
 						break;
 				  }
 			}
@@ -1455,7 +1455,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				UnitLost(unit);
 				UnitClearOrders(unit);
 				ReleaseUnit(unit);
-				SetStatusLine("Unit deleted");
+				TheUI.StatusLine.Set("Unit deleted");
 			}
 			break;
 
@@ -1642,7 +1642,7 @@ static void EditorCallbackMouse(int x, int y)
 						Viewport2MapY(TheUI.SelectedViewport, CursorY),
 						CursorBuilding, Players + SelectedPlayer);
 					UnitPlacedThisPress = 1;
-					ClearStatusLine();
+					TheUI.StatusLine.Clear();
 				}
 			}
 		}
@@ -1701,9 +1701,9 @@ static void EditorCallbackMouse(int x, int y)
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
 				if (TheMap.Info.PlayerType[i] != PlayerNobody) {
 					sprintf(buf,"Select player #%d",i);
-					SetStatusLine(buf);
+					TheUI.StatusLine.Set(buf);
 				} else {
-					ClearStatusLine();
+					TheUI.StatusLine.Clear();
 				}
 				CursorPlayer = i;
 #if 0
@@ -1732,7 +1732,7 @@ static void EditorCallbackMouse(int x, int y)
 					sprintf(buf,"%s \"%s\"",
 						UnitTypeByIdent(ShownUnitTypes[i])->Ident,
 						UnitTypeByIdent(ShownUnitTypes[i])->Name);
-					SetStatusLine(buf);
+					TheUI.StatusLine.Set(buf);
 					CursorUnitIndex = i;
 #if 0
 					ButtonUnderCursor = i + 100;
@@ -1780,7 +1780,7 @@ static void EditorCallbackMouse(int x, int y)
 
 					// FIXME: i is wrong, must find the solid type
 					j = TheMap.Tileset.Tiles[i * 16 + 16].BaseTerrain;
-					//MAPTODO SetStatusLine(TheMap.Tileset.SolidTerrainTypes[j].TerrainName);
+					//MAPTODO TheUI.StatusLine.Set(TheMap.Tileset.SolidTerrainTypes[j].TerrainName);
 					ButtonUnderCursor = i + 100;
 					CursorOn = CursorOnButton;
 					return;
@@ -1803,7 +1803,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
 		CursorOn = CursorOnButton;
-		SetStatusLine("Select mode");
+		TheUI.StatusLine.Set("Select mode");
 		return;
 	}
 	if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX &&
@@ -1813,7 +1813,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
-		SetStatusLine("Unit mode");
+		TheUI.StatusLine.Set("Unit mode");
 		return;
 	}
 	if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX &&
@@ -1823,7 +1823,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = TileButton;
 		CursorOn = CursorOnButton;
-		SetStatusLine("Tile mode");
+		TheUI.StatusLine.Set("Tile mode");
 		return;
 	}
 	if (TheUI.InfoPanelX + 4 + START_ICON_X < CursorX &&
@@ -1833,7 +1833,7 @@ static void EditorCallbackMouse(int x, int y)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
-		SetStatusLine("Set start location mode");
+		TheUI.StatusLine.Set("Set start location mode");
 		return;
 	}
 	if (TheUI.MenuButton.X != -1) {
@@ -1897,7 +1897,7 @@ static void EditorCallbackMouse(int x, int y)
 
 	// Not reached if cursor is inside the scroll area
 
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 }
 
 /**

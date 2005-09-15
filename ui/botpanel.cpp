@@ -394,7 +394,7 @@ void UpdateStatusLineForButton(const ButtonAction *button)
 	const UnitStats *stats;
 
 	Assert(button);
-	SetStatusLine(button->Hint);
+	TheUI.StatusLine.Set(button->Hint);
 
 	v = button->Value;
 	switch (button->Action) {
@@ -743,7 +743,7 @@ void CButtonPanel::DoClicked(int button)
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
 			TheUI.ButtonPanel.Update();
-			SetStatusLine("Select Target");
+			TheUI.StatusLine.Set("Select Target");
 			break;
 		case ButtonSpellCast:
 			if (KeyModifiers & ModifierControl) {
@@ -808,7 +808,7 @@ void CButtonPanel::DoClicked(int button)
 			CursorValue = CurrentButtons[button].Value;
 			CurrentButtonLevel = 9; // level 9 is cancel-only
 			TheUI.ButtonPanel.Update();
-			SetStatusLine("Select Target");
+			TheUI.StatusLine.Set("Select Target");
 			break;
 		case ButtonReturn:
 			for (i = 0; i < NumSelected; ++i) {
@@ -841,7 +841,7 @@ void CButtonPanel::DoClicked(int button)
 					SendCommandCancelResearch(Selected[0]);
 				}
 			}
-			ClearStatusLine();
+			TheUI.StatusLine.Clear();
 			ClearCosts();
 			CurrentButtonLevel = 0;
 			TheUI.ButtonPanel.Update();
@@ -853,7 +853,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonCancelTrain:
 			Assert(Selected[0]->Orders[0].Action == UnitActionTrain);
 			SendCommandCancelTraining(Selected[0], -1, NULL);
-			ClearStatusLine();
+			TheUI.StatusLine.Clear();
 			ClearCosts();
 			break;
 
@@ -863,7 +863,7 @@ void CButtonPanel::DoClicked(int button)
 			if (NumSelected == 1) {
 				SendCommandDismiss(Selected[0]);
 			}
-			ClearStatusLine();
+			TheUI.StatusLine.Clear();
 			ClearCosts();
 			break;
 
@@ -871,7 +871,7 @@ void CButtonPanel::DoClicked(int button)
 			// FIXME: store pointer in button table!
 			type = UnitTypes[CurrentButtons[button].Value];
 			if (!PlayerCheckUnitType(Selected[0]->Player, type)) {
-				SetStatusLine("Select Location");
+				TheUI.StatusLine.Set("Select Location");
 				ClearCosts();
 				CursorBuilding = type;
 				// FIXME: check is this =9 necessary?
@@ -896,7 +896,7 @@ void CButtonPanel::DoClicked(int button)
 				//PlayerSubUnitType(player,type);
 				SendCommandTrainUnit(Selected[0], type,
 					!(KeyModifiers & ModifierShift));
-				ClearStatusLine();
+				TheUI.StatusLine.Clear();
 				ClearCosts();
 			}
 			break;
@@ -908,7 +908,7 @@ void CButtonPanel::DoClicked(int button)
 				//PlayerSubUnitType(player,type);
 				SendCommandUpgradeTo(Selected[0],type,
 					!(KeyModifiers & ModifierShift));
-				ClearStatusLine();
+				TheUI.StatusLine.Clear();
 				ClearCosts();
 			}
 			break;
@@ -918,7 +918,7 @@ void CButtonPanel::DoClicked(int button)
 				//PlayerSubCosts(player,Upgrades[i].Costs);
 				SendCommandResearch(Selected[0], AllUpgrades[i],
 					!(KeyModifiers & ModifierShift));
-				ClearStatusLine();
+				TheUI.StatusLine.Clear();
 				ClearCosts();
 			}
 			break;

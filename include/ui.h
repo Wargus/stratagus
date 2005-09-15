@@ -317,6 +317,22 @@ public:
 	SDL_Color AutoCastBorderColorRGB;
 };
 
+class CStatusLine
+{
+public:
+	void Draw();
+	void Set(const char *status);
+	void Clear();
+
+	int W;
+	int TextX;
+	int TextY;
+	int Font;
+
+private:
+	char StatusLine[256];
+};
+
 /**
 **  Defines the user interface.
 */
@@ -427,10 +443,7 @@ typedef struct _ui_ {
 	Uint32        ViewportCursorColor;  /// minimap cursor color
 
 	// The status line
-	int           StatusLineW;          /// status line screen width
-	int           StatusLineTextX;      /// status line screen text X position
-	int           StatusLineTextY;      /// status line screen text Y position
-	int           StatusLineFont;       /// Status line font
+	CStatusLine   StatusLine;
 
 	// Offsets for 640x480 center used by menus
 	int Offset640X;                     /// Offset for 640x480 X position

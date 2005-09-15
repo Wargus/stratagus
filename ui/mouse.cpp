@@ -90,7 +90,7 @@ static void HandlePieMenuMouseSelection(void);
 void CancelBuildingMode(void)
 {
 	CursorBuilding = NULL;
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
 	TheUI.ButtonPanel.Update();
@@ -1310,7 +1310,7 @@ static void DoSelectionButtons(int num, unsigned button)
 		SelectSingleUnit(unit);
 	}
 
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
 	SelectionChanged();
@@ -1338,7 +1338,7 @@ static void UISelectStateButtonDown(unsigned button)
 	//  Clicking on the map.
 	//
 	if (CursorOn == CursorOnMap) {
-		ClearStatusLine();
+		TheUI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
 		GameCursor = TheUI.Point.Cursor;
@@ -1377,7 +1377,7 @@ static void UISelectStateButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			sx = mx * TileSizeX;
 			sy = my * TileSizeY;
-			ClearStatusLine();
+			TheUI.StatusLine.Clear();
 			ClearCosts();
 			CursorState = CursorStatePoint;
 			GameCursor = TheUI.Point.Cursor;
@@ -1402,7 +1402,7 @@ static void UISelectStateButtonDown(unsigned button)
 		}
 	}
 
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 	ClearCosts();
 	CursorState = CursorStatePoint;
 	GameCursor = TheUI.Point.Cursor;
@@ -1764,7 +1764,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: Not if, in input mode.
 			if (!IsNetworkGame()) {
 				GamePaused = 1;
-				SetStatusLine("Game Paused");
+				TheUI.StatusLine.Set("Game Paused");
 			}
 			ProcessMenu("menu-game", 0);
 			return;
@@ -1896,7 +1896,7 @@ void UIHandleButtonUp(unsigned button)
 		}
 
 		if (num) {
-			ClearStatusLine();
+			TheUI.StatusLine.Clear();
 			ClearCosts();
 			CurrentButtonLevel = 0;
 			SelectionChanged();
@@ -1931,7 +1931,7 @@ printf("Race = %d\n", Selected[0]->Player->Race);
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					}
-					SetStatusLine(buf);
+					TheUI.StatusLine.Set(buf);
 				}
 			}
 		}

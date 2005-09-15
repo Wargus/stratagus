@@ -1580,15 +1580,15 @@ static int CclDefineUI(lua_State* l)
 						LuaError(l, "incorrect argument");
 					}
 					lua_rawgeti(l, -1, 1);
-					ui->StatusLineTextX = LuaToNumber(l, -1);
+					ui->StatusLine.TextX = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 					lua_rawgeti(l, -1, 2);
-					ui->StatusLineTextY = LuaToNumber(l, -1);
+					ui->StatusLine.TextY = LuaToNumber(l, -1);
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "Width")) {
-					ui->StatusLineW = LuaToNumber(l, -1);
+					ui->StatusLine.W = LuaToNumber(l, -1);
 				} else if (!strcmp(value, "Font")) {
-					ui->StatusLineFont = FontByIdent(LuaToString(l, -1));
+					ui->StatusLine.Font = FontByIdent(LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -4131,7 +4131,7 @@ static int CclDefineButton(lua_State* l)
 void SelectionChanged(void)
 {
 	// We Changed out selection, anything pending buttonwise must be cleared
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
 	TheUI.ButtonPanel.Update();
