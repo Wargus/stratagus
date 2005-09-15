@@ -189,7 +189,7 @@ void ActionStillGeneric(Unit* unit, int ground)
 	// Auto cast spells
 	//
 	if (unit->AutoCastSpell) {
-		for (i = 0; i < SpellTypeCount; ++i) {
+		for (i = 0; (unsigned int) i < SpellTypeTable.size(); ++i) {
 			if (unit->AutoCastSpell[i] && AutoCastSpell(unit, SpellTypeTable[i])) {
 				return;
 			}

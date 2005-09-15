@@ -114,7 +114,7 @@ void DoRightButton(int sx, int sy)
 	int acknowledged;       // to play sound
 	int flush;              // append command to old command.
 	int res;                // resource id for harvester.
-	int spellnum;           // spell id for spell cast
+	unsigned int spellnum;  // spell id for spell cast
 
 	// No unit selected
 	if (!NumSelected) {
@@ -312,8 +312,7 @@ void DoRightButton(int sx, int sy)
 						// This is for demolition squads and such
 						Assert(unit->Type->CanCastSpell);
 						for (spellnum = 0; !type->CanCastSpell[spellnum] &&
-								spellnum < SpellTypeCount ; spellnum++) ;
-						Assert(spellnum != SpellTypeCount);
+								spellnum < SpellTypeTable.size() ; spellnum++) ;
 						SendCommandSpellCast(unit, x, y, dest, spellnum, flush);
 					} else {
 						if (CanTarget(type, dest->Type)) {

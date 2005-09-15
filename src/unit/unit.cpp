@@ -316,11 +316,11 @@ void InitUnit(Unit* unit, UnitType* type)
 	}
 
 	if (type->CanCastSpell) {
-		unit->AutoCastSpell = (char*)malloc(SpellTypeCount);
+		unit->AutoCastSpell = (char*)malloc(SpellTypeTable.size());
 		if (unit->Type->AutoCastActive) {
-			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeCount);
+			memcpy(unit->AutoCastSpell, unit->Type->AutoCastActive, SpellTypeTable.size());
 		} else {
-			memset(unit->AutoCastSpell, 0, SpellTypeCount);
+			memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
 		}
 	}
 	unit->Active = 1;
@@ -3847,7 +3847,7 @@ void SaveUnit(const Unit* unit, CLFile* file)
 		file->printf(",\n  \"goal\", %d", UnitNumber(unit->Goal));
 	}
 	if (unit->AutoCastSpell) {
-		for (i = 0; i < SpellTypeCount; ++i) {
+		for (i = 0; (unsigned int) i < SpellTypeTable.size(); ++i) {
 			if (unit->AutoCastSpell[i]) {
 				file->printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident);
 			}
