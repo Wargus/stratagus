@@ -307,7 +307,7 @@ void UpdateDisplay(void)
 			DrawInfoPanel();
 			TheUI.ButtonPanel.Draw();
 			DrawResources();
-			DrawStatusLine();
+			TheUI.StatusLine.Draw();
 		}
 
 		DrawCosts();
@@ -519,11 +519,11 @@ void GameMainLoop(void)
 	EndReplayLog();
 	if (GameResult == GameDefeat) {
 		fprintf(stderr, "You have lost!\n");
-		SetStatusLine("You have lost!");
+		TheUI.StatusLine.Set("You have lost!");
 		ProcessMenu("menu-defeated", 1);
 	} else if (GameResult == GameVictory) {
 		fprintf(stderr, "You have won!\n");
-		SetStatusLine("You have won!");
+		TheUI.StatusLine.Set("You have won!");
 		ProcessMenu("menu-victory", 1);
 	}
 

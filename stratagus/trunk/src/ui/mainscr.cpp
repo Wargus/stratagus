@@ -764,7 +764,7 @@ static void DrawUnitInfo(Unit* unit)
 					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
-					SetStatusLine(uins->Type->Name);
+					TheUI.StatusLine.Set(uins->Type->Name);
 				}
 				++j;
 			}
@@ -1154,19 +1154,15 @@ void CleanMessages(void)
 --  STATUS LINE
 ----------------------------------------------------------------------------*/
 
-static char StatusLine[256];                                /// status line/hints
-
 /**
 **  Draw status line.
 */
-void DrawStatusLine(void)
+void CStatusLine::Draw(void)
 {
 	if (StatusLine[0]) {
 		PushClipping();
-		SetClipping(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
-			TheUI.StatusLineTextX + TheUI.StatusLineW - 1, VideoHeight - 1);
-		VideoDrawTextClip(TheUI.StatusLineTextX, TheUI.StatusLineTextY,
-			TheUI.StatusLineFont, StatusLine);
+		SetClipping(TextX, TextY, TextX + W - 1, VideoHeight - 1);
+		VideoDrawTextClip(TextX, TextY, Font, StatusLine);
 		PopClipping();
 	}
 }
@@ -1176,7 +1172,7 @@ void DrawStatusLine(void)
 **
 **  @param status  New status line information.
 */
-void SetStatusLine(char* status)
+void CStatusLine::Set(const char *status)
 {
 	if (KeyState != KeyStateInput && strcmp(StatusLine, status)) {
 		strncpy(StatusLine, status, sizeof(StatusLine) - 1);
@@ -1187,10 +1183,10 @@ void SetStatusLine(char* status)
 /**
 **  Clear status line.
 */
-void ClearStatusLine(void)
+void CStatusLine::Clear(void)
 {
 	if (KeyState != KeyStateInput) {
-		SetStatusLine("");
+		TheUI.StatusLine.Set("");
 	}
 }
 
@@ -1215,12 +1211,12 @@ void DrawCosts(void)
 	int i;
 	int x;
 
-	x = TheUI.StatusLineTextX + 268;
+	x = TheUI.StatusLine.TextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
-		TheUI.Resources[GoldCost].G->DrawFrameClip(3, x, TheUI.StatusLineTextY);
+		TheUI.Resources[GoldCost].G->DrawFrameClip(3, x, TheUI.StatusLine.TextY);
 
-		VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont, CostsMana);
+		VideoDrawNumber(x + 15, TheUI.StatusLine.TextY, GameFont, CostsMana);
 		x += 45;
 	}
 
@@ -1228,9 +1224,9 @@ void DrawCosts(void)
 		if (Costs[i]) {
 			if (TheUI.Resources[i].G) {
 				TheUI.Resources[i].G->DrawFrameClip(TheUI.Resources[i].IconFrame,
-					x, TheUI.StatusLineTextY);
+					x, TheUI.StatusLine.TextY);
 			}
-			VideoDrawNumber(x + 15, TheUI.StatusLineTextY, GameFont,Costs[i]);
+			VideoDrawNumber(x + 15, TheUI.StatusLine.TextY, GameFont,Costs[i]);
 			x += 45;
 			if (x > VideoWidth - 45) {
 				break;
@@ -1313,7 +1309,7 @@ void DrawInfoPanel(void)
 
 				if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 						ButtonUnderCursor == i) {
-					SetStatusLine(Selected[i]->Type->Name);
+					TheUI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
 			if (NumSelected > TheUI.NumSelectedButtons) {
@@ -1346,7 +1342,7 @@ void DrawInfoPanel(void)
 			DrawInfoPanelBackground(i);
 			DrawUnitInfo(Selected[0]);
 			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-				SetStatusLine(Selected[0]->Type->Name);
+				TheUI.StatusLine.Set(Selected[0]->Type->Name);
 			}
 			return;
 		}

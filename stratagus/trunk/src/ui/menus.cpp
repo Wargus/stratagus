@@ -1323,7 +1323,7 @@ static void GameMenuReturn(void)
 		EndMenu();
 	}
 	InterfaceState = IfaceStateNormal;
-	ClearStatusLine();
+	TheUI.StatusLine.Clear();
 	GamePaused = 0;
 }
 
