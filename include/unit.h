@@ -821,7 +821,7 @@ extern int CanBuildOn(int x, int y, int mask);
 extern Unit* CanBuildUnitType(const Unit* unit,const struct _unit_type_* type, int x, int y, int real);
 
 	/// Find resource
-extern Unit* FindResource(const Unit* unit, int x, int y, int range, int resource);
+extern Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource);
 	/// Find nearest deposit
 extern Unit* FindDeposit(const Unit* unit, int x, int y, int range, int resource);
 	/// Find the next idle worker

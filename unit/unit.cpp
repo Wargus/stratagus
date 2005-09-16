@@ -2480,7 +2480,7 @@ int FindTerrainType(int movemask, int resmask, int rvresult, int range,
 **
 **  @return            NoUnitP or resource unit
 */
-Unit* FindResource(const Unit* unit, int x, int y, int range, int resource)
+Unit* UnitFindResource(const Unit* unit, int x, int y, int range, int resource)
 {
 	static const int xoffset[] = {  0,-1,+1, 0, -1,+1,-1,+1 };
 	static const int yoffset[] = { -1, 0, 0,+1, -1,-1,+1,+1 };
