@@ -64,12 +64,12 @@ int SpeedMouseScroll = MOUSE_SCROLL_SPEED; /// mouse scroll speed
 /**
 **  The user interface configuration
 */
-UI TheUI;
+CUserInterface TheUI;
 
 /**
 **  The available user interfaces.
 */
-UI** UI_Table;
+CUserInterface** UI_Table;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -225,7 +225,7 @@ void LoadUserInterface(void)
 **  @param file  Save file handle
 **  @param ui    User interface to save
 */
-static void SaveViewports(CLFile* file, const UI* ui)
+static void SaveViewports(CLFile* file, const CUserInterface* ui)
 {
 	int i;
 	const Viewport* vp;
@@ -309,7 +309,7 @@ void CleanPanel(InfoPanel* panel)
 /**
 **  Clean up a user interface.
 */
-void CleanUI(UI* ui)
+void CleanUI(CUserInterface* ui)
 {
 	int i;
 	MenuPanel* menupanel;
