@@ -1084,7 +1084,7 @@ void DrawMenu(Menu* menu)
 	} else if (menu->Panel) {
 		MenuPanel* menupanel;
 
-		menupanel = TheUI.MenuPanels;
+		menupanel = UI.MenuPanels;
 		while (menupanel) {
 			if (!strcmp(menupanel->Ident, menu->Panel)) {
 				break;
@@ -2517,7 +2517,7 @@ void ProcessMenu(const char* menu_id, int loop)
 
 	ButtonUnderCursor = -1;
 	CursorState = CursorStatePoint;
-	GameCursor = TheUI.Point.Cursor;
+	GameCursor = UI.Point.Cursor;
 	menu = FindMenu(menu_id);
 	if (menu == NULL) {
 		return;

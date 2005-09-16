@@ -1499,7 +1499,7 @@ int UnitVisibleOnScreen(const Unit* unit)
 {
 	const Viewport* vp;
 
-	for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
+	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (UnitVisibleInViewport(unit, vp)) {
 			return 1;
 		}
@@ -3347,7 +3347,7 @@ int ViewPointDistance(int x, int y)
 	const Viewport *vp;
 
 	// first compute the view point coordinate
-	vp = TheUI.SelectedViewport;
+	vp = UI.SelectedViewport;
 
 	// then use MapDistance
 	return MapDistance(vp->MapX + vp->MapWidth / 2,
@@ -3366,7 +3366,7 @@ int ViewPointDistanceToUnit(const Unit* dest)
 	const Viewport* vp;
 
 	// first compute the view point coordinate
-	vp = TheUI.SelectedViewport;
+	vp = UI.SelectedViewport;
 	// then use MapDistanceToUnit
 	return MapDistanceToUnit(vp->MapX + vp->MapWidth / 2,
 		vp->MapY + vp->MapHeight / 2, dest);

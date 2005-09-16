@@ -166,7 +166,7 @@ void MapFixSeenWallTile(int x, int y)
 
 		// FIXME: can this only happen if seen?
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
-			TheUI.Minimap.UpdateSeenXY(x, y);
+			UI.Minimap.UpdateSeenXY(x, y);
 		}
 	}
 }
@@ -261,10 +261,10 @@ void MapFixWallTile(int x, int y)
 
 	if (mf->Tile != tile) {
 		mf->Tile = tile;
-		TheUI.Minimap.UpdateXY(x, y);
+		UI.Minimap.UpdateXY(x, y);
 
 		if (IsMapFieldVisible(ThisPlayer, x, y)) {
-			TheUI.Minimap.UpdateSeenXY(x, y);
+			UI.Minimap.UpdateSeenXY(x, y);
 			MapMarkSeenTile(x, y);
 		}
 	}
@@ -298,12 +298,12 @@ void MapRemoveWall(unsigned x, unsigned y)
 	// FIXME: support more walls of different races.
 	mf->Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 
-	TheUI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateXY(x, y);
 	MapFixWallTile(x, y);
 	MapFixWallNeighbors(x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		TheUI.Minimap.UpdateSeenXY(x, y);
+		UI.Minimap.UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
 #ifdef MAP_REGIONS
@@ -339,12 +339,12 @@ void MapSetWall(unsigned x, unsigned y, int humanwall)
 		mf->Value = UnitTypeOrcWall->Variable[HP_INDEX].Max;
 	}
 
-	TheUI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateXY(x, y);
 	MapFixWallTile(x, y);
 	MapFixWallNeighbors(x, y);
 
 	if (IsMapFieldVisible(ThisPlayer, x, y)) {
-		TheUI.Minimap.UpdateSeenXY(x, y);
+		UI.Minimap.UpdateSeenXY(x, y);
 		MapMarkSeenTile(x, y);
 	}
 #ifdef MAP_REGIONS

@@ -70,33 +70,33 @@
 void DrawMenuButtonArea(void)
 {
 	if (!IsNetworkGame()) {
-		if (TheUI.MenuButton.X != -1) {
+		if (UI.MenuButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.MenuButton.Style,
+			DrawMenuButton(UI.MenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-				TheUI.MenuButton.X, TheUI.MenuButton.Y,
-				TheUI.MenuButton.Text);
+				UI.MenuButton.X, UI.MenuButton.Y,
+				UI.MenuButton.Text);
 		}
 	} else {
-		if (TheUI.NetworkMenuButton.X != -1) {
+		if (UI.NetworkMenuButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.NetworkMenuButton.Style,
+			DrawMenuButton(UI.NetworkMenuButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 				(GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
-				TheUI.NetworkMenuButton.X, TheUI.NetworkMenuButton.Y,
-				TheUI.NetworkMenuButton.Text);
+				UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
+				UI.NetworkMenuButton.Text);
 		}
-		if (TheUI.NetworkDiplomacyButton.X != -1) {
+		if (UI.NetworkDiplomacyButton.X != -1) {
 			// FIXME: Transparent flag, 3rd param, has been hardcoded.
-			DrawMenuButton(TheUI.NetworkDiplomacyButton.Style,
+			DrawMenuButton(UI.NetworkDiplomacyButton.Style,
 				(ButtonAreaUnderCursor == ButtonAreaMenu &&
 					ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 				(GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
-				TheUI.NetworkDiplomacyButton.X, TheUI.NetworkDiplomacyButton.Y,
-				TheUI.NetworkDiplomacyButton.Text);
+				UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
+				UI.NetworkDiplomacyButton.Text);
 		}
 	}
 }
@@ -589,8 +589,8 @@ void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
 	}
 	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
 	if (!content->Data.CompleteBar.Border) {
-		VideoFillRectangleClip(TheUI.CompletedBarColor, x, y, f * w / 100, h);
-		if (TheUI.CompletedBarShadow) {
+		VideoFillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
+		if (UI.CompletedBarShadow) {
 			// Shadow
 			VideoDrawVLine(ColorGray, x + f * w / 100, y, h);
 			VideoDrawHLine(ColorGray, x, y + h, f * w / 100);
@@ -627,8 +627,8 @@ static void DrawUnitInfo(Unit* unit)
 
 	Assert(unit);
 	UpdateUnitVariables(unit);
-	for (i = 0; i < TheUI.NumberPanel; i++) {
-		index = TheUI.PanelIndex[i];
+	for (i = 0; i < UI.NumberPanel; i++) {
+		index = UI.PanelIndex[i];
 		if (CanShowContent(AllPanels[index].Condition, unit)) {
 			for (j = 0; j < AllPanels[index].NContents; j++) {
 				content = AllPanels[index].Contents + j;
@@ -647,7 +647,7 @@ static void DrawUnitInfo(Unit* unit)
 #ifdef USE_MNG
 	if (type->Portrait.Num) {
 		type->Portrait.Mngs[type->Portrait.CurrMng]->Draw(
-			TheUI.SingleSelectedButton->X, TheUI.SingleSelectedButton->Y);
+			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		if (type->Portrait.Mngs[type->Portrait.CurrMng]->iteration == type->Portrait.NumIterations) {
 			type->Portrait.Mngs[type->Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
@@ -661,16 +661,16 @@ static void DrawUnitInfo(Unit* unit)
 		}
 	} else
 #endif
-	if (TheUI.SingleSelectedButton) {
-		x = TheUI.SingleSelectedButton->X;
-		y = TheUI.SingleSelectedButton->Y;
-		DrawUnitIcon(unit->Player, TheUI.SingleSelectedButton->Style, type->Icon.Icon,
+	if (UI.SingleSelectedButton) {
+		x = UI.SingleSelectedButton->X;
+		y = UI.SingleSelectedButton->Y;
+		DrawUnitIcon(unit->Player, UI.SingleSelectedButton->Style, type->Icon.Icon,
 			(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, NULL);
 	}
-	x = TheUI.InfoPanel.X;
-	y = TheUI.InfoPanel.Y;
+	x = UI.InfoPanel.X;
+	y = UI.InfoPanel.Y;
 	//
 	//  Show progress if they are selected.
 	//
@@ -680,33 +680,33 @@ static void DrawUnitInfo(Unit* unit)
 		//
 		if (unit->Orders[0].Action == UnitActionTrain) {
 			if (unit->OrderCount == 1 || unit->Orders[1].Action != UnitActionTrain) {
-				if (TheUI.SingleTrainingText) {
-					VideoDrawText(TheUI.SingleTrainingTextX, TheUI.SingleTrainingTextY,
-						TheUI.SingleTrainingFont, TheUI.SingleTrainingText);
+				if (UI.SingleTrainingText) {
+					VideoDrawText(UI.SingleTrainingTextX, UI.SingleTrainingTextY,
+						UI.SingleTrainingFont, UI.SingleTrainingText);
 				}
-				if (TheUI.SingleTrainingButton) {
-					DrawUnitIcon(unit->Player, TheUI.SingleTrainingButton->Style,
+				if (UI.SingleTrainingButton) {
+					DrawUnitIcon(unit->Player, UI.SingleTrainingButton->Style,
 						unit->Orders[0].Type->Icon.Icon,
 						(ButtonAreaUnderCursor == ButtonAreaTraining &&
 							ButtonUnderCursor == 0) ?
 							(IconActive | (MouseButtons & LeftButton)) : 0,
-						TheUI.SingleTrainingButton->X, TheUI.SingleTrainingButton->Y, NULL);
+						UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y, NULL);
 				}
 			} else {
-				if (TheUI.TrainingText) {
-					VideoDrawTextCentered(TheUI.TrainingTextX, TheUI.TrainingTextY,
-						TheUI.TrainingFont, TheUI.TrainingText);
+				if (UI.TrainingText) {
+					VideoDrawTextCentered(UI.TrainingTextX, UI.TrainingTextY,
+						UI.TrainingFont, UI.TrainingText);
 				}
-				if (TheUI.TrainingButtons) {
+				if (UI.TrainingButtons) {
 					for (i = 0; i < unit->OrderCount &&
-							i < TheUI.NumTrainingButtons; ++i) {
+							i < UI.NumTrainingButtons; ++i) {
 						if (unit->Orders[i].Action == UnitActionTrain) {
-							DrawUnitIcon(unit->Player, TheUI.TrainingButtons[i].Style,
+							DrawUnitIcon(unit->Player, UI.TrainingButtons[i].Style,
 								unit->Orders[i].Type->Icon.Icon,
 								(ButtonAreaUnderCursor == ButtonAreaTraining &&
 									ButtonUnderCursor == i) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0,
-								TheUI.TrainingButtons[i].X, TheUI.TrainingButtons[i].Y, NULL);
+								UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y, NULL);
 						}
 					}
 				}
@@ -718,13 +718,13 @@ static void DrawUnitInfo(Unit* unit)
 		//  Building upgrading to better type.
 		//
 		if (unit->Orders[0].Action == UnitActionUpgradeTo) {
-			if (TheUI.UpgradingButton) {
-				DrawUnitIcon(unit->Player, TheUI.UpgradingButton->Style,
+			if (UI.UpgradingButton) {
+				DrawUnitIcon(unit->Player, UI.UpgradingButton->Style,
 					unit->Orders[0].Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaUpgrading &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.UpgradingButton->X, TheUI.UpgradingButton->Y, NULL);
+					UI.UpgradingButton->X, UI.UpgradingButton->Y, NULL);
 			}
 			return;
 		}
@@ -733,13 +733,13 @@ static void DrawUnitInfo(Unit* unit)
 		//  Building research new technology.
 		//
 		if (unit->Orders[0].Action == UnitActionResearch) {
-			if (TheUI.ResearchingButton) {
-				DrawUnitIcon(unit->Player, TheUI.ResearchingButton->Style,
+			if (UI.ResearchingButton) {
+				DrawUnitIcon(unit->Player, UI.ResearchingButton->Style,
 					unit->Data.Research.Upgrade->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaResearching &&
 						ButtonUnderCursor == 0) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.ResearchingButton->X, TheUI.ResearchingButton->Y, NULL);
+					UI.ResearchingButton->X, UI.ResearchingButton->Y, NULL);
 			}
 			return;
 		}
@@ -753,18 +753,18 @@ static void DrawUnitInfo(Unit* unit)
 
 		uins = unit->UnitInside;
 		for (i = j = 0; i < unit->InsideCount; ++i, uins = uins->NextContained) {
-			if (uins->Boarded && j < TheUI.NumTransportingButtons) {
-				DrawUnitIcon(unit->Player, TheUI.TransportingButtons[j].Style,
+			if (uins->Boarded && j < UI.NumTransportingButtons) {
+				DrawUnitIcon(unit->Player, UI.TransportingButtons[j].Style,
 					uins->Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y, NULL);
-				UiDrawLifeBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+					UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, NULL);
+				UiDrawLifeBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-					UiDrawManaBar(uins, TheUI.TransportingButtons[j].X, TheUI.TransportingButtons[j].Y);
+					UiDrawManaBar(uins, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 				}
 				if (ButtonAreaUnderCursor == ButtonAreaTransporting && ButtonUnderCursor == j) {
-					TheUI.StatusLine.Set(uins->Type->Name);
+					UI.StatusLine.Set(uins->Type->Name);
 				}
 				++j;
 			}
@@ -825,33 +825,33 @@ void DrawResources(void)
 
 	// Draw all icons of resource.
 	for (i = 0; i <= ScoreCost; ++i) {
-		if (TheUI.Resources[i].G) {
-			TheUI.Resources[i].G->DrawFrameClip(TheUI.Resources[i].IconFrame,
-				TheUI.Resources[i].IconX, TheUI.Resources[i].IconY);
+		if (UI.Resources[i].G) {
+			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
+				UI.Resources[i].IconX, UI.Resources[i].IconY);
 		}
 	}
 	for (i = 0; i < MaxCosts; ++i) {
-		if (TheUI.Resources[i].TextX != -1) {
+		if (UI.Resources[i].TextX != -1) {
 			v = ThisPlayer->Resources[i];
-			VideoDrawNumber(TheUI.Resources[i].TextX,
-				TheUI.Resources[i].TextY + (v > 99999) * 3,
+			VideoDrawNumber(UI.Resources[i].TextX,
+				UI.Resources[i].TextY + (v > 99999) * 3,
 				v > 99999 ? SmallFont : GameFont, v);
 		}
 	}
-	if (TheUI.Resources[FoodCost].TextX != -1) {
+	if (UI.Resources[FoodCost].TextX != -1) {
 		sprintf(tmp, "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
-			VideoDrawReverseText(TheUI.Resources[FoodCost].TextX,
-				TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+			VideoDrawReverseText(UI.Resources[FoodCost].TextX,
+				UI.Resources[FoodCost].TextY, GameFont, tmp);
 		} else {
-			VideoDrawText(TheUI.Resources[FoodCost].TextX,
-				TheUI.Resources[FoodCost].TextY, GameFont, tmp);
+			VideoDrawText(UI.Resources[FoodCost].TextX,
+				UI.Resources[FoodCost].TextY, GameFont, tmp);
 		}
 	}
-	if (TheUI.Resources[ScoreCost].TextX != -1) {
+	if (UI.Resources[ScoreCost].TextX != -1) {
 		v = ThisPlayer->Score;
-		VideoDrawNumber(TheUI.Resources[ScoreCost].TextX,
-			TheUI.Resources[ScoreCost].TextY + (v > 99999) * 3,
+		VideoDrawNumber(UI.Resources[ScoreCost].TextX,
+			UI.Resources[ScoreCost].TextY + (v > 99999) * 3,
 			v > 99999 ? SmallFont : GameFont, v);
 	}
 }
@@ -946,11 +946,11 @@ void DrawMessages(void)
 	for (z = 0; z < MessagesCount; ++z) {
 		if (z == 0) {
 			PushClipping();
-			SetClipping(TheUI.MapArea.X + 8, TheUI.MapArea.Y + 8, VideoWidth - 1,
+			SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, VideoWidth - 1,
 				VideoHeight - 1);
 		}
-		VideoDrawTextClip(TheUI.MapArea.X + 8,
-			TheUI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
+		VideoDrawTextClip(UI.MapArea.X + 8,
+			UI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
 			GameFont, Messages[z]);
 		if (z == 0) {
 			PopClipping();
@@ -1007,7 +1007,7 @@ static void AddMessage(const char* msg)
 	}
 
 	while (VideoTextLength(GameFont, message) + 8 >=
-			TheUI.MapArea.EndX - TheUI.MapArea.X) {
+			UI.MapArea.EndX - UI.MapArea.X) {
 		while (1) {
 			--ptr;
 			if (*ptr == ' ') {
@@ -1022,7 +1022,7 @@ static void AddMessage(const char* msg)
 		if (ptr == message) {
 			ptr = next - 1;
 			while (VideoTextLength(GameFont, message) + 8 >=
-					TheUI.MapArea.EndX - TheUI.MapArea.X) {
+					UI.MapArea.EndX - UI.MapArea.X) {
 				*--ptr = '\0';
 			}
 			next = ptr + 1;
@@ -1131,7 +1131,7 @@ void CenterOnMessage(void)
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	ViewportCenterViewpoint(TheUI.SelectedViewport,
+	ViewportCenterViewpoint(UI.SelectedViewport,
 		MessagesEventX[MessagesEventIndex], MessagesEventY[MessagesEventIndex],
 		TileSizeX / 2, TileSizeY / 2);
 	SetMessage("~<Event: %s~>", MessagesEvent[MessagesEventIndex]);
@@ -1186,7 +1186,7 @@ void CStatusLine::Set(const char *status)
 void CStatusLine::Clear(void)
 {
 	if (KeyState != KeyStateInput) {
-		TheUI.StatusLine.Set("");
+		UI.StatusLine.Set("");
 	}
 }
 
@@ -1211,22 +1211,22 @@ void DrawCosts(void)
 	int i;
 	int x;
 
-	x = TheUI.StatusLine.TextX + 268;
+	x = UI.StatusLine.TextX + 268;
 	if (CostsMana) {
 		// FIXME: hardcoded image!!!
-		TheUI.Resources[GoldCost].G->DrawFrameClip(3, x, TheUI.StatusLine.TextY);
+		UI.Resources[GoldCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
-		VideoDrawNumber(x + 15, TheUI.StatusLine.TextY, GameFont, CostsMana);
+		VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont, CostsMana);
 		x += 45;
 	}
 
 	for (i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
-			if (TheUI.Resources[i].G) {
-				TheUI.Resources[i].G->DrawFrameClip(TheUI.Resources[i].IconFrame,
-					x, TheUI.StatusLine.TextY);
+			if (UI.Resources[i].G) {
+				UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
+					x, UI.StatusLine.TextY);
 			}
-			VideoDrawNumber(x + 15, TheUI.StatusLine.TextY, GameFont,Costs[i]);
+			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont,Costs[i]);
 			x += 45;
 			if (x > VideoWidth - 45) {
 				break;
@@ -1272,9 +1272,9 @@ void ClearCosts(void)
 */
 static void DrawInfoPanelBackground(unsigned frame)
 {
-	if (TheUI.InfoPanel.G) {
-		TheUI.InfoPanel.G->DrawFrameClip(frame,
-			TheUI.InfoPanel.X, TheUI.InfoPanel.Y);
+	if (UI.InfoPanel.G) {
+		UI.InfoPanel.G->DrawFrameClip(frame,
+			UI.InfoPanel.X, UI.InfoPanel.Y);
 	}
 }
 
@@ -1297,27 +1297,27 @@ void CInfoPanel::Draw(void)
 			//  If there are more units selected draw their pictures and a health bar
 			//
 			DrawInfoPanelBackground(0);
-			for (i = 0; i < (NumSelected > TheUI.NumSelectedButtons ?
-					TheUI.NumSelectedButtons : NumSelected); ++i) {
-				DrawUnitIcon(ThisPlayer, TheUI.SelectedButtons[i].Style,
+			for (i = 0; i < (NumSelected > UI.NumSelectedButtons ?
+					UI.NumSelectedButtons : NumSelected); ++i) {
+				DrawUnitIcon(ThisPlayer, UI.SelectedButtons[i].Style,
 					Selected[i]->Type->Icon.Icon,
 					(ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == i) ?
 						(IconActive | (MouseButtons & LeftButton)) : 0,
-					TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y, NULL);
+					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, NULL);
 				UiDrawLifeBar(Selected[i],
-					TheUI.SelectedButtons[i].X, TheUI.SelectedButtons[i].Y);
+					UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 				if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 						ButtonUnderCursor == i) {
-					TheUI.StatusLine.Set(Selected[i]->Type->Name);
+					UI.StatusLine.Set(Selected[i]->Type->Name);
 				}
 			}
-			if (NumSelected > TheUI.NumSelectedButtons) {
+			if (NumSelected > UI.NumSelectedButtons) {
 				char buf[5];
 
-				sprintf(buf, "+%d", NumSelected - TheUI.NumSelectedButtons);
-				VideoDrawText(TheUI.MaxSelectedTextX, TheUI.MaxSelectedTextY,
-					TheUI.MaxSelectedFont, buf);
+				sprintf(buf, "+%d", NumSelected - UI.NumSelectedButtons);
+				VideoDrawText(UI.MaxSelectedTextX, UI.MaxSelectedTextY,
+					UI.MaxSelectedFont, buf);
 			}
 			return;
 		} else {
@@ -1342,7 +1342,7 @@ void CInfoPanel::Draw(void)
 			DrawInfoPanelBackground(i);
 			DrawUnitInfo(Selected[0]);
 			if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-				TheUI.StatusLine.Set(Selected[0]->Type->Name);
+				UI.StatusLine.Set(Selected[0]->Type->Name);
 			}
 			return;
 		}
@@ -1361,8 +1361,8 @@ void CInfoPanel::Draw(void)
 		char* rc;
 		// FIXME: need some cool ideas for this.
 
-		x = TheUI.InfoPanel.X + 16;
-		y = TheUI.InfoPanel.Y + 8;
+		x = UI.InfoPanel.X + 16;
+		y = UI.InfoPanel.Y + 8;
 
 		VideoDrawText(x, y, GameFont, "Stratagus");
 		y += 16;
@@ -1428,8 +1428,8 @@ void DrawTimer(void)
 	}
 
 	// FIXME: make this configurable
-	VideoDrawText(TheUI.SelectedViewport->EndX - 70,
-		TheUI.SelectedViewport->Y + 15, GameFont, buf);
+	VideoDrawText(UI.SelectedViewport->EndX - 70,
+		UI.SelectedViewport->Y + 15, GameFont, buf);
 }
 
 /**

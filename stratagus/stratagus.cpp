@@ -570,7 +570,7 @@ void MenuLoop(const char* filename, WorldMap* map)
 			DebugPrint("Creating game with map: %s\n" _C_ filename);
 			CreateGame(filename, map);
 
-			TheUI.StatusLine.Set(NameLine);
+			UI.StatusLine.Set(NameLine);
 			SetMessage("Do it! Do it now!");
 			//
 			//  Play the game.

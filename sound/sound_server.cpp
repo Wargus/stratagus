@@ -826,8 +826,8 @@ int InitSoundServer(void)
 	int MapWidth;
 	int MapHeight;
 
-	MapWidth = (TheUI.MapArea.EndX - TheUI.MapArea.X + TileSizeX) / TileSizeX;
-	MapHeight = (TheUI.MapArea.EndY - TheUI.MapArea.Y + TileSizeY) / TileSizeY;
+	MapWidth = (UI.MapArea.EndX - UI.MapArea.X + TileSizeX) / TileSizeX;
+	MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + TileSizeY) / TileSizeY;
 	// FIXME: Valid only in shared memory context!
 	DistanceSilent = 3 * ((MapWidth > MapHeight) ? MapWidth : MapHeight);
 	ViewPointOffset = ((MapWidth / 2 > MapHeight / 2) ? MapWidth / 2 : MapHeight / 2);

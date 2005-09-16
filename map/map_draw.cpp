@@ -229,13 +229,13 @@ void ViewportCenterViewpoint(Viewport* vp, int x, int y, int offsetx, int offset
 ** |        |---+---+---+---+---+---|      |        |
 ** |        |   |   |   |   |   |   |      |        |
 ** |        |   |   |   |   |   |   |      |        |
-** |        *-----------------------*      |<-ey,TheUI.MapEndY (in pixels)
+** |        *-----------------------*      |<-ey,UI.MapEndY (in pixels)
 ** |                                       |
 ** |                                       |
 ** *---------------------------------------*
 **          ^                       ^
-**        dx|-----------------------|ex,TheUI.MapEndX (in pixels)
-**            TheUI.MapX MapWidth (in tiles)
+**        dx|-----------------------|ex,UI.MapEndX (in pixels)
+**            UI.MapX MapWidth (in tiles)
 ** (in pixels)
 ** </PRE>
 */

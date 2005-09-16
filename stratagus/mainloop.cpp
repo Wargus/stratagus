@@ -114,7 +114,7 @@ void DoScrollArea(int state, int fast)
 		return;
 	}
 
-	vp = TheUI.SelectedViewport;
+	vp = UI.SelectedViewport;
 
 	if (fast) {
 		stepx = vp->MapWidth / 2 * TileSizeX * FRAMES_PER_SECOND;
@@ -246,23 +246,23 @@ void DrawMapArea(void)
 	const Viewport* evp;
 
 	// Draw all map viewports
-	evp = TheUI.Viewports + TheUI.NumViewports;
-	for (vp = TheUI.Viewports; vp < evp; ++vp) {
+	evp = UI.Viewports + UI.NumViewports;
+	for (vp = UI.Viewports; vp < evp; ++vp) {
 		DrawMapViewport(vp);
 	}
 
 	// if we a single viewport, no need to denote the "selected" one
-	if (TheUI.NumViewports == 1) {
+	if (UI.NumViewports == 1) {
 		return;
 	}
 
 	//
 	// Separate the viewports and mark the active viewport.
 	//
-	for (vp = TheUI.Viewports; vp < evp; ++vp) {
+	for (vp = UI.Viewports; vp < evp; ++vp) {
 		Uint32 color;
 
-		if (vp == TheUI.SelectedViewport) {
+		if (vp == UI.SelectedViewport) {
 			color = ColorOrange;
 		} else {
 			color = ColorBlack;
@@ -292,22 +292,22 @@ void UpdateDisplay(void)
 		}
 
 		if (!BigMapMode) {
-			for (i = 0; i < TheUI.NumFillers; ++i) {
-				TheUI.Filler[i]->DrawSubClip(0, 0,
-					TheUI.Filler[i]->Width,
-					TheUI.Filler[i]->Height,
-					TheUI.FillerX[i], TheUI.FillerY[i]);
+			for (i = 0; i < UI.NumFillers; ++i) {
+				UI.Filler[i]->DrawSubClip(0, 0,
+					UI.Filler[i]->Width,
+					UI.Filler[i]->Height,
+					UI.FillerX[i], UI.FillerY[i]);
 			}
 			DrawMenuButtonArea();
 
-			TheUI.Minimap.Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-			TheUI.Minimap.DrawCursor(TheUI.SelectedViewport->MapX,
-				TheUI.SelectedViewport->MapY);
+			UI.Minimap.Draw(UI.SelectedViewport->MapX, UI.SelectedViewport->MapY);
+			UI.Minimap.DrawCursor(UI.SelectedViewport->MapX,
+				UI.SelectedViewport->MapY);
 
-			TheUI.InfoPanel.Draw();
-			TheUI.ButtonPanel.Draw();
+			UI.InfoPanel.Draw();
+			UI.ButtonPanel.Draw();
 			DrawResources();
-			TheUI.StatusLine.Draw();
+			UI.StatusLine.Draw();
 		}
 
 		DrawCosts();
@@ -359,7 +359,7 @@ void GameMainLoop(void)
 	Callbacks = &GameCallbacks;
 
 	SetVideoSync();
-	GameCursor = TheUI.Point.Cursor;
+	GameCursor = UI.Point.Cursor;
 	GameRunning = 1;
 
 	showtip = 0;
@@ -415,7 +415,7 @@ void GameMainLoop(void)
 				case 2:
 					break;
 				case 3: // minimap update
-					TheUI.Minimap.Update();
+					UI.Minimap.Update();
 					break;
 				case 4:
 					break;
@@ -519,11 +519,11 @@ void GameMainLoop(void)
 	EndReplayLog();
 	if (GameResult == GameDefeat) {
 		fprintf(stderr, "You have lost!\n");
-		TheUI.StatusLine.Set("You have lost!");
+		UI.StatusLine.Set("You have lost!");
 		ProcessMenu("menu-defeated", 1);
 	} else if (GameResult == GameVictory) {
 		fprintf(stderr, "You have won!\n");
-		TheUI.StatusLine.Set("You have won!");
+		UI.StatusLine.Set("You have won!");
 		ProcessMenu("menu-victory", 1);
 	}
 

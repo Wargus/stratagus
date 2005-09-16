@@ -1294,8 +1294,8 @@ static void NameLineDrawFunc(Menuitem* mi)
 		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
 	}
 
-	VideoDrawTextCentered(VideoWidth / 2, TheUI.Offset480Y + 440, GameFont, NameLine);
-	VideoDrawTextCentered(VideoWidth / 2, TheUI.Offset480Y + 456, GameFont,
+	VideoDrawTextCentered(VideoWidth / 2, UI.Offset480Y + 440, GameFont, NameLine);
+	VideoDrawTextCentered(VideoWidth / 2, UI.Offset480Y + 456, GameFont,
 		"Engine distributed under the terms of the GNU General Public License.");
 	SetDefaultTextColors(nc, rc);
 }
@@ -1323,7 +1323,7 @@ static void GameMenuReturn(void)
 		CloseMenu();
 	}
 	InterfaceState = IfaceStateNormal;
-	TheUI.StatusLine.Clear();
+	UI.StatusLine.Clear();
 	GamePaused = 0;
 }
 
@@ -1843,7 +1843,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 #endif
 			LoadCcl();
 			PreMenuSetup();
-			GameCursor = TheUI.Point.Cursor;
+			GameCursor = UI.Point.Cursor;
 			menu = FindMenu("menu-program-start");
 			if (menu->InitFunc) {
 				menu->InitFunc(menu);
@@ -2001,11 +2001,11 @@ void SpeedOptionsInit(Menu* menu)
 	}
 
 	menu->Items[i + 4].D.HSlider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
-	if (TheUI.MouseScroll == 0) {
+	if (UI.MouseScroll == 0) {
 		menu->Items[i + 4].D.HSlider.percent = 0;
 	}
 	menu->Items[i + 8].D.HSlider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
-	if (TheUI.KeyScroll == 0) {
+	if (UI.KeyScroll == 0) {
 		menu->Items[i + 8].D.HSlider.percent = 0;
 	}
 }
@@ -3177,10 +3177,10 @@ static void GameSpeedHSAction(Menuitem* mi)
 */
 static void MouseScrollHSAction(Menuitem* mi)
 {
-	TheUI.MouseScroll = 1;
+	UI.MouseScroll = 1;
 	SpeedMouseScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
 	if (mi->D.HSlider.percent == 0) {
-		TheUI.MouseScroll = 0;
+		UI.MouseScroll = 0;
 	}
 }
 
@@ -3189,10 +3189,10 @@ static void MouseScrollHSAction(Menuitem* mi)
 */
 static void KeyboardScrollHSAction(Menuitem* mi)
 {
-	TheUI.KeyScroll = 1;
+	UI.KeyScroll = 1;
 	SpeedKeyScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
 	if (mi->D.HSlider.percent == 0) {
-		TheUI.KeyScroll = 0;
+		UI.KeyScroll = 0;
 	}
 }
 
@@ -3383,13 +3383,13 @@ static void GameDrawFunc(Menuitem* mi)
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
 	l = VideoTextLength(GameFont, "Scenario:");
-	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 380, GameFont, "Scenario:");
-	VideoDrawText(TheUI.Offset640X + 16, TheUI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
+	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380, GameFont, "Scenario:");
+	VideoDrawText(UI.Offset640X + 16, UI.Offset480Y + 380 + 24 , GameFont, ScenSelectFileName);
 	if (TheMap.Info.Description) {
-		VideoDrawText(TheUI.Offset640X + 16 + l + 8, TheUI.Offset480Y + 380, GameFont, TheMap.Info.Description);
+		VideoDrawText(UI.Offset640X + 16 + l + 8, UI.Offset480Y + 380, GameFont, TheMap.Info.Description);
 	}
 	sprintf(buffer, " (%d x %d)", TheMap.Info.MapWidth, TheMap.Info.MapHeight);
-	VideoDrawText(TheUI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), TheUI.Offset480Y + 380 + 24, GameFont, buffer);
+	VideoDrawText(UI.Offset640X + 16 + l + 8 + VideoTextLength(GameFont, ScenSelectFileName), UI.Offset480Y + 380 + 24, GameFont, buffer);
 
 #if 0
 	for (n = j = 0; j < PlayerMax; j++) {
@@ -3985,7 +3985,7 @@ static void NetMultiPlayerDrawFunc(Menuitem* mi)
 
 	GetDefaultTextColors(&nc, &rc);
 	SetDefaultTextColors(rc, rc);
-	VideoDrawText(TheUI.Offset640X + mi->XOfs, TheUI.Offset480Y + mi->YOfs, GameFont, Hosts[i].PlyName);
+	VideoDrawText(UI.Offset640X + mi->XOfs, UI.Offset480Y + mi->YOfs, GameFont, Hosts[i].PlyName);
 
 	SetDefaultTextColors(nc, rc);
 }

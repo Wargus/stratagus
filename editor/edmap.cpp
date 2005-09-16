@@ -456,8 +456,8 @@ static void EditorChangeTile(int x, int y, int tile, int d)
 
 	mf->Flags |= TheMap.Tileset.FlagsTable[tile];
 
-	TheUI.Minimap.UpdateSeenXY(x, y);
-	TheUI.Minimap.UpdateXY(x, y);
+	UI.Minimap.UpdateSeenXY(x, y);
+	UI.Minimap.UpdateXY(x, y);
 
 	EditorTileChanged2(x, y, d);
 }
