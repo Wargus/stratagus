@@ -85,7 +85,7 @@ static int HandleCount = 1;     /// Lua handler count
 static int CclSetMouseScrollSpeedDefault(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheUI.MouseScrollSpeedDefault = LuaToNumber(l, 1);
+	UI.MouseScrollSpeedDefault = LuaToNumber(l, 1);
 	return 0;
 }
 
@@ -97,7 +97,7 @@ static int CclSetMouseScrollSpeedDefault(lua_State* l)
 static int CclSetMouseScrollSpeedControl(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheUI.MouseScrollSpeedControl = LuaToNumber(l, 1);
+	UI.MouseScrollSpeedControl = LuaToNumber(l, 1);
 	return 0;
 }
 
@@ -1040,10 +1040,10 @@ static int CclDefineUI(lua_State* l)
 
 	// This save the setup values FIXME: They are set by CCL.
 
-	ui->MouseScroll = TheUI.MouseScroll;
-	ui->KeyScroll = TheUI.KeyScroll;
-	ui->MouseScrollSpeedDefault = TheUI.MouseScrollSpeedDefault;
-	ui->MouseScrollSpeedControl = TheUI.MouseScrollSpeedControl;
+	ui->MouseScroll = UI.MouseScroll;
+	ui->KeyScroll = UI.KeyScroll;
+	ui->MouseScrollSpeedDefault = UI.MouseScrollSpeedDefault;
+	ui->MouseScrollSpeedControl = UI.MouseScrollSpeedControl;
 
 	ui->MouseWarpX = -1;
 	ui->MouseWarpY = -1;
@@ -2070,7 +2070,7 @@ static int CclDefineViewports(lua_State* l)
 	int slot;
 
 	i = 0;
-	ui = &TheUI;
+	ui = &UI;
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
 		value = LuaToString(l, j + 1);
@@ -2111,7 +2111,7 @@ static int CclDefineViewports(lua_State* l)
 static int CclSetMouseScroll(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheUI.MouseScroll = LuaToBoolean(l, 1);
+	UI.MouseScroll = LuaToBoolean(l, 1);
 	return 0;
 }
 
@@ -2173,7 +2173,7 @@ static int CclSetLeaveStops(lua_State* l)
 static int CclSetKeyScroll(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheUI.KeyScroll = LuaToBoolean(l, 1);
+	UI.KeyScroll = LuaToBoolean(l, 1);
 	return 0;
 }
 
@@ -2205,7 +2205,7 @@ static int CclSetShowCommandKey(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
 	ShowCommandKey = LuaToBoolean(l, 1);
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 	return 0;
 }
 
@@ -2747,8 +2747,8 @@ static int CclDefineMenu(lua_State* l)
 	int j;
 
 	name = NULL;
-	TheUI.Offset640X = (VideoWidth - 640) / 2;
-	TheUI.Offset480Y = (VideoHeight - 480) / 2;
+	UI.Offset640X = (VideoWidth - 640) / 2;
+	UI.Offset480Y = (VideoHeight - 480) / 2;
 
 	//
 	// Parse the arguments, already the new tagged format.
@@ -2839,8 +2839,8 @@ static int CclDefineMenu(lua_State* l)
 				}
 			} else {
 				//printf("VideoWidth = %d\n", VideoWidth);
-				menu->X += TheUI.Offset640X;
-				menu->Y += TheUI.Offset480Y;
+				menu->X += UI.Offset640X;
+				menu->Y += UI.Offset480Y;
 			}
 		}
 	} else {
@@ -4133,14 +4133,14 @@ static int CclDefineButton(lua_State* l)
 void SelectionChanged(void)
 {
 	// We Changed out selection, anything pending buttonwise must be cleared
-	TheUI.StatusLine.Clear();
+	UI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
-	TheUI.ButtonPanel.Update();
-	GameCursor = TheUI.Point.Cursor;
+	UI.ButtonPanel.Update();
+	GameCursor = UI.Point.Cursor;
 	CursorBuilding = NULL;
 	CursorState = CursorStatePoint;
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 }
 
 /**
@@ -4148,7 +4148,7 @@ void SelectionChanged(void)
 */
 void SelectedUnitChanged(void)
 {
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 }
 
 /**

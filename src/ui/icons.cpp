@@ -197,7 +197,7 @@ void DrawUnitIcon(const Player *player, ButtonStyle *style, Icon *icon,
 	s.Default.Frame = s.Hover.Frame = s.Selected.Frame =
 		s.Clicked.Frame = s.Disabled.Frame = icon->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
-		s.Default.BorderColorRGB = TheUI.ButtonPanel.AutoCastBorderColorRGB;
+		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
 	}
 	// FIXME: player colors

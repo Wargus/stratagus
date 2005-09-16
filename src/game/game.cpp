@@ -616,7 +616,7 @@ void CreateGame(const char* filename, WorldMap* map)
 
 	InitSelections();
 
-	TheUI.Minimap.Create();   // create minimap for pud
+	UI.Minimap.Create();   // create minimap for pud
 	InitMap();         // setup draw functions
 	InitMapFogOfWar(); // build tables for fog of war
 	PreprocessMap();   // Adjust map for use
@@ -673,14 +673,14 @@ void CreateGame(const char* filename, WorldMap* map)
 	//
 	InitTriggers();
 
-	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
+	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
 #if 0
-	if (!TheUI.SelectedViewport) {
-		TheUI.SelectedViewport = TheUI.Viewports;
+	if (!UI.SelectedViewport) {
+		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
-	ViewportCenterViewpoint(TheUI.SelectedViewport,
+	ViewportCenterViewpoint(UI.SelectedViewport,
 		ThisPlayer->StartX, ThisPlayer->StartY, TileSizeX / 2, TileSizeY / 2);
 
 	//

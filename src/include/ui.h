@@ -271,7 +271,7 @@ typedef struct _content_type_ {
 			int Height;          /// Height of the bar.
 			char Border;         /// True for additional border.
 #if 0 // FIXME : something for color parametrisations (not implemented)
-// take TheUI.CompletedBar color for the moment.
+// take UI.CompletedBar color for the moment.
 			Color colors;        /// Color to show (depend of value)
 #endif
 		} CompleteBar;  /// Show bar.
@@ -490,7 +490,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CUserInterface TheUI;                        /// The user interface
+extern CUserInterface UI;                           /// The user interface
 extern CUserInterface** UI_Table;                   /// All available user interfaces
 
 	/// Hash table of all the button styles

@@ -169,7 +169,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	//  Clip to map window.
 	//  FIXME: should re-use CLIP_RECTANGLE in some way from linedraw.c ?
 	//
-	vp = TheUI.SelectedViewport;
+	vp = UI.SelectedViewport;
 	if (x1 < vp->X) {
 		x1 = vp->X;
 	} else if (x1 > vp->EndX) {
@@ -219,7 +219,7 @@ static void DrawBuildingCursor(void)
 	Unit* ontop;
 
 	// Align to grid
-	vp = TheUI.MouseViewport;
+	vp = UI.MouseViewport;
 	x = CursorX - (CursorX - vp->X + vp->OffsetX) % TileSizeX;
 	y = CursorY - (CursorY - vp->Y + vp->OffsetY) % TileSizeY;
 	mx = Viewport2MapX(vp, x);

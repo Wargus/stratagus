@@ -475,7 +475,7 @@ static void DrawUnitOn(Unit *unit, int red_phase)
 		if (unit->Attacked && unit->Attacked + ATTACK_BLINK_DURATION > GameCycle &&
 				(red_phase || unit->Attacked + ATTACK_RED_DURATION > GameCycle)) {
 			color = ColorRed;
-		} else if (TheUI.Minimap.ShowSelected && unit->Selected) {
+		} else if (UI.Minimap.ShowSelected && unit->Selected) {
 			color = ColorWhite;
 		} else {
 			color = ColorGreen;
@@ -484,15 +484,15 @@ static void DrawUnitOn(Unit *unit, int red_phase)
 		color = unit->Player->Color;
 	}
 
-	mx = 1 + TheUI.Minimap.XOffset + Map2MinimapX[unit->X];
-	my = 1 + TheUI.Minimap.YOffset + Map2MinimapY[unit->Y];
+	mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit->X];
+	my = 1 + UI.Minimap.YOffset + Map2MinimapY[unit->Y];
 	w = Map2MinimapX[type->TileWidth];
-	if (mx + w >= TheUI.Minimap.W) { // clip right side
-		w = TheUI.Minimap.W - mx;
+	if (mx + w >= UI.Minimap.W) { // clip right side
+		w = UI.Minimap.W - mx;
 	}
 	h0 = Map2MinimapY[type->TileHeight];
-	if (my + h0 >= TheUI.Minimap.H) { // clip bottom side
-		h0 = TheUI.Minimap.H - my;
+	if (my + h0 >= UI.Minimap.H) { // clip bottom side
+		h0 = UI.Minimap.H - my;
 	}
 #ifndef USE_OPENGL
 	bpp = MinimapSurface->format->BytesPerPixel;
@@ -751,11 +751,11 @@ void CMinimap::DrawCursor(int vx, int vy)
 	// Determine and save region below minimap cursor
 	int x = X + XOffset + (vx * MinimapScaleX) / MINIMAP_FAC;
 	int y = Y + YOffset + (vy * MinimapScaleY) / MINIMAP_FAC;
-	int w = (TheUI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
-	int h = (TheUI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
+	int w = (UI.SelectedViewport->MapWidth * MinimapScaleX) / MINIMAP_FAC;
+	int h = (UI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
-	VideoDrawTransRectangle(TheUI.ViewportCursorColor, x, y, w, h, 128);
+	VideoDrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
 }
 
 /**

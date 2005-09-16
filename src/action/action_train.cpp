@@ -209,7 +209,7 @@ void HandleActionTrain(Unit* unit)
 			}
 
 			if (IsOnlySelected(unit)) {
-				TheUI.ButtonPanel.Update();
+				UI.ButtonPanel.Update();
 			}
 			return;
 		} else {

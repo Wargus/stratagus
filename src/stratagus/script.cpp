@@ -2391,7 +2391,7 @@ int CclUnits(lua_State* l)
 
 	sprintf(buf, "%d free, %d(%d) used, %d destroyed, %d null",
 		freeslots, UnitSlotFree, NumUnits, destroyed, nullrefs);
-	TheUI.StatusLine.Set(buf);
+	UI.StatusLine.Set(buf);
 	fprintf(stderr, "%s\n", buf);
 
 	lua_pushnumber(l, destroyed);

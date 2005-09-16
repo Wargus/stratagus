@@ -30,8 +30,8 @@
 
 //@{
 
-#define ICON_SIZE_X (TheUI.ButtonPanel.Buttons[0].Style->Width)
-#define ICON_SIZE_Y (TheUI.ButtonPanel.Buttons[0].Style->Height)
+#define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
+#define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
 
 /*----------------------------------------------------------------------------
 --  Includes
@@ -90,10 +90,10 @@ static void HandlePieMenuMouseSelection(void);
 void CancelBuildingMode(void)
 {
 	CursorBuilding = NULL;
-	TheUI.StatusLine.Clear();
+	UI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 }
 
 /**
@@ -481,8 +481,8 @@ static void HandleMouseOn(int x, int y)
 	//  Handle buttons
 	//
 	if (!IsNetworkGame()) {
-		if (TheUI.MenuButton.X != -1) {
-			if (OnButton(x, y, &TheUI.MenuButton)) {
+		if (UI.MenuButton.X != -1) {
+			if (OnButton(x, y, &UI.MenuButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
@@ -490,16 +490,16 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	} else {
-		if (TheUI.NetworkMenuButton.X != -1) {
-			if (OnButton(x, y, &TheUI.NetworkMenuButton)) {
+		if (UI.NetworkMenuButton.X != -1) {
+			if (OnButton(x, y, &UI.NetworkMenuButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
 				return;
 			}
 		}
-		if (TheUI.NetworkDiplomacyButton.X != -1) {
-			if (OnButton(x, y, &TheUI.NetworkDiplomacyButton)) {
+		if (UI.NetworkDiplomacyButton.X != -1) {
+			if (OnButton(x, y, &UI.NetworkDiplomacyButton)) {
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
@@ -507,8 +507,8 @@ static void HandleMouseOn(int x, int y)
 			}
 		}
 	}
-	for (i = 0; i < TheUI.ButtonPanel.NumButtons; ++i) {
-		if (OnButton(x, y, &TheUI.ButtonPanel.Buttons[i])) {
+	for (i = 0; i < UI.ButtonPanel.NumButtons; ++i) {
+		if (OnButton(x, y, &UI.ButtonPanel.Buttons[i])) {
 			ButtonAreaUnderCursor = ButtonAreaButton;
 			if (CurrentButtons && CurrentButtons[i].Pos != -1) {
 				ButtonUnderCursor = i;
@@ -519,10 +519,10 @@ static void HandleMouseOn(int x, int y)
 	}
 	if (NumSelected == 1 && Selected[0]->Type->CanTransport &&
 			Selected[0]->BoardCount) {
-		i = Selected[0]->BoardCount < TheUI.NumTransportingButtons ?
-			Selected[0]->BoardCount - 1 : TheUI.NumTransportingButtons - 1;
+		i = Selected[0]->BoardCount < UI.NumTransportingButtons ?
+			Selected[0]->BoardCount - 1 : UI.NumTransportingButtons - 1;
 		for (; i >= 0; --i) {
-			if (OnButton(x, y, &TheUI.TransportingButtons[i])) {
+			if (OnButton(x, y, &UI.TransportingButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaTransporting;
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
@@ -533,18 +533,18 @@ static void HandleMouseOn(int x, int y)
 	if (NumSelected == 1) {
 		if (Selected[0]->Orders[0].Action == UnitActionTrain) {
 			if (Selected[0]->OrderCount == 1) {
-				if (OnButton(x, y, TheUI.SingleTrainingButton)) {
+				if (OnButton(x, y, UI.SingleTrainingButton)) {
 					ButtonAreaUnderCursor = ButtonAreaTraining;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
 			} else {
-				i = Selected[0]->OrderCount < TheUI.NumTrainingButtons ?
-					Selected[0]->OrderCount - 1 : TheUI.NumTrainingButtons - 1;
+				i = Selected[0]->OrderCount < UI.NumTrainingButtons ?
+					Selected[0]->OrderCount - 1 : UI.NumTrainingButtons - 1;
 				for (; i >= 0; --i) {
 					if (Selected[0]->Orders[i].Action == UnitActionTrain &&
-							OnButton(x, y, &TheUI.TrainingButtons[i])) {
+							OnButton(x, y, &UI.TrainingButtons[i])) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
 						ButtonUnderCursor = i;
 						CursorOn = CursorOnButton;
@@ -553,14 +553,14 @@ static void HandleMouseOn(int x, int y)
 				}
 			}
 		} else if (Selected[0]->Orders[0].Action == UnitActionUpgradeTo) {
-			if (OnButton(x, y, TheUI.UpgradingButton)) {
+			if (OnButton(x, y, UI.UpgradingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaUpgrading;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
 			}
 		} else if (Selected[0]->Orders[0].Action == UnitActionResearch) {
-			if (OnButton(x, y, TheUI.ResearchingButton)) {
+			if (OnButton(x, y, UI.ResearchingButton)) {
 				ButtonAreaUnderCursor = ButtonAreaResearching;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
@@ -569,17 +569,17 @@ static void HandleMouseOn(int x, int y)
 		}
 	}
 	if (NumSelected == 1) {
-		if (TheUI.SingleSelectedButton && OnButton(x, y, TheUI.SingleSelectedButton)) {
+		if (UI.SingleSelectedButton && OnButton(x, y, UI.SingleSelectedButton)) {
 			ButtonAreaUnderCursor = ButtonAreaSelected;
 			ButtonUnderCursor = 0;
 			CursorOn = CursorOnButton;
 			return;
 		}
 	} else {
-		i = NumSelected > TheUI.NumSelectedButtons ?
-			TheUI.NumSelectedButtons - 1 : NumSelected - 1;
+		i = NumSelected > UI.NumSelectedButtons ?
+			UI.NumSelectedButtons - 1 : NumSelected - 1;
 		for (; i >= 0; --i) {
-			if (OnButton(x, y, &TheUI.SelectedButtons[i])) {
+			if (OnButton(x, y, &UI.SelectedButtons[i])) {
 				ButtonAreaUnderCursor = ButtonAreaSelected;
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
@@ -591,8 +591,8 @@ static void HandleMouseOn(int x, int y)
 	//
 	//  Minimap
 	//
-	if (x >= TheUI.Minimap.X && x < TheUI.Minimap.X + TheUI.Minimap.W &&
-			y >= TheUI.Minimap.Y && y < TheUI.Minimap.Y + TheUI.Minimap.H) {
+	if (x >= UI.Minimap.X && x < UI.Minimap.X + UI.Minimap.W &&
+			y >= UI.Minimap.Y && y < UI.Minimap.Y + UI.Minimap.H) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
@@ -601,8 +601,8 @@ static void HandleMouseOn(int x, int y)
 	//  On UI graphic
 	//
 	on_ui = 0;
-	for (i = 0; i < TheUI.NumFillers; ++i) {
-		if (OnGraphic(x, y, TheUI.Filler[i], TheUI.FillerX[i], TheUI.FillerY[i])) {
+	for (i = 0; i < UI.NumFillers; ++i) {
+		if (OnGraphic(x, y, UI.Filler[i], UI.FillerX[i], UI.FillerY[i])) {
 			on_ui = 1;
 			break;
 		}
@@ -611,17 +611,17 @@ static void HandleMouseOn(int x, int y)
 	//
 	//  Map
 	//
-	if (!on_ui && x >= TheUI.MapArea.X && x <= TheUI.MapArea.EndX &&
-			y >= TheUI.MapArea.Y && y <= TheUI.MapArea.EndY) {
+	if (!on_ui && x >= UI.MapArea.X && x <= UI.MapArea.EndX &&
+			y >= UI.MapArea.Y && y <= UI.MapArea.EndY) {
 		Viewport* vp;
 
 		vp = GetViewport(x, y);
 		Assert(vp);
 		// viewport changed
-		if (TheUI.MouseViewport != vp) {
-			TheUI.MouseViewport = vp;
+		if (UI.MouseViewport != vp) {
+			UI.MouseViewport = vp;
 			DebugPrint("current viewport changed to %d.\n" _C_
-				vp - TheUI.Viewports);
+				vp - UI.Viewports);
 		}
 
 		// Note cursor on map can be in scroll area
@@ -658,7 +658,7 @@ void HandleMouseExit(void)
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
 	CursorX = VideoWidth / 2;
 	CursorY = VideoHeight / 2;
-	GameCursor = TheUI.Point.Cursor;
+	GameCursor = UI.Point.Cursor;
 }
 
 /**
@@ -666,24 +666,24 @@ void HandleMouseExit(void)
 */
 void RestrictCursorToViewport(void)
 {
-	if (CursorX < TheUI.SelectedViewport->X) {
-		CursorStartX = TheUI.SelectedViewport->X;
-	} else if (CursorX >= TheUI.SelectedViewport->EndX) {
-		CursorStartX = TheUI.SelectedViewport->EndX - 1;
+	if (CursorX < UI.SelectedViewport->X) {
+		CursorStartX = UI.SelectedViewport->X;
+	} else if (CursorX >= UI.SelectedViewport->EndX) {
+		CursorStartX = UI.SelectedViewport->EndX - 1;
 	} else {
 		CursorStartX = CursorX;
 	}
 
-	if (CursorY < TheUI.SelectedViewport->Y) {
-		CursorStartY = TheUI.SelectedViewport->Y;
-	} else if (CursorY >= TheUI.SelectedViewport->EndY) {
-		CursorStartY = TheUI.SelectedViewport->EndY - 1;
+	if (CursorY < UI.SelectedViewport->Y) {
+		CursorStartY = UI.SelectedViewport->Y;
+	} else if (CursorY >= UI.SelectedViewport->EndY) {
+		CursorStartY = UI.SelectedViewport->EndY - 1;
 	} else {
 		CursorStartY = CursorY;
 	}
 
-	TheUI.MouseWarpX = CursorX = CursorStartX;
-	TheUI.MouseWarpY = CursorY = CursorStartY;
+	UI.MouseWarpX = CursorX = CursorStartX;
+	UI.MouseWarpY = CursorY = CursorStartY;
 	CursorOn = CursorOnMap;
 }
 
@@ -692,24 +692,24 @@ void RestrictCursorToViewport(void)
 */
 void RestrictCursorToMinimap(void)
 {
-	if (CursorX < TheUI.Minimap.X) {
-		CursorStartX = TheUI.Minimap.X;
-	} else if (CursorX >= TheUI.Minimap.X + TheUI.Minimap.W) {
-		CursorStartX = TheUI.Minimap.X + TheUI.Minimap.W - 1;
+	if (CursorX < UI.Minimap.X) {
+		CursorStartX = UI.Minimap.X;
+	} else if (CursorX >= UI.Minimap.X + UI.Minimap.W) {
+		CursorStartX = UI.Minimap.X + UI.Minimap.W - 1;
 	} else {
 		CursorStartX = CursorX;
 	}
 
-	if (CursorY < TheUI.Minimap.Y) {
-		CursorStartY = TheUI.Minimap.Y;
-	} else if (CursorY >= TheUI.Minimap.Y + TheUI.Minimap.W) {
-		CursorStartY = TheUI.Minimap.Y + TheUI.Minimap.H - 1;
+	if (CursorY < UI.Minimap.Y) {
+		CursorStartY = UI.Minimap.Y;
+	} else if (CursorY >= UI.Minimap.Y + UI.Minimap.W) {
+		CursorStartY = UI.Minimap.Y + UI.Minimap.H - 1;
 	} else {
 		CursorStartY = CursorY;
 	}
 
-	CursorX = TheUI.MouseWarpX = CursorStartX;
-	CursorY = TheUI.MouseWarpY = CursorStartY;
+	CursorX = UI.MouseWarpX = CursorStartX;
+	CursorY = UI.MouseWarpY = CursorStartY;
 	CursorOn = CursorOnMinimap;
 }
 
@@ -736,19 +736,19 @@ void UIHandleMouseMove(int x, int y)
 	//
 	//  Move map.
 	//
-	if (GameCursor == TheUI.Scroll.Cursor) {
+	if (GameCursor == UI.Scroll.Cursor) {
 		int xo;
 		int yo;
 		int speed;
 
 		if (KeyModifiers & ModifierControl) {
-			speed = TheUI.MouseScrollSpeedControl;
+			speed = UI.MouseScrollSpeedControl;
 		} else {
-			speed = TheUI.MouseScrollSpeedDefault;
+			speed = UI.MouseScrollSpeedDefault;
 		}
 
-		xo = TheUI.MouseViewport->MapX;
-		yo = TheUI.MouseViewport->MapY;
+		xo = UI.MouseViewport->MapX;
+		yo = UI.MouseViewport->MapY;
 		SubScrollX += speed * (x - CursorStartX);
 		SubScrollY += speed * (y - CursorStartY);
 
@@ -758,31 +758,31 @@ void UIHandleMouseMove(int x, int y)
 		yo += SubScrollY / TileSizeY;
 		SubScrollY = SubScrollY % TileSizeY;
 
-		TheUI.MouseWarpX = CursorStartX;
-		TheUI.MouseWarpY = CursorStartY;
-		ViewportSetViewpoint(TheUI.MouseViewport, xo, yo, 0, 0);
+		UI.MouseWarpX = CursorStartX;
+		UI.MouseWarpY = CursorStartY;
+		ViewportSetViewpoint(UI.MouseViewport, xo, yo, 0, 0);
 		return;
 	}
 
 	UnitUnderCursor = NULL;
-	GameCursor = TheUI.Point.Cursor;  // Reset
+	GameCursor = UI.Point.Cursor;  // Reset
 	HandleMouseOn(x, y);
 
 	//
 	//  Make the piemenu "follow" the mouse
 	//
 	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
-		if (CursorX - CursorStartX > TheUI.PieX[2]) {
-			CursorStartX = CursorX - TheUI.PieX[2];
+		if (CursorX - CursorStartX > UI.PieX[2]) {
+			CursorStartX = CursorX - UI.PieX[2];
 		}
-		if (CursorStartX - CursorX > TheUI.PieX[2]) {
-			CursorStartX = CursorX + TheUI.PieX[2];
+		if (CursorStartX - CursorX > UI.PieX[2]) {
+			CursorStartX = CursorX + UI.PieX[2];
 		}
-		if (CursorStartY - CursorY > TheUI.PieY[4]) {
-			CursorStartY = CursorY + TheUI.PieY[4];
+		if (CursorStartY - CursorY > UI.PieY[4]) {
+			CursorStartY = CursorY + UI.PieY[4];
 		}
-		if (CursorY - CursorStartY > TheUI.PieY[4]) {
-			CursorStartY = CursorY - TheUI.PieY[4];
+		if (CursorY - CursorStartY > UI.PieY[4]) {
+			CursorStartY = CursorY - UI.PieY[4];
 		}
 		return;
 	}
@@ -791,8 +791,8 @@ void UIHandleMouseMove(int x, int y)
 	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap &&
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
-		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+		ViewportCenterViewpoint(UI.SelectedViewport,
+			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 			TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
@@ -809,15 +809,15 @@ void UIHandleMouseMove(int x, int y)
 	if (CursorOn == CursorOnMap) {
 		const Viewport* vp;
 
-		vp = TheUI.MouseViewport;
+		vp = UI.MouseViewport;
 		if (IsMapFieldExplored(ThisPlayer, Viewport2MapX(vp, x),
 				Viewport2MapY(vp, y)) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnScreen(NULL, x - vp->X + vp->MapX * TileSizeX + vp->OffsetX,
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
-		mx = TheUI.Minimap.Screen2MapX(x);
-		my = TheUI.Minimap.Screen2MapY(y);
+		mx = UI.Minimap.Screen2MapX(x);
+		my = UI.Minimap.Screen2MapY(y);
 		if (IsMapFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(mx, my);
 		}
@@ -834,21 +834,21 @@ void UIHandleMouseMove(int x, int y)
 	//
 	if (CursorState == CursorStateSelect) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
-			GameCursor = TheUI.YellowHair.Cursor;
+			GameCursor = UI.YellowHair.Cursor;
 			if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration) {
 				if (IsAllied(ThisPlayer, UnitUnderCursor)) {
-					GameCursor = TheUI.GreenHair.Cursor;
+					GameCursor = UI.GreenHair.Cursor;
 				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-					GameCursor = TheUI.RedHair.Cursor;
+					GameCursor = UI.RedHair.Cursor;
 				}
 			}
 			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
 				//
 				//  Minimap move viewpoint
 				//
-				ViewportCenterViewpoint(TheUI.SelectedViewport,
-					TheUI.Minimap.Screen2MapX(CursorX),
-					TheUI.Minimap.Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+				ViewportCenterViewpoint(UI.SelectedViewport,
+					UI.Minimap.Screen2MapX(CursorX),
+					UI.Minimap.Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -864,7 +864,7 @@ void UIHandleMouseMove(int x, int y)
 		//
 		if (UnitUnderCursor && !UnitUnderCursor->Type->Decoration &&
 				(UnitVisible(UnitUnderCursor, ThisPlayer) || ReplayRevealMap)) {
-			GameCursor = TheUI.Glass.Cursor;
+			GameCursor = UI.Glass.Cursor;
 		}
 
 		return;
@@ -874,8 +874,8 @@ void UIHandleMouseMove(int x, int y)
 		//
 		//  Minimap move viewpoint
 		//
-		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+		ViewportCenterViewpoint(UI.SelectedViewport,
+			UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 			TileSizeX / 2, TileSizeY / 2);
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
@@ -1228,7 +1228,7 @@ static void SendCommand(int sx, int sy)
 
 	ret = 0;
 	CurrentButtonLevel = 0;
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 	switch (CursorAction) {
 		case ButtonMove:
 			ret = SendMove(sx, sy);
@@ -1311,7 +1311,7 @@ static void DoSelectionButtons(int num, unsigned button)
 		SelectSingleUnit(unit);
 	}
 
-	TheUI.StatusLine.Clear();
+	UI.StatusLine.Clear();
 	ClearCosts();
 	CurrentButtonLevel = 0;
 	SelectionChanged();
@@ -1339,17 +1339,17 @@ static void UISelectStateButtonDown(unsigned button)
 	//  Clicking on the map.
 	//
 	if (CursorOn == CursorOnMap) {
-		TheUI.StatusLine.Clear();
+		UI.StatusLine.Clear();
 		ClearCosts();
 		CursorState = CursorStatePoint;
-		GameCursor = TheUI.Point.Cursor;
+		GameCursor = UI.Point.Cursor;
 		CurrentButtonLevel = 0;
-		TheUI.ButtonPanel.Update();
+		UI.ButtonPanel.Update();
 
 		if (MouseButtons & LeftButton) {
 			const Viewport* vp;
 
-			vp = TheUI.MouseViewport;
+			vp = UI.MouseViewport;
 			if (ClickMissile) {
 				int mx;
 				int my;
@@ -1373,24 +1373,24 @@ static void UISelectStateButtonDown(unsigned button)
 		int mx;
 		int my;
 
-		mx = TheUI.Minimap.Screen2MapX(CursorX);
-		my = TheUI.Minimap.Screen2MapY(CursorY);
+		mx = UI.Minimap.Screen2MapX(CursorX);
+		my = UI.Minimap.Screen2MapY(CursorY);
 		if (MouseButtons & LeftButton) {
 			sx = mx * TileSizeX;
 			sy = my * TileSizeY;
-			TheUI.StatusLine.Clear();
+			UI.StatusLine.Clear();
 			ClearCosts();
 			CursorState = CursorStatePoint;
-			GameCursor = TheUI.Point.Cursor;
+			GameCursor = UI.Point.Cursor;
 			CurrentButtonLevel = 0;
-			TheUI.ButtonPanel.Update();
+			UI.ButtonPanel.Update();
 			if (ClickMissile) {
 				MakeLocalMissile(MissileTypeByIdent(ClickMissile),
 					sx + TileSizeX / 2, sy + TileSizeY / 2, 0, 0);
 			}
 			SendCommand(sx, sy);
 		} else {
-			ViewportCenterViewpoint(TheUI.SelectedViewport, mx, my, TileSizeX / 2, TileSizeY / 2);
+			ViewportCenterViewpoint(UI.SelectedViewport, mx, my, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
 	}
@@ -1398,17 +1398,17 @@ static void UISelectStateButtonDown(unsigned button)
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			TheUI.ButtonPanel.DoClicked(ButtonUnderCursor);
+			UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 			return;
 		}
 	}
 
-	TheUI.StatusLine.Clear();
+	UI.StatusLine.Clear();
 	ClearCosts();
 	CursorState = CursorStatePoint;
-	GameCursor = TheUI.Point.Cursor;
+	GameCursor = UI.Point.Cursor;
 	CurrentButtonLevel = 0;
-	TheUI.ButtonPanel.Update();
+	UI.ButtonPanel.Update();
 }
 
 
@@ -1482,13 +1482,13 @@ void UIHandleButtonDown(unsigned button)
 	//  Cursor is on the map area
 	//
 	if (CursorOn == CursorOnMap) {
-		Assert(TheUI.MouseViewport);
+		Assert(UI.MouseViewport);
 
 		if ((MouseButtons & LeftButton) &&
-				TheUI.SelectedViewport != TheUI.MouseViewport) {
-			TheUI.SelectedViewport = TheUI.MouseViewport;
+				UI.SelectedViewport != UI.MouseViewport) {
+			UI.SelectedViewport = UI.MouseViewport;
 			DebugPrint("selected viewport changed to %d.\n" _C_
-				TheUI.SelectedViewport - TheUI.Viewports);
+				UI.SelectedViewport - UI.Viewports);
 		}
 
 		// to redraw the cursor immediately (and avoid up to 1 sec delay
@@ -1502,8 +1502,8 @@ void UIHandleButtonDown(unsigned button)
 				int j;
 				int explored;
 
-				x = Viewport2MapX(TheUI.MouseViewport, CursorX);
-				y = Viewport2MapY(TheUI.MouseViewport, CursorY);
+				x = Viewport2MapX(UI.MouseViewport, CursorX);
+				y = Viewport2MapY(UI.MouseViewport, CursorY);
 				// FIXME: error messages
 
 				explored = 1;
@@ -1535,9 +1535,9 @@ void UIHandleButtonDown(unsigned button)
 			return;
 		}
 
-		if (MouseButtons & TheUI.PieMouseButton) { // enter pie menu
+		if (MouseButtons & UI.PieMouseButton) { // enter pie menu
 			UnitUnderCursor = NULL;
-			GameCursor = TheUI.Point.Cursor;  // Reset
+			GameCursor = UI.Point.Cursor;  // Reset
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			if (NumSelected && Selected[0]->Player == ThisPlayer &&
@@ -1547,18 +1547,18 @@ void UIHandleButtonDown(unsigned button)
 		} else if (MouseButtons & LeftButton) { // enter select mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
-			CursorStartScrMapX = CursorStartX - TheUI.MouseViewport->X +
-				TileSizeX * TheUI.MouseViewport->MapX + TheUI.MouseViewport->OffsetX;
-			CursorStartScrMapY = CursorStartY - TheUI.MouseViewport->Y +
-				TileSizeY * TheUI.MouseViewport->MapY + TheUI.MouseViewport->OffsetY;
-			GameCursor = TheUI.Cross.Cursor;
+			CursorStartScrMapX = CursorStartX - UI.MouseViewport->X +
+				TileSizeX * UI.MouseViewport->MapX + UI.MouseViewport->OffsetX;
+			CursorStartScrMapY = CursorStartY - UI.MouseViewport->Y +
+				TileSizeY * UI.MouseViewport->MapY + UI.MouseViewport->OffsetY;
+			GameCursor = UI.Cross.Cursor;
 			CursorState = CursorStateRectangle;
 		} else if (MouseButtons & MiddleButton) {// enter move map mode
 			CursorStartX = CursorX;
 			CursorStartY = CursorY;
 			SubScrollX = 0;
 			SubScrollY = 0;
-			GameCursor = TheUI.Scroll.Cursor;
+			GameCursor = UI.Scroll.Cursor;
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				Unit* unit;
@@ -1567,8 +1567,8 @@ void UIHandleButtonDown(unsigned button)
 				int x;
 				int y;
 
-				x = Viewport2MapX(TheUI.MouseViewport, CursorX);
-				y = Viewport2MapY(TheUI.MouseViewport, CursorY);
+				x = Viewport2MapX(UI.MouseViewport, CursorX);
+				y = Viewport2MapY(UI.MouseViewport, CursorY);
 
 				if (UnitUnderCursor && (unit = UnitOnMapTile(x, y)) &&
 						!UnitUnderCursor->Type->Decoration) {
@@ -1576,10 +1576,10 @@ void UIHandleButtonDown(unsigned button)
 				} else { // if not not click on building -- green cross
 					if (ClickMissile) {
 						MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-							TheUI.MouseViewport->MapX * TileSizeX +
-								CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->OffsetX,
-							TheUI.MouseViewport->MapY * TileSizeY +
-								CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->OffsetY, 0, 0);
+							UI.MouseViewport->MapX * TileSizeX +
+								CursorX - UI.MouseViewport->X + UI.MouseViewport->OffsetX,
+							UI.MouseViewport->MapY * TileSizeY +
+								CursorY - UI.MouseViewport->Y + UI.MouseViewport->OffsetY, 0, 0);
 					}
 				}
 				DoRightButton(x * TileSizeX, y * TileSizeY);
@@ -1590,19 +1590,19 @@ void UIHandleButtonDown(unsigned button)
 	//
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
-			ViewportCenterViewpoint(TheUI.SelectedViewport,
-				TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+			ViewportCenterViewpoint(UI.SelectedViewport,
+				UI.Minimap.Screen2MapX(CursorX), UI.Minimap.Screen2MapY(CursorY),
 				TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				if (ClickMissile) {
 					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-						TheUI.Minimap.Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
-						TheUI.Minimap.Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
+						UI.Minimap.Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
+						UI.Minimap.Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
 				}
 				// DoRightButton() takes screen map coordinates
-				DoRightButton(TheUI.Minimap.Screen2MapX(CursorX) * TileSizeX,
-					TheUI.Minimap.Screen2MapY(CursorY) * TileSizeY);
+				DoRightButton(UI.Minimap.Screen2MapX(CursorX) * TileSizeX,
+					UI.Minimap.Screen2MapY(CursorY) * TileSizeY);
 			}
 		}
 	//
@@ -1638,7 +1638,7 @@ void UIHandleButtonDown(unsigned button)
 				//
 				if (ButtonUnderCursor == 0 && NumSelected == 1) {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-					ViewportCenterViewpoint(TheUI.SelectedViewport, Selected[0]->X,
+					ViewportCenterViewpoint(UI.SelectedViewport, Selected[0]->X,
 						Selected[0]->Y, Selected[0]->IX + TileSizeX / 2,
 						Selected[0]->IY + TileSizeY / 2);
 				}
@@ -1707,7 +1707,7 @@ void UIHandleButtonDown(unsigned button)
 			} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 				if (!GameObserve && !GamePaused &&
 					PlayersTeamed(ThisPlayer->Index, Selected[0]->Player->Index)) {
-					TheUI.ButtonPanel.DoClicked(ButtonUnderCursor);
+					UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				}
 			}
 		} else if ((MouseButtons & MiddleButton)) {
@@ -1717,10 +1717,10 @@ void UIHandleButtonDown(unsigned button)
 			if (ButtonAreaUnderCursor == ButtonAreaSelected &&
 					ButtonUnderCursor == 0 && NumSelected == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				if (TheUI.SelectedViewport->Unit == Selected[0]) {
-					TheUI.SelectedViewport->Unit = NULL;
+				if (UI.SelectedViewport->Unit == Selected[0]) {
+					UI.SelectedViewport->Unit = NULL;
 				} else {
-					TheUI.SelectedViewport->Unit = Selected[0];
+					UI.SelectedViewport->Unit = Selected[0];
 				}
 			}
 		} else if ((MouseButtons & RightButton)) {
@@ -1738,8 +1738,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	//  Move map.
 	//
-	if (GameCursor == TheUI.Scroll.Cursor) {
-		GameCursor = TheUI.Point.Cursor;
+	if (GameCursor == UI.Scroll.Cursor) {
+		GameCursor = UI.Point.Cursor;
 		return;
 	}
 
@@ -1766,7 +1766,7 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: Not if, in input mode.
 			if (!IsNetworkGame()) {
 				GamePaused = 1;
-				TheUI.StatusLine.Set("Game Paused");
+				UI.StatusLine.Set("Game Paused");
 			}
 			ProcessMenu("menu-game", 0);
 			return;
@@ -1811,10 +1811,10 @@ void UIHandleButtonUp(unsigned button)
 
 			x0 = CursorStartScrMapX;
 			y0 = CursorStartScrMapY;
-			x1 = CursorX - TheUI.MouseViewport->X +
-				TheUI.MouseViewport->MapX * TileSizeX + TheUI.MouseViewport->OffsetX;
-			y1 = CursorY - TheUI.MouseViewport->Y +
-				TheUI.MouseViewport->MapY * TileSizeY + TheUI.MouseViewport->OffsetY;
+			x1 = CursorX - UI.MouseViewport->X +
+				UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX;
+			y1 = CursorY - UI.MouseViewport->Y +
+				UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY;
 
 			if (x0 > x1) {
 				int swap;
@@ -1854,11 +1854,11 @@ void UIHandleButtonUp(unsigned button)
 			// cade: cannot select unit on invisible space
 			// FIXME: johns: only complete invisibile units
 			if (IsMapFieldVisible(ThisPlayer,
-					Viewport2MapX(TheUI.MouseViewport, CursorX),
-					Viewport2MapY(TheUI.MouseViewport, CursorY)) || ReplayRevealMap) {
+					Viewport2MapX(UI.MouseViewport, CursorX),
+					Viewport2MapY(UI.MouseViewport, CursorY)) || ReplayRevealMap) {
 				unit = UnitOnScreen(unit,
-					CursorX - TheUI.MouseViewport->X + TheUI.MouseViewport->MapX * TileSizeX + TheUI.MouseViewport->OffsetX,
-					CursorY - TheUI.MouseViewport->Y + TheUI.MouseViewport->MapY * TileSizeY + TheUI.MouseViewport->OffsetY);
+					CursorX - UI.MouseViewport->X + UI.MouseViewport->MapX * TileSizeX + UI.MouseViewport->OffsetX,
+					CursorY - UI.MouseViewport->Y + UI.MouseViewport->MapY * TileSizeY + UI.MouseViewport->OffsetY);
 			}
 			if (unit) {
 				// FIXME: Not nice coded, button number hardcoded!
@@ -1898,7 +1898,7 @@ void UIHandleButtonUp(unsigned button)
 		}
 
 		if (num) {
-			TheUI.StatusLine.Clear();
+			UI.StatusLine.Clear();
 			ClearCosts();
 			CurrentButtonLevel = 0;
 			SelectionChanged();
@@ -1933,14 +1933,14 @@ printf("Race = %d\n", Selected[0]->Player->Race);
 							Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 							Selected[0]->Type->Name);
 					}
-					TheUI.StatusLine.Set(buf);
+					UI.StatusLine.Set(buf);
 				}
 			}
 		}
 
 		CursorStartX = 0;
 		CursorStartY = 0;
-		GameCursor = TheUI.Point.Cursor;
+		GameCursor = UI.Point.Cursor;
 		CursorState = CursorStatePoint;
 	}
 }
@@ -1959,8 +1959,8 @@ static int GetPieUnderCursor(void)
 	x = CursorX - (CursorStartX - ICON_SIZE_X / 2);
 	y = CursorY - (CursorStartY - ICON_SIZE_Y / 2);
 	for (i = 0; i < 8; ++i) {
-		if (x > TheUI.PieX[i] && x < TheUI.PieX[i] + ICON_SIZE_X &&
-				y > TheUI.PieY[i] && y < TheUI.PieY[i] + ICON_SIZE_Y) {
+		if (x > UI.PieX[i] && x < UI.PieX[i] + ICON_SIZE_X &&
+				y > UI.PieY[i] && y < UI.PieY[i] + ICON_SIZE_Y) {
 			return i;
 		}
 	}
@@ -1986,25 +1986,25 @@ void DrawPieMenu(void)
 		return;
 	}
 
-	vp = TheUI.SelectedViewport;
+	vp = UI.SelectedViewport;
 	PushClipping();
 	SetClipping(vp->X, vp->Y, vp->EndX, vp->EndY);
 
 	// Draw background
-	if (TheUI.PieMenuBackgroundG) {
-		TheUI.PieMenuBackgroundG->DrawFrameClip(0,
-			CursorStartX - TheUI.PieMenuBackgroundG->Width / 2,
-			CursorStartY - TheUI.PieMenuBackgroundG->Height / 2);
+	if (UI.PieMenuBackgroundG) {
+		UI.PieMenuBackgroundG->DrawFrameClip(0,
+			CursorStartX - UI.PieMenuBackgroundG->Width / 2,
+			CursorStartY - UI.PieMenuBackgroundG->Height / 2);
 	}
 	player = Selected[0]->Player;
 
-	for (i = 0; i < TheUI.ButtonPanel.NumButtons && i < 8; ++i) {
+	for (i = 0; i < UI.ButtonPanel.NumButtons && i < 8; ++i) {
 		if (buttons[i].Pos != -1) {
 			int x;
 			int y;
 
-			x = CursorStartX - ICON_SIZE_X / 2 + TheUI.PieX[i];
-			y = CursorStartY - ICON_SIZE_Y / 2 + TheUI.PieY[i];
+			x = CursorStartX - ICON_SIZE_X / 2 + UI.PieX[i];
+			y = CursorStartY - ICON_SIZE_Y / 2 + UI.PieY[i];
 			// Draw icon
 			DrawIcon(player, buttons[i].Icon.Icon, x, y);
 
@@ -2044,7 +2044,7 @@ static void HandlePieMenuMouseSelection(void)
 
 	pie = GetPieUnderCursor();
 	if (pie != -1) {
-		TheUI.ButtonPanel.DoClicked(pie);
+		UI.ButtonPanel.DoClicked(pie);
 		if (CurrentButtons[pie].Action == ButtonButton) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
