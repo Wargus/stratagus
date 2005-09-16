@@ -204,14 +204,13 @@ endif
 DOCS    = README doc/*.html doc/*.txt doc/scripts/*.html doc/scripts/*.py \
 	  doc/graphics/*.html doc/graphics/*.gimp doc/graphics/*.png
 
-PICS    = contrib/stratagus.ico
+PICS    = contrib/stratagus.ico contrib/poweredby.png
 
 CONTRIB	= contrib/macosx.tgz
 
-MISC    += Makefile Rules.make.orig \
-	  contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
-	  Rules.make.in configure.in configure \
-	  src/stratagus.rc stratagus.dsw stratagus.dsp \
+MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
+	  Rules.make.in configure.in configure config.h.in \
+	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
 	  $(patsubst %, %/Module.make, $(MODULES)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
@@ -222,7 +221,7 @@ distdir	= stratagus-$(mydate)
 DISTLIST = distlist.tmp
 
 distlist:
-	@echo $(SRC_ALL) $(HDRS) src/beos/beos.cpp > $(DISTLIST)
+	@echo $(SRC_ALL) $(HDRS) > $(DISTLIST)
 
 dist: distlist
 	autoconf
