@@ -126,8 +126,10 @@ protected:
 		struct _unit_* target, int x, int y);
 
 public:
+	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
 	virtual ~SpellActionType() {};
 	virtual SpellFunc Cast = 0;
+	const int ModifyManaCaster;
 };
 
 //
@@ -200,7 +202,7 @@ public:
 
 class AdjustVitals : public SpellActionType {
 public:
-	AdjustVitals() : HP(0), Mana(0), MaxMultiCast(0) {};
+	AdjustVitals() : SpellActionType(1), HP(0), Mana(0), MaxMultiCast(0) {};
 	virtual SpellFunc Cast;
 
 	int HP;         /// Target HP gain.(can be negative)
@@ -212,7 +214,7 @@ public:
 
 class Polymorph : public SpellActionType {
 public:
-	Polymorph() : NewForm(NULL), PlayerNeutral(0) {};
+	Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
 	virtual SpellFunc Cast;
 
 	struct _unit_type_* NewForm;/// The new form
@@ -222,7 +224,7 @@ public:
 
 class Summon : public SpellActionType {
 public:
-	Summon() : UnitType(NULL), TTL(0), RequireCorpse(0) {} ;
+	Summon() : SpellActionType(1), UnitType(NULL), TTL(0), RequireCorpse(0) {} ;
 	virtual SpellFunc Cast;
 
 	struct _unit_type_* UnitType;/// Type of unit to be summoned.
