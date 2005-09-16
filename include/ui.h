@@ -347,7 +347,8 @@ private:
 /**
 **  Defines the user interface.
 */
-typedef struct _ui_ {
+class CUserInterface {
+public:
 	char* Name;                         /// interface name to select
 	int Width;                          /// useable for this width
 	int Height;                         /// useable for this height
@@ -483,14 +484,14 @@ typedef struct _ui_ {
 
 	Graphic* VictoryBackgroundG;        /// Victory background graphic
 	Graphic* DefeatBackgroundG;         /// Defeat background graphic
-} UI;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern UI TheUI;                        /// The user interface
-extern UI** UI_Table;                   /// All available user interfaces
+extern CUserInterface TheUI;                        /// The user interface
+extern CUserInterface** UI_Table;                   /// All available user interfaces
 
 	/// Hash table of all the button styles
 typedef hashtable(ButtonStyle*, 128) _ButtonStyleHash;
@@ -525,7 +526,7 @@ extern void SaveUserInterface(CLFile *file);
 	/// Clean up the Panel.
 extern void CleanPanel(InfoPanel* panel);
 	/// Clean up a ui
-extern void CleanUI(UI* ui);
+extern void CleanUI(CUserInterface* ui);
 	/// Clean up the ui module
 extern void CleanUserInterface(void);
 	/// Register ccl features

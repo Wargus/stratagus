@@ -646,7 +646,7 @@ static void CclParseIcon(lua_State* l, Button* icon)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI that is updated.
 */
-static void CclParseSelected(lua_State* l, UI* ui)
+static void CclParseSelected(lua_State* l, CUserInterface* ui)
 {
 	const char* value;
 	InfoText text;
@@ -736,7 +736,7 @@ static void CclParseSelected(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseTraining(lua_State* l, UI* ui)
+static void CclParseTraining(lua_State* l, CUserInterface* ui)
 {
 	const char* value;
 	InfoText text;
@@ -835,7 +835,7 @@ static void CclParseTraining(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseUpgrading(lua_State* l, UI* ui)
+static void CclParseUpgrading(lua_State* l, CUserInterface* ui)
 {
 	const char* value;
 	int args;
@@ -867,7 +867,7 @@ static void CclParseUpgrading(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI that is updated.
 */
-static void CclParseResearching(lua_State* l, UI* ui)
+static void CclParseResearching(lua_State* l, CUserInterface* ui)
 {
 	const char* value;
 	int args;
@@ -899,7 +899,7 @@ static void CclParseResearching(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseTransporting(lua_State* l, UI* ui)
+static void CclParseTransporting(lua_State* l, CUserInterface* ui)
 {
 	const char* value;
 	int args;
@@ -942,7 +942,7 @@ static void CclParseTransporting(lua_State* l, UI* ui)
 **  @param l   Lua state.
 **  @param ui  Pointer to the UI which is updated.
 */
-static void CclParseButtonIcons(lua_State* l, UI* ui)
+static void CclParseButtonIcons(lua_State* l, CUserInterface* ui)
 {
 	int i;
 
@@ -988,8 +988,8 @@ static int CclDefineUI(lua_State* l)
 	int x;
 	int y;
 	int i;
-	UI* ui;
-	UI** v;
+	CUserInterface* ui;
+	CUserInterface** v;
 	int args;
 	int subargs;
 	int j;
@@ -1014,16 +1014,16 @@ static int CclDefineUI(lua_State* l)
 			if (UI_Table[i]->Width == x && UI_Table[i]->Height == y &&
 					!strcmp(UI_Table[i]->Name, str)) {
 				CleanUI(UI_Table[i]);
-				ui = (UI*)calloc(1, sizeof(UI));
+				ui = (CUserInterface*)calloc(1, sizeof(CUserInterface));
 				UI_Table[i] = ui;
 				break;
 			}
 		}
 	}
 	if (!ui) {
-		ui = (UI*)calloc(1, sizeof(UI));
-		v = (UI**)malloc(sizeof(UI*) * (i + 2));
-		memcpy(v, UI_Table, i * sizeof(UI*));
+		ui = (CUserInterface*)calloc(1, sizeof(CUserInterface));
+		v = (CUserInterface**)malloc(sizeof(CUserInterface*) * (i + 2));
+		memcpy(v, UI_Table, i * sizeof(CUserInterface*));
 		free(UI_Table);
 		UI_Table = v;
 		UI_Table[i] = ui;
@@ -2063,7 +2063,7 @@ static int CclDefinePanelContents(lua_State* l)
 static int CclDefineViewports(lua_State* l)
 {
 	const char* value;
-	UI* ui;
+	CUserInterface* ui;
 	int i;
 	int args;
 	int j;
