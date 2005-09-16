@@ -119,7 +119,7 @@ int TransformUnitIntoType(Unit* unit, UnitType* newtype)
 	unit->Stats = &newtype->Stats[player->Index];
 
 	if (newtype->CanCastSpell && !unit->AutoCastSpell) {
-		unit->AutoCastSpell = (char*)calloc(SpellTypeCount, sizeof(*unit->AutoCastSpell));
+		unit->AutoCastSpell = (char*)calloc(SpellTypeTable.size(), sizeof(*unit->AutoCastSpell));
 	}
 
 	UpdateForNewUnit(unit, 1);
