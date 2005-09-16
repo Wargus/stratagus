@@ -46,6 +46,7 @@
 #include "cursor.h"
 #include "interface.h"
 #include "script.h"
+#include "minimap.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -317,6 +318,16 @@ public:
 	SDL_Color AutoCastBorderColorRGB;
 };
 
+class CInfoPanel
+{
+public:
+	void Draw();
+
+	Graphic *G;
+	int X;
+	int Y;
+};
+
 class CStatusLine
 {
 public:
@@ -371,10 +382,7 @@ typedef struct _ui_ {
                                         /// +2 for food and score
 
 	// Info panel
-	Graphic* InfoPanelG;                /// Info panel background
-	int InfoPanelX;                     /// Info panel screen X position
-	int InfoPanelY;                     /// Info panel screen Y position
-
+	CInfoPanel InfoPanel;
 	char*   PanelIndex;                 /// Index of the InfoPanel.
 	char    NumberPanel;                /// Number of Panel.
 
@@ -435,11 +443,7 @@ typedef struct _ui_ {
 	Button NetworkDiplomacyButton;      /// network diplomacy button
 
 	// The minimap
-	int           MinimapW;             /// minimap screen Width
-	int           MinimapH;             /// minimap screen Height
-	int           MinimapPosX;          /// minimap screen X position
-	int           MinimapPosY;          /// minimap screen Y position
-	int           MinimapTransparent;   /// unexplored areas are transparent
+	CMinimap Minimap;
 	Uint32        ViewportCursorColor;  /// minimap cursor color
 
 	// The status line

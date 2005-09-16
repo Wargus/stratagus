@@ -384,8 +384,6 @@ extern void SetCosts(int mana, int food, const int* costs);
 	/// Clear the costs displayed in status line (undisplay!)
 extern void ClearCosts(void);
 
-	/// Draw the unit info panel
-extern void DrawInfoPanel(void);
 	/// Draw the timer
 extern void DrawTimer(void);
 	/// Update the timer

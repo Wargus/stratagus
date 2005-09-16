@@ -204,8 +204,8 @@ void EditTile(int x, int y, int tile)
 
 	mf->Flags |= TheMap.Tileset.FlagsTable[16 + tile * 16];
 
-	Minimap::UpdateSeenXY(x, y);
-	Minimap::UpdateXY(x, y);
+	TheUI.Minimap.UpdateSeenXY(x, y);
+	TheUI.Minimap.UpdateXY(x, y);
 
 	EditorTileChanged(x, y);
 }
@@ -463,8 +463,8 @@ static void DrawTileIcons(void)
 	int y;
 	int i;
 
-	x = TheUI.InfoPanelX + 46;
-	y = TheUI.InfoPanelY + 4 + IconHeight + 11;
+	x = TheUI.InfoPanel.X + 46;
+	y = TheUI.InfoPanel.Y + 4 + IconHeight + 11;
 
 	if (CursorOn == CursorOnButton &&
 			ButtonUnderCursor >= 300 && ButtonUnderCursor < 306) {
@@ -527,8 +527,8 @@ static void DrawPlayers(void)
 	int i;
 	char buf[256];
 
-	x = TheUI.InfoPanelX + 8;
-	y = TheUI.InfoPanelY + 4 + IconHeight + 10;
+	x = TheUI.InfoPanel.X + 8;
+	y = TheUI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (i = 0; i < PlayerMax; ++i) {
 		if (i == PlayerMax / 2) {
@@ -552,7 +552,7 @@ static void DrawPlayers(void)
 		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
 	}
 	
-		x = TheUI.InfoPanelX + 4;
+	x = TheUI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (SelectedPlayer != -1) {
 		i = sprintf(buf,"Plyr %d %s ", SelectedPlayer,
@@ -597,8 +597,8 @@ static void DrawUnitIcons(void)
 	//
 	// Draw the unit selection buttons.
 	//
-	x = TheUI.InfoPanelX + 10;
-	y = TheUI.InfoPanelY + 140;
+	x = TheUI.InfoPanel.X + 10;
+	y = TheUI.InfoPanel.Y + 140;
 
 	VideoDrawText(x + 28 * 0, y, GameFont, "Un");
 	MenuButtonG->DrawFrame(MBUTTON_GEM_SQUARE + (ShowUnitsToSelect ? 2 : 0),
@@ -742,8 +742,8 @@ static void DrawEditorPanel(void)
 	int y;
 	Icon* icon;
 
-	x = TheUI.InfoPanelX + 4;
-	y = TheUI.InfoPanelY + 4;
+	x = TheUI.InfoPanel.X + 4;
+	y = TheUI.InfoPanel.Y + 4;
 
 	//
 	// Select / Units / Tiles
@@ -1047,17 +1047,17 @@ void EditorUpdateDisplay(void)
 	// Minimap
 	//
 	if (TheUI.SelectedViewport) {
-		Minimap::Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
-		Minimap::DrawCursor(TheUI.SelectedViewport->MapX,
+		TheUI.Minimap.Draw(TheUI.SelectedViewport->MapX, TheUI.SelectedViewport->MapY);
+		TheUI.Minimap.DrawCursor(TheUI.SelectedViewport->MapX,
 			TheUI.SelectedViewport->MapY);
 	}
 	//
 	// Info panel
 	//
-	if (TheUI.InfoPanelG) {
-		TheUI.InfoPanelG->DrawSub(0, 0,
-			TheUI.InfoPanelG->Width, TheUI.InfoPanelG->Height,
-			TheUI.InfoPanelX, TheUI.InfoPanelY);
+	if (TheUI.InfoPanel.G) {
+		TheUI.InfoPanel.G->DrawSub(0, 0,
+			TheUI.InfoPanel.G->Width, TheUI.InfoPanel.G->Height,
+			TheUI.InfoPanel.X, TheUI.InfoPanel.Y);
 	}
 	//
 	// Button panel
@@ -1136,9 +1136,9 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportSetViewpoint(TheUI.SelectedViewport,
-				Minimap::Screen2MapX(CursorX) -
+				TheUI.Minimap.Screen2MapX(CursorX) -
 					TheUI.SelectedViewport->MapWidth / 2,
-				Minimap::Screen2MapY(CursorY) -
+				TheUI.Minimap.Screen2MapY(CursorY) -
 					TheUI.SelectedViewport->MapHeight / 2, TileSizeX / 2, TileSizeY / 2);
 		}
 		return;
@@ -1250,52 +1250,52 @@ static void EditorCallbackButtonDown(unsigned button)
 			return;
 		}
 		// Cursor on unit selection icons
-		if (TheUI.InfoPanelX + 10 + 28 * 0 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 1 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 0 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 1 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowUnitsToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
-		if (TheUI.InfoPanelX + 10 + 28 * 1 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 2 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 1 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 2 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowBuildingsToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
 #if 0
-		if (TheUI.InfoPanelX + 10 + 28 * 2 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 3 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 2 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 3 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowHeroesToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
 #endif
-		if (TheUI.InfoPanelX + 10 + 28 * 3 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 4 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 3 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 4 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowLandToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
-		if (TheUI.InfoPanelX + 10 + 28 * 4 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 5 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 4 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 5 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowWaterToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
 		}
-		if (TheUI.InfoPanelX + 10 + 28 * 5 < CursorX &&
-				CursorX < TheUI.InfoPanelX + 10 + 28 * 6 &&
-				TheUI.InfoPanelY + 140 < CursorY &&
-				CursorY < TheUI.InfoPanelY + 140 + 28) {
+		if (TheUI.InfoPanel.X + 10 + 28 * 5 < CursorX &&
+				CursorX < TheUI.InfoPanel.X + 10 + 28 * 6 &&
+				TheUI.InfoPanel.Y + 140 < CursorY &&
+				CursorY < TheUI.InfoPanel.Y + 140 + 28) {
 			ShowAirToSelect ^= 1;
 			RecalculateShownUnits();
 			return;
@@ -1656,9 +1656,9 @@ static void EditorCallbackMouse(int x, int y)
 	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportSetViewpoint(TheUI.SelectedViewport,
-			Minimap::Screen2MapX(CursorX)
+			TheUI.Minimap.Screen2MapX(CursorX)
 				- TheUI.SelectedViewport->MapWidth / 2,
-			Minimap::Screen2MapY(CursorY)
+			TheUI.Minimap.Screen2MapY(CursorY)
 				- TheUI.SelectedViewport->MapHeight / 2, 0, 0);
 		return;
 	}
@@ -1675,8 +1675,8 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Minimap
 	//
-	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
-			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
+	if (x >= TheUI.Minimap.X && x < TheUI.Minimap.X + TheUI.Minimap.W &&
+			y >= TheUI.Minimap.Y && y < TheUI.Minimap.Y + TheUI.Minimap.H) {
 		CursorOn = CursorOnMinimap;
 	}
 
@@ -1691,11 +1691,11 @@ static void EditorCallbackMouse(int x, int y)
 				&& CursorY < TheUI.ButtonPanel.Y + 24) {
 			return;
 		}
-		bx = TheUI.InfoPanelX + 8;
-		by = TheUI.InfoPanelY + 4 + IconHeight + 10;
+		bx = TheUI.InfoPanel.X + 8;
+		by = TheUI.InfoPanel.Y + 4 + IconHeight + 10;
 		for (i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerMax / 2) {
-				bx = TheUI.InfoPanelX + 8;
+				bx = TheUI.InfoPanel.X + 8;
 				by += 20;
 			}
 			if (bx < x && x < bx + 20 && by < y && y < by + 20) {
@@ -1752,8 +1752,8 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	if (EditorState == EditorEditTile) {
 		i = 0;
-		bx = TheUI.InfoPanelX + 4;
-		by = TheUI.InfoPanelY + 4 + IconHeight + 10;
+		bx = TheUI.InfoPanel.X + 4;
+		by = TheUI.InfoPanel.Y + 4 + IconHeight + 10;
 
 		while (i < 6) {
 			if (bx < x && x < bx + 100 && by < y && y < by + 18) {
@@ -1795,10 +1795,10 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Handle buttons
 	//
-	if (TheUI.InfoPanelX + 4 < CursorX &&
-			CursorX < TheUI.InfoPanelX + 4 + IconWidth + 7 &&
-			TheUI.InfoPanelY + 4 < CursorY &&
-			CursorY < TheUI.InfoPanelY + 4 + IconHeight + 7) {
+	if (TheUI.InfoPanel.X + 4 < CursorX &&
+			CursorX < TheUI.InfoPanel.X + 4 + IconWidth + 7 &&
+			TheUI.InfoPanel.Y + 4 < CursorY &&
+			CursorY < TheUI.InfoPanel.Y + 4 + IconHeight + 7) {
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -1806,30 +1806,30 @@ static void EditorCallbackMouse(int x, int y)
 		TheUI.StatusLine.Set("Select mode");
 		return;
 	}
-	if (TheUI.InfoPanelX + 4 + UNIT_ICON_X < CursorX &&
-			CursorX < TheUI.InfoPanelX + 4 + UNIT_ICON_X + IconWidth + 7 &&
-			TheUI.InfoPanelY + 4 + UNIT_ICON_Y < CursorY &&
-			CursorY < TheUI.InfoPanelY + 4 + UNIT_ICON_Y + IconHeight + 7) {
+	if (TheUI.InfoPanel.X + 4 + UNIT_ICON_X < CursorX &&
+			CursorX < TheUI.InfoPanel.X + 4 + UNIT_ICON_X + IconWidth + 7 &&
+			TheUI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorY &&
+			CursorY < TheUI.InfoPanel.Y + 4 + UNIT_ICON_Y + IconHeight + 7) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
 		TheUI.StatusLine.Set("Unit mode");
 		return;
 	}
-	if (TheUI.InfoPanelX + 4 + TILE_ICON_X < CursorX &&
-			CursorX < TheUI.InfoPanelX + 4 + TILE_ICON_X + TileSizeX + 7 &&
-			TheUI.InfoPanelY + 4 + TILE_ICON_Y < CursorY &&
-			CursorY < TheUI.InfoPanelY + 4 + TILE_ICON_Y + TileSizeY + 7) {
+	if (TheUI.InfoPanel.X + 4 + TILE_ICON_X < CursorX &&
+			CursorX < TheUI.InfoPanel.X + 4 + TILE_ICON_X + TileSizeX + 7 &&
+			TheUI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorY &&
+			CursorY < TheUI.InfoPanel.Y + 4 + TILE_ICON_Y + TileSizeY + 7) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = TileButton;
 		CursorOn = CursorOnButton;
 		TheUI.StatusLine.Set("Tile mode");
 		return;
 	}
-	if (TheUI.InfoPanelX + 4 + START_ICON_X < CursorX &&
-			CursorX < TheUI.InfoPanelX + 4 + START_ICON_X + TileSizeX + 7 &&
-			TheUI.InfoPanelY + 4 + START_ICON_Y < CursorY &&
-			CursorY < TheUI.InfoPanelY + 4 + START_ICON_Y + TileSizeY + 7) {
+	if (TheUI.InfoPanel.X + 4 + START_ICON_X < CursorX &&
+			CursorX < TheUI.InfoPanel.X + 4 + START_ICON_X + TileSizeX + 7 &&
+			TheUI.InfoPanel.Y + 4 + START_ICON_Y < CursorY &&
+			CursorY < TheUI.InfoPanel.Y + 4 + START_ICON_Y + TileSizeY + 7) {
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
@@ -1851,8 +1851,8 @@ static void EditorCallbackMouse(int x, int y)
 	//
 	// Minimap
 	//
-	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
-			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
+	if (x >= TheUI.Minimap.X && x < TheUI.Minimap.X + TheUI.Minimap.W &&
+			y >= TheUI.Minimap.Y && y < TheUI.Minimap.Y + TheUI.Minimap.H) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
@@ -2002,7 +2002,7 @@ static void CreateEditor(void)
 	ShowWaterToSelect = 1;
 
 	RecalculateShownUnits();
-	Minimap::Update();
+	TheUI.Minimap.Update();
 
 	ProcessMenu("menu-editor-tips", 1);
 	InterfaceState = IfaceStateNormal;
@@ -2073,7 +2073,7 @@ void EditorMainLoop(void)
 		while (EditorRunning) {
 			PlayListAdvance();
 
-			Minimap::Update();
+			TheUI.Minimap.Update();
 
 			EditorUpdateDisplay();
 

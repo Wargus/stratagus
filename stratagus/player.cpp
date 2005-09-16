@@ -52,7 +52,7 @@
 #include "netconnect.h"
 #include "interface.h"
 #include "iolib.h"
-#include "minimap.h"
+#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -860,7 +860,7 @@ void NotifyPlayer(const Player* player,
 	va_end(va);
 
 	if (x != -1) {
-		Minimap::AddEvent(x, y);
+		TheUI.Minimap.AddEvent(x, y);
 	}
 	if (player == ThisPlayer) {
 		SetMessageEvent(x, y, "%s", temp);

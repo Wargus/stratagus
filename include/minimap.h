@@ -37,30 +37,34 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-class Minimap
+class CMinimap
 {
 public:
-	static void UpdateXY(int tx, int ty);
-	static void UpdateSeenXY(int tx, int ty) {}
-	static void UpdateTerrain(void);
-	static void Update(void);
-	static void Create(void);
+	void UpdateXY(int tx, int ty);
+	void UpdateSeenXY(int tx, int ty) {}
+	void UpdateTerrain(void);
+	void Update(void);
+	void Create(void);
 #ifdef USE_OPENGL
-	static void Reload(void);
+	void Reload(void);
 #endif
-	static void Destroy(void);
-	static void Draw(int vx, int vy);
-	static void DrawCursor(int vx, int vy);
-	static void AddEvent(int x, int y);
+	void Destroy(void);
+	void Draw(int vx, int vy);
+	void DrawCursor(int vx, int vy);
+	void AddEvent(int x, int y);
 
-	static int Screen2MapX(int x);
-	static int Screen2MapY(int y);
+	int Screen2MapX(int x);
+	int Screen2MapY(int y);
 
-	static int X;
-	static int Y;
-	static int WithTerrain;
-	static int Friendly;
-	static int ShowSelected;
+	int X;
+	int Y;
+	int W;
+	int H;
+	int XOffset;
+	int YOffset;
+	int WithTerrain;
+	int ShowSelected;
+	int Transparent;
 };
 
 //@}

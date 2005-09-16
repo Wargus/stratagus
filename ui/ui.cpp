@@ -182,8 +182,8 @@ void LoadUserInterface(void)
 		}
 	}
 
-	if (TheUI.InfoPanelG) {
-		TheUI.InfoPanelG->Load();
+	if (TheUI.InfoPanel.G) {
+		TheUI.InfoPanel.G->Load();
 	}
 	if (TheUI.ButtonPanel.G) {
 		TheUI.ButtonPanel.G->Load();
@@ -333,7 +333,7 @@ void CleanUI(UI* ui)
 	}
 
 	// Info Panel
-	FreeGraphic(ui->InfoPanelG);
+	FreeGraphic(ui->InfoPanel.G);
 	free(ui->PanelIndex);
 	free(ui->SingleSelectedButton);
 	free(ui->SelectedButtons);
