@@ -669,8 +669,8 @@ static void DrawUnitInfo(Unit* unit)
 				(IconActive | (MouseButtons & LeftButton)) : 0,
 			x, y, NULL);
 	}
-	x = TheUI.InfoPanelX;
-	y = TheUI.InfoPanelY;
+	x = TheUI.InfoPanel.X;
+	y = TheUI.InfoPanel.Y;
 	//
 	//  Show progress if they are selected.
 	//
@@ -1272,9 +1272,9 @@ void ClearCosts(void)
 */
 static void DrawInfoPanelBackground(unsigned frame)
 {
-	if (TheUI.InfoPanelG) {
-		TheUI.InfoPanelG->DrawFrameClip(frame,
-			TheUI.InfoPanelX, TheUI.InfoPanelY);
+	if (TheUI.InfoPanel.G) {
+		TheUI.InfoPanel.G->DrawFrameClip(frame,
+			TheUI.InfoPanel.X, TheUI.InfoPanel.Y);
 	}
 }
 
@@ -1287,7 +1287,7 @@ static void DrawInfoPanelBackground(unsigned frame)
 **    magic unit   - magic units
 **    construction - under construction
 */
-void DrawInfoPanel(void)
+void CInfoPanel::Draw(void)
 {
 	int i;
 
@@ -1361,8 +1361,8 @@ void DrawInfoPanel(void)
 		char* rc;
 		// FIXME: need some cool ideas for this.
 
-		x = TheUI.InfoPanelX + 16;
-		y = TheUI.InfoPanelY + 8;
+		x = TheUI.InfoPanel.X + 16;
+		y = TheUI.InfoPanel.Y + 8;
 
 		VideoDrawText(x, y, GameFont, "Stratagus");
 		y += 16;

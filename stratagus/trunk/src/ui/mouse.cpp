@@ -591,8 +591,8 @@ static void HandleMouseOn(int x, int y)
 	//
 	//  Minimap
 	//
-	if (x >= TheUI.MinimapPosX && x < TheUI.MinimapPosX + TheUI.MinimapW &&
-			y >= TheUI.MinimapPosY && y < TheUI.MinimapPosY + TheUI.MinimapH) {
+	if (x >= TheUI.Minimap.X && x < TheUI.Minimap.X + TheUI.Minimap.W &&
+			y >= TheUI.Minimap.Y && y < TheUI.Minimap.Y + TheUI.Minimap.H) {
 		CursorOn = CursorOnMinimap;
 		return;
 	}
@@ -692,18 +692,18 @@ void RestrictCursorToViewport(void)
 */
 void RestrictCursorToMinimap(void)
 {
-	if (CursorX < TheUI.MinimapPosX) {
-		CursorStartX = TheUI.MinimapPosX;
-	} else if (CursorX >= TheUI.MinimapPosX + TheUI.MinimapW) {
-		CursorStartX = TheUI.MinimapPosX + TheUI.MinimapW - 1;
+	if (CursorX < TheUI.Minimap.X) {
+		CursorStartX = TheUI.Minimap.X;
+	} else if (CursorX >= TheUI.Minimap.X + TheUI.Minimap.W) {
+		CursorStartX = TheUI.Minimap.X + TheUI.Minimap.W - 1;
 	} else {
 		CursorStartX = CursorX;
 	}
 
-	if (CursorY < TheUI.MinimapPosY) {
-		CursorStartY = TheUI.MinimapPosY;
-	} else if (CursorY >= TheUI.MinimapPosY + TheUI.MinimapW) {
-		CursorStartY = TheUI.MinimapPosY + TheUI.MinimapH - 1;
+	if (CursorY < TheUI.Minimap.Y) {
+		CursorStartY = TheUI.Minimap.Y;
+	} else if (CursorY >= TheUI.Minimap.Y + TheUI.Minimap.W) {
+		CursorStartY = TheUI.Minimap.Y + TheUI.Minimap.H - 1;
 	} else {
 		CursorStartY = CursorY;
 	}
@@ -792,7 +792,8 @@ void UIHandleMouseMove(int x, int y)
 			(MouseButtons & LeftButton)) {
 		RestrictCursorToMinimap();
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+			TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+			TileSizeX / 2, TileSizeY / 2);
 		return;
 	}
 
@@ -815,8 +816,8 @@ void UIHandleMouseMove(int x, int y)
 				y - vp->Y + vp->MapY * TileSizeY + vp->OffsetY);
 		}
 	} else if (CursorOn == CursorOnMinimap) {
-		mx = Minimap::Screen2MapX(x);
-		my = Minimap::Screen2MapY(y);
+		mx = TheUI.Minimap.Screen2MapX(x);
+		my = TheUI.Minimap.Screen2MapY(y);
 		if (IsMapFieldExplored(ThisPlayer, mx, my) || ReplayRevealMap) {
 			UnitUnderCursor = UnitOnMapTile(mx, my);
 		}
@@ -846,8 +847,8 @@ void UIHandleMouseMove(int x, int y)
 				//  Minimap move viewpoint
 				//
 				ViewportCenterViewpoint(TheUI.SelectedViewport,
-					Minimap::Screen2MapX(CursorX),
-					Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+					TheUI.Minimap.Screen2MapX(CursorX),
+					TheUI.Minimap.Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
 			}
 		}
 		// FIXME: must move minimap if right button is down !
@@ -874,7 +875,8 @@ void UIHandleMouseMove(int x, int y)
 		//  Minimap move viewpoint
 		//
 		ViewportCenterViewpoint(TheUI.SelectedViewport,
-			Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+			TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+			TileSizeX / 2, TileSizeY / 2);
 		CursorStartX = CursorX;
 		CursorStartY = CursorY;
 		return;
@@ -1371,8 +1373,8 @@ static void UISelectStateButtonDown(unsigned button)
 		int mx;
 		int my;
 
-		mx = Minimap::Screen2MapX(CursorX);
-		my = Minimap::Screen2MapY(CursorY);
+		mx = TheUI.Minimap.Screen2MapX(CursorX);
+		my = TheUI.Minimap.Screen2MapY(CursorY);
 		if (MouseButtons & LeftButton) {
 			sx = mx * TileSizeX;
 			sy = my * TileSizeY;
@@ -1589,17 +1591,18 @@ void UIHandleButtonDown(unsigned button)
 	} else if (CursorOn == CursorOnMinimap) {
 		if (MouseButtons & LeftButton) { // enter move mini-mode
 			ViewportCenterViewpoint(TheUI.SelectedViewport,
-				Minimap::Screen2MapX(CursorX), Minimap::Screen2MapY(CursorY), TileSizeX / 2, TileSizeY / 2);
+				TheUI.Minimap.Screen2MapX(CursorX), TheUI.Minimap.Screen2MapY(CursorY),
+				TileSizeX / 2, TileSizeY / 2);
 		} else if (MouseButtons & RightButton) {
 			if (!GameObserve && !GamePaused) {
 				if (ClickMissile) {
 					MakeLocalMissile(MissileTypeByIdent(ClickMissile),
-						Minimap::Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
-						Minimap::Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
+						TheUI.Minimap.Screen2MapX(CursorX) * TileSizeX + TileSizeX / 2,
+						TheUI.Minimap.Screen2MapY(CursorY) * TileSizeY + TileSizeY / 2, 0, 0);
 				}
 				// DoRightButton() takes screen map coordinates
-				DoRightButton(Minimap::Screen2MapX(CursorX) * TileSizeX,
-					Minimap::Screen2MapY(CursorY) * TileSizeY);
+				DoRightButton(TheUI.Minimap.Screen2MapX(CursorX) * TileSizeX,
+					TheUI.Minimap.Screen2MapY(CursorY) * TileSizeY);
 			}
 		}
 	//

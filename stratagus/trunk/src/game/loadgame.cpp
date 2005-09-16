@@ -196,7 +196,7 @@ void LoadModules(void)
 	}
 
 	SetPlayersPalette();
-	Minimap::Create();
+	TheUI.Minimap.Create();
 
 	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
 
