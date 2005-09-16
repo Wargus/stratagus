@@ -386,7 +386,7 @@ int SelectUnitsByType(Unit* base)
 	int i;
 	const Viewport* vp;
 
-	Assert(TheUI.MouseViewport);
+	Assert(UI.MouseViewport);
 
 	type = base->Type;
 
@@ -394,7 +394,7 @@ int SelectUnitsByType(Unit* base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
-	vp = TheUI.MouseViewport;
+	vp = UI.MouseViewport;
 	r = UnitCacheSelect(vp->MapX - 1, vp->MapY - 1, vp->MapX + vp->MapWidth + 1,
 		vp->MapY + vp->MapHeight + 1, table);
 
@@ -489,10 +489,10 @@ int ToggleUnitsByType(Unit* base)
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	// took parameters of the selection rectangle as arguments */
-	r = UnitCacheSelect(TheUI.MouseViewport->MapX - 1,
-		TheUI.MouseViewport->MapY - 1,
-		TheUI.MouseViewport->MapX + TheUI.MouseViewport->MapWidth + 1,
-		TheUI.MouseViewport->MapY + TheUI.MouseViewport->MapHeight + 1, table);
+	r = UnitCacheSelect(UI.MouseViewport->MapX - 1,
+		UI.MouseViewport->MapY - 1,
+		UI.MouseViewport->MapX + UI.MouseViewport->MapWidth + 1,
+		UI.MouseViewport->MapY + UI.MouseViewport->MapHeight + 1, table);
 
 	// if unit is a cadaver or hidden (not on map)
 	// no unit can be selected.
@@ -810,7 +810,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!UnitVisibleInViewport(unit, TheUI.SelectedViewport)) {
+		if (!UnitVisibleInViewport(unit, UI.SelectedViewport)) {
 			continue;
 		}
 		type = unit->Type;
@@ -830,7 +830,7 @@ int SelectUnitsInRectangle (int sx0, int sy0, int sx1, int sy1)
 	for (i = 0; i < r; ++i) {
 		unit = table[i];
 		// Unit visible FIXME: write function UnitSelectable
-		if (!UnitVisibleInViewport(unit, TheUI.SelectedViewport)) {
+		if (!UnitVisibleInViewport(unit, UI.SelectedViewport)) {
 			continue;
 		}
 		// Buildings are visible but not selectable

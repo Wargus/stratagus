@@ -257,7 +257,7 @@ void InitVideoSdl(void)
 	ColorGreen = VideoMapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = VideoMapRGB(TheScreen->format, 252, 252, 0);
 
-	TheUI.MouseWarpX = TheUI.MouseWarpY = -1;
+	UI.MouseWarpX = UI.MouseWarpY = -1;
 }
 
 /**
@@ -531,16 +531,16 @@ static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 			InputMouseMove(callbacks, SDL_GetTicks(),
 				event->motion.x, event->motion.y);
 			// FIXME: Same bug fix from X11
-			if ((TheUI.MouseWarpX != -1 || TheUI.MouseWarpY != -1) &&
-					(event->motion.x != TheUI.MouseWarpX ||
-						event->motion.y != TheUI.MouseWarpY)) {
+			if ((UI.MouseWarpX != -1 || UI.MouseWarpY != -1) &&
+					(event->motion.x != UI.MouseWarpX ||
+						event->motion.y != UI.MouseWarpY)) {
 				int xw;
 				int yw;
 
-				xw = TheUI.MouseWarpX;
-				yw = TheUI.MouseWarpY;
-				TheUI.MouseWarpX = -1;
-				TheUI.MouseWarpY = -1;
+				xw = UI.MouseWarpX;
+				yw = UI.MouseWarpY;
+				UI.MouseWarpX = -1;
+				UI.MouseWarpY = -1;
 				SDL_WarpMouse(xw, yw);
 			}
 			break;
@@ -624,7 +624,7 @@ void WaitEventsOneFrame(const EventCallback* callbacks)
 #ifdef DEBUG
 		// FIXME: need locking!
 		// if (InterfaceState == IfaceStateNormal) {
-		// VideoDrawText(TheUI.MapX+10,TheUI.MapY+10,GameFont,"SLOW FRAME!!");
+		// VideoDrawText(UI.MapX+10,UI.MapY+10,GameFont,"SLOW FRAME!!");
 		// }
 #endif
 		++SlowFrameCounter;

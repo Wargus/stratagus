@@ -254,7 +254,7 @@ static int CclRevealMap(lua_State* l)
 static int CclCenterMap(lua_State* l)
 {
 	LuaCheckArgs(l, 2);
-	ViewportCenterViewpoint(TheUI.SelectedViewport,
+	ViewportCenterViewpoint(UI.SelectedViewport,
 		LuaToNumber(l, 1), LuaToNumber(l, 2), TileSizeX / 2, TileSizeY / 2);
 
 	return 0;
@@ -343,7 +343,7 @@ static int CclSetFogOfWar(lua_State* l)
 static int CclSetMinimapTerrain(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	TheUI.Minimap.WithTerrain = LuaToBoolean(l, 1);
+	UI.Minimap.WithTerrain = LuaToBoolean(l, 1);
 	return 0;
 }
 

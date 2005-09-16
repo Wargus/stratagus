@@ -96,12 +96,12 @@ static void ShowInput(void)
 	sprintf(InputStatusLine, "MESSAGE:%s~!_", Input);
 	input = InputStatusLine;
 	// FIXME: This is slow!
-	while (VideoTextLength(TheUI.StatusLine.Font, input) > TheUI.StatusLine.W) {
+	while (VideoTextLength(UI.StatusLine.Font, input) > UI.StatusLine.W) {
 		++input;
 	}
 	KeyState = KeyStateCommand;
-	TheUI.StatusLine.Clear();
-	TheUI.StatusLine.Set(input);
+	UI.StatusLine.Clear();
+	UI.StatusLine.Set(input);
 	KeyState = KeyStateInput;
 }
 
@@ -157,7 +157,7 @@ static void UiCenterOnGroup(unsigned group)
 			x += (units[n]->X - x) / 2;
 			y += (units[n]->Y - y) / 2;
 		}
-		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
+		ViewportCenterViewpoint(UI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -236,9 +236,9 @@ static void UiToggleSound(void)
 		SoundOff ^= 1;
 	}
 	if (SoundOff) {
-		TheUI.StatusLine.Set("Sound is off.");
+		UI.StatusLine.Set("Sound is off.");
 	} else {
-		TheUI.StatusLine.Set("Sound is on.");
+		UI.StatusLine.Set("Sound is on.");
 	}
 }
 
@@ -251,10 +251,10 @@ static void UiToggleMusic(void)
 	if (MusicVolume) {
 		vol = MusicVolume;
 		MusicVolume = 0;
-		TheUI.StatusLine.Set("Music is off.");
+		UI.StatusLine.Set("Music is off.");
 	} else {
 		MusicVolume = vol;
-		TheUI.StatusLine.Set("Music is on.");
+		UI.StatusLine.Set("Music is on.");
 	}
 }
 
@@ -266,9 +266,9 @@ void UiTogglePause(void)
 	if (!IsNetworkGame()) {
 		GamePaused ^= 1;
 		if (GamePaused) {
-			TheUI.StatusLine.Set("Game Paused");
+			UI.StatusLine.Set("Game Paused");
 		} else {
-			TheUI.StatusLine.Set("Game Resumed");
+			UI.StatusLine.Set("Game Resumed");
 		}
 	}
 }
@@ -280,7 +280,7 @@ static void UiEnterMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	ProcessMenu("menu-game", 0);
 }
@@ -292,7 +292,7 @@ static void UiEnterHelpMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	ProcessMenu("menu-help", 0);
 }
@@ -304,7 +304,7 @@ static void UiEnterOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	ProcessMenu("menu-game-options", 0);
 }
@@ -316,7 +316,7 @@ static void UiEnterSoundOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	SoundOptionsMenu();
 }
@@ -328,7 +328,7 @@ static void UiEnterSpeedOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	SpeedOptionsMenu();
 }
@@ -340,7 +340,7 @@ static void UiEnterPreferencesOptionsMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	PreferencesMenu();
 }
@@ -357,7 +357,7 @@ static void UiEnterSaveGameMenu(void)
 
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	SaveGameMenu();
 }
@@ -374,7 +374,7 @@ static void UiEnterLoadGameMenu(void)
 
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	LoadGameMenu();
 }
@@ -386,7 +386,7 @@ static void UiExitConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	ExitConfirmMenu();
 }
@@ -398,7 +398,7 @@ static void UiQuitToMenuConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	QuitToMenuConfirmMenu();
 }
@@ -410,7 +410,7 @@ static void UiRestartConfirmMenu(void)
 {
 	if (!IsNetworkGame()) {
 		GamePaused = 1;
-		TheUI.StatusLine.Set("Game Paused");
+		UI.StatusLine.Set("Game Paused");
 	}
 	RestartConfirmMenu();
 }
@@ -429,28 +429,28 @@ static void UiToggleBigMap(void)
 
 	BigMapMode ^= 1;
 	if (BigMapMode) {
-		mapx = TheUI.MapArea.X;
-		mapy = TheUI.MapArea.Y;
-		mapex = TheUI.MapArea.EndX;
-		mapey = TheUI.MapArea.EndY;
+		mapx = UI.MapArea.X;
+		mapy = UI.MapArea.Y;
+		mapex = UI.MapArea.EndX;
+		mapey = UI.MapArea.EndY;
 
-		TheUI.MapArea.X = 0;
-		TheUI.MapArea.Y = 0;
-		TheUI.MapArea.EndX = VideoWidth - 1;
-		TheUI.MapArea.EndY = VideoHeight - 1;
+		UI.MapArea.X = 0;
+		UI.MapArea.Y = 0;
+		UI.MapArea.EndX = VideoWidth - 1;
+		UI.MapArea.EndY = VideoHeight - 1;
 
-		SetViewportMode(TheUI.ViewportMode);
+		SetViewportMode(UI.ViewportMode);
 
-		TheUI.StatusLine.Set("Big map enabled");
+		UI.StatusLine.Set("Big map enabled");
 	} else {
-		TheUI.MapArea.X = mapx;
-		TheUI.MapArea.Y = mapy;
-		TheUI.MapArea.EndX = mapex;
-		TheUI.MapArea.EndY = mapey;
+		UI.MapArea.X = mapx;
+		UI.MapArea.Y = mapy;
+		UI.MapArea.EndX = mapex;
+		UI.MapArea.EndY = mapey;
 
-		SetViewportMode(TheUI.ViewportMode);
+		SetViewportMode(UI.ViewportMode);
 
-		TheUI.StatusLine.Set("Returning to old map");
+		UI.StatusLine.Set("Returning to old map");
 	}
 }
 
@@ -461,7 +461,7 @@ static void UiIncreaseGameSpeed(void)
 {
 	VideoSyncSpeed += 10;
 	SetVideoSync();
-	TheUI.StatusLine.Set("Faster");
+	UI.StatusLine.Set("Faster");
 }
 
 /**
@@ -477,7 +477,7 @@ static void UiDecreaseGameSpeed(void)
 		VideoSyncSpeed -= 10;
 	}
 	SetVideoSync();
-	TheUI.StatusLine.Set("Slower");
+	UI.StatusLine.Set("Slower");
 }
 
 /**
@@ -499,7 +499,7 @@ static void UiCenterOnSelected(void)
 			x += (Selected[n]->X - x) / 2;
 			y += (Selected[n]->Y - y) / 2;
 		}
-		ViewportCenterViewpoint(TheUI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
+		ViewportCenterViewpoint(UI.SelectedViewport, x, y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -510,8 +510,8 @@ static void UiCenterOnSelected(void)
 */
 static void UiSaveMapPosition(unsigned position)
 {
-	SavedMapPositionX[position] = TheUI.SelectedViewport->MapX;
-	SavedMapPositionY[position] = TheUI.SelectedViewport->MapY;
+	SavedMapPositionX[position] = UI.SelectedViewport->MapX;
+	SavedMapPositionY[position] = UI.SelectedViewport->MapY;
 }
 
 /**
@@ -521,7 +521,7 @@ static void UiSaveMapPosition(unsigned position)
 */
 static void UiRecallMapPosition(unsigned position)
 {
-	ViewportSetViewpoint(TheUI.SelectedViewport,
+	ViewportSetViewpoint(UI.SelectedViewport,
 		SavedMapPositionX[position], SavedMapPositionY[position], TileSizeX / 2, TileSizeY / 2);
 }
 
@@ -530,11 +530,11 @@ static void UiRecallMapPosition(unsigned position)
 */
 static void UiToggleTerrain(void)
 {
-	TheUI.Minimap.WithTerrain ^= 1;
-	if (TheUI.Minimap.WithTerrain) {
-		TheUI.StatusLine.Set("Terrain displayed.");
+	UI.Minimap.WithTerrain ^= 1;
+	if (UI.Minimap.WithTerrain) {
+		UI.StatusLine.Set("Terrain displayed.");
 	} else {
-		TheUI.StatusLine.Set("Terrain hidden.");
+		UI.StatusLine.Set("Terrain hidden.");
 	}
 }
 
@@ -551,12 +551,12 @@ static void UiFindIdleWorker(void)
 	if (unit != NoUnitP) {
 		LastIdleWorker = unit;
 		SelectSingleUnit(unit);
-		TheUI.StatusLine.Clear();
+		UI.StatusLine.Clear();
 		ClearCosts();
 		CurrentButtonLevel = 0;
 		PlayUnitSound(Selected[0], VoiceSelected);
 		SelectionChanged();
-		ViewportCenterViewpoint(TheUI.SelectedViewport, unit->X, unit->Y, TileSizeX / 2, TileSizeY / 2);
+		ViewportCenterViewpoint(UI.SelectedViewport, unit->X, unit->Y, TileSizeX / 2, TileSizeY / 2);
 	}
 }
 
@@ -567,7 +567,7 @@ static void UiToggleGrabMouse(void)
 {
 	DebugPrint("%x\n" _C_ KeyModifiers);
 	ToggleGrabMouse(0);
-	TheUI.StatusLine.Set("Grab mouse toggled.");
+	UI.StatusLine.Set("Grab mouse toggled.");
 }
 
 /**
@@ -575,10 +575,10 @@ static void UiToggleGrabMouse(void)
 */
 static void UiTrackUnit(void)
 {
-	if (TheUI.SelectedViewport->Unit == Selected[0]) {
-		TheUI.SelectedViewport->Unit = NULL;
+	if (UI.SelectedViewport->Unit == Selected[0]) {
+		UI.SelectedViewport->Unit = NULL;
 	} else {
-		TheUI.SelectedViewport->Unit = Selected[0];
+		UI.SelectedViewport->Unit = Selected[0];
 	}
 }
 
@@ -997,7 +997,7 @@ static int InputKey(int key)
 			// FALL THROUGH
 		case '\033':
 			KeyState = KeyStateCommand;
-			TheUI.StatusLine.Clear();
+			UI.StatusLine.Clear();
 			return 1;
 		case '\b':
 			if (InputIndex) {
@@ -1170,7 +1170,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 		if (!(KeyModifiers & (ModifierControl | ModifierAlt |
 				ModifierSuper | ModifierHyper))) {
 			if (!GameObserve && !GamePaused) {
-				if (TheUI.ButtonPanel.DoKey(key)) {
+				if (UI.ButtonPanel.DoKey(key)) {
 					return;
 				}
 			}
@@ -1240,38 +1240,38 @@ int HandleMouseScrollArea(int x, int y)
 		if (y < SCROLL_UP) {
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
-			GameCursor = TheUI.ArrowNW.Cursor;
+			GameCursor = UI.ArrowNW.Cursor;
 		} else if (y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
-			GameCursor = TheUI.ArrowSW.Cursor;
+			GameCursor = UI.ArrowSW.Cursor;
 		} else {
 			CursorOn = CursorOnScrollLeft;
 			MouseScrollState = ScrollLeft;
-			GameCursor = TheUI.ArrowW.Cursor;
+			GameCursor = UI.ArrowW.Cursor;
 		}
 	} else if (x > SCROLL_RIGHT) {
 		if (y < SCROLL_UP) {
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
-			GameCursor = TheUI.ArrowNE.Cursor;
+			GameCursor = UI.ArrowNE.Cursor;
 		} else if (y > SCROLL_DOWN) {
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
-			GameCursor = TheUI.ArrowSE.Cursor;
+			GameCursor = UI.ArrowSE.Cursor;
 		} else {
 			CursorOn = CursorOnScrollRight;
 			MouseScrollState = ScrollRight;
-			GameCursor = TheUI.ArrowE.Cursor;
+			GameCursor = UI.ArrowE.Cursor;
 		}
 	} else if (y < SCROLL_UP) {
 		CursorOn = CursorOnScrollUp;
 		MouseScrollState = ScrollUp;
-		GameCursor = TheUI.ArrowN.Cursor;
+		GameCursor = UI.ArrowN.Cursor;
 	} else if (y > SCROLL_DOWN) {
 		CursorOn = CursorOnScrollDown;
 		MouseScrollState = ScrollDown;
-		GameCursor = TheUI.ArrowS.Cursor;
+		GameCursor = UI.ArrowS.Cursor;
 	} else {
 		return 0;
 	}

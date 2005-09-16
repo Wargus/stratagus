@@ -64,7 +64,7 @@ int SpeedMouseScroll = MOUSE_SCROLL_SPEED; /// mouse scroll speed
 /**
 **  The user interface configuration
 */
-CUserInterface TheUI;
+CUserInterface UI;
 
 /**
 **  The available user interfaces.
@@ -119,46 +119,46 @@ void InitUserInterface(const char* race_name)
 		}
 	}
 
-	num_vps = TheUI.NumViewports;
-	vp_mode = TheUI.ViewportMode;
+	num_vps = UI.NumViewports;
+	vp_mode = UI.ViewportMode;
 	for (i = 0; i < num_vps; ++i) {
-		vps[i].MapX = TheUI.Viewports[i].MapX;
-		vps[i].MapY = TheUI.Viewports[i].MapY;
+		vps[i].MapX = UI.Viewports[i].MapX;
+		vps[i].MapY = UI.Viewports[i].MapY;
 	}
 
-	TheUI = *UI_Table[best];
+	UI = *UI_Table[best];
 
-	TheUI.Offset640X = (VideoWidth - 640) / 2;
-	TheUI.Offset480Y = (VideoHeight - 480) / 2;
+	UI.Offset640X = (VideoWidth - 640) / 2;
+	UI.Offset480Y = (VideoHeight - 480) / 2;
 
 	//
 	// Calculations
 	//
-	if (TheUI.MapArea.EndX > TheMap.Info.MapWidth * TileSizeX - 1) {
-		TheUI.MapArea.EndX = TheMap.Info.MapWidth * TileSizeX - 1;
+	if (UI.MapArea.EndX > TheMap.Info.MapWidth * TileSizeX - 1) {
+		UI.MapArea.EndX = TheMap.Info.MapWidth * TileSizeX - 1;
 	}
-	if (TheUI.MapArea.EndY > TheMap.Info.MapHeight * TileSizeY - 1) {
-		TheUI.MapArea.EndY = TheMap.Info.MapHeight * TileSizeY - 1;
+	if (UI.MapArea.EndY > TheMap.Info.MapHeight * TileSizeY - 1) {
+		UI.MapArea.EndY = TheMap.Info.MapHeight * TileSizeY - 1;
 	}
 
-	TheUI.SelectedViewport = TheUI.Viewports;
+	UI.SelectedViewport = UI.Viewports;
 
 	if (num_vps) {
 		SetViewportMode(vp_mode);
 		for (i = 0; i < num_vps; ++i) {
-			TheUI.Viewports[i].MapX = vps[i].MapX;
-			TheUI.Viewports[i].MapY = vps[i].MapY;
+			UI.Viewports[i].MapX = vps[i].MapX;
+			UI.Viewports[i].MapY = vps[i].MapY;
 		}
-		FinishViewportModeConfiguration(TheUI.Viewports, num_vps);
+		FinishViewportModeConfiguration(UI.Viewports, num_vps);
 	} else {
 		SetViewportMode(VIEWPORT_SINGLE);
 	}
 
-	TheUI.CompletedBarColor = VideoMapRGB(TheScreen->format,
-		TheUI.CompletedBarColorRGB.r,
-		TheUI.CompletedBarColorRGB.g,
-		TheUI.CompletedBarColorRGB.b);
-	TheUI.ViewportCursorColor = ColorWhite;
+	UI.CompletedBarColor = VideoMapRGB(TheScreen->format,
+		UI.CompletedBarColorRGB.r,
+		UI.CompletedBarColorRGB.g,
+		UI.CompletedBarColorRGB.b);
+	UI.ViewportCursorColor = ColorWhite;
 }
 
 /**
@@ -172,47 +172,47 @@ void LoadUserInterface(void)
 	//
 	//  Load graphics
 	//
-	for (i = 0; i < TheUI.NumFillers; ++i) {
-		TheUI.Filler[i]->Load();
+	for (i = 0; i < UI.NumFillers; ++i) {
+		UI.Filler[i]->Load();
 	}
 
 	for (i = 0; i <= ScoreCost; ++i) {
-		if (TheUI.Resources[i].G) {
-			TheUI.Resources[i].G->Load();
+		if (UI.Resources[i].G) {
+			UI.Resources[i].G->Load();
 		}
 	}
 
-	if (TheUI.InfoPanel.G) {
-		TheUI.InfoPanel.G->Load();
+	if (UI.InfoPanel.G) {
+		UI.InfoPanel.G->Load();
 	}
-	if (TheUI.ButtonPanel.G) {
-		TheUI.ButtonPanel.G->Load();
+	if (UI.ButtonPanel.G) {
+		UI.ButtonPanel.G->Load();
 	}
-	if (TheUI.PieMenuBackgroundG) {
-		TheUI.PieMenuBackgroundG->Load();
+	if (UI.PieMenuBackgroundG) {
+		UI.PieMenuBackgroundG->Load();
 	}
 
 	//
 	//  Resolve cursors
 	//
-	TheUI.Point.Cursor = CursorTypeByIdent(TheUI.Point.Name);
-	TheUI.Glass.Cursor = CursorTypeByIdent(TheUI.Glass.Name);
-	TheUI.Cross.Cursor = CursorTypeByIdent(TheUI.Cross.Name);
-	TheUI.YellowHair.Cursor = CursorTypeByIdent(TheUI.YellowHair.Name);
-	TheUI.GreenHair.Cursor = CursorTypeByIdent(TheUI.GreenHair.Name);
-	TheUI.RedHair.Cursor = CursorTypeByIdent(TheUI.RedHair.Name);
-	TheUI.Scroll.Cursor = CursorTypeByIdent(TheUI.Scroll.Name);
+	UI.Point.Cursor = CursorTypeByIdent(UI.Point.Name);
+	UI.Glass.Cursor = CursorTypeByIdent(UI.Glass.Name);
+	UI.Cross.Cursor = CursorTypeByIdent(UI.Cross.Name);
+	UI.YellowHair.Cursor = CursorTypeByIdent(UI.YellowHair.Name);
+	UI.GreenHair.Cursor = CursorTypeByIdent(UI.GreenHair.Name);
+	UI.RedHair.Cursor = CursorTypeByIdent(UI.RedHair.Name);
+	UI.Scroll.Cursor = CursorTypeByIdent(UI.Scroll.Name);
 
-	TheUI.ArrowE.Cursor = CursorTypeByIdent(TheUI.ArrowE.Name);
-	TheUI.ArrowNE.Cursor = CursorTypeByIdent(TheUI.ArrowNE.Name);
-	TheUI.ArrowN.Cursor = CursorTypeByIdent(TheUI.ArrowN.Name);
-	TheUI.ArrowNW.Cursor = CursorTypeByIdent(TheUI.ArrowNW.Name);
-	TheUI.ArrowW.Cursor = CursorTypeByIdent(TheUI.ArrowW.Name);
-	TheUI.ArrowSW.Cursor = CursorTypeByIdent(TheUI.ArrowSW.Name);
-	TheUI.ArrowS.Cursor = CursorTypeByIdent(TheUI.ArrowS.Name);
-	TheUI.ArrowSE.Cursor = CursorTypeByIdent(TheUI.ArrowSE.Name);
+	UI.ArrowE.Cursor = CursorTypeByIdent(UI.ArrowE.Name);
+	UI.ArrowNE.Cursor = CursorTypeByIdent(UI.ArrowNE.Name);
+	UI.ArrowN.Cursor = CursorTypeByIdent(UI.ArrowN.Name);
+	UI.ArrowNW.Cursor = CursorTypeByIdent(UI.ArrowNW.Name);
+	UI.ArrowW.Cursor = CursorTypeByIdent(UI.ArrowW.Name);
+	UI.ArrowSW.Cursor = CursorTypeByIdent(UI.ArrowSW.Name);
+	UI.ArrowS.Cursor = CursorTypeByIdent(UI.ArrowS.Name);
+	UI.ArrowSE.Cursor = CursorTypeByIdent(UI.ArrowSE.Name);
 
-	menupanel = TheUI.MenuPanels;
+	menupanel = UI.MenuPanels;
 	while (menupanel) {
 		menupanel->G->Load();
 		menupanel = menupanel->Next;
@@ -247,7 +247,7 @@ static void SaveViewports(CLFile* file, const CUserInterface* ui)
 */
 void SaveUserInterface(CLFile* file)
 {
-	SaveViewports(file, &TheUI);
+	SaveViewports(file, &UI);
 }
 
 /**
@@ -433,7 +433,7 @@ void CleanUserInterface(void)
 		TitleScreens = NULL;
 	}
 
-	memset(&TheUI, 0, sizeof(TheUI));
+	memset(&UI, 0, sizeof(UI));
 }
 
 /**
@@ -453,7 +453,7 @@ Viewport* GetViewport(int x, int y)
 {
 	Viewport* vp;
 
-	for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
+	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (x >= vp->X && x <= vp->EndX && y >= vp->Y && y <= vp->EndY) {
 			return vp;
 		}
@@ -468,7 +468,7 @@ Viewport* GetViewport(int x, int y)
 **  @param tx  x coordinate of the map tile
 **  @param ty  y coordinate of the map tile
 **
-**  @return viewport pointer (index into TheUI.Viewports) or NULL
+**  @return viewport pointer (index into UI.Viewports) or NULL
 **   if this map tile is not displayed in any of
 **   the viewports.
 **
@@ -480,7 +480,7 @@ Viewport* MapTileGetViewport(int tx, int ty)
 {
 	Viewport* vp;
 
-	for (vp = TheUI.Viewports; vp < TheUI.Viewports + TheUI.NumViewports; ++vp) {
+	for (vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		if (tx >= vp->MapX && tx < vp->MapX + vp->MapWidth &&
 				ty >= vp->MapY && ty < vp->MapY + vp->MapHeight) {
 			return vp;
@@ -504,7 +504,7 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 {
 	int i;
 
-	if (TheUI.NumViewports < num_vps) {
+	if (UI.NumViewports < num_vps) {
 		//  Compute location of the viewport using oldviewport
 		for (i = 0; i < num_vps; ++i) {
 			const Viewport* vp;
@@ -522,10 +522,10 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 		}
 	} else {
 		for (i = 0; i < num_vps; ++i) {
-			new_vps[i].MapX = TheUI.Viewports[i].MapX;
-			new_vps[i].MapY = TheUI.Viewports[i].MapY;
-			new_vps[i].OffsetX = TheUI.Viewports[i].OffsetX;
-			new_vps[i].OffsetY = TheUI.Viewports[i].OffsetY;
+			new_vps[i].MapX = UI.Viewports[i].MapX;
+			new_vps[i].MapY = UI.Viewports[i].MapY;
+			new_vps[i].OffsetX = UI.Viewports[i].OffsetX;
+			new_vps[i].OffsetY = UI.Viewports[i].OffsetY;
 		}
 	}
 
@@ -533,21 +533,21 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 	for (i = 0; i < num_vps; ++i) {
 		Viewport* vp;
 
-		vp = TheUI.Viewports + i;
+		vp = UI.Viewports + i;
 		vp->X = new_vps[i].X;
 		vp->EndX = new_vps[i].EndX;
 		vp->Y = new_vps[i].Y;
 		vp->EndY = new_vps[i].EndY;
 		ViewportSetViewpoint(vp, new_vps[i].MapX, new_vps[i].MapY, new_vps[i].OffsetX, new_vps[i].OffsetY);
 	}
-	TheUI.NumViewports = num_vps;
+	UI.NumViewports = num_vps;
 
 	//
 	//  Update the viewport pointers
 	//
-	TheUI.MouseViewport = GetViewport(CursorX, CursorY);
-	if (TheUI.SelectedViewport > TheUI.Viewports + TheUI.NumViewports - 1) {
-		TheUI.SelectedViewport = TheUI.Viewports + TheUI.NumViewports - 1;
+	UI.MouseViewport = GetViewport(CursorX, CursorY);
+	if (UI.SelectedViewport > UI.Viewports + UI.NumViewports - 1) {
+		UI.SelectedViewport = UI.Viewports + UI.NumViewports - 1;
 	}
 }
 
@@ -563,7 +563,7 @@ static void FinishViewportModeConfiguration(Viewport new_vps[], int num_vps)
 **                as dictated by current UI's geometry and ViewportMode.
 **
 **  @note It is supposed that values passed in Clip[XY] will
-**  never be greater than TheUI::MapArea::End[XY].
+**  never be greater than UI::MapArea::End[XY].
 **  However, they can be smaller according to the place
 **  the viewport vp takes in context of current ViewportMode.
 */
@@ -583,8 +583,8 @@ static void ClipViewport(Viewport* vp, int ClipX, int ClipY)
 		vp->EndY = ClipY;
 	}
 
-	Assert(vp->EndX <= TheUI.MapArea.EndX);
-	Assert(vp->EndY <= TheUI.MapArea.EndY);
+	Assert(vp->EndX <= UI.MapArea.EndX);
+	Assert(vp->EndY <= UI.MapArea.EndY);
 }
 
 /**
@@ -601,16 +601,16 @@ static void SetViewportModeSingle(void)
 
 	DebugPrint("Single viewport set\n");
 
-	new_vps[0].X = TheUI.MapArea.X;
-	new_vps[0].Y = TheUI.MapArea.Y;
-	ClipViewport(new_vps, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+	new_vps[0].X = UI.MapArea.X;
+	new_vps[0].Y = UI.MapArea.Y;
+	ClipViewport(new_vps, UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 1);
 }
 
 /**
 **  Compute viewport parameters for horizontally split viewport mode.
-**  This mode splits the TheUI::MapArea with a horizontal line to
+**  This mode splits the UI::MapArea with a horizontal line to
 **  2 (approximately) equal parts.
 **
 **  The parameters include viewport's width and height expressed
@@ -624,21 +624,21 @@ static void SetViewportModeSplitHoriz(void)
 
 	DebugPrint("Two horizontal viewports set\n");
 
-	new_vps[0].X = TheUI.MapArea.X;
-	new_vps[0].Y = TheUI.MapArea.Y;
-	ClipViewport(new_vps, TheUI.MapArea.EndX,
-		TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
+	new_vps[0].X = UI.MapArea.X;
+	new_vps[0].Y = UI.MapArea.Y;
+	ClipViewport(new_vps, UI.MapArea.EndX,
+		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[1].X = TheUI.MapArea.X;
+	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+	ClipViewport(new_vps + 1, UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
 }
 
 /**
 **  Compute viewport parameters for horizontal 3-way split viewport mode.
-**  This mode splits the TheUI::MapArea with a horizontal line to
+**  This mode splits the UI::MapArea with a horizontal line to
 **  2 (approximately) equal parts, then splits the bottom part vertically
 **  to another 2 parts.
 **
@@ -653,27 +653,27 @@ static void SetViewportModeSplitHoriz3(void)
 
 	DebugPrint("Horizontal 3-way viewport division set\n");
 
-	new_vps[0].X = TheUI.MapArea.X;
-	new_vps[0].Y = TheUI.MapArea.Y;
-	ClipViewport(new_vps, TheUI.MapArea.EndX,
-		TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
+	new_vps[0].X = UI.MapArea.X;
+	new_vps[0].Y = UI.MapArea.Y;
+	ClipViewport(new_vps, UI.MapArea.EndX,
+		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[1].X = TheUI.MapArea.X;
+	new_vps[1].X = UI.MapArea.X;
 	new_vps[1].Y = new_vps[0].EndY + 1;
 	ClipViewport(new_vps + 1,
-		TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
-		TheUI.MapArea.EndY);
+		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+		UI.MapArea.EndY);
 
 	new_vps[2].X = new_vps[1].EndX + 1;
 	new_vps[2].Y = new_vps[0].EndY + 1;
-	ClipViewport(new_vps + 2, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+	ClipViewport(new_vps + 2, UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 3);
 }
 
 /**
 **  Compute viewport parameters for vertically split viewport mode.
-**  This mode splits the TheUI::MapArea with a vertical line to
+**  This mode splits the UI::MapArea with a vertical line to
 **  2 (approximately) equal parts.
 **
 **  The parameters  include viewport's width and height expressed
@@ -687,22 +687,22 @@ static void SetViewportModeSplitVert(void)
 
 	DebugPrint("Two vertical viewports set\n");
 
-	new_vps[0].X = TheUI.MapArea.X;
-	new_vps[0].Y = TheUI.MapArea.Y;
+	new_vps[0].X = UI.MapArea.X;
+	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps,
-		TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
-		TheUI.MapArea.EndY);
+		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+		UI.MapArea.EndY);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
-	new_vps[1].Y = TheUI.MapArea.Y;
-	ClipViewport(new_vps + 1, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+	new_vps[1].Y = UI.MapArea.Y;
+	ClipViewport(new_vps + 1, UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 2);
 }
 
 /**
 **  Compute viewport parameters for 4-way split viewport mode.
-**  This mode splits the TheUI::MapArea vertically *and* horizontally
+**  This mode splits the UI::MapArea vertically *and* horizontally
 **  to 4 (approximately) equal parts.
 **
 **  The parameters  include viewport's width and height expressed
@@ -716,27 +716,27 @@ static void SetViewportModeQuad(void)
 
 	DebugPrint("Four viewports set\n");
 
-	new_vps[0].X = TheUI.MapArea.X;
-	new_vps[0].Y = TheUI.MapArea.Y;
+	new_vps[0].X = UI.MapArea.X;
+	new_vps[0].Y = UI.MapArea.Y;
 	ClipViewport(new_vps,
-		TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
-		TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
+		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
 	new_vps[1].X = new_vps[0].EndX + 1;
-	new_vps[1].Y = TheUI.MapArea.Y;
+	new_vps[1].Y = UI.MapArea.Y;
 	ClipViewport(new_vps + 1,
-		TheUI.MapArea.EndX,
-		TheUI.MapArea.Y + (TheUI.MapArea.EndY - TheUI.MapArea.Y + 1) / 2);
+		UI.MapArea.EndX,
+		UI.MapArea.Y + (UI.MapArea.EndY - UI.MapArea.Y + 1) / 2);
 
-	new_vps[2].X = TheUI.MapArea.X;
+	new_vps[2].X = UI.MapArea.X;
 	new_vps[2].Y = new_vps[0].EndY + 1;
 	ClipViewport(new_vps + 2,
-		TheUI.MapArea.X + (TheUI.MapArea.EndX - TheUI.MapArea.X + 1) / 2,
-		TheUI.MapArea.EndY);
+		UI.MapArea.X + (UI.MapArea.EndX - UI.MapArea.X + 1) / 2,
+		UI.MapArea.EndY);
 
 	new_vps[3].X = new_vps[1].X;
 	new_vps[3].Y = new_vps[2].Y;
-	ClipViewport(new_vps + 3, TheUI.MapArea.EndX, TheUI.MapArea.EndY);
+	ClipViewport(new_vps + 3, UI.MapArea.EndX, UI.MapArea.EndY);
 
 	FinishViewportModeConfiguration(new_vps, 4);
 }
@@ -748,7 +748,7 @@ static void SetViewportModeQuad(void)
 */
 void SetViewportMode(ViewportModeType new_mode)
 {
-	switch (TheUI.ViewportMode = new_mode) {
+	switch (UI.ViewportMode = new_mode) {
 		case VIEWPORT_SINGLE:
 			SetViewportModeSingle();
 			break;
@@ -782,7 +782,7 @@ void CycleViewportMode(int step)
 {
 	int new_mode;
 
-	new_mode = TheUI.ViewportMode + step;
+	new_mode = UI.ViewportMode + step;
 	if (new_mode >= NUM_VIEWPORT_MODES) {
 		new_mode = 0;
 	}

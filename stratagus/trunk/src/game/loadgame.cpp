@@ -196,9 +196,9 @@ void LoadModules(void)
 	}
 
 	SetPlayersPalette();
-	TheUI.Minimap.Create();
+	UI.Minimap.Create();
 
-	SetDefaultTextColors(TheUI.NormalFontColor, TheUI.ReverseFontColor);
+	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 
 #if 0
 	LoadButtons();

@@ -394,7 +394,7 @@ void ShowIntro(const Intro* intro)
 
 	UseContinueButton = 1;
 	InitContinueButton(455 * VideoWidth / 640, 440 * VideoHeight / 480);
-	GameCursor = TheUI.Point.Cursor;
+	GameCursor = UI.Point.Cursor;
 
 	VideoClearScreen();
 
@@ -597,11 +597,11 @@ void ShowCredits(Credits* credits)
 	}
 
 	UseContinueButton = 1;
-	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
-	GameCursor = TheUI.Point.Cursor;
+	InitContinueButton(UI.Offset640X + 455, UI.Offset480Y + 440);
+	GameCursor = UI.Point.Cursor;
 
-	x = TheUI.Offset640X;
-	y = TheUI.Offset480Y;
+	x = UI.Offset640X;
+	y = UI.Offset480Y;
 	IntroNoEvent = 1;
 	line = 0;
 	scrolling = 1;
@@ -853,8 +853,8 @@ static int GameStatsDrawFunc(int frame)
 	done = 0;
 
 	percent = 100;
-	x = TheUI.Offset640X;
-	y = TheUI.Offset480Y;
+	x = UI.Offset640X;
+	y = UI.Offset480Y;
 	dodraw = 99;
 	if (!IntroButtonPressed) {
 		dodraw = frame / stats_pause;
@@ -1207,12 +1207,12 @@ void ShowStats(void)
 
 	g = NULL;
 	if (GameResult == GameVictory) {
-		if (TheUI.VictoryBackgroundG) {
-			g = TheUI.VictoryBackgroundG;
+		if (UI.VictoryBackgroundG) {
+			g = UI.VictoryBackgroundG;
 		}
 	} else {
-		if (TheUI.DefeatBackgroundG) {
-			g = TheUI.DefeatBackgroundG;
+		if (UI.DefeatBackgroundG) {
+			g = UI.DefeatBackgroundG;
 		}
 	}
 	if (g) {
@@ -1221,8 +1221,8 @@ void ShowStats(void)
 	}
 
 	UseContinueButton = 1;
-	InitContinueButton(TheUI.Offset640X + 455, TheUI.Offset480Y + 440);
-	GameCursor = TheUI.Point.Cursor;
+	InitContinueButton(UI.Offset640X + 455, UI.Offset480Y + 440);
+	GameCursor = UI.Point.Cursor;
 
 	frame = 1;
 	done = 0;
