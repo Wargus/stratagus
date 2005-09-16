@@ -47,7 +47,7 @@ struct _unit_;
 struct _unit_type_;
 struct _player_;
 struct lua_State;
-struct _spell_type_;
+class SpellType;
 
 /*----------------------------------------------------------------------------
 --  Definitons
@@ -61,14 +61,6 @@ typedef enum {
 	TargetPosition,
 	TargetUnit
 }  TargetType;
-
-typedef struct _spell_action_type_ SpellActionType;
-/**
-**  Pointer on function that cast the spell.
-*/
-typedef int SpellFunc(struct _unit_* caster, const struct _spell_type_* spell,
-	const struct _spell_action_type_* action, struct _unit_* target, int x,
-	int y);
 
 /**
 **  Different targets.
@@ -84,15 +76,27 @@ typedef enum {
 **  It's evaluated like this, and should be more or less flexible.:
 **  base coordinates(caster or target) + (AddX,AddY) + (rand()%AddRandX,rand()%AddRandY)
 */
-typedef struct {
+class SpellActionMissileLocation {
+public:
+	SpellActionMissileLocation(LocBaseType base) : Base(base), AddX(0), AddY(0),
+								   AddRandX(0), AddRandY(0) {} ;
+
 	LocBaseType Base;   /// The base for the location (caster/target)
 	int AddX;           /// Add to the X coordinate
 	int AddY;           /// Add to the X coordinate
 	int AddRandX;       /// Random add to the X coordinate
 	int AddRandY;       /// Random add to the X coordinate
-} SpellActionMissileLocation;
+};
 
-typedef struct {
+class SpellActionTypeAdjustVariable {
+public:
+	SpellActionTypeAdjustVariable() : Enable(0), Value(0), Max(0), Increase(0),
+									ModifEnable(0), ModifValue(0),
+									ModifMax(0), ModifIncrease(0),
+									InvertEnable(0), AddValue(0),
+									AddMax(0), AddIncrease(0), IncreaseTime(0),
+									TargetIsCaster(0) {};
+
 	int Enable;                 /// Value to affect to this field.
 	int Value;                  /// Value to affect to this field.
 	int Max;                    /// Value to affect to this field.
@@ -109,77 +113,132 @@ typedef struct {
 	int AddIncrease;            /// Add this value to this field.
 	int IncreaseTime;           /// How many time increase the Value field.
 	char TargetIsCaster;        /// true if the target is the caster.
-} SpellActionTypeAdjustVariable;
+};
 
-struct _spell_action_type_ {
-	SpellFunc* CastFunction;
 
-	/// @todo some time information doesn't work as it should.
-	union {
-		struct {
-			int HP;         /// Target HP gain.(can be negative)
-			int Mana;       /// Target Mana gain.(can be negative)
-		} AreaAdjustVitals;
+/**
+**  Generic spell action virtual class.
+**  Spells are sub class of this one
+*/
+class SpellActionType {
+protected:
+	typedef int SpellFunc(struct _unit_* caster, const SpellType* spell,
+		struct _unit_* target, int x, int y);
 
-		struct {
-			int Damage;                             /// Missile damage.
-			int TTL;                                /// Missile TTL.
-			int Delay;                              /// Missile original delay.
-			SpellActionMissileLocation StartPoint;  /// Start point description.
-			SpellActionMissileLocation EndPoint;    /// Start point description.
-			MissileType* Missile;                   /// Missile fired on cast
-		} SpawnMissile;
+public:
+	virtual ~SpellActionType() {};
+	virtual SpellFunc Cast = 0;
+};
 
-		struct {
-			int Damage; /// Damage for every unit in range.
-			int Range;  /// Range of the explosion.
-		} Demolish;
+//
+//  Specific spells.
+//
 
-		struct {
-			int Fields;             /// The size of the affected square.
-			int Shards;             /// Number of shards thrown.
-			int Damage;             /// Damage for every shard.
-			int StartOffsetX;       /// The offset of the missile start point to the hit location.
-			int StartOffsetY;       /// The offset of the missile start point to the hit location.
-			MissileType* Missile;   /// Missile fired on cast
-		} AreaBombardment;
+class AreaAdjustVitals : public SpellActionType
+{
+public:
+	AreaAdjustVitals() : HP(0), Mana(0) {};
+	virtual SpellFunc Cast;
 
-		struct {
-			struct _unit_type_* PortalType;   /// The unit type spawned
-		} SpawnPortal;
+	int HP;         /// Target HP gain.(can be negative)
+	int Mana;       /// Target Mana gain.(can be negative)
+} ;
 
-		SpellActionTypeAdjustVariable *AdjustVariable;
+class SpawnMissile : public SpellActionType {
+public:
+	SpawnMissile() : Damage(0), TTL(-1), Delay(0),
+					StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {};
+	virtual SpellFunc Cast;
 
-		struct {
-			int HP;         /// Target HP gain.(can be negative)
-			int Mana;       /// Target Mana gain.(can be negative)
-			/// This spell is designed to be used wit very small amounts. The spell
-			/// can scale up to MaxMultiCast times. Use 0 for infinite.
-			int MaxMultiCast;
-		} AdjustVitals;
+	int Damage;                             /// Missile damage.
+	int TTL;                                /// Missile TTL.
+	int Delay;                              /// Missile original delay.
+	SpellActionMissileLocation StartPoint;  /// Start point description.
+	SpellActionMissileLocation EndPoint;    /// Start point description.
+	MissileType* Missile;                   /// Missile fired on cast
+};
 
-		struct {
-			struct _unit_type_* NewForm;/// The new form
-			int PlayerNeutral;          /// Convert the unit to the neutral player.
-			// TODO: temporary polymorphs would be awesome, but hard to implement
-		} Polymorph;
+class Demolish : public SpellActionType {
+public:
+	Demolish() : Damage(0), Range(0) {};
+	virtual SpellFunc Cast;
 
-		struct {
-			struct _unit_type_* UnitType;/// Type of unit to be summoned.
-			int TTL;                /// Time to live for summoned unit. 0 means infinite
-			int RequireCorpse;      /// Corpse consumed while summoning.
-		} Summon;
-		
-		struct {
-			char SacrificeEnable; /// true if the caster dies after casting.
-			int Damage;           /// damage the spell does if unable to caputre
-			int DamagePercent;    /// percent the target must be damaged for a
-								  /// capture to suceed.
-		} Capture;
+	int Damage; /// Damage for every unit in range.
+	int Range;  /// Range of the explosion.
+};
 
-		//  What about a resurection spell?
-	} Data;
-	SpellActionType* Next; /// Next action.
+class AreaBombardment : public SpellActionType {
+public:
+	AreaBombardment() : Fields(0), Shards(0), Damage(0),
+						StartOffsetX(0), StartOffsetY(0), Missile(NULL) {};
+	virtual SpellFunc Cast;
+
+	int Fields;             /// The size of the affected square.
+	int Shards;             /// Number of shards thrown.
+	int Damage;             /// Damage for every shard.
+	int StartOffsetX;       /// The offset of the missile start point to the hit location.
+	int StartOffsetY;       /// The offset of the missile start point to the hit location.
+	MissileType* Missile;   /// Missile fired on cast
+};
+
+class SpawnPortal : public SpellActionType {
+public:
+	SpawnPortal() : PortalType(0) {};
+	virtual SpellFunc Cast;
+
+	struct _unit_type_* PortalType;   /// The unit type spawned
+};
+
+class AdjustVariable : public SpellActionType {
+public:
+	AdjustVariable() : Var (NULL){};
+	~AdjustVariable() {delete [] (this->Var);};
+	virtual SpellFunc Cast;
+
+	SpellActionTypeAdjustVariable *Var;
+};
+
+class AdjustVitals : public SpellActionType {
+public:
+	AdjustVitals() : HP(0), Mana(0), MaxMultiCast(0) {};
+	virtual SpellFunc Cast;
+
+	int HP;         /// Target HP gain.(can be negative)
+	int Mana;       /// Target Mana gain.(can be negative)
+	/// This spell is designed to be used wit very small amounts. The spell
+	/// can scale up to MaxMultiCast times. Use 0 for infinite.
+	int MaxMultiCast;
+};
+
+class Polymorph : public SpellActionType {
+public:
+	Polymorph() : NewForm(NULL), PlayerNeutral(0) {};
+	virtual SpellFunc Cast;
+
+	struct _unit_type_* NewForm;/// The new form
+	int PlayerNeutral;          /// Convert the unit to the neutral player.
+	// TODO: temporary polymorphs would be awesome, but hard to implement
+};
+
+class Summon : public SpellActionType {
+public:
+	Summon() : UnitType(NULL), TTL(0), RequireCorpse(0) {} ;
+	virtual SpellFunc Cast;
+
+	struct _unit_type_* UnitType;/// Type of unit to be summoned.
+	int TTL;                /// Time to live for summoned unit. 0 means infinite
+	int RequireCorpse;      /// Corpse consumed while summoning.
+};
+
+class Capture : public SpellActionType {
+public:
+	Capture() : SacrificeEnable(0), Damage(0), DamagePercent(0) {};
+	virtual SpellFunc Cast;
+
+	char SacrificeEnable; /// true if the caster dies after casting.
+	int Damage;           /// damage the spell does if unable to caputre
+	int DamagePercent;    /// percent the target must be damaged for a
+						  /// capture to suceed.
 };
 
 /*
@@ -201,7 +260,12 @@ typedef struct {
 ** *******************
 */
 
-typedef struct _condition_info_variable_ {
+class ConditionInfoVariable {
+public:
+	ConditionInfoVariable() : Enable(0), MinValue(0), MaxValue(0),
+							MinMax(0), MinValuePercent(0), MaxValuePercent(0),
+							ConditionApplyOnCaster(0) {};
+
 	char Enable;                /// Target is 'user defined variable'.
 
 	int MinValue;               /// Target must have more Value than that.
@@ -212,14 +276,18 @@ typedef struct _condition_info_variable_ {
 
 	char ConditionApplyOnCaster; /// true if these condition are for caster.
 	// FIXME : More (increase, MaxMax) ?
-} ConditionInfoVariable;
+};
 
 /**
 **  Conditions for a spell.
 **
 **  @todo  Move more parameters into this structure.
 */
-typedef struct _condition_info_ {
+class ConditionInfo {
+public:
+	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
+					BoolFlag(NULL), Variable(NULL) {};
+	~ConditionInfo() { delete [] BoolFlag; delete [] Variable; };
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
@@ -236,13 +304,15 @@ typedef struct _condition_info_ {
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
 	//
-} ConditionInfo;
-
+};
 
 /**
 **  Informations about the autocasting mode.
 */
-typedef struct {
+class AutoCastInfo {
+public:
+	AutoCastInfo() : Range(0), Condition(0), Combat(0) {};
+	~AutoCastInfo() {delete Condition;};
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
 
@@ -254,12 +324,16 @@ typedef struct {
 
 	/// @todo Add stuff here for target preference.
 	/// @todo Heal units with the lowest hit points first.
-} AutoCastInfo;
+};
 
 /**
 **  Base structure of a spell type.
 */
-typedef struct _spell_type_ {
+class SpellType {
+public:
+	SpellType(int slot, const char *identname);
+	~SpellType();
+
 	// Identification stuff
 	char* Ident;    /// Spell unique identifier (spell-holy-vision)
 	char* Name;     /// Spell name shown by the engine
@@ -267,7 +341,7 @@ typedef struct _spell_type_ {
 
 	// Spell Specifications
 	TargetType Target;          /// Targetting information. See TargetType.
-	SpellActionType* Action;    /// More arguments for spell (damage, delay, additional sounds...).
+	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
 	int Range;                  /// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
@@ -283,7 +357,7 @@ typedef struct _spell_type_ {
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
-} SpellType;
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -292,10 +366,7 @@ typedef struct _spell_type_ {
 /**
 **  Define the names and effects of all available spells.
 */
-extern SpellType** SpellTypeTable;
-
-	/// How many spell-types are available
-extern int SpellTypeCount;
+extern std::vector<SpellType*> SpellTypeTable;
 
 
 /*----------------------------------------------------------------------------
@@ -325,30 +396,12 @@ extern int SpellCast(struct _unit_* caster, const SpellType* spell,
 	/// auto cast the spell if possible
 extern int AutoCastSpell(struct _unit_* caster, const SpellType* spell);
 
-	/// returns != 0 if spell can be auto cast
-extern int CanAutoCastSpell(const SpellType* spell);
-
 	/// return spell type by ident string
 extern SpellType* SpellTypeByIdent(const char* Ident);
 
 	/// return 0, 1, 2 for true, only, false.
 extern char Ccl2Condition(struct lua_State* l, const char* value);
 
-/*
-** Spelltype to cast.
-*/
-
-SpellFunc CastAreaAdjustVitals;
-SpellFunc CastAdjustVitals;
-SpellFunc CastAdjustVariable;
-SpellFunc CastPolymorph;
-SpellFunc CastAreaBombardment;
-SpellFunc CastSummon;
-SpellFunc CastDemolish;
-SpellFunc CastDeathCoil;
-SpellFunc CastSpawnPortal;
-SpellFunc CastSpawnMissile;
-SpellFunc CastCapture;
 //@}
 
 #endif // !__SPELLS_H__

@@ -57,7 +57,7 @@
 void AiCheckMagic(void)
 {
 	int i;
-	int j;
+	unsigned int j;
 	int n;
 	Unit** units;
 	Unit* unit;
@@ -73,7 +73,7 @@ void AiCheckMagic(void)
 		unit = units[i];
 		// Check only magic units
 		if (unit->Type->CanCastSpell) {
-			for (j = 0; j < SpellTypeCount; ++j) {
+			for (j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j) &&
 					(SpellTypeTable[j]->AutoCast || SpellTypeTable[j]->AICast)) {

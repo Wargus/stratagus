@@ -812,7 +812,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
 			if (!type->CanCastSpell) {
-				type->CanCastSpell = (char*)calloc(SpellTypeCount, sizeof(char));
+				type->CanCastSpell = (char*)calloc(SpellTypeTable.size(), sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {
@@ -841,7 +841,7 @@ static int CclDefineUnitType(lua_State* l)
 			// have been defined.
 			//
 			if (!type->AutoCastActive) {
-				type->AutoCastActive = (char*)calloc(SpellTypeCount, sizeof(char));
+				type->AutoCastActive = (char*)calloc(SpellTypeTable.size(), sizeof(char));
 			}
 			subargs = luaL_getn(l, -1);
 			if (subargs == 0) {

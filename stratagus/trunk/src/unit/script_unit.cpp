@@ -861,8 +861,8 @@ static int CclUnit(lua_State* l)
 			s = LuaToString(l, j + 1);
 			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = (char*)malloc(SpellTypeCount);
-				memset(unit->AutoCastSpell, 0, SpellTypeCount);
+				unit->AutoCastSpell = (char*)malloc(SpellTypeTable.size());
+				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
 			}
 			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
 		} else {

@@ -47,7 +47,7 @@ enum _diplomacy_ {
 struct _unit_;
 struct _unit_type_;
 struct _upgrade_;
-struct _spell_type_;
+class SpellType;
 struct _order_;
 struct _animation_;
 
@@ -131,7 +131,7 @@ extern void CommandResearch(struct _unit_* unit, struct _upgrade_* what,
 extern void CommandCancelResearch(struct _unit_* unit);
 	/// Prepare command spellcast
 extern void CommandSpellCast(struct _unit_* unit, int x, int y,
-	struct _unit_* dest, struct _spell_type_* spell, int flush);
+	struct _unit_* dest, SpellType *spell, int flush);
 	/// Prepare command auto spellcast
 extern void CommandAutoSpellCast(struct _unit_* unit, int spellid, int on);
 	/// Prepare diplomacy command

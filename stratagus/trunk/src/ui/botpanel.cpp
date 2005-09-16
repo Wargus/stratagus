@@ -751,7 +751,7 @@ void CButtonPanel::DoClicked(int button)
 				int spellId;
 
 				spellId = CurrentButtons[button].Value;
-				if (!CanAutoCastSpell(SpellTypeTable[spellId])) {
+				if (!SpellTypeTable[spellId]->AutoCast) {
 					PlayGameSound(GameSounds.PlacementError.Sound,
 						MaxSampleVolume);
 					break;

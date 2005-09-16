@@ -368,7 +368,7 @@ typedef struct _unit_ Unit;            /// unit itself
 struct _unit_type_;
 struct _unit_stats_;
 struct _new_animation;
-struct _spell_type_;
+class SpellType;
 struct _unit_colors_;
 struct _construction_frame_;
 struct _variable_type_;
@@ -441,7 +441,7 @@ typedef struct _order_ {
 			int Y;                    /// Y position for patroling.
 		} Patrol;                     /// position.
 		int ResourcePos;              /// ResourcePos == (X<<16 | Y).
-		struct _spell_type_* Spell;   /// spell when casting.
+		SpellType *Spell;             /// spell when casting.
 		struct _upgrade_* Upgrade;    /// upgrade.
 		struct _order_* Order;        /// FIXME : seems to be a hack for free memory.
 	} Arg1;             /// Extra command argument.

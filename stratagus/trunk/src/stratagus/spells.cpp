@@ -92,11 +92,8 @@ static inline max(int a, int b) { return a > b ? a : b; }
 /**
 ** Define the names and effects of all im play available spells.
 */
-SpellType** SpellTypeTable;
+std::vector<SpellType*> SpellTypeTable;
 
-
-/// How many spell-types are available
-int SpellTypeCount;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -110,15 +107,14 @@ int SpellTypeCount;
 **  Cast demolish
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastDemolish(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int Demolish::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int xmin;
 	int ymin;
@@ -133,10 +129,10 @@ int CastDemolish(Unit* caster, const SpellType* spell,
 	//
 	// Allow error margins. (Lame, I know)
 	//
-	xmin = x - action->Data.Demolish.Range - 2;
-	ymin = y - action->Data.Demolish.Range - 2;
-	xmax = x + action->Data.Demolish.Range + 2;
-	ymax = y + action->Data.Demolish.Range + 2;
+	xmin = x - this->Range - 2;
+	ymin = y - this->Range - 2;
+	xmax = x + this->Range + 2;
+	ymax = y + this->Range + 2;
 	if (xmin < 0) {
 		xmin = 0;
 	}
@@ -153,13 +149,13 @@ int CastDemolish(Unit* caster, const SpellType* spell,
 	//
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
-	if (action->Data.Demolish.Damage) {
+	if (this->Damage) {
 		n = UnitCacheSelect(xmin, ymin, xmax + 1, ymax + 1, table);
 		for (i = 0; i < n; ++i) {
 			if (table[i]->Type->UnitType != UnitTypeFly && table[i]->Orders[0].Action != UnitActionDie &&
-					MapDistanceToUnit(x, y, table[i]) <= action->Data.Demolish.Range) {
+					MapDistanceToUnit(x, y, table[i]) <= this->Range) {
 				// Don't hit flying units!
-				HitUnit(caster, table[i], action->Data.Demolish.Damage);
+				HitUnit(caster, table[i], this->Damage);
 			}
 		}
 	}
@@ -170,7 +166,7 @@ int CastDemolish(Unit* caster, const SpellType* spell,
 	for (ix = xmin; ix <= xmax; ++ix) {
 		for (iy = ymin; iy <= ymax; ++iy) {
 			n = TheMap.Fields[ix + iy * TheMap.Info.MapWidth].Flags;
-			if (MapDistance(ix, iy, x, y ) > action->Data.Demolish.Range) {
+			if (MapDistance(ix, iy, x, y ) > this->Range) {
 				// Not in circle range
 				continue;
 			} else if (n & MapFieldWall) {
@@ -190,21 +186,20 @@ int CastDemolish(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastSpawnPortal(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int SpawnPortal::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	Unit* portal;
 	UnitType* ptype;
 
-	ptype = action->Data.SpawnPortal.PortalType;
+	ptype = this->PortalType;
 
 	DebugPrint("Spawning a portal exit.\n");
 	portal = caster->Goal;
@@ -225,15 +220,14 @@ int CastSpawnPortal(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int AreaAdjustVitals::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	Unit* units[UnitMax];
 	int nunits;
@@ -247,8 +241,8 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 		x + spell->Range + caster->Type->Width,
 		y + spell->Range + caster->Type->Height,
 		units);
-	hp = action->Data.AreaAdjustVitals.HP;
-	mana = action->Data.AreaAdjustVitals.Mana;
+	hp = this->HP;
+	mana = this->Mana;
 	caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
 	for (j = 0; j < nunits; ++j) {
 		target = units[j];
@@ -280,7 +274,6 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
@@ -289,13 +282,13 @@ int CastAreaAdjustVitals(Unit* caster, const SpellType* spell,
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-int CastAreaBombardment(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int AreaBombardment::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int fields;
 	int shards;
 	int damage;
-	Missile* mis;
+	struct _missile_* mis;
 	int offsetx;
 	int offsety;
 	int dx;
@@ -305,12 +298,12 @@ int CastAreaBombardment(Unit* caster, const SpellType* spell,
 
 	mis = NULL;
 
-	fields = action->Data.AreaBombardment.Fields;
-	shards = action->Data.AreaBombardment.Shards;
-	damage = action->Data.AreaBombardment.Damage;
-	offsetx = action->Data.AreaBombardment.StartOffsetX;
-	offsety = action->Data.AreaBombardment.StartOffsetY;
-	missile = action->Data.AreaBombardment.Missile;
+	fields = this->Fields;
+	shards = this->Shards;
+	damage = this->Damage;
+	offsetx = this->StartOffsetX;
+	offsety = this->StartOffsetY;
+	missile = this->Missile;
 	while (fields--) {
 			// FIXME: radius configurable...
 		do {
@@ -382,31 +375,30 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation* location,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastSpawnMissile(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int SpawnMissile::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
-	Missile* missile;
+	struct _missile_* missile;
 	int sx;
 	int sy;
 	int dx;
 	int dy;
 
-	EvaluateMissileLocation(&action->Data.SpawnMissile.StartPoint,
+	EvaluateMissileLocation(&this->StartPoint,
 		caster, target, x, y, &sx, &sy);
-	EvaluateMissileLocation(&action->Data.SpawnMissile.EndPoint,
+	EvaluateMissileLocation(&this->EndPoint,
 		caster, target, x, y, &dx, &dy);
 
-	missile = MakeMissile(action->Data.SpawnMissile.Missile, sx, sy, dx, dy);
-	missile->TTL = action->Data.SpawnMissile.TTL;
-	missile->Delay = action->Data.SpawnMissile.Delay;
-	missile->Damage = action->Data.SpawnMissile.Damage;
+	missile = MakeMissile(this->Missile, sx, sy, dx, dy);
+	missile->TTL = this->TTL;
+	missile->Delay = this->Delay;
+	missile->Damage = this->Damage;
 	if (missile->Damage != 0) {
 		missile->SourceUnit = caster;
 		RefsIncrease(caster);
@@ -422,50 +414,47 @@ int CastSpawnMissile(Unit* caster, const SpellType* spell,
 **
 **  @param caster  Unit that casts the spell
 **  @param spell   Spell-type pointer
-**  @param action  Spell action
 **  @param target  Target
 **  @param x       X coord of target spot when/if target does not exist
 **  @param y       Y coord of target spot when/if target does not exist
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-int CastAdjustVariable(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int AdjustVariable::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int i;
 	Unit* unit;    // unit to modify.
 
-	Assert(action);
-
 	for (i = 0; i < UnitTypeVar.NumberVariable; ++i) {
-		unit = (action->Data.AdjustVariable[i].TargetIsCaster) ? caster : target;
+		unit = (this->Var[i].TargetIsCaster) ? caster : target;
 		if (!unit) {
 			continue;
 		}
 		// Enable flag.
-		if (action->Data.AdjustVariable[i].ModifEnable) {
-			unit->Variable[i].Enable = action->Data.AdjustVariable[i].Enable;
+		if (this->Var[i].ModifEnable) {
+			unit->Variable[i].Enable = this->Var[i].Enable;
 		}
-		unit->Variable[i].Enable ^= action->Data.AdjustVariable[i].InvertEnable;
+		unit->Variable[i].Enable ^= this->Var[i].InvertEnable;
 
 		// Max field
-		if (action->Data.AdjustVariable[i].ModifMax) {
-			unit->Variable[i].Max = action->Data.AdjustVariable[i].Max;
+		if (this->Var[i].ModifMax) {
+			unit->Variable[i].Max = this->Var[i].Max;
 		}
-		unit->Variable[i].Max += action->Data.AdjustVariable[i].AddMax;
+		unit->Variable[i].Max += this->Var[i].AddMax;
 
 		// Increase field
-		if (action->Data.AdjustVariable[i].ModifIncrease) {
-			unit->Variable[i].Increase = action->Data.AdjustVariable[i].Increase;
+		if (this->Var[i].ModifIncrease) {
+			unit->Variable[i].Increase = this->Var[i].Increase;
 		}
-		unit->Variable[i].Increase += action->Data.AdjustVariable[i].AddIncrease;
+		unit->Variable[i].Increase += this->Var[i].AddIncrease;
 
 		// Value field
-		if (action->Data.AdjustVariable[i].ModifValue) {
-			unit->Variable[i].Value = action->Data.AdjustVariable[i].Value;
+		if (this->Var[i].ModifValue) {
+			unit->Variable[i].Value = this->Var[i].Value;
 		}
-		unit->Variable[i].Value += action->Data.AdjustVariable[i].AddValue;
-		unit->Variable[i].Value += action->Data.AdjustVariable[i].IncreaseTime
+		unit->Variable[i].Value += this->Var[i].AddValue;
+		unit->Variable[i].Value += this->Var[i].IncreaseTime
 			* unit->Variable[i].Increase;
 
 		if (unit->Variable[i].Value <= 0) {
@@ -483,15 +472,14 @@ int CastAdjustVariable(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastAdjustVitals(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int AdjustVitals::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int castcount;
 	int diffHP;
@@ -505,8 +493,9 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	if (!target) {
 		return 0;
 	}
-	hp = action->Data.AdjustVitals.HP;
-	mana = action->Data.AdjustVitals.Mana;
+
+	hp = this->HP;
+	mana = this->Mana;
 	manacost = spell->ManaCost;
 
 	//  Healing and harming
@@ -536,8 +525,8 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 	if (manacost) {
 		castcount = min(castcount, caster->Variable[MANA_INDEX].Value / manacost);
 	}
-	if (action->Data.AdjustVitals.MaxMultiCast) {
-		castcount = min(castcount, action->Data.AdjustVitals.MaxMultiCast);
+	if (this->MaxMultiCast) {
+		castcount = min(castcount, this->MaxMultiCast);
 	}
 
 	caster->Variable[MANA_INDEX].Value -= castcount * manacost;
@@ -565,15 +554,14 @@ int CastAdjustVitals(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastPolymorph(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int Polymorph::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int i;
 	int j;
@@ -582,7 +570,8 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 	if (!target) {
 		return 0;
 	}
-	type = action->Data.Polymorph.NewForm;
+
+	type = this->NewForm;
 
 	x = x - type->TileWidth / 2;
 	y = y - type->TileHeight / 2;
@@ -616,7 +605,7 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 		}
 	}
 	caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
-	if (action->Data.Polymorph.PlayerNeutral) {
+	if (this->PlayerNeutral) {
 		MakeUnitAndPlace(x, y, type, Players + PlayerNumNeutral);
 	} else {
 		MakeUnitAndPlace(x, y, type, target->Player);
@@ -632,25 +621,25 @@ int CastPolymorph(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastCapture(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int Capture::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	if (!target || caster->Player == target->Player) {
 		return 0;
 	}
-	if (action->Data.Capture.DamagePercent) {
+
+	if (this->DamagePercent) {
 		if ((100 * target->Variable[HP_INDEX].Value) /
-			target->Variable[HP_INDEX].Max > action->Data.Capture.DamagePercent &&
-			target->Variable[HP_INDEX].Value > action->Data.Capture.Damage) {
-				HitUnit(caster, target, action->Data.Capture.Damage);
-				if (action->Data.Capture.SacrificeEnable) {
+			target->Variable[HP_INDEX].Max > this->DamagePercent &&
+			target->Variable[HP_INDEX].Value > this->Damage) {
+				HitUnit(caster, target, this->Damage);
+				if (this->SacrificeEnable) {
 					// No corpse.
 					RemoveUnit(caster, NULL);
 					UnitLost(caster);
@@ -677,7 +666,7 @@ int CastCapture(Unit* caster, const SpellType* spell,
 		caster->Variable[KILL_INDEX].Enable = 1;
 	}
 	ChangeUnitOwner(target, caster->Player);
-	if (action->Data.Capture.SacrificeEnable) {
+	if (this->SacrificeEnable) {
 		// No corpse.
 		RemoveUnit(caster, NULL);
 		UnitLost(caster);
@@ -694,27 +683,26 @@ int CastCapture(Unit* caster, const SpellType* spell,
 **
 **  @param caster       Unit that casts the spell
 **  @param spell        Spell-type pointer
-**  @param action       Parameters of the spell.
 **  @param target       Target unit that spell is addressed to
 **  @param x            X coord of target spot when/if target does not exist
 **  @param y            Y coord of target spot when/if target does not exist
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-int CastSummon(Unit* caster, const SpellType* spell,
-	const SpellActionType* action, Unit* target, int x, int y)
+int Summon::Cast(Unit* caster, const SpellType* spell,
+	Unit* target, int x, int y)
 {
 	int ttl;
 	int cansummon;
 	int n;
 	Unit* table[UnitMax];
 	Unit* unit;
-	UnitType* unittype;
+	struct _unit_type_* unittype;
 
-	unittype = action->Data.Summon.UnitType;
-	ttl = action->Data.Summon.TTL;
+	unittype = this->UnitType;
+	ttl = this->TTL;
 
-	if (action->Data.Summon.RequireCorpse) {
+	if (this->RequireCorpse) {
 		n = UnitCacheSelect(x - 1, y - 1, x + 2, y + 2, table);
 		cansummon = 0;
 		while (n) {
@@ -1062,11 +1050,9 @@ void InitSpells(void)
 */
 SpellType* SpellTypeByIdent(const char* ident)
 {
-	int i;
-
-	for (i = 0; i < SpellTypeCount; ++i) {
-		if (strcmp(SpellTypeTable[i]->Ident, ident) == 0) {
-			return SpellTypeTable[i];
+	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
+		if (strcmp((*i)->Ident, ident) == 0) {
+			return *i;
 		}
 	}
 	return NULL;
@@ -1090,19 +1076,6 @@ int SpellIsAvailable(const Player* player, int spellid)
 	dependencyId = SpellTypeTable[spellid]->DependencyId;
 
 	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
-}
-
-
-/**
-**  Check if the spell can be auto cast.
-**
-**  @param spell    Spell-type pointer
-**
-**  @return         1 if spell can be cast, 0 if not
-*/
-int CanAutoCastSpell(const SpellType* spell)
-{
-	return spell->AutoCast ? 1 : 0;
 }
 
 /**
@@ -1171,7 +1144,6 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	int x, int y)
 {
 	int cont;             // Should we recast the spell.
-	SpellActionType* act; // action to do.
 	int mustSubtractMana; // false if action which have their own calculation is present.
 
 	caster->Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
@@ -1190,22 +1162,20 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell->Ident _C_
 		caster->Type->Name _C_ target ? target->Type->Name : "none" _C_ x _C_ y);
 	if (CanCastSpell(caster, spell, target, x, y)) {
-		act = spell->Action;
 		cont = 1;
 		mustSubtractMana = 1;
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
-		while (act) {
-			Assert(act->CastFunction);
-			if (act->CastFunction == CastAdjustVitals ||
-					act->CastFunction == CastPolymorph ||
-					act->CastFunction == CastSummon) {
+		for (std::vector<SpellActionType*>::const_iterator act = spell->Action.begin();
+			act != spell->Action.end();	++act) {
+			if (dynamic_cast<const AdjustVitals *> (*act) ||
+				dynamic_cast<const Polymorph *> (*act) ||
+				dynamic_cast<const Summon *> (*act)) {
 				mustSubtractMana = 0;
 			}
-			cont = cont & act->CastFunction(caster, spell, act, target, x, y);
-			act = act->Next;
+			cont = cont & (*act)->Cast(caster, spell, target, x, y);
 		}
 		if (mustSubtractMana) {
 			caster->Variable[MANA_INDEX].Value -= spell->ManaCost;
@@ -1227,66 +1197,53 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 	return 0;
 }
 
+
+/**
+**  SpellType constructor.
+*/
+SpellType::SpellType(int slot, const char *identname) :
+	Name(NULL), Slot(slot),
+	Target(), Action(),
+	Range(0), ManaCost(0), RepeatCast(0),
+	DependencyId(-1), Condition(NULL),
+	AutoCast(NULL), AICast(NULL), SoundWhenCast()
+{
+	Ident = strdup(identname);
+}
+
+/**
+**  SpellType destructor.
+*/
+SpellType::~SpellType()
+{
+	free(Ident);
+	free(Name);
+	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
+		delete *act;
+	}
+	Action.clear();
+
+	delete Condition;
+	//
+	// Free Autocast.
+	//
+	delete AutoCast;
+	delete AICast;
+
+	free(SoundWhenCast.Name);
+}
+
+
 /**
 ** Cleanup the spell subsystem.
-**
-** @note: everything regarding spells is gone now.
-** FIXME: not complete
 */
 void CleanSpells(void)
 {
-	int i;
-	SpellType* spell;
-	SpellActionType *act;
-	SpellActionType *nextact;
-
 	DebugPrint("Cleaning spells.\n");
-	for (i = 0; i < SpellTypeCount; ++i) {
-		spell = SpellTypeTable[i];
-		free(spell->Ident);
-		free(spell->Name);
-
-		act = spell->Action;
-		while (act) {
-			nextact = act->Next;
-			if (act->CastFunction == CastAdjustVariable) {
-				free(act->Data.AdjustVariable);
-			}
-			free(act);
-			act = nextact;
-		}
-
-		if (spell->Condition) {
-			free(spell->Condition->BoolFlag);
-			free(spell->Condition->Variable);
-			free(spell->Condition);
-		}
-		//
-		// Free Autocast.
-		//
-		if (spell->AutoCast) {
-			if (spell->AutoCast->Condition) {
-				free(spell->AutoCast->Condition->BoolFlag);
-				free(spell->AutoCast->Condition->Variable);
-				free(spell->AutoCast->Condition);
-			}
-			free(spell->AutoCast);
-		}
-		if (spell->AICast) {
-			if (spell->AICast->Condition) {
-				free(spell->AICast->Condition->BoolFlag);
-				free(spell->AICast->Condition->Variable);
-				free(spell->AICast->Condition);
-			}
-			free(spell->AICast);
-		}
-		free(spell->SoundWhenCast.Name);
-		free(spell);
-		// FIXME: missile free somewhere else, right?
+	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
+		delete *i;
 	}
-	free(SpellTypeTable);
-	SpellTypeTable = 0;
-	SpellTypeCount = 0;
+	SpellTypeTable.clear();
 }
 
 //@}

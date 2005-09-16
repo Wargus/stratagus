@@ -66,7 +66,6 @@ static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* lo
 	int j;
 
 	Assert(location != NULL);
-	memset(location, 0, sizeof(*location));
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -118,7 +117,7 @@ static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* lo
 **  @param l            Lua state.
 **  @param spellaction  Pointer to spellaction.
 */
-static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
+static SpellActionType* CclSpellAction(lua_State* l)
 {
 	const char* value;
 	int args;
@@ -136,10 +135,7 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 	++j;
 
 	if (!strcmp(value, "spawn-missile")) {
-		spellaction->CastFunction = CastSpawnMissile;
-		spellaction->Data.SpawnMissile.StartPoint.Base = LocBaseCaster;
-		spellaction->Data.SpawnMissile.EndPoint.Base = LocBaseTarget;
-		spellaction->Data.SpawnMissile.TTL = -1;
+		SpawnMissile *spellaction = new SpawnMissile;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -147,29 +143,29 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			++j;
 			if (!strcmp(value, "damage")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.SpawnMissile.Damage = LuaToNumber(l, -1);
+				spellaction->Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "delay")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.SpawnMissile.Delay = LuaToNumber(l, -1);
+				spellaction->Delay = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "ttl")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.SpawnMissile.TTL = LuaToNumber(l, -1);
+				spellaction->TTL = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "start-point")) {
 				lua_rawgeti(l, -1, j + 1);
-				CclSpellMissileLocation(l, &spellaction->Data.SpawnMissile.StartPoint);
+				CclSpellMissileLocation(l, &spellaction->StartPoint);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "end-point")) {
 				lua_rawgeti(l, -1, j + 1);
-				CclSpellMissileLocation(l, &spellaction->Data.SpawnMissile.EndPoint);
+				CclSpellMissileLocation(l, &spellaction->EndPoint);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "missile")) {
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
-				spellaction->Data.SpawnMissile.Missile = MissileTypeByIdent(value);
-				if (spellaction->Data.SpawnMissile.Missile == NULL) {
+				spellaction->Missile = MissileTypeByIdent(value);
+				if (spellaction->Missile == NULL) {
 					DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
 				}
 				lua_pop(l, 1);
@@ -178,11 +174,12 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			}
 		}
 		// Now, checking value.
-		if (spellaction->Data.SpawnMissile.Missile == NULL) {
+		if (spellaction->Missile == NULL) {
 			LuaError(l, "Use a missile for spawn-missile (with missile)");
 		}
+		return spellaction;
 	} else if (!strcmp(value, "area-adjust-vitals")) {
-		spellaction->CastFunction = CastAreaAdjustVitals;
+		AreaAdjustVitals* spellaction = new AreaAdjustVitals;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -190,18 +187,19 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			++j;
 			if (!strcmp(value, "hit-points")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaAdjustVitals.HP = LuaToNumber(l, -1);
+				spellaction->HP = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "mana-points")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaAdjustVitals.Mana = LuaToNumber(l, -1);
+				spellaction->Mana = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value);
 			}
 		}
+		return spellaction;
 	} else if (!strcmp(value, "area-bombardment")) {
-		spellaction->CastFunction = CastAreaBombardment;
+		AreaBombardment *spellaction = new AreaBombardment;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -209,29 +207,29 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			++j;
 			if (!strcmp(value, "fields")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaBombardment.Fields = LuaToNumber(l, -1);
+				spellaction->Fields = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "shards")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaBombardment.Shards = LuaToNumber(l, -1);
+				spellaction->Shards = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "damage")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaBombardment.Damage = LuaToNumber(l, -1);
+				spellaction->Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "start-offset-x")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaBombardment.StartOffsetX = LuaToNumber(l, -1);
+				spellaction->StartOffsetX = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "start-offset-y")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AreaBombardment.StartOffsetY = LuaToNumber(l, -1);
+				spellaction->StartOffsetY = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "missile")) {
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
-				spellaction->Data.AreaBombardment.Missile = MissileTypeByIdent(value);
-				if (spellaction->Data.AreaBombardment.Missile == NULL) {
+				spellaction->Missile = MissileTypeByIdent(value);
+				if (spellaction->Missile == NULL) {
 					DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
 				}
 				lua_pop(l, 1);
@@ -240,11 +238,12 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			}
 		}
 		// Now, checking value.
-		if (spellaction->Data.AreaBombardment.Missile == NULL) {
+		if (spellaction->Missile == NULL) {
 			LuaError(l, "Use a missile for area-bombardment (with missile)");
 		}
+		return spellaction;
 	} else if (!strcmp(value, "demolish")) {
-		spellaction->CastFunction = CastDemolish;
+		Demolish *spellaction = new Demolish;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -252,24 +251,24 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			++j;
 			if (!strcmp(value, "range")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.Demolish.Range = LuaToNumber(l, -1);
+				spellaction->Range = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "damage")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.Demolish.Damage = LuaToNumber(l, -1);
+				spellaction->Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 			}
 		}
+		return spellaction;
 	} else if (!strcmp(value, "adjust-variable")) {
-		spellaction->CastFunction = CastAdjustVariable;
+		AdjustVariable *spellaction = new AdjustVariable;
 		lua_rawgeti(l, -1, j + 1);
 		if (!lua_istable(l, -1)) {
 			LuaError(l, "Table expected for adjust-variable.");
 		}
-		spellaction->Data.AdjustVariable = (SpellActionTypeAdjustVariable*)calloc(
-			UnitTypeVar.NumberVariable, sizeof(*spellaction->Data.AdjustVariable));
+		spellaction->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.NumberVariable];
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			int i;
 
@@ -278,45 +277,45 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -2));
 			}
 			if (lua_isnumber(l, -1)) {
-				spellaction->Data.AdjustVariable[i].Enable = (LuaToNumber(l, -1) != 0);
-				spellaction->Data.AdjustVariable[i].ModifEnable = 1;
-				spellaction->Data.AdjustVariable[i].Value = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable[i].ModifValue = 1;
-				spellaction->Data.AdjustVariable[i].Max = LuaToNumber(l, -1);
-				spellaction->Data.AdjustVariable[i].ModifMax = 1;
+				spellaction->Var[i].Enable = (LuaToNumber(l, -1) != 0);
+				spellaction->Var[i].ModifEnable = 1;
+				spellaction->Var[i].Value = LuaToNumber(l, -1);
+				spellaction->Var[i].ModifValue = 1;
+				spellaction->Var[i].Max = LuaToNumber(l, -1);
+				spellaction->Var[i].ModifMax = 1;
 			} else if (lua_istable(l, -1)) {
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 					const char *key;
 
 					key = LuaToString(l, -2);
 					if (!strcmp(key, "Enable")) {
-						spellaction->Data.AdjustVariable[i].Enable = LuaToBoolean(l, -1);
-						spellaction->Data.AdjustVariable[i].ModifEnable = 1;
+						spellaction->Var[i].Enable = LuaToBoolean(l, -1);
+						spellaction->Var[i].ModifEnable = 1;
 					} else if (!strcmp(key, "Value")) {
-						spellaction->Data.AdjustVariable[i].Value = LuaToNumber(l, -1);
-						spellaction->Data.AdjustVariable[i].ModifValue = 1;
+						spellaction->Var[i].Value = LuaToNumber(l, -1);
+						spellaction->Var[i].ModifValue = 1;
 					} else if (!strcmp(key, "Max")) {
-						spellaction->Data.AdjustVariable[i].Max = LuaToNumber(l, -1);
-						spellaction->Data.AdjustVariable[i].ModifMax = 1;
+						spellaction->Var[i].Max = LuaToNumber(l, -1);
+						spellaction->Var[i].ModifMax = 1;
 					} else if (!strcmp(key, "Increase")) {
-						spellaction->Data.AdjustVariable[i].Increase = LuaToNumber(l, -1);
-						spellaction->Data.AdjustVariable[i].ModifIncrease = 1;
+						spellaction->Var[i].Increase = LuaToNumber(l, -1);
+						spellaction->Var[i].ModifIncrease = 1;
 					} else if (!strcmp(key, "InvertEnable")) {
-						spellaction->Data.AdjustVariable[i].InvertEnable = LuaToBoolean(l, -1);
+						spellaction->Var[i].InvertEnable = LuaToBoolean(l, -1);
 					} else if (!strcmp(key, "AddValue")) {
-						spellaction->Data.AdjustVariable[i].AddValue = LuaToNumber(l, -1);
+						spellaction->Var[i].AddValue = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "AddMax")) {
-						spellaction->Data.AdjustVariable[i].AddMax = LuaToNumber(l, -1);
+						spellaction->Var[i].AddMax = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "AddIncrease")) {
-						spellaction->Data.AdjustVariable[i].AddIncrease = LuaToNumber(l, -1);
+						spellaction->Var[i].AddIncrease = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "IncreaseTime")) {
-						spellaction->Data.AdjustVariable[i].IncreaseTime = LuaToNumber(l, -1);
+						spellaction->Var[i].IncreaseTime = LuaToNumber(l, -1);
 					} else if (!strcmp(key, "TargetIsCaster")) {
 						value = LuaToString(l, -1);
 						if (!strcmp(value, "caster")) {
-							spellaction->Data.AdjustVariable[i].TargetIsCaster = 1;
+							spellaction->Var[i].TargetIsCaster = 1;
 						} else if (!strcmp(value, "target")) {
-							spellaction->Data.AdjustVariable[i].TargetIsCaster = 0;
+							spellaction->Var[i].TargetIsCaster = 0;
 						} else { // Error
 							LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
 						}
@@ -329,8 +328,9 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			}
 		}
 		lua_pop(l, 1); // pop table
+		return spellaction;
 	} else if (!strcmp(value, "summon")) {
-		spellaction->CastFunction = CastSummon;
+		Summon *spellaction = new Summon;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -340,28 +340,29 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
-				spellaction->Data.Summon.UnitType = UnitTypeByIdent(value);
-				if (!spellaction->Data.Summon.UnitType) {
-					spellaction->Data.Summon.UnitType = 0;
+				spellaction->UnitType = UnitTypeByIdent(value);
+				if (!spellaction->UnitType) {
+					spellaction->UnitType = 0;
 					DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
 				}
 			} else if (!strcmp(value, "time-to-live")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.Summon.TTL = LuaToNumber(l, -1);
+				spellaction->TTL = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "require-corpse")) {
-				spellaction->Data.Summon.RequireCorpse = 1;
+				spellaction->RequireCorpse = 1;
 				--j;
 			} else {
 				LuaError(l, "Unsupported summon tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
-		if (spellaction->Data.Summon.UnitType == NULL) {
+		if (spellaction->UnitType == NULL) {
 			LuaError(l, "Use a unittype for summon (with unit-type)");
 		}
+		return spellaction;
 	} else if (!strcmp(value, "spawn-portal")) {
-		spellaction->CastFunction = CastSpawnPortal;
+		SpawnPortal *spellaction = new SpawnPortal;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -371,9 +372,9 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
-				spellaction->Data.SpawnPortal.PortalType = UnitTypeByIdent(value);
-				if (!spellaction->Data.SpawnPortal.PortalType) {
-					spellaction->Data.SpawnPortal.PortalType = 0;
+				spellaction->PortalType = UnitTypeByIdent(value);
+				if (!spellaction->PortalType) {
+					spellaction->PortalType = 0;
 					DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
 				}
 			} else {
@@ -381,32 +382,34 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			}
 		}
 		// Now, checking value.
-		if (spellaction->Data.SpawnPortal.PortalType == NULL) {
+		if (spellaction->PortalType == NULL) {
 			LuaError(l, "Use a unittype for spawn-portal (with portal-type)");
 		}
+		return spellaction;
 	} else if (!strcmp(value, "capture")) {
-		spellaction->CastFunction = CastCapture;
+		Capture *spellaction = new Capture;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
 			lua_pop(l, 1);
 			++j;
 			if (!strcmp(value, "sacrifice")) {
-				spellaction->Data.Capture.SacrificeEnable = 1;
+				spellaction->SacrificeEnable = 1;
 			} else if (!strcmp(value, "damage")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.Capture.Damage = LuaToNumber(l, -1);
+				spellaction->Damage = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "percent")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.Capture.DamagePercent = LuaToNumber(l, -1);
+				spellaction->DamagePercent = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported Capture tag: %s" _C_ value);
 			}
 		}
+		return spellaction;
 	} else if (!strcmp(value, "polymorph")) {
-		spellaction->CastFunction = CastPolymorph;
+		Polymorph *spellaction = new Polymorph;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -416,25 +419,26 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 				lua_rawgeti(l, -1, j + 1);
 				value = LuaToString(l, -1);
 				lua_pop(l, 1);
-				spellaction->Data.Polymorph.NewForm = UnitTypeByIdent(value);
-				if (!spellaction->Data.Polymorph.NewForm) {
-					spellaction->Data.Polymorph.NewForm= 0;
+				spellaction->NewForm = UnitTypeByIdent(value);
+				if (!spellaction->NewForm) {
+					spellaction->NewForm= 0;
 					DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
 				}
 				// FIXME: temp polymorphs? hard to do.
 			} else if (!strcmp(value, "player-neutral")) {
-				spellaction->Data.Polymorph.PlayerNeutral = 1;
+				spellaction->PlayerNeutral = 1;
 				--j;
 			} else {
 				LuaError(l, "Unsupported polymorph tag: %s" _C_ value);
 			}
 		}
 		// Now, checking value.
-		if (spellaction->Data.Polymorph.NewForm == NULL) {
+		if (spellaction->NewForm == NULL) {
 			LuaError(l, "Use a unittype for polymorph (with new-form)");
 		}
+		return spellaction;
 	} else if (!strcmp(value, "adjust-vitals")) {
-		spellaction->CastFunction = CastAdjustVitals;
+		AdjustVitals *spellaction = new AdjustVitals;
 		for (; j < args; ++j) {
 			lua_rawgeti(l, -1, j + 1);
 			value = LuaToString(l, -1);
@@ -442,23 +446,25 @@ static void CclSpellAction(lua_State* l, SpellActionType* spellaction)
 			++j;
 			if (!strcmp(value, "hit-points")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustVitals.HP = LuaToNumber(l, -1);
+				spellaction->HP = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "mana-points")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustVitals.Mana = LuaToNumber(l, -1);
+				spellaction->Mana = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else if (!strcmp(value, "max-multi-cast")) {
 				lua_rawgeti(l, -1, j + 1);
-				spellaction->Data.AdjustVitals.MaxMultiCast = LuaToNumber(l, -1);
+				spellaction->MaxMultiCast = LuaToNumber(l, -1);
 				lua_pop(l, 1);
 			} else {
 				LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value);
 			}
 		}
+		return spellaction;
 	} else {
 		LuaError(l, "Unsupported action type: %s" _C_ value);
 	}
+	return NULL;
 }
 
 /**
@@ -504,11 +510,12 @@ static void CclSpellCondition(lua_State* l, ConditionInfo* condition)
 	// Initializations:
 	//
 
-	// Set everything to 0:
-	memset(condition, 0, sizeof(ConditionInfo));
 	// Flags are defaulted to 0(CONDITION_TRUE)
-	condition->BoolFlag = (char*)calloc(UnitTypeVar.NumberBoolFlag, sizeof(*condition->BoolFlag));
-	condition->Variable = (ConditionInfoVariable*)calloc(UnitTypeVar.NumberVariable, sizeof(*condition->Variable));
+	condition->BoolFlag = new char[UnitTypeVar.NumberBoolFlag];
+	for (i = 0; i < UnitTypeVar.NumberBoolFlag; ++i) {
+		condition->BoolFlag[i] = 0;
+	}
+	condition->Variable = new ConditionInfoVariable[UnitTypeVar.NumberVariable];
 	// Initialize min/max stuff to values with no effect.
 	for (i = 0; i < UnitTypeVar.NumberVariable; i++) {
 		condition->Variable[i].MinValue = -1;
@@ -620,7 +627,7 @@ static void CclSpellAutocast(lua_State* l, AutoCastInfo* autocast)
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "condition")) {
 			if (!autocast->Condition) {
-				autocast->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+				autocast->Condition = new ConditionInfo;
 			}
 			lua_rawgeti(l, -1, j + 1);
 			CclSpellCondition(l, autocast->Condition);
@@ -641,7 +648,6 @@ static int CclDefineSpell(lua_State* l)
 	const char* identname;
 	SpellType* spell;
 	const char* value;
-	SpellActionType* act;
 	int args;
 	int i;
 
@@ -651,25 +657,20 @@ static int CclDefineSpell(lua_State* l)
 	if (spell != NULL) {
 		DebugPrint("Redefining spell-type `%s'\n" _C_ identname);
 	} else {
-		SpellTypeTable = (SpellType**)realloc(SpellTypeTable, (1 + SpellTypeCount) * sizeof(SpellType*));
-		spell = SpellTypeTable[SpellTypeCount] = (SpellType*)malloc(sizeof(SpellType));
-		memset(spell, 0, sizeof(SpellType));
-		spell->Slot = SpellTypeCount;
-		spell->Ident = strdup(identname);
-		spell->DependencyId = -1;
+		spell = new SpellType(SpellTypeTable.size(), identname);
 		for (std::vector<UnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
 				UnitTypes[i]->CanCastSpell = (char *)realloc(UnitTypes[i]->CanCastSpell,
-					SpellTypeCount * sizeof(UnitTypes[i]->CanCastSpell));
-				UnitTypes[i]->CanCastSpell[SpellTypeCount] = 0;
+					SpellTypeTable.size() * sizeof(UnitTypes[i]->CanCastSpell));
+				UnitTypes[i]->CanCastSpell[SpellTypeTable.size()] = 0;
 			}
 			if (UnitTypes[i]->AutoCastActive) {
 				UnitTypes[i]->AutoCastActive = (char*)realloc(UnitTypes[i]->AutoCastActive,
-					SpellTypeCount * sizeof(UnitTypes[i]->AutoCastActive));
-				UnitTypes[i]->AutoCastActive[SpellTypeCount] = 0;
+					SpellTypeTable.size() * sizeof(UnitTypes[i]->AutoCastActive));
+				UnitTypes[i]->AutoCastActive[SpellTypeTable.size()] = 0;
 			}
 		}
-		SpellTypeCount++;
+		SpellTypeTable.push_back(spell);
 	}
 	for (i = 1; i < args; ++i) {
 		value = LuaToString(l, i + 1);
@@ -710,45 +711,32 @@ static int CclDefineSpell(lua_State* l)
 			int subargs;
 			int k;
 
-			spell->Action = (SpellActionType*)malloc(sizeof(SpellActionType));
-			act = spell->Action;
-			memset(act, 0, sizeof(SpellActionType));
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			subargs = luaL_getn(l, i + 1);
-			k = 0;
-			lua_rawgeti(l, i + 1, k + 1);
-			CclSpellAction(l, act);
-			lua_pop(l, 1);
-			++k;
-			for (; k < subargs; ++k) {
-				act->Next = (SpellActionType*)malloc(sizeof(SpellActionType));
-				act = act->Next;
-				memset(act, 0, sizeof(SpellActionType));
+			for (k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, i + 1, k + 1);
-				CclSpellAction(l, act);
+				spell->Action.push_back(CclSpellAction(l));
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "condition")) {
 			if (!spell->Condition) {
-				spell->Condition = (ConditionInfo*)malloc(sizeof(ConditionInfo));
+				spell->Condition = new ConditionInfo;
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellCondition(l, spell->Condition);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "autocast")) {
 			if (!spell->AutoCast) {
-				spell->AutoCast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
-				memset(spell->AutoCast, 0, sizeof(AutoCastInfo));
+				spell->AutoCast = new AutoCastInfo();
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AutoCast);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "ai-cast")) {
 			if (!spell->AICast) {
-				spell->AICast = (AutoCastInfo*)malloc(sizeof(AutoCastInfo));
-				memset(spell->AICast, 0, sizeof(AutoCastInfo));
+				spell->AICast = new AutoCastInfo();
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AICast);
