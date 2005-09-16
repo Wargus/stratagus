@@ -1170,9 +1170,7 @@ int SpellCast(Unit* caster, const SpellType* spell, Unit* target,
 		PlayGameSound(spell->SoundWhenCast.Sound, MaxSampleVolume);
 		for (std::vector<SpellActionType*>::const_iterator act = spell->Action.begin();
 			act != spell->Action.end();	++act) {
-			if (dynamic_cast<const AdjustVitals *> (*act) ||
-				dynamic_cast<const Polymorph *> (*act) ||
-				dynamic_cast<const Summon *> (*act)) {
+			if ((*act)->ModifyManaCaster) {
 				mustSubtractMana = 0;
 			}
 			cont = cont & (*act)->Cast(caster, spell, target, x, y);
