@@ -71,7 +71,7 @@ CLFile::CLFile()
 
 CLFile::~CLFile()
 {
-	if (cl_type == CLF_TYPE_INVALID) {
+	if (cl_type != CLF_TYPE_INVALID) {
 		DebugPrint("File wasn't closed\n");
 		close();
 	}
