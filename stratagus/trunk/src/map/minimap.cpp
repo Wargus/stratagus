@@ -664,13 +664,13 @@ void CMinimap::Draw(int vx, int vy)
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex2i(PosX, PosY);
+	glVertex2i(X, Y);
 	glTexCoord2f(0.0f, (float)H / MinimapTextureHeight);
-	glVertex2i(PosX, PosY + H);
+	glVertex2i(X, Y + H);
 	glTexCoord2f((float)W / MinimapTextureWidth, (float)H / MinimapTextureHeight);
-	glVertex2i(PosX + W, PosY + H);
+	glVertex2i(X + W, Y + H);
 	glTexCoord2f((float)W / MinimapTextureWidth, 0.0f);
-	glVertex2i(PosX + W, PosY);
+	glVertex2i(X + W, Y);
 	glEnd();
 #endif
 
