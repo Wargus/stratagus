@@ -209,7 +209,7 @@ PICS    = contrib/stratagus.ico contrib/poweredby.png
 CONTRIB	= contrib/macosx.tgz
 
 MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
-	  Rules.make.in configure.in configure config.h.in \
+	  Rules.make.in configure.in configure config.h.in Makefile \
 	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
 	  $(patsubst %, %/Module.make, $(MODULES)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
