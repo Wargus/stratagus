@@ -86,6 +86,9 @@
 #include <stdlib.h>
 
 #include "stratagus.h"
+
+#include <vector>
+
 #include "video.h"
 #include "map.h"
 #include "ui.h"
@@ -103,13 +106,12 @@
 /**
 **  Structure of pushed clippings.
 */
-typedef struct _clip_ {
-	struct _clip_* Next;                /// next pushed clipping.
+struct Clip {
 	int X1;                             /// pushed clipping top left
 	int Y1;                             /// pushed clipping top left
 	int X2;                             /// pushed clipping bottom right
 	int Y2;                             /// pushed clipping bottom right
-} Clip;
+};
 
 /*----------------------------------------------------------------------------
 --  Externals
@@ -127,8 +129,8 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 int VideoWidth;                      /// Window width in pixels
 int VideoHeight;                     /// Window height in pixels
 
-char VideoFullScreen;            /// true fullscreen wanted
-char VideoForceFullScreen;       /// fullscreen set from commandline
+char VideoFullScreen;                /// true fullscreen wanted
+char VideoForceFullScreen;           /// fullscreen set from commandline
 
 unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
 unsigned long FrameCounter;          /// Current frame number
@@ -139,8 +141,7 @@ int ClipY1;                      /// current clipping top left
 int ClipX2;                      /// current clipping bottom right
 int ClipY2;                      /// current clipping bottom right
 
-static Clip* Clips;                      /// stack of all clips
-static Clip* ClipsGarbage;               /// garbage-list of available clips
+static std::vector<Clip> Clips;
 
 	/**
 	**  Architecture-dependant video depth. Set by InitVideoXXX, if 0.
@@ -193,20 +194,8 @@ void SetClipping(int left, int top, int right, int bottom)
 */
 void PushClipping(void)
 {
-	Clip* clip;
-
-	if ((clip = ClipsGarbage)) {
-		ClipsGarbage = ClipsGarbage->Next;
-	} else {
-		clip = (Clip*)malloc(sizeof(Clip));
-	}
-
-	clip->Next = Clips;
-	clip->X1 = ClipX1;
-	clip->Y1 = ClipY1;
-	clip->X2 = ClipX2;
-	clip->Y2 = ClipY2;
-	Clips = clip;
+	Clip clip = {ClipX1, ClipY1, ClipX2, ClipY2};
+	Clips.push_back(clip);
 }
 
 /**
@@ -214,25 +203,12 @@ void PushClipping(void)
 */
 void PopClipping(void)
 {
-	Clip* clip;
-
-	clip = Clips;
-	if (clip) {
-		Clips = clip->Next;
-		ClipX1 = clip->X1;
-		ClipY1 = clip->Y1;
-		ClipX2 = clip->X2;
-		ClipY2 = clip->Y2;
-
-		clip->Next = ClipsGarbage;
-		ClipsGarbage = clip;
-	} else {
-		Assert(0);
-		ClipX1 = 0;
-		ClipY1 = 0;
-		ClipX2 = VideoWidth - 1;
-		ClipY2 = VideoHeight - 1;
-	}
+	Clip clip = Clips.back();
+	ClipX1 = clip.X1;
+	ClipY1 = clip.Y1;
+	ClipX2 = clip.X2;
+	ClipY2 = clip.Y2;
+	Clips.pop_back();
 }
 
 /*----------------------------------------------------------------------------
