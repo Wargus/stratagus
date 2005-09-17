@@ -151,6 +151,10 @@ def AutoConfigure(env):
   if env['opengl']:
      CheckOpenGL(env, conf)
   
+  # check for optional functions
+  if conf.CheckFunc('strcasestr'):
+     env.Append(CPPDEFINES = 'HAVE_STRCASESTR')
+
   env = conf.Finish()
 
 if not os.path.exists("build_config.py")  \
@@ -164,18 +168,12 @@ else:
 
 # Stratagus build specifics
 env.Append(CPPPATH='src/include')
-env.Append(CPPDEFINES = 'HAVE_CONFIG_H')
-env.Append(CPPPATH='.') # for config.h
 BuildDir('build', 'src', duplicate = 0)
 if env['debug']:
     env.Append(CPPDEFINES = 'DEBUG')
     env.Append(CCFLAGS = Split('-g -Wsign-compare -Werror -Wall'))
 else:
     env.Append(CCFLAGS = Split('-O2 -pipe -fomit-frame-pointer -fexpensive-optimizations -ffast-math'))
-if not os.path.exists('config.h'):
-    # create a dummy config.h needed by stratagus
-    open('config.h', 'wt').close()
-
 
 # Targets
 Default(env.Program('stratagus', sourcesEngine))
