@@ -164,7 +164,7 @@ char* strdcat3(const char* l, const char* m, const char* r)
 	return res;
 }
 
-#if !HAVE_STRCASESTR
+#if !defined(HAVE_STRCASESTR)
 /**
 **  Case insensitive version of strstr
 **

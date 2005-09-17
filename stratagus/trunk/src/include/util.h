@@ -62,7 +62,7 @@ extern char* strdcat(const char* l, const char* r);
 	/// strdup + strcat + strcat
 extern char* strdcat3(const char* l, const char* m, const char* r);
 
-#if !HAVE_STRCASESTR
+#if !defined(HAVE_STRCASESTR)
 	/// case insensitive strstr
 extern char* strcasestr(const char* str, const char* substr);
 #endif // !HAVE_STRCASESTR
