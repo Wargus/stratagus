@@ -1204,9 +1204,11 @@ SpellType::SpellType(int slot, const char *identname) :
 	Target(), Action(),
 	Range(0), ManaCost(0), RepeatCast(0),
 	DependencyId(-1), Condition(NULL),
-	AutoCast(NULL), AICast(NULL), SoundWhenCast()
+	AutoCast(NULL), AICast(NULL)
 {
 	Ident = strdup(identname);
+	SoundWhenCast.Name = NULL;
+	SoundWhenCast.Sound = NULL;
 }
 
 /**
