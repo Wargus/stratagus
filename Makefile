@@ -201,8 +201,9 @@ endif
 #	Distributions
 ##############################################################################
 
-DOCS    = README doc/*.html doc/*.txt doc/scripts/*.html doc/scripts/*.py \
-	  doc/graphics/*.html doc/graphics/*.gimp doc/graphics/*.png
+DOCS    = COPYING README doc/*.html doc/*.txt doc/scripts/*.html \
+	  doc/scripts/*.py doc/graphics/*.html doc/graphics/*.gimp \
+	  doc/graphics/*.png
 
 PICS    = contrib/stratagus.ico contrib/poweredby.png
 
@@ -211,6 +212,7 @@ CONTRIB	= contrib/macosx.tgz
 MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure config.h.in Makefile \
 	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
+	  autogen.sh SConstruct \
 	  $(patsubst %, %/Module.make, $(MODULES)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
