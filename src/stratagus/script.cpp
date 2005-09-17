@@ -383,10 +383,10 @@ int LuaToNumber(lua_State* l, int narg)
 **
 **  @return    1 for true, 0 for false from lua.
 */
-int LuaToBoolean(lua_State* l, int narg)
+bool LuaToBoolean(lua_State* l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TBOOLEAN);
-	return lua_toboolean(l, narg);
+	return lua_toboolean(l, narg) != 0;
 }
 
 /**
@@ -2484,6 +2484,8 @@ int CclCommand(const char* command)
 ..  Setup
 ............................................................................*/
 
+int tolua_stratagus_open(lua_State *tolua_S);
+
 /**
 **  Initialize ccl and load the config file(s).
 */
@@ -2495,6 +2497,7 @@ void InitCcl(void)
 	luaopen_string(Lua);
 	luaopen_math(Lua);
 	luaopen_debug(Lua);
+	tolua_stratagus_open(Lua);
 	lua_settop(Lua, 0);  // discard any results
 
 	lua_register(Lua, "CompileFeature", CclGetCompileFeature);
@@ -2607,7 +2610,7 @@ void SavePreferences(void)
 	fprintf(fd, "--- -----------------------------------------\n");
 	fprintf(fd, "--- $Id$\n");
 
-	fprintf(fd, "SetVideoResolution(%d, %d)\n", VideoWidth, VideoHeight);
+	fprintf(fd, "SetVideoResolution(%d, %d)\n", Video.Width, Video.Height);
 
 	fclose(fd);
 
@@ -2631,7 +2634,7 @@ void SavePreferences(void)
 	fprintf(fd, "--- -----------------------------------------\n");
 	fprintf(fd, "--- $Id$\n");
 
-	fprintf(fd, "SetVideoFullScreen(%s)\n", VideoFullScreen ? "true" : "false");
+	fprintf(fd, "SetVideoFullScreen(%s)\n", Video.FullScreen ? "true" : "false");
 	fprintf(fd, "SetLocalPlayerName(\"%s\")\n", LocalPlayerName);
 
 	// Game options

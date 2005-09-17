@@ -269,7 +269,7 @@ extern int CclInConfigFile;  /// True while config file parsing
 
 extern const char* LuaToString(lua_State* l, int narg);
 extern int LuaToNumber(lua_State* l, int narg);
-extern int LuaToBoolean(lua_State* l, int narg);
+extern bool LuaToBoolean(lua_State* l, int narg);
 
 extern void CclGarbageCollect(int fast);  /// Perform garbage collection
 extern void InitCcl(void);                /// Initialise ccl

@@ -629,7 +629,7 @@ static void DrawUnitIcons(void)
 	j = 176 - 8;
 
 	PushClipping();
-	SetClipping(0, 0, x + j - 20, VideoHeight - 1);
+	SetClipping(0, 0, x + j - 20, Video.Height - 1);
 	MenuButtonG->DrawFrameClip(MBUTTON_S_HCONT, x - 2, y);
 	PopClipping();
 	if (UI.ButtonPanel.X + 4 < CursorX

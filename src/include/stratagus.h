@@ -219,19 +219,14 @@ extern char NameLine[];
 --  Screen
 ----------------------------------------------------------------------------*/
 
-	// FIXME: this values should go into a general ui structure
-
-#define DEFAULT_VIDEO_WIDTH   640       /// Default video width
-#define DEFAULT_VIDEO_HEIGHT  480       /// Default video height
-
 	/// Scrolling area (<= 15 y)
 #define SCROLL_UP     15
 	/// Scrolling area (>= VideoHeight - 16 y)
-#define SCROLL_DOWN   (VideoHeight - 16)
+#define SCROLL_DOWN   (Video.Height - 16)
 	/// Scrolling area (<= 15 y)
 #define SCROLL_LEFT   15
 	/// Scrolling area (>= VideoWidth - 16 x)
-#define SCROLL_RIGHT  (VideoWidth - 16)
+#define SCROLL_RIGHT  (Video.Width - 16)
 
 	/// Mouse scrolling magnify
 #define MOUSE_SCROLL_SPEED  3

@@ -207,14 +207,14 @@ int PlayMovie(const char* name)
 	data.File = &f;
 
 	if (data.tinfo.frame_width * 300 / 4 > data.tinfo.frame_height * 100) {
-		rect.w = VideoWidth;
-		rect.h = VideoWidth * data.tinfo.frame_height / data.tinfo.frame_width;
+		rect.w = Video.Width;
+		rect.h = Video.Width * data.tinfo.frame_height / data.tinfo.frame_width;
 		rect.x = 0;
-		rect.y = (VideoHeight - rect.h) / 2;
+		rect.y = (Video.Height - rect.h) / 2;
 	} else {
-		rect.w = VideoHeight * data.tinfo.frame_width / data.tinfo.frame_height;
-		rect.h = VideoHeight;
-		rect.x = (VideoWidth - rect.w) / 2;
+		rect.w = Video.Height * data.tinfo.frame_width / data.tinfo.frame_height;
+		rect.h = Video.Height;
+		rect.x = (Video.Width - rect.w) / 2;
 		rect.y = 0;
 	}
 

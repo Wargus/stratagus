@@ -656,8 +656,8 @@ void HandleMouseExit(void)
 
 	// Show hour-glass (to denote to the user, the game is waiting)
 	// FIXME: couldn't define a hour-glass that easily, so used pointer
-	CursorX = VideoWidth / 2;
-	CursorY = VideoHeight / 2;
+	CursorX = Video.Width / 2;
+	CursorY = Video.Height / 2;
 	GameCursor = UI.Point.Cursor;
 }
 

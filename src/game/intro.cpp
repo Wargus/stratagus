@@ -393,7 +393,7 @@ void ShowIntro(const Intro* intro)
 	int soundcount;
 
 	UseContinueButton = 1;
-	InitContinueButton(455 * VideoWidth / 640, 440 * VideoHeight / 480);
+	InitContinueButton(455 * Video.Width / 640, 440 * Video.Height / 480);
 	GameCursor = UI.Point.Cursor;
 
 	VideoClearScreen();
@@ -413,7 +413,7 @@ void ShowIntro(const Intro* intro)
 
 	background = NewGraphic(intro->Background, 0, 0);
 	background->Load();
-	background->Resize(VideoWidth, VideoHeight);
+	background->Resize(Video.Width, Video.Height);
 
 	LibraryFileName(intro->TextFile, buf);
 	if (file.open(buf, CL_OPEN_READ) == -1) {
@@ -446,7 +446,7 @@ void ShowIntro(const Intro* intro)
 	SplitTextIntoLines(text, 320, &scrolling_text);
 	for (i = 0; i < MAX_OBJECTIVES; ++i) {
 		if (intro->Objectives[i]) {
-			SplitTextIntoLines(intro->Objectives[i], 260 * VideoWidth / 640,
+			SplitTextIntoLines(intro->Objectives[i], 260 * Video.Width / 640,
 				&objectives_text[i]);
 		} else {
 			objectives_text[i] = NULL;
@@ -479,32 +479,32 @@ void ShowIntro(const Intro* intro)
 		//
 		background->DrawSubClip(0, 0,
 			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2);
+			(Video.Width - background->Width) / 2,
+			(Video.Height - background->Height) / 2);
 		//
 		// Draw title
 		//
 		SetDefaultTextColors(FontWhite, FontYellow);
-		VideoDrawTextCentered((70 + 340) / 2 * VideoWidth / 640,
-			28 * VideoHeight / 480, LargeFont, intro->Title);
+		VideoDrawTextCentered((70 + 340) / 2 * Video.Width / 640,
+			28 * Video.Height / 480, LargeFont, intro->Title);
 		//
 		// Draw scrolling text
 		//
-		ScrollText(70 * VideoWidth / 640, 80 * VideoHeight / 480,
-			70 * VideoWidth / 640 + 320, 170 * VideoHeight / 480, line, scrolling_text);
+		ScrollText(70 * Video.Width / 640, 80 * Video.Height / 480,
+			70 * Video.Width / 640 + 320, 170 * Video.Height / 480, line, scrolling_text);
 
 		//
 		// Draw objectives
 		//
-		y = 306 * VideoHeight / 480;
-		VideoDrawText(372 * VideoWidth / 640, y, LargeFont, "Objectives:");
+		y = 306 * Video.Height / 480;
+		VideoDrawText(372 * Video.Width / 640, y, LargeFont, "Objectives:");
 		y += 30;
 		for (i = 0; i < MAX_OBJECTIVES && objectives_text[i]; ++i) {
 			TextLines* ptr;
 
 			ptr = objectives_text[i];
 			while (ptr) {
-				VideoDrawText(372 * VideoWidth / 640, y, LargeFont, ptr->Text);
+				VideoDrawText(372 * Video.Width / 640, y, LargeFont, ptr->Text);
 				y += 22;
 				ptr = ptr->Next;
 			}
@@ -586,7 +586,7 @@ void ShowCredits(Credits* credits)
 	if (credits->Background) {
 		background = NewGraphic(credits->Background, 0, 0);
 		background->Load();
-		background->Resize(VideoWidth, VideoHeight);
+		background->Resize(Video.Width, Video.Height);
 	}
 
 	// play different music?
@@ -612,8 +612,8 @@ void ShowCredits(Credits* credits)
 		if (background) {
 			background->DrawSubClip(0, 0,
 				background->Width, background->Height,
-				(VideoWidth - background->Width) / 2,
-				(VideoHeight - background->Height) / 2);
+				(Video.Width - background->Width) / 2,
+				(Video.Height - background->Height) / 2);
 		}
 
 		//
@@ -679,8 +679,8 @@ static void PictureDrawText(CampaignChapter* chapter, ChapterTextLines* chlines)
 		} else {
 			draw = VideoDrawTextCentered;
 		}
-		x = text->X * VideoWidth / 640;
-		y = text->Y * VideoHeight / 480;
+		x = text->X * Video.Width / 640;
+		y = text->Y * Video.Height / 480;
 		lines = chlines->Text;
 		while (lines) {
 			draw(x, y, text->Font, lines->Text);
@@ -726,7 +726,7 @@ void ShowPicture(CampaignChapter* chapter)
 
 	background = NewGraphic(chapter->Data.Picture.Image, 0, 0);
 	background->Load();
-	background->Resize(VideoWidth, VideoHeight);
+	background->Resize(Video.Width, Video.Height);
 	IntroNoEvent = 1;
 
 	text = chapter->Data.Picture.Text;
@@ -747,8 +747,8 @@ void ShowPicture(CampaignChapter* chapter)
 		VideoClearScreen();
 		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2,
+			(Video.Width - background->Width) / 2,
+			(Video.Height - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
 
@@ -768,8 +768,8 @@ void ShowPicture(CampaignChapter* chapter)
 	while (IntroNoEvent && j < max) {
 		background->DrawSubClip(0, 0,
 			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2);
+			(Video.Width - background->Width) / 2,
+			(Video.Height - background->Height) / 2);
 		PictureDrawText(chapter, lines);
 
 		Invalidate();
@@ -787,8 +787,8 @@ void ShowPicture(CampaignChapter* chapter)
 		VideoClearScreen();
 		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
-			(VideoWidth - background->Width) / 2,
-			(VideoHeight - background->Height) / 2,
+			(Video.Width - background->Width) / 2,
+			(Video.Height - background->Height) / 2,
 			255 * i / max);
 		PictureDrawText(chapter, lines);
 
@@ -1217,7 +1217,7 @@ void ShowStats(void)
 	}
 	if (g) {
 		g->Load();
-		g->Resize(VideoWidth, VideoHeight);
+		g->Resize(Video.Width, Video.Height);
 	}
 
 	UseContinueButton = 1;
@@ -1231,7 +1231,7 @@ void ShowStats(void)
 	while (1) {
 		if (g) {
 			g->DrawSubClip(0, 0, g->Width, g->Height,
-				(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
+				(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
 		}
 		GameStatsDrawFunc(frame);
 		DrawContinueButton();

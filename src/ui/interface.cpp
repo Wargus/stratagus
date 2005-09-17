@@ -436,8 +436,8 @@ static void UiToggleBigMap(void)
 
 		UI.MapArea.X = 0;
 		UI.MapArea.Y = 0;
-		UI.MapArea.EndX = VideoWidth - 1;
-		UI.MapArea.EndY = VideoHeight - 1;
+		UI.MapArea.EndX = Video.Width - 1;
+		UI.MapArea.EndY = Video.Height - 1;
 
 		SetViewportMode(UI.ViewportMode);
 
@@ -1291,13 +1291,13 @@ void HandleCursorMove(int* x, int* y)
 	//
 	if (*x < 0) {
 		*x = 0;
-	} else if (*x >= VideoWidth) {
-		*x = VideoWidth - 1;
+	} else if (*x >= Video.Width) {
+		*x = Video.Width - 1;
 	}
 	if (*y < 0) {
 		*y = 0;
-	} else if (*y >= VideoHeight) {
-		*y = VideoHeight - 1;
+	} else if (*y >= Video.Height) {
+		*y = Video.Height - 1;
 	}
 
 	CursorX = *x;

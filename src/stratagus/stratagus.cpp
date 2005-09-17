@@ -374,7 +374,7 @@ static void ShowTitleScreens(void)
 #endif
 				g = NewGraphic(TitleScreens[i]->File, 0, 0);
 				g->Load();
-				g->Resize(VideoWidth, VideoHeight);
+				g->Resize(Video.Width, Video.Height);
 #ifdef USE_MNG
 			}
 #endif
@@ -382,23 +382,23 @@ static void ShowTitleScreens(void)
 			while (timeout-- && WaitNoEvent) {
 #ifdef USE_MNG
 				if (mng) {
-					mng->Draw((VideoWidth - mng->surface->w) / 2,
-						(VideoHeight - mng->surface->h) / 2);
+					mng->Draw((Video.Width - mng->surface->w) / 2,
+						(Video.Height - mng->surface->h) / 2);
 					if (mng->iteration == TitleScreens[i]->Iterations) {
 						WaitNoEvent = 0;
 					}
 				} else {
 #endif
 					g->DrawSubClip(0, 0, g->Width, g->Height,
-						(VideoWidth - g->Width) / 2, (VideoHeight - g->Height) / 2);
+						(Video.Width - g->Width) / 2, (Video.Height - g->Height) / 2);
 #ifdef USE_MNG
 				}
 #endif
 				labels = TitleScreens[i]->Labels;
 				if (labels && labels[0] && IsFontLoaded(labels[0]->Font)) {
 					for (j = 0; labels[j]; ++j) {
-						x = labels[j]->Xofs * VideoWidth / 640;
-						y = labels[j]->Yofs * VideoWidth / 640;
+						x = labels[j]->Xofs * Video.Width / 640;
+						y = labels[j]->Yofs * Video.Width / 640;
 						if (labels[j]->Flags & TitleFlagCenter) {
 							x -= VideoTextLength(labels[j]->Font, labels[j]->Text) / 2;
 						}
@@ -436,16 +436,16 @@ void ShowLoadProgress(const char* fmt, ...)
 	vsnprintf(temp, sizeof(temp), fmt, va);
 	va_end(va);
 
-	if (VideoDepth && IsFontLoaded(GameFont)) {
+	if (Video.Depth && IsFontLoaded(GameFont)) {
 		// Remove non printable chars
 		for (s = temp; *s; ++s) {
 			if (*s < 32) {
 				*s = ' ';
 			}
 		}
-		VideoFillRectangle(ColorBlack, 5, VideoHeight - 18, VideoWidth - 10, 18);
-		VideoDrawTextCentered(VideoWidth / 2, VideoHeight - 16, GameFont, temp);
-		InvalidateArea(5, VideoHeight - 18, VideoWidth - 10, 18);
+		VideoFillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
+		VideoDrawTextCentered(Video.Width / 2, Video.Height - 16, GameFont, temp);
+		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		RealizeVideoMemory();
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);
@@ -646,7 +646,7 @@ static int main1(int argc, char** argv)
 	//
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
-	SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 	VideoClearScreen();
 	ShowTitleScreens();
 
@@ -871,24 +871,24 @@ int main(int argc, char** argv)
 					case 0:
 						continue;
 					case 1:
-						VideoWidth = 640;
-						VideoHeight = 480;
+						Video.Width = 640;
+						Video.Height = 480;
 						continue;
 					case 2:
-						VideoWidth = 800;
-						VideoHeight = 600;
+						Video.Width = 800;
+						Video.Height = 600;
 						continue;
 					case 3:
-						VideoWidth = 1024;
-						VideoHeight = 768;
+						Video.Width = 1024;
+						Video.Height = 768;
 						continue;
 					case 4:
-						VideoWidth = 1280;
-						VideoHeight = 960;
+						Video.Width = 1280;
+						Video.Height = 960;
 						continue;
 					case 5:
-						VideoWidth = 1600;
-						VideoHeight = 1200;
+						Video.Width = 1600;
+						Video.Height = 1200;
 						continue;
 					default:
 						Usage();
@@ -910,14 +910,14 @@ int main(int argc, char** argv)
 
 			case 'F':
 				VideoForceFullScreen = 1;
-				VideoFullScreen = 1;
+				Video.FullScreen = 1;
 				continue;
 			case 'W':
 				VideoForceFullScreen = 1;
-				VideoFullScreen = 0;
+				Video.FullScreen = 0;
 				continue;
 			case 'D':
-				VideoDepth = atoi(optarg);
+				Video.Depth = atoi(optarg);
 				continue;
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);

@@ -101,14 +101,14 @@ void InitUserInterface(const char* race_name)
 	for (i = 0; UI_Table[i]; ++i) {
 		if (!strcmp(race_name, UI_Table[i]->Name)) {
 			// perfect
-			if (VideoWidth == UI_Table[i]->Width &&
-					VideoHeight == UI_Table[i]->Height) {
+			if (Video.Width == UI_Table[i]->Width &&
+					Video.Height == UI_Table[i]->Height) {
 				best = i;
 				break;
 			}
 			// too big
-			if (VideoWidth < UI_Table[i]->Width ||
-					VideoHeight < UI_Table[i]->Height) {
+			if (Video.Width < UI_Table[i]->Width ||
+					Video.Height < UI_Table[i]->Height) {
 				continue;
 			}
 			// best smaller
@@ -128,8 +128,8 @@ void InitUserInterface(const char* race_name)
 
 	UI = *UI_Table[best];
 
-	UI.Offset640X = (VideoWidth - 640) / 2;
-	UI.Offset480Y = (VideoHeight - 480) / 2;
+	UI.Offset640X = (Video.Width - 640) / 2;
+	UI.Offset480Y = (Video.Height - 480) / 2;
 
 	//
 	// Calculations

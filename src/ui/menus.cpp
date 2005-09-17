@@ -1294,8 +1294,8 @@ static void NameLineDrawFunc(Menuitem* mi)
 		VideoDrawText(16, 16, LargeFont, "Sound disabled, please check!");
 	}
 
-	VideoDrawTextCentered(VideoWidth / 2, UI.Offset480Y + 440, GameFont, NameLine);
-	VideoDrawTextCentered(VideoWidth / 2, UI.Offset480Y + 456, GameFont,
+	VideoDrawTextCentered(Video.Width / 2, UI.Offset480Y + 440, GameFont, NameLine);
+	VideoDrawTextCentered(Video.Width / 2, UI.Offset480Y + 456, GameFont,
 		"Engine distributed under the terms of the GNU General Public License.");
 	SetDefaultTextColors(nc, rc);
 }
@@ -1774,19 +1774,19 @@ static void GlobalOptionsInit(Menu* menu)
 	menu->Items[6].D.Checkbox.Checked = 0;
 	menu->Items[7].D.Checkbox.Checked = 0;
 
-	if (VideoWidth == 640) {
+	if (Video.Width == 640) {
 		menu->Items[2].D.Checkbox.Checked = 1;
-	} else if (VideoWidth == 800) {
+	} else if (Video.Width == 800) {
 		menu->Items[3].D.Checkbox.Checked = 1;
-	} else if (VideoWidth == 1024) {
+	} else if (Video.Width == 1024) {
 		menu->Items[4].D.Checkbox.Checked = 1;
-	} else if (VideoWidth == 1280) {
+	} else if (Video.Width == 1280) {
 		menu->Items[5].D.Checkbox.Checked = 1;
-	} else if (VideoWidth == 1600) {
+	} else if (Video.Width == 1600) {
 		menu->Items[6].D.Checkbox.Checked = 1;
 	}
 
-	if (VideoFullScreen) {
+	if (Video.FullScreen) {
 		menu->Items[7].D.Checkbox.Checked = 1;
 	}
 }
@@ -1807,7 +1807,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 {
 	int res;
 
-	res = VideoWidth;
+	res = Video.Width;
 	switch (mi - mi->Menu->Items) {
 		case 2:
 			res = 640;
@@ -1826,17 +1826,17 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 			break;
 	}
 
-	if (VideoWidth != res) {
+	if (Video.Width != res) {
 		if (VideoValidResolution(res, res * 3 / 4)) {
 			Menu* menu;
 
-			VideoWidth = res;
-			VideoHeight = res * 3 / 4;
+			Video.Width = res;
+			Video.Height = res * 3 / 4;
 			SavePreferences();
 			ExitMenus();
 			InitVideo();
 			// Force Update Background Size
-			SetClipping(0, 0, VideoWidth - 1, VideoHeight - 1);
+			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 			CleanModules();
 #ifdef USE_OPENGL
 			ReloadGraphics();
@@ -1849,7 +1849,7 @@ static void GlobalOptionsResolutionCheckbox(Menuitem* mi)
 				menu->InitFunc(menu);
 			}
 			if (menu->BackgroundG) {
-				menu->BackgroundG->Resize(VideoWidth, VideoHeight);
+				menu->BackgroundG->Resize(Video.Width, Video.Height);
 			}
 			DrawMenu(menu);
 			CurrentMenu = FindMenu("menu-global-options");
@@ -5267,8 +5267,8 @@ void ErrorMenu(char *error)
 	menu = FindMenu("menu-net-error");
 	oldx = menu->X;
 	oldy = menu->Y;
-	menu->X = (VideoWidth - menu->Width) / 2;
-	menu->Y = (VideoHeight - menu->Height) / 2;
+	menu->X = (Video.Width - menu->Width) / 2;
+	menu->Y = (Video.Height - menu->Height) / 2;
 	menu->Items[1].D.Text.text = NewStringDesc(error);
 	ProcessMenu("menu-net-error", 1);
 	FreeStringDesc(menu->Items[1].D.Text.text);

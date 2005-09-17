@@ -155,9 +155,9 @@ static int CclSetVideoResolution(lua_State* l)
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!VideoWidth || !VideoHeight) {
-			VideoWidth = LuaToNumber(l, 1);
-			VideoHeight = LuaToNumber(l, 2);
+		if (!Video.Width || !Video.Height) {
+			Video.Width = LuaToNumber(l, 1);
+			Video.Height = LuaToNumber(l, 2);
 		}
 	}
 	return 0;
@@ -171,8 +171,8 @@ static int CclSetVideoResolution(lua_State* l)
 static int CclGetVideoResolution(lua_State* l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushnumber(l, VideoWidth);
-	lua_pushnumber(l, VideoHeight);
+	lua_pushnumber(l, Video.Width);
+	lua_pushnumber(l, Video.Height);
 	return 2;
 }
 
@@ -187,7 +187,7 @@ static int CclSetVideoFullScreen(lua_State* l)
 	if (CclInConfigFile) {
 		// May have been set from the command line
 		if (!VideoForceFullScreen) {
-			VideoFullScreen = LuaToBoolean(l, 1);
+			Video.FullScreen = LuaToBoolean(l, 1);
 		}
 	}
 	return 0;
@@ -201,7 +201,7 @@ static int CclSetVideoFullScreen(lua_State* l)
 static int CclGetVideoFullScreen(lua_State* l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, VideoFullScreen);
+	lua_pushboolean(l, Video.FullScreen);
 	return 1;
 }
 
@@ -2747,8 +2747,8 @@ static int CclDefineMenu(lua_State* l)
 	int j;
 
 	name = NULL;
-	UI.Offset640X = (VideoWidth - 640) / 2;
-	UI.Offset480Y = (VideoHeight - 480) / 2;
+	UI.Offset640X = (Video.Width - 640) / 2;
+	UI.Offset480Y = (Video.Height - 480) / 2;
 
 	//
 	// Parse the arguments, already the new tagged format.
@@ -2829,19 +2829,10 @@ static int CclDefineMenu(lua_State* l)
 		}
 		memcpy(menu, &item, sizeof(Menu));
 		//move the buttons for different resolutions..
-		if (VideoWidth != 640) {
-			if (VideoWidth == 0) {
-				if (DEFAULT_VIDEO_WIDTH != 640) {
-					menu->X += (DEFAULT_VIDEO_WIDTH - 640) / 2;
-				}
-				if (DEFAULT_VIDEO_HEIGHT != 480) {
-					menu->Y += (DEFAULT_VIDEO_HEIGHT - 480) / 2;
-				}
-			} else {
-				//printf("VideoWidth = %d\n", VideoWidth);
-				menu->X += UI.Offset640X;
-				menu->Y += UI.Offset480Y;
-			}
+		if (Video.Width != 640) {
+			//printf("Video.Width = %d\n", Video.Width);
+			menu->X += UI.Offset640X;
+			menu->Y += UI.Offset480Y;
 		}
 	} else {
 		fprintf(stderr, "Name of menu is missed, skip definition\n");

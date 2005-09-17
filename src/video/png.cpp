@@ -356,15 +356,15 @@ void SaveScreenshotPNG(const char* name)
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
 
-	png_set_IHDR(png_ptr, info_ptr, VideoWidth, VideoHeight, 8,
+	png_set_IHDR(png_ptr, info_ptr, Video.Width, Video.Height, 8,
 		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT);
 
 	png_set_bgr(png_ptr);
 
-	VideoLockScreen();
+	Video.LockScreen();
 
-	row = (unsigned char*)malloc(VideoWidth * 3);
+	row = (unsigned char*)malloc(Video.Width * 3);
 
 	png_write_info(png_ptr, info_ptr);
 
@@ -375,18 +375,18 @@ void SaveScreenshotPNG(const char* name)
 		exit(1);
 	}
 	glReadBuffer(GL_FRONT);
-	glReadPixels(0, 0, VideoWidth, VideoHeight, GL_RGB, GL_UNSIGNED_BYTE,
+	glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE,
 		pixels);
-	for (i = 0; i < VideoHeight; ++i) {
+	for (i = 0; i < Video.Height; ++i) {
 		int j;
 		unsigned char* src;
 		unsigned char* dst;
 
-		src = (unsigned char*)pixels + (VideoHeight - 1 - i) * VideoWidth * 3;
+		src = (unsigned char*)pixels + (Video.Height - 1 - i) * Video.Width * 3;
 		dst = row;
 
 		// Convert bgr to rgb
-		for (j = 0; j < VideoWidth; ++j) {
+		for (j = 0; j < Video.Width; ++j) {
 			dst[0] = src[2];
 			dst[1] = src[1];
 			dst[2] = src[0];
@@ -397,12 +397,12 @@ void SaveScreenshotPNG(const char* name)
 	}
 	free(pixels);
 #else
-	for (i = 0; i < VideoHeight; ++i) {
-		switch (VideoDepth) {
+	for (i = 0; i < Video.Height; ++i) {
+		switch (Video.Depth) {
 			case 15: {
 				Uint16 c;
-				for (j = 0; j < VideoWidth; ++j) {
-					c = ((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+				for (j = 0; j < Video.Width; ++j) {
+					c = ((Uint16*)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 1] = (((c >> 5) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 2] = (((c >> 10) & 0x1f) * 0xff) / 0x1f;
@@ -411,8 +411,8 @@ void SaveScreenshotPNG(const char* name)
 			}
 			case 16: {
 				Uint16 c;
-				for (j = 0; j < VideoWidth; ++j) {
-					c = ((Uint16*)TheScreen->pixels)[j + i * VideoWidth];
+				for (j = 0; j < Video.Width; ++j) {
+					c = ((Uint16*)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = (((c >> 0) & 0x1f) * 0xff) / 0x1f;
 					row[j * 3 + 1] = (((c >> 5) & 0x3f) * 0xff) / 0x3f;
 					row[j * 3 + 2] = (((c >> 11) & 0x1f) * 0xff) / 0x1f;
@@ -421,16 +421,16 @@ void SaveScreenshotPNG(const char* name)
 			}
 			case 24: {
 				Uint8 c;
-				for (j = 0; j < VideoWidth; ++j) {
-					c = ((Uint8*)TheScreen->pixels)[j * bpp + i * VideoWidth * 3];
-					memcpy(row, (char*)TheScreen->pixels + i * VideoWidth, VideoWidth * 3);
+				for (j = 0; j < Video.Width; ++j) {
+					c = ((Uint8*)TheScreen->pixels)[j * bpp + i * Video.Width * 3];
+					memcpy(row, (char*)TheScreen->pixels + i * Video.Width, Video.Width * 3);
 				}
 				break;
 			}
 			case 32: {
 				Uint32 c;
-				for (j = 0; j < VideoWidth; ++j) {
-					c = ((Uint32*)TheScreen->pixels)[j + i * VideoWidth];
+				for (j = 0; j < Video.Width; ++j) {
+					c = ((Uint32*)TheScreen->pixels)[j + i * Video.Width];
 					row[j * 3 + 0] = ((c >> 0) & 0xff);
 					row[j * 3 + 1] = ((c >> 8) & 0xff);
 					row[j * 3 + 2] = ((c >> 16) & 0xff);
@@ -444,7 +444,7 @@ void SaveScreenshotPNG(const char* name)
 
 	png_write_end(png_ptr, info_ptr);
 
-	VideoUnlockScreen();
+	Video.UnlockScreen();
 
 	/* clean up after the write, and free any memory allocated */
 	png_destroy_write_struct(&png_ptr, &info_ptr);
