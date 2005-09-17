@@ -64,27 +64,10 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  Performs remaping listed in the Remaps array. Maps also critter
-**  sounds to their correct values.
-*/
-static void RemapSounds(void)
-{
-	//
-	// Make some general sounds.
-	//
-	// FIXME: move to config CCL
-	MapSound("gold-mine-help", SoundIdForName("basic orc voices help 1"));
-
-}
-
-/**
 **  Load all sounds for units.
 */
 void LoadUnitSounds(void)
 {
-	if (SoundEnabled()) {
-		RemapSounds();
-	}
 }
 
 /**
