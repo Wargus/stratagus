@@ -83,7 +83,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-SDL_Surface* TheScreen; /// Internal screen
+SDL_Surface *TheScreen; /// Internal screen
 
 #ifndef USE_OPENGL
 static SDL_Rect Rects[100];
@@ -314,7 +314,7 @@ void Invalidate(void)
 **
 **  @return         ASCII code or internal keycode.
 */
-static int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
+static int Sdl2InternalKeycode(const SDL_keysym *code, int *keychar)
 {
 	int icode;
 
@@ -474,8 +474,8 @@ static int Sdl2InternalKeycode(const SDL_keysym* code, int* keychar)
 **  @param callbacks  Callback funktion for key down.
 **  @param code       SDL keysym structure pointer.
 */
-static void SdlHandleKeyPress(const EventCallback* callbacks,
-	const SDL_keysym* code)
+static void SdlHandleKeyPress(const EventCallback *callbacks,
+	const SDL_keysym *code)
 {
 	int icode;
 	int keychar;
@@ -490,8 +490,8 @@ static void SdlHandleKeyPress(const EventCallback* callbacks,
 **  @param callbacks  Callback funktion for key up.
 **  @param code       SDL keysym structure pointer.
 */
-static void SdlHandleKeyRelease(const EventCallback* callbacks,
-	const SDL_keysym* code)
+static void SdlHandleKeyRelease(const EventCallback *callbacks,
+	const SDL_keysym *code)
 {
 	int icode;
 	int keychar;
@@ -506,7 +506,7 @@ static void SdlHandleKeyRelease(const EventCallback* callbacks,
 **  @param callbacks  Callback structure for events.
 **  @param event      SDL event structure pointer.
 */
-static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
+static void SdlDoEvent(const EventCallback *callbacks, const SDL_Event *event)
 {
 	switch (event->type) {
 		case SDL_MOUSEBUTTONDOWN:
@@ -585,20 +585,20 @@ static void SdlDoEvent(const EventCallback* callbacks, const SDL_Event* event)
 }
 
 /**
-** Wait for interactive input event for one frame.
+**  Wait for interactive input event for one frame.
 **
-** Handles system events, joystick, keyboard, mouse.
-** Handles the network messages.
-** Handles the sound queue.
+**  Handles system events, joystick, keyboard, mouse.
+**  Handles the network messages.
+**  Handles the sound queue.
 **
-** All events available are fetched. Sound and network only if available.
-** Returns if the time for one frame is over.
+**  All events available are fetched. Sound and network only if available.
+**  Returns if the time for one frame is over.
 **
-** @param callbacks Call backs that handle the events.
+**  @param callbacks  Callbacks that handle the events.
 **
-** FIXME: the initialition could be moved out of the loop
+**  FIXME: the initialition could be moved out of the loop
 */
-void WaitEventsOneFrame(const EventCallback* callbacks)
+void WaitEventsOneFrame(const EventCallback *callbacks)
 {
 	struct timeval tv;
 	fd_set rfds;
@@ -789,8 +789,8 @@ void ToggleFullScreen(void)
 	int h;
 	int bpp;
 #ifndef USE_OPENGL
-	void* pixels;
-	SDL_Color* palette;
+	void *pixels;
+	SDL_Color *palette;
 	int ncolors;
 #endif
 
@@ -809,7 +809,7 @@ void ToggleFullScreen(void)
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
 #ifndef USE_OPENGL
-	if (!(pixels = malloc(framesize))) { // out of memory
+	if (!(pixels = new char[framesize])) { // out of memory
 		return;
 	}
 	SDL_LockSurface(TheScreen);
@@ -822,8 +822,8 @@ void ToggleFullScreen(void)
 #endif
 	if (TheScreen->format->palette) {
 		ncolors = TheScreen->format->palette->ncolors;
-		if (!(palette = (SDL_Color*)malloc(ncolors * sizeof(SDL_Color)))) {
-			free(pixels);
+		if (!(palette = new SDL_Color[ncolors])) {
+			delete[] pixels;
 			return;
 		}
 		memcpy(palette, TheScreen->format->palette->colors,
@@ -837,10 +837,8 @@ void ToggleFullScreen(void)
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
 #ifndef USE_OPENGL
-			free(pixels);
-			if (TheScreen->format->palette) {
-				free(palette);
-			}
+			delete[] pixels;
+			delete[] palette;
 #endif
 			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
 			Exit(-1);
@@ -860,12 +858,12 @@ void ToggleFullScreen(void)
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
-	free(pixels);
+	delete[] pixels;
 
 	if (TheScreen->format->palette) {
 		// !!! FIXME : No idea if that flags param is right.
 		SDL_SetPalette(TheScreen, SDL_LOGPAL, palette, 0, ncolors);
-		free(palette);
+		delete[] palette;
 	}
 	SDL_UnlockSurface(TheScreen);
 #endif
