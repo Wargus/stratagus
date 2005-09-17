@@ -37,8 +37,9 @@ CROSSDIR = /usr/local/cross
 
 INCLUDE_DIRS = src/include
 
-MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/map \
-          src/network src/pathfinder src/sound src/ui src/unit src/video
+MODULES = src/action src/ai src/beos src/editor src/game src/map src/network \
+          src/pathfinder src/sound src/stratagus src/tolua src/ui src/unit \
+          src/video
 
 MODULES_METASERVER = src/metaserver
 
@@ -214,7 +215,7 @@ CONTRIB	= contrib/macosx.tgz
 MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure config.h.in Makefile \
 	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
-	  autogen.sh SConstruct \
+	  autogen.sh SConstruct src/tolua/*.pkg \
 	  $(patsubst %, %/Module.make, $(MODULES_ALL)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
