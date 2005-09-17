@@ -120,10 +120,10 @@ static int CclStratagusMap(lua_State* l)
 					InitUnitCache();
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
-					TheMap.NoFogOfWar = 0;
+					TheMap.NoFogOfWar = false;
 					--k;
 				} else if (!strcmp(value, "no-fog-of-war")) {
-					TheMap.NoFogOfWar = 1;
+					TheMap.NoFogOfWar = true;
 					--k;
 				} else if (!strcmp(value, "filename")) {
 					 lua_rawgeti(l, j + 1, k + 1);

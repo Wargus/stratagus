@@ -667,11 +667,11 @@ typedef struct _decovartype_ {
 	char ShowWhenNull;          /// if false, don't show if var is null (F.E poison)
 	char HideHalf;              /// if true, don't show when 0 < var < max.
 	char ShowWhenMax;           /// if false, don't show if var is to max. (Like mana)
-	char ShowOnlySelected;      /// if true, show only for selected units.
+	bool ShowOnlySelected;      /// if true, show only for selected units.
 
-	char HideNeutral;           /// if true, don't show for neutral unit.
-	char HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	char ShowOpponent;          /// if true, show for opponent unit.
+	bool HideNeutral;           /// if true, don't show for neutral unit.
+	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent;          /// if true, show for opponent unit.
 
 	DrawDecoFunc* f;            /// function to draw the decorations.
 	union {

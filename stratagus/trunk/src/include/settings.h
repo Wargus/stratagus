@@ -71,7 +71,7 @@ typedef struct _settings_ {
 	int Opponents;   /// Preset # of ai-opponents
 	int Terrain;     /// Terrain type (summer,winter,...)
 	int GameType;    /// Game type (melee, free for all,...)
-	int NoFogOfWar;  /// No fog of war
+	bool NoFogOfWar; /// No fog of war
 	int RevealMap;   /// Reveal map
 } Settings;
 
@@ -148,7 +148,7 @@ typedef struct _credits_ {
 #define MAX_TIPS 50    /// How many tips supported
 
 extern char* Tips[MAX_TIPS + 1];  /// Array of tips
-extern int   ShowTips;            /// Show tips at start of level
+extern bool  ShowTips;            /// Show tips at start of level
 extern int   CurrentTip;          /// Current tip to display
 
 /*----------------------------------------------------------------------------

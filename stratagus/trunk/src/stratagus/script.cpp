@@ -88,11 +88,11 @@ int SaveGameLoading;                  /// If a Saved Game is Loading
 const char* CurrentLuaFile;                 /// Lua file currently being interpreted
 
 char* Tips[MAX_TIPS + 1];             /// Array of tips
-int ShowTips;                         /// Show tips at start of level
+bool ShowTips;                        /// Show tips at start of level
 int CurrentTip;                       /// Current tip to display
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
-char UseHPForXp = 0;                  /// true if gain XP by dealing damage, false if by killing.
+bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 NumberDesc* Damage;                   /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
@@ -1951,16 +1951,12 @@ static int CclSetLocalPlayerName(lua_State* l)
 **
 **  @param l  Lua state.
 **
-** @return 0.
+**  @return 0.
 */
 static int ScriptSetUseHPForXp(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	if (!lua_isboolean(l, 1)) {
-		LuaError(l, "incorrect argument");
-	}
-	UseHPForXp = lua_toboolean(l, 1);
-	lua_pop(l, 1);
+	UseHPForXp = LuaToBoolean(l, 1);
 	return 0;
 }
 
@@ -1973,7 +1969,6 @@ static int CclNoRandomPlacementMultiplayer(lua_State* l)
 {
 	LuaCheckArgs(l, 0);
 	NoRandomPlacementMultiplayer = 1;
-
 	return 0;
 }
 
@@ -2003,7 +1998,6 @@ static int CclSetDamageFormula(lua_State* l)
 static int CclSetGodMode(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	lua_pushboolean(l, GodMode);
 	GodMode = LuaToBoolean(l, 1);
 	return 0;
 }
@@ -2017,14 +2011,9 @@ static int CclSetGodMode(lua_State* l)
 */
 static int CclSetShowTips(lua_State* l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = ShowTips;
 	ShowTips = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -2642,7 +2631,7 @@ void SavePreferences(void)
 	fprintf(fd, "SetCurrentTip(%d)\n", CurrentTip);
 
 	fprintf(fd, "SetFogOfWar(%s)\n", !TheMap.NoFogOfWar ? "true" : "false");
-	fprintf(fd, "SetShowCommandKey(%s)\n", ShowCommandKey ? "true" : "false");
+	fprintf(fd, "SetShowCommandKey(%s)\n", UI.ButtonPanel.ShowCommandKey ? "true" : "false");
 
 	fprintf(fd, "SetGroupKeys(\"");
 	for (i = 0; UiGroupKeys[i]; ++i) {

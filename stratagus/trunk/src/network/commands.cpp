@@ -116,7 +116,7 @@ typedef struct _full_replay_ {
 	int  Resource;
 	int NumUnits;
 	int TileSet;
-	int NoFow;
+	bool NoFow;
 	int RevealMap;
 	int GameType;
 	int Opponents;
@@ -357,7 +357,7 @@ static void SaveFullLog(CLFile* dest)
 	dest->printf("  Resource = %d,\n", CurrentReplay->Resource);
 	dest->printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
 	dest->printf("  TileSet = %d,\n", CurrentReplay->TileSet);
-	dest->printf("  NoFow = %d,\n", CurrentReplay->NoFow);
+	dest->printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
 	dest->printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
 	dest->printf("  GameType = %d,\n", CurrentReplay->GameType);
 	dest->printf("  Opponents = %d,\n", CurrentReplay->Opponents);
@@ -654,7 +654,7 @@ static int CclReplayLog(lua_State* l)
 		} else if (!strcmp(value, "TileSet")) {
 			replay->TileSet = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
-			replay->NoFow = LuaToNumber(l, -1);
+			replay->NoFow = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {
 			replay->RevealMap = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "GameType")) {
@@ -733,7 +733,7 @@ int LoadReplay(char* name)
 		DisabledLog = 1;
 	}
 	if (ShowTips) {
-		ShowTips = 0;
+		ShowTips = false;
 		DisabledShowTips = 1;
 	} else {
 		DisabledShowTips = 0;
@@ -777,7 +777,7 @@ void CleanReplayLog(void)
 		DisabledLog = 0;
 // }
 	if (DisabledShowTips) {
-		ShowTips = 1;
+		ShowTips = true;
 		DisabledShowTips = 0;
 	}
 	GameObserve = 0;
@@ -903,12 +903,8 @@ static void DoNextReplay(void)
 		}
 		SendCommandDiplomacy(posx, state, posy);
 	} else if (!strcmp(action, "shared-vision")) {
-		int state;
-		state = atoi(val);
-		if (state != 0 && state != 1) {
-			DebugPrint("Invalid shared vision command: %s" _C_ val);
-			state = 0;
-		}
+		bool state;
+		state = atoi(val) ? true : false;
 		SendCommandSharedVision(posx, state, posy);
 	} else if (!strcmp(action, "input")) {
 		if (val[0] == '-') {
@@ -1467,10 +1463,10 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 ** @param state      New shared vision state.
 ** @param opponent   Opponent.
 */
-void SendCommandSharedVision(int player, int state, int opponent)
+void SendCommandSharedVision(int player, bool state, int opponent)
 {
 	if (!IsNetworkGame()) {
-		if (state == 0) {
+		if (state == false) {
 			CommandLog("shared-vision", NoUnitP, 0, player, opponent,
 				NoUnitP, "0", -1);
 		} else {
@@ -1744,7 +1740,7 @@ void ParseExtendedCommand(unsigned char type, int status,
 				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4,
 					NoUnitP, "1", -1);
 			}
-			CommandSharedVision(arg2, arg3, arg4);
+			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_

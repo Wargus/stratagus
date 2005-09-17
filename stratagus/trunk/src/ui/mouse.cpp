@@ -75,7 +75,7 @@ int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 char GameMenuButtonClicked;                  /// Menu button was clicked
 char GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
-char LeaveStops;                             /// Mouse leaves windows stops scroll
+bool LeaveStops;                             /// Mouse leaves windows stops scroll
 
 enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
 
@@ -1419,10 +1419,10 @@ static void UISelectStateButtonDown(unsigned button)
 */
 void UIHandleButtonDown(unsigned button)
 {
-	static int OldShowOrders;
 	static int OldShowSightRange;
-	static int OldShowAttackRange;
 	static int OldShowReactionRange;
+	static int OldShowAttackRange;
+	static int OldShowOrders;
 	static int OldValid;
 	Unit* uins;
 	int i;
@@ -2009,8 +2009,8 @@ void DrawPieMenu(void)
 			DrawIcon(player, buttons[i].Icon.Icon, x, y);
 
 			// Tutorial show command key in icons
-			if (ShowCommandKey) {
-				char* text;
+			if (UI.ButtonPanel.ShowCommandKey) {
+				char *text;
 
 				if (CurrentButtons[i].Key == 27) {
 					text = "ESC";

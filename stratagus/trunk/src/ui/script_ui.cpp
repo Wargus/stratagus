@@ -2204,7 +2204,7 @@ static int CclSetKeyScrollSpeed(lua_State* l)
 static int CclSetShowCommandKey(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	ShowCommandKey = LuaToBoolean(l, 1);
+	UI.ButtonPanel.ShowCommandKey = LuaToBoolean(l, 1);
 	UI.ButtonPanel.Update();
 	return 0;
 }

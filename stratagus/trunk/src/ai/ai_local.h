@@ -183,7 +183,7 @@ typedef struct _player_ai_ {
 	struct _ai_type_* AiType;/// AI type of this player AI
 	// controller
 	char*               Script;          /// Script executed
-	int                 ScriptDebug;     /// Flag script debuging on/off
+	bool                ScriptDebug;     /// Flag script debuging on/off
 	unsigned long       SleepCycles;     /// Cycles to sleep
 
 	// forces

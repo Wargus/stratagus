@@ -552,7 +552,7 @@ static int CclSetSharedVision(lua_State* l)
 {
 	int plynr;
 	int base;
-	int shared;
+	bool shared;
 
 	LuaCheckArgs(l, 3);
 

@@ -144,7 +144,7 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 	}
 	if (!player->SharedVision) {
 		if (visiontype) {
-			return visiontype + TheMap.NoFogOfWar;
+			return visiontype + (TheMap.NoFogOfWar ? 1 : 0);
 		}
 		return 0;
 	}
@@ -159,7 +159,7 @@ unsigned char IsTileVisible(const Player* player, int x, int y)
 		}
 	}
 	if (visiontype) {
-		return visiontype + TheMap.NoFogOfWar;
+		return visiontype + (TheMap.NoFogOfWar ? 1 : 0);
 	}
 	return 0;
 }

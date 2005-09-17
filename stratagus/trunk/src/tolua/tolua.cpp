@@ -1,6 +1,6 @@
 /*
 ** Lua binding: stratagus
-** Generated automatically by tolua++-1.0.6 on 09/17/05 11:39:48.
+** Generated automatically by tolua++-1.0.6 on 09/17/05 15:35:37.
 */
 
 #ifndef __cplusplus
@@ -259,6 +259,32 @@ static int tolua_set_CButtonPanel_Y(lua_State* tolua_S)
  tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->Y = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+
+/* get function: ShowCommandKey of class  CButtonPanel */
+static int tolua_get_CButtonPanel_ShowCommandKey(lua_State* tolua_S)
+{
+  CButtonPanel* self = (CButtonPanel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowCommandKey'",NULL);
+#endif
+ tolua_pushboolean(tolua_S,(bool)self->ShowCommandKey);
+ return 1;
+}
+
+/* set function: ShowCommandKey of class  CButtonPanel */
+static int tolua_set_CButtonPanel_ShowCommandKey(lua_State* tolua_S)
+{
+  CButtonPanel* self = (CButtonPanel*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'ShowCommandKey'",NULL);
+ if (!tolua_isboolean(tolua_S,2,0,&tolua_err))
+ tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->ShowCommandKey = ((bool)  tolua_toboolean(tolua_S,2,0))
 ;
  return 0;
 }
@@ -538,6 +564,7 @@ TOLUA_API int tolua_stratagus_open (lua_State* tolua_S)
  tolua_beginmodule(tolua_S,"CButtonPanel");
  tolua_variable(tolua_S,"X",tolua_get_CButtonPanel_X,tolua_set_CButtonPanel_X);
  tolua_variable(tolua_S,"Y",tolua_get_CButtonPanel_Y,tolua_set_CButtonPanel_Y);
+ tolua_variable(tolua_S,"ShowCommandKey",tolua_get_CButtonPanel_ShowCommandKey,tolua_set_CButtonPanel_ShowCommandKey);
  tolua_endmodule(tolua_S);
  tolua_cclass(tolua_S,"CInfoPanel","CInfoPanel","",NULL);
  tolua_beginmodule(tolua_S,"CInfoPanel");

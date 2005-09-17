@@ -708,9 +708,9 @@ extern int ShowAttackRange;             /// Flag: show attack range
 extern int ShowOrders;                  /// Flag: show orders of unit on map
 extern unsigned long ShowOrdersCount;   /// Show orders for some time
 extern int XpDamage;                    /// unit XP adds more damage to attacks
-extern char EnableTrainingQueue;        /// Config: training queues enabled
-extern char EnableBuildingCapture;      /// Config: building capture enabled
-extern char RevealAttacker;             /// Config: reveal attacker enabled
+extern bool EnableTrainingQueue;        /// Config: training queues enabled
+extern bool EnableBuildingCapture;      /// Config: building capture enabled
+extern bool RevealAttacker;             /// Config: reveal attacker enabled
 extern const Viewport* CurrentViewport; /// CurrentViewport
 extern void DrawUnitSelection(const Unit*);
 extern void (*DrawSelection)(Uint32, int, int, int, int);

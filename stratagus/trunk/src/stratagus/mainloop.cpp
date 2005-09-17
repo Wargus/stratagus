@@ -340,7 +340,7 @@ void UpdateDisplay(void)
 void GameMainLoop(void)
 {
 #ifdef DEBUG  // removes the setjmp warnings
-	static int showtip;
+	static bool showtip;
 #else
 	int showtip;
 #endif
@@ -535,7 +535,7 @@ void GameMainLoop(void)
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
 	GamePaused = 0;
-	GodMode = 0;
+	GodMode = false;
 }
 
 //@}
