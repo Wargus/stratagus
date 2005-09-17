@@ -234,8 +234,8 @@ Sample* LoadMikMod(const char* name, int flags)
 	data->MikModFile = new CLFile;
 	if (data->MikModFile->open(name, CL_OPEN_READ) == -1) {
 		MikMod_Exit();
-		free(data);
 		delete data->MikModFile;
+		free(data);
 		return NULL;
 	}
 	CurrentFile = data->MikModFile;
@@ -243,9 +243,9 @@ Sample* LoadMikMod(const char* name, int flags)
 	data->MikModModule = Player_LoadGeneric(&MReader, 64, 0);
 	if (!data->MikModModule) {
 		MikMod_Exit();
-		free(data);
 		data->MikModFile->close();
 		delete data->MikModFile;
+		free(data);
 		return NULL;
 	}
 
