@@ -1122,7 +1122,7 @@ void Graphic::MakeShadow()
 #ifdef USE_OPENGL
 	if (Textures) {
 		glDeleteTextures(NumTextures, Textures);
-		free(g->Textures);
+		free(Textures);
 		Textures = NULL;
 	}
 	MakeTexture(this);
