@@ -470,7 +470,7 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 			h *= i;
 			while (i--) {
 				PushClipping();
-				SetClipping(0, 0, x + w, VideoHeight - 1);
+				SetClipping(0, 0, x + w, Video.Height - 1);
 //				if (mi->transparent) {
 //					VideoDrawClipTrans50(MenuButtonG, rb, x - 1, y - 1 + oh * i);
 //				} else {
@@ -503,9 +503,9 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 
 			PushClipping();
 			if (!(mi->Flags & MI_FLAGS_DISABLED)) {
-				SetClipping(0, 0, x + w - 20, VideoHeight - 1);
+				SetClipping(0, 0, x + w - 20, Video.Height - 1);
 			} else {
-				SetClipping(0, 0, x + w - 1, VideoHeight - 1);
+				SetClipping(0, 0, x + w - 1, Video.Height - 1);
 			}
 //			if (mi->transparent) {
 //				VideoDrawClipTrans50(MenuButtonG, rb, x - 1, y - 1);
@@ -574,7 +574,7 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 	s = mi->D.Listbox.startline;
 	while (i--) {
 		PushClipping();
-		SetClipping(0, 0, x + w, VideoHeight - 1);
+		SetClipping(0, 0, x + w, Video.Height - 1);
 //		if (mi->transparent) {
 //			VideoDrawClipTrans50(MenuButtonG, rb, x - 1, y - 1 + 18 * i);
 //		} else {
@@ -669,7 +669,7 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 	} else {
 		if (flags & MI_FLAGS_DISABLED) {
 			PushClipping();
-			SetClipping(0, 0, VideoWidth - 1, y + h - 20);
+			SetClipping(0, 0, Video.Width - 1, y + h - 20);
 //			if (mi->transparent) {
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y - 2);
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT - 1, x, y + h / 2);
@@ -682,7 +682,7 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 			MenuButtonG->DrawFrame(MBUTTON_DOWN_ARROW - 1, x, y + h - 20);
 		} else {
 			PushClipping();
-			SetClipping(0, 0, VideoWidth - 1, y + h - 20);
+			SetClipping(0, 0, Video.Width - 1, y + h - 20);
 //			if (mi->transparent) {
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y - 2);
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_VCONT, x, y + h / 2);
@@ -772,7 +772,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 	} else {
 		if (flags & MI_FLAGS_DISABLED) {
 			PushClipping();
-			SetClipping(0, 0, x + w - 20, VideoHeight - 1);
+			SetClipping(0, 0, x + w - 20, Video.Height - 1);
 //			if (mi->transparent) {
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x - 2, y);
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT - 1, x + w / 2, y);
@@ -785,7 +785,7 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 			MenuButtonG->DrawFrame(MBUTTON_RIGHT_ARROW - 1, x + w - 20, y);
 		} else {
 			PushClipping();
-			SetClipping(0, 0, x + w - 20, VideoHeight - 1);
+			SetClipping(0, 0, x + w - 20, Video.Height - 1);
 //			if (mi->transparent) {
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x - 2, y);
 //				VideoDrawClipTrans50(MenuButtonG, MBUTTON_S_HCONT, x + w / 2, y);
@@ -1000,7 +1000,7 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 		}
 
 		PushClipping();
-		SetClipping(0, 0, x + w, VideoHeight - 1);
+		SetClipping(0, 0, x + w, Video.Height - 1);
 //		if (mi->transparent) {
 //			VideoDrawClipTrans50(MenuButtonG, rb, x - 1, y - 1);
 //		} else {
@@ -1052,7 +1052,7 @@ void DrawMenu(Menu* menu)
 	if (menu->BackgroundG) {
 		if (!menu->BackgroundG->Loaded()) {
 			menu->BackgroundG->Load();
-			menu->BackgroundG->Resize(VideoWidth, VideoHeight);
+			menu->BackgroundG->Resize(Video.Width, Video.Height);
 		}
 		menu->BackgroundG->DrawFrame(0, 0, 0);
 	}

@@ -161,6 +161,22 @@ typedef struct _event_callback_ {
 
 } EventCallback;
 
+class CVideo
+{
+public:
+	CVideo() : Width(640), Height(480), Depth(0), FullScreen(false) {}
+
+	void LockScreen();
+	void UnlockScreen();
+
+	int Width;
+	int Height;
+	int Depth;
+	bool FullScreen;
+};
+
+extern CVideo Video;
+
 	/**
 	**  Video synchronization speed. Synchronization time in percent.
 	**  If =0, video framerate is not synchronized. 100 is exact
@@ -171,15 +187,6 @@ typedef struct _event_callback_ {
 extern int VideoSyncSpeed;
 
 extern int SkipFrames;
-
-	/// Mainscreen width (default 640)
-extern int VideoWidth;
-
-	/// Mainscreen height (default 480)
-extern int VideoHeight;
-
-	/// Wanted videomode, fullscreen or windowed.
-extern char VideoFullScreen;
 
 	/// Fullscreen or windowed set from commandline.
 extern char VideoForceFullScreen;
@@ -196,23 +203,6 @@ extern int SlowFrameCounter;
 	/// Initialize Pixels[] for all players.
 	/// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
-
-	/// Lock the screen for display
-extern void VideoLockScreen(void);
-
-	/// Unlock the screen for display
-extern void VideoUnlockScreen(void);
-
-	/// Wanted videomode, fullscreen or windowed.
-extern char VideoFullScreen;
-
-	/**
-	**  Architecture-dependent video depth. Set by InitVideoXXX, if 0.
-	**  (8,15,16,24,32)
-	**  @see InitVideo @see InitVideoSdl
-	**  @see main
-	*/
-extern int VideoDepth;
 
 	/**
 	**  Architecture-dependant videomemory. Set by InitVideoXXX.

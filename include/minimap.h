@@ -62,9 +62,9 @@ public:
 	int H;
 	int XOffset;
 	int YOffset;
-	int WithTerrain;
-	int ShowSelected;
-	int Transparent;
+	bool WithTerrain;
+	bool ShowSelected;
+	bool Transparent;
 };
 
 //@}
