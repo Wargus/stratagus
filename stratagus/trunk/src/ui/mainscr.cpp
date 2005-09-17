@@ -946,8 +946,8 @@ void DrawMessages(void)
 	for (z = 0; z < MessagesCount; ++z) {
 		if (z == 0) {
 			PushClipping();
-			SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, VideoWidth - 1,
-				VideoHeight - 1);
+			SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+				Video.Height - 1);
 		}
 		VideoDrawTextClip(UI.MapArea.X + 8,
 			UI.MapArea.Y + 8 + z * (VideoTextHeight(GameFont) + 1) - MessagesScrollY,
@@ -1161,7 +1161,7 @@ void CStatusLine::Draw(void)
 {
 	if (StatusLine[0]) {
 		PushClipping();
-		SetClipping(TextX, TextY, TextX + W - 1, VideoHeight - 1);
+		SetClipping(TextX, TextY, TextX + W - 1, Video.Height - 1);
 		VideoDrawTextClip(TextX, TextY, Font, StatusLine);
 		PopClipping();
 	}
@@ -1228,7 +1228,7 @@ void DrawCosts(void)
 			}
 			VideoDrawNumber(x + 15, UI.StatusLine.TextY, GameFont,Costs[i]);
 			x += 45;
-			if (x > VideoWidth - 45) {
+			if (x > Video.Width - 45) {
 				break;
 			}
 		}

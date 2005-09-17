@@ -207,35 +207,30 @@ void InitVideoSdl(void)
 
 	// Initialize the display
 
-	if (!VideoWidth) {
-		VideoWidth = DEFAULT_VIDEO_WIDTH;
-		VideoHeight = DEFAULT_VIDEO_HEIGHT;
-	}
-
 	flags = 0;
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
-	if (VideoFullScreen) {
+	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
 	}
 #ifdef USE_OPENGL
 	flags |= SDL_OPENGL;
 #endif
 
-	TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, VideoDepth, flags);
+	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);
 	if (TheScreen && (TheScreen->format->BitsPerPixel != 16 &&
 			TheScreen->format->BitsPerPixel != 32)) {
 		// Only support 16 and 32 bpp, default to 16
-		TheScreen = SDL_SetVideoMode(VideoWidth, VideoHeight, 16, flags);
+		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
 	}
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
-			VideoWidth, VideoHeight, VideoDepth, SDL_GetError());
+			Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
 	}
 
-	VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
-	VideoDepth = TheScreen->format->BitsPerPixel;
+	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	Video.Depth = TheScreen->format->BitsPerPixel;
 
 	// Turn cursor off, we use our own.
 	SDL_ShowCursor(0);
@@ -283,7 +278,7 @@ void InvalidateArea(int x, int y, int w, int h)
 {
 #ifndef USE_OPENGL
 	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
-	Assert(x >= 0 && y >= 0 && x + w <= VideoWidth && y + h <= VideoHeight);
+	Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
 	Rects[NumRects].x = x;
 	Rects[NumRects].y = y;
 	Rects[NumRects].w = w;
@@ -300,8 +295,8 @@ void Invalidate(void)
 #ifndef USE_OPENGL
 	Rects[0].x = 0;
 	Rects[0].y = 0;
-	Rects[0].w = VideoWidth;
-	Rects[0].h = VideoHeight;
+	Rects[0].w = Video.Width;
+	Rects[0].h = Video.Height;
 	NumRects = 1;
 #endif
 }
@@ -789,7 +784,7 @@ void ToggleFullScreen(void)
 	int h;
 	int bpp;
 #ifndef USE_OPENGL
-	void *pixels;
+	unsigned char *pixels;
 	SDL_Color *palette;
 	int ncolors;
 #endif
@@ -809,7 +804,7 @@ void ToggleFullScreen(void)
 	framesize = w * h * TheScreen->format->BytesPerPixel;
 
 #ifndef USE_OPENGL
-	if (!(pixels = new char[framesize])) { // out of memory
+	if (!(pixels = new unsigned char[framesize])) { // out of memory
 		return;
 	}
 	SDL_LockSurface(TheScreen);
@@ -875,7 +870,7 @@ void ToggleFullScreen(void)
 	SDL_WM_ToggleFullScreen(TheScreen);
 #endif
 
-	VideoFullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 }
 
 //@}

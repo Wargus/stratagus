@@ -126,10 +126,8 @@ extern void SdlUnlockScreen(void);      /// Do SDL hardware unlock
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int VideoWidth;                      /// Window width in pixels
-int VideoHeight;                     /// Window height in pixels
+CVideo Video;
 
-char VideoFullScreen;                /// true fullscreen wanted
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
 unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
@@ -142,14 +140,6 @@ int ClipX2;                      /// current clipping bottom right
 int ClipY2;                      /// current clipping bottom right
 
 static std::vector<Clip> Clips;
-
-	/**
-	**  Architecture-dependant video depth. Set by InitVideoXXX, if 0.
-	**  (8,15,16,24,32)
-	**  @see InitVideo @see InitVideoSdl
-	**  @see main
-	*/
-int VideoDepth;
 
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
 int SkipFrames; /// Skip this frames
@@ -179,9 +169,9 @@ Uint32 ColorYellow;
 */
 void SetClipping(int left, int top, int right, int bottom)
 {
-	Assert(left <= right && top <= bottom && left >= 0 && left < VideoWidth &&
-		top >= 0 && top < VideoHeight && right >= 0 &&
-		right < VideoWidth && bottom >= 0 && bottom < VideoHeight);
+	Assert(left <= right && top <= bottom && left >= 0 && left < Video.Width &&
+		top >= 0 && top < Video.Height && right >= 0 &&
+		right < Video.Width && bottom >= 0 && bottom < Video.Height);
 
 	ClipX1 = left;
 	ClipY1 = top;
@@ -218,7 +208,7 @@ void PopClipping(void)
 /**
 **  Lock the screen for write access.
 */
-void VideoLockScreen(void)
+void CVideo::LockScreen(void)
 {
 	SdlLockScreen();
 }
@@ -226,7 +216,7 @@ void VideoLockScreen(void)
 /**
 **  Unlock the screen for write access.
 */
-void VideoUnlockScreen(void)
+void CVideo::UnlockScreen(void)
 {
 	SdlUnlockScreen();
 }
@@ -236,7 +226,7 @@ void VideoUnlockScreen(void)
 */
 void VideoClearScreen(void)
 {
-	VideoFillRectangle(ColorBlack, 0, 0, VideoWidth, VideoHeight);
+	VideoFillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
 }
 
 /**
