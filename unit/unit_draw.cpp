@@ -107,11 +107,11 @@ typedef struct {
 
 static DecoSpriteType DecoSprite; /// All sprite's infos.
 
-int ShowSightRange;              /// Flag: show right range
-int ShowReactionRange;           /// Flag: show reaction range
-int ShowAttackRange;             /// Flag: show attack range
-int ShowOrders;                  /// Flag: show orders of unit on map
-unsigned long ShowOrdersCount;   /// Show orders for some time
+int ShowSightRange;               /// Flag: show right range
+int ShowReactionRange;            /// Flag: show reaction range
+int ShowAttackRange;              /// Flag: show attack range
+int ShowOrders;                   /// Flag: show orders of unit on map
+unsigned long ShowOrdersCount;    /// Show orders for some time
 
 
 
@@ -658,8 +658,8 @@ static int CclShowEnergySelected(lua_State* l)
 	int i;
 
 	LuaCheckArgs(l, 0);
-	for (i = 0; i < UnitTypeVar.NumberDeco; i++) {
-		UnitTypeVar.DecoVar[i].ShowOnlySelected = 1;
+	for (i = 0; i < UnitTypeVar.NumberDeco; ++i) {
+		UnitTypeVar.DecoVar[i].ShowOnlySelected = true;
 	}
 	return 0;
 }

@@ -203,11 +203,11 @@ typedef struct _menu_panel_ {
 **  Condition to show panel content.
 */
 typedef struct {
-	char ShowOnlySelected;      /// if true, show only for selected unit.
+	bool ShowOnlySelected;      /// if true, show only for selected unit.
 
-	char HideNeutral;           /// if true, don't show for neutral unit.
-	char HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	char ShowOpponent;          /// if true, show for opponent unit.
+	bool HideNeutral;           /// if true, don't show for neutral unit.
+	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent;          /// if true, show for opponent unit.
 
 	char* BoolFlags;            /// array of condition about user flags.
 	char* Variables;            /// array of variable to verify (enable and max > 0)
@@ -316,6 +316,7 @@ public:
 	Button *Buttons;
 	int NumButtons;
 	SDL_Color AutoCastBorderColorRGB;
+	bool ShowCommandKey;
 };
 
 class CInfoPanel
@@ -349,12 +350,12 @@ private:
 */
 class CUserInterface {
 public:
-	char* Name;                         /// interface name to select
+	char *Name;                         /// interface name to select
 	int Width;                          /// useable for this width
 	int Height;                         /// useable for this height
 
-	int MouseScroll;                    /// Enable mouse scrolling
-	int KeyScroll;                      /// Enable keyboard scrolling
+	bool MouseScroll;                   /// Enable mouse scrolling
+	bool KeyScroll;                     /// Enable keyboard scrolling
 		/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeedDefault;
 		/// Middle-Mouse Scroll Speed with Control pressed
@@ -363,17 +364,17 @@ public:
 	int MouseWarpX;                     /// Cursor warp X position
 	int MouseWarpY;                     /// Cursor warp Y position
 
-	char* NormalFontColor;              /// Color for normal text displayed
-	char* ReverseFontColor;             /// Color for reverse text displayed
+	char *NormalFontColor;              /// Color for normal text displayed
+	char *ReverseFontColor;             /// Color for reverse text displayed
 
 	// Fillers
-	Graphic** Filler;                   /// Filler graphics
-	int* FillerX;                       /// Filler X positions
-	int* FillerY;                       /// Filler Y positions
+	Graphic **Filler;                   /// Filler graphics
+	int *FillerX;                       /// Filler X positions
+	int *FillerY;                       /// Filler Y positions
 	int  NumFillers;                    /// Number of fillers
 
 	struct {
-		Graphic* G;                     /// icon graphic
+		Graphic *G;                     /// icon graphic
 		int IconFrame;                  /// icon frame
 		int IconX;                      /// icon X position
 		int IconY;                      /// icon Y position
@@ -424,7 +425,7 @@ public:
 	CButtonPanel  ButtonPanel;
 
 	// Pie Menu
-	Graphic* PieMenuBackgroundG;        /// Optional background image for the piemenu
+	Graphic *PieMenuBackgroundG;        /// Optional background image for the piemenu
 	int PieMouseButton;/// Which mouse button pops up the piemenu. Deactivate with the NoButton value.
 	int PieX[8];                        /// X position of the pies
 	int PieY[8];                        /// Y position of the pies
@@ -480,10 +481,10 @@ public:
 /// SoundConfig PlacementSuccess;       /// played on placements success
 /// SoundConfig Click;                  /// click noice used often
 
-	MenuPanel* MenuPanels;              /// Menu panels
+	MenuPanel *MenuPanels;              /// Menu panels
 
-	Graphic* VictoryBackgroundG;        /// Victory background graphic
-	Graphic* DefeatBackgroundG;         /// Defeat background graphic
+	Graphic *VictoryBackgroundG;        /// Victory background graphic
+	Graphic *DefeatBackgroundG;         /// Defeat background graphic
 };
 
 /*----------------------------------------------------------------------------
@@ -503,7 +504,7 @@ extern _CheckboxStyleHash CheckboxStyleHash;
 
 extern char RightButtonAttacks;         /// right button 0 move, 1 attack.
 extern struct _button_action_* CurrentButtons;    /// Current Selected Buttons
-extern char FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
+extern bool FancyBuildings;             /// Mirror buildings 1 yes, 0 now.
 
 extern int SpeedKeyScroll;              /// Keyboard Scrolling Speed, in Frames
 extern int SpeedMouseScroll;            /// Mouse Scrolling Speed, in Frames

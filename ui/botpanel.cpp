@@ -66,9 +66,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-	/// Display the command key in the buttons.
-char ShowCommandKey;
-
 	/// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 	/// All buttons for units

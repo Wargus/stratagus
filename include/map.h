@@ -256,7 +256,7 @@ typedef struct _world_map_ {
 	MapField* Fields;              /// fields on map
 	unsigned* Visible[PlayerMax];  /// visible bit-field
 
-	unsigned char NoFogOfWar;  /// fog of war disabled
+	bool NoFogOfWar;          /// fog of war disabled
 
 	struct _tileset_ Tileset; /// tileset data
 	char TileModelsFileName[PATH_MAX]; /// lua filename that loads all tilemodels

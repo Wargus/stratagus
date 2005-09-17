@@ -57,7 +57,7 @@ Timer GameTimer; /// The game timer
 static unsigned long WaitFrame; /// Frame to wait for
 static int Trigger;
 static int WaitTrigger;
-static int* ActiveTriggers;
+static bool *ActiveTriggers;
 
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
@@ -652,7 +652,7 @@ static int CclSetActiveTriggers(lua_State* l)
 	int j;
 
 	args = lua_gettop(l);
-	ActiveTriggers = (int*)malloc(args * sizeof(*ActiveTriggers));
+	ActiveTriggers = new bool[args];
 	for (j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
@@ -866,7 +866,7 @@ void CleanTriggers(void)
 
 	Trigger = 0;
 
-	free(ActiveTriggers);
+	delete[] ActiveTriggers;
 	ActiveTriggers = NULL;
 
 	memset(&GameTimer, 0, sizeof(GameTimer));

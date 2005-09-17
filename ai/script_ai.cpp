@@ -506,13 +506,8 @@ static int CclAiGetSleepCycles(lua_State* l)
 static int CclAiDebug(lua_State* l)
 {
 	LuaCheckArgs(l, 1);
-	if (!LuaToBoolean(l, 1)) {
-		AiPlayer->ScriptDebug = 0;
-	} else {
-		AiPlayer->ScriptDebug = 1;
-	}
-	lua_pushboolean(l, 0);
-	return 1;
+	AiPlayer->ScriptDebug = LuaToBoolean(l, 1);
+	return 0;
 }
 
 /**

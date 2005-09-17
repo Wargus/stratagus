@@ -1932,11 +1932,11 @@ static void SetCdPower(Menuitem* mi)
 static void SetFogOfWar(Menuitem* mi)
 {
 	if (!TheMap.NoFogOfWar) {
-		TheMap.NoFogOfWar = 1;
+		TheMap.NoFogOfWar = true;
 		UpdateFogOfWarChange();
 		CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
 	} else {
-		TheMap.NoFogOfWar = 0;
+		TheMap.NoFogOfWar = false;
 		UpdateFogOfWarChange();
 		CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow on", -1);
 	}
@@ -1950,7 +1950,7 @@ static void SetFogOfWar(Menuitem* mi)
 */
 static void SetCommandKey(Menuitem* mi)
 {
-	ShowCommandKey ^= 1;
+	UI.ButtonPanel.ShowCommandKey = !UI.ButtonPanel.ShowCommandKey;
 }
 
 /**
@@ -2001,11 +2001,11 @@ void SpeedOptionsInit(Menu* menu)
 	}
 
 	menu->Items[i + 4].D.HSlider.percent = 100 - (SpeedMouseScroll - 1) * 100 / 10;
-	if (UI.MouseScroll == 0) {
+	if (UI.MouseScroll == false) {
 		menu->Items[i + 4].D.HSlider.percent = 0;
 	}
 	menu->Items[i + 8].D.HSlider.percent = 100 - (SpeedKeyScroll - 1) * 100 / 10;
-	if (UI.KeyScroll == 0) {
+	if (UI.KeyScroll == false) {
 		menu->Items[i + 8].D.HSlider.percent = 0;
 	}
 }
@@ -2171,13 +2171,13 @@ static void DiplomacyOk(void)
 			// Shared vision
 			if (menu->Items[4 * j + 7].D.Checkbox.Checked) {
 				if (!(ThisPlayer->SharedVision & (1 << Players[i].Index))) {
-					SendCommandSharedVision(ThisPlayer->Index, 1,
+					SendCommandSharedVision(ThisPlayer->Index, true,
 						Players[i].Index);
 				}
 			}
 			else {
 				if (ThisPlayer->SharedVision&(1<<Players[i].Index)) {
-					SendCommandSharedVision(ThisPlayer->Index,0,
+					SendCommandSharedVision(ThisPlayer->Index, false,
 						Players[i].Index);
 				}
 			}
@@ -2215,7 +2215,7 @@ static void PreferencesInit(Menu* menu)
 		menu->Items[1].Flags = MI_FLAGS_DISABLED;
 	}
 
-	if (ShowCommandKey) {
+	if (UI.ButtonPanel.ShowCommandKey) {
 		menu->Items[2].D.Checkbox.Checked = 1;
 	} else {
 		menu->Items[2].D.Checkbox.Checked = 0;
@@ -2536,9 +2536,9 @@ static void TipsExit(Menu* menu)
 static void TipsShowTipsCheckbox(Menuitem* mi)
 {
 	if (mi->Menu->Items[1].D.Checkbox.Checked) {
-		ShowTips = 1;
+		ShowTips = true;
 	} else {
-		ShowTips = 0;
+		ShowTips = false;
 	}
 }
 
@@ -2548,10 +2548,10 @@ static void TipsShowTipsCheckbox(Menuitem* mi)
 static void TipsShowTipsText(Menuitem* mi)
 {
 	if (!mi->Menu->Items[1].D.Checkbox.Checked) {
-		ShowTips = 1;
+		ShowTips = true;
 		mi->Menu->Items[1].D.Checkbox.Checked = 1;
 	} else {
-		ShowTips = 0;
+		ShowTips = false;
 		mi->Menu->Items[1].D.Checkbox.Checked = 0;
 	}
 }
@@ -3177,10 +3177,10 @@ static void GameSpeedHSAction(Menuitem* mi)
 */
 static void MouseScrollHSAction(Menuitem* mi)
 {
-	UI.MouseScroll = 1;
+	UI.MouseScroll = true;
 	SpeedMouseScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
 	if (mi->D.HSlider.percent == 0) {
-		UI.MouseScroll = 0;
+		UI.MouseScroll = false;
 	}
 }
 
@@ -3189,10 +3189,10 @@ static void MouseScrollHSAction(Menuitem* mi)
 */
 static void KeyboardScrollHSAction(Menuitem* mi)
 {
-	UI.KeyScroll = 1;
+	UI.KeyScroll = true;
 	SpeedKeyScroll = 10 - (mi->D.HSlider.percent * 9) / 100;
 	if (mi->D.HSlider.percent == 0) {
-		UI.KeyScroll = 0;
+		UI.KeyScroll = false;
 	}
 }
 
@@ -3513,27 +3513,27 @@ static void MultiGameFWSAction(Menuitem* mi, int i)
 		DebugPrint("Update fow %d\n" _C_ i);
 		switch (i) {
 			case 0:
-				TheMap.NoFogOfWar = 0;
+				TheMap.NoFogOfWar = false;
 				FlagRevealMap = 0;
-				GameSettings.NoFogOfWar = 0;
+				GameSettings.NoFogOfWar = false;
 				GameSettings.RevealMap = 0;
 				break;
 			case 1:
-				TheMap.NoFogOfWar = 1;
+				TheMap.NoFogOfWar = true;
 				FlagRevealMap = 0;
-				GameSettings.NoFogOfWar = 1;
+				GameSettings.NoFogOfWar = true;
 				GameSettings.RevealMap = 0;
 				break;
 			case 2:
-				TheMap.NoFogOfWar = 0;
+				TheMap.NoFogOfWar = false;
 				FlagRevealMap = 1;
-				GameSettings.NoFogOfWar = 0;
+				GameSettings.NoFogOfWar = false;
 				GameSettings.RevealMap = 1;
 				break;
 			case 3:
-				TheMap.NoFogOfWar = 1;
+				TheMap.NoFogOfWar = true;
 				FlagRevealMap = 1;
-				GameSettings.NoFogOfWar = 1;
+				GameSettings.NoFogOfWar = true;
 				GameSettings.RevealMap = 1;
 				break;
 		}

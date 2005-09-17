@@ -85,7 +85,7 @@ static int CclDefineMissileType(lua_State* l)
 	}
 
 	mtype->NumDirections = 1;
-	mtype->Flip = 1;
+	mtype->Flip = true;
 	// Ensure we don't divide by zero.
 	mtype->SplashFactor = 100;
 
@@ -111,7 +111,7 @@ static int CclDefineMissileType(lua_State* l)
 		} else if (!strcmp(value, "Frames")) {
 			mtype->SpriteFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Flip")) {
-			mtype->SpriteFrames = LuaToBoolean(l, -1);
+			mtype->Flip = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NumDirections")) {
 			mtype->NumDirections = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "transparency")) {
