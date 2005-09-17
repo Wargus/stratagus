@@ -237,14 +237,14 @@ dist: distlist
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
+	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
 	echo "(c) 2005 The Stratagus Project" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
-	du -h $(distdir)-src.tar.gz $(distdir)-src.zip
+	ls -l $(distdir)-src.tar.gz $(distdir)-src.zip
 
 bin-dist: all
 	$(RM) $(DISTLIST)
@@ -253,7 +253,7 @@ bin-dist: all
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
+	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/stratagus$(EXE)
 	tar czhf stratagus-$(mydate)-linux.tar.gz $(distdir)
@@ -267,7 +267,7 @@ bin-dist-gl: all
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 777 $(distdir)
-	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
+	for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	chmod -R a+rX $(distdir)
 	strip -s -R .comment $(distdir)/stratagus$(EXE)
 	tar czhf stratagus-$(mydate)-linux-gl.tar.gz $(distdir)
@@ -283,14 +283,14 @@ win32-bin-dist2: win32
 	@rm -rf $(distdir)
 	@mkdir $(distdir)
 	@chmod 777 $(distdir)
-	@for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
+	@for i in `cat $(DISTLIST)`; do echo $$i; done | while read j; do cp -a --parents $$j $(distdir); done
 	@chmod -R a+rX $(distdir)
 	@strip -s -R .comment $(distdir)/stratagus$(EXE)
 	@echo "(c) 2003 by the Stratagus Project http://Stratagus.Org" | \
 	zip -zq9r stratagus-$(mydate)-win32bin.zip $(distdir)
 	@$(RM) $(DISTLIST)
 	@$(RM) -r $(distdir)
-	du -h stratagus-$(mydate)-win32bin.zip
+	ls -l stratagus-$(mydate)-win32bin.zip
 
 win32-bin-dist: win32
 	@export PATH=$(CROSSDIR)/i386-mingw32msvc/bin:$(CROSSDIR)/bin:$$PATH; \
