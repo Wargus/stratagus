@@ -26,6 +26,9 @@
 ##      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 MODULE = src/tolua
-MSRC =   tolua.cpp
+MSRC =   tolua.cpp tolua_event.cpp tolua_is.cpp tolua_map.cpp tolua_push.cpp \
+         tolua_to.cpp
+MHDRS =  tolua_event.h tolua++.h
 
 SRC +=   $(addprefix $(MODULE)/,$(MSRC))
+HDRS +=  $(addprefix $(MODULE)/,$(MHDRS))
