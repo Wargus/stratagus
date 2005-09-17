@@ -40,7 +40,9 @@ INCLUDE_DIRS = src/include
 MODULES = src/action src/ai src/beos src/stratagus src/editor src/game src/map \
           src/network src/pathfinder src/sound src/ui src/unit src/video
 
-MODULES_ALL = $(MODULES)
+MODULES_METASERVER = src/metaserver
+
+MODULES_ALL = $(MODULES) $(MODULES_METASERVER)
 
 MISC :=
 
@@ -52,13 +54,13 @@ include $(patsubst %, %/Module.make, $(MODULES))
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
 OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(OBJ))),$(notdir $(OBJ)))
 
-SRC_ALL = $(SRC)
-OBJ_ALL = $(OBJ)
-
 METASERVER_SRC := src/network/lowlevel.cpp
 include src/metaserver/Module.make
 METASERVER_OBJ := $(patsubst %.cpp, %.o, $(METASERVER_SRC))
 METASERVER_OBJ := $(join $(addsuffix $(OBJDIR)/,$(dir $(METASERVER_OBJ))),$(notdir $(METASERVER_OBJ)))
+
+SRC_ALL = $(SRC) $(METASERVER_SRC)
+OBJ_ALL = $(OBJ)
 
 .SUFFIXES: .cpp .o
 
@@ -213,7 +215,7 @@ MISC    += contrib/doxygen-stratagus.cfg contrib/doxygen-header.html \
 	  Rules.make.in configure.in configure config.h.in Makefile \
 	  src/stratagus.rc stratagus.dsw stratagus.dsp metaserver.dsp \
 	  autogen.sh SConstruct \
-	  $(patsubst %, %/Module.make, $(MODULES)) \
+	  $(patsubst %, %/Module.make, $(MODULES_ALL)) \
 	  $(patsubst %, %/Module.make, $(INCLUDE_DIRS))
 
 mydate	= $(shell date +%y%m%d)
@@ -238,7 +240,7 @@ dist: distlist
 	for i in `cat $(DISTLIST)`; do echo $$i; done | cpio -pdml --quiet $(distdir)
 	chmod -R a+rX $(distdir)
 	tar czhf $(distdir)-src.tar.gz $(distdir)
-	echo "(c) 2004 The Stratagus Project" | \
+	echo "(c) 2005 The Stratagus Project" | \
 	zip -zq9r $(distdir)-src.zip $(distdir)
 	$(RM) $(DISTLIST)
 	$(RM) -r $(distdir)
