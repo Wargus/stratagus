@@ -1,0 +1,24 @@
+class CButtonPanel
+{
+public:
+	int X;
+	int Y;
+};
+
+class CInfoPanel
+{
+public:
+	int X;
+	int Y;
+};
+
+class CUserInterface
+{
+public:
+	CInfoPanel InfoPanel;
+	CButtonPanel ButtonPanel;
+	CMinimap Minimap;
+};
+
+extern CUserInterface UI;
+
