@@ -3,6 +3,7 @@ class CButtonPanel
 public:
 	int X;
 	int Y;
+	bool ShowCommandKey;
 };
 
 class CInfoPanel

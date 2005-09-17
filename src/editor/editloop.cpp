@@ -1932,7 +1932,7 @@ static void CreateEditor(void)
 	ThisPlayer = &Players[0];
 
 	FlagRevealMap = 1; // editor without fog and all visible
-	TheMap.NoFogOfWar = 1;
+	TheMap.NoFogOfWar = true;
 
 	if (!*CurrentMapPath) { // new map!
 		InitUnitTypes(1);
@@ -2080,10 +2080,10 @@ void EditorMainLoop(void)
 			//
 			// Map scrolling
 			//
-			if (UI.MouseScroll && !(FrameCounter%SpeedMouseScroll)) {
+			if (UI.MouseScroll && !(FrameCounter % SpeedMouseScroll)) {
 				DoScrollArea(MouseScrollState, 0);
 			}
-			if (UI.KeyScroll && !(FrameCounter%SpeedKeyScroll)) {
+			if (UI.KeyScroll && !(FrameCounter % SpeedKeyScroll)) {
 				DoScrollArea(KeyScrollState, KeyModifiers & ModifierControl);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 						(EditorState == EditorEditTile ||

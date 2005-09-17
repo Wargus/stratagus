@@ -71,14 +71,9 @@ extern unsigned CclGetResourceByName(lua_State* l);
 */
 static int CclSetXpDamage(lua_State* l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = XpDamage;
 	XpDamage = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -90,14 +85,9 @@ static int CclSetXpDamage(lua_State* l)
 */
 static int CclSetTrainingQueue(lua_State* l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = EnableTrainingQueue;
 	EnableTrainingQueue = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -109,14 +99,9 @@ static int CclSetTrainingQueue(lua_State* l)
 */
 static int CclSetBuildingCapture(lua_State* l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = EnableBuildingCapture;
 	EnableBuildingCapture = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**
@@ -128,14 +113,9 @@ static int CclSetBuildingCapture(lua_State* l)
 */
 static int CclSetRevealAttacker(lua_State* l)
 {
-	int old;
-
 	LuaCheckArgs(l, 1);
-	old = RevealAttacker;
 	RevealAttacker = LuaToBoolean(l, 1);
-
-	lua_pushboolean(l, old);
-	return 1;
+	return 0;
 }
 
 /**

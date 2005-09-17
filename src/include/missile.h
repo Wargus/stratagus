@@ -277,7 +277,7 @@
 **
 **    The owner of the missile. Normally the one who fired the
 **    missile.  Used to check units, to prevent hitting the owner
-**    when field MissileType::CanHitOwner==1. Also used for kill
+**    when field MissileType::CanHitOwner==true. Also used for kill
 **    and experience points.
 **
 **  Missile::TargetUnit
@@ -406,9 +406,9 @@ struct _missile_type_ {
 	SoundConfig FiredSound;   /// fired sound
 	SoundConfig ImpactSound;  /// impact sound for this missile-type
 
-	unsigned Flip : 1;        /// flip image when facing left
-	unsigned CanHitOwner : 1; /// missile can hit the owner
-	unsigned FriendlyFire : 1;/// missile can't hit own units
+	bool Flip;                /// flip image when facing left
+	bool CanHitOwner;         /// missile can hit the owner
+	bool FriendlyFire;        /// missile can't hit own units
 
 	MissileClass Class;       /// missile class
 	int          NumBounces;  /// number of bounces

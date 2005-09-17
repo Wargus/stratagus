@@ -79,7 +79,7 @@ char GameObserve;                    /// Observe mode
 char SkipGameCycle;                  /// Skip the next game cycle
 char BigMapMode;                     /// Show only the map
 enum _iface_state_ InterfaceState;   /// Current interface state
-int GodMode;                         /// Invincibility cheat
+bool GodMode;                        /// Invincibility cheat
 enum _key_state_ KeyState;           /// current key state
 
 /*----------------------------------------------------------------------------

@@ -80,9 +80,9 @@ Unit* Units[MAX_UNIT_SLOTS];              /// Array of used slots
 int NumUnits;                             /// Number of slots used
 
 int XpDamage;                             /// Hit point regeneration for all units
-char EnableTrainingQueue;                 /// Config: training queues enabled
-char EnableBuildingCapture;               /// Config: capture buildings enabled
-char RevealAttacker;                      /// Config: reveal attacker enabled
+bool EnableTrainingQueue;                 /// Config: training queues enabled
+bool EnableBuildingCapture;               /// Config: capture buildings enabled
+bool RevealAttacker;                      /// Config: reveal attacker enabled
 
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
@@ -1297,7 +1297,7 @@ void UnitCountSeen(Unit* unit)
 						}
 					} else {
 						//  Icky ugly code trick. With NoFogOfWar we haveto be > 0;
-						if (TheMap.Fields[(unit->Y + y) * TheMap.Info.MapWidth + unit->X + x].Visible[p] > 1 - TheMap.NoFogOfWar) {
+						if (TheMap.Fields[(unit->Y + y) * TheMap.Info.MapWidth + unit->X + x].Visible[p] > 1 - (TheMap.NoFogOfWar ? 1 : 0)) {
 							newv++;
 						}
 					}
@@ -3935,7 +3935,7 @@ void CleanUnits(void)
 	InitUnitsMemory();
 
 	XpDamage = 0;
-	FancyBuildings = 0;
+	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }
 

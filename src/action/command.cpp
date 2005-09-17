@@ -1253,7 +1253,7 @@ void CommandDiplomacy(int player, int state, int opponent)
 **  @param state     New shared vision state.
 **  @param opponent  Opponent.
 */
-void CommandSharedVision(int player, int state, int opponent)
+void CommandSharedVision(int player, bool state, int opponent)
 {
 	int before;
 	int after;
@@ -1274,7 +1274,7 @@ void CommandSharedVision(int player, int state, int opponent)
 	// Compute Before and after.
 	//
 	before = PlayersShareVision(player, opponent);
-	if (state == 0) {
+	if (state == false) {
 		Players[player].SharedVision &= ~(1 << opponent);
 	} else {
 		Players[player].SharedVision |= (1 << opponent);

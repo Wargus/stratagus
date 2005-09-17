@@ -137,7 +137,7 @@ extern void CommandAutoSpellCast(struct _unit_* unit, int spellid, int on);
 	/// Prepare diplomacy command
 extern void CommandDiplomacy(int player, int state, int opponent);
 	/// Prepare shared vision command
-extern void CommandSharedVision(int player, int state, int opponent);
+extern void CommandSharedVision(int player, bool state, int opponent);
 	/// Send any command
 extern void CommandAnyOrder(struct _unit_* unit, struct _order_ * order, int flush);
 	/// Move an order in command queue

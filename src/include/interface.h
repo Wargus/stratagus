@@ -234,7 +234,7 @@ extern char GameObserve;
 	/// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
 	/// Invincibility cheat
-extern int GodMode;
+extern bool GodMode;
 	/// Whether the map is the only thing displayed or not
 extern char BigMapMode;
 
@@ -261,15 +261,12 @@ extern char GameMenuButtonClicked;
 	/// diplomacy button was clicked down
 extern char GameDiplomacyButtonClicked;
 	/// Mouse leaves windows stops scroll
-extern char LeaveStops;
+extern bool LeaveStops;
 	/// current CursorOn field
 extern enum _cursor_on_ CursorOn;
 
 	/// vladi: used for unit buttons sub-menus etc
 extern int CurrentButtonLevel;
-
-	/// Display the command key in the buttons
-extern char ShowCommandKey;
 
 	/// Time to detect double clicks
 extern int DoubleClickDelay;
