@@ -1,0 +1,9 @@
+class CVideo
+{
+public:
+	int Width;
+	int Height;
+	int Depth;
+	bool FullScreen;
+};
+
