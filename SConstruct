@@ -62,7 +62,7 @@ def globSources(sourceDirs):
     targetsources.append('build' + s[3:])
   return targetsources
 
-sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video")
+sourcesEngine = globSources("action ai editor game map network pathfinder sound stratagus ui unit video tolua")
 sourcesMetaserver = globSources("metaserver")
 sourcesMetaserver.append("build/network/lowlevel.cpp")
 
