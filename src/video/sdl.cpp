@@ -856,7 +856,7 @@ void ToggleFullScreen(void)
 	InitOpenGL();
 	ReloadGraphics();
 	ReloadFonts();
-	ReloadMinimap();
+	UI.Minimap.Reload();
 #else
 	SDL_LockSurface(TheScreen);
 	memcpy(TheScreen->pixels, pixels, framesize);
