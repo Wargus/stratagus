@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_radar.c - The map radar handling. */
+/**@name map_radar.cpp - The map radar handling. */
 //
 //      (c) Copyright 2004-2005 by Russell Smith.
 //

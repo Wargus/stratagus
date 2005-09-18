@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name graphic.c - The general graphic functions. */
+/**@name graphic.cpp - The general graphic functions. */
 //
 //      (c) Copyright 1999-2005 by Lutz Sammer, Nehal Mistry, and Jimmy Salmon
 //
@@ -344,7 +344,6 @@ void Graphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 /**
 **  Draw graphic object clipped and flipped in X direction.
 **
-**  @param g       pointer to object
 **  @param frame   number of frame (object index)
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
@@ -445,7 +444,6 @@ void Graphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
 /**
 **  Draw graphic object clipped, flipped, and with player colors.
 **
-**  @param g       pointer to object
 **  @param player  player number
 **  @param frame   number of frame (object index)
 **  @param x       x coordinate on the screen
@@ -532,8 +530,6 @@ Graphic *ForceNewGraphic(const char *file, int w, int h)
 
 /**
 **  Load a graphic
-**
-**  @param g  Graphic object to load
 */
 void Graphic::Load()
 {
@@ -673,8 +669,6 @@ void ReloadGraphics(void)
 
 /**
 **  Flip graphic and store in graphic->SurfaceFlip
-**
-**  @param g  Pointer to object
 */
 void Graphic::Flip()
 {
@@ -941,7 +935,6 @@ void MakePlayerColorTexture(Graphic *g, int player)
 /**
 **  Resize a graphic
 **
-**  @param g  Graphic object.
 **  @param w  New width of graphic.
 **  @param h  New height of graphic.
 */
@@ -1098,8 +1091,6 @@ int Graphic::TransparentPixel(int x, int y)
 
 /**
 **  Make shadow sprite
-**
-**  @param g  pointer to object
 **
 **  @todo FIXME: 32bpp
 */

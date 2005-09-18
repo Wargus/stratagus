@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name astar.c - The a* path finder routines. */
+/**@name astar.cpp - The a* path finder routines. */
 //
 //      (c) Copyright 1999-2005 by Lutz Sammer,Fabrice Rossi, Russell Smith
 //

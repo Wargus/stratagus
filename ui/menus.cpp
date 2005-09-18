@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name menus.c - The menu function code. */
+/**@name menus.cpp - The menu function code. */
 //
 //      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
@@ -812,7 +812,9 @@ static void LBExit(Menuitem* mi)
 /**
 **  Listbox init callback.
 **
-**  @param mi  Listbox to free.
+**  @param mi      Listbox to free.
+**  @param path    Path
+**  @param filter  Filter
 */
 static void LBInit(Menuitem* mi, const char* path, int (*filter)(char*, FileList*))
 {
@@ -1301,9 +1303,9 @@ static void NameLineDrawFunc(Menuitem* mi)
 }
 
 /**
-** Start menu master init.
+**  Start menu master init.
 **
-** @param mi The menu.
+**  @param menu  The menu.
 */
 static void PrgStartInit(Menu* menu)
 {
@@ -4683,9 +4685,10 @@ static int PlayerTypesMenuToFc[] = {
 };
 
 /**
-** Convert player ai from internal fc number to menu number
+**  Convert player ai from internal fc number to menu number
 **
-** @param num Ai number
+**  @param ainame  Ai name
+**  @param menu    Pulldown menu item
 */
 static int PlayerSetAiToMenu(char *ainame, MenuitemPulldown* menu)
 {
@@ -4702,9 +4705,9 @@ static int PlayerSetAiToMenu(char *ainame, MenuitemPulldown* menu)
 }
 
 /**
-** Get the ai ident from the pulldown menu
+**  Get the ai ident from the pulldown menu
 **
-** @param num Ai number
+**  @param menu  Pulldown menu item
 */
 static char* PlayerGetAiFromMenu(MenuitemPulldown* menu)
 {
@@ -5623,7 +5626,7 @@ static void MultiMetaServerClose(void)
 /**
 **  Update menu item state. (disabled, ...)
 **
-**  @param Menuitem* Items
+**  @param items  Menu items
 */
 void UpdateMenuItemButton(Menuitem* items)
 {

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade.c - The upgrade/allow functions. */
+/**@name upgrade.cpp - The upgrade/allow functions. */
 //
 //      (c) Copyright 1999-2005 by Vladi Belperchinov-Shabanski and Jimmy Salmon
 //

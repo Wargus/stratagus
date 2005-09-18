@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_spell.c - The spell script functions.. */
+/**@name script_spell.cpp - The spell script functions.. */
 //
 //      (c) Copyright 1998-2005 by Joris Dauphin and Crestez Leonard
 //
@@ -114,8 +114,7 @@ static void CclSpellMissileLocation(lua_State* l, SpellActionMissileLocation* lo
 /**
 **  Parse the action for spell.
 **
-**  @param l            Lua state.
-**  @param spellaction  Pointer to spellaction.
+**  @param l  Lua state.
 */
 static SpellActionType* CclSpellAction(lua_State* l)
 {

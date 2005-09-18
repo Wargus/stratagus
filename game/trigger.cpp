@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name trigger.c - The trigger handling. */
+/**@name trigger.cpp - The trigger handling. */
 //
 //      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name font.c - The color fonts. */
+/**@name font.cpp - The color fonts. */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //

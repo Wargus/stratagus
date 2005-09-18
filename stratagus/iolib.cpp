@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name iolib.c - Compression-IO helper functions. */
+/**@name iolib.cpp - Compression-IO helper functions. */
 //
 //      (c) Copyright 2000-2005 by Andreas Arens, Lutz Sammer, and Jimmy Salmon
 //
@@ -85,6 +85,7 @@ CLFile::~CLFile()
 /**
 **  Seek on compressed input. (Newer libs support it directly)
 **
+**  @param file    File
 **  @param offset  Seek position
 **  @param whence  How to seek
 */

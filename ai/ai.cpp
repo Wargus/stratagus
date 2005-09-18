@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai.c - The computer player AI main file. */
+/**@name ai.cpp - The computer player AI main file. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer and Ludovic Pollet
 //

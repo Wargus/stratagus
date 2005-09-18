@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name commands.c - Global command handler - network support. */
+/**@name commands.cpp - Global command handler - network support. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
 //

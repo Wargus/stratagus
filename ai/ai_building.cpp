@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ai_building.c - AI building functions. */
+/**@name ai_building.cpp - AI building functions. */
 //
 //      (c) Copyright 2001-2005 by Lutz Sammer
 //

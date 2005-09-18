@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_editor.c - Editor CCL functions. */
+/**@name script_editor.cpp - Editor CCL functions. */
 //
 //      (c) Copyright 2002-2005 by Lutz Sammer and Jimmy Salmon
 //

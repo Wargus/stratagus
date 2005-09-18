@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_tileset.c - The tileset ccl functions. */
+/**@name script_tileset.cpp - The tileset ccl functions. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, François Beerten and Jimmy Salmon
 //

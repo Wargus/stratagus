@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map_draw.c - The map drawing. */
+/**@name map_draw.cpp - The map drawing. */
 //
 //      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //

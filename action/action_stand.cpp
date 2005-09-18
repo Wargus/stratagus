@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name action_stand.c - The stand ground action. */
+/**@name action_stand.cpp - The stand ground action. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer and Jimmy Salmon
 //

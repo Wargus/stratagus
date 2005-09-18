@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name pathfinder.c - The path finder routines. */
+/**@name pathfinder.cpp - The path finder routines. */
 //
 //      I use breadth-first.
 //

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter_zoneset.c - Manipulation of zone set.  */
+/**@name splitter_zoneset.cpp - Manipulation of zone set.  */
 //
 //      (c) Copyright 1999-2005 by Ludovic Pollet
 //

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name button_checks.c - The button checks. */
+/**@name button_checks.cpp - The button checks. */
 //
 //      (c) Copyright 1999-2004 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //

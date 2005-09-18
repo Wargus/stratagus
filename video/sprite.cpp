@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sprite.c - The general sprite functions. */
+/**@name sprite.cpp - The general sprite functions. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
 //                                 Nehal Mistry, and Jimmy Salmon
