@@ -80,15 +80,10 @@ help:
 	@-echo "make cycle			clean,depend,tags,all"
 	@-echo "make install			install all files"
 	@-echo "make uninstall			uninstall all files"
-	@-echo "make run			create and run"
-	@-echo "make runp			create and run with profiler"
 	@-echo "make clean			cleanup keep only executables"
 	@-echo "make distclean			clean all files"
 	@-echo "make doc			make source documention with doxygen"
-	@-echo "make doc++			make source documention with doc++"
-	@-echo "make lockver NAME="version"	label current version with symbolic name"
 	@-echo "make strip			strip stratagus and/or stratagus.exe"
-	@-echo "make tags			create ctags"
 	@-echo "make depend			create dependencies"
 	@-echo "make dist			create distribution"
 	@-echo "make win32new			(CROSS-COMPILER ONLY) start new win32"
@@ -102,21 +97,8 @@ cycle::
 	@$(MAKE) tags
 	@$(MAKE) all
 
-run::
-	@$(MAKE) && ./stratagus
-
-runp::
-	@$(MAKE) && ./stratagus && if [ -e gmon.sum ]; then \
-		gprof -s stratagus gmon.out gmon.sum; \
-	    else mv gmon.out gmon.sum; fi
-
 doc::
 	doxygen contrib/doxygen-stratagus.cfg
-
-doc++::
-	@$(MAKE) -C src RULESFILE=$(RULESFILE) doc
-	@if [ ! -d srcdoc ]; then mkdir srcdoc; fi
-	@$(DOCPP) -v -H -A -a -b -c -j -d srcdoc `find . -name "*.doc" -print`
 
 all-src: make-objdir $(OBJ)
 
@@ -143,10 +125,6 @@ src/$(OBJDIR)/stratagusrc.$(OE): src/stratagus.rc
 	if [ ! -d src/$(OBJDIR) ]; then mkdir src/$(OBJDIR); fi
 	cd src; windres -o $(OBJDIR)/stratagusrc.$(OE) stratagus.rc; cd ..
 
-echo::
-	@-echo CFLAGS: $(CFLAGS)
-	@-echo LIBS: $(STRATAGUS_LIBS)
-
 clean::
 	for i in $(MODULES_ALL); do \
 	$(RM) -rf $$i/$(OBJDIR)/*.o $$i/*.doc; done
@@ -161,24 +139,6 @@ distclean:	clean
 	srcdoc/* .depend Rules.make config.log config.status configure
 	$(RM) -rf autom4te.cache/
 	@echo
-
-configure:
-	autoconf
-	./configure --enable-static
-
-configuregl:
-	autoconf
-	./configure --enable-static --enable-opengl
-
-lockver:
-	$(LOCKVER) Makefile $(RULESFILE) .indent.pro \
-	contrib/doxygen-stratagus.cfg \
-	$(CCLS) $(DOCS) $(SRC_ALL) src/beos/beos.cpp $(HDRS) Makefile
-	for i in $(MODULES_ALL); do $(LOCKVER) Module.make; done
-
-tags:
-	for i in $(SRC); do \
-	ctags --c-types=defmpstuvx -a -f tags `pwd`/$$i ; done
 
 depend:
 	@echo -n >.depend
