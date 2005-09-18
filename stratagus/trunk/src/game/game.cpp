@@ -262,9 +262,9 @@ int SaveStratagusMap(const char* mapname, WorldMap* map, int writeTerrain)
 **  @param filename  map filename
 **  @param map       map loaded
 */
-static void LoadMap(const char* filename, WorldMap* map)
+static void LoadMap(const char *filename, WorldMap *map)
 {
-	char* tmp;
+	const char *tmp;
 
 	tmp = strrchr(filename, '.');
 	if (tmp) {
