@@ -38,7 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-**  @struct _color_font_ font.h
+**  @class ColorFont font.h
 **
 **  \#include "font.h"
 **
@@ -47,10 +47,6 @@
 **  Defines the fonts used in the Stratagus engine. We support
 **  proportional multicolor fonts of 9 colors.
 **  (Currently the fonts aren't packed)
-**
-**  ColorFont::File
-**
-**    File containing the graphics for the font.
 **
 **  ColorFont::Width
 **
@@ -65,10 +61,9 @@
 **    The width of each font glyph in pixels. The index 0 is the
 **    width of the SPACE (' ', 0x20).
 **
-**  ColorFont::Graphic
+**  ColorFont::G
 **
-**    Contains the graphics of the font, loaded from ColorFont::File.
-**    Only 9 colors are supported.
+**    Contains the graphics of the font, Only 9 colors are supported.
 */
 
 /*----------------------------------------------------------------------------
@@ -82,7 +77,8 @@ class Graphic;
 ----------------------------------------------------------------------------*/
 
 	/// Color font definition
-typedef struct _color_font_ {
+class ColorFont {
+public:
 	int  Width;           /// Max width of characters in file
 	int  Height;          /// Max height of characters in file
 	char CharWidth[208];  /// Real font width (starting with ' ')
@@ -90,13 +86,13 @@ typedef struct _color_font_ {
 // --- FILLED UP ---
 
 	Graphic *G;  /// Graphic object used to draw
-} ColorFont;
+};
 
 /**
 **  Font selector for the font functions.
 **  @todo should be removed
 */
-enum _game_font_ {
+enum {
 	SmallFont,       /// Small font used in stats
 	GameFont,        /// Normal font used in game
 	LargeFont,       /// Large font used in menus
@@ -119,41 +115,30 @@ enum _game_font_ {
 --  Variables
 ----------------------------------------------------------------------------*/
 
-/**
-**  Font names
-**  @todo should use the names of the real fonts.
-*/
-extern char* FontNames[];
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 	/// Set the default text colors for normal and reverse text
-extern void SetDefaultTextColors(char* normal, char* reverse);
+extern void SetDefaultTextColors(char *normal, char *reverse);
 	/// Get the default text colors for normal and reverse text
-extern void GetDefaultTextColors(char** normalp, char** reversep);
+extern void GetDefaultTextColors(char **normalp, char **reversep);
 	/// Returns the pixel length of a text
-extern int VideoTextLength(unsigned font, const char* text);
+extern int VideoTextLength(unsigned font, const char *text);
 	/// Returns the height of the font
 extern int VideoTextHeight(unsigned font);
 	///  Return the 'line' line of the string 's'.
-extern char* GetLineFont(int line, char* s, int maxlen, int font);
+extern char *GetLineFont(int line, char *s, int maxlen, int font);
 	/// Draw text unclipped
-extern int VideoDrawText(int x, int y, unsigned font,
-	const char* text);
+extern int VideoDrawText(int x, int y, unsigned font, const char *text);
 	/// Draw text unclipped
-extern int VideoDrawTextClip(int x, int y, unsigned font,
-	const char* text);
+extern int VideoDrawTextClip(int x, int y, unsigned font, const char *text);
 	/// Draw reverse text unclipped
-extern int VideoDrawReverseText(int x, int y, unsigned font,
-	const char* text);
+extern int VideoDrawReverseText(int x, int y, unsigned font, const char *text);
 	/// Draw reverse text clipped
-extern int VideoDrawReverseTextClip(int x, int y, unsigned font,
-	const char* text);
+extern int VideoDrawReverseTextClip(int x, int y, unsigned font, const char *text);
 	/// Draw text centered and unclipped
-extern int VideoDrawTextCentered(int x, int y, unsigned font,
-	const char* text);
+extern int VideoDrawTextCentered(int x, int y, unsigned font, const char *text);
 	/// Draw number unclipped
 extern int VideoDrawNumber(int x, int y, unsigned font, int number);
 	/// Draw number clipped
@@ -161,8 +146,7 @@ extern int VideoDrawNumberClip(int x, int y, unsigned font, int number);
 	/// Draw reverse number unclipped
 extern int VideoDrawReverseNumber(int x, int y, unsigned font, int number);
 	/// Draw reverse number clipped
-extern int VideoDrawReverseNumberClip(int x, int y, unsigned font,
-	int number);
+extern int VideoDrawReverseNumberClip(int x, int y, unsigned font, int number);
 
 	/// Load and initialize the fonts
 extern void LoadFonts(void);
@@ -177,9 +161,9 @@ extern void CleanFonts(void);
 	/// Check if font is loaded
 extern int IsFontLoaded(unsigned font);
 	/// Find font by identifier
-extern int FontByIdent(const char* ident);
+extern int FontByIdent(const char *ident);
 	// Find the name of a font.
-extern const char* FontName(int font);
+extern const char *FontName(int font);
 
 //@}
 
