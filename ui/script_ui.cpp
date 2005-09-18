@@ -2822,8 +2822,8 @@ static int CclDefineMenu(lua_State* l)
 	if (name) {
 		menu = FindMenu(name);
 		if (!menu) {
-			menu = (Menu*)malloc(sizeof(Menu));
-			*(Menu**)hash_add(MenuHash, name) = menu;
+			menu = (Menu *)malloc(sizeof(Menu));
+			MenuMap[name] = menu;
 		} else {
 			FreeMenu(menu);
 		}
@@ -3768,7 +3768,6 @@ static int CclDefineMenuItem(lua_State* l)
 	const char* value;
 	char* name;
 	Menuitem* item;
-	Menu** tmp;
 	Menu* menu;
 	int args;
 	int subargs;
@@ -3853,12 +3852,11 @@ static int CclDefineMenuItem(lua_State* l)
 		}
 	}
 
-	if ((tmp = (Menu**)hash_find(MenuHash, name))) {
-		menu = *tmp;
+	if ((menu = MenuMap[name])) {
 		if (menu->Items) {
-			menu->Items = (Menuitem*)realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
+			menu->Items = (Menuitem *)realloc(menu->Items, sizeof(Menuitem) * (menu->NumItems + 1));
 		} else {
-			menu->Items = (Menuitem*)malloc(sizeof(Menuitem));
+			menu->Items = (Menuitem *)malloc(sizeof(Menuitem));
 		}
 		item->Menu = menu;
 		memcpy(menu->Items + menu->NumItems, item, sizeof(Menuitem));

@@ -41,6 +41,9 @@
 #include "util.h"
 #include "script.h"
 
+#include <string>
+#include <map>
+
 /*----------------------------------------------------------------------------
 --  Defines/Declarations
 ----------------------------------------------------------------------------*/
@@ -317,8 +320,7 @@ extern char** KeyStrokeHelps;  /// Keystroke help pairs
 #else
 
 	/// Hash table of all the menus
-typedef hashtable(Menu*, MENUS_MAXMENU) _MenuHash;
-extern _MenuHash MenuHash;
+extern std::map<std::string, Menu *> MenuMap;
 	/// Hash table of all the menu functions
 typedef hashtable(void*, MENUS_MAXFUNC) _MenuFuncHash;
 extern _MenuFuncHash MenuFuncHash;
