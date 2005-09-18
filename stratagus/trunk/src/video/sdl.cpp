@@ -242,15 +242,15 @@ void InitVideoSdl(void)
 	InitOpenGL();
 #endif
 
-	ColorBlack = VideoMapRGB(TheScreen->format, 0, 0, 0);
-	ColorDarkGreen = VideoMapRGB(TheScreen->format, 48, 100, 4);
-	ColorBlue = VideoMapRGB(TheScreen->format, 0, 0, 252);
-	ColorOrange = VideoMapRGB(TheScreen->format, 248, 140, 20);
-	ColorWhite = VideoMapRGB(TheScreen->format, 252, 248, 240);
-	ColorGray = VideoMapRGB(TheScreen->format, 128, 128, 128);
-	ColorRed = VideoMapRGB(TheScreen->format, 252, 0, 0);
-	ColorGreen = VideoMapRGB(TheScreen->format, 0, 252, 0);
-	ColorYellow = VideoMapRGB(TheScreen->format, 252, 252, 0);
+	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
+	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
+	ColorBlue = Video.MapRGB(TheScreen->format, 0, 0, 252);
+	ColorOrange = Video.MapRGB(TheScreen->format, 248, 140, 20);
+	ColorWhite = Video.MapRGB(TheScreen->format, 252, 248, 240);
+	ColorGray = Video.MapRGB(TheScreen->format, 128, 128, 128);
+	ColorRed = Video.MapRGB(TheScreen->format, 252, 0, 0);
+	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
+	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);
 
 	UI.MouseWarpX = UI.MouseWarpY = -1;
 }

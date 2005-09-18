@@ -154,7 +154,7 @@ void InitUserInterface(const char* race_name)
 		SetViewportMode(VIEWPORT_SINGLE);
 	}
 
-	UI.CompletedBarColor = VideoMapRGB(TheScreen->format,
+	UI.CompletedBarColor = Video.MapRGB(TheScreen->format,
 		UI.CompletedBarColorRGB.r,
 		UI.CompletedBarColorRGB.g,
 		UI.CompletedBarColorRGB.b);
