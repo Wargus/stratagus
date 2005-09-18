@@ -8,9 +8,10 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name map.c - The map. */
+/**@name map.cpp - The map. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Vladi Shabanski and François Beerten
+//      (c) Copyright 1998-2005 by Lutz Sammer, Vladi Shabanski and
+//                                 François Beerten
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

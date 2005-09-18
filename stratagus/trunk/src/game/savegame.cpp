@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name savegame.c - Save game. */
+/**@name savegame.cpp - Save game. */
 //
 //      (c) Copyright 2001-2005 by Lutz Sammer, Andreas Arens
 //

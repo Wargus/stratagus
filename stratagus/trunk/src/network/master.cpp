@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name master.c - The master server. */
+/**@name master.cpp - The master server. */
 //
 //      (c) Copyright 2003-2005 by Tom Zickel and Jimmy Salmon
 //

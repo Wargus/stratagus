@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name actions.c - The actions. */
+/**@name actions.cpp - The actions. */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer, Russell Smith, and Jimmy Salmon
 //

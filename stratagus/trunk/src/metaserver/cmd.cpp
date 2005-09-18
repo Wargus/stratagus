@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cmd.c - Client/Server Command Interpreter. */
+/**@name cmd.cpp - Client/Server Command Interpreter. */
 //
 //      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
@@ -468,7 +468,7 @@ static void ParseMsg(Session* session, char* buf)
 /**
 **  ParseBuffer: Handler client/server interaction.
 **
-**  @param ptr  Current session.
+**  @param session  Current session.
 */
 static void ParseBuffer(Session* session)
 {

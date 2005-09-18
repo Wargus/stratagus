@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name command.c - Give units a command. */
+/**@name command.cpp - Give units a command. */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
 //
@@ -999,7 +999,6 @@ void CommandUpgradeTo(Unit* unit, UnitType* type, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
-**  @param flush  if true, flush command queue.
 */
 void CommandTransformIntoType(Unit* unit, UnitType* type)
 {
