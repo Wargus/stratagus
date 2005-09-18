@@ -69,20 +69,20 @@ DefineUnitType("unit-msilo", {
 	SightRange = 3, Armor = 10, BasicDamage = 0, PiercingDamage = 0,
 	Missile = "missile-none", Priority = 20, AnnoyComputerFactor = 45,
 	Points = 100, ExplodeWhenKilled = "missile-160x128-explosion",
-	Corpse = {"build-dead-body4", 0}, Type = land,
+	Corpse = {"build-dead-msilo", 0}, Type = land,
 	MaxMana = 1000, CanCastSpell = {"spell-nuke"},
 	Demand = 400, Building = true, BuilderOutside = true,
 	VisibleUnderFog = true,
 	})
-DefineAnimations("animations-elitebuild7", {
+DefineAnimations("animations-dead-msilo", {
     Death = {"unbreakable begin", "wait 1", "frame 1", "wait 2000", 
              "unbreakable end", "wait 1", },
     })
-DefineUnitType("build-dead-body7", {
+DefineUnitType("build-dead-msilo", {
 	Name = "SiloCrater",
 	Image = {"file", GetCurrentLuaPath().."/missile_silo.png", "size", {256, 256}},
-	Animations = "animations-elitebuild7", Icon = "icon-cancel",
-	Speed = 0, HitPoints = 999, DrawLevel = 10,	TileSize = {4, 4},
+	Animations = "animations-dead-msilo", Icon = "icon-cancel",
+	Speed = 0, HitPoints = 999, DrawLevel = 10,	TileSize = {5, 5},
 	BoxSize = {124, 124}, SightRange = 1, BasicDamage = 0,
 	PiercingDamage = 0, Missile = "missile-none", Priority = 0,
 	Type = "land" , Building = true, Vanishes = true})
