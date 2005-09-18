@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name splitter_lowlevel.c - Low level funcs for Regions.  */
+/**@name splitter_lowlevel.cpp - Low level funcs for Regions.  */
 //
 //      (c) Copyright 1999-2005 by Ludovic Pollet
 //

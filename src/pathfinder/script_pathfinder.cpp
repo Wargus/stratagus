@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name script_pathfinder.c - pathfinder ccl functions. */
+/**@name script_pathfinder.cpp - pathfinder ccl functions. */
 //
 //      (c) Copyright 2000-2004 by Lutz Sammer, Fabrice Rossi, Latimerius.
 //

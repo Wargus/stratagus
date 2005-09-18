@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name sound_server.c - The sound server
+/**@name sound_server.cpp - The sound server
 **                                      (hardware layer and so on) */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer, Fabrice Rossi,

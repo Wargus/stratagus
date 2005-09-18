@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name lowlevel.c - The network lowlevel. */
+/**@name lowlevel.cpp - The network lowlevel. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer and Jimmy Salmon
 //

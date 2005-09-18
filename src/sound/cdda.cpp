@@ -5,12 +5,12 @@
 //     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
 //             \/                  \/          \//_____/            \/
 //  ______________________                           ______________________
-//   T H E   W A R   B E G I N S
-//    Stratagus - A free fantasy real time strategy game engine
+//                        T H E   W A R   B E G I N S
+//         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name cdda.c - cdda support */
+/**@name cdda.cpp - cdda support */
 //
-// (c) Copyright 2002-2003 by Nehal Mistry
+//      (c) Copyright 2002-2005 by Nehal Mistry
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
 //
-// $Id: wav.c,v 1.7 2002/07/20 00:09:05 johns Exp $
+//      $Id: wav.c,v 1.7 2002/07/20 00:09:05 johns Exp $
 
 //@{
 

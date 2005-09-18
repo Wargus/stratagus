@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name player.c - The players. */
+/**@name player.cpp - The players. */
 //
 //      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //

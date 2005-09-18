@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name netdriver.c - Session mangement (SDL_net Socket Implementation). */
+/**@name netdriver.cpp - Session mangement (SDL_net Socket Implementation). */
 //
 //      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
@@ -193,7 +193,7 @@ void ServerQuit(void)
 /**
 **  Returns time (in seconds) that a session has been idle.
 **
-**  @param ptr  This is the session we are checking.
+**  @param session  This is the session we are checking.
 */
 static int IdleSeconds(Session* session)
 {
@@ -203,7 +203,7 @@ static int IdleSeconds(Session* session)
 /**
 **  Destroys and cleans up session data.
 **
-**  @param ptr  Reference to the session to be killed.
+**  @param session  Reference to the session to be killed.
 */
 static int KillSession(Session* session)
 {

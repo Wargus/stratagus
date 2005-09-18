@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unit_cache.c - The unit cache. */
+/**@name unit_cache.cpp - The unit cache. */
 //
 //      Cache to find units faster from position.
 //      Sort of trivial implementation, since most queries are on a single tile.

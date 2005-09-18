@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name menu_proc.c - The menu processing code. */
+/**@name menu_proc.cpp - The menu processing code. */
 //
 //      (c) Copyright 1999-2005 by Andreas Arens, Jimmy Salmon, Nehal Mistry
 //
@@ -815,12 +815,12 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 /**
 **  Draw checkbox on menu x, y
 **
-**  @param style  Checkbox style
-**  @param flags  State of Button (clicked, mouse over...)
-**  @param state  State
-**  @param x      X display position
-**  @param y      Y display position
-**  @param text   text to print on button
+**  @param style   Checkbox style
+**  @param flags   State of Button (clicked, mouse over...)
+**  @param checked Checked
+**  @param x       X display position
+**  @param y       Y display position
+**  @param text    text to print on button
 */
 static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 	int x, int y, const char* text)

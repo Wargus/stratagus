@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name movie.c - Movie playback functions. */
+/**@name movie.cpp - Movie playback functions. */
 //
 //      (c) Copyright 2005 by Nehal Mistry and Jimmy Salmon
 //

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name groups.c - The units' groups handling. */
+/**@name groups.cpp - The units' groups handling. */
 //
 //      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer,
 //                                 and Jimmy Salmon

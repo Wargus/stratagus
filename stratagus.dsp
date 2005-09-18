@@ -522,6 +522,34 @@ SOURCE=.\src\ui\script_ui.cpp
 SOURCE=.\src\ui\ui.cpp
 # End Source File
 # End Group
+# Begin Group "tolua"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua_event.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua_is.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua_map.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua_push.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\tolua\tolua_to.cpp
+# End Source File
+# End Group
 # Begin Group "unit"
 
 # PROP Default_Filter ""
@@ -604,34 +632,6 @@ SOURCE=.\src\video\sprite.cpp
 # Begin Source File
 
 SOURCE=.\src\video\video.cpp
-# End Source File
-# End Group
-# Begin Group "tolua"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua_event.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua_is.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua_map.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua_push.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\tolua\tolua_to.cpp
 # End Source File
 # End Group
 # End Group

@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //        Stratagus - A free fantasy real time strategy game engine
 //
-/**@name unitsound.c - The unit sounds. */
+/**@name unitsound.cpp - The unit sounds. */
 //
 //      (c) Copyright 1999-2005 by Fabrice Rossi and Jimmy Salmon
 //

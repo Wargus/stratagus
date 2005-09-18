@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name linedraw.c - The general linedraw functions. */
+/**@name linedraw.cpp - The general linedraw functions. */
 //
 //      (c) Copyright 2000-2005 by Lutz Sammer, Stephan Rasenberg,
 //                                 Jimmy Salmon, and Nehal Mistry

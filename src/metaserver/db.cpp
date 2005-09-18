@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name db.c - Database routines. */
+/**@name db.cpp - Database routines. */
 //
 //      (c) Copyright 2005 by Jimmy Salmon
 //

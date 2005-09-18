@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name edmap.c - Editor map functions. */
+/**@name edmap.cpp - Editor map functions. */
 //
 //      (c) Copyright 2002-2005 by Lutz Sammer
 //
