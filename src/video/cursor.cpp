@@ -195,7 +195,7 @@ static void DrawVisibleRectangleCursor(int x, int y, int x1, int y1)
 	}
 
 	if (w && h) {
-		VideoDrawRectangleClip(ColorGreen, x, y, w, h);
+		Video.DrawRectangleClip(ColorGreen, x, y, w, h);
 	}
 }
 
@@ -278,7 +278,7 @@ static void DrawBuildingCursor(void)
 			} else {
 				color = ColorRed;
 			}
-			VideoFillTransRectangleClip(color, x + w * TileSizeX, y + h *
+			Video.FillTransRectangleClip(color, x + w * TileSizeX, y + h *
 				TileSizeY, TileSizeX, TileSizeY, 95);
 		}
 	}

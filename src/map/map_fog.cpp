@@ -489,7 +489,7 @@ void VideoDrawOnlyFog(int x, int y)
 #else
 void VideoDrawOnlyFog(int x, int y)
 {
-	VideoFillRectangleClip(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity),
+	Video.FillRectangleClip(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity),
 		x, y, TileSizeX, TileSizeY);
 }
 #endif
@@ -686,7 +686,7 @@ void DrawMapFogOfWar(Viewport* vp)
 			if (VisibleTable[my * TheMap.Info.MapWidth + mx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-				VideoFillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
+				Video.FillRectangleClip(ColorBlack, dx, dy, TileSizeX, TileSizeY);
 			}
 			++sx;
 			dx += TileSizeX;

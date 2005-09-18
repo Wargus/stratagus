@@ -4264,7 +4264,7 @@ static void EditorNewMap(void)
 	TheMap.Info.MapWidth = atoi(width);
 	TheMap.Info.MapHeight = atoi(height);
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	*CurrentMapPath = '\0';
 
@@ -4378,7 +4378,7 @@ static void EditorMainLoadMap(void)
 		return;
 	}
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	if (ScenSelectPath[0]) {
 		s = ScenSelectPath + strlen(ScenSelectPath);
@@ -4491,7 +4491,7 @@ void EditorLoadMenu(void)
 		return;
 	}
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	if (ScenSelectPath[0]) {
 		s = ScenSelectPath + strlen(ScenSelectPath);

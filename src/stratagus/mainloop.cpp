@@ -268,7 +268,7 @@ void DrawMapArea(void)
 			color = ColorBlack;
 		}
 
-		VideoDrawRectangle(color, vp->X, vp->Y, vp->EndX - vp->X + 1,
+		Video.DrawRectangle(color, vp->X, vp->Y, vp->EndX - vp->X + 1,
 			vp->EndY - vp->Y + 1);
 	}
 }

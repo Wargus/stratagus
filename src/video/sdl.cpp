@@ -140,10 +140,10 @@ void SetVideoSync(void)
 */
 static void InitOpenGL(void)
 {
-	glViewport(0, 0, (GLsizei)VideoWidth, (GLsizei)VideoHeight);
+	glViewport(0, 0, (GLsizei)Video.Width, (GLsizei)Video.Height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, VideoWidth, VideoHeight, 0, -1, 1);
+	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.375, 0.375, 0.);
@@ -708,7 +708,7 @@ void WaitEventsOneFrame(const EventCallback *callbacks)
 	}
 
 #ifndef USE_OPENGL
-	VideoClearScreen();
+	Video.ClearScreen();
 #endif
 }
 
