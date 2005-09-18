@@ -489,7 +489,7 @@ void VideoDrawOnlyFog(int x, int y)
 #else
 void VideoDrawOnlyFog(int x, int y)
 {
-	Video.FillRectangleClip(VideoMapRGBA(0, 0, 0, 0, FogOfWarOpacity),
+	Video.FillRectangleClip(Video.MapRGBA(0, 0, 0, 0, FogOfWarOpacity),
 		x, y, TileSizeX, TileSizeY);
 }
 #endif
@@ -721,7 +721,7 @@ void InitMapFogOfWar(void)
 
 	// FIXME: Make the color configurable
 	SDL_GetRGB(ColorBlack, TheScreen->format, &r, &g, &b);
-	color = VideoMapRGB(s->format, r, g, b);
+	color = Video.MapRGB(s->format, r, g, b);
 
 	SDL_FillRect(s, NULL, color);
 	OnlyFogSurface = SDL_DisplayFormat(s);
@@ -760,9 +760,9 @@ void InitMapFogOfWar(void)
 		for (j = 0; j < s->h; ++j) {
 			for (i = 0; i < s->w; ++i) {
 				c = *(Uint32*)&((Uint8*)s->pixels)[i * 4 + j * s->pitch];
-				VideoGetRGBA(c, s->format, &r, &g, &b, &a);
+				Video.GetRGBA(c, s->format, &r, &g, &b, &a);
 				if (a) {
-					c = VideoMapRGBA(s->format, r, g, b, FogOfWarOpacity);
+					c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
 					*(Uint32*)&((Uint8*)s->pixels)[i * 4 + j * s->pitch] = c;
 				}
 

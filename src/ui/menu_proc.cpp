@@ -235,7 +235,7 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 		}
 	}
 	if (!p->BorderColor) {
-		p->BorderColor = VideoMapRGB(TheScreen->format,
+		p->BorderColor = Video.MapRGB(TheScreen->format,
 			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
 	}
 	if (p->BorderSize) {
@@ -923,7 +923,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 		}
 	}
 	if (!p->BorderColor) {
-		p->BorderColor = VideoMapRGB(TheScreen->format,
+		p->BorderColor = Video.MapRGB(TheScreen->format,
 			p->BorderColorRGB.r, p->BorderColorRGB.g, p->BorderColorRGB.b);
 	}
 	if (p->BorderSize) {

@@ -209,6 +209,39 @@ public:
 	void FillCircleClip(Uint32 color, int x, int y, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
+#ifndef USE_OPENGL
+	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
+		return SDL_MapRGB(f, r, g, b);
+	}
+	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+		return SDL_MapRGBA(f, r, g, b, a);
+	}
+	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b) {
+		SDL_GetRGB(c, f, r, g, b);
+	}
+	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+		SDL_GetRGBA(c, f, r, g, b, a);
+	}
+#else
+	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
+		return MapRGBA(f, r, g, b, 0xFF);
+	}
+	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+		return (r | (g << 8) | (b << 16) | (a << 24));
+	}
+	inline void GetRGB(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b) {
+		*r = (c >> 0) & 0xff;
+		*g = (c >> 8) & 0xff;
+		*b = (c >> 16) & 0xff;
+	}
+	inline void GetRGBA(Uint32 c, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+		*r = (c >> 0) & 0xff;
+		*g = (c >> 8) & 0xff;
+		*b = (c >> 16) & 0xff;
+		*a = (c >> 24) & 0xff;
+	}
+#endif
+
 	int Width;
 	int Height;
 	int Depth;
@@ -349,25 +382,6 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
-#ifndef USE_OPENGL
-#define VideoMapRGB(f, r, g, b) SDL_MapRGB((f), (r), (g), (b))
-#define VideoMapRGBA(f, r, g, b, a) SDL_MapRGBA((f), (r), (g), (b), (a))
-#define VideoGetRGB(c, f, r, g, b) SDL_GetRGB((c), (f), (r), (g), (b))
-#define VideoGetRGBA(c, f, r, g, b, a) SDL_GetRGBA((c), (f), (r), (g), (b), (a))
-#else
-#define VideoMapRGB(f, r, g, b) VideoMapRGBA((f), (r), (g), (b), 0xff)
-#define VideoMapRGBA(f, r, g, b, a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
-#define VideoGetRGB(c, r, g, b) { \
-	*(r) = ((c) >> 0) & 0xff; \
-	*(g) = ((c) >> 8) & 0xff; \
-	*(b) = ((c) >> 16) & 0xff; }
-#define VideoGetRGBA(c, r, g, b, a) { \
-	*(r) = ((c) >> 0) & 0xff; \
-	*(g) = ((c) >> 8) & 0xff; \
-	*(b) = ((c) >> 16) & 0xff; \
-	*(a) = ((c) >> 24) & 0xff; }
-#endif
-
 #ifdef USE_OPENGL
 void DrawTexture(const Graphic *g, GLuint *textures, int sx, int sy,
 	int ex, int ey, int x, int y, int flip);
@@ -388,9 +402,6 @@ extern void VideoDrawPixel(Uint32 color, int x, int y);
 extern void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha);
 #endif
-
-	/// Draw 8bit raw graphic data clipped, using given pixel pallette
-extern void VideoDrawRawClip(SDL_Surface *surface, int x, int y, int w, int h);
 
 //@}
 

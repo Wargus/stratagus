@@ -282,7 +282,7 @@ void CMinimap::UpdateTerrain(void)
 					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						TheMap.TileGraphic->Surface->pitch]];
-				c = VideoMapRGB(0, color.r, color.g, color.b);
+				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
 				SDL_PixelFormat* f;
 
@@ -290,7 +290,7 @@ void CMinimap::UpdateTerrain(void)
 				c = *(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * bpp + (yofs + 6 + (my % scaley) * 8) *
 					TheMap.TileGraphic->Surface->pitch];
-				c = VideoMapRGB(0,
+				c = Video.MapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
 					((c & f->Bmask) >> f->Bshift));
@@ -412,7 +412,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 					((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
 						xofs + 7 + (mx % scalex) * 8 + (yofs + 6 + (my % scaley) * 8) *
 						TheMap.TileGraphic->Surface->pitch]];
-				c = VideoMapRGB(0, color.r, color.g, color.b);
+				c = Video.MapRGB(0, color.r, color.g, color.b);
 			} else {
 				SDL_PixelFormat* f;
 
@@ -420,7 +420,7 @@ void CMinimap::UpdateXY(int tx, int ty)
 				c = *(Uint32 *)&((Uint8 *)TheMap.TileGraphic->Surface->pixels)[
 					(xofs + 7 + (mx % scalex) * 8) * 4 + (yofs + 6 + (my % scaley) * 8) *
 					TheMap.TileGraphic->Surface->pitch];
-				c = VideoMapRGB(0,
+				c = Video.MapRGB(0,
 					((c & f->Rmask) >> f->Rshift),
 					((c & f->Gmask) >> f->Gshift),
 					((c & f->Bmask) >> f->Bshift));
@@ -467,7 +467,7 @@ static void DrawUnitOn(Unit *unit, int red_phase)
 	//  FIXME: We should force unittypes to have a certain color on the minimap.
 	//
 	if (unit->Player->Index == PlayerNumNeutral) {
-		color = VideoMapRGB(TheScreen->format,
+		color = Video.MapRGB(TheScreen->format,
 			type->NeutralMinimapColorRGB.r,
 			type->NeutralMinimapColorRGB.g,
 			type->NeutralMinimapColorRGB.b);
@@ -504,7 +504,7 @@ static void DrawUnitOn(Unit *unit, int red_phase)
 #ifndef USE_OPENGL
 			if (bpp == 1) {
 				((Uint8 *)MinimapSurface->pixels)[mx + w + (my + h) * MinimapSurface->pitch] =
-					VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
+					Video.MapRGB(MinimapSurface->format, c.r, c.g, c.b);
 			} else if (bpp == 3) {
 				unsigned char *d;
 
@@ -514,7 +514,7 @@ static void DrawUnitOn(Unit *unit, int red_phase)
 				*(d + MinimapSurface->format->Bshift / 8) = c.b;
 			} else {
 				*(Uint32 *)&((Uint8*)MinimapSurface->pixels)[(mx + w) * bpp + (my + h) * MinimapSurface->pitch] =
-					VideoMapRGB(MinimapSurface->format, c.r, c.g, c.b);
+					Video.MapRGB(MinimapSurface->format, c.r, c.g, c.b);
 			}
 #else
 			*(Uint32 *)&(MinimapSurface[((mx + w) + (my + h) * MinimapTextureWidth) * 4]) = color;
@@ -594,7 +594,7 @@ void CMinimap::Update(void)
 #ifndef USE_OPENGL
 				if (bpp == 1) {
 					((Uint8 *)MinimapSurface->pixels)[mx + my * MinimapSurface->pitch] =
-						VideoMapRGB(MinimapSurface->format, 0, 0, 0);
+						Video.MapRGB(MinimapSurface->format, 0, 0, 0);
 				} else if (bpp == 3) {
 					unsigned char *d;
 
@@ -604,11 +604,11 @@ void CMinimap::Update(void)
 					*(d + MinimapSurface->format->Bshift / 8) = 0;
 				} else {
 					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[mx * bpp + my * MinimapSurface->pitch] =
-						VideoMapRGB(MinimapSurface->format, 0, 0, 0);
+						Video.MapRGB(MinimapSurface->format, 0, 0, 0);
 				}
 #else
 				*(Uint32 *)&(MinimapSurface[(mx + my * MinimapTextureWidth) * 4]) =
-					VideoMapRGB(0, 0, 0, 0);
+					Video.MapRGB(0, 0, 0, 0);
 #endif
 			}
 		}
