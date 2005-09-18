@@ -456,7 +456,7 @@ int getopt(int argc, char* const* argv, const char* opts)
 {
 	static int sp = 1;
 	register int c;
-	register char* cp;
+	register const char* cp;
 
 	optarg = NULL;
 
