@@ -97,7 +97,7 @@ void InitPlayers(void)
 			Players[p].Type = PlayerNobody;
 		}
 		for (x = 0; x < PlayerColorIndexCount; ++x) {
-			PlayerColors[p][x] = VideoMapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
+			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x].r,
 				PlayerColorsRGB[p][x].g, PlayerColorsRGB[p][x].b);
 		}
 	}

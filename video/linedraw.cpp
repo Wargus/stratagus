@@ -83,7 +83,7 @@ static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char a
 */
 static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 {
-	((Uint16*)TheScreen->pixels)[x + y * Video.Width] = color;
+	((Uint16 *)TheScreen->pixels)[x + y * Video.Width] = color;
 }
 
 /**
@@ -101,7 +101,7 @@ void VideoDrawPixel16(Uint32 color, int x, int y)
 */
 static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 {
-	((Uint32*)TheScreen->pixels)[x + y * Video.Width] = color;
+	((Uint32 *)TheScreen->pixels)[x + y * Video.Width] = color;
 }
 
 /**
@@ -119,13 +119,13 @@ void VideoDrawPixel32(Uint32 color, int x, int y)
 */
 static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
-	Uint16* p;
+	Uint16 *p;
 	unsigned long dp;
 
 	// Loses precision for speed
 	alpha = (255 - alpha) >> 3;
 
-	p = &((Uint16*)TheScreen->pixels)[x + y * Video.Width];
+	p = &((Uint16 *)TheScreen->pixels)[x + y * Video.Width];
 	color = (((color << 16) | color) & 0x07E0F81F);
 	dp = *p;
 	dp = ((dp << 16) | dp) & 0x07E0F81F;
@@ -151,7 +151,7 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 	unsigned long sp2;
 	unsigned long dp1;
 	unsigned long dp2;
-	Uint32* p;
+	Uint32 *p;
 
 	alpha = 255 - alpha;
 
@@ -166,8 +166,8 @@ static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char al
 	dp2 = (dp1 & 0xFF00FF00) >> 8;
 	dp1 &= 0x00FF00FF;
 
-	dp1 = ((((dp1-color) * alpha) >> 8) + color) & 0x00FF00FF;
-	dp2 = ((((dp2-sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
+	dp1 = ((((dp1 - color) * alpha) >> 8) + color) & 0x00FF00FF;
+	dp2 = ((((dp2 - sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
 	*p = (dp1 | (dp2 << 8));
 
 	Video.UnlockScreen();
@@ -253,9 +253,7 @@ void CVideo::DrawTransVLine(Uint32 color, int x, int y,
 */
 void CVideo::DrawVLineClip(Uint32 color, int x, int y, int height)
 {
-	int w;
-
-	w = 1;
+	int w = 1;
 	CLIP_RECTANGLE(x, y, w, height);
 	DrawVLine(color, x, y, height);
 }
@@ -644,7 +642,7 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 	int w, int h, unsigned char alpha)
 {
 	SDL_Rect drect;
-	SDL_Surface* s;
+	SDL_Surface *s;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
@@ -653,8 +651,8 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 	s = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
 		24, RMASK, GMASK, BMASK, 0);
 
-	SDL_GetRGB(color, TheScreen->format, &r, &g, &b);
-	color = VideoMapRGB(s->format, r, g, b);
+	GetRGB(color, TheScreen->format, &r, &g, &b);
+	color = MapRGB(s->format, r, g, b);
 
 	SDL_FillRect(s, NULL, color);
 
@@ -1011,7 +1009,7 @@ void VideoDrawPixel(Uint32 color, int x, int y)
 {
 	GLubyte r, g, b, a;
 
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	Video.GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_POINTS);
@@ -1033,8 +1031,8 @@ void VideoDrawTransPixel(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	Video.GetRGB(color, &r, &g, &b);
+	color = Video.MapRGBA(0, r, g, b, alpha);
 	VideoDrawPixel(color, x, y);
 }
 
@@ -1066,8 +1064,8 @@ void CVideo::DrawTransPixelClip(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawPixelClip(color, x, y);
 }
 
@@ -1083,7 +1081,7 @@ void CVideo::DrawHLine(Uint32 color, int x, int y, int width)
 {
 	GLubyte r, g, b, a;
 
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -1107,8 +1105,8 @@ void CVideo::DrawTransHLine(Uint32 color, int x, int y, int width,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawHLine(color, x, y, width);
 }
 
@@ -1156,8 +1154,8 @@ void CVideo::DrawTransHLineClip(Uint32 color, int x, int y, int width,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawHLineClip(color, x, y, width);
 }
 
@@ -1173,7 +1171,7 @@ void CVideo::DrawVLine(Uint32 color, int x, int y, int height)
 {
 	GLubyte r, g, b, a;
 
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -1197,8 +1195,8 @@ void CVideo::DrawTransVLine(Uint32 color, int x, int y, int height,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawVLine(color, x, y, height);
 }
 
@@ -1246,8 +1244,8 @@ void CVideo::DrawTransVLineClip(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawVLineClip(color, x, y, height);
 }
 
@@ -1274,7 +1272,7 @@ void CVideo::DrawLine(Uint32 color, int x1, int y1, int x2, int y2)
 	} else if (y1 > y2) {
 		--y2;
 	}
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -1409,7 +1407,7 @@ void CVideo::DrawRectangle(Uint32 color, int x, int y, int w, int h)
 {
 	GLubyte r, g, b, a;
 
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_LINES);
@@ -1443,8 +1441,8 @@ void CVideo::DrawTransRectangle(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawRectangle(color, x, y, w, h);
 }
 
@@ -1548,8 +1546,8 @@ void CVideo::DrawTransRectangleClip(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawRectangleClip(color, x, y, w, h);
 }
 
@@ -1567,7 +1565,7 @@ void CVideo::FillRectangle(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b, a;
 
-	VideoGetRGBA(color, &r, &g, &b, &a);
+	GetRGBA(color, &r, &g, &b, &a);
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(r, g, b, a);
 	glBegin(GL_TRIANGLE_STRIP);
@@ -1594,8 +1592,8 @@ void CVideo::FillTransRectangle(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	FillRectangle(color, x, y, w, h);
 }
 
@@ -1630,8 +1628,8 @@ void CVideo::FillTransRectangleClip(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	FillRectangleClip(color, x, y, w, h);
 }
 
@@ -1708,8 +1706,8 @@ void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int radius,
 {
 	GLubyte r, g, b;
 	
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	DrawCircleClip(color, x, y, radius);
 }
 
@@ -1769,8 +1767,8 @@ void CVideo::FillTransCircle(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 	
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	FillCircle(color, x, y, radius);
 }
 
@@ -1833,8 +1831,8 @@ void CVideo::FillTransCircleClip(Uint32 color, int x, int y,
 {
 	GLubyte r, g, b;
 	
-	VideoGetRGB(color, &r, &g, &b);
-	color = VideoMapRGBA(0, r, g, b, alpha);
+	GetRGB(color, &r, &g, &b);
+	color = MapRGBA(0, r, g, b, alpha);
 	FillCircleClip(color, x, y, radius);
 }
 
