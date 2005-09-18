@@ -99,15 +99,9 @@ static int MenuButtonCurSel = -1;
 **
 ** @return Pointer to the menu, NULL if menu is not found.
 */
-Menu* FindMenu(const char* menu_id)
+Menu *FindMenu(const char *menu_id)
 {
-	Menu** menu;
-
-	if (!(menu = (Menu**)hash_find(MenuHash, (char*)menu_id))) {
-		return NULL;
-	} else {
-		return *menu;
-	}
+	return MenuMap[menu_id];
 }
 
 /**
