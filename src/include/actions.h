@@ -202,8 +202,6 @@ extern void HandleActionSpellCast(struct _unit_* unit);
 extern int UnitShowAnimationScaled(struct _unit_* unit, const struct _animation_* anim, int scale);
 	/// Handle the animation of a unit
 extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* anim);
-	/// Handle the animation of a unit
-extern int UnitShowAnimation(struct _unit_* unit, const struct _animation_* animation);
 	/// Handle the actions of all units each game cycle
 extern void UnitActions(void);
 	/// Unload an unit.
