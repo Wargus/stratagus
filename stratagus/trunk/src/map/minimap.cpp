@@ -638,7 +638,7 @@ void CMinimap::Update(void)
 static void DrawEvents(void)
 {
 	for (int i = 0; i < NumMinimapEvents; ++i) {
-		VideoDrawTransCircleClip(ColorWhite,
+		Video.DrawTransCircleClip(ColorWhite,
 			MinimapEvents[i].X, MinimapEvents[i].Y,
 			MinimapEvents[i].Size, 192);
 		MinimapEvents[i].Size -= 1;
@@ -755,7 +755,7 @@ void CMinimap::DrawCursor(int vx, int vy)
 	int h = (UI.SelectedViewport->MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
-	VideoDrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
+	Video.DrawTransRectangle(UI.ViewportCursorColor, x, y, w, h, 128);
 }
 
 /**

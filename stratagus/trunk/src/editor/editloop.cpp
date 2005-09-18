@@ -468,7 +468,7 @@ static void DrawTileIcons(void)
 
 	if (CursorOn == CursorOnButton &&
 			ButtonUnderCursor >= 300 && ButtonUnderCursor < 306) {
-		VideoDrawRectangle(ColorGray, x - 42,
+		Video.DrawRectangle(ColorGray, x - 42,
 				y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 	}
 
@@ -502,13 +502,13 @@ static void DrawTileIcons(void)
 				break;
 			}
 			TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[0x10 + i * 16], x, y);
-			VideoDrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
+			Video.DrawRectangle(ColorGray, x, y, TileSizeX, TileSizeY);
 			if (TileCursor == i) {
-				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
+				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1, TileSizeX-2, TileSizeY-2);
 
 			}
 			if (CursorOn == CursorOnButton && ButtonUnderCursor == i + 100) {
-				VideoDrawRectangle(ColorWhite, x - 1, y - 1, TileSizeX+2, TileSizeY+2);
+				Video.DrawRectangle(ColorWhite, x - 1, y - 1, TileSizeX+2, TileSizeY+2);
 			}
 			x += TileSizeX+2;
 			++i;
@@ -535,18 +535,18 @@ static void DrawPlayers(void)
 			y += 20;
 		}
 		if (i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody) {
-			VideoDrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
+			Video.DrawRectangle(ColorWhite, x + i % 8 * 20, y, 20, 20);
 		}
-		VideoDrawRectangle(
+		Video.DrawRectangle(
 			i == CursorPlayer && TheMap.Info.PlayerType[i] != PlayerNobody ?
 				ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
 		if (TheMap.Info.PlayerType[i] != PlayerNobody) {
-			VideoFillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
+			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1,
 				17, 17);
 		}
 		if (i == SelectedPlayer) {
-			VideoDrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		sprintf(buf, "%d", i);
 		VideoDrawTextCentered(x + i % 8 * 20 + 10, y + 7, SmallFont, buf);
@@ -674,13 +674,13 @@ static void DrawUnitIcons(void)
 			icon = UnitTypeByIdent(ShownUnitTypes[i])->Icon.Icon;
 			DrawIcon(Players + SelectedPlayer, icon, x, y);
 
-			VideoDrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
+			Video.DrawRectangleClip(ColorGray, x, y, icon->G->Width, icon->G->Height);
 			if (i == SelectedUnitIndex) {
-				VideoDrawRectangleClip(ColorGreen, x + 1, y + 1,
+				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
 					icon->G->Width - 2, icon->G->Height - 2);
 			}
 			if (i == CursorUnitIndex) {
-				VideoDrawRectangleClip(ColorWhite,x - 1, y - 1,
+				Video.DrawRectangleClip(ColorWhite,x - 1, y - 1,
 					icon->G->Width + 2, icon->G->Height + 2);
 			}
 
@@ -705,19 +705,19 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 
 	color = (flags & IconActive) ? ColorGray : ColorBlack;
 
-	VideoDrawRectangleClip(color, x, y, TileSizeX + 7, TileSizeY + 7);
-	VideoDrawRectangleClip(ColorBlack, x + 1, y + 1, TileSizeX + 5, TileSizeY + 5);
+	Video.DrawRectangleClip(color, x, y, TileSizeX + 7, TileSizeY + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, TileSizeX + 5, TileSizeY + 5);
 
-	VideoDrawVLine(ColorGray, x + TileSizeX + 4, y + 5, TileSizeY - 1); // _|
-	VideoDrawVLine(ColorGray, x + TileSizeX + 5, y + 5, TileSizeY - 1);
-	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 4, TileSizeX + 1);
-	VideoDrawHLine(ColorGray, x + 5, y + TileSizeY + 5, TileSizeX + 1);
+	Video.DrawVLine(ColorGray, x + TileSizeX + 4, y + 5, TileSizeY - 1); // _|
+	Video.DrawVLine(ColorGray, x + TileSizeX + 5, y + 5, TileSizeY - 1);
+	Video.DrawHLine(ColorGray, x + 5, y + TileSizeY + 4, TileSizeX + 1);
+	Video.DrawHLine(ColorGray, x + 5, y + TileSizeY + 5, TileSizeX + 1);
 
 	color = (flags & IconClicked) ? ColorGray : ColorWhite;
-	VideoDrawHLine(color, x + 5, y + 3, TileSizeX + 1);
-	VideoDrawHLine(color, x + 5, y + 4, TileSizeX + 1);
-	VideoDrawVLine(color, x + 3, y + 3, TileSizeY + 3);
-	VideoDrawVLine(color, x + 4, y + 3, TileSizeY + 3);
+	Video.DrawHLine(color, x + 5, y + 3, TileSizeX + 1);
+	Video.DrawHLine(color, x + 5, y + 4, TileSizeX + 1);
+	Video.DrawVLine(color, x + 3, y + 3, TileSizeY + 3);
+	Video.DrawVLine(color, x + 4, y + 3, TileSizeY + 3);
 
 	if (flags & IconClicked) {
 		++x;
@@ -729,7 +729,7 @@ static void DrawTileIcon(unsigned tilenum,unsigned x,unsigned y,unsigned flags)
 	TheMap.TileGraphic->DrawFrameClip(TheMap.Tileset.Table[tilenum], x, y);
 
 	if (flags & IconSelected) {
-		VideoDrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
+		Video.DrawRectangleClip(ColorGreen, x, y, TileSizeX, TileSizeY);
 	}
 }
 
@@ -783,11 +783,11 @@ static void DrawEditorPanel(void)
 		x += START_ICON_X + 1;
 		y += START_ICON_Y + 1;
 		if (ButtonUnderCursor == StartButton) {
-			VideoDrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
+			Video.DrawRectangleClip(ColorGray, x - 1, y - 1, IconHeight, IconHeight);
 		}
-		VideoFillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
-		VideoDrawLineClip(PlayerColors[SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
-		VideoDrawLineClip(PlayerColors[SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
+		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
+		Video.DrawLineClip(PlayerColors[SelectedPlayer][0], x, y, x + IconHeight - 2, y + IconHeight - 2);
+		Video.DrawLineClip(PlayerColors[SelectedPlayer][0], x, y + IconHeight - 2, x + IconHeight - 2, y);
 		PopClipping();
 	}
 
@@ -872,7 +872,7 @@ static void DrawMapCursor(void)
 						TheMap.Tileset.Table[0x10 + TileCursor * 16], tx, ty);
 				}
 			}
-			VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
+			Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX * TileCursorSize,
 				TileSizeY * TileCursorSize);
 			PopClipping();
 		} else {
@@ -884,7 +884,7 @@ static void DrawMapCursor(void)
 				PushClipping();
 				SetClipping(UI.MouseViewport->X, UI.MouseViewport->Y,
 					UI.MouseViewport->EndX, UI.MouseViewport->EndY);
-				VideoDrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
+				Video.DrawRectangleClip(ColorWhite, x, y, TileSizeX, TileSizeY);
 				PopClipping();
 			}
 		}
@@ -913,8 +913,8 @@ static void DrawStartLocations(void)
 				DrawUnitType(type, type->Sprite, i, 0, x, y);
 			} else {
 				PushClipping();
-				VideoDrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
-				VideoDrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
+				Video.DrawLineClip(PlayerColors[i][0], x, y, x + TileSizeX, y + TileSizeY);
+				Video.DrawLineClip(PlayerColors[i][0], x, y + TileSizeY, x + TileSizeX, y);
 				PopClipping();
 			}
 		}
@@ -2108,7 +2108,7 @@ void EditorMainLoop(void)
 		InterfaceState = IfaceStateMenu;
 		GameCursor = UI.Point.Cursor;
 
-		VideoClearScreen();
+		Video.ClearScreen();
 		Invalidate();
 	}
 

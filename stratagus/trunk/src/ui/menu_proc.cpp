@@ -134,7 +134,7 @@ static void DrawMenuText(const MenuitemText* mit, int x, int y, int font, int fl
 		rc = oldrc;
 	}
 	if (flag & MI_FLAGS_ACTIVE && mit->action) {
-		VideoDrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
+		Video.DrawRectangle(ColorGray, x - 4, y - 4, l + 5, VideoTextHeight(font) + 5);
 		SetDefaultTextColors(nc, rc);
 	}
 	if (mit->Align == TextAlignCenter) {
@@ -240,7 +240,7 @@ void DrawMenuButton(ButtonStyle* style, unsigned flags, int x, int y,
 	}
 	if (p->BorderSize) {
 		for (i = 0; i < p->BorderSize; ++i) {
-			VideoDrawRectangleClip(p->BorderColor, x - i, y - i,
+			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
 				style->Width + 2 * i, style->Height + 2 * i);
 		}
 	}
@@ -518,9 +518,9 @@ static void DrawPulldown(Menuitem* mi, int mx, int my)
 		}
 		if (flags & MI_FLAGS_SELECTED) {
 			if (flags & MI_FLAGS_DISABLED) {
-				VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w, h);
+				Video.DrawRectangleClip(ColorGray, x - 2, y - 2, w, h);
 			} else {
-				VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w, h);
+				Video.DrawRectangleClip(ColorYellow, x - 2, y - 2, w, h);
 			}
 		}
 	}
@@ -598,9 +598,9 @@ static void DrawListbox(Menuitem* mi, int mx, int my)
 
 	if (flags & MI_FLAGS_SELECTED) {
 		if (flags & MI_FLAGS_DISABLED) {
-			VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w + 1, h + 2);
+			Video.DrawRectangleClip(ColorGray, x - 2, y - 2, w + 1, h + 2);
 		} else {
-			VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w + 1, h + 2);
+			Video.DrawRectangleClip(ColorYellow, x - 2, y - 2, w + 1, h + 2);
 		}
 	}
 	SetDefaultTextColors(oldnc, oldrc);
@@ -701,9 +701,9 @@ static void DrawVSlider(Menuitem* mi, int mx, int my)
 
 		if (flags & MI_FLAGS_SELECTED) {
 			if (flags & MI_FLAGS_DISABLED) {
-				VideoDrawRectangleClip(ColorGray, x, y - 2, w, h + 2);
+				Video.DrawRectangleClip(ColorGray, x, y - 2, w, h + 2);
 			} else {
-				VideoDrawRectangleClip(ColorYellow, x, y - 2, w, h + 2);
+				Video.DrawRectangleClip(ColorYellow, x, y - 2, w, h + 2);
 			}
 		}
 	}
@@ -804,9 +804,9 @@ static void DrawHSlider(Menuitem* mi, int mx, int my)
 
 		if (flags & MI_FLAGS_SELECTED) {
 			if (flags & MI_FLAGS_DISABLED) {
-				VideoDrawRectangleClip(ColorGray, x - 2, y, w + 2, h);
+				Video.DrawRectangleClip(ColorGray, x - 2, y, w + 2, h);
 			} else {
-				VideoDrawRectangleClip(ColorYellow, x - 2, y, w + 2, h);
+				Video.DrawRectangleClip(ColorYellow, x - 2, y, w + 2, h);
 			}
 		}
 	}
@@ -928,7 +928,7 @@ static void DrawCheckbox(CheckboxStyle* style, unsigned flags, unsigned checked,
 	}
 	if (p->BorderSize) {
 		for (i = 0; i < p->BorderSize; ++i) {
-			VideoDrawRectangleClip(p->BorderColor, x - i, y - i,
+			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
 				style->Width + 2 * i, style->Height + 2 * i);
 		}
 	}
@@ -1017,9 +1017,9 @@ static void DrawInput(Menuitem* mi, int mx, int my)
 		}
 		if (flags & MI_FLAGS_SELECTED) {
 			if (flags & MI_FLAGS_DISABLED) {
-				VideoDrawRectangleClip(ColorGray, x - 2, y - 2, w + 4, h);
+				Video.DrawRectangleClip(ColorGray, x - 2, y - 2, w + 4, h);
 			} else {
-				VideoDrawRectangleClip(ColorYellow, x - 2, y - 2, w + 4, h);
+				Video.DrawRectangleClip(ColorYellow, x - 2, y - 2, w + 4, h);
 			}
 		}
 	}
@@ -1053,30 +1053,30 @@ void DrawMenu(Menu* menu)
 
 	if (menu->Panel && !strcmp(menu->Panel, ScPanel)) {
 		// Background
-		VideoFillTransRectangle(ColorBlack, menu->X + 1,
+		Video.FillTransRectangle(ColorBlack, menu->X + 1,
 				menu->Y + 1, menu->Width - 2, menu->Height - 2, 50);
-		VideoDrawHLineClip(ColorBlue, menu->X + 3, menu->Y, menu->Width - 6);
-		VideoDrawHLineClip(ColorBlue, menu->X + 3, menu->Y + menu->Height - 1, menu->Width - 6);
-		VideoDrawVLineClip(ColorBlue, menu->X, menu->Y + 3, menu->Height - 6);
-		VideoDrawVLineClip(ColorBlue, menu->X + menu->Width - 1, menu->Y + 3, menu->Height - 6);
+		Video.DrawHLineClip(ColorBlue, menu->X + 3, menu->Y, menu->Width - 6);
+		Video.DrawHLineClip(ColorBlue, menu->X + 3, menu->Y + menu->Height - 1, menu->Width - 6);
+		Video.DrawVLineClip(ColorBlue, menu->X, menu->Y + 3, menu->Height - 6);
+		Video.DrawVLineClip(ColorBlue, menu->X + menu->Width - 1, menu->Y + 3, menu->Height - 6);
 		// top left
-		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 1);
-		VideoDrawPixelClip(ColorBlue, menu->X + 2, menu->Y + 1);
-		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 1);
+		Video.DrawPixelClip(ColorBlue, menu->X + 2, menu->Y + 1);
+		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + 2);
 		// top right
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + 1);
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 1);
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + 1);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 1);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + 2);
 		// bottom left
-		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 3);
-		VideoDrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 2);
-		VideoDrawPixelClip(ColorBlue, menu->X + 2, menu->Y + menu->Height - 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 3);
+		Video.DrawPixelClip(ColorBlue, menu->X + 1, menu->Y + menu->Height - 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + 2, menu->Y + menu->Height - 2);
 		// bottom right
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + menu->Height - 2);
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
-		VideoDrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 3, menu->Y + menu->Height - 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 2);
+		Video.DrawPixelClip(ColorBlue, menu->X + menu->Width - 2, menu->Y + menu->Height - 3);
 	} else if (menu->Panel) {
-		MenuPanel* menupanel;
+		MenuPanel *menupanel;
 
 		menupanel = UI.MenuPanels;
 		while (menupanel) {

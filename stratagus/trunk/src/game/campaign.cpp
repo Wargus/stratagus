@@ -111,7 +111,7 @@ char* NextChapter(void)
 			if (CurrentChapter->Type == ChapterShowPicture) {
 				ShowPicture(CurrentChapter);
 			} else if (CurrentChapter->Type == ChapterPlayMovie) {
-				VideoClearScreen();
+				Video.ClearScreen();
 				PlayMovie(CurrentChapter->Data.Movie.File);
 			} else if (CurrentChapter->Type == ChapterPlayLevel) {
 				break;
