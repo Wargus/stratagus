@@ -204,12 +204,7 @@ extern int SlowFrameCounter;
 	/// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette(void);
 
-	/**
-	**  Architecture-dependant videomemory. Set by InitVideoXXX.
-	**  FIXME: need a new function to set it, see #ifdef SDL code
-	**  @see InitVideo @see InitVideoSdl
-	**  @see VMemType
-	*/
+	/// The SDL screen
 extern SDL_Surface *TheScreen;
 
 #ifdef USE_OPENGL
