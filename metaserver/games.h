@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name optargs.h - Command line parser header. */
+/**@name games.h - Games header. */
 //
 //      (c) Copyright 2005 by Edward Haase and Jimmy Salmon
 //
