@@ -373,7 +373,7 @@ static void MultiGamePlayerSelectorsUpdate(int initial);
 ----------------------------------------------------------------------------*/
 
 	/// Hash table of all the menus
-_MenuHash MenuHash;
+std::map<std::string, Menu *> MenuMap;
 	/// Hash table of all the menu functions
 _MenuFuncHash MenuFuncHash;
 

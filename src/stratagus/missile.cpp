@@ -40,6 +40,10 @@
 #include <math.h>
 
 #include "stratagus.h"
+
+#include <string>
+#include <map>
+
 #include "video.h"
 #include "font.h"
 #include "tileset.h"
@@ -64,7 +68,7 @@
 /**
 **  Missile class names, used to load/save the missiles.
 */
-const char* MissileClassNames[] = {
+const char *MissileClassNames[] = {
 	"missile-class-none",
 	"missile-class-point-to-point",
 	"missile-class-point-to-point-with-hit",
@@ -99,30 +103,21 @@ static FuncController *MissileClassFunctions[] = {
 	MissileActionDeathCoil
 };
 
-MissileType** MissileTypes;              /// Missile types.
+MissileType **MissileTypes;              /// Missile types.
 int NumMissileTypes;                     /// number of missile-types made.
 
-static Missile* GlobalMissiles[MAX_MISSILES];    /// all global missiles on map
+static Missile *GlobalMissiles[MAX_MISSILES];    /// all global missiles on map
 static int NumGlobalMissiles;                    /// currently used missiles
 
-static Missile* LocalMissiles[MAX_MISSILES * 8]; /// all local missiles on map
+static Missile *LocalMissiles[MAX_MISSILES * 8]; /// all local missiles on map
 static int NumLocalMissiles;                     /// currently used missiles
 
-#ifdef DOXYGEN  // no real code, only for document
-
 	/// lookup table for missile names
-static MissileType* MissileTypeHash[61];
+static std::map<std::string, MissileType *> MissileTypeMap;
 
-#else
+BurningBuildingFrame *BurningBuildingFrames; /// Burning building frames
 
-	/// lookup table for missile names
-static hashtable(MissileType*, 61) MissileTypeHash;
-
-#endif
-
-BurningBuildingFrame* BurningBuildingFrames; /// Burning building frames
-
-extern NumberDesc* Damage;                   /// Damage calculation for missile.
+extern NumberDesc *Damage;                   /// Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -133,7 +128,7 @@ extern NumberDesc* Damage;                   /// Damage calculation for missile.
 **
 **  @param mtype  Type of missile to Load
 */
-void LoadMissileSprite(MissileType* mtype)
+void LoadMissileSprite(MissileType *mtype)
 {
 	if (mtype->G && !mtype->G->Loaded()) {
 		mtype->G->Load();
@@ -154,9 +149,7 @@ void LoadMissileSprite(MissileType* mtype)
 void LoadMissileSprites(void)
 {
 #ifndef DYNAMIC_LOAD
-	int i;
-
-	for (i = 0; i < NumMissileTypes; ++i) {
+	for (int i = 0; i < NumMissileTypes; ++i) {
 		LoadMissileSprite(MissileTypes[i]);
 	}
 #endif
@@ -168,12 +161,9 @@ void LoadMissileSprites(void)
 **
 **  @return       Missile type pointer.
 */
-MissileType* MissileTypeByIdent(const char* ident)
+MissileType *MissileTypeByIdent(const char *ident)
 {
-	MissileType* const* mtype;
-
-	mtype = (MissileType**)hash_find(MissileTypeHash, (char*)ident);
-	return mtype ? *mtype : NULL;
+	return MissileTypeMap[ident];
 }
 
 /**
@@ -183,18 +173,17 @@ MissileType* MissileTypeByIdent(const char* ident)
 **
 **  @return       New allocated (zeroed) missile-type pointer.
 */
-MissileType* NewMissileTypeSlot(char* ident)
+MissileType *NewMissileTypeSlot(char *ident)
 {
-	MissileType* mtype;
-	int i;
+	MissileType *mtype;
 
-	MissileTypes = (MissileType**)realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
-	mtype = MissileTypes[NumMissileTypes++] = (MissileType*)calloc(1, sizeof(MissileType));
+	MissileTypes = (MissileType **)realloc(MissileTypes, (NumMissileTypes + 1) * sizeof(MissileType*));
+	mtype = MissileTypes[NumMissileTypes++] = (MissileType *)calloc(1, sizeof(MissileType));
 	mtype->Ident = ident;
 
 	// Rehash.
-	for (i = 0; i < NumMissileTypes; ++i) {
-		*(MissileType**)hash_add(MissileTypeHash, MissileTypes[i]->Ident) = MissileTypes[i];
+	for (int i = 0; i < NumMissileTypes; ++i) {
+		MissileTypeMap[MissileTypes[i]->Ident] = MissileTypes[i];
 	}
 
 	return mtype;
@@ -205,9 +194,9 @@ MissileType* NewMissileTypeSlot(char* ident)
 **
 **  @return the new global missile.
 */
-static Missile* NewGlobalMissile(void)
+static Missile *NewGlobalMissile(void)
 {
-	Missile* missile;
+	Missile *missile;
 
 	// Check maximum missiles!
 	if (NumGlobalMissiles == MAX_MISSILES - 1) {
@@ -216,7 +205,7 @@ static Missile* NewGlobalMissile(void)
 		return NULL;
 	}
 
-	missile = (Missile*)calloc(1, sizeof(Missile));
+	missile = (Missile *)calloc(1, sizeof(Missile));
 	missile->MissileSlot = GlobalMissiles + NumGlobalMissiles;
 	GlobalMissiles[NumGlobalMissiles++] = missile;
 
@@ -228,9 +217,9 @@ static Missile* NewGlobalMissile(void)
 **
 **  @return the new local missile.
 */
-static Missile* NewLocalMissile(void)
+static Missile *NewLocalMissile(void)
 {
-	Missile* missile;
+	Missile *missile;
 
 	// Check maximum missiles!
 	if (NumLocalMissiles == MAX_LOCAL_MISSILES - 1) {
@@ -239,7 +228,7 @@ static Missile* NewLocalMissile(void)
 		return NULL;
 	}
 
-	missile = (Missile*)calloc(1, sizeof(Missile));
+	missile = (Missile *)calloc(1, sizeof(Missile));
 	missile->MissileSlot = LocalMissiles + NumLocalMissiles;
 	LocalMissiles[NumLocalMissiles++] = missile;
 	missile->Local = 1;
@@ -259,7 +248,7 @@ static Missile* NewLocalMissile(void)
 **
 **  @return         created missile.
 */
-static Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
+static Missile *InitMissile(Missile *missile, MissileType *mtype, int sx,
 	int sy, int dx, int dy)
 {
 	missile->X = sx - mtype->Width / 2;
@@ -296,9 +285,9 @@ static Missile* InitMissile(Missile* missile, MissileType* mtype, int sx,
 **
 **  @return       created missile.
 */
-Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
+Missile *MakeMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
-	Missile* missile;
+	Missile *missile;
 
 	if (!(missile = NewGlobalMissile())) {
 		return missile;
@@ -318,9 +307,9 @@ Missile* MakeMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 **
 **  @return       created missile.
 */
-Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
+Missile *MakeLocalMissile(MissileType *mtype, int sx, int sy, int dx, int dy)
 {
-	Missile* missile;
+	Missile *missile;
 
 	if (!(missile = NewLocalMissile())) {
 		return NULL;
@@ -334,10 +323,10 @@ Missile* MakeLocalMissile(MissileType* mtype, int sx, int sy, int dx, int dy)
 **
 **  @param missile  Missile pointer.
 */
-static void FreeMissile(Missile* missile)
+static void FreeMissile(Missile *missile)
 {
-	Missile* temp;
-	Unit* unit;
+	Missile *temp;
+	Unit *unit;
 
 	//
 	// Release all unit references.
@@ -386,8 +375,8 @@ static void FreeMissile(Missile* missile)
 **
 **  @return                damage inflicted to goal.
 */
-static int CalculateDamageStats(const UnitStats* attacker_stats,
-	const UnitStats* goal_stats, int bloodlust, int xp)
+static int CalculateDamageStats(const UnitStats *attacker_stats,
+	const UnitStats *goal_stats, int bloodlust, int xp)
 {
 	int damage;
 	int basic_damage;
@@ -418,7 +407,7 @@ static int CalculateDamageStats(const UnitStats* attacker_stats,
 **
 **  @return          damage produces on goal.
 */
-static int CalculateDamage(const Unit* attacker, const Unit* goal)
+static int CalculateDamage(const Unit *attacker, const Unit *goal)
 {
 	int res;
 
@@ -446,14 +435,14 @@ static int CalculateDamage(const Unit* attacker, const Unit* goal)
 **
 **  @param unit  Unit that fires the missile.
 */
-void FireMissile(Unit* unit)
+void FireMissile(Unit *unit)
 {
 	int x;
 	int y;
 	int dx;
 	int dy;
-	Unit* goal;
-	Missile* missile;
+	Unit *goal;
+	Missile *missile;
 
 	//
 	// Goal dead?
@@ -564,8 +553,8 @@ void FireMissile(Unit* unit)
 **
 **  @return         sx,sy,ex,ey defining area in Map
 */
-static void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
-	int* ex, int* ey)
+static void GetMissileMapArea(const Missile *missile, int *sx, int *sy,
+	int *ex, int *ey)
 {
 #define Bound(x, y) (x) < 0 ? 0 : ((x) > (y) ? (y) : (x))
 	*sx = Bound(missile->X / TileSizeX, TheMap.Info.MapWidth - 1);
@@ -583,7 +572,7 @@ static void GetMissileMapArea(const Missile* missile, int* sx, int* sy,
 **
 **  @return         Returns true if visible, false otherwise.
 */
-static int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
+static int MissileVisibleInViewport(const Viewport *vp, const Missile *missile)
 {
 	int min_x;
 	int max_x;
@@ -615,7 +604,7 @@ static int MissileVisibleInViewport(const Viewport* vp, const Missile* missile)
 **  @param x      Screen pixel X position
 **  @param y      Screen pixel Y position
 */
-static void DrawMissileType(MissileType* mtype, int frame, int x, int y)
+static void DrawMissileType(MissileType *mtype, int frame, int x, int y)
 {
 #ifdef DYNAMIC_LOAD
 	if (!GraphicLoaded(mtype->G)) {
@@ -659,11 +648,11 @@ static void DrawMissileType(MissileType* mtype, int frame, int x, int y)
 **
 **  @param missile  Missile to draw.
 */
-void DrawMissile(const Missile* missile)
+void DrawMissile(const Missile *missile)
 {
 	int x;
 	int y;
-	const Viewport* vp;
+	const Viewport *vp;
 
 	Assert(missile);
 	Assert(missile->Type);
@@ -697,13 +686,13 @@ void DrawMissile(const Missile* missile)
 **  @param v2  adress of a missile pointer.
 **  @return    -1 if v1 < v2, 1 else.
 */
-static int MissileDrawLevelCompare(const void* v1, const void* v2)
+static int MissileDrawLevelCompare(const void *v1, const void *v2)
 {
-	const Missile* c1;
-	const Missile* c2;
+	const Missile *c1;
+	const Missile *c2;
 
-	c1 = *(Missile**)v1;
-	c2 = *(Missile**)v2;
+	c1 = *(Missile **)v1;
+	c2 = *(Missile **)v2;
 
 	if (c1->Type->DrawLevel == c2->Type->DrawLevel) {
 		return c1->MissileSlot < c2->MissileSlot ? -1 : 1;
@@ -719,11 +708,11 @@ static int MissileDrawLevelCompare(const void* v1, const void* v2)
 **
 **  @return       number of missiles, (size of table).
 */
-int FindAndSortMissiles(const Viewport* vp, Missile** table)
+int FindAndSortMissiles(const Viewport *vp, Missile **table)
 {
-	Missile* missile;
-	Missile* const* missiles;
-	Missile* const* missiles_end;
+	Missile *missile;
+	Missile* const *missiles;
+	Missile* const *missiles_end;
 	int flag;
 	int nmissiles;
 
@@ -763,7 +752,7 @@ int FindAndSortMissiles(const Viewport* vp, Missile** table)
 **  @param dy       Delta in y.
 **  @internal We have : SpriteFrame / (2 * (Numdirection - 1)) == DirectionToHeading / 256.
 */
-static void MissileNewHeadingFromXY(Missile* missile, int dx, int dy)
+static void MissileNewHeadingFromXY(Missile *missile, int dx, int dy)
 {
 	int dir;
 	int nextdir;
@@ -1350,7 +1339,7 @@ void InitMissileTypes(void)
 		//
 		// Add missile names to hash table
 		//
-		*(MissileType**)hash_add(MissileTypeHash, mtype->Ident) = mtype;
+		MissileTypeMap[mtype->Ident] = mtype;
 
 		//
 		// Resolve impact missiles and sounds.
@@ -1375,16 +1364,15 @@ void InitMissileTypes(void)
 */
 void CleanMissileTypes(void)
 {
-	int i;
-	MissileType* mtype;
+	MissileType *mtype;
 
 	if (!MissileTypes) {
 		return;
 	}
 
-	for (i = 0; i < NumMissileTypes; ++i) {
+	for (int i = 0; i < NumMissileTypes; ++i) {
 		mtype = MissileTypes[i];
-		hash_del(MissileTypeHash, mtype->Ident);
+		MissileTypeMap[mtype->Ident] = NULL;
 
 		free(mtype->Ident);
 		free(mtype->FiredSound.Name);
