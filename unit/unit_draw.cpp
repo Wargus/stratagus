@@ -227,7 +227,7 @@ void DrawSelectionNone(Uint32 color, int x1, int y1,
 void DrawSelectionCircle(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
-	VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 		min((x2 - x1) / 2, (y2 - y1) / 2) + 2);
 }
 
@@ -241,9 +241,9 @@ void DrawSelectionCircle(Uint32 color, int x1, int y1,
 void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
-	VideoFillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 		min((x2 - x1) / 2, (y2 - y1) / 2), 95);
-	VideoDrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
+	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 		min((x2 - x1) / 2, (y2 - y1) / 2));
 }
 
@@ -257,7 +257,7 @@ void DrawSelectionCircleWithTrans(Uint32 color, int x1, int y1,
 void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
-	VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
 }
 
 /**
@@ -270,8 +270,8 @@ void DrawSelectionRectangle(Uint32 color, int x1, int y1,
 void DrawSelectionRectangleWithTrans(Uint32 color, int x1, int y1,
 	int x2, int y2)
 {
-	VideoDrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
-	VideoFillTransRectangleClip(color, x1 + 1, y1 + 1,
+	Video.DrawRectangleClip(color, x1, y1, x2 - x1, y2 - y1);
+	Video.FillTransRectangleClip(color, x1 + 1, y1 + 1,
 		x2 - x1 - 2, y2 - y1 - 2, 75);
 }
 
@@ -287,17 +287,17 @@ void DrawSelectionCorners(Uint32 color, int x1, int y1,
 {
 #define CORNER_PIXELS 6
 
-	VideoDrawVLineClip(color, x1, y1, CORNER_PIXELS);
-	VideoDrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x1, y1, CORNER_PIXELS);
+	Video.DrawHLineClip(color, x1 + 1, y1, CORNER_PIXELS - 1);
 
-	VideoDrawVLineClip(color, x2, y1, CORNER_PIXELS);
-	VideoDrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x2, y1, CORNER_PIXELS);
+	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y1, CORNER_PIXELS - 1);
 
-	VideoDrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	VideoDrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x1, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
+	Video.DrawHLineClip(color, x1, y2, CORNER_PIXELS - 1);
 
-	VideoDrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
-	VideoDrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
+	Video.DrawVLineClip(color, x2, y2 - CORNER_PIXELS + 1, CORNER_PIXELS);
+	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
 }
 
 
@@ -834,20 +834,20 @@ void DrawBar(int x, int y, const Unit* unit, const DecoVarType* Deco)
 	// Deco->Data.Bar.Color
 	if (b) {
 		if (Deco->Data.Bar.ShowFullBackground) {
-			VideoFillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
+			Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + width, 2 * b + height);
 		} else {
 			if (Deco->Data.Bar.SEToNW) {
-				VideoFillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
+				Video.FillRectangleClip(bcolor, x - b - w + width, y - b - h + height,
 					2 * b + w, 2 * b + h);
 			} else {
-				VideoFillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
+				Video.FillRectangleClip(bcolor, x - b, y - b, 2 * b + w, 2 * b + h);
 			}
 		}
 	}
 	if (Deco->Data.Bar.SEToNW) {
-		VideoFillRectangleClip(color, x - w + width, y - h + height, w, h);
+		Video.FillRectangleClip(color, x - w + width, y - h + height, w, h);
 	} else {
-		VideoFillRectangleClip(color, x, y, w, h);
+		Video.FillRectangleClip(color, x, y, w, h);
 	}
 }
 
@@ -1143,7 +1143,7 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 			break;
 
 		case UnitActionPatrol:
-			VideoDrawLineClip(ColorGreen, x1, y1, x2, y2);
+			Video.DrawLineClip(ColorGreen, x1, y1, x2, y2);
 			e_color = color = ColorBlue;
 			x1 = Map2ViewportX(CurrentViewport,
 				order->Arg1.Patrol.X) + TileSizeX / 2;
@@ -1230,10 +1230,10 @@ static void ShowSingleOrder(const Unit* unit, int x1, int y1, const Order* order
 			DebugPrint("Unknown action %d\n" _C_ order->Action);
 			break;
 	}
-	VideoFillCircleClip(color, x1, y1, 2);
+	Video.FillCircleClip(color, x1, y1, 2);
 	if (dest) {
-		VideoDrawLineClip(color, x1, y1, x2, y2);
-		VideoFillCircleClip(e_color, x2, y2, 3);
+		Video.DrawLineClip(color, x1, y1, x2, y2);
+		Video.FillCircleClip(e_color, x2, y2, 3);
 	}
 }
 
@@ -1301,7 +1301,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 	if (NumSelected == 1 && unit->Selected) {
 		if (ShowSightRange) {
 			// Radius -1 so you can see all ranges
-			VideoDrawCircleClip(ColorGreen,
+			Video.DrawCircleClip(ColorGreen,
 				x + type->TileWidth * TileSizeX / 2,
 				y + type->TileHeight * TileSizeY / 2,
 				((stats->Variables[SIGHTRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX) - 1);
@@ -1311,7 +1311,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 				r = (unit->Player->Type == PlayerPerson) ?
 					type->ReactRangePerson : type->ReactRangeComputer;
 				if (r) {
-					VideoDrawCircleClip(ColorBlue,
+					Video.DrawCircleClip(ColorBlue,
 						x + type->TileWidth * TileSizeX / 2,
 						y + type->TileHeight * TileSizeY / 2,
 						(r + (type->TileWidth - 1)) * TileSizeX);
@@ -1319,7 +1319,7 @@ static void DrawInformations(const Unit* unit, const UnitType* type, int x, int 
 			}
 			if (ShowAttackRange && stats->Variables[ATTACKRANGE_INDEX].Max) {
 				// Radius + 1 so you can see all ranges
-				VideoDrawCircleClip(ColorRed,
+				Video.DrawCircleClip(ColorRed,
 					x + type->TileWidth * TileSizeX / 2,
 					y + type->TileHeight * TileSizeY / 2,
 					(stats->Variables[ATTACKRANGE_INDEX].Max + (type->TileWidth - 1)) * TileSizeX + 1);

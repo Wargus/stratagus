@@ -416,7 +416,7 @@ static void ShowTitleScreens(void)
 			FreeGraphic(g);
 		}
 
-		VideoClearScreen();
+		Video.ClearScreen();
 	}
 	Invalidate();
 }
@@ -443,7 +443,7 @@ void ShowLoadProgress(const char* fmt, ...)
 				*s = ' ';
 			}
 		}
-		VideoFillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
+		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
 		VideoDrawTextCentered(Video.Width / 2, Video.Height - 16, GameFont, temp);
 		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		RealizeVideoMemory();
@@ -491,7 +491,7 @@ void MenuLoop(const char* filename, WorldMap* map)
 		//
 		//  Clear screen
 		//
-		VideoClearScreen();
+		Video.ClearScreen();
 		Invalidate();
 
 		//
@@ -647,7 +647,7 @@ static int main1(int argc, char** argv)
 	SetDefaultTextColors(FontYellow, FontWhite);
 	LoadFonts();
 	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-	VideoClearScreen();
+	Video.ClearScreen();
 	ShowTitleScreens();
 
 	// Init player data

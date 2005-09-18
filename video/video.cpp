@@ -224,9 +224,9 @@ void CVideo::UnlockScreen(void)
 /**
 **  Clear the video screen.
 */
-void VideoClearScreen(void)
+void CVideo::ClearScreen(void)
 {
-	VideoFillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
+	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
 }
 
 /**

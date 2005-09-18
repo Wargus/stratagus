@@ -369,7 +369,7 @@ void SaveScreenshotPNG(const char* name)
 	png_write_info(png_ptr, info_ptr);
 
 #ifdef USE_OPENGL
-	pixels = malloc(VideoWidth * VideoHeight * 3);
+	pixels = malloc(Video.Width * Video.Height * 3);
 	if (!pixels) {
 		fprintf(stderr, "Out of memory\n");
 		exit(1);

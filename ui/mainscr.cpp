@@ -120,7 +120,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 
 	// FIXME: add icon borders
 	y += unit->Type->Icon.Icon->G->Height;
-	VideoFillRectangleClip(ColorBlack, x, y,
+	Video.FillRectangleClip(ColorBlack, x, y,
 		unit->Type->Icon.Icon->G->Width, 7);
 	if (unit->Variable[HP_INDEX].Value) {
 		f = (100 * unit->Variable[HP_INDEX].Value) / unit->Variable[HP_INDEX].Max;
@@ -134,7 +134,7 @@ static void UiDrawLifeBar(const Unit* unit, int x, int y)
 			color = ColorRed;
 		}
 		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
-		VideoFillRectangleClip(color, x + 1, y + 1, f, 5);
+		Video.FillRectangleClip(color, x + 1, y + 1, f, 5);
 	}
 }
 
@@ -152,12 +152,12 @@ static void UiDrawManaBar(const Unit* unit, int x, int y)
 
 	// FIXME: add icon borders
 	y += unit->Type->Icon.Icon->G->Height;
-	VideoFillRectangleClip(ColorBlack, x, y + 3,
+	Video.FillRectangleClip(ColorBlack, x, y + 3,
 		unit->Type->Icon.Icon->G->Width, 4);
 	if (unit->Stats->Variables[MANA_INDEX].Max) {
 		f = (100 * unit->Variable[MANA_INDEX].Value) / unit->Variable[MANA_INDEX].Max;
 		f = (f * (unit->Type->Icon.Icon->G->Width)) / 100;
-		VideoFillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
+		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
 }
 
@@ -548,10 +548,10 @@ void DrawLifeBar(const Unit* unit, ContentType* content, int defaultfont)
 		color = ColorRed;
 	}
 	// Border
-	VideoFillRectangleClip(ColorBlack, x - 1, y - 1,
+	Video.FillRectangleClip(ColorBlack, x - 1, y - 1,
 		content->Data.LifeBar.Width + 2, content->Data.LifeBar.Height + 2);
 
-	VideoFillRectangleClip(color, x, y,
+	Video.FillRectangleClip(color, x, y,
 		(f * content->Data.LifeBar.Width) / 100, content->Data.LifeBar.Height);
 }
 
@@ -589,20 +589,20 @@ void DrawCompleteBar(const Unit* unit, ContentType* content, int defaultfont)
 	}
 	f = (100 * unit->Variable[index].Value) / unit->Variable[index].Max;
 	if (!content->Data.CompleteBar.Border) {
-		VideoFillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
+		Video.FillRectangleClip(UI.CompletedBarColor, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
 			// Shadow
-			VideoDrawVLine(ColorGray, x + f * w / 100, y, h);
-			VideoDrawHLine(ColorGray, x, y + h, f * w / 100);
+			Video.DrawVLine(ColorGray, x + f * w / 100, y, h);
+			Video.DrawHLine(ColorGray, x, y + h, f * w / 100);
 
 			// |~  Light
-			VideoDrawVLine(ColorWhite, x, y, h);
-			VideoDrawHLine(ColorWhite, x, y, f * w / 100);
+			Video.DrawVLine(ColorWhite, x, y, h);
+			Video.DrawHLine(ColorWhite, x, y, f * w / 100);
 		}
 	} else {
-		VideoDrawRectangleClip(ColorGray, x,     y,     w + 4, h );
-		VideoDrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
-		VideoFillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
+		Video.DrawRectangleClip(ColorGray, x,     y,     w + 4, h );
+		Video.DrawRectangleClip(ColorBlack,x + 1, y + 1, w + 2, h - 2);
+		Video.FillRectangleClip(ColorBlue, x + 2, y + 2, f * w / 100, h - 4);
 	}
 }
 
@@ -1385,8 +1385,8 @@ void CInfoPanel::Draw(void)
 
 				VideoDrawNumber(x + 15, y, GameFont, i);
 
-				VideoDrawRectangle(ColorWhite,x, y, 12, 12);
-				VideoFillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
+				Video.DrawRectangle(ColorWhite,x, y, 12, 12);
+				Video.FillRectangle(Players[i].Color, x + 1, y + 1, 10, 10);
 
 				VideoDrawText(x + 27, y, GameFont,Players[i].Name);
 				VideoDrawNumber(x + 117, y, GameFont,Players[i].Score);

@@ -169,6 +169,46 @@ public:
 	void LockScreen();
 	void UnlockScreen();
 
+	void ClearScreen();
+
+	void DrawPixelClip(Uint32 color, int x, int y);
+	void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);
+
+	void DrawVLine(Uint32 color, int x, int y, int height);
+	void DrawTransVLine(Uint32 color, int x, int y, int height, unsigned char alpha);
+	void DrawVLineClip(Uint32 color, int x, int y, int height);
+	void DrawTransVLineClip(Uint32 color, int x, int y, int height, unsigned char alpha);
+
+	void DrawHLine(Uint32 color, int x, int y, int width);
+	void DrawTransHLine(Uint32 color, int x, int y, int width, unsigned char alpha);
+	void DrawHLineClip(Uint32 color, int x, int y, int width);
+	void DrawTransHLineClip(Uint32 color, int x, int y, int width, unsigned char alpha);
+
+	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy);
+	void DrawTransLine(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
+	void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy);
+	void DrawTransLineClip(Uint32 color, int sx, int sy, int dx, int dy, unsigned char alpha);
+
+	void DrawRectangle(Uint32 color, int x, int y, int w, int h);
+	void DrawTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+	void DrawRectangleClip(Uint32 color, int x, int y, int w, int h);
+	void DrawTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+
+	void FillRectangle(Uint32 color, int x, int y, int w, int h);
+	void FillTransRectangle(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+	void FillRectangleClip(Uint32 color, int x, int y, int w, int h);
+	void FillTransRectangleClip(Uint32 color, int x, int y, int w, int h, unsigned char alpha);
+
+	void DrawCircle(Uint32 color, int x, int y, int r);
+	void DrawTransCircle(Uint32 color, int x, int y, int r, unsigned char alpha);
+	void DrawCircleClip(Uint32 color, int x, int y, int r);
+	void DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha);
+
+	void FillCircle(Uint32 color, int x, int y, int radius);
+	void FillTransCircle(Uint32 color, int x, int y, int radius, unsigned char alpha);
+	void FillCircleClip(Uint32 color, int x, int y, int radius);
+	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
+
 	int Width;
 	int Height;
 	int Depth;
@@ -247,9 +287,6 @@ extern void ReloadGraphics(void);
 
 	/// Initializes video synchronization.
 extern void SetVideoSync(void);
-
-	/// Clear video screen
-extern void VideoClearScreen(void);
 
 	/// Make graphic
 extern Graphic *NewGraphic(const char *file, int w, int h);
@@ -352,121 +389,8 @@ extern void VideoDrawTransPixel(Uint32 color, int x, int y,
 	unsigned char alpha);
 #endif
 
-	/// Draw pixel clipped to current clip setting.
-extern void VideoDrawPixelClip(Uint32 color, int x, int y);
-
-	/// Draw translucent pixel clipped to current clip setting.
-extern void VideoDrawTransPixelClip(Uint32 color, int x, int y,
-	unsigned char alpha);
-
-	/// Draw vertical line unclipped.
-extern void VideoDrawVLine(Uint32 color, int x, int y,
-	int height);
-
-	/// Draw translucent vertical line unclipped.
-extern void VideoDrawTransVLine(Uint32 color, int x, int y,
-	int height, unsigned char alpha);
-
-	/// Draw vertical line clipped to current clip setting
-extern void VideoDrawVLineClip(Uint32 color, int x, int y,
-	int height);
-
-	/// Draw translucent vertical line clipped to current clip setting
-extern void VideoDrawTransVLineClip(Uint32 color, int x, int y,
-	int height, unsigned char alpha);
-
-	/// Draw horizontal line unclipped.
-extern void VideoDrawHLine(Uint32 color, int x, int y,
-	int width);
-
-	/// Draw translucent horizontal line unclipped.
-extern void VideoDrawTransHLine(Uint32 color, int x, int y,
-	int width, unsigned char alpha);
-
-	/// Draw horizontal line clipped to current clip setting
-extern void VideoDrawHLineClip(Uint32 color, int x, int y,
-	int width);
-
-	/// Draw translucent horizontal line clipped to current clip setting
-extern void VideoDrawTransHLineClip(Uint32 color, int x, int y,
-	int width, unsigned char alpha);
-
-	/// Draw line unclipped.
-extern void VideoDrawLine(Uint32 color, int sx, int sy, int dx, int dy);
-
-	/// Draw translucent line unclipped.
-extern void VideoDrawTransLine(Uint32 color, int sx, int sy, int dx, int dy,
-	unsigned char alpha);
-
-	/// Draw line clipped to current clip setting
-extern void VideoDrawLineClip(Uint32 color, int sx, int sy, int dx, int dy);
-
-	/// Draw translucent line clipped to current clip setting
-extern void VideoDrawTransLineClip(Uint32 color, int sx, int sy,
-	int dx, int dy, unsigned char alpha);
-
-	/// Draw rectangle.
-extern void VideoDrawRectangle(Uint32 color, int x, int y,
-	int w, int h);
-
-	/// Draw translucent rectangle.
-extern void VideoDrawTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha);
-
-	/// Draw rectangle clipped.
-extern void VideoDrawRectangleClip(Uint32 color, int x, int y,
-	int w, int h);
-
-	/// Draw translucent rectangle clipped.
-extern void VideoDrawTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha);
-
 	/// Draw 8bit raw graphic data clipped, using given pixel pallette
 extern void VideoDrawRawClip(SDL_Surface *surface, int x, int y, int w, int h);
-
-	/// Draw circle.
-extern void VideoDrawCircle(Uint32 color, int x, int y, int r);
-
-	/// Draw translucent circle.
-extern void VideoDrawTransCircle(Uint32 color, int x, int y, int r,
-	unsigned char alpha);
-
-	/// Draw circle clipped.
-extern void VideoDrawCircleClip(Uint32 color, int x, int y, int r);
-
-	/// Draw translucent circle clipped.
-extern void VideoDrawTransCircleClip(Uint32 color, int x, int y, int r,
-	unsigned char alpha);
-
-	/// Fill rectangle.
-extern void VideoFillRectangle(Uint32 color, int x, int y,
-	int w, int h);
-
-	/// Fill translucent rectangle.
-extern void VideoFillTransRectangle(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha);
-
-	/// Fill rectangle clipped.
-extern void VideoFillRectangleClip(Uint32 color, int x, int y,
-	int w, int h);
-
-	/// Fill translucent rectangle clipped.
-extern void VideoFillTransRectangleClip(Uint32 color, int x, int y,
-	int w, int h, unsigned char alpha);
-
-	/// Fill circle.
-extern void VideoFillCircle(Uint32 color, int x, int y, int radius);
-
-	/// Fill translucent circle.
-extern void VideoFillTransCircle(Uint32 color, int x, int y, int radius,
-	unsigned char alpha);
-
-	/// Fill circle clipped.
-extern void VideoFillCircleClip(Uint32 color, int x, int y, int radius);
-
-	/// Fill translucent circle clipped.
-extern void VideoFillTransCircleClip(Uint32 color, int x, int y, int radius,
-	unsigned char alpha);
 
 //@}
 

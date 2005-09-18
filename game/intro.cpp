@@ -396,7 +396,7 @@ void ShowIntro(const Intro* intro)
 	InitContinueButton(455 * Video.Width / 640, 440 * Video.Height / 480);
 	GameCursor = UI.Point.Cursor;
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	old_video_sync = VideoSyncSpeed;
 	VideoSyncSpeed = 100;
@@ -539,7 +539,7 @@ void ShowIntro(const Intro* intro)
 	free(text);
 	FreeGraphic(background);
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -567,7 +567,7 @@ void ShowCredits(Credits* credits)
 	TextLines* scrolling_credits;
 	int old_video_sync;
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	old_video_sync = VideoSyncSpeed;
 	VideoSyncSpeed = 100;
@@ -649,7 +649,7 @@ void ShowCredits(Credits* credits)
 
 	FreeGraphic(background);
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -744,7 +744,7 @@ void ShowPicture(CampaignChapter* chapter)
 	i = 0;
 	max = chapter->Data.Picture.FadeIn;
 	while (IntroNoEvent && i < max) {
-		VideoClearScreen();
+		Video.ClearScreen();
 		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
 			(Video.Width - background->Width) / 2,
@@ -784,7 +784,7 @@ void ShowPicture(CampaignChapter* chapter)
 	//
 	max = chapter->Data.Picture.FadeOut;
 	while (i >= 0) {
-		VideoClearScreen();
+		Video.ClearScreen();
 		background->DrawSubClipTrans(0, 0,
 			background->Width, background->Height,
 			(Video.Width - background->Width) / 2,
@@ -810,7 +810,7 @@ void ShowPicture(CampaignChapter* chapter)
 		lines = ptr;
 	}
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	VideoSyncSpeed = old_video_sync;
 	SetVideoSync();
@@ -822,9 +822,9 @@ void ShowPicture(CampaignChapter* chapter)
 */
 static void DrawStatBox(int x, int y, char* text, Uint32 color, int percent)
 {
-	VideoFillRectangleClip(ColorBlack, x, y, 80, 24);
-	VideoDrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
-	VideoFillRectangleClip(color, x + 3, y + 3, percent * 74 / 100, 18);
+	Video.FillRectangleClip(ColorBlack, x, y, 80, 24);
+	Video.DrawRectangleClip(ColorYellow, x + 1, y + 1, 78, 22);
+	Video.FillRectangleClip(color, x + 3, y + 3, percent * 74 / 100, 18);
 	VideoDrawTextCentered(x + 40, y + 5, LargeFont, text);
 }
 
@@ -1203,7 +1203,7 @@ void ShowStats(void)
 	callbacks.KeyRepeated = IntroCallbackKey3;
 	callbacks.NetworkEvent = NetworkEvent;
 
-	VideoClearScreen();
+	Video.ClearScreen();
 
 	g = NULL;
 	if (GameResult == GameVictory) {
