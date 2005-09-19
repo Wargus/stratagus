@@ -459,7 +459,6 @@ void CreatePlayer(int type)
 /**
 **  Change player side.
 **
-**  @param player  Pointer to player.
 **  @param side    New side (Race).
 */
 void CPlayer::SetSide(int side)
@@ -473,7 +472,6 @@ void CPlayer::SetSide(int side)
 /**
 **  Change player name.
 **
-**  @param player  Pointer to player.
 **  @param name    New name.
 */
 void CPlayer::SetName(const char *name)
@@ -491,7 +489,6 @@ void CPlayer::SetName(const char *name)
 /**
 **  Change the player resource.
 **
-**  @param player    Pointer to player.
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
 */
@@ -503,7 +500,6 @@ void CPlayer::SetResource(int resource, int value)
 /**
 **  Check if the unit-type didn't break any unit limits.
 **
-**  @param player  Pointer to player.
 **  @param type    Type of unit.
 **
 **  @return        True if enough, negative on problem.
@@ -550,7 +546,6 @@ int CPlayer::CheckLimits(const CUnitType *type) const
 /**
 **  Check if enough resources for are available.
 **
-**  @param player  Pointer to player.
 **  @param costs   How many costs.
 **
 **  @return        False if all enough, otherwise a bit mask.
@@ -578,7 +573,6 @@ int CPlayer::CheckCosts(const int *costs) const
 /**
 **  Check if enough resources for new unit is available.
 **
-**  @param player  Pointer to player, which resources are checked.
 **  @param type    Type of unit.
 **
 **  @return        False if all enough, otherwise a bit mask.
@@ -591,7 +585,6 @@ int CPlayer::CheckUnitType(const CUnitType *type) const
 /**
 **  Add costs to the resources
 **
-**  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
 void CPlayer::AddCosts(const int *costs)
@@ -604,7 +597,6 @@ void CPlayer::AddCosts(const int *costs)
 /**
 **  Add the costs of an unit type to resources
 **
-**  @param player  Pointer of player, to which the resources are added.
 **  @param type    Type of unit.
 */
 void CPlayer::AddUnitType(const CUnitType *type)
@@ -616,7 +608,6 @@ void CPlayer::AddUnitType(const CUnitType *type)
 /**
 **  Add a factor of costs to the resources
 **
-**  @param player  Pointer to player.
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
@@ -630,7 +621,6 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 /**
 **  Subtract costs from the resources
 **
-**  @param player  Pointer to player.
 **  @param costs   How many costs.
 */
 void CPlayer::SubCosts(const int *costs)
@@ -643,7 +633,6 @@ void CPlayer::SubCosts(const int *costs)
 /**
 **  Substract the costs of new unit from resources
 **
-**  @param player  Pointer of player, from which the resources are removed.
 **  @param type    Type of unit.
 */
 void CPlayer::SubUnitType(const CUnitType *type)
@@ -654,7 +643,6 @@ void CPlayer::SubUnitType(const CUnitType *type)
 /**
 **  Substract a factor of costs from the resources
 **
-**  @param player  Pointer to player.
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
@@ -668,7 +656,6 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 /**
 **  Have unit of type.
 **
-**  @param player  Pointer to player.
 **  @param type    Type of unit.
 **
 **  @return        How many exists, false otherwise.
@@ -681,7 +668,6 @@ int CPlayer::HaveUnitTypeByType(const CUnitType *type) const
 /**
 **  Have unit of type.
 **
-**  @param player  Pointer to owning player.
 **  @param ident   Identifier of unit-type that should be lookuped.
 **
 **  @return        How many exists, false otherwise.
@@ -819,7 +805,6 @@ void DebugPlayers(void)
 /**
 **  Notify player about a problem.
 **
-**  @param player  Player with it
 **  @param type    Problem type
 **  @param x       Map X tile position
 **  @param y       Map Y tile position
